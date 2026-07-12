@@ -27,6 +27,7 @@
     game.canvas = document.getElementById('screen');
     game.ctx = game.canvas.getContext('2d');
     game.ctx.imageSmoothingEnabled = false;
+    if (PH.sprites) PH.sprites.preload();
     PH.ui.init();
     bindInput();
     resize();
@@ -62,7 +63,7 @@
           <button class="btn ${cont ? 'ghost' : 'primary'} big" id="t_new">Nueva partida</button>
         </div>
         <div class="title-help">Mover: WASD / Flechas · Interactuar/Confirmar: Espacio o E<br>
-          I Mochila · B Banco · C Catálogo · Q Misiones · M Guardar</div>
+          I Mochila · B Banco · C Catálogo · L Laboratorio · G Invernadero · Q Misiones · M Guardar</div>
       </div>`;
     // arte: pequeño jardín de fenotipos aleatorios
     const c = document.getElementById('title_canvas'); const ctx = c.getContext('2d');
@@ -104,6 +105,7 @@
         else if (k === 'q') PH.ui.quests();
         else if (k === 'm') { PH.state.save(); PH.ui.toast('Partida guardada.', 'ok'); }
         else if (k === 'l') PH.ui.lab();
+        else if (k === 'g') PH.ui.greenhouse();
       } else if (game.mode === 'menu') {
         if (k === 'escape' || k === 'i' || k === 'b' || k === 'c' || k === 'q') PH.ui.close();
       }
@@ -239,6 +241,7 @@
     if (game.mode === 'overworld' || game.mode === 'menu' || game.mode === 'dialog' || game.mode === 'encounter') {
       PH.state.updateEnv(dt);
       if (PH.events) PH.events.update(dt);
+      if (PH.garden) PH.garden.update(dt);
     }
     if (game.mode === 'overworld') {
       tryMove();

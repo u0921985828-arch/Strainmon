@@ -192,6 +192,24 @@ html, body {
 .abtns .a { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); color: #10240f; font-weight: bold; }
 .menu-keys { display: flex; gap: 8px; } .menu-keys .s { width: 44px; height: 44px; }
 
+/* --------- Invernadero / cultivo --------- */
+.garden-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-top: 6px; }
+.plot { background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 10px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 170px; justify-content: space-between; }
+.plot.ready { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.plot.empty { border-style: dashed; justify-content: center; }
+.plot-add { cursor: pointer; color: var(--dim); font-size: 1.8rem; display: flex; flex-direction: column; align-items: center; }
+.plot-add small { font-size: .7rem; } .plot-add:hover { color: var(--accent); }
+.plot-sprite { position: relative; background:
+    linear-gradient(0deg, rgba(90,140,70,.25), rgba(20,26,20,.1)); border-radius: 8px; padding: 2px; }
+.plot-sprite img { image-rendering: pixelated; display: block; }
+.phdot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 50%; border: 1px solid rgba(0,0,0,.4); }
+.plot-name { font-size: .78rem; font-weight: bold; } .plot-stage { font-size: .7rem; }
+.plot .bar { width: 100%; }
+.plot-actions { display: flex; gap: 4px; }
+.hub-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
+.btn.hub { padding: 18px 10px; line-height: 1.5; font-size: .8rem; }
+
 /* --------- Investigación / ADN --------- */
 .pill.event { background: linear-gradient(90deg, #3a2350, #6b3fa0); border-color: #a06bff; color: #f0e0ff; animation: pulse 1.2s infinite; }
 .dna { font-family: monospace; font-size: .7rem; letter-spacing: 1px; word-break: break-all; background: #0f1520;

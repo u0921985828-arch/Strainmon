@@ -59,6 +59,12 @@
       reward: { credits: 1000, prestige: 18 },
       check: (s) => Object.values(s.catalog).some(e => e.pheno && e.pheno.ploidy > 2),
     },
+    q_harvest: {
+      id: 'q_harvest', name: 'Primera cosecha',
+      desc: 'Cultiva una planta en el invernadero y coséchala.',
+      reward: { credits: 400, prestige: 7 },
+      check: (s) => (s.stats.harvests || 0) >= 1,
+    },
     q_master: {
       id: 'q_master', name: 'Maestro Pheno Hunter',
       desc: 'Registra 25 fenotipos en el catálogo mundial.',
@@ -92,10 +98,11 @@
       'Los fenotipos míticos... por esos pagaría una fortuna.',
     ],
     criador: (s) => {
-      activate('q_breeder');
+      activate('q_breeder'); activate('q_harvest');
       return [
         'Criador Wex: El verdadero arte está en el cruce.',
         'En el Laboratorio puedes cruzar dos ejemplares del Banco. La descendencia hereda genes de ambos.',
+        'Y en el Invernadero (tecla G) puedes cultivar clones: crecen por fases y, al cosechar, propagas la genética en varios clones idénticos.',
         'A veces surgen fenotipos, colores o mutaciones que nadie había visto. Eso es oro para el catálogo.',
       ];
     },

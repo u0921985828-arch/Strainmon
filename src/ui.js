@@ -416,6 +416,89 @@
     if (isNew) toast('✨ Nuevo fenotipo catalogado: ' + spec.name, 'ok');
   }
 
+  /* ---------------- INVERNADERO / CULTIVO ---------------- */
+  let plantPicker = false;
+  function greenhouse() {
+    const s = G();
+    if (!s.garden) s.garden = [];
+    const cap = PH.garden.capacity();
+    const plots = [];
+    for (let i = 0; i < cap; i++) {
+      const p = s.garden[i];
+      if (p) plots.push(plotView(p));
+      else plots.push(`<div class="plot empty"><div class="plot-add" data-add="1">＋<small>Plantar</small></div></div>`);
+    }
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2>🌿 Invernadero <small>${s.garden.length}/${cap} parcelas</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          <p class="dim">Planta clones o semillas y obsérvalos crecer por fases. Al cosechar propagas la genética (clones idénticos) y obtienes créditos. La velocidad acelera el cultivo; riega para adelantarlo.</p>
+          <div class="garden-grid">${plots.join('')}</div>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = () => { plantPicker = false; close(); };
+    overlay.querySelectorAll('[data-add]').forEach(b => b.onclick = plantPickerView);
+    overlay.querySelectorAll('[data-water]').forEach(b => b.onclick = () => { PH.garden.regar(b.dataset.water); greenhouse(); });
+    overlay.querySelectorAll('[data-harv]').forEach(b => b.onclick = () => doHarvest(b.dataset.harv));
+    overlay.querySelectorAll('[data-comp]').forEach(b => b.onclick = () => { if (confirm('¿Compostar esta planta? Se pierde.')) { PH.garden.compost(b.dataset.comp); greenhouse(); } });
+  }
+
+  function plotView(p) {
+    const stage = PH.sprites.LIFECYCLE[p.stage];
+    const uri = PH.sprites.uri(PH.garden.spriteKey(p));
+    const pct = PH.garden.progressPct(p);
+    const t = PH.gen.rarityTier(p.rarity);
+    const pal = PH.gen.paletteFor(p.pheno);
+    return `<div class="plot ${p.ready ? 'ready' : ''}">
+      <div class="plot-sprite"><img src="${uri}" width="80" height="80" alt=""><span class="phdot" style="background:${pal.base}"></span></div>
+      <div class="plot-name">${p.name}</div>
+      <div class="plot-stage" style="color:${t.color}">${p.ready ? '✅ Lista' : stage.label}</div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="plot-actions">
+        ${p.ready
+          ? `<button class="btn small primary" data-harv="${p.id}">Cosechar</button>`
+          : `<button class="btn small" data-water="${p.id}">💧 Regar</button>`}
+        <button class="btn small ghost" data-comp="${p.id}">🗑</button>
+      </div>
+    </div>`;
+  }
+
+  function plantPickerView() {
+    const s = G();
+    const usable = s.bank.filter(sp => sp.form !== 'polen');
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2>🌱 Plantar en el invernadero</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          <p class="dim">Elige una muestra del banco para cultivar. La cosecha te devolverá varios clones de esa misma genética.</p>
+          ${usable.length ? `<div class="cat-grid select">${usable.map(sp => `<div class="cat-card pick" data-plant="${sp.uid}">
+            <canvas id="gp_${sp.uid}" width="70" height="90"></canvas>
+            <div class="cc-name">${sp.nickname || sp.name}</div>
+            <div class="cc-tier" style="color:${PH.gen.rarityTier(sp.rarity).color}">${'★'.repeat(PH.gen.rarityTier(sp.rarity).stars)}</div>
+            <div class="cc-meta">${cap(sp.form)} · ${cap(sp.pheno.color)}</div>
+          </div>`).join('')}</div>` : '<p class="dim">No tienes muestras plantables. Recolecta o cruza primero.</p>'}
+          <div class="row"><button class="btn ghost" id="back">Volver al invernadero</button></div>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    document.getElementById('back').onclick = greenhouse;
+    usable.forEach(sp => paintPlant('gp_' + sp.uid, sp.pheno, 1.7));
+    overlay.querySelectorAll('[data-plant]').forEach(el => el.onclick = () => {
+      const res = PH.garden.plantFromBank(el.dataset.plant);
+      toast(res.msg, res.ok ? 'ok' : 'bad');
+      greenhouse();
+    });
+  }
+
+  function doHarvest(id) {
+    const res = PH.garden.harvest(id);
+    if (!res.ok) { toast(res.msg || 'No se pudo cosechar.', 'bad'); return; }
+    toast(`🌾 Cosechaste ${res.name}: ${res.clones.length} clones + 💰${res.credits}`, 'ok');
+    updateHUD();
+    PH.game.afterQuestCheck();
+    greenhouse();
+  }
+
   /* ---------------- MERCADO ---------------- */
   function shop() {
     const s = G();
@@ -483,8 +566,27 @@
   }
 
   /* ---------------- MENÚ / ubicaciones especiales ---------------- */
+  function labHub() {
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2>🔬 Laboratorio</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body center-col">
+          <p class="dim">Instalaciones de investigación del gremio.</p>
+          <div class="hub-grid">
+            <button class="btn big hub" id="hb_cross">🧬<br>Cruces genéticos</button>
+            <button class="btn big hub" id="hb_green">🌿<br>Invernadero</button>
+            <button class="btn big hub" id="hb_bank">🗄️<br>Banco genético</button>
+          </div>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    document.getElementById('hb_cross').onclick = lab;
+    document.getElementById('hb_green').onclick = greenhouse;
+    document.getElementById('hb_bank').onclick = bank;
+  }
+
   function placeMenu(kind) {
-    if (kind === '@lab_interior') return lab();
+    if (kind === '@lab_interior') return labHub();
     if (kind === '@tienda') return shop();
     if (kind === '@casa') return houseMenu();
     if (kind === '@cueva') return toast('La cueva está sellada. (Contenido futuro)', 'bad');
@@ -547,7 +649,7 @@
 
   PH.ui = {
     init, toast, updateHUD, open, close, isOpen,
-    dialog, dialogNext, encounter, bag, bank, catalog, lab, shop, quests, placeMenu,
+    dialog, dialogNext, encounter, bag, bank, catalog, lab, shop, quests, placeMenu, greenhouse,
     specimenCard, paintPlant,
     get mode() { return PH.game ? PH.game.mode : 'overworld'; }
   };

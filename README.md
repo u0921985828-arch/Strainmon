@@ -24,6 +24,7 @@ Abre `index.html` en un navegador moderno. No requiere servidor ni instalación.
 | Catálogo mundial | `C` |
 | Misiones | `Q` |
 | Laboratorio (cruces) | `L` |
+| Invernadero (cultivo) | `G` |
 | Guardar | `M` |
 
 También hay controles táctiles en pantallas pequeñas. La partida se autoguarda cada 20 s.
@@ -54,6 +55,17 @@ mundial con su primer descubridor, rareza y recuento.
   modifican en tiempo real las probabilidades de aparición. La esquiva *Brumaria* solo abunda con
   niebla; las variedades de sombra y la reliquia dorada *Aurífera* prefieren la noche.
 
+## 🌿 Invernadero (cultivo)
+
+Planta clones o semillas del banco y obsérvalos crecer por fases —
+**plántula → vegetativo → floración → cosecha**— con sprites pixel-art de
+cultivo. Al cosechar **propagas la genética** (varios clones idénticos, según
+producción y ploidía) y obtienes créditos; regar acelera el ciclo y la
+velocidad genética influye en el ritmo. Es la forma de multiplicar una
+variedad valiosa sin perder su genotipo. Los sprites de crecimiento viven en
+`assets/sprites/` y se sirven inline (base64) desde `src/sprites.js`, así que
+todo sigue funcionando abriendo `index.html` sin servidor.
+
 ## 📈 Progresión
 
 Se avanza por **prestigio** (no niveles), que se gana descubriendo variedades y desbloquea nuevas
@@ -72,6 +84,10 @@ Código modular con espacio de nombres global `PH` (sin bundler, se ejecuta abri
 | `src/items.js` | Herramientas de recolección y equipo |
 | `src/world.js` | Mapas por tiles, colisiones, warps, NPCs |
 | `src/render.js` | Render pixel-art: tiles, personajes y sprites de planta |
+| `src/sprites.js` | Sprites de cultivo (48×48) inline en base64 y ciclo de vida |
+| `src/garden.js` | Invernadero: plantado, crecimiento por fases y cosecha |
+| `src/events.js` | Eventos raros temporizados |
+| `src/research.js` | Secuenciación de ADN, parentesco y linaje |
 | `src/state.js` | Estado, banco, catálogo, ambiente y guardado |
 | `src/quests.js` | Misiones y diálogos |
 | `src/encounter.js` | Resolución de recolección |

@@ -27,11 +27,12 @@
         labLevel: 1,                   // mejora del laboratorio (mutaciones en cruce)
       },
       bank: [],          // especímenes almacenados
+      garden: [],        // plantas creciendo en el invernadero
       catalog: {},       // signature -> {sig, speciesId, name, tier, rarity, count, firstAt, pheno}
       species: {},       // speciesId -> {seen, obtained}
       quests: {},        // questId -> {state:'active'|'done', progress}
       flags: {},         // banderas de historia
-      stats: { discoveries: 0, crosses: 0, mutationsFound: 0, distance: 0, sequenced: 0 },
+      stats: { discoveries: 0, crosses: 0, mutationsFound: 0, distance: 0, sequenced: 0, harvests: 0 },
       env: makeEnv(),
       playtime: 0,
     };
