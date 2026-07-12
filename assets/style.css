@@ -192,6 +192,22 @@ html, body {
 .abtns .a { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); color: #10240f; font-weight: bold; }
 .menu-keys { display: flex; gap: 8px; } .menu-keys .s { width: 44px; height: 44px; }
 
+/* --------- Investigación / ADN --------- */
+.pill.event { background: linear-gradient(90deg, #3a2350, #6b3fa0); border-color: #a06bff; color: #f0e0ff; animation: pulse 1.2s infinite; }
+.dna { font-family: monospace; font-size: .7rem; letter-spacing: 1px; word-break: break-all; background: #0f1520;
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px; color: #7bd66b; line-height: 1.6; }
+.hidden-list { list-style: none; font-size: .76rem; } .hidden-list li { padding: 3px 0; border-bottom: 1px solid var(--line); }
+.hidden-list i { color: var(--accent2); font-style: normal; }
+.rel-row { display: flex; align-items: center; gap: 8px; font-size: .72rem; margin: 4px 0; }
+.rel-row span { width: 110px; } .rel-row small { color: var(--dim); }
+.seq-head { margin-bottom: 8px; }
+.stats-box { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin: 10px 0;
+  text-align: left; font-size: .8rem; line-height: 1.8; width: 100%; }
+.stats-box small { color: var(--dim); }
+.ev-row { display: flex; gap: 10px; align-items: flex-start; background: var(--panel2); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
+.ev-ico { font-size: 1.3rem; } .ev-row b { font-size: .82rem; } .ev-row small { display: block; color: var(--dim); font-size: .72rem; }
+
 /* --------- Footer --------- */
 #foot { color: var(--dim); font-size: .68rem; padding: 8px; text-align: center; }
 

@@ -62,7 +62,8 @@
     const b = PH.species.BIOMES[biome];
     let p = b ? b.baseEncounter : 0.12;
     if (s.player.cebosActivos > 0) p += 0.05;
-    return p;
+    if (PH.events && PH.events.encounterBoost) p *= PH.events.encounterBoost();
+    return Math.min(0.6, p);
   }
 
   PH.encounter = { harvest, encounterChance };

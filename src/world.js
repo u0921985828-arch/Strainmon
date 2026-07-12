@@ -1,22 +1,12 @@
 /* ============================================================
    PHENO HUNTER — world.js
    Mapas por tiles, colisiones, warps, flora y NPCs.
-   Mapas definidos como cuadrículas de caracteres para legibilidad.
    ============================================================ */
 (function (PH) {
   'use strict';
 
-  // Leyenda de tiles:
-  //  .  césped        ,  césped alto (flora/encuentros)
-  //  T  árbol         #  roca/pared    W  agua       ~  agua profunda
-  //  P  camino        H  edificio      D  puerta (bloqueante deco)
-  //  F  flores deco   b  arbusto       s  arena       m  barro/pantano
-  //  n  nieve         c  suelo cueva   =  puente
-  //  Dígitos 0-9 = warps (definidos por mapa)
-  //  Letras mayúsculas reservadas arriba; NPCs se colocan por coordenada.
-
   const TILE = {
-    '.': { name: 'grass', solid: false, enc: false },
+    '.': { name: 'grass', solid: false },
     ',': { name: 'tallgrass', solid: false, enc: true },
     'T': { name: 'tree', solid: true },
     '#': { name: 'rock', solid: true },
@@ -32,10 +22,15 @@
     'n': { name: 'snow', solid: false },
     'c': { name: 'cavefloor', solid: false },
     '=': { name: 'bridge', solid: false },
+    'l': { name: 'lava', solid: true },
+    'r': { name: 'ash', solid: false },
+    'i': { name: 'ice', solid: false },
+    'o': { name: 'stalag', solid: true },
+    'p': { name: 'palm', solid: true },
   };
   const isWarp = (ch) => ch >= '0' && ch <= '9';
 
-  /* ------------------------- MAPA: CIUDAD BASE (hub) ------------------------- */
+  /* ------------------------- CIUDAD (hub) ------------------------- */
   const laboratorio = {
     id: 'lab', name: 'Ciudad Semilla', biome: null, theme: 'town',
     grid: [
@@ -59,20 +54,21 @@
       'TTTTTTT00TTTTTTTTTTT',
     ],
     warps: {
-      '0': { to: 'pradera', x: 9, y: 1 },   // salida sur -> pradera
-      '1': { to: '@lab_interior', name: 'Laboratorio' }, // menú especial
+      '0': { to: 'pradera', x: 9, y: 1 },
+      '1': { to: '@lab_interior', name: 'Laboratorio' },
       '2': { to: '@tienda', name: 'Mercado' },
       '3': { to: '@casa', name: 'Tu casa' },
     },
     npcs: [
       { id: 'mentor', x: 9, y: 8, name: 'Dra. Elna', sprite: 'mentor', dialog: 'mentor' },
-      { id: 'coleccionista', x: 15, y: 9, name: 'Coleccionista Bru', sprite: 'npc2', dialog: 'coleccionista' },
-      { id: 'criador', x: 4, y: 9, name: 'Criador Wex', sprite: 'npc3', dialog: 'criador' },
+      { id: 'coleccionista', x: 15, y: 9, name: 'Bru', sprite: 'npc2', dialog: 'coleccionista' },
+      { id: 'criador', x: 4, y: 9, name: 'Wex', sprite: 'npc3', dialog: 'criador' },
+      { id: 'genetista', x: 12, y: 5, name: 'Dr. Vane', sprite: 'npc5', dialog: 'genetista' },
     ],
     spawn: { x: 9, y: 15 },
   };
 
-  /* ------------------------- MAPA: PRADERA ------------------------- */
+  /* ------------------------- PRADERA ------------------------- */
   const pradera = {
     id: 'pradera', name: 'Pradera de Auralia', biome: 'pradera', theme: 'meadow',
     grid: [
@@ -80,8 +76,8 @@
       'T....,,....,,......T',
       'T..,,,,..FF,,,,....T',
       'T..,,,,....,,,,..b.T',
-      'T....PP....PP......T',
-      'T....P......P......T',
+      'T....PP....PP......5',
+      'T....P......P......5',
       'T,,..P.,,,,.P..,,..T',
       'T,,..P.,,,,.P..,,..T',
       'T....P......P......T',
@@ -99,14 +95,13 @@
       '0': { to: 'lab', x: 9, y: 16 },
       '1': { to: 'bosque', x: 9, y: 1 },
       '2': { to: 'pantano', x: 3, y: 1 },
+      '5': { to: 'desierto', x: 1, y: 9 },
     },
-    npcs: [
-      { id: 'explorador', x: 14, y: 11, name: 'Explorador Ino', sprite: 'npc4', dialog: 'explorador' },
-    ],
+    npcs: [{ id: 'explorador', x: 14, y: 11, name: 'Ino', sprite: 'npc4', dialog: 'explorador' }],
     spawn: { x: 9, y: 2 },
   };
 
-  /* ------------------------- MAPA: BOSQUE ------------------------- */
+  /* ------------------------- BOSQUE ------------------------- */
   const bosque = {
     id: 'bosque', name: 'Bosque de Vael', biome: 'bosque', theme: 'forest',
     grid: [
@@ -131,15 +126,13 @@
     ],
     warps: {
       '0': { to: 'pradera', x: 9, y: 16 },
-      '3': { to: '@cueva', name: 'Cueva de Vael' },
+      '3': { to: 'cueva', x: 9, y: 1 },
     },
-    npcs: [
-      { id: 'botanica', x: 4, y: 8, name: 'Botánica Sella', sprite: 'npc5', dialog: 'botanica' },
-    ],
+    npcs: [{ id: 'botanica', x: 4, y: 8, name: 'Sella', sprite: 'npc5', dialog: 'botanica' }],
     spawn: { x: 9, y: 2 },
   };
 
-  /* ------------------------- MAPA: PANTANO ------------------------- */
+  /* ------------------------- PANTANO ------------------------- */
   const pantano = {
     id: 'pantano', name: 'Cenagal de Mureb', biome: 'pantano', theme: 'swamp',
     grid: [
@@ -164,17 +157,179 @@
     ],
     warps: {
       '0': { to: 'pradera', x: 15, y: 16 },
-      '4': { to: '@expedicion', name: 'Muelle de expediciones' },
+      '4': { to: 'isla', x: 9, y: 1 },
     },
-    npcs: [
-      { id: 'contrabandista', x: 4, y: 12, name: 'Contrabandista Kez', sprite: 'npc6', dialog: 'contrabandista' },
-    ],
+    npcs: [{ id: 'contrabandista', x: 4, y: 12, name: 'Kez', sprite: 'npc6', dialog: 'contrabandista' }],
     spawn: { x: 3, y: 1 },
   };
 
-  const MAPS = { lab: laboratorio, pradera, bosque, pantano };
+  /* ------------------------- DESIERTO ------------------------- */
+  const desierto = {
+    id: 'desierto', name: 'Erg de Sael', biome: 'desierto', theme: 'desert',
+    grid: [
+      'TT###############TTT',
+      '0ss,,.sss,,ss..sssbT',
+      'ssss..s,,s..ss,,sssT',
+      'Tss,,ss..sssss..ssbT',
+      'Tsssss.b.ss,,s.ssssT',
+      'Ts,,s.sssss..ss,,ssT',
+      'Tssss.s,,ss.ssssssbT',
+      'Ts.b.ss..s,,ss.s,,sT',
+      'Tss,,sssss..sss..ssT',
+      'Ts..ssb.ss,,ss.sssbT',
+      'Tsss,,s.sssss.s,,ssT',
+      'Ts.ssss.b.ss..ssssbT',
+      'Ts,,s.ssss,,sssss..T',
+      'Tssss.s,,ss.sss.b.sT',
+      'Ts.b.sssss..ss,,sssT',
+      'Tss,,s.sss,,ssss..sT',
+      'Tssssssss..sssss66sT',
+      'TT##############TTTT',
+    ],
+    warps: {
+      '0': { to: 'pradera', x: 18, y: 4 },
+      '6': { to: 'volcan', x: 9, y: 1 },
+    },
+    npcs: [{ id: 'nomada', x: 10, y: 8, name: 'Zahra', sprite: 'npc4', dialog: 'nomada' }],
+    spawn: { x: 1, y: 1 },
+  };
 
-  // Envuelve un mapa con métodos de consulta
+  /* ------------------------- VOLCÁN ------------------------- */
+  const volcan = {
+    id: 'volcan', name: 'Monte Calder', biome: 'volcan', theme: 'volcano',
+    grid: [
+      'TTTTTTTT00TTTTTTTTTT',
+      'T#rr,,rr#rrr,,rr##.T',
+      'T#rrrrr#rr,,rrrr#..T',
+      'Trr,,rrr#lll#rr,,r.T',
+      'Trrrrr,,#lll#,,rrr.T',
+      'T#rr#rrr#ll#rrrr#r.T',
+      'Trr,,rr#lll#rr,,rr.T',
+      'Trrrrrr#ll#rrrrrrr.T',
+      'T#r,,r#lll#r,,rr#r.T',
+      'Trrrrr#ll#rr,,rrrr.T',
+      'Trr,,rrr##rrrrr,,r.T',
+      'Trrrrr,,rrrr,,rrrrrT',
+      'T#rrr#rrrr#rrrr#rr.T',
+      'Trr,,rrrrrrrr,,rrr.T',
+      'Trrrrrrr,,rrrrrrrrrT',
+      'Tr,,rrr#rr#rr,,rrr.T',
+      'Trrrrrrrrrrrrrrr77.T',
+      'TTTTTTTTTTTTTTTTTTTT',
+    ],
+    warps: {
+      '0': { to: 'desierto', x: 9, y: 16 },
+      '7': { to: 'nieve', x: 9, y: 16 },
+    },
+    npcs: [{ id: 'vulcanologo', x: 4, y: 11, name: 'Draco', sprite: 'npc6', dialog: 'vulcanologo' }],
+    spawn: { x: 9, y: 2 },
+  };
+
+  /* ------------------------- NIEVE ------------------------- */
+  const nieve = {
+    id: 'nieve', name: 'Manto de Yrr', biome: 'nieve', theme: 'snow',
+    grid: [
+      'TTTTTTTTTTTTTTTTTTTT',
+      'Tnn,,nnnn,,nnnn,,n.T',
+      'Tnnnniinnnnii nnnn.T',
+      'Tn,,nnnn,,nniinn,,.T',
+      'Tnnii nn,,nnnnnnii.T',
+      'Tn,,nnnnnniinn,,nn.T',
+      'Tnnnn,,nn nniinnnn.T',
+      'Tnniinn nn,,nn,,nn.T',
+      'Tn,,nn,,nniinnnnii.T',
+      'Tnnnnnnnn nn,,nnnn.T',
+      'Tnii,,nn,,nniinn,,.T',
+      'Tnnnnnnnniinnnnnnn.T',
+      'Tn,,nnii,,nn,,nniin.T',
+      'Tnnnn,,nnnnnnii nn.T',
+      'Tnniinnnn,,nn,,nnn.T',
+      'Tn,,nn,,nnii nnnn..T',
+      'Tnnnnnnnnnnnnnnn88.T',
+      'TTTTTTTTTTTTTTTTTTTT',
+    ],
+    warps: {
+      '8': { to: 'volcan', x: 9, y: 1 },
+    },
+    npcs: [{ id: 'glaciologa', x: 5, y: 9, name: 'Frey', sprite: 'npc5', dialog: 'glaciologa' }],
+    spawn: { x: 9, y: 15 },
+  };
+
+  /* ------------------------- CUEVA ------------------------- */
+  const cueva = {
+    id: 'cueva', name: 'Cueva de Vael', biome: 'cueva', theme: 'cave',
+    grid: [
+      '####################',
+      '#cc,,cco cccc,,cccc#',
+      '#ccccco ccc,,ccooc.#',
+      '#cc,,cccooc cccc,,c#',
+      '#cccco,,ccccoccccc.#',
+      '#occ ccc,,ccc ,,cco#',
+      '#cc,,ccoocccccooccc#',
+      '#cccccc ccc,,cc,,cc#',
+      '#occ,,ccooc cccccco#',
+      '#ccccccc,,cccc,,ccc#',
+      '#cc,,ccoocccoocccc.#',
+      '#cccccccc,,cccccooc#',
+      '#occ,,ccc ccc,,cccc#',
+      '#ccccooc,,cccccccc.#',
+      '#cc,,ccccooc,,ccooc#',
+      '#cccccccccccccccc99#',
+      '####################',
+    ],
+    warps: {
+      '9': { to: 'bosque', x: 9, y: 16 },
+    },
+    npcs: [{ id: 'espeleologo', x: 6, y: 8, name: 'Mox', sprite: 'npc6', dialog: 'espeleologo' }],
+    spawn: { x: 9, y: 15 },
+  };
+
+  /* ------------------------- ISLA ------------------------- */
+  const isla = {
+    id: 'isla', name: 'Islas Vireo', biome: 'isla', theme: 'island',
+    grid: [
+      '~~~~~~~~WW~~~~~~~~~~~',
+      '~~WWssssssssssWW~~~~',
+      '~Wsss,,ssp ss,,sssW~',
+      '~Wssssssss,,ssspssW~',
+      '~Wsp,,ssFFss.ss,,sW~',
+      '~Wsssss.p.sssss.ssW~',
+      '~Wss,,sssss,,ss.spW~',
+      '~Wpsssss.b.sssss,,W~',
+      '~Wss,,ss,,sssspss.W~',
+      '~Wssssssssss,,sssW~~',
+      '~~Wss,,ssp ss.sssW~~',
+      '~~Wsssss,,ssss,,sW~~',
+      '~~~Wssssssssssss W~~',
+      '~~~~WWsssssssWWW~~~~',
+      '~~~~~~WW==WW~~~~~~~~~',
+      '~~~~~~~=aa=~~~~~~~~~~',
+      '~~~~~~~~WW~~~~~~~~~~~',
+      '~~~~~~~~~~~~~~~~~~~~~',
+    ],
+    warps: {
+      'a': null, // decorativo (muelle)
+    },
+    npcs: [{ id: 'marinera', x: 9, y: 6, name: 'Nira', sprite: 'npc2', dialog: 'marinera' }],
+    spawn: { x: 9, y: 4 },
+    exitBack: { to: 'pantano', x: 9, y: 2 }, // salir por el muelle
+  };
+  // La isla se sale interactuando: añadimos un warp de retorno en las celdas inferiores
+  isla.grid[15] = '~~~~~~~b0b~~~~~~~~~~~';
+  isla.warps['0'] = { to: 'pantano', x: 9, y: 2 };
+
+  const MAPS = { lab: laboratorio, pradera, bosque, pantano, desierto, volcan, nieve, cueva, isla };
+
+  // Normaliza cada mapa a una cuadrícula rectangular (robusto ante erratas).
+  (function normalizeAll() {
+    const FILL = { cave: '#', desert: '#', volcano: 'T', island: '~', snow: 'T' };
+    for (const m of Object.values(MAPS)) {
+      const fill = FILL[m.theme] || 'T';
+      let w = 0; for (const r of m.grid) w = Math.max(w, r.length);
+      m.grid = m.grid.map(r => r.length < w ? r + fill.repeat(w - r.length) : r.slice(0, w));
+    }
+  })();
+
   function tileAt(map, x, y) {
     if (y < 0 || y >= map.grid.length) return '#';
     const row = map.grid[y];
@@ -199,5 +354,8 @@
   }
   function dims(map) { return { w: map.grid[0].length, h: map.grid.length }; }
 
-  PH.world = { TILE, MAPS, isWarp, tileAt, solidAt, encounterAt, warpAt, dims };
+  // Mapea id de región a su bioma (para desbloqueos por prestigio)
+  const REGION_ORDER = ['pradera', 'bosque', 'cueva', 'pantano', 'isla', 'desierto', 'volcan', 'nieve'];
+
+  PH.world = { TILE, MAPS, isWarp, tileAt, solidAt, encounterAt, warpAt, dims, REGION_ORDER };
 })(window.PH = window.PH || {});

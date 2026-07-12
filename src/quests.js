@@ -37,6 +37,34 @@
       reward: { credits: 3000, prestige: 40 },
       check: (s) => (s.species['PH-007'] && s.species['PH-007'].obtained > 0),
     },
+    q_sequence: {
+      id: 'q_sequence', name: 'Lectura del genoma',
+      desc: 'Secuencia el ADN de una variedad en el laboratorio.',
+      reward: { credits: 500, prestige: 8 },
+      check: (s) => s.stats.sequenced >= 1,
+    },
+    q_regions: {
+      id: 'q_regions', name: 'Cartógrafo genético',
+      desc: 'Cataloga al menos una variedad en 5 biomas distintos.',
+      reward: { credits: 1200, prestige: 20, gear: 'estabilizador' },
+      check: (s) => {
+        const biomes = new Set();
+        for (const sp of s.bank) if (sp.caughtAt && sp.caughtAt.biome) biomes.add(sp.caughtAt.biome);
+        return biomes.size >= 5;
+      },
+    },
+    q_poly: {
+      id: 'q_poly', name: 'Genoma multiplicado',
+      desc: 'Documenta una variedad poliploide (triploide o superior).',
+      reward: { credits: 1000, prestige: 18 },
+      check: (s) => Object.values(s.catalog).some(e => e.pheno && e.pheno.ploidy > 2),
+    },
+    q_master: {
+      id: 'q_master', name: 'Maestro Pheno Hunter',
+      desc: 'Registra 25 fenotipos en el catálogo mundial.',
+      reward: { credits: 5000, prestige: 60 },
+      check: (s) => Object.keys(s.catalog).length >= 25,
+    },
   };
 
   // Diálogos: función que devuelve páginas (array de strings) según estado.
@@ -88,6 +116,42 @@
       'Contrabandista Kez: Psst... yo consigo lo que otros no pueden.',
       'Herramientas de alta gama, feromonas florales para atraer rarezas...',
       'Pásate por el Mercado. Y no preguntes de dónde saco la mercancía.',
+    ],
+    genetista: (s) => {
+      activate('q_sequence');
+      return [
+        'Dr. Vane: Toda planta esconde alelos recesivos invisibles a simple vista.',
+        'Secuencia su ADN en el Laboratorio (botón Investigar) para revelar genes ocultos y calcular parentescos.',
+        'Con esa información podrás dirigir tus cruces hacia mutaciones concretas.',
+      ];
+    },
+    nomada: (s) => {
+      activate('q_regions');
+      return [
+        'Zahra: El desierto castiga, pero guarda tesoros. La Solárida solo florece con calor extremo.',
+        'En verano y con olas de calor, las variedades del Erg se multiplican.',
+        'Sigue al norte y llegarás al Monte Calder... si tu prestigio lo permite.',
+      ];
+    },
+    vulcanologo: (s) => [
+      'Draco: Aquí germina lo que el fuego despierta. La Ígnea nace de la ceniza.',
+      'Y dicen que entre la obsidiana crece una flor negra, la Obsidiónida. Rarísima.',
+      'Cuidado con la lava. Cataloga y márchate.',
+    ],
+    glaciologa: (s) => [
+      'Frey: Bajo la aurora, de noche, la variedad Aurora emite luz propia.',
+      'El frío fija mutaciones cristalinas. Es el mejor sitio para resina hipertrófica.',
+      'Abrígate, cazador.',
+    ],
+    espeleologo: (s) => [
+      'Mox: Sin luz, la vida se reinventa. La Fungália brilla en la oscuridad total.',
+      'Estas galerías tienen la mayor tasa de mutación conocida.',
+      'Dicen que en lo más profundo duerme una reliquia fósil, la Cronólita...',
+    ],
+    marinera: (s) => [
+      'Nira: Bienvenido a las Islas Vireo. La sal marina moldea genéticas únicas.',
+      'La Coralina imita a los corales; su aroma marino no se encuentra en tierra firme.',
+      'El muelle te lleva de vuelta al continente cuando quieras.',
     ],
   };
 

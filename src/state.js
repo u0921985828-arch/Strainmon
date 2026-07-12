@@ -24,13 +24,14 @@
         gear: [],                      // ids de equipo
         activeTool: 'frasco',
         cebosActivos: 0,               // encuentros con feromona
+        labLevel: 1,                   // mejora del laboratorio (mutaciones en cruce)
       },
       bank: [],          // especímenes almacenados
       catalog: {},       // signature -> {sig, speciesId, name, tier, rarity, count, firstAt, pheno}
       species: {},       // speciesId -> {seen, obtained}
       quests: {},        // questId -> {state:'active'|'done', progress}
       flags: {},         // banderas de historia
-      stats: { discoveries: 0, crosses: 0, mutationsFound: 0, distance: 0 },
+      stats: { discoveries: 0, crosses: 0, mutationsFound: 0, distance: 0, sequenced: 0 },
       env: makeEnv(),
       playtime: 0,
     };
@@ -143,10 +144,14 @@
   // Umbrales de prestigio que desbloquean contenido
   const PRESTIGE_UNLOCKS = [
     { at: 0, id: 'pradera', label: 'Pradera de Auralia' },
-    { at: 10, id: 'bosque', label: 'Bosque de Vael' },
-    { at: 30, id: 'pantano', label: 'Cenagal de Mureb' },
-    { at: 60, id: 'expedicion', label: 'Expediciones marítimas' },
-    { at: 100, id: 'reliquias', label: 'Licencia de reliquias' },
+    { at: 8, id: 'bosque', label: 'Bosque de Vael' },
+    { at: 18, id: 'cueva', label: 'Cueva de Vael' },
+    { at: 25, id: 'pantano', label: 'Cenagal de Mureb' },
+    { at: 40, id: 'isla', label: 'Islas Vireo' },
+    { at: 45, id: 'desierto', label: 'Erg de Sael' },
+    { at: 65, id: 'volcan', label: 'Monte Calder' },
+    { at: 85, id: 'nieve', label: 'Manto de Yrr' },
+    { at: 120, id: 'reliquias', label: 'Licencia de reliquias' },
   ];
   function unlocked(id) {
     const u = PRESTIGE_UNLOCKS.find(x => x.id === id);

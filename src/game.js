@@ -238,6 +238,7 @@
 
     if (game.mode === 'overworld' || game.mode === 'menu' || game.mode === 'dialog' || game.mode === 'encounter') {
       PH.state.updateEnv(dt);
+      if (PH.events) PH.events.update(dt);
     }
     if (game.mode === 'overworld') {
       tryMove();
@@ -326,6 +327,37 @@
     else if (env.weather === 'nublado') { ctx.fillStyle = 'rgba(120,125,135,0.14)'; ctx.fillRect(0, 0, R.W, R.H); }
     else if (env.weather === 'ola_calor') { ctx.fillStyle = 'rgba(255,160,60,0.10)'; ctx.fillRect(0, 0, R.W, R.H); }
     if (env.weather === 'lluvia' || env.weather === 'tormenta') drawRain(ctx, env.weather === 'tormenta');
+
+    // tinte y partículas de evento raro
+    if (PH.events) {
+      const tint = PH.events.tint && PH.events.tint();
+      if (tint) { ctx.fillStyle = tint; ctx.fillRect(0, 0, R.W, R.H); }
+      const parts = PH.events.particles && PH.events.particles();
+      if (parts) drawParticles(ctx, parts);
+    }
+  }
+
+  let partSeed = [];
+  function drawParticles(ctx, kind) {
+    const n = 26;
+    if (partSeed.length !== n) { partSeed = []; for (let i = 0; i < n; i++) partSeed.push([Math.random() * R.W, Math.random() * R.H, 1 + Math.random() * 2, Math.random() * 6]); }
+    const t = performance.now();
+    for (const d of partSeed) {
+      if (kind === 'meteor') {
+        const y = (d[1] + (t * 0.12 * d[2]) % R.H) % R.H;
+        const x = (d[0] + (t * 0.06 * d[2]) % R.W) % R.W;
+        ctx.strokeStyle = 'rgba(255,220,160,0.8)'; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 4, y - 6); ctx.stroke();
+      } else if (kind === 'petal') {
+        const y = (d[1] + (t * 0.03 * d[2]) % R.H) % R.H;
+        const x = (d[0] + Math.sin((t + d[3] * 400) / 500) * 8) % R.W;
+        ctx.fillStyle = 'rgba(255,150,200,0.75)'; ctx.fillRect(x, y, 2, 2);
+      } else if (kind === 'spark') {
+        const x = (d[0] + Math.sin((t + d[3] * 300) / 600) * 6);
+        const y = (d[1] + Math.cos((t + d[3] * 300) / 700) * 6);
+        ctx.fillStyle = 'rgba(160,220,255,' + (0.4 + 0.4 * Math.abs(Math.sin(t / 300 + d[3]))) + ')';
+        ctx.fillRect(x, y, 1, 1);
+      }
+    }
   }
 
   let rainSeed = [];

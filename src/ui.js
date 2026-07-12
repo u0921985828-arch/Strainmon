@@ -33,12 +33,15 @@
     const env = s.env;
     const map = PH.world.MAPS[s.player.map];
     const wIcon = { despejado: '☀️', lluvia: '🌧️', niebla: '🌫️', tormenta: '⛈️', ola_calor: '🔥', nublado: '☁️' }[env.weather] || '☀️';
+    const ev = PH.events && PH.events.current();
+    const evPill = ev ? `<span class="pill event">${ev.icon} ${ev.name} · ${PH.events.remaining()}s</span>` : '';
     hud.innerHTML = `
       <div class="hud-left">
         <span class="pill">📍 ${map ? map.name : ''}</span>
         <span class="pill">🕑 ${PH.state.timeLabel(env)} ${env.night ? '🌙' : '☀️'}</span>
         <span class="pill">${wIcon} ${cap(env.weather.replace('_', ' '))}</span>
         <span class="pill">🍂 ${cap(env.season)}</span>
+        ${evPill}
       </div>
       <div class="hud-right">
         <span class="pill">🏅 ${s.player.prestige}</span>
@@ -231,6 +234,7 @@
             <div class="bank-row">
               ${specimenCard(sp)}
               <div class="bank-actions">
+                <button class="btn small" data-seq="${sp.uid}">${sp.sequenced ? '🧾 ADN' : '🔬 Secuenciar'}</button>
                 <button class="btn small" data-sell="${sp.uid}">Vender 💰${sellPrice(sp)}</button>
                 <button class="btn small ghost" data-rel="${sp.uid}">Liberar</button>
               </div>
@@ -241,6 +245,40 @@
     sorted.forEach(sp => paintPlant('pc_' + sp.uid, sp.pheno, 2));
     overlay.querySelectorAll('[data-sell]').forEach(b => b.onclick = () => { sell(b.dataset.sell); bank(); });
     overlay.querySelectorAll('[data-rel]').forEach(b => b.onclick = () => { PH.state.bankRemove(b.dataset.rel); toast('Muestra liberada.'); bank(); });
+    overlay.querySelectorAll('[data-seq]').forEach(b => b.onclick = () => sequencePanel(b.dataset.seq));
+  }
+
+  /* ---------------- INVESTIGACIÓN: SECUENCIACIÓN Y ADN ---------------- */
+  function sequencePanel(uid) {
+    const s = G();
+    const sp = PH.state.bankGet(uid);
+    if (!sp) return;
+    const wasSequenced = sp.sequenced;
+    const res = PH.research.sequence(sp);
+    if (!wasSequenced) { s.stats.sequenced++; PH.game.afterQuestCheck(); }
+    const dna = res.seq.match(/.{1,3}/g).join(' ');
+    const hidden = res.hidden.length
+      ? res.hidden.map(h => `<li><b>${cap(h.gene)}</b>: expresa <i>${h.expressed}</i>, oculta recesivo <i>${h.hidden}</i></li>`).join('')
+      : '<li class="dim">Homocigoto en genes visibles: sin recesivos ocultos.</li>';
+    // parientes en el banco
+    const rels = s.bank.filter(x => x.uid !== uid).map(x => ({ x, c: PH.research.compare(sp, x) }))
+      .sort((a, b) => b.c.rel - a.c.rel).slice(0, 3);
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2>🧬 Secuenciación de ADN</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          <div class="seq-head">${specimenCard(sp)}</div>
+          <h3>Cadena genómica</h3>
+          <div class="dna">${dna}</div>
+          <h3>Genes recesivos ocultos</h3>
+          <ul class="hidden-list">${hidden}</ul>
+          <h3>Parentesco en tu banco</h3>
+          ${rels.length ? rels.map(r => `<div class="rel-row"><span>${r.x.nickname || r.x.name}</span>
+            <div class="bar"><i style="width:${r.c.rel}%"></i></div><b>${r.c.rel}%</b> <small>${r.c.relation}</small></div>`).join('') : '<p class="dim">No hay otras muestras para comparar.</p>'}
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = bank;
+    paintPlant('pc_' + sp.uid, sp.pheno, 2);
   }
   function sellPrice(sp) {
     return Math.round(30 + sp.rarity * sp.rarity * 0.9 + sp.quality * 1.5);
@@ -342,7 +380,7 @@
     const s = G();
     const A = PH.state.bankGet(breedSel[0]);
     const B = PH.state.bankGet(breedSel[1]);
-    const labBonus = 1; // futuro: mejoras de laboratorio
+    const labBonus = 1 + (s.player.labLevel - 1) * 0.6; // mejoras de laboratorio
     const childGeno = PH.gen.breed(A.genotype, B.genotype, { mutRate: 0.08, mutBoost: labBonus });
     const spec = PH.species.makeSpecimen(PH.species.SPECIES_BY_ID[A.speciesId], s.env, {
       genotype: childGeno, form: 'cruce', quality: Math.round((A.quality + B.quality) / 2),
@@ -456,22 +494,55 @@
     }
   }
   function houseMenu() {
+    const s = G();
+    const cost = labUpgradeCost();
     open(`
       <div class="panel">
         <div class="panel-head"><h2>🏠 Tu casa</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body center-col">
           <p>Un lugar tranquilo para descansar y organizar tu trabajo.</p>
+          <div class="stats-box">
+            <div>🏅 Prestigio: <b>${s.player.prestige}</b></div>
+            <div>📖 Fenotipos: <b>${Object.keys(s.catalog).length}</b></div>
+            <div>🧬 Cruces: <b>${s.stats.crosses}</b> · Mutaciones: <b>${s.stats.mutationsFound}</b></div>
+            <div>🔬 Nivel de laboratorio: <b>${s.player.labLevel}</b> <small>(+${Math.round((s.player.labLevel - 1) * 60)}% mutación en cruce)</small></div>
+            <div>👣 Distancia recorrida: <b>${s.stats.distance}</b></div>
+          </div>
           <div class="row">
-            <button class="btn primary" id="h_save">💾 Guardar partida</button>
-            <button class="btn ghost" id="h_reset">Reiniciar progreso</button>
+            <button class="btn primary" id="h_lab" ${s.player.credits < cost ? 'disabled' : ''}>🔬 Mejorar laboratorio (💰${cost})</button>
+          </div>
+          <div class="row">
+            <button class="btn" id="h_events">☄️ Códice de eventos</button>
+            <button class="btn primary" id="h_save">💾 Guardar</button>
+            <button class="btn ghost" id="h_reset">Reiniciar</button>
           </div>
         </div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = close;
     document.getElementById('h_save').onclick = () => { PH.state.save(); toast('Partida guardada.', 'ok'); };
+    document.getElementById('h_events').onclick = eventsCodex;
+    document.getElementById('h_lab').onclick = () => {
+      if (s.player.credits < cost) return;
+      PH.state.addCredits(-cost); s.player.labLevel++; toast('🔬 Laboratorio mejorado a nivel ' + s.player.labLevel, 'ok');
+      updateHUD(); houseMenu();
+    };
     document.getElementById('h_reset').onclick = () => {
       if (confirm('¿Reiniciar TODO el progreso? Esto no se puede deshacer.')) { PH.state.reset(); location.reload(); }
     };
+  }
+  function labUpgradeCost() { return G().player.labLevel * 2500; }
+
+  function eventsCodex() {
+    const evs = Object.values(PH.events.EVENTS);
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2>☄️ Códice de eventos raros</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          <p class="dim">Fenómenos temporales que alteran apariciones y mutaciones. Aparecen al azar mientras exploras.</p>
+          ${evs.map(e => `<div class="ev-row"><span class="ev-ico">${e.icon}</span><div><b>${e.name}</b><small>${e.desc}</small></div></div>`).join('')}
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = houseMenu;
   }
 
   PH.ui = {
