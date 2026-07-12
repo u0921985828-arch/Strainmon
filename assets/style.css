@@ -1,0 +1,205 @@
+/* ============================================================
+   PHENO HUNTER — style.css
+   Estética GBA: marco cálido, tipografía monoespaciada, pixel-perfect.
+   ============================================================ */
+:root {
+  --bg: #12100c;
+  --panel: #1d2430;
+  --panel2: #242c3a;
+  --ink: #eaf0e6;
+  --dim: #97a1ad;
+  --accent: #7bd66b;
+  --accent2: #ffb02e;
+  --line: #33404f;
+  --shadow: 0 6px 24px rgba(0,0,0,.5);
+  font-size: 16px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  background: radial-gradient(circle at 50% 0%, #21351f 0%, #0f130d 70%);
+  color: var(--ink);
+  font-family: "Courier New", ui-monospace, monospace;
+  overflow: hidden;
+  -webkit-user-select: none; user-select: none;
+  touch-action: none;
+}
+#app { height: 100%; display: flex; flex-direction: column; align-items: center; }
+
+/* --------- HUD --------- */
+#hud {
+  width: 100%; max-width: 900px; display: flex; justify-content: space-between;
+  gap: 8px; padding: 8px 12px; flex-wrap: wrap;
+}
+.hud-left, .hud-right { display: flex; gap: 6px; flex-wrap: wrap; }
+.pill {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 999px;
+  padding: 3px 10px; font-size: .72rem; white-space: nowrap; color: var(--ink);
+}
+
+/* --------- Stage / canvas --------- */
+#stage { position: relative; line-height: 0; box-shadow: var(--shadow); border-radius: 8px; overflow: hidden;
+  border: 3px solid #2a2118; background: #000; }
+#screen { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+
+/* --------- Overlay (paneles) --------- */
+#overlay { position: absolute; inset: 0; display: none; line-height: 1.35; }
+#overlay.active { display: flex; }
+#overlay.center { align-items: center; justify-content: center; }
+#overlay.bottom { align-items: flex-end; justify-content: center; }
+#overlay::before { content: ""; position: absolute; inset: 0; background: rgba(6,8,10,.62); backdrop-filter: blur(1px); }
+#overlay > * { position: relative; z-index: 2; }
+
+/* --------- Toasts --------- */
+#toasts { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); z-index: 50;
+  display: flex; flex-direction: column; gap: 6px; align-items: center; pointer-events: none; }
+.toast { background: rgba(20,26,34,.95); border: 1px solid var(--line); color: var(--ink);
+  padding: 6px 14px; border-radius: 8px; font-size: .78rem; opacity: 0; transform: translateY(-8px);
+  transition: .3s; max-width: 90vw; text-align: center; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.ok { border-color: var(--accent); }
+.toast.bad { border-color: #e05a5a; }
+
+/* --------- Botones --------- */
+.btn { font-family: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--panel2);
+  color: var(--ink); padding: 8px 14px; border-radius: 8px; font-size: .82rem; transition: .12s; }
+.btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+.btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+.btn.primary { background: var(--accent); color: #10240f; font-weight: bold; border-color: var(--accent); }
+.btn.ghost { background: transparent; }
+.btn.small { padding: 5px 10px; font-size: .72rem; }
+.btn.big { padding: 12px 30px; font-size: 1rem; }
+
+/* --------- Título --------- */
+#overlay.title::before { background: rgba(6,10,8,.9); }
+.title-screen { text-align: center; padding: 20px; }
+.logo { font-size: 2.6rem; font-weight: 900; letter-spacing: 2px; color: var(--accent); text-shadow: 3px 3px 0 #10240f; }
+.logo span { color: var(--accent2); display: block; letter-spacing: 8px; font-size: 2rem; }
+.tagline { color: var(--dim); margin: 6px 0 14px; letter-spacing: 1px; }
+.title-art canvas { image-rendering: pixelated; border-radius: 6px; border: 1px solid var(--line); }
+.title-btns { display: flex; gap: 10px; justify-content: center; margin: 16px 0; }
+.title-help { color: var(--dim); font-size: .72rem; line-height: 1.7; }
+
+/* --------- Diálogo --------- */
+.dialog-box { width: min(92%, 640px); margin-bottom: 14px; background: var(--panel);
+  border: 2px solid var(--accent); border-radius: 10px; padding: 16px 18px; box-shadow: var(--shadow); }
+.dialog-box p { font-size: .92rem; }
+.dlg-hint { text-align: right; color: var(--dim); font-size: .7rem; margin-top: 8px; }
+
+/* --------- Paneles genéricos --------- */
+.panel { width: min(94%, 640px); max-height: 88%; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 12px; box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden; }
+.panel.wide { width: min(96%, 820px); }
+.panel-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px;
+  border-bottom: 1px solid var(--line); background: var(--panel2); }
+.panel-head h2 { font-size: 1rem; } .panel-head small { color: var(--dim); font-weight: normal; font-size: .72rem; margin-left: 6px; }
+.panel-body { padding: 14px 16px; overflow-y: auto; }
+.panel-body h3 { font-size: .8rem; color: var(--accent2); margin: 12px 0 8px; text-transform: uppercase; letter-spacing: 1px; }
+.x { background: none; border: none; color: var(--dim); font-size: 1.1rem; cursor: pointer; }
+.x:hover { color: #fff; }
+.dim { color: var(--dim); font-size: .8rem; }
+.row { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
+.center-col { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.warn { color: var(--accent2); font-size: .72rem; margin-top: 4px; }
+
+/* --------- Mochila / grids de items --------- */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.item { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 10px; cursor: pointer; }
+.item.sel { border-color: var(--accent); }
+.item b { font-size: .84rem; } .item small { display: block; color: var(--dim); font-size: .72rem; margin: 4px 0; }
+.item .tag { font-size: .68rem; color: var(--accent); }
+
+/* --------- Ficha de espécimen --------- */
+.spec-card { display: flex; gap: 12px; background: var(--panel2); border: 1px solid var(--line);
+  border-radius: 10px; padding: 12px; }
+.spec-art canvas { image-rendering: pixelated; background: #161d15; border-radius: 6px; border: 1px solid var(--line); }
+.spec-info { flex: 1; min-width: 0; }
+.spec-title { font-size: .92rem; font-weight: bold; } .spec-title small { color: var(--dim); font-weight: normal; font-size: .68rem; }
+.tier { display: inline-block; font-size: .72rem; color: var(--tc); border: 1px solid var(--tc); border-radius: 999px; padding: 1px 8px; margin: 4px 0; }
+.spec-desc { font-size: .76rem; color: var(--ink); margin: 4px 0; }
+.spec-meta { font-size: .72rem; color: var(--dim); margin-bottom: 6px; }
+.spec-stats .stat { display: flex; align-items: center; gap: 6px; font-size: .68rem; margin: 2px 0; }
+.stat span { width: 62px; color: var(--dim); } .stat b { width: 26px; text-align: right; }
+.bar { flex: 1; height: 7px; background: #121821; border-radius: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.muts { margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap; }
+.mut { font-size: .66rem; background: #3a2350; color: #d9a6ff; border: 1px solid #6b3fa0; border-radius: 999px; padding: 1px 8px; }
+
+/* --------- Banco --------- */
+.panel-body.list { display: flex; flex-direction: column; gap: 10px; }
+.bank-row { display: flex; gap: 10px; align-items: stretch; }
+.bank-row .spec-card { flex: 1; }
+.bank-actions { display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+
+/* --------- Encuentro --------- */
+.encounter { width: min(94%, 560px); background: var(--panel); border: 2px solid var(--accent2);
+  border-radius: 12px; padding: 14px; box-shadow: var(--shadow); }
+.enc-head { text-align: center; color: var(--accent2); font-weight: bold; margin-bottom: 8px; }
+.enc-body { display: flex; gap: 14px; }
+.enc-art canvas { image-rendering: pixelated; background: #101710; border-radius: 8px; border: 1px solid var(--line); }
+.enc-side { flex: 1; }
+.enc-name { font-size: 1rem; font-weight: bold; } .enc-name small { color: var(--dim); font-size: .68rem; }
+.enc-rare { color: var(--accent2); font-size: .76rem; margin: 3px 0; }
+.enc-desc { font-size: .76rem; color: var(--ink); }
+.enc-env { font-size: .7rem; color: var(--dim); margin-top: 4px; }
+.enc-fields { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.enc-fields span { font-size: .66rem; background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; }
+.enc-tools { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 12px 0 6px; }
+.enc-tools .tool { display: flex; flex-direction: column; align-items: center; font-size: .76rem; }
+.enc-tools .tool small { color: var(--dim); font-size: .62rem; }
+.enc-actions { text-align: center; }
+.enc-msg { text-align: center; min-height: 18px; margin-top: 8px; font-size: .8rem; }
+.enc-msg.ok { color: var(--accent); } .enc-msg.bad { color: #e88; }
+
+/* --------- Catálogo --------- */
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+.cat-card { background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 8px; text-align: center; }
+.cat-card canvas { image-rendering: pixelated; background: #141b13; border-radius: 6px; }
+.cc-name { font-size: .76rem; font-weight: bold; margin-top: 4px; }
+.cc-tier { font-size: .7rem; } .cc-meta { font-size: .66rem; color: var(--dim); }
+.cc-mut { font-size: .62rem; color: #d9a6ff; } .cc-count { font-size: .62rem; color: var(--dim); margin-top: 2px; }
+.cat-grid.select .pick { cursor: pointer; } .cat-grid.select .pick.picked { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; }
+
+/* --------- Laboratorio --------- */
+.breed-slots { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 10px 0 6px; flex-wrap: wrap; }
+.slot { width: 90px; min-height: 110px; background: var(--panel2); border: 1px dashed var(--line); border-radius: 10px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; }
+.slot canvas { image-rendering: pixelated; }
+.cross-sign, .cross-eq { font-size: 1.4rem; color: var(--accent2); }
+.newbadge { background: linear-gradient(90deg, var(--accent), var(--accent2)); color: #10240f; font-weight: bold;
+  padding: 6px 14px; border-radius: 999px; margin-bottom: 10px; animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+
+/* --------- Mercado --------- */
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.shop-item { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+.shop-item b { font-size: .84rem; } .shop-item small { color: var(--dim); font-size: .72rem; flex: 1; }
+
+/* --------- Misiones --------- */
+.quest { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+.quest.done { opacity: .6; } .q-name { font-size: .86rem; font-weight: bold; }
+.q-desc { font-size: .76rem; color: var(--ink); margin: 3px 0; } .q-reward { font-size: .7rem; color: var(--accent2); }
+
+/* --------- Controles táctiles --------- */
+#touch { display: none; width: 100%; max-width: 900px; justify-content: space-between; padding: 12px 18px; }
+.dpad { position: relative; width: 132px; height: 132px; }
+.tb { font-family: inherit; background: var(--panel); border: 1px solid var(--line); color: var(--ink);
+  border-radius: 10px; font-size: 1rem; cursor: pointer; }
+.dpad .tb { position: absolute; width: 44px; height: 44px; }
+.dpad .up { top: 0; left: 44px; } .dpad .down { bottom: 0; left: 44px; }
+.dpad .left { top: 44px; left: 0; } .dpad .right { top: 44px; right: 0; }
+.abtns { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.abtns .a { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); color: #10240f; font-weight: bold; }
+.menu-keys { display: flex; gap: 8px; } .menu-keys .s { width: 44px; height: 44px; }
+
+/* --------- Footer --------- */
+#foot { color: var(--dim); font-size: .68rem; padding: 8px; text-align: center; }
+
+@media (max-width: 760px) {
+  #touch { display: flex; }
+  #foot { display: none; }
+  .logo { font-size: 2rem; }
+}
+@media (hover: none) and (pointer: coarse) {
+  #touch { display: flex; }
+}

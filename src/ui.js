@@ -1,0 +1,483 @@
+/* ============================================================
+   PHENO HUNTER — ui.js
+   Capa de interfaz: HUD, notificaciones y paneles superpuestos
+   (diálogo, mochila, banco, catálogo, laboratorio, mercado,
+   encuentro y menú). Los paneles pausan el mundo.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  const { fmt, cap } = PH.util;
+  const G = () => PH.state.get();
+
+  let overlay, hud, toastBox;
+
+  function init() {
+    overlay = document.getElementById('overlay');
+    hud = document.getElementById('hud');
+    toastBox = document.getElementById('toasts');
+  }
+
+  /* ---------------- Notificaciones ---------------- */
+  function toast(msg, kind) {
+    const el = document.createElement('div');
+    el.className = 'toast ' + (kind || '');
+    el.innerHTML = msg;
+    toastBox.appendChild(el);
+    setTimeout(() => { el.classList.add('show'); }, 10);
+    setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 400); }, 3200);
+  }
+
+  /* ---------------- HUD ---------------- */
+  function updateHUD() {
+    const s = G();
+    const env = s.env;
+    const map = PH.world.MAPS[s.player.map];
+    const wIcon = { despejado: '☀️', lluvia: '🌧️', niebla: '🌫️', tormenta: '⛈️', ola_calor: '🔥', nublado: '☁️' }[env.weather] || '☀️';
+    hud.innerHTML = `
+      <div class="hud-left">
+        <span class="pill">📍 ${map ? map.name : ''}</span>
+        <span class="pill">🕑 ${PH.state.timeLabel(env)} ${env.night ? '🌙' : '☀️'}</span>
+        <span class="pill">${wIcon} ${cap(env.weather.replace('_', ' '))}</span>
+        <span class="pill">🍂 ${cap(env.season)}</span>
+      </div>
+      <div class="hud-right">
+        <span class="pill">🏅 ${s.player.prestige}</span>
+        <span class="pill">💰 ${fmt(s.player.credits)}</span>
+        <span class="pill">📖 ${Object.keys(s.catalog).length}</span>
+      </div>`;
+  }
+
+  /* ---------------- Utilidades de paneles ---------------- */
+  function open(html, cls) {
+    overlay.className = 'active ' + (cls || '');
+    overlay.innerHTML = html;
+    PH.game.mode = 'menu';
+  }
+  function close() {
+    overlay.className = '';
+    overlay.innerHTML = '';
+    PH.game.mode = 'overworld';
+  }
+  function isOpen() { return overlay.className.indexOf('active') >= 0; }
+
+  // Dibuja una planta en un <canvas> por id tras insertar el HTML
+  function paintPlant(canvasId, pheno, scale) {
+    const c = document.getElementById(canvasId);
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, c.width, c.height);
+    PH.render.drawPlant(ctx, c.width / 2, c.height - 8, pheno, scale || 2, performance.now());
+  }
+
+  /* ---------------- Ficha de espécimen (HTML) ---------------- */
+  function statBar(label, v, max) {
+    max = max || 100;
+    const pct = Math.min(100, (v / max) * 100);
+    return `<div class="stat"><span>${label}</span><div class="bar"><i style="width:${pct}%"></i></div><b>${v}</b></div>`;
+  }
+  function tierBadge(spec) {
+    const t = PH.gen.rarityTier(spec.rarity);
+    return `<span class="tier" style="--tc:${t.color}">${'★'.repeat(t.stars)} ${t.label}</span>`;
+  }
+  function specimenCard(spec, opts) {
+    opts = opts || {};
+    const ph = spec.pheno;
+    const cid = 'pc_' + spec.uid;
+    const muts = ph.mutations.map(m => `<span class="mut">${PH.gen.MUTATIONS[m].label}</span>`).join('');
+    return `
+      <div class="spec-card">
+        <div class="spec-art"><canvas id="${cid}" width="90" height="110"></canvas></div>
+        <div class="spec-info">
+          <div class="spec-title">${spec.nickname || spec.name} <small>${spec.speciesId}</small></div>
+          ${tierBadge(spec)}
+          <div class="spec-desc">${PH.gen.describe(ph)}</div>
+          <div class="spec-meta">Forma: <b>${cap(spec.form)}</b> · Calidad: <b>${spec.quality}</b>${spec.generation ? ' · Gen ' + spec.generation : ''}</div>
+          <div class="spec-stats">
+            ${statBar('Altura', ph.quant.altura, 150)}
+            ${statBar('Producción', ph.quant.produccion, 150)}
+            ${statBar('Vigor', ph.quant.vigor)}
+            ${statBar('Resina', ph.quant.resina)}
+            ${statBar('Resist.', ph.quant.resistencia)}
+          </div>
+          ${muts ? '<div class="muts">' + muts + '</div>' : ''}
+          ${ph.sterile ? '<div class="warn">⚠ Estéril (no apta para cruce)</div>' : ''}
+        </div>
+      </div>`;
+  }
+
+  /* ---------------- DIÁLOGO ---------------- */
+  let dlgPages = [], dlgIndex = 0, dlgAfter = null;
+  function dialog(pages, after) {
+    dlgPages = pages; dlgIndex = 0; dlgAfter = after || null;
+    renderDialog();
+  }
+  function renderDialog() {
+    open(`<div class="dialog-box"><p>${dlgPages[dlgIndex]}</p><div class="dlg-hint">▼ Espacio / Click para continuar</div></div>`, 'bottom');
+    PH.game.mode = 'dialog';
+  }
+  function dialogNext() {
+    dlgIndex++;
+    if (dlgIndex >= dlgPages.length) { close(); const cb = dlgAfter; dlgAfter = null; if (cb) cb(); PH.game.afterQuestCheck(); }
+    else renderDialog();
+  }
+
+  /* ---------------- ENCUENTRO ---------------- */
+  function encounter(wild) {
+    const s = G();
+    PH.state.markSeen(wild.speciesId);
+    const hasLupa = s.player.gear.includes('lupa');
+    const hasMed = s.player.gear.includes('medidor');
+    const tools = s.player.tools.map(id => PH.items.TOOLS[id]).filter(Boolean);
+    const toolBtns = tools.map(t =>
+      `<button class="btn tool" data-tool="${t.id}">${t.name}<small>${Math.round(t.success * 100)}% · fid ${Math.round(t.quality * 100)}%</small></button>`
+    ).join('');
+    const rarityHint = hasLupa ? `${'★'.repeat(PH.gen.rarityTier(wild.rarity).stars)} ${PH.gen.rarityTier(wild.rarity).label}` : '¿? (necesitas Lupa)';
+    const envHint = hasMed ? `<div class="enc-env">Clima: ${cap(s.env.weather)} · ${s.env.night ? 'Noche' : 'Día'} · ${cap(s.env.season)}</div>` : '';
+
+    open(`
+      <div class="encounter">
+        <div class="enc-head">¡Variedad salvaje avistada!</div>
+        <div class="enc-body">
+          <div class="enc-art"><canvas id="enc_canvas" width="140" height="170"></canvas></div>
+          <div class="enc-side">
+            <div class="enc-name">${wild.name} <small>${wild.speciesId}</small></div>
+            <div class="enc-rare">Rareza estimada: ${rarityHint}</div>
+            <div class="enc-desc">${PH.gen.describe(wild.pheno)}</div>
+            ${envHint}
+            <div class="enc-fields">
+              <span>Altura ${wild.pheno.quant.altura}</span>
+              <span>Prod ${wild.pheno.quant.produccion}</span>
+              <span>Resina ${wild.pheno.quant.resina}</span>
+              <span>Vigor ${wild.pheno.quant.vigor}</span>
+            </div>
+          </div>
+        </div>
+        <div class="enc-tools">${toolBtns}</div>
+        <div class="enc-actions"><button class="btn ghost" id="enc_flee">Dejar y marchar</button></div>
+        <div class="enc-msg" id="enc_msg"></div>
+      </div>`, 'center');
+    PH.game.mode = 'encounter';
+    paintPlant('enc_canvas', wild.pheno, 2.4);
+
+    overlay.querySelectorAll('.tool').forEach(b => b.onclick = () => resolveHarvest(wild, b.dataset.tool));
+    document.getElementById('enc_flee').onclick = () => close();
+  }
+
+  function resolveHarvest(wild, toolId) {
+    const res = PH.encounter.harvest(wild, toolId);
+    const msg = document.getElementById('enc_msg');
+    if (res.success) {
+      if (res.form === 'polen') {
+        // polen: material de cruce; se guarda igualmente en banco marcado
+        PH.state.bankAdd(res.specimen);
+      } else {
+        PH.state.bankAdd(res.specimen);
+      }
+      const reg = PH.state.registerCatalog ? null : null;
+      msg.className = 'enc-msg ok';
+      msg.textContent = res.msg;
+      // ¿nuevo descubrimiento?
+      setTimeout(() => { close(); PH.game.afterQuestCheck(); updateHUD(); }, 900);
+      toast(res.msg, 'ok');
+    } else {
+      msg.className = 'enc-msg bad';
+      msg.textContent = res.msg;
+      // permite reintentar con otra herramienta; deshabilita nada
+      setTimeout(() => { close(); }, 1100);
+    }
+  }
+
+  /* ---------------- MOCHILA ---------------- */
+  function bag() {
+    const s = G();
+    const tools = s.player.tools.map(id => PH.items.TOOLS[id]);
+    const gear = s.player.gear.map(id => PH.items.GEAR[id]);
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2>🎒 Mochila</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          <h3>Herramientas de recolección</h3>
+          <div class="grid">
+            ${tools.map(t => `<div class="item ${s.player.activeTool === t.id ? 'sel' : ''}" data-tool="${t.id}">
+              <b>${t.name}</b><small>${t.desc}</small>
+              <span class="tag">éxito ${Math.round(t.success * 100)}% · fidelidad ${Math.round(t.quality * 100)}%</span></div>`).join('')}
+          </div>
+          <h3>Equipo</h3>
+          <div class="grid">
+            ${gear.length ? gear.map(g => `<div class="item"><b>${g.name}</b><small>${g.desc}</small></div>`).join('') : '<p class="dim">Sin equipo aún. Visita el Mercado.</p>'}
+          </div>
+          <p class="dim">Consejo: haz clic en una herramienta para marcarla como activa.</p>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    overlay.querySelectorAll('.item[data-tool]').forEach(el => el.onclick = () => { s.player.activeTool = el.dataset.tool; bag(); });
+  }
+
+  /* ---------------- BANCO GENÉTICO ---------------- */
+  function bank() {
+    const s = G();
+    if (!s.bank.length) {
+      open(`<div class="panel"><div class="panel-head"><h2>🧬 Banco genético</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body"><p class="dim">El banco está vacío. Recolecta variedades en las rutas.</p></div></div>`, 'center');
+      document.getElementById('p_close').onclick = close; return;
+    }
+    const sorted = s.bank.slice().sort((a, b) => b.rarity - a.rarity);
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2>🧬 Banco genético <small>${s.bank.length} muestras</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body list">
+          ${sorted.map(sp => `
+            <div class="bank-row">
+              ${specimenCard(sp)}
+              <div class="bank-actions">
+                <button class="btn small" data-sell="${sp.uid}">Vender 💰${sellPrice(sp)}</button>
+                <button class="btn small ghost" data-rel="${sp.uid}">Liberar</button>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    sorted.forEach(sp => paintPlant('pc_' + sp.uid, sp.pheno, 2));
+    overlay.querySelectorAll('[data-sell]').forEach(b => b.onclick = () => { sell(b.dataset.sell); bank(); });
+    overlay.querySelectorAll('[data-rel]').forEach(b => b.onclick = () => { PH.state.bankRemove(b.dataset.rel); toast('Muestra liberada.'); bank(); });
+  }
+  function sellPrice(sp) {
+    return Math.round(30 + sp.rarity * sp.rarity * 0.9 + sp.quality * 1.5);
+  }
+  function sell(uid) {
+    const sp = PH.state.bankGet(uid);
+    if (!sp) return;
+    // no permitir vender la última copia única del catálogo si es la única muestra de esa firma? Permitimos, el catálogo persiste.
+    const price = sellPrice(sp);
+    PH.state.bankRemove(uid);
+    PH.state.addCredits(price);
+    toast(`Vendido por 💰${price}.`, 'ok');
+    updateHUD();
+  }
+
+  /* ---------------- CATÁLOGO ---------------- */
+  function catalog() {
+    const s = G();
+    const entries = Object.values(s.catalog).sort((a, b) => b.rarity - a.rarity);
+    const total = PH.species.SPECIES.length;
+    const seenSpecies = Object.keys(s.species).filter(id => s.species[id].obtained > 0).length;
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2>📖 Catálogo mundial <small>${entries.length} fenotipos · ${seenSpecies}/${total} especies</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          ${entries.length ? `<div class="cat-grid">${entries.map(e => catCard(e)).join('')}</div>` : '<p class="dim">Aún no has catalogado nada.</p>'}
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    entries.forEach((e, i) => paintPlant('cat_' + i, e.pheno, 1.7));
+  }
+  function catCard(e) {
+    const idx = catCard._i = (catCard._i || 0);
+    const t = PH.gen.rarityTier(e.rarity);
+    catCard._i++;
+    const cid = 'cat_' + idx;
+    const muts = e.mutations.map(m => PH.gen.MUTATIONS[m].label).join(', ');
+    return `<div class="cat-card">
+      <canvas id="${cid}" width="70" height="90"></canvas>
+      <div class="cc-name">${e.name}</div>
+      <div class="cc-tier" style="color:${t.color}">${'★'.repeat(t.stars)}</div>
+      <div class="cc-meta">${cap(e.pheno.color)} · ${cap(e.pheno.terp)}</div>
+      ${muts ? `<div class="cc-mut">${muts}</div>` : ''}
+      <div class="cc-count">×${e.count} · desc. ${e.firstAt}</div>
+    </div>`;
+  }
+
+  /* ---------------- LABORATORIO (CRUCE) ---------------- */
+  let breedSel = [];
+  function lab() {
+    const s = G();
+    const fertile = s.bank.filter(sp => sp.form !== 'polen' && !sp.pheno.sterile);
+    const pollen = s.bank.filter(sp => sp.form === 'polen');
+    const usable = fertile.concat(pollen);
+    breedSel = breedSel.filter(uid => s.bank.find(x => x.uid === uid));
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2>🔬 Laboratorio — Cruces genéticos</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          <p class="dim">Selecciona dos parentales. La descendencia hereda un alelo de cada uno por gen; pueden surgir fenotipos, colores y mutaciones nuevos.</p>
+          <div class="breed-slots">
+            <div class="slot">${slotView(0)}</div>
+            <div class="cross-sign">✕</div>
+            <div class="slot">${slotView(1)}</div>
+            <div class="cross-eq">→</div>
+            <button class="btn primary" id="do_cross" ${breedSel.length === 2 ? '' : 'disabled'}>Cruzar</button>
+          </div>
+          <h3>Parentales disponibles (${usable.length})</h3>
+          <div class="cat-grid select">
+            ${usable.map(sp => `<div class="cat-card pick ${breedSel.includes(sp.uid) ? 'picked' : ''}" data-pick="${sp.uid}">
+              <canvas id="lp_${sp.uid}" width="70" height="90"></canvas>
+              <div class="cc-name">${sp.nickname || sp.name}</div>
+              <div class="cc-tier" style="color:${PH.gen.rarityTier(sp.rarity).color}">${'★'.repeat(PH.gen.rarityTier(sp.rarity).stars)}</div>
+              <div class="cc-meta">${cap(sp.form)} · ${cap(sp.pheno.color)}</div>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = () => { breedSel = []; close(); };
+    usable.forEach(sp => paintPlant('lp_' + sp.uid, sp.pheno, 1.7));
+    overlay.querySelectorAll('[data-pick]').forEach(el => el.onclick = () => togglePick(el.dataset.pick));
+    document.getElementById('do_cross').onclick = doCross;
+  }
+  function slotView(i) {
+    const uid = breedSel[i];
+    if (!uid) return '<span class="dim">vacío</span>';
+    const sp = PH.state.bankGet(uid);
+    return `<canvas id="slot_${i}" width="70" height="90"></canvas><div class="cc-name">${sp.name}</div>`;
+  }
+  function togglePick(uid) {
+    const i = breedSel.indexOf(uid);
+    if (i >= 0) breedSel.splice(i, 1);
+    else if (breedSel.length < 2) breedSel.push(uid);
+    lab();
+    breedSel.forEach((u, k) => paintPlant('slot_' + k, PH.state.bankGet(u).pheno, 1.7));
+  }
+  function doCross() {
+    if (breedSel.length !== 2) return;
+    const s = G();
+    const A = PH.state.bankGet(breedSel[0]);
+    const B = PH.state.bankGet(breedSel[1]);
+    const labBonus = 1; // futuro: mejoras de laboratorio
+    const childGeno = PH.gen.breed(A.genotype, B.genotype, { mutRate: 0.08, mutBoost: labBonus });
+    const spec = PH.species.makeSpecimen(PH.species.SPECIES_BY_ID[A.speciesId], s.env, {
+      genotype: childGeno, form: 'cruce', quality: Math.round((A.quality + B.quality) / 2),
+      parents: [A.uid, B.uid], generation: Math.max(A.generation, B.generation) + 1,
+    });
+    s.stats.crosses++;
+    const before = Object.keys(s.catalog).length;
+    PH.state.bankAdd(spec);
+    const isNew = Object.keys(s.catalog).length > before;
+    breedSel = [];
+    // pantalla de resultado
+    crossResult(spec, isNew, A, B);
+    PH.game.afterQuestCheck();
+  }
+  function crossResult(spec, isNew, A, B) {
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2>🌱 Descendencia obtenida</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body center-col">
+          ${isNew ? '<div class="newbadge">✨ ¡FENOTIPO NUEVO PARA EL CATÁLOGO! ✨</div>' : '<div class="dim">Fenotipo ya conocido.</div>'}
+          ${specimenCard(spec)}
+          <p class="dim">Parentales: ${A.name} ✕ ${B.name}</p>
+          <div class="row">
+            <button class="btn primary" id="again">Volver al laboratorio</button>
+            <button class="btn ghost" id="p_close2">Cerrar</button>
+          </div>
+        </div>
+      </div>`, 'center');
+    paintPlant('pc_' + spec.uid, spec.pheno, 2.4);
+    document.getElementById('p_close').onclick = close;
+    document.getElementById('p_close2').onclick = close;
+    document.getElementById('again').onclick = lab;
+    if (isNew) toast('✨ Nuevo fenotipo catalogado: ' + spec.name, 'ok');
+  }
+
+  /* ---------------- MERCADO ---------------- */
+  function shop() {
+    const s = G();
+    const toolStock = Object.values(PH.items.TOOLS).filter(t => t.price > 0 && !s.player.tools.includes(t.id));
+    const gearStock = Object.values(PH.items.GEAR).filter(g => !g.consumable && !s.player.gear.includes(g.id))
+      .concat(Object.values(PH.items.GEAR).filter(g => g.consumable));
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2>🛒 Mercado <small>💰 ${fmt(s.player.credits)}</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          <h3>Herramientas</h3>
+          <div class="shop-grid">
+            ${toolStock.length ? toolStock.map(t => shopItem(t, 'tool')).join('') : '<p class="dim">Tienes todas las herramientas.</p>'}
+          </div>
+          <h3>Equipo y consumibles</h3>
+          <div class="shop-grid">
+            ${gearStock.map(g => shopItem(g, 'gear')).join('')}
+          </div>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    overlay.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => { buy(b.dataset.buy, b.dataset.kind); });
+  }
+  function shopItem(it, kind) {
+    return `<div class="shop-item">
+      <b>${it.name}</b><small>${it.desc}</small>
+      <button class="btn small" data-buy="${it.id}" data-kind="${kind}">💰 ${fmt(it.price)}</button>
+    </div>`;
+  }
+  function buy(id, kind) {
+    const s = G();
+    const it = kind === 'tool' ? PH.items.TOOLS[id] : PH.items.GEAR[id];
+    if (s.player.credits < it.price) { toast('Créditos insuficientes.', 'bad'); return; }
+    PH.state.addCredits(-it.price);
+    if (kind === 'tool') { if (!s.player.tools.includes(id)) s.player.tools.push(id); }
+    else if (it.consumable) { s.player.cebosActivos += 8; }
+    else { if (!s.player.gear.includes(id)) s.player.gear.push(id); }
+    toast('Comprado: ' + it.name, 'ok');
+    updateHUD(); shop();
+  }
+
+  /* ---------------- MISIONES ---------------- */
+  function quests() {
+    const list = PH.quests.activeList();
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2>📋 Misiones</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          ${list.length ? list.map(q => `<div class="quest ${q.state}">
+            <div class="q-name">${q.state === 'done' ? '✅' : '◻️'} ${q.name}</div>
+            <div class="q-desc">${q.desc}</div>
+            <div class="q-reward">Recompensa: ${rewardText(q.reward)}</div>
+          </div>`).join('') : '<p class="dim">Habla con los NPC de la Ciudad para conseguir misiones.</p>'}
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+  }
+  function rewardText(r) {
+    const bits = [];
+    if (r.credits) bits.push('💰' + r.credits);
+    if (r.prestige) bits.push('🏅' + r.prestige);
+    if (r.tool) bits.push(PH.items.TOOLS[r.tool].name);
+    if (r.gear) bits.push(PH.items.GEAR[r.gear].name);
+    return bits.join(' · ');
+  }
+
+  /* ---------------- MENÚ / ubicaciones especiales ---------------- */
+  function placeMenu(kind) {
+    if (kind === '@lab_interior') return lab();
+    if (kind === '@tienda') return shop();
+    if (kind === '@casa') return houseMenu();
+    if (kind === '@cueva') return toast('La cueva está sellada. (Contenido futuro)', 'bad');
+    if (kind === '@expedicion') {
+      if (!PH.state.unlocked('expedicion')) return toast('Necesitas 60 de prestigio para las expediciones.', 'bad');
+      return toast('Muelle de expediciones — próximamente.', 'ok');
+    }
+  }
+  function houseMenu() {
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2>🏠 Tu casa</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body center-col">
+          <p>Un lugar tranquilo para descansar y organizar tu trabajo.</p>
+          <div class="row">
+            <button class="btn primary" id="h_save">💾 Guardar partida</button>
+            <button class="btn ghost" id="h_reset">Reiniciar progreso</button>
+          </div>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    document.getElementById('h_save').onclick = () => { PH.state.save(); toast('Partida guardada.', 'ok'); };
+    document.getElementById('h_reset').onclick = () => {
+      if (confirm('¿Reiniciar TODO el progreso? Esto no se puede deshacer.')) { PH.state.reset(); location.reload(); }
+    };
+  }
+
+  PH.ui = {
+    init, toast, updateHUD, open, close, isOpen,
+    dialog, dialogNext, encounter, bag, bank, catalog, lab, shop, quests, placeMenu,
+    specimenCard, paintPlant,
+    get mode() { return PH.game ? PH.game.mode : 'overworld'; }
+  };
+})(window.PH = window.PH || {});
