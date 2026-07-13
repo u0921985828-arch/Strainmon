@@ -46,7 +46,7 @@
       <div class="hud-right">
         <span class="pill">🏅 ${s.player.prestige}</span>
         <span class="pill">💰 ${fmt(s.player.credits)}</span>
-        <span class="pill">📖 ${Object.keys(s.catalog).length}</span>
+        <span class="pill">🌿 ${Object.keys(s.catalog).length}</span>
       </div>`;
   }
 
@@ -153,7 +153,7 @@
 
     open(`
       <div class="encounter">
-        <div class="enc-head">¡Variedad salvaje avistada!</div>
+        <div class="enc-head">¡Cepa landrace salvaje!</div>
         <div class="enc-body">
           <div class="enc-art"><canvas id="enc_canvas" width="140" height="170"></canvas></div>
           <div class="enc-side">
@@ -234,14 +234,14 @@
   function bank() {
     const s = G();
     if (!s.bank.length) {
-      open(`<div class="panel"><div class="panel-head"><h2>🧬 Banco genético</h2><button class="x" id="p_close">✕</button></div>
-        <div class="panel-body"><p class="dim">El banco está vacío. Recolecta variedades en las rutas.</p></div></div>`, 'center');
+      open(`<div class="panel"><div class="panel-head"><h2>🧬 Bóveda de cepas</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body"><p class="dim">La bóveda está vacía. Recolecta cepas en las regiones.</p></div></div>`, 'center');
       document.getElementById('p_close').onclick = close; return;
     }
     const sorted = s.bank.slice().sort((a, b) => b.rarity - a.rarity);
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🧬 Banco genético <small>${s.bank.length} muestras</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2>🧬 Bóveda de cepas <small>${s.bank.length} muestras</small></h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body list">
           ${sorted.map(sp => `
             <div class="bank-row">
@@ -315,7 +315,7 @@
     const seenSpecies = Object.keys(s.species).filter(id => s.species[id].obtained > 0).length;
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🌿 Strain-dex mundial <small>${entries.length} fenotipos · ${seenSpecies}/${total} especies</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2>🌿 Strain-dex mundial <small>${entries.length} fenotipos · ${seenSpecies}/${total} cepas</small></h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           ${entries.length ? `<div class="cat-grid">${entries.map(e => catCard(e)).join('')}</div>` : '<p class="dim">Aún no has catalogado nada.</p>'}
         </div>
@@ -492,7 +492,7 @@
             <div class="cc-name">${sp.nickname || sp.name}</div>
             <div class="cc-tier" style="color:${PH.gen.rarityTier(sp.rarity).color}">${'★'.repeat(PH.gen.rarityTier(sp.rarity).stars)}</div>
             <div class="cc-meta">${cap(sp.form)} · ${cap(sp.pheno.color)}</div>
-          </div>`).join('')}</div>` : '<p class="dim">No tienes muestras plantables. Recolecta o cruza primero.</p>'}
+          </div>`).join('')}</div>` : '<p class="dim">No tienes cepas plantables. Recolecta o cruza primero.</p>'}
           <div class="row"><button class="btn ghost" id="back">Volver al invernadero</button></div>
         </div>
       </div>`, 'center');
@@ -591,7 +591,7 @@
           <div class="hub-grid">
             <button class="btn big hub" id="hb_cross">🧬<br>Cruces genéticos</button>
             <button class="btn big hub" id="hb_green">🌿<br>Invernadero</button>
-            <button class="btn big hub" id="hb_bank">🗄️<br>Banco genético</button>
+            <button class="btn big hub" id="hb_bank">🗄️<br>Bóveda de cepas</button>
           </div>
         </div>
       </div>`, 'center');

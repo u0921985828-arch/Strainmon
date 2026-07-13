@@ -8,8 +8,8 @@
   --panel2: #242c3a;
   --ink: #eaf0e6;
   --dim: #97a1ad;
-  --accent: #7bd66b;
-  --accent2: #ffb02e;
+  --accent: #79c94c;
+  --accent2: #f2b134;
   --line: #33404f;
   --shadow: 0 6px 24px rgba(0,0,0,.5);
   font-size: 16px;
@@ -17,7 +17,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
   height: 100%;
-  background: radial-gradient(circle at 50% 0%, #21351f 0%, #0f130d 70%);
+  background: radial-gradient(circle at 50% 0%, #1c3a1a 0%, #0d120b 72%);
   color: var(--ink);
   font-family: "Courier New", ui-monospace, monospace;
   overflow: hidden;
