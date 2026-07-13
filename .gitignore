@@ -1,3 +1,10 @@
 node_modules/
 *.log
 .DS_Store
+
+# Secretos (NUNCA commitear)
+.secrets/
+*.key
+
+# Salida cruda del generador (curar antes de versionar)
+assets/gen/
