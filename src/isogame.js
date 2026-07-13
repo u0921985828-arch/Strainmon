@@ -58,8 +58,8 @@
         { gx: 10, gy: 2, to: 'lab', tgx: 3, tgy: 3 },
       ],
       npcs: [
-        { gx: 6, gy: 5, name: 'Dealer Kez', sprite: 'npc6', dialog: 'contrabandista', dir: 'SW', role: 'dealer' },
-        { gx: 3, gy: 4, name: 'Vecina Bru', sprite: 'npc2', dialog: 'coleccionista', dir: 'SE', role: 'neighbor' },
+        { gx: 6, gy: 5, name: 'Dealer Kez', sprite: 'npc6', dialog: 'contrabandista', dir: 'SW', role: 'dealer', char: 'dealer' },
+        { gx: 3, gy: 4, name: 'Vecina Bru', sprite: 'npc2', dialog: 'coleccionista', dir: 'SE', role: 'neighbor', char: 'neighbor' },
         { gx: 8, gy: 3, name: 'Cliente', sprite: 'npc3', dir: 'SW', role: 'customer', char: 'customer1' },
         { gx: 4, gy: 6, name: 'Cliente', sprite: 'npc4', dir: 'NE', role: 'customer', char: 'customer2' },
         { gx: 11, gy: 5, name: 'Transeúnte', sprite: 'npc5', dir: 'NW', role: 'walker', char: 'walker' },
@@ -79,7 +79,7 @@
       ],
       spawn: { gx: 3, gy: 4 },
       doors: [{ gx: 3, gy: 4, to: 'street', tgx: 6, tgy: 3 }],
-      npcs: [{ gx: 3, gy: 1, name: 'Mercader', sprite: 'npc4', dialog: 'nomada', dir: 'SW' }],
+      npcs: [{ gx: 3, gy: 1, name: 'Mercader', sprite: 'npc4', dialog: 'nomada', dir: 'SW', role: 'merchant', char: 'merchant' }],
       objects: [{ gx: 5, gy: 2, kind: 'shop', solid: true, label: 'Mostrador' }],
     },
     lab: {
@@ -94,7 +94,7 @@
       ],
       spawn: { gx: 3, gy: 4 },
       doors: [{ gx: 3, gy: 4, to: 'street', tgx: 10, tgy: 3 }],
-      npcs: [{ gx: 2, gy: 1, name: 'Dr. Vane', sprite: 'npc5', dialog: 'genetista', dir: 'SE' }],
+      npcs: [{ gx: 2, gy: 1, name: 'Dr. Vane', sprite: 'npc5', dialog: 'genetista', dir: 'SE', role: 'botanist', char: 'botanist' }],
       objects: [
         { gx: 4, gy: 1, kind: 'lab', solid: true, label: 'Mesa de cruces' },
         { gx: 5, gy: 2, kind: 'pc', solid: true, label: 'Terminal ADN' },
