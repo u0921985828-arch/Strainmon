@@ -259,7 +259,7 @@ html, body {
 /* --------- LCD --------- */
 #lcd {
   position: relative; flex: 1 1 auto; min-height: 0;
-  aspect-ratio: 3 / 2; max-height: 62vh; margin: 0 auto;
+  aspect-ratio: 10 / 9; max-height: 62vh; margin: 0 auto;
   background: #0c110d; border-radius: 14px;
   padding: 2.2vmin; padding-top: 3vmin;
   box-shadow: 0 8px 26px rgba(0,0,0,.5), inset 0 0 0 2px #08120b, inset 0 0 3vmin rgba(0,0,0,.6);
@@ -305,9 +305,23 @@ html, body {
   box-shadow: 0 2px 0 #0a1a12; }
 .mb:active { transform: translateY(1px); box-shadow: 0 1px 0 #0a1a12; }
 
+/* START / SELECT */
+#sysrow { display: flex; justify-content: center; gap: 5vmin; }
+.pill-btn { transform: rotate(-18deg); background: linear-gradient(180deg, #2a2f35, #14181c); color: #b9c2cb;
+  border: 1px solid #0a0d10; border-radius: 999px; padding: 1.1vmin 3.2vmin; font-size: clamp(8px, 1.6vmin, 11px);
+  font-weight: 700; letter-spacing: 1px; cursor: pointer; box-shadow: 0 2px 0 #0a0d10; }
+.pill-btn:active { transform: rotate(-18deg) translateY(1px); box-shadow: 0 1px 0 #0a0d10; }
+
+/* fila inferior: ruedas + altavoz */
+#footrow { display: flex; align-items: center; justify-content: space-between; gap: 3vmin; opacity: .8; }
+.knob { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #bfe8cf;
+  font-size: clamp(6px, 1.2vmin, 9px); letter-spacing: 1px; }
+.knob i { width: 6vmin; height: 6vmin; max-width: 28px; max-height: 28px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #3a4a40, #10201a); border: 1px solid #0a1a12;
+  box-shadow: inset 0 -2px 3px rgba(0,0,0,.5); }
 /* rejilla de altavoz */
-.speaker { display: flex; gap: 5px; justify-content: center; opacity: .5; }
-.speaker i { width: 4px; height: 16px; border-radius: 3px; background: #0e2a1c; box-shadow: inset 0 0 2px #000; }
+.speaker { display: flex; gap: 5px; justify-content: center; opacity: .5; transform: rotate(-18deg); }
+.speaker i { width: 4px; height: 18px; border-radius: 3px; background: #0e2a1c; box-shadow: inset 0 0 2px #000; }
 
 @media (min-aspect-ratio: 1/1) {
   /* pantallas anchas: LCD más alta y controles a los lados */

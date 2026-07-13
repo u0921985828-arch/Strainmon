@@ -266,7 +266,7 @@ html, body {
 /* --------- LCD --------- */
 #lcd {
   position: relative; flex: 1 1 auto; min-height: 0;
-  aspect-ratio: 3 / 2; max-height: 62vh; margin: 0 auto;
+  aspect-ratio: 10 / 9; max-height: 62vh; margin: 0 auto;
   background: #0c110d; border-radius: 14px;
   padding: 2.2vmin; padding-top: 3vmin;
   box-shadow: 0 8px 26px rgba(0,0,0,.5), inset 0 0 0 2px #08120b, inset 0 0 3vmin rgba(0,0,0,.6);
@@ -312,9 +312,23 @@ html, body {
   box-shadow: 0 2px 0 #0a1a12; }
 .mb:active { transform: translateY(1px); box-shadow: 0 1px 0 #0a1a12; }
 
+/* START / SELECT */
+#sysrow { display: flex; justify-content: center; gap: 5vmin; }
+.pill-btn { transform: rotate(-18deg); background: linear-gradient(180deg, #2a2f35, #14181c); color: #b9c2cb;
+  border: 1px solid #0a0d10; border-radius: 999px; padding: 1.1vmin 3.2vmin; font-size: clamp(8px, 1.6vmin, 11px);
+  font-weight: 700; letter-spacing: 1px; cursor: pointer; box-shadow: 0 2px 0 #0a0d10; }
+.pill-btn:active { transform: rotate(-18deg) translateY(1px); box-shadow: 0 1px 0 #0a0d10; }
+
+/* fila inferior: ruedas + altavoz */
+#footrow { display: flex; align-items: center; justify-content: space-between; gap: 3vmin; opacity: .8; }
+.knob { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #bfe8cf;
+  font-size: clamp(6px, 1.2vmin, 9px); letter-spacing: 1px; }
+.knob i { width: 6vmin; height: 6vmin; max-width: 28px; max-height: 28px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #3a4a40, #10201a); border: 1px solid #0a1a12;
+  box-shadow: inset 0 -2px 3px rgba(0,0,0,.5); }
 /* rejilla de altavoz */
-.speaker { display: flex; gap: 5px; justify-content: center; opacity: .5; }
-.speaker i { width: 4px; height: 16px; border-radius: 3px; background: #0e2a1c; box-shadow: inset 0 0 2px #000; }
+.speaker { display: flex; gap: 5px; justify-content: center; opacity: .5; transform: rotate(-18deg); }
+.speaker i { width: 4px; height: 18px; border-radius: 3px; background: #0e2a1c; box-shadow: inset 0 0 2px #000; }
 
 @media (min-aspect-ratio: 1/1) {
   /* pantallas anchas: LCD más alta y controles a los lados */
@@ -367,6 +381,11 @@ html, body {
       </div>
     </div>
 
+    <div id="sysrow">
+      <button data-key="select" class="pill-btn" title="SELECT · Modo DMG/color">SELECT</button>
+      <button data-key="start" class="pill-btn" title="START · Misiones">START</button>
+    </div>
+
     <div id="menurow">
       <button data-key="i" class="mb" title="Mochila">🎒</button>
       <button data-key="g" class="mb" title="Invernadero">🌿</button>
@@ -377,7 +396,11 @@ html, body {
       <button data-key="m" class="mb" title="Guardar">💾</button>
     </div>
 
-    <div class="speaker"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div id="footrow">
+      <span class="knob"><i></i>CONTRASTE</span>
+      <div class="speaker"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <span class="knob"><i></i>VOLUMEN</span>
+    </div>
   </div>
   <script>
 /* ==== src/util.js ==== */
@@ -3818,7 +3841,8 @@ html, body {
   /* ------------------------- ESTADO ------------------------- */
   const game = {
     mode: 'boot', canvas: null, ctx: null, scale: 3,
-    W: 480, H: 320,
+    W: 480, H: 432,                 // 10:9 (proporción fiel a la Game Boy 160x144)
+    dmg: false, _dmg: null,          // modo DMG (4 tonos, 160x144)
     moving: false, from: null, to: null, moveT: 0, moveDur: 170, frame: 0, animT: 0,
     keys: {}, lastSave: 0, cam: { x: 0, y: 0 },
   };
@@ -3876,6 +3900,7 @@ html, body {
     // Partida nueva -> siempre en el apartamento. Continuar -> respeta sala iso guardada.
     if (fresh || !ROOMS[p.map] || !p.iso) { p.map = 'apt'; p.x = ROOMS.apt.spawn.gx; p.y = ROOMS.apt.spawn.gy; p.dir = 'SW'; }
     p.iso = true;
+    game.dmg = !!p.dmg;
     normalizePlayer();
     game.mode = 'overworld';
     centerCam(true);
@@ -3893,9 +3918,16 @@ html, body {
     if (game.mode !== 'overworld') return;
     if (k === ' ' || k === 'e') interact();
     else if (k === 'i') PH.ui.bag(); else if (k === 'b') PH.ui.bank();
-    else if (k === 'c') PH.ui.catalog(); else if (k === 'q') PH.ui.quests();
+    else if (k === 'c') PH.ui.catalog(); else if (k === 'q' || k === 'start' || k === 'enter') PH.ui.quests();
     else if (k === 'l') PH.ui.lab(); else if (k === 'g') PH.ui.greenhouse();
+    else if (k === 'select' || k === 'p') toggleDMG();
     else if (k === 'm') { PH.state.save(); PH.ui.toast('Partida guardada.', 'ok'); }
+  }
+  function toggleDMG() {
+    game.dmg = !game.dmg;
+    G().player.dmg = game.dmg;
+    PH.state.save();
+    PH.ui.toast(game.dmg ? '🟩 Modo DMG (4 tonos)' : '🌈 Modo color', '');
   }
   function bindInput() {
     window.addEventListener('keydown', (e) => {
@@ -4147,6 +4179,25 @@ html, body {
     // etiqueta del objeto/npc al frente si el jugador mira algo interactuable
     hudFacingLabel(ctx, m);
     envTint(ctx);
+    if (game.dmg) applyDMG();
+  }
+
+  // Post-proceso "modo DMG": reduce a 160x144, cuantiza luminancia a 4 tonos
+  // (paleta verde-oliva clásica) y reescala. Barato (~23k px/frame).
+  const DMG_PAL = [[15, 56, 15], [48, 98, 48], [139, 172, 15], [155, 188, 15]];
+  function applyDMG() {
+    if (!game._dmg) { const c = document.createElement('canvas'); c.width = 160; c.height = 144; game._dmg = c; }
+    const sc = game._dmg.getContext('2d'); sc.imageSmoothingEnabled = false;
+    sc.drawImage(game.canvas, 0, 0, 160, 144);
+    const id = sc.getImageData(0, 0, 160, 144), d = id.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const l = d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11;
+      const c = DMG_PAL[l < 48 ? 0 : l < 108 ? 1 : l < 176 ? 2 : 3];
+      d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2];
+    }
+    sc.putImageData(id, 0, 0);
+    const ctx = game.ctx; ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(game._dmg, 0, 0, game.W, game.H);
   }
 
   // Dibuja un sprite de mueble anclado a la base del tile (fallback: cubo).

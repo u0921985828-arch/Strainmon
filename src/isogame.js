@@ -150,7 +150,8 @@
   /* ------------------------- ESTADO ------------------------- */
   const game = {
     mode: 'boot', canvas: null, ctx: null, scale: 3,
-    W: 480, H: 320,
+    W: 480, H: 432,                 // 10:9 (proporción fiel a la Game Boy 160x144)
+    dmg: false, _dmg: null,          // modo DMG (4 tonos, 160x144)
     moving: false, from: null, to: null, moveT: 0, moveDur: 170, frame: 0, animT: 0,
     keys: {}, lastSave: 0, cam: { x: 0, y: 0 },
   };
@@ -208,6 +209,7 @@
     // Partida nueva -> siempre en el apartamento. Continuar -> respeta sala iso guardada.
     if (fresh || !ROOMS[p.map] || !p.iso) { p.map = 'apt'; p.x = ROOMS.apt.spawn.gx; p.y = ROOMS.apt.spawn.gy; p.dir = 'SW'; }
     p.iso = true;
+    game.dmg = !!p.dmg;
     normalizePlayer();
     game.mode = 'overworld';
     centerCam(true);
@@ -225,9 +227,16 @@
     if (game.mode !== 'overworld') return;
     if (k === ' ' || k === 'e') interact();
     else if (k === 'i') PH.ui.bag(); else if (k === 'b') PH.ui.bank();
-    else if (k === 'c') PH.ui.catalog(); else if (k === 'q') PH.ui.quests();
+    else if (k === 'c') PH.ui.catalog(); else if (k === 'q' || k === 'start' || k === 'enter') PH.ui.quests();
     else if (k === 'l') PH.ui.lab(); else if (k === 'g') PH.ui.greenhouse();
+    else if (k === 'select' || k === 'p') toggleDMG();
     else if (k === 'm') { PH.state.save(); PH.ui.toast('Partida guardada.', 'ok'); }
+  }
+  function toggleDMG() {
+    game.dmg = !game.dmg;
+    G().player.dmg = game.dmg;
+    PH.state.save();
+    PH.ui.toast(game.dmg ? '🟩 Modo DMG (4 tonos)' : '🌈 Modo color', '');
   }
   function bindInput() {
     window.addEventListener('keydown', (e) => {
@@ -479,6 +488,25 @@
     // etiqueta del objeto/npc al frente si el jugador mira algo interactuable
     hudFacingLabel(ctx, m);
     envTint(ctx);
+    if (game.dmg) applyDMG();
+  }
+
+  // Post-proceso "modo DMG": reduce a 160x144, cuantiza luminancia a 4 tonos
+  // (paleta verde-oliva clásica) y reescala. Barato (~23k px/frame).
+  const DMG_PAL = [[15, 56, 15], [48, 98, 48], [139, 172, 15], [155, 188, 15]];
+  function applyDMG() {
+    if (!game._dmg) { const c = document.createElement('canvas'); c.width = 160; c.height = 144; game._dmg = c; }
+    const sc = game._dmg.getContext('2d'); sc.imageSmoothingEnabled = false;
+    sc.drawImage(game.canvas, 0, 0, 160, 144);
+    const id = sc.getImageData(0, 0, 160, 144), d = id.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const l = d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11;
+      const c = DMG_PAL[l < 48 ? 0 : l < 108 ? 1 : l < 176 ? 2 : 3];
+      d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2];
+    }
+    sc.putImageData(id, 0, 0);
+    const ctx = game.ctx; ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(game._dmg, 0, 0, game.W, game.H);
   }
 
   // Dibuja un sprite de mueble anclado a la base del tile (fallback: cubo).
