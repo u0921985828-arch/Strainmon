@@ -7,19 +7,24 @@
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
-  <!-- Consola portátil retro ORIGINAL (no reproduce ninguna marca/diseño comercial) -->
+  <!-- Consola portátil retro ORIGINAL: homenaje a la disposición del DMG, con
+       marca y textos propios (no reproduce marca/lema/vestido comercial). -->
   <div id="device">
-    <div id="brand"><span class="mark">STRAIN<b>BOY</b></span><span class="led"></span><span class="tag">COLOR · GENETICS</span></div>
+    <!-- cubierta superior con interruptor de encendido -->
+    <div id="deck"><span class="brand-mini">STRAIN<b>BOY</b></span><span class="powersw"><i></i>OFF◦ON</span></div>
 
     <div id="lcd">
+      <!-- franja superior del bisel: rótulo propio entre acentos granate -->
+      <div class="bezel-top"><span class="dash"></span><span class="lcd-tag">DOT-MATRIX · GENETICS</span><span class="dash"></span></div>
       <div class="lcd-inner">
         <div id="hud"></div>
-        <!-- Búfer interno = 3× la matriz de puntos real de la Game Boy (160×144),
-             proporción 10:9 exacta con píxeles cuadrados (Manual Técnico DMG). -->
+        <!-- Búfer interno = 3× la matriz de puntos real (160×144), 10:9 exacto. -->
         <canvas id="screen" width="480" height="432"></canvas>
         <div id="overlay"></div>
         <div id="toasts"></div>
       </div>
+      <!-- franja inferior del bisel: piloto de batería (izq.) -->
+      <div class="bezel-bot"><span class="battery"><i></i>BATTERY</span><span class="lcd-sub">160×144 · 4-TONE</span></div>
       <div class="lcd-glare"></div>
     </div>
 
@@ -37,9 +42,13 @@
       </div>
     </div>
 
-    <div id="sysrow">
-      <button data-key="select" class="pill-btn" title="SELECT · Modo DMG/color">SELECT</button>
-      <button data-key="start" class="pill-btn" title="START · Misiones">START</button>
+    <!-- banda inferior: SELECT/START inclinados + rejilla de altavoz (der.) -->
+    <div id="lowface">
+      <div id="sysrow">
+        <button data-key="select" class="pill-btn" title="SELECT · Modo DMG/color">SELECT</button>
+        <button data-key="start" class="pill-btn" title="START · Misiones">START</button>
+      </div>
+      <div class="speaker"><i></i><i></i><i></i><i></i><i></i><i></i></div>
     </div>
 
     <div id="menurow">
@@ -54,7 +63,7 @@
 
     <div id="footrow">
       <span class="knob" data-contrast title="Contraste LCD"><i></i>CONTRASTE</span>
-      <div class="speaker"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <span class="phones">◠ PHONES</span>
       <span class="knob" data-mute title="Silenciar"><i></i>VOLUMEN</span>
     </div>
   </div>

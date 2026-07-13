@@ -295,31 +295,40 @@ html, body {
    la máquina se lea como un portátil de bolsillo en cualquier pantalla. */
 #device > * { width: min(96vw, 60vh, 600px); }
 
-#brand { display: flex; align-items: center; gap: 10px; padding: 0 4px; height: 5vmin; min-height: 26px; }
-#brand .mark { font-weight: 900; letter-spacing: 1px; color: #eafff3; font-size: clamp(14px, 3.2vmin, 24px); text-shadow: 1px 1px 0 #0c281c; }
-#brand .mark b { color: #ffd34d; }
-#brand .led { width: 10px; height: 10px; border-radius: 50%; background: #ff5d5d; box-shadow: 0 0 8px #ff5d5d, inset 0 0 2px #7a1515; }
-#brand .tag { margin-left: auto; color: #bfe8cf; font-size: clamp(7px, 1.6vmin, 11px); letter-spacing: 2px; }
+/* --------- Cubierta superior + interruptor OFF·ON --------- */
+#deck { display: flex; align-items: center; gap: 10px; padding: 0 6px; height: 4.5vmin; min-height: 24px; }
+.brand-mini { font-weight: 900; letter-spacing: 1px; color: #eafff3; font-size: clamp(12px, 2.6vmin, 20px); text-shadow: 1px 1px 0 #0c281c; }
+.brand-mini b { color: #ffd34d; }
+.powersw { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; color: #bfe8cf;
+  font-size: clamp(7px, 1.5vmin, 10px); letter-spacing: 2px; font-weight: 700;
+  background: #12281c; border: 1px solid #0a1a12; border-radius: 6px; padding: 2px 9px 2px 4px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.5); }
+.powersw i { width: 16px; height: 9px; border-radius: 5px; background: #0a140e;
+  box-shadow: inset -8px 0 0 -1px #6f9a3a; }  /* knob del deslizador a la derecha (ON) */
 
-/* --------- LCD --------- */
+/* --------- LCD (bisel oscuro con acentos granate, estilo DMG) --------- */
 #lcd {
   position: relative; flex: 0 1 auto; min-height: 0; max-height: 58vh; margin: 0 auto;
-  /* Marco de la LCD: aloja una pantalla activa 10:9 (matriz 160×144) y una
-     banda de bisel inferior más ancha, como el cuerpo DMG del manual. */
   display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-  background: #0c110d; border-radius: 12px 12px 16px 16px;
-  padding: 2.4vmin 2.4vmin 5.2vmin;
-  box-shadow: 0 8px 26px rgba(0,0,0,.5), inset 0 0 0 2px #08120b, inset 0 0 3vmin rgba(0,0,0,.6);
-  border: 2px solid #0a1a10;
+  background: linear-gradient(180deg, #201a26 0%, #17121c 60%, #0f0c13 100%);
+  border-radius: 12px 12px 16px 42px;   /* esquina inf-izq muy redondeada (silueta DMG) */
+  padding: 1.4vmin 3vmin 1.6vmin;
+  box-shadow: 0 8px 26px rgba(0,0,0,.5), inset 0 0 0 2px #0a0710, inset 0 0 3vmin rgba(0,0,0,.6);
+  border: 2px solid #0a0710;
 }
-/* Rótulo bajo la pantalla (banda inferior del bisel), diseño propio. */
-#lcd::after { content: "DOT-MATRIX · 160×144 · 4-TONE"; position: absolute;
-  left: 0; right: 0; bottom: 1.4vmin; text-align: center; pointer-events: none;
-  color: #16482f; font-size: clamp(6px, 1.3vmin, 10px); letter-spacing: 2px; font-weight: 700; }
-/* Pantalla activa: altura manda y la relación 10:9 fija el ancho -> píxeles
-   cuadrados exactos, sin deformación. */
-.lcd-inner { position: relative; height: 100%; aspect-ratio: 10 / 9; width: auto; max-width: 100%;
-  overflow: hidden; border-radius: 6px;
+/* franjas del bisel: rótulo propio entre acentos granate (no el lema comercial) */
+.bezel-top, .bezel-bot { display: flex; align-items: center; gap: 8px; width: 100%; flex: 0 0 auto; }
+.bezel-top { justify-content: center; padding: 2px 2px 4px; }
+.bezel-top .dash { flex: 1; height: 3px; max-width: 22%; border-radius: 2px;
+  background: repeating-linear-gradient(90deg, #7d1e39 0 6px, transparent 6px 9px); }
+.lcd-tag { color: #c98aa0; font-size: clamp(6px, 1.4vmin, 10px); letter-spacing: 2px; font-weight: 700; white-space: nowrap; }
+.bezel-bot { justify-content: space-between; padding: 5px 2px 1px; }
+.battery { display: inline-flex; align-items: center; gap: 5px; color: #b9c2cb; font-size: clamp(6px, 1.3vmin, 9px); letter-spacing: 1px; }
+.battery i { width: 8px; height: 8px; border-radius: 50%; background: #ff3d3d; box-shadow: 0 0 7px #ff3d3d, inset 0 0 2px #7a1010; }
+.lcd-sub { color: #4a5560; font-size: clamp(6px, 1.2vmin, 9px); letter-spacing: 2px; }
+/* Pantalla activa: altura manda y la relación 10:9 fija el ancho -> píxeles cuadrados. */
+.lcd-inner { position: relative; flex: 1 1 auto; min-height: 0; aspect-ratio: 10 / 9; width: auto; max-width: 100%;
+  overflow: hidden; border-radius: 6px 6px 6px 10px;
   background: #8b9c2f; box-shadow: inset 0 0 0 2px #05321f, inset 0 0 20px rgba(0,0,0,.45); }
 /* Textura de LCD: retícula de puntos + líneas de barrido muy tenues, como la
    matriz de puntos real. No intercepta toques. */
@@ -344,51 +353,60 @@ html, body {
 #overlay { position: absolute; inset: 0; z-index: 5; }
 #toasts { top: 4px; z-index: 8; }
 
-/* --------- Controles físicos --------- */
+/* --------- Controles físicos (cruceta izq. + A/B der. en diagonal) --------- */
 #controls { display: flex; align-items: center; justify-content: space-between; gap: 4vmin; }
-.dpad { position: relative; width: 34vmin; height: 34vmin; max-width: 150px; max-height: 150px; flex: 0 0 auto; }
-.db { position: absolute; width: 33%; height: 33%; background: linear-gradient(180deg, #2a2f35, #14181c);
-  color: #cfd6dd; border: 1px solid #0a0d10; border-radius: 6px; font-size: 2.4vmin; cursor: pointer;
-  box-shadow: 0 2px 0 #0a0d10; -webkit-user-select: none; user-select: none; }
-.db:active { transform: translateY(1px); box-shadow: 0 1px 0 #0a0d10; }
-.db.up { top: 0; left: 33.5%; } .db.down { bottom: 0; left: 33.5%; }
-.db.left { top: 33.5%; left: 0; } .db.right { top: 33.5%; right: 0; }
-.db-center { position: absolute; top: 33.5%; left: 33.5%; width: 33%; height: 33%; background: #14181c; }
-.face { display: flex; align-items: center; gap: 3vmin; }
+/* base circular recessed bajo la cruceta, como en el DMG */
+.dpad { position: relative; width: 32vmin; height: 32vmin; max-width: 144px; max-height: 144px; flex: 0 0 auto; }
+.dpad::before { content: ""; position: absolute; inset: -8%; border-radius: 50%;
+  background: radial-gradient(circle at 50% 42%, #163a26, #0e2418); box-shadow: inset 0 2px 6px rgba(0,0,0,.55); }
+/* la cruceta se lee como una sola cruz negra (brazos + centro mismo tono) */
+.db { position: absolute; width: 33%; height: 33%; background: linear-gradient(180deg, #23262b, #0e1013);
+  color: #7c8590; border: 1px solid #050607; font-size: 2.2vmin; cursor: pointer;
+  box-shadow: 0 2px 0 #050607; -webkit-user-select: none; user-select: none; z-index: 1; }
+.db:active { transform: translateY(1px); box-shadow: 0 1px 0 #050607; }
+.db.up { top: 0; left: 33.5%; border-radius: 6px 6px 0 0; } .db.down { bottom: 0; left: 33.5%; border-radius: 0 0 6px 6px; }
+.db.left { top: 33.5%; left: 0; border-radius: 6px 0 0 6px; } .db.right { top: 33.5%; right: 0; border-radius: 0 6px 6px 0; }
+.db-center { position: absolute; top: 33.5%; left: 33.5%; width: 33%; height: 33%; background: #14171b; z-index: 1;
+  box-shadow: inset 0 0 6px rgba(0,0,0,.6); }
+.db-center::after { content: ""; position: absolute; inset: 30%; border-radius: 50%; background: #0c0e11; }
+.face { display: flex; align-items: flex-end; gap: 3vmin; }
 .ab { width: 15vmin; height: 15vmin; max-width: 74px; max-height: 74px; border-radius: 50%; cursor: pointer;
-  font-weight: 900; font-size: 3.4vmin; color: #3a1020; border: 1px solid #6e1330;
-  background: radial-gradient(circle at 35% 30%, #ff7a9c, #d33a5f 60%, #a11f42);
-  box-shadow: 0 3px 0 #7a1329; }
-.ab.b { transform: translateY(1.2vmin); }
-.ab:active { transform: translateY(2px); box-shadow: 0 1px 0 #7a1329; }
+  font-weight: 900; font-size: 3vmin; line-height: 1; color: #4a1226; border: 1px solid #5a0f28;
+  background: radial-gradient(circle at 35% 30%, #b5476b, #7d1e3d 60%, #5c1730);
+  box-shadow: 0 3px 0 #3f0c1e; }
+.ab.a { transform: translateY(-1.6vmin); }  /* A arriba-derecha, B abajo-izq (diagonal DMG) */
+.ab:active { transform: translateY(2px); box-shadow: 0 1px 0 #3f0c1e; }
+.ab.a:active { transform: translateY(calc(-1.6vmin + 2px)); box-shadow: 0 1px 0 #3f0c1e; }
 
-/* fila de accesos a paneles */
-#menurow { display: flex; justify-content: center; gap: 1.4vmin; }
-.mb { width: 9vmin; height: 9vmin; max-width: 44px; max-height: 44px; border-radius: 10px; cursor: pointer;
-  font-size: 3vmin; background: linear-gradient(180deg, #243, #122); color: #dff; border: 1px solid #0a1a12;
+/* --------- Banda inferior: SELECT/START + altavoz --------- */
+#lowface { display: flex; align-items: center; justify-content: space-between; gap: 3vmin; }
+#sysrow { display: flex; justify-content: center; gap: 3.5vmin; }
+.pill-btn { transform: rotate(-25deg); background: linear-gradient(180deg, #3a3040, #1c1622); color: #b6a6c0;
+  border: 1px solid #0a0710; border-radius: 999px; padding: 1vmin 2.8vmin; font-size: clamp(8px, 1.5vmin, 11px);
+  font-weight: 700; letter-spacing: 1px; cursor: pointer; box-shadow: 0 2px 0 #0a0710; }
+.pill-btn:active { transform: rotate(-25deg) translateY(1px); box-shadow: 0 1px 0 #0a0710; }
+/* rejilla de altavoz: 6 ranuras diagonales (esquina inf-derecha del DMG) */
+.speaker { display: flex; gap: 6px; justify-content: center; opacity: .55; transform: rotate(-25deg); }
+.speaker i { width: 4px; height: 22px; border-radius: 3px; background: #0e2a1c; box-shadow: inset 0 0 2px #000; }
+
+/* fila de accesos rápidos: discreta (no forma parte de la cara clásica DMG) */
+#menurow { display: flex; justify-content: center; gap: 1vmin; opacity: .8; }
+.mb { width: 8vmin; height: 8vmin; max-width: 40px; max-height: 40px; border-radius: 9px; cursor: pointer;
+  font-size: 2.6vmin; background: linear-gradient(180deg, #1c2a22, #101a14); color: #cfe8d8; border: 1px solid #0a1a12;
   box-shadow: 0 2px 0 #0a1a12; }
 .mb:active { transform: translateY(1px); box-shadow: 0 1px 0 #0a1a12; }
 
-/* START / SELECT */
-#sysrow { display: flex; justify-content: center; gap: 5vmin; }
-.pill-btn { transform: rotate(-18deg); background: linear-gradient(180deg, #2a2f35, #14181c); color: #b9c2cb;
-  border: 1px solid #0a0d10; border-radius: 999px; padding: 1.1vmin 3.2vmin; font-size: clamp(8px, 1.6vmin, 11px);
-  font-weight: 700; letter-spacing: 1px; cursor: pointer; box-shadow: 0 2px 0 #0a0d10; }
-.pill-btn:active { transform: rotate(-18deg) translateY(1px); box-shadow: 0 1px 0 #0a0d10; }
-
-/* fila inferior: ruedas + altavoz */
-#footrow { display: flex; align-items: center; justify-content: space-between; gap: 3vmin; opacity: .8; }
+/* pie: ruedas de contraste/volumen + rótulo PHONES */
+#footrow { display: flex; align-items: center; justify-content: space-between; gap: 3vmin; opacity: .85; }
 .knob { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #bfe8cf;
   font-size: clamp(6px, 1.2vmin, 9px); letter-spacing: 1px; cursor: pointer; }
-.knob i { transition: transform .18s ease; }
 .knob i { position: relative; width: 6vmin; height: 6vmin; max-width: 28px; max-height: 28px; border-radius: 50%;
+  transition: transform .18s ease;
   background:
     linear-gradient(#cfe89a, #cfe89a) no-repeat center 2px / 2px 42%,
     radial-gradient(circle at 40% 35%, #3a4a40, #10201a); border: 1px solid #0a1a12;
   box-shadow: inset 0 -2px 3px rgba(0,0,0,.5); }
-/* rejilla de altavoz */
-.speaker { display: flex; gap: 5px; justify-content: center; opacity: .5; transform: rotate(-18deg); }
-.speaker i { width: 4px; height: 18px; border-radius: 3px; background: #0e2a1c; box-shadow: inset 0 0 2px #000; }
+.phones { color: #7fa68c; font-size: clamp(6px, 1.3vmin, 10px); letter-spacing: 2px; font-weight: 700; }
 
 @media (min-aspect-ratio: 1/1) {
   /* pantallas anchas: aprovecha más altura para la LCD */
@@ -413,19 +431,24 @@ html, body {
 </style>
 </head>
 <body>
-  <!-- Consola portátil retro ORIGINAL (no reproduce ninguna marca/diseño comercial) -->
+  <!-- Consola portátil retro ORIGINAL: homenaje a la disposición del DMG, con
+       marca y textos propios (no reproduce marca/lema/vestido comercial). -->
   <div id="device">
-    <div id="brand"><span class="mark">STRAIN<b>BOY</b></span><span class="led"></span><span class="tag">COLOR · GENETICS</span></div>
+    <!-- cubierta superior con interruptor de encendido -->
+    <div id="deck"><span class="brand-mini">STRAIN<b>BOY</b></span><span class="powersw"><i></i>OFF◦ON</span></div>
 
     <div id="lcd">
+      <!-- franja superior del bisel: rótulo propio entre acentos granate -->
+      <div class="bezel-top"><span class="dash"></span><span class="lcd-tag">DOT-MATRIX · GENETICS</span><span class="dash"></span></div>
       <div class="lcd-inner">
         <div id="hud"></div>
-        <!-- Búfer interno = 3× la matriz de puntos real de la Game Boy (160×144),
-             proporción 10:9 exacta con píxeles cuadrados (Manual Técnico DMG). -->
+        <!-- Búfer interno = 3× la matriz de puntos real (160×144), 10:9 exacto. -->
         <canvas id="screen" width="480" height="432"></canvas>
         <div id="overlay"></div>
         <div id="toasts"></div>
       </div>
+      <!-- franja inferior del bisel: piloto de batería (izq.) -->
+      <div class="bezel-bot"><span class="battery"><i></i>BATTERY</span><span class="lcd-sub">160×144 · 4-TONE</span></div>
       <div class="lcd-glare"></div>
     </div>
 
@@ -443,9 +466,13 @@ html, body {
       </div>
     </div>
 
-    <div id="sysrow">
-      <button data-key="select" class="pill-btn" title="SELECT · Modo DMG/color">SELECT</button>
-      <button data-key="start" class="pill-btn" title="START · Misiones">START</button>
+    <!-- banda inferior: SELECT/START inclinados + rejilla de altavoz (der.) -->
+    <div id="lowface">
+      <div id="sysrow">
+        <button data-key="select" class="pill-btn" title="SELECT · Modo DMG/color">SELECT</button>
+        <button data-key="start" class="pill-btn" title="START · Misiones">START</button>
+      </div>
+      <div class="speaker"><i></i><i></i><i></i><i></i><i></i><i></i></div>
     </div>
 
     <div id="menurow">
@@ -460,7 +487,7 @@ html, body {
 
     <div id="footrow">
       <span class="knob" data-contrast title="Contraste LCD"><i></i>CONTRASTE</span>
-      <div class="speaker"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <span class="phones">◠ PHONES</span>
       <span class="knob" data-mute title="Silenciar"><i></i>VOLUMEN</span>
     </div>
   </div>
