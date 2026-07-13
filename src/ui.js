@@ -31,7 +31,8 @@
   function updateHUD() {
     const s = G();
     const env = s.env;
-    const map = PH.world.MAPS[s.player.map];
+    const map = (PH.world.MAPS && PH.world.MAPS[s.player.map]) ||
+      (PH.game && PH.game.roomName ? { name: PH.game.roomName() } : null);
     const wIcon = { despejado: '☀️', lluvia: '🌧️', niebla: '🌫️', tormenta: '⛈️', ola_calor: '🔥', nublado: '☁️' }[env.weather] || '☀️';
     const ev = PH.events && PH.events.current();
     const evPill = ev ? `<span class="pill event">${ev.icon} ${ev.name} · ${PH.events.remaining()}s</span>` : '';

@@ -2684,7 +2684,8 @@ html, body {
   function updateHUD() {
     const s = G();
     const env = s.env;
-    const map = PH.world.MAPS[s.player.map];
+    const map = (PH.world.MAPS && PH.world.MAPS[s.player.map]) ||
+      (PH.game && PH.game.roomName ? { name: PH.game.roomName() } : null);
     const wIcon = { despejado: '☀️', lluvia: '🌧️', niebla: '🌫️', tormenta: '⛈️', ola_calor: '🔥', nublado: '☁️' }[env.weather] || '☀️';
     const ev = PH.events && PH.events.current();
     const evPill = ev ? `<span class="pill event">${ev.icon} ${ev.name} · ${PH.events.remaining()}s</span>` : '';
@@ -3341,42 +3342,288 @@ html, body {
   };
 })(window.PH = window.PH || {});
 
-/* ==== src/game.js ==== */
+/* ==== src/iso.js ==== */
 /* ============================================================
-   PHENO HUNTER — game.js
-   Bucle principal, entrada, movimiento por rejilla, cámara,
-   render del mundo, interacción con NPC/warps y encuentros.
+   STRAINMON — iso.js
+   Motor isométrico original (proyección 2:1, painter's algorithm).
+   Sin relación con Habbo/Sulake: matemática y arte propios.
    ============================================================ */
 (function (PH) {
   'use strict';
-  const { clamp } = PH.util;
-  const R = PH.render;
-  const World = PH.world;
+  const { shade } = PH.util;
+  const TW = 64, TH = 32;            // ancho/alto de rombo de suelo (2:1)
+  const WH = 40;                     // alto de pared/cubo
+  const px = (ctx, x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); };
+
+  // grid -> pantalla (centro superior del rombo)
+  function project(gx, gy, cam) {
+    return {
+      x: (gx - gy) * (TW / 2) + cam.x,
+      y: (gx + gy) * (TH / 2) + cam.y,
+    };
+  }
+  // pantalla -> grid (para clics)
+  function unproject(sx, sy, cam) {
+    const x = sx - cam.x, y = sy - cam.y;
+    return { gx: Math.floor((y / (TH / 2) + x / (TW / 2)) / 2), gy: Math.floor((y / (TH / 2) - x / (TW / 2)) / 2) };
+  }
+
+  // rombo de suelo con relieve
+  function floorDiamond(ctx, sx, sy, top, side) {
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(sx + TW / 2, sy + TH / 2);
+    ctx.lineTo(sx, sy + TH);
+    ctx.lineTo(sx - TW / 2, sy + TH / 2);
+    ctx.closePath();
+    ctx.fillStyle = top; ctx.fill();
+    ctx.strokeStyle = side; ctx.lineWidth = 1; ctx.stroke();
+  }
+
+  // cubo (pared / bloque) de altura h
+  function cube(ctx, sx, sy, h, pal) {
+    const topY = sy - h;
+    // cara izquierda
+    ctx.beginPath();
+    ctx.moveTo(sx - TW / 2, sy + TH / 2);
+    ctx.lineTo(sx, sy + TH);
+    ctx.lineTo(sx, sy + TH - h);
+    ctx.lineTo(sx - TW / 2, sy + TH / 2 - h);
+    ctx.closePath(); ctx.fillStyle = pal.left; ctx.fill();
+    // cara derecha
+    ctx.beginPath();
+    ctx.moveTo(sx + TW / 2, sy + TH / 2);
+    ctx.lineTo(sx, sy + TH);
+    ctx.lineTo(sx, sy + TH - h);
+    ctx.lineTo(sx + TW / 2, sy + TH / 2 - h);
+    ctx.closePath(); ctx.fillStyle = pal.right; ctx.fill();
+    // tapa
+    ctx.beginPath();
+    ctx.moveTo(sx, sy - h);
+    ctx.lineTo(sx + TW / 2, sy + TH / 2 - h);
+    ctx.lineTo(sx, sy + TH - h);
+    ctx.lineTo(sx - TW / 2, sy + TH / 2 - h);
+    ctx.closePath(); ctx.fillStyle = pal.top; ctx.fill();
+  }
+
+  // Personaje isométrico (billboard chibi original) anclado a la base del tile.
+  function actor(ctx, sx, sy, dir, frame, p) {
+    p = p || { skin: '#f0c088', hair: '#3a2a1a', shirt: '#2f9e6b', pants: '#33333f' };
+    const cx = sx, by = sy + TH / 2;         // base ~ centro del tile
+    const bob = frame === 1 ? 1 : 0;
+    // sombra
+    ctx.fillStyle = 'rgba(0,0,0,.25)';
+    ctx.beginPath(); ctx.ellipse(cx, by, 10, 5, 0, 0, Math.PI * 2); ctx.fill();
+    const H = 34, oy = -bob;
+    // piernas
+    const stride = frame === 1 ? 3 : (frame === 2 ? -3 : 0);
+    px(ctx, cx - 6, by - 10 + oy, 5, 10, p.pants);
+    px(ctx, cx + 1, by - 10 + oy, 5, 10, shade(p.pants, -0.15));
+    // torso
+    px(ctx, cx - 7, by - 22 + oy, 14, 13, p.shirt);
+    px(ctx, cx - 7, by - 22 + oy, 14, 2, shade(p.shirt, 0.18));
+    px(ctx, cx - 7, by - 11 + oy, 14, 1, shade(p.shirt, -0.22));
+    // brazos según dir (izq/der)
+    const faceLeft = dir === 'NW' || dir === 'SW';
+    px(ctx, cx - 9, by - 21 + oy, 3, 9, p.skin);
+    px(ctx, cx + 6, by - 21 + oy, 3, 9, p.skin);
+    // cabeza
+    px(ctx, cx - 6, by - 34 + oy, 12, 12, p.skin);
+    px(ctx, cx - 6, by - 35 + oy, 12, 4, p.hair);
+    px(ctx, cx - 7, by - 33 + oy, 1, 5, p.hair);
+    px(ctx, cx + 6, by - 33 + oy, 1, 5, p.hair);
+    // cara (mirando N = de espaldas, S = de frente)
+    const south = dir === 'SW' || dir === 'SE';
+    if (south) {
+      const ex = faceLeft ? -1 : 1;
+      px(ctx, cx - 3, by - 29 + oy, 2, 2, '#20202a');
+      px(ctx, cx + 1, by - 29 + oy, 2, 2, '#20202a');
+      px(ctx, cx - 2, by - 25 + oy, 4, 1, shade(p.skin, -0.2));
+    } else {
+      px(ctx, cx - 6, by - 35 + oy, 12, 8, p.hair); // nuca
+    }
+  }
+
+  // Render de una sala/mapa iso con painter's algorithm.
+  // map.grid: '.'=suelo, '#'=pared, ' '=vacío, 'D'=puerta(suelo). objects: [{gx,gy,h,draw}]
+  function renderRoom(ctx, map, cam, t, actors, objectsOverride) {
+    const W = map.grid[0].length, Hh = map.grid.length;
+    const P = map.pal || THEMES[map.theme] || THEMES.room;
+    const objs = objectsOverride || map.objects;
+    // 1) suelos primero (no ocluyen)
+    for (let gy = 0; gy < Hh; gy++) for (let gx = 0; gx < W; gx++) {
+      const ch = map.grid[gy][gx];
+      if (ch === '.' || ch === 'D') {
+        const s = project(gx, gy, cam);
+        const alt = (gx + gy) % 2;
+        floorDiamond(ctx, s.x, s.y, ch === 'D' ? P.door : (alt ? P.floorA : P.floorB), P.floorEdge);
+      }
+    }
+    // 2) drawables con profundidad (paredes, objetos, actores)
+    const list = [];
+    for (let gy = 0; gy < Hh; gy++) for (let gx = 0; gx < W; gx++) {
+      if (map.grid[gy][gx] === '#') {
+        const s = project(gx, gy, cam);
+        list.push({ d: gx + gy, draw: () => cube(ctx, s.x, s.y, WH, P.wall) });
+      }
+    }
+    for (const o of (objs || [])) {
+      const s = project(o.gx, o.gy, cam);
+      list.push({ d: o.gx + o.gy + 0.4, draw: () => o.draw(ctx, s.x, s.y, o) });
+    }
+    for (const a of (actors || [])) {
+      const s = project(a.gx, a.gy, cam);
+      list.push({ d: a.gx + a.gy + 0.5, draw: () => actor(ctx, s.x, s.y, a.dir, a.frame, a.pal) });
+    }
+    list.sort((p, q) => p.d - q.d);
+    for (const it of list) it.draw();
+  }
+
+  const THEMES = {
+    room: { floorA: '#c8a06a', floorB: '#bd9560', floorEdge: 'rgba(80,50,20,.35)', door: '#8a5a30',
+      wall: { top: '#e7ddcf', left: '#b9ac97', right: '#cdc2ad' } },
+    grass: { floorA: '#7cbd50', floorB: '#72b048', floorEdge: 'rgba(30,60,20,.3)', door: '#caa96b',
+      wall: { top: '#8a8f97', left: '#6d727a', right: '#7d828a' } },
+    street: { floorA: '#8b8f96', floorB: '#82868d', floorEdge: 'rgba(20,20,25,.35)', door: '#caa96b',
+      wall: { top: '#c86b52', left: '#8f3f30', right: '#a85040' } },
+  };
+
+  PH.iso = { TW, TH, WH, project, unproject, floorDiamond, cube, actor, renderRoom, THEMES };
+})(window.PH = window.PH || {});
+
+/* ==== src/isogame.js ==== */
+/* ============================================================
+   STRAINMON — isogame.js
+   Controlador del sandbox isométrico (híbrido "salas + grow", single-player,
+   todo NPC, roam libre). Reemplaza al overworld top-down. Reutiliza
+   PH.state / PH.ui / PH.iso / PH.genetics / PH.plantart / PH.garden.
+   Arte y diseño originales (sin relación con Habbo/Sulake).
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  const { clamp, lerp } = PH.util;
+  const ISO = PH.iso;
   const G = () => PH.state.get();
 
+  // Movimiento por ejes de rejilla (cada tecla recorre una arista del rombo).
+  // Up=NE(gy-1), Down=SW(gy+1), Left=NW(gx-1), Right=SE(gx+1).
+  const DIRV = { NE: [0, -1], SW: [0, 1], NW: [-1, 0], SE: [1, 0] };
+
+  /* ------------------------- SALAS ------------------------- */
+  // grid: '.'=suelo  '#'=pared  ' '=vacío(bloqueado)  'D'=puerta(suelo)
+  const ROOMS = {
+    apt: {
+      id: 'apt', name: 'Tu Grow-Room', theme: 'room',
+      grid: [
+        '#########',
+        '#.......#',
+        '#.......#',
+        '#.......#',
+        '#.......#',
+        '#.......#',
+        '#...D...#',
+        '#########',
+      ],
+      spawn: { gx: 4, gy: 5 },
+      doors: [{ gx: 4, gy: 6, to: 'street', tgx: 6, tgy: 3 }],
+      npcs: [],
+      objects: [
+        { gx: 2, gy: 1, kind: 'grow', solid: true, label: 'Invernadero' },
+        { gx: 6, gy: 1, kind: 'pc', solid: true, label: 'Ordenador' },
+        { gx: 2, gy: 5, kind: 'bed', solid: true, label: 'Cama' },
+      ],
+    },
+    street: {
+      id: 'street', name: 'Calle Verde', theme: 'street',
+      grid: [
+        '.............',
+        '.HH..HH..HH..',
+        '.HD..HD..HD..',
+        '.............',
+        '.....P.......',
+        '.gg.........',
+        '.gg......gg..',
+        '.............',
+      ],
+      spawn: { gx: 6, gy: 3 },
+      doors: [
+        { gx: 2, gy: 2, to: 'apt', tgx: 4, tgy: 5 },
+        { gx: 6, gy: 2, to: 'shop', tgx: 3, tgy: 3 },
+        { gx: 10, gy: 2, to: 'lab', tgx: 3, tgy: 3 },
+      ],
+      npcs: [
+        { gx: 6, gy: 5, name: 'Dealer Kez', sprite: 'npc6', dialog: 'contrabandista', dir: 'SW' },
+        { gx: 3, gy: 4, name: 'Vecina Bru', sprite: 'npc2', dialog: 'coleccionista', dir: 'SE' },
+      ],
+      objects: [],
+      wild: true, // 'g' = parterres con cepas silvestres
+    },
+    shop: {
+      id: 'shop', name: 'Mercado', theme: 'room',
+      grid: [
+        '#######',
+        '#.....#',
+        '#.....#',
+        '#.....#',
+        '#..D..#',
+        '#######',
+      ],
+      spawn: { gx: 3, gy: 4 },
+      doors: [{ gx: 3, gy: 4, to: 'street', tgx: 6, tgy: 3 }],
+      npcs: [{ gx: 3, gy: 1, name: 'Mercader', sprite: 'npc4', dialog: 'nomada', dir: 'SW' }],
+      objects: [{ gx: 5, gy: 2, kind: 'shop', solid: true, label: 'Mostrador' }],
+    },
+    lab: {
+      id: 'lab', name: 'Laboratorio', theme: 'room',
+      grid: [
+        '#######',
+        '#.....#',
+        '#.....#',
+        '#.....#',
+        '#..D..#',
+        '#######',
+      ],
+      spawn: { gx: 3, gy: 4 },
+      doors: [{ gx: 3, gy: 4, to: 'street', tgx: 10, tgy: 3 }],
+      npcs: [{ gx: 2, gy: 1, name: 'Dr. Vane', sprite: 'npc5', dialog: 'genetista', dir: 'SE' }],
+      objects: [
+        { gx: 4, gy: 1, kind: 'lab', solid: true, label: 'Mesa de cruces' },
+        { gx: 5, gy: 2, kind: 'pc', solid: true, label: 'Terminal ADN' },
+      ],
+    },
+  };
+  // 'H'=fachada(pared alta), 'P'=farola: los tratamos como bloqueantes decorativos.
+  function solidChar(ch) { return ch === '#' || ch === ' ' || ch === 'H' || ch === 'P'; }
+
+  function room(id) { return ROOMS[id]; }
+  function tileAt(m, gx, gy) {
+    if (gy < 0 || gy >= m.grid.length) return '#';
+    const r = m.grid[gy]; if (gx < 0 || gx >= r.length) return '#';
+    return r[gx];
+  }
+  function objAt(m, gx, gy) { return (m.objects || []).find(o => o.gx === gx && o.gy === gy); }
+  function doorAt(m, gx, gy) { return (m.doors || []).find(d => d.gx === gx && d.gy === gy); }
+  function npcAt(m, gx, gy) { return (m.npcs || []).find(n => n.gx === gx && n.gy === gy); }
+  function solidAt(m, gx, gy) {
+    const ch = tileAt(m, gx, gy);
+    if (solidChar(ch)) return true;
+    const o = objAt(m, gx, gy); if (o && o.solid) return true;
+    if (npcAt(m, gx, gy)) return true;
+    return false;
+  }
+
+  /* ------------------------- ESTADO ------------------------- */
   const game = {
-    mode: 'boot',     // boot | title | overworld | menu | dialog | encounter
-    canvas: null, ctx: null,
-    scale: 3,
-    // interpolación de movimiento
-    moving: false, from: null, to: null, moveT: 0, moveDur: 150,
-    frame: 0, animT: 0,
-    keys: {},
-    lastSave: 0,
-    npcAnimT: 0,
+    mode: 'boot', canvas: null, ctx: null, scale: 3,
+    W: 480, H: 320,
+    moving: false, from: null, to: null, moveT: 0, moveDur: 170, frame: 0, animT: 0,
+    keys: {}, lastSave: 0, cam: { x: 0, y: 0 },
   };
   PH.game = game;
 
   function init() {
     game.canvas = document.getElementById('screen');
     game.ctx = game.canvas.getContext('2d');
-    game.ctx.imageSmoothingEnabled = false;
-    // Búfer de mundo a resolución lógica (240x160); se escala x2 al lienzo (480x320).
-    game.world = document.createElement('canvas');
-    game.world.width = R.W; game.world.height = R.H;
-    game.wctx = game.world.getContext('2d');
-    game.wctx.imageSmoothingEnabled = false;
-    game.RScale = 2;
     if (PH.sprites) PH.sprites.preload();
     if (PH.plantart) PH.plantart.preload();
     PH.ui.init();
@@ -3388,18 +3635,15 @@ html, body {
   }
 
   function resize() {
-    // Lienzo interno a 480x320 (x2 del mundo lógico); se ajusta a la ventana con escala entera.
-    const SW = R.W * game.RScale, SH = R.H * game.RScale;
     const maxW = window.innerWidth - 24, maxH = window.innerHeight - 120;
-    const sc = Math.max(1, Math.min(maxW / SW, maxH / SH));
-    game.scale = sc;
-    game.canvas.width = SW; game.canvas.height = SH;
-    game.canvas.style.width = Math.floor(SW * sc) + 'px';
-    game.canvas.style.height = Math.floor(SH * sc) + 'px';
+    const sc = Math.max(1, Math.min(maxW / game.W, maxH / game.H));
+    game.canvas.width = game.W; game.canvas.height = game.H;
+    game.canvas.style.width = Math.floor(game.W * sc) + 'px';
+    game.canvas.style.height = Math.floor(game.H * sc) + 'px';
     game.ctx.imageSmoothingEnabled = false;
   }
 
-  /* ---------------- Título ---------------- */
+  /* ------------------------- TÍTULO ------------------------- */
   function titleScreen() {
     game.mode = 'title';
     const ov = document.getElementById('overlay');
@@ -3408,340 +3652,249 @@ html, body {
     ov.innerHTML = `
       <div class="title-screen">
         <div class="logo">STRAIN<span>MON</span></div>
-        <div class="tagline">Caza cepas landrace · Preserva linajes · Cruza genéticas</div>
-        <div class="title-art"><canvas id="title_canvas" width="200" height="120"></canvas></div>
-        <div class="title-btns">
-          ${cont}
-          <button class="btn ${cont ? 'ghost' : 'primary'} big" id="t_new">Nueva partida</button>
-        </div>
-        <div class="title-help">Mover: WASD / Flechas · Interactuar/Confirmar: Espacio o E<br>
-          I Mochila · B Banco · C Catálogo · L Laboratorio · G Invernadero · Q Misiones · M Guardar</div>
+        <div class="tagline">Sandbox isométrico · cultiva · trapichea · colecciona</div>
+        <div class="title-btns">${cont}
+          <button class="btn ${cont ? 'ghost' : 'primary'} big" id="t_new">Nueva partida</button></div>
+        <div class="title-help">Mover: WASD / Flechas (diagonales) · Interactuar: Espacio o E<br>
+          I Mochila · B Banco · C Strain-dex · L Lab · G Invernadero · Q Misiones · M Guardar</div>
       </div>`;
-    // arte: pequeño jardín de fenotipos aleatorios
-    const c = document.getElementById('title_canvas'); const ctx = c.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = '#20351f'; ctx.fillRect(0, 0, c.width, c.height);
-    for (let i = 0; i < 6; i++) {
-      const sp = PH.species.rollEncounter(PH.util.RNG.pick(['pradera', 'bosque', 'pantano']), G().env);
-      R.drawPlant(ctx, 20 + i * 30, 108, sp.pheno, 1.6, performance.now());
-    }
-    if (cont) document.getElementById('t_continue').onclick = () => { PH.state.load(); startGame(); };
-    document.getElementById('t_new').onclick = () => { PH.state.reset(); startGame(); };
+    if (cont) document.getElementById('t_continue').onclick = () => { PH.state.load(); startGame(false); };
+    document.getElementById('t_new').onclick = () => { PH.state.reset(); startGame(true); };
   }
 
-  function startGame() {
+  function normalizePlayer() {
+    const p = G().player;
+    if (!ROOMS[p.map]) { p.map = 'apt'; const sp = ROOMS.apt.spawn; p.x = sp.gx; p.y = sp.gy; }
+    if (!p.dir || !DIRV[p.dir]) p.dir = 'SW';
+  }
+  function startGame(fresh) {
     PH.ui.close();
+    const p = G().player;
+    // Partida nueva -> siempre en el apartamento. Continuar -> respeta sala iso guardada.
+    if (fresh || !ROOMS[p.map] || !p.iso) { p.map = 'apt'; p.x = ROOMS.apt.spawn.gx; p.y = ROOMS.apt.spawn.gy; p.dir = 'SW'; }
+    p.iso = true;
+    normalizePlayer();
     game.mode = 'overworld';
-    const s = G();
-    // asegura posición válida
-    const map = World.MAPS[s.player.map];
+    centerCam(true);
     PH.ui.updateHUD();
-    PH.ui.toast('¡Bienvenido a Strainmon!', 'ok');
+    PH.ui.toast('Bienvenido a tu grow-room. Sal por la puerta (abajo).', 'ok');
   }
 
-  /* ---------------- Entrada ---------------- */
+  /* ------------------------- ENTRADA ------------------------- */
   function bindInput() {
     window.addEventListener('keydown', (e) => {
-      const k = e.key.toLowerCase();
-      game.keys[k] = true;
-      // Confirmaciones de diálogo/encuentro
+      const k = e.key.toLowerCase(); game.keys[k] = true;
       if (game.mode === 'dialog' && (k === ' ' || k === 'e' || k === 'enter')) { e.preventDefault(); PH.ui.dialogNext(); return; }
       if (game.mode === 'title') return;
       if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
-
       if (game.mode === 'overworld') {
         if (k === ' ' || k === 'e') interact();
-        else if (k === 'i') PH.ui.bag();
-        else if (k === 'b') PH.ui.bank();
-        else if (k === 'c') PH.ui.catalog();
-        else if (k === 'q') PH.ui.quests();
+        else if (k === 'i') PH.ui.bag(); else if (k === 'b') PH.ui.bank();
+        else if (k === 'c') PH.ui.catalog(); else if (k === 'q') PH.ui.quests();
+        else if (k === 'l') PH.ui.lab(); else if (k === 'g') PH.ui.greenhouse();
         else if (k === 'm') { PH.state.save(); PH.ui.toast('Partida guardada.', 'ok'); }
-        else if (k === 'l') PH.ui.lab();
-        else if (k === 'g') PH.ui.greenhouse();
       } else if (game.mode === 'menu') {
         if (k === 'escape' || k === 'i' || k === 'b' || k === 'c' || k === 'q') PH.ui.close();
       }
     });
     window.addEventListener('keyup', (e) => { game.keys[e.key.toLowerCase()] = false; });
-
-    // Controles táctiles
     document.querySelectorAll('[data-key]').forEach(btn => {
       const key = btn.dataset.key;
-      const press = (v) => { game.keys[key] = v; if (v) simulateKey(key); };
-      btn.addEventListener('touchstart', (e) => { e.preventDefault(); press(true); });
-      btn.addEventListener('touchend', (e) => { e.preventDefault(); game.keys[key] = false; });
-      btn.addEventListener('mousedown', () => press(true));
-      btn.addEventListener('mouseup', () => { game.keys[key] = false; });
-      btn.addEventListener('mouseleave', () => { game.keys[key] = false; });
+      const down = (e) => { e.preventDefault(); game.keys[key] = true; if (key === ' ') simTap(); };
+      const up = (e) => { if (e) e.preventDefault(); game.keys[key] = false; };
+      btn.addEventListener('touchstart', down); btn.addEventListener('touchend', up);
+      btn.addEventListener('mousedown', down); btn.addEventListener('mouseup', up); btn.addEventListener('mouseleave', up);
     });
   }
-  function simulateKey(key) {
-    if (game.mode === 'dialog' && (key === ' ')) { PH.ui.dialogNext(); return; }
-    if (game.mode === 'overworld' && key === ' ') interact();
-    if (game.mode === 'overworld' && key === 'i') PH.ui.bag();
-    if (game.mode === 'overworld' && key === 'b') PH.ui.bank();
-    if (game.mode === 'overworld' && key === 'c') PH.ui.catalog();
+  function simTap() {
+    if (game.mode === 'dialog') PH.ui.dialogNext();
+    else if (game.mode === 'overworld') interact();
   }
 
-  /* ---------------- Interacción ---------------- */
-  function facingTile() {
-    const s = G().player;
-    let x = s.x, y = s.y;
-    if (s.dir === 'up') y--; else if (s.dir === 'down') y++;
-    else if (s.dir === 'left') x--; else if (s.dir === 'right') x++;
-    return { x, y };
+  /* ------------------------- INTERACCIÓN ------------------------- */
+  function facing() {
+    const p = G().player, d = DIRV[p.dir] || [1, 1];
+    return { gx: p.x + d[0], gy: p.y + d[1] };
   }
   function interact() {
-    const s = G();
-    const map = World.MAPS[s.player.map];
-    if (!map) return;
-    const f = facingTile();
-    // NPC?
-    const npc = (map.npcs || []).find(n => n.x === f.x && n.y === f.y);
+    const p = G().player, m = room(p.map); if (!m) return;
+    const f = facing();
+    const npc = npcAt(m, f.gx, f.gy);
     if (npc) {
-      // el NPC mira hacia el jugador
-      npc.face = { up: 'down', down: 'up', left: 'right', right: 'left' }[s.player.dir] || 'down';
-      const pages = PH.quests.DIALOGS[npc.dialog] ? PH.quests.DIALOGS[npc.dialog](s) : ['...'];
+      npc.dir = { NE: 'SW', SW: 'NE', NW: 'SE', SE: 'NW' }[p.dir] || 'SW';
+      const pages = PH.quests.DIALOGS[npc.dialog] ? PH.quests.DIALOGS[npc.dialog](G()) : ['...'];
       PH.ui.dialog(pages, null, { sprite: npc.sprite, name: npc.name });
       return;
     }
-    // warp de puerta al frente (edificios)?
-    const w = World.warpAt(map, f.x, f.y);
-    if (w && String(w.to).startsWith('@')) { PH.ui.placeMenu(w.to); }
+    const o = objAt(m, f.gx, f.gy);
+    if (o) return useObject(o);
+  }
+  function useObject(o) {
+    if (o.kind === 'grow') return PH.ui.greenhouse();
+    if (o.kind === 'lab') return PH.ui.lab();
+    if (o.kind === 'shop') return PH.ui.shop();
+    if (o.kind === 'pc') return pcMenu();
+    if (o.kind === 'bed') { PH.state.save(); return PH.ui.toast('Descansas y guardas la partida.', 'ok'); }
+  }
+  function pcMenu() {
+    PH.ui.dialog(['Terminal: accede a tu Banco (B), Strain-dex (C) o Misiones (Q).'], null, null);
   }
 
-  /* ---------------- Movimiento ---------------- */
+  /* ------------------------- MOVIMIENTO ------------------------- */
   function tryMove() {
     if (game.moving || game.mode !== 'overworld') return;
-    const s = G().player;
-    let dx = 0, dy = 0, dir = s.dir;
-    if (game.keys['arrowup'] || game.keys['w']) { dy = -1; dir = 'up'; }
-    else if (game.keys['arrowdown'] || game.keys['s']) { dy = 1; dir = 'down'; }
-    else if (game.keys['arrowleft'] || game.keys['a']) { dx = -1; dir = 'left'; }
-    else if (game.keys['arrowright'] || game.keys['d']) { dx = 1; dir = 'right'; }
-    else return;
-    s.dir = dir;
-    const map = World.MAPS[s.player ? s.player.map : G().player.map] || World.MAPS[G().player.map];
-    const cur = World.MAPS[G().player.map];
-    const nx = s.x + dx, ny = s.y + dy;
-
-    // warp por pisar celda numérica
-    const warp = World.warpAt(cur, nx, ny);
-    if (warp && !String(warp.to).startsWith('@')) {
-      // comprobar desbloqueo por prestigio para regiones
-      if (!PH.state.unlocked(warp.to)) {
-        PH.ui.toast('🔒 Necesitas más prestigio para acceder aquí.', 'bad');
-        return;
-      }
-      doWarp(warp);
-      return;
-    }
-    if (warp && String(warp.to).startsWith('@')) { PH.ui.placeMenu(warp.to); return; }
-
-    if (World.solidAt(cur, nx, ny)) return; // pared
-    // NPC bloquea
-    if ((cur.npcs || []).some(n => n.x === nx && n.y === ny)) return;
-
-    game.moving = true; game.moveT = 0;
-    game.from = { x: s.x, y: s.y };
-    game.to = { x: nx, y: ny };
+    const p = G().player; let dir = null;
+    if (game.keys['arrowup'] || game.keys['w']) dir = 'NE';
+    else if (game.keys['arrowdown'] || game.keys['s']) dir = 'SW';
+    else if (game.keys['arrowleft'] || game.keys['a']) dir = 'NW';
+    else if (game.keys['arrowright'] || game.keys['d']) dir = 'SE';
+    if (!dir) return;
+    p.dir = dir;
+    const m = room(p.map), d = DIRV[dir];
+    const nx = p.x + d[0], ny = p.y + d[1];
+    const door = doorAt(m, nx, ny);
+    if (door) { warp(door); return; }
+    if (solidAt(m, nx, ny)) return;
+    game.moving = true; game.moveT = 0; game.from = { x: p.x, y: p.y }; game.to = { x: nx, y: ny };
   }
-
   function finishMove() {
-    const s = G().player;
-    s.x = game.to.x; s.y = game.to.y;
-    game.moving = false;
+    const p = G().player; p.x = game.to.x; p.y = game.to.y; game.moving = false;
     G().stats.distance++;
-    // ¿encuentro?
-    const map = World.MAPS[s.map];
-    if (map.biome && World.encounterAt(map, s.x, s.y)) {
-      const p = PH.encounter.encounterChance(map.biome);
-      if (PH.util.RNG.chance(p)) {
-        if (G().player.cebosActivos > 0) G().player.cebosActivos--;
-        const wild = PH.species.rollEncounter(map.biome, G().env);
-        PH.ui.encounter(wild);
+    // parterres silvestres 'g' -> posible encuentro
+    const m = room(p.map);
+    if (m.wild && tileAt(m, p.x, p.y) === 'g') {
+      if (PH.util.RNG.chance(0.22)) {
+        const biome = PH.util.RNG.pick(['pradera', 'bosque', 'pantano', 'desierto', 'nieve', 'volcan', 'cueva', 'isla']);
+        PH.ui.encounter(PH.species.rollEncounter(biome, G().env));
       }
     }
   }
-
-  function doWarp(warp) {
-    const s = G().player;
-    const target = World.MAPS[warp.to];
-    if (!target) return;
-    s.map = warp.to;
-    s.x = warp.x != null ? warp.x : target.spawn.x;
-    s.y = warp.y != null ? warp.y : target.spawn.y;
-    game.moving = false;
-    PH.ui.updateHUD();
-    PH.ui.toast('📍 ' + target.name, '');
+  function warp(d) {
+    const p = G().player; const t = room(d.to); if (!t) return;
+    p.map = d.to; p.x = d.tgx; p.y = d.tgy; game.moving = false;
+    centerCam(true); PH.ui.updateHUD(); PH.ui.toast('📍 ' + t.name, '');
   }
 
-  /* ---------------- Comprobación de misiones tras acciones ---------------- */
+  game.roomName = function () { const m = room(G().player.map); return m ? m.name : ''; };
   game.afterQuestCheck = function () {
     const done = PH.quests.checkAll();
-    for (const q of done) {
-      PH.ui.toast(`✅ Misión completada: ${q.name}`, 'ok');
-    }
+    for (const q of done) PH.ui.toast('✅ Misión completada: ' + q.name, 'ok');
     PH.ui.updateHUD();
   };
 
-  /* ---------------- Bucle ---------------- */
+  /* ------------------------- CÁMARA ------------------------- */
+  function playerScreen() {
+    const p = G().player; let gx = p.x, gy = p.y;
+    if (game.moving) { const t = clamp(game.moveT / game.moveDur, 0, 1); gx = lerp(game.from.x, game.to.x, t); gy = lerp(game.from.y, game.to.y, t); }
+    return ISO.project(gx, gy, { x: 0, y: 0 });
+  }
+  function centerCam(snap) {
+    const ps = playerScreen();
+    const tx = game.W / 2 - ps.x, ty = game.H / 2 - ps.y - 20;
+    if (snap) { game.cam.x = tx; game.cam.y = ty; }
+    else { game.cam.x = lerp(game.cam.x, tx, 0.15); game.cam.y = lerp(game.cam.y, ty, 0.15); }
+  }
+
+  /* ------------------------- BUCLE ------------------------- */
   let last = performance.now();
   function loop(now) {
     const dt = Math.min(50, now - last); last = now;
-    game.animT += dt; game.npcAnimT += dt;
-    if (game.animT > 260) { game.frame ^= 1; game.animT = 0; }
-
+    game.animT += dt;
+    if (game.animT > 240) { game.frame ^= 1; game.animT = 0; }
     if (game.mode === 'overworld' || game.mode === 'menu' || game.mode === 'dialog' || game.mode === 'encounter') {
-      PH.state.updateEnv(dt);
-      if (PH.events) PH.events.update(dt);
-      if (PH.garden) PH.garden.update(dt);
+      PH.state.updateEnv(dt); if (PH.events) PH.events.update(dt); if (PH.garden) PH.garden.update(dt);
     }
     if (game.mode === 'overworld') {
       tryMove();
-      if (game.moving) {
-        game.moveT += dt;
-        if (game.moveT >= game.moveDur) finishMove();
-      }
-      // autosave cada 20s
+      if (game.moving) { game.moveT += dt; if (game.moveT >= game.moveDur) finishMove(); }
+      centerCam(false);
       if (now - game.lastSave > 20000) { PH.state.save(); game.lastSave = now; }
     }
-
     if (game.mode !== 'title' && game.mode !== 'boot') render(now);
-    // refresco de HUD ligero
-    if (game.mode === 'overworld' && (game.frame === 0)) PH.ui.updateHUD();
-
+    if (game.mode === 'overworld' && game.frame === 0) PH.ui.updateHUD();
     requestAnimationFrame(loop);
   }
 
-  /* ---------------- Render del mundo ---------------- */
+  /* ------------------------- RENDER ------------------------- */
   function render(now) {
-    now = now || performance.now();
-    const ctx = game.wctx;            // capa MUNDO (240x160 lógico)
-    const s = G().player;
-    const map = World.MAPS[s.map];
-    if (!map) return;
-    const dims = World.dims(map);
+    const ctx = game.ctx, m = room(G().player.map); if (!m) return;
+    // fondo por tema
+    ctx.fillStyle = m.theme === 'street' ? '#2a3550' : '#14100c';
+    ctx.fillRect(0, 0, game.W, game.H);
 
-    // posición interpolada del jugador (en px)
-    let pxp, pyp;
-    if (game.moving) {
-      const t = clamp(game.moveT / game.moveDur, 0, 1);
-      pxp = PH.util.lerp(game.from.x, game.to.x, t) * R.TS;
-      pyp = PH.util.lerp(game.from.y, game.to.y, t) * R.TS;
-    } else { pxp = s.x * R.TS; pyp = s.y * R.TS; }
-
-    // cámara centrada
-    let camX = pxp - (R.W / 2 - R.TS / 2);
-    let camY = pyp - (R.H / 2 - R.TS / 2);
-    camX = clamp(camX, 0, Math.max(0, dims.w * R.TS - R.W));
-    camY = clamp(camY, 0, Math.max(0, dims.h * R.TS - R.H));
-
-    ctx.fillStyle = '#101418'; ctx.fillRect(0, 0, R.W, R.H);
-
-    const x0 = Math.floor(camX / R.TS), y0 = Math.floor(camY / R.TS);
-    for (let ty = y0 - 1; ty <= y0 + R.VH + 1; ty++) {
-      for (let tx = x0 - 1; tx <= x0 + R.VW + 1; tx++) {
-        const sx = tx * R.TS - camX, sy = ty * R.TS - camY;
-        R.drawTile(ctx, map, tx, ty, sx, sy, now);
-      }
+    // parterres 'g' como suelo especial + suelo calle 'H' fachadas
+    const extraFloors = [];
+    const walls = [];
+    for (let gy = 0; gy < m.grid.length; gy++) for (let gx = 0; gx < m.grid[gy].length; gx++) {
+      const ch = m.grid[gy][gx];
+      if (ch === 'g') extraFloors.push({ gx, gy, col: '#3f7d34', edge: '#2f5b26' });
+      else if (ch === 'H') walls.push({ gx, gy, h: 56, pal: ISO.THEMES.street.wall });
+      else if (ch === 'P') walls.push({ gx, gy, h: 30, pal: { top: '#ffd34d', left: '#7c6a2a', right: '#9a8330' } });
     }
 
-    // NPCs
-    for (const n of (map.npcs || [])) {
-      const sx = n.x * R.TS - camX, sy = n.y * R.TS - camY;
-      if (sx < -R.TS || sx > R.W || sy < -R.TS || sy > R.H) continue;
-      R.drawActor(ctx, sx, sy, n.face || 'down', 0, R.NPC_PALETTES[n.sprite]);
-      // nombre
-      ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(sx - 4, sy - 8, n.name.length * 3 + 6, 7);
-      ctx.fillStyle = '#fff'; ctx.font = '5px monospace'; ctx.textAlign = 'left';
-      ctx.fillText(n.name, sx - 1, sy - 2);
-    }
+    const p = G().player;
+    const pss = playerScreen();
+    const px = pss.x, py = pss.y;
+    // actores
+    const actors = [];
+    for (const n of (m.npcs || [])) actors.push({ gx: n.gx, gy: n.gy, dir: n.dir || 'SW', frame: 0, pal: PH.render.NPC_PALETTES[n.sprite] });
+    // jugador con posición interpolada -> insertamos como actor con coords fraccionarias
+    let pgx = p.x, pgy = p.y;
+    if (game.moving) { const t = clamp(game.moveT / game.moveDur, 0, 1); pgx = lerp(game.from.x, game.to.x, t); pgy = lerp(game.from.y, game.to.y, t); }
+    const walkFrame = game.moving ? (Math.floor(game.moveT / (game.moveDur / 2)) % 2 === 0 ? 1 : 2) : 0;
+    actors.push({ gx: pgx, gy: pgy, dir: p.dir, frame: walkFrame, pal: { skin: '#f0c088', hair: '#3a2a1a', shirt: '#2f9e6b', pants: '#33333f' }, hero: true });
 
-    // Jugador
-    const psx = pxp - camX, psy = pyp - camY;
-    const wf = game.moving ? (Math.floor(game.moveT / (game.moveDur / 2)) % 2 === 0 ? 1 : 2) : 0;
-    R.drawActor(ctx, psx, psy, s.dir, wf,
-      { skin: '#f0c088', hair: '#3a2a1a', shirt: '#2f9e6b', pants: '#33333f', pack: '#8a5a2a', hat: '#1f7a4d' });
+    // objetos: dibujarlos como parte del render (cubos etiquetados / grow con planta)
+    const objects = (m.objects || []).map(o => ({ gx: o.gx, gy: o.gy, draw: (ctx, sx, sy) => drawObject(ctx, sx, sy, o) }));
 
-    // Overlays ambientales (sobre el búfer de mundo)
-    applyEnvOverlay(ctx);
+    // combinar extraFloors dentro de renderRoom: hack -> dibujar suelos extra antes
+    for (const ef of extraFloors) { const s = ISO.project(ef.gx, ef.gy, game.cam); ISO.floorDiamond(ctx, s.x, s.y, ef.col, ef.edge); }
 
-    // --- Componer: escalar el mundo x2 al lienzo, y capa de personajes en alta resolución ---
-    const m = game.ctx;
-    m.imageSmoothingEnabled = false;
-    m.drawImage(game.world, 0, 0, R.W * game.RScale, R.H * game.RScale);
-    drawHiresLayer(m, camX, camY, now);
+    // paredes 'H'/'P' como objetos altos
+    for (const w of walls) objects.push({ gx: w.gx, gy: w.gy, draw: (ctx, sx, sy) => ISO.cube(ctx, sx, sy, w.h, w.pal) });
+
+    ISO.renderRoom(ctx, m, game.cam, now, actors, objects);
+
+    // etiqueta del objeto/npc al frente si el jugador mira algo interactuable
+    hudFacingLabel(ctx, m);
+    envTint(ctx);
   }
 
-  // Capa de sprites de alta resolución (32 px nativos). Se rellenará con el arte
-  // generado (jugador, NPCs y cepas errantes). Coordenadas en espacio de lienzo (x2).
-  function drawHiresLayer(m, camX, camY, now) {
-    // (pendiente de sprites) — de momento el mundo escalado ya incluye actores procedurales.
+  function drawObject(ctx, sx, sy, o) {
+    if (o.kind === 'grow') {
+      ISO.cube(ctx, sx, sy, 12, { top: '#6b4a2a', left: '#4a3320', right: '#5a3f28' }); // mesa
+      // planta encima (retrato de una cepa del banco si hay)
+      const bank = G().bank.find(b => b.form !== 'polen');
+      const key = bank && PH.plantart ? PH.plantart.stageKey(bank.speciesId, 4) : null;
+      const im = key && PH.plantart.img(key);
+      if (im && im.complete) { const h = 40; ctx.drawImage(im, sx - h * 0.4, sy - h + 6, h * 0.8, h); }
+      else ISO.cube(ctx, sx, sy - 12, 22, { top: '#5aa64a', left: '#2f6b2a', right: '#3f8f3a' });
+    } else if (o.kind === 'pc') ISO.cube(ctx, sx, sy, 20, { top: '#3a6ea5', left: '#233f5a', right: '#2d5273' });
+    else if (o.kind === 'bed') ISO.cube(ctx, sx, sy, 8, { top: '#d64a6b', left: '#8f2f45', right: '#b03a55' });
+    else if (o.kind === 'lab') ISO.cube(ctx, sx, sy, 14, { top: '#cfe0ea', left: '#8fa3b0', right: '#aebfc9' });
+    else if (o.kind === 'shop') ISO.cube(ctx, sx, sy, 14, { top: '#ffb02e', left: '#9a6a18', right: '#c98d22' });
+    else ISO.cube(ctx, sx, sy, 14, { top: '#999', left: '#555', right: '#777' });
   }
 
-  function applyEnvOverlay(ctx) {
-    const env = G().env;
-    // tinte día/noche
-    let a = 0, col = '0,0,20';
-    const t = env.time;
-    if (t < 5 * 60) a = 0.45;
-    else if (t < 7 * 60) a = PH.util.lerp(0.45, 0, (t - 300) / 120);
-    else if (t < 18 * 60) a = 0;
-    else if (t < 20 * 60) a = PH.util.lerp(0, 0.4, (t - 1080) / 120);
-    else a = 0.45;
-    if (a > 0) { ctx.fillStyle = `rgba(${col},${a})`; ctx.fillRect(0, 0, R.W, R.H); }
-
-    // clima
-    if (env.weather === 'niebla') { ctx.fillStyle = 'rgba(200,205,215,0.28)'; ctx.fillRect(0, 0, R.W, R.H); }
-    else if (env.weather === 'nublado') { ctx.fillStyle = 'rgba(120,125,135,0.14)'; ctx.fillRect(0, 0, R.W, R.H); }
-    else if (env.weather === 'ola_calor') { ctx.fillStyle = 'rgba(255,160,60,0.10)'; ctx.fillRect(0, 0, R.W, R.H); }
-    if (env.weather === 'lluvia' || env.weather === 'tormenta') drawRain(ctx, env.weather === 'tormenta');
-
-    // tinte y partículas de evento raro
-    if (PH.events) {
-      const tint = PH.events.tint && PH.events.tint();
-      if (tint) { ctx.fillStyle = tint; ctx.fillRect(0, 0, R.W, R.H); }
-      const parts = PH.events.particles && PH.events.particles();
-      if (parts) drawParticles(ctx, parts);
-    }
+  function hudFacingLabel(ctx, m) {
+    if (game.mode !== 'overworld' || game.moving) return;
+    const f = facing();
+    const target = npcAt(m, f.gx, f.gy) || objAt(m, f.gx, f.gy) || doorAt(m, f.gx, f.gy);
+    if (!target) return;
+    const s = ISO.project(f.gx, f.gy, game.cam);
+    const label = target.name || target.label || (target.to ? '→ ' + (room(target.to) ? room(target.to).name : '') : '');
+    if (!label) return;
+    ctx.font = '8px monospace'; ctx.textAlign = 'center';
+    const w = ctx.measureText(label).width + 8;
+    ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(s.x - w / 2, s.y - 6, w, 11);
+    ctx.fillStyle = '#fff'; ctx.fillText(label, s.x, s.y + 2);
   }
 
-  let partSeed = [];
-  function drawParticles(ctx, kind) {
-    const n = 26;
-    if (partSeed.length !== n) { partSeed = []; for (let i = 0; i < n; i++) partSeed.push([Math.random() * R.W, Math.random() * R.H, 1 + Math.random() * 2, Math.random() * 6]); }
-    const t = performance.now();
-    for (const d of partSeed) {
-      if (kind === 'meteor') {
-        const y = (d[1] + (t * 0.12 * d[2]) % R.H) % R.H;
-        const x = (d[0] + (t * 0.06 * d[2]) % R.W) % R.W;
-        ctx.strokeStyle = 'rgba(255,220,160,0.8)'; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 4, y - 6); ctx.stroke();
-      } else if (kind === 'petal') {
-        const y = (d[1] + (t * 0.03 * d[2]) % R.H) % R.H;
-        const x = (d[0] + Math.sin((t + d[3] * 400) / 500) * 8) % R.W;
-        ctx.fillStyle = 'rgba(255,150,200,0.75)'; ctx.fillRect(x, y, 2, 2);
-      } else if (kind === 'spark') {
-        const x = (d[0] + Math.sin((t + d[3] * 300) / 600) * 6);
-        const y = (d[1] + Math.cos((t + d[3] * 300) / 700) * 6);
-        ctx.fillStyle = 'rgba(160,220,255,' + (0.4 + 0.4 * Math.abs(Math.sin(t / 300 + d[3]))) + ')';
-        ctx.fillRect(x, y, 1, 1);
-      }
-    }
-  }
-
-  let rainSeed = [];
-  function drawRain(ctx, heavy) {
-    const n = heavy ? 60 : 34;
-    if (rainSeed.length !== n) { rainSeed = []; for (let i = 0; i < n; i++) rainSeed.push([Math.random() * R.W, Math.random() * R.H, 2 + Math.random() * 3]); }
-    ctx.strokeStyle = heavy ? 'rgba(180,200,230,0.6)' : 'rgba(180,200,230,0.4)';
-    ctx.lineWidth = 1;
-    const t = performance.now();
-    for (const d of rainSeed) {
-      const y = (d[1] + (t * 0.35 * d[2]) % R.H) % R.H;
-      ctx.beginPath(); ctx.moveTo(d[0], y); ctx.lineTo(d[0] - 1, y + 4); ctx.stroke();
-    }
-    if (heavy && Math.random() < 0.01) { ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fillRect(0, 0, R.W, R.H); }
+  function envTint(ctx) {
+    const env = G().env; const t = env.time; let a = 0;
+    if (t < 5 * 60) a = 0.42; else if (t < 7 * 60) a = lerp(0.42, 0, (t - 300) / 120);
+    else if (t < 18 * 60) a = 0; else if (t < 20 * 60) a = lerp(0, 0.38, (t - 1080) / 120); else a = 0.42;
+    if (a > 0) { ctx.fillStyle = `rgba(0,0,25,${a})`; ctx.fillRect(0, 0, game.W, game.H); }
   }
 
   PH.game.init = init;

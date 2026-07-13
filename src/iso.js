@@ -101,9 +101,10 @@
 
   // Render de una sala/mapa iso con painter's algorithm.
   // map.grid: '.'=suelo, '#'=pared, ' '=vacío, 'D'=puerta(suelo). objects: [{gx,gy,h,draw}]
-  function renderRoom(ctx, map, cam, t, actors) {
+  function renderRoom(ctx, map, cam, t, actors, objectsOverride) {
     const W = map.grid[0].length, Hh = map.grid.length;
-    const P = map.pal || THEMES.room;
+    const P = map.pal || THEMES[map.theme] || THEMES.room;
+    const objs = objectsOverride || map.objects;
     // 1) suelos primero (no ocluyen)
     for (let gy = 0; gy < Hh; gy++) for (let gx = 0; gx < W; gx++) {
       const ch = map.grid[gy][gx];
@@ -121,7 +122,7 @@
         list.push({ d: gx + gy, draw: () => cube(ctx, s.x, s.y, WH, P.wall) });
       }
     }
-    for (const o of (map.objects || [])) {
+    for (const o of (objs || [])) {
       const s = project(o.gx, o.gy, cam);
       list.push({ d: o.gx + o.gy + 0.4, draw: () => o.draw(ctx, s.x, s.y, o) });
     }
