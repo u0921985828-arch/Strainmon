@@ -281,67 +281,93 @@ html, body {
    CONSOLA PORTÁTIL "STRAINBOY" (diseño original, no comercial)
    Ocupa toda la pantalla; LCD grande para jugar bien.
    ============================================================ */
+/* ===== Tokens de la consola (mundo visual comprometido: portátil físico) ===== */
+:root {
+  --case-hi: #99a68b; --case: #74815f; --case-lo: #505b3f; --edge: #363f2c;
+  --recess: #2b3225; --bezel-1: #241d2a; --bezel-2: #130f18;
+  --maroon: #8a1f3d; --maroon-lite: #c98aa0;
+  --btn-hi: #c15277; --btn: #83203f; --btn-lo: #5a1530; --btn-edge: #380a1b;
+  --led: #ff3d3d; --ink: #333c28; --ink-lite: #e9f0e0; --slit: #0e2318;
+}
 /* Fondo neutro: el "escritorio" sobre el que reposa la consola. */
 #device {
   position: fixed; inset: 0; width: 100vw; height: 100dvh;
   display: flex; align-items: center; justify-content: center; padding: 1.5vmin;
-  background: radial-gradient(120% 90% at 50% 0%, #24402f 0%, #14231a 55%, #0c130d 100%);
+  background: radial-gradient(130% 100% at 50% -8%, #26402e 0%, #16261b 52%, #0b110c 100%);
   overflow: hidden;
 }
-/* CUERPO de la consola: una sola carcasa de plástico con la silueta DMG
-   (esquinas superiores suaves, inferiores muy redondeadas). Todo va dentro. */
+/* CUERPO: una sola carcasa de plástico con la silueta DMG. Doble capa de luz
+   (sheen superior + vignette inferior) para leer volumen de plástico real. */
 #body {
-  position: relative; width: min(94vw, 56vh, 540px); max-height: 98dvh;
+  position: relative; width: min(94vw, 55vh, 528px); max-height: 98dvh;
   display: flex; flex-direction: column; align-items: center; gap: 1vmin;
-  padding: 2.4vmin 2.6vmin 2vmin;
-  background: linear-gradient(160deg, #7e8c74 0%, #67735d 38%, #55614c 100%);
-  border-radius: 16px 16px 58px 40px;   /* TL TR BR BL: barriga inferior redondeada */
+  padding: 2.4vmin 2.6vmin 2.2vmin;
+  background:
+    radial-gradient(140% 40% at 22% 0%, rgba(255,255,255,.16), transparent 60%),
+    linear-gradient(158deg, var(--case-hi) 0%, var(--case) 40%, var(--case-lo) 100%);
+  border-radius: 18px 18px 62px 40px;   /* TL TR BR BL: barriga inferior redondeada */
   box-shadow:
-    0 16px 40px rgba(0,0,0,.55),
-    inset 0 2px 0 rgba(255,255,255,.28),
-    inset 0 -4px 10px rgba(0,0,0,.32),
-    inset 3px 0 6px rgba(255,255,255,.12),
-    inset -4px 0 8px rgba(0,0,0,.22);
-  border: 1px solid #414b3a;
+    0 22px 50px rgba(0,0,0,.6), 0 3px 0 rgba(0,0,0,.4),
+    inset 0 3px 0 rgba(255,255,255,.34),
+    inset 0 -6px 14px rgba(0,0,0,.34),
+    inset 4px 0 8px rgba(255,255,255,.12),
+    inset -5px 0 10px rgba(0,0,0,.24);
+  border: 1px solid var(--edge);
 }
-/* bisel/hombro alrededor de la pantalla: rebaje del plástico */
-#body > * { width: 100%; }
+/* micro-grano del plástico (muy tenue, no intercepta toques) */
+#body::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  border-radius: inherit; opacity: .05; mix-blend-mode: overlay;
+  background-image: radial-gradient(rgba(255,255,255,.9) .5px, transparent .5px);
+  background-size: 3px 3px; }
+#body > * { width: 100%; position: relative; z-index: 1; }
 
 /* --------- Cubierta superior + interruptor OFF·ON --------- */
-#deck { display: flex; align-items: center; gap: 10px; padding: 0 6px; height: 4.5vmin; min-height: 24px; }
-.brand-mini { font-weight: 900; letter-spacing: 1px; color: #eafff3; font-size: clamp(12px, 2.6vmin, 20px); text-shadow: 1px 1px 0 #0c281c; }
+#deck { display: flex; align-items: center; gap: 10px; padding: 0 4px; height: 4.5vmin; min-height: 24px; }
+.brand-mini { font-weight: 900; letter-spacing: 1.5px; color: #f2f8ec; font-size: clamp(12px, 2.6vmin, 20px);
+  text-shadow: 0 1px 0 rgba(255,255,255,.25), 0 -1px 1px rgba(0,0,0,.4); }
 .brand-mini b { color: #ffd34d; }
-.powersw { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; color: #bfe8cf;
-  font-size: clamp(7px, 1.5vmin, 10px); letter-spacing: 2px; font-weight: 700;
-  background: #12281c; border: 1px solid #0a1a12; border-radius: 6px; padding: 2px 9px 2px 4px;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.5); }
-.powersw i { width: 16px; height: 9px; border-radius: 5px; background: #0a140e;
-  box-shadow: inset -8px 0 0 -1px #6f9a3a; }  /* knob del deslizador a la derecha (ON) */
+/* interruptor deslizante en un carril hundido con estrías de agarre */
+.powersw { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; color: var(--ink);
+  font-size: clamp(7px, 1.5vmin, 10px); letter-spacing: 2px; font-weight: 800;
+  background: linear-gradient(180deg, var(--recess), #1c2218); border: 1px solid var(--edge); border-radius: 7px;
+  padding: 2px 9px 2px 4px; box-shadow: inset 0 1px 3px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.2); }
+.powersw i { position: relative; width: 18px; height: 10px; border-radius: 5px;
+  background: linear-gradient(180deg, #cdd6c2, #8b957e);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 1px 2px rgba(0,0,0,.5); transform: translateX(6px); }
+.powersw i::after { content: ""; position: absolute; inset: 2px 3px; border-radius: 3px;
+  background: repeating-linear-gradient(90deg, rgba(0,0,0,.35) 0 1px, transparent 1px 3px); }
 
-/* --------- LCD (bisel oscuro con acentos granate, estilo DMG) --------- */
+/* --------- LCD: pantalla rebajada en el plástico, marco plomo-granate --------- */
 #lcd {
-  position: relative; flex: 0 1 auto; min-height: 0; max-height: 58vh; margin: 0 auto;
+  position: relative; flex: 0 1 auto; min-height: 0; max-height: 56vh; margin: 0 auto;
   display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-  background: linear-gradient(180deg, #201a26 0%, #17121c 60%, #0f0c13 100%);
-  border-radius: 12px 12px 16px 42px;   /* esquina inf-izq muy redondeada (silueta DMG) */
-  padding: 1.4vmin 3vmin 1.6vmin;
-  box-shadow: 0 8px 26px rgba(0,0,0,.5), inset 0 0 0 2px #0a0710, inset 0 0 3vmin rgba(0,0,0,.6);
-  border: 2px solid #0a0710;
+  background: linear-gradient(180deg, var(--bezel-1) 0%, #17121c 60%, var(--bezel-2) 100%);
+  border-radius: 12px 12px 16px 40px;   /* esquina inf-izq muy redondeada (silueta DMG) */
+  padding: 1.3vmin 3.2vmin 1.5vmin;
+  /* hombro biselado: labio claro arriba + rebaje profundo (parece hundida) */
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.22), 0 2px 0 rgba(0,0,0,.35),
+    0 12px 24px rgba(0,0,0,.5),
+    inset 0 0 0 2px #0a0710, inset 0 4px 12px rgba(0,0,0,.7);
+  border: 2px solid #090610;
 }
 /* franjas del bisel: rótulo propio entre acentos granate (no el lema comercial) */
 .bezel-top, .bezel-bot { display: flex; align-items: center; gap: 8px; width: 100%; flex: 0 0 auto; }
 .bezel-top { justify-content: center; padding: 2px 2px 4px; }
 .bezel-top .dash { flex: 1; height: 3px; max-width: 22%; border-radius: 2px;
-  background: repeating-linear-gradient(90deg, #7d1e39 0 6px, transparent 6px 9px); }
-.lcd-tag { color: #c98aa0; font-size: clamp(6px, 1.4vmin, 10px); letter-spacing: 2px; font-weight: 700; white-space: nowrap; }
+  background: repeating-linear-gradient(90deg, var(--maroon) 0 6px, transparent 6px 9px); }
+.lcd-tag { color: var(--maroon-lite); font-size: clamp(6px, 1.4vmin, 10px); letter-spacing: 2px; font-weight: 700; white-space: nowrap; }
 .bezel-bot { justify-content: space-between; padding: 5px 2px 1px; }
-.battery { display: inline-flex; align-items: center; gap: 5px; color: #b9c2cb; font-size: clamp(6px, 1.3vmin, 9px); letter-spacing: 1px; }
-.battery i { width: 8px; height: 8px; border-radius: 50%; background: #ff3d3d; box-shadow: 0 0 7px #ff3d3d, inset 0 0 2px #7a1010; }
-.lcd-sub { color: #4a5560; font-size: clamp(6px, 1.2vmin, 9px); letter-spacing: 2px; }
-/* Pantalla activa: altura manda y la relación 10:9 fija el ancho -> píxeles cuadrados. */
+.battery { display: inline-flex; align-items: center; gap: 5px; color: #aeb7bf; font-size: clamp(6px, 1.3vmin, 9px); letter-spacing: 1px; }
+.battery i { width: 8px; height: 8px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff8a8a, var(--led) 55%, #a81616);
+  box-shadow: 0 0 8px rgba(255,61,61,.85), inset 0 0 2px #7a1010; }
+.lcd-sub { color: #47525d; font-size: clamp(6px, 1.2vmin, 9px); letter-spacing: 2px; }
+/* Pantalla activa: altura manda y 10:9 fija el ancho -> píxeles cuadrados. */
 .lcd-inner { position: relative; flex: 1 1 auto; min-height: 0; aspect-ratio: 10 / 9; width: auto; max-width: 100%;
-  overflow: hidden; border-radius: 6px 6px 6px 10px;
-  background: #8b9c2f; box-shadow: inset 0 0 0 2px #05321f, inset 0 0 20px rgba(0,0,0,.45); }
+  overflow: hidden; border-radius: 5px 5px 5px 9px;
+  background: #8b9c2f;
+  box-shadow: inset 0 0 0 2px #05321f, inset 0 0 22px rgba(0,0,0,.5), 0 0 14px rgba(150,190,70,.10); }
 /* Textura de LCD: retícula de puntos + líneas de barrido muy tenues, como la
    matriz de puntos real. No intercepta toques. */
 .lcd-inner::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; border-radius: 6px;
@@ -365,62 +391,90 @@ html, body {
 #overlay { position: absolute; inset: 0; z-index: 5; }
 #toasts { top: 4px; z-index: 8; }
 
-/* --------- Controles físicos (cruceta abajo-izq. + A/B arriba-der. en diagonal) --------- */
-#controls { display: flex; align-items: flex-start; justify-content: space-between; gap: 4vmin; padding: 1.5vmin 1vmin 0; }
-/* base circular recessed bajo la cruceta, como en el DMG */
-.dpad { position: relative; width: 32vmin; height: 32vmin; max-width: 144px; max-height: 144px; flex: 0 0 auto; margin-top: 3vmin; }
-.dpad::before { content: ""; position: absolute; inset: -8%; border-radius: 50%;
-  background: radial-gradient(circle at 50% 42%, #163a26, #0e2418); box-shadow: inset 0 2px 6px rgba(0,0,0,.55); }
-/* la cruceta se lee como una sola cruz negra (brazos + centro mismo tono) */
-.db { position: absolute; width: 33%; height: 33%; background: linear-gradient(180deg, #23262b, #0e1013);
-  color: #7c8590; border: 1px solid #050607; font-size: 2.2vmin; cursor: pointer;
-  box-shadow: 0 2px 0 #050607; -webkit-user-select: none; user-select: none; z-index: 1; }
-.db:active { transform: translateY(1px); box-shadow: 0 1px 0 #050607; }
-.db.up { top: 0; left: 33.5%; border-radius: 6px 6px 0 0; } .db.down { bottom: 0; left: 33.5%; border-radius: 0 0 6px 6px; }
-.db.left { top: 33.5%; left: 0; border-radius: 6px 0 0 6px; } .db.right { top: 33.5%; right: 0; border-radius: 0 6px 6px 0; }
-.db-center { position: absolute; top: 33.5%; left: 33.5%; width: 33%; height: 33%; background: #14171b; z-index: 1;
-  box-shadow: inset 0 0 6px rgba(0,0,0,.6); }
-.db-center::after { content: ""; position: absolute; inset: 30%; border-radius: 50%; background: #0c0e11; }
-.face { display: flex; align-items: flex-end; gap: 2.4vmin; }
-.ab { width: 13vmin; height: 13vmin; max-width: 62px; max-height: 62px; border-radius: 50%; cursor: pointer;
-  font-weight: 900; font-size: 2.6vmin; line-height: 1; color: #4a1226; border: 1px solid #5a0f28;
-  background: radial-gradient(circle at 35% 30%, #b5476b, #7d1e3d 60%, #5c1730);
-  box-shadow: 0 3px 0 #3f0c1e; }
+/* --------- Controles (cruceta abajo-izq. + A/B arriba-der. en diagonal) --------- */
+#controls { display: flex; align-items: flex-start; justify-content: space-between; gap: 3vmin; padding: 1.5vmin 1vmin 0; }
+/* cuenco circular hundido bajo la cruceta, con reborde iluminado (DMG) */
+.dpad { position: relative; width: 32vmin; height: 32vmin; max-width: 142px; max-height: 142px; flex: 0 0 auto; margin-top: 2.6vmin; }
+.dpad::before { content: ""; position: absolute; inset: -12%; border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #223022 0%, #141c12 70%);
+  box-shadow: inset 0 3px 8px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.14); }
+/* la cruceta se lee como una sola cruz negra con brazos biselados */
+.db { position: absolute; width: 33.5%; height: 33.5%; cursor: pointer; z-index: 1;
+  background: linear-gradient(160deg, #33373d 0%, #1a1d21 46%, #0b0d10 100%);
+  color: #8b949f; border: 1px solid #050607; font-size: 2.1vmin;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 2px 3px rgba(0,0,0,.5);
+  -webkit-user-select: none; user-select: none; }
+.db:active { transform: translateY(1px); filter: brightness(.82); }
+.db.up { top: 0; left: 33.25%; border-radius: 7px 7px 0 0; }
+.db.down { bottom: 0; left: 33.25%; border-radius: 0 0 7px 7px; }
+.db.left { top: 33.25%; left: 0; border-radius: 7px 0 0 7px; }
+.db.right { top: 33.25%; right: 0; border-radius: 0 7px 7px 0; }
+.db-center { position: absolute; top: 33.25%; left: 33.25%; width: 33.5%; height: 33.5%; z-index: 1;
+  background: linear-gradient(160deg, #26292e, #101216); box-shadow: inset 0 0 7px rgba(0,0,0,.7); }
+.db-center::after { content: ""; position: absolute; inset: 28%; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #1a1d22, #08090c); box-shadow: inset 0 1px 2px rgba(0,0,0,.8); }
+
+/* A/B sobre una plataforma elevada inclinada, botones de goma abombados */
+.face { position: relative; display: flex; align-items: flex-end; gap: 2.6vmin; padding: 1.2vmin; }
+.face::before { content: ""; position: absolute; inset: -0.4vmin 0.4vmin; z-index: 0;
+  border-radius: 40px / 30px; transform: rotate(-22deg);
+  background: linear-gradient(160deg, rgba(255,255,255,.10), rgba(0,0,0,.20));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), inset 0 -2px 6px rgba(0,0,0,.28); }
+.ab { position: relative; z-index: 1; width: 13vmin; height: 13vmin; max-width: 60px; max-height: 60px;
+  border-radius: 50%; cursor: pointer; font-weight: 900; font-size: 2.5vmin; line-height: 1; color: #efd7e0;
+  border: 1px solid var(--btn-edge);
+  background: radial-gradient(circle at 36% 28%, var(--btn-hi) 0%, var(--btn) 52%, var(--btn-lo) 100%);
+  box-shadow: 0 4px 0 var(--btn-edge), 0 6px 10px rgba(0,0,0,.4),
+    inset 0 2px 3px rgba(255,255,255,.35), inset 0 -3px 5px rgba(0,0,0,.4);
+  text-shadow: 0 -1px 1px rgba(0,0,0,.5); }
 .ab.a { transform: translateY(-3vmin); }  /* A arriba-derecha, B abajo-izq (diagonal DMG) */
-.ab:active { transform: translateY(2px); box-shadow: 0 1px 0 #3f0c1e; }
-.ab.a:active { transform: translateY(calc(-3vmin + 2px)); box-shadow: 0 1px 0 #3f0c1e; }
+.ab:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--btn-edge), inset 0 2px 4px rgba(0,0,0,.4); }
+.ab.a:active { transform: translateY(calc(-3vmin + 3px)); box-shadow: 0 1px 0 var(--btn-edge), inset 0 2px 4px rgba(0,0,0,.4); }
 
 /* --------- Banda inferior: SELECT/START + altavoz --------- */
 #lowface { display: flex; align-items: center; justify-content: space-between; gap: 3vmin; }
-#sysrow { display: flex; justify-content: center; gap: 3.5vmin; }
-.pill-btn { transform: rotate(-25deg); background: linear-gradient(180deg, #3a3040, #1c1622); color: #b6a6c0;
-  border: 1px solid #0a0710; border-radius: 999px; padding: 1vmin 2.8vmin; font-size: clamp(8px, 1.5vmin, 11px);
-  font-weight: 700; letter-spacing: 1px; cursor: pointer; box-shadow: 0 2px 0 #0a0710; }
-.pill-btn:active { transform: rotate(-25deg) translateY(1px); box-shadow: 0 1px 0 #0a0710; }
-/* rejilla de altavoz: 6 ranuras diagonales (esquina inf-derecha del DMG) */
-.speaker { display: flex; gap: 6px; align-items: center; justify-content: center; opacity: .6; transform: rotate(-28deg); }
-.speaker i { width: 4px; height: 28px; border-radius: 3px; background: #0e2a1c; box-shadow: inset 0 0 2px #000; }
+#sysrow { position: relative; display: flex; justify-content: center; gap: 3.2vmin; padding: 1.4vmin 1.6vmin; }
+#sysrow::before { content: ""; position: absolute; inset: 0; z-index: 0; transform: rotate(-25deg);
+  border-radius: 26px; background: linear-gradient(160deg, rgba(255,255,255,.08), rgba(0,0,0,.16));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14), inset 0 -2px 5px rgba(0,0,0,.24); }
+.pill-btn { position: relative; z-index: 1; transform: rotate(-25deg); color: #cdbdd6; letter-spacing: 1px;
+  background: linear-gradient(180deg, #4a4052 0%, #2a2233 60%, #1a1422 100%);
+  border: 1px solid #0a0710; border-radius: 999px; padding: 0.9vmin 2.6vmin; font-size: clamp(8px, 1.5vmin, 11px);
+  font-weight: 700; cursor: pointer;
+  box-shadow: 0 3px 0 #0a0710, inset 0 1px 1px rgba(255,255,255,.22); }
+.pill-btn:active { transform: rotate(-25deg) translateY(2px); box-shadow: 0 1px 0 #0a0710, inset 0 2px 3px rgba(0,0,0,.4); }
+/* altavoz: 6 ranuras diagonales HUNDIDAS en el plástico (inf-derecha del DMG) */
+.speaker { display: flex; gap: 6px; align-items: center; justify-content: center; transform: rotate(-28deg); }
+.speaker i { width: 4px; height: 28px; border-radius: 3px;
+  background: var(--slit); box-shadow: inset 0 1px 3px rgba(0,0,0,.85), 0 1px 0 rgba(255,255,255,.16); }
 .speaker i:nth-child(1), .speaker i:nth-child(6) { height: 18px; }
 .speaker i:nth-child(2), .speaker i:nth-child(5) { height: 24px; }
 
-/* fila de accesos rápidos: discreta (no forma parte de la cara clásica DMG) */
-#menurow { display: flex; justify-content: center; gap: 1vmin; opacity: .8; }
-.mb { width: 8vmin; height: 8vmin; max-width: 40px; max-height: 40px; border-radius: 9px; cursor: pointer;
-  font-size: 2.6vmin; background: linear-gradient(180deg, #1c2a22, #101a14); color: #cfe8d8; border: 1px solid #0a1a12;
-  box-shadow: 0 2px 0 #0a1a12; }
-.mb:active { transform: translateY(1px); box-shadow: 0 1px 0 #0a1a12; }
+/* accesos rápidos: teclas hundidas discretas (no son la cara clásica DMG) */
+#menurow { display: flex; justify-content: center; gap: 1vmin; }
+.mb { width: 8vmin; height: 8vmin; max-width: 38px; max-height: 38px; border-radius: 9px; cursor: pointer;
+  font-size: 2.5vmin; color: #dfeee2; border: 1px solid var(--edge);
+  background: linear-gradient(180deg, #414c37, #2b3325);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 2px 3px rgba(0,0,0,.35); }
+.mb:active { transform: translateY(1px); box-shadow: inset 0 2px 4px rgba(0,0,0,.5); }
 
-/* pie: ruedas de contraste/volumen + rótulo PHONES */
-#footrow { display: flex; align-items: center; justify-content: space-between; gap: 3vmin; opacity: .85; }
-.knob { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #bfe8cf;
-  font-size: clamp(6px, 1.2vmin, 9px); letter-spacing: 1px; cursor: pointer; }
-.knob i { position: relative; width: 6vmin; height: 6vmin; max-width: 28px; max-height: 28px; border-radius: 50%;
+/* pie: ruedas de contraste/volumen (canto del plástico) + rótulo PHONES */
+#footrow { display: flex; align-items: center; justify-content: space-between; gap: 3vmin; }
+.knob { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--ink);
+  font-size: clamp(6px, 1.2vmin, 9px); letter-spacing: 1px; font-weight: 700; cursor: pointer; }
+.knob i { position: relative; width: 6vmin; height: 6vmin; max-width: 27px; max-height: 27px; border-radius: 50%;
   transition: transform .18s ease;
   background:
     linear-gradient(#cfe89a, #cfe89a) no-repeat center 2px / 2px 42%,
-    radial-gradient(circle at 40% 35%, #3a4a40, #10201a); border: 1px solid #0a1a12;
-  box-shadow: inset 0 -2px 3px rgba(0,0,0,.5); }
-.phones { color: #7fa68c; font-size: clamp(6px, 1.3vmin, 10px); letter-spacing: 2px; font-weight: 700; }
+    radial-gradient(circle at 40% 32%, #4a5647, #16221a);
+  border: 1px solid #0a1a12;
+  box-shadow: inset 0 -2px 3px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.2); }
+.phones { color: var(--ink); font-size: clamp(6px, 1.3vmin, 10px); letter-spacing: 2px; font-weight: 700; opacity: .8; }
+
+@media (prefers-reduced-motion: reduce) {
+  .knob i { transition: none; }
+  .boot-logo, .boot-tm, .pwr-btn { animation: none !important; }
+}
 
 @media (min-aspect-ratio: 1/1) {
   /* pantallas anchas: aprovecha más altura para la LCD */
