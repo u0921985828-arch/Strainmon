@@ -31,8 +31,9 @@
   function updateHUD() {
     const s = G();
     const env = s.env;
-    const map = (PH.world.MAPS && PH.world.MAPS[s.player.map]) ||
-      (PH.game && PH.game.roomName ? { name: PH.game.roomName() } : null);
+    // En modo iso, el nombre de sala manda; si no, el mapa top-down.
+    const isoName = PH.game && PH.game.roomName ? PH.game.roomName() : '';
+    const map = isoName ? { name: isoName } : (PH.world.MAPS && PH.world.MAPS[s.player.map]);
     const wIcon = { despejado: '☀️', lluvia: '🌧️', niebla: '🌫️', tormenta: '⛈️', ola_calor: '🔥', nublado: '☁️' }[env.weather] || '☀️';
     const ev = PH.events && PH.events.current();
     const evPill = ev ? `<span class="pill event">${ev.icon} ${ev.name} · ${PH.events.remaining()}s</span>` : '';

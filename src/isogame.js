@@ -162,6 +162,7 @@
     if (PH.sprites) PH.sprites.preload();
     if (PH.plantart) PH.plantart.preload();
     if (PH.charart) PH.charart.preload();
+    if (PH.furniart) PH.furniart.preload();
     PH.ui.init();
     bindInput();
     resize();
@@ -447,7 +448,7 @@
       const ch = m.grid[gy][gx];
       if (ch === 'g') extraFloors.push({ gx, gy, col: '#3f7d34', edge: '#2f5b26' });
       else if (ch === 'H') walls.push({ gx, gy, h: 56, pal: ISO.THEMES.street.wall });
-      else if (ch === 'P') walls.push({ gx, gy, h: 30, pal: { top: '#ffd34d', left: '#7c6a2a', right: '#9a8330' } });
+      else if (ch === 'P') walls.push({ gx, gy, h: 30, lamp: true, pal: { top: '#ffd34d', left: '#7c6a2a', right: '#9a8330' } });
     }
 
     const p = G().player;
@@ -468,8 +469,13 @@
     // combinar extraFloors dentro de renderRoom: hack -> dibujar suelos extra antes
     for (const ef of extraFloors) { const s = ISO.project(ef.gx, ef.gy, game.cam); ISO.floorDiamond(ctx, s.x, s.y, ef.col, ef.edge); }
 
-    // paredes 'H'/'P' como objetos altos
-    for (const w of walls) objects.push({ gx: w.gx, gy: w.gy, draw: (ctx, sx, sy) => ISO.cube(ctx, sx, sy, w.h, w.pal) });
+    // paredes 'H' como objetos altos; farolas 'P' con su sprite si existe
+    for (const w of walls) objects.push({
+      gx: w.gx, gy: w.gy, draw: (ctx, sx, sy) => {
+        if (w.lamp && drawFurni(ctx, sx, sy, 'lamp', 52)) return;
+        ISO.cube(ctx, sx, sy, w.h, w.pal);
+      }
+    });
 
     ISO.renderRoom(ctx, m, game.cam, now, actors, objects);
 
@@ -478,7 +484,29 @@
     envTint(ctx);
   }
 
+  // Dibuja un sprite de mueble anclado a la base del tile (fallback: cubo).
+  function drawFurni(ctx, sx, sy, kind, hCap) {
+    const im = PH.furniart && PH.furniart.forKind(kind);
+    if (im && im.complete && im.naturalWidth) {
+      const H = hCap || 46, s = H / im.naturalHeight, w = Math.round(im.naturalWidth * s), h = Math.round(im.naturalHeight * s);
+      const base = sy + ISO.TH * 0.85;
+      ctx.drawImage(im, Math.round(sx - w / 2), Math.round(base - h), w, h);
+      return true;
+    }
+    return false;
+  }
   function drawObject(ctx, sx, sy, o) {
+    if (PH.furniart && PH.furniart.has(o.kind)) {
+      const done = drawFurni(ctx, sx, sy, o.kind, o.kind === 'grow' ? 40 : 48);
+      if (o.kind === 'grow') {
+        // planta encima de la mesa de cultivo (fase 4 de una cepa del banco)
+        const bank = G().bank.find(b => b.form !== 'polen');
+        const key = bank && PH.plantart ? PH.plantart.stageKey(bank.speciesId, 4) : null;
+        const im = key && PH.plantart.img(key);
+        if (im && im.complete) { const h = 34; ctx.drawImage(im, sx - h * 0.4, sy + ISO.TH * 0.85 - 30 - h, h * 0.8, h); }
+      }
+      if (done) return;
+    }
     if (o.kind === 'grow') {
       ISO.cube(ctx, sx, sy, 12, { top: '#6b4a2a', left: '#4a3320', right: '#5a3f28' }); // mesa
       // planta encima (retrato de una cepa del banco si hay)
