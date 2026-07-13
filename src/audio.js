@@ -73,9 +73,19 @@
   function musicStart() { musicOn = true; ensure(); if (!musicTimer) musicTimer = setInterval(tick, 175); }
   function musicStop() { musicOn = false; if (musicTimer) { clearInterval(musicTimer); musicTimer = null; } }
 
+  // Melodía de arranque (original) al encender la consola: arpegio ascendente
+  // + destello, evocando el ritual de "power on" de una portátil retro.
+  function bootChime() {
+    if (muted || !ensure()) return;
+    const seq = [523.25, 659.25, 783.99, 1046.5];
+    seq.forEach((f, i) => setTimeout(() => tone(f, i === seq.length - 1 ? 0.34 : 0.11, { type: 'square', vol: 0.16 }), i * 125));
+    setTimeout(() => tone(1318.5, 0.22, { type: 'triangle', vol: 0.1 }), seq.length * 125);
+    setTimeout(() => noise(0.05, { vol: 0.05, hp: 5200 }), seq.length * 125);
+  }
+
   function setMuted(m) { muted = m; if (master) master.gain.value = m ? 0 : 0.5; }
   function toggleMute() { setMuted(!muted); return muted; }
   function isMuted() { return muted; }
 
-  PH.audio = { ensure, sfx, tone, noise, musicStart, musicStop, setMuted, toggleMute, isMuted };
+  PH.audio = { ensure, sfx, tone, noise, bootChime, musicStart, musicStop, setMuted, toggleMute, isMuted };
 })(window.PH = window.PH || {});

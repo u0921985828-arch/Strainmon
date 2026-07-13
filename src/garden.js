@@ -23,7 +23,7 @@
   // Modelo hídrico/sanitario (Fase 3).
   const WATER_MAX = 100;
   const WATER_DECAY = 100 / 42000;   // se seca por completo en ~42 s reales
-  const WATER_FULL = 96;             // nivel tras regar
+  const WATER_FULL = 82;             // nivel tras regar: por debajo del encharcamiento
   const THIRST = 22;                 // por debajo: estrés hídrico
   const SOGGY = 88;                  // por encima: encharcamiento (favorece hongos)
   const HEALTH_MAX = 100;

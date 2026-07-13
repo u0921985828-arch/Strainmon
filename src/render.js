@@ -5,7 +5,7 @@
    ============================================================ */
 (function (PH) {
   'use strict';
-  const { shade } = PH.util;
+  const { shade, hslToHex } = PH.util;
   const { TILE, isWarp } = PH.world;
 
   const TS = 16;

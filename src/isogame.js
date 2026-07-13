@@ -189,8 +189,10 @@
     W: 480, H: 432,                 // 10:9 (proporción fiel a la Game Boy 160x144)
     dmg: false, _dmg: null,          // modo DMG (4 tonos, 160x144)
     moving: false, from: null, to: null, moveT: 0, moveDur: 170, frame: 0, animT: 0,
-    keys: {}, lastSave: 0, cam: { x: 0, y: 0 }, cop: null,
+    keys: {}, tapLatch: null, lastSave: 0, cam: { x: 0, y: 0 }, cop: null, contrast: 1,
   };
+  // Mapa tecla->dirección (para taps rápidos: un toque = un paso, como en GB).
+  const KEYDIR = { arrowup: 'NE', w: 'NE', arrowdown: 'SW', s: 'SW', arrowleft: 'NW', a: 'NW', arrowright: 'SE', d: 'SE' };
   PH.game = game;
 
   function init() {
@@ -204,8 +206,32 @@
     bindInput();
     resize();
     window.addEventListener('resize', resize);
-    titleScreen();
+    applyContrast();
+    powerScreen();
     requestAnimationFrame(loop);
+  }
+
+  /* ------------------------- ENCENDIDO / BOOT ------------------------- */
+  // Ritual de "power on" original: botón de encender -> desbloquea el audio,
+  // reproduce la melodía de arranque y anima el logo antes del título.
+  function powerScreen() {
+    game.mode = 'boot';
+    const ov = document.getElementById('overlay');
+    ov.className = 'active boot';
+    ov.innerHTML = `
+      <div class="boot-screen">
+        <button id="pwr" class="pwr-btn" aria-label="Encender">⏻</button>
+        <div class="pwr-label">ENCENDER</div>
+      </div>`;
+    document.getElementById('pwr').onclick = () => { if (PH.audio) PH.audio.ensure(); bootSequence(); };
+  }
+  function bootSequence() {
+    game.mode = 'boot';
+    const ov = document.getElementById('overlay');
+    ov.className = 'active boot on';
+    ov.innerHTML = `<div class="boot-screen"><div class="boot-logo">STRAIN<span>BOY</span></div><div class="boot-tm">© STRAINMON</div></div>`;
+    if (PH.audio) PH.audio.bootChime();
+    setTimeout(titleScreen, 1500);
   }
 
   function resize() {
@@ -245,7 +271,9 @@
     // Partida nueva -> siempre en el apartamento. Continuar -> respeta sala iso guardada.
     if (fresh || !ROOMS[p.map] || !p.iso) { p.map = 'apt'; p.x = ROOMS.apt.spawn.gx; p.y = ROOMS.apt.spawn.gy; p.dir = 'SW'; }
     p.iso = true;
-    game.dmg = !!p.dmg; if (PH.audio) PH.audio.musicStart();
+    game.dmg = !!p.dmg;
+    if (p.contrast != null) { game.contrast = p.contrast; applyContrast(); }
+    if (PH.audio) PH.audio.musicStart();
     normalizePlayer();
     game.mode = 'overworld';
     centerCam(true);
@@ -276,9 +304,32 @@
     PH.state.save();
     PH.ui.toast(game.dmg ? '🟩 Modo DMG (4 tonos)' : '🌈 Modo color', '');
   }
+
+  // Rueda de CONTRASTE (como el potenciómetro físico de la Game Boy): ajusta
+  // el filtro de la LCD por niveles y gira el mando para dar realimentación.
+  const CONTRAST_LEVELS = [
+    { f: 'contrast(.9) brightness(.96) saturate(.95)', deg: -60 },
+    { f: 'none', deg: -20 },
+    { f: 'contrast(1.15) brightness(1.04) saturate(1.05)', deg: 20 },
+    { f: 'contrast(1.32) brightness(1.1) saturate(1.1)', deg: 60 },
+  ];
+  function applyContrast() {
+    const lv = CONTRAST_LEVELS[game.contrast] || CONTRAST_LEVELS[1];
+    const sc = document.getElementById('screen'); if (sc) sc.style.filter = lv.f;
+    const kn = document.querySelector('[data-contrast] i'); if (kn) kn.style.transform = `rotate(${lv.deg}deg)`;
+  }
+  function cycleContrast() {
+    game.contrast = (game.contrast + 1) % CONTRAST_LEVELS.length;
+    G().player.contrast = game.contrast;
+    applyContrast();
+    if (PH.audio) PH.audio.sfx('blip');
+    PH.ui.toast('🔆 Contraste ' + (game.contrast + 1) + '/' + CONTRAST_LEVELS.length, '');
+    PH.state.save();
+  }
   function bindInput() {
     window.addEventListener('keydown', (e) => {
       const k = e.key.toLowerCase(); game.keys[k] = true;
+      if (MOVE_KEYS[k]) game.tapLatch = k;         // registra el toque para taps ultrarrápidos
       if (PH.audio) PH.audio.ensure();
       if (MOVE_KEYS[k] || k === ' ') e.preventDefault();
       if (!MOVE_KEYS[k]) doAction(k);
@@ -286,7 +337,7 @@
     window.addEventListener('keyup', (e) => { game.keys[e.key.toLowerCase()] = false; });
     document.querySelectorAll('[data-key]').forEach(btn => {
       const key = btn.dataset.key;
-      const down = (e) => { e.preventDefault(); if (PH.audio) PH.audio.ensure(); if (MOVE_KEYS[key]) game.keys[key] = true; else doAction(key); };
+      const down = (e) => { e.preventDefault(); if (PH.audio) PH.audio.ensure(); if (MOVE_KEYS[key]) { game.keys[key] = true; game.tapLatch = key; } else doAction(key); };
       const up = (e) => { if (e) e.preventDefault(); if (MOVE_KEYS[key]) game.keys[key] = false; };
       btn.addEventListener('touchstart', down, { passive: false }); btn.addEventListener('touchend', up, { passive: false });
       btn.addEventListener('mousedown', down); btn.addEventListener('mouseup', up); btn.addEventListener('mouseleave', up);
@@ -294,6 +345,9 @@
     // rueda de VOLUMEN = silencio
     const kn = document.querySelector('[data-mute]');
     if (kn) kn.addEventListener('click', () => { const m = PH.audio && PH.audio.toggleMute(); PH.ui.toast(m ? '🔇 Silencio' : '🔊 Sonido', ''); });
+    // rueda de CONTRASTE = ajuste de LCD por niveles
+    const ck = document.querySelector('[data-contrast]');
+    if (ck) ck.addEventListener('click', cycleContrast);
   }
 
   /* ------------------------- INTERACCIÓN ------------------------- */
@@ -366,12 +420,15 @@
 
   /* ------------------------- MOVIMIENTO ------------------------- */
   function tryMove() {
-    if (game.moving || game.mode !== 'overworld') return;
+    if (game.moving || game.mode !== 'overworld') { return; }
     const p = G().player; let dir = null;
     if (game.keys['arrowup'] || game.keys['w']) dir = 'NE';
     else if (game.keys['arrowdown'] || game.keys['s']) dir = 'SW';
     else if (game.keys['arrowleft'] || game.keys['a']) dir = 'NW';
     else if (game.keys['arrowright'] || game.keys['d']) dir = 'SE';
+    // tap rápido: si ninguna tecla sigue pulsada, usa el latch (un toque = un paso)
+    if (!dir && game.tapLatch) dir = KEYDIR[game.tapLatch] || null;
+    game.tapLatch = null;
     if (!dir) return;
     p.dir = dir;
     const m = room(p.map), d = DIRV[dir];

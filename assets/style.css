@@ -50,6 +50,27 @@ html, body {
 #overlay::before { content: ""; position: absolute; inset: 0; background: rgba(6,8,10,.62); backdrop-filter: blur(1px); }
 #overlay > * { position: relative; z-index: 2; }
 
+/* --------- Encendido / Boot --------- */
+#overlay.boot { z-index: 6; }
+#overlay.boot::before { background: #9bbc0f; }
+#overlay.boot.on::before { background: #0b1a0d; transition: background .35s; }
+.boot-screen { position: relative; z-index: 2; width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+.pwr-btn { width: 20vmin; max-width: 96px; height: 20vmin; max-height: 96px; border-radius: 50%;
+  font-size: 8vmin; line-height: 1; color: #0b1a0d; cursor: pointer; border: 3px solid #17361f;
+  background: radial-gradient(circle at 38% 32%, #cfe89a, #7fae2e 62%, #5c8a1e);
+  box-shadow: 0 6px 0 #3f6a17, 0 0 24px rgba(120,200,60,.5); animation: pwrpulse 1.4s ease-in-out infinite; }
+.pwr-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 #3f6a17; }
+.pwr-label { color: #17361f; font-weight: 900; letter-spacing: 4px; font-size: clamp(10px,2.4vmin,15px); }
+@keyframes pwrpulse { 0%,100% { box-shadow: 0 6px 0 #3f6a17, 0 0 18px rgba(120,200,60,.4); } 50% { box-shadow: 0 6px 0 #3f6a17, 0 0 30px rgba(160,230,90,.75); } }
+.boot-logo { font-weight: 900; letter-spacing: 3px; font-size: clamp(24px,7vmin,52px); color: #9bbc0f;
+  text-shadow: 2px 2px 0 #16481f; animation: bootdrop 1s cubic-bezier(.2,.9,.25,1) both; }
+.boot-logo span { color: #cfe89a; }
+.boot-tm { margin-top: 10px; color: #3a5a22; font-size: clamp(8px,1.8vmin,12px); letter-spacing: 3px;
+  opacity: 0; animation: bootfade .5s .9s forwards; }
+@keyframes bootdrop { 0% { transform: translateY(-160%); opacity: 0; } 60% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(0); } }
+@keyframes bootfade { to { opacity: 1; } }
+
 /* --------- Toasts --------- */
 #toasts { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); z-index: 50;
   display: flex; flex-direction: column; gap: 6px; align-items: center; pointer-events: none; }
@@ -293,6 +314,13 @@ html, body {
 .lcd-inner { position: relative; height: 100%; aspect-ratio: 10 / 9; width: auto; max-width: 100%;
   overflow: hidden; border-radius: 6px;
   background: #8b9c2f; box-shadow: inset 0 0 0 2px #05321f, inset 0 0 20px rgba(0,0,0,.45); }
+/* Textura de LCD: retícula de puntos + líneas de barrido muy tenues, como la
+   matriz de puntos real. No intercepta toques. */
+.lcd-inner::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; border-radius: 6px;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.10) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.06) 0 1px, transparent 1px 3px);
+  mix-blend-mode: multiply; opacity: .5; }
 #lcd .lcd-glare { position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
   background: linear-gradient(135deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 35%); }
 /* object-fit:contain preserva el 10:9 exacto -> píxeles cuadrados (matriz de
@@ -344,9 +372,12 @@ html, body {
 /* fila inferior: ruedas + altavoz */
 #footrow { display: flex; align-items: center; justify-content: space-between; gap: 3vmin; opacity: .8; }
 .knob { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #bfe8cf;
-  font-size: clamp(6px, 1.2vmin, 9px); letter-spacing: 1px; }
-.knob i { width: 6vmin; height: 6vmin; max-width: 28px; max-height: 28px; border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, #3a4a40, #10201a); border: 1px solid #0a1a12;
+  font-size: clamp(6px, 1.2vmin, 9px); letter-spacing: 1px; cursor: pointer; }
+.knob i { transition: transform .18s ease; }
+.knob i { position: relative; width: 6vmin; height: 6vmin; max-width: 28px; max-height: 28px; border-radius: 50%;
+  background:
+    linear-gradient(#cfe89a, #cfe89a) no-repeat center 2px / 2px 42%,
+    radial-gradient(circle at 40% 35%, #3a4a40, #10201a); border: 1px solid #0a1a12;
   box-shadow: inset 0 -2px 3px rgba(0,0,0,.5); }
 /* rejilla de altavoz */
 .speaker { display: flex; gap: 5px; justify-content: center; opacity: .5; transform: rotate(-18deg); }

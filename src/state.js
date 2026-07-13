@@ -27,6 +27,7 @@
         labLevel: 1,                   // mejora del laboratorio (mutaciones en cruce)
         heat: 0,                       // presión policial 0..100 (Fase 4)
         busts: 0,                      // veces pillado por la poli
+        contrast: 1,                   // nivel de contraste de la LCD (0..3)
       },
       bank: [],          // especímenes almacenados
       garden: [],        // plantas creciendo en el invernadero

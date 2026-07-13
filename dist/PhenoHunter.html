@@ -57,6 +57,27 @@ html, body {
 #overlay::before { content: ""; position: absolute; inset: 0; background: rgba(6,8,10,.62); backdrop-filter: blur(1px); }
 #overlay > * { position: relative; z-index: 2; }
 
+/* --------- Encendido / Boot --------- */
+#overlay.boot { z-index: 6; }
+#overlay.boot::before { background: #9bbc0f; }
+#overlay.boot.on::before { background: #0b1a0d; transition: background .35s; }
+.boot-screen { position: relative; z-index: 2; width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+.pwr-btn { width: 20vmin; max-width: 96px; height: 20vmin; max-height: 96px; border-radius: 50%;
+  font-size: 8vmin; line-height: 1; color: #0b1a0d; cursor: pointer; border: 3px solid #17361f;
+  background: radial-gradient(circle at 38% 32%, #cfe89a, #7fae2e 62%, #5c8a1e);
+  box-shadow: 0 6px 0 #3f6a17, 0 0 24px rgba(120,200,60,.5); animation: pwrpulse 1.4s ease-in-out infinite; }
+.pwr-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 #3f6a17; }
+.pwr-label { color: #17361f; font-weight: 900; letter-spacing: 4px; font-size: clamp(10px,2.4vmin,15px); }
+@keyframes pwrpulse { 0%,100% { box-shadow: 0 6px 0 #3f6a17, 0 0 18px rgba(120,200,60,.4); } 50% { box-shadow: 0 6px 0 #3f6a17, 0 0 30px rgba(160,230,90,.75); } }
+.boot-logo { font-weight: 900; letter-spacing: 3px; font-size: clamp(24px,7vmin,52px); color: #9bbc0f;
+  text-shadow: 2px 2px 0 #16481f; animation: bootdrop 1s cubic-bezier(.2,.9,.25,1) both; }
+.boot-logo span { color: #cfe89a; }
+.boot-tm { margin-top: 10px; color: #3a5a22; font-size: clamp(8px,1.8vmin,12px); letter-spacing: 3px;
+  opacity: 0; animation: bootfade .5s .9s forwards; }
+@keyframes bootdrop { 0% { transform: translateY(-160%); opacity: 0; } 60% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(0); } }
+@keyframes bootfade { to { opacity: 1; } }
+
 /* --------- Toasts --------- */
 #toasts { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); z-index: 50;
   display: flex; flex-direction: column; gap: 6px; align-items: center; pointer-events: none; }
@@ -300,6 +321,13 @@ html, body {
 .lcd-inner { position: relative; height: 100%; aspect-ratio: 10 / 9; width: auto; max-width: 100%;
   overflow: hidden; border-radius: 6px;
   background: #8b9c2f; box-shadow: inset 0 0 0 2px #05321f, inset 0 0 20px rgba(0,0,0,.45); }
+/* Textura de LCD: retícula de puntos + líneas de barrido muy tenues, como la
+   matriz de puntos real. No intercepta toques. */
+.lcd-inner::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; border-radius: 6px;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.10) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.06) 0 1px, transparent 1px 3px);
+  mix-blend-mode: multiply; opacity: .5; }
 #lcd .lcd-glare { position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
   background: linear-gradient(135deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 35%); }
 /* object-fit:contain preserva el 10:9 exacto -> píxeles cuadrados (matriz de
@@ -351,9 +379,12 @@ html, body {
 /* fila inferior: ruedas + altavoz */
 #footrow { display: flex; align-items: center; justify-content: space-between; gap: 3vmin; opacity: .8; }
 .knob { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #bfe8cf;
-  font-size: clamp(6px, 1.2vmin, 9px); letter-spacing: 1px; }
-.knob i { width: 6vmin; height: 6vmin; max-width: 28px; max-height: 28px; border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, #3a4a40, #10201a); border: 1px solid #0a1a12;
+  font-size: clamp(6px, 1.2vmin, 9px); letter-spacing: 1px; cursor: pointer; }
+.knob i { transition: transform .18s ease; }
+.knob i { position: relative; width: 6vmin; height: 6vmin; max-width: 28px; max-height: 28px; border-radius: 50%;
+  background:
+    linear-gradient(#cfe89a, #cfe89a) no-repeat center 2px / 2px 42%,
+    radial-gradient(circle at 40% 35%, #3a4a40, #10201a); border: 1px solid #0a1a12;
   box-shadow: inset 0 -2px 3px rgba(0,0,0,.5); }
 /* rejilla de altavoz */
 .speaker { display: flex; gap: 5px; justify-content: center; opacity: .5; transform: rotate(-18deg); }
@@ -428,7 +459,7 @@ html, body {
     </div>
 
     <div id="footrow">
-      <span class="knob"><i></i>CONTRASTE</span>
+      <span class="knob" data-contrast title="Contraste LCD"><i></i>CONTRASTE</span>
       <div class="speaker"><i></i><i></i><i></i><i></i><i></i><i></i></div>
       <span class="knob" data-mute title="Silenciar"><i></i>VOLUMEN</span>
     </div>
@@ -1495,7 +1526,7 @@ html, body {
    ============================================================ */
 (function (PH) {
   'use strict';
-  const { shade } = PH.util;
+  const { shade, hslToHex } = PH.util;
   const { TILE, isWarp } = PH.world;
 
   const TS = 16;
@@ -2074,6 +2105,7 @@ html, body {
         labLevel: 1,                   // mejora del laboratorio (mutaciones en cruce)
         heat: 0,                       // presión policial 0..100 (Fase 4)
         busts: 0,                      // veces pillado por la poli
+        contrast: 1,                   // nivel de contraste de la LCD (0..3)
       },
       bank: [],          // especímenes almacenados
       garden: [],        // plantas creciendo en el invernadero
@@ -2640,7 +2672,7 @@ html, body {
   // Modelo hídrico/sanitario (Fase 3).
   const WATER_MAX = 100;
   const WATER_DECAY = 100 / 42000;   // se seca por completo en ~42 s reales
-  const WATER_FULL = 96;             // nivel tras regar
+  const WATER_FULL = 82;             // nivel tras regar: por debajo del encharcamiento
   const THIRST = 22;                 // por debajo: estrés hídrico
   const SOGGY = 88;                  // por encima: encharcamiento (favorece hongos)
   const HEALTH_MAX = 100;
@@ -3772,11 +3804,21 @@ html, body {
   function musicStart() { musicOn = true; ensure(); if (!musicTimer) musicTimer = setInterval(tick, 175); }
   function musicStop() { musicOn = false; if (musicTimer) { clearInterval(musicTimer); musicTimer = null; } }
 
+  // Melodía de arranque (original) al encender la consola: arpegio ascendente
+  // + destello, evocando el ritual de "power on" de una portátil retro.
+  function bootChime() {
+    if (muted || !ensure()) return;
+    const seq = [523.25, 659.25, 783.99, 1046.5];
+    seq.forEach((f, i) => setTimeout(() => tone(f, i === seq.length - 1 ? 0.34 : 0.11, { type: 'square', vol: 0.16 }), i * 125));
+    setTimeout(() => tone(1318.5, 0.22, { type: 'triangle', vol: 0.1 }), seq.length * 125);
+    setTimeout(() => noise(0.05, { vol: 0.05, hp: 5200 }), seq.length * 125);
+  }
+
   function setMuted(m) { muted = m; if (master) master.gain.value = m ? 0 : 0.5; }
   function toggleMute() { setMuted(!muted); return muted; }
   function isMuted() { return muted; }
 
-  PH.audio = { ensure, sfx, tone, noise, musicStart, musicStop, setMuted, toggleMute, isMuted };
+  PH.audio = { ensure, sfx, tone, noise, bootChime, musicStart, musicStop, setMuted, toggleMute, isMuted };
 })(window.PH = window.PH || {});
 
 /* ==== src/heat.js ==== */
@@ -4177,8 +4219,10 @@ html, body {
     W: 480, H: 432,                 // 10:9 (proporción fiel a la Game Boy 160x144)
     dmg: false, _dmg: null,          // modo DMG (4 tonos, 160x144)
     moving: false, from: null, to: null, moveT: 0, moveDur: 170, frame: 0, animT: 0,
-    keys: {}, lastSave: 0, cam: { x: 0, y: 0 }, cop: null,
+    keys: {}, tapLatch: null, lastSave: 0, cam: { x: 0, y: 0 }, cop: null, contrast: 1,
   };
+  // Mapa tecla->dirección (para taps rápidos: un toque = un paso, como en GB).
+  const KEYDIR = { arrowup: 'NE', w: 'NE', arrowdown: 'SW', s: 'SW', arrowleft: 'NW', a: 'NW', arrowright: 'SE', d: 'SE' };
   PH.game = game;
 
   function init() {
@@ -4192,8 +4236,32 @@ html, body {
     bindInput();
     resize();
     window.addEventListener('resize', resize);
-    titleScreen();
+    applyContrast();
+    powerScreen();
     requestAnimationFrame(loop);
+  }
+
+  /* ------------------------- ENCENDIDO / BOOT ------------------------- */
+  // Ritual de "power on" original: botón de encender -> desbloquea el audio,
+  // reproduce la melodía de arranque y anima el logo antes del título.
+  function powerScreen() {
+    game.mode = 'boot';
+    const ov = document.getElementById('overlay');
+    ov.className = 'active boot';
+    ov.innerHTML = `
+      <div class="boot-screen">
+        <button id="pwr" class="pwr-btn" aria-label="Encender">⏻</button>
+        <div class="pwr-label">ENCENDER</div>
+      </div>`;
+    document.getElementById('pwr').onclick = () => { if (PH.audio) PH.audio.ensure(); bootSequence(); };
+  }
+  function bootSequence() {
+    game.mode = 'boot';
+    const ov = document.getElementById('overlay');
+    ov.className = 'active boot on';
+    ov.innerHTML = `<div class="boot-screen"><div class="boot-logo">STRAIN<span>BOY</span></div><div class="boot-tm">© STRAINMON</div></div>`;
+    if (PH.audio) PH.audio.bootChime();
+    setTimeout(titleScreen, 1500);
   }
 
   function resize() {
@@ -4233,7 +4301,9 @@ html, body {
     // Partida nueva -> siempre en el apartamento. Continuar -> respeta sala iso guardada.
     if (fresh || !ROOMS[p.map] || !p.iso) { p.map = 'apt'; p.x = ROOMS.apt.spawn.gx; p.y = ROOMS.apt.spawn.gy; p.dir = 'SW'; }
     p.iso = true;
-    game.dmg = !!p.dmg; if (PH.audio) PH.audio.musicStart();
+    game.dmg = !!p.dmg;
+    if (p.contrast != null) { game.contrast = p.contrast; applyContrast(); }
+    if (PH.audio) PH.audio.musicStart();
     normalizePlayer();
     game.mode = 'overworld';
     centerCam(true);
@@ -4264,9 +4334,32 @@ html, body {
     PH.state.save();
     PH.ui.toast(game.dmg ? '🟩 Modo DMG (4 tonos)' : '🌈 Modo color', '');
   }
+
+  // Rueda de CONTRASTE (como el potenciómetro físico de la Game Boy): ajusta
+  // el filtro de la LCD por niveles y gira el mando para dar realimentación.
+  const CONTRAST_LEVELS = [
+    { f: 'contrast(.9) brightness(.96) saturate(.95)', deg: -60 },
+    { f: 'none', deg: -20 },
+    { f: 'contrast(1.15) brightness(1.04) saturate(1.05)', deg: 20 },
+    { f: 'contrast(1.32) brightness(1.1) saturate(1.1)', deg: 60 },
+  ];
+  function applyContrast() {
+    const lv = CONTRAST_LEVELS[game.contrast] || CONTRAST_LEVELS[1];
+    const sc = document.getElementById('screen'); if (sc) sc.style.filter = lv.f;
+    const kn = document.querySelector('[data-contrast] i'); if (kn) kn.style.transform = `rotate(${lv.deg}deg)`;
+  }
+  function cycleContrast() {
+    game.contrast = (game.contrast + 1) % CONTRAST_LEVELS.length;
+    G().player.contrast = game.contrast;
+    applyContrast();
+    if (PH.audio) PH.audio.sfx('blip');
+    PH.ui.toast('🔆 Contraste ' + (game.contrast + 1) + '/' + CONTRAST_LEVELS.length, '');
+    PH.state.save();
+  }
   function bindInput() {
     window.addEventListener('keydown', (e) => {
       const k = e.key.toLowerCase(); game.keys[k] = true;
+      if (MOVE_KEYS[k]) game.tapLatch = k;         // registra el toque para taps ultrarrápidos
       if (PH.audio) PH.audio.ensure();
       if (MOVE_KEYS[k] || k === ' ') e.preventDefault();
       if (!MOVE_KEYS[k]) doAction(k);
@@ -4274,7 +4367,7 @@ html, body {
     window.addEventListener('keyup', (e) => { game.keys[e.key.toLowerCase()] = false; });
     document.querySelectorAll('[data-key]').forEach(btn => {
       const key = btn.dataset.key;
-      const down = (e) => { e.preventDefault(); if (PH.audio) PH.audio.ensure(); if (MOVE_KEYS[key]) game.keys[key] = true; else doAction(key); };
+      const down = (e) => { e.preventDefault(); if (PH.audio) PH.audio.ensure(); if (MOVE_KEYS[key]) { game.keys[key] = true; game.tapLatch = key; } else doAction(key); };
       const up = (e) => { if (e) e.preventDefault(); if (MOVE_KEYS[key]) game.keys[key] = false; };
       btn.addEventListener('touchstart', down, { passive: false }); btn.addEventListener('touchend', up, { passive: false });
       btn.addEventListener('mousedown', down); btn.addEventListener('mouseup', up); btn.addEventListener('mouseleave', up);
@@ -4282,6 +4375,9 @@ html, body {
     // rueda de VOLUMEN = silencio
     const kn = document.querySelector('[data-mute]');
     if (kn) kn.addEventListener('click', () => { const m = PH.audio && PH.audio.toggleMute(); PH.ui.toast(m ? '🔇 Silencio' : '🔊 Sonido', ''); });
+    // rueda de CONTRASTE = ajuste de LCD por niveles
+    const ck = document.querySelector('[data-contrast]');
+    if (ck) ck.addEventListener('click', cycleContrast);
   }
 
   /* ------------------------- INTERACCIÓN ------------------------- */
@@ -4354,12 +4450,15 @@ html, body {
 
   /* ------------------------- MOVIMIENTO ------------------------- */
   function tryMove() {
-    if (game.moving || game.mode !== 'overworld') return;
+    if (game.moving || game.mode !== 'overworld') { return; }
     const p = G().player; let dir = null;
     if (game.keys['arrowup'] || game.keys['w']) dir = 'NE';
     else if (game.keys['arrowdown'] || game.keys['s']) dir = 'SW';
     else if (game.keys['arrowleft'] || game.keys['a']) dir = 'NW';
     else if (game.keys['arrowright'] || game.keys['d']) dir = 'SE';
+    // tap rápido: si ninguna tecla sigue pulsada, usa el latch (un toque = un paso)
+    if (!dir && game.tapLatch) dir = KEYDIR[game.tapLatch] || null;
+    game.tapLatch = null;
     if (!dir) return;
     p.dir = dir;
     const m = room(p.map), d = DIRV[dir];
