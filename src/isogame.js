@@ -98,8 +98,10 @@
       ],
     },
   };
-  // 'H'=fachada(pared alta), 'P'=farola: los tratamos como bloqueantes decorativos.
-  function solidChar(ch) { return ch === '#' || ch === ' ' || ch === 'H' || ch === 'P'; }
+  // Lista BLANCA de tiles caminables. Todo lo demás bloquea (paredes '#',
+  // vacío ' ', fachadas 'H', farolas 'P', dígitos, o cualquier char extraño).
+  const WALKABLE = { '.': 1, 'D': 1, 'g': 1 };
+  function walkableChar(ch) { return !!WALKABLE[ch]; }
 
   function room(id) { return ROOMS[id]; }
   function tileAt(m, gx, gy) {
@@ -110,12 +112,36 @@
   function objAt(m, gx, gy) { return (m.objects || []).find(o => o.gx === gx && o.gy === gy); }
   function doorAt(m, gx, gy) { return (m.doors || []).find(d => d.gx === gx && d.gy === gy); }
   function npcAt(m, gx, gy) { return (m.npcs || []).find(n => n.gx === gx && n.gy === gy); }
-  function solidAt(m, gx, gy) {
-    const ch = tileAt(m, gx, gy);
-    if (solidChar(ch)) return true;
-    const o = objAt(m, gx, gy); if (o && o.solid) return true;
-    if (npcAt(m, gx, gy)) return true;
+  // Bloqueado si el tile no es caminable, o hay objeto sólido, o hay un NPC.
+  // (ignoreNpc: al comprobar puertas no cuenta el NPC de destino.)
+  function solidAt(m, gx, gy, ignoreNpc) {
+    if (!walkableChar(tileAt(m, gx, gy))) return true;
+    const o = objAt(m, gx, gy); if (o && o.solid !== false) return true;
+    if (!ignoreNpc && npcAt(m, gx, gy)) return true;
     return false;
+  }
+  // Auditoría: colocaciones inválidas de NPCs/objetos (para QA).
+  function audit() {
+    const problems = [];
+    for (const id of Object.keys(ROOMS)) {
+      const m = ROOMS[id];
+      for (const n of (m.npcs || [])) {
+        if (!walkableChar(tileAt(m, n.gx, n.gy))) problems.push(`${id}: NPC ${n.name} en tile no caminable (${n.gx},${n.gy})`);
+        if (objAt(m, n.gx, n.gy)) problems.push(`${id}: NPC ${n.name} solapa objeto (${n.gx},${n.gy})`);
+        if (doorAt(m, n.gx, n.gy)) problems.push(`${id}: NPC ${n.name} sobre puerta (${n.gx},${n.gy})`);
+      }
+      for (const o of (m.objects || [])) {
+        if (!walkableChar(tileAt(m, o.gx, o.gy))) problems.push(`${id}: objeto ${o.label} en tile no caminable (${o.gx},${o.gy})`);
+      }
+      for (const d of (m.doors || [])) {
+        if (tileAt(m, d.gx, d.gy) !== 'D') problems.push(`${id}: puerta->${d.to} no está sobre 'D' (${d.gx},${d.gy})`);
+        const t = ROOMS[d.to]; if (!t) { problems.push(`${id}: puerta a sala inexistente '${d.to}'`); continue; }
+        if (solidAt(t, d.tgx, d.tgy, true)) problems.push(`${id}: destino de puerta a ${d.to} es sólido (${d.tgx},${d.tgy})`);
+      }
+      // spawn caminable
+      if (solidAt(m, m.spawn.gx, m.spawn.gy, true)) problems.push(`${id}: spawn sólido (${m.spawn.gx},${m.spawn.gy})`);
+    }
+    return problems;
   }
 
   /* ------------------------- ESTADO ------------------------- */
@@ -282,6 +308,9 @@
   }
 
   game.roomName = function () { const m = room(G().player.map); return m ? m.name : ''; };
+  game.audit = audit;
+  game.canWalk = function (mapId, gx, gy) { const m = room(mapId); return m ? !solidAt(m, gx, gy) : false; };
+  game.ROOMS = ROOMS;
   game.afterQuestCheck = function () {
     const done = PH.quests.checkAll();
     for (const q of done) PH.ui.toast('✅ Misión completada: ' + q.name, 'ok');
