@@ -8,3 +8,5 @@ node_modules/
 
 # Salida cruda del generador (curar antes de versionar)
 assets/gen/
+
+assets/gen_plants/
