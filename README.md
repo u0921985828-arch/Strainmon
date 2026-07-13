@@ -94,6 +94,13 @@ Código modular con espacio de nombres global `PH` (sin bundler, se ejecuta abri
 | `src/ui.js` | HUD y paneles superpuestos |
 | `src/game.js` | Bucle principal, entrada, cámara y render del mundo |
 
+## 🎨 Herramientas (MCP)
+
+Para generar pixel-art desde Claude Code está configurado el MCP remoto de
+**PixelLab** en `.mcp.json` (ámbito *project*). Requiere exportar la variable
+`PIXELLAB_API_KEY` (nunca se commitea el token). Detalles en
+[`docs/MCP_PIXELLAB.md`](docs/MCP_PIXELLAB.md).
+
 ## 🚧 Hoja de ruta
 
 Más regiones (desierto, nieve, volcán, islas, cuevas), investigación de ADN y árboles
