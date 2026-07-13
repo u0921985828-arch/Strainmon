@@ -32,7 +32,7 @@
 
   /* ------------------------- CIUDAD (hub) ------------------------- */
   const laboratorio = {
-    id: 'lab', name: 'Ciudad Semilla', biome: null, theme: 'town',
+    id: 'lab', name: 'Villa Semilla', biome: null, theme: 'town',
     grid: [
       'TTTTTTTTTTTTTTTTTTTT',
       'T..................T',
@@ -70,7 +70,7 @@
 
   /* ------------------------- PRADERA ------------------------- */
   const pradera = {
-    id: 'pradera', name: 'Pradera de Auralia', biome: 'pradera', theme: 'meadow',
+    id: 'pradera', name: 'Altiplano de Michoacán', biome: 'pradera', theme: 'meadow',
     grid: [
       'TTTTTTTT00TTTTTTTTTT',
       'T....,,....,,......T',
@@ -103,7 +103,7 @@
 
   /* ------------------------- BOSQUE ------------------------- */
   const bosque = {
-    id: 'bosque', name: 'Bosque de Vael', biome: 'bosque', theme: 'forest',
+    id: 'bosque', name: 'Triángulo Dorado', biome: 'bosque', theme: 'forest',
     grid: [
       'TTTTTTTT00TTTTTTTTTT',
       'T..TT..PP..TT..TTT.T',
@@ -134,7 +134,7 @@
 
   /* ------------------------- PANTANO ------------------------- */
   const pantano = {
-    id: 'pantano', name: 'Cenagal de Mureb', biome: 'pantano', theme: 'swamp',
+    id: 'pantano', name: 'Delta del Congo', biome: 'pantano', theme: 'swamp',
     grid: [
       'TTT00TTTTTTTTTTTTTTT',
       'T..P....mm....WWW..T',
@@ -165,7 +165,7 @@
 
   /* ------------------------- DESIERTO ------------------------- */
   const desierto = {
-    id: 'desierto', name: 'Erg de Sael', biome: 'desierto', theme: 'desert',
+    id: 'desierto', name: 'Rif de Marruecos', biome: 'desierto', theme: 'desert',
     grid: [
       'TT###############TTT',
       '0ss,,.sss,,ss..sssbT',
@@ -196,7 +196,7 @@
 
   /* ------------------------- VOLCÁN ------------------------- */
   const volcan = {
-    id: 'volcan', name: 'Monte Calder', biome: 'volcan', theme: 'volcano',
+    id: 'volcan', name: 'Cráteres de Oaxaca', biome: 'volcan', theme: 'volcano',
     grid: [
       'TTTTTTTT00TTTTTTTTTT',
       'T#rr,,rr#rrr,,rr##.T',
@@ -227,7 +227,7 @@
 
   /* ------------------------- NIEVE ------------------------- */
   const nieve = {
-    id: 'nieve', name: 'Manto de Yrr', biome: 'nieve', theme: 'snow',
+    id: 'nieve', name: 'Cumbres del Hindú Kush', biome: 'nieve', theme: 'snow',
     grid: [
       'TTTTTTTTTTTTTTTTTTTT',
       'Tnn,,nnnn,,nnnn,,n.T',
@@ -257,7 +257,7 @@
 
   /* ------------------------- CUEVA ------------------------- */
   const cueva = {
-    id: 'cueva', name: 'Cueva de Vael', biome: 'cueva', theme: 'cave',
+    id: 'cueva', name: 'Cuevas de Chitral', biome: 'cueva', theme: 'cave',
     grid: [
       '####################',
       '#cc,,cco cccc,,cccc#',
@@ -286,7 +286,7 @@
 
   /* ------------------------- ISLA ------------------------- */
   const isla = {
-    id: 'isla', name: 'Islas Vireo', biome: 'isla', theme: 'island',
+    id: 'isla', name: 'Costa de Jamaica', biome: 'isla', theme: 'island',
     grid: [
       '~~~~~~~~WW~~~~~~~~~~~',
       '~~WWssssssssssWW~~~~',

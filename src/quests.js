@@ -9,7 +9,7 @@
   const QUESTS = {
     q_intro: {
       id: 'q_intro', name: 'Primeros brotes',
-      desc: 'Recolecta tu primera variedad en la Pradera de Auralia.',
+      desc: 'Recolecta tu primera cepa en el Altiplano de Michoacán.',
       reward: { credits: 150, prestige: 5, tool: 'tijeras' },
       check: (s) => s.stats.discoveries >= 1,
     },
@@ -32,10 +32,10 @@
       check: (s) => s.stats.mutationsFound >= 1,
     },
     q_relic: {
-      id: 'q_relic', name: 'La reliquia dorada',
-      desc: 'Encuentra la mítica Aurífera (PH-007).',
+      id: 'q_relic', name: 'La cepa ancestral',
+      desc: 'Encuentra la mítica Cepa Primigenia (SM-000).',
       reward: { credits: 3000, prestige: 40 },
-      check: (s) => (s.species['PH-007'] && s.species['PH-007'].obtained > 0),
+      check: (s) => (s.species['SM-000'] && s.species['SM-000'].obtained > 0),
     },
     q_sequence: {
       id: 'q_sequence', name: 'Lectura del genoma',
@@ -66,8 +66,8 @@
       check: (s) => (s.stats.harvests || 0) >= 1,
     },
     q_master: {
-      id: 'q_master', name: 'Maestro Pheno Hunter',
-      desc: 'Registra 25 fenotipos en el catálogo mundial.',
+      id: 'q_master', name: 'Maestro Strainmon',
+      desc: 'Registra 25 fenotipos en el Strain-dex mundial.',
       reward: { credits: 5000, prestige: 60 },
       check: (s) => Object.keys(s.catalog).length >= 25,
     },
@@ -80,10 +80,10 @@
         s.flags.metMentor = true;
         activate('q_intro');
         return [
-          'Dra. Elna: ¡Bienvenido al gremio de los PHENO HUNTERS!',
-          'Nuestra misión no es luchar, sino encontrar y preservar la diversidad genética del planeta.',
-          'Toma tu Frasco de semillas. Ve a la Pradera, al sur, y recolecta tu primera variedad.',
-          'Pulsa I para abrir tu mochila, y C para ver tu Catálogo. ¡Suerte, cazador!',
+          'Dra. Elna: ¡Bienvenido al gremio Strainmon!',
+          'Nuestra misión no es luchar, sino encontrar y preservar las cepas landrace ancestrales y sus linajes.',
+          'Toma tu Frasco de semillas. Baja al Altiplano de Michoacán, al sur, y recolecta tu primera cepa.',
+          'Pulsa I para la mochila y C para el Strain-dex. ¡Suerte, cazador de cepas!',
         ];
       }
       return [
@@ -108,7 +108,7 @@
     },
     explorador: (s) => [
       'Explorador Ino: El clima lo cambia todo.',
-      'Con niebla aparece la esquiva Brumaria; de noche salen las variedades de sombra.',
+      'De noche salen las cepas de flor púrpura; el calor despierta las landrace del sur.',
       'Consigue un Medidor ambiental para leer las condiciones. Yo nunca salgo sin él.',
     ],
     botanica: (s) => {
@@ -135,29 +135,29 @@
     nomada: (s) => {
       activate('q_regions');
       return [
-        'Zahra: El desierto castiga, pero guarda tesoros. La Solárida solo florece con calor extremo.',
-        'En verano y con olas de calor, las variedades del Erg se multiplican.',
-        'Sigue al norte y llegarás al Monte Calder... si tu prestigio lo permite.',
+        'Zahra: El Rif guarda las landrace del hachís. La Rifeña Kif rinde tricomas incluso con sequía.',
+        'En verano y con olas de calor, las cepas del Rif se multiplican.',
+        'Sigue al norte, hacia los Cráteres de Oaxaca... si tu prestigio lo permite.',
       ];
     },
     vulcanologo: (s) => [
-      'Draco: Aquí germina lo que el fuego despierta. La Ígnea nace de la ceniza.',
-      'Y dicen que entre la obsidiana crece una flor negra, la Obsidiónida. Rarísima.',
+      'Draco: En suelo volcánico germina lo más vigoroso. La Oaxaqueña nace de la ceniza.',
+      'Y por el istmo baja la legendaria Rojo de Panamá, veteada de rojo y púrpura.',
       'Cuidado con la lava. Cataloga y márchate.',
     ],
     glaciologa: (s) => [
-      'Frey: Bajo la aurora, de noche, la variedad Aurora emite luz propia.',
-      'El frío fija mutaciones cristalinas. Es el mejor sitio para resina hipertrófica.',
-      'Abrígate, cazador.',
+      'Frey: Estas cumbres son la cuna de las índicas. El Kush Ancestral resiste el hielo.',
+      'El frío nocturno pinta de púrpura a la Afgana y fija resina cristalina.',
+      'Abrígate, cazador de cepas.',
     ],
     espeleologo: (s) => [
-      'Mox: Sin luz, la vida se reinventa. La Fungália brilla en la oscuridad total.',
+      'Mox: En Chitral se frota el charas a mano. La resina de estas cuevas no tiene igual.',
       'Estas galerías tienen la mayor tasa de mutación conocida.',
-      'Dicen que en lo más profundo duerme una reliquia fósil, la Cronólita...',
+      'Dicen que en lo más profundo duerme una reliquia: la Semilla del Edén...',
     ],
     marinera: (s) => [
-      'Nira: Bienvenido a las Islas Vireo. La sal marina moldea genéticas únicas.',
-      'La Coralina imita a los corales; su aroma marino no se encuentra en tierra firme.',
+      'Nira: Bienvenido a la Costa de Jamaica. La brisa salina moldea linajes únicos.',
+      'La Jamaicana Costera tolera la sal; su aroma marino no se da tierra adentro.',
       'El muelle te lleva de vuelta al continente cuando quieras.',
     ],
   };

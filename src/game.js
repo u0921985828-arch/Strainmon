@@ -55,8 +55,8 @@
     const cont = PH.state.hasSave() ? '<button class="btn primary big" id="t_continue">Continuar</button>' : '';
     ov.innerHTML = `
       <div class="title-screen">
-        <div class="logo">PHENO<span>HUNTER</span></div>
-        <div class="tagline">Explora · Descubre · Preserva · Cruza</div>
+        <div class="logo">STRAIN<span>MON</span></div>
+        <div class="tagline">Caza cepas landrace · Preserva linajes · Cruza genéticas</div>
         <div class="title-art"><canvas id="title_canvas" width="200" height="120"></canvas></div>
         <div class="title-btns">
           ${cont}
@@ -84,7 +84,7 @@
     // asegura posición válida
     const map = World.MAPS[s.player.map];
     PH.ui.updateHUD();
-    PH.ui.toast('¡Bienvenido, Pheno Hunter!', 'ok');
+    PH.ui.toast('¡Bienvenido a Strainmon!', 'ok');
   }
 
   /* ---------------- Entrada ---------------- */

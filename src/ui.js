@@ -83,6 +83,11 @@
     const t = PH.gen.rarityTier(spec.rarity);
     return `<span class="tier" style="--tc:${t.color}">${'★'.repeat(t.stars)} ${t.label}</span>`;
   }
+  function lineageBadge(spec) {
+    if (spec.landrace) return `<span class="landrace">🌍 Landrace pura</span>`;
+    if (spec.form === 'cruce') return `<span class="hybrid">🧬 Híbrido F${spec.generation || 1}</span>`;
+    return '';
+  }
   function specimenCard(spec, opts) {
     opts = opts || {};
     const ph = spec.pheno;
@@ -93,9 +98,9 @@
         <div class="spec-art"><canvas id="${cid}" width="90" height="110"></canvas></div>
         <div class="spec-info">
           <div class="spec-title">${spec.nickname || spec.name} <small>${spec.speciesId}</small></div>
-          ${tierBadge(spec)}
+          ${tierBadge(spec)} ${lineageBadge(spec)}
           <div class="spec-desc">${PH.gen.describe(ph)}</div>
-          <div class="spec-meta">Forma: <b>${cap(spec.form)}</b> · Calidad: <b>${spec.quality}</b>${spec.generation ? ' · Gen ' + spec.generation : ''}</div>
+          <div class="spec-meta">Forma: <b>${cap(spec.form)}</b> · Calidad: <b>${spec.quality}</b>${spec.generation ? ' · Gen ' + spec.generation : ''} · Pureza: <b>${spec.purity != null ? spec.purity : 100}%</b></div>
           <div class="spec-stats">
             ${statBar('Altura', ph.quant.altura, 150)}
             ${statBar('Producción', ph.quant.produccion, 150)}
@@ -310,7 +315,7 @@
     const seenSpecies = Object.keys(s.species).filter(id => s.species[id].obtained > 0).length;
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>📖 Catálogo mundial <small>${entries.length} fenotipos · ${seenSpecies}/${total} especies</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2>🌿 Strain-dex mundial <small>${entries.length} fenotipos · ${seenSpecies}/${total} especies</small></h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           ${entries.length ? `<div class="cat-grid">${entries.map(e => catCard(e)).join('')}</div>` : '<p class="dim">Aún no has catalogado nada.</p>'}
         </div>
@@ -390,9 +395,12 @@
     const B = PH.state.bankGet(breedSel[1]);
     const labBonus = 1 + (s.player.labLevel - 1) * 0.6; // mejoras de laboratorio
     const childGeno = PH.gen.breed(A.genotype, B.genotype, { mutRate: 0.08, mutBoost: labBonus });
+    const sameStrain = A.speciesId === B.speciesId;
+    const purity = Math.max(0, Math.round(((A.purity != null ? A.purity : 100) + (B.purity != null ? B.purity : 100)) / 2 * (sameStrain ? 0.98 : 0.6)));
     const spec = PH.species.makeSpecimen(PH.species.SPECIES_BY_ID[A.speciesId], s.env, {
       genotype: childGeno, form: 'cruce', quality: Math.round((A.quality + B.quality) / 2),
       parents: [A.uid, B.uid], generation: Math.max(A.generation, B.generation) + 1,
+      purity, landrace: sameStrain && purity >= 90,
     });
     s.stats.crosses++;
     const before = Object.keys(s.catalog).length;
