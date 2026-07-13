@@ -269,43 +269,106 @@
     npc6:   { skin: '#b98a5a', hair: '#1a1a1a', shirt: '#555', pants: '#222' },
   };
 
+  // ---- Criatura-cepa "Strainmon": planta en maceta con cara y carácter ----
+  const OUTL = '#20161f';
+  function oRect(ctx, x, y, w, h, fill) { px(ctx, x - 1, y - 1, w + 2, h + 2, OUTL); px(ctx, x, y, w, h, fill); }
+
   function drawPlant(ctx, cx, cy, pheno, scale, t) {
     scale = scale || 1;
     const pal = PH.gen.paletteFor(pheno);
-    const s = scale;
-    const height = 14 + (pheno.quant.altura / 100) * 22;
-    const bushy = pheno.quant.produccion / 100;
-    const flicker = pheno.mutations.includes('fluorescente') ? (0.6 + 0.4 * Math.abs(Math.sin(t / 300))) : 1;
+    const leafCol = pheno.albino ? '#dcd6b8' : '#3f8f3a';
+    const leafSh = shade(leafCol, -0.22), leafHi = shade(leafCol, 0.2);
+    const muts = pheno.mutations || [];
+    const gig = muts.includes('gigantismo'), dwf = muts.includes('enanismo');
+    const flick = muts.includes('fluorescente') ? (0.6 + 0.4 * Math.abs(Math.sin(t / 300))) : 1;
+    const wob = Math.round(Math.sin(t / 600) * 0.6);   // leve balanceo
+
+    // dimensiones según genética
+    const bw = dwf ? 8 : (gig ? 14 : 11);              // ancho cuerpo
+    const bh = dwf ? 7 : (gig ? 12 : 9) + Math.round((pheno.quant.altura / 100) * 3);
+    const hw = dwf ? 7 : (gig ? 11 : 9);               // ancho cabeza (cogollo)
 
     ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(s, s);
-    px(ctx, -9, 2, 18, 3, 'rgba(0,0,0,0.2)');
-    const stemH = height;
-    px(ctx, -1, -stemH + 4, 2, stemH, pheno.albino ? '#cfc69a' : '#3f7d34');
+    ctx.translate(Math.round(cx), Math.round(cy));
+    ctx.scale(scale, scale);
 
-    const leafCol = pal.leaf;
-    const leafPairs = pheno.leaf === 'digitada' ? 4 : (pheno.leaf === 'palmada' ? 3 : 3);
-    for (let i = 0; i < leafPairs; i++) {
-      const ly = -6 - i * (stemH / (leafPairs + 1)) * 0.9;
-      const lw = 6 + bushy * 5;
-      leafShape(ctx, -1, ly, -1, lw, pheno.leaf, leafCol, pheno);
-      leafShape(ctx, 1, ly, 1, lw, pheno.leaf, leafCol, pheno);
-    }
+    // sombra
+    px(ctx, -bw / 2 - 1, 1, bw + 2, 3, 'rgba(0,0,0,0.22)');
 
-    const fy = -stemH + 2;
-    const fw = pheno.mutations.includes('gigantismo') ? 11 : (pheno.mutations.includes('enanismo') ? 5 : 8);
-    ctx.globalAlpha = flicker;
-    drawFlower(ctx, 0, fy, fw, pal, pheno);
+    // --- Maceta de terracota ---
+    const potW = bw + 2, potH = 6, potY = -6;
+    oRect(ctx, -potW / 2, potY, potW, potH, '#c07048');
+    px(ctx, -potW / 2, potY, potW, 1, '#d98a5f');                       // brillo borde
+    oRect(ctx, -potW / 2 - 1, potY - 2, potW + 2, 2, '#a85a38');        // reborde
+    px(ctx, -potW / 2, potY - 2, potW, 1, '#5a3a26');                   // tierra
+    px(ctx, -potW / 2 + 1, potY + 3, potW - 2, 1, '#9a5636');           // sombra interior
+
+    // --- Cuerpo (planta) ---
+    const bodyY = potY - 2 - bh + 1 + wob;
+    oRect(ctx, -bw / 2, bodyY, bw, bh, leafCol);
+    px(ctx, -bw / 2, bodyY, bw, 1, leafHi);                              // luz superior
+    px(ctx, -bw / 2, bodyY + bh - 1, bw, 1, leafSh);                     // sombra inferior
+    px(ctx, -bw / 2, bodyY, 1, bh, leafSh);
+    if (muts.includes('variegacion')) { px(ctx, -bw / 2 + 1, bodyY + 2, 2, 3, '#eae4c4'); px(ctx, bw / 2 - 3, bodyY + 4, 2, 2, '#eae4c4'); }
+
+    // brazos-hoja (según forma de hoja)
+    const armY = bodyY + 2;
+    const armLen = pheno.leaf === 'estrecha' || pheno.leaf === 'aciculada' ? 4 : (pheno.leaf === 'ancha' ? 6 : 5);
+    drawArm(ctx, -bw / 2, armY, -1, armLen, pheno.leaf, leafCol, leafSh);
+    drawArm(ctx, bw / 2, armY, 1, armLen, pheno.leaf, leafCol, leafSh);
+
+    // --- Cabeza / cogollo (color del fenotipo) con cara ---
+    const headY = bodyY - hw + 2 + wob;
+    ctx.globalAlpha = flick;
+    oRect(ctx, -hw / 2, headY, hw, hw, pal.base);
+    px(ctx, -hw / 2, headY, hw, 1, pal.light);
+    px(ctx, -hw / 2, headY + hw - 1, hw, 1, pal.dark);
+    px(ctx, -hw / 2, headY, 1, hw, pal.light);
+    // patrones de pigmentación
+    if (pheno.pattern === 'moteado') { px(ctx, -hw / 2 + 1, headY + 2, 1, 1, pal.dark); px(ctx, hw / 2 - 2, headY + hw - 3, 1, 1, pal.dark); }
+    else if (pheno.pattern === 'rayado') { for (let i = -hw / 2 + 1; i < hw / 2; i += 2) px(ctx, i, headY, 1, hw, pal.dark); }
+    else if (pheno.pattern === 'jaspeado') px(ctx, -hw / 2, headY + hw / 2, hw / 2, hw / 2, pal.dark);
+    // codominancia / quimera: media cabeza de otro tono
+    if (pheno.colorCo) { const co = PH.gen.COLOR_BY_KEY[pheno.colorCo]; if (co) px(ctx, 0, headY, hw / 2, hw, hslToHex(co.hue, 60, 52)); }
+    if (muts.includes('quimera')) px(ctx, -hw / 2, headY, hw / 2, hw / 2, pal.dark);
+
+    // hojita de azúcar arriba
+    px(ctx, -1, headY - 3, 2, 3, leafCol); px(ctx, -2, headY - 2, 1, 1, leafSh); px(ctx, 1, headY - 2, 1, 1, leafSh);
+    if (muts.includes('hexaploide')) { px(ctx, -4, headY - 2, 2, 2, pal.light); px(ctx, 3, headY - 2, 2, 2, pal.light); }
+    if (gig) { px(ctx, -hw / 2 - 1, headY - 2, 1, 3, leafSh); px(ctx, hw / 2, headY - 2, 1, 3, leafSh); } // "cuernos"
+
+    // cara
+    const eyeY = headY + Math.max(2, hw / 2 - 1);
+    const ex = Math.max(2, Math.round(hw / 4));
+    const eye = (x) => { px(ctx, x, eyeY, 2, 2, '#f4f4ec'); px(ctx, x + (x < 0 ? 1 : 0), eyeY, 1, 2, '#20202a'); px(ctx, x, eyeY, 1, 1, 'rgba(255,255,255,.7)'); };
+    eye(-ex); eye(ex - 1);
+    // boca por "ánimo" (resina/rareza)
+    const my = eyeY + 3;
+    if (pheno.quant.resina > 72 || muts.length) { px(ctx, -2, my, 4, 1, '#3a2230'); px(ctx, -3, my - 1, 1, 1, '#3a2230'); px(ctx, 2, my - 1, 1, 1, '#3a2230'); } // sonrisa
+    else px(ctx, -1, my, 2, 1, '#3a2230');
+    // mejillas
+    px(ctx, -ex - 1, eyeY + 1, 1, 1, 'rgba(255,120,140,.5)'); px(ctx, ex, eyeY + 1, 1, 1, 'rgba(255,120,140,.5)');
     ctx.globalAlpha = 1;
 
-    if (pheno.mutations.includes('cristalina') || pheno.quant.resina > 55) {
-      const n = Math.round((pheno.quant.resina - 45) / 9) + (pheno.mutations.includes('cristalina') ? 4 : 0);
-      for (let i = 0; i < n; i++) {
-        px(ctx, -fw / 2 + (i * 3) % fw, fy - 2 + ((i * 5) % 6), 1, 1, 'rgba(255,255,255,0.85)');
-      }
+    // resina / escarcha
+    if (muts.includes('cristalina') || pheno.quant.resina > 55) {
+      const n = Math.round((pheno.quant.resina - 45) / 10) + (muts.includes('cristalina') ? 5 : 0);
+      for (let i = 0; i < n; i++) px(ctx, -hw / 2 + (i * 3) % hw, headY + ((i * 5) % hw), 1, 1, 'rgba(255,255,255,0.85)');
     }
+    // aura de bioluminiscencia
+    if (muts.includes('fluorescente')) { ctx.globalAlpha = 0.25 * flick; px(ctx, -hw / 2 - 2, headY - 2, hw + 4, hw + 4, pal.light); ctx.globalAlpha = 1; }
+
     ctx.restore();
+  }
+
+  function drawArm(ctx, ox, oy, sign, len, form, col, sh) {
+    const seg = form === 'ancha' ? 3 : (form === 'estrecha' || form === 'aciculada' ? 1 : 2);
+    for (let j = 0; j < len; j++) {
+      const yy = oy - (form === 'palmada' || form === 'digitada' ? j : (j * 0.4 | 0));
+      px(ctx, ox + sign * (j + 1), yy, 1, seg, j === len - 1 ? sh : col);
+    }
+    // "mano"-hoja al final
+    px(ctx, ox + sign * (len + 1), oy - (form === 'palmada' || form === 'digitada' ? len : (len * 0.4 | 0)) - 1, 1, seg + 1, col);
   }
 
   function leafShape(ctx, ox, oy, sign, lw, form, col, pheno) {
