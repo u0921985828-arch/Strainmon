@@ -27,6 +27,12 @@
     game.canvas = document.getElementById('screen');
     game.ctx = game.canvas.getContext('2d');
     game.ctx.imageSmoothingEnabled = false;
+    // Búfer de mundo a resolución lógica (240x160); se escala x2 al lienzo (480x320).
+    game.world = document.createElement('canvas');
+    game.world.width = R.W; game.world.height = R.H;
+    game.wctx = game.world.getContext('2d');
+    game.wctx.imageSmoothingEnabled = false;
+    game.RScale = 2;
     if (PH.sprites) PH.sprites.preload();
     PH.ui.init();
     bindInput();
@@ -37,13 +43,14 @@
   }
 
   function resize() {
-    // Ajusta la escala del canvas a la ventana manteniendo píxeles nítidos
+    // Lienzo interno a 480x320 (x2 del mundo lógico); se ajusta a la ventana con escala entera.
+    const SW = R.W * game.RScale, SH = R.H * game.RScale;
     const maxW = window.innerWidth - 24, maxH = window.innerHeight - 120;
-    const sc = Math.max(2, Math.floor(Math.min(maxW / R.W, maxH / R.H)));
+    const sc = Math.max(1, Math.min(maxW / SW, maxH / SH));
     game.scale = sc;
-    game.canvas.width = R.W; game.canvas.height = R.H;
-    game.canvas.style.width = (R.W * sc) + 'px';
-    game.canvas.style.height = (R.H * sc) + 'px';
+    game.canvas.width = SW; game.canvas.height = SH;
+    game.canvas.style.width = Math.floor(SW * sc) + 'px';
+    game.canvas.style.height = Math.floor(SH * sc) + 'px';
     game.ctx.imageSmoothingEnabled = false;
   }
 
@@ -265,7 +272,7 @@
   /* ---------------- Render del mundo ---------------- */
   function render(now) {
     now = now || performance.now();
-    const ctx = game.ctx;
+    const ctx = game.wctx;            // capa MUNDO (240x160 lógico)
     const s = G().player;
     const map = World.MAPS[s.map];
     if (!map) return;
@@ -312,8 +319,20 @@
     R.drawActor(ctx, psx, psy, s.dir, wf,
       { skin: '#f0c088', hair: '#3a2a1a', shirt: '#2f9e6b', pants: '#33333f', pack: '#8a5a2a', hat: '#1f7a4d' });
 
-    // Overlays ambientales
+    // Overlays ambientales (sobre el búfer de mundo)
     applyEnvOverlay(ctx);
+
+    // --- Componer: escalar el mundo x2 al lienzo, y capa de personajes en alta resolución ---
+    const m = game.ctx;
+    m.imageSmoothingEnabled = false;
+    m.drawImage(game.world, 0, 0, R.W * game.RScale, R.H * game.RScale);
+    drawHiresLayer(m, camX, camY, now);
+  }
+
+  // Capa de sprites de alta resolución (32 px nativos). Se rellenará con el arte
+  // generado (jugador, NPCs y cepas errantes). Coordenadas en espacio de lienzo (x2).
+  function drawHiresLayer(m, camX, camY, now) {
+    // (pendiente de sprites) — de momento el mundo escalado ya incluye actores procedurales.
   }
 
   function applyEnvOverlay(ctx) {
