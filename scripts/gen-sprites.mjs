@@ -32,9 +32,9 @@ async function listModels(key) {
   return (j.models || []).map(m => m.name.replace('models/', ''));
 }
 
-async function genImage(key, prompt, model) {
+async function genImage(key, text, model) {
   const body = {
-    contents: [{ parts: [{ text: prompt + SUFFIX }] }],
+    contents: [{ parts: [{ text }] }],
     generationConfig: { responseModalities: ['IMAGE'] },
   };
   const r = await fetch(API(model, key), {
@@ -67,7 +67,9 @@ async function main() {
   const jobs = JSON.parse(fs.readFileSync(promptsFile, 'utf8'));
   for (const job of jobs) {
     try {
-      const buf = await genImage(key, job.prompt, model);
+      // job.raw = usar el prompt tal cual (sin sufijo magenta); útil para láminas con fondo negro.
+      const text = job.raw ? job.prompt : job.prompt + SUFFIX;
+      const buf = await genImage(key, text, model);
       const out = path.join(outDir, job.name.endsWith('.png') ? job.name : job.name + '.png');
       fs.writeFileSync(out, buf);
       console.log('🖼️  ', path.relative(ROOT, out), '(' + (buf.length / 1024).toFixed(1) + ' KB)');
