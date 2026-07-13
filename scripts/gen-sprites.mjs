@@ -19,6 +19,10 @@ function loadKey() {
 }
 
 const MODEL = process.env.GEMINI_IMAGE_MODEL || 'gemini-2.5-flash-image';
+// Sufijo canónico universal: sujeto único centrado + fondo magenta (chroma en post-proceso).
+const SUFFIX = ' Un único elemento centrado y completo, sin recortar por los bordes.'
+  + ' Fondo de un color liso magenta puro #FF00FF que rellena todo el lienzo, sin escena,'
+  + ' sin paisaje, sin suelo, sin sombra proyectada, sin texto ni marca de agua.';
 const API = (m, key) => `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${key}`;
 
 async function listModels(key) {
@@ -30,7 +34,7 @@ async function listModels(key) {
 
 async function genImage(key, prompt, model) {
   const body = {
-    contents: [{ parts: [{ text: prompt }] }],
+    contents: [{ parts: [{ text: prompt + SUFFIX }] }],
     generationConfig: { responseModalities: ['IMAGE'] },
   };
   const r = await fetch(API(model, key), {

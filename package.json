@@ -1,0 +1,22 @@
+{
+  "name": "strainmon",
+  "version": "1.0.0",
+  "description": "Un RPG de exploración y **genética vegetal** parodia de coleccionismo tipo Pokémon centrada en cepas landrace de cannabis y sus linajes, inspirado en los clásicos RPG de Game Boy Advance — pero **sin combates**. Aquí no capturas criaturas: recorres biomas, descubres variedades vegetales salvajes, las recolectas con distintas herramientas, las almacenas en tu **banco genético** y las **cruzas** para crear fenotipos, colores y mutaciones que nadie había visto. Tu meta es reunir el mayor **catálogo genético del planeta**.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:41729/git/u0921985828-arch/Strainmon"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "sharp": "^0.35.3"
+  }
+}
