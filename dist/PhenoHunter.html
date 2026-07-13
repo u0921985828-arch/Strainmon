@@ -399,7 +399,7 @@ html, body {
     <div id="footrow">
       <span class="knob"><i></i>CONTRASTE</span>
       <div class="speaker"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <span class="knob"><i></i>VOLUMEN</span>
+      <span class="knob" data-mute title="Silenciar"><i></i>VOLUMEN</span>
     </div>
   </div>
   <script>
@@ -3297,7 +3297,7 @@ html, body {
   function doHarvest(id) {
     const res = PH.garden.harvest(id);
     if (!res.ok) { toast(res.msg || 'No se pudo cosechar.', 'bad'); return; }
-    toast(`🌾 Cosechaste ${res.name}: ${res.clones.length} clones + 💰${res.credits}`, 'ok');
+    if (PH.audio) PH.audio.sfx('harvest'); toast(`🌾 Cosechaste ${res.name}: ${res.clones.length} clones + 💰${res.credits}`, 'ok');
     updateHUD();
     PH.game.afterQuestCheck();
     greenhouse();
@@ -3524,6 +3524,89 @@ html, body {
   function forKind(kind) { const k = MAP[kind] || kind; return images[k] || null; }
   function has(kind) { const k = MAP[kind] || kind; return !!DATA[k]; }
   PH.furniart = { DATA, MAP, preload, forKind, has };
+})(window.PH = window.PH || {});
+
+/* ==== src/audio.js ==== */
+/* ============================================================
+   STRAINMON — audio.js
+   Motor de sonido chiptune inspirado en la APU de la Game Boy:
+   canales de PULSO (onda cuadrada con duty), ONDA (periódica) y
+   RUIDO. SFX + bucle de música. Web Audio, sin dependencias.
+   Se inicializa en el primer gesto del usuario (política autoplay).
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  let ctx = null, master = null, muted = false;
+  let musicOn = false, musicTimer = null, step = 0, noiseBuf = null;
+
+  function ensure() {
+    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return ctx; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    try { ctx = new AC(); } catch (e) { return null; }
+    master = ctx.createGain(); master.gain.value = muted ? 0 : 0.5; master.connect(ctx.destination);
+    return ctx;
+  }
+  const t = () => (ctx ? ctx.currentTime : 0);
+
+  // Voz de pulso/onda con envolvente rápida (chip).
+  function tone(freq, dur, o) {
+    o = o || {}; if (!ensure()) return;
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = o.type || 'square';
+    osc.frequency.setValueAtTime(freq, t());
+    if (o.slideTo) osc.frequency.exponentialRampToValueAtTime(Math.max(1, o.slideTo), t() + dur);
+    const vol = o.vol != null ? o.vol : 0.25, atk = o.attack || 0.004;
+    g.gain.setValueAtTime(0.0001, t());
+    g.gain.linearRampToValueAtTime(vol, t() + atk);
+    g.gain.exponentialRampToValueAtTime(0.0008, t() + dur);
+    osc.connect(g); g.connect(master); osc.start(); osc.stop(t() + dur + 0.03);
+  }
+  // Canal de ruido (percusión / efectos).
+  function noise(dur, o) {
+    o = o || {}; if (!ensure()) return;
+    if (!noiseBuf) { noiseBuf = ctx.createBuffer(1, (ctx.sampleRate * 0.5) | 0, ctx.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    const s = ctx.createBufferSource(); s.buffer = noiseBuf;
+    const f = ctx.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = o.hp || 1600;
+    const g = ctx.createGain(); const vol = o.vol != null ? o.vol : 0.2;
+    g.gain.setValueAtTime(vol, t()); g.gain.exponentialRampToValueAtTime(0.001, t() + dur);
+    s.connect(f); f.connect(g); g.connect(master); s.start(); s.stop(t() + dur + 0.03);
+  }
+
+  const SFX = {
+    step: () => tone(200, 0.045, { vol: 0.05 }),
+    confirm: () => { tone(660, 0.06, { vol: 0.22 }); tone(990, 0.09, { vol: 0.16 }); },
+    cancel: () => tone(320, 0.10, { vol: 0.2, slideTo: 170 }),
+    open: () => { tone(520, 0.05, { vol: 0.18 }); tone(760, 0.08, { vol: 0.14 }); },
+    warp: () => tone(360, 0.20, { vol: 0.2, slideTo: 900 }),
+    blip: () => tone(880, 0.05, { vol: 0.18 }),
+    cash: () => { tone(784, 0.06, { vol: 0.2 }); tone(1046, 0.08, { vol: 0.2 }); tone(1318, 0.13, { vol: 0.16 }); },
+    harvest: () => { tone(523, 0.08, { vol: 0.2 }); tone(659, 0.08, { vol: 0.2 }); tone(784, 0.16, { vol: 0.18 }); },
+    encounter: () => { tone(300, 0.09, { vol: 0.22, slideTo: 620 }); noise(0.10, { vol: 0.1 }); },
+    error: () => tone(150, 0.12, { vol: 0.2 }),
+  };
+  function sfx(k) { if (muted) return; const f = SFX[k]; if (f) f(); }
+
+  // --- Música: bucle pentatónico simple (lead pulso + bajo onda + hats ruido) ---
+  const SCALE = [0, 3, 5, 7, 10];
+  const LEAD = [0, 3, 5, 7, 5, 3, 7, 10, 7, 5, 3, 0, 3, 5, 7, 3];
+  const BASS = [110, 110, 146.83, 130.81];
+  function tick() {
+    if (!ctx || muted || !musicOn) { step++; return; }
+    const s = step % 16;
+    if (s % 4 === 0) tone(BASS[(step / 4 | 0) % BASS.length], 0.26, { type: 'triangle', vol: 0.12 });
+    if (s % 2 === 0) { const semi = LEAD[s % LEAD.length]; tone(261.63 * Math.pow(2, semi / 12), 0.14, { vol: 0.08 }); }
+    if (s % 4 === 2) noise(0.03, { vol: 0.045, hp: 4000 });
+    step++;
+  }
+  function musicStart() { musicOn = true; ensure(); if (!musicTimer) musicTimer = setInterval(tick, 175); }
+  function musicStop() { musicOn = false; if (musicTimer) { clearInterval(musicTimer); musicTimer = null; } }
+
+  function setMuted(m) { muted = m; if (master) master.gain.value = m ? 0 : 0.5; }
+  function toggleMute() { setMuted(!muted); return muted; }
+  function isMuted() { return muted; }
+
+  PH.audio = { ensure, sfx, tone, noise, musicStart, musicStop, setMuted, toggleMute, isMuted };
 })(window.PH = window.PH || {});
 
 /* ==== src/iso.js ==== */
@@ -3900,7 +3983,7 @@ html, body {
     // Partida nueva -> siempre en el apartamento. Continuar -> respeta sala iso guardada.
     if (fresh || !ROOMS[p.map] || !p.iso) { p.map = 'apt'; p.x = ROOMS.apt.spawn.gx; p.y = ROOMS.apt.spawn.gy; p.dir = 'SW'; }
     p.iso = true;
-    game.dmg = !!p.dmg;
+    game.dmg = !!p.dmg; if (PH.audio) PH.audio.musicStart();
     normalizePlayer();
     game.mode = 'overworld';
     centerCam(true);
@@ -3911,17 +3994,19 @@ html, body {
   /* ------------------------- ENTRADA ------------------------- */
   const MOVE_KEYS = { arrowup: 1, arrowdown: 1, arrowleft: 1, arrowright: 1, w: 1, a: 1, s: 1, d: 1 };
   // Acción de un botón/tecla (A=espacio/confirmar, B=escape/volver, atajos de panel).
+  const A = (k) => { if (PH.audio) PH.audio.sfx(k); };
   function doAction(k) {
+    if (k === 'n') { const m = PH.audio && PH.audio.toggleMute(); PH.ui.toast(m ? '🔇 Silencio' : '🔊 Sonido', ''); return; }
     if (game.mode === 'title') return;
-    if (game.mode === 'dialog') { if (k === ' ' || k === 'e' || k === 'enter') PH.ui.dialogNext(); return; }
-    if (game.mode === 'menu') { if (k === 'escape' || k === 'b' || k === 'i' || k === 'c' || k === 'q' || k === 'g' || k === 'l') PH.ui.close(); return; }
+    if (game.mode === 'dialog') { if (k === ' ' || k === 'e' || k === 'enter') { A('confirm'); PH.ui.dialogNext(); } return; }
+    if (game.mode === 'menu') { if (k === 'escape' || k === 'b' || k === 'i' || k === 'c' || k === 'q' || k === 'g' || k === 'l') { A('cancel'); PH.ui.close(); } return; }
     if (game.mode !== 'overworld') return;
     if (k === ' ' || k === 'e') interact();
-    else if (k === 'i') PH.ui.bag(); else if (k === 'b') PH.ui.bank();
-    else if (k === 'c') PH.ui.catalog(); else if (k === 'q' || k === 'start' || k === 'enter') PH.ui.quests();
-    else if (k === 'l') PH.ui.lab(); else if (k === 'g') PH.ui.greenhouse();
-    else if (k === 'select' || k === 'p') toggleDMG();
-    else if (k === 'm') { PH.state.save(); PH.ui.toast('Partida guardada.', 'ok'); }
+    else if (k === 'i') { A('open'); PH.ui.bag(); } else if (k === 'b') { A('open'); PH.ui.bank(); }
+    else if (k === 'c') { A('open'); PH.ui.catalog(); } else if (k === 'q' || k === 'start' || k === 'enter') { A('open'); PH.ui.quests(); }
+    else if (k === 'l') { A('open'); PH.ui.lab(); } else if (k === 'g') { A('open'); PH.ui.greenhouse(); }
+    else if (k === 'select' || k === 'p') { A('blip'); toggleDMG(); }
+    else if (k === 'm') { A('confirm'); PH.state.save(); PH.ui.toast('Partida guardada.', 'ok'); }
   }
   function toggleDMG() {
     game.dmg = !game.dmg;
@@ -3932,17 +4017,21 @@ html, body {
   function bindInput() {
     window.addEventListener('keydown', (e) => {
       const k = e.key.toLowerCase(); game.keys[k] = true;
+      if (PH.audio) PH.audio.ensure();
       if (MOVE_KEYS[k] || k === ' ') e.preventDefault();
       if (!MOVE_KEYS[k]) doAction(k);
     });
     window.addEventListener('keyup', (e) => { game.keys[e.key.toLowerCase()] = false; });
     document.querySelectorAll('[data-key]').forEach(btn => {
       const key = btn.dataset.key;
-      const down = (e) => { e.preventDefault(); if (MOVE_KEYS[key]) game.keys[key] = true; else doAction(key); };
+      const down = (e) => { e.preventDefault(); if (PH.audio) PH.audio.ensure(); if (MOVE_KEYS[key]) game.keys[key] = true; else doAction(key); };
       const up = (e) => { if (e) e.preventDefault(); if (MOVE_KEYS[key]) game.keys[key] = false; };
       btn.addEventListener('touchstart', down, { passive: false }); btn.addEventListener('touchend', up, { passive: false });
       btn.addEventListener('mousedown', down); btn.addEventListener('mouseup', up); btn.addEventListener('mouseleave', up);
     });
+    // rueda de VOLUMEN = silencio
+    const kn = document.querySelector('[data-mute]');
+    if (kn) kn.addEventListener('click', () => { const m = PH.audio && PH.audio.toggleMute(); PH.ui.toast(m ? '🔇 Silencio' : '🔊 Sonido', ''); });
   }
 
   /* ------------------------- INTERACCIÓN ------------------------- */
@@ -3953,6 +4042,7 @@ html, body {
   function interact() {
     const p = G().player, m = room(p.map); if (!m) return;
     const f = facing();
+    if (npcAt(m, f.gx, f.gy) || objAt(m, f.gx, f.gy) || doorAt(m, f.gx, f.gy)) A('confirm');
     const npc = npcAt(m, f.gx, f.gy);
     if (npc) {
       npc.dir = { NE: 'SW', SW: 'NE', NW: 'SE', SE: 'NW' }[p.dir] || 'SW';
@@ -4004,7 +4094,7 @@ html, body {
     document.getElementById('d_no').onclick = PH.ui.close;
     document.getElementById('d_yes').onclick = () => {
       PH.state.bankRemove(want.uid); PH.state.addCredits(price);
-      s.stats.deals = (s.stats.deals || 0) + 1;
+      s.stats.deals = (s.stats.deals || 0) + 1; if (PH.audio) PH.audio.sfx('cash');
       PH.ui.toast(`Vendido a ${npc.name}: 💰${price}`, 'ok');
       PH.ui.updateHUD(); PH.game.afterQuestCheck(); PH.ui.close();
     };
@@ -4030,10 +4120,12 @@ html, body {
   function finishMove() {
     const p = G().player; p.x = game.to.x; p.y = game.to.y; game.moving = false;
     G().stats.distance++;
+    A('step');
     // parterres silvestres 'g' -> posible encuentro
     const m = room(p.map);
     if (m.wild && tileAt(m, p.x, p.y) === 'g') {
       if (PH.util.RNG.chance(0.22)) {
+        A('encounter');
         const biome = PH.util.RNG.pick(['pradera', 'bosque', 'pantano', 'desierto', 'nieve', 'volcan', 'cueva', 'isla']);
         PH.ui.encounter(PH.species.rollEncounter(biome, G().env));
       }
@@ -4041,6 +4133,7 @@ html, body {
   }
   function warp(d) {
     const p = G().player; const t = room(d.to); if (!t) return;
+    A('warp');
     p.map = d.to; p.x = d.tgx; p.y = d.tgy; game.moving = false;
     centerCam(true); PH.ui.updateHUD(); PH.ui.toast('📍 ' + t.name, '');
   }

@@ -209,7 +209,7 @@
     // Partida nueva -> siempre en el apartamento. Continuar -> respeta sala iso guardada.
     if (fresh || !ROOMS[p.map] || !p.iso) { p.map = 'apt'; p.x = ROOMS.apt.spawn.gx; p.y = ROOMS.apt.spawn.gy; p.dir = 'SW'; }
     p.iso = true;
-    game.dmg = !!p.dmg;
+    game.dmg = !!p.dmg; if (PH.audio) PH.audio.musicStart();
     normalizePlayer();
     game.mode = 'overworld';
     centerCam(true);
@@ -220,17 +220,19 @@
   /* ------------------------- ENTRADA ------------------------- */
   const MOVE_KEYS = { arrowup: 1, arrowdown: 1, arrowleft: 1, arrowright: 1, w: 1, a: 1, s: 1, d: 1 };
   // Acción de un botón/tecla (A=espacio/confirmar, B=escape/volver, atajos de panel).
+  const A = (k) => { if (PH.audio) PH.audio.sfx(k); };
   function doAction(k) {
+    if (k === 'n') { const m = PH.audio && PH.audio.toggleMute(); PH.ui.toast(m ? '🔇 Silencio' : '🔊 Sonido', ''); return; }
     if (game.mode === 'title') return;
-    if (game.mode === 'dialog') { if (k === ' ' || k === 'e' || k === 'enter') PH.ui.dialogNext(); return; }
-    if (game.mode === 'menu') { if (k === 'escape' || k === 'b' || k === 'i' || k === 'c' || k === 'q' || k === 'g' || k === 'l') PH.ui.close(); return; }
+    if (game.mode === 'dialog') { if (k === ' ' || k === 'e' || k === 'enter') { A('confirm'); PH.ui.dialogNext(); } return; }
+    if (game.mode === 'menu') { if (k === 'escape' || k === 'b' || k === 'i' || k === 'c' || k === 'q' || k === 'g' || k === 'l') { A('cancel'); PH.ui.close(); } return; }
     if (game.mode !== 'overworld') return;
     if (k === ' ' || k === 'e') interact();
-    else if (k === 'i') PH.ui.bag(); else if (k === 'b') PH.ui.bank();
-    else if (k === 'c') PH.ui.catalog(); else if (k === 'q' || k === 'start' || k === 'enter') PH.ui.quests();
-    else if (k === 'l') PH.ui.lab(); else if (k === 'g') PH.ui.greenhouse();
-    else if (k === 'select' || k === 'p') toggleDMG();
-    else if (k === 'm') { PH.state.save(); PH.ui.toast('Partida guardada.', 'ok'); }
+    else if (k === 'i') { A('open'); PH.ui.bag(); } else if (k === 'b') { A('open'); PH.ui.bank(); }
+    else if (k === 'c') { A('open'); PH.ui.catalog(); } else if (k === 'q' || k === 'start' || k === 'enter') { A('open'); PH.ui.quests(); }
+    else if (k === 'l') { A('open'); PH.ui.lab(); } else if (k === 'g') { A('open'); PH.ui.greenhouse(); }
+    else if (k === 'select' || k === 'p') { A('blip'); toggleDMG(); }
+    else if (k === 'm') { A('confirm'); PH.state.save(); PH.ui.toast('Partida guardada.', 'ok'); }
   }
   function toggleDMG() {
     game.dmg = !game.dmg;
@@ -241,17 +243,21 @@
   function bindInput() {
     window.addEventListener('keydown', (e) => {
       const k = e.key.toLowerCase(); game.keys[k] = true;
+      if (PH.audio) PH.audio.ensure();
       if (MOVE_KEYS[k] || k === ' ') e.preventDefault();
       if (!MOVE_KEYS[k]) doAction(k);
     });
     window.addEventListener('keyup', (e) => { game.keys[e.key.toLowerCase()] = false; });
     document.querySelectorAll('[data-key]').forEach(btn => {
       const key = btn.dataset.key;
-      const down = (e) => { e.preventDefault(); if (MOVE_KEYS[key]) game.keys[key] = true; else doAction(key); };
+      const down = (e) => { e.preventDefault(); if (PH.audio) PH.audio.ensure(); if (MOVE_KEYS[key]) game.keys[key] = true; else doAction(key); };
       const up = (e) => { if (e) e.preventDefault(); if (MOVE_KEYS[key]) game.keys[key] = false; };
       btn.addEventListener('touchstart', down, { passive: false }); btn.addEventListener('touchend', up, { passive: false });
       btn.addEventListener('mousedown', down); btn.addEventListener('mouseup', up); btn.addEventListener('mouseleave', up);
     });
+    // rueda de VOLUMEN = silencio
+    const kn = document.querySelector('[data-mute]');
+    if (kn) kn.addEventListener('click', () => { const m = PH.audio && PH.audio.toggleMute(); PH.ui.toast(m ? '🔇 Silencio' : '🔊 Sonido', ''); });
   }
 
   /* ------------------------- INTERACCIÓN ------------------------- */
@@ -262,6 +268,7 @@
   function interact() {
     const p = G().player, m = room(p.map); if (!m) return;
     const f = facing();
+    if (npcAt(m, f.gx, f.gy) || objAt(m, f.gx, f.gy) || doorAt(m, f.gx, f.gy)) A('confirm');
     const npc = npcAt(m, f.gx, f.gy);
     if (npc) {
       npc.dir = { NE: 'SW', SW: 'NE', NW: 'SE', SE: 'NW' }[p.dir] || 'SW';
@@ -313,7 +320,7 @@
     document.getElementById('d_no').onclick = PH.ui.close;
     document.getElementById('d_yes').onclick = () => {
       PH.state.bankRemove(want.uid); PH.state.addCredits(price);
-      s.stats.deals = (s.stats.deals || 0) + 1;
+      s.stats.deals = (s.stats.deals || 0) + 1; if (PH.audio) PH.audio.sfx('cash');
       PH.ui.toast(`Vendido a ${npc.name}: 💰${price}`, 'ok');
       PH.ui.updateHUD(); PH.game.afterQuestCheck(); PH.ui.close();
     };
@@ -339,10 +346,12 @@
   function finishMove() {
     const p = G().player; p.x = game.to.x; p.y = game.to.y; game.moving = false;
     G().stats.distance++;
+    A('step');
     // parterres silvestres 'g' -> posible encuentro
     const m = room(p.map);
     if (m.wild && tileAt(m, p.x, p.y) === 'g') {
       if (PH.util.RNG.chance(0.22)) {
+        A('encounter');
         const biome = PH.util.RNG.pick(['pradera', 'bosque', 'pantano', 'desierto', 'nieve', 'volcan', 'cueva', 'isla']);
         PH.ui.encounter(PH.species.rollEncounter(biome, G().env));
       }
@@ -350,6 +359,7 @@
   }
   function warp(d) {
     const p = G().player; const t = room(d.to); if (!t) return;
+    A('warp');
     p.map = d.to; p.x = d.tgx; p.y = d.tgy; game.moving = false;
     centerCam(true); PH.ui.updateHUD(); PH.ui.toast('📍 ' + t.name, '');
   }

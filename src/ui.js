@@ -528,7 +528,7 @@
   function doHarvest(id) {
     const res = PH.garden.harvest(id);
     if (!res.ok) { toast(res.msg || 'No se pudo cosechar.', 'bad'); return; }
-    toast(`🌾 Cosechaste ${res.name}: ${res.clones.length} clones + 💰${res.credits}`, 'ok');
+    if (PH.audio) PH.audio.sfx('harvest'); toast(`🌾 Cosechaste ${res.name}: ${res.clones.length} clones + 💰${res.credits}`, 'ok');
     updateHUD();
     PH.game.afterQuestCheck();
     greenhouse();
