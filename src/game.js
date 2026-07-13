@@ -297,7 +297,7 @@
     for (const n of (map.npcs || [])) {
       const sx = n.x * R.TS - camX, sy = n.y * R.TS - camY;
       if (sx < -R.TS || sx > R.W || sy < -R.TS || sy > R.H) continue;
-      R.drawActor(ctx, sx, sy, 'down', (game.npcAnimT / 500 | 0) % 2, R.NPC_PALETTES[n.sprite]);
+      R.drawActor(ctx, sx, sy, n.face || 'down', 0, R.NPC_PALETTES[n.sprite]);
       // nombre
       ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(sx - 4, sy - 8, n.name.length * 3 + 6, 7);
       ctx.fillStyle = '#fff'; ctx.font = '5px monospace'; ctx.textAlign = 'left';
@@ -306,8 +306,9 @@
 
     // Jugador
     const psx = pxp - camX, psy = pyp - camY;
-    R.drawActor(ctx, psx, psy, s.dir, game.moving ? game.frame : 0,
-      { skin: '#f0c088', hair: '#3a2a1a', shirt: '#2f9e6b', pants: '#33333f' });
+    const wf = game.moving ? (Math.floor(game.moveT / (game.moveDur / 2)) % 2 === 0 ? 1 : 2) : 0;
+    R.drawActor(ctx, psx, psy, s.dir, wf,
+      { skin: '#f0c088', hair: '#3a2a1a', shirt: '#2f9e6b', pants: '#33333f', pack: '#8a5a2a', hat: '#1f7a4d' });
 
     // Overlays ambientales
     applyEnvOverlay(ctx);

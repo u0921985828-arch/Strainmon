@@ -1400,22 +1400,79 @@ html, body {
     }
   }
 
+  // Personaje 16px con 4 direcciones y ciclo de caminado (frame 0=idle,1,2).
   function drawActor(ctx, sx, sy, dir, frame, palette) {
-    palette = palette || { skin: '#f0c088', hair: '#4a3b2a', shirt: '#3a7bd6', pants: '#33333f' };
-    const bob = frame ? 1 : 0;
-    px(ctx, sx + 3, sy + 14, 10, 2, 'rgba(0,0,0,0.22)');
-    px(ctx, sx + 4, sy + 8 - bob, 8, 6, palette.shirt);
-    px(ctx, sx + 4, sy + 13 - bob, 3, 3, palette.pants);
-    px(ctx, sx + 9, sy + 13 - bob, 3, 3, palette.pants);
-    px(ctx, sx + 4, sy + 2 - bob, 8, 7, palette.skin);
-    px(ctx, sx + 4, sy + 1 - bob, 8, 3, palette.hair);
-    px(ctx, sx + 3, sy + 3 - bob, 1, 4, palette.hair);
-    px(ctx, sx + 12, sy + 3 - bob, 1, 4, palette.hair);
-    const ey = sy + 5 - bob;
-    if (dir === 'down') { px(ctx, sx + 6, ey, 1, 2, '#222'); px(ctx, sx + 9, ey, 1, 2, '#222'); }
-    else if (dir === 'up') { px(ctx, sx + 4, sy + 1 - bob, 8, 4, palette.hair); }
-    else if (dir === 'left') { px(ctx, sx + 5, ey, 1, 2, '#222'); }
-    else if (dir === 'right') { px(ctx, sx + 10, ey, 1, 2, '#222'); }
+    const p = palette || { skin: '#f0c088', hair: '#4a3b2a', shirt: '#3a7bd6', pants: '#33333f' };
+    const shD = shade(p.shirt, -0.22), skD = shade(p.skin, -0.18), haD = shade(p.hair, -0.25);
+    const bob = frame === 1 ? 1 : 0;              // rebote vertical al pisar
+    const oy = -bob;
+
+    // sombra suave
+    px(ctx, sx + 4, sy + 15, 8, 2, 'rgba(0,0,0,0.20)');
+    px(ctx, sx + 3, sy + 14, 10, 1, 'rgba(0,0,0,0.12)');
+
+    // ---- Piernas (animadas) ----
+    const legY = sy + 12;
+    if (dir === 'left' || dir === 'right') {
+      // paso adelante/atrás en el eje X
+      let f1 = 6, f2 = 8; // idle
+      if (frame === 1) { f1 = 4; f2 = 9; } else if (frame === 2) { f1 = 7; f2 = 6; }
+      px(ctx, sx + f2, legY, 3, 4, shade(p.pants, -0.2));
+      px(ctx, sx + f1, legY, 3, 4, p.pants);
+      px(ctx, sx + f1, sy + 15, 3, 1, '#2a2028');
+    } else {
+      let lx = 5, rx = 8;
+      if (frame === 1) { lx = 4; rx = 9; } else if (frame === 2) { lx = 5; rx = 8; }
+      px(ctx, sx + lx, legY, 3, 4, p.pants);
+      px(ctx, sx + rx, legY, 3, 4, shade(p.pants, -0.15));
+      px(ctx, sx + lx, sy + 15, 3, 1, '#2a2028'); px(ctx, sx + rx, sy + 15, 3, 1, '#2a2028');
+    }
+
+    // ---- Torso ----
+    px(ctx, sx + 4, sy + 8 + oy, 8, 5, p.shirt);
+    px(ctx, sx + 4, sy + 12 + oy, 8, 1, shD);
+    // mochila del héroe (si tiene pack)
+    if (p.pack) {
+      if (dir === 'up') px(ctx, sx + 4, sy + 8 + oy, 8, 4, p.pack);
+      else if (dir === 'down') { px(ctx, sx + 3, sy + 9 + oy, 1, 3, p.pack); px(ctx, sx + 12, sy + 9 + oy, 1, 3, p.pack); }
+      else if (dir === 'left') px(ctx, sx + 10, sy + 8 + oy, 2, 4, p.pack);
+      else px(ctx, sx + 4, sy + 8 + oy, 2, 4, p.pack);
+    }
+    // ---- Brazos (balanceo) ----
+    const armY = sy + 8 + oy + (frame === 1 ? 1 : 0);
+    if (dir === 'left' || dir === 'right') {
+      px(ctx, sx + (dir === 'left' ? 4 : 10), armY, 2, 4, skD);
+    } else {
+      px(ctx, sx + 3, armY + (frame === 2 ? 1 : 0), 2, 4, p.skin);
+      px(ctx, sx + 11, armY + (frame === 1 ? 1 : 0), 2, 4, p.skin);
+    }
+
+    // ---- Cabeza ----
+    px(ctx, sx + 4, sy + 2 + oy, 8, 7, p.skin);
+    px(ctx, sx + 4, sy + 8 + oy, 8, 1, skD);       // barbilla
+    // pelo
+    px(ctx, sx + 4, sy + 1 + oy, 8, 3, p.hair);
+    px(ctx, sx + 3, sy + 2 + oy, 1, 4, p.hair);
+    px(ctx, sx + 12, sy + 2 + oy, 1, 4, p.hair);
+    // gorra opcional
+    if (p.hat) { px(ctx, sx + 3, sy + 1 + oy, 10, 2, p.hat); px(ctx, sx + 4, sy + 0 + oy, 8, 1, p.hat); px(ctx, sx + 11, sy + 2 + oy, 3, 1, shade(p.hat, -0.2)); }
+
+    const ey = sy + 5 + oy;
+    if (dir === 'down') {
+      px(ctx, sx + 6, ey, 1, 2, '#20202a'); px(ctx, sx + 9, ey, 1, 2, '#20202a');
+      px(ctx, sx + 7, sy + 7 + oy, 2, 1, skD);   // boca/sombra
+    } else if (dir === 'up') {
+      px(ctx, sx + 4, sy + 1 + oy, 8, 6, p.hair); // nuca
+      px(ctx, sx + 3, sy + 2 + oy, 1, 4, haD); px(ctx, sx + 12, sy + 2 + oy, 1, 4, haD);
+    } else if (dir === 'left') {
+      px(ctx, sx + 4, sy + 2 + oy, 2, 5, p.hair); // flequillo lateral
+      px(ctx, sx + 6, ey, 1, 2, '#20202a');
+      px(ctx, sx + 4, sy + 6 + oy, 1, 1, skD);     // nariz
+    } else if (dir === 'right') {
+      px(ctx, sx + 10, sy + 2 + oy, 2, 5, p.hair);
+      px(ctx, sx + 9, ey, 1, 2, '#20202a');
+      px(ctx, sx + 11, sy + 6 + oy, 1, 1, skD);
+    }
   }
 
   const NPC_PALETTES = {
@@ -3246,7 +3303,7 @@ html, body {
     for (const n of (map.npcs || [])) {
       const sx = n.x * R.TS - camX, sy = n.y * R.TS - camY;
       if (sx < -R.TS || sx > R.W || sy < -R.TS || sy > R.H) continue;
-      R.drawActor(ctx, sx, sy, 'down', (game.npcAnimT / 500 | 0) % 2, R.NPC_PALETTES[n.sprite]);
+      R.drawActor(ctx, sx, sy, n.face || 'down', 0, R.NPC_PALETTES[n.sprite]);
       // nombre
       ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(sx - 4, sy - 8, n.name.length * 3 + 6, 7);
       ctx.fillStyle = '#fff'; ctx.font = '5px monospace'; ctx.textAlign = 'left';
@@ -3255,8 +3312,9 @@ html, body {
 
     // Jugador
     const psx = pxp - camX, psy = pyp - camY;
-    R.drawActor(ctx, psx, psy, s.dir, game.moving ? game.frame : 0,
-      { skin: '#f0c088', hair: '#3a2a1a', shirt: '#2f9e6b', pants: '#33333f' });
+    const wf = game.moving ? (Math.floor(game.moveT / (game.moveDur / 2)) % 2 === 0 ? 1 : 2) : 0;
+    R.drawActor(ctx, psx, psy, s.dir, wf,
+      { skin: '#f0c088', hair: '#3a2a1a', shirt: '#2f9e6b', pants: '#33333f', pack: '#8a5a2a', hat: '#1f7a4d' });
 
     // Overlays ambientales
     applyEnvOverlay(ctx);
