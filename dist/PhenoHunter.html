@@ -221,12 +221,27 @@ html, body {
 .phdot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 50%; border: 1px solid rgba(0,0,0,.4); }
 .plot-name { font-size: .78rem; font-weight: bold; } .plot-stage { font-size: .7rem; }
 .plot .bar { width: 100%; }
+.plot.sick { border-color: #c8813a; box-shadow: 0 0 0 1px rgba(200,129,58,.5) inset; }
+.plot-badge { position: absolute; top: 4px; left: 4px; font-size: .58rem; font-weight: bold; padding: 1px 5px;
+  border-radius: 6px; background: rgba(0,0,0,.55); color: #cfe8c8; letter-spacing: .3px; }
+.plot-badge.warn { background: rgba(200,150,40,.85); color: #241a05; }
+.plot-badge.bad { background: rgba(200,60,60,.9); color: #fff; }
+.plot-badge.ok { background: rgba(70,150,80,.85); color: #eaffe6; }
+.vitals { display: flex; gap: 6px; width: 100%; }
+.vit { flex: 1; display: flex; align-items: center; gap: 3px; font-size: .62rem; }
+.vit b { flex: 1; display: block; height: 5px; border-radius: 3px; background: #121821; overflow: hidden; }
+.vit b i { display: block; height: 100%; background: #2a7bd0; }
+.vit.health b i { background: #57b85a; }
+.vit.water.warn b i { background: #c89628; } .vit.water.bad b i { background: #c83c3c; }
+.vit.health.bad b i { background: #c83c3c; }
 .plot-actions { display: flex; gap: 4px; }
+.btn.small.warn { background: #7a4e17; border-color: #c8813a; color: #ffe9c4; }
 .hub-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
 .btn.hub { padding: 18px 10px; line-height: 1.5; font-size: .8rem; }
 
 /* --------- Investigación / ADN --------- */
 .pill.event { background: linear-gradient(90deg, #3a2350, #6b3fa0); border-color: #a06bff; color: #f0e0ff; animation: pulse 1.2s infinite; }
+.pill.heat { background: linear-gradient(90deg, #5a1420, #b02436); border-color: #ff5a6a; color: #ffe0e4; animation: pulse 0.8s infinite; }
 .dna { font-family: monospace; font-size: .7rem; letter-spacing: 1px; word-break: break-all; background: #0f1520;
   border: 1px solid var(--line); border-radius: 8px; padding: 10px; color: #7bd66b; line-height: 1.6; }
 .hidden-list { list-style: none; font-size: .76rem; } .hidden-list li { padding: 3px 0; border-bottom: 1px solid var(--line); }
@@ -2041,6 +2056,8 @@ html, body {
         activeTool: 'frasco',
         cebosActivos: 0,               // encuentros con feromona
         labLevel: 1,                   // mejora del laboratorio (mutaciones en cruce)
+        heat: 0,                       // presión policial 0..100 (Fase 4)
+        busts: 0,                      // veces pillado por la poli
       },
       bank: [],          // especímenes almacenados
       garden: [],        // plantas creciendo en el invernadero
@@ -2048,7 +2065,7 @@ html, body {
       species: {},       // speciesId -> {seen, obtained}
       quests: {},        // questId -> {state:'active'|'done', progress}
       flags: {},         // banderas de historia
-      stats: { discoveries: 0, crosses: 0, mutationsFound: 0, distance: 0, sequenced: 0, harvests: 0 },
+      stats: { discoveries: 0, crosses: 0, mutationsFound: 0, distance: 0, sequenced: 0, harvests: 0, perfectHarvests: 0, deals: 0 },
       env: makeEnv(),
       playtime: 0,
     };
@@ -2270,6 +2287,18 @@ html, body {
       reward: { credits: 400, prestige: 7 },
       check: (s) => (s.stats.harvests || 0) >= 1,
     },
+    q_greenthumb: {
+      id: 'q_greenthumb', name: 'Mano verde',
+      desc: 'Cosecha una planta en perfecto estado (salud ≥ 90%): riégala a tiempo y evita el moho.',
+      reward: { credits: 700, prestige: 12, gear: 'medidor' },
+      check: (s) => (s.stats.perfectHarvests || 0) >= 1,
+    },
+    q_hustle: {
+      id: 'q_hustle', name: 'Bajo perfil',
+      desc: 'Cierra 3 tratos callejeros. Vigila el nivel de búsqueda y piérdete en interiores si aprieta la poli.',
+      reward: { credits: 900, prestige: 14 },
+      check: (s) => (s.stats.deals || 0) >= 3,
+    },
     q_master: {
       id: 'q_master', name: 'Maestro Strainmon',
       desc: 'Registra 25 fenotipos en el Strain-dex mundial.',
@@ -2365,6 +2394,14 @@ html, body {
       'La Jamaicana Costera tolera la sal; su aroma marino no se da tierra adentro.',
       'El muelle te lleva de vuelta al continente cuando quieras.',
     ],
+    descampado: (s) => {
+      activate('q_greenthumb'); activate('q_hustle');
+      return [
+        'Rasta Dodo: Este descampado es tierra de nadie... y de cultivo libre. Rebusca entre la maleza (parcelas verdes).',
+        'Cuida tus plantas en casa: sin agua se estresan y el exceso de humedad cría moho. Trátalo con poda y ventilación, nada de venenos.',
+        'Y ojo en la calle: cada trapicheo levanta la liebre. Si aparece la patrulla, métete en un portal y desaparece.',
+      ];
+    },
   };
 
   function activate(id) {
@@ -2567,6 +2604,13 @@ html, body {
    Invernadero / cultivo: planta clones y semillas, obsérvalos crecer
    por fases (plántula → veg → floración → cosecha) y cosecha para
    propagar la genética. Usa los sprites de cultivo (sprites.js).
+
+   FASE 3 — estrés de cultivo: el agua se consume con el tiempo; sin
+   agua la planta se estresa y detiene su crecimiento. La humedad alta
+   (riego excesivo, eventos de bruma/niebla) puede provocar la aparición
+   de moho/patógenos, que se resuelven con manejo BIOLÓGICO limpio y no
+   tóxico (poda sanitaria + control de humedad), nunca con fungicidas
+   agresivos. La salud final modula el rendimiento de la cosecha.
    ============================================================ */
 (function (PH) {
   'use strict';
@@ -2577,6 +2621,17 @@ html, body {
   const STAGE_TIMES = [0, 25000, 55000, 90000, 130000];
   const FINAL = STAGE_TIMES.length - 1;
 
+  // Modelo hídrico/sanitario (Fase 3).
+  const WATER_MAX = 100;
+  const WATER_DECAY = 100 / 42000;   // se seca por completo en ~42 s reales
+  const WATER_FULL = 96;             // nivel tras regar
+  const THIRST = 22;                 // por debajo: estrés hídrico
+  const SOGGY = 88;                  // por encima: encharcamiento (favorece hongos)
+  const HEALTH_MAX = 100;
+  const DRY_DMG = 100 / 60000;       // seca sin agua: pierde salud en ~60 s
+  const MOLD_DMG = 100 / 45000;      // infectada: pierde salud en ~45 s
+  const HEALTH_REGEN = 100 / 80000;  // en buenas condiciones se recupera lento
+
   function capacity() {
     const s = G();
     return clamp(3 + Math.floor(s.player.prestige / 40), 3, 8);
@@ -2586,7 +2641,12 @@ html, body {
     // velocidad y vigor aceleran; floración global también
     let r = 1 + ((plant.pheno.quant.velocidad || 50) - 50) / 120;
     if (PH.events && PH.events.current() && PH.events.current().id === 'floracion') r *= 1.6;
-    return clamp(r, 0.5, 2.2);
+    // el estrés hídrico frena el desarrollo; la enfermedad también
+    if (plant.water < THIRST) r *= 0.15;
+    else if (plant.water < THIRST * 1.8) r *= 0.6;
+    if (plant.diseased) r *= 0.4;
+    if (plant.health < 40) r *= 0.7;
+    return clamp(r, 0.06, 2.2);
   }
 
   function stageOf(growMs) {
@@ -2603,12 +2663,16 @@ html, body {
     if (!sp) return { ok: false, msg: 'Muestra no encontrada.' };
     if (sp.form === 'polen') return { ok: false, msg: 'El polen no se planta; úsalo en cruces.' };
     PH.state.bankRemove(uid);
+    // resistencia al moho: rasgo cualitativo/mutación reduce el riesgo
+    let resist = 0.5 + (((sp.pheno && sp.pheno.quant && sp.pheno.quant.resistencia) || 50) - 50) / 120;
+    if (sp.pheno && sp.pheno.mutations && sp.pheno.mutations.includes('resina_blindada')) resist += 0.35;
     const plant = {
       id: 'G' + Date.now().toString(36) + RNG.i(100, 999),
       name: sp.nickname || sp.name, speciesId: sp.speciesId,
       genotype: sp.genotype, pheno: sp.pheno, rarity: sp.rarity, tier: sp.tier,
       quality: sp.quality, generation: sp.generation, form: sp.form,
       growMs: 0, stage: 0, ready: false,
+      water: 78, health: HEALTH_MAX, diseased: false, moldResist: clamp(resist, 0.35, 1.6),
       seedSprite: RNG.pick(PH.sprites.SEEDLING_VARIANTS),
       vegSprite: RNG.pick(PH.sprites.VEG_VARIANTS),
     };
@@ -2616,16 +2680,72 @@ html, body {
     return { ok: true, plant, msg: `Plantaste ${plant.name} en el invernadero.` };
   }
 
+  // Presión ambiental de humedad: bruma/niebla y floración húmeda suben el riesgo.
+  function humidityPressure() {
+    let h = 1;
+    const ev = PH.events && PH.events.current();
+    if (ev) {
+      if (ev.id === 'bruma_astral') h = 2.4;
+      else if (ev.id === 'floracion') h = 1.5;
+    }
+    return h;
+  }
+
   function update(dt) {
     const s = G();
     if (!s.garden || !s.garden.length) return;
+    const hum = humidityPressure();
     for (const p of s.garden) {
+      // compat. con partidas antiguas sin campos de Fase 3
+      if (p.water == null) p.water = 78;
+      if (p.health == null) p.health = HEALTH_MAX;
+      if (p.diseased == null) p.diseased = false;
+      if (p.moldResist == null) p.moldResist = 1;
+
+      // 1) consumo de agua (crecer da sed; el calor de floración seca más)
+      p.water = clamp(p.water - dt * WATER_DECAY * (0.8 + growRate(p) * 0.4), 0, WATER_MAX);
+
+      // 2) salud según condiciones
+      if (p.diseased) {
+        p.health = clamp(p.health - dt * MOLD_DMG, 0, HEALTH_MAX);
+      } else if (p.water < 4) {
+        p.health = clamp(p.health - dt * DRY_DMG, 0, HEALTH_MAX);
+      } else if (p.water >= THIRST && p.water <= SOGGY) {
+        p.health = clamp(p.health + dt * HEALTH_REGEN, 0, HEALTH_MAX);
+      }
+
+      // 3) aparición de moho/patógenos: encharcamiento + humedad ambiental
+      if (!p.diseased && !p.ready && p.stage >= 1) {
+        let risk = 0;
+        if (p.water > SOGGY) risk += (p.water - SOGGY) / 12; // exceso de riego
+        risk *= hum / p.moldResist;
+        // prob. por segundo → por dt
+        if (RNG.f() < risk * (dt / 1000) * 0.06) {
+          p.diseased = true;
+          if (PH.ui && PH.ui.toast) PH.ui.toast(`🍄 ${p.name} muestra moho. Trátala (poda + ventilación).`, 'warn');
+          if (PH.audio) PH.audio.sfx('error');
+        }
+      }
+
+      // 4) avance del cultivo (modulado por growRate → estrés y enfermedad frenan)
       if (p.ready) continue;
       p.growMs += dt * growRate(p);
       p.stage = stageOf(p.growMs);
       if (p.growMs >= STAGE_TIMES[FINAL]) { p.ready = true; p.stage = FINAL; }
     }
   }
+
+  // Estado sanitario legible para la UI.
+  function statusOf(p) {
+    if (p.ready) return { key: 'ready', label: 'Lista', tone: 'ok' };
+    if (p.diseased) return { key: 'mold', label: 'Moho', tone: 'bad' };
+    if ((p.water != null ? p.water : 78) < THIRST) return { key: 'thirsty', label: 'Sed', tone: 'warn' };
+    if ((p.water != null ? p.water : 78) > SOGGY) return { key: 'soggy', label: 'Encharcada', tone: 'warn' };
+    if ((p.health != null ? p.health : 100) < 45) return { key: 'weak', label: 'Débil', tone: 'warn' };
+    return { key: 'healthy', label: 'Sana', tone: 'ok' };
+  }
+  function waterPct(p) { return clamp(p.water != null ? p.water : 78, 0, 100); }
+  function healthPct(p) { return clamp(p.health != null ? p.health : 100, 0, 100); }
 
   // Sprite de la fase actual: arte real por cepa (fase 1..5). Fallback a sprites.
   function spriteKey(p) {
@@ -2643,14 +2763,28 @@ html, body {
     return clamp((p.growMs / total) * 100, 0, 100);
   }
 
+  // Riego: repone agua. El exceso encharca (riesgo de hongos), no acelera.
   function regar(id) {
     const s = G();
     const p = (s.garden || []).find(x => x.id === id);
-    if (!p || p.ready) return false;
-    p.growMs += 9000; // riego: acelera el cultivo
-    p.stage = stageOf(p.growMs);
-    if (p.growMs >= STAGE_TIMES[FINAL]) { p.ready = true; p.stage = FINAL; }
+    if (!p) return false;
+    p.water = WATER_FULL;
     return true;
+  }
+
+  // Tratamiento biológico limpio (Fase 3): poda sanitaria + ventilación.
+  // Cura el moho sin químicos agresivos; baja la humedad de la maceta y
+  // deja algo de estrés (leve pérdida de salud) por la poda.
+  function treat(id) {
+    const s = G();
+    const p = (s.garden || []).find(x => x.id === id);
+    if (!p) return { ok: false };
+    if (!p.diseased) return { ok: false, msg: 'La planta no necesita tratamiento.' };
+    p.diseased = false;
+    p.water = clamp(p.water - 22, 0, WATER_MAX); // ventilar seca el sustrato
+    p.health = clamp(p.health - 6, 0, HEALTH_MAX); // la poda estresa un poco
+    p.moldResist = clamp(p.moldResist + 0.08, 0.35, 1.8); // sanidad reforzada
+    return { ok: true, msg: `Trataste ${p.name}: poda sanitaria y ventilación. Moho eliminado.` };
   }
 
   function harvest(id) {
@@ -2661,28 +2795,33 @@ html, body {
     if (!p.ready) return { ok: false, msg: 'Aún no está lista para cosechar.' };
     s.garden.splice(i, 1);
 
-    // Rendimiento: nº de clones propagados según producción y ploidía
+    // Factor de salud: una planta descuidada rinde menos y de peor calidad.
+    const hf = clamp((p.health != null ? p.health : 100) / 100, 0.25, 1);
+
+    // Rendimiento: nº de clones propagados según producción, ploidía y salud
     const ploid = p.pheno.ploidy || 2;
-    let clones = 1 + Math.floor((p.pheno.quant.produccion || 50) / 30) + (ploid > 2 ? 1 : 0);
+    let clones = 1 + Math.floor(((p.pheno.quant.produccion || 50) * hf) / 30) + (ploid > 2 ? 1 : 0);
     if (p.pheno.mutations.includes('gigantismo')) clones += 1;
+    if (hf < 0.4) clones = Math.min(clones, 1);
     clones = clamp(clones, 1, 6);
 
     const made = [];
     for (let k = 0; k < clones; k++) {
       const spec = PH.species.makeSpecimen(PH.species.SPECIES_BY_ID[p.speciesId], s.env, {
         genotype: JSON.parse(JSON.stringify(p.genotype)),
-        form: 'clon', quality: clamp((p.quality || 80) + RNG.i(-3, 5), 5, 100),
+        form: 'clon', quality: clamp(Math.round((p.quality || 80) * (0.6 + hf * 0.4)) + RNG.i(-3, 5), 5, 100),
         generation: p.generation, caughtAt: { biome: 'invernadero', weather: '-', time: PH.state.timeLabel(s.env) },
       });
       PH.state.bankAdd(spec);
       made.push(spec);
     }
-    // Crédito por cosecha según resina/producción/rareza
-    const credits = Math.round(40 + (p.pheno.quant.resina || 40) * 1.4 + (p.pheno.quant.produccion || 40) * 1.2 + p.rarity * 3);
+    // Crédito por cosecha según resina/producción/rareza, modulado por salud
+    const credits = Math.round((40 + (p.pheno.quant.resina || 40) * 1.4 + (p.pheno.quant.produccion || 40) * 1.2 + p.rarity * 3) * (0.5 + hf * 0.5));
     PH.state.addCredits(credits);
     s.stats.harvests = (s.stats.harvests || 0) + 1;
+    if (hf >= 0.9) s.stats.perfectHarvests = (s.stats.perfectHarvests || 0) + 1;
     PH.state.addPrestige(2);
-    return { ok: true, clones: made, credits, name: p.name };
+    return { ok: true, clones: made, credits, name: p.name, health: Math.round(hf * 100) };
   }
 
   function compost(id) {
@@ -2691,7 +2830,10 @@ html, body {
     if (i >= 0) s.garden.splice(i, 1);
   }
 
-  PH.garden = { STAGE_TIMES, capacity, update, plantFromBank, spriteKey, spriteUri, progressPct, regar, harvest, compost, stageOf };
+  PH.garden = {
+    STAGE_TIMES, capacity, update, plantFromBank, spriteKey, spriteUri, progressPct,
+    regar, treat, harvest, compost, stageOf, statusOf, waterPct, healthPct,
+  };
 })(window.PH = window.PH || {});
 
 /* ==== src/encounter.js ==== */
@@ -2815,6 +2957,7 @@ html, body {
         ${evPill}
       </div>
       <div class="hud-right">
+        ${PH.heat && PH.heat.level() > 0 ? `<span class="pill heat">🚨 ${'★'.repeat(PH.heat.level())}</span>` : ''}
         <span class="pill">🏅 ${s.player.prestige}</span>
         <span class="pill">💰 ${fmt(s.player.credits)}</span>
         <span class="pill">🌿 ${Object.keys(s.catalog).length}</span>
@@ -3235,13 +3378,14 @@ html, body {
       <div class="panel wide">
         <div class="panel-head"><h2>🌿 Invernadero <small>${s.garden.length}/${cap} parcelas</small></h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
-          <p class="dim">Planta clones o semillas y obsérvalos crecer por fases. Al cosechar propagas la genética (clones idénticos) y obtienes créditos. La velocidad acelera el cultivo; riega para adelantarlo.</p>
+          <p class="dim">Planta clones o semillas y obsérvalos crecer por fases. Riega cuando tengan sed: sin agua se estresan y frenan. El riego excesivo y la humedad ambiental favorecen el moho — trátalo con poda sanitaria y ventilación (bio, sin químicos). Una planta sana rinde más al cosechar.</p>
           <div class="garden-grid">${plots.join('')}</div>
         </div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = () => { plantPicker = false; close(); };
     overlay.querySelectorAll('[data-add]').forEach(b => b.onclick = plantPickerView);
-    overlay.querySelectorAll('[data-water]').forEach(b => b.onclick = () => { PH.garden.regar(b.dataset.water); greenhouse(); });
+    overlay.querySelectorAll('[data-water]').forEach(b => b.onclick = () => { PH.garden.regar(b.dataset.water); if (PH.audio) PH.audio.sfx('blip'); greenhouse(); });
+    overlay.querySelectorAll('[data-treat]').forEach(b => b.onclick = () => { const r = PH.garden.treat(b.dataset.treat); if (r.msg) toast(r.msg, r.ok ? 'ok' : 'bad'); if (r.ok && PH.audio) PH.audio.sfx('confirm'); greenhouse(); });
     overlay.querySelectorAll('[data-harv]').forEach(b => b.onclick = () => doHarvest(b.dataset.harv));
     overlay.querySelectorAll('[data-comp]').forEach(b => b.onclick = () => { if (confirm('¿Compostar esta planta? Se pierde.')) { PH.garden.compost(b.dataset.comp); greenhouse(); } });
   }
@@ -3253,15 +3397,25 @@ html, body {
     const pct = PH.garden.progressPct(p);
     const t = PH.gen.rarityTier(p.rarity);
     const pal = PH.gen.paletteFor(p.pheno);
-    return `<div class="plot ${p.ready ? 'ready' : ''}">
-      <div class="plot-sprite"><img src="${uri}" alt=""><span class="phdot" style="background:${pal.base}"></span></div>
+    const st = PH.garden.statusOf(p);
+    const wp = PH.garden.waterPct(p), hp = PH.garden.healthPct(p);
+    const wtone = wp < 22 ? 'bad' : (wp > 88 ? 'warn' : 'ok');
+    return `<div class="plot ${p.ready ? 'ready' : ''} ${p.diseased ? 'sick' : ''}">
+      <div class="plot-sprite"><img src="${uri}" alt=""><span class="phdot" style="background:${pal.base}"></span>
+        <span class="plot-badge ${st.tone}">${st.label}</span></div>
       <div class="plot-name">${p.name}</div>
       <div class="plot-stage" style="color:${t.color}">${p.ready ? '✅ Lista' : label}</div>
-      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="bar grow"><i style="width:${pct}%"></i></div>
+      <div class="vitals">
+        <span class="vit water ${wtone}" title="Agua ${Math.round(wp)}%">💧<b><i style="width:${wp}%"></i></b></span>
+        <span class="vit health ${hp < 45 ? 'bad' : 'ok'}" title="Salud ${Math.round(hp)}%">❤️<b><i style="width:${hp}%"></i></b></span>
+      </div>
       <div class="plot-actions">
         ${p.ready
           ? `<button class="btn small primary" data-harv="${p.id}">Cosechar</button>`
-          : `<button class="btn small" data-water="${p.id}">💧 Regar</button>`}
+          : (p.diseased
+            ? `<button class="btn small warn" data-treat="${p.id}">🌿 Tratar</button>`
+            : `<button class="btn small" data-water="${p.id}">💧 Regar</button>`)}
         <button class="btn small ghost" data-comp="${p.id}">🗑</button>
       </div>
     </div>`;
@@ -3297,7 +3451,7 @@ html, body {
   function doHarvest(id) {
     const res = PH.garden.harvest(id);
     if (!res.ok) { toast(res.msg || 'No se pudo cosechar.', 'bad'); return; }
-    if (PH.audio) PH.audio.sfx('harvest'); toast(`🌾 Cosechaste ${res.name}: ${res.clones.length} clones + 💰${res.credits}`, 'ok');
+    if (PH.audio) PH.audio.sfx('harvest'); toast(`🌾 Cosechaste ${res.name} (salud ${res.health}%): ${res.clones.length} clones + 💰${res.credits}`, 'ok');
     updateHUD();
     PH.game.afterQuestCheck();
     greenhouse();
@@ -3609,6 +3763,50 @@ html, body {
   PH.audio = { ensure, sfx, tone, noise, musicStart, musicStop, setMuted, toggleMute, isMuted };
 })(window.PH = window.PH || {});
 
+/* ==== src/heat.js ==== */
+/* ============================================================
+   STRAINMON — heat.js
+   FASE 4 — presión policial ("heat", estilo GTA-lite). Trapichear en
+   la calle sube el nivel de búsqueda (0..5 estrellas). Con suficiente
+   heat aparecen patrullas que te persiguen por la calle; si te pillan,
+   pagas una multa y te confiscan género. El heat se enfría solo con el
+   tiempo, y basta con meterte en un interior para despistar a la poli.
+   Estado en s.player.heat para persistir en el guardado.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  const { clamp } = PH.util;
+  const G = () => PH.state.get();
+
+  const MAX = 100;
+  const DECAY = 100 / 90000;   // se enfría por completo en ~90 s reales
+  const COP_THRESHOLD = 55;    // a partir de aquí patrullan
+  let lastLevel = 0;
+
+  function heat() { const p = G().player; if (p.heat == null) p.heat = 0; return p.heat; }
+  function set(v) { G().player.heat = clamp(v, 0, MAX); }
+  function level() { return clamp(Math.floor(heat() / 20), 0, 5); } // 0..5 estrellas
+  function copsActive() { return heat() >= COP_THRESHOLD; }
+
+  function add(n) {
+    const before = level();
+    set(heat() + n);
+    const lv = level();
+    if (lv > before && PH.ui && PH.ui.toast) {
+      PH.ui.toast(`🚨 Nivel de búsqueda ${'★'.repeat(lv)} — baja el perfil.`, 'warn');
+      if (PH.audio) PH.audio.sfx('error');
+    }
+    lastLevel = lv;
+  }
+  function cool(n) { set(heat() - n); lastLevel = level(); }
+
+  function update(dt) {
+    if (heat() > 0) { set(heat() - dt * DECAY); lastLevel = level(); }
+  }
+
+  PH.heat = { MAX, COP_THRESHOLD, heat, add, cool, set, level, copsActive, update };
+})(window.PH = window.PH || {});
+
 /* ==== src/iso.js ==== */
 /* ============================================================
    STRAINMON — iso.js
@@ -3823,13 +4021,14 @@ html, body {
         '.....P.......',
         '.gg.........',
         '.gg......gg..',
-        '.............',
+        '......D......',
       ],
       spawn: { gx: 6, gy: 3 },
       doors: [
         { gx: 2, gy: 2, to: 'apt', tgx: 4, tgy: 5 },
         { gx: 6, gy: 2, to: 'shop', tgx: 3, tgy: 3 },
         { gx: 10, gy: 2, to: 'lab', tgx: 3, tgy: 3 },
+        { gx: 6, gy: 7, to: 'park', tgx: 5, tgy: 6 },
       ],
       npcs: [
         { gx: 6, gy: 5, name: 'Dealer Kez', sprite: 'npc6', dialog: 'contrabandista', dir: 'SW', role: 'dealer', char: 'dealer' },
@@ -3874,6 +4073,27 @@ html, body {
         { gx: 5, gy: 2, kind: 'pc', solid: true, label: 'Terminal ADN' },
       ],
     },
+    park: {
+      id: 'park', name: 'Descampado', theme: 'street',
+      grid: [
+        '###########',
+        '#.........#',
+        '#.gg...gg.#',
+        '#.gg...gg.#',
+        '#.........#',
+        '#..gg.gg..#',
+        '#..gg.gg..#',
+        '#....D....#',
+        '###########',
+      ],
+      spawn: { gx: 5, gy: 6 },
+      doors: [{ gx: 5, gy: 7, to: 'street', tgx: 6, tgy: 6 }],
+      npcs: [
+        { gx: 8, gy: 1, name: 'Rasta Dodo', sprite: 'npc6', dialog: 'descampado', dir: 'SW', role: 'neighbor', char: 'dealer' },
+      ],
+      objects: [],
+      wild: true, // maleza 'g' = cepas silvestres del descampado
+    },
   };
   // Lista BLANCA de tiles caminables. Todo lo demás bloquea (paredes '#',
   // vacío ' ', fachadas 'H', farolas 'P', dígitos, o cualquier char extraño).
@@ -3888,7 +4108,21 @@ html, body {
   }
   function objAt(m, gx, gy) { return (m.objects || []).find(o => o.gx === gx && o.gy === gy); }
   function doorAt(m, gx, gy) { return (m.doors || []).find(d => d.gx === gx && d.gy === gy); }
-  function npcAt(m, gx, gy) { return (m.npcs || []).find(n => n.gx === gx && n.gy === gy); }
+  function npcAt(m, gx, gy) { return (m.npcs || []).find(n => n.gx === gx && n.gy === gy && !n._inactive); }
+  // Horario de cada rol (Fase 4): la ciudad cobra vida según la hora.
+  function hourNow() { return G().env.time / 60; }
+  function npcActive(n) {
+    const h = hourNow();
+    switch (n.role) {
+      case 'dealer': return h >= 18 || h < 4;      // el camello trapichea de noche
+      case 'walker': return h >= 7 && h < 21;
+      case 'customer': return h >= 9 && h < 23;
+      case 'merchant': return h >= 8 && h < 20;
+      case 'botanist': return h >= 8 && h < 22;
+      case 'neighbor': return true;                 // la vecina siempre ronda
+      default: return true;
+    }
+  }
   // Bloqueado si el tile no es caminable, o hay objeto sólido, o hay un NPC.
   // (ignoreNpc: al comprobar puertas no cuenta el NPC de destino.)
   function solidAt(m, gx, gy, ignoreNpc) {
@@ -3927,7 +4161,7 @@ html, body {
     W: 480, H: 432,                 // 10:9 (proporción fiel a la Game Boy 160x144)
     dmg: false, _dmg: null,          // modo DMG (4 tonos, 160x144)
     moving: false, from: null, to: null, moveT: 0, moveDur: 170, frame: 0, animT: 0,
-    keys: {}, lastSave: 0, cam: { x: 0, y: 0 },
+    keys: {}, lastSave: 0, cam: { x: 0, y: 0 }, cop: null,
   };
   PH.game = game;
 
@@ -4095,6 +4329,8 @@ html, body {
     document.getElementById('d_yes').onclick = () => {
       PH.state.bankRemove(want.uid); PH.state.addCredits(price);
       s.stats.deals = (s.stats.deals || 0) + 1; if (PH.audio) PH.audio.sfx('cash');
+      // trapicheo en la calle -> sube el nivel de búsqueda (más si es de día)
+      if (PH.heat) PH.heat.add(G().env.night ? 12 : 20);
       PH.ui.toast(`Vendido a ${npc.name}: 💰${price}`, 'ok');
       PH.ui.updateHUD(); PH.game.afterQuestCheck(); PH.ui.close();
     };
@@ -4134,7 +4370,9 @@ html, body {
   function warp(d) {
     const p = G().player; const t = room(d.to); if (!t) return;
     A('warp');
+    const hadCop = !!game.cop;
     p.map = d.to; p.x = d.tgx; p.y = d.tgy; game.moving = false;
+    if (hadCop && t.id !== 'street') { game.cop = null; PH.ui.toast('🚪 Despistaste a la patrulla.', 'ok'); }
     centerCam(true); PH.ui.updateHUD(); PH.ui.toast('📍 ' + t.name, '');
   }
 
@@ -4152,6 +4390,10 @@ html, body {
   function updateNPCs(dt) {
     const m = room(G().player.map); if (!m) return;
     for (const n of m.npcs) {
+      // horario: fuera de su ventana, el NPC "se retira" (no colisiona ni se dibuja)
+      const on = npcActive(n);
+      if (!on) { n._inactive = true; n._mv = false; continue; }
+      n._inactive = false;
       if (n._talk) continue;                                 // pausado al hablar
       if (n._mv) {
         n._t += dt;
@@ -4178,6 +4420,95 @@ html, body {
     let gx = n.gx, gy = n.gy, frame = 0;
     if (n._mv) { const t = clamp(n._t / NPC_STEP, 0, 1); gx = lerp(n._fx, n._tx, t); gy = lerp(n._fy, n._ty, t); frame = (Math.floor(n._t / (NPC_STEP / 2)) % 2 === 0 ? 1 : 2); }
     return { gx, gy, dir: n.dir || 'SW', frame, pal: PH.render.NPC_PALETTES[n.sprite], char: n.char };
+  }
+
+  /* ------------------------- POLICÍA / HEAT (Fase 4) ------------------------- */
+  // Con nivel de búsqueda alto aparece una patrulla en la calle que te
+  // persigue. Si te alcanza: multa + confiscación. Métete en un interior
+  // para despistarla (no entra a las salas). Paleta azul, sprite reutilizado.
+  const COP_STEP = 210, COP_PAL = { skin: '#e8c49a', hair: '#1a2740', shirt: '#26407a', pants: '#182238' };
+  function copRender(c) {
+    let gx = c.gx, gy = c.gy, frame = 0;
+    if (c._mv) { const t = clamp(c._t / COP_STEP, 0, 1); gx = lerp(c._fx, c._tx, t); gy = lerp(c._fy, c._ty, t); frame = (Math.floor(c._t / (COP_STEP / 2)) % 2 === 0 ? 1 : 2); }
+    return { gx, gy, dir: c.dir || 'SW', frame, pal: COP_PAL, char: 'walker' };
+  }
+  function copSpawnPoint(m) {
+    // aparece por un borde caminable de la calle, lejos del jugador
+    const p = G().player, cand = [];
+    for (let gy = 0; gy < m.grid.length; gy++) for (let gx = 0; gx < m.grid[gy].length; gx++) {
+      if (!walkableChar(tileAt(m, gx, gy))) continue;
+      if (doorAt(m, gx, gy)) continue;
+      const d = Math.abs(gx - p.x) + Math.abs(gy - p.y);
+      if (d >= 5) cand.push({ gx, gy, d });
+    }
+    if (!cand.length) return null;
+    cand.sort((a, b) => b.d - a.d);
+    return cand[Math.min(cand.length - 1, PH.util.RNG.i(0, Math.min(3, cand.length - 1)))];
+  }
+  function copBlocked(m, gx, gy) {
+    if (!walkableChar(tileAt(m, gx, gy))) return true;
+    const o = objAt(m, gx, gy); if (o && o.solid !== false) return true;
+    for (const n of m.npcs) if (!n._inactive && n.gx === gx && n.gy === gy) return true;
+    return false;
+  }
+  function updateCop(dt) {
+    const p = G().player, m = room(p.map);
+    const active = PH.heat && PH.heat.copsActive() && m && m.id === 'street';
+    if (!active) {
+      // sin heat o fuera de la calle -> la patrulla se marcha (despiste)
+      if (game.cop) { if (game.cop.map !== p.map && PH.heat && PH.heat.heat() > 0) { /* despistado */ }
+        game.cop = null; }
+      return;
+    }
+    if (!game.cop || game.cop.map !== 'street') {
+      const sp = copSpawnPoint(m); if (!sp) return;
+      game.cop = { map: 'street', gx: sp.gx, gy: sp.gy, dir: 'SW', _mv: false, _wait: 300 };
+      PH.ui.toast('🚔 ¡Patrulla en la calle! Piérdete en un interior.', 'bad');
+      if (PH.audio) PH.audio.sfx('encounter');
+    }
+    const c = game.cop;
+    // ¿alcanzado? adyacencia manhattan 1 (o misma casilla)
+    const md = Math.abs(c.gx - p.x) + Math.abs(c.gy - p.y);
+    if (!c._mv && md <= 1) { bust(); return; }
+    if (c._mv) {
+      c._t += dt;
+      if (c._t >= COP_STEP) { c.gx = c._tx; c.gy = c._ty; c._mv = false; c._wait = 40; }
+      return;
+    }
+    c._wait = (c._wait == null ? 0 : c._wait - dt);
+    if (c._wait > 0) return;
+    // persecución voraz: elige el eje que más acerca al jugador
+    const opts = [];
+    if (p.x !== c.gx) opts.push(p.x > c.gx ? ['SE', 1, 0] : ['NW', -1, 0]);
+    if (p.y !== c.gy) opts.push(p.y > c.gy ? ['SW', 0, 1] : ['NE', 0, -1]);
+    // prioriza el eje de mayor distancia
+    opts.sort((a, b) => Math.abs((a[1] ? p.x - c.gx : p.y - c.gy)) < Math.abs((b[1] ? p.x - c.gx : p.y - c.gy)) ? 1 : -1);
+    for (const d of opts) {
+      const nx = c.gx + d[1], ny = c.gy + d[2];
+      if (nx === p.x && ny === p.y) { bust(); return; }
+      if (copBlocked(m, nx, ny)) continue;
+      c.dir = d[0]; c._fx = c.gx; c._fy = c.gy; c._tx = nx; c._ty = ny; c._mv = true; c._t = 0; return;
+    }
+    c._wait = 160; // bloqueado: espera un pelín
+  }
+  function bust() {
+    const s = G(), c = game.cop; game.cop = null;
+    if (PH.audio) PH.audio.sfx('error');
+    // multa proporcional + confiscación de la muestra menos valiosa
+    const fine = Math.min(s.player.credits, Math.max(40, Math.round(s.player.credits * 0.3)));
+    PH.state.addCredits(-fine);
+    let seized = null;
+    const stock = s.bank.filter(x => x.form !== 'polen');
+    if (stock.length) {
+      seized = stock.slice().sort((a, b) => a.rarity - b.rarity)[0];
+      PH.state.bankRemove(seized.uid);
+    }
+    s.player.busts = (s.player.busts || 0) + 1;
+    if (PH.heat) PH.heat.set(18); // te sueltan con un aviso; el heat baja
+    const msg = seized ? `🚨 ¡Te pillaron! Multa 💰${fine} y confiscan ${seized.nickname || seized.name}.`
+      : `🚨 ¡Te pillaron! Multa 💰${fine}.`;
+    PH.ui.toast(msg, 'bad');
+    PH.ui.updateHUD();
   }
 
   game.roomName = function () { const m = room(G().player.map); return m ? m.name : ''; };
@@ -4211,11 +4542,13 @@ html, body {
     if (game.animT > 240) { game.frame ^= 1; game.animT = 0; }
     if (game.mode === 'overworld' || game.mode === 'menu' || game.mode === 'dialog' || game.mode === 'encounter') {
       PH.state.updateEnv(dt); if (PH.events) PH.events.update(dt); if (PH.garden) PH.garden.update(dt);
+      if (PH.heat) PH.heat.update(dt);
     }
     if (game.mode === 'overworld') {
       tryMove();
       if (game.moving) { game.moveT += dt; if (game.moveT >= game.moveDur) finishMove(); }
       updateNPCs(dt);
+      updateCop(dt);
       centerCam(false);
       if (now - game.lastSave > 20000) { PH.state.save(); game.lastSave = now; }
     }
@@ -4246,7 +4579,8 @@ html, body {
     const px = pss.x, py = pss.y;
     // actores
     const actors = [];
-    for (const n of (m.npcs || [])) actors.push(npcRender(n));
+    for (const n of (m.npcs || [])) { if (n._inactive) continue; actors.push(npcRender(n)); }
+    if (game.cop && game.cop.map === p.map) actors.push(copRender(game.cop));
     // jugador con posición interpolada -> insertamos como actor con coords fraccionarias
     let pgx = p.x, pgy = p.y;
     if (game.moving) { const t = clamp(game.moveT / game.moveDur, 0, 1); pgx = lerp(game.from.x, game.to.x, t); pgy = lerp(game.from.y, game.to.y, t); }

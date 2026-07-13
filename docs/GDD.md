@@ -71,7 +71,7 @@
 | Genética diploide / cruces / ADN / Strain-dex | ✅ |
 | Cultivo 5 fases (maceta constante) + arte 18 cepas | ✅ |
 | Ambiente (día/noche, clima, eventos) | ✅ |
-| **Fase 2:** mobiliario iso + tiles iso | 🔄 en curso |
-| Fase 3: estrés de cultivo (riego/moho) | 🔜 |
-| Fase 4: rutinas por horario + heat/cops | 🔜 |
-| Fase 5: ciudad grande, regiones, salas decorables, misiones | 🔜 |
+| **Fase 2:** mobiliario iso + tiles iso | ✅ |
+| Fase 3: estrés de cultivo (riego/salud/moho + tratamiento bio) | ✅ |
+| Fase 4: rutinas por horario + heat/cops (persecución/multa) | ✅ |
+| Fase 5: nueva región (Descampado) + misiones estructuradas | ✅ (base) |

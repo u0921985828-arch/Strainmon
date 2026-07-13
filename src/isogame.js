@@ -49,13 +49,14 @@
         '.....P.......',
         '.gg.........',
         '.gg......gg..',
-        '.............',
+        '......D......',
       ],
       spawn: { gx: 6, gy: 3 },
       doors: [
         { gx: 2, gy: 2, to: 'apt', tgx: 4, tgy: 5 },
         { gx: 6, gy: 2, to: 'shop', tgx: 3, tgy: 3 },
         { gx: 10, gy: 2, to: 'lab', tgx: 3, tgy: 3 },
+        { gx: 6, gy: 7, to: 'park', tgx: 5, tgy: 6 },
       ],
       npcs: [
         { gx: 6, gy: 5, name: 'Dealer Kez', sprite: 'npc6', dialog: 'contrabandista', dir: 'SW', role: 'dealer', char: 'dealer' },
@@ -100,6 +101,27 @@
         { gx: 5, gy: 2, kind: 'pc', solid: true, label: 'Terminal ADN' },
       ],
     },
+    park: {
+      id: 'park', name: 'Descampado', theme: 'street',
+      grid: [
+        '###########',
+        '#.........#',
+        '#.gg...gg.#',
+        '#.gg...gg.#',
+        '#.........#',
+        '#..gg.gg..#',
+        '#..gg.gg..#',
+        '#....D....#',
+        '###########',
+      ],
+      spawn: { gx: 5, gy: 6 },
+      doors: [{ gx: 5, gy: 7, to: 'street', tgx: 6, tgy: 6 }],
+      npcs: [
+        { gx: 8, gy: 1, name: 'Rasta Dodo', sprite: 'npc6', dialog: 'descampado', dir: 'SW', role: 'neighbor', char: 'dealer' },
+      ],
+      objects: [],
+      wild: true, // maleza 'g' = cepas silvestres del descampado
+    },
   };
   // Lista BLANCA de tiles caminables. Todo lo demás bloquea (paredes '#',
   // vacío ' ', fachadas 'H', farolas 'P', dígitos, o cualquier char extraño).
@@ -114,7 +136,21 @@
   }
   function objAt(m, gx, gy) { return (m.objects || []).find(o => o.gx === gx && o.gy === gy); }
   function doorAt(m, gx, gy) { return (m.doors || []).find(d => d.gx === gx && d.gy === gy); }
-  function npcAt(m, gx, gy) { return (m.npcs || []).find(n => n.gx === gx && n.gy === gy); }
+  function npcAt(m, gx, gy) { return (m.npcs || []).find(n => n.gx === gx && n.gy === gy && !n._inactive); }
+  // Horario de cada rol (Fase 4): la ciudad cobra vida según la hora.
+  function hourNow() { return G().env.time / 60; }
+  function npcActive(n) {
+    const h = hourNow();
+    switch (n.role) {
+      case 'dealer': return h >= 18 || h < 4;      // el camello trapichea de noche
+      case 'walker': return h >= 7 && h < 21;
+      case 'customer': return h >= 9 && h < 23;
+      case 'merchant': return h >= 8 && h < 20;
+      case 'botanist': return h >= 8 && h < 22;
+      case 'neighbor': return true;                 // la vecina siempre ronda
+      default: return true;
+    }
+  }
   // Bloqueado si el tile no es caminable, o hay objeto sólido, o hay un NPC.
   // (ignoreNpc: al comprobar puertas no cuenta el NPC de destino.)
   function solidAt(m, gx, gy, ignoreNpc) {
@@ -153,7 +189,7 @@
     W: 480, H: 432,                 // 10:9 (proporción fiel a la Game Boy 160x144)
     dmg: false, _dmg: null,          // modo DMG (4 tonos, 160x144)
     moving: false, from: null, to: null, moveT: 0, moveDur: 170, frame: 0, animT: 0,
-    keys: {}, lastSave: 0, cam: { x: 0, y: 0 },
+    keys: {}, lastSave: 0, cam: { x: 0, y: 0 }, cop: null,
   };
   PH.game = game;
 
@@ -321,6 +357,8 @@
     document.getElementById('d_yes').onclick = () => {
       PH.state.bankRemove(want.uid); PH.state.addCredits(price);
       s.stats.deals = (s.stats.deals || 0) + 1; if (PH.audio) PH.audio.sfx('cash');
+      // trapicheo en la calle -> sube el nivel de búsqueda (más si es de día)
+      if (PH.heat) PH.heat.add(G().env.night ? 12 : 20);
       PH.ui.toast(`Vendido a ${npc.name}: 💰${price}`, 'ok');
       PH.ui.updateHUD(); PH.game.afterQuestCheck(); PH.ui.close();
     };
@@ -360,7 +398,9 @@
   function warp(d) {
     const p = G().player; const t = room(d.to); if (!t) return;
     A('warp');
+    const hadCop = !!game.cop;
     p.map = d.to; p.x = d.tgx; p.y = d.tgy; game.moving = false;
+    if (hadCop && t.id !== 'street') { game.cop = null; PH.ui.toast('🚪 Despistaste a la patrulla.', 'ok'); }
     centerCam(true); PH.ui.updateHUD(); PH.ui.toast('📍 ' + t.name, '');
   }
 
@@ -378,6 +418,10 @@
   function updateNPCs(dt) {
     const m = room(G().player.map); if (!m) return;
     for (const n of m.npcs) {
+      // horario: fuera de su ventana, el NPC "se retira" (no colisiona ni se dibuja)
+      const on = npcActive(n);
+      if (!on) { n._inactive = true; n._mv = false; continue; }
+      n._inactive = false;
       if (n._talk) continue;                                 // pausado al hablar
       if (n._mv) {
         n._t += dt;
@@ -404,6 +448,95 @@
     let gx = n.gx, gy = n.gy, frame = 0;
     if (n._mv) { const t = clamp(n._t / NPC_STEP, 0, 1); gx = lerp(n._fx, n._tx, t); gy = lerp(n._fy, n._ty, t); frame = (Math.floor(n._t / (NPC_STEP / 2)) % 2 === 0 ? 1 : 2); }
     return { gx, gy, dir: n.dir || 'SW', frame, pal: PH.render.NPC_PALETTES[n.sprite], char: n.char };
+  }
+
+  /* ------------------------- POLICÍA / HEAT (Fase 4) ------------------------- */
+  // Con nivel de búsqueda alto aparece una patrulla en la calle que te
+  // persigue. Si te alcanza: multa + confiscación. Métete en un interior
+  // para despistarla (no entra a las salas). Paleta azul, sprite reutilizado.
+  const COP_STEP = 210, COP_PAL = { skin: '#e8c49a', hair: '#1a2740', shirt: '#26407a', pants: '#182238' };
+  function copRender(c) {
+    let gx = c.gx, gy = c.gy, frame = 0;
+    if (c._mv) { const t = clamp(c._t / COP_STEP, 0, 1); gx = lerp(c._fx, c._tx, t); gy = lerp(c._fy, c._ty, t); frame = (Math.floor(c._t / (COP_STEP / 2)) % 2 === 0 ? 1 : 2); }
+    return { gx, gy, dir: c.dir || 'SW', frame, pal: COP_PAL, char: 'walker' };
+  }
+  function copSpawnPoint(m) {
+    // aparece por un borde caminable de la calle, lejos del jugador
+    const p = G().player, cand = [];
+    for (let gy = 0; gy < m.grid.length; gy++) for (let gx = 0; gx < m.grid[gy].length; gx++) {
+      if (!walkableChar(tileAt(m, gx, gy))) continue;
+      if (doorAt(m, gx, gy)) continue;
+      const d = Math.abs(gx - p.x) + Math.abs(gy - p.y);
+      if (d >= 5) cand.push({ gx, gy, d });
+    }
+    if (!cand.length) return null;
+    cand.sort((a, b) => b.d - a.d);
+    return cand[Math.min(cand.length - 1, PH.util.RNG.i(0, Math.min(3, cand.length - 1)))];
+  }
+  function copBlocked(m, gx, gy) {
+    if (!walkableChar(tileAt(m, gx, gy))) return true;
+    const o = objAt(m, gx, gy); if (o && o.solid !== false) return true;
+    for (const n of m.npcs) if (!n._inactive && n.gx === gx && n.gy === gy) return true;
+    return false;
+  }
+  function updateCop(dt) {
+    const p = G().player, m = room(p.map);
+    const active = PH.heat && PH.heat.copsActive() && m && m.id === 'street';
+    if (!active) {
+      // sin heat o fuera de la calle -> la patrulla se marcha (despiste)
+      if (game.cop) { if (game.cop.map !== p.map && PH.heat && PH.heat.heat() > 0) { /* despistado */ }
+        game.cop = null; }
+      return;
+    }
+    if (!game.cop || game.cop.map !== 'street') {
+      const sp = copSpawnPoint(m); if (!sp) return;
+      game.cop = { map: 'street', gx: sp.gx, gy: sp.gy, dir: 'SW', _mv: false, _wait: 300 };
+      PH.ui.toast('🚔 ¡Patrulla en la calle! Piérdete en un interior.', 'bad');
+      if (PH.audio) PH.audio.sfx('encounter');
+    }
+    const c = game.cop;
+    // ¿alcanzado? adyacencia manhattan 1 (o misma casilla)
+    const md = Math.abs(c.gx - p.x) + Math.abs(c.gy - p.y);
+    if (!c._mv && md <= 1) { bust(); return; }
+    if (c._mv) {
+      c._t += dt;
+      if (c._t >= COP_STEP) { c.gx = c._tx; c.gy = c._ty; c._mv = false; c._wait = 40; }
+      return;
+    }
+    c._wait = (c._wait == null ? 0 : c._wait - dt);
+    if (c._wait > 0) return;
+    // persecución voraz: elige el eje que más acerca al jugador
+    const opts = [];
+    if (p.x !== c.gx) opts.push(p.x > c.gx ? ['SE', 1, 0] : ['NW', -1, 0]);
+    if (p.y !== c.gy) opts.push(p.y > c.gy ? ['SW', 0, 1] : ['NE', 0, -1]);
+    // prioriza el eje de mayor distancia
+    opts.sort((a, b) => Math.abs((a[1] ? p.x - c.gx : p.y - c.gy)) < Math.abs((b[1] ? p.x - c.gx : p.y - c.gy)) ? 1 : -1);
+    for (const d of opts) {
+      const nx = c.gx + d[1], ny = c.gy + d[2];
+      if (nx === p.x && ny === p.y) { bust(); return; }
+      if (copBlocked(m, nx, ny)) continue;
+      c.dir = d[0]; c._fx = c.gx; c._fy = c.gy; c._tx = nx; c._ty = ny; c._mv = true; c._t = 0; return;
+    }
+    c._wait = 160; // bloqueado: espera un pelín
+  }
+  function bust() {
+    const s = G(), c = game.cop; game.cop = null;
+    if (PH.audio) PH.audio.sfx('error');
+    // multa proporcional + confiscación de la muestra menos valiosa
+    const fine = Math.min(s.player.credits, Math.max(40, Math.round(s.player.credits * 0.3)));
+    PH.state.addCredits(-fine);
+    let seized = null;
+    const stock = s.bank.filter(x => x.form !== 'polen');
+    if (stock.length) {
+      seized = stock.slice().sort((a, b) => a.rarity - b.rarity)[0];
+      PH.state.bankRemove(seized.uid);
+    }
+    s.player.busts = (s.player.busts || 0) + 1;
+    if (PH.heat) PH.heat.set(18); // te sueltan con un aviso; el heat baja
+    const msg = seized ? `🚨 ¡Te pillaron! Multa 💰${fine} y confiscan ${seized.nickname || seized.name}.`
+      : `🚨 ¡Te pillaron! Multa 💰${fine}.`;
+    PH.ui.toast(msg, 'bad');
+    PH.ui.updateHUD();
   }
 
   game.roomName = function () { const m = room(G().player.map); return m ? m.name : ''; };
@@ -437,11 +570,13 @@
     if (game.animT > 240) { game.frame ^= 1; game.animT = 0; }
     if (game.mode === 'overworld' || game.mode === 'menu' || game.mode === 'dialog' || game.mode === 'encounter') {
       PH.state.updateEnv(dt); if (PH.events) PH.events.update(dt); if (PH.garden) PH.garden.update(dt);
+      if (PH.heat) PH.heat.update(dt);
     }
     if (game.mode === 'overworld') {
       tryMove();
       if (game.moving) { game.moveT += dt; if (game.moveT >= game.moveDur) finishMove(); }
       updateNPCs(dt);
+      updateCop(dt);
       centerCam(false);
       if (now - game.lastSave > 20000) { PH.state.save(); game.lastSave = now; }
     }
@@ -472,7 +607,8 @@
     const px = pss.x, py = pss.y;
     // actores
     const actors = [];
-    for (const n of (m.npcs || [])) actors.push(npcRender(n));
+    for (const n of (m.npcs || [])) { if (n._inactive) continue; actors.push(npcRender(n)); }
+    if (game.cop && game.cop.map === p.map) actors.push(copRender(game.cop));
     // jugador con posición interpolada -> insertamos como actor con coords fraccionarias
     let pgx = p.x, pgy = p.y;
     if (game.moving) { const t = clamp(game.moveT / game.moveDur, 0, 1); pgx = lerp(game.from.x, game.to.x, t); pgy = lerp(game.from.y, game.to.y, t); }

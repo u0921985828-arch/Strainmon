@@ -65,6 +65,18 @@
       reward: { credits: 400, prestige: 7 },
       check: (s) => (s.stats.harvests || 0) >= 1,
     },
+    q_greenthumb: {
+      id: 'q_greenthumb', name: 'Mano verde',
+      desc: 'Cosecha una planta en perfecto estado (salud ≥ 90%): riégala a tiempo y evita el moho.',
+      reward: { credits: 700, prestige: 12, gear: 'medidor' },
+      check: (s) => (s.stats.perfectHarvests || 0) >= 1,
+    },
+    q_hustle: {
+      id: 'q_hustle', name: 'Bajo perfil',
+      desc: 'Cierra 3 tratos callejeros. Vigila el nivel de búsqueda y piérdete en interiores si aprieta la poli.',
+      reward: { credits: 900, prestige: 14 },
+      check: (s) => (s.stats.deals || 0) >= 3,
+    },
     q_master: {
       id: 'q_master', name: 'Maestro Strainmon',
       desc: 'Registra 25 fenotipos en el Strain-dex mundial.',
@@ -160,6 +172,14 @@
       'La Jamaicana Costera tolera la sal; su aroma marino no se da tierra adentro.',
       'El muelle te lleva de vuelta al continente cuando quieras.',
     ],
+    descampado: (s) => {
+      activate('q_greenthumb'); activate('q_hustle');
+      return [
+        'Rasta Dodo: Este descampado es tierra de nadie... y de cultivo libre. Rebusca entre la maleza (parcelas verdes).',
+        'Cuida tus plantas en casa: sin agua se estresan y el exceso de humedad cría moho. Trátalo con poda y ventilación, nada de venenos.',
+        'Y ojo en la calle: cada trapicheo levanta la liebre. Si aparece la patrulla, métete en un portal y desaparece.',
+      ];
+    },
   };
 
   function activate(id) {

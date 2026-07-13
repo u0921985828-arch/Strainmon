@@ -214,12 +214,27 @@ html, body {
 .phdot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 50%; border: 1px solid rgba(0,0,0,.4); }
 .plot-name { font-size: .78rem; font-weight: bold; } .plot-stage { font-size: .7rem; }
 .plot .bar { width: 100%; }
+.plot.sick { border-color: #c8813a; box-shadow: 0 0 0 1px rgba(200,129,58,.5) inset; }
+.plot-badge { position: absolute; top: 4px; left: 4px; font-size: .58rem; font-weight: bold; padding: 1px 5px;
+  border-radius: 6px; background: rgba(0,0,0,.55); color: #cfe8c8; letter-spacing: .3px; }
+.plot-badge.warn { background: rgba(200,150,40,.85); color: #241a05; }
+.plot-badge.bad { background: rgba(200,60,60,.9); color: #fff; }
+.plot-badge.ok { background: rgba(70,150,80,.85); color: #eaffe6; }
+.vitals { display: flex; gap: 6px; width: 100%; }
+.vit { flex: 1; display: flex; align-items: center; gap: 3px; font-size: .62rem; }
+.vit b { flex: 1; display: block; height: 5px; border-radius: 3px; background: #121821; overflow: hidden; }
+.vit b i { display: block; height: 100%; background: #2a7bd0; }
+.vit.health b i { background: #57b85a; }
+.vit.water.warn b i { background: #c89628; } .vit.water.bad b i { background: #c83c3c; }
+.vit.health.bad b i { background: #c83c3c; }
 .plot-actions { display: flex; gap: 4px; }
+.btn.small.warn { background: #7a4e17; border-color: #c8813a; color: #ffe9c4; }
 .hub-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
 .btn.hub { padding: 18px 10px; line-height: 1.5; font-size: .8rem; }
 
 /* --------- Investigación / ADN --------- */
 .pill.event { background: linear-gradient(90deg, #3a2350, #6b3fa0); border-color: #a06bff; color: #f0e0ff; animation: pulse 1.2s infinite; }
+.pill.heat { background: linear-gradient(90deg, #5a1420, #b02436); border-color: #ff5a6a; color: #ffe0e4; animation: pulse 0.8s infinite; }
 .dna { font-family: monospace; font-size: .7rem; letter-spacing: 1px; word-break: break-all; background: #0f1520;
   border: 1px solid var(--line); border-radius: 8px; padding: 10px; color: #7bd66b; line-height: 1.6; }
 .hidden-list { list-style: none; font-size: .76rem; } .hidden-list li { padding: 3px 0; border-bottom: 1px solid var(--line); }

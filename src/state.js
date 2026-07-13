@@ -25,6 +25,8 @@
         activeTool: 'frasco',
         cebosActivos: 0,               // encuentros con feromona
         labLevel: 1,                   // mejora del laboratorio (mutaciones en cruce)
+        heat: 0,                       // presión policial 0..100 (Fase 4)
+        busts: 0,                      // veces pillado por la poli
       },
       bank: [],          // especímenes almacenados
       garden: [],        // plantas creciendo en el invernadero
@@ -32,7 +34,7 @@
       species: {},       // speciesId -> {seen, obtained}
       quests: {},        // questId -> {state:'active'|'done', progress}
       flags: {},         // banderas de historia
-      stats: { discoveries: 0, crosses: 0, mutationsFound: 0, distance: 0, sequenced: 0, harvests: 0 },
+      stats: { discoveries: 0, crosses: 0, mutationsFound: 0, distance: 0, sequenced: 0, harvests: 0, perfectHarvests: 0, deals: 0 },
       env: makeEnv(),
       playtime: 0,
     };

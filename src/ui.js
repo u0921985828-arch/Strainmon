@@ -46,6 +46,7 @@
         ${evPill}
       </div>
       <div class="hud-right">
+        ${PH.heat && PH.heat.level() > 0 ? `<span class="pill heat">🚨 ${'★'.repeat(PH.heat.level())}</span>` : ''}
         <span class="pill">🏅 ${s.player.prestige}</span>
         <span class="pill">💰 ${fmt(s.player.credits)}</span>
         <span class="pill">🌿 ${Object.keys(s.catalog).length}</span>
@@ -466,13 +467,14 @@
       <div class="panel wide">
         <div class="panel-head"><h2>🌿 Invernadero <small>${s.garden.length}/${cap} parcelas</small></h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
-          <p class="dim">Planta clones o semillas y obsérvalos crecer por fases. Al cosechar propagas la genética (clones idénticos) y obtienes créditos. La velocidad acelera el cultivo; riega para adelantarlo.</p>
+          <p class="dim">Planta clones o semillas y obsérvalos crecer por fases. Riega cuando tengan sed: sin agua se estresan y frenan. El riego excesivo y la humedad ambiental favorecen el moho — trátalo con poda sanitaria y ventilación (bio, sin químicos). Una planta sana rinde más al cosechar.</p>
           <div class="garden-grid">${plots.join('')}</div>
         </div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = () => { plantPicker = false; close(); };
     overlay.querySelectorAll('[data-add]').forEach(b => b.onclick = plantPickerView);
-    overlay.querySelectorAll('[data-water]').forEach(b => b.onclick = () => { PH.garden.regar(b.dataset.water); greenhouse(); });
+    overlay.querySelectorAll('[data-water]').forEach(b => b.onclick = () => { PH.garden.regar(b.dataset.water); if (PH.audio) PH.audio.sfx('blip'); greenhouse(); });
+    overlay.querySelectorAll('[data-treat]').forEach(b => b.onclick = () => { const r = PH.garden.treat(b.dataset.treat); if (r.msg) toast(r.msg, r.ok ? 'ok' : 'bad'); if (r.ok && PH.audio) PH.audio.sfx('confirm'); greenhouse(); });
     overlay.querySelectorAll('[data-harv]').forEach(b => b.onclick = () => doHarvest(b.dataset.harv));
     overlay.querySelectorAll('[data-comp]').forEach(b => b.onclick = () => { if (confirm('¿Compostar esta planta? Se pierde.')) { PH.garden.compost(b.dataset.comp); greenhouse(); } });
   }
@@ -484,15 +486,25 @@
     const pct = PH.garden.progressPct(p);
     const t = PH.gen.rarityTier(p.rarity);
     const pal = PH.gen.paletteFor(p.pheno);
-    return `<div class="plot ${p.ready ? 'ready' : ''}">
-      <div class="plot-sprite"><img src="${uri}" alt=""><span class="phdot" style="background:${pal.base}"></span></div>
+    const st = PH.garden.statusOf(p);
+    const wp = PH.garden.waterPct(p), hp = PH.garden.healthPct(p);
+    const wtone = wp < 22 ? 'bad' : (wp > 88 ? 'warn' : 'ok');
+    return `<div class="plot ${p.ready ? 'ready' : ''} ${p.diseased ? 'sick' : ''}">
+      <div class="plot-sprite"><img src="${uri}" alt=""><span class="phdot" style="background:${pal.base}"></span>
+        <span class="plot-badge ${st.tone}">${st.label}</span></div>
       <div class="plot-name">${p.name}</div>
       <div class="plot-stage" style="color:${t.color}">${p.ready ? '✅ Lista' : label}</div>
-      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="bar grow"><i style="width:${pct}%"></i></div>
+      <div class="vitals">
+        <span class="vit water ${wtone}" title="Agua ${Math.round(wp)}%">💧<b><i style="width:${wp}%"></i></b></span>
+        <span class="vit health ${hp < 45 ? 'bad' : 'ok'}" title="Salud ${Math.round(hp)}%">❤️<b><i style="width:${hp}%"></i></b></span>
+      </div>
       <div class="plot-actions">
         ${p.ready
           ? `<button class="btn small primary" data-harv="${p.id}">Cosechar</button>`
-          : `<button class="btn small" data-water="${p.id}">💧 Regar</button>`}
+          : (p.diseased
+            ? `<button class="btn small warn" data-treat="${p.id}">🌿 Tratar</button>`
+            : `<button class="btn small" data-water="${p.id}">💧 Regar</button>`)}
         <button class="btn small ghost" data-comp="${p.id}">🗑</button>
       </div>
     </div>`;
@@ -528,7 +540,7 @@
   function doHarvest(id) {
     const res = PH.garden.harvest(id);
     if (!res.ok) { toast(res.msg || 'No se pudo cosechar.', 'bad'); return; }
-    if (PH.audio) PH.audio.sfx('harvest'); toast(`🌾 Cosechaste ${res.name}: ${res.clones.length} clones + 💰${res.credits}`, 'ok');
+    if (PH.audio) PH.audio.sfx('harvest'); toast(`🌾 Cosechaste ${res.name} (salud ${res.health}%): ${res.clones.length} clones + 💰${res.credits}`, 'ok');
     updateHUD();
     PH.game.afterQuestCheck();
     greenhouse();
