@@ -14,7 +14,9 @@
     <div id="lcd">
       <div class="lcd-inner">
         <div id="hud"></div>
-        <canvas id="screen" width="480" height="320"></canvas>
+        <!-- Búfer interno = 3× la matriz de puntos real de la Game Boy (160×144),
+             proporción 10:9 exacta con píxeles cuadrados (Manual Técnico DMG). -->
+        <canvas id="screen" width="480" height="432"></canvas>
         <div id="overlay"></div>
         <div id="toasts"></div>
       </div>

@@ -262,15 +262,17 @@ html, body {
    ============================================================ */
 #device {
   position: fixed; inset: 0; width: 100vw; height: 100dvh;
-  display: flex; flex-direction: column; align-items: center; gap: 1.2vmin;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.2vmin;
   padding: 2vmin 3vmin;
   background:
     radial-gradient(120% 80% at 50% -10%, #2e7d55 0%, #1f5e40 40%, #163f2c 100%);
   box-shadow: inset 0 0 12vmin rgba(0,0,0,.4);
   overflow: hidden;
 }
-/* columna interior con proporción de consola */
-#device > * { width: min(96vw, 560px); }
+/* Columna interior con la silueta real de la consola DMG (cuerpo ~90×148 mm,
+   relación an/al ≈ 0.61): el ancho se ata a la altura de viewport para que
+   la máquina se lea como un portátil de bolsillo en cualquier pantalla. */
+#device > * { width: min(96vw, 60vh, 600px); }
 
 #brand { display: flex; align-items: center; gap: 10px; padding: 0 4px; height: 5vmin; min-height: 26px; }
 #brand .mark { font-weight: 900; letter-spacing: 1px; color: #eafff3; font-size: clamp(14px, 3.2vmin, 24px); text-shadow: 1px 1px 0 #0c281c; }
@@ -280,18 +282,30 @@ html, body {
 
 /* --------- LCD --------- */
 #lcd {
-  position: relative; flex: 1 1 auto; min-height: 0;
-  aspect-ratio: 10 / 9; max-height: 62vh; margin: 0 auto;
-  background: #0c110d; border-radius: 14px;
-  padding: 2.2vmin; padding-top: 3vmin;
+  position: relative; flex: 0 1 auto; min-height: 0; max-height: 58vh; margin: 0 auto;
+  /* Marco de la LCD: aloja una pantalla activa 10:9 (matriz 160×144) y una
+     banda de bisel inferior más ancha, como el cuerpo DMG del manual. */
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  background: #0c110d; border-radius: 12px 12px 16px 16px;
+  padding: 2.4vmin 2.4vmin 5.2vmin;
   box-shadow: 0 8px 26px rgba(0,0,0,.5), inset 0 0 0 2px #08120b, inset 0 0 3vmin rgba(0,0,0,.6);
   border: 2px solid #0a1a10;
 }
-.lcd-inner { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 6px;
-  background: #101418; box-shadow: inset 0 0 0 2px #05321f, inset 0 0 20px rgba(0,0,0,.6); }
+/* Rótulo bajo la pantalla (banda inferior del bisel), diseño propio. */
+#lcd::after { content: "DOT-MATRIX · 160×144 · 4-TONE"; position: absolute;
+  left: 0; right: 0; bottom: 1.4vmin; text-align: center; pointer-events: none;
+  color: #16482f; font-size: clamp(6px, 1.3vmin, 10px); letter-spacing: 2px; font-weight: 700; }
+/* Pantalla activa: altura manda y la relación 10:9 fija el ancho -> píxeles
+   cuadrados exactos, sin deformación. */
+.lcd-inner { position: relative; height: 100%; aspect-ratio: 10 / 9; width: auto; max-width: 100%;
+  overflow: hidden; border-radius: 6px;
+  background: #8b9c2f; box-shadow: inset 0 0 0 2px #05321f, inset 0 0 20px rgba(0,0,0,.45); }
 #lcd .lcd-glare { position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
   background: linear-gradient(135deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 35%); }
-#screen { width: 100%; height: 100%; display: block; image-rendering: pixelated; image-rendering: crisp-edges; }
+/* object-fit:contain preserva el 10:9 exacto -> píxeles cuadrados (matriz de
+   puntos 160×144 del manual), sin deformar aunque el marco no sea 10:9. */
+#screen { width: 100%; height: 100%; display: block; object-fit: contain;
+  background: #8b9c2f; image-rendering: pixelated; image-rendering: crisp-edges; }
 
 /* HUD dentro de la LCD (barra fina superior) */
 #hud { position: absolute; top: 0; left: 0; right: 0; z-index: 3;
@@ -346,8 +360,8 @@ html, body {
 .speaker i { width: 4px; height: 18px; border-radius: 3px; background: #0e2a1c; box-shadow: inset 0 0 2px #000; }
 
 @media (min-aspect-ratio: 1/1) {
-  /* pantallas anchas: LCD más alta y controles a los lados */
-  #lcd { max-height: 68vh; }
+  /* pantallas anchas: aprovecha más altura para la LCD */
+  #lcd { max-height: 64vh; }
 }
 
 /* --------- Footer (oculto en modo consola) --------- */
@@ -375,7 +389,9 @@ html, body {
     <div id="lcd">
       <div class="lcd-inner">
         <div id="hud"></div>
-        <canvas id="screen" width="480" height="320"></canvas>
+        <!-- Búfer interno = 3× la matriz de puntos real de la Game Boy (160×144),
+             proporción 10:9 exacta con píxeles cuadrados (Manual Técnico DMG). -->
+        <canvas id="screen" width="480" height="432"></canvas>
         <div id="overlay"></div>
         <div id="toasts"></div>
       </div>
