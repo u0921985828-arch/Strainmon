@@ -151,79 +151,113 @@
     }
   }
 
-  // Personaje 16px con 4 direcciones y ciclo de caminado (frame 0=idle,1,2).
-  function drawActor(ctx, sx, sy, dir, frame, palette) {
-    const p = palette || { skin: '#f0c088', hair: '#4a3b2a', shirt: '#3a7bd6', pants: '#33333f' };
-    const shD = shade(p.shirt, -0.22), skD = shade(p.skin, -0.18), haD = shade(p.hair, -0.25);
-    const bob = frame === 1 ? 1 : 0;              // rebote vertical al pisar
+  // ---- Personaje con contorno, sombreado y ciclo de caminado ----
+  // Se dibuja primero en un búfer offscreen y luego se compone con una
+  // silueta oscura desplazada (contorno 1px estilo GBA).
+  const _buf = document.createElement('canvas'); _buf.width = 16; _buf.height = 18;
+  const _sil = document.createElement('canvas'); _sil.width = 16; _sil.height = 18;
+  const OUTLINE = '#20161f';
+
+  function drawActorRaw(g, dir, frame, p) {
+    const shS = shade(p.shirt, -0.24), liS = shade(p.shirt, 0.16);
+    const skD = shade(p.skin, -0.16), skL = shade(p.skin, 0.14);
+    const paD = shade(p.pants, -0.22);
+    const bob = frame === 1 ? 1 : 0;
     const oy = -bob;
+    g.clearRect(0, 0, 16, 18);
 
-    // sombra suave
-    px(ctx, sx + 4, sy + 15, 8, 2, 'rgba(0,0,0,0.20)');
-    px(ctx, sx + 3, sy + 14, 10, 1, 'rgba(0,0,0,0.12)');
-
-    // ---- Piernas (animadas) ----
-    const legY = sy + 12;
+    // ---- Piernas / botas (animadas) ----
+    const legY = 12;
     if (dir === 'left' || dir === 'right') {
-      // paso adelante/atrás en el eje X
-      let f1 = 6, f2 = 8; // idle
-      if (frame === 1) { f1 = 4; f2 = 9; } else if (frame === 2) { f1 = 7; f2 = 6; }
-      px(ctx, sx + f2, legY, 3, 4, shade(p.pants, -0.2));
-      px(ctx, sx + f1, legY, 3, 4, p.pants);
-      px(ctx, sx + f1, sy + 15, 3, 1, '#2a2028');
+      let f1 = 6, f2 = 8;
+      if (frame === 1) { f1 = 4; f2 = 9; } else if (frame === 2) { f1 = 8; f2 = 5; }
+      px(g, f2, legY, 3, 4, paD);
+      px(g, f2, 15, 3, 1, '#241a22');            // bota
+      px(g, f1, legY, 3, 4, p.pants);
+      px(g, f1, 15, 3, 1, '#2a1f28');
     } else {
       let lx = 5, rx = 8;
-      if (frame === 1) { lx = 4; rx = 9; } else if (frame === 2) { lx = 5; rx = 8; }
-      px(ctx, sx + lx, legY, 3, 4, p.pants);
-      px(ctx, sx + rx, legY, 3, 4, shade(p.pants, -0.15));
-      px(ctx, sx + lx, sy + 15, 3, 1, '#2a2028'); px(ctx, sx + rx, sy + 15, 3, 1, '#2a2028');
+      if (frame === 1) { lx = 4; rx = 9; } else if (frame === 2) { lx = 6; rx = 7; }
+      px(g, lx, legY, 3, 4, p.pants); px(g, lx, 15, 3, 1, '#2a1f28');
+      px(g, rx, legY, 3, 4, paD);      px(g, rx, 15, 3, 1, '#241a22');
     }
 
-    // ---- Torso ----
-    px(ctx, sx + 4, sy + 8 + oy, 8, 5, p.shirt);
-    px(ctx, sx + 4, sy + 12 + oy, 8, 1, shD);
-    // mochila del héroe (si tiene pack)
+    // ---- Torso con sombreado ----
+    px(g, 4, 8 + oy, 8, 5, p.shirt);
+    px(g, 4, 8 + oy, 8, 1, liS);                 // luz superior
+    px(g, 4, 12 + oy, 8, 1, shS);                // sombra inferior
+    px(g, 4, 8 + oy, 1, 5, shade(p.shirt, -0.12));
+    // mochila
     if (p.pack) {
-      if (dir === 'up') px(ctx, sx + 4, sy + 8 + oy, 8, 4, p.pack);
-      else if (dir === 'down') { px(ctx, sx + 3, sy + 9 + oy, 1, 3, p.pack); px(ctx, sx + 12, sy + 9 + oy, 1, 3, p.pack); }
-      else if (dir === 'left') px(ctx, sx + 10, sy + 8 + oy, 2, 4, p.pack);
-      else px(ctx, sx + 4, sy + 8 + oy, 2, 4, p.pack);
+      const pkD = shade(p.pack, -0.2);
+      if (dir === 'up') { px(g, 4, 8 + oy, 8, 5, p.pack); px(g, 6, 9 + oy, 4, 3, pkD); }
+      else if (dir === 'down') { px(g, 3, 9 + oy, 1, 3, p.pack); px(g, 12, 9 + oy, 1, 3, p.pack); }
+      else if (dir === 'left') px(g, 10, 8 + oy, 2, 4, p.pack);
+      else px(g, 4, 8 + oy, 2, 4, p.pack);
     }
-    // ---- Brazos (balanceo) ----
-    const armY = sy + 8 + oy + (frame === 1 ? 1 : 0);
-    if (dir === 'left' || dir === 'right') {
-      px(ctx, sx + (dir === 'left' ? 4 : 10), armY, 2, 4, skD);
-    } else {
-      px(ctx, sx + 3, armY + (frame === 2 ? 1 : 0), 2, 4, p.skin);
-      px(ctx, sx + 11, armY + (frame === 1 ? 1 : 0), 2, 4, p.skin);
+    // ---- Brazos ----
+    const armY = 8 + oy;
+    if (dir === 'left') px(g, 4, armY + (frame === 1 ? 1 : 0), 2, 4, p.skin);
+    else if (dir === 'right') px(g, 10, armY + (frame === 1 ? 1 : 0), 2, 4, p.skin);
+    else {
+      px(g, 3, armY + (frame === 2 ? 1 : 0), 2, 4, p.skin);
+      px(g, 11, armY + (frame === 1 ? 1 : 0), 2, 4, p.skin);
     }
 
     // ---- Cabeza ----
-    px(ctx, sx + 4, sy + 2 + oy, 8, 7, p.skin);
-    px(ctx, sx + 4, sy + 8 + oy, 8, 1, skD);       // barbilla
+    px(g, 4, 2 + oy, 8, 7, p.skin);
+    px(g, 4, 2 + oy, 8, 1, skL);                 // luz frente
+    px(g, 4, 8 + oy, 8, 1, skD);                 // barbilla
     // pelo
-    px(ctx, sx + 4, sy + 1 + oy, 8, 3, p.hair);
-    px(ctx, sx + 3, sy + 2 + oy, 1, 4, p.hair);
-    px(ctx, sx + 12, sy + 2 + oy, 1, 4, p.hair);
-    // gorra opcional
-    if (p.hat) { px(ctx, sx + 3, sy + 1 + oy, 10, 2, p.hat); px(ctx, sx + 4, sy + 0 + oy, 8, 1, p.hat); px(ctx, sx + 11, sy + 2 + oy, 3, 1, shade(p.hat, -0.2)); }
-
-    const ey = sy + 5 + oy;
-    if (dir === 'down') {
-      px(ctx, sx + 6, ey, 1, 2, '#20202a'); px(ctx, sx + 9, ey, 1, 2, '#20202a');
-      px(ctx, sx + 7, sy + 7 + oy, 2, 1, skD);   // boca/sombra
-    } else if (dir === 'up') {
-      px(ctx, sx + 4, sy + 1 + oy, 8, 6, p.hair); // nuca
-      px(ctx, sx + 3, sy + 2 + oy, 1, 4, haD); px(ctx, sx + 12, sy + 2 + oy, 1, 4, haD);
-    } else if (dir === 'left') {
-      px(ctx, sx + 4, sy + 2 + oy, 2, 5, p.hair); // flequillo lateral
-      px(ctx, sx + 6, ey, 1, 2, '#20202a');
-      px(ctx, sx + 4, sy + 6 + oy, 1, 1, skD);     // nariz
-    } else if (dir === 'right') {
-      px(ctx, sx + 10, sy + 2 + oy, 2, 5, p.hair);
-      px(ctx, sx + 9, ey, 1, 2, '#20202a');
-      px(ctx, sx + 11, sy + 6 + oy, 1, 1, skD);
+    px(g, 3, 1 + oy, 10, 3, p.hair);
+    px(g, 3, 2 + oy, 1, 4, p.hair); px(g, 12, 2 + oy, 1, 4, p.hair);
+    px(g, 4, 1 + oy, 8, 1, shade(p.hair, 0.18));
+    if (p.hat) {
+      const htD = shade(p.hat, -0.22);
+      px(g, 3, 0 + oy, 10, 3, p.hat); px(g, 4, -1 + oy < 0 ? 0 : -1 + oy, 8, 1, p.hat);
+      px(g, 3, 2 + oy, 10, 1, htD);
+      if (dir !== 'up') px(g, 11, 3 + oy, 3, 1, htD); // visera
     }
+    // rostro por dirección
+    const ey = 5 + oy;
+    if (dir === 'down') {
+      px(g, 6, ey, 1, 2, '#20202a'); px(g, 9, ey, 1, 2, '#20202a');
+      px(g, 6, ey, 1, 1, '#3a6ea5');            // brillo ojo
+      px(g, 7, 7 + oy, 2, 1, skD);
+    } else if (dir === 'up') {
+      px(g, 3, 1 + oy, 10, 6, p.hair);
+      px(g, 4, 1 + oy, 8, 1, shade(p.hair, 0.18));
+    } else if (dir === 'left') {
+      px(g, 4, 2 + oy, 2, 5, p.hair);
+      px(g, 6, ey, 1, 2, '#20202a');
+      px(g, 4, 6 + oy, 1, 1, skD);
+    } else if (dir === 'right') {
+      px(g, 10, 2 + oy, 2, 5, p.hair);
+      px(g, 9, ey, 1, 2, '#20202a');
+      px(g, 11, 6 + oy, 1, 1, skD);
+    }
+  }
+
+  function drawActor(ctx, sx, sy, dir, frame, palette) {
+    const p = palette || { skin: '#f0c088', hair: '#4a3b2a', shirt: '#3a7bd6', pants: '#33333f' };
+    // sombra elíptica en el suelo (bajo el contorno)
+    px(ctx, sx + 4, sy + 15, 8, 2, 'rgba(0,0,0,0.22)');
+    px(ctx, sx + 3, sy + 16, 10, 1, 'rgba(0,0,0,0.12)');
+
+    const bctx = _buf.getContext('2d'); bctx.imageSmoothingEnabled = false;
+    drawActorRaw(bctx, dir, frame, p);
+    // silueta oscura
+    const sctx = _sil.getContext('2d'); sctx.imageSmoothingEnabled = false;
+    sctx.globalCompositeOperation = 'source-over';
+    sctx.clearRect(0, 0, 16, 18);
+    sctx.drawImage(_buf, 0, 0);
+    sctx.globalCompositeOperation = 'source-in';
+    sctx.fillStyle = OUTLINE; sctx.fillRect(0, 0, 16, 18);
+    sctx.globalCompositeOperation = 'source-over';
+    // contorno (4 desplazamientos) + cuerpo encima
+    const off = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+    for (const o of off) ctx.drawImage(_sil, sx + o[0], sy + o[1]);
+    ctx.drawImage(_buf, sx, sy);
   }
 
   const NPC_PALETTES = {
