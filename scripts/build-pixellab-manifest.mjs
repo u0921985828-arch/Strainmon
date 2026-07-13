@@ -91,11 +91,12 @@ const CHAR_DESC = {
   walker: 'elderly villager out for a walk, cardigan, flat cap, wooden cane',
   neighbor: 'friendly neighbor gardener, denim overalls, straw hat, gardening gloves',
 };
+// El juego es isométrico: charart.js mapea 1=SE 2=SW 3=NW 4=NE.
 const DIRS = [
-  { i: 1, dir: 'south', face: 'facing the viewer (front view)' },
-  { i: 2, dir: 'west', face: 'facing left (side view)' },
-  { i: 3, dir: 'east', face: 'facing right (side view)' },
-  { i: 4, dir: 'north', face: 'seen from behind (back view)' },
+  { i: 1, dir: 'south-east', face: 'facing south-east, front-right three-quarter isometric view' },
+  { i: 2, dir: 'south-west', face: 'facing south-west, front-left three-quarter isometric view' },
+  { i: 3, dir: 'north-west', face: 'facing north-west, back-left three-quarter isometric view' },
+  { i: 4, dir: 'north-east', face: 'facing north-east, back-right three-quarter isometric view' },
 ];
 function charItems() {
   const items = [];

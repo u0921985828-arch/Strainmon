@@ -39,163 +39,163 @@
       "items": [
         {
           "name": "player_1",
-          "direction": "south",
-          "description": "Full-body pixel-art game character, young plant-hunter hero, green snapback cap, dark-green hoodie, khaki cargo shorts, small backpack, brown boots, standing, facing the viewer (front view). Single centered character, transparent background."
+          "direction": "south-east",
+          "description": "Full-body pixel-art game character, young plant-hunter hero, green snapback cap, dark-green hoodie, khaki cargo shorts, small backpack, brown boots, standing, facing south-east, front-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "player_2",
-          "direction": "west",
-          "description": "Full-body pixel-art game character, young plant-hunter hero, green snapback cap, dark-green hoodie, khaki cargo shorts, small backpack, brown boots, standing, facing left (side view). Single centered character, transparent background."
+          "direction": "south-west",
+          "description": "Full-body pixel-art game character, young plant-hunter hero, green snapback cap, dark-green hoodie, khaki cargo shorts, small backpack, brown boots, standing, facing south-west, front-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "player_3",
-          "direction": "east",
-          "description": "Full-body pixel-art game character, young plant-hunter hero, green snapback cap, dark-green hoodie, khaki cargo shorts, small backpack, brown boots, standing, facing right (side view). Single centered character, transparent background."
+          "direction": "north-west",
+          "description": "Full-body pixel-art game character, young plant-hunter hero, green snapback cap, dark-green hoodie, khaki cargo shorts, small backpack, brown boots, standing, facing north-west, back-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "player_4",
-          "direction": "north",
-          "description": "Full-body pixel-art game character, young plant-hunter hero, green snapback cap, dark-green hoodie, khaki cargo shorts, small backpack, brown boots, standing, seen from behind (back view). Single centered character, transparent background."
+          "direction": "north-east",
+          "description": "Full-body pixel-art game character, young plant-hunter hero, green snapback cap, dark-green hoodie, khaki cargo shorts, small backpack, brown boots, standing, facing north-east, back-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "botanist_1",
-          "direction": "south",
-          "description": "Full-body pixel-art game character, female botanist scientist, open white lab coat over a green shirt, safety goggles on forehead, dark hair in a bun, standing, facing the viewer (front view). Single centered character, transparent background."
+          "direction": "south-east",
+          "description": "Full-body pixel-art game character, female botanist scientist, open white lab coat over a green shirt, safety goggles on forehead, dark hair in a bun, standing, facing south-east, front-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "botanist_2",
-          "direction": "west",
-          "description": "Full-body pixel-art game character, female botanist scientist, open white lab coat over a green shirt, safety goggles on forehead, dark hair in a bun, standing, facing left (side view). Single centered character, transparent background."
+          "direction": "south-west",
+          "description": "Full-body pixel-art game character, female botanist scientist, open white lab coat over a green shirt, safety goggles on forehead, dark hair in a bun, standing, facing south-west, front-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "botanist_3",
-          "direction": "east",
-          "description": "Full-body pixel-art game character, female botanist scientist, open white lab coat over a green shirt, safety goggles on forehead, dark hair in a bun, standing, facing right (side view). Single centered character, transparent background."
+          "direction": "north-west",
+          "description": "Full-body pixel-art game character, female botanist scientist, open white lab coat over a green shirt, safety goggles on forehead, dark hair in a bun, standing, facing north-west, back-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "botanist_4",
-          "direction": "north",
-          "description": "Full-body pixel-art game character, female botanist scientist, open white lab coat over a green shirt, safety goggles on forehead, dark hair in a bun, standing, seen from behind (back view). Single centered character, transparent background."
+          "direction": "north-east",
+          "description": "Full-body pixel-art game character, female botanist scientist, open white lab coat over a green shirt, safety goggles on forehead, dark hair in a bun, standing, facing north-east, back-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "dealer_1",
-          "direction": "south",
-          "description": "Full-body pixel-art game character, shady streetwise dealer, dark hoodie with hood up, sunglasses, thin gold chain, baggy jeans, sneakers, standing, facing the viewer (front view). Single centered character, transparent background."
+          "direction": "south-east",
+          "description": "Full-body pixel-art game character, shady streetwise dealer, dark hoodie with hood up, sunglasses, thin gold chain, baggy jeans, sneakers, standing, facing south-east, front-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "dealer_2",
-          "direction": "west",
-          "description": "Full-body pixel-art game character, shady streetwise dealer, dark hoodie with hood up, sunglasses, thin gold chain, baggy jeans, sneakers, standing, facing left (side view). Single centered character, transparent background."
+          "direction": "south-west",
+          "description": "Full-body pixel-art game character, shady streetwise dealer, dark hoodie with hood up, sunglasses, thin gold chain, baggy jeans, sneakers, standing, facing south-west, front-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "dealer_3",
-          "direction": "east",
-          "description": "Full-body pixel-art game character, shady streetwise dealer, dark hoodie with hood up, sunglasses, thin gold chain, baggy jeans, sneakers, standing, facing right (side view). Single centered character, transparent background."
+          "direction": "north-west",
+          "description": "Full-body pixel-art game character, shady streetwise dealer, dark hoodie with hood up, sunglasses, thin gold chain, baggy jeans, sneakers, standing, facing north-west, back-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "dealer_4",
-          "direction": "north",
-          "description": "Full-body pixel-art game character, shady streetwise dealer, dark hoodie with hood up, sunglasses, thin gold chain, baggy jeans, sneakers, standing, seen from behind (back view). Single centered character, transparent background."
+          "direction": "north-east",
+          "description": "Full-body pixel-art game character, shady streetwise dealer, dark hoodie with hood up, sunglasses, thin gold chain, baggy jeans, sneakers, standing, facing north-east, back-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "merchant_1",
-          "direction": "south",
-          "description": "Full-body pixel-art game character, friendly shopkeeper, green apron over rolled-up sleeves, flat cap, bushy mustache, standing, facing the viewer (front view). Single centered character, transparent background."
+          "direction": "south-east",
+          "description": "Full-body pixel-art game character, friendly shopkeeper, green apron over rolled-up sleeves, flat cap, bushy mustache, standing, facing south-east, front-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "merchant_2",
-          "direction": "west",
-          "description": "Full-body pixel-art game character, friendly shopkeeper, green apron over rolled-up sleeves, flat cap, bushy mustache, standing, facing left (side view). Single centered character, transparent background."
+          "direction": "south-west",
+          "description": "Full-body pixel-art game character, friendly shopkeeper, green apron over rolled-up sleeves, flat cap, bushy mustache, standing, facing south-west, front-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "merchant_3",
-          "direction": "east",
-          "description": "Full-body pixel-art game character, friendly shopkeeper, green apron over rolled-up sleeves, flat cap, bushy mustache, standing, facing right (side view). Single centered character, transparent background."
+          "direction": "north-west",
+          "description": "Full-body pixel-art game character, friendly shopkeeper, green apron over rolled-up sleeves, flat cap, bushy mustache, standing, facing north-west, back-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "merchant_4",
-          "direction": "north",
-          "description": "Full-body pixel-art game character, friendly shopkeeper, green apron over rolled-up sleeves, flat cap, bushy mustache, standing, seen from behind (back view). Single centered character, transparent background."
+          "direction": "north-east",
+          "description": "Full-body pixel-art game character, friendly shopkeeper, green apron over rolled-up sleeves, flat cap, bushy mustache, standing, facing north-east, back-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "customer1_1",
-          "direction": "south",
-          "description": "Full-body pixel-art game character, slim casual townsperson, plain t-shirt and jeans, standing, facing the viewer (front view). Single centered character, transparent background."
+          "direction": "south-east",
+          "description": "Full-body pixel-art game character, slim casual townsperson, plain t-shirt and jeans, standing, facing south-east, front-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "customer1_2",
-          "direction": "west",
-          "description": "Full-body pixel-art game character, slim casual townsperson, plain t-shirt and jeans, standing, facing left (side view). Single centered character, transparent background."
+          "direction": "south-west",
+          "description": "Full-body pixel-art game character, slim casual townsperson, plain t-shirt and jeans, standing, facing south-west, front-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "customer1_3",
-          "direction": "east",
-          "description": "Full-body pixel-art game character, slim casual townsperson, plain t-shirt and jeans, standing, facing right (side view). Single centered character, transparent background."
+          "direction": "north-west",
+          "description": "Full-body pixel-art game character, slim casual townsperson, plain t-shirt and jeans, standing, facing north-west, back-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "customer1_4",
-          "direction": "north",
-          "description": "Full-body pixel-art game character, slim casual townsperson, plain t-shirt and jeans, standing, seen from behind (back view). Single centered character, transparent background."
+          "direction": "north-east",
+          "description": "Full-body pixel-art game character, slim casual townsperson, plain t-shirt and jeans, standing, facing north-east, back-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "customer2_1",
-          "direction": "south",
-          "description": "Full-body pixel-art game character, stocky cheerful townsperson, oversized hoodie and shorts, standing, facing the viewer (front view). Single centered character, transparent background."
+          "direction": "south-east",
+          "description": "Full-body pixel-art game character, stocky cheerful townsperson, oversized hoodie and shorts, standing, facing south-east, front-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "customer2_2",
-          "direction": "west",
-          "description": "Full-body pixel-art game character, stocky cheerful townsperson, oversized hoodie and shorts, standing, facing left (side view). Single centered character, transparent background."
+          "direction": "south-west",
+          "description": "Full-body pixel-art game character, stocky cheerful townsperson, oversized hoodie and shorts, standing, facing south-west, front-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "customer2_3",
-          "direction": "east",
-          "description": "Full-body pixel-art game character, stocky cheerful townsperson, oversized hoodie and shorts, standing, facing right (side view). Single centered character, transparent background."
+          "direction": "north-west",
+          "description": "Full-body pixel-art game character, stocky cheerful townsperson, oversized hoodie and shorts, standing, facing north-west, back-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "customer2_4",
-          "direction": "north",
-          "description": "Full-body pixel-art game character, stocky cheerful townsperson, oversized hoodie and shorts, standing, seen from behind (back view). Single centered character, transparent background."
+          "direction": "north-east",
+          "description": "Full-body pixel-art game character, stocky cheerful townsperson, oversized hoodie and shorts, standing, facing north-east, back-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "walker_1",
-          "direction": "south",
-          "description": "Full-body pixel-art game character, elderly villager out for a walk, cardigan, flat cap, wooden cane, standing, facing the viewer (front view). Single centered character, transparent background."
+          "direction": "south-east",
+          "description": "Full-body pixel-art game character, elderly villager out for a walk, cardigan, flat cap, wooden cane, standing, facing south-east, front-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "walker_2",
-          "direction": "west",
-          "description": "Full-body pixel-art game character, elderly villager out for a walk, cardigan, flat cap, wooden cane, standing, facing left (side view). Single centered character, transparent background."
+          "direction": "south-west",
+          "description": "Full-body pixel-art game character, elderly villager out for a walk, cardigan, flat cap, wooden cane, standing, facing south-west, front-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "walker_3",
-          "direction": "east",
-          "description": "Full-body pixel-art game character, elderly villager out for a walk, cardigan, flat cap, wooden cane, standing, facing right (side view). Single centered character, transparent background."
+          "direction": "north-west",
+          "description": "Full-body pixel-art game character, elderly villager out for a walk, cardigan, flat cap, wooden cane, standing, facing north-west, back-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "walker_4",
-          "direction": "north",
-          "description": "Full-body pixel-art game character, elderly villager out for a walk, cardigan, flat cap, wooden cane, standing, seen from behind (back view). Single centered character, transparent background."
+          "direction": "north-east",
+          "description": "Full-body pixel-art game character, elderly villager out for a walk, cardigan, flat cap, wooden cane, standing, facing north-east, back-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "neighbor_1",
-          "direction": "south",
-          "description": "Full-body pixel-art game character, friendly neighbor gardener, denim overalls, straw hat, gardening gloves, standing, facing the viewer (front view). Single centered character, transparent background."
+          "direction": "south-east",
+          "description": "Full-body pixel-art game character, friendly neighbor gardener, denim overalls, straw hat, gardening gloves, standing, facing south-east, front-right three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "neighbor_2",
-          "direction": "west",
-          "description": "Full-body pixel-art game character, friendly neighbor gardener, denim overalls, straw hat, gardening gloves, standing, facing left (side view). Single centered character, transparent background."
+          "direction": "south-west",
+          "description": "Full-body pixel-art game character, friendly neighbor gardener, denim overalls, straw hat, gardening gloves, standing, facing south-west, front-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "neighbor_3",
-          "direction": "east",
-          "description": "Full-body pixel-art game character, friendly neighbor gardener, denim overalls, straw hat, gardening gloves, standing, facing right (side view). Single centered character, transparent background."
+          "direction": "north-west",
+          "description": "Full-body pixel-art game character, friendly neighbor gardener, denim overalls, straw hat, gardening gloves, standing, facing north-west, back-left three-quarter isometric view. Single centered character, transparent background."
         },
         {
           "name": "neighbor_4",
-          "direction": "north",
-          "description": "Full-body pixel-art game character, friendly neighbor gardener, denim overalls, straw hat, gardening gloves, standing, seen from behind (back view). Single centered character, transparent background."
+          "direction": "north-east",
+          "description": "Full-body pixel-art game character, friendly neighbor gardener, denim overalls, straw hat, gardening gloves, standing, facing north-east, back-right three-quarter isometric view. Single centered character, transparent background."
         }
       ]
     },

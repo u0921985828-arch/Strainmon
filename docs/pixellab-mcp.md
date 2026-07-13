@@ -105,9 +105,34 @@ Opciones de `gen-pixellab.mjs`: `[manifest] [outDir]`, `--only=grupo,grupo`,
 Salida por defecto en `assets/gen_pixellab/<grupo>/` (ignorado por git; curar antes
 de versionar). También escribe `_palette.png` con la paleta usada.
 
-Último paso (manual, tras revisar): re-inlinear los PNG elegidos como base64 en
-`src/charart.js` / `src/plantart.js` / `src/sprites.js`, que es de donde el juego
-carga los sprites en runtime (los `assets/*.png` son las fuentes).
+### Re-inlinar en runtime
+
+El juego carga los sprites desde base64 embebido en `src/*.js`, no desde
+`assets/*.png` (esos son las fuentes). Tras revisar la salida, `scripts/inline-sprites.mjs`
+reemplaza el base64 de cada clave `DATA` con el PNG generado:
+
+```bash
+node scripts/inline-sprites.mjs --dry-run                 # qué cambiaría, sin escribir
+node scripts/inline-sprites.mjs --only=chars,plants,furni # aplica
+git diff --stat src/                                       # revisa antes de commitear
+```
+
+Mapeo grupo → archivo destino y clave:
+
+| Grupo | Destino | Clave `DATA` |
+|---|---|---|
+| `chars` | `src/charart.js` | nombre de archivo (`player_1` … `walker_4`, iso: 1=SE 2=SW 3=NW 4=NE) |
+| `plants` | `src/plantart.js` | nombre de archivo (`SM-000_1` … `SM-017_5`) |
+| `furni` | `src/furniart.js` | nombre **sin** prefijo `furni_` (`furni_bed` → `"bed"`) |
+| `parts` | — | sin destino en runtime (alimentan el ensamblador offline) |
+
+Solo reemplaza claves que ya existen; nunca añade ni borra entradas ni toca el resto
+del archivo. Opciones: `--from=DIR` (fuente, def. `assets/gen_pixellab`),
+`--only=...`, `--dry-run`.
+
+> Recomendado antes de inlinar: normalizar los PNG a los tamaños canónicos por grupo
+> con `node scripts/post-sprites.mjs <inDir> <outDir> <size> fit` (chars≈80, plants≈150,
+> furni≈64, parts≈96), y luego inlinar con `--from=<outDir>`.
 
 > Las `view` / proyección por grupo en el manifiesto (p.ej. `oblique_projection` en
 > mobiliario, 4 direcciones en personajes) son un punto de partida sensato; ajústalas
