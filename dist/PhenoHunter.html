@@ -353,10 +353,10 @@ html, body {
 #overlay { position: absolute; inset: 0; z-index: 5; }
 #toasts { top: 4px; z-index: 8; }
 
-/* --------- Controles físicos (cruceta izq. + A/B der. en diagonal) --------- */
-#controls { display: flex; align-items: center; justify-content: space-between; gap: 4vmin; }
+/* --------- Controles físicos (cruceta abajo-izq. + A/B arriba-der. en diagonal) --------- */
+#controls { display: flex; align-items: flex-start; justify-content: space-between; gap: 4vmin; padding: 1.5vmin 1vmin 0; }
 /* base circular recessed bajo la cruceta, como en el DMG */
-.dpad { position: relative; width: 32vmin; height: 32vmin; max-width: 144px; max-height: 144px; flex: 0 0 auto; }
+.dpad { position: relative; width: 32vmin; height: 32vmin; max-width: 144px; max-height: 144px; flex: 0 0 auto; margin-top: 3vmin; }
 .dpad::before { content: ""; position: absolute; inset: -8%; border-radius: 50%;
   background: radial-gradient(circle at 50% 42%, #163a26, #0e2418); box-shadow: inset 0 2px 6px rgba(0,0,0,.55); }
 /* la cruceta se lee como una sola cruz negra (brazos + centro mismo tono) */
@@ -369,14 +369,14 @@ html, body {
 .db-center { position: absolute; top: 33.5%; left: 33.5%; width: 33%; height: 33%; background: #14171b; z-index: 1;
   box-shadow: inset 0 0 6px rgba(0,0,0,.6); }
 .db-center::after { content: ""; position: absolute; inset: 30%; border-radius: 50%; background: #0c0e11; }
-.face { display: flex; align-items: flex-end; gap: 3vmin; }
-.ab { width: 15vmin; height: 15vmin; max-width: 74px; max-height: 74px; border-radius: 50%; cursor: pointer;
-  font-weight: 900; font-size: 3vmin; line-height: 1; color: #4a1226; border: 1px solid #5a0f28;
+.face { display: flex; align-items: flex-end; gap: 2.4vmin; }
+.ab { width: 13vmin; height: 13vmin; max-width: 62px; max-height: 62px; border-radius: 50%; cursor: pointer;
+  font-weight: 900; font-size: 2.6vmin; line-height: 1; color: #4a1226; border: 1px solid #5a0f28;
   background: radial-gradient(circle at 35% 30%, #b5476b, #7d1e3d 60%, #5c1730);
   box-shadow: 0 3px 0 #3f0c1e; }
-.ab.a { transform: translateY(-1.6vmin); }  /* A arriba-derecha, B abajo-izq (diagonal DMG) */
+.ab.a { transform: translateY(-3vmin); }  /* A arriba-derecha, B abajo-izq (diagonal DMG) */
 .ab:active { transform: translateY(2px); box-shadow: 0 1px 0 #3f0c1e; }
-.ab.a:active { transform: translateY(calc(-1.6vmin + 2px)); box-shadow: 0 1px 0 #3f0c1e; }
+.ab.a:active { transform: translateY(calc(-3vmin + 2px)); box-shadow: 0 1px 0 #3f0c1e; }
 
 /* --------- Banda inferior: SELECT/START + altavoz --------- */
 #lowface { display: flex; align-items: center; justify-content: space-between; gap: 3vmin; }
@@ -386,8 +386,10 @@ html, body {
   font-weight: 700; letter-spacing: 1px; cursor: pointer; box-shadow: 0 2px 0 #0a0710; }
 .pill-btn:active { transform: rotate(-25deg) translateY(1px); box-shadow: 0 1px 0 #0a0710; }
 /* rejilla de altavoz: 6 ranuras diagonales (esquina inf-derecha del DMG) */
-.speaker { display: flex; gap: 6px; justify-content: center; opacity: .55; transform: rotate(-25deg); }
-.speaker i { width: 4px; height: 22px; border-radius: 3px; background: #0e2a1c; box-shadow: inset 0 0 2px #000; }
+.speaker { display: flex; gap: 6px; align-items: center; justify-content: center; opacity: .6; transform: rotate(-28deg); }
+.speaker i { width: 4px; height: 28px; border-radius: 3px; background: #0e2a1c; box-shadow: inset 0 0 2px #000; }
+.speaker i:nth-child(1), .speaker i:nth-child(6) { height: 18px; }
+.speaker i:nth-child(2), .speaker i:nth-child(5) { height: 24px; }
 
 /* fila de accesos rápidos: discreta (no forma parte de la cara clásica DMG) */
 #menurow { display: flex; justify-content: center; gap: 1vmin; opacity: .8; }
