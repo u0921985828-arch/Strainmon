@@ -20,18 +20,18 @@ const CHARS = {
 };
 // charart.js: 1=SE 2=SW 3=NW 4=NE
 const DIRS = {
-  1: 'ABAJO-DERECHA (diagonal isométrica sureste, de frente-derecha)',
-  2: 'ABAJO-IZQUIERDA (diagonal isométrica suroeste, de frente-izquierda)',
-  3: 'ARRIBA-IZQUIERDA (diagonal isométrica noroeste, de espaldas-izquierda)',
-  4: 'ARRIBA-DERECHA (diagonal isométrica noreste, de espaldas-derecha)',
+  1: 'orientado hacia ABAJO-DERECHA (sureste). Vista DE FRENTE en 3/4 hacia la esquina inferior derecha: se ve el pecho y la cara. Cabeza y torso alineados en la MISMA dirección. No se ve la espalda',
+  2: 'orientado hacia ABAJO-IZQUIERDA (suroeste). Vista DE FRENTE en 3/4 hacia la esquina inferior izquierda: se ve el pecho y la cara. Cabeza y torso alineados en la MISMA dirección. NO se ve la espalda ni la mochila',
+  3: 'orientado hacia ARRIBA-IZQUIERDA (noroeste). Vista DE ESPALDAS en 3/4 hacia la esquina superior izquierda: se ve la espalda y la nuca. La cara NO es visible; la cabeza NO está girada hacia la cámara',
+  4: 'orientado hacia ARRIBA-DERECHA (noreste). Vista DE ESPALDAS en 3/4 hacia la esquina superior derecha: se ve la espalda y la nuca. La cara NO es visible; la cabeza NO está girada hacia la cámara',
 };
 const BASE = 'Pixel art 16-bit estilo Game Boy Advance, original, sin antialias, contorno oscuro 1px (#20161f), sombreado suave con luz cenital y volumen, paleta saturada limitada, alta definición de pixel. UN ÚNICO personaje, una sola figura completa y aislada centrada en el lienzo; NO es una hoja de turnaround, NO dupliques la figura ni muestres varias vistas ni versiones pequeñas. Personaje humano de cuerpo entero en perspectiva isométrica 3/4 desde arriba, proporción chibi (cabeza algo grande, cuerpo compacto), de pie.';
 
 function prompt(desc, dir, ref) {
-  const facing = `Mirando hacia ${DIRS[dir]}.`;
+  const facing = `Personaje ${DIRS[dir]}.`;
   const who = `${desc}.`;
-  const consist = ref ? ' Es EXACTAMENTE el mismo personaje que la imagen de referencia: misma ropa, mismos colores y proporciones; cambia SOLO la orientación.' : '';
-  return `${BASE} ${facing} ${who}${consist} Detalle nítido en cara, ropa y pliegues, como un sprite de criatura cuidado. Sprite único centrado y completo, sin recortar.`;
+  const consist = ref ? ' Es EXACTAMENTE el mismo personaje que la imagen de referencia (misma ropa, colores y proporciones), pero cambiando la orientación a la indicada arriba; NO copies la orientación de la referencia, SOLO su aspecto.' : '';
+  return `${BASE} ${facing} ${who}${consist} Detalle nítido en ropa y pliegues, como un sprite de criatura cuidado. Sprite único centrado y completo, sin recortar.`;
 }
 
 const se = [], rest = [];
