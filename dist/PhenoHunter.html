@@ -241,7 +241,90 @@ html, body {
   border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
 .ev-ico { font-size: 1.3rem; } .ev-row b { font-size: .82rem; } .ev-row small { display: block; color: var(--dim); font-size: .72rem; }
 
-/* --------- Footer --------- */
+/* ============================================================
+   CONSOLA PORTÁTIL "STRAINBOY" (diseño original, no comercial)
+   Ocupa toda la pantalla; LCD grande para jugar bien.
+   ============================================================ */
+#device {
+  position: fixed; inset: 0; width: 100vw; height: 100dvh;
+  display: flex; flex-direction: column; align-items: center; gap: 1.2vmin;
+  padding: 2vmin 3vmin;
+  background:
+    radial-gradient(120% 80% at 50% -10%, #2e7d55 0%, #1f5e40 40%, #163f2c 100%);
+  box-shadow: inset 0 0 12vmin rgba(0,0,0,.4);
+  overflow: hidden;
+}
+/* columna interior con proporción de consola */
+#device > * { width: min(96vw, 560px); }
+
+#brand { display: flex; align-items: center; gap: 10px; padding: 0 4px; height: 5vmin; min-height: 26px; }
+#brand .mark { font-weight: 900; letter-spacing: 1px; color: #eafff3; font-size: clamp(14px, 3.2vmin, 24px); text-shadow: 1px 1px 0 #0c281c; }
+#brand .mark b { color: #ffd34d; }
+#brand .led { width: 10px; height: 10px; border-radius: 50%; background: #ff5d5d; box-shadow: 0 0 8px #ff5d5d, inset 0 0 2px #7a1515; }
+#brand .tag { margin-left: auto; color: #bfe8cf; font-size: clamp(7px, 1.6vmin, 11px); letter-spacing: 2px; }
+
+/* --------- LCD --------- */
+#lcd {
+  position: relative; flex: 1 1 auto; min-height: 0;
+  aspect-ratio: 3 / 2; max-height: 62vh; margin: 0 auto;
+  background: #0c110d; border-radius: 14px;
+  padding: 2.2vmin; padding-top: 3vmin;
+  box-shadow: 0 8px 26px rgba(0,0,0,.5), inset 0 0 0 2px #08120b, inset 0 0 3vmin rgba(0,0,0,.6);
+  border: 2px solid #0a1a10;
+}
+.lcd-inner { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 6px;
+  background: #101418; box-shadow: inset 0 0 0 2px #05321f, inset 0 0 20px rgba(0,0,0,.6); }
+#lcd .lcd-glare { position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
+  background: linear-gradient(135deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 35%); }
+#screen { width: 100%; height: 100%; display: block; image-rendering: pixelated; image-rendering: crisp-edges; }
+
+/* HUD dentro de la LCD (barra fina superior) */
+#hud { position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+  max-width: none; padding: 3px 5px; gap: 4px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(8,12,10,.72), rgba(8,12,10,0)); }
+.pill { font-size: clamp(7px, 1.5vmin, 11px); padding: 2px 7px; }
+
+#overlay { position: absolute; inset: 0; z-index: 5; }
+#toasts { top: 4px; z-index: 8; }
+
+/* --------- Controles físicos --------- */
+#controls { display: flex; align-items: center; justify-content: space-between; gap: 4vmin; }
+.dpad { position: relative; width: 34vmin; height: 34vmin; max-width: 150px; max-height: 150px; flex: 0 0 auto; }
+.db { position: absolute; width: 33%; height: 33%; background: linear-gradient(180deg, #2a2f35, #14181c);
+  color: #cfd6dd; border: 1px solid #0a0d10; border-radius: 6px; font-size: 2.4vmin; cursor: pointer;
+  box-shadow: 0 2px 0 #0a0d10; -webkit-user-select: none; user-select: none; }
+.db:active { transform: translateY(1px); box-shadow: 0 1px 0 #0a0d10; }
+.db.up { top: 0; left: 33.5%; } .db.down { bottom: 0; left: 33.5%; }
+.db.left { top: 33.5%; left: 0; } .db.right { top: 33.5%; right: 0; }
+.db-center { position: absolute; top: 33.5%; left: 33.5%; width: 33%; height: 33%; background: #14181c; }
+.face { display: flex; align-items: center; gap: 3vmin; }
+.ab { width: 15vmin; height: 15vmin; max-width: 74px; max-height: 74px; border-radius: 50%; cursor: pointer;
+  font-weight: 900; font-size: 3.4vmin; color: #3a1020; border: 1px solid #6e1330;
+  background: radial-gradient(circle at 35% 30%, #ff7a9c, #d33a5f 60%, #a11f42);
+  box-shadow: 0 3px 0 #7a1329; }
+.ab.b { transform: translateY(1.2vmin); }
+.ab:active { transform: translateY(2px); box-shadow: 0 1px 0 #7a1329; }
+
+/* fila de accesos a paneles */
+#menurow { display: flex; justify-content: center; gap: 1.4vmin; }
+.mb { width: 9vmin; height: 9vmin; max-width: 44px; max-height: 44px; border-radius: 10px; cursor: pointer;
+  font-size: 3vmin; background: linear-gradient(180deg, #243, #122); color: #dff; border: 1px solid #0a1a12;
+  box-shadow: 0 2px 0 #0a1a12; }
+.mb:active { transform: translateY(1px); box-shadow: 0 1px 0 #0a1a12; }
+
+/* rejilla de altavoz */
+.speaker { display: flex; gap: 5px; justify-content: center; opacity: .5; }
+.speaker i { width: 4px; height: 16px; border-radius: 3px; background: #0e2a1c; box-shadow: inset 0 0 2px #000; }
+
+@media (min-aspect-ratio: 1/1) {
+  /* pantallas anchas: LCD más alta y controles a los lados */
+  #lcd { max-height: 68vh; }
+}
+
+/* --------- Footer (oculto en modo consola) --------- */
+#foot { display: none !important; }
+#app, #stage, #touch { all: unset; }
+/* --------- Footer legacy --------- */
 #foot { color: var(--dim); font-size: .68rem; padding: 8px; text-align: center; }
 
 @media (max-width: 760px) {
@@ -256,35 +339,45 @@ html, body {
 </style>
 </head>
 <body>
-  <div id="app">
-    <div id="hud"></div>
+  <!-- Consola portátil retro ORIGINAL (no reproduce ninguna marca/diseño comercial) -->
+  <div id="device">
+    <div id="brand"><span class="mark">STRAIN<b>BOY</b></span><span class="led"></span><span class="tag">COLOR · GENETICS</span></div>
 
-    <div id="stage">
-      <canvas id="screen" width="240" height="160"></canvas>
-      <div id="overlay"></div>
-      <div id="toasts"></div>
+    <div id="lcd">
+      <div class="lcd-inner">
+        <div id="hud"></div>
+        <canvas id="screen" width="480" height="320"></canvas>
+        <div id="overlay"></div>
+        <div id="toasts"></div>
+      </div>
+      <div class="lcd-glare"></div>
     </div>
 
-    <div id="touch">
-      <div class="dpad">
-        <button data-key="arrowup" class="tb up">▲</button>
-        <button data-key="arrowleft" class="tb left">◀</button>
-        <button data-key="arrowright" class="tb right">▶</button>
-        <button data-key="arrowdown" class="tb down">▼</button>
+    <div id="controls">
+      <div class="dpad" aria-label="dpad">
+        <button data-key="arrowup" class="db up">▲</button>
+        <button data-key="arrowleft" class="db left">◀</button>
+        <button data-key="arrowright" class="db right">▶</button>
+        <button data-key="arrowdown" class="db down">▼</button>
+        <span class="db-center"></span>
       </div>
-      <div class="abtns">
-        <button data-key=" " class="tb a">A</button>
-        <div class="menu-keys">
-          <button data-key="i" class="tb s">🎒</button>
-          <button data-key="b" class="tb s">🧬</button>
-          <button data-key="c" class="tb s">🌿</button>
-        </div>
+      <div class="face">
+        <button data-key="escape" class="ab b">B</button>
+        <button data-key=" " class="ab a">A</button>
       </div>
     </div>
 
-    <footer id="foot">
-      Strainmon — RPG de exploración y genética landrace. Sin combates. Solo descubrimiento.
-    </footer>
+    <div id="menurow">
+      <button data-key="i" class="mb" title="Mochila">🎒</button>
+      <button data-key="g" class="mb" title="Invernadero">🌿</button>
+      <button data-key="l" class="mb" title="Laboratorio">🔬</button>
+      <button data-key="b" class="mb" title="Banco">🧬</button>
+      <button data-key="c" class="mb" title="Strain-dex">📖</button>
+      <button data-key="q" class="mb" title="Misiones">📋</button>
+      <button data-key="m" class="mb" title="Guardar">💾</button>
+    </div>
+
+    <div class="speaker"><i></i><i></i><i></i><i></i><i></i><i></i></div>
   </div>
   <script>
 /* ==== src/util.js ==== */
@@ -3747,11 +3840,9 @@ html, body {
   }
 
   function resize() {
-    const maxW = window.innerWidth - 24, maxH = window.innerHeight - 120;
-    const sc = Math.max(1, Math.min(maxW / game.W, maxH / game.H));
+    // Búfer a resolución interna; el tamaño de pantalla lo gestiona la LCD (CSS).
     game.canvas.width = game.W; game.canvas.height = game.H;
-    game.canvas.style.width = Math.floor(game.W * sc) + 'px';
-    game.canvas.style.height = Math.floor(game.H * sc) + 'px';
+    game.canvas.style.width = '100%'; game.canvas.style.height = '100%';
     game.ctx.imageSmoothingEnabled = false;
   }
 
@@ -3793,34 +3884,33 @@ html, body {
   }
 
   /* ------------------------- ENTRADA ------------------------- */
+  const MOVE_KEYS = { arrowup: 1, arrowdown: 1, arrowleft: 1, arrowright: 1, w: 1, a: 1, s: 1, d: 1 };
+  // Acción de un botón/tecla (A=espacio/confirmar, B=escape/volver, atajos de panel).
+  function doAction(k) {
+    if (game.mode === 'title') return;
+    if (game.mode === 'dialog') { if (k === ' ' || k === 'e' || k === 'enter') PH.ui.dialogNext(); return; }
+    if (game.mode === 'menu') { if (k === 'escape' || k === 'b' || k === 'i' || k === 'c' || k === 'q' || k === 'g' || k === 'l') PH.ui.close(); return; }
+    if (game.mode !== 'overworld') return;
+    if (k === ' ' || k === 'e') interact();
+    else if (k === 'i') PH.ui.bag(); else if (k === 'b') PH.ui.bank();
+    else if (k === 'c') PH.ui.catalog(); else if (k === 'q') PH.ui.quests();
+    else if (k === 'l') PH.ui.lab(); else if (k === 'g') PH.ui.greenhouse();
+    else if (k === 'm') { PH.state.save(); PH.ui.toast('Partida guardada.', 'ok'); }
+  }
   function bindInput() {
     window.addEventListener('keydown', (e) => {
       const k = e.key.toLowerCase(); game.keys[k] = true;
-      if (game.mode === 'dialog' && (k === ' ' || k === 'e' || k === 'enter')) { e.preventDefault(); PH.ui.dialogNext(); return; }
-      if (game.mode === 'title') return;
-      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
-      if (game.mode === 'overworld') {
-        if (k === ' ' || k === 'e') interact();
-        else if (k === 'i') PH.ui.bag(); else if (k === 'b') PH.ui.bank();
-        else if (k === 'c') PH.ui.catalog(); else if (k === 'q') PH.ui.quests();
-        else if (k === 'l') PH.ui.lab(); else if (k === 'g') PH.ui.greenhouse();
-        else if (k === 'm') { PH.state.save(); PH.ui.toast('Partida guardada.', 'ok'); }
-      } else if (game.mode === 'menu') {
-        if (k === 'escape' || k === 'i' || k === 'b' || k === 'c' || k === 'q') PH.ui.close();
-      }
+      if (MOVE_KEYS[k] || k === ' ') e.preventDefault();
+      if (!MOVE_KEYS[k]) doAction(k);
     });
     window.addEventListener('keyup', (e) => { game.keys[e.key.toLowerCase()] = false; });
     document.querySelectorAll('[data-key]').forEach(btn => {
       const key = btn.dataset.key;
-      const down = (e) => { e.preventDefault(); game.keys[key] = true; if (key === ' ') simTap(); };
-      const up = (e) => { if (e) e.preventDefault(); game.keys[key] = false; };
-      btn.addEventListener('touchstart', down); btn.addEventListener('touchend', up);
+      const down = (e) => { e.preventDefault(); if (MOVE_KEYS[key]) game.keys[key] = true; else doAction(key); };
+      const up = (e) => { if (e) e.preventDefault(); if (MOVE_KEYS[key]) game.keys[key] = false; };
+      btn.addEventListener('touchstart', down, { passive: false }); btn.addEventListener('touchend', up, { passive: false });
       btn.addEventListener('mousedown', down); btn.addEventListener('mouseup', up); btn.addEventListener('mouseleave', up);
     });
-  }
-  function simTap() {
-    if (game.mode === 'dialog') PH.ui.dialogNext();
-    else if (game.mode === 'overworld') interact();
   }
 
   /* ------------------------- INTERACCIÓN ------------------------- */

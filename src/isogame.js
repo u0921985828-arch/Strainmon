@@ -172,11 +172,9 @@
   }
 
   function resize() {
-    const maxW = window.innerWidth - 24, maxH = window.innerHeight - 120;
-    const sc = Math.max(1, Math.min(maxW / game.W, maxH / game.H));
+    // Búfer a resolución interna; el tamaño de pantalla lo gestiona la LCD (CSS).
     game.canvas.width = game.W; game.canvas.height = game.H;
-    game.canvas.style.width = Math.floor(game.W * sc) + 'px';
-    game.canvas.style.height = Math.floor(game.H * sc) + 'px';
+    game.canvas.style.width = '100%'; game.canvas.style.height = '100%';
     game.ctx.imageSmoothingEnabled = false;
   }
 
@@ -218,34 +216,33 @@
   }
 
   /* ------------------------- ENTRADA ------------------------- */
+  const MOVE_KEYS = { arrowup: 1, arrowdown: 1, arrowleft: 1, arrowright: 1, w: 1, a: 1, s: 1, d: 1 };
+  // Acción de un botón/tecla (A=espacio/confirmar, B=escape/volver, atajos de panel).
+  function doAction(k) {
+    if (game.mode === 'title') return;
+    if (game.mode === 'dialog') { if (k === ' ' || k === 'e' || k === 'enter') PH.ui.dialogNext(); return; }
+    if (game.mode === 'menu') { if (k === 'escape' || k === 'b' || k === 'i' || k === 'c' || k === 'q' || k === 'g' || k === 'l') PH.ui.close(); return; }
+    if (game.mode !== 'overworld') return;
+    if (k === ' ' || k === 'e') interact();
+    else if (k === 'i') PH.ui.bag(); else if (k === 'b') PH.ui.bank();
+    else if (k === 'c') PH.ui.catalog(); else if (k === 'q') PH.ui.quests();
+    else if (k === 'l') PH.ui.lab(); else if (k === 'g') PH.ui.greenhouse();
+    else if (k === 'm') { PH.state.save(); PH.ui.toast('Partida guardada.', 'ok'); }
+  }
   function bindInput() {
     window.addEventListener('keydown', (e) => {
       const k = e.key.toLowerCase(); game.keys[k] = true;
-      if (game.mode === 'dialog' && (k === ' ' || k === 'e' || k === 'enter')) { e.preventDefault(); PH.ui.dialogNext(); return; }
-      if (game.mode === 'title') return;
-      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
-      if (game.mode === 'overworld') {
-        if (k === ' ' || k === 'e') interact();
-        else if (k === 'i') PH.ui.bag(); else if (k === 'b') PH.ui.bank();
-        else if (k === 'c') PH.ui.catalog(); else if (k === 'q') PH.ui.quests();
-        else if (k === 'l') PH.ui.lab(); else if (k === 'g') PH.ui.greenhouse();
-        else if (k === 'm') { PH.state.save(); PH.ui.toast('Partida guardada.', 'ok'); }
-      } else if (game.mode === 'menu') {
-        if (k === 'escape' || k === 'i' || k === 'b' || k === 'c' || k === 'q') PH.ui.close();
-      }
+      if (MOVE_KEYS[k] || k === ' ') e.preventDefault();
+      if (!MOVE_KEYS[k]) doAction(k);
     });
     window.addEventListener('keyup', (e) => { game.keys[e.key.toLowerCase()] = false; });
     document.querySelectorAll('[data-key]').forEach(btn => {
       const key = btn.dataset.key;
-      const down = (e) => { e.preventDefault(); game.keys[key] = true; if (key === ' ') simTap(); };
-      const up = (e) => { if (e) e.preventDefault(); game.keys[key] = false; };
-      btn.addEventListener('touchstart', down); btn.addEventListener('touchend', up);
+      const down = (e) => { e.preventDefault(); if (MOVE_KEYS[key]) game.keys[key] = true; else doAction(key); };
+      const up = (e) => { if (e) e.preventDefault(); if (MOVE_KEYS[key]) game.keys[key] = false; };
+      btn.addEventListener('touchstart', down, { passive: false }); btn.addEventListener('touchend', up, { passive: false });
       btn.addEventListener('mousedown', down); btn.addEventListener('mouseup', up); btn.addEventListener('mouseleave', up);
     });
-  }
-  function simTap() {
-    if (game.mode === 'dialog') PH.ui.dialogNext();
-    else if (game.mode === 'overworld') interact();
   }
 
   /* ------------------------- INTERACCIÓN ------------------------- */

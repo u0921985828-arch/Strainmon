@@ -7,35 +7,45 @@
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
-  <div id="app">
-    <div id="hud"></div>
+  <!-- Consola portátil retro ORIGINAL (no reproduce ninguna marca/diseño comercial) -->
+  <div id="device">
+    <div id="brand"><span class="mark">STRAIN<b>BOY</b></span><span class="led"></span><span class="tag">COLOR · GENETICS</span></div>
 
-    <div id="stage">
-      <canvas id="screen" width="240" height="160"></canvas>
-      <div id="overlay"></div>
-      <div id="toasts"></div>
+    <div id="lcd">
+      <div class="lcd-inner">
+        <div id="hud"></div>
+        <canvas id="screen" width="480" height="320"></canvas>
+        <div id="overlay"></div>
+        <div id="toasts"></div>
+      </div>
+      <div class="lcd-glare"></div>
     </div>
 
-    <div id="touch">
-      <div class="dpad">
-        <button data-key="arrowup" class="tb up">▲</button>
-        <button data-key="arrowleft" class="tb left">◀</button>
-        <button data-key="arrowright" class="tb right">▶</button>
-        <button data-key="arrowdown" class="tb down">▼</button>
+    <div id="controls">
+      <div class="dpad" aria-label="dpad">
+        <button data-key="arrowup" class="db up">▲</button>
+        <button data-key="arrowleft" class="db left">◀</button>
+        <button data-key="arrowright" class="db right">▶</button>
+        <button data-key="arrowdown" class="db down">▼</button>
+        <span class="db-center"></span>
       </div>
-      <div class="abtns">
-        <button data-key=" " class="tb a">A</button>
-        <div class="menu-keys">
-          <button data-key="i" class="tb s">🎒</button>
-          <button data-key="b" class="tb s">🧬</button>
-          <button data-key="c" class="tb s">🌿</button>
-        </div>
+      <div class="face">
+        <button data-key="escape" class="ab b">B</button>
+        <button data-key=" " class="ab a">A</button>
       </div>
     </div>
 
-    <footer id="foot">
-      Strainmon — RPG de exploración y genética landrace. Sin combates. Solo descubrimiento.
-    </footer>
+    <div id="menurow">
+      <button data-key="i" class="mb" title="Mochila">🎒</button>
+      <button data-key="g" class="mb" title="Invernadero">🌿</button>
+      <button data-key="l" class="mb" title="Laboratorio">🔬</button>
+      <button data-key="b" class="mb" title="Banco">🧬</button>
+      <button data-key="c" class="mb" title="Strain-dex">📖</button>
+      <button data-key="q" class="mb" title="Misiones">📋</button>
+      <button data-key="m" class="mb" title="Guardar">💾</button>
+    </div>
+
+    <div class="speaker"><i></i><i></i><i></i><i></i><i></i><i></i></div>
   </div>
 
   <script src="src/util.js"></script>
