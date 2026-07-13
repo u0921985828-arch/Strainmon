@@ -1,0 +1,674 @@
+{
+  "$schema": "strainmon-pixellab-manifest/1",
+  "note": "Generado por scripts/build-pixellab-manifest.mjs. Editable a mano. Ejecutar con scripts/gen-pixellab.mjs.",
+  "style": {
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail",
+    "view": "side",
+    "no_background": true,
+    "text_guidance_scale": 8,
+    "negative_description": "blurry, 3d render, gradient, soft shading, antialiasing, photo, realistic, watermark, text, signature, extra limbs, cut off",
+    "palette": [
+      "#1a1c2c",
+      "#5d275d",
+      "#b13e53",
+      "#ef7d57",
+      "#ffcd75",
+      "#a7f070",
+      "#38b764",
+      "#257179",
+      "#29366f",
+      "#3b5dc9",
+      "#41a6f6",
+      "#73eff7",
+      "#f4f4f4",
+      "#94b0c2",
+      "#566c86",
+      "#333c57"
+    ]
+  },
+  "groups": {
+    "chars": {
+      "size": {
+        "width": 64,
+        "height": 80
+      },
+      "view": "side",
+      "seed": 1000,
+      "items": [
+        {
+          "name": "player_1",
+          "direction": "south",
+          "description": "Full-body pixel-art game character, young plant-hunter hero, green snapback cap, dark-green hoodie, khaki cargo shorts, small backpack, brown boots, standing, facing the viewer (front view). Single centered character, transparent background."
+        },
+        {
+          "name": "player_2",
+          "direction": "west",
+          "description": "Full-body pixel-art game character, young plant-hunter hero, green snapback cap, dark-green hoodie, khaki cargo shorts, small backpack, brown boots, standing, facing left (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "player_3",
+          "direction": "east",
+          "description": "Full-body pixel-art game character, young plant-hunter hero, green snapback cap, dark-green hoodie, khaki cargo shorts, small backpack, brown boots, standing, facing right (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "player_4",
+          "direction": "north",
+          "description": "Full-body pixel-art game character, young plant-hunter hero, green snapback cap, dark-green hoodie, khaki cargo shorts, small backpack, brown boots, standing, seen from behind (back view). Single centered character, transparent background."
+        },
+        {
+          "name": "botanist_1",
+          "direction": "south",
+          "description": "Full-body pixel-art game character, female botanist scientist, open white lab coat over a green shirt, safety goggles on forehead, dark hair in a bun, standing, facing the viewer (front view). Single centered character, transparent background."
+        },
+        {
+          "name": "botanist_2",
+          "direction": "west",
+          "description": "Full-body pixel-art game character, female botanist scientist, open white lab coat over a green shirt, safety goggles on forehead, dark hair in a bun, standing, facing left (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "botanist_3",
+          "direction": "east",
+          "description": "Full-body pixel-art game character, female botanist scientist, open white lab coat over a green shirt, safety goggles on forehead, dark hair in a bun, standing, facing right (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "botanist_4",
+          "direction": "north",
+          "description": "Full-body pixel-art game character, female botanist scientist, open white lab coat over a green shirt, safety goggles on forehead, dark hair in a bun, standing, seen from behind (back view). Single centered character, transparent background."
+        },
+        {
+          "name": "dealer_1",
+          "direction": "south",
+          "description": "Full-body pixel-art game character, shady streetwise dealer, dark hoodie with hood up, sunglasses, thin gold chain, baggy jeans, sneakers, standing, facing the viewer (front view). Single centered character, transparent background."
+        },
+        {
+          "name": "dealer_2",
+          "direction": "west",
+          "description": "Full-body pixel-art game character, shady streetwise dealer, dark hoodie with hood up, sunglasses, thin gold chain, baggy jeans, sneakers, standing, facing left (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "dealer_3",
+          "direction": "east",
+          "description": "Full-body pixel-art game character, shady streetwise dealer, dark hoodie with hood up, sunglasses, thin gold chain, baggy jeans, sneakers, standing, facing right (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "dealer_4",
+          "direction": "north",
+          "description": "Full-body pixel-art game character, shady streetwise dealer, dark hoodie with hood up, sunglasses, thin gold chain, baggy jeans, sneakers, standing, seen from behind (back view). Single centered character, transparent background."
+        },
+        {
+          "name": "merchant_1",
+          "direction": "south",
+          "description": "Full-body pixel-art game character, friendly shopkeeper, green apron over rolled-up sleeves, flat cap, bushy mustache, standing, facing the viewer (front view). Single centered character, transparent background."
+        },
+        {
+          "name": "merchant_2",
+          "direction": "west",
+          "description": "Full-body pixel-art game character, friendly shopkeeper, green apron over rolled-up sleeves, flat cap, bushy mustache, standing, facing left (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "merchant_3",
+          "direction": "east",
+          "description": "Full-body pixel-art game character, friendly shopkeeper, green apron over rolled-up sleeves, flat cap, bushy mustache, standing, facing right (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "merchant_4",
+          "direction": "north",
+          "description": "Full-body pixel-art game character, friendly shopkeeper, green apron over rolled-up sleeves, flat cap, bushy mustache, standing, seen from behind (back view). Single centered character, transparent background."
+        },
+        {
+          "name": "customer1_1",
+          "direction": "south",
+          "description": "Full-body pixel-art game character, slim casual townsperson, plain t-shirt and jeans, standing, facing the viewer (front view). Single centered character, transparent background."
+        },
+        {
+          "name": "customer1_2",
+          "direction": "west",
+          "description": "Full-body pixel-art game character, slim casual townsperson, plain t-shirt and jeans, standing, facing left (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "customer1_3",
+          "direction": "east",
+          "description": "Full-body pixel-art game character, slim casual townsperson, plain t-shirt and jeans, standing, facing right (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "customer1_4",
+          "direction": "north",
+          "description": "Full-body pixel-art game character, slim casual townsperson, plain t-shirt and jeans, standing, seen from behind (back view). Single centered character, transparent background."
+        },
+        {
+          "name": "customer2_1",
+          "direction": "south",
+          "description": "Full-body pixel-art game character, stocky cheerful townsperson, oversized hoodie and shorts, standing, facing the viewer (front view). Single centered character, transparent background."
+        },
+        {
+          "name": "customer2_2",
+          "direction": "west",
+          "description": "Full-body pixel-art game character, stocky cheerful townsperson, oversized hoodie and shorts, standing, facing left (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "customer2_3",
+          "direction": "east",
+          "description": "Full-body pixel-art game character, stocky cheerful townsperson, oversized hoodie and shorts, standing, facing right (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "customer2_4",
+          "direction": "north",
+          "description": "Full-body pixel-art game character, stocky cheerful townsperson, oversized hoodie and shorts, standing, seen from behind (back view). Single centered character, transparent background."
+        },
+        {
+          "name": "walker_1",
+          "direction": "south",
+          "description": "Full-body pixel-art game character, elderly villager out for a walk, cardigan, flat cap, wooden cane, standing, facing the viewer (front view). Single centered character, transparent background."
+        },
+        {
+          "name": "walker_2",
+          "direction": "west",
+          "description": "Full-body pixel-art game character, elderly villager out for a walk, cardigan, flat cap, wooden cane, standing, facing left (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "walker_3",
+          "direction": "east",
+          "description": "Full-body pixel-art game character, elderly villager out for a walk, cardigan, flat cap, wooden cane, standing, facing right (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "walker_4",
+          "direction": "north",
+          "description": "Full-body pixel-art game character, elderly villager out for a walk, cardigan, flat cap, wooden cane, standing, seen from behind (back view). Single centered character, transparent background."
+        },
+        {
+          "name": "neighbor_1",
+          "direction": "south",
+          "description": "Full-body pixel-art game character, friendly neighbor gardener, denim overalls, straw hat, gardening gloves, standing, facing the viewer (front view). Single centered character, transparent background."
+        },
+        {
+          "name": "neighbor_2",
+          "direction": "west",
+          "description": "Full-body pixel-art game character, friendly neighbor gardener, denim overalls, straw hat, gardening gloves, standing, facing left (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "neighbor_3",
+          "direction": "east",
+          "description": "Full-body pixel-art game character, friendly neighbor gardener, denim overalls, straw hat, gardening gloves, standing, facing right (side view). Single centered character, transparent background."
+        },
+        {
+          "name": "neighbor_4",
+          "direction": "north",
+          "description": "Full-body pixel-art game character, friendly neighbor gardener, denim overalls, straw hat, gardening gloves, standing, seen from behind (back view). Single centered character, transparent background."
+        }
+      ]
+    },
+    "plants": {
+      "size": {
+        "width": 96,
+        "height": 128
+      },
+      "view": "side",
+      "seed": 2000,
+      "items": [
+        {
+          "name": "SM-001_1",
+          "description": "Cannabis sativa de altura landrace \"Michoacana\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-001_2",
+          "description": "Cannabis sativa de altura landrace \"Michoacana\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  narrow slender leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-001_3",
+          "description": "Cannabis sativa de altura landrace \"Michoacana\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. narrow slender leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-001_4",
+          "description": "Cannabis sativa de altura landrace \"Michoacana\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. narrow slender leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-001_5",
+          "description": "Cannabis sativa de altura landrace \"Michoacana\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. narrow slender leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-002_1",
+          "description": "Cannabis sativa costera landrace \"Oro de Acapulco\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-002_2",
+          "description": "Cannabis sativa costera landrace \"Oro de Acapulco\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  finger-like palmate leaves, warm amber buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-002_3",
+          "description": "Cannabis sativa costera landrace \"Oro de Acapulco\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. finger-like palmate leaves, warm amber buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-002_4",
+          "description": "Cannabis sativa costera landrace \"Oro de Acapulco\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. finger-like palmate leaves, warm amber buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-002_5",
+          "description": "Cannabis sativa costera landrace \"Oro de Acapulco\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. finger-like palmate leaves, warm amber buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-003_1",
+          "description": "Cannabis sativa andina landrace \"Punto Rojo\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-003_2",
+          "description": "Cannabis sativa andina landrace \"Punto Rojo\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  narrow slender leaves, deep crimson-red buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-003_3",
+          "description": "Cannabis sativa andina landrace \"Punto Rojo\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. narrow slender leaves, deep crimson-red buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-003_4",
+          "description": "Cannabis sativa andina landrace \"Punto Rojo\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. narrow slender leaves, deep crimson-red buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-003_5",
+          "description": "Cannabis sativa andina landrace \"Punto Rojo\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. narrow slender leaves, deep crimson-red buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-004_1",
+          "description": "Cannabis sativa ecuatorial landrace \"Tailandesa\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-004_2",
+          "description": "Cannabis sativa ecuatorial landrace \"Tailandesa\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  narrow slender leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-004_3",
+          "description": "Cannabis sativa ecuatorial landrace \"Tailandesa\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. narrow slender leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-004_4",
+          "description": "Cannabis sativa ecuatorial landrace \"Tailandesa\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. narrow slender leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-004_5",
+          "description": "Cannabis sativa ecuatorial landrace \"Tailandesa\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. narrow slender leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-005_1",
+          "description": "Cannabis sativa de selva landrace \"Laosiana\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-005_2",
+          "description": "Cannabis sativa de selva landrace \"Laosiana\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  finger-like palmate leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-005_3",
+          "description": "Cannabis sativa de selva landrace \"Laosiana\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. finger-like palmate leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-005_4",
+          "description": "Cannabis sativa de selva landrace \"Laosiana\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. finger-like palmate leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-005_5",
+          "description": "Cannabis sativa de selva landrace \"Laosiana\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. finger-like palmate leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-006_1",
+          "description": "Cannabis índica de charas landrace \"Charas de Chitral\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-006_2",
+          "description": "Cannabis índica de charas landrace \"Charas de Chitral\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  broad wide fan leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-006_3",
+          "description": "Cannabis índica de charas landrace \"Charas de Chitral\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. short bushy plant with dense chunky resinous buds. broad wide fan leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-006_4",
+          "description": "Cannabis índica de charas landrace \"Charas de Chitral\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. short bushy plant with dense chunky resinous buds. broad wide fan leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-006_5",
+          "description": "Cannabis índica de charas landrace \"Charas de Chitral\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. short bushy plant with dense chunky resinous buds. broad wide fan leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-007_1",
+          "description": "Cannabis híbrida himalaya landrace \"Nepalí de Montaña\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-007_2",
+          "description": "Cannabis híbrida himalaya landrace \"Nepalí de Montaña\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  broad wide fan leaves, royal purple buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-007_3",
+          "description": "Cannabis híbrida himalaya landrace \"Nepalí de Montaña\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. medium balanced plant with moderately dense buds. broad wide fan leaves, royal purple buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-007_4",
+          "description": "Cannabis híbrida himalaya landrace \"Nepalí de Montaña\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. medium balanced plant with moderately dense buds. broad wide fan leaves, royal purple buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-007_5",
+          "description": "Cannabis híbrida himalaya landrace \"Nepalí de Montaña\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. medium balanced plant with moderately dense buds. broad wide fan leaves, royal purple buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-008_1",
+          "description": "Cannabis sativa africana landrace \"Reina del Congo\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-008_2",
+          "description": "Cannabis sativa africana landrace \"Reina del Congo\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  narrow slender leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-008_3",
+          "description": "Cannabis sativa africana landrace \"Reina del Congo\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. narrow slender leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-008_4",
+          "description": "Cannabis sativa africana landrace \"Reina del Congo\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. narrow slender leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-008_5",
+          "description": "Cannabis sativa africana landrace \"Reina del Congo\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. narrow slender leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-009_1",
+          "description": "Cannabis sativa ecuatorial landrace \"Malawi Dorada\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-009_2",
+          "description": "Cannabis sativa ecuatorial landrace \"Malawi Dorada\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  finger-like palmate leaves, golden-yellow buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-009_3",
+          "description": "Cannabis sativa ecuatorial landrace \"Malawi Dorada\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. finger-like palmate leaves, golden-yellow buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-009_4",
+          "description": "Cannabis sativa ecuatorial landrace \"Malawi Dorada\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. finger-like palmate leaves, golden-yellow buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-009_5",
+          "description": "Cannabis sativa ecuatorial landrace \"Malawi Dorada\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. finger-like palmate leaves, golden-yellow buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-010_1",
+          "description": "Cannabis sativa isleña landrace \"Jamaicana Costera\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-010_2",
+          "description": "Cannabis sativa isleña landrace \"Jamaicana Costera\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  palmate hand-shaped leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-010_3",
+          "description": "Cannabis sativa isleña landrace \"Jamaicana Costera\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. palmate hand-shaped leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-010_4",
+          "description": "Cannabis sativa isleña landrace \"Jamaicana Costera\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. palmate hand-shaped leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-010_5",
+          "description": "Cannabis sativa isleña landrace \"Jamaicana Costera\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. palmate hand-shaped leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-011_1",
+          "description": "Cannabis índica de hachís landrace \"Rifeña Kif\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-011_2",
+          "description": "Cannabis índica de hachís landrace \"Rifeña Kif\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  broad wide fan leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-011_3",
+          "description": "Cannabis índica de hachís landrace \"Rifeña Kif\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. short bushy plant with dense chunky resinous buds. broad wide fan leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-011_4",
+          "description": "Cannabis índica de hachís landrace \"Rifeña Kif\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. short bushy plant with dense chunky resinous buds. broad wide fan leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-011_5",
+          "description": "Cannabis índica de hachís landrace \"Rifeña Kif\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. short bushy plant with dense chunky resinous buds. broad wide fan leaves, bright lime-green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-012_1",
+          "description": "Cannabis landrace del rif landrace \"Beldia\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-012_2",
+          "description": "Cannabis landrace del rif landrace \"Beldia\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  serrated saw-edged leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-012_3",
+          "description": "Cannabis landrace del rif landrace \"Beldia\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. serrated saw-edged leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-012_4",
+          "description": "Cannabis landrace del rif landrace \"Beldia\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. serrated saw-edged leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-012_5",
+          "description": "Cannabis landrace del rif landrace \"Beldia\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. serrated saw-edged leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-013_1",
+          "description": "Cannabis sativa volcánica landrace \"Oaxaqueña\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-013_2",
+          "description": "Cannabis sativa volcánica landrace \"Oaxaqueña\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  lobed leaves, deep crimson-red buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-013_3",
+          "description": "Cannabis sativa volcánica landrace \"Oaxaqueña\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. lobed leaves, deep crimson-red buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-013_4",
+          "description": "Cannabis sativa volcánica landrace \"Oaxaqueña\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. lobed leaves, deep crimson-red buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-013_5",
+          "description": "Cannabis sativa volcánica landrace \"Oaxaqueña\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. lobed leaves, deep crimson-red buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-014_1",
+          "description": "Cannabis sativa tropical landrace \"Rojo de Panamá\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-014_2",
+          "description": "Cannabis sativa tropical landrace \"Rojo de Panamá\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  finger-like palmate leaves, deep crimson-red buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-014_3",
+          "description": "Cannabis sativa tropical landrace \"Rojo de Panamá\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. finger-like palmate leaves, deep crimson-red buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-014_4",
+          "description": "Cannabis sativa tropical landrace \"Rojo de Panamá\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. finger-like palmate leaves, deep crimson-red buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-014_5",
+          "description": "Cannabis sativa tropical landrace \"Rojo de Panamá\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. tall lanky sativa plant with long internodes and airy foxtail buds. finger-like palmate leaves, deep crimson-red buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-015_1",
+          "description": "Cannabis índica de montaña landrace \"Kush Ancestral\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-015_2",
+          "description": "Cannabis índica de montaña landrace \"Kush Ancestral\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  broad wide fan leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-015_3",
+          "description": "Cannabis índica de montaña landrace \"Kush Ancestral\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. short bushy plant with dense chunky resinous buds. broad wide fan leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-015_4",
+          "description": "Cannabis índica de montaña landrace \"Kush Ancestral\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. short bushy plant with dense chunky resinous buds. broad wide fan leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-015_5",
+          "description": "Cannabis índica de montaña landrace \"Kush Ancestral\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. short bushy plant with dense chunky resinous buds. broad wide fan leaves, rich green foliage. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-016_1",
+          "description": "Cannabis índica pura landrace \"Afgana Púrpura\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-016_2",
+          "description": "Cannabis índica pura landrace \"Afgana Púrpura\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  broad wide fan leaves, royal purple buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-016_3",
+          "description": "Cannabis índica pura landrace \"Afgana Púrpura\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. short bushy plant with dense chunky resinous buds. broad wide fan leaves, royal purple buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-016_4",
+          "description": "Cannabis índica pura landrace \"Afgana Púrpura\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. short bushy plant with dense chunky resinous buds. broad wide fan leaves, royal purple buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-016_5",
+          "description": "Cannabis índica pura landrace \"Afgana Púrpura\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. short bushy plant with dense chunky resinous buds. broad wide fan leaves, royal purple buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-000_1",
+          "description": "Cannabis landrace madre landrace \"Cepa Primigenia\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-000_2",
+          "description": "Cannabis landrace madre landrace \"Cepa Primigenia\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  finger-like palmate leaves, golden-yellow buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-000_3",
+          "description": "Cannabis landrace madre landrace \"Cepa Primigenia\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. ancient primordial landrace plant, tall and hardy. finger-like palmate leaves, golden-yellow buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-000_4",
+          "description": "Cannabis landrace madre landrace \"Cepa Primigenia\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. ancient primordial landrace plant, tall and hardy. finger-like palmate leaves, golden-yellow buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-000_5",
+          "description": "Cannabis landrace madre landrace \"Cepa Primigenia\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. ancient primordial landrace plant, tall and hardy. finger-like palmate leaves, golden-yellow buds. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-017_1",
+          "description": "Cannabis reliquia fósil landrace \"Semilla del Edén\", tiny young seedling sprout with two cotyledons and a first pair of serrated leaves in a small terracotta pot.  Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-017_2",
+          "description": "Cannabis reliquia fósil landrace \"Semilla del Edén\", small vegetative plant, a few nodes of fan leaves, no buds yet, in a terracotta pot.  net-veined leaves, near-black obsidian-dark leaves. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-017_3",
+          "description": "Cannabis reliquia fósil landrace \"Semilla del Edén\", bushy vegetative plant, full leafy canopy, strong stem, no flowers yet, in a terracotta pot. ancient primordial landrace plant, tall and hardy. net-veined leaves, near-black obsidian-dark leaves. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-017_4",
+          "description": "Cannabis reliquia fósil landrace \"Semilla del Edén\", flowering plant with forming buds and white pistils among the leaves, in a terracotta pot. ancient primordial landrace plant, tall and hardy. net-veined leaves, near-black obsidian-dark leaves. Single centered plant, transparent background."
+        },
+        {
+          "name": "SM-017_5",
+          "description": "Cannabis reliquia fósil landrace \"Semilla del Edén\", mature harvest-ready plant, big frosty trichome-covered colas, dense ripe buds, in a terracotta pot. ancient primordial landrace plant, tall and hardy. net-veined leaves, near-black obsidian-dark leaves. Single centered plant, transparent background."
+        }
+      ]
+    },
+    "furni": {
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "view": "side",
+      "oblique_projection": true,
+      "seed": 3000,
+      "items": [
+        {
+          "name": "furni_bed",
+          "description": "Pixel-art game furniture: a simple single bed with a green blanket and pillow. Single centered object, transparent background."
+        },
+        {
+          "name": "furni_grow_bench",
+          "description": "Pixel-art game furniture: a grow bench with young potted cannabis plants and a small grow light. Single centered object, transparent background."
+        },
+        {
+          "name": "furni_lab_table",
+          "description": "Pixel-art game furniture: a science lab table with beakers, a microscope and petri dishes. Single centered object, transparent background."
+        },
+        {
+          "name": "furni_lamp",
+          "description": "Pixel-art game furniture: a tall floor lamp with a warm glowing shade. Single centered object, transparent background."
+        },
+        {
+          "name": "furni_pc_desk",
+          "description": "Pixel-art game furniture: a desk with a retro CRT computer and keyboard. Single centered object, transparent background."
+        },
+        {
+          "name": "furni_shop_counter",
+          "description": "Pixel-art game furniture: a wooden shop counter with a cash register. Single centered object, transparent background."
+        }
+      ]
+    },
+    "parts": {
+      "size": {
+        "width": 96,
+        "height": 96
+      },
+      "view": "side",
+      "seed": 4000,
+      "items": [
+        {
+          "name": "branch_side",
+          "description": "Pixel-art a single side branch of a cannabis plant with a few leaves. Single centered element, transparent background."
+        },
+        {
+          "name": "branch_upper",
+          "description": "Pixel-art an upper branch of a cannabis plant with a small bud. Single centered element, transparent background."
+        },
+        {
+          "name": "bud_medium",
+          "description": "Pixel-art a medium cannabis flower bud with orange pistils. Single centered element, transparent background."
+        },
+        {
+          "name": "bud_small",
+          "description": "Pixel-art a small cannabis flower bud. Single centered element, transparent background."
+        },
+        {
+          "name": "cola_large",
+          "description": "Pixel-art a large frosty top cola of a cannabis plant. Single centered element, transparent background."
+        },
+        {
+          "name": "leaf_fan5_indica",
+          "description": "Pixel-art a five-fingered broad indica cannabis fan leaf. Single centered element, transparent background."
+        },
+        {
+          "name": "leaf_fan7",
+          "description": "Pixel-art a seven-fingered cannabis fan leaf. Single centered element, transparent background."
+        },
+        {
+          "name": "leaf_fan9",
+          "description": "Pixel-art a nine-fingered slender sativa cannabis fan leaf. Single centered element, transparent background."
+        },
+        {
+          "name": "leaf_sugar",
+          "description": "Pixel-art a small frosty sugar leaf covered in trichomes. Single centered element, transparent background."
+        },
+        {
+          "name": "pistils_cluster",
+          "description": "Pixel-art a cluster of white and orange cannabis pistils. Single centered element, transparent background."
+        },
+        {
+          "name": "pot_terracotta",
+          "description": "Pixel-art an empty terracotta plant pot with soil. Single centered element, transparent background."
+        },
+        {
+          "name": "roots",
+          "description": "Pixel-art a bare root ball of a cannabis plant. Single centered element, transparent background."
+        },
+        {
+          "name": "seedling",
+          "description": "Pixel-art a tiny cannabis seedling sprout with two cotyledons. Single centered element, transparent background."
+        },
+        {
+          "name": "stem_main",
+          "description": "Pixel-art a straight main green plant stem. Single centered element, transparent background."
+        }
+      ]
+    }
+  }
+}

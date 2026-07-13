@@ -69,3 +69,46 @@ curl -sS "$HTTPS_PROXY/__agentproxy/status"   # recentRelayFailures no debe list
 
 Si sigue apareciendo `403 CONNECT rejected` para `api.pixellab.ai`, la allowlist de la
 política de red aún no incluye el host.
+
+## Generar el set completo de sprites (estilo coherente)
+
+Hay un pipeline listo, independiente del MCP, que llama a la API REST de Pixellab.
+La **coherencia de estilo** se logra aplicando a todas las peticiones los mismos
+knobs (outline / shading / detail / view) y la **misma paleta forzada** (Sweetie 16)
+vía `color_image`.
+
+Archivos:
+
+| Archivo | Rol |
+|---|---|
+| `scripts/build-pixellab-manifest.mjs` | Lee `src/species.js` y genera el manifiesto: 18 cepas × 5 fases + personajes (8 × 4 direcciones) + mobiliario + piezas. |
+| `prompts/pixellab.json` | Manifiesto generado (142 sprites). **Editable a mano**: ajusta descripciones, tamaños o el bloque `style`. |
+| `scripts/gen-pixellab.mjs` | Ejecutor sin dependencias: lee el manifiesto y escribe los PNG. |
+
+Flujo:
+
+```bash
+# 1. (opcional) regenerar el manifiesto desde species.js
+node scripts/build-pixellab-manifest.mjs
+
+# 2. validar el manifiesto sin gastar créditos (no llama a la API)
+node scripts/gen-pixellab.mjs --dry-run
+
+# 3. token disponible (env o .secrets/pixellab.key) y host permitido, entonces:
+export PIXELLAB_API_KEY="tu-token"
+node scripts/gen-pixellab.mjs --only=chars --limit=2   # prueba barata primero
+node scripts/gen-pixellab.mjs                          # set completo (142 sprites)
+```
+
+Opciones de `gen-pixellab.mjs`: `[manifest] [outDir]`, `--only=grupo,grupo`,
+`--limit=N`, `--force` (regenera existentes), `--dry-run`, `--delay=MS`.
+Salida por defecto en `assets/gen_pixellab/<grupo>/` (ignorado por git; curar antes
+de versionar). También escribe `_palette.png` con la paleta usada.
+
+Último paso (manual, tras revisar): re-inlinear los PNG elegidos como base64 en
+`src/charart.js` / `src/plantart.js` / `src/sprites.js`, que es de donde el juego
+carga los sprites en runtime (los `assets/*.png` son las fuentes).
+
+> Las `view` / proyección por grupo en el manifiesto (p.ej. `oblique_projection` en
+> mobiliario, 4 direcciones en personajes) son un punto de partida sensato; ajústalas
+> al ver el primer output real.
