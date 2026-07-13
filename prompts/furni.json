@@ -1,0 +1,8 @@
+[
+ { "name": "furni_grow_bench", "prompt": "Pixel art isometrico 16-bit, un solo mueble centrado en perspectiva isometrica 2:1, contorno oscuro 1px #20161f, sombreado suave con luz cenital. Mesa de cultivo de interior: bandeja de madera con patas metalicas y borde, superficie lista para macetas, aspecto de grow indoor limpio." },
+ { "name": "furni_pc_desk", "prompt": "Pixel art isometrico 16-bit, un solo mueble centrado en perspectiva isometrica 2:1, contorno 1px, luz cenital. Escritorio de madera con un ordenador de sobremesa: monitor encendido con pantalla azulada, teclado, torre; silla no necesaria." },
+ { "name": "furni_bed", "prompt": "Pixel art isometrico 16-bit, un solo mueble centrado en perspectiva isometrica 2:1, contorno 1px, luz cenital. Cama individual con estructura de madera, colchon, sabanas y una almohada, colcha de color calido." },
+ { "name": "furni_lab_table", "prompt": "Pixel art isometrico 16-bit, un solo mueble centrado en perspectiva isometrica 2:1, contorno 1px, luz cenital. Mesa de laboratorio blanca con material de quimica: matraces y probetas con liquido de colores, un microscopio pequeno." },
+ { "name": "furni_shop_counter", "prompt": "Pixel art isometrico 16-bit, un solo mueble centrado en perspectiva isometrica 2:1, contorno 1px, luz cenital. Mostrador de tienda de madera con una caja registradora encima y un pequeno toldo o cartel neutro." },
+ { "name": "furni_lamp", "prompt": "Pixel art isometrico 16-bit, un solo objeto centrado en perspectiva isometrica 2:1, contorno 1px, luz cenital. Farola urbana metalica alta con una luz calida encendida en lo alto, base cuadrada." }
+]
