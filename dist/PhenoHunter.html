@@ -3552,8 +3552,11 @@ html, body {
         { gx: 10, gy: 2, to: 'lab', tgx: 3, tgy: 3 },
       ],
       npcs: [
-        { gx: 6, gy: 5, name: 'Dealer Kez', sprite: 'npc6', dialog: 'contrabandista', dir: 'SW' },
-        { gx: 3, gy: 4, name: 'Vecina Bru', sprite: 'npc2', dialog: 'coleccionista', dir: 'SE' },
+        { gx: 6, gy: 5, name: 'Dealer Kez', sprite: 'npc6', dialog: 'contrabandista', dir: 'SW', role: 'dealer' },
+        { gx: 3, gy: 4, name: 'Vecina Bru', sprite: 'npc2', dialog: 'coleccionista', dir: 'SE', role: 'neighbor' },
+        { gx: 8, gy: 3, name: 'Cliente', sprite: 'npc3', dir: 'SW', role: 'customer' },
+        { gx: 4, gy: 6, name: 'Cliente', sprite: 'npc4', dir: 'NE', role: 'customer' },
+        { gx: 11, gy: 5, name: 'Transeúnte', sprite: 'npc5', dir: 'NW', role: 'walker' },
       ],
       objects: [],
       wild: true, // 'g' = parterres con cepas silvestres
@@ -3748,6 +3751,8 @@ html, body {
     const npc = npcAt(m, f.gx, f.gy);
     if (npc) {
       npc.dir = { NE: 'SW', SW: 'NE', NW: 'SE', SE: 'NW' }[p.dir] || 'SW';
+      if (npc.role === 'customer') return dealWith(npc);
+      if (npc.role === 'walker') return PH.ui.dialog(['...cruza la calle sin mirarte.'], null, { sprite: npc.sprite, name: npc.name });
       const pages = PH.quests.DIALOGS[npc.dialog] ? PH.quests.DIALOGS[npc.dialog](G()) : ['...'];
       PH.ui.dialog(pages, null, { sprite: npc.sprite, name: npc.name });
       return;
@@ -3764,6 +3769,40 @@ html, body {
   }
   function pcMenu() {
     PH.ui.dialog(['Terminal: accede a tu Banco (B), Strain-dex (C) o Misiones (Q).'], null, null);
+  }
+
+  // Trato callejero: el cliente compra una cepa de tu banco (premium sobre el
+  // mercado). Base de la economía "dealer" (heat/reputación en fase futura).
+  function dealWith(npc) {
+    const s = G();
+    const stock = s.bank.filter(x => x.form !== 'polen');
+    if (!stock.length) {
+      return PH.ui.dialog(['Cliente: ¿No llevas género? Vuelve cuando tengas algo bueno.'], null, { sprite: npc.sprite, name: npc.name });
+    }
+    // pide la más valiosa que lleves
+    const want = stock.slice().sort((a, b) => b.rarity - a.rarity)[0];
+    const price = Math.round((30 + want.rarity * want.rarity * 1.1 + want.quality * 1.8) * 1.35); // premium callejero
+    PH.ui.open(`
+      <div class="panel">
+        <div class="panel-head"><h2>🤝 Trato callejero</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body center-col">
+          <p><b>${npc.name}:</b> te compro tu <b>${want.nickname || want.name}</b> (${want.speciesId}) por <b>💰 ${price}</b>.</p>
+          <div style="width:120px">${PH.ui.specimenCard(want)}</div>
+          <div class="row">
+            <button class="btn primary" id="d_yes">Vender 💰${price}</button>
+            <button class="btn ghost" id="d_no">Paso</button>
+          </div>
+        </div>
+      </div>`, 'center');
+    PH.ui.paintPlant('pc_' + want.uid, want, 2);
+    document.getElementById('p_close').onclick = PH.ui.close;
+    document.getElementById('d_no').onclick = PH.ui.close;
+    document.getElementById('d_yes').onclick = () => {
+      PH.state.bankRemove(want.uid); PH.state.addCredits(price);
+      s.stats.deals = (s.stats.deals || 0) + 1;
+      PH.ui.toast(`Vendido a ${npc.name}: 💰${price}`, 'ok');
+      PH.ui.updateHUD(); PH.game.afterQuestCheck(); PH.ui.close();
+    };
   }
 
   /* ------------------------- MOVIMIENTO ------------------------- */
@@ -3801,6 +3840,48 @@ html, body {
     centerCam(true); PH.ui.updateHUD(); PH.ui.toast('📍 ' + t.name, '');
   }
 
+  /* ------------------------- IA DE NPCs ------------------------- */
+  // Estados: 'idle' | 'walk'. Deambulan por tiles caminables respetando
+  // colisión (paredes, objetos, jugador y otros NPCs). Los 'dealer'/'neighbor'
+  // se quedan cerca de su sitio; 'customer'/'walker' pasean más.
+  const NPC_STEP = 240;
+  function npcSolid(m, gx, gy, self) {
+    if (solidAt(m, gx, gy, true)) return true;              // pared/objeto/fuera
+    const p = G().player; if (p.x === gx && p.y === gy) return true; // jugador
+    for (const n of m.npcs) if (n !== self && n.gx === gx && n.gy === gy) return true; // otros NPCs
+    return false;
+  }
+  function updateNPCs(dt) {
+    const m = room(G().player.map); if (!m) return;
+    for (const n of m.npcs) {
+      if (n._talk) continue;                                 // pausado al hablar
+      if (n._mv) {
+        n._t += dt;
+        if (n._t >= NPC_STEP) { n.gx = n._tx; n.gy = n._ty; n._mv = false; n._wait = PH.util.RNG.i(500, 2600); }
+        continue;
+      }
+      n._wait = (n._wait == null) ? PH.util.RNG.i(300, 1800) : n._wait - dt;
+      if (n._wait > 0) continue;
+      // homebound: dealer/neighbor no se alejan de su origen
+      if (n._hx == null) { n._hx = n.gx; n._hy = n.gy; }
+      const roam = (n.role === 'customer' || n.role === 'walker') ? 6 : 2;
+      const dirs = PH.util.RNG.shuffle([['NE', 0, -1], ['SW', 0, 1], ['NW', -1, 0], ['SE', 1, 0]]);
+      let moved = false;
+      for (const d of dirs) {
+        const nx = n.gx + d[1], ny = n.gy + d[2];
+        if (Math.abs(nx - n._hx) + Math.abs(ny - n._hy) > roam) continue;
+        if (npcSolid(m, nx, ny, n)) continue;
+        n.dir = d[0]; n._tx = nx; n._ty = ny; n._fx = n.gx; n._fy = n.gy; n._mv = true; n._t = 0; moved = true; break;
+      }
+      if (!moved) n._wait = PH.util.RNG.i(600, 2000);        // atrapado -> espera
+    }
+  }
+  function npcRender(n) {
+    let gx = n.gx, gy = n.gy, frame = 0;
+    if (n._mv) { const t = clamp(n._t / NPC_STEP, 0, 1); gx = lerp(n._fx, n._tx, t); gy = lerp(n._fy, n._ty, t); frame = (Math.floor(n._t / (NPC_STEP / 2)) % 2 === 0 ? 1 : 2); }
+    return { gx, gy, dir: n.dir || 'SW', frame, pal: PH.render.NPC_PALETTES[n.sprite] };
+  }
+
   game.roomName = function () { const m = room(G().player.map); return m ? m.name : ''; };
   game.audit = audit;
   game.canWalk = function (mapId, gx, gy) { const m = room(mapId); return m ? !solidAt(m, gx, gy) : false; };
@@ -3836,6 +3917,7 @@ html, body {
     if (game.mode === 'overworld') {
       tryMove();
       if (game.moving) { game.moveT += dt; if (game.moveT >= game.moveDur) finishMove(); }
+      updateNPCs(dt);
       centerCam(false);
       if (now - game.lastSave > 20000) { PH.state.save(); game.lastSave = now; }
     }
@@ -3866,7 +3948,7 @@ html, body {
     const px = pss.x, py = pss.y;
     // actores
     const actors = [];
-    for (const n of (m.npcs || [])) actors.push({ gx: n.gx, gy: n.gy, dir: n.dir || 'SW', frame: 0, pal: PH.render.NPC_PALETTES[n.sprite] });
+    for (const n of (m.npcs || [])) actors.push(npcRender(n));
     // jugador con posición interpolada -> insertamos como actor con coords fraccionarias
     let pgx = p.x, pgy = p.y;
     if (game.moving) { const t = clamp(game.moveT / game.moveDur, 0, 1); pgx = lerp(game.from.x, game.to.x, t); pgy = lerp(game.from.y, game.to.y, t); }
