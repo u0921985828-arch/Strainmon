@@ -37,7 +37,7 @@
     const wIcon = { despejado: '☀️', lluvia: '🌧️', niebla: '🌫️', tormenta: '⛈️', ola_calor: '🔥', nublado: '☁️' }[env.weather] || '☀️';
     const ev = PH.events && PH.events.current();
     const evPill = ev ? `<span class="pill event">${ev.icon} ${ev.name} · ${PH.events.remaining()}s</span>` : '';
-    hud.innerHTML = `
+    const html = `
       <div class="hud-left">
         <span class="pill">📍 ${map ? map.name : ''}</span>
         <span class="pill">🕑 ${PH.state.timeLabel(env)} ${env.night ? '🌙' : '☀️'}</span>
@@ -51,6 +51,10 @@
         <span class="pill">💰 ${fmt(s.player.credits)}</span>
         <span class="pill">🌿 ${Object.keys(s.catalog).length}</span>
       </div>`;
+    // dirty-check: evita reflow/repaint si el HUD no cambió (~30×/s -> sólo en cambio)
+    if (hud._last === html) return;
+    hud._last = html;
+    hud.innerHTML = html;
   }
 
   /* ---------------- Utilidades de paneles ---------------- */

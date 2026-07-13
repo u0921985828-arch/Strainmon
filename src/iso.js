@@ -17,10 +17,13 @@
       y: (gx + gy) * (TH / 2) + cam.y,
     };
   }
-  // pantalla -> grid (para clics)
+  // pantalla -> grid (para clics). Mapea al CENTRO del rombo (project da el
+  // vértice superior), por lo que se resta TH/2 y se redondea al tile más
+  // cercano (snap-to-grid correcto, sin sesgo en negativos).
   function unproject(sx, sy, cam) {
-    const x = sx - cam.x, y = sy - cam.y;
-    return { gx: Math.floor((y / (TH / 2) + x / (TW / 2)) / 2), gy: Math.floor((y / (TH / 2) - x / (TW / 2)) / 2) };
+    const u = (sx - cam.x) / (TW / 2);          // = gx - gy
+    const v = (sy - cam.y - TH / 2) / (TH / 2); // = gx + gy
+    return { gx: Math.round((u + v) / 2), gy: Math.round((v - u) / 2) };
   }
 
   // rombo de suelo con relieve
@@ -69,7 +72,8 @@
     if (char && PH.charart && PH.charart.has(char)) {
       const im = PH.charart.img(char, dir);
       if (im && im.complete && im.naturalWidth) {
-        const s = CHAR_H / im.naturalHeight, w = Math.round(im.naturalWidth * s), h = Math.round(im.naturalHeight * s);
+        // escala 1/n (entera) para nearest-neighbor limpio: pixel-perfect.
+        const s = 1 / Math.max(1, Math.round(im.naturalHeight / CHAR_H)), w = Math.round(im.naturalWidth * s), h = Math.round(im.naturalHeight * s);
         const bob = frame ? -1 : 0;
         ctx.fillStyle = 'rgba(0,0,0,.22)';
         ctx.beginPath(); ctx.ellipse(cx, by, 9, 4, 0, 0, Math.PI * 2); ctx.fill();
@@ -112,40 +116,62 @@
     }
   }
 
-  // Render de una sala/mapa iso con painter's algorithm.
-  // map.grid: '.'=suelo, '#'=pared, ' '=vacío, 'D'=puerta(suelo). objects: [{gx,gy,h,draw}]
-  function renderRoom(ctx, map, cam, t, actors, objectsOverride) {
-    const W = map.grid[0].length, Hh = map.grid.length;
-    const P = map.pal || THEMES[map.theme] || THEMES.room;
-    const objs = objectsOverride || map.objects;
-    // 1) suelos primero (no ocluyen)
-    for (let gy = 0; gy < Hh; gy++) for (let gx = 0; gx < W; gx++) {
-      const ch = map.grid[gy][gx];
-      if (ch === '.' || ch === 'D') {
-        const s = project(gx, gy, cam);
-        const alt = (gx + gy) % 2;
-        floorDiamond(ctx, s.x, s.y, ch === 'D' ? P.door : (alt ? P.floorA : P.floorB), P.floorEdge);
+  // Caché de celdas estáticas por mapa: se escanea el grid UNA vez (no cada
+  // frame). Se invalida si cambian dimensiones.
+  const EMPTY = [];
+  function buildCells(map) {
+    const H = map.grid.length, W = map.grid[0].length;
+    const floors = [], walls = [];
+    for (let gy = 0; gy < H; gy++) {
+      const row = map.grid[gy];
+      for (let gx = 0; gx < W; gx++) {
+        const ch = row[gx];
+        if (ch === '.' || ch === 'D') floors.push({ gx, gy, door: ch === 'D', alt: (gx + gy) & 1 });
+        else if (ch === '#') walls.push({ gx, gy });
       }
     }
-    // 2) drawables con profundidad (paredes, objetos, actores)
-    const list = [];
-    for (let gy = 0; gy < Hh; gy++) for (let gx = 0; gx < W; gx++) {
-      if (map.grid[gy][gx] === '#') {
-        const s = project(gx, gy, cam);
-        list.push({ d: gx + gy, draw: () => cube(ctx, s.x, s.y, WH, P.wall) });
-      }
-    }
-    for (const o of (objs || [])) {
-      const s = project(o.gx, o.gy, cam);
-      list.push({ d: o.gx + o.gy + 0.4, draw: () => o.draw(ctx, s.x, s.y, o) });
-    }
-    for (const a of (actors || [])) {
-      const s = project(a.gx, a.gy, cam);
-      list.push({ d: a.gx + a.gy + 0.5, draw: () => actor(ctx, s.x, s.y, a.dir, a.frame, a.pal, a.char) });
-    }
-    list.sort((p, q) => p.d - q.d);
-    for (const it of list) it.draw();
+    return { w: W, h: H, floors, walls };
   }
+
+  // Pool de entradas ordenables (reutilizado entre frames -> cero allocs/GC).
+  const _pool = [];
+  const _order = [];
+  function slot(i) { return _pool[i] || (_pool[i] = { t: 0, d: 0, ref: null, gx: 0, gy: 0 }); }
+
+  // Render de una sala/mapa iso con painter's algorithm.
+  // map.grid: '.'=suelo, '#'=pared, ' '=vacío, 'D'=puerta(suelo). objects: [{gx,gy,draw}]
+  function renderRoom(ctx, map, cam, t, actors, objectsOverride) {
+    const P = map.pal || THEMES[map.theme] || THEMES.room;
+    let c = map._cache;
+    if (!c || c.w !== map.grid[0].length || c.h !== map.grid.length) c = map._cache = buildCells(map);
+    const cx = cam.x, cy = cam.y;
+
+    // 1) suelos (no ocluyen) — desde caché, proyección inline
+    const fl = c.floors;
+    for (let i = 0; i < fl.length; i++) {
+      const f = fl[i];
+      floorDiamond(ctx, (f.gx - f.gy) * (TW / 2) + cx, (f.gx + f.gy) * (TH / 2) + cy,
+        f.door ? P.door : (f.alt ? P.floorA : P.floorB), P.floorEdge);
+    }
+
+    // 2) drawables ordenados por profundidad (painter). Entradas pooled.
+    const objs = objectsOverride || map.objects || EMPTY;
+    const acts = actors || EMPTY, wl = c.walls;
+    _order.length = 0;
+    let n = 0;
+    for (let i = 0; i < wl.length; i++) { const w = wl[i]; const e = slot(n++); e.t = 0; e.ref = w; e.gx = w.gx; e.gy = w.gy; e.d = w.gx + w.gy; _order.push(e); }
+    for (let i = 0; i < objs.length; i++) { const o = objs[i]; const e = slot(n++); e.t = 1; e.ref = o; e.gx = o.gx; e.gy = o.gy; e.d = o.gx + o.gy + 0.4; _order.push(e); }
+    for (let i = 0; i < acts.length; i++) { const a = acts[i]; const e = slot(n++); e.t = 2; e.ref = a; e.gx = a.gx; e.gy = a.gy; e.d = a.gx + a.gy + 0.5; _order.push(e); }
+    _order.sort(byDepth);
+    for (let i = 0; i < _order.length; i++) {
+      const e = _order[i];
+      const sx = (e.gx - e.gy) * (TW / 2) + cx, sy = (e.gx + e.gy) * (TH / 2) + cy;
+      if (e.t === 0) cube(ctx, sx, sy, WH, P.wall);
+      else if (e.t === 1) e.ref.draw(ctx, sx, sy, e.ref);
+      else actor(ctx, sx, sy, e.ref.dir, e.ref.frame, e.ref.pal, e.ref.char);
+    }
+  }
+  function byDepth(p, q) { return p.d - q.d; }
 
   const THEMES = {
     room: { floorA: '#c8a06a', floorB: '#bd9560', floorEdge: 'rgba(80,50,20,.35)', door: '#8a5a30',
