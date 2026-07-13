@@ -208,8 +208,9 @@ html, body {
 .plot-add { cursor: pointer; color: var(--dim); font-size: 1.8rem; display: flex; flex-direction: column; align-items: center; }
 .plot-add small { font-size: .7rem; } .plot-add:hover { color: var(--accent); }
 .plot-sprite { position: relative; background:
-    linear-gradient(0deg, rgba(90,140,70,.25), rgba(20,26,20,.1)); border-radius: 8px; padding: 2px; }
-.plot-sprite img { image-rendering: pixelated; display: block; }
+    linear-gradient(0deg, rgba(90,140,70,.25), rgba(20,26,20,.1)); border-radius: 8px; padding: 2px;
+    height: 96px; width: 100px; display: flex; align-items: flex-end; justify-content: center; }
+.plot-sprite img { image-rendering: pixelated; display: block; height: 92px; width: auto; max-width: 96px; object-fit: contain; object-position: bottom; }
 .phdot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 50%; border: 1px solid rgba(0,0,0,.4); }
 .plot-name { font-size: .78rem; font-weight: bold; } .plot-stage { font-size: .7rem; }
 .plot .bar { width: 100%; }

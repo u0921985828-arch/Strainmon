@@ -46,20 +46,55 @@ if (start >= 0) blocks.push([start, W - 1]);
 // fusiona bloques minúsculos con el vecino
 const merged = blocks.filter(b => b[1] - b[0] > 8);
 console.log(`bloques detectados: ${merged.length} (esperados ${N})`);
-const use = merged.length >= N ? merged.slice(0, N) : merged;
+let use;
+if (merged.length === N) use = merged;
+else {
+  // fallback: N-1 cortes ajustados al hueco real (mínima densidad) cerca de cada límite ideal
+  let gx0 = W, gx1 = 0;
+  for (let x = 0; x < W; x++) if (colFilled[x] > 2) { if (x < gx0) gx0 = x; if (x > gx1) gx1 = x; }
+  const span = (gx1 - gx0 + 1) / N;
+  const cuts = [gx0 - 1];
+  for (let i = 1; i < N; i++) {
+    const ideal = Math.round(gx0 + i * span);
+    const win = Math.round(span * 0.38);
+    let best = ideal, bestV = Infinity;
+    for (let x = ideal - win; x <= ideal + win; x++) {
+      if (x <= cuts[cuts.length - 1] + 4 || x >= gx1) continue;
+      if (colFilled[x] < bestV) { bestV = colFilled[x]; best = x; }
+    }
+    cuts.push(best);
+  }
+  cuts.push(gx1 + 1);
+  use = [];
+  for (let i = 0; i < N; i++) use.push([cuts[i] + 1, cuts[i + 1] - 1]);
+  console.log(`  -> fallback ajustado a huecos: cortes ${cuts.slice(1, -1).join(',')}`);
+}
 
-// bbox vertical global para alinear por la base (maceta)
-async function saveBlock(bx, i) {
-  let minY = H, maxY = -1;
-  for (let x = bx[0]; x <= bx[1]; x++) for (let y = 0; y < H; y++) if (data[(y * W + x) * 4 + 3] > 20) { if (y < minY) minY = y; if (y > maxY) maxY = y; }
-  const cw = bx[1] - bx[0] + 1, ch = maxY - minY + 1;
-  const buf = await sharp(Buffer.from(data), { raw: { width: W, height: H, channels: 4 } })
-    .extract({ left: bx[0], top: minY, width: cw, height: ch })
-    .resize({ height: TARGET_H, fit: 'inside', kernel: 'lanczos3' })
+// Modo 'grow' (secuencia de crecimiento): TODAS las fases con la MISMA escala
+// y base comun, para que la maceta sea identica y solo crezca la planta.
+// Extremo vertical global (base = maceta alineada; techo = planta mas alta).
+let gTop = H, gBase = -1;
+for (let i = 0; i < W * H; i++) if (data[i * 4 + 3] > 20) { const y = (i / W) | 0; if (y < gTop) gTop = y; if (y > gBase) gBase = y; }
+const commonH = gBase - gTop + 1;
+const commonW = Math.max(...use.map(b => b[1] - b[0] + 1));
+const scale = TARGET_H / commonH;                 // MISMA escala para las 5
+
+async function saveGrow(bx, i) {
+  const bw = bx[1] - bx[0] + 1;
+  // centra el bloque (la maceta esta centrada) en un lienzo de ancho comun
+  const padL = ((commonW - bw) / 2) | 0;
+  const canvas = Buffer.alloc(commonW * commonH * 4, 0);
+  for (let y = 0; y < commonH; y++) for (let x = 0; x < bw; x++) {
+    const src = ((gTop + y) * W + (bx[0] + x)) * 4;
+    const dst = (y * commonW + (padL + x)) * 4;
+    canvas[dst] = data[src]; canvas[dst + 1] = data[src + 1]; canvas[dst + 2] = data[src + 2]; canvas[dst + 3] = data[src + 3];
+  }
+  const outW = Math.round(commonW * scale), outH = Math.round(commonH * scale);
+  const buf = await sharp(canvas, { raw: { width: commonW, height: commonH, channels: 4 } })
+    .resize(outW, outH, { kernel: 'lanczos3' })
     .png({ palette: true }).toBuffer();
   const out = path.join(outDir, `${prefix}_${i + 1}.png`);
   fs.writeFileSync(out, buf);
-  const m = await sharp(buf).metadata();
-  console.log('✓', path.basename(out), m.width + 'x' + m.height, (buf.length / 1024).toFixed(1) + 'KB');
+  console.log('✓', path.basename(out), outW + 'x' + outH, (buf.length / 1024).toFixed(1) + 'KB');
 }
-for (let i = 0; i < use.length; i++) await saveBlock(use[i], i);
+for (let i = 0; i < use.length; i++) await saveGrow(use[i], i);

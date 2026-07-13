@@ -64,13 +64,29 @@
   function isOpen() { return overlay.className.indexOf('active') >= 0; }
 
   // Dibuja una planta en un <canvas> por id tras insertar el HTML
-  function paintPlant(canvasId, pheno, scale) {
+  // Acepta un espécimen {pheno,speciesId,form} o un pheno suelto.
+  function paintPlant(canvasId, specOrPheno, scale) {
     const c = document.getElementById(canvasId);
     if (!c) return;
     const ctx = c.getContext('2d');
     ctx.imageSmoothingEnabled = false;
-    ctx.clearRect(0, 0, c.width, c.height);
-    PH.render.drawPlant(ctx, c.width / 2, c.height - 8, pheno, scale || 2, performance.now());
+    const spec = specOrPheno && specOrPheno.pheno ? specOrPheno : null;
+    const pheno = spec ? spec.pheno : specOrPheno;
+    const speciesId = spec ? spec.speciesId : null;
+    // Retrato de cepa (fase 5). Híbridos (cruce) usan procedural.
+    const key = speciesId && spec.form !== 'cruce' && PH.plantart ? PH.plantart.portrait(speciesId) : null;
+    const im = key && PH.plantart.img(key);
+    const drawProc = () => { ctx.clearRect(0, 0, c.width, c.height); PH.render.drawPlant(ctx, c.width / 2, c.height - 8, pheno, scale || 2, performance.now()); };
+    const drawImg = () => {
+      const pad = 3, aw = c.width - pad * 2, ah = c.height - pad * 2;
+      const r = Math.min(aw / im.naturalWidth, ah / im.naturalHeight);
+      const w = Math.round(im.naturalWidth * r), h = Math.round(im.naturalHeight * r);
+      ctx.clearRect(0, 0, c.width, c.height);
+      ctx.drawImage(im, (c.width - w) / 2, c.height - h - 2, w, h);
+    };
+    if (im && im.complete && im.naturalWidth) drawImg();
+    else if (im) { drawProc(); im.addEventListener('load', drawImg, { once: true }); }
+    else drawProc();
   }
 
   /* ---------------- Ficha de espécimen (HTML) ---------------- */
@@ -174,7 +190,7 @@
         <div class="enc-msg" id="enc_msg"></div>
       </div>`, 'center');
     PH.game.mode = 'encounter';
-    paintPlant('enc_canvas', wild.pheno, 2.4);
+    paintPlant('enc_canvas', wild, 2.4);
 
     overlay.querySelectorAll('.tool').forEach(b => b.onclick = () => resolveHarvest(wild, b.dataset.tool));
     document.getElementById('enc_flee').onclick = () => close();
@@ -255,7 +271,7 @@
         </div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = close;
-    sorted.forEach(sp => paintPlant('pc_' + sp.uid, sp.pheno, 2));
+    sorted.forEach(sp => paintPlant('pc_' + sp.uid, sp, 2));
     overlay.querySelectorAll('[data-sell]').forEach(b => b.onclick = () => { sell(b.dataset.sell); bank(); });
     overlay.querySelectorAll('[data-rel]').forEach(b => b.onclick = () => { PH.state.bankRemove(b.dataset.rel); toast('Muestra liberada.'); bank(); });
     overlay.querySelectorAll('[data-seq]').forEach(b => b.onclick = () => sequencePanel(b.dataset.seq));
@@ -291,7 +307,7 @@
         </div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = bank;
-    paintPlant('pc_' + sp.uid, sp.pheno, 2);
+    paintPlant('pc_' + sp.uid, sp, 2);
   }
   function sellPrice(sp) {
     return Math.round(30 + sp.rarity * sp.rarity * 0.9 + sp.quality * 1.5);
@@ -321,7 +337,7 @@
         </div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = close;
-    entries.forEach((e, i) => paintPlant('cat_' + i, e.pheno, 1.7));
+    entries.forEach((e, i) => paintPlant('cat_' + i, e, 1.7));
   }
   function catCard(e) {
     const idx = catCard._i = (catCard._i || 0);
@@ -371,7 +387,7 @@
         </div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = () => { breedSel = []; close(); };
-    usable.forEach(sp => paintPlant('lp_' + sp.uid, sp.pheno, 1.7));
+    usable.forEach(sp => paintPlant('lp_' + sp.uid, sp, 1.7));
     overlay.querySelectorAll('[data-pick]').forEach(el => el.onclick = () => togglePick(el.dataset.pick));
     document.getElementById('do_cross').onclick = doCross;
   }
@@ -386,7 +402,7 @@
     if (i >= 0) breedSel.splice(i, 1);
     else if (breedSel.length < 2) breedSel.push(uid);
     lab();
-    breedSel.forEach((u, k) => paintPlant('slot_' + k, PH.state.bankGet(u).pheno, 1.7));
+    breedSel.forEach((u, k) => paintPlant('slot_' + k, PH.state.bankGet(u), 1.7));
   }
   function doCross() {
     if (breedSel.length !== 2) return;
@@ -425,7 +441,7 @@
           </div>
         </div>
       </div>`, 'center');
-    paintPlant('pc_' + spec.uid, spec.pheno, 2.4);
+    paintPlant('pc_' + spec.uid, spec, 2.4);
     document.getElementById('p_close').onclick = close;
     document.getElementById('p_close2').onclick = close;
     document.getElementById('again').onclick = lab;
@@ -459,16 +475,17 @@
     overlay.querySelectorAll('[data-comp]').forEach(b => b.onclick = () => { if (confirm('¿Compostar esta planta? Se pierde.')) { PH.garden.compost(b.dataset.comp); greenhouse(); } });
   }
 
+  const STAGE_LABELS = ['Plántula', 'Vegetativo temp.', 'Vegetativo', 'Floración', 'Cosecha'];
   function plotView(p) {
-    const stage = PH.sprites.LIFECYCLE[p.stage];
-    const uri = PH.sprites.uri(PH.garden.spriteKey(p));
+    const label = STAGE_LABELS[p.stage] || 'Cosecha';
+    const uri = PH.garden.spriteUri(p);
     const pct = PH.garden.progressPct(p);
     const t = PH.gen.rarityTier(p.rarity);
     const pal = PH.gen.paletteFor(p.pheno);
     return `<div class="plot ${p.ready ? 'ready' : ''}">
-      <div class="plot-sprite"><img src="${uri}" width="80" height="80" alt=""><span class="phdot" style="background:${pal.base}"></span></div>
+      <div class="plot-sprite"><img src="${uri}" alt=""><span class="phdot" style="background:${pal.base}"></span></div>
       <div class="plot-name">${p.name}</div>
-      <div class="plot-stage" style="color:${t.color}">${p.ready ? '✅ Lista' : stage.label}</div>
+      <div class="plot-stage" style="color:${t.color}">${p.ready ? '✅ Lista' : label}</div>
       <div class="bar"><i style="width:${pct}%"></i></div>
       <div class="plot-actions">
         ${p.ready
@@ -498,7 +515,7 @@
       </div>`, 'center');
     document.getElementById('p_close').onclick = close;
     document.getElementById('back').onclick = greenhouse;
-    usable.forEach(sp => paintPlant('gp_' + sp.uid, sp.pheno, 1.7));
+    usable.forEach(sp => paintPlant('gp_' + sp.uid, sp, 1.7));
     overlay.querySelectorAll('[data-plant]').forEach(el => el.onclick = () => {
       const res = PH.garden.plantFromBank(el.dataset.plant);
       toast(res.msg, res.ok ? 'ok' : 'bad');

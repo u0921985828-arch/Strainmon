@@ -34,6 +34,7 @@
     game.wctx.imageSmoothingEnabled = false;
     game.RScale = 2;
     if (PH.sprites) PH.sprites.preload();
+    if (PH.plantart) PH.plantart.preload();
     PH.ui.init();
     bindInput();
     resize();

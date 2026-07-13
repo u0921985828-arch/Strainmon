@@ -63,11 +63,15 @@
     }
   }
 
-  // Sprite de la fase actual
+  // Sprite de la fase actual: arte real por cepa (fase 1..5). Fallback a sprites.
   function spriteKey(p) {
-    if (p.stage <= 0) return p.seedSprite;
-    if (p.stage === 1 || p.stage === 2) return p.vegSprite;
-    return PH.sprites.LIFECYCLE[p.stage].sprite;
+    const k = PH.plantart && PH.plantart.stageKey(p.speciesId, (p.stage || 0) + 1);
+    return k || (PH.sprites ? PH.sprites.LIFECYCLE[Math.min(p.stage, 4)].sprite : null);
+  }
+  function spriteUri(p) {
+    const k = PH.plantart && PH.plantart.stageKey(p.speciesId, (p.stage || 0) + 1);
+    if (k) return PH.plantart.uri(k);
+    return PH.sprites ? PH.sprites.uri(spriteKey(p)) : null;
   }
 
   function progressPct(p) {
@@ -123,5 +127,5 @@
     if (i >= 0) s.garden.splice(i, 1);
   }
 
-  PH.garden = { STAGE_TIMES, capacity, update, plantFromBank, spriteKey, progressPct, regar, harvest, compost, stageOf };
+  PH.garden = { STAGE_TIMES, capacity, update, plantFromBank, spriteKey, spriteUri, progressPct, regar, harvest, compost, stageOf };
 })(window.PH = window.PH || {});
