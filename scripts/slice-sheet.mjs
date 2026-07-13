@@ -14,22 +14,30 @@ const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveW
 const { width: W, height: H } = info;
 const lum = (o) => (data[o] * 0.3 + data[o + 1] * 0.59 + data[o + 2] * 0.11);
 const T = 42; // umbral de "negro"
+const BG = process.argv[7] || 'black'; // 'black' (flood-fill) | 'magenta' (chroma)
+const isMag = (r, g, b) => r > 135 && b > 105 && g < r - 40 && g < b - 28;
 
-// flood-fill desde el marco
-const bg = new Uint8Array(W * H);
-const stack = [];
-const pushIf = (x, y) => {
-  if (x < 0 || y < 0 || x >= W || y >= H) return;
-  const i = y * W + x; if (bg[i]) return;
-  if (lum(i * 4) < T) { bg[i] = 1; stack.push(i); }
-};
-for (let x = 0; x < W; x++) { pushIf(x, 0); pushIf(x, H - 1); }
-for (let y = 0; y < H; y++) { pushIf(0, y); pushIf(W - 1, y); }
-while (stack.length) {
-  const i = stack.pop(); const x = i % W, y = (i / W) | 0;
-  pushIf(x + 1, y); pushIf(x - 1, y); pushIf(x, y + 1); pushIf(x, y - 1);
+if (BG === 'magenta') {
+  for (let i = 0; i < W * H; i++) { const o = i * 4; if (isMag(data[o], data[o + 1], data[o + 2])) data[o + 3] = 0; }
+  // limpiar halo rosado
+  for (let i = 0; i < W * H; i++) { const o = i * 4; if (data[o + 3] === 0) continue; const r = data[o], g = data[o + 1], b = data[o + 2]; if (r > 130 && b > 110 && g < r - 25 && g < b - 18) data[o + 3] = 0; }
+} else {
+  // flood-fill desde el marco (fondo negro)
+  const bg = new Uint8Array(W * H);
+  const stack = [];
+  const pushIf = (x, y) => {
+    if (x < 0 || y < 0 || x >= W || y >= H) return;
+    const i = y * W + x; if (bg[i]) return;
+    if (lum(i * 4) < T) { bg[i] = 1; stack.push(i); }
+  };
+  for (let x = 0; x < W; x++) { pushIf(x, 0); pushIf(x, H - 1); }
+  for (let y = 0; y < H; y++) { pushIf(0, y); pushIf(W - 1, y); }
+  while (stack.length) {
+    const i = stack.pop(); const x = i % W, y = (i / W) | 0;
+    pushIf(x + 1, y); pushIf(x - 1, y); pushIf(x, y + 1); pushIf(x, y - 1);
+  }
+  for (let i = 0; i < W * H; i++) if (bg[i]) data[i * 4 + 3] = 0;
 }
-for (let i = 0; i < W * H; i++) if (bg[i]) data[i * 4 + 3] = 0;
 
 // columnas de contenido -> segmentar en N por huecos verticales vacíos
 const colFilled = new Array(W).fill(0);

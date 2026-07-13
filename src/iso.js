@@ -61,10 +61,23 @@
     ctx.closePath(); ctx.fillStyle = pal.top; ctx.fill();
   }
 
-  // Personaje isométrico (billboard chibi original) anclado a la base del tile.
-  function actor(ctx, sx, sy, dir, frame, p) {
+  // Personaje isométrico. Si hay sprite de arte para su rol+dirección, lo usa
+  // (billboard anclado a la base, con bob al andar); si no, dibujo procedural.
+  const CHAR_H = 42;
+  function actor(ctx, sx, sy, dir, frame, p, char) {
+    const cx = sx, by = sy + TH / 2;
+    if (char && PH.charart && PH.charart.has(char)) {
+      const im = PH.charart.img(char, dir);
+      if (im && im.complete && im.naturalWidth) {
+        const s = CHAR_H / im.naturalHeight, w = Math.round(im.naturalWidth * s), h = Math.round(im.naturalHeight * s);
+        const bob = frame ? -1 : 0;
+        ctx.fillStyle = 'rgba(0,0,0,.22)';
+        ctx.beginPath(); ctx.ellipse(cx, by, 9, 4, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.drawImage(im, Math.round(cx - w / 2), Math.round(by - h + 2 + bob), w, h);
+        return;
+      }
+    }
     p = p || { skin: '#f0c088', hair: '#3a2a1a', shirt: '#2f9e6b', pants: '#33333f' };
-    const cx = sx, by = sy + TH / 2;         // base ~ centro del tile
     const bob = frame === 1 ? 1 : 0;
     // sombra
     ctx.fillStyle = 'rgba(0,0,0,.25)';
@@ -128,7 +141,7 @@
     }
     for (const a of (actors || [])) {
       const s = project(a.gx, a.gy, cam);
-      list.push({ d: a.gx + a.gy + 0.5, draw: () => actor(ctx, s.x, s.y, a.dir, a.frame, a.pal) });
+      list.push({ d: a.gx + a.gy + 0.5, draw: () => actor(ctx, s.x, s.y, a.dir, a.frame, a.pal, a.char) });
     }
     list.sort((p, q) => p.d - q.d);
     for (const it of list) it.draw();

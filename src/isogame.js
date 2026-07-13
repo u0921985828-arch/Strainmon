@@ -60,9 +60,9 @@
       npcs: [
         { gx: 6, gy: 5, name: 'Dealer Kez', sprite: 'npc6', dialog: 'contrabandista', dir: 'SW', role: 'dealer' },
         { gx: 3, gy: 4, name: 'Vecina Bru', sprite: 'npc2', dialog: 'coleccionista', dir: 'SE', role: 'neighbor' },
-        { gx: 8, gy: 3, name: 'Cliente', sprite: 'npc3', dir: 'SW', role: 'customer' },
-        { gx: 4, gy: 6, name: 'Cliente', sprite: 'npc4', dir: 'NE', role: 'customer' },
-        { gx: 11, gy: 5, name: 'Transeúnte', sprite: 'npc5', dir: 'NW', role: 'walker' },
+        { gx: 8, gy: 3, name: 'Cliente', sprite: 'npc3', dir: 'SW', role: 'customer', char: 'customer1' },
+        { gx: 4, gy: 6, name: 'Cliente', sprite: 'npc4', dir: 'NE', role: 'customer', char: 'customer2' },
+        { gx: 11, gy: 5, name: 'Transeúnte', sprite: 'npc5', dir: 'NW', role: 'walker', char: 'walker' },
       ],
       objects: [],
       wild: true, // 'g' = parterres con cepas silvestres
@@ -161,6 +161,7 @@
     game.ctx = game.canvas.getContext('2d');
     if (PH.sprites) PH.sprites.preload();
     if (PH.plantart) PH.plantart.preload();
+    if (PH.charart) PH.charart.preload();
     PH.ui.init();
     bindInput();
     resize();
@@ -385,7 +386,7 @@
   function npcRender(n) {
     let gx = n.gx, gy = n.gy, frame = 0;
     if (n._mv) { const t = clamp(n._t / NPC_STEP, 0, 1); gx = lerp(n._fx, n._tx, t); gy = lerp(n._fy, n._ty, t); frame = (Math.floor(n._t / (NPC_STEP / 2)) % 2 === 0 ? 1 : 2); }
-    return { gx, gy, dir: n.dir || 'SW', frame, pal: PH.render.NPC_PALETTES[n.sprite] };
+    return { gx, gy, dir: n.dir || 'SW', frame, pal: PH.render.NPC_PALETTES[n.sprite], char: n.char };
   }
 
   game.roomName = function () { const m = room(G().player.map); return m ? m.name : ''; };
@@ -459,7 +460,7 @@
     let pgx = p.x, pgy = p.y;
     if (game.moving) { const t = clamp(game.moveT / game.moveDur, 0, 1); pgx = lerp(game.from.x, game.to.x, t); pgy = lerp(game.from.y, game.to.y, t); }
     const walkFrame = game.moving ? (Math.floor(game.moveT / (game.moveDur / 2)) % 2 === 0 ? 1 : 2) : 0;
-    actors.push({ gx: pgx, gy: pgy, dir: p.dir, frame: walkFrame, pal: { skin: '#f0c088', hair: '#3a2a1a', shirt: '#2f9e6b', pants: '#33333f' }, hero: true });
+    actors.push({ gx: pgx, gy: pgy, dir: p.dir, frame: walkFrame, pal: { skin: '#f0c088', hair: '#3a2a1a', shirt: '#2f9e6b', pants: '#33333f' }, char: 'player', hero: true });
 
     // objetos: dibujarlos como parte del render (cubos etiquetados / grow con planta)
     const objects = (m.objects || []).map(o => ({ gx: o.gx, gy: o.gy, draw: (ctx, sx, sy) => drawObject(ctx, sx, sy, o) }));
