@@ -147,8 +147,10 @@
     // NPC?
     const npc = (map.npcs || []).find(n => n.x === f.x && n.y === f.y);
     if (npc) {
+      // el NPC mira hacia el jugador
+      npc.face = { up: 'down', down: 'up', left: 'right', right: 'left' }[s.player.dir] || 'down';
       const pages = PH.quests.DIALOGS[npc.dialog] ? PH.quests.DIALOGS[npc.dialog](s) : ['...'];
-      PH.ui.dialog(pages);
+      PH.ui.dialog(pages, null, { sprite: npc.sprite, name: npc.name });
       return;
     }
     // warp de puerta al frente (edificios)?
@@ -253,7 +255,7 @@
       if (now - game.lastSave > 20000) { PH.state.save(); game.lastSave = now; }
     }
 
-    if (game.mode !== 'title' && game.mode !== 'boot') render();
+    if (game.mode !== 'title' && game.mode !== 'boot') render(now);
     // refresco de HUD ligero
     if (game.mode === 'overworld' && (game.frame === 0)) PH.ui.updateHUD();
 
@@ -261,7 +263,8 @@
   }
 
   /* ---------------- Render del mundo ---------------- */
-  function render() {
+  function render(now) {
+    now = now || performance.now();
     const ctx = game.ctx;
     const s = G().player;
     const map = World.MAPS[s.map];
@@ -287,9 +290,8 @@
     const x0 = Math.floor(camX / R.TS), y0 = Math.floor(camY / R.TS);
     for (let ty = y0 - 1; ty <= y0 + R.VH + 1; ty++) {
       for (let tx = x0 - 1; tx <= x0 + R.VW + 1; tx++) {
-        const ch = World.tileAt(map, tx, ty);
         const sx = tx * R.TS - camX, sy = ty * R.TS - camY;
-        R.drawTile(ctx, ch, sx, sy, map.theme, PH.world.TILE[ch]);
+        R.drawTile(ctx, map, tx, ty, sx, sy, now);
       }
     }
 

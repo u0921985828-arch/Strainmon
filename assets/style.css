@@ -85,6 +85,11 @@ html, body {
   border: 2px solid var(--accent); border-radius: 10px; padding: 16px 18px; box-shadow: var(--shadow); }
 .dialog-box p { font-size: .92rem; }
 .dlg-hint { text-align: right; color: var(--dim); font-size: .7rem; margin-top: 8px; }
+.dialog-box.has-portrait { display: flex; gap: 14px; align-items: flex-start; }
+.dlg-portrait { flex: 0 0 auto; text-align: center; }
+.dlg-portrait canvas { image-rendering: pixelated; background: #141b13; border: 1px solid var(--line); border-radius: 8px; }
+.dlg-portrait span { display: block; font-size: .68rem; color: var(--accent2); margin-top: 4px; max-width: 56px; }
+.dlg-text { flex: 1; min-width: 0; }
 
 /* --------- Paneles genéricos --------- */
 .panel { width: min(94%, 640px); max-height: 88%; background: var(--panel); border: 1px solid var(--line);

@@ -110,14 +110,22 @@
   }
 
   /* ---------------- DIÁLOGO ---------------- */
-  let dlgPages = [], dlgIndex = 0, dlgAfter = null;
-  function dialog(pages, after) {
-    dlgPages = pages; dlgIndex = 0; dlgAfter = after || null;
+  let dlgPages = [], dlgIndex = 0, dlgAfter = null, dlgMeta = null;
+  function dialog(pages, after, meta) {
+    dlgPages = pages; dlgIndex = 0; dlgAfter = after || null; dlgMeta = meta || null;
     renderDialog();
   }
   function renderDialog() {
-    open(`<div class="dialog-box"><p>${dlgPages[dlgIndex]}</p><div class="dlg-hint">▼ Espacio / Click para continuar</div></div>`, 'bottom');
+    const portrait = dlgMeta && dlgMeta.sprite
+      ? `<div class="dlg-portrait"><canvas id="dlg_face" width="48" height="48"></canvas>${dlgMeta.name ? `<span>${dlgMeta.name}</span>` : ''}</div>` : '';
+    open(`<div class="dialog-box ${portrait ? 'has-portrait' : ''}">${portrait}<div class="dlg-text"><p>${dlgPages[dlgIndex]}</p><div class="dlg-hint">▼ Espacio / Click para continuar</div></div></div>`, 'bottom');
     PH.game.mode = 'dialog';
+    if (portrait) {
+      const c = document.getElementById('dlg_face');
+      const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
+      ctx.scale(3, 3);
+      PH.render.drawActor(ctx, 0, 0, 'down', 0, PH.render.NPC_PALETTES[dlgMeta.sprite]);
+    }
   }
   function dialogNext() {
     dlgIndex++;

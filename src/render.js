@@ -26,15 +26,50 @@
 
   function px(ctx, x, y, w, h, col) { ctx.fillStyle = col; ctx.fillRect(x, y, w, h); }
 
-  function drawTile(ctx, ch, sx, sy, theme, t) {
+  // Hash determinista 0..1 por casilla (variación estable entre frames)
+  function hash(x, y) {
+    let h = (x * 374761393 + y * 668265263) ^ 0x9e3779b9;
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+  }
+  // Grupo de terreno para transiciones (autotiles)
+  function groundGroup(name) {
+    if (name === 'grass' || name === 'tallgrass' || name === 'flowers') return 'grass';
+    if (name === 'water' || name === 'deepwater') return 'water';
+    if (name === 'path' || name === 'bridge') return 'path';
+    if (name === 'sand') return 'sand';
+    if (name === 'snow' || name === 'ice') return 'snow';
+    if (name === 'mud') return 'mud';
+    if (name === 'ash' || name === 'lava') return 'ash';
+    if (name === 'cavefloor') return 'cave';
+    return null;
+  }
+
+  // Firma para render con conocimiento de vecinos y tiempo (agua, bordes).
+  function drawTile(ctx, map, tx, ty, sx, sy, time) {
+    const ch = PH.world.tileAt(map, tx, ty);
+    const theme = map.theme;
     const P = THEMES[theme] || THEMES.meadow;
+    const name = (TILE[ch] || {}).name;
+    const rnd = hash(tx, ty);
+    const nGroup = (dx, dy) => groundGroup((TILE[PH.world.tileAt(map, tx + dx, ty + dy)] || {}).name);
     const drawGround = () => {
       px(ctx, sx, sy, TS, TS, P.grass);
-      px(ctx, sx + 3, sy + 4, 2, 2, P.grassD);
-      px(ctx, sx + 10, sy + 9, 2, 2, P.grassD);
-      px(ctx, sx + 6, sy + 12, 1, 1, P.grassD);
+      // motas de variación deterministas
+      const m = Math.floor(rnd * 4);
+      px(ctx, sx + 2 + ((tx * 5) % 11), sy + 3 + ((ty * 7) % 10), 2, 2, P.grassD);
+      if (m > 0) px(ctx, sx + 9 + (m % 3), sy + 9 + (m % 4), 2, 2, P.grassD);
+      if (m > 2) px(ctx, sx + 5, sy + 12, 1, 1, shade(P.grass, 0.12));
+      grassEdges();
     };
-    const name = (TILE[ch] || {}).name;
+    // Bordes suaves de césped hacia terrenos vecinos distintos
+    const grassEdges = () => {
+      const c = P.grassD;
+      if (nGroup(0, -1) && nGroup(0, -1) !== 'grass') { px(ctx, sx, sy, TS, 2, c); px(ctx, sx + 3, sy + 2, 2, 1, c); px(ctx, sx + 10, sy + 2, 2, 1, c); }
+      if (nGroup(0, 1) && nGroup(0, 1) !== 'grass') { px(ctx, sx, sy + TS - 2, TS, 2, c); px(ctx, sx + 4, sy + TS - 3, 2, 1, c); }
+      if (nGroup(-1, 0) && nGroup(-1, 0) !== 'grass') { px(ctx, sx, sy, 2, TS, c); }
+      if (nGroup(1, 0) && nGroup(1, 0) !== 'grass') { px(ctx, sx + TS - 2, sy, 2, TS, c); }
+    };
     switch (name) {
       case 'grass': drawGround(); break;
       case 'tallgrass': {
@@ -46,15 +81,36 @@
         }
         break;
       }
-      case 'path': px(ctx, sx, sy, TS, TS, P.path); px(ctx, sx + 2, sy + 6, 2, 2, P.pathD); px(ctx, sx + 11, sy + 3, 2, 2, P.pathD); break;
-      case 'bridge': px(ctx, sx, sy, TS, TS, '#a9793f'); for (let i = 0; i < TS; i += 4) px(ctx, sx + i, sy, 1, TS, '#7c531f'); break;
-      case 'tree':
-        drawGround();
-        px(ctx, sx + 6, sy + 10, 4, 6, '#6b4a2a');
-        px(ctx, sx + 2, sy + 1, 12, 11, shade(P.grassD, -0.25));
-        px(ctx, sx + 4, sy + 0, 9, 10, theme === 'snow' ? '#cfe0ea' : (theme === 'volcano' ? '#5a3a2a' : '#2f6b2a'));
-        px(ctx, sx + 5, sy + 2, 5, 4, theme === 'snow' ? '#eef6fb' : '#458f3a');
+      case 'path': {
+        px(ctx, sx, sy, TS, TS, P.path);
+        px(ctx, sx + 2 + ((tx * 3) % 9), sy + 3 + ((ty * 5) % 9), 2, 2, P.pathD);
+        px(ctx, sx + 9, sy + 11, 2, 1, shade(P.path, 0.1));
+        // bordes: la hierba vecina sombrea el camino
+        if (nGroup(0, -1) === 'grass') px(ctx, sx, sy, TS, 1, P.pathD);
+        if (nGroup(-1, 0) === 'grass') px(ctx, sx, sy, 1, TS, P.pathD);
+        if (nGroup(1, 0) === 'grass') px(ctx, sx + TS - 1, sy, 1, TS, P.pathD);
         break;
+      }
+      case 'bridge': px(ctx, sx, sy, TS, TS, '#a9793f'); for (let i = 0; i < TS; i += 4) px(ctx, sx + i, sy, 1, TS, '#7c531f'); px(ctx, sx, sy, TS, 1, '#c99a5f'); break;
+      case 'tree': {
+        drawGround();
+        const big = rnd > 0.5;
+        const snow = theme === 'snow', volc = theme === 'volcano';
+        const canopy = snow ? '#dfeaf2' : (volc ? '#5a3a2a' : (rnd > 0.7 ? '#2b7a3a' : '#2f6b2a'));
+        const canHi = snow ? '#f2f8fc' : (volc ? '#6d4636' : '#4a9a3e');
+        // sombra bajo el árbol
+        px(ctx, sx + 3, sy + 13, 10, 2, 'rgba(0,0,0,0.16)');
+        px(ctx, sx + 7, sy + 10, 3, 6, '#6b4a2a');           // tronco
+        px(ctx, sx + 7, sy + 10, 1, 6, '#553a20');
+        // copa redondeada
+        px(ctx, sx + 3, sy + 2, 10, 9, shade(canopy, -0.28));
+        px(ctx, sx + 2, sy + 4, 12, 5, shade(canopy, -0.28));
+        px(ctx, sx + 4, sy + (big ? 0 : 1), 8, 9, canopy);
+        px(ctx, sx + 3, sy + 4, 10, 4, canopy);
+        px(ctx, sx + 5, sy + 2, 4, 3, canHi);               // luz
+        px(ctx, sx + 5, sy + 2, 2, 2, shade(canHi, 0.15));
+        break;
+      }
       case 'palm':
         drawGround();
         px(ctx, sx + 7, sy + 5, 2, 11, '#8a6a3a');
@@ -64,11 +120,25 @@
       case 'rock': px(ctx, sx, sy, TS, TS, '#8a8f97'); px(ctx, sx + 2, sy + 2, 12, 12, '#6d727a'); px(ctx, sx + 4, sy + 3, 5, 4, '#a2a7ae'); break;
       case 'cavefloor': px(ctx, sx, sy, TS, TS, '#3f3b47'); px(ctx, sx + 4, sy + 5, 3, 3, '#332f3a'); px(ctx, sx + 10, sy + 10, 2, 2, '#4a4652'); break;
       case 'stalag': px(ctx, sx, sy, TS, TS, '#3f3b47'); px(ctx, sx + 5, sy + 2, 6, 14, '#5a5566'); px(ctx, sx + 7, sy + 4, 2, 10, '#726c82'); break;
-      case 'water': px(ctx, sx, sy, TS, TS, '#4b8fd6'); px(ctx, sx + 2, sy + 4, 6, 2, '#7bb4ec'); px(ctx, sx + 9, sy + 10, 5, 2, '#7bb4ec'); break;
-      case 'deepwater': px(ctx, sx, sy, TS, TS, '#2f6bb0'); px(ctx, sx + 3, sy + 7, 6, 2, '#4b8fd6'); break;
-      case 'mud': px(ctx, sx, sy, TS, TS, '#6b5637'); px(ctx, sx + 3, sy + 4, 4, 3, '#54432a'); px(ctx, sx + 9, sy + 9, 4, 3, '#7d6543'); break;
-      case 'sand': px(ctx, sx, sy, TS, TS, P.grass); px(ctx, sx + 4, sy + 5, 2, 1, P.grassD); px(ctx, sx + 10, sy + 11, 2, 1, P.grassD); break;
-      case 'snow': px(ctx, sx, sy, TS, TS, '#e9f0f6'); px(ctx, sx + 5, sy + 6, 2, 2, '#d3ddea'); px(ctx, sx + 11, sy + 3, 1, 1, '#cfd9e4'); break;
+      case 'water': case 'deepwater': {
+        const deep = name === 'deepwater';
+        px(ctx, sx, sy, TS, TS, deep ? '#2f6bb0' : '#4b8fd6');
+        // ondas animadas deterministas
+        const ph = (time || 0) / 500 + (tx + ty);
+        const o1 = Math.round(Math.sin(ph) * 2), o2 = Math.round(Math.cos(ph * 0.8) * 2);
+        px(ctx, sx + 2 + o1, sy + 4, 6, 1, deep ? '#4b8fd6' : '#7bb4ec');
+        px(ctx, sx + 8 + o2, sy + 10, 5, 1, deep ? '#4b8fd6' : '#9cc9f2');
+        // espuma hacia la orilla (vecino no-agua)
+        const foam = '#dff0ff';
+        if (nGroup(0, -1) && nGroup(0, -1) !== 'water') px(ctx, sx, sy, TS, 2, foam);
+        if (nGroup(0, 1) && nGroup(0, 1) !== 'water') px(ctx, sx, sy + TS - 2, TS, 2, foam);
+        if (nGroup(-1, 0) && nGroup(-1, 0) !== 'water') px(ctx, sx, sy, 2, TS, foam);
+        if (nGroup(1, 0) && nGroup(1, 0) !== 'water') px(ctx, sx + TS - 2, sy, 2, TS, foam);
+        break;
+      }
+      case 'mud': px(ctx, sx, sy, TS, TS, '#6b5637'); px(ctx, sx + 2 + ((tx * 3) % 8), sy + 3 + ((ty * 3) % 8), 4, 3, '#54432a'); px(ctx, sx + 9, sy + 10, 4, 3, '#7d6543'); if (rnd > 0.6) px(ctx, sx + 5, sy + 7, 3, 2, '#3f7d34'); break;
+      case 'sand': px(ctx, sx, sy, TS, TS, P.grass); px(ctx, sx + 3 + ((tx * 5) % 9), sy + 4 + ((ty * 3) % 8), 2, 1, P.grassD); px(ctx, sx + 10, sy + 11, 1, 1, shade(P.grass, 0.1)); if (nGroup(0, 1) === 'water') px(ctx, sx, sy + TS - 2, TS, 2, shade(P.grass, 0.12)); break;
+      case 'snow': px(ctx, sx, sy, TS, TS, '#e9f0f6'); px(ctx, sx + 4 + ((tx * 3) % 8), sy + 5 + ((ty * 5) % 7), 2, 2, '#d3ddea'); if (rnd > 0.7) px(ctx, sx + 9, sy + 10, 1, 1, '#c3d0dc'); break;
       case 'ice': px(ctx, sx, sy, TS, TS, '#bfe0ef'); px(ctx, sx + 2, sy + 2, 6, 1, '#e6f6ff'); px(ctx, sx + 8, sy + 9, 5, 1, '#e6f6ff'); break;
       case 'ash': px(ctx, sx, sy, TS, TS, '#4a3b34'); px(ctx, sx + 3, sy + 5, 3, 2, '#5c4a42'); px(ctx, sx + 10, sy + 10, 2, 2, '#3a2d28'); break;
       case 'lava': px(ctx, sx, sy, TS, TS, '#e8531f'); px(ctx, sx + 2, sy + 3, 5, 3, '#ffb02e'); px(ctx, sx + 9, sy + 9, 4, 3, '#ffd34d'); px(ctx, sx + 6, sy + 11, 3, 2, '#c0331a'); break;
