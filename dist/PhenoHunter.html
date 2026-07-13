@@ -1,0 +1,3335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Pheno Hunter</title>
+  <style>
+/* ============================================================
+   PHENO HUNTER — style.css
+   Estética GBA: marco cálido, tipografía monoespaciada, pixel-perfect.
+   ============================================================ */
+:root {
+  --bg: #12100c;
+  --panel: #1d2430;
+  --panel2: #242c3a;
+  --ink: #eaf0e6;
+  --dim: #97a1ad;
+  --accent: #7bd66b;
+  --accent2: #ffb02e;
+  --line: #33404f;
+  --shadow: 0 6px 24px rgba(0,0,0,.5);
+  font-size: 16px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  background: radial-gradient(circle at 50% 0%, #21351f 0%, #0f130d 70%);
+  color: var(--ink);
+  font-family: "Courier New", ui-monospace, monospace;
+  overflow: hidden;
+  -webkit-user-select: none; user-select: none;
+  touch-action: none;
+}
+#app { height: 100%; display: flex; flex-direction: column; align-items: center; }
+
+/* --------- HUD --------- */
+#hud {
+  width: 100%; max-width: 900px; display: flex; justify-content: space-between;
+  gap: 8px; padding: 8px 12px; flex-wrap: wrap;
+}
+.hud-left, .hud-right { display: flex; gap: 6px; flex-wrap: wrap; }
+.pill {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 999px;
+  padding: 3px 10px; font-size: .72rem; white-space: nowrap; color: var(--ink);
+}
+
+/* --------- Stage / canvas --------- */
+#stage { position: relative; line-height: 0; box-shadow: var(--shadow); border-radius: 8px; overflow: hidden;
+  border: 3px solid #2a2118; background: #000; }
+#screen { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+
+/* --------- Overlay (paneles) --------- */
+#overlay { position: absolute; inset: 0; display: none; line-height: 1.35; }
+#overlay.active { display: flex; }
+#overlay.center { align-items: center; justify-content: center; }
+#overlay.bottom { align-items: flex-end; justify-content: center; }
+#overlay::before { content: ""; position: absolute; inset: 0; background: rgba(6,8,10,.62); backdrop-filter: blur(1px); }
+#overlay > * { position: relative; z-index: 2; }
+
+/* --------- Toasts --------- */
+#toasts { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); z-index: 50;
+  display: flex; flex-direction: column; gap: 6px; align-items: center; pointer-events: none; }
+.toast { background: rgba(20,26,34,.95); border: 1px solid var(--line); color: var(--ink);
+  padding: 6px 14px; border-radius: 8px; font-size: .78rem; opacity: 0; transform: translateY(-8px);
+  transition: .3s; max-width: 90vw; text-align: center; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.ok { border-color: var(--accent); }
+.toast.bad { border-color: #e05a5a; }
+
+/* --------- Botones --------- */
+.btn { font-family: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--panel2);
+  color: var(--ink); padding: 8px 14px; border-radius: 8px; font-size: .82rem; transition: .12s; }
+.btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+.btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+.btn.primary { background: var(--accent); color: #10240f; font-weight: bold; border-color: var(--accent); }
+.btn.ghost { background: transparent; }
+.btn.small { padding: 5px 10px; font-size: .72rem; }
+.btn.big { padding: 12px 30px; font-size: 1rem; }
+
+/* --------- Título --------- */
+#overlay.title::before { background: rgba(6,10,8,.9); }
+.title-screen { text-align: center; padding: 20px; }
+.logo { font-size: 2.6rem; font-weight: 900; letter-spacing: 2px; color: var(--accent); text-shadow: 3px 3px 0 #10240f; }
+.logo span { color: var(--accent2); display: block; letter-spacing: 8px; font-size: 2rem; }
+.tagline { color: var(--dim); margin: 6px 0 14px; letter-spacing: 1px; }
+.title-art canvas { image-rendering: pixelated; border-radius: 6px; border: 1px solid var(--line); }
+.title-btns { display: flex; gap: 10px; justify-content: center; margin: 16px 0; }
+.title-help { color: var(--dim); font-size: .72rem; line-height: 1.7; }
+
+/* --------- Diálogo --------- */
+.dialog-box { width: min(92%, 640px); margin-bottom: 14px; background: var(--panel);
+  border: 2px solid var(--accent); border-radius: 10px; padding: 16px 18px; box-shadow: var(--shadow); }
+.dialog-box p { font-size: .92rem; }
+.dlg-hint { text-align: right; color: var(--dim); font-size: .7rem; margin-top: 8px; }
+
+/* --------- Paneles genéricos --------- */
+.panel { width: min(94%, 640px); max-height: 88%; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 12px; box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden; }
+.panel.wide { width: min(96%, 820px); }
+.panel-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px;
+  border-bottom: 1px solid var(--line); background: var(--panel2); }
+.panel-head h2 { font-size: 1rem; } .panel-head small { color: var(--dim); font-weight: normal; font-size: .72rem; margin-left: 6px; }
+.panel-body { padding: 14px 16px; overflow-y: auto; }
+.panel-body h3 { font-size: .8rem; color: var(--accent2); margin: 12px 0 8px; text-transform: uppercase; letter-spacing: 1px; }
+.x { background: none; border: none; color: var(--dim); font-size: 1.1rem; cursor: pointer; }
+.x:hover { color: #fff; }
+.dim { color: var(--dim); font-size: .8rem; }
+.row { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
+.center-col { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.warn { color: var(--accent2); font-size: .72rem; margin-top: 4px; }
+
+/* --------- Mochila / grids de items --------- */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.item { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 10px; cursor: pointer; }
+.item.sel { border-color: var(--accent); }
+.item b { font-size: .84rem; } .item small { display: block; color: var(--dim); font-size: .72rem; margin: 4px 0; }
+.item .tag { font-size: .68rem; color: var(--accent); }
+
+/* --------- Ficha de espécimen --------- */
+.spec-card { display: flex; gap: 12px; background: var(--panel2); border: 1px solid var(--line);
+  border-radius: 10px; padding: 12px; }
+.spec-art canvas { image-rendering: pixelated; background: #161d15; border-radius: 6px; border: 1px solid var(--line); }
+.spec-info { flex: 1; min-width: 0; }
+.spec-title { font-size: .92rem; font-weight: bold; } .spec-title small { color: var(--dim); font-weight: normal; font-size: .68rem; }
+.tier { display: inline-block; font-size: .72rem; color: var(--tc); border: 1px solid var(--tc); border-radius: 999px; padding: 1px 8px; margin: 4px 0; }
+.spec-desc { font-size: .76rem; color: var(--ink); margin: 4px 0; }
+.spec-meta { font-size: .72rem; color: var(--dim); margin-bottom: 6px; }
+.spec-stats .stat { display: flex; align-items: center; gap: 6px; font-size: .68rem; margin: 2px 0; }
+.stat span { width: 62px; color: var(--dim); } .stat b { width: 26px; text-align: right; }
+.bar { flex: 1; height: 7px; background: #121821; border-radius: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.muts { margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap; }
+.mut { font-size: .66rem; background: #3a2350; color: #d9a6ff; border: 1px solid #6b3fa0; border-radius: 999px; padding: 1px 8px; }
+
+/* --------- Banco --------- */
+.panel-body.list { display: flex; flex-direction: column; gap: 10px; }
+.bank-row { display: flex; gap: 10px; align-items: stretch; }
+.bank-row .spec-card { flex: 1; }
+.bank-actions { display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+
+/* --------- Encuentro --------- */
+.encounter { width: min(94%, 560px); background: var(--panel); border: 2px solid var(--accent2);
+  border-radius: 12px; padding: 14px; box-shadow: var(--shadow); }
+.enc-head { text-align: center; color: var(--accent2); font-weight: bold; margin-bottom: 8px; }
+.enc-body { display: flex; gap: 14px; }
+.enc-art canvas { image-rendering: pixelated; background: #101710; border-radius: 8px; border: 1px solid var(--line); }
+.enc-side { flex: 1; }
+.enc-name { font-size: 1rem; font-weight: bold; } .enc-name small { color: var(--dim); font-size: .68rem; }
+.enc-rare { color: var(--accent2); font-size: .76rem; margin: 3px 0; }
+.enc-desc { font-size: .76rem; color: var(--ink); }
+.enc-env { font-size: .7rem; color: var(--dim); margin-top: 4px; }
+.enc-fields { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.enc-fields span { font-size: .66rem; background: var(--panel2); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; }
+.enc-tools { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 12px 0 6px; }
+.enc-tools .tool { display: flex; flex-direction: column; align-items: center; font-size: .76rem; }
+.enc-tools .tool small { color: var(--dim); font-size: .62rem; }
+.enc-actions { text-align: center; }
+.enc-msg { text-align: center; min-height: 18px; margin-top: 8px; font-size: .8rem; }
+.enc-msg.ok { color: var(--accent); } .enc-msg.bad { color: #e88; }
+
+/* --------- Catálogo --------- */
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+.cat-card { background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 8px; text-align: center; }
+.cat-card canvas { image-rendering: pixelated; background: #141b13; border-radius: 6px; }
+.cc-name { font-size: .76rem; font-weight: bold; margin-top: 4px; }
+.cc-tier { font-size: .7rem; } .cc-meta { font-size: .66rem; color: var(--dim); }
+.cc-mut { font-size: .62rem; color: #d9a6ff; } .cc-count { font-size: .62rem; color: var(--dim); margin-top: 2px; }
+.cat-grid.select .pick { cursor: pointer; } .cat-grid.select .pick.picked { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; }
+
+/* --------- Laboratorio --------- */
+.breed-slots { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 10px 0 6px; flex-wrap: wrap; }
+.slot { width: 90px; min-height: 110px; background: var(--panel2); border: 1px dashed var(--line); border-radius: 10px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; }
+.slot canvas { image-rendering: pixelated; }
+.cross-sign, .cross-eq { font-size: 1.4rem; color: var(--accent2); }
+.newbadge { background: linear-gradient(90deg, var(--accent), var(--accent2)); color: #10240f; font-weight: bold;
+  padding: 6px 14px; border-radius: 999px; margin-bottom: 10px; animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+
+/* --------- Mercado --------- */
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.shop-item { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+.shop-item b { font-size: .84rem; } .shop-item small { color: var(--dim); font-size: .72rem; flex: 1; }
+
+/* --------- Misiones --------- */
+.quest { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+.quest.done { opacity: .6; } .q-name { font-size: .86rem; font-weight: bold; }
+.q-desc { font-size: .76rem; color: var(--ink); margin: 3px 0; } .q-reward { font-size: .7rem; color: var(--accent2); }
+
+/* --------- Controles táctiles --------- */
+#touch { display: none; width: 100%; max-width: 900px; justify-content: space-between; padding: 12px 18px; }
+.dpad { position: relative; width: 132px; height: 132px; }
+.tb { font-family: inherit; background: var(--panel); border: 1px solid var(--line); color: var(--ink);
+  border-radius: 10px; font-size: 1rem; cursor: pointer; }
+.dpad .tb { position: absolute; width: 44px; height: 44px; }
+.dpad .up { top: 0; left: 44px; } .dpad .down { bottom: 0; left: 44px; }
+.dpad .left { top: 44px; left: 0; } .dpad .right { top: 44px; right: 0; }
+.abtns { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.abtns .a { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); color: #10240f; font-weight: bold; }
+.menu-keys { display: flex; gap: 8px; } .menu-keys .s { width: 44px; height: 44px; }
+
+/* --------- Invernadero / cultivo --------- */
+.garden-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-top: 6px; }
+.plot { background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 10px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 170px; justify-content: space-between; }
+.plot.ready { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.plot.empty { border-style: dashed; justify-content: center; }
+.plot-add { cursor: pointer; color: var(--dim); font-size: 1.8rem; display: flex; flex-direction: column; align-items: center; }
+.plot-add small { font-size: .7rem; } .plot-add:hover { color: var(--accent); }
+.plot-sprite { position: relative; background:
+    linear-gradient(0deg, rgba(90,140,70,.25), rgba(20,26,20,.1)); border-radius: 8px; padding: 2px; }
+.plot-sprite img { image-rendering: pixelated; display: block; }
+.phdot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 50%; border: 1px solid rgba(0,0,0,.4); }
+.plot-name { font-size: .78rem; font-weight: bold; } .plot-stage { font-size: .7rem; }
+.plot .bar { width: 100%; }
+.plot-actions { display: flex; gap: 4px; }
+.hub-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
+.btn.hub { padding: 18px 10px; line-height: 1.5; font-size: .8rem; }
+
+/* --------- Investigación / ADN --------- */
+.pill.event { background: linear-gradient(90deg, #3a2350, #6b3fa0); border-color: #a06bff; color: #f0e0ff; animation: pulse 1.2s infinite; }
+.dna { font-family: monospace; font-size: .7rem; letter-spacing: 1px; word-break: break-all; background: #0f1520;
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px; color: #7bd66b; line-height: 1.6; }
+.hidden-list { list-style: none; font-size: .76rem; } .hidden-list li { padding: 3px 0; border-bottom: 1px solid var(--line); }
+.hidden-list i { color: var(--accent2); font-style: normal; }
+.rel-row { display: flex; align-items: center; gap: 8px; font-size: .72rem; margin: 4px 0; }
+.rel-row span { width: 110px; } .rel-row small { color: var(--dim); }
+.seq-head { margin-bottom: 8px; }
+.stats-box { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin: 10px 0;
+  text-align: left; font-size: .8rem; line-height: 1.8; width: 100%; }
+.stats-box small { color: var(--dim); }
+.ev-row { display: flex; gap: 10px; align-items: flex-start; background: var(--panel2); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
+.ev-ico { font-size: 1.3rem; } .ev-row b { font-size: .82rem; } .ev-row small { display: block; color: var(--dim); font-size: .72rem; }
+
+/* --------- Footer --------- */
+#foot { color: var(--dim); font-size: .68rem; padding: 8px; text-align: center; }
+
+@media (max-width: 760px) {
+  #touch { display: flex; }
+  #foot { display: none; }
+  .logo { font-size: 2rem; }
+}
+@media (hover: none) and (pointer: coarse) {
+  #touch { display: flex; }
+}
+
+</style>
+</head>
+<body>
+  <div id="app">
+    <div id="hud"></div>
+
+    <div id="stage">
+      <canvas id="screen" width="240" height="160"></canvas>
+      <div id="overlay"></div>
+      <div id="toasts"></div>
+    </div>
+
+    <div id="touch">
+      <div class="dpad">
+        <button data-key="arrowup" class="tb up">▲</button>
+        <button data-key="arrowleft" class="tb left">◀</button>
+        <button data-key="arrowright" class="tb right">▶</button>
+        <button data-key="arrowdown" class="tb down">▼</button>
+      </div>
+      <div class="abtns">
+        <button data-key=" " class="tb a">A</button>
+        <div class="menu-keys">
+          <button data-key="i" class="tb s">🎒</button>
+          <button data-key="b" class="tb s">🧬</button>
+          <button data-key="c" class="tb s">📖</button>
+        </div>
+      </div>
+    </div>
+
+    <footer id="foot">
+      Pheno Hunter — un RPG de exploración y genética vegetal. Sin combates. Solo descubrimiento.
+    </footer>
+  </div>
+  <script>
+/* ==== src/util.js ==== */
+/* ============================================================
+   PHENO HUNTER — util.js
+   Núcleo de utilidades: RNG, matemáticas, helpers de color.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+
+  // ---- RNG con semilla (mulberry32) para generación reproducible ----
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // RNG global del juego (no sembrado -> usa Math.random para el mundo vivo)
+  const RNG = {
+    // número flotante [0,1)
+    f: () => Math.random(),
+    // entero [min,max] inclusivo
+    i: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
+    // rango flotante
+    r: (min, max) => min + Math.random() * (max - min),
+    // probabilidad p (0..1)
+    chance: (p) => Math.random() < p,
+    // elemento aleatorio de un array
+    pick: (arr) => arr[Math.floor(Math.random() * arr.length)],
+    // elección ponderada: [{w, ...}] devuelve el objeto
+    weighted: (arr, wkey) => {
+      let total = 0;
+      for (const it of arr) total += (wkey ? it[wkey] : it.w) || 0;
+      let roll = Math.random() * total;
+      for (const it of arr) {
+        roll -= (wkey ? it[wkey] : it.w) || 0;
+        if (roll <= 0) return it;
+      }
+      return arr[arr.length - 1];
+    },
+    // baraja Fisher-Yates (in place)
+    shuffle: (arr) => {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    },
+    // gaussiana aproximada, media 0, desv 1
+    gauss: () => {
+      let u = 0, v = 0;
+      while (u === 0) u = Math.random();
+      while (v === 0) v = Math.random();
+      return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    }
+  };
+
+  const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  // ---- Color helpers ----
+  function hsl(h, s, l) { return `hsl(${h},${s}%,${l}%)`; }
+  function hslToHex(h, s, l) {
+    s /= 100; l /= 100;
+    const k = (n) => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = (n) => {
+      const c = l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+      return Math.round(255 * c).toString(16).padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+  }
+  function shade(hex, amt) {
+    // amt: -1..1  oscurece/aclara
+    const n = parseInt(hex.replace('#', ''), 16);
+    let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    const t = amt < 0 ? 0 : 255;
+    const p = Math.abs(amt);
+    r = Math.round((t - r) * p) + r;
+    g = Math.round((t - g) * p) + g;
+    b = Math.round((t - b) * p) + b;
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+  }
+
+  // Formato: 12345 -> "12.3k"
+  function fmt(n) {
+    if (n < 1000) return '' + n;
+    if (n < 1e6) return (n / 1000).toFixed(n < 1e4 ? 1 : 0) + 'k';
+    return (n / 1e6).toFixed(1) + 'M';
+  }
+
+  function id() { return 'g' + (id._c = (id._c || 0) + 1) + '_' + Math.floor(Math.random() * 1e6).toString(36); }
+
+  // capitaliza
+  const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+
+  PH.util = { mulberry32, RNG, clamp, lerp, hsl, hslToHex, shade, fmt, id, cap };
+})(window.PH = window.PH || {});
+
+/* ==== src/genetics.js ==== */
+/* ============================================================
+   PHENO HUNTER — genetics.js
+   Motor genético diploide con dominancia, poligenes, mutaciones,
+   poliploidía, patrones, secuencia de ADN y parentesco.
+   Es el corazón del juego.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  const { RNG, clamp, hslToHex, cap } = PH.util;
+
+  /* --------------------------------------------------------
+     Definición de GENES
+     -------------------------------------------------------- */
+
+  // Color de flor — cualitativo. hue base para render.
+  const COLORS = [
+    { key: 'verde',    dom: 5, hue: 110, rarity: 1 },
+    { key: 'lima',     dom: 4, hue: 85,  rarity: 2 },
+    { key: 'ambar',    dom: 4, hue: 40,  rarity: 3 },
+    { key: 'purpura',  dom: 6, hue: 280, rarity: 4 },
+    { key: 'violeta',  dom: 6, hue: 300, rarity: 5 },
+    { key: 'carmesi',  dom: 7, hue: 350, rarity: 6 },
+    { key: 'azur',     dom: 7, hue: 205, rarity: 8 },
+    { key: 'turquesa', dom: 6, hue: 175, rarity: 7 },
+    { key: 'oro',      dom: 8, hue: 48,  rarity: 9 },
+    { key: 'rosa',     dom: 3, hue: 330, rarity: 4 },
+    { key: 'magenta',  dom: 7, hue: 320, rarity: 7 },
+    { key: 'obsidiana',dom: 9, hue: 260, rarity: 11, dark: true },
+    { key: 'blanco',   dom: 1, hue: 0,   rarity: 12, albino: true }, // recesivo -> albinismo
+  ];
+  const COLOR_BY_KEY = Object.fromEntries(COLORS.map(c => [c.key, c]));
+
+  // Forma de hoja — cualitativo
+  const LEAF = [
+    { key: 'ancha',     dom: 5, rarity: 1 },
+    { key: 'estrecha',  dom: 5, rarity: 1 },
+    { key: 'serrada',   dom: 4, rarity: 2 },
+    { key: 'palmada',   dom: 3, rarity: 3 },
+    { key: 'digitada',  dom: 6, rarity: 4 },
+    { key: 'lobulada',  dom: 4, rarity: 3 },
+    { key: 'aciculada', dom: 5, rarity: 5 },
+    { key: 'reticulada',dom: 2, rarity: 7 },
+  ];
+
+  // Terpeno dominante / aroma — cualitativo
+  const TERP = [
+    { key: 'citrico',    dom: 4, rarity: 1 },
+    { key: 'pino',       dom: 4, rarity: 1 },
+    { key: 'floral',     dom: 5, rarity: 2 },
+    { key: 'terroso',    dom: 3, rarity: 2 },
+    { key: 'combustible',dom: 6, rarity: 4 },
+    { key: 'dulce',      dom: 4, rarity: 3 },
+    { key: 'especiado',  dom: 5, rarity: 4 },
+    { key: 'mentolado',  dom: 7, rarity: 6 },
+    { key: 'ahumado',    dom: 6, rarity: 5 },
+    { key: 'marino',     dom: 5, rarity: 5 },
+    { key: 'incienso',   dom: 8, rarity: 9 },
+  ];
+
+  // Patrón de pigmentación — cualitativo, afecta al render de la flor
+  const PATTERN = [
+    { key: 'liso',      dom: 5, rarity: 1 },
+    { key: 'moteado',   dom: 4, rarity: 3 },
+    { key: 'rayado',    dom: 4, rarity: 4 },
+    { key: 'jaspeado',  dom: 3, rarity: 5 },
+    { key: 'aureolado', dom: 6, rarity: 7 },
+  ];
+
+  // Genes cuantitativos: cada alelo aporta un valor 0..100
+  const QUANT = ['altura', 'produccion', 'vigor', 'resistencia', 'velocidad', 'resina', 'aroma'];
+
+  // Mutaciones especiales (flags fenotípicos).
+  const MUTATIONS = {
+    variegacion:  { rarity: 8,  label: 'Variegación',     desc: 'Sectores sin clorofila; patrón jaspeado único.' },
+    gigantismo:   { rarity: 9,  label: 'Gigantismo',      desc: 'Crecimiento descomunal; +altura +producción.' },
+    enanismo:     { rarity: 7,  label: 'Enanismo',        desc: 'Porte minúsculo; densa y compacta.' },
+    quimera:      { rarity: 11, label: 'Quimera',         desc: 'Dos genotipos coexistiendo en un cuerpo.' },
+    fasciacion:   { rarity: 10, label: 'Fasciación',      desc: 'Tallos fusionados en forma de cresta.' },
+    fluorescente: { rarity: 13, label: 'Bioluminiscencia',desc: 'Tejidos que brillan en la oscuridad.' },
+    cristalina:   { rarity: 12, label: 'Cristalina',      desc: 'Resina hipertrófica; recubre la planta de escarcha.' },
+    hexaploide:   { rarity: 14, label: 'Aura hexaploide', desc: 'Duplicación genómica extrema; vigor legendario.' },
+  };
+
+  const PLOIDY = {
+    2: { label: 'Diploide',    yieldMul: 1.0,  sizeMul: 1.0,  rarity: 1 },
+    3: { label: 'Triploide',   yieldMul: 1.25, sizeMul: 1.15, rarity: 8,  sterile: true },
+    4: { label: 'Tetraploide', yieldMul: 1.45, sizeMul: 1.3,  rarity: 10 },
+  };
+
+  const QUAL_GENES = [
+    { key: 'color', list: COLORS },
+    { key: 'leaf', list: LEAF },
+    { key: 'terp', list: TERP },
+    { key: 'pattern', list: PATTERN },
+  ];
+
+  /* --------------------------------------------------------
+     Construcción de un GENOTIPO
+     -------------------------------------------------------- */
+  function randAlleleFrom(list, biasCommon) {
+    const arr = list.map(a => ({ ref: a, w: biasCommon ? 1 / a.rarity : 1 }));
+    return RNG.weighted(arr, 'w').ref.key;
+  }
+  function wildQuant(base, spread) {
+    return clamp(Math.round(base + RNG.gauss() * spread), 1, 100);
+  }
+
+  function wildGenotype(profile) {
+    const g = { color: [], leaf: [], terp: [], pattern: [], quant: {}, ploidy: 2, mut: {} };
+    for (let i = 0; i < 2; i++) g.color.push(pickProfile(profile.colors, COLORS));
+    for (let i = 0; i < 2; i++) g.leaf.push(pickProfile(profile.leaves, LEAF));
+    for (let i = 0; i < 2; i++) g.terp.push(pickProfile(profile.terps, TERP));
+    for (let i = 0; i < 2; i++) g.pattern.push(pickProfile(profile.patterns, PATTERN));
+    for (const q of QUANT) {
+      const base = (profile.quant && profile.quant[q]) || 45;
+      g.quant[q] = [wildQuant(base, 14), wildQuant(base, 14)];
+    }
+    maybeWildMutation(g, profile.mutBoost || 1);
+    maybeWildPloidy(g, profile.ploidyBoost || 1);
+    return g;
+  }
+
+  function pickProfile(pool, list) {
+    if (pool && pool.length) {
+      if (typeof pool[0] === 'string') return RNG.pick(pool);
+      return RNG.weighted(pool, 'w').key;
+    }
+    return randAlleleFrom(list, true);
+  }
+
+  function globalMutBoost() {
+    // Eventos activos y equipo de laboratorio pueden amplificar mutaciones.
+    let b = 1;
+    if (PH.events && PH.events.mutationBoost) b *= PH.events.mutationBoost();
+    return b;
+  }
+
+  function maybeWildMutation(g, boost) {
+    const gb = globalMutBoost();
+    for (const [k, m] of Object.entries(MUTATIONS)) {
+      const p = (0.5 / (m.rarity * m.rarity)) * boost * gb;
+      if (RNG.chance(p)) g.mut[k] = true;
+    }
+  }
+  function maybeWildPloidy(g, boost) {
+    const gb = globalMutBoost();
+    if (RNG.chance(0.01 * boost * gb)) g.ploidy = 4;
+    else if (RNG.chance(0.02 * boost * gb)) g.ploidy = 3;
+  }
+
+  /* --------------------------------------------------------
+     EXPRESIÓN — genotipo -> fenotipo observable
+     -------------------------------------------------------- */
+  function expressQual(alleles, list) {
+    const A = list.find(x => x.key === alleles[0]) || list[0];
+    const B = list.find(x => x.key === alleles[1]) || list[0];
+    if (A.dom === B.dom && A.key !== B.key) return { expressed: A.key, hidden: B.key, co: B.key };
+    const dom = A.dom >= B.dom ? A : B;
+    const rec = A.dom >= B.dom ? B : A;
+    return { expressed: dom.key, hidden: rec.key, co: null };
+  }
+
+  function express(genotype) {
+    const p = PLOIDY[genotype.ploidy] || PLOIDY[2];
+    const color = expressQual(genotype.color, COLORS);
+    const leaf = expressQual(genotype.leaf, LEAF);
+    const terp = expressQual(genotype.terp, TERP);
+    const pattern = expressQual(genotype.pattern || ['liso', 'liso'], PATTERN);
+
+    const q = {};
+    for (const key of QUANT) {
+      const a = genotype.quant[key] || [45, 45];
+      q[key] = clamp(Math.round((a[0] + a[1]) / 2), 1, 100);
+    }
+    const mut = Object.keys(genotype.mut || {}).filter(k => genotype.mut[k]);
+    if (genotype.mut.gigantismo) { q.altura = clamp(q.altura + 30, 1, 130); q.produccion = clamp(q.produccion + 20, 1, 130); }
+    if (genotype.mut.enanismo)  { q.altura = clamp(Math.round(q.altura * 0.4), 1, 100); q.resina = clamp(q.resina + 15, 1, 100); }
+    if (genotype.mut.cristalina) { q.resina = clamp(q.resina + 25, 1, 130); }
+    if (genotype.mut.hexaploide) { q.vigor = clamp(q.vigor + 25, 1, 130); q.produccion = clamp(q.produccion + 25, 1, 150); }
+    q.produccion = clamp(Math.round(q.produccion * p.yieldMul), 1, 150);
+    q.altura = clamp(Math.round(q.altura * p.sizeMul), 1, 150);
+
+    const colorInfo = COLOR_BY_KEY[color.expressed] || COLORS[0];
+
+    return {
+      color: color.expressed, colorHidden: color.hidden, colorCo: color.co,
+      hue: colorInfo.hue, albino: colorInfo.albino || false, dark: colorInfo.dark || false,
+      leaf: leaf.expressed, leafHidden: leaf.hidden,
+      terp: terp.expressed, terpHidden: terp.hidden,
+      pattern: pattern.expressed,
+      quant: q, ploidy: genotype.ploidy, ploidyLabel: p.label, sterile: !!p.sterile,
+      mutations: mut,
+    };
+  }
+
+  /* --------------------------------------------------------
+     RAREZA
+     -------------------------------------------------------- */
+  function rarityScore(genotype) {
+    const ph = express(genotype);
+    let score = 0;
+    score += (COLOR_BY_KEY[ph.color]?.rarity || 1) * 1.4;
+    if (ph.colorCo) score += 6;
+    score += (LEAF.find(l => l.key === ph.leaf)?.rarity || 1);
+    score += (TERP.find(t => t.key === ph.terp)?.rarity || 1) * 1.2;
+    score += (PATTERN.find(t => t.key === ph.pattern)?.rarity || 1) * 1.1;
+    for (const k of QUANT) {
+      const v = ph.quant[k];
+      if (v >= 95) score += 5; else if (v >= 88) score += 3; else if (v >= 80) score += 1.5;
+      if (v <= 6) score += 2;
+    }
+    for (const m of ph.mutations) score += (MUTATIONS[m]?.rarity || 5) * 1.6;
+    score += (PLOIDY[ph.ploidy]?.rarity || 1) * 1.2;
+    return Math.round(clamp(score, 1, 100));
+  }
+
+  function rarityTier(score) {
+    if (score >= 82) return { key: 'quimerica', label: 'Quimérica', color: '#ff3d7f', stars: 7 };
+    if (score >= 70) return { key: 'mitica', label: 'Mítica', color: '#ff5da2', stars: 6 };
+    if (score >= 55) return { key: 'legendaria', label: 'Legendaria', color: '#ffb02e', stars: 5 };
+    if (score >= 40) return { key: 'rara', label: 'Rara', color: '#8a7dff', stars: 4 };
+    if (score >= 28) return { key: 'inusual', label: 'Inusual', color: '#37c2ff', stars: 3 };
+    if (score >= 16) return { key: 'comun', label: 'Común', color: '#7bd66b', stars: 2 };
+    return { key: 'basica', label: 'Básica', color: '#a8b0b8', stars: 1 };
+  }
+
+  /* --------------------------------------------------------
+     FIRMA fenotípica
+     -------------------------------------------------------- */
+  function phenoSignature(genotype) {
+    const ph = express(genotype);
+    const bucket = (v) => Math.round(v / 20);
+    return [
+      ph.color, ph.leaf, ph.terp, ph.pattern,
+      'a' + bucket(ph.quant.altura),
+      'p' + bucket(ph.quant.produccion),
+      'r' + bucket(ph.quant.resina),
+      ph.ploidy,
+      ph.mutations.slice().sort().join('+') || '-'
+    ].join('|');
+  }
+
+  /* --------------------------------------------------------
+     ADN — cadena legible derivada del genotipo (para investigación)
+     -------------------------------------------------------- */
+  const BASES = ['A', 'T', 'C', 'G'];
+  function alleleCodon(list, key) {
+    const idx = Math.max(0, list.findIndex(x => x.key === key));
+    // 3 bases codificando el índice en base 4
+    return BASES[(idx) % 4] + BASES[(idx >> 2) % 4] + BASES[(idx >> 4) % 4];
+  }
+  function dnaSequence(genotype) {
+    let seq = '';
+    for (const g of QUAL_GENES) {
+      const list = g.list;
+      const al = genotype[g.key] || [list[0].key, list[0].key];
+      seq += alleleCodon(list, al[0]) + alleleCodon(list, al[1]);
+    }
+    for (const q of QUANT) {
+      const a = genotype.quant[q] || [45, 45];
+      for (const v of a) {
+        const n = Math.round(v / 25); // 0..4
+        seq += BASES[n % 4] + BASES[(n >> 2) % 4];
+      }
+    }
+    // marcador de ploidía y mutaciones
+    seq += 'GG'.repeat(genotype.ploidy - 1);
+    for (const k of Object.keys(MUTATIONS)) if (genotype.mut[k]) seq += 'CATG';
+    return seq;
+  }
+
+  // Parentesco 0..1 comparando alelos compartidos
+  function relatedness(gA, gB) {
+    let match = 0, total = 0;
+    for (const g of QUAL_GENES) {
+      const a = gA[g.key] || [], b = gB[g.key] || [];
+      total += 2;
+      const bb = b.slice();
+      for (const x of a) { const i = bb.indexOf(x); if (i >= 0) { match++; bb.splice(i, 1); } }
+    }
+    for (const q of QUANT) {
+      total += 1;
+      const va = gA.quant[q] || [45, 45], vb = gB.quant[q] || [45, 45];
+      const d = Math.abs((va[0] + va[1]) / 2 - (vb[0] + vb[1]) / 2);
+      match += clamp(1 - d / 60, 0, 1);
+    }
+    return clamp(match / total, 0, 1);
+  }
+
+  /* --------------------------------------------------------
+     CRUCE / BREEDING
+     -------------------------------------------------------- */
+  function inheritQual(pA, pB) { return [RNG.pick(pA), RNG.pick(pB)]; }
+
+  function breed(genoA, genoB, opts) {
+    opts = opts || {};
+    const mutRate = (opts.mutRate != null ? opts.mutRate : 0.06) * globalMutBoost();
+    const child = { color: [], leaf: [], terp: [], pattern: [], quant: {}, ploidy: 2, mut: {} };
+
+    child.color = inheritQual(genoA.color, genoB.color);
+    child.leaf = inheritQual(genoA.leaf, genoB.leaf);
+    child.terp = inheritQual(genoA.terp, genoB.terp);
+    child.pattern = inheritQual(genoA.pattern || ['liso', 'liso'], genoB.pattern || ['liso', 'liso']);
+
+    for (const q of QUANT) {
+      const a = RNG.pick(genoA.quant[q] || [45, 45]);
+      const b = RNG.pick(genoB.quant[q] || [45, 45]);
+      child.quant[q] = [clamp(Math.round(a + RNG.gauss() * 6), 1, 100), clamp(Math.round(b + RNG.gauss() * 6), 1, 100)];
+    }
+
+    const pa = genoA.ploidy, pb = genoB.ploidy;
+    child.ploidy = 2;
+    if (RNG.chance(0.02)) child.ploidy = 4;
+    else if ((pa >= 3 || pb >= 3) && RNG.chance(0.25)) child.ploidy = RNG.chance(0.5) ? 3 : 4;
+
+    for (const k of Object.keys(MUTATIONS)) {
+      const parents = (genoA.mut[k] ? 1 : 0) + (genoB.mut[k] ? 1 : 0);
+      if (parents === 2 && RNG.chance(0.6)) child.mut[k] = true;
+      else if (parents === 1 && RNG.chance(0.3)) child.mut[k] = true;
+    }
+    for (const [k, m] of Object.entries(MUTATIONS)) {
+      const p = (mutRate / m.rarity) * (opts.mutBoost || 1);
+      if (RNG.chance(p)) child.mut[k] = true;
+    }
+    if (RNG.chance(mutRate * 0.5)) {
+      const idx = RNG.i(0, 1);
+      child.color[idx] = RNG.weighted(COLORS.map(c => ({ ref: c, w: 1 / c.rarity })), 'w').ref.key;
+    }
+    return child;
+  }
+
+  /* --------------------------------------------------------
+     Presentación
+     -------------------------------------------------------- */
+  function paletteFor(pheno) {
+    let hue = pheno.hue;
+    let sat = pheno.albino ? 6 : 62;
+    let lig = pheno.albino ? 88 : (pheno.dark ? 26 : 48);
+    if (pheno.mutations.includes('fluorescente')) { sat = 90; lig = 62; }
+    if (pheno.mutations.includes('cristalina')) { lig = Math.min(80, lig + 14); }
+    const base = hslToHex(hue, sat, lig);
+    const dark = hslToHex(hue, sat, Math.max(10, lig - 22));
+    const light = hslToHex(hue, sat, Math.min(96, lig + 22));
+    const leafC = pheno.albino ? '#e8e2c8' : hslToHex(120, pheno.mutations.includes('variegacion') ? 24 : 46, 34);
+    return { base, dark, light, leaf: leafC };
+  }
+
+  function describe(pheno) {
+    const bits = [];
+    bits.push(`Flor ${pheno.color}${pheno.colorCo ? '/' + pheno.colorCo : ''}`);
+    if (pheno.pattern && pheno.pattern !== 'liso') bits.push(`patrón ${pheno.pattern}`);
+    bits.push(`hoja ${pheno.leaf}`);
+    bits.push(`aroma ${pheno.terp}`);
+    if (pheno.ploidy !== 2) bits.push(pheno.ploidyLabel.toLowerCase());
+    for (const m of pheno.mutations) bits.push(MUTATIONS[m].label.toLowerCase());
+    return cap(bits.join(', ')) + '.';
+  }
+
+  PH.gen = {
+    COLORS, LEAF, TERP, PATTERN, QUANT, MUTATIONS, PLOIDY, COLOR_BY_KEY, QUAL_GENES,
+    wildGenotype, express, rarityScore, rarityTier, phenoSignature,
+    breed, paletteFor, describe, dnaSequence, relatedness,
+  };
+})(window.PH = window.PH || {});
+
+/* ==== src/species.js ==== */
+/* ============================================================
+   PHENO HUNTER — species.js
+   Especies base, perfiles genéticos, biomas y tablas de aparición.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  const { RNG } = PH.util;
+  const { wildGenotype, express, rarityScore, rarityTier, phenoSignature } = PH.gen;
+
+  const SPECIES = [
+    // ---------- PRADERA / BOSQUE / PANTANO ----------
+    { id: 'PH-001', name: 'Musgolita', family: 'Briófita antigua', biomes: ['pradera', 'bosque'],
+      origin: 'Praderas templadas del Valle Umbral',
+      story: 'La primera variedad que todo aprendiz cataloga. Resistente y humilde.',
+      profile: { colors: [{ key: 'verde', w: 5 }, { key: 'lima', w: 3 }], leaves: [{ key: 'ancha', w: 4 }, { key: 'serrada', w: 2 }], terps: [{ key: 'terroso', w: 3 }, { key: 'pino', w: 2 }], quant: { altura: 40, produccion: 45, vigor: 55, resistencia: 60, velocidad: 55, resina: 30, aroma: 40 } } },
+    { id: 'PH-002', name: 'Solandra', family: 'Heliófita', biomes: ['pradera'],
+      origin: 'Llanuras soleadas de Auralia',
+      story: 'Gira sus flores siguiendo la luz. Aroma cítrico brillante.',
+      profile: { colors: [{ key: 'oro', w: 2 }, { key: 'ambar', w: 4 }, { key: 'lima', w: 3 }], leaves: [{ key: 'palmada', w: 3 }], terps: [{ key: 'citrico', w: 5 }, { key: 'dulce', w: 2 }], quant: { altura: 55, produccion: 60, vigor: 60, resistencia: 45, velocidad: 60, resina: 45, aroma: 65 } } },
+    { id: 'PH-003', name: 'Nébula', family: 'Umbrófita', biomes: ['bosque'],
+      origin: 'Suelos sombríos del Bosque de Vael',
+      story: 'Crece en penumbra; sus flores púrpura toman color con el frío.',
+      profile: { colors: [{ key: 'purpura', w: 4 }, { key: 'violeta', w: 2 }, { key: 'verde', w: 2 }], leaves: [{ key: 'digitada', w: 3 }, { key: 'estrecha', w: 2 }], terps: [{ key: 'floral', w: 4 }, { key: 'dulce', w: 2 }], quant: { altura: 60, produccion: 55, vigor: 50, resistencia: 40, velocidad: 45, resina: 60, aroma: 60 } } },
+    { id: 'PH-004', name: 'Ferralia', family: 'Xerófita', biomes: ['bosque', 'pantano'],
+      origin: 'Cortezas ferrosas del Bosque de Vael',
+      story: 'Sus tallos acumulan minerales; resistente como el hierro.',
+      profile: { colors: [{ key: 'ambar', w: 3 }, { key: 'carmesi', w: 2 }, { key: 'verde', w: 2 }], leaves: [{ key: 'serrada', w: 3 }, { key: 'reticulada', w: 1 }], terps: [{ key: 'combustible', w: 3 }, { key: 'especiado', w: 2 }], quant: { altura: 50, produccion: 50, vigor: 55, resistencia: 80, velocidad: 35, resina: 55, aroma: 45 }, mutBoost: 1.4 } },
+    { id: 'PH-005', name: 'Cienófaga', family: 'Higrófita', biomes: ['pantano'],
+      origin: 'Turberas del Cenagal de Mureb',
+      story: 'Prospera en el agua estancada; libera un vapor combustible.',
+      profile: { colors: [{ key: 'lima', w: 3 }, { key: 'verde', w: 3 }, { key: 'azur', w: 1 }], leaves: [{ key: 'ancha', w: 4 }], terps: [{ key: 'combustible', w: 4 }, { key: 'terroso', w: 3 }], quant: { altura: 65, produccion: 70, vigor: 65, resistencia: 55, velocidad: 45, resina: 50, aroma: 55 } } },
+    { id: 'PH-006', name: 'Brumaria', family: 'Nefelófita', biomes: ['pantano', 'bosque'],
+      origin: 'Nieblas perpetuas de Mureb',
+      story: 'Solo florece entre la niebla; sus pétalos parecen humo condensado.',
+      profile: { colors: [{ key: 'azur', w: 3 }, { key: 'violeta', w: 2 }, { key: 'blanco', w: 1 }], leaves: [{ key: 'estrecha', w: 3 }, { key: 'reticulada', w: 2 }], terps: [{ key: 'mentolado', w: 3 }, { key: 'floral', w: 3 }], quant: { altura: 55, produccion: 50, vigor: 45, resistencia: 45, velocidad: 40, resina: 70, aroma: 70 }, mutBoost: 1.6, ploidyBoost: 1.5 } },
+    // ---------- DESIERTO ----------
+    { id: 'PH-008', name: 'Solárida', family: 'Suculenta', biomes: ['desierto'],
+      origin: 'Dunas ardientes del Erg de Sael',
+      story: 'Almacena agua en hojas gruesas; florece con el calor extremo.',
+      profile: { colors: [{ key: 'ambar', w: 3 }, { key: 'oro', w: 2 }, { key: 'carmesi', w: 2 }], leaves: [{ key: 'aciculada', w: 3 }, { key: 'lobulada', w: 2 }], terps: [{ key: 'especiado', w: 3 }, { key: 'ahumado', w: 2 }], quant: { altura: 35, produccion: 45, vigor: 55, resistencia: 85, velocidad: 30, resina: 65, aroma: 50 }, mutBoost: 1.3 } },
+    { id: 'PH-009', name: 'Duníscara', family: 'Psamófita', biomes: ['desierto'],
+      origin: 'Arenas movedizas del Erg de Sael',
+      story: 'Sus raíces recorren metros bajo la arena buscando humedad.',
+      profile: { colors: [{ key: 'rosa', w: 3 }, { key: 'magenta', w: 2 }, { key: 'ambar', w: 2 }], leaves: [{ key: 'estrecha', w: 3 }], terps: [{ key: 'dulce', w: 3 }, { key: 'floral', w: 2 }], quant: { altura: 50, produccion: 55, vigor: 60, resistencia: 70, velocidad: 55, resina: 45, aroma: 60 } } },
+    // ---------- NIEVE ----------
+    { id: 'PH-010', name: 'Gélida', family: 'Criófita', biomes: ['nieve'],
+      origin: 'Neveros eternos del Manto de Yrr',
+      story: 'Genera un anticongelante natural; su resina cristaliza al aire.',
+      profile: { colors: [{ key: 'azur', w: 3 }, { key: 'turquesa', w: 3 }, { key: 'blanco', w: 2 }], leaves: [{ key: 'aciculada', w: 3 }, { key: 'estrecha', w: 2 }], terps: [{ key: 'mentolado', w: 4 }, { key: 'marino', w: 2 }], quant: { altura: 45, produccion: 50, vigor: 50, resistencia: 75, velocidad: 40, resina: 80, aroma: 65 }, mutBoost: 1.7 } },
+    { id: 'PH-011', name: 'Aurora', family: 'Fotófita', biomes: ['nieve'],
+      origin: 'Bajo las luces boreales del Manto de Yrr',
+      story: 'De noche, bajo la aurora, sus tejidos emiten un brillo tenue.',
+      profile: { colors: [{ key: 'turquesa', w: 2 }, { key: 'violeta', w: 3 }, { key: 'magenta', w: 2 }], leaves: [{ key: 'digitada', w: 3 }], terps: [{ key: 'floral', w: 3 }, { key: 'incienso', w: 1 }], quant: { altura: 55, produccion: 55, vigor: 45, resistencia: 55, velocidad: 45, resina: 70, aroma: 75 }, mutBoost: 2.0, ploidyBoost: 1.6 } },
+    // ---------- VOLCÁN ----------
+    { id: 'PH-012', name: 'Ígnea', family: 'Pirófita', biomes: ['volcan'],
+      origin: 'Laderas de ceniza del Monte Calder',
+      story: 'Germina solo tras el fuego; su savia arde con aroma a azufre.',
+      profile: { colors: [{ key: 'carmesi', w: 4 }, { key: 'oro', w: 2 }, { key: 'obsidiana', w: 1 }], leaves: [{ key: 'lobulada', w: 3 }, { key: 'serrada', w: 2 }], terps: [{ key: 'ahumado', w: 4 }, { key: 'combustible', w: 3 }], quant: { altura: 60, produccion: 65, vigor: 70, resistencia: 65, velocidad: 50, resina: 60, aroma: 70 }, mutBoost: 1.8, ploidyBoost: 1.4 } },
+    { id: 'PH-013', name: 'Obsidiónida', family: 'Litófita', biomes: ['volcan'],
+      origin: 'Grietas de obsidiana del Monte Calder',
+      story: 'Rarísima flor negra que crece sobre roca volcánica vidriada.',
+      profile: { colors: [{ key: 'obsidiana', w: 4 }, { key: 'violeta', w: 2 }], leaves: [{ key: 'reticulada', w: 2 }, { key: 'digitada', w: 2 }], terps: [{ key: 'incienso', w: 3 }, { key: 'especiado', w: 2 }], quant: { altura: 55, produccion: 60, vigor: 60, resistencia: 70, velocidad: 40, resina: 85, aroma: 80 }, mutBoost: 2.2, ploidyBoost: 2.0 } },
+    // ---------- CUEVA ----------
+    { id: 'PH-014', name: 'Fungália', family: 'Micótrofa', biomes: ['cueva'],
+      origin: 'Galerías sin luz de la Cueva de Vael',
+      story: 'Vive de la oscuridad y de hongos simbiontes; brilla en tinieblas.',
+      profile: { colors: [{ key: 'turquesa', w: 2 }, { key: 'lima', w: 2 }, { key: 'blanco', w: 2 }], leaves: [{ key: 'reticulada', w: 3 }], terps: [{ key: 'terroso', w: 4 }, { key: 'mentolado', w: 1 }], quant: { altura: 35, produccion: 45, vigor: 55, resistencia: 50, velocidad: 40, resina: 60, aroma: 50 }, mutBoost: 2.4 } },
+    // ---------- ISLA ----------
+    { id: 'PH-015', name: 'Coralina', family: 'Halófita', biomes: ['isla'],
+      origin: 'Arrecifes emergidos de las Islas Vireo',
+      story: 'Tolera la sal marina; sus flores imitan pólipos de coral.',
+      profile: { colors: [{ key: 'rosa', w: 2 }, { key: 'turquesa', w: 3 }, { key: 'magenta', w: 2 }], leaves: [{ key: 'palmada', w: 3 }], terps: [{ key: 'marino', w: 4 }, { key: 'floral', w: 2 }], quant: { altura: 50, produccion: 60, vigor: 60, resistencia: 60, velocidad: 55, resina: 55, aroma: 70 }, mutBoost: 1.5 } },
+    // ---------- RELIQUIA ----------
+    { id: 'PH-007', name: 'Aurífera', family: 'Reliquia', biomes: ['pradera', 'bosque', 'pantano', 'desierto', 'nieve', 'volcan'],
+      origin: 'Desconocido — reliquia perdida',
+      story: 'Variedad casi extinta. Sus flores doradas son leyenda entre cazadores.',
+      profile: { colors: [{ key: 'oro', w: 5 }, { key: 'ambar', w: 2 }], leaves: [{ key: 'digitada', w: 3 }, { key: 'palmada', w: 2 }], terps: [{ key: 'incienso', w: 4 }, { key: 'especiado', w: 2 }], quant: { altura: 70, produccion: 80, vigor: 70, resistencia: 60, velocidad: 40, resina: 85, aroma: 85 }, mutBoost: 2.2, ploidyBoost: 2.0 }, relic: true },
+    { id: 'PH-016', name: 'Cronólita', family: 'Reliquia', biomes: ['cueva', 'volcan', 'nieve'],
+      origin: 'Fósil viviente — anterior a los registros del gremio',
+      story: 'La más antigua conocida. Se dice que su genoma guarda variedades perdidas.',
+      profile: { colors: [{ key: 'obsidiana', w: 3 }, { key: 'oro', w: 3 }, { key: 'turquesa', w: 2 }], leaves: [{ key: 'reticulada', w: 3 }], terps: [{ key: 'incienso', w: 5 }], quant: { altura: 75, produccion: 85, vigor: 80, resistencia: 70, velocidad: 45, resina: 90, aroma: 90 }, mutBoost: 2.8, ploidyBoost: 2.6 }, relic: true },
+  ];
+
+  const SPECIES_BY_ID = Object.fromEntries(SPECIES.map(s => [s.id, s]));
+
+  const BIOMES = {
+    pradera:  { name: 'Pradera de Auralia', baseEncounter: 0.14 },
+    bosque:   { name: 'Bosque de Vael',     baseEncounter: 0.16 },
+    pantano:  { name: 'Cenagal de Mureb',   baseEncounter: 0.18 },
+    desierto: { name: 'Erg de Sael',        baseEncounter: 0.15 },
+    nieve:    { name: 'Manto de Yrr',       baseEncounter: 0.16 },
+    volcan:   { name: 'Monte Calder',       baseEncounter: 0.17 },
+    cueva:    { name: 'Cueva de Vael',      baseEncounter: 0.20 },
+    isla:     { name: 'Islas Vireo',        baseEncounter: 0.17 },
+  };
+
+  function envMultiplier(species, env) {
+    let m = 1;
+    if (env.weather === 'niebla' && species.id === 'PH-006') m *= 3;
+    if (env.weather === 'lluvia' && species.biomes.includes('pantano')) m *= 1.5;
+    if (env.night && (species.id === 'PH-003' || species.id === 'PH-011' || species.relic)) m *= 2;
+    if (env.weather === 'tormenta' && species.mutBoost) m *= 1.4;
+    if (env.season === 'invierno' && (species.id === 'PH-003' || species.biomes.includes('nieve'))) m *= 1.4;
+    if (env.season === 'verano' && species.biomes.includes('desierto')) m *= 1.3;
+    if ((env.heat || env.weather === 'ola_calor') && (species.id === 'PH-002' || species.biomes.includes('desierto') || species.biomes.includes('volcan'))) m *= 1.6;
+    // Eventos raros globales
+    if (PH.events && PH.events.spawnMultiplier) m *= PH.events.spawnMultiplier(species, env);
+    return m;
+  }
+
+  function spawnTable(biome, env) {
+    const list = SPECIES.filter(s => s.biomes.includes(biome));
+    return list.map(s => {
+      let w = s.relic ? 1 : 20;
+      w *= envMultiplier(s, env);
+      return { ref: s, w };
+    });
+  }
+
+  let uidc = 0;
+  function makeSpecimen(species, env, opts) {
+    opts = opts || {};
+    const genotype = opts.genotype || wildGenotype(species.profile);
+    const pheno = express(genotype);
+    const score = rarityScore(genotype);
+    const tier = rarityTier(score);
+    const sig = phenoSignature(genotype);
+    return {
+      uid: 'S' + (++uidc) + Date.now().toString(36).slice(-3),
+      speciesId: species.id, name: species.name,
+      genotype, pheno, rarity: score, tier: tier.key, signature: sig,
+      form: opts.form || 'salvaje',
+      quality: opts.quality != null ? opts.quality : 100,
+      parents: opts.parents || null,
+      caughtAt: opts.caughtAt || null,
+      generation: opts.generation || 0,
+      sequenced: opts.sequenced || false,
+      nickname: null,
+    };
+  }
+
+  function rollEncounter(biome, env) {
+    const table = spawnTable(biome, env);
+    const chosen = RNG.weighted(table, 'w').ref;
+    return makeSpecimen(chosen, env, { form: 'salvaje', caughtAt: null });
+  }
+
+  PH.species = { SPECIES, SPECIES_BY_ID, BIOMES, spawnTable, makeSpecimen, rollEncounter, envMultiplier };
+})(window.PH = window.PH || {});
+
+/* ==== src/items.js ==== */
+/* ============================================================
+   PHENO HUNTER — items.js
+   Herramientas de recolección, mochila y tienda.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+
+  // Herramientas de recolección. Cada una obtiene una "forma" con calidad.
+  const TOOLS = {
+    frasco: {
+      id: 'frasco', name: 'Frasco de semillas', form: 'semilla',
+      success: 0.72, quality: 0.55, price: 0, tier: 1,
+      desc: 'Recolecta semillas. Barato y fiable, pero baja fidelidad genética.',
+    },
+    tijeras: {
+      id: 'tijeras', name: 'Tijeras de esqueje', form: 'esqueje',
+      success: 0.62, quality: 0.75, price: 350, tier: 2,
+      desc: 'Corta un esqueje que conserva bien la genética del ejemplar.',
+    },
+    kitclon: {
+      id: 'kitclon', name: 'Kit de clonación', form: 'clon',
+      success: 0.55, quality: 0.92, price: 1500, tier: 3,
+      desc: 'Clon de altísima fidelidad: preserva casi intacto el genotipo.',
+    },
+    dron: {
+      id: 'dron', name: 'Dron recolector', form: 'clon',
+      success: 0.8, quality: 0.97, price: 6000, tier: 4,
+      desc: 'Recolección asistida: máxima tasa de éxito y fidelidad.',
+    },
+    polen: {
+      id: 'polen', name: 'Cepillo de polen', form: 'polen',
+      success: 0.85, quality: 0.6, price: 200, tier: 1,
+      desc: 'Recoge polen para cruces. No captura la planta entera.',
+    },
+  };
+
+  // Consumibles / equipo que modifica probabilidades
+  const GEAR = {
+    lupa:     { id: 'lupa', name: 'Lupa de campo', price: 500, desc: 'Revela la rareza estimada antes de recolectar.' },
+    medidor:  { id: 'medidor', name: 'Medidor ambiental', price: 800, desc: 'Muestra clima, estación y su efecto en las apariciones.' },
+    cebo:     { id: 'cebo', name: 'Feromona floral', price: 120, desc: 'Aumenta la probabilidad de encuentros raros un rato.', consumable: true },
+    estabilizador: { id: 'estabilizador', name: 'Estabilizador genético', price: 2500, desc: 'Reduce pérdida de calidad al recolectar.', passive: true },
+  };
+
+  function toolQuality(tool, playerBonus) {
+    // calidad final 0..100 con algo de suerte
+    const { RNG, clamp } = PH.util;
+    const base = tool.quality * 100;
+    const luck = RNG.gauss() * 8;
+    return Math.round(clamp(base + luck + (playerBonus || 0), 5, 100));
+  }
+
+  PH.items = { TOOLS, GEAR, toolQuality };
+})(window.PH = window.PH || {});
+
+/* ==== src/world.js ==== */
+/* ============================================================
+   PHENO HUNTER — world.js
+   Mapas por tiles, colisiones, warps, flora y NPCs.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+
+  const TILE = {
+    '.': { name: 'grass', solid: false },
+    ',': { name: 'tallgrass', solid: false, enc: true },
+    'T': { name: 'tree', solid: true },
+    '#': { name: 'rock', solid: true },
+    'W': { name: 'water', solid: true },
+    '~': { name: 'deepwater', solid: true },
+    'P': { name: 'path', solid: false },
+    'H': { name: 'house', solid: true },
+    'D': { name: 'door', solid: true },
+    'F': { name: 'flowers', solid: false },
+    'b': { name: 'bush', solid: true },
+    's': { name: 'sand', solid: false },
+    'm': { name: 'mud', solid: false, enc: true },
+    'n': { name: 'snow', solid: false },
+    'c': { name: 'cavefloor', solid: false },
+    '=': { name: 'bridge', solid: false },
+    'l': { name: 'lava', solid: true },
+    'r': { name: 'ash', solid: false },
+    'i': { name: 'ice', solid: false },
+    'o': { name: 'stalag', solid: true },
+    'p': { name: 'palm', solid: true },
+  };
+  const isWarp = (ch) => ch >= '0' && ch <= '9';
+
+  /* ------------------------- CIUDAD (hub) ------------------------- */
+  const laboratorio = {
+    id: 'lab', name: 'Ciudad Semilla', biome: null, theme: 'town',
+    grid: [
+      'TTTTTTTTTTTTTTTTTTTT',
+      'T..................T',
+      'T..HHHH....HHHH....T',
+      'T..HHHH....HHHH....T',
+      'T..H1HH....HH2H....T',
+      'T..PP........PP....T',
+      'T...P........P.....T',
+      'T...PPPPPPPPPP.....T',
+      'T........P.........T',
+      'T..FF....P....FF...T',
+      'T..FF....P....FF...T',
+      'T........P.........T',
+      'T..HHHHH.P.........T',
+      'T..H3HHH.P.........T',
+      'T..PPPPP.P.........T',
+      'T........P.........T',
+      'T........P.........T',
+      'TTTTTTT00TTTTTTTTTTT',
+    ],
+    warps: {
+      '0': { to: 'pradera', x: 9, y: 1 },
+      '1': { to: '@lab_interior', name: 'Laboratorio' },
+      '2': { to: '@tienda', name: 'Mercado' },
+      '3': { to: '@casa', name: 'Tu casa' },
+    },
+    npcs: [
+      { id: 'mentor', x: 9, y: 8, name: 'Dra. Elna', sprite: 'mentor', dialog: 'mentor' },
+      { id: 'coleccionista', x: 15, y: 9, name: 'Bru', sprite: 'npc2', dialog: 'coleccionista' },
+      { id: 'criador', x: 4, y: 9, name: 'Wex', sprite: 'npc3', dialog: 'criador' },
+      { id: 'genetista', x: 12, y: 5, name: 'Dr. Vane', sprite: 'npc5', dialog: 'genetista' },
+    ],
+    spawn: { x: 9, y: 15 },
+  };
+
+  /* ------------------------- PRADERA ------------------------- */
+  const pradera = {
+    id: 'pradera', name: 'Pradera de Auralia', biome: 'pradera', theme: 'meadow',
+    grid: [
+      'TTTTTTTT00TTTTTTTTTT',
+      'T....,,....,,......T',
+      'T..,,,,..FF,,,,....T',
+      'T..,,,,....,,,,..b.T',
+      'T....PP....PP......5',
+      'T....P......P......5',
+      'T,,..P.,,,,.P..,,..T',
+      'T,,..P.,,,,.P..,,..T',
+      'T....P......P......T',
+      'T....PPPPPPPP......T',
+      'T.......P.........bT',
+      'T..b....P....,,....T',
+      'T.......P....,,....T',
+      'TWWWW...P.........,T',
+      'TWWWW===P====......T',
+      'T~~~~...P....,,,,..T',
+      'T.......P....,,,,..T',
+      'TTTTTTT11TTTTTT22TTT',
+    ],
+    warps: {
+      '0': { to: 'lab', x: 9, y: 16 },
+      '1': { to: 'bosque', x: 9, y: 1 },
+      '2': { to: 'pantano', x: 3, y: 1 },
+      '5': { to: 'desierto', x: 1, y: 9 },
+    },
+    npcs: [{ id: 'explorador', x: 14, y: 11, name: 'Ino', sprite: 'npc4', dialog: 'explorador' }],
+    spawn: { x: 9, y: 2 },
+  };
+
+  /* ------------------------- BOSQUE ------------------------- */
+  const bosque = {
+    id: 'bosque', name: 'Bosque de Vael', biome: 'bosque', theme: 'forest',
+    grid: [
+      'TTTTTTTT00TTTTTTTTTT',
+      'T..TT..PP..TT..TTT.T',
+      'T.,,T..P...T,,.TT..T',
+      'T.,,...P...,,,,....T',
+      'T....T.P.T....,,...T',
+      'TT,,.T.P.T.TT..,,..T',
+      'T.,,...P......TT...T',
+      'T....TTPTT........,T',
+      'T.b....P....,,,,..,T',
+      'T....,,P,,...,,,,..T',
+      'T..T.,,P,,...T.....T',
+      'T....,,P........TT.T',
+      'TTT..T.P..TT...T...T',
+      'T..,,..P...,,......T',
+      'T..,,..PPPPPPPP....T',
+      'T.....TT......P..TTT',
+      'T..b.......TT.P...bT',
+      'TTTTTTTTTTTTT33TTTTT',
+    ],
+    warps: {
+      '0': { to: 'pradera', x: 9, y: 16 },
+      '3': { to: 'cueva', x: 9, y: 1 },
+    },
+    npcs: [{ id: 'botanica', x: 4, y: 8, name: 'Sella', sprite: 'npc5', dialog: 'botanica' }],
+    spawn: { x: 9, y: 2 },
+  };
+
+  /* ------------------------- PANTANO ------------------------- */
+  const pantano = {
+    id: 'pantano', name: 'Cenagal de Mureb', biome: 'pantano', theme: 'swamp',
+    grid: [
+      'TTT00TTTTTTTTTTTTTTT',
+      'T..P....mm....WWW..T',
+      'T..P.mmmmmm...WWW..T',
+      'T..PPP.mm.....mm...T',
+      'Tmm..P........mm...T',
+      'Tmm..P..mmmm......bT',
+      'T....PPP.mm...mmm..T',
+      'TWW....P......mm...T',
+      'TWW....P...mmmm....T',
+      'T~~....PPP....mm...T',
+      'T........P..mmmm...T',
+      'Tmm......P...mm....T',
+      'Tmm..mm..P........,T',
+      'T....mm..PPPP.....,T',
+      'T.......mm..P..mm..T',
+      'T..b....mm..P..mm..T',
+      'T...........P.....bT',
+      'TTTTTTTTTTTT44TTTTTT',
+    ],
+    warps: {
+      '0': { to: 'pradera', x: 15, y: 16 },
+      '4': { to: 'isla', x: 9, y: 1 },
+    },
+    npcs: [{ id: 'contrabandista', x: 4, y: 12, name: 'Kez', sprite: 'npc6', dialog: 'contrabandista' }],
+    spawn: { x: 3, y: 1 },
+  };
+
+  /* ------------------------- DESIERTO ------------------------- */
+  const desierto = {
+    id: 'desierto', name: 'Erg de Sael', biome: 'desierto', theme: 'desert',
+    grid: [
+      'TT###############TTT',
+      '0ss,,.sss,,ss..sssbT',
+      'ssss..s,,s..ss,,sssT',
+      'Tss,,ss..sssss..ssbT',
+      'Tsssss.b.ss,,s.ssssT',
+      'Ts,,s.sssss..ss,,ssT',
+      'Tssss.s,,ss.ssssssbT',
+      'Ts.b.ss..s,,ss.s,,sT',
+      'Tss,,sssss..sss..ssT',
+      'Ts..ssb.ss,,ss.sssbT',
+      'Tsss,,s.sssss.s,,ssT',
+      'Ts.ssss.b.ss..ssssbT',
+      'Ts,,s.ssss,,sssss..T',
+      'Tssss.s,,ss.sss.b.sT',
+      'Ts.b.sssss..ss,,sssT',
+      'Tss,,s.sss,,ssss..sT',
+      'Tssssssss..sssss66sT',
+      'TT##############TTTT',
+    ],
+    warps: {
+      '0': { to: 'pradera', x: 18, y: 4 },
+      '6': { to: 'volcan', x: 9, y: 1 },
+    },
+    npcs: [{ id: 'nomada', x: 10, y: 8, name: 'Zahra', sprite: 'npc4', dialog: 'nomada' }],
+    spawn: { x: 1, y: 1 },
+  };
+
+  /* ------------------------- VOLCÁN ------------------------- */
+  const volcan = {
+    id: 'volcan', name: 'Monte Calder', biome: 'volcan', theme: 'volcano',
+    grid: [
+      'TTTTTTTT00TTTTTTTTTT',
+      'T#rr,,rr#rrr,,rr##.T',
+      'T#rrrrr#rr,,rrrr#..T',
+      'Trr,,rrr#lll#rr,,r.T',
+      'Trrrrr,,#lll#,,rrr.T',
+      'T#rr#rrr#ll#rrrr#r.T',
+      'Trr,,rr#lll#rr,,rr.T',
+      'Trrrrrr#ll#rrrrrrr.T',
+      'T#r,,r#lll#r,,rr#r.T',
+      'Trrrrr#ll#rr,,rrrr.T',
+      'Trr,,rrr##rrrrr,,r.T',
+      'Trrrrr,,rrrr,,rrrrrT',
+      'T#rrr#rrrr#rrrr#rr.T',
+      'Trr,,rrrrrrrr,,rrr.T',
+      'Trrrrrrr,,rrrrrrrrrT',
+      'Tr,,rrr#rr#rr,,rrr.T',
+      'Trrrrrrrrrrrrrrr77.T',
+      'TTTTTTTTTTTTTTTTTTTT',
+    ],
+    warps: {
+      '0': { to: 'desierto', x: 9, y: 16 },
+      '7': { to: 'nieve', x: 9, y: 16 },
+    },
+    npcs: [{ id: 'vulcanologo', x: 4, y: 11, name: 'Draco', sprite: 'npc6', dialog: 'vulcanologo' }],
+    spawn: { x: 9, y: 2 },
+  };
+
+  /* ------------------------- NIEVE ------------------------- */
+  const nieve = {
+    id: 'nieve', name: 'Manto de Yrr', biome: 'nieve', theme: 'snow',
+    grid: [
+      'TTTTTTTTTTTTTTTTTTTT',
+      'Tnn,,nnnn,,nnnn,,n.T',
+      'Tnnnniinnnnii nnnn.T',
+      'Tn,,nnnn,,nniinn,,.T',
+      'Tnnii nn,,nnnnnnii.T',
+      'Tn,,nnnnnniinn,,nn.T',
+      'Tnnnn,,nn nniinnnn.T',
+      'Tnniinn nn,,nn,,nn.T',
+      'Tn,,nn,,nniinnnnii.T',
+      'Tnnnnnnnn nn,,nnnn.T',
+      'Tnii,,nn,,nniinn,,.T',
+      'Tnnnnnnnniinnnnnnn.T',
+      'Tn,,nnii,,nn,,nniin.T',
+      'Tnnnn,,nnnnnnii nn.T',
+      'Tnniinnnn,,nn,,nnn.T',
+      'Tn,,nn,,nnii nnnn..T',
+      'Tnnnnnnnnnnnnnnn88.T',
+      'TTTTTTTTTTTTTTTTTTTT',
+    ],
+    warps: {
+      '8': { to: 'volcan', x: 9, y: 1 },
+    },
+    npcs: [{ id: 'glaciologa', x: 5, y: 9, name: 'Frey', sprite: 'npc5', dialog: 'glaciologa' }],
+    spawn: { x: 9, y: 15 },
+  };
+
+  /* ------------------------- CUEVA ------------------------- */
+  const cueva = {
+    id: 'cueva', name: 'Cueva de Vael', biome: 'cueva', theme: 'cave',
+    grid: [
+      '####################',
+      '#cc,,cco cccc,,cccc#',
+      '#ccccco ccc,,ccooc.#',
+      '#cc,,cccooc cccc,,c#',
+      '#cccco,,ccccoccccc.#',
+      '#occ ccc,,ccc ,,cco#',
+      '#cc,,ccoocccccooccc#',
+      '#cccccc ccc,,cc,,cc#',
+      '#occ,,ccooc cccccco#',
+      '#ccccccc,,cccc,,ccc#',
+      '#cc,,ccoocccoocccc.#',
+      '#cccccccc,,cccccooc#',
+      '#occ,,ccc ccc,,cccc#',
+      '#ccccooc,,cccccccc.#',
+      '#cc,,ccccooc,,ccooc#',
+      '#cccccccccccccccc99#',
+      '####################',
+    ],
+    warps: {
+      '9': { to: 'bosque', x: 9, y: 16 },
+    },
+    npcs: [{ id: 'espeleologo', x: 6, y: 8, name: 'Mox', sprite: 'npc6', dialog: 'espeleologo' }],
+    spawn: { x: 9, y: 15 },
+  };
+
+  /* ------------------------- ISLA ------------------------- */
+  const isla = {
+    id: 'isla', name: 'Islas Vireo', biome: 'isla', theme: 'island',
+    grid: [
+      '~~~~~~~~WW~~~~~~~~~~~',
+      '~~WWssssssssssWW~~~~',
+      '~Wsss,,ssp ss,,sssW~',
+      '~Wssssssss,,ssspssW~',
+      '~Wsp,,ssFFss.ss,,sW~',
+      '~Wsssss.p.sssss.ssW~',
+      '~Wss,,sssss,,ss.spW~',
+      '~Wpsssss.b.sssss,,W~',
+      '~Wss,,ss,,sssspss.W~',
+      '~Wssssssssss,,sssW~~',
+      '~~Wss,,ssp ss.sssW~~',
+      '~~Wsssss,,ssss,,sW~~',
+      '~~~Wssssssssssss W~~',
+      '~~~~WWsssssssWWW~~~~',
+      '~~~~~~WW==WW~~~~~~~~~',
+      '~~~~~~~=aa=~~~~~~~~~~',
+      '~~~~~~~~WW~~~~~~~~~~~',
+      '~~~~~~~~~~~~~~~~~~~~~',
+    ],
+    warps: {
+      'a': null, // decorativo (muelle)
+    },
+    npcs: [{ id: 'marinera', x: 9, y: 6, name: 'Nira', sprite: 'npc2', dialog: 'marinera' }],
+    spawn: { x: 9, y: 4 },
+    exitBack: { to: 'pantano', x: 9, y: 2 }, // salir por el muelle
+  };
+  // La isla se sale interactuando: añadimos un warp de retorno en las celdas inferiores
+  isla.grid[15] = '~~~~~~~b0b~~~~~~~~~~~';
+  isla.warps['0'] = { to: 'pantano', x: 9, y: 2 };
+
+  const MAPS = { lab: laboratorio, pradera, bosque, pantano, desierto, volcan, nieve, cueva, isla };
+
+  // Normaliza cada mapa a una cuadrícula rectangular (robusto ante erratas).
+  (function normalizeAll() {
+    const FILL = { cave: '#', desert: '#', volcano: 'T', island: '~', snow: 'T' };
+    for (const m of Object.values(MAPS)) {
+      const fill = FILL[m.theme] || 'T';
+      let w = 0; for (const r of m.grid) w = Math.max(w, r.length);
+      m.grid = m.grid.map(r => r.length < w ? r + fill.repeat(w - r.length) : r.slice(0, w));
+    }
+  })();
+
+  function tileAt(map, x, y) {
+    if (y < 0 || y >= map.grid.length) return '#';
+    const row = map.grid[y];
+    if (x < 0 || x >= row.length) return '#';
+    return row[x];
+  }
+  function solidAt(map, x, y) {
+    const ch = tileAt(map, x, y);
+    if (isWarp(ch)) return false;
+    const t = TILE[ch];
+    return t ? !!t.solid : true;
+  }
+  function encounterAt(map, x, y) {
+    const ch = tileAt(map, x, y);
+    const t = TILE[ch];
+    return !!(t && t.enc);
+  }
+  function warpAt(map, x, y) {
+    const ch = tileAt(map, x, y);
+    if (isWarp(ch)) return map.warps[ch] || null;
+    return null;
+  }
+  function dims(map) { return { w: map.grid[0].length, h: map.grid.length }; }
+
+  // Mapea id de región a su bioma (para desbloqueos por prestigio)
+  const REGION_ORDER = ['pradera', 'bosque', 'cueva', 'pantano', 'isla', 'desierto', 'volcan', 'nieve'];
+
+  PH.world = { TILE, MAPS, isWarp, tileAt, solidAt, encounterAt, warpAt, dims, REGION_ORDER };
+})(window.PH = window.PH || {});
+
+/* ==== src/render.js ==== */
+/* ============================================================
+   PHENO HUNTER — render.js
+   Render pixel-art 16-bit. Tiles procedurales, personajes y
+   sprites de planta derivados del fenotipo. GBA: 240x160, 16px.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  const { shade } = PH.util;
+  const { TILE, isWarp } = PH.world;
+
+  const TS = 16;
+  const VW = 15, VH = 10;
+  const W = VW * TS, H = VH * TS;
+
+  const THEMES = {
+    town:    { grass: '#6fae4a', grassD: '#5c9a3c', path: '#caa96b', pathD: '#b2925a', blade: '#3f7d34', blade2: '#589b45' },
+    meadow:  { grass: '#7cbd50', grassD: '#68a742', path: '#cbb06f', pathD: '#b2955a', blade: '#3f7d34', blade2: '#589b45' },
+    forest:  { grass: '#4f9440', grassD: '#3f7d34', path: '#b39b64', pathD: '#997f4f', blade: '#2f6b2a', blade2: '#458f3a' },
+    swamp:   { grass: '#5f7d47', grassD: '#4d6739', path: '#8f7c4e', pathD: '#75643d', blade: '#3d5a2c', blade2: '#4f7038' },
+    desert:  { grass: '#e0cd8f', grassD: '#cbb672', path: '#d8c079', pathD: '#c0a860', blade: '#b39a4d', blade2: '#caa95c' },
+    volcano: { grass: '#5a4038', grassD: '#4a332c', path: '#3a2822', pathD: '#2e201b', blade: '#8a3520', blade2: '#c04a24' },
+    snow:    { grass: '#e9f0f6', grassD: '#cfd9e4', path: '#dbe6f0', pathD: '#c3d2e0', blade: '#8fb0c9', blade2: '#b6d0e2' },
+    cave:    { grass: '#4a4650', grassD: '#3b3843', path: '#3a3742', pathD: '#2e2b35', blade: '#4a8f7a', blade2: '#6bd0b0' },
+    island:  { grass: '#e6d79a', grassD: '#d3c17f', path: '#e0cd8f', pathD: '#cbb672', blade: '#4faf7a', blade2: '#6bd0a0' },
+  };
+
+  function px(ctx, x, y, w, h, col) { ctx.fillStyle = col; ctx.fillRect(x, y, w, h); }
+
+  function drawTile(ctx, ch, sx, sy, theme, t) {
+    const P = THEMES[theme] || THEMES.meadow;
+    const drawGround = () => {
+      px(ctx, sx, sy, TS, TS, P.grass);
+      px(ctx, sx + 3, sy + 4, 2, 2, P.grassD);
+      px(ctx, sx + 10, sy + 9, 2, 2, P.grassD);
+      px(ctx, sx + 6, sy + 12, 1, 1, P.grassD);
+    };
+    const name = (TILE[ch] || {}).name;
+    switch (name) {
+      case 'grass': drawGround(); break;
+      case 'tallgrass': {
+        drawGround();
+        for (let i = 0; i < 5; i++) {
+          const bx = sx + 2 + i * 3;
+          px(ctx, bx, sy + 6 + ((i % 2) ? 0 : 2), 2, 8, i % 2 ? P.blade : P.blade2);
+          px(ctx, bx, sy + 5 + ((i % 2) ? 0 : 2), 1, 2, shade(P.blade2, 0.3));
+        }
+        break;
+      }
+      case 'path': px(ctx, sx, sy, TS, TS, P.path); px(ctx, sx + 2, sy + 6, 2, 2, P.pathD); px(ctx, sx + 11, sy + 3, 2, 2, P.pathD); break;
+      case 'bridge': px(ctx, sx, sy, TS, TS, '#a9793f'); for (let i = 0; i < TS; i += 4) px(ctx, sx + i, sy, 1, TS, '#7c531f'); break;
+      case 'tree':
+        drawGround();
+        px(ctx, sx + 6, sy + 10, 4, 6, '#6b4a2a');
+        px(ctx, sx + 2, sy + 1, 12, 11, shade(P.grassD, -0.25));
+        px(ctx, sx + 4, sy + 0, 9, 10, theme === 'snow' ? '#cfe0ea' : (theme === 'volcano' ? '#5a3a2a' : '#2f6b2a'));
+        px(ctx, sx + 5, sy + 2, 5, 4, theme === 'snow' ? '#eef6fb' : '#458f3a');
+        break;
+      case 'palm':
+        drawGround();
+        px(ctx, sx + 7, sy + 5, 2, 11, '#8a6a3a');
+        px(ctx, sx + 2, sy + 3, 12, 2, '#3f9a5a'); px(ctx, sx + 4, sy + 1, 8, 2, '#4fb06a'); px(ctx, sx + 1, sy + 5, 5, 2, '#3f9a5a'); px(ctx, sx + 10, sy + 5, 5, 2, '#3f9a5a');
+        break;
+      case 'bush': drawGround(); px(ctx, sx + 2, sy + 5, 12, 9, shade(P.blade, -0.1)); px(ctx, sx + 4, sy + 6, 5, 4, P.blade2); break;
+      case 'rock': px(ctx, sx, sy, TS, TS, '#8a8f97'); px(ctx, sx + 2, sy + 2, 12, 12, '#6d727a'); px(ctx, sx + 4, sy + 3, 5, 4, '#a2a7ae'); break;
+      case 'cavefloor': px(ctx, sx, sy, TS, TS, '#3f3b47'); px(ctx, sx + 4, sy + 5, 3, 3, '#332f3a'); px(ctx, sx + 10, sy + 10, 2, 2, '#4a4652'); break;
+      case 'stalag': px(ctx, sx, sy, TS, TS, '#3f3b47'); px(ctx, sx + 5, sy + 2, 6, 14, '#5a5566'); px(ctx, sx + 7, sy + 4, 2, 10, '#726c82'); break;
+      case 'water': px(ctx, sx, sy, TS, TS, '#4b8fd6'); px(ctx, sx + 2, sy + 4, 6, 2, '#7bb4ec'); px(ctx, sx + 9, sy + 10, 5, 2, '#7bb4ec'); break;
+      case 'deepwater': px(ctx, sx, sy, TS, TS, '#2f6bb0'); px(ctx, sx + 3, sy + 7, 6, 2, '#4b8fd6'); break;
+      case 'mud': px(ctx, sx, sy, TS, TS, '#6b5637'); px(ctx, sx + 3, sy + 4, 4, 3, '#54432a'); px(ctx, sx + 9, sy + 9, 4, 3, '#7d6543'); break;
+      case 'sand': px(ctx, sx, sy, TS, TS, P.grass); px(ctx, sx + 4, sy + 5, 2, 1, P.grassD); px(ctx, sx + 10, sy + 11, 2, 1, P.grassD); break;
+      case 'snow': px(ctx, sx, sy, TS, TS, '#e9f0f6'); px(ctx, sx + 5, sy + 6, 2, 2, '#d3ddea'); px(ctx, sx + 11, sy + 3, 1, 1, '#cfd9e4'); break;
+      case 'ice': px(ctx, sx, sy, TS, TS, '#bfe0ef'); px(ctx, sx + 2, sy + 2, 6, 1, '#e6f6ff'); px(ctx, sx + 8, sy + 9, 5, 1, '#e6f6ff'); break;
+      case 'ash': px(ctx, sx, sy, TS, TS, '#4a3b34'); px(ctx, sx + 3, sy + 5, 3, 2, '#5c4a42'); px(ctx, sx + 10, sy + 10, 2, 2, '#3a2d28'); break;
+      case 'lava': px(ctx, sx, sy, TS, TS, '#e8531f'); px(ctx, sx + 2, sy + 3, 5, 3, '#ffb02e'); px(ctx, sx + 9, sy + 9, 4, 3, '#ffd34d'); px(ctx, sx + 6, sy + 11, 3, 2, '#c0331a'); break;
+      case 'flowers': drawGround(); px(ctx, sx + 3, sy + 4, 2, 2, '#ffd34d'); px(ctx, sx + 9, sy + 8, 2, 2, '#ff7ba0'); px(ctx, sx + 6, sy + 11, 2, 2, '#8ac6ff'); break;
+      case 'house': px(ctx, sx, sy, TS, TS, '#c86b52'); px(ctx, sx, sy, TS, 5, '#8f3f30'); px(ctx, sx + 2, sy + 7, 4, 4, '#8fd0e8'); px(ctx, sx + 10, sy + 7, 4, 4, '#8fd0e8'); break;
+      case 'door': px(ctx, sx, sy, TS, TS, '#c86b52'); px(ctx, sx + 4, sy + 3, 8, 13, '#5a3a26'); px(ctx, sx + 9, sy + 9, 2, 2, '#ffd34d'); break;
+      default:
+        if (isWarp(ch)) { drawGround(); px(ctx, sx + 3, sy + 3, 10, 10, '#3a3f4a'); px(ctx, sx + 5, sy + 5, 6, 6, '#20242c'); }
+        else drawGround();
+    }
+  }
+
+  function drawActor(ctx, sx, sy, dir, frame, palette) {
+    palette = palette || { skin: '#f0c088', hair: '#4a3b2a', shirt: '#3a7bd6', pants: '#33333f' };
+    const bob = frame ? 1 : 0;
+    px(ctx, sx + 3, sy + 14, 10, 2, 'rgba(0,0,0,0.22)');
+    px(ctx, sx + 4, sy + 8 - bob, 8, 6, palette.shirt);
+    px(ctx, sx + 4, sy + 13 - bob, 3, 3, palette.pants);
+    px(ctx, sx + 9, sy + 13 - bob, 3, 3, palette.pants);
+    px(ctx, sx + 4, sy + 2 - bob, 8, 7, palette.skin);
+    px(ctx, sx + 4, sy + 1 - bob, 8, 3, palette.hair);
+    px(ctx, sx + 3, sy + 3 - bob, 1, 4, palette.hair);
+    px(ctx, sx + 12, sy + 3 - bob, 1, 4, palette.hair);
+    const ey = sy + 5 - bob;
+    if (dir === 'down') { px(ctx, sx + 6, ey, 1, 2, '#222'); px(ctx, sx + 9, ey, 1, 2, '#222'); }
+    else if (dir === 'up') { px(ctx, sx + 4, sy + 1 - bob, 8, 4, palette.hair); }
+    else if (dir === 'left') { px(ctx, sx + 5, ey, 1, 2, '#222'); }
+    else if (dir === 'right') { px(ctx, sx + 10, ey, 1, 2, '#222'); }
+  }
+
+  const NPC_PALETTES = {
+    mentor: { skin: '#f0c088', hair: '#d8d8e0', shirt: '#e8e8ee', pants: '#555' },
+    npc2:   { skin: '#e0a878', hair: '#6a3d2a', shirt: '#d64a6b', pants: '#333' },
+    npc3:   { skin: '#f0c088', hair: '#2a2a2a', shirt: '#4aa86b', pants: '#333' },
+    npc4:   { skin: '#c98d5a', hair: '#3a2a1a', shirt: '#d68a3a', pants: '#333' },
+    npc5:   { skin: '#f0c088', hair: '#8a5a2a', shirt: '#8a6bd6', pants: '#333' },
+    npc6:   { skin: '#b98a5a', hair: '#1a1a1a', shirt: '#555', pants: '#222' },
+  };
+
+  function drawPlant(ctx, cx, cy, pheno, scale, t) {
+    scale = scale || 1;
+    const pal = PH.gen.paletteFor(pheno);
+    const s = scale;
+    const height = 14 + (pheno.quant.altura / 100) * 22;
+    const bushy = pheno.quant.produccion / 100;
+    const flicker = pheno.mutations.includes('fluorescente') ? (0.6 + 0.4 * Math.abs(Math.sin(t / 300))) : 1;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(s, s);
+    px(ctx, -9, 2, 18, 3, 'rgba(0,0,0,0.2)');
+    const stemH = height;
+    px(ctx, -1, -stemH + 4, 2, stemH, pheno.albino ? '#cfc69a' : '#3f7d34');
+
+    const leafCol = pal.leaf;
+    const leafPairs = pheno.leaf === 'digitada' ? 4 : (pheno.leaf === 'palmada' ? 3 : 3);
+    for (let i = 0; i < leafPairs; i++) {
+      const ly = -6 - i * (stemH / (leafPairs + 1)) * 0.9;
+      const lw = 6 + bushy * 5;
+      leafShape(ctx, -1, ly, -1, lw, pheno.leaf, leafCol, pheno);
+      leafShape(ctx, 1, ly, 1, lw, pheno.leaf, leafCol, pheno);
+    }
+
+    const fy = -stemH + 2;
+    const fw = pheno.mutations.includes('gigantismo') ? 11 : (pheno.mutations.includes('enanismo') ? 5 : 8);
+    ctx.globalAlpha = flicker;
+    drawFlower(ctx, 0, fy, fw, pal, pheno);
+    ctx.globalAlpha = 1;
+
+    if (pheno.mutations.includes('cristalina') || pheno.quant.resina > 55) {
+      const n = Math.round((pheno.quant.resina - 45) / 9) + (pheno.mutations.includes('cristalina') ? 4 : 0);
+      for (let i = 0; i < n; i++) {
+        px(ctx, -fw / 2 + (i * 3) % fw, fy - 2 + ((i * 5) % 6), 1, 1, 'rgba(255,255,255,0.85)');
+      }
+    }
+    ctx.restore();
+  }
+
+  function leafShape(ctx, ox, oy, sign, lw, form, col, pheno) {
+    const vg = pheno.mutations.includes('variegacion');
+    for (let j = 0; j < lw; j++) {
+      const seg = form === 'estrecha' || form === 'aciculada' ? 1 : (form === 'ancha' ? 3 : 2);
+      const yy = oy - (form === 'palmada' ? j * 0.2 : 0);
+      const c = (vg && j % 2 === 0) ? '#e9e2c0' : col;
+      px(ctx, ox + sign * j, yy - (j * 0.1 | 0), 1, seg, c);
+      if (form === 'serrada' && j % 2 === 0) px(ctx, ox + sign * j, yy - seg, 1, 1, shade(col, -0.2));
+    }
+  }
+
+  function drawFlower(ctx, cx, cy, w, pal, pheno) {
+    const half = w / 2;
+    px(ctx, cx - half, cy - half, w, w, pal.base);
+    px(ctx, cx - half, cy - half, w, 2, pal.light);
+    px(ctx, cx - half, cy + half - 2, w, 2, pal.dark);
+    // patrones
+    if (pheno.pattern === 'moteado') { px(ctx, cx - half + 1, cy - 1, 2, 2, pal.dark); px(ctx, cx + 1, cy + 1, 1, 1, pal.light); }
+    else if (pheno.pattern === 'rayado') { for (let i = -half; i < half; i += 3) px(ctx, cx + i, cy - half, 1, w, pal.dark); }
+    else if (pheno.pattern === 'jaspeado') { px(ctx, cx - half, cy - half, half, half, pal.light); px(ctx, cx, cy, half, half, pal.dark); }
+    else if (pheno.pattern === 'aureolado') { px(ctx, cx - half, cy - half, w, w, pal.dark); px(ctx, cx - half + 2, cy - half + 2, w - 4, w - 4, pal.base); }
+    if (pheno.colorCo) { const co = PH.gen.COLOR_BY_KEY[pheno.colorCo]; if (co) px(ctx, cx, cy - half, half, w, PH.util.hslToHex(co.hue, 60, 50)); }
+    px(ctx, cx - half + 1, cy - half + 1, 2, 2, pal.light);
+    if (pheno.mutations.includes('quimera')) px(ctx, cx - half, cy, half, half, pal.dark);
+  }
+
+  PH.render = { TS, VW, VH, W, H, THEMES, drawTile, drawActor, drawPlant, NPC_PALETTES };
+})(window.PH = window.PH || {});
+
+/* ==== src/sprites.js ==== */
+/* ============================================================
+   PHENO HUNTER — sprites.js
+   Sprites de cultivo (48x48) inline en base64. Fases de crecimiento
+   de la planta en maceta. Sin dependencias ni carga externa.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  const DATA = {
+    plant_1: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAEYElEQVR4nO2Y70skdRzHX844uY6Oju5ujp7dkhbHGWdRokggGvTg6DguOIgi6EHHQRF3EF39AUFEPelB1OPgioQjowt8EKQkYYldSLLnHeuaV7u3l+66ruvmujs7PZjbcVfNzpmBIuYFy858v9/5fj/vz+cz3x8DHh4eHh4eHh4eHh4eHv8ONW51JCiSUSPo1r2+XnKt74NwZRBJlozTo/3WfTKW5fvXwxRyBat/sVkwAIySSGmj4J7j3OhEF83/ZCxLMpYlHUtzerQfQZEMMKNz5vIgJy48wDMfD1jlbuCaJ3ZHYXHmd7r7O/nyxWnOXB607rfXzSF/eneJ+HzM8fiuCRCbBUMoiOgiPPuZKSQZy3Jzeo37j9bQ3d8JwNgLM4g6VenlBMedSLKZDldG+gCYDEf58E4KXYSh93sAmHrrF8DM/7Ehs93ZiVnAuRBHDwuKZHza3QXAzHq6qm48u8nyRpGBD47x3aUwFwOtAMiFEgD9jz4EmEKciLD9EguKZJS9WWn8WCbPeHZzT/urBZ2rhZ1pdmYuwmQ4ypWRPiuKtuyw85Akm8bnYinL+LFMnrFMHi2osFWqRfW3ULy7Log6aH6VQGM9oxjWD7BE2J2ZbAl4rc1Mh0rjfUIRLagAWP+d57r44dI8Aw+HmI0u0dTUgCwYdHUEAKoiMuxX7JhyeAGSLBnDPV1MhqOMZzcZz27iE4qo/paqdnO/rvD40wF03RzisSMd5PJFq75SxGQ4ysVHjtlKJdvvwCfJlHW92/j9uBlPkFlbQ5Zlq0zzq2h+tSoSh8WVlRigXa0WUazYF4WXlulUm6raJRIrJJJpx+PWOu2g7P3b6bWq8ieOanz13Ayh1mZkoTozEokVNC0IUJVWdrAdgZf8rfyRz+8pr4zEqd7jAORKNciyTHfHERbjMTQtSCZjTrWJZJpzkv3lyJaAmbkIwz1dVWXtagvtaktVJDZL2wAEGuutOk0LEo2v0tTUQDS+Siqzzsne41wPR2wJsJ1C18MRJkYGGZmY/ts2ZS/X1tVxO71GbV0dYM5AswuLAEyMDDK1GGGhrmTLDluxExTJeCegEmpupSfUxhsLUSZ/uwOYuV/JavZPavNbBDo0wkvLVvmbfpWTd1NsajHCheUVW+cEWwJ8imi8EgjQ3SDir1XoCbVZdX3f7B8RUTQ9/ONTT1pl126YafNtKsPn2bytPZHtt0eSJePtNpW2Ogmfb2cVrRSzH9duRPD5FLa2Nqyy87dWbG/oHO9GTwUVnm8K3vMzlYY78XwZx+vAiW2Rj5YXrftXQ90Htv8isWJd9zaqwN6p+DA4FgAw1LAz91eKKaMaOw42jXYPdwQ0N+97XUlKMk/+86upfevt4vhIKSiSMX40dM/t43oOgEi2wHuptOMjpePN3H2U+Dm3fujncpI7+0jXPmx9/eA/R6HsfYCXY/YWrt24+mlR1OEgIXE9x/lb5iz0n/msspt6n2/PqarybOCW4f8b/gLxe6ynBMaVOwAAAABJRU5ErkJggg==",
+    plant_2: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAEzElEQVR4nO2YXWwUVRiGn51httuhy+7WXV3aprUuwaDQgDaFBigRIcFgDCYmJsQLolfohRcmJhq90sQrEzRELiWREE0QEuXnwlhRgtWFgqApP+kirduyuNt22+1Ol25nxothzrbSljAzN5p9b+bMnPOd877zfd/5gyqqqKKKKqqooooqqqiiiv8ofF52JgUV0y4bhfI9fcshyTQNGZ+ko48bnoztmQBFVcwXvuoQ7yd2/0KpoIv+5ZBk7jrUKeqP7U7OK/JBIbnt4N8YuJInlUyz8/AGAkHZhAr5389Oinay7s14ngkoa2XfNy8naVkVJtHRRCqZZvuBTuSQZCb2riGVTLNmY51Xwwl4FkJ2fAO8eNgKpVQyjVYOA7CsfoY/PrgKgK5LlDX34QMeCFBUxdRlONbVDsDpvhscyOXQdQlZNmh+YzWqkufqvjR7o1G2rV1Hk6GxvvusJ0JcGcshyTy6aT1/DQyQKs4f1Ptvj/LkWw1CgI09bY8D0P5djysRS5waSkHFPLrJ+uuzyZ+aLAJQMqyug7NGOJDLCREHL1+jIxTmeGsLz/85YDoV4UiAoirmka52kpf6AchNT3HOrNSHH4qQyRaIx4JMDFuCdF3i6eY4305OAdA5XeJksciWmhjHW1t4bnDAdDKtOpqFZNkQZU2ROGdapG3y+ZEx4rEgmWyBx95bydV9aZ5ZnUDTNKJ1tQD0+AOM1/n58U4WgJ2yEyYOBCiqYn69bTtX+vrpNqbZf3sUgPzIGM2tTXOeE+XiHNt4PCZEROtq6ZuW6PEHOJTN8OGWThRVMecbczE4zoGffTrFJUtYFV1GPB4T35tbm+Ztn8lYf1pVVZaHI+K7pmn0+ANOaThfyI5nCwvWLZX8+GtrABhJz8yp0zQNgFv5MfIjY06HF3DkgZnpcVGOx2NkMlnhBftPJxoaAbj+eT8rI2HRPtHQyK28RdzOl3TJSmzdQR449sCb0XrS+Yk55CcmioK4jUcDtaJsk58dQjdLU+yNRrk5U8aPwYPCkYDkpX72bF4HIEQALA9HSA0PkWhoFE9/bQ2JhsY55G0P/DY0DEBHKMzpvhtOqDj3wKkzvfyw61kAro/lyWSypIaHRL3tCVVVBWFAlHsHM+i6xK9bN1IqWfmk6w9Ox9Hqp6iK+XZ9mOVhhc1PtXHwzEUxncqywdrGhgVtewcz6DJ82hJjc2IFYK3Kn+RGHZ0PHE+jAJPFMheSl2mrkTn/kuWN9iPf0zuYWdDGbse4xoVr/eK7rOMgA1xs5mwvrKhTAAgEggA80da6sNFd0oFAUIQNwGtDWcenM1cCNtRYC+erjzwMVEQshtnEu0cnAPhy8o7jHamr7bQUVMx3QmF+KlaS9PWWxKI2h29WZpuNkTDv5vKuzsaucsCet7uWVub1zwZSi9rsjETmvDuNfRuuBMye9lZH66kv33uoCSr36cPhLtSGKwGybNBtTLNV8gvyXaHQojYXtco2pFB27wFXtxKlgu47n9cc2380nnd9JnZ9rVLWyr6Px0cZVe4fC7P//vu33SWvDVchZKNU0H0nh4dMgFdi8UXbnri7lShrM55cq3giAOCLvyd9ANGlBXOHeu96YHvozJg3xG142hlYa8NC14aG4t2l7v8G/wCbrPfeE/YXoAAAAABJRU5ErkJggg==",
+    plant_3: "data:image/png;base64,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",
+    plant_4: "data:image/png;base64,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",
+    plant_5: "data:image/png;base64,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",
+    plant_6: "data:image/png;base64,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",
+    plant_7: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAEi0lEQVR4nO2YX2hbVRzHP7m3d22Spk3TdFmb2c6VObPCcLZs1jmkFB9UGEqnjiHs1YlPjr0UBgPxyQd9mPgg4ouI04mi4BD8B0WmtbWl0mRl7Wa2tN2lbXq7pLd/0pvrQ3pvkrUN9t5YEO4XQs655/zu+X7P73fO79wDDhw4cODAgQMHDhw4cPA/hWsnBxN8km6Us6lMWcYumwCDnKhBRt1ITvBJ+oufHjXrX53pL4uIsgiQPJJ+8kqe3Dev9BeJEGsF/YVPOonHFLNPdU0Fv74Z3VTsdiDYMYZi8vGYQjymcPLKUap8ot7T3a6LtYL+3PtPMtGfoCXiN3/14Wq7QwNl8IAhIB5TaIn4gZwQY4bbzjeRiGV5+mwz8ZjC0NsxpKwLTRNszz5Ahd0XaGIuZAq90BLxM9GfKOr39avXkbIuPmo7AsBro8PgkXS7ImwZSx5Jv9rVQSw6zqXZJJqWj8i2800ALCxUMf3xOC+53QAEvV4AugINAPTExmx5wrJhIfnRxSUmPbsAuJXKAiAvLnPwQogb7xV74lwwaJY9mSzHQiFbIiyF0IPk/9CBxVUAaryVhNxuUitrZv/Hwk00+uuYVub5Nr0EQOfqcq5RlvkycpCe2JilcLIk4HR1JRW7apER+Cy9Qqu30mwLrYdKIQzyjf4689n1dO5/skLjmBUS69j2Nip5JP308af4YXiIy3KS9uY9ZttDAf+mNgb5QhHBajfBajd31gR+l2UGnulE8uQz9b+F5V3IIO/TdXybEF9dUYF6NE1AVVUmVDUnBkwR08o8wWo3H0zd42WLPCwnMlHMbtmWcm0dyoYnANR1UXZgKxP79I0er9kbAqCtNUzVF1kiwRqzLeR2MzE1aYpobQoXiSg1KVvBkoC/hge5FAzwy1255GwX4sCBfchLS7Q2hc21oKppEsp9ztYHrNAALApIZeDZE+35eoGImzf/JhzejaqqRbtOemae1aUVBK9UFEaQS2rXRmJWqFhfxH1/jjBwqpuOqz8C0N68B1VVCbndpGeMGE/T6K81bVoad3M/kfPa4J17iGKWzx+JEE3KyAjrmVzbFg9L2U/ySPq7+3NHgROPH+Za3yAXZcVsjwRriogX4qfxuwC8FfJzKJBbL9GkzEVZsZSNLQt4IxSg1SsC0FwZoKVtL/HRBD2xMQB8D/hW1bNomsDAqe4c6ZHbxBeSZvuOCjBEGF6or/CZzw8dfrikXXTkdlE9vpC0TB5sHqe/T8wAcGZfXkB8NLFVdxa1TFH9u6lJO8MDNo/TVT5RPxcMMqDMmc8u7H+0pM2HE2Nm+Xidn95Zxda3se0PGoAOfz0AA8oc79y6UbLv83V1RXVRg+2nrzxsCSj8gOkKNNAVaCCalO28ctuwJUAUswwoc6YHAI54Nt8+DQypC3aG3ABbZ6HllOb6bSUfvpXLy9uy7521vvsYsH2tklEzrstykp+TM6xUVZXsWzj7dhevgbLdzEkeSX+iUuf1lla8ogQUe8Qg3zurAOW7WizLLgQ5T/SpABO6X9+cm+LSyabWdvQ+1sF/jX8AW3zZldFNo9sAAAAASUVORK5CYII=",
+    plant_8: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAEAUlEQVR4nO2YT0gcVxzHP7uTXZdZdtWt1q00GtwiTUkkiUZpi1KxhZRSaEAo9NZLDsVLeuitl14C6aGX4MFDAoXcCkItNDlISiWQ6rKBJfinuNGNUkbXbHdmXaO77k4Pk3mrG2u6M9NeOp/TzPv7/c7vzbzfG3BxcXFxcXFx+f/icXpAb8in/12dVIbSTsnROR0bzBQ+OdR3ZP2pVxoB6PthGnDOiO1BaoUvzC8f2/7DwV4Azk9OOxIRW529IZ/+8PIIq0/Vlwqv5ew5w8gnd6dtmbDc0RSfmE2yvF0S5dezuWP7fRVpIuSr3p8912vLhKVOPtmnx0dHmE+u8Ggry47Py42NLABTv9wC4LP3P6fvzRgA8cUUw7f7Afjx01kAxtoiyKUKAO9ctG7Ca8WASVqtio8FG0T51z99y7vjA8QXU0J8UfVQVD1IkiH6xkaWJ8VndqYHLETAfPoziSSpQpmftwsAdL72KnOra+T34dLEgGi/Mpmj5QOJ+1/OAzB8xoiKomRY2NIYa4sA8N5bXYzei9cdhRP1GjCpFQ9w8dRJAO5c+U20uzQxIO5N8SanW8JMlcp87JOsyrC2hFafqjzY22Vzb0+IB1CLJfSAn+EzMSF26VEegN6OqGinaQWi0VYAZK/OVKn83xoAWNreobu9KkoP+AmHg4dEhmriqygZAMLhIIqSESbsYOslbvQb30M94D9UrmkFfv9DObKPaSIabXXEhC0D8HLxW+Pz4lqWZSEcqiaymmp5fssGbg32Mbe6hme3eKg8HA6Kl7m7PcrrTWFOt4RF3cH1rygZ1nMa33RYj4IlA2vpNAD5/aPr9YCf7vaoeCei0VYh3iwzowBwsrNTjFkvdRuQpAp31zNkU2nioyPMra4RX0y90M4ULMsymlYQZYqSEXvAek7j3vDbrKXTpArWvkSWU4mxtgg9DRIX+nuYSSS5+th4oqETxn6gFqv5kSkcYGFLA+C7rlYGY28wkzKSwKuPM5ZSCcvJnE/26RPP1+6F/h5Rbub7tZSf71UPL4+AugNAYskQf+WJNfFgYyeWpArJvTI9DRLzyRVRHh8dObZfYjZJIBBid9fY4A5mslawdR4IhCS9XPYy0dFKIBD6R31M4QA3Nza5v++hkrd+HrAcAZOxtgg3NzaBTQC+6Iwd295oazAUbOZBNkfFxvy2DQB81NQMQL4E4+kXv0gHGQo2OzGlwBEDAOflRqeGqgvbBpb/zNLW3CTuhxqPN/KrWk0bnDjQ2MqFdvNlz52isXSscPvZnu2/ErYjUNopea6T06G+p39Nzdn6+pg49mPLJxv/h77v7iJyxAHFFH9NzQE4Ih7+hV+LppGDlA+cGJ0S7uLi4uLiAvAXjECr9kr6qXMAAAAASUVORK5CYII=",
+  };
+
+  // Ciclo de vida canónico (fase -> sprite base)
+  const LIFECYCLE = [
+    { key: 'plantula',  label: 'Plántula',            sprite: 'plant_1' },
+    { key: 'veg_temp',  label: 'Vegetativo temprano', sprite: 'plant_3' },
+    { key: 'veg_tard',  label: 'Vegetativo tardío',   sprite: 'plant_6' },
+    { key: 'floracion', label: 'Floración',           sprite: 'plant_5' },
+    { key: 'cosecha',   label: 'Cosecha',             sprite: 'plant_4' },
+  ];
+  const SEEDLING_VARIANTS = ['plant_1', 'plant_2', 'plant_7', 'plant_8'];
+  const VEG_VARIANTS = ['plant_3', 'plant_5', 'plant_6'];
+
+  const images = {};
+  function preload() {
+    for (const k of Object.keys(DATA)) {
+      const im = new Image();
+      im.src = DATA[k];
+      images[k] = im;
+    }
+  }
+  function img(key) { return images[key] || null; }
+  function uri(key) { return DATA[key] || null; }
+
+  PH.sprites = { DATA, LIFECYCLE, SEEDLING_VARIANTS, VEG_VARIANTS, preload, img, uri };
+})(window.PH = window.PH || {});
+
+/* ==== src/state.js ==== */
+/* ============================================================
+   PHENO HUNTER — state.js
+   Estado global: jugador, banco genético, catálogo, misiones,
+   ambiente (clima/estación/ciclo día-noche) y guardado.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  const { RNG, clamp } = PH.util;
+
+  const SAVE_KEY = 'phenohunter_save_v1';
+
+  function freshState() {
+    return {
+      version: 1,
+      player: {
+        name: 'Aprendiz',
+        map: 'lab',
+        x: PH.world.MAPS.lab.spawn.x,
+        y: PH.world.MAPS.lab.spawn.y,
+        dir: 'down',
+        credits: 300,
+        prestige: 0,
+        tools: ['frasco', 'polen'],   // ids de herramientas poseídas
+        gear: [],                      // ids de equipo
+        activeTool: 'frasco',
+        cebosActivos: 0,               // encuentros con feromona
+        labLevel: 1,                   // mejora del laboratorio (mutaciones en cruce)
+      },
+      bank: [],          // especímenes almacenados
+      garden: [],        // plantas creciendo en el invernadero
+      catalog: {},       // signature -> {sig, speciesId, name, tier, rarity, count, firstAt, pheno}
+      species: {},       // speciesId -> {seen, obtained}
+      quests: {},        // questId -> {state:'active'|'done', progress}
+      flags: {},         // banderas de historia
+      stats: { discoveries: 0, crosses: 0, mutationsFound: 0, distance: 0, sequenced: 0, harvests: 0 },
+      env: makeEnv(),
+      playtime: 0,
+    };
+  }
+
+  function makeEnv() {
+    return {
+      time: 8 * 60,          // minutos del día (0..1440)
+      dayLength: 8 * 60 * 1000, // ms reales por día de juego
+      season: 'primavera',
+      weather: 'despejado',
+      weatherTimer: 30000,
+      night: false,
+      heat: false,
+    };
+  }
+
+  const SEASONS = ['primavera', 'verano', 'otono', 'invierno'];
+  const WEATHERS = [
+    { key: 'despejado', w: 40 },
+    { key: 'lluvia', w: 16 },
+    { key: 'niebla', w: 12 },
+    { key: 'tormenta', w: 6 },
+    { key: 'ola_calor', w: 6 },
+    { key: 'nublado', w: 20 },
+  ];
+
+  const state = { data: freshState() };
+
+  function get() { return state.data; }
+
+  // Avanza el ambiente (dt en ms)
+  function updateEnv(dt) {
+    const env = state.data.env;
+    // ciclo día/noche: mapea dayLength al reloj interno
+    env.time += (dt / env.dayLength) * 1440;
+    if (env.time >= 1440) { env.time -= 1440; advanceSeason(env); }
+    env.night = env.time < 5 * 60 || env.time >= 20 * 60;
+    env.heat = env.weather === 'ola_calor';
+    // clima
+    env.weatherTimer -= dt;
+    if (env.weatherTimer <= 0) {
+      env.weather = RNG.weighted(WEATHERS, 'w').key;
+      env.weatherTimer = RNG.i(20000, 60000);
+    }
+  }
+  function advanceSeason(env) {
+    const i = SEASONS.indexOf(env.season);
+    env.season = SEASONS[(i + 1) % 4];
+  }
+
+  function timeLabel(env) {
+    const h = Math.floor(env.time / 60), m = Math.floor(env.time % 60);
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+
+  /* ---------------- BANCO GENÉTICO ---------------- */
+  function bankAdd(specimen) {
+    state.data.bank.push(specimen);
+    registerCatalog(specimen);
+  }
+  function bankRemove(uid) {
+    const i = state.data.bank.findIndex(s => s.uid === uid);
+    if (i >= 0) return state.data.bank.splice(i, 1)[0];
+    return null;
+  }
+  function bankGet(uid) { return state.data.bank.find(s => s.uid === uid); }
+
+  /* ---------------- CATÁLOGO ---------------- */
+  // Devuelve {isNewSignature, isNewSpecies, entry}
+  function registerCatalog(specimen) {
+    const sp = state.data.species[specimen.speciesId] || { seen: 0, obtained: 0 };
+    const isNewSpecies = sp.obtained === 0;
+    sp.obtained++;
+    state.data.species[specimen.speciesId] = sp;
+
+    const sig = specimen.signature;
+    let entry = state.data.catalog[sig];
+    let isNewSignature = false;
+    if (!entry) {
+      isNewSignature = true;
+      entry = {
+        sig, speciesId: specimen.speciesId, name: specimen.name,
+        tier: specimen.tier, rarity: specimen.rarity,
+        count: 0, firstAt: PH.state.timeLabel(state.data.env),
+        pheno: specimen.pheno, genotype: specimen.genotype,
+        mutations: specimen.pheno.mutations.slice(),
+      };
+      state.data.catalog[sig] = entry;
+      state.data.stats.discoveries++;
+      if (specimen.pheno.mutations.length) state.data.stats.mutationsFound++;
+      // Prestigio por descubrimiento, escalado por rareza
+      addPrestige(Math.round(3 + specimen.rarity / 3));
+    }
+    entry.count++;
+    return { isNewSignature, isNewSpecies, entry };
+  }
+
+  function markSeen(speciesId) {
+    const sp = state.data.species[speciesId] || { seen: 0, obtained: 0 };
+    sp.seen++;
+    state.data.species[speciesId] = sp;
+  }
+
+  function addPrestige(n) {
+    state.data.player.prestige += n;
+  }
+  function addCredits(n) { state.data.player.credits = Math.max(0, state.data.player.credits + n); }
+
+  // Umbrales de prestigio que desbloquean contenido
+  const PRESTIGE_UNLOCKS = [
+    { at: 0, id: 'pradera', label: 'Pradera de Auralia' },
+    { at: 8, id: 'bosque', label: 'Bosque de Vael' },
+    { at: 18, id: 'cueva', label: 'Cueva de Vael' },
+    { at: 25, id: 'pantano', label: 'Cenagal de Mureb' },
+    { at: 40, id: 'isla', label: 'Islas Vireo' },
+    { at: 45, id: 'desierto', label: 'Erg de Sael' },
+    { at: 65, id: 'volcan', label: 'Monte Calder' },
+    { at: 85, id: 'nieve', label: 'Manto de Yrr' },
+    { at: 120, id: 'reliquias', label: 'Licencia de reliquias' },
+  ];
+  function unlocked(id) {
+    const u = PRESTIGE_UNLOCKS.find(x => x.id === id);
+    if (!u) return true;
+    return state.data.player.prestige >= u.at;
+  }
+
+  /* ---------------- GUARDADO ---------------- */
+  function save() {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(state.data));
+      return true;
+    } catch (e) { return false; }
+  }
+  function load() {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return false;
+      const d = JSON.parse(raw);
+      if (d && d.version) { state.data = Object.assign(freshState(), d); return true; }
+    } catch (e) {}
+    return false;
+  }
+  function reset() { state.data = freshState(); localStorage.removeItem(SAVE_KEY); }
+  function hasSave() { try { return !!localStorage.getItem(SAVE_KEY); } catch (e) { return false; } }
+
+  PH.state = {
+    SAVE_KEY, freshState, get, updateEnv, timeLabel, SEASONS, WEATHERS, PRESTIGE_UNLOCKS,
+    bankAdd, bankRemove, bankGet, registerCatalog, markSeen,
+    addPrestige, addCredits, unlocked, save, load, reset, hasSave,
+  };
+})(window.PH = window.PH || {});
+
+/* ==== src/quests.js ==== */
+/* ============================================================
+   PHENO HUNTER — quests.js
+   Misiones, diálogos de NPC y lógica de progreso.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+
+  // Definición de misiones. check(state) -> bool completada.
+  const QUESTS = {
+    q_intro: {
+      id: 'q_intro', name: 'Primeros brotes',
+      desc: 'Recolecta tu primera variedad en la Pradera de Auralia.',
+      reward: { credits: 150, prestige: 5, tool: 'tijeras' },
+      check: (s) => s.stats.discoveries >= 1,
+    },
+    q_collector: {
+      id: 'q_collector', name: 'El ojo del coleccionista',
+      desc: 'Registra 5 variedades distintas en el catálogo mundial.',
+      reward: { credits: 400, prestige: 8, gear: 'lupa' },
+      check: (s) => Object.keys(s.catalog).length >= 5,
+    },
+    q_breeder: {
+      id: 'q_breeder', name: 'La chispa del criador',
+      desc: 'Realiza tu primer cruce genético en el laboratorio.',
+      reward: { credits: 300, prestige: 6, tool: 'kitclon' },
+      check: (s) => s.stats.crosses >= 1,
+    },
+    q_mutation: {
+      id: 'q_mutation', name: 'Anomalía prometedora',
+      desc: 'Documenta una variedad con al menos una mutación.',
+      reward: { credits: 800, prestige: 15, gear: 'medidor' },
+      check: (s) => s.stats.mutationsFound >= 1,
+    },
+    q_relic: {
+      id: 'q_relic', name: 'La reliquia dorada',
+      desc: 'Encuentra la mítica Aurífera (PH-007).',
+      reward: { credits: 3000, prestige: 40 },
+      check: (s) => (s.species['PH-007'] && s.species['PH-007'].obtained > 0),
+    },
+    q_sequence: {
+      id: 'q_sequence', name: 'Lectura del genoma',
+      desc: 'Secuencia el ADN de una variedad en el laboratorio.',
+      reward: { credits: 500, prestige: 8 },
+      check: (s) => s.stats.sequenced >= 1,
+    },
+    q_regions: {
+      id: 'q_regions', name: 'Cartógrafo genético',
+      desc: 'Cataloga al menos una variedad en 5 biomas distintos.',
+      reward: { credits: 1200, prestige: 20, gear: 'estabilizador' },
+      check: (s) => {
+        const biomes = new Set();
+        for (const sp of s.bank) if (sp.caughtAt && sp.caughtAt.biome) biomes.add(sp.caughtAt.biome);
+        return biomes.size >= 5;
+      },
+    },
+    q_poly: {
+      id: 'q_poly', name: 'Genoma multiplicado',
+      desc: 'Documenta una variedad poliploide (triploide o superior).',
+      reward: { credits: 1000, prestige: 18 },
+      check: (s) => Object.values(s.catalog).some(e => e.pheno && e.pheno.ploidy > 2),
+    },
+    q_harvest: {
+      id: 'q_harvest', name: 'Primera cosecha',
+      desc: 'Cultiva una planta en el invernadero y coséchala.',
+      reward: { credits: 400, prestige: 7 },
+      check: (s) => (s.stats.harvests || 0) >= 1,
+    },
+    q_master: {
+      id: 'q_master', name: 'Maestro Pheno Hunter',
+      desc: 'Registra 25 fenotipos en el catálogo mundial.',
+      reward: { credits: 5000, prestige: 60 },
+      check: (s) => Object.keys(s.catalog).length >= 25,
+    },
+  };
+
+  // Diálogos: función que devuelve páginas (array de strings) según estado.
+  const DIALOGS = {
+    mentor: (s) => {
+      if (!s.flags.metMentor) {
+        s.flags.metMentor = true;
+        activate('q_intro');
+        return [
+          'Dra. Elna: ¡Bienvenido al gremio de los PHENO HUNTERS!',
+          'Nuestra misión no es luchar, sino encontrar y preservar la diversidad genética del planeta.',
+          'Toma tu Frasco de semillas. Ve a la Pradera, al sur, y recolecta tu primera variedad.',
+          'Pulsa I para abrir tu mochila, y C para ver tu Catálogo. ¡Suerte, cazador!',
+        ];
+      }
+      return [
+        'Dra. Elna: Cada fenotipo que catalogas queda registrado para siempre.',
+        `Llevas ${Object.keys(s.catalog).length} variedades y ${s.player.prestige} de prestigio.`,
+        'El prestigio abre nuevas regiones y licencias. Sigue explorando.',
+      ];
+    },
+    coleccionista: (s) => [
+      'Coleccionista Bru: Compro genéticas raras a buen precio.',
+      'Cuanto más rara la variedad, más pago. Vende clones que te sobren en el Banco (B) con el botón Vender.',
+      'Los fenotipos míticos... por esos pagaría una fortuna.',
+    ],
+    criador: (s) => {
+      activate('q_breeder'); activate('q_harvest');
+      return [
+        'Criador Wex: El verdadero arte está en el cruce.',
+        'En el Laboratorio puedes cruzar dos ejemplares del Banco. La descendencia hereda genes de ambos.',
+        'Y en el Invernadero (tecla G) puedes cultivar clones: crecen por fases y, al cosechar, propagas la genética en varios clones idénticos.',
+        'A veces surgen fenotipos, colores o mutaciones que nadie había visto. Eso es oro para el catálogo.',
+      ];
+    },
+    explorador: (s) => [
+      'Explorador Ino: El clima lo cambia todo.',
+      'Con niebla aparece la esquiva Brumaria; de noche salen las variedades de sombra.',
+      'Consigue un Medidor ambiental para leer las condiciones. Yo nunca salgo sin él.',
+    ],
+    botanica: (s) => {
+      activate('q_mutation');
+      return [
+        'Botánica Sella: ¿Has visto una planta con variegación? ¿Con gigantismo?',
+        'Esas mutaciones son rarísimas en la naturaleza, pero puedes fijarlas cruzando portadores.',
+        'Documenta una y el gremio te recompensará generosamente.',
+      ];
+    },
+    contrabandista: (s) => [
+      'Contrabandista Kez: Psst... yo consigo lo que otros no pueden.',
+      'Herramientas de alta gama, feromonas florales para atraer rarezas...',
+      'Pásate por el Mercado. Y no preguntes de dónde saco la mercancía.',
+    ],
+    genetista: (s) => {
+      activate('q_sequence');
+      return [
+        'Dr. Vane: Toda planta esconde alelos recesivos invisibles a simple vista.',
+        'Secuencia su ADN en el Laboratorio (botón Investigar) para revelar genes ocultos y calcular parentescos.',
+        'Con esa información podrás dirigir tus cruces hacia mutaciones concretas.',
+      ];
+    },
+    nomada: (s) => {
+      activate('q_regions');
+      return [
+        'Zahra: El desierto castiga, pero guarda tesoros. La Solárida solo florece con calor extremo.',
+        'En verano y con olas de calor, las variedades del Erg se multiplican.',
+        'Sigue al norte y llegarás al Monte Calder... si tu prestigio lo permite.',
+      ];
+    },
+    vulcanologo: (s) => [
+      'Draco: Aquí germina lo que el fuego despierta. La Ígnea nace de la ceniza.',
+      'Y dicen que entre la obsidiana crece una flor negra, la Obsidiónida. Rarísima.',
+      'Cuidado con la lava. Cataloga y márchate.',
+    ],
+    glaciologa: (s) => [
+      'Frey: Bajo la aurora, de noche, la variedad Aurora emite luz propia.',
+      'El frío fija mutaciones cristalinas. Es el mejor sitio para resina hipertrófica.',
+      'Abrígate, cazador.',
+    ],
+    espeleologo: (s) => [
+      'Mox: Sin luz, la vida se reinventa. La Fungália brilla en la oscuridad total.',
+      'Estas galerías tienen la mayor tasa de mutación conocida.',
+      'Dicen que en lo más profundo duerme una reliquia fósil, la Cronólita...',
+    ],
+    marinera: (s) => [
+      'Nira: Bienvenido a las Islas Vireo. La sal marina moldea genéticas únicas.',
+      'La Coralina imita a los corales; su aroma marino no se encuentra en tierra firme.',
+      'El muelle te lleva de vuelta al continente cuando quieras.',
+    ],
+  };
+
+  function activate(id) {
+    const s = PH.state.get();
+    if (!s.quests[id]) s.quests[id] = { state: 'active' };
+  }
+
+  // Revisa todas las misiones activas; devuelve las recién completadas.
+  function checkAll() {
+    const s = PH.state.get();
+    const completed = [];
+    for (const id of Object.keys(s.quests)) {
+      const q = s.quests[id];
+      if (q.state === 'active' && QUESTS[id] && QUESTS[id].check(s)) {
+        q.state = 'done';
+        grantReward(QUESTS[id].reward);
+        completed.push(QUESTS[id]);
+      }
+    }
+    return completed;
+  }
+
+  function grantReward(r) {
+    if (!r) return;
+    const s = PH.state.get();
+    if (r.credits) PH.state.addCredits(r.credits);
+    if (r.prestige) PH.state.addPrestige(r.prestige);
+    if (r.tool && !s.player.tools.includes(r.tool)) s.player.tools.push(r.tool);
+    if (r.gear && !s.player.gear.includes(r.gear)) s.player.gear.push(r.gear);
+  }
+
+  function activeList() {
+    const s = PH.state.get();
+    return Object.keys(s.quests)
+      .filter(id => QUESTS[id])
+      .map(id => ({ ...QUESTS[id], state: s.quests[id].state }));
+  }
+
+  PH.quests = { QUESTS, DIALOGS, activate, checkAll, grantReward, activeList };
+})(window.PH = window.PH || {});
+
+/* ==== src/events.js ==== */
+/* ============================================================
+   PHENO HUNTER — events.js
+   Eventos raros temporizados que alteran apariciones y mutaciones.
+   Algunos se anuncian y duran pocos minutos reales.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  const { RNG } = PH.util;
+
+  // Definición de eventos. effect: modificadores globales mientras dura.
+  const EVENTS = {
+    eclipse: {
+      id: 'eclipse', name: 'Eclipse', icon: '🌑',
+      desc: 'La luz se apaga. Las variedades de sombra y las reliquias emergen.',
+      duration: 90000, mutMul: 1.4,
+      spawn: (sp) => (sp.relic || sp.id === 'PH-003' || sp.id === 'PH-011') ? 3 : 1,
+      tint: 'rgba(20,10,40,0.5)',
+    },
+    meteoros: {
+      id: 'meteoros', name: 'Lluvia de meteoros', icon: '☄️',
+      desc: 'Radiación cósmica: la tasa de mutaciones se dispara.',
+      duration: 75000, mutMul: 3.0,
+      spawn: (sp) => sp.mutBoost ? 1.5 : 1,
+      tint: 'rgba(40,20,60,0.25)', particles: 'meteor',
+    },
+    floracion: {
+      id: 'floracion', name: 'Floración masiva', icon: '🌸',
+      desc: 'Todo florece a la vez. Encuentros mucho más frecuentes.',
+      duration: 120000, mutMul: 1.1, encMul: 2.2,
+      spawn: () => 1, tint: 'rgba(255,150,200,0.10)', particles: 'petal',
+    },
+    tormenta_e: {
+      id: 'tormenta_e', name: 'Tormenta eléctrica', icon: '⚡',
+      desc: 'Descargas que inducen poliploidía y anomalías raras.',
+      duration: 80000, mutMul: 2.2, ploidyMul: 3,
+      spawn: (sp) => sp.mutBoost ? 1.4 : 1, tint: 'rgba(120,140,255,0.12)',
+    },
+    bruma_astral: {
+      id: 'bruma_astral', name: 'Bruma astral', icon: '🌌',
+      desc: 'Una niebla luminiscente favorece fenotipos bioluminiscentes.',
+      duration: 90000, mutMul: 1.8,
+      spawn: (sp) => sp.id === 'PH-006' ? 2.5 : 1, tint: 'rgba(80,120,180,0.22)', particles: 'spark',
+    },
+  };
+
+  const active = { ev: null, remaining: 0 };
+  let cooldown = 45000; // primer evento algo tardío
+
+  function update(dt) {
+    if (active.ev) {
+      active.remaining -= dt;
+      if (active.remaining <= 0) {
+        const ended = active.ev;
+        active.ev = null; active.remaining = 0;
+        cooldown = RNG.i(60000, 150000);
+        if (PH.ui && PH.ui.toast) PH.ui.toast(`${ended.icon} El evento «${ended.name}» ha terminado.`, '');
+      }
+      return;
+    }
+    cooldown -= dt;
+    if (cooldown <= 0) trigger();
+  }
+
+  function trigger(forceId) {
+    const keys = Object.keys(EVENTS);
+    const id = forceId || RNG.pick(keys);
+    const ev = EVENTS[id];
+    active.ev = ev; active.remaining = ev.duration;
+    if (PH.ui && PH.ui.toast) PH.ui.toast(`${ev.icon} ¡EVENTO RARO! «${ev.name}» — ${ev.desc}`, 'ok');
+  }
+
+  function current() { return active.ev; }
+  function remaining() { return Math.max(0, Math.round(active.remaining / 1000)); }
+
+  // Hooks consumidos por genetics/species
+  function mutationBoost() { return active.ev ? (active.ev.mutMul || 1) : 1; }
+  function spawnMultiplier(species) { return active.ev && active.ev.spawn ? active.ev.spawn(species) : 1; }
+  function encounterBoost() { return active.ev ? (active.ev.encMul || 1) : 1; }
+  function tint() { return active.ev ? active.ev.tint : null; }
+  function particles() { return active.ev ? active.ev.particles : null; }
+
+  PH.events = {
+    EVENTS, update, trigger, current, remaining,
+    mutationBoost, spawnMultiplier, encounterBoost, tint, particles,
+  };
+})(window.PH = window.PH || {});
+
+/* ==== src/research.js ==== */
+/* ============================================================
+   PHENO HUNTER — research.js
+   Investigación de ADN: secuenciación (revela alelos ocultos),
+   comparación/parentesco y árbol filogenético del banco.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  const { cap } = PH.util;
+
+  // Secuenciar un espécimen: marca sequenced y revela alelos recesivos ocultos.
+  function sequence(spec) {
+    spec.sequenced = true;
+    const g = spec.genotype;
+    const ph = spec.pheno;
+    const hidden = [];
+    for (const gene of PH.gen.QUAL_GENES) {
+      const alleles = g[gene.key] || [];
+      if (alleles[0] !== alleles[1]) {
+        // hay heterocigosis: reporta el recesivo oculto
+        const list = gene.list;
+        const A = list.find(x => x.key === alleles[0]);
+        const B = list.find(x => x.key === alleles[1]);
+        const rec = (A.dom <= B.dom ? A : B).key;
+        const dom = (A.dom > B.dom ? A : B).key;
+        if (rec !== dom) hidden.push({ gene: gene.key, hidden: rec, expressed: dom });
+      }
+    }
+    return { seq: PH.gen.dnaSequence(g), hidden };
+  }
+
+  // Compara dos especímenes -> parentesco y diferencias
+  function compare(a, b) {
+    const rel = PH.gen.relatedness(a.genotype, b.genotype);
+    const relation = rel > 0.85 ? 'clones/idénticos' : rel > 0.6 ? 'parientes cercanos' : rel > 0.35 ? 'parientes lejanos' : 'no emparentados';
+    return { rel: Math.round(rel * 100), relation };
+  }
+
+  // Construye un árbol de linaje a partir de `parents` en el banco.
+  function lineage(spec, bankIndex) {
+    function node(s, depth) {
+      if (!s || depth > 4) return null;
+      const n = { name: s.nickname || s.name, tier: s.tier, gen: s.generation, children: [] };
+      if (s.parents) {
+        for (const pid of s.parents) {
+          const p = bankIndex[pid];
+          const child = node(p, depth + 1);
+          if (child) n.children.push(child);
+        }
+      }
+      return n;
+    }
+    return node(spec, 0);
+  }
+
+  // Agrupa el catálogo por especie -> ramas filogenéticas simples
+  function phylogeny(catalog) {
+    const bySpecies = {};
+    for (const e of Object.values(catalog)) {
+      (bySpecies[e.speciesId] = bySpecies[e.speciesId] || []).push(e);
+    }
+    return bySpecies;
+  }
+
+  PH.research = { sequence, compare, lineage, phylogeny };
+})(window.PH = window.PH || {});
+
+/* ==== src/garden.js ==== */
+/* ============================================================
+   PHENO HUNTER — garden.js
+   Invernadero / cultivo: planta clones y semillas, obsérvalos crecer
+   por fases (plántula → veg → floración → cosecha) y cosecha para
+   propagar la genética. Usa los sprites de cultivo (sprites.js).
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  const { RNG, clamp } = PH.util;
+  const G = () => PH.state.get();
+
+  // Umbrales acumulados (ms reales) por fase. Ciclo completo ~130s base.
+  const STAGE_TIMES = [0, 25000, 55000, 90000, 130000];
+  const FINAL = STAGE_TIMES.length - 1;
+
+  function capacity() {
+    const s = G();
+    return clamp(3 + Math.floor(s.player.prestige / 40), 3, 8);
+  }
+
+  function growRate(plant) {
+    // velocidad y vigor aceleran; floración global también
+    let r = 1 + ((plant.pheno.quant.velocidad || 50) - 50) / 120;
+    if (PH.events && PH.events.current() && PH.events.current().id === 'floracion') r *= 1.6;
+    return clamp(r, 0.5, 2.2);
+  }
+
+  function stageOf(growMs) {
+    let idx = 0;
+    for (let i = 0; i < STAGE_TIMES.length; i++) if (growMs >= STAGE_TIMES[i]) idx = i;
+    return idx;
+  }
+
+  function plantFromBank(uid) {
+    const s = G();
+    if (!s.garden) s.garden = [];
+    if (s.garden.length >= capacity()) return { ok: false, msg: 'No hay parcelas libres en el invernadero.' };
+    const sp = PH.state.bankGet(uid);
+    if (!sp) return { ok: false, msg: 'Muestra no encontrada.' };
+    if (sp.form === 'polen') return { ok: false, msg: 'El polen no se planta; úsalo en cruces.' };
+    PH.state.bankRemove(uid);
+    const plant = {
+      id: 'G' + Date.now().toString(36) + RNG.i(100, 999),
+      name: sp.nickname || sp.name, speciesId: sp.speciesId,
+      genotype: sp.genotype, pheno: sp.pheno, rarity: sp.rarity, tier: sp.tier,
+      quality: sp.quality, generation: sp.generation, form: sp.form,
+      growMs: 0, stage: 0, ready: false,
+      seedSprite: RNG.pick(PH.sprites.SEEDLING_VARIANTS),
+      vegSprite: RNG.pick(PH.sprites.VEG_VARIANTS),
+    };
+    s.garden.push(plant);
+    return { ok: true, plant, msg: `Plantaste ${plant.name} en el invernadero.` };
+  }
+
+  function update(dt) {
+    const s = G();
+    if (!s.garden || !s.garden.length) return;
+    for (const p of s.garden) {
+      if (p.ready) continue;
+      p.growMs += dt * growRate(p);
+      p.stage = stageOf(p.growMs);
+      if (p.growMs >= STAGE_TIMES[FINAL]) { p.ready = true; p.stage = FINAL; }
+    }
+  }
+
+  // Sprite de la fase actual
+  function spriteKey(p) {
+    if (p.stage <= 0) return p.seedSprite;
+    if (p.stage === 1 || p.stage === 2) return p.vegSprite;
+    return PH.sprites.LIFECYCLE[p.stage].sprite;
+  }
+
+  function progressPct(p) {
+    const total = STAGE_TIMES[FINAL];
+    return clamp((p.growMs / total) * 100, 0, 100);
+  }
+
+  function regar(id) {
+    const s = G();
+    const p = (s.garden || []).find(x => x.id === id);
+    if (!p || p.ready) return false;
+    p.growMs += 9000; // riego: acelera el cultivo
+    p.stage = stageOf(p.growMs);
+    if (p.growMs >= STAGE_TIMES[FINAL]) { p.ready = true; p.stage = FINAL; }
+    return true;
+  }
+
+  function harvest(id) {
+    const s = G();
+    const i = (s.garden || []).findIndex(x => x.id === id);
+    if (i < 0) return { ok: false };
+    const p = s.garden[i];
+    if (!p.ready) return { ok: false, msg: 'Aún no está lista para cosechar.' };
+    s.garden.splice(i, 1);
+
+    // Rendimiento: nº de clones propagados según producción y ploidía
+    const ploid = p.pheno.ploidy || 2;
+    let clones = 1 + Math.floor((p.pheno.quant.produccion || 50) / 30) + (ploid > 2 ? 1 : 0);
+    if (p.pheno.mutations.includes('gigantismo')) clones += 1;
+    clones = clamp(clones, 1, 6);
+
+    const made = [];
+    for (let k = 0; k < clones; k++) {
+      const spec = PH.species.makeSpecimen(PH.species.SPECIES_BY_ID[p.speciesId], s.env, {
+        genotype: JSON.parse(JSON.stringify(p.genotype)),
+        form: 'clon', quality: clamp((p.quality || 80) + RNG.i(-3, 5), 5, 100),
+        generation: p.generation, caughtAt: { biome: 'invernadero', weather: '-', time: PH.state.timeLabel(s.env) },
+      });
+      PH.state.bankAdd(spec);
+      made.push(spec);
+    }
+    // Crédito por cosecha según resina/producción/rareza
+    const credits = Math.round(40 + (p.pheno.quant.resina || 40) * 1.4 + (p.pheno.quant.produccion || 40) * 1.2 + p.rarity * 3);
+    PH.state.addCredits(credits);
+    s.stats.harvests = (s.stats.harvests || 0) + 1;
+    PH.state.addPrestige(2);
+    return { ok: true, clones: made, credits, name: p.name };
+  }
+
+  function compost(id) {
+    const s = G();
+    const i = (s.garden || []).findIndex(x => x.id === id);
+    if (i >= 0) s.garden.splice(i, 1);
+  }
+
+  PH.garden = { STAGE_TIMES, capacity, update, plantFromBank, spriteKey, progressPct, regar, harvest, compost, stageOf };
+})(window.PH = window.PH || {});
+
+/* ==== src/encounter.js ==== */
+/* ============================================================
+   PHENO HUNTER — encounter.js
+   Resolución de recolección: éxito, calidad y forma obtenida.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  const { RNG, clamp } = PH.util;
+  const { TOOLS, toolQuality } = PH.items;
+
+  // Intenta recolectar `wild` con la herramienta `toolId`.
+  // Devuelve { success, specimen?, form, quality, msg }
+  function harvest(wild, toolId) {
+    const s = PH.state.get();
+    const tool = TOOLS[toolId];
+    if (!tool) return { success: false, msg: 'Herramienta no válida.' };
+
+    // Modificadores de equipo
+    const hasStab = s.player.gear.includes('estabilizador');
+    const qualityBonus = hasStab ? 8 : 0;
+
+    // Probabilidad de éxito baja con la rareza (rarezas se resisten)
+    let successP = tool.success - (wild.rarity / 300);
+    successP = clamp(successP, 0.15, 0.98);
+    const ok = RNG.chance(successP);
+
+    if (!ok) {
+      return { success: false, form: tool.form, msg: `La ${wild.name} se resistió. No obtuviste ${tool.form}.` };
+    }
+
+    const quality = toolQuality(tool, qualityBonus);
+    // El polen no crea un espécimen completo: crea material de cruce (guardamos como espécimen "polen")
+    const form = tool.form;
+
+    // Construye el espécimen recolectado. Copia el genotipo salvaje.
+    const spec = PH.species.makeSpecimen(
+      PH.species.SPECIES_BY_ID[wild.speciesId],
+      s.env,
+      {
+        genotype: JSON.parse(JSON.stringify(wild.genotype)),
+        form, quality,
+        caughtAt: { biome: mapBiome(), weather: s.env.weather, time: PH.state.timeLabel(s.env) },
+        generation: 0,
+      }
+    );
+    // conserva firma/rareza del salvaje (mismo genotipo => misma firma)
+    spec.signature = wild.signature;
+    spec.rarity = wild.rarity;
+    spec.tier = wild.tier;
+
+    return { success: true, specimen: spec, form, quality, msg: `¡Obtuviste ${form} de ${wild.name}! (calidad ${quality})` };
+  }
+
+  function mapBiome() {
+    const s = PH.state.get();
+    const map = PH.world.MAPS[s.player.map];
+    return map ? map.biome : null;
+  }
+
+  // Probabilidad de encuentro al pisar hierba alta
+  function encounterChance(biome) {
+    const s = PH.state.get();
+    const b = PH.species.BIOMES[biome];
+    let p = b ? b.baseEncounter : 0.12;
+    if (s.player.cebosActivos > 0) p += 0.05;
+    if (PH.events && PH.events.encounterBoost) p *= PH.events.encounterBoost();
+    return Math.min(0.6, p);
+  }
+
+  PH.encounter = { harvest, encounterChance };
+})(window.PH = window.PH || {});
+
+/* ==== src/ui.js ==== */
+/* ============================================================
+   PHENO HUNTER — ui.js
+   Capa de interfaz: HUD, notificaciones y paneles superpuestos
+   (diálogo, mochila, banco, catálogo, laboratorio, mercado,
+   encuentro y menú). Los paneles pausan el mundo.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  const { fmt, cap } = PH.util;
+  const G = () => PH.state.get();
+
+  let overlay, hud, toastBox;
+
+  function init() {
+    overlay = document.getElementById('overlay');
+    hud = document.getElementById('hud');
+    toastBox = document.getElementById('toasts');
+  }
+
+  /* ---------------- Notificaciones ---------------- */
+  function toast(msg, kind) {
+    const el = document.createElement('div');
+    el.className = 'toast ' + (kind || '');
+    el.innerHTML = msg;
+    toastBox.appendChild(el);
+    setTimeout(() => { el.classList.add('show'); }, 10);
+    setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 400); }, 3200);
+  }
+
+  /* ---------------- HUD ---------------- */
+  function updateHUD() {
+    const s = G();
+    const env = s.env;
+    const map = PH.world.MAPS[s.player.map];
+    const wIcon = { despejado: '☀️', lluvia: '🌧️', niebla: '🌫️', tormenta: '⛈️', ola_calor: '🔥', nublado: '☁️' }[env.weather] || '☀️';
+    const ev = PH.events && PH.events.current();
+    const evPill = ev ? `<span class="pill event">${ev.icon} ${ev.name} · ${PH.events.remaining()}s</span>` : '';
+    hud.innerHTML = `
+      <div class="hud-left">
+        <span class="pill">📍 ${map ? map.name : ''}</span>
+        <span class="pill">🕑 ${PH.state.timeLabel(env)} ${env.night ? '🌙' : '☀️'}</span>
+        <span class="pill">${wIcon} ${cap(env.weather.replace('_', ' '))}</span>
+        <span class="pill">🍂 ${cap(env.season)}</span>
+        ${evPill}
+      </div>
+      <div class="hud-right">
+        <span class="pill">🏅 ${s.player.prestige}</span>
+        <span class="pill">💰 ${fmt(s.player.credits)}</span>
+        <span class="pill">📖 ${Object.keys(s.catalog).length}</span>
+      </div>`;
+  }
+
+  /* ---------------- Utilidades de paneles ---------------- */
+  function open(html, cls) {
+    overlay.className = 'active ' + (cls || '');
+    overlay.innerHTML = html;
+    PH.game.mode = 'menu';
+  }
+  function close() {
+    overlay.className = '';
+    overlay.innerHTML = '';
+    PH.game.mode = 'overworld';
+  }
+  function isOpen() { return overlay.className.indexOf('active') >= 0; }
+
+  // Dibuja una planta en un <canvas> por id tras insertar el HTML
+  function paintPlant(canvasId, pheno, scale) {
+    const c = document.getElementById(canvasId);
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, c.width, c.height);
+    PH.render.drawPlant(ctx, c.width / 2, c.height - 8, pheno, scale || 2, performance.now());
+  }
+
+  /* ---------------- Ficha de espécimen (HTML) ---------------- */
+  function statBar(label, v, max) {
+    max = max || 100;
+    const pct = Math.min(100, (v / max) * 100);
+    return `<div class="stat"><span>${label}</span><div class="bar"><i style="width:${pct}%"></i></div><b>${v}</b></div>`;
+  }
+  function tierBadge(spec) {
+    const t = PH.gen.rarityTier(spec.rarity);
+    return `<span class="tier" style="--tc:${t.color}">${'★'.repeat(t.stars)} ${t.label}</span>`;
+  }
+  function specimenCard(spec, opts) {
+    opts = opts || {};
+    const ph = spec.pheno;
+    const cid = 'pc_' + spec.uid;
+    const muts = ph.mutations.map(m => `<span class="mut">${PH.gen.MUTATIONS[m].label}</span>`).join('');
+    return `
+      <div class="spec-card">
+        <div class="spec-art"><canvas id="${cid}" width="90" height="110"></canvas></div>
+        <div class="spec-info">
+          <div class="spec-title">${spec.nickname || spec.name} <small>${spec.speciesId}</small></div>
+          ${tierBadge(spec)}
+          <div class="spec-desc">${PH.gen.describe(ph)}</div>
+          <div class="spec-meta">Forma: <b>${cap(spec.form)}</b> · Calidad: <b>${spec.quality}</b>${spec.generation ? ' · Gen ' + spec.generation : ''}</div>
+          <div class="spec-stats">
+            ${statBar('Altura', ph.quant.altura, 150)}
+            ${statBar('Producción', ph.quant.produccion, 150)}
+            ${statBar('Vigor', ph.quant.vigor)}
+            ${statBar('Resina', ph.quant.resina)}
+            ${statBar('Resist.', ph.quant.resistencia)}
+          </div>
+          ${muts ? '<div class="muts">' + muts + '</div>' : ''}
+          ${ph.sterile ? '<div class="warn">⚠ Estéril (no apta para cruce)</div>' : ''}
+        </div>
+      </div>`;
+  }
+
+  /* ---------------- DIÁLOGO ---------------- */
+  let dlgPages = [], dlgIndex = 0, dlgAfter = null;
+  function dialog(pages, after) {
+    dlgPages = pages; dlgIndex = 0; dlgAfter = after || null;
+    renderDialog();
+  }
+  function renderDialog() {
+    open(`<div class="dialog-box"><p>${dlgPages[dlgIndex]}</p><div class="dlg-hint">▼ Espacio / Click para continuar</div></div>`, 'bottom');
+    PH.game.mode = 'dialog';
+  }
+  function dialogNext() {
+    dlgIndex++;
+    if (dlgIndex >= dlgPages.length) { close(); const cb = dlgAfter; dlgAfter = null; if (cb) cb(); PH.game.afterQuestCheck(); }
+    else renderDialog();
+  }
+
+  /* ---------------- ENCUENTRO ---------------- */
+  function encounter(wild) {
+    const s = G();
+    PH.state.markSeen(wild.speciesId);
+    const hasLupa = s.player.gear.includes('lupa');
+    const hasMed = s.player.gear.includes('medidor');
+    const tools = s.player.tools.map(id => PH.items.TOOLS[id]).filter(Boolean);
+    const toolBtns = tools.map(t =>
+      `<button class="btn tool" data-tool="${t.id}">${t.name}<small>${Math.round(t.success * 100)}% · fid ${Math.round(t.quality * 100)}%</small></button>`
+    ).join('');
+    const rarityHint = hasLupa ? `${'★'.repeat(PH.gen.rarityTier(wild.rarity).stars)} ${PH.gen.rarityTier(wild.rarity).label}` : '¿? (necesitas Lupa)';
+    const envHint = hasMed ? `<div class="enc-env">Clima: ${cap(s.env.weather)} · ${s.env.night ? 'Noche' : 'Día'} · ${cap(s.env.season)}</div>` : '';
+
+    open(`
+      <div class="encounter">
+        <div class="enc-head">¡Variedad salvaje avistada!</div>
+        <div class="enc-body">
+          <div class="enc-art"><canvas id="enc_canvas" width="140" height="170"></canvas></div>
+          <div class="enc-side">
+            <div class="enc-name">${wild.name} <small>${wild.speciesId}</small></div>
+            <div class="enc-rare">Rareza estimada: ${rarityHint}</div>
+            <div class="enc-desc">${PH.gen.describe(wild.pheno)}</div>
+            ${envHint}
+            <div class="enc-fields">
+              <span>Altura ${wild.pheno.quant.altura}</span>
+              <span>Prod ${wild.pheno.quant.produccion}</span>
+              <span>Resina ${wild.pheno.quant.resina}</span>
+              <span>Vigor ${wild.pheno.quant.vigor}</span>
+            </div>
+          </div>
+        </div>
+        <div class="enc-tools">${toolBtns}</div>
+        <div class="enc-actions"><button class="btn ghost" id="enc_flee">Dejar y marchar</button></div>
+        <div class="enc-msg" id="enc_msg"></div>
+      </div>`, 'center');
+    PH.game.mode = 'encounter';
+    paintPlant('enc_canvas', wild.pheno, 2.4);
+
+    overlay.querySelectorAll('.tool').forEach(b => b.onclick = () => resolveHarvest(wild, b.dataset.tool));
+    document.getElementById('enc_flee').onclick = () => close();
+  }
+
+  function resolveHarvest(wild, toolId) {
+    const res = PH.encounter.harvest(wild, toolId);
+    const msg = document.getElementById('enc_msg');
+    if (res.success) {
+      if (res.form === 'polen') {
+        // polen: material de cruce; se guarda igualmente en banco marcado
+        PH.state.bankAdd(res.specimen);
+      } else {
+        PH.state.bankAdd(res.specimen);
+      }
+      const reg = PH.state.registerCatalog ? null : null;
+      msg.className = 'enc-msg ok';
+      msg.textContent = res.msg;
+      // ¿nuevo descubrimiento?
+      setTimeout(() => { close(); PH.game.afterQuestCheck(); updateHUD(); }, 900);
+      toast(res.msg, 'ok');
+    } else {
+      msg.className = 'enc-msg bad';
+      msg.textContent = res.msg;
+      // permite reintentar con otra herramienta; deshabilita nada
+      setTimeout(() => { close(); }, 1100);
+    }
+  }
+
+  /* ---------------- MOCHILA ---------------- */
+  function bag() {
+    const s = G();
+    const tools = s.player.tools.map(id => PH.items.TOOLS[id]);
+    const gear = s.player.gear.map(id => PH.items.GEAR[id]);
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2>🎒 Mochila</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          <h3>Herramientas de recolección</h3>
+          <div class="grid">
+            ${tools.map(t => `<div class="item ${s.player.activeTool === t.id ? 'sel' : ''}" data-tool="${t.id}">
+              <b>${t.name}</b><small>${t.desc}</small>
+              <span class="tag">éxito ${Math.round(t.success * 100)}% · fidelidad ${Math.round(t.quality * 100)}%</span></div>`).join('')}
+          </div>
+          <h3>Equipo</h3>
+          <div class="grid">
+            ${gear.length ? gear.map(g => `<div class="item"><b>${g.name}</b><small>${g.desc}</small></div>`).join('') : '<p class="dim">Sin equipo aún. Visita el Mercado.</p>'}
+          </div>
+          <p class="dim">Consejo: haz clic en una herramienta para marcarla como activa.</p>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    overlay.querySelectorAll('.item[data-tool]').forEach(el => el.onclick = () => { s.player.activeTool = el.dataset.tool; bag(); });
+  }
+
+  /* ---------------- BANCO GENÉTICO ---------------- */
+  function bank() {
+    const s = G();
+    if (!s.bank.length) {
+      open(`<div class="panel"><div class="panel-head"><h2>🧬 Banco genético</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body"><p class="dim">El banco está vacío. Recolecta variedades en las rutas.</p></div></div>`, 'center');
+      document.getElementById('p_close').onclick = close; return;
+    }
+    const sorted = s.bank.slice().sort((a, b) => b.rarity - a.rarity);
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2>🧬 Banco genético <small>${s.bank.length} muestras</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body list">
+          ${sorted.map(sp => `
+            <div class="bank-row">
+              ${specimenCard(sp)}
+              <div class="bank-actions">
+                <button class="btn small" data-seq="${sp.uid}">${sp.sequenced ? '🧾 ADN' : '🔬 Secuenciar'}</button>
+                <button class="btn small" data-sell="${sp.uid}">Vender 💰${sellPrice(sp)}</button>
+                <button class="btn small ghost" data-rel="${sp.uid}">Liberar</button>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    sorted.forEach(sp => paintPlant('pc_' + sp.uid, sp.pheno, 2));
+    overlay.querySelectorAll('[data-sell]').forEach(b => b.onclick = () => { sell(b.dataset.sell); bank(); });
+    overlay.querySelectorAll('[data-rel]').forEach(b => b.onclick = () => { PH.state.bankRemove(b.dataset.rel); toast('Muestra liberada.'); bank(); });
+    overlay.querySelectorAll('[data-seq]').forEach(b => b.onclick = () => sequencePanel(b.dataset.seq));
+  }
+
+  /* ---------------- INVESTIGACIÓN: SECUENCIACIÓN Y ADN ---------------- */
+  function sequencePanel(uid) {
+    const s = G();
+    const sp = PH.state.bankGet(uid);
+    if (!sp) return;
+    const wasSequenced = sp.sequenced;
+    const res = PH.research.sequence(sp);
+    if (!wasSequenced) { s.stats.sequenced++; PH.game.afterQuestCheck(); }
+    const dna = res.seq.match(/.{1,3}/g).join(' ');
+    const hidden = res.hidden.length
+      ? res.hidden.map(h => `<li><b>${cap(h.gene)}</b>: expresa <i>${h.expressed}</i>, oculta recesivo <i>${h.hidden}</i></li>`).join('')
+      : '<li class="dim">Homocigoto en genes visibles: sin recesivos ocultos.</li>';
+    // parientes en el banco
+    const rels = s.bank.filter(x => x.uid !== uid).map(x => ({ x, c: PH.research.compare(sp, x) }))
+      .sort((a, b) => b.c.rel - a.c.rel).slice(0, 3);
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2>🧬 Secuenciación de ADN</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          <div class="seq-head">${specimenCard(sp)}</div>
+          <h3>Cadena genómica</h3>
+          <div class="dna">${dna}</div>
+          <h3>Genes recesivos ocultos</h3>
+          <ul class="hidden-list">${hidden}</ul>
+          <h3>Parentesco en tu banco</h3>
+          ${rels.length ? rels.map(r => `<div class="rel-row"><span>${r.x.nickname || r.x.name}</span>
+            <div class="bar"><i style="width:${r.c.rel}%"></i></div><b>${r.c.rel}%</b> <small>${r.c.relation}</small></div>`).join('') : '<p class="dim">No hay otras muestras para comparar.</p>'}
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = bank;
+    paintPlant('pc_' + sp.uid, sp.pheno, 2);
+  }
+  function sellPrice(sp) {
+    return Math.round(30 + sp.rarity * sp.rarity * 0.9 + sp.quality * 1.5);
+  }
+  function sell(uid) {
+    const sp = PH.state.bankGet(uid);
+    if (!sp) return;
+    // no permitir vender la última copia única del catálogo si es la única muestra de esa firma? Permitimos, el catálogo persiste.
+    const price = sellPrice(sp);
+    PH.state.bankRemove(uid);
+    PH.state.addCredits(price);
+    toast(`Vendido por 💰${price}.`, 'ok');
+    updateHUD();
+  }
+
+  /* ---------------- CATÁLOGO ---------------- */
+  function catalog() {
+    const s = G();
+    const entries = Object.values(s.catalog).sort((a, b) => b.rarity - a.rarity);
+    const total = PH.species.SPECIES.length;
+    const seenSpecies = Object.keys(s.species).filter(id => s.species[id].obtained > 0).length;
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2>📖 Catálogo mundial <small>${entries.length} fenotipos · ${seenSpecies}/${total} especies</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          ${entries.length ? `<div class="cat-grid">${entries.map(e => catCard(e)).join('')}</div>` : '<p class="dim">Aún no has catalogado nada.</p>'}
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    entries.forEach((e, i) => paintPlant('cat_' + i, e.pheno, 1.7));
+  }
+  function catCard(e) {
+    const idx = catCard._i = (catCard._i || 0);
+    const t = PH.gen.rarityTier(e.rarity);
+    catCard._i++;
+    const cid = 'cat_' + idx;
+    const muts = e.mutations.map(m => PH.gen.MUTATIONS[m].label).join(', ');
+    return `<div class="cat-card">
+      <canvas id="${cid}" width="70" height="90"></canvas>
+      <div class="cc-name">${e.name}</div>
+      <div class="cc-tier" style="color:${t.color}">${'★'.repeat(t.stars)}</div>
+      <div class="cc-meta">${cap(e.pheno.color)} · ${cap(e.pheno.terp)}</div>
+      ${muts ? `<div class="cc-mut">${muts}</div>` : ''}
+      <div class="cc-count">×${e.count} · desc. ${e.firstAt}</div>
+    </div>`;
+  }
+
+  /* ---------------- LABORATORIO (CRUCE) ---------------- */
+  let breedSel = [];
+  function lab() {
+    const s = G();
+    const fertile = s.bank.filter(sp => sp.form !== 'polen' && !sp.pheno.sterile);
+    const pollen = s.bank.filter(sp => sp.form === 'polen');
+    const usable = fertile.concat(pollen);
+    breedSel = breedSel.filter(uid => s.bank.find(x => x.uid === uid));
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2>🔬 Laboratorio — Cruces genéticos</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          <p class="dim">Selecciona dos parentales. La descendencia hereda un alelo de cada uno por gen; pueden surgir fenotipos, colores y mutaciones nuevos.</p>
+          <div class="breed-slots">
+            <div class="slot">${slotView(0)}</div>
+            <div class="cross-sign">✕</div>
+            <div class="slot">${slotView(1)}</div>
+            <div class="cross-eq">→</div>
+            <button class="btn primary" id="do_cross" ${breedSel.length === 2 ? '' : 'disabled'}>Cruzar</button>
+          </div>
+          <h3>Parentales disponibles (${usable.length})</h3>
+          <div class="cat-grid select">
+            ${usable.map(sp => `<div class="cat-card pick ${breedSel.includes(sp.uid) ? 'picked' : ''}" data-pick="${sp.uid}">
+              <canvas id="lp_${sp.uid}" width="70" height="90"></canvas>
+              <div class="cc-name">${sp.nickname || sp.name}</div>
+              <div class="cc-tier" style="color:${PH.gen.rarityTier(sp.rarity).color}">${'★'.repeat(PH.gen.rarityTier(sp.rarity).stars)}</div>
+              <div class="cc-meta">${cap(sp.form)} · ${cap(sp.pheno.color)}</div>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = () => { breedSel = []; close(); };
+    usable.forEach(sp => paintPlant('lp_' + sp.uid, sp.pheno, 1.7));
+    overlay.querySelectorAll('[data-pick]').forEach(el => el.onclick = () => togglePick(el.dataset.pick));
+    document.getElementById('do_cross').onclick = doCross;
+  }
+  function slotView(i) {
+    const uid = breedSel[i];
+    if (!uid) return '<span class="dim">vacío</span>';
+    const sp = PH.state.bankGet(uid);
+    return `<canvas id="slot_${i}" width="70" height="90"></canvas><div class="cc-name">${sp.name}</div>`;
+  }
+  function togglePick(uid) {
+    const i = breedSel.indexOf(uid);
+    if (i >= 0) breedSel.splice(i, 1);
+    else if (breedSel.length < 2) breedSel.push(uid);
+    lab();
+    breedSel.forEach((u, k) => paintPlant('slot_' + k, PH.state.bankGet(u).pheno, 1.7));
+  }
+  function doCross() {
+    if (breedSel.length !== 2) return;
+    const s = G();
+    const A = PH.state.bankGet(breedSel[0]);
+    const B = PH.state.bankGet(breedSel[1]);
+    const labBonus = 1 + (s.player.labLevel - 1) * 0.6; // mejoras de laboratorio
+    const childGeno = PH.gen.breed(A.genotype, B.genotype, { mutRate: 0.08, mutBoost: labBonus });
+    const spec = PH.species.makeSpecimen(PH.species.SPECIES_BY_ID[A.speciesId], s.env, {
+      genotype: childGeno, form: 'cruce', quality: Math.round((A.quality + B.quality) / 2),
+      parents: [A.uid, B.uid], generation: Math.max(A.generation, B.generation) + 1,
+    });
+    s.stats.crosses++;
+    const before = Object.keys(s.catalog).length;
+    PH.state.bankAdd(spec);
+    const isNew = Object.keys(s.catalog).length > before;
+    breedSel = [];
+    // pantalla de resultado
+    crossResult(spec, isNew, A, B);
+    PH.game.afterQuestCheck();
+  }
+  function crossResult(spec, isNew, A, B) {
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2>🌱 Descendencia obtenida</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body center-col">
+          ${isNew ? '<div class="newbadge">✨ ¡FENOTIPO NUEVO PARA EL CATÁLOGO! ✨</div>' : '<div class="dim">Fenotipo ya conocido.</div>'}
+          ${specimenCard(spec)}
+          <p class="dim">Parentales: ${A.name} ✕ ${B.name}</p>
+          <div class="row">
+            <button class="btn primary" id="again">Volver al laboratorio</button>
+            <button class="btn ghost" id="p_close2">Cerrar</button>
+          </div>
+        </div>
+      </div>`, 'center');
+    paintPlant('pc_' + spec.uid, spec.pheno, 2.4);
+    document.getElementById('p_close').onclick = close;
+    document.getElementById('p_close2').onclick = close;
+    document.getElementById('again').onclick = lab;
+    if (isNew) toast('✨ Nuevo fenotipo catalogado: ' + spec.name, 'ok');
+  }
+
+  /* ---------------- INVERNADERO / CULTIVO ---------------- */
+  let plantPicker = false;
+  function greenhouse() {
+    const s = G();
+    if (!s.garden) s.garden = [];
+    const cap = PH.garden.capacity();
+    const plots = [];
+    for (let i = 0; i < cap; i++) {
+      const p = s.garden[i];
+      if (p) plots.push(plotView(p));
+      else plots.push(`<div class="plot empty"><div class="plot-add" data-add="1">＋<small>Plantar</small></div></div>`);
+    }
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2>🌿 Invernadero <small>${s.garden.length}/${cap} parcelas</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          <p class="dim">Planta clones o semillas y obsérvalos crecer por fases. Al cosechar propagas la genética (clones idénticos) y obtienes créditos. La velocidad acelera el cultivo; riega para adelantarlo.</p>
+          <div class="garden-grid">${plots.join('')}</div>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = () => { plantPicker = false; close(); };
+    overlay.querySelectorAll('[data-add]').forEach(b => b.onclick = plantPickerView);
+    overlay.querySelectorAll('[data-water]').forEach(b => b.onclick = () => { PH.garden.regar(b.dataset.water); greenhouse(); });
+    overlay.querySelectorAll('[data-harv]').forEach(b => b.onclick = () => doHarvest(b.dataset.harv));
+    overlay.querySelectorAll('[data-comp]').forEach(b => b.onclick = () => { if (confirm('¿Compostar esta planta? Se pierde.')) { PH.garden.compost(b.dataset.comp); greenhouse(); } });
+  }
+
+  function plotView(p) {
+    const stage = PH.sprites.LIFECYCLE[p.stage];
+    const uri = PH.sprites.uri(PH.garden.spriteKey(p));
+    const pct = PH.garden.progressPct(p);
+    const t = PH.gen.rarityTier(p.rarity);
+    const pal = PH.gen.paletteFor(p.pheno);
+    return `<div class="plot ${p.ready ? 'ready' : ''}">
+      <div class="plot-sprite"><img src="${uri}" width="80" height="80" alt=""><span class="phdot" style="background:${pal.base}"></span></div>
+      <div class="plot-name">${p.name}</div>
+      <div class="plot-stage" style="color:${t.color}">${p.ready ? '✅ Lista' : stage.label}</div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="plot-actions">
+        ${p.ready
+          ? `<button class="btn small primary" data-harv="${p.id}">Cosechar</button>`
+          : `<button class="btn small" data-water="${p.id}">💧 Regar</button>`}
+        <button class="btn small ghost" data-comp="${p.id}">🗑</button>
+      </div>
+    </div>`;
+  }
+
+  function plantPickerView() {
+    const s = G();
+    const usable = s.bank.filter(sp => sp.form !== 'polen');
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2>🌱 Plantar en el invernadero</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          <p class="dim">Elige una muestra del banco para cultivar. La cosecha te devolverá varios clones de esa misma genética.</p>
+          ${usable.length ? `<div class="cat-grid select">${usable.map(sp => `<div class="cat-card pick" data-plant="${sp.uid}">
+            <canvas id="gp_${sp.uid}" width="70" height="90"></canvas>
+            <div class="cc-name">${sp.nickname || sp.name}</div>
+            <div class="cc-tier" style="color:${PH.gen.rarityTier(sp.rarity).color}">${'★'.repeat(PH.gen.rarityTier(sp.rarity).stars)}</div>
+            <div class="cc-meta">${cap(sp.form)} · ${cap(sp.pheno.color)}</div>
+          </div>`).join('')}</div>` : '<p class="dim">No tienes muestras plantables. Recolecta o cruza primero.</p>'}
+          <div class="row"><button class="btn ghost" id="back">Volver al invernadero</button></div>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    document.getElementById('back').onclick = greenhouse;
+    usable.forEach(sp => paintPlant('gp_' + sp.uid, sp.pheno, 1.7));
+    overlay.querySelectorAll('[data-plant]').forEach(el => el.onclick = () => {
+      const res = PH.garden.plantFromBank(el.dataset.plant);
+      toast(res.msg, res.ok ? 'ok' : 'bad');
+      greenhouse();
+    });
+  }
+
+  function doHarvest(id) {
+    const res = PH.garden.harvest(id);
+    if (!res.ok) { toast(res.msg || 'No se pudo cosechar.', 'bad'); return; }
+    toast(`🌾 Cosechaste ${res.name}: ${res.clones.length} clones + 💰${res.credits}`, 'ok');
+    updateHUD();
+    PH.game.afterQuestCheck();
+    greenhouse();
+  }
+
+  /* ---------------- MERCADO ---------------- */
+  function shop() {
+    const s = G();
+    const toolStock = Object.values(PH.items.TOOLS).filter(t => t.price > 0 && !s.player.tools.includes(t.id));
+    const gearStock = Object.values(PH.items.GEAR).filter(g => !g.consumable && !s.player.gear.includes(g.id))
+      .concat(Object.values(PH.items.GEAR).filter(g => g.consumable));
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2>🛒 Mercado <small>💰 ${fmt(s.player.credits)}</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          <h3>Herramientas</h3>
+          <div class="shop-grid">
+            ${toolStock.length ? toolStock.map(t => shopItem(t, 'tool')).join('') : '<p class="dim">Tienes todas las herramientas.</p>'}
+          </div>
+          <h3>Equipo y consumibles</h3>
+          <div class="shop-grid">
+            ${gearStock.map(g => shopItem(g, 'gear')).join('')}
+          </div>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    overlay.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => { buy(b.dataset.buy, b.dataset.kind); });
+  }
+  function shopItem(it, kind) {
+    return `<div class="shop-item">
+      <b>${it.name}</b><small>${it.desc}</small>
+      <button class="btn small" data-buy="${it.id}" data-kind="${kind}">💰 ${fmt(it.price)}</button>
+    </div>`;
+  }
+  function buy(id, kind) {
+    const s = G();
+    const it = kind === 'tool' ? PH.items.TOOLS[id] : PH.items.GEAR[id];
+    if (s.player.credits < it.price) { toast('Créditos insuficientes.', 'bad'); return; }
+    PH.state.addCredits(-it.price);
+    if (kind === 'tool') { if (!s.player.tools.includes(id)) s.player.tools.push(id); }
+    else if (it.consumable) { s.player.cebosActivos += 8; }
+    else { if (!s.player.gear.includes(id)) s.player.gear.push(id); }
+    toast('Comprado: ' + it.name, 'ok');
+    updateHUD(); shop();
+  }
+
+  /* ---------------- MISIONES ---------------- */
+  function quests() {
+    const list = PH.quests.activeList();
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2>📋 Misiones</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          ${list.length ? list.map(q => `<div class="quest ${q.state}">
+            <div class="q-name">${q.state === 'done' ? '✅' : '◻️'} ${q.name}</div>
+            <div class="q-desc">${q.desc}</div>
+            <div class="q-reward">Recompensa: ${rewardText(q.reward)}</div>
+          </div>`).join('') : '<p class="dim">Habla con los NPC de la Ciudad para conseguir misiones.</p>'}
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+  }
+  function rewardText(r) {
+    const bits = [];
+    if (r.credits) bits.push('💰' + r.credits);
+    if (r.prestige) bits.push('🏅' + r.prestige);
+    if (r.tool) bits.push(PH.items.TOOLS[r.tool].name);
+    if (r.gear) bits.push(PH.items.GEAR[r.gear].name);
+    return bits.join(' · ');
+  }
+
+  /* ---------------- MENÚ / ubicaciones especiales ---------------- */
+  function labHub() {
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2>🔬 Laboratorio</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body center-col">
+          <p class="dim">Instalaciones de investigación del gremio.</p>
+          <div class="hub-grid">
+            <button class="btn big hub" id="hb_cross">🧬<br>Cruces genéticos</button>
+            <button class="btn big hub" id="hb_green">🌿<br>Invernadero</button>
+            <button class="btn big hub" id="hb_bank">🗄️<br>Banco genético</button>
+          </div>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    document.getElementById('hb_cross').onclick = lab;
+    document.getElementById('hb_green').onclick = greenhouse;
+    document.getElementById('hb_bank').onclick = bank;
+  }
+
+  function placeMenu(kind) {
+    if (kind === '@lab_interior') return labHub();
+    if (kind === '@tienda') return shop();
+    if (kind === '@casa') return houseMenu();
+    if (kind === '@cueva') return toast('La cueva está sellada. (Contenido futuro)', 'bad');
+    if (kind === '@expedicion') {
+      if (!PH.state.unlocked('expedicion')) return toast('Necesitas 60 de prestigio para las expediciones.', 'bad');
+      return toast('Muelle de expediciones — próximamente.', 'ok');
+    }
+  }
+  function houseMenu() {
+    const s = G();
+    const cost = labUpgradeCost();
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2>🏠 Tu casa</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body center-col">
+          <p>Un lugar tranquilo para descansar y organizar tu trabajo.</p>
+          <div class="stats-box">
+            <div>🏅 Prestigio: <b>${s.player.prestige}</b></div>
+            <div>📖 Fenotipos: <b>${Object.keys(s.catalog).length}</b></div>
+            <div>🧬 Cruces: <b>${s.stats.crosses}</b> · Mutaciones: <b>${s.stats.mutationsFound}</b></div>
+            <div>🔬 Nivel de laboratorio: <b>${s.player.labLevel}</b> <small>(+${Math.round((s.player.labLevel - 1) * 60)}% mutación en cruce)</small></div>
+            <div>👣 Distancia recorrida: <b>${s.stats.distance}</b></div>
+          </div>
+          <div class="row">
+            <button class="btn primary" id="h_lab" ${s.player.credits < cost ? 'disabled' : ''}>🔬 Mejorar laboratorio (💰${cost})</button>
+          </div>
+          <div class="row">
+            <button class="btn" id="h_events">☄️ Códice de eventos</button>
+            <button class="btn primary" id="h_save">💾 Guardar</button>
+            <button class="btn ghost" id="h_reset">Reiniciar</button>
+          </div>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    document.getElementById('h_save').onclick = () => { PH.state.save(); toast('Partida guardada.', 'ok'); };
+    document.getElementById('h_events').onclick = eventsCodex;
+    document.getElementById('h_lab').onclick = () => {
+      if (s.player.credits < cost) return;
+      PH.state.addCredits(-cost); s.player.labLevel++; toast('🔬 Laboratorio mejorado a nivel ' + s.player.labLevel, 'ok');
+      updateHUD(); houseMenu();
+    };
+    document.getElementById('h_reset').onclick = () => {
+      if (confirm('¿Reiniciar TODO el progreso? Esto no se puede deshacer.')) { PH.state.reset(); location.reload(); }
+    };
+  }
+  function labUpgradeCost() { return G().player.labLevel * 2500; }
+
+  function eventsCodex() {
+    const evs = Object.values(PH.events.EVENTS);
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2>☄️ Códice de eventos raros</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">
+          <p class="dim">Fenómenos temporales que alteran apariciones y mutaciones. Aparecen al azar mientras exploras.</p>
+          ${evs.map(e => `<div class="ev-row"><span class="ev-ico">${e.icon}</span><div><b>${e.name}</b><small>${e.desc}</small></div></div>`).join('')}
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = houseMenu;
+  }
+
+  PH.ui = {
+    init, toast, updateHUD, open, close, isOpen,
+    dialog, dialogNext, encounter, bag, bank, catalog, lab, shop, quests, placeMenu, greenhouse,
+    specimenCard, paintPlant,
+    get mode() { return PH.game ? PH.game.mode : 'overworld'; }
+  };
+})(window.PH = window.PH || {});
+
+/* ==== src/game.js ==== */
+/* ============================================================
+   PHENO HUNTER — game.js
+   Bucle principal, entrada, movimiento por rejilla, cámara,
+   render del mundo, interacción con NPC/warps y encuentros.
+   ============================================================ */
+(function (PH) {
+  'use strict';
+  const { clamp } = PH.util;
+  const R = PH.render;
+  const World = PH.world;
+  const G = () => PH.state.get();
+
+  const game = {
+    mode: 'boot',     // boot | title | overworld | menu | dialog | encounter
+    canvas: null, ctx: null,
+    scale: 3,
+    // interpolación de movimiento
+    moving: false, from: null, to: null, moveT: 0, moveDur: 150,
+    frame: 0, animT: 0,
+    keys: {},
+    lastSave: 0,
+    npcAnimT: 0,
+  };
+  PH.game = game;
+
+  function init() {
+    game.canvas = document.getElementById('screen');
+    game.ctx = game.canvas.getContext('2d');
+    game.ctx.imageSmoothingEnabled = false;
+    if (PH.sprites) PH.sprites.preload();
+    PH.ui.init();
+    bindInput();
+    resize();
+    window.addEventListener('resize', resize);
+    titleScreen();
+    requestAnimationFrame(loop);
+  }
+
+  function resize() {
+    // Ajusta la escala del canvas a la ventana manteniendo píxeles nítidos
+    const maxW = window.innerWidth - 24, maxH = window.innerHeight - 120;
+    const sc = Math.max(2, Math.floor(Math.min(maxW / R.W, maxH / R.H)));
+    game.scale = sc;
+    game.canvas.width = R.W; game.canvas.height = R.H;
+    game.canvas.style.width = (R.W * sc) + 'px';
+    game.canvas.style.height = (R.H * sc) + 'px';
+    game.ctx.imageSmoothingEnabled = false;
+  }
+
+  /* ---------------- Título ---------------- */
+  function titleScreen() {
+    game.mode = 'title';
+    const ov = document.getElementById('overlay');
+    ov.className = 'active title';
+    const cont = PH.state.hasSave() ? '<button class="btn primary big" id="t_continue">Continuar</button>' : '';
+    ov.innerHTML = `
+      <div class="title-screen">
+        <div class="logo">PHENO<span>HUNTER</span></div>
+        <div class="tagline">Explora · Descubre · Preserva · Cruza</div>
+        <div class="title-art"><canvas id="title_canvas" width="200" height="120"></canvas></div>
+        <div class="title-btns">
+          ${cont}
+          <button class="btn ${cont ? 'ghost' : 'primary'} big" id="t_new">Nueva partida</button>
+        </div>
+        <div class="title-help">Mover: WASD / Flechas · Interactuar/Confirmar: Espacio o E<br>
+          I Mochila · B Banco · C Catálogo · L Laboratorio · G Invernadero · Q Misiones · M Guardar</div>
+      </div>`;
+    // arte: pequeño jardín de fenotipos aleatorios
+    const c = document.getElementById('title_canvas'); const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = '#20351f'; ctx.fillRect(0, 0, c.width, c.height);
+    for (let i = 0; i < 6; i++) {
+      const sp = PH.species.rollEncounter(PH.util.RNG.pick(['pradera', 'bosque', 'pantano']), G().env);
+      R.drawPlant(ctx, 20 + i * 30, 108, sp.pheno, 1.6, performance.now());
+    }
+    if (cont) document.getElementById('t_continue').onclick = () => { PH.state.load(); startGame(); };
+    document.getElementById('t_new').onclick = () => { PH.state.reset(); startGame(); };
+  }
+
+  function startGame() {
+    PH.ui.close();
+    game.mode = 'overworld';
+    const s = G();
+    // asegura posición válida
+    const map = World.MAPS[s.player.map];
+    PH.ui.updateHUD();
+    PH.ui.toast('¡Bienvenido, Pheno Hunter!', 'ok');
+  }
+
+  /* ---------------- Entrada ---------------- */
+  function bindInput() {
+    window.addEventListener('keydown', (e) => {
+      const k = e.key.toLowerCase();
+      game.keys[k] = true;
+      // Confirmaciones de diálogo/encuentro
+      if (game.mode === 'dialog' && (k === ' ' || k === 'e' || k === 'enter')) { e.preventDefault(); PH.ui.dialogNext(); return; }
+      if (game.mode === 'title') return;
+      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
+
+      if (game.mode === 'overworld') {
+        if (k === ' ' || k === 'e') interact();
+        else if (k === 'i') PH.ui.bag();
+        else if (k === 'b') PH.ui.bank();
+        else if (k === 'c') PH.ui.catalog();
+        else if (k === 'q') PH.ui.quests();
+        else if (k === 'm') { PH.state.save(); PH.ui.toast('Partida guardada.', 'ok'); }
+        else if (k === 'l') PH.ui.lab();
+        else if (k === 'g') PH.ui.greenhouse();
+      } else if (game.mode === 'menu') {
+        if (k === 'escape' || k === 'i' || k === 'b' || k === 'c' || k === 'q') PH.ui.close();
+      }
+    });
+    window.addEventListener('keyup', (e) => { game.keys[e.key.toLowerCase()] = false; });
+
+    // Controles táctiles
+    document.querySelectorAll('[data-key]').forEach(btn => {
+      const key = btn.dataset.key;
+      const press = (v) => { game.keys[key] = v; if (v) simulateKey(key); };
+      btn.addEventListener('touchstart', (e) => { e.preventDefault(); press(true); });
+      btn.addEventListener('touchend', (e) => { e.preventDefault(); game.keys[key] = false; });
+      btn.addEventListener('mousedown', () => press(true));
+      btn.addEventListener('mouseup', () => { game.keys[key] = false; });
+      btn.addEventListener('mouseleave', () => { game.keys[key] = false; });
+    });
+  }
+  function simulateKey(key) {
+    if (game.mode === 'dialog' && (key === ' ')) { PH.ui.dialogNext(); return; }
+    if (game.mode === 'overworld' && key === ' ') interact();
+    if (game.mode === 'overworld' && key === 'i') PH.ui.bag();
+    if (game.mode === 'overworld' && key === 'b') PH.ui.bank();
+    if (game.mode === 'overworld' && key === 'c') PH.ui.catalog();
+  }
+
+  /* ---------------- Interacción ---------------- */
+  function facingTile() {
+    const s = G().player;
+    let x = s.x, y = s.y;
+    if (s.dir === 'up') y--; else if (s.dir === 'down') y++;
+    else if (s.dir === 'left') x--; else if (s.dir === 'right') x++;
+    return { x, y };
+  }
+  function interact() {
+    const s = G();
+    const map = World.MAPS[s.player.map];
+    if (!map) return;
+    const f = facingTile();
+    // NPC?
+    const npc = (map.npcs || []).find(n => n.x === f.x && n.y === f.y);
+    if (npc) {
+      const pages = PH.quests.DIALOGS[npc.dialog] ? PH.quests.DIALOGS[npc.dialog](s) : ['...'];
+      PH.ui.dialog(pages);
+      return;
+    }
+    // warp de puerta al frente (edificios)?
+    const w = World.warpAt(map, f.x, f.y);
+    if (w && String(w.to).startsWith('@')) { PH.ui.placeMenu(w.to); }
+  }
+
+  /* ---------------- Movimiento ---------------- */
+  function tryMove() {
+    if (game.moving || game.mode !== 'overworld') return;
+    const s = G().player;
+    let dx = 0, dy = 0, dir = s.dir;
+    if (game.keys['arrowup'] || game.keys['w']) { dy = -1; dir = 'up'; }
+    else if (game.keys['arrowdown'] || game.keys['s']) { dy = 1; dir = 'down'; }
+    else if (game.keys['arrowleft'] || game.keys['a']) { dx = -1; dir = 'left'; }
+    else if (game.keys['arrowright'] || game.keys['d']) { dx = 1; dir = 'right'; }
+    else return;
+    s.dir = dir;
+    const map = World.MAPS[s.player ? s.player.map : G().player.map] || World.MAPS[G().player.map];
+    const cur = World.MAPS[G().player.map];
+    const nx = s.x + dx, ny = s.y + dy;
+
+    // warp por pisar celda numérica
+    const warp = World.warpAt(cur, nx, ny);
+    if (warp && !String(warp.to).startsWith('@')) {
+      // comprobar desbloqueo por prestigio para regiones
+      if (!PH.state.unlocked(warp.to)) {
+        PH.ui.toast('🔒 Necesitas más prestigio para acceder aquí.', 'bad');
+        return;
+      }
+      doWarp(warp);
+      return;
+    }
+    if (warp && String(warp.to).startsWith('@')) { PH.ui.placeMenu(warp.to); return; }
+
+    if (World.solidAt(cur, nx, ny)) return; // pared
+    // NPC bloquea
+    if ((cur.npcs || []).some(n => n.x === nx && n.y === ny)) return;
+
+    game.moving = true; game.moveT = 0;
+    game.from = { x: s.x, y: s.y };
+    game.to = { x: nx, y: ny };
+  }
+
+  function finishMove() {
+    const s = G().player;
+    s.x = game.to.x; s.y = game.to.y;
+    game.moving = false;
+    G().stats.distance++;
+    // ¿encuentro?
+    const map = World.MAPS[s.map];
+    if (map.biome && World.encounterAt(map, s.x, s.y)) {
+      const p = PH.encounter.encounterChance(map.biome);
+      if (PH.util.RNG.chance(p)) {
+        if (G().player.cebosActivos > 0) G().player.cebosActivos--;
+        const wild = PH.species.rollEncounter(map.biome, G().env);
+        PH.ui.encounter(wild);
+      }
+    }
+  }
+
+  function doWarp(warp) {
+    const s = G().player;
+    const target = World.MAPS[warp.to];
+    if (!target) return;
+    s.map = warp.to;
+    s.x = warp.x != null ? warp.x : target.spawn.x;
+    s.y = warp.y != null ? warp.y : target.spawn.y;
+    game.moving = false;
+    PH.ui.updateHUD();
+    PH.ui.toast('📍 ' + target.name, '');
+  }
+
+  /* ---------------- Comprobación de misiones tras acciones ---------------- */
+  game.afterQuestCheck = function () {
+    const done = PH.quests.checkAll();
+    for (const q of done) {
+      PH.ui.toast(`✅ Misión completada: ${q.name}`, 'ok');
+    }
+    PH.ui.updateHUD();
+  };
+
+  /* ---------------- Bucle ---------------- */
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(50, now - last); last = now;
+    game.animT += dt; game.npcAnimT += dt;
+    if (game.animT > 260) { game.frame ^= 1; game.animT = 0; }
+
+    if (game.mode === 'overworld' || game.mode === 'menu' || game.mode === 'dialog' || game.mode === 'encounter') {
+      PH.state.updateEnv(dt);
+      if (PH.events) PH.events.update(dt);
+      if (PH.garden) PH.garden.update(dt);
+    }
+    if (game.mode === 'overworld') {
+      tryMove();
+      if (game.moving) {
+        game.moveT += dt;
+        if (game.moveT >= game.moveDur) finishMove();
+      }
+      // autosave cada 20s
+      if (now - game.lastSave > 20000) { PH.state.save(); game.lastSave = now; }
+    }
+
+    if (game.mode !== 'title' && game.mode !== 'boot') render();
+    // refresco de HUD ligero
+    if (game.mode === 'overworld' && (game.frame === 0)) PH.ui.updateHUD();
+
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------------- Render del mundo ---------------- */
+  function render() {
+    const ctx = game.ctx;
+    const s = G().player;
+    const map = World.MAPS[s.map];
+    if (!map) return;
+    const dims = World.dims(map);
+
+    // posición interpolada del jugador (en px)
+    let pxp, pyp;
+    if (game.moving) {
+      const t = clamp(game.moveT / game.moveDur, 0, 1);
+      pxp = PH.util.lerp(game.from.x, game.to.x, t) * R.TS;
+      pyp = PH.util.lerp(game.from.y, game.to.y, t) * R.TS;
+    } else { pxp = s.x * R.TS; pyp = s.y * R.TS; }
+
+    // cámara centrada
+    let camX = pxp - (R.W / 2 - R.TS / 2);
+    let camY = pyp - (R.H / 2 - R.TS / 2);
+    camX = clamp(camX, 0, Math.max(0, dims.w * R.TS - R.W));
+    camY = clamp(camY, 0, Math.max(0, dims.h * R.TS - R.H));
+
+    ctx.fillStyle = '#101418'; ctx.fillRect(0, 0, R.W, R.H);
+
+    const x0 = Math.floor(camX / R.TS), y0 = Math.floor(camY / R.TS);
+    for (let ty = y0 - 1; ty <= y0 + R.VH + 1; ty++) {
+      for (let tx = x0 - 1; tx <= x0 + R.VW + 1; tx++) {
+        const ch = World.tileAt(map, tx, ty);
+        const sx = tx * R.TS - camX, sy = ty * R.TS - camY;
+        R.drawTile(ctx, ch, sx, sy, map.theme, PH.world.TILE[ch]);
+      }
+    }
+
+    // NPCs
+    for (const n of (map.npcs || [])) {
+      const sx = n.x * R.TS - camX, sy = n.y * R.TS - camY;
+      if (sx < -R.TS || sx > R.W || sy < -R.TS || sy > R.H) continue;
+      R.drawActor(ctx, sx, sy, 'down', (game.npcAnimT / 500 | 0) % 2, R.NPC_PALETTES[n.sprite]);
+      // nombre
+      ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(sx - 4, sy - 8, n.name.length * 3 + 6, 7);
+      ctx.fillStyle = '#fff'; ctx.font = '5px monospace'; ctx.textAlign = 'left';
+      ctx.fillText(n.name, sx - 1, sy - 2);
+    }
+
+    // Jugador
+    const psx = pxp - camX, psy = pyp - camY;
+    R.drawActor(ctx, psx, psy, s.dir, game.moving ? game.frame : 0,
+      { skin: '#f0c088', hair: '#3a2a1a', shirt: '#2f9e6b', pants: '#33333f' });
+
+    // Overlays ambientales
+    applyEnvOverlay(ctx);
+  }
+
+  function applyEnvOverlay(ctx) {
+    const env = G().env;
+    // tinte día/noche
+    let a = 0, col = '0,0,20';
+    const t = env.time;
+    if (t < 5 * 60) a = 0.45;
+    else if (t < 7 * 60) a = PH.util.lerp(0.45, 0, (t - 300) / 120);
+    else if (t < 18 * 60) a = 0;
+    else if (t < 20 * 60) a = PH.util.lerp(0, 0.4, (t - 1080) / 120);
+    else a = 0.45;
+    if (a > 0) { ctx.fillStyle = `rgba(${col},${a})`; ctx.fillRect(0, 0, R.W, R.H); }
+
+    // clima
+    if (env.weather === 'niebla') { ctx.fillStyle = 'rgba(200,205,215,0.28)'; ctx.fillRect(0, 0, R.W, R.H); }
+    else if (env.weather === 'nublado') { ctx.fillStyle = 'rgba(120,125,135,0.14)'; ctx.fillRect(0, 0, R.W, R.H); }
+    else if (env.weather === 'ola_calor') { ctx.fillStyle = 'rgba(255,160,60,0.10)'; ctx.fillRect(0, 0, R.W, R.H); }
+    if (env.weather === 'lluvia' || env.weather === 'tormenta') drawRain(ctx, env.weather === 'tormenta');
+
+    // tinte y partículas de evento raro
+    if (PH.events) {
+      const tint = PH.events.tint && PH.events.tint();
+      if (tint) { ctx.fillStyle = tint; ctx.fillRect(0, 0, R.W, R.H); }
+      const parts = PH.events.particles && PH.events.particles();
+      if (parts) drawParticles(ctx, parts);
+    }
+  }
+
+  let partSeed = [];
+  function drawParticles(ctx, kind) {
+    const n = 26;
+    if (partSeed.length !== n) { partSeed = []; for (let i = 0; i < n; i++) partSeed.push([Math.random() * R.W, Math.random() * R.H, 1 + Math.random() * 2, Math.random() * 6]); }
+    const t = performance.now();
+    for (const d of partSeed) {
+      if (kind === 'meteor') {
+        const y = (d[1] + (t * 0.12 * d[2]) % R.H) % R.H;
+        const x = (d[0] + (t * 0.06 * d[2]) % R.W) % R.W;
+        ctx.strokeStyle = 'rgba(255,220,160,0.8)'; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 4, y - 6); ctx.stroke();
+      } else if (kind === 'petal') {
+        const y = (d[1] + (t * 0.03 * d[2]) % R.H) % R.H;
+        const x = (d[0] + Math.sin((t + d[3] * 400) / 500) * 8) % R.W;
+        ctx.fillStyle = 'rgba(255,150,200,0.75)'; ctx.fillRect(x, y, 2, 2);
+      } else if (kind === 'spark') {
+        const x = (d[0] + Math.sin((t + d[3] * 300) / 600) * 6);
+        const y = (d[1] + Math.cos((t + d[3] * 300) / 700) * 6);
+        ctx.fillStyle = 'rgba(160,220,255,' + (0.4 + 0.4 * Math.abs(Math.sin(t / 300 + d[3]))) + ')';
+        ctx.fillRect(x, y, 1, 1);
+      }
+    }
+  }
+
+  let rainSeed = [];
+  function drawRain(ctx, heavy) {
+    const n = heavy ? 60 : 34;
+    if (rainSeed.length !== n) { rainSeed = []; for (let i = 0; i < n; i++) rainSeed.push([Math.random() * R.W, Math.random() * R.H, 2 + Math.random() * 3]); }
+    ctx.strokeStyle = heavy ? 'rgba(180,200,230,0.6)' : 'rgba(180,200,230,0.4)';
+    ctx.lineWidth = 1;
+    const t = performance.now();
+    for (const d of rainSeed) {
+      const y = (d[1] + (t * 0.35 * d[2]) % R.H) % R.H;
+      ctx.beginPath(); ctx.moveTo(d[0], y); ctx.lineTo(d[0] - 1, y + 4); ctx.stroke();
+    }
+    if (heavy && Math.random() < 0.01) { ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fillRect(0, 0, R.W, R.H); }
+  }
+
+  PH.game.init = init;
+  window.addEventListener('DOMContentLoaded', init);
+})(window.PH = window.PH || {});
+
+</script>
+</body>
+</html>
