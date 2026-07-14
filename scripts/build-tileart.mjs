@@ -1,10 +1,18 @@
 /* Empaqueta los tiles de suelo iso extraídos en src/tileart.js (base64). */
 import fs from 'node:fs'; import sharp from 'sharp';
 const MAP = { grass_a: 0, pavement: 1, zebra: 2, grass_c: 3, road: 4, plot_a: 5, grass_b: 6, road_x: 7, plot_b: 8, farmland: 9, road_corner: 10, plot_c: 11 };
+// Suelos de interior (sheet 9): parquet, baldosa gris y tierra de cultivo.
+const MAP9 = { parquet: 1, tile: 3, dirt: 8 };
 const MAXW = 128;
 const DATA = {};
 for (const [name, idx] of Object.entries(MAP)) {
   const f = `assets/ref/extracted/s01_${String(idx).padStart(2, '0')}.png`;
+  if (!fs.existsSync(f)) { console.warn('falta', f); continue; }
+  const buf = await sharp(f).resize({ width: MAXW, fit: 'inside', withoutEnlargement: true }).png({ compressionLevel: 9 }).toBuffer();
+  DATA[name] = 'data:image/png;base64,' + buf.toString('base64');
+}
+for (const [name, idx] of Object.entries(MAP9)) {
+  const f = `assets/ref/extracted/s09_${String(idx).padStart(2, '0')}.png`;
   if (!fs.existsSync(f)) { console.warn('falta', f); continue; }
   const buf = await sharp(f).resize({ width: MAXW, fit: 'inside', withoutEnlargement: true }).png({ compressionLevel: 9 }).toBuffer();
   DATA[name] = 'data:image/png;base64,' + buf.toString('base64');

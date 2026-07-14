@@ -19,7 +19,7 @@
   // grid: '.'=suelo  '#'=pared  ' '=vacío(bloqueado)  'D'=puerta(suelo)
   const ROOMS = {
     apt: {
-      id: 'apt', name: 'Tu Grow-Room', theme: 'room', wallH: 54, bg: '#1a120e',
+      id: 'apt', name: 'Tu Grow-Room', theme: 'room', wallH: 54, bg: '#1a120e', tiles: { '.': 'parquet', 'D': 'parquet' },
       pal: { floorA: '#c8a06a', floorB: '#bd9560', floorEdge: 'rgba(80,50,20,.35)', door: '#8a5a30', wall: { top: '#cfd6ac', left: '#96a074', right: '#b2bb90' } },
       rugPal: { col: '#9a4636', edge: '#6a2f26' },
       grid: [
@@ -48,7 +48,7 @@
     },
     // ---------------- CARPA INDOOR (instancia del Armario de Cultivo) ----------------
     tent: {
-      id: 'tent', name: 'Armario · Carpa Indoor', theme: 'room', wallH: 46, bg: '#0d0c10',
+      id: 'tent', name: 'Armario · Carpa Indoor', theme: 'room', wallH: 46, bg: '#0d0c10', tiles: { '.': 'tile', 'D': 'tile' },
       pal: { floorA: '#3a3630', floorB: '#332f2a', floorEdge: 'rgba(0,0,0,.45)', door: '#8a5a30', wall: { top: '#cbd0d6', left: '#8f949c', right: '#b0b5bd' } },
       grid: [
         '##########',
@@ -66,6 +66,7 @@
         { gx: 2, gy: 1, kind: 'duct', solid: true, label: 'Tubo de ventilación' },
         { gx: 7, gy: 1, kind: 'duct', solid: true, label: 'Tubo de ventilación' },
         { gx: 5, gy: 1, kind: 'extractor', solid: true, label: 'Extractor de aire' },
+        { gx: 8, gy: 1, kind: 'co2', solid: true, label: 'Bombona de CO₂' },
         { gx: 2, gy: 2, kind: 'slot', idx: 0, solid: true, label: 'Slot de cultivo' },
         { gx: 3, gy: 2, kind: 'slot', idx: 1, solid: true, label: 'Slot de cultivo' },
         { gx: 6, gy: 2, kind: 'slot', idx: 2, solid: true, label: 'Slot de cultivo' },
@@ -112,7 +113,7 @@
       wild: true, // 'g' = parterres con cepas silvestres
     },
     shop: {
-      id: 'shop', name: 'Mercado', theme: 'room', wallH: 50, bg: '#1c140e',
+      id: 'shop', name: 'Mercado', theme: 'room', wallH: 50, bg: '#1c140e', tiles: { '.': 'parquet', 'D': 'parquet' },
       pal: { floorA: '#cbb083', floorB: '#c0a476', floorEdge: 'rgba(90,60,25,.35)', door: '#8a5a30', wall: { top: '#c79a5e', left: '#8f6a38', right: '#a9803f' } },
       rugPal: { col: '#b0742f', edge: '#7a4c1e' },
       grid: [
@@ -131,14 +132,14 @@
       npcs: [{ gx: 5, gy: 1, name: 'Mercader', sprite: 'npc4', dialog: 'nomada', dir: 'SW', role: 'merchant', char: 'merchant' }],
       objects: [
         { gx: 3, gy: 1, kind: 'shop', solid: true, label: 'Mostrador' },
-        { gx: 7, gy: 1, kind: 'shop', solid: true, label: 'Mostrador' },
-        { gx: 2, gy: 4, kind: 'crate', solid: true, label: 'Caja' },
+        { gx: 7, gy: 1, kind: 'vitrina', solid: true, label: 'Vitrina expositora' },
+        { gx: 2, gy: 4, kind: 'shelf', solid: true, label: 'Estantería con tarros' },
         { gx: 8, gy: 4, kind: 'barrel', solid: true, label: 'Barril' },
         { gx: 2, gy: 6, kind: 'plant', solid: true, label: 'Planta' },
       ],
     },
     lab: {
-      id: 'lab', name: 'Laboratorio', theme: 'room', wallH: 52, bg: '#12161a',
+      id: 'lab', name: 'Laboratorio', theme: 'room', wallH: 52, bg: '#12161a', tiles: { '.': 'tile', 'D': 'tile' },
       pal: { floorA: '#c4ccd2', floorB: '#b8c1c8', floorEdge: 'rgba(60,80,95,.35)', door: '#7a8a96', wall: { top: '#dbe6ee', left: '#9fb4c2', right: '#c2d0da' } },
       rugPal: { col: '#3f7a6a', edge: '#2c564b' },
       grid: [
@@ -369,6 +370,7 @@
     if (PH.propart) PH.propart.preload();
     if (PH.tileart) PH.tileart.preload();
     if (PH.buildingart) PH.buildingart.preload();
+    if (PH.interiorart) PH.interiorart.preload();
     PH.ui.init();
     bindInput();
     resize();
@@ -549,7 +551,7 @@
   function useObject(o) {
     if (o.kind === 'grow') return PH.ui.greenhouse();
     if (o.kind === 'lab') return PH.ui.lab();
-    if (o.kind === 'shop') return PH.ui.shop();
+    if (o.kind === 'shop' || o.kind === 'vitrina') return PH.ui.shop();
     if (o.kind === 'pc') return pcMenu();
     if (o.kind === 'bed') { PH.state.save(); return PH.ui.toast('Descansas y guardas la partida.', 'ok'); }
     if (o.kind === 'closet') { A('warp'); return warp({ to: o.to, tgx: o.tgx, tgy: o.tgy }); }   // Armario -> Carpa Indoor
@@ -984,6 +986,21 @@
     ctx.drawImage(im, Math.round(sx - w / 2), Math.round(baseY - h), w, h);
     return true;
   }
+  // Mobiliario e interiores con sprite real del pack (billboard anclado a la baldosa).
+  const INTERIOR = {
+    shop: { name: 'counter', h: 50 }, shelf: { name: 'shelfjars', h: 48 },
+    vitrina: { name: 'vitrina', h: 46 }, extractor: { name: 'extractor', h: 44 },
+    duct: { name: 'duct', h: 30 }, co2: { name: 'co2', h: 46 }, tray: { name: 'tray', h: 30 },
+  };
+  function interiorObj(ctx, sx, sy, o) {
+    const def = INTERIOR[o.kind]; if (!def) return false;
+    const im = PH.interiorart && PH.interiorart.img(def.name);
+    if (!im || !im.complete || !im.naturalWidth) return false;
+    const h = def.h, w = Math.round(im.naturalWidth * (h / im.naturalHeight));
+    const baseY = sy + ISO.TH * 0.82;
+    ctx.drawImage(im, Math.round(sx - w / 2), Math.round(baseY - h), w, h);
+    return true;
+  }
   // Edificio: sprite grande anclado a la base del centro de su footprint (w×h).
   function drawBuilding(ctx, sx, sy, o) {
     const im = PH.buildingart && PH.buildingart.img(o.sprite);
@@ -998,7 +1015,8 @@
   }
   function drawObject(ctx, sx, sy, o) {
     if (o.kind === 'building' && drawBuilding(ctx, sx, sy, o)) return;   // edificio del pack
-    if (spriteObj(ctx, sx, sy, o)) return;   // atrezzo con sprite real del pack (prioridad)
+    if (spriteObj(ctx, sx, sy, o)) return;   // atrezzo exterior con sprite real del pack (prioridad)
+    if (o.kind !== 'slot' && interiorObj(ctx, sx, sy, o)) return;   // mobiliario de interior del pack
     if (PH.furniart && PH.furniart.has(o.kind)) {
       const done = drawFurni(ctx, sx, sy, o.kind, o.kind === 'grow' ? 40 : 48);
       if (o.kind === 'grow') {
@@ -1051,7 +1069,9 @@
       const st = game.tentSlot(o.idx);
       ISO.cube(ctx, sx, sy, 10, { top: '#5a4a3a', left: '#3a2f24', right: '#4a3d2e' });   // superficie de mesa
       if (st.hasPot) {
-        ISO.cube(ctx, sx, sy - 10, 8, { top: '#c07048', left: '#7a4028', right: '#9a5636' });   // maceta
+        const potIm = PH.interiorart && PH.interiorart.img('pot');
+        if (potIm && potIm.complete && potIm.naturalWidth) { const ph = 26, pw = Math.round(potIm.naturalWidth * (ph / potIm.naturalHeight)); ctx.drawImage(potIm, Math.round(sx - pw / 2), Math.round(sy + ISO.TH * 0.82 - ph), pw, ph); }
+        else ISO.cube(ctx, sx, sy - 10, 8, { top: '#c07048', left: '#7a4028', right: '#9a5636' });   // maceta (fallback)
         if (st.spec) {
           const stage = Math.min(4, Math.floor(st.grow / 25));
           const key = PH.plantart && PH.plantart.stageKey(st.spec.speciesId, stage);
