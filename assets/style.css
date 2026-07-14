@@ -315,6 +315,9 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 .cross-sign, .cross-eq { font-size: 1.4rem; color: var(--amber); }
 .newbadge { background: var(--gold); color: var(--on-accent); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
   padding: 7px 14px; border: 2px solid var(--outline); border-radius: var(--radius); margin-bottom: 10px; animation: pulse 1s infinite; }
+.blocked-badge { background: var(--danger); color: #fff; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+  padding: 7px 14px; border: 2px solid var(--outline); border-radius: var(--radius); margin-bottom: 10px; box-shadow: var(--bevel); }
+.newbadge.partial { background: var(--terra); color: var(--on-accent); animation: none; }
 @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
 
 /* ---------- Mercado ---------- */

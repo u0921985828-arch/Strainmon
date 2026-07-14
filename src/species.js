@@ -28,6 +28,49 @@
   }
   function canonicalCross(idA, idB) { return canonicalBySet([idA, idB]); }
 
+  // --- Motor de restricciones de cruce (cierre de matriz) ---
+  // Retrocruces estabilizados: única autopolinización válida (A×A). Del spec:
+  // sólo Bubblegum×Bubblegum = Sour Bubble.
+  const SELF_CROSS = { bubblegum: 'sour_bubble' };
+  // Clones / fenotipos aislados: NODOS de 1 parental que NO son retrocruce.
+  // No se obtienen por cruce; requieren "Selección fenotípica / esqueje" (ítem).
+  const CLONE_BY_PARENT = {};   // parentId -> [cloneId, ...]
+  const CLONE_IDS = new Set();
+  for (const s of SPECIES) {
+    if (s.parents && s.parents.length === 1) {
+      const p = s.parents[0];
+      if (SELF_CROSS[p] === s.id) continue;   // es retrocruce, no clon
+      (CLONE_BY_PARENT[p] = CLONE_BY_PARENT[p] || []).push(s.id);
+      CLONE_IDS.add(s.id);
+    }
+  }
+  function isClone(id) { return CLONE_IDS.has(id); }
+  function cloneOptions(speciesId) { return CLONE_BY_PARENT[speciesId] || []; }
+  // Selección fenotípica: sobre un nodo base, devuelve su clon (RNG si hay varios).
+  function phenotypeSelect(speciesId) {
+    const opts = CLONE_BY_PARENT[speciesId];
+    return (opts && opts.length) ? SPECIES_BY_ID[RNG.pick(opts)] : null;
+  }
+
+  // Resuelve un cruce según las reglas duras. Devuelve { node, reason }:
+  // reason: 'canon' (nodo del árbol), 'backcross' (retrocruce), 'self' (autopol.
+  // bloqueada), 'closed' (fuera de la matriz -> bloqueado, sin sprite procedural).
+  function resolveCross(setA, setB) {
+    if (setA.length === 1 && setB.length === 1 && setA[0] === setB[0]) {
+      const child = SELF_CROSS[setA[0]];
+      return child ? { node: SPECIES_BY_ID[child], reason: 'backcross' } : { node: null, reason: 'self' };
+    }
+    const union = [...new Set([...setA, ...setB])];
+    const node = canonicalBySet(union);
+    if (node) return { node, reason: 'canon', union };
+    // ¿progreso hacia un nodo multi-parental? (unión = subconjunto propio de sus
+    // parentales) -> intermedio oculto válido para encadenar fusiones (spec §3).
+    const toward = SPECIES.find(sp => sp.parents && sp.parents.length > union.length &&
+      union.every(u => sp.parents.includes(u)));
+    if (toward) return { node: null, reason: 'partial', union, toward };
+    return { node: null, reason: 'closed', union };
+  }
+
   // Biomas = regiones landrace del mundo.
   const BIOMES = {
     pradera:  { name: 'Altiplano de Michoacán', baseEncounter: 0.14 },
@@ -121,5 +164,5 @@
     return makeSpecimen(chosen, env, { form: 'salvaje', caughtAt: null });
   }
 
-  PH.species = { SPECIES, SPECIES_BY_ID, BIOMES, spawnTable, spawnWeight, spawnRarity, biomeChance, biomeOdds, makeSpecimen, rollEncounter, envMultiplier, canonicalCross, canonicalBySet };
+  PH.species = { SPECIES, SPECIES_BY_ID, BIOMES, spawnTable, spawnWeight, spawnRarity, biomeChance, biomeOdds, makeSpecimen, rollEncounter, envMultiplier, canonicalCross, canonicalBySet, resolveCross, isClone, cloneOptions, phenotypeSelect, CLONE_BY_PARENT };
 })(window.PH = window.PH || {});

@@ -24,6 +24,7 @@
         gear: [],                      // ids de equipo
         activeTool: 'frasco',
         cebosActivos: 0,               // encuentros con feromona
+        esquejes: 0,                   // kits de selección fenotípica (esqueje/clon)
         labLevel: 1,                   // mejora del laboratorio (mutaciones en cruce)
         heat: 0,                       // presión policial 0..100 (Fase 4)
         busts: 0,                      // veces pillado por la poli

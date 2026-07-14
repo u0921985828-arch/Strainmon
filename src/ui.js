@@ -277,17 +277,22 @@
     const sorted = s.bank.slice().sort((a, b) => b.rarity - a.rarity);
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2><i class="pic pic-helix"></i> Bóveda de cepas <small>${s.bank.length} muestras</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-helix"></i> Bóveda de cepas <small>${s.bank.length} muestras · <i class="pic pic-trash sm"></i>kits ${s.player.esquejes || 0}</small></h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body list">
-          ${sorted.map(sp => `
+          ${sorted.map(sp => {
+      const clones = PH.species.cloneOptions ? PH.species.cloneOptions(sp.speciesId) : [];
+      const canClip = clones.length && !sp.intermediate;
+      return `
             <div class="bank-row">
               ${specimenCard(sp)}
               <div class="bank-actions">
                 <button class="btn small" data-seq="${sp.uid}">${sp.sequenced ? '<i class="pic pic-doc sm"></i> ADN' : '<i class="pic pic-flask sm"></i> Secuenciar'}</button>
+                ${canClip ? `<button class="btn small" data-clip="${sp.uid}" title="Selección fenotípica (esqueje)"><i class="pic pic-sprout sm"></i> Esquejar</button>` : ''}
                 <button class="btn small" data-sell="${sp.uid}">Vender <i class="pic pic-coin sm"></i>${sellPrice(sp)}</button>
                 <button class="btn small ghost" data-rel="${sp.uid}">Liberar</button>
               </div>
-            </div>`).join('')}
+            </div>`;
+    }).join('')}
         </div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = close;
@@ -295,6 +300,7 @@
     overlay.querySelectorAll('[data-sell]').forEach(b => b.onclick = () => { sell(b.dataset.sell); bank(); });
     overlay.querySelectorAll('[data-rel]').forEach(b => b.onclick = () => { PH.state.bankRemove(b.dataset.rel); toast('Muestra liberada.'); bank(); });
     overlay.querySelectorAll('[data-seq]').forEach(b => b.onclick = () => sequencePanel(b.dataset.seq));
+    overlay.querySelectorAll('[data-clip]').forEach(b => b.onclick = () => cloneSelect(b.dataset.clip));
   }
 
   /* ---------------- INVESTIGACIÓN: SECUENCIACIÓN Y ADN ---------------- */
@@ -503,26 +509,33 @@
     const labBonus = 1 + (s.player.labLevel - 1) * 0.6; // mejoras de laboratorio
     const sameStrain = A.speciesId === B.speciesId;
     const purity = Math.max(0, Math.round(((A.purity != null ? A.purity : 100) + (B.purity != null ? B.purity : 100)) / 2 * (sameStrain ? 0.98 : 0.6)));
-    // Une las "recetas" de ambos parentales; si el conjunto coincide con un
-    // nodo del árbol (cualquier aridad), nace esa cepa. Habilita cadenas.
-    const union = [...new Set([...setOf(A), ...setOf(B)])];
-    const canon = PH.species.canonicalBySet ? PH.species.canonicalBySet(union) : null;
+    // CIERRE DE MATRIZ: une las "recetas" (strainSet) de ambos parentales y las
+    // resuelve contra el árbol. Sin nodo ni progreso -> cruce BLOQUEADO (sin
+    // sprite procedural). Autopolinización sólo válida como retrocruce.
+    const res = PH.species.resolveCross(setOf(A), setOf(B));
+    if (res.reason === 'self' || res.reason === 'closed') { breedSel = []; return crossBlocked(A, B, res.reason); }
+    const canon = res.node;   // null si es fusión parcial (intermedio)
     let spec;
     if (canon) {
-      // Cruce canónico: nace la cepa NOMBRADA del árbol (su genética oficial),
-      // y se desbloquea ese nodo en el Strain-dex.
+      // Cruce canónico / retrocruce: nace la cepa NOMBRADA del árbol (genética
+      // oficial) y se desbloquea ese nodo en el Strain-dex.
       spec = PH.species.makeSpecimen(canon, s.env, {
         form: 'cruce', quality: Math.round((A.quality + B.quality) / 2),
         parents: [A.uid, B.uid], generation: Math.max(A.generation, B.generation) + 1,
         purity: Math.max(purity, 70), landrace: false, strainSet: [canon.id],
       });
     } else {
-      const childGeno = PH.gen.breed(A.genotype, B.genotype, { mutRate: 0.08, mutBoost: labBonus });
+      // Fusión parcial: intermedio oculto que arrastra la receta acumulada
+      // hacia un nodo multi-parental. No es una cepa catalogada del árbol.
+      const childGeno = PH.gen.breed(A.genotype, B.genotype, { mutRate: 0.05, mutBoost: labBonus });
       spec = PH.species.makeSpecimen(PH.species.SPECIES_BY_ID[A.speciesId], s.env, {
         genotype: childGeno, form: 'cruce', quality: Math.round((A.quality + B.quality) / 2),
         parents: [A.uid, B.uid], generation: Math.max(A.generation, B.generation) + 1,
-        purity, landrace: sameStrain && purity >= 90, strainSet: union,
+        purity, landrace: false, strainSet: res.union,
       });
+      spec.intermediate = true;
+      spec.name = 'Fusión en progreso';
+      spec._toward = res.toward ? res.toward.name : '';
     }
     s.stats.crosses++;
     const before = Object.keys(s.catalog).length;
@@ -533,13 +546,80 @@
     crossResult(spec, isNew, A, B, canon);
     PH.game.afterQuestCheck();
   }
+  // Selección fenotípica / esqueje: aísla un clon élite de un nodo base (§4).
+  // No es hibridación; consume un "Kit de selección fenotípica".
+  function cloneSelect(uid) {
+    const s = G();
+    const sp = PH.state.bankGet(uid);
+    if (!sp) return;
+    const opts = PH.species.cloneOptions(sp.speciesId);
+    if (!opts.length) return;
+    if ((s.player.esquejes || 0) < 1) { toast('Necesitas un <b>Kit de selección fenotípica</b> (Mercado).', 'bad'); return; }
+    s.player.esquejes--;
+    const clone = PH.species.phenotypeSelect(sp.speciesId);
+    const spec = PH.species.makeSpecimen(clone, s.env, {
+      form: 'esqueje', quality: Math.min(100, sp.quality + 4),
+      parents: [sp.uid], generation: sp.generation, purity: Math.max(sp.purity || 100, 90),
+      landrace: false, strainSet: [clone.id],
+    });
+    const before = Object.keys(s.catalog).length;
+    PH.state.bankAdd(spec);
+    const isNew = Object.keys(s.catalog).length > before;
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2><i class="pic pic-sprout"></i> Selección fenotípica</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body center-col">
+          <div class="newbadge">${isNew ? '<i class="pic pic-nova sm"></i> ' : ''}FENOTIPO AISLADO: ${clone.name}</div>
+          <p class="dim">Has esquejado un clon élite de <b>${sp.name}</b>${opts.length > 1 ? ' (fenotipo al azar entre sus variantes)' : ''}.</p>
+          ${specimenCard(spec)}
+          <div class="row"><button class="btn primary" id="again">Volver a la bóveda</button></div>
+        </div>
+      </div>`, 'center');
+    paintPlant('pc_' + spec.uid, spec, 2.4);
+    document.getElementById('p_close').onclick = close;
+    document.getElementById('again').onclick = bank;
+    toast('<i class="pic pic-sprout sm"></i> Fenotipo aislado: ' + clone.name, 'ok');
+    updateHUD();
+  }
+
+  // Cruce fuera de la matriz: bloqueado (sin genética procedural).
+  function crossBlocked(A, B, reason) {
+    const s = G();
+    const sameId = A.speciesId === B.speciesId;
+    // ¿faltan parentales para completar un nodo? (pista de linaje)
+    const union = [...new Set([...setOf(A), ...setOf(B)])];
+    const near = PH.species.SPECIES.filter(sp => sp.parents && sp.parents.length >= 2 &&
+      union.every(u => sp.parents.includes(u)) && sp.parents.length > union.length)
+      .map(sp => sp.name).slice(0, 3);
+    const msg = reason === 'self'
+      ? `La autopolinización de <b>${A.name}</b> no está estabilizada: no produce un nodo del árbol. Sólo algunos retrocruces son viables.`
+      : `<b>${A.name} × ${B.name}</b> no corresponde a ningún nodo del árbol filogenético. En este mundo sólo son viables los cruces canónicos.`;
+    const hint = near.length ? `<p class="warn">Podría faltar linaje. Con esta combinación se acerca a: ${near.join(', ')} (necesita más parentales).</p>` : '';
+    open(`
+      <div class="panel">
+        <div class="panel-head"><h2><i class="pic pic-alert"></i> Cruce no viable</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body center-col">
+          <div class="blocked-badge"><i class="pic pic-alert sm"></i> CRUCE BLOQUEADO</div>
+          <p class="dim">${msg}</p>
+          ${hint}
+          <div class="row"><button class="btn primary" id="again">Volver al laboratorio</button></div>
+        </div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    document.getElementById('again').onclick = lab;
+    toast('<i class="pic pic-alert sm"></i> Cruce no viable: fuera de la matriz', 'bad');
+  }
+
   function crossResult(spec, isNew, A, B, canon) {
     open(`
       <div class="panel">
         <div class="panel-head"><h2><i class="pic pic-sprout"></i> Descendencia obtenida</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body center-col">
-          ${canon ? `<div class="newbadge"><i class="pic pic-helix sm"></i> ¡NODO DEL ÁRBOL: ${canon.name}!</div>` : (isNew ? '<div class="newbadge"><i class="pic pic-nova sm"></i> ¡FENOTIPO NUEVO PARA EL CATÁLOGO! <i class="pic pic-nova sm"></i></div>' : '<div class="dim">Fenotipo ya conocido.</div>')}
-          ${canon ? '<p class="dim">Cruce canónico reconocido: has replicado una genética del árbol filogenético.</p>' : ''}
+          ${canon ? `<div class="newbadge"><i class="pic pic-helix sm"></i> ¡NODO DEL ÁRBOL: ${canon.name}!</div>`
+            : (spec.intermediate ? '<div class="newbadge partial"><i class="pic pic-helix sm"></i> FUSIÓN PARCIAL</div>'
+            : (isNew ? '<div class="newbadge"><i class="pic pic-nova sm"></i> ¡FENOTIPO NUEVO PARA EL CATÁLOGO! <i class="pic pic-nova sm"></i></div>' : '<div class="dim">Fenotipo ya conocido.</div>'))}
+          ${canon ? '<p class="dim">Cruce canónico reconocido: has replicado una genética del árbol filogenético.</p>'
+            : (spec.intermediate ? `<p class="dim">Receta acumulada${spec._toward ? ` en camino hacia <b>${spec._toward}</b>` : ''}. Sigue cruzándola con los parentales que falten para completar el nodo.</p>` : '')}
           ${specimenCard(spec)}
           <p class="dim">Parentales: ${A.name} ✕ ${B.name}</p>
           <div class="row">
@@ -686,6 +766,7 @@
     if (s.player.credits < it.price) { toast('Créditos insuficientes.', 'bad'); return; }
     PH.state.addCredits(-it.price);
     if (kind === 'tool') { if (!s.player.tools.includes(id)) s.player.tools.push(id); }
+    else if (it.kind === 'esqueje') { s.player.esquejes = (s.player.esquejes || 0) + 1; }
     else if (it.consumable) { s.player.cebosActivos += 8; }
     else { if (!s.player.gear.includes(id)) s.player.gear.push(id); }
     toast('Comprado: ' + it.name, 'ok');
