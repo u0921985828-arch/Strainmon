@@ -103,7 +103,9 @@
       ],
     },
     park: {
-      id: 'park', name: 'Descampado', theme: 'street',
+      id: 'park', name: 'Descampado', theme: 'street', natural: true, borderKind: 'fence', bg: '#26241d',
+      pal: { floorA: '#9a8f6a', floorB: '#8f8460', floorEdge: 'rgba(45,38,20,.35)', door: '#8a5a30', wall: { top: '#9a8f6a', left: '#6f6748', right: '#82795a' } },
+      wildPal: { col: '#5f9e3a', edge: '#3d6b24' },
       grid: [
         '###########',
         '#.........#',
