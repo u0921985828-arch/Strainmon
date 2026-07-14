@@ -8,7 +8,7 @@ using System.Collections.Generic;
 public class AnimActor : MonoBehaviour
 {
     public string role = "player";
-    public float ppu = 40f;       // 96px / 40 ~= 2.4u de lienzo (personaje detallado)
+    public float ppu = 56f;       // 96px/56 ~= 1.7u -> proporción ~1.5 tiles
     public float fps = 9f;
 
     static readonly string[] DIRS = { "down", "up", "left", "right" };
