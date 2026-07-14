@@ -11,3 +11,6 @@ assets/gen/
 
 assets/gen_plants/
 assets/gen_sheets/
+
+# Salida cruda de Pixellab (curar antes de versionar)
+assets/gen_pixellab/

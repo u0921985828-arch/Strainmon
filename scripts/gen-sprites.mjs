@@ -32,9 +32,14 @@ async function listModels(key) {
   return (j.models || []).map(m => m.name.replace('models/', ''));
 }
 
-async function genImage(key, text, model) {
+async function genImage(key, text, model, refBuf) {
+  // refBuf: imagen de referencia opcional (para mantener consistencia de personaje
+  // entre direcciones). Se envía como parte inlineData antes del texto.
+  const parts = [];
+  if (refBuf) parts.push({ inlineData: { mimeType: 'image/png', data: refBuf.toString('base64') } });
+  parts.push({ text });
   const body = {
-    contents: [{ parts: [{ text }] }],
+    contents: [{ parts }],
     generationConfig: { responseModalities: ['IMAGE'] },
   };
   const r = await fetch(API(model, key), {
@@ -42,9 +47,9 @@ async function genImage(key, text, model) {
   });
   const j = await r.json();
   if (!r.ok) throw new Error('gen ' + r.status + ' ' + JSON.stringify(j.error || j).slice(0, 300));
-  const parts = j.candidates?.[0]?.content?.parts || [];
-  const img = parts.find(p => p.inlineData?.data);
-  if (!img) throw new Error('sin imagen en respuesta: ' + JSON.stringify(parts).slice(0, 200));
+  const respParts = j.candidates?.[0]?.content?.parts || [];
+  const img = respParts.find(p => p.inlineData?.data);
+  if (!img) throw new Error('sin imagen en respuesta: ' + JSON.stringify(respParts).slice(0, 200));
   return Buffer.from(img.inlineData.data, 'base64');
 }
 
@@ -65,14 +70,23 @@ async function main() {
 
   if (!promptsFile) { console.log('ℹ️  Sin archivo de prompts: solo diagnóstico. Pasa un JSON [{name,prompt}] para generar.'); return; }
   const jobs = JSON.parse(fs.readFileSync(promptsFile, 'utf8'));
+  const RESUME = process.env.GEN_RESUME === '1'; // salta los que ya existen
   for (const job of jobs) {
     try {
+      const out = path.join(outDir, job.name.endsWith('.png') ? job.name : job.name + '.png');
+      if (RESUME && fs.existsSync(out)) { console.log('↷ salto (existe):', job.name); continue; }
       // job.raw = usar el prompt tal cual (sin sufijo magenta); útil para láminas con fondo negro.
       const text = job.raw ? job.prompt : job.prompt + SUFFIX;
-      const buf = await genImage(key, text, model);
-      const out = path.join(outDir, job.name.endsWith('.png') ? job.name : job.name + '.png');
+      // job.ref = nombre de archivo (en outDir) usado como imagen de referencia.
+      let refBuf;
+      if (job.ref) {
+        const rp = path.isAbsolute(job.ref) ? job.ref : path.join(outDir, job.ref);
+        if (fs.existsSync(rp)) refBuf = fs.readFileSync(rp);
+        else console.warn('   (ref no encontrada, genero sin ella):', job.ref);
+      }
+      const buf = await genImage(key, text, model, refBuf);
       fs.writeFileSync(out, buf);
-      console.log('🖼️  ', path.relative(ROOT, out), '(' + (buf.length / 1024).toFixed(1) + ' KB)');
+      console.log('🖼️  ', path.relative(ROOT, out), '(' + (buf.length / 1024).toFixed(1) + ' KB)' + (refBuf ? ' [ref]' : ''));
     } catch (e) {
       console.error('⚠️  ', job.name, '→', e.message);
     }
