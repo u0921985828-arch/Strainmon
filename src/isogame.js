@@ -200,6 +200,7 @@
     game.ctx = game.canvas.getContext('2d');
     if (PH.sprites) PH.sprites.preload();
     if (PH.plantart) PH.plantart.preload();
+    if (PH.strainart) PH.strainart.preload();
     if (PH.charart) PH.charart.preload();
     if (PH.furniart) PH.furniart.preload();
     PH.ui.init();

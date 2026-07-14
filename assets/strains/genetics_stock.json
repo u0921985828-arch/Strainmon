@@ -1,0 +1,948 @@
+{
+  "tiers": {
+    "0": "Landraces / base",
+    "1": "Híbridas fundacionales",
+    "2": "Híbridas clásicas / nodos estructurales",
+    "3": "Polihíbridos intermedios",
+    "4": "Polihíbridos modernos"
+  },
+  "count": 100,
+  "strains": [
+    {
+      "id": "afghani",
+      "name": "Afghani",
+      "tier": 0,
+      "type": "indica",
+      "parents": []
+    },
+    {
+      "id": "hindu_kush",
+      "name": "Hindu Kush",
+      "tier": 0,
+      "type": "indica",
+      "parents": []
+    },
+    {
+      "id": "thai",
+      "name": "Thai",
+      "tier": 0,
+      "type": "sativa",
+      "parents": []
+    },
+    {
+      "id": "colombian_gold",
+      "name": "Colombian Gold",
+      "tier": 0,
+      "type": "sativa",
+      "parents": []
+    },
+    {
+      "id": "acapulco_gold",
+      "name": "Acapulco Gold",
+      "tier": 0,
+      "type": "sativa",
+      "parents": []
+    },
+    {
+      "id": "panama_red",
+      "name": "Panama Red",
+      "tier": 0,
+      "type": "sativa",
+      "parents": []
+    },
+    {
+      "id": "durban_poison",
+      "name": "Durban Poison",
+      "tier": 0,
+      "type": "sativa",
+      "parents": []
+    },
+    {
+      "id": "malawi_gold",
+      "name": "Malawi Gold",
+      "tier": 0,
+      "type": "sativa",
+      "parents": []
+    },
+    {
+      "id": "south_indian",
+      "name": "South Indian",
+      "tier": 0,
+      "type": "hybrid",
+      "parents": []
+    },
+    {
+      "id": "nepalese",
+      "name": "Nepalese",
+      "tier": 0,
+      "type": "sativa",
+      "parents": []
+    },
+    {
+      "id": "hawaiian_sativa",
+      "name": "Hawaiian Sativa",
+      "tier": 0,
+      "type": "sativa",
+      "parents": []
+    },
+    {
+      "id": "mexican_sativa",
+      "name": "Mexican Sativa",
+      "tier": 0,
+      "type": "sativa",
+      "parents": []
+    },
+    {
+      "id": "brazilian_sativa",
+      "name": "Brazilian Sativa",
+      "tier": 0,
+      "type": "sativa",
+      "parents": []
+    },
+    {
+      "id": "cambodian",
+      "name": "Cambodian",
+      "tier": 0,
+      "type": "sativa",
+      "parents": []
+    },
+    {
+      "id": "burmese_kush",
+      "name": "Burmese Kush",
+      "tier": 0,
+      "type": "indica",
+      "parents": []
+    },
+    {
+      "id": "alien_technology",
+      "name": "Alien Technology",
+      "tier": 0,
+      "type": "indica",
+      "parents": []
+    },
+    {
+      "id": "na_indica",
+      "name": "North American Indica",
+      "tier": 0,
+      "type": "indica",
+      "parents": []
+    },
+    {
+      "id": "strawberry_fields",
+      "name": "Strawberry Fields",
+      "tier": 0,
+      "type": "indica",
+      "parents": []
+    },
+    {
+      "id": "indiana_bubblegum",
+      "name": "Indiana Bubblegum",
+      "tier": 0,
+      "type": "hybrid",
+      "parents": []
+    },
+    {
+      "id": "chocolate_trip",
+      "name": "Chocolate Trip",
+      "tier": 0,
+      "type": "hybrid",
+      "parents": []
+    },
+    {
+      "id": "sativa_desconocida",
+      "name": "Sativa Desconocida",
+      "tier": 0,
+      "type": "sativa",
+      "parents": []
+    },
+    {
+      "id": "g13",
+      "name": "G13",
+      "tier": 1,
+      "type": "indica",
+      "parents": [
+        "afghani"
+      ]
+    },
+    {
+      "id": "skunk1",
+      "name": "Skunk #1",
+      "tier": 1,
+      "type": "hybrid",
+      "parents": [
+        "afghani",
+        "acapulco_gold",
+        "colombian_gold"
+      ]
+    },
+    {
+      "id": "haze",
+      "name": "Haze",
+      "tier": 1,
+      "type": "sativa",
+      "parents": [
+        "colombian_gold",
+        "thai",
+        "mexican_sativa",
+        "south_indian"
+      ]
+    },
+    {
+      "id": "northern_lights",
+      "name": "Northern Lights",
+      "tier": 1,
+      "type": "indica",
+      "parents": [
+        "afghani",
+        "thai"
+      ]
+    },
+    {
+      "id": "chemdawg",
+      "name": "Chemdawg",
+      "tier": 1,
+      "type": "hybrid",
+      "parents": [
+        "thai",
+        "nepalese"
+      ]
+    },
+    {
+      "id": "nl5",
+      "name": "NL #5",
+      "tier": 1,
+      "type": "indica",
+      "parents": [
+        "northern_lights"
+      ]
+    },
+    {
+      "id": "haze_a",
+      "name": "Haze A",
+      "tier": 1,
+      "type": "sativa",
+      "parents": [
+        "haze"
+      ]
+    },
+    {
+      "id": "cheese",
+      "name": "Cheese",
+      "tier": 1,
+      "type": "hybrid",
+      "parents": [
+        "skunk1"
+      ]
+    },
+    {
+      "id": "lemon_thai",
+      "name": "Lemon Thai",
+      "tier": 1,
+      "type": "sativa",
+      "parents": [
+        "thai",
+        "hawaiian_sativa"
+      ]
+    },
+    {
+      "id": "mendocino_purps",
+      "name": "Mendocino Purps",
+      "tier": 1,
+      "type": "indica",
+      "parents": [
+        "na_indica"
+      ]
+    },
+    {
+      "id": "bubblegum",
+      "name": "Bubblegum",
+      "tier": 1,
+      "type": "hybrid",
+      "parents": [
+        "indiana_bubblegum",
+        "na_indica"
+      ]
+    },
+    {
+      "id": "super_skunk",
+      "name": "Super Skunk",
+      "tier": 2,
+      "type": "hybrid",
+      "parents": [
+        "skunk1",
+        "afghani"
+      ]
+    },
+    {
+      "id": "white_widow",
+      "name": "White Widow",
+      "tier": 2,
+      "type": "hybrid",
+      "parents": [
+        "brazilian_sativa",
+        "south_indian"
+      ]
+    },
+    {
+      "id": "ak47",
+      "name": "AK-47",
+      "tier": 2,
+      "type": "hybrid",
+      "parents": [
+        "colombian_gold",
+        "mexican_sativa",
+        "thai",
+        "afghani"
+      ]
+    },
+    {
+      "id": "blueberry",
+      "name": "Blueberry",
+      "tier": 2,
+      "type": "indica",
+      "parents": [
+        "afghani",
+        "thai",
+        "mexican_sativa"
+      ]
+    },
+    {
+      "id": "jack_herer",
+      "name": "Jack Herer",
+      "tier": 2,
+      "type": "sativa",
+      "parents": [
+        "haze",
+        "nl5",
+        "skunk1"
+      ]
+    },
+    {
+      "id": "super_silver_haze",
+      "name": "Super Silver Haze",
+      "tier": 2,
+      "type": "sativa",
+      "parents": [
+        "haze",
+        "northern_lights",
+        "skunk1"
+      ]
+    },
+    {
+      "id": "og_kush",
+      "name": "OG Kush",
+      "tier": 2,
+      "type": "hybrid",
+      "parents": [
+        "chemdawg",
+        "lemon_thai",
+        "hindu_kush"
+      ]
+    },
+    {
+      "id": "sour_diesel",
+      "name": "Sour Diesel",
+      "tier": 2,
+      "type": "sativa",
+      "parents": [
+        "chemdawg",
+        "super_skunk"
+      ]
+    },
+    {
+      "id": "amnesia_haze",
+      "name": "Amnesia Haze",
+      "tier": 2,
+      "type": "sativa",
+      "parents": [
+        "haze",
+        "afghani",
+        "hawaiian_sativa"
+      ]
+    },
+    {
+      "id": "big_bud",
+      "name": "Big Bud",
+      "tier": 2,
+      "type": "indica",
+      "parents": [
+        "afghani",
+        "skunk1"
+      ]
+    },
+    {
+      "id": "critical_mass",
+      "name": "Critical Mass",
+      "tier": 2,
+      "type": "indica",
+      "parents": [
+        "big_bud"
+      ]
+    },
+    {
+      "id": "master_kush",
+      "name": "Master Kush",
+      "tier": 2,
+      "type": "indica",
+      "parents": [
+        "hindu_kush",
+        "skunk1"
+      ]
+    },
+    {
+      "id": "kali_mist",
+      "name": "Kali Mist",
+      "tier": 2,
+      "type": "sativa",
+      "parents": [
+        "cambodian",
+        "thai",
+        "afghani",
+        "colombian_gold"
+      ]
+    },
+    {
+      "id": "trainwreck",
+      "name": "Trainwreck",
+      "tier": 2,
+      "type": "sativa",
+      "parents": [
+        "mexican_sativa",
+        "thai",
+        "afghani"
+      ]
+    },
+    {
+      "id": "shiva_skunk",
+      "name": "Shiva Skunk",
+      "tier": 2,
+      "type": "indica",
+      "parents": [
+        "nl5",
+        "skunk1"
+      ]
+    },
+    {
+      "id": "purple_urkle",
+      "name": "Purple Urkle",
+      "tier": 2,
+      "type": "indica",
+      "parents": [
+        "mendocino_purps"
+      ]
+    },
+    {
+      "id": "ghost_og",
+      "name": "Ghost OG",
+      "tier": 2,
+      "type": "hybrid",
+      "parents": [
+        "og_kush"
+      ]
+    },
+    {
+      "id": "sfv_og",
+      "name": "SFV OG",
+      "tier": 2,
+      "type": "hybrid",
+      "parents": [
+        "og_kush"
+      ]
+    },
+    {
+      "id": "fire_og",
+      "name": "Fire OG",
+      "tier": 2,
+      "type": "hybrid",
+      "parents": [
+        "og_kush"
+      ]
+    },
+    {
+      "id": "face_off_og",
+      "name": "Face Off OG",
+      "tier": 2,
+      "type": "indica",
+      "parents": [
+        "og_kush"
+      ]
+    },
+    {
+      "id": "triangle_kush",
+      "name": "Triangle Kush",
+      "tier": 2,
+      "type": "hybrid",
+      "parents": [
+        "og_kush"
+      ]
+    },
+    {
+      "id": "tahoe_og",
+      "name": "Tahoe OG",
+      "tier": 2,
+      "type": "hybrid",
+      "parents": [
+        "og_kush"
+      ]
+    },
+    {
+      "id": "florida_kush",
+      "name": "Florida Kush",
+      "tier": 2,
+      "type": "indica",
+      "parents": [
+        "og_kush"
+      ]
+    },
+    {
+      "id": "ecsd",
+      "name": "East Coast Sour Diesel",
+      "tier": 2,
+      "type": "sativa",
+      "parents": [
+        "sour_diesel"
+      ]
+    },
+    {
+      "id": "chems_sister",
+      "name": "Chem's Sister",
+      "tier": 2,
+      "type": "hybrid",
+      "parents": [
+        "chemdawg"
+      ]
+    },
+    {
+      "id": "gsc",
+      "name": "Girl Scout Cookies",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "og_kush",
+        "durban_poison"
+      ]
+    },
+    {
+      "id": "thin_mint_gsc",
+      "name": "Thin Mint GSC",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "gsc"
+      ]
+    },
+    {
+      "id": "larry_og",
+      "name": "Larry OG",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "og_kush",
+        "sfv_og"
+      ]
+    },
+    {
+      "id": "pink_panties",
+      "name": "Pink Panties",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "burmese_kush",
+        "florida_kush"
+      ]
+    },
+    {
+      "id": "sour_bubble",
+      "name": "Sour Bubble",
+      "tier": 3,
+      "type": "indica",
+      "parents": [
+        "bubblegum"
+      ]
+    },
+    {
+      "id": "sour_dubb",
+      "name": "Sour Dubb",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "ecsd",
+        "sour_bubble"
+      ]
+    },
+    {
+      "id": "chocolate_diesel",
+      "name": "Chocolate Diesel",
+      "tier": 3,
+      "type": "sativa",
+      "parents": [
+        "sour_diesel",
+        "chocolate_trip"
+      ]
+    },
+    {
+      "id": "grape_ape",
+      "name": "Grape Ape",
+      "tier": 3,
+      "type": "indica",
+      "parents": [
+        "mendocino_purps",
+        "skunk1",
+        "afghani"
+      ]
+    },
+    {
+      "id": "cinderella99",
+      "name": "Cinderella 99",
+      "tier": 3,
+      "type": "sativa",
+      "parents": [
+        "jack_herer",
+        "shiva_skunk"
+      ]
+    },
+    {
+      "id": "grapefruit",
+      "name": "Grapefruit",
+      "tier": 3,
+      "type": "sativa",
+      "parents": [
+        "cinderella99",
+        "sativa_desconocida"
+      ]
+    },
+    {
+      "id": "alien_dawg",
+      "name": "Alien Dawg",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "chemdawg",
+        "alien_technology"
+      ]
+    },
+    {
+      "id": "alien_cookies",
+      "name": "Alien Cookies",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "alien_dawg",
+        "gsc"
+      ]
+    },
+    {
+      "id": "alien_tahoe_og",
+      "name": "Alien Tahoe OG",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "alien_dawg",
+        "tahoe_og"
+      ]
+    },
+    {
+      "id": "lemon_alien_dawg",
+      "name": "Lemon Alien Dawg",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "alien_dawg",
+        "lemon_thai"
+      ]
+    },
+    {
+      "id": "starfighter",
+      "name": "Starfighter",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "alien_tahoe_og",
+        "lemon_alien_dawg"
+      ]
+    },
+    {
+      "id": "nevilles_a5_haze",
+      "name": "Neville's A5 Haze",
+      "tier": 3,
+      "type": "sativa",
+      "parents": [
+        "nl5",
+        "haze_a"
+      ]
+    },
+    {
+      "id": "nyc_diesel",
+      "name": "NYC Diesel",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "sour_diesel",
+        "afghani"
+      ]
+    },
+    {
+      "id": "strawberry_cough",
+      "name": "Strawberry Cough",
+      "tier": 3,
+      "type": "sativa",
+      "parents": [
+        "haze",
+        "strawberry_fields"
+      ]
+    },
+    {
+      "id": "strawberry_diesel",
+      "name": "Strawberry Diesel",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "nyc_diesel",
+        "strawberry_cough"
+      ]
+    },
+    {
+      "id": "rare_dankness2",
+      "name": "Rare Dankness #2",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "triangle_kush",
+        "ghost_og"
+      ]
+    },
+    {
+      "id": "animal_cookies",
+      "name": "Animal Cookies",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "gsc",
+        "fire_og"
+      ]
+    },
+    {
+      "id": "sinmint_cookies",
+      "name": "SinMint Cookies",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "gsc",
+        "white_widow"
+      ]
+    },
+    {
+      "id": "animal_mints",
+      "name": "Animal Mints",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "animal_cookies",
+        "sinmint_cookies"
+      ]
+    },
+    {
+      "id": "sunset_sherbet",
+      "name": "Sunset Sherbet",
+      "tier": 3,
+      "type": "hybrid",
+      "parents": [
+        "gsc",
+        "pink_panties"
+      ]
+    },
+    {
+      "id": "blue_dream",
+      "name": "Blue Dream",
+      "tier": 4,
+      "type": "sativa",
+      "parents": [
+        "blueberry",
+        "super_silver_haze"
+      ]
+    },
+    {
+      "id": "green_goblin",
+      "name": "Green Goblin",
+      "tier": 4,
+      "type": "hybrid",
+      "parents": [
+        "northern_lights",
+        "skunk1"
+      ]
+    },
+    {
+      "id": "jenny_kush",
+      "name": "Jenny Kush",
+      "tier": 4,
+      "type": "hybrid",
+      "parents": [
+        "amnesia_haze",
+        "rare_dankness2"
+      ]
+    },
+    {
+      "id": "sour_joker",
+      "name": "Sour Joker",
+      "tier": 4,
+      "type": "sativa",
+      "parents": [
+        "amnesia_haze",
+        "ecsd"
+      ]
+    },
+    {
+      "id": "white_rhino",
+      "name": "White Rhino",
+      "tier": 4,
+      "type": "indica",
+      "parents": [
+        "white_widow",
+        "na_indica"
+      ]
+    },
+    {
+      "id": "gdp",
+      "name": "Granddaddy Purple",
+      "tier": 4,
+      "type": "indica",
+      "parents": [
+        "purple_urkle",
+        "big_bud"
+      ]
+    },
+    {
+      "id": "purple_punch",
+      "name": "Purple Punch",
+      "tier": 4,
+      "type": "indica",
+      "parents": [
+        "larry_og",
+        "gdp"
+      ]
+    },
+    {
+      "id": "gelato",
+      "name": "Gelato",
+      "tier": 4,
+      "type": "hybrid",
+      "parents": [
+        "sunset_sherbet",
+        "thin_mint_gsc"
+      ]
+    },
+    {
+      "id": "wedding_cake",
+      "name": "Wedding Cake",
+      "tier": 4,
+      "type": "indica",
+      "parents": [
+        "triangle_kush",
+        "animal_mints"
+      ]
+    },
+    {
+      "id": "gg4",
+      "name": "Gorilla Glue #4",
+      "tier": 4,
+      "type": "hybrid",
+      "parents": [
+        "chems_sister",
+        "sour_dubb",
+        "chocolate_diesel"
+      ]
+    },
+    {
+      "id": "zkittlez",
+      "name": "Zkittlez",
+      "tier": 4,
+      "type": "indica",
+      "parents": [
+        "grape_ape",
+        "grapefruit"
+      ]
+    },
+    {
+      "id": "runtz",
+      "name": "Runtz",
+      "tier": 4,
+      "type": "hybrid",
+      "parents": [
+        "zkittlez",
+        "gelato"
+      ]
+    },
+    {
+      "id": "slurricane",
+      "name": "Slurricane",
+      "tier": 4,
+      "type": "indica",
+      "parents": [
+        "do_si_dos",
+        "purple_punch"
+      ]
+    },
+    {
+      "id": "cherry_pie",
+      "name": "Cherry Pie",
+      "tier": 4,
+      "type": "hybrid",
+      "parents": [
+        "gdp",
+        "durban_poison"
+      ]
+    },
+    {
+      "id": "mac1",
+      "name": "MAC 1",
+      "tier": 4,
+      "type": "hybrid",
+      "parents": [
+        "alien_cookies",
+        "colombian_gold",
+        "starfighter"
+      ]
+    },
+    {
+      "id": "tangerine_dream",
+      "name": "Tangerine Dream",
+      "tier": 4,
+      "type": "hybrid",
+      "parents": [
+        "g13",
+        "afghani",
+        "nevilles_a5_haze"
+      ]
+    },
+    {
+      "id": "bruce_banner",
+      "name": "Bruce Banner",
+      "tier": 4,
+      "type": "hybrid",
+      "parents": [
+        "og_kush",
+        "strawberry_diesel"
+      ]
+    },
+    {
+      "id": "gmo_cookies",
+      "name": "GMO Cookies",
+      "tier": 4,
+      "type": "indica",
+      "parents": [
+        "chemdawg",
+        "gsc"
+      ]
+    },
+    {
+      "id": "do_si_dos",
+      "name": "Do-Si-Dos",
+      "tier": 4,
+      "type": "indica",
+      "parents": [
+        "gsc",
+        "face_off_og"
+      ]
+    }
+  ]
+}

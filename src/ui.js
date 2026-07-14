@@ -80,9 +80,8 @@
     const spec = specOrPheno && specOrPheno.pheno ? specOrPheno : null;
     const pheno = spec ? spec.pheno : specOrPheno;
     const speciesId = spec ? spec.speciesId : null;
-    // Retrato de cepa (fase 5). Híbridos (cruce) usan procedural.
-    const key = speciesId && spec.form !== 'cruce' && PH.plantart ? PH.plantart.portrait(speciesId) : null;
-    const im = key && PH.plantart.img(key);
+    // Retrato de cepa (arte 128² del pack). Híbridos (cruce) usan procedural.
+    const im = (speciesId && spec.form !== 'cruce' && PH.strainart && PH.strainart.has(speciesId)) ? PH.strainart.img(speciesId) : null;
     const drawProc = () => { ctx.clearRect(0, 0, c.width, c.height); PH.render.drawPlant(ctx, c.width / 2, c.height - 8, pheno, scale || 2, performance.now()); };
     const drawImg = () => {
       const pad = 3, aw = c.width - pad * 2, ah = c.height - pad * 2;
@@ -330,35 +329,40 @@
     updateHUD();
   }
 
-  /* ---------------- CATÁLOGO ---------------- */
+  /* ---------------- STRAIN-DEX (árbol filogenético) ---------------- */
   function catalog() {
     const s = G();
-    const entries = Object.values(s.catalog).sort((a, b) => b.rarity - a.rarity);
-    const total = PH.species.SPECIES.length;
-    const seenSpecies = Object.keys(s.species).filter(id => s.species[id].obtained > 0).length;
+    const list = PH.species.SPECIES;
+    const byId = PH.species.SPECIES_BY_ID;
+    const tiers = PH.strainTiers || {};
+    const got = (id) => s.species[id] && s.species[id].obtained > 0;
+    const total = list.length;
+    const found = list.filter(x => got(x.id)).length;
+    const phenos = Object.keys(s.catalog).length;
+    const groups = {};
+    for (const sp of list) (groups[sp.tier] = groups[sp.tier] || []).push(sp);
+    const sections = Object.keys(groups).sort((a, b) => a - b).map(t => `
+      <div class="dex-tier">
+        <h3>Nivel ${t} · ${tiers[t] || ''} <small>(${groups[t].filter(x => got(x.id)).length}/${groups[t].length})</small></h3>
+        <div class="dex-grid">${groups[t].map(sp => dexCard(sp, got(sp.id), byId)).join('')}</div>
+      </div>`).join('');
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🌿 Strain-dex mundial <small>${entries.length} fenotipos · ${seenSpecies}/${total} cepas</small></h2><button class="x" id="p_close">✕</button></div>
-        <div class="panel-body">
-          ${entries.length ? `<div class="cat-grid">${entries.map(e => catCard(e)).join('')}</div>` : '<p class="dim">Aún no has catalogado nada.</p>'}
-        </div>
+        <div class="panel-head"><h2>🌿 Strain-dex <small>${found}/${total} cepas · ${phenos} fenotipos · árbol filogenético</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body">${sections}</div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = close;
-    entries.forEach((e, i) => paintPlant('cat_' + i, e, 1.7));
   }
-  function catCard(e) {
-    const idx = catCard._i = (catCard._i || 0);
-    const t = PH.gen.rarityTier(e.rarity);
-    catCard._i++;
-    const cid = 'cat_' + idx;
-    const muts = e.mutations.map(m => PH.gen.MUTATIONS[m].label).join(', ');
-    return `<div class="cat-card">
-      <canvas id="${cid}" width="70" height="90"></canvas>
-      <div class="cc-name">${e.name}</div>
-      <div class="cc-tier" style="color:${t.color}">${'★'.repeat(t.stars)}</div>
-      <div class="cc-meta">${cap(e.pheno.color)} · ${cap(e.pheno.terp)}</div>
-      ${muts ? `<div class="cc-mut">${muts}</div>` : ''}
-      <div class="cc-count">×${e.count} · desc. ${e.firstAt}</div>
+  function dexCard(sp, gotIt, byId) {
+    const uri = PH.strainart && PH.strainart.uri(sp.id);
+    const parents = (sp.parents || []).map(p => (byId[p] ? byId[p].name : p));
+    const lineage = parents.length ? '◄ ' + parents.join(' × ') : 'landrace / base';
+    const art = uri ? `<img src="${uri}" alt="" loading="lazy">` : `<div class="dex-noart">🌿</div>`;
+    return `<div class="dex-card ${gotIt ? 'got' : 'todo'}" title="${sp.name}">
+      <div class="dex-art">${art}${gotIt ? '<span class="dex-chk">✓</span>' : ''}</div>
+      <div class="dex-name">${sp.name}</div>
+      <div class="dex-badges"><span class="dex-type ${sp.type}">${sp.type}</span></div>
+      <div class="dex-lin">${lineage}</div>
     </div>`;
   }
 
