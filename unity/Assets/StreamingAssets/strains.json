@@ -1,0 +1,1620 @@
+{
+ "count": 100,
+ "strains": [
+  {
+   "id": "afghani",
+   "name": "Afghani",
+   "tier": 0,
+   "type": "indica",
+   "parents": [],
+   "biomes": [
+    "volcan",
+    "desierto"
+   ],
+   "altura": 43,
+   "produccion": 60,
+   "resina": 82,
+   "vigor": 58,
+   "color": "verde"
+  },
+  {
+   "id": "hindu_kush",
+   "name": "Hindu Kush",
+   "tier": 0,
+   "type": "indica",
+   "parents": [],
+   "biomes": [
+    "cueva"
+   ],
+   "altura": 45,
+   "produccion": 64,
+   "resina": 83,
+   "vigor": 63,
+   "color": "verde"
+  },
+  {
+   "id": "thai",
+   "name": "Thai",
+   "tier": 0,
+   "type": "sativa",
+   "parents": [],
+   "biomes": [
+    "bosque"
+   ],
+   "altura": 72,
+   "produccion": 54,
+   "resina": 58,
+   "vigor": 65,
+   "color": "lima"
+  },
+  {
+   "id": "colombian_gold",
+   "name": "Colombian Gold",
+   "tier": 0,
+   "type": "sativa",
+   "parents": [],
+   "biomes": [
+    "pantano",
+    "nieve"
+   ],
+   "altura": 81,
+   "produccion": 54,
+   "resina": 47,
+   "vigor": 69,
+   "color": "lima"
+  },
+  {
+   "id": "acapulco_gold",
+   "name": "Acapulco Gold",
+   "tier": 0,
+   "type": "sativa",
+   "parents": [],
+   "biomes": [
+    "pantano",
+    "pradera"
+   ],
+   "altura": 69,
+   "produccion": 58,
+   "resina": 55,
+   "vigor": 61,
+   "color": "lima"
+  },
+  {
+   "id": "panama_red",
+   "name": "Panama Red",
+   "tier": 0,
+   "type": "sativa",
+   "parents": [],
+   "biomes": [
+    "volcan"
+   ],
+   "altura": 78,
+   "produccion": 55,
+   "resina": 57,
+   "vigor": 69,
+   "color": "lima"
+  },
+  {
+   "id": "durban_poison",
+   "name": "Durban Poison",
+   "tier": 0,
+   "type": "sativa",
+   "parents": [],
+   "biomes": [
+    "volcan"
+   ],
+   "altura": 82,
+   "produccion": 56,
+   "resina": 57,
+   "vigor": 67,
+   "color": "lima"
+  },
+  {
+   "id": "malawi_gold",
+   "name": "Malawi Gold",
+   "tier": 0,
+   "type": "sativa",
+   "parents": [],
+   "biomes": [
+    "pradera"
+   ],
+   "altura": 68,
+   "produccion": 59,
+   "resina": 51,
+   "vigor": 65,
+   "color": "lima"
+  },
+  {
+   "id": "south_indian",
+   "name": "South Indian",
+   "tier": 0,
+   "type": "hybrid",
+   "parents": [],
+   "biomes": [
+    "pradera"
+   ],
+   "altura": 66,
+   "produccion": 65,
+   "resina": 61,
+   "vigor": 71,
+   "color": "verde"
+  },
+  {
+   "id": "nepalese",
+   "name": "Nepalese",
+   "tier": 0,
+   "type": "sativa",
+   "parents": [],
+   "biomes": [
+    "isla"
+   ],
+   "altura": 68,
+   "produccion": 59,
+   "resina": 45,
+   "vigor": 62,
+   "color": "lima"
+  },
+  {
+   "id": "hawaiian_sativa",
+   "name": "Hawaiian Sativa",
+   "tier": 0,
+   "type": "sativa",
+   "parents": [],
+   "biomes": [
+    "volcan",
+    "cueva"
+   ],
+   "altura": 80,
+   "produccion": 61,
+   "resina": 56,
+   "vigor": 70,
+   "color": "lima"
+  },
+  {
+   "id": "mexican_sativa",
+   "name": "Mexican Sativa",
+   "tier": 0,
+   "type": "sativa",
+   "parents": [],
+   "biomes": [
+    "bosque",
+    "nieve"
+   ],
+   "altura": 70,
+   "produccion": 53,
+   "resina": 47,
+   "vigor": 69,
+   "color": "lima"
+  },
+  {
+   "id": "brazilian_sativa",
+   "name": "Brazilian Sativa",
+   "tier": 0,
+   "type": "sativa",
+   "parents": [],
+   "biomes": [
+    "pantano",
+    "isla"
+   ],
+   "altura": 71,
+   "produccion": 57,
+   "resina": 58,
+   "vigor": 58,
+   "color": "lima"
+  },
+  {
+   "id": "cambodian",
+   "name": "Cambodian",
+   "tier": 0,
+   "type": "sativa",
+   "parents": [],
+   "biomes": [
+    "pantano"
+   ],
+   "altura": 74,
+   "produccion": 59,
+   "resina": 56,
+   "vigor": 58,
+   "color": "lima"
+  },
+  {
+   "id": "burmese_kush",
+   "name": "Burmese Kush",
+   "tier": 0,
+   "type": "indica",
+   "parents": [],
+   "biomes": [
+    "nieve"
+   ],
+   "altura": 48,
+   "produccion": 70,
+   "resina": 88,
+   "vigor": 66,
+   "color": "purpura"
+  },
+  {
+   "id": "alien_technology",
+   "name": "Alien Technology",
+   "tier": 0,
+   "type": "indica",
+   "parents": [],
+   "biomes": [
+    "nieve",
+    "pantano"
+   ],
+   "altura": 50,
+   "produccion": 66,
+   "resina": 81,
+   "vigor": 61,
+   "color": "verde"
+  },
+  {
+   "id": "na_indica",
+   "name": "North American Indica",
+   "tier": 0,
+   "type": "indica",
+   "parents": [],
+   "biomes": [
+    "desierto"
+   ],
+   "altura": 48,
+   "produccion": 66,
+   "resina": 76,
+   "vigor": 57,
+   "color": "verde"
+  },
+  {
+   "id": "strawberry_fields",
+   "name": "Strawberry Fields",
+   "tier": 0,
+   "type": "indica",
+   "parents": [],
+   "biomes": [
+    "volcan"
+   ],
+   "altura": 45,
+   "produccion": 66,
+   "resina": 77,
+   "vigor": 56,
+   "color": "verde"
+  },
+  {
+   "id": "indiana_bubblegum",
+   "name": "Indiana Bubblegum",
+   "tier": 0,
+   "type": "hybrid",
+   "parents": [],
+   "biomes": [
+    "volcan",
+    "pradera"
+   ],
+   "altura": 65,
+   "produccion": 61,
+   "resina": 75,
+   "vigor": 61,
+   "color": "verde"
+  },
+  {
+   "id": "chocolate_trip",
+   "name": "Chocolate Trip",
+   "tier": 0,
+   "type": "hybrid",
+   "parents": [],
+   "biomes": [
+    "desierto",
+    "nieve"
+   ],
+   "altura": 66,
+   "produccion": 67,
+   "resina": 71,
+   "vigor": 66,
+   "color": "verde"
+  },
+  {
+   "id": "sativa_desconocida",
+   "name": "Sativa Desconocida",
+   "tier": 0,
+   "type": "sativa",
+   "parents": [],
+   "biomes": [
+    "pradera",
+    "cueva"
+   ],
+   "altura": 79,
+   "produccion": 58,
+   "resina": 53,
+   "vigor": 67,
+   "color": "verde"
+  },
+  {
+   "id": "g13",
+   "name": "G13",
+   "tier": 1,
+   "type": "indica",
+   "parents": [
+    "afghani"
+   ],
+   "biomes": [
+    "desierto"
+   ],
+   "altura": 43,
+   "produccion": 62,
+   "resina": 87,
+   "vigor": 61,
+   "color": "verde"
+  },
+  {
+   "id": "skunk1",
+   "name": "Skunk #1",
+   "tier": 1,
+   "type": "hybrid",
+   "parents": [
+    "afghani",
+    "acapulco_gold",
+    "colombian_gold"
+   ],
+   "biomes": [
+    "desierto",
+    "nieve"
+   ],
+   "altura": 64,
+   "produccion": 58,
+   "resina": 68,
+   "vigor": 64,
+   "color": "verde"
+  },
+  {
+   "id": "haze",
+   "name": "Haze",
+   "tier": 1,
+   "type": "sativa",
+   "parents": [
+    "colombian_gold",
+    "thai",
+    "mexican_sativa",
+    "south_indian"
+   ],
+   "biomes": [
+    "pantano"
+   ],
+   "altura": 75,
+   "produccion": 57,
+   "resina": 56,
+   "vigor": 65,
+   "color": "lima"
+  },
+  {
+   "id": "northern_lights",
+   "name": "Northern Lights",
+   "tier": 1,
+   "type": "indica",
+   "parents": [
+    "afghani",
+    "thai"
+   ],
+   "biomes": [
+    "desierto",
+    "bosque"
+   ],
+   "altura": 55,
+   "produccion": 61,
+   "resina": 76,
+   "vigor": 60,
+   "color": "verde"
+  },
+  {
+   "id": "chemdawg",
+   "name": "Chemdawg",
+   "tier": 1,
+   "type": "hybrid",
+   "parents": [
+    "thai",
+    "nepalese"
+   ],
+   "biomes": [
+    "bosque"
+   ],
+   "altura": 69,
+   "produccion": 61,
+   "resina": 59,
+   "vigor": 64,
+   "color": "lima"
+  },
+  {
+   "id": "nl5",
+   "name": "NL #5",
+   "tier": 1,
+   "type": "indica",
+   "parents": [
+    "northern_lights"
+   ],
+   "biomes": [
+    "volcan",
+    "bosque"
+   ],
+   "altura": 56,
+   "produccion": 62,
+   "resina": 80,
+   "vigor": 59,
+   "color": "verde"
+  },
+  {
+   "id": "haze_a",
+   "name": "Haze A",
+   "tier": 1,
+   "type": "sativa",
+   "parents": [
+    "haze"
+   ],
+   "biomes": [
+    "bosque"
+   ],
+   "altura": 76,
+   "produccion": 60,
+   "resina": 56,
+   "vigor": 64,
+   "color": "lima"
+  },
+  {
+   "id": "cheese",
+   "name": "Cheese",
+   "tier": 1,
+   "type": "hybrid",
+   "parents": [
+    "skunk1"
+   ],
+   "biomes": [
+    "nieve",
+    "pantano"
+   ],
+   "altura": 64,
+   "produccion": 64,
+   "resina": 67,
+   "vigor": 64,
+   "color": "verde"
+  },
+  {
+   "id": "lemon_thai",
+   "name": "Lemon Thai",
+   "tier": 1,
+   "type": "sativa",
+   "parents": [
+    "thai",
+    "hawaiian_sativa"
+   ],
+   "biomes": [
+    "cueva"
+   ],
+   "altura": 78,
+   "produccion": 60,
+   "resina": 58,
+   "vigor": 68,
+   "color": "lima"
+  },
+  {
+   "id": "mendocino_purps",
+   "name": "Mendocino Purps",
+   "tier": 1,
+   "type": "indica",
+   "parents": [
+    "na_indica"
+   ],
+   "biomes": [
+    "desierto"
+   ],
+   "altura": 49,
+   "produccion": 68,
+   "resina": 78,
+   "vigor": 57,
+   "color": "verde"
+  },
+  {
+   "id": "bubblegum",
+   "name": "Bubblegum",
+   "tier": 1,
+   "type": "hybrid",
+   "parents": [
+    "indiana_bubblegum",
+    "na_indica"
+   ],
+   "biomes": [
+    "desierto",
+    "volcan"
+   ],
+   "altura": 60,
+   "produccion": 65,
+   "resina": 77,
+   "vigor": 62,
+   "color": "verde"
+  },
+  {
+   "id": "super_skunk",
+   "name": "Super Skunk",
+   "tier": 2,
+   "type": "hybrid",
+   "parents": [
+    "skunk1",
+    "afghani"
+   ],
+   "biomes": [],
+   "altura": 57,
+   "produccion": 62,
+   "resina": 76,
+   "vigor": 65,
+   "color": "verde"
+  },
+  {
+   "id": "white_widow",
+   "name": "White Widow",
+   "tier": 2,
+   "type": "hybrid",
+   "parents": [
+    "brazilian_sativa",
+    "south_indian"
+   ],
+   "biomes": [],
+   "altura": 68,
+   "produccion": 64,
+   "resina": 68,
+   "vigor": 62,
+   "color": "verde"
+  },
+  {
+   "id": "ak47",
+   "name": "AK-47",
+   "tier": 2,
+   "type": "hybrid",
+   "parents": [
+    "colombian_gold",
+    "mexican_sativa",
+    "thai",
+    "afghani"
+   ],
+   "biomes": [],
+   "altura": 67,
+   "produccion": 59,
+   "resina": 68,
+   "vigor": 65,
+   "color": "verde"
+  },
+  {
+   "id": "blueberry",
+   "name": "Blueberry",
+   "tier": 2,
+   "type": "indica",
+   "parents": [
+    "afghani",
+    "thai",
+    "mexican_sativa"
+   ],
+   "biomes": [],
+   "altura": 60,
+   "produccion": 60,
+   "resina": 71,
+   "vigor": 62,
+   "color": "verde"
+  },
+  {
+   "id": "jack_herer",
+   "name": "Jack Herer",
+   "tier": 2,
+   "type": "sativa",
+   "parents": [
+    "haze",
+    "nl5",
+    "skunk1"
+   ],
+   "biomes": [],
+   "altura": 69,
+   "produccion": 59,
+   "resina": 70,
+   "vigor": 61,
+   "color": "verde"
+  },
+  {
+   "id": "super_silver_haze",
+   "name": "Super Silver Haze",
+   "tier": 2,
+   "type": "sativa",
+   "parents": [
+    "haze",
+    "northern_lights",
+    "skunk1"
+   ],
+   "biomes": [],
+   "altura": 67,
+   "produccion": 61,
+   "resina": 69,
+   "vigor": 64,
+   "color": "verde"
+  },
+  {
+   "id": "og_kush",
+   "name": "OG Kush",
+   "tier": 2,
+   "type": "hybrid",
+   "parents": [
+    "chemdawg",
+    "lemon_thai",
+    "hindu_kush"
+   ],
+   "biomes": [],
+   "altura": 61,
+   "produccion": 68,
+   "resina": 69,
+   "vigor": 63,
+   "color": "verde"
+  },
+  {
+   "id": "sour_diesel",
+   "name": "Sour Diesel",
+   "tier": 2,
+   "type": "sativa",
+   "parents": [
+    "chemdawg",
+    "super_skunk"
+   ],
+   "biomes": [],
+   "altura": 68,
+   "produccion": 60,
+   "resina": 68,
+   "vigor": 67,
+   "color": "verde"
+  },
+  {
+   "id": "amnesia_haze",
+   "name": "Amnesia Haze",
+   "tier": 2,
+   "type": "sativa",
+   "parents": [
+    "haze",
+    "afghani",
+    "hawaiian_sativa"
+   ],
+   "biomes": [],
+   "altura": 69,
+   "produccion": 59,
+   "resina": 67,
+   "vigor": 61,
+   "color": "lima"
+  },
+  {
+   "id": "big_bud",
+   "name": "Big Bud",
+   "tier": 2,
+   "type": "indica",
+   "parents": [
+    "afghani",
+    "skunk1"
+   ],
+   "biomes": [],
+   "altura": 50,
+   "produccion": 62,
+   "resina": 79,
+   "vigor": 60,
+   "color": "verde"
+  },
+  {
+   "id": "critical_mass",
+   "name": "Critical Mass",
+   "tier": 2,
+   "type": "indica",
+   "parents": [
+    "big_bud"
+   ],
+   "biomes": [],
+   "altura": 49,
+   "produccion": 67,
+   "resina": 82,
+   "vigor": 58,
+   "color": "verde"
+  },
+  {
+   "id": "master_kush",
+   "name": "Master Kush",
+   "tier": 2,
+   "type": "indica",
+   "parents": [
+    "hindu_kush",
+    "skunk1"
+   ],
+   "biomes": [],
+   "altura": 53,
+   "produccion": 64,
+   "resina": 79,
+   "vigor": 64,
+   "color": "verde"
+  },
+  {
+   "id": "kali_mist",
+   "name": "Kali Mist",
+   "tier": 2,
+   "type": "sativa",
+   "parents": [
+    "cambodian",
+    "thai",
+    "afghani",
+    "colombian_gold"
+   ],
+   "biomes": [],
+   "altura": 72,
+   "produccion": 58,
+   "resina": 64,
+   "vigor": 60,
+   "color": "verde"
+  },
+  {
+   "id": "trainwreck",
+   "name": "Trainwreck",
+   "tier": 2,
+   "type": "sativa",
+   "parents": [
+    "mexican_sativa",
+    "thai",
+    "afghani"
+   ],
+   "biomes": [],
+   "altura": 68,
+   "produccion": 59,
+   "resina": 64,
+   "vigor": 63,
+   "color": "verde"
+  },
+  {
+   "id": "shiva_skunk",
+   "name": "Shiva Skunk",
+   "tier": 2,
+   "type": "indica",
+   "parents": [
+    "nl5",
+    "skunk1"
+   ],
+   "biomes": [],
+   "altura": 56,
+   "produccion": 64,
+   "resina": 82,
+   "vigor": 64,
+   "color": "verde"
+  },
+  {
+   "id": "purple_urkle",
+   "name": "Purple Urkle",
+   "tier": 2,
+   "type": "indica",
+   "parents": [
+    "mendocino_purps"
+   ],
+   "biomes": [],
+   "altura": 50,
+   "produccion": 71,
+   "resina": 81,
+   "vigor": 56,
+   "color": "verde"
+  },
+  {
+   "id": "ghost_og",
+   "name": "Ghost OG",
+   "tier": 2,
+   "type": "hybrid",
+   "parents": [
+    "og_kush"
+   ],
+   "biomes": [],
+   "altura": 63,
+   "produccion": 72,
+   "resina": 72,
+   "vigor": 64,
+   "color": "verde"
+  },
+  {
+   "id": "sfv_og",
+   "name": "SFV OG",
+   "tier": 2,
+   "type": "hybrid",
+   "parents": [
+    "og_kush"
+   ],
+   "biomes": [],
+   "altura": 59,
+   "produccion": 71,
+   "resina": 75,
+   "vigor": 66,
+   "color": "verde"
+  },
+  {
+   "id": "fire_og",
+   "name": "Fire OG",
+   "tier": 2,
+   "type": "hybrid",
+   "parents": [
+    "og_kush"
+   ],
+   "biomes": [],
+   "altura": 61,
+   "produccion": 68,
+   "resina": 72,
+   "vigor": 63,
+   "color": "verde"
+  },
+  {
+   "id": "face_off_og",
+   "name": "Face Off OG",
+   "tier": 2,
+   "type": "indica",
+   "parents": [
+    "og_kush"
+   ],
+   "biomes": [],
+   "altura": 57,
+   "produccion": 69,
+   "resina": 77,
+   "vigor": 65,
+   "color": "verde"
+  },
+  {
+   "id": "triangle_kush",
+   "name": "Triangle Kush",
+   "tier": 2,
+   "type": "hybrid",
+   "parents": [
+    "og_kush"
+   ],
+   "biomes": [],
+   "altura": 61,
+   "produccion": 67,
+   "resina": 74,
+   "vigor": 62,
+   "color": "verde"
+  },
+  {
+   "id": "tahoe_og",
+   "name": "Tahoe OG",
+   "tier": 2,
+   "type": "hybrid",
+   "parents": [
+    "og_kush"
+   ],
+   "biomes": [],
+   "altura": 59,
+   "produccion": 69,
+   "resina": 72,
+   "vigor": 63,
+   "color": "verde"
+  },
+  {
+   "id": "florida_kush",
+   "name": "Florida Kush",
+   "tier": 2,
+   "type": "indica",
+   "parents": [
+    "og_kush"
+   ],
+   "biomes": [],
+   "altura": 60,
+   "produccion": 70,
+   "resina": 78,
+   "vigor": 62,
+   "color": "verde"
+  },
+  {
+   "id": "ecsd",
+   "name": "East Coast Sour Diesel",
+   "tier": 2,
+   "type": "sativa",
+   "parents": [
+    "sour_diesel"
+   ],
+   "biomes": [],
+   "altura": 72,
+   "produccion": 61,
+   "resina": 68,
+   "vigor": 68,
+   "color": "verde"
+  },
+  {
+   "id": "chems_sister",
+   "name": "Chem's Sister",
+   "tier": 2,
+   "type": "hybrid",
+   "parents": [
+    "chemdawg"
+   ],
+   "biomes": [],
+   "altura": 67,
+   "produccion": 66,
+   "resina": 64,
+   "vigor": 65,
+   "color": "verde"
+  },
+  {
+   "id": "gsc",
+   "name": "Girl Scout Cookies",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "og_kush",
+    "durban_poison"
+   ],
+   "biomes": [],
+   "altura": 66,
+   "produccion": 69,
+   "resina": 70,
+   "vigor": 66,
+   "color": "verde"
+  },
+  {
+   "id": "thin_mint_gsc",
+   "name": "Thin Mint GSC",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "gsc"
+   ],
+   "biomes": [],
+   "altura": 62,
+   "produccion": 73,
+   "resina": 75,
+   "vigor": 65,
+   "color": "verde"
+  },
+  {
+   "id": "larry_og",
+   "name": "Larry OG",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "og_kush",
+    "sfv_og"
+   ],
+   "biomes": [],
+   "altura": 61,
+   "produccion": 71,
+   "resina": 79,
+   "vigor": 66,
+   "color": "verde"
+  },
+  {
+   "id": "pink_panties",
+   "name": "Pink Panties",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "burmese_kush",
+    "florida_kush"
+   ],
+   "biomes": [],
+   "altura": 54,
+   "produccion": 73,
+   "resina": 88,
+   "vigor": 67,
+   "color": "verde"
+  },
+  {
+   "id": "sour_bubble",
+   "name": "Sour Bubble",
+   "tier": 3,
+   "type": "indica",
+   "parents": [
+    "bubblegum"
+   ],
+   "biomes": [],
+   "altura": 59,
+   "produccion": 67,
+   "resina": 87,
+   "vigor": 60,
+   "color": "verde"
+  },
+  {
+   "id": "sour_dubb",
+   "name": "Sour Dubb",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "ecsd",
+    "sour_bubble"
+   ],
+   "biomes": [],
+   "altura": 67,
+   "produccion": 66,
+   "resina": 80,
+   "vigor": 66,
+   "color": "verde"
+  },
+  {
+   "id": "chocolate_diesel",
+   "name": "Chocolate Diesel",
+   "tier": 3,
+   "type": "sativa",
+   "parents": [
+    "sour_diesel",
+    "chocolate_trip"
+   ],
+   "biomes": [],
+   "altura": 70,
+   "produccion": 68,
+   "resina": 73,
+   "vigor": 66,
+   "color": "verde"
+  },
+  {
+   "id": "grape_ape",
+   "name": "Grape Ape",
+   "tier": 3,
+   "type": "indica",
+   "parents": [
+    "mendocino_purps",
+    "skunk1",
+    "afghani"
+   ],
+   "biomes": [],
+   "altura": 48,
+   "produccion": 69,
+   "resina": 83,
+   "vigor": 63,
+   "color": "verde"
+  },
+  {
+   "id": "cinderella99",
+   "name": "Cinderella 99",
+   "tier": 3,
+   "type": "sativa",
+   "parents": [
+    "jack_herer",
+    "shiva_skunk"
+   ],
+   "biomes": [],
+   "altura": 64,
+   "produccion": 64,
+   "resina": 79,
+   "vigor": 65,
+   "color": "verde"
+  },
+  {
+   "id": "grapefruit",
+   "name": "Grapefruit",
+   "tier": 3,
+   "type": "sativa",
+   "parents": [
+    "cinderella99",
+    "sativa_desconocida"
+   ],
+   "biomes": [],
+   "altura": 72,
+   "produccion": 65,
+   "resina": 70,
+   "vigor": 67,
+   "color": "verde"
+  },
+  {
+   "id": "alien_dawg",
+   "name": "Alien Dawg",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "chemdawg",
+    "alien_technology"
+   ],
+   "biomes": [],
+   "altura": 61,
+   "produccion": 67,
+   "resina": 79,
+   "vigor": 64,
+   "color": "verde"
+  },
+  {
+   "id": "alien_cookies",
+   "name": "Alien Cookies",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "alien_dawg",
+    "gsc"
+   ],
+   "biomes": [],
+   "altura": 62,
+   "produccion": 70,
+   "resina": 79,
+   "vigor": 64,
+   "color": "verde"
+  },
+  {
+   "id": "alien_tahoe_og",
+   "name": "Alien Tahoe OG",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "alien_dawg",
+    "tahoe_og"
+   ],
+   "biomes": [],
+   "altura": 63,
+   "produccion": 72,
+   "resina": 82,
+   "vigor": 62,
+   "color": "verde"
+  },
+  {
+   "id": "lemon_alien_dawg",
+   "name": "Lemon Alien Dawg",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "alien_dawg",
+    "lemon_thai"
+   ],
+   "biomes": [],
+   "altura": 66,
+   "produccion": 69,
+   "resina": 78,
+   "vigor": 67,
+   "color": "verde"
+  },
+  {
+   "id": "starfighter",
+   "name": "Starfighter",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "alien_tahoe_og",
+    "lemon_alien_dawg"
+   ],
+   "biomes": [],
+   "altura": 66,
+   "produccion": 75,
+   "resina": 82,
+   "vigor": 67,
+   "color": "verde"
+  },
+  {
+   "id": "nevilles_a5_haze",
+   "name": "Neville's A5 Haze",
+   "tier": 3,
+   "type": "sativa",
+   "parents": [
+    "nl5",
+    "haze_a"
+   ],
+   "biomes": [],
+   "altura": 70,
+   "produccion": 65,
+   "resina": 69,
+   "vigor": 61,
+   "color": "verde"
+  },
+  {
+   "id": "nyc_diesel",
+   "name": "NYC Diesel",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "sour_diesel",
+    "afghani"
+   ],
+   "biomes": [],
+   "altura": 55,
+   "produccion": 67,
+   "resina": 80,
+   "vigor": 66,
+   "color": "verde"
+  },
+  {
+   "id": "strawberry_cough",
+   "name": "Strawberry Cough",
+   "tier": 3,
+   "type": "sativa",
+   "parents": [
+    "haze",
+    "strawberry_fields"
+   ],
+   "biomes": [],
+   "altura": 61,
+   "produccion": 64,
+   "resina": 67,
+   "vigor": 61,
+   "color": "verde"
+  },
+  {
+   "id": "strawberry_diesel",
+   "name": "Strawberry Diesel",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "nyc_diesel",
+    "strawberry_cough"
+   ],
+   "biomes": [],
+   "altura": 57,
+   "produccion": 68,
+   "resina": 79,
+   "vigor": 65,
+   "color": "verde"
+  },
+  {
+   "id": "rare_dankness2",
+   "name": "Rare Dankness #2",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "triangle_kush",
+    "ghost_og"
+   ],
+   "biomes": [],
+   "altura": 64,
+   "produccion": 75,
+   "resina": 79,
+   "vigor": 61,
+   "color": "verde"
+  },
+  {
+   "id": "animal_cookies",
+   "name": "Animal Cookies",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "gsc",
+    "fire_og"
+   ],
+   "biomes": [],
+   "altura": 63,
+   "produccion": 69,
+   "resina": 79,
+   "vigor": 62,
+   "color": "verde"
+  },
+  {
+   "id": "sinmint_cookies",
+   "name": "SinMint Cookies",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "gsc",
+    "white_widow"
+   ],
+   "biomes": [],
+   "altura": 67,
+   "produccion": 71,
+   "resina": 73,
+   "vigor": 64,
+   "color": "verde"
+  },
+  {
+   "id": "animal_mints",
+   "name": "Animal Mints",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "animal_cookies",
+    "sinmint_cookies"
+   ],
+   "biomes": [],
+   "altura": 61,
+   "produccion": 74,
+   "resina": 79,
+   "vigor": 63,
+   "color": "verde"
+  },
+  {
+   "id": "sunset_sherbet",
+   "name": "Sunset Sherbet",
+   "tier": 3,
+   "type": "hybrid",
+   "parents": [
+    "gsc",
+    "pink_panties"
+   ],
+   "biomes": [],
+   "altura": 62,
+   "produccion": 76,
+   "resina": 82,
+   "vigor": 66,
+   "color": "verde"
+  },
+  {
+   "id": "blue_dream",
+   "name": "Blue Dream",
+   "tier": 4,
+   "type": "sativa",
+   "parents": [
+    "blueberry",
+    "super_silver_haze"
+   ],
+   "biomes": [],
+   "altura": 67,
+   "produccion": 62,
+   "resina": 73,
+   "vigor": 60,
+   "color": "verde"
+  },
+  {
+   "id": "green_goblin",
+   "name": "Green Goblin",
+   "tier": 4,
+   "type": "hybrid",
+   "parents": [
+    "northern_lights",
+    "skunk1"
+   ],
+   "biomes": [],
+   "altura": 62,
+   "produccion": 67,
+   "resina": 82,
+   "vigor": 64,
+   "color": "verde"
+  },
+  {
+   "id": "jenny_kush",
+   "name": "Jenny Kush",
+   "tier": 4,
+   "type": "hybrid",
+   "parents": [
+    "amnesia_haze",
+    "rare_dankness2"
+   ],
+   "biomes": [],
+   "altura": 63,
+   "produccion": 69,
+   "resina": 78,
+   "vigor": 64,
+   "color": "verde"
+  },
+  {
+   "id": "sour_joker",
+   "name": "Sour Joker",
+   "tier": 4,
+   "type": "sativa",
+   "parents": [
+    "amnesia_haze",
+    "ecsd"
+   ],
+   "biomes": [],
+   "altura": 70,
+   "produccion": 65,
+   "resina": 71,
+   "vigor": 63,
+   "color": "verde"
+  },
+  {
+   "id": "white_rhino",
+   "name": "White Rhino",
+   "tier": 4,
+   "type": "indica",
+   "parents": [
+    "white_widow",
+    "na_indica"
+   ],
+   "biomes": [],
+   "altura": 53,
+   "produccion": 71,
+   "resina": 82,
+   "vigor": 62,
+   "color": "verde"
+  },
+  {
+   "id": "gdp",
+   "name": "Granddaddy Purple",
+   "tier": 4,
+   "type": "indica",
+   "parents": [
+    "purple_urkle",
+    "big_bud"
+   ],
+   "biomes": [],
+   "altura": 50,
+   "produccion": 71,
+   "resina": 91,
+   "vigor": 58,
+   "color": "verde"
+  },
+  {
+   "id": "purple_punch",
+   "name": "Purple Punch",
+   "tier": 4,
+   "type": "indica",
+   "parents": [
+    "larry_og",
+    "gdp"
+   ],
+   "biomes": [],
+   "altura": 55,
+   "produccion": 75,
+   "resina": 95,
+   "vigor": 61,
+   "color": "verde"
+  },
+  {
+   "id": "gelato",
+   "name": "Gelato",
+   "tier": 4,
+   "type": "hybrid",
+   "parents": [
+    "sunset_sherbet",
+    "thin_mint_gsc"
+   ],
+   "biomes": [],
+   "altura": 63,
+   "produccion": 78,
+   "resina": 87,
+   "vigor": 64,
+   "color": "verde"
+  },
+  {
+   "id": "wedding_cake",
+   "name": "Wedding Cake",
+   "tier": 4,
+   "type": "indica",
+   "parents": [
+    "triangle_kush",
+    "animal_mints"
+   ],
+   "biomes": [],
+   "altura": 60,
+   "produccion": 75,
+   "resina": 87,
+   "vigor": 62,
+   "color": "verde"
+  },
+  {
+   "id": "gg4",
+   "name": "Gorilla Glue #4",
+   "tier": 4,
+   "type": "hybrid",
+   "parents": [
+    "chems_sister",
+    "sour_dubb",
+    "chocolate_diesel"
+   ],
+   "biomes": [],
+   "altura": 67,
+   "produccion": 69,
+   "resina": 80,
+   "vigor": 66,
+   "color": "verde"
+  },
+  {
+   "id": "zkittlez",
+   "name": "Zkittlez",
+   "tier": 4,
+   "type": "indica",
+   "parents": [
+    "grape_ape",
+    "grapefruit"
+   ],
+   "biomes": [],
+   "altura": 57,
+   "produccion": 70,
+   "resina": 89,
+   "vigor": 66,
+   "color": "verde"
+  },
+  {
+   "id": "runtz",
+   "name": "Runtz",
+   "tier": 4,
+   "type": "hybrid",
+   "parents": [
+    "zkittlez",
+    "gelato"
+   ],
+   "biomes": [],
+   "altura": 60,
+   "produccion": 79,
+   "resina": 89,
+   "vigor": 67,
+   "color": "verde"
+  },
+  {
+   "id": "slurricane",
+   "name": "Slurricane",
+   "tier": 4,
+   "type": "indica",
+   "parents": [
+    "do_si_dos",
+    "purple_punch"
+   ],
+   "biomes": [],
+   "altura": 55,
+   "produccion": 73,
+   "resina": 95,
+   "vigor": 63,
+   "color": "verde"
+  },
+  {
+   "id": "cherry_pie",
+   "name": "Cherry Pie",
+   "tier": 4,
+   "type": "hybrid",
+   "parents": [
+    "gdp",
+    "durban_poison"
+   ],
+   "biomes": [],
+   "altura": 64,
+   "produccion": 69,
+   "resina": 79,
+   "vigor": 61,
+   "color": "verde"
+  },
+  {
+   "id": "mac1",
+   "name": "MAC 1",
+   "tier": 4,
+   "type": "hybrid",
+   "parents": [
+    "alien_cookies",
+    "colombian_gold",
+    "starfighter"
+   ],
+   "biomes": [],
+   "altura": 66,
+   "produccion": 68,
+   "resina": 75,
+   "vigor": 68,
+   "color": "verde"
+  },
+  {
+   "id": "tangerine_dream",
+   "name": "Tangerine Dream",
+   "tier": 4,
+   "type": "hybrid",
+   "parents": [
+    "g13",
+    "afghani",
+    "nevilles_a5_haze"
+   ],
+   "biomes": [],
+   "altura": 56,
+   "produccion": 70,
+   "resina": 87,
+   "vigor": 63,
+   "color": "verde"
+  },
+  {
+   "id": "bruce_banner",
+   "name": "Bruce Banner",
+   "tier": 4,
+   "type": "hybrid",
+   "parents": [
+    "og_kush",
+    "strawberry_diesel"
+   ],
+   "biomes": [],
+   "altura": 61,
+   "produccion": 74,
+   "resina": 79,
+   "vigor": 66,
+   "color": "verde"
+  },
+  {
+   "id": "gmo_cookies",
+   "name": "GMO Cookies",
+   "tier": 4,
+   "type": "indica",
+   "parents": [
+    "chemdawg",
+    "gsc"
+   ],
+   "biomes": [],
+   "altura": 65,
+   "produccion": 67,
+   "resina": 80,
+   "vigor": 65,
+   "color": "verde"
+  },
+  {
+   "id": "do_si_dos",
+   "name": "Do-Si-Dos",
+   "tier": 4,
+   "type": "indica",
+   "parents": [
+    "gsc",
+    "face_off_og"
+   ],
+   "biomes": [],
+   "altura": 58,
+   "produccion": 70,
+   "resina": 86,
+   "vigor": 61,
+   "color": "verde"
+  }
+ ]
+}

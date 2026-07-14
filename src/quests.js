@@ -32,10 +32,10 @@
       check: (s) => s.stats.mutationsFound >= 1,
     },
     q_relic: {
-      id: 'q_relic', name: 'La cepa ancestral',
-      desc: 'Encuentra la mítica Cepa Primigenia (SM-000).',
+      id: 'q_relic', name: 'La raíz del linaje',
+      desc: 'Consigue la landrace ancestral Afghani, raíz de innumerables híbridos.',
       reward: { credits: 3000, prestige: 40 },
-      check: (s) => (s.species['SM-000'] && s.species['SM-000'].obtained > 0),
+      check: (s) => (s.species['afghani'] && s.species['afghani'].obtained > 0),
     },
     q_sequence: {
       id: 'q_sequence', name: 'Lectura del genoma',

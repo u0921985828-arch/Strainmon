@@ -26,7 +26,7 @@
     return { gx: Math.round((u + v) / 2), gy: Math.round((v - u) / 2) };
   }
 
-  // rombo de suelo con relieve
+  // rombo de suelo con relieve + grano sutil (textura, no plano)
   function floorDiamond(ctx, sx, sy, top, side) {
     ctx.beginPath();
     ctx.moveTo(sx, sy);
@@ -35,6 +35,16 @@
     ctx.lineTo(sx - TW / 2, sy + TH / 2);
     ctx.closePath();
     ctx.fillStyle = top; ctx.fill();
+    // grano: motas claras/oscuras deterministas dentro del rombo
+    let seed = ((((sx | 0) * 13) ^ ((sy | 0) * 7)) >>> 0) || 1;
+    const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    const cy = sy + TH / 2, dk = shade(top, -0.07), lt = shade(top, 0.07);
+    for (let i = 0; i < 6; i++) {
+      const u = (rnd() * 2 - 1), v = (rnd() * 2 - 1);
+      if (Math.abs(u) + Math.abs(v) > 0.9) continue;         // dentro del rombo
+      ctx.fillStyle = rnd() < 0.5 ? dk : lt;
+      ctx.fillRect((sx + u * (TW / 2)) | 0, (cy + v * (TH / 2)) | 0, 2, 2);
+    }
     ctx.strokeStyle = side; ctx.lineWidth = 1; ctx.stroke();
   }
 
@@ -62,6 +72,97 @@
     ctx.lineTo(sx, sy + TH - h);
     ctx.lineTo(sx - TW / 2, sy + TH / 2 - h);
     ctx.closePath(); ctx.fillStyle = pal.top; ctx.fill();
+  }
+
+  // Props de borde/escenario para zonas naturales (setos, vallas, rocas, cañas,
+  // palmeras, árboles, cactus…) — arte propio por código, en la proyección iso.
+  // Sustituyen a los cubos '#' en los biomas para que los bordes no sean bloques.
+  function prop(ctx, sx, sy, kind, opt) {
+    const midY = sy + TH / 2;
+    if (kind === 'grass') {
+      // HIERBA ALTA: matas de briznas verticales (textura + oclusión por profundidad)
+      const base = (opt && opt.col) || '#4f9e3a', dark = shade(base, -0.22), tip = shade(base, 0.28);
+      let s2 = ((((sx | 0) * 17) ^ ((sy | 0) * 11)) >>> 0) || 1;
+      const r = () => { s2 = (s2 * 1664525 + 1013904223) >>> 0; return s2 / 4294967296; };
+      const blades = [[-11, 11], [-7, 15], [-3, 12], [1, 16], [5, 13], [9, 15], [12, 10], [-1, 9]];
+      for (const [bx, bh] of blades) {
+        const rx = sx + bx + (r() * 2 - 1), top = midY - bh - r() * 3;
+        ctx.strokeStyle = r() < 0.5 ? base : dark; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(rx, midY + 5); ctx.lineTo(rx + (r() * 3 - 1.5), top); ctx.stroke();
+        ctx.fillStyle = tip; ctx.fillRect((rx - 1) | 0, (top - 1) | 0, 2, 2);
+      }
+      return;
+    }
+    // sombra de contacto suave (asienta el prop en el suelo)
+    const shadow = (w, o) => { ctx.fillStyle = 'rgba(0,0,0,' + (o || 0.16) + ')'; ctx.beginPath(); ctx.ellipse(sx, midY + 2, w, w * 0.4, 0, 0, 6.283); ctx.fill(); };
+    const ell = (x, y, rx, ry, c) => { ctx.fillStyle = c; ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, 6.283); ctx.fill(); };
+    switch (kind) {
+      case 'hedge': case 'hedgeDark': {
+        // seto bajo y recortado: prisma corto + remate redondeado, sombreado limpio
+        const g = kind === 'hedgeDark'
+          ? { top: '#4c8a3f', left: '#2f5628', right: '#3c6e33', hi: '#61a24e' }
+          : { top: '#5ba047', left: '#356b2c', right: '#478139', hi: '#7ac05e' };
+        const h = 11;
+        shadow(TW * 0.44);
+        cube(ctx, sx, sy, h, { top: g.top, left: g.left, right: g.right });
+        ell(sx, sy + TH / 2 - h, TW * 0.30, TH * 0.40, g.top);       // remate redondeado
+        ell(sx - TW * 0.10, sy + TH / 2 - h - 1, TW * 0.16, TH * 0.22, g.hi); // brillo suave
+        break;
+      }
+      case 'tree': {
+        shadow(TW * 0.30);
+        px(ctx, sx - 2, midY - 4, 5, 14, '#7a5533'); px(ctx, sx - 2, midY - 4, 2, 14, '#5c3f26');
+        ell(sx, midY - 18, TW * 0.28, TH * 0.8, '#2f5f28');           // copa (sombra)
+        ell(sx - 1, midY - 20, TW * 0.24, TH * 0.68, '#4e8f40');      // copa
+        ell(sx - 5, midY - 24, TW * 0.12, TH * 0.34, '#66ad54');      // brillo
+        break;
+      }
+      case 'rock': case 'rockDark': {
+        const g = kind === 'rockDark' ? { a: '#463636', b: '#2c2220' } : { a: '#847d8b', b: '#565160' };
+        const c3 = kind === 'rockDark' ? '#5c4642' : '#a29caa';
+        shadow(TW * 0.34);
+        const bo = (dx, dy, r, col, hi) => { ell(sx + dx, midY + dy, r, r * 0.7, col); ell(sx + dx - r * 0.28, midY + dy - r * 0.34, r * 0.36, r * 0.26, hi); };
+        bo(-6, 2, 8, g.b, g.a); bo(7, 3, 7, g.b, g.a); bo(0, -3, 10, g.a, c3);
+        break;
+      }
+      case 'snow': {
+        shadow(TW * 0.36, 0.12);
+        ell(sx, midY - 1, TW * 0.32, TH * 0.62, '#d3e0ea');           // banco de nieve
+        ell(sx - 2, midY - 5, TW * 0.24, TH * 0.46, '#eef4f8');
+        ell(sx - 5, midY - 8, TW * 0.12, TH * 0.26, '#ffffff');       // brillo
+        break;
+      }
+      case 'reed': {
+        shadow(TW * 0.24, 0.12);
+        const blades = [[-9, 16], [-4, 20], [1, 14], [5, 19], [9, 15]];
+        for (let i = 0; i < blades.length; i++) { const rx = sx + blades[i][0], top = midY + 2 - blades[i][1]; ctx.strokeStyle = i % 2 ? '#586324' : '#7d8d3c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(rx, midY + 4); ctx.lineTo(rx, top); ctx.stroke(); ctx.fillStyle = '#c9b24a'; ctx.fillRect(rx - 1, top - 2, 2, 3); }
+        break;
+      }
+      case 'palm': {
+        shadow(TW * 0.26);
+        px(ctx, sx - 2, midY - 6, 4, 18, '#9a6a3a'); px(ctx, sx - 2, midY - 6, 1, 18, '#6e4826');
+        ctx.strokeStyle = '#4faf6a'; ctx.lineWidth = 2.4;
+        for (const ang of [3.85, 5.05, 4.45, -0.25, 0.75]) { ctx.beginPath(); ctx.moveTo(sx, midY - 20); ctx.lineTo(sx + Math.cos(ang) * 16, midY - 20 + Math.sin(ang) * 9); ctx.stroke(); }
+        ell(sx, midY - 20, 3.5, 2.6, '#357b4a');
+        break;
+      }
+      case 'cactus': {
+        shadow(TW * 0.2, 0.14);
+        const g = '#4f9a45', gd = '#347030', hi = '#63b358', b0 = midY + 4;
+        px(ctx, sx - 3, b0 - 24, 6, 24, g); px(ctx, sx - 3, b0 - 24, 2, 24, gd); px(ctx, sx + 1, b0 - 24, 1, 24, hi);
+        px(ctx, sx - 8, b0 - 14, 3, 3, g); px(ctx, sx - 8, b0 - 20, 3, 7, g);
+        px(ctx, sx + 5, b0 - 11, 3, 3, g); px(ctx, sx + 5, b0 - 17, 3, 7, g);
+        break;
+      }
+      case 'fence': default: {
+        // valla fina de madera: 2 travesaños + postes esbeltos
+        const w = '#bd8f56', d = '#7a5533', hi = '#d3ab73', by = sy + TH * 0.60;
+        shadow(TW * 0.4, 0.12);
+        ctx.fillStyle = w; ctx.fillRect(sx - 17, by - 15, 34, 2); ctx.fillRect(sx - 17, by - 9, 34, 2);
+        for (const dx of [-13, 0, 13]) { ctx.fillStyle = d; ctx.fillRect(sx + dx - 1, by - 20, 3, 20); ctx.fillStyle = w; ctx.fillRect(sx + dx - 1, by - 20, 2, 20); ctx.fillStyle = hi; ctx.fillRect(sx + dx - 1, by - 20, 2, 2); }
+        break;
+      }
+    }
   }
 
   // Personaje isométrico. Si hay sprite de arte para su rol+dirección, lo usa
@@ -127,7 +228,8 @@
       for (let gx = 0; gx < W; gx++) {
         const ch = row[gx];
         if (ch === '.' || ch === 'D') floors.push({ gx, gy, door: ch === 'D', alt: (gx + gy) & 1 });
-        else if (ch === '#') walls.push({ gx, gy });
+        // en zonas naturales el borde '#' se dibuja como prop (seto/valla/roca…) en isogame, no como cubo
+        else if (ch === '#' && !map.natural) walls.push({ gx, gy });
       }
     }
     return { w: W, h: H, floors, walls };
@@ -146,12 +248,24 @@
     if (!c || c.w !== map.grid[0].length || c.h !== map.grid.length) c = map._cache = buildCells(map);
     const cx = cam.x, cy = cam.y;
 
-    // 1) suelos (no ocluyen) — desde caché, proyección inline
+    // 1) suelos — sprite del pack (tiles) ordenado por profundidad, o rombo procedural
     const fl = c.floors;
-    for (let i = 0; i < fl.length; i++) {
-      const f = fl[i];
-      floorDiamond(ctx, (f.gx - f.gy) * (TW / 2) + cx, (f.gx + f.gy) * (TH / 2) + cy,
-        f.door ? P.door : (f.alt ? P.floorA : P.floorB), P.floorEdge);
+    const TA = (map.tiles && PH.tileart) ? PH.tileart : null;
+    if (TA) {
+      const ordered = fl.slice().sort((a, b) => (a.gx + a.gy) - (b.gx + b.gy));
+      for (const f of ordered) {
+        const sx = (f.gx - f.gy) * (TW / 2) + cx, sy = (f.gx + f.gy) * (TH / 2) + cy;
+        const nm = map.tiles[f.door ? 'D' : '.'] || map.tiles['.'];
+        const im = nm && TA.img(nm);
+        if (im && im.complete && im.naturalWidth) ctx.drawImage(im, Math.round(sx - TW / 2), Math.round(sy), TW, Math.round(im.naturalHeight * (TW / im.naturalWidth)));
+        else floorDiamond(ctx, sx, sy, f.door ? P.door : (f.alt ? P.floorA : P.floorB), P.floorEdge);
+      }
+    } else {
+      for (let i = 0; i < fl.length; i++) {
+        const f = fl[i];
+        floorDiamond(ctx, (f.gx - f.gy) * (TW / 2) + cx, (f.gx + f.gy) * (TH / 2) + cy,
+          f.door ? P.door : (f.alt ? P.floorA : P.floorB), P.floorEdge);
+      }
     }
 
     // 2) drawables ordenados por profundidad (painter). Entradas pooled.
@@ -166,7 +280,7 @@
     for (let i = 0; i < _order.length; i++) {
       const e = _order[i];
       const sx = (e.gx - e.gy) * (TW / 2) + cx, sy = (e.gx + e.gy) * (TH / 2) + cy;
-      if (e.t === 0) cube(ctx, sx, sy, WH, P.wall);
+      if (e.t === 0) cube(ctx, sx, sy, map.wallH || WH, P.wall);
       else if (e.t === 1) e.ref.draw(ctx, sx, sy, e.ref);
       else actor(ctx, sx, sy, e.ref.dir, e.ref.frame, e.ref.pal, e.ref.char);
     }
@@ -182,5 +296,5 @@
       wall: { top: '#c86b52', left: '#8f3f30', right: '#a85040' } },
   };
 
-  PH.iso = { TW, TH, WH, project, unproject, floorDiamond, cube, actor, renderRoom, THEMES };
+  PH.iso = { TW, TH, WH, project, unproject, floorDiamond, cube, prop, actor, renderRoom, THEMES };
 })(window.PH = window.PH || {});

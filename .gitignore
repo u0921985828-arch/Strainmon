@@ -5,6 +5,11 @@ node_modules/
 # Secretos (NUNCA commitear)
 .secrets/
 *.key
+.env
+.env.*
+!.env.example
+# Config local de Claude (aprobaciones/overrides por máquina)
+.claude/settings.local.json
 
 # Salida cruda del generador (curar antes de versionar)
 assets/gen/

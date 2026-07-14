@@ -1,0 +1,29 @@
+{
+  "name": "Strainmon — genética vegetal",
+  "short_name": "Strainmon",
+  "description": "RPG de exploración y genética vegetal: cultiva, cruza y colecciona cepas landrace. App web, sin descargas.",
+  "lang": "es",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#14100f",
+  "theme_color": "#20161f",
+  "categories": [
+    "games"
+  ],
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

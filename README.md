@@ -14,6 +14,12 @@ todo el arte se genera por código a partir de la genética de cada planta.
 
 Abre `index.html` en un navegador moderno. No requiere servidor ni instalación.
 
+Es una **app web responsive**: se adapta a móvil, tablet y escritorio, con
+controles táctiles en pantalla y navegación inferior. Sirviéndola por HTTP es
+además una **PWA instalable** (icono en la pantalla de inicio, pantalla completa
+y juego **offline** mediante service worker). Tema claro/oscuro automático y
+diseño ligero (fuentes del sistema, cero dependencias) por sostenibilidad.
+
 ### Controles
 | Acción | Tecla |
 |---|---|
@@ -93,6 +99,13 @@ Código modular con espacio de nombres global `PH` (sin bundler, se ejecuta abri
 | `src/encounter.js` | Resolución de recolección |
 | `src/ui.js` | HUD y paneles superpuestos |
 | `src/game.js` | Bucle principal, entrada, cámara y render del mundo |
+
+## 🎨 Herramientas (MCP)
+
+Para generar pixel-art desde Claude Code está configurado el MCP remoto de
+**PixelLab** en `.mcp.json` (ámbito *project*). Requiere exportar la variable
+`PIXELLAB_API_KEY` (nunca se commitea el token). Detalles en
+[`docs/MCP_PIXELLAB.md`](docs/MCP_PIXELLAB.md).
 
 ## 🚧 Hoja de ruta
 

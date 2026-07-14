@@ -1,0 +1,31 @@
+/* [UI] DOM híbrido sobre canvas Phaser. Estética pixel + responsive; la UI se
+   ancla a bordes/viewport y no se rompe entre aspectos móvil/escritorio. */
+:root { --ui: #efeadd; --edge: #8f8a7a; --ink: #3b3a4a; --accent: #c98a86; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #aeb9a0; overflow: hidden; }
+#game { position: fixed; inset: 0; }
+#game canvas { image-rendering: pixelated; }
+
+/* El contenedor DOM de Phaser no intercepta toques salvo en paneles activos. */
+.phaser-dom-container { pointer-events: none; }
+.ui-panel { pointer-events: auto; }
+
+.ui-panel {
+  width: min(92vw, 460px);
+  font-family: ui-monospace, "Courier New", monospace; color: var(--ink);
+  background: var(--ui); border: 2px solid var(--edge); border-radius: 6px;
+  box-shadow: 3px 3px 0 rgba(0,0,0,.3); image-rendering: pixelated;
+  padding: calc(6px + env(safe-area-inset-bottom,0px)) 8px 8px;
+  transform: translateY(110%); transition: transform .18s steps(4);
+}
+.ui-panel[data-open="true"] { transform: translateY(0); }
+.ui-panel > header {
+  font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+  font-size: clamp(9px, 2.6vw, 13px); border-bottom: 2px solid var(--edge);
+  padding-bottom: 4px; margin-bottom: 6px;
+}
+.ui-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 6px; max-height: 40vh; overflow-y: auto; }
+.ui-grid .cell { aspect-ratio: 1; background: #fff; border: 2px solid var(--edge); border-radius: 4px; }
+
+@media (max-width: 480px) { .ui-panel { width: 96vw; } }
+@media (prefers-reduced-motion: reduce) { .ui-panel { transition: none; } }
