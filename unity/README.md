@@ -55,8 +55,21 @@ configurado en el repo — requiere `PIXELLAB_API_KEY`) e impórtalo como Sprite
 con *Filter Mode: Point* y *Pixels Per Unit: 16*. **No** uses rips de Pokémon u
 otros assets con copyright (lo prohíbe el `CLAUDE.md` del proyecto).
 
-## Pendiente (siguientes pasos)
-- Sustituir placeholders por tileset original + sprites de personaje 4-dir.
-- Portar a C# la genética/cruces/cultivo (ya hay base de datos + cruce canónico).
-- UI (Canvas) para mochila/banco/Strain-dex/laboratorio.
-- Warps entre mapas, NPCs y diálogos.
+## Sistemas incluidos (C#)
+- **Mundo**: tileset original (StreamingAssets/tiles), personajes 4-dir
+  originales (StreamingAssets/chars), colisiones, tiles de encuentro.
+- **Genética** (`Genetics.cs`): cruce con reconocimiento de **nodo canónico**
+  del árbol (parentales exactos) o híbrido procedural.
+- **Cultivo** (`Cultivation.cs`): parcelas, 5 fases, riego/salud, cosecha.
+- **Estado** (`GameState.cs`): créditos, prestigio, banco, Strain-dex, avisos.
+- **UI** (`GameUI.cs`, IMGUI): HUD + paneles Dex / Banco-Cruce / Invernadero.
+- **Interacción** (`InteractionController.cs`): hablar con NPCs.
+
+### Controles
+`WASD/flechas` mover · `E`/`Espacio` hablar · `C` Strain-dex · `B` Banco/Cruce ·
+`G` Invernadero. Pisa **hierba alta** para capturar cepas salvajes.
+
+## Pendiente (opcional)
+- Warps entre mapas/biomas, más NPCs y diálogos ramificados.
+- Sustituir la UI IMGUI por Canvas/uGUI con fuente bitmap si quieres pulir.
+- Tileset lush más detallado vía PixelLab (requiere `PIXELLAB_API_KEY`).

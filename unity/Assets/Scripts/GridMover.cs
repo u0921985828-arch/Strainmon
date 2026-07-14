@@ -41,8 +41,8 @@ public class GridMover : MonoBehaviour
 
     void OnArrive()
     {
-        if (world.IsEncounter(cell.x, cell.y) && Random.value < 0.18f)
-            Debug.Log("Encuentro salvaje (enganchar aquí con la UI de captura).");
+        if (world.IsEncounter(cell.x, cell.y) && Random.value < 0.18f && GameState.Instance != null)
+            GameState.Instance.WildEncounter();
     }
 
     static bool Key(KeyCode a, KeyCode b) => Input.GetKey(a) || Input.GetKey(b);

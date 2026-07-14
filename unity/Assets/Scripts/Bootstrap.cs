@@ -31,7 +31,13 @@ public class Bootstrap : MonoBehaviour
         pGO.AddComponent<Actor>().role = "player";
         var mover = pGO.AddComponent<GridMover>();
         mover.world = world;
+        pGO.AddComponent<InteractionController>();
         pGO.transform.position = world.CellToWorld(world.spawn.x, world.spawn.y);
+
+        // --- Sistemas: estado, cultivo, UI (IMGUI) ---
+        new GameObject("GameState").AddComponent<GameState>();
+        new GameObject("Cultivation").AddComponent<Cultivation>();
+        new GameObject("GameUI").AddComponent<GameUI>();
 
         // --- NPCs (en tiles de hierba) ---
         SpawnNpc(world, "botanist", 2, 5);
@@ -50,5 +56,6 @@ public class Bootstrap : MonoBehaviour
         go.AddComponent<SpriteRenderer>().sortingOrder = 10;
         go.AddComponent<Actor>().role = role;
         go.transform.position = world.CellToWorld(x, y);
+        if (GameState.Instance != null) GameState.Instance.npcs.Add(go.transform);
     }
 }
