@@ -7,30 +7,30 @@ SM.WorldScene = class WorldScene extends Phaser.Scene {
   create() {
     const T = SM.TILE, W = PH.world;
     this.T = T; this.W = W;
+    this.DIR2F = { down: 1, left: 2, up: 3, right: 1 };           // dirección -> frame charart
+    this.SPRITE2ROLE = { mentor: 'botanist', npc2: 'neighbor', npc3: 'merchant', npc4: 'merchant', npc5: 'botanist', npc6: 'customer1' };
+    this.DIRV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 
     // --- shim de PH.game que espera la UI/misiones ---
     PH.game = PH.game || {};
-    PH.game.mode = 'overworld';
+    PH.game.mode = 'title';
     PH.game.roomName = () => { const m = this.map; return m ? m.name : ''; };
     PH.game.afterQuestCheck = () => { const done = PH.quests.checkAll ? PH.quests.checkAll() : []; for (const q of done) PH.ui.toast('✅ Misión: ' + q.name, 'ok'); PH.ui.updateHUD(); };
     PH.game.canWalk = (id, x, y) => { const m = W.MAPS[id]; return m ? !W.solidAt(m, x, y) : false; };
 
-    // --- arte + UI DOM ---
     ['sprites', 'plantart', 'strainart', 'charart', 'furniart'].forEach(k => PH[k] && PH[k].preload && PH[k].preload());
     PH.ui.init();
 
-    // --- partida (nueva si no hay guardado) en el mundo top-down ---
-    if (PH.state.hasSave && PH.state.hasSave()) PH.state.load(); else PH.state.reset();
     const p = PH.state.get().player;
     if (!W.MAPS[p.map]) { p.map = 'lab'; const s = W.MAPS.lab.spawn; p.x = s.x; p.y = s.y; }
     p.iso = false; if (!p.dir) p.dir = 'down';
 
-    // --- grupos de render ---
     this.tileLayer = this.add.group();
     this.objLayer = this.add.group();
     this.buildMap(p.map);
 
-    this.player = this.add.image(0, 0, 'a_player').setDepth(50);
+    this.player = this.add.image(0, 0, this.charTex('player', p.dir)).setDepth(50);
+    this.scaleActor(this.player);
     this.syncPlayerPx(true);
 
     const cam = this.cameras.main;
@@ -41,11 +41,37 @@ SM.WorldScene = class WorldScene extends Phaser.Scene {
 
     this.bindInput();
     PH.ui.updateHUD();
-    PH.ui.toast('Bienvenido a Villa Semilla. Explora (WASD).', 'ok');
 
-    // stepping
     this.moving = false; this.fromX = 0; this.fromY = 0; this.moveT = 0; this.MOVE_MS = 130;
-    this.DIRV = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+    this.showTitle();
+  }
+
+  charTex(role, dir) { const k = 'c_' + role + '_' + (this.DIR2F[dir] || 1); return this.textures.exists(k) ? k : 'a_npc'; }
+  scaleActor(img) { const h = img.height || 16; img.setScale(22 / h); img.setOrigin(0.5, 0.82); }
+
+  // Pantalla de título (DOM, estética del juego). Nueva/Continuar.
+  showTitle() {
+    const ov = document.getElementById('overlay');
+    const hasSave = PH.state.hasSave && PH.state.hasSave();
+    const cont = hasSave ? '<button class="btn primary big" id="t_cont">Continuar</button>' : '';
+    ov.className = 'active title';
+    ov.innerHTML = `<div class="title-screen">
+      <div class="logo">STRAIN<span>MON</span></div>
+      <div class="tagline">Sandbox top-down · genética landrace</div>
+      <div class="title-btns">${cont}<button class="btn ${cont ? 'ghost' : 'primary'} big" id="t_new">Nueva partida</button></div>
+      <div class="title-help">WASD/flechas · Espacio: acción · I·B·C·L·G·Q paneles</div></div>`;
+    const start = (fresh) => {
+      if (fresh) { PH.state.reset(); const p = PH.state.get().player; p.map = 'lab'; const s = this.W.MAPS.lab.spawn; p.x = s.x; p.y = s.y; p.dir = 'down'; }
+      else PH.state.load();
+      const p = PH.state.get().player; if (!this.W.MAPS[p.map]) { p.map = 'lab'; const s = this.W.MAPS.lab.spawn; p.x = s.x; p.y = s.y; }
+      this.buildMap(p.map); this.syncPlayerPx(true);
+      ov.className = ''; ov.innerHTML = '';
+      PH.game.mode = 'overworld'; PH.ui.updateHUD();
+      if (PH.audio && PH.audio.musicStart) PH.audio.musicStart();
+      PH.ui.toast('¡A explorar! Sal del pueblo a los biomas.', 'ok');
+    };
+    document.getElementById('t_new').onclick = () => { if (PH.audio) PH.audio.ensure && PH.audio.ensure(); start(true); };
+    if (cont) document.getElementById('t_cont').onclick = () => { if (PH.audio) PH.audio.ensure && PH.audio.ensure(); start(false); };
   }
 
   applyZoom() {
@@ -69,8 +95,9 @@ SM.WorldScene = class WorldScene extends Phaser.Scene {
       }
     }
     (m.npcs || []).forEach(n => {
-      const im = this.add.image(n.x * T + T / 2, n.y * T + T / 2, 'a_npc').setDepth(40);
-      im._npc = n; this.objLayer.add(im);
+      const role = this.SPRITE2ROLE[n.sprite] || 'neighbor';
+      const im = this.add.image(n.x * T + T / 2, n.y * T + T / 2, this.charTex(role, n.dir || 'down')).setDepth(40);
+      this.scaleActor(im); im._npc = n; this.objLayer.add(im);
     });
     const dm = this.W.dims(m);
     this.cameras.main.setBounds(0, 0, dm.w * T, dm.h * T);
@@ -137,6 +164,7 @@ SM.WorldScene = class WorldScene extends Phaser.Scene {
     const dir = this.heldDir(); this.held = null;
     if (!dir) return;
     p.dir = dir;
+    this.player.setTexture(this.charTex('player', dir)); this.scaleActor(this.player);
     const [dx, dy] = this.DIRV[dir];
     const nx = p.x + dx, ny = p.y + dy;
     if (this.W.solidAt(this.map, nx, ny)) { this.syncPlayerPx(); return; }

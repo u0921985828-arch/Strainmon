@@ -2,6 +2,12 @@
    Placeholder procedural; sustituibles por load.image de un tileset real. */
 SM.BootScene = class BootScene extends Phaser.Scene {
   constructor() { super('Boot'); }
+  preload() {
+    // Sprites reales de personajes (charart) como texturas Phaser (data-URI).
+    if (window.PH && PH.charart && PH.charart.DATA) {
+      for (const k of Object.keys(PH.charart.DATA)) this.load.image('c_' + k, PH.charart.DATA[k]);
+    }
+  }
   create() {
     const T = SM.TILE, PAL = SM.PAL;
     for (const name of Object.keys(PAL)) {
