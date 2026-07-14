@@ -28,7 +28,7 @@ public class Bootstrap : MonoBehaviour
         // --- Jugador (sprite 4-dir original) ---
         var pGO = new GameObject("Player");
         pGO.AddComponent<SpriteRenderer>().sortingOrder = 10;
-        pGO.AddComponent<Actor>().role = "player";
+        pGO.AddComponent<AnimActor>().role = "player";   // sprite propio animado (PixelLab)
         var mover = pGO.AddComponent<GridMover>();
         mover.world = world;
         pGO.AddComponent<InteractionController>();
@@ -43,6 +43,7 @@ public class Bootstrap : MonoBehaviour
         SpawnNpc(world, "botanist", 2, 5);
         SpawnNpc(world, "neighbor", 17, 5);
         SpawnNpc(world, "merchant", 2, 13);
+        SpawnAnimNpc(world, "stoner", 5, 12);   // NPC animado (sprite propio)
 
         camGO.AddComponent<CameraFollow>().target = pGO.transform;
 
@@ -55,6 +56,15 @@ public class Bootstrap : MonoBehaviour
         var go = new GameObject("NPC_" + role);
         go.AddComponent<SpriteRenderer>().sortingOrder = 10;
         go.AddComponent<Actor>().role = role;
+        go.transform.position = world.CellToWorld(x, y);
+        if (GameState.Instance != null) GameState.Instance.npcs.Add(go.transform);
+    }
+
+    void SpawnAnimNpc(TileWorld world, string role, int x, int y)
+    {
+        var go = new GameObject("NPC_" + role);
+        go.AddComponent<SpriteRenderer>().sortingOrder = 10;
+        go.AddComponent<AnimActor>().role = role;
         go.transform.position = world.CellToWorld(x, y);
         if (GameState.Instance != null) GameState.Instance.npcs.Add(go.transform);
     }
