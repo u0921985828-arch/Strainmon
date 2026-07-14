@@ -13,17 +13,20 @@
 
   const SPECIES_BY_ID = Object.fromEntries(SPECIES.map(s => [s.id, s]));
 
-  // Cruce canónico del árbol: dos parentales que coinciden EXACTAMENTE con los
-  // de un nodo de 2 parentales producen esa cepa nombrada (Blueberry × SSH ->
-  // Blue Dream). Los nodos de 3+ parentales requieren cruces encadenados.
+  // Cruce canónico del árbol: un nodo se reconoce cuando el CONJUNTO de cepas
+  // aportadas por los dos parentales del cruce coincide con sus parentales
+  // (cualquier aridad). Cada muestra arrastra su "receta" (strainSet); cruces
+  // encadenados van uniendo conjuntos hasta completar nodos de 3-4 parentales
+  // (afghani×acapulco -> {afghani,acapulco}; ×colombian -> Skunk #1).
   const CANON_CROSS = {};
   for (const s of SPECIES) {
-    if (s.parents && s.parents.length === 2) CANON_CROSS[[...s.parents].sort().join('+')] = s.id;
+    if (s.parents && s.parents.length >= 2) CANON_CROSS[[...new Set(s.parents)].sort().join('+')] = s.id;
   }
-  function canonicalCross(idA, idB) {
-    const hit = CANON_CROSS[[idA, idB].sort().join('+')];
+  function canonicalBySet(strainIds) {
+    const hit = CANON_CROSS[[...new Set(strainIds)].sort().join('+')];
     return hit ? SPECIES_BY_ID[hit] : null;
   }
+  function canonicalCross(idA, idB) { return canonicalBySet([idA, idB]); }
 
   // Biomas = regiones landrace del mundo.
   const BIOMES = {
@@ -81,6 +84,7 @@
       generation: opts.generation || 0,
       sequenced: opts.sequenced || false,
       purity, landrace,
+      strainSet: opts.strainSet || [species.id],   // "receta" de cepas para cruces encadenados
       nickname: null,
     };
   }
@@ -91,5 +95,5 @@
     return makeSpecimen(chosen, env, { form: 'salvaje', caughtAt: null });
   }
 
-  PH.species = { SPECIES, SPECIES_BY_ID, BIOMES, spawnTable, makeSpecimen, rollEncounter, envMultiplier, canonicalCross };
+  PH.species = { SPECIES, SPECIES_BY_ID, BIOMES, spawnTable, makeSpecimen, rollEncounter, envMultiplier, canonicalCross, canonicalBySet };
 })(window.PH = window.PH || {});
