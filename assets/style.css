@@ -97,7 +97,7 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
   box-shadow: inset 0 0 0 2px var(--outline), inset 0 0 60px rgba(0, 0, 0, .55);
 }
 #screen { position: absolute; inset: 0; width: 100%; height: 100%; display: block;
-  object-fit: contain; }
+  object-fit: cover; }
 /* textura de matriz LCD: puntos + líneas de barrido horizontales (no intercepta toques) */
 #stage::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background-image:
@@ -153,7 +153,7 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
    '.bottom' (diálogos) ancla abajo; '.boot' se gestiona aparte. */
 #overlay.active { display: flex; align-items: center; justify-content: center; padding: 14px; }
 #overlay.bottom { align-items: flex-end; padding-bottom: calc(14px + var(--safe-bottom)); }
-#overlay::before { content: ""; position: absolute; inset: 0; background: var(--scrim); }
+#overlay::before { content: ""; position: absolute; inset: 0; background: var(--scrim); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
 #overlay > * { position: relative; z-index: 2; }
 
 /* ---------- Encendido / Boot ---------- */
@@ -228,7 +228,7 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 
 /* ---------- Paneles (ventanas) ---------- */
 .panel { width: min(96%, 640px); max-height: min(88dvh, 760px); background: var(--panel); border: 2px solid var(--outline);
-  border-radius: var(--radius); box-shadow: var(--bevel), var(--shadow); display: flex; flex-direction: column; overflow: hidden; }
+  border-radius: var(--radius); box-shadow: var(--bevel), var(--shadow), 0 10px 44px rgba(0, 0, 0, .5); display: flex; flex-direction: column; overflow: hidden; }
 .panel.wide { width: min(96%, 840px); }
 /* Cabecera = placa de ventana: relieve + regleta de acento bajo el título */
 .panel-head { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px;
@@ -239,12 +239,17 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 .panel-head h2 .pic { color: var(--green-hi); }
 .panel-head small { color: var(--dim); font-weight: 400; font-size: .72rem; margin-left: 6px; text-transform: none; letter-spacing: 0; }
 .panel-body { padding: 16px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.panel-body h3 { font-size: .74rem; color: var(--terra-hi); margin: 14px 0 8px; text-transform: uppercase; letter-spacing: 1px; }
+.panel-body > p { margin-bottom: 12px; color: var(--dim); font-size: .82rem; line-height: 1.55; }
+.panel-body h3 { display: flex; align-items: center; gap: 6px; font-size: .74rem; color: var(--terra-hi); margin: 16px 0 9px;
+  padding-bottom: 5px; border-bottom: 1px solid var(--line); text-transform: uppercase; letter-spacing: 1px; }
+.panel-body h3:first-child { margin-top: 2px; }
+.panel-body h3 small { margin-left: auto; color: var(--dim); font-weight: 400; letter-spacing: 0; }
 .x { background: none; border: 2px solid transparent; color: var(--dim); font-size: 1.1rem; cursor: pointer; width: 32px; height: 32px; border-radius: var(--radius); font-family: var(--font); }
 .x:hover { color: var(--ink); border-color: var(--outline); }
 .dim { color: var(--dim); font-size: .82rem; }
 .row { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
-.center-col { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.center-col { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+.center-col > * { margin: 0; }
 .warn { color: var(--amber); font-size: .74rem; margin-top: 4px; }
 
 /* ---------- Grids de items ---------- */

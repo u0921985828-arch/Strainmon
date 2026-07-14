@@ -318,6 +318,7 @@
     if (PH.sprites) PH.sprites.preload();
     if (PH.plantart) PH.plantart.preload();
     if (PH.strainart) PH.strainart.preload();
+    if (PH.budart) PH.budart.preload();
     if (PH.charart) PH.charart.preload();
     if (PH.faceart) PH.faceart.preload();
     if (PH.furniart) PH.furniart.preload();
@@ -354,14 +355,18 @@
   }
 
   function resize() {
-    // Resolución interna FIJA del canon (480×320, ×2 del GBA original, 15×10
-    // tiles). El escalado a pantalla lo hace el CSS con object-fit: contain,
-    // manteniendo píxeles nítidos y proporción sin deformar (look retro).
-    game.W = 480; game.H = 320;
+    // El lienzo sigue la PROPORCIÓN real del escenario (llena la pantalla, sin
+    // franjas negras). Presupuesto horizontal fijo (~cabe la sala más ancha);
+    // el alto lo marca la pantalla. Píxeles nítidos (object-fit: cover).
+    const st = game.canvas.parentElement || document.getElementById('stage');
+    const r = st.getBoundingClientRect();
+    const w = Math.max(1, r.width), h = Math.max(1, r.height);
+    game.W = 640;
+    game.H = Math.round(game.W * h / w);
     game.canvas.width = game.W; game.canvas.height = game.H;
     game.canvas.style.width = '100%'; game.canvas.style.height = '100%';
     game.ctx.imageSmoothingEnabled = false;
-    if (game._dmg) { game._dmg.width = game.W; game._dmg.height = game.H; }
+    game._dmg = null;   // se recrea con la proporción nueva en applyDMG
   }
 
   /* ------------------------- TÍTULO ------------------------- */
@@ -850,10 +855,11 @@
   // (paleta verde-oliva clásica) y reescala. Barato (~23k px/frame).
   const DMG_PAL = [[15, 56, 15], [48, 98, 48], [139, 172, 15], [155, 188, 15]];
   function applyDMG() {
-    if (!game._dmg) { const c = document.createElement('canvas'); c.width = 160; c.height = 144; game._dmg = c; }
+    const DW = 160, DH = Math.max(1, Math.round(DW * game.H / game.W));   // proporción de pantalla
+    if (!game._dmg || game._dmg.width !== DW || game._dmg.height !== DH) { const c = game._dmg || document.createElement('canvas'); c.width = DW; c.height = DH; game._dmg = c; }
     const sc = game._dmg.getContext('2d'); sc.imageSmoothingEnabled = false;
-    sc.drawImage(game.canvas, 0, 0, 160, 144);
-    const id = sc.getImageData(0, 0, 160, 144), d = id.data;
+    sc.drawImage(game.canvas, 0, 0, DW, DH);
+    const id = sc.getImageData(0, 0, DW, DH), d = id.data;
     for (let i = 0; i < d.length; i += 4) {
       const l = d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11;
       const c = DMG_PAL[l < 48 ? 0 : l < 108 ? 1 : l < 176 ? 2 : 3];

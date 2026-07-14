@@ -380,14 +380,16 @@
     overlay.querySelectorAll('.dex-card[data-strain]').forEach(el => el.onclick = () => lineageView(el.dataset.strain));
   }
   // Tarjeta de receta: parentales × ... → descendiente (bloqueado si no obtenido).
+  // Icono compacto de una cepa: cogollo (budart) con respaldo al retrato.
+  function budIcon(id) { return (PH.budart && PH.budart.uri(id)) || (PH.strainart && PH.strainart.uri(id)) || null; }
   function recipeCard(parentsArr, node, byId, gotFn, tailIcon) {
     const thumb = pid => {
-      const u = PH.strainart && PH.strainart.uri(pid);
+      const u = budIcon(pid);
       return `<div class="rc-par" title="${byId[pid] ? byId[pid].name : pid}">${u ? `<img src="${u}" alt="" loading="lazy">` : '<i class="pic pic-leaf"></i>'}</div>`;
     };
     const parents = parentsArr.map(thumb).join('<span class="rc-x">×</span>');
     const isGot = gotFn(node.id);
-    const cu = PH.strainart && PH.strainart.uri(node.id);
+    const cu = budIcon(node.id);
     return `<div class="recipe ${isGot ? 'got' : 'locked'}">
       <div class="rc-parents">${parents}${tailIcon ? `<span class="rc-x">${tailIcon}</span>` : ''}</div>
       <span class="rc-eq">→</span>
