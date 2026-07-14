@@ -14,6 +14,12 @@ todo el arte se genera por código a partir de la genética de cada planta.
 
 Abre `index.html` en un navegador moderno. No requiere servidor ni instalación.
 
+Es una **app web responsive**: se adapta a móvil, tablet y escritorio, con
+controles táctiles en pantalla y navegación inferior. Sirviéndola por HTTP es
+además una **PWA instalable** (icono en la pantalla de inicio, pantalla completa
+y juego **offline** mediante service worker). Tema claro/oscuro automático y
+diseño ligero (fuentes del sistema, cero dependencias) por sostenibilidad.
+
 ### Controles
 | Acción | Tecla |
 |---|---|

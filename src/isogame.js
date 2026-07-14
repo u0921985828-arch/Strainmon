@@ -235,10 +235,21 @@
   }
 
   function resize() {
-    // Búfer a resolución interna; el tamaño de pantalla lo gestiona la LCD (CSS).
+    // Resolución interna ADAPTATIVA: altura lógica constante (zoom fijo entre
+    // dispositivos) y anchura según el aspecto real del escenario. Así el mundo
+    // llena la pantalla sin deformar el pixel-art, porque la proporción interna
+    // del lienzo coincide con la del contenedor CSS (que se estira al 100%).
+    const stage = document.getElementById('stage') || game.canvas.parentElement;
+    const r = stage ? stage.getBoundingClientRect() : { width: game.W, height: game.H };
+    const TARGET_H = 432;                        // resolución vertical del mundo
+    const ratio = (r.width && r.height) ? r.width / r.height : 10 / 9;
+    game.H = TARGET_H;
+    game.W = Math.max(200, Math.min(1400, Math.round(TARGET_H * ratio)));
     game.canvas.width = game.W; game.canvas.height = game.H;
     game.canvas.style.width = '100%'; game.canvas.style.height = '100%';
     game.ctx.imageSmoothingEnabled = false;
+    if (game._dmg) { game._dmg.width = game.W; game._dmg.height = game.H; }
+    if (PH.state && G().player && DIRV[G().player.dir]) centerCam(true);
   }
 
   /* ------------------------- TÍTULO ------------------------- */
