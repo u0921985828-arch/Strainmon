@@ -25,6 +25,7 @@
         activeTool: 'frasco',
         cebosActivos: 0,               // encuentros con feromona
         esquejes: 0,                   // kits de selección fenotípica (esqueje/clon)
+        macetas: 0,                    // macetas en inventario (armario de cultivo)
         labLevel: 1,                   // mejora del laboratorio (mutaciones en cruce)
         heat: 0,                       // presión policial 0..100 (Fase 4)
         busts: 0,                      // veces pillado por la poli
@@ -32,6 +33,7 @@
       },
       bank: [],          // especímenes almacenados
       garden: [],        // plantas creciendo en el invernadero
+      tent: {},          // slots del Armario de Cultivo: idx -> {hasPot, spec, t}
       catalog: {},       // signature -> {sig, speciesId, name, tier, rarity, count, firstAt, pheno}
       species: {},       // speciesId -> {seen, obtained}
       quests: {},        // questId -> {state:'active'|'done', progress}

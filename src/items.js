@@ -41,6 +41,7 @@
     cebo:     { id: 'cebo', name: 'Feromona floral', price: 120, desc: 'Aumenta la probabilidad de encuentros raros un rato.', consumable: true },
     estabilizador: { id: 'estabilizador', name: 'Estabilizador genético', price: 2500, desc: 'Reduce pérdida de calidad al recolectar.', passive: true },
     seleccion: { id: 'seleccion', name: 'Kit de selección fenotípica', price: 1200, desc: 'Aísla por esqueje un clon élite / fenotipo mutado de un ejemplar base (Cheese de Skunk #1, NL #5, fenos de OG Kush…). Un uso.', consumable: true, kind: 'esqueje' },
+    maceta: { id: 'maceta', name: 'Maceta', price: 120, desc: 'Recipiente de cultivo 1×1. Colócala en un slot del Armario de Cultivo antes de poder plantar semillas o clones.', consumable: true, kind: 'maceta' },
   };
 
   function toolQuality(tool, playerBonus) {

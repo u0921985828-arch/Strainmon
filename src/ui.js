@@ -812,6 +812,7 @@
     PH.state.addCredits(-it.price);
     if (kind === 'tool') { if (!s.player.tools.includes(id)) s.player.tools.push(id); }
     else if (it.kind === 'esqueje') { s.player.esquejes = (s.player.esquejes || 0) + 1; }
+    else if (it.kind === 'maceta') { s.player.macetas = (s.player.macetas || 0) + 1; }
     else if (it.consumable) { s.player.cebosActivos += 8; }
     else { if (!s.player.gear.includes(id)) s.player.gear.push(id); }
     toast('Comprado: ' + it.name, 'ok');
@@ -925,9 +926,57 @@
     document.getElementById('p_close').onclick = houseMenu;
   }
 
+  // ---------------- ARMARIO DE CULTIVO: slot con maceta ----------------
+  const TENT_STAGES = ['Plántula', 'Vegetativo', 'Prefloración', 'Floración', 'Lista'];
+  function tentSlot(idx) {
+    const s = G();
+    const st = PH.game.tentSlot(idx);
+    let body, wire = () => { };
+    if (!st.hasPot) {
+      const has = (s.player.macetas || 0) > 0;
+      body = `<p>Slot de cultivo vacío. Requiere una <b>Maceta</b> antes de plantar (dependencia estricta). ${has ? `Tienes <b>${s.player.macetas}</b>.` : 'Cómprala en el Mercado.'}</p>
+        <div class="row">${has ? '<button class="btn primary" id="t_pot"><i class="pic pic-sprout sm"></i> Colocar maceta</button>' : '<button class="btn" disabled>Sin macetas</button>'}<button class="btn ghost" id="t_close">Cerrar</button></div>`;
+      wire = () => { if (has) document.getElementById('t_pot').onclick = () => { s.player.macetas--; st.hasPot = true; toast('Maceta colocada en el slot.', 'ok'); tentSlot(idx); }; };
+    } else if (!st.spec) {
+      const usable = s.bank.filter(sp => sp.form !== 'polen' && !sp.pheno.sterile);
+      body = usable.length
+        ? `<p>Maceta lista (<code>hasPot = true</code>). Elige una semilla o clon del banco para plantar bajo los LED.</p>
+           <div class="cat-grid select">${usable.map(sp => `<div class="cat-card pick" data-plant="${sp.uid}"><canvas id="ts_${sp.uid}" width="70" height="90"></canvas><div class="cc-name">${sp.nickname || sp.name}</div></div>`).join('')}</div>`
+        : '<p>No tienes semillas ni clones fértiles en el banco. Recolecta o cruza cepas primero.</p><div class="row"><button class="btn ghost" id="t_close">Cerrar</button></div>';
+      wire = () => {
+        usable.forEach(sp => paintPlant('ts_' + sp.uid, sp, 1.7));
+        overlay.querySelectorAll('[data-plant]').forEach(b => b.onclick = () => {
+          const sp = PH.state.bankGet(b.dataset.plant); if (!sp) return;
+          st.spec = sp; st.grow = 0; PH.state.bankRemove(sp.uid);
+          toast('Plantado bajo LED: ' + (sp.nickname || sp.name), 'ok'); tentSlot(idx);
+        });
+      };
+    } else {
+      const stage = Math.min(4, Math.floor(st.grow / 25)), ready = st.grow >= 100;
+      body = `<div class="center-col">${specimenCard(st.spec)}
+        <p>Fase: <b>${TENT_STAGES[stage]}</b> · Madurez <b>${Math.round(st.grow)}%</b> (LED cenital activo).</p>
+        <div class="bar" style="width:82%"><i style="width:${st.grow}%"></i></div>
+        <div class="row">${ready ? '<button class="btn primary" id="t_harv"><i class="pic pic-sprout sm"></i> Cosechar</button>' : '<button class="btn" disabled>Creciendo…</button>'}<button class="btn ghost" id="t_close">Cerrar</button></div></div>`;
+      wire = () => {
+        paintPlant('pc_' + st.spec.uid, st.spec, 2);
+        if (ready) document.getElementById('t_harv').onclick = () => {
+          const sp = st.spec, credits = 40 + Math.round(sp.quality * 1.5);
+          PH.state.addCredits(credits);
+          PH.state.bankAdd(PH.species.makeSpecimen(PH.species.SPECIES_BY_ID[sp.speciesId], s.env, { genotype: sp.genotype, form: 'clon', quality: sp.quality, strainSet: sp.strainSet, landrace: sp.landrace, purity: sp.purity }));
+          st.spec = null; st.grow = 0; s.stats.harvests = (s.stats.harvests || 0) + 1;
+          toast('Cosecha en carpa: +' + credits + ' créditos · 1 clon al banco.', 'ok'); updateHUD(); tentSlot(idx);
+        };
+      };
+    }
+    open(`<div class="panel"><div class="panel-head"><h2><i class="pic pic-leaf"></i> Slot de cultivo #${idx + 1} <small>Armario · Carpa Indoor</small></h2><button class="x" id="p_close">✕</button></div><div class="panel-body">${body}</div></div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    const cbtn = document.getElementById('t_close'); if (cbtn) cbtn.onclick = close;
+    wire();
+  }
+
   PH.ui = {
     init, toast, updateHUD, open, close, isOpen,
-    dialog, dialogNext, encounter, bag, bank, catalog, lab, shop, quests, placeMenu, greenhouse,
+    dialog, dialogNext, encounter, bag, bank, catalog, lab, shop, quests, placeMenu, greenhouse, tentSlot,
     specimenCard, paintPlant,
     get mode() { return PH.game ? PH.game.mode : 'overworld'; }
   };

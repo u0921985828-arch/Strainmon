@@ -40,10 +40,36 @@
         { gx: 2, gy: 1, kind: 'grow', solid: true, label: 'Mesa de cultivo' },
         { gx: 10, gy: 1, kind: 'pc', solid: true, label: 'Ordenador' },
         { gx: 2, gy: 6, kind: 'bed', solid: true, label: 'Cama' },
-        { gx: 4, gy: 1, kind: 'plant', solid: true, label: 'Planta' },
-        { gx: 8, gy: 1, kind: 'plant', solid: true, label: 'Planta' },
+        { gx: 6, gy: 1, kind: 'closet', solid: true, w: 2, label: 'Armario de Cultivo', to: 'tent', tgx: 4, tgy: 4 },
+        { gx: 9, gy: 1, kind: 'plant', solid: true, label: 'Planta' },
         { gx: 10, gy: 5, kind: 'shelf', solid: true, label: 'Estante' },
         { gx: 2, gy: 4, kind: 'crate', solid: true, label: 'Caja' },
+      ],
+    },
+    // ---------------- CARPA INDOOR (instancia del Armario de Cultivo) ----------------
+    tent: {
+      id: 'tent', name: 'Armario · Carpa Indoor', theme: 'room', wallH: 46, bg: '#0d0c10',
+      pal: { floorA: '#3a3630', floorB: '#332f2a', floorEdge: 'rgba(0,0,0,.45)', door: '#8a5a30', wall: { top: '#cbd0d6', left: '#8f949c', right: '#b0b5bd' } },
+      grid: [
+        '##########',
+        '#........#',
+        '#........#',
+        '#........#',
+        '#........#',
+        '####D#####',
+      ],
+      spawn: { gx: 4, gy: 4 },
+      doors: [{ gx: 4, gy: 5, to: 'apt', tgx: 6, tgy: 2 }],
+      npcs: [],
+      leds: [{ gx: 1, gy: 1, w: 4, h: 4 }, { gx: 5, gy: 1, w: 4, h: 4 }],   // 2 focos cenitales, cuadrantes 4×4 exactos
+      objects: [
+        { gx: 2, gy: 1, kind: 'duct', solid: true, label: 'Tubo de ventilación' },
+        { gx: 7, gy: 1, kind: 'duct', solid: true, label: 'Tubo de ventilación' },
+        { gx: 5, gy: 1, kind: 'extractor', solid: true, label: 'Extractor de aire' },
+        { gx: 2, gy: 2, kind: 'slot', idx: 0, solid: true, label: 'Slot de cultivo' },
+        { gx: 3, gy: 2, kind: 'slot', idx: 1, solid: true, label: 'Slot de cultivo' },
+        { gx: 6, gy: 2, kind: 'slot', idx: 2, solid: true, label: 'Slot de cultivo' },
+        { gx: 7, gy: 2, kind: 'slot', idx: 3, solid: true, label: 'Slot de cultivo' },
       ],
     },
     street: {
@@ -251,7 +277,9 @@
     const r = m.grid[gy]; if (gx < 0 || gx >= r.length) return '#';
     return r[gx];
   }
-  function objAt(m, gx, gy) { return (m.objects || []).find(o => o.gx === gx && o.gy === gy); }
+  // Objeto en (gx,gy): soporta huella multi-baldosa (o.w × o.h, por defecto 1×1),
+  // anclado a la rejilla. Su hitbox ocupa el 100% de cada baldosa cubierta.
+  function objAt(m, gx, gy) { return (m.objects || []).find(o => gx >= o.gx && gx < o.gx + (o.w || 1) && gy >= o.gy && gy < o.gy + (o.h || 1)); }
   function doorAt(m, gx, gy) { return (m.doors || []).find(d => d.gx === gx && d.gy === gy); }
   function npcAt(m, gx, gy) { return (m.npcs || []).find(n => n.gx === gx && n.gy === gy && !n._inactive); }
   // Horario de cada rol (Fase 4): la ciudad cobra vida según la hora.
@@ -505,7 +533,13 @@
     if (o.kind === 'shop') return PH.ui.shop();
     if (o.kind === 'pc') return pcMenu();
     if (o.kind === 'bed') { PH.state.save(); return PH.ui.toast('Descansas y guardas la partida.', 'ok'); }
+    if (o.kind === 'closet') { A('warp'); return warp({ to: o.to, tgx: o.tgx, tgy: o.tgy }); }   // Armario -> Carpa Indoor
+    if (o.kind === 'slot') return PH.ui.tentSlot(o.idx);
+    if (o.kind === 'extractor') return PH.ui.toast('Extractor de aire activo: renueva el aire y controla la humedad.', '');
+    if (o.kind === 'duct') return PH.ui.toast('Tubo de ventilación: canaliza el flujo de aire de la carpa.', '');
   }
+  // Estado persistente de cada slot del Armario de Cultivo.
+  game.tentSlot = function (idx) { const s = G(); if (!s.tent) s.tent = {}; return (s.tent[idx] = s.tent[idx] || { hasPot: false, spec: null, grow: 0 }); };
   function pcMenu() {
     PH.ui.dialog(['Terminal: accede a tu Banco (B), Strain-dex (C) o Misiones (Q).'], null, null);
   }
@@ -771,6 +805,9 @@
     if (game.mode === 'overworld' || game.mode === 'menu' || game.mode === 'dialog' || game.mode === 'encounter') {
       PH.state.updateEnv(dt); if (PH.events) PH.events.update(dt); if (PH.garden) PH.garden.update(dt);
       if (PH.heat) PH.heat.update(dt);
+      // Crecimiento en la carpa: bajo LED, cada slot plantado madura (0..100).
+      const tent = G().tent;
+      if (tent) for (const k in tent) { const st = tent[k]; if (st.spec && st.grow < 100) st.grow = Math.min(100, st.grow + dt * 0.010); }
     }
     if (game.mode === 'overworld') {
       tryMove();
@@ -844,11 +881,35 @@
     });
 
     ISO.renderRoom(ctx, m, game.cam, now, actors, objects);
+    if (m.leds) drawLeds(ctx, m);   // focos LED: cuadrantes 4×4 exactos
 
     // etiqueta del objeto/npc al frente si el jugador mira algo interactuable
     hudFacingLabel(ctx, m);
     envTint(ctx);
     if (game.dmg) applyDMG();
+  }
+
+  // Iluminación de precisión: cada foco tiñe su cuadrante 4×4 (sin difuminado
+  // fuera de la rejilla) y dibuja la barra LED cenital.
+  function drawLeds(ctx, m) {
+    const TW = ISO.TW, TH = ISO.TH;
+    const diamond = (sx, sy, fill) => { ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + TW / 2, sy + TH / 2); ctx.lineTo(sx, sy + TH); ctx.lineTo(sx - TW / 2, sy + TH / 2); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); };
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    for (const led of m.leds) {
+      for (let dy = 0; dy < led.h; dy++) for (let dx = 0; dx < led.w; dx++) {
+        const s = ISO.project(led.gx + dx, led.gy + dy, game.cam);
+        diamond(s.x, s.y, 'rgba(216,130,224,0.09)');   // luz LED de cultivo (magenta suave)
+      }
+    }
+    ctx.restore();
+    // barra LED cenital sobre el centro de cada cuadrante
+    for (const led of m.leds) {
+      const s = ISO.project(led.gx + led.w / 2 - 0.5, led.gy, game.cam);
+      const bx = s.x, by = s.y - 30;
+      ctx.fillStyle = '#20161f'; ctx.fillRect(bx - 22, by - 4, 44, 6);
+      ctx.fillStyle = '#e6b8ea'; ctx.fillRect(bx - 20, by - 3, 40, 3);
+      ctx.fillStyle = 'rgba(230,184,234,0.5)'; ctx.fillRect(bx - 20, by, 40, 2);
+    }
   }
 
   // Post-proceso "modo DMG": reduce a 160x144, cuantiza luminancia a 4 tonos
@@ -910,6 +971,40 @@
     else if (o.kind === 'barrel') { ISO.cube(ctx, sx, sy, 20, { top: '#8a5a30', left: '#5c3f26', right: '#6e4a2c' }); }
     else if (o.kind === 'shelf') ISO.cube(ctx, sx, sy, 34, { top: '#7a5533', left: '#4a3320', right: '#5c3f26' });
     else if (o.kind === 'sign') ISO.cube(ctx, sx, sy, 26, { top: '#b98a52', left: '#6e4a2c', right: '#8a5a30' });
+    else if (o.kind === 'closet') {   // armario 2×1: mueble plateado con puertas
+      const rx = sx + ISO.TW / 2, ry = sy + ISO.TH / 2;
+      ISO.cube(ctx, rx, ry, 42, { top: '#c6cbd1', left: '#7c818a', right: '#9ea3ac' });
+      ISO.cube(ctx, sx, sy, 42, { top: '#c6cbd1', left: '#7c818a', right: '#9ea3ac' });
+      ctx.strokeStyle = '#565b62'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(sx, sy + ISO.TH - 42); ctx.lineTo(sx, sy + ISO.TH); ctx.stroke();
+      ctx.fillStyle = '#3f8f4a'; ctx.fillRect(sx - 5, sy - 8, 3, 3); ctx.fillRect(rx + 2, ry - 8, 3, 3);   // pilotos LED
+    }
+    else if (o.kind === 'duct') {
+      ISO.cube(ctx, sx, sy, 22, { top: '#b6bbc3', left: '#7f848c', right: '#9aa0a8' });
+      ctx.strokeStyle = '#767b83'; ctx.lineWidth = 1;
+      for (let y = sy + ISO.TH - 20; y < sy + ISO.TH - 2; y += 4) { ctx.beginPath(); ctx.moveTo(sx - 8, y); ctx.lineTo(sx + 8, y); ctx.stroke(); }
+    }
+    else if (o.kind === 'extractor') {
+      ISO.cube(ctx, sx, sy, 26, { top: '#9aa0a6', left: '#5f646a', right: '#7d828a' });
+      const t = performance.now() / 110, cx = sx, cy = sy + ISO.TH - 26 - 6;
+      ctx.strokeStyle = '#2e3339'; ctx.lineWidth = 2;
+      for (let i = 0; i < 4; i++) { const a = t + i * Math.PI / 2; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a) * 8, cy + Math.sin(a) * 5); ctx.stroke(); }
+      ctx.fillStyle = '#cbd0d6'; ctx.beginPath(); ctx.arc(cx, cy, 2, 0, 6.283); ctx.fill();
+    }
+    else if (o.kind === 'slot') {
+      const st = game.tentSlot(o.idx);
+      ISO.cube(ctx, sx, sy, 10, { top: '#5a4a3a', left: '#3a2f24', right: '#4a3d2e' });   // superficie de mesa
+      if (st.hasPot) {
+        ISO.cube(ctx, sx, sy - 10, 8, { top: '#c07048', left: '#7a4028', right: '#9a5636' });   // maceta
+        if (st.spec) {
+          const stage = Math.min(4, Math.floor(st.grow / 25));
+          const key = PH.plantart && PH.plantart.stageKey(st.spec.speciesId, stage);
+          const im = key && PH.plantart.img(key);
+          if (im && im.complete && im.naturalWidth) { const h = 10 + stage * 7; ctx.drawImage(im, sx - h * 0.4, sy + ISO.TH - 22 - h, h * 0.8, h); }
+          else PH.render.drawPlant(ctx, sx, sy + ISO.TH - 20, st.spec.pheno, 0.55 + stage * 0.22, performance.now());
+        }
+      }
+    }
     else ISO.cube(ctx, sx, sy, 14, { top: '#999', left: '#555', right: '#777' });
   }
 
