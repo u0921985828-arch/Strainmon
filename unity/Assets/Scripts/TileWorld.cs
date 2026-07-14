@@ -80,7 +80,7 @@ public class TileWorld : MonoBehaviour
             {
                 var tex = DownloadHandlerTexture.GetContent(req);
                 tex.filterMode = FilterMode.Point; tex.wrapMode = TextureWrapMode.Clamp;
-                sprites[name] = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), Bootstrap.PPU);
+                sprites[name] = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), tex.width);
             }
             else Debug.LogWarning($"tile '{name}' no cargó ({req.error}); uso fallback.");
         }
@@ -104,6 +104,6 @@ public class TileWorld : MonoBehaviour
         var px = new Color[w * h];
         for (int i = 0; i < px.Length; i++) { float sh = ((i / w) % 4 == 0) ? -0.04f : 0f; px[i] = new Color(col.r + sh, col.g + sh, col.b + sh, 1f); }
         tex.SetPixels(px); tex.Apply();
-        return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), Bootstrap.PPU);
+        return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), w);
     }
 }

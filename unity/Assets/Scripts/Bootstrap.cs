@@ -39,25 +39,16 @@ public class Bootstrap : MonoBehaviour
         new GameObject("Cultivation").AddComponent<Cultivation>();
         new GameObject("GameUI").AddComponent<GameUI>();
 
-        // --- NPCs (en tiles de hierba) ---
-        SpawnNpc(world, "botanist", 2, 5);
-        SpawnNpc(world, "neighbor", 17, 5);
-        SpawnNpc(world, "merchant", 2, 13);
-        SpawnAnimNpc(world, "stoner", 5, 12);   // NPC animado (sprite propio)
+        // --- NPCs animados (tus personajes / recolores, mismo estilo) ---
+        SpawnAnimNpc(world, "stoner", 5, 12);
+        SpawnAnimNpc(world, "townie_a", 2, 5);
+        SpawnAnimNpc(world, "townie_b", 17, 5);
+        SpawnAnimNpc(world, "townie_c", 2, 13);
 
         camGO.AddComponent<CameraFollow>().target = pGO.transform;
 
         // --- Datos: 100 cepas (StreamingAssets/strains.json) ---
         new GameObject("StrainDatabase").AddComponent<StrainDatabase>();
-    }
-
-    void SpawnNpc(TileWorld world, string role, int x, int y)
-    {
-        var go = new GameObject("NPC_" + role);
-        go.AddComponent<SpriteRenderer>().sortingOrder = 10;
-        go.AddComponent<Actor>().role = role;
-        go.transform.position = world.CellToWorld(x, y);
-        if (GameState.Instance != null) GameState.Instance.npcs.Add(go.transform);
     }
 
     void SpawnAnimNpc(TileWorld world, string role, int x, int y)
