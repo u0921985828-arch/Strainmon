@@ -248,12 +248,24 @@
     if (!c || c.w !== map.grid[0].length || c.h !== map.grid.length) c = map._cache = buildCells(map);
     const cx = cam.x, cy = cam.y;
 
-    // 1) suelos (no ocluyen) — desde caché, proyección inline
+    // 1) suelos — sprite del pack (tiles) ordenado por profundidad, o rombo procedural
     const fl = c.floors;
-    for (let i = 0; i < fl.length; i++) {
-      const f = fl[i];
-      floorDiamond(ctx, (f.gx - f.gy) * (TW / 2) + cx, (f.gx + f.gy) * (TH / 2) + cy,
-        f.door ? P.door : (f.alt ? P.floorA : P.floorB), P.floorEdge);
+    const TA = (map.tiles && PH.tileart) ? PH.tileart : null;
+    if (TA) {
+      const ordered = fl.slice().sort((a, b) => (a.gx + a.gy) - (b.gx + b.gy));
+      for (const f of ordered) {
+        const sx = (f.gx - f.gy) * (TW / 2) + cx, sy = (f.gx + f.gy) * (TH / 2) + cy;
+        const nm = map.tiles[f.door ? 'D' : '.'] || map.tiles['.'];
+        const im = nm && TA.img(nm);
+        if (im && im.complete && im.naturalWidth) ctx.drawImage(im, Math.round(sx - TW / 2), Math.round(sy), TW, Math.round(im.naturalHeight * (TW / im.naturalWidth)));
+        else floorDiamond(ctx, sx, sy, f.door ? P.door : (f.alt ? P.floorA : P.floorB), P.floorEdge);
+      }
+    } else {
+      for (let i = 0; i < fl.length; i++) {
+        const f = fl[i];
+        floorDiamond(ctx, (f.gx - f.gy) * (TW / 2) + cx, (f.gx + f.gy) * (TH / 2) + cy,
+          f.door ? P.door : (f.alt ? P.floorA : P.floorB), P.floorEdge);
+      }
     }
 
     // 2) drawables ordenados por profundidad (painter). Entradas pooled.
