@@ -25,18 +25,30 @@ public class Bootstrap : MonoBehaviour
         var world = new GameObject("World").AddComponent<TileWorld>();
         world.Build();
 
-        // --- Jugador ---
+        // --- Jugador (sprite 4-dir original) ---
         var pGO = new GameObject("Player");
-        var sr = pGO.AddComponent<SpriteRenderer>();
-        sr.sprite = TileWorld.MakeSprite(new Color(0.79f, 0.54f, 0.52f), 12, 14);
-        sr.sortingOrder = 10;
+        pGO.AddComponent<SpriteRenderer>().sortingOrder = 10;
+        pGO.AddComponent<Actor>().role = "player";
         var mover = pGO.AddComponent<GridMover>();
         mover.world = world;
         pGO.transform.position = world.CellToWorld(world.spawn.x, world.spawn.y);
+
+        // --- NPCs (en tiles de hierba) ---
+        SpawnNpc(world, "botanist", 2, 5);
+        SpawnNpc(world, "neighbor", 16, 5);
+        SpawnNpc(world, "merchant", 2, 13);
 
         camGO.AddComponent<CameraFollow>().target = pGO.transform;
 
         // --- Datos: 100 cepas (StreamingAssets/strains.json) ---
         new GameObject("StrainDatabase").AddComponent<StrainDatabase>();
+    }
+
+    void SpawnNpc(TileWorld world, string role, int x, int y)
+    {
+        var go = new GameObject("NPC_" + role);
+        go.AddComponent<SpriteRenderer>().sortingOrder = 10;
+        go.AddComponent<Actor>().role = role;
+        go.transform.position = world.CellToWorld(x, y);
     }
 }

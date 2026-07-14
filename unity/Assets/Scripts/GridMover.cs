@@ -11,8 +11,9 @@ public class GridMover : MonoBehaviour
     bool moving;
     Vector3 from, to;
     float t;
+    Actor actor;
 
-    void Start() { cell = world.WorldToCell(transform.position); transform.position = Snap(transform.position); }
+    void Start() { actor = GetComponent<Actor>(); cell = world.WorldToCell(transform.position); transform.position = Snap(transform.position); }
 
     void Update()
     {
@@ -32,6 +33,7 @@ public class GridMover : MonoBehaviour
         else if (Key(KeyCode.S, KeyCode.DownArrow)) dy = 1;
         if (dx == 0 && dy == 0) return;
 
+        if (actor) actor.SetFacing(dx < 0 ? "left" : dx > 0 ? "right" : dy < 0 ? "up" : "down");
         var n = new Vector2Int(cell.x + dx, cell.y + dy);
         if (world.IsSolid(n.x, n.y)) return;
         cell = n; from = transform.position; to = world.CellToWorld(n.x, n.y); moving = true; t = 0f;
