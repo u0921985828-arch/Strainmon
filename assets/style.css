@@ -238,7 +238,7 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 .panel-head h2 { display: flex; align-items: center; gap: 8px; font-size: .98rem; text-transform: uppercase; letter-spacing: 1px; color: var(--ink); }
 .panel-head h2 .pic { color: var(--green-hi); }
 .panel-head small { color: var(--dim); font-weight: 400; font-size: .72rem; margin-left: 6px; text-transform: none; letter-spacing: 0; }
-.panel-body { padding: 16px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.panel-body { padding: 16px; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 .panel-body > p { margin-bottom: 12px; color: var(--dim); font-size: .82rem; line-height: 1.55; }
 .panel-body h3 { display: flex; align-items: center; gap: 6px; font-size: .74rem; color: var(--terra-hi); margin: 16px 0 9px;
   padding-bottom: 5px; border-bottom: 1px solid var(--line); text-transform: uppercase; letter-spacing: 1px; }
@@ -285,9 +285,19 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 
 /* ---------- Banco ---------- */
 .panel-body.list { display: flex; flex-direction: column; gap: 10px; }
-.bank-row { display: flex; gap: 10px; align-items: stretch; }
-.bank-row .spec-card { flex: 1; }
-.bank-actions { display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+/* Fila de banco: tarjeta arriba (ancho completo) + acciones en fila envolvente
+   debajo -> nunca se desborda del panel en móvil. */
+.bank-row { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.bank-row .spec-card { flex: none; min-width: 0; }
+.bank-actions { display: flex; flex-direction: row; flex-wrap: wrap; gap: 6px; }
+.bank-actions .btn { flex: 1 1 auto; min-width: 96px; justify-content: center; white-space: nowrap; }
+/* En pantallas anchas, tarjeta y acciones lado a lado. */
+@media (min-width: 560px) {
+  .bank-row { flex-direction: row; align-items: stretch; }
+  .bank-row .spec-card { flex: 1; }
+  .bank-actions { flex-direction: column; flex-wrap: nowrap; justify-content: center; flex: 0 0 auto; }
+  .bank-actions .btn { flex: 0 0 auto; }
+}
 
 /* ---------- Encuentro ---------- */
 .encounter { width: min(96%, 560px); background: var(--panel); border: 2px solid var(--outline); border-top: 6px solid var(--amber);
