@@ -45,6 +45,11 @@
   --shadow: 4px 4px 0 rgba(0, 0, 0, .45);
   --scrim: rgba(10, 7, 8, .72);
 
+  /* biseles duros: luz cálida arriba-izq, sombra abajo-der (relieve de consola) */
+  --bevel-hi: rgba(255, 236, 202, .16);
+  --bevel-lo: rgba(0, 0, 0, .42);
+  --bevel: inset 1px 1px 0 var(--bevel-hi), inset -1px -2px 0 var(--bevel-lo);
+
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   font-size: 16px;
@@ -59,6 +64,12 @@ body {
 }
 img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges; }
 
+/* Iconos pixel: máscara alfa teñida con currentColor (heredan estado activo/dim) */
+.pic { display: inline-block; width: 16px; height: 16px; flex: 0 0 auto;
+  background-color: currentColor; vertical-align: -3px;
+  -webkit-mask: var(--u) center / 16px 16px no-repeat; mask: var(--u) center / 16px 16px no-repeat; }
+.pic.sm { width: 13px; height: 13px; vertical-align: -2px; }
+
 /* ---------- Estructura de la app ---------- */
 #app { height: 100dvh; display: flex; flex-direction: column; }
 
@@ -69,18 +80,18 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
   background: linear-gradient(180deg, var(--panel-2), var(--panel));
   border-bottom: 3px solid var(--outline); z-index: 5;
 }
-.brand { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 1rem;
+.brand { display: flex; align-items: center; gap: 7px; font-weight: 800; font-size: 1rem;
   letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap; color: var(--ink);
   text-shadow: 2px 2px 0 var(--outline); }
 .brand b { color: var(--green-hi); font-weight: 800; }
-.brand-mark { font-size: 1.05rem; text-shadow: none; }
+.brand-mark { color: var(--green-hi); filter: drop-shadow(1.5px 1.5px 0 var(--outline)); }
 .topbar-actions { display: flex; gap: 6px; margin-left: auto; }
 .icon-btn {
   width: 38px; height: 38px; border-radius: var(--radius); border: 2px solid var(--outline);
-  background: var(--panel-2); color: var(--ink); font-size: 1.05rem; cursor: pointer;
-  display: grid; place-items: center; box-shadow: 0 3px 0 var(--outline); font-family: var(--font);
+  background: linear-gradient(180deg, var(--panel-2), var(--panel)); color: var(--ink); cursor: pointer;
+  display: grid; place-items: center; box-shadow: var(--bevel), 0 3px 0 var(--outline); font-family: var(--font);
 }
-.icon-btn:active { transform: translateY(3px); box-shadow: none; }
+.icon-btn:active { transform: translateY(3px); box-shadow: var(--bevel); }
 
 /* HUD */
 #hud { flex: 1 1 auto; min-width: 0; display: flex; justify-content: space-between; gap: 8px;
@@ -88,9 +99,13 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 #hud::-webkit-scrollbar { display: none; }
 .hud-left, .hud-right { display: flex; gap: 6px; }
 .pill {
-  background: var(--panel-2); border: 2px solid var(--outline); border-radius: 999px;
-  padding: 2px 9px; font-size: .7rem; white-space: nowrap; color: var(--ink); font-weight: 700;
+  display: inline-flex; align-items: center; gap: 5px;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel)); border: 2px solid var(--outline); border-radius: 999px;
+  padding: 3px 10px; font-size: .7rem; white-space: nowrap; color: var(--ink); font-weight: 700;
+  box-shadow: var(--bevel); font-variant-numeric: tabular-nums;
 }
+.pill .pic { color: var(--dim); }
+.hud-right .pill .pic { color: var(--amber); }
 
 /* Escenario: marco cálido; el mundo (480×320) va contenido y nítido */
 #stage {
@@ -101,25 +116,32 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 }
 #screen { position: absolute; inset: 0; width: 100%; height: 100%; display: block;
   object-fit: contain; }
-/* trama de puntos muy tenue: textura de matriz (no intercepta toques) */
+/* textura de matriz LCD: puntos + líneas de barrido horizontales (no intercepta toques) */
 #stage::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background-image: radial-gradient(rgba(0, 0, 0, .16) 1px, transparent 1px);
-  background-size: 3px 3px; mix-blend-mode: multiply; opacity: .35; }
+  background-image:
+    radial-gradient(rgba(0, 0, 0, .16) 1px, transparent 1px),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, .10) 0 1px, transparent 1px 3px);
+  background-size: 3px 3px, 100% 3px; mix-blend-mode: multiply; opacity: .38; }
 
 /* Navegación inferior — botonera de consola cálida */
 #tabbar { flex: 0 0 auto; display: flex; align-items: stretch;
   padding-bottom: var(--safe-bottom);
-  background: linear-gradient(180deg, var(--panel), var(--panel-2));
-  border-top: 3px solid var(--outline); z-index: 5; }
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border-top: 3px solid var(--outline); box-shadow: inset 0 2px 0 var(--bevel-hi); z-index: 5; }
 .tab {
-  flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 2px;
-  padding: 7px 2px; background: none; border: none; border-right: 1px solid var(--line); cursor: pointer;
-  color: var(--dim); font-family: var(--font);
+  position: relative; flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 2px 7px; background: none; border: none; border-right: 1px solid var(--line); cursor: pointer;
+  color: var(--dim); font-family: var(--font); transition: color .12s;
 }
+.tab::before { content: ""; position: absolute; top: -1px; left: 18%; right: 18%; height: 2px;
+  background: var(--green-hi); opacity: 0; box-shadow: 0 0 6px var(--green-hi); transition: opacity .12s; }
 .tab:last-child { border-right: none; }
-.tab span { font-size: 1.15rem; line-height: 1; }
-.tab small { font-size: .56rem; letter-spacing: .3px; text-transform: uppercase; }
-.tab:active { transform: translateY(1px); color: var(--green-hi); }
+.tab .pic { width: 20px; height: 20px; }
+.tab small { font-size: .56rem; letter-spacing: .4px; text-transform: uppercase; }
+.tab:hover { color: var(--ink); }
+.tab:active, .tab.active { color: var(--green-hi); }
+.tab:active::before, .tab.active::before { opacity: 1; }
+.tab:active { transform: translateY(1px); }
 
 /* ---------- Controles táctiles (chunky/retro) ---------- */
 .touch { position: absolute; z-index: 20; display: none; }
@@ -193,21 +215,24 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 .toast.bad { border-color: var(--danger); }
 
 /* ---------- Botones (chunky) ---------- */
-.btn { font-family: var(--font); cursor: pointer; border: 2px solid var(--outline); background: var(--panel-2);
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-family: var(--font); cursor: pointer; border: 2px solid var(--outline);
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
   color: var(--ink); padding: 9px 15px; border-radius: var(--radius); font-size: .82rem; font-weight: 700;
-  box-shadow: 0 3px 0 var(--outline); }
-.btn:active { transform: translateY(3px); box-shadow: none; }
+  box-shadow: var(--bevel), 0 3px 0 var(--outline); }
+.btn:active { transform: translateY(3px); box-shadow: var(--bevel); }
 .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: 0 3px 0 var(--outline); }
-.btn.primary { background: var(--green); color: var(--on-accent); }
+.btn.primary { background: linear-gradient(180deg, var(--green-hi), var(--green)); color: var(--on-accent); }
 .btn.ghost { background: transparent; box-shadow: 0 3px 0 var(--outline); }
-.btn.small { padding: 6px 10px; font-size: .72rem; box-shadow: 0 2px 0 var(--outline); }
-.btn.small:active { transform: translateY(2px); box-shadow: none; }
+.btn.small { padding: 6px 10px; font-size: .72rem; box-shadow: var(--bevel), 0 2px 0 var(--outline); }
+.btn.small:active { transform: translateY(2px); box-shadow: var(--bevel); }
 .btn.big { padding: 13px 28px; font-size: 1rem; }
-.btn.warn { background: var(--terra); color: var(--on-accent); }
+.btn.warn { background: linear-gradient(180deg, var(--terra-hi), var(--terra)); color: var(--on-accent); }
 
 /* ---------- Diálogo ---------- */
 .dialog-box { width: min(94%, 640px); background: var(--panel); border: 2px solid var(--outline);
-  border-left: 6px solid var(--green); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
+  border-left: 6px solid var(--green); border-radius: var(--radius); padding: 16px 18px;
+  box-shadow: var(--bevel), var(--shadow); }
 .dialog-box p { font-size: .92rem; }
 .dlg-hint { text-align: right; color: var(--dim); font-size: .7rem; margin-top: 10px; }
 .dialog-box.has-portrait { display: flex; gap: 14px; align-items: flex-start; }
@@ -218,11 +243,15 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 
 /* ---------- Paneles (ventanas) ---------- */
 .panel { width: min(96%, 640px); max-height: min(88dvh, 760px); background: var(--panel); border: 2px solid var(--outline);
-  border-radius: var(--radius); box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden; }
+  border-radius: var(--radius); box-shadow: var(--bevel), var(--shadow); display: flex; flex-direction: column; overflow: hidden; }
 .panel.wide { width: min(96%, 840px); }
-.panel-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px;
-  border-bottom: 2px solid var(--outline); background: linear-gradient(180deg, var(--panel-2), var(--panel)); }
-.panel-head h2 { font-size: .98rem; text-transform: uppercase; letter-spacing: 1px; }
+/* Cabecera = placa de ventana: relieve + regleta de acento bajo el título */
+.panel-head { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px;
+  border-bottom: 2px solid var(--outline); background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  box-shadow: inset 0 1px 0 var(--bevel-hi); }
+.panel-head::after { content: ""; position: absolute; left: 16px; bottom: -1px; width: 34px; height: 2px; background: var(--green-hi); box-shadow: 0 0 6px var(--green-hi); }
+.panel-head h2 { display: flex; align-items: center; gap: 8px; font-size: .98rem; text-transform: uppercase; letter-spacing: 1px; color: var(--ink); }
+.panel-head h2 .pic { color: var(--green-hi); }
 .panel-head small { color: var(--dim); font-weight: 400; font-size: .72rem; margin-left: 6px; text-transform: none; letter-spacing: 0; }
 .panel-body { padding: 16px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .panel-body h3 { font-size: .74rem; color: var(--terra-hi); margin: 14px 0 8px; text-transform: uppercase; letter-spacing: 1px; }
@@ -235,8 +264,10 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 
 /* ---------- Grids de items ---------- */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
-.item { background: var(--panel-2); border: 2px solid var(--outline); border-radius: var(--radius); padding: 10px; cursor: pointer; }
-.item.sel { border-color: var(--green-hi); box-shadow: inset 0 0 0 1px var(--green-hi); }
+.item { background: var(--panel-2); border: 2px solid var(--outline); border-radius: var(--radius); padding: 10px; cursor: pointer;
+  box-shadow: var(--bevel); transition: border-color .12s; }
+.item:hover { border-color: var(--terra); }
+.item.sel { border-color: var(--green-hi); box-shadow: var(--bevel), inset 0 0 0 1px var(--green-hi); }
 .item b { font-size: .84rem; } .item small { display: block; color: var(--dim); font-size: .72rem; margin: 4px 0; }
 .item .tag { font-size: .68rem; color: var(--green-hi); font-weight: 700; }
 
@@ -340,7 +371,8 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 .vit.health.bad b i { background: var(--danger); }
 .plot-actions { display: flex; gap: 4px; }
 .hub-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
-.btn.hub { padding: 18px 10px; line-height: 1.5; font-size: .8rem; }
+.btn.hub { flex-direction: column; gap: 6px; padding: 18px 10px; line-height: 1.5; font-size: .8rem; }
+.btn.hub .pic { width: 22px; height: 22px; color: var(--green-hi); }
 
 /* ---------- Investigación / ADN / eventos ---------- */
 .pill.event { background: var(--panel); border-color: var(--violet); color: var(--violet); animation: pulse 1.2s infinite; }
@@ -368,6 +400,8 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 .dex-art { position: relative; height: 88px; background: var(--canvas-bg); border: 2px solid var(--outline); border-radius: var(--radius); display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
 .dex-art img { height: 86px; width: auto; max-width: 100%; object-fit: contain; object-position: bottom; image-rendering: pixelated; }
 .dex-noart { font-size: 1.6rem; align-self: center; }
+.dex-noart .pic { width: 28px; height: 28px; color: var(--green-lo); }
+.tnode-art .pic { width: 24px; height: 24px; color: var(--green-lo); }
 .dex-chk { position: absolute; top: 3px; right: 3px; background: var(--green); color: var(--on-accent); font-size: .6rem; font-weight: 800; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--outline); }
 .dex-name { font-size: .72rem; font-weight: 700; margin-top: 5px; line-height: 1.2; }
 .dex-badges { margin: 3px 0; }
@@ -410,17 +444,50 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
   * { transition: none !important; }
 }
 
+/* ICONS:START (generado por scripts/gen-icons.mjs — no editar a mano) */
+.pic-bag{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAALklEQVQ4jWNgGLTgPxogWTMDEWLUN+A/kYC2BjCQ4T2skrhsHUkG4AK0jcYBAQDmoAcIWZ6iQwAAAABJRU5ErkJggg==")}
+.pic-leaf{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAOUlEQVQ4jWNgGPTg/////ynSDAMUaYYBijTDAEWaYWC4GwACFGmGAYo0M2AxhGTNyIaQrZkqBhACANpdEvy14+0VAAAAAElFTkSuQmCC")}
+.pic-flask{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAOElEQVQ4jWNgGLTgPxoYogYwYGHTx4D/WDSQZMh/ahiADVCkGQZoa8B/qAJ8mvEaQsh2or1BVwAAszrvEROvYakAAAAASUVORK5CYII=")}
+.pic-helix{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAARElEQVQ4jc2QMQ4AIAjE7v+frnFgcSAcGGM3CFcI0vcAXAniiEhobW9foaQuCU4swSZCo3BgSUgoC2T0VRlu/WEUfMYC1Q6LdR0PWz0AAAAASUVORK5CYII=")}
+.pic-book{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAK0lEQVQ4jWNgGD7gP4kAqwEMOAwlRi0D1Qz4T4TTR73AMJjDgBSAYcCAAQCB4B7wGDW3bQAAAABJRU5ErkJggg==")}
+.pic-clip{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMUlEQVQ4jWNgoBX4jwboY8B/IgFeAxiIsIT2BvzH4/SR7AIGUgzAB4aAAf8pScrkAADfIwMM6sso/AAAAABJRU5ErkJggg==")}
+.pic-save{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAALUlEQVQ4jWNgGDTgPypgQMMYYJgbwEAA094AogAxYfAfXzgMfgMIAuobMGAAAPp1EguBheA5AAAAAElFTkSuQmCC")}
+.pic-pin{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAARklEQVQ4jc2QMQoAMAgD8/9PWzoIYjskjUMP3HI3CHxNFCw5seRElVGOi8QZCDcAJzDyB03e5LCLdOA2lmQ06UkeCdgywwLjeA8AQ2UmUgAAAABJRU5ErkJggg==")}
+.pic-clock{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAUElEQVQ4jc2RMQ4AIAwC+f+ncdJELRY2GU+4NBH4NiwSD2HwLWrYdVaqB5dBmRW7OMVZNuejaF3G5ptOUSnoJG2XgSAzI+jMwllS3BJFwzQD/LLfIXf7Q0wAAAAASUVORK5CYII=")}
+.pic-moon{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAASklEQVQ4jc2SQQoAIAzD+v9PV0QQwepWPWhg7LLkNOBr2Kj7SOzyOI4sA9sIZ2BFmJRlgJp8hM8DbkTCmH6jC0hF4m+6klchS3QoQd2nZ3LlwMMAAAAASUVORK5CYII=")}
+.pic-sun{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAR0lEQVQ4jb2OMQ4AMAgC+f+n6cTSmkgl7W2igMBrSPJfAItjV7Mbrz8StkmwAIlZtAYYAft80AVYMDGLcTOm+2rpauOP4oAF0tzjHSiuJSAAAAAASUVORK5CYII=")}
+.pic-medal{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAASUlEQVQ4jc2Q0QoAIAgD9/8/bQQFhaOcEnRvDW4sgS+xwS07FkDIKWwBFKxasP67LE+yMrZHUka4xDwue7ugQ1aUD6nJrESWozTY1gUKEJZwIAAAAABJRU5ErkJggg==")}
+.pic-coin{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAARUlEQVQ4jWNgGNTgPxIgWyM6oEgzDJCqmQGrIJEGMCBh/Ab8xw1wyg0yA0CAFAMYsIH/lBrAQGk6IMYQgppxGUSSRlIAAJKy2TWlo76fAAAAAElFTkSuQmCC")}
+.pic-grid{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAIUlEQVQ4jWNgGF7gPxogJD4cDRh48H/Aw+D/gBvAMCQBABpq/wHIgF+CAAAAAElFTkSuQmCC")}
+.pic-alert{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAARklEQVQ4jc2SMQ4AMAgC/f+nr2mnxjigJE0ZFQ4HI74XgBXestuZQLhCFoDJFRTtNkCGkEw2oLWnWOZRGxCq77xcQ0rRGy0/EJZq017qYgAAAABJRU5ErkJggg==")}
+.pic-palette{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAASUlEQVQ4jc2SMQ4AIAjE+v9P40SiJgIHi90YWiIRvsY22uLNSHaqMtHc3u6MZKcT4BjE95PeweLNR0A9IqUA039QiaTyKySJCguefNU5tbHJ/wAAAABJRU5ErkJggg==")}
+.pic-sound{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAASUlEQVQ4jWNgGP7g//////Hx8QKQYrIN+A9ViIvGayMI4DIIryH/kQA2xdgMG2QGIAN0xUSFATpAdg1JtjOgGYKPTzKg2ACqAwD5/K9RCPI/2AAAAABJRU5ErkJggg==")}
+.pic-mute{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAP0lEQVQ4jWNgGP7g/////ynSDAIU2fwfjcbrqv9IAJdBZBsAAuhyg9AAZIDL7yTFyn8kDUQFIgMOQ4hWPDQBAM2Rn2E+WlToAAAAAElFTkSuQmCC")}
+.pic-cloud{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAJ0lEQVQ4jWNgGAW0Af+RADY+0ZpxAYo0w8AgNQAEKNJMFQMYRh4AAL0vBwgq5VdlAAAAAElFTkSuQmCC")}
+.pic-rain{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAM0lEQVQ4jWNgGJ7gPxLAxidaMy5AkWYYGKQGgABFmmGAIs1UAf+RbMLFpp0B/ym1ne4AAP9FIuxmaGzEAAAAAElFTkSuQmCC")}
+.pic-storm{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAANUlEQVQ4jWNgGJ7gPxLAxidaMy5AkWYYGKQGgABFmmGAIs3ogCxNVNHMQGoCwqWZIhfQBQAADPIa9PG39sYAAAAASUVORK5CYII=")}
+.pic-wind{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAKUlEQVQ4jWNgGAUkg//////HK0kIMAxu8J9IQBWLGGgC/g9dpzMMJAAApv93iSdM6X8AAAAASUVORK5CYII=")}
+.pic-cart{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAANUlEQVQ4jWNgGD7gPxRQxSAGariEEKDIBf9pagAhBcRYwEAVA/ABBpqD/1hsI8kFA28AKQAAHja7RQNxV54AAAAASUVORK5CYII=")}
+.pic-home{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAARklEQVQ4jdWQWwoAIAgEvf+lJ/qTHq4VRM2fsDuKZs8DcFxmR0JTWpIwCKcFBEEpIbFlmsE9LEIuIiGQJzrqbH8LOqTgOgUBce0T+/mhJwAAAABJRU5ErkJggg==")}
+.pic-drop{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAP0lEQVQ4jc3QOw4AIAgEUe5/6TEWJhRmRfy+mp0Cs+8BvAvgLI2bewGE8wHcbSrCxkCVeybCcKwi4XEvMj2OKpfLF/fEmQK8AAAAAElFTkSuQmCC")}
+.pic-heart{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAQElEQVQ4jWNgGH7gPxIgRpwBlyJkxbjECWomBCjSDAMMVHEBDFCkGQYo0gwDFGmGAYo0M2AxhGTNyIaQrZkuAAAQ/XKcB4dWQgAAAABJRU5ErkJggg==")}
+.pic-trash{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMElEQVQ4jWNgoBX4jwboZ8B/AoAizTBAOwNAAKYAG01QMwiMGsAwSMLgP7lpYEAAAPDMOtTeMYqEAAAAAElFTkSuQmCC")}
+.pic-sprout{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAL0lEQVQ4jWNgGAUY4D8SIEacAZciZMW4xDHAfxIAbQwAAYo0YwMka0AHowbQAQAA47fPMVqGNEcAAAAASUVORK5CYII=")}
+.pic-nova{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMklEQVQ4jWNgGPTg/////0eqAf+hGtFpkg2BAZIUEwOo7wJ0ANOETpMM/g/ddMBALwAAwn57hXGV/94AAAAASUVORK5CYII=")}
+.pic-doc{--u:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAMElEQVQ4jWNgGFTgPxGAoAEMBAwn2wAQoJ8B/3H4fSS7gIFUA3AB+hjwn5KkPCAAACOM0y0YjioDAAAAAElFTkSuQmCC")}
+/* ICONS:END */
+
 </style>
 </head>
 <body>
   <div id="app">
     <!-- Barra superior: identidad + HUD del juego + acciones rápidas -->
     <header id="topbar">
-      <div class="brand"><span class="brand-mark" aria-hidden="true">🌿</span>Strain<b>mon</b></div>
+      <div class="brand"><i class="pic pic-leaf brand-mark" aria-hidden="true"></i>Strain<b>mon</b></div>
       <div id="hud"></div>
       <div class="topbar-actions">
-        <button class="icon-btn" data-key="select" title="Color / DMG" aria-label="Alternar color">🎨</button>
-        <button class="icon-btn" data-key="n" title="Sonido" aria-label="Silenciar">🔊</button>
+        <button class="icon-btn" data-key="select" title="Color / DMG" aria-label="Alternar color"><i class="pic pic-palette"></i></button>
+        <button class="icon-btn" data-key="n" title="Sonido" aria-label="Silenciar"><i class="pic pic-sound"></i></button>
       </div>
     </header>
 
@@ -446,13 +513,13 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 
     <!-- Navegación inferior tipo app: accesos a cada pantalla del juego -->
     <nav id="tabbar" aria-label="Menú del juego">
-      <button class="tab" data-key="i"><span>🎒</span><small>Mochila</small></button>
-      <button class="tab" data-key="g"><span>🌿</span><small>Cultivo</small></button>
-      <button class="tab" data-key="l"><span>🔬</span><small>Lab</small></button>
-      <button class="tab" data-key="b"><span>🧬</span><small>Banco</small></button>
-      <button class="tab" data-key="c"><span>📖</span><small>Dex</small></button>
-      <button class="tab" data-key="q"><span>📋</span><small>Misiones</small></button>
-      <button class="tab" data-key="m"><span>💾</span><small>Guardar</small></button>
+      <button class="tab" data-key="i"><i class="pic pic-bag"></i><small>Mochila</small></button>
+      <button class="tab" data-key="g"><i class="pic pic-leaf"></i><small>Cultivo</small></button>
+      <button class="tab" data-key="l"><i class="pic pic-flask"></i><small>Lab</small></button>
+      <button class="tab" data-key="b"><i class="pic pic-helix"></i><small>Banco</small></button>
+      <button class="tab" data-key="c"><i class="pic pic-book"></i><small>Dex</small></button>
+      <button class="tab" data-key="q"><i class="pic pic-clip"></i><small>Misiones</small></button>
+      <button class="tab" data-key="m"><i class="pic pic-save"></i><small>Guardar</small></button>
     </nav>
   </div>
 
@@ -2993,22 +3060,23 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     // En modo iso, el nombre de sala manda; si no, el mapa top-down.
     const isoName = PH.game && PH.game.roomName ? PH.game.roomName() : '';
     const map = isoName ? { name: isoName } : (PH.world.MAPS && PH.world.MAPS[s.player.map]);
-    const wIcon = { despejado: '☀️', lluvia: '🌧️', niebla: '🌫️', tormenta: '⛈️', ola_calor: '🔥', nublado: '☁️' }[env.weather] || '☀️';
+    const ic = n => `<i class="pic pic-${n} sm"></i>`;
+    const wIcon = { despejado: ic('sun'), lluvia: ic('rain'), niebla: ic('cloud'), tormenta: ic('storm'), ola_calor: ic('alert'), nublado: ic('cloud') }[env.weather] || ic('sun');
     const ev = PH.events && PH.events.current();
-    const evPill = ev ? `<span class="pill event">${ev.icon} ${ev.name} · ${PH.events.remaining()}s</span>` : '';
+    const evPill = ev ? `<span class="pill event">${ic('alert')} ${ev.name} · ${PH.events.remaining()}s</span>` : '';
     const html = `
       <div class="hud-left">
-        <span class="pill">📍 ${map ? map.name : ''}</span>
-        <span class="pill">🕑 ${PH.state.timeLabel(env)} ${env.night ? '🌙' : '☀️'}</span>
+        <span class="pill">${ic('pin')} ${map ? map.name : ''}</span>
+        <span class="pill">${ic('clock')} ${PH.state.timeLabel(env)} ${env.night ? ic('moon') : ic('sun')}</span>
         <span class="pill">${wIcon} ${cap(env.weather.replace('_', ' '))}</span>
-        <span class="pill">🍂 ${cap(env.season)}</span>
+        <span class="pill">${ic('leaf')} ${cap(env.season)}</span>
         ${evPill}
       </div>
       <div class="hud-right">
-        ${PH.heat && PH.heat.level() > 0 ? `<span class="pill heat">🚨 ${'★'.repeat(PH.heat.level())}</span>` : ''}
-        <span class="pill">🏅 ${s.player.prestige}</span>
-        <span class="pill">💰 ${fmt(s.player.credits)}</span>
-        <span class="pill">🌿 ${Object.keys(s.catalog).length}</span>
+        ${PH.heat && PH.heat.level() > 0 ? `<span class="pill heat">${ic('alert')} ${'★'.repeat(PH.heat.level())}</span>` : ''}
+        <span class="pill">${ic('medal')} ${s.player.prestige}</span>
+        <span class="pill">${ic('coin')} ${fmt(s.player.credits)}</span>
+        <span class="pill">${ic('grid')} ${Object.keys(s.catalog).length}</span>
       </div>`;
     // dirty-check: evita reflow/repaint si el HUD no cambió (~30×/s -> sólo en cambio)
     if (hud._last === html) return;
@@ -3065,8 +3133,8 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     return `<span class="tier" style="--tc:${t.color}">${'★'.repeat(t.stars)} ${t.label}</span>`;
   }
   function lineageBadge(spec) {
-    if (spec.landrace) return `<span class="landrace">🌍 Landrace pura</span>`;
-    if (spec.form === 'cruce') return `<span class="hybrid">🧬 Híbrido F${spec.generation || 1}</span>`;
+    if (spec.landrace) return `<span class="landrace"><i class="pic pic-pin sm"></i> Landrace pura</span>`;
+    if (spec.form === 'cruce') return `<span class="hybrid"><i class="pic pic-helix sm"></i> Híbrido F${spec.generation || 1}</span>`;
     return '';
   }
   function specimenCard(spec, opts) {
@@ -3090,7 +3158,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
             ${statBar('Resist.', ph.quant.resistencia)}
           </div>
           ${muts ? '<div class="muts">' + muts + '</div>' : ''}
-          ${ph.sterile ? '<div class="warn">⚠ Estéril (no apta para cruce)</div>' : ''}
+          ${ph.sterile ? '<div class="warn"><i class="pic pic-alert sm"></i> Estéril (no apta para cruce)</div>' : ''}
         </div>
       </div>`;
   }
@@ -3192,7 +3260,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     const gear = s.player.gear.map(id => PH.items.GEAR[id]);
     open(`
       <div class="panel">
-        <div class="panel-head"><h2>🎒 Mochila</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-bag"></i> Mochila</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           <h3>Herramientas de recolección</h3>
           <div class="grid">
@@ -3215,21 +3283,21 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
   function bank() {
     const s = G();
     if (!s.bank.length) {
-      open(`<div class="panel"><div class="panel-head"><h2>🧬 Bóveda de cepas</h2><button class="x" id="p_close">✕</button></div>
+      open(`<div class="panel"><div class="panel-head"><h2><i class="pic pic-helix"></i> Bóveda de cepas</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body"><p class="dim">La bóveda está vacía. Recolecta cepas en las regiones.</p></div></div>`, 'center');
       document.getElementById('p_close').onclick = close; return;
     }
     const sorted = s.bank.slice().sort((a, b) => b.rarity - a.rarity);
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🧬 Bóveda de cepas <small>${s.bank.length} muestras</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-helix"></i> Bóveda de cepas <small>${s.bank.length} muestras</small></h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body list">
           ${sorted.map(sp => `
             <div class="bank-row">
               ${specimenCard(sp)}
               <div class="bank-actions">
-                <button class="btn small" data-seq="${sp.uid}">${sp.sequenced ? '🧾 ADN' : '🔬 Secuenciar'}</button>
-                <button class="btn small" data-sell="${sp.uid}">Vender 💰${sellPrice(sp)}</button>
+                <button class="btn small" data-seq="${sp.uid}">${sp.sequenced ? '<i class="pic pic-doc sm"></i> ADN' : '<i class="pic pic-flask sm"></i> Secuenciar'}</button>
+                <button class="btn small" data-sell="${sp.uid}">Vender <i class="pic pic-coin sm"></i>${sellPrice(sp)}</button>
                 <button class="btn small ghost" data-rel="${sp.uid}">Liberar</button>
               </div>
             </div>`).join('')}
@@ -3259,7 +3327,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
       .sort((a, b) => b.c.rel - a.c.rel).slice(0, 3);
     open(`
       <div class="panel">
-        <div class="panel-head"><h2>🧬 Secuenciación de ADN</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-helix"></i> Secuenciación de ADN</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           <div class="seq-head">${specimenCard(sp)}</div>
           <h3>Cadena genómica</h3>
@@ -3284,7 +3352,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     const price = sellPrice(sp);
     PH.state.bankRemove(uid);
     PH.state.addCredits(price);
-    toast(`Vendido por 💰${price}.`, 'ok');
+    toast(`Vendido por <i class="pic pic-coin sm"></i>${price}.`, 'ok');
     updateHUD();
   }
 
@@ -3307,7 +3375,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
       </div>`).join('');
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🌿 Strain-dex <small>${found}/${total} cepas · ${phenos} fenotipos · árbol filogenético</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-book"></i> Strain-dex <small>${found}/${total} cepas · ${phenos} fenotipos · árbol filogenético</small></h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body"><p class="dim">Toca una cepa para ver su árbol de linaje.</p>${sections}</div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = close;
@@ -3317,7 +3385,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     const uri = PH.strainart && PH.strainart.uri(sp.id);
     const parents = (sp.parents || []).map(p => (byId[p] ? byId[p].name : p));
     const lineage = parents.length ? '◄ ' + parents.join(' × ') : 'landrace / base';
-    const art = uri ? `<img src="${uri}" alt="" loading="lazy">` : `<div class="dex-noart">🌿</div>`;
+    const art = uri ? `<img src="${uri}" alt="" loading="lazy">` : `<div class="dex-noart"><i class="pic pic-leaf"></i></div>`;
     return `<div class="dex-card ${gotIt ? 'got' : 'todo'}" data-strain="${sp.id}" title="${sp.name}">
       <div class="dex-art">${art}${gotIt ? '<span class="dex-chk">✓</span>' : ''}</div>
       <div class="dex-name">${sp.name}</div>
@@ -3336,7 +3404,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     const kids = (!isLand && depth < 8) ? sp.parents.map(p => lineageNode(p, byId, depth + 1)).join('') : '';
     return `<li>
       <div class="tnode ${depth === 0 ? 'root' : ''} ${isLand ? 'land' : ''}" data-strain="${id}" title="${sp.name}">
-        <div class="tnode-art">${uri ? `<img src="${uri}" alt="">` : '🌿'}</div>
+        <div class="tnode-art">${uri ? `<img src="${uri}" alt="">` : '<i class="pic pic-leaf"></i>'}</div>
         <div class="tnode-name">${sp.name}</div>
         ${isLand ? '<div class="tnode-tag">landrace</div>' : ''}
       </div>
@@ -3349,7 +3417,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     let count = 0; (function c(id) { const s = byId[id]; if (!s) return; count++; (s.parents || []).forEach(c); })(rootId);
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🧬 Linaje — ${root.name}</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-helix"></i> Linaje — ${root.name}</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           <p class="dim">De la cepa (arriba) hasta sus landraces (abajo). Toca un ancestro para ver el suyo.</p>
           <div class="ltree2"><ul>${lineageNode(rootId, byId, 0)}</ul></div>
@@ -3373,7 +3441,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     breedSel = breedSel.filter(uid => s.bank.find(x => x.uid === uid));
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🔬 Laboratorio — Cruces genéticos</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-flask"></i> Laboratorio — Cruces genéticos</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           <p class="dim">Selecciona dos parentales. La descendencia hereda un alelo de cada uno por gen; pueden surgir fenotipos, colores y mutaciones nuevos.</p>
           <div class="breed-slots">
@@ -3453,9 +3521,9 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
   function crossResult(spec, isNew, A, B, canon) {
     open(`
       <div class="panel">
-        <div class="panel-head"><h2>🌱 Descendencia obtenida</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-sprout"></i> Descendencia obtenida</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body center-col">
-          ${canon ? `<div class="newbadge">🧬 ¡NODO DEL ÁRBOL: ${canon.name}!</div>` : (isNew ? '<div class="newbadge">✨ ¡FENOTIPO NUEVO PARA EL CATÁLOGO! ✨</div>' : '<div class="dim">Fenotipo ya conocido.</div>')}
+          ${canon ? `<div class="newbadge"><i class="pic pic-helix sm"></i> ¡NODO DEL ÁRBOL: ${canon.name}!</div>` : (isNew ? '<div class="newbadge"><i class="pic pic-nova sm"></i> ¡FENOTIPO NUEVO PARA EL CATÁLOGO! <i class="pic pic-nova sm"></i></div>' : '<div class="dim">Fenotipo ya conocido.</div>')}
           ${canon ? '<p class="dim">Cruce canónico reconocido: has replicado una genética del árbol filogenético.</p>' : ''}
           ${specimenCard(spec)}
           <p class="dim">Parentales: ${A.name} ✕ ${B.name}</p>
@@ -3469,8 +3537,8 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     document.getElementById('p_close').onclick = close;
     document.getElementById('p_close2').onclick = close;
     document.getElementById('again').onclick = lab;
-    if (canon) toast('🧬 Nodo desbloqueado: ' + canon.name, 'ok');
-    else if (isNew) toast('✨ Nuevo fenotipo catalogado: ' + spec.name, 'ok');
+    if (canon) toast('<i class="pic pic-helix sm"></i> Nodo desbloqueado: ' + canon.name, 'ok');
+    else if (isNew) toast('<i class="pic pic-nova sm"></i> Nuevo fenotipo catalogado: ' + spec.name, 'ok');
   }
 
   /* ---------------- INVERNADERO / CULTIVO ---------------- */
@@ -3487,7 +3555,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     }
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🌿 Invernadero <small>${s.garden.length}/${cap} parcelas</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-leaf"></i> Invernadero <small>${s.garden.length}/${cap} parcelas</small></h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           <p class="dim">Planta clones o semillas y obsérvalos crecer por fases. Riega cuando tengan sed: sin agua se estresan y frenan. El riego excesivo y la humedad ambiental favorecen el moho — trátalo con poda sanitaria y ventilación (bio, sin químicos). Una planta sana rinde más al cosechar.</p>
           <div class="garden-grid">${plots.join('')}</div>
@@ -3515,19 +3583,19 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
       <div class="plot-sprite"><img src="${uri}" alt=""><span class="phdot" style="background:${pal.base}"></span>
         <span class="plot-badge ${st.tone}">${st.label}</span></div>
       <div class="plot-name">${p.name}</div>
-      <div class="plot-stage" style="color:${t.color}">${p.ready ? '✅ Lista' : label}</div>
+      <div class="plot-stage" style="color:${t.color}">${p.ready ? '✓ Lista' : label}</div>
       <div class="bar grow"><i style="width:${pct}%"></i></div>
       <div class="vitals">
-        <span class="vit water ${wtone}" title="Agua ${Math.round(wp)}%">💧<b><i style="width:${wp}%"></i></b></span>
-        <span class="vit health ${hp < 45 ? 'bad' : 'ok'}" title="Salud ${Math.round(hp)}%">❤️<b><i style="width:${hp}%"></i></b></span>
+        <span class="vit water ${wtone}" title="Agua ${Math.round(wp)}%"><i class="pic pic-drop sm"></i><b><i style="width:${wp}%"></i></b></span>
+        <span class="vit health ${hp < 45 ? 'bad' : 'ok'}" title="Salud ${Math.round(hp)}%"><i class="pic pic-heart sm"></i><b><i style="width:${hp}%"></i></b></span>
       </div>
       <div class="plot-actions">
         ${p.ready
           ? `<button class="btn small primary" data-harv="${p.id}">Cosechar</button>`
           : (p.diseased
-            ? `<button class="btn small warn" data-treat="${p.id}">🌿 Tratar</button>`
-            : `<button class="btn small" data-water="${p.id}">💧 Regar</button>`)}
-        <button class="btn small ghost" data-comp="${p.id}">🗑</button>
+            ? `<button class="btn small warn" data-treat="${p.id}"><i class="pic pic-leaf sm"></i> Tratar</button>`
+            : `<button class="btn small" data-water="${p.id}"><i class="pic pic-drop sm"></i> Regar</button>`)}
+        <button class="btn small ghost" data-comp="${p.id}"><i class="pic pic-trash"></i></button>
       </div>
     </div>`;
   }
@@ -3537,7 +3605,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     const usable = s.bank.filter(sp => sp.form !== 'polen');
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🌱 Plantar en el invernadero</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-sprout"></i> Plantar en el invernadero</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           <p class="dim">Elige una muestra del banco para cultivar. La cosecha te devolverá varios clones de esa misma genética.</p>
           ${usable.length ? `<div class="cat-grid select">${usable.map(sp => `<div class="cat-card pick" data-plant="${sp.uid}">
@@ -3562,7 +3630,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
   function doHarvest(id) {
     const res = PH.garden.harvest(id);
     if (!res.ok) { toast(res.msg || 'No se pudo cosechar.', 'bad'); return; }
-    if (PH.audio) PH.audio.sfx('harvest'); toast(`🌾 Cosechaste ${res.name} (salud ${res.health}%): ${res.clones.length} clones + 💰${res.credits}`, 'ok');
+    if (PH.audio) PH.audio.sfx('harvest'); toast(`<i class="pic pic-sprout sm"></i> Cosechaste ${res.name} (salud ${res.health}%): ${res.clones.length} clones + <i class="pic pic-coin sm"></i>${res.credits}`, 'ok');
     updateHUD();
     PH.game.afterQuestCheck();
     greenhouse();
@@ -3576,7 +3644,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
       .concat(Object.values(PH.items.GEAR).filter(g => g.consumable));
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🛒 Mercado <small>💰 ${fmt(s.player.credits)}</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-cart"></i> Mercado <small><i class="pic pic-coin sm"></i> ${fmt(s.player.credits)}</small></h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           <h3>Herramientas</h3>
           <div class="shop-grid">
@@ -3594,7 +3662,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
   function shopItem(it, kind) {
     return `<div class="shop-item">
       <b>${it.name}</b><small>${it.desc}</small>
-      <button class="btn small" data-buy="${it.id}" data-kind="${kind}">💰 ${fmt(it.price)}</button>
+      <button class="btn small" data-buy="${it.id}" data-kind="${kind}"><i class="pic pic-coin sm"></i> ${fmt(it.price)}</button>
     </div>`;
   }
   function buy(id, kind) {
@@ -3614,10 +3682,10 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     const list = PH.quests.activeList();
     open(`
       <div class="panel">
-        <div class="panel-head"><h2>📋 Misiones</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-clip"></i> Misiones</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           ${list.length ? list.map(q => `<div class="quest ${q.state}">
-            <div class="q-name">${q.state === 'done' ? '✅' : '◻️'} ${q.name}</div>
+            <div class="q-name">${q.state === 'done' ? '<span style="color:var(--green-hi)">✓</span>' : '<span class="dim">○</span>'} ${q.name}</div>
             <div class="q-desc">${q.desc}</div>
             <div class="q-reward">Recompensa: ${rewardText(q.reward)}</div>
           </div>`).join('') : '<p class="dim">Habla con los NPC de la Ciudad para conseguir misiones.</p>'}
@@ -3627,8 +3695,8 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
   }
   function rewardText(r) {
     const bits = [];
-    if (r.credits) bits.push('💰' + r.credits);
-    if (r.prestige) bits.push('🏅' + r.prestige);
+    if (r.credits) bits.push('<i class="pic pic-coin sm"></i> ' + r.credits);
+    if (r.prestige) bits.push('<i class="pic pic-medal sm"></i> ' + r.prestige);
     if (r.tool) bits.push(PH.items.TOOLS[r.tool].name);
     if (r.gear) bits.push(PH.items.GEAR[r.gear].name);
     return bits.join(' · ');
@@ -3638,13 +3706,13 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
   function labHub() {
     open(`
       <div class="panel">
-        <div class="panel-head"><h2>🔬 Laboratorio</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-flask"></i> Laboratorio</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body center-col">
           <p class="dim">Instalaciones de investigación del gremio.</p>
           <div class="hub-grid">
-            <button class="btn big hub" id="hb_cross">🧬<br>Cruces genéticos</button>
-            <button class="btn big hub" id="hb_green">🌿<br>Invernadero</button>
-            <button class="btn big hub" id="hb_bank">🗄️<br>Bóveda de cepas</button>
+            <button class="btn big hub" id="hb_cross"><i class="pic pic-helix"></i><br>Cruces genéticos</button>
+            <button class="btn big hub" id="hb_green"><i class="pic pic-leaf"></i><br>Invernadero</button>
+            <button class="btn big hub" id="hb_bank"><i class="pic pic-save"></i><br>Bóveda de cepas</button>
           </div>
         </div>
       </div>`, 'center');
@@ -3669,22 +3737,22 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     const cost = labUpgradeCost();
     open(`
       <div class="panel">
-        <div class="panel-head"><h2>🏠 Tu casa</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-home"></i> Tu casa</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body center-col">
           <p>Un lugar tranquilo para descansar y organizar tu trabajo.</p>
           <div class="stats-box">
-            <div>🏅 Prestigio: <b>${s.player.prestige}</b></div>
-            <div>📖 Fenotipos: <b>${Object.keys(s.catalog).length}</b></div>
-            <div>🧬 Cruces: <b>${s.stats.crosses}</b> · Mutaciones: <b>${s.stats.mutationsFound}</b></div>
-            <div>🔬 Nivel de laboratorio: <b>${s.player.labLevel}</b> <small>(+${Math.round((s.player.labLevel - 1) * 60)}% mutación en cruce)</small></div>
-            <div>👣 Distancia recorrida: <b>${s.stats.distance}</b></div>
+            <div><i class="pic pic-medal sm"></i> Prestigio: <b>${s.player.prestige}</b></div>
+            <div><i class="pic pic-book sm"></i> Fenotipos: <b>${Object.keys(s.catalog).length}</b></div>
+            <div><i class="pic pic-helix sm"></i> Cruces: <b>${s.stats.crosses}</b> · Mutaciones: <b>${s.stats.mutationsFound}</b></div>
+            <div><i class="pic pic-flask sm"></i> Nivel de laboratorio: <b>${s.player.labLevel}</b> <small>(+${Math.round((s.player.labLevel - 1) * 60)}% mutación en cruce)</small></div>
+            <div><i class="pic pic-pin sm"></i> Distancia recorrida: <b>${s.stats.distance}</b></div>
           </div>
           <div class="row">
-            <button class="btn primary" id="h_lab" ${s.player.credits < cost ? 'disabled' : ''}>🔬 Mejorar laboratorio (💰${cost})</button>
+            <button class="btn primary" id="h_lab" ${s.player.credits < cost ? 'disabled' : ''}><i class="pic pic-flask sm"></i> Mejorar laboratorio (<i class="pic pic-coin sm"></i>${cost})</button>
           </div>
           <div class="row">
             <button class="btn" id="h_events">☄️ Códice de eventos</button>
-            <button class="btn primary" id="h_save">💾 Guardar</button>
+            <button class="btn primary" id="h_save"><i class="pic pic-save sm"></i> Guardar</button>
             <button class="btn ghost" id="h_reset">Reiniciar</button>
           </div>
         </div>
@@ -3694,7 +3762,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     document.getElementById('h_events').onclick = eventsCodex;
     document.getElementById('h_lab').onclick = () => {
       if (s.player.credits < cost) return;
-      PH.state.addCredits(-cost); s.player.labLevel++; toast('🔬 Laboratorio mejorado a nivel ' + s.player.labLevel, 'ok');
+      PH.state.addCredits(-cost); s.player.labLevel++; toast('<i class="pic pic-flask sm"></i> Laboratorio mejorado a nivel ' + s.player.labLevel, 'ok');
       updateHUD(); houseMenu();
     };
     document.getElementById('h_reset').onclick = () => {
@@ -4531,12 +4599,12 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     const price = Math.round((30 + want.rarity * want.rarity * 1.1 + want.quality * 1.8) * 1.35); // premium callejero
     PH.ui.open(`
       <div class="panel">
-        <div class="panel-head"><h2>🤝 Trato callejero</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-coin"></i> Trato callejero</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body center-col">
-          <p><b>${npc.name}:</b> te compro tu <b>${want.nickname || want.name}</b> (${want.speciesId}) por <b>💰 ${price}</b>.</p>
+          <p><b>${npc.name}:</b> te compro tu <b>${want.nickname || want.name}</b> (${want.speciesId}) por <b><i class="pic pic-coin sm"></i> ${price}</b>.</p>
           <div style="width:120px">${PH.ui.specimenCard(want)}</div>
           <div class="row">
-            <button class="btn primary" id="d_yes">Vender 💰${price}</button>
+            <button class="btn primary" id="d_yes">Vender <i class="pic pic-coin sm"></i>${price}</button>
             <button class="btn ghost" id="d_no">Paso</button>
           </div>
         </div>

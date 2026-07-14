@@ -34,22 +34,23 @@
     // En modo iso, el nombre de sala manda; si no, el mapa top-down.
     const isoName = PH.game && PH.game.roomName ? PH.game.roomName() : '';
     const map = isoName ? { name: isoName } : (PH.world.MAPS && PH.world.MAPS[s.player.map]);
-    const wIcon = { despejado: '☀️', lluvia: '🌧️', niebla: '🌫️', tormenta: '⛈️', ola_calor: '🔥', nublado: '☁️' }[env.weather] || '☀️';
+    const ic = n => `<i class="pic pic-${n} sm"></i>`;
+    const wIcon = { despejado: ic('sun'), lluvia: ic('rain'), niebla: ic('cloud'), tormenta: ic('storm'), ola_calor: ic('alert'), nublado: ic('cloud') }[env.weather] || ic('sun');
     const ev = PH.events && PH.events.current();
-    const evPill = ev ? `<span class="pill event">${ev.icon} ${ev.name} · ${PH.events.remaining()}s</span>` : '';
+    const evPill = ev ? `<span class="pill event">${ic('alert')} ${ev.name} · ${PH.events.remaining()}s</span>` : '';
     const html = `
       <div class="hud-left">
-        <span class="pill">📍 ${map ? map.name : ''}</span>
-        <span class="pill">🕑 ${PH.state.timeLabel(env)} ${env.night ? '🌙' : '☀️'}</span>
+        <span class="pill">${ic('pin')} ${map ? map.name : ''}</span>
+        <span class="pill">${ic('clock')} ${PH.state.timeLabel(env)} ${env.night ? ic('moon') : ic('sun')}</span>
         <span class="pill">${wIcon} ${cap(env.weather.replace('_', ' '))}</span>
-        <span class="pill">🍂 ${cap(env.season)}</span>
+        <span class="pill">${ic('leaf')} ${cap(env.season)}</span>
         ${evPill}
       </div>
       <div class="hud-right">
-        ${PH.heat && PH.heat.level() > 0 ? `<span class="pill heat">🚨 ${'★'.repeat(PH.heat.level())}</span>` : ''}
-        <span class="pill">🏅 ${s.player.prestige}</span>
-        <span class="pill">💰 ${fmt(s.player.credits)}</span>
-        <span class="pill">🌿 ${Object.keys(s.catalog).length}</span>
+        ${PH.heat && PH.heat.level() > 0 ? `<span class="pill heat">${ic('alert')} ${'★'.repeat(PH.heat.level())}</span>` : ''}
+        <span class="pill">${ic('medal')} ${s.player.prestige}</span>
+        <span class="pill">${ic('coin')} ${fmt(s.player.credits)}</span>
+        <span class="pill">${ic('grid')} ${Object.keys(s.catalog).length}</span>
       </div>`;
     // dirty-check: evita reflow/repaint si el HUD no cambió (~30×/s -> sólo en cambio)
     if (hud._last === html) return;
@@ -106,8 +107,8 @@
     return `<span class="tier" style="--tc:${t.color}">${'★'.repeat(t.stars)} ${t.label}</span>`;
   }
   function lineageBadge(spec) {
-    if (spec.landrace) return `<span class="landrace">🌍 Landrace pura</span>`;
-    if (spec.form === 'cruce') return `<span class="hybrid">🧬 Híbrido F${spec.generation || 1}</span>`;
+    if (spec.landrace) return `<span class="landrace"><i class="pic pic-pin sm"></i> Landrace pura</span>`;
+    if (spec.form === 'cruce') return `<span class="hybrid"><i class="pic pic-helix sm"></i> Híbrido F${spec.generation || 1}</span>`;
     return '';
   }
   function specimenCard(spec, opts) {
@@ -131,7 +132,7 @@
             ${statBar('Resist.', ph.quant.resistencia)}
           </div>
           ${muts ? '<div class="muts">' + muts + '</div>' : ''}
-          ${ph.sterile ? '<div class="warn">⚠ Estéril (no apta para cruce)</div>' : ''}
+          ${ph.sterile ? '<div class="warn"><i class="pic pic-alert sm"></i> Estéril (no apta para cruce)</div>' : ''}
         </div>
       </div>`;
   }
@@ -233,7 +234,7 @@
     const gear = s.player.gear.map(id => PH.items.GEAR[id]);
     open(`
       <div class="panel">
-        <div class="panel-head"><h2>🎒 Mochila</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-bag"></i> Mochila</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           <h3>Herramientas de recolección</h3>
           <div class="grid">
@@ -256,21 +257,21 @@
   function bank() {
     const s = G();
     if (!s.bank.length) {
-      open(`<div class="panel"><div class="panel-head"><h2>🧬 Bóveda de cepas</h2><button class="x" id="p_close">✕</button></div>
+      open(`<div class="panel"><div class="panel-head"><h2><i class="pic pic-helix"></i> Bóveda de cepas</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body"><p class="dim">La bóveda está vacía. Recolecta cepas en las regiones.</p></div></div>`, 'center');
       document.getElementById('p_close').onclick = close; return;
     }
     const sorted = s.bank.slice().sort((a, b) => b.rarity - a.rarity);
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🧬 Bóveda de cepas <small>${s.bank.length} muestras</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-helix"></i> Bóveda de cepas <small>${s.bank.length} muestras</small></h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body list">
           ${sorted.map(sp => `
             <div class="bank-row">
               ${specimenCard(sp)}
               <div class="bank-actions">
-                <button class="btn small" data-seq="${sp.uid}">${sp.sequenced ? '🧾 ADN' : '🔬 Secuenciar'}</button>
-                <button class="btn small" data-sell="${sp.uid}">Vender 💰${sellPrice(sp)}</button>
+                <button class="btn small" data-seq="${sp.uid}">${sp.sequenced ? '<i class="pic pic-doc sm"></i> ADN' : '<i class="pic pic-flask sm"></i> Secuenciar'}</button>
+                <button class="btn small" data-sell="${sp.uid}">Vender <i class="pic pic-coin sm"></i>${sellPrice(sp)}</button>
                 <button class="btn small ghost" data-rel="${sp.uid}">Liberar</button>
               </div>
             </div>`).join('')}
@@ -300,7 +301,7 @@
       .sort((a, b) => b.c.rel - a.c.rel).slice(0, 3);
     open(`
       <div class="panel">
-        <div class="panel-head"><h2>🧬 Secuenciación de ADN</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-helix"></i> Secuenciación de ADN</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           <div class="seq-head">${specimenCard(sp)}</div>
           <h3>Cadena genómica</h3>
@@ -325,7 +326,7 @@
     const price = sellPrice(sp);
     PH.state.bankRemove(uid);
     PH.state.addCredits(price);
-    toast(`Vendido por 💰${price}.`, 'ok');
+    toast(`Vendido por <i class="pic pic-coin sm"></i>${price}.`, 'ok');
     updateHUD();
   }
 
@@ -348,7 +349,7 @@
       </div>`).join('');
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🌿 Strain-dex <small>${found}/${total} cepas · ${phenos} fenotipos · árbol filogenético</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-book"></i> Strain-dex <small>${found}/${total} cepas · ${phenos} fenotipos · árbol filogenético</small></h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body"><p class="dim">Toca una cepa para ver su árbol de linaje.</p>${sections}</div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = close;
@@ -358,7 +359,7 @@
     const uri = PH.strainart && PH.strainart.uri(sp.id);
     const parents = (sp.parents || []).map(p => (byId[p] ? byId[p].name : p));
     const lineage = parents.length ? '◄ ' + parents.join(' × ') : 'landrace / base';
-    const art = uri ? `<img src="${uri}" alt="" loading="lazy">` : `<div class="dex-noart">🌿</div>`;
+    const art = uri ? `<img src="${uri}" alt="" loading="lazy">` : `<div class="dex-noart"><i class="pic pic-leaf"></i></div>`;
     return `<div class="dex-card ${gotIt ? 'got' : 'todo'}" data-strain="${sp.id}" title="${sp.name}">
       <div class="dex-art">${art}${gotIt ? '<span class="dex-chk">✓</span>' : ''}</div>
       <div class="dex-name">${sp.name}</div>
@@ -377,7 +378,7 @@
     const kids = (!isLand && depth < 8) ? sp.parents.map(p => lineageNode(p, byId, depth + 1)).join('') : '';
     return `<li>
       <div class="tnode ${depth === 0 ? 'root' : ''} ${isLand ? 'land' : ''}" data-strain="${id}" title="${sp.name}">
-        <div class="tnode-art">${uri ? `<img src="${uri}" alt="">` : '🌿'}</div>
+        <div class="tnode-art">${uri ? `<img src="${uri}" alt="">` : '<i class="pic pic-leaf"></i>'}</div>
         <div class="tnode-name">${sp.name}</div>
         ${isLand ? '<div class="tnode-tag">landrace</div>' : ''}
       </div>
@@ -390,7 +391,7 @@
     let count = 0; (function c(id) { const s = byId[id]; if (!s) return; count++; (s.parents || []).forEach(c); })(rootId);
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🧬 Linaje — ${root.name}</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-helix"></i> Linaje — ${root.name}</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           <p class="dim">De la cepa (arriba) hasta sus landraces (abajo). Toca un ancestro para ver el suyo.</p>
           <div class="ltree2"><ul>${lineageNode(rootId, byId, 0)}</ul></div>
@@ -414,7 +415,7 @@
     breedSel = breedSel.filter(uid => s.bank.find(x => x.uid === uid));
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🔬 Laboratorio — Cruces genéticos</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-flask"></i> Laboratorio — Cruces genéticos</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           <p class="dim">Selecciona dos parentales. La descendencia hereda un alelo de cada uno por gen; pueden surgir fenotipos, colores y mutaciones nuevos.</p>
           <div class="breed-slots">
@@ -494,9 +495,9 @@
   function crossResult(spec, isNew, A, B, canon) {
     open(`
       <div class="panel">
-        <div class="panel-head"><h2>🌱 Descendencia obtenida</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-sprout"></i> Descendencia obtenida</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body center-col">
-          ${canon ? `<div class="newbadge">🧬 ¡NODO DEL ÁRBOL: ${canon.name}!</div>` : (isNew ? '<div class="newbadge">✨ ¡FENOTIPO NUEVO PARA EL CATÁLOGO! ✨</div>' : '<div class="dim">Fenotipo ya conocido.</div>')}
+          ${canon ? `<div class="newbadge"><i class="pic pic-helix sm"></i> ¡NODO DEL ÁRBOL: ${canon.name}!</div>` : (isNew ? '<div class="newbadge"><i class="pic pic-nova sm"></i> ¡FENOTIPO NUEVO PARA EL CATÁLOGO! <i class="pic pic-nova sm"></i></div>' : '<div class="dim">Fenotipo ya conocido.</div>')}
           ${canon ? '<p class="dim">Cruce canónico reconocido: has replicado una genética del árbol filogenético.</p>' : ''}
           ${specimenCard(spec)}
           <p class="dim">Parentales: ${A.name} ✕ ${B.name}</p>
@@ -510,8 +511,8 @@
     document.getElementById('p_close').onclick = close;
     document.getElementById('p_close2').onclick = close;
     document.getElementById('again').onclick = lab;
-    if (canon) toast('🧬 Nodo desbloqueado: ' + canon.name, 'ok');
-    else if (isNew) toast('✨ Nuevo fenotipo catalogado: ' + spec.name, 'ok');
+    if (canon) toast('<i class="pic pic-helix sm"></i> Nodo desbloqueado: ' + canon.name, 'ok');
+    else if (isNew) toast('<i class="pic pic-nova sm"></i> Nuevo fenotipo catalogado: ' + spec.name, 'ok');
   }
 
   /* ---------------- INVERNADERO / CULTIVO ---------------- */
@@ -528,7 +529,7 @@
     }
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🌿 Invernadero <small>${s.garden.length}/${cap} parcelas</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-leaf"></i> Invernadero <small>${s.garden.length}/${cap} parcelas</small></h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           <p class="dim">Planta clones o semillas y obsérvalos crecer por fases. Riega cuando tengan sed: sin agua se estresan y frenan. El riego excesivo y la humedad ambiental favorecen el moho — trátalo con poda sanitaria y ventilación (bio, sin químicos). Una planta sana rinde más al cosechar.</p>
           <div class="garden-grid">${plots.join('')}</div>
@@ -556,19 +557,19 @@
       <div class="plot-sprite"><img src="${uri}" alt=""><span class="phdot" style="background:${pal.base}"></span>
         <span class="plot-badge ${st.tone}">${st.label}</span></div>
       <div class="plot-name">${p.name}</div>
-      <div class="plot-stage" style="color:${t.color}">${p.ready ? '✅ Lista' : label}</div>
+      <div class="plot-stage" style="color:${t.color}">${p.ready ? '✓ Lista' : label}</div>
       <div class="bar grow"><i style="width:${pct}%"></i></div>
       <div class="vitals">
-        <span class="vit water ${wtone}" title="Agua ${Math.round(wp)}%">💧<b><i style="width:${wp}%"></i></b></span>
-        <span class="vit health ${hp < 45 ? 'bad' : 'ok'}" title="Salud ${Math.round(hp)}%">❤️<b><i style="width:${hp}%"></i></b></span>
+        <span class="vit water ${wtone}" title="Agua ${Math.round(wp)}%"><i class="pic pic-drop sm"></i><b><i style="width:${wp}%"></i></b></span>
+        <span class="vit health ${hp < 45 ? 'bad' : 'ok'}" title="Salud ${Math.round(hp)}%"><i class="pic pic-heart sm"></i><b><i style="width:${hp}%"></i></b></span>
       </div>
       <div class="plot-actions">
         ${p.ready
           ? `<button class="btn small primary" data-harv="${p.id}">Cosechar</button>`
           : (p.diseased
-            ? `<button class="btn small warn" data-treat="${p.id}">🌿 Tratar</button>`
-            : `<button class="btn small" data-water="${p.id}">💧 Regar</button>`)}
-        <button class="btn small ghost" data-comp="${p.id}">🗑</button>
+            ? `<button class="btn small warn" data-treat="${p.id}"><i class="pic pic-leaf sm"></i> Tratar</button>`
+            : `<button class="btn small" data-water="${p.id}"><i class="pic pic-drop sm"></i> Regar</button>`)}
+        <button class="btn small ghost" data-comp="${p.id}"><i class="pic pic-trash"></i></button>
       </div>
     </div>`;
   }
@@ -578,7 +579,7 @@
     const usable = s.bank.filter(sp => sp.form !== 'polen');
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🌱 Plantar en el invernadero</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-sprout"></i> Plantar en el invernadero</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           <p class="dim">Elige una muestra del banco para cultivar. La cosecha te devolverá varios clones de esa misma genética.</p>
           ${usable.length ? `<div class="cat-grid select">${usable.map(sp => `<div class="cat-card pick" data-plant="${sp.uid}">
@@ -603,7 +604,7 @@
   function doHarvest(id) {
     const res = PH.garden.harvest(id);
     if (!res.ok) { toast(res.msg || 'No se pudo cosechar.', 'bad'); return; }
-    if (PH.audio) PH.audio.sfx('harvest'); toast(`🌾 Cosechaste ${res.name} (salud ${res.health}%): ${res.clones.length} clones + 💰${res.credits}`, 'ok');
+    if (PH.audio) PH.audio.sfx('harvest'); toast(`<i class="pic pic-sprout sm"></i> Cosechaste ${res.name} (salud ${res.health}%): ${res.clones.length} clones + <i class="pic pic-coin sm"></i>${res.credits}`, 'ok');
     updateHUD();
     PH.game.afterQuestCheck();
     greenhouse();
@@ -617,7 +618,7 @@
       .concat(Object.values(PH.items.GEAR).filter(g => g.consumable));
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2>🛒 Mercado <small>💰 ${fmt(s.player.credits)}</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-cart"></i> Mercado <small><i class="pic pic-coin sm"></i> ${fmt(s.player.credits)}</small></h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           <h3>Herramientas</h3>
           <div class="shop-grid">
@@ -635,7 +636,7 @@
   function shopItem(it, kind) {
     return `<div class="shop-item">
       <b>${it.name}</b><small>${it.desc}</small>
-      <button class="btn small" data-buy="${it.id}" data-kind="${kind}">💰 ${fmt(it.price)}</button>
+      <button class="btn small" data-buy="${it.id}" data-kind="${kind}"><i class="pic pic-coin sm"></i> ${fmt(it.price)}</button>
     </div>`;
   }
   function buy(id, kind) {
@@ -655,10 +656,10 @@
     const list = PH.quests.activeList();
     open(`
       <div class="panel">
-        <div class="panel-head"><h2>📋 Misiones</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-clip"></i> Misiones</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body">
           ${list.length ? list.map(q => `<div class="quest ${q.state}">
-            <div class="q-name">${q.state === 'done' ? '✅' : '◻️'} ${q.name}</div>
+            <div class="q-name">${q.state === 'done' ? '<span style="color:var(--green-hi)">✓</span>' : '<span class="dim">○</span>'} ${q.name}</div>
             <div class="q-desc">${q.desc}</div>
             <div class="q-reward">Recompensa: ${rewardText(q.reward)}</div>
           </div>`).join('') : '<p class="dim">Habla con los NPC de la Ciudad para conseguir misiones.</p>'}
@@ -668,8 +669,8 @@
   }
   function rewardText(r) {
     const bits = [];
-    if (r.credits) bits.push('💰' + r.credits);
-    if (r.prestige) bits.push('🏅' + r.prestige);
+    if (r.credits) bits.push('<i class="pic pic-coin sm"></i> ' + r.credits);
+    if (r.prestige) bits.push('<i class="pic pic-medal sm"></i> ' + r.prestige);
     if (r.tool) bits.push(PH.items.TOOLS[r.tool].name);
     if (r.gear) bits.push(PH.items.GEAR[r.gear].name);
     return bits.join(' · ');
@@ -679,13 +680,13 @@
   function labHub() {
     open(`
       <div class="panel">
-        <div class="panel-head"><h2>🔬 Laboratorio</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-flask"></i> Laboratorio</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body center-col">
           <p class="dim">Instalaciones de investigación del gremio.</p>
           <div class="hub-grid">
-            <button class="btn big hub" id="hb_cross">🧬<br>Cruces genéticos</button>
-            <button class="btn big hub" id="hb_green">🌿<br>Invernadero</button>
-            <button class="btn big hub" id="hb_bank">🗄️<br>Bóveda de cepas</button>
+            <button class="btn big hub" id="hb_cross"><i class="pic pic-helix"></i><br>Cruces genéticos</button>
+            <button class="btn big hub" id="hb_green"><i class="pic pic-leaf"></i><br>Invernadero</button>
+            <button class="btn big hub" id="hb_bank"><i class="pic pic-save"></i><br>Bóveda de cepas</button>
           </div>
         </div>
       </div>`, 'center');
@@ -710,22 +711,22 @@
     const cost = labUpgradeCost();
     open(`
       <div class="panel">
-        <div class="panel-head"><h2>🏠 Tu casa</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-home"></i> Tu casa</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body center-col">
           <p>Un lugar tranquilo para descansar y organizar tu trabajo.</p>
           <div class="stats-box">
-            <div>🏅 Prestigio: <b>${s.player.prestige}</b></div>
-            <div>📖 Fenotipos: <b>${Object.keys(s.catalog).length}</b></div>
-            <div>🧬 Cruces: <b>${s.stats.crosses}</b> · Mutaciones: <b>${s.stats.mutationsFound}</b></div>
-            <div>🔬 Nivel de laboratorio: <b>${s.player.labLevel}</b> <small>(+${Math.round((s.player.labLevel - 1) * 60)}% mutación en cruce)</small></div>
-            <div>👣 Distancia recorrida: <b>${s.stats.distance}</b></div>
+            <div><i class="pic pic-medal sm"></i> Prestigio: <b>${s.player.prestige}</b></div>
+            <div><i class="pic pic-book sm"></i> Fenotipos: <b>${Object.keys(s.catalog).length}</b></div>
+            <div><i class="pic pic-helix sm"></i> Cruces: <b>${s.stats.crosses}</b> · Mutaciones: <b>${s.stats.mutationsFound}</b></div>
+            <div><i class="pic pic-flask sm"></i> Nivel de laboratorio: <b>${s.player.labLevel}</b> <small>(+${Math.round((s.player.labLevel - 1) * 60)}% mutación en cruce)</small></div>
+            <div><i class="pic pic-pin sm"></i> Distancia recorrida: <b>${s.stats.distance}</b></div>
           </div>
           <div class="row">
-            <button class="btn primary" id="h_lab" ${s.player.credits < cost ? 'disabled' : ''}>🔬 Mejorar laboratorio (💰${cost})</button>
+            <button class="btn primary" id="h_lab" ${s.player.credits < cost ? 'disabled' : ''}><i class="pic pic-flask sm"></i> Mejorar laboratorio (<i class="pic pic-coin sm"></i>${cost})</button>
           </div>
           <div class="row">
             <button class="btn" id="h_events">☄️ Códice de eventos</button>
-            <button class="btn primary" id="h_save">💾 Guardar</button>
+            <button class="btn primary" id="h_save"><i class="pic pic-save sm"></i> Guardar</button>
             <button class="btn ghost" id="h_reset">Reiniciar</button>
           </div>
         </div>
@@ -735,7 +736,7 @@
     document.getElementById('h_events').onclick = eventsCodex;
     document.getElementById('h_lab').onclick = () => {
       if (s.player.credits < cost) return;
-      PH.state.addCredits(-cost); s.player.labLevel++; toast('🔬 Laboratorio mejorado a nivel ' + s.player.labLevel, 'ok');
+      PH.state.addCredits(-cost); s.player.labLevel++; toast('<i class="pic pic-flask sm"></i> Laboratorio mejorado a nivel ' + s.player.labLevel, 'ok');
       updateHUD(); houseMenu();
     };
     document.getElementById('h_reset').onclick = () => {

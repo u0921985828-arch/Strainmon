@@ -400,12 +400,12 @@
     const price = Math.round((30 + want.rarity * want.rarity * 1.1 + want.quality * 1.8) * 1.35); // premium callejero
     PH.ui.open(`
       <div class="panel">
-        <div class="panel-head"><h2>🤝 Trato callejero</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-coin"></i> Trato callejero</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body center-col">
-          <p><b>${npc.name}:</b> te compro tu <b>${want.nickname || want.name}</b> (${want.speciesId}) por <b>💰 ${price}</b>.</p>
+          <p><b>${npc.name}:</b> te compro tu <b>${want.nickname || want.name}</b> (${want.speciesId}) por <b><i class="pic pic-coin sm"></i> ${price}</b>.</p>
           <div style="width:120px">${PH.ui.specimenCard(want)}</div>
           <div class="row">
-            <button class="btn primary" id="d_yes">Vender 💰${price}</button>
+            <button class="btn primary" id="d_yes">Vender <i class="pic pic-coin sm"></i>${price}</button>
             <button class="btn ghost" id="d_no">Paso</button>
           </div>
         </div>
