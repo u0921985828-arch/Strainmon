@@ -64,6 +64,76 @@
     ctx.closePath(); ctx.fillStyle = pal.top; ctx.fill();
   }
 
+  // Props de borde/escenario para zonas naturales (setos, vallas, rocas, cañas,
+  // palmeras, árboles, cactus…) — arte propio por código, en la proyección iso.
+  // Sustituyen a los cubos '#' en los biomas para que los bordes no sean bloques.
+  function prop(ctx, sx, sy, kind) {
+    let seed = ((((sx | 0) * 131) ^ ((sy | 0) * 57)) >>> 0) || 1;
+    const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    const dot = (x, y, c, s) => { ctx.fillStyle = c; ctx.fillRect(x | 0, y | 0, s || 2, s || 2); };
+    const midY = sy + TH / 2;
+    switch (kind) {
+      case 'hedge': case 'hedgeDark': {
+        const g = kind === 'hedgeDark'
+          ? { top: '#4a7f3c', left: '#2c4f24', right: '#39682f', d1: '#5c9a48', d2: '#24401d', h: 26 }
+          : { top: '#63ab4e', left: '#356b2c', right: '#48853a', d1: '#7cc760', d2: '#2c5a24', h: 20 };
+        cube(ctx, sx, sy, g.h, { top: g.top, left: g.left, right: g.right });
+        ctx.fillStyle = g.top; ctx.beginPath(); ctx.ellipse(sx, sy + TH / 2 - g.h, TW * 0.34, TH * 0.5, 0, 0, 6.283); ctx.fill();
+        for (let i = 0; i < 18; i++) { const a = rnd() * 6.283, r = rnd(); dot(sx + Math.cos(a) * r * TW * 0.3, sy + TH / 2 - g.h + Math.sin(a) * r * TH * 0.45, rnd() < 0.5 ? g.d1 : g.d2); }
+        for (let i = 0; i < 8; i++) dot(sx - TW / 2 + rnd() * TW, sy + TH * 0.4 - rnd() * g.h, g.d2);
+        break;
+      }
+      case 'tree': {
+        px(ctx, sx - 3, midY - 6, 6, 18, '#7a5533'); px(ctx, sx - 3, midY - 6, 2, 18, '#5c3f26');
+        const d1 = '#66ad54', d2 = '#2f5f28';
+        ctx.fillStyle = '#4e8f40';
+        ctx.beginPath(); ctx.ellipse(sx, midY - 22, TW * 0.32, TH * 0.95, 0, 0, 6.283); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(sx - 9, midY - 15, TW * 0.2, TH * 0.62, 0, 0, 6.283); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(sx + 9, midY - 17, TW * 0.2, TH * 0.62, 0, 0, 6.283); ctx.fill();
+        for (let i = 0; i < 22; i++) { const a = rnd() * 6.283, r = rnd(); dot(sx + Math.cos(a) * r * TW * 0.3, midY - 19 + Math.sin(a) * r * TH * 0.9, rnd() < 0.5 ? d1 : d2); }
+        break;
+      }
+      case 'rock': case 'rockDark': {
+        const g = kind === 'rockDark' ? { a: '#4a3a3a', b: '#2e2422', c: '#5f4a46', ember: '#d5713f' } : { a: '#8b8492', b: '#57525f', c: '#a8a2b0' };
+        const bo = (dx, dy, r, col, hi) => { ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(sx + dx, midY + dy, r, r * 0.72, 0, 0, 6.283); ctx.fill(); ctx.fillStyle = hi; ctx.beginPath(); ctx.ellipse(sx + dx - r * 0.3, midY + dy - r * 0.4, r * 0.42, r * 0.3, 0, 0, 6.283); ctx.fill(); };
+        bo(-8, 3, 11, g.b, g.a); bo(9, 5, 10, g.b, g.a); bo(0, -6, 13, g.a, g.c);
+        if (g.ember) for (let i = 0; i < 4; i++) dot(sx - 8 + rnd() * 16, midY - 2 + rnd() * 8, g.ember);
+        break;
+      }
+      case 'snow': {
+        ctx.fillStyle = '#e8eef2'; ctx.beginPath(); ctx.ellipse(sx, midY - 1, TW * 0.36, TH * 0.82, 0, 0, 6.283); ctx.fill();
+        ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.ellipse(sx - 4, midY - 8, TW * 0.2, TH * 0.5, 0, 0, 6.283); ctx.fill();
+        for (let i = 0; i < 8; i++) dot(sx - TW * 0.3 + rnd() * TW * 0.6, midY - 1 + rnd() * 8, '#c4dbe6');
+        break;
+      }
+      case 'reed': {
+        for (let i = 0; i < 7; i++) { const rx = sx - 16 + i * 5 + rnd() * 2, top = midY - 18 - rnd() * 10; ctx.strokeStyle = i % 2 ? '#556123' : '#7a8a3a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(rx, midY + 6); ctx.lineTo(rx + (rnd() * 4 - 2), top); ctx.stroke(); dot(rx - 1, top - 1, '#c9b24a'); }
+        break;
+      }
+      case 'palm': {
+        px(ctx, sx - 2, midY - 4, 4, 16, '#9a6a3a'); px(ctx, sx - 2, midY - 4, 1, 16, '#6e4826');
+        ctx.strokeStyle = '#4faf6a'; ctx.lineWidth = 3;
+        for (const ang of [3.9, 5.0, 4.45, -0.3, 0.8]) { ctx.beginPath(); ctx.moveTo(sx, midY - 18); ctx.lineTo(sx + Math.cos(ang) * 18, midY - 18 + Math.sin(ang) * 10); ctx.stroke(); }
+        ctx.fillStyle = '#357b4a'; ctx.beginPath(); ctx.ellipse(sx, midY - 18, 4, 3, 0, 0, 6.283); ctx.fill();
+        break;
+      }
+      case 'cactus': {
+        const g = '#4f9a45', gd = '#347030', hi = '#63b358', b0 = midY + 4;
+        px(ctx, sx - 3, b0 - 26, 6, 26, g); px(ctx, sx - 3, b0 - 26, 2, 26, gd); px(ctx, sx + 1, b0 - 26, 2, 26, hi);
+        px(ctx, sx - 8, b0 - 16, 3, 3, g); px(ctx, sx - 8, b0 - 22, 3, 7, g);
+        px(ctx, sx + 5, b0 - 12, 3, 3, g); px(ctx, sx + 5, b0 - 18, 3, 7, g);
+        break;
+      }
+      case 'fence': default: {
+        const w = '#b98a52', d = '#7a5533', by = sy + TH * 0.62;
+        ctx.fillStyle = w; ctx.fillRect(sx - 17, by - 20, 34, 3); ctx.fillRect(sx - 17, by - 12, 34, 3);
+        ctx.fillStyle = d; ctx.fillRect(sx - 17, by - 20, 34, 1); ctx.fillRect(sx - 17, by - 12, 34, 1);
+        for (const dx of [-14, 14]) { ctx.fillStyle = w; ctx.fillRect(sx + dx - 2, by - 26, 4, 26); ctx.fillStyle = d; ctx.fillRect(sx + dx - 2, by - 26, 1, 26); ctx.fillStyle = shade(w, 0.15); ctx.fillRect(sx + dx - 2, by - 26, 4, 2); }
+        break;
+      }
+    }
+  }
+
   // Personaje isométrico. Si hay sprite de arte para su rol+dirección, lo usa
   // (billboard anclado a la base, con bob al andar); si no, dibujo procedural.
   const CHAR_H = 42;
@@ -127,7 +197,8 @@
       for (let gx = 0; gx < W; gx++) {
         const ch = row[gx];
         if (ch === '.' || ch === 'D') floors.push({ gx, gy, door: ch === 'D', alt: (gx + gy) & 1 });
-        else if (ch === '#') walls.push({ gx, gy });
+        // en zonas naturales el borde '#' se dibuja como prop (seto/valla/roca…) en isogame, no como cubo
+        else if (ch === '#' && !map.natural) walls.push({ gx, gy });
       }
     }
     return { w: W, h: H, floors, walls };
@@ -182,5 +253,5 @@
       wall: { top: '#c86b52', left: '#8f3f30', right: '#a85040' } },
   };
 
-  PH.iso = { TW, TH, WH, project, unproject, floorDiamond, cube, actor, renderRoom, THEMES };
+  PH.iso = { TW, TH, WH, project, unproject, floorDiamond, cube, prop, actor, renderRoom, THEMES };
 })(window.PH = window.PH || {});

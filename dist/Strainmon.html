@@ -4073,6 +4073,76 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     ctx.closePath(); ctx.fillStyle = pal.top; ctx.fill();
   }
 
+  // Props de borde/escenario para zonas naturales (setos, vallas, rocas, cañas,
+  // palmeras, árboles, cactus…) — arte propio por código, en la proyección iso.
+  // Sustituyen a los cubos '#' en los biomas para que los bordes no sean bloques.
+  function prop(ctx, sx, sy, kind) {
+    let seed = ((((sx | 0) * 131) ^ ((sy | 0) * 57)) >>> 0) || 1;
+    const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    const dot = (x, y, c, s) => { ctx.fillStyle = c; ctx.fillRect(x | 0, y | 0, s || 2, s || 2); };
+    const midY = sy + TH / 2;
+    switch (kind) {
+      case 'hedge': case 'hedgeDark': {
+        const g = kind === 'hedgeDark'
+          ? { top: '#4a7f3c', left: '#2c4f24', right: '#39682f', d1: '#5c9a48', d2: '#24401d', h: 26 }
+          : { top: '#63ab4e', left: '#356b2c', right: '#48853a', d1: '#7cc760', d2: '#2c5a24', h: 20 };
+        cube(ctx, sx, sy, g.h, { top: g.top, left: g.left, right: g.right });
+        ctx.fillStyle = g.top; ctx.beginPath(); ctx.ellipse(sx, sy + TH / 2 - g.h, TW * 0.34, TH * 0.5, 0, 0, 6.283); ctx.fill();
+        for (let i = 0; i < 18; i++) { const a = rnd() * 6.283, r = rnd(); dot(sx + Math.cos(a) * r * TW * 0.3, sy + TH / 2 - g.h + Math.sin(a) * r * TH * 0.45, rnd() < 0.5 ? g.d1 : g.d2); }
+        for (let i = 0; i < 8; i++) dot(sx - TW / 2 + rnd() * TW, sy + TH * 0.4 - rnd() * g.h, g.d2);
+        break;
+      }
+      case 'tree': {
+        px(ctx, sx - 3, midY - 6, 6, 18, '#7a5533'); px(ctx, sx - 3, midY - 6, 2, 18, '#5c3f26');
+        const d1 = '#66ad54', d2 = '#2f5f28';
+        ctx.fillStyle = '#4e8f40';
+        ctx.beginPath(); ctx.ellipse(sx, midY - 22, TW * 0.32, TH * 0.95, 0, 0, 6.283); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(sx - 9, midY - 15, TW * 0.2, TH * 0.62, 0, 0, 6.283); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(sx + 9, midY - 17, TW * 0.2, TH * 0.62, 0, 0, 6.283); ctx.fill();
+        for (let i = 0; i < 22; i++) { const a = rnd() * 6.283, r = rnd(); dot(sx + Math.cos(a) * r * TW * 0.3, midY - 19 + Math.sin(a) * r * TH * 0.9, rnd() < 0.5 ? d1 : d2); }
+        break;
+      }
+      case 'rock': case 'rockDark': {
+        const g = kind === 'rockDark' ? { a: '#4a3a3a', b: '#2e2422', c: '#5f4a46', ember: '#d5713f' } : { a: '#8b8492', b: '#57525f', c: '#a8a2b0' };
+        const bo = (dx, dy, r, col, hi) => { ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(sx + dx, midY + dy, r, r * 0.72, 0, 0, 6.283); ctx.fill(); ctx.fillStyle = hi; ctx.beginPath(); ctx.ellipse(sx + dx - r * 0.3, midY + dy - r * 0.4, r * 0.42, r * 0.3, 0, 0, 6.283); ctx.fill(); };
+        bo(-8, 3, 11, g.b, g.a); bo(9, 5, 10, g.b, g.a); bo(0, -6, 13, g.a, g.c);
+        if (g.ember) for (let i = 0; i < 4; i++) dot(sx - 8 + rnd() * 16, midY - 2 + rnd() * 8, g.ember);
+        break;
+      }
+      case 'snow': {
+        ctx.fillStyle = '#e8eef2'; ctx.beginPath(); ctx.ellipse(sx, midY - 1, TW * 0.36, TH * 0.82, 0, 0, 6.283); ctx.fill();
+        ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.ellipse(sx - 4, midY - 8, TW * 0.2, TH * 0.5, 0, 0, 6.283); ctx.fill();
+        for (let i = 0; i < 8; i++) dot(sx - TW * 0.3 + rnd() * TW * 0.6, midY - 1 + rnd() * 8, '#c4dbe6');
+        break;
+      }
+      case 'reed': {
+        for (let i = 0; i < 7; i++) { const rx = sx - 16 + i * 5 + rnd() * 2, top = midY - 18 - rnd() * 10; ctx.strokeStyle = i % 2 ? '#556123' : '#7a8a3a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(rx, midY + 6); ctx.lineTo(rx + (rnd() * 4 - 2), top); ctx.stroke(); dot(rx - 1, top - 1, '#c9b24a'); }
+        break;
+      }
+      case 'palm': {
+        px(ctx, sx - 2, midY - 4, 4, 16, '#9a6a3a'); px(ctx, sx - 2, midY - 4, 1, 16, '#6e4826');
+        ctx.strokeStyle = '#4faf6a'; ctx.lineWidth = 3;
+        for (const ang of [3.9, 5.0, 4.45, -0.3, 0.8]) { ctx.beginPath(); ctx.moveTo(sx, midY - 18); ctx.lineTo(sx + Math.cos(ang) * 18, midY - 18 + Math.sin(ang) * 10); ctx.stroke(); }
+        ctx.fillStyle = '#357b4a'; ctx.beginPath(); ctx.ellipse(sx, midY - 18, 4, 3, 0, 0, 6.283); ctx.fill();
+        break;
+      }
+      case 'cactus': {
+        const g = '#4f9a45', gd = '#347030', hi = '#63b358', b0 = midY + 4;
+        px(ctx, sx - 3, b0 - 26, 6, 26, g); px(ctx, sx - 3, b0 - 26, 2, 26, gd); px(ctx, sx + 1, b0 - 26, 2, 26, hi);
+        px(ctx, sx - 8, b0 - 16, 3, 3, g); px(ctx, sx - 8, b0 - 22, 3, 7, g);
+        px(ctx, sx + 5, b0 - 12, 3, 3, g); px(ctx, sx + 5, b0 - 18, 3, 7, g);
+        break;
+      }
+      case 'fence': default: {
+        const w = '#b98a52', d = '#7a5533', by = sy + TH * 0.62;
+        ctx.fillStyle = w; ctx.fillRect(sx - 17, by - 20, 34, 3); ctx.fillRect(sx - 17, by - 12, 34, 3);
+        ctx.fillStyle = d; ctx.fillRect(sx - 17, by - 20, 34, 1); ctx.fillRect(sx - 17, by - 12, 34, 1);
+        for (const dx of [-14, 14]) { ctx.fillStyle = w; ctx.fillRect(sx + dx - 2, by - 26, 4, 26); ctx.fillStyle = d; ctx.fillRect(sx + dx - 2, by - 26, 1, 26); ctx.fillStyle = shade(w, 0.15); ctx.fillRect(sx + dx - 2, by - 26, 4, 2); }
+        break;
+      }
+    }
+  }
+
   // Personaje isométrico. Si hay sprite de arte para su rol+dirección, lo usa
   // (billboard anclado a la base, con bob al andar); si no, dibujo procedural.
   const CHAR_H = 42;
@@ -4136,7 +4206,8 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
       for (let gx = 0; gx < W; gx++) {
         const ch = row[gx];
         if (ch === '.' || ch === 'D') floors.push({ gx, gy, door: ch === 'D', alt: (gx + gy) & 1 });
-        else if (ch === '#') walls.push({ gx, gy });
+        // en zonas naturales el borde '#' se dibuja como prop (seto/valla/roca…) en isogame, no como cubo
+        else if (ch === '#' && !map.natural) walls.push({ gx, gy });
       }
     }
     return { w: W, h: H, floors, walls };
@@ -4191,7 +4262,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
       wall: { top: '#c86b52', left: '#8f3f30', right: '#a85040' } },
   };
 
-  PH.iso = { TW, TH, WH, project, unproject, floorDiamond, cube, actor, renderRoom, THEMES };
+  PH.iso = { TW, TH, WH, project, unproject, floorDiamond, cube, prop, actor, renderRoom, THEMES };
 })(window.PH = window.PH || {});
 
 </script>
@@ -4324,7 +4395,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     },
     // ---------------- SENDERO SALVAJE (hub de biomas) ----------------
     wilds: {
-      id: 'wilds', name: 'Sendero Salvaje', theme: 'grass', bg: '#2f4a2c',
+      id: 'wilds', name: 'Sendero Salvaje', theme: 'grass', natural: true, borderKind: 'hedge', bg: '#2f4a2c',
       pal: { floorA: '#8a7a52', floorB: '#7e6f49', floorEdge: 'rgba(40,30,15,.35)', door: '#caa96b', wall: { top: '#7a8a5a', left: '#54633a', right: '#657548' } },
       grid: [
         '###D##D##D###',
@@ -4355,56 +4426,56 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     },
     // ---------------- BIOMAS ----------------
     pradera: {
-      id: 'pradera', name: 'Pradera', theme: 'grass', biome: 'pradera', wild: true, encounterRate: 0.28, bg: '#3a5a34',
+      id: 'pradera', name: 'Pradera', theme: 'grass', biome: 'pradera', wild: true, natural: true, borderKind: 'hedge', encounterRate: 0.28, bg: '#3a5a34',
       pal: { floorA: '#7cbd50', floorB: '#72b048', floorEdge: 'rgba(30,60,20,.3)', door: '#caa96b', wall: { top: '#9ab06a', left: '#6f8347', right: '#82995a' } },
       wildPal: { col: '#4f9e3a', edge: '#356b26' },
       grid: ['###########', '#.........#', '#.g.g.g.g.#', '#.........#', '#.g.g.g.g.#', '#.........#', '#.g.g.g.g.#', '#....D....#', '###########'],
       spawn: { gx: 5, gy: 6 }, doors: [{ gx: 5, gy: 7, to: 'wilds', tgx: 3, tgy: 1 }], npcs: [], objects: [],
     },
     bosque: {
-      id: 'bosque', name: 'Bosque', theme: 'grass', biome: 'bosque', wild: true, encounterRate: 0.28, bg: '#22331d',
+      id: 'bosque', name: 'Bosque', theme: 'grass', biome: 'bosque', wild: true, natural: true, borderKind: 'hedgeDark', propKind: 'tree', encounterRate: 0.28, bg: '#22331d',
       pal: { floorA: '#4f8f45', floorB: '#468038', floorEdge: 'rgba(20,45,15,.35)', door: '#8a5a30', wall: { top: '#5a7a3a', left: '#3c5426', right: '#496630' } },
       wildPal: { col: '#3f7d34', edge: '#2c5a22' },
       grid: ['###########', '#..#....#.#', '#.g.g.g.g.#', '#.........#', '#.g.g#g.g.#', '#.........#', '#.g.g.g.g.#', '#....D....#', '###########'],
       spawn: { gx: 5, gy: 6 }, doors: [{ gx: 5, gy: 7, to: 'wilds', tgx: 6, tgy: 1 }], npcs: [], objects: [],
     },
     desierto: {
-      id: 'desierto', name: 'Desierto', theme: 'grass', biome: 'desierto', wild: true, encounterRate: 0.28, bg: '#7a6238',
+      id: 'desierto', name: 'Desierto', theme: 'grass', biome: 'desierto', wild: true, natural: true, borderKind: 'fence', propKind: 'cactus', encounterRate: 0.28, bg: '#7a6238',
       pal: { floorA: '#e0c380', floorB: '#d4b673', floorEdge: 'rgba(120,90,40,.3)', door: '#a9793f', wall: { top: '#d8b673', left: '#a07b3e', right: '#bd914f' } },
       wildPal: { col: '#b7a24a', edge: '#8a7730' },
       grid: ['###########', '#.........#', '#..g...g..#', '#.........#', '#.g..#..g.#', '#.........#', '#..g...g..#', '#....D....#', '###########'],
       spawn: { gx: 5, gy: 6 }, doors: [{ gx: 5, gy: 7, to: 'wilds', tgx: 9, tgy: 1 }], npcs: [], objects: [],
     },
     nieve: {
-      id: 'nieve', name: 'Nieve', theme: 'grass', biome: 'nieve', wild: true, encounterRate: 0.28, bg: '#8aa0b0',
+      id: 'nieve', name: 'Nieve', theme: 'grass', biome: 'nieve', wild: true, natural: true, borderKind: 'snow', propKind: 'snow', encounterRate: 0.28, bg: '#8aa0b0',
       pal: { floorA: '#e8eef2', floorB: '#dbe6ee', floorEdge: 'rgba(120,140,160,.3)', door: '#a9b6c0', wall: { top: '#cfe0ea', left: '#9fb4c2', right: '#b8ccd8' } },
       wildPal: { col: '#b8d0c4', edge: '#8aa89a' },
       grid: ['###########', '#.........#', '#.g.g.g.g.#', '#....#....#', '#.g.g.g.g.#', '#....#....#', '#.g.g.g.g.#', '#....D....#', '###########'],
       spawn: { gx: 5, gy: 6 }, doors: [{ gx: 5, gy: 7, to: 'wilds', tgx: 1, tgy: 2 }], npcs: [], objects: [],
     },
     volcan: {
-      id: 'volcan', name: 'Volcán', theme: 'grass', biome: 'volcan', wild: true, encounterRate: 0.28, bg: '#241614',
+      id: 'volcan', name: 'Volcán', theme: 'grass', biome: 'volcan', wild: true, natural: true, borderKind: 'rockDark', propKind: 'rockDark', encounterRate: 0.28, bg: '#241614',
       pal: { floorA: '#4a3a3a', floorB: '#3f3232', floorEdge: 'rgba(0,0,0,.45)', door: '#7a4a30', wall: { top: '#5a3a34', left: '#2e1e1c', right: '#42302c' } },
       wildPal: { col: '#c56a3a', edge: '#8a3f22' }, lavaPal: { col: '#d5713f', edge: '#8a3f22' },
       grid: ['###########', '#.g.l.g...#', '#....l....#', '#.lg...gl.#', '#.........#', '#.gl..g.l.#', '#..l.....g#', '#....D....#', '###########'],
       spawn: { gx: 5, gy: 6 }, doors: [{ gx: 5, gy: 7, to: 'wilds', tgx: 11, tgy: 2 }], npcs: [], objects: [],
     },
     cueva: {
-      id: 'cueva', name: 'Cueva', theme: 'grass', biome: 'cueva', wild: true, encounterRate: 0.28, bg: '#1a1620',
+      id: 'cueva', name: 'Cueva', theme: 'grass', biome: 'cueva', wild: true, natural: true, borderKind: 'rock', propKind: 'rock', encounterRate: 0.28, bg: '#1a1620',
       pal: { floorA: '#6a6470', floorB: '#5c5766', floorEdge: 'rgba(0,0,0,.45)', door: '#7a6a55', wall: { top: '#8b8492', left: '#57525f', right: '#6b6675' } },
       wildPal: { col: '#9a94a2', edge: '#6a6472' },
       grid: ['###########', '#.#.....#.#', '#.g.g.g.g.#', '#..#...#..#', '#.g.g.g.g.#', '#..#...#..#', '#.g.g.g.g.#', '#....D....#', '###########'],
       spawn: { gx: 5, gy: 6 }, doors: [{ gx: 5, gy: 7, to: 'wilds', tgx: 1, tgy: 5 }], npcs: [], objects: [],
     },
     pantano: {
-      id: 'pantano', name: 'Pantano', theme: 'grass', biome: 'pantano', wild: true, encounterRate: 0.28, bg: '#232a20',
+      id: 'pantano', name: 'Pantano', theme: 'grass', biome: 'pantano', wild: true, natural: true, borderKind: 'reed', encounterRate: 0.28, bg: '#232a20',
       pal: { floorA: '#6b7a45', floorB: '#5f6d3c', floorEdge: 'rgba(30,35,15,.4)', door: '#6a5a30', wall: { top: '#4a4636', left: '#332f22', right: '#3f3a2b' } },
       wildPal: { col: '#7a8a3a', edge: '#556123' }, waterPal: { col: '#3f5a52', edge: '#2c4038' },
       grid: ['###########', '#.g.w.g...#', '#....w....#', '#.wg...gw.#', '#.........#', '#.gw..g.w.#', '#..w.....g#', '#....D....#', '###########'],
       spawn: { gx: 5, gy: 6 }, doors: [{ gx: 5, gy: 7, to: 'wilds', tgx: 11, tgy: 5 }], npcs: [], objects: [],
     },
     isla: {
-      id: 'isla', name: 'Isla', theme: 'grass', biome: 'isla', wild: true, encounterRate: 0.28, bg: '#2f5a6a',
+      id: 'isla', name: 'Isla', theme: 'grass', biome: 'isla', wild: true, natural: true, borderKind: 'palm', encounterRate: 0.28, bg: '#2f5a6a',
       pal: { floorA: '#86c46a', floorB: '#7ab85e', floorEdge: 'rgba(30,60,20,.3)', door: '#caa96b', wall: { top: '#5a8a4a', left: '#3c5e30', right: '#4a7440' } },
       wildPal: { col: '#4faf6a', edge: '#357b4a' }, waterPal: { col: '#5aa6c0', edge: '#3f8aa4' },
       grid: ['###########', '#ww.....ww#', '#.g.g.g.g.#', '#.........#', '#.g.g.g.g.#', '#.........#', '#wwg...gww#', '#....D....#', '###########'],
@@ -4946,11 +5017,19 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     // suelos especiales: 'g' parterre silvestre · 'w' agua · 'l' lava · 'H' fachadas
     const extraFloors = [];
     const walls = [];
+    const propTiles = [];   // bordes/escenario natural (seto, valla, roca…) por tile
     for (let gy = 0; gy < m.grid.length; gy++) for (let gx = 0; gx < m.grid[gy].length; gx++) {
       const ch = m.grid[gy][gx];
       if (ch === 'g') { const wp = m.wildPal || { col: '#3f7d34', edge: '#2f5b26' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); }
       else if (ch === 'w') { const wp = m.waterPal || { col: '#5aa6c0', edge: '#3f8aa4' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); }
       else if (ch === 'l') { const wp = m.lavaPal || { col: '#d5713f', edge: '#8a3f22' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); }
+      else if (ch === '#' && m.natural) {
+        // suelo del bioma bajo el prop + tipo: perímetro = borde (seto/valla), interior = escenario
+        const fa = (m.pal && m.pal.floorA) || '#7cbd50', fe = (m.pal && m.pal.floorEdge) || 'rgba(30,60,20,.3)';
+        extraFloors.push({ gx, gy, col: fa, edge: fe });
+        const edge = gy === 0 || gy === m.grid.length - 1 || gx === 0 || gx === m.grid[gy].length - 1;
+        propTiles.push({ gx, gy, kind: edge ? (m.borderKind || 'hedge') : (m.propKind || m.borderKind || 'hedge') });
+      }
       else if (ch === 'H') walls.push({ gx, gy, h: 56, pal: ISO.THEMES.street.wall });
       else if (ch === 'P') walls.push({ gx, gy, h: 30, lamp: true, pal: { top: '#ffd34d', left: '#7c6a2a', right: '#9a8330' } });
     }
@@ -4973,6 +5052,9 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
 
     // combinar extraFloors dentro de renderRoom: hack -> dibujar suelos extra antes
     for (const ef of extraFloors) { const s = ISO.project(ef.gx, ef.gy, game.cam); ISO.floorDiamond(ctx, s.x, s.y, ef.col, ef.edge); }
+
+    // props naturales (bordes/escenario) como objetos con profundidad
+    for (const pt of propTiles) objects.push({ gx: pt.gx, gy: pt.gy, draw: (ctx, sx, sy) => ISO.prop(ctx, sx, sy, pt.kind) });
 
     // paredes 'H' como objetos altos; farolas 'P' con su sprite si existe
     for (const w of walls) objects.push({

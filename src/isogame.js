@@ -125,7 +125,7 @@
     },
     // ---------------- SENDERO SALVAJE (hub de biomas) ----------------
     wilds: {
-      id: 'wilds', name: 'Sendero Salvaje', theme: 'grass', bg: '#2f4a2c',
+      id: 'wilds', name: 'Sendero Salvaje', theme: 'grass', natural: true, borderKind: 'hedge', bg: '#2f4a2c',
       pal: { floorA: '#8a7a52', floorB: '#7e6f49', floorEdge: 'rgba(40,30,15,.35)', door: '#caa96b', wall: { top: '#7a8a5a', left: '#54633a', right: '#657548' } },
       grid: [
         '###D##D##D###',
@@ -156,56 +156,56 @@
     },
     // ---------------- BIOMAS ----------------
     pradera: {
-      id: 'pradera', name: 'Pradera', theme: 'grass', biome: 'pradera', wild: true, encounterRate: 0.28, bg: '#3a5a34',
+      id: 'pradera', name: 'Pradera', theme: 'grass', biome: 'pradera', wild: true, natural: true, borderKind: 'hedge', encounterRate: 0.28, bg: '#3a5a34',
       pal: { floorA: '#7cbd50', floorB: '#72b048', floorEdge: 'rgba(30,60,20,.3)', door: '#caa96b', wall: { top: '#9ab06a', left: '#6f8347', right: '#82995a' } },
       wildPal: { col: '#4f9e3a', edge: '#356b26' },
       grid: ['###########', '#.........#', '#.g.g.g.g.#', '#.........#', '#.g.g.g.g.#', '#.........#', '#.g.g.g.g.#', '#....D....#', '###########'],
       spawn: { gx: 5, gy: 6 }, doors: [{ gx: 5, gy: 7, to: 'wilds', tgx: 3, tgy: 1 }], npcs: [], objects: [],
     },
     bosque: {
-      id: 'bosque', name: 'Bosque', theme: 'grass', biome: 'bosque', wild: true, encounterRate: 0.28, bg: '#22331d',
+      id: 'bosque', name: 'Bosque', theme: 'grass', biome: 'bosque', wild: true, natural: true, borderKind: 'hedgeDark', propKind: 'tree', encounterRate: 0.28, bg: '#22331d',
       pal: { floorA: '#4f8f45', floorB: '#468038', floorEdge: 'rgba(20,45,15,.35)', door: '#8a5a30', wall: { top: '#5a7a3a', left: '#3c5426', right: '#496630' } },
       wildPal: { col: '#3f7d34', edge: '#2c5a22' },
       grid: ['###########', '#..#....#.#', '#.g.g.g.g.#', '#.........#', '#.g.g#g.g.#', '#.........#', '#.g.g.g.g.#', '#....D....#', '###########'],
       spawn: { gx: 5, gy: 6 }, doors: [{ gx: 5, gy: 7, to: 'wilds', tgx: 6, tgy: 1 }], npcs: [], objects: [],
     },
     desierto: {
-      id: 'desierto', name: 'Desierto', theme: 'grass', biome: 'desierto', wild: true, encounterRate: 0.28, bg: '#7a6238',
+      id: 'desierto', name: 'Desierto', theme: 'grass', biome: 'desierto', wild: true, natural: true, borderKind: 'fence', propKind: 'cactus', encounterRate: 0.28, bg: '#7a6238',
       pal: { floorA: '#e0c380', floorB: '#d4b673', floorEdge: 'rgba(120,90,40,.3)', door: '#a9793f', wall: { top: '#d8b673', left: '#a07b3e', right: '#bd914f' } },
       wildPal: { col: '#b7a24a', edge: '#8a7730' },
       grid: ['###########', '#.........#', '#..g...g..#', '#.........#', '#.g..#..g.#', '#.........#', '#..g...g..#', '#....D....#', '###########'],
       spawn: { gx: 5, gy: 6 }, doors: [{ gx: 5, gy: 7, to: 'wilds', tgx: 9, tgy: 1 }], npcs: [], objects: [],
     },
     nieve: {
-      id: 'nieve', name: 'Nieve', theme: 'grass', biome: 'nieve', wild: true, encounterRate: 0.28, bg: '#8aa0b0',
+      id: 'nieve', name: 'Nieve', theme: 'grass', biome: 'nieve', wild: true, natural: true, borderKind: 'snow', propKind: 'snow', encounterRate: 0.28, bg: '#8aa0b0',
       pal: { floorA: '#e8eef2', floorB: '#dbe6ee', floorEdge: 'rgba(120,140,160,.3)', door: '#a9b6c0', wall: { top: '#cfe0ea', left: '#9fb4c2', right: '#b8ccd8' } },
       wildPal: { col: '#b8d0c4', edge: '#8aa89a' },
       grid: ['###########', '#.........#', '#.g.g.g.g.#', '#....#....#', '#.g.g.g.g.#', '#....#....#', '#.g.g.g.g.#', '#....D....#', '###########'],
       spawn: { gx: 5, gy: 6 }, doors: [{ gx: 5, gy: 7, to: 'wilds', tgx: 1, tgy: 2 }], npcs: [], objects: [],
     },
     volcan: {
-      id: 'volcan', name: 'Volcán', theme: 'grass', biome: 'volcan', wild: true, encounterRate: 0.28, bg: '#241614',
+      id: 'volcan', name: 'Volcán', theme: 'grass', biome: 'volcan', wild: true, natural: true, borderKind: 'rockDark', propKind: 'rockDark', encounterRate: 0.28, bg: '#241614',
       pal: { floorA: '#4a3a3a', floorB: '#3f3232', floorEdge: 'rgba(0,0,0,.45)', door: '#7a4a30', wall: { top: '#5a3a34', left: '#2e1e1c', right: '#42302c' } },
       wildPal: { col: '#c56a3a', edge: '#8a3f22' }, lavaPal: { col: '#d5713f', edge: '#8a3f22' },
       grid: ['###########', '#.g.l.g...#', '#....l....#', '#.lg...gl.#', '#.........#', '#.gl..g.l.#', '#..l.....g#', '#....D....#', '###########'],
       spawn: { gx: 5, gy: 6 }, doors: [{ gx: 5, gy: 7, to: 'wilds', tgx: 11, tgy: 2 }], npcs: [], objects: [],
     },
     cueva: {
-      id: 'cueva', name: 'Cueva', theme: 'grass', biome: 'cueva', wild: true, encounterRate: 0.28, bg: '#1a1620',
+      id: 'cueva', name: 'Cueva', theme: 'grass', biome: 'cueva', wild: true, natural: true, borderKind: 'rock', propKind: 'rock', encounterRate: 0.28, bg: '#1a1620',
       pal: { floorA: '#6a6470', floorB: '#5c5766', floorEdge: 'rgba(0,0,0,.45)', door: '#7a6a55', wall: { top: '#8b8492', left: '#57525f', right: '#6b6675' } },
       wildPal: { col: '#9a94a2', edge: '#6a6472' },
       grid: ['###########', '#.#.....#.#', '#.g.g.g.g.#', '#..#...#..#', '#.g.g.g.g.#', '#..#...#..#', '#.g.g.g.g.#', '#....D....#', '###########'],
       spawn: { gx: 5, gy: 6 }, doors: [{ gx: 5, gy: 7, to: 'wilds', tgx: 1, tgy: 5 }], npcs: [], objects: [],
     },
     pantano: {
-      id: 'pantano', name: 'Pantano', theme: 'grass', biome: 'pantano', wild: true, encounterRate: 0.28, bg: '#232a20',
+      id: 'pantano', name: 'Pantano', theme: 'grass', biome: 'pantano', wild: true, natural: true, borderKind: 'reed', encounterRate: 0.28, bg: '#232a20',
       pal: { floorA: '#6b7a45', floorB: '#5f6d3c', floorEdge: 'rgba(30,35,15,.4)', door: '#6a5a30', wall: { top: '#4a4636', left: '#332f22', right: '#3f3a2b' } },
       wildPal: { col: '#7a8a3a', edge: '#556123' }, waterPal: { col: '#3f5a52', edge: '#2c4038' },
       grid: ['###########', '#.g.w.g...#', '#....w....#', '#.wg...gw.#', '#.........#', '#.gw..g.w.#', '#..w.....g#', '#....D....#', '###########'],
       spawn: { gx: 5, gy: 6 }, doors: [{ gx: 5, gy: 7, to: 'wilds', tgx: 11, tgy: 5 }], npcs: [], objects: [],
     },
     isla: {
-      id: 'isla', name: 'Isla', theme: 'grass', biome: 'isla', wild: true, encounterRate: 0.28, bg: '#2f5a6a',
+      id: 'isla', name: 'Isla', theme: 'grass', biome: 'isla', wild: true, natural: true, borderKind: 'palm', encounterRate: 0.28, bg: '#2f5a6a',
       pal: { floorA: '#86c46a', floorB: '#7ab85e', floorEdge: 'rgba(30,60,20,.3)', door: '#caa96b', wall: { top: '#5a8a4a', left: '#3c5e30', right: '#4a7440' } },
       wildPal: { col: '#4faf6a', edge: '#357b4a' }, waterPal: { col: '#5aa6c0', edge: '#3f8aa4' },
       grid: ['###########', '#ww.....ww#', '#.g.g.g.g.#', '#.........#', '#.g.g.g.g.#', '#.........#', '#wwg...gww#', '#....D....#', '###########'],
@@ -747,11 +747,19 @@
     // suelos especiales: 'g' parterre silvestre · 'w' agua · 'l' lava · 'H' fachadas
     const extraFloors = [];
     const walls = [];
+    const propTiles = [];   // bordes/escenario natural (seto, valla, roca…) por tile
     for (let gy = 0; gy < m.grid.length; gy++) for (let gx = 0; gx < m.grid[gy].length; gx++) {
       const ch = m.grid[gy][gx];
       if (ch === 'g') { const wp = m.wildPal || { col: '#3f7d34', edge: '#2f5b26' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); }
       else if (ch === 'w') { const wp = m.waterPal || { col: '#5aa6c0', edge: '#3f8aa4' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); }
       else if (ch === 'l') { const wp = m.lavaPal || { col: '#d5713f', edge: '#8a3f22' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); }
+      else if (ch === '#' && m.natural) {
+        // suelo del bioma bajo el prop + tipo: perímetro = borde (seto/valla), interior = escenario
+        const fa = (m.pal && m.pal.floorA) || '#7cbd50', fe = (m.pal && m.pal.floorEdge) || 'rgba(30,60,20,.3)';
+        extraFloors.push({ gx, gy, col: fa, edge: fe });
+        const edge = gy === 0 || gy === m.grid.length - 1 || gx === 0 || gx === m.grid[gy].length - 1;
+        propTiles.push({ gx, gy, kind: edge ? (m.borderKind || 'hedge') : (m.propKind || m.borderKind || 'hedge') });
+      }
       else if (ch === 'H') walls.push({ gx, gy, h: 56, pal: ISO.THEMES.street.wall });
       else if (ch === 'P') walls.push({ gx, gy, h: 30, lamp: true, pal: { top: '#ffd34d', left: '#7c6a2a', right: '#9a8330' } });
     }
@@ -774,6 +782,9 @@
 
     // combinar extraFloors dentro de renderRoom: hack -> dibujar suelos extra antes
     for (const ef of extraFloors) { const s = ISO.project(ef.gx, ef.gy, game.cam); ISO.floorDiamond(ctx, s.x, s.y, ef.col, ef.edge); }
+
+    // props naturales (bordes/escenario) como objetos con profundidad
+    for (const pt of propTiles) objects.push({ gx: pt.gx, gy: pt.gy, draw: (ctx, sx, sy) => ISO.prop(ctx, sx, sy, pt.kind) });
 
     // paredes 'H' como objetos altos; farolas 'P' con su sprite si existe
     for (const w of walls) objects.push({
