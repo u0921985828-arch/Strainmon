@@ -293,6 +293,7 @@
     if (PH.plantart) PH.plantart.preload();
     if (PH.strainart) PH.strainart.preload();
     if (PH.charart) PH.charart.preload();
+    if (PH.faceart) PH.faceart.preload();
     if (PH.furniart) PH.furniart.preload();
     PH.ui.init();
     bindInput();
@@ -459,9 +460,9 @@
     if (npc) {
       npc.dir = { NE: 'SW', SW: 'NE', NW: 'SE', SE: 'NW' }[p.dir] || 'SW';
       if (npc.role === 'customer') return dealWith(npc);
-      if (npc.role === 'walker') return PH.ui.dialog(['...cruza la calle sin mirarte.'], null, { sprite: npc.sprite, name: npc.name });
+      if (npc.role === 'walker') return PH.ui.dialog(['...cruza la calle sin mirarte.'], null, { sprite: npc.sprite, name: npc.name, char: npc.char });
       const pages = PH.quests.DIALOGS[npc.dialog] ? PH.quests.DIALOGS[npc.dialog](G()) : ['...'];
-      PH.ui.dialog(pages, null, { sprite: npc.sprite, name: npc.name });
+      PH.ui.dialog(pages, null, { sprite: npc.sprite, name: npc.name, char: npc.char });
       return;
     }
     const o = objAt(m, f.gx, f.gy);
@@ -484,7 +485,7 @@
     const s = G();
     const stock = s.bank.filter(x => x.form !== 'polen');
     if (!stock.length) {
-      return PH.ui.dialog(['Cliente: ¿No llevas género? Vuelve cuando tengas algo bueno.'], null, { sprite: npc.sprite, name: npc.name });
+      return PH.ui.dialog(['Cliente: ¿No llevas género? Vuelve cuando tengas algo bueno.'], null, { sprite: npc.sprite, name: npc.name, char: npc.char });
     }
     // pide la más valiosa que lleves
     const want = stock.slice().sort((a, b) => b.rarity - a.rarity)[0];

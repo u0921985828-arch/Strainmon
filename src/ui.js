@@ -144,12 +144,18 @@
     renderDialog();
   }
   function renderDialog() {
-    const portrait = dlgMeta && dlgMeta.sprite
-      ? `<div class="dlg-portrait"><canvas id="dlg_face" width="48" height="48"></canvas>${dlgMeta.name ? `<span>${dlgMeta.name}</span>` : ''}</div>` : '';
+    // Retrato: cara del personaje nuevo (faceart) por rol; si no, dibujo procedural.
+    const faceUri = dlgMeta && dlgMeta.char && PH.faceart && PH.faceart.has(dlgMeta.char) ? PH.faceart.uri(dlgMeta.char) : null;
+    const hasPortrait = dlgMeta && (faceUri || dlgMeta.sprite);
+    const inner = faceUri
+      ? `<img class="dlg-face" src="${faceUri}" alt="">`
+      : `<canvas id="dlg_face" width="48" height="48"></canvas>`;
+    const portrait = hasPortrait
+      ? `<div class="dlg-portrait">${inner}${dlgMeta.name ? `<span>${dlgMeta.name}</span>` : ''}</div>` : '';
     open(`<div class="dialog-box ${portrait ? 'has-portrait' : ''}">${portrait}<div class="dlg-text"><p>${dlgPages[dlgIndex]}</p><div class="dlg-hint">▼ Espacio / Click para continuar</div></div></div>`, 'bottom');
     PH.game.mode = 'dialog';
-    if (portrait) {
-      const c = document.getElementById('dlg_face');
+    const c = document.getElementById('dlg_face');
+    if (c) {
       const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
       ctx.scale(3, 3);
       PH.render.drawActor(ctx, 0, 0, 'down', 0, PH.render.NPC_PALETTES[dlgMeta.sprite]);

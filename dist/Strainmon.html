@@ -238,7 +238,8 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 .dlg-hint { text-align: right; color: var(--dim); font-size: .7rem; margin-top: 10px; }
 .dialog-box.has-portrait { display: flex; gap: 14px; align-items: flex-start; }
 .dlg-portrait { flex: 0 0 auto; text-align: center; }
-.dlg-portrait canvas { background: var(--canvas-bg); border: 2px solid var(--outline); border-radius: var(--radius); }
+.dlg-portrait canvas, .dlg-portrait img.dlg-face { background: var(--canvas-bg); border: 2px solid var(--outline); border-radius: var(--radius); display: block; }
+.dlg-portrait img.dlg-face { width: 56px; height: 56px; image-rendering: pixelated; box-shadow: var(--bevel); }
 .dlg-portrait span { display: block; font-size: .68rem; color: var(--amber); font-weight: 700; margin-top: 4px; max-width: 56px; }
 .dlg-text { flex: 1; min-width: 0; }
 
@@ -524,7 +525,7 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
     </nav>
   </div>
 
-                                                
+                                                  
 <script>
 /* src/util.js */
 /* ============================================================
@@ -3171,12 +3172,18 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     renderDialog();
   }
   function renderDialog() {
-    const portrait = dlgMeta && dlgMeta.sprite
-      ? `<div class="dlg-portrait"><canvas id="dlg_face" width="48" height="48"></canvas>${dlgMeta.name ? `<span>${dlgMeta.name}</span>` : ''}</div>` : '';
+    // Retrato: cara del personaje nuevo (faceart) por rol; si no, dibujo procedural.
+    const faceUri = dlgMeta && dlgMeta.char && PH.faceart && PH.faceart.has(dlgMeta.char) ? PH.faceart.uri(dlgMeta.char) : null;
+    const hasPortrait = dlgMeta && (faceUri || dlgMeta.sprite);
+    const inner = faceUri
+      ? `<img class="dlg-face" src="${faceUri}" alt="">`
+      : `<canvas id="dlg_face" width="48" height="48"></canvas>`;
+    const portrait = hasPortrait
+      ? `<div class="dlg-portrait">${inner}${dlgMeta.name ? `<span>${dlgMeta.name}</span>` : ''}</div>` : '';
     open(`<div class="dialog-box ${portrait ? 'has-portrait' : ''}">${portrait}<div class="dlg-text"><p>${dlgPages[dlgIndex]}</p><div class="dlg-hint">▼ Espacio / Click para continuar</div></div></div>`, 'bottom');
     PH.game.mode = 'dialog';
-    if (portrait) {
-      const c = document.getElementById('dlg_face');
+    const c = document.getElementById('dlg_face');
+    if (c) {
       const ctx = c.getContext('2d'); ctx.imageSmoothingEnabled = false;
       ctx.scale(3, 3);
       PH.render.drawActor(ctx, 0, 0, 'down', 0, PH.render.NPC_PALETTES[dlgMeta.sprite]);
@@ -3841,6 +3848,30 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
   function key(role, dir) { return role + '_' + (IDX[dir] || 1); }
   function img(role, dir) { return images[key(role, dir)] || null; }
   PH.charart = { DATA, preload, has, key, img };
+})(window.PH = window.PH || {});
+
+</script>
+<script>
+/* src/faceart.js */
+/* STRAINMON — faceart.js (retratos de diálogo, recorte de cabeza del personaje nuevo, recolor por rol). Generado: scripts/build-faceart.mjs */
+(function (PH) {
+  'use strict';
+  const DATA = {
+    "player": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsSAAALEgHS3X78AAADQklEQVR4nO1asY4TMRDNkRXfcidA1yB0ok5DcydRXEOTBgmlTkFDm5KGD0BIFHxB/oaGloY/GPSivOhlGO9ujtPZe/ZIT3K8XsfzPDMeez2bNWnSpEmTJk2aPKzYSDxasdoIMGL+dG7rzx92WK1vj8r6G3hMZBjx8vWzkwjozp7sMJu4WK0EGEDlvJJDBNwsFwdMkQTzinsF/W8lgs8aAcvpWYABGPR9WgAwlRXB+gg4BVEcmIIlWM0EmA54cX21g9ZFZp9yAX0vcIUixVRREqBK41lUVgLYh1rAVFYEawQsK7OA7beNjVn6Uv7cB08AAVKxqQKyx4NtI2BzsAA/89j4ACfs/48AU6cbYebZH/ou0gJW69ujwbN8cX55hKheFdd6rv1QlgSAkGLOCraNgE1y9iKk2mrd98sXO/S9SxfYu0FeuRhQWvH14/sDIndA/e8fX3b49O5N2EdRyyCkEXA+bPYMZr5eLQJ4++p5clXgezB72RhlsQYbGqT32agNFLgLASQhZwyw2gkIl8ExyitUcWfS/0R7LaN/JkiaFmcJjttGwGZwhv/8+nmAmj2XOwVmF24AoD3b+iCY+M8HFRuK1H2KjkVEQOBiWcRqJsAi+HV+iAANgv9JQP5NEcQTwMgOX76rBUQJVBADypCudgLm+zX6PgkYs8uclSTdXmkcXLCcWvp8Fujb+OBaROY3JLUTYDy26klWeslI7QX0SAy/kYHus9CixDjI1FE3rAEHHSkoAeyL/Sm5sjwWJVY9ATNJiiILwMkxZ1tdgPl/6kuxT7iKsYCFHFHrFtUPmgGMzwANkpHSGkjVBegG2bbAKo2A66ujWVQLYL1ahrcSD/+cM65fhvTuQU4LsMjsxxBAZbmUASmC9HOYlku4OWJVE9AFyqUISEV2VVzvDGgb5vv+42j222OdEBD5sCqOwXOmdeY1skcE6P0AkNCXXGW1gFWFBJjeAIsiuCeA9er3SkDUVl2jj4AHvz3WuSzvFALQvo8A7YNthiygEbDMbAE3cjFSl8coBuis67tqCd5NvK/3xYLsBHQSHOm/msMrotwAZW2jRDQCziZmASuZVR8wfcCLLMQHTD1ui/6fu829K46Sv8boBXcoiuhhAAAAAElFTkSuQmCC",
+    "dealer": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsSAAALEgHS3X78AAADRklEQVR4nO1avU4jMRCOrDQ8BQ+Q5iSa6yi4Aqq71HSR6K66irxFaHkHcvcG6XiRk5BoeIVBY3Y2n4exdwMIe7FH+qSN1+vsfJ4/ez2bNWnSpEmTJk2afK7QSHxZodoIIMHR3NG/9W+PzdUquMbfjK9EBgnOT74dRoCbv2DiQrUSQAxRTis5RMB6edFjiiSQVlwrqH8jEXKvEbCcngUQg1/6Iy3AkzCRjEApAg6BGQcmYAlUMwGEL7w6O/XANsvsYy6AzxmuUKQQKioEoNJ8z7pGAmQMtICpZARqBCwrs4Dd7ZbGpL6YP6egCRAwqbyoYmSPB7tGwLa3AD3zvPBhHLD+D+HmvRvxzMt4PHaRFrC5WgUvL9fHi0UAqx0VD9q73M/KCgFMSDF7BbtGwDY6exaiMw1t5z//eqSeFRfo3CCvHA8ojbi5vu1huQO33989ePy5vLZJLCkNsjQCFiPMvgtmuh0tgvHj+69oVpDnvNnvF0ZZrIGGXlL7rNWHFXgLAUJCzhhAtRNgpsExyiNQcWXSr6I9XvP4UiAFZXGO4LhrBGwHZ/jx/1MPNHtJdwieXXYDBvfvLUQHwQI+pdFQpE4pOhYWAYaLZRGqmQAyofL8EAEYBN9JQP5FkRdd6HSRnX35rRZgFVBGDChEXOUEHHU5+kMJGLHKnBUl7kVpvxMkxU0k9ekqUPfRwbWIym9QKieAZNsqUawkyYitBXBLjH9zBdpVoUUJyUtGP2u5ud/oiAEJkLFkPCQX0mNRQtUTMIOiyLIA3jmW2UYXkPo/9qVYF1zFWMAKtqhxiapfWgKY3PP3IUhaSmMgRRcQN8i2BEZpBJydBrMYWEDXjpahrURD35cZxy9DePYgpwWQZfZjCBBlJZUxYgTh5zC8LuHkCNVNgHutXIyAWGRHxfHMAPaRel9/HM1/esztCbB8GBXnl5eZxpnHyG4RgOcDmIRUcZXVAjYVEkB4AsyK4JoAaUe/RwKsvugaKQI+//SYC6u8Qwjg/ikCcAzpM2QBjYBlZgtYw8FITI9WDMBZx2fRErSbaF9PxoLsBLh9cBT/xRoeYdUGfI19kIhGgJuYBWxgVnXA1AHPshAdMHG7zfp/WW12rjhKngGp2o7GHpFqdwAAAABJRU5ErkJggg==",
+    "neighbor": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsSAAALEgHS3X78AAADQElEQVR4nO1asY4TMRDdFMuPIJ0o0BVccQVISFdBeaSj4/IBtNecaFJSnMQnpKDna6Cn5B8GvSgvehnGu5vjFHvPHulJjtfreJ5nxmOvu65JkyZNmjRp0uS0YhPxZMVqI8CIxbPePny722J5e3NQ1t/AUyLDiBdvXh1FQL9YbNHNXKxWAgygcl7JMQIuV8s95kiCecW9gv63EsFnjYDV/CzAAAz6MS0AmMuKYEMEHIMoDszBEqxmAkwHfHF9tYXWRWafcgF9L3CFIsVUURKgSuNZVFYC2IdawFxWBGsErCqzgM33tU1Z+lL+PARPAAFSsakCsseDTSNgvbcAP/PY+ABH7P8PAFOnG2Hm2R/6LtIClrc3B4Nn+fzs5QGielVc67n2Q1kSAEKKOSvYNALWydmLkGqrdV/fdVsMvUsX2LlBXjkfUVpx/+XjHpE7oP7nj7stPn96G/ZR1DIIaQScjZs9g5mvV4sA3r9+nlwV+B7MXjZGWazBxgbpfTZqAwUeQgBJyBkDrHYCwmVwivIKVdyZ9D/RXsvonwmSpsVZguOmEbAeneE/v3/toWbP5U6B2YUbAGjPtj4IJv7zpGJjkXpI0amICAhcLItYzQRYBL/OjxGgQfA/Cci/KYJ4AhjZ4csPtYAogQpiQBnS107AYrdGPyYBU3aZXUnS75TGwQXLqaXPZ4G+jQ+uRWR+Y1I7AcZjq4FkZZCM1F5Aj8TwGxnoLgstSoyDTB11wxpw0JGCEsC+2J+SK8tjUWLVE9BJUhRZAE6OOdvqAsz/U1+KfcJVjAVcyBG1blH9oBnA+AzQIBkprYFUXYBukG0LrNIIuL46mEW1ANarZXgr8fDPOeP6ZUjvHuS0AIvMfgoBVJZLGZAiSD+HabmEmyNWNQF9oFyKgFRkV8X1zoC2Yb7vP45mvz3WCwGRD6viGDxnWmdeI3tEgN4PAAlDyVVWC1hWSIDpDbAognsCWK9+rwREbdU1hgg4+e2x3mV5xxCA9kMEaB9sM2YBjYBVZgu4lIuRujxGMUBnXd9VS/Bu4n19KBZkJ6CX4Ej/1RxeEeUGKGsbJaIRsJiZBSxlVn3A9AEvshAfMPW4Lfp/7jZ3rjhJ/gL0vdtwxt8XCgAAAABJRU5ErkJggg==",
+    "botanist": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsSAAALEgHS3X78AAADSUlEQVR4nO1avWocMRBeRCB+hPQpjB8glXERAq5TLG78As5h/ABHIF3cH6QM7vwi56dwHUiXVxgz8s7ep/FIu+cYS2tp4IM9rVa382n+pFXXNWnSpEmTJk2avK7QTLxZodoIIMHBu/f0+/uNx3p1HVzjb8ZbIoMEJ5++7EeAc49YuFCtBBBDlNNKThGw6q9GLJEE0oprBfVvJELuNQL65VkAMfilX9ICPAkLyQiUImAfmHFgAZZANRNA+ML96bkHtllmH3MBfM5whSKFUFEhAJXme9Y1EiBjoAUsJSNQI6CvzAI2t1uak/pi/pyCJkDApPKiipE9HmwaAdvRAvTM88KHscf6P4RzoxvxzMt4PHaRFrBeXQcvL9eHRx8DWO2oeNA+5H5WVghgQorZK9g0ArbR2bMQnWlo6y5/eaSeFRcY3CCvHE4ojTj7eTPCcgdu/3b3x+P44odNYklpkKURcDTD7IdgptvRIhgfPn+NZgV5zpv9bmGUxRpo6iW1z1p9WIHnECAk5IwBVDsBZhqcozwCFVcm/STa4zWPLwVSUBbnCI6bRsB2cobv//4bgWYv6Q7Bs8tuwOD+o4XoIFjApzSaitQpRefCIsBwsSxCNRNAJlSenyIAg+B/EpB/UeRFFzpDZGdffq4FWAWUEQMKEVc5AQdDjn5RAmasMruixD0q7XeCpLiJpD5dBeo+OrgWUflNSuUEkGxbJYqVJBmxtQBuifFvrkCHKrQoIXnJ6Gct5/xGRwxIgIwl4yG5kB6LEqqegA6KIssCeOdYZhtdQOr/2JdiXXAVYwE9bFHjElW/tAQwuefvQ5C0lMZAii4gbpBtCYzSCDg9D2YxsIChHS1DW4mGvi8zjl+G8OxBTgsgy+znECDKSipjxAjCz2F4XcLJEaqbAPdUuRgBsciOiuOZAewj9b7+OJr/9JjbEWD5MCrOLy8zjTOPkd0iAM8HMAmp4iqrBawrJIDwBJgVwTUB0o5+jwRYfdE1UgS8/ukxF1Z5+xDA/VME4BjSZ8oCGgF9ZgtYwcFITI9WDMBZx2fRErSbaF9PxoLsBLhdcBT/xRoeYdUGfI19kIhGgFuYBaxhVnXA1AHPshAdMHG7zfp/WW0OrjhLHgCdhKGygmBmogAAAABJRU5ErkJggg==",
+    "merchant": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsSAAALEgHS3X78AAADQUlEQVR4nO1aPY/UMBDNXSTE36BgdbruamhCjZCuu3oliqOivPK0FQUNP2BFQ8uf4H8gSn7GoAl5q5dhbGeP09o5e6QnZR3Hm3l+M/6Iu65Zs2bNmjVr1uy0JgvxZE1qI0CAs2fP5c2XbyOGu/vZNf9WPCUyBHjxejiKgP78L7qVm9RKgCjgnHUyRcDF9uMBayRBrOPWQfubicC9RsB2fQoQhb70YypAsZYRQWIEHAMvD6xBCVIzAcIvvLm+GcFlnuxDIcDPOaFQpAk7CgLYab3nXTMBaIMVsJYRQRoB28oUsPu+lyVDXyieY7AEAEqqLqoU2fPBrhGwPyjA9rwufBRHrP9nUKkjjLTn0Z62XaQChrv72cvj+mrzcgavnB3ncoz96iwIUEKK2SvYNQL2wd7zEKrLZa/edyNizyIEpjDIa1cJpxkfPt0e4IWDln/98XnE29t3bhtFDYNqjYBNWvZIZracFTGqYrgMjgp4TmVPC6MsapDUS9qY9eqoAw8hACTkzAFSOwHuMLjEeQY7biT9T7bna20fEySeFmdJjrtGwD7Zw79+/zyAZY/hjjEqaLgcofVR1ybBwH+e1CSVqWOOLoVHgBNiWUxqJkA82HE+RQAnwf8kIP+iSM0SgMyusfxQBXgTKCcHlGF97QScTWP0YxKwZJXZlWT95LRuXOA6NPTZWaCtY5NrETO/lNVOgGDbKjJZiZIRWgvwlpj+1hnoNAstygQvGdrqVjXoRkcITADaQntMLg2PRZlUT0BHkyJPAbpzjN6erQGm+X/oS7GdcBWjgA1tUfMS1b40EhjuKThJek5zIuUQQBhkWwKzNQKub2a9yApAOSvDqsTC3keP85chPnuQUwHiyX4JAXAWQ5kiRBB/DuPrEk6OSNUE9I5zIQJCmZ0d5zMDXAfzfftxNPvpsZ4I8GKYHdeXR09zz3Nm9wjg8wFKQmxylVUBQ4UECJ8A8zK4JQDlHPdMgFeXQyNGwMlPj/VmlncMAVo/RgC3gTopBTQCtpkVcEEHI3l49HIA9zo/y0qwYWJjPZYLshPQU3JE/PIcnuHNDfSa6zARjYDzlSlgoF61CdMmPE8hNmHydpv3/1htTqG4yP4AIVvvBZkZ/2gAAAAASUVORK5CYII=",
+    "customer1": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsSAAALEgHS3X78AAADSklEQVR4nO1avW4UMRBeWTqJJ+ABqFKkgI4yUgqKUKTf4pSGBiGUDlFcR4NEXiQFD3AtEq/AI+QtBo3x7H2ejL17IYq9sUf6pD2v17fzef7s9TB06dKlS5cuXbo8rdBCPFuh1gggwWbzgr5+++mxvb6JrvE34zmRQYLXb98dR4ALWLlQqwQQQ5TTSs4RcDl+mbBGEkgrrhXUv5EIudcJGNdnAcTgl35MC/AkrCQjUI6AY2DGgRVYArVMAOELn11ceWCbZfYpF8DnDFeoUggVFQJQab5nXSMBMgZawFoyAnUCxsYsYHe7pyWpL+XPOWgCBEwqL6oYxePBrhOwnyxAzzwvfBhHrP9juGFyI555GY/HrtICttc30cvL9enJqwhWOyoetYfcz8oKAUxINXsFu07APjl7FpIzDW3Dp9Ej96y4QHCDsnI6ozTi/fcfEyx34PYPv395vPn42SaxpjTI0gk4WWD2IZjpdrQIxsvz82RWkOe82R8WRkWsgeZeUvus1YcVeAgBQkLJGECtE2CmwSXKI1BxZdL3oj1e8/hSIEVlcYnguOsE7Gdn+M/d3QQ0e0l3CJ5ddgMG958sRAfBCj6l0Vykzim6FBYBhosVEWqZADKh8vwcARgE/5OA8osiL7rQCZGdffmhFmAVUEYMqERc4wRsQo5+VAIWrDKHqsT9U9rvBElxk0h9ugrUfXRwraLym5XGCSDZtsoUK1kyUmsB3BLj31yBhiq0KiF5yeRnLTf4jY4UkAAZS8ZDciE9ViXUPAEDFEWWBfDOscw2uoDU/6kvxbrgqsYCzmCLGpeo+qUlgMk9fx+CpKU0BlJ0AXGDYktglE7AxVU0i5EFhHa0DG0lGvq+zDh+GcKzByUtgCyzX0KAKCupjJEiCD+H4XUNJ0eobQLcfeVSBKQiOyqOZwawj9T7+uNo+dNj7kCA5cOoOL+8zDTOPEZ2iwA8H8Ak5IqrohawbZAAwhNgVgTXBEg7+j0SYPVF18gR8PSnx1xc5R1DAPfPEYBjSJ85C+gEjIUt4BIORmJ6tGIAzjo+i5ag3UT7ejYWFCfAHYKj+C/W8AirNuBr7INEdALcyixgC7OqA6YOeJaF6ICJ223W/8tqM7jiIvkLfKRoTjhwVYoAAAAASUVORK5CYII=",
+    "customer2": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsSAAALEgHS3X78AAADRElEQVR4nO1asW7bMBCVISS/0SFDka2Ahw4ZOmfM4A7OnCFDpkzdPBTdDXTrliGf0D/whwTIBzRfcMUJesbT9UjJaWBSIQ94gCzTtO7x3fFIsWmqVatWrVq1atWOazIR79akNAIEOD1ZyM8f1x02d1eDa/6seE9kCPDl88eDCGgXbYdm5ialEiAKOGedHCPgZn2xxxxJEOu4ddB+ZiLwXSVgPT8FiEIf+i0VoJjLjCAxAg6BlwfmoAQpmQDhB15dLjvwPU/2oRDg3zmhkKUJOwoC2Gn9zrtmAtAHK2AuM4JUAtaFKWD3aytTpr5QPMdgCQCUVF1UKZLng10lYLtXgB15XfgoDlj/D6BSRxjpyKM/7TtLBWzurgYPj+uz808DePfZcb6PuV+dBQFKSDZ7BbtKwDY4eh5Cbfne44fbDrHfIgT6MEhrZyNOMx7vv+3hhYPe//Pwu8P3r9duH1lNg2qVgPNx2SOZ2fusCMVqOVj2uiGjsqeFURI1yNhD2pj12qgDryEAJKTMAVI6Ae40OMV5BjtuJP1Ptudr7R8FEpfFSZLjrhKwHR3hl6fnPVj2mO4Y3eguLzpoe7S1STDwn0c1GcvUMUenwiPACbEkJiUTIB7sPD9GACfB/yQg/aJIzRKAzK6x/FoFeAWUkwPysLZ0Ak77OfotCZiyymxysrZ3WjcucB2a+mwVaNvY5JpF5TdmpRMg2LaKFCtRMkJrAd4S089agfZVaFYmeMjQVreqQTc6QmAC0Bf6Y3JpeszKpHgCGiqKPAXozjFGm0MA9X/oTbEtuLJRwIq2qHmJah8aCQzfKThJek5zIuUQQBgkWwKzVQIul4NRZAXgPivDqsTCfo8R5zdDfPYgpQLEk/0UAuAspjJFiCB+HcbXOZwckaIJaB3nQgSEMjs7zmcGuA3qfftyNPnpsZYI8GKYHdeHx0jzyHNm9wjg8wFKQqy4SqqATYEECJ8A8zK4JQD3Oe6ZAK8th0aMgKOfHmtNlXcIAdo+RgD3gTZjCqgErBMr4IYORvL06OUAHnX+LSvBhomN9VguSE5AS8kR8cs1PMOrDfSa2zARlYDFzBSwoVG1CdMmPE8hNmHydpv3/1ht9qE4yf4CJl0296LEh+MAAAAASUVORK5CYII=",
+    "walker": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsSAAALEgHS3X78AAADO0lEQVR4nO1asW7bMBC106p/UmRJMxepF88Biuypi8Kf0MVLJ31Ct6BrV/1Q13TuL1xxgp7xdD1SchqYVMgDHkBTFM17vDseKa5WVapUqVKlSpUq5xWZiRcrUhoBAly8eS1fvn/tsTvcj8r8W/GSyBDg3eb6JAKa9brHauEipRIgCihnlZwiYLu/PWKJJIhV3CpofzMReFYJ2C/PAkShg35OC1AsZUWQGAGnwIsDS7AEKZkA4QHf3G16cJ1n9iEX4PccV8hShBUFAay0PvPKTAD6YAtYyooglYB9YRbQ/WxlztIX8ucYLAGAkqqbKkXyeNBVAtqjBdiZ142P4oT9/whq6nAjnXn0p31naQG7w/1o8ChfXV6P4NWz4lyPtV+VBQFKSDZnBV0loA3OnodQW6778eFVj9i7cIHBDdLK1YTSjIdvn47w3EHrf3dtj8PnrdtHVsugSiXgctrsEcxsPVuE4uP7t8FVAe+p2dPGKIk1yNQgrc96bVSBpxAAElLGACmdAHcZnKM8gxU3Jv1PtOey9o8EidPiJMGxqwS0kzP85/HXEWz2WO4YOrvqBgptj7Y2CAb+86wiU5E6puhceAQ4LpZEpGQCxINd56cI4CD4nwSk3xSpWAIQ2dWXn2oBXgLlxIA8pCmdgIthjX5OAubsMlc5STMorQcXKIeWPpsF2jY2uGaR+U1J6QQIjq0iyUqUjNBegI/E9LdmoEMWmpUIBhk66lZr0IOOEJgA9IX+mFxaHrMSKZ6AFSVFngXoyTFmm10A+X/oS7FNuLKxgBs6ouYtqh00AhieKThIekpzIGUXgBsk2wKzVALuNqNZZAtAPVuGtRIL+xwzzl+G+O5BSgsQz+znEABlsZQpQgTx5zAu53BzRIomoHGUCxEQiuysON8Z4DbI9+3H0eS3xxoiwPNhVlwHj5nmmefI7hHA9wOUhFhyldQCdgUSIHwDzIvglgDUs98zAV5bdo0YAWe/PdaYLO8UArR9jADuA22mLKASsE9sAVu6GMnLoxcDeNb5XbYE6ybW12OxIDkBDQVH+C/n8AwvN9Ayt2EiKgHrhVnAjmbVBkwb8DwLsQGTj9u8/8duc3DFWfIX4yjo/hfxI0QAAAAASUVORK5CYII=",
+  };
+  const images = {};
+  function preload() { for (const k of Object.keys(DATA)) { const im = new Image(); im.src = DATA[k]; images[k] = im; } }
+  function has(role) { return !!DATA[role]; }
+  function uri(role) { return DATA[role] || null; }
+  function img(role) { return images[role] || null; }
+  PH.faceart = { DATA, preload, has, uri, img };
 })(window.PH = window.PH || {});
 
 </script>
@@ -4572,6 +4603,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     if (PH.plantart) PH.plantart.preload();
     if (PH.strainart) PH.strainart.preload();
     if (PH.charart) PH.charart.preload();
+    if (PH.faceart) PH.faceart.preload();
     if (PH.furniart) PH.furniart.preload();
     PH.ui.init();
     bindInput();
@@ -4738,9 +4770,9 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     if (npc) {
       npc.dir = { NE: 'SW', SW: 'NE', NW: 'SE', SE: 'NW' }[p.dir] || 'SW';
       if (npc.role === 'customer') return dealWith(npc);
-      if (npc.role === 'walker') return PH.ui.dialog(['...cruza la calle sin mirarte.'], null, { sprite: npc.sprite, name: npc.name });
+      if (npc.role === 'walker') return PH.ui.dialog(['...cruza la calle sin mirarte.'], null, { sprite: npc.sprite, name: npc.name, char: npc.char });
       const pages = PH.quests.DIALOGS[npc.dialog] ? PH.quests.DIALOGS[npc.dialog](G()) : ['...'];
-      PH.ui.dialog(pages, null, { sprite: npc.sprite, name: npc.name });
+      PH.ui.dialog(pages, null, { sprite: npc.sprite, name: npc.name, char: npc.char });
       return;
     }
     const o = objAt(m, f.gx, f.gy);
@@ -4763,7 +4795,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     const s = G();
     const stock = s.bank.filter(x => x.form !== 'polen');
     if (!stock.length) {
-      return PH.ui.dialog(['Cliente: ¿No llevas género? Vuelve cuando tengas algo bueno.'], null, { sprite: npc.sprite, name: npc.name });
+      return PH.ui.dialog(['Cliente: ¿No llevas género? Vuelve cuando tengas algo bueno.'], null, { sprite: npc.sprite, name: npc.name, char: npc.char });
     }
     // pide la más valiosa que lleves
     const want = stock.slice().sort((a, b) => b.rarity - a.rarity)[0];

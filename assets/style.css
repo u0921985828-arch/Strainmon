@@ -220,7 +220,8 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 .dlg-hint { text-align: right; color: var(--dim); font-size: .7rem; margin-top: 10px; }
 .dialog-box.has-portrait { display: flex; gap: 14px; align-items: flex-start; }
 .dlg-portrait { flex: 0 0 auto; text-align: center; }
-.dlg-portrait canvas { background: var(--canvas-bg); border: 2px solid var(--outline); border-radius: var(--radius); }
+.dlg-portrait canvas, .dlg-portrait img.dlg-face { background: var(--canvas-bg); border: 2px solid var(--outline); border-radius: var(--radius); display: block; }
+.dlg-portrait img.dlg-face { width: 56px; height: 56px; image-rendering: pixelated; box-shadow: var(--bevel); }
 .dlg-portrait span { display: block; font-size: .68rem; color: var(--amber); font-weight: 700; margin-top: 4px; max-width: 56px; }
 .dlg-text { flex: 1; min-width: 0; }
 
