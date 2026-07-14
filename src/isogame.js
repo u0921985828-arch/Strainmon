@@ -313,7 +313,7 @@
     ov.className = 'active boot';
     ov.innerHTML = `
       <div class="boot-screen">
-        <button id="pwr" class="pwr-btn" aria-label="Encender">⏻</button>
+        <button id="pwr" class="pwr-btn" aria-label="Encender"><i class="pic pic-power"></i></button>
         <div class="pwr-label">ENCENDER</div>
       </div>`;
     document.getElementById('pwr').onclick = () => { if (PH.audio) PH.audio.ensure(); bootSequence(); };

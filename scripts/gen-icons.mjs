@@ -63,6 +63,9 @@ const I = {
   sprout(b) { vline(b, 6, 13, 8); disc(b, 5, 6, 2); disc(b, 11, 6, 2); rect(b, 5, 6, 7, 8); rect(b, 9, 6, 11, 8); line(b, 8, 9, 5, 7); line(b, 8, 8, 11, 6); }, // brote
   nova(b) { vline(b, 2, 13, 8); hline(b, 2, 13, 8); on(b, 6, 6); on(b, 10, 6); on(b, 6, 10); on(b, 10, 10); on(b, 7, 7); on(b, 9, 7); on(b, 7, 9); on(b, 9, 9); }, // destello
   doc(b) { frame(b, 3, 2, 11, 13); line(b, 9, 2, 11, 4); for (let y = 2; y <= 4; y++) for (let x = 9 + (y - 2); x <= 11; x++) on(b, x, y); hline(b, 5, 9, 6); hline(b, 5, 9, 8); hline(b, 5, 8, 10); }, // documento
+  power(b) { ring(b, 8, 9, 5); ring(b, 8, 9, 4); // aro doble (grosor)
+    for (const [x, y] of [[7, 4], [8, 4], [9, 4], [7, 5], [8, 5], [9, 5], [8, 3]]) { const o = (y * S + x) * 4; b[o + 3] = 0; } // hueco superior
+    rect(b, 7, 2, 8, 9); }, // barra vertical (símbolo de encendido)
 };
 
 let css = '';
