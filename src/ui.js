@@ -122,7 +122,7 @@
       <div class="spec-card">
         <div class="spec-art"><canvas id="${cid}" width="90" height="110"></canvas></div>
         <div class="spec-info">
-          <div class="spec-title">${spec.nickname || spec.name} <small>${spec.speciesId}</small></div>
+          <div class="spec-title">${budTag(spec)}${spec.nickname || spec.name} <small>${spec.speciesId}</small></div>
           ${tierBadge(spec)} ${lineageBadge(spec)}
           <div class="spec-desc">${PH.gen.describe(ph)}</div>
           <div class="spec-meta">Forma: <b>${cap(spec.form)}</b> · Calidad: <b>${spec.quality}</b>${spec.generation ? ' · Gen ' + spec.generation : ''} · Pureza: <b>${spec.purity != null ? spec.purity : 100}%</b></div>
@@ -382,6 +382,8 @@
   // Tarjeta de receta: parentales × ... → descendiente (bloqueado si no obtenido).
   // Icono compacto de una cepa: cogollo (budart) con respaldo al retrato.
   function budIcon(id) { return (PH.budart && PH.budart.uri(id)) || (PH.strainart && PH.strainart.uri(id)) || null; }
+  // Emblema de cogollo junto al nombre (banco / resultado de cruce / encuentro).
+  function budTag(spec) { const u = spec && !spec.intermediate && budIcon(spec.speciesId); return u ? `<img class="bud-tag" src="${u}" alt="">` : ''; }
   function recipeCard(parentsArr, node, byId, gotFn, tailIcon) {
     const thumb = pid => {
       const u = budIcon(pid);
@@ -444,8 +446,9 @@
     const spawn = rar
       ? `<div class="dex-spawn"><span class="srar ${rar.key}">${rar.label}</span> <span class="spct">${pct.toFixed(0)}%</span></div>`
       : `<div class="dex-spawn dim2">solo por cruce</div>`;
+    const bud = budIcon(sp.id);
     return `<div class="dex-card ${gotIt ? 'got' : 'todo'}" data-strain="${sp.id}" title="${sp.name}">
-      <div class="dex-art">${art}${gotIt ? '<span class="dex-chk">✓</span>' : ''}</div>
+      <div class="dex-art">${art}${bud ? `<span class="dex-bud"><img src="${bud}" alt="" loading="lazy"></span>` : ''}${gotIt ? '<span class="dex-chk">✓</span>' : ''}</div>
       <div class="dex-name">${sp.name}</div>
       <div class="dex-badges"><span class="dex-type ${sp.type}">${sp.type}</span></div>
       ${spawn}

@@ -266,6 +266,11 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 .spec-art canvas { background: var(--canvas-bg); border: 2px solid var(--outline); border-radius: var(--radius); }
 .spec-info { flex: 1; min-width: 0; }
 .spec-title { font-size: .92rem; font-weight: 700; } .spec-title small { color: var(--dim); font-weight: 400; font-size: .68rem; }
+.bud-tag { width: 18px; height: 18px; vertical-align: -4px; margin-right: 5px; image-rendering: pixelated;
+  background: var(--canvas-bg); border: 1px solid var(--outline); border-radius: 3px; }
+.dex-bud { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: var(--canvas-bg);
+  border: 1px solid var(--outline); border-radius: 3px; display: grid; place-items: center; overflow: hidden; }
+.dex-bud img { width: 18px; height: 18px; image-rendering: pixelated; }
 .tier { display: inline-block; font-size: .72rem; color: var(--tc); border: 2px solid var(--tc); border-radius: 999px; padding: 0 8px; margin: 4px 0; font-weight: 700; }
 .landrace { display: inline-block; font-size: .68rem; color: var(--green-hi); border: 2px solid var(--green-hi); border-radius: 999px; padding: 0 8px; font-weight: 700; }
 .hybrid { display: inline-block; font-size: .68rem; color: var(--violet); border: 2px solid var(--violet); border-radius: 999px; padding: 0 8px; font-weight: 700; }
