@@ -186,7 +186,7 @@
   /* ------------------------- ESTADO ------------------------- */
   const game = {
     mode: 'boot', canvas: null, ctx: null, scale: 3,
-    W: 480, H: 432,                 // 10:9 (proporción fiel a la Game Boy 160x144)
+    W: 480, H: 320,                 // resolución interna del canon (×2 GBA, 15×10 tiles)
     dmg: false, _dmg: null,          // modo DMG (4 tonos, 160x144)
     moving: false, from: null, to: null, moveT: 0, moveDur: 170, frame: 0, animT: 0,
     keys: {}, tapLatch: null, lastSave: 0, cam: { x: 0, y: 0 }, cop: null, contrast: 1,
@@ -235,21 +235,14 @@
   }
 
   function resize() {
-    // Resolución interna ADAPTATIVA: altura lógica constante (zoom fijo entre
-    // dispositivos) y anchura según el aspecto real del escenario. Así el mundo
-    // llena la pantalla sin deformar el pixel-art, porque la proporción interna
-    // del lienzo coincide con la del contenedor CSS (que se estira al 100%).
-    const stage = document.getElementById('stage') || game.canvas.parentElement;
-    const r = stage ? stage.getBoundingClientRect() : { width: game.W, height: game.H };
-    const TARGET_H = 432;                        // resolución vertical del mundo
-    const ratio = (r.width && r.height) ? r.width / r.height : 10 / 9;
-    game.H = TARGET_H;
-    game.W = Math.max(200, Math.min(1400, Math.round(TARGET_H * ratio)));
+    // Resolución interna FIJA del canon (480×320, ×2 del GBA original, 15×10
+    // tiles). El escalado a pantalla lo hace el CSS con object-fit: contain,
+    // manteniendo píxeles nítidos y proporción sin deformar (look retro).
+    game.W = 480; game.H = 320;
     game.canvas.width = game.W; game.canvas.height = game.H;
     game.canvas.style.width = '100%'; game.canvas.style.height = '100%';
     game.ctx.imageSmoothingEnabled = false;
     if (game._dmg) { game._dmg.width = game.W; game._dmg.height = game.H; }
-    if (PH.state && G().player && DIRV[G().player.dir]) centerCam(true);
   }
 
   /* ------------------------- TÍTULO ------------------------- */
