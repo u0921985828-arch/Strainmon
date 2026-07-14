@@ -35,7 +35,7 @@ public class Bootstrap : MonoBehaviour
 
         // --- NPCs (en tiles de hierba) ---
         SpawnNpc(world, "botanist", 2, 5);
-        SpawnNpc(world, "neighbor", 16, 5);
+        SpawnNpc(world, "neighbor", 17, 5);
         SpawnNpc(world, "merchant", 2, 13);
 
         camGO.AddComponent<CameraFollow>().target = pGO.transform;

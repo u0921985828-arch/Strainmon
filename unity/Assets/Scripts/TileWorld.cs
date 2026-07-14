@@ -11,26 +11,28 @@ public class TileWorld : MonoBehaviour
 {
     // .=hierba ,=hierba alta(encuentro) P=camino W=agua T=árbol H=muro D=puerta F=flores
     static readonly string[] MAP = {
-        "TTTTTTTTTTTTTTTTTTTT",
-        "T..........,,,.....T",
-        "T..HHH.....,,,.....T",
-        "T..HHH......,......T",
-        "T..HDH....PPPPP....T",
-        "T....P....P...P..F.T",
-        "T....P....P...P....T",
-        "TFF..PPPPPP...PWWW.T",
-        "T....P........PWWW.T",
-        "T....P..HHH...PWWW.T",
-        "T,,..P..HDH...P....T",
-        "T,,..P...P....P..FFT",
-        "T....PPPPPPPPPP....T",
-        "T.........P........T",
-        "T....,,,..P..,,,...T",
-        "TTTTTTTTTTTTTTTTTTTT",
+        "BBBBBBBBBBBBBBBBBBBB",
+        "B..g......,,,......B",
+        "B.HHH.....,,,.....bB",
+        "B.HDH......,......bB",
+        "B..P......PPPPP....B",
+        "B..P......P...P.S..B",
+        "B.gPggg...P...P....B",
+        "B..P..b...PPPPP...sB",
+        "B..P.........P...ssB",
+        "B..PPPPP.HHH.P...ssB",
+        "B.,,...P.HDH.P.....B",
+        "B.,,...P..P..PPP...B",
+        "B..b...PPPP....P...B",
+        "B..g......,,,..P..rB",
+        "B..r...bb.,,,..g...B",
+        "BBBBBBBBBBBBBBBBBBBB",
     };
     static readonly Dictionary<char, string> TILE = new Dictionary<char, string> {
         { '.', "grass" }, { ',', "tallgrass" }, { 'P', "path" }, { 'W', "water" },
         { 'T', "tree" }, { 'H', "wall" }, { 'D', "door" }, { 'F', "flowers" },
+        { 'B', "pine" }, { 'g', "grass2" }, { 'f', "fence" }, { 'S', "sign" },
+        { 's', "shore" }, { 'b', "bush" }, { 'r', "rock" },
     };
     static readonly Dictionary<char, Color> FALLBACK = new Dictionary<char, Color> {
         { '.', new Color(0.56f,0.70f,0.42f) }, { ',', new Color(0.44f,0.60f,0.31f) },
@@ -38,9 +40,9 @@ public class TileWorld : MonoBehaviour
         { 'T', new Color(0.31f,0.48f,0.26f) }, { 'H', new Color(0.85f,0.78f,0.65f) },
         { 'D', new Color(0.48f,0.29f,0.17f) }, { 'F', new Color(0.80f,0.73f,0.85f) },
     };
-    const string SOLID = "THW";
+    const string SOLID = "THWBfSsbr";
 
-    public Vector2Int spawn = new Vector2Int(9, 13);
+    public Vector2Int spawn = new Vector2Int(10, 7);
     int W, H;
     readonly Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
 

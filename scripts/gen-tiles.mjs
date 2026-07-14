@@ -11,6 +11,7 @@ const hex = h => [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h
 function canvas(){ return new Uint8Array(S*S*4); }
 function px(b,x,y,c,a=255){ if(x<0||y<0||x>=S||y>=S)return; const o=(y*S+x)*4; b[o]=c[0];b[o+1]=c[1];b[o+2]=c[2];b[o+3]=a; }
 function fill(b,c){ for(let y=0;y<S;y++)for(let x=0;x<S;x++)px(b,x,y,c); }
+function rect(b,x0,y0,x1,y1,c){ for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)px(b,x,y,c); }
 function speck(b,c,n,seed){ const r=rng(seed); for(let i=0;i<n;i++)px(b,(r()*S)|0,(r()*S)|0,c); }
 
 // paleta soft
@@ -54,6 +55,14 @@ const TILES = {
   cavefloor(b){ fill(b,c('cave')); speck(b,c('rockD'),24,12); },
   lava(b){ fill(b,c('lava')); for(let y=2;y<S;y+=5)for(let x=0;x<S;x++)px(b,x,y,c('roofD')); speck(b,c('flower2'),8,13); },
   mud(b){ fill(b,c('mud')); speck(b,c('dirtD'),22,14); },
+  pine(b){ fill(b,c('grass')); speck(b,c('grassD'),8,20);
+    for(let l=0;l<4;l++){ const cy=3+l*3, hw=2+l*1.6; for(let y=cy;y<cy+4;y++)for(let x=0;x<S;x++){ if(Math.abs(x-8)<=hw-(y-cy)*0.6){ px(b,x,y,c('treeD')); if((x+y)%3===0)px(b,x,y,c('tree')); } } }
+    px(b,7,14,c('trunk')); px(b,8,14,c('trunk')); px(b,7,15,c('trunk')); px(b,8,15,c('trunk')); },
+  grass2(b){ TILES.grass(b); const r=rng(31); for(let i=0;i<3;i++){ const x=(r()*S)|0,y=(r()*S)|0; px(b,x,y,c('flower2')); } speck2(b,'grassL',10,33,2,14); },
+  fence(b){ TILES.grass(b); rect(b,0,7,S-1,8,c('wood')); for(let x=1;x<S;x+=5){ rect(b,x,5,x+1,12,c('woodD')); } },
+  sign(b){ TILES.grass(b); rect(b,7,10,8,15,c('woodD')); rect(b,4,4,11,10,c('wood')); rect(b,5,6,10,6,c('woodD')); rect(b,5,8,9,8,c('woodD')); },
+  shore(b){ for(let y=0;y<10;y++)for(let x=0;x<S;x++)px(b,x,y,c('grass')); speck2(b,'grassD',10,41,0,9);
+    for(let y=10;y<S;y++)for(let x=0;x<S;x++)px(b,x,y,c('water')); for(let y=12;y<S;y+=3)for(let x=0;x<S;x++)px(b,x,y,c('waterD')); rect(b,0,9,S-1,10,c('sandD')); },
 };
 function speck2(b,k,n,seed,y0,y1){ const r=rng(seed); for(let i=0;i<n;i++){ const y=y0+((r()*(y1-y0))|0); px(b,(r()*S)|0,y,c(k)); } }
 
