@@ -55,20 +55,26 @@
   // Resuelve un cruce según las reglas duras. Devuelve { node, reason }:
   // reason: 'canon' (nodo del árbol), 'backcross' (retrocruce), 'self' (autopol.
   // bloqueada), 'closed' (fuera de la matriz -> bloqueado, sin sprite procedural).
-  function resolveCross(setA, setB) {
-    if (setA.length === 1 && setB.length === 1 && setA[0] === setB[0]) {
-      const child = SELF_CROSS[setA[0]];
-      return child ? { node: SPECIES_BY_ID[child], reason: 'backcross' } : { node: null, reason: 'self' };
+  // Resuelve una FUSIÓN de 2-4 parentales (cada uno con su strainSet/receta).
+  // Devuelve { node, reason, union, toward?, missing? }.
+  // reason: 'need' (<2), 'canon', 'backcross', 'self' (autopol. bloqueada),
+  // 'partial' (faltan parentales para un nodo multi-parental), 'closed'.
+  function resolveCross(sets) {
+    sets = (sets || []).filter(Boolean);
+    if (sets.length < 2) return { node: null, reason: 'need' };
+    const uniq = [...new Set(sets.flat())];
+    // Autopolinización: todos los parentales son la MISMA cepa mono-nodo.
+    if (sets.every(s => s.length === 1) && uniq.length === 1) {
+      const child = SELF_CROSS[uniq[0]];
+      return child ? { node: SPECIES_BY_ID[child], reason: 'backcross', union: uniq } : { node: null, reason: 'self', union: uniq };
     }
-    const union = [...new Set([...setA, ...setB])];
-    const node = canonicalBySet(union);
-    if (node) return { node, reason: 'canon', union };
-    // ¿progreso hacia un nodo multi-parental? (unión = subconjunto propio de sus
-    // parentales) -> intermedio oculto válido para encadenar fusiones (spec §3).
-    const toward = SPECIES.find(sp => sp.parents && sp.parents.length > union.length &&
-      union.every(u => sp.parents.includes(u)));
-    if (toward) return { node: null, reason: 'partial', union, toward };
-    return { node: null, reason: 'closed', union };
+    const node = canonicalBySet(uniq);
+    if (node) return { node, reason: 'canon', union: uniq };
+    // ¿subconjunto propio de un nodo multi-parental? -> faltan parentales.
+    const toward = SPECIES.find(sp => sp.parents && sp.parents.length > uniq.length &&
+      uniq.every(u => sp.parents.includes(u)));
+    if (toward) return { node: null, reason: 'partial', union: uniq, toward, missing: toward.parents.filter(p => !uniq.includes(p)) };
+    return { node: null, reason: 'closed', union: uniq };
   }
 
   // Biomas = regiones landrace del mundo.
@@ -164,5 +170,5 @@
     return makeSpecimen(chosen, env, { form: 'salvaje', caughtAt: null });
   }
 
-  PH.species = { SPECIES, SPECIES_BY_ID, BIOMES, spawnTable, spawnWeight, spawnRarity, biomeChance, biomeOdds, makeSpecimen, rollEncounter, envMultiplier, canonicalCross, canonicalBySet, resolveCross, isClone, cloneOptions, phenotypeSelect, CLONE_BY_PARENT };
+  PH.species = { SPECIES, SPECIES_BY_ID, BIOMES, spawnTable, spawnWeight, spawnRarity, biomeChance, biomeOdds, makeSpecimen, rollEncounter, envMultiplier, canonicalCross, canonicalBySet, resolveCross, isClone, cloneOptions, phenotypeSelect, CLONE_BY_PARENT, SELF_CROSS };
 })(window.PH = window.PH || {});

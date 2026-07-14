@@ -371,13 +371,66 @@
     open(`
       <div class="panel wide">
         <div class="panel-head"><h2><i class="pic pic-book"></i> Strain-dex <small>${found}/${total} cepas · ${phenos} fenotipos</small></h2>
-          <div class="head-actions"><button class="btn small" id="dex_odds"><i class="pic pic-grid sm"></i> Probabilidades</button><button class="x" id="p_close">✕</button></div></div>
+          <div class="head-actions"><button class="btn small" id="dex_guide"><i class="pic pic-helix sm"></i> Cruces</button><button class="btn small" id="dex_odds"><i class="pic pic-grid sm"></i> Probabilidades</button><button class="x" id="p_close">✕</button></div></div>
         <div class="panel-body"><p class="dim">Toca una cepa para ver su árbol de linaje.</p>${sections}</div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = close;
     document.getElementById('dex_odds').onclick = habitatStats;
+    document.getElementById('dex_guide').onclick = crossGuide;
     overlay.querySelectorAll('.dex-card[data-strain]').forEach(el => el.onclick = () => lineageView(el.dataset.strain));
   }
+  // Tarjeta de receta: parentales × ... → descendiente (bloqueado si no obtenido).
+  function recipeCard(parentsArr, node, byId, gotFn, tailIcon) {
+    const thumb = pid => {
+      const u = PH.strainart && PH.strainart.uri(pid);
+      return `<div class="rc-par" title="${byId[pid] ? byId[pid].name : pid}">${u ? `<img src="${u}" alt="" loading="lazy">` : '<i class="pic pic-leaf"></i>'}</div>`;
+    };
+    const parents = parentsArr.map(thumb).join('<span class="rc-x">×</span>');
+    const isGot = gotFn(node.id);
+    const cu = PH.strainart && PH.strainart.uri(node.id);
+    return `<div class="recipe ${isGot ? 'got' : 'locked'}">
+      <div class="rc-parents">${parents}${tailIcon ? `<span class="rc-x">${tailIcon}</span>` : ''}</div>
+      <span class="rc-eq">→</span>
+      <div class="rc-child" data-strain="${node.id}">
+        <div class="rc-art">${cu ? `<img src="${cu}" class="${isGot ? '' : 'locked'}" alt="" loading="lazy">` : '<i class="pic pic-leaf"></i>'}${isGot ? '' : '<span class="rc-lock"><i class="pic pic-alert sm"></i></span>'}</div>
+        <div class="rc-name">${isGot ? node.name : '? ? ?'}</div>
+      </div>
+    </div>`;
+  }
+
+  // Guía de cruces: recetas del árbol con el descendiente bloqueado/oculto.
+  function crossGuide() {
+    const S = PH.species.SPECIES, byId = PH.species.SPECIES_BY_ID, st = G();
+    const got = id => st.species[id] && st.species[id].obtained > 0;
+    const tiers = PH.strainTiers || {};
+    const crosses = S.filter(s => s.parents && s.parents.length >= 2);
+    const byTier = {};
+    crosses.forEach(s => (byTier[s.tier] = byTier[s.tier] || []).push(s));
+    const crossSecs = Object.keys(byTier).sort((a, b) => a - b).map(t => `
+      <h3>Nivel ${t} · ${tiers[t] || ''} <small>(${byTier[t].filter(x => got(x.id)).length}/${byTier[t].length})</small></h3>
+      <div class="recipe-grid">${byTier[t].map(n => recipeCard(n.parents, n, byId, got)).join('')}</div>`).join('');
+    // Retrocruces (autopolinización estabilizada)
+    const self = PH.species.SELF_CROSS || {};
+    const backNodes = Object.keys(self).map(p => byId[self[p]]).filter(Boolean);
+    const backSec = backNodes.length ? `<h3><i class="pic pic-helix sm"></i> Retrocruces <small>(${backNodes.filter(n => got(n.id)).length}/${backNodes.length})</small></h3>
+      <div class="recipe-grid">${backNodes.map(n => recipeCard([n.parents[0], n.parents[0]], n, byId, got)).join('')}</div>` : '';
+    // Selección fenotípica (esqueje, ítem)
+    const CB = PH.species.CLONE_BY_PARENT || {};
+    const clones = [];
+    Object.keys(CB).forEach(p => CB[p].forEach(cid => clones.push(byId[cid])));
+    const cloneSec = clones.length ? `<h3><i class="pic pic-sprout sm"></i> Selección fenotípica (esqueje) <small>(${clones.filter(c => got(c.id)).length}/${clones.length})</small></h3>
+      <div class="recipe-grid">${clones.map(n => recipeCard([n.parents[0]], n, byId, got, '<i class="pic pic-sprout sm"></i>')).join('')}</div>` : '';
+    const total = crosses.length + backNodes.length + clones.length;
+    const done = crosses.filter(x => got(x.id)).length + backNodes.filter(x => got(x.id)).length + clones.filter(x => got(x.id)).length;
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2><i class="pic pic-helix"></i> Guía de cruces <small>${done}/${total} recetas</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body"><p>Todas las recetas del árbol filogenético. Los descendientes que aún no has obtenido aparecen <b>bloqueados</b>: crúzalos en el laboratorio, esqueja el nodo base o repite el retrocruce para revelar su sprite y su nombre.</p>${crossSecs}${backSec}${cloneSec}</div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    overlay.querySelectorAll('.recipe.got .rc-child[data-strain]').forEach(el => el.onclick = () => lineageView(el.dataset.strain));
+  }
+
   function dexCard(sp, gotIt, byId) {
     const uri = PH.strainart && PH.strainart.uri(sp.id);
     const parents = (sp.parents || []).map(p => (byId[p] ? byId[p].name : p));
@@ -462,28 +515,25 @@
     const pollen = s.bank.filter(sp => sp.form === 'polen');
     const usable = fertile.concat(pollen);
     breedSel = breedSel.filter(uid => s.bank.find(x => x.uid === uid));
-    // Vista previa de viabilidad: gatea el botón y evita el pop-up de bloqueo.
+    // Vista previa de viabilidad (fusión 2-4 parentales): gatea el botón y, si
+    // faltan parentales para un nodo, los INDICA. No crea intermedios.
+    const byIdSp = PH.species.SPECIES_BY_ID;
+    const res = PH.species.resolveCross(breedSel.map(uid => setOf(PH.state.bankGet(uid))));
     const cross = { can: false, hint: '' };
-    if (breedSel.length === 2) {
-      const pa = PH.state.bankGet(breedSel[0]), pb = PH.state.bankGet(breedSel[1]);
-      const res = PH.species.resolveCross(setOf(pa), setOf(pb));
-      if (res.reason === 'self' || res.reason === 'closed') cross.hint = '<div class="cross-hint bad"><i class="pic pic-alert sm"></i> Cruce no viable — fuera de la matriz filogenética.</div>';
-      else if (res.reason === 'partial') { cross.can = true; cross.hint = `<div class="cross-hint"><i class="pic pic-helix sm"></i> Fusión parcial${res.toward ? ` → hacia <b>${res.toward.name}</b>` : ''}.</div>`; }
-      else if (res.node) { cross.can = true; cross.hint = `<div class="cross-hint ok"><i class="pic pic-sprout sm"></i> → <b>${res.node.name}</b>${res.reason === 'backcross' ? ' (retrocruce)' : ''}</div>`; }
-    } else {
-      cross.hint = '<div class="cross-hint dim">Selecciona dos parentales compatibles del árbol.</div>';
-    }
+    if (res.reason === 'need') cross.hint = '<div class="cross-hint dim">Selecciona 2–4 parentales del árbol. Algunas cepas requieren 3-4 parentales a la vez.</div>';
+    else if (res.reason === 'self' || res.reason === 'closed') cross.hint = '<div class="cross-hint bad"><i class="pic pic-alert sm"></i> Fusión no viable — fuera de la matriz filogenética.</div>';
+    else if (res.reason === 'partial') cross.hint = `<div class="cross-hint"><i class="pic pic-helix sm"></i> Hacia <b>${res.toward.name}</b> — añade: ${res.missing.map(m => byIdSp[m] ? byIdSp[m].name : m).join(', ')}.</div>`;
+    else if (res.node) { cross.can = true; cross.hint = `<div class="cross-hint ok"><i class="pic pic-sprout sm"></i> → <b>${res.node.name}</b>${res.reason === 'backcross' ? ' (retrocruce)' : ''}</div>`; }
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2><i class="pic pic-flask"></i> Laboratorio — Cruces genéticos</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-flask"></i> Laboratorio — Cruces genéticos</h2>
+          <div class="head-actions"><button class="btn small" id="lab_guide"><i class="pic pic-helix sm"></i> Guía</button><button class="x" id="p_close">✕</button></div></div>
         <div class="panel-body">
-          <p class="dim">Selecciona dos parentales. La descendencia hereda un alelo de cada uno por gen; pueden surgir fenotipos, colores y mutaciones nuevos.</p>
+          <p>Selecciona <b>2 a 4 parentales</b> del árbol filogenético. La mayoría de cepas nacen de 2, pero algunas (Skunk #1, Haze, OG Kush, AK-47…) exigen 3-4 parentales a la vez. Solo se permiten fusiones que completen un nodo del árbol.</p>
           <div class="breed-slots">
-            <div class="slot">${slotView(0)}</div>
-            <div class="cross-sign">✕</div>
-            <div class="slot">${slotView(1)}</div>
+            ${Array.from({ length: Math.min(4, Math.max(2, breedSel.length)) }, (_, i) => `${i ? '<div class="cross-sign">×</div>' : ''}<div class="slot">${slotView(i)}</div>`).join('')}
             <div class="cross-eq">→</div>
-            <button class="btn primary" id="do_cross" ${cross.can ? '' : 'disabled'}>Cruzar</button>
+            <button class="btn primary" id="do_cross" ${cross.can ? '' : 'disabled'}>Fusionar</button>
           </div>
           ${cross.hint}
           <h3>Parentales disponibles (${usable.length})</h3>
@@ -498,6 +548,7 @@
         </div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = () => { breedSel = []; close(); };
+    document.getElementById('lab_guide').onclick = crossGuide;
     usable.forEach(sp => paintPlant('lp_' + sp.uid, sp, 1.7));
     overlay.querySelectorAll('[data-pick]').forEach(el => el.onclick = () => togglePick(el.dataset.pick));
     document.getElementById('do_cross').onclick = doCross;
@@ -511,54 +562,33 @@
   function togglePick(uid) {
     const i = breedSel.indexOf(uid);
     if (i >= 0) breedSel.splice(i, 1);
-    else if (breedSel.length < 2) breedSel.push(uid);
+    else if (breedSel.length < 4) breedSel.push(uid);   // fusión de hasta 4 parentales
     lab();
     breedSel.forEach((u, k) => paintPlant('slot_' + k, PH.state.bankGet(u), 1.7));
   }
   function doCross() {
-    if (breedSel.length !== 2) return;
+    if (breedSel.length < 2) return;
     const s = G();
-    const A = PH.state.bankGet(breedSel[0]);
-    const B = PH.state.bankGet(breedSel[1]);
-    const labBonus = 1 + (s.player.labLevel - 1) * 0.6; // mejoras de laboratorio
-    const sameStrain = A.speciesId === B.speciesId;
-    const purity = Math.max(0, Math.round(((A.purity != null ? A.purity : 100) + (B.purity != null ? B.purity : 100)) / 2 * (sameStrain ? 0.98 : 0.6)));
-    // CIERRE DE MATRIZ: une las "recetas" (strainSet) de ambos parentales y las
-    // resuelve contra el árbol. Sin nodo ni progreso -> cruce BLOQUEADO (sin
-    // sprite procedural). Autopolinización sólo válida como retrocruce.
-    const res = PH.species.resolveCross(setOf(A), setOf(B));
-    // Cruces no permitidos ya vienen bloqueados por el botón; salida silenciosa (sin pop-up).
-    if (res.reason === 'self' || res.reason === 'closed') { toast('<i class="pic pic-alert sm"></i> Cruce no viable', 'bad'); return; }
-    const canon = res.node;   // null si es fusión parcial (intermedio)
-    let spec;
-    if (canon) {
-      // Cruce canónico / retrocruce: nace la cepa NOMBRADA del árbol (genética
-      // oficial) y se desbloquea ese nodo en el Strain-dex.
-      spec = PH.species.makeSpecimen(canon, s.env, {
-        form: 'cruce', quality: Math.round((A.quality + B.quality) / 2),
-        parents: [A.uid, B.uid], generation: Math.max(A.generation, B.generation) + 1,
-        purity: Math.max(purity, 70), landrace: false, strainSet: [canon.id],
-      });
-    } else {
-      // Fusión parcial: intermedio oculto que arrastra la receta acumulada
-      // hacia un nodo multi-parental. No es una cepa catalogada del árbol.
-      const childGeno = PH.gen.breed(A.genotype, B.genotype, { mutRate: 0.05, mutBoost: labBonus });
-      spec = PH.species.makeSpecimen(PH.species.SPECIES_BY_ID[A.speciesId], s.env, {
-        genotype: childGeno, form: 'cruce', quality: Math.round((A.quality + B.quality) / 2),
-        parents: [A.uid, B.uid], generation: Math.max(A.generation, B.generation) + 1,
-        purity, landrace: false, strainSet: res.union,
-      });
-      spec.intermediate = true;
-      spec.name = 'Fusión en progreso';
-      spec._toward = res.toward ? res.toward.name : '';
-    }
+    const parents = breedSel.map(uid => PH.state.bankGet(uid)).filter(Boolean);
+    if (parents.length < 2) return;
+    // CIERRE DE MATRIZ: la fusión de 2-4 parentales solo produce cepa si su
+    // receta completa un nodo del árbol. Los inválidos ya vienen gateados.
+    const res = PH.species.resolveCross(parents.map(setOf));
+    if (!res.node) { toast('<i class="pic pic-alert sm"></i> Fusión no viable', 'bad'); return; }
+    const canon = res.node;
+    const avgQ = Math.round(parents.reduce((a, p) => a + p.quality, 0) / parents.length);
+    const avgPur = Math.round(parents.reduce((a, p) => a + (p.purity != null ? p.purity : 100), 0) / parents.length);
+    const maxGen = Math.max(...parents.map(p => p.generation || 0));
+    const spec = PH.species.makeSpecimen(canon, s.env, {
+      form: 'cruce', quality: avgQ, parents: parents.map(p => p.uid),
+      generation: maxGen + 1, purity: Math.max(avgPur, 70), landrace: false, strainSet: [canon.id],
+    });
     s.stats.crosses++;
     const before = Object.keys(s.catalog).length;
     PH.state.bankAdd(spec);
     const isNew = Object.keys(s.catalog).length > before;
     breedSel = [];
-    // pantalla de resultado
-    crossResult(spec, isNew, A, B, canon);
+    crossResult(spec, isNew, parents, canon);
     PH.game.afterQuestCheck();
   }
   // Selección fenotípica / esqueje: aísla un clon élite de un nodo base (§4).
@@ -625,18 +655,16 @@
     toast('<i class="pic pic-alert sm"></i> Cruce no viable: fuera de la matriz', 'bad');
   }
 
-  function crossResult(spec, isNew, A, B, canon) {
+  function crossResult(spec, isNew, parents, canon) {
+    const pnames = parents.map(p => p.nickname || p.name).join(' × ');
     open(`
       <div class="panel">
         <div class="panel-head"><h2><i class="pic pic-sprout"></i> Descendencia obtenida</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body center-col">
-          ${canon ? `<div class="newbadge"><i class="pic pic-helix sm"></i> ¡NODO DEL ÁRBOL: ${canon.name}!</div>`
-            : (spec.intermediate ? '<div class="newbadge partial"><i class="pic pic-helix sm"></i> FUSIÓN PARCIAL</div>'
-            : (isNew ? '<div class="newbadge"><i class="pic pic-nova sm"></i> ¡FENOTIPO NUEVO PARA EL CATÁLOGO! <i class="pic pic-nova sm"></i></div>' : '<div class="dim">Fenotipo ya conocido.</div>'))}
-          ${canon ? '<p class="dim">Cruce canónico reconocido: has replicado una genética del árbol filogenético.</p>'
-            : (spec.intermediate ? `<p class="dim">Receta acumulada${spec._toward ? ` en camino hacia <b>${spec._toward}</b>` : ''}. Sigue cruzándola con los parentales que falten para completar el nodo.</p>` : '')}
+          <div class="newbadge"><i class="pic pic-helix sm"></i> ¡NODO DEL ÁRBOL: ${canon.name}!</div>
+          <p>Fusión canónica reconocida: has replicado <b>${canon.name}</b>, una genética del árbol filogenético${parents.length > 2 ? ` (${parents.length} parentales)` : ''}.</p>
           ${specimenCard(spec)}
-          <p class="dim">Parentales: ${A.name} ✕ ${B.name}</p>
+          <p class="dim">Parentales: ${pnames}</p>
           <div class="row">
             <button class="btn primary" id="again">Volver al laboratorio</button>
             <button class="btn ghost" id="p_close2">Cerrar</button>

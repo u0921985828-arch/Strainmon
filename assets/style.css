@@ -317,6 +317,41 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 .cross-hint.ok { color: var(--green-hi); font-weight: 700; }
 .cross-hint.bad { color: var(--danger); font-weight: 700; }
 .cross-hint.dim { color: var(--dim); }
+
+/* ---------- Guía de cruces (recetario) ---------- */
+.recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+.recipe { display: flex; align-items: center; gap: 8px; background: var(--panel-2); border: 2px solid var(--outline);
+  border-radius: var(--radius); padding: 8px 10px; box-shadow: var(--bevel); }
+.recipe.got { border-color: var(--green-hi); }
+.recipe.locked { filter: saturate(.85); }
+.rc-parents { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; }
+.rc-par { width: 30px; height: 30px; background: var(--canvas-bg); border: 2px solid var(--outline); border-radius: 3px;
+  display: flex; align-items: center; justify-content: center; overflow: hidden; flex: 0 0 auto; }
+.rc-par img { height: 28px; width: auto; image-rendering: pixelated; }
+.rc-par .pic { width: 16px; height: 16px; color: var(--green-lo); }
+.rc-x { color: var(--amber); font-weight: 800; font-size: .8rem; display: inline-flex; align-items: center; }
+.rc-eq { color: var(--terra-hi); font-weight: 800; font-size: 1.1rem; flex: 0 0 auto; }
+.rc-child { text-align: center; margin-left: auto; }
+.rc-art { position: relative; width: 48px; height: 48px; background: var(--canvas-bg); border: 2px solid var(--outline);
+  border-radius: 3px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 0 auto; }
+.rc-art img { height: 46px; width: auto; image-rendering: pixelated; }
+.rc-art img.locked { filter: brightness(0) opacity(.5); }        /* silueta bloqueada */
+.rc-lock { position: absolute; inset: 0; display: grid; place-items: center; }
+.rc-lock .pic { width: 18px; height: 18px; color: var(--amber); }
+.rc-name { font-size: .58rem; font-weight: 700; margin-top: 3px; max-width: 66px; line-height: 1.15; }
+.recipe.locked .rc-name { color: var(--dim); letter-spacing: 2px; }
+.recipe.got .rc-child { cursor: pointer; }
+.recipe.got .rc-child:hover .rc-art { border-color: var(--terra); }
+
+/* ---------- Legibilidad de pop-ups: texto justificado y responsive ---------- */
+.panel-body > p, .dlg-text p { text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto; }
+.dialog-box p { text-align: justify; text-justify: inter-word; hyphens: auto; }
+.center-col > p, .enc-msg, .cross-hint, .dlg-hint { text-align: center; hyphens: none; }
+@media (max-width: 400px) {
+  .recipe-grid { grid-template-columns: 1fr; }
+  .head-actions .btn.small { padding: 5px 7px; font-size: .64rem; }
+  .panel-head h2 { font-size: .86rem; }
+}
 .newbadge { background: var(--gold); color: var(--on-accent); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
   padding: 7px 14px; border: 2px solid var(--outline); border-radius: var(--radius); margin-bottom: 10px; animation: pulse 1s infinite; }
 .blocked-badge { background: var(--danger); color: #fff; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
