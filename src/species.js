@@ -13,6 +13,18 @@
 
   const SPECIES_BY_ID = Object.fromEntries(SPECIES.map(s => [s.id, s]));
 
+  // Cruce canónico del árbol: dos parentales que coinciden EXACTAMENTE con los
+  // de un nodo de 2 parentales producen esa cepa nombrada (Blueberry × SSH ->
+  // Blue Dream). Los nodos de 3+ parentales requieren cruces encadenados.
+  const CANON_CROSS = {};
+  for (const s of SPECIES) {
+    if (s.parents && s.parents.length === 2) CANON_CROSS[[...s.parents].sort().join('+')] = s.id;
+  }
+  function canonicalCross(idA, idB) {
+    const hit = CANON_CROSS[[idA, idB].sort().join('+')];
+    return hit ? SPECIES_BY_ID[hit] : null;
+  }
+
   // Biomas = regiones landrace del mundo.
   const BIOMES = {
     pradera:  { name: 'Altiplano de Michoacán', baseEncounter: 0.14 },
@@ -41,7 +53,7 @@
   function spawnTable(biome, env) {
     const list = SPECIES.filter(s => s.biomes.includes(biome));
     return list.map(s => {
-      let w = s.relic ? 1 : 20;
+      let w = s.relic ? 1 : (s.tier === 1 ? 5 : 20);   // tier-1 más raras que las landrace
       w *= envMultiplier(s, env);
       return { ref: s, w };
     });
@@ -79,5 +91,5 @@
     return makeSpecimen(chosen, env, { form: 'salvaje', caughtAt: null });
   }
 
-  PH.species = { SPECIES, SPECIES_BY_ID, BIOMES, spawnTable, makeSpecimen, rollEncounter, envMultiplier };
+  PH.species = { SPECIES, SPECIES_BY_ID, BIOMES, spawnTable, makeSpecimen, rollEncounter, envMultiplier, canonicalCross };
 })(window.PH = window.PH || {});

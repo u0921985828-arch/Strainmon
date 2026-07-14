@@ -109,27 +109,44 @@ function genHybrid(s, rnd) {
 }
 
 const order = topo();
-let sat = 0, ind = 0;
-const out = [];
+// 1) perfiles + biomas de las tier-0 (landraces)
+const tier0Biomes = {};
 for (const s of order) {
   const rnd = rngFor(s.id);
-  const prof = s.tier === 0 ? genTier0(s, rnd) : genHybrid(s, rnd);
-  profiles[s.id] = prof;
+  profiles[s.id] = s.tier === 0 ? genTier0(s, rnd) : genHybrid(s, rnd);
+  if (s.tier === 0) {
+    const rb = rngFor(s.id + '#bio');
+    const pool = s.type === 'indica' ? INDICA_BIOMES : (s.type === 'sativa' ? SATIVA_BIOMES : BIOME_LIST);
+    const b1 = pool[Math.floor(rb() * pool.length)];
+    const bs = [b1];
+    if (rb() < 0.4) { const b2 = BIOME_LIST[Math.floor(rb() * BIOME_LIST.length)]; if (b2 !== b1) bs.push(b2); }
+    tier0Biomes[s.id] = bs;
+  }
 }
-// segunda pasada en orden original (para salida estable por id numérico del pack)
+// 2) biomas "raíz" del linaje: unión de los biomas de los ancestros landrace
+const rootBiomes = {};
+for (const s of order) {
+  if (s.tier === 0) { rootBiomes[s.id] = tier0Biomes[s.id].slice(); continue; }
+  const set = new Set();
+  for (const p of normParents(s.parents)) for (const b of (rootBiomes[p] || [])) set.add(b);
+  rootBiomes[s.id] = [...set];
+}
+
+const out = [];
 for (const s of strains) {
-  const rnd = rngFor(s.id + '#bio');
+  const rnd = rngFor(s.id + '#bio2');
   const prof = profiles[s.id];
   const parents = normParents(s.parents);
-  // biomas: solo las tier-0 aparecen salvajes
+  // Salvajes: SOLO landraces (tier-0) y ALGUNAS de la siguiente generación
+  // (tier-1) dentro de su linaje/bioma; el resto se obtiene cruzando.
   let biomes = [];
   if (s.tier === 0) {
-    const pool = s.type === 'indica' ? INDICA_BIOMES : (s.type === 'sativa' ? SATIVA_BIOMES : BIOME_LIST);
-    const b1 = pool[Math.floor(rnd() * pool.length)];
-    biomes = [b1];
-    if (rnd() < 0.4) { const b2 = BIOME_LIST[Math.floor(rnd() * BIOME_LIST.length)]; if (b2 !== b1) biomes.push(b2); }
+    biomes = tier0Biomes[s.id];
+  } else if (s.tier === 1) {
+    const rb = (rootBiomes[s.id] || []).slice();
+    if (rb.length) { biomes = [rb[Math.floor(rnd() * rb.length)]]; if (rb.length > 1 && rnd() < 0.35) { const b2 = rb[Math.floor(rnd() * rb.length)]; if (b2 !== biomes[0]) biomes.push(b2); } }
   }
-  const typeLabel = s.type === 'indica' ? 'índica' : (s.type === 'sativa' ? 'sativa' : 'híbrida');
+  const typeLabel = s.type === 'índica' ? 'índica' : s.type === 'indica' ? 'índica' : (s.type === 'sativa' ? 'sativa' : 'híbrida');
   const family = s.tier === 0 ? `Landrace ${typeLabel}` : `${TIERS[s.tier]}`;
   const parentNames = parents.map(p => byId[p].name);
   const story = s.tier === 0

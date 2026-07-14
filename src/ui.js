@@ -349,21 +349,69 @@
     open(`
       <div class="panel wide">
         <div class="panel-head"><h2>🌿 Strain-dex <small>${found}/${total} cepas · ${phenos} fenotipos · árbol filogenético</small></h2><button class="x" id="p_close">✕</button></div>
-        <div class="panel-body">${sections}</div>
+        <div class="panel-body"><p class="dim">Toca una cepa para ver su árbol de linaje.</p>${sections}</div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = close;
+    overlay.querySelectorAll('.dex-card[data-strain]').forEach(el => el.onclick = () => lineageView(el.dataset.strain));
   }
   function dexCard(sp, gotIt, byId) {
     const uri = PH.strainart && PH.strainart.uri(sp.id);
     const parents = (sp.parents || []).map(p => (byId[p] ? byId[p].name : p));
     const lineage = parents.length ? '◄ ' + parents.join(' × ') : 'landrace / base';
     const art = uri ? `<img src="${uri}" alt="" loading="lazy">` : `<div class="dex-noart">🌿</div>`;
-    return `<div class="dex-card ${gotIt ? 'got' : 'todo'}" title="${sp.name}">
+    return `<div class="dex-card ${gotIt ? 'got' : 'todo'}" data-strain="${sp.id}" title="${sp.name}">
       <div class="dex-art">${art}${gotIt ? '<span class="dex-chk">✓</span>' : ''}</div>
       <div class="dex-name">${sp.name}</div>
       <div class="dex-badges"><span class="dex-type ${sp.type}">${sp.type}</span></div>
       <div class="dex-lin">${lineage}</div>
     </div>`;
+  }
+
+  // Árbol de linaje de una cepa: sus ancestros por niveles, con líneas
+  // padre -> hijo dibujadas en SVG. Tocar un ancestro abre su propio árbol.
+  function lineageView(rootId) {
+    const byId = PH.species.SPECIES_BY_ID;
+    const root = byId[rootId]; if (!root) return;
+    const nodes = new Map();
+    (function collect(id) { const sp = byId[id]; if (!sp || nodes.has(id)) return; nodes.set(id, sp); (sp.parents || []).forEach(collect); })(rootId);
+    const byTier = {};
+    for (const sp of nodes.values()) (byTier[sp.tier] = byTier[sp.tier] || []).push(sp);
+    const tiers = Object.keys(byTier).map(Number).sort((a, b) => a - b);
+    const rows = tiers.map(t => `<div class="ltree-row">${byTier[t].map(sp => {
+      const uri = PH.strainart && PH.strainart.uri(sp.id);
+      return `<div class="ltree-node ${sp.id === rootId ? 'root' : ''}" id="ln_${sp.id}" data-strain="${sp.id}" title="${sp.name}">
+        <div class="ltree-art">${uri ? `<img src="${uri}" alt="">` : '🌿'}</div>
+        <div class="ltree-name">${sp.name}</div></div>`;
+    }).join('')}</div>`).join('');
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2>🧬 Linaje — ${root.name} <small>${nodes.size} nodos</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body"><div class="ltree" id="ltree"><svg class="ltree-svg" id="ltree_svg" preserveAspectRatio="none"></svg>${rows}</div>
+          <div class="row"><button class="btn ghost" id="back">◄ Strain-dex</button></div></div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
+    document.getElementById('back').onclick = catalog;
+    overlay.querySelectorAll('.ltree-node[data-strain]').forEach(el => el.onclick = () => { if (el.dataset.strain !== rootId) lineageView(el.dataset.strain); });
+    requestAnimationFrame(() => drawLineageEdges(nodes));
+  }
+  function drawLineageEdges(nodes) {
+    const cont = document.getElementById('ltree'), svg = document.getElementById('ltree_svg');
+    if (!cont || !svg) return;
+    const W = cont.scrollWidth, H = cont.scrollHeight;
+    svg.setAttribute('width', W); svg.setAttribute('height', H); svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const cr = cont.getBoundingClientRect();
+    const center = (id) => { const el = document.getElementById('ln_' + id); if (!el) return null; const r = el.getBoundingClientRect(); return { x: r.left - cr.left + cont.scrollLeft + r.width / 2, y: r.top - cr.top + cont.scrollTop + r.height / 2 }; };
+    let paths = '';
+    for (const sp of nodes.values()) {
+      const c = center(sp.id); if (!c) continue;
+      for (const p of (sp.parents || [])) {
+        if (!nodes.has(p)) continue;
+        const pc = center(p); if (!pc) continue;
+        const my = (c.y + pc.y) / 2;
+        paths += `<path class="ledge" d="M${pc.x.toFixed(1)},${pc.y.toFixed(1)} C${pc.x.toFixed(1)},${my.toFixed(1)} ${c.x.toFixed(1)},${my.toFixed(1)} ${c.x.toFixed(1)},${c.y.toFixed(1)}"/>`;
+      }
+    }
+    svg.innerHTML = paths;
   }
 
   /* ---------------- LABORATORIO (CRUCE) ---------------- */
@@ -421,29 +469,43 @@
     const A = PH.state.bankGet(breedSel[0]);
     const B = PH.state.bankGet(breedSel[1]);
     const labBonus = 1 + (s.player.labLevel - 1) * 0.6; // mejoras de laboratorio
-    const childGeno = PH.gen.breed(A.genotype, B.genotype, { mutRate: 0.08, mutBoost: labBonus });
     const sameStrain = A.speciesId === B.speciesId;
     const purity = Math.max(0, Math.round(((A.purity != null ? A.purity : 100) + (B.purity != null ? B.purity : 100)) / 2 * (sameStrain ? 0.98 : 0.6)));
-    const spec = PH.species.makeSpecimen(PH.species.SPECIES_BY_ID[A.speciesId], s.env, {
-      genotype: childGeno, form: 'cruce', quality: Math.round((A.quality + B.quality) / 2),
-      parents: [A.uid, B.uid], generation: Math.max(A.generation, B.generation) + 1,
-      purity, landrace: sameStrain && purity >= 90,
-    });
+    // ¿los parentales coinciden con un nodo del árbol filogenético?
+    const canon = PH.species.canonicalCross ? PH.species.canonicalCross(A.speciesId, B.speciesId) : null;
+    let spec;
+    if (canon) {
+      // Cruce canónico: nace la cepa NOMBRADA del árbol (su genética oficial),
+      // y se desbloquea ese nodo en el Strain-dex.
+      spec = PH.species.makeSpecimen(canon, s.env, {
+        form: 'cruce', quality: Math.round((A.quality + B.quality) / 2),
+        parents: [A.uid, B.uid], generation: Math.max(A.generation, B.generation) + 1,
+        purity: Math.max(purity, 70), landrace: false,
+      });
+    } else {
+      const childGeno = PH.gen.breed(A.genotype, B.genotype, { mutRate: 0.08, mutBoost: labBonus });
+      spec = PH.species.makeSpecimen(PH.species.SPECIES_BY_ID[A.speciesId], s.env, {
+        genotype: childGeno, form: 'cruce', quality: Math.round((A.quality + B.quality) / 2),
+        parents: [A.uid, B.uid], generation: Math.max(A.generation, B.generation) + 1,
+        purity, landrace: sameStrain && purity >= 90,
+      });
+    }
     s.stats.crosses++;
     const before = Object.keys(s.catalog).length;
     PH.state.bankAdd(spec);
     const isNew = Object.keys(s.catalog).length > before;
     breedSel = [];
     // pantalla de resultado
-    crossResult(spec, isNew, A, B);
+    crossResult(spec, isNew, A, B, canon);
     PH.game.afterQuestCheck();
   }
-  function crossResult(spec, isNew, A, B) {
+  function crossResult(spec, isNew, A, B, canon) {
     open(`
       <div class="panel">
         <div class="panel-head"><h2>🌱 Descendencia obtenida</h2><button class="x" id="p_close">✕</button></div>
         <div class="panel-body center-col">
-          ${isNew ? '<div class="newbadge">✨ ¡FENOTIPO NUEVO PARA EL CATÁLOGO! ✨</div>' : '<div class="dim">Fenotipo ya conocido.</div>'}
+          ${canon ? `<div class="newbadge">🧬 ¡NODO DEL ÁRBOL: ${canon.name}!</div>` : (isNew ? '<div class="newbadge">✨ ¡FENOTIPO NUEVO PARA EL CATÁLOGO! ✨</div>' : '<div class="dim">Fenotipo ya conocido.</div>')}
+          ${canon ? '<p class="dim">Cruce canónico reconocido: has replicado una genética del árbol filogenético.</p>' : ''}
           ${specimenCard(spec)}
           <p class="dim">Parentales: ${A.name} ✕ ${B.name}</p>
           <div class="row">
@@ -456,7 +518,8 @@
     document.getElementById('p_close').onclick = close;
     document.getElementById('p_close2').onclick = close;
     document.getElementById('again').onclick = lab;
-    if (isNew) toast('✨ Nuevo fenotipo catalogado: ' + spec.name, 'ok');
+    if (canon) toast('🧬 Nodo desbloqueado: ' + canon.name, 'ok');
+    else if (isNew) toast('✨ Nuevo fenotipo catalogado: ' + spec.name, 'ok');
   }
 
   /* ---------------- INVERNADERO / CULTIVO ---------------- */
