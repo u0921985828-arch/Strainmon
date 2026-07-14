@@ -26,7 +26,7 @@
     return { gx: Math.round((u + v) / 2), gy: Math.round((v - u) / 2) };
   }
 
-  // rombo de suelo con relieve
+  // rombo de suelo con relieve + grano sutil (textura, no plano)
   function floorDiamond(ctx, sx, sy, top, side) {
     ctx.beginPath();
     ctx.moveTo(sx, sy);
@@ -35,6 +35,16 @@
     ctx.lineTo(sx - TW / 2, sy + TH / 2);
     ctx.closePath();
     ctx.fillStyle = top; ctx.fill();
+    // grano: motas claras/oscuras deterministas dentro del rombo
+    let seed = ((((sx | 0) * 13) ^ ((sy | 0) * 7)) >>> 0) || 1;
+    const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    const cy = sy + TH / 2, dk = shade(top, -0.07), lt = shade(top, 0.07);
+    for (let i = 0; i < 6; i++) {
+      const u = (rnd() * 2 - 1), v = (rnd() * 2 - 1);
+      if (Math.abs(u) + Math.abs(v) > 0.9) continue;         // dentro del rombo
+      ctx.fillStyle = rnd() < 0.5 ? dk : lt;
+      ctx.fillRect((sx + u * (TW / 2)) | 0, (cy + v * (TH / 2)) | 0, 2, 2);
+    }
     ctx.strokeStyle = side; ctx.lineWidth = 1; ctx.stroke();
   }
 
@@ -67,8 +77,22 @@
   // Props de borde/escenario para zonas naturales (setos, vallas, rocas, cañas,
   // palmeras, árboles, cactus…) — arte propio por código, en la proyección iso.
   // Sustituyen a los cubos '#' en los biomas para que los bordes no sean bloques.
-  function prop(ctx, sx, sy, kind) {
+  function prop(ctx, sx, sy, kind, opt) {
     const midY = sy + TH / 2;
+    if (kind === 'grass') {
+      // HIERBA ALTA: matas de briznas verticales (textura + oclusión por profundidad)
+      const base = (opt && opt.col) || '#4f9e3a', dark = shade(base, -0.22), tip = shade(base, 0.28);
+      let s2 = ((((sx | 0) * 17) ^ ((sy | 0) * 11)) >>> 0) || 1;
+      const r = () => { s2 = (s2 * 1664525 + 1013904223) >>> 0; return s2 / 4294967296; };
+      const blades = [[-11, 11], [-7, 15], [-3, 12], [1, 16], [5, 13], [9, 15], [12, 10], [-1, 9]];
+      for (const [bx, bh] of blades) {
+        const rx = sx + bx + (r() * 2 - 1), top = midY - bh - r() * 3;
+        ctx.strokeStyle = r() < 0.5 ? base : dark; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(rx, midY + 5); ctx.lineTo(rx + (r() * 3 - 1.5), top); ctx.stroke();
+        ctx.fillStyle = tip; ctx.fillRect((rx - 1) | 0, (top - 1) | 0, 2, 2);
+      }
+      return;
+    }
     // sombra de contacto suave (asienta el prop en el suelo)
     const shadow = (w, o) => { ctx.fillStyle = 'rgba(0,0,0,' + (o || 0.16) + ')'; ctx.beginPath(); ctx.ellipse(sx, midY + 2, w, w * 0.4, 0, 0, 6.283); ctx.fill(); };
     const ell = (x, y, rx, ry, c) => { ctx.fillStyle = c; ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, 6.283); ctx.fill(); };

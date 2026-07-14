@@ -53,11 +53,37 @@
     return m;
   }
 
+  // Peso base de aparición (sin clima). Determina la probabilidad relativa.
+  function spawnWeight(s) { return s.relic ? 1 : (s.tier === 1 ? 5 : 20); }
+
+  // Clasificación de rareza de APARICIÓN (distinta de la rareza del fenotipo).
+  function spawnRarity(s) {
+    if (s.relic) return { key: 'legendaria', label: 'Legendaria', color: '#e0b23c' };
+    if (s.tier >= 2) return { key: 'muyrara', label: 'Muy rara', color: '#a06fd6' };
+    if (s.tier === 1) return { key: 'rara', label: 'Rara', color: '#5aa6c0' };
+    return { key: 'comun', label: 'Común', color: '#5ab04f' };
+  }
+
+  // Probabilidad (%) base de que una cepa salga en la hierba alta de un bioma.
+  function biomeChance(s, biome) {
+    if (!s.biomes.includes(biome)) return 0;
+    const list = SPECIES.filter(x => x.biomes.includes(biome));
+    const tot = list.reduce((a, x) => a + spawnWeight(x), 0);
+    return tot ? (spawnWeight(s) / tot) * 100 : 0;
+  }
+
+  // Tabla de probabilidades de un bioma (base, ordenada de más a menos probable).
+  function biomeOdds(biome) {
+    const list = SPECIES.filter(s => s.biomes.includes(biome));
+    const tot = list.reduce((a, s) => a + spawnWeight(s), 0);
+    return list.map(s => ({ ref: s, w: spawnWeight(s), pct: tot ? (spawnWeight(s) / tot) * 100 : 0 }))
+      .sort((a, b) => b.pct - a.pct);
+  }
+
   function spawnTable(biome, env) {
     const list = SPECIES.filter(s => s.biomes.includes(biome));
     return list.map(s => {
-      let w = s.relic ? 1 : (s.tier === 1 ? 5 : 20);   // tier-1 más raras que las landrace
-      w *= envMultiplier(s, env);
+      let w = spawnWeight(s) * envMultiplier(s, env);   // tier-1 más raras que las landrace
       return { ref: s, w };
     });
   }
@@ -95,5 +121,5 @@
     return makeSpecimen(chosen, env, { form: 'salvaje', caughtAt: null });
   }
 
-  PH.species = { SPECIES, SPECIES_BY_ID, BIOMES, spawnTable, makeSpecimen, rollEncounter, envMultiplier, canonicalCross, canonicalBySet };
+  PH.species = { SPECIES, SPECIES_BY_ID, BIOMES, spawnTable, spawnWeight, spawnRarity, biomeChance, biomeOdds, makeSpecimen, rollEncounter, envMultiplier, canonicalCross, canonicalBySet };
 })(window.PH = window.PH || {});

@@ -412,6 +412,22 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 .dex-type.sativa { background: var(--green); }
 .dex-type.hybrid { background: var(--amber); }
 .dex-lin { font-size: .56rem; color: var(--dim); line-height: 1.3; }
+.dex-spawn { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 3px 0 1px; }
+.dex-spawn.dim2 { color: var(--dim); font-size: .56rem; font-style: italic; }
+.srar { font-size: .54rem; font-weight: 800; text-transform: uppercase; letter-spacing: .3px; padding: 1px 6px; border-radius: 999px; border: 2px solid currentColor; }
+.srar.comun { color: var(--green-hi); } .srar.rara { color: #5aa6c0; } .srar.muyrara { color: var(--violet); } .srar.legendaria { color: var(--gold); }
+.spct { font-size: .62rem; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.head-actions { display: flex; align-items: center; gap: 8px; }
+.enc-spawn { font-size: .72rem; color: var(--dim); margin: 2px 0; }
+
+/* ---------- Probabilidades por bioma ---------- */
+.odds-biome { margin-bottom: 14px; }
+.odds-biome h3 { display: flex; justify-content: space-between; align-items: baseline; }
+.odds-row { display: flex; align-items: center; gap: 8px; font-size: .74rem; padding: 3px 0; border-bottom: 1px solid var(--line); }
+.odds-name { flex: 0 0 38%; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.odds-bar { flex: 1; height: 9px; background: var(--canvas-bg); border: 2px solid var(--outline); border-radius: 2px; overflow: hidden; }
+.odds-bar i { display: block; height: 100%; background: var(--green); }
+.odds-row b { flex: 0 0 34px; text-align: right; font-variant-numeric: tabular-nums; }
 .dex-card[data-strain] { cursor: pointer; }
 .dex-card[data-strain]:hover { border-color: var(--terra); }
 
@@ -1066,11 +1082,37 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     return m;
   }
 
+  // Peso base de aparición (sin clima). Determina la probabilidad relativa.
+  function spawnWeight(s) { return s.relic ? 1 : (s.tier === 1 ? 5 : 20); }
+
+  // Clasificación de rareza de APARICIÓN (distinta de la rareza del fenotipo).
+  function spawnRarity(s) {
+    if (s.relic) return { key: 'legendaria', label: 'Legendaria', color: '#e0b23c' };
+    if (s.tier >= 2) return { key: 'muyrara', label: 'Muy rara', color: '#a06fd6' };
+    if (s.tier === 1) return { key: 'rara', label: 'Rara', color: '#5aa6c0' };
+    return { key: 'comun', label: 'Común', color: '#5ab04f' };
+  }
+
+  // Probabilidad (%) base de que una cepa salga en la hierba alta de un bioma.
+  function biomeChance(s, biome) {
+    if (!s.biomes.includes(biome)) return 0;
+    const list = SPECIES.filter(x => x.biomes.includes(biome));
+    const tot = list.reduce((a, x) => a + spawnWeight(x), 0);
+    return tot ? (spawnWeight(s) / tot) * 100 : 0;
+  }
+
+  // Tabla de probabilidades de un bioma (base, ordenada de más a menos probable).
+  function biomeOdds(biome) {
+    const list = SPECIES.filter(s => s.biomes.includes(biome));
+    const tot = list.reduce((a, s) => a + spawnWeight(s), 0);
+    return list.map(s => ({ ref: s, w: spawnWeight(s), pct: tot ? (spawnWeight(s) / tot) * 100 : 0 }))
+      .sort((a, b) => b.pct - a.pct);
+  }
+
   function spawnTable(biome, env) {
     const list = SPECIES.filter(s => s.biomes.includes(biome));
     return list.map(s => {
-      let w = s.relic ? 1 : (s.tier === 1 ? 5 : 20);   // tier-1 más raras que las landrace
-      w *= envMultiplier(s, env);
+      let w = spawnWeight(s) * envMultiplier(s, env);   // tier-1 más raras que las landrace
       return { ref: s, w };
     });
   }
@@ -1108,7 +1150,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     return makeSpecimen(chosen, env, { form: 'salvaje', caughtAt: null });
   }
 
-  PH.species = { SPECIES, SPECIES_BY_ID, BIOMES, spawnTable, makeSpecimen, rollEncounter, envMultiplier, canonicalCross, canonicalBySet };
+  PH.species = { SPECIES, SPECIES_BY_ID, BIOMES, spawnTable, spawnWeight, spawnRarity, biomeChance, biomeOdds, makeSpecimen, rollEncounter, envMultiplier, canonicalCross, canonicalBySet };
 })(window.PH = window.PH || {});
 
 </script>
@@ -3196,7 +3238,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
   }
 
   /* ---------------- ENCUENTRO ---------------- */
-  function encounter(wild) {
+  function encounter(wild, biome) {
     const s = G();
     PH.state.markSeen(wild.speciesId);
     const hasLupa = s.player.gear.includes('lupa');
@@ -3207,6 +3249,12 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     ).join('');
     const rarityHint = hasLupa ? `${'★'.repeat(PH.gen.rarityTier(wild.rarity).stars)} ${PH.gen.rarityTier(wild.rarity).label}` : '¿? (necesitas Lupa)';
     const envHint = hasMed ? `<div class="enc-env">Clima: ${cap(s.env.weather)} · ${s.env.night ? 'Noche' : 'Día'} · ${cap(s.env.season)}</div>` : '';
+    // Aparición: rareza de spawn + probabilidad en la hierba alta de este bioma
+    const spSp = PH.species.SPECIES_BY_ID[wild.speciesId];
+    const srar = spSp ? PH.species.spawnRarity(spSp) : null;
+    const pct = (spSp && biome) ? PH.species.biomeChance(spSp, biome) : 0;
+    const bname = biome && PH.species.BIOMES[biome] ? PH.species.BIOMES[biome].name : '';
+    const spawnHint = srar ? `<div class="enc-spawn">Aparición: <b style="color:${srar.color}">${srar.label}</b>${biome ? ` · ${pct.toFixed(0)}% en ${bname}` : ''}</div>` : '';
 
     open(`
       <div class="encounter">
@@ -3216,6 +3264,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
           <div class="enc-side">
             <div class="enc-name">${wild.name} <small>${wild.speciesId}</small></div>
             <div class="enc-rare">Rareza estimada: ${rarityHint}</div>
+            ${spawnHint}
             <div class="enc-desc">${PH.gen.describe(wild.pheno)}</div>
             ${envHint}
             <div class="enc-fields">
@@ -3383,10 +3432,12 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
       </div>`).join('');
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2><i class="pic pic-book"></i> Strain-dex <small>${found}/${total} cepas · ${phenos} fenotipos · árbol filogenético</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-book"></i> Strain-dex <small>${found}/${total} cepas · ${phenos} fenotipos</small></h2>
+          <div class="head-actions"><button class="btn small" id="dex_odds"><i class="pic pic-grid sm"></i> Probabilidades</button><button class="x" id="p_close">✕</button></div></div>
         <div class="panel-body"><p class="dim">Toca una cepa para ver su árbol de linaje.</p>${sections}</div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = close;
+    document.getElementById('dex_odds').onclick = habitatStats;
     overlay.querySelectorAll('.dex-card[data-strain]').forEach(el => el.onclick = () => lineageView(el.dataset.strain));
   }
   function dexCard(sp, gotIt, byId) {
@@ -3394,12 +3445,38 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     const parents = (sp.parents || []).map(p => (byId[p] ? byId[p].name : p));
     const lineage = parents.length ? '◄ ' + parents.join(' × ') : 'landrace / base';
     const art = uri ? `<img src="${uri}" alt="" loading="lazy">` : `<div class="dex-noart"><i class="pic pic-leaf"></i></div>`;
+    const canSpawn = sp.biomes && sp.biomes.length;
+    const rar = canSpawn ? PH.species.spawnRarity(sp) : null;
+    const pct = canSpawn ? PH.species.biomeChance(sp, sp.biomes[0]) : 0;
+    const spawn = rar
+      ? `<div class="dex-spawn"><span class="srar ${rar.key}">${rar.label}</span> <span class="spct">${pct.toFixed(0)}%</span></div>`
+      : `<div class="dex-spawn dim2">solo por cruce</div>`;
     return `<div class="dex-card ${gotIt ? 'got' : 'todo'}" data-strain="${sp.id}" title="${sp.name}">
       <div class="dex-art">${art}${gotIt ? '<span class="dex-chk">✓</span>' : ''}</div>
       <div class="dex-name">${sp.name}</div>
       <div class="dex-badges"><span class="dex-type ${sp.type}">${sp.type}</span></div>
+      ${spawn}
       <div class="dex-lin">${lineage}</div>
     </div>`;
+  }
+
+  // Panel de probabilidades de aparición por bioma (hierba alta).
+  function habitatStats() {
+    const B = PH.species.BIOMES;
+    const sections = Object.keys(B).map(bk => {
+      const odds = PH.species.biomeOdds(bk);
+      const rows = odds.map(o => {
+        const rar = PH.species.spawnRarity(o.ref);
+        return `<div class="odds-row"><span class="odds-name">${o.ref.name}</span><span class="srar ${rar.key}">${rar.label}</span><div class="odds-bar"><i style="width:${o.pct}%; background:${rar.color}"></i></div><b>${o.pct.toFixed(0)}%</b></div>`;
+      }).join('');
+      return `<div class="odds-biome"><h3>${cap(bk)} — ${B[bk].name} <small>${Math.round(B[bk].baseEncounter * 100)}% / paso</small></h3>${rows}</div>`;
+    }).join('');
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2><i class="pic pic-grid"></i> Probabilidades de aparición</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body"><p class="dim">Al pisar hierba alta puede salir una cepa. La cifra "/paso" es la probabilidad de encuentro; el % de cada cepa es su peso relativo dentro del bioma (base, sin clima ni hora, que lo modifican).</p>${sections}</div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
   }
 
   // Árbol de linaje LIMPIO: la cepa arriba y sus parentales colgando debajo,
@@ -4068,7 +4145,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     return { gx: Math.round((u + v) / 2), gy: Math.round((v - u) / 2) };
   }
 
-  // rombo de suelo con relieve
+  // rombo de suelo con relieve + grano sutil (textura, no plano)
   function floorDiamond(ctx, sx, sy, top, side) {
     ctx.beginPath();
     ctx.moveTo(sx, sy);
@@ -4077,6 +4154,16 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     ctx.lineTo(sx - TW / 2, sy + TH / 2);
     ctx.closePath();
     ctx.fillStyle = top; ctx.fill();
+    // grano: motas claras/oscuras deterministas dentro del rombo
+    let seed = ((((sx | 0) * 13) ^ ((sy | 0) * 7)) >>> 0) || 1;
+    const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    const cy = sy + TH / 2, dk = shade(top, -0.07), lt = shade(top, 0.07);
+    for (let i = 0; i < 6; i++) {
+      const u = (rnd() * 2 - 1), v = (rnd() * 2 - 1);
+      if (Math.abs(u) + Math.abs(v) > 0.9) continue;         // dentro del rombo
+      ctx.fillStyle = rnd() < 0.5 ? dk : lt;
+      ctx.fillRect((sx + u * (TW / 2)) | 0, (cy + v * (TH / 2)) | 0, 2, 2);
+    }
     ctx.strokeStyle = side; ctx.lineWidth = 1; ctx.stroke();
   }
 
@@ -4109,8 +4196,22 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
   // Props de borde/escenario para zonas naturales (setos, vallas, rocas, cañas,
   // palmeras, árboles, cactus…) — arte propio por código, en la proyección iso.
   // Sustituyen a los cubos '#' en los biomas para que los bordes no sean bloques.
-  function prop(ctx, sx, sy, kind) {
+  function prop(ctx, sx, sy, kind, opt) {
     const midY = sy + TH / 2;
+    if (kind === 'grass') {
+      // HIERBA ALTA: matas de briznas verticales (textura + oclusión por profundidad)
+      const base = (opt && opt.col) || '#4f9e3a', dark = shade(base, -0.22), tip = shade(base, 0.28);
+      let s2 = ((((sx | 0) * 17) ^ ((sy | 0) * 11)) >>> 0) || 1;
+      const r = () => { s2 = (s2 * 1664525 + 1013904223) >>> 0; return s2 / 4294967296; };
+      const blades = [[-11, 11], [-7, 15], [-3, 12], [1, 16], [5, 13], [9, 15], [12, 10], [-1, 9]];
+      for (const [bx, bh] of blades) {
+        const rx = sx + bx + (r() * 2 - 1), top = midY - bh - r() * 3;
+        ctx.strokeStyle = r() < 0.5 ? base : dark; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(rx, midY + 5); ctx.lineTo(rx + (r() * 3 - 1.5), top); ctx.stroke();
+        ctx.fillStyle = tip; ctx.fillRect((rx - 1) | 0, (top - 1) | 0, 2, 2);
+      }
+      return;
+    }
     // sombra de contacto suave (asienta el prop en el suelo)
     const shadow = (w, o) => { ctx.fillStyle = 'rgba(0,0,0,' + (o || 0.16) + ')'; ctx.beginPath(); ctx.ellipse(sx, midY + 2, w, w * 0.4, 0, 0, 6.283); ctx.fill(); };
     const ell = (x, y, rx, ry, c) => { ctx.fillStyle = c; ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, 6.283); ctx.fill(); };
@@ -4852,11 +4953,13 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     // parterres silvestres 'g' -> posible encuentro
     const m = room(p.map);
     if (m.wild && tileAt(m, p.x, p.y) === 'g') {
-      if (PH.util.RNG.chance(m.encounterRate || 0.22)) {
+      // en un bioma, sólo aparecen las cepas de su linaje; en parterres urbanos, mezcla
+      const biome = m.biome || PH.util.RNG.pick(['pradera', 'bosque', 'pantano', 'desierto', 'nieve', 'volcan', 'cueva', 'isla']);
+      const B = PH.species.BIOMES[biome];
+      const rate = (B && B.baseEncounter) || m.encounterRate || 0.22;   // prob. por paso en hierba alta
+      if (PH.util.RNG.chance(rate)) {
         A('encounter');
-        // en un bioma, sólo aparecen las cepas de su linaje; en parterres urbanos, mezcla
-        const biome = m.biome || PH.util.RNG.pick(['pradera', 'bosque', 'pantano', 'desierto', 'nieve', 'volcan', 'cueva', 'isla']);
-        PH.ui.encounter(PH.species.rollEncounter(biome, G().env));
+        PH.ui.encounter(PH.species.rollEncounter(biome, G().env), biome);
       }
     }
   }
@@ -5075,7 +5178,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     const propTiles = [];   // bordes/escenario natural (seto, valla, roca…) por tile
     for (let gy = 0; gy < m.grid.length; gy++) for (let gx = 0; gx < m.grid[gy].length; gx++) {
       const ch = m.grid[gy][gx];
-      if (ch === 'g') { const wp = m.wildPal || { col: '#3f7d34', edge: '#2f5b26' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); }
+      if (ch === 'g') { const wp = m.wildPal || { col: '#3f7d34', edge: '#2f5b26' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); propTiles.push({ gx, gy, kind: 'grass', opt: { col: wp.col } }); }
       else if (ch === 'w') { const wp = m.waterPal || { col: '#5aa6c0', edge: '#3f8aa4' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); }
       else if (ch === 'l') { const wp = m.lavaPal || { col: '#d5713f', edge: '#8a3f22' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); }
       else if (ch === '#' && m.natural) {
@@ -5109,7 +5212,7 @@ window.PH.strainTiers = {"0":"Landraces / base","1":"Híbridas fundacionales","2
     for (const ef of extraFloors) { const s = ISO.project(ef.gx, ef.gy, game.cam); ISO.floorDiamond(ctx, s.x, s.y, ef.col, ef.edge); }
 
     // props naturales (bordes/escenario) como objetos con profundidad
-    for (const pt of propTiles) objects.push({ gx: pt.gx, gy: pt.gy, draw: (ctx, sx, sy) => ISO.prop(ctx, sx, sy, pt.kind) });
+    for (const pt of propTiles) objects.push({ gx: pt.gx, gy: pt.gy, draw: (ctx, sx, sy) => ISO.prop(ctx, sx, sy, pt.kind, pt.opt) });
 
     // paredes 'H' como objetos altos; farolas 'P' con su sprite si existe
     for (const w of walls) objects.push({

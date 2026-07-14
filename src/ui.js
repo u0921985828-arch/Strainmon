@@ -168,7 +168,7 @@
   }
 
   /* ---------------- ENCUENTRO ---------------- */
-  function encounter(wild) {
+  function encounter(wild, biome) {
     const s = G();
     PH.state.markSeen(wild.speciesId);
     const hasLupa = s.player.gear.includes('lupa');
@@ -179,6 +179,12 @@
     ).join('');
     const rarityHint = hasLupa ? `${'★'.repeat(PH.gen.rarityTier(wild.rarity).stars)} ${PH.gen.rarityTier(wild.rarity).label}` : '¿? (necesitas Lupa)';
     const envHint = hasMed ? `<div class="enc-env">Clima: ${cap(s.env.weather)} · ${s.env.night ? 'Noche' : 'Día'} · ${cap(s.env.season)}</div>` : '';
+    // Aparición: rareza de spawn + probabilidad en la hierba alta de este bioma
+    const spSp = PH.species.SPECIES_BY_ID[wild.speciesId];
+    const srar = spSp ? PH.species.spawnRarity(spSp) : null;
+    const pct = (spSp && biome) ? PH.species.biomeChance(spSp, biome) : 0;
+    const bname = biome && PH.species.BIOMES[biome] ? PH.species.BIOMES[biome].name : '';
+    const spawnHint = srar ? `<div class="enc-spawn">Aparición: <b style="color:${srar.color}">${srar.label}</b>${biome ? ` · ${pct.toFixed(0)}% en ${bname}` : ''}</div>` : '';
 
     open(`
       <div class="encounter">
@@ -188,6 +194,7 @@
           <div class="enc-side">
             <div class="enc-name">${wild.name} <small>${wild.speciesId}</small></div>
             <div class="enc-rare">Rareza estimada: ${rarityHint}</div>
+            ${spawnHint}
             <div class="enc-desc">${PH.gen.describe(wild.pheno)}</div>
             ${envHint}
             <div class="enc-fields">
@@ -355,10 +362,12 @@
       </div>`).join('');
     open(`
       <div class="panel wide">
-        <div class="panel-head"><h2><i class="pic pic-book"></i> Strain-dex <small>${found}/${total} cepas · ${phenos} fenotipos · árbol filogenético</small></h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-head"><h2><i class="pic pic-book"></i> Strain-dex <small>${found}/${total} cepas · ${phenos} fenotipos</small></h2>
+          <div class="head-actions"><button class="btn small" id="dex_odds"><i class="pic pic-grid sm"></i> Probabilidades</button><button class="x" id="p_close">✕</button></div></div>
         <div class="panel-body"><p class="dim">Toca una cepa para ver su árbol de linaje.</p>${sections}</div>
       </div>`, 'center');
     document.getElementById('p_close').onclick = close;
+    document.getElementById('dex_odds').onclick = habitatStats;
     overlay.querySelectorAll('.dex-card[data-strain]').forEach(el => el.onclick = () => lineageView(el.dataset.strain));
   }
   function dexCard(sp, gotIt, byId) {
@@ -366,12 +375,38 @@
     const parents = (sp.parents || []).map(p => (byId[p] ? byId[p].name : p));
     const lineage = parents.length ? '◄ ' + parents.join(' × ') : 'landrace / base';
     const art = uri ? `<img src="${uri}" alt="" loading="lazy">` : `<div class="dex-noart"><i class="pic pic-leaf"></i></div>`;
+    const canSpawn = sp.biomes && sp.biomes.length;
+    const rar = canSpawn ? PH.species.spawnRarity(sp) : null;
+    const pct = canSpawn ? PH.species.biomeChance(sp, sp.biomes[0]) : 0;
+    const spawn = rar
+      ? `<div class="dex-spawn"><span class="srar ${rar.key}">${rar.label}</span> <span class="spct">${pct.toFixed(0)}%</span></div>`
+      : `<div class="dex-spawn dim2">solo por cruce</div>`;
     return `<div class="dex-card ${gotIt ? 'got' : 'todo'}" data-strain="${sp.id}" title="${sp.name}">
       <div class="dex-art">${art}${gotIt ? '<span class="dex-chk">✓</span>' : ''}</div>
       <div class="dex-name">${sp.name}</div>
       <div class="dex-badges"><span class="dex-type ${sp.type}">${sp.type}</span></div>
+      ${spawn}
       <div class="dex-lin">${lineage}</div>
     </div>`;
+  }
+
+  // Panel de probabilidades de aparición por bioma (hierba alta).
+  function habitatStats() {
+    const B = PH.species.BIOMES;
+    const sections = Object.keys(B).map(bk => {
+      const odds = PH.species.biomeOdds(bk);
+      const rows = odds.map(o => {
+        const rar = PH.species.spawnRarity(o.ref);
+        return `<div class="odds-row"><span class="odds-name">${o.ref.name}</span><span class="srar ${rar.key}">${rar.label}</span><div class="odds-bar"><i style="width:${o.pct}%; background:${rar.color}"></i></div><b>${o.pct.toFixed(0)}%</b></div>`;
+      }).join('');
+      return `<div class="odds-biome"><h3>${cap(bk)} — ${B[bk].name} <small>${Math.round(B[bk].baseEncounter * 100)}% / paso</small></h3>${rows}</div>`;
+    }).join('');
+    open(`
+      <div class="panel wide">
+        <div class="panel-head"><h2><i class="pic pic-grid"></i> Probabilidades de aparición</h2><button class="x" id="p_close">✕</button></div>
+        <div class="panel-body"><p class="dim">Al pisar hierba alta puede salir una cepa. La cifra "/paso" es la probabilidad de encuentro; el % de cada cepa es su peso relativo dentro del bioma (base, sin clima ni hora, que lo modifican).</p>${sections}</div>
+      </div>`, 'center');
+    document.getElementById('p_close').onclick = close;
   }
 
   // Árbol de linaje LIMPIO: la cepa arriba y sus parentales colgando debajo,

@@ -542,11 +542,13 @@
     // parterres silvestres 'g' -> posible encuentro
     const m = room(p.map);
     if (m.wild && tileAt(m, p.x, p.y) === 'g') {
-      if (PH.util.RNG.chance(m.encounterRate || 0.22)) {
+      // en un bioma, sólo aparecen las cepas de su linaje; en parterres urbanos, mezcla
+      const biome = m.biome || PH.util.RNG.pick(['pradera', 'bosque', 'pantano', 'desierto', 'nieve', 'volcan', 'cueva', 'isla']);
+      const B = PH.species.BIOMES[biome];
+      const rate = (B && B.baseEncounter) || m.encounterRate || 0.22;   // prob. por paso en hierba alta
+      if (PH.util.RNG.chance(rate)) {
         A('encounter');
-        // en un bioma, sólo aparecen las cepas de su linaje; en parterres urbanos, mezcla
-        const biome = m.biome || PH.util.RNG.pick(['pradera', 'bosque', 'pantano', 'desierto', 'nieve', 'volcan', 'cueva', 'isla']);
-        PH.ui.encounter(PH.species.rollEncounter(biome, G().env));
+        PH.ui.encounter(PH.species.rollEncounter(biome, G().env), biome);
       }
     }
   }
@@ -765,7 +767,7 @@
     const propTiles = [];   // bordes/escenario natural (seto, valla, roca…) por tile
     for (let gy = 0; gy < m.grid.length; gy++) for (let gx = 0; gx < m.grid[gy].length; gx++) {
       const ch = m.grid[gy][gx];
-      if (ch === 'g') { const wp = m.wildPal || { col: '#3f7d34', edge: '#2f5b26' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); }
+      if (ch === 'g') { const wp = m.wildPal || { col: '#3f7d34', edge: '#2f5b26' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); propTiles.push({ gx, gy, kind: 'grass', opt: { col: wp.col } }); }
       else if (ch === 'w') { const wp = m.waterPal || { col: '#5aa6c0', edge: '#3f8aa4' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); }
       else if (ch === 'l') { const wp = m.lavaPal || { col: '#d5713f', edge: '#8a3f22' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); }
       else if (ch === '#' && m.natural) {
@@ -799,7 +801,7 @@
     for (const ef of extraFloors) { const s = ISO.project(ef.gx, ef.gy, game.cam); ISO.floorDiamond(ctx, s.x, s.y, ef.col, ef.edge); }
 
     // props naturales (bordes/escenario) como objetos con profundidad
-    for (const pt of propTiles) objects.push({ gx: pt.gx, gy: pt.gy, draw: (ctx, sx, sy) => ISO.prop(ctx, sx, sy, pt.kind) });
+    for (const pt of propTiles) objects.push({ gx: pt.gx, gy: pt.gy, draw: (ctx, sx, sy) => ISO.prop(ctx, sx, sy, pt.kind, pt.opt) });
 
     // paredes 'H' como objetos altos; farolas 'P' con su sprite si existe
     for (const w of walls) objects.push({
