@@ -268,7 +268,7 @@
     for (let i = 0; i < _order.length; i++) {
       const e = _order[i];
       const sx = (e.gx - e.gy) * (TW / 2) + cx, sy = (e.gx + e.gy) * (TH / 2) + cy;
-      if (e.t === 0) cube(ctx, sx, sy, WH, P.wall);
+      if (e.t === 0) cube(ctx, sx, sy, map.wallH || WH, P.wall);
       else if (e.t === 1) e.ref.draw(ctx, sx, sy, e.ref);
       else actor(ctx, sx, sy, e.ref.dir, e.ref.frame, e.ref.pal, e.ref.char);
     }

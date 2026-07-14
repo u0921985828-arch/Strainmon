@@ -81,15 +81,17 @@
     const spec = specOrPheno && specOrPheno.pheno ? specOrPheno : null;
     const pheno = spec ? spec.pheno : specOrPheno;
     const speciesId = spec ? spec.speciesId : null;
-    // Retrato de cepa (arte 128² del pack). Híbridos (cruce) usan procedural.
-    const im = (speciesId && spec.form !== 'cruce' && PH.strainart && PH.strainart.has(speciesId)) ? PH.strainart.img(speciesId) : null;
-    const drawProc = () => { ctx.clearRect(0, 0, c.width, c.height); PH.render.drawPlant(ctx, c.width / 2, c.height - 8, pheno, scale || 2, performance.now()); };
+    // Retrato de cepa (arte 128² del pack): landraces, cruces canónicos y clones
+    // (nodos del árbol). Solo las fusiones parciales intermedias usan procedural.
+    const isInter = spec && spec.intermediate;
+    const im = (speciesId && !isInter && PH.strainart && PH.strainart.has(speciesId)) ? PH.strainart.img(speciesId) : null;
+    const drawProc = () => { ctx.clearRect(0, 0, c.width, c.height); PH.render.drawPlant(ctx, c.width / 2, Math.round(c.height * 0.86), pheno, scale || 2, performance.now()); };
     const drawImg = () => {
       const pad = 3, aw = c.width - pad * 2, ah = c.height - pad * 2;
       const r = Math.min(aw / im.naturalWidth, ah / im.naturalHeight);
       const w = Math.round(im.naturalWidth * r), h = Math.round(im.naturalHeight * r);
       ctx.clearRect(0, 0, c.width, c.height);
-      ctx.drawImage(im, (c.width - w) / 2, c.height - h - 2, w, h);
+      ctx.drawImage(im, Math.round((c.width - w) / 2), Math.round((c.height - h) / 2), w, h);  // centrado
     };
     if (im && im.complete && im.naturalWidth) drawImg();
     else if (im) { drawProc(); im.addEventListener('load', drawImg, { once: true }); }
@@ -460,6 +462,17 @@
     const pollen = s.bank.filter(sp => sp.form === 'polen');
     const usable = fertile.concat(pollen);
     breedSel = breedSel.filter(uid => s.bank.find(x => x.uid === uid));
+    // Vista previa de viabilidad: gatea el botón y evita el pop-up de bloqueo.
+    const cross = { can: false, hint: '' };
+    if (breedSel.length === 2) {
+      const pa = PH.state.bankGet(breedSel[0]), pb = PH.state.bankGet(breedSel[1]);
+      const res = PH.species.resolveCross(setOf(pa), setOf(pb));
+      if (res.reason === 'self' || res.reason === 'closed') cross.hint = '<div class="cross-hint bad"><i class="pic pic-alert sm"></i> Cruce no viable — fuera de la matriz filogenética.</div>';
+      else if (res.reason === 'partial') { cross.can = true; cross.hint = `<div class="cross-hint"><i class="pic pic-helix sm"></i> Fusión parcial${res.toward ? ` → hacia <b>${res.toward.name}</b>` : ''}.</div>`; }
+      else if (res.node) { cross.can = true; cross.hint = `<div class="cross-hint ok"><i class="pic pic-sprout sm"></i> → <b>${res.node.name}</b>${res.reason === 'backcross' ? ' (retrocruce)' : ''}</div>`; }
+    } else {
+      cross.hint = '<div class="cross-hint dim">Selecciona dos parentales compatibles del árbol.</div>';
+    }
     open(`
       <div class="panel wide">
         <div class="panel-head"><h2><i class="pic pic-flask"></i> Laboratorio — Cruces genéticos</h2><button class="x" id="p_close">✕</button></div>
@@ -470,8 +483,9 @@
             <div class="cross-sign">✕</div>
             <div class="slot">${slotView(1)}</div>
             <div class="cross-eq">→</div>
-            <button class="btn primary" id="do_cross" ${breedSel.length === 2 ? '' : 'disabled'}>Cruzar</button>
+            <button class="btn primary" id="do_cross" ${cross.can ? '' : 'disabled'}>Cruzar</button>
           </div>
+          ${cross.hint}
           <h3>Parentales disponibles (${usable.length})</h3>
           <div class="cat-grid select">
             ${usable.map(sp => `<div class="cat-card pick ${breedSel.includes(sp.uid) ? 'picked' : ''}" data-pick="${sp.uid}">
@@ -513,7 +527,8 @@
     // resuelve contra el árbol. Sin nodo ni progreso -> cruce BLOQUEADO (sin
     // sprite procedural). Autopolinización sólo válida como retrocruce.
     const res = PH.species.resolveCross(setOf(A), setOf(B));
-    if (res.reason === 'self' || res.reason === 'closed') { breedSel = []; return crossBlocked(A, B, res.reason); }
+    // Cruces no permitidos ya vienen bloqueados por el botón; salida silenciosa (sin pop-up).
+    if (res.reason === 'self' || res.reason === 'closed') { toast('<i class="pic pic-alert sm"></i> Cruce no viable', 'bad'); return; }
     const canon = res.node;   // null si es fusión parcial (intermedio)
     let spec;
     if (canon) {

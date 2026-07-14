@@ -19,24 +19,31 @@
   // grid: '.'=suelo  '#'=pared  ' '=vacío(bloqueado)  'D'=puerta(suelo)
   const ROOMS = {
     apt: {
-      id: 'apt', name: 'Tu Grow-Room', theme: 'room',
+      id: 'apt', name: 'Tu Grow-Room', theme: 'room', wallH: 54, bg: '#1a120e',
+      pal: { floorA: '#c8a06a', floorB: '#bd9560', floorEdge: 'rgba(80,50,20,.35)', door: '#8a5a30', wall: { top: '#cfd6ac', left: '#96a074', right: '#b2bb90' } },
+      rugPal: { col: '#9a4636', edge: '#6a2f26' },
       grid: [
-        '#########',
-        '#.......#',
-        '#.......#',
-        '#.......#',
-        '#.......#',
-        '#.......#',
-        '#...D...#',
-        '#########',
+        '#############',
+        '#...........#',
+        '#...........#',
+        '#...........#',
+        '#....mmm....#',
+        '#....mmm....#',
+        '#...........#',
+        '#.....D.....#',
+        '#############',
       ],
-      spawn: { gx: 4, gy: 5 },
-      doors: [{ gx: 4, gy: 6, to: 'street', tgx: 6, tgy: 3 }],
+      spawn: { gx: 6, gy: 6 },
+      doors: [{ gx: 6, gy: 7, to: 'street', tgx: 6, tgy: 3 }],
       npcs: [],
       objects: [
-        { gx: 2, gy: 1, kind: 'grow', solid: true, label: 'Invernadero' },
-        { gx: 6, gy: 1, kind: 'pc', solid: true, label: 'Ordenador' },
-        { gx: 2, gy: 5, kind: 'bed', solid: true, label: 'Cama' },
+        { gx: 2, gy: 1, kind: 'grow', solid: true, label: 'Mesa de cultivo' },
+        { gx: 10, gy: 1, kind: 'pc', solid: true, label: 'Ordenador' },
+        { gx: 2, gy: 6, kind: 'bed', solid: true, label: 'Cama' },
+        { gx: 4, gy: 1, kind: 'plant', solid: true, label: 'Planta' },
+        { gx: 8, gy: 1, kind: 'plant', solid: true, label: 'Planta' },
+        { gx: 10, gy: 5, kind: 'shelf', solid: true, label: 'Estante' },
+        { gx: 2, gy: 4, kind: 'crate', solid: true, label: 'Caja' },
       ],
     },
     street: {
@@ -53,9 +60,9 @@
       ],
       spawn: { gx: 6, gy: 3 },
       doors: [
-        { gx: 2, gy: 2, to: 'apt', tgx: 4, tgy: 5 },
-        { gx: 6, gy: 2, to: 'shop', tgx: 3, tgy: 3 },
-        { gx: 10, gy: 2, to: 'lab', tgx: 3, tgy: 3 },
+        { gx: 2, gy: 2, to: 'apt', tgx: 6, tgy: 6 },
+        { gx: 6, gy: 2, to: 'shop', tgx: 5, tgy: 6 },
+        { gx: 10, gy: 2, to: 'lab', tgx: 5, tgy: 6 },
         { gx: 6, gy: 7, to: 'park', tgx: 5, tgy: 6 },
         { gx: 0, gy: 3, to: 'wilds', tgx: 9, tgy: 8 },
       ],
@@ -70,36 +77,55 @@
       wild: true, // 'g' = parterres con cepas silvestres
     },
     shop: {
-      id: 'shop', name: 'Mercado', theme: 'room',
+      id: 'shop', name: 'Mercado', theme: 'room', wallH: 50, bg: '#1c140e',
+      pal: { floorA: '#cbb083', floorB: '#c0a476', floorEdge: 'rgba(90,60,25,.35)', door: '#8a5a30', wall: { top: '#c79a5e', left: '#8f6a38', right: '#a9803f' } },
+      rugPal: { col: '#b0742f', edge: '#7a4c1e' },
       grid: [
-        '#######',
-        '#.....#',
-        '#.....#',
-        '#.....#',
-        '#..D..#',
-        '#######',
+        '###########',
+        '#.........#',
+        '#.........#',
+        '#....m....#',
+        '#...mmm...#',
+        '#....m....#',
+        '#.........#',
+        '#....D....#',
+        '###########',
       ],
-      spawn: { gx: 3, gy: 4 },
-      doors: [{ gx: 3, gy: 4, to: 'street', tgx: 6, tgy: 3 }],
-      npcs: [{ gx: 3, gy: 1, name: 'Mercader', sprite: 'npc4', dialog: 'nomada', dir: 'SW', role: 'merchant', char: 'merchant' }],
-      objects: [{ gx: 5, gy: 2, kind: 'shop', solid: true, label: 'Mostrador' }],
+      spawn: { gx: 5, gy: 6 },
+      doors: [{ gx: 5, gy: 7, to: 'street', tgx: 6, tgy: 3 }],
+      npcs: [{ gx: 5, gy: 1, name: 'Mercader', sprite: 'npc4', dialog: 'nomada', dir: 'SW', role: 'merchant', char: 'merchant' }],
+      objects: [
+        { gx: 3, gy: 1, kind: 'shop', solid: true, label: 'Mostrador' },
+        { gx: 7, gy: 1, kind: 'shop', solid: true, label: 'Mostrador' },
+        { gx: 2, gy: 4, kind: 'crate', solid: true, label: 'Caja' },
+        { gx: 8, gy: 4, kind: 'barrel', solid: true, label: 'Barril' },
+        { gx: 2, gy: 6, kind: 'plant', solid: true, label: 'Planta' },
+      ],
     },
     lab: {
-      id: 'lab', name: 'Laboratorio', theme: 'room',
+      id: 'lab', name: 'Laboratorio', theme: 'room', wallH: 52, bg: '#12161a',
+      pal: { floorA: '#c4ccd2', floorB: '#b8c1c8', floorEdge: 'rgba(60,80,95,.35)', door: '#7a8a96', wall: { top: '#dbe6ee', left: '#9fb4c2', right: '#c2d0da' } },
+      rugPal: { col: '#3f7a6a', edge: '#2c564b' },
       grid: [
-        '#######',
-        '#.....#',
-        '#.....#',
-        '#.....#',
-        '#..D..#',
-        '#######',
+        '###########',
+        '#.........#',
+        '#.........#',
+        '#.........#',
+        '#...mmm...#',
+        '#...mmm...#',
+        '#.........#',
+        '#....D....#',
+        '###########',
       ],
-      spawn: { gx: 3, gy: 4 },
-      doors: [{ gx: 3, gy: 4, to: 'street', tgx: 10, tgy: 3 }],
-      npcs: [{ gx: 2, gy: 1, name: 'Dr. Vane', sprite: 'npc5', dialog: 'genetista', dir: 'SE', role: 'botanist', char: 'botanist' }],
+      spawn: { gx: 5, gy: 6 },
+      doors: [{ gx: 5, gy: 7, to: 'street', tgx: 10, tgy: 3 }],
+      npcs: [{ gx: 3, gy: 1, name: 'Dr. Vane', sprite: 'npc5', dialog: 'genetista', dir: 'SE', role: 'botanist', char: 'botanist' }],
       objects: [
-        { gx: 4, gy: 1, kind: 'lab', solid: true, label: 'Mesa de cruces' },
-        { gx: 5, gy: 2, kind: 'pc', solid: true, label: 'Terminal ADN' },
+        { gx: 5, gy: 1, kind: 'lab', solid: true, label: 'Mesa de cruces' },
+        { gx: 7, gy: 1, kind: 'pc', solid: true, label: 'Terminal ADN' },
+        { gx: 2, gy: 5, kind: 'shelf', solid: true, label: 'Estante' },
+        { gx: 8, gy: 4, kind: 'plant', solid: true, label: 'Planta' },
+        { gx: 2, gy: 2, kind: 'crate', solid: true, label: 'Caja' },
       ],
     },
     park: {
@@ -216,7 +242,7 @@
   };
   // Lista BLANCA de tiles caminables. Todo lo demás bloquea (paredes '#',
   // vacío ' ', fachadas 'H', farolas 'P', dígitos, o cualquier char extraño).
-  const WALKABLE = { '.': 1, 'D': 1, 'g': 1 };
+  const WALKABLE = { '.': 1, 'D': 1, 'g': 1, 'm': 1 };   // 'm' = alfombra/estera (decorativa, caminable)
   function walkableChar(ch) { return !!WALKABLE[ch]; }
 
   function room(id) { return ROOMS[id]; }
@@ -770,6 +796,7 @@
       if (ch === 'g') { const wp = m.wildPal || { col: '#3f7d34', edge: '#2f5b26' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); propTiles.push({ gx, gy, kind: 'grass', opt: { col: wp.col } }); }
       else if (ch === 'w') { const wp = m.waterPal || { col: '#5aa6c0', edge: '#3f8aa4' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); }
       else if (ch === 'l') { const wp = m.lavaPal || { col: '#d5713f', edge: '#8a3f22' }; extraFloors.push({ gx, gy, col: wp.col, edge: wp.edge }); }
+      else if (ch === 'm') { const rp = m.rugPal || { col: '#9a4636', edge: '#6a2f26' }; extraFloors.push({ gx, gy, col: rp.col, edge: rp.edge }); }
       else if (ch === '#' && m.natural) {
         // suelo del bioma bajo el prop + tipo: perímetro = borde (seto/valla), interior = escenario
         const fa = (m.pal && m.pal.floorA) || '#7cbd50', fe = (m.pal && m.pal.floorEdge) || 'rgba(30,60,20,.3)';
@@ -872,6 +899,11 @@
     else if (o.kind === 'bed') ISO.cube(ctx, sx, sy, 8, { top: '#d64a6b', left: '#8f2f45', right: '#b03a55' });
     else if (o.kind === 'lab') ISO.cube(ctx, sx, sy, 14, { top: '#cfe0ea', left: '#8fa3b0', right: '#aebfc9' });
     else if (o.kind === 'shop') ISO.cube(ctx, sx, sy, 14, { top: '#ffb02e', left: '#9a6a18', right: '#c98d22' });
+    else if (o.kind === 'plant') { ISO.cube(ctx, sx, sy, 9, { top: '#b06a42', left: '#6e3f26', right: '#8a5236' }); ISO.prop(ctx, sx, sy - 9, 'hedge'); } // maceta + fronda
+    else if (o.kind === 'crate') ISO.cube(ctx, sx, sy, 16, { top: '#c79a5e', left: '#7a5533', right: '#9a6f3f' });
+    else if (o.kind === 'barrel') { ISO.cube(ctx, sx, sy, 20, { top: '#8a5a30', left: '#5c3f26', right: '#6e4a2c' }); }
+    else if (o.kind === 'shelf') ISO.cube(ctx, sx, sy, 34, { top: '#7a5533', left: '#4a3320', right: '#5c3f26' });
+    else if (o.kind === 'sign') ISO.cube(ctx, sx, sy, 26, { top: '#b98a52', left: '#6e4a2c', right: '#8a5a30' });
     else ISO.cube(ctx, sx, sy, 14, { top: '#999', left: '#555', right: '#777' });
   }
 

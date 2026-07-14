@@ -313,6 +313,10 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 .slot { width: 92px; min-height: 112px; background: var(--panel-2); border: 2px dashed var(--outline); border-radius: var(--radius);
   display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; }
 .cross-sign, .cross-eq { font-size: 1.4rem; color: var(--amber); }
+.cross-hint { text-align: center; font-size: .82rem; margin: 2px 0 6px; color: var(--ink); }
+.cross-hint.ok { color: var(--green-hi); font-weight: 700; }
+.cross-hint.bad { color: var(--danger); font-weight: 700; }
+.cross-hint.dim { color: var(--dim); }
 .newbadge { background: var(--gold); color: var(--on-accent); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
   padding: 7px 14px; border: 2px solid var(--outline); border-radius: var(--radius); margin-bottom: 10px; animation: pulse 1s infinite; }
 .blocked-badge { background: var(--danger); color: #fff; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
