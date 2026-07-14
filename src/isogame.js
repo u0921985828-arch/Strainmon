@@ -710,8 +710,20 @@
     return ISO.project(gx, gy, { x: 0, y: 0 });
   }
   function centerCam(snap) {
-    const ps = playerScreen();
-    const tx = game.W / 2 - ps.x, ty = game.H / 2 - ps.y - 20;
+    // Todas las salas caben en pantalla: centramos la SALA (estable y centrada)
+    // en vez de seguir al jugador, que dejaba huecos negros descentrados.
+    const m = room(G().player.map);
+    let tx, ty;
+    if (m && m.grid) {
+      const W = m.grid[0].length, H = m.grid.length;
+      const c = ISO.project((W - 1) / 2, (H - 1) / 2, { x: 0, y: 0 });
+      tx = game.W / 2 - c.x;
+      // -TH/2 baja al centro del rombo; +6 compensa el alto de props/paredes arriba
+      ty = game.H / 2 - c.y - ISO.TH / 2 + 6;
+    } else {
+      const ps = playerScreen();
+      tx = game.W / 2 - ps.x; ty = game.H / 2 - ps.y - 20;
+    }
     if (snap) { game.cam.x = tx; game.cam.y = ty; }
     else { game.cam.x = lerp(game.cam.x, tx, 0.15); game.cam.y = lerp(game.cam.y, ty, 0.15); }
   }

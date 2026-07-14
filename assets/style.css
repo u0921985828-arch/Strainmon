@@ -149,9 +149,10 @@ img, canvas, #screen { image-rendering: pixelated; image-rendering: crisp-edges;
 
 /* ---------- Overlay / modales ---------- */
 #overlay { position: fixed; inset: 0; display: none; line-height: 1.45; z-index: 100; }
-#overlay.active { display: flex; padding: 14px; }
-#overlay.center { align-items: center; justify-content: center; }
-#overlay.bottom { align-items: flex-end; justify-content: center; padding-bottom: calc(14px + var(--safe-bottom)); }
+/* Todos los modales van centrados por defecto (menús cuadrados y lógicos).
+   '.bottom' (diálogos) ancla abajo; '.boot' se gestiona aparte. */
+#overlay.active { display: flex; align-items: center; justify-content: center; padding: 14px; }
+#overlay.bottom { align-items: flex-end; padding-bottom: calc(14px + var(--safe-bottom)); }
 #overlay::before { content: ""; position: absolute; inset: 0; background: var(--scrim); }
 #overlay > * { position: relative; z-index: 2; }
 
