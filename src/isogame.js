@@ -34,7 +34,7 @@
         '#############',
       ],
       spawn: { gx: 6, gy: 6 },
-      doors: [{ gx: 6, gy: 7, to: 'street', tgx: 6, tgy: 3 }],
+      doors: [{ gx: 6, gy: 7, to: 'street', tgx: 1, tgy: 3 }],
       npcs: [],
       objects: [
         { gx: 2, gy: 1, kind: 'grow', solid: true, label: 'Mesa de cultivo' },
@@ -73,37 +73,41 @@
       ],
     },
     street: {
-      id: 'street', name: 'Calle Verde', theme: 'street', tiles: { '.': 'pavement', 'D': 'pavement' },
+      id: 'street', name: 'Ciudad Verde', theme: 'street', tiles: { '.': 'pavement', 'D': 'pavement' },
       grid: [
-        '.............',
-        '.HH..HH..HH..',
-        '.HD..HD..HD..',
-        'D............',
-        '.....P.......',
-        '.gg.........',
-        '.gg......gg..',
-        '......D......',
+        '..............',
+        '..............',
+        '..............',
+        '..............',
+        '..............',
+        '.gg........gg.',
+        '.gg........gg.',
+        'D.............',
+        '..............',
+        '..............',
+        '......D.......',
       ],
-      spawn: { gx: 6, gy: 3 },
+      spawn: { gx: 7, gy: 8 },
       doors: [
-        { gx: 2, gy: 2, to: 'apt', tgx: 6, tgy: 6 },
-        { gx: 6, gy: 2, to: 'shop', tgx: 5, tgy: 6 },
-        { gx: 10, gy: 2, to: 'lab', tgx: 5, tgy: 6 },
-        { gx: 6, gy: 7, to: 'park', tgx: 5, tgy: 6 },
-        { gx: 0, gy: 3, to: 'wilds', tgx: 9, tgy: 8 },
+        { gx: 0, gy: 7, to: 'wilds', tgx: 9, tgy: 8 },
+        { gx: 6, gy: 10, to: 'park', tgx: 5, tgy: 6 },
       ],
       npcs: [
-        { gx: 6, gy: 5, name: 'Dealer Kez', sprite: 'npc6', dialog: 'contrabandista', dir: 'SW', role: 'dealer', char: 'dealer' },
+        { gx: 5, gy: 6, name: 'Dealer Kez', sprite: 'npc6', dialog: 'contrabandista', dir: 'SW', role: 'dealer', char: 'dealer' },
         { gx: 3, gy: 4, name: 'Vecina Bru', sprite: 'npc2', dialog: 'coleccionista', dir: 'SE', role: 'neighbor', char: 'neighbor' },
-        { gx: 8, gy: 3, name: 'Cliente', sprite: 'npc3', dir: 'SW', role: 'customer', char: 'customer1' },
-        { gx: 4, gy: 6, name: 'Cliente', sprite: 'npc4', dir: 'NE', role: 'customer', char: 'customer2' },
-        { gx: 11, gy: 5, name: 'Transeúnte', sprite: 'npc5', dir: 'NW', role: 'walker', char: 'walker' },
+        { gx: 9, gy: 4, name: 'Cliente', sprite: 'npc3', dir: 'SW', role: 'customer', char: 'customer1' },
+        { gx: 4, gy: 8, name: 'Cliente', sprite: 'npc4', dir: 'NE', role: 'customer', char: 'customer2' },
+        { gx: 10, gy: 8, name: 'Transeúnte', sprite: 'npc5', dir: 'NW', role: 'walker', char: 'walker' },
       ],
       objects: [
-        { gx: 2, gy: 0, kind: 'tree', solid: true, label: 'Árbol' },
-        { gx: 10, gy: 0, kind: 'tree', solid: true, label: 'Árbol' },
-        { gx: 4, gy: 0, kind: 'bench', solid: true, label: 'Banco' },
-        { gx: 8, gy: 0, kind: 'trash', solid: true, label: 'Papelera' },
+        { gx: 0, gy: 1, kind: 'building', sprite: 'casa', w: 3, h: 2, solid: true, to: 'apt', tgx: 6, tgy: 6, label: 'Casa del cultivador' },
+        { gx: 4, gy: 1, kind: 'building', sprite: 'dispensario', w: 2, h: 2, solid: true, to: 'shop', tgx: 5, tgy: 6, label: 'Dispensario' },
+        { gx: 7, gy: 1, kind: 'building', sprite: 'lab', w: 3, h: 2, solid: true, to: 'lab', tgx: 5, tgy: 6, label: 'Laboratorio de genética' },
+        { gx: 11, gy: 1, kind: 'building', sprite: 'ayuntamiento', w: 3, h: 2, solid: true, action: 'quests', label: 'Ayuntamiento' },
+        { gx: 0, gy: 9, kind: 'tree', solid: true, label: 'Árbol' },
+        { gx: 13, gy: 9, kind: 'tree', solid: true, label: 'Árbol' },
+        { gx: 3, gy: 9, kind: 'bench', solid: true, label: 'Banco' },
+        { gx: 10, gy: 10, kind: 'trash', solid: true, label: 'Papelera' },
       ],
       wild: true, // 'g' = parterres con cepas silvestres
     },
@@ -123,7 +127,7 @@
         '###########',
       ],
       spawn: { gx: 5, gy: 6 },
-      doors: [{ gx: 5, gy: 7, to: 'street', tgx: 6, tgy: 3 }],
+      doors: [{ gx: 5, gy: 7, to: 'street', tgx: 4, tgy: 3 }],
       npcs: [{ gx: 5, gy: 1, name: 'Mercader', sprite: 'npc4', dialog: 'nomada', dir: 'SW', role: 'merchant', char: 'merchant' }],
       objects: [
         { gx: 3, gy: 1, kind: 'shop', solid: true, label: 'Mostrador' },
@@ -149,7 +153,7 @@
         '###########',
       ],
       spawn: { gx: 5, gy: 6 },
-      doors: [{ gx: 5, gy: 7, to: 'street', tgx: 10, tgy: 3 }],
+      doors: [{ gx: 5, gy: 7, to: 'street', tgx: 8, tgy: 3 }],
       npcs: [{ gx: 3, gy: 1, name: 'Dr. Vane', sprite: 'npc5', dialog: 'genetista', dir: 'SE', role: 'botanist', char: 'botanist' }],
       objects: [
         { gx: 5, gy: 1, kind: 'lab', solid: true, label: 'Mesa de cruces' },
@@ -175,7 +179,7 @@
         '###########',
       ],
       spawn: { gx: 5, gy: 6 },
-      doors: [{ gx: 5, gy: 7, to: 'street', tgx: 6, tgy: 6 }],
+      doors: [{ gx: 5, gy: 7, to: 'street', tgx: 6, tgy: 9 }],
       npcs: [
         { gx: 8, gy: 1, name: 'Rasta Dodo', sprite: 'npc6', dialog: 'descampado', dir: 'SW', role: 'neighbor', char: 'dealer' },
       ],
@@ -215,7 +219,7 @@
         { gx: 0, gy: 5, to: 'cueva', tgx: 5, tgy: 6 },
         { gx: 12, gy: 5, to: 'pantano', tgx: 5, tgy: 6 },
         { gx: 3, gy: 9, to: 'isla', tgx: 5, tgy: 6 },
-        { gx: 9, gy: 9, to: 'street', tgx: 1, tgy: 3 },
+        { gx: 9, gy: 9, to: 'street', tgx: 1, tgy: 7 },
       ],
       npcs: [{ gx: 6, gy: 6, name: 'Guía Fenn', sprite: 'npc2', dialog: 'descampado', dir: 'SW', role: 'neighbor', char: 'neighbor' }],
       objects: [],
@@ -364,6 +368,7 @@
     if (PH.furniart) PH.furniart.preload();
     if (PH.propart) PH.propart.preload();
     if (PH.tileart) PH.tileart.preload();
+    if (PH.buildingart) PH.buildingart.preload();
     PH.ui.init();
     bindInput();
     resize();
@@ -548,6 +553,12 @@
     if (o.kind === 'pc') return pcMenu();
     if (o.kind === 'bed') { PH.state.save(); return PH.ui.toast('Descansas y guardas la partida.', 'ok'); }
     if (o.kind === 'closet') { A('warp'); return warp({ to: o.to, tgx: o.tgx, tgy: o.tgy }); }   // Armario -> Carpa Indoor
+    if (o.kind === 'building') {
+      if (o.to) { A('warp'); return warp({ to: o.to, tgx: o.tgx, tgy: o.tgy }); }
+      if (o.action === 'quests') return PH.ui.quests();
+      if (o.action === 'greenhouse') return PH.ui.greenhouse();
+      return PH.ui.toast(o.label + ' — próximamente.', '');
+    }
     if (o.kind === 'slot') return PH.ui.tentSlot(o.idx);
     if (o.kind === 'extractor') return PH.ui.toast('Extractor de aire activo: renueva el aire y controla la humedad.', '');
     if (o.kind === 'duct') return PH.ui.toast('Tubo de ventilación: canaliza el flujo de aire de la carpa.', '');
@@ -973,7 +984,20 @@
     ctx.drawImage(im, Math.round(sx - w / 2), Math.round(baseY - h), w, h);
     return true;
   }
+  // Edificio: sprite grande anclado a la base del centro de su footprint (w×h).
+  function drawBuilding(ctx, sx, sy, o) {
+    const im = PH.buildingart && PH.buildingart.img(o.sprite);
+    if (!im || !im.complete || !im.naturalWidth) return false;
+    const w = o.w || 2, h = o.h || 2;
+    const centerX = sx + (w - h) * ISO.TW / 4;
+    const baseY = sy + (w + h - 2) * ISO.TH / 4 + ISO.TH;
+    const dw = Math.round((w + h) * ISO.TW / 2 * 0.98);
+    const dh = Math.round(im.naturalHeight * (dw / im.naturalWidth));
+    ctx.drawImage(im, Math.round(centerX - dw / 2), Math.round(baseY - dh), dw, dh);
+    return true;
+  }
   function drawObject(ctx, sx, sy, o) {
+    if (o.kind === 'building' && drawBuilding(ctx, sx, sy, o)) return;   // edificio del pack
     if (spriteObj(ctx, sx, sy, o)) return;   // atrezzo con sprite real del pack (prioridad)
     if (PH.furniart && PH.furniart.has(o.kind)) {
       const done = drawFurni(ctx, sx, sy, o.kind, o.kind === 'grow' ? 40 : 48);
