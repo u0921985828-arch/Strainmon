@@ -99,7 +99,12 @@
         { gx: 4, gy: 6, name: 'Cliente', sprite: 'npc4', dir: 'NE', role: 'customer', char: 'customer2' },
         { gx: 11, gy: 5, name: 'Transeúnte', sprite: 'npc5', dir: 'NW', role: 'walker', char: 'walker' },
       ],
-      objects: [],
+      objects: [
+        { gx: 2, gy: 0, kind: 'tree', solid: true, label: 'Árbol' },
+        { gx: 10, gy: 0, kind: 'tree', solid: true, label: 'Árbol' },
+        { gx: 4, gy: 0, kind: 'bench', solid: true, label: 'Banco' },
+        { gx: 8, gy: 0, kind: 'trash', solid: true, label: 'Papelera' },
+      ],
       wild: true, // 'g' = parterres con cepas silvestres
     },
     shop: {
@@ -174,7 +179,14 @@
       npcs: [
         { gx: 8, gy: 1, name: 'Rasta Dodo', sprite: 'npc6', dialog: 'descampado', dir: 'SW', role: 'neighbor', char: 'dealer' },
       ],
-      objects: [],
+      objects: [
+        { gx: 4, gy: 3, kind: 'fountain', solid: true, w: 2, h: 2, label: 'Fuente de parque' },
+        { gx: 1, gy: 1, kind: 'palm', solid: true, label: 'Palmera' },
+        { gx: 9, gy: 4, kind: 'tree', solid: true, label: 'Árbol' },
+        { gx: 1, gy: 4, kind: 'bench', solid: true, label: 'Banco' },
+        { gx: 9, gy: 1, kind: 'bush', solid: true, label: 'Arbusto' },
+        { gx: 5, gy: 1, kind: 'trash', solid: true, label: 'Papelera' },
+      ],
       wild: true, // maleza 'g' = cepas silvestres del descampado
     },
     // ---------------- SENDERO SALVAJE (hub de biomas) ----------------
@@ -350,6 +362,7 @@
     if (PH.charart) PH.charart.preload();
     if (PH.faceart) PH.faceart.preload();
     if (PH.furniart) PH.furniart.preload();
+    if (PH.propart) PH.propart.preload();
     PH.ui.init();
     bindInput();
     resize();
@@ -944,7 +957,23 @@
     }
     return false;
   }
+  // Atrezzo con sprite real del pack (billboard anclado a la base de la baldosa).
+  const PROP_SPRITE = {
+    tree: { name: 'tree', h: 86 }, palm: { name: 'palm', h: 90 }, treeb: { name: 'treeb', h: 86 },
+    bush: { name: 'bush', h: 42 }, bench: { name: 'bench', h: 42 }, trash: { name: 'trash', h: 36 },
+    sign: { name: 'sign', h: 48 }, fountain: { name: 'fountain', h: 78, big: true },
+  };
+  function spriteObj(ctx, sx, sy, o) {
+    const def = PROP_SPRITE[o.kind]; if (!def) return false;
+    const im = PH.propart && PH.propart.img(def.name);
+    if (!im || !im.complete || !im.naturalWidth) return false;
+    const h = def.h, w = Math.round(im.naturalWidth * (h / im.naturalHeight));
+    const baseY = sy + ISO.TH * (def.big ? 1.15 : 0.72);   // fuente (2×2) al centro del footprint
+    ctx.drawImage(im, Math.round(sx - w / 2), Math.round(baseY - h), w, h);
+    return true;
+  }
   function drawObject(ctx, sx, sy, o) {
+    if (spriteObj(ctx, sx, sy, o)) return;   // atrezzo con sprite real del pack (prioridad)
     if (PH.furniart && PH.furniart.has(o.kind)) {
       const done = drawFurni(ctx, sx, sy, o.kind, o.kind === 'grow' ? 40 : 48);
       if (o.kind === 'grow') {
