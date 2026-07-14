@@ -1,13 +1,15 @@
-// Mundo top-down por tiles. Mapa original (no reproduce ningún mundo con
-// copyright). Tiles como sprites de color generados en runtime (placeholder
-// original); sustituibles por un tileset propio importado a Unity.
+// Mundo top-down por tiles. Mapa original + TILESET ORIGINAL (PNGs propios en
+// StreamingAssets/tiles, generados por scripts/gen-tiles.mjs; sin assets de
+// terceros). Carga las texturas en runtime (Android/WebGL/desktop) con filtro
+// Point y PPU 16. Fallback a color liso si faltara alguna.
 using UnityEngine;
+using UnityEngine.Networking;
+using System.Collections;
 using System.Collections.Generic;
 
 public class TileWorld : MonoBehaviour
 {
-    // Leyenda: .=hierba ,=hierba alta(encuentro) P=camino W=agua T=árbol
-    //          H=edificio D=puerta F=flores  (todo arte propio/placeholder)
+    // .=hierba ,=hierba alta(encuentro) P=camino W=agua T=árbol H=muro D=puerta F=flores
     static readonly string[] MAP = {
         "TTTTTTTTTTTTTTTTTTTT",
         "T..........,,,.....T",
@@ -26,33 +28,60 @@ public class TileWorld : MonoBehaviour
         "T....,,,..P..,,,...T",
         "TTTTTTTTTTTTTTTTTTTT",
     };
-
-    static readonly Dictionary<char, Color> COL = new Dictionary<char, Color> {
-        { '.', new Color(0.725f,0.788f,0.639f) }, { ',', new Color(0.655f,0.729f,0.565f) },
-        { 'P', new Color(0.847f,0.804f,0.690f) }, { 'W', new Color(0.663f,0.780f,0.812f) },
-        { 'T', new Color(0.498f,0.604f,0.435f) }, { 'H', new Color(0.788f,0.718f,0.604f) },
-        { 'D', new Color(0.604f,0.416f,0.290f) }, { 'F', new Color(0.804f,0.729f,0.851f) },
+    static readonly Dictionary<char, string> TILE = new Dictionary<char, string> {
+        { '.', "grass" }, { ',', "tallgrass" }, { 'P', "path" }, { 'W', "water" },
+        { 'T', "tree" }, { 'H', "wall" }, { 'D', "door" }, { 'F', "flowers" },
     };
-    const string SOLID = "THW";   // caracteres que bloquean el paso
+    static readonly Dictionary<char, Color> FALLBACK = new Dictionary<char, Color> {
+        { '.', new Color(0.56f,0.70f,0.42f) }, { ',', new Color(0.44f,0.60f,0.31f) },
+        { 'P', new Color(0.79f,0.66f,0.47f) }, { 'W', new Color(0.48f,0.71f,0.78f) },
+        { 'T', new Color(0.31f,0.48f,0.26f) }, { 'H', new Color(0.85f,0.78f,0.65f) },
+        { 'D', new Color(0.48f,0.29f,0.17f) }, { 'F', new Color(0.80f,0.73f,0.85f) },
+    };
+    const string SOLID = "THW";
 
     public Vector2Int spawn = new Vector2Int(9, 13);
     int W, H;
+    readonly Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
 
     public void Build()
     {
-        H = MAP.Length; W = MAP[0].Length;
+        H = MAP.Length; W = MAP[0].Length;        // dims disponibles ya (para el jugador)
+        StartCoroutine(LoadAndBuild());
+    }
+
+    IEnumerator LoadAndBuild()
+    {
+        var names = new HashSet<string>(TILE.Values);
+        foreach (var n in names) yield return LoadSprite(n);
         for (int y = 0; y < H; y++)
             for (int x = 0; x < W; x++)
             {
                 char c = MAP[y][x];
-                Color col = COL.ContainsKey(c) ? COL[c] : COL['.'];
+                Sprite sp = (TILE.ContainsKey(c) && sprites.ContainsKey(TILE[c])) ? sprites[TILE[c]]
+                          : MakeSprite(FALLBACK.ContainsKey(c) ? FALLBACK[c] : FALLBACK['.'], 16, 16);
                 var go = new GameObject($"t_{x}_{y}");
                 go.transform.SetParent(transform);
                 go.transform.position = CellToWorld(x, y);
-                var sr = go.AddComponent<SpriteRenderer>();
-                sr.sprite = MakeSprite(col, 16, 16);
-                sr.sortingOrder = 0;
+                go.AddComponent<SpriteRenderer>().sprite = sp;
             }
+    }
+
+    IEnumerator LoadSprite(string name)
+    {
+        string url = System.IO.Path.Combine(Application.streamingAssetsPath, "tiles", name + ".png");
+        if (!url.Contains("://")) url = "file://" + url;      // desktop
+        using (var req = UnityWebRequestTexture.GetTexture(url))
+        {
+            yield return req.SendWebRequest();
+            if (req.result == UnityWebRequest.Result.Success)
+            {
+                var tex = DownloadHandlerTexture.GetContent(req);
+                tex.filterMode = FilterMode.Point; tex.wrapMode = TextureWrapMode.Clamp;
+                sprites[name] = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), Bootstrap.PPU);
+            }
+            else Debug.LogWarning($"tile '{name}' no cargó ({req.error}); uso fallback.");
+        }
     }
 
     public bool IsSolid(int x, int y)
@@ -62,22 +91,16 @@ public class TileWorld : MonoBehaviour
     }
     public bool IsEncounter(int x, int y) => (x >= 0 && y >= 0 && x < W && y < H) && MAP[y][x] == ',';
 
-    // Rejilla -> mundo. y crece hacia abajo en el mapa, hacia arriba en el mundo.
     public Vector3 CellToWorld(int x, int y) => new Vector3(x - W / 2f + 0.5f, (H / 2f) - y - 0.5f, 0);
     public Vector2Int WorldToCell(Vector3 p) => new Vector2Int(
         Mathf.RoundToInt(p.x + W / 2f - 0.5f), Mathf.RoundToInt(H / 2f - p.y - 0.5f));
 
-    // --- Sprite de color liso (placeholder original), point-filter (pixel) ---
-    public static Sprite MakeSprite(Color c, int w, int h)
+    // Sprite de color liso (fallback original), point-filter.
+    public static Sprite MakeSprite(Color col, int w, int h)
     {
         var tex = new Texture2D(w, h, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp };
         var px = new Color[w * h];
-        for (int i = 0; i < px.Length; i++)
-        {
-            // leve sombreado para dar textura, sin depender de arte externo
-            int yy = i / w; float sh = (yy % 4 == 0) ? -0.04f : 0f;
-            px[i] = new Color(Mathf.Clamp01(c.r + sh), Mathf.Clamp01(c.g + sh), Mathf.Clamp01(c.b + sh), 1f);
-        }
+        for (int i = 0; i < px.Length; i++) { float sh = ((i / w) % 4 == 0) ? -0.04f : 0f; px[i] = new Color(col.r + sh, col.g + sh, col.b + sh, 1f); }
         tex.SetPixels(px); tex.Apply();
         return Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), Bootstrap.PPU);
     }
