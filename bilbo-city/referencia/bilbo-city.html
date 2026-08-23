@@ -136,6 +136,7 @@ function azar(){_semilla=(_semilla+0x6D2B79F5)>>>0;let t=_semilla;
  return ((t^(t>>>14))>>>0)/4294967296;}
 const rnd=(a,b)=>a+azar()*(b-a), rndi=(a,b)=>Math.floor(rnd(a,b+1));
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const modp=(a,n)=>((a%n)+n)%n;   /* el % de JS devuelve negativos y aquí no valen */
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const lerp=(a,b,t)=>a+(b-a)*t;
 function hash(a,b){let h=(a*73856093)^(b*19349663);h=(h^(h>>13))*1274126177;return Math.abs(h^(h>>16));}
@@ -693,50 +694,51 @@ const ATLAS=[
  'FFFFFFDDDDDDDPPPPDDDDDDDDDUUUUUUUUUUUGGGGGGGGGSPPPPPTTFF',
  'FFFFFDDDDDDDDPPPPDDDDDDDDDUUUUUUUUUUUGGGGGGGGSSSSSSTTTFF',
  'FFFFDDDDDDDDDPPPPDDDDDDDDDUUUUUUUUUUUGGGGGGGSSSSSSSSSTFF',
- 'FFFFDDDDDDDDDDDDDDDDDDDDDIXXXXXXXXXAAAAGGGGSSSSSSSSSFFFF',
- 'FFFFFDDDDDDDDDDDDDDDDDIIIIXXXXXXXXXAAAAAAACPPPPSSSFFFFFF',
- 'FFFFFFDDDDDDDDDDDDZZZIIIIIIXXXXXXXXAAAAAAACPPPPCSSSFFFFF',
- 'FFFFFFOOODDDDDDDDZZZZZZIIIIIXXXXXXXAAAAAAACPPPPCCCCFFFFF',
- 'FFFFFOOOOOOODDDDZZZZZZIIIIIIIXXXXXAAAAAAAACCCCCCCCCCFFFF',
- 'FFFFOOOOOOOOOOBZZZZZZZIPPPIIIIXXXXAAAAAAAACCCCCCCCCCFFFF',
- 'FFFFOOOOOOOOOOBZZZZZZZIPPPPIIIIIXAAAAAAAAACCCCCCCCCCFFFF',
- 'FFFFFOOOOOOOOOBZZZZZZEEPPPPIIIIIIAAAAAAAAACCCCCCCCCCFFFF',
- 'FFFFOOOOOOOOOOZZZZZZBEEEPPPPIIIIIAAAAAAAAMMMMCCCCCCCCFFF',
- 'FFFOOOOOOOOOOOZZZZZBEEEEEIIIIIIIIRAAAAAAMMMMMMMMMCCCCFFF',
- 'FFOOOOOOOOOOOOZZZZBBBEEEEIIIIIIIRRRRAAAMMMMMMMMMMMMMMFFF',
- 'FOOOOOOOOOOOOOBZZBBBBEEEEIIIIIIRRRRRRRAMMMMMMMMMMMMMFFFF',
- 'FOOOOOOOOOOOOOOBBBBBBBEEEIIIPPPPRRRRRRRMMMMMMMMMMMMMFFFF',
- 'FOOOOOOOOOOOOOOBBBBBBBBBBIIIPPPPRRRRRRRMMMMMMMMMMMMMFFFF',
- 'FFOOOOOOOOOOOOOBBBBBBBBBBIIRPPPPRRRRRRRMMMMMMMMMMMMFFFFF',
- 'FFOOOOOOOOOOOOOBBBBBBBBBBBRRRRRRRRRRRRRRMMMMMMMMMMFFFFFF',
- 'FFOOOOOOOOOOOOOBBBBBBBBBBBRRRRRRRRRFFRRRMMMMMMMMMFFFFFFF',
+ 'FFFFODDDDDDDDDDDDDDDDDDDDDUUUUUXXXXUUGGGGGGSSSSSSSSSFFFF',
+ 'FFFFFOODDDDDDDDDDDDDDDDDDDUXXXXXXXXAAAAGGGSPPPPSSSFFFFFF',
+ 'FFFFFFOOOODDDDDDDDDDDDDDIIIXXXXXXXXAAAAAAGSPPPPSSSSFFFFF',
+ 'FFFFFFOOOOOODDDDDDDDDDIIIIIIXXXXXXXAAAAAAACPPPPSSSSFFFFF',
+ 'FFFFFOOOOOOZZZZZDDDDDIIIIIIIIXXXXXAAAAAAAACCCSSSSSSSFFFF',
+ 'FFFFOOZZZZZZZZZZZBBBBIIPPPIIIIXXXXAAAAAAAACCCCSSSSSSFFFF',
+ 'FFFFOZZZZZZZZZZZZBBBBBIPPPPIIIIIXAAAAAAAAACCCCCCSSSSFFFF',
+ 'FFFFFZZZZZZZZZZZBBBBBEEPPPPIIIIIIAAAAAAAAACCCCCCCCCCFFFF',
+ 'FFFFOOZZZZZZZZZBBBBBBEEEPPPPIIIIIAAAAAAAAMMMMCCCCCCCCFFF',
+ 'FFFOOOOOOOOOOOOBBBBBEEEEEIIIIIIIIRAAAAAAMMMMMMMMMCCCCFFF',
+ 'FFOOOOOOOOOOOOOBBBBBBEEEEIIIIIIIRRRRAAAMMMMMMMMMMMMMMFFF',
+ 'FOOOOOOOOOOOOOBBBBBBBEEEEIIIIIIRRRRRRRAMMMMMMMMMMMMMFFFF',
+ 'FOOOOOOOOOOOOOBBBBBBBBEEEIIIPPPPRRRRRRRMMMMMMMMMMMMMFFFF',
+ 'FOOOOOOOOOOOOOBBBBBBBBBBBIIIPPPPRRRRRRRMMMMMMMMMMMMMFFFF',
+ 'FFOOOOOOOOOOOOBBBBBBBBBBBIIRPPPPRRRRRRRMMMMMMMMMMMMFFFFF',
+ 'FFOOOOOOOOOOOOBBBBBBBBBBBBRRRRRRRRRRRRRRMMMMMMMMMMFFFFFF',
+ 'FFOOOOOOOOOOOOBBBBBBBBBBBBRRRRRRRRRFFRRRMMMMMMMMMFFFFFFF',
  'FFFOOOOOOOOOOFFBBBBBBBBBBFRRRRRRRRFFFFRRRMMMMMMMFFFFFFFF',
  'FFFFOOOOOOOOFFFFBBBBBBBFFFFRRRRRRRFFFFFRRMMMMMMFFFFFFFFF',
  'FFFFFOOOFFFFFFFFFBBBFFFFFFFFRRRRRFFFFFFFRRMMMMFFFFFFFFFF',
  'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRFFFFFFFFFFFMMFFFFFFFFFFFF',
  'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
 ];
-/* sp = separación entre calles en horizontal · spy = en vertical (si falta, cuadrado)
-   w = ancho de calle · jit = cuánto serpentea la calle, en casillas (0 = a escuadra)
-   Cada barrio tiene su trama porque en el plano real se distinguen de un vistazo: el
-   Casco Viejo es un nudo de callejas torcidas, el Ensanche una retícula ancha y regular,
-   y los barrios de los años sesenta manzanas alargadas. Si todos llevan la misma malla,
-   el plano entero parece papel milimetrado. */
+/* sp = separación entre calles a lo largo · spy = a lo ancho · w = ancho de calle
+   ang = giro de la trama en grados · curva y onda = cuánto y cada cuánto serpentea
+
+   Bilbao no está a escuadra: las calles siguen la ladera y el río, así que cada barrio
+   tiene su rumbo y sus curvas. Con una malla ortogonal el plano salía encajonado, como
+   papel milimetrado. El Ensanche va en diagonal, los barrios de ladera trepan curvando,
+   y el Casco Viejo se retuerce. */
 const ZONAS={
- C:{n:'Casco Viejo',   sp:7, spy:6, w:2, ox:1, oy:2, jit:3, estilo:'denso',      tinte:'#6b4a2e'},
- A:{n:'Abando',        sp:15,spy:12,w:2, ox:5, oy:3, estilo:'senorial',   tinte:'#4a4f5c'},
- I:{n:'Indautxu',      sp:14,spy:12,w:2, ox:2, oy:6, estilo:'senorial',   tinte:'#55505f'},
- X:{n:'Abandoibarra',  sp:17,spy:15,w:2, ox:7, oy:1, estilo:'abierto',    tinte:'#5f6b74'},
- D:{n:'Deusto',        sp:13,spy:8, w:2, ox:3, oy:5, estilo:'bloques',    tinte:'#4e5a52'},
- Z:{n:'Zorrotzaurre',  sp:20,spy:16,w:2, ox:2, oy:2, estilo:'industrial', tinte:'#6b5f45'},
- O:{n:'Olabeaga',      sp:18,spy:14,w:2, ox:6, oy:4, estilo:'industrial', tinte:'#5a5340'},
- S:{n:'Santutxu',      sp:9, spy:14,w:2, ox:4, oy:1, jit:2, estilo:'bloques',    tinte:'#5c4a3a'},
- G:{n:'Begoña',        sp:12,spy:8, w:2, ox:6, oy:7, jit:2, estilo:'bloques',    tinte:'#57505a'},
- U:{n:'Uribarri',      sp:9, spy:15,w:2, ox:0, oy:3, jit:2, estilo:'bloques',    tinte:'#4f5a63'},
- T:{n:'Txurdinaga',    sp:13,spy:10,w:2, ox:2, oy:5, jit:3, estilo:'bloques',    tinte:'#4d5750'},
- M:{n:'Miribilla',     sp:12,spy:13,w:2, ox:9, oy:2, estilo:'senorial',   tinte:'#525a63'},
- B:{n:'Basurto',       sp:12,spy:9, w:2, ox:4, oy:6, estilo:'bloques',    tinte:'#4e5548'},
- R:{n:'Rekalde',       sp:8, spy:7, w:2, ox:7, oy:4, jit:3, estilo:'denso',      tinte:'#584c46'},
+ C:{n:'Casco Viejo',   sp:7, spy:6, w:2, ox:1, oy:2, ang:12, curva:3, onda:11, estilo:'denso',      tinte:'#6b4a2e'},
+ A:{n:'Abando',        sp:15,spy:12,w:2, ox:5, oy:3, ang:31, curva:1, onda:40, estilo:'senorial',   tinte:'#4a4f5c'},
+ I:{n:'Indautxu',      sp:14,spy:12,w:2, ox:2, oy:6, ang:28, curva:2, onda:34, estilo:'senorial',   tinte:'#55505f'},
+ X:{n:'Abandoibarra',  sp:17,spy:15,w:2, ox:7, oy:1, ang:20, curva:2, onda:40, estilo:'abierto',    tinte:'#5f6b74'},
+ D:{n:'Deusto',        sp:13,spy:8, w:2, ox:3, oy:5, ang:8,  curva:4, onda:30, estilo:'bloques',    tinte:'#4e5a52'},
+ Z:{n:'Zorrotzaurre',  sp:20,spy:16,w:2, ox:2, oy:2, ang:14, curva:2, onda:30, estilo:'industrial', tinte:'#6b5f45'},
+ O:{n:'Olabeaga',      sp:18,spy:14,w:2, ox:6, oy:4, ang:40, curva:5, onda:26, estilo:'industrial', tinte:'#5a5340'},
+ S:{n:'Santutxu',      sp:9, spy:14,w:2, ox:4, oy:1, ang:55, curva:6, onda:20, estilo:'bloques',    tinte:'#5c4a3a'},
+ G:{n:'Begoña',        sp:12,spy:8, w:2, ox:6, oy:7, ang:65, curva:7, onda:18, estilo:'bloques',    tinte:'#57505a'},
+ U:{n:'Uribarri',      sp:9, spy:15,w:2, ox:0, oy:3, ang:48, curva:6, onda:20, estilo:'bloques',    tinte:'#4f5a63'},
+ T:{n:'Txurdinaga',    sp:13,spy:10,w:2, ox:2, oy:5, ang:35, curva:8, onda:22, estilo:'bloques',    tinte:'#4d5750'},
+ M:{n:'Miribilla',     sp:12,spy:13,w:2, ox:9, oy:2, ang:20, curva:5, onda:24, estilo:'senorial',   tinte:'#525a63'},
+ B:{n:'Basurto',       sp:12,spy:9, w:2, ox:4, oy:6, ang:12, curva:3, onda:28, estilo:'bloques',    tinte:'#4e5548'},
+ R:{n:'Rekalde',       sp:8, spy:7, w:2, ox:7, oy:4, ang:40, curva:5, onda:18, estilo:'denso',      tinte:'#584c46'},
  P:{n:'Parque',        verde:1, estilo:'parque', tinte:'#46603f'},
  E:{n:'San Mamés',     estadio:1, sp:16,w:3, ox:0, oy:0, estilo:'abierto', tinte:'#4a5f52'},
  F:{n:'Los montes',    verde:1, monte:1, estilo:'monte', tinte:'#3f5a3c'},
@@ -762,12 +764,12 @@ function linea(pts,ancho,t,soloSi){
    redonda a propósito: con un vértice en punta el plano parecía una tienda de campaña,
    no un río. Los dos brazos son distintos porque en Bilbao tampoco son iguales — el
    Nervión baja recto y el tramo de salida se abre. */
-const RIA=[[223,76],[210,72],[198,68],[188,64],[178,62],[168,60],[156,58],[144,56],
- [132,55],[120,55],[108,56],[96,59],[86,63],[76,71],[68,83],[64,96],
- [66,108],[58,118],[44,126],[28,132],[12,136],[0,138]];
+const RIA=[[223,76],[212,80],[202,84],[192,82],[182,76],[172,70],[162,64],[150,60],
+ [138,58],[126,58],[114,60],[102,64],[90,70],[78,78],[66,86],[54,92],
+ [42,92],[32,86],[24,76],[16,64],[8,52],[0,44]];
 /* Canal de Deusto: corre paralelo al tramo de salida, por dentro, y deja Zorrotzaurre
    convertida en isla. Arranca y muere en la ría, que es lo que la hace isla y no península. */
-const CANAL=[[92,64],[86,76],[82,90],[80,104],[74,114]];
+const CANAL=[[70,76],[58,73],[46,71],[34,67],[26,60]];
 /* Ancho en casillas a lo largo del recorrido: estrecho aguas arriba, ancho en la salida. */
 function lineaRio(pts,a0,a1,t){
  let total=0;const seg=[];
@@ -811,10 +813,13 @@ function generarCiudad(){
    if(((x+3)%24<1)||((y+7)%24<1))map[y*MW+x]=ACERA;
    continue;}
   if(Z.estadio)continue;
-  /* El serpenteo va por tramos de 6 casillas, no casilla a casilla: así la calle se
-     tuerce como una calleja vieja pero sigue siendo una calle, no una escalera. */
-  const jx=Z.jit?hash(7,(y/6)|0)%(Z.jit+1):0, jy=Z.jit?hash((x/6)|0,11)%(Z.jit+1):0;
-  if(((x+Z.ox+jx)%Z.sp)<Z.w||((y+Z.oy+jy)%(Z.spy||Z.sp))<Z.w)map[y*MW+x]=ROAD;}
+  /* La calle no es (x % sp): es una curva de nivel de un sistema de coordenadas girado
+     y ondulado. Como u y v son continuas, las calles salen continuas — curvas de verdad,
+     no escaleras — y la trama sigue conectada. */
+  const ca=Math.cos(Z.ang*Math.PI/180), sa=Math.sin(Z.ang*Math.PI/180), on=Z.onda||24, cu=Z.curva||0;
+  const u= x*ca + y*sa + cu*Math.sin(y/on) + Z.ox;
+  const v=-x*sa + y*ca + cu*Math.sin(x/on) + Z.oy;
+  if(modp(u,Z.sp)<Z.w||modp(v,Z.spy||Z.sp)<Z.w)map[y*MW+x]=ROAD;}
  /* 4 · Gran Vía: la diagonal del Ensanche, con Moyúa en medio */
  linea([[172,72],[160,80],[148,88],[136,96]],5,ROAD,(x,y)=>!ZONAS[charDe(x,y)].verde);
  for(let dy=-7;dy<=7;dy++)for(let dx=-7;dx<=7;dx++){
@@ -823,6 +828,23 @@ function generarCiudad(){
  for(let dy=-5;dy<=5;dy++)for(let dx=-5;dx<=5;dx++){
   if(dx*dx+dy*dy>25)continue;
   pon(136+dx,96+dy, dx*dx+dy*dy>15?ROAD:PLAZA);}
+ /* 4 bis · las arterias con nombre. Sin ellas todas las calles miden igual y ninguna
+    manda: en el plano de Bilbao se leen de un vistazo la Gran Vía, Urquijo, Autonomía,
+    las dos riberas y el eje de Deusto. Van anchas y por encima de la trama del barrio. */
+ const ARTERIAS=[
+  [[168,80],[148,92],[130,102],[116,108]],   /* Alameda de Urquijo */
+  [[158,104],[136,110],[114,112],[100,112]], /* Autonomía */
+  [[124,98],[110,106],[98,114]],             /* Sabino Arana, hacia San Mamés */
+  [[160,84],[152,96],[146,110]],             /* Alameda Rekalde */
+  [[178,56],[160,50],[140,46],[118,46],[100,48]], /* Campo Volantín y Uribitarte */
+  [[184,70],[170,66],[150,62],[130,62],[112,64]], /* el Arenal y la Ribera */
+  [[104,52],[86,46],[68,42],[48,40]],        /* Lehendakari Aguirre, el eje de Deusto */
+  [[178,52],[190,60],[200,70],[206,82]],     /* Zabalbide, subiendo a Santutxu */
+  [[186,96],[198,106],[208,118]],            /* Miraflores */
+  [[150,40],[164,36],[178,34]],              /* Zumalakarregi */
+ ];
+ ARTERIAS.forEach(a=>linea(a,5,ROAD,(x,y)=>!ZONAS[charDe(x,y)].verde));
+
  /* 5 · San Mamés */
  for(let cy=0;cy<NCY;cy++)for(let cx=0;cx<NCX;cx++){
   if(ATLAS[cy][cx]!=='E')continue;
@@ -978,6 +1000,20 @@ function colocarPOIs(){
   {id:'abando',n:'Estación de Abando',ico:'🚉',c:'#c9a13f',mira:1,cerca:[150,84],z:'A'},
   {id:'ayto',n:'El Ayuntamiento',ico:'🏢',c:'#a8b4bc',mira:1,cerca:[132,38],z:'U'},
   {id:'casilla',n:'Parque de Doña Casilda',ico:'🌳',c:C.cesped,mira:1,cerca:[102,86],z:'P'},
+  /* Los emblemáticos, cada uno en su barrio de verdad */
+  {id:'arriaga',n:'Teatro Arriaga',ico:'🎭',c:'#d0a05a',mira:1,cerca:[172,66],z:'C'},
+  {id:'catedral',n:'Catedral de Santiago',ico:'⛪',c:'#c2b8a8',mira:1,cerca:[182,78],z:'C'},
+  {id:'plazanueva',n:'La Plaza Nueva',ico:'🏛',c:'#bfa878',mira:1,cerca:[178,72],z:'C'},
+  {id:'euskalduna',n:'Palacio Euskalduna',ico:'🎼',c:'#8fa0ad',mira:1,cerca:[112,68],z:'X'},
+  {id:'iberdrola',n:'Torre Iberdrola',ico:'🏙',c:'#9fb4c4',mira:1,cerca:[134,68],z:'X'},
+  {id:'bellasartes',n:'Museo de Bellas Artes',ico:'🖼',c:'#b09a6e',mira:1,cerca:[110,84],z:'P'},
+  {id:'alhondiga',n:'Azkuna Zentroa',ico:'🍷',c:'#c07f52',mira:1,cerca:[116,88],z:'I'},
+  {id:'begonia',n:'Basílica de Begoña',ico:'⛪',c:'#cbbf9c',mira:1,cerca:[166,44],z:'G'},
+  {id:'funicular',n:'Funicular de Artxanda',ico:'🚡',c:'#7fbf9f',mira:1,cerca:[140,30],z:'U'},
+  {id:'moyua',n:'Plaza Moyúa',ico:'⛲',c:'#a8bcc8',mira:1,cerca:[160,80],z:'A'},
+  {id:'deustuni',n:'Universidad de Deusto',ico:'🎓',c:'#b8a05c',mira:1,cerca:[76,48],z:'D'},
+  {id:'maritimo',n:'Museo Marítimo',ico:'⚓',c:'#6f9ab5',mira:1,cerca:[48,96],z:'O'},
+  {id:'arena',n:'Bilbao Arena',ico:'🏀',c:'#c4693f',mira:1,cerca:[180,110],z:'M'},
  ].forEach(d=>POI.push({...d,
    p:d.mira?puntoZona(d.cerca[0],d.cerca[1],30,d.z):puntoPortal(d.cerca[0],d.cerca[1],30,d.z)}));
 }

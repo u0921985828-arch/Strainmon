@@ -87,7 +87,7 @@ const dormir = ms => new Promise(r => setTimeout(r, ms));
         fallos.push(p.n + ' está en ' + real + ' y debería estar en ' + esperado[p.id]);
       }
     });
-    if (!descolocados) bien.push('los 15 sitios en su barrio');
+    if (!descolocados) bien.push('los ' + A.POI.length + ' sitios en su barrio');
 
     // ── 5 · la red viaria está conectada ───────────────────────────────
     {

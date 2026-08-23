@@ -149,6 +149,20 @@ public class Estado {
         S("abando",   "Estación de Abando",     Paleta.H("#c9a13f"), null,       150, 84, 'A', true);
         S("ayto",     "El Ayuntamiento",        Paleta.H("#a8b4bc"), null,       132, 38, 'U', true);
         S("casilla",  "Parque de Doña Casilda", Paleta.Cesped,       null,       102, 86, 'P', true);
+        // Los emblemáticos, cada uno en su barrio de verdad
+        S("arriaga",  "Teatro Arriaga",         Paleta.H("#d0a05a"), null,       172, 66, 'C', true);
+        S("catedral", "Catedral de Santiago",   Paleta.H("#c2b8a8"), null,       182, 78, 'C', true);
+        S("plazanueva","La Plaza Nueva",        Paleta.H("#bfa878"), null,       178, 72, 'C', true);
+        S("euskalduna","Palacio Euskalduna",    Paleta.H("#8fa0ad"), null,       112, 68, 'X', true);
+        S("iberdrola","Torre Iberdrola",        Paleta.H("#9fb4c4"), null,       134, 68, 'X', true);
+        S("bellasartes","Museo de Bellas Artes",Paleta.H("#b09a6e"), null,       110, 84, 'P', true);
+        S("alhondiga","Azkuna Zentroa",         Paleta.H("#c07f52"), null,       116, 88, 'I', true);
+        S("begonia",  "Basílica de Begoña",     Paleta.H("#cbbf9c"), null,       166, 44, 'G', true);
+        S("funicular","Funicular de Artxanda",  Paleta.H("#7fbf9f"), null,       140, 30, 'U', true);
+        S("moyua",    "Plaza Moyúa",            Paleta.H("#a8bcc8"), null,       160, 80, 'A', true);
+        S("deustuni", "Universidad de Deusto",  Paleta.H("#b8a05c"), null,        76, 48, 'D', true);
+        S("maritimo", "Museo Marítimo",         Paleta.H("#6f9ab5"), null,        48, 96, 'O', true);
+        S("arena",    "Bilbao Arena",           Paleta.H("#c4693f"), null,       180,110, 'M', true);
     }
     public static Sitio Sitio_(string id) { return Sitios.Find(s => s.Id == id); }
 }

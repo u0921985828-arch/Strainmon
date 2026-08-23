@@ -5,9 +5,12 @@ namespace BilboCity {
 
 public class Zona {
     public string Nombre, Estilo;
-    /// Sp = separación entre calles en horizontal · Spy = en vertical (0 = cuadrado)
-    /// Jit = cuánto serpentea la calle, en casillas (0 = a escuadra)
-    public int Sp, Spy, W, Ox, Oy, Jit;
+    /// Sp = separación entre calles a lo largo · Spy = a lo ancho (0 = cuadrado)
+    /// Ang = giro de la trama en grados · Curva y Onda = cuánto y cada cuánto serpentea.
+    /// Bilbao no está a escuadra: las calles siguen la ladera y el río, así que cada
+    /// barrio tiene su rumbo. Con una malla ortogonal el plano sale encajonado.
+    public int Sp, Spy, W, Ox, Oy;
+    public float Ang, Curva, Onda;
     public bool Verde, Monte, Estadio;
     public Color32 Tinte;
     public int SpV { get { return Spy > 0 ? Spy : Sp; } }
@@ -40,23 +43,23 @@ public static class Ciudad {
         "FFFFFFDDDDDDDPPPPDDDDDDDDDUUUUUUUUUUUGGGGGGGGGSPPPPPTTFF",
         "FFFFFDDDDDDDDPPPPDDDDDDDDDUUUUUUUUUUUGGGGGGGGSSSSSSTTTFF",
         "FFFFDDDDDDDDDPPPPDDDDDDDDDUUUUUUUUUUUGGGGGGGSSSSSSSSSTFF",
-        "FFFFDDDDDDDDDDDDDDDDDDDDDIXXXXXXXXXAAAAGGGGSSSSSSSSSFFFF",
-        "FFFFFDDDDDDDDDDDDDDDDDIIIIXXXXXXXXXAAAAAAACPPPPSSSFFFFFF",
-        "FFFFFFDDDDDDDDDDDDZZZIIIIIIXXXXXXXXAAAAAAACPPPPCSSSFFFFF",
-        "FFFFFFOOODDDDDDDDZZZZZZIIIIIXXXXXXXAAAAAAACPPPPCCCCFFFFF",
-        "FFFFFOOOOOOODDDDZZZZZZIIIIIIIXXXXXAAAAAAAACCCCCCCCCCFFFF",
-        "FFFFOOOOOOOOOOBZZZZZZZIPPPIIIIXXXXAAAAAAAACCCCCCCCCCFFFF",
-        "FFFFOOOOOOOOOOBZZZZZZZIPPPPIIIIIXAAAAAAAAACCCCCCCCCCFFFF",
-        "FFFFFOOOOOOOOOBZZZZZZEEPPPPIIIIIIAAAAAAAAACCCCCCCCCCFFFF",
-        "FFFFOOOOOOOOOOZZZZZZBEEEPPPPIIIIIAAAAAAAAMMMMCCCCCCCCFFF",
-        "FFFOOOOOOOOOOOZZZZZBEEEEEIIIIIIIIRAAAAAAMMMMMMMMMCCCCFFF",
-        "FFOOOOOOOOOOOOZZZZBBBEEEEIIIIIIIRRRRAAAMMMMMMMMMMMMMMFFF",
-        "FOOOOOOOOOOOOOBZZBBBBEEEEIIIIIIRRRRRRRAMMMMMMMMMMMMMFFFF",
-        "FOOOOOOOOOOOOOOBBBBBBBEEEIIIPPPPRRRRRRRMMMMMMMMMMMMMFFFF",
-        "FOOOOOOOOOOOOOOBBBBBBBBBBIIIPPPPRRRRRRRMMMMMMMMMMMMMFFFF",
-        "FFOOOOOOOOOOOOOBBBBBBBBBBIIRPPPPRRRRRRRMMMMMMMMMMMMFFFFF",
-        "FFOOOOOOOOOOOOOBBBBBBBBBBBRRRRRRRRRRRRRRMMMMMMMMMMFFFFFF",
-        "FFOOOOOOOOOOOOOBBBBBBBBBBBRRRRRRRRRFFRRRMMMMMMMMMFFFFFFF",
+        "FFFFODDDDDDDDDDDDDDDDDDDDDUUUUUXXXXUUGGGGGGSSSSSSSSSFFFF",
+        "FFFFFOODDDDDDDDDDDDDDDDDDDUXXXXXXXXAAAAGGGSPPPPSSSFFFFFF",
+        "FFFFFFOOOODDDDDDDDDDDDDDIIIXXXXXXXXAAAAAAGSPPPPSSSSFFFFF",
+        "FFFFFFOOOOOODDDDDDDDDDIIIIIIXXXXXXXAAAAAAACPPPPSSSSFFFFF",
+        "FFFFFOOOOOOZZZZZDDDDDIIIIIIIIXXXXXAAAAAAAACCCSSSSSSSFFFF",
+        "FFFFOOZZZZZZZZZZZBBBBIIPPPIIIIXXXXAAAAAAAACCCCSSSSSSFFFF",
+        "FFFFOZZZZZZZZZZZZBBBBBIPPPPIIIIIXAAAAAAAAACCCCCCSSSSFFFF",
+        "FFFFFZZZZZZZZZZZBBBBBEEPPPPIIIIIIAAAAAAAAACCCCCCCCCCFFFF",
+        "FFFFOOZZZZZZZZZBBBBBBEEEPPPPIIIIIAAAAAAAAMMMMCCCCCCCCFFF",
+        "FFFOOOOOOOOOOOOBBBBBEEEEEIIIIIIIIRAAAAAAMMMMMMMMMCCCCFFF",
+        "FFOOOOOOOOOOOOOBBBBBBEEEEIIIIIIIRRRRAAAMMMMMMMMMMMMMMFFF",
+        "FOOOOOOOOOOOOOBBBBBBBEEEEIIIIIIRRRRRRRAMMMMMMMMMMMMMFFFF",
+        "FOOOOOOOOOOOOOBBBBBBBBEEEIIIPPPPRRRRRRRMMMMMMMMMMMMMFFFF",
+        "FOOOOOOOOOOOOOBBBBBBBBBBBIIIPPPPRRRRRRRMMMMMMMMMMMMMFFFF",
+        "FFOOOOOOOOOOOOBBBBBBBBBBBIIRPPPPRRRRRRRMMMMMMMMMMMMFFFFF",
+        "FFOOOOOOOOOOOOBBBBBBBBBBBBRRRRRRRRRRRRRRMMMMMMMMMMFFFFFF",
+        "FFOOOOOOOOOOOOBBBBBBBBBBBBRRRRRRRRRFFRRRMMMMMMMMMFFFFFFF",
         "FFFOOOOOOOOOOFFBBBBBBBBBBFRRRRRRRRFFFFRRRMMMMMMMFFFFFFFF",
         "FFFFOOOOOOOOFFFFBBBBBBBFFFFRRRRRRRFFFFFRRMMMMMMFFFFFFFFF",
         "FFFFFOOOFFFFFFFFFBBBFFFFFFFFRRRRRFFFFFFFRRMMMMFFFFFFFFFF",
@@ -65,20 +68,20 @@ public static class Ciudad {
     };
 
     public static readonly Dictionary<char, Zona> Zonas = new Dictionary<char, Zona> {
-        {'C', new Zona{ Nombre="Casco Viejo",  Sp=7,  Spy=6, W=2, Ox=1, Oy=2, Jit=3, Estilo="denso",      Tinte=Paleta.H("#6b4a2e") }},
-        {'A', new Zona{ Nombre="Abando",       Sp=15, Spy=12,W=2, Ox=5, Oy=3, Estilo="senorial",   Tinte=Paleta.H("#4a4f5c") }},
-        {'I', new Zona{ Nombre="Indautxu",     Sp=14, Spy=12,W=2, Ox=2, Oy=6, Estilo="senorial",   Tinte=Paleta.H("#55505f") }},
-        {'X', new Zona{ Nombre="Abandoibarra", Sp=17, Spy=15,W=2, Ox=7, Oy=1, Estilo="abierto",    Tinte=Paleta.H("#5f6b74") }},
-        {'D', new Zona{ Nombre="Deusto",       Sp=13, Spy=8, W=2, Ox=3, Oy=5, Estilo="bloques",    Tinte=Paleta.H("#4e5a52") }},
-        {'Z', new Zona{ Nombre="Zorrotzaurre", Sp=20, Spy=16,W=2, Ox=2, Oy=2, Estilo="industrial", Tinte=Paleta.H("#6b5f45") }},
-        {'O', new Zona{ Nombre="Olabeaga",     Sp=18, Spy=14,W=2, Ox=6, Oy=4, Estilo="industrial", Tinte=Paleta.H("#5a5340") }},
-        {'S', new Zona{ Nombre="Santutxu",     Sp=9,  Spy=14,W=2, Ox=4, Oy=1, Jit=2, Estilo="bloques",    Tinte=Paleta.H("#5c4a3a") }},
-        {'G', new Zona{ Nombre="Begoña",       Sp=12, Spy=8, W=2, Ox=6, Oy=7, Jit=2, Estilo="bloques",    Tinte=Paleta.H("#57505a") }},
-        {'U', new Zona{ Nombre="Uribarri",     Sp=9,  Spy=15,W=2, Ox=0, Oy=3, Jit=2, Estilo="bloques",    Tinte=Paleta.H("#4f5a63") }},
-        {'T', new Zona{ Nombre="Txurdinaga",   Sp=13, Spy=10,W=2, Ox=2, Oy=5, Jit=3, Estilo="bloques",    Tinte=Paleta.H("#4d5750") }},
-        {'M', new Zona{ Nombre="Miribilla",    Sp=12, Spy=13,W=2, Ox=9, Oy=2, Estilo="senorial",   Tinte=Paleta.H("#525a63") }},
-        {'B', new Zona{ Nombre="Basurto",      Sp=12, Spy=9,W=2, Ox=4, Oy=6, Estilo="bloques",    Tinte=Paleta.H("#4e5548") }},
-        {'R', new Zona{ Nombre="Rekalde",      Sp=8,  Spy=7, W=2, Ox=7, Oy=4, Jit=3, Estilo="denso",      Tinte=Paleta.H("#584c46") }},
+        {'C', new Zona{ Nombre="Casco Viejo",  Sp=7,  Spy=6, W=2, Ox=1, Oy=2, Ang=12, Curva=3, Onda=11, Estilo="denso",      Tinte=Paleta.H("#6b4a2e") }},
+        {'A', new Zona{ Nombre="Abando",       Sp=15, Spy=12,W=2, Ox=5, Oy=3, Ang=31, Curva=1, Onda=40, Estilo="senorial",   Tinte=Paleta.H("#4a4f5c") }},
+        {'I', new Zona{ Nombre="Indautxu",     Sp=14, Spy=12,W=2, Ox=2, Oy=6, Ang=28, Curva=2, Onda=34, Estilo="senorial",   Tinte=Paleta.H("#55505f") }},
+        {'X', new Zona{ Nombre="Abandoibarra", Sp=17, Spy=15,W=2, Ox=7, Oy=1, Ang=20, Curva=2, Onda=40, Estilo="abierto",    Tinte=Paleta.H("#5f6b74") }},
+        {'D', new Zona{ Nombre="Deusto",       Sp=13, Spy=8, W=2, Ox=3, Oy=5, Ang=8,  Curva=4, Onda=30, Estilo="bloques",    Tinte=Paleta.H("#4e5a52") }},
+        {'Z', new Zona{ Nombre="Zorrotzaurre", Sp=20, Spy=16,W=2, Ox=2, Oy=2, Ang=14, Curva=2, Onda=30, Estilo="industrial", Tinte=Paleta.H("#6b5f45") }},
+        {'O', new Zona{ Nombre="Olabeaga",     Sp=18, Spy=14,W=2, Ox=6, Oy=4, Ang=40, Curva=5, Onda=26, Estilo="industrial", Tinte=Paleta.H("#5a5340") }},
+        {'S', new Zona{ Nombre="Santutxu",     Sp=9,  Spy=14,W=2, Ox=4, Oy=1, Ang=55, Curva=6, Onda=20, Estilo="bloques",    Tinte=Paleta.H("#5c4a3a") }},
+        {'G', new Zona{ Nombre="Begoña",       Sp=12, Spy=8, W=2, Ox=6, Oy=7, Ang=65, Curva=7, Onda=18, Estilo="bloques",    Tinte=Paleta.H("#57505a") }},
+        {'U', new Zona{ Nombre="Uribarri",     Sp=9,  Spy=15,W=2, Ox=0, Oy=3, Ang=48, Curva=6, Onda=20, Estilo="bloques",    Tinte=Paleta.H("#4f5a63") }},
+        {'T', new Zona{ Nombre="Txurdinaga",   Sp=13, Spy=10,W=2, Ox=2, Oy=5, Ang=35, Curva=8, Onda=22, Estilo="bloques",    Tinte=Paleta.H("#4d5750") }},
+        {'M', new Zona{ Nombre="Miribilla",    Sp=12, Spy=13,W=2, Ox=9, Oy=2, Ang=20, Curva=5, Onda=24, Estilo="senorial",   Tinte=Paleta.H("#525a63") }},
+        {'B', new Zona{ Nombre="Basurto",      Sp=12, Spy=9, W=2, Ox=4, Oy=6, Ang=12, Curva=3, Onda=28, Estilo="bloques",    Tinte=Paleta.H("#4e5548") }},
+        {'R', new Zona{ Nombre="Rekalde",      Sp=8,  Spy=7, W=2, Ox=7, Oy=4, Ang=40, Curva=5, Onda=18, Estilo="denso",      Tinte=Paleta.H("#584c46") }},
         {'P', new Zona{ Nombre="Parque",       Verde=true, Estilo="parque", Tinte=Paleta.H("#46603f") }},
         {'E', new Zona{ Nombre="San Mamés",    Estadio=true, Sp=16, W=3, Estilo="abierto", Tinte=Paleta.H("#4a5f52") }},
         {'F', new Zona{ Nombre="Los montes",   Verde=true, Monte=true, Estilo="monte", Tinte=Paleta.H("#3f5a3c") }},
@@ -100,21 +103,24 @@ public static class Ciudad {
     }
     public static bool Andable(Suelo t) { return t != Suelo.Edif && t != Suelo.Agua; }
 
+    /// El % de C# devuelve negativos y aquí no valen.
+    static float ModP(float a, float n) { return ((a % n) + n) % n; }
+
     static void Pon(int x, int y, Suelo t) { if (x >= 0 && y >= 0 && x < MW && y < MH) Map[y*MW+x] = (byte)t; }
     static void Rect(int x0, int y0, int w, int h, Suelo t) {
         for (int y = y0; y < y0+h; y++) for (int x = x0; x < x0+w; x++) Pon(x,y,t);
     }
 
     static readonly Vector2[] RIA = {
-        new Vector2(223,76), new Vector2(210,72), new Vector2(198,68), new Vector2(188,64),
-        new Vector2(178,62), new Vector2(168,60), new Vector2(156,58), new Vector2(144,56),
-        new Vector2(132,55), new Vector2(120,55), new Vector2(108,56), new Vector2(96,59),
-        new Vector2(86,63),  new Vector2(76,71),  new Vector2(68,83),  new Vector2(64,96),
-        new Vector2(66,108), new Vector2(58,118), new Vector2(44,126), new Vector2(28,132),
-        new Vector2(12,136), new Vector2(0,138)
+        new Vector2(223,76), new Vector2(212,80), new Vector2(202,84), new Vector2(192,82),
+        new Vector2(182,76), new Vector2(172,70), new Vector2(162,64), new Vector2(150,60),
+        new Vector2(138,58), new Vector2(126,58), new Vector2(114,60), new Vector2(102,64),
+        new Vector2(90,70),  new Vector2(78,78),  new Vector2(66,86),  new Vector2(54,92),
+        new Vector2(42,92),  new Vector2(32,86),  new Vector2(24,76),  new Vector2(16,64),
+        new Vector2(8,52),   new Vector2(0,44)
     };
     static readonly Vector2[] CANAL = {
-        new Vector2(92,64), new Vector2(86,76), new Vector2(82,90), new Vector2(80,104), new Vector2(74,114)
+        new Vector2(70,76), new Vector2(58,73), new Vector2(46,71), new Vector2(34,67), new Vector2(26,60)
     };
 
     /// Cauce de ancho variable: estrecho aguas arriba y ancho en la salida. Con ancho
@@ -203,11 +209,15 @@ public static class Ciudad {
                     continue;
                 }
                 if (Z.Estadio) continue;
-                // El serpenteo va por tramos de 6 casillas, no casilla a casilla: así la
-                // calle se tuerce como una calleja vieja pero sigue siendo una calle.
-                int jx = Z.Jit > 0 ? Utiles.Hash(7, y/6) % (Z.Jit+1) : 0;
-                int jy = Z.Jit > 0 ? Utiles.Hash(x/6, 11) % (Z.Jit+1) : 0;
-                if (((x+Z.Ox+jx) % Z.Sp) < Z.W || ((y+Z.Oy+jy) % Z.SpV) < Z.W) Map[y*MW+x] = (byte)Suelo.Road;
+                // La calle no es (x % Sp): es una curva de nivel de un sistema de
+                // coordenadas girado y ondulado. Como u y v son continuas, las calles
+                // salen continuas — curvas de verdad, no escaleras — y la trama sigue
+                // conectada.
+                float ca = Mathf.Cos(Z.Ang*Mathf.Deg2Rad), sa = Mathf.Sin(Z.Ang*Mathf.Deg2Rad);
+                float on = Z.Onda > 0 ? Z.Onda : 24f;
+                float u =  x*ca + y*sa + Z.Curva*Mathf.Sin(y/on) + Z.Ox;
+                float v = -x*sa + y*ca + Z.Curva*Mathf.Sin(x/on) + Z.Oy;
+                if (ModP(u, Z.Sp) < Z.W || ModP(v, Z.SpV) < Z.W) Map[y*MW+x] = (byte)Suelo.Road;
             }
 
         // 4 · la Gran Vía, con Moyúa y Sagrado Corazón
@@ -221,6 +231,24 @@ public static class Ciudad {
             if (dx*dx+dy*dy > 25) continue;
             Pon(136+dx, 96+dy, dx*dx+dy*dy > 15 ? Suelo.Road : Suelo.Plaza);
         }
+
+        // 4 bis · las arterias con nombre. Sin ellas todas las calles miden igual y
+        // ninguna manda: en el plano de Bilbao se leen de un vistazo la Gran Vía,
+        // Urquijo, Autonomía, las dos riberas y el eje de Deusto.
+        var arterias = new[]{
+            new[]{ new Vector2(168,80), new Vector2(148,92), new Vector2(130,102), new Vector2(116,108) },
+            new[]{ new Vector2(158,104), new Vector2(136,110), new Vector2(114,112), new Vector2(100,112) },
+            new[]{ new Vector2(124,98), new Vector2(110,106), new Vector2(98,114) },
+            new[]{ new Vector2(160,84), new Vector2(152,96), new Vector2(146,110) },
+            new[]{ new Vector2(178,56), new Vector2(160,50), new Vector2(140,46), new Vector2(118,46), new Vector2(100,48) },
+            new[]{ new Vector2(184,70), new Vector2(170,66), new Vector2(150,62), new Vector2(130,62), new Vector2(112,64) },
+            new[]{ new Vector2(104,52), new Vector2(86,46), new Vector2(68,42), new Vector2(48,40) },
+            new[]{ new Vector2(178,52), new Vector2(190,60), new Vector2(200,70), new Vector2(206,82) },
+            new[]{ new Vector2(186,96), new Vector2(198,106), new Vector2(208,118) },
+            new[]{ new Vector2(150,40), new Vector2(164,36), new Vector2(178,34) },
+        };
+        foreach (var a in arterias)
+            Linea(a, 5, Suelo.Road, (x,y) => !ZonaDe(Mathf.Clamp(x,0,MW-1),Mathf.Clamp(y,0,MH-1)).Verde);
 
         // 5 · San Mamés
         int sx = 0, sy = 0, n = 0;

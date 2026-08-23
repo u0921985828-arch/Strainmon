@@ -29,14 +29,14 @@ VALLE = [(40,0),(48,1),(53,4),(55,9),(54,14),(50,15),(52,19),(53,24),(51,29),
 # Centro de cada barrio. El peso encoge (<1) o agranda (>1) su reparto: el Casco Viejo
 # es pequeño de verdad y Txurdinaga y Rekalde son extensos.
 SEMILLAS = [('D',(17, 9)), ('U',(33, 9)), ('G',(41,11)), ('T',(48, 6)), ('S',(46,15)),
-            ('O',(10,28)), ('X',(31,17)), ('C',(45,19)), ('A',(37,20)), ('I',(28,22)),
+            ('O',(9,26)), ('X',(31,17)), ('C',(45,19)), ('A',(37,20)), ('I',(28,22)),
             ('P',(25,21)), ('E',(22,24)), ('B',(18,27)), ('M',(43,25)), ('R',(33,28))]
 PESO = {'C':.85,'P':.5,'E':.55,'X':.75,'O':1.15,'T':1.15,'S':.95,'G':.95,
         'R':1.1,'B':1.05,'D':1.2,'U':1.05,'M':.95}
 
 # Zorrotzaurre va aparte: es la isla entre la ría y el Canal de Deusto, y un reparto
 # por cercanía la dejaría a caballo de las dos orillas.
-ISLA = [(19,16),(23,17),(21,22),(17,26),(14,25),(15,20)]
+ISLA = [(6,19),(16,18),(17,20),(15,23),(7,23),(5,21)]
 
 # Los parques grandes, uno a uno. En el plano municipal el verde dentro de la ciudad
 # pesa tanto como el monte de alrededor, y sin ellos todo sale gris.
@@ -51,9 +51,9 @@ PARQUES = [
 # La ría, en casillas del mapa (la misma polilínea que dibuja el juego). Sirve para que
 # ningún barrio salte de orilla: en Bilbao el Casco Viejo está en una margen y el
 # Ensanche en la otra, y un reparto por cercanía sin esto los mezcla.
-RIA = [(223,76),(210,72),(198,68),(188,64),(178,62),(168,60),(156,58),(144,56),
-       (132,55),(120,55),(108,56),(96,59),(86,63),(76,71),(68,83),(64,96),
-       (66,108),(58,118),(44,126),(28,132),(12,136),(0,138)]
+RIA = [(223,76),(212,80),(202,84),(192,82),(182,76),(172,70),(162,64),(150,60),
+       (138,58),(126,58),(114,60),(102,64),(90,70),(78,78),(66,86),(54,92),
+       (42,92),(32,86),(24,76),(16,64),(8,52),(0,44)]
 NORTE = set('DUGTS')          # margen derecha, la de Deusto y Begoña
 SUR    = set('XCAIPEBMR')     # margen izquierda, la del Ensanche
 def riaEnX(mx):
