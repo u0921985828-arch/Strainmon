@@ -30,8 +30,8 @@ cd herramientas/html && npm install    # compila 'canvas' de forma nativa
 apt-get install -y dotnet-sdk-8.0      # Roslyn, para compilar el C# sin Unity
 ```
 
-**No des por buena una tarea sin que `./verificar.sh` pase en verde.** Si tocas la
-generación de ciudad, saca también el plano y míralo:
+**No des por buena una tarea sin que `./verificar.sh` pase en verde.** Si tocas la trama
+de la ciudad, saca también el plano y míralo (ver *La ciudad*):
 
 ```bash
 node herramientas/html/plano.js
@@ -41,8 +41,8 @@ node herramientas/html/plano.js
 
 `herramientas/html/pruebas.js` arranca el juego de verdad sobre un DOM simulado con canvas
 real: juega las 8 misiones, entra y sale de los 7 interiores, verifica que los sitios
-están sobre suelo pisable y en su barrio, mide la conectividad de la red viaria, prueba
-combate, conducción desde 16 puntos al azar, muerte y 150 s de bucle.
+están sobre suelo pisable y cerca de donde los pone el plano, mide la conectividad de la
+red viaria, prueba combate, conducción desde 16 puntos al azar, muerte y 150 s de bucle.
 
 `herramientas/compilar/` compila el C# de verdad, sin tener Unity: hay un remedo de la API
 del motor — solo firmas, nunca se ejecuta — y el juego se compila contra él con Roslyn, con
@@ -90,40 +90,76 @@ Si algo sale espejado o al revés, empieza mirando ahí.
 
 ## La ciudad
 
-Bilbao no es procedural: está trazada. El mapa mide 448×288 casillas y el atlas 112×72
-celdas, una letra por barrio. Encima se tallan la ría con su curso real, el Canal de Deusto
-que hace isla a Zorrotzaurre, diez arterias con nombre, la Gran Vía con Moyúa y Sagrado
-Corazón, San Mamés y los montes cerrando el valle.
+Bilbao no es procedural ni está trazada a mano: **está sacada del plano municipal**. El
+plano oficial es un PDF vectorial y trae la ciudad en dos capas que se separan limpias:
 
-**El atlas no se edita a mano.** Lo escribe `herramientas/plano/trazar.py`, en el HTML y en
-`Ciudad.cs` a la vez, a partir de la mancha urbana y de una semilla por barrio. Mover un
-barrio es mover un punto.
+- las **manzanas**, los parques y la ría son polígonos con su color de relleno;
+- la **calzada** es un trazo blanco con el ancho real de cada calle — un callejón del
+  Casco Viejo y la Gran Vía son la misma línea con distinto grosor.
 
-**Hay ferrocarril.** `VIA` / `Suelo.Via` es un tipo de suelo propio: se pisa pero no se
-conduce. Las cuatro líneas —metro por el valle, Renfe hacia el suroeste, Euskotren al este
-y la de Zorrotza— se dibujan **sin pisar la calzada**, así que cada cruce con una calle
-queda a nivel y la red viaria no se corta. Si añades una línea, respétalo o la batería te
-lo dirá en la conectividad.
+`herramientas/plano/extraer.py` separa esas capas, las pasa a casillas y escribe el
+resultado comprimido en el HTML y en `unity/.../Ciudad/Plano.cs` a la vez. Lo que se
+dibuja son **las calles de Bilbao**, no unas calles verosímiles: la retícula del Ensanche,
+la diagonal de la Gran Vía, la elipse de Moyúa, el meandro de Deusto, la Ribera de Deustu
+entre el Canal de Deusto y la ría, las revueltas de Artxanda y las autopistas cruzando el
+monte.
 
-**Hay dos maneras de trazar la calle, y el estilo del barrio decide cuál.**
+```bash
+python3 herramientas/plano/extraer.py ruta/al/plano_bilbao.pdf
+```
 
-- `senorial` y `abierto` → **malla**. Retícula regular estampada, girada al rumbo del
-  barrio. El Ensanche se proyectó de una vez y a tiralíneas, y tiene que notarse.
-- los demás → **crecida**. Cada calle nace sobre otra ya trazada y corre hasta topar con
-  una tercera. Eso da cruces en T, fondos de saco, manzanas de tamaños distintos y bordes
-  dentados. Una malla no puede dar nada de eso por muchos parámetros que le pongas: son
-  bandas paralelas infinitas recortadas contra el borde del barrio.
+El mapa mide **1440×776 casillas a 5,16 m cada una**: 7,4 km de este a oeste por 4 de
+norte a sur, el término municipal entero. Es rectangular porque el valle lo es.
 
-En un plano de verdad la red de calles va primero y las manzanas son lo que queda entre
-ellas; estampar un patrón sobre un área es al revés, y se nota.
+**El bloque `/*<<<PLANO*/ … /*PLANO>>>*/` no se edita a mano** — ni en el HTML ni en
+`Plano.cs`. Se vuelve a ejecutar el extractor.
 
-**La red viaria se cose al final.** La ciudad se traza por partes y siempre queda algún
-trozo suelto — una carretera que muere en el monte, la isla sin enlace. `CoserRedViaria`
-los engancha a la pieza mayor. No recoloques coordenadas a mano para arreglar eso: el
-cosido sigue valiendo cuando se mueva el trazado, y las coordenadas no.
+### Qué se toma del plano y qué no
 
-Si tocas el atlas o los trazados, **comprueba dos cosas**: que la red viaria siga conectada
-por encima del 90 % (lo mide la batería) y que los sitios sigan cayendo en su barrio.
+Se toma la **geometría**: por dónde va cada calle, dónde acaba una manzana, dónde está el
+parque, dónde pone el ayuntamiento el rótulo de cada barrio. Eso son hechos geográficos de
+la ciudad, no una creación de quien dibujó el plano. No se toma nada de su forma de
+dibujarlo: ni colores, ni tipografías, ni símbolos, ni composición. **El PDF no entra en el
+repositorio**; solo entra la rejilla derivada, y el juego la pinta con arte propio.
+
+### Cuatro cosas que no son obvias y cuestan de encontrar
+
+- **El plano pinta la ría de una vez y le devuelve el suelo encima.** La mancha de agua se
+  come Zorrotzaurre, y la isla reaparece porque después le pintan el suelo blanco por
+  encima. Por eso los rellenos se redibujan **en el orden del plano** (`seqno`) y el blanco
+  es una clase más. Reordenando por clases, la Ribera de Deustu queda bajo el agua.
+- **Las calles peatonales no llevan trazo blanco.** Las Siete Calles, media Bilbao la Vieja
+  y los pasajes de los grupos de viviendas son el hueco entre manzanas y nada más. Lo que
+  queda en blanco a menos de seis casillas de una casa es calle; el mismo blanco lejos de
+  toda casa es monte.
+- **La acera se saca erosionando la calzada, y eso parte la red.** En una calle de tres
+  casillas en diagonal el interior queda en una hilera que solo se toca por la esquina, y
+  los coches se mueven en cruz. Hay dos remiendos después del corte, uno local para las
+  diagonales y otro global; la cifra a vigilar es la que imprime el extractor
+  (`calzada en una pieza`, ahora 95,6 %) y la que mide la batería.
+- **Los barrios se reparten por cercanía al rótulo, pero andando.** El agua no se cruza —
+  los puentes tampoco — así que Deustu no se come Olabeaga aunque estén a doscientos metros
+  a vuelo de pájaro. Es una aproximación: el plano no dibuja los límites de barrio, solo
+  los rotula, y en la frontera entre dos hay casillas que caen en el vecino.
+
+**Hay monte.** `MONTE` / `Suelo.Monte` es un tipo de suelo propio y es la mitad del mapa:
+se pisa pero no se conduce, y va más tupido de árboles que un parque urbano.
+
+**Los sitios llevan la coordenada del plano**, no una pista. Por eso se colocan buscando la
+casilla pisable **más cercana** (`cercaDe` / `Ciudad.CercaDe`), no una al azar del
+vecindario: correr la catedral cien metros la saca del Casco Viejo. La batería comprueba
+que ninguno se va más de 30 casillas de donde lo pone el plano, y
+`herramientas/plano/sitios.py` que el HTML y Unity tengan las mismas coordenadas.
+
+Si tocas el extractor, **comprueba tres cosas**: que la red viaria siga por encima del
+90 % (lo mide la batería), que los sitios sigan cerca de su coordenada, y saca el plano y
+míralo:
+
+```bash
+node herramientas/html/plano.js                      # con rótulos y chinchetas
+node herramientas/html/plano.js salida.png --zoom 2 --sin-nombres
+node herramientas/html/manzanas.js                   # el grano de la trama
+```
 
 ## Pixel perfect
 
@@ -147,7 +183,7 @@ referencia/          prototipo HTML probado, forja de sprites, estudio de arte, 
 unity/BilboCity/     proyecto Unity 2022.3 LTS
   Assets/Scripts/
     Arte/            paleta, forja de personajes, tiles, vehículos, fuente de bits
-    Ciudad/          generación de Bilbao, volcado a Tilemaps, mobiliario urbano
+    Ciudad/          carga de la trama de Bilbao, volcado a Tilemaps, mobiliario urbano
     Entidades/       jugador, vehículo, peatones, enemigos, tráfico
     Juego/           estado, combate, misiones, curros, interiores, acciones, bootstrap
     UI/              HUD, controles táctiles, menús, audio, guardado
@@ -168,5 +204,5 @@ escena serializada a mano es la mejor forma de acabar con un proyecto que no car
 - No reescribas el HTML para "modernizarlo". Es la referencia probada, no deuda técnica.
 - No metas dependencias nuevas de Unity sin una razón fuerte. El proyecto va con paquetes
   base a propósito.
-- No sustituyas la generación de ciudad por algo procedural. La gracia es que sea Bilbao.
+- No sustituyas la trama por algo procedural. La gracia es que sea Bilbao de verdad.
 - No añadas `.unity`, `.meta` ni `Library/` al repositorio.

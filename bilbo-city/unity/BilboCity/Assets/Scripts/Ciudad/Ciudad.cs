@@ -1,138 +1,51 @@
-using System.Collections.Generic;
+using System;
+using System.IO;
+using System.IO.Compression;
 using UnityEngine;
 
 namespace BilboCity {
 
-public class Zona {
-    public string Nombre, Estilo;
-    /// Sp = separación entre calles a lo largo · Spy = a lo ancho (0 = cuadrado)
-    /// Ang = giro de la trama en grados · Curva y Onda = cuánto y cada cuánto serpentea.
-    /// Bilbao no está a escuadra: las calles siguen la ladera y el río, así que cada
-    /// barrio tiene su rumbo. Con una malla ortogonal el plano sale encajonado.
-    public int Sp, Spy, W, Ox, Oy;
-    public float Ang, Curva, Onda;
-    public bool Verde, Monte, Estadio;
-    public Color32 Tinte;
-    public int SpV { get { return Spy > 0 ? Spy : Sp; } }
+/// <summary>Un barrio de Bilbao: cómo se llama, de qué es su pavimento y a qué tira su luz.</summary>
+public class Barrio {
+    public readonly string Nombre, Estilo;
+    public readonly Color32 Tinte;
+    /// Donde el plano municipal pone su rótulo, en casillas.
+    public readonly int X, Y;
+    public Barrio(string nombre, string estilo, string tinte, int x, int y) {
+        Nombre = nombre; Estilo = estilo; Tinte = Paleta.H(tinte); X = x; Y = y;
+    }
 }
 
 /// <summary>
-/// La planta de Bilbao. El atlas de 112×72 celdas reparte los barrios, y encima se tallan
-/// la ría, el Canal de Deusto que hace isla a Zorrotzaurre, la Gran Vía y los puentes.
-/// El mapa es rectangular porque el valle va tumbado de este a oeste.
-/// El atlas lo escribe herramientas/plano/trazar.py: no se edita a mano.
+/// La planta de Bilbao. Ya no se genera: se carga.
+///
+/// El plano municipal es vectorial y trae la ciudad en dos capas que se separan limpias:
+/// las manzanas, los parques y la ría son polígonos con su relleno, y la calzada es un
+/// trazo blanco con el ancho real de cada calle. herramientas/plano/extraer.py separa
+/// esas capas, las pasa a casillas y las deja en Plano.cs comprimidas. Lo que se dibuja
+/// aquí son las calles de Bilbao —la retícula del Ensanche, la diagonal de la Gran Vía,
+/// la elipse de Moyúa, la Ribera de Deustu entre el canal y la ría— y no unas calles
+/// verosímiles.
+///
+/// El mapa mide 1440×776 casillas a 5,16 m cada una: 7,4 km de este a oeste por 4 de
+/// norte a sur. Es rectangular porque el valle lo es.
 /// </summary>
 public static class Ciudad {
-    public const int MW = 448, MH = 288, CEL = 4;
-    public const int NCX = MW/CEL, NCY = MH/CEL;
+    public const int MW = Plano.MW, MH = Plano.MH;
     public static readonly byte[] Map = new byte[MW*MH];
     public static readonly byte[] Roof = new byte[MW*MH];
+    /// Índice del barrio de cada casilla, en el orden de Plano.Barrios.
+    public static readonly byte[] BarrioIdx = new byte[MW*MH];
 
-    static readonly string[] ATLAS = {
-        "DDDDDDDDDDDDDFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFUUUUUUUUFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "DDDDDDDDDDDDDDDDDDDFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFUUUUUUUUUUFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "DDDDDDDDDDDDDDDDDDDDDDFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFUUUUUUUUUUUFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFTTTTFF",
-        "DDDDDDDDDDDDDDDDDDDDDDDDDDFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFUUUUUUUUUUUFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFTTTTTTTTTT",
-        "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDFFFFFFFFFFFFFFFFFFFFFFFFFFFUUUUUUUUUUUUUFFFFFFFFFFFFFUGGGFFFFFFFFFFFFFFTTTTTTTTTTTT",
-        "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDFFFFFFFFFFFFFFFDDUUUUUUUUUUUUUUUUUUUUFFFFFFFFFFUUGGGGGTFFFFFFFFFFFTTTTTTTTTTTTT",
-        "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDFFFFFFDDDDDDDDDUUUUUUUUUUUUUUUUUUUUUFFFFFFFFUUGGGGGGGTFFFFFFFFFTTTTTTTTTTTTTT",
-        "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDFFDDDDDDDDDDDUUUUUUUUUUUUUUUUUUUUUFFFFFFFFUUGGGGGGGTFFFFFFFFTTTTTTTTTTTTTTT",
-        "FDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDUUUUUUUUUUUUUUUUUUUUUUFFFFFUUUGGGGGGGGTTFFFFFFTTTTTTTTTTTTTTTT",
-        "FFDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDUUUUUUUUUUUUUUUUUUUUUUFFFFUUUGGGGGGGGGGTFFFFFTTTTTTTTTTTTTTTTT",
-        "FFDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDUUUUUUUUUUUUUUUUUUUUUUUFFUUUUGGGGGGGGGGTFFFFTTTTTTTTTTTTTTTTTT",
-        "FFFYDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDUUUUUUUUUUUUUUUUUUUUUUUFFUUUGGGGGGGGGGGTFFTTTTTTTTTTTTTTTTTTTT",
-        "FFFYYYDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDUUUUUUUUUUUUUUUUUUUUUUUUUUUUGGGGGGGGGGGGFTTTTTTTTTTTTTTTTTTTTT",
-        "FFFFYYYYDDDDDDDDDDDDDDDDDDPPPPPPPDDDDDDDDDDDDDDDDDUUUUUUUUUUUUUUUUUUUUUUUUUUUGGGGGGGGGGGGGTTTTTTTTTTTTTTTTTTTTTT",
-        "FFFFFYYYYDDDDDDDDDDDDDDDDDPPPPPPPDDDDDDDDDDDDDDDDDUUUUUUUUUUUUUUUUUUUUUUUUUUGGGGGGGGGGGGGGTTTTTTTTTTTTTTTTTTTTTT",
-        "FFFFFFYYYYYDDDDDDDDDDDDDDDPPPPPPPDDDDDDDDDDDDDDDDDUUUUUUUUUUUUUUUUUUUUUUUUUUGGGGGGGGGGGGGGTTTTPPPPPPPPTTTTTTTTTT",
-        "FFFFFFFYYYYYYDDDDDDDDDDDDDPPPPPPPDDDDDDDDDDDDDDDDDUUUUUUUUUUUUUUUUUUUUUUUUUGGGGGGGGGGGGGGGTTTTPPPPPPPPTTTTTTTTTF",
-        "FFFFFFFYYYYYYYDDDDDDDDDDDDPPPPPPPDDDDDDDDDDDDDDDDUUAAAAAAXUUUUUUUUUUUUUUUUUGGGGGGGGGGGGGGGGTTTPPPPPPPPTTTTTTTTFF",
-        "FFFFFFFFYYYYYYYYDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDAAAAAAAAAXXXXXUUUUUUUUUUUUGGGGGGGGGGGGGGGGGTTTPPPPPPPPTTTTTTTTFF",
-        "FFFFFFFFFYYYYYYYYDDDDDDDDDDDDDDDDDDDZZZZZZZZZZDAAAAAAAAAAAXXXXXXUUUUUUUUUUGGGGGGGGGGGGGGGGGTTTPPPPPPPPTTTTTTTFFF",
-        "FFFFFFFFFFYYYYYYYYOODDDDDDZZZZZZZZZZZZZZZZZZZZZAAAAAAAAAAAXXXXXXXXUUUUUUUGGGGGGGGGGGGGGGGGGTTTPPPPPPPPTTTTTTTFFF",
-        "FFFFFFFFFFYYYYYYYYOOOOOOOZZZZZZZZZZZZZZZZZZZZZZZAAAAAAAAAAAXXXXXXXXAUUUUUGGGGGGGGGGGGGGGGGGTTTTTTTTTTTTTTTTTFFFF",
-        "FFFFFFFFFFFYYYYYYYOOOOOOOZZZZZZZZZZZZZZZZZZZZZZIIIAAAAAAAAAAAXXXXAACCCUUGGGGGGGGGGGGGGGGGGGTTTTTTTTTTTTTTTTFFFFF",
-        "FFFFFFFFFFFYYYYYYYOOOOOOOOZZZZZZZZZZZZZZZZZZZZIIIIIAAAAAAAAAAAAAAAACCCCUGGGGGGGGGGGGGGGGGGGTTTTTTTTTTTTTTTFFFFFF",
-        "FFFFFFFFYYYYYYYYYYOOOOOOOOOZZZZZZZZZZZZZZZZZZIIIPPPIAAAAAAAAAAAAAACCCCCCGGPPPPPPGGGGGGGGGGGTTTTTTTTTTTTTTFFFFFFF",
-        "FFFFFFYYYYYYYYYYYYOOOOOOOOOOOOOOOOOBBBBBBBBBIIPPPPPPPIAAAAAAAAAAAACCCCCCCGPPPPPPGGGGGGGGGGGTTTTTTTTTTTTTTTTFFFFF",
-        "FFFFFYYYYYYYYYYYYYYOOOOOOOOOOOOOOOOBBBBBBBBBEIPPPPPPPIIAAAAAAAAAACCCCCCCCCPPPPPPGGGGGGGGGSSSSTTTTTTTTTTTTTTTTTFF",
-        "FFFFYYYYYYYYYYYYYYYOOOOOOOOOOOOOOOBBBBBBBBBBEEPPPPPPPIIIIAAAAAAAACCCCCCCCCPPPPPPGGGGGGGGSSSSSSSTTTTTTTTTTTTTTTTT",
-        "FFFYYYYYYYYYYYYYYYYOOOOOOOOOOOOOOOBBBBBBBBBEEEEPPPPPPPIIIIAAAAAAACCCCCCCCCPPPPPPGGGGGGSSSSSSSSSSSTTTTTTTTTTTTTTT",
-        "FYYYYYYYYYYYYYYYYYYOOOOOOOOOOOOOOOBBBBBBBBBEEEEPPPPPPPIIIIIAAAAACCCCCCCCCCCCCCCGGGGGSSSSSSSSSSSSSSTTTTTTTTTTTTTT",
-        "YYYYYYYYYYYYYYYYYYYOOOOOOOOOOOOOOOBBBBBBBBBEEEEEEIIIIIIIIIIIIAAACCCCCCCCCCCCCCCCGGSSSSSSSSSSSSSSSSSSTTTTTTTTTTTT",
-        "YYYYYYYYYYYYYYYYYYYOOOOOOOOOOOOOOBBBBBBBBBBEEEEEEIIIIIIIIIIIIIAACCCCCCCCCCCCCCCCCCSSSSSSSSSSSSSSSSSSSTTTTTTTTTTT",
-        "YYYYYYYYYYYYYYYYYYYOOOOOOOOOOOOOOBBBBBBBBBBBEEEEEIIIIIIIIIIIIIIICCCCCCCCCCCCCCCCCCCCSSSSSSSSSSSSSSSSSSTTTTTTTTTT",
-        "YYYYYYYYYYYYYYYYYYOOOOOOOOOOOOOOOBBBBBBBBBBBEEEEEIIIIIIIIIIIIIIICCCCCCCCCCCCCCCCCMMMMSSSSSSSSSSSSSSSSSSTTTTTTTTT",
-        "YYYYYYYYYYYYYYYYYYOOOOOOOOOOOOOOOBBBBBBBBBBBBEEEIIIIIIIIIIIIIIIICCCCCCCCCCCCCCMMMMMMMMMSSSSSSSSSSSSSSSSSSTTTTTTT",
-        "YYYYYYYYYYYYYYYYYYOOOOOOOOOOOOOOOBBBBBBBBBBBBBEEIIIIIIIIIIIIIIRRRCCCCCCCCMMMMMMMMMMMMMMMMMSSSSSSSSSSSSSSSSTTTTTT",
-        "YYYYYYYYYYYYYYYYYYOOOOOOOOOOOOOOBBBBBBBBBBBBBBBIIIIIIIPPPPPPRRRRRRCMMMMMMMMMMMMMMMMMMMMMMMMMSSSSSSSSMMMMMMMMTTTT",
-        "YYYYYYYYYYYYYYYYYYOOOOOOOOOOOOOOBBBBBBBBBBBBBBBBIIIIIIPPPPPPRRRRRRMMMMMMMMMMMMMMMMMMMMMMMMMMMMMSSSMMMMMMMMMMMTTT",
-        "FYYYYYYYYYYYYYYYYYOOOOOOOOOOOOOOBBBBBBBBBBBBBBBBIIIIRRPPPPPPRRRRRRMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMTTT",
-        "FFFYYYYYYYYYYYYYYYOOOOOOOOOOOOOOBBBBBBBBBBBBBBBBRRRRRRPPPPPPRRRRRRMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMTT",
-        "FFFFFFFFFFFFFFFFFFFFOOOOOOOOOOOOBBBBBBBBBBBBBBBBRRRRRRPPPPPPRRRRRRMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMTT",
-        "FFFFFFFFFFFFFFFFFFFFOOOOOOOOOOOOBBBBBBBBBBBBBBBRRRRRRRRRRRRRRRRRRRMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMST",
-        "FFFFFFFFFFFFFFFFFFFFOOOOOOOOOOOOBBBBBBBBBBBBBBBRRRRRRRRRRRRRRRRRRRMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMST",
-        "FFFFFFFFFFFFFFFFFFFFOOOOOOOOOOOOBBBBBBBBBBBBBBRRRRRRRRRRRRRRRRRRRRRMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMSS",
-        "FFFFFFFFFFFFFFFFFFFFOOOOOOOOOOOOBBBBBBBBBBBBBBRRRRRRRRRRRRRRRRRRRRPPPPPPMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMSS",
-        "FFFFFFFFFFFFFFFFFFFFOOOOOOOOOOOOBBBBBBBBBBBFFFRRRRRRRRRRRRRRRRRRRRPPPPPPMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMSS",
-        "FFFFFFFFFFFFFFFFFFFFOOOOOOOOOOOOBBBBBBBBBFFFFFRRRRRRRRRRRRRRRRRRRRPPPPPPMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMSS",
-        "FFFFFFFFFFFFFFFFFFFFFOOOOOOOOOOOBBBBBBBFFFFFFFFRRRRRRRRRRRRRRRRRRRPPPPPPMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMSS",
-        "FFFFFFFFFFFFFFFFFFFFFOOOOOOOOOOOBBBBBFFFFFFFFFFRRRRRRRRRRRRRRRRRRRPPPPPPMMMMMMMMMMMMMMMFMMMMMMMMMMMMMMMMMMMMMMSS",
-        "FFFFFFFFFFFFFFFFFFFFFFOOOOOOOOOOBBFFFFFFFFFFFFFRRRRRRRRRRRRRRRRRRRRMMMMMMMMMMMMMMMMMMMMMFFFMMMMMMMMMMMMMMMMMMMSS",
-        "FFFFFFFFFFFFFFFFFFFFFFFOOOOOOOOOBFFFFFFFFFFFFFFFRRRRRRRRRRRRRRRRRRRRMMMMMMMMMMMMMMMMMMMMFFFFFFMMMMMMMMMMMMMMMMSS",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFOOOOOOFFFFFFFFFFFFFFFFFRRRRRRRRRRRRRRRRRRRRFMMMMMMMMMMMMMMMMMMMMFFFFFFFFMMMMMMMMMMMMMSS",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRRRRRRRRRRRRRRRFFMMMMMMMMMMMMMMMMMMMFFFFFFFFFFFFFMMMMMMMMSS",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRRRRRRRRRRRRRRRFFFMMMMMMMMMMMMMMMMMMFFFFFFFFFFFFFFFFFFMMMSS",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRRRRRRRRRRRRRRRFFFFMMMMMMMMMMMMMMMMMFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRRRRRRRRRRRRRRRFFFFFMMMMMMMMMMMMMMMMFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRRRRRRRRRRRRRFFFFFFFFMMMMMMMMMMMMMMFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRRRRRRRRRRRRRFFFFFFFFFMMMMMMMMMMMMFFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRRRRRRRRRRRRFFFFFFFFFFFMMMMMMMMMMFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRRRRRRRRRRRRFFFFFFFFFFFFMMMMMMMMFFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRRRRRRRRRRRFFFFFFFFFFFFFFMMMMMMFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRRRRRRRRRFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRRRRRRRRRFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRRRRRRRFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRRRRRFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRRRFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFRRRRRRFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-    };
-
-    public static readonly Dictionary<char, Zona> Zonas = new Dictionary<char, Zona> {
-        {'C', new Zona{ Nombre="Casco Viejo",    Sp=10, Spy=9, W=3, Ox=1, Oy=2, Ang=12, Curva=3, Onda=11, Estilo="denso",         Tinte=Paleta.H("#6b4a2e") }},
-        {'A', new Zona{ Nombre="Abando",         Sp=20, Spy=19, W=3, Ox=5, Oy=3, Ang=31, Curva=0, Onda=40, Estilo="senorial",      Tinte=Paleta.H("#4a4f5c") }},
-        {'I', new Zona{ Nombre="Indautxu",       Sp=19, Spy=18, W=3, Ox=2, Oy=6, Ang=30, Curva=1, Onda=34, Estilo="senorial",      Tinte=Paleta.H("#55505f") }},
-        {'X', new Zona{ Nombre="Abandoibarra",   Sp=25, Spy=22, W=3, Ox=7, Oy=1, Ang=20, Curva=2, Onda=40, Estilo="abierto",       Tinte=Paleta.H("#5f6b74") }},
-        {'D', new Zona{ Nombre="Deusto",         Sp=19, Spy=12, W=3, Ox=3, Oy=5, Ang=8, Curva=4, Onda=30, Estilo="bloques",       Tinte=Paleta.H("#4e5a52") }},
-        {'Z', new Zona{ Nombre="Zorrotzaurre",   Sp=20, Spy=16, W=3, Ox=2, Oy=2, Ang=14, Curva=2, Onda=30, Estilo="industrial",    Tinte=Paleta.H("#6b5f45") }},
-        {'O', new Zona{ Nombre="Olabeaga",       Sp=26, Spy=20, W=3, Ox=6, Oy=4, Ang=40, Curva=5, Onda=26, Estilo="industrial",    Tinte=Paleta.H("#5a5340") }},
-        {'Y', new Zona{ Nombre="Zorrotza",       Sp=28, Spy=22, W=3, Ox=3, Oy=7, Ang=32, Curva=4, Onda=28, Estilo="industrial",    Tinte=Paleta.H("#57503e") }},
-        {'S', new Zona{ Nombre="Santutxu",       Sp=13, Spy=20, W=3, Ox=4, Oy=1, Ang=55, Curva=6, Onda=20, Estilo="bloques",       Tinte=Paleta.H("#5c4a3a") }},
-        {'G', new Zona{ Nombre="Begoña",         Sp=17, Spy=12, W=3, Ox=6, Oy=7, Ang=65, Curva=7, Onda=18, Estilo="bloques",       Tinte=Paleta.H("#57505a") }},
-        {'U', new Zona{ Nombre="Uribarri",       Sp=13, Spy=22, W=3, Ox=0, Oy=3, Ang=48, Curva=6, Onda=20, Estilo="bloques",       Tinte=Paleta.H("#4f5a63") }},
-        {'T', new Zona{ Nombre="Txurdinaga",     Sp=19, Spy=15, W=3, Ox=2, Oy=5, Ang=35, Curva=8, Onda=22, Estilo="bloques",       Tinte=Paleta.H("#4d5750") }},
-        {'M', new Zona{ Nombre="Miribilla",      Sp=17, Spy=19, W=3, Ox=9, Oy=2, Ang=20, Curva=5, Onda=24, Estilo="senorial",      Tinte=Paleta.H("#525a63") }},
-        {'B', new Zona{ Nombre="Basurto",        Sp=17, Spy=13, W=3, Ox=4, Oy=6, Ang=12, Curva=3, Onda=28, Estilo="bloques",       Tinte=Paleta.H("#4e5548") }},
-        {'R', new Zona{ Nombre="Rekalde",        Sp=12, Spy=10, W=3, Ox=7, Oy=4, Ang=40, Curva=5, Onda=18, Estilo="denso",         Tinte=Paleta.H("#584c46") }},
-        {'P', new Zona{ Nombre="Parque",       Verde=true, Estilo="parque", Tinte=Paleta.H("#46603f") }},
-        {'E', new Zona{ Nombre="San Mamés",    Estadio=true, Sp=16, W=3, Estilo="abierto", Tinte=Paleta.H("#4a5f52") }},
-        {'F', new Zona{ Nombre="Los montes",   Verde=true, Monte=true, Estilo="monte", Tinte=Paleta.H("#3f5a3c") }},
-    };
-
-    public static char CharDe(int x, int y) {
-        int cy = Mathf.Clamp(y / CEL, 0, NCY-1), cx = Mathf.Clamp(x / CEL, 0, NCX-1);
-        return ATLAS[cy][cx];
+    public static Barrio BarrioDe(int x, int y) {
+        int k = Mathf.Clamp(y,0,MH-1)*MW + Mathf.Clamp(x,0,MW-1);
+        int i = BarrioIdx[k];
+        return i < Plano.Barrios.Length ? Plano.Barrios[i] : Plano.Barrios[0];
     }
-    public static Zona ZonaDe(int x, int y) { return Zonas[CharDe(x,y)]; }
 
     public static Suelo T(int x, int y) {
         if (x < 0 || y < 0 || x >= MW || y >= MH) return Suelo.Edif;
-        return (Suelo)Map[y*MW + x];
+        return (Suelo)Map[y*MW+x];
     }
     public static bool Rodable(int x, int y) {
         var t = T(x,y);
@@ -140,479 +53,39 @@ public static class Ciudad {
     }
     public static bool Andable(Suelo t) { return t != Suelo.Edif && t != Suelo.Agua; }
 
-    /// El % de C# devuelve negativos y aquí no valen.
-    static float ModP(float a, float n) { return ((a % n) + n) % n; }
-
-    /// <summary>Una calle desde (x0,y0) en la dirección dada, hasta topar con otra o
-    /// salir del barrio. Devuelve false si sale tan corta que no vale como calle.</summary>
-    static bool CrecerCalle(int x0, int y0, float ang, char c, Zona Z, float largoMax, List<Vector2Int> sem) {
-        float x = x0 + .5f, y = y0 + .5f, a = ang;
-        var paso = new List<Vector2Int>();
-        for (int n = 0; n < largoMax; n++) {
-            x += Mathf.Cos(a); y += Mathf.Sin(a);
-            a += (Utiles.Rnd(0,1) - .5f) * .06f;      // la calle se va torciendo
-            int ix = Mathf.RoundToInt(x), iy = Mathf.RoundToInt(y);
-            if (ix < 2 || iy < 2 || ix >= MW-2 || iy >= MH-2) break;
-            if (CharDe(ix,iy) != c) break;            // no se sale del barrio
-            var t = (Suelo)Map[iy*MW+ix];
-            if (t == Suelo.Agua || t == Suelo.Via) break;
-            if (n > 5 && t == Suelo.Road) { paso.Add(new Vector2Int(ix,iy)); break; }
-            paso.Add(new Vector2Int(ix,iy));
+    /// <summary>
+    /// Deflate crudo, sin cabecera zlib: los mismos bytes que descomprime el prototipo
+    /// con DecompressionStream("deflate-raw"), y sin meter una biblioteca en ninguno de
+    /// los dos lados. Sin comprimir, a byte por casilla, serían 1,1 MB por capa.
+    /// </summary>
+    static byte[] Inflar(string b64) {
+        var bin = Convert.FromBase64String(b64);
+        using (var ms = new MemoryStream(bin))
+        using (var ds = new DeflateStream(ms, CompressionMode.Decompress))
+        using (var salida = new MemoryStream(MW*MH)) {
+            ds.CopyTo(salida);
+            return salida.ToArray();
         }
-        if (paso.Count < 6) return false;
-        int r = (Z.W - 1) / 2;
-        foreach (var q in paso) {
-            for (int dy = -r; dy <= r; dy++)
-                for (int dx = -r; dx <= r; dx++) {
-                    int qx = q.x + dx, qy = q.y + dy;
-                    if (qx < 1 || qy < 1 || qx >= MW-1 || qy >= MH-1) continue;
-                    if (CharDe(qx,qy) != c) continue;
-                    var s = (Suelo)Map[qy*MW+qx];
-                    if (s == Suelo.Agua || s == Suelo.Via || s == Suelo.Puente) continue;
-                    Map[qy*MW+qx] = (byte)Suelo.Road;
-                }
-            if (q.x % 5 == 0) sem.Add(q);
-        }
-        return true;
-    }
-
-    static void CoserRedViaria() {
-        int N = MW * MH;
-        var vec = new[]{ new Vector2Int(1,0), new Vector2Int(-1,0), new Vector2Int(0,1), new Vector2Int(0,-1) };
-        for (int pasada = 0; pasada < 5; pasada++) {
-            var comp = new int[N]; for (int k = 0; k < N; k++) comp[k] = -1;
-            var tam = new List<int>();
-            var pila = new Stack<int>();
-            for (int y = 1; y < MH-1; y++)
-                for (int x = 1; x < MW-1; x++) {
-                    if (!Rodable(x,y) || comp[y*MW+x] >= 0) continue;
-                    int id = tam.Count, n = 0;
-                    pila.Push(y*MW+x); comp[y*MW+x] = id;
-                    while (pila.Count > 0) {
-                        int k = pila.Pop(); n++;
-                        int cx = k % MW, cy = k / MW;
-                        foreach (var d in vec) {
-                            int nx = cx+d.x, ny = cy+d.y;
-                            if (nx < 1 || ny < 1 || nx >= MW-1 || ny >= MH-1) continue;
-                            int j = ny*MW+nx;
-                            if (comp[j] < 0 && Rodable(nx,ny)) { comp[j] = id; pila.Push(j); }
-                        }
-                    }
-                    tam.Add(n);
-                }
-            if (tam.Count < 2) return;
-            int mayor = 0;
-            for (int i = 1; i < tam.Count; i++) if (tam[i] > tam[mayor]) mayor = i;
-
-            // distancia a la pieza mayor, por todo el mapa
-            var dist = new int[N]; for (int k = 0; k < N; k++) dist[k] = -1;
-            var cola = new List<int>();
-            for (int k = 0; k < N; k++) if (comp[k] == mayor) { dist[k] = 0; cola.Add(k); }
-            for (int cab = 0; cab < cola.Count; cab++) {
-                int k = cola[cab], cx = k % MW, cy = k / MW, d0 = dist[k] + 1;
-                foreach (var d in vec) {
-                    int nx = cx+d.x, ny = cy+d.y;
-                    if (nx < 1 || ny < 1 || nx >= MW-1 || ny >= MH-1) continue;
-                    int j = ny*MW+nx;
-                    if (dist[j] < 0) { dist[j] = d0; cola.Add(j); }
-                }
-            }
-
-            var cerca = new int[tam.Count]; for (int i = 0; i < cerca.Length; i++) cerca[i] = -1;
-            for (int k = 0; k < N; k++) {
-                int c = comp[k];
-                // los trozos diminutos son callejones sin salida, y en una ciudad los hay
-                if (c < 0 || c == mayor || tam[c] < 50) continue;
-                if (cerca[c] < 0 || dist[k] < dist[cerca[c]]) cerca[c] = k;
-            }
-
-            bool cosido = false;
-            for (int c = 0; c < tam.Count; c++) {
-                if (cerca[c] < 0) continue;
-                int k = cerca[c], guarda = 0;
-                while (dist[k] > 0 && guarda++ < 400) {
-                    int cx = k % MW, cy = k / MW;
-                    for (int dy = -1; dy <= 1; dy++)
-                        for (int dx = -1; dx <= 1; dx++) {
-                            int qx = cx+dx, qy = cy+dy;
-                            if (qx < 1 || qy < 1 || qx >= MW-1 || qy >= MH-1) continue;
-                            var q = (Suelo)Map[qy*MW+qx];
-                            if (q == Suelo.Via) continue;
-                            Map[qy*MW+qx] = (byte)(q == Suelo.Agua ? Suelo.Puente : Suelo.Road);
-                        }
-                    int sig = -1;
-                    foreach (var d in vec) {
-                        int nx = cx+d.x, ny = cy+d.y;
-                        if (nx < 1 || ny < 1 || nx >= MW-1 || ny >= MH-1) continue;
-                        int j = ny*MW+nx;
-                        if (dist[j] >= 0 && dist[j] < dist[k] && (sig < 0 || dist[j] < dist[sig])) sig = j;
-                    }
-                    if (sig < 0) break;
-                    k = sig;
-                }
-                cosido = true;
-            }
-            if (!cosido) return;
-        }
-    }
-
-    static void Pon(int x, int y, Suelo t) { if (x >= 0 && y >= 0 && x < MW && y < MH) Map[y*MW+x] = (byte)t; }
-    static void Rect(int x0, int y0, int w, int h, Suelo t) {
-        for (int y = y0; y < y0+h; y++) for (int x = x0; x < x0+w; x++) Pon(x,y,t);
-    }
-
-    static readonly Vector2[] RIA = {
-        new Vector2(392,215), new Vector2(404,200), new Vector2(418,188), new Vector2(432,176),
-        new Vector2(440,160), new Vector2(432,146), new Vector2(416,142), new Vector2(400,146),
-        new Vector2(386,152), new Vector2(369,146), new Vector2(346,137), new Vector2(326,125),
-        new Vector2(302,110), new Vector2(282,92), new Vector2(262,80), new Vector2(238,71),
-        new Vector2(215,68), new Vector2(196,72), new Vector2(180,84), new Vector2(165,96),
-        new Vector2(148,102), new Vector2(130,100), new Vector2(114,90), new Vector2(96,84),
-        new Vector2(84,86), new Vector2(55,68), new Vector2(35,45), new Vector2(17,21),
-        new Vector2(6,6)
-    };
-    static readonly Vector2[] CANAL = {
-        new Vector2(196,72), new Vector2(174,73), new Vector2(152,75), new Vector2(130,78),
-        new Vector2(108,82)
-    };
-
-    /// Cauce de ancho variable: estrecho aguas arriba y ancho en la salida. Con ancho
-    /// constante la ría parecía un canal, no un río.
-    static void LineaRio(Vector2[] pts, float a0, float a1, Suelo t) {
-        float total = 0;
-        var seg = new float[pts.Length-1];
-        for (int i = 0; i < pts.Length-1; i++) { seg[i] = Vector2.Distance(pts[i], pts[i+1]); total += seg[i]; }
-        float rec = 0;
-        for (int i = 0; i < pts.Length-1; i++) {
-            Vector2 a = pts[i], b = pts[i+1];
-            int n = Mathf.Max(1, Mathf.CeilToInt(seg[i] * 3));
-            for (int k = 0; k <= n; k++) {
-                float f = (rec + seg[i]*k/n) / total;
-                float px = a.x + (b.x-a.x)*k/n, py = a.y + (b.y-a.y)*k/n, r = (a0 + (a1-a0)*f)/2;
-                int ri = Mathf.CeilToInt(r);
-                for (int dy = -ri; dy <= ri; dy++)
-                    for (int dx = -ri; dx <= ri; dx++) {
-                        if (dx*dx + dy*dy > r*r) continue;
-                        Pon(Mathf.RoundToInt(px+dx), Mathf.RoundToInt(py+dy), t);
-                    }
-            }
-            rec += seg[i];
-        }
-    }
-
-    static void Linea(Vector2[] pts, float ancho, Suelo t, System.Func<int,int,bool> soloSi) {
-        for (int i = 0; i < pts.Length-1; i++) {
-            Vector2 a = pts[i], b = pts[i+1];
-            int n = Mathf.CeilToInt(Vector2.Distance(a,b) * 2);
-            for (int k = 0; k <= n; k++) {
-                float px = Mathf.Lerp(a.x,b.x,k/(float)n), py = Mathf.Lerp(a.y,b.y,k/(float)n);
-                int r = Mathf.CeilToInt(ancho/2f);
-                for (int dy = -r; dy <= r; dy++)
-                    for (int dx = -r; dx <= r; dx++) {
-                        if (dx*dx + dy*dy > (ancho/2f)*(ancho/2f)) continue;
-                        int qx = Mathf.RoundToInt(px+dx), qy = Mathf.RoundToInt(py+dy);
-                        if (soloSi != null && !soloSi(qx,qy)) continue;
-                        Pon(qx,qy,t);
-                    }
-            }
-        }
-    }
-
-    struct PuntoRuta { public float x, y, ang; }
-    static PuntoRuta EnRuta(Vector2[] pts, float t) {
-        float total = 0;
-        var seg = new float[pts.Length-1];
-        for (int i = 0; i < pts.Length-1; i++) { seg[i] = Vector2.Distance(pts[i],pts[i+1]); total += seg[i]; }
-        float rec = t * total;
-        for (int i = 0; i < seg.Length; i++) {
-            if (rec <= seg[i]) {
-                float f = rec / seg[i];
-                return new PuntoRuta {
-                    x = Mathf.Lerp(pts[i].x, pts[i+1].x, f),
-                    y = Mathf.Lerp(pts[i].y, pts[i+1].y, f),
-                    ang = Mathf.Atan2(pts[i+1].y-pts[i].y, pts[i+1].x-pts[i].x)
-                };
-            }
-            rec -= seg[i];
-        }
-        var l = pts[pts.Length-1];
-        return new PuntoRuta { x = l.x, y = l.y, ang = 0 };
     }
 
     public static void Generar() {
-        // 1 · relleno por zona
-        for (int y = 0; y < MH; y++)
-            for (int x = 0; x < MW; x++)
-                Map[y*MW+x] = (byte)(ZonaDe(x,y).Verde ? Suelo.Parque : Suelo.Edif);
-
-        // 2 · avenidas en las fronteras entre barrios
-        for (int cy = 0; cy < NCY; cy++)
-            for (int cx = 0; cx < NCX; cx++) {
-                char c = ATLAS[cy][cx];
-                if (cx < NCX-1 && ATLAS[cy][cx+1] != c) Rect((cx+1)*CEL-1, cy*CEL, 3, CEL, Suelo.Road);
-                if (cy < NCY-1 && ATLAS[cy+1][cx] != c) Rect(cx*CEL, (cy+1)*CEL-1, CEL, 3, Suelo.Road);
-            }
-
-        // 3 · la malla de los barrios proyectados, y los caminos del monte
-        for (int y = 0; y < MH; y++)
-            for (int x = 0; x < MW; x++) {
-                var Z = ZonaDe(x,y);
-                if (Z.Verde) {
-                    // Cada 13 casillas: con la malla más suelta un parque de barrio cabía
-                    // entero entre dos caminos y salía como un cuadrado verde macizo.
-                    if (((x+3) % 13) < 1 || ((y+7) % 13) < 1) Map[y*MW+x] = (byte)Suelo.Acera;
-                    continue;
-                }
-                if (Z.Estadio) continue;
-                if (Z.Estilo != "senorial" && Z.Estilo != "abierto") continue;
-                // El Ensanche se proyectó de una vez: retícula regular girada al rumbo del
-                // barrio. La calle es una curva de nivel de ese sistema, así que sale continua.
-                float ca = Mathf.Cos(Z.Ang*Mathf.Deg2Rad), sa = Mathf.Sin(Z.Ang*Mathf.Deg2Rad);
-                float on = Z.Onda > 0 ? Z.Onda : 24f;
-                float u =  x*ca + y*sa + Z.Curva*Mathf.Sin(y/on) + Z.Ox;
-                float v = -x*sa + y*ca + Z.Curva*Mathf.Sin(x/on) + Z.Oy;
-                if (ModP(u, Z.Sp) < Z.W || ModP(v, Z.SpV) < Z.W) Map[y*MW+x] = (byte)Suelo.Road;
-            }
-
-        // 4 · la Gran Vía, con Moyúa y Sagrado Corazón
-        Linea(new[]{ new Vector2(344,144), new Vector2(320,160), new Vector2(296,176), new Vector2(272,192) },
-              6, Suelo.Road, (x,y) => !ZonaDe(Mathf.Clamp(x,0,MW-1),Mathf.Clamp(y,0,MH-1)).Verde);
-        for (int dy = -11; dy <= 11; dy++) for (int dx = -11; dx <= 11; dx++) {
-            if (dx*dx+dy*dy > 121) continue;
-            Pon(320+dx, 160+dy, dx*dx+dy*dy > 74 ? Suelo.Road : Suelo.Plaza);
-        }
-        for (int dy = -8; dy <= 8; dy++) for (int dx = -8; dx <= 8; dx++) {
-            if (dx*dx+dy*dy > 64) continue;
-            Pon(272+dx, 192+dy, dx*dx+dy*dy > 38 ? Suelo.Road : Suelo.Plaza);
-        }
-
-        // 4 bis · las arterias con nombre. Sin ellas todas las calles miden igual y
-        // ninguna manda: en el plano de Bilbao se leen de un vistazo la Gran Vía,
-        // Urquijo, Autonomía, las dos riberas y el eje de Deusto.
-        var arterias = new[]{
-            new[]{ new Vector2(336,160), new Vector2(296,184), new Vector2(260,204), new Vector2(232,216) },
-            new[]{ new Vector2(316,208), new Vector2(272,220), new Vector2(228,224), new Vector2(200,224) },
-            new[]{ new Vector2(248,196), new Vector2(220,212), new Vector2(196,228) },
-            new[]{ new Vector2(320,168), new Vector2(304,192), new Vector2(292,220) },
-            new[]{ new Vector2(356,112), new Vector2(320,100), new Vector2(280,92), new Vector2(236,92), new Vector2(200,96) },
-            new[]{ new Vector2(368,140), new Vector2(340,132), new Vector2(300,124), new Vector2(260,124), new Vector2(224,128) },
-            new[]{ new Vector2(208,104), new Vector2(172,92), new Vector2(136,84), new Vector2(96,80) },
-            new[]{ new Vector2(356,104), new Vector2(380,120), new Vector2(400,140), new Vector2(412,164) },
-            new[]{ new Vector2(372,192), new Vector2(396,212), new Vector2(416,236) },
-            new[]{ new Vector2(300,80), new Vector2(328,72), new Vector2(356,68) },
-        };
-        foreach (var a in arterias)
-            Linea(a, 5, Suelo.Road, (x,y) => !ZonaDe(Mathf.Clamp(x,0,MW-1),Mathf.Clamp(y,0,MH-1)).Verde);
-
-        // 4 ter · el ferrocarril. En el plano municipal las vías ordenan la lectura tanto
-        // como las avenidas, y además parten manzanas y obligan a rodear. Se dibujan SIN
-        // pisar la calzada: cada cruce con una calle queda a nivel, así que la red viaria
-        // no se corta — que es lo que mide la batería.
-        var vias = new[]{
-            // metro por el corredor del valle: Basauri, Casco Viejo, Abando, Indautxu,
-            // San Mamés, Deusto, San Ignacio y salida a Erandio
-            new[]{ new Vector2(440,150), new Vector2(400,142), new Vector2(360,132), new Vector2(320,116),
-                   new Vector2(290,104), new Vector2(262,96),  new Vector2(232,102), new Vector2(206,110),
-                   new Vector2(178,108), new Vector2(150,96),  new Vector2(120,88),  new Vector2(92,76),
-                   new Vector2(60,58),   new Vector2(30,34),   new Vector2(8,12) },
-            // Renfe: Abando, Zabalburu, Ametzola, Errekalde y salida al suroeste
-            new[]{ new Vector2(248,104), new Vector2(236,120), new Vector2(224,140), new Vector2(212,160),
-                   new Vector2(196,180), new Vector2(176,196), new Vector2(152,208) },
-            // Euskotren por Atxuri hacia Bolueta y el este
-            new[]{ new Vector2(300,118), new Vector2(326,132), new Vector2(352,142), new Vector2(380,152),
-                   new Vector2(412,160) },
-            // la línea de Zorrotza, por la margen izquierda
-            new[]{ new Vector2(228,142), new Vector2(196,148), new Vector2(164,150), new Vector2(130,148),
-                   new Vector2(96,142),  new Vector2(64,134) },
-        };
-        foreach (var v in vias)
-            Linea(v, 3, Suelo.Via, (x,y) => {
-                var t = T(x,y);
-                return t != Suelo.Road && t != Suelo.Puente && t != Suelo.Agua && t != Suelo.Muelle;
-            });
-
-        // 4 quater · las carreteras de fuera. En el plano el monte no está vacío: lo cruzan
-        // la autopista del Cantábrico por el norte, la de Zaragoza al suroeste, la salida a
-        // Mungia al noreste y la del Nervión al este. Salen de la ciudad, así que entran en
-        // la red viaria y no dejan trozos sueltos. Sobre el agua se vuelven puente.
-        var carreteras = new[]{
-            new[]{ new Vector2(120,60), new Vector2(86,44), new Vector2(52,30), new Vector2(20,18), new Vector2(0,10) },
-            new[]{ new Vector2(300,88), new Vector2(340,64), new Vector2(386,44), new Vector2(420,26), new Vector2(447,16) },
-            new[]{ new Vector2(196,180), new Vector2(160,206), new Vector2(120,232), new Vector2(80,254), new Vector2(48,272) },
-            new[]{ new Vector2(392,215), new Vector2(420,232), new Vector2(447,244) },
-            new[]{ new Vector2(64,134), new Vector2(36,152), new Vector2(14,176), new Vector2(0,196) },
-            new[]{ new Vector2(344,184), new Vector2(380,206), new Vector2(412,230) },
-        };
-        var anchos = new[]{ 5f, 5f, 5f, 4f, 4f, 4f };
-        for (int i = 0; i < carreteras.Length; i++) {
-            Linea(carreteras[i], anchos[i], Suelo.Road,   (x,y) => T(x,y) != Suelo.Agua);
-            Linea(carreteras[i], anchos[i], Suelo.Puente, (x,y) => T(x,y) == Suelo.Agua);
-        }
-
-        // 4 quinquies · la trama de los demás barrios, hecha crecer desde las avenidas.
-        // Estamparla —mod(u,sp) < w— da bandas paralelas infinitas recortadas contra el
-        // borde: todas las manzanas iguales, ninguna calle que empiece ni termine, y un
-        // borde de ciudad liso. En un plano de verdad la red de calles va primero y las
-        // manzanas son lo que queda entre ellas. Aquí cada calle nace sobre otra ya
-        // trazada y corre hasta topar con una tercera: cruces en T, fondos de saco,
-        // manzanas de tamaños distintos. Y como toda calle nace pegada a la red, la red
-        // no se parte.
-        {
-            var tiles = new Dictionary<char, List<Vector2Int>>();
-            var semillas = new Dictionary<char, List<Vector2Int>>();
-            for (int y = 2; y < MH-2; y++)
-                for (int x = 2; x < MW-2; x++) {
-                    char c = CharDe(x,y); var Z = Zonas[c];
-                    if (Z.Verde || Z.Estadio) continue;
-                    if (Z.Estilo == "senorial" || Z.Estilo == "abierto") continue;
-                    if (!tiles.ContainsKey(c)) { tiles[c] = new List<Vector2Int>(); semillas[c] = new List<Vector2Int>(); }
-                    tiles[c].Add(new Vector2Int(x,y));
-                    if (Map[y*MW+x] == (byte)Suelo.Road) semillas[c].Add(new Vector2Int(x,y));
-                }
-
-            foreach (var c in tiles.Keys) {
-                var Z = Zonas[c]; var sem = semillas[c];
-                if (sem.Count == 0) continue;
-                float rumbo = Z.Ang * Mathf.Deg2Rad;
-                int objetivo = Mathf.CeilToInt(tiles[c].Count / (float)(Z.Sp * Z.SpV) * 2.6f);
-                float largoMax = Mathf.Max(Z.Sp, Z.SpV) * 2.5f;
-                int pendiente = objetivo;
-                for (int i = 0; i < objetivo*6 && sem.Count > 0 && pendiente > 0; i++) {
-                    var s0 = sem[Utiles.RndI(0, sem.Count-1)];
-                    // la mitad siguen el rumbo del barrio y la mitad lo cruzan; el desvío
-                    // es lo que impide que vuelva a salir una retícula
-                    float a0 = rumbo
-                             + (Utiles.Rnd(0,1) < .5f ? 0f : Mathf.PI/2)
-                             + (Utiles.Rnd(0,1) < .5f ? 0f : Mathf.PI)
-                             + (Utiles.Rnd(0,1) - .5f) * .35f;
-                    if (CrecerCalle(s0.x, s0.y, a0, c, Z, largoMax, sem)) pendiente--;
-                    else i += 2;
-                }
-            }
-        }
-
-        // 5 · San Mamés
-        int sx = 0, sy = 0, n = 0;
-        for (int cy = 0; cy < NCY; cy++) for (int cx = 0; cx < NCX; cx++)
-            if (ATLAS[cy][cx] == 'E') { Rect(cx*CEL, cy*CEL, CEL, CEL, Suelo.Plaza); sx += cx*CEL+CEL/2; sy += cy*CEL+CEL/2; n++; }
-        if (n > 0) {
-            int ex = sx/n, ey = sy/n;
-            for (int dy = -18; dy <= 18; dy++)
-                for (int dx = -21; dx <= 21; dx++) {
-                    float e = (dx*dx)/441f + (dy*dy)/324f;
-                    if (e > 1) continue;
-                    Pon(ex+dx, ey+dy, e > 0.62f ? Suelo.Edif : (e > 0.5f ? Suelo.Plaza : Suelo.Parque));
-                }
-            Rect(ex-10, ey-2, 20, 3, Suelo.Plaza);
-        }
-
-        // 6 · la ría y el canal
-        LineaRio(RIA, 7, 12, Suelo.Agua);
-        LineaRio(CANAL, 6, 7, Suelo.Agua);
-
-        // 7 · puentes
-        float[] tsRia = { .06f,.13f,.2f,.27f,.33f,.38f,.43f,.48f,.53f,.58f,.64f,.71f,.79f,.87f };
-        foreach (float t in tsRia) Puente(RIA, t, 24);
-        foreach (float t in new[]{ .3f,.6f }) Puente(CANAL, t, 18);
-
-        // 8 · muelles del puerto viejo
-        for (int x = 1; x < MW-1; x++)
-            for (int y = 1; y < MH-1; y++) {
-                if (Map[y*MW+x] != (byte)Suelo.Edif) continue;
-                if (ZonaDe(x,y).Estilo != "industrial") continue;
-                if (Map[(y+1)*MW+x] == (byte)Suelo.Agua || Map[(y-1)*MW+x] == (byte)Suelo.Agua ||
-                    Map[y*MW+x+1] == (byte)Suelo.Agua || Map[y*MW+x-1] == (byte)Suelo.Agua)
-                    Map[y*MW+x] = (byte)Suelo.Muelle;
-            }
-
-        // 9 · patios de manzana
-        Patios();
-
-        // 9 bis · coser la red viaria. La ciudad se traza por partes —barrios, arterias,
-        // ferrocarril, carreteras de fuera— y siempre queda algún trozo suelto: una
-        // carretera que muere en el monte sin llegar a tocar ciudad, la isla sin enlace.
-        // En una ciudad no hay calles a las que no se pueda llegar. Se cosen al final, en
-        // vez de recolocar coordenadas a mano: así el arreglo sigue valiendo cuando se
-        // mueva el trazado. El enlace sale de un BFS desde la pieza mayor y luego se baja
-        // por el gradiente; buscar el par de casillas más cercano a fuerza bruta costaba
-        // casi medio segundo.
-        CoserRedViaria();
-
-        // 10 · aceras: toda fachada que da a la calle
-        var cop = (byte[])Map.Clone();
-        for (int y = 0; y < MH; y++)
-            for (int x = 0; x < MW; x++) {
-                if (cop[y*MW+x] != (byte)Suelo.Edif) continue;
-                bool borde = false;
-                int[] dxs = {1,-1,0,0}, dys = {0,0,1,-1};
-                for (int k = 0; k < 4; k++) {
-                    int nx = x+dxs[k], ny = y+dys[k];
-                    if (nx < 0 || ny < 0 || nx >= MW || ny >= MH) continue;
-                    var t = (Suelo)cop[ny*MW+nx];
-                    if (t == Suelo.Road || t == Suelo.Puente || t == Suelo.Plaza || t == Suelo.Muelle || t == Suelo.Parque)
-                    { borde = true; break; }
-                }
-                if (borde) Map[y*MW+x] = (byte)Suelo.Acera;
-            }
-
-        // 11 · un tejado por edificio contiguo, para que el bloque se lea entero
+        var trama = Inflar(Plano.Trama());
+        var barrios = Inflar(Plano.TramaBarrio());
+        Array.Copy(trama, Map, Mathf.Min(trama.Length, Map.Length));
+        Array.Copy(barrios, BarrioIdx, Mathf.Min(barrios.Length, BarrioIdx.Length));
         Tejados();
-
-        for (int i = 0; i < MW; i++) {
-            Pon(i,0,Suelo.Edif); Pon(i,MH-1,Suelo.Edif); Pon(0,i,Suelo.Edif); Pon(MW-1,i,Suelo.Edif);
-        }
+        // borde cerrado: fuera del término municipal no hay nada que visitar
+        for (int x = 0; x < MW; x++) { Map[x] = (byte)Suelo.Edif; Map[(MH-1)*MW+x] = (byte)Suelo.Edif; }
+        for (int y = 0; y < MH; y++) { Map[y*MW] = (byte)Suelo.Edif; Map[y*MW+MW-1] = (byte)Suelo.Edif; }
     }
 
-    static void Puente(Vector2[] ruta, float t, int alcance) {
-        var p = EnRuta(ruta, t);
-        float per = p.ang + Mathf.PI/2f;
-        for (int d = -alcance; d <= alcance; d++)
-            for (int w = -2; w <= 2; w++) {
-                int px = Mathf.RoundToInt(p.x + Mathf.Cos(per)*d + Mathf.Cos(p.ang)*w);
-                int py = Mathf.RoundToInt(p.y + Mathf.Sin(per)*d + Mathf.Sin(p.ang)*w);
-                if (T(px,py) == Suelo.Agua) Pon(px,py,Suelo.Puente);
-            }
-    }
-
-    static void Patios() {
-        var visto = new bool[MW*MH];
-        var pila = new Stack<Vector2Int>();
-        for (int y = 0; y < MH; y++)
-            for (int x = 0; x < MW; x++) {
-                if (Map[y*MW+x] != (byte)Suelo.Edif || visto[y*MW+x]) continue;
-                int x0 = x, x1 = x, y0 = y, y1 = y, cuenta = 0;
-                pila.Clear(); pila.Push(new Vector2Int(x,y)); visto[y*MW+x] = true;
-                while (pila.Count > 0) {
-                    var c = pila.Pop(); cuenta++;
-                    if (c.x < x0) x0 = c.x; if (c.x > x1) x1 = c.x;
-                    if (c.y < y0) y0 = c.y; if (c.y > y1) y1 = c.y;
-                    int[] dxs = {1,-1,0,0}, dys = {0,0,1,-1};
-                    for (int k = 0; k < 4; k++) {
-                        int nx = c.x+dxs[k], ny = c.y+dys[k];
-                        if (nx < 0 || ny < 0 || nx >= MW || ny >= MH || visto[ny*MW+nx]) continue;
-                        if (Map[ny*MW+nx] == (byte)Suelo.Edif) { visto[ny*MW+nx] = true; pila.Push(new Vector2Int(nx,ny)); }
-                    }
-                }
-                int w = x1-x0+1, h = y1-y0+1;
-                var Z = ZonaDe(x0,y0);
-                if (w < 6 || h < 6 || cuenta < 36) continue;
-                int hh = Utiles.Hash(x0,y0);
-                if (Z.Estilo == "denso" && hh % 3 != 0) continue;
-                if (hh % 10 < 6) {
-                    int pw = Mathf.Max(2, (int)(w*0.4f)), ph = Mathf.Max(2, (int)(h*0.4f));
-                    Rect(x0 + (w-pw)/2, y0 + (h-ph)/2, pw, ph, Suelo.Patio);
-                } else if (hh % 10 < 8) {
-                    int cw = (int)(w*0.45f), ch = (int)(h*0.45f);
-                    Rect((hh>>3)%2 == 1 ? x0 : x1-cw+1, (hh>>4)%2 == 1 ? y0 : y1-ch+1, cw, ch,
-                         Z.Estilo == "abierto" ? Suelo.Plaza : Suelo.Patio);
-                }
-            }
-    }
-
+    /// <summary>Un tejado por edificio contiguo.</summary>
+    /// Esto sí se calcula aquí y no en el extractor: depende de cuántos tejados haya
+    /// forjado el arte, que es cosa del juego y no del plano.
     static void Tejados() {
-        System.Array.Clear(Roof, 0, Roof.Length);
         var visto = new bool[MW*MH];
-        var pila = new Stack<Vector2Int>();
+        var pila = new System.Collections.Generic.Stack<Vector2Int>();
+        System.Array.Clear(Roof, 0, Roof.Length);
         for (int y = 0; y < MH; y++)
             for (int x = 0; x < MW; x++) {
                 if (Map[y*MW+x] != (byte)Suelo.Edif || visto[y*MW+x]) continue;
@@ -633,6 +106,8 @@ public static class Ciudad {
     }
 
     // ═══════════ BÚSQUEDAS ═══════════
+    /// <summary>Una casilla cualquiera del vecindario que cumpla la condición.</summary>
+    /// Vale para lo que da igual dónde caiga: un peatón, un coche aparcado.
     public static Vector2 Buscar(System.Func<int,int,bool> cond, int cx, int cy, int rad) {
         for (int i = 0; i < 900; i++) {
             int x = cx < 0 ? Utiles.RndI(2, MW-3) : Mathf.Clamp(cx + Utiles.RndI(-rad,rad), 2, MW-3);
@@ -641,6 +116,30 @@ public static class Ciudad {
         }
         return new Vector2(MW/2f, MH/2f);
     }
+
+    /// <summary>La casilla válida MÁS cercana al punto, buscando en anillos hacia fuera.</summary>
+    /// Los sitios de verdad llevan la coordenada del plano municipal, y correr la catedral
+    /// cien metros la saca del Casco Viejo. Los anillos son cuadrados, así que la esquina
+    /// de uno queda más lejos que el centro del lado del siguiente: no vale quedarse con
+    /// el primero que aparezca, hay que seguir mientras el anillo pueda mejorar.
+    public static Vector2 CercaDe(System.Func<int,int,bool> cond, int cx, int cy, int rmax) {
+        cx = Mathf.Clamp(cx, 1, MW-2); cy = Mathf.Clamp(cy, 1, MH-2);
+        if (cond(cx,cy)) return new Vector2(cx+0.5f, cy+0.5f);
+        int mx = -1, my = -1; float mejor = float.MaxValue;
+        for (int r = 1; r <= rmax && r < mejor; r++)
+            for (int d = -r; d <= r; d++) {
+                int[] xs = { cx+d, cx+d, cx-r, cx+r };
+                int[] ys = { cy-r, cy+r, cy+d, cy+d };
+                for (int k = 0; k < 4; k++) {
+                    int x = xs[k], y = ys[k];
+                    if (x < 1 || y < 1 || x >= MW-1 || y >= MH-1) continue;
+                    float q = Mathf.Sqrt((x-cx)*(x-cx) + (y-cy)*(y-cy));
+                    if (q < mejor && cond(x,y)) { mejor = q; mx = x; my = y; }
+                }
+            }
+        return mx < 0 ? new Vector2(cx+0.5f, cy+0.5f) : new Vector2(mx+0.5f, my+0.5f);
+    }
+
     public static Vector2 PuntoAcera(int cx = -1, int cy = -1, int r = 40) {
         return Buscar((x,y) => { var t = T(x,y); return t == Suelo.Acera || t == Suelo.Plaza; }, cx, cy, r);
     }
@@ -648,10 +147,9 @@ public static class Ciudad {
         return Buscar((x,y) => T(x,y) == Suelo.Road, cx, cy, r);
     }
     /// <summary>Acera con fachada detrás y calle delante: donde va un portal de verdad.</summary>
-    public static Vector2 PuntoPortal(int cx, int cy, int r, char zona) {
-        return Buscar((x,y) => {
+    public static Vector2 PuntoPortal(int cx, int cy, int r = 60) {
+        return CercaDe((x,y) => {
             if (T(x,y) != Suelo.Acera) return false;
-            if (zona != '\0' && CharDe(x,y) != zona) return false;
             int fach = 0, calle = 0;
             int[] dxs = {1,-1,0,0}, dys = {0,0,1,-1};
             for (int k = 0; k < 4; k++) {
@@ -662,12 +160,9 @@ public static class Ciudad {
             return fach > 0 && calle > 0;
         }, cx, cy, r);
     }
-    public static Vector2 PuntoZona(int cx, int cy, int r, char zona) {
-        return Buscar((x,y) => {
-            var t = T(x,y);
-            if (t != Suelo.Acera && t != Suelo.Plaza && t != Suelo.Parque) return false;
-            return zona == '\0' || CharDe(x,y) == zona;
-        }, cx, cy, r);
+    /// <summary>Para los monumentos: la casilla pisable más próxima que no sea ladera.</summary>
+    public static Vector2 PuntoZona(int cx, int cy, int r = 60) {
+        return CercaDe((x,y) => { var t = T(x,y); return Andable(t) && t != Suelo.Monte; }, cx, cy, r);
     }
 }
 

@@ -77,27 +77,32 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
     let accesibles = 0;
     A.POI.forEach(p => {
       const t = A.Tc(p.p.x | 0, p.p.y | 0);
-      if (t === A.ACERA || t === A.PLAZA || t === A.PARQUE) accesibles++;
+      if (t !== A.EDIF && t !== A.AGUA && t !== A.MONTE) accesibles++;
     });
     ok(accesibles === A.POI.length, (A.POI.length - accesibles) + ' sitios inaccesibles');
     bien.push(accesibles + '/' + A.POI.length + ' sitios accesibles');
 
-    // ── 4 · cada sitio en su barrio ────────────────────────────────────
-    const esperado = {
-      piso: 'Santutxu', portal: 'Santutxu', bar: 'Casco Viejo', merca: 'Casco Viejo',
-      armeria: 'Santutxu', taller: 'Rekalde', hospital: 'Basurto', obra: 'Zorrotzaurre',
-      puerto: 'Olabeaga', poli: 'Indautxu', guggen: 'Abandoibarra', sanmames: 'San Mamés',
-      abando: 'Abando', ayto: 'Uribarri', casilla: 'Parque'
-    };
-    let descolocados = 0;
+    // ── 4 · cada sitio, donde lo pone el plano ─────────────────────────
+    // Antes se comprobaba el barrio, que era lo único que se podía comprobar cuando la
+    // coordenada era una pista. Ahora la coordenada sale del plano municipal, así que lo
+    // que hay que vigilar es otra cosa: que al buscarle una casilla pisable el sitio no
+    // se vaya lejos. Treinta casillas son ciento cincuenta metros, que es lo que mide
+    // un recinto grande: el rótulo del Hospital de Basurto cae en mitad del complejo y
+    // la calle más cercana está en el borde. Más que eso ya no es el borde de la
+    // manzana, es otro barrio.
+    const TOPE = 30;
+    let idos = 0, peor = 0, peorN = '';
     A.POI.forEach(p => {
-      const real = A.distDe(p.p.x | 0, p.p.y | 0).n;
-      if (esperado[p.id] && real !== esperado[p.id]) {
-        descolocados++;
-        fallos.push(p.n + ' está en ' + real + ' y debería estar en ' + esperado[p.id]);
+      if (!p.cerca) return;
+      const d = Math.hypot(p.p.x - p.cerca[0], p.p.y - p.cerca[1]);
+      if (d > peor) { peor = d; peorN = p.n; }
+      if (d > TOPE) {
+        idos++;
+        fallos.push(p.n + ' se ha ido ' + d.toFixed(0) + ' casillas de donde lo pone el plano');
       }
     });
-    if (!descolocados) bien.push('los ' + A.POI.length + ' sitios en su barrio');
+    if (!idos) bien.push(A.POI.length + ' sitios a menos de ' + TOPE + ' casillas del plano'
+      + ' (el peor, ' + peorN + ', a ' + peor.toFixed(0) + ')');
 
     // ── 5 · la red viaria está conectada ───────────────────────────────
     {

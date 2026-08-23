@@ -184,7 +184,7 @@ public class MenuMovil : MonoBehaviour {
             Fila(_listaPausa, "", "Salud", "", Mathf.RoundToInt(E.Hp) + "%", null, Paleta.Sangre);
             Fila(_listaPausa, "", "Arma", "", Armas.De(E.ArmaAct).Nombre, null, Paleta.Acero);
             Fila(_listaPausa, "", "Barrio", "",
-                 Ciudad.ZonaDe(Mathf.Clamp((int)J.Jug.Pos.x,0,Ciudad.MW-1), Mathf.Clamp((int)J.Jug.Pos.y,0,Ciudad.MH-1)).Nombre,
+                 Ciudad.BarrioDe(Mathf.Clamp((int)J.Jug.Pos.x,0,Ciudad.MW-1), Mathf.Clamp((int)J.Jug.Pos.y,0,Ciudad.MH-1)).Nombre,
                  null, Paleta.Acero);
         } else {
             Fila(_listaPausa, "", "Efectos de sonido", "", AudioProc.I.Sonido ? "ON" : "OFF",

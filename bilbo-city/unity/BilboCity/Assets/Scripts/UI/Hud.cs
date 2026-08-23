@@ -279,7 +279,7 @@ public class Hud : MonoBehaviour {
 
         string barrio = E.EnInterior && Interiores.Actual != null
             ? Interiores.Actual.Nombre
-            : Ciudad.ZonaDe(Mathf.Clamp((int)J.Jug.Pos.x,0,Ciudad.MW-1), Mathf.Clamp((int)J.Jug.Pos.y,0,Ciudad.MH-1)).Nombre;
+            : Ciudad.BarrioDe(Mathf.Clamp((int)J.Jug.Pos.x,0,Ciudad.MW-1), Mathf.Clamp((int)J.Jug.Pos.y,0,Ciudad.MH-1)).Nombre;
         _tBarrio.Escribir(barrio);
         if (E.Deuda > 0) _tDeuda.Escribir("ALQUILER " + E.Deuda + " €"); else _tDeuda.Ocultar();
 

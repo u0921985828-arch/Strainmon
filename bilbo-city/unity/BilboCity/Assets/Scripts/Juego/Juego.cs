@@ -394,7 +394,7 @@ public class Juego : MonoBehaviour {
     }
 
     void TinteBarrio(float dt) {
-        var Z = Ciudad.ZonaDe(Mathf.Clamp((int)Jug.Pos.x,0,Ciudad.MW-1), Mathf.Clamp((int)Jug.Pos.y,0,Ciudad.MH-1));
+        var Z = Ciudad.BarrioDe(Mathf.Clamp((int)Jug.Pos.x,0,Ciudad.MW-1), Mathf.Clamp((int)Jug.Pos.y,0,Ciudad.MH-1));
         Color objetivo = Z.Tinte;
         objetivo.a = 0.13f;
         _tinteActual = Color.Lerp(_tinteActual, objetivo, dt * 0.6f);

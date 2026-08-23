@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Comprueba —o sincroniza— las pistas de los sitios entre el HTML y Ciudad/Estado.cs.
 
-Los sitios se colocan buscando suelo pisable de su barrio cerca de una pista. Esa pista
-está escrita en los dos sitios, y cada vez que se movió el trazado se quedaron distintas:
-el HTML pasaba la batería y Unity habría puesto los sitios en otro lado sin que nadie lo
-viera, porque el C# no se ejecuta aquí.
+Cada sitio lleva la coordenada que le da el plano municipal, y el juego busca desde ahí
+la casilla pisable más cercana. Esa coordenada está escrita en los dos sitios, y cada vez
+que se movió algo se quedaron distintas: el HTML pasaba la batería y Unity habría puesto
+los sitios en otro lado sin que nadie lo viera, porque el C# no se ejecuta aquí.
 
     python3 herramientas/plano/sitios.py          # comprueba, falla si no cuadran
     python3 herramientas/plano/sitios.py --fijar  # copia las del HTML al C#
@@ -17,14 +17,14 @@ CS   = RAIZ / 'unity' / 'BilboCity' / 'Assets' / 'Scripts' / 'Juego' / 'Estado.c
 
 def delHtml():
     s = HTML.read_text()
-    return {m.group(1): (int(m.group(2)), int(m.group(3)), m.group(4))
-            for m in re.finditer(r"\{id:'([a-z]+)'[^}]*?cerca:\[(\d+),(\d+)\],z:'([A-Z])'", s)}
+    return {m.group(1): (int(m.group(2)), int(m.group(3)))
+            for m in re.finditer(r"\{id:'([a-z]+)'[^}]*?cerca:\[(\d+),(\d+)\]", s)}
 
 def delCs():
     s = CS.read_text()
-    return {m.group(1): (int(m.group(2)), int(m.group(3)), m.group(4))
+    return {m.group(1): (int(m.group(2)), int(m.group(3)))
             for m in re.finditer(r"S\(\"([a-z]+)\",\s*\"[^\"]+\",\s*[^,]+,\s*(?:null|\"[a-z]+\"),"
-                                 r"\s*(\d+)\s*,\s*(\d+),\s*'([A-Z])'", s)}
+                                 r"\s*(\d+)\s*,\s*(\d+)", s)}
 
 def main():
     h, c = delHtml(), delCs()
@@ -35,9 +35,9 @@ def main():
     if '--fijar' in sys.argv:
         s = CS.read_text()
         for k in distintos:
-            x, y, z = h[k]
-            s, n = re.subn(r"(S\(\"%s\",\s*\"[^\"]+\",\s*[^,]+,\s*(?:null|\"[a-z]+\"),\s*)\d+\s*,\s*\d+(,\s*')[A-Z]" % k,
-                           lambda m: "%s%3d,%3d%s%s" % (m.group(1), x, y, m.group(2), z), s, count=1)
+            x, y = h[k]
+            s, n = re.subn(r"(S\(\"%s\",\s*\"[^\"]+\",\s*[^,]+,\s*(?:null|\"[a-z]+\"),\s*)\d+\s*,\s*\d+" % k,
+                           lambda m: "%s%4d,%4d" % (m.group(1), x, y), s, count=1)
             if n != 1: sys.exit('no pude reescribir el sitio %s en %s' % (k, CS))
         CS.write_text(s)
         print('sincronizados %d sitios' % len(distintos))

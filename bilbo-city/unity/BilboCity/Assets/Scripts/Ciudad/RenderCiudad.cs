@@ -48,6 +48,8 @@ public class RenderCiudad : MonoBehaviour {
         var plaza = TileDe(T["plaza"]); var patio = TileDe(T["patio"]);
         var via = TileDe(T["via"]); var viaV = TileDe(T["viaV"]);
         var parque = TileDe(T["parque"]); var parqueA = TileDe(T["parqueAlto"]);
+        var monte = TileDe(T["monte"]); var monteM = TileDe(T["monteMata"]);
+        var monteR = TileDe(T["monteRoca"]);
         var puente = TileDe(T["puente"]); var muelle = TileDe(T["muelle"]);
         var tejados = new Tile[8]; for (int i = 0; i < 8; i++) tejados[i] = TileDe(Forja.Tejados[i]);
         var azoteas = new Tile[8]; for (int i = 0; i < 8; i++) azoteas[i] = TileDe(Forja.Azoteas[i]);
@@ -77,13 +79,18 @@ public class RenderCiudad : MonoBehaviour {
                         break;
                     }
                     case Suelo.Acera: {
-                        var Z = Ciudad.ZonaDe(x,y);
+                        var Z = Ciudad.BarrioDe(x,y);
                         if (Z.Estilo == "denso") elegido = adoquin;
                         else if (Z.Estilo == "abierto") elegido = adoquinR;
                         else elegido = Utiles.Hash(x,y) % 11 == 0 ? aceraG : acera;
                         break;
                     }
                     case Suelo.Parque: elegido = Utiles.Hash(x,y) % 4 == 0 ? parqueA : parque; break;
+                    case Suelo.Monte: {
+                        int hm = Utiles.Hash(x,y) % 9;
+                        elegido = hm == 0 ? monteR : (hm < 4 ? monteM : monte);
+                        break;
+                    }
                     case Suelo.Plaza:  elegido = plaza; break;
                     case Suelo.Patio:  elegido = patio; break;
                     case Suelo.Via:

@@ -31,7 +31,7 @@ public static class Mobiliario {
     static bool Elegir(int x, int y, out Pieza p) {
         p = new Pieza();
         var t = Ciudad.T(x,y);
-        var Z = Ciudad.ZonaDe(x,y);
+        var Z = Ciudad.BarrioDe(x,y);
         int h = Utiles.Hash(x*7+1, y*13+5);
         bool juntoCalle = JuntoA(x,y,Suelo.Road) || JuntoA(x,y,Suelo.Puente);
 
@@ -67,11 +67,14 @@ public static class Mobiliario {
             return false;
         }
 
-        if (t == Suelo.Parque) {
-            // el monte va más tupido que un parque urbano
-            int cada = Ciudad.ZonaDe(x,y).Monte ? 4 : 7;
-            if (h % cada == 0) { p.Clave = "arbol"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
-            if (h % 23 == 0)   { p.Clave = "banco"; p.Dx = 0.5f; p.Dy = 0.9f;  return true; }
+        if (t == Suelo.Parque || t == Suelo.Monte) {
+            // el monte va más tupido que un parque urbano, y sin bancos
+            if (t == Suelo.Monte) {
+                if (h % 4 == 0) { p.Clave = "arbol"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
+                return false;
+            }
+            if (h % 7 == 0)  { p.Clave = "arbol"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
+            if (h % 23 == 0) { p.Clave = "banco"; p.Dx = 0.5f; p.Dy = 0.9f;  return true; }
             return false;
         }
 

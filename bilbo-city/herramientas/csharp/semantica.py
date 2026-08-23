@@ -27,6 +27,8 @@ EXTERNOS = {
  'MenuItem','Convert','Math','System','Func','Action','List','Dictionary','Stack','Queue','HashSet','Array','String',
  'Mathf','IEnumerator','IEnumerable','Coroutine','WaitForSeconds','Destroy','Instantiate','LayerMask','Physics2D',
  'Renderer','Space','Application','SystemInfo','Screen','Handheld','Sleep','Gizmos','GUI','GUILayout','Vector4',
+ # De la biblioteca base, para descomprimir la trama de la ciudad
+ 'MemoryStream','DeflateStream','CompressionMode','Stream',
 }
 PRIMITIVOS = {'int','float','bool','string','char','byte','sbyte','short','ushort','uint','long','ulong','double',
               'decimal','object','void','var','dynamic','T'}

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace BilboCity {
 
 /// <summary>Tipos de casilla del mundo.</summary>
-public enum Suelo { Road = 0, Acera = 1, Edif = 2, Parque = 3, Agua = 4, Puente = 5, Plaza = 6, Muelle = 7, Patio = 8, Via = 9 }
+public enum Suelo { Road = 0, Acera = 1, Edif = 2, Parque = 3, Agua = 4, Puente = 5, Plaza = 6, Muelle = 7, Patio = 8, Via = 9, Monte = 10 }
 
 /// <summary>Todo el arte que no son personajes: suelo, vehículos, mobiliario, armas y HUD.</summary>
 public static class Forja {
@@ -78,6 +78,17 @@ public static class Forja {
 
         g = T32(); g.Rellenar(Paleta.CespedO); g.Ruido(new[]{Paleta.Cesped,Paleta.H("#4d7c48")}, 34);
         for (int i = 0; i < 10; i++) g.P((i*7)%30,(i*11)%28,1,4,Paleta.H("#4d7c48")); Reg("parqueAlto", g);
+
+        // Medio término municipal de Bilbao es ladera. No es parque: es argoma, helecho y
+        // roca, y se pisa pero no se conduce.
+        g = T32(); g.Rellenar(Paleta.H("#4a6340")); g.Ruido(new[]{Paleta.H("#3f5638"),Paleta.H("#57704a")}, 30);
+        Reg("monte", g);
+
+        g = T32(); g.Rellenar(Paleta.H("#456039")); g.Ruido(new[]{Paleta.H("#3a5232"),Paleta.H("#5b7550")}, 36);
+        for (int i = 0; i < 8; i++) g.P((i*11)%29,(i*7)%27,2,3,Paleta.H("#6b7f4a")); Reg("monteMata", g);
+
+        g = T32(); g.Rellenar(Paleta.H("#4a6340")); g.Ruido(new[]{Paleta.H("#3f5638")}, 26);
+        g.P(9,12,10,7,Paleta.H("#7a7468")); g.P(11,10,6,3,Paleta.H("#8a8478")); Reg("monteRoca", g);
 
         for (int f = 0; f < 2; f++) {
             g = T32(); g.Rellenar(Paleta.Agua); g.Ruido(new[]{Paleta.H("#193f4a"),Paleta.H("#20505e")}, 20);
