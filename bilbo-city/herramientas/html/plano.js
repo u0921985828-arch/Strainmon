@@ -16,7 +16,7 @@ setTimeout(() => {
   const c = createCanvas(A.MW * Z, A.MH * Z), g = c.getContext('2d');
   g.imageSmoothingEnabled = false;
   const col = { 0:'#4a505a', 1:'#8a8578', 2:'#5c5148', 3:'#3c6338', 4:'#1c4652',
-                5:'#8d99a4', 6:'#a8a294', 7:'#6b5f45', 8:'#3f3a34' };
+                5:'#8d99a4', 6:'#a8a294', 7:'#6b5f45', 8:'#3f3a34', 9:'#241f1c' };
   for (let y = 0; y < A.MH; y++)
     for (let x = 0; x < A.MW; x++) {
       g.fillStyle = col[A.map[y * A.MW + x]] || '#f0f';
@@ -32,7 +32,7 @@ setTimeout(() => {
   for (let i = 0; i < A.MW * A.MH; i++) cuenta[A.map[i]] = (cuenta[A.map[i]] || 0) + 1;
   const total = A.MW * A.MH;
   const nom = { 0:'calzada', 1:'acera', 2:'edificio', 3:'verde', 4:'agua',
-                5:'puente', 6:'plaza', 7:'muelle', 8:'patio' };
+                5:'puente', 6:'plaza', 7:'muelle', 8:'patio', 9:'vía' };
   console.log('plano escrito en ' + salida + '\n');
   Object.keys(cuenta).sort().forEach(k =>
     console.log('  ' + (nom[k] || k).padEnd(9) + (cuenta[k] / total * 100).toFixed(1) + '%'));

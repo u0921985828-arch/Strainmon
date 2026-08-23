@@ -4,7 +4,7 @@ using UnityEngine;
 namespace BilboCity {
 
 /// <summary>Tipos de casilla del mundo.</summary>
-public enum Suelo { Road = 0, Acera = 1, Edif = 2, Parque = 3, Agua = 4, Puente = 5, Plaza = 6, Muelle = 7, Patio = 8 }
+public enum Suelo { Road = 0, Acera = 1, Edif = 2, Parque = 3, Agua = 4, Puente = 5, Plaza = 6, Muelle = 7, Patio = 8, Via = 9 }
 
 /// <summary>Todo el arte que no son personajes: suelo, vehículos, mobiliario, armas y HUD.</summary>
 public static class Forja {
@@ -63,6 +63,16 @@ public static class Forja {
 
         g = T32(); g.Rellenar(Paleta.HormigonO); g.Ruido(new[]{Paleta.Hormigon,Paleta.CespedO}, 20);
         for (int i = 0; i < 32; i += 11) g.P(i,0,1,32,Paleta.Carbon); Reg("patio", g);
+
+        // La vía se forja en las dos orientaciones y al volcar se elige según por dónde
+        // sigue el trazado: una sola horizontal quedaría con las traviesas atravesadas.
+        g = T32(); g.Rellenar(Paleta.H("#6e6660")); g.Ruido(new[]{Paleta.H("#5f5852"),Paleta.H("#7d746c")}, 26);
+        for (int x = 1; x < 32; x += 5) g.P(x,10,3,12,Paleta.H("#4a423c"));
+        g.P(0,12,32,2,Paleta.H("#9aa0a4")); g.P(0,19,32,2,Paleta.H("#9aa0a4")); Reg("via", g);
+
+        g = T32(); g.Rellenar(Paleta.H("#6e6660")); g.Ruido(new[]{Paleta.H("#5f5852"),Paleta.H("#7d746c")}, 26);
+        for (int y = 1; y < 32; y += 5) g.P(10,y,12,3,Paleta.H("#4a423c"));
+        g.P(12,0,2,32,Paleta.H("#9aa0a4")); g.P(19,0,2,32,Paleta.H("#9aa0a4")); Reg("viaV", g);
 
         g = T32(); g.Rellenar(Paleta.Cesped); g.Ruido(new[]{Paleta.CespedO,Paleta.H("#4d7c48")}, 28); Reg("parque", g);
 

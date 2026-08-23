@@ -71,8 +71,10 @@ def enCiudad(px, py):
 # un peatón cruza y un coche no, y la batería lo caza en la mediana de conducción.
 BARRIOS = [
     ('C', 'Casco Viejo',   10, 9,  3, 1, 2, 12, 3, 11, 'denso',      '#6b4a2e'),
-    ('A', 'Abando',        22, 17, 3, 5, 3, 31, 1, 40, 'senorial',   '#4a4f5c'),
-    ('I', 'Indautxu',      20, 17, 3, 2, 6, 28, 2, 34, 'senorial',   '#55505f'),
+    # Abando es el Ensanche: retícula cerrada, manzanas casi cuadradas y sin curvatura.
+    # Es el único barrio de Bilbao trazado a tiralíneas y tiene que notarse de lejos.
+    ('A', 'Abando',        20, 19, 3, 5, 3, 31, 0, 40, 'senorial',   '#4a4f5c'),
+    ('I', 'Indautxu',      19, 18, 3, 2, 6, 30, 1, 34, 'senorial',   '#55505f'),
     ('X', 'Abandoibarra',  25, 22, 3, 7, 1, 20, 2, 40, 'abierto',    '#5f6b74'),
     ('D', 'Deusto',        19, 12, 3, 3, 5,  8, 4, 30, 'bloques',    '#4e5a52'),
     ('Z', 'Zorrotzaurre',  20, 16, 3, 2, 2, 14, 2, 30, 'industrial', '#6b5f45'),

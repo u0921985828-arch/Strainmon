@@ -120,7 +120,7 @@ canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixela
 /* El mapa es rectangular a propósito: el valle de Bilbao va tumbado de este a oeste
    y en un cuadrado no cabe sin deformarlo. */
 const TS=32, MW=448, MH=288;
-const ROAD=0,ACERA=1,EDIF=2,PARQUE=3,AGUA=4,PUENTE=5,PLAZA=6,MUELLE=7,PATIO=8;
+const ROAD=0,ACERA=1,EDIF=2,PARQUE=3,AGUA=4,PUENTE=5,PLAZA=6,MUELLE=7,PATIO=8,VIA=9;
 const cv=document.getElementById('c'), ctx=cv.getContext('2d');
 let W=0,H=0,DPR=1;
 /* DPR entero a propósito: con 1,5 o 1,75 un píxel de textura cae a caballo de dos de
@@ -490,6 +490,13 @@ function generarTiles(){
  TILE.parqueAlto=T32(g=>{rell(g,C.cespedO);ruido(g,32,32,[C.cesped,'#4d7c48'],34);
   for(let i=0;i<10;i++)P(g,(i*7)%30,(i*11)%28,1,4,'#4d7c48');});
  TILE.camino=T32(g=>{rell(g,'#8a7f66');ruido(g,32,32,['#79705a','#9c9078'],22);});
+ /* La vía va en horizontal; para los tramos verticales se gira al dibujar. */
+ TILE[VIA]=T32(g=>{rell(g,'#6e6660');ruido(g,32,32,['#5f5852','#7d746c'],26);
+  for(let x=1;x<32;x+=5)P(g,x,10,3,12,'#4a423c');
+  P(g,0,12,32,2,'#9aa0a4');P(g,0,19,32,2,'#9aa0a4');});
+ TILE.viaV=T32(g=>{rell(g,'#6e6660');ruido(g,32,32,['#5f5852','#7d746c'],26);
+  for(let y=1;y<32;y+=5)P(g,10,y,12,3,'#4a423c');
+  P(g,12,0,2,32,'#9aa0a4');P(g,19,0,2,32,'#9aa0a4');});
  TILE.agua=[0,1].map(f=>T32(g=>{rell(g,C.agua);ruido(g,32,32,['#193f4a','#20505e'],20);
   for(let y=(f*4)%8;y<32;y+=8)P(g,0,y,32,1,C.aguaL);
   for(let y=(f*4+4)%8;y<32;y+=8)P(g,4,y,22,1,'#35798a');}));
@@ -764,8 +771,8 @@ const ATLAS=[
    y el Casco Viejo se retuerce. */
 const ZONAS={
  C:{n:'Casco Viejo',   sp:10,spy:9,w:3, ox:1, oy:2, ang:12, curva:3, onda:11, estilo:'denso',        tinte:'#6b4a2e'},
- A:{n:'Abando',        sp:22,spy:17,w:3, ox:5, oy:3, ang:31, curva:1, onda:40, estilo:'senorial',     tinte:'#4a4f5c'},
- I:{n:'Indautxu',      sp:20,spy:17,w:3, ox:2, oy:6, ang:28, curva:2, onda:34, estilo:'senorial',     tinte:'#55505f'},
+ A:{n:'Abando',        sp:20,spy:19,w:3, ox:5, oy:3, ang:31, curva:0, onda:40, estilo:'senorial',     tinte:'#4a4f5c'},
+ I:{n:'Indautxu',      sp:19,spy:18,w:3, ox:2, oy:6, ang:30, curva:1, onda:34, estilo:'senorial',     tinte:'#55505f'},
  X:{n:'Abandoibarra',  sp:25,spy:22,w:3, ox:7, oy:1, ang:20, curva:2, onda:40, estilo:'abierto',      tinte:'#5f6b74'},
  D:{n:'Deusto',        sp:19,spy:12,w:3, ox:3, oy:5, ang:8, curva:4, onda:30, estilo:'bloques',      tinte:'#4e5a52'},
  Z:{n:'Zorrotzaurre',  sp:20,spy:16,w:3, ox:2, oy:2, ang:14, curva:2, onda:30, estilo:'industrial',   tinte:'#6b5f45'},
@@ -882,6 +889,26 @@ function generarCiudad(){
   [[300,80],[328,72],[356,68]],              /* Zumalakarregi */
  ];
  ARTERIAS.forEach(a=>linea(a,5,ROAD,(x,y)=>!ZONAS[charDe(x,y)].verde));
+
+ /* 4 ter · el ferrocarril. En el plano municipal las vías ordenan la lectura tanto
+    como las avenidas, y aquí además parten manzanas y obligan a rodear. Se dibujan
+    SIN pisar la calzada: cada cruce con una calle queda a nivel, así que la red viaria
+    no se corta — que es lo que mide la batería. */
+ const VIAS=[
+  /* metro por el corredor del valle: Basauri, Casco Viejo, Abando, Indautxu, San
+     Mamés, Deusto, San Ignacio y salida a Erandio */
+  [[440,150],[400,142],[360,132],[320,116],[290,104],[262,96],[232,102],[206,110],
+   [178,108],[150,96],[120,88],[92,76],[60,58],[30,34],[8,12]],
+  /* Renfe: Abando, Zabalburu, Ametzola, Errekalde y salida al suroeste */
+  [[248,104],[236,120],[224,140],[212,160],[196,180],[176,196],[152,208]],
+  /* Euskotren por Atxuri hacia Bolueta y el este */
+  [[300,118],[326,132],[352,142],[380,152],[412,160]],
+  /* la línea de Zorrotza, por la margen izquierda */
+  [[228,142],[196,148],[164,150],[130,148],[96,142],[64,134]],
+ ];
+ VIAS.forEach(v=>linea(v,3,VIA,(x,y)=>{
+  const t=map[y*MW+x];
+  return t!==ROAD&&t!==PUENTE&&t!==AGUA&&t!==MUELLE;}));
 
  /* 5 · San Mamés */
  for(let cy=0;cy<NCY;cy++)for(let cx=0;cx<NCX;cx++){
@@ -1853,6 +1880,7 @@ function tileDe(x,y,fa){
   if(D.estilo==='abierto')return TILE.adoquinRojo;
   return hash(x,y)%11===0?TILE.aceraGast:TILE[ACERA];}
  if(t===PARQUE)return hash(x,y)%4===0?TILE.parqueAlto:TILE[PARQUE];
+ if(t===VIA)return (Tc(x-1,y)===VIA||Tc(x+1,y)===VIA)?TILE[VIA]:TILE.viaV;
  return TILE[t]||TILE[ACERA];}
 function dib(){
  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.imageSmoothingEnabled=false;

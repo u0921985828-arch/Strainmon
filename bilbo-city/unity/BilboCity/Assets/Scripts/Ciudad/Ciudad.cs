@@ -105,8 +105,8 @@ public static class Ciudad {
 
     public static readonly Dictionary<char, Zona> Zonas = new Dictionary<char, Zona> {
         {'C', new Zona{ Nombre="Casco Viejo",    Sp=10, Spy=9, W=3, Ox=1, Oy=2, Ang=12, Curva=3, Onda=11, Estilo="denso",         Tinte=Paleta.H("#6b4a2e") }},
-        {'A', new Zona{ Nombre="Abando",         Sp=22, Spy=17, W=3, Ox=5, Oy=3, Ang=31, Curva=1, Onda=40, Estilo="senorial",      Tinte=Paleta.H("#4a4f5c") }},
-        {'I', new Zona{ Nombre="Indautxu",       Sp=20, Spy=17, W=3, Ox=2, Oy=6, Ang=28, Curva=2, Onda=34, Estilo="senorial",      Tinte=Paleta.H("#55505f") }},
+        {'A', new Zona{ Nombre="Abando",         Sp=20, Spy=19, W=3, Ox=5, Oy=3, Ang=31, Curva=0, Onda=40, Estilo="senorial",      Tinte=Paleta.H("#4a4f5c") }},
+        {'I', new Zona{ Nombre="Indautxu",       Sp=19, Spy=18, W=3, Ox=2, Oy=6, Ang=30, Curva=1, Onda=34, Estilo="senorial",      Tinte=Paleta.H("#55505f") }},
         {'X', new Zona{ Nombre="Abandoibarra",   Sp=25, Spy=22, W=3, Ox=7, Oy=1, Ang=20, Curva=2, Onda=40, Estilo="abierto",       Tinte=Paleta.H("#5f6b74") }},
         {'D', new Zona{ Nombre="Deusto",         Sp=19, Spy=12, W=3, Ox=3, Oy=5, Ang=8, Curva=4, Onda=30, Estilo="bloques",       Tinte=Paleta.H("#4e5a52") }},
         {'Z', new Zona{ Nombre="Zorrotzaurre",   Sp=20, Spy=16, W=3, Ox=2, Oy=2, Ang=14, Curva=2, Onda=30, Estilo="industrial",    Tinte=Paleta.H("#6b5f45") }},
@@ -288,6 +288,33 @@ public static class Ciudad {
         };
         foreach (var a in arterias)
             Linea(a, 5, Suelo.Road, (x,y) => !ZonaDe(Mathf.Clamp(x,0,MW-1),Mathf.Clamp(y,0,MH-1)).Verde);
+
+        // 4 ter · el ferrocarril. En el plano municipal las vías ordenan la lectura tanto
+        // como las avenidas, y además parten manzanas y obligan a rodear. Se dibujan SIN
+        // pisar la calzada: cada cruce con una calle queda a nivel, así que la red viaria
+        // no se corta — que es lo que mide la batería.
+        var vias = new[]{
+            // metro por el corredor del valle: Basauri, Casco Viejo, Abando, Indautxu,
+            // San Mamés, Deusto, San Ignacio y salida a Erandio
+            new[]{ new Vector2(440,150), new Vector2(400,142), new Vector2(360,132), new Vector2(320,116),
+                   new Vector2(290,104), new Vector2(262,96),  new Vector2(232,102), new Vector2(206,110),
+                   new Vector2(178,108), new Vector2(150,96),  new Vector2(120,88),  new Vector2(92,76),
+                   new Vector2(60,58),   new Vector2(30,34),   new Vector2(8,12) },
+            // Renfe: Abando, Zabalburu, Ametzola, Errekalde y salida al suroeste
+            new[]{ new Vector2(248,104), new Vector2(236,120), new Vector2(224,140), new Vector2(212,160),
+                   new Vector2(196,180), new Vector2(176,196), new Vector2(152,208) },
+            // Euskotren por Atxuri hacia Bolueta y el este
+            new[]{ new Vector2(300,118), new Vector2(326,132), new Vector2(352,142), new Vector2(380,152),
+                   new Vector2(412,160) },
+            // la línea de Zorrotza, por la margen izquierda
+            new[]{ new Vector2(228,142), new Vector2(196,148), new Vector2(164,150), new Vector2(130,148),
+                   new Vector2(96,142),  new Vector2(64,134) },
+        };
+        foreach (var v in vias)
+            Linea(v, 3, Suelo.Via, (x,y) => {
+                var t = T(x,y);
+                return t != Suelo.Road && t != Suelo.Puente && t != Suelo.Agua && t != Suelo.Muelle;
+            });
 
         // 5 · San Mamés
         int sx = 0, sy = 0, n = 0;

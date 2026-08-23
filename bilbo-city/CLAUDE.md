@@ -99,6 +99,12 @@ Corazón, San Mamés y los montes cerrando el valle.
 `Ciudad.cs` a la vez, a partir de la mancha urbana y de una semilla por barrio. Mover un
 barrio es mover un punto.
 
+**Hay ferrocarril.** `VIA` / `Suelo.Via` es un tipo de suelo propio: se pisa pero no se
+conduce. Las cuatro líneas —metro por el valle, Renfe hacia el suroeste, Euskotren al este
+y la de Zorrotza— se dibujan **sin pisar la calzada**, así que cada cruce con una calle
+queda a nivel y la red viaria no se corta. Si añades una línea, respétalo o la batería te
+lo dirá en la conectividad.
+
 **Las calles no van a escuadra.** Cada barrio tiene su rumbo (`ang`) y su curvatura
 (`curva`, `onda`): la calle es una curva de nivel de un sistema de coordenadas girado y
 ondulado, no `x % sp`. Con una malla ortogonal el plano sale encajonado, como papel

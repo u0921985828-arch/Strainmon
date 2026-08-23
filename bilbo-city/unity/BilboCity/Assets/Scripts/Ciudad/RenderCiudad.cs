@@ -46,6 +46,7 @@ public class RenderCiudad : MonoBehaviour {
         var acera = TileDe(T["acera"]); var aceraG = TileDe(T["aceraGast"]);
         var adoquin = TileDe(T["adoquin"]); var adoquinR = TileDe(T["adoquinRojo"]);
         var plaza = TileDe(T["plaza"]); var patio = TileDe(T["patio"]);
+        var via = TileDe(T["via"]); var viaV = TileDe(T["viaV"]);
         var parque = TileDe(T["parque"]); var parqueA = TileDe(T["parqueAlto"]);
         var puente = TileDe(T["puente"]); var muelle = TileDe(T["muelle"]);
         var tejados = new Tile[8]; for (int i = 0; i < 8; i++) tejados[i] = TileDe(Forja.Tejados[i]);
@@ -85,6 +86,9 @@ public class RenderCiudad : MonoBehaviour {
                     case Suelo.Parque: elegido = Utiles.Hash(x,y) % 4 == 0 ? parqueA : parque; break;
                     case Suelo.Plaza:  elegido = plaza; break;
                     case Suelo.Patio:  elegido = patio; break;
+                    case Suelo.Via:
+                        elegido = (Ciudad.T(x-1,y) == Suelo.Via || Ciudad.T(x+1,y) == Suelo.Via) ? via : viaV;
+                        break;
                     case Suelo.Puente: elegido = puente; break;
                     case Suelo.Muelle: elegido = muelle; break;
                     default: elegido = acera; break;
