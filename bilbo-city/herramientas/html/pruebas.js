@@ -91,24 +91,32 @@ const dormir = ms => new Promise(r => setTimeout(r, ms));
 
     // ── 5 · la red viaria está conectada ───────────────────────────────
     {
+      // Se mide la componente MAYOR, no la que toque salir primero al escanear. Lo que
+      // interesa es si la ciudad es de una pieza; arrancando por la esquina, un callejón
+      // suelto de cien casillas daba 0 % con el 98 % de la red entera y bien conectada.
       const vis = new Uint8Array(A.MW * A.MH);
-      let sx = 0, sy = 0, total = 0;
-      buscar: for (let y = 0; y < A.MH; y++)
-        for (let x = 0; x < A.MW; x++) if (A.rodable(x, y)) { sx = x; sy = y; break buscar; }
+      let total = 0, mayor = 0, trozos = 0;
       for (let y = 0; y < A.MH; y++)
         for (let x = 0; x < A.MW; x++) if (A.rodable(x, y)) total++;
-      const pila = [[sx, sy]]; vis[sy * A.MW + sx] = 1; let alcanzado = 0;
-      while (pila.length) {
-        const [cx, cy] = pila.pop(); alcanzado++;
-        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-          const nx = cx + dx, ny = cy + dy;
-          if (nx < 0 || ny < 0 || nx >= A.MW || ny >= A.MH || vis[ny * A.MW + nx]) continue;
-          if (A.rodable(nx, ny)) { vis[ny * A.MW + nx] = 1; pila.push([nx, ny]); }
+      for (let y0 = 0; y0 < A.MH; y0++) {
+        for (let x0 = 0; x0 < A.MW; x0++) {
+          if (!A.rodable(x0, y0) || vis[y0 * A.MW + x0]) continue;
+          trozos++;
+          const pila = [[x0, y0]]; vis[y0 * A.MW + x0] = 1; let n = 0;
+          while (pila.length) {
+            const [cx, cy] = pila.pop(); n++;
+            for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+              const nx = cx + dx, ny = cy + dy;
+              if (nx < 0 || ny < 0 || nx >= A.MW || ny >= A.MH || vis[ny * A.MW + nx]) continue;
+              if (A.rodable(nx, ny)) { vis[ny * A.MW + nx] = 1; pila.push([nx, ny]); }
+            }
+          }
+          if (n > mayor) mayor = n;
         }
       }
-      const pct = alcanzado / total * 100;
-      ok(pct > 90, 'la red viaria está partida: solo se alcanza el ' + pct.toFixed(1) + '%');
-      bien.push('red viaria conectada al ' + pct.toFixed(1) + '%');
+      const pct = mayor / total * 100;
+      ok(pct > 90, 'la red viaria está partida: la pieza mayor es el ' + pct.toFixed(1) + '%');
+      bien.push('red viaria conectada al ' + pct.toFixed(1) + '% en ' + trozos + ' trozos');
     }
 
     // ── 6 · combate ────────────────────────────────────────────────────

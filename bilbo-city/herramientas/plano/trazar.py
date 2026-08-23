@@ -26,27 +26,28 @@ CS   = RAIZ / 'unity' / 'BilboCity' / 'Assets' / 'Scripts' / 'Ciudad' / 'Ciudad.
 # cambiando a lo largo: (x, y, radio). El radio se interpola entre puntos, así que un
 # brazo puede nacer ancho en el valle y morir estrecho ladera arriba.
 CORREDORES = [
-    # el fondo del valle, siguiendo la ría de Bolueta (este) a Zorrotza (oeste)
-    [(111,38,13),(101,42,14),(91,38,15),(81,32,15),(69,29,14),(57,30,14),
-     (45,35,13),(33,43,12),(21,46,11),(12,38,10),(4,26,8),(0,22,7)],
-    # Deusto, subiendo al noroeste por la margen derecha
-    [(46,32,9),(38,26,10),(30,20,10),(22,16,8),(16,14,6)],
-    # Uribarri y el alto de Artxanda
-    [(64,27,8),(62,20,8),(60,13,6),(58,8,4)],
-    # Begoña, ladera arriba desde el Arenal
-    [(82,31,7),(84,25,8),(86,19,7),(88,14,5)],
+    # el fondo del valle, de Bolueta (este) a Zorrotza y Erandio (oeste), siguiendo la ría
+    [(111,41,13),(101,38,14),(92,34,15),(84,31,15),(75,28,14),(65,23,13),
+     (58,19,13),(52,18,13),(45,19,13),(40,22,13),(34,23,12),(26,21,11),
+     (18,15,10),(10,8,8),(4,3,6)],
+    # Deusto: San Pedro, Ibarrekolanda, Arangoiti y San Ignacio, margen derecha
+    [(38,20,9),(30,15,10),(23,12,9),(16,9,8),(10,7,6)],
+    # Matiko, Ciudad Jardín y Uribarri, trepando a Artxanda
+    [(66,17,9),(64,11,8),(62,6,6),(60,2,4)],
+    # Zurbaran-Arabella y Begoña, ladera arriba desde el Arenal
+    [(78,20,8),(82,15,8),(84,10,6)],
     # Txurdinaga y Otxarkoaga, el vallecito del noreste
-    [(90,30,7),(96,24,9),(100,17,10),(104,11,9),(107,6,6)],
-    # Santutxu, colgado entre Begoña y Txurdinaga
-    [(88,34,7),(93,31,8),(97,29,7)],
-    # el Casco Viejo y Miribilla, bajando al sureste
-    [(90,40,9),(90,47,10),(88,54,9),(84,60,7)],
-    # Rekalde, el valle del sur
-    [(68,38,10),(68,46,11),(66,54,11),(62,62,9),(58,68,6)],
-    # Basurto y Ametzola, al suroeste
-    [(48,42,10),(42,49,11),(36,56,10),(30,62,7)],
-    # Olabeaga y Zorrotza, siguiendo la ría abajo
-    [(22,46,9),(16,53,9),(10,60,7),(6,66,5)],
+    [(88,24,8),(95,21,9),(101,16,9),(105,11,8),(108,7,5)],
+    # Santutxu, Solokoetxe, Atxuri y Bolueta, la margen derecha aguas arriba
+    [(80,28,8),(86,31,9),(91,34,9),(97,37,8),(103,40,6)],
+    # Casco Viejo, Bilbao la Vieja, Miribilla, San Adrián y La Peña, hacia el sureste
+    [(72,28,8),(72,35,9),(74,42,10),(78,48,9),(82,54,7)],
+    # Rekalde: Ametzola, Iralabarri, Errekaldeberri y Larraskitu, el valle del sur
+    [(56,32,10),(55,39,11),(58,46,11),(58,53,10),(56,60,7)],
+    # Basurtu, Altamira y Masustegi, al suroeste
+    [(46,30,10),(41,34,11),(34,39,10),(28,44,8)],
+    # Olabeaga y Zorrotza, ría abajo por la margen izquierda
+    [(32,32,9),(24,32,9),(16,31,8),(10,33,6)],
 ]
 
 def enCiudad(px, py):
@@ -112,32 +113,52 @@ def tablaCS():
 
 # Centro de cada barrio. El peso encoge (<1) o agranda (>1) su reparto: el Casco Viejo
 # es pequeño de verdad y Txurdinaga y Rekalde son extensos.
-SEMILLAS = [('D',(34,18)), ('U',(66,18)), ('G',(82,22)), ('T',(96,12)), ('S',(92,30)),
-            ('O',(18,52)), ('X',(62,34)), ('C',(90,38)), ('A',(74,40)), ('I',(56,44)),
-            ('P',(50,42)), ('E',(44,48)), ('B',(36,54)), ('M',(86,50)), ('R',(66,56))]
+SEMILLAS = [('D',(30, 9)), ('U',(66,11)), ('G',(83,20)), ('T',(99,19)), ('S',(91,34)),
+            ('O',(24,33)), ('X',(60,20)), ('C',(71,28)), ('A',(58,23)), ('I',(53,30)),
+            ('P',(50,27)), ('E',(46,31)), ('B',(38,35)), ('M',(74,43)), ('R',(57,45))]
 PESO = {'C':.85,'P':.5,'E':.55,'X':.75,'O':1.15,'T':1.15,'S':.95,'G':.95,
         'R':1.1,'B':1.05,'D':1.2,'U':1.05,'M':.95}
 
 # Zorrotzaurre va aparte: es la isla entre la ría y el Canal de Deusto, y un reparto
 # por cercanía la dejaría a caballo de las dos orillas.
-ISLA = [(12,38),(32,36),(34,40),(30,46),(14,46),(10,42)]
+ISLA = [(27,20),(46,19),(48,22),(44,25),(28,25),(25,22)]
 
 # Los parques grandes, uno a uno. En el plano municipal el verde dentro de la ciudad
 # pesa tanto como el monte de alrededor, y sin ellos todo sale gris.
 PARQUES = [
-    [(46,40),(54,40),(56,46),(48,46)],        # Doña Casilda
-    [(86,30),(94,30),(94,36),(86,36)],        # Etxebarria, sobre el Casco Viejo
-    [(94,16),(104,16),(104,24),(94,24)],          # Europa, en Txurdinaga
-    [(56,52),(64,52),(64,58),(56,58)],        # Ametzola
-    [(26,22),(34,22),(34,28),(26,28)],        # Deusto, la campa de la universidad
+    [(46,25),(53,25),(54,30),(47,30)],        # Doña Casilda, entre Abando e Indautxu
+    [(74,24),(80,24),(80,29),(74,29)],        # Etxebarria, sobre el Casco Viejo
+    [(94,15),(102,15),(102,21),(94,21)],      # Europa, en Txurdinaga
+    [(54,36),(60,36),(60,41),(54,41)],        # Ametzola
+    [(26,13),(33,13),(33,18),(26,18)],        # la campa de Deusto
+    [(66,44),(72,44),(72,49),(66,49)],        # el vivero de Miribilla
 ]
 
 # La ría, en casillas del mapa (la misma polilínea que dibuja el juego). Sirve para que
 # ningún barrio salte de orilla: en Bilbao el Casco Viejo está en una margen y el
 # Ensanche en la otra, y un reparto por cercanía sin esto los mezcla.
-RIA = [(446,152),(424,160),(404,168),(384,164),(364,152),(344,140),(324,128),(300,120),
-       (276,116),(252,116),(228,120),(204,128),(180,140),(156,156),(132,172),(108,184),
-       (84,184),(64,172),(48,152),(32,128),(16,104),(0,88)]
+RIA = [(445, 163),
+       (404, 154),
+       (369, 146),
+       (346, 137),
+       (326, 125),
+       (302, 110),
+       (282, 92),
+       (262, 80),
+       (238, 71),
+       (215, 68),
+       (196, 72),
+       (180, 84),
+       (165, 96),
+       (148, 102),
+       (130, 100),
+       (114, 90),
+       (96, 84),
+       (84, 86),
+       (55, 68),
+       (35, 45),
+       (17, 21),
+       (6, 6)]
 NORTE = set('DUGTS')          # margen derecha, la de Deusto y Begoña
 SUR    = set('XCAIPEBMR')     # margen izquierda, la del Ensanche
 def riaEnX(mx):
@@ -162,7 +183,7 @@ def trazar():
             # margen: al este del meandro la ría parte la ciudad en dos y cada barrio
             # es de una orilla. Al oeste se dobla sobre sí misma y ahí no aplica.
             orilla = None
-            if x*4+2 >= 152:
+            if x*4+2 >= 170:
                 ry = riaEnX(x*4+2)
                 if ry is not None: orilla = NORTE if y*4+2 < ry else SUR
             mejor, md = None, 1e9

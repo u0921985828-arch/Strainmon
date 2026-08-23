@@ -134,35 +134,35 @@ public class Estado {
             s.Pos = mira ? Ciudad.PuntoZona(cx,cy,30,z) : Ciudad.PuntoPortal(cx,cy,30,z);
             Sitios.Add(s);
         }
-        S("piso",     "Tu piso",                Paleta.Mostaza,      "piso",     372,104, 'S');
-        S("portal",   "Portal",                 Paleta.H("#c98fd0"), "portal",   384,116, 'S');
-        S("bar",      "Bar Zurito",             Paleta.RojoL,        "bar",      360,156, 'C');
-        S("merca",    "Mercado de la Ribera",   Paleta.VerdeL,       "merca",    372,168, 'C');
-        S("armeria",  "Bazar Nervión",          Paleta.Sangre,       "armeria",  392,128, 'S');
-        S("taller",   "Taller Iker",            Paleta.H("#9d8ec4"), "taller",   264,228, 'R');
-        S("hospital", "Hospital de Basurto",    Paleta.Blanco,       "hospital",  148,220, 'B');
-        S("obra",     "Obra de Zorrotzaurre",   Paleta.H("#e8a33d"), null,         88,164, 'Z');
-        S("puerto",   "Muelle de Olabeaga",     Paleta.H("#4d9de0"), null,        80,224, 'O');
-        S("poli",     "Comisaría",              Paleta.H("#4dd0e1"), null,       224,180, 'I');
-        S("guggen",   "El Guggenheim",          Paleta.H("#b8c4cc"), null,       248,140, 'X', true);
-        S("sanmames", "San Mamés",              Paleta.VerdeL,       null,        180,196, 'E', true);
-        S("abando",   "Estación de Abando",     Paleta.H("#c9a13f"), null,       300,168, 'A', true);
-        S("ayto",     "El Ayuntamiento",        Paleta.H("#a8b4bc"), null,       264,76, 'U', true);
-        S("casilla",  "Parque de Doña Casilda", Paleta.Cesped,       null,       204,172, 'P', true);
+        S("piso",     "Tu piso",                Paleta.Mostaza,      "piso",     384,131, 'S');
+        S("portal",   "Portal",                 Paleta.H("#c98fd0"), "portal",   388,135, 'S');
+        S("bar",      "Bar Zurito",             Paleta.RojoL,        "bar",      281,123, 'C');
+        S("merca",    "Mercado de la Ribera",   Paleta.VerdeL,       "merca",    285,127, 'C');
+        S("armeria",  "Bazar Nervión",          Paleta.Sangre,       "armeria",  380,127, 'S');
+        S("taller",   "Taller Iker",            Paleta.H("#9d8ec4"), "taller",   228,204, 'R');
+        S("hospital", "Hospital de Basurto",    Paleta.Blanco,       "hospital",  153,155, 'B');
+        S("obra",     "Obra de Zorrotzaurre",   Paleta.H("#e8a33d"), null,         148, 86, 'Z');
+        S("puerto",   "Muelle de Olabeaga",     Paleta.H("#4d9de0"), null,         79,136, 'O');
+        S("poli",     "Comisaría",              Paleta.H("#4dd0e1"), null,       214,128, 'I');
+        S("guggen",   "El Guggenheim",          Paleta.H("#b8c4cc"), null,       246, 86, 'X', true);
+        S("sanmames", "San Mamés",              Paleta.VerdeL,       null,        186,124, 'E', true);
+        S("abando",   "Estación de Abando",     Paleta.H("#c9a13f"), null,       232, 98, 'A', true);
+        S("ayto",     "El Ayuntamiento",        Paleta.H("#a8b4bc"), null,       257, 39, 'U', true);
+        S("casilla",  "Parque de Doña Casilda", Paleta.Cesped,       null,       200,110, 'P', true);
         // Los emblemáticos, cada uno en su barrio de verdad
-        S("arriaga",  "Teatro Arriaga",         Paleta.H("#d0a05a"), null,       344,132, 'C', true);
-        S("catedral", "Catedral de Santiago",   Paleta.H("#c2b8a8"), null,       364,156, 'C', true);
-        S("plazanueva","La Plaza Nueva",        Paleta.H("#bfa878"), null,       356,144, 'C', true);
-        S("euskalduna","Palacio Euskalduna",    Paleta.H("#8fa0ad"), null,       224,136, 'X', true);
-        S("iberdrola","Torre Iberdrola",        Paleta.H("#9fb4c4"), null,       268,136, 'X', true);
-        S("bellasartes","Museo de Bellas Artes",Paleta.H("#b09a6e"), null,       220,168, 'P', true);
-        S("alhondiga","Azkuna Zentroa",         Paleta.H("#c07f52"), null,       232,176, 'I', true);
-        S("begonia",  "Basílica de Begoña",     Paleta.H("#cbbf9c"), null,       332,88, 'G', true);
-        S("funicular","Funicular de Artxanda",  Paleta.H("#7fbf9f"), null,       280,60, 'U', true);
-        S("moyua",    "Plaza Moyúa",            Paleta.H("#a8bcc8"), null,       320,160, 'A', true);
-        S("deustuni", "Universidad de Deusto",  Paleta.H("#b8a05c"), null,        152,96, 'D', true);
-        S("maritimo", "Museo Marítimo",         Paleta.H("#6f9ab5"), null,        96,192, 'O', true);
-        S("arena",    "Bilbao Arena",           Paleta.H("#c4693f"), null,       360,220, 'M', true);
+        S("arriaga",  "Teatro Arriaga",         Paleta.H("#d0a05a"), null,       277,119, 'C', true);
+        S("catedral", "Catedral de Santiago",   Paleta.H("#c2b8a8"), null,       283,125, 'C', true);
+        S("plazanueva","La Plaza Nueva",        Paleta.H("#bfa878"), null,       279,121, 'C', true);
+        S("euskalduna","Palacio Euskalduna",    Paleta.H("#8fa0ad"), null,       244, 84, 'X', true);
+        S("iberdrola","Torre Iberdrola",        Paleta.H("#9fb4c4"), null,       248, 88, 'X', true);
+        S("bellasartes","Museo de Bellas Artes",Paleta.H("#b09a6e"), null,       204,106, 'P', true);
+        S("alhondiga","Azkuna Zentroa",         Paleta.H("#c07f52"), null,       218,132, 'I', true);
+        S("begonia",  "Basílica de Begoña",     Paleta.H("#cbbf9c"), null,       332, 72, 'G', true);
+        S("funicular","Funicular de Artxanda",  Paleta.H("#7fbf9f"), null,       253, 35, 'U', true);
+        S("moyua",    "Plaza Moyúa",            Paleta.H("#a8bcc8"), null,       236,102, 'A', true);
+        S("deustuni", "Universidad de Deusto",  Paleta.H("#b8a05c"), null,        106, 39, 'D', true);
+        S("maritimo", "Museo Marítimo",         Paleta.H("#6f9ab5"), null,         83,140, 'O', true);
+        S("arena",    "Bilbao Arena",           Paleta.H("#c4693f"), null,       344,184, 'M', true);
     }
     public static Sitio Sitio_(string id) { return Sitios.Find(s => s.Id == id); }
 }
