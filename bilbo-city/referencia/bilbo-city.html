@@ -2706,10 +2706,27 @@ const TIPOS_PESADO=['autobus','basura','camionObra','furgoLarga'];
 function poblar(){
  tuCoche=nuevoCoche(poi('piso').p.x+1.4,poi('piso').p.y,'utilitario',0,true,11);
  coches.push(tuCoche);
- for(let i=0;i<40;i++){const p=puntoCalle();
+ /* Cuarenta coches aparcados repartidos por el término municipal entero son cuarenta
+    coches que no se ven nunca: son siete kilómetros de calle. Se sueltan alrededor del
+    jugador y se reciclan al alejarse, igual que el tráfico y los peatones. */
+ for(let i=0;i<40;i++){const p=puntoCalle(player.x|0,player.y|0,48);
   coches.push(nuevoCoche(p.x,p.y,TIPOS_CIVIL[i%TIPOS_CIVIL.length],(i+1)%LIBREAS.length,false));}
- for(let i=0;i<16;i++)trafico.push(nuevoTrafico());
+ for(let i=0;i<16;i++)trafico.push(nuevoTrafico(player.x|0,player.y|0));
  for(let i=0;i<26;i++)peatones.push(nuevoPeaton(player.x|0,player.y|0));
+}
+/* Se recolocan de dos en dos por vuelta: buscar sitio en la calle cuesta lo suyo y
+   hacerlo para cuarenta coches el mismo fotograma se nota en el pulso del juego. */
+let _reciclaCoche=0;
+function reciclarCoches(){
+ let hechos=0;
+ for(let n=0;n<coches.length&&hechos<2;n++){
+  _reciclaCoche=(_reciclaCoche+1)%coches.length;
+  const c=coches[_reciclaCoche];
+  if(c.propio||c===player.enCoche||dist(c,player)<=72)continue;
+  const p=puntoCalle(player.x|0,player.y|0,54);
+  if(dist(p,player)<26)continue;                 /* que no aparezca en las narices */
+  c.x=p.x;c.y=p.y;c.ang=angCalle(p.x,p.y);c.vx=c.vy=0;c.dano=0;c.vivo=true;c.lib=(c.lib+1)%LIBREAS.length;
+  hechos++;}
 }
 function nuevoTrafico(cx,cy){
  const p=cx!==undefined?puntoCalle(cx,cy,44):puntoCalle();
@@ -3047,14 +3064,32 @@ function finCurro(ok){curroEl.style.display='none';
 /*═══════════════ CURROS ═══════════════*/
 function aceptarCurro(j,pago){
  let o,d=null;
- if(j.id==='reparto'){o=poi('bar').p;d=puntoAcera(player.x|0,player.y|0,45);}
- else if(j.id==='taxi'||j.id==='mudanza'){o=puntoAcera(player.x|0,player.y|0,35);d=puntoAcera();}
+ let dn=null;
+ const dest=(min,max)=>{const q=destinoCurro(min,max);dn=q.n;return q.p;};
+ if(j.id==='reparto'){o=poi('bar').p;d=dest(70,200);}
+ else if(j.id==='taxi'||j.id==='mudanza'){o=puntoAcera(player.x|0,player.y|0,60);d=dest(90,300);}
  else if(j.id==='obra')o=poi('obra').p;
  else if(j.id==='puerto')o=poi('puerto').p;
  else if(j.id==='lonja')o=poi('merca').p;
- else if(j.id==='fuga'){o=puntoAcera(player.x|0,player.y|0,30);d=puntoAcera();}
- else{o=poi('taller').p;d=puntoAcera();}
- S.job={...j,pago,o,d,fase:0};aviso('Curro aceptado: '+j.tt);}
+ else if(j.id==='fuga'){o=puntoAcera(player.x|0,player.y|0,50);d=dest(90,280);}
+ else{o=poi('taller').p;d=dest(70,240);}
+ S.job={...j,pago,o,d,dn,fase:0};
+ aviso('Curro aceptado: '+j.tt+(dn?' · '+dn.toUpperCase():''));}
+
+/* Un destino de curro tiene que estar lejos para que el viaje valga algo y cerca para
+   que no sea media hora andando: entre 300 m y kilómetro y medio. Y mejor un sitio con
+   nombre —«a San Mamés», «a Zorrotza»— que una acera cualquiera. La ciudad es la de
+   verdad; que se note en el trabajo, no solo en el plano. */
+function destinoCurro(minC,maxC){
+ const px=player.x,py=player.y,cand=[];
+ for(const b of BARRIOS){const q=Math.hypot(b.x-px,b.y-py);
+  if(q>=minC&&q<=maxC)cand.push({n:b.n,c:[b.x,b.y]});}
+ for(const p of POI){if(p.int||!p.mira)continue;
+  const q=Math.hypot(p.p.x-px,p.p.y-py);
+  if(q>=minC&&q<=maxC)cand.push({n:p.n,c:[p.p.x|0,p.p.y|0]});}
+ if(!cand.length)return{n:null,p:puntoAcera(px|0,py|0,Math.round(maxC))};
+ const e=cand[rndi(0,cand.length-1)];
+ return{n:e.n,p:puntoAcera(e.c[0],e.c[1],24)};}
 function cobrar(j){
  S.dinero+=j.pago;S.rep[j.g]++;sfx('dinero');let e='';
  if(S.contrato&&S.contrato.g===j.g){S.contrato.hechos++;
@@ -3473,6 +3508,7 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
   else if(player.golpeT>0){}
   else player.pose=player.herido>0?'herido':(arma(S.armaAct).cuerpo?'quieto':'apunta');
  }
+ reciclarCoches();
  for(const c of trafico){c.frenado=(player.enCoche&&dist(c,player)<2.2)?1:0;rejilla(c,dt,false);
   if(dist(c,player)>56)Object.assign(c,nuevoTrafico(player.x|0,player.y|0));}
  const persiguen=S.estrellas>0;
@@ -3827,7 +3863,8 @@ function dibHUD(){
  if(S.escena==='ciudad'&&(S.mision||S.job)){
   const o=objetivo(),dm=o?Math.round(dist(o,player)*8):0;
   const t1=S.mision?S.mision.def.n:S.job.tt;
-  const t2=S.mision?pasoActual().txt:(S.job.fase===0?'RECOGIDA':'ENTREGA');
+  const t2=S.mision?pasoActual().txt
+   :(S.job.fase===0?'RECOGIDA':'ENTREGA'+(S.job.dn?' · '+S.job.dn.toUpperCase():''));
   const t3=dm+' M'+(S.mision&&S.mision.limite?'  '+Math.max(0,Math.ceil(S.mision.limite-S.mision.t))+' S':
    (S.job?'  '+S.job.pago+' €':''));
   const wm=Math.max(anchoTexto(t1,1),anchoTexto(t2,1),anchoTexto(t3,1))+12;
