@@ -141,7 +141,7 @@ public class Estado {
         S("armeria",  "Bazar Nervión",          Paleta.Sangre,       "armeria",  392,128, 'S');
         S("taller",   "Taller Iker",            Paleta.H("#9d8ec4"), "taller",   264,228, 'R');
         S("hospital", "Hospital de Basurto",    Paleta.Blanco,       "hospital",  148,220, 'B');
-        S("obra",     "Obra de Zorrotzaurre",   Paleta.H("#e8a33d"), null,        152,168, 'Z');
+        S("obra",     "Obra de Zorrotzaurre",   Paleta.H("#e8a33d"), null,         88,164, 'Z');
         S("puerto",   "Muelle de Olabeaga",     Paleta.H("#4d9de0"), null,        80,224, 'O');
         S("poli",     "Comisaría",              Paleta.H("#4dd0e1"), null,       224,180, 'I');
         S("guggen",   "El Guggenheim",          Paleta.H("#b8c4cc"), null,       248,140, 'X', true);
