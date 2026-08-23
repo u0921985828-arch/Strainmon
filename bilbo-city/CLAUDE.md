@@ -90,7 +90,7 @@ Si algo sale espejado o al revés, empieza mirando ahí.
 
 ## La ciudad
 
-Bilbao no es procedural: está trazada. El mapa mide 448×224 casillas y el atlas 112×72
+Bilbao no es procedural: está trazada. El mapa mide 448×288 casillas y el atlas 112×72
 celdas, una letra por barrio. Encima se tallan la ría con su curso real, el Canal de Deusto
 que hace isla a Zorrotzaurre, diez arterias con nombre, la Gran Vía con Moyúa y Sagrado
 Corazón, San Mamés y los montes cerrando el valle.
