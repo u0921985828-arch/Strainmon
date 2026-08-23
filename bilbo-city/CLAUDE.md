@@ -40,7 +40,7 @@ node herramientas/html/plano.js
 ## Qué comprueba cada cosa
 
 `herramientas/html/pruebas.js` arranca el juego de verdad sobre un DOM simulado con canvas
-real: juega las 8 misiones, entra y sale de los 7 interiores, verifica que los 15 sitios
+real: juega las 8 misiones, entra y sale de los 7 interiores, verifica que los sitios
 están sobre suelo pisable y en su barrio, mide la conectividad de la red viaria, prueba
 combate, conducción desde 16 puntos al azar, muerte y 150 s de bucle.
 
@@ -90,13 +90,37 @@ Si algo sale espejado o al revés, empieza mirando ahí.
 
 ## La ciudad
 
-Bilbao no es procedural: está trazada. `Ciudad.cs` tiene un atlas de 20×20 celdas donde cada
-letra es un barrio (17 barrios reales), y encima se tallan la ría en arco, el Canal de Deusto
-que hace isla a Zorrotzaurre, la Gran Vía en diagonal con Moyúa y Sagrado Corazón, San Mamés
-como estadio elíptico, diez puentes y los montes cerrando el valle.
+Bilbao no es procedural: está trazada. El mapa mide 448×224 casillas y el atlas 112×72
+celdas, una letra por barrio. Encima se tallan la ría con su curso real, el Canal de Deusto
+que hace isla a Zorrotzaurre, diez arterias con nombre, la Gran Vía con Moyúa y Sagrado
+Corazón, San Mamés y los montes cerrando el valle.
+
+**El atlas no se edita a mano.** Lo escribe `herramientas/plano/trazar.py`, en el HTML y en
+`Ciudad.cs` a la vez, a partir de la mancha urbana y de una semilla por barrio. Mover un
+barrio es mover un punto.
+
+**Las calles no van a escuadra.** Cada barrio tiene su rumbo (`ang`) y su curvatura
+(`curva`, `onda`): la calle es una curva de nivel de un sistema de coordenadas girado y
+ondulado, no `x % sp`. Con una malla ortogonal el plano sale encajonado, como papel
+milimetrado, y Bilbao no es así.
 
 Si tocas el atlas o los trazados, **comprueba dos cosas**: que la red viaria siga conectada
-por encima del 90 % (lo mide la batería) y que los 15 sitios sigan cayendo en su barrio.
+por encima del 90 % (lo mide la batería) y que los sitios sigan cayendo en su barrio.
+
+## Pixel perfect
+
+El arte es pixel art y hay que dibujarlo sin medios píxeles. Tres reglas, y las tres hacen
+falta a la vez:
+
+- **Escala entera.** Un píxel de textura ocupa un número entero de píxeles de pantalla. En
+  el HTML el zoom se redondea (con histéresis, para que no baile); en Unity el tamaño
+  ortográfico se despeja de `Screen.height / (2 · PPU · escala)` con `escala` entera.
+- **Cámara clavada al píxel.** Si la cámara se traslada en fracciones, el mundo entero
+  tiembla al andar aunque cada sprite esté bien.
+- **Sprites clavados al píxel.** Todo lo que lleve `SpriteRenderer` se coloca con
+  `Mundo.AMundoPixel`, no con `Mundo.AMundo`.
+
+Y `DPR` entero en el HTML: con 1,5 un píxel de textura cae a caballo de dos de pantalla.
 
 ## Estructura
 

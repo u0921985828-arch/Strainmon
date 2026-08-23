@@ -114,7 +114,7 @@ public static class Interiores {
         foreach (var n in Actual.Npcs) {
             var go = new GameObject("npc_" + n.Nombre);
             go.transform.SetParent(_raiz.transform, false);
-            go.transform.position = Mundo.AMundo(new Vector2(n.X, n.Y));
+            go.transform.position = Mundo.AMundoPixel(new Vector2(n.X, n.Y));
             var sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = ForjaChar.Frame(n.Arq, Pose.Quieto, 0);
             sr.sortingOrder = Mundo.OrdenY(n.Y);
@@ -124,7 +124,7 @@ public static class Interiores {
     static void Poner(Sprite s, int x, int y, int orden) {
         var go = new GameObject("t");
         go.transform.SetParent(_raiz.transform, false);
-        go.transform.position = Mundo.AMundo(new Vector2(x, y + 1));
+        go.transform.position = Mundo.AMundoPixel(new Vector2(x, y + 1));
         var sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = s;
         sr.sortingOrder = orden;

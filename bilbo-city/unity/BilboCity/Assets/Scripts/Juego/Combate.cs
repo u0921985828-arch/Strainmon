@@ -65,7 +65,7 @@ public class Particulas : MonoBehaviour {
                 _vivas.RemoveAt(i);
                 continue;
             }
-            p.Sr.transform.position = Mundo.AMundo(p.Pos);
+            p.Sr.transform.position = Mundo.AMundoPixel(p.Pos);
             float e = p.R / 16f;
             p.Sr.transform.localScale = new Vector3(e,e,1);
             var c = p.Sr.color;
@@ -166,7 +166,7 @@ public class Combate : MonoBehaviour {
                 }
             }
             if (muerta || b.Vida <= 0) { DevolverBala(b); Balas.RemoveAt(i); }
-            else b.Go.transform.position = Mundo.AMundo(b.Pos);
+            else b.Go.transform.position = Mundo.AMundoPixel(b.Pos);
         }
     }
 

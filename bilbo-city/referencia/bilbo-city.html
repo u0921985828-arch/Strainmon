@@ -123,7 +123,9 @@ const TS=32, MW=448, MH=288;
 const ROAD=0,ACERA=1,EDIF=2,PARQUE=3,AGUA=4,PUENTE=5,PLAZA=6,MUELLE=7,PATIO=8;
 const cv=document.getElementById('c'), ctx=cv.getContext('2d');
 let W=0,H=0,DPR=1;
-function resize(){DPR=Math.min(devicePixelRatio||1,2);W=cv.clientWidth;H=cv.clientHeight;
+/* DPR entero a propósito: con 1,5 o 1,75 un píxel de textura cae a caballo de dos de
+   pantalla y el pixel art se ve sucio. Mejor perder algo de resolución que el filo. */
+function resize(){DPR=Math.min(2,Math.max(1,Math.floor(devicePixelRatio||1)));W=cv.clientWidth;H=cv.clientHeight;
  cv.width=W*DPR|0;cv.height=H*DPR|0;ctx.imageSmoothingEnabled=false;}
 addEventListener('resize',resize);resize();
 /* Generador propio en vez del de la plataforma: así una partida — o una pasada de la
@@ -1865,12 +1867,19 @@ function dib(){
 function dibCiudad(){
  const vel=player.enCoche?Math.hypot(player.enCoche.vx,player.enCoche.vy):0;
  const zObj=player.enCoche?(H/TS)/(19+vel*.5):(H/TS)/13.5;
- cam.z+=(zObj-cam.z)*.06;
+ /* El zoom es entero: un píxel de textura tiene que ocupar un número entero de píxeles
+    de pantalla o el arte se ve con píxeles de tamaños distintos. La histéresis de 0,25
+    evita que el nivel baile arriba y abajo cuando el objetivo cae justo en la frontera. */
+ const zEnt=clamp(Math.round(zObj),1,4);
+ if(Math.abs(zObj-cam.z)>.25||cam.z<1)cam.z=zEnt;
  let tx=player.x,ty=player.y;
  if(player.enCoche){tx+=player.enCoche.vx*.22;ty+=player.enCoche.vy*.22;}
  cam.x+=(tx-cam.x)*.14;cam.y+=(ty-cam.y)*.14;
  const z=cam.z;
- ctx.save();ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-cam.x*TS,-cam.y*TS);
+ /* La cámara se clava al píxel de pantalla. Si se traslada en fracciones, el mundo
+    entero tiembla al andar aunque cada sprite esté bien dibujado. */
+ const cx=Math.round(cam.x*TS*z)/z, cy=Math.round(cam.y*TS*z)/z;
+ ctx.save();ctx.translate(Math.round(W/2),Math.round(H/2));ctx.scale(z,z);ctx.translate(-cx,-cy);
  const hw=(W/2)/z/TS+1.5,hh=(H/2)/z/TS+1.5;
  const x0=Math.max(0,(cam.x-hw)|0),x1=Math.min(MW-1,(cam.x+hw)|0);
  const y0=Math.max(0,(cam.y-hh)|0),y1=Math.min(MH-1,(cam.y+hh)|0);

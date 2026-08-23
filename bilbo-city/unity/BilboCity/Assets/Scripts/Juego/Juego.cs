@@ -373,8 +373,24 @@ public class Juego : MonoBehaviour {
         }
         var destino = Mundo.AMundo(objetivo);
         destino.z = -10;
-        _cam.transform.position = Vector3.Lerp(_cam.transform.position, destino, 1f - Mathf.Exp(-8f*dt));
-        _cam.orthographicSize = Mathf.Lerp(_cam.orthographicSize, zoom, 1f - Mathf.Exp(-3f*dt));
+        var suave = Vector3.Lerp(_cam.transform.position, destino, 1f - Mathf.Exp(-8f*dt));
+
+        // Pixel perfect. Dos condiciones, y las dos hacen falta:
+        //
+        // 1. Un píxel de textura tiene que ocupar un número ENTERO de píxeles de pantalla.
+        //    Como el sprite va a 32 px por unidad, eso fija el tamaño ortográfico: no se
+        //    puede interpolar libremente o salen píxeles de tamaños distintos a la vez.
+        // 2. La cámara tiene que caer en un múltiplo exacto de píxel de textura. Si se
+        //    mueve en fracciones, el mundo entero tiembla al andar aunque cada sprite
+        //    esté bien dibujado.
+        int escala = Mathf.Max(1, Mathf.RoundToInt(Screen.height / (2f * Mundo.PPU * zoom)));
+        _cam.orthographicSize = Screen.height / (2f * Mundo.PPU * escala);
+
+        float paso = 1f / Mundo.PPU;
+        _cam.transform.position = new Vector3(
+            Mathf.Round(suave.x / paso) * paso,
+            Mathf.Round(suave.y / paso) * paso,
+            -10f);
     }
 
     void TinteBarrio(float dt) {

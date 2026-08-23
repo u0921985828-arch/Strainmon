@@ -81,7 +81,7 @@ public class Vehiculo : MonoBehaviour {
     }
 
     void LateUpdate() {
-        transform.position = Mundo.AMundo(Pos);
+        transform.position = Mundo.AMundoPixel(Pos);
         // el ángulo del mundo va con la Y invertida respecto a Unity
         transform.rotation = Quaternion.Euler(0, 0, -Ang * Mathf.Rad2Deg);
         if (_sr != null) _sr.sortingOrder = Mundo.OrdenY(Pos.y);

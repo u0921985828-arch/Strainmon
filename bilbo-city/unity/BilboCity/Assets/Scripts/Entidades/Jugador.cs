@@ -58,7 +58,7 @@ public class Jugador : MonoBehaviour {
         if (Cadencia > 0) Cadencia -= dt;
         if (_fogT > 0) _fogT -= dt;
 
-        transform.position = Mundo.AMundo(Pos);
+        transform.position = Mundo.AMundoPixel(Pos);
         bool visible = EnCoche == null;
         _sr.enabled = visible;
         _srArma.enabled = visible;
@@ -106,8 +106,21 @@ public static class Movimiento {
 
 /// <summary>Conversión entre coordenadas de casilla y de Unity, y orden de dibujo por Y.</summary>
 public static class Mundo {
+    /// <summary>Píxeles de sprite por unidad de Unity. Una casilla mide una unidad y su
+    /// tile 32 px, así que este número tiene que coincidir con el de Utiles.Rebanada.</summary>
+    public const float PPU = 32f;
+
     /// <summary>La Y de las casillas crece hacia abajo; la de Unity hacia arriba.</summary>
     public static Vector3 AMundo(Vector2 p) { return new Vector3(p.x, Ciudad.MH - p.y, 0); }
+
+    /// <summary>Igual, pero clavado a la rejilla de píxel del sprite. Todo lo que lleve
+    /// SpriteRenderer va por aquí: si un sprite cae en medio píxel, se le mueven los
+    /// bordes un píxel arriba y abajo mientras anda, y el pixel art se ve hervir.</summary>
+    public static Vector3 AMundoPixel(Vector2 p) {
+        var v = AMundo(p);
+        return new Vector3(Mathf.Round(v.x * PPU) / PPU, Mathf.Round(v.y * PPU) / PPU, v.z);
+    }
+
     public static Vector2 ACasilla(Vector3 v) { return new Vector2(v.x, Ciudad.MH - v.y); }
     public static int OrdenY(float y) { return Mathf.RoundToInt(y * 10f); }
 }

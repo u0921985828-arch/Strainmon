@@ -24,7 +24,7 @@ public class Andante : MonoBehaviour {
 
     protected virtual void LateUpdate() {
         if (Herido > 0) Herido -= Time.deltaTime;
-        transform.position = Mundo.AMundo(Pos);
+        transform.position = Mundo.AMundoPixel(Pos);
         Sr.sprite = ForjaChar.Frame(Arq, Herido > 0 ? Pose.Herido : PoseAct, Dir8);
         Sr.sortingOrder = Mundo.OrdenY(Pos.y);
     }
@@ -149,7 +149,7 @@ public class Rejilla : MonoBehaviour {
     }
 
     void LateUpdate() {
-        transform.position = Mundo.AMundo(Pos);
+        transform.position = Mundo.AMundoPixel(Pos);
         transform.rotation = Quaternion.Euler(0, 0, -Ang * Mathf.Rad2Deg);
         if (_sr == null) return;
         _sr.sprite = Persigue

@@ -113,7 +113,7 @@ public static class Mobiliario {
                 if (!Forja.Props.TryGetValue(p.Clave, out sp)) continue;
                 var go = new GameObject(p.Clave);
                 go.transform.SetParent(padre, false);
-                go.transform.position = Mundo.AMundo(new Vector2(x + p.Dx, y + p.Dy));
+                go.transform.position = Mundo.AMundoPixel(new Vector2(x + p.Dx, y + p.Dy));
                 go.isStatic = true;
                 var sr = go.AddComponent<SpriteRenderer>();
                 sr.sprite = sp;
