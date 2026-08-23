@@ -6,22 +6,23 @@ let js=html.match(/<script>([\s\S]*)<\/script>/)[1];
 const H={};const cache={};
 function el(id){const o={id,style:{},dataset:{},className:'',textContent:'',value:'',children:[],
  classList:{add(){},remove(){},toggle(){}},addEventListener(n,f){if(id)H[id+':'+n]=f;},
- appendChild(){},querySelector:()=>el(),querySelectorAll:()=>[],clientWidth:400,clientHeight:840,
+ appendChild(){},querySelector:()=>el(),querySelectorAll:()=>[],clientWidth:840,clientHeight:400,
  getContext:()=>createCanvas(1,1).getContext('2d'),width:0,height:0,toDataURL:()=>'d',select(){}};return o;}
 global.document={createElement:t=>{if(t==='canvas'){const c=createCanvas(1,1);c.style={};c.className='';
  c.classList={add(){},remove(){},toggle(){}};c.addEventListener=()=>{};c.appendChild=()=>{};
  c.querySelector=()=>el();c.querySelectorAll=()=>[];return c;}return el();},
  getElementById:i=>cache[i]||(cache[i]=el(i)),querySelectorAll:()=>[],addEventListener(){}};
 // canvas principal real
-const real=createCanvas(400,840);
+// El juego es apaisado: el arnés tiene que serlo también o el mando no cae donde cae.
+const real=createCanvas(840,400);
 cache.c=Object.assign(real,{style:{},className:'',classList:{add(){},remove(){},toggle(){}},
  addEventListener:()=>{},appendChild:()=>{},querySelector:()=>el(),querySelectorAll:()=>[],
- clientWidth:400,clientHeight:840});
+ clientWidth:840,clientHeight:400});
 global.addEventListener=()=>{};global.devicePixelRatio=1;
 let store={};global.localStorage={getItem:k=>store[k]??null,setItem:(k,v)=>store[k]=v,removeItem:k=>delete store[k]};
 let now=0;global.performance={now:()=>now};
 let raf=null;global.requestAnimationFrame=f=>{raf=f;};
-global.location={reload(){}};global.innerWidth=400;global.window=global;
+global.location={reload(){}};global.innerWidth=840;global.innerHeight=400;global.window=global;
 /* Se siembra el generador antes de arrancar para que dos pasadas de la batería den
    exactamente lo mismo. BILBO_SEMILLA cambia la semilla cuando quieras probar otra
    tirada — un fallo que solo sale con una semilla concreta sigue siendo un fallo. */

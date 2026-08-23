@@ -155,34 +155,56 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       A.enemigos.push({ x: P.x + 3, y: P.y, hp: 60, arq: 'maton', arma: 'punos',
                         d8: 0, pose: 'quieto', anim: 0, cad: 0, herido: 0 });
       P.d8 = 2;
-      for (let k = 0; k < 30 && A.enemigos.length; k++) { A.atacarJugador(); paso(20); }
+      // se dispara con la cruceta puesta al este, que es como se juega ahora
+      for (let k = 0; k < 30 && A.enemigos.length; k++) { A.atacarJugador(1, 0); paso(20); }
       ok(A.enemigos.length === 0, 'la pistola no mata a un enemigo a 3 casillas');
       if (!A.enemigos.length) bien.push('combate con pistola');
     }
 
     // ── 7 · conducción desde varios puntos al azar ─────────────────────
+    // Se conduce señalando, así que la prueba es: ¿un piloto tonto que solo mira por
+    // dónde hay calle libre consigue moverse? Antes se apretaba una dirección 2,5 s
+    // seguidos y se medía la distancia, pero eso en Bilbao es empotrarse en la primera
+    // esquina: medía lo recta que era la calle, no si el mando sirve.
     {
       S.hp = 100; S.muerto = 0; S.estrellas = 0; A.policia.length = 0; A.enemigos.length = 0;
+      const DIRS = [[1,0,'d'],[1,1,'ds'],[0,1,'s'],[-1,1,'as'],[-1,0,'a'],[-1,-1,'aw'],[0,-1,'w'],[1,-1,'dw']];
+      const conduce = t => t !== A.EDIF && t !== A.AGUA && t !== A.PARQUE && t !== A.MONTE;
+      const libreHacia = (cc, dx, dy) => {
+        const n = Math.hypot(dx, dy);
+        for (let d = 1; d <= 16; d++)
+          if (!conduce(A.Tc((cc.x + dx / n * d) | 0, (cc.y + dy / n * d) | 0))) return d - 1;
+        return 16;
+      };
       const recorridos = [];
       for (let i = 0; i < 16; i++) {
         const cc = A.coches.find(c => c.propio), cp = A.puntoCalle();
         cc.x = cp.x; cc.y = cp.y; cc.dano = 0; cc.vivo = true; cc.vx = cc.vy = 0;
-        let h = 0, v = 0; const fx = cc.x | 0, fy = cc.y | 0;
-        for (let d = 1; d <= 3; d++) {
-          if (A.rodable(fx + d, fy)) h++; if (A.rodable(fx - d, fy)) h++;
-          if (A.rodable(fx, fy + d)) v++; if (A.rodable(fx, fy - d)) v++;
-        }
-        cc.ang = h >= v ? 0 : Math.PI / 2;
+        cc.ang = 0;
         P.x = cc.x; P.y = cc.y; P.enCoche = cc;
         const x0 = cc.x, y0 = cc.y;
-        A.teclas['w'] = true; paso(150); A.teclas['w'] = false;
+        let vx = 1, vy = 0;
+        for (let q = 0; q < 10; q++) {
+          // cada cuarto de segundo el piloto elige entre las ocho, con ventaja para
+          // seguir recto: si no, se queda temblando entre dos direcciones igual de buenas
+          let mejor = null, mejorP = -1;
+          for (const [dx, dy, ks] of DIRS) {
+            const p = libreHacia(cc, dx, dy) + (dx * vx + dy * vy) * 2.5;
+            if (p > mejorP) { mejorP = p; mejor = [dx, dy, ks]; }
+          }
+          vx = mejor[0]; vy = mejor[1];
+          for (const k of mejor[2]) A.teclas[k] = true;
+          paso(15);
+          for (const k of mejor[2]) A.teclas[k] = false;
+        }
         recorridos.push(Math.hypot(cc.x - x0, cc.y - y0));
         P.enCoche = null;
       }
       recorridos.sort((a, b) => a - b);
       const mediana = recorridos[8];
-      ok(mediana > 6, 'la mediana de conducción es de solo ' + mediana.toFixed(1) + ' casillas');
-      bien.push('conducción: mediana ' + mediana.toFixed(1) + ' casillas en 2,5 s');
+      ok(mediana > 10, 'la mediana de conducción es de solo ' + mediana.toFixed(1) + ' casillas');
+      bien.push('conducción en 2,5 s: mediana ' + mediana.toFixed(1) + ' casillas (peor '
+        + recorridos[0].toFixed(1) + ', mejor ' + recorridos[15].toFixed(1) + ')');
     }
 
     // ── 8 · muerte y reaparición ───────────────────────────────────────

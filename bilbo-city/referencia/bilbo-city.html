@@ -16,21 +16,70 @@ canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixela
  background:radial-gradient(circle at 34% 30%,rgba(78,88,99,.92),rgba(24,29,35,.92));
  border:2px solid rgba(230,226,214,.28);box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.12);}
 .btn:active{background:radial-gradient(circle at 34% 30%,#d0561f,#8e3316);transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.5);}
-#bA{right:20px;bottom:calc(env(safe-area-inset-bottom) + 88px);width:80px;height:80px;font-size:12px;}
-#bC{right:106px;bottom:calc(env(safe-area-inset-bottom) + 142px);width:74px;height:74px;
- border-color:rgba(193,54,43,.75);}
-#bB{right:114px;bottom:calc(env(safe-area-inset-bottom) + 46px);width:60px;height:60px;font-size:10px;}
-#bTel{right:12px;bottom:calc(env(safe-area-inset-bottom) + 12px);width:52px;height:52px;font-size:17px;}
-#bPau{left:10px;bottom:calc(env(safe-area-inset-bottom) + 12px);width:46px;height:46px;font-size:14px;}
-#bArma{left:66px;bottom:calc(env(safe-area-inset-bottom) + 12px);width:46px;height:46px;font-size:14px;}
-#joy{position:absolute;width:132px;height:132px;border-radius:50%;display:none;pointer-events:none;
- border:2px solid rgba(230,226,214,.18);background:radial-gradient(circle,rgba(230,226,214,.05),transparent 70%);}
-#joy i{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;
- background:radial-gradient(circle at 35% 30%,rgba(230,226,214,.42),rgba(140,146,152,.3));
- border:1px solid rgba(230,226,214,.3);}
+/* ═══ EL MANDO ═══
+   La pantalla se parte en cuatro a lo ancho. El cuarto de la izquierda es el pulgar
+   izquierdo: joystick para andar o conducir, y encima SELECT y OPTIONS. El de la
+   derecha es el derecho: cruceta para apuntar y A/B debajo. Los dos cuartos del medio
+   quedan limpios, que es por donde se ve el juego.
+   Todo va en porcentajes y no en píxeles: un móvil tumbado puede medir 640 o 1280 de
+   ancho y el pulgar sigue estando en el mismo sitio de la mano. */
+#izq,#der{position:absolute;top:0;bottom:0;width:25%;pointer-events:none;}
+#izq{left:0;} #der{right:0;}
+
+#joy{position:absolute;left:50%;bottom:12%;width:min(38vh,148px);height:min(38vh,148px);
+ margin-left:calc(min(38vh,148px) / -2);border-radius:50%;pointer-events:auto;
+ border:2px solid rgba(230,226,214,.20);
+ background:radial-gradient(circle,rgba(230,226,214,.07),rgba(10,14,18,.35) 72%);}
+#joy i{position:absolute;left:50%;top:50%;width:42%;height:42%;margin:-21% 0 0 -21%;border-radius:50%;
+ background:radial-gradient(circle at 35% 30%,rgba(230,226,214,.48),rgba(140,146,152,.34));
+ border:1px solid rgba(230,226,214,.34);box-shadow:0 2px 6px rgba(0,0,0,.5);}
+/* El anillo se enciende al correr: sin botón de correr, es lo que dice que vas a tope. */
+#joy.corre{border-color:rgba(232,197,71,.75);}
+
+/* La cruceta: cuatro flechas como las de una consola de bolsillo. Apunta el arma, y en
+   coche toca el claxon. Se pinta como cruz, no como disco, para que el pulgar note por
+   la forma dónde está sin mirar. */
+#cruz{position:absolute;left:50%;bottom:34%;width:min(34vh,132px);height:min(34vh,132px);
+ margin-left:calc(min(34vh,132px) / -2);pointer-events:auto;}
+#cruz s{position:absolute;background:linear-gradient(180deg,rgba(78,88,99,.92),rgba(24,29,35,.92));
+ border:2px solid rgba(230,226,214,.26);box-shadow:0 3px 0 rgba(0,0,0,.45);}
+#cruz s.h{left:0;right:0;top:34%;height:32%;}
+#cruz s.v{top:0;bottom:0;left:34%;width:32%;}
+#cruz b{position:absolute;width:34%;height:34%;display:flex;align-items:center;justify-content:center;
+ font-size:min(2.4vh,15px);color:rgba(230,226,214,.72);}
+#cruz b.on{color:var(--neon);}
+#cruz b.ar{left:33%;top:0;} #cruz b.ab{left:33%;bottom:0;}
+#cruz b.iz{left:0;top:33%;} #cruz b.de{right:0;top:33%;}
+
+.btn{position:absolute;pointer-events:auto;border-radius:50%;display:flex;align-items:center;justify-content:center;
+ font-size:min(2vh,12px);font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--hueso);
+ background:radial-gradient(circle at 34% 30%,rgba(78,88,99,.92),rgba(24,29,35,.92));
+ border:2px solid rgba(230,226,214,.28);box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.12);}
+.btn:active,.btn.on{background:radial-gradient(circle at 34% 30%,#d0561f,#8e3316);transform:translateY(2px);
+ box-shadow:0 1px 0 rgba(0,0,0,.5);}
+/* A y B en diagonal, como en cualquier mando: B abajo a la izquierda, A arriba a la
+   derecha. Así el pulgar llega a los dos sin soltar la cruceta. */
+#bA{right:6%;bottom:14%;width:min(13vh,74px);height:min(13vh,74px);font-size:min(2.6vh,17px);}
+#bB{right:calc(6% + min(14vh,80px));bottom:9%;width:min(11.5vh,66px);height:min(11.5vh,66px);
+ font-size:min(2.4vh,15px);border-color:rgba(193,54,43,.7);}
+#bR{right:6%;top:6%;width:min(9vh,52px);height:min(9vh,52px);font-size:min(2.2vh,14px);border-radius:26% / 50%;}
+#bSel{left:14%;top:6%;width:min(8vh,46px);height:min(8vh,46px);font-size:min(1.9vh,11px);border-radius:26% / 50%;}
+#bOpt{left:calc(14% + min(9.5vh,56px));top:6%;width:min(8vh,46px);height:min(8vh,46px);
+ font-size:min(1.9vh,11px);border-radius:26% / 50%;}
+
+/* Tumba el móvil: el juego es apaisado y punto. En vertical el pulgar no llega al
+   centro de la pantalla y la ciudad se ve por una rendija. */
+#gira{position:absolute;inset:0;background:#07090c;z-index:20;display:none;
+ flex-direction:column;align-items:center;justify-content:center;gap:18px;pointer-events:auto;
+ text-align:center;padding:24px;}
+#gira .g{font-size:64px;animation:vuelta 2.2s ease-in-out infinite;}
+#gira .t{font-size:15px;letter-spacing:4px;text-transform:uppercase;color:var(--acero);}
+@keyframes vuelta{0%,42%{transform:rotate(0)}58%,100%{transform:rotate(-90deg)}}
 .pant{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,11,.985),rgba(12,16,21,.985));
- display:none;flex-direction:column;padding:calc(env(safe-area-inset-top) + 15px) 14px 14px;
+ display:none;flex-direction:column;padding:calc(env(safe-area-inset-top) + 12px) 14px 12px;
  overflow-y:auto;pointer-events:auto;}
+/* El cuerpo del panel se centra y se limita: leer una línea de 1200 px cansa. */
+.pant>*{width:100%;max-width:620px;margin-left:auto;margin-right:auto;}
 .pant h2{margin:0;font-size:25px;letter-spacing:4px;text-transform:uppercase;
  background:linear-gradient(180deg,#f5e9b8,#b7451f);-webkit-background-clip:text;background-clip:text;color:transparent;}
 .pant .sub{font-size:11px;letter-spacing:2px;color:var(--acero);margin:2px 0 11px;text-transform:uppercase;}
@@ -53,7 +102,8 @@ canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixela
 .rep .n{display:flex;justify-content:space-between;font-size:12px;letter-spacing:1px;text-transform:uppercase;}
 .rep .b{height:8px;background:rgba(0,0,0,.55);border:1px solid rgba(141,153,164,.28);margin-top:2px;}
 .rep .b i{display:block;height:100%;background:linear-gradient(90deg,#b7451f,#e8c547);}
-#dlg{position:absolute;left:9px;right:9px;bottom:calc(env(safe-area-inset-bottom) + 10px);
+#dlg{position:absolute;left:50%;transform:translateX(-50%);width:min(560px,50%);
+ bottom:calc(env(safe-area-inset-bottom) + 10px);
  background:linear-gradient(180deg,rgba(9,12,16,.98),rgba(14,19,25,.98));
  border:1px solid rgba(141,153,164,.36);border-top:3px solid var(--neon);padding:10px 12px;
  display:none;pointer-events:auto;box-shadow:0 -6px 20px rgba(0,0,0,.5);}
@@ -92,11 +142,18 @@ canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixela
 <body>
 <canvas id="c"></canvas>
 <div id="capa">
-  <div id="joy"><i></i></div>
-  <div class="btn" id="bA">Acción</div><div class="btn" id="bC">Atacar</div>
-  <div class="btn" id="bB">Correr</div><div class="btn" id="bTel">☎</div>
-  <div class="btn" id="bPau">❚❚</div><div class="btn" id="bArma">⇄</div>
+  <div id="izq">
+    <div class="btn" id="bSel">☎</div><div class="btn" id="bOpt">❚❚</div>
+    <div id="joy"><i></i></div>
+  </div>
+  <div id="der">
+    <div class="btn" id="bR">⇄</div>
+    <div id="cruz"><s class="h"></s><s class="v"></s>
+      <b class="ar">▲</b><b class="ab">▼</b><b class="iz">◀</b><b class="de">▶</b></div>
+    <div class="btn" id="bB">B</div><div class="btn" id="bA">A</div>
+  </div>
 </div>
+<div id="gira"><div class="g">📱</div><div class="t">Gira el móvil<br>Bilbo City se juega apaisado</div></div>
 <div class="pant" id="tel"><h2>Móvil</h2><div class="sub">Bilbo City</div>
   <div class="tabs"><div class="tab on" data-t="hist">Historia</div><div class="tab" data-t="trab">Curros</div><div class="tab" data-t="rep">Fama</div></div>
   <div id="telCuerpo"></div><div class="cerrar" id="telCerrar">Cerrar</div></div>
@@ -2669,36 +2726,111 @@ function particula(x,y,tipo,n=1){
    tipo,r:tipo==='humo'?rnd(4,9):rnd(1.5,3.5)});}}
 
 /*═══════════════ ENTRADA ═══════════════*/
+/* Un mando de consola repartido en los dos cuartos exteriores de la pantalla apaisada.
+   A la izquierda el pulgar que anda o conduce, a la derecha el que apunta y dispara.
+   Nada en el medio: por ahí se ve Bilbao.
+
+   No hay botón de correr. El joystick es analógico, así que empujarlo a fondo ya es
+   correr — un botón menos que buscar con el pulgar, y el anillo se enciende para que se
+   note. */
 const teclas={};
-let aPuls=false,cPuls=false,cMant=false,btnB=false;
+let aPuls=false,cPuls=false,cMant=false;
+const joy={id:null,dx:0,dy:0,mag:0};      /* andar y conducir */
+const mira={id:null,dx:0,dy:0};           /* cruceta: hacia dónde apunta el arma */
+const CORRE=.82;                          /* a partir de aquí el joystick es correr */
+
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();
  if(k==='tab'){e.preventDefault();abrirTel();return;}
  if(k==='escape'){e.preventDefault();togglePausa();return;}
  if(k==='e'&&!teclas[k])aPuls=true;
- if(k===' '&&!teclas[k]){e.preventDefault();cPuls=true;}
+ if(k===' '&&!teclas[k]){e.preventDefault();cPuls=true;cMant=true;}
  if(k==='q'&&!teclas[k])cambiarArma();
  teclas[k]=true;});
-addEventListener('keyup',e=>teclas[e.key.toLowerCase()]=false);
+addEventListener('keyup',e=>{const k=e.key.toLowerCase();
+ if(k===' ')cMant=false;
+ teclas[k]=false;});
+
 const joyEl=document.getElementById('joy'),joyPal=joyEl.querySelector('i');
-const joy={id:null,dx:0,dy:0,ox:0,oy:0};
-cv.addEventListener('touchstart',e=>{audioInit();for(const t of e.changedTouches)
- if(t.clientX<innerWidth*.55&&joy.id===null){joy.id=t.identifier;joy.ox=t.clientX;joy.oy=t.clientY;
-  joyEl.style.display='block';joyEl.style.left=(t.clientX-66)+'px';joyEl.style.top=(t.clientY-66)+'px';}},{passive:true});
-addEventListener('touchmove',e=>{for(const t of e.changedTouches)if(t.identifier===joy.id){
- let dx=t.clientX-joy.ox,dy=t.clientY-joy.oy;const d=Math.hypot(dx,dy),m=50;
- if(d>m){dx=dx/d*m;dy=dy/d*m;}joy.dx=dx/m;joy.dy=dy/m;joyPal.style.transform=`translate(${dx}px,${dy}px)`;}},{passive:true});
-function finT(e){for(const t of e.changedTouches)if(t.identifier===joy.id){
- joy.id=null;joy.dx=joy.dy=0;joyEl.style.display='none';joyPal.style.transform='';}}
+const cruzEl=document.getElementById('cruz');
+const flechas={ar:cruzEl.querySelector('.ar'),ab:cruzEl.querySelector('.ab'),
+ iz:cruzEl.querySelector('.iz'),de:cruzEl.querySelector('.de')};
+
+/* El punto de agarre del joystick es su centro en pantalla, y se recalcula en cada
+   toque: la barra del navegador aparece y desaparece y con ella se mueve todo. */
+function centro(el){const r=el.getBoundingClientRect();
+ return{x:r.left+r.width/2,y:r.top+r.height/2,r:Math.max(24,r.width/2)};}
+
+function tomarJoy(x,y){
+ const c=centro(joyEl);
+ let dx=x-c.x,dy=y-c.y;const d=Math.hypot(dx,dy);
+ if(d>c.r){dx=dx/d*c.r;dy=dy/d*c.r;}
+ joy.dx=dx/c.r;joy.dy=dy/c.r;joy.mag=Math.min(1,d/c.r);
+ joyPal.style.transform=`translate(${dx*.62}px,${dy*.62}px)`;
+ joyEl.classList.toggle('corre',joy.mag>CORRE);}
+function soltarJoy(){joy.id=null;joy.dx=joy.dy=0;joy.mag=0;
+ joyPal.style.transform='';joyEl.classList.remove('corre');}
+
+/* La cruceta da ocho direcciones limpias, no un ángulo continuo: apuntar con el pulgar
+   a un grado concreto en una pantalla no se puede, y ocho sí se aciertan a ciegas. */
+function tomarCruz(x,y){
+ const c=centro(cruzEl);
+ const dx=x-c.x,dy=y-c.y;
+ if(Math.hypot(dx,dy)<c.r*.26){mira.dx=mira.dy=0;}
+ else{const u=Math.round(Math.atan2(dy,dx)/(Math.PI/4))*(Math.PI/4);
+  mira.dx=Math.round(Math.cos(u));mira.dy=Math.round(Math.sin(u));}
+ flechas.ar.classList.toggle('on',mira.dy<0);flechas.ab.classList.toggle('on',mira.dy>0);
+ flechas.iz.classList.toggle('on',mira.dx<0);flechas.de.classList.toggle('on',mira.dx>0);}
+function soltarCruz(){mira.id=null;mira.dx=mira.dy=0;
+ for(const k in flechas)flechas[k].classList.remove('on');}
+
+/* Los dedos se siguen por identificador: con el pulgar izquierdo andando y el derecho
+   apuntando hay dos toques vivos a la vez, y si se mezclan el personaje se va solo. */
+function dedos(e,f){for(const t of e.changedTouches)f(t);}
+function zonaIzq(x){return x<innerWidth*.34;}
+function zonaDer(x){return x>innerWidth*.66;}
+addEventListener('touchstart',e=>{audioInit();dedos(e,t=>{
+ if(joy.id===null&&zonaIzq(t.clientX)){joy.id=t.identifier;tomarJoy(t.clientX,t.clientY);}
+ else if(mira.id===null&&zonaDer(t.clientX)&&t.target===cruzEl){mira.id=t.identifier;tomarCruz(t.clientX,t.clientY);}});},
+ {passive:true});
+addEventListener('touchmove',e=>dedos(e,t=>{
+ if(t.identifier===joy.id)tomarJoy(t.clientX,t.clientY);
+ else if(t.identifier===mira.id)tomarCruz(t.clientX,t.clientY);}),{passive:true});
+function finT(e){dedos(e,t=>{
+ if(t.identifier===joy.id)soltarJoy();
+ if(t.identifier===mira.id)soltarCruz();});}
 addEventListener('touchend',finT,{passive:true});addEventListener('touchcancel',finT,{passive:true});
-function bind(el,f){el.addEventListener('touchstart',e=>{e.preventDefault();audioInit();f(true);},{passive:false});
- el.addEventListener('touchend',e=>{e.preventDefault();f(false);},{passive:false});
- el.addEventListener('mousedown',()=>{audioInit();f(true);});el.addEventListener('mouseup',()=>f(false));}
+
+/* Con ratón vale el mismo mando: se prueba en el escritorio sin tener que enchufar nada. */
+let ratonEn=null;
+addEventListener('mousedown',e=>{audioInit();
+ if(zonaIzq(e.clientX)){ratonEn='joy';tomarJoy(e.clientX,e.clientY);}
+ else if(zonaDer(e.clientX)&&e.target===cruzEl){ratonEn='cruz';tomarCruz(e.clientX,e.clientY);}});
+addEventListener('mousemove',e=>{
+ if(ratonEn==='joy')tomarJoy(e.clientX,e.clientY);
+ else if(ratonEn==='cruz')tomarCruz(e.clientX,e.clientY);});
+addEventListener('mouseup',()=>{
+ if(ratonEn==='joy')soltarJoy();else if(ratonEn==='cruz')soltarCruz();ratonEn=null;});
+
+function bind(el,f){el.addEventListener('touchstart',e=>{e.preventDefault();e.stopPropagation();audioInit();f(true);},{passive:false});
+ el.addEventListener('touchend',e=>{e.preventDefault();e.stopPropagation();f(false);},{passive:false});
+ el.addEventListener('mousedown',e=>{e.stopPropagation();audioInit();f(true);});
+ el.addEventListener('mouseup',e=>{e.stopPropagation();f(false);});}
 bind(document.getElementById('bA'),v=>{if(v)aPuls=true;});
-bind(document.getElementById('bC'),v=>{if(v)cPuls=true;cMant=v;});
-bind(document.getElementById('bB'),v=>btnB=v);
-document.getElementById('bTel').addEventListener('click',abrirTel);
-document.getElementById('bPau').addEventListener('click',togglePausa);
-document.getElementById('bArma').addEventListener('click',cambiarArma);
+bind(document.getElementById('bB'),v=>{if(v)cPuls=true;cMant=v;});
+document.getElementById('bSel').addEventListener('click',abrirTel);
+document.getElementById('bOpt').addEventListener('click',togglePausa);
+document.getElementById('bR').addEventListener('click',cambiarArma);
+
+/* Apaisado o nada. En vertical el pulgar no llega al centro y la ciudad se ve por una
+   rendija; más vale decirlo que dejar jugar mal. */
+const giraEl=document.getElementById('gira');
+function comprobarGiro(){
+ const vertical=innerHeight>innerWidth*1.04;
+ giraEl.style.display=vertical?'flex':'none';}
+addEventListener('resize',comprobarGiro);
+addEventListener('orientationchange',comprobarGiro);
+comprobarGiro();
+
 function cambiarArma(){
  const ids=ARMAS.map(a=>a.id).filter(id=>S.armas[id]!==undefined&&(S.armas[id]>0||arma(id).inf));
  if(ids.length<2)return;
@@ -3129,22 +3261,28 @@ function disparar(desde,ang,a,dueno){
  sfx(a.id==='escopeta'?'escopeta':'disparo',.8);}
 const dirAng=d8=>(2-d8)*Math.PI/4;
 let fogT=0,fogTipo=null,fogD=0;
-function atacarJugador(){
+/* mx,my es la cruceta. Si está puesta, se dispara hacia ahí; si no, hacia donde mira el
+   personaje. En los dos casos el arma corrige sola hacia el enemigo que tenga delante:
+   acertar a un blanco de veinte píxeles con el pulgar en un móvil no es puntería, es
+   suerte, y el juego no debería depender de eso. El cono de ayuda es estrecho, así que
+   sigue haciendo falta encarar. */
+function atacarJugador(mx,my){
  if(S.escena!=='ciudad'||player.enCoche)return;
  const a=arma(S.armaAct);
  if(player.cad>0)return;
  if(!a.inf&&!(S.armas[a.id]>0))return aviso('Sin munición');
  player.cad=a.cad;
+ const base=(mx||my)?Math.atan2(my,mx):dirAng(player.d8);
  let obj=null,md=a.alc+.6;
  for(const e of enemigos){const d=dist(e,player);if(d>md)continue;
   const ang=Math.atan2(e.y-player.y,e.x-player.x);
-  const df=Math.abs(((ang-dirAng(player.d8)+Math.PI*3)%(Math.PI*2))-Math.PI);
-  if(df<1.05&&lineaVista(player,e)){md=d;obj=e;}}
+  const df=Math.abs(((ang-base+Math.PI*3)%(Math.PI*2))-Math.PI);
+  if(df<.62&&lineaVista(player,e)){md=d;obj=e;}}
  if(a.cuerpo&&!obj)for(const p of peatones){const d=dist(p,player);if(d>a.alc+.4)continue;
   const ang=Math.atan2(p.y-player.y,p.x-player.x);
-  const df=Math.abs(((ang-dirAng(player.d8)+Math.PI*3)%(Math.PI*2))-Math.PI);
+  const df=Math.abs(((ang-base+Math.PI*3)%(Math.PI*2))-Math.PI);
   if(df<1.05){obj=p;break;}}
- const ang=obj?Math.atan2(obj.y-player.y,obj.x-player.x):dirAng(player.d8);
+ const ang=obj?Math.atan2(obj.y-player.y,obj.x-player.x):base;
  if(obj)player.d8=dir8De(Math.cos(ang),Math.sin(ang));
  if(a.cuerpo){sfx('golpe',.7);player.pose='pega2';player.golpeT=.22;
   if(obj&&dist(obj,player)<=a.alc+.4){danar(obj,a.dmg);particula(obj.x,obj.y,'sangre',4);}
@@ -3183,7 +3321,7 @@ function detener(){
 function libre(x,y,coche){
  if(S.escena==='interior')return !solidoInt(tileInt(x,y));
  const t=Tc(Math.floor(x),Math.floor(y));
- return coche?(t!==EDIF&&t!==AGUA&&t!==PARQUE):andable(t);}
+ return coche?(t!==EDIF&&t!==AGUA&&t!==PARQUE&&t!==MONTE):andable(t);}
 function mover(e,nx,ny,coche){
  if(libre(nx,e.y,coche))e.x=nx;else if(coche)e.golpe=true;
  if(libre(e.x,ny,coche))e.y=ny;else if(coche)e.golpe=true;
@@ -3235,19 +3373,32 @@ function act(dt){
  if(pausa){motorAudio(null,1);sirenaAudio(dt,false);return;}
  acum+=dt;while(acum>.45){acum-=.45;S.min++;if(S.min>=1440){S.min=0;S.dia++;}}
  S.hambre=Math.max(0,S.hambre-dt*.004);
- S.energia=Math.max(0,S.energia-dt*.0025-((btnB&&!player.enCoche)?dt*.01:0));
+ /* Correr ya no es un botón: es empujar el joystick a fondo. */
+ let ix=joy.dx,iy=joy.dy,fuerza=joy.mag;
+ if(teclas['a'])ix=-1;if(teclas['d'])ix=1;
+ if(teclas['w'])iy=-1;if(teclas['s'])iy=1;
+ if(teclas['a']||teclas['d']||teclas['w']||teclas['s'])fuerza=teclas['shift']?1:.7;
+ const correr=fuerza>CORRE;
+ /* La cruceta apunta; con las teclas, las flechas. */
+ let mx=mira.dx,my=mira.dy;
+ if(teclas['arrowleft'])mx=-1;if(teclas['arrowright'])mx=1;
+ if(teclas['arrowup'])my=-1;if(teclas['arrowdown'])my=1;
+
+ S.energia=Math.max(0,S.energia-dt*.0025-((correr&&!player.enCoche)?dt*.01:0));
  if(S.hambre<=0){S.energia=Math.max(0,S.energia-dt*.017);S.hp=Math.max(1,S.hp-dt*.9);}
  player.cad=Math.max(0,player.cad-dt);
- let ix=joy.dx,iy=joy.dy;
- if(teclas['a']||teclas['arrowleft'])ix=-1;if(teclas['d']||teclas['arrowright'])ix=1;
- if(teclas['w']||teclas['arrowup'])iy=-1;if(teclas['s']||teclas['arrowdown'])iy=1;
- const correr=btnB||teclas['shift'];
+
+ /* Apuntar con la cruceta gira al personaje aunque esté quieto: así se puede cubrir una
+    esquina sin andar hacia ella, que es media pelea. */
+ if((mx||my)&&!player.enCoche)player.d8=dir8De(mx,my);
  if(aPuls){aPuls=false;accion();}
  const auto=arma(S.armaAct).cad<.12;
- if(cPuls||(auto&&cMant)){cPuls=false;
-  if(player.enCoche){sfx('claxon');asustar(player,7);}else atacarJugador();}
+ /* Con la cruceta puesta se dispara sin soltarla: B mantenido basta, sea el arma
+    automática o no. Antes había que dar toques con el pulgar a cada bala. */
+ if(cPuls||((auto||(mx||my))&&cMant)){cPuls=false;
+  if(player.enCoche){sfx('claxon');asustar(player,7);}else atacarJugador(mx,my);}
  if(S.escena==='interior')return actInterior(dt,ix,iy);
- actCiudad(dt,ix,iy,correr);}
+ actCiudad(dt,ix,iy,correr,fuerza,!!(mx||my));}
 function poseAndar(e,vel,correr,dt){
  e.anim+=dt*(correr?11:7.5);
  const f=Math.floor(e.anim)%4+1;
@@ -3263,18 +3414,36 @@ function actInterior(dt,ix,iy){
  pista1=n?'ACCIÓN: HABLAR CON '+n.n.toUpperCase()
   :tileInt(player.x,player.y-.9)==='C'?'ACCIÓN: DORMIR'
   :tileInt(player.x,player.y-.9)==='L'?'ACCIÓN: QUE TE CUREN':'';}
-function actCiudad(dt,ix,iy,correr){
+function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
  const cans=S.energia<=0?.6:1;
  if(player.enCoche){
   const c=player.enCoche;
   const f={x:Math.cos(c.ang),y:Math.sin(c.ang)},r={x:-f.y,y:f.x};
   let vf=c.vx*f.x+c.vy*f.y, vr=c.vx*r.x+c.vy*r.y;
-  vf+=(-iy)*(c.vmax*1.25)*cans*dt;
-  vf*=(1-dt*(Math.abs(iy)<.1?1.7:.45));
-  vr*=Math.pow(correr?.965:.86,dt*60);
-  const lim=correr?c.vmax*1.28:c.vmax;
-  vf=clamp(vf,-lim*.42,lim);
-  c.ang+=ix*dt*2.35*clamp(vf/3.2,-1.15,1.15);
+  /* Se conduce señalando: el coche va hacia donde apunta el joystick. Con mandos de
+     tanque —arriba acelera, izquierda gira— hay que pensar en coordenadas del coche, y
+     eso con el pulgar sobre un cristal no sale: se acaba dando vueltas en una plaza.
+     Señalando, el pulgar dice el rumbo y el coche se las arregla. */
+  if(fuerza>.12){
+   const obj=Math.atan2(iy,ix);
+   const dif=((obj-c.ang+Math.PI*3)%(Math.PI*2))-Math.PI;
+   if(Math.abs(dif)>2.36&&vf<1.2){
+    vf-=c.vmax*.85*cans*dt;                    /* señala hacia atrás y está parado: recular */
+   }else{
+    /* Casi parado el coche maniobra: gira en el sitio y no acelera hasta encarar. Es
+       hacerle al jugador el cambio de sentido que en un móvil no se puede pedir — sin
+       esto, arrancar mirando a una fachada eran dos segundos de volante y un golpe. */
+    const parado=Math.abs(vf)<1.2, torcido=Math.abs(dif)>1;
+    const giro=parado?4.4:3.3*(.42+clamp(Math.abs(vf)/5.5,0,1));
+    c.ang+=clamp(dif,-1.1,1.1)*giro*dt;
+    /* Cuanto más cerrada la curva, menos gas: así se traza en vez de rebotar. */
+    if(!(parado&&torcido))
+     vf+=fuerza*c.vmax*1.3*cans*dt*(1-clamp(Math.abs(dif)/3.14,0,.6));
+   }
+  }
+  vf*=(1-dt*(fuerza<.12?1.7:.45));
+  vr*=Math.pow(.86,dt*60);
+  vf=clamp(vf,-c.vmax*.42,c.vmax);
   c.vx=f.x*vf+r.x*vr;c.vy=f.y*vf+r.y*vr;
   const antes={x:c.x,y:c.y};c.golpe=false;
   mover(c,c.x+c.vx*dt,c.y+c.vy*dt,true);
@@ -3294,9 +3463,13 @@ function actCiudad(dt,ix,iy,correr){
   asustar(c,Math.abs(vf)>4?4.5:2.2);
  }else{
   motorAudio(null,1);
-  const v=(correr?4.7:2.9)*cans,m=Math.hypot(ix,iy);
-  if(m>.08){mover(player,player.x+ix/m*Math.min(1,m)*v*dt,player.y+iy/m*Math.min(1,m)*v*dt,false);
-   player.d8=dir8De(ix,iy);poseAndar(player,v,correr,dt);}
+  const m=Math.hypot(ix,iy);
+  /* Velocidad analógica: el joystick a medias pasea y a fondo corre, sin escalón. */
+  const v=(1.55+fuerza*3.25)*cans;
+  if(m>.08){mover(player,player.x+ix/m*v*dt,player.y+iy/m*v*dt,false);
+   /* Si la cruceta está puesta manda ella: se anda de lado sin dejar de apuntar. */
+   if(!apuntando)player.d8=dir8De(ix,iy);
+   poseAndar(player,v,correr,dt);}
   else if(player.golpeT>0){}
   else player.pose=player.herido>0?'herido':(arma(S.armaAct).cuerpo?'quieto':'apunta');
  }
@@ -3575,10 +3748,14 @@ function cajaHUD(x,y,w,h){
  ctx.fillStyle='rgba(141,153,164,.35)';ctx.fillRect(x,y,w,1);ctx.fillRect(x,y+h-1,w,1);
  ctx.fillRect(x,y,1,h);ctx.fillRect(x+w-1,y,1,h);}
 function dibHUD(){
- const T0=Math.max(12,(cv.height/DPR)*0);
- const marg=10, top=marg+(window.visualViewport?0:0);
+ /* El HUD vive en la mitad central de la pantalla. Los cuartos de los lados son de los
+    pulgares —joystick a la izquierda, cruceta y botones a la derecha— y cualquier cosa
+    dibujada ahí queda debajo del mando: se ve el radar por detrás de los botones y no se
+    lee ni una cosa ni la otra. */
+ const marg=10;
+ const zi=Math.round(W*.25)+marg, zd=Math.round(W*.75)-marg;
  /* ── radar circular con anillo de salud ── */
- const R=52, cxr=marg+R, cyr=marg+R+6;
+ const R=Math.min(52,H*.19), cxr=zi+R, cyr=marg+R+2;
  ctx.save();
  ctx.beginPath();ctx.arc(cxr,cyr,R,0,6.283);ctx.closePath();
  ctx.fillStyle='rgba(7,9,12,.85)';ctx.fill();
@@ -3610,7 +3787,7 @@ function dibHUD(){
   ctx.drawImage(fl,cxr+Math.cos(ang)*(R-11)-8,cyr+Math.sin(ang)*(R-11)-8);}
  ctx.restore();
  /* ── estrellas ── */
- const exd=W-marg;
+ const exd=zd;
  for(let i=0;i<5;i++)ctx.drawImage(i<S.estrellas?ICO.estrella:ICO.estrellaOff,exd-24-i*20,marg+2,20,20);
  /* ── dinero ── */
  const din=String(Math.round(S.dinero));
@@ -3627,25 +3804,25 @@ function dibHUD(){
  /* ── energía y hambre bajo el radar ── */
  const by=cyr+R+14;
  const barra=(y,v,col,ico)=>{
-  ctx.drawImage(ico,marg,y-3,14,14);
-  ctx.fillStyle='rgba(7,9,12,.8)';ctx.fillRect(marg+18,y,74,8);
-  ctx.fillStyle='rgba(141,153,164,.4)';ctx.fillRect(marg+18,y,74,1);ctx.fillRect(marg+18,y+7,74,1);
-  ctx.fillStyle=col;ctx.fillRect(marg+19,y+1,72*clamp(v,0,1),6);};
+  ctx.drawImage(ico,zi,y-3,14,14);
+  ctx.fillStyle='rgba(7,9,12,.8)';ctx.fillRect(zi+18,y,74,8);
+  ctx.fillStyle='rgba(141,153,164,.4)';ctx.fillRect(zi+18,y,74,1);ctx.fillRect(zi+18,y+7,74,1);
+  ctx.fillStyle=col;ctx.fillRect(zi+19,y+1,72*clamp(v,0,1),6);};
  barra(by,S.energia,'#4d9de0',ICO.energia);
  barra(by+16,S.hambre,'#e0a14d',ICO.hambre);
  /* ── barrio ── */
  const D=distDe(clamp(player.x|0,0,MW-1),clamp(player.y|0,0,MH-1));
  const nb=S.escena==='interior'?S.interior.n:D.n;
- texto(ctx,nb,marg,by+32,1,'hueso');
+ texto(ctx,nb,zi,by+32,1,'hueso');
  /* ── arma y munición ── */
  const a=arma(S.armaAct);
  const mun=a.inf?'∞':String(S.armas[a.id]||0);
  const wa=Math.max(anchoTexto(a.n,1),anchoTexto(mun,2))+34;
- const ay=H-218;
- cajaHUD(W-marg-wa,ay,wa,36);
- ctx.drawImage(ICO[a.id]||ICO.punos,W-marg-wa+3,ay+8,22,22);
- texto(ctx,a.n,W-marg-wa+28,ay+4,1,'hueso');
- texto(ctx,mun,W-marg-wa+28,ay+16,2,'ambar');
+ const ay=marg+98;
+ cajaHUD(zd-wa,ay,wa,36);
+ ctx.drawImage(ICO[a.id]||ICO.punos,zd-wa+3,ay+8,22,22);
+ texto(ctx,a.n,zd-wa+28,ay+4,1,'hueso');
+ texto(ctx,mun,zd-wa+28,ay+16,2,'ambar');
  /* ── misión o curro ── */
  if(S.escena==='ciudad'&&(S.mision||S.job)){
   const o=objetivo(),dm=o?Math.round(dist(o,player)*8):0;
@@ -3654,7 +3831,7 @@ function dibHUD(){
   const t3=dm+' M'+(S.mision&&S.mision.limite?'  '+Math.max(0,Math.ceil(S.mision.limite-S.mision.t))+' S':
    (S.job?'  '+S.job.pago+' €':''));
   const wm=Math.max(anchoTexto(t1,1),anchoTexto(t2,1),anchoTexto(t3,1))+12;
-  const mx=clamp((W-wm)/2,4,W-wm-4), my=cyr+R+62;
+  const mx=clamp((W-wm)/2,zi,zd-wm), my=H-58;
   cajaHUD(mx,my,wm,42);
   ctx.fillStyle=C.mostaza;ctx.fillRect(mx,my,wm,2);
   texto(ctx,t1,mx+6,my+4,1,'ambar');
@@ -3662,20 +3839,20 @@ function dibHUD(){
   texto(ctx,t3,mx+6,my+28,1,'ambar');}
  /* ── deuda ── */
  if(S.deuda>0){const td='ALQUILER '+S.deuda+' €';
-  texto(ctx,td,marg,by+46,1,'rojo');}
+  texto(ctx,td,zi,by+46,1,'rojo');}
  /* ── pista contextual ── */
  if(pista1){const w=anchoTexto(pista1,1)+12;
-  cajaHUD((W-w)/2,H-190,w,16);
-  texto(ctx,pista1,(W-w)/2+6,H-188,1,'hueso');}
+  cajaHUD((W-w)/2,H-24,w,16);
+  texto(ctx,pista1,(W-w)/2+6,H-22,1,'hueso');}
  /* ── aviso ── */
  if(avisoT>0&&aviso1){
-  let esc=2;while(esc>1&&anchoTexto(aviso1,esc)>W-30)esc--;
-  const w=Math.min(W-12,anchoTexto(aviso1,esc)+16), al=clamp(avisoT,0,1);
+  let esc=2;while(esc>1&&anchoTexto(aviso1,esc)>zd-zi)esc--;
+  const w=Math.min(zd-zi,anchoTexto(aviso1,esc)+16), al=clamp(avisoT,0,1);
   ctx.globalAlpha=al;cajaHUD((W-w)/2,H*.42,w,11*esc+8);
   texto(ctx,aviso1,(W-w)/2+8,H*.42+4,esc,'ambar');ctx.globalAlpha=1;}
  /* ── rótulo grande ── */
- if(grandeT>0&&grande1){let esc=W<420?3:4;
-  while(esc>1&&anchoTexto(grande1,esc)>W-20)esc--;
+ if(grandeT>0&&grande1){let esc=W<620?3:4;
+  while(esc>1&&anchoTexto(grande1,esc)>zd-zi)esc--;
   const w=anchoTexto(grande1,esc);
   const al=clamp(grandeT,0,1);
   ctx.globalAlpha=al;

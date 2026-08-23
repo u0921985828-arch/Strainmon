@@ -8,6 +8,7 @@
     "plano": "node plano.js"
   },
   "dependencies": {
-    "canvas": "^2.11.2"
+    "canvas": "^2.11.2",
+    "playwright": "^1.62.1"
   }
 }
