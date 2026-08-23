@@ -22,7 +22,10 @@ fi
 
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 export DOTNET_NOLOGO=1
+# Sin reutilizar nodos: MSBuild los deja vivos esperando otra compilación, y en un
+# contenedor eso son procesos sueltos después de que el script haya terminado.
+export MSBUILDDISABLENODEREUSE=1
 
 # Editor.csproj arrastra a Juego.csproj y a los dos remedos: una orden basta.
 # -warnaserror para que un aviso nuevo no pase desapercibido.
-dotnet build Editor.csproj -v q --nologo -warnaserror
+dotnet build Editor.csproj -v q --nologo -warnaserror -nodeReuse:false

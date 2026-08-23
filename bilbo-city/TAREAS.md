@@ -35,18 +35,6 @@ herramientas/compilar/compilar.sh     # o ./verificar.sh csharp
 - [ ] ¿El HUD se lee en un móvil de verdad, no solo en el editor?
 - [ ] ¿Cuántos fps da en un dispositivo real con el mobiliario sembrado?
 
-## 2 bis · La batería del HTML es intermitente
-
-Sin sembrar: usa `Math.random()`. Medido en diez pasadas, dos dan
-`FALLO misión no completable: El último puente` — siempre esa, la última y la más larga de
-la campaña. El arnés corta cada misión a 40 iteraciones y esa se queda a un paso.
-
-- [ ] Sembrar el generador del prototipo para que las pasadas sean reproducibles.
-- [ ] En `pruebas.js`, medir progreso (¿avanzó de paso?) en vez de contar vueltas, o darle
-      holgura al tope en las misiones largas.
-
-Mientras siga así, un rojo de la batería no significa nada hasta repetirlo.
-
 ## 3 · Diferencias con el HTML
 
 Repasar comportamiento contra el prototipo, que es el probado:
@@ -93,6 +81,8 @@ Fallos que ya se cazaron y no deben volver:
 - Flechas de dirección dentadas al rotar píxel a píxel.
 - Un campo llamado `Lienzo` que tapaba a la clase `Lienzo`.
 - Dos listas recorridas mientras se borraba de ellas (explosión y atropello).
+- El arnés dando por fallada la última misión sin que el juego tuviera la culpa: `S.hp = 100`
+  no deshace un K.O. Ver abajo.
 - `Correr` y `AtacarMantenido` que se quedaban pegados a `true` para siempre.
 
 Los dos primeros errores de compilación reales, con lo que enseñan:
@@ -109,3 +99,16 @@ Los dos primeros errores de compilación reales, con lo que enseñan:
 Lo que buscaría un verificador nuevo, a la vista de esto: nombres de tipo que existan a la
 vez en `System` y en `UnityEngine` (`Random`, `Object`, `Debug`) usados sin calificar en un
 fichero que importe los dos espacios de nombres.
+
+Y el rojo intermitente de la batería del HTML, que resultó no ser del juego:
+
+- El arnés reponía `S.hp = 100` en cada vuelta para que una muerte de paso no estropeara la
+  prueba, pero un K.O. deja además `S.muerto` contando 2,2 s. Mientras corre, `act()` vuelve
+  antes de llegar a `comprobarObjetivos`, así que la misión no avanza aunque el jugador esté
+  encima del objetivo; al agotarse, manda al hospital y da la misión por fallada. Salía en
+  *El último puente* por ser la última: era la que estaba activa cuando vencía el contador.
+  El juego hacía lo correcto. Arreglado poniendo también `S.muerto = 0`.
+- De paso, el prototipo ya no usa `Math.random()` sino un generador propio sembrable
+  (`sembrar` / `azar`, mulberry32). En el navegador arranca de la hora, como siempre; la
+  batería lo siembra con 20250823, y `BILBO_SEMILLA` cambia la tirada. Dos pasadas dan
+  ahora exactamente lo mismo, que es lo que hacía falta para poder depurar esto.

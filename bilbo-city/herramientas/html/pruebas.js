@@ -28,11 +28,14 @@ const dormir = ms => new Promise(r => setTimeout(r, ms));
   try {
     // ── 1 · la campaña entera ──────────────────────────────────────────
     for (let k = 0; k < A.MISIONES.length; k++) {
-      S.misionIdx = k; S.hp = 100;
+      S.misionIdx = k; S.hp = 100; S.muerto = 0;
       A.empezarMision(A.MISIONES[k]);
       let guarda = 0;
       while (S.mision && guarda++ < 40) {
-        A.cerrarDlg(); S.estrellas = 0; A.policia.length = 0; S.hp = 100;
+        // S.hp = 100 no basta para deshacer un K.O.: deja S.muerto contando, y mientras
+        // corre, act() vuelve antes de comprobar objetivos. Al agotarse manda al hospital y
+        // da la misión por fallada — daba un rojo intermitente en la última, la más larga.
+        A.cerrarDlg(); S.estrellas = 0; A.policia.length = 0; S.hp = 100; S.muerto = 0;
         const p = S.mision.pasos[S.mision.paso];
         if (p.t === 'matar') {
           for (const e of A.enemigos) if (e.mision) e.hp = 0;
@@ -123,7 +126,7 @@ const dormir = ms => new Promise(r => setTimeout(r, ms));
 
     // ── 7 · conducción desde varios puntos al azar ─────────────────────
     {
-      S.hp = 100; S.estrellas = 0; A.policia.length = 0; A.enemigos.length = 0;
+      S.hp = 100; S.muerto = 0; S.estrellas = 0; A.policia.length = 0; A.enemigos.length = 0;
       const recorridos = [];
       for (let i = 0; i < 16; i++) {
         const cc = A.coches.find(c => c.propio), cp = A.puntoCalle();

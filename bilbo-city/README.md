@@ -104,22 +104,16 @@ red viaria conectada al 98,5 % · conducción mediana 12,5 casillas
 61 tipos · 240 métodos · 541 campos · 0 fallos
 ```
 
-La batería del HTML no está sembrada: usa `Math.random()`, así que las cifras bailan entre
-pasadas (la mediana de conducción sale entre 12 y 20 casillas) y hay un fallo intermitente
-medido:
+**La batería es reproducible.** El prototipo no usa `Math.random()` sino un generador propio
+sembrable (`sembrar` / `azar`). En el navegador arranca de la hora, como siempre; la batería
+lo siembra, así que dos pasadas dan exactamente lo mismo. Para probar otra tirada:
 
+```bash
+BILBO_SEMILLA=42 node herramientas/html/pruebas.js
 ```
-FALLO misión no completable: El último puente
-```
 
-Dos veces de diez pasadas, **siempre esa misión y ninguna otra**. Es la última de la
-campaña y la más larga — subir al puente, aguantar a siete matones con escopeta y volver
-al Zurito con 180 s de límite —, así que el arnés se queda a un paso dentro de su tope de
-40 iteraciones por misión. Si sale, repítelo antes de darlo por roto.
-
-Está sin arreglar a propósito: son dos arreglos distintos y ninguno es de una línea —
-sembrar el generador para que las pasadas sean reproducibles, y darle holgura al tope del
-arnés o medir el progreso en vez de contar vueltas.
+Un fallo que solo salga con una semilla concreta sigue siendo un fallo — la semilla no está
+para buscar un verde, sino para que un rojo se pueda repetir y depurar.
 
 ---
 

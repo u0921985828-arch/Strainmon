@@ -124,7 +124,15 @@ let W=0,H=0,DPR=1;
 function resize(){DPR=Math.min(devicePixelRatio||1,2);W=cv.clientWidth;H=cv.clientHeight;
  cv.width=W*DPR|0;cv.height=H*DPR|0;ctx.imageSmoothingEnabled=false;}
 addEventListener('resize',resize);resize();
-const rnd=(a,b)=>a+Math.random()*(b-a), rndi=(a,b)=>Math.floor(rnd(a,b+1));
+/* Generador propio en vez del de la plataforma: así una partida — o una pasada de la
+   batería de pruebas — se puede repetir clavada. Sin sembrar arranca de la hora,
+   que es el comportamiento de siempre. mulberry32: corto, rápido y bien repartido. */
+let _semilla=(Date.now()^0x9E3779B9)>>>0;
+function sembrar(s){_semilla=(s>>>0)||1;}
+function azar(){_semilla=(_semilla+0x6D2B79F5)>>>0;let t=_semilla;
+ t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);
+ return ((t^(t>>>14))>>>0)/4294967296;}
+const rnd=(a,b)=>a+azar()*(b-a), rndi=(a,b)=>Math.floor(rnd(a,b+1));
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const lerp=(a,b,t)=>a+(b-a)*t;
@@ -944,8 +952,8 @@ function angCalle(x,y){
  for(let d=1;d<=3;d++){
   if(rodable(fx+d,fy))h++;if(rodable(fx-d,fy))h++;
   if(rodable(fx,fy+d))v++;if(rodable(fx,fy-d))v++;}
- if(h===v)return Math.random()<.5?0:Math.PI/2;
- return h>v?(Math.random()<.5?0:Math.PI):(Math.random()<.5?Math.PI/2:-Math.PI/2);}
+ if(h===v)return azar()<.5?0:Math.PI/2;
+ return h>v?(azar()<.5?0:Math.PI):(azar()<.5?Math.PI/2:-Math.PI/2);}
 function nuevoCoche(x,y,tipo,lib,propio,vmax){
  return{x,y,ang:angCalle(x,y),vx:0,vy:0,tipo,lib,propio,vmax:vmax||11,dano:0,vivo:true};}
 const coches=[],trafico=[],policia=[],enemigos=[],balas=[],parts=[],peatones=[];
@@ -962,7 +970,7 @@ function poblar(){
 }
 function nuevoTrafico(cx,cy){
  const p=cx!==undefined?puntoCalle(cx,cy,44):puntoCalle();
- const pesado=Math.random()<.18;
+ const pesado=azar()<.18;
  const tipo=pesado?TIPOS_PESADO[rndi(0,3)]:TIPOS_CIVIL[rndi(0,5)];
  return{x:p.x,y:p.y,tx:p.x|0,ty:p.y|0,dx:1,dy:0,vel:pesado?2.7:3.7,ang:0,
   tipo,lib:rndi(0,LIBREAS.length-1),frenado:0};}
@@ -1024,7 +1032,7 @@ function audioInit(){
  so.type='square';so.frequency.value=680;sg.gain.value=0;so.connect(sg);sg.connect(AU.gSfx);so.start();
  AU.sirena={o:so,g:sg,t:0};}
 function ruidoBuf(seg){const n=AU.ctx.sampleRate*seg,b=AU.ctx.createBuffer(1,n,AU.ctx.sampleRate),d=b.getChannelData(0);
- for(let i=0;i<n;i++)d[i]=Math.random()*2-1;return b;}
+ for(let i=0;i<n;i++)d[i]=azar()*2-1;return b;}
 function sfx(tipo,vol=1){
  if(!AU.ctx||!AU.on)return;const t=AU.ctx.currentTime,g=AU.ctx.createGain();g.connect(AU.gSfx);
  if(['disparo','escopeta','golpe','explosion','choque','grito'].includes(tipo)){
@@ -1064,14 +1072,14 @@ function musica(dt){
  if(!AU.ctx||!AU.mus||!AU.on)return;
  AU.musT-=dt;if(AU.musT>0)return;AU.musT=.24;
  const t=AU.ctx.currentTime,base=S.estrellas>0?58:S.escena==='interior'?46:41;
- const paso=(Math.random()<.75)?ESCALA[rndi(0,4)]:ESCALA[rndi(0,4)]+12;
+ const paso=(azar()<.75)?ESCALA[rndi(0,4)]:ESCALA[rndi(0,4)]+12;
  const o=AU.ctx.createOscillator(),g=AU.ctx.createGain();
  o.type=S.estrellas>0?'sawtooth':'triangle';
  o.frequency.value=440*Math.pow(2,(base+paso-69)/12);
  g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(.5,t+.02);
  g.gain.exponentialRampToValueAtTime(.001,t+.23);
  o.connect(g);g.connect(AU.gMus);o.start(t);o.stop(t+.25);
- if(Math.random()<.5){const b=AU.ctx.createOscillator(),bg=AU.ctx.createGain();
+ if(azar()<.5){const b=AU.ctx.createOscillator(),bg=AU.ctx.createGain();
   b.type='square';b.frequency.value=440*Math.pow(2,(base-24-69)/12);
   bg.gain.setValueAtTime(.4,t);bg.gain.exponentialRampToValueAtTime(.001,t+.2);
   b.connect(bg);bg.connect(AU.gMus);b.start(t);b.stop(t+.22);}}
@@ -1428,7 +1436,7 @@ function lineaVista(a,b){
  return true;}
 function disparar(desde,ang,a,dueno){
  const n=a.disp||1;
- for(let i=0;i<n;i++){const sp=(Math.random()-.5)*(a.spread||0)*2;
+ for(let i=0;i<n;i++){const sp=(azar()-.5)*(a.spread||0)*2;
   balas.push({x:desde.x+Math.cos(ang)*.5,y:desde.y+Math.sin(ang)*.5,
    vx:Math.cos(ang+sp)*a.vel,vy:Math.sin(ang+sp)*a.vel,dmg:a.dmg,vida:a.alc/a.vel,dueno});}
  particula(desde.x+Math.cos(ang)*.6,desde.y+Math.sin(ang)*.6,'chispa',3);
@@ -1502,11 +1510,11 @@ function rejilla(c,dt,persigue){
   let el;
   if(persigue){d.sort((a,b)=>Math.hypot(c.tx+a[0]-player.x,c.ty+a[1]-player.y)-Math.hypot(c.tx+b[0]-player.x,c.ty+b[1]-player.y));el=d[0];}
   else{const r=d.find(([dx,dy])=>dx===c.dx&&dy===c.dy);
-   el=(r&&Math.random()<.82)?r:(d.filter(([dx,dy])=>!(dx===-c.dx&&dy===-c.dy))[0]||d[0]);}
+   el=(r&&azar()<.82)?r:(d.filter(([dx,dy])=>!(dx===-c.dx&&dy===-c.dy))[0]||d[0]);}
   c.dx=el[0];c.dy=el[1];c.tx+=el[0];c.ty+=el[1];}
  c.ang=Math.atan2(c.ty+.5-c.y,c.tx+.5-c.x);
  c.x+=Math.cos(c.ang)*c.vel*dt;c.y+=Math.sin(c.ang)*c.vel*dt;}
-function asustar(p,r){for(const q of peatones)if(dist(q,p)<r){q.huye=3.5;if(Math.random()<.1)sfx('grito',.3);}}
+function asustar(p,r){for(const q of peatones)if(dist(q,p)<r){q.huye=3.5;if(azar()<.1)sfx('grito',.3);}}
 function objetivo(){
  if(S.mision){const p=pasoActual();if(!p)return null;return p.t==='robar'?p.coche:p.p;}
  if(S.job)return S.job.fase===0?S.job.o:S.job.d;
@@ -1588,7 +1596,7 @@ function actCiudad(dt,ix,iy,correr){
   if(c.golpe&&esp>.02&&rec<esp*.55){const imp=Math.abs(vf);
    if(imp>3){sfx('choque',clamp(imp/12,.2,1));c.dano+=imp*.035;danarJugador(imp*1.2);particula(c.x,c.y,'chispa',4);}
    c.vx*=.25;c.vy*=.25;}
-  if(c.dano>.55&&Math.random()<dt*7)particula(c.x,c.y,'humo',1);
+  if(c.dano>.55&&azar()<dt*7)particula(c.x,c.y,'humo',1);
   if(c.dano>=1&&c.vivo)explotar(c);
   player.x=c.x;player.y=c.y;
   motorAudio(vf,c.vmax);
@@ -1614,7 +1622,7 @@ function actCiudad(dt,ix,iy,correr){
   if(dist(p,player)<1.25){S.detT+=dt;
    if(player.enCoche){danarJugador(dt*14);player.enCoche.dano+=dt*.12;}
    if(!player.enCoche&&S.detT>1.5){S.detT=0;detener();}}
-  if(S.estrellas>=2&&dist(p,player)<9&&enemigos.filter(e=>e.tipo==='poli').length<S.estrellas*2&&Math.random()<dt*.7)
+  if(S.estrellas>=2&&dist(p,player)<9&&enemigos.filter(e=>e.tipo==='poli').length<S.estrellas*2&&azar()<dt*.7)
    enemigos.push({x:p.x,y:p.y,hp:55,arq:'ertzaina',arma:S.estrellas>=3?'uzi':'pistola',
     d8:0,pose:'quieto',anim:0,cad:0,tipo:'poli',herido:0});}
  if(S.estrellas>0){
@@ -1696,7 +1704,7 @@ function comprobarObjetivos(dt){
     else{j.fase=1;aviso('RECOGIDO');}
    }else if(j.fase===1){
     if((j.id==='taxi'||j.id==='mudanza'||j.id==='fuga')&&!player.enCoche)aviso('Llega en coche');
-    else{cobrar(j);if(j.id==='recado'&&Math.random()<.4){estrellas(1);aviso('TE HAN FICHADO');}}}}}}
+    else{cobrar(j);if(j.id==='recado'&&azar()<.4){estrellas(1);aviso('TE HAN FICHADO');}}}}}}
 /*═══════════════ RENDER DEL MUNDO ═══════════════*/
 const cam={x:0,y:0,z:1,tinte:[0,0,0]};
 function nocheF(){const h=S.min/60;

@@ -22,11 +22,16 @@ let store={};global.localStorage={getItem:k=>store[k]??null,setItem:(k,v)=>store
 let now=0;global.performance={now:()=>now};
 let raf=null;global.requestAnimationFrame=f=>{raf=f;};
 global.location={reload(){}};global.innerWidth=400;global.window=global;
+/* Se siembra el generador antes de arrancar para que dos pasadas de la batería den
+   exactamente lo mismo. BILBO_SEMILLA cambia la semilla cuando quieras probar otra
+   tirada — un fallo que solo sale con una semilla concreta sigue siendo un fallo. */
+const SEMILLA=Number(process.env.BILBO_SEMILLA)||20250823;
 const i=js.lastIndexOf('arrancar();');
 js=js.slice(0,i)+`global.__={S,player,MISIONES,empezarMision,avanzarPaso,objetivo,cerrarDlg,enemigos,
  policia,coches,peatones,balas,estrellas,danarJugador,entrar,salir,atacarJugador,teclas,map,MW,MH,
  EDIF,ROAD,ACERA,AGUA,PARQUE,PLAZA,MUELLE,PATIO,PUENTE,POI,puntoAcera,puntoCalle,arma,HOJAS,hoja,
- real:cv,dib,ZONAS,ATLAS,distDe,Tc,rodable};`+js.slice(i);
+ real:cv,dib,ZONAS,ATLAS,distDe,Tc,rodable,sembrar,azar};
+ sembrar(SEMILLA);`+js.slice(i);
 eval(js);
 module.exports={H,step:n=>{for(let k=0;k<n;k++){now+=16.7;const f=raf;raf=null;if(!f)throw new Error('sin frame');f(now);}},
  raf:()=>raf,setNow:v=>now=v,store};

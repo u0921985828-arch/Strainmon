@@ -72,6 +72,10 @@ nada, en C# la excepción salta en el siguiente `MoveNext`.
   nuevo, se forja por código en `Assets/Scripts/Arte/`.
 - **En artefactos web no uses `localStorage` directamente**: el HTML usa `window.storage` con
   respaldo a `localStorage`.
+- **Nada de `Math.random()` en el prototipo.** Usa `azar()`, o `rnd(a,b)` / `rndi(a,b)`, que
+  van por encima. El generador es sembrable (`sembrar(n)`) y la batería lo siembra, así que
+  dos pasadas dan lo mismo. Un `Math.random()` suelto rompe eso y devuelve los rojos
+  intermitentes que costó quitar.
 
 ## La trampa de la Y
 
