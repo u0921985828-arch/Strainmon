@@ -94,6 +94,36 @@ Código modular con espacio de nombres global `PH` (sin bundler, se ejecuta abri
 | `src/ui.js` | HUD y paneles superpuestos |
 | `src/game.js` | Bucle principal, entrada, cámara y render del mundo |
 
+## 🏙️ `bilbo-city/` — proyecto aparte alojado aquí
+
+Este repositorio hospeda además un segundo juego, **sin ninguna relación con Strainmon**:
+no comparten código, ni motor, ni assets, ni convenciones. Vive entero bajo `bilbo-city/`
+y no toca nada de la raíz.
+
+**Bilbo City** es un sandbox 2D cenital tipo *GTA Chinatown Wars* ambientado en Bilbao,
+para móvil. Bilbao no es procedural: está trazada a mano sobre un atlas de 20×20 celdas con
+17 barrios reales, la ría en arco, el Canal de Deusto, la Gran Vía en diagonal y diez
+puentes. Todo el arte y el audio se generan por código — igual que aquí, ni una imagen ni
+un WAV en el repositorio.
+
+Tiene dos implementaciones y su propia cadena de verificación:
+
+| | Estado |
+|---|---|
+| `bilbo-city/referencia/bilbo-city.html` | Prototipo completo, ejecutado y probado. Es la fuente de la verdad. |
+| `bilbo-city/unity/BilboCity/` | Puerto a Unity 2022.3. Compila con Roslyn; **sin abrir en el editor todavía**. |
+
+```bash
+cd bilbo-city
+./verificar.sh           # compilación del C#, análisis y batería de juego del HTML
+./verificar.sh csharp    # solo Unity
+./verificar.sh html      # solo el prototipo
+```
+
+Lo que hay que saber antes de tocarlo está en `bilbo-city/CLAUDE.md`; lo que queda por
+hacer, en `bilbo-city/TAREAS.md`. **No mezcles los dos proyectos**: Strainmon es `PH` y
+vanilla JS, Bilbo City es C# en español sobre Unity, y cada uno tiene sus reglas.
+
 ## 🚧 Hoja de ruta
 
 Más regiones (desierto, nieve, volcán, islas, cuevas), investigación de ADN y árboles

@@ -33,3 +33,17 @@ informe técnico directo + código refactorizado, sin relleno.
 - Build (bundle inline autocontenido): `node <scratchpad>/build.js` → `dist/PhenoHunter.html`.
 - Consola: LCD 10:9 (matriz 160×144, píxeles cuadrados), modo DMG 4 tonos.
 - Rama de trabajo: `claude/pheno-hunter-game-wzl06e`.
+
+## Segundo proyecto alojado: `bilbo-city/`
+
+El repositorio hospeda un juego aparte, **sin relación con Strainmon**: sandbox 2D cenital
+ambientado en Bilbao (prototipo HTML probado + puerto a Unity 2022.3 en C#). Vive entero
+bajo `bilbo-city/` y no toca la raíz.
+
+- Tiene **su propio `CLAUDE.md`, su `TAREAS.md` y su `./verificar.sh`**. Al trabajar ahí,
+  manda el suyo: código y comentarios en español, sin físicas de Unity, paleta de 48
+  colores, nada de assets importados.
+- No mezcles convenciones ni código entre los dos. Strainmon es vanilla JS con espacio de
+  nombres `PH`; Bilbo City es C# sobre Unity.
+- La restricción de propiedad intelectual de arriba aplica igual: arte y código 100%
+  originales en los dos.
