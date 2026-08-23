@@ -318,6 +318,24 @@ public static class Ciudad {
                 return t != Suelo.Road && t != Suelo.Puente && t != Suelo.Agua && t != Suelo.Muelle;
             });
 
+        // 4 quater · las carreteras de fuera. En el plano el monte no está vacío: lo cruzan
+        // la autopista del Cantábrico por el norte, la de Zaragoza al suroeste, la salida a
+        // Mungia al noreste y la del Nervión al este. Salen de la ciudad, así que entran en
+        // la red viaria y no dejan trozos sueltos. Sobre el agua se vuelven puente.
+        var carreteras = new[]{
+            new[]{ new Vector2(120,60), new Vector2(86,44), new Vector2(52,30), new Vector2(20,18), new Vector2(0,10) },
+            new[]{ new Vector2(300,88), new Vector2(340,64), new Vector2(386,44), new Vector2(420,26), new Vector2(447,16) },
+            new[]{ new Vector2(196,180), new Vector2(160,206), new Vector2(120,232), new Vector2(80,254), new Vector2(48,272) },
+            new[]{ new Vector2(392,215), new Vector2(420,232), new Vector2(447,244) },
+            new[]{ new Vector2(64,134), new Vector2(36,152), new Vector2(14,176), new Vector2(0,196) },
+            new[]{ new Vector2(344,184), new Vector2(380,206), new Vector2(412,230) },
+        };
+        var anchos = new[]{ 5f, 5f, 5f, 4f, 4f, 4f };
+        for (int i = 0; i < carreteras.Length; i++) {
+            Linea(carreteras[i], anchos[i], Suelo.Road,   (x,y) => T(x,y) != Suelo.Agua);
+            Linea(carreteras[i], anchos[i], Suelo.Puente, (x,y) => T(x,y) == Suelo.Agua);
+        }
+
         // 5 · San Mamés
         int sx = 0, sy = 0, n = 0;
         for (int cy = 0; cy < NCY; cy++) for (int cx = 0; cx < NCX; cx++)

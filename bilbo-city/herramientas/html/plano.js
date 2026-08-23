@@ -22,10 +22,65 @@ setTimeout(() => {
       g.fillStyle = col[A.map[y * A.MW + x]] || '#f0f';
       g.fillRect(x * Z, y * Z, Z, Z);
     }
+  // ── mobiliario de plano: rejilla, barrios y leyenda ─────────────────────────────
+  // Sin esto el plano es una mancha bonita que no dice dónde está nada. Con la rejilla
+  // y los nombres se puede señalar un sitio por escrito — «el puente de D3» — que es
+  // justo para lo que se saca este PNG.
+  const CEL = 64;                                  // casillas por cuadro de rejilla
+  g.strokeStyle = 'rgba(255,255,255,.20)'; g.lineWidth = 1;
+  g.font = 'bold 13px sans-serif'; g.textBaseline = 'top';
+  for (let x = CEL; x < A.MW; x += CEL) {
+    g.beginPath(); g.moveTo(x*Z + .5, 0); g.lineTo(x*Z + .5, A.MH*Z); g.stroke();
+  }
+  for (let y = CEL; y < A.MH; y += CEL) {
+    g.beginPath(); g.moveTo(0, y*Z + .5); g.lineTo(A.MW*Z, y*Z + .5); g.stroke();
+  }
+  g.fillStyle = 'rgba(255,255,255,.55)';
+  for (let i = 0, x = 0; x < A.MW; x += CEL, i++)
+    g.fillText(String.fromCharCode(65+i), x*Z + 5, 4);
+  for (let i = 0, y = 0; y < A.MH; y += CEL, i++)
+    g.fillText(String(i+1), 4, y*Z + 5);
+
+  // nombre de cada barrio en su centro de masas, saltándose monte y parques
+  const centro = {};
+  for (let y = 0; y < A.MH; y++)
+    for (let x = 0; x < A.MW; x++) {
+      const z = A.distDe(x, y);
+      if (z.monte || z.verde) continue;
+      (centro[z.n] = centro[z.n] || {x:0, y:0, n:0});
+      centro[z.n].x += x; centro[z.n].y += y; centro[z.n].n++;
+    }
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = 'bold 15px sans-serif';
+  for (const n of Object.keys(centro)) {
+    const s = centro[n], px = s.x/s.n*Z, py = s.y/s.n*Z;
+    g.lineWidth = 3; g.strokeStyle = 'rgba(0,0,0,.75)'; g.strokeText(n.toUpperCase(), px, py);
+    g.fillStyle = '#f2ede0'; g.fillText(n.toUpperCase(), px, py);
+  }
+
   A.POI.forEach(p => {
     g.fillStyle = '#000'; g.fillRect(p.p.x * Z - 5, p.p.y * Z - 5, 11, 11);
     g.fillStyle = p.c;    g.fillRect(p.p.x * Z - 3, p.p.y * Z - 3, 7, 7);
   });
+
+  // leyenda: los sitios, en dos columnas, sobre un panel con el mismo aire que el plano
+  const filas = Math.ceil(A.POI.length / 2);
+  // abajo a la izquierda: es la esquina con menos ciudad, y arriba a la derecha el panel
+  // tapaba Begoña y Txurdinaga
+  const LW = 430, LH = 34 + filas * 18, LX = 14, LY = A.MH*Z - LH - 14;
+  g.textAlign = 'left'; g.textBaseline = 'middle';
+  g.fillStyle = 'rgba(20,18,15,.86)'; g.fillRect(LX, LY, LW, LH);
+  g.strokeStyle = 'rgba(242,237,224,.45)'; g.lineWidth = 2; g.strokeRect(LX+.5, LY+.5, LW, LH);
+  g.fillStyle = '#f2ede0'; g.font = 'bold 15px sans-serif';
+  g.fillText('BILBAO · SITIOS', LX + 12, LY + 17);
+  g.font = '12px sans-serif';
+  A.POI.forEach((p, i) => {
+    const cx = LX + 12 + (i < filas ? 0 : LW/2), cy = LY + 34 + (i % filas) * 18 + 8;
+    g.fillStyle = '#000'; g.fillRect(cx, cy - 5, 10, 10);
+    g.fillStyle = p.c;    g.fillRect(cx + 2, cy - 3, 6, 6);
+    g.fillStyle = '#e6e0d2'; g.fillText(p.n, cx + 16, cy);
+  });
+
   fs.writeFileSync(salida, c.toBuffer('image/png'));
 
   const cuenta = {};

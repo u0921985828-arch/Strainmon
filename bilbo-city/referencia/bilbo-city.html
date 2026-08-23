@@ -910,6 +910,22 @@ function generarCiudad(){
   const t=map[y*MW+x];
   return t!==ROAD&&t!==PUENTE&&t!==AGUA&&t!==MUELLE;}));
 
+ /* 4 quater · las carreteras de fuera. En el plano el monte no está vacío: lo cruzan la
+    autopista del Cantábrico por el norte, la de Zaragoza al suroeste, la salida a Mungia
+    al noreste y la del Nervión al este. Salen de la ciudad, así que entran en la red
+    viaria y no dejan trozos sueltos. Sobre el agua se convierten en puente. */
+ const carretera=(pts,ancho)=>{
+  linea(pts,ancho,ROAD,(x,y)=>map[y*MW+x]!==AGUA);
+  linea(pts,ancho,PUENTE,(x,y)=>map[y*MW+x]===AGUA);};
+ [
+  [[[120,60],[86,44],[52,30],[20,18],[0,10]],5],    /* al Cantábrico, por Deusto */
+  [[[300,88],[340,64],[386,44],[420,26],[447,16]],5],/* a Mungia, por Txurdinaga */
+  [[[196,180],[160,206],[120,232],[80,254],[48,272]],5], /* a Zaragoza, por Rekalde */
+  [[[392,215],[420,232],[447,244]],4],              /* al Nervión arriba, por Bolueta */
+  [[[64,134],[36,152],[14,176],[0,196]],4],         /* a Zorrotza y el Kadagua */
+  [[[344,184],[380,206],[412,230]],4],              /* la variante sur, por La Peña */
+ ].forEach(([v,w])=>carretera(v,w));
+
  /* 5 · San Mamés */
  for(let cy=0;cy<NCY;cy++)for(let cx=0;cx<NCX;cx++){
   if(ATLAS[cy][cx]!=='E')continue;
