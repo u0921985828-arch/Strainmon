@@ -2269,34 +2269,42 @@ const GLIFOS={
  'Ñ':[14,0,17,25,21,19,17],'Á':[2,0,14,17,31,17,17],'É':[2,0,31,16,30,16,31],
  'Í':[2,0,14,4,4,4,14],'Ó':[2,0,14,17,17,17,14],'Ú':[2,0,17,17,17,17,14],
  ' ':[0,0,0,0,0,0,0],
+ /* El infinito y el punto volado se dibujan pensando en que la fuente los engorda
+    después: un trazo de un píxel sale sólido y deja de leerse. Estos van con hueco. */
+ '∞':[0,0,17,10,17,0,0], '·':[0,0,0,4,0,0,0],
 };
+/* La fuente del juego es BLOQUE: el alfabeto de 5×7 engordado a 6 de ancho, relleno
+   plano y sombra dura de un píxel abajo a la derecha. Se eligió sobre otras cinco
+   (herramientas/html/fuentes.js las saca todas en una imagen) porque a tamaño 1 en un
+   móvil es la que se lee sin acercar la cara, y a tamaño 3 aguanta como rótulo.
+
+   La sombra va en un color de la paleta, no en negro: sobre las cajas oscuras del HUD un
+   negro no se ve y la letra se queda plana. */
+const GLIFOS_B={};
+for(const k in GLIFOS)GLIFOS_B[k]=GLIFOS[k].map(r=>(r|(r<<1))&63);
 const TINTAS={
- ambar:[C.crema,C.mostaza,'#d9891f',C.rojoO],
- hueso:[C.blanco,C.hueso,C.acero,C.aceroO],
- rojo:[C.crema,C.rojoL,C.rojo,C.sangre],
- verde:[C.crema,C.verdeL,C.verde,C.verdeO],
+ ambar:[C.mostaza,C.rojoO],
+ hueso:[C.hueso,C.aceroO],
+ rojo:[C.rojoL,C.sangre],
+ verde:[C.verdeL,C.verdeO],
 };
 const FUENTE={};
 function glifo(ch,tinta){
  const k=tinta+ch;if(FUENTE[k])return FUENTE[k];
- const f=GLIFOS[ch]||GLIFOS['?'],T=TINTAS[tinta];
- const c=lienzo(9,11),g=c.getContext('2d');
- const on=(x,y)=>y>=0&&y<7&&x>=0&&x<5&&((f[y]>>(4-x))&1);
- for(let y=-1;y<8;y++)for(let x=-1;x<6;x++){
-  if(on(x,y))continue;let v=false;
-  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)if(on(x+dx,y+dy))v=true;
-  if(v)P(g,x+2,y+2,1,1,C.carbon);}
- for(let y=0;y<7;y++)for(let x=0;x<5;x++)if(on(x,y))P(g,x+2,y+2,1,1,y<2?T[1]:y<5?T[2]:T[3]);
- for(let x=0;x<5;x++)if(on(x,0))P(g,x+2,1,1,1,T[0]);
+ const f=GLIFOS_B[ch]||GLIFOS_B['?'],T=TINTAS[tinta];
+ const c=lienzo(8,9),g=c.getContext('2d');
+ const on=(x,y)=>y>=0&&y<7&&x>=0&&x<6&&((f[y]>>(5-x))&1);
+ for(let y=0;y<7;y++)for(let x=0;x<6;x++)if(on(x,y))P(g,x+1,y+1,1,1,T[1]);
+ for(let y=0;y<7;y++)for(let x=0;x<6;x++)if(on(x,y))P(g,x,y,1,1,T[0]);
  return FUENTE[k]=cuantizar(c);
 }
 function texto(g,s,x,y,esc,tinta){
  s=String(s).toUpperCase();let cx=x;
  for(const ch of s){
-  if(ch===' '){cx+=4*esc;continue;}
-  g.drawImage(glifo(ch,tinta||'ambar'),cx,y,9*esc,11*esc);cx+=6*esc;}
+  if(ch===' '){cx+=5*esc;continue;}
+  g.drawImage(glifo(ch,tinta||'ambar'),cx,y,8*esc,9*esc);cx+=7*esc;}
  return cx-x;}
-const anchoTexto=(s,esc)=>{let w=0;for(const ch of String(s))w+=(ch===' '?4:6)*esc;return w;};
+const anchoTexto=(s,esc)=>{let w=0;for(const ch of String(s))w+=(ch===' '?5:7)*esc;return w;};
 
 /*═══════════════ MARCADORES ═══════════════*/
 function marcaAbajo(col){
@@ -3895,7 +3903,7 @@ function dibHUD(){
  if(avisoT>0&&aviso1){
   let esc=2;while(esc>1&&anchoTexto(aviso1,esc)>zd-zi)esc--;
   const w=Math.min(zd-zi,anchoTexto(aviso1,esc)+16), al=clamp(avisoT,0,1);
-  ctx.globalAlpha=al;cajaHUD((W-w)/2,H*.42,w,11*esc+8);
+  ctx.globalAlpha=al;cajaHUD((W-w)/2,H*.42,w,9*esc+8);
   texto(ctx,aviso1,(W-w)/2+8,H*.42+4,esc,'ambar');ctx.globalAlpha=1;}
  /* ── rótulo grande ── */
  if(grandeT>0&&grande1){let esc=W<620?3:4;

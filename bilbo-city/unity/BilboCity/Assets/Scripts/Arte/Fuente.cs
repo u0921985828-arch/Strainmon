@@ -27,19 +27,33 @@ public static class Fuente {
         {'Ñ',new[]{14,0,17,25,21,19,17}},  {'Á',new[]{2,0,14,17,31,17,17}},   {'É',new[]{2,0,31,16,30,16,31}},
         {'Í',new[]{2,0,14,4,4,4,14}},      {'Ó',new[]{2,0,14,17,17,17,14}},   {'Ú',new[]{2,0,17,17,17,17,14}},
         {' ',new[]{0,0,0,0,0,0,0}},
+        // El infinito y el punto volado van pensando en que la fuente los engorda
+        // después: un trazo de un píxel sale sólido y deja de leerse.
+        {'∞',new[]{0,0,17,10,17,0,0}},     {'·',new[]{0,0,0,4,0,0,0}},
     };
 
     public enum Tinta { Ambar, Hueso, Rojo, Verde }
+
+    /// <summary>Relleno y sombra de cada tinta.</summary>
+    /// La sombra va en un color de la paleta y no en negro: sobre las cajas oscuras del
+    /// HUD un negro no se ve y la letra se queda plana.
     static Color32[] Tonos(Tinta t) {
         switch (t) {
-            case Tinta.Hueso: return new[]{ Paleta.Blanco, Paleta.Hueso, Paleta.Acero, Paleta.AceroO };
-            case Tinta.Rojo:  return new[]{ Paleta.Crema, Paleta.RojoL, Paleta.Rojo, Paleta.Sangre };
-            case Tinta.Verde: return new[]{ Paleta.Crema, Paleta.VerdeL, Paleta.Verde, Paleta.VerdeO };
-            default:          return new[]{ Paleta.Crema, Paleta.Mostaza, Paleta.H("#d9891f"), Paleta.RojoO };
+            case Tinta.Hueso: return new[]{ Paleta.Hueso, Paleta.AceroO };
+            case Tinta.Rojo:  return new[]{ Paleta.RojoL, Paleta.Sangre };
+            case Tinta.Verde: return new[]{ Paleta.VerdeL, Paleta.VerdeO };
+            default:          return new[]{ Paleta.Mostaza, Paleta.RojoO };
         }
     }
 
-    public const int GW = 9, GH = 11, AVANCE = 6, ESPACIO = 4;
+    /// <summary>
+    /// La fuente es BLOQUE: el alfabeto de 5×7 engordado a 6 de ancho, relleno plano y
+    /// sombra dura de un píxel abajo a la derecha. Se eligió sobre otras cinco porque a
+    /// tamaño 1 en un móvil se lee sin acercar la cara y a tamaño 3 aguanta como rótulo.
+    /// El engorde se hace aquí y no en la tabla para que la tabla siga siendo la misma
+    /// que la del prototipo, letra por letra.
+    /// </summary>
+    public const int GW = 8, GH = 9, AVANCE = 7, ESPACIO = 5;
     static readonly Dictionary<string, Sprite> Cache = new Dictionary<string, Sprite>();
 
     public static Sprite Glifo(char ch, Tinta tinta) {
@@ -51,18 +65,13 @@ public static class Fuente {
         if (!Glifos.TryGetValue(ch, out f)) f = Glifos['?'];
         var T = Tonos(tinta);
         var L = new Lienzo(GW, GH);
-        System.Func<int,int,bool> on = (x,y) => y >= 0 && y < 7 && x >= 0 && x < 5 && ((f[y] >> (4-x)) & 1) != 0;
-        for (int y = -1; y < 8; y++)
-            for (int x = -1; x < 6; x++) {
-                if (on(x,y)) continue;
-                bool v = false;
-                for (int dy = -1; dy <= 1; dy++) for (int dx = -1; dx <= 1; dx++) if (on(x+dx,y+dy)) v = true;
-                if (v) L.P(x+2, y+2, 1, 1, Paleta.Carbon);
-            }
-        for (int y = 0; y < 7; y++)
-            for (int x = 0; x < 5; x++)
-                if (on(x,y)) L.P(x+2, y+2, 1, 1, y < 2 ? T[1] : (y < 5 ? T[2] : T[3]));
-        for (int x = 0; x < 5; x++) if (on(x,0)) L.P(x+2, 1, 1, 1, T[0]);
+        System.Func<int,int,bool> on = (x,y) => {
+            if (y < 0 || y >= 7 || x < 0 || x >= 6) return false;
+            int r = (f[y] | (f[y] << 1)) & 63;
+            return ((r >> (5-x)) & 1) != 0;
+        };
+        for (int y = 0; y < 7; y++) for (int x = 0; x < 6; x++) if (on(x,y)) L.P(x+1, y+1, 1, 1, T[1]);
+        for (int y = 0; y < 7; y++) for (int x = 0; x < 6; x++) if (on(x,y)) L.P(x, y, 1, 1, T[0]);
         s = Forja.SpriteDe(L);
         Cache[clave] = s;
         return s;
