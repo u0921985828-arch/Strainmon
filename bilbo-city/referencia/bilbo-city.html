@@ -67,32 +67,55 @@ body{background:radial-gradient(circle at 50% 40%,#12171d,#080a0d 78%);}
 #gira .g{font-size:64px;animation:vuelta 2.2s ease-in-out infinite;}
 #gira .t{font-size:15px;letter-spacing:4px;text-transform:uppercase;color:var(--acero);}
 @keyframes vuelta{0%,42%{transform:rotate(0)}58%,100%{transform:rotate(-90deg)}}
-.pant{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,11,.985),rgba(12,16,21,.985));
- display:none;flex-direction:column;padding:calc(env(safe-area-inset-top) + 12px) 14px 12px;
- overflow-y:auto;pointer-events:auto;}
-/* El cuerpo del panel se centra y se limita: leer una línea de 1200 px cansa. */
-.pant>*{width:100%;max-width:620px;margin-left:auto;margin-right:auto;}
-.pant h2{margin:0;font-size:25px;letter-spacing:4px;text-transform:uppercase;
- background:linear-gradient(180deg,#f5e9b8,#b7451f);-webkit-background-clip:text;background-clip:text;color:transparent;}
-.pant .sub{font-size:11px;letter-spacing:2px;color:var(--acero);margin:2px 0 11px;text-transform:uppercase;}
-.tabs{display:flex;gap:5px;margin-bottom:11px;}
-.tab{flex:1;text-align:center;padding:7px 0;font-size:11px;letter-spacing:2px;text-transform:uppercase;
- border:1px solid rgba(141,153,164,.3);background:rgba(20,26,32,.8);}
-.tab.on{background:var(--oxido);border-color:var(--oxido);}
-.item{background:linear-gradient(180deg,#161d24,#10161b);border:1px solid rgba(141,153,164,.24);
- border-left:4px solid var(--oxido);padding:9px 10px;margin-bottom:7px;display:flex;gap:9px;align-items:center;}
-.item:active{background:#1e262f;}
-.item .ico{font-size:22px;width:28px;text-align:center;}
-.item .txt{flex:1;} .item .tt{font-size:15px;font-weight:700;letter-spacing:.5px;}
-.item .dd{font-size:11px;color:var(--acero);line-height:1.3;}
-.item .pago{font-size:16px;font-weight:700;color:var(--neon);white-space:nowrap;}
+/* ═══ LOS PANELES ═══
+   El móvil, la pausa y las tiendas. Van dentro de la pantalla de la consola, no encima
+   de todo: si un menú tapa también el marco, se pierde la ilusión de estar mirando un
+   cacharro. De ahí que no sean `inset:0` sino que se recorten al hueco del lienzo. */
+.pant{position:absolute;left:17%;right:17%;top:5%;bottom:5%;
+ background:linear-gradient(180deg,rgba(8,11,15,.995),rgba(13,18,24,.995));
+ border:2px solid rgba(230,226,214,.14);border-radius:4px;
+ display:none;flex-direction:column;padding:12px 14px;overflow:hidden;pointer-events:auto;}
+.pant>*{width:100%;max-width:620px;margin-left:auto;margin-right:auto;flex-shrink:0;}
+/* El plano de la ciudad se estira al ancho del panel; si no, queda arrinconado. */
+#pausaCuerpo canvas{display:block;width:100%;height:auto;image-rendering:pixelated;}
+/* Las rayas horizontales son de tubo, no de adorno: dan al menú la misma materia que
+   la pantalla del juego y disimulan el degradado. */
+.pant::after{content:'';position:absolute;inset:0;pointer-events:none;border-radius:4px;z-index:1;
+ background:repeating-linear-gradient(180deg,rgba(0,0,0,.14) 0 1px,transparent 1px 4px);}
+/* La pestaña encendida va por encima de las rayas: es lo único de la pantalla que tiene
+   que leerse de un vistazo, y rayada parece deshabilitada. */
+.tabs{position:relative;z-index:2;}
+.pant h2{margin:0;font-size:20px;letter-spacing:5px;text-transform:uppercase;
+ color:var(--neon);text-shadow:2px 2px 0 var(--oxido);}
+.pant .sub{font-size:10px;letter-spacing:3px;color:var(--acero);margin:1px 0 9px;text-transform:uppercase;}
+.tabs{display:flex;gap:4px;margin-bottom:9px;}
+.tab{flex:1;text-align:center;padding:6px 0;font-size:10px;letter-spacing:2px;text-transform:uppercase;
+ border:2px solid rgba(141,153,164,.28);background:rgba(16,21,27,.9);color:var(--acero);}
+.tab.on{background:var(--neon);border-color:var(--neon);color:#1a1206;text-shadow:none;font-weight:700;}
+/* El cuerpo es lo único que se desplaza: la cabecera y el botón de cerrar se quedan. */
+#telCuerpo,#pausaCuerpo,#tiendaCuerpo{flex:1;overflow-y:auto;min-height:0;}
+
+.item{background:linear-gradient(180deg,#161d24,#10161b);border:2px solid rgba(141,153,164,.2);
+ border-left:5px solid var(--oxido);padding:5px 8px;margin-bottom:5px;display:flex;gap:8px;align-items:center;}
+.item:active{background:#1e262f;border-color:var(--neon);}
+/* El icono va en un hueco hundido, como una casilla de inventario. */
+/* Caben cinco filas en un móvil tumbado; con la caja más alta solo entraban cuatro. */
+.item .ico{width:30px;height:30px;flex:0 0 30px;display:flex;align-items:center;justify-content:center;
+ background:#0a0d11;border:1px solid rgba(141,153,164,.22);box-shadow:inset 0 2px 4px rgba(0,0,0,.7);}
+img.pix{image-rendering:pixelated;display:block;}
+.item .txt{flex:1;min-width:0;}
+.item .tt{font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.item .dd{font-size:11px;color:var(--acero);line-height:1.25;}
+.item .pago{font-size:15px;font-weight:700;color:var(--neon);white-space:nowrap;
+ text-shadow:1px 1px 0 var(--oxido);}
 .item.legal{border-left-color:var(--verde);} .item.turbio{border-left-color:var(--morado);}
-.item.hist{border-left-color:var(--neon);} .item.no{opacity:.36;}
-.cerrar{margin-top:auto;padding:12px;text-align:center;letter-spacing:3px;text-transform:uppercase;
- border:1px solid rgba(230,226,214,.3);font-weight:700;background:rgba(20,26,32,.8);}
+.item.hist{border-left-color:var(--neon);} .item.no{opacity:.34;}
+.cerrar{margin-top:8px;padding:10px;text-align:center;letter-spacing:3px;text-transform:uppercase;
+ border:2px solid rgba(230,226,214,.26);font-weight:700;font-size:12px;background:rgba(16,21,27,.9);}
+.cerrar:active{background:var(--oxido);border-color:var(--oxido);}
 .rep{margin-bottom:8px;}
-.rep .n{display:flex;justify-content:space-between;font-size:12px;letter-spacing:1px;text-transform:uppercase;}
-.rep .b{height:8px;background:rgba(0,0,0,.55);border:1px solid rgba(141,153,164,.28);margin-top:2px;}
+.rep .n{display:flex;justify-content:space-between;font-size:11px;letter-spacing:1px;text-transform:uppercase;}
+.rep .b{height:9px;background:rgba(0,0,0,.6);border:1px solid rgba(141,153,164,.28);margin-top:2px;}
 .rep .b i{display:block;height:100%;background:linear-gradient(90deg,#b7451f,#e8c547);}
 #dlg{position:absolute;left:50%;transform:translateX(-50%);width:min(560px,50%);
  bottom:calc(env(safe-area-inset-bottom) + 10px);
@@ -2432,6 +2455,12 @@ function generarTiles(){
  TILE.estante=T32(g=>{rell(g,C.grisO);for(let y=2;y<30;y+=9){P(g,0,y+7,32,2,C.gris);
   for(let x=2;x<30;x+=6)P(g,x,y,4,7,C.mostazaO);}});
 }
+/* Los muebles de interior se dibujan ENCIMA del suelo, así que tienen que llevar
+   transparencia: una mesa que ocupa toda la casilla no deja ver la tarima. El resto de
+   tiles son suelo y no pueden tener ni un hueco — por un agujero se ve el negro del
+   fondo y sale una rejilla de puntos por toda la ciudad. El verificador de estilo
+   distingue los dos casos por esta lista. */
+const TILE_MUEBLE=new Set(['mesa','cama','mueble','vitrina','puesto','camilla','mostrador']);
 
 /*═══════════════ VEHÍCULOS ═══════════════*/
 const CHASIS={
@@ -2530,13 +2559,107 @@ function generarProps(){
 
 /*═══════════════ ICONOS HUD ═══════════════*/
 const ICO={};
-function I24(fn){const c=lienzo(24,24),g=c.getContext('2d');fn(g);return cuantizar(c);}
+/* Un icono se mira a 24 píxeles y sobre fondos de cualquier color: la caja del HUD, la
+   fila oscura del móvil, el marco claro de la tienda. Sin un contorno alrededor, la mitad
+   de ellos se pierden contra el fondo. Se pone aquí, una vez, y no en cada dibujo. */
+function contorno(c,col){
+ const g=c.getContext('2d'),w=c.width,h=c.height;
+ const src=g.getImageData(0,0,w,h).data;
+ const out=g.createImageData(w,h),o=out.data;
+ const hay=(x,y)=>x>=0&&y>=0&&x<w&&y<h&&src[(y*w+x)*4+3]>0;
+ const rgb=[parseInt(col.slice(1,3),16),parseInt(col.slice(3,5),16),parseInt(col.slice(5,7),16)];
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+  const i=(y*w+x)*4;
+  if(src[i+3]>0){o[i]=src[i];o[i+1]=src[i+1];o[i+2]=src[i+2];o[i+3]=255;continue;}
+  let v=false;
+  for(let dy=-1;dy<=1&&!v;dy++)for(let dx=-1;dx<=1&&!v;dx++)if(hay(x+dx,y+dy))v=true;
+  if(v){o[i]=rgb[0];o[i+1]=rgb[1];o[i+2]=rgb[2];o[i+3]=255;}}
+ g.putImageData(out,0,0);return c;}
+/* Rellenar con un color transparente no borra nada: pinta cero píxeles. Para abrir un
+   hueco en algo ya dibujado —el ojo de una llave— hace falta borrar de verdad. */
+const hueco=(g,x,y,w,h)=>g.clearRect(x|0,y|0,w|0,h|0);
+function I24(fn){const c=lienzo(24,24),g=c.getContext('2d');fn(g);return cuantizar(contorno(c,C.negro));}
+
+/* Los iconos de la interfaz. Antes los curros y los menús iban con emoji del sistema:
+   cada móvil los dibuja a su manera, no están en la paleta y al lado del pixel art
+   cantan. Estos son del juego. */
 function generarIconos(){
- ICO.punos=I24(g=>{P(g,7,9,10,8,C.piel2);P(g,7,9,10,2,C.piel1);P(g,5,11,2,4,C.piel3);});
- ICO.bate=I24(g=>{P(g,4,16,6,3,C.maderaO);P(g,9,8,10,10,C.maderaL);});
- ICO.pistola=I24(g=>{P(g,5,9,13,4,C.carbon);P(g,6,13,4,7,C.negro);P(g,5,9,13,1,C.gris);});
- ICO.uzi=I24(g=>{P(g,4,8,15,5,C.carbon);P(g,8,13,4,8,C.negro);P(g,15,4,3,5,C.gris);});
- ICO.escopeta=I24(g=>{P(g,3,10,18,4,C.maderaO);P(g,3,10,18,1,C.acero);P(g,4,14,6,5,C.carbon);});
+ /* ── armas ── */
+ /* El puño se mira de tres cuartos: cuatro nudillos marcados y el pulgar cruzado por
+    delante. De frente y liso se lee como una caja de cartón. */
+ ICO.punos=I24(g=>{P(g,7,7,11,12,C.piel2);P(g,7,7,11,3,C.piel1);
+  for(let i=0;i<4;i++){P(g,8+i*3,7,2,3,C.piel1);P(g,8+i*3,10,2,2,C.piel3);}
+  P(g,5,12,4,6,C.piel3);P(g,5,12,4,2,C.piel2);P(g,7,17,11,2,C.piel4);
+  P(g,10,19,8,3,C.piel4);});
+ ICO.bate=I24(g=>{for(let i=0;i<7;i++)P(g,4+i,17-i,3,3,C.maderaO);
+  for(let i=0;i<8;i++)P(g,10+i,11-i,4,4,C.maderaL);P(g,5,16,3,3,C.carbon);});
+ ICO.pistola=I24(g=>{P(g,4,8,15,5,C.carbon);P(g,4,8,15,1,C.gris);P(g,17,10,4,2,C.grisO);
+  P(g,6,13,5,8,C.negro);P(g,7,14,3,6,C.grisO);P(g,11,12,3,2,C.carbon);});
+ ICO.uzi=I24(g=>{P(g,3,7,16,6,C.carbon);P(g,3,7,16,1,C.gris);
+  P(g,8,13,4,9,C.negro);P(g,15,3,3,5,C.grisO);P(g,4,4,3,4,C.grisO);P(g,19,9,2,2,C.gris);});
+ ICO.escopeta=I24(g=>{P(g,7,8,15,3,C.grisO);P(g,7,11,15,3,C.carbon);P(g,7,8,15,1,C.acero);
+  P(g,20,8,2,6,C.negro);
+  for(let i=0;i<7;i++)P(g,3+i,14+i,4,3,C.maderaO);P(g,4,15,3,3,C.maderaL);
+  P(g,9,13,4,3,C.madera);});
+
+ /* ── herramientas de curro, una por oficio ── */
+ ICO.reparto=I24(g=>{P(g,4,7,16,14,C.rojoO);P(g,4,7,16,3,C.rojo);P(g,9,4,6,4,C.carbon);
+  P(g,7,12,10,6,C.crema);P(g,9,14,6,2,C.rojo);});
+ ICO.lonja=I24(g=>{P(g,3,10,18,10,C.maderaO);P(g,3,10,18,2,C.maderaL);
+  for(let i=0;i<4;i++)P(g,5+i*4,13,3,7,C.madera);
+  P(g,6,6,10,5,C.acero);P(g,14,5,4,7,C.aceroO);P(g,8,8,2,2,C.negro);});
+ ICO.taxi=I24(g=>{P(g,4,9,16,7,C.mostaza);P(g,4,9,16,2,C.crema);P(g,6,16,12,4,C.carbon);
+  P(g,7,11,4,3,C.carbon);P(g,13,11,4,3,C.carbon);P(g,2,17,20,2,C.negro);});
+ ICO.obra=I24(g=>{P(g,5,9,14,8,C.mostaza);P(g,7,5,10,5,C.mostaza);P(g,11,4,2,6,C.mostazaO);
+  P(g,3,17,18,3,C.mostazaO);P(g,5,9,14,1,C.crema);});
+ ICO.puerto=I24(g=>{P(g,11,2,3,10,C.acero);P(g,8,2,9,2,C.aceroO);
+  P(g,11,12,3,3,C.acero);P(g,7,14,7,3,C.acero);P(g,6,16,3,5,C.acero);P(g,8,20,5,2,C.aceroO);});
+ ICO.mudanza=I24(g=>{P(g,3,7,18,14,'#a07a4a');P(g,3,7,18,2,'#c09760');
+  P(g,11,7,2,14,C.crema);P(g,3,12,18,2,C.crema);P(g,5,16,5,3,'#8a6538');});
+ ICO.recado=I24(g=>{P(g,4,8,16,13,'#b09a72');P(g,4,8,16,2,'#c9b48c');
+  P(g,11,8,2,13,C.maderaO);P(g,4,13,16,2,C.maderaO);P(g,9,4,6,5,C.maderaO);});
+ ICO.fuga=I24(g=>{P(g,11,3,2,18,C.carbon);P(g,3,11,18,2,C.carbon);
+  for(let i=0;i<8;i++){const a=i*Math.PI/4;
+   P(g,12+Math.cos(a)*9-1,12+Math.sin(a)*9-1,3,3,i%2?C.crema:C.carbon);}
+  P(g,9,9,6,6,C.grisO);});
+ ICO.llaveInglesa=I24(g=>{for(let i=0;i<10;i++)P(g,7+i,16-i,3,3,C.acero);
+  P(g,2,14,8,8,C.aceroO);hueco(g,5,16,4,4);hueco(g,2,14,3,3);
+  P(g,14,2,8,8,C.aceroO);hueco(g,15,15,0,0);hueco(g,15,4,4,4);hueco(g,19,7,3,3);});
+
+ ICO.furgo=I24(g=>{P(g,2,8,20,9,C.crema);P(g,2,8,20,2,C.blanco);P(g,14,9,7,5,C.azulL);
+  P(g,2,17,20,2,C.grisO);P(g,5,17,4,4,C.carbon);P(g,15,17,4,4,C.carbon);});
+ ICO.deportivo=I24(g=>{P(g,2,11,20,6,C.rojo);P(g,6,7,12,5,C.rojoO);P(g,8,8,8,3,C.azulL);
+  P(g,2,11,20,1,C.rojoL);P(g,2,17,20,2,C.carbon);P(g,4,16,4,5,C.carbon);P(g,16,16,4,5,C.carbon);});
+
+ /* ── marcas de la interfaz ── */
+ ICO.diana=I24(g=>{P(g,4,10,16,4,C.rojoL);P(g,10,4,4,16,C.rojoL);
+  P(g,8,8,8,8,C.crema);P(g,10,10,4,4,C.sangre);});
+ ICO.aviso=I24(g=>{poligono(g,[[12,2],[22,20],[2,20]],C.mostaza,0,0,24,24);
+  P(g,11,8,2,7,C.carbon);P(g,11,16,2,2,C.carbon);});
+ ICO.meta=I24(g=>{P(g,4,3,2,18,C.grisO);
+  for(let y=0;y<4;y++)for(let x=0;x<4;x++)P(g,6+x*4,4+y*3,4,3,(x+y)%2?C.carbon:C.crema);});
+ ICO.libro=I24(g=>{P(g,3,4,18,16,C.rojoO);P(g,5,6,14,12,C.crema);P(g,11,4,2,16,C.rojoO);
+  for(let i=0;i<3;i++){P(g,6,8+i*3,4,1,C.acero);P(g,14,8+i*3,4,1,C.acero);}});
+ ICO.contrato=I24(g=>{P(g,4,3,16,18,C.crema);P(g,4,3,16,3,C.acero);
+  for(let i=0;i<4;i++)P(g,7,9+i*3,10,1,C.aceroO);P(g,9,2,6,4,C.grisO);});
+ ICO.llave=I24(g=>{P(g,4,9,7,7,C.mostaza);P(g,6,11,3,3,'#00000000');
+  P(g,11,11,10,3,C.mostaza);P(g,17,14,2,4,C.mostaza);P(g,20,14,2,3,C.mostaza);});
+ ICO.prohibido=I24(g=>{P(g,4,4,16,16,C.sangre);P(g,6,6,12,12,C.rojoO);
+  for(let i=0;i<12;i++)P(g,6+i,6+i,2,2,C.crema);});
+ ICO.movil=I24(g=>{P(g,7,2,10,20,C.carbon);P(g,8,5,8,12,'#4d9de0');P(g,10,3,4,1,C.grisO);
+  P(g,10,18,4,2,C.grisO);});
+
+ /* ── consumibles ── */
+ ICO.pintxo=I24(g=>{P(g,4,12,16,6,'#c9a86a');P(g,4,12,16,2,'#e0c48c');
+  P(g,6,9,12,4,C.rojoO);P(g,8,7,3,3,C.verde);P(g,12,15,1,7,C.maderaL);});
+ ICO.botellin=I24(g=>{P(g,9,2,6,4,C.verdeO);P(g,8,6,8,15,C.verde);P(g,10,9,4,9,'#7ab06a');
+  P(g,8,13,8,5,C.crema);P(g,9,1,6,2,C.mostaza);});
+ ICO.botiquin=I24(g=>{P(g,3,6,18,14,C.crema);P(g,3,6,18,2,C.acero);
+  P(g,10,9,4,9,C.sangre);P(g,7,12,10,3,C.sangre);P(g,9,4,6,3,C.grisO);});
+ ICO.cargador=I24(g=>{P(g,7,6,10,14,C.carbon);P(g,7,6,10,2,C.gris);
+  for(let i=0;i<4;i++)P(g,9,9+i*3,6,2,C.mostazaO);});
+
+ /* ── HUD ── */
  ICO.estrella=I24(g=>{poligono(g,[[12,1],[15,9],[23,9],[16,14],[19,22],[12,17],[5,22],[8,14],[1,9],[9,9]],'#ff5a3c',0,0,24,24);});
  ICO.estrellaOff=I24(g=>{poligono(g,[[12,1],[15,9],[23,9],[16,14],[19,22],[12,17],[5,22],[8,14],[1,9],[9,9]],C.grisO,0,0,24,24);});
  ICO.euro=I24(g=>{P(g,7,5,10,3,C.mostaza);P(g,5,8,4,8,C.mostaza);P(g,7,16,10,3,C.mostaza);
@@ -2545,6 +2668,13 @@ function generarIconos(){
  ICO.hambre=I24(g=>{P(g,5,4,3,10,C.crema);P(g,10,4,2,7,C.crema);P(g,13,4,2,7,C.crema);
   P(g,10,10,5,3,C.crema);P(g,11,13,3,8,C.crema);P(g,5,14,3,7,C.crema);});
 }
+
+/* Los menús son HTML, así que el icono entra como imagen. Se guarda hecho: convertir un
+   lienzo a data-URL en cada repintado del móvil se nota al desplazar la lista. */
+const _icoURL={};
+function icoImg(k,tam){
+ if(!_icoURL[k]){const c=ICO[k];if(!c)return '';_icoURL[k]=c.toDataURL();}
+ return `<img class="pix" src="${_icoURL[k]}" width="${tam||24}" height="${tam||24}" alt="">`;}
 
 /*═══════════════ BILBAO ═══════════════*/
 /* La planta ya no se inventa. Sale del plano municipal, que es vectorial: las manzanas
@@ -2680,7 +2810,7 @@ function colocarPOIs(){
  [{id:'piso',n:'Tu piso',ico:'🏠',c:C.mostaza,int:'piso',cerca:[1184,440]},
   {id:'portal',n:'Portal',ico:'🔑',c:'#c98fd0',int:'portal',cerca:[1188,436]},
   {id:'bar',n:'Bar Zurito',ico:'🍷',c:C.rojoL,int:'bar',cerca:[934,352]},
-  {id:'merca',n:'Mercado de la Ribera',ico:'🐟',c:C.verdeL,int:'merca',cerca:[956,403]},
+  {id:'merca',n:'Mercado de la Ribera',ico:'lonja',c:C.verdeL,int:'merca',cerca:[956,403]},
   {id:'armeria',n:'Bazar Nervión',ico:'🔫',c:C.sangre,int:'armeria',cerca:[1170,430]},
   {id:'taller',n:'Taller Iker',ico:'🔧',c:'#9d8ec4',int:'taller',cerca:[732,672]},
   {id:'hospital',n:'Hospital de Basurto',ico:'🏥',c:C.blanco,int:'hospital',cerca:[470,456]},
@@ -2960,14 +3090,14 @@ function abrirTel(){if(telEl.style.display==='flex'){telEl.style.display='none';
 const NOMREP={hosteleria:'Hostelería',obra:'Obra y puerto',transporte:'Transporte',calle:'Calle'};
 const nivel=g=>Math.floor(S.rep[g]/4), multip=g=>1+nivel(g)*.18;
 const CURROS=[
- {id:'reparto',ico:'🛵',tt:'Reparto de pintxos',dd:'Recoges en el Zurito y llevas el pedido.',tipo:'legal',g:'hosteleria',base:16,req:0},
- {id:'lonja',ico:'🐟',tt:'Cajas en la Ribera',dd:'Madrugón en el mercado.',tipo:'legal',g:'hosteleria',base:30,req:0},
- {id:'taxi',ico:'🚕',tt:'Turno de taxi',dd:'Con coche. Recoges y dejas.',tipo:'legal',g:'transporte',base:34,req:0},
- {id:'obra',ico:'🚧',tt:'Peón en la obra',dd:'Jornada dura. Paga fijo.',tipo:'legal',g:'obra',base:44,req:0},
- {id:'puerto',ico:'⚓',tt:'Descarga en el muelle',dd:'Contenedores en el Nervión.',tipo:'legal',g:'obra',base:62,req:1},
- {id:'mudanza',ico:'📦',tt:'Mudanza exprés',dd:'Necesitas furgoneta.',tipo:'legal',g:'transporte',base:95,req:1,furgo:true},
- {id:'recado',ico:'🎒',tt:'Recado sin preguntas',dd:'De A a B. Nadie mira dentro.',tipo:'turbio',g:'calle',base:100,req:0},
- {id:'fuga',ico:'🏁',tt:'Conductor de fuga',dd:'Ruta corta, mucha estrella.',tipo:'turbio',g:'calle',base:230,req:2},
+ {id:'reparto',ico:'reparto',tt:'Reparto de pintxos',dd:'Recoges en el Zurito y llevas el pedido.',tipo:'legal',g:'hosteleria',base:16,req:0},
+ {id:'lonja',ico:'lonja',tt:'Cajas en la Ribera',dd:'Madrugón en el mercado.',tipo:'legal',g:'hosteleria',base:30,req:0},
+ {id:'taxi',ico:'taxi',tt:'Turno de taxi',dd:'Con coche. Recoges y dejas.',tipo:'legal',g:'transporte',base:34,req:0},
+ {id:'obra',ico:'obra',tt:'Peón en la obra',dd:'Jornada dura. Paga fijo.',tipo:'legal',g:'obra',base:44,req:0},
+ {id:'puerto',ico:'puerto',tt:'Descarga en el muelle',dd:'Contenedores en el Nervión.',tipo:'legal',g:'obra',base:62,req:1},
+ {id:'mudanza',ico:'mudanza',tt:'Mudanza exprés',dd:'Necesitas furgoneta.',tipo:'legal',g:'transporte',base:95,req:1,furgo:true},
+ {id:'recado',ico:'recado',tt:'Recado sin preguntas',dd:'De A a B. Nadie mira dentro.',tipo:'turbio',g:'calle',base:100,req:0},
+ {id:'fuga',ico:'fuga',tt:'Conductor de fuga',dd:'Ruta corta, mucha estrella.',tipo:'turbio',g:'calle',base:230,req:2},
 ];
 const dispon=j=>(!j.furgo||S.tiene.furgo)&&nivel(j.g)>=j.req;
 const pagoDe=j=>Math.round(j.base*multip(j.g)*rnd(.9,1.25));
@@ -2975,24 +3105,25 @@ function pintarTel(){
  telC.innerHTML='';
  if(telTab==='hist'){
   const m=MISIONES[S.misionIdx],d=document.createElement('div');d.className='item hist';
-  if(S.mision)d.innerHTML=`<div class="ico">🎯</div><div class="txt"><div class="tt">${S.mision.def.n}</div>
+  if(S.mision)d.innerHTML=`<div class="ico">${icoImg('diana')}</div><div class="txt"><div class="tt">${S.mision.def.n}</div>
     <div class="dd">${S.mision.pasos[S.mision.paso].txt}</div></div>`;
-  else if(m)d.innerHTML=`<div class="ico">❗</div><div class="txt"><div class="tt">${m.n}</div>
+  else if(m)d.innerHTML=`<div class="ico">${icoImg('aviso')}</div><div class="txt"><div class="tt">${m.n}</div>
     <div class="dd">Te espera ${m.giver} en ${m.donde}.</div></div><div class="pago">${m.pago} €</div>`;
-  else d.innerHTML=`<div class="ico">🏁</div><div class="txt"><div class="tt">Historia terminada</div>
+  else d.innerHTML=`<div class="ico">${icoImg('meta')}</div><div class="txt"><div class="tt">Historia terminada</div>
     <div class="dd">Bilbao es tuya. O al menos el Casco Viejo.</div></div>`;
   telC.appendChild(d);
   const p=document.createElement('div');p.className='item';
-  p.innerHTML=`<div class="ico">📖</div><div class="txt"><div class="tt">Progreso</div>
+  p.innerHTML=`<div class="ico">${icoImg('libro')}</div><div class="txt"><div class="tt">Progreso</div>
    <div class="dd">${S.misionIdx} de ${MISIONES.length} misiones</div></div>`;
   telC.appendChild(p);
  }else if(telTab==='trab'){
   if(S.mision){const d=document.createElement('div');d.className='item no';
-   d.innerHTML='<div class="ico">⛔</div><div class="txt"><div class="tt">Estás en una misión</div><div class="dd">Termínala o abandónala.</div></div>';
+   d.innerHTML=`<div class="ico">${icoImg('prohibido')}</div><div class="txt">
+    <div class="tt">Estás en una misión</div><div class="dd">Termínala o abandónala.</div></div>`;
    telC.appendChild(d);}
   CURROS.forEach(j=>{const ok=dispon(j)&&!S.mision,pago=pagoDe(j);
    const d=document.createElement('div');d.className='item '+(j.tipo==='legal'?'legal':'turbio')+(ok?'':' no');
-   d.innerHTML=`<div class="ico">${j.ico}</div><div class="txt"><div class="tt">${j.tt}</div>
+   d.innerHTML=`<div class="ico">${icoImg(j.ico)}</div><div class="txt"><div class="tt">${j.tt}</div>
     <div class="dd">${dispon(j)?j.dd:'Necesitas '+(j.furgo&&!S.tiene.furgo?'furgoneta':'nivel '+j.req+' en '+NOMREP[j.g])}</div></div>
     <div class="pago">${pago} €</div>`;
    if(ok)d.addEventListener('click',()=>{aceptarCurro(j,pago);telEl.style.display='none';});
@@ -3002,12 +3133,12 @@ function pintarTel(){
    d.innerHTML=`<div class="n"><span>${NOMREP[g]}</span><span>nivel ${nivel(g)} · ×${multip(g).toFixed(2)}</span></div>
     <div class="b"><i style="width:${(S.rep[g]%4)/4*100}%"></i></div>`;telC.appendChild(d);});
   const c=document.createElement('div');c.className='item';
-  c.innerHTML=S.contrato?`<div class="ico">📋</div><div class="txt"><div class="tt">Contrato activo</div>
+  c.innerHTML=S.contrato?`<div class="ico">${icoImg('contrato')}</div><div class="txt"><div class="tt">Contrato activo</div>
     <div class="dd">${S.contrato.hechos}/${S.contrato.meta} de ${NOMREP[S.contrato.g]}</div></div><div class="pago">+${S.contrato.bonus} €</div>`
-   :`<div class="ico">📋</div><div class="txt"><div class="tt">Sin contrato</div><div class="dd">Firma uno con Josu o Iker.</div></div>`;
+   :`<div class="ico">${icoImg('contrato')}</div><div class="txt"><div class="tt">Sin contrato</div><div class="dd">Firma uno con Josu o Iker.</div></div>`;
   telC.appendChild(c);
   if(S.deuda>0){const a=document.createElement('div');a.className='item turbio';
-   a.innerHTML=`<div class="ico">🔑</div><div class="txt"><div class="tt">Pagar alquiler</div>
+   a.innerHTML=`<div class="ico">${icoImg('llave')}</div><div class="txt"><div class="tt">Pagar alquiler</div>
     <div class="dd">Transferencia a la casera</div></div><div class="pago">${S.deuda} €</div>`;
    a.addEventListener('click',()=>{if(S.dinero<S.deuda)return aviso('No te llega');
     S.dinero-=S.deuda;S.deuda=0;sfx('dinero');aviso('Alquiler al día');pintarTel();guardar();});
@@ -3057,7 +3188,7 @@ function abrirTienda(t,s,arts){
  tiC.innerHTML='';
  arts.forEach(a=>{const puede=S.dinero>=a.precio&&!a.ya();
   const d=document.createElement('div');d.className='item '+(puede?'legal':'no');
-  d.innerHTML=`<div class="ico">${a.ico}</div><div class="txt"><div class="tt">${a.tt}</div>
+  d.innerHTML=`<div class="ico">${icoImg(a.ico)}</div><div class="txt"><div class="tt">${a.tt}</div>
    <div class="dd">${a.ya()?'Ya lo tienes':a.dd}</div></div><div class="pago">${a.precio} €</div>`;
   if(puede)d.addEventListener('click',()=>{S.dinero-=a.precio;a.fn();sfx('dinero');tiEl.style.display='none';guardar();});
   tiC.appendChild(d);});
@@ -3259,9 +3390,9 @@ function hablarCon(n){
  if(n.tipo==='mecanico'){
   const m=MISIONES[S.misionIdx];
   const ops=[{txt:'Ver vehículos',fn:()=>abrirTienda('Taller Iker','Vehículos',[
-   {ico:'🚐',tt:'Furgoneta',dd:'Abre mudanzas y entregas grandes.',precio:700,ya:()=>S.tiene.furgo,
+   {ico:'furgo',tt:'Furgoneta',dd:'Abre mudanzas y entregas grandes.',precio:700,ya:()=>S.tiene.furgo,
     fn:()=>{S.tiene.furgo=true;tuCoche.tipo='furgoLarga';tuCoche.vmax=9.5;aviso('Furgoneta comprada');}},
-   {ico:'🏎',tt:'Deportivo',dd:'Más velocidad y mejor agarre.',precio:1600,ya:()=>S.tiene.deportivo,
+   {ico:'deportivo',tt:'Deportivo',dd:'Más velocidad y mejor agarre.',precio:1600,ya:()=>S.tiene.deportivo,
     fn:()=>{S.tiene.deportivo=true;tuCoche.tipo='deportivo';tuCoche.lib=2;tuCoche.vmax=15.5;aviso('Deportivo comprado');}}])},
    {txt:'Repintar el coche',coste:'100 €',fn:()=>{if(S.dinero<100)return aviso('No te llega');
     if(!S.estrellas)return aviso('No te busca nadie');
@@ -3286,11 +3417,11 @@ function hablarCon(n){
   {txt:'Preguntar por el barrio',fn:()=>aviso('«Aquí siempre ha llovido y siempre se ha currado»')}]);
  if(n.tipo==='armero')return hablar('Koldo',['Aquí no se pregunta y no se fía.'],[
   {txt:'Ver género',fn:()=>abrirTienda('Bazar Nervión','Sin papeles',
-   ARMAS.filter(a=>a.precio).map(a=>({ico:a.cuerpo?'🏏':'🔫',tt:a.n,
+   ARMAS.filter(a=>a.precio).map(a=>({ico:a.id,tt:a.n,
     dd:a.cuerpo?'Cuerpo a cuerpo':`Daño ${a.dmg} · ${a.balas} balas`,precio:a.precio,
     ya:()=>S.armas[a.id]!==undefined,
     fn:()=>{S.armas[a.id]=a.inf?Infinity:a.balas;S.armaAct=a.id;aviso(a.n+' comprada');}}))
-   .concat(ARMAS.filter(a=>a.pack&&S.armas[a.id]!==undefined).map(a=>({ico:'📦',tt:'Munición '+a.n,
+   .concat(ARMAS.filter(a=>a.pack&&S.armas[a.id]!==undefined).map(a=>({ico:'cargador',tt:'Munición '+a.n,
     dd:'+'+a.pack+' balas',precio:Math.round(a.precio*.18),ya:()=>false,
     fn:()=>{S.armas[a.id]+=a.pack;aviso('+'+a.pack+' balas');}}))))}]);
 }

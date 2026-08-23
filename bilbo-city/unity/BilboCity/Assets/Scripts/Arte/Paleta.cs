@@ -109,6 +109,29 @@ public class Lienzo {
     }
     public void Rellenar(Color32 c) { for (int i = 0; i < Px.Length; i++) Px[i] = c; }
 
+    /// <summary>Abre un hueco de verdad.</summary>
+    /// Pintar con un color transparente no borra: escribe alfa cero encima, sí, pero
+    /// hacerlo con P() y un Color32 a cero es justo esto, y con nombre se entiende.
+    public void Borrar(int x, int y, int w, int h) { P(x, y, w, h, new Color32(0,0,0,0)); }
+
+    /// <summary>Rodea de un color todo lo dibujado.</summary>
+    /// Un icono se mira a 24 píxeles y sobre fondos de cualquier color: la caja oscura
+    /// del HUD, la fila del móvil, el marco claro de la tienda. Sin contorno, la mitad se
+    /// pierden contra el fondo.
+    public void Contorno(Color32 col) {
+        var copia = (Color32[])Px.Clone();
+        System.Func<int,int,bool> hay = (x,y) =>
+            x >= 0 && y >= 0 && x < W && y < H && copia[y*W+x].a > 0;
+        for (int y = 0; y < H; y++)
+            for (int x = 0; x < W; x++) {
+                if (copia[y*W+x].a > 0) continue;
+                bool v = false;
+                for (int dy = -1; dy <= 1 && !v; dy++)
+                    for (int dx = -1; dx <= 1 && !v; dx++) if (hay(x+dx, y+dy)) v = true;
+                if (v) Px[y*W+x] = col;
+            }
+    }
+
     public void Ruido(Color32[] cols, int densidad) {
         for (int y = 0; y < H; y++)
             for (int x = 0; x < W; x++) {

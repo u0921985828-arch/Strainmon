@@ -167,17 +167,21 @@ node herramientas/html/manzanas.js                   # el grano de la trama
 
 ## El arte
 
-Todo se forja por código, y hay dos herramientas para trabajarlo:
+**Todo el juego sigue una sola guía de estilo: [`referencia/ESTILO.md`](referencia/ESTILO.md).**
+Proporciones, vista, dirección de la luz, uso del color, contorno, tipografía, rejilla de
+la interfaz y animación. Léela antes de dibujar nada.
+
+No es un documento de buenas intenciones: la mitad de sus reglas las comprueba
+`herramientas/html/estilo.js` sobre el arte de verdad —el que se forja al arrancar— y
+`./verificar.sh` falla si alguna se incumple. Las reglas que se comprueban solas son las
+que sobreviven.
 
 ```bash
+node herramientas/html/estilo.js      # ¿el arte cumple la guía?
+node herramientas/html/iconos.js      # todos los iconos en una hoja, a dos tamaños
 node herramientas/html/fuentes.js     # seis fuentes en una imagen, para elegir
 python3 herramientas/sprites/pixellab.py --simular   # sprites de PixelLab, sin gastar red
 ```
-
-Dos cosas aprendidas dibujando fuentes de mapa de bits, por si vuelven a hacer falta:
-engordar entera la primera y la última fila para simular una serifa **pega los trazos** y
-la M sale un borrón — hay que detectar qué columnas son asta y ponerles pie solo a ellas;
-y un halo de dos píxeles junta unas letras con otras hasta no poder leerlas.
 
 Los sprites de PixelLab necesitan clave (`PIXELLAB_API_KEY`) y salida a `api.pixellab.ai`,
 que **desde una sesión de Claude está cerrada**: eso se ejecuta en local. Ver
