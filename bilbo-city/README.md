@@ -104,10 +104,22 @@ red viaria conectada al 98,5 % · conducción mediana 12,5 casillas
 61 tipos · 240 métodos · 541 campos · 0 fallos
 ```
 
-La batería del HTML no está sembrada: usa `Math.random()`, así que las cifras de conducción
-bailan entre pasadas y la campaña puede quedarse a un paso de completar una misión dentro
-del tope de 40 iteraciones del arnés. Si sale un `FALLO misión no completable`, repítelo
-antes de darlo por roto — y siembra el generador, que es el arreglo de verdad.
+La batería del HTML no está sembrada: usa `Math.random()`, así que las cifras bailan entre
+pasadas (la mediana de conducción sale entre 12 y 20 casillas) y hay un fallo intermitente
+medido:
+
+```
+FALLO misión no completable: El último puente
+```
+
+Dos veces de diez pasadas, **siempre esa misión y ninguna otra**. Es la última de la
+campaña y la más larga — subir al puente, aguantar a siete matones con escopeta y volver
+al Zurito con 180 s de límite —, así que el arnés se queda a un paso dentro de su tope de
+40 iteraciones por misión. Si sale, repítelo antes de darlo por roto.
+
+Está sin arreglar a propósito: son dos arreglos distintos y ninguno es de una línea —
+sembrar el generador para que las pasadas sean reproducibles, y darle holgura al tope del
+arnés o medir el progreso en vez de contar vueltas.
 
 ---
 

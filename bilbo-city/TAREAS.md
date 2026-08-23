@@ -35,6 +35,18 @@ herramientas/compilar/compilar.sh     # o ./verificar.sh csharp
 - [ ] ¿El HUD se lee en un móvil de verdad, no solo en el editor?
 - [ ] ¿Cuántos fps da en un dispositivo real con el mobiliario sembrado?
 
+## 2 bis · La batería del HTML es intermitente
+
+Sin sembrar: usa `Math.random()`. Medido en diez pasadas, dos dan
+`FALLO misión no completable: El último puente` — siempre esa, la última y la más larga de
+la campaña. El arnés corta cada misión a 40 iteraciones y esa se queda a un paso.
+
+- [ ] Sembrar el generador del prototipo para que las pasadas sean reproducibles.
+- [ ] En `pruebas.js`, medir progreso (¿avanzó de paso?) en vez de contar vueltas, o darle
+      holgura al tope en las misiones largas.
+
+Mientras siga así, un rojo de la batería no significa nada hasta repetirlo.
+
 ## 3 · Diferencias con el HTML
 
 Repasar comportamiento contra el prototipo, que es el probado:
