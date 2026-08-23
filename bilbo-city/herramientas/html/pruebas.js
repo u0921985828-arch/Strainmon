@@ -63,6 +63,39 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
     bien.push(A.MISIONES.length + ' misiones completadas');
     A.cerrarDlg();
 
+    // ── 1 bis · las misiones mandan a sitios alcanzables ───────────────
+    // La prueba de arriba teletransporta al jugador al objetivo, así que da igual lo
+    // lejos que esté: una misión imposible la pasa igual. Aquí se miden las distancias
+    // de verdad. Hizo falta al crecer el mapa: «La entrega grande» repartía por tres
+    // puntos al azar del término municipal con dos minutos por parada, que con 448
+    // casillas colaba y con 1440 es mandar a alguien a Zorrotza y darle tiempo de nada.
+    {
+      // Cruzar la ciudad en coche es normal en un juego así —el jugador tiene el suyo
+      // aparcado en el portal desde el minuto uno—, así que el tope suelto es generoso:
+      // lo que no vale es cruzarla contrarreloj. Ahí se mide de verdad.
+      const VEL = 5;          // casillas por segundo conduciendo, medido en la prueba 7
+      const TOPE = 700;       // ~3,6 km, media ciudad; más que eso es que algo se ha ido
+      let malas = 0;
+      for (const def of A.MISIONES) {
+        let ox = P.x, oy = P.y;
+        for (const p of def.pasos()) {
+          const q = p.p || (p.coche && { x: p.coche.x, y: p.coche.y });
+          if (!q) continue;
+          const d = Math.hypot(q.x - ox, q.y - oy);
+          if (d > TOPE) {
+            malas++;
+            fallos.push(def.n + ': «' + p.txt + '» a ' + Math.round(d) + ' casillas');
+          } else if (p.limite && d > p.limite * VEL) {
+            malas++;
+            fallos.push(def.n + ': «' + p.txt + '» a ' + Math.round(d)
+              + ' casillas con solo ' + p.limite + ' s');
+          }
+          ox = q.x; oy = q.y;
+        }
+      }
+      if (!malas) bien.push(A.MISIONES.length + ' misiones con destinos alcanzables');
+    }
+
     // ── 2 · interiores ─────────────────────────────────────────────────
     const interiores = ['bar', 'piso', 'taller', 'armeria', 'merca', 'hospital', 'portal'];
     for (const id of interiores) {

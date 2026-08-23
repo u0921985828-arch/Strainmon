@@ -2760,7 +2760,7 @@ function reciclarCoches(){
   hechos++;}
 }
 function nuevoTrafico(cx,cy){
- const p=cx!==undefined?puntoCalle(cx,cy,44):puntoCalle();
+ const p=puntoCalle(cx===undefined?player.x|0:cx,cy===undefined?player.y|0:cy,44);
  const pesado=azar()<.18;
  const tipo=pesado?TIPOS_PESADO[rndi(0,3)]:TIPOS_CIVIL[rndi(0,5)];
  return{x:p.x,y:p.y,tx:p.x|0,ty:p.y|0,dx:1,dy:0,vel:pesado?2.7:3.7,ang:0,
@@ -3083,8 +3083,8 @@ function aceptarCurro(j,pago){
    que no sea media hora andando: entre 300 m y kilómetro y medio. Y mejor un sitio con
    nombre —«a San Mamés», «a Zorrotza»— que una acera cualquiera. La ciudad es la de
    verdad; que se note en el trabajo, no solo en el plano. */
-function destinoCurro(minC,maxC){
- const px=player.x,py=player.y,cand=[];
+function destinoCurro(minC,maxC,ox,oy){
+ const px=ox===undefined?player.x:ox, py=oy===undefined?player.y:oy, cand=[];
  for(const b of BARRIOS){const q=Math.hypot(b.x-px,b.y-py);
   if(q>=minC&&q<=maxC)cand.push({n:b.n,c:[b.x,b.y]});}
  for(const p of POI){if(p.int||!p.mira)continue;
@@ -3134,7 +3134,14 @@ const MISIONES=[
  {n:'La entrega grande',giver:'Iker',donde:'el Taller',pago:900,requiereFurgo:true,
   intro:['Furgoneta cargada, tres paradas y el reloj corriendo.','Si te paran con eso dentro, no me conoces.'],
   fin:['Todo entregado y sin una multa.','Eres el mejor sueldo que he pagado nunca.'],
-  pasos:()=>{const p=[];for(let i=0;i<3;i++)p.push({t:'irCoche',p:puntoAcera(),txt:'PARADA '+(i+1)+' DE 3',limite:i===0?120:100});return p;}},
+  /* Tres paradas encadenadas, cada una a un barrio o sitio con nombre y a tiro del
+     anterior. Antes eran tres puntos al azar de todo el mapa: con 448 casillas colaba,
+     con 1440 es mandar a alguien a Zorrotza y darle dos minutos. */
+  pasos:()=>{const p=[];let ox=player.x,oy=player.y;
+   for(let i=0;i<3;i++){const q=destinoCurro(70,190,ox,oy);ox=q.p.x;oy=q.p.y;
+    p.push({t:'irCoche',p:q.p,txt:'PARADA '+(i+1)+' DE 3'+(q.n?' - '+q.n.toUpperCase():''),
+     limite:i===0?150:130});}
+   return p;}},
  {n:'Traición',giver:'Txema',donde:'el Bar Zurito',pago:1200,
   intro:['Uno de los míos se ha ido de la lengua.','Está en el mercado, con dos que le cuidan.'],
   fin:['Ya está.','No me mires así. Tú también estabas allí.'],
