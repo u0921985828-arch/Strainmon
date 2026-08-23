@@ -9,7 +9,14 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{margin:0;height:100%;overflow:hidden;background:#07090c;color:var(--hueso);
  font-family:"Barlow Condensed","Oswald","Arial Narrow",system-ui,sans-serif;user-select:none;touch-action:none;}
-canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;}
+/* Consola de mano: la pantalla va en medio y los mandos en el marco, fuera de ella.
+   Overlaid sobre el juego los pulgares tapan justo lo que hay que mirar; aquí no tapan
+   nada, y además la mano descansa en el marco como en una consola de verdad. */
+canvas#c{position:absolute;left:17%;right:17%;top:5%;bottom:5%;width:66%;height:90%;
+ image-rendering:pixelated;background:#05070a;
+ border:2px solid rgba(230,226,214,.14);border-radius:4px;
+ box-shadow:0 0 0 6px #0d1116, 0 6px 22px rgba(0,0,0,.75), inset 0 0 40px rgba(0,0,0,.6);}
+body{background:radial-gradient(circle at 50% 40%,#12171d,#080a0d 78%);}
 #capa{position:absolute;inset:0;pointer-events:none;}
 .btn{position:absolute;pointer-events:auto;border-radius:50%;display:flex;align-items:center;justify-content:center;
  font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--hueso);
@@ -17,58 +24,43 @@ canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixela
  border:2px solid rgba(230,226,214,.28);box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.12);}
 .btn:active{background:radial-gradient(circle at 34% 30%,#d0561f,#8e3316);transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.5);}
 /* ═══ EL MANDO ═══
-   La pantalla se parte en cuatro a lo ancho. El cuarto de la izquierda es el pulgar
-   izquierdo: joystick para andar o conducir, y encima SELECT y OPTIONS. El de la
-   derecha es el derecho: cruceta para apuntar y A/B debajo. Los dos cuartos del medio
-   quedan limpios, que es por donde se ve el juego.
-   Todo va en porcentajes y no en píxeles: un móvil tumbado puede medir 640 o 1280 de
-   ancho y el pulgar sigue estando en el mismo sitio de la mano. */
-#izq,#der{position:absolute;top:0;bottom:0;width:25%;pointer-events:none;}
+   Los dos marcos laterales, a los lados de la pantalla. A la izquierda el pulgar que
+   anda o conduce, con SELECT y OPTIONS encima; a la derecha A y B, y el cambio de arma.
+   Todo en porcentajes: un móvil tumbado puede medir 640 o 1280 de ancho y el pulgar
+   sigue cayendo en el mismo sitio de la mano. */
+#izq,#der{position:absolute;top:0;bottom:0;width:17%;pointer-events:none;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4%;}
 #izq{left:0;} #der{right:0;}
 
-#joy{position:absolute;left:50%;bottom:12%;width:min(38vh,148px);height:min(38vh,148px);
- margin-left:calc(min(38vh,148px) / -2);border-radius:50%;pointer-events:auto;
- border:2px solid rgba(230,226,214,.20);
- background:radial-gradient(circle,rgba(230,226,214,.07),rgba(10,14,18,.35) 72%);}
-#joy i{position:absolute;left:50%;top:50%;width:42%;height:42%;margin:-21% 0 0 -21%;border-radius:50%;
- background:radial-gradient(circle at 35% 30%,rgba(230,226,214,.48),rgba(140,146,152,.34));
- border:1px solid rgba(230,226,214,.34);box-shadow:0 2px 6px rgba(0,0,0,.5);}
-/* El anillo se enciende al correr: sin botón de correr, es lo que dice que vas a tope. */
-#joy.corre{border-color:rgba(232,197,71,.75);}
+/* Las pastillas de arriba: pequeñas y alargadas, que no se pulsan a menudo. */
+.pastillas{display:flex;gap:10%;width:78%;justify-content:center;pointer-events:none;}
+.pas{pointer-events:auto;width:38%;height:min(4.4vh,22px);border-radius:99px;
+ background:linear-gradient(180deg,#2a3138,#171c21);border:1px solid rgba(230,226,214,.22);
+ box-shadow:0 2px 0 rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;
+ font-size:min(2vh,12px);color:rgba(230,226,214,.72);}
+.pas:active{background:linear-gradient(180deg,#d0561f,#8e3316);transform:translateY(1px);}
 
-/* La cruceta: cuatro flechas como las de una consola de bolsillo. Apunta el arma, y en
-   coche toca el claxon. Se pinta como cruz, no como disco, para que el pulgar note por
-   la forma dónde está sin mirar. */
-#cruz{position:absolute;left:50%;bottom:34%;width:min(34vh,132px);height:min(34vh,132px);
- margin-left:calc(min(34vh,132px) / -2);pointer-events:auto;}
-#cruz s{position:absolute;background:linear-gradient(180deg,rgba(78,88,99,.92),rgba(24,29,35,.92));
- border:2px solid rgba(230,226,214,.26);box-shadow:0 3px 0 rgba(0,0,0,.45);}
-#cruz s.h{left:0;right:0;top:34%;height:32%;}
-#cruz s.v{top:0;bottom:0;left:34%;width:32%;}
-#cruz b{position:absolute;width:34%;height:34%;display:flex;align-items:center;justify-content:center;
- font-size:min(2.4vh,15px);color:rgba(230,226,214,.72);}
-#cruz b.on{color:var(--neon);}
-#cruz b.ar{left:33%;top:0;} #cruz b.ab{left:33%;bottom:0;}
-#cruz b.iz{left:0;top:33%;} #cruz b.de{right:0;top:33%;}
+#joy{position:relative;width:min(24vh,120px);height:min(24vh,120px);border-radius:50%;
+ pointer-events:auto;background:radial-gradient(circle at 50% 42%,#d8d4c8,#a9a69c);
+ box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 -3px 6px rgba(0,0,0,.28);}
+#joy i{position:absolute;left:50%;top:50%;width:66%;height:66%;margin:-33% 0 0 -33%;border-radius:50%;
+ background:radial-gradient(circle at 38% 32%,#4b535b,#20262c);
+ box-shadow:0 2px 5px rgba(0,0,0,.6);}
+/* El aro se enciende al correr: sin botón de correr, es lo que dice que vas a tope. */
+#joy.corre{box-shadow:0 0 0 3px rgba(232,197,71,.8),0 3px 0 rgba(0,0,0,.5);}
 
-.btn{position:absolute;pointer-events:auto;border-radius:50%;display:flex;align-items:center;justify-content:center;
- font-size:min(2vh,12px);font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--hueso);
- background:radial-gradient(circle at 34% 30%,rgba(78,88,99,.92),rgba(24,29,35,.92));
- border:2px solid rgba(230,226,214,.28);box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.12);}
-.btn:active,.btn.on{background:radial-gradient(circle at 34% 30%,#d0561f,#8e3316);transform:translateY(2px);
- box-shadow:0 1px 0 rgba(0,0,0,.5);}
-/* A y B en diagonal, como en cualquier mando: B abajo a la izquierda, A arriba a la
-   derecha. Así el pulgar llega a los dos sin soltar la cruceta. */
-#bA{right:6%;bottom:14%;width:min(13vh,74px);height:min(13vh,74px);font-size:min(2.6vh,17px);}
-#bB{right:calc(6% + min(14vh,80px));bottom:9%;width:min(11.5vh,66px);height:min(11.5vh,66px);
- font-size:min(2.4vh,15px);border-color:rgba(193,54,43,.7);}
-#bR{right:6%;top:6%;width:min(9vh,52px);height:min(9vh,52px);font-size:min(2.2vh,14px);border-radius:26% / 50%;}
-#bSel{left:14%;top:6%;width:min(8vh,46px);height:min(8vh,46px);font-size:min(1.9vh,11px);border-radius:26% / 50%;}
-#bOpt{left:calc(14% + min(9.5vh,56px));top:6%;width:min(8vh,46px);height:min(8vh,46px);
- font-size:min(1.9vh,11px);border-radius:26% / 50%;}
+/* A y B, redondos y uno encima de otro, como en el boceto. */
+.btn{pointer-events:auto;border-radius:50%;display:flex;align-items:center;justify-content:center;
+ font-size:min(2.8vh,18px);font-weight:700;letter-spacing:1px;color:var(--hueso);
+ width:min(15vh,78px);height:min(15vh,78px);
+ background:radial-gradient(circle at 50% 42%,#d8d4c8,#a9a69c);
+ box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 -3px 6px rgba(0,0,0,.28);position:relative;}
+.btn s{position:absolute;width:22%;height:22%;border-radius:50%;background:#20262c;
+ right:14%;bottom:16%;box-shadow:inset 0 1px 2px rgba(0,0,0,.7);}
+.btn:active,.btn.on{background:radial-gradient(circle at 50% 42%,#e8935f,#b7451f);
+ transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.5);}
 
-/* Tumba el móvil: el juego es apaisado y punto. En vertical el pulgar no llega al
-   centro de la pantalla y la ciudad se ve por una rendija. */
+/* Tumba el móvil: el juego es apaisado y punto. */
 #gira{position:absolute;inset:0;background:#07090c;z-index:20;display:none;
  flex-direction:column;align-items:center;justify-content:center;gap:18px;pointer-events:auto;
  text-align:center;padding:24px;}
@@ -143,14 +135,13 @@ canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixela
 <canvas id="c"></canvas>
 <div id="capa">
   <div id="izq">
-    <div class="btn" id="bSel">☎</div><div class="btn" id="bOpt">❚❚</div>
+    <div class="pastillas"><div class="pas" id="bSel">SEL</div><div class="pas" id="bOpt">OPT</div></div>
     <div id="joy"><i></i></div>
   </div>
   <div id="der">
-    <div class="btn" id="bR">⇄</div>
-    <div id="cruz"><s class="h"></s><s class="v"></s>
-      <b class="ar">▲</b><b class="ab">▼</b><b class="iz">◀</b><b class="de">▶</b></div>
-    <div class="btn" id="bB">B</div><div class="btn" id="bA">A</div>
+    <div class="pastillas"><div class="pas" id="bR">⇄ ARMA</div></div>
+    <div class="btn" id="bA">A<s></s></div>
+    <div class="btn" id="bB">B<s></s></div>
   </div>
 </div>
 <div id="gira"><div class="g">📱</div><div class="t">Gira el móvil<br>Bilbo City se juega apaisado</div></div>
@@ -2164,17 +2155,57 @@ const ARQ={
  p8:A('p8','delgada',3,'coleta',C.pelo1,'ninguno',null,'delantal','vestir','deportivas','ninguno'),
 };
 const PEATON_ARQ=['p1','p2','p3','p4','p5','p6','p7','p8'];
-/* Una hoja por arquetipo: 8 columnas (direcciones) × 14 filas (poses) */
+/* Una hoja por arquetipo: 8 columnas (direcciones) × 14 filas (poses).
+
+   Hay dos maneras de tenerla. La de siempre es forjarla aquí, por capas, con el mismo
+   código que dibuja la ropa y el pelo. La otra es traerla hecha desde PixelLab: la
+   genera herramientas/sprites/pixellab.py y la deja abajo, en el bloque SPRITES, ya
+   cuantizada a la paleta y comprimida.
+
+   Conviven a propósito. El que no tenga clave de PixelLab —o no quiera gastarla— sigue
+   jugando con la forja, y un arquetipo que falte en la hoja traída se forja y ya está.
+   Nunca se queda un personaje sin dibujar. */
+/*<<<SPRITES*/
+/* Lo escribe herramientas/sprites/pixellab.py. Vacío = todo forjado por código. */
+const SPR={cel:[20,26], hojas:{}};
+/*SPRITES>>>*/
+const CEL_W=()=>SPR.cel[0], CEL_H=()=>SPR.cel[1];
 const HOJAS={};
+
+/* Los sprites traídos vienen como un índice de paleta por píxel —0 es transparente— y
+   no como PNG: así el archivo sigue siendo uno solo y el arte sigue atado a los 48
+   colores. Se descomprimen todos al arrancar porque dibujar no puede esperar. */
+function lienzoDeIndices(bytes,w,h){
+ const c=lienzo(w,h),g=c.getContext('2d'),img=g.createImageData(w,h),d=img.data;
+ for(let i=0,j=0;i<bytes.length;i++,j+=4){
+  const v=bytes[i];
+  if(!v){d[j+3]=0;continue;}
+  const p=PALETA[(v-1)%PALETA.length];
+  d[j]=p[0];d[j+1]=p[1];d[j+2]=p[2];d[j+3]=255;}
+ g.putImageData(img,0,0);return c;}
+
+async function cargarSprites(){
+ const w=CEL_W()*8, h=CEL_H()*ORDEN_POSES.length;
+ for(const k of Object.keys(SPR.hojas)){
+  try{
+   const bytes=await inflar(SPR.hojas[k]);
+   if(bytes.length!==w*h){console.warn('hoja de',k,'con medidas raras; se forja');continue;}
+   HOJAS[k]=lienzoDeIndices(bytes,w,h);
+  }catch(e){console.warn('no pude leer la hoja de',k,e);}}}
+
 function hoja(k){
  if(HOJAS[k])return HOJAS[k];
- const c=lienzo(20*8,26*ORDEN_POSES.length),g=c.getContext('2d');
- ORDEN_POSES.forEach((p,fy)=>{for(let d=0;d<8;d++)g.drawImage(dibChar(ARQ[k],p,d),d*20,fy*26);});
+ /* La forja dibuja a 20×26. Si los sprites traídos usan otra medida, se centra dentro
+    de la celda y se apoya en el suelo: mezclar tamaños descoloca los pies. */
+ const cw=CEL_W(), ch=CEL_H();
+ const c=lienzo(cw*8,ch*ORDEN_POSES.length),g=c.getContext('2d');
+ const ox=Math.round((cw-20)/2), oy=ch-26;
+ ORDEN_POSES.forEach((p,fy)=>{for(let d=0;d<8;d++)g.drawImage(dibChar(ARQ[k],p,d),d*cw+ox,fy*ch+oy);});
  return HOJAS[k]=cuantizar(c);
 }
 function pintaChar(g,k,d8,pose,x,y){
- const h=HOJAS[k]||hoja(k);
- g.drawImage(h,d8*20,IPOSE[pose]*26,20,26,Math.round(x)-10,Math.round(y)-19,20,26);}
+ const h=HOJAS[k]||hoja(k), cw=CEL_W(), ch=CEL_H();
+ g.drawImage(h,d8*cw,IPOSE[pose]*ch,cw,ch,Math.round(x)-(cw>>1),Math.round(y)-ch+7,cw,ch);}
 const dir8De=(dx,dy)=>((2-Math.round(Math.atan2(dy,dx)/(Math.PI/4)))%8+8)%8;
 
 /*═══════════════ ARMAS ═══════════════*/
@@ -2753,7 +2784,7 @@ function particula(x,y,tipo,n=1){
 const teclas={};
 let aPuls=false,cPuls=false,cMant=false;
 const joy={id:null,dx:0,dy:0,mag:0};      /* andar y conducir */
-const mira={id:null,dx:0,dy:0};           /* cruceta: hacia dónde apunta el arma */
+const mira={dx:0,dy:0};                   /* apuntado fino: solo con las flechas del teclado */
 const CORRE=.82;                          /* a partir de aquí el joystick es correr */
 
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();
@@ -2768,9 +2799,6 @@ addEventListener('keyup',e=>{const k=e.key.toLowerCase();
  teclas[k]=false;});
 
 const joyEl=document.getElementById('joy'),joyPal=joyEl.querySelector('i');
-const cruzEl=document.getElementById('cruz');
-const flechas={ar:cruzEl.querySelector('.ar'),ab:cruzEl.querySelector('.ab'),
- iz:cruzEl.querySelector('.iz'),de:cruzEl.querySelector('.de')};
 
 /* El punto de agarre del joystick es su centro en pantalla, y se recalcula en cada
    toque: la barra del navegador aparece y desaparece y con ella se mueve todo. */
@@ -2782,51 +2810,26 @@ function tomarJoy(x,y){
  let dx=x-c.x,dy=y-c.y;const d=Math.hypot(dx,dy);
  if(d>c.r){dx=dx/d*c.r;dy=dy/d*c.r;}
  joy.dx=dx/c.r;joy.dy=dy/c.r;joy.mag=Math.min(1,d/c.r);
- joyPal.style.transform=`translate(${dx*.62}px,${dy*.62}px)`;
+ joyPal.style.transform=`translate(${dx*.5}px,${dy*.5}px)`;
  joyEl.classList.toggle('corre',joy.mag>CORRE);}
 function soltarJoy(){joy.id=null;joy.dx=joy.dy=0;joy.mag=0;
  joyPal.style.transform='';joyEl.classList.remove('corre');}
 
-/* La cruceta da ocho direcciones limpias, no un ángulo continuo: apuntar con el pulgar
-   a un grado concreto en una pantalla no se puede, y ocho sí se aciertan a ciegas. */
-function tomarCruz(x,y){
- const c=centro(cruzEl);
- const dx=x-c.x,dy=y-c.y;
- if(Math.hypot(dx,dy)<c.r*.26){mira.dx=mira.dy=0;}
- else{const u=Math.round(Math.atan2(dy,dx)/(Math.PI/4))*(Math.PI/4);
-  mira.dx=Math.round(Math.cos(u));mira.dy=Math.round(Math.sin(u));}
- flechas.ar.classList.toggle('on',mira.dy<0);flechas.ab.classList.toggle('on',mira.dy>0);
- flechas.iz.classList.toggle('on',mira.dx<0);flechas.de.classList.toggle('on',mira.dx>0);}
-function soltarCruz(){mira.id=null;mira.dx=mira.dy=0;
- for(const k in flechas)flechas[k].classList.remove('on');}
-
-/* Los dedos se siguen por identificador: con el pulgar izquierdo andando y el derecho
-   apuntando hay dos toques vivos a la vez, y si se mezclan el personaje se va solo. */
-function dedos(e,f){for(const t of e.changedTouches)f(t);}
-function zonaIzq(x){return x<innerWidth*.34;}
-function zonaDer(x){return x>innerWidth*.66;}
-addEventListener('touchstart',e=>{audioInit();dedos(e,t=>{
- if(joy.id===null&&zonaIzq(t.clientX)){joy.id=t.identifier;tomarJoy(t.clientX,t.clientY);}
- else if(mira.id===null&&zonaDer(t.clientX)&&t.target===cruzEl){mira.id=t.identifier;tomarCruz(t.clientX,t.clientY);}});},
- {passive:true});
-addEventListener('touchmove',e=>dedos(e,t=>{
- if(t.identifier===joy.id)tomarJoy(t.clientX,t.clientY);
- else if(t.identifier===mira.id)tomarCruz(t.clientX,t.clientY);}),{passive:true});
-function finT(e){dedos(e,t=>{
- if(t.identifier===joy.id)soltarJoy();
- if(t.identifier===mira.id)soltarCruz();});}
+/* Se agarra desde todo el marco izquierdo, no solo desde el disco: en marcha el pulgar
+   no acierta al centro y quedarse sin andar por dos milímetros da mucha rabia. */
+const zonaIzq=x=>x<innerWidth*.20;
+addEventListener('touchstart',e=>{audioInit();for(const t of e.changedTouches)
+ if(joy.id===null&&zonaIzq(t.clientX)){joy.id=t.identifier;tomarJoy(t.clientX,t.clientY);}},{passive:true});
+addEventListener('touchmove',e=>{for(const t of e.changedTouches)
+ if(t.identifier===joy.id)tomarJoy(t.clientX,t.clientY);},{passive:true});
+function finT(e){for(const t of e.changedTouches)if(t.identifier===joy.id)soltarJoy();}
 addEventListener('touchend',finT,{passive:true});addEventListener('touchcancel',finT,{passive:true});
 
-/* Con ratón vale el mismo mando: se prueba en el escritorio sin tener que enchufar nada. */
-let ratonEn=null;
-addEventListener('mousedown',e=>{audioInit();
- if(zonaIzq(e.clientX)){ratonEn='joy';tomarJoy(e.clientX,e.clientY);}
- else if(zonaDer(e.clientX)&&e.target===cruzEl){ratonEn='cruz';tomarCruz(e.clientX,e.clientY);}});
-addEventListener('mousemove',e=>{
- if(ratonEn==='joy')tomarJoy(e.clientX,e.clientY);
- else if(ratonEn==='cruz')tomarCruz(e.clientX,e.clientY);});
-addEventListener('mouseup',()=>{
- if(ratonEn==='joy')soltarJoy();else if(ratonEn==='cruz')soltarCruz();ratonEn=null;});
+/* Con ratón vale el mismo mando: se prueba en el escritorio sin enchufar nada. */
+let ratonEn=false;
+addEventListener('mousedown',e=>{audioInit();if(zonaIzq(e.clientX)){ratonEn=true;tomarJoy(e.clientX,e.clientY);}});
+addEventListener('mousemove',e=>{if(ratonEn)tomarJoy(e.clientX,e.clientY);});
+addEventListener('mouseup',()=>{if(ratonEn)soltarJoy();ratonEn=false;});
 
 function bind(el,f){el.addEventListener('touchstart',e=>{e.preventDefault();e.stopPropagation();audioInit();f(true);},{passive:false});
  el.addEventListener('touchend',e=>{e.preventDefault();e.stopPropagation();f(false);},{passive:false});
@@ -3296,11 +3299,11 @@ function disparar(desde,ang,a,dueno){
  sfx(a.id==='escopeta'?'escopeta':'disparo',.8);}
 const dirAng=d8=>(2-d8)*Math.PI/4;
 let fogT=0,fogTipo=null,fogD=0;
-/* mx,my es la cruceta. Si está puesta, se dispara hacia ahí; si no, hacia donde mira el
-   personaje. En los dos casos el arma corrige sola hacia el enemigo que tenga delante:
-   acertar a un blanco de veinte píxeles con el pulgar en un móvil no es puntería, es
-   suerte, y el juego no debería depender de eso. El cono de ayuda es estrecho, así que
-   sigue haciendo falta encarar. */
+/* mx,my es el apuntado fino del teclado. Si está puesto se dispara hacia ahí y el arma
+   apenas corrige; si no —que es como se juega con el pulgar— se dispara hacia donde mira
+   el personaje y el arma busca blanco en un cono ancho. Acertar a una figura de veinte
+   píxeles con el pulgar en un móvil no es puntería, es suerte, y el juego no debería
+   depender de eso. */
 function atacarJugador(mx,my){
  if(S.escena!=='ciudad'||player.enCoche)return;
  const a=arma(S.armaAct);
@@ -3308,11 +3311,12 @@ function atacarJugador(mx,my){
  if(!a.inf&&!(S.armas[a.id]>0))return aviso('Sin munición');
  player.cad=a.cad;
  const base=(mx||my)?Math.atan2(my,mx):dirAng(player.d8);
+ const cono=(mx||my)?.62:1.15;
  let obj=null,md=a.alc+.6;
  for(const e of enemigos){const d=dist(e,player);if(d>md)continue;
   const ang=Math.atan2(e.y-player.y,e.x-player.x);
   const df=Math.abs(((ang-base+Math.PI*3)%(Math.PI*2))-Math.PI);
-  if(df<.62&&lineaVista(player,e)){md=d;obj=e;}}
+  if(df<cono&&lineaVista(player,e)){md=d;obj=e;}}
  if(a.cuerpo&&!obj)for(const p of peatones){const d=dist(p,player);if(d>a.alc+.4)continue;
   const ang=Math.atan2(p.y-player.y,p.x-player.x);
   const df=Math.abs(((ang-base+Math.PI*3)%(Math.PI*2))-Math.PI);
@@ -3414,7 +3418,8 @@ function act(dt){
  if(teclas['w'])iy=-1;if(teclas['s'])iy=1;
  if(teclas['a']||teclas['d']||teclas['w']||teclas['s'])fuerza=teclas['shift']?1:.7;
  const correr=fuerza>CORRE;
- /* La cruceta apunta; con las teclas, las flechas. */
+ /* Apuntado fino solo con las flechas del teclado. Con el pulgar no hay cruceta: se
+    apunta encarando, y el arma corrige. */
  let mx=mira.dx,my=mira.dy;
  if(teclas['arrowleft'])mx=-1;if(teclas['arrowright'])mx=1;
  if(teclas['arrowup'])my=-1;if(teclas['arrowdown'])my=1;
@@ -3423,14 +3428,14 @@ function act(dt){
  if(S.hambre<=0){S.energia=Math.max(0,S.energia-dt*.017);S.hp=Math.max(1,S.hp-dt*.9);}
  player.cad=Math.max(0,player.cad-dt);
 
- /* Apuntar con la cruceta gira al personaje aunque esté quieto: así se puede cubrir una
-    esquina sin andar hacia ella, que es media pelea. */
+ /* Apuntar gira al personaje aunque esté quieto: así se puede cubrir una esquina sin
+    andar hacia ella, que es media pelea. */
  if((mx||my)&&!player.enCoche)player.d8=dir8De(mx,my);
  if(aPuls){aPuls=false;accion();}
  const auto=arma(S.armaAct).cad<.12;
- /* Con la cruceta puesta se dispara sin soltarla: B mantenido basta, sea el arma
-    automática o no. Antes había que dar toques con el pulgar a cada bala. */
- if(cPuls||((auto||(mx||my))&&cMant)){cPuls=false;
+ /* B mantenido dispara seguido, sea el arma automática o no: dar toques con el pulgar
+    a cada bala no es puntería, es tendinitis. */
+ if(cPuls||cMant){cPuls=false;
   if(player.enCoche){sfx('claxon');asustar(player,7);}else atacarJugador(mx,my);}
  if(S.escena==='interior')return actInterior(dt,ix,iy);
  actCiudad(dt,ix,iy,correr,fuerza,!!(mx||my));}
@@ -3784,12 +3789,10 @@ function cajaHUD(x,y,w,h){
  ctx.fillStyle='rgba(141,153,164,.35)';ctx.fillRect(x,y,w,1);ctx.fillRect(x,y+h-1,w,1);
  ctx.fillRect(x,y,1,h);ctx.fillRect(x+w-1,y,1,h);}
 function dibHUD(){
- /* El HUD vive en la mitad central de la pantalla. Los cuartos de los lados son de los
-    pulgares —joystick a la izquierda, cruceta y botones a la derecha— y cualquier cosa
-    dibujada ahí queda debajo del mando: se ve el radar por detrás de los botones y no se
-    lee ni una cosa ni la otra. */
- const marg=10;
- const zi=Math.round(W*.25)+marg, zd=Math.round(W*.75)-marg;
+ /* El HUD ocupa la pantalla entera otra vez: los mandos viven en el marco, fuera del
+    lienzo, así que ya no hay nada que esquivar. */
+ const marg=8;
+ const zi=marg, zd=W-marg;
  /* ── radar circular con anillo de salud ── */
  const R=Math.min(52,H*.19), cxr=zi+R, cyr=marg+R+2;
  ctx.save();
@@ -3937,7 +3940,7 @@ async function arrancar(){
   ['iconos',()=>generarIconos()],
   ['la ciudad',async()=>{await cargarCiudad();colocarPOIs();}],
   ['el barrio',()=>{player.x=poi('piso').p.x;player.y=poi('piso').p.y;poblar();}],
-  ['a la gente',()=>{['protagonista','ertzaina','maton','maton2'].forEach(hoja);}],
+  ['a la gente',async()=>{await cargarSprites();['protagonista','ertzaina','maton','maton2'].forEach(hoja);}],
  ];
  for(const[n,f]of pasos){cargaEl.textContent='forjando '+n+'…';await espera(12);await f();}
  cargaEl.textContent='';
