@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./verificar.sh)",
+      "Bash(./verificar.sh:*)",
+      "Bash(python3 herramientas/csharp/sintaxis.py)",
+      "Bash(python3 herramientas/csharp/semantica.py)",
+      "Bash(node herramientas/html/pruebas.js)",
+      "Bash(node herramientas/html/plano.js)",
+      "Bash(node herramientas/html/plano.js:*)",
+      "Bash(npm install)",
+      "Bash(npm test)",
+      "Bash(pip install -r herramientas/requirements.txt)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(wc:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git push:*)"
+    ]
+  }
+}

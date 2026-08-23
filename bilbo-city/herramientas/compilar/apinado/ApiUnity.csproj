@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Remedo de la API de Unity 2022.3. Solo firmas: nunca se ejecuta. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <AssemblyName>ApiUnity</AssemblyName>
+    <RootNamespace>UnityEngine</RootNamespace>
+    <Nullable>disable</Nullable>
+    <NoWarn>CS0169;CS0649;CS0067;CS0660;CS0661;CS0108;CS0114;CS8981;CS0282</NoWarn>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Api/**/*.cs" />
+  </ItemGroup>
+</Project>

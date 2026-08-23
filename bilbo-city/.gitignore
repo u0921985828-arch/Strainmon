@@ -1,0 +1,26 @@
+# Unity
+unity/BilboCity/[Ll]ibrary/
+unity/BilboCity/[Tt]emp/
+unity/BilboCity/[Oo]bj/
+unity/BilboCity/[Bb]uild/
+unity/BilboCity/[Bb]uilds/
+unity/BilboCity/[Ll]ogs/
+unity/BilboCity/[Uu]ser[Ss]ettings/
+unity/BilboCity/Assets/Scenes/
+unity/BilboCity/*.csproj
+unity/BilboCity/*.sln
+*.unityproj
+*.apk
+*.aab
+
+# herramientas
+herramientas/html/node_modules/
+herramientas/compilar/**/obj/
+herramientas/compilar/**/bin/
+__pycache__/
+*.pyc
+
+# sistema
+.DS_Store
+.vs/
+.idea/

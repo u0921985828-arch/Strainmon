@@ -1,0 +1,11 @@
+{
+  "name": "BilboCity.Editor",
+  "rootNamespace": "BilboCity",
+  "references": [ "BilboCity" ],
+  "includePlatforms": [ "Editor" ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "autoReferenced": true,
+  "noEngineReferences": false
+}

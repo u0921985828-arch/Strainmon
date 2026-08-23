@@ -1,0 +1,13 @@
+{
+  "name": "bilbo-city-pruebas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Arnés de pruebas del prototipo HTML de Bilbo City",
+  "scripts": {
+    "test": "node pruebas.js",
+    "plano": "node plano.js"
+  },
+  "dependencies": {
+    "canvas": "^2.11.2"
+  }
+}
