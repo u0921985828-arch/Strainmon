@@ -13,9 +13,19 @@
 require('./arnes.js');
 
 const dormir = ms => new Promise(r => setTimeout(r, ms));
+// Esperar un número fijo de milisegundos era una carrera: el arranque forja el arte y
+// traza la ciudad, y en cuanto la generación se complicó dejó de caber en el plazo. Se
+// espera a que el juego esté listo de verdad.
+const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
+  for (let t = 0; t < topeMs; t += 25) {
+    if (global.__H && global.__H[que]) return;
+    await dormir(25);
+  }
+  throw new Error('el juego no arrancó en ' + topeMs + ' ms');
+};
 
 (async () => {
-  await dormir(500);
+  await listo();
 
   const H = global.__H, A = global.__, S = A.S, P = A.player, paso = global.__step;
   const fallos = [];

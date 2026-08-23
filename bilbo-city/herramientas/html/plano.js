@@ -10,7 +10,16 @@ const { createCanvas } = require('canvas');
 
 const salida = process.argv[2] || path.join(__dirname, '..', '..', 'referencia', 'capturas', 'plano-bilbo.png');
 
-setTimeout(() => {
+// Igual que en la batería: se espera a que la ciudad esté trazada, no un plazo fijo.
+const listo = async () => {
+  for (let t = 0; t < 20000; t += 25) {
+    if (global.__ && global.__.map && global.__.POI.length) return;
+    await new Promise(r => setTimeout(r, 25));
+  }
+  throw new Error('la ciudad no se generó en 20 s');
+};
+
+listo().then(() => {
   const A = global.__;
   const Z = 4;
   const c = createCanvas(A.MW * Z, A.MH * Z), g = c.getContext('2d');
@@ -93,4 +102,4 @@ setTimeout(() => {
     console.log('  ' + (nom[k] || k).padEnd(9) + (cuenta[k] / total * 100).toFixed(1) + '%'));
   console.log('\n  barrios   ' + Object.keys(A.ZONAS).length);
   console.log('  sitios    ' + A.POI.length);
-}, 500);
+});

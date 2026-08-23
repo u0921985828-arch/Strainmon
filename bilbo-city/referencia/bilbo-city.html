@@ -849,22 +849,25 @@ function generarCiudad(){
   const c=ATLAS[cy][cx];
   if(cx<NCX-1&&ATLAS[cy][cx+1]!==c)rect((cx+1)*CEL-1,cy*CEL,3,CEL,ROAD);
   if(cy<NCY-1&&ATLAS[cy+1][cx]!==c)rect(cx*CEL,(cy+1)*CEL-1,CEL,3,ROAD);}
- /* 3 · trama interior de cada barrio */
+ /* 3 · la malla de los barrios proyectados, y los caminos del monte */
  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){
   const Z=ZONAS[charDe(x,y)];
-  if(Z.verde){ /* por el monte y los parques solo pasa algún camino */
-   /* Los caminos van cada 13 casillas: con la malla más suelta un parque de barrio
-      cabía entero entre dos y salía como un cuadrado verde macizo, un agujero. */
-   if(((x+3)%13<1)||((y+7)%13<1))map[y*MW+x]=ACERA;
-   continue;}
-  if(Z.estadio)continue;
-  /* La calle no es (x % sp): es una curva de nivel de un sistema de coordenadas girado
-     y ondulado. Como u y v son continuas, las calles salen continuas — curvas de verdad,
-     no escaleras — y la trama sigue conectada. */
+  if(Z.verde||Z.estadio)continue;
+  if(Z.estilo!=='senorial'&&Z.estilo!=='abierto')continue;
+  /* El Ensanche se proyectó de una vez: retícula regular, girada al rumbo del barrio.
+     La calle es una curva de nivel de ese sistema, así que sale continua. */
   const ca=Math.cos(Z.ang*Math.PI/180), sa=Math.sin(Z.ang*Math.PI/180), on=Z.onda||24, cu=Z.curva||0;
   const u= x*ca + y*sa + cu*Math.sin(y/on) + Z.ox;
   const v=-x*sa + y*ca + cu*Math.sin(x/on) + Z.oy;
   if(modp(u,Z.sp)<Z.w||modp(v,Z.spy||Z.sp)<Z.w)map[y*MW+x]=ROAD;}
+
+ /* 3 bis · caminos por el monte y los parques */
+ for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){
+  const Z=ZONAS[charDe(x,y)];
+  if(!Z.verde)continue;
+  /* Cada 13 casillas: con la malla más suelta un parque de barrio cabía entero entre
+     dos caminos y salía como un cuadrado verde macizo, un agujero. */
+  if(((x+3)%13<1)||((y+7)%13<1))map[y*MW+x]=ACERA;}
  /* 4 · Gran Vía: la diagonal del Ensanche, con Moyúa en medio */
  linea([[344,144],[320,160],[296,176],[272,192]],6,ROAD,(x,y)=>!ZONAS[charDe(x,y)].verde);
  for(let dy=-11;dy<=11;dy++)for(let dx=-11;dx<=11;dx++){
@@ -926,6 +929,67 @@ function generarCiudad(){
   [[[344,184],[380,206],[412,230]],4],              /* la variante sur, por La Peña */
  ].forEach(([v,w])=>carretera(v,w));
 
+ /* 4 quinquies · la trama, hecha crecer desde las avenidas.
+    Antes se estampaba: mod(u,sp) < w sobre un sistema girado, o sea bandas paralelas
+    infinitas recortadas contra el borde del barrio. De ahí que todas las manzanas
+    midieran lo mismo, que ninguna calle empezara ni terminara y que el borde de la
+    ciudad saliera liso. En un plano de verdad la red de calles va primero y las
+    manzanas son lo que queda entre ellas.
+    Aquí cada calle nace sobre otra ya trazada y corre hasta topar con una tercera. Eso
+    da cruces en T, fondos de saco, manzanas de tamaños distintos y esquinas en cuña
+    donde dos barrios con rumbos distintos se tocan. Y como toda calle nace pegada a la
+    red, la red no se parte. */
+ (()=>{
+  const porBarrio={};
+  for(let y=2;y<MH-2;y++)for(let x=2;x<MW-2;x++){
+   const c=charDe(x,y), Z=ZONAS[c];
+   if(Z.verde||Z.estadio)continue;
+   if(Z.estilo==='senorial'||Z.estilo==='abierto')continue;   /* esos ya llevan malla */
+   (porBarrio[c]=porBarrio[c]||{tiles:[],semillas:[]}).tiles.push([x,y]);
+   if(map[y*MW+x]===ROAD)porBarrio[c].semillas.push([x,y]);}
+
+  for(const c of Object.keys(porBarrio)){
+   const Z=ZONAS[c], B=porBarrio[c];
+   if(!B.semillas.length)continue;
+   const rumbo=Z.ang*Math.PI/180;
+   /* una calle por cada manzana que quepa, y algo más: las que se quedan cortas o
+      chocan enseguida no cuentan */
+   const objetivo=Math.ceil(B.tiles.length/(Z.sp*Z.spy)*2.6);
+   const largoMax=Math.max(Z.sp,Z.spy)*2.5;
+   let pendiente=objetivo;
+   for(let i=0;i<objetivo*6&&B.semillas.length;i++){
+    const[sx,sy]=B.semillas[rndi(0,B.semillas.length-1)];
+    /* la mitad siguen el rumbo del barrio y la mitad lo cruzan; el desvío es lo que
+       impide que salga una retícula */
+    const a0=rumbo+(azar()<.5?0:Math.PI/2)+(azar()<.5?0:Math.PI)+(azar()-.5)*(Z.desvio||.35);
+    if(crecerCalle(sx,sy,a0,c,Z,largoMax,B)){if(--pendiente<=0)break;}else i+=2;}}
+
+  function crecerCalle(x0,y0,ang,c,Z,largoMax,B){
+   let x=x0+.5,y=y0+.5,a=ang;const paso=[];
+   for(let n=0;n<largoMax;n++){
+    x+=Math.cos(a);y+=Math.sin(a);
+    a+=(azar()-.5)*(Z.deriva||.06);     /* la calle se va torciendo, como en el plano */
+    const ix=Math.round(x),iy=Math.round(y);
+    if(ix<2||iy<2||ix>=MW-2||iy>=MH-2)break;
+    if(charDe(ix,iy)!==c)break;         /* no se sale del barrio */
+    const t=map[iy*MW+ix];
+    if(t===AGUA||t===VIA)break;
+    if(n>5&&t===ROAD){paso.push([ix,iy]);break;}   /* topa con otra: cruce en T */
+    paso.push([ix,iy]);}
+   if(paso.length<6)return false;       /* muy corta, no vale como calle */
+   const r=(Z.w-1)/2;
+   for(const[ix,iy]of paso){
+    for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){
+     const qx=Math.round(ix+dx),qy=Math.round(iy+dy);
+     if(qx<1||qy<1||qx>=MW-1||qy>=MH-1)continue;
+     if(charDe(qx,qy)!==c)continue;
+     const q=map[qy*MW+qx];
+     if(q===AGUA||q===VIA||q===PUENTE)continue;
+     map[qy*MW+qx]=ROAD;}
+    if(ix%5===0)B.semillas.push([ix,iy]);}
+   return true;}
+ })();
+
  /* 5 · San Mamés */
  for(let cy=0;cy<NCY;cy++)for(let cx=0;cx<NCX;cx++){
   if(ATLAS[cy][cx]!=='E')continue;
@@ -979,6 +1043,75 @@ function generarCiudad(){
    rect(x0+((w-pw)/2|0),y0+((h-ph)/2|0),pw,ph,PATIO);}
   else if(hh%10<8){const cw=(w*.45)|0,ch=(h*.45)|0;
    rect((hh>>3)%2?x0:x1-cw+1,(hh>>4)%2?y0:y1-ch+1,cw,ch,Z.estilo==='abierto'?PLAZA:PATIO);}}
+ /* 9 bis · coser la red viaria.
+    La ciudad se traza por partes —barrios, arterias, ferrocarril, carreteras de fuera— y
+    siempre queda algún trozo suelto: una carretera que muere en el monte sin llegar a
+    tocar ciudad, la isla sin enlace. En una ciudad no hay calles a las que no se pueda
+    llegar. Se cosen aquí, al final, en vez de recolocar coordenadas a mano: así el
+    arreglo sigue valiendo cuando se mueva el trazado.
+
+    El enlace se busca con un BFS desde la pieza mayor sobre todo el mapa, y luego se
+    baja por el gradiente desde el trozo suelto. Es lineal; buscar el par de casillas más
+    cercano a fuerza bruta costaba casi medio segundo y retrasaba el arranque. */
+ (()=>{
+  const N=MW*MH;
+  for(let pasada=0;pasada<5;pasada++){
+   const comp=new Int32Array(N).fill(-1), tam=[];
+   for(let y=1;y<MH-1;y++)for(let x=1;x<MW-1;x++){
+    if(!rodable(x,y)||comp[y*MW+x]>=0)continue;
+    const id=tam.length;let n=0;const pila=[y*MW+x];comp[y*MW+x]=id;
+    while(pila.length){const k=pila.pop();n++;
+     const cx=k%MW,cy=(k/MW)|0;
+     for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=cx+dx,ny=cy+dy;
+      if(nx<1||ny<1||nx>=MW-1||ny>=MH-1)continue;
+      const j=ny*MW+nx;
+      if(comp[j]<0&&rodable(nx,ny)){comp[j]=id;pila.push(j);}}}
+    tam.push(n);}
+   if(tam.length<2)return;
+   let mayor=0;for(let i=1;i<tam.length;i++)if(tam[i]>tam[mayor])mayor=i;
+
+   /* distancia a la pieza mayor, por todo el mapa */
+   const dist=new Int32Array(N).fill(-1);
+   let cola=[];
+   for(let k=0;k<N;k++)if(comp[k]===mayor){dist[k]=0;cola.push(k);}
+   for(let cab=0;cab<cola.length;cab++){
+    const k=cola[cab],cx=k%MW,cy=(k/MW)|0,d=dist[k]+1;
+    for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=cx+dx,ny=cy+dy;
+     if(nx<1||ny<1||nx>=MW-1||ny>=MH-1)continue;
+     const j=ny*MW+nx;
+     if(dist[j]<0){dist[j]=d;cola.push(j);}}}
+
+   /* por cada trozo suelto que merezca la pena, su casilla más cercana a la red */
+   const cerca=new Array(tam.length).fill(-1);
+   for(let k=0;k<N;k++){
+    const c=comp[k];
+    if(c<0||c===mayor||tam[c]<50)continue;
+    if(cerca[c]<0||dist[k]<dist[cerca[c]])cerca[c]=k;}
+
+   let cosido=false;
+   for(let c=0;c<tam.length;c++){
+    if(cerca[c]<0)continue;
+    /* se baja por el gradiente hasta tocar la red, abriendo calle por donde pasa */
+    let k=cerca[c],guarda=0;
+    while(dist[k]>0&&guarda++<400){
+     const cx=k%MW,cy=(k/MW)|0;
+     for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+      const qx=cx+dx,qy=cy+dy;
+      if(qx<1||qy<1||qx>=MW-1||qy>=MH-1)continue;
+      const q=map[qy*MW+qx];
+      if(q===VIA)continue;
+      map[qy*MW+qx]=q===AGUA?PUENTE:ROAD;}
+     let sig=-1;
+     for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=cx+dx,ny=cy+dy;
+      if(nx<1||ny<1||nx>=MW-1||ny>=MH-1)continue;
+      const j=ny*MW+nx;
+      if(dist[j]>=0&&dist[j]<dist[k]&&(sig<0||dist[j]<dist[sig]))sig=j;}
+     if(sig<0)break;
+     k=sig;}
+    cosido=true;}
+   if(!cosido)return;}
+ })();
+
  /* 10 · aceras: toda fachada que da a la calle */
  const cop=map.slice();
  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){

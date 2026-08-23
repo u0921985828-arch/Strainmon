@@ -105,10 +105,22 @@ y la de Zorrotza— se dibujan **sin pisar la calzada**, así que cada cruce con
 queda a nivel y la red viaria no se corta. Si añades una línea, respétalo o la batería te
 lo dirá en la conectividad.
 
-**Las calles no van a escuadra.** Cada barrio tiene su rumbo (`ang`) y su curvatura
-(`curva`, `onda`): la calle es una curva de nivel de un sistema de coordenadas girado y
-ondulado, no `x % sp`. Con una malla ortogonal el plano sale encajonado, como papel
-milimetrado, y Bilbao no es así.
+**Hay dos maneras de trazar la calle, y el estilo del barrio decide cuál.**
+
+- `senorial` y `abierto` → **malla**. Retícula regular estampada, girada al rumbo del
+  barrio. El Ensanche se proyectó de una vez y a tiralíneas, y tiene que notarse.
+- los demás → **crecida**. Cada calle nace sobre otra ya trazada y corre hasta topar con
+  una tercera. Eso da cruces en T, fondos de saco, manzanas de tamaños distintos y bordes
+  dentados. Una malla no puede dar nada de eso por muchos parámetros que le pongas: son
+  bandas paralelas infinitas recortadas contra el borde del barrio.
+
+En un plano de verdad la red de calles va primero y las manzanas son lo que queda entre
+ellas; estampar un patrón sobre un área es al revés, y se nota.
+
+**La red viaria se cose al final.** La ciudad se traza por partes y siempre queda algún
+trozo suelto — una carretera que muere en el monte, la isla sin enlace. `CoserRedViaria`
+los engancha a la pieza mayor. No recoloques coordenadas a mano para arreglar eso: el
+cosido sigue valiendo cuando se mueva el trazado, y las coordenadas no.
 
 Si tocas el atlas o los trazados, **comprueba dos cosas**: que la red viaria siga conectada
 por encima del 90 % (lo mide la batería) y que los sitios sigan cayendo en su barrio.

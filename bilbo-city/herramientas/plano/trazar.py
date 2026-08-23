@@ -69,6 +69,13 @@ def enCiudad(px, py):
 # Bilbao no está a escuadra: las calles siguen la ladera y el río, así que cada barrio
 # tiene su rumbo. El ancho de calle no baja de 3: con 2, la trama girada deja pasos que
 # un peatón cruza y un coche no, y la batería lo caza en la mediana de conducción.
+#
+# El estilo decide además CÓMO se traza la calle, que es lo que más se nota en el plano:
+#   senorial / abierto -> malla. Retícula regular estampada. El Ensanche se proyectó de
+#                         una vez y a tiralíneas, y tiene que notarse.
+#   los demás          -> crecida. Las calles nacen sobre otra y corren hasta topar con
+#                         una tercera: manzanas de tamaños distintos, cruces en T, fondos
+#                         de saco y bordes dentados. Es lo que una malla no puede dar.
 BARRIOS = [
     ('C', 'Casco Viejo',   10, 9,  3, 1, 2, 12, 3, 11, 'denso',      '#6b4a2e'),
     # Abando es el Ensanche: retícula cerrada, manzanas casi cuadradas y sin curvatura.

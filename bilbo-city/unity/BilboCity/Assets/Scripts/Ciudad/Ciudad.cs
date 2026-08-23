@@ -142,6 +142,119 @@ public static class Ciudad {
     /// El % de C# devuelve negativos y aquí no valen.
     static float ModP(float a, float n) { return ((a % n) + n) % n; }
 
+    /// <summary>Una calle desde (x0,y0) en la dirección dada, hasta topar con otra o
+    /// salir del barrio. Devuelve false si sale tan corta que no vale como calle.</summary>
+    static bool CrecerCalle(int x0, int y0, float ang, char c, Zona Z, float largoMax, List<Vector2Int> sem) {
+        float x = x0 + .5f, y = y0 + .5f, a = ang;
+        var paso = new List<Vector2Int>();
+        for (int n = 0; n < largoMax; n++) {
+            x += Mathf.Cos(a); y += Mathf.Sin(a);
+            a += (Utiles.Rnd(0,1) - .5f) * .06f;      // la calle se va torciendo
+            int ix = Mathf.RoundToInt(x), iy = Mathf.RoundToInt(y);
+            if (ix < 2 || iy < 2 || ix >= MW-2 || iy >= MH-2) break;
+            if (CharDe(ix,iy) != c) break;            // no se sale del barrio
+            var t = (Suelo)Map[iy*MW+ix];
+            if (t == Suelo.Agua || t == Suelo.Via) break;
+            if (n > 5 && t == Suelo.Road) { paso.Add(new Vector2Int(ix,iy)); break; }
+            paso.Add(new Vector2Int(ix,iy));
+        }
+        if (paso.Count < 6) return false;
+        int r = (Z.W - 1) / 2;
+        foreach (var q in paso) {
+            for (int dy = -r; dy <= r; dy++)
+                for (int dx = -r; dx <= r; dx++) {
+                    int qx = q.x + dx, qy = q.y + dy;
+                    if (qx < 1 || qy < 1 || qx >= MW-1 || qy >= MH-1) continue;
+                    if (CharDe(qx,qy) != c) continue;
+                    var s = (Suelo)Map[qy*MW+qx];
+                    if (s == Suelo.Agua || s == Suelo.Via || s == Suelo.Puente) continue;
+                    Map[qy*MW+qx] = (byte)Suelo.Road;
+                }
+            if (q.x % 5 == 0) sem.Add(q);
+        }
+        return true;
+    }
+
+    static void CoserRedViaria() {
+        int N = MW * MH;
+        var vec = new[]{ new Vector2Int(1,0), new Vector2Int(-1,0), new Vector2Int(0,1), new Vector2Int(0,-1) };
+        for (int pasada = 0; pasada < 5; pasada++) {
+            var comp = new int[N]; for (int k = 0; k < N; k++) comp[k] = -1;
+            var tam = new List<int>();
+            var pila = new Stack<int>();
+            for (int y = 1; y < MH-1; y++)
+                for (int x = 1; x < MW-1; x++) {
+                    if (!Rodable(x,y) || comp[y*MW+x] >= 0) continue;
+                    int id = tam.Count, n = 0;
+                    pila.Push(y*MW+x); comp[y*MW+x] = id;
+                    while (pila.Count > 0) {
+                        int k = pila.Pop(); n++;
+                        int cx = k % MW, cy = k / MW;
+                        foreach (var d in vec) {
+                            int nx = cx+d.x, ny = cy+d.y;
+                            if (nx < 1 || ny < 1 || nx >= MW-1 || ny >= MH-1) continue;
+                            int j = ny*MW+nx;
+                            if (comp[j] < 0 && Rodable(nx,ny)) { comp[j] = id; pila.Push(j); }
+                        }
+                    }
+                    tam.Add(n);
+                }
+            if (tam.Count < 2) return;
+            int mayor = 0;
+            for (int i = 1; i < tam.Count; i++) if (tam[i] > tam[mayor]) mayor = i;
+
+            // distancia a la pieza mayor, por todo el mapa
+            var dist = new int[N]; for (int k = 0; k < N; k++) dist[k] = -1;
+            var cola = new List<int>();
+            for (int k = 0; k < N; k++) if (comp[k] == mayor) { dist[k] = 0; cola.Add(k); }
+            for (int cab = 0; cab < cola.Count; cab++) {
+                int k = cola[cab], cx = k % MW, cy = k / MW, d0 = dist[k] + 1;
+                foreach (var d in vec) {
+                    int nx = cx+d.x, ny = cy+d.y;
+                    if (nx < 1 || ny < 1 || nx >= MW-1 || ny >= MH-1) continue;
+                    int j = ny*MW+nx;
+                    if (dist[j] < 0) { dist[j] = d0; cola.Add(j); }
+                }
+            }
+
+            var cerca = new int[tam.Count]; for (int i = 0; i < cerca.Length; i++) cerca[i] = -1;
+            for (int k = 0; k < N; k++) {
+                int c = comp[k];
+                // los trozos diminutos son callejones sin salida, y en una ciudad los hay
+                if (c < 0 || c == mayor || tam[c] < 50) continue;
+                if (cerca[c] < 0 || dist[k] < dist[cerca[c]]) cerca[c] = k;
+            }
+
+            bool cosido = false;
+            for (int c = 0; c < tam.Count; c++) {
+                if (cerca[c] < 0) continue;
+                int k = cerca[c], guarda = 0;
+                while (dist[k] > 0 && guarda++ < 400) {
+                    int cx = k % MW, cy = k / MW;
+                    for (int dy = -1; dy <= 1; dy++)
+                        for (int dx = -1; dx <= 1; dx++) {
+                            int qx = cx+dx, qy = cy+dy;
+                            if (qx < 1 || qy < 1 || qx >= MW-1 || qy >= MH-1) continue;
+                            var q = (Suelo)Map[qy*MW+qx];
+                            if (q == Suelo.Via) continue;
+                            Map[qy*MW+qx] = (byte)(q == Suelo.Agua ? Suelo.Puente : Suelo.Road);
+                        }
+                    int sig = -1;
+                    foreach (var d in vec) {
+                        int nx = cx+d.x, ny = cy+d.y;
+                        if (nx < 1 || ny < 1 || nx >= MW-1 || ny >= MH-1) continue;
+                        int j = ny*MW+nx;
+                        if (dist[j] >= 0 && dist[j] < dist[k] && (sig < 0 || dist[j] < dist[sig])) sig = j;
+                    }
+                    if (sig < 0) break;
+                    k = sig;
+                }
+                cosido = true;
+            }
+            if (!cosido) return;
+        }
+    }
+
     static void Pon(int x, int y, Suelo t) { if (x >= 0 && y >= 0 && x < MW && y < MH) Map[y*MW+x] = (byte)t; }
     static void Rect(int x0, int y0, int w, int h, Suelo t) {
         for (int y = y0; y < y0+h; y++) for (int x = x0; x < x0+w; x++) Pon(x,y,t);
@@ -239,7 +352,7 @@ public static class Ciudad {
                 if (cy < NCY-1 && ATLAS[cy+1][cx] != c) Rect(cx*CEL, (cy+1)*CEL-1, CEL, 3, Suelo.Road);
             }
 
-        // 3 · trama interior de cada barrio
+        // 3 · la malla de los barrios proyectados, y los caminos del monte
         for (int y = 0; y < MH; y++)
             for (int x = 0; x < MW; x++) {
                 var Z = ZonaDe(x,y);
@@ -250,10 +363,9 @@ public static class Ciudad {
                     continue;
                 }
                 if (Z.Estadio) continue;
-                // La calle no es (x % Sp): es una curva de nivel de un sistema de
-                // coordenadas girado y ondulado. Como u y v son continuas, las calles
-                // salen continuas — curvas de verdad, no escaleras — y la trama sigue
-                // conectada.
+                if (Z.Estilo != "senorial" && Z.Estilo != "abierto") continue;
+                // El Ensanche se proyectó de una vez: retícula regular girada al rumbo del
+                // barrio. La calle es una curva de nivel de ese sistema, así que sale continua.
                 float ca = Mathf.Cos(Z.Ang*Mathf.Deg2Rad), sa = Mathf.Sin(Z.Ang*Mathf.Deg2Rad);
                 float on = Z.Onda > 0 ? Z.Onda : 24f;
                 float u =  x*ca + y*sa + Z.Curva*Mathf.Sin(y/on) + Z.Ox;
@@ -336,6 +448,48 @@ public static class Ciudad {
             Linea(carreteras[i], anchos[i], Suelo.Puente, (x,y) => T(x,y) == Suelo.Agua);
         }
 
+        // 4 quinquies · la trama de los demás barrios, hecha crecer desde las avenidas.
+        // Estamparla —mod(u,sp) < w— da bandas paralelas infinitas recortadas contra el
+        // borde: todas las manzanas iguales, ninguna calle que empiece ni termine, y un
+        // borde de ciudad liso. En un plano de verdad la red de calles va primero y las
+        // manzanas son lo que queda entre ellas. Aquí cada calle nace sobre otra ya
+        // trazada y corre hasta topar con una tercera: cruces en T, fondos de saco,
+        // manzanas de tamaños distintos. Y como toda calle nace pegada a la red, la red
+        // no se parte.
+        {
+            var tiles = new Dictionary<char, List<Vector2Int>>();
+            var semillas = new Dictionary<char, List<Vector2Int>>();
+            for (int y = 2; y < MH-2; y++)
+                for (int x = 2; x < MW-2; x++) {
+                    char c = CharDe(x,y); var Z = Zonas[c];
+                    if (Z.Verde || Z.Estadio) continue;
+                    if (Z.Estilo == "senorial" || Z.Estilo == "abierto") continue;
+                    if (!tiles.ContainsKey(c)) { tiles[c] = new List<Vector2Int>(); semillas[c] = new List<Vector2Int>(); }
+                    tiles[c].Add(new Vector2Int(x,y));
+                    if (Map[y*MW+x] == (byte)Suelo.Road) semillas[c].Add(new Vector2Int(x,y));
+                }
+
+            foreach (var c in tiles.Keys) {
+                var Z = Zonas[c]; var sem = semillas[c];
+                if (sem.Count == 0) continue;
+                float rumbo = Z.Ang * Mathf.Deg2Rad;
+                int objetivo = Mathf.CeilToInt(tiles[c].Count / (float)(Z.Sp * Z.SpV) * 2.6f);
+                float largoMax = Mathf.Max(Z.Sp, Z.SpV) * 2.5f;
+                int pendiente = objetivo;
+                for (int i = 0; i < objetivo*6 && sem.Count > 0 && pendiente > 0; i++) {
+                    var s0 = sem[Utiles.RndI(0, sem.Count-1)];
+                    // la mitad siguen el rumbo del barrio y la mitad lo cruzan; el desvío
+                    // es lo que impide que vuelva a salir una retícula
+                    float a0 = rumbo
+                             + (Utiles.Rnd(0,1) < .5f ? 0f : Mathf.PI/2)
+                             + (Utiles.Rnd(0,1) < .5f ? 0f : Mathf.PI)
+                             + (Utiles.Rnd(0,1) - .5f) * .35f;
+                    if (CrecerCalle(s0.x, s0.y, a0, c, Z, largoMax, sem)) pendiente--;
+                    else i += 2;
+                }
+            }
+        }
+
         // 5 · San Mamés
         int sx = 0, sy = 0, n = 0;
         for (int cy = 0; cy < NCY; cy++) for (int cx = 0; cx < NCX; cx++)
@@ -372,6 +526,16 @@ public static class Ciudad {
 
         // 9 · patios de manzana
         Patios();
+
+        // 9 bis · coser la red viaria. La ciudad se traza por partes —barrios, arterias,
+        // ferrocarril, carreteras de fuera— y siempre queda algún trozo suelto: una
+        // carretera que muere en el monte sin llegar a tocar ciudad, la isla sin enlace.
+        // En una ciudad no hay calles a las que no se pueda llegar. Se cosen al final, en
+        // vez de recolocar coordenadas a mano: así el arreglo sigue valiendo cuando se
+        // mueva el trazado. El enlace sale de un BFS desde la pieza mayor y luego se baja
+        // por el gradiente; buscar el par de casillas más cercano a fuerza bruta costaba
+        // casi medio segundo.
+        CoserRedViaria();
 
         // 10 · aceras: toda fachada que da a la calle
         var cop = (byte[])Map.Clone();
