@@ -12,7 +12,7 @@ Después hay que mirar el plano:  node herramientas/html/plano.js
 """
 import math, re, sys, pathlib
 
-NX, NY = 56, 36             # celdas del atlas (mapa 224x144, celda de 4 casillas)
+NX, NY = 112, 72            # celdas del atlas (mapa 448x288, celda de 4 casillas)
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 HTML = RAIZ / 'referencia' / 'bilbo-city.html'
 CS   = RAIZ / 'unity' / 'BilboCity' / 'Assets' / 'Scripts' / 'Ciudad' / 'Ciudad.cs'
@@ -21,39 +21,39 @@ CS   = RAIZ / 'unity' / 'BilboCity' / 'Assets' / 'Scripts' / 'Ciudad' / 'Ciudad.
 # este a oeste: la mancha sigue la ría y se mete por los vallecitos laterales —
 # Txurdinaga al noreste, Rekalde al sur, Zorrotza al oeste. Por eso el mapa es
 # rectangular: en un cuadrado el valle no cabe sin deformarlo.
-VALLE = [(40,0),(48,1),(53,4),(55,9),(54,14),(50,15),(52,19),(53,24),(51,29),
-         (47,33),(43,35),(39,33),(36,29),(33,34),(29,35),(26,31),(22,33),(18,34),
-         (14,31),(11,33),(6,34),(2,31),(1,25),(5,22),(4,19),(7,17),(4,14),
-         (6,11),(11,9),(12,5),(17,3),(21,6),(26,4),(33,2)]
+VALLE = [(80,0),(96,2),(106,8),(110,18),(108,28),(100,30),(104,38),(106,48),(102,58),
+         (94,66),(86,70),(78,66),(72,58),(66,68),(58,70),(52,62),(44,66),(36,68),
+         (28,62),(22,66),(12,68),(4,62),(2,50),(10,44),(8,38),(14,34),(8,28),
+         (12,22),(22,18),(24,10),(34,6),(42,12),(52,8),(66,4)]
 
 # Centro de cada barrio. El peso encoge (<1) o agranda (>1) su reparto: el Casco Viejo
 # es pequeño de verdad y Txurdinaga y Rekalde son extensos.
-SEMILLAS = [('D',(17, 9)), ('U',(33, 9)), ('G',(41,11)), ('T',(48, 6)), ('S',(46,15)),
-            ('O',(9,26)), ('X',(31,17)), ('C',(45,19)), ('A',(37,20)), ('I',(28,22)),
-            ('P',(25,21)), ('E',(22,24)), ('B',(18,27)), ('M',(43,25)), ('R',(33,28))]
+SEMILLAS = [('D',(34,18)), ('U',(66,18)), ('G',(82,22)), ('T',(96,12)), ('S',(92,30)),
+            ('O',(18,52)), ('X',(62,34)), ('C',(90,38)), ('A',(74,40)), ('I',(56,44)),
+            ('P',(50,42)), ('E',(44,48)), ('B',(36,54)), ('M',(86,50)), ('R',(66,56))]
 PESO = {'C':.85,'P':.5,'E':.55,'X':.75,'O':1.15,'T':1.15,'S':.95,'G':.95,
         'R':1.1,'B':1.05,'D':1.2,'U':1.05,'M':.95}
 
 # Zorrotzaurre va aparte: es la isla entre la ría y el Canal de Deusto, y un reparto
 # por cercanía la dejaría a caballo de las dos orillas.
-ISLA = [(6,19),(16,18),(17,20),(15,23),(7,23),(5,21)]
+ISLA = [(12,38),(32,36),(34,40),(30,46),(14,46),(10,42)]
 
 # Los parques grandes, uno a uno. En el plano municipal el verde dentro de la ciudad
 # pesa tanto como el monte de alrededor, y sin ellos todo sale gris.
 PARQUES = [
-    [(23,20),(27,20),(28,23),(24,23)],        # Doña Casilda
-    [(43,15),(47,15),(47,18),(43,18)],        # Etxebarria, sobre el Casco Viejo
-    [(47,8),(52,8),(52,12),(47,12)],          # Europa, en Txurdinaga
-    [(28,26),(32,26),(32,29),(28,29)],        # Ametzola
-    [(13,11),(17,11),(17,14),(13,14)],        # Deusto, la campa de la universidad
+    [(46,40),(54,40),(56,46),(48,46)],        # Doña Casilda
+    [(86,30),(94,30),(94,36),(86,36)],        # Etxebarria, sobre el Casco Viejo
+    [(94,16),(104,16),(104,24),(94,24)],          # Europa, en Txurdinaga
+    [(56,52),(64,52),(64,58),(56,58)],        # Ametzola
+    [(26,22),(34,22),(34,28),(26,28)],        # Deusto, la campa de la universidad
 ]
 
 # La ría, en casillas del mapa (la misma polilínea que dibuja el juego). Sirve para que
 # ningún barrio salte de orilla: en Bilbao el Casco Viejo está en una margen y el
 # Ensanche en la otra, y un reparto por cercanía sin esto los mezcla.
-RIA = [(223,76),(212,80),(202,84),(192,82),(182,76),(172,70),(162,64),(150,60),
-       (138,58),(126,58),(114,60),(102,64),(90,70),(78,78),(66,86),(54,92),
-       (42,92),(32,86),(24,76),(16,64),(8,52),(0,44)]
+RIA = [(446,152),(424,160),(404,168),(384,164),(364,152),(344,140),(324,128),(300,120),
+       (276,116),(252,116),(228,120),(204,128),(180,140),(156,156),(132,172),(108,184),
+       (84,184),(64,172),(48,152),(32,128),(16,104),(0,88)]
 NORTE = set('DUGTS')          # margen derecha, la de Deusto y Begoña
 SUR    = set('XCAIPEBMR')     # margen izquierda, la del Ensanche
 def riaEnX(mx):
@@ -78,7 +78,7 @@ def trazar():
             # margen: al este del meandro la ría parte la ciudad en dos y cada barrio
             # es de una orilla. Al oeste se dobla sobre sí misma y ahí no aplica.
             orilla = None
-            if x*4+2 >= 76:
+            if x*4+2 >= 152:
                 ry = riaEnX(x*4+2)
                 if ry is not None: orilla = NORTE if y*4+2 < ry else SUR
             mejor, md = None, 1e9
