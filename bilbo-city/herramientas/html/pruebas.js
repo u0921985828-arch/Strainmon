@@ -113,7 +113,20 @@ const dormir = ms => new Promise(r => setTimeout(r, ms));
 
     // ── 6 · combate ────────────────────────────────────────────────────
     {
-      const p0 = A.puntoAcera(P.x | 0, P.y | 0, 10);
+      // La prueba es si la pistola mata a 3 casillas, no si hay una pared en medio: hay
+      // que buscar una acera con tiro libre al este, que es hacia donde apunta (d8 = 2).
+      let p0 = null;
+      for (let i = 0; i < 300 && !p0; i++) {
+        const c = A.puntoAcera(P.x | 0, P.y | 0, 50);
+        let libre = true;
+        for (let d = 1; d <= 4; d++) {
+          const t = A.Tc((c.x | 0) + d, c.y | 0);
+          if (t === A.EDIF || t === A.AGUA) { libre = false; break; }
+        }
+        if (libre) p0 = c;
+      }
+      ok(p0, 'no encuentro una acera con tiro libre al este');
+      p0 = p0 || A.puntoAcera(P.x | 0, P.y | 0, 10);
       P.x = p0.x; P.y = p0.y; P.enCoche = null;
       S.armas.pistola = 60; S.armaAct = 'pistola'; A.enemigos.length = 0;
       A.enemigos.push({ x: P.x + 3, y: P.y, hp: 60, arq: 'maton', arma: 'punos',
