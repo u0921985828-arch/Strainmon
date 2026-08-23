@@ -142,7 +142,7 @@ public class Estado {
         S("taller",   "Taller Iker",            Paleta.H("#9d8ec4"), "taller",   228,204, 'R');
         S("hospital", "Hospital de Basurto",    Paleta.Blanco,       "hospital",  153,155, 'B');
         S("obra",     "Obra de Zorrotzaurre",   Paleta.H("#e8a33d"), null,         148, 86, 'Z');
-        S("puerto",   "Muelle de Olabeaga",     Paleta.H("#4d9de0"), null,         79,136, 'O');
+        S("puerto",   "Muelle de Olabeaga",     Paleta.H("#4d9de0"), null,         100,147, 'O');
         S("poli",     "Comisaría",              Paleta.H("#4dd0e1"), null,       214,128, 'I');
         S("guggen",   "El Guggenheim",          Paleta.H("#b8c4cc"), null,       246, 86, 'X', true);
         S("sanmames", "San Mamés",              Paleta.VerdeL,       null,        186,124, 'E', true);
@@ -163,6 +163,7 @@ public class Estado {
         S("deustuni", "Universidad de Deusto",  Paleta.H("#b8a05c"), null,        106, 39, 'D', true);
         S("maritimo", "Museo Marítimo",         Paleta.H("#6f9ab5"), null,         83,140, 'O', true);
         S("arena",    "Bilbao Arena",           Paleta.H("#c4693f"), null,       344,184, 'M', true);
+        S("zorrotza", "Estación de Zorrotza",   Paleta.H("#8fa66b"), null,        41,117, 'Y', true);
     }
     public static Sitio Sitio_(string id) { return Sitios.Find(s => s.Id == id); }
 }

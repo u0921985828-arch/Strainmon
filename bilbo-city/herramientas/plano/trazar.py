@@ -47,7 +47,7 @@ CORREDORES = [
     # Basurtu, Altamira y Masustegi, al suroeste
     [(46,30,10),(41,34,11),(34,39,10),(28,44,8)],
     # Olabeaga y Zorrotza, ría abajo por la margen izquierda
-    [(32,32,9),(24,32,9),(16,31,8),(10,33,6)],
+    [(32,32,9),(24,32,9),(17,31,9),(11,32,8),(5,34,6)],
 ]
 
 def enCiudad(px, py):
@@ -86,6 +86,9 @@ BARRIOS = [
     ('D', 'Deusto',        19, 12, 3, 3, 5,  8, 4, 30, 'bloques',    '#4e5a52'),
     ('Z', 'Zorrotzaurre',  20, 16, 3, 2, 2, 14, 2, 30, 'industrial', '#6b5f45'),
     ('O', 'Olabeaga',      26, 20, 3, 6, 4, 40, 5, 26, 'industrial', '#5a5340'),
+    # Zorrotza es barrio propio, no un trozo de Olabeaga: margen izquierda río abajo,
+    # donde entra el Kadagua. Puerto, muelles y polígono, de ahí la trama industrial.
+    ('Y', 'Zorrotza',      28, 22, 3, 3, 7, 32, 4, 28, 'industrial', '#57503e'),
     ('S', 'Santutxu',      13, 20, 3, 4, 1, 55, 6, 20, 'bloques',    '#5c4a3a'),
     ('G', 'Begoña',        17, 12, 3, 6, 7, 65, 7, 18, 'bloques',    '#57505a'),
     ('U', 'Uribarri',      13, 22, 3, 0, 3, 48, 6, 20, 'bloques',    '#4f5a63'),
@@ -123,7 +126,7 @@ def tablaCS():
 # Centro de cada barrio. El peso encoge (<1) o agranda (>1) su reparto: el Casco Viejo
 # es pequeño de verdad y Txurdinaga y Rekalde son extensos.
 SEMILLAS = [('D',(30, 9)), ('U',(66,11)), ('G',(83,20)), ('T',(99,19)), ('S',(91,34)),
-            ('O',(24,33)), ('X',(60,20)), ('C',(71,28)), ('A',(58,23)), ('I',(53,30)),
+            ('O',(26,33)), ('Y',(11,32)), ('X',(60,20)), ('C',(71,28)), ('A',(58,23)), ('I',(53,30)),
             ('P',(50,27)), ('E',(46,31)), ('B',(38,35)), ('M',(74,43)), ('R',(57,45))]
 PESO = {'C':.85,'P':.5,'E':.55,'X':.75,'O':1.15,'T':1.15,'S':.95,'G':.95,
         'R':1.1,'B':1.05,'D':1.2,'U':1.05,'M':.95}
