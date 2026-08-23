@@ -139,8 +139,15 @@ PARQUES = [
 # La ría, en casillas del mapa (la misma polilínea que dibuja el juego). Sirve para que
 # ningún barrio salte de orilla: en Bilbao el Casco Viejo está en una margen y el
 # Ensanche en la otra, y un reparto por cercanía sin esto los mezcla.
-RIA = [(445, 163),
-       (404, 154),
+RIA = [(392, 215),
+       (404, 200),
+       (418, 188),
+       (432, 176),
+       (440, 160),
+       (432, 146),
+       (416, 142),
+       (400, 146),
+       (386, 152),
        (369, 146),
        (346, 137),
        (326, 125),
