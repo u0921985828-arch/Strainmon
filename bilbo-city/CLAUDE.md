@@ -68,8 +68,12 @@ nada, en C# la excepción salta en el siguiente `MoveNext`.
   con deslizamiento por ejes (`Movimiento.Deslizar`). Es predecible y va rápido en móvil.
 - **Paleta bloqueada de 48 colores.** Todo sprite pasa por `Paleta.Cuantizar`. No introduzcas
   colores nuevos sin añadirlos a la paleta.
-- **Sin assets importados.** Ni PNG, ni WAV, ni fuentes TTF de terceros. Si necesitas algo
-  nuevo, se forja por código en `Assets/Scripts/Arte/`.
+- **Sin assets importados.** Ni PNG, ni WAV, ni fuentes TTF de terceros en el
+  repositorio. Si necesitas algo nuevo, se forja por código en `Assets/Scripts/Arte/`.
+  **Excepción con condiciones: los sprites de personaje pueden venir de PixelLab**
+  (`herramientas/sprites/`), pero entran cuantizados a la paleta y escritos como índices
+  comprimidos en el bloque `SPRITES`, nunca como archivo de imagen. Lo que falte se sigue
+  forjando: el juego no puede depender de que haya hoja.
 - **En artefactos web no uses `localStorage` directamente**: el HTML usa `window.storage` con
   respaldo a `localStorage`.
 - **Nada de `Math.random()` en el prototipo.** Usa `azar()`, o `rnd(a,b)` / `rndi(a,b)`, que
@@ -160,6 +164,24 @@ node herramientas/html/plano.js                      # con rótulos y chinchetas
 node herramientas/html/plano.js salida.png --zoom 2 --sin-nombres
 node herramientas/html/manzanas.js                   # el grano de la trama
 ```
+
+## El arte
+
+Todo se forja por código, y hay dos herramientas para trabajarlo:
+
+```bash
+node herramientas/html/fuentes.js     # seis fuentes en una imagen, para elegir
+python3 herramientas/sprites/pixellab.py --simular   # sprites de PixelLab, sin gastar red
+```
+
+Dos cosas aprendidas dibujando fuentes de mapa de bits, por si vuelven a hacer falta:
+engordar entera la primera y la última fila para simular una serifa **pega los trazos** y
+la M sale un borrón — hay que detectar qué columnas son asta y ponerles pie solo a ellas;
+y un halo de dos píxeles junta unas letras con otras hasta no poder leerlas.
+
+Los sprites de PixelLab necesitan clave (`PIXELLAB_API_KEY`) y salida a `api.pixellab.ai`,
+que **desde una sesión de Claude está cerrada**: eso se ejecuta en local. Ver
+`herramientas/sprites/LEEME.md`.
 
 ## Pixel perfect
 
