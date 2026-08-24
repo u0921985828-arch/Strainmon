@@ -524,6 +524,36 @@ def hoja(nombre, clave, simular, pal, ramp, diag=False):
     return rej
 
 
+def lamina(hojas, pal, ruta, esc=4):
+    """Vuelca las hojas empaquetadas a un PNG, para poder mirarlas sin abrir el juego.
+
+    Existe por una razón práctica: enseñar cómo ha quedado una tirada no debería obligar a
+    compilar `node-canvas`. Lo que sale es la hoja **tal como se guardó**, con los colores
+    de plantilla puestos en sus rampas — que es justo lo que hay que mirar para saber si el
+    reparto por partes acertó. La piel en tonos carne, el pelo en marrones, el torso en
+    azules, las piernas en verdes y el calzado en maderas. Una manga que salga en tonos
+    carne es el reparto equivocándose, y aquí se ve de un vistazo.
+    """
+    from PIL import Image
+    anchoc, altoc = CEL_W * 8, CEL_H * len(POSES)
+    im = Image.new('RGB', (anchoc * len(hojas) + 8 * (len(hojas) - 1), altoc),
+                   (24, 26, 30))
+    px = im.load()
+    for n, (nombre, rej) in enumerate(sorted(hojas.items())):
+        ox = n * (anchoc + 8)
+        for y in range(altoc):
+            for x in range(anchoc):
+                v = rej[y * anchoc + x]
+                if v:
+                    px[ox + x, y] = pal[(v - 1) % len(pal)]
+                elif (x // 4 + y // 4) % 2:                  # damero: se ve el hueco
+                    px[ox + x, y] = (34, 37, 42)
+    if esc > 1:
+        im = im.resize((im.width * esc, im.height * esc), Image.NEAREST)
+    im.save(ruta)
+    print(f'-> {ruta}  ({im.width}x{im.height}, {len(hojas)} siluetas)')
+
+
 def comprimir(datos):
     c = zlib.compressobj(9, zlib.DEFLATED, -15)          # deflate crudo, como la trama
     return base64.b64encode(c.compress(bytes(datos)) + c.flush()).decode()
@@ -550,6 +580,9 @@ if __name__ == '__main__':
     ap.add_argument('--clave', default=os.environ.get('PIXELLAB_API_KEY', ''))
     ap.add_argument('--simular', action='store_true', help='sin red: monigotes de relleno')
     ap.add_argument('--coste', action='store_true', help='solo la cuenta, no baja nada')
+    ap.add_argument('--lamina', metavar='SALIDA.PNG',
+                    help='vuelca las hojas a un PNG para mirarlas sin abrir el juego')
+    ap.add_argument('--esc', type=int, default=4, help='aumento de --lamina')
     ap.add_argument('--diag', action='store_true',
                     help='el reparto por partes de cada celda, para ver si el '
                          'generador respetó los colores de plantilla')
@@ -579,9 +612,12 @@ if __name__ == '__main__':
     if not a.simular and not a.clave:
         raise SystemExit('falta la clave: PIXELLAB_API_KEY o --clave')
 
-    hojas = {}
+    crudas = {}
     for k in quiere:
-        hojas[k] = comprimir(hoja(k, a.clave, a.simular, pal, ramp, a.diag))
+        crudas[k] = hoja(k, a.clave, a.simular, pal, ramp, a.diag)
+    hojas = {k: comprimir(v) for k, v in crudas.items()}
     escribir(hojas, ramp)
+    if a.lamina:
+        lamina(crudas, pal, a.lamina, a.esc)
     peso = sum(len(v) for v in hojas.values()) / 1024
     print(f'-> {HTML}  ({peso:.0f} KB de hojas)')

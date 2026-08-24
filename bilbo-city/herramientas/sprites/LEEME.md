@@ -11,7 +11,14 @@ python3 herramientas/sprites/pixellab.py --simular        # sin red ni clave
 python3 herramientas/sprites/pixellab.py                  # las siete siluetas
 python3 herramientas/sprites/pixellab.py --que largo_pantalon,abrigo_pantalon
 python3 herramientas/sprites/pixellab.py --diag --que largo_pantalon   # reparto por partes
+python3 herramientas/sprites/pixellab.py --lamina hojas.png --esc 4     # verlas sin abrir el juego
 ```
+
+`--lamina` vuelca las hojas empaquetadas a un PNG usando solo Pillow: enseñar una tirada no
+obliga a compilar `node-canvas`. Sale la hoja **tal como se guardó**, con los colores de
+plantilla en sus rampas, que es justo lo que hay que mirar — piel en tonos carne, pelo en
+marrones, torso en azules, piernas en verdes, calzado en maderas. Una manga en tonos carne
+es el reparto equivocándose.
 
 ## No se baja un personaje: se baja una silueta
 
