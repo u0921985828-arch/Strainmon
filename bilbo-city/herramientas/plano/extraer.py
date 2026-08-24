@@ -674,8 +674,13 @@ def _cerca_de_via(rej, gx, gy, r=CALLE_RADIO_VIA):
 SALTO_CALLE = 220
 
 
-def _grupo_mayor(pts):
-    """El grupo de rótulos más numeroso, uniendo los que están cerca unos de otros."""
+def _grupo_mayor(pts, celda=None):
+    """El grupo de rótulos más numeroso, uniendo los que están cerca unos de otros.
+
+    Si se sabe en qué casilla de la cuadrícula pone el índice la calle, mandan los grupos
+    que pisan esa casilla exacta: la tolerancia de una casilla de margen deja entrar
+    rótulos de bastante más allá, y 'Correo' —que es del Casco Viejo, casilla E3— se
+    llevaba a rastras uno de la otra orilla, en D4."""
     padre = list(range(len(pts)))
 
     def raiz(a):
@@ -693,7 +698,25 @@ def _grupo_mayor(pts):
     grupos = {}
     for i in range(len(pts)):
         grupos.setdefault(raiz(i), []).append(pts[i])
-    return max(grupos.values(), key=len)
+    gs = list(grupos.values())
+    if celda is not None:
+        justos = [g for g in gs if any(_celda(x, y) == celda for x, y in g)]
+        if justos:
+            gs = justos
+    return max(gs, key=len)
+
+
+def _en_su_celda(pts, celda, estricto):
+    """Filtra los rótulos que no caen en la casilla que el índice le da a la calle.
+
+    Solo para nombres cortos de una palabra. Son los que dan falsos positivos: 'Correo'
+    son seis letras y aparece rotulado en Abando por algo que no es la calle Correo del
+    Casco Viejo, y con una casilla de margen entraba y arrastraba la calle a la otra
+    orilla. A un nombre largo o compuesto no le hace falta esta severidad."""
+    if not estricto or celda is None:
+        return pts
+    justos = [p for p in pts if _celda(p[0], p[1]) == celda]
+    return justos or pts
 
 
 def _orden_en_eje(pts):
@@ -1035,10 +1058,16 @@ def calles_de(pdf, rej):
         nombre = ent[0]
         if _clave_calle(nombre) in puestas or len(ik) < 5:
             continue
+        # Dos casillas de margen, no una: rastreando un nombre concreto el riesgo de
+        # confundirse es bajo —tiene que salir la palabra entera— y la casilla del índice
+        # marca dónde empieza la calle, no dónde acaba. De una a dos aparecen sesenta y
+        # siete más; abriendo a toda la ciudad solo cuatro, así que no compensa.
         arranques = []
-        for dc in (-1, 0, 1):
-            for df in (-1, 0, 1):
-                arranques += porcel.get((chr(ord(ent[1]) + dc), ent[2] + df), [])
+        for dc in (-2, -1, 0, 1, 2):
+            for df in (-2, -1, 0, 1, 2):
+                col = chr(ord(ent[1]) + dc)
+                if 'A' <= col <= 'G':
+                    arranques += porcel.get((col, ent[2] + df), [])
         # El índice invierte el nombre para ordenarlo alfabéticamente —'Aguirre
         # Lehendakari'— y el mapa lo escribe como se dice —'LEHENDAKARI AGIRRE'—, así que
         # buscando el índice tal cual no aparece ninguna. Se prueban las rotaciones del
@@ -1056,6 +1085,7 @@ def calles_de(pdf, rej):
         por_nombre.setdefault(nombre, []).append((gx, gy))
         puestas.add(_clave_calle(nombre))
 
+    celda_de = {ent[0]: (ent[1], ent[2]) for ent in indice.values()}
     fuera = []
     for nombre, pts in por_nombre.items():
         # La tolerancia de una casilla de cuadrícula da margen para que un mismo nombre se
@@ -1063,7 +1093,9 @@ def calles_de(pdf, rej):
         # casualidad—. Uniendo esos dos sitios, la calle acababa cruzando la ría: 'Correo'
         # salía del Casco Viejo a San Francisco, que están en orillas distintas. Así que se
         # agrupan los rótulos por cercanía y se conserva el grupo grande.
-        pts = _grupo_mayor(pts)
+        celda = celda_de.get(nombre)
+        corto = len(re.split(r'[\s.]+', nombre.strip())) == 1 and len(_clave_calle(nombre)) <= 7
+        pts = _grupo_mayor(_en_su_celda(pts, celda, corto), celda)
         limpios = []
         for q in _orden_en_eje(pts):
             if all(abs(q[0] - r[0]) + abs(q[1] - r[1]) > 6 for r in limpios):
