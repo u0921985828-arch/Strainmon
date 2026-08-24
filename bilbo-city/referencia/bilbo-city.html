@@ -2268,7 +2268,25 @@ const PEATON_BARRIO={
    Nunca se queda un personaje sin dibujar. */
 /*<<<SPRITES*/
 /* Lo escribe herramientas/sprites/pixellab.py. Vacío = todo forjado. */
-const SPR={cel:[34,38], rampas:{}, hojas:{}};
+const SPR={cel:[34,38],
+ rampas:{piel:[20,19,18,17,16,15], pelo:[21,22,23,24], torso:[26,25,27], piernas:[33,32,34], calzado:[45,44,46], contorno:[1]},
+ hojas:{
+ largo_pantalon: [
+  '7doxjqNAEIbRPsImGyAS5AP4/sdb2lavBiOj2t4xFMz7pIlcQc9L+UuRJEk6sN+t7Bf7PIMHDx7/4PGrlf1in2fw4LHpUU5zsc8zeCwbx3E+',
+  'GIch+8UwPA7GsXzyor6jtv3SDBfz//KsfPKCBw8ePHjw4MGDB49cHrfbbZymach+Mcw/Po7KJy9KmX8u81n+i/pjPfrsBY+X7vf74y/9xT7P',
+  '4CFJkiRJ58xeigcPHr0e9mM8eMQ97Ol42BeGL3y/5cGDBw8ePHjw4MEjr0cd29XeL7eSXNRlYO39+us7Lv6OyzZfmuGi/bD53/73BY+X2rjs',
+  '/cgsycU+z+AhSZIkSWfNXooHDx69HvZjPHjEPezpeNgXhi98v+XBgwcPHjx48ODBI6+HfeHqHe0094V94SEe9nQ87AslSZIkXSJ7KR48ePR6',
+  '2I/x4BH3sKfjYV8YvvD9lgcPHjx48ODBgwePvB72hat3tNPcF/aFh3jY0/GwL5QkSZJ0ieylePDg0ethP8aDR9zDno6HfWH4wvdbHjx48ODB',
+  'gwcPHjzyetgXrt7RTnNf2Bce4mFPx8O+UJIkSdIlspfiwYNHr4f9GA8ecQ97Oh72heEL32958ODBgwcPHjx48MjrYV+4ekc7zX1hX3iIhz0d',
+  'D/tCSZIkSZfIXooHDx69HvZjPHjEPezpeNgXhi98v+XBgwcPHjx48ODBI6+HfeHqHe0094V94SEe9nQ87AslSZIkXSJ7KR48ePR62I/x4BH3',
+  'sKfjYV8YvvD9lgcPHjx48ODBgwePvB72hat3tNPcF/aFh3jY0/GwL5QkSZJ0ieylePDg0ethP8aDR9zDno6HfWH4wvdbHjx48ODBgwcPHjzy',
+  'etgXrt7RTnNf2Bce4mFPx8O+UJIkSdIlspfiwYNHr4f9GA8ecQ97Oh72heEL32958ODBgwcPHjx48MjsUZd90zQN2S+Gug6sR+WTF89x2fud',
+  'W6KL+uPGEu6bLni8VMdl2wOzJBf7PIOHJEmSJJ0zeykePHj0etiP8eAR97Cn42FfGL7w/ZYHDx48ePDgwYMHj8we9oXL7Ol4bHnY0/EokiRJ',
+  'knT+7KV48ODR62E/xoNH3MOejod9YfjC91sePHjw4MGDBw8ePDJ72Bcus6fjseVhT8ejSJIkSTpj9kE8ePDo9bCX4sEj7mE/xsOeLnzheyUP',
+  'Hjx48ODBgwcPHpk97OmW2Y/x2PKwH+NRJEmSJElXy36MBw8evR72dDx4xD3sC3nYW4YvfM/mwYMHDx48ePDgwSOzh73lMvtCHlse9oU8iiRJ',
+  'kiRJ0s/N3pIHDx69HvanPHjEPexxedgnhy/sP3jw4MGDBw/7wi//i33hMvvCQzzs6XgUSZIkSZIk6Zn9GA8ePHo97Ol48Ih72BfysLcMX9jD',
+  '8ODBgwcPHvaWX/4Xe8tl9paHeNgX8iiSOvsD'].join('')
+}};
 /*SPRITES>>>*/
 const CEL_W=()=>SPR.cel[0], CEL_H=()=>SPR.cel[1];
 const HOJAS={};

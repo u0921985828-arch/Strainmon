@@ -122,6 +122,44 @@ semillas = {PL.semilla(k) for k in PL.SETS}
 ok(len(semillas) == len(PL.SETS), 'dos siluetas comparten semilla')
 bien.append('%d semillas estables, una por silueta' % len(semillas))
 
+# ── 4 quater · los píxeles sueltos se limpian, el contorno no ──────────────────────
+sucio = [['torso'] * 9 for _ in range(9)]
+sucio[4][4] = 'piernas'                                   # un punto perdido en la manga
+n = PL._limpia(sucio, 9, 9)
+ok(sucio[4][4] == 'torso' and n == 1, 'un píxel suelto sobrevive dentro de otra parte')
+linea = [[''] * 9 for _ in range(9)]
+for y in range(9):
+    linea[y][4] = 'contorno'                              # una línea de contorno de 1 px
+PL._limpia(linea, 9, 9)
+ok(all(linea[y][4] == 'contorno' for y in range(9)), 'la limpieza se come el contorno')
+bien.append('los píxeles sueltos se reasignan al vecino y el contorno se respeta')
+
+# ── 4 quinquies · la figura pisa donde tiene que pisar ─────────────────────────────
+# Unos píxeles de diferencia entre un fotograma y el siguiente se ven como un bote al
+# andar. El juego ancla la celda por abajo, así que la fila de los pies tiene que ser la
+# misma en las 128 casillas de la hoja.
+def coloca(x0, y0):
+    m = [[''] * PL.CEL_W for _ in range(PL.CEL_H)]
+    for y in range(y0, y0 + 6):
+        for x in range(x0, x0 + 4):
+            m[y][x] = 'piernas' if y < y0 + 4 else 'calzado'
+    return m
+for x0, y0 in ((2, 2), (25, 28), (14, 15)):
+    m = coloca(x0, y0)
+    dx, dy = PL._encuadra(m, PL.CEL_W, PL.CEL_H)
+    ok(y0 + 5 + dy == PL.BASE_PIES,
+       'los pies quedan en la fila %d y no en la %d' % (y0 + 5 + dy, PL.BASE_PIES))
+    ok(abs((x0 + 1 + dx) - PL.EJE_X) <= 1,
+       'el eje queda en x=%d y no en %d' % (x0 + 1 + dx, PL.EJE_X))
+# Y el brazo estirado del puñetazo no descentra el cuerpo: se centra por las piernas.
+m = coloca(14, 15)
+for x in range(18, 30):
+    m[17][x] = 'torso'
+ok(PL._encuadra(m, PL.CEL_W, PL.CEL_H)[0] == dx,
+   'el brazo del puñetazo descentra la figura')
+bien.append('los pies caen siempre en la fila %d y el eje en x=%d, brazo estirado incluido'
+            % (PL.BASE_PIES, PL.EJE_X))
+
 # ── 5 · todas las poses del juego tienen dibujo, y ninguno sobra ────────────────────
 sin = [p for p in PL.POSES if p not in PL.DE_POSE]
 ok(not sin, 'poses del juego sin dibujo: %s' % ', '.join(sin))
@@ -154,6 +192,15 @@ mal = [y for y in range(H - 1)
 ok(not mal, 'disparar no es apuntar con un píxel de retroceso')
 ok(len(hoja) == W * H * len(PL.POSES), 'la hoja no mide 8 direcciones × %d poses'
    % len(PL.POSES))
+bajos = set()
+for fy, pose in enumerate(PL.POSES):
+    for d in range(8):
+        filas = [y for y in range(H) if any(fila(fy, d, y))]
+        if filas:
+            bajos.add(max(filas) - PL.DESPLAZA.get(pose, 0))
+ok(len(bajos) == 1, 'la fila de los pies baila entre casillas: %s' % sorted(bajos))
+ok(bajos == {PL.BASE_PIES}, 'los pies no caen en la fila %d sino en %s'
+   % (PL.BASE_PIES, sorted(bajos)))
 bien.append('la hoja sale de %d dibujos: 3 direcciones en espejo y %d poses repetidas'
             % (len(usados) * PL.PEDIDAS, len(PL.POSES) - len(usados)))
 

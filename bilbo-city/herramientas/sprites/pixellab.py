@@ -117,6 +117,10 @@ NEGATIVO = ('gradient, dithering, soft shading, antialiasing, blurry, 3d render,
             'realistic, watermark, text, signature, extra limbs, cut off, ground shadow, '
             'hat, cap, helmet, bag, backpack, weapon prop')
 GUIA = 8                   # cuánto se le aprieta para que siga el texto
+# Por debajo de esto la figura va medio sin contorno, y sobre el hormigón de la ciudad
+# —del mismo gris que media ropa— se deshace. Se avisa; no se repasa, que un contorno
+# repasado encima del que ya está queda de dos píxeles y a esta escala es peor.
+BORDE_MINIMO = .6
 _GASTO = [0.]              # lo que lleva gastado la tirada, según la propia API
 
 
@@ -205,10 +209,14 @@ def _celda_forja():
     if not m:
         raise SystemExit('no encuentro los márgenes de la forja en el HTML')
     mx, arr, aba = (int(g) for g in m.groups())
-    return 20 + mx * 2, 26 + arr + aba
+    # Dónde pisa la figura y por dónde va su eje, en coordenadas de celda. La forja dibuja
+    # en una caja de 20×26 dentro del margen: los pies caben en las dos últimas filas de
+    # esa caja y el eje va por su mitad. El juego ancla la celda por abajo, así que estas
+    # dos cifras son las que hacen que un personaje traído pise donde pisa uno forjado.
+    return 20 + mx * 2, 26 + arr + aba, arr + 25, mx + 10
 
 
-CEL_W, CEL_H = _celda_forja()
+CEL_W, CEL_H, BASE_PIES, EJE_X = _celda_forja()
 POSES = _poses()
 
 
@@ -514,6 +522,94 @@ def _png(im):
     return b.getvalue()
 
 
+def _limpia(partes, w, h):
+    """Quita los píxeles sueltos: uno de una parte perdido dentro de otra.
+
+    A treinta y cuatro píxeles de ancho, un punto de color pantalón en mitad de la manga
+    no se lee como sombra: se lee como suciedad. Se reasigna al vecino que mande. El
+    contorno se deja en paz — es una línea de un píxel de grueso, así que por definición
+    tiene pocos vecinos suyos y limpiarlo sería borrarlo.
+    """
+    sueltos = 0
+    for y in range(h):
+        for x in range(w):
+            v = partes[y][x]
+            if not v or v == 'contorno':
+                continue
+            vecinos = {}
+            iguales = 0
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    if not dx and not dy:
+                        continue
+                    nx, ny = x + dx, y + dy
+                    if not (0 <= nx < w and 0 <= ny < h):
+                        continue
+                    n = partes[ny][nx]
+                    if n == v:
+                        iguales += 1
+                    elif n and n != 'contorno':
+                        vecinos[n] = vecinos.get(n, 0) + 1
+            if iguales <= 1 and vecinos:
+                manda = max(vecinos, key=vecinos.get)
+                if vecinos[manda] >= 4:
+                    partes[y][x] = manda
+                    sueltos += 1
+    return sueltos
+
+
+def _encuadra(partes, w, h):
+    """Cuánto hay que mover la figura para que pise donde tiene que pisar.
+
+    Cada llamada devuelve al personaje colocado a su aire dentro de la celda, y unos
+    píxeles arriba o abajo de diferencia entre un fotograma y el siguiente se ven como un
+    bote: el que anda parece ir dando saltos, y al agacharse se hunde en el suelo. El
+    juego ancla la celda por abajo, así que lo que tiene que coincidir es la fila de los
+    pies.
+
+    De lado se centra por las piernas, no por la silueta entera: al dar el puñetazo el
+    brazo se estira medio cuerpo, y centrando por la caja el cuerpo se iría al lado
+    contrario del golpe.
+    """
+    xs = [x for y in range(h) for x in range(w) if partes[y][x]]
+    ys = [y for y in range(h) for x in range(w) if partes[y][x]]
+    if not xs:
+        return 0, 0
+    piernas = [x for y in range(h) for x in range(w)
+               if partes[y][x] in ('piernas', 'calzado')]
+    eje = piernas or xs
+    dx = EJE_X - (min(eje) + max(eje)) // 2
+    dy = BASE_PIES - max(ys)
+    # Mover no puede sacar nada de la celda: antes de cuadrar los pies, no perder la cabeza.
+    dx = max(-min(xs), min(dx, w - 1 - max(xs)))
+    dy = max(-min(ys), min(dy, h - 1 - max(ys)))
+    return dx, dy
+
+
+def _borde(partes, w, h):
+    """Qué parte del perfil de la figura lleva contorno.
+
+    La forja le pone contorno a todo lo suyo, y no por gusto: la gente cruza del asfalto a
+    la acera y de la acera al parque, y una cazadora gris sobre hormigón gris sin borde se
+    deshace. A un dibujo traído se le pide contorno, pero pedirlo no es tenerlo. Esto lo
+    mide en vez de darlo por hecho — y no lo impone: repasar un contorno que ya está lo
+    dejaría de dos píxeles, que a esta escala es peor que no tenerlo.
+    """
+    perfil = pintados = 0
+    for y in range(h):
+        for x in range(w):
+            v = partes[y][x]
+            if not v:
+                continue
+            fuera = any(not (0 <= x + dx < w and 0 <= y + dy < h)
+                        or not partes[y + dy][x + dx]
+                        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+            if fuera:
+                perfil += 1
+                pintados += v == 'contorno'
+    return pintados / perfil if perfil else 1.
+
+
 def a_indices(png, pal, ramp):
     """PNG -> un byte por píxel: 0 transparente, y si no la rampa de su parte.
 
@@ -531,19 +627,27 @@ def a_indices(png, pal, ramp):
         im = im.resize((CEL_W, CEL_H), Image.NEAREST)
     px = im.load()
     partes, cuentas = _reparte(px, CEL_W, CEL_H)
+    cuentas['sueltos_limpiados'] = _limpia(partes, CEL_W, CEL_H)
+    dx, dy = _encuadra(partes, CEL_W, CEL_H)
+    cuentas['movida'] = f'{dx:+d},{dy:+d}'
+    cuentas['borde'] = round(_borde(partes, CEL_W, CEL_H), 2)
     luces = {p: [_luz(pal[i - 1]) for i in idx] for p, idx in ramp.items()}
     fuera = bytearray(CEL_W * CEL_H)
     reparto = {}
     for y in range(CEL_H):
+        oy = y + dy
+        if not 0 <= oy < CEL_H:
+            continue
         for x in range(CEL_W):
             parte = partes[y][x]
-            if not parte:
+            ox = x + dx
+            if not parte or not 0 <= ox < CEL_W:
                 continue
             reparto[parte] = reparto.get(parte, 0) + 1
             l = _luz(px[x, y][:3])
             idx = ramp[parte]
-            fuera[y * CEL_W + x] = idx[min(range(len(idx)),
-                                           key=lambda i: abs(luces[parte][i] - l))]
+            fuera[oy * CEL_W + ox] = idx[min(range(len(idx)),
+                                             key=lambda i: abs(luces[parte][i] - l))]
     reparto.update(cuentas)
     return fuera, reparto
 
@@ -565,6 +669,8 @@ def _avisa(nombre, dib, direccion, rep):
         avisos.append('%d%% desvaído' % (100 * rep['desvaidos'] / pintados))
     if rep.get('sueltos'):
         avisos.append('%d píxeles sin parte' % rep['sueltos'])
+    if rep.get('borde', 1) < BORDE_MINIMO:
+        avisos.append('contorno solo en el %d%% del perfil' % (100 * rep['borde']))
     if avisos:
         print(f'  ¡ojo! {nombre} {dib} {direccion}: ' + ', '.join(avisos), flush=True)
     return bool(avisos)
