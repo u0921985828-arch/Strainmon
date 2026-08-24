@@ -237,6 +237,100 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       bien.push('sigilo: postura, cono, línea de vista, ruido y delito sin testigos');
     }
 
+    // ── 2 sexies · nivel, viviendas y negocios ─────────────────────
+    {
+      // El nivel sube con la experiencia y la curva no se estanca.
+      S.nivel = 1; S.xp = 0;
+      ok(A.XP_NIVEL(2) > A.XP_NIVEL(1) && A.XP_NIVEL(9) > A.XP_NIVEL(8) * 1.05,
+         'la curva de nivel no sube');
+      A.darXp(A.XP_NIVEL(1) + A.XP_NIVEL(2));
+      ok(S.nivel === 3, 'con dos niveles de experiencia se queda en ' + S.nivel);
+
+      // Comprar: primero falta nivel, luego dinero, y al final es tuyo.
+      const caro = A.PROPIEDADES.find(q => q.nivel >= 9);
+      S.nivel = 1; S.dinero = 999999;
+      ok(A.pegaPara(caro).startsWith('Necesitas nivel'), 'no exige nivel para ' + caro.id);
+      S.nivel = 20; S.dinero = 0;
+      ok(A.pegaPara(caro).startsWith('Te faltan'), 'no exige dinero para ' + caro.id);
+      S.dinero = caro.precio + 500;
+      A.comprarProp(caro.id);
+      ok(A.esMio(caro.id), 'la compra no se registra');
+      ok(Math.round(S.dinero) === 500, 'la compra no cobra: quedan ' + Math.round(S.dinero));
+      ok(A.pegaPara(caro) === null, 'lo comprado sigue en venta');
+
+      // Un negocio renta cada día, y la renta se cobra al dormir.
+      const neg = A.PROPIEDADES.find(q => q.tipo === 'negocio');
+      S.nivel = 20; S.dinero = neg.precio;
+      A.comprarProp(neg.id);
+      ok(A.rentaDiaria() >= neg.renta, 'el negocio no renta');
+      S.dinero = 0; A.cobrarRentas();
+      ok(S.dinero >= neg.renta, 'la renta no se cobra');
+
+      // En un local tuyo no se paga.
+      S.interior = { id: 'tasca', poi: neg.id }; S.dinero = 100; S.hambre = 0;
+      A.comer(18, 1, 0.6, 0, 'Menú.');
+      ok(S.dinero === 100, 'te cobran en tu propio local');
+      S.interior = null;
+      bien.push(A.PROPIEDADES.length + ' propiedades, con nivel, precio y renta');
+    }
+
+    // ── 2 septies · el alquiler y la casera ────────────────────────
+    {
+      // De cero: al día, con recibo cada siete días.
+      S.props = {}; S.alquiler = 220; S.deuda = 0; S.ultCobro = 1; S.dia = 1;
+      S.casera = { paciencia: 3, avisada: 0, desahucio: false, okupa: false };
+      ok(A.estadoCasera() === 'aldia', 'no empieza al día');
+
+      S.dia = 8; A.correrAlquiler();
+      ok(S.deuda === 220, 'el recibo semanal no cae: deuda ' + S.deuda);
+      ok(A.estadoCasera() === 'debiendo', 'debiendo 220 € dice ' + A.estadoCasera());
+
+      // Dos recibos sin pagar: aviso. Tres: cerradura nueva.
+      S.dia = 15; A.correrAlquiler();
+      ok(A.estadoCasera() === 'avisado', 'dos meses sin pagar no avisan');
+      S.dia = 22; A.correrAlquiler();
+      ok(S.casera.desahucio && A.estadoCasera() === 'desahuciado', 'tres meses no desahucian');
+
+      // Volver cuesta la deuda más la cerradura.
+      ok(A.deudaTotal() > S.deuda, 'recuperar la llave no cuesta más que la deuda');
+      // Y forzar la puerta es un delito que deja okupa.
+      A.ocupar();
+      ok(S.casera.okupa && A.estadoCasera() === 'okupa', 'forzar la puerta no deja okupa');
+
+      // Pagando todo se recupera la llave y se sale del okupa.
+      S.dinero = A.deudaTotal() + 10;
+      A.pagarCasera();
+      ok(S.deuda === 0 && !S.casera.desahucio && !S.casera.okupa,
+         'pagar no devuelve la llave: ' + A.estadoCasera());
+
+      // Dejar el piso corta el recibo.
+      A.dejarPiso();
+      S.dia += 30; const antes = S.deuda;
+      A.correrAlquiler();
+      ok(S.deuda === antes, 'sigue corriendo el alquiler de un piso dejado');
+
+      // Y comprarlo también.
+      S.props = {}; S.alquiler = 220; S.deuda = 660; S.nivel = 20; S.dinero = 99999;
+      S.casera = { paciencia: 3, avisada: 0, desahucio: false, okupa: false };
+      A.comprarProp('pisosantutxu');
+      ok(A.esMio('pisosantutxu') && S.deuda === 0 && S.alquiler === 0,
+         'comprar el piso no quita el alquiler');
+
+      S.props = {}; S.alquiler = 220; S.deuda = 0; S.ultCobro = S.dia; S.dinero = 60;
+      S.casera = { paciencia: 3, avisada: 0, desahucio: false, okupa: false };
+      bien.push('alquiler: recibo, aviso, desahucio, okupa y vuelta pagando');
+    }
+
+    // ── 2 octies · el móvil pinta las cuatro pestañas ──────────────
+    {
+      for (const t of ['hist', 'trab', 'bien', 'rep']) {
+        A.verTab(t);
+        ok(A.telC.children.length > 0, 'la pestaña ' + t + ' del móvil sale vacía');
+      }
+      A.verTab('hist');
+      bien.push('las 4 pestañas del móvil pintan');
+    }
+
     // ── 3 · los sitios están sobre suelo pisable ───────────────────────
     let accesibles = 0;
     A.POI.forEach(p => {

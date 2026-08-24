@@ -4,10 +4,18 @@ const RUTA=process.env.BILBO_HTML||path.join(__dirname,'..','..','referencia','b
 const html=fs.readFileSync(RUTA,'utf8');
 let js=html.match(/<script>([\s\S]*)<\/script>/)[1];
 const H={};const cache={};
-function el(id){const o={id,style:{},dataset:{},className:'',textContent:'',value:'',children:[],
+/* appendChild era un hueco vacío, así que ningún panel del juego contaba nunca sus filas
+   y una pestaña que no pintara nada habría pasado por buena. Ahora los hijos se guardan
+   de verdad, e `innerHTML=''` los tira, que es como los vacía el juego. */
+function el(id){const o={id,style:{},dataset:{},className:'',textContent:'',value:'',
  classList:{add(){},remove(){},toggle(){}},addEventListener(n,f){if(id)H[id+':'+n]=f;},
- appendChild(){},querySelector:()=>el(),querySelectorAll:()=>[],clientWidth:840,clientHeight:400,
- getContext:()=>createCanvas(1,1).getContext('2d'),width:0,height:0,toDataURL:()=>'d',select(){}};return o;}
+ appendChild(h){o.children.push(h);},querySelector:()=>el(),querySelectorAll:()=>[],
+ clientWidth:840,clientHeight:400,
+ getContext:()=>createCanvas(1,1).getContext('2d'),width:0,height:0,toDataURL:()=>'d',select(){}};
+ let hijos=[],html='';
+ Object.defineProperty(o,'children',{get:()=>hijos});
+ Object.defineProperty(o,'innerHTML',{get:()=>html,set(v){html=v;if(v==='')hijos=[];}});
+ return o;}
 global.document={createElement:t=>{if(t==='canvas'){const c=createCanvas(1,1);c.style={};c.className='';
  c.classList={add(){},remove(){},toggle(){}};c.addEventListener=()=>{};c.appendChild=()=>{};
  c.querySelector=()=>el();c.querySelectorAll=()=>[];return c;}return el();},
@@ -35,7 +43,10 @@ js=js.slice(0,i)+`global.__={S,player,MISIONES,empezarMision,avanzarPaso,objetiv
  INT,TILE_INT,solidoInt,PARADAS,PRENDAS,REDES,vestir,tiendaRopa,abrirRed,viajarA,nodos,estacion,
  paradaCerca,minutosViaje,comer,repostar,ACERA,PLAZA,salir,
  teVe,testigos,delito,ruido,ojos,alcanceVista,esDeNoche,porDetras,desprevenido,CONO,
- AGACHA,CORRE,lineaVista,dirAng,estrellas,atacarJugador,dir8De,generarEnemigos,danar};
+ AGACHA,CORRE,lineaVista,dirAng,estrellas,atacarJugador,dir8De,generarEnemigos,danar,
+ XP_NIVEL,darXp,PROPIEDADES,propDe,esMio,pegaPara,comprarProp,rentaDiaria,cobrarRentas,
+ estadoCasera,deudaTotal,correrAlquiler,pagarCasera,dejarPiso,ocupar,dormir,
+ NIVEL_ARMA,NIVEL_VEHICULO,comer,verTab,telC};
  sembrar(SEMILLA);`+js.slice(i);
 eval(js);
 module.exports={H,step:n=>{for(let k=0;k<n;k++){now+=16.7;const f=raf;raf=null;if(!f)throw new Error('sin frame');f(now);}},

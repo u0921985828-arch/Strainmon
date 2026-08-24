@@ -169,7 +169,7 @@ img.pix{image-rendering:pixelated;display:block;}
 </div>
 <div id="gira"><div class="g">📱</div><div class="t">Gira el móvil<br>Bilbo City se juega apaisado</div></div>
 <div class="pant" id="tel"><h2>Móvil</h2><div class="sub">Bilbo City</div>
-  <div class="tabs"><div class="tab on" data-t="hist">Historia</div><div class="tab" data-t="trab">Curros</div><div class="tab" data-t="rep">Fama</div></div>
+  <div class="tabs"><div class="tab on" data-t="hist">Historia</div><div class="tab" data-t="trab">Curros</div><div class="tab" data-t="bien">Bienes</div><div class="tab" data-t="rep">Fama</div></div>
   <div id="telCuerpo"></div><div class="cerrar" id="telCerrar">Cerrar</div></div>
 <div class="pant" id="pausa"><h2>Pausa</h2><div class="sub" id="pausaSub"></div>
   <div class="tabs"><div class="tab on" data-p="mapa">Mapa</div><div class="tab" data-p="est">Datos</div><div class="tab" data-p="op">Opciones</div></div>
@@ -2273,6 +2273,10 @@ const ARMAS=[
   l:11,col:C.maderaO,mango:C.carbon,grosor:2,fog:'escopeta'},
 ];
 const arma=id=>ARMAS.find(a=>a.id===id);
+/* Lo gordo se desbloquea con el nivel, no solo con el dinero: un recado bien hecho vale
+   más que un golpe de suerte. */
+const NIVEL_ARMA={uzi:4,escopeta:6};
+const NIVEL_VEHICULO={furgo:2,deportivo:5};
 const ARMA_MANO={};
 ARMAS.forEach(a=>{if(!a.l)return;
  ARMA_MANO[a.id]=[];
@@ -2963,6 +2967,11 @@ function colocarPOIs(){
   {id:'trolabeaga',n:'Apeadero de Olabeaga',c:'#8fa66b',red:'tren',cerca:[392,412]},
   {id:'trametzola',n:'Apeadero de Ametzola',c:'#8fa66b',red:'tren',cerca:[640,470]},
   {id:'trbasurto',n:'Apeadero de Basurto',c:'#8fa66b',red:'tren',cerca:[482,438]},
+  /* Las viviendas que se venden. Hasta que no son tuyas no se entra: en la puerta hay
+     un cartel y punto. */
+  {id:'pisodeustu',n:'Piso en Deustu',c:C.mostazaO,int:'piso',vende:'pisodeustu',cerca:[628,190]},
+  {id:'loftabando',n:'Loft en Abandoibarra',c:C.mostazaO,int:'piso',vende:'loftabando',cerca:[660,215]},
+  {id:'caserio',n:'Caserío en Artxanda',c:C.mostazaO,int:'piso',vende:'caserio',cerca:[830,118]},
  ].forEach(d=>POI.push({...d,
    p:d.mira?puntoZona(d.cerca[0],d.cerca[1],40):puntoPortal(d.cerca[0],d.cerca[1],40)}));
 }
@@ -2979,6 +2988,8 @@ const S={
  job:null,contrato:null,mision:null,misionIdx:0,
  cooldown:0,detT:0,muerto:0,escena:'ciudad',interior:null,volver:null,
  sospecha:0,visto:false,
+ xp:0,nivel:1,props:{},
+ casera:{paciencia:3,avisada:0,desahucio:false,okupa:false},
 };
 const player={x:0,y:0,d8:0,pose:'quieto',anim:0,enCoche:null,cad:0,herido:0,arq:'protagonista',
  sigilo:false,corriendo:false};
@@ -3214,8 +3225,13 @@ function cerrarDlg(){dlg=null;dlgEl.style.display='none';}
 /*═══════════════ MENÚS ═══════════════*/
 const telEl=document.getElementById('tel'),telC=document.getElementById('telCuerpo');
 let telTab='hist';
-document.querySelectorAll('#tel .tab').forEach(t=>t.addEventListener('click',()=>{
- telTab=t.dataset.t;document.querySelectorAll('#tel .tab').forEach(x=>x.classList.toggle('on',x===t));pintarTel();}));
+/* Cambiar de pestaña es una función y no el cuerpo del manejador para que la batería
+   pueda pintar cada una sin tocar el DOM: una pestaña que revienta al pintarse deja el
+   móvil en blanco y no se ve hasta abrirlo. */
+function verTab(t){telTab=t;
+ document.querySelectorAll('#tel .tab').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
+ pintarTel();}
+document.querySelectorAll('#tel .tab').forEach(t=>t.addEventListener('click',()=>verTab(t.dataset.t)));
 document.getElementById('telCerrar').addEventListener('click',()=>telEl.style.display='none');
 function abrirTel(){if(telEl.style.display==='flex'){telEl.style.display='none';return;}pintarTel();telEl.style.display='flex';}
 const NOMREP={hosteleria:'Hostelería',obra:'Obra y puerto',transporte:'Transporte',calle:'Calle'};
@@ -3247,6 +3263,38 @@ function pintarTel(){
   p.innerHTML=`<div class="ico">${icoImg('libro')}</div><div class="txt"><div class="tt">Progreso</div>
    <div class="dd">${S.misionIdx} de ${MISIONES.length} misiones</div></div>`;
   telC.appendChild(p);
+ }else if(telTab==='bien'){
+  /* Nivel arriba del todo: es lo que decide qué puedes comprar, así que va donde se
+     mira primero. */
+  const nv=document.createElement('div');nv.className='rep';
+  nv.innerHTML=`<div class="n"><span>Nivel ${S.nivel}</span><span>${S.xp} / ${XP_NIVEL(S.nivel)} XP</span></div>
+   <div class="b"><i style="width:${clamp(S.xp/XP_NIVEL(S.nivel),0,1)*100}%"></i></div>`;
+  telC.appendChild(nv);
+  const r=rentaDiaria();
+  if(r>0){const d=document.createElement('div');d.className='item legal';
+   d.innerHTML=`<div class="ico">${icoImg('euro')}</div><div class="txt"><div class="tt">Rentas</div>
+    <div class="dd">Se cobran al dormir</div></div><div class="pago">+${r} €/día</div>`;
+   telC.appendChild(d);}
+  /* La situación con la casera, si todavía hay casera. */
+  if(S.alquiler>0&&!esMio('pisosantutxu')){
+   const est=estadoCasera(),t=deudaTotal();
+   const txt={aldia:'Al día con Amaia',debiendo:'Debes '+S.deuda+' €',
+    avisado:'Aviso de desahucio',desahuciado:'Desahuciado. Cerradura cambiada',
+    okupa:'Vives ahí de okupa'}[est];
+   const d=document.createElement('div');d.className='item '+(est==='aldia'?'legal':'turbio');
+   d.innerHTML=`<div class="ico">${icoImg('llave')}</div><div class="txt"><div class="tt">Piso de Santutxu</div>
+    <div class="dd">${txt}</div></div><div class="pago">${t>0?t+' €':S.alquiler+' €/sem'}</div>`;
+   telC.appendChild(d);}
+  PROPIEDADES.forEach(q=>{
+   const mio=esMio(q.id),pega=pegaPara(q);
+   const d=document.createElement('div');
+   d.className='item '+(mio?'legal':pega?'no':'turbio');
+   const dd=mio?(q.renta?'Tuyo · +'+q.renta+' €/día':'Tuyo')
+    :pega?pega:q.tipo==='vivienda'?'En venta. Ve a la puerta':'En venta. Habla con el dueño';
+   d.innerHTML=`<div class="ico">${icoImg(q.tipo==='vivienda'?'llave':'euro')}</div>
+    <div class="txt"><div class="tt">${q.n}</div><div class="dd">${dd}</div></div>
+    <div class="pago">${mio?'✔':q.precio+' €'}</div>`;
+   telC.appendChild(d);});
  }else if(telTab==='trab'){
   if(S.mision){const d=document.createElement('div');d.className='item no';
    d.innerHTML=`<div class="ico">${icoImg('prohibido')}</div><div class="txt">
@@ -3367,9 +3415,158 @@ function cobrar(j){
  S.dinero+=j.pago;S.rep[j.g]++;sfx('dinero');let e='';
  if(S.contrato&&S.contrato.g===j.g){S.contrato.hechos++;
   if(S.contrato.hechos>=S.contrato.meta){S.dinero+=S.contrato.bonus;e=' +'+S.contrato.bonus+' CONTRATO';S.contrato=null;}}
+ darXp(Math.max(6,Math.round(j.pago*.5)));
  aviso('+'+j.pago+' €'+e);S.job=null;guardar();}
 function firmar(g,meta,bonus){if(S.contrato)return aviso('Ya tienes contrato');
  S.contrato={g,meta,hechos:0,bonus};aviso('Contrato firmado');guardar();}
+
+/*═══════════════ NIVEL, VIVIENDAS Y NEGOCIOS ═══════════════*/
+/* La fama por gremio ya existía y desbloquea curros, pero es local: ser bueno repartiendo
+   pintxos no dice nada de lo que has hecho en la calle. El nivel es el resumen de todo, y
+   es lo que abre las armas grandes, los coches y —sobre todo— lo que te dejan comprar.
+
+   La curva sube deprisa a propósito: el primer piso tiene que costar varios días de curro
+   y la galería, media partida. Si el dinero llega antes que el nivel, comprar deja de ser
+   una meta y pasa a ser un trámite. */
+const XP_NIVEL=n=>Math.round(140*Math.pow(n,1.5));
+function darXp(n,motivo){
+ S.xp+=n;
+ while(S.xp>=XP_NIVEL(S.nivel)){S.xp-=XP_NIVEL(S.nivel);S.nivel++;
+  grande('NIVEL '+S.nivel,2.4);sfx('dinero');}
+ if(motivo)aviso('+'+n+' XP · '+motivo);}
+
+/* Las viviendas se compran en su puerta y los negocios a su dueño, dentro. No hay
+   inmobiliaria ni menú de compra: si quieres el taller, vas al taller y se lo dices a
+   Iker. Es lo que hace que el mapa sirva para algo más que ir a la misión. */
+const PROPIEDADES=[
+ {id:'pisosantutxu',n:'Tu piso de Santutxu',tipo:'vivienda',precio: 9000,nivel:2,poi:'piso',
+  dd:'El que le alquilas a Amaia. Comprarlo te quita la deuda de encima.'},
+ {id:'pisodeustu', n:'Piso en Deustu',      tipo:'vivienda',precio:16000,nivel:4,poi:'pisodeustu',
+  dd:'Dos habitaciones y el metro debajo.'},
+ {id:'loftabando', n:'Loft en Abandoibarra',tipo:'vivienda',precio:38000,nivel:7,poi:'loftabando',
+  dd:'Suelo de hormigón y vistas a la ría. Caro por las vistas.'},
+ {id:'caserio',    n:'Caserío en Artxanda', tipo:'vivienda',precio:62000,nivel:9,poi:'caserio',
+  dd:'Arriba del todo. Nadie sube aquí sin querer subir.'},
+ {id:'tascapozas', n:'Tasca Ondarra',       tipo:'negocio', precio:13000,nivel:3,renta: 95,
+  dd:'Cuatro mesas y una barra. Se llena a la salida del turno.',perk:'comer'},
+ {id:'ropagranvia',n:'Trapos Gran Vía',     tipo:'negocio', precio:22000,nivel:5,renta:150,
+  dd:'Escaparate a la Gran Vía. El alquiler se lo come casi todo.',perk:'ropa'},
+ {id:'gasodeustu', n:'Gasolinera Deustu',   tipo:'negocio', precio:31000,nivel:6,renta:215,
+  dd:'Tres surtidores y la tienda. No cierra nunca.',perk:'taller'},
+ {id:'taller',     n:'Taller Iker',         tipo:'negocio', precio:47000,nivel:8,renta:310,
+  dd:'Foso, chapa y pintura. Y lo que no se pregunta.',perk:'repintar'},
+ {id:'galeria',    n:'Galería Abandoibarra',tipo:'negocio', precio:95000,nivel:11,renta:640,
+  dd:'Veinte locales alquilados. Esto ya no es un negocio, es una renta.'},
+];
+const propDe=id=>PROPIEDADES.find(p=>p.id===id);
+const esMio=id=>!!S.props[id];
+const perkMio=perk=>PROPIEDADES.some(p=>p.perk===perk&&esMio(p.id));
+const rentaDiaria=()=>PROPIEDADES.reduce((t,p)=>t+(esMio(p.id)?(p.renta||0):0),0);
+/* Falta nivel, falta dinero, o nada: el mismo texto sirve para el móvil y para el
+   diálogo, y así no se explican de dos maneras distintas. */
+function pegaPara(p){
+ if(esMio(p.id))return null;
+ if(S.nivel<p.nivel)return 'Necesitas nivel '+p.nivel;
+ if(S.dinero<p.precio)return 'Te faltan '+(p.precio-Math.round(S.dinero))+' €';
+ return '';}
+function comprarProp(id){
+ const p=propDe(id);if(!p)return;
+ const pega=pegaPara(p);
+ if(pega===null)return aviso('Ya es tuyo');
+ if(pega)return aviso(pega);
+ S.dinero-=p.precio;S.props[id]=true;sfx('dinero');
+ /* Comprar el piso de Santutxu es dejar de ser inquilino: se salda lo que se deba y no
+    vuelve a correr el alquiler. */
+ if(id==='pisosantutxu'){S.deuda=0;S.alquiler=0;}
+ darXp(Math.round(p.precio/220));
+ grande(p.tipo==='vivienda'?'CASA NUEVA':'NEGOCIO COMPRADO',2.6);
+ aviso(p.n+' · −'+p.precio+' €',3);guardar();}
+/* Lo que renta un negocio se cobra al dormir, como el alquiler pero al revés. */
+function cobrarRentas(){
+ const r=rentaDiaria();
+ if(r>0){S.dinero+=r;aviso('Cuentas del día: +'+r+' €',3);}
+ return r;}
+/* Una opción de compra para el diálogo del dueño. Si ya es tuyo, la casa invita. */
+function opcionComprar(id,textoDentro){
+ const p=propDe(id);
+ if(esMio(p.id))return {txt:textoDentro||'Ver las cuentas',
+  fn:()=>aviso(p.n+' es tuyo · +'+p.renta+' €/día')};
+ const pega=pegaPara(p);
+ return {txt:'¿Y si te lo compro?',coste:p.precio+' €',
+  fn:()=>pega?aviso(pega):hablar('Trato',[p.dd,'Son '+p.precio+' €. ¿Cerramos?'],
+   [{txt:'Trato hecho',fn:()=>comprarProp(id)},{txt:'Me lo pienso',fn:()=>{}}])};}
+
+/*═══════════════ EL ALQUILER Y LA CASERA ═══════════════*/
+/* El alquiler era un número que subía y una frase al dormir. Ahora hay alguien al otro
+   lado: Amaia lleva la cuenta, avisa, y si no pagas te cambia la cerradura. Se puede
+   seguir durmiendo allí a la fuerza, pero eso ya es otra cosa —y se paga de otra manera.
+
+   Estados, en orden: al día → debiendo → avisado → desahuciado → okupa. No hay más, y
+   ninguno es un callejón sin salida: pagando se vuelve, aunque el precio de volver sube. */
+const SEMANA=7;
+const semanasDebe=()=>S.alquiler>0?Math.floor(S.deuda/S.alquiler):0;
+function estadoCasera(){
+ if(S.casera.okupa)return 'okupa';
+ if(S.casera.desahucio)return 'desahuciado';
+ if(S.casera.avisada)return 'avisado';
+ return S.deuda>0?'debiendo':'aldia';}
+/* Lo que hay que soltar para volver a tener llave. La mudanza y la cerradura las paga
+   quien las provoca. */
+const deudaTotal=()=>S.deuda+(S.casera.desahucio?Math.round(S.alquiler*1.5):0);
+
+/* Se llama al dormir, una vez por día. El recibo cae cada siete. */
+function correrAlquiler(){
+ if(S.alquiler<=0)return;                       /* piso comprado o dejado: no hay recibo */
+ while(S.dia-S.ultCobro>=SEMANA){
+  S.ultCobro+=SEMANA;S.deuda+=S.alquiler;
+  aviso('Recibo del alquiler: +'+S.alquiler+' € de deuda',3);}
+ const sem=semanasDebe();
+ if(sem>=2&&!S.casera.avisada&&!S.casera.desahucio){
+  S.casera.avisada=1;S.casera.paciencia=Math.max(0,S.casera.paciencia-1);
+  grande('AVISO DE AMAIA',2.4);
+  aviso('«Dos meses. El que viene te cambio la cerradura»',4);}
+ if(sem>=3&&!S.casera.desahucio){
+  S.casera.desahucio=true;
+  grande('TE HAN DESAHUCIADO',2.8);
+  aviso('Amaia ha cambiado la cerradura de tu piso',4);}}
+
+/* Dormir de okupa es dormir mal, y a veces con visita. */
+function dormirOkupa(){
+ S.hp=Math.min(100,S.hp+18);S.energia=.55;
+ if(azar()<.3){delito(1,false);estrellas(1);
+  aviso('Alguien ha llamado a la pasma',3);}
+ else aviso('Has dormido en el suelo. Día '+S.dia,3);}
+
+function pagarCasera(){
+ const t=deudaTotal();
+ if(t<=0){
+  /* Pagar por adelantado no es tirar el dinero: la casera se ablanda, y con ella al día
+     es cuando se puede hablar de comprarle el piso. */
+  if(S.dinero<S.alquiler)return aviso('No te llega ni para adelantar un mes');
+  S.dinero-=S.alquiler;S.ultCobro+=SEMANA;
+  S.casera.paciencia=Math.min(5,S.casera.paciencia+1);
+  sfx('dinero');aviso('Un mes por adelantado. −'+S.alquiler+' €');guardar();return;}
+ if(S.dinero<t)return aviso('Son '+t+' € y no los tienes');
+ S.dinero-=t;S.deuda=0;
+ const volvia=S.casera.desahucio;
+ S.casera.desahucio=false;S.casera.okupa=false;S.casera.avisada=0;
+ sfx('dinero');
+ aviso(volvia?'Llave nueva. −'+t+' €':'Alquiler al día. −'+t+' €',3);
+ guardar();}
+
+/* Dejar el piso: se acaba el recibo y se acaba la cama. Es la salida limpia para quien
+   ya se ha comprado otra cosa. */
+function dejarPiso(){
+ if(S.deuda>0)return aviso('Primero paga lo que debes');
+ S.alquiler=0;S.casera.desahucio=true;S.casera.okupa=false;
+ aviso('Le has dejado las llaves a Amaia',3);guardar();}
+
+/* Forzar la puerta de tu antiguo piso. Es un delito y se oye. */
+function ocupar(){
+ ruido(player.x,player.y,8);
+ S.casera.okupa=true;
+ delito(1,true);
+ aviso('Has forzado la puerta. Ahora eres el okupa',3);guardar();}
 
 /*═══════════════ MISIONES ═══════════════*/
 const MISIONES=[
@@ -3447,7 +3644,7 @@ function generarEnemigos(p){
  if(p.estrellas)estrellas(p.estrellas);}
 function terminarMision(ok){
  const m=S.mision;if(!m)return;
- if(ok){S.dinero+=m.def.pago;S.rep.calle+=2;S.misionIdx++;
+ if(ok){S.dinero+=m.def.pago;S.rep.calle+=2;S.misionIdx++;darXp(Math.round(m.def.pago*1.4));
   grande('MISIÓN CUMPLIDA',2.6);sfx('dinero');
   hablar(m.def.giver,m.def.fin.concat(['+'+m.def.pago+' €']));}
  else grande('MISIÓN FALLIDA',2.4);
@@ -3459,8 +3656,8 @@ function tileInt(x,y){const m=S.interior.mapa,fy=Math.floor(y),fx=Math.floor(x);
  if(fy<0||fy>=m.length||fx<0||fx>=m[fy].length)return '#';return m[fy][fx];}
 /* El nombre viene de fuera a propósito: dos tascas iguales por dentro se llaman
    distinto en la puerta, que es lo que pasa en cualquier barrio. */
-function entrar(id,desde,nombre){fundir(()=>{
- S.interior={...INT[id],id};if(nombre)S.interior.n=nombre;
+function entrar(id,desde,nombre,poiId){fundir(()=>{
+ S.interior={...INT[id],id,poi:poiId||null};if(nombre)S.interior.n=nombre;
  const m=S.interior.mapa;let px=2,py=2;
  for(let y=0;y<m.length;y++)for(let x=0;x<m[y].length;x++)if(m[y][x]==='D'){px=x+.5;py=y-.7;}
  S.escena='interior';player.enCoche=null;player.x=px;player.y=py;player.d8=4;S.volver=desde;});}
@@ -3483,7 +3680,19 @@ function accion(){
   player.enCoche=null;motorAudio(null,1);return;}
  const p=poiCerca();
  if(p){if(p.red)return estacion(p);
-  if(p.int)return entrar(p.int,{x:p.p.x,y:p.p.y},p.n);
+  /* Tu piso, cuando ya no es tuyo. */
+  if(p.id==='piso'&&S.casera.desahucio&&!esMio('pisosantutxu')){
+   if(S.casera.okupa)return entrar('piso',{x:p.p.x,y:p.p.y},'Tu piso · de okupa',p.id);
+   return hablar('Cerradura nueva',['La llave no entra. Amaia la ha cambiado.'],
+    [{txt:'Forzar la puerta',fn:()=>{ocupar();entrar('piso',{x:p.p.x,y:p.p.y},'Tu piso · de okupa',p.id);}},
+     {txt:'Dejarlo estar',fn:()=>{}}]);}
+  /* En la puerta de una casa en venta: o la compras o te quedas mirando el cartel. */
+  if(p.vende&&!esMio(p.vende)){
+   const q=propDe(p.vende),pega=pegaPara(q);
+   return hablar('SE VENDE',[q.dd,pega||('Piden '+q.precio+' €.')],
+    pega?null:[{txt:'Comprarla',coste:q.precio+' €',fn:()=>comprarProp(q.id)},
+               {txt:'Otro día',fn:()=>{}}]);}
+  if(p.int)return entrar(p.int,{x:p.p.x,y:p.p.y},p.n,p.id);
   if(p.id==='poli')return aviso('Comisaría. Mejor no entres');
   if(p.mira)return aviso(p.n.toUpperCase());
   return aviso('Acepta un curro aquí desde el móvil');}
@@ -3504,10 +3713,14 @@ function curar(){
  if(S.dinero<c)return aviso('Te cobran '+c+' € y no los tienes');
  S.dinero-=c;S.hp=100;sfx('dinero');aviso('Curado. −'+c+' €');}
 function dormir(){
+ const okupa=S.casera.okupa&&S.interior&&S.interior.id==='piso'&&!esMio('pisosantutxu');
  S.dia++;S.min=8*60;S.energia=1;S.hp=Math.min(100,S.hp+45);S.estrellas=0;policia.length=0;
- if(S.dia-S.ultCobro>=7){S.deuda+=S.alquiler;S.ultCobro=S.dia;aviso('Alquiler: +'+S.alquiler+' € de deuda',3);}
- else aviso('Has dormido. Día '+S.dia);
- if(S.deuda>=S.alquiler*2){S.energia=.55;aviso('Debes '+S.deuda+' €. Duermes fatal',3);}
+ const renta=cobrarRentas();
+ correrAlquiler();
+ if(okupa)dormirOkupa();
+ else if(!renta&&!S.deuda)aviso('Has dormido. Día '+S.dia);
+ if(S.deuda>=S.alquiler*2&&S.alquiler>0){S.energia=Math.min(S.energia,.55);
+  aviso('Debes '+S.deuda+' €. Duermes fatal',3);}
  guardar();}
 const tieneArmaFuego=()=>ARMAS.some(a=>!a.cuerpo&&S.armas[a.id]>0);
 function hablarCon(n){
@@ -3519,11 +3732,12 @@ function hablarCon(n){
   if(m.giver!=='Txema')return hablar('Txema',['Ahora mismo quien tiene curro es '+m.giver+'.']);
   if(m.requiereArma&&!tieneArmaFuego())return hablar('Txema',['Sin un hierro no te mando ahí. Pásate por el Bazar.']);
   return hablar('Txema',m.intro,[{txt:'Acepto',fn:()=>empezarMision(m)},{txt:'Ahora no',fn:()=>{}}]);}
- if(n.tipo==='barman')return hablar('Josu',['Aupa. ¿Qué te pongo?'],[
+ if(n.tipo==='barman')return hablar(n.n,['Aupa. ¿Qué te pongo?'],[
   {txt:'Zurito y pintxo',coste:'5 €',fn:()=>{if(S.dinero<5)return aviso('No te llega');
    S.dinero-=5;S.hambre=Math.min(1,S.hambre+.5);S.energia=Math.min(1,S.energia+.2);S.hp=Math.min(100,S.hp+8);aviso('−5 €');}},
   {txt:'Menú del día',coste:'12 €',fn:()=>{if(S.dinero<12)return aviso('No te llega');
    S.dinero-=12;S.hambre=1;S.energia=Math.min(1,S.energia+.45);S.hp=Math.min(100,S.hp+22);aviso('−12 €');}},
+  ...(S.interior.poi==='tascapozas'?[opcionComprar('tascapozas','Ver las cuentas')]:[]),
   {txt:'Firmar contrato de hostelería',fn:()=>firmar('hosteleria',3,140)}]);
  if(n.tipo==='parroquiano'){const p=['El puente viejo se cierra cuando la pasma se pone seria.',
   'En el hospital te cosen por dinero y sin preguntas.','Koldo vende cosas que no salen en el escaparate.',
@@ -3532,20 +3746,27 @@ function hablarCon(n){
  if(n.tipo==='mecanico'){
   const m=MISIONES[S.misionIdx];
   const ops=[{txt:'Ver vehículos',fn:()=>abrirTienda('Taller Iker','Vehículos',[
-   {ico:'furgo',tt:'Furgoneta',dd:'Abre mudanzas y entregas grandes.',precio:700,ya:()=>S.tiene.furgo,
+   {ico:'furgo',tt:'Furgoneta',dd:S.nivel<NIVEL_VEHICULO.furgo?'Necesitas nivel '+NIVEL_VEHICULO.furgo:'Abre mudanzas y entregas grandes.',
+    precio:700,ya:()=>S.tiene.furgo||S.nivel<NIVEL_VEHICULO.furgo,
     fn:()=>{S.tiene.furgo=true;tuCoche.tipo='furgoLarga';tuCoche.vmax=9.5;aviso('Furgoneta comprada');}},
-   {ico:'deportivo',tt:'Deportivo',dd:'Más velocidad y mejor agarre.',precio:1600,ya:()=>S.tiene.deportivo,
+   {ico:'deportivo',tt:'Deportivo',dd:S.nivel<NIVEL_VEHICULO.deportivo?'Necesitas nivel '+NIVEL_VEHICULO.deportivo:'Más velocidad y mejor agarre.',
+    precio:1600,ya:()=>S.tiene.deportivo||S.nivel<NIVEL_VEHICULO.deportivo,
     fn:()=>{S.tiene.deportivo=true;tuCoche.tipo='deportivo';tuCoche.lib=2;tuCoche.vmax=15.5;aviso('Deportivo comprado');}}])},
-   {txt:'Repintar el coche',coste:'100 €',fn:()=>{if(S.dinero<100)return aviso('No te llega');
+   {txt:'Repintar el coche',coste:(esMio('taller')?0:100)+' €',fn:()=>{
+    const c=esMio('taller')?0:100;
+    if(S.dinero<c)return aviso('No te llega');
     if(!S.estrellas)return aviso('No te busca nadie');
-    S.dinero-=100;S.estrellas=Math.max(0,S.estrellas-1);if(!S.estrellas)policia.length=0;aviso('Una estrella menos');}},
+    S.dinero-=c;S.estrellas=Math.max(0,S.estrellas-1);if(!S.estrellas)policia.length=0;aviso('Una estrella menos');}},
+   opcionComprar('taller','Ver las cuentas'),
    {txt:'Firmar contrato de transporte',fn:()=>firmar('transporte',3,170)}];
   if(m&&m.giver==='Iker'&&!S.mision){
    if(m.requiereFurgo&&!S.tiene.furgo)return hablar('Iker',['Tengo curro pero necesitas furgoneta.'],ops);
    return hablar('Iker',m.intro,[{txt:'Acepto',fn:()=>empezarMision(m)},...ops]);}
   return hablar('Iker',['Aupa. ¿Vienes a mirar o a comprar?'],ops);}
- if(n.tipo==='ropa')return hablar('Nerea',['Pasa, pasa. ¿Te vistes o miras?'],[
+ if(n.tipo==='ropa')return hablar('Nerea',[esMio('ropagranvia')&&S.interior.poi==='ropagranvia'
+   ?'Buenos días, jefe. Todo en orden.':'Pasa, pasa. ¿Te vistes o miras?'],[
   {txt:'Ver la ropa',fn:()=>tiendaRopa(S.interior.n)},
+  ...(S.interior.poi==='ropagranvia'?[opcionComprar('ropagranvia','Ver las cuentas')]:[]),
   {txt:'¿Qué se lleva?',fn:()=>aviso('«Aquí lo que se lleva es que no se te note de dónde vienes»')}]);
  if(n.tipo==='cocinero')return hablar('Patxi',['Hay menú y hay carta. Tú dirás.'],[
   {txt:'Menú del día',coste:'18 €',fn:()=>comer(18,1,.6,30,'Menú del día.')},
@@ -3556,6 +3777,7 @@ function hablarCon(n){
   {txt:'Repostar y revisar el coche',fn:()=>repostar()},
   {txt:'Café de máquina',coste:'2 €',fn:()=>comer(2,.05,.3,0,'Café de máquina.')},
   {txt:'Bocadillo de la vitrina',coste:'6 €',fn:()=>comer(6,.6,.1,6,'Bocadillo.')},
+  ...(S.interior.poi==='gasodeustu'?[opcionComprar('gasodeustu','Ver las cuentas')]:[]),
   {txt:'Firmar contrato de transporte',fn:()=>firmar('transporte',3,170)}]);
  if(n.tipo==='pescatera')return hablar('Bego',['Buenos días. Aquí se empieza pronto.'],[
   {txt:'Firmar contrato de hostelería',fn:()=>firmar('hosteleria',3,140)},
@@ -3565,16 +3787,35 @@ function hablarCon(n){
   {txt:'Que me curen',fn:()=>curar()},
   {txt:'Comprar chaleco',coste:'250 €',fn:()=>{if(S.dinero<250)return aviso('No te llega');
    S.dinero-=250;S.hp=Math.min(100,S.hp+60);aviso('Chaleco puesto');}}]);
- if(n.tipo==='casera')return hablar('Amaia',[S.deuda>0?`Me debes ${S.deuda} € de alquiler.`:'Estás al día. Así da gusto.'],[
-  ...(S.deuda>0?[{txt:'Pagar alquiler',coste:S.deuda+' €',fn:()=>{
-   if(S.dinero<S.deuda)return aviso('No tienes suficiente');
-   S.dinero-=S.deuda;S.deuda=0;sfx('dinero');aviso('Alquiler al día');guardar();}}]:[]),
-  {txt:'Preguntar por el barrio',fn:()=>aviso('«Aquí siempre ha llovido y siempre se ha currado»')}]);
+ if(n.tipo==='casera'){
+  if(esMio('pisosantutxu'))return hablar('Amaia',['Ahora el piso es tuyo. Yo solo bajo la basura.'],[
+   {txt:'Preguntar por el barrio',fn:()=>aviso('«Aquí siempre ha llovido y siempre se ha currado»')}]);
+  const est=estadoCasera(),t=deudaTotal();
+  const linea={
+   aldia:'Estás al día. Así da gusto.',
+   debiendo:`Me debes ${S.deuda} € de alquiler.`,
+   avisado:`Van dos meses, ${S.deuda} €. No me obligues.`,
+   desahuciado:`La cerradura ya está cambiada. Son ${t} € y hablamos.`,
+   okupa:`Sé que estás durmiendo ahí dentro. ${t} € o llamo a quien tenga que llamar.`,
+  }[est];
+  const ops=[{txt:t>0?(S.casera.desahucio?'Pagar todo y recuperar la llave':'Pagar el alquiler')
+              :'Adelantar un mes',coste:(t>0?t:S.alquiler)+' €',fn:()=>pagarCasera()}];
+  /* Solo se le compra el piso a quien está al día. Es lo que ata las dos cosas: la
+     compra deja de ser una lista de precios y pasa a depender de cómo te has portado. */
+  if(est==='aldia'&&S.casera.paciencia>=3)ops.push(opcionComprar('pisosantutxu'));
+  else if(!esMio('pisosantutxu'))ops.push({txt:'¿Me lo venderías?',
+   fn:()=>aviso('«¿Vendértelo? Págame lo que debes y hablamos»')});
+  if(S.alquiler>0&&S.deuda===0&&!S.casera.desahucio)
+   ops.push({txt:'Dejar el piso',fn:()=>hablar('Amaia',['¿Te vas? Pues las llaves.'],
+    [{txt:'Me voy',fn:()=>dejarPiso()},{txt:'Me quedo',fn:()=>{}}])});
+  ops.push({txt:'Preguntar por el barrio',fn:()=>aviso('«Aquí siempre ha llovido y siempre se ha currado»')});
+  return hablar('Amaia',[linea],ops);}
  if(n.tipo==='armero')return hablar('Koldo',['Aquí no se pregunta y no se fía.'],[
   {txt:'Ver género',fn:()=>abrirTienda('Bazar Nervión','Sin papeles',
    ARMAS.filter(a=>a.precio).map(a=>({ico:a.id,tt:a.n,
-    dd:a.cuerpo?'Cuerpo a cuerpo':`Daño ${a.dmg} · ${a.balas} balas`,precio:a.precio,
-    ya:()=>S.armas[a.id]!==undefined,
+    dd:S.nivel<(NIVEL_ARMA[a.id]||0)?'Necesitas nivel '+NIVEL_ARMA[a.id]
+      :a.cuerpo?'Cuerpo a cuerpo':`Daño ${a.dmg} · ${a.balas} balas`,precio:a.precio,
+    ya:()=>S.armas[a.id]!==undefined||S.nivel<(NIVEL_ARMA[a.id]||0),
     fn:()=>{S.armas[a.id]=a.inf?Infinity:a.balas;S.armaAct=a.id;aviso(a.n+' comprada');}}))
    .concat([{ico:'pistola',tt:'Silenciador',dd:'Para la pistola. El disparo deja de oírse en media calle.',
      precio:520,ya:()=>S.tiene.silenciador,
@@ -3619,14 +3860,19 @@ function vestir(cambio){
   aviso('Ropa nueva. Una estrella menos');}
  guardar();}
 function tiendaRopa(titulo){
- abrirTienda(titulo,'Ropa',PRENDAS.map(q=>({ico:q.ico,tt:q.tt,dd:q.dd,precio:q.precio,
+ const mio=enLoMio();
+ abrirTienda(titulo,mio?'Ropa · tuya':'Ropa',PRENDAS.map(q=>({ico:q.ico,tt:q.tt,dd:q.dd,precio:mio?0:q.precio,
   ya:()=>S.pinta[q.r]===q.v,fn:()=>{vestir({[q.r]:q.v});aviso(q.tt+' puesta');}})));}
 
+/* En un local tuyo no se paga: es la gracia de haberlo comprado, y se nota más que un
+   número en una pantalla de estadísticas. */
+const enLoMio=()=>S.interior&&esMio(S.interior.poi);
 function comer(coste,h,e,hp,txt){
+ if(enLoMio())coste=0;
  if(S.dinero<coste)return aviso('No te llega');
  S.dinero-=coste;S.hambre=Math.min(1,S.hambre+h);
  S.energia=Math.min(1,S.energia+e);S.hp=Math.min(100,S.hp+hp);
- sfx('dinero');aviso(txt+' −'+coste+' €');}
+ sfx('dinero');aviso(coste?txt+' −'+coste+' €':txt+' Invita la casa');}
 
 /* El coche que se repara es el que has dejado en la puerta, no el que llevas: al entrar
    te bajas. Se busca alrededor del sitio por el que entraste. */
@@ -3636,9 +3882,10 @@ function repostar(){
  for(const c of coches){if(!c.vivo)continue;const d=dist(c,donde);if(d<md){md=d;mej=c;}}
  if(!mej)return aviso('Acerca el coche a los surtidores');
  if(mej.dano<=.02)return aviso('El coche está entero');
- const cst=Math.max(15,Math.round(mej.dano*260));
+ const cst=enLoMio()?0:Math.max(15,Math.round(mej.dano*260));
  if(S.dinero<cst)return aviso('Te piden '+cst+' € y no los tienes');
- S.dinero-=cst;mej.dano=0;sfx('dinero');aviso('Repostado y arreglado. −'+cst+' €');}
+ S.dinero-=cst;mej.dano=0;sfx('dinero');
+ aviso(cst?'Repostado y arreglado. −'+cst+' €':'Repostado y arreglado. Es tuya');}
 
 /*═══════════════ TRANSPORTE PÚBLICO ═══════════════*/
 /* Tres redes con la misma mecánica y tres coberturas distintas, que es lo que las
@@ -3818,7 +4065,7 @@ function atacarJugador(mx,my){
      llegar al mismo tiroteo. */
   if(obj&&enemigos.includes(obj)&&desprevenido(obj)&&porDetras(obj)&&dist(obj,player)<1.4){
    sfx('golpe',.35);danar(obj,999);particula(obj.x,obj.y,'sangre',6);
-   ruido(obj.x,obj.y,2.5);aviso('Por la espalda');return;}
+   ruido(obj.x,obj.y,2.5);darXp(25);aviso('Por la espalda');return;}
   sfx('golpe',.7);
   if(obj&&dist(obj,player)<=a.alc+.4){danar(obj,a.dmg);particula(obj.x,obj.y,'sangre',4);}
  }else{S.armas[a.id]--;disparar(player,ang,a,'jugador');
@@ -4455,13 +4702,15 @@ function guardar(){
   dinero:S.dinero,hp:S.hp,energia:S.energia,hambre:S.hambre,min:S.min,dia:S.dia,rep:S.rep,
   deuda:S.deuda,alquiler:S.alquiler,ultCobro:S.ultCobro,tiene:S.tiene,contrato:S.contrato,
   armas:Object.fromEntries(Object.entries(S.armas).map(([k,v])=>[k,v===Infinity?-1:v])),
-  armaAct:S.armaAct,misionIdx:S.misionIdx,pinta:S.pinta,x:player.x,y:player.y}));}
+  armaAct:S.armaAct,misionIdx:S.misionIdx,pinta:S.pinta,
+  xp:S.xp,nivel:S.nivel,props:S.props,casera:S.casera,x:player.x,y:player.y}));}
 async function cargar(){
  const raw=await alm.get(CLAVE);if(!raw)return false;
  try{const d=JSON.parse(raw);
   Object.assign(S,{dinero:d.dinero,hp:d.hp??100,energia:d.energia,hambre:d.hambre,min:d.min,dia:d.dia,
    rep:d.rep||S.rep,deuda:d.deuda||0,alquiler:d.alquiler||220,ultCobro:d.ultCobro||1,
-   tiene:d.tiene||S.tiene,contrato:d.contrato||null,misionIdx:d.misionIdx||0,armaAct:d.armaAct||'punos'});
+   tiene:d.tiene||S.tiene,contrato:d.contrato||null,misionIdx:d.misionIdx||0,armaAct:d.armaAct||'punos',
+   xp:d.xp||0,nivel:d.nivel||1,props:d.props||{},casera:d.casera||S.casera});
   S.armas={};Object.entries(d.armas||{punos:-1}).forEach(([k,v])=>S.armas[k]=v===-1?Infinity:v);
   if(S.armas.punos===undefined)S.armas.punos=Infinity;
   if(d.pinta)vestir(d.pinta);

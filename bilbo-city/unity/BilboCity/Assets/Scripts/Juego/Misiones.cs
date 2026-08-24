@@ -197,6 +197,7 @@ public class Misiones : MonoBehaviour {
             Estado.I.Dinero += def.Pago;
             Estado.I.Rep["calle"] += 2;
             Estado.I.MisionIdx++;
+            Bienes.DarXp(Mathf.RoundToInt(def.Pago * 1.4f));
             Hud.I.Grande("MISIÓN CUMPLIDA", 2.6f);
             AudioProc.I.Sfx("dinero", 1f);
             var lineas = new List<string>(def.Fin) { "+" + def.Pago + " €" };
@@ -278,6 +279,7 @@ public class Curros : MonoBehaviour {
         string gremio = Activo.Gremio;
         E.Dinero += Pago;
         E.Rep[gremio]++;
+        Bienes.DarXp(Mathf.Max(6, Mathf.RoundToInt(Pago * 0.5f)));
         AudioProc.I.Sfx("dinero", 1f);
         int bonus = E.ApuntarCurro(gremio);
         if (bonus > 0) {

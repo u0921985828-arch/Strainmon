@@ -1,8 +1,9 @@
 # Bilbo City
 
-Juego sandbox 2D cenital tipo GTA Chinatown Wars, ambientado en **Bilbao**, para móvil.
-Además del crimen se pueden hacer curros honrados. Todo el arte y el audio se generan por
-código: **no hay ni una imagen ni un archivo de sonido en el repositorio**.
+Juego sandbox 2D cenital ambientado en **Bilbao**, para móvil: ciudad abierta, historia
+que no obliga, nivel de personaje y propiedades que se compran. Además del crimen se
+pueden hacer curros honrados. Todo el arte y el audio se generan por código: **no hay ni
+una imagen ni un archivo de sonido en el repositorio**.
 
 ## Las dos implementaciones
 
@@ -199,6 +200,36 @@ que pasa de verdad.
 Las paradas de bus **no son POIs** y no llevan coordenada escrita: se sacan del rótulo de
 cada barrio en el plano, con la acera más cercana. Treinta y cuatro chinchetas más taparían
 la ciudad en el radar, así que se encuentran estando encima.
+
+## Nivel, propiedades y alquiler
+
+La fama por gremio (`S.rep`) ya existía y desbloquea curros, pero es local. El **nivel de
+personaje** (`S.nivel`) es el resumen de todo — misiones, curros, golpes limpios — y es lo
+que abre las armas grandes (uzi a nivel 4, escopeta a 6), los vehículos (furgoneta 2,
+deportivo 5) y, sobre todo, **lo que te dejan comprar**. La curva sube deprisa a propósito:
+si el dinero llega antes que el nivel, comprar deja de ser una meta y pasa a ser un trámite.
+
+**Nueve propiedades**, cuatro viviendas y cinco negocios. No hay inmobiliaria ni menú de
+compra: las viviendas se compran **en su puerta** y los negocios **a su dueño, dentro**. Si
+quieres el taller, vas al taller y se lo dices a Iker. Un negocio renta cada día —se cobra
+al dormir— y en un local tuyo no se paga: comer, vestirte o que te arreglen el coche sale
+gratis en tu propia casa, que se nota más que un número en una pantalla de estadísticas.
+
+**El alquiler tiene a alguien al otro lado.** Amaia lleva la cuenta del piso de Santutxu, y
+los estados van en orden y sin callejones sin salida:
+
+| | |
+|---|---|
+| `aldia` | Al día. Solo aquí te vende el piso, y solo con paciencia ≥ 3. |
+| `debiendo` | Un recibo sin pagar. Duermes peor. |
+| `avisado` | Dos recibos: te avisa de que la próxima te cambia la cerradura. |
+| `desahuciado` | Tres: la llave ya no entra. Volver cuesta la deuda **más** la cerradura. |
+| `okupa` | Has forzado la puerta. Es un delito, se oye, duermes en el suelo y a veces viene la pasma. |
+
+Pagando se vuelve siempre, aunque el precio de volver suba. Y hay salida limpia: **dejar el
+piso** corta el recibo, y **comprarlo** lo corta para siempre. El estado de la casera es
+precondición de la compra: eso ata las dos cosas y hace que comprar dependa de cómo te has
+portado, no solo de la cartera.
 
 ## Sigilo
 

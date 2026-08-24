@@ -25,8 +25,8 @@ public class MenuMovil : MonoBehaviour {
     void Awake() { I = this; }
 
     public void Montar(Transform canvas) {
-        _panel = Pantalla(canvas, "Movil", out _lista, new[]{"HISTORIA","CURROS","FAMA"},
-                          i => { _pestana = i == 0 ? "hist" : i == 1 ? "trab" : "rep"; Pintar(); },
+        _panel = Pantalla(canvas, "Movil", out _lista, new[]{"HISTORIA","CURROS","BIENES","FAMA"},
+                          i => { _pestana = i == 0 ? "hist" : i == 1 ? "trab" : i == 2 ? "bien" : "rep"; Pintar(); },
                           () => { Abierto = false; _panel.SetActive(false); });
         _panelPausa = Pantalla(canvas, "Pausa", out _listaPausa, new[]{"DATOS","OPCIONES"},
                           i => PintarPausa(i), () => { Pausado = false; _panelPausa.SetActive(false); });
@@ -141,6 +141,37 @@ public class MenuMovil : MonoBehaviour {
             else
                 Fila(_lista, "🏁", "Historia terminada", "Bilbao es tuya. O al menos el Casco Viejo.", "", null, Paleta.Mostaza);
             Fila(_lista, "📖", "Progreso", E.MisionIdx + " de " + Misiones.Lista.Count + " misiones", "", null, Paleta.Acero);
+        } else if (_pestana == "bien") {
+            // Nivel arriba del todo: es lo que decide qué puedes comprar, así que va donde
+            // se mira primero.
+            Fila(_lista, "estrella", "Nivel " + E.NivelPj,
+                 E.Xp + " / " + Bienes.XpNivel(E.NivelPj) + " XP", "", null, Paleta.Mostaza);
+            int renta = Bienes.RentaDiaria();
+            if (renta > 0)
+                Fila(_lista, "euro", "Rentas", "Se cobran al dormir", "+" + renta + " €/día", null, Paleta.VerdeL);
+            if (E.Alquiler > 0 && !Bienes.EsMio("pisosantutxu")) {
+                string est = Bienes.EstadoCasera();
+                int t = Bienes.DeudaTotal();
+                string txt =
+                    est == "aldia"       ? "Al día con Amaia" :
+                    est == "debiendo"    ? "Debes " + E.Deuda + " €" :
+                    est == "avisado"     ? "Aviso de desahucio" :
+                    est == "desahuciado" ? "Desahuciado. Cerradura cambiada"
+                                         : "Vives ahí de okupa";
+                Fila(_lista, "llave", "Piso de Santutxu", txt,
+                     t > 0 ? t + " €" : E.Alquiler + " €/sem", null,
+                     est == "aldia" ? Paleta.VerdeL : Paleta.Morado);
+            }
+            foreach (var q in Bienes.Todas) {
+                bool mio = Bienes.EsMio(q.Id);
+                string pega = Bienes.PegaPara(q);
+                string dd = mio ? (q.Renta > 0 ? "Tuyo · +" + q.Renta + " €/día" : "Tuyo")
+                          : pega != "" ? pega
+                          : q.Tipo == "vivienda" ? "En venta. Ve a la puerta" : "En venta. Habla con el dueño";
+                Fila(_lista, q.Tipo == "vivienda" ? "llave" : "euro", q.Nombre, dd,
+                     mio ? "✔" : q.Precio + " €", null,
+                     mio ? Paleta.VerdeL : pega != "" ? Paleta.Gris : Paleta.Mostaza);
+            }
         } else if (_pestana == "trab") {
             if (Misiones.I.Activa != null)
                 Fila(_lista, "⛔", "Estás en una misión", "Termínala o abandónala.", "", null, Paleta.Gris);

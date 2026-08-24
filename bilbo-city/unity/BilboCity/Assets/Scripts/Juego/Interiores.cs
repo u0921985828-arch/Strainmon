@@ -106,7 +106,12 @@ public static class Interiores {
 
     /// <summary>El nombre viene de fuera a propósito: dos tascas iguales por dentro se
     /// llaman distinto en la puerta, que es lo que pasa en cualquier barrio.</summary>
-    public static void Entrar(string id, Vector2 desde, string nombre = null) {
+    /// <summary>De qué sitio del mapa es el interior en el que estás. Dos tascas comparten
+    /// plano pero no dueño.</summary>
+    public static string PoiActual;
+
+    public static void Entrar(string id, Vector2 desde, string nombre = null, string poi = null) {
+        PoiActual = poi;
         var d = Todos[id];
         Actual = nombre == null ? d : new DefInterior{
             Nombre=nombre, Suelo=d.Suelo, Pared=d.Pared, Mapa=d.Mapa, Npcs=d.Npcs };

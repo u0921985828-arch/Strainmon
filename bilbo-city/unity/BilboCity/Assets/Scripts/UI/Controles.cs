@@ -235,6 +235,10 @@ public class Partida {
     public int munBate, munPistola, munUzi, munEscopeta;
     public string torso, piernas, calzado, gorro;
     public bool silenciador;
+    public int xp, nivelPj = 1;
+    public List<string> props = new List<string>();
+    public int caseraPaciencia = 3;
+    public bool caseraAvisada, caseraDesahucio, caseraOkupa;
     public float x, y;
     public List<Contrato> contratos = new List<Contrato>();
 }
@@ -256,6 +260,9 @@ public static class Guardado {
             munUzi = E.Mun("uzi"), munEscopeta = E.Mun("escopeta"),
             torso = E.Torso, piernas = E.Piernas, calzado = E.Calzado, gorro = E.Gorro,
             silenciador = E.TieneSilenciador,
+            xp = E.Xp, nivelPj = E.NivelPj, props = new List<string>(E.Props),
+            caseraPaciencia = E.CaseraPaciencia, caseraAvisada = E.CaseraAvisada,
+            caseraDesahucio = E.CaseraDesahucio, caseraOkupa = E.CaseraOkupa,
             x = J != null && J.Jug != null ? J.Jug.Pos.x : 0,
             y = J != null && J.Jug != null ? J.Jug.Pos.y : 0,
             contratos = E.Contratos
@@ -291,6 +298,11 @@ public static class Guardado {
         E.Rep["hosteleria"] = p.repHosteleria; E.Rep["obra"] = p.repObra;
         E.Rep["transporte"] = p.repTransporte; E.Rep["calle"] = p.repCalle;
         E.TieneFurgo = p.furgo; E.TieneDeportivo = p.deportivo; E.TieneSilenciador = p.silenciador;
+        E.Xp = p.xp; E.NivelPj = Mathf.Max(1, p.nivelPj);
+        E.Props.Clear();
+        if (p.props != null) foreach (var id in p.props) E.Props.Add(id);
+        E.CaseraPaciencia = p.caseraPaciencia; E.CaseraAvisada = p.caseraAvisada;
+        E.CaseraDesahucio = p.caseraDesahucio; E.CaseraOkupa = p.caseraOkupa;
         E.ArmaAct = string.IsNullOrEmpty(p.armaAct) ? "punos" : p.armaAct;
         E.Municion.Clear();
         if (p.munBate > 0) E.Municion["bate"] = p.munBate;

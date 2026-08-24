@@ -1,8 +1,13 @@
 # Bilbo City
 
-Juego sandbox 2D cenital tipo *GTA Chinatown Wars*, ambientado en **Bilbao**, para móvil.
-Además del crimen se pueden hacer curros honrados: repartir pintxos, descargar en el muelle,
-turnos de taxi, peón de obra. Y pagar el alquiler cada semana.
+Juego sandbox 2D para móvil, visto desde arriba y ambientado en **Bilbao**: una ciudad
+abierta por la que se anda, se conduce, se pelea y se trapichea, con una historia por
+delante y sin que nada te obligue a seguirla.
+
+Además del crimen se pueden hacer curros honrados: repartir pintxos, descargar en el
+muelle, turnos de taxi, peón de obra. Se sube de nivel, se compran pisos y negocios que
+rentan cada día, y se paga el alquiler cada semana — o no se paga, y entonces la casera
+te cambia la cerradura.
 
 Todo el arte y todo el audio se generan por código. **El repositorio no contiene ni una
 imagen ni un archivo de sonido.**

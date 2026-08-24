@@ -44,6 +44,8 @@ public class Contrato {
 
 public class Sitio {
     public string Id, Nombre, Interior;
+    /// Id de la propiedad que se vende en esta puerta, si se vende alguna.
+    public string Vende;
     public Color32 Color;
     public Vector2 Pos;
     public bool Mirador;
@@ -64,6 +66,14 @@ public class Estado {
     };
     public int Deuda, Alquiler = 220, UltCobro = 1;
     public bool TieneFurgo, TieneDeportivo, TieneSilenciador;
+    /// Nivel de personaje y lo que se lleva de él. Distinto de Nivel(gremio), que es la
+    /// fama en un oficio: esto es el resumen de todo lo que has hecho.
+    public int Xp, NivelPj = 1;
+    public readonly HashSet<string> Props = new HashSet<string>();
+    /// Cómo va la cosa con Amaia: paciencia, si ya te avisó, si te cambió la cerradura y
+    /// si estás durmiendo ahí a la fuerza.
+    public int CaseraPaciencia = 3;
+    public bool CaseraAvisada, CaseraDesahucio, CaseraOkupa;
     /// Lo que el HUD pinta en el ojo: la sospecha más alta de los que te rodean, y si
     /// alguno te tiene a la vista ahora mismo.
     public float Sospecha;
@@ -142,8 +152,10 @@ public class Estado {
         // Las coordenadas salen del plano municipal: se buscó el rótulo de cada sitio y
         // se pasó su posición a casillas. Por eso ya no hace falta decirle a cada uno en
         // qué barrio va — cae en el suyo solo, porque está donde está de verdad.
-        void S(string id, string n, Color32 c, string inter, int cx, int cy, bool mira = false, string red = null) {
-            var s = new Sitio { Id=id, Nombre=n, Color=c, Interior=inter, Cx=cx, Cy=cy, Mirador=mira, Red=red };
+        void S(string id, string n, Color32 c, string inter, int cx, int cy, bool mira = false,
+               string red = null, string vende = null) {
+            var s = new Sitio { Id=id, Nombre=n, Color=c, Interior=inter, Cx=cx, Cy=cy,
+                                Mirador=mira, Red=red, Vende=vende };
             s.Pos = mira ? Ciudad.PuntoZona(cx,cy,40) : Ciudad.PuntoPortal(cx,cy,40);
             Sitios.Add(s);
         }
@@ -206,6 +218,11 @@ public class Estado {
         S("trolabeaga",  "Apeadero de Olabeaga",  Paleta.H("#8fa66b"), null, 392,412, false, "tren");
         S("trametzola",  "Apeadero de Ametzola",  Paleta.H("#8fa66b"), null, 640,470, false, "tren");
         S("trbasurto",   "Apeadero de Basurto",   Paleta.H("#8fa66b"), null, 482,438, false, "tren");
+        // Las viviendas que se venden. Hasta que no son tuyas no se entra: en la puerta
+        // hay un cartel y punto.
+        S("pisodeustu",  "Piso en Deustu",         Paleta.MostazaO, "piso", 628,190, false, null, "pisodeustu");
+        S("loftabando",  "Loft en Abandoibarra",   Paleta.MostazaO, "piso", 660,215, false, null, "loftabando");
+        S("caserio",     "Caserío en Artxanda",    Paleta.MostazaO, "piso", 830,118, false, null, "caserio");
     }
     public static Sitio Sitio_(string id) { return Sitios.Find(s => s.Id == id); }
 }
