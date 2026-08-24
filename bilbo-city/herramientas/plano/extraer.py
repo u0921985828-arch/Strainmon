@@ -666,6 +666,34 @@ def _cerca_de_via(rej, gx, gy, r=CALLE_RADIO_VIA):
     return False
 
 
+# Casillas entre dos rótulos consecutivos de la misma calle. El número tiene dos filos: a
+# 60 se partía la Alameda Urquijo, que mide kilómetro y medio y va rotulada cada cuatro
+# manzanas; a 300 volvía a colarse el 'Correo' de la otra orilla. 140 casillas son 720 m.
+SALTO_CALLE = 140
+
+
+def _grupo_mayor(pts):
+    """El grupo de rótulos más numeroso, uniendo los que están cerca unos de otros."""
+    padre = list(range(len(pts)))
+
+    def raiz(a):
+        while padre[a] != a:
+            padre[a] = padre[padre[a]]
+            a = padre[a]
+        return a
+
+    for i in range(len(pts)):
+        for j in range(i + 1, len(pts)):
+            if abs(pts[i][0] - pts[j][0]) + abs(pts[i][1] - pts[j][1]) <= SALTO_CALLE:
+                ra, rb = raiz(i), raiz(j)
+                if ra != rb:
+                    padre[ra] = rb
+    grupos = {}
+    for i in range(len(pts)):
+        grupos.setdefault(raiz(i), []).append(pts[i])
+    return max(grupos.values(), key=len)
+
+
 def _orden_en_eje(pts):
     """Ordena unos puntos a lo largo del eje que mejor los ajusta.
 
@@ -850,6 +878,12 @@ def calles_de(pdf, rej):
         por_nombre.setdefault(mejor[0], []).append((gx, gy))
     fuera = []
     for nombre, pts in por_nombre.items():
+        # La tolerancia de una casilla de cuadrícula da margen para que un mismo nombre se
+        # acepte en dos sitios lejanos —hay calles homónimas, y hay rótulos que encajan por
+        # casualidad—. Uniendo esos dos sitios, la calle acababa cruzando la ría: 'Correo'
+        # salía del Casco Viejo a San Francisco, que están en orillas distintas. Así que se
+        # agrupan los rótulos por cercanía y se conserva el grupo grande.
+        pts = _grupo_mayor(pts)
         limpios = []
         for q in _orden_en_eje(pts):
             if all(abs(q[0] - r[0]) + abs(q[1] - r[1]) > 6 for r in limpios):
