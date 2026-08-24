@@ -25,7 +25,9 @@ public static class ForjaChar {
     // se salen de la caja, y el moño, la txapela y el casco de obra asoman por arriba.
     // Contra el borde de la celda se cortaban en seco, y encima no quedaba sitio para el
     // contorno de la silueta.
-    public const int MG_X = 7, MG_ARR = 8, MG_ABA = 4;
+    // Los fija CONTEXT.md §18.1: celda de 24×32 con el pivote en (12,30). La figura sigue
+    // siendo la caja de 20×26, así que queda 2 de margen a los lados, 5 arriba y 1 abajo.
+    public const int MG_X = 2, MG_ARR = 5, MG_ABA = 1;
     public const int CW = 20 + MG_X * 2, CH = 26 + MG_ARR + MG_ABA;   // tamaño de celda
     public const int NPOSES = 16, NDIRS = 8;
 
@@ -35,7 +37,10 @@ public static class ForjaChar {
     static readonly bool[] Frente = { false, true, false, false, false, false, false, true };
     static readonly bool[] Espalda = { false, false, false, true, false, true, false, false };
 
-    struct Postura { public int p0, p1, b0, b1, y, ataque, apunta; public bool herido, fog; }
+    // `y` mueve la figura entera; `yt` solo el cuerpo, dejando los pies en el suelo. Hace
+    // falta desde que la celda es de 24×32: bajar la figura entera hunde el contorno de las
+    // botas fuera de la celda, y además al agacharse los pies no se mueven, baja la cabeza.
+    struct Postura { public int p0, p1, b0, b1, y, yt, ataque, apunta; public bool herido, fog; }
     static readonly Postura[] Posturas = {
         new Postura{ p0=0,p1=0,b0=0,b1=0,y=0 },                       // Quieto
         new Postura{ p0=0,p1=1,b0=1,b1=-1,y=0 },                      // Andar1
@@ -44,19 +49,19 @@ public static class ForjaChar {
         new Postura{ p0=0,p1=1,b0=0,b1=0,y=-1 },                      // Andar4
         new Postura{ p0=-2,p1=2,b0=2,b1=-2,y=-1 },                    // Correr1
         new Postura{ p0=2,p1=-2,b0=-2,b1=2,y=-1 },                    // Correr2
-        new Postura{ p0=-3,p1=3,b0=3,b1=-3,y=-2 },                    // Correr3
-        new Postura{ p0=3,p1=-3,b0=-3,b1=3,y=-2 },                    // Correr4
+        new Postura{ p0=-3,p1=3,b0=3,b1=-3,y=-1 },                    // Correr3
+        new Postura{ p0=3,p1=-3,b0=-3,b1=3,y=-1 },                    // Correr4
         new Postura{ p0=0,p1=0,b0=0,b1=0,y=0, ataque=1 },             // Pega1
         new Postura{ p0=0,p1=1,b0=0,b1=0,y=0, ataque=2 },             // Pega2
         new Postura{ p0=0,p1=0,b0=0,b1=0,y=0, apunta=1 },             // Apunta
         new Postura{ p0=0,p1=0,b0=0,b1=0,y=-1, apunta=1, fog=true },  // Dispara
-        new Postura{ p0=1,p1=1,b0=2,b1=2,y=1, herido=true },          // Herido
+        new Postura{ p0=1,p1=1,b0=2,b1=2,y=0, yt=1, herido=true },    // Herido
         // Agachado no lleva dibujo nuevo: se acortan las dos piernas y se baja el cuerpo.
         // A veintiséis píxeles de alto eso ya se lee como unas cuclillas, y no hay que
         // tocar la forja ni volver a cuadrar los gorros. Y no baja más de dos píxeles:
         // con tres, el contorno de los pies se sale de la celda.
-        new Postura{ p0=3,p1=3,b0=1,b1=1,y=2 },                       // Agacha
-        new Postura{ p0=2,p1=4,b0=0,b1=2,y=2 },                       // Agacha2
+        new Postura{ p0=3,p1=3,b0=1,b1=1,y=0, yt=2 },                 // Agacha
+        new Postura{ p0=2,p1=4,b0=0,b1=2,y=0, yt=2 },                 // Agacha2
     };
 
     struct Prenda { public Color32 b, s, l; public bool corta, capucha, peto, bandas, mandil, placa, largo; public Color32 raya; public bool tieneRaya; }
@@ -239,7 +244,7 @@ public static class ForjaChar {
         else { L.P(cx - 3, zy, 3, 2, zap); L.P(cx, zy, 3, 2, zap); }
 
         // ── torso ──
-        int ty = MG_ARR + 9 + oy, th = T.largo ? 10 : 8;
+        int ty = MG_ARR + 9 + oy + P_.yt, th = T.largo ? 10 : 8;
         L.P(cx - hom/2, ty, hom, th, T.b);
         L.P(cx - hom/2, ty, hom, 2, T.l);
         L.P(cx + hom/2 - 1, ty, 1, th, T.s);
@@ -255,13 +260,15 @@ public static class ForjaChar {
         int manoY = T.corta ? ty + 4 : ty + 7;
         int bx1 = cx - hom/2 - 2, bx2 = cx + hom/2;
         if (P_.ataque > 0) {
-            int ex = P_.ataque == 2 ? 4 : 2;
+            // El alcance cabe en el margen lateral, que con la celda de 24 son dos. Con
+            // los cuatro de antes el puño se cortaba contra el canto.
+            int ex = P_.ataque == 2 ? 1 : 0;
             if (derV || dir == AB) { L.P(bx2, ty + 2, 2 + ex, 3, T.b); L.P(bx2 + 2 + ex, ty + 2, 2, 3, cfg.Piel); }
             else { L.P(bx1 - ex, ty + 2, 2 + ex, 3, T.b); L.P(bx1 - ex - 2, ty + 2, 2, 3, cfg.Piel); }
             if (!lateral) L.P(bx1, ty + 2 + b2, 2, 6, T.s);
         } else if (P_.apunta > 0) {
-            if (derV) { L.P(bx2, ty + 3, 5, 2, T.b); L.P(bx2 + 5, ty + 3, 2, 2, cfg.Piel); }
-            else if (izqV) { L.P(bx1 - 3, ty + 3, 5, 2, T.b); L.P(bx1 - 5, ty + 3, 2, 2, cfg.Piel); }
+            if (derV) { L.P(bx2, ty + 3, 3, 2, T.b); L.P(bx2 + 3, ty + 3, 2, 2, cfg.Piel); }
+            else if (izqV) { L.P(bx1 - 1, ty + 3, 3, 2, T.b); L.P(bx1 - 3, ty + 3, 2, 2, cfg.Piel); }
             else { L.P(bx2 - 1, ty + 2, 3, 5, T.b); L.P(bx2 - 1, ty + 7, 3, 2, cfg.Piel); }
             if (!lateral) L.P(bx1, ty + 3, 2, 5, T.s);
         } else if (lateral) {
@@ -276,7 +283,7 @@ public static class ForjaChar {
         }
 
         // ── cabeza ──
-        int hy = MG_ARR + 1 + oy;
+        int hy = MG_ARR + 1 + oy + P_.yt;
         L.P(cx - 4, hy, 8, 8, cfg.Piel);
         L.P(cx + 3, hy, 1, 8, cfg.PielS);
         L.P(cx - 4, hy, 8, 1, cfg.PielS);
@@ -298,7 +305,7 @@ public static class ForjaChar {
             else if (est == "corto") { L.P(cx - 4, hy - 2, 8, 4, pc); if (!arr) L.P(cx - 4, hy + 2, 2, 2, pc); }
             else if (est == "melena") { L.P(cx - 5, hy - 2, 10, 4, pc); L.P(cx - 5, hy + 2, 2, 7, pc); L.P(cx + 3, hy + 2, 2, 7, pc); }
             else if (est == "coleta") { L.P(cx - 4, hy - 2, 8, 4, pc); L.P(cx - 6, hy + 1, 2, 6, pc); }
-            else if (est == "mono") { L.P(cx - 4, hy - 2, 8, 4, pc); L.P(cx - 2, hy - 5, 4, 3, pc); }
+            else if (est == "mono") { L.P(cx - 4, hy - 2, 8, 4, pc); L.P(cx - 2, hy - 4, 4, 2, pc); }
             else if (est == "afro") L.P(cx - 6, hy - 4, 12, 7, pc);
             else L.P(cx - 4, hy - 2, 8, 4, pc);
             if (arr) L.P(cx - 4, hy - 2, 8, 8, pc);
@@ -322,7 +329,7 @@ public static class ForjaChar {
             case "cascoObra":
                 L.P(cx - 5, hy - 4, 10, 5, Paleta.Mostaza); L.P(cx - 5, hy - 4, 6, 1, Paleta.Hueso);
                 L.P(cx + 4, hy - 4, 1, 5, Paleta.MostazaO); L.P(cx - 6, hy, 12, 1, Paleta.MostazaO);
-                L.P(cx - 1, hy - 5, 2, 1, Paleta.MostazaO); break;
+                L.P(cx - 1, hy - 4, 2, 1, Paleta.MostazaO); break;
             case "cascoMoto":
                 L.P(cx - 5, hy - 3, 10, 9, Paleta.Rojo); L.P(cx - 5, hy - 3, 6, 1, Paleta.RojoL);
                 L.P(cx + 4, hy - 3, 1, 9, Paleta.RojoO);
@@ -355,15 +362,15 @@ public static class ForjaChar {
                 break;
             case "carrito":
                 if (!arr) {
-                    L.P(cx + 5, ty + 5, 5, 8, Paleta.RojoO); L.P(cx + 5, ty + 5, 5, 2, Paleta.Rojo);
-                    L.P(cx + 6, ty + 13, 1, 2, Paleta.Carbon); L.P(cx + 8, ty + 13, 1, 2, Paleta.Carbon);
+                    L.P(cx + 4, ty + 5, 5, 8, Paleta.RojoO); L.P(cx + 4, ty + 5, 5, 2, Paleta.Rojo);
+                    L.P(cx + 5, ty + 13, 1, 2, Paleta.Carbon); L.P(cx + 7, ty + 13, 1, 2, Paleta.Carbon);
                 }
                 break;
         }
 
         if (P_.fog) {
-            if (derV) L.P(cx + hom/2 + 7, ty + 2, 3, 3, Paleta.Mostaza);
-            else if (izqV) L.P(cx - hom/2 - 8, ty + 2, 3, 3, Paleta.Mostaza);
+            if (derV) L.P(cx + hom/2 + 2, ty + 2, 3, 3, Paleta.Mostaza);
+            else if (izqV) L.P(cx - hom/2 - 3, ty + 2, 3, 3, Paleta.Mostaza);
             else L.P(cx + hom/2 - 1, ty + 9, 3, 3, Paleta.Mostaza);
         }
         // Contorno solo por fuera, como los iconos y por lo mismo: la gente cruza del

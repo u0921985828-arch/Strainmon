@@ -77,13 +77,16 @@ CLAVES = {
 }
 # La rampa de la paleta en la que se guarda cada parte. Tienen que ser disjuntas: es lo
 # que permite repintar una parte sin tocar las demás.
+# Se nombran por familia y no por apodo: la paleta de CONTEXT.md §18.6 viene ya en rampas
+# de ocho tonos de oscuro a claro, que es exactamente lo que esto necesitaba y antes había
+# que apañar juntando colores sueltos. La piel pasa de seis tonos a ocho.
 RAMPAS = {
-    'piel':    ['piel6', 'piel5', 'piel4', 'piel3', 'piel2', 'piel1'],
-    'pelo':    ['pelo1', 'pelo2', 'pelo3', 'pelo4'],
-    'torso':   ['azulO', 'azul', 'azulL'],
-    'piernas': ['verdeO', 'verde', 'verdeL'],
-    'calzado': ['maderaO', 'madera', 'maderaL'],
-    'contorno': ['negro'],
+    'piel':    ['tez0', 'tez1', 'tez2', 'tez3', 'tez4', 'tez5', 'tez6', 'tez7'],
+    'pelo':    ['ladrillo0', 'ladrillo1', 'ladrillo2', 'ladrillo3'],
+    'torso':   ['ria2', 'ria3', 'ria4', 'ria5'],
+    'piernas': ['verde2', 'verde3', 'verde4', 'verde5'],
+    'calzado': ['luz2', 'luz3', 'luz4'],
+    'contorno': ['tinta'],
 }
 # El contorno no se reconoce por ser oscuro, sino por ser oscuro **y no tener color**. Con
 # la oscuridad a secas, el azul del pelo —que a plena intensidad tiene luminancia 29, por

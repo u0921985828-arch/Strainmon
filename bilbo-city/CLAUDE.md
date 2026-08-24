@@ -78,8 +78,12 @@ nada, en C# la excepción salta en el siguiente `MoveNext`.
   la línea siguiente, sobra.
 - **Nada de físicas de Unity.** Ni `Rigidbody2D` ni `Collider2D`. La colisión es por casilla
   con deslizamiento por ejes (`Movimiento.Deslizar`). Es predecible y va rápido en móvil.
-- **Paleta bloqueada de 48 colores.** Todo sprite pasa por `Paleta.Cuantizar`. No introduzcas
-  colores nuevos sin añadirlos a la paleta.
+- **Paleta bloqueada de 61 colores, la de CONTEXT.md §18.6.** Seis familias de ocho tonos
+  —hormigón, ladrillo, verde industrial, ría, luz artificial y tez— más los acentos. Todo
+  sprite pasa por `cuantizar` / `Paleta.Cuantizar`. No introduzcas colores nuevos.
+  Los nombres de siempre (`C.asfalto`, `C.piel1`) siguen valiendo: ahora son **apodos** que
+  apuntan a un color de familia, repartidos por significado y no por color más cercano.
+  `herramientas/plano/paleta.py` compara colores y apodos entre el HTML y Unity.
 - **Sin assets importados.** Ni PNG, ni WAV, ni fuentes TTF de terceros en el
   repositorio. Si necesitas algo nuevo, se forja por código en `Assets/Scripts/Arte/`.
   **Excepción con condiciones: los sprites de personaje pueden venir de PixelLab**
@@ -308,7 +312,7 @@ el barrio. Una calle inventada en el sitio de una que existe es peor que no pone
 
 El título iba en HTML: tipografía del sistema, degradados y el mapa teñido de rojo. Nada
 de eso está en el juego, así que la primera pantalla mentía sobre lo que venía después.
-Ahora se dibuja entera en su lienzo con **la fuente BLOQUE, la paleta de 48 y los sprites
+Ahora se dibuja entera en su lienzo con **la fuente BLOQUE, la paleta y los sprites
 forjados**, sobre un trozo del plano de verdad —con la ría dentro, que es lo que se
 reconoce de Bilbao desde arriba— y a **escala entera**, para que un píxel del rótulo mida
 lo mismo que un píxel del juego. La barra de carga dice qué se está forjando.
@@ -432,11 +436,20 @@ reloj.
   detrás de un contenedor, con la patrulla a diez metros pero mirando a otro lado, la
   cuenta corre — y baja a 8 segundos por estrella en vez de 12.
 
-Agachado no lleva dibujo nuevo: se acortan las dos piernas y se baja el cuerpo dos
-píxeles. **Dos, no tres**: con tres, el contorno de los pies se sale de la celda y salta
-la regla del verificador.
+Agachado no lleva dibujo nuevo: se acortan las dos piernas y baja **el cuerpo**, no la
+figura entera. Esa distinción (`yt` en la tabla de posturas) hace falta desde que la celda
+es la de 24×32 de CONTEXT.md §18.1: bajando la figura entera, el contorno de las botas se
+quedaba fuera. Y de paso es más correcto — al ponerse en cuclillas los pies no se mueven.
 
 ## El arte
+
+**La celda de personaje es de 24×32 con el pivote en (12,30)**, y la paleta la de 61
+colores: las dos las fija `CONTEXT.md` §18. La celda es apretada a propósito y el arte la
+llena, así que la regla del verificador no es «no tocar el canto» —el contorno de los pies
+cae en la última fila por diseño— sino **no salirse**: un píxel de color en el borde es un
+píxel al que le recortaron el contorno. Por eso el puñetazo, el fogonazo y el carro de la
+compra van recogidos: los de antes contaban con siete píxeles de margen lateral y ahora
+hay dos.
 
 **Todo el juego sigue una sola guía de estilo: [`referencia/ESTILO.md`](referencia/ESTILO.md).**
 Proporciones, vista, dirección de la luz, uso del color, contorno, tipografía, rejilla de

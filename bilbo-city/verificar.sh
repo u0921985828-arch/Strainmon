@@ -12,6 +12,9 @@ if [ "$QUE" = "todo" ] || [ "$QUE" = "csharp" ]; then
   echo "═══ C# · compilación (Roslyn contra remedo de la API de Unity) ═══"
   herramientas/compilar/compilar.sh
   echo
+  echo "═══ paleta · HTML contra Unity ═══"
+  python3 herramientas/plano/paleta.py
+  echo
   echo "═══ sitios · HTML contra Unity ═══"
   python3 herramientas/plano/sitios.py
   echo

@@ -62,7 +62,9 @@ listo().then(() => {
 
   // ── R2 · los iconos: 24×24, contorno negro y pocos colores ───────────────────────
   {
-    const NEG = A.PALETA.find(p => p[3] === '#0b0e12') || [11,14,18];
+    // El negro se lee del juego, no se escribe aquí. Escrito a mano, al cambiar la paleta
+    // este test acusaba de no tener contorno a treinta iconos que lo tenían perfecto.
+    const NEG = A.PALETA.find(p => p[3] === A.C.negro) || [0, 0, 0];
     let malos = 0;
     for (const [k, c] of Object.entries(A.ICO)) {
       if (c.width !== 24 || c.height !== 24) { fallos.push('icono ' + k + ': mide ' + c.width + 'x' + c.height + ', no 24x24'); malos++; continue; }
@@ -117,30 +119,36 @@ listo().then(() => {
     if (!malos) bien.push(Object.keys(A.ARQ).length + ' hojas de ' + (cw*8) + 'x' + (ch*filas) + ' (8 direcciones × ' + filas + ' poses)');
   }
 
-  // ── R5 · ningún personaje toca el borde de su celda ──────────────────────────────
-  // La celda es más grande que la figura a propósito, para que quepan el puñetazo, el
-  // fogonazo, los gorros altos y el contorno. Un sprite que llega al borde ya no se sabe
-  // si está entero: lo que se salga se corta en seco y nadie se entera hasta verlo en
-  // marcha. Un píxel de aire alrededor y esta regla lo vigila.
+  // ── R5 · ningún personaje se sale de su celda ───────────────────────────────────
+  // Antes esta regla exigía un píxel de aire alrededor. Con la celda de 24×32 que fija
+  // CONTEXT.md §18.1 eso ya no se puede pedir: el pivote está en (12,30), así que el
+  // contorno de los pies cae en la última fila por diseño, y el de un gorro alto en la
+  // primera. Lo que hay que vigilar no es tocar el canto sino **salirse** por él, y eso
+  // deja una huella inconfundible: un píxel de color en el borde es un píxel al que le
+  // recortaron su contorno. El contorno tocando el canto es correcto; la piel, no.
   {
     const [cw, ch] = A.SPR.cel, filas = A.ORDEN_POSES.length;
-    let tocan = 0;
+    const NEG = A.PALETA.find(p => p[3] === A.C.negro) || [0, 0, 0];
+    let cortados = 0;
     for (const k of Object.keys(A.ARQ)) {
       const h = A.HOJAS[k] || A.hoja(k), g = h.getContext('2d');
       for (let f = 0; f < filas; f++) for (let d = 0; d < 8; d++) {
         const px = g.getImageData(d*cw, f*ch, cw, ch).data;
-        const opaco = (x, y) => px[(y*cw + x)*4 + 3] > 0;
-        let borde = false;
-        for (let x = 0; x < cw && !borde; x++) if (opaco(x, 0) || opaco(x, ch-1)) borde = true;
-        for (let y = 0; y < ch && !borde; y++) if (opaco(0, y) || opaco(cw-1, y)) borde = true;
-        if (borde) {
-          if (tocan < 6) fallos.push('hoja ' + k + ': ' + A.ORDEN_POSES[f] + '/' + d + ' llega al borde de la celda');
-          tocan++;
+        const cortado = (x, y) => {
+          const i = (y*cw + x)*4;
+          return px[i+3] > 0 && !(px[i] === NEG[0] && px[i+1] === NEG[1] && px[i+2] === NEG[2]);
+        };
+        let malo = false;
+        for (let x = 0; x < cw && !malo; x++) if (cortado(x, 0) || cortado(x, ch-1)) malo = true;
+        for (let y = 0; y < ch && !malo; y++) if (cortado(0, y) || cortado(cw-1, y)) malo = true;
+        if (malo) {
+          if (cortados < 6) fallos.push('hoja ' + k + ': ' + A.ORDEN_POSES[f] + '/' + d + ' se sale de la celda');
+          cortados++;
         }
       }
     }
-    if (tocan > 6) fallos.push('...y ' + (tocan - 6) + ' fotogramas más al borde');
-    if (!tocan) bien.push('ningún fotograma de personaje toca el borde de su celda de ' + cw + 'x' + ch);
+    if (cortados > 6) fallos.push('...y ' + (cortados - 6) + ' fotogramas más recortados');
+    if (!cortados) bien.push('ningún fotograma de personaje se sale de su celda de ' + cw + 'x' + ch);
   }
 
   // ── R6 · los edificios singulares, a su medida y sin transparencias por dentro ──────

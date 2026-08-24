@@ -11,70 +11,138 @@ public static class Paleta {
         return new Color32((byte)r,(byte)g,(byte)b,255);
     }
 
-    public static readonly Color32 Negro     = H("#0b0e12");
-    public static readonly Color32 Carbon    = H("#1c2229");
-    public static readonly Color32 Asfalto   = H("#33383e");
-    public static readonly Color32 AsfaltoO  = H("#2a2f34");
-    public static readonly Color32 AsfaltoL  = H("#3f454c");
-    public static readonly Color32 Gris      = H("#4a444c");
-    public static readonly Color32 GrisO     = H("#3a353c");
-    public static readonly Color32 GrisL     = H("#5f5a63");
-    public static readonly Color32 Acero     = H("#8d99a4");
-    public static readonly Color32 AceroO    = H("#6d7883");
-    public static readonly Color32 Hueso     = H("#e6e2d6");
-    public static readonly Color32 Hormigon  = H("#7b7669");
-    public static readonly Color32 HormigonO = H("#655f55");
-    public static readonly Color32 HormigonL = H("#948e80");
-    public static readonly Color32 Piel1     = H("#f0cfae");
-    public static readonly Color32 Piel2     = H("#e0b48c");
-    public static readonly Color32 Piel3     = H("#c69068");
-    public static readonly Color32 Piel4     = H("#a87247");
-    public static readonly Color32 Piel5     = H("#8d6142");
-    public static readonly Color32 Piel6     = H("#6b482f");
-    public static readonly Color32 Pelo1     = H("#2a2018");
-    public static readonly Color32 Pelo2     = H("#4a3520");
-    public static readonly Color32 Pelo3     = H("#7a5a2a");
-    public static readonly Color32 Pelo4     = H("#b09a72");
-    public static readonly Color32 Pelo5     = H("#8d99a4");
-    public static readonly Color32 Azul      = H("#1f3a5f");
-    public static readonly Color32 AzulO     = H("#152741");
-    public static readonly Color32 AzulL     = H("#2f5182");
-    public static readonly Color32 Rojo      = H("#b7451f");
-    public static readonly Color32 RojoO     = H("#8e3316");
-    public static readonly Color32 RojoL     = H("#d05c33");
-    public static readonly Color32 Sangre    = H("#951f18");
-    public static readonly Color32 Verde     = H("#3d6b4a");
-    public static readonly Color32 VerdeO    = H("#2d5137");
-    public static readonly Color32 VerdeL    = H("#508a5f");
-    public static readonly Color32 Cesped    = H("#3c6338");
-    public static readonly Color32 CespedO   = H("#2f5330");
-    public static readonly Color32 Agua      = H("#1c4652");
-    public static readonly Color32 AguaL     = H("#2a6473");
-    public static readonly Color32 Mostaza   = H("#e8c547");
-    public static readonly Color32 MostazaO  = H("#b89a2c");
-    public static readonly Color32 Morado    = H("#5b4a76");
-    public static readonly Color32 Teja      = H("#7a5f52");
-    public static readonly Color32 TejaO     = H("#5f4840");
-    public static readonly Color32 Madera    = H("#6b4326");
-    public static readonly Color32 MaderaO   = H("#4d3019");
-    public static readonly Color32 MaderaL   = H("#8a5c37");
-    public static readonly Color32 Blanco    = H("#f4f2ea");
-    public static readonly Color32 Crema     = H("#d8d4c4");
+    // La paleta de CONTEXT.md §18.6: seis familias de ocho tonos y los acentos. La
+    // familia de piel se llama Tez porque Piel1..Piel6 ya eran los tonos de la forja.
+    // herramientas/plano/paleta.py compara esta lista con la del HTML.
+    public static readonly Color32 Hormigon0  = H("#1a1c21");
+    public static readonly Color32 Hormigon1  = H("#2b2f36");
+    public static readonly Color32 Hormigon2  = H("#3d434c");
+    public static readonly Color32 Hormigon3  = H("#525963");
+    public static readonly Color32 Hormigon4  = H("#6b7280");
+    public static readonly Color32 Hormigon5  = H("#8a919c");
+    public static readonly Color32 Hormigon6  = H("#a9b0ba");
+    public static readonly Color32 Hormigon7  = H("#c8cdd5");
+    public static readonly Color32 Ladrillo0  = H("#2a1512");
+    public static readonly Color32 Ladrillo1  = H("#43231c");
+    public static readonly Color32 Ladrillo2  = H("#5e3227");
+    public static readonly Color32 Ladrillo3  = H("#7a4232");
+    public static readonly Color32 Ladrillo4  = H("#96543e");
+    public static readonly Color32 Ladrillo5  = H("#b06b52");
+    public static readonly Color32 Ladrillo6  = H("#c68a6e");
+    public static readonly Color32 Ladrillo7  = H("#d9a98f");
+    public static readonly Color32 Verde0     = H("#121a14");
+    public static readonly Color32 Verde1     = H("#1d2c20");
+    public static readonly Color32 Verde2     = H("#2b412e");
+    public static readonly Color32 Verde3     = H("#3a573d");
+    public static readonly Color32 Verde4     = H("#4c6e4c");
+    public static readonly Color32 Verde5     = H("#63875f");
+    public static readonly Color32 Verde6     = H("#7fa277");
+    public static readonly Color32 Verde7     = H("#9fbc94");
+    public static readonly Color32 Ria0       = H("#0d1424");
+    public static readonly Color32 Ria1       = H("#141f38");
+    public static readonly Color32 Ria2       = H("#1e2a4a");
+    public static readonly Color32 Ria3       = H("#2a3a61");
+    public static readonly Color32 Ria4       = H("#3a4e7a");
+    public static readonly Color32 Ria5       = H("#4e6595");
+    public static readonly Color32 Ria6       = H("#6681af");
+    public static readonly Color32 Ria7       = H("#84a0c8");
+    public static readonly Color32 Luz0       = H("#2e1f08");
+    public static readonly Color32 Luz1       = H("#4a3210");
+    public static readonly Color32 Luz2       = H("#69481a");
+    public static readonly Color32 Luz3       = H("#8a6127");
+    public static readonly Color32 Luz4       = H("#ab7c37");
+    public static readonly Color32 Luz5       = H("#c8974b");
+    public static readonly Color32 Luz6       = H("#e0b468");
+    public static readonly Color32 Luz7       = H("#f2d294");
+    public static readonly Color32 Tez0       = H("#3d2419");
+    public static readonly Color32 Tez1       = H("#573424");
+    public static readonly Color32 Tez2       = H("#734833");
+    public static readonly Color32 Tez3       = H("#8f5f45");
+    public static readonly Color32 Tez4       = H("#ab7a5c");
+    public static readonly Color32 Tez5       = H("#c29578");
+    public static readonly Color32 Tez6       = H("#d6b096");
+    public static readonly Color32 Tez7       = H("#e8cab4");
+    public static readonly Color32 Peligro0   = H("#8b1a1a");
+    public static readonly Color32 Peligro1   = H("#b82424");
+    public static readonly Color32 Peligro2   = H("#d94040");
+    public static readonly Color32 Aviso0     = H("#c8971e");
+    public static readonly Color32 Aviso1     = H("#e5b62f");
+    public static readonly Color32 Titanio0   = H("#c4d4e0");
+    public static readonly Color32 Titanio1   = H("#e8f4ff");
+    public static readonly Color32 Policia0   = H("#1b3a8c");
+    public static readonly Color32 Policia1   = H("#2d55c4");
+    public static readonly Color32 Senal      = H("#1f7a4c");
+    public static readonly Color32 Nieve      = H("#f5f7fa");
+    public static readonly Color32 Tinta      = H("#000000");
+    public static readonly Color32 Interfaz   = H("#e8e4dc");
+
+    // Los de siempre, ahora apodos. Los usa todo el arte forjado.
+    public static readonly Color32 Negro      = Tinta;
+    public static readonly Color32 Carbon     = Hormigon0;
+    public static readonly Color32 Asfalto    = Hormigon1;
+    public static readonly Color32 AsfaltoO   = Hormigon0;
+    public static readonly Color32 AsfaltoL   = Hormigon2;
+    public static readonly Color32 Gris       = Hormigon2;
+    public static readonly Color32 GrisO      = Hormigon1;
+    public static readonly Color32 GrisL      = Hormigon3;
+    public static readonly Color32 Acero      = Hormigon5;
+    public static readonly Color32 AceroO     = Hormigon4;
+    public static readonly Color32 Hueso      = Hormigon7;
+    public static readonly Color32 Hormigon   = Hormigon4;
+    public static readonly Color32 HormigonO  = Hormigon3;
+    public static readonly Color32 HormigonL  = Hormigon5;
+    public static readonly Color32 Piel1      = Tez7;
+    public static readonly Color32 Piel2      = Tez6;
+    public static readonly Color32 Piel3      = Tez5;
+    public static readonly Color32 Piel4      = Tez4;
+    public static readonly Color32 Piel5      = Tez3;
+    public static readonly Color32 Piel6      = Tez2;
+    public static readonly Color32 Pelo1      = Ladrillo0;
+    public static readonly Color32 Pelo2      = Ladrillo1;
+    public static readonly Color32 Pelo3      = Luz2;
+    public static readonly Color32 Pelo4      = Luz6;
+    public static readonly Color32 Pelo5      = Hormigon5;
+    public static readonly Color32 Azul       = Ria3;
+    public static readonly Color32 AzulO      = Ria2;
+    public static readonly Color32 AzulL      = Ria4;
+    public static readonly Color32 Rojo       = Peligro1;
+    public static readonly Color32 RojoO      = Peligro0;
+    public static readonly Color32 RojoL      = Peligro2;
+    public static readonly Color32 Sangre     = Peligro0;
+    public static readonly Color32 Verde      = Verde4;
+    public static readonly Color32 VerdeO     = Verde3;
+    public static readonly Color32 VerdeL     = Verde5;
+    public static readonly Color32 Cesped     = Verde3;
+    public static readonly Color32 CespedO    = Verde2;
+    public static readonly Color32 Agua       = Ria1;
+    public static readonly Color32 AguaL      = Ria2;
+    public static readonly Color32 Mostaza    = Aviso1;
+    public static readonly Color32 MostazaO   = Aviso0;
+    public static readonly Color32 Morado     = Ria4;
+    public static readonly Color32 Teja       = Ladrillo2;
+    public static readonly Color32 TejaO      = Ladrillo1;
+    public static readonly Color32 Madera     = Ladrillo2;
+    public static readonly Color32 MaderaO    = Ladrillo0;
+    public static readonly Color32 MaderaL    = Ladrillo4;
+    public static readonly Color32 Blanco     = Nieve;
+    public static readonly Color32 Crema      = Interfaz;
 
     static Color32[] _lista;
     public static Color32[] Lista {
         get {
             if (_lista == null) _lista = new Color32[] {
-                Negro,Carbon,Asfalto,AsfaltoO,AsfaltoL,Gris,GrisO,GrisL,Acero,AceroO,Hueso,
-                Hormigon,HormigonO,HormigonL,Piel1,Piel2,Piel3,Piel4,Piel5,Piel6,
-                Pelo1,Pelo2,Pelo3,Pelo4,Pelo5,Azul,AzulO,AzulL,Rojo,RojoO,RojoL,Sangre,
-                Verde,VerdeO,VerdeL,Cesped,CespedO,Agua,AguaL,Mostaza,MostazaO,Morado,
-                Teja,TejaO,Madera,MaderaO,MaderaL,Blanco,Crema
+                Hormigon0,Hormigon1,Hormigon2,Hormigon3,Hormigon4,Hormigon5,Hormigon6,Hormigon7,
+                Ladrillo0,Ladrillo1,Ladrillo2,Ladrillo3,Ladrillo4,Ladrillo5,Ladrillo6,Ladrillo7,
+                Verde0,Verde1,Verde2,Verde3,Verde4,Verde5,Verde6,Verde7,
+                Ria0,Ria1,Ria2,Ria3,Ria4,Ria5,Ria6,Ria7,
+                Luz0,Luz1,Luz2,Luz3,Luz4,Luz5,Luz6,Luz7,
+                Tez0,Tez1,Tez2,Tez3,Tez4,Tez5,Tez6,Tez7,
+                Peligro0,Peligro1,Peligro2,Aviso0,Aviso1,Titanio0,Titanio1,Policia0,
+                Policia1,Senal,Nieve,Tinta,Interfaz
             };
             return _lista;
         }
     }
-
     public static void Cuantizar(Color32[] px) {
         var pal = Lista;
         for (int i = 0; i < px.Length; i++) {

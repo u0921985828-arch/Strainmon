@@ -144,7 +144,9 @@ def coloca(x0, y0):
         for x in range(x0, x0 + 4):
             m[y][x] = 'piernas' if y < y0 + 4 else 'calzado'
     return m
-for x0, y0 in ((2, 2), (25, 28), (14, 15)):
+# Las posiciones salen de la celda y no van escritas: con la celda de 24×32 de CONTEXT.md
+# §18.1, las de antes se salían del papel y la prueba reventaba en vez de fallar.
+for x0, y0 in ((1, 1), (PL.CEL_W - 6, PL.CEL_H - 8), (PL.CEL_W // 2, PL.CEL_H // 2)):
     m = coloca(x0, y0)
     dx, dy = PL._encuadra(m, PL.CEL_W, PL.CEL_H)
     ok(y0 + 5 + dy == PL.BASE_PIES,
@@ -152,8 +154,8 @@ for x0, y0 in ((2, 2), (25, 28), (14, 15)):
     ok(abs((x0 + 1 + dx) - PL.EJE_X) <= 1,
        'el eje queda en x=%d y no en %d' % (x0 + 1 + dx, PL.EJE_X))
 # Y el brazo estirado del puñetazo no descentra el cuerpo: se centra por las piernas.
-m = coloca(14, 15)
-for x in range(18, 30):
+m = coloca(PL.CEL_W // 2, PL.CEL_H // 2)
+for x in range(PL.CEL_W // 2 + 4, PL.CEL_W):
     m[17][x] = 'torso'
 ok(PL._encuadra(m, PL.CEL_W, PL.CEL_H)[0] == dx,
    'el brazo del puñetazo descentra la figura')
