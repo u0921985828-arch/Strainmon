@@ -76,7 +76,7 @@ listo().then(() => {
   });
 
   y += 40;
-  cabecera('protagonista · catorce poses', y - 14);
+  cabecera('protagonista · ' + A.ORDEN_POSES.length + ' poses', y - 14);
   g.font = '11px sans-serif';
   DIRS.forEach((d, i) => { g.fillStyle = '#8a8578'; g.fillText(d, 128 + i * PASO_X, y - 2); });
   y += 8;

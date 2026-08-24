@@ -1,14 +1,61 @@
 # Sprites traídos de PixelLab
 
 El juego forja su arte por código y seguirá pudiendo hacerlo. Esto es la vía alternativa:
-bajar sprites de [PixelLab](https://www.pixellab.ai), cuantizarlos a la paleta del juego y
+bajar dibujos de [PixelLab](https://www.pixellab.ai), cuantizarlos a la paleta del juego y
 empaquetarlos en la hoja que el juego ya sabe leer.
 
 ```bash
 export PIXELLAB_API_KEY=...
-python3 herramientas/sprites/pixellab.py --que protagonista,ertzaina
-python3 herramientas/sprites/pixellab.py --simular      # sin red ni clave
+python3 herramientas/sprites/pixellab.py --coste          # solo la cuenta
+python3 herramientas/sprites/pixellab.py --simular        # sin red ni clave
+python3 herramientas/sprites/pixellab.py                  # las siete siluetas
+python3 herramientas/sprites/pixellab.py --que largo_pantalon,abrigo_pantalon
 ```
+
+## No se baja un personaje: se baja una silueta
+
+Un vecino de Bilbao no es un dibujo, es una combinación: complexión, torso, piernas,
+calzado, peinado, gorro y bolsa. Pedirle a PixelLab cada combinación entera son ochenta
+hojas para vestir a treinta y cuatro arquetipos, y el número treinta y cinco vuelve a
+costar lo mismo que el primero. Así que se baja lo único que no se puede fabricar —**la
+silueta**— y todo lo demás se pone encima:
+
+| | |
+|---|---|
+| **Se baja** | el cuerpo con su ropa: chaqueta y pantalón, abrigo, falda, pantalón corto, capucha. |
+| **Se repinta** | el color de la chaqueta, del pantalón, del calzado, de la piel y del pelo. |
+| **Se forja encima** | el pelo largo, la txapela, el casco de obra, la mochila, el carro de la compra y el fogonazo. |
+
+La hoja no viene pintada de los colores finales: viene de **colores de plantilla**, uno por
+parte del cuerpo —magenta el torso, verde las piernas, cian el calzado, azul el pelo— y el
+empaquetado los guarda cada uno en su propia rampa de la paleta. Como las rampas no se
+tocan entre sí, repintar es cambiar índices por índices: la tabla de 256 bytes que arma
+`lutDe()` en el juego. Un vecino nuevo cuesta **cero llamadas**.
+
+De propina, dos cosas salen gratis de ahí: **calvo** es mandarle el pelo al color de su
+piel, y **canoso** es mandárselo al gris. Ninguno de los dos necesita hoja propia.
+
+## De cada silueta se baja menos de lo que se ve
+
+* **Cinco direcciones de ocho.** Oeste es este del revés, y lo mismo las dos diagonales.
+  El precio de esto es que un personaje asimétrico cambia de mano al girar — por eso la
+  bolsa y la mochila no van en la hoja, sino forjadas encima.
+* **Once dibujos de dieciséis poses.** Los dos pasos de apoyo del andar son el mismo
+  dibujo, las dos zancadas de la carrera también, y **disparar es apuntar** con el
+  fogonazo encima y un píxel de retroceso, que lo pone el juego. Las poses que repiten
+  dibujo van desplazadas un píxel para que no se queden clavadas.
+
+## La cuenta
+
+| | Llamadas | A quién viste |
+|---|---|---|
+| Un personaje entero, 8 direcciones × 16 poses | 128 | a uno |
+| Una silueta, 5 direcciones × 11 dibujos | **55** | a todos los que la lleven |
+| Las siete siluetas | **385** | los 34 arquetipos, y los que se inventen después |
+
+**Bajar una sola ya es jugable.** El juego busca para cada arquetipo la silueta más
+parecida a su ropa, y si no hay ninguna lo forja como siempre: nunca se queda nadie sin
+dibujar. Se puede empezar por `largo_pantalon`, mirar cómo queda y seguir.
 
 ## Hace falta dos cosas que aquí no hay
 
@@ -18,16 +65,11 @@ python3 herramientas/sprites/pixellab.py --simular      # sin red ni clave
    la tiene cerrada — el proxy contesta 403 al CONNECT — así que **esto se ejecuta en
    local**, no desde una sesión.
 
-`--simular` existe justo por eso: dibuja siluetas de relleno con el mismo tamaño y el
-mismo recorrido, y sirve para comprobar que el empaquetado, la compresión, la escritura
-en el HTML y la carga en el juego funcionan **antes** de gastar una sola llamada. Está
-probado así de punta a punta.
-
-## Qué hace exactamente
-
-Por cada arquetipo pide 8 direcciones × 14 poses = **112 imágenes**, y con ellas monta la
-hoja de 8 columnas por 14 filas que el juego dibuja. Ojo al coste: cuatro personajes son
-448 llamadas.
+`--simular` existe justo por eso: dibuja monigotes de relleno con los mismos colores de
+plantilla y el mismo recorrido, y sirve para comprobar que el troceado, el repintado, la
+compresión, la escritura y la carga en el juego funcionan **antes** de gastar una sola
+llamada. Está probado así de punta a punta. Lo que sale no vale para jugar: después,
+`git checkout referencia/bilbo-city.html`.
 
 Lo que baja se guarda en `cache/` —que no va al repositorio— así que repetir una tirada no
 se paga dos veces y cambiar solo el empaquetado no cuesta nada. **Lo simulado y lo traído
@@ -35,15 +77,21 @@ se guardan con clave distinta** (`sim_` y `api_`): sin eso, el `--simular` que s
 arriba dejaba la caché llena de monigotes, la tirada de verdad los encontraba, no llamaba a
 PixelLab ni una vez y terminaba diciendo que todo había ido bien.
 
+## Cómo se comprueba sin bajar nada
+
+La batería (`./verificar.sh html`) monta una hoja de mentira con las rampas de plantilla y
+verifica lo único que puede romperse en silencio: que los nombres de silueta que espera el
+juego son los que baja el empaquetador, que las rampas no comparten ni un color, que cada
+arquetipo encuentra silueta, que el repintado le pone a cada uno su ropa y que dos vecinos
+de la misma silueta no salen clavados. `--coste` revisa las tablas del empaquetador sin
+tocar nada.
+
 ## Por qué no entra ni un PNG
 
 El repositorio no lleva imágenes, y esto no lo cambia. La hoja se escribe en el bloque
 `/*<<<SPRITES*/` del HTML como **un índice de paleta por píxel**, comprimida con deflate y
 en base64 — el mismo formato que la trama de la ciudad. El juego sigue siendo un archivo
 solo y el arte sigue atado a los 48 colores de la paleta.
-
-Un arquetipo que no esté en la hoja **se forja por código**, como siempre. Se puede traer
-de dos en dos y nunca se queda un personaje sin dibujar.
 
 ## Si la API contesta raro
 

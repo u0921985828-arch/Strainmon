@@ -10,6 +10,8 @@
  * Si tocas la generación de ciudad o el combate, esto es lo que te dice si has
  * roto algo. Salida distinta de 0 = hay fallos.
  */
+const fs = require('fs');
+const path = require('path');
 require('./arnes.js');
 
 const dormir = ms => new Promise(r => setTimeout(r, ms));
@@ -135,6 +137,97 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       bien.push(A.PRENDAS.length + ' prendas, y el sprite cambia al vestirse');
     }
 
+
+    // ── 2 quinquies · una silueta traída viste a muchos ────────────────
+    /* Las hojas de PixelLab no se bajan por personaje sino por silueta, y el juego las
+       repinta para cada vecino. Aquí no hay red ni hoja de verdad —el bloque SPRITES va
+       vacío a propósito—, así que se monta una de mentira con las rampas de plantilla y
+       se comprueba lo único que puede romperse en silencio: que los nombres de silueta
+       que espera el juego son los que baja el empaquetador, que el repintado le pone a
+       cada uno su ropa, y que dos vecinos de la misma silueta no salen clavados. */
+    {
+      const py = fs.readFileSync(
+        path.join(__dirname, '..', 'sprites', 'pixellab.py'), 'utf8');
+      const trozo = (marca) => py.slice(py.indexOf(marca), py.indexOf('}', py.indexOf(marca)));
+      const sets = [...trozo('SETS = {').matchAll(/^\s*'(\w+)':/gm)].map(m => m[1]);
+      ok(sets.length >= 4, 'no leo las siluetas de pixellab.py');
+
+      const rampas = {};
+      for (const m of trozo('RAMPAS = {').matchAll(/^\s*'(\w+)':\s*\[([^\]]*)\]/gm)) {
+        rampas[m[1]] = [...m[2].matchAll(/'(\w+)'/g)].map(c => {
+          const hex = A.C[c[1]];
+          ok(!!hex, 'pixellab.py usa un color que no está en la paleta: ' + c[1]);
+          return A.PALETA.findIndex(p => p[3] === hex) + 1;
+        });
+      }
+      const todos = Object.values(rampas).flat();
+      ok(new Set(todos).size === todos.length,
+         'dos partes comparten rampa: repintar una tocaría la otra');
+
+      // Una hoja de mentira por silueta: cabeza, torso, piernas y zapatos, cada parte
+      // recorriendo entera su rampa para que el repintado se ejercite en todas sus posiciones.
+      const cw = A.SPR.cel[0], ch = A.SPR.cel[1], w = cw * 8, h = ch * A.ORDEN_POSES.length;
+      const franjas = [[1, 2, 'pelo'], [2, 10, 'piel'], [10, 18, 'torso'],
+                       [18, 24, 'piernas'], [24, 26, 'calzado']];
+      const bytes = Buffer.alloc(w * h);
+      for (let fy = 0; fy < A.ORDEN_POSES.length; fy++)
+        for (let d = 0; d < 8; d++)
+          for (const [y0, y1, parte] of franjas) {
+            const r = rampas[parte];
+            for (let y = y0; y < y1; y++)
+              for (let x = cw / 2 - 5; x < cw / 2 + 5; x++)
+                bytes[(fy * ch + y + 6) * w + d * cw + (x | 0)] = r[(y - y0) % r.length];
+          }
+      const b64 = require('zlib').deflateRawSync(bytes).toString('base64');
+
+      const antesForja = A.hoja('protagonista').toDataURL();
+      A.SPR.rampas = rampas;
+      for (const s of sets) A.SPR.hojas[s] = b64;
+      await A.cargarSprites();
+      ok(Object.keys(A.BASES).length === sets.length,
+         'no se cargaron las ' + sets.length + ' siluetas');
+
+      const sinSilueta = Object.keys(A.ARQ).filter(k => !A.setDe(A.ARQ[k]));
+      ok(!sinSilueta.length, 'sin silueta que les valga: ' + sinSilueta.join(', '));
+
+      for (const k of Object.keys(A.ARQ)) delete A.HOJAS[k];
+      const color = (k, y) => {
+        const c = A.hoja(k), g = c.getContext('2d');
+        const d = g.getImageData(cw >> 1, y + 6, 1, 1).data;
+        return '#' + [d[0], d[1], d[2]].map(v => v.toString(16).padStart(2, '0')).join('');
+      };
+      for (const k of ['protagonista', 'ertzaina', 'amaia', 'p6']) {
+        const T = A.TORSOS[A.ARQ[k].torso];
+        const suyo = [T.s, T.b, T.l].map(x => x.toLowerCase());
+        ok(suyo.includes(color(k, 13)),
+           k + ': la silueta no se repintó con su torso (salió ' + color(k, 13) + ')');
+      }
+      // Calvo no lleva hoja propia: el pelo se le manda al color de su piel. Los tonos
+      // oscuros de la forja no están entre los 48, así que se compara ya cuantizado.
+      const cerca = (hex) => {
+        const v = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+        let mej = A.PALETA[0], md = 1e9;
+        for (const p of A.PALETA) {
+          const d = (p[0] - v[0]) ** 2 + (p[1] - v[1]) ** 2 + (p[2] - v[2]) ** 2;
+          if (d < md) { md = d; mej = p; }
+        }
+        return mej[3].toLowerCase();
+      };
+      ok([A.ARQ.koldo.piel, A.ARQ.koldo.pielS].map(cerca).includes(color('koldo', 1)),
+         'un calvo sigue saliendo con pelo (salió ' + color('koldo', 1) + ')');
+      ok(A.hoja('protagonista').toDataURL() !== A.hoja('ertzaina').toDataURL(),
+         'dos vecinos de la misma silueta salen clavados');
+      ok(A.hoja('protagonista').toDataURL() !== antesForja,
+         'la hoja traída no llega a usarse: sigue saliendo la forjada');
+
+      // Se deshace todo: el resto de la batería juega con el arte forjado de verdad.
+      A.SPR.rampas = {};
+      for (const s of sets) delete A.SPR.hojas[s];
+      for (const s of sets) delete A.BASES[s];
+      for (const k of Object.keys(A.ARQ)) delete A.HOJAS[k];
+      bien.push(sets.length + ' siluetas visten a los ' + Object.keys(A.ARQ).length +
+                ' arquetipos, repintadas una a una');
+    }
     // ── 2 quater · transporte público ──────────────────────────────────
     {
       ok(A.PARADAS.length === A.BARRIOS.length,

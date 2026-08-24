@@ -2143,8 +2143,24 @@ function dibChar(cfg,pose,d8){
   else{P(g,cx-1,hy,4,8,cfg.piel);P(g,cx+2,hy+4,1,2,C.negro);P(g,cx-3,hy+6,1,1,cfg.pielS);}}
  if(espalda)P(g,cx-4,hy,8,8,cfg.pielS);
  if(P_.herido&&dir===AB)P(g,cx-2,hy+4,4,1,C.sangre);
+ capasEncima(g,cfg,cx,hy,ty,hom,{dir,arr,T,izqV,derV,fog:P_.fog},0);
+ /* Contorno solo por fuera, como los iconos y por lo mismo: la gente cruza del asfalto
+    a la acera y de la acera al parque, y una cazadora gris sobre hormigón gris sin borde
+    se deshace. Las costuras de la ropa no llevan, que a 20 píxeles taparían el dibujo. */
+ return contorno(c,C.negro);
+}
+/* Pelo, gorro, accesorio y fogonazo: lo que va por encima del cuerpo.
+   Está aparte porque se dibuja en dos sitios. Uno es la forja de aquí arriba, sobre el
+   cuerpo que ella misma pinta. El otro son las hojas traídas de PixelLab, que vienen a
+   propósito sin nada en la cabeza y sin bolsas: así una sola hoja vale para todo el que
+   tenga esa silueta, y el peinado, la txapela y el carro de la compra se le ponen encima.
+   Con `soloGrandes` el pelo corto no se repite —ese ya viene en la hoja— y solo se añaden
+   los peinados que cambian el contorno de la cabeza. */
+const GRANDES={melena:1,coleta:1,mono:1,afro:1};
+function capasEncima(g,cfg,cx,hy,ty,hom,E,soloGrandes){
+ const dir=E.dir,arr=E.arr,T=E.T,izqV=E.izqV,derV=E.derV;
  const pc=cfg.pelo==='canoso'?C.pelo5:cfg.pelocol, est=cfg.pelo;
- if(est!=='calvo'){
+ if(est!=='calvo'&&(!soloGrandes||GRANDES[est])){
   if(est==='rapado')P(g,cx-4,hy-1,8,3,pc);
   else if(est==='corto'){P(g,cx-4,hy-2,8,4,pc);if(!arr)P(g,cx-4,hy+2,2,2,pc);}
   else if(est==='melena'){P(g,cx-5,hy-2,10,4,pc);P(g,cx-5,hy+2,2,7,pc);P(g,cx+3,hy+2,2,7,pc);}
@@ -2180,13 +2196,9 @@ function dibChar(cfg,pose,d8){
  else if(A==='gafas'&&dir===AB){P(g,cx-3,hy+4,2,2,C.carbon);P(g,cx+1,hy+4,2,2,C.carbon);P(g,cx-1,hy+4,2,1,C.carbon);}
  else if(A==='carrito'&&!arr){P(g,cx+5,ty+5,5,8,C.rojoO);P(g,cx+5,ty+5,5,2,C.rojo);
   P(g,cx+6,ty+13,1,2,C.carbon);P(g,cx+8,ty+13,1,2,C.carbon);}
- if(P_.fog){if(derV)P(g,cx+hom/2+7,ty+2,3,3,C.mostaza);
+ if(E.fog){if(derV)P(g,cx+hom/2+7,ty+2,3,3,C.mostaza);
   else if(izqV)P(g,cx-hom/2-8,ty+2,3,3,C.mostaza);
   else P(g,cx+hom/2-1,ty+9,3,3,C.mostaza);}
- /* Contorno solo por fuera, como los iconos y por lo mismo: la gente cruza del asfalto
-    a la acera y de la acera al parque, y una cazadora gris sobre hormigón gris sin borde
-    se deshace. Las costuras de la ropa no llevan, que a 20 píxeles taparían el dibujo. */
- return contorno(c,C.negro);
 }
 function A(nombre,comp,pielI,pelo,pelocol,gorro,gorroCol,torso,piernas,calzado,acces){
  const pieles=[C.piel1,C.piel2,C.piel3,C.piel4,C.piel5,C.piel6];
@@ -2255,11 +2267,13 @@ const PEATON_BARRIO={
    jugando con la forja, y un arquetipo que falte en la hoja traída se forja y ya está.
    Nunca se queda un personaje sin dibujar. */
 /*<<<SPRITES*/
-/* Lo escribe herramientas/sprites/pixellab.py. Vacío = todo forjado por código. */
-const SPR={cel:[34,38], hojas:{}};
+/* Lo escribe herramientas/sprites/pixellab.py. Vacío = todo forjado. */
+const SPR={cel:[34,38], rampas:{}, hojas:{}};
 /*SPRITES>>>*/
 const CEL_W=()=>SPR.cel[0], CEL_H=()=>SPR.cel[1];
 const HOJAS={};
+/* Los bytes de cada silueta traída, sin repintar: de aquí salen todos los arquetipos. */
+const BASES={};
 
 /* Los sprites traídos vienen como un índice de paleta por píxel —0 es transparente— y
    no como PNG: así el archivo sigue siendo uno solo y el arte sigue atado a los 48
@@ -2273,17 +2287,122 @@ function lienzoDeIndices(bytes,w,h){
   d[j]=p[0];d[j+1]=p[1];d[j+2]=p[2];d[j+3]=255;}
  g.putImageData(img,0,0);return c;}
 
+/*═══════════════ HOJAS TRAÍDAS: UNA SILUETA, MUCHOS VECINOS ═══════════════*/
+/* Una hoja de PixelLab no se baja para un personaje: se baja para una silueta, y de esa
+   silueta salen todos los que la comparten. Viene pintada con colores de plantilla —cada
+   parte del cuerpo en su propia rampa de la paleta— y cada arquetipo la repinta cambiando
+   índices por índices: la chaqueta al color de su chaqueta, el pantalón al suyo, la piel a
+   la suya. Encima se le forjan el pelo largo, el gorro y la bolsa, que es justo lo que
+   habría multiplicado las hojas por setenta si viniera dibujado.
+
+   Siete hojas visten a los treinta y cuatro arquetipos, y el vecino número treinta y cinco
+   no cuesta ni una llamada más. */
+
+/* De la ropa de un arquetipo a la hoja que le sirve. Lo que decide es la silueta, no el
+   color: manga larga o corta, abrigo, capucha; pantalón, falda o pantalón corto. Si la
+   hoja exacta no está bajada se prueba con la más parecida, así que bajar una sola ya
+   viste a todo el mundo y bajarlas todas afina. */
+function setDe(cfg){
+ const T=TORSOS[cfg.torso],PN=PIERNAS[cfg.piernas];
+ const arriba=T.largo?'abrigo':T.capucha?'capucha':T.manga==='corta'?'corto':'largo';
+ const abajo=PN.falda?'falda':PN.corto?'short':'pantalon';
+ const h=SPR.hojas||{};
+ for(const k of [arriba+'_'+abajo,arriba+'_pantalon','largo_'+abajo,'largo_pantalon'])
+  if(BASES[k])return k;
+ return null;}
+
+const iPaleta=(()=>{const m=new Map();PALETA.forEach((p,i)=>m.set(p[3],i));return m;})();
+/* El índice de un color en la paleta. Los tonos de piel oscura de la forja no están en
+   los 48 —se cuantizan al pintar—, así que aquí se cuantizan igual antes de indexar. */
+function indiceDe(hex){
+ const v=iPaleta.get(hex);
+ if(v!==undefined)return v;
+ const p=masCercano(parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16));
+ return PALETA.indexOf(p);}
+
+/* La tabla de repintado de un arquetipo: 256 bytes que dicen en qué se convierte cada
+   índice de la hoja de plantilla. Una rampa de tres tonos que va a parar a una de dos se
+   reparte proporcionalmente; la de un solo color aplana. */
+function lutDe(cfg){
+ const lut=new Uint8Array(256);
+ for(let i=0;i<256;i++)lut[i]=i;
+ const R=SPR.rampas||{};
+ const pinta=(rampa,cols)=>{
+  if(!rampa||!rampa.length||!cols.length)return;
+  const n=rampa.length,m=cols.length;
+  for(let i=0;i<n;i++)lut[rampa[i]]=1+indiceDe(cols[m<2?0:Math.round(i*(m-1)/(n-1))]);};
+ const T=TORSOS[cfg.torso],PN=PIERNAS[cfg.piernas];
+ pinta(R.piel,[cfg.pielS,cfg.piel]);
+ /* Calvo no necesita hoja propia: se le manda el pelo al color de su piel y desaparece. */
+ pinta(R.pelo,cfg.pelo==='calvo'?[cfg.pielS,cfg.piel]
+  :[cfg.pelo==='canoso'?C.pelo5:cfg.pelocol]);
+ pinta(R.torso,[T.s,T.b,T.l]);
+ pinta(R.piernas,[PN.s,PN.b]);
+ pinta(R.calzado,[CALZADO[cfg.calzado]]);
+ return lut;}
+
+/* Dónde tiene la cabeza esta casilla de la hoja. No se da por supuesto: el dibujo traído
+   no cae píxel a píxel donde lo pone la forja, y un gorro colocado a ojo se queda flotando
+   o le tapa los ojos. Se busca la primera fila con piel o pelo y el borde izquierdo de esa
+   cabeza, y el gorro se sitúa respecto a eso. */
+function anclaCabeza(bytes,w,cw,ch,d,fy,masc){
+ const x0=d*cw;
+ let arriba=-1;
+ for(let y=0;y<ch&&arriba<0;y++){
+  const f=(fy*ch+y)*w+x0;
+  for(let x=0;x<cw;x++)if(masc[bytes[f+x]]){arriba=y;break;}}
+ if(arriba<0)return null;
+ let xmin=cw;
+ for(let y=arriba;y<Math.min(ch,arriba+8);y++){
+  const f=(fy*ch+y)*w+x0;
+  for(let x=0;x<cw;x++)if(masc[bytes[f+x]]&&x<xmin){xmin=x;break;}}
+ return {x:xmin,y:arriba};}
+
+/* Las capas de encima, forjadas en la caja de la forja, y dónde queda su cabeza para poder
+   cuadrarlas con la de la hoja traída. */
+function dibEncima(cfg,pose,d8){
+ const M=MAPA8[d8],dir=M.b,frente=M.f,espalda=M.e;
+ const c=lienzo(FORJA_W,FORJA_H),g=c.getContext('2d');
+ g.translate(MG_X,MG_ARR);
+ const P_=POSES[pose],comp=COMPLEX[cfg.comp],T=TORSOS[cfg.torso];
+ const diag=frente||espalda,lateral=(dir===DE||dir===IZ)&&!diag;
+ const cx=10+(diag?(dir===DE?-1:1):0)+(lateral?(dir===DE?1:-1):0);
+ const oy=P_.y,hom=comp.hom-(diag?1:0)-(lateral?2:0);
+ const arr=(dir===AR)||espalda,ty=9+oy,hy=1+oy;
+ capasEncima(g,cfg,cx,hy,ty,hom,
+  {dir,arr,T,izqV:dir===IZ,derV:dir===DE,fog:P_.fog},1);
+ return {c:contorno(c,C.negro),hx:MG_X+cx-4,hy:MG_ARR+hy};}
+
+/* La hoja de un arquetipo a partir de la silueta que le toca: repintar y poner encima. */
+function hojaDeSet(k){
+ const cfg=ARQ[k],s=cfg&&setDe(cfg),base=s&&BASES[s];
+ if(!base)return null;
+ const cw=CEL_W(),ch=CEL_H(),w=cw*8;
+ const lut=lutDe(cfg),bytes=new Uint8Array(base.length);
+ for(let i=0;i<base.length;i++)bytes[i]=lut[base[i]];
+ const c=lienzoDeIndices(bytes,w,ch*ORDEN_POSES.length),g=c.getContext('2d');
+ const masc=new Uint8Array(256);
+ for(const r of ['piel','pelo'])for(const v of (SPR.rampas||{})[r]||[])masc[v]=1;
+ ORDEN_POSES.forEach((p,fy)=>{for(let d=0;d<8;d++){
+  const a=anclaCabeza(base,w,cw,ch,d,fy,masc);
+  if(!a)continue;
+  const e=dibEncima(cfg,p,d);
+  g.drawImage(e.c,d*cw+a.x-e.hx,fy*ch+a.y-e.hy);}});
+ return cuantizar(c);}
+
 async function cargarSprites(){
  const w=CEL_W()*8, h=CEL_H()*ORDEN_POSES.length;
  for(const k of Object.keys(SPR.hojas)){
   try{
    const bytes=await inflar(SPR.hojas[k]);
-   if(bytes.length!==w*h){console.warn('hoja de',k,'con medidas raras; se forja');continue;}
-   HOJAS[k]=lienzoDeIndices(bytes,w,h);
-  }catch(e){console.warn('no pude leer la hoja de',k,e);}}}
+   if(bytes.length!==w*h){console.warn('silueta',k,'con medidas raras; se forja');continue;}
+   BASES[k]=bytes;
+  }catch(e){console.warn('no pude leer la silueta',k,e);}}}
 
 function hoja(k){
  if(HOJAS[k])return HOJAS[k];
+ const traida=hojaDeSet(k);
+ if(traida)return HOJAS[k]=traida;
  /* La forja da la celda entera, figura y margen. Si los sprites traídos usan otra
     medida, la celda forjada se centra en la suya y se apoya abajo: mezclar tamaños
     descoloca los pies. Con la medida de siempre, ox y oy salen cero. */

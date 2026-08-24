@@ -84,8 +84,10 @@ nada, en C# la excepción salta en el siguiente `MoveNext`.
   repositorio. Si necesitas algo nuevo, se forja por código en `Assets/Scripts/Arte/`.
   **Excepción con condiciones: los sprites de personaje pueden venir de PixelLab**
   (`herramientas/sprites/`), pero entran cuantizados a la paleta y escritos como índices
-  comprimidos en el bloque `SPRITES`, nunca como archivo de imagen. Lo que falte se sigue
-  forjando: el juego no puede depender de que haya hoja.
+  comprimidos en el bloque `SPRITES`, nunca como archivo de imagen. Y entran por
+  **siluetas**, no por personajes: cada parte del cuerpo en su rampa, para poder repintarla
+  (ver *El arte*). Lo que falte se sigue forjando: el juego no puede depender de que haya
+  hoja.
 - **En artefactos web no uses `localStorage` directamente**: el HTML usa `window.storage` con
   respaldo a `localStorage`.
 - **Nada de `Math.random()` en el prototipo.** Usa `azar()`, o `rnd(a,b)` / `rndi(a,b)`, que
@@ -454,6 +456,26 @@ node herramientas/html/captura.js    # el juego en marcha, para ver el arte en l
 node herramientas/html/fuentes.js     # seis fuentes en una imagen, para elegir
 python3 herramientas/sprites/pixellab.py --simular   # sprites de PixelLab, sin gastar red
 ```
+
+### Los sprites traídos no son personajes: son siluetas
+
+Lo que se le pide a PixelLab no es «el protagonista», es **una silueta** — chaqueta con
+pantalón, abrigo largo, falda, pantalón corto, capucha — y de cada una salen todos los
+vecinos que la llevan. La hoja viene pintada con **colores de plantilla**, uno por parte
+del cuerpo, y el empaquetado guarda cada parte en su propia rampa de la paleta; como las
+rampas no comparten ni un color, repintar es cambiar índices por índices (`lutDe()`). El
+pelo largo, el gorro, la bolsa y el fogonazo no se bajan nunca: se forjan encima, anclados
+a la cabeza que trae la hoja (`capasEncima()`, `anclaCabeza()`). Es lo que evita que las
+hojas se multipliquen por cada peinado y cada sombrero.
+
+Y de cada silueta se baja menos de lo que se ve: **cinco direcciones de ocho** —las otras
+tres son espejo— y **once dibujos de dieciséis poses**, porque los pasos de apoyo del andar
+repiten y disparar es apuntar con el fogonazo encima. Salen 55 llamadas por silueta y **385
+para el juego entero**; pedir cuatro personajes completos eran 512 y vestían a cuatro. El
+arquetipo número treinta y cinco no cuesta ninguna.
+
+Si no hay hoja de su silueta exacta, el juego busca la más parecida; si no hay ninguna, lo
+forja. **Nunca se queda nadie sin dibujar**, y por eso bajar una sola silueta ya es jugable.
 
 Los sprites de PixelLab necesitan clave (`PIXELLAB_API_KEY`) y salida a `api.pixellab.ai`,
 que **desde una sesión de Claude está cerrada**: eso se ejecuta en local. Ver

@@ -391,7 +391,7 @@ public static class ForjaChar {
         Hojas.Remove("protagonista");
     }
 
-    /// <summary>Hoja de un arquetipo: 8 columnas × 14 filas. Se compila la primera vez que hace falta.</summary>
+    /// <summary>Hoja de un arquetipo: 8 columnas × una fila por pose. Se compila la primera vez que hace falta.</summary>
     public static Sprite[] Hoja(string arq) {
         Sprite[] s;
         if (Hojas.TryGetValue(arq, out s)) return s;
