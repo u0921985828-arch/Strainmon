@@ -59,7 +59,7 @@ firma exacta de Unity** — una firma inventada de más tapa errores reales, que
 que puede estropear esta herramienta.
 
 `herramientas/plano/sitios.py`, `singulares.py` y `calles.py` comparan las coordenadas de
-los 57 sitios, las medidas de los 13 singulares y los puntos de paso de las 34 calles entre
+los 57 sitios, las medidas de los 13 singulares y los puntos de paso de las 513 calles entre
 el HTML y el C#. Es la trampa clásica de tener dos implementaciones: el HTML pasa la
 batería, el C# no se ejecuta aquí, y Unity acaba poniendo las cosas en otro lado sin que
 nadie lo vea.
@@ -242,64 +242,53 @@ la Galería Abandoibarra. Sitio real, nombre nuestro.
 
 ## El callejero
 
-Andabas por «Abando» y ya está. Ahora el HUD dice también **por qué calle vas**, y son las
-calles de Bilbao: la Gran Vía, Urquijo, Autonomía, Zabalbide, Lehendakari Agirre.
+El HUD dice por qué calle vas, y son **513 calles de Bilbao sacadas del plano municipal**:
+nombre oficial y sitio real, no una lista escrita a mano.
 
-**Para tener todo Bilbao hay que volver a pasar el plano.** El extractor saca del PDF
-**todos** los rótulos de calle y reescribe la tabla entera, en el HTML y en Unity a la vez:
+**Cómo se sacan, que tiene truco.** Sobre el mapa el plano no escribe «ALAMEDA URQUIJO» de
+un tirón: reparte las letras a lo largo de la calle, una a una y siguiendo su curva. Al
+extraer el texto llegan hechas picadillo — la primera versión sacó mil seiscientas «calles»
+llamadas `E R O S` u `O T E R O`. Pero el plano trae además, en el margen derecho, el
+**índice alfabético del callejero** con el nombre entero y su casilla de la cuadrícula
+(A-G × 1-7). Así que se usan los dos: del mapa sale **dónde**, del índice sale **qué**.
+
+1. Las letras del mapa se encadenan por geometría — mismo cuerpo, misma línea de base,
+   hacia delante y a menos de dos cuerpos. Las tolerancias son apretadas a propósito: con
+   margen de sobra la cadena salta al rótulo de al lado y salen dos calles entrelazadas.
+2. Cada cadena se busca en el índice, **solo entre las calles de su casilla o una vecina**.
+   Vale que un nombre contenga al otro —el mapa pone «URQUIJO» y el índice «Urquijo
+   Alameda»— pero solo si el trozo común pasa de cinco letras y no hay empate.
+3. Las dos condiciones a la vez son las que tiran la basura: los números de portal, las
+   letras de la cuadrícula y los equipamientos no están en el índice, y un nombre que sí
+   está pero aparece en la otra punta de Bilbao no es esa calle.
 
 ```bash
 python3 herramientas/plano/extraer.py ruta/al/plano_bilbao.pdf
 ```
 
-Eso es lo que hace que esto sea el callejero de verdad y no una lista escrita a mano. El
-PDF no está en el repositorio —norma nuestra— así que **el extractor no se puede ejecutar
-en una sesión de Claude**: se corre en local, con el plano delante.
+Eso reescribe la tabla entera en los dos ficheros, entre `/*<<<CALLES*/` y `/*CALLES>>>*/`:
+**no la edites a mano esperando que sobreviva**. El PDF no entra en el repositorio, así que
+esa parte se prueba con un **PDF de mentira** —mapa con rótulos repetidos, un equipamiento
+sobre una manzana, un número, un barrio, y su índice de margen— en
+`herramientas/plano/pruebas_extraer.py`, dentro de `./verificar.sh`.
 
-Los rótulos de barrio van en la fuente Skia y por eso salen filtrando por ella; el resto
-del texto sobre el mapa es el callejero. Se criba con tres reglas: parecer un nombre (tres
-letras, no todo dígitos), **caer sobre la calle** —a menos de cuatro casillas de calzada o
-acera, que es lo que se lleva por delante los equipamientos, rotulados sobre la manzana— y
-no ser un barrio. Una calle larga sale rotulada varias veces y esos rótulos se juntan en
-una sola calle, ordenados a lo largo del eje de la nube: eso da justo los puntos de paso
-que come el juego.
+**Del rótulo a las casillas.** Cada calle llega como unos cuantos puntos de paso: los sitios
+donde el plano la rotula. El juego busca el camino de calle que los une, así que lo que se
+afirma no es una coordenada sino un trazado. Tres cosas, cada una de un intento fallido:
 
-Como el plano no está aquí, esa parte se prueba con un **PDF de mentira**
-(`herramientas/plano/pruebas_extraer.py`, dentro de `./verificar.sh`): rótulos repetidos a
-lo largo de una calle, un equipamiento sobre una manzana, un número y un barrio, y se
-comprueba que sale lo que tiene que salir. Y que el juego aguanta el callejero entero lo
-mide `node herramientas/html/escala-calles.js 1200`: **1234 calles se nombran en medio
-segundo**, porque la caja de búsqueda es proporcional al tramo.
+- **La acera es calle.** Con solo calzada, el Casco Viejo se quedaba mudo —las Siete Calles
+  son peatonales y el plano no les pinta trazo de rodadura— y andando, que es la mitad del
+  rato, el rótulo no salía nunca. El camino va por calzada ∪ acera ∪ plaza.
+- **Pero la calzada vale menos.** Dijkstra con dos precios (calzada 1, acera 4): a igual
+  precio el camino se va por la acera y la Gran Vía sale nombrada por el portal.
+- **Dos pasadas: primero los trazados, después las faldas.** En una sola, la falda de una
+  calle se comía el trazado de la vecina. Y si aun así alguna se queda a cero, se le da la
+  casilla de su propio rótulo: que dos calles se disputen una esquina pasa en Bilbao
+  también; que una desaparezca del juego, no.
 
-**Mientras tanto, las 34 de la tabla.** No están leídas de un rótulo: están puestas por su
-trazado, que es el hecho geográfico que sí se puede afirmar. La Gran Vía va de Moyúa a la
-Circular; Urquijo, de la Circular a San Mamés; Zabalbide, del Casco a Santutxu.
-
-La tabla vive entre `/*<<<CALLES*/` y `/*CALLES>>>*/` en los dos ficheros: **no la edites a
-mano esperando que sobreviva**, que la próxima extracción la pisa entera.
-
-Por eso las coordenadas de `CALLES` **son referencias, no medidas**. Cada calle lleva unos
-puntos de paso y el juego busca el camino de calle que los une, así que un punto seis
-casillas corrido sigue cayendo en la calle que va de un sitio al otro — que es exactamente
-lo que identifica a una calle. Si tocas la trama, no hace falta recolocar nada a mano: se
-vuelve a buscar solo, y la batería avisa si alguna se queda corta.
-
-Tres cosas del trazado que costaron un intento cada una:
-
-- **La acera es calle.** Con solo calzada, el Casco Viejo entero se quedaba sin nombre —las
-  Siete Calles son peatonales y el plano no les pinta trazo de rodadura— y andando, que es
-  como se va la mitad del rato, el rótulo no salía nunca. El camino va por
-  calzada ∪ acera ∪ plaza.
-- **Pero la calzada vale menos.** Es un Dijkstra con dos precios (calzada 1, acera 4): con
-  el mismo precio el camino se va por la acera en cuanto ahorra una casilla, y la Gran Vía
-  salía nombrada por el portal en vez de por la avenida.
-- **Y hay red que no conecta.** Donde el plano deja la calle partida, se nombra a lo largo
-  de la recta entre los puntos. Menos exacto, pero el trazado que se afirma es el mismo y
-  ninguna calle se queda en cero.
-
-Y el nombrado va en **dos pasadas**: primero todos los trazados y después las faldas. En
-una sola, la falda de una calle se comía el trazado de su vecina — Colón de Larreátegui va
-a una manzana de la Gran Vía y se quedaba en veinte casillas.
+La caja de búsqueda es proporcional al tramo, no fija: con sesenta casillas fijas, mil
+calles eran minutos de carga. `node herramientas/html/escala-calles.js 1200` lo mide —
+**1234 calles se nombran en medio segundo**.
 
 Para verlo:
 
@@ -308,10 +297,10 @@ node herramientas/html/plano.js salida.png --calles
 node herramientas/html/plano.js ensanche.png --calles --zoom 3 --zona 560,250,380,170
 ```
 
-**Lo que no se puede afirmar no se nombra.** Las Siete Calles miden dos casillas de ancho
-cada una y a 5,16 m por casilla no caben, así que del Casco solo van Bidebarrieta,
-Iturribide y la Ribera. Fuera de las 34, el HUD enseña solo el barrio: una calle inventada
-en el sitio de una que existe es peor que no poner nada.
+**Lo que no está rotulado en el plano no se nombra.** El índice trae unas mil cuatrocientas
+calles y se recuperan 513: el resto son las que el plano no rotula sobre el mapa, o cuyo
+rótulo queda tan partido que no se puede afirmar cuál es. Donde no hay calle, el HUD enseña
+el barrio. Una calle inventada en el sitio de una que existe es peor que no poner nada.
 
 ## La portada
 

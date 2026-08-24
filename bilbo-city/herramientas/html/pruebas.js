@@ -455,24 +455,31 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
     // casillas es un nombre que no sale nunca. Aquí se comprueba sobre el nombrado de
     // verdad, el que hace el juego al cargar la ciudad.
     {
-      const CAL = A.CALLES || [], TOPE = 15;
-      let flojas = 0, tot = 0, peor = 1e9, peorN = '';
+      // Cuando esto eran 34 ejes puestos a mano se exigía un mínimo de quince casillas a
+      // cada uno. Con el callejero del plano —quinientas y pico calles— eso no vale: un
+      // callejón de sesenta metros son doce casillas y es una calle perfectamente real.
+      // Lo que sí sigue siendo un fallo es que una calle que el plano rotula no aparezca
+      // en ninguna casilla, y que la mitad del callejero se quede en nada.
+      const CAL = A.CALLES || [];
+      const largos = CAL.map((c, i) => A.LARGO_CALLE[i] || 0);
+      const vacias = largos.filter(n => n === 0).length;
+      const cortas = largos.filter(n => n < 8).length;
+      const mediana = [...largos].sort((a, b) => a - b)[largos.length >> 1] || 0;
       CAL.forEach((c, i) => {
-        const n = A.LARGO_CALLE[i] || 0;
-        tot += n;
-        if (n < peor) { peor = n; peorN = c.n; }
-        if (n < TOPE) { fallos.push('la calle ' + c.n + ' se queda en ' + n + ' casillas'); flojas++; }
+        if (largos[i] === 0) fallos.push('la calle ' + c.n + ' no cae en ninguna casilla');
       });
-      // Y que el nombre llegue de verdad al jugador: se pregunta por una casilla de cada
-      // calle, que es lo que hace el HUD.
+      if (cortas > CAL.length * .25)
+        fallos.push(cortas + ' de ' + CAL.length + ' calles se quedan en menos de 8 casillas');
+      // Y que el nombre llegue de verdad al jugador: se pregunta por una casilla nombrada,
+      // que es lo que hace el HUD.
       let mudas = 0;
       for (let i = 0; i < A.calleDe.length && mudas < 1; i++) {
         if (!A.calleDe[i]) continue;
         if (!A.calleEn(i % A.MW, (i / A.MW) | 0)) { fallos.push('calleEn no devuelve el nombre'); mudas++; }
       }
-      if (!flojas && !mudas)
-        bien.push(CAL.length + ' calles con nombre sobre ' + tot + ' casillas (la más corta, '
-          + peorN + ', ' + peor + ')');
+      if (!vacias && !mudas && cortas <= CAL.length * .25)
+        bien.push(CAL.length + ' calles con nombre sobre ' + largos.reduce((a, b) => a + b, 0)
+          + ' casillas (mediana ' + mediana + ', ' + cortas + ' de menos de 8)');
     }
 
     // ── 5 · la red viaria está conectada ───────────────────────────────

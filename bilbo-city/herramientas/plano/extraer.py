@@ -29,7 +29,7 @@ Escribe `referencia/bilbo-trama.txt`: la rejilla comprimida en RLE + base64, que
 que cargan el prototipo y Unity. Volver a ejecutarlo con otro plano regenera el mapa
 entero sin tocar una sola coordenada a mano.
 """
-import base64, re, sys, os, zlib
+import base64, re, sys, os, zlib, unicodedata
 import pymupdf
 
 # ── encuadre ────────────────────────────────────────────────────────────────────────
@@ -645,6 +645,9 @@ CALLE_RADIO_VIA = 4          # casillas: cómo de cerca de la calle tiene que ca
 
 def _texto_de_calle(t):
     """Limpia el rótulo y dice si parece un nombre de calle. Devuelve None si no."""
+    # El PDF usa ligaduras tipográficas: 'GRÁFICO' llega con un solo glifo 'ﬁ' y sin
+    # deshacerlo el nombre sale con un carácter que no está en la fuente del juego.
+    t = unicodedata.normalize('NFKC', t)
     t = _limpia(t)
     t = re.sub(r'\s*\d+\s*$', '', t).strip()          # «ERCILLA 12» → «ERCILLA»
     if len(re.findall(r'[^\W\d_]', t, re.UNICODE)) < CALLE_MIN_LETRAS:
@@ -683,29 +686,170 @@ def _orden_en_eje(pts):
     return sorted(pts, key=lambda p: (p[0] - mx) * ux + (p[1] - my) * uy)
 
 
-def calles_de(pdf, rej):
-    """Las calles rotuladas en el plano, cada una con sus puntos de paso en casillas."""
+def indice_callejero(pdf):
+    """Los nombres de calle del índice del margen: el callejero oficial, limpio.
+
+    El plano trae en el margen derecho la lista alfabética de todas las calles con su
+    casilla de la cuadrícula — «C.  Abaitua Eulalia  F 3». Eso es oro: sobre el mapa los
+    nombres están escritos letra a letra siguiendo la curva de la calle y salen hechos
+    picadillo, pero aquí están enteros y bien escritos. Se usan de diccionario: del mapa
+    se saca DÓNDE, y de aquí QUÉ."""
+    p = pdf[0]
+    caja = pymupdf.Rect(RECORTE[2], 0, p.rect.x1, p.rect.y1)
+    txt = unicodedata.normalize('NFKC', p.get_text('text', clip=caja))
+    fuera = {}
+    # El separador es un tabulador en el PDF de verdad, pero al extraer texto de otras
+    # formas llega como varios espacios: se aceptan los dos.
+    sep = r'(?:\t|\s{2,})'
+    for m in re.finditer(r'^\s*[A-Za-zÁÉÍÓÚÑ]{1,3}\.?\s*' + sep + r'\s*(.+?)\s*' + sep +
+                         r'\s*([A-G])\s*([1-7])\s*$', txt, re.M):
+        nombre = re.sub(r'\s+', ' ', m.group(1)).strip()
+        if len(nombre) < 3:
+            continue
+        fuera.setdefault(_clave_calle(nombre), (nombre, m.group(2), int(m.group(3))))
+    return fuera
+
+
+def _clave_calle(t):
+    """El nombre reducido a lo comparable: sin tildes, sin signos y sin mayúsculas."""
+    t = unicodedata.normalize('NFD', t)
+    t = ''.join(c for c in t if unicodedata.category(c) != 'Mn')
+    return re.sub(r'[^a-z0-9]', '', t.lower())
+
+
+def _cadenas(pdf):
+    """Reconstruye los rótulos del mapa juntando las letras que van seguidas.
+
+    El plano no escribe 'ALAMEDA URQUIJO' de un tirón: reparte las letras a lo largo de la
+    calle, una a una y siguiendo su curva. PyMuPDF las devuelve troceadas en spans y líneas
+    que no tienen nada que ver con el nombre.
+
+    Así que se trabaja por letras: cada una con su sitio, su cuerpo y la dirección en que
+    está escrita, y se encadenan las que van a continuación unas de otras. Las tolerancias
+    son apretadas a propósito — mismo cuerpo, misma línea de base, hacia delante y a menos
+    de dos cuerpos — porque con margen de sobra la cadena salta de un rótulo al de al lado
+    y salen engendros con las letras de dos calles entrelazadas."""
     p = pdf[0]
     caja = pymupdf.Rect(*RECORTE)
-    por_nombre = {}
-    for b in p.get_text('dict', clip=caja)['blocks']:
+    letras = []
+    for b in p.get_text('rawdict', clip=caja)['blocks']:
         for l in b.get('lines', []):
+            dx, dy = l.get('dir', (1, 0))
             for sp in l['spans']:
                 if FUENTE_ROTULO in sp['font']:
                     continue                       # eso es un barrio
-                t = _texto_de_calle(sp['text'])
-                if t is None or clave_de(t) is not None:
-                    continue                       # vacío, basura, o un barrio
-                x0, y0, x1, y1 = sp['bbox']
-                gx, gy = a_casilla((x0 + x1) / 2, (y0 + y1) / 2)
-                if not (0 <= gx < MW and 0 <= gy < MH):
-                    continue
-                if not _cerca_de_via(rej, gx, gy):
-                    continue                       # un equipamiento, no una calle
-                por_nombre.setdefault(t, []).append((gx, gy))
+                cuerpo = round(sp.get('size', 8), 1)
+                for ch in sp.get('chars', []):
+                    if not ch['c'].strip():
+                        continue
+                    x0, y0, x1, y1 = ch['bbox']
+                    letras.append([ch['c'], (x0 + x1) / 2, (y0 + y1) / 2,
+                                   max(2.0, y1 - y0), dx, dy, cuerpo])
+    LADO = 24
+    cubo = {}
+    for i, L in enumerate(letras):
+        cubo.setdefault((int(L[1] // LADO), int(L[2] // LADO)), []).append(i)
+    padre = list(range(len(letras)))
+
+    def raiz(a):
+        while padre[a] != a:
+            padre[a] = padre[padre[a]]
+            a = padre[a]
+        return a
+
+    for i, A in enumerate(letras):
+        cx, cy, h, ux, uy, cuerpo = A[1], A[2], A[3], A[4], A[5], A[6]
+        for ddx in (-1, 0, 1):
+            for ddy in (-1, 0, 1):
+                for j in cubo.get((int(cx // LADO) + ddx, int(cy // LADO) + ddy), ()):
+                    if j == i:
+                        continue
+                    B = letras[j]
+                    if B[6] != cuerpo:                     # otro cuerpo, otro rótulo
+                        continue
+                    if ux * B[4] + uy * B[5] < .97:        # escritas en otra dirección
+                        continue
+                    vx, vy = B[1] - cx, B[2] - cy
+                    largo = vx * ux + vy * uy              # a lo largo del renglón
+                    ancho = abs(-vx * uy + vy * ux)        # separación de la línea de base
+                    if not (0 < largo <= 2.0 * h) or ancho > .5 * h:
+                        continue
+                    ra, rb = raiz(i), raiz(j)
+                    if ra != rb:
+                        padre[ra] = rb
+    grupos = {}
+    for i in range(len(letras)):
+        grupos.setdefault(raiz(i), []).append(i)
+    fuera = []
+    for g in grupos.values():
+        ux = sum(letras[i][4] for i in g) / len(g)
+        uy = sum(letras[i][5] for i in g) / len(g)
+        g.sort(key=lambda i: letras[i][1] * ux + letras[i][2] * uy)
+        fuera.append((''.join(letras[i][0] for i in g),
+                      sum(letras[i][1] for i in g) / len(g),
+                      sum(letras[i][2] for i in g) / len(g)))
+    return fuera
+
+
+# La cuadrícula del plano: siete columnas (A-G) por siete filas (1-7) sobre el recorte.
+def _celda(gx, gy):
+    col = 'ABCDEFG'[min(6, gx * 7 // MW)]
+    return col, min(7, gy * 7 // MH + 1)
+
+
+def calles_de(pdf, rej):
+    """Las calles del plano, con su nombre del índice y su sitio del mapa.
+
+    Un rótulo del mapa solo se acepta si su texto —hecho picadillo y todo— corresponde a un
+    nombre del índice, y si además cae en la casilla de la cuadrícula que el índice le da o
+    en una vecina. Las dos condiciones a la vez es lo que se lleva por delante la basura:
+    los números de portal, las letras de la cuadrícula, los nombres de equipamiento y las
+    cadenas que se han comido dos rótulos entrelazados no están en el índice, y un nombre
+    que sí está pero aparece en la otra punta de Bilbao no es esa calle."""
+    indice = indice_callejero(pdf)
+    # El índice, repartido por casilla de la cuadrícula: así cada rótulo del mapa solo se
+    # compara con las calles que pueden estar donde él está, y no con las mil cuatrocientas.
+    por_celda = {}
+    for k, ent in indice.items():
+        por_celda.setdefault((ent[1], ent[2]), []).append((k, ent))
+    por_nombre = {}
+    for txt, x, y in _cadenas(pdf):
+        k = _clave_calle(txt)
+        if len(k) < 5:
+            continue
+        gx, gy = a_casilla(x, y)
+        if not (0 <= gx < MW and 0 <= gy < MH):
+            continue
+        if not _cerca_de_via(rej, gx, gy):
+            continue                               # un equipamiento, no una calle
+        col, fila = _celda(gx, gy)
+        # Sobre el mapa el rótulo suele traer solo el nombre propio —'URQUIJO'— y el índice
+        # lo lista invertido —'Urquijo Alameda'—, así que pedir que coincidan enteros deja
+        # fuera a la mayoría. Vale que uno contenga al otro, pero solo si el trozo común es
+        # largo y solo si NO hay dos calles de la casilla que encajen igual de bien: con un
+        # 'san' de por medio, media Bilbao valdría.
+        mejor, mejor_n, empate = None, 0, False
+        for dc in (-1, 0, 1):
+            for df in (-1, 0, 1):
+                celda = (chr(ord(col) + dc), fila + df)
+                for ik, ent in por_celda.get(celda, ()):
+                    if k in ik:
+                        n = len(k)
+                    elif ik in k:
+                        n = len(ik)
+                    else:
+                        continue
+                    if n < 5:
+                        continue
+                    if n > mejor_n:
+                        mejor, mejor_n, empate = ent, n, False
+                    elif n == mejor_n and ent[0] != (mejor[0] if mejor else None):
+                        empate = True
+        if mejor is None or empate:
+            continue
+        por_nombre.setdefault(mejor[0], []).append((gx, gy))
     fuera = []
     for nombre, pts in por_nombre.items():
-        # Dos rótulos pegados son el mismo sitio escrito dos veces: sobra uno.
         limpios = []
         for q in _orden_en_eje(pts):
             if all(abs(q[0] - r[0]) + abs(q[1] - r[1]) > 6 for r in limpios):
@@ -713,12 +857,11 @@ def calles_de(pdf, rej):
         if not limpios:
             continue
         # Una calle con un solo rótulo no tiene tramo que recorrer. Se le da un segmento
-        # mínimo a lo largo del eje de su propia letra para que el juego tenga por dónde
-        # empezar a buscar.
+        # mínimo para que el juego tenga por dónde empezar a buscar.
         if len(limpios) == 1:
             gx, gy = limpios[0]
             limpios = [(gx, gy), (gx + 1, gy)]
-        fuera.append((nombre.title(), limpios))
+        fuera.append((nombre, limpios))
     fuera.sort(key=lambda c: c[0])
     return fuera
 

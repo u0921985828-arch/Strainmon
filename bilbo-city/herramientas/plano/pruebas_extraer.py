@@ -40,27 +40,44 @@ def punto_de(gx, gy):
     return E.RECORTE[0] + (gx + .5) * ex, E.RECORTE[1] + (gy + .5) * ey
 
 
-def pdf_falso(rotulos):
+def pdf_falso(rotulos, indice):
+    """El mapa con sus rótulos, y el índice del callejero en el margen derecho.
+
+    Los dos hacen falta: el extractor saca del mapa DÓNDE está cada calle y del índice
+    QUÉ es, porque sobre el mapa los nombres van escritos letra a letra siguiendo la
+    curva de la calle y llegan hechos picadillo."""
     doc = pymupdf.open()
-    pag = doc.new_page(width=E.RECORTE[2] + 200, height=E.RECORTE[3] + 200)
+    pag = doc.new_page(width=E.RECORTE[2] + 700, height=E.RECORTE[3] + 200)
     for texto, gx, gy in rotulos:
         x, y = punto_de(gx, gy)
         pag.insert_text((x, y), texto, fontname='helv', fontsize=7)
+    y = 60
+    for abrev, nombre, celda in indice:
+        pag.insert_text((E.RECORTE[2] + 40, y), '%s    %s    %s' % (abrev, nombre, celda),
+                        fontname='helv', fontsize=9)
+        y += 18
     return pymupdf.open('pdf', doc.tobytes())
 
 
 rej = rejilla_falsa()
+# Los rótulos van juntos en el centro del mapa: la cuadrícula del plano son siete columnas
+# por siete filas, y el extractor exige que el rótulo caiga en la casilla que le da el
+# índice o en una vecina — que es lo que descarta un nombre que aparece en la otra punta.
 pdf = pdf_falso([
     # Una avenida larga, rotulada cuatro veces y a propósito en desorden: el extractor
     # tiene que ordenarlas a lo largo del eje, que si no los puntos de paso van en zigzag.
-    ('GRAN VIA', 900, 383), ('GRAN VIA', 300, 383),
-    ('GRAN VIA', 600, 383), ('GRAN VIA', 1100, 383),
-    ('ERCILLA', 500, 383),                    # una calle con un solo rótulo
-    ('ERCILLA 12', 505, 383),                 # el mismo, con número: mismo nombre
+    ('GRAN VIA', 740, 383), ('GRAN VIA', 560, 383),
+    ('GRAN VIA', 620, 383), ('GRAN VIA', 680, 383),
+    ('ERCILLA', 800, 383),                    # una calle con un solo rótulo
     ('POLIDEPORTIVO', 700, 200),              # equipamiento: lejos de la calle, fuera
-    ('SANTUTXU', 400, 383),                   # un barrio: tiene su tabla, fuera
-    ('27', 800, 383),                         # un número suelto, fuera
-    ('B', 850, 383),                          # una letra de cuadrícula, fuera
+    ('SANTUTXU', 500, 383),                   # un barrio: tiene su tabla, fuera
+    ('MONTEVIDEO', 900, 383),                 # una calle que el índice pone en otro sitio
+    ('27', 860, 383),                         # un número suelto, fuera
+    ('B', 880, 383),                          # una letra de cuadrícula, fuera
+], [
+    ('Av.', 'Gran Via', 'C 4'),
+    ('C.',  'Ercilla', 'D 4'),
+    ('C.',  'Montevideo', 'A 6'),             # existe, pero lejos del rótulo de arriba
 ])
 calles = dict(E.calles_de(pdf, rej))
 
@@ -69,6 +86,7 @@ ok('Ercilla' in calles, 'no salió la calle de un solo rótulo')
 ok('Polideportivo' not in calles, 'se coló un equipamiento, que está lejos de la calle')
 ok('Santutxu' not in calles, 'se coló un barrio')
 ok('27' not in calles and 'B' not in calles, 'se coló un número o una letra de cuadrícula')
+ok('Montevideo' not in calles, 'se aceptó un nombre del índice que aparece en otra casilla')
 
 if 'Gran Via' in calles:
     v = calles['Gran Via']
@@ -77,9 +95,10 @@ if 'Gran Via' in calles:
     ok(all(380 <= y <= 386 for _, y in v), 'algún punto de paso cayó fuera de la calle')
 
 if 'Ercilla' in calles:
-    # Dos rótulos a cinco casillas son el mismo sitio escrito dos veces.
+    # Con un solo rótulo no hay tramo: se le da un segmento mínimo para que el juego tenga
+    # por dónde empezar a buscar.
     ok(len(calles['Ercilla']) == 2,
-       'los dos rótulos pegados de Ercilla no se fundieron: %s' % (calles['Ercilla'],))
+       'la calle de un solo rótulo no recibió su segmento mínimo: %s' % (calles['Ercilla'],))
 
 # Y que lo emitido sea código válido en los dos lados.
 js = E.bloque_calles_js(list(calles.items()))
