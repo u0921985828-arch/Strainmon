@@ -6,18 +6,21 @@
  * Un personaje de 20×26 no se dibuja a ojo desde el código: hay que verlo grande para
  * juzgar el dibujo, y en fila para saber si las ocho direcciones son el mismo tipo.
  * La lámina saca cada arquetipo con sus ocho direcciones en reposo, y debajo, del
- * protagonista, las catorce poses.
+ * protagonista, todas las poses.
  */
 require('./arnes.js');
 const fs = require('fs'), path = require('path');
 const { createCanvas } = require('canvas');
 
+// Hay que esperar a que el juego esté listo del todo, no a que exista la forja: las
+// hojas traídas de PixelLab se descomprimen durante el arranque, y dibujar antes saca la
+// forja aunque haya hoja. La lámina tiene que enseñar lo que el juego va a dibujar.
 const listo = async () => {
-  for (let t = 0; t < 30000; t += 25) {
-    if (global.__ && global.__.ARQ && global.__.hoja) return;
+  for (let t = 0; t < 40000; t += 25) {
+    if (global.__H && global.__H['btnNuevo:click'] && global.__ && global.__.hoja) return;
     await new Promise(r => setTimeout(r, 25));
   }
-  throw new Error('los personajes no se forjaron');
+  throw new Error('el juego no arrancó');
 };
 
 const DIRS = ['abajo', 'ab-de', 'derecha', 'ar-de', 'arriba', 'ar-iz', 'izquierda', 'ab-iz'];
