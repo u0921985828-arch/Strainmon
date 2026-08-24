@@ -749,6 +749,8 @@ ABREVIATURAS = {
     'Ctra.': 'Carretera', 'Cm.': 'Camino', 'Pj.': 'Pasaje', 'Tr.': 'Travesía',
     'Es.': 'Escalinata', 'Gp.': 'Grupo', 'Mu.': 'Muelle', 'Pt.': 'Puente',
     'Cs.': 'Caserío', 'Ba.': 'Barrio', 'Ro.': 'Ronda', 'Ca.': 'Callejón',
+    'Co.': 'Camino', 'Er.': 'Erribera', 'Pk.': 'Parque', 'Zh.': 'Zeharkalea',
+    'Bo.': 'Barrio', 'Gr.': 'Grupo', 'Mo.': 'Monte', 'Ct.': 'Cuesta',
 }
 
 
@@ -772,7 +774,38 @@ def indice_callejero(pdf):
                       r'\s*(.+?)\s*(?:' + sep + r'\s*([A-G])\s*([1-7]))?\s*$')
     sola = re.compile(r'^\s*([A-G])\s*([1-7])\s*$')
     fuera = {}
-    # Dos pasadas porque el índice no tiene una sola forma: la que despliega abreviaturas
+    # El índice va en ciclos de tres líneas —abreviatura, nombre, casilla— y esa es la
+    # forma buena: leyéndolo así salen las novecientas y pico calles que tiene Bilbao, y
+    # no las ochocientas que salían buscando las tres cosas en el mismo renglón. Además la
+    # abreviatura hace falta para distinguir: 'C. Arenal', 'Ps. Arenal' y 'Pt. Arenal del'
+    # son tres sitios distintos con el mismo nombre.
+    sola_abrev = re.compile(r'^\s*([A-Za-zÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑ.]{0,6}\.)\s*$')
+    sola_celda = re.compile(r'^\s*([A-G])\s*([1-7])\s*$')
+    i = 0
+    while i < len(lineas):
+        m = sola_abrev.match(lineas[i])
+        if not m:
+            i += 1
+            continue
+        j = i + 1
+        while j < len(lineas) and not lineas[j].strip():
+            j += 1
+        k = j + 1
+        while k < len(lineas) and not lineas[k].strip():
+            k += 1
+        if k >= len(lineas):
+            break
+        cel = sola_celda.match(lineas[k])
+        nombre = re.sub(r'\s+', ' ', lineas[j]).strip() if j < len(lineas) else ''
+        if cel and len(nombre) >= 3 and not sola_abrev.match(lineas[j]):
+            largo = (ABREVIATURAS.get(m.group(1), '') + ' ' + nombre).strip()
+            ent = (largo, cel.group(1), int(cel.group(2)))
+            for c in (_clave_calle(largo), _clave_calle(nombre)):
+                fuera.setdefault(c, ent)
+            i = k + 1
+            continue
+        i += 1
+    # Y dos pasadas más porque el índice no tiene una sola forma: la que despliega abreviaturas
     # va primero, para que el nombre que se guarde sea el completo —'Gran Vía López de
     # Haro' y no 'López de Haro'—; la otra rellena lo que aquélla no reconoce.
     # Antes: la mayoría de las entradas
