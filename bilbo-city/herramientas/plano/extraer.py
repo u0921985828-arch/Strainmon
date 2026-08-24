@@ -925,8 +925,14 @@ def _cadenas_de(letras):
     return fuera
 
 
-def _variantes(nombre):
-    """Las formas en que un nombre del índice puede estar escrito sobre el mapa."""
+def _variantes(nombre, sueltas=True):
+    """Las formas en que un nombre del índice puede estar escrito sobre el mapa.
+
+    Las rotaciones del orden de las palabras siempre: el índice invierte el nombre para
+    ordenarlo y el mapa lo escribe como se dice. Las palabras sueltas solo cuando se busca
+    un nombre concreto: valen para encontrar 'ARRIAGA' partiendo de 'Arriaga Emiliano',
+    pero como criterio de aceptación son un coladero — cualquier rótulo que ponga ARRIAGA
+    en la otra punta de Bilbao se lleva la calle."""
     pal = [p for p in re.split(r'[\s.]+', nombre) if p]
     fuera, vistos = [], set()
 
@@ -937,8 +943,10 @@ def _variantes(nombre):
 
     for i in range(len(pal)):
         mete(_clave_calle(''.join(pal[i:] + pal[:i])))
-    for p in sorted(pal, key=len, reverse=True):
-        mete(_clave_calle(p))
+    if sueltas:
+        for p in sorted(pal, key=len, reverse=True):
+            if len(_clave_calle(p)) >= 6:
+                mete(_clave_calle(p))
     return fuera
 
 
@@ -998,7 +1006,7 @@ def calles_de(pdf, rej):
     for k, ent in indice.items():
         # Con todas las formas del nombre, no solo la del índice: el índice lo invierte
         # para ordenarlo —'Aguirre Lehendakari'— y el mapa lo escribe como se dice.
-        for v in set(_variantes(ent[0])) | {k}:
+        for v in set(_variantes(ent[0], sueltas=False)) | {k}:
             por_celda.setdefault((ent[1], ent[2]), []).append((v, ent))
     letras = _letras(pdf)
     por_nombre = {}
@@ -1108,7 +1116,14 @@ def calles_de(pdf, rej):
             gx, gy = limpios[0]
             limpios = [(gx, gy), (gx + 1, gy)]
         fuera.append((nombre, limpios))
-    fuera.sort(key=lambda c: c[0])
+    # Dos entradas del índice pueden llevar al mismo sitio —'Arenal' y 'Arenal del'—.
+    # Se queda la de nombre más largo, que es la más específica.
+    porsitio = {}
+    for nombre, pts in fuera:
+        clave = pts[0]
+        if clave not in porsitio or len(nombre) > len(porsitio[clave][0]):
+            porsitio[clave] = (nombre, pts)
+    fuera = sorted(porsitio.values(), key=lambda c: c[0])
     return fuera
 
 
