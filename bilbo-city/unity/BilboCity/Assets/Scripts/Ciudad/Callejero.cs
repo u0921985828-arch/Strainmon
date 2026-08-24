@@ -33,6 +33,11 @@ public static class Callejero {
         return new Calle { Nombre = nombre, Puntos = p };
     }
 
+    // Esta tabla la escribe el extractor: `python3 herramientas/plano/extraer.py plano.pdf`
+    // saca los rótulos de calle del plano y la reemplaza entera. Lo de abajo es lo que hay
+    // hasta que se vuelva a extraer — los ejes principales, puestos por su trazado. NO se
+    // edita a mano esperando que sobreviva: la próxima extracción lo pisa.
+    /*<<<CALLES*/
     public static readonly Calle[] Calles = {
         // El Ensanche de Abando. La retícula que se ve desde el aire, con Moyúa en medio.
         C("Gran Vía",             634,310, 728,319, 846,330),
@@ -75,6 +80,7 @@ public static class Callejero {
         C("Doctor Areilza",       626,362, 566,376),
         C("Zabala",               838,458, 856,476),
     };
+    /*CALLES>>>*/
 
     /// <summary>Qué calle es cada casilla: 0 es «ninguna», y si no, el índice más uno.</summary>
     static readonly short[] _de = new short[Ciudad.MW*Ciudad.MH];
@@ -113,8 +119,12 @@ public static class Callejero {
     /// distancia, que se recorren en orden.
     /// </summary>
     static List<Vector2Int> Camino(int ax, int ay, int bx, int by) {
-        int x0 = Mathf.Max(1, Mathf.Min(ax,bx)-Holgura), x1 = Mathf.Min(Ciudad.MW-2, Mathf.Max(ax,bx)+Holgura);
-        int y0 = Mathf.Max(1, Mathf.Min(ay,by)-Holgura), y1 = Mathf.Min(Ciudad.MH-2, Mathf.Max(ay,by)+Holgura);
+        // La holgura, a la medida del tramo. Con sesenta fijas, dos rótulos de la misma
+        // calle a quince casillas montaban una caja de 135×135 para un camino de quince:
+        // con las mil y pico calles que saca el extractor del plano, eso son minutos.
+        int hol = Mathf.Clamp(Mathf.Max(Mathf.Abs(bx-ax), Mathf.Abs(by-ay)), 24, Holgura);
+        int x0 = Mathf.Max(1, Mathf.Min(ax,bx)-hol), x1 = Mathf.Min(Ciudad.MW-2, Mathf.Max(ax,bx)+hol);
+        int y0 = Mathf.Max(1, Mathf.Min(ay,by)-hol), y1 = Mathf.Min(Ciudad.MH-2, Mathf.Max(ay,by)+hol);
         int an = x1-x0+1, al = y1-y0+1, N = an*al;
         var dist = new int[N]; var de = new int[N];
         for (int i = 0; i < N; i++) { dist[i] = int.MaxValue; de[i] = -1; }

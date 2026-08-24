@@ -620,6 +620,123 @@ def marcas_de(pdf):
     return fuera
 
 
+# ── el callejero ────────────────────────────────────────────────────────────────────
+# Los rótulos de barrio van en Skia y filtrando por esa fuente salen los 35 y solo ellos.
+# Todo lo demás que hay escrito sobre el mapa —y hay mucho— es el callejero: el plano
+# rotula cada calle con su nombre, repetido a lo largo del trazado cuando es larga.
+#
+# Filtrar «todo lo que no sea Skia» no basta: ahí dentro caen números de portal, letras
+# de la cuadrícula, nombres de equipamientos y el índice del margen. Se cribia con tres
+# reglas que se sostienen solas:
+#
+#   1. tiene que parecer un nombre: tres letras o más, y no ser todo dígitos;
+#   2. tiene que estar SOBRE la calle — un rótulo de calle se dibuja encima de su calle,
+#      así que se exige calzada o acera a menos de cuatro casillas. Esto es lo que se
+#      lleva por delante los equipamientos, que se rotulan sobre la manzana;
+#   3. no puede ser un barrio, que ya tienen su tabla.
+#
+# Una calle larga sale rotulada varias veces. Los rótulos con el mismo nombre se juntan
+# en una sola calle y sus posiciones se ordenan a lo largo del eje de la nube: eso da
+# justo lo que come el juego —unos puntos de paso—, y el trazado entre ellos ya lo busca
+# él solo por la calle de verdad.
+CALLE_MIN_LETRAS = 3
+CALLE_RADIO_VIA = 4          # casillas: cómo de cerca de la calle tiene que caer el rótulo
+
+
+def _texto_de_calle(t):
+    """Limpia el rótulo y dice si parece un nombre de calle. Devuelve None si no."""
+    t = _limpia(t)
+    t = re.sub(r'\s*\d+\s*$', '', t).strip()          # «ERCILLA 12» → «ERCILLA»
+    if len(re.findall(r'[^\W\d_]', t, re.UNICODE)) < CALLE_MIN_LETRAS:
+        return None
+    if re.fullmatch(r'[\d\W_]+', t, re.UNICODE):
+        return None
+    return t
+
+
+def _cerca_de_via(rej, gx, gy, r=CALLE_RADIO_VIA):
+    for dy in range(-r, r + 1):
+        for dx in range(-r, r + 1):
+            x, y = gx + dx, gy + dy
+            if 0 <= x < MW and 0 <= y < MH and rej[y * MW + x] in (CALLE, ACERA, PLAZA):
+                return True
+    return False
+
+
+def _orden_en_eje(pts):
+    """Ordena unos puntos a lo largo del eje que mejor los ajusta.
+
+    Los rótulos de una calle larga salen del PDF en el orden en que estén escritos, que no
+    es el de la calle. Sin ordenarlos, los puntos de paso van en zigzag y el trazado se
+    recorre dos veces de punta a punta."""
+    n = len(pts)
+    if n < 3:
+        return pts
+    mx = sum(p[0] for p in pts) / n
+    my = sum(p[1] for p in pts) / n
+    sxx = sum((p[0] - mx) ** 2 for p in pts) / n
+    syy = sum((p[1] - my) ** 2 for p in pts) / n
+    sxy = sum((p[0] - mx) * (p[1] - my) for p in pts) / n
+    import math
+    ang = .5 * math.atan2(2 * sxy, sxx - syy)
+    ux, uy = math.cos(ang), math.sin(ang)
+    return sorted(pts, key=lambda p: (p[0] - mx) * ux + (p[1] - my) * uy)
+
+
+def calles_de(pdf, rej):
+    """Las calles rotuladas en el plano, cada una con sus puntos de paso en casillas."""
+    p = pdf[0]
+    caja = pymupdf.Rect(*RECORTE)
+    por_nombre = {}
+    for b in p.get_text('dict', clip=caja)['blocks']:
+        for l in b.get('lines', []):
+            for sp in l['spans']:
+                if FUENTE_ROTULO in sp['font']:
+                    continue                       # eso es un barrio
+                t = _texto_de_calle(sp['text'])
+                if t is None or clave_de(t) is not None:
+                    continue                       # vacío, basura, o un barrio
+                x0, y0, x1, y1 = sp['bbox']
+                gx, gy = a_casilla((x0 + x1) / 2, (y0 + y1) / 2)
+                if not (0 <= gx < MW and 0 <= gy < MH):
+                    continue
+                if not _cerca_de_via(rej, gx, gy):
+                    continue                       # un equipamiento, no una calle
+                por_nombre.setdefault(t, []).append((gx, gy))
+    fuera = []
+    for nombre, pts in por_nombre.items():
+        # Dos rótulos pegados son el mismo sitio escrito dos veces: sobra uno.
+        limpios = []
+        for q in _orden_en_eje(pts):
+            if all(abs(q[0] - r[0]) + abs(q[1] - r[1]) > 6 for r in limpios):
+                limpios.append(q)
+        if not limpios:
+            continue
+        # Una calle con un solo rótulo no tiene tramo que recorrer. Se le da un segmento
+        # mínimo a lo largo del eje de su propia letra para que el juego tenga por dónde
+        # empezar a buscar.
+        if len(limpios) == 1:
+            gx, gy = limpios[0]
+            limpios = [(gx, gy), (gx + 1, gy)]
+        fuera.append((nombre.title(), limpios))
+    fuera.sort(key=lambda c: c[0])
+    return fuera
+
+
+def bloque_calles_js(calles):
+    filas = ',\n'.join(
+        ' {n:%r, v:[%s]}' % (n, ','.join(f'[{x},{y}]' for x, y in v))
+        for n, v in calles)
+    return f"const CALLES=[\n{filas},\n];"
+
+
+def bloque_calles_cs(calles):
+    filas = ',\n'.join(
+        '        C("%s", %s)' % (n, ', '.join(f'{x},{y}' for x, y in v))
+        for n, v in calles)
+    return f"    public static readonly Calle[] Calles = {{\n{filas},\n    }};"
+
+
 def b64(datos):
     return base64.b64encode(bytes(comprimir(datos))).decode()
 
@@ -672,6 +789,7 @@ if __name__ == '__main__':
     doc_f, doc_c, n = capas(pdf)
     rej, viaria = aceras(rejilla(doc_f, doc_c))
     marcas = marcas_de(pdf)
+    calles = calles_de(pdf, rej)
     dueno = barrios(rej, marcas)
 
     from collections import Counter
@@ -679,7 +797,7 @@ if __name__ == '__main__':
     nombres = {CALLE: 'calle', ACERA: 'acera', EDIF: 'manzana', PARQUE: 'parque',
                AGUA: 'agua', PUENTE: 'puente', MONTE: 'monte'}
     print(f'{MW}x{MH} casillas · {METROS_POR_PUNTO*(RECORTE[2]-RECORTE[0])/MW:.2f} m por casilla '
-          f'· {n} trazos de calzada · {len(marcas)} barrios')
+          f'· {n} trazos de calzada · {len(marcas)} barrios · {len(calles)} calles')
     print(f'  calzada en una pieza: {viaria:.1f}%')
     for k, v in sorted(c.items()):
         print(f'  {nombres.get(k,k):8s} {v:8d}  {100*v/(MW*MH):5.1f}%')
@@ -690,11 +808,16 @@ if __name__ == '__main__':
     raiz = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
     html = os.path.join(raiz, 'referencia', 'bilbo-city.html')
     csf = os.path.join(raiz, 'unity', 'BilboCity', 'Assets', 'Scripts', 'Ciudad', 'Plano.cs')
+    calf = os.path.join(raiz, 'unity', 'BilboCity', 'Assets', 'Scripts', 'Ciudad', 'Callejero.cs')
     sustituir(html, 'PLANO', bloque_js(rej, dueno, marcas))
+    sustituir(html, 'CALLES', bloque_calles_js(calles))
     print(f'  -> {html}')
     if os.path.exists(csf):
         sustituir(csf, 'PLANO', bloque_cs(rej, dueno, marcas))
         print(f'  -> {csf}')
+    if os.path.exists(calf):
+        sustituir(calf, 'CALLES', bloque_calles_cs(calles))
+        print(f'  -> {calf}')
     with open('/tmp/trama.bin', 'wb') as f:
         f.write(bytes(rej))
     with open('/tmp/barrio.bin', 'wb') as f:

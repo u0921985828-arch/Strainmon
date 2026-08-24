@@ -245,11 +245,38 @@ la Galería Abandoibarra. Sitio real, nombre nuestro.
 Andabas por «Abando» y ya está. Ahora el HUD dice también **por qué calle vas**, y son las
 calles de Bilbao: la Gran Vía, Urquijo, Autonomía, Zabalbide, Lehendakari Agirre.
 
-**De dónde salen, y qué no son.** El plano municipal trae su callejero rotulado, pero el
-PDF no entra en el repositorio —norma nuestra— y el extractor solo se queda con la
-geometría. Así que estas 34 calles **no están leídas de un rótulo**: están puestas por su
+**Para tener todo Bilbao hay que volver a pasar el plano.** El extractor saca del PDF
+**todos** los rótulos de calle y reescribe la tabla entera, en el HTML y en Unity a la vez:
+
+```bash
+python3 herramientas/plano/extraer.py ruta/al/plano_bilbao.pdf
+```
+
+Eso es lo que hace que esto sea el callejero de verdad y no una lista escrita a mano. El
+PDF no está en el repositorio —norma nuestra— así que **el extractor no se puede ejecutar
+en una sesión de Claude**: se corre en local, con el plano delante.
+
+Los rótulos de barrio van en la fuente Skia y por eso salen filtrando por ella; el resto
+del texto sobre el mapa es el callejero. Se criba con tres reglas: parecer un nombre (tres
+letras, no todo dígitos), **caer sobre la calle** —a menos de cuatro casillas de calzada o
+acera, que es lo que se lleva por delante los equipamientos, rotulados sobre la manzana— y
+no ser un barrio. Una calle larga sale rotulada varias veces y esos rótulos se juntan en
+una sola calle, ordenados a lo largo del eje de la nube: eso da justo los puntos de paso
+que come el juego.
+
+Como el plano no está aquí, esa parte se prueba con un **PDF de mentira**
+(`herramientas/plano/pruebas_extraer.py`, dentro de `./verificar.sh`): rótulos repetidos a
+lo largo de una calle, un equipamiento sobre una manzana, un número y un barrio, y se
+comprueba que sale lo que tiene que salir. Y que el juego aguanta el callejero entero lo
+mide `node herramientas/html/escala-calles.js 1200`: **1234 calles se nombran en medio
+segundo**, porque la caja de búsqueda es proporcional al tramo.
+
+**Mientras tanto, las 34 de la tabla.** No están leídas de un rótulo: están puestas por su
 trazado, que es el hecho geográfico que sí se puede afirmar. La Gran Vía va de Moyúa a la
 Circular; Urquijo, de la Circular a San Mamés; Zabalbide, del Casco a Santutxu.
+
+La tabla vive entre `/*<<<CALLES*/` y `/*CALLES>>>*/` en los dos ficheros: **no la edites a
+mano esperando que sobreviva**, que la próxima extracción la pisa entera.
 
 Por eso las coordenadas de `CALLES` **son referencias, no medidas**. Cada calle lleva unos
 puntos de paso y el juego busca el camino de calle que los une, así que un punto seis

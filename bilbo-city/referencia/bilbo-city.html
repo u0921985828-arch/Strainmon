@@ -4420,6 +4420,11 @@ function dibSingulares(x0,y0,x1,y1){
    que identifica a una calle. Lo que no se puede afirmar no se nombra: las Siete Calles
    miden dos casillas de ancho cada una y a 5,16 m por casilla no caben, así que del Casco
    solo van Bidebarrieta, Iturribide y la Ribera. */
+/* Esta tabla la escribe el extractor: `python3 herramientas/plano/extraer.py plano.pdf`
+   saca del plano los rótulos de calle —todos— y la reemplaza entera. Lo de abajo es lo
+   que hay hasta que se vuelva a extraer: los ejes principales, puestos por su trazado.
+   No lo edites a mano esperando que sobreviva; la próxima extracción lo pisa. */
+/*<<<CALLES*/
 const CALLES=[
  /* El Ensanche de Abando. La retícula que se ve desde el aire, con Moyúa en medio. */
  {n:'Gran Vía',            v:[[634,310],[728,319],[846,330]]},
@@ -4462,6 +4467,7 @@ const CALLES=[
  {n:'Doctor Areilza',      v:[[626,362],[566,376]]},
  {n:'Zabala',              v:[[838,458],[856,476]]},
 ];
+/*CALLES>>>*/
 /* Qué calle es cada casilla: 0 es «ninguna», y si no, el índice en CALLES más uno. */
 const calleDe=new Int16Array(MW*MH);
 const calleEn=(x,y)=>{
@@ -4488,8 +4494,12 @@ const esCalle=(x,y)=>{const t=Tc(x,y);
    cubos por distancia, que se recorren en orden. */
 const HOLGURA_CALLE=60, PRECIO_ACERA=4;
 function caminoCalle(ax,ay,bx,by){
- const x0=Math.max(1,Math.min(ax,bx)-HOLGURA_CALLE),x1=Math.min(MW-2,Math.max(ax,bx)+HOLGURA_CALLE),
-       y0=Math.max(1,Math.min(ay,by)-HOLGURA_CALLE),y1=Math.min(MH-2,Math.max(ay,by)+HOLGURA_CALLE);
+ /* La holgura, a la medida del tramo. Con sesenta fijas, dos rótulos de la misma calle a
+    quince casillas montaban una caja de 135×135 para un camino de quince: con las mil y
+    pico calles que saca el extractor del plano, eso es la carga entera. */
+ const hol=clamp(Math.max(Math.abs(bx-ax),Math.abs(by-ay)),24,HOLGURA_CALLE);
+ const x0=Math.max(1,Math.min(ax,bx)-hol),x1=Math.min(MW-2,Math.max(ax,bx)+hol),
+       y0=Math.max(1,Math.min(ay,by)-hol),y1=Math.min(MH-2,Math.max(ay,by)+hol);
  const an=x1-x0+1,al=y1-y0+1,N=an*al;
  const k=(x,y)=>(y-y0)*an+(x-x0);
  const dist=new Int32Array(N).fill(0x7fffffff),de=new Int32Array(N).fill(-1);
