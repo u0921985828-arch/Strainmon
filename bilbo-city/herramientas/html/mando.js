@@ -30,7 +30,7 @@ const MOVILES = [
   // Playwright: se le señala el binario en vez de bajar otro.
   const PUESTO = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
   const nav = await chromium.launch(fs.existsSync(PUESTO) ? { executablePath: PUESTO } : {});
-  const tomas = [];
+  const tomas = [], portadas = [];
   console.log('móvil            marco   pantalla   joystick   botón A');
   for (const m of MOVILES) {
     const pag = await nav.newPage({ viewport: { width: m.w, height: m.h } });
@@ -39,11 +39,11 @@ const MOVILES = [
     // se va hasta que la ciudad está forjada, que tarda unos segundos.
     // El botón no hace nada hasta que la ciudad está forjada: el rótulo de carga es el
     // que dice cuándo. Pulsar antes se traga la pulsación y la foto sale del título.
-    await pag.waitForFunction(
-      () => { const c = document.getElementById('carga');
-              return c && (c.style.display === 'none' || c.textContent.trim() === ''); },
-      null, { timeout: 60000 }).catch(() => {});
+    // El juego marca la raíz cuando la portada ya está pintada del todo.
+    await pag.waitForFunction(() => document.body.dataset.listo === '1',
+                              null, { timeout: 90000 }).catch(() => {});
     await pag.waitForSelector('#btnNuevo', { timeout: 30000 });
+    if (m.n.startsWith('normal')) portadas.push(await pag.screenshot());
     await pag.click('#btnNuevo');
     // El mando aparece cuando el juego arranca; se espera a que el joystick tenga tamaño.
     await pag.waitForFunction(
@@ -72,6 +72,11 @@ const MOVILES = [
   const salida = process.argv[2] || path.join(__dirname, '..', '..', 'referencia', 'capturas', 'mando.png');
   fs.mkdirSync(path.dirname(salida), { recursive: true });
   fs.writeFileSync(salida, tomas[1]);
+  if (portadas.length) {
+    const pp = salida.replace(/\.png$/, '-portada.png');
+    fs.writeFileSync(pp, portadas[0]);
+    console.log('->', pp);
+  }
   console.log('->', salida);
   process.exit(0);
 })();

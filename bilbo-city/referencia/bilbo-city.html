@@ -148,6 +148,10 @@ img.pix{image-rendering:pixelated;display:block;}
  display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;letter-spacing:2px;}
 #curroBtn:active{transform:scale(.94);}
 #curro .p{font-size:11px;letter-spacing:2px;color:var(--acero);text-transform:uppercase;}
+/* La portada se dibuja entera en su lienzo, con la fuente y los sprites del juego. Aquí
+   solo queda centrarlo y escalarlo en entero, como el juego. */
+#tcv{position:absolute;image-rendering:pixelated;}
+#titulo .b{position:absolute;pointer-events:auto;background:transparent;border:none;}
 #titulo{position:absolute;inset:0;background:#07090c;display:flex;flex-direction:column;align-items:center;
  justify-content:center;gap:4px;pointer-events:auto;z-index:9;overflow:hidden;}
 #tcv{position:absolute;inset:0;width:100%;height:100%;opacity:.28;image-rendering:pixelated;}
@@ -191,10 +195,9 @@ img.pix{image-rendering:pixelated;display:block;}
 <div id="curro"><div class="t" id="curroT"></div><div class="c" id="curroC"></div>
   <div id="curroBtn">Dale</div><div class="p" id="curroP"></div></div>
 <div id="fund"></div><div id="flash"></div>
-<div id="titulo"><canvas id="tcv"></canvas><div class="z">
-  <h1>BILBO<br>CITY</h1><div class="tag">Nervión · 199X</div>
-  <div class="b" id="btnCont">Continuar</div><div class="b" id="btnNuevo">Partida nueva</div>
-</div><div id="carga">forjando la ciudad…</div></div>
+<div id="titulo"><canvas id="tcv"></canvas>
+  <div class="b" id="btnCont"></div><div class="b" id="btnNuevo"></div>
+  <div id="carga"></div></div>
 <script>
 (()=>{
 "use strict";
@@ -2883,6 +2886,7 @@ async function inflar(b64){
 async function cargarCiudad(){
  map.set(await inflar(TRAMA));
  barrioDe.set(await inflar(TRAMA_BARRIO));
+ ciudadLista=true;_mb=null;
  /* Un tejado por edificio contiguo, y el tejado lo deciden el barrio y el tamaño. El
     plano ya distingue las manzanas; esto es lo que hace que además se noten desde el
     aire. Hay que recorrer el edificio entero antes de elegir, porque hasta que no se
@@ -4985,10 +4989,100 @@ async function cargar(){
 
 /*═══════════════ ARRANQUE ═══════════════*/
 const tituloEl=document.getElementById('titulo'),tcv=document.getElementById('tcv'),cargaEl=document.getElementById('carga');
-function fondoTitulo(){
- const g=tcv.getContext('2d');tcv.width=MW;tcv.height=MH;g.imageSmoothingEnabled=false;
- g.drawImage(mapaBase(),0,0);
- g.fillStyle='rgba(183,69,31,.3)';g.fillRect(0,0,MW,MH);}
+/*═══════════════ PORTADA Y CARGA ═══════════════*/
+/* El título iba en HTML: tipografía del sistema, degradados y un mapa de fondo teñido de
+   rojo. Nada de eso está en el juego, así que la primera pantalla mentía sobre lo que
+   venía después. Ahora se dibuja con lo mismo que todo lo demás —la fuente BLOQUE, la
+   paleta de 48 y los sprites forjados— sobre un trozo de la ciudad de verdad.
+
+   El lienzo va a una resolución baja y se escala en entero: es la única manera de que un
+   píxel del rótulo mida lo mismo que un píxel del juego. */
+const POR_W=320, POR_H=180;
+/* `map` está preasignado, así que preguntarle por su tamaño dice que sí desde el primer
+   paso de la carga: el mapa del fondo se cacheaba vacío y la portada salía negra. */
+let ciudadLista=false;
+let porT=0, porPaso='', porProg=0, porHay=false;
+function escalaPortada(){
+ return Math.max(1,Math.floor(Math.min(innerWidth/POR_W,innerHeight/POR_H)));}
+/* Un rótulo grande con sombra dura, centrado. */
+function rotulo(g,txt,y,esc,tinta){
+ texto(g,txt,Math.round((POR_W-anchoTexto(txt,esc))/2),y,esc,tinta);}
+/* Una caja de las del juego: borde de dos, relleno oscuro y rayas de tubo. */
+function cajaPortada(g,x,y,w,h,encendida){
+ P(g,x,y,w,h,encendida?C.rojoO:C.carbon);
+ P(g,x+2,y+2,w-4,h-4,encendida?'#7a2f14':C.negro);
+ P(g,x,y,w,2,encendida?C.rojoL:C.grisL);
+ P(g,x,y+h-2,w,2,C.negro);
+ for(let i=y+4;i<y+h-2;i+=3){g.globalAlpha=.14;P(g,x+2,i,w-4,1,C.hueso);g.globalAlpha=1;}}
+function pintarPortada(){
+ const g=tcv.getContext('2d');
+ if(tcv.width!==POR_W){tcv.width=POR_W;tcv.height=POR_H;}
+ g.imageSmoothingEnabled=false;
+ /* Fondo: un trozo de Bilbao de verdad —el meandro de Deusto y el Casco— a una casilla
+    por píxel. Si la ciudad aún no está cargada se queda el asfalto, que tampoco
+    desentona. */
+ P(g,0,0,POR_W,POR_H,C.asfaltoO);
+ if(ciudadLista){
+  /* A una casilla por píxel el recorte cae entero sobre manzanas y sale una plancha
+     oscura: 320 casillas son kilómetro y medio de edificios. Se coge el doble de ciudad
+     y con la ría dentro, que es lo que se reconoce de Bilbao desde arriba. */
+  g.drawImage(mapaBase(),470,110,POR_W*2,POR_H*2,0,0,POR_W,POR_H);
+  g.globalAlpha=.22;P(g,0,0,POR_W,POR_H,C.negro);g.globalAlpha=1;}
+ /* Bandas arriba y abajo, para que el rótulo y los botones se lean siempre. */
+ for(let i=0;i<34;i++){g.globalAlpha=Math.min(.92,(34-i)/30);
+  P(g,0,i,POR_W,1,C.negro);P(g,0,POR_H-1-i,POR_W,1,C.negro);}
+ g.globalAlpha=1;
+ rotulo(g,'BILBO',14,4,'ambar');
+ rotulo(g,'CITY',50,4,'ambar');
+ rotulo(g,'NERVION · 199X',88,1,'hueso');
+ /* Una acera con cuatro vecinos y un coche: es un juego de andar por la calle y la
+    portada tiene que decirlo antes que ninguna otra cosa. */
+ const suelo=POR_H-34;
+ P(g,0,suelo,POR_W,2,C.asfalto);
+ g.globalAlpha=.5;P(g,0,suelo+2,POR_W,6,C.negro);g.globalAlpha=1;
+ if(VEH&&VEH.utilitario)g.drawImage(VEH.utilitario[0],POR_W-96,suelo-16);
+ const cw=CEL_W(),ch=CEL_H();
+ for(const[k,d,x] of [['protagonista',2,16],['p6',0,52],['p10',6,84],['ertzaina',4,POR_W-30]]){
+  const h=hoja(k);if(h)g.drawImage(h,d*cw,0,cw,ch,x,suelo-ch+8,cw,ch);}
+ /* Y encima de todo, la carga o los botones. */
+ if(porProg<1){
+  const bw=180,bx=(POR_W-bw)/2,by=POR_H-16;
+  P(g,bx-2,by-2,bw+4,10,C.carbon);
+  P(g,bx,by,bw,6,C.negro);
+  P(g,bx,by,Math.round(bw*porProg),6,C.mostaza);
+  P(g,bx,by,Math.round(bw*porProg),2,C.hueso);
+  const t='FORJANDO '+porPaso.toUpperCase();
+  texto(g,t,Math.round((POR_W-anchoTexto(t,1))/2),by-12,1,'hueso');
+ }else{
+  const bw=112,bx=(POR_W-bw)/2;
+  cajaPortada(g,bx,POR_H-30,bw,13,false);
+  const t1='CONTINUAR';
+  texto(g,t1,Math.round((POR_W-anchoTexto(t1,1))/2),POR_H-27,1,porHay?'ambar':'hueso');
+  if(!porHay){g.globalAlpha=.55;P(g,bx,POR_H-30,bw,13,C.negro);g.globalAlpha=1;}
+  cajaPortada(g,bx,POR_H-15,bw,13,true);
+  const t2=porHay?'PARTIDA NUEVA':'EMPEZAR';
+  texto(g,t2,Math.round((POR_W-anchoTexto(t2,1))/2),POR_H-12,1,'hueso');}
+ /* Las cajas de clic del DOM se colocan encima de lo dibujado: la lógica de los botones
+    no cambia, solo dónde se ven. */
+ colocarBotonesPortada();}
+function colocarBotonesPortada(){
+ const e=escalaPortada(),ox=Math.round((innerWidth-POR_W*e)/2),oy=Math.round((innerHeight-POR_H*e)/2);
+ /* El lienzo se estira a un múltiplo entero y se coloca a mano: centrarlo con flex y
+    dejarle el tamaño natural lo dejaba a 320×180 en una esquina. */
+ if(tcv&&tcv.style){tcv.style.position='absolute';tcv.style.transform='none';
+  tcv.style.left=ox+'px';tcv.style.top=oy+'px';
+  tcv.style.width=(POR_W*e)+'px';tcv.style.height=(POR_H*e)+'px';
+  tcv.style.maxWidth='none';tcv.style.maxHeight='none';}
+  const bw=112,bx=(POR_W-bw)/2;
+ const poner=(el,y)=>{if(!el||!el.style)return;
+  el.style.position='absolute';el.style.left=(ox+bx*e)+'px';el.style.top=(oy+y*e)+'px';
+  el.style.width=(bw*e)+'px';el.style.height=(13*e)+'px';
+  el.style.padding='0';el.style.margin='0';el.style.border='none';
+  el.style.background='transparent';el.style.color='transparent';el.style.fontSize='0';};
+ poner(document.getElementById('btnCont'),POR_H-30);
+ poner(document.getElementById('btnNuevo'),POR_H-15);}
+addEventListener('resize',()=>{if(tituloEl&&tituloEl.style.display!=='none')pintarPortada();});
+
 const espera=ms=>new Promise(r=>setTimeout(r,ms));
 async function arrancar(){
  const pasos=[
@@ -5000,13 +5094,19 @@ async function arrancar(){
   ['el barrio',()=>{player.x=poi('piso').p.x;player.y=poi('piso').p.y;poblar();}],
   ['a la gente',async()=>{await cargarSprites();['protagonista','ertzaina','maton','maton2'].forEach(hoja);}],
  ];
- for(const[n,f]of pasos){cargaEl.textContent='forjando '+n+'…';await espera(12);await f();}
- cargaEl.textContent='';
- fondoTitulo();
+ for(let i=0;i<pasos.length;i++){
+  const[n,f]=pasos[i];
+  porPaso=n;porProg=i/pasos.length;
+  cargaEl.textContent='';
+  pintarPortada();
+  await espera(12);await f();}
+ porProg=1;
  const hay=await cargar();
+ document.body.dataset.listo='1';
+ porHay=hay;
+ pintarPortada();
  const bc=document.getElementById('btnCont'),bn=document.getElementById('btnNuevo');
- if(!hay){bc.style.opacity=.32;bc.style.pointerEvents='none';}
- bn.textContent=hay?'Partida nueva':'Empezar';
+ if(!hay)bc.style.pointerEvents='none';
  const entrar1=nuevo=>{audioInit();tituloEl.style.display='none';
   if(!arrancado){arrancado=true;ult=performance.now();requestAnimationFrame(bucle);}
   aviso(nuevo?'VIVE DONDE PUEDAS. COBRA DONDE TOQUE':'PARTIDA CARGADA · DIA '+S.dia,3.4);};

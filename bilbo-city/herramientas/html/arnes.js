@@ -22,7 +22,8 @@ global.document={createElement:t=>{if(t==='canvas'){const c=createCanvas(1,1);c.
  getElementById:i=>cache[i]||(cache[i]=el(i)),querySelectorAll:()=>[],addEventListener(){},
  /* El juego escribe variables CSS en la raíz para el tamaño del mando. Sin esto el
     arranque revienta en el arnés y no en el navegador, que es la peor combinación. */
- documentElement:{style:{setProperty(){},getPropertyValue:()=>''}}};
+ documentElement:{style:{setProperty(){},getPropertyValue:()=>''}},
+ body:el('body')};
 // canvas principal real
 // El juego es apaisado: el arnés tiene que serlo también o el mando no cae donde cae.
 const real=createCanvas(840,400);

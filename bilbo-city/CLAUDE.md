@@ -193,6 +193,27 @@ plancha lisa.
 chasis y dieciocho arquetipos según el estilo: taxis y gabardinas por la Gran Vía, monos de
 faena y camiones en Zorrotzaurre, motos por el Casco.
 
+## La portada
+
+El título iba en HTML: tipografía del sistema, degradados y el mapa teñido de rojo. Nada
+de eso está en el juego, así que la primera pantalla mentía sobre lo que venía después.
+Ahora se dibuja entera en su lienzo con **la fuente BLOQUE, la paleta de 48 y los sprites
+forjados**, sobre un trozo del plano de verdad —con la ría dentro, que es lo que se
+reconoce de Bilbao desde arriba— y a **escala entera**, para que un píxel del rótulo mida
+lo mismo que un píxel del juego. La barra de carga dice qué se está forjando.
+
+Los botones siguen siendo `<div>`: la lógica no cambia, solo se colocan encima de lo
+dibujado y se quedan transparentes. Así el clic sigue funcionando igual en el navegador,
+en la batería y en `mando.js`.
+
+Dos trampas del arranque, las dos por preguntar lo que no era:
+
+- **`map` está preasignado**, así que `map.length` dice que sí desde el primer paso de la
+  carga. El fondo se cacheaba vacío y la portada salía negra. Hay una bandera,
+  `ciudadLista`, y `cargarCiudad` tira la caché del mapa.
+- **A una casilla por píxel el recorte cae entero sobre manzanas**: 320 casillas son
+  kilómetro y medio de edificios y sale una plancha oscura. Se coge el doble de ciudad.
+
 ## El mando
 
 La pantalla en medio y los mandos en el marco. El reparto no se decide de memoria:
