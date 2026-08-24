@@ -2196,6 +2196,11 @@ const ARQ={
  p6:A('p6','corpulenta',2,'corto',C.pelo2,'cascoObra',null,'reflectante','cargo','botas','ninguno'),
  p7:A('p7','corpulenta',4,'rapado',C.pelo1,'lana',null,'reflectante','monoP','botas','ninguno'),
  p8:A('p8','delgada',3,'coleta',C.pelo1,'ninguno',null,'delantal','vestir','deportivas','ninguno'),
+ /* Los del mostrador. Se les ve mucho rato y de cerca, así que van con pinta propia y no
+    con la de un peatón cualquiera. */
+ nerea:A('nerea','delgada',0,'melena',C.pelo2,'ninguno',null,'polo','vestir','deportivas','ninguno'),
+ patxi:A('patxi','corpulenta',1,'calvo',C.pelo1,'ninguno',null,'delantal','vestir','zapatos','ninguno'),
+ gorka:A('gorka','media',2,'corto',C.pelo1,'gorra',C.azul,'mono','monoP','botas','ninguno'),
 };
 const PEATON_ARQ=['p1','p2','p3','p4','p5','p6','p7','p8'];
 /* Una hoja por arquetipo: 8 columnas (direcciones) × 14 filas (poses).
@@ -2475,6 +2480,17 @@ function generarTiles(){
  TILE.sillas=T32(g=>{rell(g,'#8fa8a0');for(let x=2;x<30;x+=9){P(g,x,8,7,12,C.azulL);P(g,x,6,7,3,C.azul);}});
  TILE.estante=T32(g=>{rell(g,C.grisO);for(let y=2;y<30;y+=9){P(g,0,y+7,32,2,C.gris);
   for(let x=2;x<30;x+=6)P(g,x,y,4,7,C.mostazaO);}});
+ TILE.perchero=T32(g=>{rell(g,C.grisO);P(g,0,5,32,2,C.acero);P(g,0,4,32,1,C.hormigonL);
+  const tr=[C.rojoO,C.azul,C.verdeO,C.mostazaO,C.morado,C.carbon];
+  for(let i=0;i<6;i++){const x=1+i*5;P(g,x+1,3,2,3,C.aceroO);
+   P(g,x,7,4,15,tr[i]);P(g,x,7,4,2,C.hueso);P(g,x+3,7,1,15,C.negro);}
+  P(g,0,28,32,4,C.gris);});
+ TILE.escalera=T32(g=>{rell(g,C.acero);
+  for(let y=0;y<32;y+=4){P(g,2,y,28,3,C.aceroO);P(g,2,y,28,1,C.hormigonL);}
+  P(g,0,0,2,32,C.gris);P(g,30,0,2,32,C.grisO);});
+ TILE.surtidor=T32(g=>{rell(g,C.hormigon);P(g,5,2,22,26,C.rojoO);P(g,5,2,22,3,C.rojo);
+  P(g,26,2,1,26,C.sangre);P(g,8,6,15,11,C.carbon);P(g,10,8,11,4,C.mostaza);
+  P(g,10,13,7,2,C.acero);P(g,27,12,4,9,C.carbon);P(g,4,20,24,3,C.grisO);});
 }
 /* Los muebles de interior se dibujan ENCIMA del suelo, así que tienen que llevar
    transparencia: una mesa que ocupa toda la casilla no deja ver la tarima. El resto de
@@ -2677,6 +2693,26 @@ function generarIconos(){
   P(g,8,13,8,5,C.crema);P(g,9,1,6,2,C.mostaza);});
  ICO.botiquin=I24(g=>{P(g,3,6,18,14,C.crema);P(g,3,6,18,2,C.acero);
   P(g,10,9,4,9,C.sangre);P(g,7,12,10,3,C.sangre);P(g,9,4,6,3,C.grisO);});
+ ICO.camisa=I24(g=>{P(g,6,4,12,16,C.azulL);P(g,6,4,12,2,'#a8c4dd');
+  P(g,2,5,5,8,C.azulL);P(g,17,5,5,8,C.azul);P(g,11,4,2,15,C.azul);
+  P(g,8,3,3,3,C.hueso);P(g,13,3,3,3,C.hueso);P(g,11,9,1,1,C.hueso);P(g,11,14,1,1,C.hueso);});
+ ICO.pantalon=I24(g=>{P(g,5,3,14,5,'#3a4f6b');P(g,5,3,14,2,C.acero);
+  P(g,5,8,6,13,'#3a4f6b');P(g,13,8,6,13,'#2c3d53');P(g,11,8,2,5,'#2c3d53');
+  P(g,5,3,1,18,C.acero);P(g,7,10,1,4,'#2c3d53');});
+ ICO.zapato=I24(g=>{P(g,3,12,13,7,C.maderaO);P(g,3,12,13,2,'#8a6a44');
+  P(g,14,14,7,5,C.maderaO);P(g,3,19,18,2,C.negro);P(g,6,14,7,2,C.crema);});
+ ICO.gorra=I24(g=>{P(g,5,7,14,7,C.rojoO);P(g,5,7,14,2,C.rojo);P(g,3,13,17,3,C.rojoO);
+  P(g,11,4,2,4,C.rojo);});
+ ICO.bus=I24(g=>{P(g,2,5,20,13,C.rojoO);P(g,2,5,20,2,C.rojo);P(g,4,8,6,5,C.azulL);
+  P(g,12,8,8,5,C.azulL);P(g,4,15,16,2,C.mostaza);P(g,5,18,4,3,C.carbon);P(g,15,18,4,3,C.carbon);});
+ ICO.metro=I24(g=>{P(g,3,4,18,14,C.rojoO);P(g,3,4,18,2,C.rojo);P(g,5,7,14,6,C.azulL);
+  P(g,3,18,18,2,C.carbon);P(g,6,20,3,2,C.mostaza);P(g,15,20,3,2,C.mostaza);
+  P(g,11,7,2,6,C.carbon);});
+ ICO.tren=I24(g=>{P(g,2,6,17,11,C.verdeO);P(g,2,6,17,2,C.verde);P(g,4,9,5,5,C.azulL);
+  P(g,11,9,6,5,C.azulL);P(g,19,10,3,7,C.grisO);P(g,2,17,20,2,C.carbon);
+  P(g,5,19,4,3,C.carbon);P(g,14,19,4,3,C.carbon);});
+ ICO.plato=I24(g=>{P(g,2,9,20,3,C.hueso);P(g,4,12,16,3,C.blanco);P(g,7,5,10,4,C.maderaO);
+  P(g,8,3,8,3,'#8a6a44');P(g,9,6,3,2,C.crema);P(g,2,16,20,2,C.grisO);});
  ICO.cargador=I24(g=>{P(g,7,6,10,14,C.carbon);P(g,7,6,10,2,C.gris);
   for(let i=0;i<4;i++)P(g,9,9+i*3,6,2,C.mostazaO);});
 
@@ -2804,7 +2840,7 @@ const INT={
   npcs:[{x:7.5,y:4.5,n:'Iker',arq:'iker',tipo:'mecanico'}]},
  armeria:{n:'Bazar Nervión',suelo:'sueloTaller',pared:'pared',mapa:[
   '#############','#XXXXXXXXXXX#','#...........#','#..EE...EE..#',
-  '#...........#','#....OO.....#','#####DD#####'],
+  '#...........#','#....OO.....#','#####DD######'],
   npcs:[{x:6.5,y:4.5,n:'Koldo',arq:'koldo',tipo:'armero'}]},
  merca:{n:'Mercado de la Ribera',suelo:'terrazo',pared:'paredChapa',mapa:[
   '#################','#PPPP...PPPP..PP#','#...............#','#..PPPP...PPPP..#',
@@ -2812,15 +2848,47 @@ const INT={
   npcs:[{x:3.5,y:2.6,n:'Bego',arq:'bego',tipo:'pescatera'}]},
  hospital:{n:'Hospital de Basurto',suelo:'sueloHosp',pared:'paredBlanca',mapa:[
   '###############','#LL...LL...QQ.#','#LL...LL......#','#.............#',
-  '#SSSS....OOOO.#','#.............#','######DD######'],
+  '#SSSS....OOOO.#','#.............#','######DD#######'],
   npcs:[{x:9.5,y:5.5,n:'Nekane',arq:'enfermera',tipo:'enfermera'}]},
  portal:{n:'Portal · la casera',suelo:'sueloCasa',pared:'paredBlanca',mapa:[
   '############','#....WW....#','#..........#','#..........#','#####DD#####'],
   npcs:[{x:6.5,y:2.5,n:'Amaia',arq:'amaia',tipo:'casera'}]},
+ /* Los cuatro de abajo los comparten varios sitios: el rótulo lo pone el POI, no el
+    interior. Dos tascas iguales por dentro y con distinto nombre en la puerta es lo que
+    hay en cualquier barrio, y así no se duplica el plano por cada esquina. */
+ ropa:{n:'Tienda de ropa',suelo:'terrazo',pared:'paredBlanca',mapa:[
+  '###############','#RRRRR...RRRRR#','#.............#','#..XX.....XX..#',
+  '#.............#','#RRRRR...EEEE.#','#.............#','#.....OOO.....#',
+  '#.............#','#######DD######'],
+  npcs:[{x:7.5,y:6.5,n:'Nerea',arq:'nerea',tipo:'ropa'}]},
+ tasca:{n:'Tasca',suelo:'terrazo',pared:'paredAzul',mapa:[
+  '############','#BBBBBB...W#','#..........#','#..MM..MM..#',
+  '#..MM..MM..#','#..........#','#####DD#####'],
+  npcs:[{x:3.5,y:2.6,n:'Patxi',arq:'patxi',tipo:'barman'},
+        {x:8.5,y:5.4,n:'Mikel',arq:'mikel',tipo:'parroquiano'}]},
+ resto:{n:'Restaurante',suelo:'terrazo',pared:'paredAzul',mapa:[
+  '################','#BB....WW....WW#','#..............#','#..MM..MM..MM..#',
+  '#..SS..SS..SS..#','#..............#','#..MM..MM..MM..#','#..SS..SS..SS..#',
+  '#..............#','#######DD#######'],
+  npcs:[{x:2.5,y:2.6,n:'Patxi',arq:'patxi',tipo:'cocinero'}]},
+ centro:{n:'Galería',suelo:'terrazo',pared:'paredBlanca',mapa:[
+  '#####################','#RRRR..XXXX..EEEE..P#','#...................#',
+  '#..AA...........AA..#','#...................#','#..MM..MM...PPPP...P#',
+  '#..SS..SS...........#','#..........OOO......#','#...................#',
+  '#########DD##########'],
+  npcs:[{x:3.5,y:2.6,n:'Nerea',arq:'nerea',tipo:'ropa'},
+        {x:8.5,y:6.4,n:'Patxi',arq:'patxi',tipo:'cocinero'},
+        {x:18.5,y:2.6,n:'Bego',arq:'bego',tipo:'pescatera'}]},
+ gasoli:{n:'Gasolinera',suelo:'sueloTaller',pared:'paredChapa',mapa:[
+  '###############','#GG..GG..GG...#','#.............#','#.............#',
+  '#EEEE....XXXX.#','#.............#','#....OOO......#','######DD#######'],
+  npcs:[{x:6.5,y:5.5,n:'Gorka',arq:'gorka',tipo:'gasolinero'}]},
 };
 const TILE_INT={'#':'pared','B':'barra','M':'mesa','C':'cama','W':'mueble','X':'vitrina',
- 'P':'puesto','V':'cocheEx','O':'mostrador','Q':'taquilla','S':'sillas','E':'estante','L':'camilla'};
-const solidoInt=ch=>'#BMCWXPVOQEL'.includes(ch);
+ 'P':'puesto','V':'cocheEx','O':'mostrador','Q':'taquilla','S':'sillas','E':'estante','L':'camilla',
+ 'R':'perchero','A':'escalera','G':'surtidor'};
+/* La escalera mecánica no es sólida: se anda por encima. El resto del mobiliario sí. */
+const solidoInt=ch=>'#BMCWXPVOQELRG'.includes(ch);
 
 /*═══════════════ POIs ═══════════════*/
 const POI=[];
@@ -2846,7 +2914,7 @@ function colocarPOIs(){
   {id:'bellasartes',n:'Museo de Bellas Artes',ico:'🖼',c:'#b09a6e',mira:1,cerca:[661,285]},
   {id:'casilla',n:'Parque de Doña Casilda',ico:'🌳',c:C.cesped,mira:1,cerca:[640,299]},
   {id:'moyua',n:'Plaza Moyúa',ico:'⛲',c:'#a8bcc8',mira:1,cerca:[728,319]},
-  {id:'abando',n:'Estación de Abando',ico:'🚉',c:'#c9a13f',mira:1,cerca:[857,329]},
+  {id:'abando',n:'Estación de Abando',ico:'🚉',c:'#c9a13f',mira:1,red:'metrotren',cerca:[857,329]},
   {id:'alhondiga',n:'Azkuna Zentroa',ico:'🍷',c:'#c07f52',mira:1,cerca:[721,396]},
   {id:'sanmames',n:'San Mamés',ico:'⚽',c:C.verdeL,mira:1,cerca:[497,384]},
   {id:'deustuni',n:'Universidad de Deusto',ico:'🎓',c:'#b8a05c',mira:1,cerca:[624,163]},
@@ -2857,9 +2925,36 @@ function colocarPOIs(){
   {id:'etxebarria',n:'Parque Etxebarria',ico:'🌳',c:'#7fae63',mira:1,cerca:[955,217]},
   {id:'funicular',n:'Funicular de Artxanda',ico:'🚡',c:'#7fbf9f',mira:1,cerca:[814,146]},
   {id:'begonia',n:'Basílica de Begoña',ico:'⛪',c:'#cbbf9c',mira:1,cerca:[1087,269]},
-  {id:'atxuri',n:'Estación de Atxuri',ico:'🚋',c:'#b58a5a',mira:1,cerca:[1009,424]},
+  {id:'atxuri',n:'Estación de Atxuri',ico:'🚋',c:'#b58a5a',mira:1,red:'tren',cerca:[1009,424]},
   {id:'arena',n:'Bilbao Arena',ico:'🏀',c:'#c4693f',mira:1,cerca:[961,484]},
-  {id:'zorrotza',n:'Estación de Zorrotza',ico:'🚂',c:'#8fa66b',mira:1,cerca:[120,335]},
+  {id:'zorrotza',n:'Estación de Zorrotza',ico:'🚂',c:'#8fa66b',mira:1,red:'tren',cerca:[120,335]},
+  /* Comercios. Nombres inventados, sitios reales: la Gran Vía, las Siete Calles, Pozas,
+     Deustu, Abandoibarra, Artxanda, Atxuri y Rekalde. */
+  {id:'ropagranvia',n:'Trapos Gran Vía',c:'#c98fd0',int:'ropa',cerca:[790,325]},
+  {id:'ropacasco',n:'Ropero del Casco',c:'#b878c0',int:'ropa',cerca:[944,340]},
+  {id:'tascapozas',n:'Tasca Ondarra',c:C.rojoL,int:'tasca',cerca:[560,370]},
+  {id:'tascadeustu',n:'Tasca Iparragirre',c:C.rojoL,int:'tasca',cerca:[620,205]},
+  {id:'asador',n:'Asador de Artxanda',c:'#d08a4a',int:'resto',cerca:[806,120]},
+  {id:'sidreria',n:'Sidrería Atxuri',c:'#d08a4a',int:'resto',cerca:[1000,412]},
+  {id:'galeria',n:'Galería Abandoibarra',c:'#7fbfd0',int:'centro',cerca:[645,232]},
+  {id:'gasodeustu',n:'Gasolinera Deustu',c:'#e05a3c',int:'gasoli',cerca:[612,192]},
+  {id:'gasorekalde',n:'Gasolinera Rekalde',c:'#e05a3c',int:'gasoli',cerca:[700,560]},
+  /* Estaciones de metro. Las de verdad, en el barrio que les toca. Abando está arriba
+     porque además es de cercanías: allí se cambia de una red a la otra. */
+  {id:'mtinazio',n:'Metro San Inazio',c:C.rojoL,red:'metro',cerca:[500,120]},
+  {id:'mtsarriko',n:'Metro Sarriko',c:C.rojoL,red:'metro',cerca:[585,150]},
+  {id:'mtdeustu',n:'Metro Deustu',c:C.rojoL,red:'metro',cerca:[640,175]},
+  {id:'mtsanmames',n:'Metro San Mamés',c:C.rojoL,red:'metro',cerca:[500,378]},
+  {id:'mtindautxu',n:'Metro Indautxu',c:C.rojoL,red:'metro',cerca:[628,345]},
+  {id:'mtmoyua',n:'Metro Moyúa',c:C.rojoL,red:'metro',cerca:[728,322]},
+  {id:'mtcasco',n:'Metro Casco Viejo',c:C.rojoL,red:'metro',cerca:[940,330]},
+  {id:'mtsantutxu',n:'Metro Santutxu',c:C.rojoL,red:'metro',cerca:[1160,420]},
+  {id:'mtbasarrate',n:'Metro Basarrate',c:C.rojoL,red:'metro',cerca:[1110,400]},
+  {id:'mtbolueta',n:'Metro Bolueta',c:C.rojoL,red:'metro',cerca:[1258,400]},
+  /* Cercanías: los apeaderos del fondo del valle, que es donde el metro no llega. */
+  {id:'trolabeaga',n:'Apeadero de Olabeaga',c:'#8fa66b',red:'tren',cerca:[392,412]},
+  {id:'trametzola',n:'Apeadero de Ametzola',c:'#8fa66b',red:'tren',cerca:[640,470]},
+  {id:'trbasurto',n:'Apeadero de Basurto',c:'#8fa66b',red:'tren',cerca:[482,438]},
  ].forEach(d=>POI.push({...d,
    p:d.mira?puntoZona(d.cerca[0],d.cerca[1],40):puntoPortal(d.cerca[0],d.cerca[1],40)}));
 }
@@ -2871,6 +2966,7 @@ const S={
  rep:{hosteleria:0,obra:0,transporte:0,calle:0},
  deuda:0,alquiler:220,ultCobro:1,
  tiene:{furgo:false,deportivo:false},
+ pinta:{torso:'cazadora',piernas:'vaquero',calzado:'botas',gorro:'txapela'},
  armas:{punos:Infinity},armaAct:'punos',
  job:null,contrato:null,mision:null,misionIdx:0,
  cooldown:0,detT:0,muerto:0,escena:'ciudad',interior:null,volver:null,
@@ -3347,8 +3443,11 @@ function terminarMision(ok){
 /*═══════════════ ACCIONES ═══════════════*/
 function tileInt(x,y){const m=S.interior.mapa,fy=Math.floor(y),fx=Math.floor(x);
  if(fy<0||fy>=m.length||fx<0||fx>=m[fy].length)return '#';return m[fy][fx];}
-function entrar(id,desde){fundir(()=>{
- S.interior={...INT[id],id};const m=S.interior.mapa;let px=2,py=2;
+/* El nombre viene de fuera a propósito: dos tascas iguales por dentro se llaman
+   distinto en la puerta, que es lo que pasa en cualquier barrio. */
+function entrar(id,desde,nombre){fundir(()=>{
+ S.interior={...INT[id],id};if(nombre)S.interior.n=nombre;
+ const m=S.interior.mapa;let px=2,py=2;
  for(let y=0;y<m.length;y++)for(let x=0;x<m[y].length;x++)if(m[y][x]==='D'){px=x+.5;py=y-.7;}
  S.escena='interior';player.enCoche=null;player.x=px;player.y=py;player.d8=4;S.volver=desde;});}
 function salir(){fundir(()=>{S.escena='ciudad';player.x=S.volver.x;player.y=S.volver.y+1.2;S.interior=null;});}
@@ -3369,10 +3468,14 @@ function accion(){
   player.x=c.x+Math.cos(c.ang+Math.PI/2)*1.3;player.y=c.y+Math.sin(c.ang+Math.PI/2)*1.3;
   player.enCoche=null;motorAudio(null,1);return;}
  const p=poiCerca();
- if(p){if(p.int)return entrar(p.int,{x:p.p.x,y:p.p.y});
+ if(p){if(p.red)return estacion(p);
+  if(p.int)return entrar(p.int,{x:p.p.x,y:p.p.y},p.n);
   if(p.id==='poli')return aviso('Comisaría. Mejor no entres');
   if(p.mira)return aviso(p.n.toUpperCase());
   return aviso('Acepta un curro aquí desde el móvil');}
+ const q=paradaCerca();
+ if(q){if(S.estrellas>0)return aviso('Con la pasma detrás no subes a ningún sitio');
+  return abrirRed('bus','Parada · '+q.n,q.p);}
  const c=cocheCerca();
  if(c){player.enCoche=c;
   if(!c.propio&&!c.marcado){estrellas(1);aviso('Coche robado');}else aviso('A rodar');return;}
@@ -3423,6 +3526,19 @@ function hablarCon(n){
    if(m.requiereFurgo&&!S.tiene.furgo)return hablar('Iker',['Tengo curro pero necesitas furgoneta.'],ops);
    return hablar('Iker',m.intro,[{txt:'Acepto',fn:()=>empezarMision(m)},...ops]);}
   return hablar('Iker',['Aupa. ¿Vienes a mirar o a comprar?'],ops);}
+ if(n.tipo==='ropa')return hablar('Nerea',['Pasa, pasa. ¿Te vistes o miras?'],[
+  {txt:'Ver la ropa',fn:()=>tiendaRopa(S.interior.n)},
+  {txt:'¿Qué se lleva?',fn:()=>aviso('«Aquí lo que se lleva es que no se te note de dónde vienes»')}]);
+ if(n.tipo==='cocinero')return hablar('Patxi',['Hay menú y hay carta. Tú dirás.'],[
+  {txt:'Menú del día',coste:'18 €',fn:()=>comer(18,1,.6,30,'Menú del día.')},
+  {txt:'Chuletón y postre',coste:'45 €',fn:()=>comer(45,1,1,55,'Chuletón.')},
+  {txt:'Café solo',coste:'2 €',fn:()=>comer(2,.05,.25,0,'Café.')},
+  {txt:'Firmar contrato de hostelería',fn:()=>firmar('hosteleria',3,140)}]);
+ if(n.tipo==='gasolinero')return hablar('Gorka',['Surtidor libre el tres. ¿Lleno?'],[
+  {txt:'Repostar y revisar el coche',fn:()=>repostar()},
+  {txt:'Café de máquina',coste:'2 €',fn:()=>comer(2,.05,.3,0,'Café de máquina.')},
+  {txt:'Bocadillo de la vitrina',coste:'6 €',fn:()=>comer(6,.6,.1,6,'Bocadillo.')},
+  {txt:'Firmar contrato de transporte',fn:()=>firmar('transporte',3,170)}]);
  if(n.tipo==='pescatera')return hablar('Bego',['Buenos días. Aquí se empieza pronto.'],[
   {txt:'Firmar contrato de hostelería',fn:()=>firmar('hosteleria',3,140)},
   {txt:'Comprar bocata',coste:'7 €',fn:()=>{if(S.dinero<7)return aviso('No te llega');
@@ -3446,6 +3562,117 @@ function hablarCon(n){
     dd:'+'+a.pack+' balas',precio:Math.round(a.precio*.18),ya:()=>false,
     fn:()=>{S.armas[a.id]+=a.pack;aviso('+'+a.pack+' balas');}}))))}]);
 }
+
+/*═══════════════ ROPA, MESA Y SURTIDOR ═══════════════*/
+/* Vestirse es barato de programar porque la forja del personaje ya sabe montar cualquier
+   combinación de torso, piernas, calzado y gorro: es como se dibujan los veinte
+   peatones. Comprar una prenda cambia cuatro campos del arquetipo del protagonista y
+   tira su hoja para que se vuelva a forjar en el siguiente fotograma. */
+const PRENDAS=[
+ {r:'torso',   v:'chaqueta',  ico:'camisa',  tt:'Chaqueta de traje', dd:'Para pisar moqueta.',          precio:190},
+ {r:'torso',   v:'sudadera',  ico:'camisa',  tt:'Sudadera con capucha', dd:'La cara medio tapada.',     precio: 70},
+ {r:'torso',   v:'chandal',   ico:'camisa',  tt:'Chándal',           dd:'Verde, con la raya blanca.',   precio: 90},
+ {r:'torso',   v:'abrigo',    ico:'camisa',  tt:'Abrigo largo',      dd:'Aquí llueve nueve meses.',     precio:240},
+ {r:'torso',   v:'gabardina', ico:'camisa',  tt:'Gabardina',         dd:'De las de esperar bajo un soportal.', precio:210},
+ {r:'torso',   v:'polo',      ico:'camisa',  tt:'Polo',              dd:'Discreto y de verano.',        precio: 45},
+ {r:'torso',   v:'cazadora',  ico:'camisa',  tt:'Cazadora negra',    dd:'La de siempre.',               precio: 80},
+ {r:'piernas', v:'vestir',    ico:'pantalon',tt:'Pantalón de vestir',dd:'Raya y todo.',                 precio: 95},
+ {r:'piernas', v:'vaquero',   ico:'pantalon',tt:'Vaquero',           dd:'No falla.',                    precio: 55},
+ {r:'piernas', v:'chandalP',  ico:'pantalon',tt:'Pantalón de chándal',dd:'Juego con la parte de arriba.',precio: 40},
+ {r:'piernas', v:'cargo',     ico:'pantalon',tt:'Pantalón de faena',  dd:'Bolsillos en las perneras.',  precio: 60},
+ {r:'calzado', v:'deportivas',ico:'zapato',  tt:'Deportivas',        dd:'Blancas, para correr de verdad.',precio: 75},
+ {r:'calzado', v:'zapatos',   ico:'zapato',  tt:'Zapatos',           dd:'Negros, de suela dura.',       precio:110},
+ {r:'calzado', v:'botas',     ico:'zapato',  tt:'Botas',             dd:'De obra, sirven para todo.',   precio: 85},
+ {r:'gorro',   v:'txapela',   ico:'gorra',   tt:'Txapela',           dd:'De aquí de toda la vida.',     precio: 35},
+ {r:'gorro',   v:'gorra',     ico:'gorra',   tt:'Gorra',             dd:'Visera y sombra en la cara.',  precio: 25},
+ {r:'gorro',   v:'lana',      ico:'gorra',   tt:'Gorro de lana',     dd:'Para el sirimiri.',            precio: 20},
+ {r:'gorro',   v:'ninguno',   ico:'gorra',   tt:'A cabeza descubierta',dd:'Se te va a mojar.',          precio: 10},
+];
+function vestir(cambio){
+ Object.assign(S.pinta,cambio);
+ Object.assign(ARQ.protagonista,S.pinta,{gorroCol:S.pinta.gorro==='gorra'?C.carbon:null});
+ delete HOJAS.protagonista;
+ /* Cambiarse de arriba abajo quita una estrella: la descripción que la pasma va pasando
+    por la emisora deja de valer. Es lo que hace el repintado con el coche. */
+ if(S.estrellas>0){S.estrellas--;if(!S.estrellas)policia.length=0;
+  aviso('Ropa nueva. Una estrella menos');}
+ guardar();}
+function tiendaRopa(titulo){
+ abrirTienda(titulo,'Ropa',PRENDAS.map(q=>({ico:q.ico,tt:q.tt,dd:q.dd,precio:q.precio,
+  ya:()=>S.pinta[q.r]===q.v,fn:()=>{vestir({[q.r]:q.v});aviso(q.tt+' puesta');}})));}
+
+function comer(coste,h,e,hp,txt){
+ if(S.dinero<coste)return aviso('No te llega');
+ S.dinero-=coste;S.hambre=Math.min(1,S.hambre+h);
+ S.energia=Math.min(1,S.energia+e);S.hp=Math.min(100,S.hp+hp);
+ sfx('dinero');aviso(txt+' −'+coste+' €');}
+
+/* El coche que se repara es el que has dejado en la puerta, no el que llevas: al entrar
+   te bajas. Se busca alrededor del sitio por el que entraste. */
+function repostar(){
+ const donde=S.volver||player;
+ let mej=null,md=9;
+ for(const c of coches){if(!c.vivo)continue;const d=dist(c,donde);if(d<md){md=d;mej=c;}}
+ if(!mej)return aviso('Acerca el coche a los surtidores');
+ if(mej.dano<=.02)return aviso('El coche está entero');
+ const cst=Math.max(15,Math.round(mej.dano*260));
+ if(S.dinero<cst)return aviso('Te piden '+cst+' € y no los tienes');
+ S.dinero-=cst;mej.dano=0;sfx('dinero');aviso('Repostado y arreglado. −'+cst+' €');}
+
+/*═══════════════ TRANSPORTE PÚBLICO ═══════════════*/
+/* Tres redes con la misma mecánica y tres coberturas distintas, que es lo que las
+   diferencia: el bus para en los treinta y cuatro barrios pero tarda; el metro solo
+   pasa por donde pasa, y vuela; el cercanías llega al fondo del valle —Zorrotza,
+   Olabeaga— que es justo donde el metro no baja.
+
+   Cuesta dinero y cuesta reloj. Y con la pasma detrás no te dejan subir: si no, el
+   billete de dos euros sería la mejor huida del juego. */
+const REDES={
+ bus:  {n:'Bilbobus',  tarifa:2, vel: 48, espera: 7, ico:'bus'},
+ metro:{n:'Metro',     tarifa:3, vel:115, espera: 4, ico:'metro'},
+ tren: {n:'Cercanías', tarifa:3, vel:135, espera:10, ico:'tren'},
+};
+const PARADAS=[];
+function colocarParadas(){
+ /* La parada de bus de cada barrio va en la acera más cercana a su rótulo del plano. No
+    hay que escribir ninguna coordenada: los barrios ya están donde el ayuntamiento los
+    rotula, y así el bus llega a todos sin una lista que mantener. */
+ PARADAS.length=0;
+ for(const b of BARRIOS)PARADAS.push({n:b.n,p:cercaDe((x,y)=>{
+  const t=Tc(x,y);return t===ACERA||t===PLAZA;},b.x,b.y,34)});}
+const redesDe=p=>p.red?(p.red.match(/metro|tren|bus/g)||[]):[];
+function nodos(red){
+ if(red==='bus')return PARADAS;
+ return POI.filter(p=>redesDe(p).includes(red)).map(p=>({n:p.n,p:p.p}));}
+function minutosViaje(red,d){return Math.max(2,Math.round(REDES[red].espera+d/REDES[red].vel));}
+function viajarA(red,destino){
+ const min=minutosViaje(red,dist(destino.p,player));
+ fundir(()=>{
+  player.x=destino.p.x;player.y=destino.p.y;player.enCoche=null;
+  S.min+=min;while(S.min>=1440){S.min-=1440;S.dia++;}
+  S.energia=Math.max(0,S.energia-min*.004);
+  grande(destino.n.toUpperCase(),2);});
+ aviso(REDES[red].n+' · '+min+' min');guardar();}
+function lineaDe(red,aqui){
+ return nodos(red).filter(q=>dist(q.p,aqui)>3)
+  .map(q=>({q,d:dist(q.p,aqui)})).sort((a,b)=>a.d-b.d);}
+function abrirRed(red,titulo,aqui){
+ const R=REDES[red],destinos=lineaDe(red,aqui);
+ if(!destinos.length)return aviso('No hay más paradas en esta red');
+ abrirTienda(titulo,R.n+' · '+R.tarifa+' €',destinos.map(({q,d})=>({
+  ico:R.ico,tt:q.n,dd:minutosViaje(red,d)+' min · '+Math.round(d*5.16/100)/10+' km',
+  precio:R.tarifa,ya:()=>false,fn:()=>viajarA(red,q)})));}
+/* Una parada de bus no es un POI: no sale en el radar ni en el mapa de pausa, porque
+   treinta y cuatro chinchetas más taparían la ciudad. Se encuentra estando encima. */
+function paradaCerca(){let m=null,md=1.8;
+ for(const q of PARADAS){const d=dist(q.p,player);if(d<md){md=d;m=q;}}return m;}
+function estacion(p){
+ if(S.estrellas>0)return aviso('Con la pasma detrás no subes a ningún sitio');
+ const redes=redesDe(p);
+ if(redes.length===1)return abrirRed(redes[0],p.n,p.p);
+ /* Abando es las dos cosas, que es lo que pasa de verdad: allí se cambia de red. */
+ return hablar(p.n,['Metro abajo, cercanías arriba. ¿Qué coges?'],
+  redes.map(r=>({txt:REDES[r].n,fn:()=>abrirRed(r,p.n,p.p)})));}
 
 /*═══════════════ COMBATE ═══════════════*/
 function estrellas(n){
@@ -3861,7 +4088,11 @@ function dibCiudad(){
   ctx.fillStyle='rgba(0,0,0,.4)';
   if(abajo)ctx.fillRect(x*TS,y*TS+TS-2,TS,2);
   if(der)ctx.fillRect(x*TS+TS-2,y*TS,2,TS);}
- for(const p of POI){const sx=p.p.x*TS,sy=p.p.y*TS;
+ /* Cincuenta y tres chinchetas por fotograma son cincuenta y tres dibujos, y casi todas
+    caen fuera de la pantalla: el mapa mide siete kilómetros. */
+ for(const p of POI){
+  if(p.p.x<x0-3||p.p.x>x1+3||p.p.y<y0-3||p.p.y>y1+3)continue;
+  const sx=p.p.x*TS,sy=p.p.y*TS;
   ctx.drawImage(MARCA[p.id]||(MARCA[p.id]=marcaAbajo(p.c)),sx-7,sy-30);
   if(p.int&&!S.mision){const m=MISIONES[S.misionIdx];
    if(m&&((m.giver==='Txema'&&p.id==='bar')||(m.giver==='Iker'&&p.id==='taller'))){
@@ -4077,7 +4308,7 @@ function guardar(){
   dinero:S.dinero,hp:S.hp,energia:S.energia,hambre:S.hambre,min:S.min,dia:S.dia,rep:S.rep,
   deuda:S.deuda,alquiler:S.alquiler,ultCobro:S.ultCobro,tiene:S.tiene,contrato:S.contrato,
   armas:Object.fromEntries(Object.entries(S.armas).map(([k,v])=>[k,v===Infinity?-1:v])),
-  armaAct:S.armaAct,misionIdx:S.misionIdx,x:player.x,y:player.y}));}
+  armaAct:S.armaAct,misionIdx:S.misionIdx,pinta:S.pinta,x:player.x,y:player.y}));}
 async function cargar(){
  const raw=await alm.get(CLAVE);if(!raw)return false;
  try{const d=JSON.parse(raw);
@@ -4086,6 +4317,7 @@ async function cargar(){
    tiene:d.tiene||S.tiene,contrato:d.contrato||null,misionIdx:d.misionIdx||0,armaAct:d.armaAct||'punos'});
   S.armas={};Object.entries(d.armas||{punos:-1}).forEach(([k,v])=>S.armas[k]=v===-1?Infinity:v);
   if(S.armas.punos===undefined)S.armas.punos=Infinity;
+  if(d.pinta)vestir(d.pinta);
   player.x=d.x;player.y=d.y;
   if(S.tiene.deportivo){tuCoche.tipo='deportivo';tuCoche.lib=2;tuCoche.vmax=15.5;}
   else if(S.tiene.furgo){tuCoche.tipo='furgoLarga';tuCoche.vmax=9.5;}
@@ -4105,7 +4337,7 @@ async function arrancar(){
   ['vehículos',()=>generarVeh()],
   ['props',()=>generarProps()],
   ['iconos',()=>generarIconos()],
-  ['la ciudad',async()=>{await cargarCiudad();colocarPOIs();}],
+  ['la ciudad',async()=>{await cargarCiudad();colocarPOIs();colocarParadas();}],
   ['el barrio',()=>{player.x=poi('piso').p.x;player.y=poi('piso').p.y;poblar();}],
   ['a la gente',async()=>{await cargarSprites();['protagonista','ertzaina','maton','maton2'].forEach(hoja);}],
  ];

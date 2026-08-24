@@ -1,7 +1,7 @@
 /**
  * Saca una captura del juego en marcha, sobre el DOM simulado.
  *
- *   node herramientas/html/captura.js [salida.png] [--pasos N] [--anda N]
+ *   node herramientas/html/captura.js [salida.png] [--pasos N] [--anda N] [--dentro id]
  *
  * El arte se juzga mal en una lámina de contacto: ahí cada sprite está solo y sobre un
  * fondo elegido. En la calle cae encima del asfalto, de la acera y del portal, y al lado
@@ -23,6 +23,7 @@ const listo = async (topeMs = 40000) => {
 listo().then(() => {
   const H = global.__H, A = global.__, paso = global.__step;
   const opc = n => { const i = process.argv.indexOf(n); return i < 0 ? null : Number(process.argv[i+1]); };
+  const txt = n => { const i = process.argv.indexOf(n); return i < 0 ? null : process.argv[i+1]; };
 
   (H['btnNuevo:click'] || H['btnCont:click'])();
   paso(opc('--pasos') || 90);
@@ -32,6 +33,18 @@ listo().then(() => {
   const anda = opc('--anda') === null ? 70 : opc('--anda');
   if (anda) { A.teclas['w'] = true; paso(anda); A.teclas['w'] = false; paso(40); }
 
+  const dentro = txt('--dentro');
+  if (dentro) {
+    A.entrar(dentro, { x: A.player.x, y: A.player.y }, txt('--rotulo'));
+    // entrar() va con fundido: hay que dejar pasar el temporizador antes de la foto.
+    return setTimeout(() => { paso(20); volcar(); }, 400);
+  }
+  volcar();
+});
+
+function volcar() {
+  const A = global.__;
+
   const salida = (process.argv[2] && !process.argv[2].startsWith('--')) ? process.argv[2]
     : path.join(__dirname, '..', '..', 'referencia', 'capturas', 'captura-calle.png');
   fs.mkdirSync(path.dirname(salida), { recursive: true });
@@ -39,4 +52,4 @@ listo().then(() => {
   console.log('->', salida, A.real.width + 'x' + A.real.height,
               '· ' + A.peatones.length + ' peatones · ' + A.coches.length + ' coches');
   process.exit(0);
-});
+}

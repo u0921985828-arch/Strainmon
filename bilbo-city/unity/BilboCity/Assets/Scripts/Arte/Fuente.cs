@@ -246,6 +246,49 @@ public static class Fuente {
         L.P(7,6,10,14,Paleta.Carbon); L.P(7,6,10,2,Paleta.Gris);
         for (int i = 0; i < 4; i++) L.P(9,9+i*3,6,2,Paleta.MostazaO); Guardar("cargador", L);
 
+        // Ropa, mesa y transporte.
+        L = I24();
+        L.P(6,4,12,16,Paleta.AzulL); L.P(6,4,12,2,Paleta.H("#a8c4dd"));
+        L.P(2,5,5,8,Paleta.AzulL); L.P(17,5,5,8,Paleta.Azul); L.P(11,4,2,15,Paleta.Azul);
+        L.P(8,3,3,3,Paleta.Hueso); L.P(13,3,3,3,Paleta.Hueso);
+        L.P(11,9,1,1,Paleta.Hueso); L.P(11,14,1,1,Paleta.Hueso); Guardar("camisa", L);
+
+        L = I24();
+        L.P(5,3,14,5,Paleta.H("#3a4f6b")); L.P(5,3,14,2,Paleta.Acero);
+        L.P(5,8,6,13,Paleta.H("#3a4f6b")); L.P(13,8,6,13,Paleta.H("#2c3d53"));
+        L.P(11,8,2,5,Paleta.H("#2c3d53")); L.P(5,3,1,18,Paleta.Acero);
+        L.P(7,10,1,4,Paleta.H("#2c3d53")); Guardar("pantalon", L);
+
+        L = I24();
+        L.P(3,12,13,7,Paleta.MaderaO); L.P(3,12,13,2,Paleta.H("#8a6a44"));
+        L.P(14,14,7,5,Paleta.MaderaO); L.P(3,19,18,2,Paleta.Negro);
+        L.P(6,14,7,2,Paleta.Crema); Guardar("zapato", L);
+
+        L = I24();
+        L.P(5,7,14,7,Paleta.RojoO); L.P(5,7,14,2,Paleta.Rojo);
+        L.P(3,13,17,3,Paleta.RojoO); L.P(11,4,2,4,Paleta.Rojo); Guardar("gorra", L);
+
+        L = I24();
+        L.P(2,5,20,13,Paleta.RojoO); L.P(2,5,20,2,Paleta.Rojo);
+        L.P(4,8,6,5,Paleta.AzulL); L.P(12,8,8,5,Paleta.AzulL); L.P(4,15,16,2,Paleta.Mostaza);
+        L.P(5,18,4,3,Paleta.Carbon); L.P(15,18,4,3,Paleta.Carbon); Guardar("bus", L);
+
+        L = I24();
+        L.P(3,4,18,14,Paleta.RojoO); L.P(3,4,18,2,Paleta.Rojo); L.P(5,7,14,6,Paleta.AzulL);
+        L.P(3,18,18,2,Paleta.Carbon); L.P(6,20,3,2,Paleta.Mostaza); L.P(15,20,3,2,Paleta.Mostaza);
+        L.P(11,7,2,6,Paleta.Carbon); Guardar("metro", L);
+
+        L = I24();
+        L.P(2,6,17,11,Paleta.VerdeO); L.P(2,6,17,2,Paleta.Verde);
+        L.P(4,9,5,5,Paleta.AzulL); L.P(11,9,6,5,Paleta.AzulL); L.P(19,10,3,7,Paleta.GrisO);
+        L.P(2,17,20,2,Paleta.Carbon); L.P(5,19,4,3,Paleta.Carbon);
+        L.P(14,19,4,3,Paleta.Carbon); Guardar("tren", L);
+
+        L = I24();
+        L.P(2,9,20,3,Paleta.Hueso); L.P(4,12,16,3,Paleta.Blanco); L.P(7,5,10,4,Paleta.MaderaO);
+        L.P(8,3,8,3,Paleta.H("#8a6a44")); L.P(9,6,3,2,Paleta.Crema);
+        L.P(2,16,20,2,Paleta.GrisO); Guardar("plato", L);
+
         // ── HUD ──
         var estrella = new[]{ new Vector2(12,1), new Vector2(15,9), new Vector2(23,9), new Vector2(16,14),
             new Vector2(19,22), new Vector2(12,17), new Vector2(5,22), new Vector2(8,14),

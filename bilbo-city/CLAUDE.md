@@ -40,9 +40,13 @@ node herramientas/html/plano.js
 ## Qué comprueba cada cosa
 
 `herramientas/html/pruebas.js` arranca el juego de verdad sobre un DOM simulado con canvas
-real: juega las 8 misiones, entra y sale de los 7 interiores, verifica que los sitios
-están sobre suelo pisable y cerca de donde los pone el plano, mide la conectividad de la
-red viaria, prueba combate, conducción desde 16 puntos al azar, muerte y 150 s de bucle.
+real: juega las 8 misiones, entra y sale de **todos** los interiores —la lista sale del
+juego, así que uno nuevo se prueba solo— comprobando que tienen puerta, que las filas del
+plano miden lo mismo y que no hay ningún tendero empotrado en una pared; compra ropa y
+verifica que el sprite cambia; recorre las tres redes de transporte; verifica que los
+sitios están sobre suelo pisable y cerca de donde los pone el plano; mide la conectividad
+de la red viaria, y prueba combate, conducción desde 16 puntos al azar, muerte y 150 s de
+bucle.
 
 `herramientas/compilar/` compila el C# de verdad, sin tener Unity: hay un remedo de la API
 del motor — solo firmas, nunca se ejecuta — y el juego se compila contra él con Roslyn, con
@@ -164,6 +168,36 @@ node herramientas/html/plano.js                      # con rótulos y chinchetas
 node herramientas/html/plano.js salida.png --zoom 2 --sin-nombres
 node herramientas/html/manzanas.js                   # el grano de la trama
 ```
+
+## Comercio y transporte
+
+Los sitios donde se entra son **doce**, y los cuatro últimos los comparten varios POI: el
+rótulo de la puerta lo pone el sitio (`entrar(id, desde, nombre)`), no el plano de dentro.
+Dos tascas iguales por dentro y con distinto nombre en la puerta es lo que hay en
+cualquier barrio, y así no se duplica un plano por cada esquina.
+
+**La ropa cambia al personaje de verdad.** No es un icono ni una estadística: la forja ya
+sabe montar cualquier combinación de torso, piernas, calzado y gorro —es como se dibujan
+los veinte peatones—, así que comprar una prenda cambia cuatro campos del arquetipo del
+protagonista y tira su hoja (`delete HOJAS.protagonista` / `Hojas.Remove`) para que se
+vuelva a forjar. Cambiarse **quita una estrella**, como repintar el coche: la descripción
+que la pasma va pasando por la emisora deja de valer.
+
+**Tres redes de transporte**, y lo que las diferencia es la cobertura:
+
+| | Tarifa | Paradas | Velocidad |
+|---|---|---|---|
+| **Bilbobus** | 2 € | los 34 barrios | lenta |
+| **Metro** | 3 € | 11 estaciones | la más rápida |
+| **Cercanías** | 3 € | 6 apeaderos | rápida, y baja al fondo del valle |
+
+Viajar cuesta dinero y **reloj** (`S.min`), y con estrellas no te dejan subir: si no, un
+billete de dos euros sería la mejor huida del juego. Abando es de las dos redes, que es lo
+que pasa de verdad.
+
+Las paradas de bus **no son POIs** y no llevan coordenada escrita: se sacan del rótulo de
+cada barrio en el plano, con la acera más cercana. Treinta y cuatro chinchetas más taparían
+la ciudad en el radar, así que se encuentran estando encima.
 
 ## El arte
 

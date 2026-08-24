@@ -48,6 +48,9 @@ public class Sitio {
     public Vector2 Pos;
     public bool Mirador;
     public int Cx, Cy;
+    /// <summary>Redes de transporte que paran aquí: "metro", "tren" o las dos.</summary>
+    public string Red;
+    public bool EsDeRed(string red) { return Red != null && Red.Contains(red); }
 }
 
 /// <summary>Estado de la partida. Lo que se guarda y lo que consulta todo lo demás.</summary>
@@ -66,6 +69,10 @@ public class Estado {
     public int MisionIdx;
     public float Muerto;
     public bool EnInterior;
+    /// <summary>La ropa puesta. La forja del personaje ya sabe montar cualquier
+    /// combinación —es como se dibujan los peatones—, así que vestirse es cambiar cuatro
+    /// campos del arquetipo del protagonista y tirar su hoja para que se vuelva a forjar.</summary>
+    public string Torso = "cazadora", Piernas = "vaquero", Calzado = "botas", Gorro = "txapela";
     public readonly List<Contrato> Contratos = new List<Contrato>();
 
     public Contrato ContratoDe(string gremio) { return Contratos.Find(c => c.Gremio == gremio && !c.Cerrado); }
@@ -131,8 +138,8 @@ public class Estado {
         // Las coordenadas salen del plano municipal: se buscó el rótulo de cada sitio y
         // se pasó su posición a casillas. Por eso ya no hace falta decirle a cada uno en
         // qué barrio va — cae en el suyo solo, porque está donde está de verdad.
-        void S(string id, string n, Color32 c, string inter, int cx, int cy, bool mira = false) {
-            var s = new Sitio { Id=id, Nombre=n, Color=c, Interior=inter, Cx=cx, Cy=cy, Mirador=mira };
+        void S(string id, string n, Color32 c, string inter, int cx, int cy, bool mira = false, string red = null) {
+            var s = new Sitio { Id=id, Nombre=n, Color=c, Interior=inter, Cx=cx, Cy=cy, Mirador=mira, Red=red };
             s.Pos = mira ? Ciudad.PuntoZona(cx,cy,40) : Ciudad.PuntoPortal(cx,cy,40);
             Sitios.Add(s);
         }
@@ -154,7 +161,7 @@ public class Estado {
         S("bellasartes","Museo de Bellas Artes",Paleta.H("#b09a6e"), null,        661,285, true);
         S("casilla",  "Parque de Doña Casilda", Paleta.Cesped,       null,        640,299, true);
         S("moyua",    "Plaza Moyúa",            Paleta.H("#a8bcc8"), null,        728,319, true);
-        S("abando",   "Estación de Abando",     Paleta.H("#c9a13f"), null,        857,329, true);
+        S("abando",   "Estación de Abando",     Paleta.H("#c9a13f"), null,        857,329, true, "metrotren");
         S("alhondiga","Azkuna Zentroa",         Paleta.H("#c07f52"), null,        721,396, true);
         S("sanmames", "San Mamés",              Paleta.VerdeL,       null,        497,384, true);
         S("deustuni", "Universidad de Deusto",  Paleta.H("#b8a05c"), null,        624,163, true);
@@ -165,9 +172,36 @@ public class Estado {
         S("etxebarria","Parque Etxebarria",     Paleta.H("#7fae63"), null,        955,217, true);
         S("funicular","Funicular de Artxanda",  Paleta.H("#7fbf9f"), null,        814,146, true);
         S("begonia",  "Basílica de Begoña",     Paleta.H("#cbbf9c"), null,       1087,269, true);
-        S("atxuri",   "Estación de Atxuri",     Paleta.H("#b58a5a"), null,       1009,424, true);
+        S("atxuri",   "Estación de Atxuri",     Paleta.H("#b58a5a"), null,       1009,424, true, "tren");
         S("arena",    "Bilbao Arena",           Paleta.H("#c4693f"), null,        961,484, true);
-        S("zorrotza", "Estación de Zorrotza",   Paleta.H("#8fa66b"), null,        120,335, true);
+        S("zorrotza", "Estación de Zorrotza",   Paleta.H("#8fa66b"), null,        120,335, true, "tren");
+        // Comercios. Nombres inventados, sitios reales: la Gran Vía, las Siete Calles,
+        // Pozas, Deustu, Abandoibarra, Artxanda, Atxuri y Rekalde.
+        S("ropagranvia", "Trapos Gran Vía",       Paleta.H("#c98fd0"), "ropa",      790,325);
+        S("ropacasco",   "Ropero del Casco",      Paleta.H("#b878c0"), "ropa",      944,340);
+        S("tascapozas",  "Tasca Ondarra",         Paleta.RojoL,        "tasca",     560,370);
+        S("tascadeustu", "Tasca Iparragirre",     Paleta.RojoL,        "tasca",     620,205);
+        S("asador",      "Asador de Artxanda",    Paleta.H("#d08a4a"), "resto",     806,120);
+        S("sidreria",    "Sidrería Atxuri",       Paleta.H("#d08a4a"), "resto",    1000,412);
+        S("galeria",     "Galería Abandoibarra",  Paleta.H("#7fbfd0"), "centro",    645,232);
+        S("gasodeustu",  "Gasolinera Deustu",     Paleta.H("#e05a3c"), "gasoli",    612,192);
+        S("gasorekalde", "Gasolinera Rekalde",    Paleta.H("#e05a3c"), "gasoli",    700,560);
+        // Estaciones de metro. Las de verdad, en el barrio que les toca. Abando está
+        // arriba porque además es de cercanías: allí se cambia de una red a la otra.
+        S("mtinazio",    "Metro San Inazio",      Paleta.RojoL, null,  500,120, false, "metro");
+        S("mtsarriko",   "Metro Sarriko",         Paleta.RojoL, null,  585,150, false, "metro");
+        S("mtdeustu",    "Metro Deustu",          Paleta.RojoL, null,  640,175, false, "metro");
+        S("mtsanmames",  "Metro San Mamés",       Paleta.RojoL, null,  500,378, false, "metro");
+        S("mtindautxu",  "Metro Indautxu",        Paleta.RojoL, null,  628,345, false, "metro");
+        S("mtmoyua",     "Metro Moyúa",           Paleta.RojoL, null,  728,322, false, "metro");
+        S("mtcasco",     "Metro Casco Viejo",     Paleta.RojoL, null,  940,330, false, "metro");
+        S("mtsantutxu",  "Metro Santutxu",        Paleta.RojoL, null, 1160,420, false, "metro");
+        S("mtbasarrate", "Metro Basarrate",       Paleta.RojoL, null, 1110,400, false, "metro");
+        S("mtbolueta",   "Metro Bolueta",         Paleta.RojoL, null, 1258,400, false, "metro");
+        // Cercanías: los apeaderos del fondo del valle, que es donde el metro no llega.
+        S("trolabeaga",  "Apeadero de Olabeaga",  Paleta.H("#8fa66b"), null, 392,412, false, "tren");
+        S("trametzola",  "Apeadero de Ametzola",  Paleta.H("#8fa66b"), null, 640,470, false, "tren");
+        S("trbasurto",   "Apeadero de Basurto",   Paleta.H("#8fa66b"), null, 482,438, false, "tren");
     }
     public static Sitio Sitio_(string id) { return Sitios.Find(s => s.Id == id); }
 }

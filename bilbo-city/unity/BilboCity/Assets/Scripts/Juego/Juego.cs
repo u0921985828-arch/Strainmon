@@ -64,6 +64,7 @@ public class Juego : MonoBehaviour {
         _entidades.SetParent(transform, false);
 
         Estado.ColocarSitios();
+        Transporte.ColocarParadas();
         var goProps = new GameObject("Mobiliario").transform;
         goProps.SetParent(_mundo, false);
         Mobiliario.Sembrar(goProps);

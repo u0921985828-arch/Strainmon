@@ -16,7 +16,8 @@ public class DefInterior {
     public NpcInterior[] Npcs;
 }
 
-/// <summary>Los siete sitios en los que se entra: bar, piso, taller, armería, mercado, hospital y portal.</summary>
+/// <summary>Los sitios en los que se entra. Los cuatro últimos los comparten varios POI:
+/// el rótulo de la puerta lo pone el sitio, no el plano de dentro.</summary>
 public static class Interiores {
     public static DefInterior Actual;
     public static Vector2 Volver;
@@ -41,7 +42,7 @@ public static class Interiores {
             Npcs=new[]{ new NpcInterior{ X=7.5f, Y=4.5f, Nombre="Iker", Arq="iker", Tipo="mecanico" }}}},
         {"armeria", new DefInterior{ Nombre="Bazar Nervión", Suelo="sueloTaller", Pared="pared", Mapa=new[]{
             "#############","#XXXXXXXXXXX#","#...........#","#..EE...EE..#",
-            "#...........#","#....OO.....#","#####DD#####"},
+            "#...........#","#....OO.....#","#####DD######"},
             Npcs=new[]{ new NpcInterior{ X=6.5f, Y=4.5f, Nombre="Koldo", Arq="koldo", Tipo="armero" }}}},
         {"merca", new DefInterior{ Nombre="Mercado de la Ribera", Suelo="terrazo", Pared="paredChapa", Mapa=new[]{
             "#################","#PPPP...PPPP..PP#","#...............#","#..PPPP...PPPP..#",
@@ -49,17 +50,47 @@ public static class Interiores {
             Npcs=new[]{ new NpcInterior{ X=3.5f, Y=2.6f, Nombre="Bego", Arq="bego", Tipo="pescatera" }}}},
         {"hospital", new DefInterior{ Nombre="Hospital de Basurto", Suelo="sueloHosp", Pared="paredBlanca", Mapa=new[]{
             "###############","#LL...LL...QQ.#","#LL...LL......#","#.............#",
-            "#SSSS....OOOO.#","#.............#","######DD######"},
+            "#SSSS....OOOO.#","#.............#","######DD#######"},
             Npcs=new[]{ new NpcInterior{ X=9.5f, Y=5.5f, Nombre="Nekane", Arq="enfermera", Tipo="enfermera" }}}},
         {"portal", new DefInterior{ Nombre="Portal · la casera", Suelo="hidraulico", Pared="paredBlanca", Mapa=new[]{
             "############","#....WW....#","#..........#","#..........#","#####DD#####"},
             Npcs=new[]{ new NpcInterior{ X=6.5f, Y=2.5f, Nombre="Amaia", Arq="amaia", Tipo="casera" }}}},
+        {"ropa", new DefInterior{ Nombre="Tienda de ropa", Suelo="terrazo", Pared="paredBlanca", Mapa=new[]{
+            "###############","#RRRRR...RRRRR#","#.............#","#..XX.....XX..#",
+            "#.............#","#RRRRR...EEEE.#","#.............#","#.....OOO.....#",
+            "#.............#","#######DD######"},
+            Npcs=new[]{ new NpcInterior{ X=7.5f, Y=6.5f, Nombre="Nerea", Arq="nerea", Tipo="ropa" }}}},
+        {"tasca", new DefInterior{ Nombre="Tasca", Suelo="terrazo", Pared="paredAzul", Mapa=new[]{
+            "############","#BBBBBB...W#","#..........#","#..MM..MM..#",
+            "#..MM..MM..#","#..........#","#####DD#####"},
+            Npcs=new[]{
+                new NpcInterior{ X=3.5f, Y=2.6f, Nombre="Patxi", Arq="patxi", Tipo="barman" },
+                new NpcInterior{ X=8.5f, Y=5.4f, Nombre="Mikel", Arq="mikel", Tipo="parroquiano" }}}},
+        {"resto", new DefInterior{ Nombre="Restaurante", Suelo="terrazo", Pared="paredAzul", Mapa=new[]{
+            "################","#BB....WW....WW#","#..............#","#..MM..MM..MM..#",
+            "#..SS..SS..SS..#","#..............#","#..MM..MM..MM..#","#..SS..SS..SS..#",
+            "#..............#","#######DD#######"},
+            Npcs=new[]{ new NpcInterior{ X=2.5f, Y=2.6f, Nombre="Patxi", Arq="patxi", Tipo="cocinero" }}}},
+        {"centro", new DefInterior{ Nombre="Galería", Suelo="terrazo", Pared="paredBlanca", Mapa=new[]{
+            "#####################","#RRRR..XXXX..EEEE..P#","#...................#",
+            "#..AA...........AA..#","#...................#","#..MM..MM...PPPP...P#",
+            "#..SS..SS...........#","#..........OOO......#","#...................#",
+            "#########DD##########"},
+            Npcs=new[]{
+                new NpcInterior{ X=3.5f,  Y=2.6f, Nombre="Nerea", Arq="nerea", Tipo="ropa" },
+                new NpcInterior{ X=8.5f,  Y=6.4f, Nombre="Patxi", Arq="patxi", Tipo="cocinero" },
+                new NpcInterior{ X=18.5f, Y=2.6f, Nombre="Bego",  Arq="bego",  Tipo="pescatera" }}}},
+        {"gasoli", new DefInterior{ Nombre="Gasolinera", Suelo="sueloTaller", Pared="paredChapa", Mapa=new[]{
+            "###############","#GG..GG..GG...#","#.............#","#.............#",
+            "#EEEE....XXXX.#","#.............#","#....OOO......#","######DD#######"},
+            Npcs=new[]{ new NpcInterior{ X=6.5f, Y=5.5f, Nombre="Gorka", Arq="gorka", Tipo="gasolinero" }}}},
     };
 
     static readonly Dictionary<char,string> TileDe = new Dictionary<char,string> {
         {'#',"pared"},{'B',"barra"},{'M',"mesa"},{'C',"cama"},{'W',"mueble"},{'X',"vitrina"},
         {'P',"puesto"},{'V',"cocheEx"},{'O',"mostrador"},{'Q',"taquilla"},{'S',"sillas"},
-        {'E',"estante"},{'L',"camilla"}
+        {'E',"estante"},{'L',"camilla"},
+        {'R',"perchero"},{'A',"escalera"},{'G',"surtidor"}
     };
 
     public static char Casilla(float x, float y) {
@@ -70,10 +101,15 @@ public static class Interiores {
         if (fx < 0 || fx >= fila.Length) return '#';
         return fila[fx];
     }
-    public static bool Solido(float x, float y) { return "#BMCWXPVOQEL".IndexOf(Casilla(x,y)) >= 0; }
+    /// <summary>La escalera mecánica no es sólida: se anda por encima. El resto sí.</summary>
+    public static bool Solido(float x, float y) { return "#BMCWXPVOQELRG".IndexOf(Casilla(x,y)) >= 0; }
 
-    public static void Entrar(string id, Vector2 desde) {
-        Actual = Todos[id];
+    /// <summary>El nombre viene de fuera a propósito: dos tascas iguales por dentro se
+    /// llaman distinto en la puerta, que es lo que pasa en cualquier barrio.</summary>
+    public static void Entrar(string id, Vector2 desde, string nombre = null) {
+        var d = Todos[id];
+        Actual = nombre == null ? d : new DefInterior{
+            Nombre=nombre, Suelo=d.Suelo, Pared=d.Pared, Mapa=d.Mapa, Npcs=d.Npcs };
         Volver = desde;
         Estado.I.EnInterior = true;
         var J = Juego.I;

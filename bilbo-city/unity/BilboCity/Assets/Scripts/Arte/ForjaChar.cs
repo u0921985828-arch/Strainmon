@@ -149,6 +149,11 @@ public static class ForjaChar {
             Add(A("p6","corpulenta",2,"corto",Paleta.Pelo2,"cascoObra",Paleta.Mostaza,"reflectante","cargo","botas","ninguno"));
             Add(A("p7","corpulenta",4,"rapado",Paleta.Pelo1,"lana",Paleta.RojoO,"reflectante","monoP","botas","ninguno"));
             Add(A("p8","delgada",3,"coleta",Paleta.Pelo1,"ninguno",Paleta.Carbon,"delantal","vestir","deportivas","ninguno"));
+            // Los del mostrador. Se les ve mucho rato y de cerca, así que van con pinta
+            // propia y no con la de un peatón cualquiera.
+            Add(A("nerea","delgada",0,"melena",Paleta.Pelo2,"ninguno",Paleta.Carbon,"polo","vestir","deportivas","ninguno"));
+            Add(A("patxi","corpulenta",1,"calvo",Paleta.Pelo1,"ninguno",Paleta.Carbon,"delantal","vestir","zapatos","ninguno"));
+            Add(A("gorka","media",2,"corto",Paleta.Pelo1,"gorra",Paleta.Azul,"mono","monoP","botas","ninguno"));
             return _arq;
         }
     }
@@ -334,6 +339,18 @@ public static class ForjaChar {
     }
 
     static readonly Dictionary<string, Sprite[]> Hojas = new Dictionary<string, Sprite[]>();
+
+    /// <summary>Vestir al protagonista: cambia su arquetipo y tira su hoja para que la
+    /// forja la vuelva a compilar con la ropa nueva.</summary>
+    public static void Vestir(string torso, string piernas, string calzado, string gorro) {
+        // Arquetipo es un struct: sin volver a meterlo en el diccionario se cambia una
+        // copia y el protagonista sigue vestido igual.
+        var a = Arq["protagonista"];
+        a.Torso = torso; a.Piernas = piernas; a.Calzado = calzado;
+        a.Gorro = gorro; a.GorroCol = Paleta.Carbon;
+        Arq["protagonista"] = a;
+        Hojas.Remove("protagonista");
+    }
 
     /// <summary>Hoja de un arquetipo: 8 columnas × 14 filas. Se compila la primera vez que hace falta.</summary>
     public static Sprite[] Hoja(string arq) {

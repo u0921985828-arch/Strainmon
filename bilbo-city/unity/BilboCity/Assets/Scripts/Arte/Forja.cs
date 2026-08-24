@@ -190,6 +190,19 @@ public static class Forja {
         g = T32(); g.Rellenar(Paleta.GrisO);
         for (int y = 2; y < 30; y += 9) { g.P(0,y+7,32,2,Paleta.Gris);
             for (int x = 2; x < 30; x += 6) g.P(x,y,4,7,Paleta.MostazaO); } Reg("estante", g);
+        g = T32(); g.Rellenar(Paleta.GrisO); g.P(0,5,32,2,Paleta.Acero); g.P(0,4,32,1,Paleta.HormigonL);
+        var trapos = new[]{ Paleta.RojoO, Paleta.Azul, Paleta.VerdeO, Paleta.MostazaO, Paleta.Morado, Paleta.Carbon };
+        for (int i = 0; i < 6; i++) { int x = 1 + i*5;
+            g.P(x+1,3,2,3,Paleta.AceroO);
+            g.P(x,7,4,15,trapos[i]); g.P(x,7,4,2,Paleta.Hueso); g.P(x+3,7,1,15,Paleta.Negro); }
+        g.P(0,28,32,4,Paleta.Gris); Reg("perchero", g);
+        g = T32(); g.Rellenar(Paleta.Acero);
+        for (int y = 0; y < 32; y += 4) { g.P(2,y,28,3,Paleta.AceroO); g.P(2,y,28,1,Paleta.HormigonL); }
+        g.P(0,0,2,32,Paleta.Gris); g.P(30,0,2,32,Paleta.GrisO); Reg("escalera", g);
+        g = T32(); g.Rellenar(Paleta.Hormigon);
+        g.P(5,2,22,26,Paleta.RojoO); g.P(5,2,22,3,Paleta.Rojo); g.P(26,2,1,26,Paleta.Sangre);
+        g.P(8,6,15,11,Paleta.Carbon); g.P(10,8,11,4,Paleta.Mostaza); g.P(10,13,7,2,Paleta.Acero);
+        g.P(27,12,4,9,Paleta.Carbon); g.P(4,20,24,3,Paleta.GrisO); Reg("surtidor", g);
 
         // ── volcado al atlas ──
         int cols = 8;

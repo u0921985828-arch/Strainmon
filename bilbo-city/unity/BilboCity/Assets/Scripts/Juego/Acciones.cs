@@ -53,10 +53,18 @@ public static class Acciones {
 
         var s = SitioCerca(J.Jug.Pos);
         if (s != null) {
-            if (s.Interior != null) { Interiores.Entrar(s.Interior, s.Pos); return; }
+            if (s.Red != null) { Transporte.Estacion(s); return; }
+            if (s.Interior != null) { Interiores.Entrar(s.Interior, s.Pos, s.Nombre); return; }
             if (s.Id == "poli") { Hud.I.Aviso("COMISARÍA. MEJOR NO ENTRES"); return; }
             if (s.Mirador) { Hud.I.Aviso(s.Nombre); return; }
             Hud.I.Aviso("ACEPTA UN CURRO AQUÍ DESDE EL MÓVIL");
+            return;
+        }
+
+        var parada = Transporte.ParadaCerca(J.Jug.Pos);
+        if (parada != null) {
+            if (Estado.I.Estrellas > 0) { Hud.I.Aviso("CON LA PASMA DETRÁS NO SUBES A NINGÚN SITIO"); return; }
+            Transporte.AbrirRed("bus", "Parada · " + parada.Nombre, parada.Pos);
             return;
         }
 
@@ -142,6 +150,100 @@ public static class Acciones {
     }
 
     // ═══════════ SERVICIOS ═══════════
+    // ═══════════ ROPA, MESA Y SURTIDOR ═══════════
+    /// <summary>Una prenda: qué ranura ocupa y por qué valor la cambia.</summary>
+    public class ArticuloRopa {
+        public string Ranura, Valor, Icono, Titulo, Desc;
+        public int Precio;
+    }
+    static ArticuloRopa Pr(string r, string v, string ico, string tt, string dd, int precio) {
+        return new ArticuloRopa{ Ranura=r, Valor=v, Icono=ico, Titulo=tt, Desc=dd, Precio=precio };
+    }
+    public static readonly ArticuloRopa[] Prendas = {
+        Pr("torso","chaqueta", "camisa","Chaqueta de traje","Para pisar moqueta.",190),
+        Pr("torso","sudadera", "camisa","Sudadera con capucha","La cara medio tapada.",70),
+        Pr("torso","chandal",  "camisa","Chándal","Verde, con la raya blanca.",90),
+        Pr("torso","abrigo",   "camisa","Abrigo largo","Aquí llueve nueve meses.",240),
+        Pr("torso","gabardina","camisa","Gabardina","De las de esperar bajo un soportal.",210),
+        Pr("torso","polo",     "camisa","Polo","Discreto y de verano.",45),
+        Pr("torso","cazadora", "camisa","Cazadora negra","La de siempre.",80),
+        Pr("piernas","vestir",  "pantalon","Pantalón de vestir","Raya y todo.",95),
+        Pr("piernas","vaquero", "pantalon","Vaquero","No falla.",55),
+        Pr("piernas","chandalP","pantalon","Pantalón de chándal","Juego con la parte de arriba.",40),
+        Pr("piernas","cargo",   "pantalon","Pantalón de faena","Bolsillos en las perneras.",60),
+        Pr("calzado","deportivas","zapato","Deportivas","Blancas, para correr de verdad.",75),
+        Pr("calzado","zapatos",   "zapato","Zapatos","Negros, de suela dura.",110),
+        Pr("calzado","botas",     "zapato","Botas","De obra, sirven para todo.",85),
+        Pr("gorro","txapela","gorra","Txapela","De aquí de toda la vida.",35),
+        Pr("gorro","gorra",  "gorra","Gorra","Visera y sombra en la cara.",25),
+        Pr("gorro","lana",   "gorra","Gorro de lana","Para el sirimiri.",20),
+        Pr("gorro","ninguno","gorra","A cabeza descubierta","Se te va a mojar.",10),
+    };
+    static string Puesta(string ranura) {
+        var E = Estado.I;
+        return ranura == "torso" ? E.Torso : ranura == "piernas" ? E.Piernas
+             : ranura == "calzado" ? E.Calzado : E.Gorro;
+    }
+    public static void Vestir(string ranura, string valor) {
+        var E = Estado.I;
+        if (ranura == "torso") E.Torso = valor;
+        else if (ranura == "piernas") E.Piernas = valor;
+        else if (ranura == "calzado") E.Calzado = valor;
+        else E.Gorro = valor;
+        ForjaChar.Vestir(E.Torso, E.Piernas, E.Calzado, E.Gorro);
+        // Cambiarse de arriba abajo quita una estrella: la descripción que la pasma va
+        // pasando por la emisora deja de valer. Es lo que hace el repintado con el coche.
+        if (E.Estrellas > 0) {
+            E.Estrellas--;
+            if (E.Estrellas == 0) Juego.I.Patrullas.Clear();
+            Hud.I.Aviso("ROPA NUEVA. UNA ESTRELLA MENOS");
+        }
+        Guardado.Guardar();
+    }
+    public static void TiendaRopa(string titulo) {
+        var arts = new List<Articulo>();
+        foreach (var q in Prendas) {
+            var pr = q;
+            arts.Add(new Articulo{
+                Icono = pr.Icono, Titulo = pr.Titulo, Desc = pr.Desc, Precio = pr.Precio,
+                YaLoTiene = () => Puesta(pr.Ranura) == pr.Valor,
+                Comprar = () => { Vestir(pr.Ranura, pr.Valor);
+                                  Hud.I.Aviso(pr.Titulo.ToUpperInvariant() + " PUESTA"); }});
+        }
+        MenuMovil.I.AbrirTienda(titulo + " · Ropa", arts);
+    }
+
+    public static void Comer(int coste, float hambre, float energia, int hp) {
+        var E = Estado.I;
+        if (E.Dinero < coste) { Hud.I.Aviso("NO TE LLEGA"); return; }
+        E.Dinero -= coste;
+        E.Hambre = Mathf.Min(1f, E.Hambre + hambre);
+        E.Energia = Mathf.Min(1f, E.Energia + energia);
+        E.Hp = Mathf.Min(100f, E.Hp + hp);
+        AudioProc.I.Sfx("dinero", 1f);
+        Hud.I.Aviso("−" + coste + " €");
+    }
+
+    /// <summary>El coche que se repara es el que has dejado en la puerta, no el que
+    /// llevas: al entrar te bajas. Se busca alrededor del sitio por el que entraste.</summary>
+    public static void Repostar() {
+        var E = Estado.I;
+        var donde = Interiores.Volver;
+        Vehiculo mej = null; float md = 9f;
+        foreach (var c in Juego.I.Coches) {
+            if (!c.Vivo) continue;
+            float d = Vector2.Distance(c.Pos, donde);
+            if (d < md) { md = d; mej = c; }
+        }
+        if (mej == null) { Hud.I.Aviso("ACERCA EL COCHE A LOS SURTIDORES"); return; }
+        if (mej.Dano <= 0.02f) { Hud.I.Aviso("EL COCHE ESTÁ ENTERO"); return; }
+        int cst = Mathf.Max(15, Mathf.RoundToInt(mej.Dano * 260f));
+        if (E.Dinero < cst) { Hud.I.Aviso("TE PIDEN " + cst + " € Y NO LOS TIENES"); return; }
+        E.Dinero -= cst; mej.Dano = 0f;
+        AudioProc.I.Sfx("dinero", 1f);
+        Hud.I.Aviso("REPOSTADO Y ARREGLADO. −" + cst + " €");
+    }
+
     public static void Curar() {
         var E = Estado.I;
         if (E.Hp >= 100) { Hud.I.Aviso("ESTÁS ENTERO"); return; }
@@ -216,6 +318,26 @@ public static class Acciones {
                         E.Energia = Mathf.Min(1, E.Energia + 0.45f); E.Hp = Mathf.Min(100, E.Hp + 22);
                         Hud.I.Aviso("−12 €"); }},
                     new Opcion{ Texto="Firmar contrato de hostelería", Accion=() => Firmar("hosteleria", 3, 140) }});
+                return;
+            case "ropa":
+                Dialogo.I.Abrir("Nerea", new[]{"Pasa, pasa. ¿Te vistes o miras?"}, new[]{
+                    new Opcion{ Texto="Ver la ropa", Accion=() => TiendaRopa(Interiores.Actual.Nombre) },
+                    new Opcion{ Texto="¿Qué se lleva?", Accion=() =>
+                        Hud.I.Aviso("AQUÍ LO QUE SE LLEVA ES QUE NO SE TE NOTE DE DÓNDE VIENES") }});
+                return;
+            case "cocinero":
+                Dialogo.I.Abrir("Patxi", new[]{"Hay menú y hay carta. Tú dirás."}, new[]{
+                    new Opcion{ Texto="Menú del día", Coste="18 €", Accion=() => Comer(18, 1f, .6f, 30) },
+                    new Opcion{ Texto="Chuletón y postre", Coste="45 €", Accion=() => Comer(45, 1f, 1f, 55) },
+                    new Opcion{ Texto="Café solo", Coste="2 €", Accion=() => Comer(2, .05f, .25f, 0) },
+                    new Opcion{ Texto="Firmar contrato de hostelería", Accion=() => Firmar("hosteleria", 3, 140) }});
+                return;
+            case "gasolinero":
+                Dialogo.I.Abrir("Gorka", new[]{"Surtidor libre el tres. ¿Lleno?"}, new[]{
+                    new Opcion{ Texto="Repostar y revisar el coche", Accion=Repostar },
+                    new Opcion{ Texto="Café de máquina", Coste="2 €", Accion=() => Comer(2, .05f, .3f, 0) },
+                    new Opcion{ Texto="Bocadillo de la vitrina", Coste="6 €", Accion=() => Comer(6, .6f, .1f, 6) },
+                    new Opcion{ Texto="Firmar contrato de transporte", Accion=() => Firmar("transporte", 3, 170) }});
                 return;
             case "parroquiano": {
                 var frases = new[]{

@@ -233,6 +233,7 @@ public class Partida {
     public bool furgo, deportivo;
     public string armaAct;
     public int munBate, munPistola, munUzi, munEscopeta;
+    public string torso, piernas, calzado, gorro;
     public float x, y;
     public List<Contrato> contratos = new List<Contrato>();
 }
@@ -252,6 +253,7 @@ public static class Guardado {
             furgo = E.TieneFurgo, deportivo = E.TieneDeportivo, armaAct = E.ArmaAct,
             munBate = E.Mun("bate"), munPistola = E.Mun("pistola"),
             munUzi = E.Mun("uzi"), munEscopeta = E.Mun("escopeta"),
+            torso = E.Torso, piernas = E.Piernas, calzado = E.Calzado, gorro = E.Gorro,
             x = J != null && J.Jug != null ? J.Jug.Pos.x : 0,
             y = J != null && J.Jug != null ? J.Jug.Pos.y : 0,
             contratos = E.Contratos
@@ -293,6 +295,12 @@ public static class Guardado {
         if (p.munPistola > 0) E.Municion["pistola"] = p.munPistola;
         if (p.munUzi > 0) E.Municion["uzi"] = p.munUzi;
         if (p.munEscopeta > 0) E.Municion["escopeta"] = p.munEscopeta;
+        // La ropa puesta. Una partida de antes de que hubiera tiendas no la trae: se deja
+        // la de fábrica en vez de dejar al protagonista en calzoncillos.
+        if (!string.IsNullOrEmpty(p.torso)) {
+            E.Torso = p.torso; E.Piernas = p.piernas; E.Calzado = p.calzado; E.Gorro = p.gorro;
+            ForjaChar.Vestir(E.Torso, E.Piernas, E.Calzado, E.Gorro);
+        }
         E.Contratos.Clear();
         if (p.contratos != null) E.Contratos.AddRange(p.contratos);
         if (Juego.I != null && Juego.I.Jug != null && p.x > 0)

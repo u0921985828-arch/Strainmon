@@ -97,14 +97,76 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
     }
 
     // ── 2 · interiores ─────────────────────────────────────────────────
-    const interiores = ['bar', 'piso', 'taller', 'armeria', 'merca', 'hospital', 'portal'];
+    // La lista sale del juego, no de aquí: un interior nuevo se prueba solo.
+    const interiores = Object.keys(A.INT);
     for (const id of interiores) {
+      const d = A.INT[id], m = d.mapa;
+      ok(m.some(f => f.includes('D')), id + ': no tiene puerta');
+      ok(m.every(f => f.length === m[0].length), id + ': filas de distinto largo');
+      // Un tendero dentro de una pared o encima del mostrador es lo que sale al dibujar
+      // un plano nuevo a mano, y no se ve hasta entrar.
+      for (const n of d.npcs) {
+        const fx = Math.floor(n.x), fy = Math.floor(n.y);
+        const ch = (fy >= 0 && fy < m.length && fx >= 0 && fx < m[fy].length) ? m[fy][fx] : '#';
+        ok(!A.solidoInt(ch), id + ': ' + n.n + ' está dentro de un «' + ch + '»');
+      }
+      for (const f of m) for (const ch of f)
+        ok(ch === '.' || ch === 'D' || A.TILE_INT[ch], id + ': tile «' + ch + '» sin dibujo');
       A.entrar(id, { x: P.x, y: P.y }); await dormir(280); paso(8);
       ok(S.escena === 'interior', 'no se entra en ' + id);
       A.salir(); await dormir(280); paso(8);
       ok(S.escena === 'ciudad', 'no se sale de ' + id);
     }
-    bien.push(interiores.length + ' interiores entran y salen');
+    bien.push(interiores.length + ' interiores entran y salen, con puerta y sin nadie empotrado');
+
+    // ── 2 ter · la ropa cambia al personaje ────────────────────────────
+    {
+      const antes = A.hoja('protagonista').toDataURL();
+      const puesto = S.pinta.torso;
+      const otra = A.PRENDAS.find(q => q.r === 'torso' && q.v !== puesto);
+      A.vestir({ torso: otra.v });
+      ok(S.pinta.torso === otra.v, 'la prenda comprada no se pone');
+      const despues = A.hoja('protagonista').toDataURL();
+      ok(antes !== despues, 'el personaje se dibuja igual con otra ropa');
+      // Cambiarse quita una estrella: es la baza del jugador contra la descripción.
+      S.estrellas = 2; A.vestir({ torso: puesto });
+      ok(S.estrellas === 1, 'cambiarse de ropa no quita estrella');
+      S.estrellas = 0;
+      bien.push(A.PRENDAS.length + ' prendas, y el sprite cambia al vestirse');
+    }
+
+    // ── 2 quater · transporte público ──────────────────────────────────
+    {
+      ok(A.PARADAS.length === A.BARRIOS.length,
+         'hay ' + A.PARADAS.length + ' paradas de bus para ' + A.BARRIOS.length + ' barrios');
+      let malas = 0;
+      for (const q of A.PARADAS) {
+        const t = A.Tc(q.p.x | 0, q.p.y | 0);
+        if (t !== A.ACERA && t !== A.PLAZA) malas++;
+      }
+      ok(!malas, malas + ' paradas de bus fuera de la acera');
+      for (const red of Object.keys(A.REDES)) {
+        const l = A.nodos(red);
+        ok(l.length >= 3, 'la red ' + red + ' solo tiene ' + l.length + ' paradas');
+        for (const q of l) {
+          const t = A.Tc(q.p.x | 0, q.p.y | 0);
+          ok(t !== A.EDIF && t !== A.AGUA, red + ': ' + q.n + ' no se pisa');
+        }
+      }
+      // Viajar cuesta dinero y reloj, y deja al jugador en el destino.
+      const metro = A.nodos('metro');
+      const origen = metro[0], destino = metro[metro.length - 1];
+      P.x = origen.p.x; P.y = origen.p.y;
+      const dinero0 = S.dinero, min0 = S.min + S.dia * 1440;
+      S.dinero = 50;
+      A.viajarA('metro', destino);
+      await dormir(280); paso(4);
+      ok(Math.hypot(P.x - destino.p.x, P.y - destino.p.y) < 1.5, 'el metro no te deja en el destino');
+      ok(S.min + S.dia * 1440 > min0, 'viajar no cuesta reloj');
+      S.dinero = dinero0;
+      bien.push(Object.keys(A.REDES).length + ' redes · ' + A.nodos('metro').length + ' estaciones de metro, '
+                + A.nodos('tren').length + ' de cercanías y ' + A.PARADAS.length + ' paradas de bus');
+    }
 
     // ── 3 · los sitios están sobre suelo pisable ───────────────────────
     let accesibles = 0;
