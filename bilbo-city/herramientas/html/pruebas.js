@@ -447,6 +447,34 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
         + peorD.toFixed(0) + ')');
     }
 
+    // ── 4c · el callejero ──────────────────────────────────────────────
+    // Las calles no llevan escrita una lista de casillas: llevan unos puntos de paso y el
+    // juego busca el camino de calle que los une. Eso puede quedarse en nada sin dar
+    // error —lo hizo con nueve de las treinta y cuatro la primera vez, porque en el Casco
+    // Viejo las calles son peatonales y no llevan trazo de calzada— y una calle de cero
+    // casillas es un nombre que no sale nunca. Aquí se comprueba sobre el nombrado de
+    // verdad, el que hace el juego al cargar la ciudad.
+    {
+      const CAL = A.CALLES || [], TOPE = 15;
+      let flojas = 0, tot = 0, peor = 1e9, peorN = '';
+      CAL.forEach((c, i) => {
+        const n = A.LARGO_CALLE[i] || 0;
+        tot += n;
+        if (n < peor) { peor = n; peorN = c.n; }
+        if (n < TOPE) { fallos.push('la calle ' + c.n + ' se queda en ' + n + ' casillas'); flojas++; }
+      });
+      // Y que el nombre llegue de verdad al jugador: se pregunta por una casilla de cada
+      // calle, que es lo que hace el HUD.
+      let mudas = 0;
+      for (let i = 0; i < A.calleDe.length && mudas < 1; i++) {
+        if (!A.calleDe[i]) continue;
+        if (!A.calleEn(i % A.MW, (i / A.MW) | 0)) { fallos.push('calleEn no devuelve el nombre'); mudas++; }
+      }
+      if (!flojas && !mudas)
+        bien.push(CAL.length + ' calles con nombre sobre ' + tot + ' casillas (la más corta, '
+          + peorN + ', ' + peor + ')');
+    }
+
     // ── 5 · la red viaria está conectada ───────────────────────────────
     {
       // Se mide la componente MAYOR, no la que toque salir primero al escanear. Lo que

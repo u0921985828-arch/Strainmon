@@ -4403,6 +4403,153 @@ function dibSingulares(x0,y0,x1,y1){
    if(!pintable(map[y*MW+x]))continue;
    ctx.drawImage(s.c,(x-s.x)*TS,(y-s.y)*TS,TS,TS,x*TS,y*TS,TS,TS);}}}
 
+/*═══════════════ EL CALLEJERO ═══════════════*/
+/* Andabas por «Abando» y ya está. Ahora el HUD dice también por qué calle vas, y son las
+   calles de Bilbao: la Gran Vía, Urquijo, Autonomía, Zabalbide, Lehendakari Agirre.
+
+   De dónde salen, y qué NO son. El plano municipal trae su callejero rotulado, pero el
+   PDF no entra en el repositorio —esa es una norma nuestra— y el extractor solo se queda
+   con la geometría. Así que estas calles no están leídas de un rótulo: están puestas por
+   su trazado, que es el hecho geográfico que sí se puede afirmar. La Gran Vía va de Moyúa
+   a la Circular; Urquijo, de la Circular a San Mamés; Zabalbide, del Casco a Santutxu.
+
+   Y por eso las coordenadas de aquí abajo son referencias, no medidas: lo que manda es la
+   calzada de verdad. Cada calle se apunta a unos cuantos puntos de paso y el juego busca
+   el camino por asfalto que los une, así que si un punto está seis casillas corrido, la
+   calle sigue cayendo en la calzada que va de un sitio al otro — que es exactamente lo
+   que identifica a una calle. Lo que no se puede afirmar no se nombra: las Siete Calles
+   miden dos casillas de ancho cada una y a 5,16 m por casilla no caben, así que del Casco
+   solo van Bidebarrieta, Iturribide y la Ribera. */
+const CALLES=[
+ /* El Ensanche de Abando. La retícula que se ve desde el aire, con Moyúa en medio. */
+ {n:'Gran Vía',            v:[[634,310],[728,319],[846,330]]},
+ {n:'Alameda Recalde',     v:[[714,276],[728,319],[736,390]]},
+ {n:'Alameda Mazarredo',   v:[[668,292],[740,300],[842,318]]},
+ {n:'Alameda Urquijo',     v:[[836,344],[740,352],[650,368],[566,380]]},
+ {n:'Rodríguez Arias',     v:[[648,330],[724,336],[800,344]]},
+ {n:'Licenciado Poza',     v:[[696,328],[640,350],[592,368]]},
+ {n:'Iparraguirre',        v:[[748,313],[716,268],[700,218]]},
+ {n:'Ercilla',             v:[[760,316],[752,356]]},
+ {n:'Colón de Larreátegui',v:[[756,308],[838,322]]},
+ {n:'Hurtado de Amézaga',  v:[[852,332],[846,306],[842,282]]},
+ {n:'Autonomía',           v:[[560,400],[660,398],[780,394]]},
+ {n:'Gordóniz',            v:[[700,400],[706,462],[714,516]]},
+ {n:'Sabino Arana',        v:[[516,388],[542,438],[566,486]]},
+ /* Abandoibarra y la ría: lo que se hizo donde estaba el astillero. */
+ {n:'Abandoibarra',        v:[[688,192],[640,232],[580,272]]},
+ {n:'Uribitarte',          v:[[806,268],[756,244],[716,218]]},
+ /* Deustu y la Ribera, al otro lado del canal. */
+ {n:'Lehendakari Agirre',  v:[[346,332],[452,296],[556,238],[628,186]]},
+ {n:'Ribera de Deustu',    v:[[408,308],[500,262],[586,222]]},
+ {n:'Avenida Universidades',v:[[596,196],[632,170]]},
+ {n:'Blas de Otero',       v:[[420,306],[486,278]]},
+ /* El Casco Viejo y la orilla de enfrente. */
+ {n:'Bidebarrieta',        v:[[920,326],[936,346],[948,362]]},
+ {n:'Iturribide',          v:[[942,340],[996,340],[1046,348]]},
+ {n:'La Ribera',           v:[[930,392],[958,402],[986,408]]},
+ {n:'San Francisco',       v:[[866,412],[902,418],[936,424]]},
+ {n:'Las Cortes',          v:[[870,424],[910,430]]},
+ /* Ladera de Begoña, Santutxu y el fondo del valle. */
+ {n:'Zabalbide',           v:[[972,344],[1044,362],[1120,400],[1178,428]]},
+ {n:'Zumalakarregi',       v:[[1020,420],[1120,452],[1240,478],[1298,486]]},
+ {n:'Karmelo',             v:[[1150,424],[1198,442]]},
+ {n:'Miraflores',          v:[[958,486],[994,570],[1022,660]]},
+ {n:'Rekalde Zumarkalea',  v:[[716,520],[726,596],[732,664]]},
+ /* Los extremos: Basurtu, Olabeaga y Zorrotza, río abajo. */
+ {n:'Montevideo',          v:[[516,404],[488,432],[474,452]]},
+ {n:'Olabeaga',            v:[[354,428],[408,422]]},
+ {n:'Camino de Zorrotza',  v:[[114,356],[174,364]]},
+ {n:'Doctor Areilza',      v:[[626,362],[566,376]]},
+ {n:'Zabala',              v:[[838,458],[856,476]]},
+];
+/* Qué calle es cada casilla: 0 es «ninguna», y si no, el índice en CALLES más uno. */
+const calleDe=new Int16Array(MW*MH);
+const calleEn=(x,y)=>{
+ if(x<0||y<0||x>=MW||y>=MH)return null;
+ const i=calleDe[y*MW+x];return i?CALLES[i-1].n:null;};
+/* Cuántas casillas le han salido a cada calle. Lo mira la batería: una calle que se
+   queda en cuatro casillas es una calle que no se ha encontrado, aunque no dé error. */
+const LARGO_CALLE=[];
+/* Qué casillas son «calle». No solo la calzada: la acera es calle, y en el Casco Viejo la
+   calle ES la acera —las Siete Calles y media Bilbao la Vieja son peatonales y el plano no
+   les pinta trazo de rodadura, así que buscando solo asfalto el Casco entero se quedaba
+   sin nombrar—. Y andando, que es como se va la mitad del rato, se va por la acera: con
+   la calzada sola el rótulo solo salía conduciendo. */
+const esCalle=(x,y)=>{const t=Tc(x,y);
+ return t===ROAD||t===ACERA||t===PLAZA||t===PUENTE||t===MUELLE;};
+/* El camino de calle entre dos puntos, encerrado en la caja de los dos extremos con
+   holgura: sin la caja, un tramo que no se puede unir se pone a recorrer los siete
+   kilómetros de ciudad antes de rendirse.
+
+   No es una anchura a secas sino un Dijkstra con dos precios —la calzada vale 1 y la
+   acera 4— porque si los dos cuestan igual el camino se va por la acera en cuanto ahorra
+   una casilla, y entonces la Gran Vía sale nombrada por el portal en vez de por la
+   avenida. Con dos precios y tan pocos valores no hace falta un montículo: valen unos
+   cubos por distancia, que se recorren en orden. */
+const HOLGURA_CALLE=60, PRECIO_ACERA=4;
+function caminoCalle(ax,ay,bx,by){
+ const x0=Math.max(1,Math.min(ax,bx)-HOLGURA_CALLE),x1=Math.min(MW-2,Math.max(ax,bx)+HOLGURA_CALLE),
+       y0=Math.max(1,Math.min(ay,by)-HOLGURA_CALLE),y1=Math.min(MH-2,Math.max(ay,by)+HOLGURA_CALLE);
+ const an=x1-x0+1,al=y1-y0+1,N=an*al;
+ const k=(x,y)=>(y-y0)*an+(x-x0);
+ const dist=new Int32Array(N).fill(0x7fffffff),de=new Int32Array(N).fill(-1);
+ const tope=(an+al)*PRECIO_ACERA+8,cubos=new Array(tope);
+ const mete=(i,d)=>{const c=d%tope;(cubos[c]||(cubos[c]=[])).push(i);};
+ dist[k(ax,ay)]=0;mete(k(ax,ay),0);
+ const fin=k(bx,by);
+ for(let d=0;d<(an*al)*PRECIO_ACERA;d++){
+  const lote=cubos[d%tope];if(!lote||!lote.length)continue;
+  cubos[d%tope]=[];
+  for(const i of lote){
+   if(dist[i]!==d)continue;                       /* entrada vieja, ya mejorada */
+   if(i===fin){
+    const cam=[];let j=i;
+    while(j>=0){cam.push([x0+(j%an),y0+((j/an)|0)]);j=de[j];}
+    return cam;}
+   const x=x0+(i%an),y=y0+((i/an)|0);
+   for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){
+    const nx=x+dx,ny=y+dy;
+    if(nx<x0||ny<y0||nx>x1||ny>y1||!esCalle(nx,ny))continue;
+    const nd=d+(rodable(nx,ny)?1:PRECIO_ACERA),j=k(nx,ny);
+    if(nd<dist[j]){dist[j]=nd;de[j]=i;mete(j,nd);}}}}
+ return null;}
+/* El apaño de cuando no hay camino: la recta entre los dos extremos, casilla a casilla. */
+function rectaCalle(ax,ay,bx,by){
+ const n=Math.max(Math.abs(bx-ax),Math.abs(by-ay)),cam=[];
+ for(let i=0;i<=n;i++){
+  const x=Math.round(ax+(bx-ax)*i/n),y=Math.round(ay+(by-ay)*i/n);
+  if(esCalle(x,y))cam.push([x,y]);}
+ return cam.length?cam:null;}
+/* La casilla de calle más cercana a un punto de paso. */
+const calleCerca=(cx,cy,r)=>{const q=cercaDe(esCalle,cx,cy,r||24);
+ return esCalle(q.x|0,q.y|0)?[q.x|0,q.y|0]:null;};
+function nombrarCalles(){
+ calleDe.fill(0);
+ for(let c=0;c<CALLES.length;c++){
+  const via=CALLES[c];let n=0;
+  for(let t=0;t+1<via.v.length;t++){
+   const a=calleCerca(via.v[t][0],via.v[t][1]),b=calleCerca(via.v[t+1][0],via.v[t+1][1]);
+   if(!a||!b)continue;
+   /* Si no hay camino, se nombra a lo largo de la recta. Pasa donde el plano deja la
+      calle partida —la acera sale de erosionar la calzada y en una diagonal estrecha el
+      interior se queda en una hilera que solo se toca por la esquina— y también donde el
+      tramo cruza un puente que el extractor no cosió. Es menos exacto que seguir la
+      calle, pero el trazado que se afirma es el mismo y así ninguna calle de la tabla se
+      queda sin una sola casilla. */
+   const cam=caminoCalle(a[0],a[1],b[0],b[1])||rectaCalle(a[0],a[1],b[0],b[1]);
+   if(!cam)continue;
+   /* Se nombra el camino y la calle pegada a él: una avenida son tres o cuatro casillas
+      de calzada más dos aceras, y el camino solo va por una, así que cruzándola por el
+      otro carril el HUD se quedaba en blanco. */
+   for(const[x,y]of cam)
+    for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
+     const px=x+dx,py=y+dy;
+     if(px<0||py<0||px>=MW||py>=MH)continue;
+     const i=py*MW+px;
+     if(calleDe[i]||!esCalle(px,py))continue;
+     calleDe[i]=c+1;n++;}}
+  LARGO_CALLE[c]=n;}}
+
 /*═══════════════ ROPA, MESA Y SURTIDOR ═══════════════*/
 /* Vestirse es barato de programar porque la forja del personaje ya sabe montar cualquier
    combinación de torso, piernas, calzado y gorro: es como se dibujan los veinte
@@ -5230,10 +5377,16 @@ function dibHUD(){
   ctx.fillStyle=col;ctx.fillRect(zi+19,y+1,72*clamp(v,0,1),6);};
  barra(by,S.energia,'#4d9de0',ICO.energia);
  barra(by+16,S.hambre,'#e0a14d',ICO.hambre);
- /* ── barrio ── */
+ /* ── dónde estás: la calle, y debajo el barrio ──
+    La calle solo cuando se sabe cuál es. Nombrar de menos es mejor que nombrar mal: la
+    mayor parte de la trama son calles que no se pueden afirmar sin el callejero, y una
+    inventada en el sitio de una que existe es peor que no poner nada. */
  const D=distDe(clamp(player.x|0,0,MW-1),clamp(player.y|0,0,MH-1));
- const nb=S.escena==='interior'?S.interior.n:D.n;
- texto(ctx,nb,zi,by+32,1,'hueso');
+ if(S.escena==='interior')texto(ctx,S.interior.n,zi,by+32,1,'hueso');
+ else{
+  const cl=calleEn(player.x|0,player.y|0);
+  if(cl){texto(ctx,cl,zi,by+32,1,'hueso');texto(ctx,D.n,zi,by+44,1,'ambar');}
+  else texto(ctx,D.n,zi,by+32,1,'hueso');}
  /* ── arma y munición ── */
  const a=arma(S.armaAct);
  const mun=a.inf?'∞':String(S.armas[a.id]||0);
@@ -5424,7 +5577,7 @@ async function arrancar(){
   ['vehículos',()=>generarVeh()],
   ['props',()=>generarProps()],
   ['iconos',()=>{generarIconos();forjarMando();ajustarMando();}],
-  ['la ciudad',async()=>{await cargarCiudad();colocarPOIs();colocarSingulares();colocarParadas();}],
+  ['la ciudad',async()=>{await cargarCiudad();colocarPOIs();colocarSingulares();colocarParadas();nombrarCalles();}],
   ['el barrio',()=>{player.x=poi('piso').p.x;player.y=poi('piso').p.y;poblar();}],
   ['a la gente',async()=>{await cargarSprites();['protagonista','ertzaina','maton','maton2'].forEach(hoja);}],
  ];

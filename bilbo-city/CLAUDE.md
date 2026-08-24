@@ -58,10 +58,11 @@ del motor que el remedo no tenga, añádela a `herramientas/compilar/apinado/Api
 firma exacta de Unity** — una firma inventada de más tapa errores reales, que es lo único
 que puede estropear esta herramienta.
 
-`herramientas/plano/sitios.py` y `herramientas/plano/singulares.py` comparan las
-coordenadas de los 57 sitios y las medidas de los 13 singulares entre el HTML y el C#. Es
-la trampa clásica de tener dos implementaciones: el HTML pasa la batería, el C# no se
-ejecuta aquí, y Unity acaba poniendo las cosas en otro lado sin que nadie lo vea.
+`herramientas/plano/sitios.py`, `singulares.py` y `calles.py` comparan las coordenadas de
+los 57 sitios, las medidas de los 13 singulares y los puntos de paso de las 34 calles entre
+el HTML y el C#. Es la trampa clásica de tener dos implementaciones: el HTML pasa la
+batería, el C# no se ejecuta aquí, y Unity acaba poniendo las cosas en otro lado sin que
+nadie lo vea.
 
 `herramientas/csharp/` analiza el C# sobre el árbol de sintaxis real (tree-sitter). No es un
 compilador, pero verifica sintaxis, miembros inexistentes, aridad de llamadas y
@@ -238,6 +239,41 @@ marcas comerciales no**: no hay ningún Corte Inglés ni ninguna otra cadena en 
 grandes almacenes de la Gran Vía son los **Almacenes Ibaizabal**, inventados, con su
 interior de tres mostradores y su encargada; igual que Trapos Gran Vía, la Tasca Ondarra o
 la Galería Abandoibarra. Sitio real, nombre nuestro.
+
+## El callejero
+
+Andabas por «Abando» y ya está. Ahora el HUD dice también **por qué calle vas**, y son las
+calles de Bilbao: la Gran Vía, Urquijo, Autonomía, Zabalbide, Lehendakari Agirre.
+
+**De dónde salen, y qué no son.** El plano municipal trae su callejero rotulado, pero el
+PDF no entra en el repositorio —norma nuestra— y el extractor solo se queda con la
+geometría. Así que estas 34 calles **no están leídas de un rótulo**: están puestas por su
+trazado, que es el hecho geográfico que sí se puede afirmar. La Gran Vía va de Moyúa a la
+Circular; Urquijo, de la Circular a San Mamés; Zabalbide, del Casco a Santutxu.
+
+Por eso las coordenadas de `CALLES` **son referencias, no medidas**. Cada calle lleva unos
+puntos de paso y el juego busca el camino de calle que los une, así que un punto seis
+casillas corrido sigue cayendo en la calle que va de un sitio al otro — que es exactamente
+lo que identifica a una calle. Si tocas la trama, no hace falta recolocar nada a mano: se
+vuelve a buscar solo, y la batería avisa si alguna se queda corta.
+
+Tres cosas del trazado que costaron un intento cada una:
+
+- **La acera es calle.** Con solo calzada, el Casco Viejo entero se quedaba sin nombre —las
+  Siete Calles son peatonales y el plano no les pinta trazo de rodadura— y andando, que es
+  como se va la mitad del rato, el rótulo no salía nunca. El camino va por
+  calzada ∪ acera ∪ plaza.
+- **Pero la calzada vale menos.** Es un Dijkstra con dos precios (calzada 1, acera 4): con
+  el mismo precio el camino se va por la acera en cuanto ahorra una casilla, y la Gran Vía
+  salía nombrada por el portal en vez de por la avenida.
+- **Y hay red que no conecta.** Donde el plano deja la calle partida, se nombra a lo largo
+  de la recta entre los puntos. Menos exacto, pero el trazado que se afirma es el mismo y
+  ninguna calle se queda en cero.
+
+**Lo que no se puede afirmar no se nombra.** Las Siete Calles miden dos casillas de ancho
+cada una y a 5,16 m por casilla no caben, así que del Casco solo van Bidebarrieta,
+Iturribide y la Ribera. Fuera de las 34, el HUD enseña solo el barrio: una calle inventada
+en el sitio de una que existe es peor que no poner nada.
 
 ## La portada
 

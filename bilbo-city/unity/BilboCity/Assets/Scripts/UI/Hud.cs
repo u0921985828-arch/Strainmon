@@ -109,7 +109,7 @@ public class Hud : MonoBehaviour {
     Image _icoOjo, _fondoOjo, _barraOjo;
     Image _icoEuro, _icoArma, _icoEnergia, _icoHambre;
     Image _barEnergia, _barHambre;
-    TextoBits _tDinero, _tReloj, _tDia, _tBarrio, _tArma, _tMun, _tMision1, _tMision2, _tMision3, _tAviso, _tGrande, _tPista, _tDeuda;
+    TextoBits _tDinero, _tReloj, _tDia, _tCalle, _tBarrio, _tArma, _tMun, _tMision1, _tMision2, _tMision3, _tAviso, _tGrande, _tPista, _tDeuda;
     Image _panelMision, _panelArma, _panelAviso;
     float _avisoT, _grandeT, _flashT;
     string _aviso = "", _grande = "", _pista = "";
@@ -173,8 +173,11 @@ public class Hud : MonoBehaviour {
         _barEnergia = Barra(raiz, new Vector2(28,-127), Paleta.H("#4d9de0"));
         _barHambre  = Barra(raiz, new Vector2(28,-145), Paleta.H("#e0a14d"));
 
-        _tBarrio = Nuevo(raiz, new Vector2(10,164), 1, Fuente.Tinta.Hueso);
-        _tDeuda  = Nuevo(raiz, new Vector2(10,178), 1, Fuente.Tinta.Rojo);
+        // La calle arriba y el barrio debajo: la calle es lo que cambia al doblar la
+        // esquina y el barrio es el contexto. Sin calle, el barrio sube a su sitio.
+        _tCalle  = Nuevo(raiz, new Vector2(10,164), 1, Fuente.Tinta.Hueso);
+        _tBarrio = Nuevo(raiz, new Vector2(10,176), 1, Fuente.Tinta.Ambar);
+        _tDeuda  = Nuevo(raiz, new Vector2(10,192), 1, Fuente.Tinta.Rojo);
 
         // panel de misión
         _panelMision = UiFab.Img(raiz, Plano(new Color32(7,9,12,190)), new Vector2(0,1), new Vector2(10,-196), new Vector2(220,44));
@@ -299,10 +302,20 @@ public class Hud : MonoBehaviour {
         _barEnergia.fillAmount = Mathf.Clamp01(E.Energia);
         _barHambre.fillAmount = Mathf.Clamp01(E.Hambre);
 
-        string barrio = E.EnInterior && Interiores.Actual != null
-            ? Interiores.Actual.Nombre
-            : Ciudad.BarrioDe(Mathf.Clamp((int)J.Jug.Pos.x,0,Ciudad.MW-1), Mathf.Clamp((int)J.Jug.Pos.y,0,Ciudad.MH-1)).Nombre;
-        _tBarrio.Escribir(barrio);
+        // ── dónde estás: la calle, y debajo el barrio ──
+        // La calle solo cuando se sabe cuál es. Nombrar de menos es mejor que nombrar mal:
+        // la mayor parte de la trama son calles que no se pueden afirmar sin el callejero,
+        // y una inventada en el sitio de una que existe es peor que no poner nada.
+        if (E.EnInterior && Interiores.Actual != null) {
+            _tCalle.Escribir(Interiores.Actual.Nombre);
+            _tBarrio.Ocultar();
+        } else {
+            int jx = Mathf.Clamp((int)J.Jug.Pos.x, 0, Ciudad.MW-1);
+            int jy = Mathf.Clamp((int)J.Jug.Pos.y, 0, Ciudad.MH-1);
+            string calle = Callejero.En(jx, jy), barrio = Ciudad.BarrioDe(jx, jy).Nombre;
+            if (calle != null) { _tCalle.Escribir(calle); _tBarrio.Escribir(barrio); }
+            else { _tCalle.Escribir(barrio); _tBarrio.Ocultar(); }
+        }
         if (E.Deuda > 0) _tDeuda.Escribir("ALQUILER " + E.Deuda + " €"); else _tDeuda.Ocultar();
 
         // ── arma ──
