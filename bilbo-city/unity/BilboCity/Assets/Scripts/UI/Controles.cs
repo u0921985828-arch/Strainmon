@@ -234,6 +234,7 @@ public class Partida {
     public string armaAct;
     public int munBate, munPistola, munUzi, munEscopeta;
     public string torso, piernas, calzado, gorro;
+    public bool silenciador;
     public float x, y;
     public List<Contrato> contratos = new List<Contrato>();
 }
@@ -254,6 +255,7 @@ public static class Guardado {
             munBate = E.Mun("bate"), munPistola = E.Mun("pistola"),
             munUzi = E.Mun("uzi"), munEscopeta = E.Mun("escopeta"),
             torso = E.Torso, piernas = E.Piernas, calzado = E.Calzado, gorro = E.Gorro,
+            silenciador = E.TieneSilenciador,
             x = J != null && J.Jug != null ? J.Jug.Pos.x : 0,
             y = J != null && J.Jug != null ? J.Jug.Pos.y : 0,
             contratos = E.Contratos
@@ -288,7 +290,7 @@ public static class Guardado {
         E.UltCobro = p.ultCobro; E.MisionIdx = p.misionIdx;
         E.Rep["hosteleria"] = p.repHosteleria; E.Rep["obra"] = p.repObra;
         E.Rep["transporte"] = p.repTransporte; E.Rep["calle"] = p.repCalle;
-        E.TieneFurgo = p.furgo; E.TieneDeportivo = p.deportivo;
+        E.TieneFurgo = p.furgo; E.TieneDeportivo = p.deportivo; E.TieneSilenciador = p.silenciador;
         E.ArmaAct = string.IsNullOrEmpty(p.armaAct) ? "punos" : p.armaAct;
         E.Municion.Clear();
         if (p.munBate > 0) E.Municion["bate"] = p.munBate;

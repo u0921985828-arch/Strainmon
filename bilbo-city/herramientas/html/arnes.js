@@ -33,7 +33,9 @@ js=js.slice(0,i)+`global.__={S,player,MISIONES,empezarMision,avanzarPaso,objetiv
  EDIF,ROAD,ACERA,AGUA,PARQUE,PLAZA,MUELLE,PATIO,PUENTE,POI,puntoAcera,puntoCalle,arma,HOJAS,hoja,
  real:cv,dib,BARRIOS,barrioDe,distDe,Tc,rodable,sembrar,azar,MONTE,SPR,HOJAS,ICO,CURROS,ARMAS,TILE,PROP,VEH,PALETA,ORDEN_POSES,ARQ,TILE_MUEBLE,hoja,
  INT,TILE_INT,solidoInt,PARADAS,PRENDAS,REDES,vestir,tiendaRopa,abrirRed,viajarA,nodos,estacion,
- paradaCerca,minutosViaje,comer,repostar,ACERA,PLAZA,salir};
+ paradaCerca,minutosViaje,comer,repostar,ACERA,PLAZA,salir,
+ teVe,testigos,delito,ruido,ojos,alcanceVista,esDeNoche,porDetras,desprevenido,CONO,
+ AGACHA,CORRE,lineaVista,dirAng,estrellas,atacarJugador,dir8De,generarEnemigos,danar};
  sembrar(SEMILLA);`+js.slice(i);
 eval(js);
 module.exports={H,step:n=>{for(let k=0;k<n;k++){now+=16.7;const f=raf;raf=null;if(!f)throw new Error('sin frame');f(now);}},

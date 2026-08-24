@@ -71,7 +71,11 @@ public static class Acciones {
         var v = CocheCerca(J);
         if (v != null) {
             J.Jug.EnCoche = v;
-            if (!v.Propio && !v.Marcado) { Combate.I.Estrellas(1, J); Hud.I.Aviso("COCHE ROBADO"); }
+            if (!v.Propio && !v.Marcado) {
+                // Reventar una ventanilla se oye, aunque no haya nadie mirando.
+                Sigilo.Ruido(v.Pos, 7f);
+                Hud.I.Aviso(Sigilo.Delito(1) ? "COCHE ROBADO" : "COCHE ROBADO. SIN TESTIGOS");
+            }
             else Hud.I.Aviso("A RODAR");
             return;
         }
@@ -114,9 +118,21 @@ public static class Acciones {
         if (obj != null || victima != null) J.Jug.Dir8 = ForjaChar.Dir8(Mathf.Cos(angulo), Mathf.Sin(angulo));
 
         if (a.Cuerpo) {
-            AudioProc.I.Sfx("golpe", 0.7f);
             J.Jug.PoseAct = Pose.Pega2;
             J.Jug.GolpeT = 0.22f;
+            // Por detrás y a alguien que no sabe que estás ahí: cae de un golpe y sin
+            // ruido. Es el premio de haber ido despacio; sin esto, el sigilo solo sirve
+            // para tardar más en llegar al mismo tiroteo.
+            if (obj != null && Sigilo.Desprevenido(obj) && Sigilo.PorDetras(obj)
+                && Vector2.Distance(obj.Pos, J.Jug.Pos) < 1.4f) {
+                AudioProc.I.Sfx("golpe", 0.35f);
+                Combate.I.Danar(obj, 999, J);
+                Particulas.I.Emitir(obj.Pos, "sangre", 6);
+                Sigilo.Ruido(obj.Pos, 2.5f);
+                Hud.I.Aviso("POR LA ESPALDA");
+                return;
+            }
+            AudioProc.I.Sfx("golpe", 0.7f);
             if (obj != null && Vector2.Distance(obj.Pos, J.Jug.Pos) <= a.Alc + 0.4f) Combate.I.Danar(obj, a.Dmg, J);
             else if (victima != null) Combate.I.DanarPeaton(victima, a.Dmg, J);
         } else {
@@ -125,7 +141,12 @@ public static class Acciones {
             J.Jug.PoseAct = Pose.Dispara;
             J.Jug.GolpeT = 0.16f;
             if (a.Fog != null) J.Jug.Fogonazo(a.Fog, J.Jug.Dir8);
-            if (E.Estrellas < 1) Combate.I.Estrellas(1, J);
+            // Un disparo se oye a media calle. Con silenciador, a la acera de enfrente y
+            // poco más: el arma sigue haciendo el mismo daño, lo que compras es no
+            // despertar al barrio.
+            bool sil = E.TieneSilenciador && a.Id == "pistola";
+            Sigilo.Ruido(J.Jug.Pos, sil ? 5f : 18f);
+            if (E.Estrellas < 1) Sigilo.Delito(1);
         }
     }
 
@@ -427,6 +448,12 @@ public static class Acciones {
                                 Comprar = () => { E.Municion[arma.Id] = arma.Infinita ? 999 : arma.Balas;
                                                   E.ArmaAct = arma.Id; Hud.I.Aviso(arma.Nombre.ToUpperInvariant() + " COMPRADA"); }});
                         }
+                        arts.Add(new Articulo{
+                            Icono = "pistola", Titulo = "Silenciador",
+                            Desc = "Para la pistola. El disparo deja de oírse en media calle.",
+                            Precio = 520,
+                            YaLoTiene = () => E.TieneSilenciador,
+                            Comprar = () => { E.TieneSilenciador = true; Hud.I.Aviso("SILENCIADOR MONTADO"); }});
                         foreach (var a in Armas.Todas) {
                             if (a.Pack <= 0 || !E.Municion.ContainsKey(a.Id)) continue;
                             var arma = a;

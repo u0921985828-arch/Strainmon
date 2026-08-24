@@ -72,12 +72,41 @@ public class Enemigo : Andante {
     public string ArmaId = "punos";
     public float Cad;
     public bool DeMision, EsPoli;
+    /// Lo que sabe de ti: sospecha llenándose, si ya te ha fichado, y el último ruido
+    /// que ha oído y va a mirar.
+    public float Sospecha;
+    public bool Alerta, TieneOido;
+    public Vector2 Oido;
+    float _ronda; Vector2 _rumboRonda;
 
     public void Tic(float dt, Vector2 jugador) {
         var a = Armas.De(ArmaId);
         float d = Vector2.Distance(Pos, jugador);
         Cad = Mathf.Max(0, Cad - dt);
         bool ve = Combate.LineaVista(Pos, jugador);
+        // Un enemigo que no te ha visto ni oído no viene a por ti: da vueltas por donde
+        // está. Sin esto el sigilo no serviría de nada, porque toda la banda te vendría
+        // encima en cuanto apareces.
+        if (!Alerta) {
+            if (TieneOido) {
+                Vector2 haciaRuido = (Oido - Pos).normalized;
+                Movimiento.Deslizar(ref Pos, haciaRuido * 1.9f * dt, false);
+                Dir8 = ForjaChar.Dir8(haciaRuido.x, haciaRuido.y);
+                CicloAndar(dt, false);
+                if (Vector2.Distance(Pos, Oido) < 1.2f) TieneOido = false;
+            } else {
+                _ronda -= dt;
+                if (_ronda <= 0) {
+                    _ronda = Utiles.Rnd(1.6f, 3.4f);
+                    float ang = Utiles.Rnd(0f, Mathf.PI * 2f);
+                    _rumboRonda = new Vector2(Mathf.Cos(ang), Mathf.Sin(ang));
+                }
+                Movimiento.Deslizar(ref Pos, _rumboRonda * 1.3f * dt, false);
+                Dir8 = ForjaChar.Dir8(_rumboRonda.x, _rumboRonda.y);
+                CicloAndar(dt, false);
+            }
+            return;
+        }
         if (d > (a.Cuerpo ? 1.1f : a.Alc * 0.75f) || !ve) {
             Vector2 dir = (jugador - Pos).normalized;
             float v = a.Cuerpo ? 2.7f : 2.2f;
@@ -107,6 +136,8 @@ public class Rejilla : MonoBehaviour {
     public Vector2 Pos;
     public int Tx, Ty, Dx = 1, Dy;
     public float Vel = 3.7f, Ang, Luz;
+    /// Lo que lleva acumulado de verte: al llenarse, canta.
+    public float Sospecha;
     public bool Persigue, Frenado;
     public string Tipo = "utilitario";
     public int Librea;

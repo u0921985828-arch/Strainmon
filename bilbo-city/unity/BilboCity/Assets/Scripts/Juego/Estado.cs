@@ -63,7 +63,11 @@ public class Estado {
         {"hosteleria",0},{"obra",0},{"transporte",0},{"calle",0}
     };
     public int Deuda, Alquiler = 220, UltCobro = 1;
-    public bool TieneFurgo, TieneDeportivo;
+    public bool TieneFurgo, TieneDeportivo, TieneSilenciador;
+    /// Lo que el HUD pinta en el ojo: la sospecha más alta de los que te rodean, y si
+    /// alguno te tiene a la vista ahora mismo.
+    public float Sospecha;
+    public bool Visto;
     public Dictionary<string,int> Municion = new Dictionary<string,int>();
     public string ArmaAct = "punos";
     public int MisionIdx;

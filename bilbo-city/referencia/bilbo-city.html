@@ -2034,9 +2034,13 @@ const POSES={
  pega1:{p:[0,0],b:[0,0],y:0,ataque:1}, pega2:{p:[0,1],b:[0,0],y:0,ataque:2},
  apunta:{p:[0,0],b:[0,0],y:0,apunta:1}, dispara:{p:[0,0],b:[0,0],y:-1,apunta:1,fog:1},
  herido:{p:[1,1],b:[2,2],y:1,herido:1},
+ /* Agachado no lleva dibujo nuevo: se acortan las dos piernas y se baja el cuerpo. A
+    veintiséis píxeles de alto eso ya se lee como una cuclillas, y no hace falta tocar la
+    forja ni volver a cuadrar los gorros. */
+ agacha:{p:[3,3],b:[1,1],y:2}, agacha2:{p:[2,4],b:[0,2],y:2},
 };
 const ORDEN_POSES=['quieto','andar1','andar2','andar3','andar4','correr1','correr2','correr3','correr4',
- 'pega1','pega2','apunta','dispara','herido'];
+ 'pega1','pega2','apunta','dispara','herido','agacha','agacha2'];
 const IPOSE={};ORDEN_POSES.forEach((p,i)=>IPOSE[p]=i);
 const COMPLEX={delgada:{w:6,hom:7},media:{w:8,hom:9},corpulenta:{w:10,hom:11}};
 /* La figura se dibuja en una caja de 20×26 y esas coordenadas no se tocan. Lo de
@@ -2693,6 +2697,10 @@ function generarIconos(){
   P(g,8,13,8,5,C.crema);P(g,9,1,6,2,C.mostaza);});
  ICO.botiquin=I24(g=>{P(g,3,6,18,14,C.crema);P(g,3,6,18,2,C.acero);
   P(g,10,9,4,9,C.sangre);P(g,7,12,10,3,C.sangre);P(g,9,4,6,3,C.grisO);});
+ ICO.ojo=I24(g=>{P(g,2,9,20,6,C.hueso);P(g,4,7,16,10,C.hueso);P(g,7,7,10,10,C.blanco);
+  P(g,8,8,8,8,C.azulL);P(g,10,10,4,4,C.carbon);P(g,4,6,16,1,C.acero);});
+ ICO.ojoTachado=I24(g=>{P(g,3,10,18,4,C.grisO);P(g,5,9,14,6,C.grisO);P(g,8,10,8,4,C.acero);
+  for(let i=0;i<16;i++)P(g,4+i,18-i,3,3,C.carbon);});
  ICO.camisa=I24(g=>{P(g,6,4,12,16,C.azulL);P(g,6,4,12,2,'#a8c4dd');
   P(g,2,5,5,8,C.azulL);P(g,17,5,5,8,C.azul);P(g,11,4,2,15,C.azul);
   P(g,8,3,3,3,C.hueso);P(g,13,3,3,3,C.hueso);P(g,11,9,1,1,C.hueso);P(g,11,14,1,1,C.hueso);});
@@ -2965,13 +2973,15 @@ const S={
  dinero:60,hp:100,energia:1,hambre:1,estrellas:0,min:8*60,dia:1,
  rep:{hosteleria:0,obra:0,transporte:0,calle:0},
  deuda:0,alquiler:220,ultCobro:1,
- tiene:{furgo:false,deportivo:false},
+ tiene:{furgo:false,deportivo:false,silenciador:false},
  pinta:{torso:'cazadora',piernas:'vaquero',calzado:'botas',gorro:'txapela'},
  armas:{punos:Infinity},armaAct:'punos',
  job:null,contrato:null,mision:null,misionIdx:0,
  cooldown:0,detT:0,muerto:0,escena:'ciudad',interior:null,volver:null,
+ sospecha:0,visto:false,
 };
-const player={x:0,y:0,d8:0,pose:'quieto',anim:0,enCoche:null,cad:0,herido:0,arq:'protagonista'};
+const player={x:0,y:0,d8:0,pose:'quieto',anim:0,enCoche:null,cad:0,herido:0,arq:'protagonista',
+ sigilo:false,corriendo:false};
 
 /*═══════════════ VEHÍCULOS Y NPCs ═══════════════*/
 /* un coche aparcado mira hacia donde va la calle, no siempre al este */
@@ -3041,6 +3051,10 @@ let aPuls=false,cPuls=false,cMant=false;
 const joy={id:null,dx:0,dy:0,mag:0};      /* andar y conducir */
 const mira={dx:0,dy:0};                   /* apuntado fino: solo con las flechas del teclado */
 const CORRE=.82;                          /* a partir de aquí el joystick es correr */
+/* Y por debajo de esto, agachado. El joystick ya decía si andas o corres; que diga
+   también si vas agachado es un botón menos que buscar con el pulgar. La postura se
+   queda puesta al soltar: si no, cada vez que paras a mirar una esquina te levantas. */
+const AGACHA=.34;
 
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();
  if(k==='tab'){e.preventDefault();abrirTel();return;}
@@ -3429,7 +3443,7 @@ function avanzarPaso(){
 function generarEnemigos(p){
  for(let i=0;i<p.n;i++){const q=puntoAcera(p.donde.x|0,p.donde.y|0,8);
   enemigos.push({x:q.x,y:q.y,hp:60,arq:p.arq||'maton',arma:p.arma||'punos',d8:0,pose:'quieto',
-   anim:0,cad:0,mision:true,herido:0});}
+   anim:0,cad:0,mision:true,herido:0,alerta:0,sosp:0,oido:null});}
  if(p.estrellas)estrellas(p.estrellas);}
 function terminarMision(ok){
  const m=S.mision;if(!m)return;
@@ -3478,7 +3492,11 @@ function accion(){
   return abrirRed('bus','Parada · '+q.n,q.p);}
  const c=cocheCerca();
  if(c){player.enCoche=c;
-  if(!c.propio&&!c.marcado){estrellas(1);aviso('Coche robado');}else aviso('A rodar');return;}
+  if(!c.propio&&!c.marcado){
+   /* Reventar una ventanilla se oye, aunque no haya nadie mirando. */
+   ruido(c.x,c.y,7);
+   if(delito(1))aviso('Coche robado');else aviso('Coche robado. Sin testigos');
+  }else aviso('A rodar');return;}
  aviso('Aquí no hay nada que hacer');}
 function curar(){
  if(S.hp>=100)return aviso('Estás entero');
@@ -3558,6 +3576,9 @@ function hablarCon(n){
     dd:a.cuerpo?'Cuerpo a cuerpo':`Daño ${a.dmg} · ${a.balas} balas`,precio:a.precio,
     ya:()=>S.armas[a.id]!==undefined,
     fn:()=>{S.armas[a.id]=a.inf?Infinity:a.balas;S.armaAct=a.id;aviso(a.n+' comprada');}}))
+   .concat([{ico:'pistola',tt:'Silenciador',dd:'Para la pistola. El disparo deja de oírse en media calle.',
+     precio:520,ya:()=>S.tiene.silenciador,
+     fn:()=>{S.tiene.silenciador=true;aviso('Silenciador montado');}}])
    .concat(ARMAS.filter(a=>a.pack&&S.armas[a.id]!==undefined).map(a=>({ico:'cargador',tt:'Munición '+a.n,
     dd:'+'+a.pack+' balas',precio:Math.round(a.precio*.18),ya:()=>false,
     fn:()=>{S.armas[a.id]+=a.pack;aviso('+'+a.pack+' balas');}}))))}]);
@@ -3698,6 +3719,80 @@ let fogT=0,fogTipo=null,fogD=0;
    el personaje y el arma busca blanco en un cono ancho. Acertar a una figura de veinte
    píxeles con el pulgar en un móvil no es puntería, es suerte, y el juego no debería
    depender de eso. */
+/*═══════════════ SIGILO ═══════════════*/
+/* Hasta aquí el juego repartía estrellas por el hecho de hacer algo, mirara quien
+   mirara: robar un coche en un descampado a las cuatro de la mañana costaba lo mismo que
+   robarlo delante de una patrulla. Ahora lo que cuenta es que te vean.
+
+   Todo cuelga de tres cosas que ya estaban: `lineaVista`, hacia dónde mira cada uno, y
+   el reloj. Lo demás es cono, distancia y paciencia. */
+const CONO=1.05;                          /* medio ángulo del cono de visión, ~60° */
+const esDeNoche=()=>S.min<7*60||S.min>=21*60;
+/* Un coche se ve venir aunque vayas despacio; agachado se te ve la mitad; corriendo
+   llamas la atención. De noche, todo esto a la mitad larga. */
+function alcanceVista(){
+ let r=esDeNoche()?9:15;
+ if(player.enCoche)return r*1.3;
+ if(player.sigilo)r*=.5;
+ else if(player.corriendo)r*=1.3;
+ return r;}
+/* Los peatones y los enemigos miran hacia donde andan (d8); los coches patrulla, hacia
+   donde conducen (ang). */
+const miraA=o=>o.d8!==undefined?dirAng(o.d8):(o.ang||0);
+function teVe(o,r){
+ const d=dist(o,player);
+ const alc=r===undefined?alcanceVista():r;
+ if(d>alc)return false;
+ /* A bocajarro no hace falta cono: te tiene encima. */
+ if(d>2.2){
+  const ang=Math.atan2(player.y-o.y,player.x-o.x);
+  if(Math.abs(((ang-miraA(o)+Math.PI*3)%(Math.PI*2))-Math.PI)>CONO)return false;}
+ return lineaVista(o,player);}
+/* ¿Hay ahora mismo alguien que pueda declarar? La pasma y los enemigos siempre cuentan;
+   los viandantes solo de cerca, que a cincuenta metros nadie distingue una cara. */
+function testigos(){
+ for(const p of policia)if(teVe(p))return true;
+ for(const e of enemigos)if(teVe(e))return true;
+ for(const q of peatones)if(!(q.huye>0)&&teVe(q,Math.min(9,alcanceVista())))return true;
+ return false;}
+/* Un delito que no ve nadie no da estrellas. Es la regla entera del sigilo. */
+let avisoLimpio=0;
+function delito(n,que){
+ if(testigos()){estrellas(n);return true;}
+ if(que&&avisoLimpio<=0){avisoLimpio=6;aviso('Nadie te ha visto');}
+ return false;}
+/* El ruido no ve, pero orienta: quien lo oye deja de mirar hacia donde miraba y va a
+   mirar ahí. Es lo que convierte un disparo en un problema aunque estés a cubierto. */
+function ruido(x,y,r){
+ if(r<=0)return;
+ const o={x,y};
+ for(const p of policia)if(dist(p,o)<r){p.sosp=Math.min(1,(p.sosp||0)+.55);p.oido={x,y};}
+ for(const e of enemigos)if(dist(e,o)<r*.8){e.sosp=Math.min(1,(e.sosp||0)+.7);e.oido={x,y};e.alerta=1;}
+ asustar(o,r*.45);}
+/* Quien no te ha visto todavía va llenando su sospecha; quien te pierde la vacía. Al
+   llenarse, canta. */
+function ojos(dt){
+ let max=0,visto=false;
+ const mira=(o,esPoli)=>{
+  const ve=teVe(o);
+  if(ve){visto=true;
+   const d=dist(o,player);
+   o.sosp=Math.min(1,(o.sosp||0)+dt*(esPoli?1.5:1.1)*(1.3-clamp(d/alcanceVista(),0,1)));
+  }else o.sosp=Math.max(0,(o.sosp||0)-dt*.5);
+  if(o.sosp>max)max=o.sosp;
+  return ve;};
+ for(const p of policia)mira(p,true);
+ for(const e of enemigos){
+  if(mira(e,false)){e.oido=null;if(e.sosp>=.6)e.alerta=1;}
+  else if(e.alerta&&e.sosp<=0&&!e.oido)e.alerta=0;}
+ S.sospecha=max;S.visto=visto;
+ if(avisoLimpio>0)avisoLimpio-=dt;}
+/* Un enemigo que no sabe que estás ahí y al que llegas por detrás cae de un golpe y sin
+   ruido. Es el premio de haber ido despacio: si no, el sigilo solo sirve para tardar
+   más en llegar al mismo tiroteo. */
+const porDetras=o=>Math.abs(((Math.atan2(player.y-o.y,player.x-o.x)-miraA(o)+Math.PI*3)%(Math.PI*2))-Math.PI)>1.85;
+const desprevenido=o=>!o.alerta&&(o.sosp||0)<.5;
+
 function atacarJugador(mx,my){
  if(S.escena!=='ciudad'||player.enCoche)return;
  const a=arma(S.armaAct);
@@ -3717,12 +3812,24 @@ function atacarJugador(mx,my){
   if(df<1.05){obj=p;break;}}
  const ang=obj?Math.atan2(obj.y-player.y,obj.x-player.x):base;
  if(obj)player.d8=dir8De(Math.cos(ang),Math.sin(ang));
- if(a.cuerpo){sfx('golpe',.7);player.pose='pega2';player.golpeT=.22;
+ if(a.cuerpo){player.pose='pega2';player.golpeT=.22;
+  /* Por detrás y a alguien que no sabe que estás ahí: cae de un golpe y sin ruido. Es
+     el premio de haber ido despacio; sin esto, el sigilo solo sirve para tardar más en
+     llegar al mismo tiroteo. */
+  if(obj&&enemigos.includes(obj)&&desprevenido(obj)&&porDetras(obj)&&dist(obj,player)<1.4){
+   sfx('golpe',.35);danar(obj,999);particula(obj.x,obj.y,'sangre',6);
+   ruido(obj.x,obj.y,2.5);aviso('Por la espalda');return;}
+  sfx('golpe',.7);
   if(obj&&dist(obj,player)<=a.alc+.4){danar(obj,a.dmg);particula(obj.x,obj.y,'sangre',4);}
  }else{S.armas[a.id]--;disparar(player,ang,a,'jugador');
   player.golpeT=.16;player.pose='dispara';
   fogT=.07;fogTipo=a.fog;fogD=player.d8;
-  if(S.estrellas<1)estrellas(1);}}
+  /* Un disparo se oye a media calle. Con silenciador, a la acera de enfrente y poco
+     más: el arma sigue haciendo el mismo daño, lo que compras es no despertar al
+     barrio. */
+  const sil=S.tiene.silenciador&&a.id==='pistola';
+  ruido(player.x,player.y,sil?5:18);
+  if(S.estrellas<1)delito(1);}}
 function danar(e,d){
  e.hp-=d;e.herido=.25;
  if(e.hp<=0){
@@ -3730,14 +3837,14 @@ function danar(e,d){
   if(i>=0){enemigos.splice(i,1);S.dinero+=rndi(20,70);sfx('dinero',.5);particula(e.x,e.y,'sangre',10);
    if(S.mision){const p=pasoActual();if(p&&p.t==='matar'){p.n--;if(p.n<=0)avanzarPaso();else aviso('QUEDAN '+p.n);}}}
   else{const j=peatones.indexOf(e);if(j>=0){peatones.splice(j,1);peatones.push(nuevoPeaton(player.x|0,player.y|0));
-   particula(e.x,e.y,'sangre',8);estrellas(1);sfx('grito',.6);}}
+   particula(e.x,e.y,'sangre',8);sfx('grito',.6);delito(1);}}
  }else{particula(e.x,e.y,'sangre',3);if(e.huye!==undefined)e.huye=4;}}
 function danarJugador(d){
  if(S.muerto>0)return;
  S.hp=Math.max(0,S.hp-d);flashT=.3;player.herido=.25;
  if(S.hp<=0){S.muerto=2.2;grande('K.O.',2.2);}}
 function explotar(c){
- c.vivo=false;sfx('explosion');particula(c.x,c.y,'chispa',26);particula(c.x,c.y,'humo',16);
+ c.vivo=false;sfx('explosion');ruido(c.x,c.y,30);particula(c.x,c.y,'chispa',26);particula(c.x,c.y,'humo',16);
  for(const e of enemigos)if(dist(e,c)<2.6)danar(e,90);
  if(dist(player,c)<2.8)danarJugador(55);
  if(player.enCoche===c){player.enCoche=null;player.x=c.x+1;player.y=c.y+1;}}
@@ -3812,6 +3919,10 @@ function act(dt){
  if(teclas['w'])iy=-1;if(teclas['s'])iy=1;
  if(teclas['a']||teclas['d']||teclas['w']||teclas['s'])fuerza=teclas['shift']?1:.7;
  const correr=fuerza>CORRE;
+ /* La postura se decide con el joystick y se queda puesta al soltarlo: agacharse para
+    mirar una esquina y levantarse solo al parar sería inservible. */
+ if(fuerza>.02)player.sigilo=fuerza<AGACHA;
+ player.corriendo=correr;
  /* Apuntado fino solo con las flechas del teclado. Con el pulgar no hay cruceta: se
     apunta encarando, y el arma corrige. */
  let mx=mira.dx,my=mira.dy;
@@ -3830,12 +3941,13 @@ function act(dt){
  /* B mantenido dispara seguido, sea el arma automática o no: dar toques con el pulgar
     a cada bala no es puntería, es tendinitis. */
  if(cPuls||cMant){cPuls=false;
-  if(player.enCoche){sfx('claxon');asustar(player,7);}else atacarJugador(mx,my);}
+  if(player.enCoche){sfx('claxon');ruido(player.x,player.y,12);}else atacarJugador(mx,my);}
  if(S.escena==='interior')return actInterior(dt,ix,iy);
  actCiudad(dt,ix,iy,correr,fuerza,!!(mx||my));}
-function poseAndar(e,vel,correr,dt){
- e.anim+=dt*(correr?11:7.5);
+function poseAndar(e,vel,correr,dt,sigilo){
+ e.anim+=dt*(sigilo?4.5:correr?11:7.5);
  const f=Math.floor(e.anim)%4+1;
+ if(sigilo){e.pose=f<3?'agacha':'agacha2';return;}
  e.pose=(correr?'correr':'andar')+(correr?((f-1)%4+1):f);}
 function actInterior(dt,ix,iy){
  motorAudio(null,1);sirenaAudio(dt,false);
@@ -3892,21 +4004,26 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
   if(Math.abs(vf)>3.2){
    for(let i=peatones.length-1;i>=0;i--){const p=peatones[i];
     if(dist(p,c)<.85){peatones.splice(i,1);peatones.push(nuevoPeaton(player.x|0,player.y|0));
-     estrellas(1);sfx('grito',.8);particula(c.x,c.y,'sangre',7);aviso('¡ATROPELLO!');}}
+     sfx('grito',.8);particula(c.x,c.y,'sangre',7);aviso('¡ATROPELLO!');
+     ruido(c.x,c.y,12);delito(1);}}
    for(const e of enemigos)if(dist(e,c)<.9)danar(e,55);}
   asustar(c,Math.abs(vf)>4?4.5:2.2);
  }else{
   motorAudio(null,1);
   const m=Math.hypot(ix,iy);
-  /* Velocidad analógica: el joystick a medias pasea y a fondo corre, sin escalón. */
-  const v=(1.55+fuerza*3.25)*cans;
+  /* Velocidad analógica: el joystick a medias pasea y a fondo corre, sin escalón. Y por
+     debajo del umbral, agachado: la mitad de rápido y la mitad de visible. */
+  const v=(player.sigilo?1.25:1.55+fuerza*3.25)*cans;
   if(m>.08){mover(player,player.x+ix/m*v*dt,player.y+iy/m*v*dt,false);
    /* Si la cruceta está puesta manda ella: se anda de lado sin dejar de apuntar. */
    if(!apuntando)player.d8=dir8De(ix,iy);
-   poseAndar(player,v,correr,dt);}
+   poseAndar(player,v,correr,dt,player.sigilo);
+   /* Correr suena. Agachado no. */
+   if(correr&&azar()<dt*3)ruido(player.x,player.y,4.5);}
   else if(player.golpeT>0){}
-  else player.pose=player.herido>0?'herido':(arma(S.armaAct).cuerpo?'quieto':'apunta');
+  else player.pose=player.sigilo?'agacha':player.herido>0?'herido':(arma(S.armaAct).cuerpo?'quieto':'apunta');
  }
+ ojos(dt);
  reciclarCoches();
  for(const c of trafico){c.frenado=(player.enCoche&&dist(c,player)<2.2)?1:0;rejilla(c,dt,false);
   if(dist(c,player)>56)Object.assign(c,nuevoTrafico(player.x|0,player.y|0));}
@@ -3918,11 +4035,14 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
    if(!player.enCoche&&S.detT>1.5){S.detT=0;detener();}}
   if(S.estrellas>=2&&dist(p,player)<9&&enemigos.filter(e=>e.tipo==='poli').length<S.estrellas*2&&azar()<dt*.7)
    enemigos.push({x:p.x,y:p.y,hp:55,arq:'ertzaina',arma:S.estrellas>=3?'uzi':'pistola',
-    d8:0,pose:'quieto',anim:0,cad:0,tipo:'poli',herido:0});}
+    d8:0,pose:'quieto',anim:0,cad:0,tipo:'poli',herido:0,alerta:1,sosp:1,oido:null});}
  if(S.estrellas>0){
-  const cerca=policia.some(p=>dist(p,player)<15)||enemigos.some(e=>e.tipo==='poli'&&dist(e,player)<12);
+  /* Antes bastaba con alejarse quince casillas, mirase quien mirase. Ahora lo que cuenta
+     es que ninguno te tenga a la vista: agachado detrás de un contenedor, con la patrulla
+     a diez metros pero mirando a otro lado, la cuenta corre. */
+  const cerca=S.visto||policia.some(p=>dist(p,player)<4)||enemigos.some(e=>e.tipo==='poli'&&dist(e,player)<4);
   if(!cerca){S.cooldown+=dt;
-   if(S.cooldown>12){S.cooldown=0;S.estrellas--;policia.pop();
+   if(S.cooldown>8){S.cooldown=0;S.estrellas--;policia.pop();
     if(!S.estrellas){aviso('Los has despistado');
      for(let i=enemigos.length-1;i>=0;i--)if(enemigos[i].tipo==='poli')enemigos.splice(i,1);}}}
   else S.cooldown=Math.max(0,S.cooldown-dt*.6);}
@@ -3932,6 +4052,21 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
   if(d>46){enemigos.splice(i,1);continue;}
   e.cad=Math.max(0,e.cad-dt);
   const ve=lineaVista(e,player);
+  /* Un enemigo que no te ha visto ni oído no viene a por ti: da vueltas por donde está.
+     Sin esto el sigilo no serviría de nada, porque toda la banda te vendría encima en
+     cuanto apareces. */
+  if(!e.alerta){
+   if(e.oido){
+    const ang=Math.atan2(e.oido.y-e.y,e.oido.x-e.x);
+    mover(e,e.x+Math.cos(ang)*1.9*dt,e.y+Math.sin(ang)*1.9*dt,false);
+    e.d8=dir8De(Math.cos(ang),Math.sin(ang));poseAndar(e,1.9,false,dt);
+    if(dist(e,e.oido)<1.2)e.oido=null;
+   }else{
+    e.ronda=(e.ronda||0)-dt;
+    if(e.ronda<=0){e.ronda=rnd(1.6,3.4);e.rumbo=rnd(0,6.283);}
+    mover(e,e.x+Math.cos(e.rumbo)*1.3*dt,e.y+Math.sin(e.rumbo)*1.3*dt,false);
+    e.d8=dir8De(Math.cos(e.rumbo),Math.sin(e.rumbo));poseAndar(e,1.3,false,dt);}
+   continue;}
   if(d>(a.cuerpo?1.1:a.alc*.75)||!ve){
    const ang=Math.atan2(player.y-e.y,player.x-e.x),v=a.cuerpo?2.7:2.2;
    mover(e,e.x+Math.cos(ang)*v*dt,e.y+Math.sin(ang)*v*dt,false);
@@ -4260,6 +4395,18 @@ function dibHUD(){
  ctx.drawImage(ICO[a.id]||ICO.punos,zd-wa+3,ay+8,22,22);
  texto(ctx,a.n,zd-wa+28,ay+4,1,'hueso');
  texto(ctx,mun,zd-wa+28,ay+16,2,'ambar');
+ /* ── el ojo ──
+    Sin esto el sigilo se juega a ciegas: no hay forma de saber si el que está ahí
+    enfrente te ha visto o está mirando al escaparate. El ojo se abre según lo que le
+    falta a la sospecha para llenarse, y se pone en rojo cuando ya te tienen. Va debajo
+    del arma, que es la esquina que queda libre. */
+ if(S.escena==='ciudad'&&(S.sospecha>.02||S.visto)){
+  const an=64,oy=ay+40;
+  cajaHUD(zd-an,oy,an,26);
+  ctx.drawImage(S.visto?ICO.ojo:ICO.ojoTachado,zd-an+3,oy+3,20,20);
+  ctx.fillStyle=C.carbon;ctx.fillRect(zd-an+26,oy+9,32,8);
+  ctx.fillStyle=S.sospecha>=1?C.sangre:S.sospecha>.5?C.mostaza:C.acero;
+  ctx.fillRect(zd-an+26,oy+9,Math.round(32*clamp(S.sospecha,0,1)),8);}
  /* ── misión o curro ── */
  if(S.escena==='ciudad'&&(S.mision||S.job)){
   const o=objetivo(),dm=o?Math.round(dist(o,player)*8):0;

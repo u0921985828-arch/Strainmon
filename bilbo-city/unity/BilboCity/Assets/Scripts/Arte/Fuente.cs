@@ -246,6 +246,17 @@ public static class Fuente {
         L.P(7,6,10,14,Paleta.Carbon); L.P(7,6,10,2,Paleta.Gris);
         for (int i = 0; i < 4; i++) L.P(9,9+i*3,6,2,Paleta.MostazaO); Guardar("cargador", L);
 
+        // El ojo del sigilo: abierto cuando te tienen a la vista, tachado mientras solo
+        // sospechan.
+        L = I24();
+        L.P(2,9,20,6,Paleta.Hueso); L.P(4,7,16,10,Paleta.Hueso); L.P(7,7,10,10,Paleta.Blanco);
+        L.P(8,8,8,8,Paleta.AzulL); L.P(10,10,4,4,Paleta.Carbon);
+        L.P(4,6,16,1,Paleta.Acero); Guardar("ojo", L);
+
+        L = I24();
+        L.P(3,10,18,4,Paleta.GrisO); L.P(5,9,14,6,Paleta.GrisO); L.P(8,10,8,4,Paleta.Acero);
+        for (int i = 0; i < 16; i++) L.P(4+i,18-i,3,3,Paleta.Carbon); Guardar("ojoTachado", L);
+
         // Ropa, mesa y transporte.
         L = I24();
         L.P(6,4,12,16,Paleta.AzulL); L.P(6,4,12,2,Paleta.H("#a8c4dd"));

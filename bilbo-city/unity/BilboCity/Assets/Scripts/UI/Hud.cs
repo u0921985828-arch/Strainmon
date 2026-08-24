@@ -104,6 +104,9 @@ public class Hud : MonoBehaviour {
     Texture2D _texRadar;
     Image _anillo, _flechaObj, _flash;
     Image[] _estrellas = new Image[5];
+    // Sin esto el sigilo se juega a ciegas: no hay forma de saber si el que está enfrente
+    // te ha visto o está mirando al escaparate.
+    Image _icoOjo, _fondoOjo, _barraOjo;
     Image _icoEuro, _icoArma, _icoEnergia, _icoHambre;
     Image _barEnergia, _barHambre;
     TextoBits _tDinero, _tReloj, _tDia, _tBarrio, _tArma, _tMun, _tMision1, _tMision2, _tMision3, _tAviso, _tGrande, _tPista, _tDeuda;
@@ -151,6 +154,12 @@ public class Hud : MonoBehaviour {
         for (int i = 0; i < 5; i++)
             _estrellas[i] = UiFab.Img(raiz, Fuente.Ico["estrellaOff"], new Vector2(1,1),
                                       new Vector2(-26-i*20, -10), new Vector2(20,20));
+
+        // el ojo del sigilo
+        _icoOjo   = UiFab.Img(raiz, Fuente.Ico["ojoTachado"], new Vector2(1,1), new Vector2(-58,-120), new Vector2(20,20));
+        _fondoOjo = UiFab.Img(raiz, null, new Vector2(1,1), new Vector2(-34,-125), new Vector2(32,8));
+        _barraOjo = UiFab.Img(raiz, null, new Vector2(1,1), new Vector2(-34,-125), new Vector2(32,8));
+        _fondoOjo.color = Paleta.Carbon;
 
         // cartera, reloj
         _icoEuro = UiFab.Img(raiz, Fuente.Ico["euro"], new Vector2(1,1), new Vector2(-136,-38), new Vector2(20,20));
@@ -262,6 +271,19 @@ public class Hud : MonoBehaviour {
         // ── estrellas ──
         for (int i = 0; i < 5; i++)
             _estrellas[i].sprite = i < E.Estrellas ? Fuente.Ico["estrella"] : Fuente.Ico["estrellaOff"];
+
+        // ── el ojo ──
+        // Se abre según lo que le falta a la sospecha para llenarse, y se pone en rojo
+        // cuando ya te tienen.
+        bool hayOjo = E.Sospecha > 0.02f || E.Visto;
+        _icoOjo.enabled = _fondoOjo.enabled = _barraOjo.enabled = hayOjo;
+        if (hayOjo) {
+            _icoOjo.sprite = Fuente.Ico[E.Visto ? "ojo" : "ojoTachado"];
+            _barraOjo.color = E.Sospecha >= 1f ? Paleta.Sangre
+                            : E.Sospecha > 0.5f ? Paleta.Mostaza : Paleta.Acero;
+            var rt = _barraOjo.GetComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(Mathf.Round(32f * Mathf.Clamp01(E.Sospecha)), 8f);
+        }
 
         // ── textos ──
         var rtC = Cnv.GetComponent<RectTransform>();

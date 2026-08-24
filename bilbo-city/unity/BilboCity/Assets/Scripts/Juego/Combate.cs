@@ -188,7 +188,7 @@ public class Combate : MonoBehaviour {
         if (p.Hp > 0) return;
         Particulas.I.Emitir(p.Pos, "sangre", 8);
         AudioProc.I.Sfx("grito", 0.6f);
-        Estrellas(1, J);
+        Sigilo.Delito(1);
         p.Recolocar(J.Jug.Pos);
     }
 
@@ -242,11 +242,15 @@ public class Combate : MonoBehaviour {
         AudioProc.I.Sirena(dt, E.Estrellas > 0 && sirena);
 
         if (E.Estrellas <= 0) return;
-        bool cerca = sirena;
-        foreach (var e in J.Enemigos) if (e.EsPoli && Vector2.Distance(e.Pos, J.Jug.Pos) < 12f) cerca = true;
+        // Antes bastaba con alejarse, mirase quien mirase. Ahora lo que cuenta es que
+        // ninguno te tenga a la vista: agachado detrás de un contenedor, con la patrulla a
+        // diez metros pero mirando a otro lado, la cuenta corre.
+        bool cerca = E.Visto;
+        foreach (var p2 in J.Patrullas) if (Vector2.Distance(p2.Pos, J.Jug.Pos) < 4f) cerca = true;
+        foreach (var e in J.Enemigos) if (e.EsPoli && Vector2.Distance(e.Pos, J.Jug.Pos) < 4f) cerca = true;
         if (!cerca) {
             _cooldown += dt;
-            if (_cooldown > 12f) {
+            if (_cooldown > 8f) {
                 _cooldown = 0;
                 E.Estrellas--;
                 J.QuitarUnaPatrulla();

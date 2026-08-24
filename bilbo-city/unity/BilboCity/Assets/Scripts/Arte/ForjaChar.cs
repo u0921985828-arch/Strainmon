@@ -6,7 +6,8 @@ namespace BilboCity {
 public enum Pose {
     Quieto, Andar1, Andar2, Andar3, Andar4,
     Correr1, Correr2, Correr3, Correr4,
-    Pega1, Pega2, Apunta, Dispara, Herido
+    Pega1, Pega2, Apunta, Dispara, Herido,
+    Agacha, Agacha2
 }
 
 public struct Arquetipo {
@@ -26,7 +27,7 @@ public static class ForjaChar {
     // contorno de la silueta.
     public const int MG_X = 7, MG_ARR = 8, MG_ABA = 4;
     public const int CW = 20 + MG_X * 2, CH = 26 + MG_ARR + MG_ABA;   // tamaño de celda
-    public const int NPOSES = 14, NDIRS = 8;
+    public const int NPOSES = 16, NDIRS = 8;
 
     const int AB = 0, AR = 1, IZ = 2, DE = 3;
     // base cardinal + si vemos la cara (f) o el cogote (e) en las diagonales
@@ -50,6 +51,12 @@ public static class ForjaChar {
         new Postura{ p0=0,p1=0,b0=0,b1=0,y=0, apunta=1 },             // Apunta
         new Postura{ p0=0,p1=0,b0=0,b1=0,y=-1, apunta=1, fog=true },  // Dispara
         new Postura{ p0=1,p1=1,b0=2,b1=2,y=1, herido=true },          // Herido
+        // Agachado no lleva dibujo nuevo: se acortan las dos piernas y se baja el cuerpo.
+        // A veintiséis píxeles de alto eso ya se lee como unas cuclillas, y no hay que
+        // tocar la forja ni volver a cuadrar los gorros. Y no baja más de dos píxeles:
+        // con tres, el contorno de los pies se sale de la celda.
+        new Postura{ p0=3,p1=3,b0=1,b1=1,y=2 },                       // Agacha
+        new Postura{ p0=2,p1=4,b0=0,b1=2,y=2 },                       // Agacha2
     };
 
     struct Prenda { public Color32 b, s, l; public bool corta, capucha, peto, bandas, mandil, placa, largo; public Color32 raya; public bool tieneRaya; }
@@ -339,6 +346,9 @@ public static class ForjaChar {
     }
 
     static readonly Dictionary<string, Sprite[]> Hojas = new Dictionary<string, Sprite[]>();
+
+    /// <summary>Hacia dónde mira una de las ocho direcciones, en radianes.</summary>
+    public static float AngDe(int d8) { return (2 - d8) * Mathf.PI / 4f; }
 
     /// <summary>Vestir al protagonista: cambia su arquetipo y tira su hoja para que la
     /// forja la vuelva a compilar con la ropa nueva.</summary>

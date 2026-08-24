@@ -7,6 +7,10 @@ public class Jugador : MonoBehaviour {
     public Vector2 Pos;
     public int Dir8;
     public Pose PoseAct = Pose.Quieto;
+    /// La postura la decide el propio joystick: flojo va agachado, a fondo corre. Se
+    /// queda puesta al soltarlo, que si no, agacharse para mirar una esquina y levantarse
+    /// solo al parar sería inservible.
+    public bool Agachado, Corriendo;
     public Vehiculo EnCoche;
     public float Cadencia, Herido, GolpeT, Anim;
     public string Arquetipo = "protagonista";
@@ -33,21 +37,32 @@ public class Jugador : MonoBehaviour {
 
     public void Fogonazo(string tipo, int d8) { _fogT = 0.07f; _fogTipo = tipo; Dir8 = d8; }
 
-    public void Mover(float dt, Vector2 entrada, bool correr) {
+    public void Mover(float dt, Vector2 entrada, bool correr) { Mover(dt, entrada, correr ? 1f : 0.7f, true); }
+
+    /// <summary>Velocidad analógica: el joystick a medias pasea, a fondo corre y por debajo
+    /// del umbral va agachado — la mitad de rápido y la mitad de visible.</summary>
+    public void Mover(float dt, Vector2 entrada, float fuerza, bool calle) {
         var E = Estado.I;
+        if (calle && fuerza > 0.02f) { Agachado = fuerza < Sigilo.Agacha; Corriendo = fuerza > Sigilo.Corre; }
+        bool corre = Corriendo && calle;
         float cansado = E.Energia <= 0 ? 0.6f : 1f;
-        float v = (correr ? 4.7f : 2.9f) * cansado;
+        float v = (calle && Agachado ? 1.25f : 1.55f + fuerza * 3.25f) * cansado;
+        if (!calle) v = 2.7f;
         float m = entrada.magnitude;
         if (m > 0.08f) {
             Vector2 d = entrada / m * Mathf.Min(1f, m) * v * dt;
             Movimiento.Deslizar(ref Pos, d, false);
             Dir8 = ForjaChar.Dir8(entrada.x, entrada.y);
-            Anim += dt * (correr ? 11f : 7.5f);
+            Anim += dt * (calle && Agachado ? 4.5f : corre ? 11f : 7.5f);
             int f = Mathf.FloorToInt(Anim) % 4;
-            PoseAct = correr ? (Pose)((int)Pose.Correr1 + f) : (Pose)((int)Pose.Andar1 + f);
+            PoseAct = calle && Agachado ? (f < 2 ? Pose.Agacha : Pose.Agacha2)
+                    : corre ? (Pose)((int)Pose.Correr1 + f) : (Pose)((int)Pose.Andar1 + f);
+            // Correr suena. Agachado no.
+            if (corre && Utiles.Rnd(0f,1f) < dt * 3f) Sigilo.Ruido(Pos, 4.5f);
         } else if (GolpeT <= 0) {
             var a = Armas.De(E.ArmaAct);
-            PoseAct = Herido > 0 ? Pose.Herido : (a.Cuerpo ? Pose.Quieto : Pose.Apunta);
+            PoseAct = calle && Agachado ? Pose.Agacha
+                    : Herido > 0 ? Pose.Herido : (a.Cuerpo ? Pose.Quieto : Pose.Apunta);
         }
     }
 

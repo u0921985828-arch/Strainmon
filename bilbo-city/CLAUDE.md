@@ -43,10 +43,11 @@ node herramientas/html/plano.js
 real: juega las 8 misiones, entra y sale de **todos** los interiores —la lista sale del
 juego, así que uno nuevo se prueba solo— comprobando que tienen puerta, que las filas del
 plano miden lo mismo y que no hay ningún tendero empotrado en una pared; compra ropa y
-verifica que el sprite cambia; recorre las tres redes de transporte; verifica que los
-sitios están sobre suelo pisable y cerca de donde los pone el plano; mide la conectividad
-de la red viaria, y prueba combate, conducción desde 16 puntos al azar, muerte y 150 s de
-bucle.
+verifica que el sprite cambia; recorre las tres redes de transporte; comprueba el sigilo
+—postura, cono, línea de vista, ruido y que un delito sin testigos no da estrellas—;
+verifica que los sitios están sobre suelo pisable y cerca de donde los pone el plano; mide
+la conectividad de la red viaria, y prueba combate, conducción desde 16 puntos al azar,
+muerte y 150 s de bucle.
 
 `herramientas/compilar/` compila el C# de verdad, sin tener Unity: hay un remedo de la API
 del motor — solo firmas, nunca se ejecuta — y el juego se compila contra él con Roslyn, con
@@ -198,6 +199,41 @@ que pasa de verdad.
 Las paradas de bus **no son POIs** y no llevan coordenada escrita: se sacan del rótulo de
 cada barrio en el plano, con la acera más cercana. Treinta y cuatro chinchetas más taparían
 la ciudad en el radar, así que se encuentran estando encima.
+
+## Sigilo
+
+Hasta que se metió esto, el juego repartía estrellas por el hecho de hacer algo, mirara
+quien mirara: robar un coche en un descampado a las cuatro de la mañana costaba lo mismo
+que robarlo delante de una patrulla. **Ahora lo que cuenta es que te vean**, y esa es la
+regla entera: `delito(n)` solo llama a `estrellas(n)` si `testigos()` dice que sí.
+
+Todo cuelga de tres cosas que ya estaban: `lineaVista`, hacia dónde mira cada uno y el
+reloj.
+
+- **La postura la decide el propio joystick**, sin botón nuevo: por debajo de `AGACHA`
+  (0,34) vas agachado, por encima de `CORRE` (0,82) corriendo. Se queda puesta al soltar,
+  que si no, agacharse para mirar una esquina y levantarse solo al parar sería inservible.
+  Agachado se te ve **la mitad de lejos** y andas a 1,25 casillas/s en vez de a 4,8.
+- **Cono de 60° y línea de vista.** A menos de 2,2 casillas no hace falta cono: te tiene
+  encima. Un coche se ve venir aunque vayas despacio; **de noche** (antes de las 7 y
+  después de las 21) el alcance baja de 15 casillas a 9.
+- **La sospecha se llena mirando y se vacía al perderte de vista.** El HUD lo pinta en un
+  ojo debajo del arma: sin eso, el sigilo se juega a ciegas.
+- **El ruido no ve, pero orienta.** Un disparo son 18 casillas —5 con silenciador, que se
+  compra en el Bazar por 520 €—, un cristal roto 7, el claxon 12, una explosión 30. Quien
+  lo oye va a mirar ahí.
+- **Los enemigos de misión nacen sin saber que existes** y dan vueltas por donde están.
+  Sin eso el sigilo no serviría de nada: toda la banda te vendría encima al aparecer.
+- **Golpe por la espalda**: cuerpo a cuerpo, a menos de 1,4 casillas, por detrás y a
+  alguien desprevenido — cae de un golpe y casi sin ruido. Es el premio de haber ido
+  despacio; si no, el sigilo solo serviría para tardar más en llegar al mismo tiroteo.
+- **Despistar a la pasma** ya no es alejarse: es que ninguno te tenga a la vista. Agachado
+  detrás de un contenedor, con la patrulla a diez metros pero mirando a otro lado, la
+  cuenta corre — y baja a 8 segundos por estrella en vez de 12.
+
+Agachado no lleva dibujo nuevo: se acortan las dos piernas y se baja el cuerpo dos
+píxeles. **Dos, no tres**: con tres, el contorno de los pies se sale de la celda y salta
+la regla del verificador.
 
 ## El arte
 

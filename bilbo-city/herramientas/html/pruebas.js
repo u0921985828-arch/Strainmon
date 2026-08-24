@@ -168,6 +168,75 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
                 + A.nodos('tren').length + ' de cercanías y ' + A.PARADAS.length + ' paradas de bus');
     }
 
+    // ── 2 quinquies · sigilo ───────────────────────────────────────
+    {
+      // Un sitio despejado y a plena luz, para que las cuentas sean las del cono y no
+      // las de una fachada que se cruza por medio.
+      const moyua = A.POI.find(q => q.id === 'moyua');
+      const llano = A.puntoAcera(moyua.p.x | 0, moyua.p.y | 0, 20);
+      S.min = 12 * 60;
+      ok(!A.esDeNoche(), 'a mediodía dice que es de noche');
+      P.x = llano.x; P.y = llano.y; P.enCoche = null;
+
+      // La postura cambia lo lejos que se te ve, y de noche se ve menos.
+      P.sigilo = false; P.corriendo = false;
+      const dePie = A.alcanceVista();
+      P.sigilo = true;  const agachado = A.alcanceVista();
+      P.sigilo = false; P.corriendo = true; const corriendo = A.alcanceVista();
+      P.corriendo = false;
+      ok(agachado < dePie && dePie < corriendo,
+         'la postura no cambia el alcance (' + agachado + '/' + dePie + '/' + corriendo + ')');
+      S.min = 3 * 60;
+      ok(A.esDeNoche() && A.alcanceVista() < dePie, 'de noche se ve igual de lejos');
+      S.min = 12 * 60;
+
+      // Un vigilante mirando a otro lado no te ve; girándose, sí.
+      const ojo = { x: P.x + 6, y: P.y, d8: A.dir8De(1, 0), sosp: 0 };
+      ok(!A.teVe(ojo), 'te ve estando de espaldas');
+      ojo.d8 = A.dir8De(-1, 0);
+      ok(A.teVe(ojo), 'no te ve teniéndote delante y a seis casillas');
+      // Y por lejos que mire, no ve a través de la ciudad.
+      ojo.x = P.x + 400;
+      ok(!A.teVe(ojo), 'te ve desde el otro lado de Bilbao');
+
+      // Por la espalda: el mismo vigilante, según hacia dónde mire.
+      ojo.x = P.x + 1; ojo.y = P.y; ojo.d8 = A.dir8De(1, 0);
+      ok(A.porDetras(ojo), 'no reconoce que lo tienes de espaldas');
+      ojo.d8 = A.dir8De(-1, 0);
+      ok(!A.porDetras(ojo), 'dice que es por la espalda teniéndote de cara');
+      ok(A.desprevenido({ alerta: 0, sosp: 0 }) && !A.desprevenido({ alerta: 1, sosp: 0 }),
+         'la alerta del enemigo no cuenta');
+
+      // Un delito sin testigos no da estrellas; con un guardia delante, sí.
+      A.policia.length = 0; A.enemigos.length = 0; A.peatones.length = 0;
+      S.estrellas = 0;
+      ok(!A.testigos(), 'hay testigos con la calle vacía');
+      ok(!A.delito(1) && S.estrellas === 0, 'un delito sin testigos da estrellas');
+      A.enemigos.push({ x: P.x + 4, y: P.y, d8: A.dir8De(-1, 0), hp: 60, arq: 'maton',
+                        arma: 'punos', pose: 'quieto', anim: 0, cad: 0, herido: 0,
+                        alerta: 1, sosp: 1, oido: null });
+      ok(A.testigos(), 'no hay testigos con uno mirándote a cuatro casillas');
+      ok(A.delito(1) && S.estrellas === 1, 'un delito visto no da estrellas');
+
+      // El ruido orienta a quien lo oye aunque no vea nada.
+      const sordo = A.enemigos[0];
+      sordo.sosp = 0; sordo.alerta = 0; sordo.oido = null;
+      A.ruido(P.x, P.y, 10);
+      ok(sordo.oido && sordo.alerta === 1, 'el ruido no alerta a quien lo tiene al lado');
+
+      // Y mirando fijamente, la sospecha se llena.
+      sordo.sosp = 0; sordo.oido = null;
+      for (let k = 0; k < 120; k++) A.ojos(1 / 60);
+      ok(sordo.sosp >= 1 && S.visto, 'mirándote dos segundos no acaba de verte');
+      // Perdido de vista, se vacía.
+      sordo.x = P.x + 400;
+      for (let k = 0; k < 240; k++) A.ojos(1 / 60);
+      ok(sordo.sosp === 0 && !S.visto, 'la sospecha no baja al perderte de vista');
+
+      A.enemigos.length = 0; S.estrellas = 0;
+      bien.push('sigilo: postura, cono, línea de vista, ruido y delito sin testigos');
+    }
+
     // ── 3 · los sitios están sobre suelo pisable ───────────────────────
     let accesibles = 0;
     A.POI.forEach(p => {

@@ -218,6 +218,9 @@ public class Juego : MonoBehaviour {
         e.Preparar();
         e.Pos = p; e.Arq = arq; e.ArmaId = arma; e.Hp = esPoli ? 55 : 60;
         e.DeMision = deMision; e.EsPoli = esPoli;
+        // La pasma que baja del coche ya viene avisada; los de una misión, no: hay que
+        // dejarles la opción de no enterarse.
+        e.Alerta = esPoli; e.Sospecha = esPoli ? 1f : 0f;
         Enemigos.Add(e);
     }
 
@@ -302,12 +305,12 @@ public class Juego : MonoBehaviour {
         bool automatica = arma.Cad < 0.12f;
         if (Controles.I.AtacarPulsado || (automatica && Controles.I.AtacarMantenido)) {
             Controles.I.AtacarPulsado = false;
-            if (Jug.EnCoche != null) { AudioProc.I.Sfx("claxon", 1f); Asustar(Jug.Pos, 7f); }
+            if (Jug.EnCoche != null) { AudioProc.I.Sfx("claxon", 1f); Sigilo.Ruido(Jug.Pos, 12f); }
             else Acciones.Atacar(this);
         }
 
         if (E.EnInterior) {
-            Jug.Mover(dt, eje, false);
+            Jug.Mover(dt, eje, eje.magnitude, false);
             Acciones.PistaInterior(this);
             SeguirCamara(dt);
             return;
@@ -320,11 +323,12 @@ public class Juego : MonoBehaviour {
             if (Mathf.Abs(vf) > 3.2f) {
                 foreach (var p in Peatones)
                     if (Vector2.Distance(p.Pos, Jug.Pos) < 0.85f) {
-                        Combate.I.Estrellas(1, this);
                         AudioProc.I.Sfx("grito", 0.8f);
                         Particulas.I.Emitir(Jug.Pos, "sangre", 7);
                         Hud.I.Aviso("¡ATROPELLO!");
                         p.Recolocar(Jug.Pos);
+                        Sigilo.Ruido(Jug.Pos, 12f);
+                        Sigilo.Delito(1);
                     }
                 for (int i = Enemigos.Count-1; i >= 0; i--) {
                     var e = Enemigos[i];
@@ -334,8 +338,10 @@ public class Juego : MonoBehaviour {
             Asustar(Jug.Pos, Mathf.Abs(vf) > 4 ? 4.5f : 2.2f);
         } else {
             AudioProc.I.MotorApagado();
-            Jug.Mover(dt, eje, correr);
+            Jug.Mover(dt, eje, correr ? 1f : eje.magnitude, true);
         }
+
+        Sigilo.Ojos(dt);
 
         foreach (var t in Trafico) {
             t.Frenado = Jug.EnCoche != null && Vector2.Distance(t.Pos, Jug.Pos) < 2.2f;
@@ -359,7 +365,7 @@ public class Juego : MonoBehaviour {
         TinteBarrio(dt);
     }
 
-    void Asustar(Vector2 p, float r) {
+    public void Asustar(Vector2 p, float r) {
         foreach (var q in Peatones)
             if (Vector2.Distance(q.Pos, p) < r) q.Huye = 3.5f;
     }
