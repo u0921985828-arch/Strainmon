@@ -362,7 +362,10 @@ public static class Forja {
             for (int d8 = 0; d8 < 8; d8++) {
                 int dir = d8 == 0 ? 0 : (d8 == 4 ? 1 : (d8 >= 5 ? 2 : 3));
                 bool diag = d8 == 1 || d8 == 3 || d8 == 5 || d8 == 7;
-                var L = new Lienzo(ForjaChar.CW, ForjaChar.CH);
+                // El arma en la mano va en su propia caja de 20×26 con el mismo pivote que
+                // la figura, no en la celda del personaje: el margen de la celda es para el
+                // fogonazo y el puñetazo, y aquí solo descolocaría el cañón.
+                var L = new Lienzo(20, 26);
                 int gr = a.Grosor, y = 13, dg = diag ? 1 : 0;
                 if (dir == 3) { L.P(13-dg, y+dg, a.Largo, gr, a.Col); L.P(11-dg, y+dg, 2, gr+1, a.Mango); }
                 else if (dir == 2) { L.P(7+dg-a.Largo, y+dg, a.Largo, gr, a.Col); L.P(7+dg, y+dg, 2, gr+1, a.Mango); }

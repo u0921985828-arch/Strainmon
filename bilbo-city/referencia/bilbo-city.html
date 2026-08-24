@@ -2039,6 +2039,13 @@ const ORDEN_POSES=['quieto','andar1','andar2','andar3','andar4','correr1','corre
  'pega1','pega2','apunta','dispara','herido'];
 const IPOSE={};ORDEN_POSES.forEach((p,i)=>IPOSE[p]=i);
 const COMPLEX={delgada:{w:6,hom:7},media:{w:8,hom:9},corpulenta:{w:10,hom:11}};
+/* La figura se dibuja en una caja de 20×26 y esas coordenadas no se tocan. Lo de
+   alrededor es margen. Hace falta porque el puñetazo, el fogonazo y el carro de la
+   compra se salen de la caja, y el moño, la txapela y el casco de obra asoman por
+   arriba: contra el borde de la celda se cortaban en seco —el fogonazo salía partido
+   por la mitad— y encima no quedaba sitio para el contorno de la silueta. */
+const MG_X=7, MG_ARR=8, MG_ABA=4;
+const FORJA_W=20+MG_X*2, FORJA_H=26+MG_ARR+MG_ABA;
 const TORSOS={
  camisa:{b:C.blanco,s:C.crema,l:C.blanco,manga:'larga'},
  camisaRem:{b:C.blanco,s:C.crema,l:C.blanco,manga:'corta'},
@@ -2067,7 +2074,8 @@ const CALZADO={deportivas:C.blanco,botas:'#3a2d22',zapatos:C.negro,katiuskas:C.m
 
 function dibChar(cfg,pose,d8){
  const M=MAPA8[d8], dir=M.b, frente=M.f, espalda=M.e;
- const c=lienzo(20,26),g=c.getContext('2d');
+ const c=lienzo(FORJA_W,FORJA_H),g=c.getContext('2d');
+ g.translate(MG_X,MG_ARR);
  const P_=POSES[pose],comp=COMPLEX[cfg.comp],T=TORSOS[cfg.torso],PN=PIERNAS[cfg.piernas];
  const diag=frente||espalda, lateral=(dir===DE||dir===IZ)&&!diag;
  const cx=10+(diag?(dir===DE?-1:1):0)+(lateral?(dir===DE?1:-1):0);
@@ -2128,13 +2136,22 @@ function dibChar(cfg,pose,d8){
   else P(g,cx-4,hy-2,8,4,pc);
   if(arr)P(g,cx-4,hy-2,8,8,pc);}
  const G=cfg.gorro;
- if(G==='txapela'){P(g,cx-5,hy-3,10,3,C.carbon);P(g,cx-6,hy-1,12,2,C.carbon);P(g,cx-1,hy-4,2,1,C.gris);}
- else if(G==='gorra'){P(g,cx-4,hy-3,8,3,cfg.gorroCol);if(!arr)P(g,cx-4,hy,6,1,cfg.gorroCol);}
- else if(G==='visera'){P(g,cx-4,hy-2,8,2,cfg.gorroCol);if(!arr)P(g,cx-5,hy,7,1,cfg.gorroCol);}
- else if(G==='cascoObra'){P(g,cx-5,hy-4,10,5,C.mostaza);P(g,cx-6,hy,12,1,C.mostazaO);P(g,cx-1,hy-5,2,1,C.mostazaO);}
- else if(G==='cascoMoto'){P(g,cx-5,hy-3,10,9,C.rojo);if(!arr)P(g,cx-3,hy+2,6,3,C.carbon);}
- else if(G==='lana'){P(g,cx-4,hy-3,8,4,C.rojoO);P(g,cx-4,hy+1,8,1,C.rojo);}
- else if(G==='policia'){P(g,cx-4,hy-3,8,3,C.azulO);if(!arr){P(g,cx-5,hy,8,1,C.azulO);P(g,cx-1,hy-2,2,1,C.mostaza);}}
+ /* Los gorros llevan su brillo de arriba a la izquierda como todo lo demás. Y ninguno
+    pasa de diez píxeles de ancho: la cabeza mide ocho, y con el contorno alrededor un
+    gorro de doce deja de parecer un gorro y parece una nube. */
+ if(G==='txapela'){P(g,cx-4,hy-3,8,3,C.carbon);P(g,cx-4,hy-3,5,1,C.gris);
+  P(g,cx-5,hy,10,1,C.carbon);P(g,cx-5,hy,4,1,C.gris);P(g,cx-1,hy-4,2,1,C.gris);}
+ else if(G==='gorra'){P(g,cx-4,hy-3,8,3,cfg.gorroCol);P(g,cx-4,hy-3,5,1,C.hueso);
+  if(!arr)P(g,cx-4,hy,6,1,cfg.gorroCol);}
+ else if(G==='visera'){P(g,cx-4,hy-2,8,2,cfg.gorroCol);P(g,cx-4,hy-2,5,1,C.hueso);
+  if(!arr)P(g,cx-5,hy,7,1,cfg.gorroCol);}
+ else if(G==='cascoObra'){P(g,cx-5,hy-4,10,5,C.mostaza);P(g,cx-5,hy-4,6,1,C.hueso);
+  P(g,cx+4,hy-4,1,5,C.mostazaO);P(g,cx-6,hy,12,1,C.mostazaO);P(g,cx-1,hy-5,2,1,C.mostazaO);}
+ else if(G==='cascoMoto'){P(g,cx-5,hy-3,10,9,C.rojo);P(g,cx-5,hy-3,6,1,C.rojoL);
+  P(g,cx+4,hy-3,1,9,C.rojoO);if(!arr)P(g,cx-3,hy+2,6,3,C.carbon);}
+ else if(G==='lana'){P(g,cx-4,hy-3,8,4,C.rojoO);P(g,cx-4,hy-3,5,1,C.rojo);P(g,cx-4,hy+1,8,1,C.rojo);}
+ else if(G==='policia'){P(g,cx-4,hy-3,8,3,C.azulO);P(g,cx-4,hy-3,5,1,C.azul);
+  if(!arr){P(g,cx-5,hy,8,1,C.azulO);P(g,cx-1,hy-2,2,1,C.mostaza);}}
  else if(G==='capucha'){P(g,cx-5,hy-2,10,6,T.s);if(!arr)P(g,cx-3,hy+1,6,5,cfg.piel);}
  const A=cfg.acces;
  if(A==='mochila'){if(arr)P(g,cx-4,ty+1,8,7,C.verdeO);
@@ -2148,7 +2165,10 @@ function dibChar(cfg,pose,d8){
  if(P_.fog){if(derV)P(g,cx+hom/2+7,ty+2,3,3,C.mostaza);
   else if(izqV)P(g,cx-hom/2-8,ty+2,3,3,C.mostaza);
   else P(g,cx+hom/2-1,ty+9,3,3,C.mostaza);}
- return c;
+ /* Contorno solo por fuera, como los iconos y por lo mismo: la gente cruza del asfalto
+    a la acera y de la acera al parque, y una cazadora gris sobre hormigón gris sin borde
+    se deshace. Las costuras de la ropa no llevan, que a 20 píxeles taparían el dibujo. */
+ return contorno(c,C.negro);
 }
 function A(nombre,comp,pielI,pelo,pelocol,gorro,gorroCol,torso,piernas,calzado,acces){
  const pieles=[C.piel1,C.piel2,C.piel3,C.piel4,C.piel5,C.piel6];
@@ -2190,7 +2210,7 @@ const PEATON_ARQ=['p1','p2','p3','p4','p5','p6','p7','p8'];
    Nunca se queda un personaje sin dibujar. */
 /*<<<SPRITES*/
 /* Lo escribe herramientas/sprites/pixellab.py. Vacío = todo forjado por código. */
-const SPR={cel:[20,26], hojas:{}};
+const SPR={cel:[34,38], hojas:{}};
 /*SPRITES>>>*/
 const CEL_W=()=>SPR.cel[0], CEL_H=()=>SPR.cel[1];
 const HOJAS={};
@@ -2218,17 +2238,18 @@ async function cargarSprites(){
 
 function hoja(k){
  if(HOJAS[k])return HOJAS[k];
- /* La forja dibuja a 20×26. Si los sprites traídos usan otra medida, se centra dentro
-    de la celda y se apoya en el suelo: mezclar tamaños descoloca los pies. */
+ /* La forja da la celda entera, figura y margen. Si los sprites traídos usan otra
+    medida, la celda forjada se centra en la suya y se apoya abajo: mezclar tamaños
+    descoloca los pies. Con la medida de siempre, ox y oy salen cero. */
  const cw=CEL_W(), ch=CEL_H();
  const c=lienzo(cw*8,ch*ORDEN_POSES.length),g=c.getContext('2d');
- const ox=Math.round((cw-20)/2), oy=ch-26;
+ const ox=Math.round((cw-FORJA_W)/2), oy=ch-FORJA_H;
  ORDEN_POSES.forEach((p,fy)=>{for(let d=0;d<8;d++)g.drawImage(dibChar(ARQ[k],p,d),d*cw+ox,fy*ch+oy);});
  return HOJAS[k]=cuantizar(c);
 }
 function pintaChar(g,k,d8,pose,x,y){
  const h=HOJAS[k]||hoja(k), cw=CEL_W(), ch=CEL_H();
- g.drawImage(h,d8*cw,IPOSE[pose]*ch,cw,ch,Math.round(x)-(cw>>1),Math.round(y)-ch+7,cw,ch);}
+ g.drawImage(h,d8*cw,IPOSE[pose]*ch,cw,ch,Math.round(x)-(cw>>1),Math.round(y)-ch+7+MG_ABA,cw,ch);}
 const dir8De=(dx,dy)=>((2-Math.round(Math.atan2(dy,dx)/(Math.PI/4)))%8+8)%8;
 
 /*═══════════════ ARMAS ═══════════════*/

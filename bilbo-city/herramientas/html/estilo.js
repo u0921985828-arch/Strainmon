@@ -107,6 +107,32 @@ listo().then(() => {
     if (!malos) bien.push(Object.keys(A.ARQ).length + ' hojas de ' + (cw*8) + 'x' + (ch*filas) + ' (8 direcciones × ' + filas + ' poses)');
   }
 
+  // ── R5 · ningún personaje toca el borde de su celda ──────────────────────────────
+  // La celda es más grande que la figura a propósito, para que quepan el puñetazo, el
+  // fogonazo, los gorros altos y el contorno. Un sprite que llega al borde ya no se sabe
+  // si está entero: lo que se salga se corta en seco y nadie se entera hasta verlo en
+  // marcha. Un píxel de aire alrededor y esta regla lo vigila.
+  {
+    const [cw, ch] = A.SPR.cel, filas = A.ORDEN_POSES.length;
+    let tocan = 0;
+    for (const k of Object.keys(A.ARQ)) {
+      const h = A.HOJAS[k] || A.hoja(k), g = h.getContext('2d');
+      for (let f = 0; f < filas; f++) for (let d = 0; d < 8; d++) {
+        const px = g.getImageData(d*cw, f*ch, cw, ch).data;
+        const opaco = (x, y) => px[(y*cw + x)*4 + 3] > 0;
+        let borde = false;
+        for (let x = 0; x < cw && !borde; x++) if (opaco(x, 0) || opaco(x, ch-1)) borde = true;
+        for (let y = 0; y < ch && !borde; y++) if (opaco(0, y) || opaco(cw-1, y)) borde = true;
+        if (borde) {
+          if (tocan < 6) fallos.push('hoja ' + k + ': ' + A.ORDEN_POSES[f] + '/' + d + ' llega al borde de la celda');
+          tocan++;
+        }
+      }
+    }
+    if (tocan > 6) fallos.push('...y ' + (tocan - 6) + ' fotogramas más al borde');
+    if (!tocan) bien.push('ningún fotograma de personaje toca el borde de su celda de ' + cw + 'x' + ch);
+  }
+
   bien.forEach(b => console.log('  ok    ' + b));
   if (fallos.length) {
     console.log('');

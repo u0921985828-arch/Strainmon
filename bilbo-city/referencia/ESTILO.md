@@ -17,6 +17,7 @@ Bilbao a finales de los noventa, vista desde arriba y algo escorada, en pixel ar
 |---|---|---|
 | Casilla del mundo | **32×32 px** | 5,16 m de Bilbao. Un portal ocupa una casilla. |
 | Persona | **20×26 px** | Cabeza ≈ 1/3,5 de la altura: cabezona a propósito, como en un GTA cenital. Se lee a 20 px. |
+| Celda del personaje | **34×38 px** **[V]** | La figura mide 20×26; el resto es margen. Ahí caben el puñetazo, el fogonazo, el casco de obra y el contorno. |
 | Icono de interfaz | **24×24 px** **[V]** | 22×22 de dibujo y 1 px de aire alrededor para el contorno. |
 | Vehículo | largo 26–44, ancho 15–21 | Un utilitario cabe en una calle de 2 casillas; la furgoneta no. |
 | Hoja de personaje | **8 columnas × 14 filas** **[V]** | 8 direcciones × 14 poses. Una hoja por arquetipo. |
@@ -70,7 +71,14 @@ qué. En la práctica:
   el negro del fondo y aparece una trama de puntos por todo el mapa. Los muebles de
   interior sí son transparentes —van encima del suelo— y están declarados en
   `TILE_MUEBLE`.
-- Los personajes llevan contorno solo en la silueta, no en las costuras de la ropa.
+- **Los personajes llevan contorno negro de 1 px en la silueta** **[V]**, no en las
+  costuras de la ropa. Por la misma razón que los iconos: la gente cruza del asfalto a la
+  acera y de la acera al parque, y una cazadora gris sobre hormigón gris sin borde se
+  deshace. Lo pone `contorno()` / `Lienzo.Contorno()` al cerrar el dibujo, igual que en
+  los iconos.
+- **Ningún fotograma de personaje toca el borde de su celda** **[V]**. Para eso está el
+  margen. Lo que se salga se corta en seco y no se nota hasta verlo en marcha: el
+  fogonazo salía partido por la mitad y la txapela decapitada, y costó verlo.
 
 ## Tipografía
 

@@ -179,6 +179,9 @@ que sobreviven.
 ```bash
 node herramientas/html/estilo.js      # ¿el arte cumple la guía?
 node herramientas/html/iconos.js      # todos los iconos en una hoja, a dos tamaños
+node herramientas/html/personajes.js  # las hojas de personaje, para juzgarlas
+node herramientas/html/personajes.js --esc 8 --que protagonista,ertzaina
+node herramientas/html/captura.js    # el juego en marcha, para ver el arte en la calle
 node herramientas/html/fuentes.js     # seis fuentes en una imagen, para elegir
 python3 herramientas/sprites/pixellab.py --simular   # sprites de PixelLab, sin gastar red
 ```

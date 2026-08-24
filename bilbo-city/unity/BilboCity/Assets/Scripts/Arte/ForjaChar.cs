@@ -19,7 +19,13 @@ public struct Arquetipo {
 /// y accesorio. 8 direcciones × 14 poses por arquetipo, todo en una hoja.
 /// </summary>
 public static class ForjaChar {
-    public const int CW = 20, CH = 26;          // tamaño de celda
+    // La figura se dibuja en una caja de 20×26 y esas coordenadas no se tocan. Lo de
+    // alrededor es margen, y hace falta: el puñetazo, el fogonazo y el carro de la compra
+    // se salen de la caja, y el moño, la txapela y el casco de obra asoman por arriba.
+    // Contra el borde de la celda se cortaban en seco, y encima no quedaba sitio para el
+    // contorno de la silueta.
+    public const int MG_X = 7, MG_ARR = 8, MG_ABA = 4;
+    public const int CW = 20 + MG_X * 2, CH = 26 + MG_ARR + MG_ABA;   // tamaño de celda
     public const int NPOSES = 14, NDIRS = 8;
 
     const int AB = 0, AR = 1, IZ = 2, DE = 3;
@@ -149,7 +155,7 @@ public static class ForjaChar {
 
     public static readonly string[] PeatonArq = { "p1","p2","p3","p4","p5","p6","p7","p8" };
 
-    /// <summary>Dibuja un fotograma de personaje en un lienzo de 20×26.</summary>
+    /// <summary>Dibuja un fotograma de personaje: caja de 20×26 con margen alrededor.</summary>
     public static Lienzo Dibujar(Arquetipo cfg, Pose pose, int d8) {
         var L = new Lienzo(CW, CH);
         int dir = BaseDir[d8];
@@ -163,13 +169,13 @@ public static class ForjaChar {
 
         bool diag = frente || espalda;
         bool lateral = (dir == DE || dir == IZ) && !diag;
-        int cx = 10 + (diag ? (dir == DE ? -1 : 1) : 0) + (lateral ? (dir == DE ? 1 : -1) : 0);
+        int cx = MG_X + 10 + (diag ? (dir == DE ? -1 : 1) : 0) + (lateral ? (dir == DE ? 1 : -1) : 0);
         int oy = P_.y;
         int hom = hom0 - (diag ? 1 : 0) - (lateral ? 2 : 0);
         bool izqV = dir == IZ, derV = dir == DE, arr = (dir == AR) || espalda;
 
         // ── piernas ──
-        int py = 17 + oy, l1 = P_.p0, l2 = P_.p1;
+        int py = MG_ARR + 17 + oy, l1 = P_.p0, l2 = P_.p1;
         if (PN.falda) {
             L.P(cx - compW/2 - 1, py - 1, compW + 2, 6, PN.b);
             L.P(cx - compW/2 - 1, py + 4, compW + 2, 1, PN.s);
@@ -187,11 +193,12 @@ public static class ForjaChar {
             if (PN.corto) { L.P(cx - 3, py + 4, 3, 4, cfg.Piel); L.P(cx, py + 4, 3, 4, cfg.Piel); }
         }
         var zap = Calzado(cfg.Calzado);
-        if (lateral) { int dx = derV ? 1 : -1; L.P(cx - 2 - dx, 24 + oy, 3, 2, zap); L.P(cx - 2 + dx, 24 + oy, 4, 2, zap); }
-        else { L.P(cx - 3, 24 + oy, 3, 2, zap); L.P(cx, 24 + oy, 3, 2, zap); }
+        int zy = MG_ARR + 24 + oy;
+        if (lateral) { int dx = derV ? 1 : -1; L.P(cx - 2 - dx, zy, 3, 2, zap); L.P(cx - 2 + dx, zy, 4, 2, zap); }
+        else { L.P(cx - 3, zy, 3, 2, zap); L.P(cx, zy, 3, 2, zap); }
 
         // ── torso ──
-        int ty = 9 + oy, th = T.largo ? 10 : 8;
+        int ty = MG_ARR + 9 + oy, th = T.largo ? 10 : 8;
         L.P(cx - hom/2, ty, hom, th, T.b);
         L.P(cx - hom/2, ty, hom, 2, T.l);
         L.P(cx + hom/2 - 1, ty, 1, th, T.s);
@@ -228,7 +235,7 @@ public static class ForjaChar {
         }
 
         // ── cabeza ──
-        int hy = 1 + oy;
+        int hy = MG_ARR + 1 + oy;
         L.P(cx - 4, hy, 8, 8, cfg.Piel);
         L.P(cx + 3, hy, 1, 8, cfg.PielS);
         L.P(cx - 4, hy, 8, 1, cfg.PielS);
@@ -258,22 +265,32 @@ public static class ForjaChar {
 
         // ── gorro ──
         switch (cfg.Gorro) {
+            // Los gorros llevan su brillo de arriba a la izquierda como todo lo demás. Y
+            // ninguno pasa de diez píxeles de ancho: la cabeza mide ocho, y con el contorno
+            // alrededor un gorro de doce deja de parecer un gorro y parece una nube.
             case "txapela":
-                L.P(cx - 5, hy - 3, 10, 3, Paleta.Carbon); L.P(cx - 6, hy - 1, 12, 2, Paleta.Carbon);
+                L.P(cx - 4, hy - 3, 8, 3, Paleta.Carbon); L.P(cx - 4, hy - 3, 5, 1, Paleta.Gris);
+                L.P(cx - 5, hy, 10, 1, Paleta.Carbon); L.P(cx - 5, hy, 4, 1, Paleta.Gris);
                 L.P(cx - 1, hy - 4, 2, 1, Paleta.Gris); break;
             case "gorra":
-                L.P(cx - 4, hy - 3, 8, 3, cfg.GorroCol); if (!arr) L.P(cx - 4, hy, 6, 1, cfg.GorroCol); break;
+                L.P(cx - 4, hy - 3, 8, 3, cfg.GorroCol); L.P(cx - 4, hy - 3, 5, 1, Paleta.Hueso);
+                if (!arr) L.P(cx - 4, hy, 6, 1, cfg.GorroCol); break;
             case "visera":
-                L.P(cx - 4, hy - 2, 8, 2, cfg.GorroCol); if (!arr) L.P(cx - 5, hy, 7, 1, cfg.GorroCol); break;
+                L.P(cx - 4, hy - 2, 8, 2, cfg.GorroCol); L.P(cx - 4, hy - 2, 5, 1, Paleta.Hueso);
+                if (!arr) L.P(cx - 5, hy, 7, 1, cfg.GorroCol); break;
             case "cascoObra":
-                L.P(cx - 5, hy - 4, 10, 5, Paleta.Mostaza); L.P(cx - 6, hy, 12, 1, Paleta.MostazaO);
+                L.P(cx - 5, hy - 4, 10, 5, Paleta.Mostaza); L.P(cx - 5, hy - 4, 6, 1, Paleta.Hueso);
+                L.P(cx + 4, hy - 4, 1, 5, Paleta.MostazaO); L.P(cx - 6, hy, 12, 1, Paleta.MostazaO);
                 L.P(cx - 1, hy - 5, 2, 1, Paleta.MostazaO); break;
             case "cascoMoto":
-                L.P(cx - 5, hy - 3, 10, 9, Paleta.Rojo); if (!arr) L.P(cx - 3, hy + 2, 6, 3, Paleta.Carbon); break;
+                L.P(cx - 5, hy - 3, 10, 9, Paleta.Rojo); L.P(cx - 5, hy - 3, 6, 1, Paleta.RojoL);
+                L.P(cx + 4, hy - 3, 1, 9, Paleta.RojoO);
+                if (!arr) L.P(cx - 3, hy + 2, 6, 3, Paleta.Carbon); break;
             case "lana":
-                L.P(cx - 4, hy - 3, 8, 4, Paleta.RojoO); L.P(cx - 4, hy + 1, 8, 1, Paleta.Rojo); break;
+                L.P(cx - 4, hy - 3, 8, 4, Paleta.RojoO); L.P(cx - 4, hy - 3, 5, 1, Paleta.Rojo);
+                L.P(cx - 4, hy + 1, 8, 1, Paleta.Rojo); break;
             case "policia":
-                L.P(cx - 4, hy - 3, 8, 3, Paleta.AzulO);
+                L.P(cx - 4, hy - 3, 8, 3, Paleta.AzulO); L.P(cx - 4, hy - 3, 5, 1, Paleta.Azul);
                 if (!arr) { L.P(cx - 5, hy, 8, 1, Paleta.AzulO); L.P(cx - 1, hy - 2, 2, 1, Paleta.Mostaza); }
                 break;
             case "capucha":
@@ -308,6 +325,11 @@ public static class ForjaChar {
             else if (izqV) L.P(cx - hom/2 - 8, ty + 2, 3, 3, Paleta.Mostaza);
             else L.P(cx + hom/2 - 1, ty + 9, 3, 3, Paleta.Mostaza);
         }
+        // Contorno solo por fuera, como los iconos y por lo mismo: la gente cruza del
+        // asfalto a la acera y de la acera al parque, y una cazadora gris sobre hormigón
+        // gris sin borde se deshace. Las costuras de la ropa no llevan, que a 20 píxeles
+        // taparían el dibujo.
+        L.Contorno(Paleta.Negro);
         return L;
     }
 
@@ -330,7 +352,9 @@ public static class ForjaChar {
             for (int d = 0; d < NDIRS; d++) {
                 int rx = d * CW;
                 int ry = ah - (p + 1) * CH;   // la textura va de abajo arriba
-                s[p * NDIRS + d] = Utiles.Rebanada(tex, rx, ry, CW, CH, 10f, 6f);
+                // El pivote es el de la caja de 20×26, corrido por el margen: si se deja
+                // en el centro de la celda, el personaje flota sobre sus propios pies.
+                s[p * NDIRS + d] = Utiles.Rebanada(tex, rx, ry, CW, CH, 10f + MG_X, 6f + MG_ABA);
             }
         Hojas[arq] = s;
         return s;

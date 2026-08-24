@@ -73,7 +73,25 @@ ACCION = {
     'pega': 'punching forward', 'apunta': 'aiming a pistol',
     'dispara': 'firing a pistol', 'herido': 'staggering, hurt',
 }
-CEL_W, CEL_H = 24, 32          # medida de cada casilla de la hoja
+
+
+def _celda_forja():
+    """La celda que usa la forja del juego, leída del propio juego.
+
+    No se pone a mano. La forja dibuja la figura en una caja de 20×26 y le deja un margen
+    alrededor para el puñetazo, el fogonazo, los gorros altos y el contorno; si la hoja
+    traída viniera más pequeña que esa celda, el juego recortaría los arquetipos que sí
+    forja y nadie ataría cabos.
+    """
+    s = open(HTML, encoding='utf-8').read()
+    m = re.search(r'const MG_X=(\d+), MG_ARR=(\d+), MG_ABA=(\d+);', s)
+    if not m:
+        raise SystemExit('no encuentro los márgenes de la forja en el HTML')
+    mx, arr, aba = (int(g) for g in m.groups())
+    return 20 + mx * 2, 26 + arr + aba
+
+
+CEL_W, CEL_H = _celda_forja()  # medida de cada casilla de la hoja
 
 
 def paleta():
@@ -143,7 +161,7 @@ def _silueta(direccion, accion):
     im = Image.new('RGBA', (CEL_W, CEL_H), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     tono = (60 + 12 * DIRECCIONES.index(direccion), 90, 120, 255)
-    cx, base = CEL_W // 2, CEL_H - 2
+    cx, base = CEL_W // 2, CEL_H - 4      # los pies, donde los pone la forja
     paso = 2 if 'walk' in accion or 'run' in accion else 0
     d.rectangle([cx - 4, base - 16, cx + 4, base - 4], fill=tono)          # torso
     d.ellipse([cx - 4, base - 24, cx + 4, base - 16], fill=(230, 200, 170, 255))
