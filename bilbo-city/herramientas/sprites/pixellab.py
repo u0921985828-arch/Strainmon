@@ -51,8 +51,14 @@ CAMPO_IMAGEN  = 'image'                        # respuesta: {"image": {"base64":
 # El juego dibuja desde arriba y algo escorado, así que la vista es cenital alta. Las
 # descripciones van en inglés porque es lo que entiende el modelo; los nombres, no.
 VISTA = 'high top-down'
-ESTILO = ('16-bit pixel art sprite, top-down GTA-style, dark muted 1990s Bilbao, '
-          'flat shading, black outline, transparent background')
+# La descripción es del aspecto que queremos, no de la obra de nadie. Pedirle a un
+# generador el estilo de un juego con dueño es hacerle producir algo derivado de ese
+# juego, y ese algo acabaría dentro del nuestro. Lo que va aquí es lo mismo que dice
+# referencia/ESTILO.md, en inglés y con sus propias palabras.
+ESTILO = ('16-bit pixel art sprite, high top-down view of a character, chunky proportions '
+          'with a large head, dark muted palette, industrial northern Spain in the late '
+          '1990s, concrete grey and rust and amber, flat shading, light from the upper '
+          'left, single-colour black outline, transparent background')
 
 PERSONAJES = {
     'protagonista': 'young man, black leather jacket, jeans, basque txapela beret, boots',
