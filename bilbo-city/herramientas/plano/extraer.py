@@ -810,7 +810,7 @@ def _clave_calle(t):
     return re.sub(r'[^a-z0-9]', '', t.lower())
 
 
-def _cadenas(pdf):
+def _letras(pdf):
     """Reconstruye los rótulos del mapa juntando las letras que van seguidas.
 
     El plano no escribe 'ALAMEDA URQUIJO' de un tirón: reparte las letras a lo largo de la
@@ -838,10 +838,42 @@ def _cadenas(pdf):
                     x0, y0, x1, y1 = ch['bbox']
                     letras.append([ch['c'], (x0 + x1) / 2, (y0 + y1) / 2,
                                    max(2.0, y1 - y0), dx, dy, cuerpo])
-    LADO = 24
+    return letras
+
+
+LADO_CUBO = 24
+
+
+def _vecinas(letras, largo_max=2.0, ancho_max=.5, dir_min=.97):
+    """Qué letra puede ir detrás de cuál: mismo cuerpo, misma dirección, misma línea de
+    base y a menos de dos cuerpos por delante.
+
+    Los márgenes por defecto son apretados porque al armar cadenas a ciegas un margen
+    generoso las hace saltar de un rótulo al de al lado. Al rastrear un nombre concreto no
+    hace falta tanta prudencia —el propio nombre valida el resultado— y se aflojan."""
     cubo = {}
     for i, L in enumerate(letras):
-        cubo.setdefault((int(L[1] // LADO), int(L[2] // LADO)), []).append(i)
+        cubo.setdefault((int(L[1] // LADO_CUBO), int(L[2] // LADO_CUBO)), []).append(i)
+    sig = [[] for _ in letras]
+    for i, A in enumerate(letras):
+        cx, cy, h, ux, uy, cuerpo = A[1], A[2], A[3], A[4], A[5], A[6]
+        for ddx in (-1, 0, 1):
+            for ddy in (-1, 0, 1):
+                for j in cubo.get((int(cx // LADO_CUBO) + ddx, int(cy // LADO_CUBO) + ddy), ()):
+                    if j == i:
+                        continue
+                    B = letras[j]
+                    if B[6] != cuerpo or ux * B[4] + uy * B[5] < dir_min:
+                        continue
+                    vx, vy = B[1] - cx, B[2] - cy
+                    largo = vx * ux + vy * uy
+                    if not (0 < largo <= largo_max * h) or abs(-vx * uy + vy * ux) > ancho_max * h:
+                        continue
+                    sig[i].append(j)
+    return sig, cubo
+
+
+def _cadenas_de(letras):
     padre = list(range(len(letras)))
 
     def raiz(a):
@@ -850,26 +882,12 @@ def _cadenas(pdf):
             a = padre[a]
         return a
 
-    for i, A in enumerate(letras):
-        cx, cy, h, ux, uy, cuerpo = A[1], A[2], A[3], A[4], A[5], A[6]
-        for ddx in (-1, 0, 1):
-            for ddy in (-1, 0, 1):
-                for j in cubo.get((int(cx // LADO) + ddx, int(cy // LADO) + ddy), ()):
-                    if j == i:
-                        continue
-                    B = letras[j]
-                    if B[6] != cuerpo:                     # otro cuerpo, otro rótulo
-                        continue
-                    if ux * B[4] + uy * B[5] < .97:        # escritas en otra dirección
-                        continue
-                    vx, vy = B[1] - cx, B[2] - cy
-                    largo = vx * ux + vy * uy              # a lo largo del renglón
-                    ancho = abs(-vx * uy + vy * ux)        # separación de la línea de base
-                    if not (0 < largo <= 2.0 * h) or ancho > .5 * h:
-                        continue
-                    ra, rb = raiz(i), raiz(j)
-                    if ra != rb:
-                        padre[ra] = rb
+    sig, _ = _vecinas(letras)
+    for i in range(len(letras)):
+        for j in sig[i]:
+            ra, rb = raiz(i), raiz(j)
+            if ra != rb:
+                padre[ra] = rb
     grupos = {}
     for i in range(len(letras)):
         grupos.setdefault(raiz(i), []).append(i)
@@ -882,6 +900,57 @@ def _cadenas(pdf):
                       sum(letras[i][1] for i in g) / len(g),
                       sum(letras[i][2] for i in g) / len(g)))
     return fuera
+
+
+def _variantes(nombre):
+    """Las formas en que un nombre del índice puede estar escrito sobre el mapa."""
+    pal = [p for p in re.split(r'[\s.]+', nombre) if p]
+    fuera, vistos = [], set()
+
+    def mete(k):
+        if len(k) >= 5 and k not in vistos:
+            vistos.add(k)
+            fuera.append(k)
+
+    for i in range(len(pal)):
+        mete(_clave_calle(''.join(pal[i:] + pal[:i])))
+    for p in sorted(pal, key=len, reverse=True):
+        mete(_clave_calle(p))
+    return fuera
+
+
+def _rastrea(clave, letras, sig, nl, arranques):
+    """Busca un nombre concreto entre las letras del mapa, siguiéndolas una a una.
+
+    Es la búsqueda al revés, y es la que recupera las calles que la otra pierde. Armar
+    cadenas y luego mirar a ver qué dicen falla cuando la cadena se rompe: media calle por
+    un lado, media por otro, y ninguna de las dos mitades se parece a nada del índice.
+    Aquí ya se sabe QUÉ se busca —'Iturribide'— así que se arranca de cada 'i' de su
+    casilla y se va tirando de letra en letra a ver si sale la palabra entera. Que el
+    rótulo esté partido en dos spans o dé la vuelta a una curva deja de importar.
+
+    Devuelve el centro de lo encontrado, o None."""
+    tope = len(clave)
+    for a in arranques:
+        if nl[a] != clave[0]:
+            continue
+        pila = [(a, 1, [a])]
+        vistos = set()
+        while pila:
+            i, k, cam = pila.pop()
+            if k == tope:
+                return (sum(letras[j][1] for j in cam) / len(cam),
+                        sum(letras[j][2] for j in cam) / len(cam))
+            if (i, k) in vistos:
+                continue
+            vistos.add((i, k))
+            for j in sig[i]:
+                c = nl[j]
+                if not c:                       # un signo de puntuación: se atraviesa
+                    pila.append((j, k, cam + [j]))
+                elif c == clave[k]:
+                    pila.append((j, k + 1, cam + [j]))
+    return None
 
 
 # La cuadrícula del plano: siete columnas (A-G) por siete filas (1-7) sobre el recorte.
@@ -904,9 +973,13 @@ def calles_de(pdf, rej):
     # compara con las calles que pueden estar donde él está, y no con las mil cuatrocientas.
     por_celda = {}
     for k, ent in indice.items():
-        por_celda.setdefault((ent[1], ent[2]), []).append((k, ent))
+        # Con todas las formas del nombre, no solo la del índice: el índice lo invierte
+        # para ordenarlo —'Aguirre Lehendakari'— y el mapa lo escribe como se dice.
+        for v in set(_variantes(ent[0])) | {k}:
+            por_celda.setdefault((ent[1], ent[2]), []).append((v, ent))
+    letras = _letras(pdf)
     por_nombre = {}
-    for txt, x, y in _cadenas(pdf):
+    for txt, x, y in _cadenas_de(letras):
         k = _clave_calle(txt)
         if len(k) < 5:
             continue
@@ -946,6 +1019,43 @@ def calles_de(pdf, rej):
         if mejor is None or empate:
             continue
         por_nombre.setdefault(mejor[0], []).append((gx, gy))
+    # Segunda pasada: las que no ha encontrado nadie, se buscan por su nombre. Armar
+    # cadenas y ver qué dicen pierde toda calle cuyo rótulo se rompa por el medio; sabiendo
+    # de antemano qué palabra se busca, se rastrea letra a letra y da igual dónde se rompa.
+    puestas = {_clave_calle(n) for n in por_nombre}
+    nl = [_clave_calle(L[0]) for L in letras]
+    sig, cubo = _vecinas(letras, largo_max=3.4, ancho_max=1.0, dir_min=.90)
+    # Las letras de cada casilla de la cuadrícula, para no arrancar desde toda la ciudad.
+    porcel = {}
+    for i, L in enumerate(letras):
+        gx, gy = a_casilla(L[1], L[2])
+        if 0 <= gx < MW and 0 <= gy < MH:
+            porcel.setdefault(_celda(gx, gy), []).append(i)
+    for ik, ent in indice.items():
+        nombre = ent[0]
+        if _clave_calle(nombre) in puestas or len(ik) < 5:
+            continue
+        arranques = []
+        for dc in (-1, 0, 1):
+            for df in (-1, 0, 1):
+                arranques += porcel.get((chr(ord(ent[1]) + dc), ent[2] + df), [])
+        # El índice invierte el nombre para ordenarlo alfabéticamente —'Aguirre
+        # Lehendakari'— y el mapa lo escribe como se dice —'LEHENDAKARI AGIRRE'—, así que
+        # buscando el índice tal cual no aparece ninguna. Se prueban las rotaciones del
+        # orden de las palabras, y de última las palabras largas sueltas.
+        hallado = None
+        for cand in _variantes(nombre):
+            hallado = _rastrea(cand, letras, sig, nl, arranques)
+            if hallado is not None:
+                break
+        if hallado is None:
+            continue
+        gx, gy = a_casilla(*hallado)
+        if not (0 <= gx < MW and 0 <= gy < MH) or not _cerca_de_via(rej, gx, gy):
+            continue
+        por_nombre.setdefault(nombre, []).append((gx, gy))
+        puestas.add(_clave_calle(nombre))
+
     fuera = []
     for nombre, pts in por_nombre.items():
         # La tolerancia de una casilla de cuadrícula da margen para que un mismo nombre se
