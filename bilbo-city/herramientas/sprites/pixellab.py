@@ -148,7 +148,11 @@ def _imagen(resp):
 
 def genera(desc, direccion, accion, clave, simular):
     """Un PNG de un personaje mirando a una dirección y haciendo algo."""
-    etiqueta = f'{desc}|{direccion}|{accion}|{CEL_W}x{CEL_H}'
+    # La procedencia va en la clave. Sin esto, un --simular previo —que es lo primero que
+    # recomienda el LEEME— deja la caché llena de monigotes de relleno, y la tirada de
+    # verdad los encuentra ahí, no llama a PixelLab ni una vez y termina diciendo que todo
+    # ha ido bien. Se paga una tirada para acabar con el mismo dibujo de antes.
+    etiqueta = f'{"sim" if simular else "api"}|{desc}|{direccion}|{accion}|{CEL_W}x{CEL_H}'
     nombre = os.path.join(CACHE, re.sub(r'\W+', '_', etiqueta)[:120] + '.png')
     if os.path.exists(nombre):
         return open(nombre, 'rb').read()

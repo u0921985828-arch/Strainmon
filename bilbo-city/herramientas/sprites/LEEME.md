@@ -30,7 +30,10 @@ hoja de 8 columnas por 14 filas que el juego dibuja. Ojo al coste: cuatro person
 448 llamadas.
 
 Lo que baja se guarda en `cache/` —que no va al repositorio— así que repetir una tirada no
-se paga dos veces y cambiar solo el empaquetado no cuesta nada.
+se paga dos veces y cambiar solo el empaquetado no cuesta nada. **Lo simulado y lo traído
+se guardan con clave distinta** (`sim_` y `api_`): sin eso, el `--simular` que se recomienda
+arriba dejaba la caché llena de monigotes, la tirada de verdad los encontraba, no llamaba a
+PixelLab ni una vez y terminaba diciendo que todo había ido bien.
 
 ## Por qué no entra ni un PNG
 
