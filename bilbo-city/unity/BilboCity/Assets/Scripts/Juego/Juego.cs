@@ -28,8 +28,24 @@ public class Juego : MonoBehaviour {
     bool _listo;
     readonly List<SpriteRenderer> _marcas = new List<SpriteRenderer>();
 
-    static readonly string[] TiposCivil = { "utilitario","berlina","ranchera","todoterreno","taxi","furgoCorta" };
-    static readonly string[] TiposPesado = { "autobus","basura","camionObra","furgoLarga" };
+    static readonly string[] TiposCivil = { "utilitario","berlina","ranchera","todoterreno","taxi","furgoCorta","moto","microbus" };
+    static readonly string[] TiposPesado = { "autobus","basura","camionObra","furgoLarga","bomberos","grua","furgonPoli" };
+    /// <summary>Por la Gran Vía no pasan las mismas cosas que por Zorrotzaurre. La mezcla
+    /// la decide el estilo del barrio, que ya lo tenemos del plano: no hace falta pintar
+    /// rutas a mano.</summary>
+    static readonly Dictionary<string,string[]> TraficoBarrio = new Dictionary<string,string[]> {
+        {"senorial",  new[]{"taxi","berlina","berlina","utilitario","moto","microbus","furgoCorta"}},
+        {"denso",     new[]{"utilitario","moto","moto","taxi","furgoCorta","microbus"}},
+        {"bloques",   new[]{"utilitario","utilitario","ranchera","furgoCorta","moto","todoterreno","microbus"}},
+        {"industrial",new[]{"furgoLarga","camionObra","grua","furgoCorta","todoterreno","basura","ranchera"}},
+        {"abierto",   new[]{"todoterreno","ranchera","utilitario","moto","autobus"}},
+    };
+    public static string TipoParaBarrio(Vector2 p) {
+        var b = Ciudad.BarrioDe(Mathf.RoundToInt(p.x), Mathf.RoundToInt(p.y));
+        string[] l;
+        if (b != null && TraficoBarrio.TryGetValue(b.Estilo, out l)) return l[Utiles.RndI(0, l.Length-1)];
+        return TiposCivil[Utiles.RndI(0, TiposCivil.Length-1)];
+    }
 
     void Awake() {
         I = this;
@@ -143,7 +159,10 @@ public class Juego : MonoBehaviour {
     void Poblar() {
         NuevoCoche(Estado.Sitio_("piso").Pos + new Vector2(1.4f,0), "utilitario", 0, true, 11f);
         for (int i = 0; i < 40; i++)
-            NuevoCoche(Ciudad.PuntoCalle(), TiposCivil[i % TiposCivil.Length], (i+1) % Forja.Libreas.Length, false, 11f);
+            {
+                var p = Ciudad.PuntoCalle();
+                NuevoCoche(p, TipoParaBarrio(p), (i+1) % Forja.Libreas.Length, false, 11f);
+            }
         for (int i = 0; i < 16; i++) NuevoTrafico();
         for (int i = 0; i < 26; i++) {
             var go = new GameObject("peaton");
@@ -196,7 +215,7 @@ public class Juego : MonoBehaviour {
         var p = Ciudad.PuntoCalle(Mathf.RoundToInt(Jug.Pos.x), Mathf.RoundToInt(Jug.Pos.y), 44);
         bool pesado = Random.value < 0.18f;
         r.Pos = p; r.Tx = Mathf.FloorToInt(p.x); r.Ty = Mathf.FloorToInt(p.y);
-        r.Tipo = pesado ? TiposPesado[Utiles.RndI(0,3)] : TiposCivil[Utiles.RndI(0,5)];
+        r.Tipo = pesado ? TiposPesado[Utiles.RndI(0, TiposPesado.Length-1)] : TipoParaBarrio(r.Pos);
         r.Vel = pesado ? 2.7f : 3.7f;
         r.Librea = Utiles.RndI(0, Forja.Libreas.Length-1);
     }

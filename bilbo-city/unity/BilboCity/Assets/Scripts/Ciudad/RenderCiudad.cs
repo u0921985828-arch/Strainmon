@@ -51,8 +51,8 @@ public class RenderCiudad : MonoBehaviour {
         var monte = TileDe(T["monte"]); var monteM = TileDe(T["monteMata"]);
         var monteR = TileDe(T["monteRoca"]);
         var puente = TileDe(T["puente"]); var muelle = TileDe(T["muelle"]);
-        var tejados = new Tile[8]; for (int i = 0; i < 8; i++) tejados[i] = TileDe(Forja.Tejados[i]);
-        var azoteas = new Tile[8]; for (int i = 0; i < 8; i++) azoteas[i] = TileDe(Forja.Azoteas[i]);
+        var tejados = new Tile[Forja.Tejados.Length];
+        for (int i = 0; i < tejados.Length; i++) tejados[i] = TileDe(Forja.Tejados[i]);
 
         int MW = Ciudad.MW, MH = Ciudad.MH;
         var bloque = new TileBase[MW*MH];
@@ -61,11 +61,7 @@ public class RenderCiudad : MonoBehaviour {
                 var t = Ciudad.T(x,y);
                 Tile elegido;
                 switch (t) {
-                    case Suelo.Edif: {
-                        byte r = Ciudad.Roof[y*MW+x];
-                        elegido = r >= 8 ? azoteas[r-8] : tejados[r];
-                        break;
-                    }
+                    case Suelo.Edif: elegido = tejados[Ciudad.Roof[y*MW+x]]; break;
                     case Suelo.Agua: elegido = _aguaA; break;
                     case Suelo.Road: {
                         int h = Utiles.Hash(x,y);

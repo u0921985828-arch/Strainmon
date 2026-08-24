@@ -171,6 +171,44 @@ node herramientas/html/plano.js salida.png --zoom 2 --sin-nombres
 node herramientas/html/manzanas.js                   # el grano de la trama
 ```
 
+## El mundo: tejados, tráfico y gente
+
+Tres cosas que salen del plano sin escribir una coordenada, porque el estilo de cada
+barrio ya viene del extractor:
+
+**Los tejados dicen en qué barrio estás.** Cuatro familias —teja, pizarra, azotea y nave—
+y la elige el barrio de **cada casilla**, no el del rincón por el que el recorrido empezó
+el edificio: la manzana del Casco Viejo es una sola pieza de 6366 casillas que cruza a
+Abando, y tomando el estilo del origen el casco entero salía de pizarra. Los umbrales
+(`familiaTejado`) salen de medir el plano: la mediana de una manzana son 44 casillas y el
+percentil 90 son 220.
+
+Dos cosas que costaron un intento cada una: los tejados son **materia, no objetos** —un
+depósito dibujado dentro del tile se repite en cada casilla y la azotea parece papel
+pintado, así que los remates van sueltos y sembrados por hash como las farolas—; y la
+variante cambia **por parches de 6 casillas**, que con un solo tile una manzana así es una
+plancha lisa.
+
+**El tráfico y los peatones también.** `TRAFICO_BARRIO` y `PEATON_BARRIO` reparten trece
+chasis y dieciocho arquetipos según el estilo: taxis y gabardinas por la Gran Vía, monos de
+faena y camiones en Zorrotzaurre, motos por el Casco.
+
+## El mando
+
+La pantalla en medio y los mandos en el marco. El reparto no se decide de memoria:
+`node herramientas/html/mando.js` abre el juego en Chromium a tamaños de móvil reales,
+mide en píxeles CSS y lo pasa a milímetros. Con el 17 % de marco de la primera versión y el
+joystick atado a la altura, en un móvil de 5,4" el joystick salía a **14,5 mm** —más
+pequeño que el pulgar que lo usa— y los botones a 9,1 mm, justo en el mínimo que se puede
+acertar. Ahora el marco es `clamp(112px, 20%, 220px)` y el joystick se mide **desde el
+marco**: 21 mm y 14,5 mm en ese mismo móvil.
+
+El mando **no lleva ni un degradado de CSS**: los sprites los forja el juego (`forjarMando`)
+en la paleta y con la luz de arriba a la izquierda, como todo lo demás, y el tamaño en
+pantalla va en múltiplos enteros del sprite (`ajustarMando`) para que no salgan píxeles a
+medias. La letra va dentro del sprite y en negro, que sobre plástico de hueso es lo único
+que se lee.
+
 ## Comercio y transporte
 
 Los sitios donde se entra son **doce**, y los cuatro últimos los comparten varios POI: el

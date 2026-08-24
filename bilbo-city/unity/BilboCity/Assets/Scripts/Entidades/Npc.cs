@@ -37,7 +37,7 @@ public class Peaton : Andante {
 
     public void Recolocar(Vector2 cerca) {
         Pos = Ciudad.PuntoAcera(Mathf.RoundToInt(cerca.x), Mathf.RoundToInt(cerca.y), 22);
-        Arq = ForjaChar.PeatonArq[Utiles.RndI(0, ForjaChar.PeatonArq.Length-1)];
+        Arq = ForjaChar.ArqPeaton(Pos);
         Hp = 30; Huye = 0;
     }
 

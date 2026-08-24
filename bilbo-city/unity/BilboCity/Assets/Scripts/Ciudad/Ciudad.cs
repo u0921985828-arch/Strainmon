@@ -82,25 +82,67 @@ public static class Ciudad {
     /// <summary>Un tejado por edificio contiguo.</summary>
     /// Esto sí se calcula aquí y no en el extractor: depende de cuántos tejados haya
     /// forjado el arte, que es cosa del juego y no del plano.
+    /// <summary>Dónde empieza cada familia dentro de Forja.Tejados y cuántas variantes
+    /// tiene: teja, pizarra, azotea y nave, en ese orden.</summary>
+    static readonly System.Collections.Generic.Dictionary<string,int[]> FamRango =
+        new System.Collections.Generic.Dictionary<string,int[]> {
+            {"teja", new[]{0,5}}, {"pizarra", new[]{5,4}}, {"azotea", new[]{9,5}}, {"nave", new[]{14,5}}
+        };
+
+    /// <summary>Qué sombrero le toca a un edificio. Los umbrales salen de medir el plano,
+    /// no de suponer: la mediana de una manzana son 44 casillas, el percentil 90 son 220 y
+    /// el Casco Viejo entero es una sola pieza de 6366. El barrio manda antes que el tamaño
+    /// donde se vive, o el casco sale de chapa ondulada.</summary>
+    public static string FamiliaTejado(string estilo, int celdas) {
+        if (estilo == "industrial") return celdas >= 110 ? "nave" : "azotea";
+        if (estilo == "denso") return "teja";
+        if (estilo == "senorial") return celdas >= 70 ? "pizarra" : "teja";
+        if (celdas >= 900) return "nave";            // cocheras, lonjas, recintos feriales
+        if (estilo == "bloques") return celdas >= 45 ? "azotea" : "teja";
+        return celdas >= 90 ? "azotea" : "teja";
+    }
+
+    public static string FamiliaDe(int idx) {
+        foreach (var kv in FamRango)
+            if (idx >= kv.Value[0] && idx < kv.Value[0] + kv.Value[1]) return kv.Key;
+        return "azotea";
+    }
+
+    /// <summary>Casillas de lado del parche de tejado. Una manzana del casco son seis mil
+    /// casillas: con un solo tile es una plancha lisa, y por parches se lee lo que es —
+    /// muchas casas pegadas— sin inventarse un plano que el municipal no da.</summary>
+    const int Parche = 6;
+
     static void Tejados() {
         var visto = new bool[MW*MH];
-        var pila = new System.Collections.Generic.Stack<Vector2Int>();
+        var celdas = new System.Collections.Generic.List<int>();
         System.Array.Clear(Roof, 0, Roof.Length);
+        var pila = new System.Collections.Generic.Stack<int>();
+        int[] dx = {1,-1,0,0}, dy = {0,0,1,-1};
         for (int y = 0; y < MH; y++)
             for (int x = 0; x < MW; x++) {
-                if (Map[y*MW+x] != (byte)Suelo.Edif || visto[y*MW+x]) continue;
-                int idx = Utiles.Hash(x,y) % 8;
-                bool az = Utiles.Hash(x*3, y*5) % 5 == 0;
-                pila.Clear(); pila.Push(new Vector2Int(x,y)); visto[y*MW+x] = true;
+                int i0 = y*MW + x;
+                if (T(x,y) != Suelo.Edif || visto[i0]) continue;
+                celdas.Clear();
+                pila.Push(i0); visto[i0] = true;
                 while (pila.Count > 0) {
-                    var c = pila.Pop();
-                    Roof[c.y*MW+c.x] = (byte)(az ? 8 + (idx % 8) : idx);
-                    int[] dxs = {1,-1,0,0}, dys = {0,0,1,-1};
+                    int i = pila.Pop(); celdas.Add(i);
+                    int cx = i % MW, cy = i / MW;
                     for (int k = 0; k < 4; k++) {
-                        int nx = c.x+dxs[k], ny = c.y+dys[k];
-                        if (nx < 0 || ny < 0 || nx >= MW || ny >= MH || visto[ny*MW+nx]) continue;
-                        if (Map[ny*MW+nx] == (byte)Suelo.Edif) { visto[ny*MW+nx] = true; pila.Push(new Vector2Int(nx,ny)); }
+                        int nx = cx + dx[k], ny = cy + dy[k];
+                        if (nx < 0 || ny < 0 || nx >= MW || ny >= MH) continue;
+                        int j = ny*MW + nx;
+                        if (T(nx,ny) == Suelo.Edif && !visto[j]) { visto[j] = true; pila.Push(j); }
                     }
+                }
+                // El tamaño es del edificio entero, pero el material lo pone el barrio de
+                // cada casilla: la manzana del Casco Viejo cruza a Abando, y tomando el
+                // estilo del origen el casco entero salía de pizarra.
+                int n = celdas.Count;
+                foreach (int i in celdas) {
+                    var b = BarrioDe(i % MW, i / MW);
+                    var r = FamRango[FamiliaTejado(b != null ? b.Estilo : "bloques", n)];
+                    Roof[i] = (byte)(r[0] + Utiles.Hash((i % MW)/Parche, (i / MW)/Parche) % r[1]);
                 }
             }
     }

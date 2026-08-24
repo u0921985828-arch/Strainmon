@@ -12,7 +12,8 @@ public static class Forja {
     // ═══════════ TILES ═══════════
     public const int TS = 32;
     public static readonly Dictionary<string, Sprite> Tiles = new Dictionary<string, Sprite>();
-    public static Sprite[] Tejados, Azoteas, AguaFrames;
+    /// Los 19 tejados: 5 de teja, 4 de pizarra, 5 de azotea y 5 de nave, en ese orden.
+    public static Sprite[] Tejados, AguaFrames;
     static Texture2D _atlasTiles;
     static readonly List<Lienzo> _pend = new List<Lienzo>();
     static readonly List<string> _pendNom = new List<string>();
@@ -103,39 +104,53 @@ public static class Forja {
         g = T32(); g.Rellenar(Paleta.H("#5e5346")); g.Ruido(new[]{Paleta.H("#524839"),Paleta.H("#6b6052")}, 18);
         for (int y = 0; y < 32; y += 6) g.P(0,y,32,1,Paleta.H("#463d31")); Reg("muelle", g);
 
-        string[,] tej = {
-            {"#6b5d52","#554a41","#867567"}, {"#5c5a63","#4a4850","#75727d"},
-            {"#7a5f52","#635047","#95776a"}, {"#566060","#454e4e","#6e7a7a"},
-            {"#6e6656","#5a5346","#8a806c"}, {"#4d4a52","#3d3b42","#656169"},
-            {"#7d6a4e","#66563e","#998364"}, {"#5a4f4a","#48403c","#736660"}
-        };
-        for (int i = 0; i < 8; i++) {
-            g = T32(); g.Rellenar(Paleta.H(tej[i,0]));
-            g.Ruido(new[]{Paleta.H(tej[i,1]),Paleta.H(tej[i,2])}, 14);
-            for (int y = 6; y < 28; y += 7) g.P(3,y,26,1,Paleta.H(tej[i,1]));
+        // Vista desde arriba, un edificio es su tejado, y hasta aquí todos llevaban el
+        // mismo: el Casco Viejo, el Ensanche y una nave de Zorrotzaurre se veían igual.
+        // Ahora hay cuatro familias y la elige el barrio de cada casilla (Ciudad.Tejados).
+        // Poco contraste dentro del tile a propósito: a treinta y dos píxeles por cinco
+        // metros un tejado tiene que leerse como material y no como rayas.
+        string[,] teja = { {"#8e4f2c","#5f3520"}, {"#8a5c37","#5f4840"}, {"#7a4630","#54301f"},
+                           {"#7a5f52","#4d3728"}, {"#96603a","#63402a"} };
+        for (int i = 0; i < 5; i++) {
+            g = T32(); g.Rellenar(Paleta.H(teja[i,0])); g.Ruido(new[]{Paleta.H(teja[i,1])}, 9);
+            for (int y = 0; y < 32; y += 5) {
+                g.P(0,y,32,1,Paleta.H(teja[i,1]));
+                for (int x = (y/5%2)*4; x < 32; x += 8) g.P(x,y+1,2,4,Paleta.H(teja[i,1]));
+            }
             Reg("tejado"+i, g);
         }
-        // azoteas: lucernario, aire acondicionado, tendedero, antenas, depósito, chapa, óxido, pizarra
-        g = T32(); g.Rellenar(Paleta.H("#5c5a63")); g.Ruido(new[]{Paleta.H("#4a4850")},16);
-        g.P(9,9,14,14,Paleta.H("#7f9aa8")); g.P(11,11,10,10,Paleta.H("#a8c4d0")); Reg("azotea0", g);
-        g = T32(); g.Rellenar(Paleta.H("#5c5a63")); g.Ruido(new[]{Paleta.H("#4a4850")},16);
-        g.P(6,8,14,12,Paleta.Acero); g.P(8,10,10,8,Paleta.AceroO);
-        for (int i = 9; i < 18; i += 3) g.P(i,10,1,8,Paleta.Acero); Reg("azotea1", g);
-        g = T32(); g.Rellenar(Paleta.H("#6e6656")); g.Ruido(new[]{Paleta.H("#5a5346")},14);
-        g.P(4,10,24,1,Paleta.Acero);
-        var ropa = new[]{Paleta.Rojo,Paleta.Blanco,Paleta.Azul,Paleta.Mostaza};
-        for (int i = 0; i < 4; i++) g.P(6+i*6,11,4,7,ropa[i]); Reg("azotea2", g);
-        g = T32(); g.Rellenar(Paleta.H("#5c5a63")); g.Ruido(new[]{Paleta.H("#4a4850")},16);
-        g.P(15,6,2,20,Paleta.Acero); for (int y = 8; y < 22; y += 4) g.P(10,y,12,1,Paleta.Acero); Reg("azotea3", g);
-        g = T32(); g.Rellenar(Paleta.H("#5c5a63")); g.Ruido(new[]{Paleta.H("#4a4850")},16);
-        g.P(8,8,16,16,Paleta.Crema); g.P(10,10,12,12,Paleta.Hormigon); g.P(14,4,4,5,Paleta.Acero); Reg("azotea4", g);
-        g = T32(); g.Rellenar(Paleta.H("#566060"));
-        for (int x = 0; x < 32; x += 4) { g.P(x,0,1,32,Paleta.H("#454e4e")); g.P(x+1,0,1,32,Paleta.H("#6e7a7a")); } Reg("azotea5", g);
-        g = T32(); g.Rellenar(Paleta.H("#6b4f3a"));
-        for (int x = 0; x < 32; x += 4) g.P(x,0,1,32,Paleta.H("#4d3728"));
-        g.Ruido(new[]{Paleta.H("#8a5c37"),Paleta.RojoO}, 22); Reg("azotea6", g);
-        g = T32(); g.Rellenar(Paleta.H("#3f4348")); g.Ruido(new[]{Paleta.H("#33373b"),Paleta.H("#4d5257")},20);
-        for (int y = 0; y < 32; y += 8) g.P(0,y,32,1,Paleta.H("#2c3033")); Reg("azotea7", g);
+        string[,] piz = { {"#585665","#3f3d4a"}, {"#4e545c","#383d44"},
+                          {"#615d69","#46434e"}, {"#4a5460","#353d47"} };
+        for (int i = 0; i < 4; i++) {
+            g = T32(); g.Rellenar(Paleta.H(piz[i,0])); g.Ruido(new[]{Paleta.H(piz[i,1])}, 10);
+            for (int y = 0; y < 32; y += 5)
+                for (int x = (y/5%2)*4; x < 32; x += 8) g.P(x,y,7,4,Paleta.H(piz[i,1]));
+            Reg("tejado"+(5+i), g);
+        }
+        // La azotea es grava y nada más: lo que va encima va suelto, en Mobiliario. Un
+        // depósito dibujado en el tile sale una vez por casilla y parece papel pintado.
+        string[,] gra = { {"#5c5a63","#4a4850"}, {"#63615a","#4e4c46"}, {"#55524b","#423f3a"},
+                          {"#4a5257","#3a4145"}, {"#6b6052","#524839"} };
+        for (int i = 0; i < 5; i++) {
+            g = T32(); g.Rellenar(Paleta.H(gra[i,0])); g.Ruido(new[]{Paleta.H(gra[i,1])}, 30);
+            Reg("tejado"+(9+i), g);
+        }
+        // Naves: chapa ondulada y diente de sierra con los lucernarios.
+        string[,] nav = { {"#7d8a90","#66727a"}, {"#8f8578","#736a5f"}, {"#6d7883","#57616b"} };
+        for (int i = 0; i < 3; i++) {
+            g = T32(); g.Rellenar(Paleta.H(nav[i,0]));
+            for (int x = 0; x < 32; x += 5) g.P(x,0,2,32,Paleta.H(nav[i,1]));
+            Reg("tejado"+(14+i), g);
+        }
+        string[,] sie = { {"#8a949a","#6d787f"}, {"#7f8a86","#65706c"} };
+        for (int i = 0; i < 2; i++) {
+            g = T32(); g.Rellenar(Paleta.H(sie[i,0]));
+            for (int y = 0; y < 32; y += 10) {
+                g.P(0,y,32,6,Paleta.H(sie[i,1]));
+                g.P(0,y+6,32,3,Paleta.H("#a8c4d0"));
+            }
+            Reg("tejado"+(17+i), g);
+        }
 
         // suelos y paredes de interior
         g = T32(); g.Rellenar(Paleta.HormigonL); g.Ruido(new[]{Paleta.Acero,Paleta.Crema,Paleta.HormigonO}, 38);
@@ -218,14 +233,14 @@ public static class Forja {
             int ry = ah - ((i / cols) + 1) * TS;
             Tiles[_pendNom[i]] = Utiles.Rebanada(_atlasTiles, rx, ry, TS, TS, 0f, 0f);
         }
-        Tejados = new Sprite[8]; for (int i = 0; i < 8; i++) Tejados[i] = Tiles["tejado"+i];
-        Azoteas = new Sprite[8]; for (int i = 0; i < 8; i++) Azoteas[i] = Tiles["azotea"+i];
+        Tejados = new Sprite[19]; for (int i = 0; i < 19; i++) Tejados[i] = Tiles["tejado"+i];
         AguaFrames = new[]{ Tiles["agua0"], Tiles["agua1"] };
         _pend.Clear(); _pendNom.Clear();
     }
 
     // ═══════════ VEHÍCULOS ═══════════
-    public struct Chasis { public int l, an, morro, cabX, cabW, cajaX, cajaW; public bool taxi, rotativo, cruz, bus, volquete, alto; }
+    public struct Chasis { public int l, an, morro, cabX, cabW, cajaX, cajaW;
+        public bool taxi, rotativo, cruz, bus, volquete, alto, moto, escalera, brazo, rejilla; }
     public static readonly Dictionary<string, Chasis> Chasises = new Dictionary<string, Chasis> {
         {"utilitario", new Chasis{ l=32,an=18,morro=4,cabX=9,cabW=11 }},
         {"berlina",    new Chasis{ l=38,an=18,morro=6,cabX=12,cabW=12 }},
@@ -240,6 +255,13 @@ public static class Forja {
         {"basura",     new Chasis{ l=46,an=21,morro=5,cabX=8,cabW=9, cajaX=18,cajaW=26 }},
         {"autobus",    new Chasis{ l=56,an=22,morro=3,cabX=6,cabW=46, bus=true }},
         {"camionObra", new Chasis{ l=46,an=21,morro=6,cabX=9,cabW=10, volquete=true }},
+        // Lo que faltaba por la calle: dos ruedas, los bomberos, la grúa municipal, el
+        // microbús de barrio y el furgón de la Ertzaintza.
+        {"moto",       new Chasis{ l=20,an=11,morro=3,cabX=7,cabW=5, moto=true }},
+        {"bomberos",   new Chasis{ l=50,an=22,morro=5,cabX=9,cabW=12, cajaX=22,cajaW=24, rotativo=true, escalera=true }},
+        {"grua",       new Chasis{ l=44,an=20,morro=5,cabX=8,cabW=10, cajaX=19,cajaW=16, brazo=true }},
+        {"microbus",   new Chasis{ l=42,an=20,morro=4,cabX=6,cabW=32, bus=true }},
+        {"furgonPoli", new Chasis{ l=44,an=21,morro=5,cabX=8,cabW=8, cajaX=16,cajaW=24, rotativo=true, rejilla=true }},
     };
     public static readonly string[][] Libreas = {
         new[]{"#c23b22","#952914","#e05b3c"}, new[]{"#3f6f8f","#2f5469","#5b93b5"},
@@ -257,6 +279,17 @@ public static class Forja {
         int ox = 3, oy = 3, l = K.l, an = K.an;
         Color32 baseC = Paleta.H(lib[0]), osc = Paleta.H(lib[1]), cl = Paleta.H(lib[2]);
         if (estado == "quemado") { baseC = Paleta.H("#2a2622"); osc = Paleta.H("#191612"); cl = Paleta.H("#3a352f"); }
+        // La moto no es un coche estrecho: no tiene morro, ni cabina, ni cuatro ruedas.
+        if (K.moto) {
+            L.P(ox+2, oy+2, l-4, an-4, Paleta.Negro);
+            L.P(ox+3, oy+3, l-6, an-6, baseC); L.P(ox+3, oy+3, l-6, 1, cl);
+            L.P(ox+l-7, oy+3, 3, an-6, osc);
+            L.P(ox+1, oy+an/2-2, 4, 4, Paleta.Carbon); L.P(ox+l-5, oy+an/2-2, 4, 4, Paleta.Carbon);
+            L.P(ox+6, oy+1, 5, an-2, Paleta.Carbon);          // el que va encima
+            L.P(ox+7, oy+2, 3, 3, Paleta.Piel2);
+            L.P(ox+l-4, oy+an/2-1, 2, 2, Paleta.H("#e8dfa8"));
+            return L;
+        }
         L.P(ox, oy+1, l, an-2, Paleta.Negro);
         L.P(ox+1, oy+1, l-2, an-2, baseC);
         L.P(ox+1, oy+1, l-2, 2, cl);
@@ -284,6 +317,17 @@ public static class Forja {
             L.P(ox+K.cabX+3, oy+1, 3, an-2, estado == "rotA" ? Paleta.Gris : Paleta.H("#ff3b30"));
         }
         if (K.cruz) { L.P(ox+18, oy+an/2-1, 10, 2, Paleta.Rojo); L.P(ox+22, oy+an/2-5, 2, 10, Paleta.Rojo); }
+        if (K.escalera) {
+            L.P(ox+K.cajaX+1, oy+an/2-4, K.cajaW-2, 8, Paleta.GrisO);
+            for (int i = 2; i < K.cajaW-3; i += 4) L.P(ox+K.cajaX+i, oy+an/2-4, 2, 8, Paleta.Acero);
+        }
+        if (K.brazo) {
+            L.P(ox+K.cajaX+K.cajaW-2, oy+an/2-2, l-K.cajaX-K.cajaW, 4, Paleta.MostazaO);
+            L.P(ox+l-6, oy+an/2-4, 4, 8, Paleta.Carbon);
+            L.P(ox+K.cajaX, oy+2, 4, an-4, Paleta.Mostaza);
+        }
+        if (K.rejilla)
+            for (int i = 1; i < K.cajaW-1; i += 3) L.P(ox+K.cajaX+i, oy+3, 1, an-6, Paleta.GrisO);
         if (estado == "quemado")
             for (int i = 0; i < 14; i++) L.P(ox+2+((i*5)%(l-4)), oy+2+((i*3)%(an-4)), 2, 2, Paleta.H("#1a1714"));
         return L;

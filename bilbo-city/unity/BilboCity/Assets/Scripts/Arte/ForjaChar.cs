@@ -161,11 +161,39 @@ public static class ForjaChar {
             Add(A("nerea","delgada",0,"melena",Paleta.Pelo2,"ninguno",Paleta.Carbon,"polo","vestir","deportivas","ninguno"));
             Add(A("patxi","corpulenta",1,"calvo",Paleta.Pelo1,"ninguno",Paleta.Carbon,"delantal","vestir","zapatos","ninguno"));
             Add(A("gorka","media",2,"corto",Paleta.Pelo1,"gorra",Paleta.Azul,"mono","monoP","botas","ninguno"));
+            // Más gente por la calle. Ocho tipos no llenan una ciudad de siete kilómetros:
+            // a la tercera manzana ya has visto a todo el mundo dos veces.
+            Add(A("p9", "media",   0,"canoso",Paleta.Pelo5,"ninguno",  Paleta.Carbon,"gabardina","vestir",  "zapatos",   "ninguno"));
+            Add(A("p10","delgada", 1,"mono",  Paleta.Pelo2,"ninguno",  Paleta.Carbon,"chaqueta", "falda",   "zapatos",   "bolso"));
+            Add(A("p11","delgada", 2,"corto", Paleta.Pelo1,"ninguno",  Paleta.Carbon,"sudadera", "vaquero", "deportivas","mochila"));
+            Add(A("p12","corpulenta",1,"calvo",Paleta.Pelo1,"lana",    Paleta.Carbon,"jersey",   "cargo",   "botas",     "ninguno"));
+            Add(A("p13","delgada", 0,"coleta",Paleta.Pelo3,"ninguno",  Paleta.Carbon,"camiseta", "short",   "deportivas","ninguno"));
+            Add(A("p14","media",   0,"corto", Paleta.Pelo4,"visera",   Paleta.Blanco,"camisaRem","short",   "deportivas","mochila"));
+            Add(A("p15","corpulenta",3,"rapado",Paleta.Pelo1,"cascoObra",Paleta.Carbon,"mono",   "monoP",   "botas",     "ninguno"));
+            Add(A("p16","media",   1,"corto", Paleta.Pelo2,"ninguno",  Paleta.Carbon,"delantal", "vestir",  "zapatos",   "bandolera"));
+            Add(A("p17","media",   4,"afro",  Paleta.Pelo1,"ninguno",  Paleta.Carbon,"polo",     "vaquero", "deportivas","bandolera"));
+            Add(A("p18","media",   0,"melena",Paleta.Pelo5,"txapela",  Paleta.Carbon,"abrigo",   "vestir",  "zapatos",   "carrito"));
             return _arq;
         }
     }
 
-    public static readonly string[] PeatonArq = { "p1","p2","p3","p4","p5","p6","p7","p8" };
+    public static readonly string[] PeatonArq = { "p1","p2","p3","p4","p5","p6","p7","p8",
+        "p9","p10","p11","p12","p13","p14","p15","p16","p17","p18" };
+    /// <summary>Quién anda por dónde. En la Gran Vía hay gabardinas y en Zorrotzaurre monos
+    /// de faena, y el plano ya nos dice cuál es cuál: no hay que repartir a nadie a mano.</summary>
+    static readonly Dictionary<string,string[]> PeatonBarrio = new Dictionary<string,string[]> {
+        {"senorial",  new[]{"p1","p2","p4","p9","p10","p16","p18"}},
+        {"denso",     new[]{"p1","p3","p5","p8","p11","p16","p17","p18"}},
+        {"bloques",   new[]{"p1","p3","p5","p8","p11","p12","p13","p17","p18"}},
+        {"industrial",new[]{"p6","p7","p12","p15","p15","p5"}},
+        {"abierto",   new[]{"p13","p13","p14","p11","p5","p12"}},
+    };
+    public static string ArqPeaton(Vector2 p) {
+        var b = Ciudad.BarrioDe(Mathf.RoundToInt(p.x), Mathf.RoundToInt(p.y));
+        string[] l;
+        if (b != null && PeatonBarrio.TryGetValue(b.Estilo, out l)) return l[Utiles.RndI(0, l.Length-1)];
+        return PeatonArq[Utiles.RndI(0, PeatonArq.Length-1)];
+    }
 
     /// <summary>Dibuja un fotograma de personaje: caja de 20×26 con margen alrededor.</summary>
     public static Lienzo Dibujar(Arquetipo cfg, Pose pose, int d8) {

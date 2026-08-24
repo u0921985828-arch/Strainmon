@@ -331,6 +331,25 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       bien.push('las 4 pestañas del móvil pintan');
     }
 
+    // ── 2 nonies · los tejados dicen en qué barrio estás ───────────
+    {
+      // El material lo pone el barrio de cada casilla, no el rincón por el que el
+      // recorrido empezó el edificio: la manzana del Casco Viejo cruza a Abando, y
+      // tomando el estilo del origen el casco entero salía de pizarra.
+      const porEst = {};
+      for (let y = 0; y < A.MH; y += 3) for (let x = 0; x < A.MW; x += 3) {
+        if (A.Tc(x, y) !== A.EDIF) continue;
+        const e = A.distDe(x, y).estilo, f = A.famDe(A.roof[y * A.MW + x]);
+        (porEst[e] = porEst[e] || {})[f] = (porEst[e][f] || 0) + 1;
+      }
+      const manda = e => Object.keys(porEst[e] || {}).sort((a, b) => porEst[e][b] - porEst[e][a])[0];
+      for (const [est, esperada] of [['denso', 'teja'], ['senorial', 'pizarra'],
+                                     ['bloques', 'azotea'], ['industrial', 'nave']])
+        ok(manda(est) === esperada,
+           'en los barrios «' + est + '» manda el tejado «' + manda(est) + '», no «' + esperada + '»');
+      bien.push('4 familias de tejado, cada una mandando en su tipo de barrio');
+    }
+
     // ── 3 · los sitios están sobre suelo pisable ───────────────────────
     let accesibles = 0;
     A.POI.forEach(p => {

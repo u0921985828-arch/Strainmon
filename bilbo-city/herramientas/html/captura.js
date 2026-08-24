@@ -2,6 +2,7 @@
  * Saca una captura del juego en marcha, sobre el DOM simulado.
  *
  *   node herramientas/html/captura.js [salida.png] [--pasos N] [--anda N] [--dentro id]
+ *                                       [--donde x,y]
  *
  * El arte se juzga mal en una lámina de contacto: ahí cada sprite está solo y sobre un
  * fondo elegido. En la calle cae encima del asfalto, de la acera y del portal, y al lado
@@ -30,7 +31,17 @@ listo().then(() => {
 
   // Andar un poco antes de la foto: al arrancar, el tráfico y los peatones aún no se han
   // repartido y sale una calle vacía que no se parece a jugar.
-  const anda = opc('--anda') === null ? 70 : opc('--anda');
+  // Plantarse en un sitio concreto del mapa: la ciudad no se parece a sí misma de un
+  // barrio a otro, y una sola foto de Santutxu no dice nada del Casco Viejo.
+  const donde = txt('--donde');
+  if (donde) {
+    const [x, y] = donde.split(',').map(Number);
+    const q = A.puntoAcera(x | 0, y | 0, 30);
+    A.player.x = q.x; A.player.y = q.y; A.player.enCoche = null;
+    paso(30);
+  }
+
+  const anda = donde ? 0 : (opc('--anda') === null ? 70 : opc('--anda'));
   if (anda) { A.teclas['w'] = true; paso(anda); A.teclas['w'] = false; paso(40); }
 
   const dentro = txt('--dentro');

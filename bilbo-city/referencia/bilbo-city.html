@@ -12,7 +12,17 @@ html,body{margin:0;height:100%;overflow:hidden;background:#07090c;color:var(--hu
 /* Consola de mano: la pantalla va en medio y los mandos en el marco, fuera de ella.
    Overlaid sobre el juego los pulgares tapan justo lo que hay que mirar; aquí no tapan
    nada, y además la mano descansa en el marco como en una consola de verdad. */
-canvas#c{position:absolute;left:17%;right:17%;top:5%;bottom:5%;width:66%;height:90%;
+/* El ancho del marco es una sola cuenta y todo lo demás cuelga de ella. Medido con
+   herramientas/html/mando.js en móviles de verdad: con el 17% de antes y el joystick
+   atado a la altura, en un móvil de 5,4" el joystick salía a 14,5 mm — más pequeño que el
+   pulgar que lo usa— y los botones a 9,1 mm, justo en el mínimo que se puede acertar. El
+   marco crece hasta el 20% y el joystick se mide desde el marco, no desde la altura. La
+   pantalla pierde una casilla y media de ancho; el pulgar gana seis milímetros. */
+:root{--marco:clamp(112px,20%,220px);}
+/* El ancho va explícito: un <canvas> es un elemento reemplazado y con width:auto usa su
+   tamaño intrínseco, así que se salía por debajo de los marcos. */
+canvas#c{position:absolute;left:var(--marco);top:5%;bottom:5%;height:90%;
+ width:calc(100% - var(--marco) * 2);
  image-rendering:pixelated;background:#05070a;
  border:2px solid rgba(230,226,214,.14);border-radius:4px;
  box-shadow:0 0 0 6px #0d1116, 0 6px 22px rgba(0,0,0,.75), inset 0 0 40px rgba(0,0,0,.6);}
@@ -28,37 +38,38 @@ body{background:radial-gradient(circle at 50% 40%,#12171d,#080a0d 78%);}
    anda o conduce, con SELECT y OPTIONS encima; a la derecha A y B, y el cambio de arma.
    Todo en porcentajes: un móvil tumbado puede medir 640 o 1280 de ancho y el pulgar
    sigue cayendo en el mismo sitio de la mano. */
-#izq,#der{position:absolute;top:0;bottom:0;width:17%;pointer-events:none;
+#izq,#der{position:absolute;top:0;bottom:0;width:var(--marco);pointer-events:none;
  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4%;}
 #izq{left:0;} #der{right:0;}
 
 /* Las pastillas de arriba: pequeñas y alargadas, que no se pulsan a menudo. */
 .pastillas{display:flex;gap:10%;width:78%;justify-content:center;pointer-events:none;}
-.pas{pointer-events:auto;width:38%;height:min(4.4vh,22px);border-radius:99px;
- background:linear-gradient(180deg,#2a3138,#171c21);border:1px solid rgba(230,226,214,.22);
- box-shadow:0 2px 0 rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;
- font-size:min(2vh,12px);color:rgba(230,226,214,.72);}
-.pas:active{background:linear-gradient(180deg,#d0561f,#8e3316);transform:translateY(1px);}
+/* El mando no lleva ni un degradado: los sprites los forja el juego, en la paleta y con
+   la luz de arriba a la izquierda como todo lo demás, y aquí solo se colocan. El tamaño
+   lo pone ajustarMando() en múltiplos enteros del sprite, que si no salen píxeles a
+   medias. */
+.pas,#joy,#joy i,.btn{background-repeat:no-repeat;background-size:100% 100%;
+ image-rendering:pixelated;-webkit-tap-highlight-color:transparent;}
+.pas{pointer-events:auto;width:var(--pas,56px);height:calc(var(--pas,56px) * 12 / 28);
+ background-image:var(--imgPas);display:flex;align-items:center;justify-content:center;
+ font-size:min(2vh,12px);color:rgba(230,226,214,.78);letter-spacing:.5px;}
+.pas:active{background-image:var(--imgPasP);}
 
-#joy{position:relative;width:min(24vh,120px);height:min(24vh,120px);border-radius:50%;
- pointer-events:auto;background:radial-gradient(circle at 50% 42%,#d8d4c8,#a9a69c);
- box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 -3px 6px rgba(0,0,0,.28);}
-#joy i{position:absolute;left:50%;top:50%;width:66%;height:66%;margin:-33% 0 0 -33%;border-radius:50%;
- background:radial-gradient(circle at 38% 32%,#4b535b,#20262c);
- box-shadow:0 2px 5px rgba(0,0,0,.6);}
+#joy{position:relative;width:var(--joy,128px);height:var(--joy,128px);
+ pointer-events:auto;background-image:var(--imgJoy);}
+#joy i{position:absolute;left:50%;top:50%;width:var(--seta,80px);height:var(--seta,80px);
+ margin:calc(var(--seta,80px) / -2) 0 0 calc(var(--seta,80px) / -2);
+ background-image:var(--imgSeta);}
 /* El aro se enciende al correr: sin botón de correr, es lo que dice que vas a tope. */
-#joy.corre{box-shadow:0 0 0 3px rgba(232,197,71,.8),0 3px 0 rgba(0,0,0,.5);}
+#joy.corre{box-shadow:0 0 0 3px rgba(232,197,71,.85);border-radius:50%;}
 
-/* A y B, redondos y uno encima de otro, como en el boceto. */
-.btn{pointer-events:auto;border-radius:50%;display:flex;align-items:center;justify-content:center;
- font-size:min(2.8vh,18px);font-weight:700;letter-spacing:1px;color:var(--hueso);
- width:min(15vh,78px);height:min(15vh,78px);
- background:radial-gradient(circle at 50% 42%,#d8d4c8,#a9a69c);
- box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 -3px 6px rgba(0,0,0,.28);position:relative;}
-.btn s{position:absolute;width:22%;height:22%;border-radius:50%;background:#20262c;
- right:14%;bottom:16%;box-shadow:inset 0 1px 2px rgba(0,0,0,.7);}
-.btn:active,.btn.on{background:radial-gradient(circle at 50% 42%,#e8935f,#b7451f);
- transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.5);}
+/* A y B, redondos y uno encima de otro, como en el boceto. La letra va dentro del sprite
+   y en negro: sobre plástico de hueso es lo único que se lee. */
+.btn{pointer-events:auto;width:var(--btn,88px);height:var(--btn,88px);
+ background-image:var(--imgA);font-size:0;position:relative;}
+#bB{background-image:var(--imgB);}
+#bA:active,#bA.on{background-image:var(--imgAp);}
+#bB:active,#bB.on{background-image:var(--imgBp);}
 
 /* Tumba el móvil: el juego es apaisado y punto. */
 #gira{position:absolute;inset:0;background:#07090c;z-index:20;display:none;
@@ -163,8 +174,8 @@ img.pix{image-rendering:pixelated;display:block;}
   </div>
   <div id="der">
     <div class="pastillas"><div class="pas" id="bR">⇄ ARMA</div></div>
-    <div class="btn" id="bA">A<s></s></div>
-    <div class="btn" id="bB">B<s></s></div>
+    <div class="btn" id="bA"></div>
+    <div class="btn" id="bB"></div>
   </div>
 </div>
 <div id="gira"><div class="g">📱</div><div class="t">Gira el móvil<br>Bilbo City se juega apaisado</div></div>
@@ -2205,8 +2216,30 @@ const ARQ={
  nerea:A('nerea','delgada',0,'melena',C.pelo2,'ninguno',null,'polo','vestir','deportivas','ninguno'),
  patxi:A('patxi','corpulenta',1,'calvo',C.pelo1,'ninguno',null,'delantal','vestir','zapatos','ninguno'),
  gorka:A('gorka','media',2,'corto',C.pelo1,'gorra',C.azul,'mono','monoP','botas','ninguno'),
+ /* Más gente por la calle. Ocho tipos no llenan una ciudad de siete kilómetros: a la
+    tercera manzana ya has visto a todo el mundo dos veces. */
+ p9: A('p9','media',0,'canoso',C.pelo5,'ninguno',null,'gabardina','vestir','zapatos','ninguno'),
+ p10:A('p10','delgada',1,'mono',C.pelo2,'ninguno',null,'chaqueta','falda','zapatos','bolso'),
+ p11:A('p11','delgada',2,'corto',C.pelo1,'ninguno',null,'sudadera','vaquero','deportivas','mochila'),
+ p12:A('p12','corpulenta',1,'calvo',C.pelo1,'lana',null,'jersey','cargo','botas','ninguno'),
+ p13:A('p13','delgada',0,'coleta',C.pelo3,'ninguno',null,'camiseta','short','deportivas','ninguno'),
+ p14:A('p14','media',0,'corto',C.pelo4,'visera',C.blanco,'camisaRem','short','deportivas','mochila'),
+ p15:A('p15','corpulenta',3,'rapado',C.pelo1,'cascoObra',null,'mono','monoP','botas','ninguno'),
+ p16:A('p16','media',1,'corto',C.pelo2,'ninguno',null,'delantal','vestir','zapatos','bandolera'),
+ p17:A('p17','media',4,'afro',C.pelo1,'ninguno',null,'polo','vaquero','deportivas','bandolera'),
+ p18:A('p18','media',0,'melena',C.pelo5,'txapela',null,'abrigo','vestir','zapatos','carrito'),
 };
-const PEATON_ARQ=['p1','p2','p3','p4','p5','p6','p7','p8'];
+const PEATON_ARQ=['p1','p2','p3','p4','p5','p6','p7','p8','p9','p10','p11','p12',
+ 'p13','p14','p15','p16','p17','p18'];
+/* Quién anda por dónde. En la Gran Vía hay gabardinas y en Zorrotzaurre monos de faena, y
+   el plano ya nos dice cuál es cuál: no hay que repartir a nadie a mano. */
+const PEATON_BARRIO={
+ senorial:  ['p1','p2','p4','p9','p10','p16','p18'],
+ denso:     ['p1','p3','p5','p8','p11','p16','p17','p18'],
+ bloques:   ['p1','p3','p5','p8','p11','p12','p13','p17','p18'],
+ industrial:['p6','p7','p12','p15','p15','p5'],
+ abierto:   ['p13','p13','p14','p11','p5','p12'],
+};
 /* Una hoja por arquetipo: 8 columnas (direcciones) × 14 filas (poses).
 
    Hay dos maneras de tenerla. La de siempre es forjarla aquí, por capas, con el mismo
@@ -2341,6 +2374,7 @@ const GLIFOS_B={};
 for(const k in GLIFOS)GLIFOS_B[k]=GLIFOS[k].map(r=>(r|(r<<1))&63);
 const TINTAS={
  ambar:[C.mostaza,C.rojoO],
+ negra:[C.negro,C.hormigonL],
  hueso:[C.hueso,C.aceroO],
  rojo:[C.rojoL,C.sangre],
  verde:[C.verdeL,C.verdeO],
@@ -2378,6 +2412,10 @@ function flechaDir(d8,col){
 const MARCA={};
 /*═══════════════ TILES ═══════════════*/
 const TILE={};
+/* Familias de tejado, por estilo de barrio. TEJADO_DE dice dónde empieza cada una
+   dentro del índice plano y cuántas variantes tiene. */
+const TEJADOS={},TEJADO_DE={};
+const PARCHE=6;      /* casillas de lado del parche de tejado */
 function T32(fn){const c=lienzo(32,32),g=c.getContext('2d');fn(g);return cuantizar(c);}
 const rell=(g,col)=>P(g,0,0,32,32,col);
 function generarTiles(){
@@ -2427,26 +2465,51 @@ function generarTiles(){
   for(let x=0;x<32;x+=4){P(g,x,0,2,2,C.acero);P(g,x,30,2,2,C.acero);}});
  TILE[MUELLE]=T32(g=>{rell(g,'#5e5346');ruido(g,32,32,['#524839','#6b6052'],18);
   for(let y=0;y<32;y+=6)P(g,0,y,32,1,'#463d31');});
+ /* Vista desde arriba, un edificio es su tejado. Hasta aquí todos llevaban el mismo, con
+    ocho variantes de color repartidas al azar, así que el Casco Viejo, el Ensanche y una
+    nave de Zorrotzaurre se veían igual desde el aire: el plano distinguía las manzanas
+    pero el juego las pintaba a todas de gris.
+
+    Ahora el tejado sale del estilo del barrio y del tamaño del edificio. Teja a dos aguas
+    en el casco, pizarra con buhardillas en el ensanche, azotea de grava con depósitos y
+    tendederos en los bloques, y chapa con lucernarios en diente de sierra en la
+    industria. El bulto lo pone la ciudad, no el azar. */
  const tej=(b,o,cl)=>T32(g=>{rell(g,b);ruido(g,32,32,[o,cl],14);
   for(let y=6;y<28;y+=7)P(g,3,y,26,1,o);});
- TILE.tejados=[tej('#6b5d52','#554a41','#867567'),tej('#5c5a63','#4a4850','#75727d'),
-  tej('#7a5f52','#635047','#95776a'),tej('#566060','#454e4e','#6e7a7a'),
-  tej('#6e6656','#5a5346','#8a806c'),tej('#4d4a52','#3d3b42','#656169'),
-  tej('#7d6a4e','#66563e','#998364'),tej('#5a4f4a','#48403c','#736660')];
- TILE.azoteas=[
-  T32(g=>{rell(g,'#5c5a63');ruido(g,32,32,['#4a4850'],16);P(g,9,9,14,14,'#7f9aa8');P(g,11,11,10,10,'#a8c4d0');}),
-  T32(g=>{rell(g,'#5c5a63');ruido(g,32,32,['#4a4850'],16);P(g,6,8,14,12,C.acero);P(g,8,10,10,8,C.aceroO);
-   for(let i=9;i<18;i+=3)P(g,i,10,1,8,C.acero);}),
-  T32(g=>{rell(g,'#6e6656');ruido(g,32,32,['#5a5346'],14);P(g,4,10,24,1,C.acero);
-   for(let i=0;i<4;i++)P(g,6+i*6,11,4,7,[C.rojo,C.blanco,C.azul,C.mostaza][i]);}),
-  T32(g=>{rell(g,'#5c5a63');ruido(g,32,32,['#4a4850'],16);P(g,15,6,2,20,C.acero);
-   for(let y=8;y<22;y+=4)P(g,10,y,12,1,C.acero);}),
-  T32(g=>{rell(g,'#5c5a63');ruido(g,32,32,['#4a4850'],16);P(g,8,8,16,16,C.crema);
-   P(g,10,10,12,12,C.hormigon);P(g,14,4,4,5,C.acero);}),
-  T32(g=>{rell(g,'#566060');for(let x=0;x<32;x+=4){P(g,x,0,1,32,'#454e4e');P(g,x+1,0,1,32,'#6e7a7a');}}),
-  T32(g=>{rell(g,'#6b4f3a');for(let x=0;x<32;x+=4)P(g,x,0,1,32,'#4d3728');ruido(g,32,32,['#8a5c37',C.rojoO],22);}),
-  T32(g=>{rell(g,'#3f4348');ruido(g,32,32,['#33373b','#4d5257'],20);for(let y=0;y<32;y+=8)P(g,0,y,32,1,'#2c3033');}),
- ];
+ /* Teja árabe: hiladas de canales. Poco contraste a propósito — a treinta y dos píxeles
+    por cinco metros, un tejado tiene que leerse como material y no como rayas. La primera
+    versión llevaba una banda clara en medio de cada tile y toda la ciudad salió a pana. */
+ const teja=(b,o)=>T32(g=>{rell(g,b);ruido(g,32,32,[o],9);
+  for(let y=0;y<32;y+=5){P(g,0,y,32,1,o);
+   for(let x=(y/5%2)*4;x<32;x+=8)P(g,x,y+1,2,4,o);}});
+ /* Pizarra: placas pequeñas y oscuras, a matarrás. */
+ const pizarra=(b,o)=>T32(g=>{rell(g,b);ruido(g,32,32,[o],10);
+  for(let y=0;y<32;y+=5)for(let x=(y/5%2)*4;x<32;x+=8)P(g,x,y,7,4,o);});
+ /* Azotea: grava y nada más. Lo que va encima va suelto. */
+ const grava=(b,o)=>T32(g=>{rell(g,b);ruido(g,32,32,[o],30);});
+ /* Nave: chapa ondulada, y en las grandes el diente de sierra con los lucernarios. */
+ const chapa=(b,o)=>T32(g=>{rell(g,b);for(let x=0;x<32;x+=5)P(g,x,0,2,32,o);});
+ const sierra=(b,o,luz)=>T32(g=>{rell(g,b);
+  for(let y=0;y<32;y+=10){P(g,0,y,32,6,o);P(g,0,y+6,32,3,luz);}});
+
+ /* Tejas de barro viejo, no de tejado nuevo: entre variantes hay un paso corto de tono.
+    Una de ellas era roja de bandera y la manzana entera cantaba desde el otro lado del
+    río. */
+ TEJADOS.teja=[teja('#8e4f2c','#5f3520'),teja('#8a5c37','#5f4840'),
+  teja('#7a4630','#54301f'),teja(C.teja,'#4d3728'),teja('#96603a','#63402a')];
+ TEJADOS.pizarra=[pizarra('#585665','#3f3d4a'),pizarra('#4e545c','#383d44'),
+  pizarra('#615d69','#46434e'),pizarra('#4a5460','#353d47')];
+ TEJADOS.azotea=[grava('#5c5a63','#4a4850'),grava('#63615a','#4e4c46'),
+  grava('#55524b','#423f3a'),grava('#4a5257','#3a4145'),grava('#6b6052','#524839')];
+ TEJADOS.nave=[chapa('#7d8a90','#66727a'),sierra('#8a949a','#6d787f','#a8c4d0'),
+  chapa('#8f8578','#736a5f'),sierra('#7f8a86','#65706c','#a8c4d0'),
+  chapa('#6d7883','#57616b')];
+ /* Un índice plano: el mapa de tejados guarda un número por casilla y no puede permitirse
+    una tupla por edificio. */
+ TILE.tejados=[];
+ for(const fam of Object.keys(TEJADOS)){
+  TEJADO_DE[fam]=[TILE.tejados.length,TEJADOS[fam].length];
+  for(const t of TEJADOS[fam]){FAM_DE[TILE.tejados.length]=fam;TILE.tejados.push(t);}}
  TILE.suelo=T32(g=>{rell(g,'#7a5f3f');ruido(g,32,32,['#654e33','#8f7150'],14);
   for(let i=0;i<32;i+=8)P(g,0,i,32,1,'#654e33');});
  TILE.sueloCasa=T32(g=>{rell(g,C.crema);
@@ -2522,6 +2585,13 @@ const CHASIS={
  basura:{l:46,an:21,morro:5,cabina:[8,9],caja:[18,26]},
  autobus:{l:56,an:22,morro:3,cabina:[6,46],bus:1},
  camionObra:{l:46,an:21,morro:6,cabina:[9,10],volquete:1},
+ /* Lo que faltaba por la calle: dos ruedas, los bomberos, la grúa municipal, el microbús
+    de barrio y el furgón de la Ertzaintza. */
+ moto:{l:20,an:11,morro:3,cabina:[7,5],moto:1},
+ bomberos:{l:50,an:22,morro:5,cabina:[9,12],caja:[22,24],rotativo:1,escalera:1},
+ grua:{l:44,an:20,morro:5,cabina:[8,10],caja:[19,16],brazo:1},
+ microbus:{l:42,an:20,morro:4,cabina:[6,32],bus:1},
+ furgonPoli:{l:44,an:21,morro:5,cabina:[8,8],caja:[16,24],rotativo:1,rejilla:1},
 };
 const LIBREAS=[['#c23b22','#952914','#e05b3c'],['#3f6f8f','#2f5469','#5b93b5'],
  ['#8f8f3f','#6e6e2f','#b3b35b'],['#3f8f6f','#2f6c53','#5bb392'],['#8f5f3f','#6c472f','#b37f5b'],
@@ -2531,6 +2601,17 @@ function dibVeh(tipo,lib,estado){
  const ox=3,oy=3,L=K.l,AN=K.an;
  let base=lib[0],osc=lib[1],cl=lib[2];
  if(estado==='quemado'){base='#2a2622';osc='#191612';cl='#3a352f';}
+ /* La moto no es un coche estrecho: no tiene morro, ni cabina, ni cuatro ruedas. Se
+    dibuja aparte y se acabó. */
+ if(K.moto){
+  P(g,ox+2,oy+2,L-4,AN-4,C.negro);
+  P(g,ox+3,oy+3,L-6,AN-6,base);P(g,ox+3,oy+3,L-6,1,cl);
+  P(g,ox+L-7,oy+3,3,AN-6,osc);
+  P(g,ox+1,oy+AN/2-2,4,4,C.carbon);P(g,ox+L-5,oy+AN/2-2,4,4,C.carbon);
+  P(g,ox+6,oy+1,5,AN-2,C.carbon);                    /* el que va encima */
+  P(g,ox+7,oy+2,3,3,C.piel2);
+  P(g,ox+L-4,oy+AN/2-1,2,2,'#e8dfa8');
+  return cuantizar(c);}
  P(g,ox,oy+1,L,AN-2,C.negro);
  P(g,ox+1,oy+1,L-2,AN-2,base);P(g,ox+1,oy+1,L-2,2,cl);P(g,ox+1,oy+AN-3,L-2,2,osc);
  P(g,ox+2,oy+3,K.morro,AN-6,cl);
@@ -2550,6 +2631,14 @@ function dibVeh(tipo,lib,estado){
  if(K.rotativo){P(g,ox+cxp,oy+1,3,AN-2,estado==='rotA'?'#2f6bff':C.gris);
   P(g,ox+cxp+3,oy+1,3,AN-2,estado==='rotA'?C.gris:'#ff3b30');}
  if(K.cruz){P(g,ox+18,oy+AN/2-1,10,2,C.rojo);P(g,ox+22,oy+AN/2-5,2,10,C.rojo);}
+ if(K.escalera){const[bx,bw]=K.caja;
+  P(g,ox+bx+1,oy+AN/2-4,bw-2,8,C.grisO);
+  for(let i=2;i<bw-3;i+=4)P(g,ox+bx+i,oy+AN/2-4,2,8,C.acero);}
+ if(K.brazo){const[bx,bw]=K.caja;
+  P(g,ox+bx+bw-2,oy+AN/2-2,L-bx-bw,4,C.mostazaO);
+  P(g,ox+L-6,oy+AN/2-4,4,8,C.carbon);P(g,ox+bx,oy+2,4,AN-4,C.mostaza);}
+ if(K.rejilla){const[bx,bw]=K.caja;
+  for(let i=1;i<bw-1;i+=3)P(g,ox+bx+i,oy+3,1,AN-6,C.grisO);}
  if(estado==='abollado')for(let i=0;i<9;i++)P(g,ox+4+((i*7)%(L-8)),oy+3+((i*5)%(AN-6)),2,2,osc);
  if(estado==='quemado')for(let i=0;i<14;i++)P(g,ox+2+((i*5)%(L-4)),oy+2+((i*3)%(AN-4)),2,2,'#1a1714');
  return cuantizar(c);
@@ -2566,6 +2655,26 @@ function generarVeh(){
 const PROP={};
 function S_(w,h,fn){const c=lienzo(w,h),g=c.getContext('2d');fn(g);return cuantizar(c);}
 function generarProps(){
+ /* Lo que hay encima de un tejado. Va suelto y sembrado por hash, como el mobiliario de
+    la acera: dibujado dentro del tile se repetiría en cada casilla del edificio. */
+ PROP.deposito=S_(18,20,g=>{P(g,3,4,12,14,'#7f9aa8');P(g,3,4,12,3,'#a8c4d0');
+  P(g,15,4,2,14,C.aceroO);P(g,4,18,3,2,C.carbon);P(g,12,18,3,2,C.carbon);
+  P(g,5,1,8,3,C.acero);});
+ PROP.climatizador=S_(18,16,g=>{P(g,2,3,14,12,C.acero);P(g,2,3,14,2,C.hueso);
+  P(g,16,3,1,12,C.aceroO);P(g,4,6,10,7,C.aceroO);
+  for(let i=5;i<14;i+=3)P(g,i,6,1,7,C.acero);});
+ PROP.antenaTv=S_(14,26,g=>{P(g,6,8,2,18,C.aceroO);
+  for(let y=2;y<14;y+=4){P(g,2,y,10,1,C.acero);P(g,7,y,1,4,C.acero);}});
+ PROP.tendedero=S_(28,14,g=>{P(g,1,2,1,12,C.aceroO);P(g,26,2,1,12,C.aceroO);
+  P(g,1,3,26,1,C.acero);P(g,1,8,26,1,C.acero);
+  const t=[C.rojo,C.hueso,C.azul,C.mostaza,C.verdeL];
+  for(let i=0;i<5;i++)P(g,3+i*5,4,4,5,t[i]);});
+ PROP.caseta=S_(22,20,g=>{P(g,2,3,18,16,C.hormigon);P(g,2,3,18,3,C.hormigonL);
+  P(g,19,3,1,16,C.hormigonO);P(g,8,9,6,10,C.maderaO);P(g,12,13,1,2,C.mostaza);});
+ PROP.chimenea=S_(12,18,g=>{P(g,2,4,8,14,C.tejaO);P(g,2,4,8,2,C.teja);
+  P(g,9,4,1,14,'#4d3728');P(g,1,2,10,3,C.hormigonO);P(g,1,2,10,1,C.hormigonL);});
+ PROP.lucernario=S_(24,16,g=>{P(g,1,2,22,13,C.aceroO);P(g,3,4,18,9,'#a8c4d0');
+  for(let i=6;i<21;i+=5)P(g,i,4,1,9,C.aceroO);});
  PROP.farola=S_(12,28,g=>{P(g,5,8,2,20,C.asfaltoL);P(g,4,27,4,1,C.carbon);
   P(g,5,6,5,2,C.asfaltoL);P(g,8,7,4,3,C.gris);P(g,9,8,2,2,'#f2e2a8');});
  PROP.semaforo=S_(10,30,g=>{P(g,4,13,2,17,C.carbon);P(g,2,1,6,13,C.grisO);
@@ -2774,22 +2883,58 @@ async function inflar(b64){
 async function cargarCiudad(){
  map.set(await inflar(TRAMA));
  barrioDe.set(await inflar(TRAMA_BARRIO));
- /* Un tejado por edificio contiguo. Esto sí se calcula aquí: depende de cuántos tejados
-    haya pintado generarTiles, que es cosa del juego y no del plano. */
+ /* Un tejado por edificio contiguo, y el tejado lo deciden el barrio y el tamaño. El
+    plano ya distingue las manzanas; esto es lo que hace que además se noten desde el
+    aire. Hay que recorrer el edificio entero antes de elegir, porque hasta que no se
+    acaba no se sabe si es una casa o una nave. */
  roof.fill(0);
- const visto=new Uint8Array(MW*MH);
+ const visto=new Uint8Array(MW*MH),celdas=[];
  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){
   if(map[y*MW+x]!==EDIF||visto[y*MW+x])continue;
-  const idx=hash(x,y)%TILE.tejados.length, az=hash(x*3,y*5)%5===0;
-  const pila=[[x,y]];visto[y*MW+x]=1;
-  while(pila.length){const[cx,cy]=pila.pop();roof[cy*MW+cx]=az?8+(idx%TILE.azoteas.length):idx;
+  celdas.length=0;
+  const pila=[y*MW+x];visto[y*MW+x]=1;
+  while(pila.length){const i=pila.pop();celdas.push(i);
+   const cx=i%MW,cy=(i/MW)|0;
    for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){
     const nx=cx+dx,ny=cy+dy;if(nx<0||ny<0||nx>=MW||ny>=MH)continue;
-    if(map[ny*MW+nx]===EDIF&&!visto[ny*MW+nx]){visto[ny*MW+nx]=1;pila.push([nx,ny]);}}}}
+    const j=ny*MW+nx;
+    if(map[j]===EDIF&&!visto[j]){visto[j]=1;pila.push(j);}}}
+  /* El tamaño es del edificio entero —eso decide si es una casa o una nave— pero el
+     material lo pone el barrio de cada casilla, no el del rincón por el que empezó el
+     recorrido: la manzana del Casco Viejo son 6366 casillas y cruza a Abando, así que
+     tomando el estilo del origen el casco entero salía de pizarra.
+
+     Y la variante cambia por parches, que con un solo tile una manzana así es una plancha
+     lisa; por parches se lee lo que es, muchas casas pegadas. */
+  const n=celdas.length;
+  for(const i of celdas){
+   const est=(BARRIOS[barrioDe[i]]||BARRIOS[0]).estilo;
+   const[base,cuantas]=TEJADO_DE[familiaTejado(est,n)];
+   roof[i]=base+hash(((i%MW)/PARCHE)|0,((i/MW)/PARCHE)|0)%cuantas;}}
  /* borde cerrado: fuera del término municipal no hay nada que visitar */
  for(let x=0;x<MW;x++){pon(x,0,EDIF);pon(x,MH-1,EDIF);}
  for(let y=0;y<MH;y++){pon(0,y,EDIF);pon(MW-1,y,EDIF);}
 }
+/* Qué sombrero le toca a un edificio. El tamaño manda sobre el estilo cuando el edificio
+   es claramente otra cosa: una nave de sesenta casillas en un barrio de bloques sigue
+   siendo una nave, y un bajo de cuatro casillas en el Ensanche no lleva mansarda. */
+/* De qué familia es un índice del atlas de tejados. Se pregunta por casilla al dibujar,
+   así que se resuelve con una tabla y no recorriendo nada. */
+const FAM_DE=[];
+function famDe(idx){return FAM_DE[idx]||'azotea';}
+/* Los umbrales salen de medir el plano, no de suponer: la mediana de una manzana son 44
+   casillas, el percentil 90 son 220 y el Casco Viejo entero es una sola pieza de 6366.
+   La primera versión daba «nave» a partir de 90 y salió media Bilbao de chapa. */
+function familiaTejado(estilo,celdas){
+ if(estilo==='industrial')return celdas>=110?'nave':'azotea';
+ /* El barrio manda antes que el tamaño donde se vive: el Casco Viejo entero es una sola
+    pieza de 6366 casillas, y con la regla del tamaño por delante salía de chapa
+    ondulada. Lo grande solo se vuelve nave donde puede haberla. */
+ if(estilo==='denso')return 'teja';
+ if(estilo==='senorial')return celdas>=70?'pizarra':'teja';
+ if(celdas>=900)return 'nave';                  /* cocheras, lonjas, recintos feriales */
+ if(estilo==='bloques')return celdas>=45?'azotea':'teja';
+ return celdas>=90?'azotea':'teja';}
 const Tc=(x,y)=>(x<0||y<0||x>=MW||y>=MH)?EDIF:map[y*MW+x];
 const rodable=(x,y)=>{const t=Tc(x,y);return t===ROAD||t===PUENTE||t===MUELLE;};
 const andable=t=>t!==EDIF&&t!==AGUA;
@@ -3008,8 +3153,20 @@ function nuevoCoche(x,y,tipo,lib,propio,vmax){
  return{x,y,ang:angCalle(x,y),vx:0,vy:0,tipo,lib,propio,vmax:vmax||11,dano:0,vivo:true};}
 const coches=[],trafico=[],policia=[],enemigos=[],balas=[],parts=[],peatones=[];
 let tuCoche=null;
-const TIPOS_CIVIL=['utilitario','berlina','ranchera','todoterreno','taxi','furgoCorta'];
-const TIPOS_PESADO=['autobus','basura','camionObra','furgoLarga'];
+const TIPOS_CIVIL=['utilitario','berlina','ranchera','todoterreno','taxi','furgoCorta','moto','microbus'];
+const TIPOS_PESADO=['autobus','basura','camionObra','furgoLarga','bomberos','grua','furgonPoli'];
+/* Por la Gran Vía no pasan las mismas cosas que por Zorrotzaurre. La mezcla la decide el
+   estilo del barrio, que ya lo tenemos del plano: no hace falta pintar rutas a mano. */
+const TRAFICO_BARRIO={
+ senorial:  ['taxi','berlina','berlina','utilitario','moto','microbus','furgoCorta'],
+ denso:     ['utilitario','moto','moto','taxi','furgoCorta','microbus'],
+ bloques:   ['utilitario','utilitario','ranchera','furgoCorta','moto','todoterreno','microbus'],
+ industrial:['furgoLarga','camionObra','grua','furgoCorta','todoterreno','basura','ranchera'],
+ abierto:   ['todoterreno','ranchera','utilitario','moto','autobus'],
+};
+const tipoParaBarrio=(x,y)=>{
+ const l=TRAFICO_BARRIO[distDe(clamp(x|0,0,MW-1),clamp(y|0,0,MH-1)).estilo];
+ return l?l[rndi(0,l.length-1)]:TIPOS_CIVIL[rndi(0,TIPOS_CIVIL.length-1)];};
 function poblar(){
  tuCoche=nuevoCoche(poi('piso').p.x+1.4,poi('piso').p.y,'utilitario',0,true,11);
  coches.push(tuCoche);
@@ -3017,7 +3174,7 @@ function poblar(){
     coches que no se ven nunca: son siete kilómetros de calle. Se sueltan alrededor del
     jugador y se reciclan al alejarse, igual que el tráfico y los peatones. */
  for(let i=0;i<40;i++){const p=puntoCalle(player.x|0,player.y|0,48);
-  coches.push(nuevoCoche(p.x,p.y,TIPOS_CIVIL[i%TIPOS_CIVIL.length],(i+1)%LIBREAS.length,false));}
+  coches.push(nuevoCoche(p.x,p.y,tipoParaBarrio(p.x,p.y),(i+1)%LIBREAS.length,false));}
  for(let i=0;i<16;i++)trafico.push(nuevoTrafico(player.x|0,player.y|0));
  for(let i=0;i<26;i++)peatones.push(nuevoPeaton(player.x|0,player.y|0));
 }
@@ -3032,22 +3189,113 @@ function reciclarCoches(){
   if(c.propio||c===player.enCoche||dist(c,player)<=72)continue;
   const p=puntoCalle(player.x|0,player.y|0,54);
   if(dist(p,player)<26)continue;                 /* que no aparezca en las narices */
-  c.x=p.x;c.y=p.y;c.ang=angCalle(p.x,p.y);c.vx=c.vy=0;c.dano=0;c.vivo=true;c.lib=(c.lib+1)%LIBREAS.length;
+  c.x=p.x;c.y=p.y;c.ang=angCalle(p.x,p.y);c.vx=c.vy=0;c.dano=0;c.vivo=true;
+  c.tipo=tipoParaBarrio(p.x,p.y);c.lib=(c.lib+1)%LIBREAS.length;
   hechos++;}
 }
 function nuevoTrafico(cx,cy){
  const p=puntoCalle(cx===undefined?player.x|0:cx,cy===undefined?player.y|0:cy,44);
  const pesado=azar()<.18;
- const tipo=pesado?TIPOS_PESADO[rndi(0,3)]:TIPOS_CIVIL[rndi(0,5)];
+ const tipo=pesado?TIPOS_PESADO[rndi(0,TIPOS_PESADO.length-1)]:tipoParaBarrio(p.x,p.y);
  return{x:p.x,y:p.y,tx:p.x|0,ty:p.y|0,dx:1,dy:0,vel:pesado?2.7:3.7,ang:0,
   tipo,lib:rndi(0,LIBREAS.length-1),frenado:0};}
+function arqPeaton(x,y){
+ const l=PEATON_BARRIO[distDe(clamp(x|0,0,MW-1),clamp(y|0,0,MH-1)).estilo];
+ return (l||PEATON_ARQ)[rndi(0,(l||PEATON_ARQ).length-1)];}
 function nuevoPeaton(cx,cy){const p=puntoAcera(cx,cy,22);
- return{x:p.x,y:p.y,dx:0,dy:0,t:0,arq:PEATON_ARQ[rndi(0,PEATON_ARQ.length-1)],
+ return{x:p.x,y:p.y,dx:0,dy:0,t:0,arq:arqPeaton(p.x,p.y),
   d8:0,pose:'quieto',anim:0,huye:0,hp:30};}
 function particula(x,y,tipo,n=1){
  for(let i=0;i<n;i++){const a=rnd(0,6.283),v=tipo==='sangre'?rnd(1,4):tipo==='chispa'?rnd(2,7):rnd(.4,2.4);
   parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,vida:tipo==='humo'?rnd(.6,1.6):rnd(.25,.7),
    tipo,r:tipo==='humo'?rnd(4,9):rnd(1.5,3.5)});}}
+
+/*═══════════════ EL MANDO, FORJADO ═══════════════*/
+/* El marco era CSS: degradados radiales y una bolita negra de «brillo». Un brillo negro
+   sobre plástico claro no es un brillo, es una mancha —y encima se comía la letra. Aquí
+   todo lo demás se dibuja por código y a la paleta; el mando también.
+
+   Plástico de consola: cuerpo claro, canto vivo arriba a la izquierda, sombra abajo a la
+   derecha, un reflejo blanco arriba —donde pega la luz, que en este juego siempre viene
+   de arriba a la izquierda— y la letra en negro, que es lo único que se lee sobre un
+   botón de hueso. */
+const MANDO={};
+const disco=(g,cx,cy,r,col)=>{
+ for(let y=-r;y<=r;y++)for(let x=-r;x<=r;x++)
+  if(x*x+y*y<=r*r)P(g,cx+x,cy+y,1,1,col);};
+const arco=(g,cx,cy,r,col,d0,d1)=>{
+ for(let y=-r;y<=r;y++)for(let x=-r;x<=r;x++){
+  const q=x*x+y*y;
+  if(q>r*r||q<(r-1.6)*(r-1.6))continue;
+  const a=Math.atan2(y,x);
+  if(a>=d0&&a<=d1)P(g,cx+x,cy+y,1,1,col);}};
+/* Un botón redondo de 24, pulsado o sin pulsar. */
+function botonMando(letra,pulsado){
+ const N=24,c=lienzo(N,N),g=c.getContext('2d'),r=11,cx=12,cy=12;
+ disco(g,cx,cy,r,C.carbon);                                   /* el hueco donde va */
+ const cuerpo=pulsado?C.hormigonO:C.crema, alto=pulsado?C.hormigon:C.hueso;
+ disco(g,cx,cy+(pulsado?1:0),r-1,cuerpo);
+ arco(g,cx,cy+(pulsado?1:0),r-1,alto,-Math.PI,-0.15);          /* canto de arriba */
+ arco(g,cx,cy+(pulsado?1:0),r-1,C.hormigonO,0.25,Math.PI-0.1); /* canto de abajo */
+ if(!pulsado){P(g,7,5,4,2,C.blanco);P(g,6,6,2,2,C.blanco);}    /* el reflejo, en blanco */
+ texto(g,letra,cx-3,cy-3+(pulsado?1:0),1,'negra');
+ return cuantizar(c);}
+/* La base del joystick: un plato cóncavo. */
+function joyBase(){
+ const N=32,c=lienzo(N,N),g=c.getContext('2d');
+ disco(g,16,16,15,C.carbon);
+ disco(g,16,16,14,C.crema);
+ arco(g,16,16,14,C.hueso,-Math.PI,-0.15);
+ arco(g,16,16,14,C.hormigonO,0.25,Math.PI-0.1);
+ disco(g,16,16,9,C.hormigon);                                  /* el hueco del plato */
+ arco(g,16,16,9,C.hormigonO,-Math.PI,-0.15);
+ arco(g,16,16,9,C.hormigonL,0.25,Math.PI-0.1);
+ P(g,9,7,4,2,C.hueso);
+ return cuantizar(c);}
+/* La seta que se mueve dentro del plato. */
+function joySeta(){
+ const N=20,c=lienzo(N,N),g=c.getContext('2d');
+ disco(g,10,10,9,C.negro);
+ disco(g,10,10,8,C.gris);
+ arco(g,10,10,8,C.grisL,-Math.PI,-0.15);
+ arco(g,10,10,8,C.carbon,0.25,Math.PI-0.1);
+ disco(g,10,9,5,C.grisL);
+ P(g,6,5,3,2,C.acero);
+ return cuantizar(c);}
+/* Las pastillas alargadas de arriba. */
+function pastilla(pulsada){
+ const W=28,Hh=12,c=lienzo(W,Hh),g=c.getContext('2d');
+ P(g,0,1,W,Hh-2,C.carbon);P(g,1,0,W-2,Hh,C.carbon);
+ const cuerpo=pulsada?C.hormigonO:C.gris;
+ P(g,1,2,W-2,Hh-4,cuerpo);P(g,2,1,W-4,Hh-2,cuerpo);
+ if(!pulsada){P(g,2,2,W-4,1,C.grisL);P(g,2,Hh-3,W-4,1,C.negro);P(g,3,3,4,1,C.acero);}
+ return cuantizar(c);}
+function forjarMando(){
+ MANDO.a=botonMando('A',0);MANDO.aP=botonMando('A',1);
+ MANDO.b=botonMando('B',0);MANDO.bP=botonMando('B',1);
+ MANDO.joy=joyBase();MANDO.seta=joySeta();
+ MANDO.pas=pastilla(0);MANDO.pasP=pastilla(1);
+ const url=c=>`url(${c.toDataURL()})`;
+ const R=document.documentElement.style;
+ R.setProperty('--imgA',url(MANDO.a));   R.setProperty('--imgAp',url(MANDO.aP));
+ R.setProperty('--imgB',url(MANDO.b));   R.setProperty('--imgBp',url(MANDO.bP));
+ R.setProperty('--imgJoy',url(MANDO.joy));R.setProperty('--imgSeta',url(MANDO.seta));
+ R.setProperty('--imgPas',url(MANDO.pas));R.setProperty('--imgPasP',url(MANDO.pasP));}
+/* Los sprites del mando miden 24 y 32; para que no salgan píxeles a medias, el tamaño en
+   pantalla se redondea a un múltiplo entero, como el zoom del juego. */
+function ajustarMando(){
+ const marco=document.getElementById('izq').clientWidth;
+ if(!marco)return;
+ const alto=innerHeight;
+ const esc=n=>Math.max(2,Math.floor(n));
+ const eBtn=esc(Math.min(marco*.60,alto*.24,110)/24);
+ const eJoy=esc(Math.min(marco*.80,alto*.38,152)/32);
+ const R=document.documentElement.style;
+ R.setProperty('--btn',eBtn*24+'px');
+ R.setProperty('--joy',eJoy*32+'px');
+ R.setProperty('--seta',eJoy*20+'px');
+ R.setProperty('--pas',Math.max(2,Math.floor(Math.min(marco*.42,alto*.06,34)/28))*28+'px');}
+addEventListener('resize',ajustarMando);
 
 /*═══════════════ ENTRADA ═══════════════*/
 /* Un mando de consola repartido en los dos cuartos exteriores de la pantalla apaisada.
@@ -4388,7 +4636,7 @@ function nocheF(){const h=S.min/60;
 const hexRGB=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
 function tileDe(x,y,fa){
  const t=map[y*MW+x];
- if(t===EDIF){const r=roof[y*MW+x];return r>=8?TILE.azoteas[r-8]:TILE.tejados[r];}
+ if(t===EDIF)return TILE.tejados[roof[y*MW+x]]||TILE.tejados[0];
  if(t===AGUA)return TILE.agua[fa];
  if(t===ROAD){
   const h=hash(x,y);
@@ -4456,7 +4704,22 @@ function dibCiudad(){
    else if(h%13===0)ctx.drawImage(PROP.pales,x*TS+5,y*TS+8);
    else if(h%11===0)ctx.drawImage(PROP.bidon,x*TS+10,y*TS+9);}
   else if(t===PATIO){if(h%7===0)ctx.drawImage(PROP.arbolPodado,x*TS+6,y*TS+3);
-   else if(h%9===0)ctx.drawImage(PROP.pales,x*TS+5,y*TS+8);}}
+   else if(h%9===0)ctx.drawImage(PROP.pales,x*TS+5,y*TS+8);}
+  else if(t===EDIF){
+   /* Cada familia de tejado lleva lo suyo: en la teja, chimeneas; en la azotea, depósitos
+      y tendederos; en la nave, lucernarios. Con eso, un bloque de Santutxu y una nave de
+      Zorrotzaurre dejan de ser dos rectángulos grises. */
+   const fam=famDe(roof[y*MW+x]);
+   if(fam==='teja'||fam==='pizarra'){
+    if(h%23===0)ctx.drawImage(PROP.chimenea,x*TS+10,y*TS+4);
+    else if(h%71===0)ctx.drawImage(PROP.antenaTv,x*TS+9,y*TS+2);}
+   else if(fam==='azotea'){
+    if(h%37===0)ctx.drawImage(PROP.deposito,x*TS+7,y*TS+5);
+    else if(h%41===0)ctx.drawImage(PROP.tendedero,x*TS+2,y*TS+9);
+    else if(h%43===0)ctx.drawImage(PROP.climatizador,x*TS+7,y*TS+8);
+    else if(h%47===0)ctx.drawImage(PROP.caseta,x*TS+5,y*TS+6);
+    else if(h%53===0)ctx.drawImage(PROP.antenaTv,x*TS+9,y*TS+2);}
+   else if(h%29===0)ctx.drawImage(PROP.lucernario,x*TS+4,y*TS+8);}}
  /* segunda pasada: los edificios se leen como bloques, no como casillas sueltas */
  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
   if(map[y*MW+x]!==EDIF)continue;
@@ -4732,7 +4995,7 @@ async function arrancar(){
   ['tiles',()=>generarTiles()],
   ['vehículos',()=>generarVeh()],
   ['props',()=>generarProps()],
-  ['iconos',()=>generarIconos()],
+  ['iconos',()=>{generarIconos();forjarMando();ajustarMando();}],
   ['la ciudad',async()=>{await cargarCiudad();colocarPOIs();colocarParadas();}],
   ['el barrio',()=>{player.x=poi('piso').p.x;player.y=poi('piso').p.y;poblar();}],
   ['a la gente',async()=>{await cargarSprites();['protagonista','ertzaina','maton','maton2'].forEach(hoja);}],
