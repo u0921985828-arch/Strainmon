@@ -3,7 +3,7 @@
  * Sirve para ver de un vistazo si un cambio ha roto Bilbao.
  *
  *   node herramientas/html/plano.js [salida.png] [--zoom N] [--sin-nombres]
- *                                   [--calles] [--zona x,y,ancho,alto]
+ *                                   [--calles] [--leyenda] [--zona x,y,ancho,alto]
  *
  * Con --sin-nombres sale el plano pelado, sin rejilla ni rótulos ni chinchetas: para
  * imprimirlo, anotarlo a mano y devolverlo marcado.
@@ -15,6 +15,11 @@
  *
  * Con --zona se recorta un trozo, que a ciudad entera los rótulos no caben: el Ensanche
  * son doce calles en cuatrocientas casillas.
+ *
+ * Y con --leyenda, en vez del nombre encima de cada calle va un número, y debajo del mapa
+ * la lista de qué es cada número. Quinientas trece calles no caben escritas sobre la
+ * ciudad —se tapan unas a otras y no se lee ninguna—, pero numeradas sí: se busca el
+ * número en la leyenda y se comprueba si esa calle va por donde tiene que ir.
  */
 require('./arnes.js');
 const fs = require('fs'), path = require('path');
@@ -22,9 +27,10 @@ const { createCanvas } = require('canvas');
 
 const args = process.argv.slice(2).filter(a => !a.startsWith('--'));
 const zArg = process.argv.indexOf('--zoom');
-const Z = zArg > 0 ? Number(process.argv[zArg + 1]) : 1;
+const Z = zArg > 0 ? Number(process.argv[zArg + 1]) : (process.argv.includes('--leyenda') ? 2 : 1);
 const limpio = process.argv.includes('--sin-nombres');
-const conCalles = process.argv.includes('--calles');
+const conLeyenda = process.argv.includes('--leyenda');
+const conCalles = process.argv.includes('--calles') || conLeyenda;
 const zArg2 = process.argv.indexOf('--zona');
 const ZONA = zArg2 > 0 ? process.argv[zArg2 + 1].split(',').map(Number) : null;
 const salida = args[0] || path.join(__dirname, '..', '..', 'referencia', 'capturas', 'plano-bilbo.png');
@@ -42,7 +48,8 @@ const listo = async () => {
 
 listo().then(() => {
   const A = global.__;
-  const c = createCanvas(A.MW * Z, A.MH * Z), g = c.getContext('2d');
+  let c = createCanvas(A.MW * Z, A.MH * Z);
+  const g = c.getContext('2d');
   g.imageSmoothingEnabled = false;
   const col = { 0:'#4a505a', 1:'#8a8578', 2:'#5c5148', 3:'#6c9658', 4:'#3f7396',
                 5:'#8d99a4', 6:'#a8a294', 7:'#6b5f45', 8:'#3f3a34', 9:'#241f1c',
@@ -63,6 +70,7 @@ listo().then(() => {
     g.fillStyle = 'rgba(12,14,18,.62)';
     g.fillRect(0, 0, c.width, c.height);
     const tono = i => `hsl(${(i * 47) % 360} 85% 62%)`;
+    const centros = [];
     A.CALLES.forEach((via, i) => {
       // Las casillas de esta calle, y de paso su centro y su eje principal.
       let n = 0, sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0;
@@ -79,6 +87,8 @@ listo().then(() => {
       // recta y su opuesta cuenten igual, y luego se deshace: es la cuenta de siempre
       // para la dirección de una mancha alargada.
       const ang = .5 * Math.atan2(2 * (sxy/n - mx*my), (sxx/n - mx*mx) - (syy/n - my*my));
+      centros[i] = [mx, my];
+      if (conLeyenda) return;                     // el rótulo va en la leyenda, no encima
       g.save();
       g.translate(mx * Z, my * Z);
       g.rotate(Math.abs(ang) > Math.PI/2 ? ang - Math.PI : ang);
@@ -88,6 +98,16 @@ listo().then(() => {
       g.strokeText(via.n.toUpperCase(), 0, 0);
       g.fillStyle = tono(i); g.fillText(via.n.toUpperCase(), 0, 0);
       g.restore();
+    });
+    if (!conLeyenda) return;
+    // El número, encima de su calle y con la misma tinta que la leyenda.
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `bold ${9 * Z}px sans-serif`;
+    centros.forEach((c, i) => {
+      if (!c) return;
+      g.lineWidth = 3.5; g.strokeStyle = 'rgba(0,0,0,.95)';
+      g.strokeText(String(i + 1), c[0] * Z, c[1] * Z);
+      g.fillStyle = tono(i); g.fillText(String(i + 1), c[0] * Z, c[1] * Z);
     });
   }
   // ── mobiliario de plano ────────────────────────────────────────────────────────
@@ -119,6 +139,32 @@ listo().then(() => {
 
   }
   fs.mkdirSync(path.dirname(salida), { recursive: true });
+  // ── la leyenda ─────────────────────────────────────────────────────────────────
+  // Debajo del mapa y a varias columnas: quinientas trece líneas en una sola serían más
+  // altas que el propio Bilbao.
+  if (conLeyenda) {
+    const tono = i => `hsl(${(i * 47) % 360} 85% 62%)`;
+    const COLS = 6, ALTO = 15, MARG = 14;
+    const filas = Math.ceil(A.CALLES.length / COLS);
+    const anchoCol = Math.floor((c.width - MARG * 2) / COLS);
+    const alto = c.height + MARG * 2 + filas * ALTO + 30;
+    const hoja2 = createCanvas(c.width, alto), h = hoja2.getContext('2d');
+    h.fillStyle = '#0b0e12'; h.fillRect(0, 0, c.width, alto);
+    h.drawImage(c, 0, 0);
+    h.font = 'bold 15px sans-serif'; h.fillStyle = '#e6e2d6'; h.textAlign = 'left';
+    h.fillText(A.CALLES.length + ' calles del plano municipal de Bilbao',
+               MARG, c.height + MARG + 12);
+    h.font = '12px sans-serif';
+    A.CALLES.forEach((via, i) => {
+      const col = Math.floor(i / filas), fila = i % filas;
+      const x = MARG + col * anchoCol, y = c.height + MARG + 34 + fila * ALTO;
+      h.fillStyle = tono(i);
+      h.fillText(String(i + 1), x, y);
+      h.fillStyle = '#c9c4b6';
+      h.fillText(via.n, x + 30, y);
+    });
+    c = hoja2;
+  }
   let hoja = c;
   if (ZONA) {
     const [zx, zy, zan, zal] = ZONA;
