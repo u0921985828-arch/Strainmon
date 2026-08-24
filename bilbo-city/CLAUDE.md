@@ -477,6 +477,16 @@ arquetipo número treinta y cinco no cuesta ninguna.
 Si no hay hoja de su silueta exacta, el juego busca la más parecida; si no hay ninguna, lo
 forja. **Nunca se queda nadie sin dibujar**, y por eso bajar una sola silueta ya es jugable.
 
+Todo esto se sostiene en que el generador respete los colores de plantilla, y ahí hay dos
+trampas que costaron un fallo cada una. El reparto va **por matiz**, no por color
+normalizado: un brillo del pelo azul, aclarado hacia el blanco, se acerca más al magenta
+del torso que al azul del que salió, y media cabeza acababa repintada del color de la
+chaqueta. Y el **contorno se reconoce por no tener color**, no por ser oscuro: el azul puro
+tiene luminancia 29, así que con un umbral por oscuridad el pelo se iba entero al contorno y
+el arquetipo salía calvo. Los píxeles desvaídos —brillos, sombras apagadas— no se reparten
+por tono: se contagian del vecino con color. El empaquetador avisa cuando falta un color de
+plantilla o cuando la mayoría de la celda vino apagada, y `--diag` enseña el recuento.
+
 Los sprites de PixelLab necesitan clave (`PIXELLAB_API_KEY`) y salida a `api.pixellab.ai`,
 que **desde una sesión de Claude está cerrada**: eso se ejecuta en local. Ver
 `herramientas/sprites/LEEME.md`.

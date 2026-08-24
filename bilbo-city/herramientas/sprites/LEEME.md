@@ -10,6 +10,7 @@ python3 herramientas/sprites/pixellab.py --coste          # solo la cuenta
 python3 herramientas/sprites/pixellab.py --simular        # sin red ni clave
 python3 herramientas/sprites/pixellab.py                  # las siete siluetas
 python3 herramientas/sprites/pixellab.py --que largo_pantalon,abrigo_pantalon
+python3 herramientas/sprites/pixellab.py --diag --que largo_pantalon   # reparto por partes
 ```
 
 ## No se baja un personaje: se baja una silueta
@@ -77,14 +78,45 @@ se guardan con clave distinta** (`sim_` y `api_`): sin eso, el `--simular` que s
 arriba dejaba la caché llena de monigotes, la tirada de verdad los encontraba, no llamaba a
 PixelLab ni una vez y terminaba diciendo que todo había ido bien.
 
+## Lo que hay que mirar en la primera tirada
+
+Todo esto se sostiene sobre una cosa: que el generador **respete los colores de plantilla**.
+Si devuelve la chaqueta sombreada hacia el gris, o se salta un color, el reparto por partes
+se equivoca y no salta ningún error — sale un vecino con media manga del color de la piel y
+no se ve hasta tenerlo en el juego. Por eso el empaquetador avisa solo:
+
+```
+¡ojo! largo_pantalon quieto south: sin calzado, 61% desvaído
+```
+
+«sin *algo*» es que ese color de plantilla no aparece: el generador lo ignoró, y esa parte
+no se podrá repintar. «desvaído» es que devolvió la mayoría de los píxeles sin saturación,
+y el reparto se está apoyando en la vecindad en vez de en el color. Con cualquiera de los
+dos, **para y ajusta el texto antes de seguir**: `CLAVES` para los colores y `ESTILO` para
+el «sin degradados, sin tramado» que los mantiene separables. `--diag` enseña el recuento
+de cada celda.
+
+El reparto se hace **por matiz**, no por color normalizado, y el contorno se reconoce por
+no tener color, no por ser oscuro. Las dos cosas costaron un fallo cada una: normalizando,
+un brillo del pelo azul se acercaba más al magenta del torso que al azul, y media cabeza
+salía repintada de color chaqueta; y con el contorno por oscuridad, el azul del pelo
+—luminancia 29 a plena intensidad— se iba entero al contorno y el personaje salía calvo.
+
 ## Cómo se comprueba sin bajar nada
 
-La batería (`./verificar.sh html`) monta una hoja de mentira con las rampas de plantilla y
-verifica lo único que puede romperse en silencio: que los nombres de silueta que espera el
-juego son los que baja el empaquetador, que las rampas no comparten ni un color, que cada
+Dos baterías, las dos dentro de `./verificar.sh`.
+
+`herramientas/sprites/pruebas_sprites.py` le da al empaquetador colores fabricados —cada
+color de plantilla con su sombra y su brillo, negros de contorno, grises sueltos— y
+comprueba que cada uno acaba en la rampa que le toca, que los matices de plantilla están a
+60° unos de otros, que las poses del juego salen todas de los once dibujos sin sobrar
+ninguno, y que la hoja simulada tiene de verdad sus tres direcciones en espejo y su
+retroceso de un píxel al disparar.
+
+La batería del HTML monta una hoja de mentira con las rampas y verifica el otro extremo:
+que los nombres de silueta que espera el juego son los que baja el empaquetador, que cada
 arquetipo encuentra silueta, que el repintado le pone a cada uno su ropa y que dos vecinos
-de la misma silueta no salen clavados. `--coste` revisa las tablas del empaquetador sin
-tocar nada.
+de la misma silueta no salen clavados. `--coste` revisa las tablas sin tocar nada.
 
 ## Por qué no entra ni un PNG
 

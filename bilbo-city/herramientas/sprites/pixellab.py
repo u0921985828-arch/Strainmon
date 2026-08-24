@@ -69,11 +69,11 @@ CAMPO_IMAGEN  = 'image'                        # respuesta: {"image": {"base64":
 # La piel se queda natural a propósito. Pedirle a un generador una cara magenta le sale
 # mal, y de todas formas un tono carne no se confunde con un magenta, un verde ni un cian.
 CLAVES = {
-    'piel':    ((224, 172, 128), 'natural tan skin'),
-    'pelo':    ((  0,   0, 255), 'bright blue hair, short'),
-    'torso':   ((255,   0, 255), 'bright magenta'),
-    'piernas': ((  0, 255,   0), 'bright green'),
-    'calzado': ((  0, 255, 255), 'bright cyan'),
+    'piel':    ((224, 172, 128), 'plain tan skin'),
+    'pelo':    ((  0,   0, 255), 'short vivid blue hair'),
+    'torso':   ((255,   0, 255), 'vivid magenta'),
+    'piernas': ((  0, 255,   0), 'vivid green'),
+    'calzado': ((  0, 255, 255), 'vivid cyan'),
 }
 # La rampa de la paleta en la que se guarda cada parte. Tienen que ser disjuntas: es lo
 # que permite repintar una parte sin tocar las demás.
@@ -85,7 +85,16 @@ RAMPAS = {
     'calzado': ['maderaO', 'madera', 'maderaL'],
     'contorno': ['negro'],
 }
-LUZ_CONTORNO = 46          # por debajo de esto un píxel es contorno, no color
+# El contorno no se reconoce por ser oscuro, sino por ser oscuro **y no tener color**. Con
+# la oscuridad a secas, el azul del pelo —que a plena intensidad tiene luminancia 29, por
+# debajo de cualquier umbral razonable— se iba entero al contorno y el pelo desaparecía de
+# la hoja: el arquetipo salía calvo y el repintado no tenía nada que repintar.
+LUZ_CONTORNO = 46
+SAT_CONTORNO = .45
+# Por debajo de esto un píxel no tiene color suficiente para decir de qué parte es, y se
+# reparte por vecindad en vez de por tono. El tono de plantilla más apagado es la piel, con
+# 0,43: el umbral tiene que quedar por debajo de eso y por encima de un gris de sombra.
+SAT_MINIMA = .22
 
 # ── las siluetas ────────────────────────────────────────────────────────────────────
 # El nombre es «lo de arriba _ lo de abajo», y el juego lo deduce igual de la ropa de cada
@@ -106,9 +115,15 @@ VISTA = 'high top-down'
 # generador el estilo de un juego con dueño es hacerle producir algo derivado de ese
 # juego, y ese algo acabaría dentro del nuestro. Lo que va aquí es lo mismo que dice
 # referencia/ESTILO.md, en inglés y con sus propias palabras.
-ESTILO = ('16-bit pixel art sprite, high top-down view of a character, chunky proportions '
-          'with a large head, flat shading, light from the upper left, single-colour black '
-          'outline, transparent background, bare head, no hat, no bag, no backpack')
+ESTILO = ('16-bit pixel art sprite, high top-down view of a single character, full body, '
+          'centred, feet near the bottom edge, chunky proportions with a large head, '
+          # Lo que sigue no es gusto: es lo que mantiene separables los colores de
+          # plantilla. Un degradado o un tramado mezcla el magenta del torso con el verde
+          # de las piernas, y en la mezcla ya no se sabe qué era cada píxel.
+          'flat blocks of saturated colour, no gradients, no dithering, no colour blending, '
+          'strong saturation, light from the upper left, single-colour black outline, '
+          'transparent background, no ground shadow, '
+          'bare head, no hat, no helmet, no bag, no backpack, no props')
 
 # Las ocho direcciones del juego, en su orden: 0 es sur y se gira en sentido antihorario.
 DIRECCIONES = ['south', 'south-east', 'east', 'north-east',
@@ -139,7 +154,8 @@ DE_POSE = {
     'herido': 'herido', 'agacha': 'agacha', 'agacha2': 'agacha',
 }
 # Las poses que repiten dibujo no quedan clavadas: se desplazan un píxel. El retroceso del
-# disparo y el balanceo del que anda agachado los pone esto, no una llamada más.
+# disparo y el balanceo del que anda agachado los pone esto, no una llamada más. El signo
+# es el del juego: negativo sube la figura, como el `y:-1` que la forja le da a `dispara`.
 DESPLAZA = {'dispara': -1, 'agacha2': 1}
 
 
@@ -217,19 +233,99 @@ def _luz(c):
 
 
 def _tono(c):
-    """El color sin su brillo: (r,g,b) normalizado. Es lo que separa una parte de otra."""
-    t = c[0] + c[1] + c[2] or 1
-    return (c[0] / t, c[1] / t, c[2] / t)
+    """El matiz, en grados. Es lo que separa una parte de otra.
+
+    Y tiene que ser el matiz, no el color normalizado. Un generador ilumina aclarando hacia
+    el blanco, y normalizando, un brillo del pelo azul —(89,89,255)— se acerca más al
+    magenta del torso que al azul del que salió: media cabeza acababa repintada del color
+    de la chaqueta. El matiz de ese brillo sigue siendo 240 clavados.
+    """
+    r, g, b = c[0] / 255., c[1] / 255., c[2] / 255.
+    mx, mn = max(r, g, b), min(r, g, b)
+    d = mx - mn
+    if not d:
+        return 0.
+    if mx == r:
+        h = 60 * (((g - b) / d) % 6)
+    elif mx == g:
+        h = 60 * ((b - r) / d + 2)
+    else:
+        h = 60 * ((r - g) / d + 4)
+    return h
 
 
-def _clasificador():
+def _dista(a, b):
+    """Lo que hay entre dos matices, contando que 350 y 10 están a veinte grados."""
+    d = abs(a - b) % 360
+    return min(d, 360 - d)
+
+
+def _sat(c):
+    """Cuánto color tiene, de 0 a 1. Un gris vale 0; el magenta de plantilla, 1."""
+    m = max(c)
+    return 0. if not m else (m - min(c)) / m
+
+
+def _reparte(px, w, h):
+    """Qué parte del cuerpo es cada píxel de una celda. '' = transparente.
+
+    Por tono no basta, y esto es lo que más puede romperse sin avisar. Un generador
+    sombrea, y una sombra apagada de una chaqueta magenta se acerca en tono a la piel
+    mucho más que al magenta del que salió: repartiendo píxel a píxel, media manga acaba
+    en la rampa de la piel y el repintado la deja de color carne para siempre. Así que van
+    dos pasadas:
+
+    1. Los píxeles **con color de verdad** se reparten por tono, que ahí no hay duda.
+    2. Los **desvaídos** —grises, blancos de brillo, sombras apagadas— no se reparten por
+       tono: se quedan con la parte del píxel clasificado que tengan más cerca. Un brillo
+       en el hombro es torso porque está rodeado de torso, no porque su gris se parezca a
+       nada.
+
+    El contorno se saca antes por oscuridad y no siembra la segunda pasada: es negro y
+    toca todas las partes a la vez, así que sembraría cualquier gris de contorno.
+    """
     claves = [(p, _tono(rgb)) for p, (rgb, _) in CLAVES.items()]
-    def cual(r, g, b):
-        if _luz((r, g, b)) < LUZ_CONTORNO:
-            return 'contorno'
-        t = _tono((r, g, b))
-        return min(claves, key=lambda k: sum((k[1][i] - t[i]) ** 2 for i in range(3)))[0]
-    return cual
+    partes = [[''] * w for _ in range(h)]
+    desvaidos, semillas = [], []
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a < 128:
+                continue
+            c = (r, g, b)
+            if _luz(c) < LUZ_CONTORNO and _sat(c) < SAT_CONTORNO:
+                partes[y][x] = 'contorno'
+            elif _sat(c) < SAT_MINIMA:
+                partes[y][x] = '?'
+                desvaidos.append((x, y))
+            else:
+                t = _tono(c)
+                partes[y][x] = min(claves, key=lambda k: _dista(k[1], t))[0]
+                semillas.append((x, y))
+    # Los desvaídos se contagian de sus vecinos con color, por cercanía.
+    cola, i = semillas[:], 0
+    while i < len(cola):
+        x, y = cola[i]; i += 1
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < w and 0 <= ny < h and partes[ny][nx] == '?':
+                partes[ny][nx] = partes[y][x]
+                cola.append((nx, ny))
+    # Si la celda entera vino desvaída, no hay de quién contagiarse. Se le da la parte
+    # que más manda y se cuenta: es justo lo que hay que mirar antes de gastar 385
+    # llamadas con un texto que el generador no está respetando.
+    sueltos = [(x, y) for x, y in desvaidos if partes[y][x] == '?']
+    if sueltos:
+        cuenta = {}
+        for f in partes:
+            for v in f:
+                if v and v not in ('?', 'contorno'):
+                    cuenta[v] = cuenta.get(v, 0) + 1
+        manda = max(cuenta, key=cuenta.get) if cuenta else 'contorno'
+        for x, y in sueltos:
+            partes[y][x] = manda
+    return partes, {'desvaidos': len(desvaidos), 'sueltos': len(sueltos),
+                    'color': len(semillas)}
 
 
 def _pedir(ruta, cuerpo, clave):
@@ -272,11 +368,13 @@ def genera(ropa, direccion, dibujo, clave, simular):
     if simular:
         datos = _silueta(direccion, dibujo)
     else:
-        colores = ', '.join(f'{CLAVES[p][1]} {ropa_de(ropa, p)}'.strip()
-                            for p in ('torso', 'piernas', 'calzado'))
+        # «wearing a long sleeved jacket in flat bright magenta» y no «bright magenta,
+        # long sleeved jacket»: suelto, el color se le va a otra prenda o al fondo.
+        colores = ', '.join(f'wearing {ropa_de(ropa, p)} in flat {CLAVES[p][1]}'
+                            for p in ('torso', 'piernas', 'calzado') if ropa_de(ropa, p))
         resp = _pedir(API_GENERAR, {
-            'description': (f'{colores}, {CLAVES["pelo"][1]}, {CLAVES["piel"][1]}, '
-                            f'{DIBUJOS[dibujo]}, {ESTILO}'),
+            'description': (f'a person {colores}, with {CLAVES["pelo"][1]}, '
+                            f'{CLAVES["piel"][1]}, {DIBUJOS[dibujo]}, {ESTILO}'),
             'image_size': {'width': CEL_W, 'height': CEL_H},
             'view': VISTA, 'direction': direccion,
             'no_background': True, 'outline': 'single color black outline',
@@ -336,57 +434,86 @@ def _png(im):
     return b.getvalue()
 
 
-def a_indices(png, pal, ramp, cual):
+def a_indices(png, pal, ramp):
     """PNG -> un byte por píxel: 0 transparente, y si no la rampa de su parte.
 
     El color final no sale de buscar el más parecido entre los 48: sale de decidir primero
     qué parte del cuerpo es ese píxel, y luego colocar su brillo dentro de la rampa de esa
-    parte. Es lo que hace que el repintado sea posible — con la búsqueda a secas, la
-    manga y el pantalón acaban compartiendo color y ya no hay manera de separarlos.
+    parte. Es lo que hace que el repintado sea posible — con la búsqueda a secas, la manga
+    y el pantalón acaban compartiendo color y ya no hay manera de separarlos.
+
+    Devuelve además el reparto, para poder mirarlo con --diag antes de gastar la tirada.
     """
     from PIL import Image
     import io
     im = Image.open(io.BytesIO(png)).convert('RGBA')
     if im.size != (CEL_W, CEL_H):
         im = im.resize((CEL_W, CEL_H), Image.NEAREST)
+    px = im.load()
+    partes, cuentas = _reparte(px, CEL_W, CEL_H)
     luces = {p: [_luz(pal[i - 1]) for i in idx] for p, idx in ramp.items()}
     fuera = bytearray(CEL_W * CEL_H)
-    px, memo = im.load(), {}
+    reparto = {}
     for y in range(CEL_H):
         for x in range(CEL_W):
-            r, g, b, a = px[x, y]
-            if a < 128:
+            parte = partes[y][x]
+            if not parte:
                 continue
-            v = memo.get((r, g, b))
-            if v is None:
-                parte = cual(r, g, b)
-                l = _luz((r, g, b))
-                idx = ramp[parte]
-                v = min(range(len(idx)), key=lambda i: abs(luces[parte][i] - l))
-                v = idx[v]
-                memo[(r, g, b)] = v
-            fuera[y * CEL_W + x] = v
-    return fuera
+            reparto[parte] = reparto.get(parte, 0) + 1
+            l = _luz(px[x, y][:3])
+            idx = ramp[parte]
+            fuera[y * CEL_W + x] = idx[min(range(len(idx)),
+                                           key=lambda i: abs(luces[parte][i] - l))]
+    reparto.update(cuentas)
+    return fuera, reparto
 
 
-def hoja(nombre, clave, simular, pal, ramp):
+def _avisa(nombre, dib, direccion, rep):
+    """Lo que hay que ver antes de gastar las 385 llamadas.
+
+    Dos maneras de que una tirada salga mal sin dar ningún error: que el generador se
+    salte un color de plantilla —y entonces esa parte no aparece en el reparto, así que el
+    repintado no tiene nada que repintar— y que lo devuelva todo apagado, y el reparto se
+    apoye en la vecindad en vez de en el color.
+    """
+    faltan = [p for p in CLAVES if not rep.get(p)]
+    avisos = []
+    if faltan:
+        avisos.append('sin ' + '/'.join(faltan))
+    pintados = rep.get('color', 0) + rep.get('desvaidos', 0)
+    if pintados and rep.get('desvaidos', 0) > pintados * .5:
+        avisos.append('%d%% desvaído' % (100 * rep['desvaidos'] / pintados))
+    if rep.get('sueltos'):
+        avisos.append('%d píxeles sin parte' % rep['sueltos'])
+    if avisos:
+        print(f'  ¡ojo! {nombre} {dib} {direccion}: ' + ', '.join(avisos), flush=True)
+    return bool(avisos)
+
+
+def hoja(nombre, clave, simular, pal, ramp, diag=False):
     """La hoja entera de una silueta: 8 columnas de dirección × 16 filas de pose."""
-    cual = _clasificador()
     ancho, alto = CEL_W * 8, CEL_H * len(POSES)
     rej = bytearray(ancho * alto)
-    celdas = {}
+    celdas, dudosas = {}, 0
     for dib in sorted(set(DE_POSE[p] for p in POSES)):
         for fx in range(PEDIDAS):
-            celdas[(dib, fx)] = a_indices(
-                genera(nombre, DIRECCIONES[fx], dib, clave, simular), pal, ramp, cual)
+            celdas[(dib, fx)], rep = a_indices(
+                genera(nombre, DIRECCIONES[fx], dib, clave, simular), pal, ramp)
             print(f'  {nombre:15s} {dib:8s} {DIRECCIONES[fx]}', flush=True)
+            if diag:
+                print('     ' + '  '.join(f'{k} {v}' for k, v in sorted(rep.items())),
+                      flush=True)
+            dudosas += _avisa(nombre, dib, DIRECCIONES[fx], rep)
+    if dudosas:
+        print(f'  {nombre}: {dudosas} de {len(celdas)} celdas dudosas — mírala con '
+              f'`node herramientas/html/personajes.js` antes de bajar las demás', flush=True)
     for fy, pose in enumerate(POSES):
         dib, dy = DE_POSE[pose], DESPLAZA.get(pose, 0)
         for fx in range(8):
             fuente, esp = ESPEJO.get(fx, fx), fx in ESPEJO
             celda = celdas[(dib, fuente)]
             for y in range(CEL_H):
-                oy = y + dy
+                oy = y - dy
                 if not 0 <= oy < CEL_H:
                     continue
                 fila = celda[oy * CEL_W:(oy + 1) * CEL_W]
@@ -423,6 +550,9 @@ if __name__ == '__main__':
     ap.add_argument('--clave', default=os.environ.get('PIXELLAB_API_KEY', ''))
     ap.add_argument('--simular', action='store_true', help='sin red: monigotes de relleno')
     ap.add_argument('--coste', action='store_true', help='solo la cuenta, no baja nada')
+    ap.add_argument('--diag', action='store_true',
+                    help='el reparto por partes de cada celda, para ver si el '
+                         'generador respetó los colores de plantilla')
     a = ap.parse_args()
 
     quiere = [q.strip() for q in a.que.split(',') if q.strip()]
@@ -451,7 +581,7 @@ if __name__ == '__main__':
 
     hojas = {}
     for k in quiere:
-        hojas[k] = comprimir(hoja(k, a.clave, a.simular, pal, ramp))
+        hojas[k] = comprimir(hoja(k, a.clave, a.simular, pal, ramp, a.diag))
     escribir(hojas, ramp)
     peso = sum(len(v) for v in hojas.values()) / 1024
     print(f'-> {HTML}  ({peso:.0f} KB de hojas)')

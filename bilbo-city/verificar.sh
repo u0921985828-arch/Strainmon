@@ -36,8 +36,9 @@ if [ "$QUE" = "todo" ] || [ "$QUE" = "html" ]; then
   echo "═══ callejero · extracción del plano ═══"
   python3 herramientas/plano/pruebas_extraer.py
   echo
-  echo "═══ sprites · tablas del empaquetador ═══"
+  echo "═══ sprites · empaquetador ═══"
   python3 herramientas/sprites/pixellab.py --coste
+  python3 herramientas/sprites/pruebas_sprites.py
   echo
   echo "═══ arte · guía de estilo ═══"
   ( cd herramientas/html && node estilo.js )
