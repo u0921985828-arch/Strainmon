@@ -64,15 +64,26 @@ PERSONAJES = {
 # Las ocho direcciones del juego, en su orden: 0 es sur y se gira en sentido antihorario.
 DIRECCIONES = ['south', 'south-east', 'east', 'north-east',
                'north', 'north-west', 'west', 'south-west']
-# Las catorce poses, en el orden en que el juego las apila en la hoja.
-POSES = ['quieto', 'andar1', 'andar2', 'andar3', 'andar4',
-         'correr1', 'correr2', 'correr3', 'correr4',
-         'pega1', 'pega2', 'apunta', 'dispara', 'herido']
 ACCION = {
     'quieto': 'standing still', 'andar': 'walking', 'correr': 'running',
     'pega': 'punching forward', 'apunta': 'aiming a pistol',
     'dispara': 'firing a pistol', 'herido': 'staggering, hurt',
+    'agacha': 'crouching low, sneaking',
 }
+
+
+def _poses():
+    """Las poses, en el orden en que el juego las apila en la hoja.
+
+    Tampoco se ponen a mano. La lista creció al meter el sigilo —dos fotogramas de
+    agachado— y una hoja con las de antes le sobran dos filas al juego: la descarta al
+    cargarla y se forja todo, sin decir por qué. Se lee del juego y no puede desfasarse.
+    """
+    s = open(HTML, encoding='utf-8').read()
+    m = re.search(r'const ORDEN_POSES=\[(.*?)\];', s, re.S)
+    if not m:
+        raise SystemExit('no encuentro ORDEN_POSES en el HTML')
+    return re.findall(r"'([a-z0-9]+)'", m.group(1))
 
 
 def _celda_forja():
@@ -92,6 +103,7 @@ def _celda_forja():
 
 
 CEL_W, CEL_H = _celda_forja()  # medida de cada casilla de la hoja
+POSES = _poses()
 
 
 def paleta():
