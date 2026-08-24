@@ -174,32 +174,44 @@ public static class Callejero {
         return EsCalle(rx, ry);
     }
 
+    /// <summary>
+    /// Primero todos los trazados, y después las faldas. En una sola pasada la falda de
+    /// una calle se comía el trazado de su vecina: en el Ensanche, Colón de Larreátegui va
+    /// a una manzana de la Gran Vía y se quedaba en veinte casillas, porque la Gran Vía
+    /// iba antes en la tabla y le pintaba encima. El trazado de cualquiera pesa más que la
+    /// falda de cualquiera; entre dos trazados que se cruzan, manda el orden de la tabla.
+    /// </summary>
     public static void Nombrar() {
         System.Array.Clear(_de, 0, _de.Length);
+        var caminos = new List<Vector2Int>[Calles.Length];
         for (int c = 0; c < Calles.Length; c++) {
             var via = Calles[c];
-            int n = 0;
+            caminos[c] = new List<Vector2Int>();
             for (int t = 0; t+1 < via.Puntos.GetLength(0); t++) {
                 int ax, ay, bx, by;
                 if (!Cerca(via.Puntos[t,0],   via.Puntos[t,1],   out ax, out ay)) continue;
                 if (!Cerca(via.Puntos[t+1,0], via.Puntos[t+1,1], out bx, out by)) continue;
                 var cam = Camino(ax,ay,bx,by) ?? Recta(ax,ay,bx,by);
-                if (cam == null) continue;
-                // Se nombra el camino y la calle pegada a él: una avenida son tres o cuatro
-                // casillas de calzada más dos aceras, y el camino solo va por una, así que
-                // cruzándola por el otro carril el HUD se quedaba en blanco.
-                foreach (var p in cam)
-                    for (int dy = -2; dy <= 2; dy++)
-                        for (int dx = -2; dx <= 2; dx++) {
-                            int px = p.x+dx, py = p.y+dy;
-                            if (px < 0 || py < 0 || px >= Ciudad.MW || py >= Ciudad.MH) continue;
-                            int i = py*Ciudad.MW + px;
-                            if (_de[i] != 0 || !EsCalle(px,py)) continue;
-                            _de[i] = (short)(c+1); n++;
-                        }
+                if (cam != null) caminos[c].AddRange(cam);
             }
-            Largo[c] = n;
+            Largo[c] = 0;
         }
+        // Se nombra el trazado y la calle pegada a él: una avenida son tres o cuatro
+        // casillas de calzada más dos aceras, y el camino solo va por una, así que
+        // cruzándola por el otro carril el HUD se quedaba en blanco.
+        System.Action<int,int> Pinta = (c, r) => {
+            foreach (var p in caminos[c])
+                for (int dy = -r; dy <= r; dy++)
+                    for (int dx = -r; dx <= r; dx++) {
+                        int px = p.x+dx, py = p.y+dy;
+                        if (px < 0 || py < 0 || px >= Ciudad.MW || py >= Ciudad.MH) continue;
+                        int i = py*Ciudad.MW + px;
+                        if (_de[i] != 0 || !EsCalle(px,py)) continue;
+                        _de[i] = (short)(c+1); Largo[c]++;
+                    }
+        };
+        for (int c = 0; c < Calles.Length; c++) Pinta(c, 0);
+        for (int c = 0; c < Calles.Length; c++) Pinta(c, 2);
     }
 }
 

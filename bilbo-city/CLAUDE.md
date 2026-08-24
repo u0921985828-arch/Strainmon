@@ -270,6 +270,17 @@ Tres cosas del trazado que costaron un intento cada una:
   de la recta entre los puntos. Menos exacto, pero el trazado que se afirma es el mismo y
   ninguna calle se queda en cero.
 
+Y el nombrado va en **dos pasadas**: primero todos los trazados y después las faldas. En
+una sola, la falda de una calle se comía el trazado de su vecina — Colón de Larreátegui va
+a una manzana de la Gran Vía y se quedaba en veinte casillas.
+
+Para verlo:
+
+```bash
+node herramientas/html/plano.js salida.png --calles
+node herramientas/html/plano.js ensanche.png --calles --zoom 3 --zona 560,250,380,170
+```
+
 **Lo que no se puede afirmar no se nombra.** Las Siete Calles miden dos casillas de ancho
 cada una y a 5,16 m por casilla no caben, así que del Casco solo van Bidebarrieta,
 Iturribide y la Ribera. Fuera de las 34, el HUD enseña solo el barrio: una calle inventada

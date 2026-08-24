@@ -4525,8 +4525,14 @@ const calleCerca=(cx,cy,r)=>{const q=cercaDe(esCalle,cx,cy,r||24);
  return esCalle(q.x|0,q.y|0)?[q.x|0,q.y|0]:null;};
 function nombrarCalles(){
  calleDe.fill(0);
+ /* Primero todos los trazados, y después las faldas. En una sola pasada la falda de una
+    calle se comía el trazado de su vecina: en el Ensanche, Colón de Larreátegui va a una
+    manzana de la Gran Vía y se quedaba en veinte casillas, porque la Gran Vía iba antes
+    en la tabla y le pintaba encima. El trazado de cualquiera pesa más que la falda de
+    cualquiera; entre dos trazados que se cruzan, manda el orden de la tabla. */
+ const caminos=[];
  for(let c=0;c<CALLES.length;c++){
-  const via=CALLES[c];let n=0;
+  const via=CALLES[c];caminos[c]=[];
   for(let t=0;t+1<via.v.length;t++){
    const a=calleCerca(via.v[t][0],via.v[t][1]),b=calleCerca(via.v[t+1][0],via.v[t+1][1]);
    if(!a||!b)continue;
@@ -4537,18 +4543,22 @@ function nombrarCalles(){
       calle, pero el trazado que se afirma es el mismo y así ninguna calle de la tabla se
       queda sin una sola casilla. */
    const cam=caminoCalle(a[0],a[1],b[0],b[1])||rectaCalle(a[0],a[1],b[0],b[1]);
-   if(!cam)continue;
-   /* Se nombra el camino y la calle pegada a él: una avenida son tres o cuatro casillas
-      de calzada más dos aceras, y el camino solo va por una, así que cruzándola por el
-      otro carril el HUD se quedaba en blanco. */
-   for(const[x,y]of cam)
-    for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
-     const px=x+dx,py=y+dy;
-     if(px<0||py<0||px>=MW||py>=MH)continue;
-     const i=py*MW+px;
-     if(calleDe[i]||!esCalle(px,py))continue;
-     calleDe[i]=c+1;n++;}}
-  LARGO_CALLE[c]=n;}}
+   if(cam)for(const q of cam)caminos[c].push(q);}}
+ const cuenta=new Int32Array(CALLES.length);
+ /* Se nombra el trazado y la calle pegada a él: una avenida son tres o cuatro casillas de
+    calzada más dos aceras, y el camino solo va por una, así que cruzándola por el otro
+    carril el HUD se quedaba en blanco. */
+ const pinta=(c,r)=>{
+  for(const[x,y]of caminos[c])
+   for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){
+    const px=x+dx,py=y+dy;
+    if(px<0||py<0||px>=MW||py>=MH)continue;
+    const i=py*MW+px;
+    if(calleDe[i]||!esCalle(px,py))continue;
+    calleDe[i]=c+1;cuenta[c]++;}};
+ for(let c=0;c<CALLES.length;c++)pinta(c,0);
+ for(let c=0;c<CALLES.length;c++)pinta(c,2);
+ for(let c=0;c<CALLES.length;c++)LARGO_CALLE[c]=cuenta[c];}
 
 /*═══════════════ ROPA, MESA Y SURTIDOR ═══════════════*/
 /* Vestirse es barato de programar porque la forja del personaje ya sabe montar cualquier
