@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -56,10 +57,22 @@ public class RenderCiudad : MonoBehaviour {
 
         int MW = Ciudad.MW, MH = Ciudad.MH;
         var bloque = new TileBase[MW*MH];
+        // Un tile por trozo de singular. Se cachean porque el estadio son ochocientas
+        // casillas y crear un Tile por cada una en el bucle grande es tirar memoria.
+        var singular = new Dictionary<Sprite,Tile>();
         for (int y = 0; y < MH; y++)
             for (int x = 0; x < MW; x++) {
                 var t = Ciudad.T(x,y);
                 Tile elegido;
+                // El estadio, la catedral, el Ayuntamiento: donde hay singular manda el
+                // singular, y el tejado genérico no llega a verse.
+                var trozo = Singulares.En(x,y);
+                if (trozo != null) {
+                    if (!singular.TryGetValue(trozo, out elegido))
+                        singular[trozo] = elegido = TileDe(trozo);
+                    bloque[(MH-1-y)*MW + x] = elegido;
+                    continue;
+                }
                 switch (t) {
                     case Suelo.Edif: elegido = tejados[Ciudad.Roof[y*MW+x]]; break;
                     case Suelo.Agua: elegido = _aguaA; break;

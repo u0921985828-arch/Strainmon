@@ -373,6 +373,69 @@ public static class Forja {
         L = new Lienzo(12,28); L.P(5,8,2,20,Paleta.AsfaltoL); L.P(4,27,4,1,Paleta.Carbon);
         L.P(5,6,5,2,Paleta.AsfaltoL); L.P(8,7,4,3,Paleta.Gris); L.P(9,8,2,2,Paleta.H("#f2e2a8"));
         Props["farola"] = SpriteBase(L);
+
+        // Lo que hay encima de un tejado. Va suelto y sembrado por hash, como el
+        // mobiliario de la acera: dibujado dentro del tile se repetiría en cada casilla
+        // del edificio y la azotea parecería papel pintado.
+        L = new Lienzo(18,20); L.P(3,4,12,14,Paleta.H("#7f9aa8")); L.P(3,4,12,3,Paleta.H("#a8c4d0"));
+        L.P(15,4,2,14,Paleta.AceroO); L.P(4,18,3,2,Paleta.Carbon); L.P(12,18,3,2,Paleta.Carbon);
+        L.P(5,1,8,3,Paleta.Acero); Props["deposito"] = SpriteBase(L);
+        L = new Lienzo(18,16); L.P(2,3,14,12,Paleta.Acero); L.P(2,3,14,2,Paleta.Hueso);
+        L.P(16,3,1,12,Paleta.AceroO); L.P(4,6,10,7,Paleta.AceroO);
+        for (int i = 5; i < 14; i += 3) L.P(i,6,1,7,Paleta.Acero);
+        Props["climatizador"] = SpriteBase(L);
+        L = new Lienzo(14,26); L.P(6,8,2,18,Paleta.AceroO);
+        for (int y = 2; y < 14; y += 4) { L.P(2,y,10,1,Paleta.Acero); L.P(7,y,1,4,Paleta.Acero); }
+        Props["antenaTv"] = SpriteBase(L);
+        L = new Lienzo(28,14); L.P(1,2,1,12,Paleta.AceroO); L.P(26,2,1,12,Paleta.AceroO);
+        L.P(1,3,26,1,Paleta.Acero); L.P(1,8,26,1,Paleta.Acero);
+        var ropaT = new[]{ Paleta.Rojo, Paleta.Hueso, Paleta.Azul, Paleta.Mostaza, Paleta.VerdeL };
+        for (int i = 0; i < 5; i++) L.P(3+i*5,4,4,5,ropaT[i]);
+        Props["tendedero"] = SpriteBase(L);
+        L = new Lienzo(22,20); L.P(2,3,18,16,Paleta.Hormigon); L.P(2,3,18,3,Paleta.HormigonL);
+        L.P(19,3,1,16,Paleta.HormigonO); L.P(8,9,6,10,Paleta.MaderaO); L.P(12,13,1,2,Paleta.Mostaza);
+        Props["caseta"] = SpriteBase(L);
+        L = new Lienzo(12,18); L.P(2,4,8,14,Paleta.TejaO); L.P(2,4,8,2,Paleta.Teja);
+        L.P(9,4,1,14,Paleta.H("#4d3728")); L.P(1,2,10,3,Paleta.HormigonO); L.P(1,2,10,1,Paleta.HormigonL);
+        Props["chimenea"] = SpriteBase(L);
+        L = new Lienzo(24,16); L.P(1,2,22,13,Paleta.AceroO); L.P(3,4,18,9,Paleta.H("#a8c4d0"));
+        for (int i = 6; i < 21; i += 5) L.P(i,4,1,9,Paleta.AceroO);
+        Props["lucernario"] = SpriteBase(L);
+
+        // Las fachadas. La vista es cenital escorada, así que el canto sur de cada manzana
+        // es lo único que se ve de la calle a pie de obra: estaba liso, una ciudad entera
+        // de paredes ciegas con cincuenta y seis sitios y ni un escaparate más.
+        Lienzo Fach(System.Action<Lienzo> fn, Color32 col) {
+            var f = new Lienzo(16,13);
+            f.P(0,0,16,13,Paleta.Negro); f.P(1,1,14,12,col);
+            fn(f); return f;
+        }
+        L = Fach(f => { f.P(4,3,8,10,Paleta.Madera); f.P(4,3,8,1,Paleta.MaderaL);
+                        f.P(10,8,2,2,Paleta.MostazaO); f.P(2,1,12,1,Paleta.HormigonL); }, Paleta.MaderaO);
+        Props["fachPortal"] = SpriteBase(L);
+        L = Fach(f => { f.P(3,2,10,11,Paleta.Carbon); f.P(4,3,8,10,Paleta.MaderaO);
+                        f.P(2,1,12,2,Paleta.HormigonL); f.P(11,8,1,2,Paleta.Mostaza); }, Paleta.HormigonO);
+        Props["fachPortalPiedra"] = SpriteBase(L);
+        L = Fach(f => { f.P(2,4,12,9,Paleta.H("#3f5566")); f.P(3,5,10,4,Paleta.H("#7f9aa8"));
+                        f.P(2,2,12,2,Paleta.RojoO);
+                        for (int i = 2; i < 14; i += 3) f.P(i,2,2,2,Paleta.Crema); }, Paleta.HormigonO);
+        Props["fachEscaparate"] = SpriteBase(L);
+        L = Fach(f => { f.P(2,5,12,8,Paleta.Carbon); f.P(3,6,10,3,Paleta.H("#e8dfa8"));
+                        f.P(2,2,12,3,Paleta.VerdeO); f.P(2,2,12,1,Paleta.VerdeL); }, Paleta.MaderaO);
+        Props["fachTasca"] = SpriteBase(L);
+        L = Fach(f => { for (int y = 2; y < 13; y += 2) f.P(2,y,12,1,Paleta.Gris);
+                        f.P(2,2,12,1,Paleta.GrisL); f.P(6,7,4,1,Paleta.MostazaO); }, Paleta.GrisO);
+        Props["fachPersiana"] = SpriteBase(L);
+        L = Fach(f => { for (int y = 3; y < 13; y += 3) f.P(1,y,14,2,Paleta.Acero);
+                        f.P(1,1,14,2,Paleta.HormigonO); }, Paleta.AceroO);
+        Props["fachGaraje"] = SpriteBase(L);
+        L = Fach(f => { f.P(1,2,14,11,Paleta.AceroO);
+                        for (int x = 2; x < 15; x += 4) f.P(x,2,1,11,Paleta.Acero);
+                        f.P(1,1,14,1,Paleta.HormigonL); }, Paleta.GrisO);
+        Props["fachPorton"] = SpriteBase(L);
+        L = Fach(f => { f.P(2,2,12,3,Paleta.Hormigon); f.P(5,7,6,5,Paleta.Carbon);
+                        f.P(6,8,4,3,Paleta.H("#3f5566")); }, Paleta.HormigonO);
+        Props["fachCiega"] = SpriteBase(L);
         L = new Lienzo(10,30); L.P(4,13,2,17,Paleta.Carbon); L.P(2,1,6,13,Paleta.GrisO);
         L.P(3,2,4,3,Paleta.Rojo); L.P(3,6,4,3,Paleta.Mostaza); L.P(3,10,4,3,Paleta.VerdeL);
         Props["semaforo"] = SpriteBase(L);

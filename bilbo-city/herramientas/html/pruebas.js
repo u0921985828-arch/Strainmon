@@ -381,6 +381,39 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
     if (!idos) bien.push(A.POI.length + ' sitios a menos de ' + TOPE + ' casillas del plano'
       + ' (el peor, ' + peorN + ', a ' + peor.toFixed(0) + ')');
 
+    // ── 4b · los edificios singulares, en su sitio y en tierra ─────────
+    // El estadio, la catedral, el Ayuntamiento y los demás no se dibujan sobre una
+    // casilla: ocupan una caja de hasta treinta y cinco casillas de largo, y esa caja se
+    // busca sola alrededor del rótulo del plano. Dos cosas pueden salir mal y las dos ya
+    // salieron mal: que la caja acabe lejos del rótulo, y que acabe encima de la ría
+    // —el rótulo de San Mamés cae literalmente en el agua—. Aquí se comprueban las dos
+    // sobre la colocación de verdad, la que hace el juego al cargar la ciudad.
+    {
+      const S = A.SINGULARES || {};
+      const ids = Object.keys(S);
+      let malos = 0, peorD = 0, peorN = '', peorS = 1, peorSN = '';
+      for (const id of ids) {
+        const s = S[id], p = A.POI.find(q => q.id === id);
+        if (s.x === undefined) { fallos.push('singular ' + id + ': sin colocar'); malos++; continue; }
+        const d = Math.hypot(s.x + (s.w >> 1) - p.cerca[0], s.y + (s.h >> 1) - p.cerca[1]);
+        if (d > peorD) { peorD = d; peorN = id; }
+        if (d > 30) { fallos.push('singular ' + id + ': a ' + d.toFixed(0) + ' casillas del rótulo'); malos++; }
+        let pintables = 0;
+        for (let y = s.y; y < s.y + s.h; y++)
+          for (let x = s.x; x < s.x + s.w; x++) {
+            const t = A.Tc(x, y);
+            if (t !== A.AGUA && t !== A.MUELLE && t !== A.PUENTE && t !== A.ROAD && t !== A.MONTE) pintables++;
+          }
+        const seco = pintables / (s.w * s.h);
+        if (seco < peorS) { peorS = seco; peorSN = id; }
+        if (seco < 0.75) { fallos.push('singular ' + id + ': solo el ' + Math.round(seco * 100) + '% de su caja es suelo'); malos++; }
+      }
+      if (ids.length !== 12) { fallos.push('hay ' + ids.length + ' singulares, no 12'); malos++; }
+      if (!malos) bien.push(ids.length + ' edificios singulares en tierra (el peor, ' + peorSN + ', al '
+        + Math.round(peorS * 100) + '%) y a menos de 30 casillas del plano (el peor, ' + peorN + ', a '
+        + peorD.toFixed(0) + ')');
+    }
+
     // ── 5 · la red viaria está conectada ───────────────────────────────
     {
       // Se mide la componente MAYOR, no la que toque salir primero al escanear. Lo que

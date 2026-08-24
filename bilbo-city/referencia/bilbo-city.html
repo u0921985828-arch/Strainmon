@@ -2657,9 +2657,55 @@ function generarVeh(){
 /*═══════════════ PROPS ═══════════════*/
 const PROP={};
 function S_(w,h,fn){const c=lienzo(w,h),g=c.getContext('2d');fn(g);return cuantizar(c);}
+/* Qué se puede abrir en cada tipo de barrio. Se repite alguno a propósito: si todos los
+   locales fueran distintos, una calle parecería una feria. */
+const FACH_H=13;
+const FACH_BARRIO={
+ denso:     ['tasca','persiana','portal','escaparate','portal','persiana','tasca','ciega'],
+ senorial:  ['escaparate','portalPiedra','escaparate','ciega','portalPiedra','persiana'],
+ bloques:   ['portal','ciega','persiana','portal','escaparate','garaje','ciega','portal'],
+ industrial:['porton','porton','garaje','ciega','persiana','porton'],
+ abierto:   ['portal','ciega','garaje','ciega'],
+};
+
 function generarProps(){
  /* Lo que hay encima de un tejado. Va suelto y sembrado por hash, como el mobiliario de
     la acera: dibujado dentro del tile se repetiría en cada casilla del edificio. */
+ /* Las fachadas. La vista es cenital escorada —se ve la tapa y un poco de la cara
+    frontal—, así que el canto sur de cada manzana es lo único que se ve de la calle a pie
+    de obra. Estaba liso: una ciudad entera de paredes ciegas, con cincuenta y tres sitios
+    y ni un escaparate más.
+
+    Cada tramo de doce píxeles es un local, y lo que le toca lo decide el hash de su
+    casilla y el estilo del barrio: en el Casco hay tasca y persiana echada; en el
+    Ensanche, escaparate con toldo y portal de madera; en los bloques, más portal que
+    tienda; en la industria, portones de chapa. No hay nada escrito a mano. */
+ PROP.fachadas={};
+  const local=(fn)=>{const c=lienzo(16,FACH_H),g=c.getContext('2d');fn(g);return cuantizar(c);};
+ const marco=(g,col)=>{P(g,0,0,16,FACH_H,C.negro);P(g,1,1,14,FACH_H-1,col);};
+ PROP.fachadas.portal=local(g=>{marco(g,C.maderaO);
+  P(g,4,3,8,FACH_H-3,C.madera);P(g,4,3,8,1,C.maderaL);P(g,10,8,2,2,C.mostazaO);
+  P(g,2,1,12,1,C.hormigonL);});
+ PROP.fachadas.portalPiedra=local(g=>{marco(g,C.hormigonO);
+  P(g,3,2,10,FACH_H-2,C.carbon);P(g,4,3,8,FACH_H-3,C.maderaO);
+  P(g,2,1,12,2,C.hormigonL);P(g,11,8,1,2,C.mostaza);});
+ PROP.fachadas.escaparate=local(g=>{marco(g,C.hormigonO);
+  P(g,2,4,12,FACH_H-4,'#3f5566');P(g,3,5,10,4,'#7f9aa8');
+  P(g,2,2,12,2,C.rojoO);for(let i=2;i<14;i+=3)P(g,i,2,2,2,C.crema);});
+ PROP.fachadas.tasca=local(g=>{marco(g,C.maderaO);
+  P(g,2,5,12,FACH_H-5,C.carbon);P(g,3,6,10,3,'#e8dfa8');
+  P(g,2,2,12,3,C.verdeO);P(g,2,2,12,1,C.verdeL);});
+ PROP.fachadas.persiana=local(g=>{marco(g,C.grisO);
+  for(let y=2;y<FACH_H;y+=2)P(g,2,y,12,1,C.gris);
+  P(g,2,2,12,1,C.grisL);P(g,6,7,4,1,C.mostazaO);});
+ PROP.fachadas.garaje=local(g=>{marco(g,C.aceroO);
+  for(let y=3;y<FACH_H;y+=3)P(g,1,y,14,2,C.acero);
+  P(g,1,1,14,2,C.hormigonO);});
+ PROP.fachadas.porton=local(g=>{marco(g,C.grisO);
+  P(g,1,2,14,FACH_H-2,C.aceroO);for(let x=2;x<15;x+=4)P(g,x,2,1,FACH_H-2,C.acero);
+  P(g,1,1,14,1,C.hormigonL);});
+ PROP.fachadas.ciega=local(g=>{marco(g,C.hormigonO);
+  P(g,2,2,12,3,C.hormigon);P(g,5,7,6,5,C.carbon);P(g,6,8,4,3,'#3f5566');});
  PROP.deposito=S_(18,20,g=>{P(g,3,4,12,14,'#7f9aa8');P(g,3,4,12,3,'#a8c4d0');
   P(g,15,4,2,14,C.aceroO);P(g,4,18,3,2,C.carbon);P(g,12,18,3,2,C.carbon);
   P(g,5,1,8,3,C.acero);});
@@ -4077,6 +4123,249 @@ function hablarCon(n){
     fn:()=>{S.armas[a.id]+=a.pack;aviso('+'+a.pack+' balas');}}))))}]);
 }
 
+/*═══════════════ EDIFICIOS SINGULARES ═══════════════*/
+/* Hasta aquí, el Arriaga y el Ayuntamiento eran una chincheta sobre una manzana igual que
+   las demás: el juego te decía dónde estaban pero desde arriba no se veía nada. Estos se
+   dibujan enteros, encima del tejado genérico y a su tamaño de verdad: la estación de
+   Abando ocupa treinta y dos casillas de largo porque la nave mide ciento ochenta metros
+   y la casilla son 5,16 m. No caben en pantalla de una vez, y así debe ser — se recorren
+   andando, como el resto de la ciudad.
+
+   No son fachadas fotografiadas ni plantas copiadas: son la silueta que tiene cada uno
+   visto desde arriba —el cuenco de un campo de fútbol, la cruz de una catedral, la nave
+   de una estación— dibujada con la paleta del juego. Eso es un hecho de la ciudad, como
+   las calles; el dibujo es nuestro. */
+const SINGULARES={};
+/* Se dibuja en casillas, no en píxeles. La primera versión iba en píxeles absolutos y
+   valía mientras un singular medía ocho casillas; a treinta y dos, un remate de tres
+   píxeles sobre un lienzo de mil se pierde. Así el mismo dibujo sirve a cualquier tamaño,
+   que hace falta: abajo se encogen hasta que caben. */
+function singular(id,w,h,fn){
+ const c=lienzo(w*TS,h*TS),g=c.getContext('2d');
+ const T=(x,y,an,al,col)=>P(g,Math.round(x*TS),Math.round(y*TS),
+  Math.max(1,Math.round(an*TS)),Math.max(1,Math.round(al*TS)),col);
+ const aro=(cx,cy,r,gr,col)=>{const n=Math.max(32,Math.round(r*TS/1.5));
+  for(let i=0;i<n;i++){const a=i/n*6.283;T(cx+Math.cos(a)*r-gr/2,cy+Math.sin(a)*r-gr/2,gr,gr,col);}};
+ fn(T,w,h,aro,g);
+ SINGULARES[id]={w,h,c:cuantizar(c)};}
+
+/* Cada uno con su medida real en metros pasada a casillas, y su dibujo. */
+const PLANO_SINGULAR={
+ /* 227×203 m: el estadio, y lo que más se reconoce de Bilbao desde el aire después de la
+    ría. No hay otro rectángulo verde en toda la ciudad. */
+ sanmames:[44,39,(T,W,H,aro)=>{
+  T(0,0,W,H,C.hormigonO);
+  T(1,1,W-2,H-2,C.grisL);                            /* el anillo de fuera */
+  T(2.6,2.6,W-5.2,H-5.2,C.gris);                     /* la grada */
+  T(4.4,3.8,W-8.8,H-7.6,C.carbon);                   /* la boca, en sombra */
+  const px=6,py=5,pw=W-12,ph=H-10;
+  T(px,py,pw,ph,C.cespedO);
+  for(let i=0;i<pw;i+=2)T(px+i,py,1,ph,C.cesped);    /* las franjas de siega */
+  const l=.22;
+  T(px,py,pw,l,C.hueso);T(px,py+ph-l,pw,l,C.hueso);
+  T(px,py,l,ph,C.hueso);T(px+pw-l,py,l,ph,C.hueso);
+  T(px+pw/2-l/2,py,l,ph,C.hueso);                    /* el medio campo */
+  aro(px+pw/2,py+ph/2,ph/5.5,l,C.hueso);
+  for(const s of[0,1]){                              /* las dos áreas */
+   const bx=s?px+pw-pw/6:px+pw/6;
+   T(s?bx:px,py+ph/2-ph/3,pw/6,l,C.hueso);
+   T(s?bx:px,py+ph/2+ph/3,pw/6,l,C.hueso);
+   T(bx,py+ph/2-ph/3,l,ph*2/3,C.hueso);}
+  for(const[fx,fy]of[[1.4,1.4],[W-3.4,1.4],[1.4,H-3.4],[W-3.4,H-3.4]]){
+   T(fx,fy,2,2,C.acero);T(fx+.45,fy+.45,1.1,1.1,C.hueso);}}],
+ /* 150×110 m. Chapa de titanio: bandas alabeadas unas sobre otras, cada una con su
+    brillo arriba. Desde el aire el museo es eso y poco más. */
+ guggen:[29,21,(T,W,H)=>{
+  T(0,0,W,H,C.hormigonO);
+  /* Placas de titanio: velas que se solapan, cada una con su brillo por el canto de
+     arriba y su sombra por el de la derecha. Ninguna alineada con la de al lado — eso es
+     lo único que separa al museo de un tejado de chapa cualquiera, y la primera versión,
+     con las bandas a paso regular, salió persiana. */
+  const velas=[[.7,1,W-8.5,3.4],[3.6,3.4,W-5.8,3],[1,5.9,W-9.5,4],[5.2,9.3,W-7.2,3.2],
+               [.7,12,W-10.5,3.6],[4.4,14.9,W-6.6,3.4],[1.8,17.6,W-8.5,2.4]];
+  velas.forEach(([x,y,an,al],i)=>{
+   T(x,y,an,al,i%2?C.acero:C.aceroO);
+   T(x,y,an,.45,C.hueso);
+   T(x+an-.45,y,.45,al,C.grisO);});
+  T(W-3.4,.7,2.7,H-2.2,C.grisL);T(W-3.4,.7,2.7,.4,C.hueso);
+  T(.6,H-1.1,W-1.2,.8,C.hormigon);}],                /* la lámina de agua del muelle */
+ /* 42×42 m. Desde arriba una torre es un cuadrado; lo que la delata es el cristal. */
+ iberdrola:[8,8,(T,W,H)=>{
+  T(0,0,W,H,C.grisO);
+  T(.5,.5,W-1,H-1,C.aceroO);
+  T(1,1,W-2,H-2,C.acero);
+  for(let i=1.5;i<W-1.5;i+=.9)T(i,1,.3,H-2,C.hueso);
+  T(1,1,W-2,.4,C.hueso);
+  T(W/2-1,H/2-1,2,2,C.aceroO);}],                    /* el casquete de arriba */
+ /* 130×85 m. Casco de barco en acero oxidado, en el sitio del astillero: las cuadernas
+    se ven desde arriba como costillas. */
+ euskalduna:[25,16,(T,W,H)=>{
+  T(0,0,W,H,C.hormigonO);
+  T(1,1.6,W-2,H-4,C.tejaO);
+  T(1,1.6,W-2,.45,C.maderaL);
+  for(let x=2;x<W-2;x+=1.6)T(x,2.2,.5,H-5.4,C.maderaO);
+  T(W-4.6,1,3.6,H-2,C.gris);                         /* la caja de escena */
+  T(2.6,H-2.6,W-5.2,1.8,C.grisL);                    /* la plaza de delante */
+  T(2.6,H-2.6,W-5.2,.35,C.hueso);}],
+ /* 180×80 m. La nave de la estación, con los andenes y las vías debajo. */
+ abando:[35,16,(T,W,H)=>{
+  T(0,0,W,H,C.hormigonO);
+  T(.6,.6,W-1.2,H-1.2,C.aceroO);
+  for(let y=1.3;y<H-2.2;y+=2.6){
+   T(1.2,y,W-2.4,1.9,C.acero);                       /* la bóveda */
+   T(1.2,y,W-2.4,.3,C.hueso);
+   T(1.2,y+1.9,W-2.4,.5,C.asfaltoO);                 /* la vía por debajo */
+   T(1.2,y+2.05,W-2.4,.15,C.grisL);}
+  T(.6,.6,W-1.2,.4,C.hueso);
+  T(W/2-3,H-1.5,6,1,C.mostazaO);}],                  /* el vestíbulo, a la calle */
+ /* 60×45 m. Mansarda de pizarra, frontón al medio y marquesina a la calle. */
+ arriaga:[12,9,(T,W,H)=>{
+  T(0,0,W,H,C.grisL);
+  T(.45,.45,W-.9,H-.9,C.gris);
+  for(let x=1;x<W-1;x+=1.4)T(x,1,.45,H-3,C.grisO);   /* las limatesas */
+  T(W/2-2.6,.2,5.2,2.4,C.mostazaO);                  /* el frontón */
+  T(W/2-2.2,.6,4.4,1.6,C.mostaza);
+  T(.6,H-2.2,W-1.2,1.4,C.maderaO);                   /* la marquesina */
+  T(.6,H-2.2,W-1.2,.4,C.mostazaO);
+  T(1.6,H-1,W-3.2,.7,C.carbon);}],
+ /* 78×45 m. Planta simétrica y la torre del reloj en el eje. */
+ ayto:[15,9,(T,W,H)=>{
+  T(0,0,W,H,C.hormigon);
+  T(.5,.5,W-1,H-1,C.hormigonL);
+  T(1.2,1.6,W-2.4,H-3.2,C.grisL);                    /* el cuerpo y sus dos alas */
+  for(let x=2;x<W-2;x+=1.7)T(x,2,.6,H-4,C.gris);
+  T(W/2-2.2,.2,4.4,4.6,C.hormigonL);                 /* la torre del reloj */
+  T(W/2-1.8,.6,3.6,3.8,C.hormigon);
+  /* El reloj. Con dos agujas y nada más se leía como una ele mayúscula: hacen falta las
+     marcas del cuadrante y el eje para que la cabeza lo vea como una esfera. */
+  const rx=W/2,ry=2.4,rr=1.1;
+  T(rx-rr,ry-rr,rr*2,rr*2,C.crema);
+  for(const[dx,dy]of[[0,-1],[1,0],[0,1],[-1,0]])
+   T(rx+dx*(rr-.3)-.09,ry+dy*(rr-.3)-.09,.18,.18,C.carbon);
+  T(rx-.09,ry-.72,.18,.75,C.carbon);                 /* la aguja larga, a las doce */
+  T(rx,ry-.09,.58,.18,C.carbon);                     /* la corta, a las tres */
+  T(rx-.15,ry-.15,.3,.3,C.carbon);                   /* el eje */
+  T(.8,H-1.4,W-1.6,.9,C.hormigonO);}],               /* la escalinata */
+ /* 62×32 m. Cruz latina: la nave a lo largo, el crucero cruzándola y la aguja al medio. */
+ catedral:[13,8,(T,W,H)=>{
+  T(0,0,W,H,C.hormigonO);
+  /* Cruz latina: la nave a lo largo, el crucero cruzándola cerca de la cabecera y el
+     cimborrio en el cruce. A doce por seis el crucero no llegaba a leerse como brazo y
+     la catedral salía siendo una nave más. */
+  const nv=2.9,cx=W*.62;
+  T(.6,H/2-nv/2,W-1.2,nv,C.gris);
+  T(cx-1.7,.7,3.4,H-1.4,C.gris);
+  T(.6,H/2-nv/2,W-1.2,.4,C.grisL);
+  T(cx-1.7,.7,3.4,.4,C.grisL);
+  for(let x=1;x<W-1.4;x+=1.2)T(x,H/2-nv/2,.26,nv,C.grisO);
+  for(let y=1.3;y<H-1.2;y+=1.2)T(cx-1.7,y,3.4,.26,C.grisO);
+  T(cx-1.05,H/2-1.45,2.1,2.9,C.hormigonL);           /* el cimborrio */
+  T(cx-.5,H/2-.95,1,1.9,C.mostazaO);                 /* la aguja */
+  T(W-2,H/2-1.9,1.4,3.8,C.hormigon);}],              /* el ábside */
+ /* 60×28 m. Nave larga y su torre, que se ve desde media villa. */
+ begonia:[12,5,(T,W,H)=>{
+  T(0,0,W,H,C.hormigonO);
+  T(1,.8,W-2,H-1.6,C.teja);
+  T(1,.8,W-2,.35,C.tejaO);
+  for(let y=1.4;y<H-1;y+=.7)T(1,y,W-2,.18,C.maderaO);
+  T(.4,.4,2.8,H-.8,C.hormigonL);                     /* la torre */
+  T(.7,.7,2.2,H-1.4,C.hormigon);
+  T(1.2,1.4,1.2,1.6,C.crema);
+  T(1.5,.05,.5,.8,C.mostazaO);}],
+ /* 130×40 m. Nave junto al agua, con sus lucernarios en diente de sierra. */
+ merca:[25,8,(T,W,H)=>{
+  T(0,0,W,H,C.hormigonO);
+  T(.6,.6,W-1.2,H-1.2,C.grisL);
+  for(let x=1.6;x<W-2;x+=2.3){
+   T(x,1.2,1.6,H-2.4,C.gris);
+   T(x+.3,1.5,1,H-3,C.acero);
+   T(x+.3,1.5,1,.3,C.hueso);}
+  T(.6,.6,W-1.2,.4,C.hueso);}],
+ /* 76×76 m. El almacén de vinos: ladrillo, y los tres patios que le abrieron dentro. */
+ alhondiga:[15,15,(T,W,H)=>{
+  T(0,0,W,H,C.maderaL);
+  T(.45,.45,W-.9,H-.9,C.teja);
+  for(let y=1.2;y<H-1;y+=.9)T(.9,y,W-1.8,.2,C.tejaO);
+  const an=(W-3.2)/3;
+  for(let i=0;i<3;i++){
+   T(1.6+i*an,H/2-2.4,an-1.1,4.8,C.aceroO);
+   T(1.9+i*an,H/2-2.1,an-1.7,4.2,C.acero);}
+  T(.45,.45,W-.9,.4,C.maderaL);}],
+ /* 105×90 m. Cuenco pequeño y tejado de madera. */
+ arena:[20,17,(T,W,H,aro)=>{
+  T(0,0,W,H,C.hormigonO);
+  T(1,1,W-2,H-2,C.maderaO);
+  for(let x=1.6;x<W-1.6;x+=1.2)T(x,1.4,.45,H-2.8,C.madera);
+  T(1,1,W-2,.4,C.maderaL);
+  aro(W/2,H/2,Math.min(W,H)/3.2,.5,C.grisL);
+  T(W/2-3.2,H/2-2.6,6.4,5.2,C.gris);
+  T(W/2-2.8,H/2-2.2,5.6,4.4,C.acero);}],
+};
+
+/* Dónde se planta cada uno, y de qué tamaño.
+
+   El rótulo del plano marca el sitio con un error de unas cuantas casillas, y en dos
+   casos el error es gordo: los de San Mamés y el Bilbao Arena caen en mitad de la ría.
+   Plantarlos ahí sin mirar dejaba medio estadio flotando. Así que no se planta: se
+   desliza la caja alrededor del rótulo y se elige donde más manzana pisa y menos agua
+   toca; si a diez casillas no hay sitio seco, se busca a veinte; y si aun así no cabe,
+   el edificio se encoge de diez en diez por ciento hasta que cabe. Lo que se pierde es
+   escala; lo que se gana es que está donde el plano dice y pisando tierra.
+
+   Veinte casillas es el tope a propósito: la batería exige que ningún sitio se aleje
+   más de treinta del plano, y así la colocación no puede ser nunca la que rompa eso.
+
+   Dos tablas de sumas acumuladas hacen que cada posición candidata se resuelva con
+   cuatro restas, así que probar dos mil sitios por edificio no cuesta nada. */
+const RADIOS_SINGULAR=[10,20],SECO_SINGULAR=.88;
+function colocarSingulares(){
+ const acumula=cond=>{
+  const t=new Int32Array((MW+1)*(MH+1));
+  for(let y=0;y<MH;y++){let f=0;
+   for(let x=0;x<MW;x++){if(cond(map[y*MW+x]))f++;
+    t[(y+1)*(MW+1)+x+1]=t[y*(MW+1)+x+1]+f;}}
+  return t;};
+ const caja=(t,x,y,w,h)=>t[(y+h)*(MW+1)+x+w]-t[y*(MW+1)+x+w]-t[(y+h)*(MW+1)+x]+t[y*(MW+1)+x];
+ const manzana=acumula(t=>t===EDIF||t===PATIO),
+       prohibido=acumula(t=>!pintable(t)),
+       seco=acumula(pintable);
+ const busca=(cx,cy,w,h,R)=>{
+  let mx=clamp(cx-(w>>1),1,MW-w-1),my=clamp(cy-(h>>1),1,MH-h-1),mej=-1e9;
+  for(let dy=-R;dy<=R;dy++)for(let dx=-R;dx<=R;dx++){
+   const x=clamp(cx-(w>>1)+dx,1,MW-w-1),y=clamp(cy-(h>>1)+dy,1,MH-h-1);
+   /* Manda la manzana, pero un paso de más desde el rótulo se paga: entre dos sitios
+      parecidos gana el que está donde lo pone el plano. */
+   const v=caja(seco,x,y,w,h)+caja(manzana,x,y,w,h)-6*caja(prohibido,x,y,w,h)-Math.hypot(dx,dy)*1.2;
+   if(v>mej){mej=v;mx=x;my=y;}}
+  return{x:mx,y:my,seco:caja(seco,mx,my,w,h)/(w*h)};};
+ for(const p of POI){
+  const d=PLANO_SINGULAR[p.id];if(!d)continue;
+  const[W0,H0,dib]=d;
+  let el=null;
+  buscando:
+  for(const R of RADIOS_SINGULAR)for(let k=10;k>=5;k--){
+   const w=Math.max(4,Math.round(W0*k/10)),h=Math.max(4,Math.round(H0*k/10));
+   const r=busca(p.cerca[0],p.cerca[1],w,h,R);
+   if(!el||r.seco>el.seco+.001)el={...r,w,h};
+   if(r.seco>=SECO_SINGULAR){el={...r,w,h};break buscando;}}
+  singular(p.id,el.w,el.h,dib);
+  SINGULARES[p.id].x=el.x;SINGULARES[p.id].y=el.y;}}
+
+/* Dónde puede pisar un singular. La calle, la acera de enfrente, la ría y el monte no:
+   por ahí se anda o se navega, y un edificio encima los borraría. */
+const pintable=t=>t!==AGUA&&t!==MUELLE&&t!==PUENTE&&t!==ROAD&&t!==MONTE;
+/* Se dibujan con la ciudad, antes que la gente: son suelo, no bicho. Y casilla a casilla,
+   no de un trazo, porque la caja de un edificio de treinta metros de largo siempre pilla
+   un trozo de calle por medio y esa calle tiene que seguir estando. */
+function dibSingulares(x0,y0,x1,y1){
+ for(const id in SINGULARES){
+  const s=SINGULARES[id];if(s.x===undefined)continue;
+  const ax=Math.max(x0,s.x),ay=Math.max(y0,s.y),
+        bx=Math.min(x1,s.x+s.w-1),by=Math.min(y1,s.y+s.h-1);
+  for(let y=ay;y<=by;y++)for(let x=ax;x<=bx;x++){
+   if(!pintable(map[y*MW+x]))continue;
+   ctx.drawImage(s.c,(x-s.x)*TS,(y-s.y)*TS,TS,TS,x*TS,y*TS,TS,TS);}}}
+
 /*═══════════════ ROPA, MESA Y SURTIDOR ═══════════════*/
 /* Vestirse es barato de programar porque la forja del personaje ya sabe montar cualquier
    combinación de torso, piernas, calzado y gorro: es como se dibujan los veinte
@@ -4729,6 +5018,13 @@ function dibCiudad(){
   if(map[y*MW+x]!==EDIF)continue;
   const arriba=Tc(x,y-1)!==EDIF,abajo=Tc(x,y+1)!==EDIF;
   const izq=Tc(x-1,y)!==EDIF,der=Tc(x+1,y)!==EDIF;
+  /* La cara sur es la única que se ve de pie en la calle: ahí van los locales. Solo si
+     hay dónde pararse a mirarlos — contra el agua o contra el monte no hay escaparate. */
+  if(abajo&&andable(Tc(x,y+1))&&Tc(x,y+1)!==AGUA){
+   const l=FACH_BARRIO[(BARRIOS[barrioDe[y*MW+x]]||BARRIOS[0]).estilo]||FACH_BARRIO.bloques;
+   const h2=hash(x*7,y*13);
+   ctx.drawImage(PROP.fachadas[l[h2%l.length]],x*TS,y*TS+TS-FACH_H);
+   ctx.drawImage(PROP.fachadas[l[(h2>>3)%l.length]],x*TS+16,y*TS+TS-FACH_H);}
   if(abajo){ctx.fillStyle='rgba(0,0,0,.34)';ctx.fillRect(x*TS,(y+1)*TS,TS,5);}
   if(der){ctx.fillStyle='rgba(0,0,0,.28)';ctx.fillRect((x+1)*TS,y*TS,4,TS);}
   ctx.fillStyle='rgba(255,255,255,.14)';
@@ -4737,7 +5033,8 @@ function dibCiudad(){
   ctx.fillStyle='rgba(0,0,0,.4)';
   if(abajo)ctx.fillRect(x*TS,y*TS+TS-2,TS,2);
   if(der)ctx.fillRect(x*TS+TS-2,y*TS,2,TS);}
- /* Cincuenta y tres chinchetas por fotograma son cincuenta y tres dibujos, y casi todas
+ dibSingulares(x0,y0,x1,y1);
+ /* Cincuenta y seis chinchetas por fotograma son cincuenta y seis dibujos, y casi todas
     caen fuera de la pantalla: el mapa mide siete kilómetros. */
  for(const p of POI){
   if(p.p.x<x0-3||p.p.x>x1+3||p.p.y<y0-3||p.p.y>y1+3)continue;
@@ -5090,7 +5387,7 @@ async function arrancar(){
   ['vehículos',()=>generarVeh()],
   ['props',()=>generarProps()],
   ['iconos',()=>{generarIconos();forjarMando();ajustarMando();}],
-  ['la ciudad',async()=>{await cargarCiudad();colocarPOIs();colocarParadas();}],
+  ['la ciudad',async()=>{await cargarCiudad();colocarPOIs();colocarSingulares();colocarParadas();}],
   ['el barrio',()=>{player.x=poi('piso').p.x;player.y=poi('piso').p.y;poblar();}],
   ['a la gente',async()=>{await cargarSprites();['protagonista','ertzaina','maton','maton2'].forEach(hoja);}],
  ];

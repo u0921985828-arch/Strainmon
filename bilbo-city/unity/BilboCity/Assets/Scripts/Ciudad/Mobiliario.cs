@@ -28,12 +28,40 @@ public static class Mobiliario {
         return n >= 3;
     }
 
+    /// <summary>Qué se puede abrir en cada tipo de barrio. Se repite alguno a propósito: si
+    /// todos los locales fueran distintos, una calle parecería una feria.</summary>
+    static readonly Dictionary<string,string[]> FachBarrio = new Dictionary<string,string[]> {
+        {"denso",     new[]{"fachTasca","fachPersiana","fachPortal","fachEscaparate","fachPortal","fachPersiana","fachTasca","fachCiega"}},
+        {"senorial",  new[]{"fachEscaparate","fachPortalPiedra","fachEscaparate","fachCiega","fachPortalPiedra","fachPersiana"}},
+        {"bloques",   new[]{"fachPortal","fachCiega","fachPersiana","fachPortal","fachEscaparate","fachGaraje","fachCiega","fachPortal"}},
+        {"industrial",new[]{"fachPorton","fachPorton","fachGaraje","fachCiega","fachPersiana","fachPorton"}},
+        {"abierto",   new[]{"fachPortal","fachCiega","fachGaraje","fachCiega"}},
+    };
+
     static bool Elegir(int x, int y, out Pieza p) {
         p = new Pieza();
         var t = Ciudad.T(x,y);
         var Z = Ciudad.BarrioDe(x,y);
         int h = Utiles.Hash(x*7+1, y*13+5);
         bool juntoCalle = JuntoA(x,y,Suelo.Road) || JuntoA(x,y,Suelo.Puente);
+
+        // Cada familia de tejado lleva lo suyo: en la teja, chimeneas; en la azotea,
+        // depósitos y tendederos; en la nave, lucernarios.
+        if (t == Suelo.Edif) {
+            var fam = Ciudad.FamiliaDe(Ciudad.Roof[y*Ciudad.MW+x]);
+            int hr = Utiles.Hash(x,y);
+            if (fam == "teja" || fam == "pizarra") {
+                if (hr % 23 == 0) { p.Clave = "chimenea"; p.Dx = 0.31f; p.Dy = 0.13f; return true; }
+                if (hr % 71 == 0) { p.Clave = "antenaTv"; p.Dx = 0.28f; p.Dy = 0.06f; return true; }
+            } else if (fam == "azotea") {
+                if (hr % 37 == 0) { p.Clave = "deposito";     p.Dx = 0.22f; p.Dy = 0.16f; return true; }
+                if (hr % 41 == 0) { p.Clave = "tendedero";    p.Dx = 0.06f; p.Dy = 0.28f; return true; }
+                if (hr % 43 == 0) { p.Clave = "climatizador"; p.Dx = 0.22f; p.Dy = 0.25f; return true; }
+                if (hr % 47 == 0) { p.Clave = "caseta";       p.Dx = 0.16f; p.Dy = 0.19f; return true; }
+                if (hr % 53 == 0) { p.Clave = "antenaTv";     p.Dx = 0.28f; p.Dy = 0.06f; return true; }
+            } else if (hr % 29 == 0) { p.Clave = "lucernario"; p.Dx = 0.13f; p.Dy = 0.25f; return true; }
+            return false;
+        }
 
         if (t == Suelo.Acera) {
             // semáforo en las esquinas de los cruces grandes

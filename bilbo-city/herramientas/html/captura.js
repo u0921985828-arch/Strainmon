@@ -33,10 +33,16 @@ listo().then(() => {
   // repartido y sale una calle vacía que no se parece a jugar.
   // Plantarse en un sitio concreto del mapa: la ciudad no se parece a sí misma de un
   // barrio a otro, y una sola foto de Santutxu no dice nada del Casco Viejo.
+  // Plantarse en un sitio concreto del mapa. Por defecto se busca una acera cerca, que es
+  // donde estaría un jugador; con --exacto se planta en la casilla pedida aunque sea el
+  // centro de una manzana. Eso hace falta para mirar un edificio grande: la cámara sigue
+  // al jugador y la pantalla son veintiséis casillas, así que buscando acera para el
+  // centro del estadio la foto salía de la calle de al lado, sin estadio.
   const donde = txt('--donde');
   if (donde) {
     const [x, y] = donde.split(',').map(Number);
-    const q = A.puntoAcera(x | 0, y | 0, 30);
+    const q = process.argv.includes('--exacto')
+      ? { x: x + .5, y: y + .5 } : A.puntoAcera(x | 0, y | 0, 30);
     A.player.x = q.x; A.player.y = q.y; A.player.enCoche = null;
     paso(30);
   }
@@ -60,7 +66,11 @@ function volcar() {
     : path.join(__dirname, '..', '..', 'referencia', 'capturas', 'captura-calle.png');
   fs.mkdirSync(path.dirname(salida), { recursive: true });
   fs.writeFileSync(salida, A.real.toBuffer('image/png'));
+  // Dónde se plantó de verdad: --donde pide una acera cerca del punto, y si el punto cae
+  // dentro de una manzana la acera más próxima puede quedar a media calle de distancia.
+  // Sin decirlo, uno mira la foto buscando un edificio que está fuera de cuadro.
   console.log('->', salida, A.real.width + 'x' + A.real.height,
-              '· ' + A.peatones.length + ' peatones · ' + A.coches.length + ' coches');
+              '· en ' + A.player.x.toFixed(0) + ',' + A.player.y.toFixed(0)
+              + ' · ' + A.peatones.length + ' peatones · ' + A.coches.length + ' coches');
   process.exit(0);
 }

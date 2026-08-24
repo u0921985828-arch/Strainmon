@@ -50,7 +50,7 @@ js=js.slice(0,i)+`global.__={S,player,MISIONES,empezarMision,avanzarPaso,objetiv
  AGACHA,CORRE,lineaVista,dirAng,estrellas,atacarJugador,dir8De,generarEnemigos,danar,
  XP_NIVEL,darXp,PROPIEDADES,propDe,esMio,pegaPara,comprarProp,rentaDiaria,cobrarRentas,
  estadoCasera,deudaTotal,correrAlquiler,pagarCasera,dejarPiso,ocupar,dormir,
- NIVEL_ARMA,NIVEL_VEHICULO,comer,verTab,telC,roof,famDe,familiaTejado,TEJADO_DE,PROP};
+ NIVEL_ARMA,NIVEL_VEHICULO,comer,verTab,telC,roof,famDe,familiaTejado,TEJADO_DE,PROP,SINGULARES,TS};
  sembrar(SEMILLA);`+js.slice(i);
 eval(js);
 module.exports={H,step:n=>{for(let k=0;k<n;k++){now+=16.7;const f=raf;raf=null;if(!f)throw new Error('sin frame');f(now);}},

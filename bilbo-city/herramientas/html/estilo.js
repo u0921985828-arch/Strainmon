@@ -11,7 +11,10 @@ require('./arnes.js');
 const listo = async () => {
   for (let t = 0; t < 30000; t += 25) {
     const A = global.__;
-    if (A && A.TILE && A.ICO && Object.keys(A.TILE).length && Object.keys(A.ICO).length) return;
+    // Los singulares no se forjan con el resto del arte: hasta que no está la ciudad no se
+    // sabe de qué tamaño caben, así que hay que esperar a que la ciudad cargue.
+    if (A && A.TILE && A.ICO && Object.keys(A.TILE).length && Object.keys(A.ICO).length
+        && A.SINGULARES && Object.keys(A.SINGULARES).length) return;
     await new Promise(r => setTimeout(r, 25));
   }
   throw new Error('el arte no se forjó');
@@ -24,8 +27,14 @@ listo().then(() => {
   const enPaleta = new Set(A.PALETA.map(p => (p[0] << 16) | (p[1] << 8) | p[2]));
 
   // Un lienzo cualquiera: puede venir suelto o dentro de un array (los tejados, el agua).
-  const todos = obj => Object.entries(obj).flatMap(([k, v]) =>
-    Array.isArray(v) ? v.map((c, i) => [k + '[' + i + ']', c]) : [[k, v]]);
+  // Los grupos anidados —PROP.fachadas, por ejemplo— también son arte y también tienen
+  // que pasar por la paleta: sin bajar un nivel se colaban enteros sin revisar.
+  const todos = obj => Object.entries(obj).flatMap(([k, v]) => {
+    if (Array.isArray(v)) return v.map((c, i) => [k + '[' + i + ']', c]);
+    if (v && typeof v.getContext !== 'function' && typeof v === 'object')
+      return Object.entries(v).map(([k2, c]) => [k + '.' + k2, c]);
+    return [[k, v]];
+  });
 
   // ── R1 · nada fuera de la paleta, y nada a medio transparente ────────────────────
   {
@@ -47,6 +56,7 @@ listo().then(() => {
     for (const [k, c] of todos(A.ICO)) revisa('icono ' + k, c);
     for (const [k, c] of todos(A.PROP || {})) revisa('prop ' + k, c);
     for (const k of Object.keys(A.ARQ)) revisa('hoja ' + k, A.HOJAS[k] || A.hoja(k));
+    for (const [k, s] of Object.entries(A.SINGULARES || {})) revisa('singular ' + k, s.c);
     if (!malos && !medias) bien.push('todo el arte dentro de los ' + A.PALETA.length + ' colores');
   }
 
@@ -131,6 +141,31 @@ listo().then(() => {
     }
     if (tocan > 6) fallos.push('...y ' + (tocan - 6) + ' fotogramas más al borde');
     if (!tocan) bien.push('ningún fotograma de personaje toca el borde de su celda de ' + cw + 'x' + ch);
+  }
+
+  // ── R6 · los edificios singulares, a su medida y sin transparencias por dentro ──────
+  // Cada singular se dibuja encima del tejado genérico, así que un hueco en medio no es un
+  // agujero al fondo negro: es el tejado de siempre asomándose por el centro de la
+  // catedral. Se le exige que tape su propia silueta y que mida justo lo que dice medir.
+  {
+    let malos = 0;
+    const SING = A.SINGULARES || {};
+    for (const [k, s] of Object.entries(SING)) {
+      if (s.c.width !== s.w * A.TS || s.c.height !== s.h * A.TS) {
+        fallos.push('singular ' + k + ': mide ' + s.c.width + 'x' + s.c.height
+          + ', se esperaba ' + (s.w * A.TS) + 'x' + (s.h * A.TS));
+        malos++; continue;
+      }
+      const d = px(s.c);
+      let opacos = 0;
+      for (let i = 3; i < d.length; i += 4) if (d[i] === 255) opacos++;
+      const cubre = opacos / (s.c.width * s.c.height);
+      if (cubre < 0.999) {
+        fallos.push('singular ' + k + ': solo tapa el ' + Math.round(cubre * 100) + '% de su celda');
+        malos++;
+      }
+    }
+    if (!malos) bien.push(Object.keys(SING).length + ' edificios singulares a su medida y tapando su celda');
   }
 
   bien.forEach(b => console.log('  ok    ' + b));

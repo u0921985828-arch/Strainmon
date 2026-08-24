@@ -58,6 +58,11 @@ del motor que el remedo no tenga, añádela a `herramientas/compilar/apinado/Api
 firma exacta de Unity** — una firma inventada de más tapa errores reales, que es lo único
 que puede estropear esta herramienta.
 
+`herramientas/plano/sitios.py` y `herramientas/plano/singulares.py` comparan las
+coordenadas de los 56 sitios y las medidas de los 12 singulares entre el HTML y el C#. Es
+la trampa clásica de tener dos implementaciones: el HTML pasa la batería, el C# no se
+ejecuta aquí, y Unity acaba poniendo las cosas en otro lado sin que nadie lo vea.
+
 `herramientas/csharp/` analiza el C# sobre el árbol de sintaxis real (tree-sitter). No es un
 compilador, pero verifica sintaxis, miembros inexistentes, aridad de llamadas y
 constructores, miembros de enum, tipos desconocidos y **listas modificadas mientras se
@@ -192,6 +197,46 @@ plancha lisa.
 **El tráfico y los peatones también.** `TRAFICO_BARRIO` y `PEATON_BARRIO` reparten trece
 chasis y dieciocho arquetipos según el estilo: taxis y gabardinas por la Gran Vía, monos de
 faena y camiones en Zorrotzaurre, motos por el Casco.
+
+## Los edificios singulares
+
+Doce sitios —San Mamés, el Guggenheim, el Arriaga, el Ayuntamiento, la catedral, Begoña,
+la torre Iberdrola, el Euskalduna, Abando, la Ribera, la Alhóndiga y el Arena— **se dibujan
+enteros y a su tamaño real**, encima del tejado genérico. Antes eran una chincheta sobre
+una manzana igual que las demás: el juego te decía dónde estaban y desde arriba no se veía
+nada. La estación de Abando ocupa 35 casillas de largo porque la nave mide 180 m; no cabe
+en pantalla de una vez, y así debe ser.
+
+Tres cosas que hay que respetar al tocarlos:
+
+**Se dibujan en casillas, no en píxeles.** El pincel que recibe cada dibujo (`T`) trabaja en
+unidades de casilla, con decimales. La primera versión iba en píxeles absolutos y valía
+mientras un singular medía ocho casillas; a treinta y cinco, un remate de tres píxeles sobre
+un lienzo de mil se pierde. Esto no es un detalle de estilo: **el tamaño final no se conoce
+hasta que carga la ciudad**, porque se encogen hasta que caben.
+
+**Se colocan solos, y por eso hay que fiarse del plano hasta cierto punto.** El rótulo del
+plano trae un error de unas casillas, y en dos casos es gordo: los de San Mamés y el Arena
+caen literalmente en mitad de la ría. `colocarSingulares()` desliza la caja alrededor del
+rótulo (tabla de sumas acumuladas, cada candidato son cuatro restas), se queda donde más
+manzana pisa y menos agua toca, y si a 10 casillas no hay suelo busca a 20; si aún así no
+cabe, encoge el edificio de 10 en 10 %. El tope de 20 es a propósito: la batería exige que
+ningún sitio se aleje más de 30 del plano, así que la colocación no puede ser nunca la que
+rompa eso.
+
+**No pintan sobre la calle ni sobre el agua.** `dibSingulares` va casilla a casilla, no de un
+trazo: la caja de un edificio de 180 m siempre pilla un trozo de calle por medio y esa calle
+tiene que seguir estando. `pintable()` es la lista de lo que se respeta — calle, acera de
+enfrente, ría, muelle, puente y monte.
+
+Las medidas están escritas en dos sitios (`PLANO_SINGULAR` en el HTML, `DePlano` en
+`Singulares.cs`) y `herramientas/plano/singulares.py` las compara, igual que
+`sitios.py` compara las coordenadas.
+
+Sobre nombres: los edificios públicos van con el suyo, que es un hecho de la ciudad. **Las
+marcas comerciales no**: no hay ningún Corte Inglés ni ninguna otra cadena en el mapa; los
+comercios llevan nombres inventados sobre calles reales (Trapos Gran Vía, Tasca Ondarra,
+Galería Abandoibarra).
 
 ## La portada
 

@@ -71,6 +71,11 @@ public class Juego : MonoBehaviour {
         // ── ciudad ──
         Ciudad.Generar();          yield return null;
 
+        // Los sitios van antes que el render: los singulares se colocan alrededor del
+        // rótulo de su sitio, y es el render el que los pinta.
+        Estado.ColocarSitios();
+        Singulares.Colocar();      yield return null;
+
         _mundo = new GameObject("Mundo").transform;
         _mundo.SetParent(transform, false);
         _render = _mundo.gameObject.AddComponent<RenderCiudad>();
@@ -79,7 +84,6 @@ public class Juego : MonoBehaviour {
         _entidades = new GameObject("Entidades").transform;
         _entidades.SetParent(transform, false);
 
-        Estado.ColocarSitios();
         Transporte.ColocarParadas();
         var goProps = new GameObject("Mobiliario").transform;
         goProps.SetParent(_mundo, false);

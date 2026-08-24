@@ -82,7 +82,10 @@ def es_estatico(n, src):
 def recolectar(n, src, fichero, contenedor=None):
     for h in n.children:
         t = h.type
-        if t in ('class_declaration','struct_declaration','enum_declaration','interface_declaration','record_declaration'):
+        # Un delegate declara un tipo como cualquier otro; sin contarlo, el primer campo
+        # que lo use se denuncia como tipo desconocido y el fallo es del analizador.
+        if t in ('class_declaration','struct_declaration','enum_declaration','interface_declaration',
+                 'record_declaration','delegate_declaration'):
             nom_n = nombre_de(h)
             if nom_n is None: continue
             nombre = txt(nom_n, src)
