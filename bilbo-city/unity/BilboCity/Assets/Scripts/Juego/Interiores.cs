@@ -80,6 +80,17 @@ public static class Interiores {
                 new NpcInterior{ X=3.5f,  Y=2.6f, Nombre="Nerea", Arq="nerea", Tipo="ropa" },
                 new NpcInterior{ X=8.5f,  Y=6.4f, Nombre="Patxi", Arq="patxi", Tipo="cocinero" },
                 new NpcInterior{ X=18.5f, Y=2.6f, Nombre="Bego",  Arq="bego",  Tipo="pescatera" }}}},
+        // Los almacenes: la única tienda con más de un mostrador. Las escaleras mecánicas
+        // no llevan a ninguna planta —no hay pisos— pero dicen que el sitio tiene tres.
+        {"almacenes", new DefInterior{ Nombre="Almacenes", Suelo="terrazo", Pared="paredBlanca", Mapa=new[]{
+            "#########################","#RRRR..RRRR..XXXX..EEEE.#","#.......................#",
+            "#..AA.............AA....#","#.......................#","#..WW..WW....PPPP..PPPP.#",
+            "#..WW..WW...............#","#...........OOO....OOO..#","#.......................#",
+            "#.EEEE..EEEE..XXXX..RRR.#","#.......................#","###########DD############"},
+            Npcs=new[]{
+                new NpcInterior{ X=3.5f,  Y=2.6f, Nombre="Nerea", Arq="nerea", Tipo="ropa" },
+                new NpcInterior{ X=13.5f, Y=6.4f, Nombre="Maite", Arq="maite", Tipo="encargada" },
+                new NpcInterior{ X=20.5f, Y=6.4f, Nombre="Patxi", Arq="patxi", Tipo="cocinero" }}}},
         {"gasoli", new DefInterior{ Nombre="Gasolinera", Suelo="sueloTaller", Pared="paredChapa", Mapa=new[]{
             "###############","#GG..GG..GG...#","#.............#","#.............#",
             "#EEEE....XXXX.#","#.............#","#....OOO......#","######DD#######"},

@@ -69,6 +69,8 @@ public static class Bienes {
                        Desc="Foso, chapa y pintura. Y lo que no se pregunta." },
         new Propiedad{ Id="galeria",      Nombre="Galería Abandoibarra", Tipo="negocio",  Precio=95000, Nivel=11, Renta=640,
                        Desc="Veinte locales alquilados. Esto ya no es un negocio, es una renta." },
+        new Propiedad{ Id="almacenes",    Nombre="Almacenes Ibaizabal", Tipo="negocio", Precio=180000, Nivel=14, Renta=1150,
+            Desc="Toda la esquina de la Gran Vía. Lo último que se compra, y el que paga los demás.", Perk="ropa" },
     };
 
     public static Propiedad PropDe(string id) { return Todas.Find(p => p.Id == id); }

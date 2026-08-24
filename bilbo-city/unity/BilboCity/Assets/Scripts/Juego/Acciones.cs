@@ -374,6 +374,18 @@ public static class Acciones {
                     ? "Buenos días, jefe. Todo en orden." : "Pasa, pasa. ¿Te vistes o miras?" }, ops.ToArray());
                 return;
             }
+            case "encargada": {
+                var ops = new List<Opcion>{
+                    new Opcion{ Texto="Ver la ropa", Accion=() => TiendaRopa(Interiores.Actual.Nombre) },
+                    new Opcion{ Texto="Llenar la despensa", Coste="25 €", Accion=() => Comer(25, 1f, .35f, 12) },
+                    Bienes.OpcionComprar("almacenes"),
+                    new Opcion{ Texto="¿Se vende bien?", Accion=() =>
+                        Hud.I.Aviso("EN DICIEMBRE NO CABE UN ALMA. EN AGOSTO ESTO ES UN MUSEO") }};
+                Dialogo.I.Abrir("Maite", new[]{ Bienes.EsMio("almacenes")
+                    ? "Buenos días, jefe. La caja de ayer ya está cuadrada."
+                    : "Tres plantas: ropa arriba, alimentación abajo y lo demás en medio." }, ops.ToArray());
+                return;
+            }
             case "cocinero":
                 Dialogo.I.Abrir("Patxi", new[]{"Hay menú y hay carta. Tú dirás."}, new[]{
                     new Opcion{ Texto="Menú del día", Coste="18 €", Accion=() => Comer(18, 1f, .6f, 30) },

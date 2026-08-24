@@ -172,8 +172,35 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
     {
       // Un sitio despejado y a plena luz, para que las cuentas sean las del cono y no
       // las de una fachada que se cruza por medio.
+      //
+      // «Despejado» hay que comprobarlo, no pedirlo: antes esto era puntoAcera(), que
+      // elige por sorteo entre las aceras del vecindario, y el sorteo depende de cuántas
+      // veces se haya tirado el dado antes en la batería. Añadir un comercio al juego
+      // corrió el dado, la acera que salió tenía una fachada a tres casillas, y cuatro
+      // pruebas de sigilo se pusieron rojas sin que el sigilo hubiera cambiado. Ahora se
+      // busca en espiral la primera acera con ocho casillas libres a los cuatro lados.
+      const abierto = (x, y) => {
+        const t = A.Tc(x, y);
+        return t !== A.EDIF && t !== A.AGUA && t !== A.MONTE;
+      };
+      const despejado = (cx, cy, rmax, libre) => {
+        for (let d = 0; d <= rmax; d++)
+          for (let dy = -d; dy <= d; dy++)
+            for (let dx = -d; dx <= d; dx++) {
+              if (Math.max(Math.abs(dx), Math.abs(dy)) !== d) continue;
+              const x = cx + dx, y = cy + dy, t = A.Tc(x, y);
+              if (t !== A.ACERA && t !== A.PLAZA) continue;
+              let libreAqui = true;
+              for (let i = -libre; i <= libre && libreAqui; i++)
+                if (!abierto(x + i, y) || !abierto(x, y + i)) libreAqui = false;
+              if (libreAqui) return { x: x + .5, y: y + .5 };
+            }
+        return null;
+      };
       const moyua = A.POI.find(q => q.id === 'moyua');
-      const llano = A.puntoAcera(moyua.p.x | 0, moyua.p.y | 0, 20);
+      const llano = despejado(moyua.p.x | 0, moyua.p.y | 0, 60, 8);
+      ok(!!llano, 'no hay ninguna explanada cerca de Moyúa donde medir el sigilo');
+      if (!llano) throw new Error('sin sitio donde probar el sigilo');
       S.min = 12 * 60;
       ok(!A.esDeNoche(), 'a mediodía dice que es de noche');
       P.x = llano.x; P.y = llano.y; P.enCoche = null;
@@ -408,7 +435,13 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
         if (seco < peorS) { peorS = seco; peorSN = id; }
         if (seco < 0.75) { fallos.push('singular ' + id + ': solo el ' + Math.round(seco * 100) + '% de su caja es suelo'); malos++; }
       }
-      if (ids.length !== 12) { fallos.push('hay ' + ids.length + ' singulares, no 12'); malos++; }
+      // Cuántos hay lo dice la tabla del juego, no un número escrito aquí: si mañana se
+      // añade el Arriaga bis, esto tiene que seguir midiendo lo mismo y no romperse.
+      const enTabla = Object.keys(A.PLANO_SINGULAR || {}).length;
+      if (ids.length !== enTabla) {
+        fallos.push('la tabla tiene ' + enTabla + ' singulares y se colocaron ' + ids.length);
+        malos++;
+      }
       if (!malos) bien.push(ids.length + ' edificios singulares en tierra (el peor, ' + peorSN + ', al '
         + Math.round(peorS * 100) + '%) y a menos de 30 casillas del plano (el peor, ' + peorN + ', a '
         + peorD.toFixed(0) + ')');

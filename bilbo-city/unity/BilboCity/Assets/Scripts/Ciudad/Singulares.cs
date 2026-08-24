@@ -84,7 +84,7 @@ public static class Singulares {
 
     struct Plano_ { public int W, H; public Dibujo Dib; }
 
-    // ═══════════ LOS DOCE ═══════════
+    // ═══════════ LOS TRECE ═══════════
 
     static readonly Dictionary<string,Plano_> DePlano = new Dictionary<string,Plano_> {
         // 227×203 m: el estadio, y lo que más se reconoce de Bilbao desde el aire después
@@ -246,6 +246,25 @@ public static class Singulares {
                 T.P(1.9f+i*an,H/2f-2.1f,an-1.7f,4.2f,Paleta.Acero);
             }
             T.P(.45f,.45f,W-.9f,.4f,Paleta.MaderaL);
+        }}},
+        // 100×62 m. Los almacenes de la Gran Vía: un bloque macizo con la cubierta llena
+        // de máquinas y el rótulo corrido por el canto de la calle. Nombre inventado,
+        // sitio real — aquí no entra ninguna marca de nadie.
+        {"almacenes", new Plano_ { W = 19, H = 12, Dib = (T,W,H) => {
+            T.P(0,0,W,H,Paleta.HormigonO);
+            T.P(.5f,.5f,W-1,H-1,Paleta.HormigonL);
+            T.P(1.2f,1.2f,W-2.4f,H-3.4f,Paleta.Hormigon);
+            for (float y = 2.2f; y < H-3.4f; y += 2.4f)       // los climatizadores
+                for (float x = 2.2f; x < W-3; x += 2.6f) {
+                    T.P(x,y,1.8f,1.4f,Paleta.AceroO);
+                    T.P(x+.25f,y+.25f,1.3f,.9f,Paleta.Acero);
+                    T.P(x+.25f,y+.25f,1.3f,.25f,Paleta.Hueso);
+                }
+            T.P(1.2f,H-4.2f,W-2.4f,.35f,Paleta.GrisO);        // la junta de la cubierta
+            T.P(.8f,H-2.4f,W-1.6f,1.5f,Paleta.MostazaO);      // el rótulo, a la Gran Vía
+            T.P(1.2f,H-2.1f,W-2.4f,.9f,Paleta.Mostaza);
+            for (float x = 2; x < W-2; x += 1.5f) T.P(x,H-1.85f,.55f,.4f,Paleta.Carbon);
+            T.P(.8f,H-.9f,W-1.6f,.5f,Paleta.Carbon);          // la marquesina
         }}},
         // 105×90 m. Cuenco pequeño y tejado de madera.
         {"arena", new Plano_ { W = 20, H = 17, Dib = (T,W,H) => {

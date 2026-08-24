@@ -2219,6 +2219,7 @@ const ARQ={
  nerea:A('nerea','delgada',0,'melena',C.pelo2,'ninguno',null,'polo','vestir','deportivas','ninguno'),
  patxi:A('patxi','corpulenta',1,'calvo',C.pelo1,'ninguno',null,'delantal','vestir','zapatos','ninguno'),
  gorka:A('gorka','media',2,'corto',C.pelo1,'gorra',C.azul,'mono','monoP','botas','ninguno'),
+ maite:A('maite','media',3,'coleta',C.pelo1,'ninguno',null,'chaqueta','falda','zapatos','ninguno'),
  /* Más gente por la calle. Ocho tipos no llenan una ciudad de siete kilómetros: a la
     tercera manzana ya has visto a todo el mundo dos veces. */
  p9: A('p9','media',0,'canoso',C.pelo5,'ninguno',null,'gabardina','vestir','zapatos','ninguno'),
@@ -3086,6 +3087,16 @@ const INT={
   npcs:[{x:3.5,y:2.6,n:'Nerea',arq:'nerea',tipo:'ropa'},
         {x:8.5,y:6.4,n:'Patxi',arq:'patxi',tipo:'cocinero'},
         {x:18.5,y:2.6,n:'Bego',arq:'bego',tipo:'pescatera'}]},
+ /* Los almacenes: la única tienda con más de un mostrador. Las escaleras mecánicas no
+    llevan a ninguna planta —no hay pisos— pero dicen que el sitio tiene tres. */
+ almacenes:{n:'Almacenes',suelo:'terrazo',pared:'paredBlanca',mapa:[
+  '#########################','#RRRR..RRRR..XXXX..EEEE.#','#.......................#',
+  '#..AA.............AA....#','#.......................#','#..WW..WW....PPPP..PPPP.#',
+  '#..WW..WW...............#','#...........OOO....OOO..#','#.......................#',
+  '#.EEEE..EEEE..XXXX..RRR.#','#.......................#','###########DD############'],
+  npcs:[{x:3.5,y:2.6,n:'Nerea',arq:'nerea',tipo:'ropa'},
+        {x:13.5,y:6.4,n:'Maite',arq:'maite',tipo:'encargada'},
+        {x:20.5,y:6.4,n:'Patxi',arq:'patxi',tipo:'cocinero'}]},
  gasoli:{n:'Gasolinera',suelo:'sueloTaller',pared:'paredChapa',mapa:[
   '###############','#GG..GG..GG...#','#.............#','#.............#',
   '#EEEE....XXXX.#','#.............#','#....OOO......#','######DD#######'],
@@ -3138,6 +3149,7 @@ function colocarPOIs(){
   /* Comercios. Nombres inventados, sitios reales: la Gran Vía, las Siete Calles, Pozas,
      Deustu, Abandoibarra, Artxanda, Atxuri y Rekalde. */
   {id:'ropagranvia',n:'Trapos Gran Vía',c:'#c98fd0',int:'ropa',cerca:[790,325]},
+  {id:'almacenes',n:'Almacenes Ibaizabal',c:'#d0b46a',int:'almacenes',cerca:[812,327]},
   {id:'ropacasco',n:'Ropero del Casco',c:'#b878c0',int:'ropa',cerca:[944,340]},
   {id:'tascapozas',n:'Tasca Ondarra',c:C.rojoL,int:'tasca',cerca:[560,370]},
   {id:'tascadeustu',n:'Tasca Iparragirre',c:C.rojoL,int:'tasca',cerca:[620,205]},
@@ -3755,6 +3767,9 @@ const PROPIEDADES=[
   dd:'Foso, chapa y pintura. Y lo que no se pregunta.',perk:'repintar'},
  {id:'galeria',    n:'Galería Abandoibarra',tipo:'negocio', precio:95000,nivel:11,renta:640,
   dd:'Veinte locales alquilados. Esto ya no es un negocio, es una renta.'},
+ {id:'almacenes',  n:'Almacenes Ibaizabal', tipo:'negocio', precio:180000,nivel:14,renta:1150,
+  dd:'Toda la esquina de la Gran Vía. Lo último que se compra, y el que paga los demás.',
+  perk:'ropa'},
 ];
 const propDe=id=>PROPIEDADES.find(p=>p.id===id);
 const esMio=id=>!!S.props[id];
@@ -4066,6 +4081,13 @@ function hablarCon(n){
   {txt:'Ver la ropa',fn:()=>tiendaRopa(S.interior.n)},
   ...(S.interior.poi==='ropagranvia'?[opcionComprar('ropagranvia','Ver las cuentas')]:[]),
   {txt:'¿Qué se lleva?',fn:()=>aviso('«Aquí lo que se lleva es que no se te note de dónde vienes»')}]);
+ if(n.tipo==='encargada')return hablar('Maite',[esMio('almacenes')
+   ?'Buenos días, jefe. La caja de ayer ya está cuadrada.'
+   :'Tres plantas: ropa arriba, alimentación abajo y lo demás en medio.'],[
+  {txt:'Ver la ropa',fn:()=>tiendaRopa(S.interior.n)},
+  {txt:'Llenar la despensa',coste:'25 €',fn:()=>comer(25,1,.35,12,'La compra de la semana.')},
+  opcionComprar('almacenes','Ver las cuentas'),
+  {txt:'¿Se vende bien?',fn:()=>aviso('«En diciembre no cabe un alma. En agosto esto es un museo»')}]);
  if(n.tipo==='cocinero')return hablar('Patxi',['Hay menú y hay carta. Tú dirás.'],[
   {txt:'Menú del día',coste:'18 €',fn:()=>comer(18,1,.6,30,'Menú del día.')},
   {txt:'Chuletón y postre',coste:'45 €',fn:()=>comer(45,1,1,55,'Chuletón.')},
@@ -4291,6 +4313,21 @@ const PLANO_SINGULAR={
    T(1.6+i*an,H/2-2.4,an-1.1,4.8,C.aceroO);
    T(1.9+i*an,H/2-2.1,an-1.7,4.2,C.acero);}
   T(.45,.45,W-.9,.4,C.maderaL);}],
+ /* 100×62 m. Los almacenes de la Gran Vía: un bloque macizo con la cubierta llena de
+    máquinas y el rótulo corrido por el canto de la calle. Nombre inventado, sitio real —
+    aquí no entra ninguna marca de nadie. */
+ almacenes:[19,12,(T,W,H)=>{
+  T(0,0,W,H,C.hormigonO);
+  T(.5,.5,W-1,H-1,C.hormigonL);
+  T(1.2,1.2,W-2.4,H-3.4,C.hormigon);
+  /* Los climatizadores de la azotea, en dos hileras. */
+  for(let y=2.2;y<H-3.4;y+=2.4)for(let x=2.2;x<W-3;x+=2.6){
+   T(x,y,1.8,1.4,C.aceroO);T(x+.25,y+.25,1.3,.9,C.acero);T(x+.25,y+.25,1.3,.25,C.hueso);}
+  T(1.2,H-4.2,W-2.4,.35,C.grisO);                   /* la junta de la cubierta */
+  T(.8,H-2.4,W-1.6,1.5,C.mostazaO);                 /* el rótulo, a la Gran Vía */
+  T(1.2,H-2.1,W-2.4,.9,C.mostaza);
+  for(let x=2;x<W-2;x+=1.5)T(x,H-1.85,.55,.4,C.carbon);
+  T(.8,H-.9,W-1.6,.5,C.carbon);}],                  /* la marquesina */
  /* 105×90 m. Cuenco pequeño y tejado de madera. */
  arena:[20,17,(T,W,H,aro)=>{
   T(0,0,W,H,C.hormigonO);

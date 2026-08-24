@@ -194,6 +194,7 @@ public class Estado {
         // Comercios. Nombres inventados, sitios reales: la Gran Vía, las Siete Calles,
         // Pozas, Deustu, Abandoibarra, Artxanda, Atxuri y Rekalde.
         S("ropagranvia", "Trapos Gran Vía",       Paleta.H("#c98fd0"), "ropa",      790,325);
+        S("almacenes",   "Almacenes Ibaizabal",   Paleta.H("#d0b46a"), "almacenes", 812,327);
         S("ropacasco",   "Ropero del Casco",      Paleta.H("#b878c0"), "ropa",      944,340);
         S("tascapozas",  "Tasca Ondarra",         Paleta.RojoL,        "tasca",     560,370);
         S("tascadeustu", "Tasca Iparragirre",     Paleta.RojoL,        "tasca",     620,205);

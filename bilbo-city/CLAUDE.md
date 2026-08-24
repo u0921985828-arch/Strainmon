@@ -59,7 +59,7 @@ firma exacta de Unity** — una firma inventada de más tapa errores reales, que
 que puede estropear esta herramienta.
 
 `herramientas/plano/sitios.py` y `herramientas/plano/singulares.py` comparan las
-coordenadas de los 56 sitios y las medidas de los 12 singulares entre el HTML y el C#. Es
+coordenadas de los 57 sitios y las medidas de los 13 singulares entre el HTML y el C#. Es
 la trampa clásica de tener dos implementaciones: el HTML pasa la batería, el C# no se
 ejecuta aquí, y Unity acaba poniendo las cosas en otro lado sin que nadie lo vea.
 
@@ -200,12 +200,12 @@ faena y camiones en Zorrotzaurre, motos por el Casco.
 
 ## Los edificios singulares
 
-Doce sitios —San Mamés, el Guggenheim, el Arriaga, el Ayuntamiento, la catedral, Begoña,
-la torre Iberdrola, el Euskalduna, Abando, la Ribera, la Alhóndiga y el Arena— **se dibujan
-enteros y a su tamaño real**, encima del tejado genérico. Antes eran una chincheta sobre
-una manzana igual que las demás: el juego te decía dónde estaban y desde arriba no se veía
-nada. La estación de Abando ocupa 35 casillas de largo porque la nave mide 180 m; no cabe
-en pantalla de una vez, y así debe ser.
+Trece sitios —San Mamés, el Guggenheim, el Arriaga, el Ayuntamiento, la catedral, Begoña,
+la torre Iberdrola, el Euskalduna, Abando, la Ribera, la Alhóndiga, el Arena y los
+Almacenes Ibaizabal— **se dibujan enteros y a su tamaño real**, encima del tejado
+genérico. Antes eran una chincheta sobre una manzana igual que las demás: el juego te
+decía dónde estaban y desde arriba no se veía nada. La estación de Abando ocupa 35 casillas
+de largo porque la nave mide 180 m; no cabe en pantalla de una vez, y así debe ser.
 
 Tres cosas que hay que respetar al tocarlos:
 
@@ -234,9 +234,10 @@ Las medidas están escritas en dos sitios (`PLANO_SINGULAR` en el HTML, `DePlano
 `sitios.py` compara las coordenadas.
 
 Sobre nombres: los edificios públicos van con el suyo, que es un hecho de la ciudad. **Las
-marcas comerciales no**: no hay ningún Corte Inglés ni ninguna otra cadena en el mapa; los
-comercios llevan nombres inventados sobre calles reales (Trapos Gran Vía, Tasca Ondarra,
-Galería Abandoibarra).
+marcas comerciales no**: no hay ningún Corte Inglés ni ninguna otra cadena en el mapa. Los
+grandes almacenes de la Gran Vía son los **Almacenes Ibaizabal**, inventados, con su
+interior de tres mostradores y su encargada; igual que Trapos Gran Vía, la Tasca Ondarra o
+la Galería Abandoibarra. Sitio real, nombre nuestro.
 
 ## La portada
 
@@ -277,7 +278,7 @@ que se lee.
 
 ## Comercio y transporte
 
-Los sitios donde se entra son **doce**, y los cuatro últimos los comparten varios POI: el
+Los sitios donde se entra son **trece**, y los cinco últimos los comparten varios POI: el
 rótulo de la puerta lo pone el sitio (`entrar(id, desde, nombre)`), no el plano de dentro.
 Dos tascas iguales por dentro y con distinto nombre en la puerta es lo que hay en
 cualquier barrio, y así no se duplica un plano por cada esquina.
@@ -313,7 +314,7 @@ que abre las armas grandes (uzi a nivel 4, escopeta a 6), los vehículos (furgon
 deportivo 5) y, sobre todo, **lo que te dejan comprar**. La curva sube deprisa a propósito:
 si el dinero llega antes que el nivel, comprar deja de ser una meta y pasa a ser un trámite.
 
-**Nueve propiedades**, cuatro viviendas y cinco negocios. No hay inmobiliaria ni menú de
+**Diez propiedades**, cuatro viviendas y seis negocios. No hay inmobiliaria ni menú de
 compra: las viviendas se compran **en su puerta** y los negocios **a su dueño, dentro**. Si
 quieres el taller, vas al taller y se lo dices a Iker. Un negocio renta cada día —se cobra
 al dormir— y en un local tuyo no se paga: comer, vestirte o que te arreglen el coche sale
