@@ -667,9 +667,11 @@ def _cerca_de_via(rej, gx, gy, r=CALLE_RADIO_VIA):
 
 
 # Casillas entre dos rótulos consecutivos de la misma calle. El número tiene dos filos: a
-# 60 se partía la Alameda Urquijo, que mide kilómetro y medio y va rotulada cada cuatro
-# manzanas; a 300 volvía a colarse el 'Correo' de la otra orilla. 140 casillas son 720 m.
-SALTO_CALLE = 140
+# 60 se partía la Alameda Urquijo y a 140 la Gran Vía, que va rotulada de punta a punta y
+# mide kilómetro y medio; a 300 volvía a colarse el 'Correo' de la otra orilla, que está
+# a unas 250. Queda en 220 casillas —1,1 km—, y de que
+# una calle no salte de una orilla a otra se encarga el juego: el trazado no cruza puentes.
+SALTO_CALLE = 220
 
 
 def _grupo_mayor(pts):
@@ -714,6 +716,19 @@ def _orden_en_eje(pts):
     return sorted(pts, key=lambda p: (p[0] - mx) * ux + (p[1] - my) * uy)
 
 
+# Las abreviaturas del índice. Importan por dos motivos: 'G.V. López de Haro D. Diego' es
+# la Gran Vía y sin desplegarla nadie la reconoce, y sobre el mapa el rótulo pone 'GRAN
+# VÍA', que no se parece en nada al nombre del índice. Así que la abreviatura se despliega
+# y se registra también como forma de buscar la calle.
+ABREVIATURAS = {
+    'C.': '', 'Cl.': '', 'Av.': 'Avenida', 'Al.': 'Alameda', 'G.V.': 'Gran Vía',
+    'Pl.': 'Plaza', 'Ps.': 'Paseo', 'Pq.': 'Parque', 'J.': 'Jardín', 'Js.': 'Jardines',
+    'Ctra.': 'Carretera', 'Cm.': 'Camino', 'Pj.': 'Pasaje', 'Tr.': 'Travesía',
+    'Es.': 'Escalinata', 'Gp.': 'Grupo', 'Mu.': 'Muelle', 'Pt.': 'Puente',
+    'Cs.': 'Caserío', 'Ba.': 'Barrio', 'Ro.': 'Ronda', 'Ca.': 'Callejón',
+}
+
+
 def indice_callejero(pdf):
     """Los nombres de calle del índice del margen: el callejero oficial, limpio.
 
@@ -721,21 +736,71 @@ def indice_callejero(pdf):
     casilla de la cuadrícula — «C.  Abaitua Eulalia  F 3». Eso es oro: sobre el mapa los
     nombres están escritos letra a letra siguiendo la curva de la calle y salen hechos
     picadillo, pero aquí están enteros y bien escritos. Se usan de diccionario: del mapa
-    se saca DÓNDE, y de aquí QUÉ."""
+    se saca DÓNDE, y de aquí QUÉ.
+
+    Dos formas del índice que hay que respetar, y que costaron calles: la casilla no
+    siempre va en la misma línea que el nombre, y la abreviatura puede llevar punto por
+    dentro — 'G.V.' es la Gran Vía, y pidiendo letras seguidas se quedaba fuera."""
     p = pdf[0]
     caja = pymupdf.Rect(RECORTE[2], 0, p.rect.x1, p.rect.y1)
-    txt = unicodedata.normalize('NFKC', p.get_text('text', clip=caja))
-    fuera = {}
-    # El separador es un tabulador en el PDF de verdad, pero al extraer texto de otras
-    # formas llega como varios espacios: se aceptan los dos.
+    lineas = unicodedata.normalize('NFKC', p.get_text('text', clip=caja)).split('\n')
     sep = r'(?:\t|\s{2,})'
-    for m in re.finditer(r'^\s*[A-Za-zÁÉÍÓÚÑ]{1,3}\.?\s*' + sep + r'\s*(.+?)\s*' + sep +
-                         r'\s*([A-G])\s*([1-7])\s*$', txt, re.M):
-        nombre = re.sub(r'\s+', ' ', m.group(1)).strip()
+    fila = re.compile(r'^\s*([A-Za-zÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑ.]{0,5}\.)\s*' + sep +
+                      r'\s*(.+?)\s*(?:' + sep + r'\s*([A-G])\s*([1-7]))?\s*$')
+    sola = re.compile(r'^\s*([A-G])\s*([1-7])\s*$')
+    fuera = {}
+    # Dos pasadas porque el índice no tiene una sola forma: la que despliega abreviaturas
+    # va primero, para que el nombre que se guarde sea el completo —'Gran Vía López de
+    # Haro' y no 'López de Haro'—; la otra rellena lo que aquélla no reconoce.
+    # Antes: la mayoría de las entradas
+    # caben en una línea con tabuladores, y unas cuantas —las de abreviatura con punto por
+    # dentro, y las que parten la casilla a la línea de abajo— no. Con una sola pasada se
+    # pierden ochocientas o veinte, según cuál se elija.
+    for n, l in enumerate(lineas):
+        m = fila.match(l)
+        if not m:
+            continue
+        abrev, nombre, col, num = m.group(1), re.sub(r'\s+', ' ', m.group(2)).strip(), m.group(3), m.group(4)
+        if col is None:
+            # La casilla se ha ido a la línea de abajo; se mira un poco más allá porque
+            # entre medias puede quedar una línea en blanco.
+            for k in range(n + 1, min(n + 4, len(lineas))):
+                s2 = sola.match(lineas[k])
+                if s2:
+                    col, num = s2.group(1), s2.group(2)
+                    break
+            if col is None:
+                continue
         if len(nombre) < 3:
             continue
-        fuera.setdefault(_clave_calle(nombre), (nombre, m.group(2), int(m.group(3))))
+        largo = (ABREVIATURAS.get(abrev, '') + ' ' + nombre).strip()
+        ent = (largo, col, int(num))
+        # Se registra por el nombre a secas y por el nombre con la abreviatura desplegada:
+        # sobre el mapa unas calles se rotulan de una forma y otras de la otra.
+        for k in (_clave_calle(nombre), _clave_calle(largo)):
+            fuera.setdefault(k, ent)
+    entero = re.compile(r'^\s*[A-Za-zÁÉÍÓÚÑ]{1,3}\.?\s*' + sep + r'\s*(.+?)\s*' + sep +
+                        r'\s*([A-G])\s*([1-7])\s*$', re.M)
+    for m in entero.finditer('\n'.join(lineas)):
+        nombre = re.sub(r'\s+', ' ', m.group(1)).strip()
+        if len(nombre) >= 3:
+            fuera.setdefault(_clave_calle(nombre), (nombre, m.group(2), int(m.group(3))))
     return fuera
+
+
+def _comun(a, b):
+    """Longitud del trozo seguido más largo que comparten dos nombres."""
+    mejor = 0
+    prev = [0] * (len(b) + 1)
+    for i in range(1, len(a) + 1):
+        cur = [0] * (len(b) + 1)
+        for j in range(1, len(b) + 1):
+            if a[i-1] == b[j-1]:
+                cur[j] = prev[j-1] + 1
+                if cur[j] > mejor:
+                    mejor = cur[j]
+        prev = cur
+    return mejor
 
 
 def _clave_calle(t):
@@ -866,7 +931,12 @@ def calles_de(pdf, rej):
                     elif ik in k:
                         n = len(ik)
                     else:
-                        continue
+                        # Ni uno contiene al otro y aun así puede ser la misma calle: el
+                        # mapa pone 'GRAN VÍA DON DIEGO LÓPEZ DE HARO' y el índice
+                        # 'López de Haro D. Diego'. Con el trozo común largo basta.
+                        n = _comun(k, ik)
+                        if n < 8:
+                            continue
                     if n < 5:
                         continue
                     if n > mejor_n:
@@ -969,19 +1039,6 @@ if __name__ == '__main__':
     calles = calles_de(pdf, rej)
     dueno = barrios(rej, marcas)
 
-    from collections import Counter
-    c = Counter(rej)
-    nombres = {CALLE: 'calle', ACERA: 'acera', EDIF: 'manzana', PARQUE: 'parque',
-               AGUA: 'agua', PUENTE: 'puente', MONTE: 'monte'}
-    print(f'{MW}x{MH} casillas · {METROS_POR_PUNTO*(RECORTE[2]-RECORTE[0])/MW:.2f} m por casilla '
-          f'· {n} trazos de calzada · {len(marcas)} barrios · {len(calles)} calles')
-    print(f'  calzada en una pieza: {viaria:.1f}%')
-    for k, v in sorted(c.items()):
-        print(f'  {nombres.get(k,k):8s} {v:8d}  {100*v/(MW*MH):5.1f}%')
-    faltan = sorted(set(ESTILOS) - {m[0] for m in marcas})
-    if faltan:
-        print('  sin rótulo dentro del recorte: ' + ', '.join(faltan))
-
     raiz = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
     html = os.path.join(raiz, 'referencia', 'bilbo-city.html')
     csf = os.path.join(raiz, 'unity', 'BilboCity', 'Assets', 'Scripts', 'Ciudad', 'Plano.cs')
@@ -995,6 +1052,19 @@ if __name__ == '__main__':
     if os.path.exists(calf):
         sustituir(calf, 'CALLES', bloque_calles_cs(calles))
         print(f'  -> {calf}')
+    from collections import Counter
+    c = Counter(rej)
+    nombres = {CALLE: 'calle', ACERA: 'acera', EDIF: 'manzana', PARQUE: 'parque',
+               AGUA: 'agua', PUENTE: 'puente', MONTE: 'monte'}
+    print(f'{MW}x{MH} casillas · {METROS_POR_PUNTO*(RECORTE[2]-RECORTE[0])/MW:.2f} m por casilla '
+          f'· {n} trazos de calzada · {len(marcas)} barrios · {len(calles)} calles')
+    print(f'  calzada en una pieza: {viaria:.1f}%')
+    for k, v in sorted(c.items()):
+        print(f'  {nombres.get(k,k):8s} {v:8d}  {100*v/(MW*MH):5.1f}%')
+    faltan = sorted(set(ESTILOS) - {m[0] for m in marcas})
+    if faltan:
+        print('  sin rótulo dentro del recorte: ' + ', '.join(faltan))
+
     with open('/tmp/trama.bin', 'wb') as f:
         f.write(bytes(rej))
     with open('/tmp/barrio.bin', 'wb') as f:

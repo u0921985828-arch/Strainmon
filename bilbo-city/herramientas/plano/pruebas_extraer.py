@@ -81,15 +81,17 @@ pdf = pdf_falso([
 ])
 calles = dict(E.calles_de(pdf, rej))
 
-ok('Gran Via' in calles, 'no salió la avenida rotulada varias veces')
+# El índice la lista como 'Av. Gran Via' y el extractor despliega la abreviatura: sobre el
+# mapa el rótulo pone solo el nombre, pero lo que se guarda es el nombre completo.
+ok('Avenida Gran Via' in calles, 'no salió la avenida rotulada varias veces')
 ok('Ercilla' in calles, 'no salió la calle de un solo rótulo')
 ok('Polideportivo' not in calles, 'se coló un equipamiento, que está lejos de la calle')
 ok('Santutxu' not in calles, 'se coló un barrio')
 ok('27' not in calles and 'B' not in calles, 'se coló un número o una letra de cuadrícula')
 ok('Montevideo' not in calles, 'se aceptó un nombre del índice que aparece en otra casilla')
 
-if 'Gran Via' in calles:
-    v = calles['Gran Via']
+if 'Avenida Gran Via' in calles:
+    v = calles['Avenida Gran Via']
     ok(len(v) == 4, 'la avenida salió con %d puntos de paso, no 4' % len(v))
     ok(v == sorted(v), 'los puntos de paso no están ordenados a lo largo de la calle: %s' % (v,))
     ok(all(380 <= y <= 386 for _, y in v), 'algún punto de paso cayó fuera de la calle')
@@ -104,7 +106,7 @@ if 'Ercilla' in calles:
 js = E.bloque_calles_js(list(calles.items()))
 cs = E.bloque_calles_cs(list(calles.items()))
 ok(js.startswith('const CALLES=[') and js.rstrip().endswith('];'), 'el bloque JS no cierra')
-ok('C("Gran Via"' in cs, 'el bloque C# no trae la avenida')
+ok('C("Avenida Gran Via"' in cs, 'el bloque C# no trae la avenida')
 ok(js.count('{n:') == len(calles), 'el bloque JS no trae todas las calles')
 
 if fallos:
