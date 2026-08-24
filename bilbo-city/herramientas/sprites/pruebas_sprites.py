@@ -97,6 +97,31 @@ bien.append('los %d colores de plantilla se separan %d° en el peor caso'
             % (len(matices), peor[0]))
 
 
+# ── 4 bis · la paleta que se le manda a PixelLab es exactamente la de las rampas ────
+# `color_image` es lo que convierte el estarcido en certeza: al generador se le da la lista
+# cerrada de colores que puede usar. Si esa lista se desviara de las rampas que luego se
+# escriben en la hoja, el reparto por partes volvería a ser una apuesta — y en silencio.
+b64, ntonos = PL.png_plantilla(pal, ramp)
+from PIL import Image
+import base64 as _b64
+im = Image.open(io.BytesIO(_b64.b64decode(b64))).convert('RGB')
+en_png = set(im.getdata())
+en_rampas = set(pal[i - 1] for l in ramp.values() for i in l)
+ok(en_png == en_rampas,
+   'la paleta que se manda no coincide con las rampas: sobran %s, faltan %s'
+   % (sorted(en_png - en_rampas), sorted(en_rampas - en_png)))
+ok(ntonos == len(en_rampas), 'el recuento de tonos de la plantilla no cuadra')
+bien.append('la paleta forzada lleva los %d tonos de las rampas, ni uno más' % ntonos)
+
+# ── 4 ter · la semilla es estable y distinta por silueta ────────────────────────────
+# Todas las celdas de una silueta van con la misma semilla: es lo que hace que las 55
+# imágenes parezcan la misma persona. Y tiene que salir del nombre, no del reloj, o
+# repetir una tirada devolvería a otro vecino.
+ok(PL.semilla('largo_pantalon') == PL.semilla('largo_pantalon'), 'la semilla no es estable')
+semillas = {PL.semilla(k) for k in PL.SETS}
+ok(len(semillas) == len(PL.SETS), 'dos siluetas comparten semilla')
+bien.append('%d semillas estables, una por silueta' % len(semillas))
+
 # ── 5 · todas las poses del juego tienen dibujo, y ninguno sobra ────────────────────
 sin = [p for p in PL.POSES if p not in PL.DE_POSE]
 ok(not sin, 'poses del juego sin dibujo: %s' % ', '.join(sin))

@@ -85,6 +85,17 @@ se guardan con clave distinta** (`sim_` y `api_`): sin eso, el `--simular` que s
 arriba dejaba la caché llena de monigotes, la tirada de verdad los encontraba, no llamaba a
 PixelLab ni una vez y terminaba diciendo que todo había ido bien.
 
+## La paleta va forzada
+
+A cada petición se le manda `color_image`: un PNG con los 20 tonos de las rampas de
+plantilla y ninguno más. Eso cierra la lista de colores que el generador puede usar, así
+que **lo que vuelve ya viene en las rampas** y el reparto por partes deja de tener que
+adivinar. Antes se le pedía «magenta vivo» y se confiaba en que no lo apagara.
+
+Y todas las celdas de una silueta van con **la misma semilla**, sacada de su nombre. Sin
+eso, cada una de las 55 llamadas inventa una persona distinta y el que anda cambia de cara
+a cada paso.
+
 ## Lo que hay que mirar en la primera tirada
 
 Todo esto se sostiene sobre una cosa: que el generador **respete los colores de plantilla**.
@@ -138,3 +149,7 @@ Los nombres de los extremos y de los campos están todos juntos al principio de
 `pixellab.py`, en `API_*`: es lo único que puede haber cambiado desde que se escribió
 esto. Cuando la respuesta no trae imagen donde se espera, el error imprime el cuerpo
 entero — leerlo es más rápido que adivinar.
+
+Un 429 o un 5xx se reintentan cuatro veces, esperando el doble cada vez. No es un lujo:
+una tirada son 385 llamadas seguidas y sin eso un solo 429 a media tirada se llevaba por
+delante todo lo ya pagado. Un 401 no se reintenta — por insistir no mejora una clave mala.

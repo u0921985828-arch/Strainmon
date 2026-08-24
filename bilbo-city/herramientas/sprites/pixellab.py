@@ -48,7 +48,7 @@ sitio, porque son lo único que puede haber cambiado desde que se escribió esto
 llamada devuelve algo inesperado, el error trae el cuerpo entero de la respuesta: es más
 rápido leerlo que adivinar.
 """
-import argparse, base64, json, os, re, sys, zlib
+import argparse, base64, json, os, re, sys, time, zlib
 
 RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 HTML = os.path.join(RAIZ, 'referencia', 'bilbo-city.html')
@@ -111,6 +111,23 @@ SETS = {
 }
 
 VISTA = 'high top-down'
+# Lo que NO queremos. Va en su propio campo y no metido a empujones en la descripción:
+# ahí compite con lo que sí queremos, y de paso el generador dibuja lo que se le nombra.
+NEGATIVO = ('gradient, dithering, soft shading, antialiasing, blurry, 3d render, photo, '
+            'realistic, watermark, text, signature, extra limbs, cut off, ground shadow, '
+            'hat, cap, helmet, bag, backpack, weapon prop')
+GUIA = 8                   # cuánto se le aprieta para que siga el texto
+_GASTO = [0.]              # lo que lleva gastado la tirada, según la propia API
+
+
+def semilla(ropa):
+    """La semilla de una silueta. Estable, y distinta para cada una.
+
+    Todas las celdas de una silueta van con la misma: es lo que hace que las 55 imágenes
+    parezcan la misma persona en vez de 55 personas distintas haciendo cada una una pose.
+    Se saca del nombre para que repetir una tirada dé lo mismo.
+    """
+    return zlib.crc32(ropa.encode()) % 100000
 # La descripción es del aspecto que queremos, no de la obra de nadie. Pedirle a un
 # generador el estilo de un juego con dueño es hacerle producir algo derivado de ese
 # juego, y ese algo acabaría dentro del nuestro. Lo que va aquí es lo mismo que dice
@@ -328,21 +345,73 @@ def _reparte(px, w, h):
                     'color': len(semillas)}
 
 
-def _pedir(ruta, cuerpo, clave):
+def png_plantilla(pal, ramp):
+    """Un PNG con los colores de plantilla, para mandárselo a PixelLab como `color_image`.
+
+    Es la pieza que convierte el estarcido de apuesta en certeza. Sin esto, se le pide al
+    generador «magenta vivo» y se confía en que no lo apague; con esto, se le da la lista
+    exacta de colores que puede usar, y lo que vuelve ya viene en las rampas de cada parte.
+    El reparto por partes deja de tener que adivinar.
+
+    Sale de las mismas rampas que se escriben en la hoja, así que no puede desfasarse de
+    ellas: cada parte aporta sus tonos, más el negro del contorno.
+    """
+    from PIL import Image
+    tonos = []
+    for parte in list(CLAVES) + ['contorno']:
+        for i in ramp[parte]:
+            if pal[i - 1] not in tonos:
+                tonos.append(pal[i - 1])
+    lado = 8
+    cols = min(8, len(tonos))
+    filas = (len(tonos) + cols - 1) // cols
+    im = Image.new('RGB', (cols * lado, filas * lado), tonos[0])
+    px = im.load()
+    for n, c in enumerate(tonos):
+        cx, cy = (n % cols) * lado, (n // cols) * lado
+        for y in range(lado):
+            for x in range(lado):
+                px[cx + x, cy + y] = c
+    import io as _io
+    b = _io.BytesIO()
+    im.save(b, 'PNG')
+    return base64.b64encode(b.getvalue()).decode(), len(tonos)
+
+
+def _pedir(ruta, cuerpo, clave, intentos=4):
+    """Una llamada a PixelLab, con reintentos.
+
+    Los reintentos no son un lujo: una tirada son 385 llamadas seguidas, y sin esto un
+    solo 429 a mitad de camino tiraba la tirada entera y dejaba a medias lo ya pagado.
+    Se reintenta lo que puede arreglarse esperando —429 y los 5xx— y no lo que no: un 401
+    por clave mala no mejora por insistir.
+    """
     import urllib.error, urllib.request
-    pet = urllib.request.Request(
-        API_BASE + ruta, data=json.dumps(cuerpo).encode(),
-        headers={'Content-Type': 'application/json', 'Authorization': 'Bearer ' + clave})
-    try:
-        with urllib.request.urlopen(pet, timeout=180) as r:
-            return json.loads(r.read().decode())
-    except urllib.error.HTTPError as e:
-        detalle = e.read().decode('utf8', 'replace')[:2000]
-        raise SystemExit(f'PixelLab respondió {e.code} a {ruta}:\n{detalle}')
-    except urllib.error.URLError as e:
-        raise SystemExit(f'no se llega a {API_BASE}{ruta}: {e.reason}\n'
-                         '¿Hay salida a internet desde aquí? En el contenedor de Claude '
-                         'suele estar cerrada; esto se ejecuta en local.')
+    ultimo = ''
+    for intento in range(intentos):
+        pet = urllib.request.Request(
+            API_BASE + ruta, data=json.dumps(cuerpo).encode(),
+            headers={'Content-Type': 'application/json',
+                     'Authorization': 'Bearer ' + clave})
+        try:
+            with urllib.request.urlopen(pet, timeout=180) as r:
+                return json.loads(r.read().decode())
+        except urllib.error.HTTPError as e:
+            detalle = e.read().decode('utf8', 'replace')[:2000]
+            if e.code != 429 and e.code < 500:
+                raise SystemExit(f'PixelLab respondió {e.code} a {ruta}:\n{detalle}')
+            ultimo = f'{e.code}: {detalle[:200]}'
+        except urllib.error.URLError as e:
+            if intento == intentos - 1:
+                raise SystemExit(
+                    f'no se llega a {API_BASE}{ruta}: {e.reason}\n'
+                    '¿Hay salida a internet desde aquí? En el contenedor de Claude '
+                    'suele estar cerrada; esto se ejecuta en local.')
+            ultimo = str(e.reason)
+        espera = 2 ** intento
+        print(f'  reintento {intento + 1}/{intentos} en {espera}s ({ultimo})', flush=True)
+        time.sleep(espera)
+    raise SystemExit(f'PixelLab no responde después de {intentos} intentos: {ultimo}')
 
 
 def _imagen(resp):
@@ -355,13 +424,14 @@ def _imagen(resp):
     return base64.b64decode(re.sub(r'^data:[^,]+,', '', v))
 
 
-def genera(ropa, direccion, dibujo, clave, simular):
+def genera(ropa, direccion, dibujo, clave, simular, plantilla=None):
     """Un PNG de una silueta mirando a una dirección y haciendo algo."""
     # La procedencia va en la clave. Sin esto, un --simular previo —que es lo primero que
     # recomienda el LEEME— deja la caché llena de monigotes de relleno, y la tirada de
     # verdad los encuentra ahí, no llama a PixelLab ni una vez y termina diciendo que todo
     # ha ido bien. Se paga una tirada para acabar con el mismo dibujo de antes.
-    etiqueta = f'{"sim" if simular else "api"}|{ropa}|{direccion}|{dibujo}|{CEL_W}x{CEL_H}'
+    etiqueta = (f'{"sim" if simular else "api"}|{ropa}|{direccion}|{dibujo}'
+                f'|{CEL_W}x{CEL_H}|{"pal" if plantilla else "libre"}')
     nombre = os.path.join(CACHE, re.sub(r'\W+', '_', etiqueta)[:120] + '.png')
     if os.path.exists(nombre):
         return open(nombre, 'rb').read()
@@ -372,13 +442,23 @@ def genera(ropa, direccion, dibujo, clave, simular):
         # long sleeved jacket»: suelto, el color se le va a otra prenda o al fondo.
         colores = ', '.join(f'wearing {ropa_de(ropa, p)} in flat {CLAVES[p][1]}'
                             for p in ('torso', 'piernas', 'calzado') if ropa_de(ropa, p))
-        resp = _pedir(API_GENERAR, {
+        cuerpo = {
             'description': (f'a person {colores}, with {CLAVES["pelo"][1]}, '
                             f'{CLAVES["piel"][1]}, {DIBUJOS[dibujo]}, {ESTILO}'),
+            'negative_description': NEGATIVO,
             'image_size': {'width': CEL_W, 'height': CEL_H},
             'view': VISTA, 'direction': direccion,
             'no_background': True, 'outline': 'single color black outline',
-        }, clave)
+            'shading': 'basic shading', 'detail': 'low detail',
+            'text_guidance_scale': GUIA,
+            # La misma semilla en las 55 celdas de una silueta. Sin esto, cada llamada
+            # inventa una persona distinta y el que anda cambia de cara a cada paso.
+            'seed': semilla(ropa),
+        }
+        if plantilla:
+            cuerpo['color_image'] = {'type': 'base64', 'base64': plantilla}
+        resp = _pedir(API_GENERAR, cuerpo, clave)
+        _GASTO[0] += (resp.get('usage') or {}).get('usd') or 0
         datos = _imagen(resp)
     os.makedirs(CACHE, exist_ok=True)
     open(nombre, 'wb').write(datos)
@@ -490,7 +570,7 @@ def _avisa(nombre, dib, direccion, rep):
     return bool(avisos)
 
 
-def hoja(nombre, clave, simular, pal, ramp, diag=False):
+def hoja(nombre, clave, simular, pal, ramp, diag=False, plantilla=None):
     """La hoja entera de una silueta: 8 columnas de dirección × 16 filas de pose."""
     ancho, alto = CEL_W * 8, CEL_H * len(POSES)
     rej = bytearray(ancho * alto)
@@ -498,7 +578,7 @@ def hoja(nombre, clave, simular, pal, ramp, diag=False):
     for dib in sorted(set(DE_POSE[p] for p in POSES)):
         for fx in range(PEDIDAS):
             celdas[(dib, fx)], rep = a_indices(
-                genera(nombre, DIRECCIONES[fx], dib, clave, simular), pal, ramp)
+                genera(nombre, DIRECCIONES[fx], dib, clave, simular, plantilla), pal, ramp)
             print(f'  {nombre:15s} {dib:8s} {DIRECCIONES[fx]}', flush=True)
             if diag:
                 print('     ' + '  '.join(f'{k} {v}' for k, v in sorted(rep.items())),
@@ -612,12 +692,16 @@ if __name__ == '__main__':
     if not a.simular and not a.clave:
         raise SystemExit('falta la clave: PIXELLAB_API_KEY o --clave')
 
+    plantilla, ntonos = png_plantilla(pal, ramp)
+    print(f'  paleta forzada de {ntonos} tonos: lo que vuelva ya viene en las rampas')
     crudas = {}
     for k in quiere:
-        crudas[k] = hoja(k, a.clave, a.simular, pal, ramp, a.diag)
+        crudas[k] = hoja(k, a.clave, a.simular, pal, ramp, a.diag,
+                         None if a.simular else plantilla)
     hojas = {k: comprimir(v) for k, v in crudas.items()}
     escribir(hojas, ramp)
     if a.lamina:
         lamina(crudas, pal, a.lamina, a.esc)
     peso = sum(len(v) for v in hojas.values()) / 1024
-    print(f'-> {HTML}  ({peso:.0f} KB de hojas)')
+    gasto = f' · ${_GASTO[0]:.2f} gastados' if _GASTO[0] else ''
+    print(f'-> {HTML}  ({peso:.0f} KB de hojas{gasto})')
