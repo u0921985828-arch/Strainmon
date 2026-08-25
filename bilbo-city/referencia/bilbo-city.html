@@ -2833,18 +2833,27 @@ function generarTiles(){
  /* Teja árabe: hiladas de canales. Poco contraste a propósito — a treinta y dos píxeles
     por cinco metros, un tejado tiene que leerse como material y no como rayas. La primera
     versión llevaba una banda clara en medio de cada tile y toda la ciudad salió a pana. */
- const teja=(b,o)=>T32(g=>{rell(g,b);ruido(g,32,32,[o],9);
-  for(let y=0;y<32;y+=5){P(g,0,y,32,1,o);
-   for(let x=(y/5%2)*4;x<32;x+=8)P(g,x,y+1,2,4,o);}});
- /* Pizarra: placas pequeñas y oscuras, a matarrás. */
- const pizarra=(b,o)=>T32(g=>{rell(g,b);ruido(g,32,32,[o],10);
-  for(let y=0;y<32;y+=5)for(let x=(y/5%2)*4;x<32;x+=8)P(g,x,y,7,4,o);});
- /* Azotea: grava y nada más. Lo que va encima va suelto. */
- const grava=(b,o)=>T32(g=>{rell(g,b);ruido(g,32,32,[o],30);});
- /* Nave: chapa ondulada, y en las grandes el diente de sierra con los lucernarios. */
- const chapa=(b,o)=>T32(g=>{rell(g,b);for(let x=0;x<32;x+=5)P(g,x,0,2,32,o);});
- const sierra=(b,o,luz)=>T32(g=>{rell(g,b);
-  for(let y=0;y<32;y+=10){P(g,0,y,32,6,o);P(g,0,y+6,32,3,luz);}});
+ /* Los tejados, a la medida final. A 8 cm por pixel una teja curva mide 40x25 cm, o sea
+    5x3 px, y por eso a 32 no cabia: las hileras de antes eran de 80 cm y el tejado parecia
+    una persiana. Ahora se dibuja pieza a pieza, con la canal entre teja y teja y el solape
+    de la hilera de abajo, que es lo que hace que un tejado se lea como tejado. */
+ const teja=(b,o)=>T64((g,N)=>{P(g,0,0,N,N,b);ruido(g,N,N,[o],9);
+  for(let y=0;y<N;y+=6){
+   P(g,0,y,N,1,o);                                   /* el solape de la hilera */
+   for(let x=(y/6%2)*3;x<N;x+=5){P(g,x,y+1,1,5,o);   /* la canal entre tejas */
+    P(g,x+1,y+1,3,1,C.ladrillo5);}}});               /* el lomo, que da la luz */
+ /* Pizarra: placa de 30x20 cm a matarras, con el clavo visto. */
+ const pizarra=(b,o)=>T64((g,N)=>{P(g,0,0,N,N,b);ruido(g,N,N,[o],10);
+  for(let y=0;y<N;y+=3)for(let x=(y/3%2)*2;x<N;x+=4){
+   P(g,x,y,3,2,o);P(g,x,y,3,1,C.hormigon5);}});
+ /* Azotea: grava, y la junta de dilatacion de la lamina cada tres metros. */
+ const grava=(b,o)=>T64((g,N)=>{P(g,0,0,N,N,b);ruido(g,N,N,[o],34);
+  for(let i=0;i<N;i+=37)P(g,i,0,1,N,o);});
+ /* Nave: chapa grecada de 25 cm de paso, y el diente de sierra con sus lucernarios. */
+ const chapa=(b,o)=>T64((g,N)=>{P(g,0,0,N,N,b);
+  for(let x=0;x<N;x+=3){P(g,x,0,1,N,o);P(g,x+1,0,1,N,C.acero);}});
+ const sierra=(b,o,luz)=>T64((g,N)=>{P(g,0,0,N,N,b);
+  for(let y=0;y<N;y+=20){P(g,0,y,N,12,o);P(g,0,y+12,N,6,luz);P(g,0,y+12,N,1,C.nieve);}});
 
  /* Tejas de barro viejo, no de tejado nuevo: entre variantes hay un paso corto de tono.
     Una de ellas era roja de bandera y la manzana entera cantaba desde el otro lado del
@@ -3186,17 +3195,35 @@ function generarProps(){
  const AN_V=10, AL_V=14;
  const fila=(g,W,fn)=>{const n=3,paso=W/n;
   for(let i=0;i<n;i++)fn(Math.round(i*paso+(paso-AN_V)/2));};
- const TIPOS=(muro,muroL,muroO,ph)=>[
+ /* El alero: la cornisa que remata la fachada por arriba y la sombra que tira sobre la
+    ultima planta. Sin ella el muro y el tejado se tocan sin transicion y no se sabe donde
+    acaba un piso y empieza el siguiente, que es lo que hacia que la manzana pareciese
+    plana por mucho detalle que llevase. Vuela 30 cm, como una cornisa de verdad. */
+ const alero=(muro,muroL,muroO)=>banda(5,(g,W,H)=>{
+  P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);
+  P(g,0,H-3,W,2,muroO);P(g,0,H-1,W,1,C.carbon);});
+ /* El estado de conservacion. No hay dos comunidades que cuiden igual el edificio, y eso
+    se ve desde la calle antes que ninguna otra cosa: el revoco manchado bajo los aleros y
+    los antepechos, la baranda oxidada, la persiana de cada vecino a una altura. Lo lleva
+    el mismo hash del edificio, asi que un portal esta cuidado y el de al lado, dejado. */
+ const mancha=(g,W,H,osc)=>{
+  for(let x=0;x<W;x++){const alto=((x*13)%5)+2;
+   if(((x*7+3)%9)<4)for(let y=0;y<alto;y++)P(g,x,y+2,1,1,osc);}
+  ruido(g,W,H,[osc],8);};
+ const TIPOS=(muro,muroL,muroO,ph,viejo)=>[
   /* liso: ventana y nada mas, la planta de patio o de medianera */
   banda(ph,(g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+   if(viejo)mancha(g,W,H,muroO);
    fila(g,W,x=>hueco(g,x,7,AN_V,AL_V,muroO,muroL));}),
   /* balcon: losa que vuela, baranda de hierro y la sombra que tira sobre el muro */
   banda(ph,(g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+   if(viejo)mancha(g,W,H,muroO);
+   const HI=viejo?C.ladrillo2:HIERRO;   /* la baranda, oxidada o no */
    fila(g,W,x=>{hueco(g,x,5,AN_V,AL_V,muroO,muroL);
     /* La losa vuela y tira sombra sobre el muro; la baranda va delante del hueco. */
     P(g,x-3,H-8,AN_V+6,2,muroL);P(g,x-3,H-6,AN_V+6,1,muroO);
-    P(g,x-3,H-13,AN_V+6,1,HIERRO);
-    for(let b=0;b<AN_V+6;b+=3)P(g,x-3+b,H-13,1,5,HIERRO);});}),
+    P(g,x-3,H-13,AN_V+6,1,HI);
+    for(let b=0;b<AN_V+6;b+=3)P(g,x-3+b,H-13,1,5,HI);});}),
   /* mirador: la galeria acristalada de Bilbao, dos huecos de frente y su canto */
   banda(ph,(g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
    /* El mirador de Bilbao no es un balcon acristalado suelto: es una columna que sube la
@@ -3205,7 +3232,8 @@ function generarProps(){
       apiladas, las bandas forman la galeria continua— y su color no sale del revoco sino
       de la carpinteria: el contraste es la mitad de lo que se reconoce de una calle de
       aqui. */
-   const bx=Math.round((W-34)/2), CARP=C.verde2, CARPL=C.verde3;
+   if(viejo)mancha(g,W,H,muroO);
+   const bx=Math.round((W-34)/2), CARP=viejo?C.verde1:C.verde2, CARPL=viejo?C.verde2:C.verde3;
    P(g,bx,0,34,H,CARP);P(g,bx,0,34,1,CARPL);
    P(g,bx+2,2,30,H-4,VIDRIO);P(g,bx+2,2,28,2,VIDRIOL);
    for(let m=10;m<30;m+=10)P(g,bx+2+m,2,2,H-4,CARP);
@@ -3213,22 +3241,31 @@ function generarProps(){
    P(g,bx-1,0,1,H,muroO);P(g,bx+34,0,1,H,muroO);}),
   /* persiana echada: media calle esta asi a media manana */
   banda(ph,(g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+   if(viejo)mancha(g,W,H,muroO);
+   let iv=0;
    fila(g,W,x=>{hueco(g,x,7,AN_V,AL_V,muroO,muroL);
-    /* Bajada hasta la misma altura en toda la banda: cada ventana a su aire quedaba
-       inquieto, y una persiana no se para donde le da la gana en cada piso. */
-    const b=9;
+    /* En un edificio cuidado las persianas van parejas; en uno dejado cada vecino la
+       tiene a su altura, y eso es exactamente lo que se ve desde la acera de enfrente. */
+    const b=viejo?[6,11,8][iv++%3]:9;
     P(g,x,7,AN_V,b,C.grisO);for(let y=7;y<7+b;y+=2)P(g,x,y,AN_V,1,C.gris);});}),
  ];
  /* Un juego de cuatro tipos por cada revoco y por cada altura de planta: el sprite se
     forja una vez y se reparte por hash, asi que la variedad no cuesta nada en marcha. */
  PROP.pisos={};
  for(const est of Object.keys(REVOCO)){
-  PROP.pisos[est]=REVOCO[est].map(([m,l,o])=>TIPOS(m,l,o,PISO_BARRIO[est]));
+  PROP.pisos[est]=[];
+  for(const [m,l,o] of REVOCO[est])for(const viejo of [0,1]){
+   const juego=TIPOS(m,l,o,PISO_BARRIO[est],viejo);
+   juego.alero=alero(m,l,o);            /* la cornisa va con su revoco */
+   PROP.pisos[est].push(juego);
+  }
  }
  /* La nave no tiene plantas: una franja de ventana alta y chapa, y punto. */
- PROP.pisosNave=[banda(PISO_BARRIO.industrial,(g,W,H)=>{
+ const naveJuego=[banda(PISO_BARRIO.industrial,(g,W,H)=>{
   P(g,0,0,W,H,C.aceroO);P(g,0,0,W,2,C.acero);P(g,0,H-2,W,2,C.grisO);
   for(let x=4;x<W-6;x+=10)P(g,x,4,6,H-9,VIDRIO);})];
+ naveJuego.alero=alero(C.aceroO,C.acero,C.grisO);
+ PROP.pisosNave=naveJuego;
  PROP.deposito=S_(18,20,g=>{P(g,3,4,12,14,'#7f9aa8');P(g,3,4,12,3,'#a8c4d0');
   P(g,15,4,2,14,C.aceroO);P(g,4,18,3,2,C.carbon);P(g,12,18,3,2,C.carbon);
   P(g,5,1,8,3,C.acero);});
@@ -6500,6 +6537,29 @@ function dibCiudad(){
   if(map[y*MW+x]!==EDIF)continue;
   const arriba=Tc(x,y-1)!==EDIF,abajo=Tc(x,y+1)!==EDIF;
   const izq=Tc(x-1,y)!==EDIF,der=Tc(x+1,y)!==EDIF;
+  /* La caida del tejado. Un tejado plano con textura no es un tejado: lo que se lee como
+     cubierta es que tenga dos faldones, una limatesa en medio y un alero volado. La
+     casilla no sabe donde esta dentro de la manzana, asi que se mide aqui —cuanto
+     edificio hay arriba y cuanto abajo, con tope— y de ahi sale el faldon:
+       el de delante da a la calle y recibe la luz, asi que va aclarado;
+       el de detras se va en sombra;
+       en la fila de en medio va la limatesa, y en la de abajo el alero con su sombra.
+     Es lo que convierte la plancha en un volumen sin salir del cenital. */
+  const famT=famDe(roof[y*MW+x]);
+  if(famT!=='azotea'){
+   let ar=0; while(ar<7&&Tc(x,y-ar-1)===EDIF)ar++;
+   let ab=0; while(ab<7&&Tc(x,y+ab+1)===EDIF)ab++;
+   const prof=ar+ab;
+   if(prof>=2){
+    const cumbre=Math.abs(ar-ab)<=(prof%2), delante=ab<ar;
+    const f=1-Math.min(ab,ar)/(prof/2);        /* 0 en la cumbre, 1 en el alero */
+    ctx.fillStyle=delante?'rgba(255,255,255,'+(.05+f*.12).toFixed(3)+')'
+                         :'rgba(0,0,0,'+(.06+f*.16).toFixed(3)+')';
+    ctx.fillRect(x*TS,y*TS,TS,TS);
+    if(cumbre){ctx.fillStyle='rgba(255,255,255,.22)';ctx.fillRect(x*TS,y*TS+TS/2-2,TS,2);
+     ctx.fillStyle='rgba(0,0,0,.28)';ctx.fillRect(x*TS,y*TS+TS/2,TS,2);}
+   }
+  }
   /* La cara sur es la única que se ve de pie en la calle: ahí van los locales. Solo si
      hay dónde pararse a mirarlos — contra el agua o contra el monte no hay escaparate. */
   if(abajo&&andable(Tc(x,y+1))&&Tc(x,y+1)!==AGUA){
@@ -6534,11 +6594,20 @@ function dibCiudad(){
    const sprP=tipos[(hEd>>7)%tipos.length];
    for(let k=0;k<nPisos;k++)
     ctx.drawImage(sprP,x*TS,y*TS+TS-FACH_H*ESC-(k+1)*ph*ESC);
+   /* El alero remata la pila por arriba. Sin el, el muro y el tejado se tocan sin
+      transicion y no se sabe donde acaba la ultima planta. */
+   if(nPisos&&tipos.alero)
+    ctx.drawImage(tipos.alero,x*TS,y*TS+TS-FACH_H*ESC-nPisos*ph*ESC-tipos.alero.height);
    for(let px=0,n=0;px<TS;n++){
     let t=l[(h2>>(n*3))%l.length];
     if(ANCHO_FACH[t]>TS-px)t=l.find(k=>ANCHO_FACH[k]<=TS-px)||'portal';
     ctx.drawImage(PROP.fachadas[t],x*TS+px*ESC,y*TS+TS-FACH_H*ESC);
     px+=ANCHO_FACH[t];}}
+  /* El alero vuela 40 cm sobre la fachada y tira su sombra: es el remate de arriba del
+     edificio, y sin el la pared y el tejado se tocan a hueso. */
+  if(abajo&&famT!=='azotea'&&famT!=='nave'){
+   ctx.drawImage(TILE.tejados[roof[y*MW+x]]||TILE.tejados[0],0,TS-6,TS,6,x*TS,y*TS+TS-1,TS,6);
+   ctx.fillStyle='rgba(0,0,0,.45)';ctx.fillRect(x*TS,y*TS+TS+5,TS,2);}
   /* La sombra sobre la calle crece con el edificio: con cinco píxeles, una manzana de
      seis alturas proyectaba lo mismo que un bordillo. */
   if(abajo){ctx.fillStyle='rgba(0,0,0,.34)';ctx.fillRect(x*TS,(y+1)*TS,TS,9*ESC);}
