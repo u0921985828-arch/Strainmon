@@ -3112,19 +3112,61 @@ function generarProps(){
  /* Las plantas: muro con su luz arriba a la izquierda y su sombra abajo y a la derecha,
     como todo, y dos filas de ventanas. La ventana no es un agujero negro: lleva dintel
     claro y el vidrio azulado, que es lo que la distingue de un hueco. */
- const pisos=(h,muro,muroL,muroO,fn)=>{const c=lienzo(32*ESC,h*ESC),g=c.getContext('2d');
-  ESC_P=ESC;
-  P(g,0,0,32,h,muro);P(g,0,0,32,1,muroL);P(g,31,0,1,h,muroO);P(g,0,h-1,32,1,muroO);
-  fn(g,h);ESC_P=1;return cuantizar(c);};
- const ventanas=(hueco,dintel)=>(g,h)=>{
-  for(let fy=2;fy<h-4;fy+=6)for(let x=3;x<29;x+=7){
-   P(g,x,fy,5,4,hueco);P(g,x,fy,5,1,dintel);P(g,x+1,fy+1,3,2,'#3f5566');}};
+ /* Las plantas, dibujadas a la medida final (64 de ancho por 30 de alto la banda), que
+    es lo que deja poner una baranda de un pixel o el vidrio de un mirador. A 8 cm por
+    pixel: hueco de ventana 1,0 x 1,4 m, antepecho 90 cm, mirador de 2,4 m de frente.
+
+    Y hay cuatro tipos por material, no uno. No porque en Bilbao haya cuatro clases de
+    casa, sino porque una sola banda repetida convierte la manzana en papel pintado: lo
+    que hace que una calle parezca una calle es que el edificio de al lado no sea el
+    mismo. El tipo lo elige el hash de la casilla, asi que sale solo y no hay nada
+    escrito a mano. */
+ const VIDRIO='#3f5566', VIDRIOL='#7f9aa8', HIERRO=C.carbon;
+ const banda=(fn)=>{const W=32*ESC,H=PISO_H*ESC,c=lienzo(W,H),g=c.getContext('2d');
+  fn(g,W,H);return cuantizar(c);};
+ /* El hueco: dintel claro arriba, jamba en sombra a la derecha, vidrio con su reflejo en
+    la esquina de arriba a la izquierda, que es de donde viene la luz en todo el juego. */
+ const hueco=(g,x,y,w,h,muroO,muroL)=>{
+  P(g,x-1,y-1,w+2,h+2,muroO);P(g,x-1,y-1,w+2,1,muroL);
+  P(g,x,y,w,h,VIDRIO);P(g,x,y,w-2,2,VIDRIOL);};
+ /* Tres huecos por casilla: 2,1 m entre ejes, que es lo que hay en una fachada de
+    vivienda. Con cuatro y huecos de metro y medio salia un muro cortina de oficinas. */
+ const AN_V=10, AL_V=14;
+ const fila=(g,W,fn)=>{const n=3,paso=W/n;
+  for(let i=0;i<n;i++)fn(Math.round(i*paso+(paso-AN_V)/2));};
+ const TIPOS=(muro,muroL,muroO)=>[
+  /* liso: ventana y nada mas, la planta de patio o de medianera */
+  banda((g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+   fila(g,W,x=>hueco(g,x,7,AN_V,AL_V,muroO,muroL));}),
+  /* balcon: losa que vuela, baranda de hierro y la sombra que tira sobre el muro */
+  banda((g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+   fila(g,W,x=>{hueco(g,x,5,AN_V,AL_V,muroO,muroL);
+    /* La losa vuela y tira sombra sobre el muro; la baranda va delante del hueco. */
+    P(g,x-3,H-8,AN_V+6,2,muroL);P(g,x-3,H-6,AN_V+6,1,muroO);
+    P(g,x-3,H-13,AN_V+6,1,HIERRO);
+    for(let b=0;b<AN_V+6;b+=3)P(g,x-3+b,H-13,1,5,HIERRO);});}),
+  /* mirador: la galeria acristalada de Bilbao, dos huecos de frente y su canto */
+  banda((g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+   /* Un mirador por casilla: 2,6 m de frente, que es lo que vuela una galeria. */
+   const bx=Math.round((W-32)/2);
+   P(g,bx,3,32,H-7,muroO);P(g,bx,3,32,1,muroL);
+   P(g,bx+2,5,28,H-11,VIDRIO);P(g,bx+2,5,26,2,VIDRIOL);
+   for(let m=9;m<28;m+=9)P(g,bx+2+m,5,2,H-11,muroO);
+   P(g,bx,H-4,32,2,C.carbon);}),
+  /* persiana echada: media calle esta asi a media manana */
+  banda((g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+   fila(g,W,x=>{hueco(g,x,7,AN_V,AL_V,muroO,muroL);
+    /* Bajada hasta la misma altura en toda la banda: cada ventana a su aire quedaba
+       inquieto, y una persiana no se para donde le da la gana en cada piso. */
+    const b=9;
+    P(g,x,7,AN_V,b,C.grisO);for(let y=7;y<7+b;y+=2)P(g,x,y,AN_V,1,C.gris);});}),
+ ];
  PROP.pisos={
-  ladrillo:pisos(14,C.teja,C.ladrillo4,C.ladrillo1,ventanas(C.ladrillo0,C.ladrillo5)),
-  hormigon:pisos(14,C.hormigon,C.hormigonL,C.hormigonO,ventanas(C.carbon,C.hormigon5)),
-  /* La nave no tiene plantas: tiene una franja de ventanas altas y chapa. */
-  nave:pisos(6,C.aceroO,C.acero,C.grisO,(g)=>{
-   for(let x=2;x<29;x+=5)P(g,x,2,3,2,'#3f5566');}),
+  ladrillo:TIPOS(C.teja,C.ladrillo4,C.ladrillo1),
+  hormigon:TIPOS(C.hormigon,C.hormigonL,C.hormigonO),
+  /* La nave no tiene plantas: una franja de ventana alta y chapa, y punto. */
+  nave:[banda((g,W,H)=>{P(g,0,0,W,H,C.aceroO);P(g,0,0,W,2,C.acero);P(g,0,H-2,W,2,C.grisO);
+   for(let x=4;x<W-6;x+=10)P(g,x,4,6,H-9,VIDRIO);})],
  };
  PROP.deposito=S_(18,20,g=>{P(g,3,4,12,14,'#7f9aa8');P(g,3,4,12,3,'#a8c4d0');
   P(g,15,4,2,14,C.aceroO);P(g,4,18,3,2,C.carbon);P(g,12,18,3,2,C.carbon);
@@ -6416,7 +6458,11 @@ function dibCiudad(){
    let fondo=1; while(fondo<5&&Tc(x,y-fondo)===EDIF)fondo++;
    const nPisos=Math.min(PLANTAS[estF]||2,
     Math.max(0,Math.floor((fondo*TS-FACH_H*ESC)/(ph*ESC))));
-   const sprP=PROP.pisos[PISOS_MAT[famF]||'hormigon'];
+   /* El tipo de fachada lo elige el hash de la casilla y se queda igual en todas las
+      plantas de esa columna: un edificio no cambia de estilo de una planta a otra, pero
+      el de al lado si es distinto, que es lo que rompe el papel pintado. */
+   const tipos=PROP.pisos[PISOS_MAT[famF]||'hormigon'];
+   const sprP=tipos[(h2>>5)%tipos.length];
    for(let k=0;k<nPisos;k++)
     ctx.drawImage(sprP,x*TS,y*TS+TS-FACH_H*ESC-(k+1)*ph*ESC);
    for(let px=0,n=0;px<TS;n++){

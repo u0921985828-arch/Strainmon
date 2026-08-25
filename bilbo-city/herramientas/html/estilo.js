@@ -30,11 +30,16 @@ listo().then(() => {
   // Un lienzo cualquiera: puede venir suelto o dentro de un array (los tejados, el agua).
   // Los grupos anidados —PROP.fachadas, por ejemplo— también son arte y también tienen
   // que pasar por la paleta: sin bajar un nivel se colaban enteros sin revisar.
-  const todos = obj => Object.entries(obj).flatMap(([k, v]) => {
-    if (Array.isArray(v)) return v.map((c, i) => [k + '[' + i + ']', c]);
-    if (v && typeof v.getContext !== 'function' && typeof v === 'object')
-      return Object.entries(v).map(([k2, c]) => [k + '.' + k2, c]);
-    return [[k, v]];
+  // Baja por arrays y por objetos hasta dar con el lienzo, sin suponer un solo nivel:
+  // `PROP.pisos` pasó a ser objeto de arrays —cuatro tipos de fachada por material— y con
+  // la versión de un nivel se colaba un array entero como si fuese un lienzo.
+  const todos = (obj, pre = '') => Object.entries(obj).flatMap(([k, v]) => {
+    const n = pre + k;
+    if (!v) return [];
+    if (typeof v.getContext === 'function') return [[n, v]];
+    if (Array.isArray(v)) return v.flatMap((c, i) => todos({ [i]: c }, n + '.'));
+    if (typeof v === 'object') return todos(v, n + '.');
+    return [];
   });
 
   // ── R0 · la guía dice la verdad ─────────────────────────────────────────────────
