@@ -1,0 +1,85 @@
+{
+  "extends": "_common.json",
+  "id": "vehicle",
+  "title": "Generador de vehículos por piezas",
+  "canvas": { "width": 96, "height": 80 },
+  "directions": ["south-east", "south-west", "north-west", "north-east"],
+  "api": { "size": { "width": 96, "height": 64 }, "view": "high top-down", "isometric": true, "styleStrength": 60 },
+  "style": "original 16-bit isometric pixel art vehicle part for a game sprite sheet, 2:1 isometric projection, clean hard pixels, no anti-aliasing, 1px dark outline, top light, limited palette, single element cut out on transparent background, generic design that copies no real brand",
+  "styleAnchor": {
+    "id": "anchor_vehicle",
+    "size": { "width": 96, "height": 64 },
+    "prompt": "isometric pixel art small city car body without wheels, generic compact hatchback shape, plain green paint, dark windows, facing front-right"
+  },
+  "tints": {
+    "paint": [
+      { "id": "verde", "title": "Verde", "h": 0, "s": 1, "l": 1 },
+      { "id": "rojo", "title": "Rojo", "h": 235, "s": 1.15, "l": 1 },
+      { "id": "azul", "title": "Azul", "h": 95, "s": 1.05, "l": 1 },
+      { "id": "amarillo", "title": "Amarillo", "h": -60, "s": 1.2, "l": 1.15 },
+      { "id": "blanco", "title": "Blanco", "h": 0, "s": 0.15, "l": 1.5 },
+      { "id": "negro", "title": "Negro", "h": 0, "s": 0.4, "l": 0.5 }
+    ]
+  },
+  "slots": [
+    {
+      "id": "wheels", "title": "Ruedas", "z": 10, "place": [48, 74], "anchor": "bottom-center",
+      "size": { "width": 96, "height": 32 }, "required": true,
+      "prompt": "isometric set of four vehicle wheels alone in their driving position, no car body, no ground, {v}",
+      "parts": [
+        { "id": "street", "title": "Calle", "prompt": "ordinary road tyres with simple steel rims" },
+        { "id": "sport", "title": "Deportiva", "prompt": "low profile tyres with wide alloy rims" },
+        { "id": "offroad", "title": "Campo", "prompt": "chunky knobbly off road tyres, tall and muddy" },
+        { "id": "truck", "title": "Camión", "prompt": "heavy double rear truck tyres with steel rims" }
+      ]
+    },
+    {
+      "id": "chassis", "title": "Carrocería", "z": 20, "place": [48, 68], "anchor": "bottom-center",
+      "size": { "width": 96, "height": 56 }, "required": true, "tint": "paint",
+      "prompt": "isometric vehicle body without wheels, generic design, no logos, no ground, {v}",
+      "parts": [
+        { "id": "hatch", "title": "Utilitario", "prompt": "small compact hatchback body, rounded and friendly" },
+        { "id": "sedan", "title": "Berlina", "prompt": "four door saloon body with a long bonnet and boot" },
+        { "id": "van", "title": "Furgoneta", "prompt": "boxy delivery van body with sliding side door and blank panels" },
+        { "id": "pickup", "title": "Pickup", "prompt": "pickup truck body with a cab and an open rear bed" },
+        { "id": "sport", "title": "Deportivo", "prompt": "low wide sports car body with a wedge nose" },
+        { "id": "truck", "title": "Camión", "prompt": "small flatbed lorry cab with a chassis rail behind" },
+        { "id": "scooter", "title": "Scooter", "prompt": "small delivery scooter frame with a leg shield, no wheels" }
+      ]
+    },
+    {
+      "id": "top", "title": "Techo", "z": 30, "place": [48, 30], "anchor": "center",
+      "size": { "width": 64, "height": 40 }, "optional": true, "tint": "paint",
+      "prompt": "isometric vehicle roof accessory alone, nothing underneath, no car, no ground, {v}",
+      "parts": [
+        { "id": "rack", "title": "Baca", "prompt": "metal roof rack with cross bars" },
+        { "id": "box", "title": "Cofre", "prompt": "aerodynamic roof box case strapped to bars" },
+        { "id": "lightbar", "title": "Rotativo", "prompt": "amber warning light bar on low feet" },
+        { "id": "sign", "title": "Cartel", "prompt": "small blank illuminated roof sign box, no text" },
+        { "id": "canvas", "title": "Lona", "prompt": "rolled canvas tarpaulin tied with rope" }
+      ]
+    },
+    {
+      "id": "front", "title": "Frontal", "z": 40, "place": [64, 58], "anchor": "center",
+      "size": { "width": 48, "height": 32 }, "optional": true,
+      "prompt": "isometric vehicle front accessory alone, no car body behind it, {v}",
+      "parts": [
+        { "id": "bullbar", "title": "Defensa", "prompt": "tubular metal bull bar bumper guard" },
+        { "id": "plough", "title": "Pala", "prompt": "small snow plough blade on a mount" },
+        { "id": "lights", "title": "Focos", "prompt": "pair of round auxiliary driving lights on a bar" },
+        { "id": "plate", "title": "Matrícula", "prompt": "blank white licence plate with no characters" }
+      ]
+    },
+    {
+      "id": "rear", "title": "Trasera", "z": 45, "place": [26, 58], "anchor": "center",
+      "size": { "width": 48, "height": 32 }, "optional": true,
+      "prompt": "isometric vehicle rear accessory alone, no car body attached, {v}",
+      "parts": [
+        { "id": "spoiler", "title": "Alerón", "prompt": "small rear spoiler wing on two stands" },
+        { "id": "trailer", "title": "Enganche", "prompt": "tow hitch ball with a short drawbar" },
+        { "id": "crates", "title": "Cajas", "prompt": "stack of two plastic crates strapped down" },
+        { "id": "exhaust", "title": "Escape", "prompt": "chrome exhaust pipe with a wide tip and a puff of smoke" }
+      ]
+    }
+  ]
+}

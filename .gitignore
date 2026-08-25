@@ -11,3 +11,7 @@ assets/gen/
 
 assets/gen_plants/
 assets/gen_sheets/
+
+# Kits de Pixel Lab: piezas crudas y caché de la API (curar antes de versionar)
+assets/gen_kits/
+.cache/

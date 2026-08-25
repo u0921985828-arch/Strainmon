@@ -7,7 +7,12 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "kit:balance": "node scripts/pixellab.mjs balance",
+    "kit:gen": "node scripts/gen-kit.mjs",
+    "kit:pack": "node scripts/pack-kit.mjs",
+    "kit:export": "node scripts/kit-export.mjs",
+    "kit:mock": "node scripts/kit-mock-server.mjs 8787"
   },
   "repository": {
     "type": "git",

@@ -1,0 +1,59 @@
+{
+  "extends": "_common.json",
+  "id": "props",
+  "title": "Generador de mobiliario urbano y props",
+  "canvas": { "width": 64, "height": 96 },
+  "directions": ["south-east", "south-west"],
+  "api": { "size": { "width": 64, "height": 80 }, "view": "high top-down", "isometric": true, "styleStrength": 60 },
+  "style": "original 16-bit isometric pixel art prop for a city game, 2:1 isometric projection, clean hard pixels, no anti-aliasing, 1px dark outline, top light, limited palette, single object standing on nothing, transparent background, no ground tile",
+  "styleAnchor": {
+    "id": "anchor_props",
+    "size": { "width": 64, "height": 80 },
+    "prompt": "isometric pixel art street lamp post, slim dark metal pole with a curved arm and a warm glowing lamp head, standing alone"
+  },
+  "tints": {
+    "paint": [
+      { "id": "neutro", "title": "Neutro", "h": 0, "s": 1, "l": 1 },
+      { "id": "verde", "title": "Verde", "h": 85, "s": 1, "l": 1 },
+      { "id": "oxido", "title": "Óxido", "h": -30, "s": 1.35, "l": 0.85 },
+      { "id": "municipal", "title": "Municipal", "h": 150, "s": 0.8, "l": 0.95 }
+    ]
+  },
+  "slots": [
+    {
+      "id": "prop", "title": "Objeto", "z": 10, "place": [32, 92], "anchor": "bottom-center",
+      "size": { "width": 64, "height": 80 }, "required": true, "tint": "paint",
+      "prompt": "isometric street prop standing alone with nothing around it, no ground, no shadow on the floor, {v}",
+      "parts": [
+        { "id": "lamp", "title": "Farola", "prompt": "tall street lamp post with a curved arm and a glowing head" },
+        { "id": "bin", "title": "Papelera", "prompt": "public waste bin of perforated metal on a post" },
+        { "id": "bench", "title": "Banco", "prompt": "park bench with wooden slats and cast iron legs" },
+        { "id": "traffic", "title": "Semáforo", "prompt": "traffic light on a pole with three coloured lenses" },
+        { "id": "sign", "title": "Señal", "prompt": "round blank traffic sign on a slim pole, no symbol, no text" },
+        { "id": "hydrant", "title": "Hidrante", "prompt": "squat fire hydrant with two side caps" },
+        { "id": "container", "title": "Contenedor", "prompt": "wheeled rubbish container with a hinged lid" },
+        { "id": "bollard", "title": "Bolardo", "prompt": "short metal bollard with a reflective band" },
+        { "id": "planter", "title": "Jardinera", "prompt": "concrete planter box with a small leafy shrub" },
+        { "id": "phone", "title": "Cabina", "prompt": "small phone booth with glass panels and a folding door" },
+        { "id": "stall", "title": "Puesto", "prompt": "small market stall with a striped canopy and a counter" },
+        { "id": "crate", "title": "Palé", "prompt": "stack of wooden crates on a pallet" },
+        { "id": "fence", "title": "Valla", "prompt": "section of chain link fence with a metal frame" },
+        { "id": "meter", "title": "Parquímetro", "prompt": "parking meter post with a small screen" },
+        { "id": "tree", "title": "Árbol", "prompt": "young street tree with a slim trunk and a round canopy" },
+        { "id": "grate", "title": "Rejilla", "prompt": "ventilation grate box for a basement, low and wide" }
+      ]
+    },
+    {
+      "id": "top", "title": "Encima", "z": 20, "place": [32, 40], "anchor": "center",
+      "size": { "width": 48, "height": 32 }, "optional": true,
+      "prompt": "small isometric object on its own, no support underneath, no ground, {v}",
+      "parts": [
+        { "id": "poster", "title": "Cartel", "prompt": "blank paper poster taped at the corners, no text" },
+        { "id": "bird", "title": "Pájaro", "prompt": "small perched pigeon seen in isometric view" },
+        { "id": "cam", "title": "Cámara", "prompt": "security camera on a short bracket" },
+        { "id": "flag", "title": "Banderola", "prompt": "small plain fabric banner hanging from a bracket, no text" },
+        { "id": "solar", "title": "Placa", "prompt": "small solar panel tilted on a frame" }
+      ]
+    }
+  ]
+}

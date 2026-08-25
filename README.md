@@ -72,6 +72,25 @@ Se avanza por **prestigio** (no niveles), que se gana descubriendo variedades y 
 regiones y licencias. La economía permite comprar herramientas mejores (tijeras, kit de clonación,
 dron) y equipo (lupa, medidor ambiental, feromonas, estabilizador genético).
 
+## 🧩 Kits de piezas (Pixel Lab)
+
+Los sprites nuevos no se generan de uno en uno: se generan **sets de piezas
+intercambiables** con la API de Pixel Lab y luego se **componen**. Hay kits de
+personajes (cuerpos, cabezas, caras, pelos, gorros, objetos), calles y caminos,
+edificios modulares de altura variable, vehículos por partes y mobiliario urbano.
+
+```bash
+echo "TU_KEY" > .secrets/pixellab.key
+node scripts/gen-kit.mjs character --dry   # plan y coste, sin gastar
+node scripts/gen-kit.mjs character --limit 12
+node scripts/pack-kit.mjs character        # atlas + hojas de contacto
+open tools/kit-lab.html                    # componer, aleatorizar, exportar
+```
+
+Con 130 imágenes generadas salen más de 145 000 personajes distintos por
+dirección (recoloreado HSL de piel, ropa y pelo incluido). Detalle completo en
+[`docs/PIXELLAB_KITS.md`](docs/PIXELLAB_KITS.md).
+
 ## 🏗️ Arquitectura
 
 Código modular con espacio de nombres global `PH` (sin bundler, se ejecuta abriendo el HTML):
@@ -93,6 +112,7 @@ Código modular con espacio de nombres global `PH` (sin bundler, se ejecuta abri
 | `src/encounter.js` | Resolución de recolección |
 | `src/ui.js` | HUD y paneles superpuestos |
 | `src/game.js` | Bucle principal, entrada, cámara y render del mundo |
+| `src/kitgen.js` | Compositor de sprites por piezas (kits de Pixel Lab) |
 
 ## 🚧 Hoja de ruta
 

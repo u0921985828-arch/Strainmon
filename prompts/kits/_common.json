@@ -1,0 +1,30 @@
+{
+  "_doc": "Base compartida por todos los kits (se hereda con \"extends\": \"_common.json\"). Los prompts van en inglés porque el modelo de Pixel Lab responde mucho mejor; los títulos y la documentación, en español.",
+  "style": "original 16-bit pixel art game asset, clean hard pixels, no anti-aliasing, 1px dark outline, top light, limited warm palette, single centered object, transparent background",
+  "negative": "text, watermark, logo, signature, ui, frame, grid, background scenery, ground plane, drop shadow, blurry, anti-aliased, 3d render, photo, multiple objects",
+  "api": {
+    "engine": "bitforge",
+    "view": "high top-down",
+    "isometric": true,
+    "obliqueProjection": false,
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "medium detail",
+    "noBackground": true,
+    "textGuidanceScale": 7,
+    "extraGuidanceScale": 3,
+    "styleStrength": 55,
+    "initImageStrength": 300,
+    "seed": 1
+  },
+  "dirWords": {
+    "south": "seen from the front",
+    "south-east": "facing front-right in isometric three-quarter view",
+    "south-west": "facing front-left in isometric three-quarter view",
+    "north-east": "facing back-right in isometric three-quarter view",
+    "north-west": "facing back-left in isometric three-quarter view",
+    "north": "seen from behind",
+    "east": "seen from the right side",
+    "west": "seen from the left side"
+  }
+}

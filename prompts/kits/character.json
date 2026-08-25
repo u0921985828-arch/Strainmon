@@ -1,0 +1,123 @@
+{
+  "extends": "_common.json",
+  "id": "character",
+  "title": "Generador de personajes",
+  "canvas": { "width": 64, "height": 96 },
+  "directions": ["south-east", "south-west", "north-west", "north-east"],
+  "api": { "size": { "width": 48, "height": 64 }, "view": "high top-down", "isometric": true },
+  "style": "original 16-bit isometric pixel art character part for a game sprite sheet, chibi proportions, clean hard pixels, no anti-aliasing, 1px dark outline, top light, limited warm palette, single centered element, transparent background, cut out with nothing else around it",
+  "styleAnchor": {
+    "id": "anchor_character",
+    "size": { "width": 48, "height": 64 },
+    "prompt": "full body isometric pixel art person, young grower in a green hoodie and dark trousers, chibi proportions, standing idle, facing front-right"
+  },
+  "tints": {
+    "skin": [
+      { "id": "clara", "title": "Clara", "h": 0, "s": 1, "l": 1.06 },
+      { "id": "media", "title": "Media", "h": -4, "s": 1.05, "l": 0.94 },
+      { "id": "oliva", "title": "Oliva", "h": 8, "s": 0.95, "l": 0.86 },
+      { "id": "oscura", "title": "Oscura", "h": -6, "s": 1.1, "l": 0.68 }
+    ],
+    "cloth": [
+      { "id": "verde", "title": "Verde", "h": 0, "s": 1, "l": 1 },
+      { "id": "azul", "title": "Azul", "h": 95, "s": 1, "l": 1 },
+      { "id": "rojo", "title": "Rojo", "h": 235, "s": 1.1, "l": 0.98 },
+      { "id": "ambar", "title": "Ámbar", "h": -70, "s": 1.1, "l": 1.05 },
+      { "id": "purpura", "title": "Púrpura", "h": 165, "s": 0.95, "l": 0.95 },
+      { "id": "gris", "title": "Gris", "h": 0, "s": 0.15, "l": 1 }
+    ],
+    "hair": [
+      { "id": "castano", "title": "Castaño", "h": 0, "s": 1, "l": 1 },
+      { "id": "negro", "title": "Negro", "h": 0, "s": 0.6, "l": 0.55 },
+      { "id": "rubio", "title": "Rubio", "h": -18, "s": 1.2, "l": 1.45 },
+      { "id": "rojizo", "title": "Rojizo", "h": -28, "s": 1.3, "l": 0.95 },
+      { "id": "verde", "title": "Verde", "h": 75, "s": 1.2, "l": 1.1 }
+    ]
+  },
+  "slots": [
+    {
+      "id": "back", "title": "Espalda", "z": 10, "place": [32, 62], "anchor": "center",
+      "size": { "width": 32, "height": 32 }, "tint": "cloth", "optional": true,
+      "parts": [
+        { "id": "backpack", "title": "Mochila", "prompt": "small canvas backpack with two straps, worn on the back, no person, just the bag" },
+        { "id": "roll", "title": "Petate", "prompt": "rolled sleeping mat tied with straps, carried on the back, no person" }
+      ]
+    },
+    {
+      "id": "body", "title": "Cuerpo", "z": 20, "place": [32, 94], "anchor": "bottom-center",
+      "size": { "width": 48, "height": 64 }, "required": true, "tint": "cloth",
+      "prompt": "headless body of an isometric game character standing idle, neck stump at the top, arms at the sides, legs together, {v}",
+      "parts": [
+        { "id": "hoodie", "title": "Sudadera", "prompt": "slim build wearing a hooded sweatshirt, cargo trousers and trainers" },
+        { "id": "worker", "title": "Operario", "prompt": "stocky build wearing work overalls with chest pocket and heavy boots" },
+        { "id": "labcoat", "title": "Bata", "prompt": "slim build wearing an open lab coat over a shirt and dark trousers" },
+        { "id": "tracksuit", "title": "Chándal", "prompt": "athletic build wearing a zipped tracksuit with side stripes and running shoes" },
+        { "id": "denim", "title": "Vaquera", "prompt": "average build wearing a denim jacket, plain t-shirt, jeans and sneakers" },
+        { "id": "apron", "title": "Delantal", "prompt": "average build wearing a gardening apron with tool pockets, rolled sleeves and rubber boots" },
+        { "id": "raincoat", "title": "Impermeable", "prompt": "tall build wearing a long raincoat and waterproof boots" },
+        { "id": "suit", "title": "Traje", "prompt": "slim build wearing a plain buttoned suit jacket, trousers and dress shoes" }
+      ]
+    },
+    {
+      "id": "head", "title": "Cabeza", "z": 30, "place": [32, 38], "anchor": "bottom-center",
+      "size": { "width": 32, "height": 32 }, "required": true, "tint": "skin",
+      "prompt": "bald head only of an isometric chibi game character, no hair, no hat, neutral bare scalp, cut at the neck, {v}",
+      "parts": [
+        { "id": "round", "title": "Redonda", "prompt": "round soft head with full cheeks and small nose" },
+        { "id": "narrow", "title": "Alargada", "prompt": "narrow long head with defined jaw and pointed chin" },
+        { "id": "square", "title": "Cuadrada", "prompt": "square broad head with strong jaw" },
+        { "id": "elder", "title": "Mayor", "prompt": "older head with sunken cheeks and wrinkles" }
+      ]
+    },
+    {
+      "id": "face", "title": "Cara", "z": 40, "place": [32, 30], "anchor": "center",
+      "size": { "width": 24, "height": 24 }, "optional": true,
+      "dirs": ["south-east", "south-west"],
+      "prompt": "facial features only on transparent background, no head shape, no skin fill, just eyes eyebrows and mouth as separate pixels, {v}",
+      "parts": [
+        { "id": "neutral", "title": "Neutra", "prompt": "calm neutral expression, two dot eyes and a straight small mouth" },
+        { "id": "smile", "title": "Sonriente", "prompt": "happy expression, curved smiling mouth and bright eyes with highlight" },
+        { "id": "tired", "title": "Cansada", "prompt": "tired expression, half closed eyes and small flat mouth with eye bags" },
+        { "id": "stern", "title": "Seria", "prompt": "stern expression, frowning eyebrows and tight mouth" },
+        { "id": "shades", "title": "Gafas", "prompt": "dark rectangular sunglasses covering the eyes and a small smirk" }
+      ]
+    },
+    {
+      "id": "hair", "title": "Pelo", "z": 45, "place": [32, 12], "anchor": "top-center",
+      "size": { "width": 32, "height": 32 }, "optional": true, "tint": "hair",
+      "prompt": "hair piece only, hollow underneath, no head, no face, no skin, shaped to sit on top of a chibi head, {v}",
+      "parts": [
+        { "id": "crop", "title": "Corto", "prompt": "short cropped hair with a small fringe" },
+        { "id": "long", "title": "Largo", "prompt": "long straight hair falling past the shoulders" },
+        { "id": "curly", "title": "Rizado", "prompt": "big round curly hair volume" },
+        { "id": "ponytail", "title": "Coleta", "prompt": "hair tied back into a high ponytail" },
+        { "id": "buzz", "title": "Rapado", "prompt": "very short buzz cut hugging the scalp" },
+        { "id": "locs", "title": "Rastas", "prompt": "shoulder length locs gathered at the back" }
+      ]
+    },
+    {
+      "id": "hat", "title": "Sombrero", "z": 50, "place": [32, 8], "anchor": "top-center",
+      "size": { "width": 32, "height": 24 }, "optional": true, "tint": "cloth",
+      "prompt": "headwear only, hollow underneath, no head, no face, no person, {v}",
+      "parts": [
+        { "id": "cap", "title": "Gorra", "prompt": "baseball cap with a curved peak, plain, no logo" },
+        { "id": "beanie", "title": "Gorro", "prompt": "knitted beanie with a folded rim" },
+        { "id": "bucket", "title": "Pescador", "prompt": "soft bucket hat with a full droopy brim" },
+        { "id": "straw", "title": "Paja", "prompt": "wide straw sun hat with a fabric band" },
+        { "id": "hood", "title": "Capucha", "prompt": "raised fabric hood of a sweatshirt, empty inside" }
+      ]
+    },
+    {
+      "id": "held", "title": "En mano", "z": 60, "place": [48, 62], "anchor": "center",
+      "size": { "width": 24, "height": 24 }, "optional": true,
+      "prompt": "small handheld game item on its own, no hand, no arm, no person, {v}",
+      "parts": [
+        { "id": "can", "title": "Regadera", "prompt": "small metal watering can with a spout" },
+        { "id": "jar", "title": "Bote", "prompt": "glass jar with a metal lid holding seeds" },
+        { "id": "tablet", "title": "Tableta", "prompt": "rugged handheld tablet with a glowing screen" },
+        { "id": "shears", "title": "Tijeras", "prompt": "pair of small pruning shears with orange grips" },
+        { "id": "cup", "title": "Vaso", "prompt": "paper cup of coffee with a lid" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "extends": "_common.json",
+  "id": "building",
+  "title": "Generador de edificios modulares",
+  "canvas": { "width": 128, "height": 360 },
+  "directions": ["south-east", "south-west"],
+  "api": { "size": { "width": 96, "height": 64 }, "view": "high top-down", "isometric": true, "styleStrength": 65 },
+  "style": "original 16-bit isometric pixel art building module for a city tileset, 2:1 isometric projection, clean hard pixels, no anti-aliasing, 1px dark outline, top light, limited palette, single module cut out on transparent background, flat top and bottom edges so modules stack vertically",
+  "styleAnchor": {
+    "id": "anchor_building",
+    "size": { "width": 96, "height": 64 },
+    "prompt": "isometric pixel art module of a city building floor, two corner walls of worn brick with three plain windows, flat top edge and flat bottom edge, no roof, no ground"
+  },
+  "tints": {
+    "wall": [
+      { "id": "ladrillo", "title": "Ladrillo", "h": 0, "s": 1, "l": 1 },
+      { "id": "estuco", "title": "Estuco", "h": 12, "s": 0.55, "l": 1.2 },
+      { "id": "hormigon", "title": "Hormigón", "h": 0, "s": 0.25, "l": 1.1 },
+      { "id": "verde", "title": "Verde", "h": 95, "s": 0.8, "l": 1 },
+      { "id": "azul", "title": "Azul", "h": 150, "s": 0.9, "l": 1 }
+    ]
+  },
+  "slots": [
+    {
+      "id": "ground", "title": "Planta baja", "z": 10, "place": [64, 356], "anchor": "bottom-center",
+      "size": { "width": 96, "height": 72 }, "required": true, "tint": "wall",
+      "prompt": "isometric ground floor module of a city building, two visible facades meeting at a corner, flat top edge for stacking, no roof, no street, {v}",
+      "parts": [
+        { "id": "shop", "title": "Comercio", "prompt": "shop front with a wide glass window, a glazed door and a low step" },
+        { "id": "portal", "title": "Portal", "prompt": "residential entrance with a double door, a small canopy and two narrow windows" },
+        { "id": "garage", "title": "Garaje", "prompt": "closed roller shutter garage door and a small side door" },
+        { "id": "cafe", "title": "Bar", "prompt": "small bar front with folding windows, a chalkboard and stacked stools inside" },
+        { "id": "warehouse", "title": "Nave", "prompt": "industrial base with corrugated metal panels and a loading dock" },
+        { "id": "greenhouse", "title": "Invernadero", "prompt": "glazed greenhouse base with a metal frame and misted glass panels" }
+      ]
+    },
+    {
+      "id": "floor", "title": "Piso", "z": 20, "place": [64, 288], "anchor": "bottom-center",
+      "size": { "width": 96, "height": 56 }, "required": true, "tint": "wall",
+      "repeat": { "min": 0, "max": 4, "stepY": -52 },
+      "prompt": "isometric middle floor module of a city building, two visible facades meeting at a corner, flat top and bottom edges for stacking, no roof, no ground, {v}",
+      "parts": [
+        { "id": "plain", "title": "Liso", "prompt": "plain rendered wall with three evenly spaced rectangular windows" },
+        { "id": "brick", "title": "Ladrillo", "prompt": "worn brick wall with arched windows and stone sills" },
+        { "id": "balcony", "title": "Balcones", "prompt": "wall with french windows and small wrought iron balconies" },
+        { "id": "office", "title": "Oficinas", "prompt": "modern floor with a continuous band of tinted glass and thin mullions" },
+        { "id": "shutters", "title": "Persianas", "prompt": "wall with windows half covered by roller shutters and an air conditioning unit" },
+        { "id": "grow", "title": "Cultivo", "prompt": "wall with blacked out windows glowing faint purple at the edges and a ventilation duct" }
+      ]
+    },
+    {
+      "id": "roof", "title": "Remate", "z": 30, "place": [64, 288], "anchor": "bottom-center", "stackAfter": "floor",
+      "size": { "width": 96, "height": 64 }, "required": true, "tint": "wall",
+      "prompt": "isometric roof module that finishes the top of a building, flat bottom edge for stacking, no walls below, no ground, {v}",
+      "parts": [
+        { "id": "flat", "title": "Azotea", "prompt": "flat gravel roof with a low parapet wall and a stair hut" },
+        { "id": "gable", "title": "Dos aguas", "prompt": "pitched tile roof with two slopes, ridge line and overhanging eaves" },
+        { "id": "cornice", "title": "Cornisa", "prompt": "flat roof with a decorated stone cornice and a small pediment" },
+        { "id": "tech", "title": "Técnica", "prompt": "flat roof crowded with air conditioning units, ducts and a water tank" },
+        { "id": "garden", "title": "Terraza", "prompt": "roof terrace with planters, a pergola and a railing" }
+      ]
+    },
+    {
+      "id": "extra", "title": "Añadido", "z": 40, "place": [64, 300], "anchor": "center",
+      "size": { "width": 64, "height": 48 }, "optional": true,
+      "prompt": "isometric building attachment on its own, no wall behind it, no ground, {v}",
+      "parts": [
+        { "id": "awning", "title": "Toldo", "prompt": "striped fabric awning stretched over a metal frame" },
+        { "id": "sign", "title": "Letrero", "prompt": "blank hanging shop sign board with a metal bracket, no text" },
+        { "id": "neon", "title": "Neón", "prompt": "glowing neon tube sign shaped as a plain rectangle outline, no letters" },
+        { "id": "stairs", "title": "Escalera", "prompt": "external metal fire escape staircase with a railing" },
+        { "id": "duct", "title": "Conducto", "prompt": "industrial extraction duct climbing the facade with brackets" },
+        { "id": "graffiti", "title": "Grafiti", "prompt": "abstract spray painted colour splash panel, no letters, no words" }
+      ]
+    }
+  ]
+}

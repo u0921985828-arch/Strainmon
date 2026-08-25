@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STRAINBOY · Laboratorio de kits</title>
+<style>
+  :root { --bg:#0f1410; --panel:#161d17; --line:#2b3a2c; --ink:#cfe8c2; --dim:#7d9a78; --accent:#8fd46a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:13px/1.45 ui-monospace,Menlo,Consolas,monospace; }
+  header { padding:10px 14px; border-bottom:1px solid var(--line); display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+  h1 { font-size:14px; margin:0; letter-spacing:.14em; color:var(--accent); }
+  main { display:grid; grid-template-columns:300px 1fr; min-height:calc(100vh - 45px); }
+  aside { border-right:1px solid var(--line); padding:12px; overflow:auto; max-height:calc(100vh - 45px); }
+  section { padding:14px; }
+  .row { margin-bottom:10px; }
+  label { display:block; color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:.08em; margin-bottom:3px; }
+  select, input, button { background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:4px; padding:5px 7px; font:inherit; width:100%; }
+  button { cursor:pointer; }
+  button:hover { border-color:var(--accent); color:var(--accent); }
+  .btns { display:flex; gap:6px; flex-wrap:wrap; }
+  .btns button { width:auto; flex:1 1 auto; }
+  .dirs { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; }
+  .dirs button.on { border-color:var(--accent); color:var(--accent); }
+  canvas { image-rendering:pixelated; background:
+     repeating-conic-gradient(#1b241c 0% 25%, #141b15 0% 50%) 50%/16px 16px; border:1px solid var(--line); }
+  #gallery { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  #gallery canvas { cursor:pointer; }
+  .hint { color:var(--dim); font-size:11px; }
+  pre { background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:8px; overflow:auto; max-height:180px; font-size:11px; color:var(--dim); }
+  .warn { padding:20px; color:var(--dim); }
+  .warn code { color:var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <h1>STRAINBOY · LABORATORIO DE KITS</h1>
+  <span class="hint">componer · aleatorizar · exportar</span>
+</header>
+<main>
+  <aside>
+    <div class="row">
+      <label>Kit</label>
+      <select id="kit"></select>
+    </div>
+    <div class="row">
+      <label>Dirección</label>
+      <div class="dirs" id="dirs"></div>
+    </div>
+    <div id="slots"></div>
+    <div id="tints"></div>
+    <div class="row">
+      <label>Semilla</label>
+      <input id="seed" type="number" value="1">
+    </div>
+    <div class="row btns">
+      <button id="rnd">Aleatorio</button>
+      <button id="def">Base</button>
+    </div>
+    <div class="row btns">
+      <button id="png">PNG</button>
+      <button id="sheet">Hoja 4 dir</button>
+      <button id="copy">Receta</button>
+    </div>
+    <div class="row">
+      <label>Zoom</label>
+      <input id="zoom" type="range" min="1" max="8" value="4">
+    </div>
+    <div class="row">
+      <label>Galería aleatoria</label>
+      <div class="btns"><button id="gen12">12 variantes</button></div>
+    </div>
+  </aside>
+  <section>
+    <div id="stage"><canvas id="view" width="64" height="96"></canvas></div>
+    <div id="gallery"></div>
+    <div class="row" style="margin-top:14px"><label>Receta</label><pre id="json"></pre></div>
+    <div id="warn"></div>
+  </section>
+</main>
+
+<script src="../src/kitgen.js"></script>
+<script>
+// Carga perezosa de los atlas generados (assets/gen_kits/<kit>/atlas.js).
+const KNOWN = ['character', 'road', 'building', 'vehicle', 'props'];
+function loadScript(src) {
+  return new Promise((res) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = () => res(true); s.onerror = () => res(false);
+    document.head.appendChild(s);
+  });
+}
+
+const $ = (id) => document.getElementById(id);
+let kitId = null, recipe = null;
+
+async function boot() {
+  await Promise.all(KNOWN.map(k => loadScript(`../assets/gen_kits/${k}/atlas.js`)));
+  const ids = PH.kitgen.list();
+  if (!ids.length) {
+    $('warn').innerHTML = '<div class="warn">No hay ningún kit empaquetado todavía.<br><br>' +
+      'Genera piezas y empaquétalas:<br><code>node scripts/gen-kit.mjs character --dry</code><br>' +
+      '<code>node scripts/gen-kit.mjs character --limit 12</code><br>' +
+      '<code>node scripts/pack-kit.mjs character</code></div>';
+    return;
+  }
+  $('kit').innerHTML = ids.map(i => `<option value="${i}">${PH.kitgen.data(i).title || i}</option>`).join('');
+  $('kit').onchange = () => selectKit($('kit').value);
+  await selectKit(ids[0]);
+}
+
+async function selectKit(id) {
+  kitId = id;
+  await PH.kitgen.ready(id);
+  const d = PH.kitgen.data(id);
+  $('gallery').innerHTML = '';
+  // zoom automático para que el lienzo del kit quepa en pantalla
+  $('zoom').value = Math.max(1, Math.min(8, Math.floor(560 / d.canvas.height) || 1));
+  $('dirs').innerHTML = d.directions.map(x => `<button data-dir="${x}">${d.dirCode[x].toUpperCase()}</button>`).join('');
+  $('dirs').querySelectorAll('button').forEach(b => b.onclick = () => { recipe.dir = b.dataset.dir; sync(); });
+  recipe = PH.kitgen.defaultRecipe(id);
+  buildControls();
+  sync();
+}
+
+function buildControls() {
+  const d = PH.kitgen.data(kitId);
+  $('slots').innerHTML = d.slots.map(s => {
+    const opts = (s.optional ? '<option value="">— ninguno —</option>' : '') +
+      s.parts.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
+    const rep = s.repeat ? `<input type="range" data-rep="${s.id}" min="${s.repeat.min || 0}" max="${s.repeat.max || 1}" value="1">` : '';
+    return `<div class="row"><label>${s.title}</label><select data-slot="${s.id}">${opts}</select>${rep}</div>`;
+  }).join('');
+  $('tints').innerHTML = Object.keys(d.tints || {}).map(g => {
+    const opts = d.tints[g].map(t => `<option value="${t.id}">${t.title || t.id}</option>`).join('');
+    return `<div class="row"><label>Tinte · ${g}</label><select data-tint="${g}">${opts}</select></div>`;
+  }).join('');
+  $('slots').querySelectorAll('[data-slot]').forEach(sel => sel.onchange = () => {
+    const id = sel.dataset.slot;
+    if (!sel.value) delete recipe.parts[id];
+    else recipe.parts[id] = Object.assign({}, recipe.parts[id], { part: sel.value });
+    sync();
+  });
+  $('slots').querySelectorAll('[data-rep]').forEach(inp => inp.oninput = () => {
+    const id = inp.dataset.rep;
+    if (recipe.parts[id]) recipe.parts[id].repeat = +inp.value;
+    sync();
+  });
+  $('tints').querySelectorAll('[data-tint]').forEach(sel => sel.onchange = () => {
+    recipe.tints[sel.dataset.tint] = sel.value; sync();
+  });
+}
+
+function pullControls() {
+  $('slots').querySelectorAll('[data-slot]').forEach(sel => {
+    const e = recipe.parts[sel.dataset.slot];
+    sel.value = e ? (e.part || e) : '';
+  });
+  $('slots').querySelectorAll('[data-rep]').forEach(inp => {
+    const e = recipe.parts[inp.dataset.rep];
+    if (e && e.repeat != null) inp.value = e.repeat;
+  });
+  $('tints').querySelectorAll('[data-tint]').forEach(sel => {
+    if (recipe.tints[sel.dataset.tint]) sel.value = recipe.tints[sel.dataset.tint];
+  });
+  $('dirs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.dir === recipe.dir));
+}
+
+function sync() {
+  const d = PH.kitgen.data(kitId);
+  const scale = +$('zoom').value;
+  const view = $('view');
+  view.width = d.canvas.width * scale; view.height = d.canvas.height * scale;
+  PH.kitgen.compose(kitId, recipe, { scale, canvas: view });
+  $('json').textContent = JSON.stringify(recipe, null, 1);
+  pullControls();
+}
+
+$('zoom').oninput = () => sync();
+$('rnd').onclick = () => {
+  const seed = (+$('seed').value || 0) + 1;
+  $('seed').value = seed;
+  recipe = PH.kitgen.randomRecipe(kitId, seed, { dir: recipe.dir });
+  sync();
+};
+$('def').onclick = () => { recipe = PH.kitgen.defaultRecipe(kitId, recipe.dir); sync(); };
+$('png').onclick = () => download(`${kitId}_${recipe.dir}.png`, PH.kitgen.dataURL(kitId, recipe, { scale: 1 }));
+$('sheet').onclick = () => download(`${kitId}_sheet.png`, PH.kitgen.sheet(kitId, recipe).toDataURL('image/png'));
+$('copy').onclick = async () => {
+  try { await navigator.clipboard.writeText(JSON.stringify(recipe)); $('copy').textContent = '¡copiada!'; }
+  catch (e) { $('copy').textContent = 'copia manual ↓'; }
+  setTimeout(() => $('copy').textContent = 'Receta', 1200);
+};
+$('gen12').onclick = () => {
+  const g = $('gallery'); g.innerHTML = '';
+  for (let i = 0; i < 12; i++) {
+    const seed = (+$('seed').value || 0) * 1000 + i;
+    const r = PH.kitgen.randomRecipe(kitId, seed, { dir: recipe.dir });
+    const c = PH.kitgen.compose(kitId, r, { scale: 2 });
+    c.title = 'clic para editar';
+    c.onclick = () => { recipe = r; sync(); };
+    g.appendChild(c);
+  }
+};
+function download(name, url) {
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.click();
+}
+boot();
+</script>
+</body>
+</html>

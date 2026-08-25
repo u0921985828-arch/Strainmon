@@ -1,0 +1,58 @@
+{
+  "extends": "_common.json",
+  "id": "road",
+  "title": "Generador de calles y caminos",
+  "canvas": { "width": 64, "height": 64 },
+  "directions": ["south-east"],
+  "api": { "size": { "width": 64, "height": 64 }, "view": "high top-down", "isometric": true, "styleStrength": 70 },
+  "style": "original 16-bit isometric pixel art ground tile for a game tileset, 2:1 isometric diamond footprint, clean hard pixels, no anti-aliasing, top light, limited palette, seamless edges that tile with neighbours, transparent background, nothing outside the diamond",
+  "styleAnchor": {
+    "id": "anchor_road",
+    "size": { "width": 64, "height": 64 },
+    "prompt": "isometric pixel art asphalt road tile, flat diamond shaped piece of dark grey asphalt with a pale dashed centre line and light kerbs on both sides"
+  },
+  "tints": {
+    "ground": [
+      { "id": "asfalto", "title": "Asfalto", "h": 0, "s": 1, "l": 1 },
+      { "id": "hormigon", "title": "Hormigón", "h": 0, "s": 0.5, "l": 1.25 },
+      { "id": "tierra", "title": "Tierra", "h": -35, "s": 1.6, "l": 1.05 },
+      { "id": "nocturno", "title": "Nocturno", "h": 120, "s": 0.9, "l": 0.7 }
+    ]
+  },
+  "slots": [
+    {
+      "id": "tile", "title": "Pieza", "z": 10, "place": [32, 60], "anchor": "bottom-center",
+      "size": { "width": 64, "height": 64 }, "required": true, "tint": "ground",
+      "prompt": "isometric asphalt road tile, single flat diamond piece seen from above, {v}",
+      "parts": [
+        { "id": "straight_a", "title": "Recto A", "prompt": "straight two lane road running from the lower left to the upper right, dashed centre line, kerb along both long sides" },
+        { "id": "straight_b", "title": "Recto B", "prompt": "straight two lane road running from the lower right to the upper left, dashed centre line, kerb along both long sides" },
+        { "id": "curve", "title": "Curva", "prompt": "ninety degree road bend joining the lower left edge to the lower right edge, curved dashed line, kerb on the outer side" },
+        { "id": "tee", "title": "Cruce en T", "prompt": "three way T junction of asphalt roads, no centre line in the middle of the junction, kerbs on the closed side" },
+        { "id": "cross", "title": "Cruce", "prompt": "four way crossroads of asphalt, plain surface in the middle, kerb corners at the four corners" },
+        { "id": "end", "title": "Fin", "prompt": "dead end road piece finishing in a kerb with a striped barrier line" },
+        { "id": "crosswalk", "title": "Paso de cebra", "prompt": "road tile with a white striped pedestrian crossing painted across it" },
+        { "id": "sidewalk", "title": "Acera", "prompt": "pavement tile of square concrete slabs with a raised kerb edge" },
+        { "id": "sidewalk_corner", "title": "Esquina acera", "prompt": "corner pavement tile of concrete slabs with the kerb turning ninety degrees" },
+        { "id": "dirt", "title": "Camino", "prompt": "dirt track of packed earth with wheel ruts and small stones, grassy edges" },
+        { "id": "gravel", "title": "Grava", "prompt": "gravel path of loose light stones with worn edges" },
+        { "id": "cobble", "title": "Adoquín", "prompt": "old cobblestone street of rounded grey stones" },
+        { "id": "plaza", "title": "Plaza", "prompt": "large square paving tile with a decorative border pattern" },
+        { "id": "parking", "title": "Aparcamiento", "prompt": "asphalt tile with white painted parking bay lines" }
+      ]
+    },
+    {
+      "id": "overlay", "title": "Detalle", "z": 20, "place": [32, 52], "anchor": "center",
+      "size": { "width": 32, "height": 32 }, "optional": true,
+      "prompt": "small isometric road detail on its own, no tile underneath, no ground, {v}",
+      "parts": [
+        { "id": "manhole", "title": "Alcantarilla", "prompt": "round cast iron manhole cover seen from above in isometric view" },
+        { "id": "drain", "title": "Sumidero", "prompt": "rectangular metal storm drain grate seen from above" },
+        { "id": "puddle", "title": "Charco", "prompt": "shallow puddle of water with a reflective highlight" },
+        { "id": "crack", "title": "Grieta", "prompt": "patch of cracked and patched asphalt" },
+        { "id": "arrow", "title": "Flecha", "prompt": "white painted road arrow pointing forward" },
+        { "id": "stopline", "title": "Línea de parada", "prompt": "thick white painted stop line" }
+      ]
+    }
+  ]
+}
