@@ -2259,7 +2259,13 @@ function capasEncima(g,cfg,cx,hy,ty,hom,E,soloGrandes){
   else{P(g,cx+hom/2-1,ty+5,3,3,C.maderaO);P(g,cx-1,ty+1,hom/2,1,C.madera);}}
  else if(A==='bandolera'){P(g,cx-hom/2,ty+1,hom,1,C.maderaO);P(g,cx-hom/2-1,ty+5,2,3,C.madera);}
  else if(A==='bufanda'){P(g,cx-4,ty-1,8,2,C.rojo);P(g,cx+1,ty+1,2,4,C.rojoO);}
- else if(A==='gafas'&&dir===AB){P(g,cx-3,hy+4,2,2,C.carbon);P(g,cx+1,hy+4,2,2,C.carbon);P(g,cx-1,hy+4,2,1,C.carbon);}
+ /* Las gafas tapan los ojos, así que van en las cinco direcciones en las que se ve la
+    cara y en ninguna de las tres de espaldas. Antes solo se dibujaban mirando abajo: en
+    las otras siete el tipo se las quitaba solo. El brillo va arriba, como en todo. */
+ else if(A==='gafas'&&!arr){
+  if(izqV){P(g,cx-4,hy+4,3,2,C.carbon);P(g,cx-4,hy+4,3,1,C.gris);}
+  else if(derV){P(g,cx+1,hy+4,3,2,C.carbon);P(g,cx+1,hy+4,3,1,C.gris);}
+  else{P(g,cx-3,hy+4,6,2,C.carbon);P(g,cx-3,hy+4,6,1,C.gris);P(g,cx-1,hy+5,2,1,C.carbon);}}
  else if(A==='carrito'&&!arr){P(g,cx+4,ty+5,5,8,C.rojoO);P(g,cx+4,ty+5,5,2,C.rojo);
   P(g,cx+5,ty+13,1,2,C.carbon);P(g,cx+7,ty+13,1,2,C.carbon);}
  /* El fogonazo sale del cañón, y el cañón está donde acaba la mano: a siete píxeles del
@@ -2501,17 +2507,25 @@ const arma=id=>ARMAS.find(a=>a.id===id);
    más que un golpe de suerte. */
 const NIVEL_ARMA={uzi:4,escopeta:6};
 const NIVEL_VEHICULO={furgo:2,deportivo:5};
+/* El arma se forja en su propio lienzo y hacía falta ensancharlo: el cañón de la escopeta
+   mide once píxeles y en los veinte de antes se salía por el canto en las tres direcciones
+   que miran a la derecha —cuatro píxeles perdidos de once, un tercio del arma—, y el bate
+   y la uzi otro tanto. Solo la pistola cabía. Treinta y dos da sitio a la más larga con su
+   contorno, y sigue siendo par, que si no el sprite baila medio píxel al girar.
+   Y va con contorno, como el personaje y por lo mismo: una pistola de carbón con la culata
+   negra cruzando el asfalto, que es del mismo gris, se deshacía. */
+const ARMA_W=32, ARMA_H=26, ARMA_CX=16;
 const ARMA_MANO={};
 ARMAS.forEach(a=>{if(!a.l)return;
  ARMA_MANO[a.id]=[];
  for(let d8=0;d8<8;d8++){
-  const M=MAPA8[d8],dir=M.b,c=lienzo(20,26),g=c.getContext('2d');
-  const gr=a.grosor||1,y=13,dg=(M.f||M.e)?1:0;
-  if(dir===DE){P(g,13-dg,y+dg,a.l,gr,a.col);P(g,11-dg,y+dg,2,gr+1,a.mango);}
-  else if(dir===IZ){P(g,7+dg-a.l,y+dg,a.l,gr,a.col);P(g,7+dg,y+dg,2,gr+1,a.mango);}
-  else if(dir===AB){P(g,12,y+2,gr,a.l,a.col);P(g,12,y,gr+1,2,a.mango);}
-  else{P(g,7,y-a.l,gr,a.l,a.col);P(g,7,y,gr+1,2,a.mango);}
-  ARMA_MANO[a.id].push(cuantizar(c));}
+  const M=MAPA8[d8],dir=M.b,c=lienzo(ARMA_W,ARMA_H),g=c.getContext('2d');
+  const gr=a.grosor||1,y=13,dg=(M.f||M.e)?1:0,ox=ARMA_CX-10;
+  if(dir===DE){P(g,ox+13-dg,y+dg,a.l,gr,a.col);P(g,ox+11-dg,y+dg,2,gr+1,a.mango);}
+  else if(dir===IZ){P(g,ox+7+dg-a.l,y+dg,a.l,gr,a.col);P(g,ox+7+dg,y+dg,2,gr+1,a.mango);}
+  else if(dir===AB){P(g,ox+12,y+2,gr,a.l,a.col);P(g,ox+12,y,gr+1,2,a.mango);}
+  else{P(g,ox+7,y-a.l,gr,a.l,a.col);P(g,ox+7,y,gr+1,2,a.mango);}
+  ARMA_MANO[a.id].push(cuantizar(contorno(c,C.negro)));}
 });
 
 /*═══════════════ FOGONAZOS Y EFECTOS ═══════════════*/
@@ -6223,7 +6237,7 @@ function pintaSombraChar(e,esJugador){
  const pose=e.herido>0?'herido':e.pose||'quieto';
  pintaChar(ctx,e.arq,e.d8,pose,e.x*TS,e.y*TS);
  const aid=esJugador?S.armaAct:e.arma;
- if(aid&&ARMA_MANO[aid])ctx.drawImage(ARMA_MANO[aid][e.d8],Math.round(e.x*TS)-10,Math.round(e.y*TS)-19);
+ if(aid&&ARMA_MANO[aid])ctx.drawImage(ARMA_MANO[aid][e.d8],Math.round(e.x*TS)-ARMA_CX,Math.round(e.y*TS)-19);
  if(esJugador&&fogT>0&&fogTipo)ctx.drawImage(FOG[fogTipo][fogD],Math.round(e.x*TS)-12,Math.round(e.y*TS)-12);}
 function pintaCoche(c,esPoli,mio){
  const spr=esPoli?VEH.patrullaRot[Math.sin(c.luz)>0?0:1]
