@@ -2114,6 +2114,7 @@ const TORSOS={
  polo:{b:C.verdeL,s:C.verde,l:C.verdeL,manga:'corta'},
  reflectante:{b:C.rojo,s:C.rojoO,l:C.mostaza,manga:'corta',bandas:1},
  delantal:{b:C.asfalto,s:C.carbon,l:C.grisL,manga:'corta',mandil:1},
+ tirantes:{b:C.blanco,s:C.hormigon6,l:C.blanco,manga:'sin'},
 };
 const PIERNAS={
  vaquero:{b:'#3a4f6b',s:'#2c3d53',l:C.ria5},vestir:{b:C.asfalto,s:C.carbon,l:C.gris},
@@ -2179,19 +2180,24 @@ function dibChar(cfg,pose,d8){
  if(!T.capucha)P(g,cx-1,ty,2,1,cfg.pielS);
  if(T.capucha)P(g,cx-hom/2,ty-1,hom,3,T.s);
  const b1=P_.b[0],b2=P_.b[1];
- const manoY=T.manga==='corta'?ty+4:ty+7, bx1=cx-hom/2-2, bx2=cx+hom/2;
+ /* Sin mangas el brazo es piel, no tela, y conserva el mismo volumen que una manga: el
+    tono claro pasa a ser la piel y el oscuro su sombra. El brazo de detrás va en sombra
+    en las dos, que si no los dos brazos son la misma mancha. */
+ const sinM=T.manga==='sin';
+ const bB=sinM?cfg.piel:T.b, bL=sinM?cfg.piel:T.l, bS=sinM?cfg.pielS:T.s;
+ const manoY=T.manga==='larga'?ty+7:ty+4, bx1=cx-hom/2-2, bx2=cx+hom/2;
  if(P_.ataque!==undefined){const ex=P_.ataque;
-  if(derV||dir===AB){P(g,bx2,ty+2,2+ex,3,T.b);P(g,bx2+2+ex,ty+2,2,3,cfg.piel);}
-  else{P(g,bx1-ex,ty+2,2+ex,3,T.b);P(g,bx1-ex-2,ty+2,2,3,cfg.piel);}
-  if(!lateral)P(g,bx1,ty+2+b2,2,6,T.s);
+  if(derV||dir===AB){P(g,bx2,ty+2,2+ex,3,bB);P(g,bx2+2+ex,ty+2,2,3,cfg.piel);}
+  else{P(g,bx1-ex,ty+2,2+ex,3,bB);P(g,bx1-ex-2,ty+2,2,3,cfg.piel);}
+  if(!lateral)P(g,bx1,ty+2+b2,2,6,bS);
  }else if(P_.apunta){
-  if(derV){P(g,bx2,ty+3,3,2,T.b);P(g,bx2+3,ty+3,2,2,cfg.piel);}
-  else if(izqV){P(g,bx1-1,ty+3,3,2,T.b);P(g,bx1-3,ty+3,2,2,cfg.piel);}
-  else{P(g,bx2-1,ty+2,3,5,T.b);P(g,bx2-1,ty+7,3,2,cfg.piel);}
-  if(!lateral)P(g,bx1,ty+3,2,5,T.s);
+  if(derV){P(g,bx2,ty+3,3,2,bB);P(g,bx2+3,ty+3,2,2,cfg.piel);}
+  else if(izqV){P(g,bx1-1,ty+3,3,2,bB);P(g,bx1-3,ty+3,2,2,cfg.piel);}
+  else{P(g,bx2-1,ty+2,3,5,bB);P(g,bx2-1,ty+7,3,2,cfg.piel);}
+  if(!lateral)P(g,bx1,ty+3,2,5,bS);
  }else if(lateral){const bf=derV?bx2:bx1;
-  P(g,bf,ty+1+b1,2,6,T.l);P(g,bf,manoY+b1,2,2,cfg.piel);
- }else{P(g,bx1,ty+1+b1,2,6,T.l);P(g,bx2,ty+1+b2,2,6,T.s);
+  P(g,bf,ty+1+b1,2,6,bL);P(g,bf,manoY+b1,2,2,cfg.piel);
+ }else{P(g,bx1,ty+1+b1,2,6,bL);P(g,bx2,ty+1+b2,2,6,bS);
   P(g,bx1,manoY+b1,2,2,cfg.piel);P(g,bx2,manoY+b2,2,2,cfg.piel);}
  const hy=1+oy+yt;
  P(g,cx-4,hy,8,8,cfg.piel);P(g,cx+3,hy,1,8,cfg.pielS);P(g,cx-4,hy,8,1,cfg.pielS);
@@ -2282,7 +2288,7 @@ function A(nombre,comp,pielI,pelo,pelocol,gorro,gorroCol,torso,piernas,calzado,a
 const ARQ={
  protagonista:A('protagonista','media',1,'corto',C.pelo1,'txapela',null,'cazadora','vaquero','botas','ninguno'),
  ertzaina:A('ertzaina','corpulenta',1,'rapado',C.pelo1,'policia',null,'uniforme','uniformeP','botas','ninguno'),
- maton:A('maton','corpulenta',2,'rapado',C.pelo1,'gorra',C.carbon,'cazadora','vaquero','deportivas','ninguno'),
+ maton:A('maton','corpulenta',2,'rapado',C.pelo1,'ninguno',null,'tirantes','vaquero','botas','gafas'),
  maton2:A('maton2','media',4,'corto',C.pelo1,'capucha',null,'sudadera','chandalP','deportivas','ninguno'),
  josu:A('josu','media',1,'corto',C.pelo2,'ninguno',null,'camisaRem','vestir','zapatos','ninguno'),
  txema:A('txema','corpulenta',2,'corto',C.pelo1,'ninguno',null,'abrigo','vestir','zapatos','ninguno'),
@@ -2378,7 +2384,7 @@ function lienzoDeIndices(bytes,w,h){
    viste a todo el mundo y bajarlas todas afina. */
 function setDe(cfg){
  const T=TORSOS[cfg.torso],PN=PIERNAS[cfg.piernas];
- const arriba=T.largo?'abrigo':T.capucha?'capucha':T.manga==='corta'?'corto':'largo';
+ const arriba=T.largo?'abrigo':T.capucha?'capucha':(T.manga==='corta'||T.manga==='sin')?'corto':'largo';
  const abajo=PN.falda?'falda':PN.corto?'short':'pantalon';
  const h=SPR.hojas||{};
  for(const k of [arriba+'_'+abajo,arriba+'_pantalon','largo_'+abajo,'largo_pantalon'])

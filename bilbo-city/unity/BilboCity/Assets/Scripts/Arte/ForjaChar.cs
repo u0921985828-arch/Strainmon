@@ -64,7 +64,7 @@ public static class ForjaChar {
         new Postura{ p0=2,p1=4,b0=0,b1=2,y=0, yt=2 },                 // Agacha2
     };
 
-    struct Prenda { public Color32 b, s, l; public bool corta, capucha, peto, bandas, mandil, placa, largo; public Color32 raya; public bool tieneRaya; }
+    struct Prenda { public Color32 b, s, l; public bool corta, sinMangas, capucha, peto, bandas, mandil, placa, largo; public Color32 raya; public bool tieneRaya; }
     static Dictionary<string,Prenda> _torsos;
     static Dictionary<string,Prenda> Torsos {
         get {
@@ -86,6 +86,7 @@ public static class ForjaChar {
                 {"polo",       new Prenda{ b=Paleta.VerdeL, s=Paleta.Verde, l=Paleta.VerdeL, corta=true }},
                 {"reflectante",new Prenda{ b=Paleta.Rojo, s=Paleta.RojoO, l=Paleta.Mostaza, corta=true, bandas=true }},
                 {"delantal",   new Prenda{ b=Paleta.Asfalto, s=Paleta.Carbon, l=Paleta.GrisL, corta=true, mandil=true }},
+                {"tirantes",   new Prenda{ b=Paleta.Blanco, s=Paleta.Hormigon6, l=Paleta.Blanco, corta=true, sinMangas=true }},
             };
             return _torsos;
         }
@@ -144,7 +145,7 @@ public static class ForjaChar {
             void Add(Arquetipo a) { _arq[a.Nombre] = a; }
             Add(A("protagonista","media",1,"corto",Paleta.Pelo1,"txapela",Paleta.Carbon,"cazadora","vaquero","botas","ninguno"));
             Add(A("ertzaina","corpulenta",1,"rapado",Paleta.Pelo1,"policia",Paleta.AzulO,"uniforme","uniformeP","botas","ninguno"));
-            Add(A("maton","corpulenta",2,"rapado",Paleta.Pelo1,"gorra",Paleta.Carbon,"cazadora","vaquero","deportivas","ninguno"));
+            Add(A("maton","corpulenta",2,"rapado",Paleta.Pelo1,"ninguno",Paleta.Carbon,"tirantes","vaquero","botas","gafas"));
             Add(A("maton2","media",4,"corto",Paleta.Pelo1,"capucha",Paleta.Carbon,"sudadera","chandalP","deportivas","ninguno"));
             Add(A("josu","media",1,"corto",Paleta.Pelo2,"ninguno",Paleta.Carbon,"camisaRem","vestir","zapatos","ninguno"));
             Add(A("txema","corpulenta",2,"corto",Paleta.Pelo1,"ninguno",Paleta.Carbon,"abrigo","vestir","zapatos","ninguno"));
@@ -287,27 +288,33 @@ public static class ForjaChar {
 
         // ── brazos ──
         int b1 = P_.b0, b2 = P_.b1;
+        // Sin mangas el brazo es piel, no tela, y conserva el mismo volumen que una
+        // manga: el tono claro pasa a ser la piel y el oscuro su sombra. El brazo de
+        // detrás va en sombra en las dos, que si no los dos brazos son la misma mancha.
+        Color32 bB = T.sinMangas ? cfg.Piel : T.b;
+        Color32 bL = T.sinMangas ? cfg.Piel : T.l;
+        Color32 bS = T.sinMangas ? cfg.PielS : T.s;
         int manoY = T.corta ? ty + 4 : ty + 7;
         int bx1 = cx - hom/2 - 2, bx2 = cx + hom/2;
         if (P_.ataque > 0) {
             // El alcance cabe en el margen lateral, que con la celda de 24 son dos. Con
             // los cuatro de antes el puño se cortaba contra el canto.
             int ex = P_.ataque == 2 ? 1 : 0;
-            if (derV || dir == AB) { L.P(bx2, ty + 2, 2 + ex, 3, T.b); L.P(bx2 + 2 + ex, ty + 2, 2, 3, cfg.Piel); }
-            else { L.P(bx1 - ex, ty + 2, 2 + ex, 3, T.b); L.P(bx1 - ex - 2, ty + 2, 2, 3, cfg.Piel); }
-            if (!lateral) L.P(bx1, ty + 2 + b2, 2, 6, T.s);
+            if (derV || dir == AB) { L.P(bx2, ty + 2, 2 + ex, 3, bB); L.P(bx2 + 2 + ex, ty + 2, 2, 3, cfg.Piel); }
+            else { L.P(bx1 - ex, ty + 2, 2 + ex, 3, bB); L.P(bx1 - ex - 2, ty + 2, 2, 3, cfg.Piel); }
+            if (!lateral) L.P(bx1, ty + 2 + b2, 2, 6, bS);
         } else if (P_.apunta > 0) {
-            if (derV) { L.P(bx2, ty + 3, 3, 2, T.b); L.P(bx2 + 3, ty + 3, 2, 2, cfg.Piel); }
-            else if (izqV) { L.P(bx1 - 1, ty + 3, 3, 2, T.b); L.P(bx1 - 3, ty + 3, 2, 2, cfg.Piel); }
-            else { L.P(bx2 - 1, ty + 2, 3, 5, T.b); L.P(bx2 - 1, ty + 7, 3, 2, cfg.Piel); }
-            if (!lateral) L.P(bx1, ty + 3, 2, 5, T.s);
+            if (derV) { L.P(bx2, ty + 3, 3, 2, bB); L.P(bx2 + 3, ty + 3, 2, 2, cfg.Piel); }
+            else if (izqV) { L.P(bx1 - 1, ty + 3, 3, 2, bB); L.P(bx1 - 3, ty + 3, 2, 2, cfg.Piel); }
+            else { L.P(bx2 - 1, ty + 2, 3, 5, bB); L.P(bx2 - 1, ty + 7, 3, 2, cfg.Piel); }
+            if (!lateral) L.P(bx1, ty + 3, 2, 5, bS);
         } else if (lateral) {
             int bf = derV ? bx2 : bx1;
-            L.P(bf, ty + 1 + b1, 2, 6, T.l);
+            L.P(bf, ty + 1 + b1, 2, 6, bL);
             L.P(bf, manoY + b1, 2, 2, cfg.Piel);
         } else {
-            L.P(bx1, ty + 1 + b1, 2, 6, T.l);
-            L.P(bx2, ty + 1 + b2, 2, 6, T.s);
+            L.P(bx1, ty + 1 + b1, 2, 6, bL);
+            L.P(bx2, ty + 1 + b2, 2, 6, bS);
             L.P(bx1, manoY + b1, 2, 2, cfg.Piel);
             L.P(bx2, manoY + b2, 2, 2, cfg.Piel);
         }
@@ -394,8 +401,15 @@ public static class ForjaChar {
                 L.P(cx - hom/2, ty + 1, hom, 1, Paleta.MaderaO); L.P(cx - hom/2 - 1, ty + 5, 2, 3, Paleta.Madera); break;
             case "bufanda":
                 L.P(cx - 4, ty - 1, 8, 2, Paleta.Rojo); L.P(cx + 1, ty + 1, 2, 4, Paleta.RojoO); break;
+            // Las gafas tapan los ojos, así que van en las cinco direcciones en las que
+            // se ve la cara y en ninguna de las tres de espaldas. Antes solo se dibujaban
+            // mirando abajo: en las otras siete el tipo se las quitaba solo.
             case "gafas":
-                if (dir == AB) { L.P(cx - 3, hy + 4, 2, 2, Paleta.Carbon); L.P(cx + 1, hy + 4, 2, 2, Paleta.Carbon); L.P(cx - 1, hy + 4, 2, 1, Paleta.Carbon); }
+                if (!arr) {
+                    if (izqV) { L.P(cx - 4, hy + 4, 3, 2, Paleta.Carbon); L.P(cx - 4, hy + 4, 3, 1, Paleta.Gris); }
+                    else if (derV) { L.P(cx + 1, hy + 4, 3, 2, Paleta.Carbon); L.P(cx + 1, hy + 4, 3, 1, Paleta.Gris); }
+                    else { L.P(cx - 3, hy + 4, 6, 2, Paleta.Carbon); L.P(cx - 3, hy + 4, 6, 1, Paleta.Gris); L.P(cx - 1, hy + 5, 2, 1, Paleta.Carbon); }
+                }
                 break;
             case "carrito":
                 if (!arr) {
