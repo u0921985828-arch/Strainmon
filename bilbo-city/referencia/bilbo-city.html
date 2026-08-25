@@ -3052,6 +3052,28 @@ const ANCHO_FACH={portal:16,portalPiedra:16,garaje:16,
    que una nave es una sola altura. */
 const PISOS_H={teja:PISO_H,pizarra:PISO_H,azotea:PISO_H,nave:8};
 const PISOS_MAT={teja:'ladrillo',pizarra:'ladrillo',azotea:'hormigon',nave:'nave'};
+/* La altura de planta no es la misma en toda la ciudad. Un piso del Ensanche mide 3,2 m
+   de suelo a suelo y uno de un bloque de los sesenta, 2,7: por eso un edificio de Santutxu
+   con las mismas alturas que uno de la Gran Via se ve mal aunque no se sepa por que.
+   En espacio de forja (x2 en pantalla, 8 cm por pixel). */
+const PISO_BARRIO={senorial:20,denso:18,bloques:17,industrial:15,abierto:16};
+/* De que esta hecha la fachada, por barrio. No es decoracion: Santutxu se levanto entre
+   los cincuenta y los setenta y es ladrillo caravista y revoco —crema, gris y verde
+   palido—, mientras el Ensanche es piedra y revoco claro y Zorrotzaurre es hormigon y
+   chapa. Cada edificio coge una del monton por hash, y de ahi sale que dos portales
+   seguidos no sean del mismo color. */
+const REVOCO={
+ senorial:  [[C.hormigon5,C.hormigon7,C.hormigon3],[C.crema,C.blanco,C.hormigonO],
+             [C.hormigon6,C.nieve,C.hormigon4]],
+ denso:     [[C.ladrillo4,C.ladrillo5,C.ladrillo2],[C.luz5,C.luz6,C.luz3],
+             [C.hormigon5,C.hormigon7,C.hormigon3]],
+ /* Santutxu */
+ bloques:   [[C.ladrillo4,C.ladrillo5,C.ladrillo2],[C.luz5,C.luz6,C.luz3],
+             [C.hormigon5,C.hormigon7,C.hormigon3],[C.verde6,C.verde7,C.verde4],
+             [C.hormigon4,C.hormigon6,C.hormigon2]],
+ industrial:[[C.hormigon4,C.hormigon6,C.hormigon2],[C.aceroO,C.acero,C.grisO]],
+ abierto:   [[C.hormigon5,C.hormigon7,C.hormigon3],[C.ladrillo4,C.ladrillo5,C.ladrillo2]],
+};
 const FACH_BARRIO={
  denso:     ['tasca','persiana','portal','escaparate','portal','persiana','tasca','ciega'],
  senorial:  ['escaparate','portalPiedra','escaparate','ciega','portalPiedra','persiana'],
@@ -3122,7 +3144,7 @@ function generarProps(){
     mismo. El tipo lo elige el hash de la casilla, asi que sale solo y no hay nada
     escrito a mano. */
  const VIDRIO='#3f5566', VIDRIOL='#7f9aa8', HIERRO=C.carbon;
- const banda=(fn)=>{const W=32*ESC,H=PISO_H*ESC,c=lienzo(W,H),g=c.getContext('2d');
+ const banda=(ph,fn)=>{const W=32*ESC,H=ph*ESC,c=lienzo(W,H),g=c.getContext('2d');
   fn(g,W,H);return cuantizar(c);};
  /* El hueco: dintel claro arriba, jamba en sombra a la derecha, vidrio con su reflejo en
     la esquina de arriba a la izquierda, que es de donde viene la luz en todo el juego. */
@@ -3134,19 +3156,19 @@ function generarProps(){
  const AN_V=10, AL_V=14;
  const fila=(g,W,fn)=>{const n=3,paso=W/n;
   for(let i=0;i<n;i++)fn(Math.round(i*paso+(paso-AN_V)/2));};
- const TIPOS=(muro,muroL,muroO)=>[
+ const TIPOS=(muro,muroL,muroO,ph)=>[
   /* liso: ventana y nada mas, la planta de patio o de medianera */
-  banda((g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+  banda(ph,(g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
    fila(g,W,x=>hueco(g,x,7,AN_V,AL_V,muroO,muroL));}),
   /* balcon: losa que vuela, baranda de hierro y la sombra que tira sobre el muro */
-  banda((g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+  banda(ph,(g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
    fila(g,W,x=>{hueco(g,x,5,AN_V,AL_V,muroO,muroL);
     /* La losa vuela y tira sombra sobre el muro; la baranda va delante del hueco. */
     P(g,x-3,H-8,AN_V+6,2,muroL);P(g,x-3,H-6,AN_V+6,1,muroO);
     P(g,x-3,H-13,AN_V+6,1,HIERRO);
     for(let b=0;b<AN_V+6;b+=3)P(g,x-3+b,H-13,1,5,HIERRO);});}),
   /* mirador: la galeria acristalada de Bilbao, dos huecos de frente y su canto */
-  banda((g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+  banda(ph,(g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
    /* Un mirador por casilla: 2,6 m de frente, que es lo que vuela una galeria. */
    const bx=Math.round((W-32)/2);
    P(g,bx,3,32,H-7,muroO);P(g,bx,3,32,1,muroL);
@@ -3154,20 +3176,23 @@ function generarProps(){
    for(let m=9;m<28;m+=9)P(g,bx+2+m,5,2,H-11,muroO);
    P(g,bx,H-4,32,2,C.carbon);}),
   /* persiana echada: media calle esta asi a media manana */
-  banda((g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+  banda(ph,(g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
    fila(g,W,x=>{hueco(g,x,7,AN_V,AL_V,muroO,muroL);
     /* Bajada hasta la misma altura en toda la banda: cada ventana a su aire quedaba
        inquieto, y una persiana no se para donde le da la gana en cada piso. */
     const b=9;
     P(g,x,7,AN_V,b,C.grisO);for(let y=7;y<7+b;y+=2)P(g,x,y,AN_V,1,C.gris);});}),
  ];
- PROP.pisos={
-  ladrillo:TIPOS(C.teja,C.ladrillo4,C.ladrillo1),
-  hormigon:TIPOS(C.hormigon,C.hormigonL,C.hormigonO),
-  /* La nave no tiene plantas: una franja de ventana alta y chapa, y punto. */
-  nave:[banda((g,W,H)=>{P(g,0,0,W,H,C.aceroO);P(g,0,0,W,2,C.acero);P(g,0,H-2,W,2,C.grisO);
-   for(let x=4;x<W-6;x+=10)P(g,x,4,6,H-9,VIDRIO);})],
- };
+ /* Un juego de cuatro tipos por cada revoco y por cada altura de planta: el sprite se
+    forja una vez y se reparte por hash, asi que la variedad no cuesta nada en marcha. */
+ PROP.pisos={};
+ for(const est of Object.keys(REVOCO)){
+  PROP.pisos[est]=REVOCO[est].map(([m,l,o])=>TIPOS(m,l,o,PISO_BARRIO[est]));
+ }
+ /* La nave no tiene plantas: una franja de ventana alta y chapa, y punto. */
+ PROP.pisosNave=[banda(PISO_BARRIO.industrial,(g,W,H)=>{
+  P(g,0,0,W,H,C.aceroO);P(g,0,0,W,2,C.acero);P(g,0,H-2,W,2,C.grisO);
+  for(let x=4;x<W-6;x+=10)P(g,x,4,6,H-9,VIDRIO);})];
  PROP.deposito=S_(18,20,g=>{P(g,3,4,12,14,'#7f9aa8');P(g,3,4,12,3,'#a8c4d0');
   P(g,15,4,2,14,C.aceroO);P(g,4,18,3,2,C.carbon);P(g,12,18,3,2,C.carbon);
   P(g,5,1,8,3,C.acero);});
@@ -6450,7 +6475,7 @@ function dibCiudad(){
       si el barrio no tiene ninguno, un portal, que lo tiene toda casa. */
    /* Primero las plantas y encima los bajos: el edificio se lee de arriba abajo, tejado,
       ventanas, escaparate y acera. */
-   const famF=famDe(roof[y*MW+x]), ph=PISOS_H[famF]||PISO_H;
+   const famF=famDe(roof[y*MW+x]), ph=PISO_BARRIO[estF]||PISO_H;
    /* Cuantas plantas caben. Las pide el barrio, pero las manda el fondo de la manzana:
       la pared sube por encima del tejado del propio edificio, y en una manzana de una
       sola casilla de fondo se saldria por el norte y quedaria una pared flotando sobre
@@ -6461,8 +6486,16 @@ function dibCiudad(){
    /* El tipo de fachada lo elige el hash de la casilla y se queda igual en todas las
       plantas de esa columna: un edificio no cambia de estilo de una planta a otra, pero
       el de al lado si es distinto, que es lo que rompe el papel pintado. */
-   const tipos=PROP.pisos[PISOS_MAT[famF]||'hormigon'];
-   const sprP=tipos[(h2>>5)%tipos.length];
+   /* El revoco y el tipo cambian por EDIFICIO, no por casilla. Con el hash de la casilla
+      la manzana cambiaba de color cada 5,16 m y salia un damero, que es lo contrario de lo
+      que se buscaba: un portal de Santutxu son veinte o treinta metros de la misma
+      fachada. Se agrupa de cinco en cinco casillas —25,8 m— y en franjas de cuatro de
+      fondo, asi que el edificio es uno y el de al lado es otro.
+      Los bajos siguen yendo por casilla: ahi si cambia el local cada pocos metros. */
+   const hEd=hash(Math.floor(x/5)*31,Math.floor(y/4)*17);
+   const juegos=famF==='nave'?[PROP.pisosNave]:(PROP.pisos[estF]||PROP.pisos.bloques);
+   const tipos=juegos[hEd%juegos.length];
+   const sprP=tipos[(hEd>>7)%tipos.length];
    for(let k=0;k<nPisos;k++)
     ctx.drawImage(sprP,x*TS,y*TS+TS-FACH_H*ESC-(k+1)*ph*ESC);
    for(let px=0,n=0;px<TS;n++){
