@@ -38,6 +38,18 @@ public static class Sol {
         return Mathf.Min(4f, m / Mathf.Tan(Elev) / 5.16f);
     }
 
+    /// <summary>Lo que proyecta un singular, en casillas: su altura real partida por la
+    /// tangente de la elevación. Veinte casillas de tope, más holgado que el de una manzana
+    /// corriente, porque al ras del horizonte la sombra de una torre de verdad sale de
+    /// cuatrocientos metros y taparía media ciudad. Si el id no está en la tabla, se supone
+    /// 25 m —lo que mide un edificio de barrio alto, no una excepción.</summary>
+    public static float LargoSombraSingular(string id) {
+        if (Elev <= 0) return 0;
+        float m;
+        if (!Singulares.AltoSingular.TryGetValue(id, out m)) m = 25f;
+        return Mathf.Min(20f, m / Mathf.Tan(Elev) / 5.16f);
+    }
+
     /// <summary>Lo que proyecta cualquier cosa que esté de pie, en casillas: la altura
     /// partida por la tangente de la elevación. Sale de aquí para todo —persona, coche,
     /// farola y árbol— porque si la manzana proyecta a un lado y el coche al otro, la escena

@@ -5302,6 +5302,35 @@ function colocarSingulares(){
   singular(p.id,el.w,el.h,dib);
   SINGULARES[p.id].x=el.x;SINGULARES[p.id].y=el.y;}}
 
+/* Lo que levanta cada uno, en metros. Un singular no es una manzana más: la torre
+   Iberdrola son 165 m y a media tarde su sombra cruza Abandoibarra entera, y eso es
+   justo lo que se ve de ella desde arriba. Con la altura del barrio —trece metros— la
+   torre proyectaba lo mismo que el portal de al lado. */
+const ALTO_SINGULAR={sanmames:40,guggen:50,iberdrola:165,euskalduna:40,abando:25,
+ arriaga:30,ayto:30,catedral:45,begonia:35,merca:20,alhondiga:25,almacenes:30,arena:30};
+/* La sombra de un singular es su planta barrida hasta donde llega: la caja, su copia
+   corrida y las cuatro bandas que las unen, todo en un trazo y un solo relleno — con dos
+   rellenos superpuestos la parte común saldría al doble de oscuro. */
+function sombraSingulares(x0,y0,x1,y1){
+ if(!SOL.elev)return;
+ ctx.fillStyle='rgba(7,9,12,.30)';
+ for(const id in SINGULARES){
+  const s=SINGULARES[id];if(s.x===undefined)continue;
+  const L=Math.min(20,(ALTO_SINGULAR[id]||25)/Math.tan(SOL.elev)/5.16);
+  const dx=SOL.ux*L,dy=SOL.uy*L;
+  if(Math.min(s.x,s.x+dx)>x1+2||Math.max(s.x+s.w,s.x+s.w+dx)<x0-2)continue;
+  if(Math.min(s.y,s.y+dy)>y1+2||Math.max(s.y+s.h,s.y+s.h+dy)<y0-2)continue;
+  const ax=s.x*TS,ay=s.y*TS,bx=(s.x+s.w)*TS,by=(s.y+s.h)*TS,px=dx*TS,py=dy*TS;
+  const V=[[ax,ay],[bx,ay],[bx,by],[ax,by]];
+  ctx.beginPath();
+  ctx.moveTo(ax,ay);ctx.lineTo(bx,ay);ctx.lineTo(bx,by);ctx.lineTo(ax,by);ctx.closePath();
+  ctx.moveTo(ax+px,ay+py);ctx.lineTo(bx+px,ay+py);ctx.lineTo(bx+px,by+py);
+  ctx.lineTo(ax+px,by+py);ctx.closePath();
+  for(let i=0;i<4;i++){const a=V[i],b=V[(i+1)%4];
+   ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);
+   ctx.lineTo(b[0]+px,b[1]+py);ctx.lineTo(a[0]+px,a[1]+py);ctx.closePath();}
+  ctx.fill();}}
+
 /* Dónde puede pisar un singular. La calle, la acera de enfrente, la ría y el monte no:
    por ahí se anda o se navega, y un edificio encima los borraría. */
 const pintable=t=>t!==AGUA&&t!==MUELLE&&t!==PUENTE&&t!==ROAD&&t!==MONTE;
@@ -6950,7 +6979,12 @@ function dib(){
  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.imageSmoothingEnabled=false;
  ctx.fillStyle=C.negro;ctx.fillRect(0,0,W,H);
  if(S.escena==='interior')dibInterior();else dibCiudad();
- const L=luzAmbiente(),n=(S.escena==='interior'?.35:1)*L[3];
+ /* Dentro, de noche, la luz está encendida: no se ve azul y oscuro, se ve cálido y flojo.
+    Con el mismo tinte que la calle, entrar en casa a las once era meterse en una cueva. */
+ let L=luzAmbiente(),n=L[3];
+ if(S.escena==='interior'){
+  if(L[2]>L[0]){L=[236,186,96,.12];n=.12;}   /* la bombilla del techo */
+  else n*=.35;}
  if(n>0){ctx.fillStyle='rgba('+L[0]+','+L[1]+','+L[2]+','+n.toFixed(3)+')';ctx.fillRect(0,0,W,H);}
  if(S.muerto>0){ctx.fillStyle='rgba(120,10,10,'+clamp((2.2-S.muerto)/1.4,0,.75)+')';ctx.fillRect(0,0,W,H);}
  dibHUD();}
@@ -7096,6 +7130,14 @@ function dibCiudad(){
    const sprP=tipos[(hEd>>7)%tipos.length];
    for(let k=0;k<nPisos;k++)
     ctx.drawImage(sprP,x*TS,y*TS+TS-FACH_H*ESC-(k+1)*ph*ESC);
+   /* La cara sur solo la da el sol cuando está al sur, o sea a mediodía. A primera y a
+      última hora viene de costado y la fachada se apaga: sin esto la calle cambiaba de
+      hora y las paredes se quedaban igual de encendidas a las ocho que a las dos. */
+   if(SOL.elev){
+    const luz=Math.max(0,-SOL.uy);
+    if(luz<.97){const alto=FACH_H*ESC+nPisos*ph*ESC;
+     ctx.fillStyle='rgba(7,9,12,'+(.34*(1-luz)).toFixed(3)+')';
+     ctx.fillRect(x*TS,y*TS+TS-alto,TS,alto);}}
    /* El alero remata la pila por arriba. Sin el, el muro y el tejado se tocan sin
       transicion y no se sabe donde acaba la ultima planta. */
    if(nPisos&&tipos.alero)
@@ -7116,6 +7158,7 @@ function dibCiudad(){
   ctx.fillStyle='rgba(0,0,0,.4)';
   if(abajo)ctx.fillRect(x*TS,y*TS+TS-2,TS,2);
   if(der)ctx.fillRect(x*TS+TS-2,y*TS,2,TS);}
+ sombraSingulares(x0,y0,x1,y1);
  dibSingulares(x0,y0,x1,y1);
  /* Cincuenta y seis chinchetas por fotograma son cincuenta y seis dibujos, y casi todas
     caen fuera de la pantalla: el mapa mide siete kilómetros. */

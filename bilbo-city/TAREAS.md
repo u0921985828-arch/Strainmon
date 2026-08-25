@@ -56,6 +56,10 @@ casilla al dibujar.
 - [ ] Luz ambiente: teñir con un quad a pantalla completa o con `Camera.backgroundColor` +
       un `SpriteRenderer` en overlay. No con URP: el proyecto va con paquetes base.
 - [ ] Farolas encendidas de noche.
+- [ ] Sombra de los singulares: pintar la planta barrida hasta donde llega —la caja, su
+      copia corrida y las bandas que las unen— en un solo trazo y un solo relleno, para que
+      la parte común no salga al doble de oscuro. Como ya hace `sombraSingulares` en el
+      prototipo.
 
 ## 2 · Primera pasada de juego real
 

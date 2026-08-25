@@ -271,6 +271,11 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       ok(l13[3] === 0, 'a mediodía la ciudad va teñida');
       ok(l23[3] > 0.4 && l23[2] > l23[0], 'la noche no es azul');
       ok(l20[0] > l20[2], 'el atardecer no es cálido');
+      // Y la torre Iberdrola no proyecta lo que un portal: 165 m contra los 13 del barrio.
+      S.min = 17 * 60; A.calcularSol();
+      const lt2 = A.largoSombra('senorial');
+      const torre = Math.min(20, 165 / Math.tan(A.SOL.elev) / 5.16);
+      ok(torre > lt2 * 3, 'la torre proyecta ' + torre.toFixed(1) + ' y una manzana ' + lt2.toFixed(1));
       // Y lo que está de pie proyecta al mismo sitio que la manzana: si el coche tira la
       // sombra a un lado y el edificio al otro, la escena se rompe.
       S.min = 9 * 60;  A.calcularSol(); const sm = A.sombraSol(1.7);

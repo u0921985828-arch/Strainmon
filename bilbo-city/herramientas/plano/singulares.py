@@ -25,6 +25,16 @@ def delCs():
     return {m.group(1): (int(m.group(2)), int(m.group(3)))
             for m in re.finditer(r'\{"([a-z]+)",\s*new Plano_ \{ W = (\d+), H = (\d+),', s)}
 
+def altoHtml():
+    s = HTML.read_text()
+    bloque = re.search(r'const ALTO_SINGULAR=\{(.*?)\};', s, re.S).group(1)
+    return {m.group(1): int(m.group(2)) for m in re.finditer(r'(\w+):(\d+)', bloque)}
+
+def altoCs():
+    s = CS.read_text()
+    bloque = re.search(r'AltoSingular = new Dictionary<string,float> \{(.*?)\n    \};', s, re.S).group(1)
+    return {m.group(1): int(m.group(2)) for m in re.finditer(r'\{"(\w+)", (\d+)\}', bloque)}
+
 def main():
     h, c = delHtml(), delCs()
     if not h:
@@ -38,6 +48,16 @@ def main():
         for k in distintos: print('  no cuadra: %-11s HTML %dx%d · Unity %dx%d'
                                   % (k, *h[k], *c[k]))
         sys.exit('los singulares no cuadran entre el HTML y Unity')
-    print('%d edificios singulares cuadran entre el HTML y Unity' % len(h))
+    # La altura no la usa el dibujo, la usa la sombra: la torre Iberdrola son 165 m y a
+    # media tarde su sombra cruza Abandoibarra. Si las dos tablas se separan, en Unity la
+    # torre proyecta como un portal y aquí no lo ve nadie.
+    ah, ac = altoHtml(), altoCs()
+    malas = sorted(set(ah) ^ set(ac)) + sorted(k for k in set(ah) & set(ac) if ah[k] != ac[k])
+    if malas:
+        for k in malas:
+            print('  altura no cuadra: %-11s HTML %s m · Unity %s m'
+                  % (k, ah.get(k, '—'), ac.get(k, '—')))
+        sys.exit('las alturas de los singulares no cuadran entre el HTML y Unity')
+    print('%d edificios singulares cuadran entre el HTML y Unity, medida y altura' % len(h))
 
 main()

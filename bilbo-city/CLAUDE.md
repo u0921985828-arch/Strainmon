@@ -264,6 +264,18 @@ de color a la misma altura.
   una vista cenital eso no se ve: una farola de cuatro metros a primera hora proyecta veinte,
   y sin recortar se le subía al tejado del edificio de al lado. Se corta en la primera manzana
   que encuentra por el camino (`sombraCorta`).
+- **Un singular no es una manzana más.** La torre Iberdrola son 165 m y a media tarde su
+  sombra cruza Abandoibarra entera; con la altura del barrio —13 m— proyectaba lo mismo que
+  el portal de al lado. Cada uno lleva la suya (`ALTO_SINGULAR` / `AltoSingular`, comparadas
+  por `singulares.py`) y su sombra es la planta barrida: la caja, su copia corrida y las
+  bandas que las unen, **en un trazo y un solo relleno** — con dos rellenos superpuestos la
+  parte común sale al doble de oscuro. Tope de 20 casillas: al ras del horizonte una torre
+  proyecta cuatrocientos metros y taparía media ciudad.
+- **La cara sur solo la da el sol a mediodía.** A primera y a última hora viene de costado y
+  la fachada se apaga. Sin esto la calle cambiaba de hora y las paredes seguían igual de
+  encendidas a las ocho que a las dos.
+- **Dentro, de noche, la luz está encendida**: cálida y floja, no azul y oscura. Con el tinte
+  de la calle, entrar en casa a las once era meterse en una cueva.
 - **Canto negro en el mobiliario**, la misma regla que ya tenían los iconos del HUD. Solo se
   exige donde hay margen: lo que toca el borde del lienzo no puede llevarlo.
 

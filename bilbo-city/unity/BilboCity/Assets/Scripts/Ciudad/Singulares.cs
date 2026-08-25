@@ -34,6 +34,15 @@ public static class Singulares {
     /// Un trozo de 32×32 por casilla ocupada, indexado por casilla del mapa.
     static readonly Dictionary<int,Sprite> _trozos = new Dictionary<int,Sprite>();
 
+    /// <summary>Altura real de cada singular, en metros, copiada del prototipo. Un singular
+    /// no es una manzana más: la torre Iberdrola son 165 m, y usando la altura del barrio
+    /// (13 m) proyectaba la misma sombra que el portal de al lado.</summary>
+    public static readonly Dictionary<string,float> AltoSingular = new Dictionary<string,float> {
+        {"sanmames", 40}, {"guggen", 50}, {"iberdrola", 165}, {"euskalduna", 40},
+        {"abando", 25}, {"arriaga", 30}, {"ayto", 30}, {"catedral", 45}, {"begonia", 35},
+        {"merca", 20}, {"alhondiga", 25}, {"almacenes", 30}, {"arena", 30},
+    };
+
     /// <summary>Radios de búsqueda, en casillas, del más pegado al rótulo al más lejano.</summary>
     static readonly int[] Radios = { 10, 20 };
     /// Cuánta caja tiene que caer en suelo pintable para dar la colocación por buena.
