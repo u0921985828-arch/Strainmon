@@ -3,8 +3,18 @@ description: Trae de PixelLab una silueta de sprites y juzga si el estarcido sal
 ---
 
 Trae de PixelLab la silueta que te digan —o `largo_pantalon` si no dicen ninguna— y juzga
-el resultado. Esto **solo funciona en local**: desde una sesión en la nube el proxy
-rechaza el CONNECT a `api.pixellab.ai` y no hay forma de saltárselo.
+el resultado.
+
+**Comprueba primero que hay salida**, porque de esto depende dónde se puede ejecutar:
+
+```
+curl -s -o /dev/null -w '%{http_code}\n' --max-time 12 https://api.pixellab.ai/v1/balance
+```
+
+`000` significa que la política de red del entorno remoto no tiene permitido
+`api.pixellab.ai`, y no hay forma de saltárselo desde dentro: o lo abre el dueño del
+entorno en claude.ai/code, o esto se ejecuta en local. Cualquier otro código —incluso un
+401— quiere decir que se llega y se puede tirar desde aquí.
 
 Lee antes `herramientas/sprites/LEEME.md`: explica por qué se baja una silueta y no un
 personaje, y qué es cada color de plantilla.
