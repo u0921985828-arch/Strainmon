@@ -2147,16 +2147,20 @@ function dibChar(cfg,pose,d8){
  /* La pernera de delante lleva su canto claro a la izquierda, que es de donde viene la
     luz, y la de detrás se queda en sombra: sin eso las dos piernas son un solo bloque. */
  if(PN.falda){P(g,cx-w/2-1,py-1,w+2,6,PN.b);P(g,cx-w/2-1,py-1,w+2,1,PN.l);P(g,cx-w/2-1,py+4,w+2,1,PN.s);
-  P(g,cx-3,py+5,2,4,cfg.piel);P(g,cx+1,py+5,2,4,cfg.piel);
-  P(g,cx-3,py+8,2,1,cfg.pielS);P(g,cx+1,py+8,2,1,cfg.pielS);}
+  P(g,cx-3,py+5,2,PH-4,cfg.piel);P(g,cx+1,py+5,2,PH-4,cfg.piel);
+  P(g,cx-3,py+PH,2,1,cfg.pielS);P(g,cx+1,py+PH,2,1,cfg.pielS);}
  else if(lateral){const dx=derV?1:-1;
   P(g,cx-2-dx,py+l2,3,PH-l2,PN.s);P(g,cx-2+dx,py+l1,3,PH-l1,PN.b);
   P(g,cx-2+dx,py+l1,1,PH-l1,PN.l);
-  if(PN.corto)P(g,cx-2+dx,py+4,3,4,cfg.piel);}
+  if(PN.corto)P(g,cx-2+dx,py+4,3,PH-4,cfg.piel);}
  else{P(g,cx-3,py+l1,3,PH-l1,PN.b);P(g,cx,py+l2,3,PH-l2,PN.s);
   P(g,cx-3,py+l1,1,PH-l1,PN.l);
   if(PN.raya){P(g,cx-3,py+l1,1,PH-l1,PN.raya);P(g,cx+2,py+l2,1,PH-l2,PN.raya);}
-  if(PN.corto){P(g,cx-3,py+4,3,4,cfg.piel);P(g,cx,py+4,3,4,cfg.piel);}}
+  if(PN.corto){P(g,cx-3,py+4,3,PH-4,cfg.piel);P(g,cx,py+4,3,PH-4,cfg.piel);}
+  /* La costura entre las perneras, y solo de medio muslo para abajo: los dos tonos del
+     pantalón se parecen demasiado para separarlas solos y de frente las piernas eran un
+     bloque. Arriba no va, que ahí las piernas se juntan de verdad. */
+  P(g,cx-1,py+3,1,PH-3,C.negro);}
  /* Bajo falda los pies van donde la falda deja las piernas —dos píxeles— y no donde los
     pone la plantilla lateral, que son tres y cuatro: descuadrados asomaba medio zapato por
     fuera de la pernera. */
@@ -2215,7 +2219,7 @@ function dibChar(cfg,pose,d8){
   else{P(g,cx-1,hy,h2,HH,cfg.piel);P(g,cx+2,ey,1,2,C.negro);P(g,cx-3,ey+2,1,1,cfg.pielS);}}
  if(espalda)P(g,hx,hy,HW,HH,cfg.pielS);
  if(P_.herido&&dir===AB)P(g,cx-eo,ey,4,1,C.sangre);
- capasEncima(g,cfg,cx,hy,ty,hom,{dir,arr,T,izqV,derV,fog:P_.fog,HW,HH,ey},0);
+ capasEncima(g,cfg,cx,hy,ty,hom,{dir,arr,T,izqV,derV,fog:P_.fog,HW,HH,ey,py},0);
  /* Contorno solo por fuera, como los iconos y por lo mismo: la gente cruza del asfalto
     a la acera y de la acera al parque, y una cazadora gris sobre hormigón gris sin borde
     se deshace. Las costuras de la ropa no llevan, que a 20 píxeles taparían el dibujo. */
@@ -2233,7 +2237,7 @@ const GRANDES={melena:1,coleta:1,mono:1,afro:1};
    con la cabezona del protagonista, un gorro clavado a ocho se le queda de bufón. Con
    HW=8 sale píxel a píxel lo de antes, así que los otros arquetipos no se mueven. */
 function capasEncima(g,cfg,cx,hy,ty,hom,E,soloGrandes){
- const dir=E.dir,arr=E.arr,T=E.T,izqV=E.izqV,derV=E.derV;
+ const dir=E.dir,arr=E.arr,T=E.T,izqV=E.izqV,derV=E.derV,py=E.py!==undefined?E.py:ty+8;
  const HW=E.HW||8, HH=E.HH||8, h2=HW/2, ey=E.ey!==undefined?E.ey:hy+4;
  const pc=cfg.pelo==='canoso'?C.pelo5:cfg.pelocol, est=cfg.pelo;
  if(est!=='calvo'&&(!soloGrandes||GRANDES[est])){
@@ -2283,8 +2287,11 @@ function capasEncima(g,cfg,cx,hy,ty,hom,E,soloGrandes){
   if(izqV){P(g,cx-h2,ey,3,2,C.carbon);P(g,cx-h2,ey,3,1,C.gris);}
   else if(derV){P(g,cx+h2-3,ey,3,2,C.carbon);P(g,cx+h2-3,ey,3,1,C.gris);}
   else{P(g,cx-3,ey,6,2,C.carbon);P(g,cx-3,ey,6,1,C.gris);P(g,cx-1,ey+1,2,1,C.carbon);}}
- else if(A==='carrito'&&!arr){P(g,cx+4,ty+5,5,8,C.rojoO);P(g,cx+4,ty+5,5,2,C.rojo);
-  P(g,cx+5,ty+13,1,2,C.carbon);P(g,cx+7,ty+13,1,2,C.carbon);}
+ /* El carro va anclado a las perneras y no al torso, porque está en el suelo: colgado
+    del torso bajaba con él —dos filas con la cabezona, y las ruedas se salían de la
+    celda— y se agachaba con el personaje, que un carro de la compra no hace. */
+ else if(A==='carrito'&&!arr){P(g,cx+4,py-3,5,8,C.rojoO);P(g,cx+4,py-3,5,2,C.rojo);
+  P(g,cx+5,py+5,1,2,C.carbon);P(g,cx+7,py+5,1,2,C.carbon);}
  /* El fogonazo sale del cañón, y el cañón está donde acaba la mano: a siete píxeles del
     hombro se salía de la celda de 24 y se veía cortado por la mitad. */
  if(E.fog){if(derV)P(g,cx+hom/2+2,ty+2,3,3,C.mostaza);
@@ -2342,9 +2349,10 @@ const ARQ={
  banda2:A('banda2','corpulenta',3,'corto',C.pelo1,'gorra',C.rojo,'chandal','chandalP','deportivas','ninguno'),
  banda3:A('banda3','media',4,'rapado',C.pelo1,'ninguno',null,'cazadora','vaquero','botas','gafas'),
 };
-/* De momento solo el protagonista. Vestirse hace `Object.assign` sobre este mismo objeto,
-   así que la bandera sobrevive a cambiarse de ropa. */
-ARQ.protagonista.cabezona=1;
+/* La cabezona, ya para los treinta y siete. Sigue siendo bandera por arquetipo y no una
+   constante: cuesta una línea volver atrás, o dejar a alguien con la cabeza pequeña.
+   Vestirse hace `Object.assign` sobre el mismo objeto, así que sobrevive a la ropa. */
+Object.values(ARQ).forEach(a=>a.cabezona=1);
 const PEATON_ARQ=['p1','p2','p3','p4','p5','p6','p7','p8','p9','p10','p11','p12',
  'p13','p14','p15','p16','p17','p18','banda1','banda2','banda3'];
 /* Quién anda por dónde. En la Gran Vía hay gabardinas y en Zorrotzaurre monos de faena, y

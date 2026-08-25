@@ -188,9 +188,13 @@ public static class ForjaChar {
             Add(A("banda1","delgada",   5,"rapado",Paleta.Pelo1,"ninguno",Paleta.Carbon,"tirantes","chandalP","deportivas","gafas"));
             Add(A("banda2","corpulenta",3,"corto", Paleta.Pelo1,"gorra",  Paleta.Rojo,  "chandal", "chandalP","deportivas","ninguno"));
             Add(A("banda3","media",     4,"rapado",Paleta.Pelo1,"ninguno",Paleta.Carbon,"cazadora","vaquero", "botas",     "gafas"));
-            // De momento solo el protagonista. Arquetipo es un struct, así que hay que
-            // volver a meterlo en el diccionario para que el cambio no se quede en la copia.
-            var prota = _arq["protagonista"]; prota.Cabezona = true; _arq["protagonista"] = prota;
+            // La cabezona, ya para los treinta y siete. Sigue siendo bandera por arquetipo y
+            // no una constante: cuesta una línea volver atrás, o dejar a alguien con la cabeza
+            // pequeña. Arquetipo es un struct, así que hay que volver a meterlo en el
+            // diccionario para que el cambio no se quede en la copia.
+            foreach (var k in new List<string>(_arq.Keys)) {
+                var a2 = _arq[k]; a2.Cabezona = true; _arq[k] = a2;
+            }
             return _arq;
         }
     }
@@ -247,22 +251,26 @@ public static class ForjaChar {
             L.P(cx - compW/2 - 1, py - 1, compW + 2, 6, PN.b);
             L.P(cx - compW/2 - 1, py - 1, compW + 2, 1, PN.l);
             L.P(cx - compW/2 - 1, py + 4, compW + 2, 1, PN.s);
-            L.P(cx - 3, py + 5, 2, 4, cfg.Piel);
-            L.P(cx + 1, py + 5, 2, 4, cfg.Piel);
-            L.P(cx - 3, py + 8, 2, 1, cfg.PielS);
-            L.P(cx + 1, py + 8, 2, 1, cfg.PielS);
+            L.P(cx - 3, py + 5, 2, PH - 4, cfg.Piel);
+            L.P(cx + 1, py + 5, 2, PH - 4, cfg.Piel);
+            L.P(cx - 3, py + PH, 2, 1, cfg.PielS);
+            L.P(cx + 1, py + PH, 2, 1, cfg.PielS);
         } else if (lateral) {
             int dx = derV ? 1 : -1;
             L.P(cx - 2 - dx, py + l2, 3, PH - l2, PN.s);
             L.P(cx - 2 + dx, py + l1, 3, PH - l1, PN.b);
             L.P(cx - 2 + dx, py + l1, 1, PH - l1, PN.l);
-            if (PN.corto) L.P(cx - 2 + dx, py + 4, 3, 4, cfg.Piel);
+            if (PN.corto) L.P(cx - 2 + dx, py + 4, 3, PH - 4, cfg.Piel);
         } else {
             L.P(cx - 3, py + l1, 3, PH - l1, PN.b);
             L.P(cx, py + l2, 3, PH - l2, PN.s);
             L.P(cx - 3, py + l1, 1, PH - l1, PN.l);
             if (PN.tieneRaya) { L.P(cx - 3, py + l1, 1, PH - l1, PN.raya); L.P(cx + 2, py + l2, 1, PH - l2, PN.raya); }
-            if (PN.corto) { L.P(cx - 3, py + 4, 3, 4, cfg.Piel); L.P(cx, py + 4, 3, 4, cfg.Piel); }
+            if (PN.corto) { L.P(cx - 3, py + 4, 3, PH - 4, cfg.Piel); L.P(cx, py + 4, 3, PH - 4, cfg.Piel); }
+            // La costura entre las perneras, y solo de medio muslo para abajo: los dos tonos
+            // del pantalón se parecen demasiado para separarlas solos y de frente las piernas
+            // eran un bloque. Arriba no va, que ahí las piernas se juntan de verdad.
+            L.P(cx - 1, py + 3, 1, PH - 3, Paleta.Negro);
         }
         // Bajo falda los pies van donde la falda deja las piernas —dos píxeles— y no donde
         // los pone la plantilla lateral, que son tres y cuatro: descuadrados asomaba medio
@@ -429,10 +437,13 @@ public static class ForjaChar {
                     else { L.P(cx - 3, ey, 6, 2, Paleta.Carbon); L.P(cx - 3, ey, 6, 1, Paleta.Gris); L.P(cx - 1, ey + 1, 2, 1, Paleta.Carbon); }
                 }
                 break;
+            // El carro va anclado a las perneras y no al torso, porque está en el suelo:
+            // colgado del torso bajaba con él —dos filas con la cabezona, y las ruedas se
+            // salían de la celda— y se agachaba con el personaje, que un carro no hace.
             case "carrito":
                 if (!arr) {
-                    L.P(cx + 4, ty + 5, 5, 8, Paleta.RojoO); L.P(cx + 4, ty + 5, 5, 2, Paleta.Rojo);
-                    L.P(cx + 5, ty + 13, 1, 2, Paleta.Carbon); L.P(cx + 7, ty + 13, 1, 2, Paleta.Carbon);
+                    L.P(cx + 4, py - 3, 5, 8, Paleta.RojoO); L.P(cx + 4, py - 3, 5, 2, Paleta.Rojo);
+                    L.P(cx + 5, py + 5, 1, 2, Paleta.Carbon); L.P(cx + 7, py + 5, 1, 2, Paleta.Carbon);
                 }
                 break;
         }
