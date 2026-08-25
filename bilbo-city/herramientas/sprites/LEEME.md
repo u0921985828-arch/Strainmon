@@ -85,9 +85,20 @@ se guardan con clave distinta** (`sim_` y `api_`): sin eso, el `--simular` que s
 arriba dejaba la caché llena de monigotes, la tirada de verdad los encontraba, no llamaba a
 PixelLab ni una vez y terminaba diciendo que todo había ido bien.
 
+## Medidas y paleta
+
+La celda es de **24×32 con el pivote en (12,30)** y la paleta la de **61 colores**: las dos
+las fija `CONTEXT.md` §18, y el empaquetador **las lee del propio juego**, no las lleva
+escritas. Si mañana cambian allí, aquí no hay nada que tocar.
+
+Las rampas de plantilla van por familia de la paleta —`tez0..tez7` para la piel,
+`ladrillo0..3` para el pelo, `ria2..5` para el torso, `verde2..5` para las piernas y
+`luz2..4` para el calzado—, que es lo que esta pieza necesitaba y antes había que apañar
+juntando colores sueltos.
+
 ## La paleta va forzada
 
-A cada petición se le manda `color_image`: un PNG con los 20 tonos de las rampas de
+A cada petición se le manda `color_image`: un PNG con los 24 tonos de las rampas de
 plantilla y ninguno más. Eso cierra la lista de colores que el generador puede usar, así
 que **lo que vuelve ya viene en las rampas** y el reparto por partes deja de tener que
 adivinar. Antes se le pedía «magenta vivo» y se confiaba en que no lo apagara.

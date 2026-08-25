@@ -515,6 +515,16 @@ def _silueta(direccion, dibujo):
     d.rectangle([cx + 1 + paso, base - 1, cx + 3 + paso, base], fill=calzado[0])
     d.ellipse([cx - 4, base - 24 + baja, cx + 4, base - 16 + baja], fill=piel[2])
     d.rectangle([cx - 4, base - 25 + baja, cx + 4, base - 22 + baja], fill=pelo[1])
+    # Contorno negro alrededor, como lo trae el arte de verdad. Sin él, el aviso de
+    # «contorno solo en el 0% del perfil» saltaba en las 385 celdas del ensayo y dejaba de
+    # significar nada: un aviso que salta siempre es un aviso que se ignora siempre.
+    px = im.load()
+    fuera = [(x, y) for y in range(CEL_H) for x in range(CEL_W)
+             if not px[x, y][3] and any(
+                 0 <= x + dx < CEL_W and 0 <= y + dy < CEL_H and px[x + dx, y + dy][3]
+                 for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))]
+    for x, y in fuera:
+        px[x, y] = (0, 0, 0, 255)
     return _png(im)
 
 

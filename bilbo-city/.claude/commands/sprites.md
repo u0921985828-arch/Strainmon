@@ -22,13 +22,13 @@ personaje, y qué es cada color de plantilla.
 4. **Abre `hojas.png` y míralo.** No des por buena una tirada sin verla. Lo que sale es la
    hoja tal como se guardó, con los colores de plantilla en sus rampas:
 
-   | Parte | Tiene que salir en |
-   |---|---|
-   | piel | tonos carne |
-   | pelo | marrones |
-   | torso | azules |
-   | piernas | verdes |
-   | calzado | maderas |
+   | Parte | Rampa | Tiene que salir en |
+   |---|---|---|
+   | piel | `tez0..7` | tonos carne |
+   | pelo | `ladrillo0..3` | marrones |
+   | torso | `ria2..5` | azules |
+   | piernas | `verde2..5` | verdes |
+   | calzado | `luz2..4` | ocres |
 
    Una manga en tonos carne, o un pantalón en azules, es el reparto por partes
    equivocándose. El personaje se verá mal en el juego y no saltará ningún error.
