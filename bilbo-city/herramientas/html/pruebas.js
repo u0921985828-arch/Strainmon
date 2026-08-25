@@ -246,6 +246,36 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
         + (cuenta[7]||0) + ' árboles de alineación, ' + (cuenta[9]||0) + ' marquesinas');
     }
 
+    // ── 1 quater · el sol y la hora ────────────────────────────────────
+    /* Desde arriba, la sombra es lo único que dice cuánto levanta un edificio y hasta
+       dónde llega su tejado. Antes era fija —siempre abajo y a la derecha, nueve píxeles—
+       y a las nueve de la mañana la ciudad se veía igual que a las tres de la tarde. */
+    {
+      const min0 = S.min;
+      const alSol = h => { S.min = h * 60; return { ...A.calcularSol(), luz: A.luzAmbiente() }; };
+      const m = alSol(9), t = alSol(14), v = alSol(20), n = alSol(23);
+      ok(m.ux < -0.5, 'a las 9 la sombra no cae al oeste (ux ' + m.ux.toFixed(2) + ')');
+      ok(t.uy < -0.7 && Math.abs(t.ux) < 0.5,
+         'a las 14 la sombra no cae al norte (' + t.ux.toFixed(2) + ',' + t.uy.toFixed(2) + ')');
+      ok(v.ux > 0.5, 'a las 20 la sombra no cae al este (ux ' + v.ux.toFixed(2) + ')');
+      ok(!n.elev, 'a las 23:00 sigue habiendo sol');
+      // Y se alarga cuando el sol baja: es lo que hace que la hora se lea sin reloj.
+      S.min = 9 * 60;  A.calcularSol(); const lm = A.largoSombra('denso');
+      S.min = 14 * 60; A.calcularSol(); const lt = A.largoSombra('denso');
+      ok(lm > lt * 1.5, 'la sombra de las 9 (' + lm.toFixed(1) + ') no es más larga que la de las 14 ('
+         + lt.toFixed(1) + ')');
+      ok(lt > 0.2 && lm <= 4.01, 'sombras fuera de rango: ' + lt.toFixed(1) + ' a ' + lm.toFixed(1));
+      // El tinte: a mediodía no se tiñe nada, de noche azul y a la caída, cálido.
+      const l13 = (S.min = 13 * 60, A.luzAmbiente()), l23 = (S.min = 23 * 60, A.luzAmbiente());
+      const l20 = (S.min = 20.6 * 60, A.luzAmbiente());
+      ok(l13[3] === 0, 'a mediodía la ciudad va teñida');
+      ok(l23[3] > 0.4 && l23[2] > l23[0], 'la noche no es azul');
+      ok(l20[0] > l20[2], 'el atardecer no es cálido');
+      S.min = min0;
+      bien.push('el sol gira con la hora: sombra de ' + lm.toFixed(1) + ' casillas a las 9 y '
+        + lt.toFixed(1) + ' a las 14, y tinte de amanecer, día, ocaso y noche');
+    }
+
     // ── 2 bis · se duerme y te curan ───────────────────────────────────
     // dormir() y curar() miran la casilla que hay delante. Si un plano nuevo pone la cama
     // pegada a la pared de abajo, la cama existe y no se puede usar.

@@ -235,6 +235,46 @@ La batería lo mide: que ningún paso caiga fuera de la calzada, que ningún mue
 del bordillo, que ningún semáforo esté suelto y que la separación entre farolas —contada
 sobre las casillas de bordillo— caiga entre 15 y 45 m.
 
+## El sol, la hora y el canto negro
+
+La pregunta era si lo que faltaba era contorno o sombra. Son dos cosas distintas y hacían
+falta las dos: **el canto dice dónde acaba un objeto** y **la sombra dice cuánto levanta y
+dónde se apoya**. Desde arriba, sin sombra, un tejado y el patio de al lado son dos manchas
+de color a la misma altura.
+
+- **El sol gira con la hora.** Bilbao está a 43° N: sale por el este, cruza por el sur y se
+  pone por el oeste, así que a mediodía la sombra apunta al norte —arriba en pantalla— y a
+  primera y última hora se tumba y cruza la calle entera. El largo es altura partida por la
+  tangente de la elevación, con tope de cuatro casillas: al ras del horizonte la sombra sale
+  infinita y taparía la ciudad.
+- **La sombra se resuelve mirando desde la casilla**, no pintando desde el edificio: se mira
+  hacia el sol y, si hay manzana a menos de lo que proyecta, esa casilla está a la sombra.
+  Por eso dobla la esquina y se para en la acera de enfrente sin llevar la cuenta de nada.
+- **La luz de la hora**: noche azul, amanecer y atardecer cálidos, mediodía limpio. Antes
+  solo había noche y a las nueve de la mañana la ciudad se veía igual que a las tres.
+- **De noche las farolas encienden** un charco de luz en escalones —no en degradado, y no es
+  un sprite: es luz, como el tinte, y un sprite a medio alfa se saltaría la regla de que todo
+  el arte va opaco y en paleta.
+- **Canto negro en el mobiliario**, la misma regla que ya tenían los iconos del HUD. Solo se
+  exige donde hay margen: lo que toca el borde del lienzo no puede llevarlo.
+
+**Y las proporciones del mobiliario.** Estaba dibujado a ojo: una papelera de 1,9 m de ancho,
+un bolardo más gordo que una farola, un contenedor de barco de cuatro metros y árboles de
+dos. Ahora cada pieza sale de una tabla en metros (`MOB_M` / `MedidasMob`) y se forja a
+**20 px/m**, la densidad a la que está dibujada la gente: una papelera se mira al lado de
+quien la usa, no al lado de un coche. Lo que pasa de cuatro metros de alto se recorta ahí —
+una farola de nueve tapa media manzana y deja de ser una farola.
+
+La batería comprueba que la sombra cae al oeste a las 9, al norte a las 14 y al este a las
+20, que a las 23 no hay sol, que la de las 9 es más larga que la de las 14 y que a mediodía
+la ciudad no va teñida. El verificador de estilo comprueba que cada pieza mide lo que dice la
+tabla y que lleva canto, y `herramientas/plano/mobiliario.py` que la tabla sea la misma en el
+HTML y en Unity.
+
+```bash
+node herramientas/html/captura.js foto.png --donde 1176,428 --hora 20:45
+```
+
 ## Los edificios singulares
 
 Trece sitios —San Mamés, el Guggenheim, el Arriaga, el Ayuntamiento, la catedral, Begoña,

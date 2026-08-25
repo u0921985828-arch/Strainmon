@@ -2,7 +2,7 @@
  * Saca una captura del juego en marcha, sobre el DOM simulado.
  *
  *   node herramientas/html/captura.js [salida.png] [--pasos N] [--anda N] [--dentro id]
- *                                       [--donde x,y] [--rotulo t] [--poi id]
+ *                                       [--donde x,y] [--rotulo t] [--poi id] [--hora HH:MM]
  *
  * El arte se juzga mal en una lámina de contacto: ahí cada sprite está solo y sobre un
  * fondo elegido. En la calle cae encima del asfalto, de la acera y del portal, y al lado
@@ -38,6 +38,12 @@ listo().then(() => {
   // centro de una manzana. Eso hace falta para mirar un edificio grande: la cámara sigue
   // al jugador y la pantalla son veintiséis casillas, así que buscando acera para el
   // centro del estadio la foto salía de la calle de al lado, sin estadio.
+  // La hora manda en cómo se ve: la sombra del sol gira y se alarga, y el tinte cambia.
+  const hora = txt('--hora');
+  if (hora) {
+    const [hh, mm] = hora.split(':').map(Number);
+    A.S.min = hh * 60 + (mm || 0);
+  }
   const donde = txt('--donde');
   if (donde) {
     const [x, y] = donde.split(',').map(Number);

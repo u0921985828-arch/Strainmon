@@ -380,40 +380,83 @@ public static class Forja {
 
     // ═══════════ PROPS ═══════════
     public static readonly Dictionary<string, Sprite> Props = new Dictionary<string, Sprite>();
+    /// <summary>Lo que mide cada pieza de mobiliario, en metros. Estaba dibujado a ojo: una
+    /// papelera de 1,9 m de ancho, un bolardo más gordo que una farola, un contenedor de barco
+    /// de cuatro metros y árboles de dos. Cada pieza sale de su medida real y se forja a
+    /// 20 px/m —la densidad a la que está dibujada la gente, que es con lo que se compara en
+    /// la calle—; lo que pasa de cuatro metros de alto se recorta ahí, que una farola de nueve
+    /// tapa media manzana.</summary>
+    public static readonly Dictionary<string, float[]> MedidasMob = new Dictionary<string, float[]> {
+        {"deposito", new[]{2.0f,2.2f}}, {"climatizador", new[]{1.2f,1.0f}},
+        {"antenaTv", new[]{1.2f,2.4f}}, {"tendedero", new[]{3.0f,1.4f}},
+        {"caseta", new[]{2.4f,2.4f}},   {"chimenea", new[]{0.8f,1.6f}},
+        {"lucernario", new[]{2.4f,1.6f}}, {"farola", new[]{1.0f,4.0f}},
+        {"semaforo", new[]{0.9f,3.4f}}, {"arbol", new[]{5.0f,5.6f}},
+        {"arbolPodado", new[]{3.4f,3.8f}}, {"contenedor", new[]{1.4f,1.4f}},
+        {"contenedor2", new[]{1.4f,1.4f}}, {"papelera", new[]{0.5f,1.0f}},
+        {"banco", new[]{1.8f,1.0f}},    {"marquesina", new[]{4.0f,2.6f}},
+        {"cabina", new[]{1.0f,2.4f}},   {"bolardo", new[]{0.3f,0.9f}},
+        {"valla", new[]{2.5f,1.2f}},    {"andamio", new[]{3.0f,6.0f}},
+        {"pales", new[]{1.2f,1.0f}},    {"cono", new[]{0.4f,0.7f}},
+        {"grua", new[]{8.0f,12.0f}},    {"contMaritimo", new[]{12.0f,2.6f}},
+        {"bidon", new[]{0.6f,0.9f}},    {"toldo", new[]{3.0f,1.2f}},
+        {"terraza", new[]{1.6f,1.4f}},  {"placa", new[]{0.9f,0.4f}},
+    };
+
+    /// <summary>Lo que lleva canto negro: lo que se apoya en el suelo y se ve contra él. Sobre
+    /// el asfalto o el adoquín, un objeto sin contorno se funde con el fondo.</summary>
+    public static readonly string[] MobContorno = {
+        "farola","semaforo","arbol","arbolPodado","contenedor","contenedor2","papelera","banco",
+        "marquesina","cabina","bolardo","valla","andamio","pales","cono","grua","contMaritimo",
+        "bidon","terraza","deposito","climatizador","antenaTv","tendedero","caseta","chimenea",
+        "lucernario" };
+
+    /// <summary>El sprite de una pieza de mobiliario, con canto negro si le toca.</summary>
+    static Sprite SpriteMob(string k, Lienzo L) {
+        if (System.Array.IndexOf(MobContorno, k) >= 0) L.Contorno(Paleta.Negro);
+        return SpriteBase(L);
+    }
+
     public static void GenerarProps() {
         if (Props.Count > 0) return;
         Lienzo L;
-        L = new Lienzo(12,28); L.P(5,8,2,20,Paleta.AsfaltoL); L.P(4,27,4,1,Paleta.Carbon);
-        L.P(5,6,5,2,Paleta.AsfaltoL); L.P(8,7,4,3,Paleta.Gris); L.P(9,8,2,2,Paleta.H("#f2e2a8"));
-        Props["farola"] = SpriteBase(L);
+        // 10 y no 20 porque el tile del mundo va al doble: la cuenta es metros × 20 px.
+        System.Func<string, Lienzo> Mob = k => {
+            var m = MedidasMob[k];
+            return new Lienzo(Mathf.RoundToInt(m[0]*10), Mathf.RoundToInt(m[1]*10));
+        };
 
-        // Lo que hay encima de un tejado. Va suelto y sembrado por hash, como el
-        // mobiliario de la acera: dibujado dentro del tile se repetiría en cada casilla
-        // del edificio y la azotea parecería papel pintado.
-        L = new Lienzo(18,20); L.P(3,4,12,14,Paleta.H("#7f9aa8")); L.P(3,4,12,3,Paleta.H("#a8c4d0"));
-        L.P(15,4,2,14,Paleta.AceroO); L.P(4,18,3,2,Paleta.Carbon); L.P(12,18,3,2,Paleta.Carbon);
-        L.P(5,1,8,3,Paleta.Acero); Props["deposito"] = SpriteBase(L);
-        L = new Lienzo(18,16); L.P(2,3,14,12,Paleta.Acero); L.P(2,3,14,2,Paleta.Hueso);
-        L.P(16,3,1,12,Paleta.AceroO); L.P(4,6,10,7,Paleta.AceroO);
-        for (int i = 5; i < 14; i += 3) L.P(i,6,1,7,Paleta.Acero);
-        Props["climatizador"] = SpriteBase(L);
-        L = new Lienzo(14,26); L.P(6,8,2,18,Paleta.AceroO);
-        for (int y = 2; y < 14; y += 4) { L.P(2,y,10,1,Paleta.Acero); L.P(7,y,1,4,Paleta.Acero); }
-        Props["antenaTv"] = SpriteBase(L);
-        L = new Lienzo(28,14); L.P(1,2,1,12,Paleta.AceroO); L.P(26,2,1,12,Paleta.AceroO);
-        L.P(1,3,26,1,Paleta.Acero); L.P(1,8,26,1,Paleta.Acero);
-        var ropaT = new[]{ Paleta.Rojo, Paleta.Hueso, Paleta.Azul, Paleta.Mostaza, Paleta.VerdeL };
-        for (int i = 0; i < 5; i++) L.P(3+i*5,4,4,5,ropaT[i]);
-        Props["tendedero"] = SpriteBase(L);
-        L = new Lienzo(22,20); L.P(2,3,18,16,Paleta.Hormigon); L.P(2,3,18,3,Paleta.HormigonL);
-        L.P(19,3,1,16,Paleta.HormigonO); L.P(8,9,6,10,Paleta.MaderaO); L.P(12,13,1,2,Paleta.Mostaza);
-        Props["caseta"] = SpriteBase(L);
-        L = new Lienzo(12,18); L.P(2,4,8,14,Paleta.TejaO); L.P(2,4,8,2,Paleta.Teja);
-        L.P(9,4,1,14,Paleta.H("#4d3728")); L.P(1,2,10,3,Paleta.HormigonO); L.P(1,2,10,1,Paleta.HormigonL);
-        Props["chimenea"] = SpriteBase(L);
-        L = new Lienzo(24,16); L.P(1,2,22,13,Paleta.AceroO); L.P(3,4,18,9,Paleta.H("#a8c4d0"));
-        for (int i = 6; i < 21; i += 5) L.P(i,4,1,9,Paleta.AceroO);
-        Props["lucernario"] = SpriteBase(L);
+        L = Mob("farola"); L.P(4,4,2,36,Paleta.AsfaltoL); L.P(3,39,4,1,Paleta.Carbon);
+        L.P(4,3,5,2,Paleta.AsfaltoL); L.P(7,4,3,3,Paleta.Gris); L.P(8,5,2,2,Paleta.H("#f2e2a8"));
+        Props["farola"] = SpriteMob("farola", L);
+
+        // Lo que hay encima de un tejado. Va suelto y sembrado por hash, como el mobiliario
+        // de la acera: dibujado dentro del tile se repetiría en cada casilla del edificio y
+        // la azotea parecería papel pintado.
+        L = Mob("deposito"); L.P(2,4,16,16,Paleta.H("#7f9aa8")); L.P(2,4,16,3,Paleta.H("#a8c4d0"));
+        L.P(17,4,2,16,Paleta.AceroO); L.P(3,20,3,2,Paleta.Carbon); L.P(14,20,3,2,Paleta.Carbon);
+        L.P(6,1,8,3,Paleta.Acero); Props["deposito"] = SpriteMob("deposito", L);
+        L = Mob("climatizador"); L.P(0,1,12,9,Paleta.Acero); L.P(0,1,12,2,Paleta.Hueso);
+        L.P(11,1,1,9,Paleta.AceroO); L.P(2,3,8,5,Paleta.AceroO);
+        for (int i = 3; i < 10; i += 2) L.P(i,3,1,5,Paleta.Acero);
+        Props["climatizador"] = SpriteMob("climatizador", L);
+        L = Mob("antenaTv"); L.P(5,8,2,16,Paleta.AceroO);
+        for (int y = 2; y < 12; y += 3) { L.P(1,y,10,1,Paleta.Acero); L.P(6,y,1,3,Paleta.Acero); }
+        Props["antenaTv"] = SpriteMob("antenaTv", L);
+        L = Mob("tendedero"); L.P(1,2,1,12,Paleta.AceroO); L.P(28,2,1,12,Paleta.AceroO);
+        L.P(1,3,28,1,Paleta.Acero); L.P(1,8,28,1,Paleta.Acero);
+        var trapos = new[]{Paleta.Rojo,Paleta.Hueso,Paleta.Azul,Paleta.Mostaza,Paleta.VerdeL};
+        for (int i = 0; i < 5; i++) L.P(3+i*5,4,4,4,trapos[i]);
+        Props["tendedero"] = SpriteMob("tendedero", L);
+        L = Mob("caseta"); L.P(1,2,22,22,Paleta.Hormigon); L.P(1,2,22,3,Paleta.HormigonL);
+        L.P(22,2,1,22,Paleta.HormigonO); L.P(9,12,6,12,Paleta.MaderaO); L.P(13,17,1,2,Paleta.Mostaza);
+        Props["caseta"] = SpriteMob("caseta", L);
+        L = Mob("chimenea"); L.P(1,3,6,13,Paleta.TejaO); L.P(1,3,6,2,Paleta.Teja);
+        L.P(6,3,1,13,Paleta.H("#4d3728")); L.P(0,1,8,3,Paleta.HormigonO); L.P(0,1,8,1,Paleta.HormigonL);
+        Props["chimenea"] = SpriteMob("chimenea", L);
+        L = Mob("lucernario"); L.P(1,1,22,14,Paleta.AceroO); L.P(3,3,18,10,Paleta.H("#a8c4d0"));
+        for (int i = 6; i < 21; i += 5) L.P(i,3,1,10,Paleta.AceroO);
+        Props["lucernario"] = SpriteMob("lucernario", L);
 
         // Las fachadas. La vista es cenital escorada, así que el canto sur de cada manzana
         // es lo único que se ve de la calle a pie de obra: estaba liso, una ciudad entera
@@ -456,38 +499,67 @@ public static class Forja {
                         foreach (int vx in new[]{ w/4-3, w-w/4-3 }) {
                             f.P(vx,7,6,5,Paleta.Carbon); f.P(vx+1,8,4,3,Paleta.H("#3f5566")); } }, Paleta.HormigonO);
         Props["fachCiega"] = SpriteBase(L);
-        L = new Lienzo(10,30); L.P(4,13,2,17,Paleta.Carbon); L.P(2,1,6,13,Paleta.GrisO);
-        L.P(3,2,4,3,Paleta.Rojo); L.P(3,6,4,3,Paleta.Mostaza); L.P(3,10,4,3,Paleta.VerdeL);
-        Props["semaforo"] = SpriteBase(L);
-        L = new Lienzo(28,30); L.P(12,18,4,12,Paleta.H("#4a3524")); L.P(6,4,16,16,Paleta.H("#2e5b2c"));
-        L.P(8,2,12,4,Paleta.H("#3a7038")); L.P(4,8,20,8,Paleta.H("#356b33")); L.P(9,6,8,5,Paleta.H("#4a8746"));
-        Props["arbol"] = SpriteBase(L);
-        L = new Lienzo(20,26); L.P(9,14,3,12,Paleta.H("#4a3524")); L.P(5,5,11,10,Paleta.H("#356b33"));
-        L.P(7,3,7,4,Paleta.H("#4a8746")); Props["arbolPodado"] = SpriteBase(L);
-        L = new Lienzo(22,18); L.P(1,3,20,15,Paleta.H("#2f6b4a")); L.P(2,4,18,4,Paleta.H("#3d8a60"));
-        L.P(1,1,20,3,Paleta.H("#22503a")); Props["contenedor"] = SpriteBase(L);
-        L = new Lienzo(22,18); L.P(1,3,20,15,Paleta.MostazaO); L.P(2,4,18,4,Paleta.Mostaza);
-        L.P(1,1,20,3,Paleta.H("#8c7420")); Props["contenedor2"] = SpriteBase(L);
-        L = new Lienzo(12,16); L.P(2,4,8,12,Paleta.GrisO); L.P(1,2,10,3,Paleta.Gris);
-        for (int i = 3; i < 9; i += 2) L.P(i,6,1,8,Paleta.Carbon); Props["papelera"] = SpriteBase(L);
-        L = new Lienzo(24,12); L.P(1,2,22,8,Paleta.Madera); L.P(1,2,22,2,Paleta.MaderaL);
-        L.P(3,10,3,2,Paleta.Carbon); L.P(18,10,3,2,Paleta.Carbon); Props["banco"] = SpriteBase(L);
-        L = new Lienzo(16,22); L.P(1,1,14,21,Paleta.RojoO); L.P(3,3,10,14,Paleta.H("#7f9aa8"));
-        L.P(1,0,14,3,Paleta.Rojo); Props["cabina"] = SpriteBase(L);
-        L = new Lienzo(48,48); L.P(4,20,10,10,Paleta.Rojo); L.P(8,4,3,26,Paleta.Crema);
-        L.P(8,4,36,3,Paleta.Crema); L.P(40,7,2,14,Paleta.Acero); L.P(38,20,6,4,Paleta.Mostaza);
-        Props["grua"] = SpriteBase(L);
-        L = new Lienzo(40,20); L.P(0,0,40,20,Paleta.RojoO);
-        for (int x = 2; x < 40; x += 4) L.P(x,1,2,18,Paleta.Rojo);
-        L.P(0,0,40,3,Paleta.H("#7a2c12")); Props["contMaritimo"] = SpriteBase(L);
-        L = new Lienzo(22,16); L.P(1,4,20,10,Paleta.Madera);
-        for (int x = 2; x < 20; x += 5) L.P(x,4,3,10,Paleta.MaderaL);
-        L.P(1,2,20,3,Paleta.MaderaO); Props["pales"] = SpriteBase(L);
-        L = new Lienzo(12,14); L.P(2,2,8,12,Paleta.AzulL); L.P(2,4,8,1,Paleta.Azul);
-        L.P(2,9,8,1,Paleta.Azul); L.P(3,1,6,2,Paleta.Acero); Props["bidon"] = SpriteBase(L);
-        L = new Lienzo(20,18); L.P(3,3,14,12,Paleta.Crema); L.P(3,3,14,3,Paleta.Blanco);
-        L.P(5,15,2,3,Paleta.Acero); L.P(13,15,2,3,Paleta.Acero); L.P(8,6,4,4,Paleta.VerdeL);
-        Props["terraza"] = SpriteBase(L);
+
+        L = Mob("semaforo"); L.P(4,12,2,22,Paleta.Carbon); L.P(3,33,4,1,Paleta.Carbon);
+        L.P(2,1,6,12,Paleta.GrisO); L.P(3,2,4,3,Paleta.Rojo); L.P(3,6,4,3,Paleta.Mostaza);
+        L.P(3,10,4,2,Paleta.VerdeL); Props["semaforo"] = SpriteMob("semaforo", L);
+        // Un plátano de sombra de la Gran Vía: cinco metros de copa. El de antes medía dos y
+        // parecía un arbusto al lado de un coche de cuatro.
+        L = Mob("arbol"); L.P(22,38,6,18,Paleta.H("#4a3524")); L.P(9,6,32,30,Paleta.H("#2e5b2c"));
+        L.P(14,2,22,7,Paleta.H("#3a7038")); L.P(4,14,42,14,Paleta.H("#356b33"));
+        L.P(16,10,16,9,Paleta.H("#4a8746")); Props["arbol"] = SpriteMob("arbol", L);
+        L = Mob("arbolPodado"); L.P(15,24,4,14,Paleta.H("#4a3524")); L.P(5,4,24,22,Paleta.H("#356b33"));
+        L.P(10,1,14,6,Paleta.H("#4a8746")); L.P(3,12,28,8,Paleta.H("#2e5b2c"));
+        Props["arbolPodado"] = SpriteMob("arbolPodado", L);
+        L = Mob("contenedor"); L.P(0,2,14,12,Paleta.H("#2f6b4a")); L.P(1,3,12,4,Paleta.H("#3d8a60"));
+        L.P(0,0,14,3,Paleta.H("#22503a")); L.P(1,13,2,1,Paleta.Carbon); L.P(11,13,2,1,Paleta.Carbon);
+        Props["contenedor"] = SpriteMob("contenedor", L);
+        L = Mob("contenedor2"); L.P(0,2,14,12,Paleta.MostazaO); L.P(1,3,12,4,Paleta.Mostaza);
+        L.P(0,0,14,3,Paleta.H("#8c7420")); L.P(1,13,2,1,Paleta.Carbon); L.P(11,13,2,1,Paleta.Carbon);
+        Props["contenedor2"] = SpriteMob("contenedor2", L);
+        L = Mob("papelera"); L.P(1,3,3,7,Paleta.GrisO); L.P(0,2,5,2,Paleta.Gris);
+        L.P(2,7,1,3,Paleta.Carbon); Props["papelera"] = SpriteMob("papelera", L);
+        L = Mob("banco"); L.P(0,1,18,6,Paleta.Madera); L.P(0,1,18,2,Paleta.MaderaL);
+        L.P(2,7,2,3,Paleta.Carbon); L.P(14,7,2,3,Paleta.Carbon); Props["banco"] = SpriteMob("banco", L);
+        L = Mob("marquesina"); L.P(0,0,40,4,Paleta.GrisO); L.P(1,4,2,22,Paleta.Gris);
+        L.P(37,4,2,22,Paleta.Gris); L.P(3,5,34,14,Paleta.H("#7f9aa8")); L.P(5,20,30,3,Paleta.Madera);
+        Props["marquesina"] = SpriteMob("marquesina", L);
+        L = Mob("cabina"); L.P(0,0,10,24,Paleta.RojoO); L.P(2,3,6,14,Paleta.H("#7f9aa8"));
+        L.P(0,0,10,3,Paleta.Rojo); Props["cabina"] = SpriteMob("cabina", L);
+        L = Mob("bolardo"); L.P(0,1,3,8,Paleta.Carbon); L.P(0,0,3,2,Paleta.Mostaza);
+        Props["bolardo"] = SpriteMob("bolardo", L);
+        L = Mob("valla"); L.P(0,1,25,4,Paleta.Mostaza); L.P(0,6,25,4,Paleta.Rojo);
+        L.P(1,10,3,2,Paleta.Carbon); L.P(21,10,3,2,Paleta.Carbon); Props["valla"] = SpriteMob("valla", L);
+        L = Mob("andamio");
+        for (int x = 0; x < 30; x += 9) L.P(x,0,2,60,Paleta.Acero);
+        for (int y = 2; y < 60; y += 14) L.P(0,y,30,2,Paleta.AceroO);
+        L.P(0,30,30,2,Paleta.Madera); Props["andamio"] = SpriteMob("andamio", L);
+        L = Mob("pales"); L.P(0,2,12,8,Paleta.Madera);
+        for (int x = 1; x < 11; x += 3) L.P(x,2,2,8,Paleta.MaderaL);
+        L.P(0,1,12,2,Paleta.MaderaO); Props["pales"] = SpriteMob("pales", L);
+        L = Mob("cono"); L.P(1,1,2,5,Paleta.Rojo); L.P(1,3,2,1,Paleta.Crema);
+        L.P(0,6,4,1,Paleta.RojoO); Props["cono"] = SpriteMob("cono", L);
+        // La grúa del muelle: doce metros de alto, no cuatro. Es lo que se ve desde el otro
+        // lado de la ría y lo que dice que eso es un puerto.
+        L = Mob("grua"); L.P(20,84,40,36,Paleta.Rojo); L.P(30,12,8,108,Paleta.Crema);
+        L.P(4,10,72,6,Paleta.Crema); L.P(66,16,3,44,Paleta.Acero); L.P(60,58,16,8,Paleta.Mostaza);
+        L.P(24,116,10,4,Paleta.Carbon); L.P(46,116,10,4,Paleta.Carbon);
+        Props["grua"] = SpriteMob("grua", L);
+        // Un contenedor de barco mide doce metros: dos coches y medio en fila.
+        L = Mob("contMaritimo"); L.P(0,0,120,26,Paleta.RojoO);
+        for (int x = 2; x < 120; x += 5) L.P(x,2,3,22,Paleta.Rojo);
+        L.P(0,0,120,3,Paleta.H("#7a2c12")); L.P(0,23,120,3,Paleta.H("#7a2c12"));
+        Props["contMaritimo"] = SpriteMob("contMaritimo", L);
+        L = Mob("bidon"); L.P(0,1,6,8,Paleta.AzulL); L.P(0,3,6,1,Paleta.Azul);
+        L.P(0,6,6,1,Paleta.Azul); L.P(1,0,4,2,Paleta.Acero); Props["bidon"] = SpriteMob("bidon", L);
+        L = Mob("toldo");
+        for (int x = 0; x < 30; x += 6) { L.P(x,0,3,10,Paleta.RojoO); L.P(x+3,0,3,10,Paleta.Crema); }
+        L.P(0,10,30,2,Paleta.Carbon); Props["toldo"] = SpriteMob("toldo", L);
+        L = Mob("terraza"); L.P(2,2,12,9,Paleta.Crema); L.P(2,2,12,2,Paleta.Blanco);
+        L.P(4,11,2,3,Paleta.Acero); L.P(10,11,2,3,Paleta.Acero); L.P(6,5,4,3,Paleta.VerdeL);
+        Props["terraza"] = SpriteMob("terraza", L);
+        L = Mob("placa"); L.P(0,0,9,4,Paleta.Blanco); L.P(0,0,9,1,Paleta.Azul);
+        L.P(1,1,7,2,Paleta.Azul); Props["placa"] = SpriteMob("placa", L);
     }
 
     // ═══════════ ARMAS EN MANO Y FOGONAZOS ═══════════

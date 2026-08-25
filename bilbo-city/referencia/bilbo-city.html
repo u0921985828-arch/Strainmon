@@ -3181,6 +3181,12 @@ const FACH_BARRIO={
  abierto:   ['portal','ciega','garaje','ciega'],
 };
 
+const MOB_M={deposito:[2.0,2.2],climatizador:[1.2,1.0],antenaTv:[1.2,2.4],tendedero:[3.0,1.4],
+  caseta:[2.4,2.4],chimenea:[0.8,1.6],lucernario:[2.4,1.6],farola:[1.0,4.0],semaforo:[0.9,3.4],
+  arbol:[5.0,5.6],arbolPodado:[3.4,3.8],contenedor:[1.4,1.4],contenedor2:[1.4,1.4],
+  papelera:[0.5,1.0],banco:[1.8,1.0],marquesina:[4.0,2.6],cabina:[1.0,2.4],bolardo:[0.3,0.9],
+  valla:[2.5,1.2],andamio:[3.0,6.0],pales:[1.2,1.0],cono:[0.4,0.7],grua:[8.0,12.0],
+  contMaritimo:[12.0,2.6],bidon:[0.6,0.9],toldo:[3.0,1.2],terraza:[1.6,1.4],placa:[0.9,0.4]};
 function generarProps(){
  /* Lo que hay encima de un tejado. Va suelto y sembrado por hash, como el mobiliario de
     la acera: dibujado dentro del tile se repetiría en cada casilla del edificio. */
@@ -3369,59 +3375,87 @@ function generarProps(){
   for(let x=4;x<W-6;x+=10)P(g,x,4,6,H-9,VIDRIO);})];
  naveJuego.alero=alero(C.aceroO,C.acero,C.grisO,'liso');
  PROP.pisosNave=naveJuego;
- PROP.deposito=S_(18,20,g=>{P(g,3,4,12,14,'#7f9aa8');P(g,3,4,12,3,'#a8c4d0');
-  P(g,15,4,2,14,C.aceroO);P(g,4,18,3,2,C.carbon);P(g,12,18,3,2,C.carbon);
-  P(g,5,1,8,3,C.acero);});
- PROP.climatizador=S_(18,16,g=>{P(g,2,3,14,12,C.acero);P(g,2,3,14,2,C.hueso);
-  P(g,16,3,1,12,C.aceroO);P(g,4,6,10,7,C.aceroO);
-  for(let i=5;i<14;i+=3)P(g,i,6,1,7,C.acero);});
- PROP.antenaTv=S_(14,26,g=>{P(g,6,8,2,18,C.aceroO);
-  for(let y=2;y<14;y+=4){P(g,2,y,10,1,C.acero);P(g,7,y,1,4,C.acero);}});
- PROP.tendedero=S_(28,14,g=>{P(g,1,2,1,12,C.aceroO);P(g,26,2,1,12,C.aceroO);
-  P(g,1,3,26,1,C.acero);P(g,1,8,26,1,C.acero);
+ /* ── El mobiliario, medido ──────────────────────────────────────────────────────
+    Estaba dibujado a ojo: una papelera de 1,9 m de ancho, un bolardo más gordo que una
+    farola, un contenedor marítimo de cuatro metros y árboles de dos. Ahora cada pieza sale
+    de su medida real en metros y se forja a 20 px/m —la densidad a la que está dibujada la
+    gente—, que es con lo que se compara en la calle: una papelera se mira al lado de quien
+    la usa, no al lado de un coche. Lo que pasa de cuatro metros de alto se recorta ahí: una
+    farola de nueve tapa media manzana y deja de ser una farola para ser una columna. */
+ /* 10 y no 20 porque S_ ya forja al doble: la cuenta es metros × 20 px. */
+ const M_=(k,fn)=>{const[a,al]=MOB_M[k];PROP[k]=S_(Math.round(a*10),Math.round(al*10),fn);};
+ M_('deposito',(g)=>{P(g,2,4,16,16,'#7f9aa8');P(g,2,4,16,3,'#a8c4d0');
+  P(g,17,4,2,16,C.aceroO);P(g,3,20,3,2,C.carbon);P(g,14,20,3,2,C.carbon);P(g,6,1,8,3,C.acero);});
+ M_('climatizador',(g)=>{P(g,0,1,12,9,C.acero);P(g,0,1,12,2,C.hueso);P(g,11,1,1,9,C.aceroO);
+  P(g,2,3,8,5,C.aceroO);for(let i=3;i<10;i+=2)P(g,i,3,1,5,C.acero);});
+ M_('antenaTv',(g)=>{P(g,5,8,2,16,C.aceroO);
+  for(let y=2;y<12;y+=3){P(g,1,y,10,1,C.acero);P(g,6,y,1,3,C.acero);}});
+ M_('tendedero',(g)=>{P(g,1,2,1,12,C.aceroO);P(g,28,2,1,12,C.aceroO);
+  P(g,1,3,28,1,C.acero);P(g,1,8,28,1,C.acero);
   const t=[C.rojo,C.hueso,C.azul,C.mostaza,C.verdeL];
-  for(let i=0;i<5;i++)P(g,3+i*5,4,4,5,t[i]);});
- PROP.caseta=S_(22,20,g=>{P(g,2,3,18,16,C.hormigon);P(g,2,3,18,3,C.hormigonL);
-  P(g,19,3,1,16,C.hormigonO);P(g,8,9,6,10,C.maderaO);P(g,12,13,1,2,C.mostaza);});
- PROP.chimenea=S_(12,18,g=>{P(g,2,4,8,14,C.tejaO);P(g,2,4,8,2,C.teja);
-  P(g,9,4,1,14,'#4d3728');P(g,1,2,10,3,C.hormigonO);P(g,1,2,10,1,C.hormigonL);});
- PROP.lucernario=S_(24,16,g=>{P(g,1,2,22,13,C.aceroO);P(g,3,4,18,9,'#a8c4d0');
-  for(let i=6;i<21;i+=5)P(g,i,4,1,9,C.aceroO);});
- PROP.farola=S_(12,28,g=>{P(g,5,8,2,20,C.asfaltoL);P(g,4,27,4,1,C.carbon);
-  P(g,5,6,5,2,C.asfaltoL);P(g,8,7,4,3,C.gris);P(g,9,8,2,2,'#f2e2a8');});
- PROP.semaforo=S_(10,30,g=>{P(g,4,13,2,17,C.carbon);P(g,2,1,6,13,C.grisO);
-  P(g,3,2,4,3,C.rojo);P(g,3,6,4,3,C.mostaza);P(g,3,10,4,3,C.verdeL);});
- PROP.arbol=S_(28,30,g=>{P(g,12,18,4,12,'#4a3524');P(g,6,4,16,16,'#2e5b2c');
-  P(g,8,2,12,4,'#3a7038');P(g,4,8,20,8,'#356b33');P(g,9,6,8,5,'#4a8746');});
- PROP.arbolPodado=S_(20,26,g=>{P(g,9,14,3,12,'#4a3524');P(g,5,5,11,10,'#356b33');P(g,7,3,7,4,'#4a8746');});
- PROP.contenedor=S_(22,18,g=>{P(g,1,3,20,15,'#2f6b4a');P(g,2,4,18,4,'#3d8a60');P(g,1,1,20,3,'#22503a');});
- PROP.contenedor2=S_(22,18,g=>{P(g,1,3,20,15,C.mostazaO);P(g,2,4,18,4,C.mostaza);P(g,1,1,20,3,'#8c7420');});
- PROP.papelera=S_(12,16,g=>{P(g,2,4,8,12,C.grisO);P(g,1,2,10,3,C.gris);
-  for(let i=3;i<9;i+=2)P(g,i,6,1,8,C.carbon);});
- PROP.banco=S_(24,12,g=>{P(g,1,2,22,8,C.madera);P(g,1,2,22,2,C.maderaL);
-  P(g,3,10,3,2,C.carbon);P(g,18,10,3,2,C.carbon);});
- PROP.marquesina=S_(40,20,g=>{P(g,0,0,40,4,C.grisO);P(g,1,4,2,16,C.gris);P(g,37,4,2,16,C.gris);
-  P(g,4,5,32,10,'#7f9aa8');P(g,6,15,28,3,C.madera);});
- PROP.cabina=S_(16,22,g=>{P(g,1,1,14,21,C.rojoO);P(g,3,3,10,14,'#7f9aa8');P(g,1,0,14,3,C.rojo);});
- PROP.bolardo=S_(8,14,g=>{P(g,2,3,4,11,C.carbon);P(g,2,2,4,2,C.mostaza);});
- PROP.valla=S_(30,16,g=>{P(g,0,2,30,4,C.mostaza);P(g,0,8,30,4,C.rojo);
-  P(g,2,12,3,4,C.carbon);P(g,25,12,3,4,C.carbon);});
- PROP.andamio=S_(34,30,g=>{for(let x=1;x<34;x+=10)P(g,x,0,2,30,C.acero);
-  for(let y=2;y<30;y+=9)P(g,0,y,34,2,C.aceroO);P(g,0,11,34,2,C.madera);});
- PROP.pales=S_(22,16,g=>{P(g,1,4,20,10,C.madera);
-  for(let x=2;x<20;x+=5)P(g,x,4,3,10,C.maderaL);P(g,1,2,20,3,C.maderaO);});
- PROP.cono=S_(12,14,g=>{P(g,3,2,6,10,C.rojo);P(g,4,5,4,3,C.crema);P(g,1,12,10,2,C.rojoO);});
- PROP.grua=S_(48,48,g=>{P(g,4,20,10,10,C.rojo);P(g,8,4,3,26,C.crema);
-  P(g,8,4,36,3,C.crema);P(g,40,7,2,14,C.acero);P(g,38,20,6,4,C.mostaza);});
- PROP.contMaritimo=S_(40,20,g=>{P(g,0,0,40,20,C.rojoO);
-  for(let x=2;x<40;x+=4)P(g,x,1,2,18,C.rojo);P(g,0,0,40,3,'#7a2c12');});
- PROP.bidon=S_(12,14,g=>{P(g,2,2,8,12,C.azulL);P(g,2,4,8,1,C.azul);P(g,2,9,8,1,C.azul);P(g,3,1,6,2,C.acero);});
- PROP.toldo=S_(36,14,g=>{for(let x=0;x<36;x+=6){P(g,x,0,3,12,C.rojoO);P(g,x+3,0,3,12,C.crema);}
-  P(g,0,12,36,2,C.carbon);});
- PROP.terraza=S_(20,18,g=>{P(g,3,3,14,12,C.crema);P(g,3,3,14,3,C.blanco);
-  P(g,5,15,2,3,C.acero);P(g,13,15,2,3,C.acero);P(g,8,6,4,4,C.verdeL);});
- PROP.placa=S_(24,10,g=>{P(g,0,0,24,10,C.blanco);P(g,1,1,22,8,C.azul);P(g,3,4,18,2,C.hueso);});
+  for(let i=0;i<5;i++)P(g,3+i*5,4,4,4,t[i]);});
+ M_('caseta',(g)=>{P(g,1,2,22,22,C.hormigon);P(g,1,2,22,3,C.hormigonL);
+  P(g,22,2,1,22,C.hormigonO);P(g,9,12,6,12,C.maderaO);P(g,13,17,1,2,C.mostaza);});
+ M_('chimenea',(g)=>{P(g,1,3,6,13,C.tejaO);P(g,1,3,6,2,C.teja);P(g,6,3,1,13,'#4d3728');
+  P(g,0,1,8,3,C.hormigonO);P(g,0,1,8,1,C.hormigonL);});
+ M_('lucernario',(g)=>{P(g,1,1,22,14,C.aceroO);P(g,3,3,18,10,'#a8c4d0');
+  for(let i=6;i<21;i+=5)P(g,i,3,1,10,C.aceroO);});
+ /* La farola: columna de 15 cm, brazo y luminaria. A 20 px/m la columna son tres píxeles,
+    que es lo que mide de verdad y lo que la distingue de un poste de la luz. */
+ M_('farola',(g)=>{P(g,4,4,2,36,C.asfaltoL);P(g,3,39,4,1,C.carbon);
+  P(g,4,3,5,2,C.asfaltoL);P(g,7,4,3,3,C.gris);P(g,8,5,2,2,'#f2e2a8');});
+ M_('semaforo',(g)=>{P(g,4,12,2,22,C.carbon);P(g,3,33,4,1,C.carbon);
+  P(g,2,1,6,12,C.grisO);P(g,3,2,4,3,C.rojo);P(g,3,6,4,3,C.mostaza);P(g,3,10,4,2,C.verdeL);});
+ /* Un plátano de sombra de la Gran Vía: cinco metros de copa. El de antes medía dos y
+    parecía un arbusto al lado de un coche de cuatro. */
+ M_('arbol',(g)=>{P(g,22,38,6,18,'#4a3524');P(g,9,6,32,30,'#2e5b2c');
+  P(g,14,2,22,7,'#3a7038');P(g,4,14,42,14,'#356b33');P(g,16,10,16,9,'#4a8746');});
+ M_('arbolPodado',(g)=>{P(g,15,24,4,14,'#4a3524');P(g,5,4,24,22,'#356b33');
+  P(g,10,1,14,6,'#4a8746');P(g,3,12,28,8,'#2e5b2c');});
+ M_('contenedor',(g)=>{P(g,0,2,14,12,'#2f6b4a');P(g,1,3,12,4,'#3d8a60');P(g,0,0,14,3,'#22503a');
+  P(g,1,13,2,1,C.carbon);P(g,11,13,2,1,C.carbon);});
+ M_('contenedor2',(g)=>{P(g,0,2,14,12,C.mostazaO);P(g,1,3,12,4,C.mostaza);P(g,0,0,14,3,'#8c7420');
+  P(g,1,13,2,1,C.carbon);P(g,11,13,2,1,C.carbon);});
+ M_('papelera',(g)=>{P(g,1,3,3,7,C.grisO);P(g,0,2,5,2,C.gris);P(g,2,7,1,3,C.carbon);});
+ M_('banco',(g)=>{P(g,0,1,18,6,C.madera);P(g,0,1,18,2,C.maderaL);
+  P(g,2,7,2,3,C.carbon);P(g,14,7,2,3,C.carbon);});
+ M_('marquesina',(g)=>{P(g,0,0,40,4,C.grisO);P(g,1,4,2,22,C.gris);P(g,37,4,2,22,C.gris);
+  P(g,3,5,34,14,'#7f9aa8');P(g,5,20,30,3,C.madera);});
+ M_('cabina',(g)=>{P(g,0,0,10,24,C.rojoO);P(g,2,3,6,14,'#7f9aa8');P(g,0,0,10,3,C.rojo);});
+ M_('bolardo',(g)=>{P(g,0,1,3,8,C.carbon);P(g,0,0,3,2,C.mostaza);});
+ M_('valla',(g)=>{P(g,0,1,25,4,C.mostaza);P(g,0,6,25,4,C.rojo);
+  P(g,1,10,3,2,C.carbon);P(g,21,10,3,2,C.carbon);});
+ M_('andamio',(g)=>{for(let x=0;x<30;x+=9)P(g,x,0,2,60,C.acero);
+  for(let y=2;y<60;y+=14)P(g,0,y,30,2,C.aceroO);P(g,0,30,30,2,C.madera);});
+ M_('pales',(g)=>{P(g,0,2,12,8,C.madera);for(let x=1;x<11;x+=3)P(g,x,2,2,8,C.maderaL);
+  P(g,0,1,12,2,C.maderaO);});
+ M_('cono',(g)=>{P(g,1,1,2,5,C.rojo);P(g,1,3,2,1,C.crema);P(g,0,6,4,1,C.rojoO);});
+ /* La grúa del muelle: doce metros de alto, no cuatro. Es lo que se ve desde el otro lado
+    de la ría y lo que dice que eso es un puerto. */
+ M_('grua',(g)=>{P(g,20,84,40,36,C.rojo);P(g,30,12,8,108,C.crema);
+  P(g,4,10,72,6,C.crema);P(g,66,16,3,44,C.acero);P(g,60,58,16,8,C.mostaza);
+  P(g,24,116,10,4,C.carbon);P(g,46,116,10,4,C.carbon);});
+ /* Un contenedor de barco mide doce metros: dos coches y medio en fila. */
+ M_('contMaritimo',(g)=>{P(g,0,0,120,26,C.rojoO);
+  for(let x=2;x<120;x+=5)P(g,x,2,3,22,C.rojo);P(g,0,0,120,3,'#7a2c12');
+  P(g,0,23,120,3,'#7a2c12');});
+ M_('bidon',(g)=>{P(g,0,1,6,8,C.azulL);P(g,0,3,6,1,C.azul);P(g,0,6,6,1,C.azul);P(g,1,0,4,2,C.acero);});
+ M_('toldo',(g)=>{for(let x=0;x<30;x+=6){P(g,x,0,3,10,C.rojoO);P(g,x+3,0,3,10,C.crema);}
+  P(g,0,10,30,2,C.carbon);});
+ M_('terraza',(g)=>{P(g,2,2,12,9,C.crema);P(g,2,2,12,2,C.blanco);
+  P(g,4,11,2,3,C.acero);P(g,10,11,2,3,C.acero);P(g,6,5,4,3,C.verdeL);});
+ M_('placa',(g)=>{P(g,0,0,9,4,C.blanco);P(g,0,0,9,1,C.azul);P(g,1,1,7,2,C.azul);});
+ /* Contorno negro en el mobiliario. Sobre el asfalto, el adoquín o el césped, un objeto
+    sin canto se funde con el fondo y no se sabe dónde empieza — es la misma regla que ya
+    tenían los iconos del HUD, y la que faltaba en la calle. */
+ for(const k of MOB_CONTORNO)if(PROP[k])contorno(PROP[k],C.negro);
 }
+/* Lo que lleva canto: lo que se apoya en el suelo y se ve contra él. Los tejados y las
+   fachadas no, que son superficie y no objeto. */
+const MOB_CONTORNO=['farola','semaforo','arbol','arbolPodado','contenedor','contenedor2',
+ 'papelera','banco','marquesina','cabina','bolardo','valla','andamio','pales','cono','grua',
+ 'contMaritimo','bidon','terraza','deposito','climatizador','antenaTv','tendedero','caseta',
+ 'chimenea','lucernario'];
 
 /*═══════════════ ICONOS HUD ═══════════════*/
 const ICO={};
@@ -3932,27 +3966,38 @@ function colocarCalle(){
  return cruces;}
 /* El sprite se arrima al bordillo: una farola en el centro de la acera es una farola en
    mitad del paso. El lado lo dice la calzada que tiene al lado. */
+/* El charco de luz de una farola encendida. Va en escalones y no en degradado, y no es un
+   sprite: es luz, como el tinte de la hora, y un sprite con medio alfa se saltaría la regla
+   de que todo el arte va a la paleta y opaco. */
+function halo(px,py){
+ for(const[rad,a]of[[38,.05],[26,.07],[15,.10]]){
+  ctx.fillStyle='rgba(232,197,71,'+a+')';ctx.beginPath();ctx.arc(px,py,rad,0,6.283);ctx.fill();}}
 function dibMobiliario(mb,x,y){
  const pE=Tc(x+1,y)===ROAD,pO=Tc(x-1,y)===ROAD,pS=Tc(x,y+1)===ROAD;
- /* Sobre 32 de casilla: pegado al canto que da a la calzada, y centrado en el otro eje. */
- const bx=pE?22:pO?4:13, by=pS?18:(Tc(x,y-1)===ROAD?4:12);
- const D=(spr,dx,dy)=>ctx.drawImage(spr,x*TS+(bx+dx)*ESC,y*TS+(by+dy)*ESC);
+ /* El punto del bordillo, en espacio de 32 por casilla: pegado al canto que da a la
+    calzada y centrado en el otro eje. */
+ const bx=pE?26:pO?6:16, by=pS?27:(Tc(x,y-1)===ROAD?7:18);
+ /* Cada pieza se planta por su base y centrada en su ancho, que es como se apoya en el
+    suelo. Antes cada una llevaba su desplazamiento a mano y al cambiar de tamaño se
+    quedaban flotando. */
+ const D=(k,dx,dy)=>{const[a,al]=MOB_M[k];
+  ctx.drawImage(PROP[k],x*TS+(bx-a*5+(dx||0))*ESC,y*TS+(by-al*10+(dy||0))*ESC);};
  switch(mb){
-  case M_FAROLA:    D(PROP.farola,-3,-14);break;
-  case M_SEMAFORO:  D(PROP.semaforo,-2,-16);break;
-  case M_ARBOL:     D(PROP.arbolPodado,-8,-10);break;
+  case M_FAROLA:    D('farola');break;
+  case M_SEMAFORO:  D('semaforo');break;
+  case M_ARBOL:     D('arbolPodado');break;
   /* Los bolardos van en fila, que es como se ponen: uno cada casilla serían cinco
      metros de separación y no cierran el paso a nada. */
   case M_BOLARDO:   for(let k=-1;k<2;k++){
-    if(pE||pO)D(PROP.bolardo,-2,-6+k*10);else D(PROP.bolardo,-2+k*10,-6);}break;
-  case M_CONT:      D(PROP.contenedor,-9,-6);break;
-  case M_CONT2:     D(PROP.contenedor2,-9,-6);break;
-  case M_PAPELERA:  D(PROP.papelera,-4,-6);break;
-  case M_BANCO:     D(PROP.banco,-10,-4);break;
-  case M_CABINA:    D(PROP.cabina,-6,-10);break;
-  case M_MARQUESINA:D(PROP.marquesina,-18,-8);break;
+    if(pE||pO)D('bolardo',0,k*10);else D('bolardo',k*10,0);}break;
+  case M_CONT:      D('contenedor');break;
+  case M_CONT2:     D('contenedor2');break;
+  case M_PAPELERA:  D('papelera');break;
+  case M_BANCO:     D('banco');break;
+  case M_CABINA:    D('cabina');break;
+  case M_MARQUESINA:D('marquesina');break;
   /* La terraza sale de la pared del bar hacia la calzada, no encima del bordillo. */
-  case M_TERRAZA:   ctx.drawImage(PROP.terraza,x*TS+6*ESC,y*TS+7*ESC);break;}}
+  case M_TERRAZA:   D('terraza',0,-4);break;}}
 
 /*═══════════════ ESTADO ═══════════════*/
 const S={
@@ -6804,8 +6849,40 @@ function comprobarObjetivos(dt){
     else{cobrar(j);if(j.id==='recado'&&azar()<.4){estrellas(1);aviso('TE HAN FICHADO');}}}}}}
 /*═══════════════ RENDER DEL MUNDO ═══════════════*/
 const cam={x:0,y:0,z:1,tinte:[0,0,0]};
-function nocheF(){const h=S.min/60;
- if(h>21.5||h<5.5)return .58;if(h>19.5)return .58*(h-19.5)/2;if(h<7.5)return .58*(7.5-h)/2;return 0;}
+/*── El sol ──────────────────────────────────────────────────────────────────
+  Bilbao está a 43° N: el sol sale por el este, cruza por el sur y se pone por el oeste,
+  así que a mediodía la sombra apunta al norte —hacia arriba en pantalla— y a primera y
+  última hora se tumba y cruza la calle entera. Desde arriba, la sombra es lo único que
+  dice cuánto levanta un edificio y dónde acaba su tejado; y como sale de la hora y no de
+  una constante, además dice qué hora es sin mirar el reloj. */
+const AMANECE=7.5, ANOCHECE=21.5;
+const SOL={ux:0,uy:-1,alto:0,elev:0};
+function calcularSol(){
+ const h=S.min/60;
+ if(h<=AMANECE||h>=ANOCHECE){SOL.alto=0;SOL.elev=0;return SOL;}
+ const t=(h-AMANECE)/(ANOCHECE-AMANECE);
+ SOL.alto=Math.sin(t*Math.PI);
+ const az=Math.PI/2+t*Math.PI;          /* este al amanecer, sur al mediodía, oeste al ocaso */
+ SOL.ux=-Math.sin(az);SOL.uy=Math.cos(az);   /* la sombra va al contrario que el sol */
+ SOL.elev=Math.max(.10,SOL.alto*1.13);       /* 65° de elevación máxima, en radianes */
+ return SOL;}
+/* Lo que proyecta un edificio, en casillas: su altura partida por la tangente de la
+   elevación. Cuatro casillas de tope —20 m— porque al ras del horizonte la sombra sale
+   infinita y taparía la ciudad entera. */
+const ALTURA_M={senorial:13,denso:13,bloques:10,industrial:8,abierto:7};
+function largoSombra(est){
+ if(!SOL.elev)return 0;
+ return Math.min(4,(ALTURA_M[est]||10)/Math.tan(SOL.elev)/5.16);}
+/* La luz de la hora: noche azul, amanecer y atardecer cálidos, mediodía limpio. Antes
+   solo había noche, y a las nueve de la mañana la ciudad se veía igual que a las tres. */
+const LUZ_HORA=[[0,8,14,38,.56],[6.2,8,14,38,.56],[7.6,232,150,60,.15],[9.2,0,0,0,0],
+ [18.4,0,0,0,0],[20.6,236,130,54,.17],[21.8,8,14,38,.56],[24,8,14,38,.56]];
+function luzAmbiente(){
+ const h=S.min/60;
+ let i=0;while(i<LUZ_HORA.length-2&&LUZ_HORA[i+1][0]<=h)i++;
+ const a=LUZ_HORA[i],b=LUZ_HORA[i+1],k=clamp((h-a[0])/(b[0]-a[0]||1),0,1);
+ return [lerp(a[1],b[1],k)|0,lerp(a[2],b[2],k)|0,lerp(a[3],b[3],k)|0,lerp(a[4],b[4],k)];}
+function nocheF(){const l=luzAmbiente();return l[2]>30?l[3]:0;}
 const hexRGB=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
 function tileDe(x,y,fa){
  const t=map[y*MW+x];
@@ -6835,8 +6912,8 @@ function dib(){
  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.imageSmoothingEnabled=false;
  ctx.fillStyle=C.negro;ctx.fillRect(0,0,W,H);
  if(S.escena==='interior')dibInterior();else dibCiudad();
- const n=S.escena==='interior'?nocheF()*.35:nocheF();
- if(n>0){ctx.fillStyle='rgba(8,14,38,'+n+')';ctx.fillRect(0,0,W,H);}
+ const L=luzAmbiente(),n=(S.escena==='interior'?.35:1)*L[3];
+ if(n>0){ctx.fillStyle='rgba('+L[0]+','+L[1]+','+L[2]+','+n.toFixed(3)+')';ctx.fillRect(0,0,W,H);}
  if(S.muerto>0){ctx.fillStyle='rgba(120,10,10,'+clamp((2.2-S.muerto)/1.4,0,.75)+')';ctx.fillRect(0,0,W,H);}
  dibHUD();}
 function dibCiudad(){
@@ -6859,9 +6936,23 @@ function dibCiudad(){
  const x0=Math.max(0,(cam.x-hw)|0),x1=Math.min(MW-1,(cam.x+hw)|0);
  const y0=Math.max(0,(cam.y-hh)|0),y1=Math.min(MH-1,(cam.y+hh)|0);
  const fa=(performance.now()/380|0)%2;
+ calcularSol();
  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
   ctx.drawImage(tileDe(x,y,fa),x*TS,y*TS);
   const t=map[y*MW+x],h=hash(x,y);
+  /* La sombra del sol: se mira hacia el sol y, si hay un edificio a menos de lo que
+     proyecta, esta casilla está a la sombra. Se resuelve mirando desde la casilla en vez
+     de pintando desde el edificio, que es lo que permite que la sombra doble la esquina y
+     se pare en la acera de enfrente sin llevar la cuenta de nada. */
+  if(SOL.elev&&t!==EDIF){
+   for(let k=1;k<=8;k++){
+    const px=Math.round(x-SOL.ux*k*.5),py=Math.round(y-SOL.uy*k*.5);
+    if(px<0||py<0||px>=MW||py>=MH)break;
+    if(map[py*MW+px]!==EDIF)continue;
+    const L=largoSombra(distDe(px,py).estilo),d=k*.5;
+    if(d<=L){ctx.fillStyle='rgba(7,9,12,'+(.42*(1-d/(L+.6))).toFixed(3)+')';
+     ctx.fillRect(x*TS,y*TS,TS,TS);}
+    break;}}
   if(t===ROAD){
    ctx.fillStyle='rgba(7,9,12,.34)';
    if(Tc(x+1,y)===ACERA)ctx.fillRect(x*TS+TS-3*ESC,y*TS,3*ESC,TS);
@@ -6877,7 +6968,10 @@ function dibCiudad(){
    if(rodable(x,y+1))ctx.fillRect(x*TS,y*TS+TS-2*ESC,TS,2*ESC);
    if(rodable(x,y-1))ctx.fillRect(x*TS,y*TS,TS,2*ESC);
    const mb=MOB[y*MW+x];
-   if(mb)dibMobiliario(mb,x,y);}
+   if(mb)dibMobiliario(mb,x,y);
+   /* De noche las farolas están para algo. El halo va en escalones, no en degradado:
+      un degradado suave al lado de un pixel art canta más que la falta de luz. */
+   if(mb===M_FAROLA&&!SOL.elev)halo(x*TS+TS/2,y*TS+TS/2+6*ESC);}
   else if(t===PARQUE){if(h%4===0)ctx.drawImage(PROP.arbol,x*TS+2*ESC,y*TS+1*ESC);}
   else if(t===PLAZA){if(h%23===0)ctx.drawImage(PROP.arbolPodado,x*TS+6*ESC,y*TS+3*ESC);
    else if(h%31===0)ctx.drawImage(PROP.banco,x*TS+4*ESC,y*TS+10*ESC);}
@@ -6978,10 +7072,6 @@ function dibCiudad(){
   if(abajo&&famT!=='azotea'&&famT!=='nave'){
    ctx.drawImage(TILE.tejados[roof[y*MW+x]]||TILE.tejados[0],0,TS-6,TS,6,x*TS,y*TS+TS-1,TS,6);
    ctx.fillStyle='rgba(0,0,0,.45)';ctx.fillRect(x*TS,y*TS+TS+5,TS,2);}
-  /* La sombra sobre la calle crece con el edificio: con cinco píxeles, una manzana de
-     seis alturas proyectaba lo mismo que un bordillo. */
-  if(abajo){ctx.fillStyle='rgba(0,0,0,.34)';ctx.fillRect(x*TS,(y+1)*TS,TS,9*ESC);}
-  if(der){ctx.fillStyle='rgba(0,0,0,.28)';ctx.fillRect((x+1)*TS,y*TS,4*ESC,TS);}
   ctx.fillStyle='rgba(255,255,255,.14)';
   if(arriba)ctx.fillRect(x*TS,y*TS,TS,2*ESC);
   if(izq)ctx.fillRect(x*TS,y*TS,2,TS);

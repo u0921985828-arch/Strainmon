@@ -272,6 +272,50 @@ listo().then(() => {
       + A.TS_INT + 'x' + A.TS_INT);
   }
 
+  // ── R8 · el mobiliario urbano mide lo que mide ──────────────────────────────────
+  /* Estaba dibujado a ojo: una papelera de 1,9 m de ancho, un bolardo más gordo que una
+     farola, un contenedor de barco de cuatro metros y árboles de dos. Cada pieza sale ahora
+     de su medida en metros, forjada a 20 px/m —la densidad a la que está dibujada la gente,
+     que es con lo que se compara en la calle—, y aquí se comprueba que el dibujo mide lo que
+     dice la tabla. */
+  {
+    let malos = 0;
+    const PXM = 20;
+    for (const k of Object.keys(A.MOB_M)) {
+      const c = A.PROP[k], [an, al] = A.MOB_M[k];
+      if (!c) { fallos.push('mobiliario ' + k + ': está en la tabla y no se forja'); malos++; continue; }
+      const dx = Math.abs(c.width / an - PXM), dy = Math.abs(c.height / al - PXM);
+      if (dx > 1 || dy > 1) {
+        fallos.push('mobiliario ' + k + ': ' + (c.width/PXM).toFixed(1) + '×' + (c.height/PXM).toFixed(1)
+          + ' m dibujados contra ' + an + '×' + al + ' de la tabla');
+        malos++;
+      }
+    }
+    // Y el canto negro: sobre el asfalto o el adoquín, un objeto sin contorno se funde con
+    // el fondo. Solo se exige donde hay margen — lo que toca el borde del lienzo no puede
+    // llevarlo.
+    const NEG = A.C.negro;
+    const rgbNeg = [parseInt(NEG.slice(1,3),16), parseInt(NEG.slice(3,5),16), parseInt(NEG.slice(5,7),16)];
+    let sinCanto = 0;
+    for (const k of A.MOB_CONTORNO) {
+      const c = A.PROP[k];
+      if (!c) continue;
+      const d = px(c), w = c.width, h = c.height;
+      const opaco = (x, y) => d[(y*w + x)*4 + 3] > 0;
+      let malo = 0;
+      for (let y = 1; y < h-1 && !malo; y++) for (let x = 1; x < w-1; x++) {
+        const i = (y*w + x)*4;
+        if (!d[i+3]) continue;
+        if (d[i] === rgbNeg[0] && d[i+1] === rgbNeg[1] && d[i+2] === rgbNeg[2]) continue;
+        if (!opaco(x-1,y) || !opaco(x+1,y) || !opaco(x,y-1) || !opaco(x,y+1)) { malo = 1; break; }
+      }
+      if (malo) { fallos.push('mobiliario ' + k + ': tiene color pegado al hueco, le falta el canto'); sinCanto++; }
+    }
+    if (!malos && !sinCanto)
+      bien.push(Object.keys(A.MOB_M).length + ' piezas de mobiliario a su medida en metros, '
+        + A.MOB_CONTORNO.length + ' con canto negro');
+  }
+
   bien.forEach(b => console.log('  ok    ' + b));
   if (fallos.length) {
     console.log('');
