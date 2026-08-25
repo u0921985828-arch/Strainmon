@@ -2104,6 +2104,15 @@ const COMPLEX={delgada:{w:6,hom:7},media:{w:8,hom:9},corpulenta:{w:10,hom:11}};
    20×26 de siempre, así que lo que queda de margen es 2 a los lados, 5 arriba y 1 abajo.
    Es mucho menos aire del que había, y por eso el puñetazo, el fogonazo y el carro de la
    compra van recogidos: antes se salían de la caja contando con siete píxeles de margen. */
+/* La figura se forja a escala 3:2 sobre la geometria de siempre: 26 px de alto pasan a 39
+   —3,14 m con la casilla a 64 px, o sea x1,85 sobre una persona de verdad—, que es la talla
+   que se pidio. Se escala la coordenada, no el dibujo: cada rectangulo se recalcula por sus
+   dos cantos (sc(x+w)-sc(x)), asi que los que iban pegados siguen pegados y no salen ni
+   costuras ni solapes, que es lo que pasa multiplicando el ancho. La geometria logica —hy,
+   ty, py, los gorros, las poses— se queda escrita en 26 y no hay que tocar ni una. */
+const PJ_N=3, PJ_D=2;
+const sc=v=>Math.floor(v*PJ_N/PJ_D);
+const Pe=(g,x,y,w,h,c)=>P(g,sc(x),sc(y),sc(x+w)-sc(x),sc(y+h)-sc(y),c);
 const MG_X=2, MG_ARR=5, MG_ABA=1;
 const FORJA_W=20+MG_X*2, FORJA_H=26+MG_ARR+MG_ABA;
 const TORSOS={
@@ -2138,8 +2147,9 @@ const CALZADO={deportivas:{b:C.blanco,s:C.acero},botas:{b:'#3a2d22',s:C.ladrillo
 
 function dibChar(cfg,pose,d8){
  const M=MAPA8[d8], dir=M.b, frente=M.f, espalda=M.e;
- const c=lienzo(FORJA_W,FORJA_H),g=c.getContext('2d');
- g.translate(MG_X,MG_ARR);
+ const c=lienzo(sc(FORJA_W),sc(FORJA_H)),g=c.getContext('2d');
+ g.translate(sc(MG_X),sc(MG_ARR));
+ const P=Pe;
  const P_=POSES[pose],comp=COMPLEX[cfg.comp],T=TORSOS[cfg.torso],PN=PIERNAS[cfg.piernas];
  const diag=frente||espalda, lateral=(dir===DE||dir===IZ)&&!diag;
  const cx=10+(diag?(dir===DE?-1:1):0)+(lateral?(dir===DE?1:-1):0);
@@ -2273,6 +2283,7 @@ const GRANDES={melena:1,coleta:1,mono:1,afro:1};
    HW=8 sale píxel a píxel lo de antes, así que los otros arquetipos no se mueven. */
 function capasEncima(g,cfg,cx,hy,ty,hom,E,soloGrandes){
  const dir=E.dir,arr=E.arr,T=E.T,izqV=E.izqV,derV=E.derV,py=E.py!==undefined?E.py:ty+8;
+ const P=Pe;
  const HW=E.HW||8, HH=E.HH||8, h2=HW/2, ey=E.ey!==undefined?E.ey:hy+4;
  const pc=cfg.pelo==='canoso'?C.pelo5:cfg.pelocol, est=cfg.pelo;
  if(est!=='calvo'&&(!soloGrandes||GRANDES[est])){
@@ -2412,7 +2423,7 @@ const PEATON_BARRIO={
    Nunca se queda un personaje sin dibujar. */
 /*<<<SPRITES*/
 /* Lo escribe herramientas/sprites/pixellab.py. Vacío = todo forjado. */
-const SPR={cel:[24,32], rampas:{}, hojas:{}};
+const SPR={cel:[36,48], rampas:{}, hojas:{}};   /* 24x32 x 3:2 — ver PJ_N/PJ_D */
 /*SPRITES>>>*/
 const CEL_W=()=>SPR.cel[0], CEL_H=()=>SPR.cel[1];
 const HOJAS={};
@@ -2506,8 +2517,9 @@ function anclaCabeza(bytes,w,cw,ch,d,fy,masc){
    cuadrarlas con la de la hoja traída. */
 function dibEncima(cfg,pose,d8){
  const M=MAPA8[d8],dir=M.b,frente=M.f,espalda=M.e;
- const c=lienzo(FORJA_W,FORJA_H),g=c.getContext('2d');
- g.translate(MG_X,MG_ARR);
+ const c=lienzo(sc(FORJA_W),sc(FORJA_H)),g=c.getContext('2d');
+ g.translate(sc(MG_X),sc(MG_ARR));
+ const P=Pe;
  const P_=POSES[pose],comp=COMPLEX[cfg.comp],T=TORSOS[cfg.torso];
  const diag=frente||espalda,lateral=(dir===DE||dir===IZ)&&!diag;
  const cx=10+(diag?(dir===DE?-1:1):0)+(lateral?(dir===DE?1:-1):0);
@@ -2552,13 +2564,13 @@ function hoja(k){
     descoloca los pies. Con la medida de siempre, ox y oy salen cero. */
  const cw=CEL_W(), ch=CEL_H();
  const c=lienzo(cw*8,ch*ORDEN_POSES.length),g=c.getContext('2d');
- const ox=Math.round((cw-FORJA_W)/2), oy=ch-FORJA_H;
+ const ox=Math.round((cw-sc(FORJA_W))/2), oy=ch-sc(FORJA_H);
  ORDEN_POSES.forEach((p,fy)=>{for(let d=0;d<8;d++)g.drawImage(dibChar(ARQ[k],p,d),d*cw+ox,fy*ch+oy);});
  return HOJAS[k]=cuantizar(c);
 }
 function pintaChar(g,k,d8,pose,x,y){
  const h=HOJAS[k]||hoja(k), cw=CEL_W(), ch=CEL_H();
- g.drawImage(h,d8*cw,IPOSE[pose]*ch,cw,ch,Math.round(x)-(cw>>1),Math.round(y)-ch+7+MG_ABA,cw,ch);}
+ g.drawImage(h,d8*cw,IPOSE[pose]*ch,cw,ch,Math.round(x)-(cw>>1),Math.round(y)-ch+sc(7+MG_ABA),cw,ch);}
 const dir8De=(dx,dy)=>((2-Math.round(Math.atan2(dy,dx)/(Math.PI/4)))%8+8)%8;
 
 /*═══════════════ ARMAS ═══════════════*/
@@ -2589,7 +2601,8 @@ const ARMA_MANO={};
 ARMAS.forEach(a=>{if(!a.l)return;
  ARMA_MANO[a.id]=[];
  for(let d8=0;d8<8;d8++){
-  const M=MAPA8[d8],dir=M.b,c=lienzo(ARMA_W,ARMA_H),g=c.getContext('2d');
+  const M=MAPA8[d8],dir=M.b,c=lienzo(sc(ARMA_W),sc(ARMA_H)),g=c.getContext('2d');
+  const P=Pe;
   const gr=a.grosor||1,y=13,dg=(M.f||M.e)?1:0,ox=ARMA_CX-10;
   if(dir===DE){P(g,ox+13-dg,y+dg,a.l,gr,a.col);P(g,ox+11-dg,y+dg,2,gr+1,a.mango);}
   else if(dir===IZ){P(g,ox+7+dg-a.l,y+dg,a.l,gr,a.col);P(g,ox+7+dg,y+dg,2,gr+1,a.mango);}
@@ -6402,7 +6415,7 @@ function pintaSombraChar(e,esJugador){
  const pose=e.herido>0?'herido':e.pose||'quieto';
  pintaChar(ctx,e.arq,e.d8,pose,e.x*TS,e.y*TS);
  const aid=esJugador?S.armaAct:e.arma;
- if(aid&&ARMA_MANO[aid])ctx.drawImage(ARMA_MANO[aid][e.d8],Math.round(e.x*TS)-ARMA_CX,Math.round(e.y*TS)-19);
+ if(aid&&ARMA_MANO[aid])ctx.drawImage(ARMA_MANO[aid][e.d8],Math.round(e.x*TS)-sc(ARMA_CX),Math.round(e.y*TS)-sc(19));
  if(esJugador&&fogT>0&&fogTipo)ctx.drawImage(FOG[fogTipo][fogD],Math.round(e.x*TS)-12,Math.round(e.y*TS)-12);}
 function pintaCoche(c,esPoli,mio){
  const spr=esPoli?VEH.patrullaRot[Math.sin(c.luz)>0?0:1]

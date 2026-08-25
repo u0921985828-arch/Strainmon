@@ -49,7 +49,7 @@ listo().then(() => {
     const doc = fs.readFileSync(ruta, 'utf8');
     const [CW, CH] = A.SPR.cel;
     const dice = [
-      [/Persona \|\s*\*\*(\d+)×(\d+) px\*\*/,            ['20', '26'],                 'la figura'],
+      [/Persona \|\s*\*\*(\d+)×(\d+) px\*\*/,            [String(A.sc(20)), String(A.sc(26))], 'la figura'],
       [/Celda del personaje \|\s*\*\*(\d+)×(\d+) px\*\*/, [String(CW), String(CH)],     'la celda del personaje'],
       [/Icono de interfaz \|\s*\*\*(\d+)×(\d+) px\*\*/,   ['24', '24'],                 'el icono de interfaz'],
       [/Casilla del mundo \|\s*\*\*(\d+)×(\d+) px\*\*/,   [String(A.TS), String(A.TS)], 'la casilla del mundo'],
