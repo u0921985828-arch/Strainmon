@@ -3063,8 +3063,11 @@ const PISO_BARRIO={senorial:20,denso:18,bloques:17,industrial:15,abierto:16};
    chapa. Cada edificio coge una del monton por hash, y de ahi sale que dos portales
    seguidos no sean del mismo color. */
 const REVOCO={
- senorial:  [[C.hormigon5,C.hormigon7,C.hormigon3],[C.crema,C.blanco,C.hormigonO],
-             [C.hormigon6,C.nieve,C.hormigon4]],
+ /* El Ensanche de la foto de Zubiarte: revoco crema, rosa palido y piedra clara, y el
+    mirador verde oscuro recortado encima. Nada de ladrillo caravista, que eso es de los
+    bloques de los sesenta y aqui no hay. */
+ senorial:  [[C.crema,C.blanco,C.hormigonO],[C.tez7,C.nieve,C.tez5],
+             [C.hormigon6,C.nieve,C.hormigon4],[C.hormigon5,C.hormigon7,C.hormigon3]],
  denso:     [[C.ladrillo4,C.ladrillo5,C.ladrillo2],[C.luz5,C.luz6,C.luz3],
              [C.hormigon5,C.hormigon7,C.hormigon3]],
  /* Santutxu */
@@ -3094,43 +3097,71 @@ function generarProps(){
     casilla y el estilo del barrio: en el Casco hay tasca y persiana echada; en el
     Ensanche, escaparate con toldo y portal de madera; en los bloques, más portal que
     tienda; en la industria, portones de chapa. No hay nada escrito a mano. */
- /* Cada local mide lo que mide de verdad. Iban todos a 16 px —2,58 m, el ancho de un
-    portal— y por eso un utilitario ocupaba dos escaparates: un escaparate de Bilbao mide
-    cuatro o cinco metros, no dos y medio. Ahora hay dos anchos, y la casilla se llena
-    con lo que quepa:
-      medio  (16 px = 2,58 m) portal, portal de piedra, garaje — que eso sí mide eso;
-      entero (32 px = 5,16 m) escaparate, tasca, persiana, portón y pared ciega.
-    Nada dibujado a mano: cada dibujo se pinta contra su propio ancho `w`. */
+ const VIDRIO='#3f5566', VIDRIOL='#7f9aa8', HIERRO=C.carbon;
+ /* Los bajos, a medida real. Iban dibujados en espacio de 32 y nunca se pasaron a metros:
+    la hoja de un portal medía 1,29 × 3,06 m —una puerta de tres metros— al lado de una
+    ventana de 0,81 × 1,13. Eso es lo que hacía que la fachada se viese falsa aunque cada
+    pieza por separado pareciese correcta.
+    Ahora se dibujan en la medida final. Con 1 px = 8 cm y un bajo de 3,55 m de alto:
+      hoja de puerta      0,89 × 2,10 m   (11 × 26 px)
+      dintel sobre puerta 1,45 m de muro por encima
+      escaparate          4,2 × 2,2 m, con zócalo de 40 cm y rótulo de 50
+      portón de garaje    2,2 × 2,3 m
+    Medio local son 32 px (2,58 m) y uno entero, 64 (5,16 m). */
  PROP.fachadas={};
- const local=(w,fn)=>{const c=lienzo(w*ESC,FACH_H*ESC),g=c.getContext('2d');
-  ESC_P=ESC;fn(g,w);ESC_P=1;return cuantizar(c);};
- const marco=(g,w,col)=>{P(g,0,0,w,FACH_H,C.negro);P(g,1,1,w-2,FACH_H-1,col);};
- PROP.fachadas.portal=local(16,(g,w)=>{marco(g,w,C.maderaO);
-  P(g,4,3,w-8,FACH_H-3,C.madera);P(g,4,3,w-8,1,C.maderaL);P(g,w-6,8,2,2,C.mostazaO);
-  P(g,2,1,w-4,1,C.hormigonL);});
- PROP.fachadas.portalPiedra=local(16,(g,w)=>{marco(g,w,C.hormigonO);
-  P(g,3,2,w-6,FACH_H-2,C.carbon);P(g,4,3,w-8,FACH_H-3,C.maderaO);
-  P(g,2,1,w-4,2,C.hormigonL);P(g,w-5,8,1,2,C.mostaza);});
- PROP.fachadas.garaje=local(16,(g,w)=>{marco(g,w,C.aceroO);
-  for(let y=3;y<FACH_H;y+=3)P(g,1,y,w-2,2,C.acero);
-  P(g,1,1,w-2,2,C.hormigonO);});
- PROP.fachadas.escaparate=local(32,(g,w)=>{marco(g,w,C.hormigonO);
-  P(g,2,4,w-4,FACH_H-4,'#3f5566');P(g,3,5,w-6,4,'#7f9aa8');
-  P(g,w/2-1,4,2,FACH_H-4,C.hormigonO);          /* el montante que parte el cristal */
-  P(g,2,2,w-4,2,C.rojoO);for(let i=2;i<w-2;i+=3)P(g,i,2,2,2,C.crema);});
- PROP.fachadas.tasca=local(32,(g,w)=>{marco(g,w,C.maderaO);
-  P(g,2,5,w-4,FACH_H-5,C.carbon);P(g,3,6,w-8,3,'#e8dfa8');
-  P(g,w-6,6,3,FACH_H-6,C.maderaO);              /* la puerta, a un lado del ventanal */
-  P(g,2,2,w-4,3,C.verdeO);P(g,2,2,w-4,1,C.verdeL);});
- PROP.fachadas.persiana=local(32,(g,w)=>{marco(g,w,C.grisO);
-  for(let y=2;y<FACH_H;y+=2)P(g,2,y,w-4,1,C.gris);
-  P(g,2,2,w-4,1,C.grisL);P(g,w/2-2,7,4,1,C.mostazaO);});
- PROP.fachadas.porton=local(32,(g,w)=>{marco(g,w,C.grisO);
-  P(g,1,2,w-2,FACH_H-2,C.aceroO);for(let x=2;x<w-1;x+=4)P(g,x,2,1,FACH_H-2,C.acero);
-  P(g,1,1,w-2,1,C.hormigonL);});
- PROP.fachadas.ciega=local(32,(g,w)=>{marco(g,w,C.hormigonO);
-  P(g,2,2,w-4,3,C.hormigon);
-  for(const vx of [w/4-3,w-w/4-3]){P(g,vx,7,6,5,C.carbon);P(g,vx+1,8,4,3,'#3f5566');}});
+ const AL_PUERTA=26, AN_PUERTA=11;      /* 2,10 x 0,89 m */
+ const local=(w,fn)=>{const W=w*ESC,H=FACH_H*ESC,c=lienzo(W,H),g=c.getContext('2d');
+  fn(g,W,H);return cuantizar(c);};
+ /* El paño: muro con su luz arriba, su sombra a la derecha y el zócalo sucio de abajo,
+    que es lo primero que se ensucia de una fachada a pie de calle. */
+ const pano=(g,W,H,col,cl,osc)=>{P(g,0,0,W,H,col);P(g,0,0,W,1,cl);
+  P(g,W-1,0,1,H,osc);P(g,0,H-3,W,3,osc);};
+ const puerta=(g,W,H,hoja,marco,tira)=>{const x=Math.round((W-AN_PUERTA)/2),y=H-AL_PUERTA;
+  P(g,x-2,y-2,AN_PUERTA+4,AL_PUERTA+2,marco);P(g,x-2,y-2,AN_PUERTA+4,1,tira);
+  P(g,x,y,AN_PUERTA,AL_PUERTA,hoja);P(g,x,y,AN_PUERTA,1,tira);
+  P(g,x+AN_PUERTA-3,y+13,2,2,C.mostazaO);      /* el pomo, a 1 m del suelo */
+  return {x,y};};
+ PROP.fachadas.portal=local(16,(g,W,H)=>{pano(g,W,H,C.maderaO,C.ladrillo4,C.ladrillo0);
+  puerta(g,W,H,C.madera,C.maderaO,C.maderaL);
+  P(g,4,H-AL_PUERTA-8,W-8,3,C.hormigonO);      /* el dintel */
+  P(g,4,H-AL_PUERTA-8,W-8,1,C.hormigonL);});
+ PROP.fachadas.portalPiedra=local(16,(g,W,H)=>{pano(g,W,H,C.hormigonO,C.hormigonL,C.hormigon2);
+  P(g,3,H-AL_PUERTA-6,W-6,AL_PUERTA+6,C.hormigon5);P(g,3,H-AL_PUERTA-6,W-6,2,C.hormigon7);
+  puerta(g,W,H,C.maderaO,C.carbon,C.madera);});
+ PROP.fachadas.garaje=local(16,(g,W,H)=>{pano(g,W,H,C.hormigonO,C.hormigonL,C.hormigon2);
+  const an=27,al=28,x=Math.round((W-an)/2),y=H-al;    /* 2,2 x 2,3 m */
+  P(g,x-1,y-1,an+2,al+1,C.carbon);P(g,x,y,an,al,C.aceroO);
+  for(let i=y+2;i<H-2;i+=4)P(g,x,i,an,2,C.acero);
+  P(g,x+an/2-3,y+al-9,6,2,C.mostazaO);});
+ /* Escaparate: 4,2 m de hueco, zócalo de 40 cm, rótulo de 50 y toldo encima. El montante
+    parte el cristal en dos hojas, que a cinco metros no se hace un vidrio de una pieza. */
+ PROP.fachadas.escaparate=local(32,(g,W,H)=>{pano(g,W,H,C.hormigonO,C.hormigonL,C.hormigon2);
+  const x=6,an=W-12,y=H-28,al=27;
+  P(g,x-1,y-1,an+2,al+1,C.carbon);
+  P(g,x,y,an,al-5,VIDRIO);P(g,x,y,an-4,3,VIDRIOL);
+  P(g,x+an/2-1,y,2,al-5,C.hormigonO);
+  P(g,x,H-6,an,5,C.hormigon);P(g,x,H-6,an,1,C.hormigonL);   /* zocalo */
+  P(g,2,y-9,W-4,7,C.rojoO);for(let i=2;i<W-4;i+=5)P(g,i,y-9,3,7,C.crema);});
+ PROP.fachadas.tasca=local(32,(g,W,H)=>{pano(g,W,H,C.maderaO,C.ladrillo4,C.ladrillo0);
+  const x=5,an=W-24,y=H-25;
+  P(g,x-1,y-1,an+2,20,C.carbon);P(g,x,y,an,18,'#e8dfa8');P(g,x,y,an-3,2,C.crema);
+  P(g,x,H-6,an,5,C.madera);
+  puerta(g,W+34,H,C.madera,C.maderaO,C.maderaL);            /* la puerta, a un lado */
+  P(g,2,y-10,W-4,8,C.verdeO);P(g,2,y-10,W-4,2,C.verdeL);}); /* el rotulo */
+ PROP.fachadas.persiana=local(32,(g,W,H)=>{pano(g,W,H,C.hormigonO,C.hormigonL,C.hormigon2);
+  const x=5,an=W-10,y=H-32;
+  P(g,x-1,y-1,an+2,33,C.grisO);
+  for(let i=y;i<H-2;i+=3)P(g,x,i,an,2,C.gris);
+  P(g,x,y,an,2,C.grisL);P(g,W/2-4,H-9,8,2,C.mostazaO);});
+ PROP.fachadas.porton=local(32,(g,W,H)=>{pano(g,W,H,C.grisO,C.hormigonL,C.carbon);
+  const x=4,an=W-8,y=H-37;                                   /* 4,4 x 3,0 m */
+  P(g,x-1,y-1,an+2,38,C.carbon);P(g,x,y,an,37,C.aceroO);
+  for(let i=x+2;i<x+an;i+=6)P(g,i,y+1,2,35,C.acero);
+  P(g,x,y,an,2,C.grisL);});
+ /* Pared ciega: la medianera. Una reja de ventilación y poco más. */
+ PROP.fachadas.ciega=local(32,(g,W,H)=>{pano(g,W,H,C.hormigonO,C.hormigonL,C.hormigon2);
+  for(const vx of [W/4-5,W-W/4-5]){P(g,vx,H-22,10,8,C.carbon);
+   for(let i=0;i<8;i+=2)P(g,vx+1,H-21+i,8,1,C.grisO);}});
  /* Las plantas: muro con su luz arriba a la izquierda y su sombra abajo y a la derecha,
     como todo, y dos filas de ventanas. La ventana no es un agujero negro: lleva dintel
     claro y el vidrio azulado, que es lo que la distingue de un hueco. */
@@ -3143,7 +3174,6 @@ function generarProps(){
     que hace que una calle parezca una calle es que el edificio de al lado no sea el
     mismo. El tipo lo elige el hash de la casilla, asi que sale solo y no hay nada
     escrito a mano. */
- const VIDRIO='#3f5566', VIDRIOL='#7f9aa8', HIERRO=C.carbon;
  const banda=(ph,fn)=>{const W=32*ESC,H=ph*ESC,c=lienzo(W,H),g=c.getContext('2d');
   fn(g,W,H);return cuantizar(c);};
  /* El hueco: dintel claro arriba, jamba en sombra a la derecha, vidrio con su reflejo en
@@ -3169,12 +3199,18 @@ function generarProps(){
     for(let b=0;b<AN_V+6;b+=3)P(g,x-3+b,H-13,1,5,HIERRO);});}),
   /* mirador: la galeria acristalada de Bilbao, dos huecos de frente y su canto */
   banda(ph,(g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
-   /* Un mirador por casilla: 2,6 m de frente, que es lo que vuela una galeria. */
-   const bx=Math.round((W-32)/2);
-   P(g,bx,3,32,H-7,muroO);P(g,bx,3,32,1,muroL);
-   P(g,bx+2,5,28,H-11,VIDRIO);P(g,bx+2,5,26,2,VIDRIOL);
-   for(let m=9;m<28;m+=9)P(g,bx+2+m,5,2,H-11,muroO);
-   P(g,bx,H-4,32,2,C.carbon);}),
+   /* El mirador de Bilbao no es un balcon acristalado suelto: es una columna que sube la
+      fachada entera, de la primera planta al alero, pintada de verde oscuro sobre revoco
+      claro. Por eso la caja ocupa la banda de arriba abajo, sin muro entre plantas —
+      apiladas, las bandas forman la galeria continua— y su color no sale del revoco sino
+      de la carpinteria: el contraste es la mitad de lo que se reconoce de una calle de
+      aqui. */
+   const bx=Math.round((W-34)/2), CARP=C.verde2, CARPL=C.verde3;
+   P(g,bx,0,34,H,CARP);P(g,bx,0,34,1,CARPL);
+   P(g,bx+2,2,30,H-4,VIDRIO);P(g,bx+2,2,28,2,VIDRIOL);
+   for(let m=10;m<30;m+=10)P(g,bx+2+m,2,2,H-4,CARP);
+   P(g,bx+2,H-6,30,2,CARP);                  /* el antepecho de cada planta */
+   P(g,bx-1,0,1,H,muroO);P(g,bx+34,0,1,H,muroO);}),
   /* persiana echada: media calle esta asi a media manana */
   banda(ph,(g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
    fila(g,W,x=>{hueco(g,x,7,AN_V,AL_V,muroO,muroL);
