@@ -2104,13 +2104,15 @@ const COMPLEX={delgada:{w:6,hom:7},media:{w:8,hom:9},corpulenta:{w:10,hom:11}};
    20×26 de siempre, así que lo que queda de margen es 2 a los lados, 5 arriba y 1 abajo.
    Es mucho menos aire del que había, y por eso el puñetazo, el fogonazo y el carro de la
    compra van recogidos: antes se salían de la caja contando con siete píxeles de margen. */
-/* La figura se forja a escala 3:2 sobre la geometria de siempre: 26 px de alto pasan a 39
-   —3,14 m con la casilla a 64 px, o sea x1,85 sobre una persona de verdad—, que es la talla
-   que se pidio. Se escala la coordenada, no el dibujo: cada rectangulo se recalcula por sus
+/* La figura se forja a escala 4:3 sobre la geometria de siempre: 26 px de alto pasan a 39
+   —2,74 m con la casilla a 64 px, o sea x1,61 sobre una persona de verdad—, que es la talla
+   que se pidio. Se probo 3:2 (39 px) y salia grande. 4:3 da 34 y no 35 a proposito: deja la
+   celda en 32x42, las dos medidas pares, que es lo que pide la guia para que la figura tenga
+   centro y no baile medio pixel al girar. Se escala la coordenada, no el dibujo: cada rectangulo se recalcula por sus
    dos cantos (sc(x+w)-sc(x)), asi que los que iban pegados siguen pegados y no salen ni
    costuras ni solapes, que es lo que pasa multiplicando el ancho. La geometria logica —hy,
    ty, py, los gorros, las poses— se queda escrita en 26 y no hay que tocar ni una. */
-const PJ_N=3, PJ_D=2;
+const PJ_N=4, PJ_D=3;
 const sc=v=>Math.floor(v*PJ_N/PJ_D);
 const Pe=(g,x,y,w,h,c)=>P(g,sc(x),sc(y),sc(x+w)-sc(x),sc(y+h)-sc(y),c);
 const MG_X=2, MG_ARR=5, MG_ABA=1;
@@ -2148,7 +2150,10 @@ const CALZADO={deportivas:{b:C.blanco,s:C.acero},botas:{b:'#3a2d22',s:C.ladrillo
 function dibChar(cfg,pose,d8){
  const M=MAPA8[d8], dir=M.b, frente=M.f, espalda=M.e;
  const c=lienzo(sc(FORJA_W),sc(FORJA_H)),g=c.getContext('2d');
- g.translate(sc(MG_X),sc(MG_ARR));
+ /* El margen se reparte sobre la celda ya escalada, no escalando el margen: sc() no es
+    aditivo —sc(20)+2*sc(2) no da sc(24)— y confiando en sc(MG_X) el lado izquierdo se
+    quedaba con dos pixeles en vez de tres y el puno y la correa se salian por ahi. */
+ g.translate(Math.round((sc(FORJA_W)-sc(20))/2),sc(FORJA_H)-sc(26)-sc(MG_ABA));
  const P=Pe;
  const P_=POSES[pose],comp=COMPLEX[cfg.comp],T=TORSOS[cfg.torso],PN=PIERNAS[cfg.piernas];
  const diag=frente||espalda, lateral=(dir===DE||dir===IZ)&&!diag;
@@ -2423,7 +2428,7 @@ const PEATON_BARRIO={
    Nunca se queda un personaje sin dibujar. */
 /*<<<SPRITES*/
 /* Lo escribe herramientas/sprites/pixellab.py. Vacío = todo forjado. */
-const SPR={cel:[36,48], rampas:{}, hojas:{}};   /* 24x32 x 3:2 — ver PJ_N/PJ_D */
+const SPR={cel:[32,42], rampas:{}, hojas:{}};   /* 24x32 x 4:3 — ver PJ_N/PJ_D */
 /*SPRITES>>>*/
 const CEL_W=()=>SPR.cel[0], CEL_H=()=>SPR.cel[1];
 const HOJAS={};
@@ -2518,7 +2523,10 @@ function anclaCabeza(bytes,w,cw,ch,d,fy,masc){
 function dibEncima(cfg,pose,d8){
  const M=MAPA8[d8],dir=M.b,frente=M.f,espalda=M.e;
  const c=lienzo(sc(FORJA_W),sc(FORJA_H)),g=c.getContext('2d');
- g.translate(sc(MG_X),sc(MG_ARR));
+ /* El margen se reparte sobre la celda ya escalada, no escalando el margen: sc() no es
+    aditivo —sc(20)+2*sc(2) no da sc(24)— y confiando en sc(MG_X) el lado izquierdo se
+    quedaba con dos pixeles en vez de tres y el puno y la correa se salian por ahi. */
+ g.translate(Math.round((sc(FORJA_W)-sc(20))/2),sc(FORJA_H)-sc(26)-sc(MG_ABA));
  const P=Pe;
  const P_=POSES[pose],comp=COMPLEX[cfg.comp],T=TORSOS[cfg.torso];
  const diag=frente||espalda,lateral=(dir===DE||dir===IZ)&&!diag;
