@@ -279,6 +279,28 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       ok(sm && sm.dx < 0 && sm.largo > st.largo, 'la sombra de una persona no sigue al sol');
       ok(st && st.dy < 0 && Math.abs(st.dx) < st.largo * 0.5, 'a las 14 la figura no proyecta al norte');
       ok(!sn, 'de noche las figuras siguen proyectando sombra de sol');
+      // Y ninguna sombra se sube a un tejado: al llegar a la fachada, la sombra trepa por
+      // la pared, y en una vista cenital eso no se ve. Se mide sobre las farolas de verdad,
+      // que son las más largas — cuatro metros de alto a primera hora son veinte de sombra.
+      {
+        S.min = 9 * 60; A.calcularSol();
+        let miradas = 0, encima = 0, recortadas = 0;
+        const largoLibre = A.sombraSol(4).largo;
+        for (let i = 0; i < A.MOB.length && miradas < 4000; i++) {
+          if (A.MOB[i] !== 1) continue;                    // farola
+          const x = i % A.MW, y = (i / A.MW) | 0;
+          miradas++;
+          const so = A.sombraCorta(x * A.TS + A.TS/2, y * A.TS + A.TS/2, 4);
+          if (so.largo < largoLibre - 0.01) recortadas++;
+          const fx = Math.floor(x + 0.5 + so.dx / A.TS), fy = Math.floor(y + 0.5 + so.dy / A.TS);
+          if (fx >= 0 && fy >= 0 && fx < A.MW && fy < A.MH
+              && A.map[fy * A.MW + fx] === A.EDIF) encima++;
+        }
+        ok(!encima, encima + ' de ' + miradas + ' farolas tiran la sombra encima de un tejado');
+        ok(recortadas > miradas * 0.2,
+           'solo ' + recortadas + ' de ' + miradas + ' sombras se paran en la fachada: no se está recortando');
+        bien.push(miradas + ' farolas con la sombra parada en la fachada (' + recortadas + ' recortadas)');
+      }
       S.min = min0;
       bien.push('el sol gira con la hora: sombra de ' + lm.toFixed(1) + ' casillas a las 9 y '
         + lt.toFixed(1) + ' a las 14, y tinte de amanecer, día, ocaso y noche');

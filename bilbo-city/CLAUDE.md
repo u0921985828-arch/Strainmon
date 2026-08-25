@@ -260,6 +260,10 @@ de color a la misma altura.
   coche iba dos píxeles abajo a la derecha a cualquier hora, y la de la gente era una elipse
   fija. Sin sol —de noche o dentro de un sitio— queda la sombra de contacto: que algo apoya
   en el suelo hay que verlo igual.
+- **Una sombra se para en la fachada.** Al llegar a la pared, la sombra trepa por ella, y en
+  una vista cenital eso no se ve: una farola de cuatro metros a primera hora proyecta veinte,
+  y sin recortar se le subía al tejado del edificio de al lado. Se corta en la primera manzana
+  que encuentra por el camino (`sombraCorta`).
 - **Canto negro en el mobiliario**, la misma regla que ya tenían los iconos del HUD. Solo se
   exige donde hay margen: lo que toca el borde del lienzo no puede llevarlo.
 

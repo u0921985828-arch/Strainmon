@@ -6876,11 +6876,29 @@ function sombraSol(altoM){
  if(!SOL.elev)return null;
  const largo=Math.min(4*TS,altoM/Math.tan(SOL.elev)*(TS/5.16));
  return {dx:SOL.ux*largo,dy:SOL.uy*largo,largo,ang:Math.atan2(SOL.uy,SOL.ux)};}
+/* La misma sombra, pero parada donde se acaba el suelo. Desde arriba, la de una farola no
+   puede subirse al tejado del edificio de al lado: al llegar a la fachada, la sombra trepa
+   por la pared y en una vista cenital eso no se ve. Se recorta en la primera manzana que
+   encuentra por el camino. */
+function sombraCorta(px,py,altoM){
+ const so=sombraSol(altoM);
+ if(!so)return null;
+ const cx=px/TS,cy=py/TS,tope=so.largo/TS;
+ /* El paso es de un cuarto de casilla y llega hasta la punta incluida: a medio paso, una
+    sombra en diagonal se salta la esquina de la manzana, y parando antes de la punta se
+    cuela justo el último trozo, que es el que se veía encima del tejado. */
+ for(let d=.25;d<=tope+1e-6;d+=.25){
+  const mx=Math.floor(cx+SOL.ux*d),my=Math.floor(cy+SOL.uy*d);
+  if(mx<0||my<0||mx>=MW||my>=MH)break;
+  if(map[my*MW+mx]===EDIF){
+   const l=Math.max(TS*.2,(d-.25)*TS);
+   return {dx:SOL.ux*l,dy:SOL.uy*l,largo:l,ang:so.ang};}}
+ return so;}
 /* La sombra de una figura: una elipse tumbada en la dirección del sol. De noche, o dentro
    de un sitio, se queda en sombra de contacto — que algo apoya en el suelo hay que verlo
    igual, aunque no haya sol que la proyecte. */
 function sombraFig(px,py,r,altoM){
- const so=S.escena==='interior'?null:sombraSol(altoM);
+ const so=S.escena==='interior'?null:sombraCorta(px,py,altoM);
  if(!so){ctx.fillStyle='rgba(7,9,12,.32)';
   ctx.beginPath();ctx.ellipse(px,py+3,r,r*.44,0,0,6.283);ctx.fill();return;}
  ctx.save();ctx.translate(px+so.dx*.5,py+3+so.dy*.5);ctx.rotate(so.ang);
@@ -7152,7 +7170,7 @@ function pintaCoche(c,esPoli,mio){
  ctx.save();ctx.translate(c.x*TS,c.y*TS);
  /* La sombra del coche es su propia silueta corrida hacia donde va la del edificio de al
     lado. Iba dos píxeles abajo a la derecha, a cualquier hora y en cualquier calle. */
- const so=sombraSol(1.5);
+ const so=sombraCorta(c.x*TS,c.y*TS,1.5);
  ctx.save();ctx.translate(so?so.dx:2,so?so.dy:3);ctx.rotate(c.ang);
  ctx.fillStyle='rgba(7,9,12,.32)';ctx.fillRect(-w/2,-h/2,w,h);ctx.restore();
  ctx.rotate(c.ang);ctx.drawImage(spr,-w/2,-h/2);

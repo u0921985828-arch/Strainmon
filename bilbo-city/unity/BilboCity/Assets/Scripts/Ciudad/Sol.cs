@@ -48,6 +48,25 @@ public static class Sol {
         return Direccion * largo;
     }
 
+    /// <summary>La misma sombra, pero parada donde se acaba el suelo. Desde arriba, la de una
+    /// farola no puede subirse al tejado del edificio de al lado: al llegar a la fachada la
+    /// sombra trepa por la pared, y en una vista cenital eso no se ve.</summary>
+    public static Vector2 SombraCorta(Vector2 casilla, float altoM) {
+        var so = Sombra(altoM);
+        if (so == Vector2.zero) return so;
+        float tope = so.magnitude;
+        // El paso es de un cuarto de casilla y llega hasta la punta incluida: a medio paso una
+        // sombra en diagonal se salta la esquina de la manzana, y parando antes de la punta se
+        // cuela justo el último trozo, que es el que se veía encima del tejado.
+        for (float d = 0.25f; d <= tope + 1e-4f; d += 0.25f) {
+            int mx = Mathf.FloorToInt(casilla.x + Direccion.x * d);
+            int my = Mathf.FloorToInt(casilla.y + Direccion.y * d);
+            if (mx < 0 || my < 0 || mx >= Ciudad.MW || my >= Ciudad.MH) break;
+            if (Ciudad.T(mx, my) == Suelo.Edif) return Direccion * Mathf.Max(0.2f, d - 0.25f);
+        }
+        return so;
+    }
+
     /// <summary>La luz de la hora: noche azul, amanecer y atardecer cálidos, mediodía limpio.
     /// Antes solo había noche, y a las nueve de la mañana la ciudad se veía igual que a las
     /// tres de la tarde.</summary>
