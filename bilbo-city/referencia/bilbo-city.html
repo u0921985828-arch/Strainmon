@@ -1978,7 +1978,8 @@ const TRAMA_BARRIO=
   'PvOZz3zms/jMZz7zWXxuGmg+85nP4jOf+cxn8ZnPfOYzn8VnPvOZz3zmM5/5zGc+i8/2b/CZz3wWn/nMZz6Lz3jmM5/5LD7zmc98Fp/xzGc+'+
   '81l8Lsczn/nMZ/GZz3zms/iMZz7zmc/is/mZz3zmM58RzWc+81l8dr6bz3zms9rzeeIzn/msKv0v';
 /*PLANO>>>*/
-const cv=document.getElementById('c'), ctx=cv.getContext('2d');
+const cv=document.getElementById('c');
+let ctx=cv.getContext('2d');
 let W=0,H=0,DPR=1;
 /* DPR entero a propósito: con 1,5 o 1,75 un píxel de textura cae a caballo de dos de
    pantalla y el pixel art se ve sucio. Mejor perder algo de resolución que el filo. */
@@ -4090,7 +4091,7 @@ function musica(dt){
   b.connect(bg);bg.connect(AU.gMus);b.start(t);b.stop(t+.22);}}
 
 /*═══════════════ AVISOS Y DIÁLOGO ═══════════════*/
-let aviso1='',avisoT=0,grande1='',grandeT=0,pista1='',flashT=0;
+let aviso1='',avisoT=0,grande1='',grandeT=0,pista1='',flashT=0,hudBaseIzq=0;
 function aviso(t,s=2.4){aviso1=t;avisoT=s;}
 function grande(t,s=2.2){grande1=t;grandeT=s;}
 const fundEl=document.getElementById('fund'),flashEl=document.getElementById('flash');
@@ -6735,7 +6736,26 @@ function cajaHUD(x,y,w,h){
  ctx.fillStyle='rgba(7,9,12,.72)';ctx.fillRect(x,y,w,h);
  ctx.fillStyle='rgba(141,153,164,.35)';ctx.fillRect(x,y,w,1);ctx.fillRect(x,y+h-1,w,1);
  ctx.fillRect(x,y,1,h);ctx.fillRect(x+w-1,y,1,h);}
+/* El HUD se dibuja SIEMPRE a una resolución de 400 px de alto y se sube al lienzo con un
+   entero. Iba en píxeles absolutos, así que en un móvil de 1080 se quedaba de la mitad de
+   tamaño que en uno de 540 y el texto no se leía: el mundo escala con el zoom y el HUD no
+   escalaba con nada. Con el buffer, las medidas de aquí abajo son de una vez y para
+   siempre, y el escalado entero mantiene el píxel cuadrado como en el resto del juego. */
+let hudCv=null,hudG=null;
+const HUD_H=400;
 function dibHUD(){
+ const U=Math.max(1,Math.floor(H/HUD_H));
+ const bw=Math.ceil(W/U), bh=Math.ceil(H/U);
+ if(!hudCv||hudCv.width!==bw||hudCv.height!==bh){
+  hudCv=lienzo(bw,bh);hudG=hudCv.getContext('2d');}
+ hudG.clearRect(0,0,bw,bh);
+ const real=ctx, RW=W, RH=H;
+ ctx=hudG; W=bw; H=bh;
+ try{ hudCuerpo(); }finally{ ctx=real; W=RW; H=RH; }
+ real.imageSmoothingEnabled=false;
+ real.drawImage(hudCv,0,0,bw,bh,0,0,bw*U,bh*U);
+}
+function hudCuerpo(){
  /* El HUD ocupa la pantalla entera otra vez: los mandos viven en el marco, fuera del
     lienzo, así que ya no hay nada que esquivar. */
  const marg=8;
@@ -6774,19 +6794,29 @@ function dibHUD(){
  ctx.restore();
  /* ── estrellas ── */
  const exd=zd;
- for(let i=0;i<5;i++)ctx.drawImage(i<S.estrellas?ICO.estrella:ICO.estrellaOff,exd-24-i*20,marg+2,20,20);
- /* ── dinero ── */
+ for(let i=0;i<5;i++)ctx.drawImage(i<S.estrellas?ICO.estrella:ICO.estrellaOff,exd-20-i*20,marg+2,20,20);
+ /* La columna de la derecha va a un solo ancho y a un solo canto. Cada caja se medía a
+    sí misma, así que dinero, reloj y arma salían de tres anchos distintos apilados: tres
+    escalones en el borde de la pantalla. El ancho es el de la caja más ancha, y el paso
+    entre cajas, constante. */
  const din=String(Math.round(S.dinero));
- const wd=anchoTexto(din,2)+34;
- cajaHUD(exd-wd,marg+26,wd,26);
- ctx.drawImage(ICO.euro,exd-wd+3,marg+29,20,20);
- texto(ctx,din,exd-wd+26,marg+29,2,'ambar');
- /* ── reloj y día ── */
  const hr=String((S.min/60)|0).padStart(2,'0')+':'+String(S.min%60).padStart(2,'0');
- const wh=Math.max(anchoTexto(hr,2),anchoTexto('DIA '+S.dia,1))+10;
- cajaHUD(exd-wh,marg+58,wh,36);
- texto(ctx,hr,exd-wh+5,marg+61,2,'hueso');
- texto(ctx,'DIA '+S.dia,exd-wh+5,marg+81,1,'hueso');
+ const aq=arma(S.armaAct), munq=aq.inf?'∞':String(S.armas[aq.id]||0);
+ const wCol=Math.max(anchoTexto(din,2)+34,
+                     anchoTexto(hr,2)+10, anchoTexto('DIA '+S.dia,1)+10,
+                     anchoTexto(aq.n,1)+34, anchoTexto(munq,2)+34, 74);
+ const xCol=exd-wCol, GAP=4;
+ /* ── dinero ── */
+ const wd=wCol;
+ cajaHUD(xCol,marg+26,wd,26);
+ ctx.drawImage(ICO.euro,xCol+3,marg+29,20,20);
+ texto(ctx,din,xCol+26,marg+29,2,'ambar');
+ /* ── reloj y día ── */
+ const wh=wCol;
+ const yRel=marg+26+26+GAP;
+ cajaHUD(xCol,yRel,wh,36);
+ texto(ctx,hr,xCol+5,yRel+3,2,'hueso');
+ texto(ctx,'DIA '+S.dia,xCol+5,yRel+23,1,'hueso');
  /* ── energía y hambre bajo el radar ── */
  const by=cyr+R+14;
  const barra=(y,v,col,ico)=>{
@@ -6806,27 +6836,30 @@ function dibHUD(){
   const cl=calleEn(player.x|0,player.y|0);
   if(cl){texto(ctx,cl,zi,by+32,1,'hueso');texto(ctx,D.n,zi,by+44,1,'ambar');}
   else texto(ctx,D.n,zi,by+32,1,'hueso');}
+ /* Dónde acaba la columna izquierda. El rótulo grande iba a una fracción de la altura
+    (H*.42) y la columna va en píxeles fijos, así que en una pantalla baja el aviso caía
+    justo encima del barrio y de las barras. */
+ hudBaseIzq=by+58;
  /* ── arma y munición ── */
- const a=arma(S.armaAct);
- const mun=a.inf?'∞':String(S.armas[a.id]||0);
- const wa=Math.max(anchoTexto(a.n,1),anchoTexto(mun,2))+34;
- const ay=marg+98;
- cajaHUD(zd-wa,ay,wa,36);
- ctx.drawImage(ICO[a.id]||ICO.punos,zd-wa+3,ay+8,22,22);
- texto(ctx,a.n,zd-wa+28,ay+4,1,'hueso');
- texto(ctx,mun,zd-wa+28,ay+16,2,'ambar');
+ const a=aq, mun=munq, wa=wCol;
+ const ay=yRel+36+GAP;
+ cajaHUD(xCol,ay,wa,36);
+ ctx.drawImage(ICO[a.id]||ICO.punos,xCol+3,ay+8,22,22);
+ texto(ctx,a.n,xCol+28,ay+4,1,'hueso');
+ texto(ctx,mun,xCol+28,ay+16,2,'ambar');
  /* ── el ojo ──
     Sin esto el sigilo se juega a ciegas: no hay forma de saber si el que está ahí
     enfrente te ha visto o está mirando al escaparate. El ojo se abre según lo que le
     falta a la sospecha para llenarse, y se pone en rojo cuando ya te tienen. Va debajo
     del arma, que es la esquina que queda libre. */
  if(S.escena==='ciudad'&&(S.sospecha>.02||S.visto)){
-  const an=64,oy=ay+40;
-  cajaHUD(zd-an,oy,an,26);
-  ctx.drawImage(S.visto?ICO.ojo:ICO.ojoTachado,zd-an+3,oy+3,20,20);
-  ctx.fillStyle=C.carbon;ctx.fillRect(zd-an+26,oy+9,32,8);
+  const an=wCol,oy=ay+36+GAP;
+  cajaHUD(xCol,oy,an,26);
+  ctx.drawImage(S.visto?ICO.ojo:ICO.ojoTachado,xCol+3,oy+3,20,20);
+  const wb=an-30;
+  ctx.fillStyle=C.carbon;ctx.fillRect(xCol+26,oy+9,wb,8);
   ctx.fillStyle=S.sospecha>=1?C.sangre:S.sospecha>.5?C.mostaza:C.acero;
-  ctx.fillRect(zd-an+26,oy+9,Math.round(32*clamp(S.sospecha,0,1)),8);}
+  ctx.fillRect(xCol+26,oy+9,Math.round(wb*clamp(S.sospecha,0,1)),8);}
  /* ── misión o curro ── */
  if(S.escena==='ciudad'&&(S.mision||S.job)){
   const o=objetivo(),dm=o?Math.round(dist(o,player)*8):0;
@@ -6853,8 +6886,9 @@ function dibHUD(){
  if(avisoT>0&&aviso1){
   let esc=2;while(esc>1&&anchoTexto(aviso1,esc)>zd-zi)esc--;
   const w=Math.min(zd-zi,anchoTexto(aviso1,esc)+16), al=clamp(avisoT,0,1);
-  ctx.globalAlpha=al;cajaHUD((W-w)/2,H*.42,w,9*esc+8);
-  texto(ctx,aviso1,(W-w)/2+8,H*.42+4,esc,'ambar');ctx.globalAlpha=1;}
+  const ya=Math.max(H*.42,hudBaseIzq);
+  ctx.globalAlpha=al;cajaHUD((W-w)/2,ya,w,9*esc+8);
+  texto(ctx,aviso1,(W-w)/2+8,ya+4,esc,'ambar');ctx.globalAlpha=1;}
  /* ── rótulo grande ── */
  if(grandeT>0&&grande1){let esc=W<620?3:4;
   while(esc>1&&anchoTexto(grande1,esc)>zd-zi)esc--;
