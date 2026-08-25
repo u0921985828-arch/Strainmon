@@ -2288,8 +2288,8 @@ function A(nombre,comp,pielI,pelo,pelocol,gorro,gorroCol,torso,piernas,calzado,a
 const ARQ={
  protagonista:A('protagonista','media',1,'corto',C.pelo1,'txapela',null,'cazadora','vaquero','botas','ninguno'),
  ertzaina:A('ertzaina','corpulenta',1,'rapado',C.pelo1,'policia',null,'uniforme','uniformeP','botas','ninguno'),
- maton:A('maton','corpulenta',2,'rapado',C.pelo1,'ninguno',null,'tirantes','vaquero','botas','gafas'),
- maton2:A('maton2','media',4,'corto',C.pelo1,'capucha',null,'sudadera','chandalP','deportivas','ninguno'),
+ maton:A('maton','corpulenta',3,'rapado',C.pelo1,'ninguno',null,'tirantes','vaquero','botas','gafas'),
+ maton2:A('maton2','media',5,'corto',C.pelo1,'capucha',null,'sudadera','chandalP','deportivas','ninguno'),
  josu:A('josu','media',1,'corto',C.pelo2,'ninguno',null,'camisaRem','vestir','zapatos','ninguno'),
  txema:A('txema','corpulenta',2,'corto',C.pelo1,'ninguno',null,'abrigo','vestir','zapatos','ninguno'),
  mikel:A('mikel','media',1,'canoso',C.pelo5,'txapela',null,'jersey','vestir','zapatos','bufanda'),
@@ -2300,12 +2300,12 @@ const ARQ={
  enfermera:A('enfermera','delgada',3,'coleta',C.pelo1,'ninguno',null,'bata','vestir','deportivas','ninguno'),
  p1:A('p1','media',0,'corto',C.pelo2,'ninguno',null,'camisa','vestir','zapatos','bandolera'),
  p2:A('p2','delgada',1,'melena',C.pelo2,'ninguno',null,'gabardina','falda','zapatos','bolso'),
- p3:A('p3','media',1,'mono',C.pelo3,'ninguno',null,'jersey','falda','zapatos','carrito'),
+ p3:A('p3','media',2,'mono',C.pelo3,'ninguno',null,'jersey','falda','zapatos','carrito'),
  p4:A('p4','media',0,'canoso',C.pelo5,'txapela',null,'abrigo','vestir','zapatos','ninguno'),
- p5:A('p5','delgada',2,'corto',C.pelo1,'gorra',C.rojo,'chandal','chandalP','deportivas','mochila'),
+ p5:A('p5','delgada',3,'corto',C.pelo1,'gorra',C.rojo,'chandal','chandalP','deportivas','mochila'),
  p6:A('p6','corpulenta',2,'corto',C.pelo2,'cascoObra',null,'reflectante','cargo','botas','ninguno'),
  p7:A('p7','corpulenta',4,'rapado',C.pelo1,'lana',null,'reflectante','monoP','botas','ninguno'),
- p8:A('p8','delgada',3,'coleta',C.pelo1,'ninguno',null,'delantal','vestir','deportivas','ninguno'),
+ p8:A('p8','delgada',5,'coleta',C.pelo1,'ninguno',null,'delantal','vestir','deportivas','ninguno'),
  /* Los del mostrador. Se les ve mucho rato y de cerca, así que van con pinta propia y no
     con la de un peatón cualquiera. */
  nerea:A('nerea','delgada',0,'melena',C.pelo2,'ninguno',null,'polo','vestir','deportivas','ninguno'),
@@ -2314,26 +2314,32 @@ const ARQ={
  maite:A('maite','media',3,'coleta',C.pelo1,'ninguno',null,'chaqueta','falda','zapatos','ninguno'),
  /* Más gente por la calle. Ocho tipos no llenan una ciudad de siete kilómetros: a la
     tercera manzana ya has visto a todo el mundo dos veces. */
- p9: A('p9','media',0,'canoso',C.pelo5,'ninguno',null,'gabardina','vestir','zapatos','ninguno'),
- p10:A('p10','delgada',1,'mono',C.pelo2,'ninguno',null,'chaqueta','falda','zapatos','bolso'),
- p11:A('p11','delgada',2,'corto',C.pelo1,'ninguno',null,'sudadera','vaquero','deportivas','mochila'),
+ p9: A('p9','media',1,'canoso',C.pelo5,'ninguno',null,'gabardina','vestir','zapatos','ninguno'),
+ p10:A('p10','delgada',3,'mono',C.pelo2,'ninguno',null,'chaqueta','falda','zapatos','bolso'),
+ p11:A('p11','delgada',4,'corto',C.pelo1,'ninguno',null,'sudadera','vaquero','deportivas','mochila'),
  p12:A('p12','corpulenta',1,'calvo',C.pelo1,'lana',null,'jersey','cargo','botas','ninguno'),
- p13:A('p13','delgada',0,'coleta',C.pelo3,'ninguno',null,'camiseta','short','deportivas','ninguno'),
+ p13:A('p13','delgada',5,'coleta',C.pelo3,'ninguno',null,'camiseta','short','deportivas','ninguno'),
  p14:A('p14','media',0,'corto',C.pelo4,'visera',C.blanco,'camisaRem','short','deportivas','mochila'),
  p15:A('p15','corpulenta',3,'rapado',C.pelo1,'cascoObra',null,'mono','monoP','botas','ninguno'),
- p16:A('p16','media',1,'corto',C.pelo2,'ninguno',null,'delantal','vestir','zapatos','bandolera'),
+ p16:A('p16','media',2,'corto',C.pelo2,'ninguno',null,'delantal','vestir','zapatos','bandolera'),
  p17:A('p17','media',4,'afro',C.pelo1,'ninguno',null,'polo','vaquero','deportivas','bandolera'),
- p18:A('p18','media',0,'melena',C.pelo5,'txapela',null,'abrigo','vestir','zapatos','carrito'),
+ p18:A('p18','media',1,'melena',C.pelo5,'txapela',null,'abrigo','vestir','zapatos','carrito'),
+ /* Los de la esquina. No son enemigos —no atacan— pero visten como los matones y por eso
+    se leen distinto de un viandante: en un barrio con banda, ver una esquina con gente así
+    dice dónde estás sin un solo rótulo. Salen del mismo vestuario, sin un píxel nuevo. */
+ banda1:A('banda1','delgada',5,'rapado',C.pelo1,'ninguno',null,'tirantes','chandalP','deportivas','gafas'),
+ banda2:A('banda2','corpulenta',3,'corto',C.pelo1,'gorra',C.rojo,'chandal','chandalP','deportivas','ninguno'),
+ banda3:A('banda3','media',4,'rapado',C.pelo1,'ninguno',null,'cazadora','vaquero','botas','gafas'),
 };
 const PEATON_ARQ=['p1','p2','p3','p4','p5','p6','p7','p8','p9','p10','p11','p12',
- 'p13','p14','p15','p16','p17','p18'];
+ 'p13','p14','p15','p16','p17','p18','banda1','banda2','banda3'];
 /* Quién anda por dónde. En la Gran Vía hay gabardinas y en Zorrotzaurre monos de faena, y
    el plano ya nos dice cuál es cuál: no hay que repartir a nadie a mano. */
 const PEATON_BARRIO={
  senorial:  ['p1','p2','p4','p9','p10','p16','p18'],
- denso:     ['p1','p3','p5','p8','p11','p16','p17','p18'],
- bloques:   ['p1','p3','p5','p8','p11','p12','p13','p17','p18'],
- industrial:['p6','p7','p12','p15','p15','p5'],
+ denso:     ['p1','p3','p5','p8','p11','p16','p17','p18','banda3'],
+ bloques:   ['p1','p3','p5','p8','p11','p12','p13','p17','p18','banda1','banda2','banda3'],
+ industrial:['p6','p7','p12','p15','p15','p5','banda2'],
  abierto:   ['p13','p13','p14','p11','p5','p12'],
 };
 /* Una hoja por arquetipo: 8 columnas (direcciones) × 14 filas (poses).
@@ -2375,7 +2381,7 @@ function lienzoDeIndices(bytes,w,h){
    la suya. Encima se le forjan el pelo largo, el gorro y la bolsa, que es justo lo que
    habría multiplicado las hojas por setenta si viniera dibujado.
 
-   Siete hojas visten a los treinta y cuatro arquetipos, y el vecino número treinta y cinco
+   Siete hojas visten a los treinta y siete arquetipos, y el vecino número treinta y ocho
    no cuesta ni una llamada más. */
 
 /* De la ropa de un arquetipo a la hoja que le sirve. Lo que decide es la silueta, no el

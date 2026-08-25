@@ -202,7 +202,7 @@ variante cambia **por parches de 6 casillas**, que con un solo tile una manzana 
 plancha lisa.
 
 **El tráfico y los peatones también.** `TRAFICO_BARRIO` y `PEATON_BARRIO` reparten trece
-chasis y dieciocho arquetipos según el estilo: taxis y gabardinas por la Gran Vía, monos de
+chasis y veintiún arquetipos según el estilo: taxis y gabardinas por la Gran Vía, monos de
 faena y camiones en Zorrotzaurre, motos por el Casco.
 
 ## Los edificios singulares
@@ -485,7 +485,7 @@ Y de cada silueta se baja menos de lo que se ve: **cinco direcciones de ocho** �
 tres son espejo— y **once dibujos de dieciséis poses**, porque los pasos de apoyo del andar
 repiten y disparar es apuntar con el fogonazo encima. Salen 55 llamadas por silueta y **385
 para el juego entero**; pedir cuatro personajes completos eran 512 y vestían a cuatro. El
-arquetipo número treinta y cinco no cuesta ninguna.
+arquetipo número treinta y ocho no cuesta ninguna.
 
 Si no hay hoja de su silueta exacta, el juego busca la más parecida; si no hay ninguna, lo
 forja. **Nunca se queda nadie sin dibujar**, y por eso bajar una sola silueta ya es jugable.

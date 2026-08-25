@@ -145,8 +145,8 @@ public static class ForjaChar {
             void Add(Arquetipo a) { _arq[a.Nombre] = a; }
             Add(A("protagonista","media",1,"corto",Paleta.Pelo1,"txapela",Paleta.Carbon,"cazadora","vaquero","botas","ninguno"));
             Add(A("ertzaina","corpulenta",1,"rapado",Paleta.Pelo1,"policia",Paleta.AzulO,"uniforme","uniformeP","botas","ninguno"));
-            Add(A("maton","corpulenta",2,"rapado",Paleta.Pelo1,"ninguno",Paleta.Carbon,"tirantes","vaquero","botas","gafas"));
-            Add(A("maton2","media",4,"corto",Paleta.Pelo1,"capucha",Paleta.Carbon,"sudadera","chandalP","deportivas","ninguno"));
+            Add(A("maton","corpulenta",3,"rapado",Paleta.Pelo1,"ninguno",Paleta.Carbon,"tirantes","vaquero","botas","gafas"));
+            Add(A("maton2","media",5,"corto",Paleta.Pelo1,"capucha",Paleta.Carbon,"sudadera","chandalP","deportivas","ninguno"));
             Add(A("josu","media",1,"corto",Paleta.Pelo2,"ninguno",Paleta.Carbon,"camisaRem","vestir","zapatos","ninguno"));
             Add(A("txema","corpulenta",2,"corto",Paleta.Pelo1,"ninguno",Paleta.Carbon,"abrigo","vestir","zapatos","ninguno"));
             Add(A("mikel","media",1,"canoso",Paleta.Pelo5,"txapela",Paleta.Carbon,"jersey","vestir","zapatos","bufanda"));
@@ -157,12 +157,12 @@ public static class ForjaChar {
             Add(A("enfermera","delgada",3,"coleta",Paleta.Pelo1,"ninguno",Paleta.Carbon,"bata","vestir","deportivas","ninguno"));
             Add(A("p1","media",0,"corto",Paleta.Pelo2,"ninguno",Paleta.Carbon,"camisa","vestir","zapatos","bandolera"));
             Add(A("p2","delgada",1,"melena",Paleta.Pelo2,"ninguno",Paleta.Carbon,"gabardina","falda","zapatos","bolso"));
-            Add(A("p3","media",1,"mono",Paleta.Pelo3,"ninguno",Paleta.Carbon,"jersey","falda","zapatos","carrito"));
+            Add(A("p3","media",2,"mono",Paleta.Pelo3,"ninguno",Paleta.Carbon,"jersey","falda","zapatos","carrito"));
             Add(A("p4","media",0,"canoso",Paleta.Pelo5,"txapela",Paleta.Carbon,"abrigo","vestir","zapatos","ninguno"));
-            Add(A("p5","delgada",2,"corto",Paleta.Pelo1,"gorra",Paleta.Rojo,"chandal","chandalP","deportivas","mochila"));
+            Add(A("p5","delgada",3,"corto",Paleta.Pelo1,"gorra",Paleta.Rojo,"chandal","chandalP","deportivas","mochila"));
             Add(A("p6","corpulenta",2,"corto",Paleta.Pelo2,"cascoObra",Paleta.Mostaza,"reflectante","cargo","botas","ninguno"));
             Add(A("p7","corpulenta",4,"rapado",Paleta.Pelo1,"lana",Paleta.RojoO,"reflectante","monoP","botas","ninguno"));
-            Add(A("p8","delgada",3,"coleta",Paleta.Pelo1,"ninguno",Paleta.Carbon,"delantal","vestir","deportivas","ninguno"));
+            Add(A("p8","delgada",5,"coleta",Paleta.Pelo1,"ninguno",Paleta.Carbon,"delantal","vestir","deportivas","ninguno"));
             // Los del mostrador. Se les ve mucho rato y de cerca, así que van con pinta
             // propia y no con la de un peatón cualquiera.
             Add(A("nerea","delgada",0,"melena",Paleta.Pelo2,"ninguno",Paleta.Carbon,"polo","vestir","deportivas","ninguno"));
@@ -171,29 +171,35 @@ public static class ForjaChar {
             Add(A("maite","media",3,"coleta",Paleta.Pelo1,"ninguno",default(Color32),"chaqueta","falda","zapatos","ninguno"));
             // Más gente por la calle. Ocho tipos no llenan una ciudad de siete kilómetros:
             // a la tercera manzana ya has visto a todo el mundo dos veces.
-            Add(A("p9", "media",   0,"canoso",Paleta.Pelo5,"ninguno",  Paleta.Carbon,"gabardina","vestir",  "zapatos",   "ninguno"));
-            Add(A("p10","delgada", 1,"mono",  Paleta.Pelo2,"ninguno",  Paleta.Carbon,"chaqueta", "falda",   "zapatos",   "bolso"));
-            Add(A("p11","delgada", 2,"corto", Paleta.Pelo1,"ninguno",  Paleta.Carbon,"sudadera", "vaquero", "deportivas","mochila"));
+            Add(A("p9", "media",   1,"canoso",Paleta.Pelo5,"ninguno",  Paleta.Carbon,"gabardina","vestir",  "zapatos",   "ninguno"));
+            Add(A("p10","delgada", 3,"mono",  Paleta.Pelo2,"ninguno",  Paleta.Carbon,"chaqueta", "falda",   "zapatos",   "bolso"));
+            Add(A("p11","delgada", 4,"corto", Paleta.Pelo1,"ninguno",  Paleta.Carbon,"sudadera", "vaquero", "deportivas","mochila"));
             Add(A("p12","corpulenta",1,"calvo",Paleta.Pelo1,"lana",    Paleta.Carbon,"jersey",   "cargo",   "botas",     "ninguno"));
-            Add(A("p13","delgada", 0,"coleta",Paleta.Pelo3,"ninguno",  Paleta.Carbon,"camiseta", "short",   "deportivas","ninguno"));
+            Add(A("p13","delgada", 5,"coleta",Paleta.Pelo3,"ninguno",  Paleta.Carbon,"camiseta", "short",   "deportivas","ninguno"));
             Add(A("p14","media",   0,"corto", Paleta.Pelo4,"visera",   Paleta.Blanco,"camisaRem","short",   "deportivas","mochila"));
             Add(A("p15","corpulenta",3,"rapado",Paleta.Pelo1,"cascoObra",Paleta.Carbon,"mono",   "monoP",   "botas",     "ninguno"));
-            Add(A("p16","media",   1,"corto", Paleta.Pelo2,"ninguno",  Paleta.Carbon,"delantal", "vestir",  "zapatos",   "bandolera"));
+            Add(A("p16","media",   2,"corto", Paleta.Pelo2,"ninguno",  Paleta.Carbon,"delantal", "vestir",  "zapatos",   "bandolera"));
             Add(A("p17","media",   4,"afro",  Paleta.Pelo1,"ninguno",  Paleta.Carbon,"polo",     "vaquero", "deportivas","bandolera"));
-            Add(A("p18","media",   0,"melena",Paleta.Pelo5,"txapela",  Paleta.Carbon,"abrigo",   "vestir",  "zapatos",   "carrito"));
+            Add(A("p18","media",   1,"melena",Paleta.Pelo5,"txapela",  Paleta.Carbon,"abrigo",   "vestir",  "zapatos",   "carrito"));
+            // Los de la esquina. No son enemigos —no atacan— pero visten como los matones
+            // y por eso se leen distinto de un viandante: en un barrio con banda, ver una
+            // esquina con gente así dice dónde estás sin un solo rótulo.
+            Add(A("banda1","delgada",   5,"rapado",Paleta.Pelo1,"ninguno",Paleta.Carbon,"tirantes","chandalP","deportivas","gafas"));
+            Add(A("banda2","corpulenta",3,"corto", Paleta.Pelo1,"gorra",  Paleta.Rojo,  "chandal", "chandalP","deportivas","ninguno"));
+            Add(A("banda3","media",     4,"rapado",Paleta.Pelo1,"ninguno",Paleta.Carbon,"cazadora","vaquero", "botas",     "gafas"));
             return _arq;
         }
     }
 
     public static readonly string[] PeatonArq = { "p1","p2","p3","p4","p5","p6","p7","p8",
-        "p9","p10","p11","p12","p13","p14","p15","p16","p17","p18" };
+        "p9","p10","p11","p12","p13","p14","p15","p16","p17","p18","banda1","banda2","banda3" };
     /// <summary>Quién anda por dónde. En la Gran Vía hay gabardinas y en Zorrotzaurre monos
     /// de faena, y el plano ya nos dice cuál es cuál: no hay que repartir a nadie a mano.</summary>
     static readonly Dictionary<string,string[]> PeatonBarrio = new Dictionary<string,string[]> {
         {"senorial",  new[]{"p1","p2","p4","p9","p10","p16","p18"}},
-        {"denso",     new[]{"p1","p3","p5","p8","p11","p16","p17","p18"}},
-        {"bloques",   new[]{"p1","p3","p5","p8","p11","p12","p13","p17","p18"}},
-        {"industrial",new[]{"p6","p7","p12","p15","p15","p5"}},
+        {"denso",     new[]{"p1","p3","p5","p8","p11","p16","p17","p18","banda3"}},
+        {"bloques",   new[]{"p1","p3","p5","p8","p11","p12","p13","p17","p18","banda1","banda2","banda3"}},
+        {"industrial",new[]{"p6","p7","p12","p15","p15","p5","banda2"}},
         {"abierto",   new[]{"p13","p13","p14","p11","p5","p12"}},
     };
     public static string ArqPeaton(Vector2 p) {
