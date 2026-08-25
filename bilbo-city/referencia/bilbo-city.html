@@ -2136,19 +2136,26 @@ function dibChar(cfg,pose,d8){
  const cx=10+(diag?(dir===DE?-1:1):0)+(lateral?(dir===DE?1:-1):0);
  const oy=P_.y, yt=P_.yt||0, w=comp.w, hom=comp.hom-(diag?1:0)-(lateral?2:0);
  const izqV=dir===IZ, derV=dir===DE, arr=(dir===AR)||espalda;
- const py=17+oy, l1=P_.p[0], l2=P_.p[1];
+ /* La cabezona. Los pies no se mueven —CONTEXT.md §18.1 los clava en la fila 30— así que
+    los dos píxeles que gana la cabeza salen de una fila del torso y otra de las perneras.
+    Sube la proporción de 8/26 (1/3,25) a 10/26 (1/2,6), que es lo que da el aire cabezón
+    de un cenital: la cara es lo único que distingue las ocho direcciones, y a ocho píxeles
+    no le cabe. Va por arquetipo a propósito, para poder verlo en uno antes que en todos. */
+ const cabez=!!cfg.cabezona;
+ const HW=cabez?10:8, HH=cabez?10:8, h2=HW/2, PH=cabez?7:8;
+ const py=(cabez?18:17)+oy, l1=P_.p[0], l2=P_.p[1];
  /* La pernera de delante lleva su canto claro a la izquierda, que es de donde viene la
     luz, y la de detrás se queda en sombra: sin eso las dos piernas son un solo bloque. */
  if(PN.falda){P(g,cx-w/2-1,py-1,w+2,6,PN.b);P(g,cx-w/2-1,py-1,w+2,1,PN.l);P(g,cx-w/2-1,py+4,w+2,1,PN.s);
   P(g,cx-3,py+5,2,4,cfg.piel);P(g,cx+1,py+5,2,4,cfg.piel);
   P(g,cx-3,py+8,2,1,cfg.pielS);P(g,cx+1,py+8,2,1,cfg.pielS);}
  else if(lateral){const dx=derV?1:-1;
-  P(g,cx-2-dx,py+l2,3,8-l2,PN.s);P(g,cx-2+dx,py+l1,3,8-l1,PN.b);
-  P(g,cx-2+dx,py+l1,1,8-l1,PN.l);
+  P(g,cx-2-dx,py+l2,3,PH-l2,PN.s);P(g,cx-2+dx,py+l1,3,PH-l1,PN.b);
+  P(g,cx-2+dx,py+l1,1,PH-l1,PN.l);
   if(PN.corto)P(g,cx-2+dx,py+4,3,4,cfg.piel);}
- else{P(g,cx-3,py+l1,3,8-l1,PN.b);P(g,cx,py+l2,3,8-l2,PN.s);
-  P(g,cx-3,py+l1,1,8-l1,PN.l);
-  if(PN.raya){P(g,cx-3,py+l1,1,8-l1,PN.raya);P(g,cx+2,py+l2,1,8-l2,PN.raya);}
+ else{P(g,cx-3,py+l1,3,PH-l1,PN.b);P(g,cx,py+l2,3,PH-l2,PN.s);
+  P(g,cx-3,py+l1,1,PH-l1,PN.l);
+  if(PN.raya){P(g,cx-3,py+l1,1,PH-l1,PN.raya);P(g,cx+2,py+l2,1,PH-l2,PN.raya);}
   if(PN.corto){P(g,cx-3,py+4,3,4,cfg.piel);P(g,cx,py+4,3,4,cfg.piel);}}
  /* Bajo falda los pies van donde la falda deja las piernas —dos píxeles— y no donde los
     pone la plantilla lateral, que son tres y cuatro: descuadrados asomaba medio zapato por
@@ -2161,7 +2168,7 @@ function dibChar(cfg,pose,d8){
   P(g,cx-2-dx,25+oy,3,1,Z.s);P(g,cx-2+dx,25+oy,4,1,Z.s);}
  else{P(g,cx-3,24+oy,3,2,Z.b);P(g,cx,24+oy,3,2,Z.b);
   P(g,cx-3,25+oy,3,1,Z.s);P(g,cx,25+oy,3,1,Z.s);}
- const ty=9+oy+yt,th=T.largo?10:8;
+ const ty=(cabez?11:9)+oy+yt,th=(T.largo?10:8)-(cabez?1:0);
  /* Antes el tono claro eran las dos filas de arriba enteras: eso no es volumen, es una
     franja, y el torso quedaba de cartón. La regla de ESTILO.md es 1 px claro arriba y a la
     izquierda, base en el cuerpo y oscuro abajo y a la derecha. La fila oscura de abajo hace
@@ -2199,16 +2206,16 @@ function dibChar(cfg,pose,d8){
   P(g,bf,ty+1+b1,2,6,bL);P(g,bf,manoY+b1,2,2,cfg.piel);
  }else{P(g,bx1,ty+1+b1,2,6,bL);P(g,bx2,ty+1+b2,2,6,bS);
   P(g,bx1,manoY+b1,2,2,cfg.piel);P(g,bx2,manoY+b2,2,2,cfg.piel);}
- const hy=1+oy+yt;
- P(g,cx-4,hy,8,8,cfg.piel);P(g,cx+3,hy,1,8,cfg.pielS);P(g,cx-4,hy,8,1,cfg.pielS);
- if(dir===AB){P(g,cx-2,hy+4,1,2,C.negro);P(g,cx+1,hy+4,1,2,C.negro);P(g,cx-1,hy+7,2,1,cfg.pielS);}
- if(izqV){P(g,cx-4,hy+4,1,2,C.negro);P(g,cx-4,hy,4,8,cfg.pielS);}
- if(derV){P(g,cx+3,hy+4,1,2,C.negro);P(g,cx,hy,4,8,cfg.pielS);}
- if(frente){if(derV){P(g,cx,hy,4,8,cfg.piel);P(g,cx,hy+4,1,2,C.negro);P(g,cx+2,hy+6,1,1,cfg.pielS);}
-  else{P(g,cx-1,hy,4,8,cfg.piel);P(g,cx+2,hy+4,1,2,C.negro);P(g,cx-3,hy+6,1,1,cfg.pielS);}}
- if(espalda)P(g,cx-4,hy,8,8,cfg.pielS);
- if(P_.herido&&dir===AB)P(g,cx-2,hy+4,4,1,C.sangre);
- capasEncima(g,cfg,cx,hy,ty,hom,{dir,arr,T,izqV,derV,fog:P_.fog},0);
+ const hy=1+oy+yt, hx=cx-h2, ey=hy+(cabez?5:4), my=hy+HH-(cabez?2:1), eo=cabez?3:2;
+ P(g,hx,hy,HW,HH,cfg.piel);P(g,hx+HW-1,hy,1,HH,cfg.pielS);P(g,hx,hy,HW,1,cfg.pielS);
+ if(dir===AB){P(g,cx-eo,ey,1,2,C.negro);P(g,cx+eo-1,ey,1,2,C.negro);P(g,cx-1,my,2,1,cfg.pielS);}
+ if(izqV){P(g,hx,ey,1,2,C.negro);P(g,hx,hy,h2,HH,cfg.pielS);}
+ if(derV){P(g,hx+HW-1,ey,1,2,C.negro);P(g,cx,hy,h2,HH,cfg.pielS);}
+ if(frente){if(derV){P(g,cx,hy,h2,HH,cfg.piel);P(g,cx,ey,1,2,C.negro);P(g,cx+2,ey+2,1,1,cfg.pielS);}
+  else{P(g,cx-1,hy,h2,HH,cfg.piel);P(g,cx+2,ey,1,2,C.negro);P(g,cx-3,ey+2,1,1,cfg.pielS);}}
+ if(espalda)P(g,hx,hy,HW,HH,cfg.pielS);
+ if(P_.herido&&dir===AB)P(g,cx-eo,ey,4,1,C.sangre);
+ capasEncima(g,cfg,cx,hy,ty,hom,{dir,arr,T,izqV,derV,fog:P_.fog,HW,HH,ey},0);
  /* Contorno solo por fuera, como los iconos y por lo mismo: la gente cruza del asfalto
     a la acera y de la acera al parque, y una cazadora gris sobre hormigón gris sin borde
     se deshace. Las costuras de la ropa no llevan, que a 20 píxeles taparían el dibujo. */
@@ -2222,36 +2229,40 @@ function dibChar(cfg,pose,d8){
    Con `soloGrandes` el pelo corto no se repite —ese ya viene en la hoja— y solo se añaden
    los peinados que cambian el contorno de la cabeza. */
 const GRANDES={melena:1,coleta:1,mono:1,afro:1};
+/* Todo lo de la cabeza va en función de lo que mide la cabeza, no del ocho de siempre:
+   con la cabezona del protagonista, un gorro clavado a ocho se le queda de bufón. Con
+   HW=8 sale píxel a píxel lo de antes, así que los otros arquetipos no se mueven. */
 function capasEncima(g,cfg,cx,hy,ty,hom,E,soloGrandes){
  const dir=E.dir,arr=E.arr,T=E.T,izqV=E.izqV,derV=E.derV;
+ const HW=E.HW||8, HH=E.HH||8, h2=HW/2, ey=E.ey!==undefined?E.ey:hy+4;
  const pc=cfg.pelo==='canoso'?C.pelo5:cfg.pelocol, est=cfg.pelo;
  if(est!=='calvo'&&(!soloGrandes||GRANDES[est])){
-  if(est==='rapado')P(g,cx-4,hy-1,8,3,pc);
-  else if(est==='corto'){P(g,cx-4,hy-2,8,4,pc);if(!arr)P(g,cx-4,hy+2,2,2,pc);}
-  else if(est==='melena'){P(g,cx-5,hy-2,10,4,pc);P(g,cx-5,hy+2,2,7,pc);P(g,cx+3,hy+2,2,7,pc);}
-  else if(est==='coleta'){P(g,cx-4,hy-2,8,4,pc);P(g,cx-6,hy+1,2,6,pc);}
-  else if(est==='mono'){P(g,cx-4,hy-2,8,4,pc);P(g,cx-2,hy-4,4,2,pc);}
-  else if(est==='afro')P(g,cx-6,hy-4,12,7,pc);
-  else P(g,cx-4,hy-2,8,4,pc);
-  if(arr)P(g,cx-4,hy-2,8,8,pc);}
+  if(est==='rapado')P(g,cx-h2,hy-1,HW,3,pc);
+  else if(est==='corto'){P(g,cx-h2,hy-2,HW,4,pc);if(!arr)P(g,cx-h2,hy+2,2,2,pc);}
+  else if(est==='melena'){P(g,cx-h2-1,hy-2,HW+2,4,pc);P(g,cx-h2-1,hy+2,2,7,pc);P(g,cx+h2-1,hy+2,2,7,pc);}
+  else if(est==='coleta'){P(g,cx-h2,hy-2,HW,4,pc);P(g,cx-h2-2,hy+1,2,6,pc);}
+  else if(est==='mono'){P(g,cx-h2,hy-2,HW,4,pc);P(g,cx-2,hy-4,4,2,pc);}
+  else if(est==='afro')P(g,cx-h2-2,hy-4,HW+4,7,pc);
+  else P(g,cx-h2,hy-2,HW,4,pc);
+  if(arr)P(g,cx-h2,hy-2,HW,HH,pc);}
  const G=cfg.gorro;
  /* Los gorros llevan su brillo de arriba a la izquierda como todo lo demás. Y ninguno
     pasa de diez píxeles de ancho: la cabeza mide ocho, y con el contorno alrededor un
     gorro de doce deja de parecer un gorro y parece una nube. */
- if(G==='txapela'){P(g,cx-4,hy-3,8,3,C.carbon);P(g,cx-4,hy-3,5,1,C.gris);
-  P(g,cx-5,hy,10,1,C.carbon);P(g,cx-5,hy,4,1,C.gris);P(g,cx-1,hy-4,2,1,C.gris);}
- else if(G==='gorra'){P(g,cx-4,hy-3,8,3,cfg.gorroCol);P(g,cx-4,hy-3,5,1,C.hueso);
-  if(!arr)P(g,cx-4,hy,6,1,cfg.gorroCol);}
- else if(G==='visera'){P(g,cx-4,hy-2,8,2,cfg.gorroCol);P(g,cx-4,hy-2,5,1,C.hueso);
-  if(!arr)P(g,cx-5,hy,7,1,cfg.gorroCol);}
- else if(G==='cascoObra'){P(g,cx-5,hy-4,10,5,C.mostaza);P(g,cx-5,hy-4,6,1,C.hueso);
-  P(g,cx+4,hy-4,1,5,C.mostazaO);P(g,cx-6,hy,12,1,C.mostazaO);P(g,cx-1,hy-4,2,1,C.mostazaO);}
- else if(G==='cascoMoto'){P(g,cx-5,hy-3,10,9,C.rojo);P(g,cx-5,hy-3,6,1,C.rojoL);
-  P(g,cx+4,hy-3,1,9,C.rojoO);if(!arr)P(g,cx-3,hy+2,6,3,C.carbon);}
- else if(G==='lana'){P(g,cx-4,hy-3,8,4,C.rojoO);P(g,cx-4,hy-3,5,1,C.rojo);P(g,cx-4,hy+1,8,1,C.rojo);}
- else if(G==='policia'){P(g,cx-4,hy-3,8,3,C.azulO);P(g,cx-4,hy-3,5,1,C.azul);
-  if(!arr){P(g,cx-5,hy,8,1,C.azulO);P(g,cx-1,hy-2,2,1,C.mostaza);}}
- else if(G==='capucha'){P(g,cx-5,hy-2,10,6,T.s);if(!arr)P(g,cx-3,hy+1,6,5,cfg.piel);}
+ if(G==='txapela'){P(g,cx-h2,hy-3,HW,3,C.carbon);P(g,cx-h2,hy-3,HW-3,1,C.gris);
+  P(g,cx-h2-1,hy,HW+2,1,C.carbon);P(g,cx-h2-1,hy,4,1,C.gris);P(g,cx-1,hy-4,2,1,C.gris);}
+ else if(G==='gorra'){P(g,cx-h2,hy-3,HW,3,cfg.gorroCol);P(g,cx-h2,hy-3,HW-3,1,C.hueso);
+  if(!arr)P(g,cx-h2,hy,HW-2,1,cfg.gorroCol);}
+ else if(G==='visera'){P(g,cx-h2,hy-2,HW,2,cfg.gorroCol);P(g,cx-h2,hy-2,HW-3,1,C.hueso);
+  if(!arr)P(g,cx-h2-1,hy,HW-1,1,cfg.gorroCol);}
+ else if(G==='cascoObra'){P(g,cx-h2-1,hy-4,HW+2,5,C.mostaza);P(g,cx-h2-1,hy-4,HW-2,1,C.hueso);
+  P(g,cx+h2,hy-4,1,5,C.mostazaO);P(g,cx-h2-2,hy,HW+4,1,C.mostazaO);P(g,cx-1,hy-4,2,1,C.mostazaO);}
+ else if(G==='cascoMoto'){P(g,cx-h2-1,hy-3,HW+2,9,C.rojo);P(g,cx-h2-1,hy-3,HW-2,1,C.rojoL);
+  P(g,cx+h2,hy-3,1,9,C.rojoO);if(!arr)P(g,cx-3,hy+2,6,3,C.carbon);}
+ else if(G==='lana'){P(g,cx-h2,hy-3,HW,4,C.rojoO);P(g,cx-h2,hy-3,HW-3,1,C.rojo);P(g,cx-h2,hy+1,HW,1,C.rojo);}
+ else if(G==='policia'){P(g,cx-h2,hy-3,HW,3,C.azulO);P(g,cx-h2,hy-3,HW-3,1,C.azul);
+  if(!arr){P(g,cx-h2-1,hy,HW,1,C.azulO);P(g,cx-1,hy-2,2,1,C.mostaza);}}
+ else if(G==='capucha'){P(g,cx-h2-1,hy-2,HW+2,6,T.s);if(!arr)P(g,cx-3,hy+1,6,5,cfg.piel);}
  const A=cfg.acces;
  if(A==='mochila'){if(arr)P(g,cx-4,ty+1,8,7,C.verdeO);
   else{P(g,cx-hom/2-1,ty+2,2,5,C.verdeO);P(g,cx+hom/2-1,ty+2,2,5,C.verdeO);}}
@@ -2269,9 +2280,9 @@ function capasEncima(g,cfg,cx,hy,ty,hom,E,soloGrandes){
     cara y en ninguna de las tres de espaldas. Antes solo se dibujaban mirando abajo: en
     las otras siete el tipo se las quitaba solo. El brillo va arriba, como en todo. */
  else if(A==='gafas'&&!arr){
-  if(izqV){P(g,cx-4,hy+4,3,2,C.carbon);P(g,cx-4,hy+4,3,1,C.gris);}
-  else if(derV){P(g,cx+1,hy+4,3,2,C.carbon);P(g,cx+1,hy+4,3,1,C.gris);}
-  else{P(g,cx-3,hy+4,6,2,C.carbon);P(g,cx-3,hy+4,6,1,C.gris);P(g,cx-1,hy+5,2,1,C.carbon);}}
+  if(izqV){P(g,cx-h2,ey,3,2,C.carbon);P(g,cx-h2,ey,3,1,C.gris);}
+  else if(derV){P(g,cx+h2-3,ey,3,2,C.carbon);P(g,cx+h2-3,ey,3,1,C.gris);}
+  else{P(g,cx-3,ey,6,2,C.carbon);P(g,cx-3,ey,6,1,C.gris);P(g,cx-1,ey+1,2,1,C.carbon);}}
  else if(A==='carrito'&&!arr){P(g,cx+4,ty+5,5,8,C.rojoO);P(g,cx+4,ty+5,5,2,C.rojo);
   P(g,cx+5,ty+13,1,2,C.carbon);P(g,cx+7,ty+13,1,2,C.carbon);}
  /* El fogonazo sale del cañón, y el cañón está donde acaba la mano: a siete píxeles del
@@ -2331,6 +2342,9 @@ const ARQ={
  banda2:A('banda2','corpulenta',3,'corto',C.pelo1,'gorra',C.rojo,'chandal','chandalP','deportivas','ninguno'),
  banda3:A('banda3','media',4,'rapado',C.pelo1,'ninguno',null,'cazadora','vaquero','botas','gafas'),
 };
+/* De momento solo el protagonista. Vestirse hace `Object.assign` sobre este mismo objeto,
+   así que la bandera sobrevive a cambiarse de ropa. */
+ARQ.protagonista.cabezona=1;
 const PEATON_ARQ=['p1','p2','p3','p4','p5','p6','p7','p8','p9','p10','p11','p12',
  'p13','p14','p15','p16','p17','p18','banda1','banda2','banda3'];
 /* Quién anda por dónde. En la Gran Vía hay gabardinas y en Zorrotzaurre monos de faena, y

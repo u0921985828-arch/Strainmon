@@ -13,6 +13,7 @@ public enum Pose {
 public struct Arquetipo {
     public string Nombre, Pelo, Gorro, Torso, Piernas, Calzado, Acces, Complexion;
     public Color32 Piel, PielS, PeloCol, GorroCol;
+    public bool Cabezona;
 }
 
 /// <summary>
@@ -187,6 +188,9 @@ public static class ForjaChar {
             Add(A("banda1","delgada",   5,"rapado",Paleta.Pelo1,"ninguno",Paleta.Carbon,"tirantes","chandalP","deportivas","gafas"));
             Add(A("banda2","corpulenta",3,"corto", Paleta.Pelo1,"gorra",  Paleta.Rojo,  "chandal", "chandalP","deportivas","ninguno"));
             Add(A("banda3","media",     4,"rapado",Paleta.Pelo1,"ninguno",Paleta.Carbon,"cazadora","vaquero", "botas",     "gafas"));
+            // De momento solo el protagonista. Arquetipo es un struct, así que hay que
+            // volver a meterlo en el diccionario para que el cambio no se quede en la copia.
+            var prota = _arq["protagonista"]; prota.Cabezona = true; _arq["protagonista"] = prota;
             return _arq;
         }
     }
@@ -227,9 +231,16 @@ public static class ForjaChar {
         int oy = P_.y;
         int hom = hom0 - (diag ? 1 : 0) - (lateral ? 2 : 0);
         bool izqV = dir == IZ, derV = dir == DE, arr = (dir == AR) || espalda;
+        // La cabezona. Los pies no se mueven —CONTEXT.md §18.1 los clava en la fila 30— así
+        // que los dos píxeles que gana la cabeza salen de una fila del torso y otra de las
+        // perneras. Sube la proporción de 8/26 (1/3,25) a 10/26 (1/2,6), que es lo que da el
+        // aire cabezón de un cenital: la cara es lo único que distingue las ocho direcciones,
+        // y a ocho píxeles no le cabe. Va por arquetipo, para verlo en uno antes que en todos.
+        bool cabez = cfg.Cabezona;
+        int HW = cabez ? 10 : 8, HH = cabez ? 10 : 8, h2 = HW/2, PH = cabez ? 7 : 8;
 
         // ── piernas ──
-        int py = MG_ARR + 17 + oy, l1 = P_.p0, l2 = P_.p1;
+        int py = MG_ARR + (cabez ? 18 : 17) + oy, l1 = P_.p0, l2 = P_.p1;
         // La pernera de delante lleva su canto claro a la izquierda, que es de donde viene
         // la luz, y la de detrás se queda en sombra: sin eso las dos piernas son un bloque.
         if (PN.falda) {
@@ -242,15 +253,15 @@ public static class ForjaChar {
             L.P(cx + 1, py + 8, 2, 1, cfg.PielS);
         } else if (lateral) {
             int dx = derV ? 1 : -1;
-            L.P(cx - 2 - dx, py + l2, 3, 8 - l2, PN.s);
-            L.P(cx - 2 + dx, py + l1, 3, 8 - l1, PN.b);
-            L.P(cx - 2 + dx, py + l1, 1, 8 - l1, PN.l);
+            L.P(cx - 2 - dx, py + l2, 3, PH - l2, PN.s);
+            L.P(cx - 2 + dx, py + l1, 3, PH - l1, PN.b);
+            L.P(cx - 2 + dx, py + l1, 1, PH - l1, PN.l);
             if (PN.corto) L.P(cx - 2 + dx, py + 4, 3, 4, cfg.Piel);
         } else {
-            L.P(cx - 3, py + l1, 3, 8 - l1, PN.b);
-            L.P(cx, py + l2, 3, 8 - l2, PN.s);
-            L.P(cx - 3, py + l1, 1, 8 - l1, PN.l);
-            if (PN.tieneRaya) { L.P(cx - 3, py + l1, 1, 8 - l1, PN.raya); L.P(cx + 2, py + l2, 1, 8 - l2, PN.raya); }
+            L.P(cx - 3, py + l1, 3, PH - l1, PN.b);
+            L.P(cx, py + l2, 3, PH - l2, PN.s);
+            L.P(cx - 3, py + l1, 1, PH - l1, PN.l);
+            if (PN.tieneRaya) { L.P(cx - 3, py + l1, 1, PH - l1, PN.raya); L.P(cx + 2, py + l2, 1, PH - l2, PN.raya); }
             if (PN.corto) { L.P(cx - 3, py + 4, 3, 4, cfg.Piel); L.P(cx, py + 4, 3, 4, cfg.Piel); }
         }
         // Bajo falda los pies van donde la falda deja las piernas —dos píxeles— y no donde
@@ -271,7 +282,7 @@ public static class ForjaChar {
         }
 
         // ── torso ──
-        int ty = MG_ARR + 9 + oy + P_.yt, th = T.largo ? 10 : 8;
+        int ty = MG_ARR + (cabez ? 11 : 9) + oy + P_.yt, th = (T.largo ? 10 : 8) - (cabez ? 1 : 0);
         // Antes el tono claro eran las dos filas de arriba enteras: eso no es volumen, es
         // una franja, y el torso quedaba de cartón. La regla de ESTILO.md es 1 px claro
         // arriba y a la izquierda, base en el cuerpo y oscuro abajo y a la derecha. La fila
@@ -327,55 +338,56 @@ public static class ForjaChar {
 
         // ── cabeza ──
         int hy = MG_ARR + 1 + oy + P_.yt;
-        L.P(cx - 4, hy, 8, 8, cfg.Piel);
-        L.P(cx + 3, hy, 1, 8, cfg.PielS);
-        L.P(cx - 4, hy, 8, 1, cfg.PielS);
-        if (dir == AB) { L.P(cx - 2, hy + 4, 1, 2, Paleta.Negro); L.P(cx + 1, hy + 4, 1, 2, Paleta.Negro); L.P(cx - 1, hy + 7, 2, 1, cfg.PielS); }
-        if (izqV) { L.P(cx - 4, hy + 4, 1, 2, Paleta.Negro); L.P(cx - 4, hy, 4, 8, cfg.PielS); }
-        if (derV) { L.P(cx + 3, hy + 4, 1, 2, Paleta.Negro); L.P(cx, hy, 4, 8, cfg.PielS); }
+        int hx = cx - h2, ey = hy + (cabez ? 5 : 4), my = hy + HH - (cabez ? 2 : 1), eo = cabez ? 3 : 2;
+        L.P(hx, hy, HW, HH, cfg.Piel);
+        L.P(hx + HW - 1, hy, 1, HH, cfg.PielS);
+        L.P(hx, hy, HW, 1, cfg.PielS);
+        if (dir == AB) { L.P(cx - eo, ey, 1, 2, Paleta.Negro); L.P(cx + eo - 1, ey, 1, 2, Paleta.Negro); L.P(cx - 1, my, 2, 1, cfg.PielS); }
+        if (izqV) { L.P(hx, ey, 1, 2, Paleta.Negro); L.P(hx, hy, h2, HH, cfg.PielS); }
+        if (derV) { L.P(hx + HW - 1, ey, 1, 2, Paleta.Negro); L.P(cx, hy, h2, HH, cfg.PielS); }
         if (frente) {
-            if (derV) { L.P(cx, hy, 4, 8, cfg.Piel); L.P(cx, hy + 4, 1, 2, Paleta.Negro); L.P(cx + 2, hy + 6, 1, 1, cfg.PielS); }
-            else { L.P(cx - 1, hy, 4, 8, cfg.Piel); L.P(cx + 2, hy + 4, 1, 2, Paleta.Negro); L.P(cx - 3, hy + 6, 1, 1, cfg.PielS); }
+            if (derV) { L.P(cx, hy, h2, HH, cfg.Piel); L.P(cx, ey, 1, 2, Paleta.Negro); L.P(cx + 2, ey + 2, 1, 1, cfg.PielS); }
+            else { L.P(cx - 1, hy, h2, HH, cfg.Piel); L.P(cx + 2, ey, 1, 2, Paleta.Negro); L.P(cx - 3, ey + 2, 1, 1, cfg.PielS); }
         }
-        if (espalda) L.P(cx - 4, hy, 8, 8, cfg.PielS);
-        if (P_.herido && dir == AB) L.P(cx - 2, hy + 4, 4, 1, Paleta.Sangre);
+        if (espalda) L.P(hx, hy, HW, HH, cfg.PielS);
+        if (P_.herido && dir == AB) L.P(cx - eo, ey, 4, 1, Paleta.Sangre);
 
         // ── pelo ──
         Color32 pc = cfg.Pelo == "canoso" ? Paleta.Pelo5 : cfg.PeloCol;
         string est = cfg.Pelo;
         if (est != "calvo") {
-            if (est == "rapado") L.P(cx - 4, hy - 1, 8, 3, pc);
-            else if (est == "corto") { L.P(cx - 4, hy - 2, 8, 4, pc); if (!arr) L.P(cx - 4, hy + 2, 2, 2, pc); }
-            else if (est == "melena") { L.P(cx - 5, hy - 2, 10, 4, pc); L.P(cx - 5, hy + 2, 2, 7, pc); L.P(cx + 3, hy + 2, 2, 7, pc); }
-            else if (est == "coleta") { L.P(cx - 4, hy - 2, 8, 4, pc); L.P(cx - 6, hy + 1, 2, 6, pc); }
-            else if (est == "mono") { L.P(cx - 4, hy - 2, 8, 4, pc); L.P(cx - 2, hy - 4, 4, 2, pc); }
-            else if (est == "afro") L.P(cx - 6, hy - 4, 12, 7, pc);
-            else L.P(cx - 4, hy - 2, 8, 4, pc);
-            if (arr) L.P(cx - 4, hy - 2, 8, 8, pc);
+            if (est == "rapado") L.P(cx - h2, hy - 1, HW, 3, pc);
+            else if (est == "corto") { L.P(cx - h2, hy - 2, HW, 4, pc); if (!arr) L.P(cx - h2, hy + 2, 2, 2, pc); }
+            else if (est == "melena") { L.P(cx - h2 - 1, hy - 2, HW + 2, 4, pc); L.P(cx - h2 - 1, hy + 2, 2, 7, pc); L.P(cx + h2 - 1, hy + 2, 2, 7, pc); }
+            else if (est == "coleta") { L.P(cx - h2, hy - 2, HW, 4, pc); L.P(cx - h2 - 2, hy + 1, 2, 6, pc); }
+            else if (est == "mono") { L.P(cx - h2, hy - 2, HW, 4, pc); L.P(cx - 2, hy - 4, 4, 2, pc); }
+            else if (est == "afro") L.P(cx - h2 - 2, hy - 4, HW + 4, 7, pc);
+            else L.P(cx - h2, hy - 2, HW, 4, pc);
+            if (arr) L.P(cx - h2, hy - 2, HW, HH, pc);
         }
 
         // ── gorro ──
         switch (cfg.Gorro) {
-            // Los gorros llevan su brillo de arriba a la izquierda como todo lo demás. Y
-            // ninguno pasa de diez píxeles de ancho: la cabeza mide ocho, y con el contorno
-            // alrededor un gorro de doce deja de parecer un gorro y parece una nube.
+            // Los gorros llevan su brillo de arriba a la izquierda como todo lo demás, y
+            // todos se miden desde la cabeza (HW), no desde el ocho de siempre: con la
+            // cabezona, un gorro clavado a ocho se queda de bufón.
             case "txapela":
-                L.P(cx - 4, hy - 3, 8, 3, Paleta.Carbon); L.P(cx - 4, hy - 3, 5, 1, Paleta.Gris);
-                L.P(cx - 5, hy, 10, 1, Paleta.Carbon); L.P(cx - 5, hy, 4, 1, Paleta.Gris);
+                L.P(cx - h2, hy - 3, HW, 3, Paleta.Carbon); L.P(cx - h2, hy - 3, HW - 3, 1, Paleta.Gris);
+                L.P(cx - h2 - 1, hy, HW + 2, 1, Paleta.Carbon); L.P(cx - h2 - 1, hy, 4, 1, Paleta.Gris);
                 L.P(cx - 1, hy - 4, 2, 1, Paleta.Gris); break;
             case "gorra":
-                L.P(cx - 4, hy - 3, 8, 3, cfg.GorroCol); L.P(cx - 4, hy - 3, 5, 1, Paleta.Hueso);
-                if (!arr) L.P(cx - 4, hy, 6, 1, cfg.GorroCol); break;
+                L.P(cx - h2, hy - 3, HW, 3, cfg.GorroCol); L.P(cx - h2, hy - 3, HW - 3, 1, Paleta.Hueso);
+                if (!arr) L.P(cx - h2, hy, HW - 2, 1, cfg.GorroCol); break;
             case "visera":
-                L.P(cx - 4, hy - 2, 8, 2, cfg.GorroCol); L.P(cx - 4, hy - 2, 5, 1, Paleta.Hueso);
-                if (!arr) L.P(cx - 5, hy, 7, 1, cfg.GorroCol); break;
+                L.P(cx - h2, hy - 2, HW, 2, cfg.GorroCol); L.P(cx - h2, hy - 2, HW - 3, 1, Paleta.Hueso);
+                if (!arr) L.P(cx - h2 - 1, hy, HW - 1, 1, cfg.GorroCol); break;
             case "cascoObra":
-                L.P(cx - 5, hy - 4, 10, 5, Paleta.Mostaza); L.P(cx - 5, hy - 4, 6, 1, Paleta.Hueso);
-                L.P(cx + 4, hy - 4, 1, 5, Paleta.MostazaO); L.P(cx - 6, hy, 12, 1, Paleta.MostazaO);
+                L.P(cx - h2 - 1, hy - 4, HW + 2, 5, Paleta.Mostaza); L.P(cx - h2 - 1, hy - 4, HW - 2, 1, Paleta.Hueso);
+                L.P(cx + h2, hy - 4, 1, 5, Paleta.MostazaO); L.P(cx - h2 - 2, hy, HW + 4, 1, Paleta.MostazaO);
                 L.P(cx - 1, hy - 4, 2, 1, Paleta.MostazaO); break;
             case "cascoMoto":
-                L.P(cx - 5, hy - 3, 10, 9, Paleta.Rojo); L.P(cx - 5, hy - 3, 6, 1, Paleta.RojoL);
-                L.P(cx + 4, hy - 3, 1, 9, Paleta.RojoO);
+                L.P(cx - h2 - 1, hy - 3, HW + 2, 9, Paleta.Rojo); L.P(cx - h2 - 1, hy - 3, HW - 2, 1, Paleta.RojoL);
+                L.P(cx + h2, hy - 3, 1, 9, Paleta.RojoO);
                 if (!arr) L.P(cx - 3, hy + 2, 6, 3, Paleta.Carbon); break;
             case "lana":
                 L.P(cx - 4, hy - 3, 8, 4, Paleta.RojoO); L.P(cx - 4, hy - 3, 5, 1, Paleta.Rojo);
@@ -412,9 +424,9 @@ public static class ForjaChar {
             // mirando abajo: en las otras siete el tipo se las quitaba solo.
             case "gafas":
                 if (!arr) {
-                    if (izqV) { L.P(cx - 4, hy + 4, 3, 2, Paleta.Carbon); L.P(cx - 4, hy + 4, 3, 1, Paleta.Gris); }
-                    else if (derV) { L.P(cx + 1, hy + 4, 3, 2, Paleta.Carbon); L.P(cx + 1, hy + 4, 3, 1, Paleta.Gris); }
-                    else { L.P(cx - 3, hy + 4, 6, 2, Paleta.Carbon); L.P(cx - 3, hy + 4, 6, 1, Paleta.Gris); L.P(cx - 1, hy + 5, 2, 1, Paleta.Carbon); }
+                    if (izqV) { L.P(cx - h2, ey, 3, 2, Paleta.Carbon); L.P(cx - h2, ey, 3, 1, Paleta.Gris); }
+                    else if (derV) { L.P(cx + h2 - 3, ey, 3, 2, Paleta.Carbon); L.P(cx + h2 - 3, ey, 3, 1, Paleta.Gris); }
+                    else { L.P(cx - 3, ey, 6, 2, Paleta.Carbon); L.P(cx - 3, ey, 6, 1, Paleta.Gris); L.P(cx - 1, ey + 1, 2, 1, Paleta.Carbon); }
                 }
                 break;
             case "carrito":
