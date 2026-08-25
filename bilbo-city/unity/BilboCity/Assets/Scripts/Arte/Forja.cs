@@ -405,36 +405,43 @@ public static class Forja {
         // Las fachadas. La vista es cenital escorada, así que el canto sur de cada manzana
         // es lo único que se ve de la calle a pie de obra: estaba liso, una ciudad entera
         // de paredes ciegas con cincuenta y seis sitios y ni un escaparate más.
-        Lienzo Fach(System.Action<Lienzo> fn, Color32 col) {
-            var f = new Lienzo(16,13);
-            f.P(0,0,16,13,Paleta.Negro); f.P(1,1,14,12,col);
-            fn(f); return f;
+        // Cada local mide lo que mide de verdad. Iban todos a 16 px —2,58 m, el ancho de un
+        // portal— y por eso un utilitario ocupaba dos escaparates: un escaparate de Bilbao
+        // mide cuatro o cinco metros, no dos y medio. Medio local (16 px = 2,58 m) para
+        // portal, portal de piedra y garaje; entero (32 px = 5,16 m) para el resto.
+        Lienzo Fach(int w, System.Action<Lienzo,int> fn, Color32 col) {
+            var f = new Lienzo(w,13);
+            f.P(0,0,w,13,Paleta.Negro); f.P(1,1,w-2,12,col);
+            fn(f,w); return f;
         }
-        L = Fach(f => { f.P(4,3,8,10,Paleta.Madera); f.P(4,3,8,1,Paleta.MaderaL);
-                        f.P(10,8,2,2,Paleta.MostazaO); f.P(2,1,12,1,Paleta.HormigonL); }, Paleta.MaderaO);
+        L = Fach(16, (f,w) => { f.P(4,3,w-8,10,Paleta.Madera); f.P(4,3,w-8,1,Paleta.MaderaL);
+                        f.P(w-6,8,2,2,Paleta.MostazaO); f.P(2,1,w-4,1,Paleta.HormigonL); }, Paleta.MaderaO);
         Props["fachPortal"] = SpriteBase(L);
-        L = Fach(f => { f.P(3,2,10,11,Paleta.Carbon); f.P(4,3,8,10,Paleta.MaderaO);
-                        f.P(2,1,12,2,Paleta.HormigonL); f.P(11,8,1,2,Paleta.Mostaza); }, Paleta.HormigonO);
+        L = Fach(16, (f,w) => { f.P(3,2,w-6,11,Paleta.Carbon); f.P(4,3,w-8,10,Paleta.MaderaO);
+                        f.P(2,1,w-4,2,Paleta.HormigonL); f.P(w-5,8,1,2,Paleta.Mostaza); }, Paleta.HormigonO);
         Props["fachPortalPiedra"] = SpriteBase(L);
-        L = Fach(f => { f.P(2,4,12,9,Paleta.H("#3f5566")); f.P(3,5,10,4,Paleta.H("#7f9aa8"));
-                        f.P(2,2,12,2,Paleta.RojoO);
-                        for (int i = 2; i < 14; i += 3) f.P(i,2,2,2,Paleta.Crema); }, Paleta.HormigonO);
+        L = Fach(32, (f,w) => { f.P(2,4,w-4,9,Paleta.H("#3f5566")); f.P(3,5,w-6,4,Paleta.H("#7f9aa8"));
+                        f.P(w/2-1,4,2,9,Paleta.HormigonO);   // el montante que parte el cristal
+                        f.P(2,2,w-4,2,Paleta.RojoO);
+                        for (int i = 2; i < w-2; i += 3) f.P(i,2,2,2,Paleta.Crema); }, Paleta.HormigonO);
         Props["fachEscaparate"] = SpriteBase(L);
-        L = Fach(f => { f.P(2,5,12,8,Paleta.Carbon); f.P(3,6,10,3,Paleta.H("#e8dfa8"));
-                        f.P(2,2,12,3,Paleta.VerdeO); f.P(2,2,12,1,Paleta.VerdeL); }, Paleta.MaderaO);
+        L = Fach(32, (f,w) => { f.P(2,5,w-4,8,Paleta.Carbon); f.P(3,6,w-8,3,Paleta.H("#e8dfa8"));
+                        f.P(w-6,6,3,7,Paleta.MaderaO);       // la puerta, a un lado del ventanal
+                        f.P(2,2,w-4,3,Paleta.VerdeO); f.P(2,2,w-4,1,Paleta.VerdeL); }, Paleta.MaderaO);
         Props["fachTasca"] = SpriteBase(L);
-        L = Fach(f => { for (int y = 2; y < 13; y += 2) f.P(2,y,12,1,Paleta.Gris);
-                        f.P(2,2,12,1,Paleta.GrisL); f.P(6,7,4,1,Paleta.MostazaO); }, Paleta.GrisO);
+        L = Fach(32, (f,w) => { for (int y = 2; y < 13; y += 2) f.P(2,y,w-4,1,Paleta.Gris);
+                        f.P(2,2,w-4,1,Paleta.GrisL); f.P(w/2-2,7,4,1,Paleta.MostazaO); }, Paleta.GrisO);
         Props["fachPersiana"] = SpriteBase(L);
-        L = Fach(f => { for (int y = 3; y < 13; y += 3) f.P(1,y,14,2,Paleta.Acero);
-                        f.P(1,1,14,2,Paleta.HormigonO); }, Paleta.AceroO);
+        L = Fach(16, (f,w) => { for (int y = 3; y < 13; y += 3) f.P(1,y,w-2,2,Paleta.Acero);
+                        f.P(1,1,w-2,2,Paleta.HormigonO); }, Paleta.AceroO);
         Props["fachGaraje"] = SpriteBase(L);
-        L = Fach(f => { f.P(1,2,14,11,Paleta.AceroO);
-                        for (int x = 2; x < 15; x += 4) f.P(x,2,1,11,Paleta.Acero);
-                        f.P(1,1,14,1,Paleta.HormigonL); }, Paleta.GrisO);
+        L = Fach(32, (f,w) => { f.P(1,2,w-2,11,Paleta.AceroO);
+                        for (int x = 2; x < w-1; x += 4) f.P(x,2,1,11,Paleta.Acero);
+                        f.P(1,1,w-2,1,Paleta.HormigonL); }, Paleta.GrisO);
         Props["fachPorton"] = SpriteBase(L);
-        L = Fach(f => { f.P(2,2,12,3,Paleta.Hormigon); f.P(5,7,6,5,Paleta.Carbon);
-                        f.P(6,8,4,3,Paleta.H("#3f5566")); }, Paleta.HormigonO);
+        L = Fach(32, (f,w) => { f.P(2,2,w-4,3,Paleta.Hormigon);
+                        foreach (int vx in new[]{ w/4-3, w-w/4-3 }) {
+                            f.P(vx,7,6,5,Paleta.Carbon); f.P(vx+1,8,4,3,Paleta.H("#3f5566")); } }, Paleta.HormigonO);
         Props["fachCiega"] = SpriteBase(L);
         L = new Lienzo(10,30); L.P(4,13,2,17,Paleta.Carbon); L.P(2,1,6,13,Paleta.GrisO);
         L.P(3,2,4,3,Paleta.Rojo); L.P(3,6,4,3,Paleta.Mostaza); L.P(3,10,4,3,Paleta.VerdeL);

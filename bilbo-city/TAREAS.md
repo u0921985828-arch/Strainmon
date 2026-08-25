@@ -53,6 +53,11 @@ Repasar comportamiento contra el prototipo, que es el probado:
 
 ## 5 · Contenido que falta respecto al plan original
 
+- [ ] **Unity no coloca los locales.** `Mobiliario.FachBarrio` está declarado y no lo usa
+      nadie: la forja saca los ocho tipos de fachada a `Props` y luego no los pinta ninguno,
+      así que en Unity las manzanas siguen siendo paredes ciegas mientras en el HTML tienen
+      escaparates. Portar el bucle del HTML, que ahora rellena la casilla por anchos
+      (`ANCHO_FACH`): un local entero de 32 px o dos de medio.
 - [ ] Oclusión de interiores de manzana con transición.
 - [ ] Más variedad de diálogo en los parroquianos.
 - [ ] Misiones secundarias no encadenadas.

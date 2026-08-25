@@ -2923,6 +2923,11 @@ function S_(w,h,fn){const c=lienzo(w,h),g=c.getContext('2d');fn(g);return cuanti
 /* Qué se puede abrir en cada tipo de barrio. Se repite alguno a propósito: si todos los
    locales fueran distintos, una calle parecería una feria. */
 const FACH_H=13;
+/* Lo que mide cada local, en píxeles: medio (2,58 m, un portal) o entero (5,16 m, una
+   tienda). Va aquí arriba y no dentro de `generarProps()` porque quien lo necesita es el
+   pintado de la ciudad, que está en otro sitio. */
+const ANCHO_FACH={portal:16,portalPiedra:16,garaje:16,
+                  escaparate:32,tasca:32,persiana:32,porton:32,ciega:32};
 const FACH_BARRIO={
  denso:     ['tasca','persiana','portal','escaparate','portal','persiana','tasca','ciega'],
  senorial:  ['escaparate','portalPiedra','escaparate','ciega','portalPiedra','persiana'],
@@ -2943,32 +2948,42 @@ function generarProps(){
     casilla y el estilo del barrio: en el Casco hay tasca y persiana echada; en el
     Ensanche, escaparate con toldo y portal de madera; en los bloques, más portal que
     tienda; en la industria, portones de chapa. No hay nada escrito a mano. */
+ /* Cada local mide lo que mide de verdad. Iban todos a 16 px —2,58 m, el ancho de un
+    portal— y por eso un utilitario ocupaba dos escaparates: un escaparate de Bilbao mide
+    cuatro o cinco metros, no dos y medio. Ahora hay dos anchos, y la casilla se llena
+    con lo que quepa:
+      medio  (16 px = 2,58 m) portal, portal de piedra, garaje — que eso sí mide eso;
+      entero (32 px = 5,16 m) escaparate, tasca, persiana, portón y pared ciega.
+    Nada dibujado a mano: cada dibujo se pinta contra su propio ancho `w`. */
  PROP.fachadas={};
-  const local=(fn)=>{const c=lienzo(16,FACH_H),g=c.getContext('2d');fn(g);return cuantizar(c);};
- const marco=(g,col)=>{P(g,0,0,16,FACH_H,C.negro);P(g,1,1,14,FACH_H-1,col);};
- PROP.fachadas.portal=local(g=>{marco(g,C.maderaO);
-  P(g,4,3,8,FACH_H-3,C.madera);P(g,4,3,8,1,C.maderaL);P(g,10,8,2,2,C.mostazaO);
-  P(g,2,1,12,1,C.hormigonL);});
- PROP.fachadas.portalPiedra=local(g=>{marco(g,C.hormigonO);
-  P(g,3,2,10,FACH_H-2,C.carbon);P(g,4,3,8,FACH_H-3,C.maderaO);
-  P(g,2,1,12,2,C.hormigonL);P(g,11,8,1,2,C.mostaza);});
- PROP.fachadas.escaparate=local(g=>{marco(g,C.hormigonO);
-  P(g,2,4,12,FACH_H-4,'#3f5566');P(g,3,5,10,4,'#7f9aa8');
-  P(g,2,2,12,2,C.rojoO);for(let i=2;i<14;i+=3)P(g,i,2,2,2,C.crema);});
- PROP.fachadas.tasca=local(g=>{marco(g,C.maderaO);
-  P(g,2,5,12,FACH_H-5,C.carbon);P(g,3,6,10,3,'#e8dfa8');
-  P(g,2,2,12,3,C.verdeO);P(g,2,2,12,1,C.verdeL);});
- PROP.fachadas.persiana=local(g=>{marco(g,C.grisO);
-  for(let y=2;y<FACH_H;y+=2)P(g,2,y,12,1,C.gris);
-  P(g,2,2,12,1,C.grisL);P(g,6,7,4,1,C.mostazaO);});
- PROP.fachadas.garaje=local(g=>{marco(g,C.aceroO);
-  for(let y=3;y<FACH_H;y+=3)P(g,1,y,14,2,C.acero);
-  P(g,1,1,14,2,C.hormigonO);});
- PROP.fachadas.porton=local(g=>{marco(g,C.grisO);
-  P(g,1,2,14,FACH_H-2,C.aceroO);for(let x=2;x<15;x+=4)P(g,x,2,1,FACH_H-2,C.acero);
-  P(g,1,1,14,1,C.hormigonL);});
- PROP.fachadas.ciega=local(g=>{marco(g,C.hormigonO);
-  P(g,2,2,12,3,C.hormigon);P(g,5,7,6,5,C.carbon);P(g,6,8,4,3,'#3f5566');});
+ const local=(w,fn)=>{const c=lienzo(w,FACH_H),g=c.getContext('2d');fn(g,w);return cuantizar(c);};
+ const marco=(g,w,col)=>{P(g,0,0,w,FACH_H,C.negro);P(g,1,1,w-2,FACH_H-1,col);};
+ PROP.fachadas.portal=local(16,(g,w)=>{marco(g,w,C.maderaO);
+  P(g,4,3,w-8,FACH_H-3,C.madera);P(g,4,3,w-8,1,C.maderaL);P(g,w-6,8,2,2,C.mostazaO);
+  P(g,2,1,w-4,1,C.hormigonL);});
+ PROP.fachadas.portalPiedra=local(16,(g,w)=>{marco(g,w,C.hormigonO);
+  P(g,3,2,w-6,FACH_H-2,C.carbon);P(g,4,3,w-8,FACH_H-3,C.maderaO);
+  P(g,2,1,w-4,2,C.hormigonL);P(g,w-5,8,1,2,C.mostaza);});
+ PROP.fachadas.garaje=local(16,(g,w)=>{marco(g,w,C.aceroO);
+  for(let y=3;y<FACH_H;y+=3)P(g,1,y,w-2,2,C.acero);
+  P(g,1,1,w-2,2,C.hormigonO);});
+ PROP.fachadas.escaparate=local(32,(g,w)=>{marco(g,w,C.hormigonO);
+  P(g,2,4,w-4,FACH_H-4,'#3f5566');P(g,3,5,w-6,4,'#7f9aa8');
+  P(g,w/2-1,4,2,FACH_H-4,C.hormigonO);          /* el montante que parte el cristal */
+  P(g,2,2,w-4,2,C.rojoO);for(let i=2;i<w-2;i+=3)P(g,i,2,2,2,C.crema);});
+ PROP.fachadas.tasca=local(32,(g,w)=>{marco(g,w,C.maderaO);
+  P(g,2,5,w-4,FACH_H-5,C.carbon);P(g,3,6,w-8,3,'#e8dfa8');
+  P(g,w-6,6,3,FACH_H-6,C.maderaO);              /* la puerta, a un lado del ventanal */
+  P(g,2,2,w-4,3,C.verdeO);P(g,2,2,w-4,1,C.verdeL);});
+ PROP.fachadas.persiana=local(32,(g,w)=>{marco(g,w,C.grisO);
+  for(let y=2;y<FACH_H;y+=2)P(g,2,y,w-4,1,C.gris);
+  P(g,2,2,w-4,1,C.grisL);P(g,w/2-2,7,4,1,C.mostazaO);});
+ PROP.fachadas.porton=local(32,(g,w)=>{marco(g,w,C.grisO);
+  P(g,1,2,w-2,FACH_H-2,C.aceroO);for(let x=2;x<w-1;x+=4)P(g,x,2,1,FACH_H-2,C.acero);
+  P(g,1,1,w-2,1,C.hormigonL);});
+ PROP.fachadas.ciega=local(32,(g,w)=>{marco(g,w,C.hormigonO);
+  P(g,2,2,w-4,3,C.hormigon);
+  for(const vx of [w/4-3,w-w/4-3]){P(g,vx,7,6,5,C.carbon);P(g,vx+1,8,4,3,'#3f5566');}});
  PROP.deposito=S_(18,20,g=>{P(g,3,4,12,14,'#7f9aa8');P(g,3,4,12,3,'#a8c4d0');
   P(g,15,4,2,14,C.aceroO);P(g,4,18,3,2,C.carbon);P(g,12,18,3,2,C.carbon);
   P(g,5,1,8,3,C.acero);});
@@ -6245,8 +6260,14 @@ function dibCiudad(){
   if(abajo&&andable(Tc(x,y+1))&&Tc(x,y+1)!==AGUA){
    const l=FACH_BARRIO[(BARRIOS[barrioDe[y*MW+x]]||BARRIOS[0]).estilo]||FACH_BARRIO.bloques;
    const h2=hash(x*7,y*13);
-   ctx.drawImage(PROP.fachadas[l[h2%l.length]],x*TS,y*TS+TS-FACH_H);
-   ctx.drawImage(PROP.fachadas[l[(h2>>3)%l.length]],x*TS+16,y*TS+TS-FACH_H);}
+   /* La casilla se llena con lo que quepa: un local entero, o dos de medio. Cuando solo
+      queda medio hueco no cabe un escaparate, así que ahí entra uno de los estrechos —y
+      si el barrio no tiene ninguno, un portal, que lo tiene toda casa. */
+   for(let px=0,n=0;px<TS;n++){
+    let t=l[(h2>>(n*3))%l.length];
+    if(ANCHO_FACH[t]>TS-px)t=l.find(k=>ANCHO_FACH[k]<=TS-px)||'portal';
+    ctx.drawImage(PROP.fachadas[t],x*TS+px,y*TS+TS-FACH_H);
+    px+=ANCHO_FACH[t];}}
   if(abajo){ctx.fillStyle='rgba(0,0,0,.34)';ctx.fillRect(x*TS,(y+1)*TS,TS,5);}
   if(der){ctx.fillStyle='rgba(0,0,0,.28)';ctx.fillRect((x+1)*TS,y*TS,4,TS);}
   ctx.fillStyle='rgba(255,255,255,.14)';
