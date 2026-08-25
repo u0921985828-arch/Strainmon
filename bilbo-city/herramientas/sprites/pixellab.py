@@ -103,22 +103,52 @@ SAT_MINIMA = .22
 # El nombre es «lo de arriba _ lo de abajo», y el juego lo deduce igual de la ropa de cada
 # arquetipo: manga larga, manga corta, abrigo o capucha; pantalón, falda o pantalón corto.
 # Cambiar un nombre aquí sin cambiarlo allí deja la hoja sin usar — la batería lo mira.
+# Exactamente tres trozos separados por coma —torso, piernas y calzado— porque `ropa_de`
+# le pega a cada uno su color de plantilla por separado. Y ropa del 96, que es cuando pasa
+# el juego: cazadora bomber y no parka técnica, chándal de algodón y no de licra.
 SETS = {
-    'largo_pantalon': 'long sleeved jacket, long trousers, ankle boots',
-    'largo_falda':    'long sleeved jumper, knee length skirt, flat shoes',
-    'corto_pantalon': 'short sleeved shirt, long trousers, flat shoes',
-    'corto_short':    'short sleeved t-shirt, shorts, trainers',
-    'abrigo_pantalon':  'long overcoat down to the knees, long trousers, flat shoes',
-    'abrigo_falda':     'long open coat, knee length skirt, flat shoes',
-    'capucha_pantalon': 'hooded sweatshirt with the hood down, tracksuit trousers, trainers',
+    'largo_pantalon':   'a bomber jacket, straight leg jeans, ankle boots',
+    'largo_falda':      'a wool jumper, a knee length skirt, flat shoes',
+    'corto_pantalon':   'a short sleeved shirt, straight leg trousers, flat shoes',
+    'corto_short':      'a short sleeved t-shirt, sports shorts, canvas trainers',
+    'abrigo_pantalon':  'a long overcoat down to the knees, straight leg trousers, flat shoes',
+    'abrigo_falda':     'a long open raincoat, a knee length skirt, flat shoes',
+    'capucha_pantalon': 'a hooded sweatshirt with the hood down, cotton tracksuit trousers, trainers',
 }
 
 VISTA = 'high top-down'
-# Lo que NO queremos. Va en su propio campo y no metido a empujones en la descripción:
-# ahí compite con lo que sí queremos, y de paso el generador dibuja lo que se le nombra.
-NEGATIVO = ('gradient, dithering, soft shading, antialiasing, blurry, 3d render, photo, '
-            'realistic, watermark, text, signature, extra limbs, cut off, ground shadow, '
-            'hat, cap, helmet, bag, backpack, weapon prop')
+# La descripción es del aspecto que queremos, no de la obra de nadie. Pedirle a un
+# generador el estilo de un juego con dueño es hacerle producir algo derivado de ese juego,
+# y ese algo acabaría dentro del nuestro.
+#
+# El vocabulario sale de CONTEXT.md §18.5, que ya fija cómo se le habla al generador:
+# «8-bit indexed palette, hard pixel edges, no anti-aliasing, no outline glow,
+# orthographic top-down at 45 degrees, 1996 period accurate». No se inventa otro aquí.
+#
+# Solo hay un punto donde esto se aparta del documento a propósito. §18.5 pide una paleta
+# «muted overcast northern Spain» y aquí se piden colores saturados. No es contradicción:
+# lo que se le pide al generador es el **estarcido**, no el aspecto final. Las partes del
+# cuerpo tienen que llegar separables por tono, y un magenta apagado se confunde con la
+# piel. Lo apagado lo pone el repintado, que manda cada rampa a la paleta del juego.
+#
+# Y aquí no va ni un «no»: lo que no queremos vive en NEGATIVO. Mezclados, el «no» compite
+# con lo que sí queremos y encima el generador dibuja lo que se le nombra.
+ESTILO = ('8-bit indexed pixel art sprite of one single character, full body, centred, '
+          'feet near the bottom edge, orthographic top-down view at 45 degrees, '
+          'chunky proportions with a large head, flat blocks of saturated colour, '
+          'hard pixel edges, light from the upper left, single colour black outline, '
+          'transparent background, bare head, Spain 1996')
+# Lo que NO queremos, en su propio campo.
+NEGATIVO = ('gradient, dithering, soft shading, anti-aliasing, outline glow, blurry, '
+            'motion blur, 3d render, photo, realistic, watermark, text, signature, '
+            'extra limbs, cropped, cut off, ground shadow, drop shadow, scenery, '
+            'multiple characters, hat, cap, helmet, bag, backpack')
+# Palabras que no pueden aparecer en ninguna descripción positiva porque están en la
+# negativa. La lista va a mano y no sacada de NEGATIVO: «outline» está en las dos con
+# sentidos distintos —queremos contorno, no queremos que brille— y comparar palabra por
+# palabra la marcaría. Estas son las que sí son contradicción se miren como se miren.
+PROHIBIDAS = ('hat', 'cap', 'helmet', 'bag', 'backpack', 'gradient', 'dithering',
+              'shadow', 'scenery', 'blurry')
 GUIA = 8                   # cuánto se le aprieta para que siga el texto
 # Por debajo de esto la figura va medio sin contorno, y sobre el hormigón de la ciudad
 # —del mismo gris que media ropa— se deshace. Se avisa; no se repasa, que un contorno
@@ -135,19 +165,6 @@ def semilla(ropa):
     Se saca del nombre para que repetir una tirada dé lo mismo.
     """
     return zlib.crc32(ropa.encode()) % 100000
-# La descripción es del aspecto que queremos, no de la obra de nadie. Pedirle a un
-# generador el estilo de un juego con dueño es hacerle producir algo derivado de ese
-# juego, y ese algo acabaría dentro del nuestro. Lo que va aquí es lo mismo que dice
-# referencia/ESTILO.md, en inglés y con sus propias palabras.
-ESTILO = ('16-bit pixel art sprite, high top-down view of a single character, full body, '
-          'centred, feet near the bottom edge, chunky proportions with a large head, '
-          # Lo que sigue no es gusto: es lo que mantiene separables los colores de
-          # plantilla. Un degradado o un tramado mezcla el magenta del torso con el verde
-          # de las piernas, y en la mezcla ya no se sabe qué era cada píxel.
-          'flat blocks of saturated colour, no gradients, no dithering, no colour blending, '
-          'strong saturation, light from the upper left, single-colour black outline, '
-          'transparent background, no ground shadow, '
-          'bare head, no hat, no helmet, no bag, no backpack, no props')
 
 # Las ocho direcciones del juego, en su orden: 0 es sur y se gira en sentido antihorario.
 DIRECCIONES = ['south', 'south-east', 'east', 'north-east',
@@ -156,18 +173,21 @@ PEDIDAS = 5                                   # las cinco primeras; el resto son
 ESPEJO = {5: 3, 6: 2, 7: 1}                   # noroeste<-nordeste, oeste<-este, so<-se
 
 # Los once dibujos que hay que pedir, y en cuál cae cada una de las dieciséis poses.
+# Desde arriba de una figura de 32 píxeles no se lee la cara: se lee el hombro, el paso y
+# el bulto de la cabeza. Por eso cada dibujo dice qué hacen los brazos y las piernas, que
+# es lo único que se distingue, y no qué expresión pone.
 DIBUJOS = {
-    'quieto':  'standing still',
-    'andarA':  'walking, left leg forward',
-    'andarP':  'walking, legs together at mid stride',
-    'andarB':  'walking, right leg forward',
-    'correrA': 'running fast, left leg forward, leaning ahead',
-    'correrB': 'running fast, right leg forward, leaning ahead',
-    'pega1':   'punching forward, arm half extended',
-    'pega2':   'punching forward, arm fully extended',
-    'apunta':  'aiming a pistol forward with both hands',
-    'herido':  'staggering backwards, hurt',
-    'agacha':  'crouching low, sneaking',
+    'quieto':  'standing still, arms hanging at the sides',
+    'andarA':  'mid walk, left leg forward and right arm forward',
+    'andarP':  'mid walk, legs together passing each other, arms at the sides',
+    'andarB':  'mid walk, right leg forward and left arm forward',
+    'correrA': 'running, left leg forward, body leaning ahead, arms bent',
+    'correrB': 'running, right leg forward, body leaning ahead, arms bent',
+    'pega1':   'throwing a punch, fist just leaving the shoulder',
+    'pega2':   'throwing a punch, arm extended forward, shoulders turned into it',
+    'apunta':  'aiming a small pistol straight ahead with both arms',
+    'herido':  'reeling from a blow, shoulders thrown back',
+    'agacha':  'crouching low on the heels, head down, knees bent',
 }
 DE_POSE = {
     'quieto': 'quieto',

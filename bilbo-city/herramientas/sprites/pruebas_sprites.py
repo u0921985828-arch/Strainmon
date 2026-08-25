@@ -9,7 +9,7 @@ que cada uno acaba en la rampa que le toca.
 
     python3 herramientas/sprites/pruebas_sprites.py
 """
-import io, os, sys
+import io, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pixellab as PL
 
@@ -172,6 +172,33 @@ ok(not (set(PL.DIBUJOS) - usados), 'dibujos que se bajarían sin usarse: %s'
    % ', '.join(sorted(set(PL.DIBUJOS) - usados)))
 bien.append('%d poses del juego salen de %d dibujos, sin sobrar ninguno'
             % (len(PL.POSES), len(usados)))
+
+# ── 5 bis · cada silueta se parte en tres prendas, ni una más ───────────────────────
+# `ropa_de` reparte la descripción por comas y le pega a cada trozo su color de plantilla.
+# Un cuarto trozo —una bufanda, un cinturón— no da error: corre la lista, y el cian del
+# calzado acaba pintando el pantalón. El estarcido se va al garete sin decir nada.
+for nombre, desc in PL.SETS.items():
+    trozos = [t.strip() for t in desc.split(',')]
+    ok(len(trozos) == 3, '%s tiene %d prendas y no 3: %s' % (nombre, len(trozos), desc))
+    ok(all(trozos), '%s deja una prenda vacía' % nombre)
+    for parte in ('torso', 'piernas', 'calzado'):
+        ok(PL.ropa_de(nombre, parte) in trozos, '%s: %s no sale de la descripción'
+           % (nombre, parte))
+bien.append('las %d siluetas se parten en torso, piernas y calzado' % len(PL.SETS))
+
+# ── 5 ter · lo que se pide y lo que se rechaza no se contradicen ────────────────────
+# Nombrar algo en la descripción positiva y a la vez en la negativa es pedirle al generador
+# que lo dibuje y que no lo dibuje. Suele ganar la positiva —nombrar algo lo invoca—, así
+# que las siluetas volverían con gorro justo cuando el gorro se forja encima.
+positivo = ' '.join([PL.ESTILO] + list(PL.SETS.values()) + list(PL.DIBUJOS.values())
+                    + [d for _, d in PL.CLAVES.values()]).lower()
+for mala in PL.PROHIBIDAS:
+    ok(not re.search(r'\b%ss?\b' % re.escape(mala), positivo),
+       '«%s» está en la descripción positiva y también en la negativa' % mala)
+ok(PL.NEGATIVO and ' no ' not in ' %s ' % PL.ESTILO.lower(),
+   'la descripción positiva lleva negaciones; van en NEGATIVO')
+bien.append('%d palabras vetadas, y ninguna se cuela en lo que se pide'
+            % len(PL.PROHIBIDAS))
 
 # ── 6 · el espejo y la repetición de poses arman la hoja de verdad ──────────────────
 # Se monta una hoja simulada entera y se comprueba su estructura: es lo que convierte 55
