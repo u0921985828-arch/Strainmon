@@ -685,6 +685,26 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       ok(mediana > 0.9, 'la mediana de conducción es de solo ' + mediana.toFixed(1) + ' casillas');
       bien.push('conducción en 2,5 s: mediana ' + mediana.toFixed(1) + ' casillas (peor '
         + recorridos[0].toFixed(1) + ', mejor ' + recorridos[15].toFixed(1) + ')');
+
+      // ── el pie no patina ──
+      // La cadencia del andar iba a un ritmo fijo, así que con el joystick analógico se
+      // podía avanzar despacio moviendo las piernas a toda pastilla. Se comprueba que los
+      // pasos por segundo salgan de la velocidad —una zancada son ZANCADA metros— y que
+      // andar o correr lo decida la velocidad y no quien llame a la función.
+      {
+        const paso1 = v => { const e = { anim: 0 }; A.poseAndar(e, v * A.MS, false, 1, false);
+                             return { pasos: e.anim, pose: e.pose }; };
+        const lento = paso1(1.4), rapido = paso1(5.6);
+        const espLento = 1.4 / A.ZANCADA, espRapido = 5.6 / A.ZANCADA;
+        ok(Math.abs(lento.pasos - espLento) < .05 && Math.abs(rapido.pasos - espRapido) < .05,
+          'la cadencia no sale de la velocidad: a 1,4 m/s da ' + lento.pasos.toFixed(2)
+          + ' pasos/s y debería dar ' + espLento.toFixed(2));
+        ok(lento.pose.startsWith('andar') && rapido.pose.startsWith('correr'),
+          'andar o correr no lo decide la velocidad: a 1,4 m/s sale ' + lento.pose
+          + ' y a 5,6 sale ' + rapido.pose);
+        bien.push('la cadencia sale de la velocidad: ' + espLento.toFixed(1) + ' pasos/s andando y '
+          + espRapido.toFixed(1) + ' corriendo, con zancada de ' + A.ZANCADA + ' m');
+      }
     }
 
     // ── 8 · muerte y reaparición ───────────────────────────────────────

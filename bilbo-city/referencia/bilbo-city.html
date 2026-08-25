@@ -6307,11 +6307,22 @@ function act(dt){
  else if(player.enCoche)cPuls=false;
  if(S.escena==='interior')return actInterior(dt,ix,iy);
  actCiudad(dt,ix,iy,correr,fuerza,!!(mx||my));}
+/* La cadencia sale de la velocidad de verdad, no de un ritmo fijo. Iba a 7,5 pasos por
+   segundo andando y 11 corriendo pasara lo que pasara, asi que desde que el joystick es
+   analogico y la velocidad tiene inercia se podia avanzar a paso de tortuga moviendo las
+   piernas a toda pastilla — el pie patinaba sobre el suelo, que es lo que mas canta de
+   una animacion mal atada.
+   Una zancada mide unos 0,75 m, asi que los pasos por segundo son la velocidad partida
+   por eso. Y correr o andar tampoco lo decide el boton: lo decide ir a mas de 3,2 m/s,
+   que es donde una persona deja de andar. */
+const ZANCADA=0.75;              /* metros por paso */
 function poseAndar(e,vel,correr,dt,sigilo){
- e.anim+=dt*(sigilo?4.5:correr?11:7.5);
+ const ms=Math.abs(vel)/MS;      /* casillas/s -> m/s */
+ e.anim+=dt*Math.max(.6,ms/ZANCADA);
  const f=Math.floor(e.anim)%4+1;
  if(sigilo){e.pose=f<3?'agacha':'agacha2';return;}
- e.pose=(correr?'correr':'andar')+(correr?((f-1)%4+1):f);}
+ const corriendo=ms>3.2;
+ e.pose=(corriendo?'correr':'andar')+(corriendo?((f-1)%4+1):f);}
 function actInterior(dt,ix,iy){
  motorAudio(null,1);sirenaAudio(dt,false);
  const v=V_INTERIOR,m=Math.hypot(ix,iy);
@@ -6446,13 +6457,13 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
    if(e.oido){
     const ang=Math.atan2(e.oido.y-e.y,e.oido.x-e.x);
     mover(e,e.x+Math.cos(ang)*V_HUIDA*dt,e.y+Math.sin(ang)*V_HUIDA*dt,false);
-    e.d8=dir8De(Math.cos(ang),Math.sin(ang));poseAndar(e,1.9,false,dt);
+    e.d8=dir8De(Math.cos(ang),Math.sin(ang));poseAndar(e,V_HUIDA,false,dt);
     if(dist(e,e.oido)<1.2)e.oido=null;
    }else{
     e.ronda=(e.ronda||0)-dt;
     if(e.ronda<=0){e.ronda=rnd(1.6,3.4);e.rumbo=rnd(0,6.283);}
     mover(e,e.x+Math.cos(e.rumbo)*V_PEATON*dt,e.y+Math.sin(e.rumbo)*V_PEATON*dt,false);
-    e.d8=dir8De(Math.cos(e.rumbo),Math.sin(e.rumbo));poseAndar(e,1.3,false,dt);}
+    e.d8=dir8De(Math.cos(e.rumbo),Math.sin(e.rumbo));poseAndar(e,V_PEATON,false,dt);}
    continue;}
   if(d>(a.cuerpo?1.1:a.alc*.75)||!ve){
    const ang=Math.atan2(player.y-e.y,player.x-e.x),v=a.cuerpo?2.7:2.2;
@@ -6486,12 +6497,12 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
   if(p.huye>0){p.huye-=dt;
    const ang=Math.atan2(p.y-player.y,p.x-player.x);
    mover(p,p.x+Math.cos(ang)*V_HUIDA*dt,p.y+Math.sin(ang)*V_HUIDA*dt,false);
-   p.d8=dir8De(Math.cos(ang),Math.sin(ang));poseAndar(p,3.6,true,dt);
+   p.d8=dir8De(Math.cos(ang),Math.sin(ang));poseAndar(p,V_HUIDA,true,dt);
   }else{
    p.t-=dt;if(p.t<=0){const a=rnd(0,6.283);p.dx=Math.cos(a);p.dy=Math.sin(a);p.t=rnd(1,4);}
    const nx=p.x+p.dx*.95*dt,ny=p.y+p.dy*.95*dt,t=Tc(Math.floor(nx),Math.floor(ny));
    if(t===ACERA||t===PLAZA||t===MUELLE||t===PARQUE||t===PATIO||t===MONTE){p.x=nx;p.y=ny;
-    p.d8=dir8De(p.dx,p.dy);poseAndar(p,1,false,dt);}
+    p.d8=dir8De(p.dx,p.dy);poseAndar(p,V_PEATON,false,dt);}
    else{p.t=0;p.pose='quieto';}}
   if(dist(p,player)>36){const q=nuevoPeaton(player.x|0,player.y|0);p.x=q.x;p.y=q.y;p.huye=0;}}
  comprobarObjetivos(dt);
