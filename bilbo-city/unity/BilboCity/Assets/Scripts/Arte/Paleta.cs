@@ -182,6 +182,30 @@ public class Lienzo {
     /// hacerlo con P() y un Color32 a cero es justo esto, y con nombre se entiende.
     public void Borrar(int x, int y, int w, int h) { P(x, y, w, h, new Color32(0,0,0,0)); }
 
+    /// <summary>Quita el píxel de cada esquina recta de la silueta.</summary>
+    /// Todo lo que dibuja la forja son rectángulos —P() no sabe hacer otra cosa— y a 26
+    /// píxeles la suma de rectángulos se lee como un montón de cajas apiladas: el cráneo,
+    /// el hombro y la puntera son cantos de noventa grados. Quitando la esquina, la
+    /// silueta se redondea sin dibujar una forma nueva.
+    /// La condición es apretada a propósito —los dos vecinos de fuera transparentes y los
+    /// dos de dentro opacos— porque con la suelta un detalle de un píxel de ancho, como la
+    /// correa del bolso, se lo come entero. Y se recogen todas las esquinas antes de
+    /// borrar ninguna: borrando sobre la marcha, el hueco recién hecho convierte al vecino
+    /// en esquina y el chaflán se come la figura en diagonal.
+    public void Chaflan() {
+        var copia = (Color32[])Px.Clone();
+        System.Func<int,int,bool> op = (x,y) =>
+            x >= 0 && y >= 0 && x < W && y < H && copia[y*W+x].a > 0;
+        for (int y = 0; y < H; y++)
+            for (int x = 0; x < W; x++) {
+                if (!op(x,y)) continue;
+                bool iz = op(x-1,y), de = op(x+1,y), ar = op(x,y-1), ab = op(x,y+1);
+                if ((!iz && !ar && de && ab) || (!de && !ar && iz && ab) ||
+                    (!iz && !ab && de && ar) || (!de && !ab && iz && ar))
+                    Px[y*W+x] = new Color32(0,0,0,0);
+            }
+    }
+
     /// <summary>Rodea de un color todo lo dibujado.</summary>
     /// Un icono se mira a 24 píxeles y sobre fondos de cualquier color: la caja oscura
     /// del HUD, la fila del móvil, el marco claro de la tienda. Sin contorno, la mitad se

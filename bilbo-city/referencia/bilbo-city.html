@@ -2154,7 +2154,7 @@ function dibChar(cfg,pose,d8){
   P(g,cx-2+dx,py+l1,1,PH-l1,PN.l);
   if(PN.corto)P(g,cx-2+dx,py+4,3,PH-4,cfg.piel);}
  else{P(g,cx-3,py+l1,3,PH-l1,PN.b);P(g,cx,py+l2,3,PH-l2,PN.s);
-  P(g,cx-3,py+l1,1,PH-l1,PN.l);
+  P(g,cx-3,py+l1,1,PH-l1,PN.l);P(g,cx-3,py+l1,3,1,PN.s);
   if(PN.raya){P(g,cx-3,py+l1,1,PH-l1,PN.raya);P(g,cx+2,py+l2,1,PH-l2,PN.raya);}
   if(PN.corto){P(g,cx-3,py+4,3,PH-4,cfg.piel);P(g,cx,py+4,3,PH-4,cfg.piel);}
   /* La costura entre las perneras, y solo de medio muslo para abajo: los dos tonos del
@@ -2180,6 +2180,9 @@ function dibChar(cfg,pose,d8){
  P(g,cx-hom/2,ty,hom,th,T.b);
  P(g,cx-hom/2,ty,hom,1,T.l);P(g,cx-hom/2,ty,1,th,T.l);
  P(g,cx+hom/2-1,ty,1,th,T.s);P(g,cx-hom/2,ty+th-1,hom,1,T.s);
+ /* La barbilla proyecta sobre el pecho. Sin esto la cabeza y el torso son dos tonos
+    pegados, no una cosa delante de otra, y es la mitad de lo que se lee como volumen. */
+ if(!T.capucha)P(g,cx-h2+1,ty+1,HW-2,1,T.s);
  if(T.raya)P(g,cx-hom/2,ty,1,th,T.raya);
  if(T.peto){P(g,cx-hom/2+1,ty+2,hom-2,5,T.l);P(g,cx-1,ty+3,2,2,T.s);}
  if(T.bandas){P(g,cx-hom/2,ty+3,hom,1,C.hueso);P(g,cx-hom/2,ty+6,hom,1,C.hueso);}
@@ -2223,7 +2226,7 @@ function dibChar(cfg,pose,d8){
  /* Contorno solo por fuera, como los iconos y por lo mismo: la gente cruza del asfalto
     a la acera y de la acera al parque, y una cazadora gris sobre hormigón gris sin borde
     se deshace. Las costuras de la ropa no llevan, que a 20 píxeles taparían el dibujo. */
- return contorno(c,C.negro);
+ return contorno(chaflan(c),C.negro);
 }
 /* Pelo, gorro, accesorio y fogonazo: lo que va por encima del cuerpo.
    Está aparte porque se dibuja en dos sitios. Uno es la forja de aquí arriba, sobre el
@@ -2232,6 +2235,29 @@ function dibChar(cfg,pose,d8){
    tenga esa silueta, y el peinado, la txapela y el carro de la compra se le ponen encima.
    Con `soloGrandes` el pelo corto no se repite —ese ya viene en la hoja— y solo se añaden
    los peinados que cambian el contorno de la cabeza. */
+/* El chaflán, y es lo que quita el aire de muñeco de bloques. Todo lo que dibuja la forja
+   son rectángulos —`P` no sabe hacer otra cosa— y a 26 píxeles la suma de rectángulos se
+   lee como un montón de cajas apiladas: el cráneo, el hombro y la puntera son cantos de
+   noventa grados. Quitando el píxel de cada esquina convexa, la silueta se redondea sin
+   dibujar una forma nueva.
+   La condición es apretada a propósito —los dos vecinos de fuera transparentes y los dos
+   de dentro opacos— porque con la suelta un detalle de un píxel de ancho, como la correa
+   del bolso o el cañón de un arma, se lo come entero. Y se recogen todas las esquinas
+   antes de borrar ninguna: borrando sobre la marcha, el hueco recién hecho convierte al
+   vecino en esquina y el chaflán se come la figura en diagonal. */
+function chaflan(c){
+ const g=c.getContext('2d'),W=c.width,H=c.height;
+ const img=g.getImageData(0,0,W,H),d=img.data;
+ const op=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&d[(y*W+x)*4+3]>0;
+ const esquinas=[];
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+  if(!op(x,y))continue;
+  const iz=op(x-1,y),de=op(x+1,y),ar=op(x,y-1),ab=op(x,y+1);
+  if((!iz&&!ar&&de&&ab)||(!de&&!ar&&iz&&ab)||(!iz&&!ab&&de&&ar)||(!de&&!ab&&iz&&ar))esquinas.push((y*W+x)*4+3);
+ }
+ for(const i of esquinas)d[i]=0;
+ g.putImageData(img,0,0);return c;}
+
 const GRANDES={melena:1,coleta:1,mono:1,afro:1};
 /* Todo lo de la cabeza va en función de lo que mide la cabeza, no del ocho de siempre:
    con la cabezona del protagonista, un gorro clavado a ocho se le queda de bufón. Con
@@ -2349,10 +2375,11 @@ const ARQ={
  banda2:A('banda2','corpulenta',3,'corto',C.pelo1,'gorra',C.rojo,'chandal','chandalP','deportivas','ninguno'),
  banda3:A('banda3','media',4,'rapado',C.pelo1,'ninguno',null,'cazadora','vaquero','botas','gafas'),
 };
-/* La cabezona, ya para los treinta y siete. Sigue siendo bandera por arquetipo y no una
-   constante: cuesta una línea volver atrás, o dejar a alguien con la cabeza pequeña.
-   Vestirse hace `Object.assign` sobre el mismo objeto, así que sobrevive a la ropa. */
-Object.values(ARQ).forEach(a=>a.cabezona=1);
+/* La cabezona se probó a 10/26 y se descartó: a esa proporción la figura se lee de
+   juguete, no de juego con historia. La maquinaria se queda —todo lo de la cabeza va por
+   HW/HH y no por el ocho a pelo, que era deuda de todos modos— pero la bandera va apagada.
+   Volver a probarla es poner esta línea a 1. */
+Object.values(ARQ).forEach(a=>a.cabezona=0);
 const PEATON_ARQ=['p1','p2','p3','p4','p5','p6','p7','p8','p9','p10','p11','p12',
  'p13','p14','p15','p16','p17','p18','banda1','banda2','banda3'];
 /* Quién anda por dónde. En la Gran Vía hay gabardinas y en Zorrotzaurre monos de faena, y

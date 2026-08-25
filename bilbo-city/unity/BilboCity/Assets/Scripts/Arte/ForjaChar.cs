@@ -188,12 +188,12 @@ public static class ForjaChar {
             Add(A("banda1","delgada",   5,"rapado",Paleta.Pelo1,"ninguno",Paleta.Carbon,"tirantes","chandalP","deportivas","gafas"));
             Add(A("banda2","corpulenta",3,"corto", Paleta.Pelo1,"gorra",  Paleta.Rojo,  "chandal", "chandalP","deportivas","ninguno"));
             Add(A("banda3","media",     4,"rapado",Paleta.Pelo1,"ninguno",Paleta.Carbon,"cazadora","vaquero", "botas",     "gafas"));
-            // La cabezona, ya para los treinta y siete. Sigue siendo bandera por arquetipo y
-            // no una constante: cuesta una línea volver atrás, o dejar a alguien con la cabeza
-            // pequeña. Arquetipo es un struct, así que hay que volver a meterlo en el
-            // diccionario para que el cambio no se quede en la copia.
+            // La cabezona se probó a 10/26 y se descartó: a esa proporción la figura se lee
+            // de juguete, no de juego con historia. La maquinaria se queda —todo lo de la
+            // cabeza va por HW/HH y no por el ocho a pelo, que era deuda de todos modos—
+            // pero la bandera va apagada. Volver a probarla es poner este false a true.
             foreach (var k in new List<string>(_arq.Keys)) {
-                var a2 = _arq[k]; a2.Cabezona = true; _arq[k] = a2;
+                var a2 = _arq[k]; a2.Cabezona = false; _arq[k] = a2;
             }
             return _arq;
         }
@@ -265,6 +265,8 @@ public static class ForjaChar {
             L.P(cx - 3, py + l1, 3, PH - l1, PN.b);
             L.P(cx, py + l2, 3, PH - l2, PN.s);
             L.P(cx - 3, py + l1, 1, PH - l1, PN.l);
+            // El dobladillo proyecta sobre la pernera, igual que la barbilla sobre el pecho.
+            L.P(cx - 3, py + l1, 3, 1, PN.s);
             if (PN.tieneRaya) { L.P(cx - 3, py + l1, 1, PH - l1, PN.raya); L.P(cx + 2, py + l2, 1, PH - l2, PN.raya); }
             if (PN.corto) { L.P(cx - 3, py + 4, 3, PH - 4, cfg.Piel); L.P(cx, py + 4, 3, PH - 4, cfg.Piel); }
             // La costura entre las perneras, y solo de medio muslo para abajo: los dos tonos
@@ -300,6 +302,9 @@ public static class ForjaChar {
         L.P(cx - hom/2, ty, 1, th, T.l);
         L.P(cx + hom/2 - 1, ty, 1, th, T.s);
         L.P(cx - hom/2, ty + th - 1, hom, 1, T.s);
+        // La barbilla proyecta sobre el pecho. Sin esto la cabeza y el torso son dos tonos
+        // pegados, no una cosa delante de otra, y es la mitad de lo que se lee como volumen.
+        if (!T.capucha) L.P(cx - h2 + 1, ty + 1, HW - 2, 1, T.s);
         if (T.tieneRaya) L.P(cx - hom/2, ty, 1, th, T.raya);
         if (T.peto) { L.P(cx - hom/2 + 1, ty + 2, hom - 2, 5, T.l); L.P(cx - 1, ty + 3, 2, 2, T.s); }
         if (T.bandas) { L.P(cx - hom/2, ty + 3, hom, 1, Paleta.Hueso); L.P(cx - hom/2, ty + 6, hom, 1, Paleta.Hueso); }
@@ -457,6 +462,7 @@ public static class ForjaChar {
         // asfalto a la acera y de la acera al parque, y una cazadora gris sobre hormigón
         // gris sin borde se deshace. Las costuras de la ropa no llevan, que a 20 píxeles
         // taparían el dibujo.
+        L.Chaflan();
         L.Contorno(Paleta.Negro);
         return L;
     }
