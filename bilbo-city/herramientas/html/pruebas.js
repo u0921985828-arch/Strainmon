@@ -271,6 +271,14 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       ok(l13[3] === 0, 'a mediodía la ciudad va teñida');
       ok(l23[3] > 0.4 && l23[2] > l23[0], 'la noche no es azul');
       ok(l20[0] > l20[2], 'el atardecer no es cálido');
+      // Y lo que está de pie proyecta al mismo sitio que la manzana: si el coche tira la
+      // sombra a un lado y el edificio al otro, la escena se rompe.
+      S.min = 9 * 60;  A.calcularSol(); const sm = A.sombraSol(1.7);
+      S.min = 14 * 60; A.calcularSol(); const st = A.sombraSol(1.7);
+      S.min = 23 * 60; A.calcularSol(); const sn = A.sombraSol(1.7);
+      ok(sm && sm.dx < 0 && sm.largo > st.largo, 'la sombra de una persona no sigue al sol');
+      ok(st && st.dy < 0 && Math.abs(st.dx) < st.largo * 0.5, 'a las 14 la figura no proyecta al norte');
+      ok(!sn, 'de noche las figuras siguen proyectando sombra de sol');
       S.min = min0;
       bien.push('el sol gira con la hora: sombra de ' + lm.toFixed(1) + ' casillas a las 9 y '
         + lt.toFixed(1) + ' a las 14, y tinte de amanecer, día, ocaso y noche');

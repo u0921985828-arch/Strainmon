@@ -3981,6 +3981,9 @@ function dibMobiliario(mb,x,y){
     suelo. Antes cada una llevaba su desplazamiento a mano y al cambiar de tamaño se
     quedaban flotando. */
  const D=(k,dx,dy)=>{const[a,al]=MOB_M[k];
+  /* Cada pieza tira su sombra desde su base y con su altura: una farola de cuatro metros
+     no proyecta lo mismo que una papelera de uno. */
+  sombraFig(x*TS+(bx+(dx||0))*ESC,y*TS+(by+(dy||0))*ESC,a*4,al);
   ctx.drawImage(PROP[k],x*TS+(bx-a*5+(dx||0))*ESC,y*TS+(by-al*10+(dy||0))*ESC);};
  switch(mb){
   case M_FAROLA:    D('farola');break;
@@ -6866,6 +6869,23 @@ function calcularSol(){
  SOL.ux=-Math.sin(az);SOL.uy=Math.cos(az);   /* la sombra va al contrario que el sol */
  SOL.elev=Math.max(.10,SOL.alto*1.13);       /* 65° de elevación máxima, en radianes */
  return SOL;}
+/* Lo que proyecta cualquier cosa que esté de pie, en píxeles: la altura partida por la
+   tangente de la elevación. Sale de aquí para todo —persona, coche, farola y árbol— porque
+   si la manzana proyecta a un lado y el coche al otro, la escena se rompe. */
+function sombraSol(altoM){
+ if(!SOL.elev)return null;
+ const largo=Math.min(4*TS,altoM/Math.tan(SOL.elev)*(TS/5.16));
+ return {dx:SOL.ux*largo,dy:SOL.uy*largo,largo,ang:Math.atan2(SOL.uy,SOL.ux)};}
+/* La sombra de una figura: una elipse tumbada en la dirección del sol. De noche, o dentro
+   de un sitio, se queda en sombra de contacto — que algo apoya en el suelo hay que verlo
+   igual, aunque no haya sol que la proyecte. */
+function sombraFig(px,py,r,altoM){
+ const so=S.escena==='interior'?null:sombraSol(altoM);
+ if(!so){ctx.fillStyle='rgba(7,9,12,.32)';
+  ctx.beginPath();ctx.ellipse(px,py+3,r,r*.44,0,0,6.283);ctx.fill();return;}
+ ctx.save();ctx.translate(px+so.dx*.5,py+3+so.dy*.5);ctx.rotate(so.ang);
+ ctx.fillStyle='rgba(7,9,12,.30)';
+ ctx.beginPath();ctx.ellipse(0,0,so.largo*.5+r,r*.5,0,0,6.283);ctx.fill();ctx.restore();}
 /* Lo que proyecta un edificio, en casillas: su altura partida por la tangente de la
    elevación. Cuatro casillas de tope —20 m— porque al ras del horizonte la sombra sale
    infinita y taparía la ciudad entera. */
@@ -7119,8 +7139,7 @@ function pintaSombraChar(e,esJugador){
  /* La casilla vale lo que valga en esta escena: 5,16 m en la calle y 0,80 m dentro. El
     dibujo del personaje mide lo mismo en las dos —es el mundo el que cambia de vara. */
  const U=S.escena==='interior'?TS_INT:TS;
- ctx.fillStyle='rgba(0,0,0,.34)';
- ctx.beginPath();ctx.ellipse(e.x*U,e.y*U+8,9,4,0,0,6.283);ctx.fill();
+ sombraFig(e.x*U,e.y*U+5,9,1.7);
  const pose=e.herido>0?'herido':e.pose||'quieto';
  pintaChar(ctx,e.arq,e.d8,pose,e.x*U,e.y*U);
  const aid=esJugador?S.armaAct:e.arma;
@@ -7131,7 +7150,11 @@ function pintaCoche(c,esPoli,mio){
   :(!c.vivo?VEH_QUEMADO[c.tipo]:VEH[c.tipo][c.lib%LIBREAS.length]);
  const w=spr.width,h=spr.height;
  ctx.save();ctx.translate(c.x*TS,c.y*TS);
- ctx.fillStyle='rgba(0,0,0,.32)';ctx.fillRect(-w/2+2,-h/2+3,w-2,h-2);
+ /* La sombra del coche es su propia silueta corrida hacia donde va la del edificio de al
+    lado. Iba dos píxeles abajo a la derecha, a cualquier hora y en cualquier calle. */
+ const so=sombraSol(1.5);
+ ctx.save();ctx.translate(so?so.dx:2,so?so.dy:3);ctx.rotate(c.ang);
+ ctx.fillStyle='rgba(7,9,12,.32)';ctx.fillRect(-w/2,-h/2,w,h);ctx.restore();
  ctx.rotate(c.ang);ctx.drawImage(spr,-w/2,-h/2);
  if(mio){ctx.strokeStyle='rgba(232,197,71,.55)';ctx.lineWidth=1;ctx.strokeRect(-w/2,-h/2,w,h);}
  if(c.marcado){ctx.restore();

@@ -38,6 +38,16 @@ public static class Sol {
         return Mathf.Min(4f, m / Mathf.Tan(Elev) / 5.16f);
     }
 
+    /// <summary>Lo que proyecta cualquier cosa que esté de pie, en casillas: la altura
+    /// partida por la tangente de la elevación. Sale de aquí para todo —persona, coche,
+    /// farola y árbol— porque si la manzana proyecta a un lado y el coche al otro, la escena
+    /// se rompe. Devuelve el vector de la sombra; en cero con el sol puesto.</summary>
+    public static Vector2 Sombra(float altoM) {
+        if (Elev <= 0) return Vector2.zero;
+        float largo = Mathf.Min(4f, altoM / Mathf.Tan(Elev) / 5.16f);
+        return Direccion * largo;
+    }
+
     /// <summary>La luz de la hora: noche azul, amanecer y atardecer cálidos, mediodía limpio.
     /// Antes solo había noche, y a las nueve de la mañana la ciudad se veía igual que a las
     /// tres de la tarde.</summary>

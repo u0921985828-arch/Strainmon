@@ -42,6 +42,21 @@ de la casilla de la calle.
 - [ ] El puerto sigue con `Forja.TS = 32` mientras el HTML va a 64 (ver §4b). Los interiores
       ya no dependen de eso, pero la calle sí.
 
+## 1 ter · El sol en Unity
+
+`Ciudad/Sol.cs` lleva la misma cuenta que el prototipo —dirección y largo de la sombra por
+la hora, luz ambiente por franjas y `Sombra(alto)` para lo que está de pie—, pero en Unity
+no hay quien la pinte: la ciudad va en Tilemaps y la sombra del prototipo se resuelve por
+casilla al dibujar.
+
+- [ ] Sombra de manzana: un Tilemap encima con la casilla en sombra, recalculado cuando
+      cambie la hora (no por fotograma: son siete kilómetros).
+- [ ] Sombra de figura y de mobiliario: un `SpriteRenderer` hijo, tumbado con
+      `Sol.Sombra(alto)`.
+- [ ] Luz ambiente: teñir con un quad a pantalla completa o con `Camera.backgroundColor` +
+      un `SpriteRenderer` en overlay. No con URP: el proyecto va con paquetes base.
+- [ ] Farolas encendidas de noche.
+
 ## 2 · Primera pasada de juego real
 
 - [ ] ¿Se ve Bilbao? Comparar con `referencia/capturas/plano-bilbo.png`.

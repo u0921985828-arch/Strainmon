@@ -255,6 +255,11 @@ de color a la misma altura.
 - **De noche las farolas encienden** un charco de luz en escalones —no en degradado, y no es
   un sprite: es luz, como el tinte, y un sprite a medio alfa se saltaría la regla de que todo
   el arte va opaco y en paleta.
+- **Todo lo que está de pie proyecta al mismo sitio** y con su altura: la persona (1,7 m), el
+  coche (1,5), la farola (4) y el árbol (5,6) salen de la misma cuenta que la manzana. La del
+  coche iba dos píxeles abajo a la derecha a cualquier hora, y la de la gente era una elipse
+  fija. Sin sol —de noche o dentro de un sitio— queda la sombra de contacto: que algo apoya
+  en el suelo hay que verlo igual.
 - **Canto negro en el mobiliario**, la misma regla que ya tenían los iconos del HUD. Solo se
   exige donde hay margen: lo que toca el borde del lienzo no puede llevarlo.
 
