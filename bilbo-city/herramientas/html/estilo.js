@@ -7,6 +7,7 @@
  * arte de verdad, el que se forja al arrancar, y devuelve 1 si algo se ha ido.
  */
 require('./arnes.js');
+const fs = require('fs'), path = require('path');
 
 const listo = async () => {
   for (let t = 0; t < 30000; t += 25) {
@@ -35,6 +36,40 @@ listo().then(() => {
       return Object.entries(v).map(([k2, c]) => [k + '.' + k2, c]);
     return [[k, v]];
   });
+
+  // ── R0 · la guía dice la verdad ─────────────────────────────────────────────────
+  // Esta regla no mira el arte: mira el documento. Las medidas marcadas [V] en ESTILO.md
+  // estaban escritas como si alguien las comprobara y no las comprobaba nadie —el
+  // verificador leía `SPR.cel` del juego, nunca el número del papel—, así que la guía
+  // llegó a decir celda de 34×38, hoja de 14 filas y 48 colores mientras el juego iba a
+  // 24×32, 16 filas y 61. Un documento que puede mentir sin que salte nada acaba
+  // mintiendo. Ahora los números del papel se leen del papel y se comparan con el juego.
+  {
+    const ruta = path.join(__dirname, '..', '..', 'referencia', 'ESTILO.md');
+    const doc = fs.readFileSync(ruta, 'utf8');
+    const [CW, CH] = A.SPR.cel;
+    const dice = [
+      [/Persona \|\s*\*\*(\d+)×(\d+) px\*\*/,            ['20', '26'],                 'la figura'],
+      [/Celda del personaje \|\s*\*\*(\d+)×(\d+) px\*\*/, [String(CW), String(CH)],     'la celda del personaje'],
+      [/Icono de interfaz \|\s*\*\*(\d+)×(\d+) px\*\*/,   ['24', '24'],                 'el icono de interfaz'],
+      [/Casilla del mundo \|\s*\*\*(\d+)×(\d+) px\*\*/,   ['32', '32'],                 'la casilla del mundo'],
+      [/Hoja de personaje \|\s*\*\*(\d+) columnas × (\d+) filas\*\*/,
+                                                      ['8', String(A.ORDEN_POSES.length)], 'la hoja de personaje'],
+      [/\*\*(\d+) colores y ninguno más\*\*/,               [String(A.PALETA.length)],    'la paleta'],
+    ];
+    let malos = 0;
+    for (const [re, esperado, que] of dice) {
+      const m = doc.match(re);
+      if (!m) { fallos.push('ESTILO.md: no se encuentra la medida de ' + que); malos++; continue; }
+      const leido = m.slice(1, esperado.length + 1);
+      if (leido.join('×') !== esperado.join('×')) {
+        fallos.push('ESTILO.md dice que ' + que + ' mide ' + leido.join('×')
+          + ', y el juego la hace de ' + esperado.join('×'));
+        malos++;
+      }
+    }
+    if (!malos) bien.push(dice.length + ' medidas de ESTILO.md cuadran con el juego');
+  }
 
   // ── R1 · nada fuera de la paleta, y nada a medio transparente ────────────────────
   {

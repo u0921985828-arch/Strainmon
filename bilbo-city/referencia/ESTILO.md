@@ -16,11 +16,11 @@ Bilbao a finales de los noventa, vista desde arriba y algo escorada, en pixel ar
 | | Medida | Por qué |
 |---|---|---|
 | Casilla del mundo | **32×32 px** | 5,16 m de Bilbao. Un portal ocupa una casilla. |
-| Persona | **20×26 px** | Cabeza ≈ 1/3,5 de la altura: cabezona a propósito, como en un GTA cenital. Se lee a 20 px. |
-| Celda del personaje | **34×38 px** **[V]** | La figura mide 20×26; el resto es margen. Ahí caben el puñetazo, el fogonazo, el casco de obra y el contorno. |
+| Persona | **20×26 px** **[V]** | Cabeza ≈ 1/3,25 de la altura. Se probó a 1/2,6 y se descartó: a esa proporción la figura se lee de juguete y no de juego con historia. La bandera `cabezona` sigue ahí por si se quiere volver a probar. |
+| Celda del personaje | **24×32 px** **[V]** | La fija CONTEXT.md §18.1, con el pivote en (12,30). La figura mide 20×26; lo que queda de margen es 2 a los lados, 5 arriba y 1 abajo. Ahí caben el puñetazo, el fogonazo, el casco de obra y el contorno, todos recogidos a propósito. |
 | Icono de interfaz | **24×24 px** **[V]** | 22×22 de dibujo y 1 px de aire alrededor para el contorno. |
 | Vehículo | largo 26–44, ancho 15–21 | Un utilitario cabe en una calle de 2 casillas; la furgoneta no. |
-| Hoja de personaje | **8 columnas × 14 filas** **[V]** | 8 direcciones × 14 poses. Una hoja por arquetipo. |
+| Hoja de personaje | **8 columnas × 16 filas** **[V]** | 8 direcciones × 16 poses. Una hoja por arquetipo. |
 
 Todas las medidas son **pares**: si no, no hay centro y el sprite baila medio píxel al
 girar.
@@ -34,13 +34,18 @@ plano; todo lo que sobresale lleva **2–3 px de canto** por abajo.
 la derecha en medio de una acera iluminada por la izquierda se nota aunque no se sepa por
 qué. En la práctica:
 
-- 1 px claro en el borde de arriba,
+- 1 px claro en el borde de arriba **y en el de la izquierda**,
 - el color base en el cuerpo,
 - 1–2 px oscuros abajo y a la derecha.
 
+**Y lo que tapa, ensombrece.** Tres tonos puestos uno al lado del otro no son volumen: lo
+que hace que una cosa esté *delante* de otra es la sombra que le proyecta encima. La
+barbilla ensombrece el pecho y el dobladillo la pernera. Sin eso la cabeza y el torso son
+dos manchas pegadas.
+
 ## Color
 
-- **48 colores y ninguno más** **[V]**. Están en `C` (prototipo) y `Paleta` (Unity). Todo
+- **61 colores y ninguno más** **[V]**. Están en `C` (prototipo) y `Paleta` (Unity). Todo
   sprite pasa por `cuantizar` / `Paleta.Cuantizar`.
 - Cada material tiene su terna base / oscuro / claro: `piel1..6`, `madera/maderaO/maderaL`,
   `acero/aceroO`, `hormigon/hormigonO/hormigonL`. Úsalas; no mezcles el gris del asfalto
@@ -71,6 +76,13 @@ qué. En la práctica:
   el negro del fondo y aparece una trama de puntos por todo el mapa. Los muebles de
   interior sí son transparentes —van encima del suelo— y están declarados en
   `TILE_MUEBLE`.
+- **La silueta va achaflanada, sin esquinas de noventa grados** **[V]**. Todo lo que
+  dibuja la forja son rectángulos —`P()` no sabe hacer otra cosa— y a 26 píxeles la suma
+  de rectángulos se lee como un montón de cajas apiladas. `chaflan()` / `Lienzo.Chaflan()`
+  quita el píxel de cada esquina convexa **antes** del contorno, y el cráneo, el hombro y
+  la puntera dejan de ser cantos rectos. Va apretado a propósito —los dos vecinos de fuera
+  transparentes y los dos de dentro opacos— porque con la condición suelta se come entero
+  un detalle de un píxel de ancho, como la correa del bolso.
 - **Los personajes llevan contorno negro de 1 px en la silueta** **[V]**, no en las
   costuras de la ropa. Por la misma razón que los iconos: la gente cruza del asfalto a la
   acera y de la acera al parque, y una cazadora gris sobre hormigón gris sin borde se
