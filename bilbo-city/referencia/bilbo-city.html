@@ -2880,63 +2880,11 @@ function generarTiles(){
   for(const t of TEJADOS[fam]){FAM_DE[TILE.tejados.length]=fam;TILE.tejados.push(t);}}
  TILE.suelo=T32(g=>{rell(g,'#7a5f3f');ruido(g,32,32,['#654e33','#8f7150'],14);
   for(let i=0;i<32;i+=8)P(g,0,i,32,1,'#654e33');});
- TILE.sueloCasa=T32(g=>{rell(g,C.crema);
-  for(let y=0;y<32;y+=16)for(let x=0;x<32;x+=16){P(g,x+2,y+2,12,12,C.azulL);P(g,x+5,y+5,6,6,C.crema);
-   P(g,x,y,16,1,C.hormigonO);P(g,x,y,1,16,C.hormigonO);}});
- TILE.terrazo=T32(g=>{rell(g,C.hormigonL);ruido(g,32,32,[C.acero,C.crema,C.hormigonO],38);
-  for(let i=0;i<32;i+=16){P(g,i,0,1,32,C.hormigonO);P(g,0,i,32,1,C.hormigonO);}});
- TILE.sueloTaller=T32(g=>{rell(g,'#4d5157');ruido(g,32,32,['#42464b','#5b6067'],18);P(g,0,15,32,2,C.mostazaO);});
- TILE.sueloHosp=T32(g=>{rell(g,'#8fa8a0');ruido(g,32,32,['#7d968e','#a3bab2'],14);
-  for(let i=0;i<32;i+=16)P(g,i,0,1,32,'#7d968e');});
- TILE.pared=T32(g=>{rell(g,'#4b3b32');ruido(g,32,32,['#43342c','#57453a'],16);
-  for(let y=0;y<32;y+=8){P(g,0,y,32,1,'#3a2d26');for(let x=(y%16?8:0);x<32;x+=16)P(g,x,y,1,8,'#3a2d26');}
-  P(g,0,0,32,3,'#5e4a3d');});
- TILE.paredAzul=T32(g=>{rell(g,'#2f5f5a');
-  for(let y=0;y<32;y+=8)for(let x=0;x<32;x+=8){P(g,x,y,7,7,'#3a7570');P(g,x,y,7,1,'#4d908a');}
-  P(g,0,0,32,3,'#4d908a');});
- TILE.paredChapa=T32(g=>{rell(g,'#566060');for(let x=0;x<32;x+=4)P(g,x,0,2,32,'#454e4e');P(g,0,0,32,3,'#6e7a7a');});
- TILE.paredBlanca=T32(g=>{rell(g,'#c9c4b6');ruido(g,32,32,['#b8b3a5'],10);P(g,0,0,32,3,C.blanco);});
- /* mobiliario */
- TILE.barra=T32(g=>{rell(g,C.madera);ruido(g,32,32,[C.maderaO,C.maderaL],14);
-  P(g,0,0,32,4,C.maderaL);P(g,0,28,32,4,C.maderaO);});
- TILE.mesa=T32(g=>{P(g,4,6,24,22,C.negro);P(g,3,4,25,23,'#7a5233');P(g,5,6,21,4,'#93663f');
-  P(g,7,12,6,6,C.crema);P(g,18,15,5,8,'#8fae8a');});
- TILE.cama=T32(g=>{P(g,3,2,26,28,'#5a4433');P(g,5,4,22,24,'#8a9bb0');P(g,5,4,22,8,'#c9d2dd');
-  P(g,8,5,16,5,C.blanco);});
- TILE.mueble=T32(g=>{P(g,2,4,28,24,'#5c4630');P(g,4,6,11,20,'#6d543a');P(g,17,6,11,20,'#6d543a');
-  P(g,13,14,3,3,C.mostaza);P(g,16,14,3,3,C.mostaza);});
- TILE.vitrina=T32(g=>{P(g,1,4,30,24,C.grisO);P(g,3,6,26,14,'#66727f');
-  P(g,5,9,10,2,C.carbon);P(g,5,14,13,2,C.carbon);P(g,20,9,8,3,C.acero);P(g,1,2,30,3,C.rojoO);});
- TILE.cocheEx=T32(g=>{rell(g,'#3d3d44');ruido(g,32,32,['#35353b','#46464e'],18);
-  P(g,4,10,24,12,C.rojoO);P(g,10,12,12,8,C.carbon);});
- TILE.puesto=T32(g=>{P(g,1,6,30,22,C.acero);P(g,3,8,26,10,'#cfd6dd');
-  for(let i=0;i<5;i++)P(g,4+i*5,10,4,6,'#7fa8c4');P(g,1,4,30,3,C.rojoO);});
- TILE.camilla=T32(g=>{P(g,3,4,26,24,C.blanco);P(g,5,6,22,20,'#8fa8a0');P(g,5,6,22,6,C.crema);
-  P(g,4,28,3,3,C.acero);P(g,25,28,3,3,C.acero);});
- TILE.mostrador=T32(g=>{P(g,1,10,30,18,C.maderaO);P(g,1,8,30,4,C.maderaL);P(g,6,14,8,6,C.crema);});
- TILE.taquilla=T32(g=>{rell(g,'#5f7182');for(let x=0;x<32;x+=8){P(g,x,0,7,32,'#6b7f92');
-  P(g,x+5,6,1,3,C.acero);P(g,x+5,20,1,3,C.acero);}});
- TILE.sillas=T32(g=>{rell(g,'#8fa8a0');for(let x=2;x<30;x+=9){P(g,x,8,7,12,C.azulL);P(g,x,6,7,3,C.azul);}});
- TILE.estante=T32(g=>{rell(g,C.grisO);for(let y=2;y<30;y+=9){P(g,0,y+7,32,2,C.gris);
-  for(let x=2;x<30;x+=6)P(g,x,y,4,7,C.mostazaO);}});
- TILE.perchero=T32(g=>{rell(g,C.grisO);P(g,0,5,32,2,C.acero);P(g,0,4,32,1,C.hormigonL);
-  const tr=[C.rojoO,C.azul,C.verdeO,C.mostazaO,C.morado,C.carbon];
-  for(let i=0;i<6;i++){const x=1+i*5;P(g,x+1,3,2,3,C.aceroO);
-   P(g,x,7,4,15,tr[i]);P(g,x,7,4,2,C.hueso);P(g,x+3,7,1,15,C.negro);}
-  P(g,0,28,32,4,C.gris);});
- TILE.escalera=T32(g=>{rell(g,C.acero);
-  for(let y=0;y<32;y+=4){P(g,2,y,28,3,C.aceroO);P(g,2,y,28,1,C.hormigonL);}
-  P(g,0,0,2,32,C.gris);P(g,30,0,2,32,C.grisO);});
- TILE.surtidor=T32(g=>{rell(g,C.hormigon);P(g,5,2,22,26,C.rojoO);P(g,5,2,22,3,C.rojo);
-  P(g,26,2,1,26,C.sangre);P(g,8,6,15,11,C.carbon);P(g,10,8,11,4,C.mostaza);
-  P(g,10,13,7,2,C.acero);P(g,27,12,4,9,C.carbon);P(g,4,20,24,3,C.grisO);});
+ generarInteriores();
 }
-/* Los muebles de interior se dibujan ENCIMA del suelo, así que tienen que llevar
-   transparencia: una mesa que ocupa toda la casilla no deja ver la tarima. El resto de
-   tiles son suelo y no pueden tener ni un hueco — por un agujero se ve el negro del
-   fondo y sale una rejilla de puntos por toda la ciudad. El verificador de estilo
-   distingue los dos casos por esta lista. */
-const TILE_MUEBLE=new Set(['mesa','cama','mueble','vitrina','puesto','camilla','mostrador']);
+/* Ningún tile puede tener un hueco: por un agujero se ve el negro del fondo y sale una
+   rejilla de puntos por toda la ciudad. El mobiliario, que sí lleva transparencia, ya no
+   es un tile — son piezas de interior, y van por su cuenta (ver ARTE DE INTERIOR). */
 
 /*═══════════════ VEHÍCULOS ═══════════════*/
 /* Las medidas salen de las de verdad, no de lo que quedaba bonito. La escala del mapa es
@@ -3034,6 +2982,138 @@ function generarVeh(){
   VEH_QUEMADO[t]=dibVeh(t,LIBREAS[0],'quemado');});
  VEH.patrullaRot=[dibVeh('patrulla',LIBREAS[5],'rotA'),dibVeh('patrulla',LIBREAS[5],'rotB')];
 }
+
+/*═══════════════ ARTE DE INTERIOR ═══════════════*/
+/* Todo esto se forja a 16 px por casilla, o sea a 20 px/m. No pasa por ESC_P: aquí el
+   píxel ya es el final. Y el mobiliario no es un tile repetido sino una pieza entera —una
+   cama de 0,8×2,4 m se dibuja de una vez, con su cabecero y su almohada—, igual que los
+   edificios singulares se dibujan a su tamaño y no a base de baldosas. */
+const SUELO_I={},PARED_I={},PUERTA_I={},PASO_I={};
+const T_I=fn=>{const c=lienzo(TS_INT,TS_INT),g=c.getContext('2d');fn(g);return cuantizar(c);};
+const rellI=(g,col)=>P(g,0,0,TS_INT,TS_INT,col);
+function generarInteriores(){
+ /* Una baldosa hidráulica de 20 cm son 4 px y se ve. Con la casilla de fuera, el suelo de
+    una casa era un cuadrado de cinco metros con una junta pintada. */
+ SUELO_I.parquet=T_I(g=>{rellI(g,C.maderaL);ruido(g,16,16,[C.madera],4);
+  /* Tabla de 1,2 m por 12 cm: a 20 px/m son veinticuatro píxeles de largo y tres de
+     ancho. Con la junta cada ocho, la tabla salía cuadrada y el suelo se leía como un
+     muro de ladrillo. */
+  for(let y=3;y<16;y+=4)P(g,0,y,16,1,C.madera);});
+ SUELO_I.hidraulico=T_I(g=>{rellI(g,C.crema);
+  for(let y=0;y<16;y+=8)for(let x=0;x<16;x+=8){P(g,x+1,y+1,6,6,C.azulL);P(g,x+3,y+3,2,2,C.crema);
+   P(g,x,y,8,1,C.hormigonO);P(g,x,y,1,8,C.hormigonO);}});
+ SUELO_I.terrazo=T_I(g=>{rellI(g,C.hormigonL);ruido(g,16,16,[C.acero,C.crema,C.hormigonO],34);
+  P(g,0,0,16,1,C.hormigonO);P(g,0,0,1,16,C.hormigonO);});
+ SUELO_I.chapa=T_I(g=>{rellI(g,'#4d5157');ruido(g,16,16,['#42464b','#5b6067'],16);});
+ SUELO_I.hospital=T_I(g=>{rellI(g,'#8fa8a0');ruido(g,16,16,['#7d968e','#a3bab2'],12);
+  P(g,0,0,1,16,'#7d968e');});
+ /* El muro lleva la luz arriba y la sombra abajo, como todo lo demás: es lo que hace que
+    una habitación se lea como una caja y no como una retícula de cuadros. */
+ PARED_I.yeso=T_I(g=>{rellI(g,'#c9c4b6');ruido(g,16,16,['#b8b3a5'],10);
+  P(g,0,0,16,2,C.blanco);P(g,0,14,16,2,'#a9a496');});
+ PARED_I.azulejo=T_I(g=>{rellI(g,'#2f5f5a');
+  for(let y=0;y<16;y+=4)for(let x=0;x<16;x+=4){P(g,x,y,3,3,'#3a7570');P(g,x,y,3,1,'#4d908a');}
+  P(g,0,0,16,2,'#4d908a');P(g,0,15,16,1,'#22403d');});
+ PARED_I.chapa=T_I(g=>{rellI(g,'#566060');for(let x=0;x<16;x+=3)P(g,x,0,1,16,'#454e4e');
+  P(g,0,0,16,2,'#6e7a7a');});
+ PARED_I.ladrillo=T_I(g=>{rellI(g,'#4b3b32');ruido(g,16,16,['#43342c','#57453a'],16);
+  for(let y=0;y<16;y+=4){P(g,0,y,16,1,'#3a2d26');for(let x=(y%8?4:0);x<16;x+=8)P(g,x,y,1,4,'#3a2d26');}
+  P(g,0,0,16,2,'#5e4a3d');});
+ PUERTA_I.v=T_I(g=>{P(g,0,0,16,16,C.maderaO);P(g,1,1,14,14,C.madera);
+  P(g,2,3,12,4,'#93663f');P(g,2,9,12,4,'#93663f');P(g,12,7,2,2,C.mostaza);});
+ PASO_I.v=T_I(g=>{P(g,0,0,2,16,C.hormigonL);P(g,14,0,2,16,C.hormigonL);});
+ PASO_I.h=T_I(g=>{P(g,0,0,16,2,C.hormigonL);P(g,0,14,16,2,C.hormigonL);});
+}
+/* Cada mueble se dibuja al tamaño que ocupe en el plano, con w y h en píxeles. Los que
+   pueden ir en fila o en columna miran cuál es su lado largo: una estantería contra la
+   pared de arriba y otra contra la de la izquierda son la misma pieza girada. */
+const MUEBLES={
+ C:{n:'cama',dib(g,w,h){P(g,0,0,w,h,'#5a4433');P(g,1,1,w-2,3,C.maderaL);
+  P(g,1,4,w-2,h-6,'#8a9bb0');P(g,2,5,w-4,5,C.hueso);
+  P(g,1,Math.round(h*.55),w-2,1,'#6f7d8f');P(g,0,h-2,w,2,C.maderaO);}},
+ A:{n:'armario',dib(g,w,h){P(g,0,0,w,h,'#5c4630');P(g,1,1,w-2,h-2,'#6d543a');
+  const hz=w>=h,n=Math.max(1,Math.round((hz?w:h)/16));
+  for(let i=1;i<n;i++){const p=i*16;if(hz)P(g,p,1,1,h-2,'#4a3826');else P(g,1,p,w-2,1,'#4a3826');}
+  for(let i=0;i<n;i++){if(hz)P(g,i*16+12,(h>>1)-1,2,3,C.mostaza);else P(g,(w>>1)-1,i*16+12,3,2,C.mostaza);}}},
+ U:{n:'mesita',dib(g,w,h){P(g,1,2,w-2,h-3,C.maderaO);P(g,2,3,w-4,3,C.maderaL);
+  P(g,(w>>1)-2,7,4,4,C.mostaza);P(g,(w>>1)-1,6,2,1,C.hueso);}},
+ F:{n:'sofá',dib(g,w,h){const hz=w>=h;P(g,0,0,w,h,'#4d5b6b');
+  if(hz){P(g,0,0,w,4,'#3d4a58');for(let x=1;x<w-1;x+=16)P(g,x,5,Math.min(14,w-1-x),h-7,'#5f7182');}
+  else{P(g,0,0,4,h,'#3d4a58');for(let y=1;y<h-1;y+=16)P(g,5,y,w-7,Math.min(14,h-1-y),'#5f7182');}}},
+ M:{n:'mesa',dib(g,w,h){P(g,0,1,w,h-1,C.negro);P(g,0,0,w,h-2,'#7a5233');P(g,1,1,w-2,3,'#93663f');
+  if(w>=32&&h>=32){P(g,6,7,6,6,C.crema);P(g,w-13,h-16,5,8,'#8fae8a');}
+  else P(g,(w>>1)-2,(h>>1)-2,4,4,C.crema);}},
+ S:{n:'silla',dib(g,w,h){P(g,3,2,10,3,C.madera);P(g,3,5,10,9,C.maderaO);P(g,4,6,8,7,'#93663f');}},
+ K:{n:'encimera',dib(g,w,h){P(g,0,0,w,h,'#6d543a');const hz=w>=h;
+  if(hz){P(g,0,0,w,3,C.hormigonL);for(let x=0;x<w;x+=16)P(g,x+1,4,14,h-5,'#7d6244');
+   P(g,4,5,8,6,C.acero);P(g,w-12,5,8,6,C.carbon);}
+  else{P(g,0,0,3,h,C.hormigonL);for(let y=0;y<h;y+=16)P(g,4,y+1,w-5,14,'#7d6244');
+   P(g,5,4,8,6,C.acero);P(g,5,h-12,8,6,C.carbon);}}},
+ N:{n:'nevera',dib(g,w,h){P(g,0,0,w,h,C.hormigonL);P(g,1,1,w-2,h-2,C.hueso);
+  P(g,1,(h>>1),w-2,1,C.hormigonO);P(g,w-4,3,2,6,C.acero);P(g,w-4,(h>>1)+3,2,6,C.acero);}},
+ T:{n:'inodoro',dib(g,w,h){P(g,4,2,8,4,C.blanco);P(g,3,6,10,8,C.blanco);
+  P(g,5,8,6,5,'#b9c6cf');P(g,4,14,8,1,C.hormigonO);}},
+ V:{n:'lavabo',dib(g,w,h){P(g,2,3,12,10,C.blanco);P(g,4,5,8,6,'#b9c6cf');P(g,7,2,2,3,C.acero);}},
+ H:{n:'ducha',dib(g,w,h){P(g,0,0,w,h,'#b9c6cf');P(g,1,1,w-2,h-2,'#8fa8a0');
+  for(let i=2;i<w-2;i+=3)P(g,i,2,1,h-4,'#a3bab2');P(g,w-6,2,4,4,C.acero);}},
+ E:{n:'estantería',dib(g,w,h){P(g,0,0,w,h,C.grisO);const hz=w>=h,
+  cols=[C.mostazaO,C.rojoO,C.azul,C.verdeO,C.crema,C.morado];
+  if(hz){P(g,0,0,w,2,C.gris);for(let x=1,i=0;x<w-2;x+=4,i++)P(g,x,3,3,h-5,cols[i%cols.length]);}
+  else{P(g,0,0,2,h,C.gris);for(let y=1,i=0;y<h-2;y+=4,i++)P(g,3,y,w-5,3,cols[i%cols.length]);}}},
+ B:{n:'barra',dib(g,w,h){P(g,0,0,w,h,C.madera);ruido(g,w,h,[C.maderaO,C.maderaL],12);
+  P(g,0,0,w,2,C.maderaL);P(g,0,h-3,w,3,C.maderaO);P(g,0,h-1,w,1,C.acero);}},
+ O:{n:'mostrador',dib(g,w,h){P(g,0,2,w,h-2,C.maderaO);P(g,0,0,w,3,C.maderaL);
+  P(g,3,5,7,6,C.crema);if(w>16)P(g,w-9,5,6,6,C.carbon);}},
+ X:{n:'vitrina',dib(g,w,h){P(g,0,0,w,h,C.grisO);P(g,1,2,w-2,h-4,'#66727f');P(g,0,0,w,2,C.rojoO);
+  const hz=w>=h;for(let i=2;i<(hz?w:h)-3;i+=5){if(hz)P(g,i,4,3,h-8,C.acero);else P(g,4,i,w-8,3,C.acero);}}},
+ P:{n:'puesto',dib(g,w,h){P(g,0,0,w,h,C.acero);P(g,1,1,w-2,h-4,'#cfd6dd');
+  for(let x=2;x<w-4;x+=5)P(g,x,3,4,h-8,'#7fa8c4');P(g,0,0,w,2,C.rojoO);P(g,0,h-3,w,3,C.aceroO);}},
+ L:{n:'camilla',dib(g,w,h){P(g,0,0,w,h,C.blanco);P(g,1,2,w-2,h-4,'#8fa8a0');
+  P(g,2,3,w-4,4,C.crema);P(g,0,h-2,w,2,C.acero);}},
+ Q:{n:'taquilla',dib(g,w,h){P(g,0,0,w,h,'#5f7182');const hz=w>=h;
+  for(let i=0;i<(hz?w:h);i+=8){if(hz){P(g,i,0,7,h,'#6b7f92');P(g,i+5,4,1,3,C.acero);}
+   else{P(g,0,i,w,7,'#6b7f92');P(g,4,i+5,3,1,C.acero);}}}},
+ R:{n:'perchero',dib(g,w,h){P(g,0,0,w,h,C.grisO);P(g,0,2,w,1,C.acero);
+  const tr=[C.rojoO,C.azul,C.verdeO,C.mostazaO,C.morado,C.carbon];
+  for(let x=0,i=0;x<w-2;x+=3,i++){P(g,x+1,3,2,h-5,tr[i%tr.length]);P(g,x+1,3,2,1,C.hueso);}}},
+ Z:{n:'coche',dib(g,w,h){P(g,3,2,w-6,h-4,C.rojoO);P(g,2,5,w-4,h-10,C.rojoO);
+  P(g,4,8,w-8,9,C.carbon);P(g,4,h-19,w-8,8,C.carbon);
+  P(g,0,6,2,6,C.negro);P(g,w-2,6,2,6,C.negro);P(g,0,h-13,2,6,C.negro);P(g,w-2,h-13,2,6,C.negro);
+  P(g,5,3,w-10,2,C.hueso);}},
+ Y:{n:'escalera',dib(g,w,h){P(g,0,0,w,h,C.acero);
+  for(let y=0;y<h;y+=4){P(g,1,y,w-2,3,C.aceroO);P(g,1,y,w-2,1,C.hormigonL);}
+  P(g,0,0,1,h,C.gris);P(g,w-1,0,1,h,C.grisO);}},
+ W:{n:'aparador',dib(g,w,h){P(g,0,1,w,h-1,'#5c4630');P(g,0,0,w,2,C.maderaL);
+  for(let x=2;x<w-3;x+=6){P(g,x,4,5,h-7,'#6d543a');P(g,x+2,h-6,2,1,C.mostaza);}}},
+ J:{n:'planta',dib(g,w,h){P(g,5,10,6,5,'#8a5b36');P(g,4,9,8,2,'#6f4a31');
+  P(g,4,3,8,6,C.verdeO);P(g,6,1,4,4,C.cesped);}},
+};
+/* El plano se trocea en piezas rectangulares una sola vez al entrar: dos casillas de «C»
+   seguidas no son dos camas, son una cama de 1,6 m. Los muebles de esta lista no se juntan
+   nunca —cuatro sillas en fila son cuatro sillas, no un banco de 3,2 m— y por eso salen de
+   una en una. */
+const UNITARIO_I='STVUJN';
+function piezasDe(I){
+ if(I._piezas)return I._piezas;
+ const m=I.mapa,h=m.length,visto=m.map(f=>new Array(f.length).fill(false)),out=[];
+ for(let y=0;y<h;y++)for(let x=0;x<m[y].length;x++){
+  const ch=m[y][x];
+  if(ch==='#'||BLANDO_I.includes(ch)||visto[y][x])continue;
+  if(UNITARIO_I.includes(ch)){visto[y][x]=true;out.push({ch,x,y,w:1,h:1});continue;}
+  let aw=0;while(x+aw<m[y].length&&m[y][x+aw]===ch&&!visto[y][x+aw])aw++;
+  let ah=1;
+  while(y+ah<h){let ok=m[y+ah].length>=x+aw;
+   for(let i=0;ok&&i<aw;i++)if(m[y+ah][x+i]!==ch||visto[y+ah][x+i])ok=false;
+   if(!ok)break;ah++;}
+  for(let j=0;j<ah;j++)for(let i=0;i<aw;i++)visto[y+j][x+i]=true;
+  out.push({ch,x,y,w:aw,h:ah});}
+ return I._piezas=out;}
+const _mue={};
+function sprMueble(ch,cw,cf){
+ const k=ch+cw+'x'+cf;if(_mue[k])return _mue[k];
+ const c=lienzo(cw*TS_INT,cf*TS_INT),g=c.getContext('2d'),M=MUEBLES[ch];
+ if(M)M.dib(g,c.width,c.height);
+ return _mue[k]=cuantizar(c);}
 
 /*═══════════════ PROPS ═══════════════*/
 const PROP={};
@@ -3612,86 +3692,99 @@ const puntoZona=(cx,cy,r,z)=>cercaDe((x,y)=>{
  return !z||distDe(x,y).n===z;},cx,cy,r||60);
 const puntoCalle=(cx,cy,r)=>buscar((x,y)=>Tc(x,y)===ROAD,cx,cy,r||40);
 /*═══════════════ INTERIORES ═══════════════*/
-/* # pared · . suelo · B barra · M mesa · C cama · W mueble · X vitrina · P puesto · V coche
-   O mostrador · Q taquilla · S sillas · E estante · L camilla · D puerta */
+/* Fuera, una casilla son 5,16 m. Dentro no puede serlo: con esa vara el piso medía 72×41 m,
+   una cama 5 m de ancho y cruzar el salón costaba cincuenta segundos, y lo que se veía al
+   entrar no se parecía a una casa. La casilla de interior mide 0,80 m —el ancho de una
+   puerta de paso— y se dibuja a 16 px: 20 px/m, la densidad a la que está dibujada la
+   gente. Dentro de una casa la vara de medir es una persona, no un coche. */
+const M_INT=.8, TS_INT=16, MS_I=1/M_INT;
+const V_INTERIOR_C=1.4*MS_I;        /* 1,4 m/s, en casillas de interior por segundo */
+
+/* # pared · . suelo · D salida · d paso · C cama · A armario · U mesita · F sofá · M mesa
+   S silla · K encimera · N nevera · T inodoro · V lavabo · H ducha · E estantería
+   B barra · O mostrador · X vitrina · P puesto · L camilla · Q taquilla · R perchero
+   G surtidor · Z coche · Y escalera · W aparador · J planta */
 const INT={
- bar:{n:'Bar Zurito',suelo:'terrazo',pared:'paredAzul',mapa:[
-  '################','#BBBBBBBB.....W#','#..............#','#..MM....MM....#',
-  '#..MM....MM....#','#..............#','#..MM....MM....#','#..MM....MM....#',
-  '#..............#','#######DD#######'],
-  npcs:[{x:3.5,y:2.6,n:'Josu',arq:'josu',tipo:'barman'},{x:11.5,y:2.6,n:'Txema',arq:'txema',tipo:'jefe'},
-        {x:6.5,y:8.4,n:'Mikel',arq:'mikel',tipo:'parroquiano'}]},
- /* Dos camas porque es un piso compartido: la de la izquierda es la del primo. Los
-    pisos que se compran reaprovechan este plano, y ahí la segunda cama pasa por la de
-    invitados. */
- piso:{n:'Tu piso',suelo:'sueloCasa',pared:'paredBlanca',mapa:[
-  '##############','#CC.......CC.#','#CC.......CC.#','#..........WW#','#....MM......#',
-  '#....MM......#','#............#','#####DD#######'],npcs:[]},
- taller:{n:'Taller Iker',suelo:'sueloTaller',pared:'paredChapa',mapa:[
-  '################','#VVVV....VVVV.W#','#VVVV....VVVV..#','#..............#',
-  '#..............#','#....WW........#','#######DD#######'],
-  npcs:[{x:7.5,y:4.5,n:'Iker',arq:'iker',tipo:'mecanico'}]},
- armeria:{n:'Bazar Nervión',suelo:'sueloTaller',pared:'pared',mapa:[
-  '#############','#XXXXXXXXXXX#','#...........#','#..EE...EE..#',
-  '#...........#','#....OO.....#','#####DD######'],
-  npcs:[{x:6.5,y:4.5,n:'Koldo',arq:'koldo',tipo:'armero'}]},
- merca:{n:'Mercado de la Ribera',suelo:'terrazo',pared:'paredChapa',mapa:[
-  '#################','#PPPP...PPPP..PP#','#...............#','#..PPPP...PPPP..#',
-  '#...............#','########DD#######'],
-  npcs:[{x:3.5,y:2.6,n:'Bego',arq:'bego',tipo:'pescatera'}]},
- hospital:{n:'Hospital de Basurto',suelo:'sueloHosp',pared:'paredBlanca',mapa:[
-  '###############','#LL...LL...QQ.#','#LL...LL......#','#.............#',
-  '#SSSS....OOOO.#','#.............#','######DD#######'],
-  npcs:[{x:9.5,y:5.5,n:'Nekane',arq:'enfermera',tipo:'enfermera'}]},
- portal:{n:'Portal · la casera',suelo:'sueloCasa',pared:'paredBlanca',mapa:[
-  '############','#....WW....#','#..........#','#..........#','#####DD#####'],
-  npcs:[{x:6.5,y:2.5,n:'Amaia',arq:'amaia',tipo:'casera'}]},
- /* Los cuatro de abajo los comparten varios sitios: el rótulo lo pone el POI, no el
+ /* El piso compartido: dos habitaciones, salón, cocina y baño alrededor de un pasillo.
+    62 m² útiles, que es lo que mide un piso de los años sesenta en Santutxu. La habitación
+    de la derecha es la del primo. Los pisos que se compran reaprovechan este plano. */
+ piso:{n:'Tu piso',suelo:'parquet',pared:'yeso',mapa:[
+  '#############','#CCU.#.#.UCC#','#CC..#.#..CC#','#CC..d.d..CC#','#....#.#....#',
+  '#AAA.#.#.EEE#','######.######','#FFF.#.#KKKN#','#....d.d....#','#..U.#.#.MSS#',
+  '#....#.######','#MMS.#.d...H#','#MMS.#.#TV..#','######D######'],npcs:[]},
+ portal:{n:'Portal · la casera',suelo:'hidraulico',pared:'yeso',mapa:[
+  '#######','#WW..Y#','#....Y#','#....Y#','#.....#','#.....#','#J...J#','#.....#','###D###'],
+  npcs:[{x:3.5,y:4.5,n:'Amaia',arq:'amaia',tipo:'casera'}]},
+ bar:{n:'Bar Zurito',suelo:'terrazo',pared:'azulejo',mapa:[
+  '############','#EEEEEE..NN#','#..........#','#BBBBBBB...#','#..........#',
+  '#SMS..SMS..#','#..........#','#SMS..SMS..#','#......#####','#SMS...#TV.#',
+  '#......d...#','#......#...#','#####D######'],
+  npcs:[{x:3.5,y:2.5,n:'Josu',arq:'josu',tipo:'barman'},
+        {x:8.5,y:6.5,n:'Txema',arq:'txema',tipo:'jefe'},
+        {x:5.5,y:10.5,n:'Mikel',arq:'mikel',tipo:'parroquiano'}]},
+ taller:{n:'Taller Iker',suelo:'chapa',pared:'chapa',mapa:[
+  '###############','#EEEE....EEEE.#','#.............#','#.ZZ.....ZZ...#','#.ZZ.....ZZ...#',
+  '#.ZZ.....ZZ...#','#.ZZ.....ZZ...#','#.ZZ.....ZZ...#','#.............#','#OOO......QQQ.#',
+  '#.............#','#####DDDD######'],
+  npcs:[{x:11.5,y:10.5,n:'Iker',arq:'iker',tipo:'mecanico'}]},
+ armeria:{n:'Bazar Nervión',suelo:'chapa',pared:'ladrillo',mapa:[
+  '##########','#XXXXXXX.#','#........#','#EEE..EEE#','#........#','#EEE..EEE#',
+  '#........#','#.OOOO...#','#........#','####D#####'],
+  npcs:[{x:3.5,y:8.5,n:'Koldo',arq:'koldo',tipo:'armero'}]},
+ merca:{n:'Mercado de la Ribera',suelo:'terrazo',pared:'chapa',mapa:[
+  '###################','#PPPP..PPPP..PPPP.#','#PPPP..PPPP..PPPP.#','#.................#',
+  '#.................#','#PPPP..PPPP..PPPP.#','#PPPP..PPPP..PPPP.#','#.................#',
+  '#.................#','#OOOO.............#','#########D#########'],
+  npcs:[{x:2.5,y:8.5,n:'Bego',arq:'bego',tipo:'pescatera'}]},
+ hospital:{n:'Hospital de Basurto',suelo:'hospital',pared:'yeso',mapa:[
+  '################','#LL#LL#LL#LL...#','#..#..#..#.....#','#..............#','#..............#',
+  '#SSSS....OOOO..#','#..............#','#SSSS.........Q#','#..............#','#SSSS..........#',
+  '#..............#','#######D########'],
+  npcs:[{x:9.5,y:4.5,n:'Nekane',arq:'enfermera',tipo:'enfermera'}]},
+ /* Los cinco de abajo los comparten varios sitios: el rótulo lo pone el POI, no el
     interior. Dos tascas iguales por dentro y con distinto nombre en la puerta es lo que
     hay en cualquier barrio, y así no se duplica el plano por cada esquina. */
- ropa:{n:'Tienda de ropa',suelo:'terrazo',pared:'paredBlanca',mapa:[
-  '###############','#RRRRR...RRRRR#','#.............#','#..XX.....XX..#',
-  '#.............#','#RRRRR...EEEE.#','#.............#','#.....OOO.....#',
-  '#.............#','#######DD######'],
-  npcs:[{x:7.5,y:6.5,n:'Nerea',arq:'nerea',tipo:'ropa'}]},
- tasca:{n:'Tasca',suelo:'terrazo',pared:'paredAzul',mapa:[
-  '############','#BBBBBB...W#','#..........#','#..MM..MM..#',
-  '#..MM..MM..#','#..........#','#####DD#####'],
-  npcs:[{x:3.5,y:2.6,n:'Patxi',arq:'patxi',tipo:'barman'},
-        {x:8.5,y:5.4,n:'Mikel',arq:'mikel',tipo:'parroquiano'}]},
- resto:{n:'Restaurante',suelo:'terrazo',pared:'paredAzul',mapa:[
-  '################','#BB....WW....WW#','#..............#','#..MM..MM..MM..#',
-  '#..SS..SS..SS..#','#..............#','#..MM..MM..MM..#','#..SS..SS..SS..#',
-  '#..............#','#######DD#######'],
-  npcs:[{x:2.5,y:2.6,n:'Patxi',arq:'patxi',tipo:'cocinero'}]},
- centro:{n:'Galería',suelo:'terrazo',pared:'paredBlanca',mapa:[
-  '#####################','#RRRR..XXXX..EEEE..P#','#...................#',
-  '#..AA...........AA..#','#...................#','#..MM..MM...PPPP...P#',
-  '#..SS..SS...........#','#..........OOO......#','#...................#',
-  '#########DD##########'],
-  npcs:[{x:3.5,y:2.6,n:'Nerea',arq:'nerea',tipo:'ropa'},
-        {x:8.5,y:6.4,n:'Patxi',arq:'patxi',tipo:'cocinero'},
-        {x:18.5,y:2.6,n:'Bego',arq:'bego',tipo:'pescatera'}]},
+ ropa:{n:'Tienda de ropa',suelo:'terrazo',pared:'yeso',mapa:[
+  '###########','#RRRR.RRRR#','#.........#','#.........#','#RRRR.RRRR#','#.........#',
+  '#.........#','#XX....EEE#','#.........#','#.OOO.....#','#.........#','#####D#####'],
+  npcs:[{x:2.5,y:8.5,n:'Nerea',arq:'nerea',tipo:'ropa'}]},
+ tasca:{n:'Tasca',suelo:'terrazo',pared:'azulejo',mapa:[
+  '##########','#EEEE..NN#','#........#','#BBBBB...#','#........#','#SMS..SMS#',
+  '#........#','#SMS..SMS#','#........#','####D#####'],
+  npcs:[{x:3.5,y:2.5,n:'Patxi',arq:'patxi',tipo:'barman'},
+        {x:5.5,y:8.5,n:'Mikel',arq:'mikel',tipo:'parroquiano'}]},
+ resto:{n:'Restaurante',suelo:'terrazo',pared:'azulejo',mapa:[
+  '#############','#KKKKN#.EEEE#','#.....#.....#','#..MM.d.....#','######.######',
+  '#SMMS..SMMS.#','#SMMS..SMMS.#','#...........#','#SMMS..SMMS.#','#SMMS..SMMS.#',
+  '#OOO........#','#####D#######'],
+  npcs:[{x:3.5,y:2.5,n:'Patxi',arq:'patxi',tipo:'cocinero'}]},
+ centro:{n:'Galería',suelo:'terrazo',pared:'yeso',mapa:[
+  '###################','#RRRR..EEEE..XXXX.#','#.................#','#.................#',
+  '#OOO....OOO....OOO#','#.................#','#.................#','#YY....J....J...YY#',
+  '#YY.............YY#','#.................#','#EEEE..XXXX..RRRR.#','#.................#',
+  '#########D#########'],
+  npcs:[{x:2.5,y:5.5,n:'Nerea',arq:'nerea',tipo:'ropa'},
+        {x:9.5,y:5.5,n:'Patxi',arq:'patxi',tipo:'cocinero'},
+        {x:16.5,y:5.5,n:'Bego',arq:'bego',tipo:'pescatera'}]},
  /* Los almacenes: la única tienda con más de un mostrador. Las escaleras mecánicas no
     llevan a ninguna planta —no hay pisos— pero dicen que el sitio tiene tres. */
- almacenes:{n:'Almacenes',suelo:'terrazo',pared:'paredBlanca',mapa:[
-  '#########################','#RRRR..RRRR..XXXX..EEEE.#','#.......................#',
-  '#..AA.............AA....#','#.......................#','#..WW..WW....PPPP..PPPP.#',
-  '#..WW..WW...............#','#...........OOO....OOO..#','#.......................#',
-  '#.EEEE..EEEE..XXXX..RRR.#','#.......................#','###########DD############'],
-  npcs:[{x:3.5,y:2.6,n:'Nerea',arq:'nerea',tipo:'ropa'},
-        {x:13.5,y:6.4,n:'Maite',arq:'maite',tipo:'encargada'},
-        {x:20.5,y:6.4,n:'Patxi',arq:'patxi',tipo:'cocinero'}]},
- gasoli:{n:'Gasolinera',suelo:'sueloTaller',pared:'paredChapa',mapa:[
-  '###############','#GG..GG..GG...#','#.............#','#.............#',
-  '#EEEE....XXXX.#','#.............#','#....OOO......#','######DD#######'],
-  npcs:[{x:6.5,y:5.5,n:'Gorka',arq:'gorka',tipo:'gasolinero'}]},
+ almacenes:{n:'Almacenes',suelo:'terrazo',pared:'yeso',mapa:[
+  '#####################','#RRRR..RRRR..XXXX..E#','#...................#','#...................#',
+  '#EEEE..EEEE..EEEE..E#','#...................#','#...................#','#OOO....YY....YY.OOO#',
+  '#.......YY....YY....#','#...................#','#XXXX..XXXX..RRRR..R#','#...................#',
+  '#...................#','#EEEE..EEEE..OOOO...#','#...................#','##########D##########'],
+  npcs:[{x:2.5,y:8.5,n:'Nerea',arq:'nerea',tipo:'ropa'},
+        {x:10.5,y:12.5,n:'Maite',arq:'maite',tipo:'encargada'},
+        {x:18.5,y:8.5,n:'Patxi',arq:'patxi',tipo:'cocinero'}]},
+ gasoli:{n:'Gasolinera',suelo:'chapa',pared:'chapa',mapa:[
+  '##########','#EEE..NNN#','#........#','#EEE..EEE#','#........#','#XX......#',
+  '#........#','#.OOOO...#','#........#','####D#####'],
+  npcs:[{x:3.5,y:8.5,n:'Gorka',arq:'gorka',tipo:'gasolinero'}]},
 };
-const TILE_INT={'#':'pared','B':'barra','M':'mesa','C':'cama','W':'mueble','X':'vitrina',
- 'P':'puesto','V':'cocheEx','O':'mostrador','Q':'taquilla','S':'sillas','E':'estante','L':'camilla',
- 'R':'perchero','A':'escalera','G':'surtidor'};
-/* La escalera mecánica no es sólida: se anda por encima. El resto del mobiliario sí. */
-const solidoInt=ch=>'#BMCWXPVOQELRG'.includes(ch);
+/* Lo que se pisa. Todo lo demás del plano es mueble y frena: la escalera mecánica se anda
+   por encima, y el paso de una habitación a otra no tiene hoja. */
+const BLANDO_I='.dDY';
+const solidoInt=ch=>!BLANDO_I.includes(ch);
 
 /*═══════════════ POIs ═══════════════*/
 const POI=[];
@@ -3969,7 +4062,7 @@ const mira={dx:0,dy:0};                   /* apuntado fino: solo con las flechas
    valores son humanos pero del lado rápido —paso vivo y carrera de alguien que huye—,
    porque el juego se cruza en coche y en metro, no andando. */
 const MS=1/5.16;                          /* m/s -> casillas/s */
-const V_ANDAR=1.7*MS, V_CORRER=6.0*MS, V_AGACHADO=1.0*MS, V_INTERIOR=1.4*MS;
+const V_ANDAR=1.7*MS, V_CORRER=6.0*MS, V_AGACHADO=1.0*MS;
 const V_PEATON=1.3*MS, V_HUIDA=4.5*MS, V_ENEMIGO=3.4*MS;
 /* El coche: punta por chasis y aceleración de verdad. 2,5 m/s² son los 0-100 en 11 s de
    un utilitario; la furgoneta y el camión, menos. Frenar es 7 m/s², que es lo que da un
@@ -4632,7 +4725,11 @@ function entrar(id,desde,nombre,poiId){fundir(()=>{
     nadie. La copia es a propósito: empujarlo en INT.piso lo dejaría también en esos. */
  if(poiId==='piso'&&!S.casera.desahucio)S.interior.npcs=INT[id].npcs.concat([PRIMO]);
  const m=S.interior.mapa;let px=2,py=2;
- for(let y=0;y<m.length;y++)for(let x=0;x<m[y].length;x++)if(m[y][x]==='D'){px=x+.5;py=y-.7;}
+ /* El portón de un taller mide más que una puerta de casa, así que se entra por el centro
+    del hueco y no por su última casilla. */
+ const ds=[];
+ for(let y=0;y<m.length;y++)for(let x=0;x<m[y].length;x++)if(m[y][x]==='D')ds.push([x,y]);
+ if(ds.length){px=ds.reduce((a,d)=>a+d[0],0)/ds.length+.5;py=ds[0][1]-.7;}
  S.escena='interior';player.enCoche=null;player.x=px;player.y=py;player.d8=4;S.volver=desde;
  /* Un paso de entrar no lo puede ver comprobarObjetivos: dentro de un interior el bucle
     se va por actInterior y nunca llega a mirarlo. */
@@ -6387,8 +6484,10 @@ function act(dt){
    por eso. Y correr o andar tampoco lo decide el boton: lo decide ir a mas de 3,2 m/s,
    que es donde una persona deja de andar. */
 const ZANCADA=0.75;              /* metros por paso */
-function poseAndar(e,vel,correr,dt,sigilo){
- const ms=Math.abs(vel)/MS;      /* casillas/s -> m/s */
+function poseAndar(e,vel,correr,dt,sigilo,mCasilla){
+ /* La cadencia sale de los metros por segundo, así que hay que saber cuánto mide la
+    casilla: 5,16 m en la calle, 0,80 m dentro de un sitio. */
+ const ms=Math.abs(vel)*(mCasilla||1/MS);
  e.anim+=dt*Math.max(.6,ms/ZANCADA);
  const f=Math.floor(e.anim)%4+1;
  if(sigilo){e.pose=f<3?'agacha':'agacha2';return;}
@@ -6396,9 +6495,9 @@ function poseAndar(e,vel,correr,dt,sigilo){
  e.pose=(corriendo?'correr':'andar')+(corriendo?((f-1)%4+1):f);}
 function actInterior(dt,ix,iy){
  motorAudio(null,1);sirenaAudio(dt,false);
- const v=V_INTERIOR,m=Math.hypot(ix,iy);
+ const v=V_INTERIOR_C,m=Math.hypot(ix,iy);
  if(m>.08){mover(player,player.x+ix/m*Math.min(1,m)*v*dt,player.y+iy/m*Math.min(1,m)*v*dt,false);
-  player.d8=dir8De(ix,iy);poseAndar(player,v,false,dt);}
+  player.d8=dir8De(ix,iy);poseAndar(player,v,false,dt,false,M_INT);}
  else player.pose=player.herido>0?'herido':'quieto';
  if(tileInt(player.x,player.y+.6)==='D'&&iy>.3)salir();
  const n=npcCerca();
@@ -6826,13 +6925,16 @@ function dibCiudad(){
  ctx.fillStyle=`rgba(${cam.tinte[0]|0},${cam.tinte[1]|0},${cam.tinte[2]|0},.13)`;
  ctx.fillRect(0,0,W,H);}
 function pintaSombraChar(e,esJugador){
+ /* La casilla vale lo que valga en esta escena: 5,16 m en la calle y 0,80 m dentro. El
+    dibujo del personaje mide lo mismo en las dos —es el mundo el que cambia de vara. */
+ const U=S.escena==='interior'?TS_INT:TS;
  ctx.fillStyle='rgba(0,0,0,.34)';
- ctx.beginPath();ctx.ellipse(e.x*TS,e.y*TS+8,9,4,0,0,6.283);ctx.fill();
+ ctx.beginPath();ctx.ellipse(e.x*U,e.y*U+8,9,4,0,0,6.283);ctx.fill();
  const pose=e.herido>0?'herido':e.pose||'quieto';
- pintaChar(ctx,e.arq,e.d8,pose,e.x*TS,e.y*TS);
+ pintaChar(ctx,e.arq,e.d8,pose,e.x*U,e.y*U);
  const aid=esJugador?S.armaAct:e.arma;
- if(aid&&ARMA_MANO[aid])ctx.drawImage(ARMA_MANO[aid][e.d8],Math.round(e.x*TS)-sc(ARMA_CX),Math.round(e.y*TS)-sc(19));
- if(esJugador&&fogT>0&&fogTipo)ctx.drawImage(FOG[fogTipo][fogD],Math.round(e.x*TS)-12,Math.round(e.y*TS)-12);}
+ if(aid&&ARMA_MANO[aid])ctx.drawImage(ARMA_MANO[aid][e.d8],Math.round(e.x*U)-sc(ARMA_CX),Math.round(e.y*U)-sc(19));
+ if(esJugador&&fogT>0&&fogTipo)ctx.drawImage(FOG[fogTipo][fogD],Math.round(e.x*U)-12,Math.round(e.y*U)-12);}
 function pintaCoche(c,esPoli,mio){
  const spr=esPoli?VEH.patrullaRot[Math.sin(c.luz)>0?0:1]
   :(!c.vivo?VEH_QUEMADO[c.tipo]:VEH[c.tipo][c.lib%LIBREAS.length]);
@@ -6846,30 +6948,56 @@ function pintaCoche(c,esPoli,mio){
   return;}
  ctx.restore();}
 function dibInterior(){
- const m=S.interior.mapa,iw=Math.max(...m.map(r=>r.length)),ih=m.length;
- const z=clamp((H/TS)/13.5,1.4,2.6);
- const vw=W/z/TS, vh=H/z/TS;
+ const I=S.interior,m=I.mapa,ih=m.length,iw=Math.max(...m.map(r=>r.length));
+ /* Zoom entero —un píxel de textura tiene que ocupar un número entero de píxeles de
+    pantalla— y, si el sitio cabe, se enseña entero: una habitación se entiende de un
+    vistazo, no asomándose por una mirilla. */
+ const z=clamp(Math.min(Math.floor(W/(iw*TS_INT)),Math.floor(H/(ih*TS_INT))),2,4);
+ const vw=W/z/TS_INT, vh=H/z/TS_INT;
  const cx=iw<=vw?iw/2:clamp(player.x,vw/2,iw-vw/2);
  const cy=ih<=vh?ih/2:clamp(player.y,vh/2,ih-vh/2);
- ctx.save();ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-cx*TS,-cy*TS);
- const su=TILE[S.interior.suelo],pa=TILE[S.interior.pared];
+ ctx.save();ctx.translate(Math.round(W/2),Math.round(H/2));ctx.scale(z,z);
+ ctx.translate(-Math.round(cx*TS_INT),-Math.round(cy*TS_INT));
+ const su=SUELO_I[I.suelo]||SUELO_I.terrazo, pa=PARED_I[I.pared]||PARED_I.yeso;
+ /* Todo lo que sobresale del suelo se ordena por su canto de abajo, muros incluidos: así
+    quien está delante de una pared la tapa y quien está detrás queda tapado. */
+ const L=[];
  for(let y=0;y<ih;y++)for(let x=0;x<m[y].length;x++){
-  ctx.drawImage(su,x*TS,y*TS);const ch=m[y][x];
-  if(ch==='#')ctx.drawImage(pa,x*TS,y*TS);
-  else if(TILE_INT[ch])ctx.drawImage(TILE[TILE_INT[ch]],x*TS,y*TS);
-  else if(ch==='D'){ctx.fillStyle=C.maderaO;ctx.fillRect(x*TS,y*TS,TS,TS);
-   ctx.fillStyle=C.mostaza;ctx.fillRect(x*TS+2,y*TS+TS-5,TS-4,3);}}
- const L=[[player.y,()=>pintaSombraChar(player,true)]];
- S.interior.npcs.forEach(n=>L.push([n.y,()=>{
-  ctx.fillStyle='rgba(0,0,0,.34)';ctx.beginPath();ctx.ellipse(n.x*TS,n.y*TS+8,9,4,0,0,6.283);ctx.fill();
-  pintaChar(ctx,n.arq,0,'quieto',n.x*TS,n.y*TS);
-  const m2=MISIONES[S.misionIdx];
-  const w=anchoTexto(n.n,1)+6;
-  ctx.fillStyle='rgba(7,9,12,.82)';ctx.fillRect(n.x*TS-w/2,n.y*TS-33,w,13);
-  texto(ctx,n.n,n.x*TS-w/2+3,n.y*TS-32,1,'hueso');
+  const ch=m[y][x];
+  if(ch==='#'){L.push([y+1,()=>{
+   ctx.drawImage(pa,x*TS_INT,y*TS_INT);
+   /* El canto oscuro solo por donde el muro da a la habitación. Dibujado en el tile
+      saldría también entre dos casillas de muro, y una pared de tres metros se vería
+      como tres ladrillos sueltos. */
+   ctx.fillStyle='rgba(7,9,12,.55)';
+   if(m[y-1]&&m[y-1][x]!=='#')ctx.fillRect(x*TS_INT,y*TS_INT,TS_INT,1);
+   if(m[y+1]&&m[y+1][x]!=='#')ctx.fillRect(x*TS_INT,(y+1)*TS_INT-1,TS_INT,1);
+   if(m[y][x-1]!=='#')ctx.fillRect(x*TS_INT,y*TS_INT,1,TS_INT);
+   if(m[y][x+1]!=='#')ctx.fillRect((x+1)*TS_INT-1,y*TS_INT,1,TS_INT);}]);continue;}
+  ctx.drawImage(su,x*TS_INT,y*TS_INT);
+  /* La sombra que el muro tira sobre el suelo. Es lo único que dice, desde arriba, que
+     una cosa es alta y la otra es el suelo: sin ella una pared clara y una baldosa clara
+     son el mismo cuadrado. */
+  if(m[y-1]&&m[y-1][x]==='#'){ctx.fillStyle='rgba(7,9,12,.42)';
+   ctx.fillRect(x*TS_INT,y*TS_INT,TS_INT,4);}
+  if(m[y][x-1]==='#'){ctx.fillStyle='rgba(7,9,12,.26)';
+   ctx.fillRect(x*TS_INT,y*TS_INT,3,TS_INT);}
+  if(ch==='D')ctx.drawImage(PUERTA_I.v,x*TS_INT,y*TS_INT);
+  else if(ch==='d')ctx.drawImage(
+   (m[y][x-1]==='#'&&m[y][x+1]==='#')?PASO_I.v:PASO_I.h,x*TS_INT,y*TS_INT);}
+ for(const p of piezasDe(I))
+  L.push([p.y+p.h,()=>ctx.drawImage(sprMueble(p.ch,p.w,p.h),p.x*TS_INT,p.y*TS_INT)]);
+ L.push([player.y,()=>pintaSombraChar(player,true)]);
+ I.npcs.forEach(n=>L.push([n.y,()=>{
+  ctx.fillStyle='rgba(0,0,0,.34)';ctx.beginPath();
+  ctx.ellipse(n.x*TS_INT,n.y*TS_INT+6,7,3,0,0,6.283);ctx.fill();
+  pintaChar(ctx,n.arq,0,'quieto',n.x*TS_INT,n.y*TS_INT);
+  const m2=MISIONES[S.misionIdx],w=anchoTexto(n.n,1)+6;
+  ctx.fillStyle='rgba(7,9,12,.82)';ctx.fillRect(n.x*TS_INT-w/2,n.y*TS_INT-46,w,13);
+  texto(ctx,n.n,n.x*TS_INT-w/2+3,n.y*TS_INT-45,1,'hueso');
   if(!S.mision&&m2&&m2.giver===n.n){ctx.fillStyle=C.mostaza;
    const b=Math.abs(Math.sin(performance.now()/300))*4;
-   ctx.fillRect(n.x*TS-2,n.y*TS-50-b,4,10);ctx.fillRect(n.x*TS-2,n.y*TS-37-b,4,3);}}]));
+   ctx.fillRect(n.x*TS_INT-2,n.y*TS_INT-63-b,4,10);ctx.fillRect(n.x*TS_INT-2,n.y*TS_INT-50-b,4,3);}}]));
  L.sort((a,b)=>a[0]-b[0]).forEach(l=>l[1]());
  ctx.restore();}
 

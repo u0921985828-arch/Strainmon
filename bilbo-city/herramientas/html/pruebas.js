@@ -129,25 +129,86 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
     // ── 2 · interiores ─────────────────────────────────────────────────
     // La lista sale del juego, no de aquí: un interior nuevo se prueba solo.
     const interiores = Object.keys(A.INT);
+    // Las medidas de verdad de cada mueble, en metros. Sin esto un plano nuevo puede
+    // tener una cama de cinco metros o una puerta por la que no pasa nadie, y no se ve
+    // hasta entrar — que es exactamente lo que pasaba cuando el interior iba con la
+    // casilla de la calle.
+    const MEDIDAS = {           // [ancho mín, ancho máx, largo mín, largo máx] en metros
+      C: [0.8, 1.6, 1.6, 2.4], M: [0.8, 2.4, 0.8, 2.4], S: [0.8, 0.8, 0.8, 0.8],
+      N: [0.8, 1.6, 0.8, 1.6], T: [0.8, 0.8, 0.8, 0.8], V: [0.8, 0.8, 0.8, 0.8],
+      H: [0.8, 1.6, 0.8, 1.6], U: [0.8, 0.8, 0.8, 0.8], L: [0.8, 0.8, 1.6, 2.4],
+      Z: [1.6, 1.6, 4.0, 4.0], F: [0.8, 0.8, 1.6, 3.2], J: [0.8, 0.8, 0.8, 0.8],
+    };
+    let metros = [];
     for (const id of interiores) {
-      const d = A.INT[id], m = d.mapa;
-      ok(m.some(f => f.includes('D')), id + ': no tiene puerta');
-      ok(m.every(f => f.length === m[0].length), id + ': filas de distinto largo');
-      // Un tendero dentro de una pared o encima del mostrador es lo que sale al dibujar
-      // un plano nuevo a mano, y no se ve hasta entrar.
-      for (const n of d.npcs) {
-        const fx = Math.floor(n.x), fy = Math.floor(n.y);
-        const ch = (fy >= 0 && fy < m.length && fx >= 0 && fx < m[fy].length) ? m[fy][fx] : '#';
-        ok(!A.solidoInt(ch), id + ': ' + n.n + ' está dentro de un «' + ch + '»');
+      const d = A.INT[id], m = d.mapa, ih = m.length, iw = m[0].length;
+      const suelo = ch => A.BLANDO_I.includes(ch);
+      ok(m.every(f => f.length === iw), id + ': filas de distinto largo');
+      ok(m[0].split('').every(c => c === '#') && m.every(f => f[0] === '#' && f[iw-1] === '#'),
+         id + ': el muro de fuera tiene un hueco');
+      // La puerta: entre 0,8 m (una de casa) y 3,2 m (el portón de un taller), de una pieza.
+      const ds = [];
+      for (let y = 0; y < ih; y++) for (let x = 0; x < iw; x++) if (m[y][x] === 'D') ds.push([x, y]);
+      ok(ds.length >= 1 && ds.length <= 4, id + ': puerta de ' + (ds.length * A.M_INT).toFixed(1) + ' m');
+      ok(ds.every(([, y]) => y === ih - 1), id + ': la salida no está en el muro de abajo');
+      // Todo el suelo tiene que ser alcanzable desde delante de la puerta. Una habitación
+      // sellada por un mueble no se ve dibujando el plano: se ve cuando no puedes entrar.
+      if (ds.length) {
+        const ini = [ds[0][0], ds[0][1] - 1], vis = new Set([ini.join()]), q = [ini];
+        ok(suelo(m[ini[1]][ini[0]]), id + ': delante de la puerta hay un mueble');
+        while (q.length) {
+          const [x, y] = q.shift();
+          for (const [a, b] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+            const nx = x + a, ny = y + b, k = nx + ',' + ny;
+            if (nx >= 0 && ny >= 0 && nx < iw && ny < ih && !vis.has(k) && suelo(m[ny][nx])) {
+              vis.add(k); q.push([nx, ny]);
+            }
+          }
+        }
+        let sueltas = 0;
+        for (let y = 0; y < ih; y++) for (let x = 0; x < iw; x++)
+          if (suelo(m[y][x]) && !vis.has(x + ',' + y)) sueltas++;
+        ok(!sueltas, id + ': ' + sueltas + ' casillas de suelo sin manera de llegar');
+        // Y a cada dependiente se le tiene que poder hablar, que para eso está.
+        for (const n of d.npcs) {
+          const k = Math.floor(n.x) + ',' + Math.floor(n.y);
+          ok(suelo(m[Math.floor(n.y)][Math.floor(n.x)]),
+             id + ': ' + n.n + ' está dentro de un «' + m[Math.floor(n.y)][Math.floor(n.x)] + '»');
+          ok(vis.has(k), id + ': a ' + n.n + ' no se llega desde la puerta');
+        }
       }
-      for (const f of m) for (const ch of f)
-        ok(ch === '.' || ch === 'D' || A.TILE_INT[ch], id + ': tile «' + ch + '» sin dibujo');
+      for (const p of A.piezasDe(d)) {
+        ok(!!A.MUEBLES[p.ch], id + ': el mueble «' + p.ch + '» no tiene dibujo');
+        const md = MEDIDAS[p.ch];
+        if (!md) continue;
+        const an = Math.min(p.w, p.h) * A.M_INT, la = Math.max(p.w, p.h) * A.M_INT;
+        const E = 1e-6;   // 3 × 0,8 no da 2,4 exacto en coma flotante
+        ok(an >= md[0]-E && an <= md[1]+E && la >= md[2]-E && la <= md[3]+E,
+           id + ': ' + A.MUEBLES[p.ch].n + ' de ' + an.toFixed(1) + '×' + la.toFixed(1) + ' m');
+      }
+      metros.push(Math.round(iw * ih * A.M_INT * A.M_INT));
       A.entrar(id, { x: P.x, y: P.y }); await dormir(280); paso(8);
       ok(S.escena === 'interior', 'no se entra en ' + id);
       A.salir(); await dormir(280); paso(8);
       ok(S.escena === 'ciudad', 'no se sale de ' + id);
     }
-    bien.push(interiores.length + ' interiores entran y salen, con puerta y sin nadie empotrado');
+    bien.push(interiores.length + ' interiores a escala humana: casilla de ' + A.M_INT
+      + ' m, de ' + Math.min(...metros) + ' a ' + Math.max(...metros) + ' m², sin cuartos sellados');
+
+    // ── 2 bis · se duerme y te curan ───────────────────────────────────
+    // dormir() y curar() miran la casilla que hay delante. Si un plano nuevo pone la cama
+    // pegada a la pared de abajo, la cama existe y no se puede usar.
+    {
+      const delante = (id, ch) => {
+        const m = A.INT[id].mapa;
+        for (let y = 1; y < m.length; y++) for (let x = 1; x < m[y].length; x++)
+          if (m[y][x] === ch && A.BLANDO_I.includes(m[y+1] ? m[y+1][x] : '#')) return true;
+        return false;
+      };
+      ok(delante('piso', 'C'), 'no se puede dormir: no hay hueco delante de ninguna cama');
+      ok(delante('hospital', 'L'), 'no te pueden curar: no hay hueco delante de ninguna camilla');
+      bien.push('cama y camilla con sitio para plantarse delante');
+    }
 
     // ── 2 ter · la ropa cambia al personaje ────────────────────────────
     {

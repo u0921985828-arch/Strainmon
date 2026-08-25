@@ -366,6 +366,51 @@ soltar y volver a empujar cambiaba de paseo a carrera en un fotograma.
 lanzar eventos, así que mirando solo el estado del botón el coche no arrancaba en las
 pruebas aunque en el juego fuese bien.
 
+## Los interiores: la casilla mide 0,80 m
+
+Fuera, una casilla son **5,16 m**. Dentro no puede serlo, y durante mucho tiempo lo fue: con
+esa vara el piso medía **72×41 m**, una cama 5 m de ancho, la puerta 10 m y cruzar el salón
+costaba cincuenta segundos. Lo que se veía al entrar no se parecía a una casa porque no
+tenía el tamaño de una casa.
+
+Ahora la casilla de interior mide **0,80 m** —el ancho de una puerta de paso— y se dibuja a
+**16 px**: 20 px por metro, que es la densidad a la que está dibujada la gente. Dentro de una
+casa la vara de medir es una persona, no un coche, así que **dentro el personaje sale a
+escala real** y no con la sobreescala que necesita la calle (ver `ESTILO.md`).
+
+De ahí sale todo lo demás sin tocar nada más: 1,4 m/s andando son 1,75 casillas por segundo,
+`npcCerca` a 1,7 casillas es hablar a metro y medio, y la casilla que se mira delante para
+dormir o para que te curen cae a 70 cm.
+
+**Los trece sitios son plantas, no cajas.** El piso compartido tiene dos habitaciones, salón,
+cocina y baño alrededor de un pasillo —62 m² útiles, lo que mide un piso de los sesenta en
+Santutxu—; el bar tiene su barra, sus mesas y su aseo al fondo; el taller cabe dos coches de
+4 m y tiene un portón de 3,2 m, porque por 1,6 no entra ninguno.
+
+**El mobiliario no es un tile repetido: son piezas.** El plano se trocea una vez al entrar
+(`piezasDe`) en rectángulos del mismo carácter, y cada pieza se dibuja **entera y a su
+tamaño** —una cama de 0,8×2,4 m con su cabecero y su almohada—, igual que los edificios
+singulares. Dos casillas de `C` seguidas son una cama de 1,6 m, no dos camas. Los muebles de
+`UNITARIO_I` no se juntan nunca: cuatro sillas en fila son cuatro sillas.
+
+Tres cosas que se aprendieron dibujando:
+
+- **Un muro visto desde arriba no se distingue de un suelo** si solo cambia de color. Lleva
+  sombra proyectada sobre la casilla que tiene debajo y canto oscuro por donde da a la
+  habitación —solo por ahí: dibujado en el tile, una pared de tres metros se ve como tres
+  ladrillos sueltos.
+- **El suelo se queda en el fondo.** El primer parqué iba con la junta cada ocho píxeles y
+  se leía como un muro de ladrillo. Una tabla son 1,2 m × 12 cm: veinticuatro píxeles de
+  largo y tres de ancho.
+- **El zoom es entero también aquí**, y si el sitio cabe en pantalla se enseña entero: una
+  habitación se entiende de un vistazo, no asomándose por una mirilla.
+
+La batería mide cada plano: metros cuadrados, ancho de puerta (de 0,8 a 3,2 m y de una
+pieza), que **todo el suelo se pueda alcanzar desde la puerta**, que a cada dependiente se le
+llegue, y que ningún mueble tenga medidas imposibles —una cama entre 0,8×1,6 y 1,6×2,4 m, un
+coche de 1,6×4—. Un cuarto sellado por un mueble no se ve dibujando el plano: se ve cuando
+no puedes entrar.
+
 ## Comercio y transporte
 
 Los sitios donde se entra son **trece**, y los cinco últimos los comparten varios POI: el

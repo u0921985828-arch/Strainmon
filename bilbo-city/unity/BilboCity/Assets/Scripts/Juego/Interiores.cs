@@ -10,6 +10,12 @@ public class NpcInterior {
     public string Nombre, Arq, Tipo;
 }
 
+/// <summary>Un mueble del plano ya montado: qué es, dónde empieza y cuántas casillas ocupa.</summary>
+public class PiezaInterior {
+    public char Ch;
+    public int X, Y, W, H;
+}
+
 public class DefInterior {
     public string Nombre, Suelo, Pared;
     public string[] Mapa;
@@ -23,88 +29,100 @@ public static class Interiores {
     public static Vector2 Volver;
     static GameObject _raiz;
 
+    // '#' pared · '.' suelo · 'D' salida · 'd' paso · C cama · A armario · U mesita · F sofá
+    // M mesa · S silla · K encimera · N nevera · T inodoro · V lavabo · H ducha · E estantería
+    // B barra · O mostrador · X vitrina · P puesto · L camilla · Q taquilla · R perchero
+    // Z coche · Y escalera · W aparador · J planta
     public static readonly Dictionary<string, DefInterior> Todos = new Dictionary<string, DefInterior> {
-        {"bar", new DefInterior{ Nombre="Bar Zurito", Suelo="terrazo", Pared="paredAzul", Mapa=new[]{
-            "################","#BBBBBBBB.....W#","#..............#","#..MM....MM....#",
-            "#..MM....MM....#","#..............#","#..MM....MM....#","#..MM....MM....#",
-            "#..............#","#######DD#######"},
-            Npcs=new[]{
-                new NpcInterior{ X=3.5f, Y=2.6f, Nombre="Josu", Arq="josu", Tipo="barman" },
-                new NpcInterior{ X=11.5f, Y=2.6f, Nombre="Txema", Arq="txema", Tipo="jefe" },
-                new NpcInterior{ X=6.5f, Y=8.4f, Nombre="Mikel", Arq="mikel", Tipo="parroquiano" }}}},
-        // Dos camas porque es un piso compartido: la de la izquierda es la del primo. Los
-        // pisos que se compran reaprovechan este plano, y ahí la segunda pasa por la de invitados.
-        {"piso", new DefInterior{ Nombre="Tu piso", Suelo="hidraulico", Pared="paredBlanca", Mapa=new[]{
-            "##############","#CC.......CC.#","#CC.......CC.#","#..........WW#",
-            "#....MM......#","#....MM......#","#............#","#####DD#######"},
+        // El piso compartido: dos habitaciones, salón, cocina y baño alrededor de un pasillo.
+        // 62 m² útiles, que es lo que mide un piso de los sesenta en Santutxu. La habitación de
+        // la derecha es la del primo. Los pisos que se compran reaprovechan este plano.
+        {"piso", new DefInterior{ Nombre="Tu piso", Suelo="parquet", Pared="yeso", Mapa=new[]{
+            "#############","#CCU.#.#.UCC#","#CC..#.#..CC#","#CC..d.d..CC#","#....#.#....#",
+            "#AAA.#.#.EEE#","######.######","#FFF.#.#KKKN#","#....d.d....#","#..U.#.#.MSS#",
+            "#....#.######","#MMS.#.d...H#","#MMS.#.#TV..#","######D######"},
             Npcs=new NpcInterior[0]}},
-        {"taller", new DefInterior{ Nombre="Taller Iker", Suelo="sueloTaller", Pared="paredChapa", Mapa=new[]{
-            "################","#VVVV....VVVV.W#","#VVVV....VVVV..#","#..............#",
-            "#..............#","#....WW........#","#######DD#######"},
-            Npcs=new[]{ new NpcInterior{ X=7.5f, Y=4.5f, Nombre="Iker", Arq="iker", Tipo="mecanico" }}}},
-        {"armeria", new DefInterior{ Nombre="Bazar Nervión", Suelo="sueloTaller", Pared="pared", Mapa=new[]{
-            "#############","#XXXXXXXXXXX#","#...........#","#..EE...EE..#",
-            "#...........#","#....OO.....#","#####DD######"},
-            Npcs=new[]{ new NpcInterior{ X=6.5f, Y=4.5f, Nombre="Koldo", Arq="koldo", Tipo="armero" }}}},
-        {"merca", new DefInterior{ Nombre="Mercado de la Ribera", Suelo="terrazo", Pared="paredChapa", Mapa=new[]{
-            "#################","#PPPP...PPPP..PP#","#...............#","#..PPPP...PPPP..#",
-            "#...............#","########DD#######"},
-            Npcs=new[]{ new NpcInterior{ X=3.5f, Y=2.6f, Nombre="Bego", Arq="bego", Tipo="pescatera" }}}},
-        {"hospital", new DefInterior{ Nombre="Hospital de Basurto", Suelo="sueloHosp", Pared="paredBlanca", Mapa=new[]{
-            "###############","#LL...LL...QQ.#","#LL...LL......#","#.............#",
-            "#SSSS....OOOO.#","#.............#","######DD#######"},
-            Npcs=new[]{ new NpcInterior{ X=9.5f, Y=5.5f, Nombre="Nekane", Arq="enfermera", Tipo="enfermera" }}}},
-        {"portal", new DefInterior{ Nombre="Portal · la casera", Suelo="hidraulico", Pared="paredBlanca", Mapa=new[]{
-            "############","#....WW....#","#..........#","#..........#","#####DD#####"},
-            Npcs=new[]{ new NpcInterior{ X=6.5f, Y=2.5f, Nombre="Amaia", Arq="amaia", Tipo="casera" }}}},
-        {"ropa", new DefInterior{ Nombre="Tienda de ropa", Suelo="terrazo", Pared="paredBlanca", Mapa=new[]{
-            "###############","#RRRRR...RRRRR#","#.............#","#..XX.....XX..#",
-            "#.............#","#RRRRR...EEEE.#","#.............#","#.....OOO.....#",
-            "#.............#","#######DD######"},
-            Npcs=new[]{ new NpcInterior{ X=7.5f, Y=6.5f, Nombre="Nerea", Arq="nerea", Tipo="ropa" }}}},
-        {"tasca", new DefInterior{ Nombre="Tasca", Suelo="terrazo", Pared="paredAzul", Mapa=new[]{
-            "############","#BBBBBB...W#","#..........#","#..MM..MM..#",
-            "#..MM..MM..#","#..........#","#####DD#####"},
+        {"portal", new DefInterior{ Nombre="Portal · la casera", Suelo="hidraulico", Pared="yeso", Mapa=new[]{
+            "#######","#WW..Y#","#....Y#","#....Y#","#.....#","#.....#","#J...J#","#.....#","###D###"},
+            Npcs=new[]{ new NpcInterior{ X=3.5f, Y=4.5f, Nombre="Amaia", Arq="amaia", Tipo="casera" }}}},
+        {"bar", new DefInterior{ Nombre="Bar Zurito", Suelo="terrazo", Pared="azulejo", Mapa=new[]{
+            "############","#EEEEEE..NN#","#..........#","#BBBBBBB...#","#..........#",
+            "#SMS..SMS..#","#..........#","#SMS..SMS..#","#......#####","#SMS...#TV.#",
+            "#......d...#","#......#...#","#####D######"},
             Npcs=new[]{
-                new NpcInterior{ X=3.5f, Y=2.6f, Nombre="Patxi", Arq="patxi", Tipo="barman" },
-                new NpcInterior{ X=8.5f, Y=5.4f, Nombre="Mikel", Arq="mikel", Tipo="parroquiano" }}}},
-        {"resto", new DefInterior{ Nombre="Restaurante", Suelo="terrazo", Pared="paredAzul", Mapa=new[]{
-            "################","#BB....WW....WW#","#..............#","#..MM..MM..MM..#",
-            "#..SS..SS..SS..#","#..............#","#..MM..MM..MM..#","#..SS..SS..SS..#",
-            "#..............#","#######DD#######"},
-            Npcs=new[]{ new NpcInterior{ X=2.5f, Y=2.6f, Nombre="Patxi", Arq="patxi", Tipo="cocinero" }}}},
-        {"centro", new DefInterior{ Nombre="Galería", Suelo="terrazo", Pared="paredBlanca", Mapa=new[]{
-            "#####################","#RRRR..XXXX..EEEE..P#","#...................#",
-            "#..AA...........AA..#","#...................#","#..MM..MM...PPPP...P#",
-            "#..SS..SS...........#","#..........OOO......#","#...................#",
-            "#########DD##########"},
+                new NpcInterior{ X=3.5f,  Y=2.5f,  Nombre="Josu",  Arq="josu",  Tipo="barman" },
+                new NpcInterior{ X=8.5f,  Y=6.5f,  Nombre="Txema", Arq="txema", Tipo="jefe" },
+                new NpcInterior{ X=5.5f,  Y=10.5f, Nombre="Mikel", Arq="mikel", Tipo="parroquiano" }}}},
+        {"taller", new DefInterior{ Nombre="Taller Iker", Suelo="chapa", Pared="chapa", Mapa=new[]{
+            "###############","#EEEE....EEEE.#","#.............#","#.ZZ.....ZZ...#","#.ZZ.....ZZ...#",
+            "#.ZZ.....ZZ...#","#.ZZ.....ZZ...#","#.ZZ.....ZZ...#","#.............#","#OOO......QQQ.#",
+            "#.............#","#####DDDD######"},
+            Npcs=new[]{ new NpcInterior{ X=11.5f, Y=10.5f, Nombre="Iker", Arq="iker", Tipo="mecanico" }}}},
+        {"armeria", new DefInterior{ Nombre="Bazar Nervión", Suelo="chapa", Pared="ladrillo", Mapa=new[]{
+            "##########","#XXXXXXX.#","#........#","#EEE..EEE#","#........#","#EEE..EEE#",
+            "#........#","#.OOOO...#","#........#","####D#####"},
+            Npcs=new[]{ new NpcInterior{ X=3.5f, Y=8.5f, Nombre="Koldo", Arq="koldo", Tipo="armero" }}}},
+        {"merca", new DefInterior{ Nombre="Mercado de la Ribera", Suelo="terrazo", Pared="chapa", Mapa=new[]{
+            "###################","#PPPP..PPPP..PPPP.#","#PPPP..PPPP..PPPP.#","#.................#",
+            "#.................#","#PPPP..PPPP..PPPP.#","#PPPP..PPPP..PPPP.#","#.................#",
+            "#.................#","#OOOO.............#","#########D#########"},
+            Npcs=new[]{ new NpcInterior{ X=2.5f, Y=8.5f, Nombre="Bego", Arq="bego", Tipo="pescatera" }}}},
+        {"hospital", new DefInterior{ Nombre="Hospital de Basurto", Suelo="hospital", Pared="yeso", Mapa=new[]{
+            "################","#LL#LL#LL#LL...#","#..#..#..#.....#","#..............#","#..............#",
+            "#SSSS....OOOO..#","#..............#","#SSSS.........Q#","#..............#","#SSSS..........#",
+            "#..............#","#######D########"},
+            Npcs=new[]{ new NpcInterior{ X=9.5f, Y=4.5f, Nombre="Nekane", Arq="enfermera", Tipo="enfermera" }}}},
+        // Los cinco de abajo los comparten varios sitios: el rótulo lo pone el POI.
+        {"ropa", new DefInterior{ Nombre="Tienda de ropa", Suelo="terrazo", Pared="yeso", Mapa=new[]{
+            "###########","#RRRR.RRRR#","#.........#","#.........#","#RRRR.RRRR#","#.........#",
+            "#.........#","#XX....EEE#","#.........#","#.OOO.....#","#.........#","#####D#####"},
+            Npcs=new[]{ new NpcInterior{ X=2.5f, Y=8.5f, Nombre="Nerea", Arq="nerea", Tipo="ropa" }}}},
+        {"tasca", new DefInterior{ Nombre="Tasca", Suelo="terrazo", Pared="azulejo", Mapa=new[]{
+            "##########","#EEEE..NN#","#........#","#BBBBB...#","#........#","#SMS..SMS#",
+            "#........#","#SMS..SMS#","#........#","####D#####"},
             Npcs=new[]{
-                new NpcInterior{ X=3.5f,  Y=2.6f, Nombre="Nerea", Arq="nerea", Tipo="ropa" },
-                new NpcInterior{ X=8.5f,  Y=6.4f, Nombre="Patxi", Arq="patxi", Tipo="cocinero" },
-                new NpcInterior{ X=18.5f, Y=2.6f, Nombre="Bego",  Arq="bego",  Tipo="pescatera" }}}},
-        // Los almacenes: la única tienda con más de un mostrador. Las escaleras mecánicas
-        // no llevan a ninguna planta —no hay pisos— pero dicen que el sitio tiene tres.
-        {"almacenes", new DefInterior{ Nombre="Almacenes", Suelo="terrazo", Pared="paredBlanca", Mapa=new[]{
-            "#########################","#RRRR..RRRR..XXXX..EEEE.#","#.......................#",
-            "#..AA.............AA....#","#.......................#","#..WW..WW....PPPP..PPPP.#",
-            "#..WW..WW...............#","#...........OOO....OOO..#","#.......................#",
-            "#.EEEE..EEEE..XXXX..RRR.#","#.......................#","###########DD############"},
+                new NpcInterior{ X=3.5f, Y=2.5f, Nombre="Patxi", Arq="patxi", Tipo="barman" },
+                new NpcInterior{ X=5.5f, Y=8.5f, Nombre="Mikel", Arq="mikel", Tipo="parroquiano" }}}},
+        {"resto", new DefInterior{ Nombre="Restaurante", Suelo="terrazo", Pared="azulejo", Mapa=new[]{
+            "#############","#KKKKN#.EEEE#","#.....#.....#","#..MM.d.....#","######.######",
+            "#SMMS..SMMS.#","#SMMS..SMMS.#","#...........#","#SMMS..SMMS.#","#SMMS..SMMS.#",
+            "#OOO........#","#####D#######"},
+            Npcs=new[]{ new NpcInterior{ X=3.5f, Y=2.5f, Nombre="Patxi", Arq="patxi", Tipo="cocinero" }}}},
+        {"centro", new DefInterior{ Nombre="Galería", Suelo="terrazo", Pared="yeso", Mapa=new[]{
+            "###################","#RRRR..EEEE..XXXX.#","#.................#","#.................#",
+            "#OOO....OOO....OOO#","#.................#","#.................#","#YY....J....J...YY#",
+            "#YY.............YY#","#.................#","#EEEE..XXXX..RRRR.#","#.................#",
+            "#########D#########"},
             Npcs=new[]{
-                new NpcInterior{ X=3.5f,  Y=2.6f, Nombre="Nerea", Arq="nerea", Tipo="ropa" },
-                new NpcInterior{ X=13.5f, Y=6.4f, Nombre="Maite", Arq="maite", Tipo="encargada" },
-                new NpcInterior{ X=20.5f, Y=6.4f, Nombre="Patxi", Arq="patxi", Tipo="cocinero" }}}},
-        {"gasoli", new DefInterior{ Nombre="Gasolinera", Suelo="sueloTaller", Pared="paredChapa", Mapa=new[]{
-            "###############","#GG..GG..GG...#","#.............#","#.............#",
-            "#EEEE....XXXX.#","#.............#","#....OOO......#","######DD#######"},
-            Npcs=new[]{ new NpcInterior{ X=6.5f, Y=5.5f, Nombre="Gorka", Arq="gorka", Tipo="gasolinero" }}}},
+                new NpcInterior{ X=2.5f,  Y=5.5f, Nombre="Nerea", Arq="nerea", Tipo="ropa" },
+                new NpcInterior{ X=9.5f,  Y=5.5f, Nombre="Patxi", Arq="patxi", Tipo="cocinero" },
+                new NpcInterior{ X=16.5f, Y=5.5f, Nombre="Bego",  Arq="bego",  Tipo="pescatera" }}}},
+        // Los almacenes: la única tienda con más de un mostrador. Las escaleras mecánicas no
+        // llevan a ninguna planta —no hay pisos— pero dicen que el sitio tiene tres.
+        {"almacenes", new DefInterior{ Nombre="Almacenes", Suelo="terrazo", Pared="yeso", Mapa=new[]{
+            "#####################","#RRRR..RRRR..XXXX..E#","#...................#","#...................#",
+            "#EEEE..EEEE..EEEE..E#","#...................#","#...................#","#OOO....YY....YY.OOO#",
+            "#.......YY....YY....#","#...................#","#XXXX..XXXX..RRRR..R#","#...................#",
+            "#...................#","#EEEE..EEEE..OOOO...#","#...................#","##########D##########"},
+            Npcs=new[]{
+                new NpcInterior{ X=2.5f,  Y=8.5f,  Nombre="Nerea", Arq="nerea", Tipo="ropa" },
+                new NpcInterior{ X=10.5f, Y=12.5f, Nombre="Maite", Arq="maite", Tipo="encargada" },
+                new NpcInterior{ X=18.5f, Y=8.5f,  Nombre="Patxi", Arq="patxi", Tipo="cocinero" }}}},
+        {"gasoli", new DefInterior{ Nombre="Gasolinera", Suelo="chapa", Pared="chapa", Mapa=new[]{
+            "##########","#EEE..NNN#","#........#","#EEE..EEE#","#........#","#XX......#",
+            "#........#","#.OOOO...#","#........#","####D#####"},
+            Npcs=new[]{ new NpcInterior{ X=3.5f, Y=8.5f, Nombre="Gorka", Arq="gorka", Tipo="gasolinero" }}}},
     };
 
-    static readonly Dictionary<char,string> TileDe = new Dictionary<char,string> {
-        {'#',"pared"},{'B',"barra"},{'M',"mesa"},{'C',"cama"},{'W',"mueble"},{'X',"vitrina"},
-        {'P',"puesto"},{'V',"cocheEx"},{'O',"mostrador"},{'Q',"taquilla"},{'S',"sillas"},
-        {'E',"estante"},{'L',"camilla"},
-        {'R',"perchero"},{'A',"escalera"},{'G',"surtidor"}
-    };
+    /// <summary>Lo que se pisa. Todo lo demás del plano es mueble y frena: la escalera
+    /// mecánica se anda por encima, y el paso de una habitación a otra no tiene hoja.</summary>
+    public const string Blando = ".dDY";
+    /// <summary>Los muebles de esta lista no se juntan nunca: cuatro sillas en fila son cuatro
+    /// sillas, no un banco de 3,2 m.</summary>
+    public const string Unitario = "STVUJN";
+    /// <summary>Media unidad de Unity por casilla: 16 px de arte sobre 32 px por unidad.</summary>
+    public static float Escala { get { return ForjaInterior.Px / Mundo.PPU; } }
+    public static int Alto { get { return Actual != null ? Actual.Mapa.Length : 0; } }
 
     public static char Casilla(float x, float y) {
         if (Actual == null) return '#';
@@ -114,8 +132,7 @@ public static class Interiores {
         if (fx < 0 || fx >= fila.Length) return '#';
         return fila[fx];
     }
-    /// <summary>La escalera mecánica no es sólida: se anda por encima. El resto sí.</summary>
-    public static bool Solido(float x, float y) { return "#BMCWXPVOQELRG".IndexOf(Casilla(x,y)) >= 0; }
+    public static bool Solido(float x, float y) { return Blando.IndexOf(Casilla(x,y)) < 0; }
 
     /// <summary>El nombre viene de fuera a propósito: dos tascas iguales por dentro se
     /// llaman distinto en la puerta, que es lo que pasa en cualquier barrio.</summary>
@@ -137,9 +154,13 @@ public static class Interiores {
         Estado.I.EnInterior = true;
         var J = Juego.I;
         J.Jug.EnCoche = null;
+        // El portón de un taller mide más que una puerta de casa, así que se entra por el
+        // centro del hueco y no por su última casilla.
+        int sum = 0, cuantas = 0, fila = 0;
         for (int y = 0; y < Actual.Mapa.Length; y++)
             for (int x = 0; x < Actual.Mapa[y].Length; x++)
-                if (Actual.Mapa[y][x] == 'D') { J.Jug.Pos = new Vector2(x + 0.5f, y - 0.7f); }
+                if (Actual.Mapa[y][x] == 'D') { sum += x; cuantas++; fila = y; }
+        if (cuantas > 0) J.Jug.Pos = new Vector2(sum / (float)cuantas + 0.5f, fila - 0.7f);
         J.Jug.Dir8 = 4;
         Construir();
         J.MostrarCiudad(false);
@@ -159,21 +180,61 @@ public static class Interiores {
         J.MostrarCiudad(true);
     }
 
+    /// <summary>Trocea el plano en piezas rectangulares: dos casillas de «C» seguidas no son
+    /// dos camas, son una cama de 1,6 m. Se hace una vez al entrar.</summary>
+    public static List<PiezaInterior> Piezas(DefInterior d) {
+        var m = d.Mapa;
+        int alto = m.Length;
+        var visto = new bool[alto][];
+        for (int y = 0; y < alto; y++) visto[y] = new bool[m[y].Length];
+        var salida = new List<PiezaInterior>();
+        for (int y = 0; y < alto; y++)
+            for (int x = 0; x < m[y].Length; x++) {
+                char ch = m[y][x];
+                if (ch == '#' || Blando.IndexOf(ch) >= 0 || visto[y][x]) continue;
+                if (Unitario.IndexOf(ch) >= 0) {
+                    visto[y][x] = true;
+                    salida.Add(new PiezaInterior{ Ch=ch, X=x, Y=y, W=1, H=1 });
+                    continue;
+                }
+                int aw = 0;
+                while (x + aw < m[y].Length && m[y][x+aw] == ch && !visto[y][x+aw]) aw++;
+                int ah = 1;
+                while (y + ah < alto) {
+                    bool ok = m[y+ah].Length >= x + aw;
+                    for (int i = 0; ok && i < aw; i++)
+                        if (m[y+ah][x+i] != ch || visto[y+ah][x+i]) ok = false;
+                    if (!ok) break;
+                    ah++;
+                }
+                for (int j = 0; j < ah; j++) for (int i = 0; i < aw; i++) visto[y+j][x+i] = true;
+                salida.Add(new PiezaInterior{ Ch=ch, X=x, Y=y, W=aw, H=ah });
+            }
+        return salida;
+    }
+
     static void Construir() {
         if (_raiz != null) UnityEngine.Object.Destroy(_raiz);
         _raiz = new GameObject("Interior");
+        ForjaInterior.Generar();
         var m = Actual.Mapa;
-        var suelo = Forja.Tiles[Actual.Suelo];
-        var pared = Forja.Tiles[Actual.Pared];
+        var suelo = ForjaInterior.Suelos[Actual.Suelo];
+        var pared = ForjaInterior.Paredes[Actual.Pared];
         for (int y = 0; y < m.Length; y++)
             for (int x = 0; x < m[y].Length; x++) {
-                Poner(suelo, x, y, -200);
                 char ch = m[y][x];
-                if (ch == 'D') continue;
-                string clave;
-                if (ch == '#') Poner(pared, x, y, -199);
-                else if (TileDe.TryGetValue(ch, out clave)) Poner(Forja.Tiles[clave], x, y, -199);
+                if (ch == '#') { Poner(pared, x, y, 1, 1, -199); continue; }
+                Poner(suelo, x, y, 1, 1, -200);
+                if (ch == 'D') Poner(ForjaInterior.Puerta, x, y, 1, 1, -198);
+                else if (ch == 'd') {
+                    bool vertical = x > 0 && x+1 < m[y].Length && m[y][x-1] == '#' && m[y][x+1] == '#';
+                    Poner(vertical ? ForjaInterior.PasoV : ForjaInterior.PasoH, x, y, 1, 1, -198);
+                }
             }
+        // Todo lo que sobresale del suelo se ordena por su canto de abajo: así quien está
+        // delante de un mueble lo tapa y quien está detrás queda tapado.
+        foreach (var p in Piezas(Actual))
+            Poner(ForjaInterior.Mueble(p.Ch, p.W, p.H), p.X, p.Y, p.W, p.H, Mundo.OrdenY(p.Y + p.H));
         foreach (var n in Actual.Npcs) {
             var go = new GameObject("npc_" + n.Nombre);
             go.transform.SetParent(_raiz.transform, false);
@@ -184,10 +245,11 @@ public static class Interiores {
         }
     }
 
-    static void Poner(Sprite s, int x, int y, int orden) {
+    static void Poner(Sprite s, int x, int y, int w, int h, int orden) {
         var go = new GameObject("t");
         go.transform.SetParent(_raiz.transform, false);
-        go.transform.position = Mundo.AMundoPixel(new Vector2(x, y + 1));
+        // El sprite lleva el pivote en el centro, así que se coloca por el centro de la pieza.
+        go.transform.position = Mundo.AMundoPixel(new Vector2(x + w/2f, y + h/2f));
         var sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = s;
         sr.sortingOrder = orden;

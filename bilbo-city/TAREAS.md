@@ -27,6 +27,21 @@ herramientas/compilar/compilar.sh     # o ./verificar.sh csharp
 - [ ] Menú **BilboCity → Preparar escena** y comprobar que arranca.
 - [ ] Anotar abajo lo que salga en Unity, para seguir afinando los verificadores.
 
+## 1 bis · Los interiores en Unity
+
+El prototipo pasó los interiores a escala humana (casilla de 0,80 m dibujada a 16 px) y el
+puerto lleva los mismos planos, las mismas piezas de mobiliario y el mismo arte. Lo que no se
+ha podido comprobar sin abrir el editor es **la cámara de dentro**: en el HTML el zoom es
+entero y encuadra el sitio completo si cabe, y en Unity el tamaño ortográfico sigue saliendo
+de la casilla de la calle.
+
+- [ ] Entrar en los trece sitios y mirar el encuadre: media unidad por casilla
+      (`Interiores.Escala`), zoom entero y el sitio entero en pantalla si cabe.
+- [ ] Comprobar que el personaje y los muebles miden lo mismo dentro que en el prototipo:
+      una persona de 1,70 m al lado de una cama de 2,4 m.
+- [ ] El puerto sigue con `Forja.TS = 32` mientras el HTML va a 64 (ver §4b). Los interiores
+      ya no dependen de eso, pero la calle sí.
+
 ## 2 · Primera pasada de juego real
 
 - [ ] ¿Se ve Bilbao? Comparar con `referencia/capturas/plano-bilbo.png`.

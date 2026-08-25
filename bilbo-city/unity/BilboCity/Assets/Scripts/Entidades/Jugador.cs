@@ -47,7 +47,9 @@ public class Jugador : MonoBehaviour {
         bool corre = Corriendo && calle;
         float cansado = E.Energia <= 0 ? 0.6f : 1f;
         float v = (calle && Agachado ? 1.25f : 1.55f + fuerza * 3.25f) * cansado;
-        if (!calle) v = 2.7f;
+        // Dentro se anda a 1,4 m/s, y ahí la casilla mide 0,80 m: 1,75 casillas por segundo.
+        // Con la vara de la calle salían 0,27 y cruzar el salón costaba cincuenta segundos.
+        if (!calle) v = 1.4f / ForjaInterior.Metro;
         float m = entrada.magnitude;
         if (m > 0.08f) {
             Vector2 d = entrada / m * Mathf.Min(1f, m) * v * dt;
@@ -126,7 +128,13 @@ public static class Mundo {
     public const float PPU = 32f;
 
     /// <summary>La Y de las casillas crece hacia abajo; la de Unity hacia arriba.</summary>
-    public static Vector3 AMundo(Vector2 p) { return new Vector3(p.x, Ciudad.MH - p.y, 0); }
+    public static Vector3 AMundo(Vector2 p) {
+        // Dentro de un sitio la casilla mide 0,80 m y se dibuja a 16 px, no 5,16 m y 32: media
+        // unidad. Y la Y se voltea contra el alto del interior, no contra el de Bilbao.
+        if (Estado.I != null && Estado.I.EnInterior && Interiores.Actual != null)
+            return new Vector3(p.x * Interiores.Escala, (Interiores.Alto - p.y) * Interiores.Escala, 0);
+        return new Vector3(p.x, Ciudad.MH - p.y, 0);
+    }
 
     /// <summary>Igual, pero clavado a la rejilla de píxel del sprite. Todo lo que lleve
     /// SpriteRenderer va por aquí: si un sprite cae en medio píxel, se le mueven los

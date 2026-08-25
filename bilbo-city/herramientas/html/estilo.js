@@ -57,6 +57,8 @@ listo().then(() => {
       [/Persona \|\s*\*\*(\d+)×(\d+) px\*\*/,            [String(A.sc(20)), String(A.sc(26))], 'la figura'],
       [/Celda del personaje \|\s*\*\*(\d+)×(\d+) px\*\*/, [String(CW), String(CH)],     'la celda del personaje'],
       [/Icono de interfaz \|\s*\*\*(\d+)×(\d+) px\*\*/,   ['24', '24'],                 'el icono de interfaz'],
+      [/Casilla de interior \|\s*\*\*(\d+)×(\d+) px\*\*/,
+                                                      [String(A.TS_INT), String(A.TS_INT)], 'la casilla de interior'],
       [/Casilla del mundo \|\s*\*\*(\d+)×(\d+) px\*\*/,   [String(A.TS), String(A.TS)], 'la casilla del mundo'],
       [/Hoja de personaje \|\s*\*\*(\d+) columnas × (\d+) filas\*\*/,
                                                       ['8', String(A.ORDEN_POSES.length)], 'la hoja de personaje'],
@@ -93,6 +95,12 @@ listo().then(() => {
       }
     };
     for (const [k, c] of todos(A.TILE)) revisa('tile ' + k, c);
+    for (const [k, c] of Object.entries(A.SUELO_I)) revisa('suelo de interior ' + k, c);
+    for (const [k, c] of Object.entries(A.PARED_I)) revisa('pared de interior ' + k, c);
+    for (const [k, c] of Object.entries(A.PUERTA_I)) revisa('puerta ' + k, c);
+    for (const [k, c] of Object.entries(A.PASO_I)) revisa('paso ' + k, c);
+    for (const id of Object.keys(A.INT)) for (const p of A.piezasDe(A.INT[id]))
+      revisa('mueble ' + A.MUEBLES[p.ch].n, A.sprMueble(p.ch, p.w, p.h));
     for (const [k, c] of todos(A.ICO)) revisa('icono ' + k, c);
     for (const [k, c] of todos(A.PROP || {})) revisa('prop ' + k, c);
     for (const k of Object.keys(A.ARQ)) revisa('hoja ' + k, A.HOJAS[k] || A.hoja(k));
@@ -133,7 +141,6 @@ listo().then(() => {
   {
     let malos = 0;
     for (const [k, c] of todos(A.TILE)) {
-      if (A.TILE_MUEBLE.has(k.replace(/\[\d+\]$/, ''))) continue;
       // La medida sale del juego (`TS`), no de un 32 escrito aquí: la casilla subió a 64
       // para que una persona a escala real tuviese píxeles con los que dibujarse, y un
       // verificador con el número a mano habría dado por malo todo el suelo.
@@ -145,7 +152,7 @@ listo().then(() => {
       // rejilla de puntos por toda la ciudad.
       if (huecos) { fallos.push('tile ' + k + ': ' + huecos + ' píxeles transparentes'); malos++; }
     }
-    if (!malos) bien.push((todos(A.TILE).length - A.TILE_MUEBLE.size) + ' tiles de suelo a ' + A.TS + 'x' + A.TS + ' y sin agujeros');
+    if (!malos) bien.push(todos(A.TILE).length + ' tiles de suelo a ' + A.TS + 'x' + A.TS + ' y sin agujeros');
   }
 
   // ── R4 · las hojas de personaje, a su medida ─────────────────────────────────────
@@ -217,6 +224,52 @@ listo().then(() => {
       }
     }
     if (!malos) bien.push(Object.keys(SING).length + ' edificios singulares a su medida y tapando su celda');
+  }
+
+  // ── R7 · el arte de interior, a su escala y a la de la gente ────────────────────
+  /* Dentro de un sitio la casilla no es la de la calle: son 0,80 m dibujados a 16 px. Esa
+     densidad —20 px por metro— tiene que ser la misma a la que está dibujada una persona,
+     porque dentro de una casa la vara de medir es la gente y no los coches. Si alguien
+     cambia una de las dos y no la otra, la cama vuelve a quedarse enorme o la puerta
+     enana, y eso no se ve hasta entrar. */
+  {
+    const pxmInt = A.TS_INT / A.M_INT;
+    const pxmPj = A.sc(26) / 1.70;          // la figura mide 26 en el papel y 1,70 m de alto
+    if (Math.abs(pxmInt - pxmPj) / pxmPj > 0.1)
+      fallos.push('el interior va a ' + pxmInt.toFixed(1) + ' px/m y la gente a '
+        + pxmPj.toFixed(1) + ': dentro de una casa tienen que medir igual');
+    else bien.push('interior y personaje a la misma densidad: ' + pxmInt.toFixed(0) + ' px/m');
+
+    let malos = 0;
+    for (const [d, n] of [[A.SUELO_I, 'suelo'], [A.PARED_I, 'pared']])
+      for (const [k, c] of Object.entries(d)) {
+        if (c.width !== A.TS_INT || c.height !== A.TS_INT) {
+          fallos.push(n + ' ' + k + ': mide ' + c.width + 'x' + c.height); malos++; continue;
+        }
+        const t = px(c);
+        let huecos = 0;
+        for (let i = 3; i < t.length; i += 4) if (t[i] !== 255) huecos++;
+        if (huecos) { fallos.push(n + ' ' + k + ': ' + huecos + ' píxeles transparentes'); malos++; }
+      }
+    // Cada mueble se forja del tamaño con el que sale en algún plano de verdad: así se
+    // comprueba el dibujo que se va a ver, no uno de muestra.
+    const vistos = new Set();
+    for (const id of Object.keys(A.INT)) for (const p of A.piezasDe(A.INT[id])) {
+      const k = p.ch + p.w + 'x' + p.h;
+      if (vistos.has(k)) continue;
+      vistos.add(k);
+      const c = A.sprMueble(p.ch, p.w, p.h);
+      const t = px(c);
+      let pinta = 0;
+      for (let i = 3; i < t.length; i += 4) if (t[i] === 255) pinta++;
+      if (pinta / (c.width * c.height) < 0.35) {
+        fallos.push('mueble ' + A.MUEBLES[p.ch].n + ' ' + p.w + 'x' + p.h + ': casi no pinta nada');
+        malos++;
+      }
+    }
+    if (!malos) bien.push(vistos.size + ' muebles de interior dibujados a su tamaño, sobre '
+      + (Object.keys(A.SUELO_I).length + Object.keys(A.PARED_I).length) + ' suelos y paredes de '
+      + A.TS_INT + 'x' + A.TS_INT);
   }
 
   bien.forEach(b => console.log('  ok    ' + b));
