@@ -2602,8 +2602,11 @@ const dir8De=(dx,dy)=>((2-Math.round(Math.atan2(dy,dx)/(Math.PI/4)))%8+8)%8;
 
 /*═══════════════ ARMAS ═══════════════*/
 const ARMAS=[
- {id:'punos',n:'Puños',dmg:11,alc:1.0,cad:.34,cuerpo:true,inf:true,l:0},
- {id:'bate',n:'Bate',dmg:30,alc:1.4,cad:.5,cuerpo:true,inf:true,precio:120,l:9,col:C.maderaL,mango:C.maderaO,grosor:2},
+ /* El alcance en casillas engañaba: `1.0` parece poco y son 5,2 m — se pegaba a alguien
+    desde el otro lado de la acera, y con el bate desde el otro lado de la calle (7,2 m).
+    Un puño llega a metro y medio y un bate a dos y pico, contando el brazo y el paso. */
+ {id:'punos',n:'Puños',dmg:11,alc:.30,cad:.34,cuerpo:true,inf:true,l:0},
+  {id:'bate',n:'Bate',dmg:30,alc:.45,cad:.5,cuerpo:true,inf:true,precio:120,l:9,col:C.maderaL,mango:C.maderaO,grosor:2},
  {id:'pistola',n:'Pistola',dmg:24,alc:9,cad:.3,vel:26,disp:1,spread:.05,precio:450,balas:60,pack:24,
   l:5,col:C.carbon,mango:C.negro,fog:'pistola'},
  {id:'uzi',n:'Uzi',dmg:13,alc:8,cad:.085,vel:24,disp:1,spread:.14,precio:1400,balas:200,pack:80,
@@ -6170,7 +6173,7 @@ function atacarJugador(mx,my){
   /* Por detrás y a alguien que no sabe que estás ahí: cae de un golpe y sin ruido. Es
      el premio de haber ido despacio; sin esto, el sigilo solo sirve para tardar más en
      llegar al mismo tiroteo. */
-  if(obj&&enemigos.includes(obj)&&desprevenido(obj)&&porDetras(obj)&&dist(obj,player)<1.4){
+  if(obj&&enemigos.includes(obj)&&desprevenido(obj)&&porDetras(obj)&&dist(obj,player)<.35){
    sfx('golpe',.35);danar(obj,999);particula(obj.x,obj.y,'sangre',6);
    ruido(obj.x,obj.y,2.5);darXp(25);aviso('Por la espalda');return;}
   sfx('golpe',.7);
@@ -6385,7 +6388,15 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
   mover(c,c.x+c.vx*dt,c.y+c.vy*dt,true);
   const rec=Math.hypot(c.x-antes.x,c.y-antes.y),esp=Math.hypot(c.vx,c.vy)*dt;
   if(c.golpe&&esp>.02&&rec<esp*.55){const imp=Math.abs(vf);
-   if(imp>3){sfx('choque',clamp(imp/12,.2,1));c.dano+=imp*.035;danarJugador(imp*1.2);particula(c.x,c.y,'chispa',4);}
+   /* El daño de un choque va con la ENERGIA, o sea con el cuadrado de la velocidad, no
+      con la velocidad. Iba lineal y con el umbral en 3 casillas/s, que con las velocidades
+      viejas —punta de 204 km/h— colaba; al pasarlas a m/s el umbral quedo en 56 km/h y la
+      punta del utilitario en 120, asi que chocar a menos de 56 no hacia nada y a fondo
+      quitaba 8 puntos de 100. Ahora empieza a doler a 18 km/h, a 50 quita medio deposito
+      de vida y a 120 no se sale andando, que es lo que pasa de verdad. */
+   const vms=Math.abs(imp)/MS;
+   if(vms*3.6>18){const d=Math.min(100,.23*vms*vms);
+    sfx('choque',clamp(d/60,.2,1));c.dano+=d*.011;danarJugador(d);particula(c.x,c.y,'chispa',4);}
    c.vx*=.25;c.vy*=.25;}
   if(c.dano>.55&&azar()<dt*7)particula(c.x,c.y,'humo',1);
   if(c.dano>=1&&c.vivo)explotar(c);
