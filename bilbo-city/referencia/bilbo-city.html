@@ -2837,27 +2837,35 @@ function generarTiles(){
 const TILE_MUEBLE=new Set(['mesa','cama','mueble','vitrina','puesto','camilla','mostrador']);
 
 /*═══════════════ VEHÍCULOS ═══════════════*/
+/* Las medidas salen de las de verdad, no de lo que quedaba bonito. La escala del mapa es
+   1 casilla = 32 px = 5,16 m, o sea 0,161 m por píxel, y todo lo vivo y lo rodante va a una
+   sola sobreescala, **×2,1**: es la más pequeña con la que un personaje sigue siendo
+   dibujable —a escala real unos hombros son 3 px— y aplicarla igual a todos es lo que hace
+   que la calle deje de contradecirse. Antes cada chasis iba por libre: el utilitario a
+   ×1,32, la moto a ×1,54 y el autobús a ×0,75, más corto que una ambulancia.
+   Así que un utilitario mide 3,9 m de verdad y 52 px en pantalla, y un autobús 12 m y 156.
+   Si tocas uno, sácalo de su medida real: largo_en_metros × 2,1 / 0,161, redondeado a par. */
 const CHASIS={
- utilitario:{l:32,an:18,morro:4,cabina:[9,11]},
- berlina:{l:38,an:18,morro:6,cabina:[12,12]},
- ranchera:{l:40,an:18,morro:6,cabina:[11,18]},
- furgoCorta:{l:36,an:20,morro:5,cabina:[8,8],caja:[17,15]},
- furgoLarga:{l:44,an:20,morro:5,cabina:[8,8],caja:[17,24]},
- deportivo:{l:38,an:17,morro:8,cabina:[14,11]},
- todoterreno:{l:38,an:21,morro:5,cabina:[11,16],alto:1},
- taxi:{l:38,an:18,morro:6,cabina:[12,12],taxi:1},
- patrulla:{l:38,an:18,morro:6,cabina:[12,12],rotativo:1},
- ambulancia:{l:44,an:21,morro:5,cabina:[8,8],caja:[16,26],rotativo:1,cruz:1},
- basura:{l:46,an:21,morro:5,cabina:[8,9],caja:[18,26]},
- autobus:{l:56,an:22,morro:3,cabina:[6,46],bus:1},
- camionObra:{l:46,an:21,morro:6,cabina:[9,10],volquete:1},
+ utilitario:{l:52,an:22,morro:7,cabina:[15,18]},
+ berlina:{l:60,an:24,morro:9,cabina:[19,19]},
+ ranchera:{l:64,an:24,morro:10,cabina:[18,29]},
+ furgoCorta:{l:66,an:26,morro:9,cabina:[15,15],caja:[31,28]},
+ furgoLarga:{l:78,an:26,morro:9,cabina:[14,14],caja:[30,43]},
+ deportivo:{l:58,an:24,morro:12,cabina:[21,17]},
+ todoterreno:{l:60,an:26,morro:8,cabina:[17,25],alto:1},
+ taxi:{l:60,an:24,morro:9,cabina:[19,19],taxi:1},
+ patrulla:{l:60,an:24,morro:9,cabina:[19,19],rotativo:1},
+ ambulancia:{l:72,an:28,morro:8,cabina:[13,13],caja:[26,43],rotativo:1,cruz:1},
+ basura:{l:98,an:34,morro:11,cabina:[17,19],caja:[38,55]},
+ autobus:{l:156,an:34,morro:8,cabina:[17,128],bus:1},
+ camionObra:{l:92,an:34,morro:12,cabina:[18,20],volquete:1},
  /* Lo que faltaba por la calle: dos ruedas, los bomberos, la grúa municipal, el microbús
     de barrio y el furgón de la Ertzaintza. */
- moto:{l:20,an:11,morro:3,cabina:[7,5],moto:1},
- bomberos:{l:50,an:22,morro:5,cabina:[9,12],caja:[22,24],rotativo:1,escalera:1},
- grua:{l:44,an:20,morro:5,cabina:[8,10],caja:[19,16],brazo:1},
- microbus:{l:42,an:20,morro:4,cabina:[6,32],bus:1},
- furgonPoli:{l:44,an:21,morro:5,cabina:[8,8],caja:[16,24],rotativo:1,rejilla:1},
+ moto:{l:28,an:10,morro:4,cabina:[10,7],moto:1},
+ bomberos:{l:104,an:34,morro:10,cabina:[19,25],caja:[46,50],rotativo:1,escalera:1},
+ grua:{l:86,an:30,morro:10,cabina:[16,20],caja:[37,31],brazo:1},
+ microbus:{l:92,an:30,morro:9,cabina:[13,70],bus:1},
+ furgonPoli:{l:72,an:26,morro:8,cabina:[13,13],caja:[26,39],rotativo:1,rejilla:1},
 };
 const LIBREAS=[['#c23b22','#952914','#e05b3c'],['#3f6f8f','#2f5469','#5b93b5'],
  ['#8f8f3f','#6e6e2f','#b3b35b'],['#3f8f6f','#2f6c53','#5bb392'],['#8f5f3f','#6c472f','#b37f5b'],
@@ -2872,41 +2880,49 @@ function dibVeh(tipo,lib,estado){
  if(K.moto){
   P(g,ox+2,oy+2,L-4,AN-4,C.negro);
   P(g,ox+3,oy+3,L-6,AN-6,base);P(g,ox+3,oy+3,L-6,1,cl);
-  P(g,ox+L-7,oy+3,3,AN-6,osc);
-  P(g,ox+1,oy+AN/2-2,4,4,C.carbon);P(g,ox+L-5,oy+AN/2-2,4,4,C.carbon);
-  P(g,ox+6,oy+1,5,AN-2,C.carbon);                    /* el que va encima */
-  P(g,ox+7,oy+2,3,3,C.piel2);
-  P(g,ox+L-4,oy+AN/2-1,2,2,'#e8dfa8');
+  P(g,ox+L-9,oy+3,4,AN-6,osc);
+  P(g,ox+1,oy+AN/2-3,6,6,C.carbon);P(g,ox+L-7,oy+AN/2-3,6,6,C.carbon);
+  P(g,ox+9,oy+1,7,AN-2,C.carbon);                    /* el que va encima */
+  P(g,ox+10,oy+2,5,3,C.piel2);
+  P(g,ox+L-5,oy+AN/2-2,3,3,'#e8dfa8');
   return cuantizar(c);}
  P(g,ox,oy+1,L,AN-2,C.negro);
- P(g,ox+1,oy+1,L-2,AN-2,base);P(g,ox+1,oy+1,L-2,2,cl);P(g,ox+1,oy+AN-3,L-2,2,osc);
+ /* Los remates iban en píxeles absolutos —faros de 3, ruedas de 6, ventanillas de 3— y
+    con la escala vieja colaban. Sobre un autobús de 156 px se quedan de juguete, así que
+    van al doble: una rueda mide 0,65 m de verdad, que a ×2,1 son 8 px, no 3. */
+ P(g,ox+1,oy+1,L-2,AN-2,base);P(g,ox+1,oy+1,L-2,3,cl);P(g,ox+1,oy+AN-4,L-2,3,osc);
  P(g,ox+2,oy+3,K.morro,AN-6,cl);
  const[cxp,cw]=K.cabina;
  P(g,ox+cxp,oy+3,cw,AN-6,C.carbon);
- P(g,ox+cxp+1,oy+4,3,AN-8,'#3f5566');P(g,ox+cxp+cw-3,oy+4,2,AN-8,'#31424f');
- if(K.caja){const[bx,bw]=K.caja;P(g,ox+bx,oy+2,bw,AN-4,cl);P(g,ox+bx+1,oy+3,bw-2,AN-6,base);}
- if(K.bus)for(let i=8;i<L-6;i+=7)P(g,ox+i,oy+2,5,2,'#3f5566');
+ P(g,ox+cxp+2,oy+5,5,AN-10,'#3f5566');P(g,ox+cxp+cw-6,oy+5,4,AN-10,'#31424f');
+ if(K.caja){const[bx,bw]=K.caja;P(g,ox+bx,oy+2,bw,AN-4,cl);P(g,ox+bx+2,oy+4,bw-4,AN-8,base);}
+ if(K.bus)for(let i=16;i<L-12;i+=15)P(g,ox+i,oy+3,9,3,'#3f5566');
  if(K.volquete)P(g,ox+cxp+cw,oy+2,L-cxp-cw-2,AN-4,C.mostazaO);
- P(g,ox+L-4,oy+4,3,3,'#e8dfa8');P(g,ox+L-4,oy+AN-7,3,3,'#e8dfa8');
- P(g,ox+1,oy+4,2,3,C.crema);P(g,ox+1,oy+AN-7,2,3,C.crema);
- const rw=K.alto?4:3;
- P(g,ox+5,oy-1,6,rw,C.negro);P(g,ox+L-12,oy-1,6,rw,C.negro);
- P(g,ox+5,oy+AN-2,6,rw,C.negro);P(g,ox+L-12,oy+AN-2,6,rw,C.negro);
- if(K.taxi){P(g,ox+cxp+2,oy-1,6,3,C.mostaza);
-  for(let i=0;i<L-8;i+=4)P(g,ox+2+i,oy+AN/2-1,2,2,C.carbon);}
- if(K.rotativo){P(g,ox+cxp,oy+1,3,AN-2,estado==='rotA'?'#2f6bff':C.gris);
-  P(g,ox+cxp+3,oy+1,3,AN-2,estado==='rotA'?C.gris:'#ff3b30');}
- if(K.cruz){P(g,ox+18,oy+AN/2-1,10,2,C.rojo);P(g,ox+22,oy+AN/2-5,2,10,C.rojo);}
+ /* Un faro mide 60×25 cm: a ×2,1 son 8 de ancho por 3 de alto, y visto desde arriba lo
+    que asoma es una tira, no un cuadrado. Con los 5×5 de antes el coche parecía llevar
+    cuatro paneles blancos atornillados en las esquinas. */
+ P(g,ox+L-6,oy+4,4,3,'#e8dfa8');P(g,ox+L-6,oy+AN-7,4,3,'#e8dfa8');
+ P(g,ox+2,oy+4,3,3,C.crema);P(g,ox+2,oy+AN-7,3,3,C.crema);
+ const rw=K.alto?6:5;
+ P(g,ox+8,oy-2,10,rw,C.negro);P(g,ox+L-18,oy-2,10,rw,C.negro);
+ P(g,ox+8,oy+AN-3,10,rw,C.negro);P(g,ox+L-18,oy+AN-3,10,rw,C.negro);
+ if(K.taxi){P(g,ox+cxp+4,oy-2,10,5,C.mostaza);
+  for(let i=0;i<L-14;i+=8)P(g,ox+4+i,oy+AN/2-2,4,4,C.carbon);}
+ if(K.rotativo){P(g,ox+cxp,oy+1,5,AN-2,estado==='rotA'?'#2f6bff':C.gris);
+  P(g,ox+cxp+5,oy+1,5,AN-2,estado==='rotA'?C.gris:'#ff3b30');}
+ /* La cruz, centrada en la caja y no a dieciocho píxeles del morro: con la ambulancia a
+    72 px, ese dieciocho la dejaba montada sobre la cabina. */
+ if(K.cruz){P(g,ox+L/2-9,oy+AN/2-2,18,4,C.rojo);P(g,ox+L/2-2,oy+AN/2-9,4,18,C.rojo);}
  if(K.escalera){const[bx,bw]=K.caja;
-  P(g,ox+bx+1,oy+AN/2-4,bw-2,8,C.grisO);
-  for(let i=2;i<bw-3;i+=4)P(g,ox+bx+i,oy+AN/2-4,2,8,C.acero);}
+  P(g,ox+bx+2,oy+AN/2-7,bw-4,14,C.grisO);
+  for(let i=3;i<bw-5;i+=7)P(g,ox+bx+i,oy+AN/2-7,3,14,C.acero);}
  if(K.brazo){const[bx,bw]=K.caja;
-  P(g,ox+bx+bw-2,oy+AN/2-2,L-bx-bw,4,C.mostazaO);
-  P(g,ox+L-6,oy+AN/2-4,4,8,C.carbon);P(g,ox+bx,oy+2,4,AN-4,C.mostaza);}
+  P(g,ox+bx+bw-3,oy+AN/2-4,L-bx-bw,8,C.mostazaO);
+  P(g,ox+L-10,oy+AN/2-7,7,14,C.carbon);P(g,ox+bx,oy+2,7,AN-4,C.mostaza);}
  if(K.rejilla){const[bx,bw]=K.caja;
-  for(let i=1;i<bw-1;i+=3)P(g,ox+bx+i,oy+3,1,AN-6,C.grisO);}
- if(estado==='abollado')for(let i=0;i<9;i++)P(g,ox+4+((i*7)%(L-8)),oy+3+((i*5)%(AN-6)),2,2,osc);
- if(estado==='quemado')for(let i=0;i<14;i++)P(g,ox+2+((i*5)%(L-4)),oy+2+((i*3)%(AN-4)),2,2,'#1a1714');
+  for(let i=2;i<bw-2;i+=6)P(g,ox+bx+i,oy+4,2,AN-8,C.grisO);}
+ if(estado==='abollado')for(let i=0;i<14;i++)P(g,ox+6+((i*11)%(L-12)),oy+4+((i*7)%(AN-8)),3,3,osc);
+ if(estado==='quemado')for(let i=0;i<22;i++)P(g,ox+3+((i*9)%(L-6)),oy+3+((i*5)%(AN-6)),3,3,'#1a1714');
  return cuantizar(c);
 }
 const VEH={},VEH_QUEMADO={};

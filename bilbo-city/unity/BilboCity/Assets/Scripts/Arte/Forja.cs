@@ -241,27 +241,34 @@ public static class Forja {
     // ═══════════ VEHÍCULOS ═══════════
     public struct Chasis { public int l, an, morro, cabX, cabW, cajaX, cajaW;
         public bool taxi, rotativo, cruz, bus, volquete, alto, moto, escalera, brazo, rejilla; }
+    // Las medidas salen de las de verdad, no de lo que quedaba bonito. La escala del mapa
+    // es 1 casilla = 32 px = 5,16 m, o sea 0,161 m por píxel, y todo lo vivo y lo rodante
+    // va a una sola sobreescala, x2,1: es la más pequeña con la que un personaje sigue
+    // siendo dibujable —a escala real unos hombros son 3 px— y aplicarla igual a todos es
+    // lo que hace que la calle deje de contradecirse. Antes cada chasis iba por libre: el
+    // utilitario a x1,32, la moto a x1,54 y el autobús a x0,75, más corto que una
+    // ambulancia. Si tocas uno, sácalo de su medida real: metros x 2,1 / 0,161, a par.
     public static readonly Dictionary<string, Chasis> Chasises = new Dictionary<string, Chasis> {
-        {"utilitario", new Chasis{ l=32,an=18,morro=4,cabX=9,cabW=11 }},
-        {"berlina",    new Chasis{ l=38,an=18,morro=6,cabX=12,cabW=12 }},
-        {"ranchera",   new Chasis{ l=40,an=18,morro=6,cabX=11,cabW=18 }},
-        {"furgoCorta", new Chasis{ l=36,an=20,morro=5,cabX=8,cabW=8, cajaX=17,cajaW=15 }},
-        {"furgoLarga", new Chasis{ l=44,an=20,morro=5,cabX=8,cabW=8, cajaX=17,cajaW=24 }},
-        {"deportivo",  new Chasis{ l=38,an=17,morro=8,cabX=14,cabW=11 }},
-        {"todoterreno",new Chasis{ l=38,an=21,morro=5,cabX=11,cabW=16, alto=true }},
-        {"taxi",       new Chasis{ l=38,an=18,morro=6,cabX=12,cabW=12, taxi=true }},
-        {"patrulla",   new Chasis{ l=38,an=18,morro=6,cabX=12,cabW=12, rotativo=true }},
-        {"ambulancia", new Chasis{ l=44,an=21,morro=5,cabX=8,cabW=8, cajaX=16,cajaW=26, rotativo=true, cruz=true }},
-        {"basura",     new Chasis{ l=46,an=21,morro=5,cabX=8,cabW=9, cajaX=18,cajaW=26 }},
-        {"autobus",    new Chasis{ l=56,an=22,morro=3,cabX=6,cabW=46, bus=true }},
-        {"camionObra", new Chasis{ l=46,an=21,morro=6,cabX=9,cabW=10, volquete=true }},
+        {"utilitario", new Chasis{ l=52,an=22,morro=7,cabX=15,cabW=18 }},
+        {"berlina",    new Chasis{ l=60,an=24,morro=9,cabX=19,cabW=19 }},
+        {"ranchera",   new Chasis{ l=64,an=24,morro=10,cabX=18,cabW=29 }},
+        {"furgoCorta", new Chasis{ l=66,an=26,morro=9,cabX=15,cabW=15, cajaX=31,cajaW=28 }},
+        {"furgoLarga", new Chasis{ l=78,an=26,morro=9,cabX=14,cabW=14, cajaX=30,cajaW=43 }},
+        {"deportivo",  new Chasis{ l=58,an=24,morro=12,cabX=21,cabW=17 }},
+        {"todoterreno",new Chasis{ l=60,an=26,morro=8,cabX=17,cabW=25, alto=true }},
+        {"taxi",       new Chasis{ l=60,an=24,morro=9,cabX=19,cabW=19, taxi=true }},
+        {"patrulla",   new Chasis{ l=60,an=24,morro=9,cabX=19,cabW=19, rotativo=true }},
+        {"ambulancia", new Chasis{ l=72,an=28,morro=8,cabX=13,cabW=13, cajaX=26,cajaW=43, rotativo=true, cruz=true }},
+        {"basura",     new Chasis{ l=98,an=34,morro=11,cabX=17,cabW=19, cajaX=38,cajaW=55 }},
+        {"autobus",    new Chasis{ l=156,an=34,morro=8,cabX=17,cabW=128, bus=true }},
+        {"camionObra", new Chasis{ l=92,an=34,morro=12,cabX=18,cabW=20, volquete=true }},
         // Lo que faltaba por la calle: dos ruedas, los bomberos, la grúa municipal, el
         // microbús de barrio y el furgón de la Ertzaintza.
-        {"moto",       new Chasis{ l=20,an=11,morro=3,cabX=7,cabW=5, moto=true }},
-        {"bomberos",   new Chasis{ l=50,an=22,morro=5,cabX=9,cabW=12, cajaX=22,cajaW=24, rotativo=true, escalera=true }},
-        {"grua",       new Chasis{ l=44,an=20,morro=5,cabX=8,cabW=10, cajaX=19,cajaW=16, brazo=true }},
-        {"microbus",   new Chasis{ l=42,an=20,morro=4,cabX=6,cabW=32, bus=true }},
-        {"furgonPoli", new Chasis{ l=44,an=21,morro=5,cabX=8,cabW=8, cajaX=16,cajaW=24, rotativo=true, rejilla=true }},
+        {"moto",       new Chasis{ l=28,an=10,morro=4,cabX=10,cabW=7, moto=true }},
+        {"bomberos",   new Chasis{ l=104,an=34,morro=10,cabX=19,cabW=25, cajaX=46,cajaW=50, rotativo=true, escalera=true }},
+        {"grua",       new Chasis{ l=86,an=30,morro=10,cabX=16,cabW=20, cajaX=37,cajaW=31, brazo=true }},
+        {"microbus",   new Chasis{ l=92,an=30,morro=9,cabX=13,cabW=70, bus=true }},
+        {"furgonPoli", new Chasis{ l=72,an=26,morro=8,cabX=13,cabW=13, cajaX=26,cajaW=39, rotativo=true, rejilla=true }},
     };
     public static readonly string[][] Libreas = {
         new[]{"#c23b22","#952914","#e05b3c"}, new[]{"#3f6f8f","#2f5469","#5b93b5"},
@@ -283,53 +290,59 @@ public static class Forja {
         if (K.moto) {
             L.P(ox+2, oy+2, l-4, an-4, Paleta.Negro);
             L.P(ox+3, oy+3, l-6, an-6, baseC); L.P(ox+3, oy+3, l-6, 1, cl);
-            L.P(ox+l-7, oy+3, 3, an-6, osc);
-            L.P(ox+1, oy+an/2-2, 4, 4, Paleta.Carbon); L.P(ox+l-5, oy+an/2-2, 4, 4, Paleta.Carbon);
-            L.P(ox+6, oy+1, 5, an-2, Paleta.Carbon);          // el que va encima
-            L.P(ox+7, oy+2, 3, 3, Paleta.Piel2);
-            L.P(ox+l-4, oy+an/2-1, 2, 2, Paleta.H("#e8dfa8"));
+            L.P(ox+l-9, oy+3, 4, an-6, osc);
+            L.P(ox+1, oy+an/2-3, 6, 6, Paleta.Carbon); L.P(ox+l-7, oy+an/2-3, 6, 6, Paleta.Carbon);
+            L.P(ox+9, oy+1, 7, an-2, Paleta.Carbon);          // el que va encima
+            L.P(ox+10, oy+2, 5, 3, Paleta.Piel2);
+            L.P(ox+l-5, oy+an/2-2, 3, 3, Paleta.H("#e8dfa8"));
             return L;
         }
         L.P(ox, oy+1, l, an-2, Paleta.Negro);
         L.P(ox+1, oy+1, l-2, an-2, baseC);
-        L.P(ox+1, oy+1, l-2, 2, cl);
-        L.P(ox+1, oy+an-3, l-2, 2, osc);
+        // Los remates iban en píxeles absolutos —faros de 3, ruedas de 6, ventanillas de
+        // 3— y con la escala vieja colaban. Sobre un autobús de 156 px se quedan de
+        // juguete, así que van al doble: una rueda mide 0,65 m de verdad, que a x2,1 son
+        // 8 px, no 3. Y un faro es 60x25 cm: una tira, no un cuadrado.
+        L.P(ox+1, oy+1, l-2, 3, cl);
+        L.P(ox+1, oy+an-4, l-2, 3, osc);
         L.P(ox+2, oy+3, K.morro, an-6, cl);
         L.P(ox+K.cabX, oy+3, K.cabW, an-6, Paleta.Carbon);
-        L.P(ox+K.cabX+1, oy+4, 3, an-8, Paleta.H("#3f5566"));
-        L.P(ox+K.cabX+K.cabW-3, oy+4, 2, an-8, Paleta.H("#31424f"));
-        if (K.cajaW > 0) { L.P(ox+K.cajaX, oy+2, K.cajaW, an-4, cl); L.P(ox+K.cajaX+1, oy+3, K.cajaW-2, an-6, baseC); }
-        if (K.bus) for (int i = 8; i < l-6; i += 7) L.P(ox+i, oy+2, 5, 2, Paleta.H("#3f5566"));
+        L.P(ox+K.cabX+2, oy+5, 5, an-10, Paleta.H("#3f5566"));
+        L.P(ox+K.cabX+K.cabW-6, oy+5, 4, an-10, Paleta.H("#31424f"));
+        if (K.cajaW > 0) { L.P(ox+K.cajaX, oy+2, K.cajaW, an-4, cl); L.P(ox+K.cajaX+2, oy+4, K.cajaW-4, an-8, baseC); }
+        if (K.bus) for (int i = 16; i < l-12; i += 15) L.P(ox+i, oy+3, 9, 3, Paleta.H("#3f5566"));
         if (K.volquete) L.P(ox+K.cabX+K.cabW, oy+2, l-K.cabX-K.cabW-2, an-4, Paleta.MostazaO);
-        L.P(ox+l-4, oy+4, 3, 3, Paleta.H("#e8dfa8"));
-        L.P(ox+l-4, oy+an-7, 3, 3, Paleta.H("#e8dfa8"));
-        L.P(ox+1, oy+4, 2, 3, Paleta.Crema);
-        L.P(ox+1, oy+an-7, 2, 3, Paleta.Crema);
-        int rw = K.alto ? 4 : 3;
-        L.P(ox+5, oy-1, 6, rw, Paleta.Negro); L.P(ox+l-12, oy-1, 6, rw, Paleta.Negro);
-        L.P(ox+5, oy+an-2, 6, rw, Paleta.Negro); L.P(ox+l-12, oy+an-2, 6, rw, Paleta.Negro);
+        L.P(ox+l-6, oy+4, 4, 3, Paleta.H("#e8dfa8"));
+        L.P(ox+l-6, oy+an-7, 4, 3, Paleta.H("#e8dfa8"));
+        L.P(ox+2, oy+4, 3, 3, Paleta.Crema);
+        L.P(ox+2, oy+an-7, 3, 3, Paleta.Crema);
+        int rw = K.alto ? 6 : 5;
+        L.P(ox+8, oy-2, 10, rw, Paleta.Negro); L.P(ox+l-18, oy-2, 10, rw, Paleta.Negro);
+        L.P(ox+8, oy+an-3, 10, rw, Paleta.Negro); L.P(ox+l-18, oy+an-3, 10, rw, Paleta.Negro);
         if (K.taxi) {
-            L.P(ox+K.cabX+2, oy-1, 6, 3, Paleta.Mostaza);
-            for (int i = 0; i < l-8; i += 4) L.P(ox+2+i, oy+an/2-1, 2, 2, Paleta.Carbon);
+            L.P(ox+K.cabX+4, oy-2, 10, 5, Paleta.Mostaza);
+            for (int i = 0; i < l-14; i += 8) L.P(ox+4+i, oy+an/2-2, 4, 4, Paleta.Carbon);
         }
         if (K.rotativo) {
-            L.P(ox+K.cabX, oy+1, 3, an-2, estado == "rotA" ? Paleta.H("#2f6bff") : Paleta.Gris);
-            L.P(ox+K.cabX+3, oy+1, 3, an-2, estado == "rotA" ? Paleta.Gris : Paleta.H("#ff3b30"));
+            L.P(ox+K.cabX, oy+1, 5, an-2, estado == "rotA" ? Paleta.H("#2f6bff") : Paleta.Gris);
+            L.P(ox+K.cabX+5, oy+1, 5, an-2, estado == "rotA" ? Paleta.Gris : Paleta.H("#ff3b30"));
         }
-        if (K.cruz) { L.P(ox+18, oy+an/2-1, 10, 2, Paleta.Rojo); L.P(ox+22, oy+an/2-5, 2, 10, Paleta.Rojo); }
+        // La cruz, centrada en la caja y no a dieciocho píxeles del morro: con la
+        // ambulancia a 72 px, ese dieciocho la dejaba montada sobre la cabina.
+        if (K.cruz) { L.P(ox+l/2-9, oy+an/2-2, 18, 4, Paleta.Rojo); L.P(ox+l/2-2, oy+an/2-9, 4, 18, Paleta.Rojo); }
         if (K.escalera) {
-            L.P(ox+K.cajaX+1, oy+an/2-4, K.cajaW-2, 8, Paleta.GrisO);
-            for (int i = 2; i < K.cajaW-3; i += 4) L.P(ox+K.cajaX+i, oy+an/2-4, 2, 8, Paleta.Acero);
+            L.P(ox+K.cajaX+2, oy+an/2-7, K.cajaW-4, 14, Paleta.GrisO);
+            for (int i = 3; i < K.cajaW-5; i += 7) L.P(ox+K.cajaX+i, oy+an/2-7, 3, 14, Paleta.Acero);
         }
         if (K.brazo) {
-            L.P(ox+K.cajaX+K.cajaW-2, oy+an/2-2, l-K.cajaX-K.cajaW, 4, Paleta.MostazaO);
-            L.P(ox+l-6, oy+an/2-4, 4, 8, Paleta.Carbon);
-            L.P(ox+K.cajaX, oy+2, 4, an-4, Paleta.Mostaza);
+            L.P(ox+K.cajaX+K.cajaW-3, oy+an/2-4, l-K.cajaX-K.cajaW, 8, Paleta.MostazaO);
+            L.P(ox+l-10, oy+an/2-7, 7, 14, Paleta.Carbon);
+            L.P(ox+K.cajaX, oy+2, 7, an-4, Paleta.Mostaza);
         }
         if (K.rejilla)
-            for (int i = 1; i < K.cajaW-1; i += 3) L.P(ox+K.cajaX+i, oy+3, 1, an-6, Paleta.GrisO);
+            for (int i = 2; i < K.cajaW-2; i += 6) L.P(ox+K.cajaX+i, oy+4, 2, an-8, Paleta.GrisO);
         if (estado == "quemado")
-            for (int i = 0; i < 14; i++) L.P(ox+2+((i*5)%(l-4)), oy+2+((i*3)%(an-4)), 2, 2, Paleta.H("#1a1714"));
+            for (int i = 0; i < 22; i++) L.P(ox+3+((i*9)%(l-6)), oy+3+((i*5)%(an-6)), 3, 3, Paleta.H("#1a1714"));
         return L;
     }
 
