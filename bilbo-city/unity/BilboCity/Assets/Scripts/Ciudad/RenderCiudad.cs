@@ -44,6 +44,7 @@ public class RenderCiudad : MonoBehaviour {
         var road = TileDe(T["road"]); var roadG = TileDe(T["roadGrieta"]);
         var lineaH = TileDe(T["lineaH"]); var lineaV = TileDe(T["lineaV"]);
         var alcant = TileDe(T["alcantarilla"]);
+        var cebraH = TileDe(T["cebraH"]); var cebraV = TileDe(T["cebraV"]);
         var acera = TileDe(T["acera"]); var aceraG = TileDe(T["aceraGast"]);
         var adoquin = TileDe(T["adoquin"]); var adoquinR = TileDe(T["adoquinRojo"]);
         var plaza = TileDe(T["plaza"]); var patio = TileDe(T["patio"]);
@@ -78,6 +79,9 @@ public class RenderCiudad : MonoBehaviour {
                     case Suelo.Agua: elegido = _aguaA; break;
                     case Suelo.Road: {
                         int h = Utiles.Hash(x,y);
+                        char cb = Mobiliario.Cebra(x,y);
+                        if (cb == 'V') { elegido = cebraV; break; }
+                        if (cb == 'H') { elegido = cebraH; break; }
                         if (h % 37 == 0) elegido = alcant;
                         else if (h % 19 == 0) elegido = roadG;
                         else {

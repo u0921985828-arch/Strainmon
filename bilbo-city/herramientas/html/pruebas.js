@@ -195,6 +195,57 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
     bien.push(interiores.length + ' interiores a escala humana: casilla de ' + A.M_INT
       + ' m, de ' + Math.min(...metros) + ' a ' + Math.max(...metros) + ' m², sin cuartos sellados');
 
+    // ── 1 ter · la calle: bordillo, pasos y mobiliario ─────────────────
+    /* El mobiliario iba sembrado por hash sobre cualquier acera y no había un solo paso
+       de cebra en toda la ciudad. Lo que se mide aquí es que cada cosa esté donde va: el
+       paso, en la calzada y en la bocacalle; la farola, en la fila del bordillo y a la
+       distancia a la que se ponen; el semáforo, en una esquina con paso al lado. */
+    {
+      const MOB = A.MOB, MW = A.MW, MH = A.MH;
+      const T = (x, y) => A.Tc(x, y);
+      let cebra = 0, mob = 0, fuera = 0, cebraMal = 0, semSuelto = 0;
+      const cuenta = {};
+      for (let y = 1; y < MH-1; y++) for (let x = 1; x < MW-1; x++) {
+        const v = MOB[y*MW + x];
+        if (!v) continue;
+        cuenta[v] = (cuenta[v] || 0) + 1;
+        if (v >= 20) {
+          cebra++;
+          if (T(x, y) !== A.ROAD) cebraMal++;      // un paso pintado sobre la acera
+          continue;
+        }
+        mob++;
+        // Todo el mobiliario va en la acera y tocando calzada: una farola en mitad de la
+        // acera ancha es una farola en mitad del paso.
+        const bordillo = T(x+1,y) === A.ROAD || T(x-1,y) === A.ROAD
+                      || T(x,y+1) === A.ROAD || T(x,y-1) === A.ROAD;
+        if (T(x, y) !== A.ACERA || !bordillo) fuera++;
+        if (v === 6) {   // semáforo
+          const hayPaso = MOB[(y-1)*MW+x] >= 20 || MOB[(y+1)*MW+x] >= 20
+                       || MOB[y*MW+x+1] >= 20 || MOB[y*MW+x-1] >= 20;
+          if (!hayPaso) semSuelto++;
+        }
+      }
+      ok(cebra > 2000, 'solo ' + cebra + ' pasos de cebra en toda la ciudad');
+      ok(!cebraMal, cebraMal + ' pasos de cebra pintados fuera de la calzada');
+      ok(!fuera, fuera + ' muebles de calle lejos del bordillo');
+      ok(!semSuelto, semSuelto + ' semáforos sin un paso al lado');
+      // La separación entre farolas: en Bilbao hay una cada 25-30 m, y la casilla mide
+      // 5,16. Se mide sobre la fila del bordillo entera, que es donde van: cuántas casillas
+      // de bordillo hay por farola.
+      let kerb = 0;
+      for (let y = 1; y < MH-1; y++) for (let x = 1; x < MW-1; x++) {
+        if (T(x,y) !== A.ACERA) continue;
+        if (T(x+1,y) === A.ROAD || T(x-1,y) === A.ROAD
+         || T(x,y+1) === A.ROAD || T(x,y-1) === A.ROAD) kerb++;
+      }
+      const sep = (cuenta[1] ? kerb / cuenta[1] : 0) * 5.16;
+      ok(sep > 15 && sep < 45, 'las farolas van cada ' + sep.toFixed(0) + ' m');
+      bien.push(cebra + ' pasos de cebra y ' + mob + ' muebles de calle en el bordillo · '
+        + 'farola cada ' + sep.toFixed(0) + ' m · ' + (cuenta[6]||0) + ' semáforos, '
+        + (cuenta[7]||0) + ' árboles de alineación, ' + (cuenta[9]||0) + ' marquesinas');
+    }
+
     // ── 2 bis · se duerme y te curan ───────────────────────────────────
     // dormir() y curar() miran la casilla que hay delante. Si un plano nuevo pone la cama
     // pegada a la pared de abajo, la cama existe y no se puede usar.

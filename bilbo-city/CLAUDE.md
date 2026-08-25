@@ -205,6 +205,36 @@ plancha lisa.
 chasis y veintiún arquetipos según el estilo: taxis y gabardinas por la Gran Vía, monos de
 faena y camiones en Zorrotzaurre, motos por el Casco.
 
+## La calle: bordillo, pasos y mobiliario
+
+El mobiliario iba sembrado por hash sobre cualquier acera: una farola cada 29 casillas
+—150 m, y en Bilbao hay una cada 25— caída en mitad del ancho, un semáforo en medio de una
+recta y **ni un paso de cebra en toda la ciudad**, con los dos tiles forjados y sin usarlos
+nadie. Una calle no es una acera con cosas repartidas: es un bordillo con todo alineado
+encima, cruces donde se cruza, y el barrio decidiendo qué hay.
+
+Se calcula **una vez al cargar** y se guarda un byte por casilla (`MOB`), como los tejados:
+siete kilómetros de calle no se resuelven por fotograma.
+
+- **El bordillo se dibuja**, no se supone: canto claro en la acera y sombra sobre el asfalto
+  de enfrente. Desde arriba, una acera y una calzada solo se distinguen por el color; con el
+  escalón se ve cuál está más alta.
+- **Los pasos de cebra se encuentran solos.** En mitad de una calle la acera acompaña a los
+  dos lados y justo en la bocacalle se interrumpe: ahí es donde cruza la gente. Las bandas
+  van paralelas al tráfico, como se pintan de verdad. Salen 10 327 pasos.
+- **Todo lo demás va en la fila del bordillo** y a paso fijo a lo largo de la calle: farola
+  cada cuatro casillas (21 m), árbol de alineación cada cuatro con otro desfase, papelera
+  cada nueve, y los contenedores **en batería de tres**, que es como están en la calle.
+- **El semáforo va en la esquina y solo con un paso al lado.** Puesto en cada acera que toca
+  un cruce salían 24 058, uno cada cinco metros.
+- **El barrio manda**: el Casco (denso) no tiene arbolado y sí bolardos en fila; el Ensanche
+  y lo abierto, al revés. La marquesina va donde para el bus de verdad, y la terraza en la
+  acera del bar, la tasca o el asador.
+
+La batería lo mide: que ningún paso caiga fuera de la calzada, que ningún mueble esté lejos
+del bordillo, que ningún semáforo esté suelto y que la separación entre farolas —contada
+sobre las casillas de bordillo— caiga entre 15 y 45 m.
+
 ## Los edificios singulares
 
 Trece sitios —San Mamés, el Guggenheim, el Arriaga, el Ayuntamiento, la catedral, Begoña,

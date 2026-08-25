@@ -19,6 +19,31 @@ public static class Mobiliario {
         return Ciudad.T(x+1,y) == t || Ciudad.T(x-1,y) == t || Ciudad.T(x,y+1) == t || Ciudad.T(x,y-1) == t;
     }
 
+    /// <summary>Un paso de cebra, y en qué sentido van las bandas. 0 = no hay; 'V' = calle
+    /// norte-sur, bandas verticales; 'H' = calle este-oeste. Se encuentran solos: en mitad
+    /// de una calle la acera acompaña a los dos lados y justo en la bocacalle se interrumpe,
+    /// que es donde cruza la gente. Las bandas van paralelas al tráfico, como se pintan.</summary>
+    public static char Cebra(int x, int y) {
+        if (Ciudad.T(x,y) != Suelo.Road) return '\0';
+        bool eo = Pisable(x-1,y) && Pisable(x+1,y), ns = Pisable(x,y-1) && Pisable(x,y+1);
+        if (eo && !ns) {
+            if (!Pisable(x-1,y-1) || !Pisable(x+1,y-1) || !Pisable(x-1,y+1) || !Pisable(x+1,y+1)) return 'V';
+        } else if (ns && !eo) {
+            if (!Pisable(x-1,y-1) || !Pisable(x-1,y+1) || !Pisable(x+1,y-1) || !Pisable(x+1,y+1)) return 'H';
+        }
+        return '\0';
+    }
+
+    static bool Pisable(int x, int y) {
+        var t = Ciudad.T(x,y);
+        return t == Suelo.Acera || t == Suelo.Plaza;
+    }
+
+    static bool CebraAlLado(int x, int y) {
+        return Cebra(x,y-1) != '\0' || Cebra(x,y+1) != '\0'
+            || Cebra(x+1,y) != '\0' || Cebra(x-1,y) != '\0';
+    }
+
     static bool Cruce(int x, int y) {
         int n = 0;
         if (Ciudad.Rodable(x+1,y)) n++;
@@ -64,27 +89,29 @@ public static class Mobiliario {
         }
 
         if (t == Suelo.Acera) {
-            // semáforo en las esquinas de los cruces grandes
-            if (juntoCalle && Cruce(x,y) && h % 3 == 0) {
+            // Una calle no es una acera con cosas repartidas por un hash: es un bordillo con
+            // todo alineado encima. Nada fuera de la fila que toca calzada, y a paso fijo a lo
+            // largo de la calle — una farola cada cuatro casillas son 21 m, y en Bilbao hay
+            // una cada 25.
+            if (!juntoCalle) return false;
+            bool cE = Ciudad.T(x+1,y) == Suelo.Road, cO = Ciudad.T(x-1,y) == Suelo.Road;
+            bool cN = Ciudad.T(x,y-1) == Suelo.Road, cS = Ciudad.T(x,y+1) == Suelo.Road;
+            // El semáforo va en la esquina y solo si tiene un paso al lado. En cada acera que
+            // toca un cruce salían veinticuatro mil, uno cada cinco metros.
+            if ((cN || cS) && (cE || cO) && CebraAlLado(x,y) && h % 3 == 0) {
                 p.Clave = "semaforo"; p.Dx = 0.5f; p.Dy = 0.9f; return true;
             }
-            // farolas a intervalos regulares a lo largo de la acera
-            if (juntoCalle && ((x*3 + y*5) % 11 == 0)) {
-                p.Clave = "farola"; p.Dx = 0.5f; p.Dy = 0.95f; return true;
-            }
-            if (Z.Estilo == "industrial") {
-                if (h % 23 == 0) { p.Clave = "pales";  p.Dx = 0.5f; p.Dy = 0.9f; return true; }
-                if (h % 29 == 0) { p.Clave = "bidon";  p.Dx = 0.5f; p.Dy = 0.9f; return true; }
-            }
-            if (Z.Estilo == "denso") {
-                // terrazas y papeleras en el casco viejo
-                if (h % 17 == 0) { p.Clave = "terraza";  p.Dx = 0.5f; p.Dy = 0.9f; return true; }
-                if (h % 19 == 0) { p.Clave = "papelera"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
-            }
-            if (juntoCalle && h % 31 == 0) { p.Clave = h % 2 == 0 ? "contenedor" : "contenedor2"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
-            if (h % 41 == 0) { p.Clave = "papelera"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
-            if (h % 97 == 0) { p.Clave = "cabina";   p.Dx = 0.5f; p.Dy = 0.9f; return true; }
-            if (Z.Estilo == "senorial" && h % 13 == 0) { p.Clave = "arbolPodado"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
+            int l = (cE || cO) ? y : x;          // el paso, a lo largo de la calle
+            if (l % 4 == 0) { p.Clave = "farola"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
+            if ((Z.Estilo == "senorial" || Z.Estilo == "abierto") && l % 4 == 2) {
+                p.Clave = "arbolPodado"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
+            if (Z.Estilo == "denso" && l % 3 == 1) { p.Clave = "bolardo"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            // Los contenedores van en batería, que es como están en la calle.
+            if (l % 37 < 3) { p.Clave = h % 2 == 0 ? "contenedor" : "contenedor2"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            if (l % 9 == 4) { p.Clave = "papelera"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            if ((Z.Estilo == "senorial" || Z.Estilo == "abierto") && l % 13 == 6) {
+                p.Clave = "banco"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            if (l % 97 == 0) { p.Clave = "cabina"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
             return false;
         }
 

@@ -3862,6 +3862,98 @@ function colocarPOIs(){
 }
 const poi=id=>POI.find(p=>p.id===id);
 
+/*═══════════════ LA CALLE: BORDILLO, PASOS Y MOBILIARIO ═══════════════*/
+/* El mobiliario iba sembrado por hash sobre cualquier acera: una farola cada 29 casillas
+   —150 m, y en Bilbao hay una cada 25— caída en mitad del ancho, un semáforo en medio de
+   una recta y ni un paso de cebra en toda la ciudad (los dos tiles estaban forjados y no
+   los usaba nadie). Una calle no es una acera con cosas repartidas: es un bordillo con
+   todo alineado encima, cruces donde se cruza y el barrio decidiendo qué hay.
+
+   Se calcula una vez al cargar la ciudad y se guarda un byte por casilla, como los
+   tejados: siete kilómetros de calle no se pueden resolver por fotograma. */
+const MOB=new Uint8Array(MW*MH);
+const M_FAROLA=1,M_CONT=2,M_CONT2=3,M_BANCO=4,M_PAPELERA=5,M_SEMAFORO=6,M_ARBOL=7,
+      M_TERRAZA=8,M_MARQUESINA=9,M_BOLARDO=10,M_CABINA=11,M_CEBRA_V=20,M_CEBRA_H=21;
+function colocarCalle(){
+ MOB.fill(0);
+ const pisable=(x,y)=>{const t=Tc(x,y);return t===ACERA||t===PLAZA;};
+ const rueda=(x,y)=>Tc(x,y)===ROAD;
+ /* 1 · Los pasos de cebra van en la bocacalle, y se encuentran solos: en mitad de una
+    calle la acera acompaña a los dos lados, y justo en el cruce se interrumpe. Ahí es
+    donde cruza la gente. Las bandas van paralelas al tráfico, que es como se pintan. */
+ let cruces=0;
+ for(let y=1;y<MH-1;y++)for(let x=1;x<MW-1;x++){
+  if(!rueda(x,y))continue;
+  const eo=pisable(x-1,y)&&pisable(x+1,y), ns=pisable(x,y-1)&&pisable(x,y+1);
+  if(eo&&!ns){
+   if(!pisable(x-1,y-1)||!pisable(x+1,y-1)||!pisable(x-1,y+1)||!pisable(x+1,y+1)){
+    MOB[y*MW+x]=M_CEBRA_V;cruces++;}}
+  else if(ns&&!eo){
+   if(!pisable(x-1,y-1)||!pisable(x-1,y+1)||!pisable(x+1,y-1)||!pisable(x+1,y+1)){
+    MOB[y*MW+x]=M_CEBRA_H;cruces++;}}}
+ /* 2 · Todo lo demás va en la fila del bordillo —la acera que toca calzada— y a paso
+    fijo a lo largo de la calle, no al azar: una farola cada cinco casillas son 26 m, y
+    un árbol de alineación cada cuatro son 21. Lo que hay lo decide el barrio: el Casco
+    no tiene arbolado y sí bolardos; el Ensanche, lo contrario. */
+ for(let y=1;y<MH-1;y++)for(let x=1;x<MW-1;x++){
+  const i=y*MW+x;
+  if(map[i]!==ACERA)continue;
+  const cN=rueda(x,y-1),cS=rueda(x,y+1),cE=rueda(x+1,y),cO=rueda(x-1,y);
+  if(!(cN||cS||cE||cO))continue;
+  /* El semáforo va en la esquina —acera que da a la calzada por dos lados— y solo si
+     tiene un paso al lado. Puesto en cada acera que toca un cruce salían veinticuatro mil,
+     uno cada cinco metros; y aun así no todos los cruces de Bilbao están semaforizados. */
+  const esquina=(cN||cS)&&(cE||cO);
+  if(esquina&&(MOB[(y-1)*MW+x]>=20||MOB[(y+1)*MW+x]>=20||MOB[y*MW+x+1]>=20||MOB[y*MW+x-1]>=20)
+     &&hash(x,y)%3===0){MOB[i]=M_SEMAFORO;continue;}
+  const est=distDe(x,y).estilo;
+  const l=(cE||cO)?y:x;                  /* el paso, a lo largo de la calle */
+  const h=hash(x,y);
+  if(l%4===0)MOB[i]=M_FAROLA;
+  else if((est==='senorial'||est==='abierto')&&l%4===2)MOB[i]=M_ARBOL;
+  else if(est==='denso'&&l%3===1)MOB[i]=M_BOLARDO;
+  else if(l%37<3)MOB[i]=(h%2?M_CONT:M_CONT2);   /* los contenedores van en batería */
+  else if(l%9===4)MOB[i]=M_PAPELERA;
+  else if((est==='senorial'||est==='abierto')&&l%13===6)MOB[i]=M_BANCO;
+  else if(l%97===0)MOB[i]=M_CABINA;}
+ /* 3 · La marquesina va donde para el bus, y la terraza delante de donde se bebe. */
+ const bordillo=(x,y)=>map[y*MW+x]===ACERA&&
+  (rueda(x+1,y)||rueda(x-1,y)||rueda(x,y+1)||rueda(x,y-1));
+ for(const q of PARADAS){const x=q.p.x|0,y=q.p.y|0;
+  if(bordillo(x,y))MOB[y*MW+x]=M_MARQUESINA;}
+ for(const p of POI){
+  if(p.int!=='bar'&&p.int!=='tasca'&&p.int!=='resto')continue;
+  let puestas=0;
+  for(let d=-2;d<=2&&puestas<3;d++)for(const[dx,dy]of[[d,1],[d,-1],[1,d],[-1,d]]){
+   const x=(p.p.x|0)+dx,y=(p.p.y|0)+dy,i=y*MW+x;
+   if(x<1||y<1||x>=MW-1||y>=MH-1)continue;
+   if(bordillo(x,y)&&MOB[i]!==M_SEMAFORO&&MOB[i]<20&&MOB[i]!==M_TERRAZA){
+    MOB[i]=M_TERRAZA;puestas++;break;}}}
+ return cruces;}
+/* El sprite se arrima al bordillo: una farola en el centro de la acera es una farola en
+   mitad del paso. El lado lo dice la calzada que tiene al lado. */
+function dibMobiliario(mb,x,y){
+ const pE=Tc(x+1,y)===ROAD,pO=Tc(x-1,y)===ROAD,pS=Tc(x,y+1)===ROAD;
+ /* Sobre 32 de casilla: pegado al canto que da a la calzada, y centrado en el otro eje. */
+ const bx=pE?22:pO?4:13, by=pS?18:(Tc(x,y-1)===ROAD?4:12);
+ const D=(spr,dx,dy)=>ctx.drawImage(spr,x*TS+(bx+dx)*ESC,y*TS+(by+dy)*ESC);
+ switch(mb){
+  case M_FAROLA:    D(PROP.farola,-3,-14);break;
+  case M_SEMAFORO:  D(PROP.semaforo,-2,-16);break;
+  case M_ARBOL:     D(PROP.arbolPodado,-8,-10);break;
+  /* Los bolardos van en fila, que es como se ponen: uno cada casilla serían cinco
+     metros de separación y no cierran el paso a nada. */
+  case M_BOLARDO:   for(let k=-1;k<2;k++){
+    if(pE||pO)D(PROP.bolardo,-2,-6+k*10);else D(PROP.bolardo,-2+k*10,-6);}break;
+  case M_CONT:      D(PROP.contenedor,-9,-6);break;
+  case M_CONT2:     D(PROP.contenedor2,-9,-6);break;
+  case M_PAPELERA:  D(PROP.papelera,-4,-6);break;
+  case M_BANCO:     D(PROP.banco,-10,-4);break;
+  case M_CABINA:    D(PROP.cabina,-6,-10);break;
+  case M_MARQUESINA:D(PROP.marquesina,-18,-8);break;
+  /* La terraza sale de la pared del bar hacia la calzada, no encima del bordillo. */
+  case M_TERRAZA:   ctx.drawImage(PROP.terraza,x*TS+6*ESC,y*TS+7*ESC);break;}}
+
 /*═══════════════ ESTADO ═══════════════*/
 const S={
  dinero:60,hp:100,energia:1,hambre:1,estrellas:0,min:8*60,dia:1,
@@ -6720,6 +6812,9 @@ function tileDe(x,y,fa){
  if(t===EDIF)return TILE.tejados[roof[y*MW+x]]||TILE.tejados[0];
  if(t===AGUA)return TILE.agua[fa];
  if(t===ROAD){
+  const mb=MOB[y*MW+x];
+  if(mb===M_CEBRA_V)return TILE.cebraV;
+  if(mb===M_CEBRA_H)return TILE.cebraH;
   const h=hash(x,y);
   if(h%37===0)return TILE.alcantarilla;
   if(h%19===0)return TILE.roadGrieta;
@@ -6767,16 +6862,22 @@ function dibCiudad(){
  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
   ctx.drawImage(tileDe(x,y,fa),x*TS,y*TS);
   const t=map[y*MW+x],h=hash(x,y);
+  if(t===ROAD){
+   ctx.fillStyle='rgba(7,9,12,.34)';
+   if(Tc(x+1,y)===ACERA)ctx.fillRect(x*TS+TS-3*ESC,y*TS,3*ESC,TS);
+   if(Tc(x-1,y)===ACERA)ctx.fillRect(x*TS,y*TS,3*ESC,TS);
+   if(Tc(x,y+1)===ACERA)ctx.fillRect(x*TS,y*TS+TS-3*ESC,TS,3*ESC);
+   if(Tc(x,y-1)===ACERA)ctx.fillRect(x*TS,y*TS,TS,3*ESC);}
   if(t===ACERA){
-   if(h%29===0)ctx.drawImage(PROP.farola,x*TS+10*ESC,y*TS+2*ESC);
-   else if(h%43===0)ctx.drawImage(PROP.contenedor,x*TS+5*ESC,y*TS+8*ESC);
-   else if(h%47===0)ctx.drawImage(PROP.contenedor2,x*TS+5*ESC,y*TS+8*ESC);
-   else if(h%53===0)ctx.drawImage(PROP.banco,x*TS+4*ESC,y*TS+10*ESC);
-   else if(h%59===0)ctx.drawImage(PROP.papelera,x*TS+10*ESC,y*TS+8*ESC);
-   else if(h%61===0)ctx.drawImage(PROP.cabina,x*TS+8*ESC,y*TS+4*ESC);
-   else if(h%67===0)ctx.drawImage(PROP.semaforo,x*TS+11*ESC,y*TS+1*ESC);
-   else if(h%71===0)ctx.drawImage(PROP.arbolPodado,x*TS+6*ESC,y*TS+3*ESC);
-   else if(h%73===0)ctx.drawImage(PROP.terraza,x*TS+6*ESC,y*TS+7*ESC);}
+   /* El bordillo. Desde arriba, una acera y una calzada solo se distinguen por el color;
+      con el canto claro y la sombra que cae sobre el asfalto, se ve el escalón. */
+   ctx.fillStyle='rgba(232,228,220,.30)';
+   if(rodable(x+1,y))ctx.fillRect(x*TS+TS-2*ESC,y*TS,2*ESC,TS);
+   if(rodable(x-1,y))ctx.fillRect(x*TS,y*TS,2*ESC,TS);
+   if(rodable(x,y+1))ctx.fillRect(x*TS,y*TS+TS-2*ESC,TS,2*ESC);
+   if(rodable(x,y-1))ctx.fillRect(x*TS,y*TS,TS,2*ESC);
+   const mb=MOB[y*MW+x];
+   if(mb)dibMobiliario(mb,x,y);}
   else if(t===PARQUE){if(h%4===0)ctx.drawImage(PROP.arbol,x*TS+2*ESC,y*TS+1*ESC);}
   else if(t===PLAZA){if(h%23===0)ctx.drawImage(PROP.arbolPodado,x*TS+6*ESC,y*TS+3*ESC);
    else if(h%31===0)ctx.drawImage(PROP.banco,x*TS+4*ESC,y*TS+10*ESC);}
@@ -7310,7 +7411,7 @@ async function arrancar(){
   ['vehículos',()=>generarVeh()],
   ['props',()=>generarProps()],
   ['iconos',()=>{generarIconos();forjarMando();ajustarMando();}],
-  ['la ciudad',async()=>{await cargarCiudad();colocarPOIs();colocarSingulares();colocarParadas();nombrarCalles();}],
+  ['la ciudad',async()=>{await cargarCiudad();colocarPOIs();colocarSingulares();colocarParadas();nombrarCalles();colocarCalle();}],
   ['el barrio',()=>{player.x=poi('piso').p.x;player.y=poi('piso').p.y;poblar();}],
   ['a la gente',async()=>{await cargarSprites();['protagonista','ertzaina','maton','maton2'].forEach(hoja);}],
  ];
