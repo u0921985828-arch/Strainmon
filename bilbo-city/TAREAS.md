@@ -58,10 +58,13 @@ La casilla pasó de 32 a 64 px para que la escala fuese realista (ver *El arte* 
 dibujo se sigue forjando a 32 y se sube con `x2()`: un píxel de arte por cada cuatro de
 pantalla. Funciona y las proporciones ya son las buenas, pero el detalle todavía no está.
 
-- [ ] Repintar los **61 tiles de suelo** a 64×64 de verdad, con el grano que ahora no cabe:
-      junta de adoquín, bordillo con canto, marca vial con desgaste.
-- [ ] Lo mismo con los props y el mobiliario urbano.
-- [ ] Quitar `x2()` cuando no quede nadie que lo use.
+- [x] El suelo, los props y las fachadas se forjan ya a 64: la geometría se sigue
+      escribiendo en espacio de 32 y sale al doble recalculando cada rectángulo por sus
+      cantos, y **el grano va a 1 px** (`ruido` pinta con la escala apagada). Con eso se
+      acabaron los dos tamaños de píxel en la misma pantalla. `x2()` fuera.
+- [ ] Aprovechar la resolución en la **geometría**, que sigue siendo la de 32 al doble:
+      junta de adoquín de 1 px, bordillo con canto, marca vial con desgaste, teja por
+      pieza. Eso es dibujo nuevo, no escalado.
 - [ ] **Unity va todavía a 32.** `Mundo`/`Lienzo` y los tiles del puerto siguen en la
       medida vieja: mientras no se suban, las dos implementaciones no se ven igual.
 - [ ] Medir la memoria en un móvil de verdad. Doblar la casilla cuadruplica los píxeles del

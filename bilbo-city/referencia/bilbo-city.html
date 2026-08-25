@@ -2001,9 +2001,27 @@ const lerp=(a,b,t)=>a+(b-a)*t;
 function hash(a,b){let h=(a*73856093)^(b*19349663);h=(h^(h>>13))*1274126177;return Math.abs(h^(h>>16));}
 function lienzo(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;
  const g=c.getContext('2d');g.imageSmoothingEnabled=false;return c;}
-const P=(g,x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x|0,y|0,w|0,h|0);};
-function ruido(g,w,h,cols,d,ox=0,oy=0){for(let y=0;y<h;y++)for(let x=0;x<w;x++)
- if(((x*7+y*13+((x*3)^(y*5)))%100)<d)P(g,x+ox,y+oy,1,1,cols[(x*3+y*7)%cols.length]);}
+/* La escala a la que se forja lo que se dibuje ahora. El mundo se sigue escribiendo en
+   espacio de 32 —61 tiles, los props, las fachadas— y sale a 64 recalculando cada
+   rectangulo por sus dos cantos, no multiplicando el ancho: asi lo que iba pegado sigue
+   pegado. Lo que NO se escala es el grano: `ruido` pinta a 1 y por eso la textura del
+   asfalto y del ladrillo es fina de verdad, del tamano de pixel del personaje. Antes el
+   tile se forjaba a 32 y se subia con `x2()`, y se veian dos tamanos de pixel en la misma
+   pantalla: bloques de 2x2 en el suelo y pixeles sueltos en la gente. */
+let ESC_P=1;
+const P=(g,x,y,w,h,c)=>{
+ if(ESC_P===1){g.fillStyle=c;g.fillRect(x|0,y|0,w|0,h|0);return;}
+ const s=ESC_P,X=Math.floor(x*s),Y=Math.floor(y*s);
+ g.fillStyle=c;g.fillRect(X,Y,Math.floor((x+w)*s)-X,Math.floor((y+h)*s)-Y);};
+/* El grano va a resolucion de pantalla, no a la de la geometria: se recorre el area ya
+   escalada y se pinta de uno en uno con la escala apagada. Es lo unico que distingue una
+   textura de un damero de bloques cuando el tile sale al doble. */
+function ruido(g,w,h,cols,d,ox=0,oy=0){
+ const s=ESC_P,W=Math.round(w*s),H=Math.round(h*s),OX=Math.round(ox*s),OY=Math.round(oy*s);
+ ESC_P=1;
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++)
+  if(((x*7+y*13+((x*3)^(y*5)))%100)<d)P(g,x+OX,y+OY,1,1,cols[(x*3+y*7)%cols.length]);
+ ESC_P=s;}
 
 /*═══════════════ PALETA BLOQUEADA ═══════════════*/
 /* La paleta de CONTEXT.md §18.6: seis familias de ocho tonos, de oscuro a claro, más
@@ -2712,14 +2730,8 @@ const TILE={};
    dentro del índice plano y cuántas variantes tiene. */
 const TEJADOS={},TEJADO_DE={};
 const PARCHE=6;      /* casillas de lado del parche de tejado */
-/* De momento el suelo se sigue forjando a 32 y se sube a 64 sin interpolar: la geometría
-   queda donde toca y el dibujo es el de siempre, un píxel por cada cuatro. Es el paso que
-   permite ver las proporciones sin repintar 61 tiles; el detalle de verdad llega después,
-   redibujando cada tile a 64. */
-function x2(c){if(ESC===1)return c;
- const d=lienzo(c.width*ESC,c.height*ESC),g=d.getContext('2d');
- g.imageSmoothingEnabled=false;g.drawImage(c,0,0,c.width*ESC,c.height*ESC);return d;}
-function T32(fn){const c=lienzo(32,32),g=c.getContext('2d');fn(g);return x2(cuantizar(c));}
+function T32(fn){const c=lienzo(32*ESC,32*ESC),g=c.getContext('2d');
+ ESC_P=ESC;fn(g);ESC_P=1;return cuantizar(c);}
 const rell=(g,col)=>P(g,0,0,32,32,col);
 function generarTiles(){
  TILE[ROAD]=T32(g=>{rell(g,C.asfalto);ruido(g,32,32,[C.asfaltoO,C.asfaltoL],22);});
@@ -2972,7 +2984,8 @@ function generarVeh(){
 
 /*═══════════════ PROPS ═══════════════*/
 const PROP={};
-function S_(w,h,fn){const c=lienzo(w,h),g=c.getContext('2d');fn(g);return x2(cuantizar(c));}
+function S_(w,h,fn){const c=lienzo(w*ESC,h*ESC),g=c.getContext('2d');
+ ESC_P=ESC;fn(g);ESC_P=1;return cuantizar(c);}
 /* Qué se puede abrir en cada tipo de barrio. Se repite alguno a propósito: si todos los
    locales fueran distintos, una calle parecería una feria. */
 /* El frente visible de un edificio, en espacio de forja (se sube a pantalla con ESC).
@@ -3028,7 +3041,8 @@ function generarProps(){
       entero (32 px = 5,16 m) escaparate, tasca, persiana, portón y pared ciega.
     Nada dibujado a mano: cada dibujo se pinta contra su propio ancho `w`. */
  PROP.fachadas={};
- const local=(w,fn)=>{const c=lienzo(w,FACH_H),g=c.getContext('2d');fn(g,w);return x2(cuantizar(c));};
+ const local=(w,fn)=>{const c=lienzo(w*ESC,FACH_H*ESC),g=c.getContext('2d');
+  ESC_P=ESC;fn(g,w);ESC_P=1;return cuantizar(c);};
  const marco=(g,w,col)=>{P(g,0,0,w,FACH_H,C.negro);P(g,1,1,w-2,FACH_H-1,col);};
  PROP.fachadas.portal=local(16,(g,w)=>{marco(g,w,C.maderaO);
   P(g,4,3,w-8,FACH_H-3,C.madera);P(g,4,3,w-8,1,C.maderaL);P(g,w-6,8,2,2,C.mostazaO);
@@ -3059,9 +3073,10 @@ function generarProps(){
  /* Las plantas: muro con su luz arriba a la izquierda y su sombra abajo y a la derecha,
     como todo, y dos filas de ventanas. La ventana no es un agujero negro: lleva dintel
     claro y el vidrio azulado, que es lo que la distingue de un hueco. */
- const pisos=(h,muro,muroL,muroO,fn)=>{const c=lienzo(32,h),g=c.getContext('2d');
+ const pisos=(h,muro,muroL,muroO,fn)=>{const c=lienzo(32*ESC,h*ESC),g=c.getContext('2d');
+  ESC_P=ESC;
   P(g,0,0,32,h,muro);P(g,0,0,32,1,muroL);P(g,31,0,1,h,muroO);P(g,0,h-1,32,1,muroO);
-  fn(g,h);return x2(cuantizar(c));};
+  fn(g,h);ESC_P=1;return cuantizar(c);};
  const ventanas=(hueco,dintel)=>(g,h)=>{
   for(let fy=2;fy<h-4;fy+=6)for(let x=3;x<29;x+=7){
    P(g,x,fy,5,4,hueco);P(g,x,fy,5,1,dintel);P(g,x+1,fy+1,3,2,'#3f5566');}};
