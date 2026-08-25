@@ -639,6 +639,13 @@ píxel al que le recortaron el contorno. Por eso el puñetazo, el fogonazo y el 
 compra van recogidos: los de antes contaban con siete píxeles de margen lateral y ahora
 hay dos.
 
+**Las cinco leyes del sprite están en `ESTILO.md`** y se comprueban solas: medida en metros
+a la densidad de su familia, cuerpo común con la ropa en capas, ancla por la base, huella y
+estorbo, y **orden de capas** — suelo, bloques, objetos, vuelo, HUD. La de capas se verifica
+grabando un fotograma de verdad y mirando que el orden nunca retroceda; así se cazó que el
+mobiliario iba mezclado con el suelo (un árbol de dos casillas perdía la mitad derecha) y que
+las chinchetas se pintaban antes que la gente.
+
 **Todo el juego sigue una sola guía de estilo: [`referencia/ESTILO.md`](referencia/ESTILO.md).**
 Proporciones, vista, dirección de la luz, uso del color, contorno, tipografía, rejilla de
 la interfaz y animación. Léela antes de dibujar nada.

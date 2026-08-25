@@ -316,6 +316,55 @@ listo().then(() => {
         + A.MOB_CONTORNO.length + ' con canto negro');
   }
 
+  // ── R9 · todos salen del mismo cuerpo ───────────────────────────────────────────
+  /* Una figura no se dibuja entera por arquetipo: hay un cuerpo con su anatomía —dónde
+     cae la cabeza, el hombro, la cintura y el pie— y la ropa va en capas encima. Es lo que
+     permite que cualquiera lleve cualquier prenda y que treinta y ocho vecinos salgan de
+     siete siluetas. Si un arquetipo se dibuja por su cuenta, la ropa comprada le queda a
+     otra altura y no se ve hasta ponérsela. Aquí se mide sobre el fotograma quieto de
+     frente: la coronilla y la planta del pie tienen que caer en la misma fila para todos,
+     y el hombro solo puede cambiar lo que cambia la complexión. */
+  {
+    const [CW, CH] = A.SPR.cel;
+    const fila = A.ORDEN_POSES.indexOf('quieto');
+    const perfil = k => {
+      const hoja = A.HOJAS[k] || A.hoja(k);
+      const d = hoja.getContext('2d').getImageData(0, fila * CH, CW, CH).data;
+      const filas = [];
+      for (let y = 0; y < CH; y++) {
+        let a = -1, b = -1;
+        for (let x = 0; x < CW; x++) if (d[(y*CW + x)*4 + 3] > 0) { if (a < 0) a = x; b = x; }
+        filas.push(a < 0 ? null : [a, b]);
+      }
+      const arriba = filas.findIndex(f => f), abajo = filas.length - 1 - [...filas].reverse().findIndex(f => f);
+      // El hombro se mide contando desde los pies, no desde la coronilla: un casco de obra
+      // sube la coronilla tres píxeles y la ventana se iba al pecho, así que la misma figura
+      // con y sin gorro salía con dos hombros distintos.
+      let hombro = 0;
+      for (let y = abajo - 26; y <= abajo - 21; y++)
+        if (y >= 0 && filas[y]) hombro = Math.max(hombro, filas[y][1] - filas[y][0] + 1);
+      return { arriba, abajo, hombro };
+    };
+    const arqs = Object.keys(A.ARQ), P = {};
+    for (const k of arqs) P[k] = perfil(k);
+    const cor = arqs.map(k => P[k].arriba), pie = arqs.map(k => P[k].abajo);
+    const dCor = Math.max(...cor) - Math.min(...cor), dPie = Math.max(...pie) - Math.min(...pie);
+    // La planta del pie es la que no se mueve: es el pivote con el que la figura se apoya
+    // en el suelo. La coronilla sí sube, pero solo lo que suba el gorro — un casco de obra
+    // o una capucha son cuatro o cinco píxeles.
+    if (dCor > 6) fallos.push('la coronilla baila ' + dCor + ' px entre arquetipos: eso ya no es el gorro');
+    if (dPie > 0) fallos.push('la planta del pie baila ' + dPie + ' px: la figura no se apoya igual');
+    const hombros = arqs.map(k => P[k].hombro);
+    const dH = Math.max(...hombros) - Math.min(...hombros);
+    // Tres complexiones, tres anchos. Más que eso ya no es complexión, es otro cuerpo.
+    if (Math.min(...hombros) < 14 || Math.max(...hombros) > 24 || dH > 8)
+      fallos.push('el hombro va de ' + Math.min(...hombros) + ' a ' + Math.max(...hombros)
+        + ' px: eso ya no es complexión, es otro cuerpo');
+    else if (dCor <= 6 && dPie === 0)
+      bien.push(arqs.length + ' arquetipos sobre el mismo cuerpo: pie clavado, coronilla ±'
+        + dCor + ' px por el gorro, y hombro de ' + Math.min(...hombros) + ' a ' + Math.max(...hombros) + ' px');
+  }
+
   bien.forEach(b => console.log('  ok    ' + b));
   if (fallos.length) {
     console.log('');

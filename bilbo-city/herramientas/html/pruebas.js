@@ -311,6 +311,40 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
         + lt.toFixed(1) + ' a las 14, y tinte de amanecer, día, ocaso y noche');
     }
 
+    // ── 1 quinquies · la ley de las capas ──────────────────────────────
+    /* Lo que se pinta después tapa, así que el orden no es una costumbre: es una ley. El
+       suelo entero primero, los bloques después, lo que sobresale encima y los rótulos al
+       final. Iba mezclado casilla a casilla y por eso un árbol de dos casillas de ancho
+       perdía la mitad derecha —la casilla siguiente le echaba el suelo por encima— y las
+       chinchetas se pintaban antes que la gente, así que el jugador tapaba la del sitio al
+       que iba. Se comprueba grabando un fotograma de verdad. */
+    {
+      const g = A.real.getContext('2d');
+      const rec = [];
+      const espia = ['drawImage', 'fillRect', 'fill'];
+      const antes = {};
+      for (const m of espia) {
+        antes[m] = g[m];
+        g[m] = function (...args) { rec.push(A.capaAct()); return antes[m].apply(this, args); };
+      }
+      S.escena = 'ciudad'; A.cerrarDlg();
+      paso(1);                      // un fotograma: entre dos, la capa vuelve al suelo
+      for (const m of espia) g[m] = antes[m];
+      let saltos = 0, peor = '';
+      for (let i = 1; i < rec.length; i++)
+        if (rec[i] < rec[i-1]) {
+          saltos++;
+          if (!peor) peor = 'de ' + rec[i-1] + ' a ' + rec[i] + ' en el dibujo ' + i;
+        }
+      ok(rec.length > 500, 'el fotograma grabado solo tiene ' + rec.length + ' dibujos');
+      ok(!saltos, saltos + ' dibujos rompen el orden de capas (' + peor + ')');
+      const capas = new Set(rec);
+      ok(capas.has(A.CAPA.SUELO) && capas.has(A.CAPA.EDIFICIO) && capas.has(A.CAPA.OBJETO)
+         && capas.has(A.CAPA.HUD), 'hay capas que no se pintan: ' + [...capas].join(','));
+      bien.push(rec.length + ' dibujos en un fotograma, todos en orden de capa: '
+        + 'suelo → bloques → objetos → vuelo → HUD');
+    }
+
     // ── 2 bis · se duerme y te curan ───────────────────────────────────
     // dormir() y curar() miran la casilla que hay delante. Si un plano nuevo pone la cama
     // pegada a la pared de abajo, la cama existe y no se puede usar.

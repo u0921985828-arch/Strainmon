@@ -6880,6 +6880,12 @@ function comprobarObjetivos(dt){
     if((j.id==='taxi'||j.id==='mudanza'||j.id==='fuga')&&!player.enCoche)aviso('Llega en coche');
     else{cobrar(j);if(j.id==='recado'&&azar()<.4){estrellas(1);aviso('TE HAN FICHADO');}}}}}}
 /*═══════════════ RENDER DEL MUNDO ═══════════════*/
+/* Las capas, de abajo arriba, y el orden en que se pinta. Es una ley, no una costumbre:
+   nada de una capa puede pintarse antes que algo de una capa de más abajo, porque lo que
+   va después tapa. El verificador la comprueba grabando un fotograma de verdad. */
+const CAPA={SUELO:0,EDIFICIO:1,OBJETO:2,VUELO:3,HUD:4};
+let capa=CAPA.SUELO;
+const capaAct=()=>capa;
 const cam={x:0,y:0,z:1,tinte:[0,0,0]};
 /*── El sol ──────────────────────────────────────────────────────────────────
   Bilbao está a 43° N: el sol sale por el este, cruza por el sur y se pone por el oeste,
@@ -6987,7 +6993,7 @@ function dib(){
   else n*=.35;}
  if(n>0){ctx.fillStyle='rgba('+L[0]+','+L[1]+','+L[2]+','+n.toFixed(3)+')';ctx.fillRect(0,0,W,H);}
  if(S.muerto>0){ctx.fillStyle='rgba(120,10,10,'+clamp((2.2-S.muerto)/1.4,0,.75)+')';ctx.fillRect(0,0,W,H);}
- dibHUD();}
+ capa=CAPA.HUD;dibHUD();capa=CAPA.SUELO;}
 function dibCiudad(){
  const vel=player.enCoche?Math.hypot(player.enCoche.vx,player.enCoche.vy):0;
  const zObj=player.enCoche?(H/TS)/(19+vel*.5):(H/TS)/13.5;
@@ -7039,35 +7045,8 @@ function dibCiudad(){
    if(rodable(x-1,y))ctx.fillRect(x*TS,y*TS,2*ESC,TS);
    if(rodable(x,y+1))ctx.fillRect(x*TS,y*TS+TS-2*ESC,TS,2*ESC);
    if(rodable(x,y-1))ctx.fillRect(x*TS,y*TS,TS,2*ESC);
-   const mb=MOB[y*MW+x];
-   if(mb)dibMobiliario(mb,x,y);
-   /* De noche las farolas están para algo. El halo va en escalones, no en degradado:
-      un degradado suave al lado de un pixel art canta más que la falta de luz. */
-   if(mb===M_FAROLA&&!SOL.elev)halo(x*TS+TS/2,y*TS+TS/2+6*ESC);}
-  else if(t===PARQUE){if(h%4===0)ctx.drawImage(PROP.arbol,x*TS+2*ESC,y*TS+1*ESC);}
-  else if(t===PLAZA){if(h%23===0)ctx.drawImage(PROP.arbolPodado,x*TS+6*ESC,y*TS+3*ESC);
-   else if(h%31===0)ctx.drawImage(PROP.banco,x*TS+4*ESC,y*TS+10*ESC);}
-  else if(t===MUELLE){if(h%29===0)ctx.drawImage(PROP.grua,x*TS-8*ESC,y*TS-16*ESC);
-   else if(h%17===0)ctx.drawImage(PROP.contMaritimo,x*TS-4*ESC,y*TS+6*ESC);
-   else if(h%13===0)ctx.drawImage(PROP.pales,x*TS+5*ESC,y*TS+8*ESC);
-   else if(h%11===0)ctx.drawImage(PROP.bidon,x*TS+10*ESC,y*TS+9*ESC);}
-  else if(t===PATIO){if(h%7===0)ctx.drawImage(PROP.arbolPodado,x*TS+6*ESC,y*TS+3*ESC);
-   else if(h%9===0)ctx.drawImage(PROP.pales,x*TS+5*ESC,y*TS+8*ESC);}
-  else if(t===EDIF){
-   /* Cada familia de tejado lleva lo suyo: en la teja, chimeneas; en la azotea, depósitos
-      y tendederos; en la nave, lucernarios. Con eso, un bloque de Santutxu y una nave de
-      Zorrotzaurre dejan de ser dos rectángulos grises. */
-   const fam=famDe(roof[y*MW+x]);
-   if(fam==='teja'||fam==='pizarra'){
-    if(h%23===0)ctx.drawImage(PROP.chimenea,x*TS+10*ESC,y*TS+4*ESC);
-    else if(h%71===0)ctx.drawImage(PROP.antenaTv,x*TS+9*ESC,y*TS+2*ESC);}
-   else if(fam==='azotea'){
-    if(h%37===0)ctx.drawImage(PROP.deposito,x*TS+7*ESC,y*TS+5*ESC);
-    else if(h%41===0)ctx.drawImage(PROP.tendedero,x*TS+2*ESC,y*TS+9*ESC);
-    else if(h%43===0)ctx.drawImage(PROP.climatizador,x*TS+7*ESC,y*TS+8*ESC);
-    else if(h%47===0)ctx.drawImage(PROP.caseta,x*TS+5*ESC,y*TS+6*ESC);
-    else if(h%53===0)ctx.drawImage(PROP.antenaTv,x*TS+9*ESC,y*TS+2*ESC);}
-   else if(h%29===0)ctx.drawImage(PROP.lucernario,x*TS+4*ESC,y*TS+8*ESC);}}
+  }}
+ capa=CAPA.EDIFICIO;
  /* segunda pasada: los edificios se leen como bloques, no como casillas sueltas */
  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
   if(map[y*MW+x]!==EDIF)continue;
@@ -7158,21 +7137,50 @@ function dibCiudad(){
   ctx.fillStyle='rgba(0,0,0,.4)';
   if(abajo)ctx.fillRect(x*TS,y*TS+TS-2,TS,2);
   if(der)ctx.fillRect(x*TS+TS-2,y*TS,2,TS);}
+ capa=CAPA.EDIFICIO;
  sombraSingulares(x0,y0,x1,y1);
  dibSingulares(x0,y0,x1,y1);
- /* Cincuenta y seis chinchetas por fotograma son cincuenta y seis dibujos, y casi todas
-    caen fuera de la pantalla: el mapa mide siete kilómetros. */
- for(const p of POI){
-  if(p.p.x<x0-3||p.p.x>x1+3||p.p.y<y0-3||p.p.y>y1+3)continue;
-  const sx=p.p.x*TS,sy=p.p.y*TS;
-  ctx.drawImage(MARCA[p.id]||(MARCA[p.id]=marcaAbajo(p.c)),sx-7,sy-30);
-  if(p.int&&!S.mision){const m=MISIONES[S.misionIdx];
-   if(m&&((m.giver==='Txema'&&p.id==='bar')||(m.giver==='Iker'&&p.id==='taller'))){
-    ctx.fillStyle=C.mostaza;ctx.fillRect(sx-2,sy-46-Math.abs(Math.sin(performance.now()/300))*4,4,10);
-    ctx.fillRect(sx-2,sy-33-Math.abs(Math.sin(performance.now()/300))*4,4,3);}}}
- const o=objetivo();
- if(o){const pu=Math.abs(Math.sin(performance.now()/300));
-  ctx.drawImage(MARCA.obj||(MARCA.obj=marcaAbajo(C.mostaza)),o.x*TS-7,o.y*TS-32-pu*5);}
+ /* Tercera pasada: lo que sobresale del suelo. Iba mezclado con el suelo, casilla a
+    casilla, y por eso un árbol de cinco metros —dos casillas de ancho— perdía la mitad
+    derecha: la casilla de al lado se pintaba después y le echaba el suelo por encima. Y lo
+    que cae sobre un edificio se lo comía el relieve del tejado, que va en la pasada de los
+    bloques. La ley es esa y está en CAPA: el suelo entero primero, los bloques después y lo
+    que sobresale al final. */
+ capa=CAPA.OBJETO;
+ for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+  const t=map[y*MW+x],h=hash(x,y);
+  if(t===ACERA){
+   const mb=MOB[y*MW+x];
+   if(mb)dibMobiliario(mb,x,y);
+   /* De noche las farolas están para algo. El halo va en escalones, no en degradado:
+      un degradado suave al lado de un pixel art canta más que la falta de luz. */
+   if(mb===M_FAROLA&&!SOL.elev)halo(x*TS+TS/2,y*TS+TS/2+6*ESC);}
+  else if(t===PARQUE){if(h%4===0)ctx.drawImage(PROP.arbol,x*TS+2*ESC,y*TS+1*ESC);}
+  else if(t===PLAZA){if(h%23===0)ctx.drawImage(PROP.arbolPodado,x*TS+6*ESC,y*TS+3*ESC);
+   else if(h%31===0)ctx.drawImage(PROP.banco,x*TS+4*ESC,y*TS+10*ESC);}
+  else if(t===MUELLE){if(h%29===0)ctx.drawImage(PROP.grua,x*TS-8*ESC,y*TS-16*ESC);
+   else if(h%17===0)ctx.drawImage(PROP.contMaritimo,x*TS-4*ESC,y*TS+6*ESC);
+   else if(h%13===0)ctx.drawImage(PROP.pales,x*TS+5*ESC,y*TS+8*ESC);
+   else if(h%11===0)ctx.drawImage(PROP.bidon,x*TS+10*ESC,y*TS+9*ESC);}
+  else if(t===PATIO){if(h%7===0)ctx.drawImage(PROP.arbolPodado,x*TS+6*ESC,y*TS+3*ESC);
+   else if(h%9===0)ctx.drawImage(PROP.pales,x*TS+5*ESC,y*TS+8*ESC);}
+  else if(t===EDIF){
+   /* Cada familia de tejado lleva lo suyo: en la teja, chimeneas; en la azotea, depósitos
+      y tendederos; en la nave, lucernarios. Con eso, un bloque de Santutxu y una nave de
+      Zorrotzaurre dejan de ser dos rectángulos grises. */
+   const fam=famDe(roof[y*MW+x]);
+   if(fam==='teja'||fam==='pizarra'){
+    if(h%23===0)ctx.drawImage(PROP.chimenea,x*TS+10*ESC,y*TS+4*ESC);
+    else if(h%71===0)ctx.drawImage(PROP.antenaTv,x*TS+9*ESC,y*TS+2*ESC);}
+   else if(fam==='azotea'){
+    if(h%37===0)ctx.drawImage(PROP.deposito,x*TS+7*ESC,y*TS+5*ESC);
+    else if(h%41===0)ctx.drawImage(PROP.tendedero,x*TS+2*ESC,y*TS+9*ESC);
+    else if(h%43===0)ctx.drawImage(PROP.climatizador,x*TS+7*ESC,y*TS+8*ESC);
+    else if(h%47===0)ctx.drawImage(PROP.caseta,x*TS+5*ESC,y*TS+6*ESC);
+    else if(h%53===0)ctx.drawImage(PROP.antenaTv,x*TS+9*ESC,y*TS+2*ESC);}
+   else if(h%29===0)ctx.drawImage(PROP.lucernario,x*TS+4*ESC,y*TS+8*ESC);}}
+ /* Lo que anda por el mundo, ordenado por los pies: quien está más abajo está más cerca
+    y tapa. */
  const L=[];
  for(const p of peatones)L.push([p.y,()=>pintaSombraChar(p)]);
  for(const e of enemigos)L.push([e.y,()=>{pintaSombraChar(e);
@@ -7188,7 +7196,26 @@ function dibCiudad(){
  for(const p of parts){const a=clamp(p.vida/.7,0,1);
   ctx.fillStyle=p.tipo==='sangre'?`rgba(149,31,24,${a})`:p.tipo==='chispa'?`rgba(232,197,71,${a})`:`rgba(109,120,131,${a*.5})`;
   ctx.beginPath();ctx.arc(p.x*TS,p.y*TS,p.r,0,6.283);ctx.fill();}
+ /* Las chinchetas van en vuelo: no son cosas del mundo sino rótulos sobre él, así que se
+    pintan las últimas. Iban antes que la gente, y un edificio alto o el propio jugador
+    tapaban la chincheta del sitio al que ibas.
+    Cincuenta y siete por fotograma son cincuenta y siete dibujos, y casi todas caen fuera
+    de pantalla: el mapa mide siete kilómetros. */
+ capa=CAPA.VUELO;
+ for(const p of POI){
+  if(p.p.x<x0-3||p.p.x>x1+3||p.p.y<y0-3||p.p.y>y1+3)continue;
+  const sx=p.p.x*TS,sy=p.p.y*TS;
+  ctx.drawImage(MARCA[p.id]||(MARCA[p.id]=marcaAbajo(p.c)),sx-7,sy-30);
+  if(p.int&&!S.mision){const m=MISIONES[S.misionIdx];
+   if(m&&((m.giver==='Txema'&&p.id==='bar')||(m.giver==='Iker'&&p.id==='taller'))){
+    ctx.fillStyle=C.mostaza;ctx.fillRect(sx-2,sy-46-Math.abs(Math.sin(performance.now()/300))*4,4,10);
+    ctx.fillRect(sx-2,sy-33-Math.abs(Math.sin(performance.now()/300))*4,4,3);}}}
+ const o=objetivo();
+ if(o){const pu=Math.abs(Math.sin(performance.now()/300));
+  ctx.drawImage(MARCA.obj||(MARCA.obj=marcaAbajo(C.mostaza)),o.x*TS-7,o.y*TS-32-pu*5);}
  ctx.restore();
+ /* El tinte de barrio y el de la hora son mantas sobre el mundo entero: van en vuelo, no
+    en el suelo, porque tapan todo lo pintado. Solo el HUD va por encima. */
  /* tinte de barrio: cada zona con su color, mezclado poco a poco */
  const D=distDe(clamp(player.x|0,0,MW-1),clamp(player.y|0,0,MH-1));
  const rgb=hexRGB(D.tinte);
@@ -7234,6 +7261,7 @@ function dibInterior(){
  ctx.save();ctx.translate(Math.round(W/2),Math.round(H/2));ctx.scale(z,z);
  ctx.translate(-Math.round(cx*TS_INT),-Math.round(cy*TS_INT));
  const su=SUELO_I[I.suelo]||SUELO_I.terrazo, pa=PARED_I[I.pared]||PARED_I.yeso;
+ capa=CAPA.SUELO;
  /* Todo lo que sobresale del suelo se ordena por su canto de abajo, muros incluidos: así
     quien está delante de una pared la tapa y quien está detrás queda tapado. */
  const L=[];
@@ -7273,7 +7301,9 @@ function dibInterior(){
   if(!S.mision&&m2&&m2.giver===n.n){ctx.fillStyle=C.mostaza;
    const b=Math.abs(Math.sin(performance.now()/300))*4;
    ctx.fillRect(n.x*TS_INT-2,n.y*TS_INT-63-b,4,10);ctx.fillRect(n.x*TS_INT-2,n.y*TS_INT-50-b,4,3);}}]));
+ capa=CAPA.OBJETO;
  L.sort((a,b)=>a[0]-b[0]).forEach(l=>l[1]());
+ capa=CAPA.SUELO;
  ctx.restore();}
 
 /*═══════════════ HUD ═══════════════*/

@@ -11,6 +11,53 @@ Bilbao a finales de los noventa, vista desde arriba y algo escorada, en pixel ar
 16 bits con pocos colores y mucha suciedad. Gris hormigón, óxido, verde de ladera y
 ámbar de farola. Nada brillante, nada redondeado, nada de degradados suaves.
 
+## Las leyes del sprite
+
+No son gustos: son cinco reglas que se comprueban solas y que, incumplidas, se ven en
+pantalla — un árbol partido por la mitad, una papelera de dos metros o una chincheta debajo
+del jugador.
+
+**1 · Medida.** Toda familia declara lo que mide **en metros**, y el dibujo tiene que salir
+a la densidad de su familia. Un sprite no se dibuja «como quede bien de tamaño».
+
+| Familia | Densidad | De dónde sale |
+|---|---|---|
+| Casilla del mundo, tejados, calzada | **12,4 px/m** | 64 px por 5,16 m |
+| Vehículos | **13,3 px/m** | tabla `CHASIS`, largo real × 2,1 de la casilla de 32 |
+| Gente | **20 px/m** | 34 px para 1,70 m |
+| Mobiliario urbano | **20 px/m** | `MOB_M`: se mira al lado de quien lo usa, no al lado de un coche |
+| Interiores | **20 px/m** | casilla de 0,80 m a 16 px |
+
+**2 · Cuerpo común.** Una figura no se dibuja entera por arquetipo: hay **un cuerpo** con su
+anatomía y la ropa va en capas encima. Por eso cualquiera puede llevar cualquier prenda y 38
+vecinos salen de 7 siluetas. La planta del pie cae en la misma fila para todos —es el pivote
+con el que la figura se apoya—, la coronilla solo sube lo que suba el gorro, y el hombro solo
+cambia lo que cambia la complexión: delgada, media, corpulenta.
+
+**3 · Ancla.** Todo se planta **por su base y centrado en su ancho**. Nada lleva su
+desplazamiento a mano: al cambiar de tamaño, los que lo llevaban se quedaban flotando.
+
+**4 · Huella y estorbo.** Lo que ocupa suelo lo dice su medida, y lo que estorba lo dice la
+lista: dentro de un sitio, todo lo que no sea `.dDY` frena; en la calle, el mobiliario no
+frena —una papelera no cierra una acera— pero **no puede plantarse donde no cabe**: nada de
+más de cuatro metros de alto en una acera (la grúa y el andamio son de muelle y de obra).
+
+**5 · Capas.** Lo que se pinta después tapa, así que el orden es ley, no costumbre:
+
+| | |
+|---|---|
+| `SUELO` | tiles, sombra del sol, bordillo, pasos de cebra |
+| `EDIFICIO` | relieve del tejado, fachadas, alero, singulares y su sombra |
+| `OBJETO` | mobiliario, gente, coches, balas — ordenados por su base, que quien está más abajo tapa |
+| `VUELO` | chinchetas, rótulos y las mantas de color (tinte de barrio y de la hora) |
+| `HUD` | el mando y los cuadros de la interfaz |
+
+Nada de una capa se pinta antes que algo de una capa de más abajo. El verificador **graba un
+fotograma de verdad** y falla si el orden se rompe: así se cazó que el mobiliario iba mezclado
+con el suelo —un árbol de dos casillas perdía la mitad derecha, porque la casilla de al lado
+se pintaba después y le echaba el suelo por encima— y que las chinchetas iban antes que la
+gente, de modo que el propio jugador tapaba la del sitio al que iba.
+
 ## Rejilla y proporciones
 
 | | Medida | Por qué |
