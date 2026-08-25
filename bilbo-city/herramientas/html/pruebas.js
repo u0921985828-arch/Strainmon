@@ -673,7 +673,12 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       }
       recorridos.sort((a, b) => a - b);
       const mediana = recorridos[8];
-      ok(mediana > 10, 'la mediana de conducción es de solo ' + mediana.toFixed(1) + ' casillas');
+      // El umbral sale de la física, no de lo que daba antes. Arrancando parado con
+      // 3,1 m/s² —los 0-100 en 9 s de un utilitario— en 2,5 s se recorren 9,7 m, o sea
+      // 1,9 casillas; con las maniobras y los semáforos de por medio, medio de eso es un
+      // suelo razonable. El 10 de antes venía de cuando el coche corría a 204 km/h y
+      // aceleraba a 7,5 g: cualquier valor realista lo habría dado por roto.
+      ok(mediana > 0.9, 'la mediana de conducción es de solo ' + mediana.toFixed(1) + ' casillas');
       bien.push('conducción en 2,5 s: mediana ' + mediana.toFixed(1) + ' casillas (peor '
         + recorridos[0].toFixed(1) + ', mejor ' + recorridos[15].toFixed(1) + ')');
     }

@@ -418,7 +418,12 @@ reloj.
 - **La postura la decide el propio joystick**, sin botón nuevo: por debajo de `AGACHA`
   (0,34) vas agachado, por encima de `CORRE` (0,82) corriendo. Se queda puesta al soltar,
   que si no, agacharse para mirar una esquina y levantarse solo al parar sería inservible.
-  Agachado se te ve **la mitad de lejos** y andas a 1,25 casillas/s en vez de a 4,8.
+  Agachado se te ve **la mitad de lejos** y andas a 1 m/s en vez de a 6.
+- **Las velocidades se escriben en metros por segundo**, no en casillas. Medidas contra
+  la escala del mapa, las de antes eran de otro juego: se andaba a 28,8 km/h, se corría
+  a 89,2 y un utilitario hacía 204 km/h acelerando a 7,5 g. En casillas por segundo eso
+  no se ve; en m/s no cuela. `MS` convierte, y `VMAX_VEH` da la punta de cada chasis en
+  km/h de verdad.
 - **Cono de 60° y línea de vista.** A menos de 2,2 casillas no hace falta cono: te tiene
   encima. Un coche se ve venir aunque vayas despacio; **de noche** (antes de las 7 y
   después de las 21) el alcance baja de 15 casillas a 9.

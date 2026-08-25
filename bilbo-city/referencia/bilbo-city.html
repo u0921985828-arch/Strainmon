@@ -3790,7 +3790,7 @@ function angCalle(x,y){
  if(h===v)return azar()<.5?0:Math.PI/2;
  return h>v?(azar()<.5?0:Math.PI):(azar()<.5?Math.PI/2:-Math.PI/2);}
 function nuevoCoche(x,y,tipo,lib,propio,vmax){
- return{x,y,ang:angCalle(x,y),vx:0,vy:0,tipo,lib,propio,vmax:vmax||11,dano:0,vivo:true};}
+ return{x,y,ang:angCalle(x,y),vx:0,vy:0,tipo,lib,propio,vmax:vmax||vmaxDe(tipo),dano:0,vivo:true};}
 const coches=[],trafico=[],policia=[],enemigos=[],balas=[],parts=[],peatones=[];
 let tuCoche=null;
 const TIPOS_CIVIL=['utilitario','berlina','ranchera','todoterreno','taxi','furgoCorta','moto','microbus'];
@@ -3949,6 +3949,28 @@ const teclas={};
 let aPuls=false,cPuls=false,cMant=false;
 const joy={id:null,dx:0,dy:0,mag:0};      /* andar y conducir */
 const mira={dx:0,dy:0};                   /* apuntado fino: solo con las flechas del teclado */
+/* Las velocidades, escritas en metros por segundo y pasadas a casillas con la escala del
+   mapa. Iban en casillas puestas a ojo y, medidas, salía esto:
+     andar     1,55 c/s =  28,8 km/h        correr  4,80 c/s = 89,2 km/h
+     agachado  1,25 c/s =  23,2 km/h        coche  11,00 c/s = 204 km/h
+     aceleración del coche  73,8 m/s² = 7,5 g
+   Un peatón que anda a 29 km/h y acelera un utilitario a siete veces la gravedad. Nada de
+   eso se nota mirando el número en casillas, y por eso estaba así: en metros por segundo
+   no cuela.
+   Ahora se escribe en m/s y se convierte, que es lo único que mantiene esto honesto. Los
+   valores son humanos pero del lado rápido —paso vivo y carrera de alguien que huye—,
+   porque el juego se cruza en coche y en metro, no andando. */
+const MS=1/5.16;                          /* m/s -> casillas/s */
+const V_ANDAR=1.7*MS, V_CORRER=6.0*MS, V_AGACHADO=1.0*MS, V_INTERIOR=1.4*MS;
+const V_PEATON=1.3*MS, V_HUIDA=4.5*MS, V_ENEMIGO=3.4*MS;
+/* El coche: punta por chasis y aceleración de verdad. 2,5 m/s² son los 0-100 en 11 s de
+   un utilitario; la furgoneta y el camión, menos. Frenar es 7 m/s², que es lo que da un
+   freno decente sobre asfalto seco. */
+const ACEL=3.1*MS, FRENO=7*MS;
+const VMAX_VEH={utilitario:120,berlina:150,ranchera:145,furgoCorta:110,furgoLarga:105,
+ deportivo:200,todoterreno:140,taxi:150,patrulla:170,ambulancia:120,basura:80,
+ autobus:80,camionObra:90,moto:130,bomberos:90,grua:95,microbus:95,furgonPoli:130};
+const vmaxDe=t=>(VMAX_VEH[t]||120)/3.6*MS;   /* km/h -> casillas/s */
 const CORRE=.82;                          /* a partir de aquí el joystick es correr */
 /* Y por debajo de esto, agachado. El joystick ya decía si andas o corres; que diga
    también si vas agachado es un botón menos que buscar con el pulgar. La postura se
@@ -4639,10 +4661,10 @@ function hablarCon(n){
   const ops=[{txt:'Ver vehículos',fn:()=>abrirTienda('Taller Iker','Vehículos',[
    {ico:'furgo',tt:'Furgoneta',dd:S.nivel<NIVEL_VEHICULO.furgo?'Necesitas nivel '+NIVEL_VEHICULO.furgo:'Abre mudanzas y entregas grandes.',
     precio:700,ya:()=>S.tiene.furgo||S.nivel<NIVEL_VEHICULO.furgo,
-    fn:()=>{S.tiene.furgo=true;tuCoche.tipo='furgoLarga';tuCoche.vmax=9.5;aviso('Furgoneta comprada');}},
+    fn:()=>{S.tiene.furgo=true;tuCoche.tipo='furgoLarga';tuCoche.vmax=vmaxDe('furgoLarga');aviso('Furgoneta comprada');}},
    {ico:'deportivo',tt:'Deportivo',dd:S.nivel<NIVEL_VEHICULO.deportivo?'Necesitas nivel '+NIVEL_VEHICULO.deportivo:'Más velocidad y mejor agarre.',
     precio:1600,ya:()=>S.tiene.deportivo||S.nivel<NIVEL_VEHICULO.deportivo,
-    fn:()=>{S.tiene.deportivo=true;tuCoche.tipo='deportivo';tuCoche.lib=2;tuCoche.vmax=15.5;aviso('Deportivo comprado');}}])},
+    fn:()=>{S.tiene.deportivo=true;tuCoche.tipo='deportivo';tuCoche.lib=2;tuCoche.vmax=vmaxDe('deportivo');aviso('Deportivo comprado');}}])},
    {txt:'Repintar el coche',coste:(esMio('taller')?0:100)+' €',fn:()=>{
     const c=esMio('taller')?0:100;
     if(S.dinero<c)return aviso('No te llega');
@@ -6277,7 +6299,7 @@ function poseAndar(e,vel,correr,dt,sigilo){
  e.pose=(correr?'correr':'andar')+(correr?((f-1)%4+1):f);}
 function actInterior(dt,ix,iy){
  motorAudio(null,1);sirenaAudio(dt,false);
- const v=2.7,m=Math.hypot(ix,iy);
+ const v=V_INTERIOR,m=Math.hypot(ix,iy);
  if(m>.08){mover(player,player.x+ix/m*Math.min(1,m)*v*dt,player.y+iy/m*Math.min(1,m)*v*dt,false);
   player.d8=dir8De(ix,iy);poseAndar(player,v,false,dt);}
  else player.pose=player.herido>0?'herido':'quieto';
@@ -6300,7 +6322,7 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
    const obj=Math.atan2(iy,ix);
    const dif=((obj-c.ang+Math.PI*3)%(Math.PI*2))-Math.PI;
    if(Math.abs(dif)>2.36&&vf<1.2){
-    vf-=c.vmax*.85*cans*dt;                    /* señala hacia atrás y está parado: recular */
+    vf-=ACEL*.7*cans*dt;                       /* señala hacia atrás y está parado: recular */
    }else{
     /* Casi parado el coche maniobra: gira en el sitio y no acelera hasta encarar. Es
        hacerle al jugador el cambio de sentido que en un móvil no se puede pedir — sin
@@ -6310,10 +6332,13 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
     c.ang+=clamp(dif,-1.1,1.1)*giro*dt;
     /* Cuanto más cerrada la curva, menos gas: así se traza en vez de rebotar. */
     if(!(parado&&torcido))
-     vf+=fuerza*c.vmax*1.3*cans*dt*(1-clamp(Math.abs(dif)/3.14,0,.6));
+     vf+=fuerza*ACEL*cans*dt*(1-clamp(Math.abs(dif)/3.14,0,.6));
    }
   }
-  vf*=(1-dt*(fuerza<.12?1.7:.45));
+  /* Sin gas frena de verdad; con gas solo hay rozamiento. Iba por un factor exponencial
+     que a poca velocidad no frenaba nada y a mucha frenaba de golpe. */
+  if(fuerza<.12)vf-=Math.sign(vf)*Math.min(Math.abs(vf),FRENO*dt);
+  else vf*=(1-dt*.12);
   vr*=Math.pow(.86,dt*60);
   vf=clamp(vf,-c.vmax*.42,c.vmax);
   c.vx=f.x*vf+r.x*vr;c.vy=f.y*vf+r.y*vr;
@@ -6339,7 +6364,7 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
   const m=Math.hypot(ix,iy);
   /* Velocidad analógica: el joystick a medias pasea y a fondo corre, sin escalón. Y por
      debajo del umbral, agachado: la mitad de rápido y la mitad de visible. */
-  const v=(player.sigilo?1.25:1.55+fuerza*3.25)*cans;
+  const v=(player.sigilo?V_AGACHADO:V_ANDAR+fuerza*(V_CORRER-V_ANDAR))*cans;
   if(m>.08){mover(player,player.x+ix/m*v*dt,player.y+iy/m*v*dt,false);
    /* Si la cruceta está puesta manda ella: se anda de lado sin dejar de apuntar. */
    if(!apuntando)player.d8=dir8De(ix,iy);
@@ -6384,13 +6409,13 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
   if(!e.alerta){
    if(e.oido){
     const ang=Math.atan2(e.oido.y-e.y,e.oido.x-e.x);
-    mover(e,e.x+Math.cos(ang)*1.9*dt,e.y+Math.sin(ang)*1.9*dt,false);
+    mover(e,e.x+Math.cos(ang)*V_HUIDA*dt,e.y+Math.sin(ang)*V_HUIDA*dt,false);
     e.d8=dir8De(Math.cos(ang),Math.sin(ang));poseAndar(e,1.9,false,dt);
     if(dist(e,e.oido)<1.2)e.oido=null;
    }else{
     e.ronda=(e.ronda||0)-dt;
     if(e.ronda<=0){e.ronda=rnd(1.6,3.4);e.rumbo=rnd(0,6.283);}
-    mover(e,e.x+Math.cos(e.rumbo)*1.3*dt,e.y+Math.sin(e.rumbo)*1.3*dt,false);
+    mover(e,e.x+Math.cos(e.rumbo)*V_PEATON*dt,e.y+Math.sin(e.rumbo)*V_PEATON*dt,false);
     e.d8=dir8De(Math.cos(e.rumbo),Math.sin(e.rumbo));poseAndar(e,1.3,false,dt);}
    continue;}
   if(d>(a.cuerpo?1.1:a.alc*.75)||!ve){
@@ -6424,7 +6449,7 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
  for(const p of peatones){
   if(p.huye>0){p.huye-=dt;
    const ang=Math.atan2(p.y-player.y,p.x-player.x);
-   mover(p,p.x+Math.cos(ang)*3.6*dt,p.y+Math.sin(ang)*3.6*dt,false);
+   mover(p,p.x+Math.cos(ang)*V_HUIDA*dt,p.y+Math.sin(ang)*V_HUIDA*dt,false);
    p.d8=dir8De(Math.cos(ang),Math.sin(ang));poseAndar(p,3.6,true,dt);
   }else{
    p.t-=dt;if(p.t<=0){const a=rnd(0,6.283);p.dx=Math.cos(a);p.dy=Math.sin(a);p.t=rnd(1,4);}
@@ -6922,8 +6947,8 @@ async function cargar(){
   if(S.armas.punos===undefined)S.armas.punos=Infinity;
   if(d.pinta)vestir(d.pinta);
   player.x=d.x;player.y=d.y;
-  if(S.tiene.deportivo){tuCoche.tipo='deportivo';tuCoche.lib=2;tuCoche.vmax=15.5;}
-  else if(S.tiene.furgo){tuCoche.tipo='furgoLarga';tuCoche.vmax=9.5;}
+  if(S.tiene.deportivo){tuCoche.tipo='deportivo';tuCoche.lib=2;tuCoche.vmax=vmaxDe('deportivo');}
+  else if(S.tiene.furgo){tuCoche.tipo='furgoLarga';tuCoche.vmax=vmaxDe('furgoLarga');}
   tuCoche.x=poi('piso').p.x+1.4;tuCoche.y=poi('piso').p.y;
   return true;}catch(e){return false;}}
 
