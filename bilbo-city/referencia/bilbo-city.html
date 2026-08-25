@@ -2928,6 +2928,13 @@ const FACH_H=13;
    pintado de la ciudad, que está en otro sitio. */
 const ANCHO_FACH={portal:16,portalPiedra:16,garaje:16,
                   escaparate:32,tasca:32,persiana:32,porton:32,ciega:32};
+/* Lo que se ve de las plantas de encima. El canto eran 13 px —2,10 m, menos de una
+   planta—, así que de un bloque de seis alturas solo se veían los bajos y la manzana
+   quedaba de zócalo sobre una plancha de tejado. La vista es cenital escorada: de un
+   edificio alto se ve el bajo y unas cuantas ventanas por encima. Una nave lleva menos,
+   que una nave es una sola altura. */
+const PISOS_H={teja:14,pizarra:14,azotea:14,nave:6};
+const PISOS_MAT={teja:'ladrillo',pizarra:'ladrillo',azotea:'hormigon',nave:'nave'};
 const FACH_BARRIO={
  denso:     ['tasca','persiana','portal','escaparate','portal','persiana','tasca','ciega'],
  senorial:  ['escaparate','portalPiedra','escaparate','ciega','portalPiedra','persiana'],
@@ -2984,6 +2991,22 @@ function generarProps(){
  PROP.fachadas.ciega=local(32,(g,w)=>{marco(g,w,C.hormigonO);
   P(g,2,2,w-4,3,C.hormigon);
   for(const vx of [w/4-3,w-w/4-3]){P(g,vx,7,6,5,C.carbon);P(g,vx+1,8,4,3,'#3f5566');}});
+ /* Las plantas: muro con su luz arriba a la izquierda y su sombra abajo y a la derecha,
+    como todo, y dos filas de ventanas. La ventana no es un agujero negro: lleva dintel
+    claro y el vidrio azulado, que es lo que la distingue de un hueco. */
+ const pisos=(h,muro,muroL,muroO,fn)=>{const c=lienzo(32,h),g=c.getContext('2d');
+  P(g,0,0,32,h,muro);P(g,0,0,32,1,muroL);P(g,31,0,1,h,muroO);P(g,0,h-1,32,1,muroO);
+  fn(g,h);return cuantizar(c);};
+ const ventanas=(hueco,dintel)=>(g,h)=>{
+  for(let fy=2;fy<h-4;fy+=6)for(let x=3;x<29;x+=7){
+   P(g,x,fy,5,4,hueco);P(g,x,fy,5,1,dintel);P(g,x+1,fy+1,3,2,'#3f5566');}};
+ PROP.pisos={
+  ladrillo:pisos(14,C.teja,C.ladrillo4,C.ladrillo1,ventanas(C.ladrillo0,C.ladrillo5)),
+  hormigon:pisos(14,C.hormigon,C.hormigonL,C.hormigonO,ventanas(C.carbon,C.hormigon5)),
+  /* La nave no tiene plantas: tiene una franja de ventanas altas y chapa. */
+  nave:pisos(6,C.aceroO,C.acero,C.grisO,(g)=>{
+   for(let x=2;x<29;x+=5)P(g,x,2,3,2,'#3f5566');}),
+ };
  PROP.deposito=S_(18,20,g=>{P(g,3,4,12,14,'#7f9aa8');P(g,3,4,12,3,'#a8c4d0');
   P(g,15,4,2,14,C.aceroO);P(g,4,18,3,2,C.carbon);P(g,12,18,3,2,C.carbon);
   P(g,5,1,8,3,C.acero);});
@@ -6263,12 +6286,18 @@ function dibCiudad(){
    /* La casilla se llena con lo que quepa: un local entero, o dos de medio. Cuando solo
       queda medio hueco no cabe un escaparate, así que ahí entra uno de los estrechos —y
       si el barrio no tiene ninguno, un portal, que lo tiene toda casa. */
+   /* Primero las plantas y encima los bajos: el edificio se lee de arriba abajo, tejado,
+      ventanas, escaparate y acera. */
+   const famF=famDe(roof[y*MW+x]), ph=PISOS_H[famF]||14;
+   ctx.drawImage(PROP.pisos[PISOS_MAT[famF]||'hormigon'],x*TS,y*TS+TS-FACH_H-ph);
    for(let px=0,n=0;px<TS;n++){
     let t=l[(h2>>(n*3))%l.length];
     if(ANCHO_FACH[t]>TS-px)t=l.find(k=>ANCHO_FACH[k]<=TS-px)||'portal';
     ctx.drawImage(PROP.fachadas[t],x*TS+px,y*TS+TS-FACH_H);
     px+=ANCHO_FACH[t];}}
-  if(abajo){ctx.fillStyle='rgba(0,0,0,.34)';ctx.fillRect(x*TS,(y+1)*TS,TS,5);}
+  /* La sombra sobre la calle crece con el edificio: con cinco píxeles, una manzana de
+     seis alturas proyectaba lo mismo que un bordillo. */
+  if(abajo){ctx.fillStyle='rgba(0,0,0,.34)';ctx.fillRect(x*TS,(y+1)*TS,TS,9);}
   if(der){ctx.fillStyle='rgba(0,0,0,.28)';ctx.fillRect((x+1)*TS,y*TS,4,TS);}
   ctx.fillStyle='rgba(255,255,255,.14)';
   if(arriba)ctx.fillRect(x*TS,y*TS,TS,2);
