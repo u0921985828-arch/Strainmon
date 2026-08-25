@@ -51,6 +51,22 @@ Repasar comportamiento contra el prototipo, que es el probado:
 - [ ] Perfilar el HUD: `SetPixels32` + `Apply` del radar una vez por frame.
 - [ ] Comprobar que las hojas de personaje se compilan bajo demanda y no todas al arrancar.
 
+## 4b · Terminar la subida del mundo a casilla de 64
+
+La casilla pasó de 32 a 64 px para que la escala fuese realista (ver *El arte* en
+`CLAUDE.md`). El suelo, las fachadas y el mobiliario están a 64 **de geometría**, pero el
+dibujo se sigue forjando a 32 y se sube con `x2()`: un píxel de arte por cada cuatro de
+pantalla. Funciona y las proporciones ya son las buenas, pero el detalle todavía no está.
+
+- [ ] Repintar los **61 tiles de suelo** a 64×64 de verdad, con el grano que ahora no cabe:
+      junta de adoquín, bordillo con canto, marca vial con desgaste.
+- [ ] Lo mismo con los props y el mobiliario urbano.
+- [ ] Quitar `x2()` cuando no quede nadie que lo use.
+- [ ] **Unity va todavía a 32.** `Mundo`/`Lienzo` y los tiles del puerto siguen en la
+      medida vieja: mientras no se suban, las dos implementaciones no se ven igual.
+- [ ] Medir la memoria en un móvil de verdad. Doblar la casilla cuadruplica los píxeles del
+      atlas de suelo; las hojas de personaje no cambian, que el personaje no se tocó.
+
 ## 5 · Contenido que falta respecto al plan original
 
 - [ ] **Unity no coloca los locales.** `Mobiliario.FachBarrio` está declarado y no lo usa

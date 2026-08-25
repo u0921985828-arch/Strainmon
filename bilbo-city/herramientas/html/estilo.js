@@ -52,7 +52,7 @@ listo().then(() => {
       [/Persona \|\s*\*\*(\d+)×(\d+) px\*\*/,            ['20', '26'],                 'la figura'],
       [/Celda del personaje \|\s*\*\*(\d+)×(\d+) px\*\*/, [String(CW), String(CH)],     'la celda del personaje'],
       [/Icono de interfaz \|\s*\*\*(\d+)×(\d+) px\*\*/,   ['24', '24'],                 'el icono de interfaz'],
-      [/Casilla del mundo \|\s*\*\*(\d+)×(\d+) px\*\*/,   ['32', '32'],                 'la casilla del mundo'],
+      [/Casilla del mundo \|\s*\*\*(\d+)×(\d+) px\*\*/,   [String(A.TS), String(A.TS)], 'la casilla del mundo'],
       [/Hoja de personaje \|\s*\*\*(\d+) columnas × (\d+) filas\*\*/,
                                                       ['8', String(A.ORDEN_POSES.length)], 'la hoja de personaje'],
       [/\*\*(\d+) colores y ninguno más\*\*/,               [String(A.PALETA.length)],    'la paleta'],
@@ -129,7 +129,10 @@ listo().then(() => {
     let malos = 0;
     for (const [k, c] of todos(A.TILE)) {
       if (A.TILE_MUEBLE.has(k.replace(/\[\d+\]$/, ''))) continue;
-      if (c.width !== 32 || c.height !== 32) { fallos.push('tile ' + k + ': mide ' + c.width + 'x' + c.height); malos++; continue; }
+      // La medida sale del juego (`TS`), no de un 32 escrito aquí: la casilla subió a 64
+      // para que una persona a escala real tuviese píxeles con los que dibujarse, y un
+      // verificador con el número a mano habría dado por malo todo el suelo.
+      if (c.width !== A.TS || c.height !== A.TS) { fallos.push('tile ' + k + ': mide ' + c.width + 'x' + c.height + ', no ' + A.TS + 'x' + A.TS); malos++; continue; }
       const d = px(c);
       let huecos = 0;
       for (let i = 3; i < d.length; i += 4) if (d[i] < 255) huecos++;
@@ -137,7 +140,7 @@ listo().then(() => {
       // rejilla de puntos por toda la ciudad.
       if (huecos) { fallos.push('tile ' + k + ': ' + huecos + ' píxeles transparentes'); malos++; }
     }
-    if (!malos) bien.push((todos(A.TILE).length - A.TILE_MUEBLE.size) + ' tiles de suelo a 32x32 y sin agujeros');
+    if (!malos) bien.push((todos(A.TILE).length - A.TILE_MUEBLE.size) + ' tiles de suelo a ' + A.TS + 'x' + A.TS + ' y sin agujeros');
   }
 
   // ── R4 · las hojas de personaje, a su medida ─────────────────────────────────────

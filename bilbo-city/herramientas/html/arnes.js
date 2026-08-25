@@ -1,4 +1,5 @@
 const {createCanvas}=require('canvas');const fs=require('fs');
+const [LIENZO_W,LIENZO_H]=(process.env.BILBO_LIENZO||'840x400').split('x').map(Number);
 const path=require('path');
 const RUTA=process.env.BILBO_HTML||path.join(__dirname,'..','..','referencia','bilbo-city.html');
 const html=fs.readFileSync(RUTA,'utf8');
@@ -10,7 +11,11 @@ const H={};const cache={};
 function el(id){const o={id,style:{},dataset:{},className:'',textContent:'',value:'',
  classList:{add(){},remove(){},toggle(){}},addEventListener(n,f){if(id)H[id+':'+n]=f;},
  appendChild(h){o.children.push(h);},querySelector:()=>el(),querySelectorAll:()=>[],
- clientWidth:840,clientHeight:400,
+/* El lienzo, configurable con BILBO_LIENZO=anchoxalto. Hace falta para juzgar el campo de
+   visión: la cámara enseña 13,5 casillas de alto y el zoom es entero, así que con la
+   casilla a 64 px una pantalla de 400 enseña la mitad de ciudad que una de 800. Comparar
+   dos resoluciones de casilla en el mismo lienzo compara dos cosas distintas. */
+ clientWidth:LIENZO_W,clientHeight:LIENZO_H,
  getContext:()=>createCanvas(1,1).getContext('2d'),width:0,height:0,toDataURL:()=>'d',select(){}};
  let hijos=[],html='';
  Object.defineProperty(o,'children',{get:()=>hijos});
@@ -26,15 +31,15 @@ global.document={createElement:t=>{if(t==='canvas'){const c=createCanvas(1,1);c.
  body:el('body')};
 // canvas principal real
 // El juego es apaisado: el arnés tiene que serlo también o el mando no cae donde cae.
-const real=createCanvas(840,400);
+const real=createCanvas(LIENZO_W,LIENZO_H);
 cache.c=Object.assign(real,{style:{},className:'',classList:{add(){},remove(){},toggle(){}},
  addEventListener:()=>{},appendChild:()=>{},querySelector:()=>el(),querySelectorAll:()=>[],
- clientWidth:840,clientHeight:400});
+ clientWidth:LIENZO_W,clientHeight:LIENZO_H});
 global.addEventListener=()=>{};global.devicePixelRatio=1;
 let store={};global.localStorage={getItem:k=>store[k]??null,setItem:(k,v)=>store[k]=v,removeItem:k=>delete store[k]};
 let now=0;global.performance={now:()=>now};
 let raf=null;global.requestAnimationFrame=f=>{raf=f;};
-global.location={reload(){}};global.innerWidth=840;global.innerHeight=400;global.window=global;
+global.location={reload(){}};global.innerWidth=LIENZO_W;global.innerHeight=LIENZO_H;global.window=global;
 /* Se siembra el generador antes de arrancar para que dos pasadas de la batería den
    exactamente lo mismo. BILBO_SEMILLA cambia la semilla cuando quieras probar otra
    tirada — un fallo que solo sale con una semilla concreta sigue siendo un fallo. */

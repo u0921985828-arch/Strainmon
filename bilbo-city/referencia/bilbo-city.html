@@ -204,7 +204,16 @@ img.pix{image-rendering:pixelated;display:block;}
 /*═══════════════ BÁSICOS ═══════════════*/
 /* El mapa es el término municipal de Bilbao a 5,16 m por casilla: 7,4 km de este a
    oeste y 4 de norte a sur. Rectangular porque el valle lo es. */
-const TS=32;
+/* La resolución del mundo. La cámara enseña 13,5 casillas de alto pase lo que pase
+   —`zObj` se despeja de ahí—, así que subir la casilla de 32 a 64 px NO quita campo de
+   visión: baja el zoom entero de 2 a 1 y en pantalla se ve lo mismo. Lo que cambia es que
+   el mundo pasa a tener el doble de resolución, y con eso una persona a escala real deja
+   de medir 3 px de hombros y mide 6. Es lo único que permite el 90% de realismo sin dejar
+   al personaje en nada.
+   El arte de personaje y de vehículo NO se toca: al doblar la casilla, el peatón pasa solo
+   de ×2,46 a ×1,24 y el utilitario de ×2,10 a ×1,07. */
+const ESC=2;
+const TS=32*ESC;
 const ROAD=0,ACERA=1,EDIF=2,PARQUE=3,AGUA=4,PUENTE=5,PLAZA=6,MUELLE=7,PATIO=8,VIA=9,MONTE=10;
 /* Lo de aquí abajo lo escribe herramientas/plano/extraer.py leyendo el plano
    municipal. No se edita a mano: se vuelve a ejecutar el extractor. */
@@ -2682,7 +2691,14 @@ const TILE={};
    dentro del índice plano y cuántas variantes tiene. */
 const TEJADOS={},TEJADO_DE={};
 const PARCHE=6;      /* casillas de lado del parche de tejado */
-function T32(fn){const c=lienzo(32,32),g=c.getContext('2d');fn(g);return cuantizar(c);}
+/* De momento el suelo se sigue forjando a 32 y se sube a 64 sin interpolar: la geometría
+   queda donde toca y el dibujo es el de siempre, un píxel por cada cuatro. Es el paso que
+   permite ver las proporciones sin repintar 61 tiles; el detalle de verdad llega después,
+   redibujando cada tile a 64. */
+function x2(c){if(ESC===1)return c;
+ const d=lienzo(c.width*ESC,c.height*ESC),g=d.getContext('2d');
+ g.imageSmoothingEnabled=false;g.drawImage(c,0,0,c.width*ESC,c.height*ESC);return d;}
+function T32(fn){const c=lienzo(32,32),g=c.getContext('2d');fn(g);return x2(cuantizar(c));}
 const rell=(g,col)=>P(g,0,0,32,32,col);
 function generarTiles(){
  TILE[ROAD]=T32(g=>{rell(g,C.asfalto);ruido(g,32,32,[C.asfaltoO,C.asfaltoL],22);});
@@ -2935,7 +2951,7 @@ function generarVeh(){
 
 /*═══════════════ PROPS ═══════════════*/
 const PROP={};
-function S_(w,h,fn){const c=lienzo(w,h),g=c.getContext('2d');fn(g);return cuantizar(c);}
+function S_(w,h,fn){const c=lienzo(w,h),g=c.getContext('2d');fn(g);return x2(cuantizar(c));}
 /* Qué se puede abrir en cada tipo de barrio. Se repite alguno a propósito: si todos los
    locales fueran distintos, una calle parecería una feria. */
 const FACH_H=13;
@@ -2979,7 +2995,7 @@ function generarProps(){
       entero (32 px = 5,16 m) escaparate, tasca, persiana, portón y pared ciega.
     Nada dibujado a mano: cada dibujo se pinta contra su propio ancho `w`. */
  PROP.fachadas={};
- const local=(w,fn)=>{const c=lienzo(w,FACH_H),g=c.getContext('2d');fn(g,w);return cuantizar(c);};
+ const local=(w,fn)=>{const c=lienzo(w,FACH_H),g=c.getContext('2d');fn(g,w);return x2(cuantizar(c));};
  const marco=(g,w,col)=>{P(g,0,0,w,FACH_H,C.negro);P(g,1,1,w-2,FACH_H-1,col);};
  PROP.fachadas.portal=local(16,(g,w)=>{marco(g,w,C.maderaO);
   P(g,4,3,w-8,FACH_H-3,C.madera);P(g,4,3,w-8,1,C.maderaL);P(g,w-6,8,2,2,C.mostazaO);
@@ -3012,7 +3028,7 @@ function generarProps(){
     claro y el vidrio azulado, que es lo que la distingue de un hueco. */
  const pisos=(h,muro,muroL,muroO,fn)=>{const c=lienzo(32,h),g=c.getContext('2d');
   P(g,0,0,32,h,muro);P(g,0,0,32,1,muroL);P(g,31,0,1,h,muroO);P(g,0,h-1,32,1,muroO);
-  fn(g,h);return cuantizar(c);};
+  fn(g,h);return x2(cuantizar(c));};
  const ventanas=(hueco,dintel)=>(g,h)=>{
   for(let fy=2;fy<h-4;fy+=6)for(let x=3;x<29;x+=7){
    P(g,x,fy,5,4,hueco);P(g,x,fy,5,1,dintel);P(g,x+1,fy+1,3,2,'#3f5566');}};
@@ -6256,39 +6272,39 @@ function dibCiudad(){
   ctx.drawImage(tileDe(x,y,fa),x*TS,y*TS);
   const t=map[y*MW+x],h=hash(x,y);
   if(t===ACERA){
-   if(h%29===0)ctx.drawImage(PROP.farola,x*TS+10,y*TS+2);
-   else if(h%43===0)ctx.drawImage(PROP.contenedor,x*TS+5,y*TS+8);
-   else if(h%47===0)ctx.drawImage(PROP.contenedor2,x*TS+5,y*TS+8);
-   else if(h%53===0)ctx.drawImage(PROP.banco,x*TS+4,y*TS+10);
-   else if(h%59===0)ctx.drawImage(PROP.papelera,x*TS+10,y*TS+8);
-   else if(h%61===0)ctx.drawImage(PROP.cabina,x*TS+8,y*TS+4);
-   else if(h%67===0)ctx.drawImage(PROP.semaforo,x*TS+11,y*TS+1);
-   else if(h%71===0)ctx.drawImage(PROP.arbolPodado,x*TS+6,y*TS+3);
-   else if(h%73===0)ctx.drawImage(PROP.terraza,x*TS+6,y*TS+7);}
-  else if(t===PARQUE){if(h%4===0)ctx.drawImage(PROP.arbol,x*TS+2,y*TS+1);}
-  else if(t===PLAZA){if(h%23===0)ctx.drawImage(PROP.arbolPodado,x*TS+6,y*TS+3);
-   else if(h%31===0)ctx.drawImage(PROP.banco,x*TS+4,y*TS+10);}
-  else if(t===MUELLE){if(h%29===0)ctx.drawImage(PROP.grua,x*TS-8,y*TS-16);
-   else if(h%17===0)ctx.drawImage(PROP.contMaritimo,x*TS-4,y*TS+6);
-   else if(h%13===0)ctx.drawImage(PROP.pales,x*TS+5,y*TS+8);
-   else if(h%11===0)ctx.drawImage(PROP.bidon,x*TS+10,y*TS+9);}
-  else if(t===PATIO){if(h%7===0)ctx.drawImage(PROP.arbolPodado,x*TS+6,y*TS+3);
-   else if(h%9===0)ctx.drawImage(PROP.pales,x*TS+5,y*TS+8);}
+   if(h%29===0)ctx.drawImage(PROP.farola,x*TS+10*ESC,y*TS+2*ESC);
+   else if(h%43===0)ctx.drawImage(PROP.contenedor,x*TS+5*ESC,y*TS+8*ESC);
+   else if(h%47===0)ctx.drawImage(PROP.contenedor2,x*TS+5*ESC,y*TS+8*ESC);
+   else if(h%53===0)ctx.drawImage(PROP.banco,x*TS+4*ESC,y*TS+10*ESC);
+   else if(h%59===0)ctx.drawImage(PROP.papelera,x*TS+10*ESC,y*TS+8*ESC);
+   else if(h%61===0)ctx.drawImage(PROP.cabina,x*TS+8*ESC,y*TS+4*ESC);
+   else if(h%67===0)ctx.drawImage(PROP.semaforo,x*TS+11*ESC,y*TS+1*ESC);
+   else if(h%71===0)ctx.drawImage(PROP.arbolPodado,x*TS+6*ESC,y*TS+3*ESC);
+   else if(h%73===0)ctx.drawImage(PROP.terraza,x*TS+6*ESC,y*TS+7*ESC);}
+  else if(t===PARQUE){if(h%4===0)ctx.drawImage(PROP.arbol,x*TS+2*ESC,y*TS+1*ESC);}
+  else if(t===PLAZA){if(h%23===0)ctx.drawImage(PROP.arbolPodado,x*TS+6*ESC,y*TS+3*ESC);
+   else if(h%31===0)ctx.drawImage(PROP.banco,x*TS+4*ESC,y*TS+10*ESC);}
+  else if(t===MUELLE){if(h%29===0)ctx.drawImage(PROP.grua,x*TS-8*ESC,y*TS-16*ESC);
+   else if(h%17===0)ctx.drawImage(PROP.contMaritimo,x*TS-4*ESC,y*TS+6*ESC);
+   else if(h%13===0)ctx.drawImage(PROP.pales,x*TS+5*ESC,y*TS+8*ESC);
+   else if(h%11===0)ctx.drawImage(PROP.bidon,x*TS+10*ESC,y*TS+9*ESC);}
+  else if(t===PATIO){if(h%7===0)ctx.drawImage(PROP.arbolPodado,x*TS+6*ESC,y*TS+3*ESC);
+   else if(h%9===0)ctx.drawImage(PROP.pales,x*TS+5*ESC,y*TS+8*ESC);}
   else if(t===EDIF){
    /* Cada familia de tejado lleva lo suyo: en la teja, chimeneas; en la azotea, depósitos
       y tendederos; en la nave, lucernarios. Con eso, un bloque de Santutxu y una nave de
       Zorrotzaurre dejan de ser dos rectángulos grises. */
    const fam=famDe(roof[y*MW+x]);
    if(fam==='teja'||fam==='pizarra'){
-    if(h%23===0)ctx.drawImage(PROP.chimenea,x*TS+10,y*TS+4);
-    else if(h%71===0)ctx.drawImage(PROP.antenaTv,x*TS+9,y*TS+2);}
+    if(h%23===0)ctx.drawImage(PROP.chimenea,x*TS+10*ESC,y*TS+4*ESC);
+    else if(h%71===0)ctx.drawImage(PROP.antenaTv,x*TS+9*ESC,y*TS+2*ESC);}
    else if(fam==='azotea'){
-    if(h%37===0)ctx.drawImage(PROP.deposito,x*TS+7,y*TS+5);
-    else if(h%41===0)ctx.drawImage(PROP.tendedero,x*TS+2,y*TS+9);
-    else if(h%43===0)ctx.drawImage(PROP.climatizador,x*TS+7,y*TS+8);
-    else if(h%47===0)ctx.drawImage(PROP.caseta,x*TS+5,y*TS+6);
-    else if(h%53===0)ctx.drawImage(PROP.antenaTv,x*TS+9,y*TS+2);}
-   else if(h%29===0)ctx.drawImage(PROP.lucernario,x*TS+4,y*TS+8);}}
+    if(h%37===0)ctx.drawImage(PROP.deposito,x*TS+7*ESC,y*TS+5*ESC);
+    else if(h%41===0)ctx.drawImage(PROP.tendedero,x*TS+2*ESC,y*TS+9*ESC);
+    else if(h%43===0)ctx.drawImage(PROP.climatizador,x*TS+7*ESC,y*TS+8*ESC);
+    else if(h%47===0)ctx.drawImage(PROP.caseta,x*TS+5*ESC,y*TS+6*ESC);
+    else if(h%53===0)ctx.drawImage(PROP.antenaTv,x*TS+9*ESC,y*TS+2*ESC);}
+   else if(h%29===0)ctx.drawImage(PROP.lucernario,x*TS+4*ESC,y*TS+8*ESC);}}
  /* segunda pasada: los edificios se leen como bloques, no como casillas sueltas */
  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
   if(map[y*MW+x]!==EDIF)continue;
@@ -6305,18 +6321,18 @@ function dibCiudad(){
    /* Primero las plantas y encima los bajos: el edificio se lee de arriba abajo, tejado,
       ventanas, escaparate y acera. */
    const famF=famDe(roof[y*MW+x]), ph=PISOS_H[famF]||14;
-   ctx.drawImage(PROP.pisos[PISOS_MAT[famF]||'hormigon'],x*TS,y*TS+TS-FACH_H-ph);
+   ctx.drawImage(PROP.pisos[PISOS_MAT[famF]||'hormigon'],x*TS,y*TS+TS-FACH_H*ESC-ph*ESC);
    for(let px=0,n=0;px<TS;n++){
     let t=l[(h2>>(n*3))%l.length];
     if(ANCHO_FACH[t]>TS-px)t=l.find(k=>ANCHO_FACH[k]<=TS-px)||'portal';
-    ctx.drawImage(PROP.fachadas[t],x*TS+px,y*TS+TS-FACH_H);
+    ctx.drawImage(PROP.fachadas[t],x*TS+px*ESC,y*TS+TS-FACH_H*ESC);
     px+=ANCHO_FACH[t];}}
   /* La sombra sobre la calle crece con el edificio: con cinco píxeles, una manzana de
      seis alturas proyectaba lo mismo que un bordillo. */
-  if(abajo){ctx.fillStyle='rgba(0,0,0,.34)';ctx.fillRect(x*TS,(y+1)*TS,TS,9);}
-  if(der){ctx.fillStyle='rgba(0,0,0,.28)';ctx.fillRect((x+1)*TS,y*TS,4,TS);}
+  if(abajo){ctx.fillStyle='rgba(0,0,0,.34)';ctx.fillRect(x*TS,(y+1)*TS,TS,9*ESC);}
+  if(der){ctx.fillStyle='rgba(0,0,0,.28)';ctx.fillRect((x+1)*TS,y*TS,4*ESC,TS);}
   ctx.fillStyle='rgba(255,255,255,.14)';
-  if(arriba)ctx.fillRect(x*TS,y*TS,TS,2);
+  if(arriba)ctx.fillRect(x*TS,y*TS,TS,2*ESC);
   if(izq)ctx.fillRect(x*TS,y*TS,2,TS);
   ctx.fillStyle='rgba(0,0,0,.4)';
   if(abajo)ctx.fillRect(x*TS,y*TS+TS-2,TS,2);

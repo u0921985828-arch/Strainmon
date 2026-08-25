@@ -15,8 +15,8 @@ Bilbao a finales de los noventa, vista desde arriba y algo escorada, en pixel ar
 
 | | Medida | Por qué |
 |---|---|---|
-| Casilla del mundo | **32×32 px** | 5,16 m de Bilbao. Un portal ocupa una casilla. |
-| Persona | **20×26 px** **[V]** | Cabeza ≈ 1/3,25 de la altura. Se probó a 1/2,6 y se descartó: a esa proporción la figura se lee de juguete y no de juego con historia. La bandera `cabezona` sigue ahí por si se quiere volver a probar. |
+| Casilla del mundo | **64×64 px** **[V]** | 5,16 m de Bilbao, o sea **0,081 m por píxel**. Era de 32 y se dobló: a 32, una persona a escala real mide 3 px de hombros y ahí no cabe un personaje, así que el juego arrastraba una sobreescala de ×2,5 en la gente y ×2,1 en los coches que se veía a simple vista. Doblar la casilla no cuesta campo de visión —la cámara enseña 13,5 casillas pase lo que pase— pero **pide el doble de píxeles de pantalla**, porque el zoom es entero y no baja de 1. |
+| Persona | **20×26 px** **[V]** | Con la casilla a 64, eso son 1,62 m de ancho de caja y **2,10 m de alto: ×1,23 sobre una persona de verdad**, o sea el 90% de realismo que se pide. Antes, con la casilla a 32, era ×2,46. La figura no se ha tocado: lo que cambió fue el mundo debajo. Cabeza ≈ 1/3,25 de la altura; se probó a 1/2,6 y se descartó, que a esa proporción se lee de juguete. |
 | Celda del personaje | **24×32 px** **[V]** | La fija CONTEXT.md §18.1, con el pivote en (12,30). La figura mide 20×26; lo que queda de margen es 2 a los lados, 5 arriba y 1 abajo. Ahí caben el puñetazo, el fogonazo, el casco de obra y el contorno, todos recogidos a propósito. |
 | Icono de interfaz | **24×24 px** **[V]** | 22×22 de dibujo y 1 px de aire alrededor para el contorno. |
 | Vehículo | largo 26–44, ancho 15–21 | Un utilitario cabe en una calle de 2 casillas; la furgoneta no. |
