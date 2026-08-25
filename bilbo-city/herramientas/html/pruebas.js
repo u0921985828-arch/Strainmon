@@ -664,9 +664,13 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
             if (p > mejorP) { mejorP = p; mejor = [dx, dy, ks]; }
           }
           vx = mejor[0]; vy = mejor[1];
+          // El joystick solo dirige: el gas es su propio pedal, así que hay que mantenerlo
+          // o el coche se queda parado por muy bien que se apunte.
           for (const k of mejor[2]) A.teclas[k] = true;
+          A.teclas[' '] = true;
           paso(15);
           for (const k of mejor[2]) A.teclas[k] = false;
+          A.teclas[' '] = false;
         }
         recorridos.push(Math.hypot(cc.x - x0, cc.y - y0));
         P.enCoche = null;

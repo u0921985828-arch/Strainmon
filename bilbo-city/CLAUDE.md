@@ -345,6 +345,27 @@ pantalla va en múltiplos enteros del sprite (`ajustarMando`) para que no salgan
 medias. La letra va dentro del sprite y en negro, que sobre plástico de hueso es lo único
 que se lee.
 
+## Los mandos: pedales, no magnitud de joystick
+
+Al volante el **joystick solo dirige**, y el gas y el freno son sus propios botones:
+
+| | |
+|---|---|
+| **B mantenido** | Acelerador. La aceleración se integra, así que cuanto más se mantiene, más corre — no hay tope de pulsación. |
+| **A mantenido** | Freno, 7 m/s². A toques, frena a toques. Parado y con A puesto, marcha atrás. |
+| **A, toque corto** | Parado, te bajas. En marcha, claxon. Se distinguen por el tiempo (250 ms), que es lo único que no obliga a meter otro botón en un marco donde no cabe. |
+
+Antes la **magnitud del joystick** hacía de acelerador, y eso obliga a llevar el pulgar a
+medio recorrido mientras se apunta el rumbo con el mismo dedo: o corres o giras.
+
+A pie el joystick sigue mandando la velocidad, pero **con inercia**: pide una velocidad y
+las piernas tardan en darla (3,5 m/s² para arrancar, 6 para parar). Iba directa, así que
+soltar y volver a empujar cambiaba de paseo a carrera en un fotograma.
+
+**El pedal se lee del botón y de la tecla a la vez.** La batería mueve `teclas` a mano, sin
+lanzar eventos, así que mirando solo el estado del botón el coche no arrancaba en las
+pruebas aunque en el juego fuese bien.
+
 ## Comercio y transporte
 
 Los sitios donde se entra son **trece**, y los cinco últimos los comparten varios POI: el

@@ -3946,7 +3946,7 @@ addEventListener('resize',ajustarMando);
    correr — un botón menos que buscar con el pulgar, y el anillo se enciende para que se
    note. */
 const teclas={};
-let aPuls=false,cPuls=false,cMant=false;
+let aPuls=false,cPuls=false,cMant=false,aMant=false,aDesde=0,aToque=false;
 const joy={id:null,dx:0,dy:0,mag:0};      /* andar y conducir */
 const mira={dx:0,dy:0};                   /* apuntado fino: solo con las flechas del teclado */
 /* Las velocidades, escritas en metros por segundo y pasadas a casillas con la escala del
@@ -3980,12 +3980,13 @@ const AGACHA=.34;
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();
  if(k==='tab'){e.preventDefault();abrirTel();return;}
  if(k==='escape'){e.preventDefault();togglePausa();return;}
- if(k==='e'&&!teclas[k])aPuls=true;
+ if(k==='e'&&!teclas[k]){aPuls=true;aMant=true;aDesde=performance.now();}
  if(k===' '&&!teclas[k]){e.preventDefault();cPuls=true;cMant=true;}
  if(k==='q'&&!teclas[k])cambiarArma();
  teclas[k]=true;});
 addEventListener('keyup',e=>{const k=e.key.toLowerCase();
  if(k===' ')cMant=false;
+ if(k==='e'){aMant=false;aToque=performance.now()-aDesde<250;}
  teclas[k]=false;});
 
 const joyEl=document.getElementById('joy'),joyPal=joyEl.querySelector('i');
@@ -4025,7 +4026,12 @@ function bind(el,f){el.addEventListener('touchstart',e=>{e.preventDefault();e.st
  el.addEventListener('touchend',e=>{e.preventDefault();e.stopPropagation();f(false);},{passive:false});
  el.addEventListener('mousedown',e=>{e.stopPropagation();audioInit();f(true);});
  el.addEventListener('mouseup',e=>{e.stopPropagation();f(false);});}
-bind(document.getElementById('bA'),v=>{if(v)aPuls=true;});
+/* A deja de ser solo un pulso: mantenido es el freno del coche, y el toque corto sigue
+   siendo la accion. Se distinguen por el tiempo, que es lo unico que no obliga a meter
+   otro boton en un marco donde no cabe. */
+bind(document.getElementById('bA'),v=>{
+ if(v){aPuls=true;aMant=true;aDesde=performance.now();}
+ else{aMant=false;aToque=performance.now()-aDesde<250;}});
 bind(document.getElementById('bB'),v=>{if(v)cPuls=true;cMant=v;});
 document.getElementById('bSel').addEventListener('click',abrirTel);
 document.getElementById('bOpt').addEventListener('click',togglePausa);
@@ -6284,12 +6290,21 @@ function act(dt){
  /* Apuntar gira al personaje aunque esté quieto: así se puede cubrir una esquina sin
     andar hacia ella, que es media pelea. */
  if((mx||my)&&!player.enCoche)player.d8=dir8De(mx,my);
- if(aPuls){aPuls=false;accion();}
+ /* Al volante, A es el freno y el toque corto vale de claxon o de bajarse; a pie sigue
+    siendo la accion de siempre. */
+ if(player.enCoche){
+  if(aToque){aToque=false;
+   const v=Math.hypot(player.enCoche.vx,player.enCoche.vy);
+   if(v<1.2*MS*5)accion(); else {sfx('claxon');ruido(player.x,player.y,12);}}
+  aPuls=false;
+ }else if(aPuls){aPuls=false;accion();}
+ aToque=false;
  const auto=arma(S.armaAct).cad<.12;
  /* B mantenido dispara seguido, sea el arma automática o no: dar toques con el pulgar
     a cada bala no es puntería, es tendinitis. */
- if(cPuls||cMant){cPuls=false;
-  if(player.enCoche){sfx('claxon');ruido(player.x,player.y,12);}else atacarJugador(mx,my);}
+ /* En coche, B es el acelerador y se lee mantenido; a pie sigue disparando. */
+ if((cPuls||cMant)&&!player.enCoche){cPuls=false;atacarJugador(mx,my);}
+ else if(player.enCoche)cPuls=false;
  if(S.escena==='interior')return actInterior(dt,ix,iy);
  actCiudad(dt,ix,iy,correr,fuerza,!!(mx||my));}
 function poseAndar(e,vel,correr,dt,sigilo){
@@ -6318,12 +6333,24 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
      tanque —arriba acelera, izquierda gira— hay que pensar en coordenadas del coche, y
      eso con el pulgar sobre un cristal no sale: se acaba dando vueltas en una plaza.
      Señalando, el pulgar dice el rumbo y el coche se las arregla. */
+  /* El acelerador y el freno son botones, y el joystick solo dirige. Antes la magnitud
+     del joystick hacia de acelerador, asi que para ir despacio habia que llevar el pulgar
+     a medio recorrido mientras se apuntaba el rumbo con el mismo dedo: o corrias o
+     girabas. Con pedales, mantener B sube la velocidad todo el rato que se mantenga —la
+     aceleracion se integra, no hay tope de pulsacion— y A frena; a toques, frena a
+     toques. Parado y con A puesto, marcha atras. */
+  /* El pedal se lee del boton y de la tecla a la vez: la bateria mueve `teclas` a mano,
+     sin lanzar eventos, asi que mirando solo el estado del boton el coche no arrancaba
+     en las pruebas aunque en el juego fuese bien. */
+  const gas=(cMant||teclas[' '])?1:0, freno=(aMant||teclas.e)?1:0;
+  if(freno){
+   if(vf>0.02*MS*5)vf-=Math.min(vf,FRENO*dt);
+   else vf-=ACEL*.7*cans*dt;                   /* parado y frenando: marcha atras */
+  }
   if(fuerza>.12){
    const obj=Math.atan2(iy,ix);
    const dif=((obj-c.ang+Math.PI*3)%(Math.PI*2))-Math.PI;
-   if(Math.abs(dif)>2.36&&vf<1.2){
-    vf-=ACEL*.7*cans*dt;                       /* señala hacia atrás y está parado: recular */
-   }else{
+   {
     /* Casi parado el coche maniobra: gira en el sitio y no acelera hasta encarar. Es
        hacerle al jugador el cambio de sentido que en un móvil no se puede pedir — sin
        esto, arrancar mirando a una fachada eran dos segundos de volante y un golpe. */
@@ -6332,13 +6359,14 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
     c.ang+=clamp(dif,-1.1,1.1)*giro*dt;
     /* Cuanto más cerrada la curva, menos gas: así se traza en vez de rebotar. */
     if(!(parado&&torcido))
-     vf+=fuerza*ACEL*cans*dt*(1-clamp(Math.abs(dif)/3.14,0,.6));
+     vf+=gas*ACEL*cans*dt*(1-clamp(Math.abs(dif)/3.14,0,.6));
    }
-  }
+  }else if(gas) vf+=gas*ACEL*cans*dt;          /* recto, sin tocar el joystick */
   /* Sin gas frena de verdad; con gas solo hay rozamiento. Iba por un factor exponencial
      que a poca velocidad no frenaba nada y a mucha frenaba de golpe. */
-  if(fuerza<.12)vf-=Math.sign(vf)*Math.min(Math.abs(vf),FRENO*dt);
-  else vf*=(1-dt*.12);
+  /* Sin gas ni freno, el coche rueda: freno motor flojo, no una frenada. */
+  if(!gas&&!freno)vf-=Math.sign(vf)*Math.min(Math.abs(vf),0.6*MS*dt);
+  else if(gas)vf*=(1-dt*.12);
   vr*=Math.pow(.86,dt*60);
   vf=clamp(vf,-c.vmax*.42,c.vmax);
   c.vx=f.x*vf+r.x*vr;c.vy=f.y*vf+r.y*vr;
@@ -6364,7 +6392,15 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
   const m=Math.hypot(ix,iy);
   /* Velocidad analógica: el joystick a medias pasea y a fondo corre, sin escalón. Y por
      debajo del umbral, agachado: la mitad de rápido y la mitad de visible. */
-  const v=(player.sigilo?V_AGACHADO:V_ANDAR+fuerza*(V_CORRER-V_ANDAR))*cans;
+  /* La velocidad tiene inercia: el joystick pide una velocidad y las piernas tardan en
+     darla. Iba directa, asi que soltar y volver a empujar cambiaba de paseo a carrera en
+     un fotograma —y frenaba igual de seco— cuando arrancar a correr son dos zancadas.
+     Acelera a 3,5 m/s² y para a 6, que es mas o menos lo que hace una persona. */
+  const vObj=(m>.08?(player.sigilo?V_AGACHADO:V_ANDAR+fuerza*(V_CORRER-V_ANDAR)):0)*cans;
+  if(player.vel===undefined)player.vel=0;
+  const rampa=(vObj>player.vel?3.5:6)*MS*dt;
+  player.vel+=clamp(vObj-player.vel,-rampa,rampa);
+  const v=player.vel;
   if(m>.08){mover(player,player.x+ix/m*v*dt,player.y+iy/m*v*dt,false);
    /* Si la cruceta está puesta manda ella: se anda de lado sin dejar de apuntar. */
    if(!apuntando)player.d8=dir8De(ix,iy);
