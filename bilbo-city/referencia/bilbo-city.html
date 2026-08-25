@@ -2101,7 +2101,7 @@ const TORSOS={
  camisa:{b:C.blanco,s:C.crema,l:C.blanco,manga:'larga'},
  camisaRem:{b:C.blanco,s:C.crema,l:C.blanco,manga:'corta'},
  chaqueta:{b:C.azul,s:C.azulO,l:C.azulL,manga:'larga'},
- cazadora:{b:C.carbon,s:C.negro,l:C.gris,manga:'larga'},
+ cazadora:{b:C.asfalto,s:C.carbon,l:C.grisL,manga:'larga'},
  sudadera:{b:C.grisL,s:C.gris,l:C.acero,manga:'larga',capucha:1},
  chandal:{b:C.verde,s:C.verdeO,l:C.verdeL,manga:'larga',raya:C.hueso},
  mono:{b:C.azulL,s:C.azul,l:C.acero,manga:'larga',peto:1},
@@ -2109,19 +2109,22 @@ const TORSOS={
  gabardina:{b:C.crema,s:C.hormigonO,l:C.hueso,manga:'larga',largo:1},
  jersey:{b:C.rojoO,s:C.sangre,l:C.rojo,manga:'larga'},
  bata:{b:C.blanco,s:C.crema,l:C.blanco,manga:'larga',largo:1},
- uniforme:{b:C.azulO,s:C.negro,l:C.azul,manga:'larga',placa:1},
+ uniforme:{b:C.azulO,s:C.ria1,l:C.azul,manga:'larga',placa:1},
  camiseta:{b:C.mostaza,s:C.mostazaO,l:C.mostaza,manga:'corta'},
  polo:{b:C.verdeL,s:C.verde,l:C.verdeL,manga:'corta'},
  reflectante:{b:C.rojo,s:C.rojoO,l:C.mostaza,manga:'corta',bandas:1},
- delantal:{b:C.carbon,s:C.negro,l:C.gris,manga:'corta',mandil:1},
+ delantal:{b:C.asfalto,s:C.carbon,l:C.grisL,manga:'corta',mandil:1},
 };
 const PIERNAS={
- vaquero:{b:'#3a4f6b',s:'#2c3d53'},vestir:{b:C.carbon,s:C.negro},
- chandalP:{b:C.verdeO,s:'#24422a',raya:C.hueso},monoP:{b:C.azulL,s:C.azul},
- falda:{b:C.morado,s:'#443759',falda:1},short:{b:C.crema,s:C.hormigonO,corto:1},
- cargo:{b:'#5d5b45',s:'#474535'},uniformeP:{b:C.azulO,s:C.negro},
+ vaquero:{b:'#3a4f6b',s:'#2c3d53',l:C.ria5},vestir:{b:C.asfalto,s:C.carbon,l:C.gris},
+ chandalP:{b:C.verdeO,s:'#24422a',l:C.verde,raya:C.hueso},monoP:{b:C.azulL,s:C.azul,l:C.ria5},
+ falda:{b:C.morado,s:'#443759',l:C.ria5,falda:1},short:{b:C.crema,s:C.hormigonO,l:C.hueso,corto:1},
+ cargo:{b:'#5d5b45',s:'#474535',l:C.verde5},uniformeP:{b:C.azulO,s:C.ria1,l:C.azul},
 };
-const CALZADO={deportivas:C.blanco,botas:'#3a2d22',zapatos:C.negro,katiuskas:C.mostazaO};
+/* El calzado va con su terna como todo lo demás: la suela es la sombra. Un zapato de un
+   solo tono se leía como un tapón, y si ese tono era el negro del contorno, ni eso. */
+const CALZADO={deportivas:{b:C.blanco,s:C.acero},botas:{b:'#3a2d22',s:C.ladrillo0},
+ zapatos:{b:C.asfalto,s:C.carbon},katiuskas:{b:C.mostazaO,s:C.luz2}};
 
 function dibChar(cfg,pose,d8){
  const M=MAPA8[d8], dir=M.b, frente=M.f, espalda=M.e;
@@ -2133,24 +2136,47 @@ function dibChar(cfg,pose,d8){
  const oy=P_.y, yt=P_.yt||0, w=comp.w, hom=comp.hom-(diag?1:0)-(lateral?2:0);
  const izqV=dir===IZ, derV=dir===DE, arr=(dir===AR)||espalda;
  const py=17+oy, l1=P_.p[0], l2=P_.p[1];
- if(PN.falda){P(g,cx-w/2-1,py-1,w+2,6,PN.b);P(g,cx-w/2-1,py+4,w+2,1,PN.s);
-  P(g,cx-3,py+5,2,4,cfg.piel);P(g,cx+1,py+5,2,4,cfg.piel);}
+ /* La pernera de delante lleva su canto claro a la izquierda, que es de donde viene la
+    luz, y la de detrás se queda en sombra: sin eso las dos piernas son un solo bloque. */
+ if(PN.falda){P(g,cx-w/2-1,py-1,w+2,6,PN.b);P(g,cx-w/2-1,py-1,w+2,1,PN.l);P(g,cx-w/2-1,py+4,w+2,1,PN.s);
+  P(g,cx-3,py+5,2,4,cfg.piel);P(g,cx+1,py+5,2,4,cfg.piel);
+  P(g,cx-3,py+8,2,1,cfg.pielS);P(g,cx+1,py+8,2,1,cfg.pielS);}
  else if(lateral){const dx=derV?1:-1;
   P(g,cx-2-dx,py+l2,3,8-l2,PN.s);P(g,cx-2+dx,py+l1,3,8-l1,PN.b);
+  P(g,cx-2+dx,py+l1,1,8-l1,PN.l);
   if(PN.corto)P(g,cx-2+dx,py+4,3,4,cfg.piel);}
  else{P(g,cx-3,py+l1,3,8-l1,PN.b);P(g,cx,py+l2,3,8-l2,PN.s);
+  P(g,cx-3,py+l1,1,8-l1,PN.l);
   if(PN.raya){P(g,cx-3,py+l1,1,8-l1,PN.raya);P(g,cx+2,py+l2,1,8-l2,PN.raya);}
   if(PN.corto){P(g,cx-3,py+4,3,4,cfg.piel);P(g,cx,py+4,3,4,cfg.piel);}}
- if(lateral){const dx=derV?1:-1;
-  P(g,cx-2-dx,24+oy,3,2,CALZADO[cfg.calzado]);P(g,cx-2+dx,24+oy,4,2,CALZADO[cfg.calzado]);}
- else{P(g,cx-3,24+oy,3,2,CALZADO[cfg.calzado]);P(g,cx,24+oy,3,2,CALZADO[cfg.calzado]);}
+ /* Bajo falda los pies van donde la falda deja las piernas —dos píxeles— y no donde los
+    pone la plantilla lateral, que son tres y cuatro: descuadrados asomaba medio zapato por
+    fuera de la pernera. */
+ const Z=CALZADO[cfg.calzado];
+ if(PN.falda){P(g,cx-3,24+oy,2,2,Z.b);P(g,cx+1,24+oy,2,2,Z.b);
+  P(g,cx-3,25+oy,2,1,Z.s);P(g,cx+1,25+oy,2,1,Z.s);}
+ else if(lateral){const dx=derV?1:-1;
+  P(g,cx-2-dx,24+oy,3,2,Z.b);P(g,cx-2+dx,24+oy,4,2,Z.b);
+  P(g,cx-2-dx,25+oy,3,1,Z.s);P(g,cx-2+dx,25+oy,4,1,Z.s);}
+ else{P(g,cx-3,24+oy,3,2,Z.b);P(g,cx,24+oy,3,2,Z.b);
+  P(g,cx-3,25+oy,3,1,Z.s);P(g,cx,25+oy,3,1,Z.s);}
  const ty=9+oy+yt,th=T.largo?10:8;
- P(g,cx-hom/2,ty,hom,th,T.b);P(g,cx-hom/2,ty,hom,2,T.l);P(g,cx+hom/2-1,ty,1,th,T.s);
+ /* Antes el tono claro eran las dos filas de arriba enteras: eso no es volumen, es una
+    franja, y el torso quedaba de cartón. La regla de ESTILO.md es 1 px claro arriba y a la
+    izquierda, base en el cuerpo y oscuro abajo y a la derecha. La fila oscura de abajo hace
+    además de dobladillo y despega el torso de las perneras. */
+ P(g,cx-hom/2,ty,hom,th,T.b);
+ P(g,cx-hom/2,ty,hom,1,T.l);P(g,cx-hom/2,ty,1,th,T.l);
+ P(g,cx+hom/2-1,ty,1,th,T.s);P(g,cx-hom/2,ty+th-1,hom,1,T.s);
  if(T.raya)P(g,cx-hom/2,ty,1,th,T.raya);
  if(T.peto){P(g,cx-hom/2+1,ty+2,hom-2,5,T.l);P(g,cx-1,ty+3,2,2,T.s);}
  if(T.bandas){P(g,cx-hom/2,ty+3,hom,1,C.hueso);P(g,cx-hom/2,ty+6,hom,1,C.hueso);}
- if(T.mandil&&!arr)P(g,cx-hom/2+1,ty+2,hom-2,th-1,C.crema);
+ if(T.mandil&&!arr)P(g,cx-hom/2+1,ty+2,hom-2,th-3,C.crema);
  if(T.placa&&!arr)P(g,cx-hom/2+1,ty+3,2,2,C.mostaza);
+ /* Dos píxeles de cuello bajo la barbilla. Sin ellos la cabeza se apoya en los hombros
+    sin transición y la figura parece un muñeco de dos piezas. Bajo capucha no van: ahí lo
+    que hay es tela. */
+ if(!T.capucha)P(g,cx-1,ty,2,1,cfg.pielS);
  if(T.capucha)P(g,cx-hom/2,ty-1,hom,3,T.s);
  const b1=P_.b[0],b2=P_.b[1];
  const manoY=T.manga==='corta'?ty+4:ty+7, bx1=cx-hom/2-2, bx2=cx+hom/2;
@@ -2223,7 +2249,14 @@ function capasEncima(g,cfg,cx,hy,ty,hom,E,soloGrandes){
  const A=cfg.acces;
  if(A==='mochila'){if(arr)P(g,cx-4,ty+1,8,7,C.verdeO);
   else{P(g,cx-hom/2-1,ty+2,2,5,C.verdeO);P(g,cx+hom/2-1,ty+2,2,5,C.verdeO);}}
- else if(A==='bolso'){P(g,cx+hom/2-1,ty+5,3,3,C.maderaO);P(g,cx-1,ty+1,hom/2,1,C.madera);}
+ /* El bolso va colgado de un hombro y por eso no puede quedarse clavado en el mismo
+    costado en las ocho direcciones, que es lo que hacía: de espaldas se ve al otro lado y
+    la correa cruza entera; de perfil, solo el bulto del lado que mira. */
+ else if(A==='bolso'){
+  if(arr){P(g,cx-hom/2-1,ty+5,3,3,C.maderaO);P(g,cx-hom/2,ty+1,hom,1,C.madera);}
+  else if(izqV){P(g,cx-hom/2-2,ty+5,3,3,C.maderaO);P(g,cx-hom/2,ty+1,hom/2,1,C.madera);}
+  else if(derV){P(g,cx+hom/2-1,ty+5,3,3,C.maderaO);P(g,cx,ty+1,hom/2,1,C.madera);}
+  else{P(g,cx+hom/2-1,ty+5,3,3,C.maderaO);P(g,cx-1,ty+1,hom/2,1,C.madera);}}
  else if(A==='bandolera'){P(g,cx-hom/2,ty+1,hom,1,C.maderaO);P(g,cx-hom/2-1,ty+5,2,3,C.madera);}
  else if(A==='bufanda'){P(g,cx-4,ty-1,8,2,C.rojo);P(g,cx+1,ty+1,2,4,C.rojoO);}
  else if(A==='gafas'&&dir===AB){P(g,cx-3,hy+4,2,2,C.carbon);P(g,cx+1,hy+4,2,2,C.carbon);P(g,cx-1,hy+4,2,1,C.carbon);}
@@ -2372,8 +2405,8 @@ function lutDe(cfg){
  pinta(R.pelo,cfg.pelo==='calvo'?[cfg.pielS,cfg.piel]
   :[cfg.pelo==='canoso'?C.pelo5:cfg.pelocol]);
  pinta(R.torso,[T.s,T.b,T.l]);
- pinta(R.piernas,[PN.s,PN.b]);
- pinta(R.calzado,[CALZADO[cfg.calzado]]);
+ pinta(R.piernas,[PN.s,PN.b,PN.l]);
+ pinta(R.calzado,[CALZADO[cfg.calzado].s,CALZADO[cfg.calzado].b]);
  return lut;}
 
 /* Dónde tiene la cabeza esta casilla de la hoja. No se da por supuesto: el dibujo traído
