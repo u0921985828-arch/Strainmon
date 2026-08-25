@@ -337,6 +337,11 @@ public static class Acciones {
         var E = Estado.I;
         switch (n.Tipo) {
             case "jefe": {
+                if (E.Prologo) {
+                    Dialogo.I.Abrir("Txema", new[]{"Tú eres el primo de Yeray, el de las islas.",
+                        "Deja la bolsa en el piso y luego hablamos de trabajar."}, null);
+                    return;
+                }
                 var m = Misiones.I.Siguiente();
                 if (Misiones.I.Activa != null) {
                     Dialogo.I.Abrir("Txema", new[]{"Estás en mitad de un marrón. Termínalo."}, new[]{
@@ -471,6 +476,24 @@ public static class Acciones {
                         E.Dinero -= 250; E.Hp = Mathf.Min(100, E.Hp + 60);
                         Hud.I.Aviso("CHALECO PUESTO"); }}});
                 return;
+            case "primo": {
+                if (E.Prologo) { Dialogo.I.Abrir("Yeray", new[]{"Suelta la bolsa, anda."}, null); return; }
+                string estP = Bienes.EstadoCasera();
+                string linP =
+                    estP == "desahuciado" ? "Amaia ha cambiado la cerradura. A mí no me mires: yo pago lo mío." :
+                    E.Deuda > 0 ? "Debes " + E.Deuda + " € y Amaia lleva mejor la cuenta que tú." :
+                                  "Aupa. La cocina está como la dejaste.";
+                Dialogo.I.Abrir("Yeray", new[]{linP}, new[]{
+                    new Opcion{ Texto="Cenar lo que haya", Coste="4 €", Accion=() => {
+                        if (E.Dinero < 4) { Hud.I.Aviso("NO TE LLEGA NI PARA ESO"); return; }
+                        E.Dinero -= 4;
+                        E.Hambre = Mathf.Min(1f, E.Hambre + 0.55f);
+                        E.Energia = Mathf.Min(1f, E.Energia + 0.15f);
+                        AudioProc.I.Sfx("dinero", 1f);
+                        Hud.I.Aviso("CENA DE PISO · −4 €"); }},
+                    new Opcion{ Texto="Nada" }});
+                return;
+            }
             case "casera": {
                 var ops = new List<Opcion>();
                 if (Bienes.EsMio("pisosantutxu")) {

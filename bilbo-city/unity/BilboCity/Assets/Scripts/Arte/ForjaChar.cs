@@ -156,6 +156,7 @@ public static class ForjaChar {
             Add(A("koldo","corpulenta",1,"calvo",Paleta.Pelo1,"ninguno",Paleta.Carbon,"camisa","cargo","botas","ninguno"));
             Add(A("amaia","media",0,"mono",Paleta.Pelo5,"ninguno",Paleta.Carbon,"jersey","falda","zapatos","bolso"));
             Add(A("enfermera","delgada",3,"coleta",Paleta.Pelo1,"ninguno",Paleta.Carbon,"bata","vestir","deportivas","ninguno"));
+            Add(A("yeray","corpulenta",2,"corto",Paleta.Pelo2,"ninguno",Paleta.Carbon,"sudadera","vaquero","deportivas","ninguno"));
             Add(A("p1","media",0,"corto",Paleta.Pelo2,"ninguno",Paleta.Carbon,"camisa","vestir","zapatos","bandolera"));
             Add(A("p2","delgada",1,"melena",Paleta.Pelo2,"ninguno",Paleta.Carbon,"gabardina","falda","zapatos","bolso"));
             Add(A("p3","media",2,"mono",Paleta.Pelo3,"ninguno",Paleta.Carbon,"jersey","falda","zapatos","carrito"));

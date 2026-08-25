@@ -2,7 +2,7 @@
  * Saca una captura del juego en marcha, sobre el DOM simulado.
  *
  *   node herramientas/html/captura.js [salida.png] [--pasos N] [--anda N] [--dentro id]
- *                                       [--donde x,y]
+ *                                       [--donde x,y] [--rotulo t] [--poi id]
  *
  * El arte se juzga mal en una lámina de contacto: ahí cada sprite está solo y sobre un
  * fondo elegido. En la calle cae encima del asfalto, de la acera y del portal, y al lado
@@ -52,7 +52,9 @@ listo().then(() => {
 
   const dentro = txt('--dentro');
   if (dentro) {
-    A.entrar(dentro, { x: A.player.x, y: A.player.y }, txt('--rotulo'));
+    // El sitio del mapa importa dentro: el piso de Santutxu es compartido y el primo
+    // solo sale por esa puerta, no en los pisos que se compran con el mismo plano.
+    A.entrar(dentro, { x: A.player.x, y: A.player.y }, txt('--rotulo'), txt('--poi'));
     // entrar() va con fundido: hay que dejar pasar el temporizador antes de la foto.
     return setTimeout(() => { paso(20); volcar(); }, 400);
   }

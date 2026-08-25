@@ -38,6 +38,34 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
   paso(60);
 
   try {
+    // ── 0 · el prólogo: llegas de Canarias y conoces el piso ───────────
+    /* Una partida nueva no empieza con el piso puesto: empieza en Moyúa, con la bolsa y
+       el primo al teléfono. Se juega entera aquí porque es lo único que ve sí o sí un
+       jugador nuevo, y porque va montada sobre el motor de misiones: cualquier cambio
+       ahí se la lleva por delante sin que nada más se entere. */
+    {
+      ok(S.prologo === 1, 'una partida nueva no arranca el prólogo');
+      ok(!!S.mision && S.mision.def.prologo, 'el prólogo no monta sus pasos');
+      const moy = A.poi('moyua').p;
+      ok(Math.hypot(P.x - moy.x, P.y - moy.y) < 3, 'no se llega a Bilbao por Moyúa');
+      ok(A.poi('piso').n === 'Piso de Yeray', 'el piso es tuyo antes de que te den la llave');
+      // La llamada del primo deja el diálogo abierto, y con diálogo abierto el bucle no
+      // mira los objetivos: hay que colgar, igual que cuelga el jugador.
+      A.cerrarDlg();
+      const o = A.objetivo(); P.x = o.x; P.y = o.y; paso(8);
+      const p = A.pasoActual();
+      ok(!!p && p.t === 'entrar' && p.poi === 'piso', 'llegar a Santutxu no cierra el primer paso');
+      A.entrar('piso', { x: P.x, y: P.y }, 'Tu piso', 'piso'); await dormir(280); paso(8);
+      ok(S.prologo === 0 && !S.mision, 'entrar en el piso no cierra el prólogo');
+      ok(A.poi('piso').n === 'Tu piso', 'el piso no pasa a ser tuyo al instalarte');
+      const primo = (S.interior.npcs || []).find(n => n.tipo === 'primo');
+      ok(!!primo, 'el primo no está en el piso compartido');
+      // Vive en el de Santutxu, no en los que se compran: la plantilla no se toca.
+      ok(A.INT.piso.npcs.length === 0, 'el primo se queda pegado a la plantilla del piso');
+      A.cerrarDlg(); A.salir(); await dormir(280); paso(8);
+      if (primo) bien.push('el prólogo: Moyúa, metro a Santutxu y el piso de ' + primo.n);
+    }
+
     // ── 1 · la campaña entera ──────────────────────────────────────────
     for (let k = 0; k < A.MISIONES.length; k++) {
       S.misionIdx = k; S.hp = 100; S.muerto = 0;

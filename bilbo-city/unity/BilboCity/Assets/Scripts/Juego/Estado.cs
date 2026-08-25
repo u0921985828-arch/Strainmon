@@ -74,6 +74,9 @@ public class Estado {
     /// si estás durmiendo ahí a la fuerza.
     public int CaseraPaciencia = 3;
     public bool CaseraAvisada, CaseraDesahucio, CaseraOkupa;
+    /// <summary>La llegada a Bilbao, sin terminar. Se guarda: recargar en mitad del
+    /// prólogo te dejaría en la calle sin saber a dónde ibas.</summary>
+    public bool Prologo;
     /// Lo que el HUD pinta en el ojo: la sospecha más alta de los que te rodean, y si
     /// alguno te tiene a la vista ahora mismo.
     public float Sospecha;

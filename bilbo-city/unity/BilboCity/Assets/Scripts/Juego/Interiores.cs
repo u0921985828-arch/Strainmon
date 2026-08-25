@@ -32,8 +32,10 @@ public static class Interiores {
                 new NpcInterior{ X=3.5f, Y=2.6f, Nombre="Josu", Arq="josu", Tipo="barman" },
                 new NpcInterior{ X=11.5f, Y=2.6f, Nombre="Txema", Arq="txema", Tipo="jefe" },
                 new NpcInterior{ X=6.5f, Y=8.4f, Nombre="Mikel", Arq="mikel", Tipo="parroquiano" }}}},
+        // Dos camas porque es un piso compartido: la de la izquierda es la del primo. Los
+        // pisos que se compran reaprovechan este plano, y ahí la segunda pasa por la de invitados.
         {"piso", new DefInterior{ Nombre="Tu piso", Suelo="hidraulico", Pared="paredBlanca", Mapa=new[]{
-            "##############","#CC.......WWW#","#CC..........#","#............#",
+            "##############","#CC.......CC.#","#CC.......CC.#","#..........WW#",
             "#....MM......#","#....MM......#","#............#","#####DD#######"},
             Npcs=new NpcInterior[0]}},
         {"taller", new DefInterior{ Nombre="Taller Iker", Suelo="sueloTaller", Pared="paredChapa", Mapa=new[]{
@@ -124,8 +126,13 @@ public static class Interiores {
     public static void Entrar(string id, Vector2 desde, string nombre = null, string poi = null) {
         PoiActual = poi;
         var d = Todos[id];
-        Actual = nombre == null ? d : new DefInterior{
-            Nombre=nombre, Suelo=d.Suelo, Pared=d.Pared, Mapa=d.Mapa, Npcs=d.Npcs };
+        // El piso de Santutxu es compartido y el primo está dentro. Se le añade aquí y no en
+        // la plantilla porque el mismo plano lo usan los pisos que se compran, y allí no vive
+        // nadie: metido en Todos["piso"] saldría también en el loft y en el caserío.
+        var npcs = (poi == "piso" && !Estado.I.CaseraDesahucio)
+            ? new List<NpcInterior>(d.Npcs){ Prologo.Primo }.ToArray() : d.Npcs;
+        Actual = (nombre == null && npcs == d.Npcs) ? d : new DefInterior{
+            Nombre=nombre ?? d.Nombre, Suelo=d.Suelo, Pared=d.Pared, Mapa=d.Mapa, Npcs=npcs };
         Volver = desde;
         Estado.I.EnInterior = true;
         var J = Juego.I;
@@ -136,6 +143,10 @@ public static class Interiores {
         J.Jug.Dir8 = 4;
         Construir();
         J.MostrarCiudad(false);
+        // Un paso de entrar no lo puede ver el Tic de misiones: dentro de un interior el
+        // bucle no llega a mirarlo.
+        var pa = Misiones.I != null && Misiones.I.Activa != null ? Misiones.I.Activa.Actual : null;
+        if (pa != null && pa.Tipo == "entrar" && pa.Poi == poi) Misiones.I.Avanzar();
     }
 
     public static void Salir() {

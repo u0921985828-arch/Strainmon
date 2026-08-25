@@ -139,9 +139,12 @@ public class Juego : MonoBehaviour {
         Poblar();
         MontarMarcas();
 
-        Guardado.Cargar();
+        bool hay = Guardado.Cargar();
         _listo = true;
-        Hud.I.Aviso("VIVE DONDE PUEDAS. COBRA DONDE TOQUE", 3.4f);
+        // Partida nueva: no se empieza en el piso, se empieza llegando a la ciudad.
+        if (!hay) Prologo.Empezar();
+        else if (Estado.I.Prologo) Prologo.Retomar();
+        else Hud.I.Aviso("PARTIDA CARGADA · DÍA " + Estado.I.Dia, 3.4f);
     }
 
     Canvas MontarCanvas() {

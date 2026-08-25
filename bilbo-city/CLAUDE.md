@@ -396,6 +396,32 @@ Las paradas de bus **no son POIs** y no llevan coordenada escrita: se sacan del 
 cada barrio en el plano, con la acera más cercana. Treinta y cuatro chinchetas más taparían
 la ciudad en el radar, así que se encuentran estando encima.
 
+## El prólogo: llegar a Bilbao
+
+Una partida nueva **no empieza con el piso puesto**. Empieza en **Plaza Moyúa**, a las
+19:20, recién bajado del autobús del aeropuerto y con el primo al teléfono: **Yeray**,
+canario como el protagonista pero afincado aquí, que comparte el piso de Santutxu.
+
+Va montado sobre el motor de misiones —con la marca `prologo` / `EsPrologo`, que es lo que
+le quita el pago, el contador de misiones y la recogida de enemigos—, así que hereda gratis
+la flecha, el cartel del HUD y el aviso de cada paso. Son dos pasos, y cada uno enseña una
+cosa que hace falta para moverse por la ciudad: **coger el metro** (Moyúa → Santutxu, 3 €,
+que andando son 2,3 km) y **entrar en un sitio**.
+
+Tres detalles que no son evidentes:
+
+- **El paso de `entrar` no lo puede ver el bucle de objetivos.** Dentro de un interior la
+  vuelta se va por `actInterior` y no llega a mirarlos, así que lo comprueba `entrar()`.
+- **El primo no está en la plantilla del interior.** El plano de `piso` lo reaprovechan las
+  viviendas que se compran, y metido en `INT.piso` saldría también en el loft y en el
+  caserío: se añade al entrar, y solo en la puerta de Santutxu.
+- **El prólogo se guarda** (`S.prologo`). Recargar en mitad de la llegada, sin eso, te deja
+  en la calle sin saber a dónde ibas.
+
+El piso se llama **«Piso de Yeray»** en el plano hasta que te instalas; después es tuyo, con
+su recibo y su casera. Y el utilitario aparcado en el portal desde el minuto uno ya tiene
+dueño: es del primo, y lo dice él.
+
 ## Nivel, propiedades y alquiler
 
 La fama por gremio (`S.rep`) ya existía y desbloquea curros, pero es local. El **nivel de

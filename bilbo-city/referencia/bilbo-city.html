@@ -2386,6 +2386,7 @@ const ARQ={
  koldo:A('koldo','corpulenta',1,'calvo',C.pelo1,'ninguno',null,'camisa','cargo','botas','ninguno'),
  amaia:A('amaia','media',0,'mono',C.pelo5,'ninguno',null,'jersey','falda','zapatos','bolso'),
  enfermera:A('enfermera','delgada',3,'coleta',C.pelo1,'ninguno',null,'bata','vestir','deportivas','ninguno'),
+ yeray:A('yeray','corpulenta',2,'corto',C.pelo2,'ninguno',null,'sudadera','vaquero','deportivas','ninguno'),
  p1:A('p1','media',0,'corto',C.pelo2,'ninguno',null,'camisa','vestir','zapatos','bandolera'),
  p2:A('p2','delgada',1,'melena',C.pelo2,'ninguno',null,'gabardina','falda','zapatos','bolso'),
  p3:A('p3','media',2,'mono',C.pelo3,'ninguno',null,'jersey','falda','zapatos','carrito'),
@@ -3620,8 +3621,11 @@ const INT={
   '#..............#','#######DD#######'],
   npcs:[{x:3.5,y:2.6,n:'Josu',arq:'josu',tipo:'barman'},{x:11.5,y:2.6,n:'Txema',arq:'txema',tipo:'jefe'},
         {x:6.5,y:8.4,n:'Mikel',arq:'mikel',tipo:'parroquiano'}]},
+ /* Dos camas porque es un piso compartido: la de la izquierda es la del primo. Los
+    pisos que se compran reaprovechan este plano, y ahí la segunda cama pasa por la de
+    invitados. */
  piso:{n:'Tu piso',suelo:'sueloCasa',pared:'paredBlanca',mapa:[
-  '##############','#CC.......WWW#','#CC..........#','#............#','#....MM......#',
+  '##############','#CC.......CC.#','#CC.......CC.#','#..........WW#','#....MM......#',
   '#....MM......#','#............#','#####DD#######'],npcs:[]},
  taller:{n:'Taller Iker',suelo:'sueloTaller',pared:'paredChapa',mapa:[
   '################','#VVVV....VVVV.W#','#VVVV....VVVV..#','#..............#',
@@ -3778,6 +3782,7 @@ const S={
  sospecha:0,visto:false,
  xp:0,nivel:1,props:{},
  casera:{paciencia:3,avisada:0,desahucio:false,okupa:false},
+ prologo:0,
 };
 const player={x:0,y:0,d8:0,pose:'quieto',anim:0,enCoche:null,cad:0,herido:0,arq:'protagonista',
  sigilo:false,corriendo:false};
@@ -4566,12 +4571,54 @@ function generarEnemigos(p){
  if(p.estrellas)estrellas(p.estrellas);}
 function terminarMision(ok){
  const m=S.mision;if(!m)return;
+ /* El prólogo se apoya en el motor de misiones para tener flecha y cartel, pero no paga,
+    no cuenta para el contador de misiones y no deja enemigos que recoger. */
+ if(m.def.prologo){S.mision=null;if(ok)finPrologo();return;}
  if(ok){S.dinero+=m.def.pago;S.rep.calle+=2;S.misionIdx++;darXp(Math.round(m.def.pago*1.4));
   grande('MISIÓN CUMPLIDA',2.6);sfx('dinero');
   hablar(m.def.giver,m.def.fin.concat(['+'+m.def.pago+' €']));}
  else grande('MISIÓN FALLIDA',2.4);
  for(let i=enemigos.length-1;i>=0;i--)if(enemigos[i].mision)enemigos.splice(i,1);
  S.mision=null;guardar();}
+
+/*═══════════════ EL PRÓLOGO ═══════════════*/
+/* La partida no empieza con el piso puesto: empieza bajando del autobús del aeropuerto en
+   Moyúa con una bolsa. Reaprovecha el motor de misiones —pasos, flecha y cartel— con la
+   marca `prologo`, que es lo que le quita el pago y el contador. Los dos pasos enseñan de
+   paso las dos cosas que hacen falta para moverse: el metro y entrar en un sitio. */
+const PRIMO={x:8.5,y:5.6,n:'Yeray',arq:'yeray',tipo:'primo'};
+const PROLOGO={n:'Recién llegado',prologo:true,giver:'Yeray',pago:0,
+ pasos:()=>[
+  {t:'ir',p:poi('mtsantutxu').p,txt:'SUBE A SANTUTXU · METRO EN MOYÚA'},
+  {t:'entrar',poi:'piso',p:poi('piso').p,txt:'ENTRA EN EL PISO DE KEPA'}]};
+function retomarPrologo(){
+ /* Hasta que no duermes ahí, el piso es el del primo: el rótulo del plano lo dice. */
+ poi('piso').n='Piso de Yeray';
+ empezarMision(PROLOGO);}
+function empezarPrologo(){
+ S.prologo=1;S.min=19*60+20;
+ player.x=poi('moyua').p.x;player.y=poi('moyua').p.y+1.2;
+ retomarPrologo();
+ hablar('Yeray · al teléfono',[
+  '¿Ya has aterrizado? Aupa, primo.',
+  'Aquí llueve. Te aviso para que no te lleves la sorpresa tú solo.',
+  'Yo salgo de currar a las diez, pero la llave te la dejo yo en mano.',
+  'Estás en Moyúa. Ahí mismo tienes el metro: bájate en Santutxu.',
+  'Portal viejo, tercero. Y no llames al segundo, que es la casera.'],
+  [{txt:'Voy para allá',fn:()=>{}}]);}
+function finPrologo(){
+ S.prologo=0;poi('piso').n='Tu piso';
+ grande('BILBAO',2.6);
+ hablar('Yeray',[
+  'Ya era hora. ¿Ese es todo el equipaje?',
+  'Esa habitación es la tuya. La cama la bajó un vecino de una lonja, así que no preguntes.',
+  'El piso es de Amaia, la del segundo. '+S.alquiler+' € al mes, y no le gusta esperar.',
+  'Yo pongo lo mío. Lo tuyo lo pones tú, que para eso has cruzado medio Atlántico.',
+  'El coche de abajo es mío. Cógelo si te hace falta, pero me lo traes con las cuatro ruedas.',
+  'Y si quieres cobrar rápido, en el Bar Zurito hay un tal Txema que siempre anda pidiendo favores.'],
+  [{txt:'¿Y de cenar?',fn:()=>hablar('Yeray',['Huevos y poco más.','Mañana bajas tú a la Ribera.'])},
+   {txt:'Me pongo a ello',fn:()=>aviso('VIVE DONDE PUEDAS. COBRA DONDE TOQUE',3.4)}]);
+ guardar();}
 
 /*═══════════════ ACCIONES ═══════════════*/
 function tileInt(x,y){const m=S.interior.mapa,fy=Math.floor(y),fx=Math.floor(x);
@@ -4580,9 +4627,16 @@ function tileInt(x,y){const m=S.interior.mapa,fy=Math.floor(y),fx=Math.floor(x);
    distinto en la puerta, que es lo que pasa en cualquier barrio. */
 function entrar(id,desde,nombre,poiId){fundir(()=>{
  S.interior={...INT[id],id,poi:poiId||null};if(nombre)S.interior.n=nombre;
+ /* El piso de Santutxu es compartido y el primo está dentro. Se le añade aquí y no en la
+    plantilla porque el mismo plano lo usan los pisos que se compran, y allí no vive
+    nadie. La copia es a propósito: empujarlo en INT.piso lo dejaría también en esos. */
+ if(poiId==='piso'&&!S.casera.desahucio)S.interior.npcs=INT[id].npcs.concat([PRIMO]);
  const m=S.interior.mapa;let px=2,py=2;
  for(let y=0;y<m.length;y++)for(let x=0;x<m[y].length;x++)if(m[y][x]==='D'){px=x+.5;py=y-.7;}
- S.escena='interior';player.enCoche=null;player.x=px;player.y=py;player.d8=4;S.volver=desde;});}
+ S.escena='interior';player.enCoche=null;player.x=px;player.y=py;player.d8=4;S.volver=desde;
+ /* Un paso de entrar no lo puede ver comprobarObjetivos: dentro de un interior el bucle
+    se va por actInterior y nunca llega a mirarlo. */
+ const p=pasoActual();if(p&&p.t==='entrar'&&p.poi===poiId)avanzarPaso();});}
 function salir(){fundir(()=>{S.escena='ciudad';player.x=S.volver.x;player.y=S.volver.y+1.2;S.interior=null;});}
 function poiCerca(){let m=null,md=1.8;for(const p of POI){const d=dist(p.p,player);if(d<md){md=d;m=p;}}return m;}
 function cocheCerca(){let m=null,md=1.7;
@@ -4647,6 +4701,8 @@ function dormir(){
 const tieneArmaFuego=()=>ARMAS.some(a=>!a.cuerpo&&S.armas[a.id]>0);
 function hablarCon(n){
  if(n.tipo==='jefe'){
+  if(S.prologo)return hablar('Txema',['Tú eres el primo de Yeray, el de las islas.',
+   'Deja la bolsa en el piso y luego hablamos de trabajar.']);
   const m=MISIONES[S.misionIdx];
   if(S.mision)return hablar('Txema',['Estás en mitad de un marrón. Termínalo.'],
    [{txt:'Abandonar la misión',fn:()=>terminarMision(false)},{txt:'Voy a ello',fn:()=>{}}]);
@@ -4716,6 +4772,18 @@ function hablarCon(n){
   {txt:'Que me curen',fn:()=>curar()},
   {txt:'Comprar chaleco',coste:'250 €',fn:()=>{if(S.dinero<250)return aviso('No te llega');
    S.dinero-=250;S.hp=Math.min(100,S.hp+60);aviso('Chaleco puesto');}}]);
+ if(n.tipo==='primo'){
+  if(S.prologo)return hablar('Yeray',['Suelta la bolsa, anda.']);
+  const est=estadoCasera();
+  const l=est==='desahuciado'?'Amaia ha cambiado la cerradura. A mí no me mires: yo pago lo mío.'
+   :S.deuda>0?'Debes '+S.deuda+' € y Amaia lleva mejor la cuenta que tú.'
+   :'Aupa. La cocina está como la dejaste.';
+  return hablar('Yeray',[l],[
+   {txt:'Cenar lo que haya',coste:'4 €',fn:()=>{
+    if(S.dinero<4)return aviso('No te llega ni para eso');
+    S.dinero-=4;S.hambre=Math.min(1,S.hambre+.55);S.energia=Math.min(1,S.energia+.15);
+    sfx('dinero');aviso('Cena de piso · −4 €');}},
+   {txt:'Nada',fn:()=>{}}]);}
  if(n.tipo==='casera'){
   if(esMio('pisosantutxu'))return hablar('Amaia',['Ahora el piso es tuyo. Yo solo bajo la basura.'],[
    {txt:'Preguntar por el barrio',fn:()=>aviso('«Aquí siempre ha llovido y siempre se ha currado»')}]);
@@ -6993,17 +7061,18 @@ function guardar(){
   deuda:S.deuda,alquiler:S.alquiler,ultCobro:S.ultCobro,tiene:S.tiene,contrato:S.contrato,
   armas:Object.fromEntries(Object.entries(S.armas).map(([k,v])=>[k,v===Infinity?-1:v])),
   armaAct:S.armaAct,misionIdx:S.misionIdx,pinta:S.pinta,
-  xp:S.xp,nivel:S.nivel,props:S.props,casera:S.casera,x:player.x,y:player.y}));}
+  xp:S.xp,nivel:S.nivel,props:S.props,casera:S.casera,prologo:S.prologo,x:player.x,y:player.y}));}
 async function cargar(){
  const raw=await alm.get(CLAVE);if(!raw)return false;
  try{const d=JSON.parse(raw);
   Object.assign(S,{dinero:d.dinero,hp:d.hp??100,energia:d.energia,hambre:d.hambre,min:d.min,dia:d.dia,
    rep:d.rep||S.rep,deuda:d.deuda||0,alquiler:d.alquiler||220,ultCobro:d.ultCobro||1,
    tiene:d.tiene||S.tiene,contrato:d.contrato||null,misionIdx:d.misionIdx||0,armaAct:d.armaAct||'punos',
-   xp:d.xp||0,nivel:d.nivel||1,props:d.props||{},casera:d.casera||S.casera});
+   xp:d.xp||0,nivel:d.nivel||1,props:d.props||{},casera:d.casera||S.casera,prologo:d.prologo||0});
   S.armas={};Object.entries(d.armas||{punos:-1}).forEach(([k,v])=>S.armas[k]=v===-1?Infinity:v);
   if(S.armas.punos===undefined)S.armas.punos=Infinity;
   if(d.pinta)vestir(d.pinta);
+  if(S.prologo)retomarPrologo();
   player.x=d.x;player.y=d.y;
   if(S.tiene.deportivo){tuCoche.tipo='deportivo';tuCoche.lib=2;tuCoche.vmax=vmaxDe('deportivo');}
   else if(S.tiene.furgo){tuCoche.tipo='furgoLarga';tuCoche.vmax=vmaxDe('furgoLarga');}
@@ -7132,7 +7201,8 @@ async function arrancar(){
  if(!hay)bc.style.pointerEvents='none';
  const entrar1=nuevo=>{audioInit();tituloEl.style.display='none';
   if(!arrancado){arrancado=true;ult=performance.now();requestAnimationFrame(bucle);}
-  aviso(nuevo?'VIVE DONDE PUEDAS. COBRA DONDE TOQUE':'PARTIDA CARGADA · DIA '+S.dia,3.4);};
+  if(nuevo)empezarPrologo();
+  else aviso('PARTIDA CARGADA · DIA '+S.dia,3.4);};
  bc.addEventListener('click',()=>{if(hay)entrar1(false);});
  bn.addEventListener('click',async()=>{if(hay){await alm.del(CLAVE);location.reload();}else entrar1(true);});
 }

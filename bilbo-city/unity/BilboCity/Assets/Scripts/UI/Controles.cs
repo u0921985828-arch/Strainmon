@@ -239,6 +239,7 @@ public class Partida {
     public List<string> props = new List<string>();
     public int caseraPaciencia = 3;
     public bool caseraAvisada, caseraDesahucio, caseraOkupa;
+    public bool prologo;
     public float x, y;
     public List<Contrato> contratos = new List<Contrato>();
 }
@@ -263,6 +264,7 @@ public static class Guardado {
             xp = E.Xp, nivelPj = E.NivelPj, props = new List<string>(E.Props),
             caseraPaciencia = E.CaseraPaciencia, caseraAvisada = E.CaseraAvisada,
             caseraDesahucio = E.CaseraDesahucio, caseraOkupa = E.CaseraOkupa,
+            prologo = E.Prologo,
             x = J != null && J.Jug != null ? J.Jug.Pos.x : 0,
             y = J != null && J.Jug != null ? J.Jug.Pos.y : 0,
             contratos = E.Contratos
@@ -303,6 +305,7 @@ public static class Guardado {
         if (p.props != null) foreach (var id in p.props) E.Props.Add(id);
         E.CaseraPaciencia = p.caseraPaciencia; E.CaseraAvisada = p.caseraAvisada;
         E.CaseraDesahucio = p.caseraDesahucio; E.CaseraOkupa = p.caseraOkupa;
+        E.Prologo = p.prologo;
         E.ArmaAct = string.IsNullOrEmpty(p.armaAct) ? "punos" : p.armaAct;
         E.Municion.Clear();
         if (p.munBate > 0) E.Municion["bate"] = p.munBate;

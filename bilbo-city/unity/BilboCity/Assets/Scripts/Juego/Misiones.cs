@@ -5,7 +5,9 @@ using UnityEngine;
 namespace BilboCity {
 
 public class Paso {
-    public string Tipo;            // ir, irCoche, robar, entregarCoche, matar, evento
+    public string Tipo;            // ir, irCoche, robar, entregarCoche, matar, evento, entrar
+    /// <summary>Para los pasos de tipo "entrar": el sitio en cuya puerta se cierra.</summary>
+    public string Poi;
     public Vector2 Destino;
     public string Texto;
     public float Limite;
@@ -22,6 +24,9 @@ public class DefMision {
     public int Pago;
     public string[] Intro, Fin;
     public bool RequiereArma, RequiereFurgo;
+    /// <summary>La llegada a Bilbao va sobre este motor para tener flecha y cartel, pero
+    /// no es un encargo: ni paga, ni cuenta, ni deja enemigos que recoger.</summary>
+    public bool EsPrologo;
     public Func<List<Paso>> Pasos;
 }
 
@@ -193,6 +198,7 @@ public class Misiones : MonoBehaviour {
     public void Terminar(bool ok) {
         if (Activa == null) return;
         var def = Activa.Def;
+        if (def.EsPrologo) { Activa = null; if (ok) Prologo.Fin(); return; }
         if (ok) {
             Estado.I.Dinero += def.Pago;
             Estado.I.Rep["calle"] += 2;
@@ -325,6 +331,67 @@ public class Curros : MonoBehaviour {
                 }
             }
         }
+    }
+}
+
+
+// ═══════════ EL PRÓLOGO ═══════════
+/// <summary>La partida no empieza con el piso puesto: empieza bajando del autobús del
+/// aeropuerto en Moyúa con una bolsa. Los dos pasos enseñan de paso lo único que hace
+/// falta para moverse por la ciudad: el metro y entrar en un sitio.</summary>
+public static class Prologo {
+    public static readonly NpcInterior Primo =
+        new NpcInterior{ X=8.5f, Y=5.6f, Nombre="Yeray", Arq="yeray", Tipo="primo" };
+
+    public static readonly DefMision Def = new DefMision {
+        Nombre="Recién llegado", Giver="Yeray", Pago=0, EsPrologo=true,
+        Intro=new string[0], Fin=new string[0],
+        Pasos=() => new List<Paso>{
+            new Paso{ Tipo="ir", Destino=Estado.Sitio_("mtsantutxu").Pos,
+                      Texto="SUBE A SANTUTXU · METRO EN MOYÚA" },
+            new Paso{ Tipo="entrar", Poi="piso", Destino=Estado.Sitio_("piso").Pos,
+                      Texto="ENTRA EN EL PISO DE YERAY" }}
+    };
+
+    public static void Retomar() {
+        // Hasta que no duermes ahí, el piso es el del primo: el rótulo del plano lo dice.
+        Estado.Sitio_("piso").Nombre = "Piso de Yeray";
+        Misiones.I.Empezar(Def);
+    }
+
+    public static void Empezar() {
+        var E = Estado.I;
+        E.Prologo = true;
+        E.Min = 19 * 60 + 20;
+        Juego.I.Jug.Pos = Estado.Sitio_("moyua").Pos + new Vector2(0, 1.2f);
+        Retomar();
+        Dialogo.I.Abrir("Yeray · al teléfono", new[]{
+            "¿Ya has aterrizado? Aupa, primo.",
+            "Aquí llueve. Te aviso para que no te lleves la sorpresa tú solo.",
+            "Yo salgo de currar a las diez, pero la llave te la dejo yo en mano.",
+            "Estás en Moyúa. Ahí mismo tienes el metro: bájate en Santutxu.",
+            "Portal viejo, tercero. Y no llames al segundo, que es la casera."},
+            new[]{ new Opcion{ Texto="Voy para allá" }});
+    }
+
+    public static void Fin() {
+        var E = Estado.I;
+        E.Prologo = false;
+        Estado.Sitio_("piso").Nombre = "Tu piso";
+        Hud.I.Grande("BILBAO", 2.6f);
+        Dialogo.I.Abrir("Yeray", new[]{
+            "Ya era hora. ¿Ese es todo el equipaje?",
+            "Esa habitación es la tuya. La cama la bajó un vecino de una lonja, así que no preguntes.",
+            "El piso es de Amaia, la del segundo. " + E.Alquiler + " € al mes, y no le gusta esperar.",
+            "Yo pongo lo mío. Lo tuyo lo pones tú, que para eso has cruzado medio Atlántico.",
+            "El coche de abajo es mío. Cógelo si te hace falta, pero me lo traes con las cuatro ruedas.",
+            "Y si quieres cobrar rápido, en el Bar Zurito hay un tal Txema que siempre anda pidiendo favores."},
+            new[]{
+                new Opcion{ Texto="¿Y de cenar?", Accion=() => Dialogo.I.Abrir("Yeray",
+                    new[]{"Huevos y poco más.","Mañana bajas tú a la Ribera."}, null) },
+                new Opcion{ Texto="Me pongo a ello",
+                    Accion=() => Hud.I.Aviso("VIVE DONDE PUEDAS. COBRA DONDE TOQUE", 3.4f) }});
+        Guardado.Guardar();
     }
 }
 
