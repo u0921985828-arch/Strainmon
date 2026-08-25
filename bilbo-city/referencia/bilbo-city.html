@@ -3075,16 +3075,18 @@ const REVOCO={
  /* El Ensanche de la foto de Zubiarte: revoco crema, rosa palido y piedra clara, y el
     mirador verde oscuro recortado encima. Nada de ladrillo caravista, que eso es de los
     bloques de los sesenta y aqui no hay. */
- senorial:  [[C.crema,C.blanco,C.hormigonO],[C.tez7,C.nieve,C.tez5],
-             [C.hormigon6,C.nieve,C.hormigon4],[C.hormigon5,C.hormigon7,C.hormigon3]],
- denso:     [[C.ladrillo4,C.ladrillo5,C.ladrillo2],[C.luz5,C.luz6,C.luz3],
-             [C.hormigon5,C.hormigon7,C.hormigon3]],
+ senorial:  [[C.crema,C.blanco,C.hormigonO,'liso'],[C.tez7,C.nieve,C.tez5,'liso'],
+             [C.hormigon6,C.nieve,C.hormigon4,'liso'],[C.hormigon5,C.hormigon7,C.hormigon3,'liso']],
+ denso:     [[C.ladrillo4,C.ladrillo5,C.ladrillo2,'ladrillo'],[C.luz5,C.luz6,C.luz3,'liso'],
+             [C.hormigon5,C.hormigon7,C.hormigon3,'liso']],
  /* Santutxu */
- bloques:   [[C.ladrillo4,C.ladrillo5,C.ladrillo2],[C.luz5,C.luz6,C.luz3],
-             [C.hormigon5,C.hormigon7,C.hormigon3],[C.verde6,C.verde7,C.verde4],
-             [C.hormigon4,C.hormigon6,C.hormigon2]],
- industrial:[[C.hormigon4,C.hormigon6,C.hormigon2],[C.aceroO,C.acero,C.grisO]],
- abierto:   [[C.hormigon5,C.hormigon7,C.hormigon3],[C.ladrillo4,C.ladrillo5,C.ladrillo2]],
+ /* Santutxu: ladrillo caravista, azulejo de los sesenta —marron y verde, que es lo que
+    se puso—, revoco ocre y hormigon visto. */
+ bloques:   [[C.ladrillo4,C.ladrillo5,C.ladrillo2,'ladrillo'],[C.luz5,C.luz6,C.luz3,'liso'],
+             [C.ladrillo3,C.ladrillo5,C.ladrillo1,'azulejo'],[C.verde5,C.verde7,C.verde3,'azulejo'],
+             [C.hormigon4,C.hormigon6,C.hormigon2,'liso']],
+ industrial:[[C.hormigon4,C.hormigon6,C.hormigon2,'liso'],[C.aceroO,C.acero,C.grisO,'liso']],
+ abierto:   [[C.hormigon5,C.hormigon7,C.hormigon3,'liso'],[C.ladrillo4,C.ladrillo5,C.ladrillo2,'ladrillo']],
 };
 const FACH_BARRIO={
  denso:     ['tasca','persiana','portal','escaparate','portal','persiana','tasca','ciega'],
@@ -3107,6 +3109,22 @@ function generarProps(){
     Ensanche, escaparate con toldo y portal de madera; en los bloques, más portal que
     tienda; en la industria, portones de chapa. No hay nada escrito a mano. */
  const VIDRIO='#3f5566', VIDRIOL='#7f9aa8', HIERRO=C.carbon;
+ /* De que esta hecho el paramento, que no es lo mismo que de que color es. A 8 cm por
+    pixel un ladrillo caravista mide 24x11,5 cm —3x1,5 px— y un azulejo de los sesenta,
+    15x15 —2x2—, asi que las dos texturas caben de verdad y no hay que sugerirlas.
+    Es lo que distingue un bloque de ladrillo visto de uno revocado del mismo color:
+    de lejos el despiece se lee como grano, y de cerca como lo que es. */
+ const pared=(g,W,H,muro,muroL,muroO,tex)=>{
+  P(g,0,0,W,H,muro);
+  if(tex==='ladrillo'){
+   for(let y=0;y<H;y+=2){P(g,0,y+1,W,1,muroO);          /* el tendel */
+    for(let x=(y/2%2)*2;x<W;x+=4)P(g,x,y,1,1,muroO);}   /* la llaga, a matajunta */
+  }else if(tex==='azulejo'){
+   for(let y=0;y<H;y+=3){P(g,0,y,W,1,muroL);            /* el brillo del vidriado */
+    P(g,0,y+2,W,1,muroO);
+    for(let x=0;x<W;x+=3)P(g,x+2,y,1,3,muroO);}
+  }
+  P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);};
  /* Los bajos, a medida real. Iban dibujados en espacio de 32 y nunca se pasaron a metros:
     la hoja de un portal medía 1,29 × 3,06 m —una puerta de tres metros— al lado de una
     ventana de 0,81 × 1,13. Eso es lo que hacía que la fachada se viese falsa aunque cada
@@ -3199,8 +3217,8 @@ function generarProps(){
     ultima planta. Sin ella el muro y el tejado se tocan sin transicion y no se sabe donde
     acaba un piso y empieza el siguiente, que es lo que hacia que la manzana pareciese
     plana por mucho detalle que llevase. Vuela 30 cm, como una cornisa de verdad. */
- const alero=(muro,muroL,muroO)=>banda(5,(g,W,H)=>{
-  P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);
+ const alero=(muro,muroL,muroO,tex)=>banda(5,(g,W,H)=>{
+  pared(g,W,H,muro,muroL,muroO,tex);
   P(g,0,H-3,W,2,muroO);P(g,0,H-1,W,1,C.carbon);});
  /* El estado de conservacion. No hay dos comunidades que cuiden igual el edificio, y eso
     se ve desde la calle antes que ninguna otra cosa: el revoco manchado bajo los aleros y
@@ -3210,13 +3228,13 @@ function generarProps(){
   for(let x=0;x<W;x++){const alto=((x*13)%5)+2;
    if(((x*7+3)%9)<4)for(let y=0;y<alto;y++)P(g,x,y+2,1,1,osc);}
   ruido(g,W,H,[osc],8);};
- const TIPOS=(muro,muroL,muroO,ph,viejo)=>[
+ const TIPOS=(muro,muroL,muroO,ph,viejo,tex)=>[
   /* liso: ventana y nada mas, la planta de patio o de medianera */
-  banda(ph,(g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+  banda(ph,(g,W,H)=>{pared(g,W,H,muro,muroL,muroO,tex);
    if(viejo)mancha(g,W,H,muroO);
    fila(g,W,x=>hueco(g,x,7,AN_V,AL_V,muroO,muroL));}),
   /* balcon: losa que vuela, baranda de hierro y la sombra que tira sobre el muro */
-  banda(ph,(g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+  banda(ph,(g,W,H)=>{pared(g,W,H,muro,muroL,muroO,tex);
    if(viejo)mancha(g,W,H,muroO);
    const HI=viejo?C.ladrillo2:HIERRO;   /* la baranda, oxidada o no */
    fila(g,W,x=>{hueco(g,x,5,AN_V,AL_V,muroO,muroL);
@@ -3225,7 +3243,7 @@ function generarProps(){
     P(g,x-3,H-13,AN_V+6,1,HI);
     for(let b=0;b<AN_V+6;b+=3)P(g,x-3+b,H-13,1,5,HI);});}),
   /* mirador: la galeria acristalada de Bilbao, dos huecos de frente y su canto */
-  banda(ph,(g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+  banda(ph,(g,W,H)=>{pared(g,W,H,muro,muroL,muroO,tex);
    /* El mirador de Bilbao no es un balcon acristalado suelto: es una columna que sube la
       fachada entera, de la primera planta al alero, pintada de verde oscuro sobre revoco
       claro. Por eso la caja ocupa la banda de arriba abajo, sin muro entre plantas —
@@ -3240,7 +3258,7 @@ function generarProps(){
    P(g,bx+2,H-6,30,2,CARP);                  /* el antepecho de cada planta */
    P(g,bx-1,0,1,H,muroO);P(g,bx+34,0,1,H,muroO);}),
   /* persiana echada: media calle esta asi a media manana */
-  banda(ph,(g,W,H)=>{P(g,0,0,W,H,muro);P(g,0,0,W,2,muroL);P(g,0,H-2,W,2,muroO);
+  banda(ph,(g,W,H)=>{pared(g,W,H,muro,muroL,muroO,tex);
    if(viejo)mancha(g,W,H,muroO);
    let iv=0;
    fila(g,W,x=>{hueco(g,x,7,AN_V,AL_V,muroO,muroL);
@@ -3254,9 +3272,9 @@ function generarProps(){
  PROP.pisos={};
  for(const est of Object.keys(REVOCO)){
   PROP.pisos[est]=[];
-  for(const [m,l,o] of REVOCO[est])for(const viejo of [0,1]){
-   const juego=TIPOS(m,l,o,PISO_BARRIO[est],viejo);
-   juego.alero=alero(m,l,o);            /* la cornisa va con su revoco */
+  for(const [m,l,o,tx] of REVOCO[est])for(const viejo of [0,1]){
+   const juego=TIPOS(m,l,o,PISO_BARRIO[est],viejo,tx);
+   juego.alero=alero(m,l,o,tx);            /* la cornisa va con su revoco */
    PROP.pisos[est].push(juego);
   }
  }
@@ -3264,7 +3282,7 @@ function generarProps(){
  const naveJuego=[banda(PISO_BARRIO.industrial,(g,W,H)=>{
   P(g,0,0,W,H,C.aceroO);P(g,0,0,W,2,C.acero);P(g,0,H-2,W,2,C.grisO);
   for(let x=4;x<W-6;x+=10)P(g,x,4,6,H-9,VIDRIO);})];
- naveJuego.alero=alero(C.aceroO,C.acero,C.grisO);
+ naveJuego.alero=alero(C.aceroO,C.acero,C.grisO,'liso');
  PROP.pisosNave=naveJuego;
  PROP.deposito=S_(18,20,g=>{P(g,3,4,12,14,'#7f9aa8');P(g,3,4,12,3,'#a8c4d0');
   P(g,15,4,2,14,C.aceroO);P(g,4,18,3,2,C.carbon);P(g,12,18,3,2,C.carbon);
