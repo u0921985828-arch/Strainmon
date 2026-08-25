@@ -2954,7 +2954,19 @@ const PROP={};
 function S_(w,h,fn){const c=lienzo(w,h),g=c.getContext('2d');fn(g);return x2(cuantizar(c));}
 /* Qué se puede abrir en cada tipo de barrio. Se repite alguno a propósito: si todos los
    locales fueran distintos, una calle parecería una feria. */
-const FACH_H=13;
+/* El frente visible de un edificio, en espacio de forja (se sube a pantalla con ESC).
+   Iba a 13 px de bajos y 14 de plantas: 4,35 m de frente para un bloque de seis alturas,
+   o sea que el edificio era tan «alto» como largo es un utilitario. No cuadraba con nada.
+   Ahora el bajo mide lo que mide un bajo comercial —3,5 m— y encima van plantas de 2,4 m,
+   tantas como el barrio y el fondo de la manzana permitan. Un edificio del Ensanche saca
+   3,5 + 3×2,4 = 10,7 m de frente contra los 3,9 m del coche: la relación que se ve desde
+   una acera de verdad. */
+const FACH_H=22;
+const PISO_H=15;
+/* Cuántas plantas se ven, por estilo de barrio. No es la altura real del edificio: es
+   cuánto de su cara frontal entra en una vista escorada. El Ensanche y el Casco son de
+   seis y siete alturas; los bloques, de cuatro; una nave industrial es una sola. */
+const PLANTAS={senorial:3,denso:3,bloques:2,industrial:0,abierto:1};
 /* Lo que mide cada local, en píxeles: medio (2,58 m, un portal) o entero (5,16 m, una
    tienda). Va aquí arriba y no dentro de `generarProps()` porque quien lo necesita es el
    pintado de la ciudad, que está en otro sitio. */
@@ -2965,7 +2977,7 @@ const ANCHO_FACH={portal:16,portalPiedra:16,garaje:16,
    quedaba de zócalo sobre una plancha de tejado. La vista es cenital escorada: de un
    edificio alto se ve el bajo y unas cuantas ventanas por encima. Una nave lleva menos,
    que una nave es una sola altura. */
-const PISOS_H={teja:14,pizarra:14,azotea:14,nave:6};
+const PISOS_H={teja:PISO_H,pizarra:PISO_H,azotea:PISO_H,nave:8};
 const PISOS_MAT={teja:'ladrillo',pizarra:'ladrillo',azotea:'hormigon',nave:'nave'};
 const FACH_BARRIO={
  denso:     ['tasca','persiana','portal','escaparate','portal','persiana','tasca','ciega'],
@@ -6313,15 +6325,25 @@ function dibCiudad(){
   /* La cara sur es la única que se ve de pie en la calle: ahí van los locales. Solo si
      hay dónde pararse a mirarlos — contra el agua o contra el monte no hay escaparate. */
   if(abajo&&andable(Tc(x,y+1))&&Tc(x,y+1)!==AGUA){
-   const l=FACH_BARRIO[(BARRIOS[barrioDe[y*MW+x]]||BARRIOS[0]).estilo]||FACH_BARRIO.bloques;
+   const estF=(BARRIOS[barrioDe[y*MW+x]]||BARRIOS[0]).estilo;
+   const l=FACH_BARRIO[estF]||FACH_BARRIO.bloques;
    const h2=hash(x*7,y*13);
    /* La casilla se llena con lo que quepa: un local entero, o dos de medio. Cuando solo
       queda medio hueco no cabe un escaparate, así que ahí entra uno de los estrechos —y
       si el barrio no tiene ninguno, un portal, que lo tiene toda casa. */
    /* Primero las plantas y encima los bajos: el edificio se lee de arriba abajo, tejado,
       ventanas, escaparate y acera. */
-   const famF=famDe(roof[y*MW+x]), ph=PISOS_H[famF]||14;
-   ctx.drawImage(PROP.pisos[PISOS_MAT[famF]||'hormigon'],x*TS,y*TS+TS-FACH_H*ESC-ph*ESC);
+   const famF=famDe(roof[y*MW+x]), ph=PISOS_H[famF]||PISO_H;
+   /* Cuantas plantas caben. Las pide el barrio, pero las manda el fondo de la manzana:
+      la pared sube por encima del tejado del propio edificio, y en una manzana de una
+      sola casilla de fondo se saldria por el norte y quedaria una pared flotando sobre
+      la calle de detras. Se cuenta cuanto edificio hay arriba y se recorta a eso. */
+   let fondo=1; while(fondo<5&&Tc(x,y-fondo)===EDIF)fondo++;
+   const nPisos=Math.min(PLANTAS[estF]||2,
+    Math.max(0,Math.floor((fondo*TS-FACH_H*ESC)/(ph*ESC))));
+   const sprP=PROP.pisos[PISOS_MAT[famF]||'hormigon'];
+   for(let k=0;k<nPisos;k++)
+    ctx.drawImage(sprP,x*TS,y*TS+TS-FACH_H*ESC-(k+1)*ph*ESC);
    for(let px=0,n=0;px<TS;n++){
     let t=l[(h2>>(n*3))%l.length];
     if(ANCHO_FACH[t]>TS-px)t=l.find(k=>ANCHO_FACH[k]<=TS-px)||'portal';
