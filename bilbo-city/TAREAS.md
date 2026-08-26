@@ -114,13 +114,18 @@ pantalla. Funciona y las proporciones ya son las buenas, pero el detalle todaví
       así que en Unity las manzanas siguen siendo paredes ciegas mientras en el HTML tienen
       escaparates. Portar el bucle del HTML, que ahora rellena la casilla por anchos
       (`ANCHO_FACH`): un local entero de 32 px o dos de medio.
-- [ ] **El puerto no existe en el mapa.** Del plano solo salen siete tipos de suelo: calzada,
-      acera, edificio, parque, agua, puente y monte. `MUELLE`, `PATIO`, `PLAZA` y `VIA` están
-      declarados y no hay **ni una casilla** de ninguno en las 1.117.440 del mapa. Consecuencia:
-      la grúa, el contenedor marítimo, los palés y el bidón se forjan al arrancar y no se
-      plantan nunca —arte muerto—, y Zorrotzaurre y el Abra son césped. Hay que clasificar
-      muelle y patio de manzana en `herramientas/plano/extraer.py` (la lámina del plano los
-      distingue por relleno) y volver a extraer.
+- [x] **El puerto no existe en el mapa.** Del plano salían siete tipos de suelo y `MUELLE`,
+      `PATIO`, `PLAZA` y `VIA` estaban declarados sin **ni una casilla** en el mapa: la grúa y
+      el contenedor marítimo se forjaban y no se plantaban nunca. Ahora se clasifican en el
+      juego (`clasificarSuelos` y `clasificarNombres`), sin tocar el extractor y sin inventar
+      geometría: el muelle es la acera pegada al agua en barrio industrial más la de las nueve
+      calles «Muelle …» del callejero; el patio, el hueco cerrado por manzana que no da a la
+      calzada; la plaza, la acera de las setenta y siete calles «Plaza …».
+- [ ] **`VIA` sigue vacío.** El ferrocarril no se distingue en la capa de rellenos del plano.
+      Mientras no se saque, el tile de vía y sus traviesas siguen forjados y sin usar.
+- [ ] **La plaza sale pequeña.** Las plazas peatonales del Casco caben en quince casillas
+      porque el plano pinta buena parte de ellas como manzana. Lo que se ve es real, pero
+      corto: habría que sacar del plano el recinto peatonal, no solo su acera.
 - [ ] Oclusión de interiores de manzana con transición.
 - [ ] Más variedad de diálogo en los parroquianos.
 - [ ] Misiones secundarias no encadenadas.

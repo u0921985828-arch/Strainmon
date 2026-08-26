@@ -401,6 +401,24 @@ public static class Forja {
         {"grua", new[]{8.0f,12.0f}},    {"contMaritimo", new[]{12.0f,2.6f}},
         {"bidon", new[]{0.6f,0.9f}},    {"toldo", new[]{3.0f,1.2f}},
         {"terraza", new[]{1.6f,1.4f}},  {"placa", new[]{0.9f,0.4f}},
+        // Atrezzo. Cada medida es la de verdad, tomada de lo que hay en la calle: un buzón
+        // de Correos son 50 cm de frente, una señal se lee a 2,20 del suelo, un iglú de
+        // vidrio tiene metro y medio y un contenedor de barco apilado de dos son 5,20 de
+        // alto.
+        {"buzon", new[]{0.5f,1.2f}},     {"parquimetro", new[]{0.4f,1.5f}},
+        {"senal", new[]{0.6f,2.2f}},     {"hidrante", new[]{0.4f,0.9f}},
+        {"jardinera", new[]{1.2f,0.9f}}, {"seto", new[]{1.8f,1.1f}},
+        {"bici", new[]{1.7f,1.1f}},      {"moto", new[]{2.0f,1.2f}},
+        {"aparcabicis", new[]{2.2f,0.9f}}, {"contVidrio", new[]{1.5f,1.6f}},
+        {"contPapel", new[]{1.4f,1.5f}}, {"bocaMetro", new[]{3.0f,2.4f}},
+        {"farolaCasco", new[]{1.2f,3.6f}}, {"quiosco", new[]{2.4f,2.8f}},
+        {"fuente", new[]{2.6f,1.4f}},    {"estatua", new[]{1.4f,3.2f}},
+        {"reloj", new[]{0.7f,3.6f}},     {"noray", new[]{0.5f,0.6f}},
+        {"pilaCont", new[]{12.0f,5.2f}}, {"trastos", new[]{1.6f,1.0f}},
+        {"columpio", new[]{2.4f,2.2f}},  {"tobogan", new[]{2.6f,2.0f}},
+        {"arenero", new[]{3.0f,0.4f}},   {"porteria", new[]{3.2f,2.0f}},
+        {"fuenteBeber", new[]{0.4f,1.0f}}, {"hormigonera", new[]{2.0f,2.4f}},
+        {"escombros", new[]{2.0f,0.8f}}, {"contObra", new[]{6.0f,2.6f}},
     };
 
     /// <summary>Lo que lleva canto negro: lo que se apoya en el suelo y se ve contra él. Sobre
@@ -409,7 +427,11 @@ public static class Forja {
         "farola","semaforo","arbol","arbolPodado","contenedor","contenedor2","papelera","banco",
         "marquesina","cabina","bolardo","valla","andamio","pales","cono","grua","contMaritimo",
         "bidon","terraza","deposito","climatizador","antenaTv","tendedero","caseta","chimenea",
-        "lucernario" };
+        "lucernario",
+        "buzon","parquimetro","senal","hidrante","jardinera","seto","bici","moto","aparcabicis",
+        "contVidrio","contPapel","bocaMetro","farolaCasco","quiosco","fuente","estatua","reloj",
+        "noray","pilaCont","trastos","columpio","tobogan","arenero","porteria","fuenteBeber",
+        "hormigonera","escombros","contObra" };
 
     /// <summary>El sprite de una pieza de mobiliario, con canto negro si le toca.</summary>
     static Sprite SpriteMob(string k, Lienzo L) {
@@ -560,6 +582,125 @@ public static class Forja {
         Props["terraza"] = SpriteMob("terraza", L);
         L = Mob("placa"); L.P(0,0,9,4,Paleta.Blanco); L.P(0,0,9,1,Paleta.Azul);
         L.P(1,1,7,2,Paleta.Azul); Props["placa"] = SpriteMob("placa", L);
+
+        // ── Atrezzo de acera ──
+        L = Mob("buzon"); L.P(0,2,5,8,Paleta.MostazaO); L.P(0,2,5,2,Paleta.Mostaza);
+        L.P(1,4,3,1,Paleta.Carbon); L.P(1,10,3,2,Paleta.Carbon);
+        Props["buzon"] = SpriteMob("buzon", L);
+        L = Mob("parquimetro"); L.P(1,7,2,8,Paleta.GrisO); L.P(0,0,4,8,Paleta.Gris);
+        L.P(1,1,2,3,Paleta.Carbon); L.P(1,5,2,1,Paleta.Mostaza);
+        Props["parquimetro"] = SpriteMob("parquimetro", L);
+        // La señal se lee a 2,20 del suelo: el poste es casi todo el sprite.
+        L = Mob("senal"); L.P(2,7,2,15,Paleta.Acero); L.P(0,0,6,7,Paleta.Rojo);
+        L.P(1,2,4,3,Paleta.Blanco);
+        Props["senal"] = SpriteMob("senal", L);
+        L = Mob("hidrante"); L.P(1,3,2,6,Paleta.RojoO); L.P(0,1,4,3,Paleta.Rojo);
+        L.P(0,5,4,1,Paleta.RojoO);
+        Props["hidrante"] = SpriteMob("hidrante", L);
+        L = Mob("jardinera"); L.P(0,4,12,5,Paleta.Hormigon); L.P(0,4,12,1,Paleta.HormigonL);
+        L.P(1,0,10,5,Paleta.H("#356b33")); L.P(3,0,6,3,Paleta.H("#4a8746"));
+        Props["jardinera"] = SpriteMob("jardinera", L);
+        L = Mob("seto"); L.P(0,2,18,9,Paleta.H("#2e5b2c")); L.P(0,2,18,3,Paleta.H("#356b33"));
+        for (int x = 2; x < 17; x += 5) L.P(x,3,2,2,Paleta.H("#4a8746"));
+        Props["seto"] = SpriteMob("seto", L);
+        // Una bici de perfil: rueda de 70 cm, cuadro y manillar.
+        L = Mob("bici"); L.P(1,4,5,5,Paleta.Carbon); L.P(11,4,5,5,Paleta.Carbon);
+        L.P(2,5,3,3,Paleta.GrisO); L.P(12,5,3,3,Paleta.GrisO); L.P(5,4,7,1,Paleta.Rojo);
+        L.P(8,2,1,3,Paleta.Rojo); L.P(4,1,3,1,Paleta.Carbon); L.P(11,1,2,1,Paleta.Carbon);
+        Props["bici"] = SpriteMob("bici", L);
+        L = Mob("moto"); L.P(0,5,6,6,Paleta.Carbon); L.P(14,5,6,6,Paleta.Carbon);
+        L.P(1,6,4,4,Paleta.GrisO); L.P(15,6,4,4,Paleta.GrisO); L.P(4,3,13,4,Paleta.RojoO);
+        L.P(5,1,6,3,Paleta.Carbon); L.P(15,2,4,2,Paleta.Acero);
+        Props["moto"] = SpriteMob("moto", L);
+        // Tres arcos de acero, no una valla: en blanco y con seis barrotes parecía un
+        // cierre de obra desde arriba.
+        L = Mob("aparcabicis");
+        for (int x = 2; x < 20; x += 8) {
+            L.P(x,3,1,6,Paleta.AceroO); L.P(x+5,3,1,6,Paleta.AceroO); L.P(x,2,6,1,Paleta.Acero);
+        }
+        Props["aparcabicis"] = SpriteMob("aparcabicis", L);
+        // Los iglús del vidrio y del papel: los de la calle, no un cubo de basura.
+        L = Mob("contVidrio"); L.P(1,5,13,11,Paleta.H("#2f6b4a")); L.P(2,3,11,3,Paleta.H("#3d8a60"));
+        L.P(4,1,7,3,Paleta.H("#22503a")); L.P(6,7,3,3,Paleta.Carbon);
+        Props["contVidrio"] = SpriteMob("contVidrio", L);
+        L = Mob("contPapel"); L.P(1,4,12,11,Paleta.Azul); L.P(2,2,10,3,Paleta.AzulL);
+        L.P(4,0,6,3,Paleta.AzulO); L.P(5,6,4,2,Paleta.Carbon);
+        Props["contPapel"] = SpriteMob("contPapel", L);
+        // Una boca de metro: el hueco de la escalera, la barandilla y el rótulo.
+        L = Mob("bocaMetro"); L.P(0,11,30,13,Paleta.Carbon); L.P(2,13,26,9,Paleta.Hormigon0);
+        for (int x = 0; x < 29; x += 4) L.P(x,8,2,4,Paleta.Acero);
+        L.P(10,0,10,7,Paleta.Rojo); L.P(12,2,6,3,Paleta.Blanco);
+        Props["bocaMetro"] = SpriteMob("bocaMetro", L);
+        // La farola de fundición del Casco: tres metros y medio, columna gorda y capitel.
+        L = Mob("farolaCasco"); L.P(5,7,3,28,Paleta.Carbon); L.P(3,34,7,2,Paleta.Carbon);
+        L.P(4,31,5,2,Paleta.GrisO); L.P(2,2,9,6,Paleta.GrisO); L.P(3,3,7,4,Paleta.H("#f2e2a8"));
+        L.P(4,0,5,2,Paleta.Carbon);
+        Props["farolaCasco"] = SpriteMob("farolaCasco", L);
+        L = Mob("quiosco"); L.P(0,5,24,23,Paleta.VerdeO); L.P(0,3,24,3,Paleta.Verde);
+        L.P(0,0,24,3,Paleta.RojoO); L.P(2,9,20,9,Paleta.Crema); L.P(3,10,18,7,Paleta.Hueso);
+        L.P(2,20,20,6,Paleta.MaderaO); L.P(4,21,6,4,Paleta.Hueso); L.P(13,21,7,4,Paleta.Hueso);
+        Props["quiosco"] = SpriteMob("quiosco", L);
+
+        // ── Plaza ──
+        L = Mob("fuente"); L.P(0,6,26,8,Paleta.Hormigon); L.P(1,7,24,5,Paleta.AguaL);
+        L.P(0,6,26,2,Paleta.HormigonL); L.P(11,0,4,8,Paleta.HormigonL); L.P(9,2,8,2,Paleta.Hueso);
+        Props["fuente"] = SpriteMob("fuente", L);
+        L = Mob("estatua"); L.P(1,20,12,12,Paleta.HormigonO); L.P(0,18,14,3,Paleta.Hormigon);
+        L.P(5,7,4,12,Paleta.AceroO); L.P(4,2,6,6,Paleta.AceroO); L.P(9,9,3,7,Paleta.AceroO);
+        Props["estatua"] = SpriteMob("estatua", L);
+        L = Mob("reloj"); L.P(2,7,3,29,Paleta.Carbon); L.P(1,34,5,2,Paleta.Carbon);
+        L.P(0,0,7,8,Paleta.GrisO); L.P(1,1,5,6,Paleta.Crema); L.P(3,2,1,4,Paleta.Carbon);
+        Props["reloj"] = SpriteMob("reloj", L);
+
+        // ── Muelle ──
+        L = Mob("noray"); L.P(1,2,3,4,Paleta.Carbon); L.P(0,0,5,3,Paleta.GrisO);
+        Props["noray"] = SpriteMob("noray", L);
+        L = Mob("pilaCont");
+        System.Action<int, Color32, Color32> caja = (y, c, cl) => {
+            L.P(0,y,120,26,c);
+            for (int x = 2; x < 117; x += 5) L.P(x,y+3,3,20,cl);
+            L.P(0,y,120,3,Paleta.Carbon); L.P(0,y+23,120,3,Paleta.Carbon);
+        };
+        caja(0,Paleta.AzulO,Paleta.Azul); caja(26,Paleta.RojoO,Paleta.Rojo);
+        Props["pilaCont"] = SpriteMob("pilaCont", L);
+
+        // ── Patio de manzana y obra ──
+        L = Mob("trastos"); L.P(0,5,16,5,Paleta.MaderaO); L.P(2,1,6,5,Paleta.Acero);
+        L.P(9,2,5,4,Paleta.RojoO); L.P(1,8,14,2,Paleta.Carbon);
+        Props["trastos"] = SpriteMob("trastos", L);
+        L = Mob("hormigonera"); L.P(2,4,14,12,Paleta.MostazaO); L.P(3,2,12,4,Paleta.Mostaza);
+        L.P(0,16,20,4,Paleta.Carbon); L.P(2,20,4,4,Paleta.GrisO); L.P(14,20,4,4,Paleta.GrisO);
+        Props["hormigonera"] = SpriteMob("hormigonera", L);
+        L = Mob("escombros"); L.P(0,4,20,4,Paleta.HormigonO); L.P(2,2,6,3,Paleta.Hormigon);
+        L.P(10,1,7,4,Paleta.Hormigon); L.P(5,3,3,2,Paleta.TejaO);
+        Props["escombros"] = SpriteMob("escombros", L);
+        L = Mob("contObra"); L.P(0,2,60,24,Paleta.MostazaO); L.P(0,2,60,3,Paleta.Mostaza);
+        for (int x = 4; x < 57; x += 8) L.P(x,7,3,16,Paleta.H("#8c7420"));
+        L.P(0,24,60,2,Paleta.Carbon);
+        Props["contObra"] = SpriteMob("contObra", L);
+
+        // ── Parque ──
+        L = Mob("columpio"); L.P(1,4,2,18,Paleta.Acero); L.P(21,4,2,18,Paleta.Acero);
+        L.P(0,2,24,3,Paleta.AceroO); L.P(6,5,1,10,Paleta.Carbon); L.P(17,5,1,10,Paleta.Carbon);
+        L.P(4,15,5,2,Paleta.Mostaza); L.P(15,15,5,2,Paleta.Mostaza);
+        Props["columpio"] = SpriteMob("columpio", L);
+        L = Mob("tobogan"); L.P(0,2,10,4,Paleta.RojoO); L.P(1,6,2,14,Paleta.Acero);
+        L.P(7,6,2,14,Paleta.Acero);
+        for (int i = 0; i < 8; i++) L.P(10+i*2,4+i*2,4,3,Paleta.Mostaza);
+        L.P(24,17,2,3,Paleta.AceroO);
+        Props["tobogan"] = SpriteMob("tobogan", L);
+        L = Mob("arenero"); L.P(0,0,30,4,Paleta.H("#8a7f66")); L.P(0,0,30,1,Paleta.H("#9c9078"));
+        Props["arenero"] = SpriteMob("arenero", L);
+        // Una portería vista desde arriba es el larguero, los dos postes y la red: la red
+        // va rala y gris, que tupida se lee como una reja.
+        L = Mob("porteria"); L.P(0,0,32,3,Paleta.Hueso); L.P(0,0,3,20,Paleta.Hueso);
+        L.P(29,0,3,20,Paleta.Hueso);
+        for (int x = 5; x < 28; x += 6) L.P(x,3,1,14,Paleta.GrisL);
+        for (int y = 5; y < 18; y += 6) L.P(3,y,26,1,Paleta.GrisL);
+        Props["porteria"] = SpriteMob("porteria", L);
+        L = Mob("fuenteBeber"); L.P(1,3,2,7,Paleta.GrisO); L.P(0,0,4,4,Paleta.Gris);
+        L.P(1,4,1,1,Paleta.AzulL);
+        Props["fuenteBeber"] = SpriteMob("fuenteBeber", L);
     }
 
     // ═══════════ ARMAS EN MANO Y FOGONAZOS ═══════════

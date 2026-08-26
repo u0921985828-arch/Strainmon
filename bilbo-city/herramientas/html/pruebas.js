@@ -204,14 +204,18 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       const MOB = A.MOB, MW = A.MW, MH = A.MH;
       const T = (x, y) => A.Tc(x, y);
       let cebra = 0, mob = 0, fuera = 0, cebraMal = 0, semSuelto = 0;
+      let stop = 0, aparca = 0, pinturaMal = 0;
       const cuenta = {};
       for (let y = 1; y < MH-1; y++) for (let x = 1; x < MW-1; x++) {
         const v = MOB[y*MW + x];
         if (!v) continue;
         cuenta[v] = (cuenta[v] || 0) + 1;
-        if (v >= 20) {
-          cebra++;
-          if (T(x, y) !== A.ROAD) cebraMal++;      // un paso pintado sobre la acera
+        // Del 200 arriba es suelo pintado, no mueble: paso de cebra, línea de detención y
+        // plaza de aparcamiento. Todo eso va sobre la calzada y en ningún otro sitio.
+        if (v >= 200) {
+          if (v === 200 || v === 201) cebra++;
+          else if (v < 206) stop++; else aparca++;
+          if (T(x, y) !== A.ROAD) { cebraMal += (v < 202 ? 1 : 0); pinturaMal++; }
           continue;
         }
         mob++;
@@ -221,8 +225,9 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
                       || T(x,y+1) === A.ROAD || T(x,y-1) === A.ROAD;
         if (T(x, y) !== A.ACERA || !bordillo) fuera++;
         if (v === 6) {   // semáforo
-          const hayPaso = MOB[(y-1)*MW+x] >= 20 || MOB[(y+1)*MW+x] >= 20
-                       || MOB[y*MW+x+1] >= 20 || MOB[y*MW+x-1] >= 20;
+          const cebra = c => c === 200 || c === 201;
+          const hayPaso = cebra(MOB[(y-1)*MW+x]) || cebra(MOB[(y+1)*MW+x])
+                       || cebra(MOB[y*MW+x+1]) || cebra(MOB[y*MW+x-1]);
           if (!hayPaso) semSuelto++;
         }
       }
@@ -230,6 +235,22 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       ok(!cebraMal, cebraMal + ' pasos de cebra pintados fuera de la calzada');
       ok(!fuera, fuera + ' muebles de calle lejos del bordillo');
       ok(!semSuelto, semSuelto + ' semáforos sin un paso al lado');
+      ok(!pinturaMal, pinturaMal + ' marcas viales pintadas fuera de la calzada');
+      ok(stop > 2000, 'solo ' + stop + ' líneas de detención para ' + cebra + ' pasos');
+      ok(aparca > 5000, 'solo ' + aparca + ' plazas de aparcamiento marcadas');
+      // Una línea de detención sin su paso al lado es pintura suelta en mitad de la calle.
+      {
+        let stopSuelta = 0;
+        const lados = [[0,0,-1],[1,0,1],[2,-1,0],[3,1,0]];
+        for (let y = 1; y < MH-1; y++) for (let x = 1; x < MW-1; x++) {
+          const v = MOB[y*MW+x];
+          if (v < 202 || v >= 206) continue;
+          const [, dx, dy] = lados[v - 202];
+          const vec = MOB[(y+dy)*MW + x+dx];
+          if (vec !== 200 && vec !== 201) stopSuelta++;
+        }
+        ok(!stopSuelta, stopSuelta + ' líneas de detención sin paso de cebra delante');
+      }
       // La separación entre farolas: en Bilbao hay una cada 25-30 m, y la casilla mide
       // 5,16. Se mide sobre la fila del bordillo entera, que es donde van: cuántas casillas
       // de bordillo hay por farola.
@@ -241,7 +262,8 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       }
       const sep = (cuenta[1] ? kerb / cuenta[1] : 0) * 5.16;
       ok(sep > 15 && sep < 45, 'las farolas van cada ' + sep.toFixed(0) + ' m');
-      bien.push(cebra + ' pasos de cebra y ' + mob + ' muebles de calle en el bordillo · '
+      bien.push(cebra + ' pasos de cebra, ' + stop + ' líneas de detención y ' + aparca
+        + ' plazas de aparcamiento marcadas · ' + mob + ' muebles de calle en el bordillo · '
         + 'farola cada ' + sep.toFixed(0) + ' m · ' + (cuenta[6]||0) + ' semáforos, '
         + (cuenta[7]||0) + ' árboles de alineación, ' + (cuenta[9]||0) + ' marquesinas');
     }
@@ -345,6 +367,66 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
         + 'suelo → bloques → objetos → vuelo → HUD');
     }
 
+    // ── 1 quinquies bis · los suelos que faltaban ──────────────────────
+    /* Del plano salen siete tipos de suelo. El juego tiene arte para diez: muelle, patio de
+       manzana y plaza estaban forjados —con sus tiles y sus grúas— y no había ni una casilla
+       de ninguno, así que Zorrotzaurre era césped y la grúa no se plantaba nunca. Se
+       clasifican con la propia trama y con el callejero, y aquí se comprueba que lo que sale
+       es lo que dice ser. */
+    {
+      const n = A.MW * A.MH, cuenta = {};
+      for (let i = 0; i < n; i++) cuenta[A.map[i]] = (cuenta[A.map[i]] || 0) + 1;
+      ok((cuenta[A.MUELLE] || 0) > 200, 'no hay muelle: ' + (cuenta[A.MUELLE] || 0) + ' casillas');
+      ok((cuenta[A.PATIO] || 0) > 400, 'no hay patios de manzana: ' + (cuenta[A.PATIO] || 0));
+      ok((cuenta[A.PLAZA] || 0) > 400, 'no hay plazas: ' + (cuenta[A.PLAZA] || 0));
+      // El muelle es orilla de trabajo: agua cerca y barrio industrial. Ni una casilla suelta
+      // tierra adentro, que entonces sería un descampado pintado de muelle.
+      let sinAgua = 0;
+      for (let i = 0; i < n; i++) {
+        if (A.map[i] !== A.MUELLE) continue;
+        const x = i % A.MW, y = (i / A.MW) | 0;
+        let agua = false;
+        for (let dy = -5; dy <= 5 && !agua; dy++) for (let dx = -5; dx <= 5; dx++) {
+          const j = (y + dy) * A.MW + x + dx;
+          if (j >= 0 && j < n && A.map[j] === A.AGUA) { agua = true; break; }
+        }
+        if (!agua) sinAgua++;
+      }
+      // Un muelle sin agua a la vista es un descampado pintado de muelle.
+      ok(sinAgua < 40, sinAgua + ' casillas de muelle sin agua a menos de 25 m');
+      // El patio es un hueco cerrado: si toca calzada, es una calle y no un patio.
+      let patioAbierto = 0, patioSuelto = 0;
+      for (let i = 0; i < n; i++) {
+        if (A.map[i] !== A.PATIO) continue;
+        const x = i % A.MW, y = (i / A.MW) | 0;
+        let edif = false;
+        for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+          const t2 = A.map[(y + dy) * A.MW + x + dx];
+          if (t2 === A.ROAD || t2 === A.PUENTE) patioAbierto++;
+          if (t2 === A.EDIF) edif = true;
+        }
+        if (!edif) patioSuelto++;
+      }
+      ok(!patioAbierto, patioAbierto + ' casillas de patio dan a la calzada: eso es una calle');
+      ok(patioSuelto < 40, patioSuelto + ' casillas de patio sin un edificio al lado');
+      // Y la plaza lleva el nombre del plano: o es una calle «Plaza …» o toca una que lo es.
+      let plazaSinNombre = 0;
+      for (let i = 0; i < n; i++) {
+        if (A.map[i] !== A.PLAZA) continue;
+        const x = i % A.MW, y = (i / A.MW) | 0;
+        let nombrada = false;
+        for (let dy = -3; dy <= 3 && !nombrada; dy++) for (let dx = -3; dx <= 3; dx++) {
+          const nm = A.calleEn(x + dx, y + dy);
+          if (nm && /^(pl\.|plaza|plazuela)/i.test(nm)) { nombrada = true; break; }
+        }
+        if (!nombrada) plazaSinNombre++;
+      }
+      ok(plazaSinNombre < 30, plazaSinNombre + ' casillas de plaza que no son ninguna plaza del callejero');
+      bien.push((cuenta[A.MUELLE] || 0) + ' casillas de muelle en la orilla industrial, '
+        + (cuenta[A.PATIO] || 0) + ' de patio de manzana cerrado y '
+        + (cuenta[A.PLAZA] || 0) + ' de plaza con nombre del callejero');
+    }
+
     // ── 1 sexies · la ley de la visión ─────────────────────────────────
     /* Un objeto no ocupa solo suelo: ocupa vista. Dos reglas, y las dos se barren enteras
        en vez de mirarse a ojo en una captura:
@@ -359,7 +441,7 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       let sinPieza = 0, pasadas = 0, peor = '', piezas = new Set();
       for (let i = 0; i < A.MOB.length; i++) {
         const mb = A.MOB[i];
-        if (!mb || mb >= 20) continue;                       // 20 y 21 son pasos de cebra
+        if (!mb || mb >= 200) continue;                      // del 200 arriba son pasos de cebra
         const k = A.MOB_PIEZA[mb];
         if (!k) { sinPieza++; continue; }
         piezas.add(k);

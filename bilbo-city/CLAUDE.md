@@ -167,6 +167,28 @@ repositorio**; solo entra la rejilla derivada, y el juego la pinta con arte prop
 **Hay monte.** `MONTE` / `Suelo.Monte` es un tipo de suelo propio y es la mitad del mapa:
 se pisa pero no se conduce, y va más tupido de árboles que un parque urbano.
 
+### Los suelos que el plano no distingue
+
+Del plano salen siete cosas: calzada, acera, manzana, parque, agua, puente y monte. El juego
+tiene arte para más —muelle, patio de manzana, plaza— y lo tenía **sin una sola casilla donde
+ponerlo**: la grúa y el contenedor marítimo se forjaban al arrancar y no se plantaban nunca, y
+Zorrotzaurre era césped. `clasificarSuelos()` y `clasificarNombres()` le ponen nombre a la
+geometría que ya hay, **sin mover una casilla**:
+
+| | |
+|---|---|
+| **Muelle** | La acera pegada al agua en barrio industrial —Zorrotza, Olabeaga, Bolueta—, más la de las nueve calles «Muelle …» del callejero, y de ahí quince metros tierra adentro: la explanada donde caben la grúa y el camión. Tres condiciones a la vez, y cada una quita algo: la orilla de Abandoibarra también toca el agua y es un paseo, y el césped de la ladera tampoco es muelle aunque llegue al agua. |
+| **Patio de manzana** | El hueco cerrado por edificio que no da a la calzada ni al borde del mapa, y de menos de trescientas casillas: más que eso no es un patio, es un parque al que se entra por otro lado. |
+| **Plaza** | La acera de las setenta y siete calles que el callejero llama «Plaza …», extendida dos casillas. No se puede sacar midiendo el ancho: en el plano **ninguna acera pasa de una casilla de holgura**, ni la del Arenal. El nombre sí lo sabe, y el nombre es un dato del plano. |
+
+Es clasificación, no invención: si mañana el extractor sabe distinguirlos, esto sobra.
+
+**La orilla y el muro.** La ría es la mancha más grande de la pantalla y llegaba pegada a la
+ciudad sin un canto, dos colores planos. Ahora el agua lleva su espuma contra el borde y la
+tierra su paramento en sombra con la albardilla clara encima: eso es lo que dice que del agua
+a la calle hay tres metros de subida y no un charco. Y el parque lleva **paseo perimetral** por
+donde da a la calle, que a un parque no se entra pisando el césped.
+
 **Los sitios llevan la coordenada del plano**, no una pista. Por eso se colocan buscando la
 casilla pisable **más cercana** (`cercaDe` / `Ciudad.CercaDe`), no una al azar del
 vecindario: correr la catedral cien metros la saca del Casco Viejo. La batería comprueba
@@ -231,9 +253,33 @@ siete kilómetros de calle no se resuelven por fotograma.
   y lo abierto, al revés. La marquesina va donde para el bus de verdad, y la terraza en la
   acera del bar, la tasca o el asador.
 
-La batería lo mide: que ningún paso caiga fuera de la calzada, que ningún mueble esté lejos
-del bordillo, que ningún semáforo esté suelto y que la separación entre farolas —contada
-sobre las casillas de bordillo— caiga entre 15 y 45 m.
+**Y la calzada se pinta.** El paso de cebra estaba, pero el resto de la marca vial no: no
+había una sola línea de detención ni una plaza de aparcamiento marcada en siete kilómetros de
+calle. Ahora la casilla de calzada lleva su pintura, calculada con la misma pasada:
+
+- **Línea de detención** de 40 cm delante de cada paso, y solo por donde se llega a él: la
+  cebra vertical cruza una calle norte-sur, así que se para por arriba y por abajo.
+- **Plaza de aparcamiento en línea.** Una casilla mide 5,16 m, que es justo lo que ocupa un
+  coche aparcado: cada casilla de calzada pegada al bordillo, en tramo recto, es una plaza
+  con su línea de fondo a 2,20 m y sus travesaños. De cada tres se deja una sin marcar —vados,
+  contenedores, la parada del bus—.
+
+Los códigos de pintura van del 200 para arriba (`esPintura`), separados de los muebles: antes
+la cebra era el 20 y el 21 y la primera pieza nueva de atrezzo se habría dibujado como un paso.
+
+**El atrezzo.** Una acera con farolas y papeleras no es una calle: es un pasillo. Además de lo
+de siempre hay buzón, parquímetro, señal, hidrante, jardinera, seto, aparcabicis, los iglús del
+vidrio y del papel, la moto y la bici aparcadas, el quiosco de prensa y la **boca de metro** en
+las once estaciones —hasta ahora el metro se cogía tocando una chincheta sobre una manzana—. El
+Casco no lleva la farola de aluminio de la Gran Vía: lleva la de fundición. En la plaza hay
+fuente, estatua, reloj y quiosco; en el parque, columpio, tobogán, arenero, portería y fuente
+de beber; en el muelle, grúa, contenedores apilados, hormigonera, escombros y el noray de
+amarre; en el patio de manzana, trastos, tendedero y la bici del vecino.
+
+La batería lo mide: que ningún paso caiga fuera de la calzada, que ninguna marca vial se pinte
+fuera de ella, que ninguna línea de detención se quede sin su paso delante, que ningún mueble
+esté lejos del bordillo, que ningún semáforo esté suelto y que la separación entre farolas
+—contada sobre las casillas de bordillo— caiga entre 15 y 45 m.
 
 ## El sol, la hora y el canto negro
 
