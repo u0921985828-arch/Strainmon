@@ -55,6 +55,44 @@ public static class Mobiliario {
         return n >= 3;
     }
 
+    /// Lado hacia el que mira la marca: 0 norte, 1 sur, 2 oeste, 3 este. El mismo orden que
+    /// usa Cebra() para decidir qué vecino es el paso.
+    static readonly int[] DxLado = {0,0,-1,1}, DyLado = {-1,1,0,0};
+
+    /// <summary>Línea de detención: delante de cada paso de cebra, y solo por donde se llega
+    /// a él —la cebra vertical cruza una calle norte-sur, así que se para por arriba y por
+    /// abajo, y la horizontal al revés—. -1 si esta calzada no lleva.</summary>
+    public static int Stop(int x, int y) {
+        if (Ciudad.T(x,y) != Suelo.Road) return -1;
+        if (Cebra(x,y) != '\0') return -1;     // la propia cebra no lleva línea encima
+        for (int lado = 0; lado < 4; lado++) {
+            int dx = DxLado[lado], dy = DyLado[lado];
+            char v = Cebra(x+dx, y+dy);
+            if ((v == 'V' && dx == 0) || (v == 'H' && dy == 0)) return lado;
+        }
+        return -1;
+    }
+
+    /// <summary>Plaza de aparcamiento en línea: una casilla mide 5,16 m, justo lo que ocupa
+    /// un coche aparcado, así que cada casilla de calzada pegada al bordillo en tramo recto
+    /// es una plaza. De cada tres se deja una sin marcar —vados, contenedores, la parada del
+    /// bus—. -1 si esta calzada no lleva.</summary>
+    public static int Aparca(int x, int y) {
+        if (Ciudad.T(x,y) != Suelo.Road || Stop(x,y) >= 0) return -1;
+        if (Utiles.Hash(x,y) % 3 == 0) return -1;
+        for (int lado = 0; lado < 4; lado++) {
+            int dx = DxLado[lado], dy = DyLado[lado];
+            var t2 = Ciudad.T(x+dx, y+dy);
+            if (t2 != Suelo.Acera && t2 != Suelo.Plaza && t2 != Suelo.Muelle) continue;
+            bool recto = dx == 0
+                ? Ciudad.T(x-1,y) == Suelo.Road && Ciudad.T(x+1,y) == Suelo.Road
+                : Ciudad.T(x,y-1) == Suelo.Road && Ciudad.T(x,y+1) == Suelo.Road;
+            if (!recto) continue;
+            return lado;
+        }
+        return -1;
+    }
+
     /// <summary>Qué se puede abrir en cada tipo de barrio. Se repite alguno a propósito: si
     /// todos los locales fueran distintos, una calle parecería una feria.</summary>
     static readonly Dictionary<string,string[]> FachBarrio = new Dictionary<string,string[]> {
@@ -63,6 +101,38 @@ public static class Mobiliario {
         {"bloques",   new[]{"fachPortal","fachCiega","fachPersiana","fachPortal","fachEscaparate","fachGaraje","fachCiega","fachPortal"}},
         {"industrial",new[]{"fachPorton","fachPorton","fachGaraje","fachCiega","fachPersiana","fachPorton"}},
         {"abierto",   new[]{"fachPortal","fachCiega","fachGaraje","fachCiega"}},
+    };
+
+    /// <summary>Lo que se siembra fuera de la acera, y a qué hash, para cada suelo. Gana la
+    /// primera pieza que case —lo raro va primero, que si no se lo come el arbolado— y todas
+    /// a la misma posición dentro de la casilla. Es la misma tabla SIEMBRA del HTML, en el
+    /// mismo orden: cambiar el orden aquí cambia qué sale en cada casilla.</summary>
+    static readonly Dictionary<Suelo, (int Mod, string Clave)[]> Siembra = new Dictionary<Suelo, (int, string)[]> {
+        // Un parque no es césped con árboles: es donde está el columpio, el tobogán, el
+        // arenero y la fuente de beber. Van antes que el árbol en la lista porque el árbol
+        // se lleva una de cada cuatro casillas y si no, no saldría ninguno.
+        { Suelo.Parque, new (int, string)[] {
+            (53,"columpio"), (59,"tobogan"), (67,"arenero"), (71,"porteria"), (37,"fuenteBeber"),
+            (4,"arbol"), (19,"matorral"), (23,"banco"), (43,"papelera") } },
+        // El monte es el 39% del mapa —Artxanda, Pagasarri, las laderas— y estaba pelado:
+        // verde con manchas y ni un árbol. Es pino de repoblación y eucalipto, no el
+        // plátano de sombra de la Gran Vía, así que lleva su propio arbolado y su matorral.
+        { Suelo.Monte, new (int, string)[] { (4,"pino"), (9,"matorral"), (13,"arbol") } },
+        // La plaza tiene lo que tiene una plaza de Bilbao: fuente, quiosco de prensa, el
+        // reloj, la estatua de alguien y bancos alrededor. Lo raro va primero, que si no se
+        // lo come el arbolado.
+        { Suelo.Plaza, new (int, string)[] {
+            (97,"fuente"), (89,"estatua"), (83,"reloj"), (151,"quiosco"), (59,"jardinera"),
+            (23,"arbolPodado"), (31,"banco"), (41,"papelera") } },
+        // El muelle es sitio de trabajo: grúa, contenedores apilados, palés, bidones, la
+        // hormigonera y el noray donde se amarra.
+        { Suelo.Muelle, new (int, string)[] {
+            (29,"grua"), (37,"pilaCont"), (17,"contMaritimo"), (13,"pales"), (11,"bidon"),
+            (23,"hormigonera"), (31,"escombros"), (43,"contObra"), (7,"noray") } },
+        // El patio de manzana: trastos, el tendedero, la bici del vecino y el contenedor.
+        { Suelo.Patio, new (int, string)[] {
+            (13,"trastos"), (19,"contenedor"), (29,"tendedero"), (17,"bici"),
+            (7,"arbolPodado"), (9,"pales") } },
     };
 
     internal static bool Elegir(int x, int y, out Pieza p) {
@@ -104,7 +174,12 @@ public static class Mobiliario {
                 p.Clave = "semaforo"; p.Dx = 0.5f; p.Dy = 0.9f; return true;
             }
             int l = (cE || cO) ? y : x;          // el paso, a lo largo de la calle
-            if (l % 4 == 0) { p.Clave = "farola"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
+            // El Casco no lleva la farola de aluminio de la Gran Vía: lleva la de
+            // fundición, más baja y con capitel. Es la misma cadencia, otra pieza.
+            if (l % 4 == 0) {
+                p.Clave = Z.Estilo == "denso" ? "farolaCasco" : "farola";
+                p.Dx = 0.5f; p.Dy = 0.95f; return true;
+            }
             if ((Z.Estilo == "senorial" || Z.Estilo == "abierto") && l % 4 == 2) {
                 p.Clave = "arbolPodado"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
             if (Z.Estilo == "denso" && l % 3 == 1) { p.Clave = "bolardo"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
@@ -114,38 +189,33 @@ public static class Mobiliario {
             if ((Z.Estilo == "senorial" || Z.Estilo == "abierto") && l % 13 == 6) {
                 p.Clave = "banco"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
             if (l % 97 == 0) { p.Clave = "cabina"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            // Y lo demás, que es lo que hace que una acera no sea una fila de farolas: el
+            // buzón, el parquímetro donde se aparca, la señal, el hidrante, los iglús del
+            // vidrio y del papel, el aparcabicis, la jardinera del Ensanche y el seto de
+            // los bloques. Cada uno con su paso a lo largo de la calle, así que salen
+            // repartidos y no en corro.
+            if (l % 53 == 7) { p.Clave = "buzon"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            if ((Z.Estilo == "senorial" || Z.Estilo == "denso") && l % 29 == 11) {
+                p.Clave = "parquimetro"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            if (l % 23 == 5) { p.Clave = "senal"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            if (l % 61 == 13) { p.Clave = "hidrante"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            if ((Z.Estilo == "senorial" || Z.Estilo == "abierto") && l % 17 == 9) {
+                p.Clave = "jardinera"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            if ((Z.Estilo == "bloques" || Z.Estilo == "abierto") && l % 19 == 7) {
+                p.Clave = "seto"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            if (l % 41 == 15) { p.Clave = "aparcabicis"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            if (l % 31 == 12) { p.Clave = h % 2 != 0 ? "contVidrio" : "contPapel"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            if (l % 149 == 0) { p.Clave = "quiosco"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            if (l % 73 == 33) { p.Clave = "moto"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            if (l % 79 == 41) { p.Clave = "bici"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
             return false;
         }
 
-        if (t == Suelo.Plaza) {
-            if (h % 9 == 0)  { p.Clave = "arbolPodado"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
-            if (h % 14 == 0) { p.Clave = "banco";       p.Dx = 0.5f; p.Dy = 0.9f;  return true; }
-            if (h % 37 == 0) { p.Clave = "papelera";    p.Dx = 0.5f; p.Dy = 0.9f;  return true; }
-            return false;
-        }
-
-        if (t == Suelo.Parque || t == Suelo.Monte) {
-            // el monte va más tupido que un parque urbano, y sin bancos
-            if (t == Suelo.Monte) {
-                if (h % 4 == 0) { p.Clave = "arbol"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
-                return false;
-            }
-            if (h % 7 == 0)  { p.Clave = "arbol"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
-            if (h % 23 == 0) { p.Clave = "banco"; p.Dx = 0.5f; p.Dy = 0.9f;  return true; }
-            return false;
-        }
-
-        if (t == Suelo.Muelle) {
-            if (h % 11 == 0) { p.Clave = "contMaritimo"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
-            if (h % 19 == 0) { p.Clave = "pales";        p.Dx = 0.5f; p.Dy = 0.9f; return true; }
-            if (h % 53 == 0) { p.Clave = "grua";         p.Dx = 0.5f; p.Dy = 0.95f; return true; }
-            return false;
-        }
-
-        if (t == Suelo.Patio) {
-            if (h % 13 == 0) { p.Clave = "arbolPodado"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
-            if (h % 21 == 0) { p.Clave = "contenedor";  p.Dx = 0.5f; p.Dy = 0.9f;  return true; }
-            return false;
+        // El resto de suelos siembra por la tabla, primera pieza que case el hash.
+        (int Mod, string Clave)[] tabla;
+        if (Siembra.TryGetValue(t, out tabla)) {
+            foreach (var pieza in tabla)
+                if (h % pieza.Mod == 0) { p.Clave = pieza.Clave; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
         }
         return false;
     }
@@ -164,31 +234,60 @@ public static class Mobiliario {
                     vetado.Add((sy+dy) * Ciudad.MW + (sx+dx));
         }
 
+        // Y la boca de metro donde está la estación. Once agujeros en la acera con su
+        // barandilla y su rótulo: hasta ahora el metro se cogía tocando una chincheta sobre
+        // una manzana. Se busca la acera o plaza más cercana en anillos crecientes, y se
+        // veta la casilla para que el barrido de abajo no le plante encima otra cosa.
+        foreach (var q in Transporte.Nodos("metro")) {
+            int cx = Mathf.FloorToInt(q.Pos.x), cy = Mathf.FloorToInt(q.Pos.y);
+            bool puesta = false;
+            for (int r = 0; r < 3 && !puesta; r++)
+                for (int dy = -r; dy <= r && !puesta; dy++)
+                    for (int dx = -r; dx <= r; dx++) {
+                        if (Mathf.Max(Mathf.Abs(dx), Mathf.Abs(dy)) != r) continue;
+                        int nx = cx+dx, ny = cy+dy;
+                        if (nx < 1 || ny < 1 || nx >= Ciudad.MW-1 || ny >= Ciudad.MH-1) continue;
+                        var t = Ciudad.T(nx, ny);
+                        if (t != Suelo.Acera && t != Suelo.Plaza) continue;
+                        if (Colocar(padre, nx, ny, "bocaMetro", 0.5f, 0.9f))
+                            vetado.Add(ny * Ciudad.MW + nx);
+                        puesta = true; break;
+                    }
+        }
+
         for (int y = 1; y < Ciudad.MH-1; y++)
             for (int x = 1; x < Ciudad.MW-1; x++) {
                 if (vetado.Contains(y * Ciudad.MW + x)) continue;
                 Pieza p;
                 if (!Elegir(x, y, out p)) continue;
-                // Ley 6 · tope de sitio: una acera de dos metros y medio no admite una
-                // grúa de doce, y algo que pase la altura que cabe en su suelo deja de
-                // ser mobiliario y pasa a ser un muro. No es un límite de estilo, es el
-                // mismo que exige la batería del HTML (TOPE_ALTO/Vision.TopeAlto): si el
-                // día de mañana una pieza nueva de Forja.MedidasMob se cuela por encima,
-                // se frena aquí, no se descubre mirando la calle.
-                float[] medida;
-                if (Forja.MedidasMob.TryGetValue(p.Clave, out medida)
-                    && medida[1] > Vision.TopeAlto(Ciudad.T(x, y)) + 1e-4f) continue;
-                Sprite sp;
-                if (!Forja.Props.TryGetValue(p.Clave, out sp)) continue;
-                var go = new GameObject(p.Clave);
-                go.transform.SetParent(padre, false);
-                go.transform.position = Mundo.AMundoPixel(new Vector2(x + p.Dx, y + p.Dy));
-                go.isStatic = true;
-                var sr = go.AddComponent<SpriteRenderer>();
-                sr.sprite = sp;
-                sr.sortingOrder = Mundo.OrdenY(y + p.Dy);
-                Sembradas++;
+                Colocar(padre, x, y, p.Clave, p.Dx, p.Dy);
             }
+    }
+
+    /// <summary>Planta una pieza ya elegida: comprueba tope de altura y sprite, y crea el
+    /// GameObject. Lo comparten el barrido general y la boca de metro, que se coloca aparte
+    /// porque no sale del hash de su casilla sino de la estación más cercana.</summary>
+    static bool Colocar(Transform padre, int x, int y, string clave, float dx, float dy) {
+        // Ley 6 · tope de sitio: una acera de dos metros y medio no admite una grúa de
+        // doce, y algo que pase la altura que cabe en su suelo deja de ser mobiliario y
+        // pasa a ser un muro. No es un límite de estilo, es el mismo que exige la batería
+        // del HTML (TOPE_ALTO/Vision.TopeAlto): si el día de mañana una pieza nueva de
+        // Forja.MedidasMob se cuela por encima, se frena aquí, no se descubre mirando la
+        // calle.
+        float[] medida;
+        if (Forja.MedidasMob.TryGetValue(clave, out medida)
+            && medida[1] > Vision.TopeAlto(Ciudad.T(x, y)) + 1e-4f) return false;
+        Sprite sp;
+        if (!Forja.Props.TryGetValue(clave, out sp)) return false;
+        var go = new GameObject(clave);
+        go.transform.SetParent(padre, false);
+        go.transform.position = Mundo.AMundoPixel(new Vector2(x + dx, y + dy));
+        go.isStatic = true;
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = sp;
+        sr.sortingOrder = Mundo.OrdenY(y + dy);
+        Sembradas++;
+        return true;
     }
 }
 

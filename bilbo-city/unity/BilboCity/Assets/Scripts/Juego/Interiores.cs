@@ -33,29 +33,32 @@ public static class Interiores {
     // M mesa · S silla · K encimera · N nevera · T inodoro · V lavabo · H ducha · E estantería
     // B barra · O mostrador · X vitrina · P puesto · L camilla · Q taquilla · R perchero
     // Z coche · Y escalera · W aparador · J planta
+    // Atrezzo de dentro, en minúscula porque las mayúsculas se acabaron: g televisión ·
+    // i lavadora · r radiador · a alfombra · t taburete · e escritorio · b bañera ·
+    // w banco de taller · n neumáticos · f futbolín · x recreativa · p palés
     public static readonly Dictionary<string, DefInterior> Todos = new Dictionary<string, DefInterior> {
         // El piso compartido: dos habitaciones, salón, cocina y baño alrededor de un pasillo.
         // 62 m² útiles, que es lo que mide un piso de los sesenta en Santutxu. La habitación de
         // la derecha es la del primo. Los pisos que se compran reaprovechan este plano.
         {"piso", new DefInterior{ Nombre="Tu piso", Suelo="parquet", Pared="yeso", Mapa=new[]{
-            "#############","#CCU.#.#.UCC#","#CC..#.#..CC#","#CC..d.d..CC#","#....#.#....#",
-            "#AAA.#.#.EEE#","######.######","#FFF.#.#KKKN#","#....d.d....#","#..U.#.#.MSS#",
+            "#############","#CCU.#.#.UCC#","#CC..#.#..CC#","#CC..d.d..CC#","#r...#.#...r#",
+            "#AAA.#.#.EEE#","######.######","#FFF.#.#KKKN#","#.aa.d.d....#","#g.U.#.#iMSS#",
             "#....#.######","#MMS.#.d...H#","#MMS.#.#TV..#","######D######"},
             Npcs=new NpcInterior[0]}},
         {"portal", new DefInterior{ Nombre="Portal · la casera", Suelo="hidraulico", Pared="yeso", Mapa=new[]{
-            "#######","#WW..Y#","#....Y#","#....Y#","#.....#","#.....#","#J...J#","#.....#","###D###"},
+            "#######","#WW..Y#","#....Y#","#....Y#","#.aa..#","#.aa..#","#J...J#","#.....#","###D###"},
             Npcs=new[]{ new NpcInterior{ X=3.5f, Y=4.5f, Nombre="Amaia", Arq="amaia", Tipo="casera" }}}},
         {"bar", new DefInterior{ Nombre="Bar Zurito", Suelo="terrazo", Pared="azulejo", Mapa=new[]{
-            "############","#EEEEEE..NN#","#..........#","#BBBBBBB...#","#..........#",
+            "############","#EEEEEE..NN#","#..........#","#BBBBBBB...#","#t.t.t.t...#",
             "#SMS..SMS..#","#..........#","#SMS..SMS..#","#......#####","#SMS...#TV.#",
-            "#......d...#","#......#...#","#####D######"},
+            "#......d...#","#ff.x..#...#","#####D######"},
             Npcs=new[]{
                 new NpcInterior{ X=3.5f,  Y=2.5f,  Nombre="Josu",  Arq="josu",  Tipo="barman" },
                 new NpcInterior{ X=8.5f,  Y=6.5f,  Nombre="Txema", Arq="txema", Tipo="jefe" },
                 new NpcInterior{ X=5.5f,  Y=10.5f, Nombre="Mikel", Arq="mikel", Tipo="parroquiano" }}}},
         {"taller", new DefInterior{ Nombre="Taller Iker", Suelo="chapa", Pared="chapa", Mapa=new[]{
             "###############","#EEEE....EEEE.#","#.............#","#.ZZ.....ZZ...#","#.ZZ.....ZZ...#",
-            "#.ZZ.....ZZ...#","#.ZZ.....ZZ...#","#.ZZ.....ZZ...#","#.............#","#OOO......QQQ.#",
+            "#.ZZ.....ZZ...#","#.ZZ.....ZZ...#","#.ZZ.....ZZ...#","#ww.........nn#","#OOO......QQQ.#",
             "#.............#","#####DDDD######"},
             Npcs=new[]{ new NpcInterior{ X=11.5f, Y=10.5f, Nombre="Iker", Arq="iker", Tipo="mecanico" }}}},
         {"armeria", new DefInterior{ Nombre="Bazar Nervión", Suelo="chapa", Pared="ladrillo", Mapa=new[]{
@@ -78,7 +81,7 @@ public static class Interiores {
             "#.........#","#XX....EEE#","#.........#","#.OOO.....#","#.........#","#####D#####"},
             Npcs=new[]{ new NpcInterior{ X=2.5f, Y=8.5f, Nombre="Nerea", Arq="nerea", Tipo="ropa" }}}},
         {"tasca", new DefInterior{ Nombre="Tasca", Suelo="terrazo", Pared="azulejo", Mapa=new[]{
-            "##########","#EEEE..NN#","#........#","#BBBBB...#","#........#","#SMS..SMS#",
+            "##########","#EEEE..NN#","#........#","#BBBBB...#","#t.t.t...#","#SMS..SMS#",
             "#........#","#SMS..SMS#","#........#","####D#####"},
             Npcs=new[]{
                 new NpcInterior{ X=3.5f, Y=2.5f, Nombre="Patxi", Arq="patxi", Tipo="barman" },
@@ -109,7 +112,7 @@ public static class Interiores {
                 new NpcInterior{ X=10.5f, Y=12.5f, Nombre="Maite", Arq="maite", Tipo="encargada" },
                 new NpcInterior{ X=18.5f, Y=8.5f,  Nombre="Patxi", Arq="patxi", Tipo="cocinero" }}}},
         {"gasoli", new DefInterior{ Nombre="Gasolinera", Suelo="chapa", Pared="chapa", Mapa=new[]{
-            "##########","#EEE..NNN#","#........#","#EEE..EEE#","#........#","#XX......#",
+            "##########","#EEE..NNN#","#........#","#EEE..EEE#","#........#","#XX.....n#",
             "#........#","#.OOOO...#","#........#","####D#####"},
             Npcs=new[]{ new NpcInterior{ X=3.5f, Y=8.5f, Nombre="Gorka", Arq="gorka", Tipo="gasolinero" }}}},
     };
@@ -117,9 +120,14 @@ public static class Interiores {
     /// <summary>Lo que se pisa. Todo lo demás del plano es mueble y frena: la escalera
     /// mecánica se anda por encima, y el paso de una habitación a otra no tiene hoja.</summary>
     public const string Blando = ".dDY";
+    /// <summary>Se pisa y se dibuja: la alfombra no frena a nadie, y el taburete tampoco —se
+    /// pasa de lado—. La diferencia importa: una fila de taburetes delante de la barra, si
+    /// frenase, sería un muro y dejaría medio bar sin manera de llegar. Blando no vale para
+    /// esto, porque lo que está en esa lista ni siquiera se dibuja como pieza.</summary>
+    public const string Pisable = "at";
     /// <summary>Los muebles de esta lista no se juntan nunca: cuatro sillas en fila son cuatro
     /// sillas, no un banco de 3,2 m.</summary>
-    public const string Unitario = "STVUJN";
+    public const string Unitario = "STVUJNtgixb";
     /// <summary>Media unidad de Unity por casilla: 16 px de arte sobre 32 px por unidad.</summary>
     public static float Escala { get { return ForjaInterior.Px / Mundo.PPU; } }
     public static int Alto { get { return Actual != null ? Actual.Mapa.Length : 0; } }
@@ -132,7 +140,10 @@ public static class Interiores {
         if (fx < 0 || fx >= fila.Length) return '#';
         return fila[fx];
     }
-    public static bool Solido(float x, float y) { return Blando.IndexOf(Casilla(x,y)) < 0; }
+    public static bool Solido(float x, float y) {
+        char ch = Casilla(x, y);
+        return Blando.IndexOf(ch) < 0 && Pisable.IndexOf(ch) < 0;
+    }
 
     /// <summary>El nombre viene de fuera a propósito: dos tascas iguales por dentro se
     /// llaman distinto en la puerta, que es lo que pasa en cualquier barrio.</summary>

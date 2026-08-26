@@ -40,6 +40,32 @@ public static class Forja {
         g = T32(); g.Rellenar(Paleta.Asfalto);
         for (int x = 2; x < 32; x += 8) g.P(x,0,5,32,Paleta.Crema); Reg("cebraV", g);
 
+        // Línea de detención: pegada al paso de cebra, del lado por el que se llega a él.
+        // 40 cm de ancho de verdad; a 5,16 m de casilla son dos píxeles.
+        for (int lado = 0; lado < 4; lado++) {
+            g = T32(); g.Rellenar(Paleta.Asfalto); g.Ruido(new[]{Paleta.AsfaltoO,Paleta.AsfaltoL}, 22);
+            const int w = 2;
+            if (lado == 0) g.P(0,1,32,w,Paleta.Crema);            // arriba
+            else if (lado == 1) g.P(0,32-1-w,32,w,Paleta.Crema);  // abajo
+            else if (lado == 2) g.P(1,0,w,32,Paleta.Crema);       // izquierda
+            else g.P(32-1-w,0,w,32,Paleta.Crema);                 // derecha
+            Reg("stop"+lado, g);
+        }
+
+        // Plaza de aparcamiento en línea. Una casilla son 5,16 m, justo lo que ocupa un
+        // coche aparcado: línea de fondo a 2,20 m del bordillo y los dos travesaños que
+        // separan una plaza de la siguiente.
+        for (int lado = 0; lado < 4; lado++) {
+            g = T32(); g.Rellenar(Paleta.Asfalto); g.Ruido(new[]{Paleta.AsfaltoO,Paleta.AsfaltoL}, 22);
+            const int w = 2;
+            int f = Mathf.RoundToInt(2.2f / (5.16f/32f));
+            if (lado == 0) { g.P(0,f,32,w,Paleta.Crema); g.P(0,0,w,f,Paleta.Crema); g.P(32-w,0,w,f,Paleta.Crema); }
+            else if (lado == 1) { g.P(0,32-f-w,32,w,Paleta.Crema); g.P(0,32-f,w,f,Paleta.Crema); g.P(32-w,32-f,w,f,Paleta.Crema); }
+            else if (lado == 2) { g.P(f,0,w,32,Paleta.Crema); g.P(0,0,f,w,Paleta.Crema); g.P(0,32-w,f,w,Paleta.Crema); }
+            else { g.P(32-f-w,0,w,32,Paleta.Crema); g.P(32-f,0,f,w,Paleta.Crema); g.P(32-f,32-w,f,w,Paleta.Crema); }
+            Reg("aparca"+lado, g);
+        }
+
         g = T32(); g.Rellenar(Paleta.Asfalto); g.Ruido(new[]{Paleta.AsfaltoO}, 18);
         g.P(9,9,14,14,Paleta.Gris);
         for (int i = 11; i < 22; i += 3) g.P(i,11,1,10,Paleta.Carbon); Reg("alcantarilla", g);
@@ -64,6 +90,11 @@ public static class Forja {
 
         g = T32(); g.Rellenar(Paleta.HormigonO); g.Ruido(new[]{Paleta.Hormigon,Paleta.CespedO}, 20);
         for (int i = 0; i < 32; i += 11) g.P(i,0,1,32,Paleta.Carbon); Reg("patio", g);
+
+        // El paseo perimetral del parque: a un parque no se entra pisando el césped, se
+        // anda por el borde que da a la calle.
+        g = T32(); g.Rellenar(Paleta.H("#8a7f66")); g.Ruido(new[]{Paleta.H("#79705a"),Paleta.H("#9c9078")}, 22);
+        Reg("camino", g);
 
         // La vía se forja en las dos orientaciones y al volcar se elige según por dónde
         // sigue el trazado: una sola horizontal quedaría con las traviesas atravesadas.
@@ -419,6 +450,9 @@ public static class Forja {
         {"arenero", new[]{3.0f,0.4f}},   {"porteria", new[]{3.2f,2.0f}},
         {"fuenteBeber", new[]{0.4f,1.0f}}, {"hormigonera", new[]{2.0f,2.4f}},
         {"escombros", new[]{2.0f,0.8f}}, {"contObra", new[]{6.0f,2.6f}},
+        // El monte de Bilbao es pino de repoblación y eucalipto, no el plátano de sombra
+        // de la Gran Vía: siete metros de fuste y copa estrecha.
+        {"pino", new[]{3.0f,7.0f}}, {"matorral", new[]{1.6f,1.0f}},
     };
 
     /// <summary>Lo que lleva canto negro: lo que se apoya en el suelo y se ve contra él. Sobre
@@ -431,7 +465,7 @@ public static class Forja {
         "buzon","parquimetro","senal","hidrante","jardinera","seto","bici","moto","aparcabicis",
         "contVidrio","contPapel","bocaMetro","farolaCasco","quiosco","fuente","estatua","reloj",
         "noray","pilaCont","trastos","columpio","tobogan","arenero","porteria","fuenteBeber",
-        "hormigonera","escombros","contObra" };
+        "hormigonera","escombros","contObra","pino","matorral" };
 
     /// <summary>El sprite de una pieza de mobiliario, con canto negro si le toca.</summary>
     static Sprite SpriteMob(string k, Lienzo L) {
@@ -701,6 +735,16 @@ public static class Forja {
         L = Mob("fuenteBeber"); L.P(1,3,2,7,Paleta.GrisO); L.P(0,0,4,4,Paleta.Gris);
         L.P(1,4,1,1,Paleta.AzulL);
         Props["fuenteBeber"] = SpriteMob("fuenteBeber", L);
+
+        // ── Monte ──
+        L = Mob("pino"); L.P(13,52,4,18,Paleta.H("#4a3524"));
+        L.P(8,34,14,20,Paleta.H("#24471f")); L.P(5,40,20,10,Paleta.H("#2b5426"));
+        L.P(10,18,10,20,Paleta.H("#2b5426")); L.P(7,24,16,8,Paleta.H("#356b33"));
+        L.P(12,4,6,18,Paleta.H("#356b33")); L.P(10,10,10,6,Paleta.H("#3f7a3a"));
+        Props["pino"] = SpriteMob("pino", L);
+        L = Mob("matorral"); L.P(0,3,16,7,Paleta.H("#2e5b2c")); L.P(2,1,12,4,Paleta.H("#356b33"));
+        L.P(5,0,6,3,Paleta.H("#4a8746")); L.P(1,8,14,2,Paleta.H("#24471f"));
+        Props["matorral"] = SpriteMob("matorral", L);
     }
 
     // ═══════════ ARMAS EN MANO Y FOGONAZOS ═══════════

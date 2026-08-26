@@ -542,6 +542,18 @@ Tres cosas que se aprendieron dibujando:
 - **El zoom es entero también aquí**, y si el sitio cabe en pantalla se enseña entero: una
   habitación se entiende de un vistazo, no asomándose por una mirilla.
 
+**Y el atrezzo de dentro.** Un piso con cama, armario y sofá está amueblado, pero no está
+habitado. Ahora hay televisión mirando al sofá, lavadora en la cocina, radiador debajo de la
+ventana y alfombra en el suelo; taburetes en la barra del bar, con su futbolín y su máquina
+recreativa al fondo; banco de trabajo y neumáticos en el taller. Las piezas nuevas van en
+**minúscula** porque las mayúsculas se acabaron: el plano es un carácter por casilla.
+
+Eso trajo una distinción que no existía: **`PISABLE_I`**, lo que se dibuja y **no** frena.
+La alfombra no frena a nadie y el taburete tampoco —se pasa de lado—, y la diferencia no es
+cosmética: una fila de taburetes delante de la barra, si frenase, sería un muro y dejaría
+medio bar sin manera de llegar. `BLANDO_I` no servía, porque lo que está en esa lista ni
+siquiera se dibuja.
+
 La batería mide cada plano: metros cuadrados, ancho de puerta (de 0,8 a 3,2 m y de una
 pieza), que **todo el suelo se pueda alcanzar desde la puerta**, que a cada dependiente se le
 llegue, y que ningún mueble tenga medidas imposibles —una cama entre 0,8×1,6 y 1,6×2,4 m, un

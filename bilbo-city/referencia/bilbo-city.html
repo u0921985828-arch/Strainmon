@@ -3104,12 +3104,44 @@ const MUEBLES={
   for(let x=2;x<w-3;x+=6){P(g,x,4,5,h-7,'#6d543a');P(g,x+2,h-6,2,1,C.mostaza);}}},
  J:{n:'planta',dib(g,w,h){P(g,5,10,6,5,'#8a5b36');P(g,4,9,8,2,'#6f4a31');
   P(g,4,3,8,6,C.verdeO);P(g,6,1,4,4,C.cesped);}},
+ /* Atrezzo de dentro. Un piso con cama, armario y sofá está amueblado, pero no está
+    habitado: falta la tele mirando al sofá, la lavadora en la cocina, el radiador debajo
+    de la ventana y la alfombra en el suelo. Van en minúscula porque las mayúsculas se
+    acabaron: el plano es un carácter por casilla. */
+ g:{n:'televisión',dib(g,w,h){P(g,1,h-6,w-2,5,C.maderaO);P(g,2,2,w-4,h-8,C.carbon);
+  P(g,3,3,w-6,h-11,'#2b3a4a');P(g,(w>>1)-2,h-7,4,1,C.acero);}},
+ i:{n:'lavadora',dib(g,w,h){P(g,0,0,w,h,C.hueso);P(g,1,1,w-2,h-2,C.blanco);
+  P(g,3,4,w-6,h-8,'#8fa8a0');P(g,4,5,w-8,h-10,'#b9c6cf');P(g,1,1,w-2,2,C.hormigonL);}},
+ r:{n:'radiador',dib(g,w,h){P(g,0,1,w,h-2,C.hormigonL);const hz=w>=h;
+  if(hz)for(let x=1;x<w-1;x+=3)P(g,x,2,2,h-4,C.hueso);
+  else for(let y=1;y<h-1;y+=3)P(g,2,y,w-4,2,C.hueso);}},
+ /* La alfombra se pisa: es lo único del plano que se dibuja y no frena. */
+ a:{n:'alfombra',dib(g,w,h){P(g,0,0,w,h,'#7a3f37');P(g,1,1,w-2,h-2,'#96543e');
+  P(g,3,3,w-6,h-6,'#7a3f37');if(w>12&&h>12)P(g,5,5,w-10,h-10,C.mostazaO);}},
+ /* El taburete se ve desde arriba: el asiento y, asomando, el pie. Dibujado solo como un
+    cuadrito de asiento no se leía como nada. */
+ t:{n:'taburete',dib(g,w,h){P(g,2,11,12,4,C.carbon);P(g,3,2,10,10,C.maderaO);
+  P(g,4,3,8,8,C.maderaL);P(g,6,5,4,4,'#93663f');}},
+ e:{n:'escritorio',dib(g,w,h){P(g,0,1,w,h-1,C.maderaO);P(g,0,0,w,2,C.maderaL);
+  P(g,3,4,7,6,C.crema);if(w>16)P(g,w-8,4,5,5,C.carbon);}},
+ b:{n:'bañera',dib(g,w,h){P(g,0,0,w,h,C.blanco);P(g,2,2,w-4,h-4,'#b9c6cf');
+  P(g,3,3,w-6,h-6,'#8fa8a0');P(g,w-5,2,2,3,C.acero);}},
+ w:{n:'banco de taller',dib(g,w,h){P(g,0,2,w,h-2,'#5c4630');P(g,0,0,w,3,C.hormigonL);
+  for(let x=2;x<w-3;x+=6)P(g,x,4,4,h-7,'#6d543a');P(g,3,1,5,1,C.acero);}},
+ n:{n:'neumáticos',dib(g,w,h){for(let y=0;y<h-3;y+=6){P(g,1,y,w-2,5,C.carbon);
+  P(g,3,y+1,w-6,3,C.grisO);}}},
+ f:{n:'futbolín',dib(g,w,h){P(g,0,0,w,h,'#3a5a3a');P(g,1,1,w-2,h-2,C.verdeO);const hz=w>=h;
+  for(let i=4;i<(hz?w:h)-3;i+=5){if(hz)P(g,i,0,2,h,C.acero);else P(g,0,i,w,2,C.acero);}}},
+ x:{n:'recreativa',dib(g,w,h){P(g,0,0,w,h,C.rojoO);P(g,2,2,w-4,h-8,C.carbon);
+  P(g,3,3,w-6,h-11,'#2b3a4a');P(g,3,h-5,w-6,3,C.mostaza);}},
+ p:{n:'palés',dib(g,w,h){P(g,0,0,w,h,C.maderaO);
+  for(let x=1;x<w-1;x+=4)P(g,x,1,3,h-2,C.madera);P(g,0,h-2,w,2,'#4a3826');}},
 };
 /* El plano se trocea en piezas rectangulares una sola vez al entrar: dos casillas de «C»
    seguidas no son dos camas, son una cama de 1,6 m. Los muebles de esta lista no se juntan
    nunca —cuatro sillas en fila son cuatro sillas, no un banco de 3,2 m— y por eso salen de
    una en una. */
-const UNITARIO_I='STVUJN';
+const UNITARIO_I='STVUJNtgixb';
 function piezasDe(I){
  if(I._piezas)return I._piezas;
  const m=I.mapa,h=m.length,visto=m.map(f=>new Array(f.length).fill(false)),out=[];
@@ -3213,7 +3245,10 @@ const MOB_M={deposito:[2.0,2.2],climatizador:[1.2,1.0],antenaTv:[1.2,2.4],tended
   quiosco:[2.4,2.8],fuente:[2.6,1.4],estatua:[1.4,3.2],reloj:[0.7,3.6],noray:[0.5,0.6],
   pilaCont:[12.0,5.2],trastos:[1.6,1.0],columpio:[2.4,2.2],tobogan:[2.6,2.0],
   arenero:[3.0,0.4],porteria:[3.2,2.0],fuenteBeber:[0.4,1.0],hormigonera:[2.0,2.4],
-  escombros:[2.0,0.8],contObra:[6.0,2.6]};
+  escombros:[2.0,0.8],contObra:[6.0,2.6],
+  /* El monte de Bilbao es pino de repoblación y eucalipto, no el plátano de sombra de la
+     Gran Vía: siete metros de fuste y copa estrecha. */
+  pino:[3.0,7.0],matorral:[1.6,1.0]};
 function generarProps(){
  /* Lo que hay encima de un tejado. Va suelto y sembrado por hash, como el mobiliario de
     la acera: dibujado dentro del tile se repetiría en cada casilla del edificio. */
@@ -3544,6 +3579,13 @@ function generarProps(){
   for(let x=5;x<28;x+=6)P(g,x,3,1,14,C.grisL);
   for(let y=5;y<18;y+=6)P(g,3,y,26,1,C.grisL);});
  M_('fuenteBeber',(g)=>{P(g,1,3,2,7,C.grisO);P(g,0,0,4,4,C.gris);P(g,1,4,1,1,C.azulL);});
+ /*── Monte ────────────────────────────────────────────────────────────────*/
+ M_('pino',(g)=>{P(g,13,52,4,18,'#4a3524');
+  P(g,8,34,14,20,'#24471f');P(g,5,40,20,10,'#2b5426');
+  P(g,10,18,10,20,'#2b5426');P(g,7,24,16,8,'#356b33');
+  P(g,12,4,6,18,'#356b33');P(g,10,10,10,6,'#3f7a3a');});
+ M_('matorral',(g)=>{P(g,0,3,16,7,'#2e5b2c');P(g,2,1,12,4,'#356b33');
+  P(g,5,0,6,3,'#4a8746');P(g,1,8,14,2,'#24471f');});
  /* Contorno negro en el mobiliario. Sobre el asfalto, el adoquín o el césped, un objeto
     sin canto se funde con el fondo y no se sabe dónde empieza — es la misma regla que ya
     tenían los iconos del HUD, y la que faltaba en la calle. */
@@ -3558,7 +3600,7 @@ const MOB_CONTORNO=['farola','semaforo','arbol','arbolPodado','contenedor','cont
  'buzon','parquimetro','senal','hidrante','jardinera','seto','bici','moto','aparcabicis',
  'contVidrio','contPapel','bocaMetro','farolaCasco','quiosco','fuente','estatua','reloj',
  'noray','pilaCont','trastos','columpio','tobogan','arenero','porteria','fuenteBeber',
- 'hormigonera','escombros','contObra'];
+ 'hormigonera','escombros','contObra','pino','matorral'];
 
 /*═══════════════ ICONOS HUD ═══════════════*/
 const ICO={};
@@ -3974,22 +4016,22 @@ const INT={
     62 m² útiles, que es lo que mide un piso de los años sesenta en Santutxu. La habitación
     de la derecha es la del primo. Los pisos que se compran reaprovechan este plano. */
  piso:{n:'Tu piso',suelo:'parquet',pared:'yeso',mapa:[
-  '#############','#CCU.#.#.UCC#','#CC..#.#..CC#','#CC..d.d..CC#','#....#.#....#',
-  '#AAA.#.#.EEE#','######.######','#FFF.#.#KKKN#','#....d.d....#','#..U.#.#.MSS#',
+  '#############','#CCU.#.#.UCC#','#CC..#.#..CC#','#CC..d.d..CC#','#r...#.#...r#',
+  '#AAA.#.#.EEE#','######.######','#FFF.#.#KKKN#','#.aa.d.d....#','#g.U.#.#iMSS#',
   '#....#.######','#MMS.#.d...H#','#MMS.#.#TV..#','######D######'],npcs:[]},
  portal:{n:'Portal · la casera',suelo:'hidraulico',pared:'yeso',mapa:[
-  '#######','#WW..Y#','#....Y#','#....Y#','#.....#','#.....#','#J...J#','#.....#','###D###'],
+  '#######','#WW..Y#','#....Y#','#....Y#','#.aa..#','#.aa..#','#J...J#','#.....#','###D###'],
   npcs:[{x:3.5,y:4.5,n:'Amaia',arq:'amaia',tipo:'casera'}]},
  bar:{n:'Bar Zurito',suelo:'terrazo',pared:'azulejo',mapa:[
-  '############','#EEEEEE..NN#','#..........#','#BBBBBBB...#','#..........#',
+  '############','#EEEEEE..NN#','#..........#','#BBBBBBB...#','#t.t.t.t...#',
   '#SMS..SMS..#','#..........#','#SMS..SMS..#','#......#####','#SMS...#TV.#',
-  '#......d...#','#......#...#','#####D######'],
+  '#......d...#','#ff.x..#...#','#####D######'],
   npcs:[{x:3.5,y:2.5,n:'Josu',arq:'josu',tipo:'barman'},
         {x:8.5,y:6.5,n:'Txema',arq:'txema',tipo:'jefe'},
         {x:5.5,y:10.5,n:'Mikel',arq:'mikel',tipo:'parroquiano'}]},
  taller:{n:'Taller Iker',suelo:'chapa',pared:'chapa',mapa:[
   '###############','#EEEE....EEEE.#','#.............#','#.ZZ.....ZZ...#','#.ZZ.....ZZ...#',
-  '#.ZZ.....ZZ...#','#.ZZ.....ZZ...#','#.ZZ.....ZZ...#','#.............#','#OOO......QQQ.#',
+  '#.ZZ.....ZZ...#','#.ZZ.....ZZ...#','#.ZZ.....ZZ...#','#ww.........nn#','#OOO......QQQ.#',
   '#.............#','#####DDDD######'],
   npcs:[{x:11.5,y:10.5,n:'Iker',arq:'iker',tipo:'mecanico'}]},
  armeria:{n:'Bazar Nervión',suelo:'chapa',pared:'ladrillo',mapa:[
@@ -4014,7 +4056,7 @@ const INT={
   '#.........#','#XX....EEE#','#.........#','#.OOO.....#','#.........#','#####D#####'],
   npcs:[{x:2.5,y:8.5,n:'Nerea',arq:'nerea',tipo:'ropa'}]},
  tasca:{n:'Tasca',suelo:'terrazo',pared:'azulejo',mapa:[
-  '##########','#EEEE..NN#','#........#','#BBBBB...#','#........#','#SMS..SMS#',
+  '##########','#EEEE..NN#','#........#','#BBBBB...#','#t.t.t...#','#SMS..SMS#',
   '#........#','#SMS..SMS#','#........#','####D#####'],
   npcs:[{x:3.5,y:2.5,n:'Patxi',arq:'patxi',tipo:'barman'},
         {x:5.5,y:8.5,n:'Mikel',arq:'mikel',tipo:'parroquiano'}]},
@@ -4042,14 +4084,19 @@ const INT={
         {x:10.5,y:12.5,n:'Maite',arq:'maite',tipo:'encargada'},
         {x:18.5,y:8.5,n:'Patxi',arq:'patxi',tipo:'cocinero'}]},
  gasoli:{n:'Gasolinera',suelo:'chapa',pared:'chapa',mapa:[
-  '##########','#EEE..NNN#','#........#','#EEE..EEE#','#........#','#XX......#',
+  '##########','#EEE..NNN#','#........#','#EEE..EEE#','#........#','#XX.....n#',
   '#........#','#.OOOO...#','#........#','####D#####'],
   npcs:[{x:3.5,y:8.5,n:'Gorka',arq:'gorka',tipo:'gasolinero'}]},
 };
 /* Lo que se pisa. Todo lo demás del plano es mueble y frena: la escalera mecánica se anda
    por encima, y el paso de una habitación a otra no tiene hoja. */
 const BLANDO_I='.dDY';
-const solidoInt=ch=>!BLANDO_I.includes(ch);
+/* Se pisa y se dibuja: la alfombra no frena a nadie, y el taburete tampoco —se pasa de
+   lado—. La diferencia importa: una fila de taburetes delante de la barra, si frenase,
+   sería un muro y dejaría medio bar sin manera de llegar. BLANDO_I no vale para esto,
+   porque lo que está en esa lista ni siquiera se dibuja como pieza. */
+const PISABLE_I='at';
+const solidoInt=ch=>!BLANDO_I.includes(ch)&&!PISABLE_I.includes(ch);
 
 /*═══════════════ POIs ═══════════════*/
 const POI=[];
@@ -4168,11 +4215,11 @@ const SIEMBRA={
     y la fuente de beber. Van antes que el árbol en la lista porque el árbol se lleva una
     de cada cuatro casillas y si no, no saldría ninguno. */
  [PARQUE]:[[53,'columpio'],[59,'tobogan'],[67,'arenero'],[71,'porteria'],[37,'fuenteBeber'],
-           [4,'arbol'],[23,'banco'],[43,'papelera']],
+           [4,'arbol'],[19,'matorral'],[23,'banco'],[43,'papelera']],
  /* El monte es el 39% del mapa —Artxanda, Pagasarri, las laderas— y estaba pelado: verde
     con manchas y ni un árbol. El puerto de Unity sí los planta; el prototipo no, y el
     prototipo es el que manda. Uno de cada cuatro casillas son diez metros entre árboles. */
- [MONTE]: [[4,'arbol']],
+ [MONTE]: [[4,'pino'],[9,'matorral'],[13,'arbol']],
  /* La plaza tiene lo que tiene una plaza de Bilbao: fuente, quiosco de prensa, el reloj,
     la estatua de alguien y bancos alrededor. Lo raro va primero, que si no se lo come el
     arbolado. */
@@ -4199,7 +4246,9 @@ const SIEMBRA_TEJADO={
    esconderlo entero — y cuando eso pasa, al jugador se le pinta la silueta encima, que
    perderse a uno mismo detrás de un plátano de sombra no es dificultad, es un fallo. */
 const ALTO_TAPA=2.0;
-const TOPE_ALTO={[ACERA]:4,[PLAZA]:4,[PARQUE]:6,[MONTE]:6,[PATIO]:6,[MUELLE]:12,[EDIF]:2.4};
+/* El monte admite ocho metros porque ahí hay pinos de verdad; en un parque urbano el
+   arbolado está podado y no pasa de seis. */
+const TOPE_ALTO={[ACERA]:4,[PLAZA]:4,[PARQUE]:6,[MONTE]:8,[PATIO]:6,[MUELLE]:12,[EDIF]:2.4};
 function colocarCalle(){
  MOB.fill(0);
  const pisable=(x,y)=>{const t=Tc(x,y);return t===ACERA||t===PLAZA;};
@@ -4392,6 +4441,26 @@ const TRAFICO_BARRIO={
 const tipoParaBarrio=(x,y)=>{
  const l=TRAFICO_BARRIO[distDe(clamp(x|0,0,MW-1),clamp(y|0,0,MH-1)).estilo];
  return l?l[rndi(0,l.length-1)]:TIPOS_CIVIL[rndi(0,TIPOS_CIVIL.length-1)];};
+/* Un coche aparcado va en su plaza y mirando a donde va la calle, no en mitad del carril
+   y de cualquier manera. La plaza ya está pintada en el suelo, y su código dice además de
+   qué lado queda el bordillo: de ahí salen el sitio —arrimado al bordillo, no en el eje— y
+   el rumbo, que es el de la calle. Si no hay ninguna cerca se vuelve a lo de antes. */
+function puntoAparcamiento(cx,cy,rad){
+ for(let i=0;i<500;i++){
+  const x=clamp(cx+rndi(-rad,rad),2,MW-3),y=clamp(cy+rndi(-rad,rad),2,MH-3);
+  const mb=MOB[y*MW+x];
+  if(mb<M_APARCA||mb>=M_APARCA+4)continue;
+  const[dx,dy]=[[0,-1],[0,1],[-1,0],[1,0]][mb-M_APARCA];
+  /* El bordillo a los lados quiere decir calle de norte a sur, y al revés. El sentido lo
+     da la paridad de la casilla: los de un lado miran a un lado. */
+  const ang=dx?(y%2?Math.PI/2:-Math.PI/2):(x%2?Math.PI:0);
+  return{x:x+.5+dx*.28,y:y+.5+dy*.28,ang};}
+ return null;}
+function aparcarCoche(c,cx,cy,rad){
+ const q=puntoAparcamiento(cx,cy,rad);
+ if(q){c.x=q.x;c.y=q.y;c.ang=q.ang;return true;}
+ const p=puntoCalle(cx,cy,rad);
+ c.x=p.x;c.y=p.y;c.ang=angCalle(p.x,p.y);return false;}
 function poblar(){
  tuCoche=nuevoCoche(poi('piso').p.x+1.4,poi('piso').p.y,'utilitario',0,true,11);
  coches.push(tuCoche);
@@ -4399,7 +4468,9 @@ function poblar(){
     coches que no se ven nunca: son siete kilómetros de calle. Se sueltan alrededor del
     jugador y se reciclan al alejarse, igual que el tráfico y los peatones. */
  for(let i=0;i<40;i++){const p=puntoCalle(player.x|0,player.y|0,48);
-  coches.push(nuevoCoche(p.x,p.y,tipoParaBarrio(p.x,p.y),(i+1)%LIBREAS.length,false));}
+  const c=nuevoCoche(p.x,p.y,tipoParaBarrio(p.x,p.y),(i+1)%LIBREAS.length,false);
+  aparcarCoche(c,player.x|0,player.y|0,48);
+  coches.push(c);}
  for(let i=0;i<16;i++)trafico.push(nuevoTrafico(player.x|0,player.y|0));
  for(let i=0;i<26;i++)peatones.push(nuevoPeaton(player.x|0,player.y|0));
 }
@@ -4412,10 +4483,11 @@ function reciclarCoches(){
   _reciclaCoche=(_reciclaCoche+1)%coches.length;
   const c=coches[_reciclaCoche];
   if(c.propio||c===player.enCoche||dist(c,player)<=72)continue;
-  const p=puntoCalle(player.x|0,player.y|0,54);
-  if(dist(p,player)<26)continue;                 /* que no aparezca en las narices */
-  c.x=p.x;c.y=p.y;c.ang=angCalle(p.x,p.y);c.vx=c.vy=0;c.dano=0;c.vivo=true;
-  c.tipo=tipoParaBarrio(p.x,p.y);c.lib=(c.lib+1)%LIBREAS.length;
+  const q=puntoAparcamiento(player.x|0,player.y|0,54)||puntoCalle(player.x|0,player.y|0,54);
+  if(dist(q,player)<26)continue;                 /* que no aparezca en las narices */
+  c.x=q.x;c.y=q.y;c.ang=q.ang!==undefined?q.ang:angCalle(q.x,q.y);
+  c.vx=c.vy=0;c.dano=0;c.vivo=true;
+  c.tipo=tipoParaBarrio(q.x,q.y);c.lib=(c.lib+1)%LIBREAS.length;
   hechos++;}
 }
 function nuevoTrafico(cx,cy){
@@ -7326,7 +7398,10 @@ function tileDe(x,y,fa){
  /* El paseo perimetral del parque. Un parque no se pisa por el césped: se entra por el
     borde que da a la calle y se anda por ahí. El tile del camino estaba forjado y sin usar. */
  if(t===PARQUE){
-  const b=(dx,dy)=>{const v=Tc(x+dx,y+dy);return v===ACERA||v===PLAZA||v===ROAD;};
+  /* Solo donde hay parque de verdad detrás: en una mediana de dos casillas, «el borde que
+     da a la calle» es la mediana entera y el césped desaparecía. */
+  const b=(dx,dy)=>{const v=Tc(x+dx,y+dy);
+   return (v===ACERA||v===PLAZA||v===ROAD)&&Tc(x-dx,y-dy)===PARQUE&&Tc(x-2*dx,y-2*dy)===PARQUE;};
   if(b(1,0)||b(-1,0)||b(0,1)||b(0,-1))return TILE.camino;
   return hash(x,y)%4===0?TILE.parqueAlto:TILE[PARQUE];}
  if(t===MONTE){const h=hash(x,y)%9;return h===0?TILE.monteRoca:h<4?TILE.monteMata:TILE[MONTE];}

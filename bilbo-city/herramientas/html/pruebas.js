@@ -142,7 +142,8 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
     let metros = [];
     for (const id of interiores) {
       const d = A.INT[id], m = d.mapa, ih = m.length, iw = m[0].length;
-      const suelo = ch => A.BLANDO_I.includes(ch);
+      // La alfombra se pisa aunque se dibuje: para andar cuenta como suelo.
+      const suelo = ch => A.BLANDO_I.includes(ch) || A.PISABLE_I.includes(ch);
       ok(m.every(f => f.length === iw), id + ': filas de distinto largo');
       ok(m[0].split('').every(c => c === '#') && m.every(f => f[0] === '#' && f[iw-1] === '#'),
          id + ': el muro de fuera tiene un hueco');
@@ -266,6 +267,29 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
         + ' plazas de aparcamiento marcadas · ' + mob + ' muebles de calle en el bordillo · '
         + 'farola cada ' + sep.toFixed(0) + ' m · ' + (cuenta[6]||0) + ' semáforos, '
         + (cuenta[7]||0) + ' árboles de alineación, ' + (cuenta[9]||0) + ' marquesinas');
+    }
+
+    // ── 1 ter bis · los coches aparcan en su plaza ─────────────────────
+    /* Los cuarenta coches aparcados se soltaban en cualquier casilla de calzada y con el
+       rumbo de la calle a ojo: salían en mitad del carril y cruzados. Ahora van a una plaza
+       marcada, arrimados al bordillo y mirando a donde va la calle. */
+    {
+      let enPlaza = 0, torcidos = 0, total = 0;
+      for (const c of A.coches) {
+        if (c.propio) continue;
+        total++;
+        const x = c.x | 0, y = c.y | 0, mb = A.MOB[y * A.MW + x];
+        if (mb < 206 || mb >= 210) continue;
+        enPlaza++;
+        // Bordillo arriba o abajo quiere decir calle este-oeste, y el coche mira a lo largo.
+        const eo = mb - 206 < 2;
+        const a2 = Math.abs(Math.sin(c.ang)), tumbado = a2 < 0.01, depie = a2 > 0.99;
+        if (eo ? !tumbado : !depie) torcidos++;
+      }
+      ok(total > 20, 'no hay coches aparcados que mirar: ' + total);
+      ok(enPlaza >= total - 1, (total - enPlaza) + ' de ' + total + ' coches aparcados fuera de plaza');
+      ok(!torcidos, torcidos + ' coches aparcados cruzados en la calle');
+      bien.push(enPlaza + ' de ' + total + ' coches aparcados en plaza marcada y en el sentido de la calle');
     }
 
     // ── 1 quater · el sol y la hora ────────────────────────────────────

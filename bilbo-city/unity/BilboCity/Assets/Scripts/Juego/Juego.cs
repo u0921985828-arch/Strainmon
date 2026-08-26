@@ -76,6 +76,14 @@ public class Juego : MonoBehaviour {
         Estado.ColocarSitios();
         Singulares.Colocar();      yield return null;
 
+        // El callejero y la clasificación por nombre (plaza, muelle) tienen que estar
+        // resueltos antes de construir los Tilemaps: el render elige el tile mirando el
+        // Suelo de cada casilla, y SuelosCiudad.ClasificarNombres todavía cambia casillas de
+        // Acera a Plaza o Muelle según el nombre de la calle.
+        Transporte.ColocarParadas();
+        Callejero.Nombrar();
+        SuelosCiudad.ClasificarNombres();
+
         _mundo = new GameObject("Mundo").transform;
         _mundo.SetParent(transform, false);
         _render = _mundo.gameObject.AddComponent<RenderCiudad>();
@@ -84,8 +92,6 @@ public class Juego : MonoBehaviour {
         _entidades = new GameObject("Entidades").transform;
         _entidades.SetParent(transform, false);
 
-        Transporte.ColocarParadas();
-        Callejero.Nombrar();
         var goProps = new GameObject("Mobiliario").transform;
         goProps.SetParent(_mundo, false);
         Mobiliario.Sembrar(goProps);

@@ -74,6 +74,7 @@ public static class Ciudad {
         Array.Copy(trama, Map, Mathf.Min(trama.Length, Map.Length));
         Array.Copy(barrios, BarrioIdx, Mathf.Min(barrios.Length, BarrioIdx.Length));
         Tejados();
+        SuelosCiudad.Clasificar();
         // borde cerrado: fuera del término municipal no hay nada que visitar
         for (int x = 0; x < MW; x++) { Map[x] = (byte)Suelo.Edif; Map[(MH-1)*MW+x] = (byte)Suelo.Edif; }
         for (int y = 0; y < MH; y++) { Map[y*MW] = (byte)Suelo.Edif; Map[y*MW+MW-1] = (byte)Suelo.Edif; }

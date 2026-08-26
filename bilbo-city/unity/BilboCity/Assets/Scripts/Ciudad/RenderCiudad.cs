@@ -53,6 +53,9 @@ public class RenderCiudad : MonoBehaviour {
         var monte = TileDe(T["monte"]); var monteM = TileDe(T["monteMata"]);
         var monteR = TileDe(T["monteRoca"]);
         var puente = TileDe(T["puente"]); var muelle = TileDe(T["muelle"]);
+        var camino = TileDe(T["camino"]);
+        var stop = new Tile[4]; for (int i = 0; i < 4; i++) stop[i] = TileDe(T["stop"+i]);
+        var aparca = new Tile[4]; for (int i = 0; i < 4; i++) aparca[i] = TileDe(T["aparca"+i]);
         var tejados = new Tile[Forja.Tejados.Length];
         for (int i = 0; i < tejados.Length; i++) tejados[i] = TileDe(Forja.Tejados[i]);
 
@@ -82,6 +85,12 @@ public class RenderCiudad : MonoBehaviour {
                         char cb = Mobiliario.Cebra(x,y);
                         if (cb == 'V') { elegido = cebraV; break; }
                         if (cb == 'H') { elegido = cebraH; break; }
+                        // La marca vial: línea de detención delante del paso, y si no,
+                        // plaza de aparcamiento en el tramo recto pegado al bordillo.
+                        int ladoStop = Mobiliario.Stop(x,y);
+                        if (ladoStop >= 0) { elegido = stop[ladoStop]; break; }
+                        int ladoAparca = Mobiliario.Aparca(x,y);
+                        if (ladoAparca >= 0) { elegido = aparca[ladoAparca]; break; }
                         if (h % 37 == 0) elegido = alcant;
                         else if (h % 19 == 0) elegido = roadG;
                         else {
@@ -98,7 +107,14 @@ public class RenderCiudad : MonoBehaviour {
                         else elegido = Utiles.Hash(x,y) % 11 == 0 ? aceraG : acera;
                         break;
                     }
-                    case Suelo.Parque: elegido = Utiles.Hash(x,y) % 4 == 0 ? parqueA : parque; break;
+                    case Suelo.Parque: {
+                        // A un parque no se entra pisando el césped: se anda por el borde
+                        // que da a la calle. El tile del camino estaba forjado y sin usar.
+                        bool borde = EsBordeParque(x,y,1,0) || EsBordeParque(x,y,-1,0)
+                                  || EsBordeParque(x,y,0,1) || EsBordeParque(x,y,0,-1);
+                        elegido = borde ? camino : (Utiles.Hash(x,y) % 4 == 0 ? parqueA : parque);
+                        break;
+                    }
                     case Suelo.Monte: {
                         int hm = Utiles.Hash(x,y) % 9;
                         elegido = hm == 0 ? monteR : (hm < 4 ? monteM : monte);
@@ -131,7 +147,87 @@ public class RenderCiudad : MonoBehaviour {
                 if (abajo && y+1 < MH) det[(MH-1-(y+1))*MW + x] = _sombraAbajo;
                 else if (arriba) det[(MH-1-y)*MW + x] = _luzArriba;
             }
+
+        // La orilla. La ría llegaba pegada a la ciudad sin un canto, dos colores planos: un
+        // río tiene borde —la espuma contra el muro— y la ciudad tiene muro —el paramento
+        // en sombra y su albardilla—, que es lo que dice que del agua a la calle hay tres
+        // metros de subida y no un charco. Se cachea por máscara de vecinos porque son solo
+        // dieciséis combinaciones y el mapa tiene cientos de miles de casillas de ría.
+        var cacheEspuma = new Dictionary<int,Tile>();
+        var cacheOrilla = new Dictionary<int,Tile>();
+        for (int y = 0; y < MH; y++)
+            for (int x = 0; x < MW; x++) {
+                var t = Ciudad.T(x,y);
+                if (t == Suelo.Agua) {
+                    int m = MascaraOrilla(x, y, tj => tj != Suelo.Agua && tj != Suelo.Puente);
+                    if (m == 0) continue;
+                    Tile tile;
+                    if (!cacheEspuma.TryGetValue(m, out tile)) cacheEspuma[m] = tile = TileEspuma(m);
+                    det[(MH-1-y)*MW + x] = tile;
+                } else if (t != Suelo.Puente && t != Suelo.Edif) {
+                    int m = MascaraOrilla(x, y, tj => tj == Suelo.Agua);
+                    if (m == 0) continue;
+                    Tile tile;
+                    if (!cacheOrilla.TryGetValue(m, out tile)) cacheOrilla[m] = tile = TileOrilla(m);
+                    det[(MH-1-y)*MW + x] = tile;
+                }
+            }
+
         _detalle.SetTilesBlock(new BoundsInt(0, 0, 0, MW, MH, 1), det);
+    }
+
+    /// <summary>Bitmask de vecinos que cumplen la condición: bit0 este, bit1 oeste,
+    /// bit2 sur, bit3 norte. Lo comparten la espuma del agua y el muro de la orilla.</summary>
+    static int MascaraOrilla(int x, int y, System.Func<Suelo,bool> cond) {
+        int m = 0;
+        if (cond(Ciudad.T(x+1,y))) m |= 1;
+        if (cond(Ciudad.T(x-1,y))) m |= 2;
+        if (cond(Ciudad.T(x,y+1))) m |= 4;
+        if (cond(Ciudad.T(x,y-1))) m |= 8;
+        return m;
+    }
+
+    static Tile TileDeLienzo(Lienzo l) {
+        var px = new Color32[l.W*l.H];
+        l.VolcarEn(px, l.W, l.H, 0, 0);
+        var tex = Utiles.Textura(l.W, l.H, px);
+        return TileDe(Utiles.Rebanada(tex, 0, 0, l.W, l.H, 0f, 0f));
+    }
+
+    /// <summary>La espuma del agua contra la orilla, del lado que da a tierra.</summary>
+    static Tile TileEspuma(int mascara) {
+        int ts = Forja.TS;
+        var l = new Lienzo(ts, ts);
+        var col = new Color32(132,160,200,89);
+        if ((mascara & 1) != 0) l.P(ts-3,0,3,ts,col);
+        if ((mascara & 2) != 0) l.P(0,0,3,ts,col);
+        if ((mascara & 4) != 0) l.P(0,ts-3,ts,3,col);
+        if ((mascara & 8) != 0) l.P(0,0,ts,3,col);
+        return TileDeLienzo(l);
+    }
+
+    /// <summary>El paramento en sombra de la orilla, con su albardilla clara justo encima,
+    /// del lado que da al agua.</summary>
+    static Tile TileOrilla(int mascara) {
+        int ts = Forja.TS;
+        var l = new Lienzo(ts, ts);
+        var osc = new Color32(7,9,12,115);
+        var clr = new Color32(232,228,220,56);
+        if ((mascara & 1) != 0) { l.P(ts-3,0,3,ts,osc); l.P(ts-4,0,1,ts,clr); }
+        if ((mascara & 2) != 0) { l.P(0,0,3,ts,osc);    l.P(3,0,1,ts,clr); }
+        if ((mascara & 4) != 0) { l.P(0,ts-3,ts,3,osc); l.P(0,ts-4,ts,1,clr); }
+        if ((mascara & 8) != 0) { l.P(0,0,ts,3,osc);    l.P(0,3,ts,1,clr); }
+        return TileDeLienzo(l);
+    }
+
+    /// <summary>Por dónde se anda en un parque: acera, plaza o calzada, y solo cuando
+    /// detrás hay parque de verdad —dos casillas más, no una—. Sin la segunda condición,
+    /// una mediana de dos casillas de ancho es «el borde que da a la calle» por los dos
+    /// lados a la vez y el césped desaparece entero.</summary>
+    static bool EsBordeParque(int x, int y, int dx, int dy) {
+        var v = Ciudad.T(x+dx, y+dy);
+        if (v != Suelo.Acera && v != Suelo.Plaza && v != Suelo.Road) return false;
+        return Ciudad.T(x-dx, y-dy) == Suelo.Parque && Ciudad.T(x-2*dx, y-2*dy) == Suelo.Parque;
     }
 
     static Tilemap NuevoTilemap(Transform padre, string nombre, int orden) {

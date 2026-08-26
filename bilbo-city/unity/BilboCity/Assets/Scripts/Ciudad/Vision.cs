@@ -32,7 +32,9 @@ public static class Vision {
             case Suelo.Acera:  return 4f;
             case Suelo.Plaza:  return 4f;
             case Suelo.Parque: return 6f;
-            case Suelo.Monte:  return 6f;
+            // El monte admite ocho metros porque ahí hay pinos de verdad; en un parque
+            // urbano el arbolado está podado y no pasa de seis.
+            case Suelo.Monte:  return 8f;
             case Suelo.Patio:  return 6f;
             case Suelo.Muelle: return 12f;
             case Suelo.Edif:   return 2.4f;

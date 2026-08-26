@@ -220,6 +220,61 @@ public static class ForjaInterior {
         case 'J':
             g.P(5,10,6,5,Paleta.H("#8a5b36")); g.P(4,9,8,2,Paleta.H("#6f4a31"));
             g.P(4,3,8,6,Paleta.VerdeO); g.P(6,1,4,4,Paleta.Cesped); break;
+        // Atrezzo de dentro. Un piso con cama, armario y sofá está amueblado, pero no está
+        // habitado. Ahora hay televisión mirando al sofá, lavadora en la cocina, radiador
+        // debajo de la ventana y alfombra en el suelo; taburetes en la barra del bar, con su
+        // futbolín y su máquina recreativa al fondo; banco de trabajo y neumáticos en el
+        // taller. Las piezas nuevas van en minúscula porque las mayúsculas se acabaron: el
+        // plano es un carácter por casilla.
+        case 'g':
+            g.P(1,h-6,w-2,5,Paleta.MaderaO); g.P(2,2,w-4,h-8,Paleta.Carbon);
+            g.P(3,3,w-6,h-11,Paleta.H("#2b3a4a")); g.P((w>>1)-2,h-7,4,1,Paleta.Acero); break;
+        case 'i':
+            g.P(0,0,w,h,Paleta.Hueso); g.P(1,1,w-2,h-2,Paleta.Blanco);
+            g.P(3,4,w-6,h-8,Paleta.H("#8fa8a0")); g.P(4,5,w-8,h-10,Paleta.H("#b9c6cf"));
+            g.P(1,1,w-2,2,Paleta.HormigonL); break;
+        case 'r':
+            g.P(0,1,w,h-2,Paleta.HormigonL);
+            if (hz) { for (int x = 1; x < w-1; x += 3) g.P(x,2,2,h-4,Paleta.Hueso); }
+            else { for (int y = 1; y < h-1; y += 3) g.P(2,y,w-4,2,Paleta.Hueso); }
+            break;
+        // La alfombra se pisa: es lo único del plano que se dibuja y no frena.
+        case 'a':
+            g.P(0,0,w,h,Paleta.H("#7a3f37")); g.P(1,1,w-2,h-2,Paleta.H("#96543e"));
+            g.P(3,3,w-6,h-6,Paleta.H("#7a3f37")); if (w > 12 && h > 12) g.P(5,5,w-10,h-10,Paleta.MostazaO);
+            break;
+        case 't':
+            g.P(4,4,8,8,Paleta.MaderaO); g.P(5,5,6,6,Paleta.MaderaL); g.P(6,12,4,2,Paleta.Carbon); break;
+        case 'e':
+            g.P(0,1,w,h-1,Paleta.MaderaO); g.P(0,0,w,2,Paleta.MaderaL);
+            g.P(3,4,7,6,Paleta.Crema); if (w > 16) g.P(w-8,4,5,5,Paleta.Carbon);
+            break;
+        case 'b':
+            g.P(0,0,w,h,Paleta.Blanco); g.P(2,2,w-4,h-4,Paleta.H("#b9c6cf"));
+            g.P(3,3,w-6,h-6,Paleta.H("#8fa8a0")); g.P(w-5,2,2,3,Paleta.Acero); break;
+        case 'w':
+            g.P(0,2,w,h-2,Paleta.H("#5c4630")); g.P(0,0,w,3,Paleta.HormigonL);
+            for (int x = 2; x < w-3; x += 6) g.P(x,4,4,h-7,Paleta.H("#6d543a"));
+            g.P(3,1,5,1,Paleta.Acero);
+            break;
+        case 'n':
+            for (int y = 0; y < h-3; y += 6) { g.P(1,y,w-2,5,Paleta.Carbon); g.P(3,y+1,w-6,3,Paleta.GrisO); }
+            break;
+        case 'f':
+            g.P(0,0,w,h,Paleta.H("#3a5a3a")); g.P(1,1,w-2,h-2,Paleta.VerdeO);
+            for (int i = 4; i < (hz ? w : h)-3; i += 5) {
+                if (hz) g.P(i,0,2,h,Paleta.Acero); else g.P(0,i,w,2,Paleta.Acero);
+            }
+            break;
+        case 'x':
+            g.P(0,0,w,h,Paleta.RojoO); g.P(2,2,w-4,h-8,Paleta.Carbon);
+            g.P(3,3,w-6,h-11,Paleta.H("#2b3a4a")); g.P(3,h-5,w-6,3,Paleta.Mostaza);
+            break;
+        case 'p':
+            g.P(0,0,w,h,Paleta.MaderaO);
+            for (int x = 1; x < w-1; x += 4) g.P(x,1,3,h-2,Paleta.Madera);
+            g.P(0,h-2,w,2,Paleta.H("#4a3826"));
+            break;
         }
     }
 }

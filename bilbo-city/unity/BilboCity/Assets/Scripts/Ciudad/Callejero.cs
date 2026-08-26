@@ -840,6 +840,14 @@ public static class Callejero {
         return i > 0 ? Corto(Calles[i-1].Nombre) : null;
     }
 
+    /// <summary>El índice de la calle más uno (0 si ninguna). Lo usa SuelosCiudad.ClasificarNombres
+    /// para saber qué acera es de una calle «Plaza …» o «Muelle …», sin duplicar la tabla
+    /// de nombres que ya lleva _de.</summary>
+    public static int Indice(int x, int y) {
+        if (x < 0 || y < 0 || x >= Ciudad.MW || y >= Ciudad.MH) return 0;
+        return _de[y*Ciudad.MW + x];
+    }
+
     /// <summary>Qué casillas son «calle». No solo la calzada: la acera es calle, y en el
     /// Casco Viejo la calle ES la acera —las Siete Calles y media Bilbao la Vieja son
     /// peatonales y el plano no les pinta trazo de rodadura, así que buscando solo asfalto
