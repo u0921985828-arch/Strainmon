@@ -2596,8 +2596,8 @@ function hoja(k){
  ORDEN_POSES.forEach((p,fy)=>{for(let d=0;d<8;d++)g.drawImage(dibChar(ARQ[k],p,d),d*cw+ox,fy*ch+oy);});
  return HOJAS[k]=cuantizar(c);
 }
-function pintaChar(g,k,d8,pose,x,y){
- const h=HOJAS[k]||hoja(k), cw=CEL_W(), ch=CEL_H();
+function pintaChar(g,k,d8,pose,x,y,hj){
+ const h=hj||HOJAS[k]||hoja(k), cw=CEL_W(), ch=CEL_H();
  g.drawImage(h,d8*cw,IPOSE[pose]*ch,cw,ch,Math.round(x)-(cw>>1),Math.round(y)-ch+sc(7+MG_ABA),cw,ch);}
 const dir8De=(dx,dy)=>((2-Math.round(Math.atan2(dy,dx)/(Math.PI/4)))%8+8)%8;
 
@@ -3908,6 +3908,38 @@ const poi=id=>POI.find(p=>p.id===id);
 const MOB=new Uint8Array(MW*MH);
 const M_FAROLA=1,M_CONT=2,M_CONT2=3,M_BANCO=4,M_PAPELERA=5,M_SEMAFORO=6,M_ARBOL=7,
       M_TERRAZA=8,M_MARQUESINA=9,M_BOLARDO=10,M_CABINA=11,M_CEBRA_V=20,M_CEBRA_H=21;
+/* Qué pieza es cada código. Estaba solo dentro del switch de dibujo, así que nadie más
+   podía saber qué hay plantado en una casilla ni cuánto mide. */
+const MOB_PIEZA={[M_FAROLA]:'farola',[M_SEMAFORO]:'semaforo',[M_ARBOL]:'arbolPodado',
+ [M_BOLARDO]:'bolardo',[M_CONT]:'contenedor',[M_CONT2]:'contenedor2',[M_PAPELERA]:'papelera',
+ [M_BANCO]:'banco',[M_CABINA]:'cabina',[M_MARQUESINA]:'marquesina',[M_TERRAZA]:'terraza'};
+/* Lo que se siembra fuera de la acera, y cada cuánto. Iba metido en el bucle de dibujo con
+   sus desplazamientos a mano: ni se podía comprobar ni se podía mover sin tocar el render.
+   Gana la primera que case, que es como estaba la cadena de condiciones. */
+const SIEMBRA={
+ [PARQUE]:[[4,'arbol']],
+ /* El monte es el 39% del mapa —Artxanda, Pagasarri, las laderas— y estaba pelado: verde
+    con manchas y ni un árbol. El puerto de Unity sí los planta; el prototipo no, y el
+    prototipo es el que manda. Uno de cada cuatro casillas son diez metros entre árboles. */
+ [MONTE]: [[4,'arbol']],
+ [PLAZA]: [[23,'arbolPodado'],[31,'banco']],
+ [MUELLE]:[[29,'grua'],[17,'contMaritimo'],[13,'pales'],[11,'bidon']],
+ [PATIO]: [[7,'arbolPodado'],[9,'pales']],
+};
+const SIEMBRA_TEJADO={
+ teja:   [[23,'chimenea'],[71,'antenaTv']],
+ pizarra:[[23,'chimenea'],[71,'antenaTv']],
+ azotea: [[37,'deposito'],[41,'tendedero'],[43,'climatizador'],[47,'caseta'],[53,'antenaTv']],
+ nave:   [[29,'lucernario']],
+};
+/* Ley 6 · lo que tapa. Un objeto no ocupa solo suelo: ocupa vista. De ahí dos topes.
+   Uno de sitio: en una acera de dos metros y medio no cabe una grúa de doce, y una acera
+   con algo de más de cuatro metros deja de ser una acera y pasa a ser un muro. Otro de
+   figura: lo que pasa de dos metros es más alto que quien anda por delante, así que puede
+   esconderlo entero — y cuando eso pasa, al jugador se le pinta la silueta encima, que
+   perderse a uno mismo detrás de un plátano de sombra no es dificultad, es un fallo. */
+const ALTO_TAPA=2.0;
+const TOPE_ALTO={[ACERA]:4,[PLAZA]:4,[PARQUE]:6,[MONTE]:6,[PATIO]:6,[MUELLE]:12,[EDIF]:2.4};
 function colocarCalle(){
  MOB.fill(0);
  const pisable=(x,y)=>{const t=Tc(x,y);return t===ACERA||t===PLAZA;};
@@ -3972,35 +4004,33 @@ function colocarCalle(){
 function halo(px,py){
  for(const[rad,a]of[[38,.05],[26,.07],[15,.10]]){
   ctx.fillStyle='rgba(232,197,71,'+a+')';ctx.beginPath();ctx.arc(px,py,rad,0,6.283);ctx.fill();}}
-function dibMobiliario(mb,x,y){
+/* El punto del bordillo, en espacio de 32 por casilla: pegado al canto que da a la
+   calzada y centrado en el otro eje. Se saca aparte porque no solo lo quiere el dibujo:
+   la cola de dibujado necesita la base para ordenar por profundidad. */
+function anclaMob(x,y){
  const pE=Tc(x+1,y)===ROAD,pO=Tc(x-1,y)===ROAD,pS=Tc(x,y+1)===ROAD;
- /* El punto del bordillo, en espacio de 32 por casilla: pegado al canto que da a la
-    calzada y centrado en el otro eje. */
- const bx=pE?26:pO?6:16, by=pS?27:(Tc(x,y-1)===ROAD?7:18);
- /* Cada pieza se planta por su base y centrada en su ancho, que es como se apoya en el
-    suelo. Antes cada una llevaba su desplazamiento a mano y al cambiar de tamaño se
-    quedaban flotando. */
- const D=(k,dx,dy)=>{const[a,al]=MOB_M[k];
-  /* Cada pieza tira su sombra desde su base y con su altura: una farola de cuatro metros
-     no proyecta lo mismo que una papelera de uno. */
-  sombraFig(x*TS+(bx+(dx||0))*ESC,y*TS+(by+(dy||0))*ESC,a*4,al);
-  ctx.drawImage(PROP[k],x*TS+(bx-a*5+(dx||0))*ESC,y*TS+(by-al*10+(dy||0))*ESC);};
- switch(mb){
-  case M_FAROLA:    D('farola');break;
-  case M_SEMAFORO:  D('semaforo');break;
-  case M_ARBOL:     D('arbolPodado');break;
-  /* Los bolardos van en fila, que es como se ponen: uno cada casilla serían cinco
-     metros de separación y no cierran el paso a nada. */
-  case M_BOLARDO:   for(let k=-1;k<2;k++){
-    if(pE||pO)D('bolardo',0,k*10);else D('bolardo',k*10,0);}break;
-  case M_CONT:      D('contenedor');break;
-  case M_CONT2:     D('contenedor2');break;
-  case M_PAPELERA:  D('papelera');break;
-  case M_BANCO:     D('banco');break;
-  case M_CABINA:    D('cabina');break;
-  case M_MARQUESINA:D('marquesina');break;
-  /* La terraza sale de la pared del bar hacia la calzada, no encima del bordillo. */
-  case M_TERRAZA:   D('terraza',0,-4);break;}}
+ return [pE?26:pO?6:16, pS?27:(Tc(x,y-1)===ROAD?7:18)];}
+/* Ley 3 · ancla: por la base y centrado en su ancho, en casillas del mundo. Un sitio, una
+   fórmula. Lo del parque y el muelle iba con desplazamientos a mano y sin sombra: un árbol
+   de cinco metros flotaba sobre el césped sin marcar dónde se apoya. */
+function plantar(k,cx,cy){
+ const[a,al]=MOB_M[k];
+ /* Cada pieza tira su sombra desde su base y con su altura: una farola de cuatro metros
+    no proyecta lo mismo que una papelera de uno. */
+ sombraFig(cx*TS,cy*TS,a*4,al);
+ ctx.drawImage(PROP[k],Math.round(cx*TS-a*5*ESC),Math.round(cy*TS-al*10*ESC));}
+/* La caja que ocupa en pantalla, para saber a quién esconde. */
+function cajaProp(k,cx,cy){const[a,al]=MOB_M[k];
+ return {x0:cx*TS-a*5*ESC,x1:cx*TS+a*5*ESC,y0:cy*TS-al*10*ESC,y1:cy*TS,alto:al};}
+function dibMobiliario(mb,x,y){
+ const[bx,by]=anclaMob(x,y),pE=Tc(x+1,y)===ROAD,pO=Tc(x-1,y)===ROAD;
+ const k=MOB_PIEZA[mb];if(!k)return;
+ const D=(dx,dy)=>plantar(k,x+(bx+dx)/32,y+(by+dy)/32);
+ /* Los bolardos van en fila, que es como se ponen: uno cada casilla serían cinco metros
+    de separación y no cierran el paso a nada. */
+ if(mb===M_BOLARDO){for(let j=-1;j<2;j++){if(pE||pO)D(0,j*10);else D(j*10,0);}return;}
+ /* La terraza sale de la pared del bar hacia la calzada, no encima del bordillo. */
+ D(0,mb===M_TERRAZA?-4:0);}
 
 /*═══════════════ ESTADO ═══════════════*/
 const S={
@@ -7147,41 +7177,31 @@ function dibCiudad(){
     bloques. La ley es esa y está en CAPA: el suelo entero primero, los bloques después y lo
     que sobresale al final. */
  capa=CAPA.OBJETO;
+ /* Ley 5 · dentro de OBJETO manda la base: quien está más al sur está más cerca y tapa.
+    El mobiliario iba aparte y antes que nadie, casilla por casilla, así que el jugador se
+    dibujaba encima de la farola que tenía delante. Ahora entra en la misma cola. */
+ const L=[];
+ const sembrar=(k,cx,cy)=>L.push([cy,()=>plantar(k,cx,cy),cajaProp(k,cx,cy)]);
+ /* Lo que toca por hash en este suelo, primera que case. */
+ const deTabla=(tab,h,x,y,fy)=>{for(const[m,k]of tab)if(h%m===0){sembrar(k,x+.5,y+fy);return;}};
  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
   const t=map[y*MW+x],h=hash(x,y);
   if(t===ACERA){
    const mb=MOB[y*MW+x];
-   if(mb)dibMobiliario(mb,x,y);
+   if(mb&&mb<20){const[bx,by]=anclaMob(x,y),k=MOB_PIEZA[mb];
+    L.push([y+by/32,()=>dibMobiliario(mb,x,y),k?cajaProp(k,x+bx/32,y+by/32):null]);}
    /* De noche las farolas están para algo. El halo va en escalones, no en degradado:
-      un degradado suave al lado de un pixel art canta más que la falta de luz. */
+      un degradado suave al lado de un pixel art canta más que la falta de luz. Es luz y
+      no cosa, así que se queda en el suelo, debajo de todo lo que pise el charco. */
    if(mb===M_FAROLA&&!SOL.elev)halo(x*TS+TS/2,y*TS+TS/2+6*ESC);}
-  else if(t===PARQUE){if(h%4===0)ctx.drawImage(PROP.arbol,x*TS+2*ESC,y*TS+1*ESC);}
-  else if(t===PLAZA){if(h%23===0)ctx.drawImage(PROP.arbolPodado,x*TS+6*ESC,y*TS+3*ESC);
-   else if(h%31===0)ctx.drawImage(PROP.banco,x*TS+4*ESC,y*TS+10*ESC);}
-  else if(t===MUELLE){if(h%29===0)ctx.drawImage(PROP.grua,x*TS-8*ESC,y*TS-16*ESC);
-   else if(h%17===0)ctx.drawImage(PROP.contMaritimo,x*TS-4*ESC,y*TS+6*ESC);
-   else if(h%13===0)ctx.drawImage(PROP.pales,x*TS+5*ESC,y*TS+8*ESC);
-   else if(h%11===0)ctx.drawImage(PROP.bidon,x*TS+10*ESC,y*TS+9*ESC);}
-  else if(t===PATIO){if(h%7===0)ctx.drawImage(PROP.arbolPodado,x*TS+6*ESC,y*TS+3*ESC);
-   else if(h%9===0)ctx.drawImage(PROP.pales,x*TS+5*ESC,y*TS+8*ESC);}
-  else if(t===EDIF){
-   /* Cada familia de tejado lleva lo suyo: en la teja, chimeneas; en la azotea, depósitos
-      y tendederos; en la nave, lucernarios. Con eso, un bloque de Santutxu y una nave de
-      Zorrotzaurre dejan de ser dos rectángulos grises. */
-   const fam=famDe(roof[y*MW+x]);
-   if(fam==='teja'||fam==='pizarra'){
-    if(h%23===0)ctx.drawImage(PROP.chimenea,x*TS+10*ESC,y*TS+4*ESC);
-    else if(h%71===0)ctx.drawImage(PROP.antenaTv,x*TS+9*ESC,y*TS+2*ESC);}
-   else if(fam==='azotea'){
-    if(h%37===0)ctx.drawImage(PROP.deposito,x*TS+7*ESC,y*TS+5*ESC);
-    else if(h%41===0)ctx.drawImage(PROP.tendedero,x*TS+2*ESC,y*TS+9*ESC);
-    else if(h%43===0)ctx.drawImage(PROP.climatizador,x*TS+7*ESC,y*TS+8*ESC);
-    else if(h%47===0)ctx.drawImage(PROP.caseta,x*TS+5*ESC,y*TS+6*ESC);
-    else if(h%53===0)ctx.drawImage(PROP.antenaTv,x*TS+9*ESC,y*TS+2*ESC);}
-   else if(h%29===0)ctx.drawImage(PROP.lucernario,x*TS+4*ESC,y*TS+8*ESC);}}
+  else if(SIEMBRA[t])deTabla(SIEMBRA[t],h,x,y,.9);
+  /* Cada familia de tejado lleva lo suyo: en la teja, chimeneas; en la azotea, depósitos
+     y tendederos; en la nave, lucernarios. Con eso, un bloque de Santutxu y una nave de
+     Zorrotzaurre dejan de ser dos rectángulos grises. */
+  else if(t===EDIF){const fam=famDe(roof[y*MW+x]);
+   deTabla(SIEMBRA_TEJADO[fam]||SIEMBRA_TEJADO.nave,h,x,y,.62);}}
  /* Lo que anda por el mundo, ordenado por los pies: quien está más abajo está más cerca
     y tapa. */
- const L=[];
  for(const p of peatones)L.push([p.y,()=>pintaSombraChar(p)]);
  for(const e of enemigos)L.push([e.y,()=>{pintaSombraChar(e);
   ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(e.x*TS-9,e.y*TS-26,18,3);
@@ -7191,7 +7211,14 @@ function dibCiudad(){
  for(const p of policia)L.push([p.y,()=>pintaCoche(p,true)]);
  if(player.enCoche)L.push([player.y,()=>pintaCoche(player.enCoche,false,true)]);
  else L.push([player.y,()=>pintaSombraChar(player,true)]);
- L.sort((a,b)=>a[0]-b[0]).forEach(l=>l[1]());
+ L.sort((a,b)=>a[0]-b[0]);
+ /* Ley 6: mientras se pinta, se mira qué de lo que va después del jugador y le pisa la
+    caja pasa de dos metros. Si algo lo esconde, va su silueta encima. */
+ const cj=cajaJugador();let tapado=false;
+ for(const l of L){
+  if(!player.enCoche&&l[0]>player.y&&l[2]&&l[2].alto>=ALTO_TAPA&&tapa(l[2],cj))tapado=true;
+  l[1]();}
+ if(tapado)siluetaChar(player);
  for(const b of balas){ctx.fillStyle=C.mostaza;ctx.fillRect(b.x*TS-1.5,b.y*TS-1.5,3,3);}
  for(const p of parts){const a=clamp(p.vida/.7,0,1);
   ctx.fillStyle=p.tipo==='sangre'?`rgba(149,31,24,${a})`:p.tipo==='chispa'?`rgba(232,197,71,${a})`:`rgba(109,120,131,${a*.5})`;
@@ -7233,6 +7260,31 @@ function pintaSombraChar(e,esJugador){
  const aid=esJugador?S.armaAct:e.arma;
  if(aid&&ARMA_MANO[aid])ctx.drawImage(ARMA_MANO[aid][e.d8],Math.round(e.x*U)-sc(ARMA_CX),Math.round(e.y*U)-sc(19));
  if(esJugador&&fogT>0&&fogTipo)ctx.drawImage(FOG[fogTipo][fogD],Math.round(e.x*U)-12,Math.round(e.y*U)-12);}
+/* Ley 6: la silueta. La hoja del personaje, aplanada a un solo tono, se pinta encima de lo
+   que lo esconde. Se forja una vez por arquetipo —son ocho direcciones por pose— y sale de
+   la propia hoja, así que la silueta es exactamente la figura, gorro y bulto incluidos. */
+const SILU={};
+function hojaSilueta(k){
+ if(SILU[k])return SILU[k];
+ const h=HOJAS[k]||hoja(k),c=lienzo(h.width,h.height),g=c.getContext('2d');
+ g.drawImage(h,0,0);g.globalCompositeOperation='source-in';
+ g.fillStyle=C.mostaza;g.fillRect(0,0,c.width,c.height);
+ return SILU[k]=c;}
+let siluetas=0;
+function siluetaChar(e){
+ const U=S.escena==='interior'?TS_INT:TS;
+ siluetas++;
+ pintaChar(ctx,e.arq,e.d8,e.herido>0?'herido':e.pose||'quieto',e.x*U,e.y*U,hojaSilueta(e.arq));}
+/* Dos cajas que se pisan, y cuánto. Un roce no cuenta: si con cada esquina de banco se
+   encendiera la silueta, parpadearía toda la calle. */
+function tapa(c,j){
+ const w=Math.min(c.x1,j.x1)-Math.max(c.x0,j.x0), h=Math.min(c.y1,j.y1)-Math.max(c.y0,j.y0);
+ if(w<=0||h<=0)return false;
+ return w*h >= (j.x1-j.x0)*(j.y1-j.y0)*.35;}
+function cajaJugador(){
+ const U=S.escena==='interior'?TS_INT:TS,px=player.x*U,py=player.y*U;
+ /* 1,70 m a 20 px/m: 34 de alto y 17 de ancho de hombro a hombro. */
+ return {x0:px-8.5,x1:px+8.5,y0:py-34,y1:py};}
 function pintaCoche(c,esPoli,mio){
  const spr=esPoli?VEH.patrullaRot[Math.sin(c.luz)>0?0:1]
   :(!c.vivo?VEH_QUEMADO[c.tipo]:VEH[c.tipo][c.lib%LIBREAS.length]);

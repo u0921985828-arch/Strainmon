@@ -13,7 +13,7 @@ Bilbao a finales de los noventa, vista desde arriba y algo escorada, en pixel ar
 
 ## Las leyes del sprite
 
-No son gustos: son cinco reglas que se comprueban solas y que, incumplidas, se ven en
+No son gustos: son seis reglas que se comprueban solas y que, incumplidas, se ven en
 pantalla — un árbol partido por la mitad, una papelera de dos metros o una chincheta debajo
 del jugador.
 
@@ -39,8 +39,15 @@ desplazamiento a mano: al cambiar de tamaño, los que lo llevaban se quedaban fl
 
 **4 · Huella y estorbo.** Lo que ocupa suelo lo dice su medida, y lo que estorba lo dice la
 lista: dentro de un sitio, todo lo que no sea `.dDY` frena; en la calle, el mobiliario no
-frena —una papelera no cierra una acera— pero **no puede plantarse donde no cabe**: nada de
-más de cuatro metros de alto en una acera (la grúa y el andamio son de muelle y de obra).
+frena —una papelera no cierra una acera— pero **no puede plantarse donde no cabe**. Cada
+suelo tiene su tope de altura, y el verificador barre el mapa entero contra él:
+
+| Suelo | Tope | Por qué |
+|---|---|---|
+| Acera, plaza | **4 m** | una acera con algo de seis metros deja de ser acera y es un muro |
+| Parque, patio | **6 m** | ahí sí cabe un árbol de copa entera |
+| Muelle | **12 m** | la grúa y el contenedor marítimo son de puerto, no de bordillo |
+| Tejado | **2,4 m** | lo que se sube a una azotea: depósito, caseta, antena |
 
 **5 · Capas.** Lo que se pinta después tapa, así que el orden es ley, no costumbre:
 
@@ -52,11 +59,22 @@ más de cuatro metros de alto en una acera (la grúa y el andamio son de muelle 
 | `VUELO` | chinchetas, rótulos y las mantas de color (tinte de barrio y de la hora) |
 | `HUD` | el mando y los cuadros de la interfaz |
 
+Dentro de `OBJETO` manda la base: quien está más al sur está más cerca y tapa. El mobiliario
+iba en su propio bucle, casilla por casilla y antes que nadie, así que **el jugador se pintaba
+encima de la farola que tenía delante**. Ahora entra en la misma cola que la gente y los coches.
+
 Nada de una capa se pinta antes que algo de una capa de más abajo. El verificador **graba un
 fotograma de verdad** y falla si el orden se rompe: así se cazó que el mobiliario iba mezclado
 con el suelo —un árbol de dos casillas perdía la mitad derecha, porque la casilla de al lado
 se pintaba después y le echaba el suelo por encima— y que las chinchetas iban antes que la
 gente, de modo que el propio jugador tapaba la del sitio al que iba.
+
+**6 · Visión.** Un objeto no ocupa solo suelo: ocupa vista. Lo que pasa de **dos metros** es
+más alto que quien anda por delante y puede esconderlo entero, y perderse a uno mismo detrás
+de un plátano de sombra no es dificultad: es un fallo. Cuando algo que se pinta después del
+jugador le tapa más de un tercio de su caja, se le pinta la **silueta** encima —su propia
+hoja aplanada a un tono— y sigue sabiéndose dónde está. Un roce no cuenta, o parpadearía la
+calle entera.
 
 ## Rejilla y proporciones
 

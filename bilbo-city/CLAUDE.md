@@ -639,12 +639,24 @@ píxel al que le recortaron el contorno. Por eso el puñetazo, el fogonazo y el 
 compra van recogidos: los de antes contaban con siete píxeles de margen lateral y ahora
 hay dos.
 
-**Las cinco leyes del sprite están en `ESTILO.md`** y se comprueban solas: medida en metros
+**Las seis leyes del sprite están en `ESTILO.md`** y se comprueban solas: medida en metros
 a la densidad de su familia, cuerpo común con la ropa en capas, ancla por la base, huella y
-estorbo, y **orden de capas** — suelo, bloques, objetos, vuelo, HUD. La de capas se verifica
-grabando un fotograma de verdad y mirando que el orden nunca retroceda; así se cazó que el
-mobiliario iba mezclado con el suelo (un árbol de dos casillas perdía la mitad derecha) y que
-las chinchetas se pintaban antes que la gente.
+estorbo, **orden de capas** —suelo, bloques, objetos, vuelo, HUD— y **visión**. La de capas se
+verifica grabando un fotograma de verdad y mirando que el orden nunca retroceda; así se cazó
+que el mobiliario iba mezclado con el suelo (un árbol de dos casillas perdía la mitad derecha)
+y que las chinchetas se pintaban antes que la gente.
+
+De la de visión salen tres cosas que hay que respetar al tocar el mobiliario:
+
+- `TOPE_ALTO` dice cuánto puede medir lo que se planta en cada suelo —acera 4 m, parque 6,
+  muelle 12, tejado 2,4— y la batería barre el mapa entero contra la tabla. Si hace falta
+  algo más alto, se cambia la tabla y se justifica; no se cuela la pieza.
+- Dentro de `OBJETO` **todo va en la misma cola ordenada por la base**, mobiliario incluido.
+  Un `drawImage` suelto en el bucle de casillas se salta la profundidad: el jugador acaba
+  pintado encima de la farola que tiene delante.
+- Lo que pasa de `ALTO_TAPA` (2 m) puede esconder al jugador entero, y entonces se le pinta
+  la silueta encima. Toda pieza nueva necesita su alto real en `MOB_M` para que la cuenta
+  salga.
 
 **Todo el juego sigue una sola guía de estilo: [`referencia/ESTILO.md`](referencia/ESTILO.md).**
 Proporciones, vista, dirección de la luz, uso del color, contorno, tipografía, rejilla de

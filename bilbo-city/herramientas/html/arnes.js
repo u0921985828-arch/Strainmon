@@ -57,7 +57,8 @@ js=js.slice(0,i)+`global.__={S,player,MISIONES,empezarMision,avanzarPaso,objetiv
  estadoCasera,deudaTotal,correrAlquiler,pagarCasera,dejarPiso,ocupar,dormir,
  NIVEL_ARMA,NIVEL_VEHICULO,comer,verTab,telC,roof,famDe,familiaTejado,TEJADO_DE,PROP,SINGULARES,PLANO_SINGULAR,TS,CALLES,calleEn,calleDe,LARGO_CALLE,nombrarCalles,
  BASES,cargarSprites,setDe,lutDe,hojaDeSet,TORSOS,PIERNAS,CALZADO,C,COMPLEX,ARMA_MANO,FOG,contorno,sc,ANCHO_FACH,REVOCO,PISO_BARRIO,poseAndar,MS,ZANCADA,
- poi,pasoActual,npcCerca,MOB_M,CAPA,capaAct,sombraSol,sombraCorta,calcularSol,luzAmbiente,largoSombra,SOL,MOB_CONTORNO,empezarPrologo,PROLOGO,PRIMO};
+ poi,pasoActual,npcCerca,MOB_M,CAPA,capaAct,sombraSol,sombraCorta,calcularSol,luzAmbiente,largoSombra,SOL,MOB_CONTORNO,empezarPrologo,PROLOGO,PRIMO,
+ MOB_PIEZA,SIEMBRA,SIEMBRA_TEJADO,TOPE_ALTO,ALTO_TAPA,cajaProp,cajaJugador,tapa,plantar,anclaMob,siluetas:()=>siluetas};
  sembrar(SEMILLA);`+js.slice(i);
 eval(js);
 module.exports={H,step:n=>{for(let k=0;k<n;k++){now+=16.7;const f=raf;raf=null;if(!f)throw new Error('sin frame');f(now);}},

@@ -345,6 +345,90 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
         + 'suelo → bloques → objetos → vuelo → HUD');
     }
 
+    // ── 1 sexies · la ley de la visión ─────────────────────────────────
+    /* Un objeto no ocupa solo suelo: ocupa vista. Dos reglas, y las dos se barren enteras
+       en vez de mirarse a ojo en una captura:
+         · dónde cabe cada cosa — en una acera de dos metros y medio no se planta una grúa
+           de doce, y algo de más de cuatro metros en el bordillo deja de ser mobiliario y
+           pasa a ser un muro;
+         · a quién esconde — lo que pasa de dos metros es más alto que quien anda por
+           delante, así que puede tapar al jugador entero. */
+    {
+      // 1 · todo código de mobiliario es una pieza conocida, y cabe donde está plantado.
+      const tope = A.TOPE_ALTO, alto = k => A.MOB_M[k][1];
+      let sinPieza = 0, pasadas = 0, peor = '', piezas = new Set();
+      for (let i = 0; i < A.MOB.length; i++) {
+        const mb = A.MOB[i];
+        if (!mb || mb >= 20) continue;                       // 20 y 21 son pasos de cebra
+        const k = A.MOB_PIEZA[mb];
+        if (!k) { sinPieza++; continue; }
+        piezas.add(k);
+        if (alto(k) > tope[A.ACERA] + 1e-6) {
+          pasadas++;
+          if (!peor) peor = k + ' de ' + alto(k) + ' m en la acera ' + (i % A.MW) + ',' + ((i / A.MW) | 0);
+        }
+      }
+      ok(!sinPieza, sinPieza + ' casillas con un código de mobiliario que nadie sabe dibujar');
+      ok(!pasadas, pasadas + ' piezas no caben donde están: ' + peor);
+      // 2 · y lo que se siembra fuera de la acera, igual: cada suelo tiene su tope.
+      let fuera = '';
+      for (const suelo of Object.keys(A.SIEMBRA)) {
+        for (const [, k] of A.SIEMBRA[suelo]) {
+          piezas.add(k);
+          if (alto(k) > tope[suelo] + 1e-6)
+            fuera = fuera || (k + ' de ' + alto(k) + ' m en un suelo con tope de ' + tope[suelo]);
+        }
+      }
+      for (const fam of Object.keys(A.SIEMBRA_TEJADO))
+        for (const [, k] of A.SIEMBRA_TEJADO[fam]) {
+          piezas.add(k);
+          if (alto(k) > tope[A.EDIF] + 1e-6)
+            fuera = fuera || (k + ' de ' + alto(k) + ' m en un tejado');
+        }
+      ok(!fuera, 'se siembra donde no cabe: ' + fuera);
+      // La grúa y el andamio son de muelle y de obra: si alguno acabara en una acera, la
+      // regla de arriba lo cazaría, pero se dice aquí por si un día cambia el tope.
+      ok(alto('grua') > tope[A.ACERA] && alto('andamio') > tope[A.ACERA],
+         'la grúa o el andamio han dejado de ser demasiado altos para una acera');
+
+      // 3 · la silueta. Delante de un árbol de cuatro metros, el jugador no se pierde.
+      const g = A.real.getContext('2d');
+      S.escena = 'ciudad'; A.cerrarDlg(); P.enCoche = null;
+      const conProp = [], sinProp = [];
+      for (let i = A.MW * 60; i < A.MOB.length && (!conProp.length || !sinProp.length); i++) {
+        const x = i % A.MW, y = (i / A.MW) | 0;
+        if (x < 3 || y < 3 || x > A.MW - 4 || y > A.MH - 4) continue;
+        if (A.MOB[i] === 7 && !conProp.length) {             // árbol de alineación, 3,8 m
+          const [bx, by] = A.anclaMob(x, y);
+          if (A.map[(y - 1) * A.MW + x] === A.ACERA) conProp.push(x + bx / 32, y + by / 32);
+        }
+        if (!sinProp.length && A.map[i] === A.ROAD) {
+          let limpio = true;
+          for (let dy = 0; dy <= 4 && limpio; dy++) for (let dx = -2; dx <= 2; dx++) {
+            const j = (y + dy) * A.MW + x + dx, t = A.map[j];
+            if (A.MOB[j] || t === A.EDIF || A.SIEMBRA[t]) { limpio = false; break; }
+          }
+          if (limpio) sinProp.push(x + 0.5, y + 0.5);
+        }
+      }
+      ok(conProp.length === 2, 'no se encontró ningún árbol de acera con acera por encima');
+      ok(sinProp.length === 2, 'no se encontró un trozo de calzada sin nada plantado alrededor');
+      const fotograma = () => { const n = A.siluetas(); paso(1); return A.siluetas() - n; };
+      const plantarse = (px, py) => {
+        P.x = px; P.y = py; P.d8 = 2;
+        paso(30);                                            // la cámara va detrás, no salta
+      };
+      plantarse(conProp[0], conProp[1] - 0.3);
+      const tapado = fotograma();
+      plantarse(sinProp[0], sinProp[1]);
+      const libre = fotograma();
+      ok(tapado === 1, 'delante de un árbol de 3,8 m el jugador no lleva silueta');
+      ok(libre === 0, 'en mitad de la calzada, sin nada delante, se pinta silueta igual');
+      bien.push(piezas.size + ' piezas plantadas donde caben (acera hasta '
+        + tope[A.ACERA] + ' m, muelle hasta ' + tope[A.MUELLE]
+        + '), y silueta cuando algo de más de ' + A.ALTO_TAPA + ' m tapa al jugador');
+    }
+
     // ── 2 bis · se duerme y te curan ───────────────────────────────────
     // dormir() y curar() miran la casilla que hay delante. Si un plano nuevo pone la cama
     // pegada a la pared de abajo, la cama existe y no se puede usar.

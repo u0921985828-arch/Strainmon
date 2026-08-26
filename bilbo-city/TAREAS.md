@@ -111,6 +111,13 @@ pantalla. Funciona y las proporciones ya son las buenas, pero el detalle todaví
       así que en Unity las manzanas siguen siendo paredes ciegas mientras en el HTML tienen
       escaparates. Portar el bucle del HTML, que ahora rellena la casilla por anchos
       (`ANCHO_FACH`): un local entero de 32 px o dos de medio.
+- [ ] **El puerto no existe en el mapa.** Del plano solo salen siete tipos de suelo: calzada,
+      acera, edificio, parque, agua, puente y monte. `MUELLE`, `PATIO`, `PLAZA` y `VIA` están
+      declarados y no hay **ni una casilla** de ninguno en las 1.117.440 del mapa. Consecuencia:
+      la grúa, el contenedor marítimo, los palés y el bidón se forjan al arrancar y no se
+      plantan nunca —arte muerto—, y Zorrotzaurre y el Abra son césped. Hay que clasificar
+      muelle y patio de manzana en `herramientas/plano/extraer.py` (la lámina del plano los
+      distingue por relleno) y volver a extraer.
 - [ ] Oclusión de interiores de manzana con transición.
 - [ ] Más variedad de diálogo en los parroquianos.
 - [ ] Misiones secundarias no encadenadas.
