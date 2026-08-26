@@ -2236,8 +2236,7 @@ function dibChar(cfg,pose,d8){
  /* De perfil, la pierna de delante va hacia donde mira la figura y la de detrás se queda:
     iban al revés —las dos por detrás del eje— y el resultado era una figura mirando a la
     derecha con los dos pies apuntando a la izquierda. */
- else if(lateral){const dx=derV?1:-1;
-  const xa=derV?cx-1:cx-2, xd=derV?cx+1:cx-4;
+ else if(lateral){const xa=derV?cx-1:cx-2, xd=derV?cx+1:cx-4;
   pierna(xa,d2,m2,l2,PN.s);pierna(xd,d1,m1,l1,PN.b);
   P(g,xd+m1,py+l1,1,rod-py-l1,PN.l);P(g,xd+d1,rod,1,py+PH-rod,PN.l);
   if(PN.corto)P(g,xd+m1,py+4,3,PH-4,cfg.piel);}

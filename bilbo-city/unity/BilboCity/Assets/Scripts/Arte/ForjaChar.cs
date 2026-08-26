@@ -57,9 +57,9 @@ public static class ForjaChar {
         new Postura{ p0=2,p1=0,b0=0,b1=0,y=-1 },                                // Andar2
         new Postura{ p0=1,p1=0,b0=1,b1=-1,y=0, dx0=-2,dx1=2 },                  // Andar3
         new Postura{ p0=0,p1=2,b0=0,b1=0,y=-1 },                                // Andar4
-        new Postura{ p0=-2,p1=2,b0=2,b1=-2,y=-1, dx0=3,dx1=-3 },                // Correr1
+        new Postura{ p0=-2,p1=2,b0=2,b1=-2,y=-1, dx0=2,dx1=-2 },                // Correr1
         new Postura{ p0=2,p1=-2,b0=-1,b1=1,y=-1, dx0=1,dx1=-1 },                // Correr2
-        new Postura{ p0=-3,p1=3,b0=-2,b1=2,y=-1, dx0=-3,dx1=3 },                // Correr3
+        new Postura{ p0=-3,p1=3,b0=-2,b1=2,y=-1, dx0=-2,dx1=2 },                // Correr3
         new Postura{ p0=3,p1=-3,b0=-1,b1=1,y=-1, dx0=-1,dx1=1 },                // Correr4
         new Postura{ p0=0,p1=0,b0=0,b1=0,y=0, ataque=1 },             // Pega1
         new Postura{ p0=0,p1=1,b0=0,b1=0,y=0, ataque=2 },             // Pega2
@@ -270,30 +270,83 @@ public static class ForjaChar {
         // lados, cada una a la suya.
         int abre = Mathf.Max(Mathf.Abs(P_.dx0), Mathf.Abs(P_.dx1));
         int d1 = lateral ? P_.dx0 : -abre, d2 = lateral ? P_.dx1 : abre;
+        // Y la pierna se mueve **por la rodilla**, no entera: el muslo nace en la cadera y
+        // se queda donde está. Moviendo la pierna completa se despegaba del cuerpo —a esta
+        // escala la cadera son seis píxeles y un desplazamiento de dos ya deja el pantalón
+        // en el aire, que es lo que se veía como una figura rota— y encima el muslo se
+        // salía del torso. Quebrada por la rodilla se queda pegada y además anda: es lo que
+        // hace una pierna de verdad.
+        // Hacia dónde mira la figura, en horizontal: de perfil un paso entero y en tres
+        // cuartos medio. Con esto las piernas de cualquier prenda —también las que asoman
+        // bajo una falda— se van al lado al que mira la cara, en vez de quedarse plantadas
+        // de frente.
+        int mira = lateral ? (derV ? 2 : -2) : (diag ? (dir == DE ? 1 : -1) : 0);
+        int rod = py + 4;
+        int Mitad(int v) => v > 0 ? Mathf.CeilToInt(v / 2f) : Mathf.FloorToInt(v / 2f);
+        int m1 = Mitad(d1), m2 = Mitad(d2);
         // La pernera de delante lleva su canto claro a la izquierda, que es de donde viene
         // la luz, y la de detrás se queda en sombra: sin eso las dos piernas son un bloque.
+        // La cadera, y esto es lo que faltaba de siempre: las posturas acortan la pierna
+        // **desde arriba**, así que en cuanto una se recoge queda una franja de nada entre
+        // el torso y el pantalón y la pierna se ve suelta en el aire —agachado, herido y la
+        // mitad del ciclo de correr—. La cadera la rellena, y además es lo que hay ahí: el
+        // pantalón sigue puesto.
+        int cad = Mathf.Max(Mathf.Max(l1, l2), 0);
+        if (!PN.falda && cad > 0) {
+            int hx0 = Mathf.Min(cx - 3 + m1, cx - 3), hx1 = Mathf.Max(cx + 3 + m2, cx + 3);
+            L.P(hx0, py - 1, hx1 - hx0, cad + 2, PN.b);
+        }
+        // Una pierna: el muslo desde la cadera hasta la rodilla y de ahí abajo la caña,
+        // corrida. El muslo se lleva la mitad del desplazamiento para que no quede un
+        // escalón seco.
+        void Pierna(int bx, int d, int m, int l, Color32 col) {
+            L.P(bx + m, py + l, 3, rod - py - l, col);
+            L.P(bx + d, rod, 3, py + PH - rod, col);
+        }
         if (PN.falda) {
             L.P(cx - compW/2 - 1, py - 1, compW + 2, 6, PN.b);
             L.P(cx - compW/2 - 1, py - 1, compW + 2, 1, PN.l);
             L.P(cx - compW/2 - 1, py + 4, compW + 2, 1, PN.s);
-            L.P(cx - 3 + d1, py + 5, 2, PH - 4, cfg.Piel);
-            L.P(cx + 1 + d2, py + 5, 2, PH - 4, cfg.Piel);
-            L.P(cx - 3 + d1, py + PH, 2, 1, cfg.PielS);
-            L.P(cx + 1 + d2, py + PH, 2, 1, cfg.PielS);
+            L.P(cx - 3 + d1 + mira, py + 5, 2, PH - 4, cfg.Piel);
+            L.P(cx + 1 + d2 + mira, py + 5, 2, PH - 4, cfg.Piel);
+            L.P(cx - 3 + d1 + mira, py + PH, 2, 1, cfg.PielS);
+            L.P(cx + 1 + d2 + mira, py + PH, 2, 1, cfg.PielS);
+        // De perfil, la pierna de delante va hacia donde mira la figura y la de detrás se
+        // queda: iban al revés —las dos por detrás del eje— y el resultado era una figura
+        // mirando a la derecha con los dos pies apuntando a la izquierda.
         } else if (lateral) {
-            int dx = derV ? 1 : -1;
-            L.P(cx - 2 - dx + d2, py + l2, 3, PH - l2, PN.s);
-            L.P(cx - 2 + dx + d1, py + l1, 3, PH - l1, PN.b);
-            L.P(cx - 2 + dx + d1, py + l1, 1, PH - l1, PN.l);
-            if (PN.corto) L.P(cx - 2 + dx + d1, py + 4, 3, PH - 4, cfg.Piel);
+            int xa = derV ? cx - 1 : cx - 2, xd = derV ? cx + 1 : cx - 4;
+            Pierna(xa, d2, m2, l2, PN.s); Pierna(xd, d1, m1, l1, PN.b);
+            L.P(xd + m1, py + l1, 1, rod - py - l1, PN.l);
+            L.P(xd + d1, rod, 1, py + PH - rod, PN.l);
+            if (PN.corto) L.P(xd + m1, py + 4, 3, PH - 4, cfg.Piel);
+        // Tres cuartos: la figura no mira ni de frente ni de perfil, y las piernas
+        // tampoco. Iban de frente —dos perneras iguales, una al lado de la otra— mientras
+        // la cabeza y el torso ya estaban girados: media figura hacia un lado y media
+        // hacia el otro. Aquí la pierna de delante va entera y la de detrás queda medio
+        // tapada por el cuerpo: un píxel más estrecha, otro más arriba y arrimada al eje.
+        } else if (diag) {
+            int s = dir == DE ? 1 : -1;
+            // Un píxel hacia donde mira: el torso ya va corrido en la diagonal y, sin
+            // esto, los pies se quedaban del lado de atrás.
+            int xc = (s > 0 ? cx : cx - 3) + s, xl = (s > 0 ? cx - 2 : cx + 1) + s;
+            int dc = s > 0 ? d2 : d1, mc = s > 0 ? m2 : m1, lc = s > 0 ? l2 : l1;
+            int dl = s > 0 ? d1 : d2, ml = s > 0 ? m1 : m2, ll = (s > 0 ? l1 : l2) + 1;
+            L.P(xl + ml, py + ll, 2, rod - py - ll, PN.s);
+            L.P(xl + dl, rod, 2, py + PH - rod, PN.s);
+            Pierna(xc, dc, mc, lc, PN.b);
+            L.P(xc + mc, py + lc, 1, rod - py - lc, PN.l);
+            L.P(xc + dc, rod, 1, py + PH - rod, PN.l);
+            L.P(xc + mc, py + lc, 3, 1, PN.s);
+            if (PN.corto) { L.P(xc + mc, py + 4, 3, PH - 4, cfg.Piel); L.P(xl + ml, py + 4, 2, PH - 4, cfg.Piel); }
         } else {
-            L.P(cx - 3 + d1, py + l1, 3, PH - l1, PN.b);
-            L.P(cx + d2, py + l2, 3, PH - l2, PN.s);
-            L.P(cx - 3 + d1, py + l1, 1, PH - l1, PN.l);
+            Pierna(cx - 3, d1, m1, l1, PN.b); Pierna(cx, d2, m2, l2, PN.s);
+            L.P(cx - 3 + m1, py + l1, 1, rod - py - l1, PN.l);
+            L.P(cx - 3 + d1, rod, 1, py + PH - rod, PN.l);
             // El dobladillo proyecta sobre la pernera, igual que la barbilla sobre el pecho.
-            L.P(cx - 3 + d1, py + l1, 3, 1, PN.s);
-            if (PN.tieneRaya) { L.P(cx - 3 + d1, py + l1, 1, PH - l1, PN.raya); L.P(cx + 2 + d2, py + l2, 1, PH - l2, PN.raya); }
-            if (PN.corto) { L.P(cx - 3 + d1, py + 4, 3, PH - 4, cfg.Piel); L.P(cx + d2, py + 4, 3, PH - 4, cfg.Piel); }
+            L.P(cx - 3 + m1, py + l1, 3, 1, PN.s);
+            if (PN.tieneRaya) { L.P(cx - 3 + m1, py + l1, 1, rod - py - l1, PN.raya); L.P(cx + 2 + m2, py + l2, 1, rod - py - l2, PN.raya); }
+            if (PN.corto) { L.P(cx - 3 + m1, py + 4, 3, PH - 4, cfg.Piel); L.P(cx + m2, py + 4, 3, PH - 4, cfg.Piel); }
             // La costura entre las perneras solo cuando van juntas: con las piernas
             // abiertas, una raya negra en medio del hueco es una raya en el aire.
             if (d1 == 0 && d2 == 0) L.P(cx - 1, py + 3, 1, PH - 3, Paleta.Negro);
@@ -304,13 +357,25 @@ public static class ForjaChar {
         var zap = Calzado(cfg.Calzado);
         int zy = MG_ARR + 24 + oy;
         // El zapato va con su pierna: clavado en el sitio, la figura patina.
+        // Bajo falda los pies son dos, pequeños, y también miran a donde mira la cara; de
+        // perfil el de delante asoma un píxel más, que es la punta.
         if (PN.falda) {
-            L.P(cx - 3 + d1, zy, 2, 2, zap.b); L.P(cx + 1 + d2, zy, 2, 2, zap.b);
-            L.P(cx - 3 + d1, zy + 1, 2, 1, zap.s); L.P(cx + 1 + d2, zy + 1, 2, 1, zap.s);
+            int az = derV ? 1 : 0, iz = derV ? 0 : 1;
+            L.P(cx - 3 + d1 + mira, zy, 2 + (lateral ? iz : 0), 2, zap.b);
+            L.P(cx + 1 + d2 + mira, zy, 2 + (lateral ? az : 0), 2, zap.b);
+            L.P(cx - 3 + d1 + mira, zy + 1, 2 + (lateral ? iz : 0), 1, zap.s);
+            L.P(cx + 1 + d2 + mira, zy + 1, 2 + (lateral ? az : 0), 1, zap.s);
         } else if (lateral) {
-            int dx = derV ? 1 : -1;
-            L.P(cx - 2 - dx + d2, zy, 3, 2, zap.b); L.P(cx - 2 + dx + d1, zy, 4, 2, zap.b);
-            L.P(cx - 2 - dx + d2, zy + 1, 3, 1, zap.s); L.P(cx - 2 + dx + d1, zy + 1, 4, 1, zap.s);
+            int xa = (derV ? cx - 1 : cx - 2) + d2, xd = (derV ? cx + 1 : cx - 5) + d1;
+            L.P(xa, zy, 3, 2, zap.b); L.P(xd, zy, 4, 2, zap.b);
+            L.P(xa, zy + 1, 3, 1, zap.s); L.P(xd, zy + 1, 4, 1, zap.s);
+        // Y el pie de delante apunta a donde mira: cuatro píxeles hacia ese lado. El de
+        // detrás asoma tres, medio tapado.
+        } else if (diag) {
+            int s = dir == DE ? 1 : -1;
+            int xc = (s > 0 ? cx : cx - 4) + s + (s > 0 ? d2 : d1), xl = (s > 0 ? cx - 2 : cx + 1) + s + (s > 0 ? d1 : d2);
+            L.P(xl, zy, 3, 2, zap.s); L.P(xl, zy + 1, 3, 1, zap.s);
+            L.P(xc, zy, 4, 2, zap.b); L.P(xc, zy + 1, 4, 1, zap.s);
         } else {
             L.P(cx - 3 + d1, zy, 3, 2, zap.b); L.P(cx + d2, zy, 3, 2, zap.b);
             L.P(cx - 3 + d1, zy + 1, 3, 1, zap.s); L.P(cx + d2, zy + 1, 3, 1, zap.s);
