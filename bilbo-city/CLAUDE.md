@@ -308,6 +308,13 @@ de color a la misma altura.
   Por eso dobla la esquina y se para en la acera de enfrente sin llevar la cuenta de nada.
 - **La luz de la hora**: noche azul, amanecer y atardecer cálidos, mediodía limpio. Antes
   solo había noche y a las nueve de la mañana la ciudad se veía igual que a las tres.
+- **De noche se encienden las ventanas.** A las once la ciudad era una mancha negra con
+  farolas: lo que dice que ahí vive gente es la ventana encendida. Se enciende una de cada
+  tres, y **siempre la misma** —sale del hash de la casilla, el piso y el hueco—, que si
+  parpadeara al mover la cámara sería un cartel de neón y no un edificio. Cada tipo de
+  fachada tiene el cristal donde lo tiene: el balcón dos píxeles más arriba, el mirador
+  entero, la persiana solo por debajo. Por eso el hueco de ventana (`AN_VENT`, `X_VENT`)
+  está fuera de la forja: de noche hay que volver a encontrarlo.
 - **De noche las farolas encienden** un charco de luz en escalones —no en degradado, y no es
   un sprite: es luz, como el tinte, y un sprite a medio alfa se saltaría la regla de que todo
   el arte va opaco y en paleta.

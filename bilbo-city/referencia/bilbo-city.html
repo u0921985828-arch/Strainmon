@@ -3250,6 +3250,10 @@ const MOB_M={deposito:[2.0,2.2],climatizador:[1.2,1.0],antenaTv:[1.2,2.4],tended
      Gran Vía: siete metros de fuste y copa estrecha. */
   pino:[3.0,7.0],matorral:[1.6,1.0]};
 const AVE=[];
+/* El hueco de ventana, en unidades de forja: 2,1 m entre ejes, tres por casilla. Está aquí
+   arriba y no dentro de la forja porque de noche hay que volver a encontrar las ventanas
+   para encenderlas, y una fachada iluminada por donde no hay cristal canta. */
+const AN_VENT=10, AL_VENT=14, X_VENT=[0,11,22];
 function generarProps(){
  /* Lo que hay encima de un tejado. Va suelto y sembrado por hash, como el mobiliario de
     la acera: dibujado dentro del tile se repetiría en cada casilla del edificio. */
@@ -3364,7 +3368,7 @@ function generarProps(){
   P(g,x,y,w,h,VIDRIO);P(g,x,y,w-2,2,VIDRIOL);};
  /* Tres huecos por casilla: 2,1 m entre ejes, que es lo que hay en una fachada de
     vivienda. Con cuatro y huecos de metro y medio salia un muro cortina de oficinas. */
- const AN_V=10, AL_V=14;
+ const AN_V=AN_VENT, AL_V=AL_VENT;
  const fila=(g,W,fn)=>{const n=3,paso=W/n;
   for(let i=0;i<n;i++)fn(Math.round(i*paso+(paso-AN_V)/2));};
  /* El alero: la cornisa que remata la fachada por arriba y la sombra que tira sobre la
@@ -7595,6 +7599,26 @@ function dibCiudad(){
    const sprP=tipos[(hEd>>7)%tipos.length];
    for(let k=0;k<nPisos;k++)
     ctx.drawImage(sprP,x*TS,y*TS+TS-FACH_H*ESC-(k+1)*ph*ESC);
+   /* De noche la fachada se enciende por dentro. Sin esto, a las once la ciudad era una
+      mancha negra con farolas, y lo que dice que ahí vive gente es la ventana encendida.
+      Se enciende una de cada tres y siempre la misma, que es el hash de la casilla, el piso
+      y el hueco: si parpadeara al mover la cámara sería un cartel de neón, no un edificio.
+      Cada tipo de fachada tiene el cristal donde lo tiene —el balcón dos píxeles más
+      arriba, el mirador entero, la persiana solo por debajo— y por eso hace falta saber
+      qué tipo se está pintando. */
+   if(!SOL.elev&&famF!=='nave'&&nPisos){
+    const ti=(hEd>>7)%tipos.length;
+    for(let k=0;k<nPisos;k++){
+     const top=y*TS+TS-FACH_H*ESC-(k+1)*ph*ESC;
+     if(ti===2){
+      if(hash(x*13+k,y*7)%3){ctx.fillStyle='rgba(242,210,148,.55)';
+       ctx.fillRect(x*TS+2*ESC,top+2*ESC,28*ESC,(ph-4)*ESC);}
+      continue;}
+     const vy=(ti===1?5:7)+(ti===3?8:0), vh=ti===3?6:AL_VENT;
+     for(let i=0;i<3;i++){
+      if(hash(x*13+i,y*7+k)%3)continue;
+      ctx.fillStyle='rgba(242,210,148,.72)';
+      ctx.fillRect(x*TS+X_VENT[i]*ESC,top+vy*ESC,AN_VENT*ESC,vh*ESC);}}}
    /* La cara sur solo la da el sol cuando está al sur, o sea a mediodía. A primera y a
       última hora viene de costado y la fachada se apaga: sin esto la calle cambiaba de
       hora y las paredes se quedaban igual de encendidas a las ocho que a las dos. */

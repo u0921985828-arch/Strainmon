@@ -388,6 +388,39 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
         + lt.toFixed(1) + ' a las 14, y tinte de amanecer, día, ocaso y noche');
     }
 
+    // ── 1 quater bis · de noche se encienden las ventanas ──────────────
+    /* A las once la ciudad era una mancha negra con farolas. Lo que dice que ahí vive
+       gente es la ventana encendida, y tiene que ser siempre la misma: si parpadeara al
+       mover la cámara sería un cartel de neón y no un edificio. */
+    {
+      const g = A.real.getContext('2d'), ant = g.fillRect;
+      const cuenta = () => {
+        let n = 0;
+        g.fillRect = function (...r) {
+          // node-canvas normaliza el color, así que se compara sin espacios.
+          const col = typeof this.fillStyle === 'string' ? this.fillStyle.replace(/\s/g, '') : '';
+          if (col.indexOf('242,210,148') >= 0) n++;
+          return ant.apply(this, r);
+        };
+        paso(1);
+        g.fillRect = ant;
+        return n;
+      };
+      S.escena = 'ciudad'; A.cerrarDlg(); P.enCoche = null;
+      P.x = 1185.5; P.y = 441.5; paso(30);
+      const min0 = S.min;
+      S.min = 23 * 60; paso(2);
+      const noche = cuenta(), noche2 = cuenta();
+      S.min = 14 * 60; paso(2);
+      const dia = cuenta();
+      S.min = min0;
+      ok(noche > 20, 'de noche solo se encienden ' + noche + ' ventanas en toda la pantalla');
+      ok(noche === noche2, 'las ventanas parpadean: ' + noche + ' y luego ' + noche2);
+      ok(!dia, dia + ' ventanas encendidas a las dos de la tarde');
+      bien.push(noche + ' ventanas encendidas de noche en una pantalla de Santutxu, '
+        + 'siempre las mismas, y ninguna a mediodía');
+    }
+
     // ── 1 quinquies · la ley de las capas ──────────────────────────────
     /* Lo que se pinta después tapa, así que el orden no es una costumbre: es una ley. El
        suelo entero primero, los bloques después, lo que sobresale encima y los rótulos al
