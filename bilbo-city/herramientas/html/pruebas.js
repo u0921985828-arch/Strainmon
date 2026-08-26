@@ -1242,24 +1242,39 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       bien.push('conducción en 2,5 s: mediana ' + mediana.toFixed(1) + ' casillas (peor '
         + recorridos[0].toFixed(1) + ', mejor ' + recorridos[15].toFixed(1) + ')');
 
-      // ── el pie no patina ──
-      // La cadencia del andar iba a un ritmo fijo, así que con el joystick analógico se
-      // podía avanzar despacio moviendo las piernas a toda pastilla. Se comprueba que los
-      // pasos por segundo salgan de la velocidad —una zancada son ZANCADA metros— y que
-      // andar o correr lo decida la velocidad y no quien llame a la función.
+      // ── el paso se ve como el de alguien de ese tamaño ──
+      /* El ojo no mide metros: mide cuerpos. La figura se dibuja a 20 px/m y el suelo va a
+         12,4, así que es 1,6 veces más grande que la calle que pisa; andando a 1,7 m/s de
+         mapa avanzaba 0,6 alturas de cuerpo por segundo cuando una persona de verdad avanza
+         una entera, y eso es exactamente lo que se ve como patinar. Lo que se comprueba es
+         que ande a la cuenta de una persona **en su propio tamaño**, y que la cadencia salga
+         de la velocidad y no de un ritmo fijo. */
       {
-        const paso1 = v => { const e = { anim: 0 }; A.poseAndar(e, v * A.MS, false, 1, false);
+        const altoFig = A.sc(26);                       // lo que mide la figura, en píxeles
+        const px = v => v * A.TS;                       // casillas/s -> px/s
+        const cuerposAndar = px(A.V_ANDAR) / altoFig, cuerposCorrer = px(A.V_CORRER) / altoFig;
+        // Una persona de 1,70 andando a 1,7 m/s hace una altura por segundo; corriendo a 6,
+        // tres y media.
+        ok(Math.abs(cuerposAndar - 1.0) < 0.12,
+          'andando avanza ' + cuerposAndar.toFixed(2) + ' alturas de cuerpo por segundo y '
+          + 'una persona avanza 1,00: por eso parece que patina');
+        ok(Math.abs(cuerposCorrer - 3.53) < 0.4,
+          'corriendo avanza ' + cuerposCorrer.toFixed(2) + ' alturas por segundo, y son 3,53');
+        // Y la cadencia: pasos por segundo = velocidad partida por zancada, con la zancada
+        // del andar o la de la carrera, que no miden lo mismo.
+        const paso1 = v => { const e = { anim: 0 }; A.poseAndar(e, v, false, 1, false);
                              return { pasos: e.anim, pose: e.pose }; };
-        const lento = paso1(1.4), rapido = paso1(5.6);
-        const espLento = 1.4 / A.ZANCADA, espRapido = 5.6 / A.ZANCADA;
-        ok(Math.abs(lento.pasos - espLento) < .05 && Math.abs(rapido.pasos - espRapido) < .05,
-          'la cadencia no sale de la velocidad: a 1,4 m/s da ' + lento.pasos.toFixed(2)
-          + ' pasos/s y debería dar ' + espLento.toFixed(2));
+        const lento = paso1(A.V_ANDAR), rapido = paso1(A.V_CORRER);
+        const espLento = 1.7 / 0.75, espRapido = 6.0 / 1.80;
+        ok(Math.abs(lento.pasos - espLento) < .06,
+          'andando da ' + lento.pasos.toFixed(2) + ' pasos/s y una persona da ' + espLento.toFixed(2));
+        ok(Math.abs(rapido.pasos - espRapido) < .06,
+          'corriendo da ' + rapido.pasos.toFixed(2) + ' pasos/s y un corredor da ' + espRapido.toFixed(2));
         ok(lento.pose.startsWith('andar') && rapido.pose.startsWith('correr'),
-          'andar o correr no lo decide la velocidad: a 1,4 m/s sale ' + lento.pose
-          + ' y a 5,6 sale ' + rapido.pose);
-        bien.push('la cadencia sale de la velocidad: ' + espLento.toFixed(1) + ' pasos/s andando y '
-          + espRapido.toFixed(1) + ' corriendo, con zancada de ' + A.ZANCADA + ' m');
+          'andar o correr no lo decide la velocidad: sale ' + lento.pose + ' y ' + rapido.pose);
+        bien.push('el paso, en cuerpos: ' + cuerposAndar.toFixed(2) + ' alturas/s andando y '
+          + cuerposCorrer.toFixed(2) + ' corriendo · ' + espLento.toFixed(1) + ' y '
+          + espRapido.toFixed(1) + ' pasos/s, con zancada de 0,75 y 1,80 m');
       }
     }
 

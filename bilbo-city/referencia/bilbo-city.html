@@ -2088,12 +2088,18 @@ const MAPA8=[{b:AB,f:0,e:0},{b:DE,f:1,e:0},{b:DE,f:0,e:0},{b:DE,f:0,e:1},
  {b:AR,f:0,e:0},{b:IZ,f:0,e:1},{b:IZ,f:0,e:0},{b:IZ,f:1,e:0}];
 const POSES={
  quieto:{p:[0,0],b:[0,0],y:0},
- andar1:{p:[0,1],b:[1,-1],y:0}, andar2:{p:[1,0],b:[0,0],y:-1},
- andar3:{p:[1,0],b:[-1,1],y:0}, andar4:{p:[0,1],b:[0,0],y:-1},
- correr1:{p:[-2,2],b:[2,-2],y:-1}, correr2:{p:[2,-2],b:[-2,2],y:-1},
+ /* El ciclo de andar. El de antes movía la pierna un píxel de largo y **no movía el pie**:
+    el zapato iba clavado en la misma fila pasara lo que pasara, así que la figura no
+    andaba, se deslizaba. Un paso son cuatro fotogramas y dos de ellos son apoyos, con las
+    piernas separadas de verdad —`dx`, que es lo que faltaba— y el cuerpo abajo; los otros
+    dos son el paso por el centro, con una pierna recogida y el cuerpo un píxel arriba, que
+    es el bote de andar. Los brazos van al revés que las piernas, como los de cualquiera. */
+ andar1:{p:[0,1],dx:[2,-2],b:[-1,1],y:0}, andar2:{p:[2,0],dx:[0,0],b:[0,0],y:-1},
+ andar3:{p:[1,0],dx:[-2,2],b:[1,-1],y:0}, andar4:{p:[0,2],dx:[0,0],b:[0,0],y:-1},
+ correr1:{p:[-2,2],dx:[3,-3],b:[2,-2],y:-1}, correr2:{p:[2,-2],dx:[1,-1],b:[-1,1],y:-1},
  /* El bote de la carrera es de un píxel y no de dos: con dos, el gorro se sale por arriba
     de la celda de 24×32 y el contorno se corta. */
- correr3:{p:[-3,3],b:[3,-3],y:-1}, correr4:{p:[3,-3],b:[-3,3],y:-1},
+ correr3:{p:[-3,3],dx:[-3,3],b:[-2,2],y:-1}, correr4:{p:[3,-3],dx:[-1,1],b:[1,-1],y:-1},
  /* El alcance del puñetazo va en píxeles y tiene que caber en el margen lateral, que con
     la celda de 24 son dos. Con los siete de antes el brazo salía cuatro píxeles fuera y el
     puño se cortaba en seco contra el canto de la celda. Lo que separa un golpe del otro ya
@@ -2136,24 +2142,29 @@ const sc=v=>Math.floor(v*PJ_N/PJ_D);
 const Pe=(g,x,y,w,h,c)=>P(g,sc(x),sc(y),sc(x+w)-sc(x),sc(y+h)-sc(y),c);
 const MG_X=2, MG_ARR=5, MG_ABA=1;
 const FORJA_W=20+MG_X*2, FORJA_H=26+MG_ARR+MG_ABA;
+/* Cada prenda va con tres tonos: base, sombra y luz. Los que tenían la luz igual que la
+   base —la camisa, la camiseta, el polo y los tirantes— salían planos: el volumen de una
+   figura de veintiséis píxeles es esa fila clara de arriba y nada más. Y la cazadora del
+   protagonista iba de asfalto con sombra de carbón, dos tonos que a este tamaño son el
+   mismo: el cuello y la cremallera se perdían dentro de la mancha. */
 const TORSOS={
- camisa:{b:C.blanco,s:C.crema,l:C.blanco,manga:'larga'},
- camisaRem:{b:C.blanco,s:C.crema,l:C.blanco,manga:'corta'},
- chaqueta:{b:C.azul,s:C.azulO,l:C.azulL,manga:'larga'},
- cazadora:{b:C.asfalto,s:C.carbon,l:C.grisL,manga:'larga'},
+ camisa:{b:C.hueso,s:C.crema,l:C.blanco,manga:'larga',cierre:1},
+ camisaRem:{b:C.hueso,s:C.crema,l:C.blanco,manga:'corta'},
+ chaqueta:{b:C.azul,s:C.azulO,l:C.azulL,manga:'larga',cierre:1},
+ cazadora:{b:C.gris,s:C.asfaltoO,l:C.grisL,manga:'larga',cierre:1},
  sudadera:{b:C.grisL,s:C.gris,l:C.acero,manga:'larga',capucha:1},
  chandal:{b:C.verde,s:C.verdeO,l:C.verdeL,manga:'larga',raya:C.hueso},
  mono:{b:C.azulL,s:C.azul,l:C.acero,manga:'larga',peto:1},
- abrigo:{b:C.tejaO,s:C.maderaO,l:C.teja,manga:'larga',largo:1},
- gabardina:{b:C.crema,s:C.hormigonO,l:C.hueso,manga:'larga',largo:1},
+ abrigo:{b:C.tejaO,s:C.maderaO,l:C.teja,manga:'larga',largo:1,cierre:1},
+ gabardina:{b:C.crema,s:C.hormigonO,l:C.hueso,manga:'larga',largo:1,cierre:1},
  jersey:{b:C.rojoO,s:C.sangre,l:C.rojo,manga:'larga'},
- bata:{b:C.blanco,s:C.crema,l:C.blanco,manga:'larga',largo:1},
- uniforme:{b:C.azulO,s:C.ria1,l:C.azul,manga:'larga',placa:1},
- camiseta:{b:C.mostaza,s:C.mostazaO,l:C.mostaza,manga:'corta'},
- polo:{b:C.verdeL,s:C.verde,l:C.verdeL,manga:'corta'},
+ bata:{b:C.hueso,s:C.crema,l:C.blanco,manga:'larga',largo:1,cierre:1},
+ uniforme:{b:C.azulO,s:C.ria1,l:C.azul,manga:'larga',placa:1,cierre:1},
+ camiseta:{b:C.mostaza,s:C.mostazaO,l:C.luz7,manga:'corta'},
+ polo:{b:C.verdeL,s:C.verde,l:C.verde6,manga:'corta'},
  reflectante:{b:C.rojo,s:C.rojoO,l:C.mostaza,manga:'corta',bandas:1},
  delantal:{b:C.asfalto,s:C.carbon,l:C.grisL,manga:'corta',mandil:1},
- tirantes:{b:C.blanco,s:C.hormigon6,l:C.blanco,manga:'sin'},
+ tirantes:{b:C.hueso,s:C.hormigon6,l:C.blanco,manga:'sin'},
 };
 const PIERNAS={
  vaquero:{b:'#3a4f6b',s:'#2c3d53',l:C.ria5},vestir:{b:C.asfalto,s:C.carbon,l:C.gris},
@@ -2187,42 +2198,62 @@ function dibChar(cfg,pose,d8){
  const cabez=!!cfg.cabezona;
  const HW=cabez?10:8, HH=cabez?10:8, h2=HW/2, PH=cabez?7:8;
  const py=(cabez?18:17)+oy, l1=P_.p[0], l2=P_.p[1];
+ /* Cuánto se separa cada pierna del eje del cuerpo, y el signo no es el mismo mirando de
+    frente que de perfil: de perfil el paso va hacia delante y hacia atrás —una pierna
+    adelanta y la otra se queda—, pero de frente eso cruzaría las dos piernas en el centro y
+    lo que se ve es un nudo. De frente se abren a los lados, cada una a la suya. */
+ const dz=P_.dx||[0,0], abre=Math.max(Math.abs(dz[0]),Math.abs(dz[1]));
+ const d1=lateral?dz[0]:-abre, d2=lateral?dz[1]:abre;
  /* La pernera de delante lleva su canto claro a la izquierda, que es de donde viene la
     luz, y la de detrás se queda en sombra: sin eso las dos piernas son un solo bloque. */
  if(PN.falda){P(g,cx-w/2-1,py-1,w+2,6,PN.b);P(g,cx-w/2-1,py-1,w+2,1,PN.l);P(g,cx-w/2-1,py+4,w+2,1,PN.s);
-  P(g,cx-3,py+5,2,PH-4,cfg.piel);P(g,cx+1,py+5,2,PH-4,cfg.piel);
-  P(g,cx-3,py+PH,2,1,cfg.pielS);P(g,cx+1,py+PH,2,1,cfg.pielS);}
+  P(g,cx-3+d1,py+5,2,PH-4,cfg.piel);P(g,cx+1+d2,py+5,2,PH-4,cfg.piel);
+  P(g,cx-3+d1,py+PH,2,1,cfg.pielS);P(g,cx+1+d2,py+PH,2,1,cfg.pielS);}
  else if(lateral){const dx=derV?1:-1;
-  P(g,cx-2-dx,py+l2,3,PH-l2,PN.s);P(g,cx-2+dx,py+l1,3,PH-l1,PN.b);
-  P(g,cx-2+dx,py+l1,1,PH-l1,PN.l);
-  if(PN.corto)P(g,cx-2+dx,py+4,3,PH-4,cfg.piel);}
- else{P(g,cx-3,py+l1,3,PH-l1,PN.b);P(g,cx,py+l2,3,PH-l2,PN.s);
-  P(g,cx-3,py+l1,1,PH-l1,PN.l);P(g,cx-3,py+l1,3,1,PN.s);
-  if(PN.raya){P(g,cx-3,py+l1,1,PH-l1,PN.raya);P(g,cx+2,py+l2,1,PH-l2,PN.raya);}
-  if(PN.corto){P(g,cx-3,py+4,3,PH-4,cfg.piel);P(g,cx,py+4,3,PH-4,cfg.piel);}
+  P(g,cx-2-dx+d2,py+l2,3,PH-l2,PN.s);P(g,cx-2+dx+d1,py+l1,3,PH-l1,PN.b);
+  P(g,cx-2+dx+d1,py+l1,1,PH-l1,PN.l);
+  if(PN.corto)P(g,cx-2+dx+d1,py+4,3,PH-4,cfg.piel);}
+ else{P(g,cx-3+d1,py+l1,3,PH-l1,PN.b);P(g,cx+d2,py+l2,3,PH-l2,PN.s);
+  P(g,cx-3+d1,py+l1,1,PH-l1,PN.l);P(g,cx-3+d1,py+l1,3,1,PN.s);
+  if(PN.raya){P(g,cx-3+d1,py+l1,1,PH-l1,PN.raya);P(g,cx+2+d2,py+l2,1,PH-l2,PN.raya);}
+  if(PN.corto){P(g,cx-3+d1,py+4,3,PH-4,cfg.piel);P(g,cx+d2,py+4,3,PH-4,cfg.piel);}
   /* La costura entre las perneras, y solo de medio muslo para abajo: los dos tonos del
      pantalón se parecen demasiado para separarlas solos y de frente las piernas eran un
      bloque. Arriba no va, que ahí las piernas se juntan de verdad. */
-  P(g,cx-1,py+3,1,PH-3,C.negro);}
+  /* La costura entre las perneras solo cuando van juntas: con las piernas abiertas, una
+     raya negra en medio del hueco es una raya en el aire. */
+  if(!d1&&!d2)P(g,cx-1,py+3,1,PH-3,C.negro);}
  /* Bajo falda los pies van donde la falda deja las piernas —dos píxeles— y no donde los
     pone la plantilla lateral, que son tres y cuatro: descuadrados asomaba medio zapato por
     fuera de la pernera. */
  const Z=CALZADO[cfg.calzado];
- if(PN.falda){P(g,cx-3,24+oy,2,2,Z.b);P(g,cx+1,24+oy,2,2,Z.b);
-  P(g,cx-3,25+oy,2,1,Z.s);P(g,cx+1,25+oy,2,1,Z.s);}
+ /* El zapato va con su pierna: clavado en el sitio, la figura patina. */
+ if(PN.falda){P(g,cx-3+d1,24+oy,2,2,Z.b);P(g,cx+1+d2,24+oy,2,2,Z.b);
+  P(g,cx-3+d1,25+oy,2,1,Z.s);P(g,cx+1+d2,25+oy,2,1,Z.s);}
  else if(lateral){const dx=derV?1:-1;
-  P(g,cx-2-dx,24+oy,3,2,Z.b);P(g,cx-2+dx,24+oy,4,2,Z.b);
-  P(g,cx-2-dx,25+oy,3,1,Z.s);P(g,cx-2+dx,25+oy,4,1,Z.s);}
- else{P(g,cx-3,24+oy,3,2,Z.b);P(g,cx,24+oy,3,2,Z.b);
-  P(g,cx-3,25+oy,3,1,Z.s);P(g,cx,25+oy,3,1,Z.s);}
+  P(g,cx-2-dx+d2,24+oy,3,2,Z.b);P(g,cx-2+dx+d1,24+oy,4,2,Z.b);
+  P(g,cx-2-dx+d2,25+oy,3,1,Z.s);P(g,cx-2+dx+d1,25+oy,4,1,Z.s);}
+ else{P(g,cx-3+d1,24+oy,3,2,Z.b);P(g,cx+d2,24+oy,3,2,Z.b);
+  P(g,cx-3+d1,25+oy,3,1,Z.s);P(g,cx+d2,25+oy,3,1,Z.s);}
  const ty=(cabez?11:9)+oy+yt,th=(T.largo?10:8)-(cabez?1:0);
  /* Antes el tono claro eran las dos filas de arriba enteras: eso no es volumen, es una
     franja, y el torso quedaba de cartón. La regla de ESTILO.md es 1 px claro arriba y a la
     izquierda, base en el cuerpo y oscuro abajo y a la derecha. La fila oscura de abajo hace
     además de dobladillo y despega el torso de las perneras. */
- P(g,cx-hom/2,ty,hom,th,T.b);
- P(g,cx-hom/2,ty,hom,1,T.l);P(g,cx-hom/2,ty,1,th,T.l);
- P(g,cx+hom/2-1,ty,1,th,T.s);P(g,cx-hom/2,ty+th-1,hom,1,T.s);
+ /* El hombro cae: la fila de arriba va un píxel más estrecha a cada lado. Con el torso
+    rectangular la figura era un ladrillo con cabeza, y el chaflán solo redondea la esquina
+    —no inclina el hombro—. */
+ P(g,cx-hom/2,ty+1,hom,th-1,T.b);
+ P(g,cx-hom/2+1,ty,hom-2,1,T.b);
+ P(g,cx-hom/2+1,ty,hom-2,1,T.l);P(g,cx-hom/2,ty+1,1,th-1,T.l);
+ P(g,cx+hom/2-1,ty+1,1,th-1,T.s);P(g,cx-hom/2,ty+th-1,hom,1,T.s);
+ /* Y la prenda tiene cuello y cierre. Sin ellos el torso es una mancha de un solo tono:
+    dos píxeles de solapa a los lados del cuello y una costura por el centro bastan para
+    que se lea una cazadora y no un jersey pintado. */
+ if(T.cierre){P(g,cx-2,ty+1,1,2,T.s);P(g,cx+1,ty+1,1,2,T.s);P(g,cx,ty+2,1,th-4,T.s);}
+ /* Lo que no se abre por delante lleva escote y no solapa: un jersey con cremallera es
+    una chaqueta, y a este tamaño se nota. */
+ else if(!T.capucha&&!T.mandil)P(g,cx-1,ty+1,2,1,T.s);
  /* La barbilla proyecta sobre el pecho. Sin esto la cabeza y el torso son dos tonos
     pegados, no una cosa delante de otra, y es la mitad de lo que se lee como volumen. */
  if(!T.capucha)P(g,cx-h2+1,ty+1,HW-2,1,T.s);
@@ -2258,11 +2289,19 @@ function dibChar(cfg,pose,d8){
   P(g,bx1,manoY+b1,2,2,cfg.piel);P(g,bx2,manoY+b2,2,2,cfg.piel);}
  const hy=1+oy+yt, hx=cx-h2, ey=hy+(cabez?5:4), my=hy+HH-(cabez?2:1), eo=cabez?3:2;
  P(g,hx,hy,HW,HH,cfg.piel);P(g,hx+HW-1,hy,1,HH,cfg.pielS);P(g,hx,hy,HW,1,cfg.pielS);
- if(dir===AB){P(g,cx-eo,ey,1,2,C.negro);P(g,cx+eo-1,ey,1,2,C.negro);P(g,cx-1,my,2,1,cfg.pielS);}
+ /* Las cejas y la sombra del pómulo. La cara son diez píxeles de piel lisa con dos ojos y
+    una boca: cualquier cosa que rompa esa plancha se nota, y la ceja es la que dice de quién
+    es la cara —va del color del pelo—. */
+ const pcj=cfg.pelo==='canoso'?C.pelo5:cfg.pelocol;
+ if(dir===AB){P(g,cx-eo,ey,1,2,C.negro);P(g,cx+eo-1,ey,1,2,C.negro);P(g,cx-1,my,2,1,cfg.pielS);
+  P(g,cx-eo,ey-1,1,1,pcj);P(g,cx+eo-1,ey-1,1,1,pcj);
+  P(g,cx-h2,ey,1,3,cfg.pielS);P(g,cx+h2-1,ey,1,3,cfg.pielS);}
  if(izqV){P(g,hx,ey,1,2,C.negro);P(g,hx,hy,h2,HH,cfg.pielS);}
  if(derV){P(g,hx+HW-1,ey,1,2,C.negro);P(g,cx,hy,h2,HH,cfg.pielS);}
- if(frente){if(derV){P(g,cx,hy,h2,HH,cfg.piel);P(g,cx,ey,1,2,C.negro);P(g,cx+2,ey+2,1,1,cfg.pielS);}
-  else{P(g,cx-1,hy,h2,HH,cfg.piel);P(g,cx+2,ey,1,2,C.negro);P(g,cx-3,ey+2,1,1,cfg.pielS);}}
+ if(frente){if(derV){P(g,cx,hy,h2,HH,cfg.piel);P(g,cx,ey,1,2,C.negro);P(g,cx+2,ey+2,1,1,cfg.pielS);
+   P(g,cx,ey-1,1,1,pcj);}
+  else{P(g,cx-1,hy,h2,HH,cfg.piel);P(g,cx+2,ey,1,2,C.negro);P(g,cx-3,ey+2,1,1,cfg.pielS);
+   P(g,cx+2,ey-1,1,1,pcj);}}
  if(espalda)P(g,hx,hy,HW,HH,cfg.pielS);
  if(P_.herido&&dir===AB)P(g,cx-eo,ey,4,1,C.sangre);
  capasEncima(g,cfg,cx,hy,ty,hom,{dir,arr,T,izqV,derV,fog:P_.fog,HW,HH,ey,py},0);
@@ -4680,8 +4719,23 @@ const mira={dx:0,dy:0};                   /* apuntado fino: solo con las flechas
    valores son humanos pero del lado rápido —paso vivo y carrera de alguien que huye—,
    porque el juego se cruza en coche y en metro, no andando. */
 const MS=1/5.16;                          /* m/s -> casillas/s */
-const V_ANDAR=1.7*MS, V_CORRER=6.0*MS, V_AGACHADO=1.0*MS;
-const V_PEATON=1.3*MS, V_HUIDA=4.5*MS, V_ENEMIGO=3.4*MS;
+/* La vara de la figura. La gente y el mobiliario se dibujan a 20 px/m —a la escala del
+   suelo una persona mide 21 px y ahí no cabe una cara, ni ocho direcciones— mientras que el
+   suelo va a 12,4. O sea que la figura es **1,6 veces más grande que la calle que pisa**, y
+   de ahí salía que andar pareciese patinar: a 1,7 m/s avanzaba 0,6 alturas de cuerpo por
+   segundo, cuando una persona de verdad avanza una entera. El ojo no mide metros: mide
+   cuerpos.
+
+   Así que lo que anda por encima del suelo anda en **la vara de la figura**, no en la del
+   plano: velocidad y zancada se multiplican por ESC_FIG y el paso se ve como el de alguien
+   de ese tamaño. En metros de mapa sale más rápido, y es a propósito.
+
+   Dentro de un sitio no hace falta y por eso ahí siempre se vio bien: la casilla de interior
+   va a 20 px/m, la misma vara que la gente. */
+const PX_M=TS/5.16;                       /* píxeles de pantalla por metro de suelo */
+const ESC_FIG=sc(26)/(1.70*PX_M);         /* la figura mide sc(26) px y representa 1,70 m */
+const V_ANDAR=1.7*MS*ESC_FIG, V_CORRER=6.0*MS*ESC_FIG, V_AGACHADO=1.0*MS*ESC_FIG;
+const V_PEATON=1.3*MS*ESC_FIG, V_HUIDA=4.5*MS*ESC_FIG, V_ENEMIGO=3.4*MS*ESC_FIG;
 /* El coche: punta por chasis y aceleración de verdad. 2,5 m/s² son los 0-100 en 11 s de
    un utilitario; la furgoneta y el camión, menos. Frenar es 7 m/s², que es lo que da un
    freno decente sobre asfalto seco. */
@@ -7151,15 +7205,20 @@ function act(dt){
    Una zancada mide unos 0,75 m, asi que los pasos por segundo son la velocidad partida
    por eso. Y correr o andar tampoco lo decide el boton: lo decide ir a mas de 3,2 m/s,
    que es donde una persona deja de andar. */
-const ZANCADA=0.75;              /* metros por paso */
+/* Andando la zancada es de 75 cm y corriendo de 1,80 m: no es la misma, y con una sola
+   medida la carrera salía a ocho pasos por segundo —el doble que un atleta— y las piernas
+   se veían como un abanico. Van en metros de figura, que es la vara en la que se mueve
+   (ver ESC_FIG). */
+const ZANCADA=0.75*ESC_FIG, ZANCADA_C=1.80*ESC_FIG;
+const V_CORRE_ANIM=3.2*ESC_FIG;  /* de aquí para arriba, la pose es de correr */
 function poseAndar(e,vel,correr,dt,sigilo,mCasilla){
  /* La cadencia sale de los metros por segundo, así que hay que saber cuánto mide la
     casilla: 5,16 m en la calle, 0,80 m dentro de un sitio. */
  const ms=Math.abs(vel)*(mCasilla||1/MS);
- e.anim+=dt*Math.max(.6,ms/ZANCADA);
+ const corriendo=ms>(mCasilla?3.2:V_CORRE_ANIM);
+ e.anim+=dt*Math.max(.6,ms/(corriendo?ZANCADA_C:ZANCADA));
  const f=Math.floor(e.anim)%4+1;
  if(sigilo){e.pose=f<3?'agacha':'agacha2';return;}
- const corriendo=ms>3.2;
  e.pose=(corriendo?'correr':'andar')+(corriendo?((f-1)%4+1):f);}
 function actInterior(dt,ix,iy){
  motorAudio(null,1);sirenaAudio(dt,false);
@@ -7313,7 +7372,11 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
     e.d8=dir8De(Math.cos(e.rumbo),Math.sin(e.rumbo));poseAndar(e,V_PEATON,false,dt);}
    continue;}
   if(d>(a.cuerpo?1.1:a.alc*.75)||!ve){
-   const ang=Math.atan2(player.y-e.y,player.x-e.x),v=a.cuerpo?2.7:2.2;
+   /* Iba en casillas por segundo crudas —2,7 casillas son 14 m/s, el récord del mundo de
+      100 m es 10,4— así que un matón te alcanzaba andando tú a la carrera. Va en la vara de
+      la figura como todo lo que anda: se acerca corriendo si va a cuerpo, y a paso vivo si
+      viene a dispararte. */
+   const ang=Math.atan2(player.y-e.y,player.x-e.x),v=a.cuerpo?V_CORRER:V_HUIDA;
    mover(e,e.x+Math.cos(ang)*v*dt,e.y+Math.sin(ang)*v*dt,false);
    e.d8=dir8De(Math.cos(ang),Math.sin(ang));poseAndar(e,v,false,dt);
   }else{

@@ -24,7 +24,7 @@ a la densidad de su familia. Un sprite no se dibuja «como quede bien de tamaño
 |---|---|---|
 | Casilla del mundo, tejados, calzada | **12,4 px/m** | 64 px por 5,16 m |
 | Vehículos | **13,3 px/m** | tabla `CHASIS`, largo real × 2,1 de la casilla de 32 |
-| Gente | **20 px/m** | 34 px para 1,70 m |
+| Gente | **20 px/m** | 34 px para 1,70 m — **1,6 veces la escala del suelo**, y por eso lo que anda se mueve en la vara de la figura (`ESC_FIG`) y no en la del plano |
 | Mobiliario urbano | **20 px/m** | `MOB_M`: se mira al lado de quien lo usa, no al lado de un coche |
 | Interiores | **20 px/m** | casilla de 0,80 m a 16 px |
 

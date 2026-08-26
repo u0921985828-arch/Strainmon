@@ -691,6 +691,18 @@ reloj.
   (0,34) vas agachado, por encima de `CORRE` (0,82) corriendo. Se queda puesta al soltar,
   que si no, agacharse para mirar una esquina y levantarse solo al parar sería inservible.
   Agachado se te ve **la mitad de lejos** y andas a 1 m/s en vez de a 6.
+- **La figura anda en su propia vara.** La gente y el mobiliario se dibujan a 20 px/m —a la
+  escala del suelo una persona mide 21 px y ahí no cabe una cara, ni ocho direcciones— y el
+  suelo va a 12,4: **la figura es 1,6 veces más grande que la calle que pisa**. Andando a
+  1,7 m/s de mapa avanzaba 0,6 alturas de cuerpo por segundo, cuando una persona de verdad
+  avanza una entera, y eso es exactamente lo que se ve como patinar. El ojo no mide metros:
+  mide cuerpos. Por eso lo que anda por encima del suelo va multiplicado por `ESC_FIG`
+  —velocidad y zancada—, y en metros de mapa sale más rápido a propósito. Dentro de un sitio
+  no hace falta, y por eso ahí siempre se vio bien: la casilla de interior va a 20 px/m, la
+  misma vara que la gente.
+- **La zancada del andar y la de la carrera no miden lo mismo**: 75 cm y 1,80 m. Con una sola
+  medida la carrera salía a ocho pasos por segundo —el doble que un atleta— y las piernas
+  eran un abanico.
 - **Las velocidades se escriben en metros por segundo**, no en casillas. Medidas contra
   la escala del mapa, las de antes eran de otro juego: se andaba a 28,8 km/h, se corría
   a 89,2 y un utilitario hacía 204 km/h acelerando a 7,5 g. En casillas por segundo eso
@@ -719,6 +731,23 @@ es la de 24×32 de CONTEXT.md §18.1: bajando la figura entera, el contorno de l
 quedaba fuera. Y de paso es más correcto — al ponerse en cuclillas los pies no se mueven.
 
 ## El arte
+
+**El ciclo de andar mueve el pie.** El de antes cambiaba la pierna un píxel de largo y dejaba
+el zapato clavado en la misma fila pasara lo que pasara: la figura no andaba, se deslizaba —y
+eso, más que el tamaño, es lo que hacía que el andar no se creyera—. Un paso son cuatro
+fotogramas: dos apoyos con las piernas separadas de verdad (`dx` en la tabla de posturas) y el
+cuerpo abajo, y dos pasos por el centro con una pierna recogida y el cuerpo un píxel arriba.
+El signo de `dx` no es el mismo de frente que de perfil: de perfil una pierna adelanta y la
+otra se queda, pero de frente eso cruzaría las dos en el centro y lo que se ve es un nudo, así
+que de frente se abren a los lados.
+
+**Y la ropa tiene tres tonos de verdad.** Cuatro prendas tenían la luz igual que la base —la
+camisa, la camiseta, el polo y los tirantes— y salían planas; la cazadora del protagonista iba
+de asfalto con sombra de carbón, dos tonos que a veintiséis píxeles son el mismo, así que el
+cuello y la cremallera se perdían dentro de la mancha. Además, lo que se abre por delante
+lleva `cierre` y se le pintan solapa y cremallera; lo que no, escote: un jersey con cremallera
+es una chaqueta, y a este tamaño se nota. El hombro cae un píxel a cada lado, que con el torso
+rectangular la figura era un ladrillo con cabeza.
 
 **La celda de personaje es de 24×32 con el pivote en (12,30)**, y la paleta la de 61
 colores: las dos las fija `CONTEXT.md` §18. La celda es apretada a propósito y el arte la
