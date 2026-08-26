@@ -103,7 +103,11 @@ pantalla. Funciona y las proporciones ya son las buenas, pero el detalle todaví
       medida vieja: mientras no se suban, las dos implementaciones no se ven igual. Al
       subirlo hay que repasar `Ciudad/Vision.cs`: sus cajas mezclan casillas (`Forja.TS`)
       con píxeles de sprite (20 px/m), y con la casilla a 32 el jugador queda tapado desde
-      el doble de lejos que en el HTML.
+      el doble de lejos que en el HTML. Y con ello converge solo `Movimiento.EscFig`: hoy la
+      figura del puerto es 2,46 veces su suelo y la del HTML 1,61, porque el HTML forja a 4:3
+      sobre casilla de 64 y el puerto a 1:1 sobre 32. Las dos cifras son correctas en su
+      implementación —se calculan, no se copian—, pero el juego no se ve igual en las dos
+      hasta que la casilla sea la misma.
 - [ ] Medir la memoria en un móvil de verdad. Doblar la casilla cuadruplica los píxeles del
       atlas de suelo; las hojas de personaje no cambian, que el personaje no se tocó.
 

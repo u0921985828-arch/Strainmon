@@ -51,18 +51,20 @@ public class Jugador : MonoBehaviour {
         bool corre = Corriendo && calle;
         float cansado = E.Energia <= 0 ? 0.6f : 1f;
         float v = (calle && Agachado ? 1.25f : 1.55f + fuerza * 3.25f) * cansado;
+        // La figura anda en la vara de Movimiento.EscFig, no en la del plano (ver el porqué
+        // ahí): en metros de mapa sale más rápido a propósito, para que el paso no patine.
+        if (calle) v *= Movimiento.EscFig;
         // Dentro se anda a 1,4 m/s, y ahí la casilla mide 0,80 m: 1,75 casillas por segundo.
         // Con la vara de la calle salían 0,27 y cruzar el salón costaba cincuenta segundos.
+        // Y al ir ya a la vara de la figura, no hace falta EscFig.
         if (!calle) v = 1.4f / ForjaInterior.Metro;
         float m = entrada.magnitude;
         if (m > 0.08f) {
             Vector2 d = entrada / m * Mathf.Min(1f, m) * v * dt;
             Movimiento.Deslizar(ref Pos, d, false);
             Dir8 = ForjaChar.Dir8(entrada.x, entrada.y);
-            Anim += dt * (calle && Agachado ? 4.5f : corre ? 11f : 7.5f);
-            int f = Mathf.FloorToInt(Anim) % 4;
-            PoseAct = calle && Agachado ? (f < 2 ? Pose.Agacha : Pose.Agacha2)
-                    : corre ? (Pose)((int)Pose.Correr1 + f) : (Pose)((int)Pose.Andar1 + f);
+            Movimiento.PoseAndar(ref Anim, ref PoseAct, v, calle && Agachado, dt, calle,
+                calle ? Movimiento.MetroCalle : ForjaInterior.Metro);
             // Correr suena. Agachado no.
             if (corre && Utiles.Rnd(0f,1f) < dt * 3f) Sigilo.Ruido(Pos, 4.5f);
         } else if (GolpeT <= 0) {
@@ -118,6 +120,42 @@ public class Jugador : MonoBehaviour {
 
 /// <summary>Colisión por casilla con deslizamiento por ejes, igual que en el prototipo.</summary>
 public static class Movimiento {
+    /// <summary>Metros por casilla en la calle, para pasar una velocidad de casillas por
+    /// segundo a metros por segundo.</summary>
+    public const float MetroCalle = 5.16f;
+
+    /// <summary>La vara de la figura. La gente y el mobiliario se dibujan a 20 px/m —a la
+    /// escala del suelo una persona mide 21 px y ahí no cabe una cara, ni ocho direcciones—
+    /// mientras que el suelo de la calle va a 12,4: la figura es 1,6 veces más grande que
+    /// la calle que pisa. Andando a 1,7 m/s de mapa la figura solo avanzaba 0,6 alturas de
+    /// cuerpo por segundo, cuando una persona de verdad avanza una entera —el ojo no mide
+    /// metros, mide cuerpos, y eso es lo que se ve como patinar—. Así que lo que anda por
+    /// encima del suelo anda en la vara de la figura, no en la del plano: la velocidad se
+    /// multiplica por EscFig y el paso se ve como el de alguien de ese tamaño, aunque en
+    /// metros de mapa salga más rápido a propósito. Dentro de un sitio no hace falta y por
+    /// eso ahí siempre se vio bien: la casilla de interior ya va a 20 px/m, la misma vara
+    /// que la gente.
+    ///
+    /// No se copia el número del prototipo: se calcula, porque **aquí no sale el mismo**. El
+    /// HTML forja la figura a 4:3 sobre una casilla de 64 px y le da 1,61; el puerto la forja
+    /// a 1:1 sobre una casilla de 32 y le sale 2,46. Las dos cifras son correctas en su
+    /// implementación —la regla es la misma, los píxeles no—, y convergerán solas cuando
+    /// Unity suba la casilla a 64 (TAREAS §4b). Copiar el 1,61 dejaría al puerto andando a la
+    /// vara de otro dibujo.</summary>
+    public static readonly float EscFig =
+        ForjaChar.ALTO_FIGURA / (1.70f * (Forja.TS / MetroCalle));
+
+    /// <summary>La zancada del andar y la de la carrera no miden lo mismo —75 cm y 1,80 m—,
+    /// en metros de la vara de la figura: con una sola medida la carrera salía a ocho pasos
+    /// por segundo, el doble que un atleta, y las piernas se veían como un abanico.</summary>
+    public static readonly float Zancada = 0.75f * EscFig, ZancadaC = 1.80f * EscFig;
+
+    /// <summary>De aquí para arriba se anda a la carrera. En la calle el umbral va en la
+    /// vara de la figura como la velocidad; dentro de un sitio no, porque ahí ya se anda a
+    /// esa vara sin escalar nada.</summary>
+    public static readonly float VelCorreAnim = 3.2f * EscFig;
+    public const float VelCorreAnimInterior = 3.2f;
+
     public static bool Libre(float x, float y, bool coche) {
         if (Estado.I.EnInterior) return !Interiores.Solido(x, y);
         var t = Ciudad.T(Mathf.FloorToInt(x), Mathf.FloorToInt(y));
@@ -135,6 +173,21 @@ public static class Movimiento {
             p.y = Mathf.Clamp(p.y, 1, Ciudad.MH - 1);
         }
         return golpe;
+    }
+
+    /// <summary>La cadencia del ciclo de andar sale de la velocidad de verdad, no de un
+    /// ritmo fijo: a la misma zancada, ir más rápido son más pasos por segundo. `vel` va en
+    /// casillas por segundo —en la vara de la figura si es calle— y `metroCasilla` dice
+    /// cuánto mide esa casilla para pasarla a metros por segundo: 5,16 m en la calle, o el
+    /// ancho real de la casilla de interior.</summary>
+    public static void PoseAndar(ref float anim, ref Pose pose, float vel, bool sigilo, float dt, bool calle, float metroCasilla) {
+        float ms = Mathf.Abs(vel) * metroCasilla;
+        bool corriendo = ms > (calle ? VelCorreAnim : VelCorreAnimInterior);
+        anim += dt * Mathf.Max(0.6f, ms / (corriendo ? ZancadaC : Zancada));
+        int f = Mathf.FloorToInt(anim) % 4;
+        // Agachado no lleva dibujo nuevo: se acortan las dos piernas y baja el cuerpo.
+        if (sigilo) { pose = f < 2 ? Pose.Agacha : Pose.Agacha2; return; }
+        pose = corriendo ? (Pose)((int)Pose.Correr1 + f) : (Pose)((int)Pose.Andar1 + f);
     }
 }
 

@@ -30,6 +30,9 @@ public static class ForjaChar {
     // siendo la caja de 20×26, así que queda 2 de margen a los lados, 5 arriba y 1 abajo.
     public const int MG_X = 2, MG_ARR = 5, MG_ABA = 1;
     public const int CW = 20 + MG_X * 2, CH = 26 + MG_ARR + MG_ABA;   // tamaño de celda
+    /// <summary>Lo que mide la figura de pies a coronilla, sin el margen de la celda. Hace
+    /// falta fuera de la forja: de aquí sale la vara en la que anda (Movimiento.EscFig).</summary>
+    public const int ALTO_FIGURA = 26;
     public const int NPOSES = 16, NDIRS = 8;
 
     const int AB = 0, AR = 1, IZ = 2, DE = 3;
@@ -41,17 +44,23 @@ public static class ForjaChar {
     // `y` mueve la figura entera; `yt` solo el cuerpo, dejando los pies en el suelo. Hace
     // falta desde que la celda es de 24×32: bajar la figura entera hunde el contorno de las
     // botas fuera de la celda, y además al agacharse los pies no se mueven, baja la cabeza.
-    struct Postura { public int p0, p1, b0, b1, y, yt, ataque, apunta; public bool herido, fog; }
+    // `dx0`/`dx1` es lo nuevo: cuánto se separa cada pierna del eje del cuerpo. El de antes
+    // cambiaba la pierna un píxel de largo y no movía el pie —el zapato iba clavado en la
+    // misma fila pasara lo que pasara, así que la figura no andaba, se deslizaba—. Un paso
+    // son cuatro fotogramas: dos apoyos con las piernas separadas de verdad (dx) y el
+    // cuerpo abajo, y dos pasos por el centro con una pierna recogida y el cuerpo un
+    // píxel arriba, que es el bote de andar. Los brazos van al revés que las piernas.
+    struct Postura { public int p0, p1, b0, b1, y, yt, ataque, apunta, dx0, dx1; public bool herido, fog; }
     static readonly Postura[] Posturas = {
-        new Postura{ p0=0,p1=0,b0=0,b1=0,y=0 },                       // Quieto
-        new Postura{ p0=0,p1=1,b0=1,b1=-1,y=0 },                      // Andar1
-        new Postura{ p0=1,p1=0,b0=0,b1=0,y=-1 },                      // Andar2
-        new Postura{ p0=1,p1=0,b0=-1,b1=1,y=0 },                      // Andar3
-        new Postura{ p0=0,p1=1,b0=0,b1=0,y=-1 },                      // Andar4
-        new Postura{ p0=-2,p1=2,b0=2,b1=-2,y=-1 },                    // Correr1
-        new Postura{ p0=2,p1=-2,b0=-2,b1=2,y=-1 },                    // Correr2
-        new Postura{ p0=-3,p1=3,b0=3,b1=-3,y=-1 },                    // Correr3
-        new Postura{ p0=3,p1=-3,b0=-3,b1=3,y=-1 },                    // Correr4
+        new Postura{ p0=0,p1=0,b0=0,b1=0,y=0 },                                 // Quieto
+        new Postura{ p0=0,p1=1,b0=-1,b1=1,y=0, dx0=2,dx1=-2 },                  // Andar1
+        new Postura{ p0=2,p1=0,b0=0,b1=0,y=-1 },                                // Andar2
+        new Postura{ p0=1,p1=0,b0=1,b1=-1,y=0, dx0=-2,dx1=2 },                  // Andar3
+        new Postura{ p0=0,p1=2,b0=0,b1=0,y=-1 },                                // Andar4
+        new Postura{ p0=-2,p1=2,b0=2,b1=-2,y=-1, dx0=3,dx1=-3 },                // Correr1
+        new Postura{ p0=2,p1=-2,b0=-1,b1=1,y=-1, dx0=1,dx1=-1 },                // Correr2
+        new Postura{ p0=-3,p1=3,b0=-2,b1=2,y=-1, dx0=-3,dx1=3 },                // Correr3
+        new Postura{ p0=3,p1=-3,b0=-1,b1=1,y=-1, dx0=-1,dx1=1 },                // Correr4
         new Postura{ p0=0,p1=0,b0=0,b1=0,y=0, ataque=1 },             // Pega1
         new Postura{ p0=0,p1=1,b0=0,b1=0,y=0, ataque=2 },             // Pega2
         new Postura{ p0=0,p1=0,b0=0,b1=0,y=0, apunta=1 },             // Apunta
@@ -65,29 +74,37 @@ public static class ForjaChar {
         new Postura{ p0=2,p1=4,b0=0,b1=2,y=0, yt=2 },                 // Agacha2
     };
 
-    struct Prenda { public Color32 b, s, l; public bool corta, sinMangas, capucha, peto, bandas, mandil, placa, largo; public Color32 raya; public bool tieneRaya; }
+    // Cada prenda va con tres tonos: base, sombra y luz. Las que tenían la luz igual que la
+    // base —la camisa, la camiseta, el polo y los tirantes— salían planas: el volumen de
+    // una figura de veintiséis píxeles es esa fila clara de arriba y nada más. Y la
+    // cazadora del protagonista iba de asfalto con sombra de carbón, dos tonos que a este
+    // tamaño son el mismo, así que el cuello y la cremallera se perdían dentro de la
+    // mancha. Además, lo que se abre por delante lleva `cierre` y se le pinta solapa y
+    // cremallera; lo que no, escote: un jersey con cremallera es una chaqueta, y a este
+    // tamaño se nota.
+    struct Prenda { public Color32 b, s, l; public bool corta, sinMangas, capucha, peto, bandas, mandil, placa, largo, cierre; public Color32 raya; public bool tieneRaya; }
     static Dictionary<string,Prenda> _torsos;
     static Dictionary<string,Prenda> Torsos {
         get {
             if (_torsos != null) return _torsos;
             _torsos = new Dictionary<string,Prenda> {
-                {"camisa",     new Prenda{ b=Paleta.Blanco, s=Paleta.Crema, l=Paleta.Blanco }},
-                {"camisaRem",  new Prenda{ b=Paleta.Blanco, s=Paleta.Crema, l=Paleta.Blanco, corta=true }},
-                {"chaqueta",   new Prenda{ b=Paleta.Azul, s=Paleta.AzulO, l=Paleta.AzulL }},
-                {"cazadora",   new Prenda{ b=Paleta.Asfalto, s=Paleta.Carbon, l=Paleta.GrisL }},
+                {"camisa",     new Prenda{ b=Paleta.Hueso, s=Paleta.Crema, l=Paleta.Blanco, cierre=true }},
+                {"camisaRem",  new Prenda{ b=Paleta.Hueso, s=Paleta.Crema, l=Paleta.Blanco, corta=true }},
+                {"chaqueta",   new Prenda{ b=Paleta.Azul, s=Paleta.AzulO, l=Paleta.AzulL, cierre=true }},
+                {"cazadora",   new Prenda{ b=Paleta.Gris, s=Paleta.AsfaltoO, l=Paleta.GrisL, cierre=true }},
                 {"sudadera",   new Prenda{ b=Paleta.GrisL, s=Paleta.Gris, l=Paleta.Acero, capucha=true }},
                 {"chandal",    new Prenda{ b=Paleta.Verde, s=Paleta.VerdeO, l=Paleta.VerdeL, raya=Paleta.Hueso, tieneRaya=true }},
                 {"mono",       new Prenda{ b=Paleta.AzulL, s=Paleta.Azul, l=Paleta.Acero, peto=true }},
-                {"abrigo",     new Prenda{ b=Paleta.TejaO, s=Paleta.MaderaO, l=Paleta.Teja, largo=true }},
-                {"gabardina",  new Prenda{ b=Paleta.Crema, s=Paleta.HormigonO, l=Paleta.Hueso, largo=true }},
+                {"abrigo",     new Prenda{ b=Paleta.TejaO, s=Paleta.MaderaO, l=Paleta.Teja, largo=true, cierre=true }},
+                {"gabardina",  new Prenda{ b=Paleta.Crema, s=Paleta.HormigonO, l=Paleta.Hueso, largo=true, cierre=true }},
                 {"jersey",     new Prenda{ b=Paleta.RojoO, s=Paleta.Sangre, l=Paleta.Rojo }},
-                {"bata",       new Prenda{ b=Paleta.Blanco, s=Paleta.Crema, l=Paleta.Blanco, largo=true }},
-                {"uniforme",   new Prenda{ b=Paleta.AzulO, s=Paleta.Ria1, l=Paleta.Azul, placa=true }},
-                {"camiseta",   new Prenda{ b=Paleta.Mostaza, s=Paleta.MostazaO, l=Paleta.Mostaza, corta=true }},
-                {"polo",       new Prenda{ b=Paleta.VerdeL, s=Paleta.Verde, l=Paleta.VerdeL, corta=true }},
+                {"bata",       new Prenda{ b=Paleta.Hueso, s=Paleta.Crema, l=Paleta.Blanco, largo=true, cierre=true }},
+                {"uniforme",   new Prenda{ b=Paleta.AzulO, s=Paleta.Ria1, l=Paleta.Azul, placa=true, cierre=true }},
+                {"camiseta",   new Prenda{ b=Paleta.Mostaza, s=Paleta.MostazaO, l=Paleta.Luz7, corta=true }},
+                {"polo",       new Prenda{ b=Paleta.VerdeL, s=Paleta.Verde, l=Paleta.Verde6, corta=true }},
                 {"reflectante",new Prenda{ b=Paleta.Rojo, s=Paleta.RojoO, l=Paleta.Mostaza, corta=true, bandas=true }},
                 {"delantal",   new Prenda{ b=Paleta.Asfalto, s=Paleta.Carbon, l=Paleta.GrisL, corta=true, mandil=true }},
-                {"tirantes",   new Prenda{ b=Paleta.Blanco, s=Paleta.Hormigon6, l=Paleta.Blanco, corta=true, sinMangas=true }},
+                {"tirantes",   new Prenda{ b=Paleta.Hueso, s=Paleta.Hormigon6, l=Paleta.Blanco, corta=true, sinMangas=true }},
             };
             return _torsos;
         }
@@ -246,50 +263,57 @@ public static class ForjaChar {
 
         // ── piernas ──
         int py = MG_ARR + (cabez ? 18 : 17) + oy, l1 = P_.p0, l2 = P_.p1;
+        // Cuánto se separa cada pierna del eje del cuerpo, y el signo no es el mismo
+        // mirando de frente que de perfil: de perfil el paso va hacia delante y hacia
+        // atrás —una pierna adelanta y la otra se queda—, pero de frente eso cruzaría las
+        // dos piernas en el centro y lo que se ve es un nudo. De frente se abren a los
+        // lados, cada una a la suya.
+        int abre = Mathf.Max(Mathf.Abs(P_.dx0), Mathf.Abs(P_.dx1));
+        int d1 = lateral ? P_.dx0 : -abre, d2 = lateral ? P_.dx1 : abre;
         // La pernera de delante lleva su canto claro a la izquierda, que es de donde viene
         // la luz, y la de detrás se queda en sombra: sin eso las dos piernas son un bloque.
         if (PN.falda) {
             L.P(cx - compW/2 - 1, py - 1, compW + 2, 6, PN.b);
             L.P(cx - compW/2 - 1, py - 1, compW + 2, 1, PN.l);
             L.P(cx - compW/2 - 1, py + 4, compW + 2, 1, PN.s);
-            L.P(cx - 3, py + 5, 2, PH - 4, cfg.Piel);
-            L.P(cx + 1, py + 5, 2, PH - 4, cfg.Piel);
-            L.P(cx - 3, py + PH, 2, 1, cfg.PielS);
-            L.P(cx + 1, py + PH, 2, 1, cfg.PielS);
+            L.P(cx - 3 + d1, py + 5, 2, PH - 4, cfg.Piel);
+            L.P(cx + 1 + d2, py + 5, 2, PH - 4, cfg.Piel);
+            L.P(cx - 3 + d1, py + PH, 2, 1, cfg.PielS);
+            L.P(cx + 1 + d2, py + PH, 2, 1, cfg.PielS);
         } else if (lateral) {
             int dx = derV ? 1 : -1;
-            L.P(cx - 2 - dx, py + l2, 3, PH - l2, PN.s);
-            L.P(cx - 2 + dx, py + l1, 3, PH - l1, PN.b);
-            L.P(cx - 2 + dx, py + l1, 1, PH - l1, PN.l);
-            if (PN.corto) L.P(cx - 2 + dx, py + 4, 3, PH - 4, cfg.Piel);
+            L.P(cx - 2 - dx + d2, py + l2, 3, PH - l2, PN.s);
+            L.P(cx - 2 + dx + d1, py + l1, 3, PH - l1, PN.b);
+            L.P(cx - 2 + dx + d1, py + l1, 1, PH - l1, PN.l);
+            if (PN.corto) L.P(cx - 2 + dx + d1, py + 4, 3, PH - 4, cfg.Piel);
         } else {
-            L.P(cx - 3, py + l1, 3, PH - l1, PN.b);
-            L.P(cx, py + l2, 3, PH - l2, PN.s);
-            L.P(cx - 3, py + l1, 1, PH - l1, PN.l);
+            L.P(cx - 3 + d1, py + l1, 3, PH - l1, PN.b);
+            L.P(cx + d2, py + l2, 3, PH - l2, PN.s);
+            L.P(cx - 3 + d1, py + l1, 1, PH - l1, PN.l);
             // El dobladillo proyecta sobre la pernera, igual que la barbilla sobre el pecho.
-            L.P(cx - 3, py + l1, 3, 1, PN.s);
-            if (PN.tieneRaya) { L.P(cx - 3, py + l1, 1, PH - l1, PN.raya); L.P(cx + 2, py + l2, 1, PH - l2, PN.raya); }
-            if (PN.corto) { L.P(cx - 3, py + 4, 3, PH - 4, cfg.Piel); L.P(cx, py + 4, 3, PH - 4, cfg.Piel); }
-            // La costura entre las perneras, y solo de medio muslo para abajo: los dos tonos
-            // del pantalón se parecen demasiado para separarlas solos y de frente las piernas
-            // eran un bloque. Arriba no va, que ahí las piernas se juntan de verdad.
-            L.P(cx - 1, py + 3, 1, PH - 3, Paleta.Negro);
+            L.P(cx - 3 + d1, py + l1, 3, 1, PN.s);
+            if (PN.tieneRaya) { L.P(cx - 3 + d1, py + l1, 1, PH - l1, PN.raya); L.P(cx + 2 + d2, py + l2, 1, PH - l2, PN.raya); }
+            if (PN.corto) { L.P(cx - 3 + d1, py + 4, 3, PH - 4, cfg.Piel); L.P(cx + d2, py + 4, 3, PH - 4, cfg.Piel); }
+            // La costura entre las perneras solo cuando van juntas: con las piernas
+            // abiertas, una raya negra en medio del hueco es una raya en el aire.
+            if (d1 == 0 && d2 == 0) L.P(cx - 1, py + 3, 1, PH - 3, Paleta.Negro);
         }
         // Bajo falda los pies van donde la falda deja las piernas —dos píxeles— y no donde
         // los pone la plantilla lateral, que son tres y cuatro: descuadrados asomaba medio
         // zapato por fuera de la pernera.
         var zap = Calzado(cfg.Calzado);
         int zy = MG_ARR + 24 + oy;
+        // El zapato va con su pierna: clavado en el sitio, la figura patina.
         if (PN.falda) {
-            L.P(cx - 3, zy, 2, 2, zap.b); L.P(cx + 1, zy, 2, 2, zap.b);
-            L.P(cx - 3, zy + 1, 2, 1, zap.s); L.P(cx + 1, zy + 1, 2, 1, zap.s);
+            L.P(cx - 3 + d1, zy, 2, 2, zap.b); L.P(cx + 1 + d2, zy, 2, 2, zap.b);
+            L.P(cx - 3 + d1, zy + 1, 2, 1, zap.s); L.P(cx + 1 + d2, zy + 1, 2, 1, zap.s);
         } else if (lateral) {
             int dx = derV ? 1 : -1;
-            L.P(cx - 2 - dx, zy, 3, 2, zap.b); L.P(cx - 2 + dx, zy, 4, 2, zap.b);
-            L.P(cx - 2 - dx, zy + 1, 3, 1, zap.s); L.P(cx - 2 + dx, zy + 1, 4, 1, zap.s);
+            L.P(cx - 2 - dx + d2, zy, 3, 2, zap.b); L.P(cx - 2 + dx + d1, zy, 4, 2, zap.b);
+            L.P(cx - 2 - dx + d2, zy + 1, 3, 1, zap.s); L.P(cx - 2 + dx + d1, zy + 1, 4, 1, zap.s);
         } else {
-            L.P(cx - 3, zy, 3, 2, zap.b); L.P(cx, zy, 3, 2, zap.b);
-            L.P(cx - 3, zy + 1, 3, 1, zap.s); L.P(cx, zy + 1, 3, 1, zap.s);
+            L.P(cx - 3 + d1, zy, 3, 2, zap.b); L.P(cx + d2, zy, 3, 2, zap.b);
+            L.P(cx - 3 + d1, zy + 1, 3, 1, zap.s); L.P(cx + d2, zy + 1, 3, 1, zap.s);
         }
 
         // ── torso ──
@@ -298,11 +322,22 @@ public static class ForjaChar {
         // una franja, y el torso quedaba de cartón. La regla de ESTILO.md es 1 px claro
         // arriba y a la izquierda, base en el cuerpo y oscuro abajo y a la derecha. La fila
         // oscura de abajo hace además de dobladillo y despega el torso de las perneras.
-        L.P(cx - hom/2, ty, hom, th, T.b);
-        L.P(cx - hom/2, ty, hom, 1, T.l);
-        L.P(cx - hom/2, ty, 1, th, T.l);
-        L.P(cx + hom/2 - 1, ty, 1, th, T.s);
+        // El hombro cae: la fila de arriba va un píxel más estrecha a cada lado. Con el
+        // torso rectangular la figura era un ladrillo con cabeza, y el chaflán solo
+        // redondea la esquina —no inclina el hombro—.
+        L.P(cx - hom/2, ty + 1, hom, th - 1, T.b);
+        L.P(cx - hom/2 + 1, ty, hom - 2, 1, T.b);
+        L.P(cx - hom/2 + 1, ty, hom - 2, 1, T.l);
+        L.P(cx - hom/2, ty + 1, 1, th - 1, T.l);
+        L.P(cx + hom/2 - 1, ty + 1, 1, th - 1, T.s);
         L.P(cx - hom/2, ty + th - 1, hom, 1, T.s);
+        // Y la prenda tiene cuello y cierre. Sin ellos el torso es una mancha de un solo
+        // tono: dos píxeles de solapa a los lados del cuello y una costura por el centro
+        // bastan para que se lea una cazadora y no un jersey pintado.
+        if (T.cierre) { L.P(cx - 2, ty + 1, 1, 2, T.s); L.P(cx + 1, ty + 1, 1, 2, T.s); L.P(cx, ty + 2, 1, th - 4, T.s); }
+        // Lo que no se abre por delante lleva escote y no solapa: un jersey con cremallera
+        // es una chaqueta, y a este tamaño se nota.
+        else if (!T.capucha && !T.mandil) L.P(cx - 1, ty + 1, 2, 1, T.s);
         // La barbilla proyecta sobre el pecho. Sin esto la cabeza y el torso son dos tonos
         // pegados, no una cosa delante de otra, y es la mitad de lo que se lee como volumen.
         if (!T.capucha) L.P(cx - h2 + 1, ty + 1, HW - 2, 1, T.s);
@@ -356,12 +391,25 @@ public static class ForjaChar {
         L.P(hx, hy, HW, HH, cfg.Piel);
         L.P(hx + HW - 1, hy, 1, HH, cfg.PielS);
         L.P(hx, hy, HW, 1, cfg.PielS);
-        if (dir == AB) { L.P(cx - eo, ey, 1, 2, Paleta.Negro); L.P(cx + eo - 1, ey, 1, 2, Paleta.Negro); L.P(cx - 1, my, 2, 1, cfg.PielS); }
+        // Las cejas y la sombra del pómulo. La cara son diez píxeles de piel lisa con dos
+        // ojos y una boca: cualquier cosa que rompa esa plancha se nota, y la ceja es la
+        // que dice de quién es la cara —va del color del pelo—.
+        Color32 pcj = cfg.Pelo == "canoso" ? Paleta.Pelo5 : cfg.PeloCol;
+        if (dir == AB) {
+            L.P(cx - eo, ey, 1, 2, Paleta.Negro); L.P(cx + eo - 1, ey, 1, 2, Paleta.Negro); L.P(cx - 1, my, 2, 1, cfg.PielS);
+            L.P(cx - eo, ey - 1, 1, 1, pcj); L.P(cx + eo - 1, ey - 1, 1, 1, pcj);
+            L.P(cx - h2, ey, 1, 3, cfg.PielS); L.P(cx + h2 - 1, ey, 1, 3, cfg.PielS);
+        }
         if (izqV) { L.P(hx, ey, 1, 2, Paleta.Negro); L.P(hx, hy, h2, HH, cfg.PielS); }
         if (derV) { L.P(hx + HW - 1, ey, 1, 2, Paleta.Negro); L.P(cx, hy, h2, HH, cfg.PielS); }
         if (frente) {
-            if (derV) { L.P(cx, hy, h2, HH, cfg.Piel); L.P(cx, ey, 1, 2, Paleta.Negro); L.P(cx + 2, ey + 2, 1, 1, cfg.PielS); }
-            else { L.P(cx - 1, hy, h2, HH, cfg.Piel); L.P(cx + 2, ey, 1, 2, Paleta.Negro); L.P(cx - 3, ey + 2, 1, 1, cfg.PielS); }
+            if (derV) {
+                L.P(cx, hy, h2, HH, cfg.Piel); L.P(cx, ey, 1, 2, Paleta.Negro); L.P(cx + 2, ey + 2, 1, 1, cfg.PielS);
+                L.P(cx, ey - 1, 1, 1, pcj);
+            } else {
+                L.P(cx - 1, hy, h2, HH, cfg.Piel); L.P(cx + 2, ey, 1, 2, Paleta.Negro); L.P(cx - 3, ey + 2, 1, 1, cfg.PielS);
+                L.P(cx + 2, ey - 1, 1, 1, pcj);
+            }
         }
         if (espalda) L.P(hx, hy, HW, HH, cfg.PielS);
         if (P_.herido && dir == AB) L.P(cx - eo, ey, 4, 1, Paleta.Sangre);

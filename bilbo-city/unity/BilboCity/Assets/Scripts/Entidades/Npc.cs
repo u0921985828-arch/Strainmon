@@ -16,10 +16,10 @@ public class Andante : MonoBehaviour {
         Sr = gameObject.AddComponent<SpriteRenderer>();
     }
 
-    protected void CicloAndar(float dt, bool correr) {
-        Anim += dt * (correr ? 11f : 7.5f);
-        int f = Mathf.FloorToInt(Anim) % 4;
-        PoseAct = correr ? (Pose)((int)Pose.Correr1 + f) : (Pose)((int)Pose.Andar1 + f);
+    /// <summary>Ningún Andante vive dentro de un sitio, así que siempre está en la calle: la
+    /// cadencia sale de la velocidad de verdad, ya en la vara de la figura (Movimiento.EscFig).</summary>
+    protected void CicloAndar(float dt, float vel) {
+        Movimiento.PoseAndar(ref Anim, ref PoseAct, vel, false, dt, true, Movimiento.MetroCalle);
     }
 
     protected virtual void LateUpdate() {
@@ -45,9 +45,10 @@ public class Peaton : Andante {
         if (Huye > 0) {
             Huye -= dt;
             Vector2 d = (Pos - jugador).normalized;
-            Movimiento.Deslizar(ref Pos, d * 3.6f * dt, false);
+            float v = 3.6f * Movimiento.EscFig;
+            Movimiento.Deslizar(ref Pos, d * v * dt, false);
             Dir8 = ForjaChar.Dir8(d.x, d.y);
-            CicloAndar(dt, true);
+            CicloAndar(dt, v);
         } else {
             Temporizador -= dt;
             if (Temporizador <= 0) {
@@ -55,12 +56,13 @@ public class Peaton : Andante {
                 _rumbo = new Vector2(Mathf.Cos(a), Mathf.Sin(a));
                 Temporizador = Utiles.Rnd(1, 4);
             }
-            Vector2 n = Pos + _rumbo * 0.95f * dt;
+            float vp = 0.95f * Movimiento.EscFig;
+            Vector2 n = Pos + _rumbo * vp * dt;
             var t = Ciudad.T(Mathf.FloorToInt(n.x), Mathf.FloorToInt(n.y));
             if (t == Suelo.Acera || t == Suelo.Plaza || t == Suelo.Muelle || t == Suelo.Parque || t == Suelo.Patio) {
                 Pos = n;
                 Dir8 = ForjaChar.Dir8(_rumbo.x, _rumbo.y);
-                CicloAndar(dt, false);
+                CicloAndar(dt, vp);
             } else { Temporizador = 0; PoseAct = Pose.Quieto; }
         }
         if (Vector2.Distance(Pos, jugador) > 36f) Recolocar(jugador);
@@ -90,9 +92,10 @@ public class Enemigo : Andante {
         if (!Alerta) {
             if (TieneOido) {
                 Vector2 haciaRuido = (Oido - Pos).normalized;
-                Movimiento.Deslizar(ref Pos, haciaRuido * 1.9f * dt, false);
+                float v = 1.9f * Movimiento.EscFig;
+                Movimiento.Deslizar(ref Pos, haciaRuido * v * dt, false);
                 Dir8 = ForjaChar.Dir8(haciaRuido.x, haciaRuido.y);
-                CicloAndar(dt, false);
+                CicloAndar(dt, v);
                 if (Vector2.Distance(Pos, Oido) < 1.2f) TieneOido = false;
             } else {
                 _ronda -= dt;
@@ -101,18 +104,19 @@ public class Enemigo : Andante {
                     float ang = Utiles.Rnd(0f, Mathf.PI * 2f);
                     _rumboRonda = new Vector2(Mathf.Cos(ang), Mathf.Sin(ang));
                 }
-                Movimiento.Deslizar(ref Pos, _rumboRonda * 1.3f * dt, false);
+                float v = 1.3f * Movimiento.EscFig;
+                Movimiento.Deslizar(ref Pos, _rumboRonda * v * dt, false);
                 Dir8 = ForjaChar.Dir8(_rumboRonda.x, _rumboRonda.y);
-                CicloAndar(dt, false);
+                CicloAndar(dt, v);
             }
             return;
         }
         if (d > (a.Cuerpo ? 1.1f : a.Alc * 0.75f) || !ve) {
             Vector2 dir = (jugador - Pos).normalized;
-            float v = a.Cuerpo ? 2.7f : 2.2f;
+            float v = (a.Cuerpo ? 2.7f : 2.2f) * Movimiento.EscFig;
             Movimiento.Deslizar(ref Pos, dir * v * dt, false);
             Dir8 = ForjaChar.Dir8(dir.x, dir.y);
-            CicloAndar(dt, false);
+            CicloAndar(dt, v);
         } else {
             Vector2 dir = (jugador - Pos).normalized;
             Dir8 = ForjaChar.Dir8(dir.x, dir.y);
