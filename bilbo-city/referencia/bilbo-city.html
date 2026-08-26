@@ -2209,6 +2209,10 @@ function dibChar(cfg,pose,d8){
     son seis píxeles y un desplazamiento de dos ya deja el pantalón en el aire, que es lo que
     se veía como una figura rota— y encima el muslo se salía del torso. Quebrada por la
     rodilla se queda pegada y además anda: es lo que hace una pierna de verdad. */
+ /* Hacia dónde mira la figura, en horizontal: de perfil un paso entero y en tres cuartos
+    medio. Con esto las piernas de cualquier prenda —también las que asoman bajo una falda—
+    se van al lado al que mira la cara, en vez de quedarse plantadas de frente. */
+ const mira=lateral?(derV?2:-2):(diag?(dir===DE?1:-1):0);
  const rod=py+4, mitad=v=>v>0?Math.ceil(v/2):Math.floor(v/2);
  const m1=mitad(d1), m2=mitad(d2);
  /* La pernera de delante lleva su canto claro a la izquierda, que es de donde viene la
@@ -2227,12 +2231,32 @@ function dibChar(cfg,pose,d8){
   P(g,bx+m,py+l,3,rod-py-l,col);
   P(g,bx+d,rod,3,py+PH-rod,col);};
  if(PN.falda){P(g,cx-w/2-1,py-1,w+2,6,PN.b);P(g,cx-w/2-1,py-1,w+2,1,PN.l);P(g,cx-w/2-1,py+4,w+2,1,PN.s);
-  P(g,cx-3+d1,py+5,2,PH-4,cfg.piel);P(g,cx+1+d2,py+5,2,PH-4,cfg.piel);
-  P(g,cx-3+d1,py+PH,2,1,cfg.pielS);P(g,cx+1+d2,py+PH,2,1,cfg.pielS);}
+  P(g,cx-3+d1+mira,py+5,2,PH-4,cfg.piel);P(g,cx+1+d2+mira,py+5,2,PH-4,cfg.piel);
+  P(g,cx-3+d1+mira,py+PH,2,1,cfg.pielS);P(g,cx+1+d2+mira,py+PH,2,1,cfg.pielS);}
+ /* De perfil, la pierna de delante va hacia donde mira la figura y la de detrás se queda:
+    iban al revés —las dos por detrás del eje— y el resultado era una figura mirando a la
+    derecha con los dos pies apuntando a la izquierda. */
  else if(lateral){const dx=derV?1:-1;
-  pierna(cx-2-dx,d2,m2,l2,PN.s);pierna(cx-2+dx,d1,m1,l1,PN.b);
-  P(g,cx-2+dx+m1,py+l1,1,rod-py-l1,PN.l);P(g,cx-2+dx+d1,rod,1,py+PH-rod,PN.l);
-  if(PN.corto)P(g,cx-2+dx+m1,py+4,3,PH-4,cfg.piel);}
+  const xa=derV?cx-1:cx-2, xd=derV?cx+1:cx-4;
+  pierna(xa,d2,m2,l2,PN.s);pierna(xd,d1,m1,l1,PN.b);
+  P(g,xd+m1,py+l1,1,rod-py-l1,PN.l);P(g,xd+d1,rod,1,py+PH-rod,PN.l);
+  if(PN.corto)P(g,xd+m1,py+4,3,PH-4,cfg.piel);}
+ /* Tres cuartos: la figura no mira ni de frente ni de perfil, y las piernas tampoco. Iban
+    de frente —dos perneras iguales, una al lado de la otra— mientras la cabeza y el torso ya
+    estaban girados: media figura hacia un lado y media hacia el otro. Aquí la pierna de
+    delante va entera y la de detrás queda medio tapada por el cuerpo: un píxel más estrecha,
+    otro más arriba y arrimada al eje. */
+ else if(diag){const s=dir===DE?1:-1;
+  /* Un píxel hacia donde mira: el torso ya va corrido en la diagonal y, sin esto, los pies
+     se quedaban del lado de atrás. */
+  const xc=(s>0?cx:cx-3)+s, xl=(s>0?cx-2:cx+1)+s;
+  const dc=s>0?d2:d1, mc=s>0?m2:m1, lc=s>0?l2:l1;
+  const dl=s>0?d1:d2, ml=s>0?m1:m2, ll=(s>0?l1:l2)+1;
+  P(g,xl+ml,py+ll,2,rod-py-ll,PN.s);P(g,xl+dl,rod,2,py+PH-rod,PN.s);
+  pierna(xc,dc,mc,lc,PN.b);
+  P(g,xc+mc,py+lc,1,rod-py-lc,PN.l);P(g,xc+dc,rod,1,py+PH-rod,PN.l);
+  P(g,xc+mc,py+lc,3,1,PN.s);
+  if(PN.corto){P(g,xc+mc,py+4,3,PH-4,cfg.piel);P(g,xl+ml,py+4,2,PH-4,cfg.piel);}}
  else{pierna(cx-3,d1,m1,l1,PN.b);pierna(cx,d2,m2,l2,PN.s);
   P(g,cx-3+m1,py+l1,1,rod-py-l1,PN.l);P(g,cx-3+d1,rod,1,py+PH-rod,PN.l);
   P(g,cx-3+m1,py+l1,3,1,PN.s);
@@ -2249,11 +2273,23 @@ function dibChar(cfg,pose,d8){
     fuera de la pernera. */
  const Z=CALZADO[cfg.calzado];
  /* El zapato va con su pierna: clavado en el sitio, la figura patina. */
- if(PN.falda){P(g,cx-3+d1,24+oy,2,2,Z.b);P(g,cx+1+d2,24+oy,2,2,Z.b);
-  P(g,cx-3+d1,25+oy,2,1,Z.s);P(g,cx+1+d2,25+oy,2,1,Z.s);}
- else if(lateral){const dx=derV?1:-1;
-  P(g,cx-2-dx+d2,24+oy,3,2,Z.b);P(g,cx-2+dx+d1,24+oy,4,2,Z.b);
-  P(g,cx-2-dx+d2,25+oy,3,1,Z.s);P(g,cx-2+dx+d1,25+oy,4,1,Z.s);}
+ /* Bajo falda los pies son dos, pequeños, y también miran a donde mira la cara; de perfil
+    el de delante asoma un píxel más, que es la punta. */
+ if(PN.falda){const az=derV?1:0, iz=derV?0:1;
+  P(g,cx-3+d1+mira,24+oy,2+(lateral?iz:0),2,Z.b);
+  P(g,cx+1+d2+mira,24+oy,2+(lateral?az:0),2,Z.b);
+  P(g,cx-3+d1+mira,25+oy,2+(lateral?iz:0),1,Z.s);
+  P(g,cx+1+d2+mira,25+oy,2+(lateral?az:0),1,Z.s);}
+ else if(lateral){
+  const xa=(derV?cx-1:cx-2)+d2, xd=(derV?cx+1:cx-5)+d1;
+  P(g,xa,24+oy,3,2,Z.b);P(g,xd,24+oy,4,2,Z.b);
+  P(g,xa,25+oy,3,1,Z.s);P(g,xd,25+oy,4,1,Z.s);}
+ /* Y el pie de delante apunta a donde mira: cuatro píxeles hacia ese lado. El de detrás
+    asoma tres, medio tapado. */
+ else if(diag){const s=dir===DE?1:-1;
+  const xc=(s>0?cx:cx-4)+s+(s>0?d2:d1), xl=(s>0?cx-2:cx+1)+s+(s>0?d1:d2);
+  P(g,xl,24+oy,3,2,Z.s);P(g,xl,25+oy,3,1,Z.s);
+  P(g,xc,24+oy,4,2,Z.b);P(g,xc,25+oy,4,1,Z.s);}
  else{P(g,cx-3+d1,24+oy,3,2,Z.b);P(g,cx+d2,24+oy,3,2,Z.b);
   P(g,cx-3+d1,25+oy,3,1,Z.s);P(g,cx+d2,25+oy,3,1,Z.s);}
  const ty=(cabez?11:9)+oy+yt,th=(T.largo?10:8)-(cabez?1:0);

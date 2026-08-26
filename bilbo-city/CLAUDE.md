@@ -742,6 +742,15 @@ dibuja la cadera, que además es lo que hay ahí (el pantalón sigue puesto), y 
 comprueba que **cada fotograma sea un solo trozo de píxeles pegados**. Las dos excepciones son
 de dibujo y no de error: el fogonazo sale del cañón y el carro de la compra va al lado.
 
+**Y gira la figura entera, no solo la cabeza.** Ocho direcciones son ocho dibujos, y es fácil
+girar la cara y dejarse el resto: en las cuatro diagonales la cabeza y el torso iban girados y
+**las piernas seguían de frente**, con los dos pies mirando a cámara; y de perfil los pies
+apuntaban al revés que la cara, porque la pierna de delante se dibujaba por detrás del eje.
+Ahora hay una sola cuenta —`mira`, cuánto se va la figura al lado al que mira— que colocan
+igual las piernas de pantalón, las de falda y los zapatos, la pierna de detrás queda medio
+tapada en las diagonales y el pie de delante asoma la punta. `estilo.js` lo mide: el pie tiene
+que irse hacia donde mira el cuerpo, y de espaldas no puede verse la cara.
+
 **El ciclo de andar mueve el pie.** El de antes cambiaba la pierna un píxel de largo y dejaba
 el zapato clavado en la misma fila pasara lo que pasara: la figura no andaba, se deslizaba —y
 eso, más que el tamaño, es lo que hacía que el andar no se creyera—. Un paso son cuatro

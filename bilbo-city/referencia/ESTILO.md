@@ -28,6 +28,11 @@ a la densidad de su familia. Un sprite no se dibuja «como quede bien de tamaño
 | Mobiliario urbano | **20 px/m** | `MOB_M`: se mira al lado de quien lo usa, no al lado de un coche |
 | Interiores | **20 px/m** | casilla de 0,80 m a 16 px |
 
+**2 bis · Girada entera.** Lo que gira gira todo: cara, tronco, piernas y pies. En las
+diagonales la pierna de detrás queda medio tapada por el cuerpo y el pie de delante asoma la
+punta hacia donde mira la figura; de espaldas no se ve la cara. Se comprueba midiendo si el
+pie se va al lado al que mira el cuerpo.
+
 **2 · Cuerpo común.** Una figura no se dibuja entera por arquetipo: hay **un cuerpo** con su
 anatomía y la ropa va en capas encima. Por eso cualquiera puede llevar cualquier prenda y 38
 vecinos salen de 7 siluetas. La planta del pie cae en la misma fila para todos —es el pivote

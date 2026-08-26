@@ -418,6 +418,111 @@ listo().then(() => {
     else bien.push(miradas + ' fotogramas comprobados y todos de una pieza: nada despegado del cuerpo');
   }
 
+  // ── R11 · la figura mira entera para el mismo lado ──────────────────────────────
+  /* Ocho direcciones son ocho dibujos distintos, y es fácil girar la cabeza y dejarse el
+     resto: durante un tiempo, en las cuatro diagonales la cara y el torso iban girados y las
+     piernas seguían de frente, con los dos pies mirando a cámara. Aquí se mide sobre el
+     fotograma quieto de cada arquetipo:
+       · los pies se van hacia donde mira la figura (y en las vistas de frente y de espaldas
+         se quedan centrados);
+       · de frente y en tres cuartos delanteros se le ven los ojos, y de espaldas no. */
+  {
+    const [CW, CH] = A.SPR.cel;
+    const fila = A.ORDEN_POSES.indexOf('quieto');
+    // Hacia dónde mira cada dirección, en horizontal, y si se le ve la cara.
+    const MIRA = [0, 1, 1, 1, 0, -1, -1, -1];
+    /* De lo que se puede afirmar sin discutir de dibujo, se afirma esto: **de espaldas no se
+       ve la cara**. Que de frente se vean los ojos no se puede exigir —el matón lleva gafas
+       de sol y el de la capucha va tapado— y de perfil el ojo cae en el mismo canto de la
+       cara, sin piel a los dos lados. Las tres direcciones de espaldas, en cambio, no
+       admiten discusión: si ahí hay ojos, la cabeza está girada al revés que el cuerpo. */
+    const CARA = [null, null, null, false, false, false, null, null];
+    const arqs = Object.keys(A.ARQ);
+    let pies = 0, ojos = 0, peorP = '', peorO = '';
+    for (const k of arqs) {
+      // El carro de la compra va al lado de la figura y pesa más que ella en el recuento:
+      // con él dentro, el centro del tronco se va medio cuerpo y no mide nada.
+      if (A.ARQ[k].acces === 'carrito') continue;
+      const hoja = A.HOJAS[k] || A.hoja(k);
+      const g = hoja.getContext('2d');
+      // Los dos tonos de piel del arquetipo, pasados por la paleta como los pasa la forja.
+      const tonos = new Set([A.ARQ[k].piel, A.ARQ[k].pielS].map(hex => {
+        const r = parseInt(hex.slice(1,3),16), v = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+        let mej = null, md = 1e9;
+        for (const [pr, pv, pb] of A.PALETA) {          // la paleta viene como [r,g,b,'#hex']
+          const dd = (pr-r)**2 + (pv-v)**2 + (pb-b)**2;
+          if (dd < md) { md = dd; mej = pr + ',' + pv + ',' + pb; }
+        }
+        return mej;
+      }));
+      for (let d = 0; d < 8; d++) {
+        const px = g.getImageData(d * CW, fila * CH, CW, CH).data;
+        const op = (x, y) => px[(y*CW + x)*4 + 3] > 0;
+        // Oscuro, no negro puro: el ojo es negro, pero unas gafas de sol son carbón y
+        // también son cara —al matón no se le ven los ojos y no por eso mira hacia otro lado—.
+        const negro = (x, y) => { const i = (y*CW + x)*4;
+          return op(x,y) && (px[i] + px[i+1] + px[i+2]) / 3 < 60; };
+        let abajo = -1;
+        for (let y = CH - 1; y >= 0 && abajo < 0; y--)
+          for (let x = 0; x < CW; x++) if (op(x, y)) { abajo = y; break; }
+        if (abajo < 0) continue;
+        const centro = (y0, y1) => {
+          let s = 0, n = 0;
+          for (let y = y0; y <= y1; y++) for (let x = 0; x < CW; x++) if (op(x, y)) { s += x; n++; }
+          return n ? s / n : null;
+        };
+        // El pie contra el tronco: cuánto se va el zapato del eje del cuerpo. (piel se define
+        // arriba, por arquetipo, con los tonos exactos de ESE arquetipo.)
+        const cPie = centro(abajo - 1, abajo), cTronco = centro(abajo - 20, abajo - 14);
+        if (cPie !== null && cTronco !== null) {
+          const dif = cPie - cTronco, m = MIRA[d];
+          // De frente el margen es de un píxel largo, no cero: el bolso y la bolsa de la
+          // compra cuelgan de un lado y corren el centro del tronco, y eso no es que la
+          // figura mire torcida.
+          const bien2 = m === 0 ? Math.abs(dif) < 1.1 : (m > 0 ? dif > 0.25 : dif < -0.25);
+          if (!bien2) { pies++; if (!peorP) peorP = k + ' mirando a ' + d + ': el pie se va ' + dif.toFixed(2) + ' px y debería irse ' + (m || 'nada'); }
+        }
+        // Un ojo es un píxel negro **con piel al lado**: así no se cuenta la txapela, que
+        // también es casi negra y ocupa media cabeza.
+        // Piel es piel, no «un color cálido»: se compara con los dos tonos de piel de este
+        // arquetipo, ya cuantizados a la paleta. Con un umbral por color, las katiuskas
+        // mostaza de la pescatera contaban como cara y el hueco entre las botas, como un ojo.
+        const piel = (x, y) => { const i = (y*CW + x)*4;
+          if (!op(x, y)) return false;
+          const c = px[i] + ',' + px[i+1] + ',' + px[i+2];
+          return tonos.has(c); };
+        // Un ojo es una mancha negra **corta con cara a los dos lados**: el contorno de una
+        // mano tiene piel por un lado y fondo por el otro, y la txapela es casi negra pero
+        // mide media cabeza. Se busca por tramos, que el ojo mide uno o dos píxeles según
+        // cómo caiga la escala.
+        // Y solo en el tercio de arriba, que es donde está la cabeza: bajo una falda, el
+        // hueco entre las dos piernas también es una mancha oscura con piel a los dos lados.
+        let arriba = 0;
+        while (arriba < CH && !(() => { for (let x = 0; x < CW; x++) if (op(x, arriba)) return true; return false; })()) arriba++;
+        const finCabeza = arriba + Math.round((abajo - arriba) / 3);
+        let n = 0;
+        for (let y = Math.max(1, arriba); y < Math.min(CH - 1, finCabeza); y++) {
+          let x = 1;
+          while (x < CW - 1) {
+            if (!negro(x, y)) { x++; continue; }
+            let f = x;
+            while (f < CW - 1 && negro(f, y)) f++;
+            if (f - x <= 3 && piel(x - 1, y) && piel(f, y)) n += f - x;
+            x = f + 1;
+          }
+        }
+        if (CARA[d] !== null && (CARA[d] ? n === 0 : n > 0)) {
+          ojos++;
+          if (!peorO) peorO = k + ' mirando a ' + d + ': ' + n + ' píxeles de ojo donde debería haber ' + (CARA[d] ? 'cara' : 'nuca');
+        }
+      }
+    }
+    if (pies) fallos.push(pies + ' figuras con los pies mirando a otro lado que el cuerpo: ' + peorP);
+    if (ojos) fallos.push(ojos + ' figuras con la cara donde no toca: ' + peorO);
+    if (!pies && !ojos)
+      bien.push(arqs.length * 8 + ' figuras giradas enteras: pie, tronco y cara al mismo lado en las ocho direcciones');
+  }
+
   bien.forEach(b => console.log('  ok    ' + b));
   if (fallos.length) {
     console.log('');
