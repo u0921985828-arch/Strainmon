@@ -87,9 +87,17 @@ PixelLab ni una vez y terminaba diciendo que todo había ido bien.
 
 ## Medidas y paleta
 
-La celda es de **24×32 con el pivote en (12,30)** y la paleta la de **61 colores**: las dos
-las fija `CONTEXT.md` §18, y el empaquetador **las lee del propio juego**, no las lleva
-escritas. Si mañana cambian allí, aquí no hay nada que tocar.
+La celda de diseño es de **24×32 con el pivote en (12,30)** y la paleta la de **61
+colores**: las dos las fija `CONTEXT.md` §18. Pero el juego **no forja a esa medida**: la
+sube por `PJ_N`/`PJ_D`, hoy 4:3, así que trabaja a **32×42**, y eso es lo que se pide y lo
+que tiene que medir la hoja. El empaquetador lee del propio juego las tres cosas —caja,
+márgenes y escala—, así que si mañana cambian allí, aquí no hay nada que tocar.
+
+> **Esto tuvo la vía muerta sin que se viera.** El empaquetador leía solo la caja y los
+> márgenes —24×32— y no la escala. El juego habría rechazado **toda** hoja traída por
+> «medidas raras» y lo habría forjado todo igual, que es justo lo que tapa el fallo: el
+> juego nunca se queda sin dibujar, así que nadie se entera de que la hoja pagada no se usó.
+> `--coste` imprime la celda; si no dice `32x42`, para.
 
 Las rampas de plantilla van por familia de la paleta —`tez0..tez7` para la piel,
 `ladrillo0..3` para el pelo, `ria2..5` para el torso, `verde2..5` para las piernas y
@@ -106,6 +114,42 @@ adivinar. Antes se le pedía «magenta vivo» y se confiaba en que no lo apagara
 Y todas las celdas de una silueta van con **la misma semilla**, sacada de su nombre. Sin
 eso, cada una de las 55 llamadas inventa una persona distinta y el que anda cambia de cara
 a cada paso.
+
+## La tirada, paso a paso
+
+Se hace en local: aquí no hay clave ni salida hacia `api.pixellab.ai`. El orden importa,
+porque los tres primeros pasos no cuestan nada y el cuarto sí.
+
+```bash
+pip install -r herramientas/requirements.txt      # Pillow, una vez
+export PIXELLAB_API_KEY=...
+
+# 1 · las cuentas, sin tocar nada. Confirma que la celda dice 32x42.
+python3 herramientas/sprites/pixellab.py --coste
+
+# 2 · la tubería entera sin gastar: monigotes de relleno, mismo recorrido.
+python3 herramientas/sprites/pixellab.py --simular
+./verificar.sh html                               # tiene que pasar con las hojas puestas
+git checkout referencia/bilbo-city.html           # lo simulado NO se commitea
+
+# 3 · una silueta de verdad, para juzgar antes de pagar las siete.
+python3 herramientas/sprites/pixellab.py --que largo_pantalon --diag \
+        --lamina /tmp/largo.png --esc 6
+# mirar /tmp/largo.png: ver más abajo qué se mira exactamente
+
+# 4 · si convence, el resto. La caché no vuelve a pagar lo ya bajado.
+python3 herramientas/sprites/pixellab.py
+./verificar.sh
+node herramientas/html/personajes.js --esc 6      # los arquetipos vestidos, para juzgarlos
+```
+
+Antes de la tirada larga se imprime el **saldo de la cuenta**. Es una comodidad, no un
+requisito: si el extremo cambió de nombre o no hay salida, lo dice y sigue. Enterarse a
+media tirada de que no queda saldo deja 385 llamadas hechas a medias y ya pagadas.
+
+Y la **caché guarda por procedencia** (`sim_` y `api_`), así que el `--simular` del paso 2
+no envenena el paso 4. Repetir la tirada no se paga dos veces, y cambiar solo el empaquetado
+no cuesta ninguna llamada.
 
 ## Lo que hay que mirar en la primera tirada
 
@@ -152,7 +196,7 @@ de la misma silueta no salen clavados. `--coste` revisa las tablas sin tocar nad
 El repositorio no lleva imágenes, y esto no lo cambia. La hoja se escribe en el bloque
 `/*<<<SPRITES*/` del HTML como **un índice de paleta por píxel**, comprimida con deflate y
 en base64 — el mismo formato que la trama de la ciudad. El juego sigue siendo un archivo
-solo y el arte sigue atado a los 48 colores de la paleta.
+solo y el arte sigue atado a los 61 colores de la paleta.
 
 ## Si la API contesta raro
 

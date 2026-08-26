@@ -464,6 +464,25 @@ def _imagen(resp):
     return base64.b64decode(re.sub(r'^data:[^,]+,', '', v))
 
 
+def saldo(clave):
+    """Lo que queda en la cuenta, si se deja preguntar. Nunca aborta.
+
+    Una tirada entera son 385 llamadas: enterarse de que no hay saldo a la mitad deja el
+    trabajo hecho a medias y ya pagado. Pero esto es una comodidad, no un requisito —si el
+    extremo cambió de nombre o no hay salida, se dice y se sigue: quien decide si tira es
+    el que tiene la clave, no este aviso.
+    """
+    import urllib.error, urllib.request
+    pet = urllib.request.Request(API_BASE + API_SALDO,
+                                 headers={'Authorization': 'Bearer ' + clave})
+    try:
+        with urllib.request.urlopen(pet, timeout=20) as r:
+            d = json.loads(r.read().decode())
+        return d.get('usd', d.get('balance', d))
+    except Exception as e:                      # noqa: BLE001 — cualquier fallo es «no sé»
+        return f'no se ha podido consultar ({e.__class__.__name__}: {e})'
+
+
 def genera(ropa, direccion, dibujo, clave, simular, plantilla=None):
     """Un PNG de una silueta mirando a una dirección y haciendo algo."""
     # La procedencia va en la clave. Sin esto, un --simular previo —que es lo primero que
@@ -840,6 +859,8 @@ if __name__ == '__main__':
     if not a.simular and not a.clave:
         raise SystemExit('falta la clave: PIXELLAB_API_KEY o --clave')
 
+    if not a.simular:
+        print(f'  saldo de la cuenta: {saldo(a.clave)}')
     plantilla, ntonos = png_plantilla(pal, ramp)
     print(f'  paleta forzada de {ntonos} tonos: lo que vuelva ya viene en las rampas')
     crudas = {}

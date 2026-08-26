@@ -903,8 +903,11 @@ por tono: se contagian del vecino con color. El empaquetador avisa cuando falta 
 plantilla o cuando la mayoría de la celda vino apagada, y `--diag` enseña el recuento.
 
 Los sprites de PixelLab necesitan clave (`PIXELLAB_API_KEY`) y salida a `api.pixellab.ai`,
-que **desde una sesión de Claude está cerrada**: eso se ejecuta en local. Ver
-`herramientas/sprites/LEEME.md`.
+que **desde una sesión de Claude está cerrada** —el proxy contesta 403 al CONNECT—: eso se
+ejecuta en local. El orden de la tirada está en `herramientas/sprites/LEEME.md`, y no es
+capricho: `--coste` y `--simular` no cuestan nada y comprueban la celda y la tubería entera,
+así que **se hacen antes** de gastar las 385 llamadas. Antes de la tirada larga se imprime el
+saldo de la cuenta; es un aviso, no un requisito, y nunca aborta.
 
 **Ojo con la celda, que esta vía estuvo muerta sin que se viera.** El empaquetador saca la
 celda del propio juego, pero leía solo la caja y los márgenes —24×32— y no la escala a la que
