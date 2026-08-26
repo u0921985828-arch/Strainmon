@@ -365,6 +365,59 @@ listo().then(() => {
         + dCor + ' px por el gorro, y hombro de ' + Math.min(...hombros) + ' a ' + Math.max(...hombros) + ' px');
   }
 
+  // ── R10 · la figura es de una pieza ─────────────────────────────────────────────
+  /* Al mover la pierna para que el paso se viera, la pierna se despegó del cuerpo: a esta
+     escala la cadera son seis píxeles y un desplazamiento de dos deja el pantalón en el
+     aire. En una lámina de contacto eso no canta —cada fotograma se mira solo—, y en
+     movimiento se ve como una figura rota. La regla es que **todo lo dibujado esté pegado**:
+     un solo trozo de píxeles opacos por fotograma. Las dos excepciones son de dibujo, no de
+     error: el fogonazo sale del cañón y va suelto, y el carro de la compra va al lado. */
+  {
+    const [CW, CH] = A.SPR.cel;
+    const arqs = Object.keys(A.ARQ);
+    const poses = A.ORDEN_POSES.filter(p => p !== 'dispara');
+    let miradas = 0, rotos = 0, peor = '';
+    for (const k of arqs) {
+      if (A.ARQ[k].acces === 'carrito') continue;          // el carro va suelto a propósito
+      const hoja = A.HOJAS[k] || A.hoja(k);
+      const g = hoja.getContext('2d');
+      for (const pose of poses) {
+        const fila = A.ORDEN_POSES.indexOf(pose);
+        for (let d = 0; d < 8; d++) {
+          const px = g.getImageData(d * CW, fila * CH, CW, CH).data;
+          const dentro = i => px[i * 4 + 3] > 0;
+          // Un recorrido en anchura desde el primer píxel opaco: lo que no se alcance está
+          // suelto.
+          let ini = -1;
+          for (let i = 0; i < CW * CH && ini < 0; i++) if (dentro(i)) ini = i;
+          if (ini < 0) continue;
+          const visto = new Uint8Array(CW * CH);
+          const pila = [ini]; visto[ini] = 1;
+          let n = 1;
+          while (pila.length) {
+            const i = pila.pop(), x = i % CW, y = (i / CW) | 0;
+            for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+              const nx = x + dx, ny = y + dy;
+              if (nx < 0 || ny < 0 || nx >= CW || ny >= CH) continue;
+              const j = ny * CW + nx;
+              if (visto[j] || !dentro(j)) continue;
+              visto[j] = 1; n++; pila.push(j);
+            }
+          }
+          let total = 0;
+          for (let i = 0; i < CW * CH; i++) if (dentro(i)) total++;
+          miradas++;
+          if (n !== total) {
+            rotos++;
+            if (!peor) peor = k + ' · ' + pose + ' · dirección ' + d + ' (' + (total - n) + ' px sueltos)';
+          }
+        }
+      }
+    }
+    if (rotos) fallos.push(rotos + ' de ' + miradas + ' fotogramas con un trozo despegado del cuerpo: ' + peor);
+    else bien.push(miradas + ' fotogramas comprobados y todos de una pieza: nada despegado del cuerpo');
+  }
+
   bien.forEach(b => console.log('  ok    ' + b));
   if (fallos.length) {
     console.log('');

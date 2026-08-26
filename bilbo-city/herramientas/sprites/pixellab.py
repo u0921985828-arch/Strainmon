@@ -232,11 +232,20 @@ def _celda_forja():
     if not m:
         raise SystemExit('no encuentro los márgenes de la forja en el HTML')
     mx, arr, aba = (int(g) for g in m.groups())
+    # Y la escala a la que la forja sube esa caja. Estaba sin leer, así que el empaquetador
+    # pedía celdas de 24×32 —la caja sin escalar— mientras el juego trabaja a 32×42, y
+    # `cargarSprites` rechazaba toda hoja traída por «medidas raras»: la vía de PixelLab
+    # estaba muerta sin que nadie lo viera, porque el juego siempre tiene la forja detrás.
+    e = re.search(r'const PJ_N=(\d+), PJ_D=(\d+);', _texto_html())
+    if not e:
+        raise SystemExit('no encuentro la escala de la forja (PJ_N/PJ_D) en el HTML')
+    pn, pd = (int(g) for g in e.groups())
+    sc = lambda v: v * pn // pd            # la misma cuenta que sc() en el juego
     # Dónde pisa la figura y por dónde va su eje, en coordenadas de celda. La forja dibuja
     # en una caja de 20×26 dentro del margen: los pies caben en las dos últimas filas de
     # esa caja y el eje va por su mitad. El juego ancla la celda por abajo, así que estas
     # dos cifras son las que hacen que un personaje traído pise donde pisa uno forjado.
-    return 20 + mx * 2, 26 + arr + aba, arr + 25, mx + 10
+    return sc(20 + mx * 2), sc(26 + arr + aba), sc(arr + 25), sc(mx + 10)
 
 
 CEL_W, CEL_H, BASE_PIES, EJE_X = _celda_forja()

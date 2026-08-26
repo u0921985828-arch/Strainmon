@@ -732,6 +732,16 @@ quedaba fuera. Y de paso es más correcto — al ponerse en cuclillas los pies n
 
 ## El arte
 
+**Y la figura es de una pieza.** Al mover la pierna para que el paso se viera, la pierna se
+despegó del cuerpo: a esta escala la cadera son seis píxeles y un desplazamiento de dos deja
+el pantalón en el aire. Pero al comprobarlo salió que **ya venía roto de antes**: las posturas
+acortan la pierna *desde arriba*, así que agachado, herido y media carrera dejaban una franja
+de nada entre el torso y el pantalón —386 de 4320 fotogramas—. En una lámina de contacto eso
+no canta, porque cada fotograma se mira solo; en movimiento se ve como una figura rota. Se
+dibuja la cadera, que además es lo que hay ahí (el pantalón sigue puesto), y `estilo.js`
+comprueba que **cada fotograma sea un solo trozo de píxeles pegados**. Las dos excepciones son
+de dibujo y no de error: el fogonazo sale del cañón y el carro de la compra va al lado.
+
 **El ciclo de andar mueve el pie.** El de antes cambiaba la pierna un píxel de largo y dejaba
 el zapato clavado en la misma fila pasara lo que pasara: la figura no andaba, se deslizaba —y
 eso, más que el tamaño, es lo que hacía que el andar no se creyera—. Un paso son cuatro
@@ -829,6 +839,14 @@ plantilla o cuando la mayoría de la celda vino apagada, y `--diag` enseña el r
 Los sprites de PixelLab necesitan clave (`PIXELLAB_API_KEY`) y salida a `api.pixellab.ai`,
 que **desde una sesión de Claude está cerrada**: eso se ejecuta en local. Ver
 `herramientas/sprites/LEEME.md`.
+
+**Ojo con la celda, que esta vía estuvo muerta sin que se viera.** El empaquetador saca la
+celda del propio juego, pero leía solo la caja y los márgenes —24×32— y no la escala a la que
+la forja la sube (`PJ_N`/`PJ_D`, hoy 4:3). El juego trabaja a 32×42, así que `cargarSprites`
+habría rechazado **toda** hoja traída por «medidas raras» y se habría forjado todo igual, que
+es justo lo que tapa el fallo: el juego nunca se queda sin dibujar. Ahora la escala también se
+lee del HTML. Y `--simular` **escribe las hojas de mentira en el juego**: sirve para probar la
+tubería sin red, pero no se commitea.
 
 ## Pixel perfect
 

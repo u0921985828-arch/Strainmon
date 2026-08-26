@@ -2096,10 +2096,10 @@ const POSES={
     es el bote de andar. Los brazos van al revés que las piernas, como los de cualquiera. */
  andar1:{p:[0,1],dx:[2,-2],b:[-1,1],y:0}, andar2:{p:[2,0],dx:[0,0],b:[0,0],y:-1},
  andar3:{p:[1,0],dx:[-2,2],b:[1,-1],y:0}, andar4:{p:[0,2],dx:[0,0],b:[0,0],y:-1},
- correr1:{p:[-2,2],dx:[3,-3],b:[2,-2],y:-1}, correr2:{p:[2,-2],dx:[1,-1],b:[-1,1],y:-1},
+ correr1:{p:[-2,2],dx:[2,-2],b:[2,-2],y:-1}, correr2:{p:[2,-2],dx:[1,-1],b:[-1,1],y:-1},
  /* El bote de la carrera es de un píxel y no de dos: con dos, el gorro se sale por arriba
     de la celda de 24×32 y el contorno se corta. */
- correr3:{p:[-3,3],dx:[-3,3],b:[-2,2],y:-1}, correr4:{p:[3,-3],dx:[-1,1],b:[1,-1],y:-1},
+ correr3:{p:[-3,3],dx:[-2,2],b:[-2,2],y:-1}, correr4:{p:[3,-3],dx:[-1,1],b:[1,-1],y:-1},
  /* El alcance del puñetazo va en píxeles y tiene que caber en el margen lateral, que con
     la celda de 24 son dos. Con los siete de antes el brazo salía cuatro píxeles fuera y el
     puño se cortaba en seco contra el canto de la celda. Lo que separa un golpe del otro ya
@@ -2204,19 +2204,40 @@ function dibChar(cfg,pose,d8){
     lo que se ve es un nudo. De frente se abren a los lados, cada una a la suya. */
  const dz=P_.dx||[0,0], abre=Math.max(Math.abs(dz[0]),Math.abs(dz[1]));
  const d1=lateral?dz[0]:-abre, d2=lateral?dz[1]:abre;
+ /* Y la pierna se mueve **por la rodilla**, no entera: el muslo nace en la cadera y se queda
+    donde está. Moviendo la pierna completa se despegaba del cuerpo —a esta escala la cadera
+    son seis píxeles y un desplazamiento de dos ya deja el pantalón en el aire, que es lo que
+    se veía como una figura rota— y encima el muslo se salía del torso. Quebrada por la
+    rodilla se queda pegada y además anda: es lo que hace una pierna de verdad. */
+ const rod=py+4, mitad=v=>v>0?Math.ceil(v/2):Math.floor(v/2);
+ const m1=mitad(d1), m2=mitad(d2);
  /* La pernera de delante lleva su canto claro a la izquierda, que es de donde viene la
     luz, y la de detrás se queda en sombra: sin eso las dos piernas son un solo bloque. */
+ /* La cadera, y esto es lo que faltaba de siempre: las posturas acortan la pierna **desde
+    arriba**, así que en cuanto una se recoge queda una franja de nada entre el torso y el
+    pantalón y la pierna se ve suelta en el aire —agachado, herido y la mitad del ciclo de
+    correr—. La cadera la rellena, y además es lo que hay ahí: el pantalón sigue puesto. */
+ const cad=Math.max(l1,l2,0);
+ if(!PN.falda&&cad>0){
+  const hx0=Math.min(cx-3+m1,cx-3), hx1=Math.max(cx+3+m2,cx+3);
+  P(g,hx0,py-1,hx1-hx0,cad+2,PN.b);}
+ /* Una pierna: el muslo desde la cadera hasta la rodilla y de ahí abajo la caña, corrida.
+    El muslo se lleva la mitad del desplazamiento para que no quede un escalón seco. */
+ const pierna=(bx,d,m,l,col)=>{
+  P(g,bx+m,py+l,3,rod-py-l,col);
+  P(g,bx+d,rod,3,py+PH-rod,col);};
  if(PN.falda){P(g,cx-w/2-1,py-1,w+2,6,PN.b);P(g,cx-w/2-1,py-1,w+2,1,PN.l);P(g,cx-w/2-1,py+4,w+2,1,PN.s);
   P(g,cx-3+d1,py+5,2,PH-4,cfg.piel);P(g,cx+1+d2,py+5,2,PH-4,cfg.piel);
   P(g,cx-3+d1,py+PH,2,1,cfg.pielS);P(g,cx+1+d2,py+PH,2,1,cfg.pielS);}
  else if(lateral){const dx=derV?1:-1;
-  P(g,cx-2-dx+d2,py+l2,3,PH-l2,PN.s);P(g,cx-2+dx+d1,py+l1,3,PH-l1,PN.b);
-  P(g,cx-2+dx+d1,py+l1,1,PH-l1,PN.l);
-  if(PN.corto)P(g,cx-2+dx+d1,py+4,3,PH-4,cfg.piel);}
- else{P(g,cx-3+d1,py+l1,3,PH-l1,PN.b);P(g,cx+d2,py+l2,3,PH-l2,PN.s);
-  P(g,cx-3+d1,py+l1,1,PH-l1,PN.l);P(g,cx-3+d1,py+l1,3,1,PN.s);
-  if(PN.raya){P(g,cx-3+d1,py+l1,1,PH-l1,PN.raya);P(g,cx+2+d2,py+l2,1,PH-l2,PN.raya);}
-  if(PN.corto){P(g,cx-3+d1,py+4,3,PH-4,cfg.piel);P(g,cx+d2,py+4,3,PH-4,cfg.piel);}
+  pierna(cx-2-dx,d2,m2,l2,PN.s);pierna(cx-2+dx,d1,m1,l1,PN.b);
+  P(g,cx-2+dx+m1,py+l1,1,rod-py-l1,PN.l);P(g,cx-2+dx+d1,rod,1,py+PH-rod,PN.l);
+  if(PN.corto)P(g,cx-2+dx+m1,py+4,3,PH-4,cfg.piel);}
+ else{pierna(cx-3,d1,m1,l1,PN.b);pierna(cx,d2,m2,l2,PN.s);
+  P(g,cx-3+m1,py+l1,1,rod-py-l1,PN.l);P(g,cx-3+d1,rod,1,py+PH-rod,PN.l);
+  P(g,cx-3+m1,py+l1,3,1,PN.s);
+  if(PN.raya){P(g,cx-3+m1,py+l1,1,rod-py-l1,PN.raya);P(g,cx+2+m2,py+l2,1,rod-py-l2,PN.raya);}
+  if(PN.corto){P(g,cx-3+m1,py+4,3,PH-4,cfg.piel);P(g,cx+m2,py+4,3,PH-4,cfg.piel);}
   /* La costura entre las perneras, y solo de medio muslo para abajo: los dos tonos del
      pantalón se parecen demasiado para separarlas solos y de frente las piernas eran un
      bloque. Arriba no va, que ahí las piernas se juntan de verdad. */
@@ -2357,7 +2378,10 @@ function capasEncima(g,cfg,cx,hy,ty,hom,E,soloGrandes){
   else if(est==='mono'){P(g,cx-h2,hy-2,HW,4,pc);P(g,cx-2,hy-4,4,2,pc);}
   else if(est==='afro')P(g,cx-h2-2,hy-4,HW+4,7,pc);
   else P(g,cx-h2,hy-2,HW,4,pc);
-  if(arr)P(g,cx-h2,hy-2,HW,HH,pc);}
+  /* De espaldas se ve pelo hasta la nuca y solo asoma el cuello. Con el pelo acabando dos
+     filas antes del final de la cabeza quedaba una banda de piel del ancho del cráneo, y de
+     espaldas el personaje parecía llevar barba. */
+  if(arr){P(g,cx-h2,hy-2,HW,HH+1,pc);P(g,cx-2,hy+HH-1,4,1,cfg.pielS);}}
  const G=cfg.gorro;
  /* Los gorros llevan su brillo de arriba a la izquierda como todo lo demás. Y ninguno
     pasa de diez píxeles de ancho: la cabeza mide ocho, y con el contorno alrededor un
@@ -2487,7 +2511,7 @@ const PEATON_BARRIO={
    Nunca se queda un personaje sin dibujar. */
 /*<<<SPRITES*/
 /* Lo escribe herramientas/sprites/pixellab.py. Vacío = todo forjado. */
-const SPR={cel:[32,42], rampas:{}, hojas:{}};   /* 24x32 x 4:3 — ver PJ_N/PJ_D */
+const SPR={cel:[32,42], rampas:{}, hojas:{}};   /* la celda del juego: 24x32 forjado a 4:3 */
 /*SPRITES>>>*/
 const CEL_W=()=>SPR.cel[0], CEL_H=()=>SPR.cel[1];
 const HOJAS={};
