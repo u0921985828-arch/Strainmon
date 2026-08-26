@@ -2786,6 +2786,16 @@ function generarTiles(){
   else if(lado===2){P(g,f,0,w,N,C.crema);P(g,0,0,f,w,C.crema);P(g,0,N-w,f,w,C.crema);}
   else {P(g,N-f-w,0,w,N,C.crema);P(g,N-f,0,f,w,C.crema);P(g,N-f,N-w,f,w,C.crema);}};
  TILE.aparca=[0,1,2,3].map(l=>T64((g,N)=>{asfalto(g,N);aparcaL(g,N,l);}));
+ /* La flecha de carril: 2,5 m de largo, la que se pinta antes de un cruce para decir por
+    dónde se sigue. Va en el sentido de la marcha, así que hay una por cada lado. */
+ const flechaL=(g,N,lado)=>{
+  const L=Math.round(2.5/0.0806), w=4, c=N/2;
+  /* Se dibuja apuntando arriba y se gira: cuatro dibujos a mano se descuadran entre sí. */
+  g.save();g.translate(c,c);g.rotate([0,Math.PI,-Math.PI/2,Math.PI/2][lado]);
+  P(g,-w/2,-L/2,w,L,C.crema);
+  for(let i=0;i<9;i++)P(g,-1-i,-L/2+i,2+i*2,2,C.crema);
+  g.restore();};
+ TILE.flecha=[0,1,2,3].map(l=>T64((g,N)=>{asfalto(g,N);flechaL(g,N,l);}));
  /* Tapa de registro: 60 cm de diametro, marco de fundicion y rejilla, no un cuadrado. */
  TILE.alcantarilla=T64((g,N)=>{asfalto(g,N);
   const r=Math.round(0.31/0.081),cx=N/2,cy=N/2;
@@ -4213,7 +4223,7 @@ const M_FAROLA=1,M_CONT=2,M_CONT2=3,M_BANCO=4,M_PAPELERA=5,M_SEMAFORO=6,M_ARBOL=
       M_CEBRA_V=200,M_CEBRA_H=201,
       /* Marca vial: la línea de detención y la plaza de aparcamiento, cada una con el lado
          al que mira (0 arriba, 1 abajo, 2 izquierda, 3 derecha). También son suelo pintado. */
-      M_STOP=202,M_APARCA=206;
+      M_STOP=202,M_APARCA=206,M_FLECHA=210;
 const esCebra=mb=>mb===M_CEBRA_V||mb===M_CEBRA_H;
 const esPintura=mb=>mb>=200;
 /* Qué pieza es cada código. Estaba solo dentro del switch de dibujo, así que nadie más
@@ -4307,6 +4317,27 @@ function colocarCalle(){
    const largo=(dx===0)?(rueda(x-1,y)&&rueda(x+1,y)):(rueda(x,y-1)&&rueda(x,y+1));
    if(!largo)continue;
    MOB[i]=M_APARCA+lado;break;}}
+ /* 1 ter · La flecha de carril, antes del cruce y en el sentido de la marcha. Un cruce es
+    una casilla de calzada con salida por tres lados o más; la flecha va en la casilla de
+    antes, que es donde se pinta de verdad. */
+ const cruceCalle=(x,y)=>{
+  if(!rueda(x,y))return false;
+  let n=0;
+  if(rueda(x+1,y))n++;if(rueda(x-1,y))n++;if(rueda(x,y+1))n++;if(rueda(x,y-1))n++;
+  return n>=3;};
+ for(let y=2;y<MH-2;y++)for(let x=2;x<MW-2;x++){
+  const i=y*MW+x;
+  if(map[i]!==ROAD||MOB[i]||hash(x,y)%3)continue;
+  for(const[lado,dx,dy]of[[0,0,-1],[1,0,1],[2,-1,0],[3,1,0]]){
+   if(!cruceCalle(x+dx,y+dy))continue;
+   /* Y solo en el cruce que tiene paso: la flecha se pinta donde el tráfico se ordena, no
+      en cada bocacalle de las siete mil que tiene Bilbao. */
+   const j=(y+dy)*MW+x+dx;
+   if(!esCebra(MOB[j-1])&&!esCebra(MOB[j+1])&&!esCebra(MOB[j-MW])&&!esCebra(MOB[j+MW]))continue;
+   /* Y solo si por detrás sigue habiendo calle: una flecha en una casilla suelta no
+      señala nada. */
+   if(!rueda(x-dx,y-dy))continue;
+   MOB[i]=M_FLECHA+lado;break;}}
  /* 2 · Todo lo demás va en la fila del bordillo —la acera que toca calzada— y a paso
     fijo a lo largo de la calle, no al azar: una farola cada cinco casillas son 26 m, y
     un árbol de alineación cada cuatro son 21. Lo que hay lo decide el barrio: el Casco
@@ -7421,6 +7452,7 @@ function tileDe(x,y,fa){
   const mb=MOB[y*MW+x];
   if(mb===M_CEBRA_V)return TILE.cebraV;
   if(mb===M_CEBRA_H)return TILE.cebraH;
+  if(mb>=M_FLECHA)return TILE.flecha[mb-M_FLECHA];
   if(mb>=M_APARCA)return TILE.aparca[mb-M_APARCA];
   if(mb>=M_STOP)return TILE.stop[mb-M_STOP];
   const h=hash(x,y);

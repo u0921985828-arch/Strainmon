@@ -205,7 +205,7 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       const MOB = A.MOB, MW = A.MW, MH = A.MH;
       const T = (x, y) => A.Tc(x, y);
       let cebra = 0, mob = 0, fuera = 0, cebraMal = 0, semSuelto = 0;
-      let stop = 0, aparca = 0, pinturaMal = 0;
+      let stop = 0, aparca = 0, flecha = 0, pinturaMal = 0;
       const cuenta = {};
       for (let y = 1; y < MH-1; y++) for (let x = 1; x < MW-1; x++) {
         const v = MOB[y*MW + x];
@@ -215,7 +215,9 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
         // plaza de aparcamiento. Todo eso va sobre la calzada y en ningún otro sitio.
         if (v >= 200) {
           if (v === 200 || v === 201) cebra++;
-          else if (v < 206) stop++; else aparca++;
+          else if (v < 206) stop++;
+          else if (v < 210) aparca++;
+          else flecha++;
           if (T(x, y) !== A.ROAD) { cebraMal += (v < 202 ? 1 : 0); pinturaMal++; }
           continue;
         }
@@ -239,6 +241,25 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       ok(!pinturaMal, pinturaMal + ' marcas viales pintadas fuera de la calzada');
       ok(stop > 2000, 'solo ' + stop + ' líneas de detención para ' + cebra + ' pasos');
       ok(aparca > 5000, 'solo ' + aparca + ' plazas de aparcamiento marcadas');
+      ok(flecha > 1000, 'solo ' + flecha + ' flechas de carril');
+      // Una flecha señala un cruce: si no lo tiene delante, es pintura suelta.
+      {
+        let sueltas = 0;
+        const lados = [[0,-1],[0,1],[-1,0],[1,0]];
+        for (let y = 2; y < MH-2; y++) for (let x = 2; x < MW-2; x++) {
+          const v = MOB[y*MW+x];
+          if (v < 210 || v >= 214) continue;
+          const [dx, dy] = lados[v - 210];
+          let n = 0;
+          const rod = (a, b) => A.rodable(a, b);
+          if (rod(x+dx+1, y+dy)) n++;
+          if (rod(x+dx-1, y+dy)) n++;
+          if (rod(x+dx, y+dy+1)) n++;
+          if (rod(x+dx, y+dy-1)) n++;
+          if (n < 3) sueltas++;
+        }
+        ok(!sueltas, sueltas + ' flechas de carril que no señalan ningún cruce');
+      }
       // Una línea de detención sin su paso al lado es pintura suelta en mitad de la calle.
       {
         let stopSuelta = 0;
@@ -263,8 +284,8 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       }
       const sep = (cuenta[1] ? kerb / cuenta[1] : 0) * 5.16;
       ok(sep > 15 && sep < 45, 'las farolas van cada ' + sep.toFixed(0) + ' m');
-      bien.push(cebra + ' pasos de cebra, ' + stop + ' líneas de detención y ' + aparca
-        + ' plazas de aparcamiento marcadas · ' + mob + ' muebles de calle en el bordillo · '
+      bien.push(cebra + ' pasos de cebra, ' + stop + ' líneas de detención, ' + aparca
+        + ' plazas de aparcamiento y ' + flecha + ' flechas de carril · ' + mob + ' muebles de calle en el bordillo · '
         + 'farola cada ' + sep.toFixed(0) + ' m · ' + (cuenta[6]||0) + ' semáforos, '
         + (cuenta[7]||0) + ' árboles de alineación, ' + (cuenta[9]||0) + ' marquesinas');
     }

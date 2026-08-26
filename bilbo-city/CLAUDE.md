@@ -264,6 +264,10 @@ calle. Ahora la casilla de calzada lleva su pintura, calculada con la misma pasa
   con su línea de fondo a 2,20 m y sus travesaños. De cada tres se deja una sin marcar —vados,
   contenedores, la parada del bus—.
 
+- **Flecha de carril** antes del cruce y en el sentido de la marcha, pero **solo en el cruce
+  que tiene paso**: pintada en cada bocacalle salían 36 000, una de cada cinco casillas de
+  calzada, y eso no es una ciudad, es un parking. Con la condición del paso quedan 1 700.
+
 Los códigos de pintura van del 200 para arriba (`esPintura`), separados de los muebles: antes
 la cebra era el 20 y el 21 y la primera pieza nueva de atrezzo se habría dibujado como un paso.
 
