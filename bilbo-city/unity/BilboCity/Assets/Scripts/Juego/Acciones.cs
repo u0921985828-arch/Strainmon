@@ -120,7 +120,9 @@ public static class Acciones {
             if (d > md) continue;
             float ang = Mathf.Atan2(e.Pos.y - J.Jug.Pos.y, e.Pos.x - J.Jug.Pos.x);
             float df = Mathf.Abs(Mathf.DeltaAngle(ang * Mathf.Rad2Deg, DirAng(J.Jug.Dir8) * Mathf.Rad2Deg)) * Mathf.Deg2Rad;
-            if (df < 1.05f && Combate.LineaVista(J.Jug.Pos, e.Pos)) { md = d; obj = e; }
+            // Sin joystick de puntería el cono de autoapuntado es ancho: 1,15 rad. El 1,05
+            // es el de los peatones, más estrecho a propósito para no pegar al que pasa.
+            if (df < 1.15f && Combate.LineaVista(J.Jug.Pos, e.Pos)) { md = d; obj = e; }
         }
         Peaton victima = null;
         if (a.Cuerpo && obj == null) {
@@ -146,7 +148,7 @@ public static class Acciones {
             // ruido. Es el premio de haber ido despacio; sin esto, el sigilo solo sirve
             // para tardar más en llegar al mismo tiroteo.
             if (obj != null && Sigilo.Desprevenido(obj) && Sigilo.PorDetras(obj)
-                && Vector2.Distance(obj.Pos, J.Jug.Pos) < 1.4f) {
+                && Vector2.Distance(obj.Pos, J.Jug.Pos) < .35f) {
                 AudioProc.I.Sfx("golpe", 0.35f);
                 Combate.I.Danar(obj, 999, J);
                 Particulas.I.Emitir(obj.Pos, "sangre", 6);

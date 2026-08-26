@@ -415,6 +415,10 @@ public static class Forja {
         if (Veh.Count > 0) return;
         foreach (var kv in Chasises) {
             string tipo = kv.Key;
+            // La patrulla solo se dibuja con la rotativa, y nunca quemada: el render sale
+            // por PatrullaRot en cuanto es de la pasma. Las siete libreas y el chasis
+            // calcinado se forjaban igual, ocho texturas por arranque que no ve nadie.
+            if (tipo == "patrulla") continue;
             var sp = new Sprite[Libreas.Length];
             for (int i = 0; i < Libreas.Length; i++) sp[i] = SpriteDe(DibVeh(tipo, Libreas[i], "normal"));
             Veh[tipo] = sp;
@@ -461,7 +465,10 @@ public static class Forja {
         {"contenedor2", new[]{1.4f,1.4f}}, {"papelera", new[]{0.5f,1.0f}},
         {"banco", new[]{1.8f,1.0f}},    {"marquesina", new[]{4.0f,2.6f}},
         {"cabina", new[]{1.0f,2.4f}},   {"bolardo", new[]{0.3f,0.9f}},
-        {"valla", new[]{2.5f,1.2f}},    {"andamio", new[]{3.0f,6.0f}},
+        // El andamio es de una planta —3,80 m— y no de seis: la ley 6 le da a la acera un
+        // tope de cuatro metros, y un andamio de seis es un muro. El de picar un bajo mide
+        // esto.
+        {"valla", new[]{2.5f,1.2f}},    {"andamio", new[]{3.0f,3.8f}},
         {"pales", new[]{1.2f,1.0f}},    {"cono", new[]{0.4f,0.7f}},
         {"grua", new[]{8.0f,12.0f}},    {"contMaritimo", new[]{12.0f,2.6f}},
         {"bidon", new[]{0.6f,0.9f}},    {"toldo", new[]{3.0f,1.2f}},
@@ -621,9 +628,10 @@ public static class Forja {
         L = Mob("valla"); L.P(0,1,25,4,Paleta.Mostaza); L.P(0,6,25,4,Paleta.Rojo);
         L.P(1,10,3,2,Paleta.Carbon); L.P(21,10,3,2,Paleta.Carbon); Props["valla"] = SpriteMob("valla", L);
         L = Mob("andamio");
-        for (int x = 0; x < 30; x += 9) L.P(x,0,2,60,Paleta.Acero);
-        for (int y = 2; y < 60; y += 14) L.P(0,y,30,2,Paleta.AceroO);
-        L.P(0,30,30,2,Paleta.Madera); Props["andamio"] = SpriteMob("andamio", L);
+        for (int x = 0; x < 30; x += 9) L.P(x,0,2,38,Paleta.Acero);
+        for (int y = 2; y < 38; y += 12) L.P(0,y,30,2,Paleta.AceroO);
+        L.P(0,20,30,2,Paleta.Madera); L.P(0,36,30,2,Paleta.AceroO);
+        Props["andamio"] = SpriteMob("andamio", L);
         L = Mob("pales"); L.P(0,2,12,8,Paleta.Madera);
         for (int x = 1; x < 11; x += 3) L.P(x,2,2,8,Paleta.MaderaL);
         L.P(0,1,12,2,Paleta.MaderaO); Props["pales"] = SpriteMob("pales", L);

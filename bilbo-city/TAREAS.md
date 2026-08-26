@@ -73,10 +73,37 @@ casilla al dibujar.
 
 Repasar comportamiento contra el prototipo, que es el probado:
 
+- [x] Alcance del cuerpo a cuerpo. Unity se había quedado con el `1.0` y el `1.4` que el
+      HTML abandonó por engañosos: son 5,2 m y 7,2 m, o sea pegar desde la otra acera. Y
+      afectaba a los dos lados, que los matones usan la misma tabla. Ahora hay comparador
+      (`herramientas/plano/armas.py`) y va en `./verificar.sh`.
+- [x] Golpe por la espalda: iba a 1,4 casillas (7,2 m) en vez de a 0,35 (1,8 m).
+- [x] Cono de auto-apuntado sin joystick de puntería: 1,15 rad, no 1,05.
+- [x] La ambulancia no salía en ninguna lista de tráfico: se forjaba y no circulaba.
 - [ ] Escalado del daño y de las estrellas de búsqueda.
 - [ ] Tiempos de las misiones con límite.
-- [ ] Economía: precios, pagos de curros, alquiler semanal.
+- [ ] Economía: precios, pagos de curros, alquiler semanal. Un comparador tipo `armas.py`
+      lo sujetaría (`CURROS`, `PROPIEDADES`, `PRENDAS`, `XP_NIVEL`): hoy cuadran, pero sin red.
+- [ ] `VMAX_VEH` no existe en Unity: todo coche del tráfico se crea con `vmax:11f` fijo,
+      así que el autobús corre lo mismo que el deportivo. Y comprar furgoneta o deportivo
+      solo pone un booleano: el coche del jugador no cambia ni de modelo ni de punta.
 - [ ] Auto-apuntado: solo a enemigos, nunca a viandantes salvo con las manos.
+- [ ] Mobiliario pegado al sitio: la marquesina de la parada, la terraza del bar, el toldo
+      del comercio y la placa del singular. En el HTML van en `colocarCalle()`; el puerto
+      solo siembra por cadencia y no ata ninguna pieza a un POI.
+
+## 3 bis · Lo que se forja y no se usa
+
+La clase de fallo que ya cazó tres veces —la grúa y el contenedor marítimo sobre una ciudad
+sin muelles, la celda de PixelLab, y las cinco piezas de obra sin acera—. Ahora la batería
+lo comprueba sola: toda pieza de `MOB_M`, todo mueble de `MUEBLES` y todo chasis de `CHASIS`
+tienen que estar plantados en algún sitio. Lo que quedó al descubierto y sigue abierto:
+
+- [ ] Seis iconos del HUD forjados y sin usar: `pintxo`, `botellin`, `plato`, `botiquin`,
+      `llaveInglesa` y `movil`. Las opciones de diálogo son texto sin icono, así que o se
+      les pone icono a las opciones —que es lo que pedían estos seis— o se borran. No hay
+      red que lo sujete todavía: `icoImg` se llama con literales y con campos de tabla, y
+      eso no se puede barrer sin ejecutar todos los diálogos.
 
 ## 4 · Rendimiento
 
@@ -171,6 +198,15 @@ Fallos que ya se cazaron y no deben volver:
 - El arnés dando por fallada la última misión sin que el juego tuviera la culpa: `S.hp = 100`
   no deshace un K.O. Ver abajo.
 - `Correr` y `AtacarMantenido` que se quedaban pegados a `true` para siempre.
+- Un guardado corrupto envenenando la partida nueva: `cargar()` hacía `Object.assign` nada
+  más parsear, reventaba a media carga, devolvía false —«aquí no hay partida»— y el arranque
+  dejaba empezar una nueva **encima** del estado ya escrito: dinero `NaN`, reloj `NaN` y el
+  protagonista en la casilla 99999. Ahora la carga es atómica y acota cada campo, y la
+  batería la prueba de ida y vuelta y con nueve guardados rotos.
+- La tabla de armas separándose entre el HTML y Unity sin que nadie lo viera.
+- Cinco piezas de calle (valla, andamio, cono, toldo, placa), tres muebles de interior
+  (bañera, escritorio, palés), un tile de suelo, dos tablas huérfanas y catorce libreas de
+  coche: forjados al arrancar y sin un solo camino de dibujo.
 
 Los dos primeros errores de compilación reales, con lo que enseñan:
 

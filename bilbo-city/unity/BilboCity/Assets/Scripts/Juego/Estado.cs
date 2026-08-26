@@ -14,9 +14,12 @@ public class Arma {
 }
 
 public static class Armas {
+    // El alcance en casillas engañaba: `1.0` parece poco y son 5,2 m — se pegaba a alguien
+    // desde el otro lado de la acera, y con el bate desde el otro lado de la calle (7,2 m).
+    // Un puño llega a metro y medio y un bate a dos y pico, contando el brazo y el paso.
     public static readonly List<Arma> Todas = new List<Arma> {
-        new Arma{ Id="punos", Nombre="Puños", Dmg=11, Alc=1.0f, Cad=.34f, Cuerpo=true, Infinita=true, Largo=0 },
-        new Arma{ Id="bate", Nombre="Bate", Dmg=30, Alc=1.4f, Cad=.5f, Cuerpo=true, Infinita=true, Precio=120,
+        new Arma{ Id="punos", Nombre="Puños", Dmg=11, Alc=.30f, Cad=.34f, Cuerpo=true, Infinita=true, Largo=0 },
+        new Arma{ Id="bate", Nombre="Bate", Dmg=30, Alc=.45f, Cad=.5f, Cuerpo=true, Infinita=true, Precio=120,
                   Largo=9, Grosor=2, Col=Paleta.MaderaL, Mango=Paleta.MaderaO },
         new Arma{ Id="pistola", Nombre="Pistola", Dmg=24, Alc=9, Cad=.3f, Vel=26, Spread=.05f, Precio=450,
                   Balas=60, Pack=24, Largo=5, Col=Paleta.Carbon, Mango=Paleta.Negro, Fog="pistola" },

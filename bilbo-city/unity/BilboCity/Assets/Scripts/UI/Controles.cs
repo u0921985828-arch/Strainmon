@@ -294,9 +294,13 @@ public static class Guardado {
             return false;
         }
         var E = Estado.I;
-        E.Dinero = p.dinero; E.Hp = p.hp; E.Energia = p.energia; E.Hambre = p.hambre;
-        E.Min = p.min; E.Dia = p.dia; E.Deuda = p.deuda; E.Alquiler = p.alquiler;
-        E.UltCobro = p.ultCobro; E.MisionIdx = p.misionIdx;
+        // JsonUtility no deja colar un tipo raro, pero sí un NaN o un número absurdo: un
+        // reloj a -500 o un saldo a NaN dejan la partida inservible sin que nada avise.
+        E.Dinero = Num(p.dinero, 60f, -1e6f, 1e9f); E.Hp = Num(p.hp, 100f, 0f, 100f);
+        E.Energia = Num(p.energia, 1f, 0f, 1f); E.Hambre = Num(p.hambre, 1f, 0f, 1f);
+        E.Min = Mathf.Clamp(p.min, 0, 24*60); E.Dia = Mathf.Max(1, p.dia);
+        E.Deuda = Mathf.Max(0, p.deuda); E.Alquiler = Mathf.Clamp(p.alquiler, 0, 1000000);
+        E.UltCobro = Mathf.Max(1, p.ultCobro); E.MisionIdx = Mathf.Max(0, p.misionIdx);
         E.Rep["hosteleria"] = p.repHosteleria; E.Rep["obra"] = p.repObra;
         E.Rep["transporte"] = p.repTransporte; E.Rep["calle"] = p.repCalle;
         E.TieneFurgo = p.furgo; E.TieneDeportivo = p.deportivo; E.TieneSilenciador = p.silenciador;
@@ -320,9 +324,21 @@ public static class Guardado {
         }
         E.Contratos.Clear();
         if (p.contratos != null) E.Contratos.AddRange(p.contratos);
-        if (Juego.I != null && Juego.I.Jug != null && p.x > 0)
-            Juego.I.Jug.Pos = new Vector2(p.x, p.y);
+        // Y una posición sin validar saca al jugador del mapa, donde no hay casilla que
+        // pisar. Se cae a la casilla andable más cercana.
+        if (Juego.I != null && Juego.I.Jug != null && p.x > 0) {
+            float px = Num(p.x, 1f, 1f, Ciudad.MW-2), py = Num(p.y, 1f, 1f, Ciudad.MH-2);
+            Juego.I.Jug.Pos = Ciudad.Andable(Ciudad.T((int)px, (int)py))
+                ? new Vector2(px, py)
+                : Ciudad.CercaDe((x,y) => Ciudad.Andable(Ciudad.T(x,y)), (int)px, (int)py, 60);
+        }
         return true;
+    }
+
+    /// <summary>Un número del archivo: si no es finito o se sale, vale el de fábrica.</summary>
+    static float Num(float v, float def, float lo, float hi) {
+        if (float.IsNaN(v) || float.IsInfinity(v)) return def;
+        return Mathf.Clamp(v, lo, hi);
     }
 }
 

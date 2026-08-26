@@ -50,6 +50,16 @@ verifica que los sitios están sobre suelo pisable y cerca de donde los pone el 
 la conectividad de la red viaria, y prueba combate, conducción desde 16 puntos al azar,
 muerte y 150 s de bucle.
 
+Dos cosas de esa batería no se miden solas y hay que decirlas aparte. **El reloj del arnés es
+virtual** —`now += 16.7` por paso—, así que «150 s de bucle sin excepciones» no dice nada del
+coste: un bucle O(n²) nuevo pasaba igual de verde. El tiempo se mide desde fuera, con
+`process.hrtime`, en cuatro sitios distintos de la ciudad. El canvas del arnés es de software
+y sin GPU, así que esos milisegundos son varias veces los del navegador (hoy, de 4,7 a 6,5): el
+número no es el presupuesto del juego, es el testigo de que no se ha multiplicado. Y **el
+guardado se prueba de ida y vuelta**, no mirando si hay algo escrito: antes bastaba con que el
+almacén tuviera una clave, así que un campo nuevo de `S` que se olvidara en `guardar()` se
+perdía al recargar sin que nadie se enterara.
+
 `herramientas/compilar/` compila el C# de verdad, sin tener Unity: hay un remedo de la API
 del motor — solo firmas, nunca se ejecuta — y el juego se compila contra él con Roslyn, con
 las opciones de Unity 2022.3 (netstandard2.1, C# 9) y la separación de ensamblados de los
@@ -57,6 +67,12 @@ las opciones de Unity 2022.3 (netstandard2.1, C# 9) y la separación de ensambla
 del motor que el remedo no tenga, añádela a `herramientas/compilar/apinado/Api/` con la
 firma exacta de Unity** — una firma inventada de más tapa errores reales, que es lo único
 que puede estropear esta herramienta.
+
+`herramientas/plano/armas.py` compara la tabla de armas —daño, alcance, cadencia, precio y
+munición— entre los dos. Es la trampa de siempre y ya mordió: el alcance del puño y el del
+bate se quedaron en Unity con el `1.0` y el `1.4` que el HTML abandonó por engañosos —5,2 m y
+7,2 m, o sea pegar desde la otra acera—, y como la tabla la usan también los matones, la
+diferencia iba en los dos sentidos.
 
 `herramientas/plano/sitios.py`, `singulares.py` y `calles.py` comparan las coordenadas de
 los 57 sitios, las medidas de los 13 singulares y los puntos de paso de las 513 calles entre
@@ -290,10 +306,26 @@ fuente, estatua, reloj y quiosco; en el parque, columpio, tobogán, arenero, por
 de beber; en el muelle, grúa, contenedores apilados, hormigonera, escombros y el noray de
 amarre; en el patio de manzana, trastos, tendedero y la bici del vecino.
 
+**Y una calle levantada.** Bilbao siempre tiene una obra: cada doscientas y pico casillas de
+bordillo van tres seguidas con el andamio contra la fachada, la valla que corta el paso y el
+cono en el canto. Es lo que ocupa una obra de verdad —no se levanta una acera de cinco metros
+y se deja el andamio suelto en mitad—. El andamio es **de una planta, 3,80 m**, y no de seis:
+la ley 6 le da a la acera un tope de cuatro metros, y con razón, que un andamio de seis es un
+muro. Y el toldo va donde hay escaparate y la placa en la fachada del singular, atados al
+sitio como la terraza al bar.
+
 La batería lo mide: que ningún paso caiga fuera de la calzada, que ninguna marca vial se pinte
 fuera de ella, que ninguna línea de detención se quede sin su paso delante, que ningún mueble
 esté lejos del bordillo, que ningún semáforo esté suelto y que la separación entre farolas
 —contada sobre las casillas de bordillo— caiga entre 15 y 45 m.
+
+**Y que no sobre nada.** Toda pieza con medida en `MOB_M` se forja al arrancar, así que cuesta
+arranque y memoria; si además no está en `MOB_PIEZA` ni en ninguna siembra, no la ve nadie. Es
+el fallo que dejó la grúa y el contenedor marítimo forjados sobre una ciudad sin muelles, y
+después cinco piezas de obra sin una acera donde ponerse. La batería lo barre en los tres
+sitios donde pasa: **mobiliario** (`MOB_M` contra lo plantado), **muebles de interior**
+(`MUEBLES` contra los caracteres de las trece plantas) y **chasis** (`CHASIS` contra las
+listas de tráfico). O se planta, o no se forja.
 
 **Y hay gaviotas.** Diez, planeando en círculo por la capa de vuelo —no las tapa nada— con
 su sombra en el suelo, y haciendo el corro sobre el agua cuando hay ría cerca, que es donde
@@ -590,6 +622,31 @@ pieza), que **todo el suelo se pueda alcanzar desde la puerta**, que a cada depe
 llegue, y que ningún mueble tenga medidas imposibles —una cama entre 0,8×1,6 y 1,6×2,4 m, un
 coche de 1,6×4—. Un cuarto sellado por un mueble no se ve dibujando el plano: se ve cuando
 no puedes entrar.
+
+## El guardado desconfía del archivo
+
+Se guarda en `window.storage` (con respaldo a `localStorage`) bajo `bilbocity_v4`, y se
+carga **de forma atómica**: se valida y se acota cada campo en variables aparte, y el estado
+del juego no se toca hasta que sale todo bien.
+
+No es prudencia de más. Antes se hacía `Object.assign` nada más parsear, y un guardado a
+medias —la pestaña cerrada mientras escribía, otra versión del juego, un campo a `null`—
+reventaba a mitad. `cargar()` devolvía `false`, que el arranque lee como «aquí no hay
+partida», y te dejaba **empezar una nueva encima del estado ya envenenado**: dinero `NaN`,
+reloj `NaN`, y el protagonista en la casilla 99999, fuera del mapa, sin nada que pisar.
+
+Tres reglas, y las tres hacen falta:
+
+- **Un número que no es finito o se sale del rango vale el de fábrica**, no `undefined`.
+- **La ropa y el arma se validan contra la lista de verdad** —la de la tienda y la de
+  `ARMAS`—: una prenda que no existe deja el arquetipo sin torso y la forja se cae al vestir.
+- **La posición se valida contra el mapa**: si no es andable, se cae a la casilla andable más
+  cercana, y si viene basura, al portal.
+
+La batería prueba las dos cosas: que una partida marcada vuelve **entera** —dinero, munición,
+ropa, propiedades y sitio— y que nueve guardados rotos distintos no dejan la partida en mal
+estado. Lo primero es lo que caza el campo nuevo que se olvida en `guardar()`; lo segundo,
+lo de arriba.
 
 ## Comercio y transporte
 

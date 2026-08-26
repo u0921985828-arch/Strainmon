@@ -30,7 +30,9 @@ public class Juego : MonoBehaviour {
     readonly List<SpriteRenderer> _marcas = new List<SpriteRenderer>();
 
     static readonly string[] TiposCivil = { "utilitario","berlina","ranchera","todoterreno","taxi","furgoCorta","moto","microbus" };
-    static readonly string[] TiposPesado = { "autobus","basura","camionObra","furgoLarga","bomberos","grua","furgonPoli" };
+    // La ambulancia estaba dibujada, con su chasis, y no salía nunca: no estaba en ninguna
+    // lista, así que ni el tráfico la sacaba ni el jugador podía subirse.
+    static readonly string[] TiposPesado = { "autobus","basura","camionObra","furgoLarga","bomberos","grua","furgonPoli","ambulancia" };
     /// <summary>Por la Gran Vía no pasan las mismas cosas que por Zorrotzaurre. La mezcla
     /// la decide el estilo del barrio, que ya lo tenemos del plano: no hace falta pintar
     /// rutas a mano.</summary>

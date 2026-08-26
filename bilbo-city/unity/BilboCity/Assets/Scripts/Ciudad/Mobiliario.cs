@@ -263,6 +263,12 @@ public static class Mobiliario {
             if (l % 149 == 0) { p.Clave = "quiosco"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
             if (l % 73 == 33) { p.Clave = "moto"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
             if (l % 79 == 41) { p.Clave = "bici"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            // La obra ocupa tres casillas seguidas, que es lo que ocupa de verdad: no se
+            // levanta una acera de cinco metros y se deja el andamio suelto en mitad. Una
+            // cada kilómetro. Las tres piezas estaban forjadas y no se plantaban nunca.
+            if (l % 211 == 0) { p.Clave = "andamio"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
+            if (l % 211 == 1) { p.Clave = "valla"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
+            if (l % 211 == 2) { p.Clave = "cono"; p.Dx = 0.5f; p.Dy = 0.9f; return true; }
             return false;
         }
 

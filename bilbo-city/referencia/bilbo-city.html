@@ -3003,8 +3003,6 @@ function generarTiles(){
  for(const fam of Object.keys(TEJADOS)){
   TEJADO_DE[fam]=[TILE.tejados.length,TEJADOS[fam].length];
   for(const t of TEJADOS[fam]){FAM_DE[TILE.tejados.length]=fam;TILE.tejados.push(t);}}
- TILE.suelo=T32(g=>{rell(g,'#7a5f3f');ruido(g,32,32,['#654e33','#8f7150'],14);
-  for(let i=0;i<32;i+=8)P(g,0,i,32,1,'#654e33');});
  generarInteriores();
 }
 /* Ningún tile puede tener un hueco: por un agujero se ve el negro del fondo y sale una
@@ -3103,6 +3101,10 @@ function dibVeh(tipo,lib,estado){
 const VEH={},VEH_QUEMADO={};
 function generarVeh(){
  Object.keys(CHASIS).forEach(t=>{
+  /* La patrulla solo se dibuja con la rotativa, y nunca quemada: pintaCoche() sale por
+     `patrullaRot` en cuanto es de la pasma. Las siete libreas y el chasis calcinado se
+     forjaban igual, ocho lienzos por arranque que no veía nadie. */
+  if(t==='patrulla')return;
   VEH[t]=LIBREAS.map(l=>dibVeh(t,l,'normal'));
   VEH_QUEMADO[t]=dibVeh(t,LIBREAS[0],'quemado');});
  VEH.patrullaRot=[dibVeh('patrulla',LIBREAS[5],'rotA'),dibVeh('patrulla',LIBREAS[5],'rotB')];
@@ -3301,8 +3303,6 @@ const ANCHO_FACH={portal:16,portalPiedra:16,garaje:16,
    quedaba de zócalo sobre una plancha de tejado. La vista es cenital escorada: de un
    edificio alto se ve el bajo y unas cuantas ventanas por encima. Una nave lleva menos,
    que una nave es una sola altura. */
-const PISOS_H={teja:PISO_H,pizarra:PISO_H,azotea:PISO_H,nave:8};
-const PISOS_MAT={teja:'ladrillo',pizarra:'ladrillo',azotea:'hormigon',nave:'nave'};
 /* La altura de planta no es la misma en toda la ciudad. Un piso del Ensanche mide 3,2 m
    de suelo a suelo y uno de un bloque de los sesenta, 2,7: por eso un edificio de Santutxu
    con las mismas alturas que uno de la Gran Via se ve mal aunque no se sepa por que.
@@ -3342,7 +3342,10 @@ const MOB_M={deposito:[2.0,2.2],climatizador:[1.2,1.0],antenaTv:[1.2,2.4],tended
   caseta:[2.4,2.4],chimenea:[0.8,1.6],lucernario:[2.4,1.6],farola:[1.0,4.0],semaforo:[0.9,3.4],
   arbol:[5.0,5.6],arbolPodado:[3.4,3.8],contenedor:[1.4,1.4],contenedor2:[1.4,1.4],
   papelera:[0.5,1.0],banco:[1.8,1.0],marquesina:[4.0,2.6],cabina:[1.0,2.4],bolardo:[0.3,0.9],
-  valla:[2.5,1.2],andamio:[3.0,6.0],pales:[1.2,1.0],cono:[0.4,0.7],grua:[8.0,12.0],
+  /* El andamio es de una planta —3,80 m— y no de seis: la ley 6 le da a la acera un tope
+     de cuatro metros, y con razón, que un andamio de seis es un muro. El de la calle,
+     el de picar la fachada de un bajo, es justo este. */
+  valla:[2.5,1.2],andamio:[3.0,3.8],pales:[1.2,1.0],cono:[0.4,0.7],grua:[8.0,12.0],
   contMaritimo:[12.0,2.6],bidon:[0.6,0.9],toldo:[3.0,1.2],terraza:[1.6,1.4],placa:[0.9,0.4],
   /* Atrezzo. Cada medida es la de verdad, tomada de lo que hay en la calle: un buzón de
      Correos son 50 cm de frente, una señal se lee a 2,20 del suelo, un iglú de vidrio tiene
@@ -3600,8 +3603,9 @@ function generarProps(){
  M_('bolardo',(g)=>{P(g,0,1,3,8,C.carbon);P(g,0,0,3,2,C.mostaza);});
  M_('valla',(g)=>{P(g,0,1,25,4,C.mostaza);P(g,0,6,25,4,C.rojo);
   P(g,1,10,3,2,C.carbon);P(g,21,10,3,2,C.carbon);});
- M_('andamio',(g)=>{for(let x=0;x<30;x+=9)P(g,x,0,2,60,C.acero);
-  for(let y=2;y<60;y+=14)P(g,0,y,30,2,C.aceroO);P(g,0,30,30,2,C.madera);});
+ M_('andamio',(g)=>{for(let x=0;x<30;x+=9)P(g,x,0,2,38,C.acero);
+  for(let y=2;y<38;y+=12)P(g,0,y,30,2,C.aceroO);P(g,0,20,30,2,C.madera);
+  P(g,0,36,30,2,C.aceroO);});
  M_('pales',(g)=>{P(g,0,2,12,8,C.madera);for(let x=1;x<11;x+=3)P(g,x,2,2,8,C.maderaL);
   P(g,0,1,12,2,C.maderaO);});
  M_('cono',(g)=>{P(g,1,1,2,5,C.rojo);P(g,1,3,2,1,C.crema);P(g,0,6,4,1,C.rojoO);});
@@ -4140,15 +4144,20 @@ const V_INTERIOR_C=1.4*MS_I;        /* 1,4 m/s, en casillas de interior por segu
 /* # pared · . suelo · D salida · d paso · C cama · A armario · U mesita · F sofá · M mesa
    S silla · K encimera · N nevera · T inodoro · V lavabo · H ducha · E estantería
    B barra · O mostrador · X vitrina · P puesto · L camilla · Q taquilla · R perchero
-   G surtidor · Z coche · Y escalera · W aparador · J planta */
+   Z coche · Y escalera · W aparador · J planta
+   g televisión · i lavadora · r radiador · a alfombra · t taburete · e escritorio
+   b bañera · w banco de taller · n neumáticos · f futbolín · x recreativa · p palés */
 const INT={
  /* El piso compartido: dos habitaciones, salón, cocina y baño alrededor de un pasillo.
     62 m² útiles, que es lo que mide un piso de los años sesenta en Santutxu. La habitación
     de la derecha es la del primo. Los pisos que se compran reaprovechan este plano. */
  piso:{n:'Tu piso',suelo:'parquet',pared:'yeso',mapa:[
-  '#############','#CCU.#.#.UCC#','#CC..#.#..CC#','#CC..d.d..CC#','#r...#.#...r#',
+  /* El escritorio en el cuarto de la izquierda y la bañera en el baño: dos piezas que
+     estaban dibujadas y sin una sola planta donde ponerse. Un piso de los sesenta en
+     Santutxu tiene bañera; la ducha se queda porque el baño tiene las dos cosas. */
+  '#############','#CCUe#.#.UCC#','#CC.e#.#..CC#','#CC..d.d..CC#','#r...#.#...r#',
   '#AAA.#.#.EEE#','######.######','#FFF.#.#KKKN#','#.aa.d.d....#','#g.U.#.#iMSS#',
-  '#....#.######','#MMS.#.d...H#','#MMS.#.#TV..#','######D######'],npcs:[]},
+  '#....#.######','#MMS.#.d...H#','#MMS.#.#TVbb#','######D######'],npcs:[]},
  portal:{n:'Portal · la casera',suelo:'hidraulico',pared:'yeso',mapa:[
   '#######','#WW..Y#','#....Y#','#....Y#','#.aa..#','#.aa..#','#J...J#','#.....#','###D###'],
   npcs:[{x:3.5,y:4.5,n:'Amaia',arq:'amaia',tipo:'casera'}]},
@@ -4162,7 +4171,8 @@ const INT={
  taller:{n:'Taller Iker',suelo:'chapa',pared:'chapa',mapa:[
   '###############','#EEEE....EEEE.#','#.............#','#.ZZ.....ZZ...#','#.ZZ.....ZZ...#',
   '#.ZZ.....ZZ...#','#.ZZ.....ZZ...#','#.ZZ.....ZZ...#','#ww.........nn#','#OOO......QQQ.#',
-  '#.............#','#####DDDD######'],
+  /* Y los palés en el taller, que es donde están: apilados contra la pared del portón. */
+  '#pp...........#','#####DDDD######'],
   npcs:[{x:11.5,y:10.5,n:'Iker',arq:'iker',tipo:'mecanico'}]},
  armeria:{n:'Bazar Nervión',suelo:'chapa',pared:'ladrillo',mapa:[
   '##########','#XXXXXXX.#','#........#','#EEE..EEE#','#........#','#EEE..EEE#',
@@ -4319,6 +4329,12 @@ const M_FAROLA=1,M_CONT=2,M_CONT2=3,M_BANCO=4,M_PAPELERA=5,M_SEMAFORO=6,M_ARBOL=
       M_BUZON=12,M_PARQUIMETRO=13,M_SENAL=14,M_HIDRANTE=15,M_JARDINERA=16,M_SETO=17,
       M_BICIS=18,M_VIDRIO=19,M_PAPEL=20,M_BOCAMETRO=21,M_QUIOSCO=22,M_MOTO=23,M_BICI=24,
       M_FAROLA_CASCO=25,
+      /* La obra: tres casillas seguidas del bordillo —el andamio contra la fachada, la
+         valla que corta el paso y el cono en el canto—. Bilbao siempre tiene una calle
+         levantada; hasta ahora las tres piezas se forjaban y no se plantaban nunca. */
+      M_ANDAMIO=26,M_VALLA=27,M_CONO=28,
+      /* El toldo del comercio y la placa de la calle, que van pegados al sitio. */
+      M_TOLDO=29,M_PLACA=30,
       /* Los pasos de cebra no son un mueble: son suelo pintado, y por eso van aparte y
          arriba del todo. Estaban en el 20 y el 21, pegados a la lista de muebles, y al
          crecer el atrezzo la primera pieza nueva se habría dibujado como un paso. */
@@ -4336,7 +4352,8 @@ const MOB_PIEZA={[M_FAROLA]:'farola',[M_SEMAFORO]:'semaforo',[M_ARBOL]:'arbolPod
  [M_BUZON]:'buzon',[M_PARQUIMETRO]:'parquimetro',[M_SENAL]:'senal',[M_HIDRANTE]:'hidrante',
  [M_JARDINERA]:'jardinera',[M_SETO]:'seto',[M_BICIS]:'aparcabicis',[M_VIDRIO]:'contVidrio',
  [M_PAPEL]:'contPapel',[M_BOCAMETRO]:'bocaMetro',[M_QUIOSCO]:'quiosco',[M_MOTO]:'moto',
- [M_BICI]:'bici',[M_FAROLA_CASCO]:'farolaCasco'};
+ [M_BICI]:'bici',[M_FAROLA_CASCO]:'farolaCasco',
+ [M_ANDAMIO]:'andamio',[M_VALLA]:'valla',[M_CONO]:'cono',[M_TOLDO]:'toldo',[M_PLACA]:'placa'};
 /* Lo que se siembra fuera de la acera, y cada cuánto. Iba metido en el bucle de dibujo con
    sus desplazamientos a mano: ni se podía comprobar ni se podía mover sin tocar el render.
    Gana la primera que case, que es como estaba la cadena de condiciones. */
@@ -4482,7 +4499,12 @@ function colocarCalle(){
   else if(l%31===12)MOB[i]=(h%2?M_VIDRIO:M_PAPEL);
   else if(l%149===0)MOB[i]=M_QUIOSCO;
   else if(l%73===33)MOB[i]=M_MOTO;
-  else if(l%79===41)MOB[i]=M_BICI;}
+  else if(l%79===41)MOB[i]=M_BICI;
+  /* La obra ocupa tres casillas seguidas, que es lo que ocupa de verdad: no se levanta
+     una acera de cinco metros y se deja el andamio suelto en mitad. Una cada kilómetro. */
+  else if(l%211===0)MOB[i]=M_ANDAMIO;
+  else if(l%211===1)MOB[i]=M_VALLA;
+  else if(l%211===2)MOB[i]=M_CONO;}
  /* 3 · La marquesina va donde para el bus, y la terraza delante de donde se bebe. */
  const bordillo=(x,y)=>map[y*MW+x]===ACERA&&
   (rueda(x+1,y)||rueda(x-1,y)||rueda(x,y+1)||rueda(x,y-1));
@@ -4501,6 +4523,19 @@ function colocarCalle(){
     if(map[j]!==ACERA&&map[j]!==PLAZA)continue;
     MOB[j]=M_BOCAMETRO;puesta=true;break;}
    if(puesta)break;}}
+ /* El toldo es del comercio, no del bar: lo que tiene escaparate a la calle. Y la placa
+    de mármol con el nombre va en la fachada del edificio que lo merece, que son los trece
+    singulares. Las dos piezas estaban forjadas y sin un sitio donde ponerse. */
+ const pegar=(p,cod)=>{
+  for(let d=-2;d<=2;d++)for(const[dx,dy]of[[d,1],[d,-1],[1,d],[-1,d]]){
+   const x=(p.p.x|0)+dx,y=(p.p.y|0)+dy,i=y*MW+x;
+   if(x<1||y<1||x>=MW-1||y>=MH-1)continue;
+   if(bordillo(x,y)&&MOB[i]!==M_SEMAFORO&&!esPintura(MOB[i])&&MOB[i]!==M_TERRAZA){
+    MOB[i]=cod;return true;}}
+  return false;};
+ for(const p of POI){
+  if(p.int==='ropa'||p.int==='merca'||p.int==='almacenes'||p.int==='armeria'||p.int==='centro')pegar(p,M_TOLDO);
+  if(PLANO_SINGULAR[p.id])pegar(p,M_PLACA);}
  for(const p of POI){
   if(p.int!=='bar'&&p.int!=='tasca'&&p.int!=='resto')continue;
   let puestas=0;
@@ -4579,7 +4614,9 @@ function nuevoCoche(x,y,tipo,lib,propio,vmax){
 const coches=[],trafico=[],policia=[],enemigos=[],balas=[],parts=[],peatones=[];
 let tuCoche=null;
 const TIPOS_CIVIL=['utilitario','berlina','ranchera','todoterreno','taxi','furgoCorta','moto','microbus'];
-const TIPOS_PESADO=['autobus','basura','camionObra','furgoLarga','bomberos','grua','furgonPoli'];
+/* La ambulancia estaba dibujada, con su chasis y su tope de velocidad, y no salía nunca:
+   no estaba en ninguna lista, así que ni el tráfico la sacaba ni el jugador podía subirse. */
+const TIPOS_PESADO=['autobus','basura','camionObra','furgoLarga','bomberos','grua','furgonPoli','ambulancia'];
 /* Por la Gran Vía no pasan las mismas cosas que por Zorrotzaurre. La mezcla la decide el
    estilo del barrio, que ya lo tenemos del plano: no hace falta pintar rutas a mano. */
 const TRAFICO_BARRIO={
@@ -5414,7 +5451,7 @@ const PRIMO={x:8.5,y:5.6,n:'Yeray',arq:'yeray',tipo:'primo'};
 const PROLOGO={n:'Recién llegado',prologo:true,giver:'Yeray',pago:0,
  pasos:()=>[
   {t:'ir',p:poi('mtsantutxu').p,txt:'SUBE A SANTUTXU · METRO EN MOYÚA'},
-  {t:'entrar',poi:'piso',p:poi('piso').p,txt:'ENTRA EN EL PISO DE KEPA'}]};
+  {t:'entrar',poi:'piso',p:poi('piso').p,txt:'ENTRA EN EL PISO DE YERAY'}]};
 function retomarPrologo(){
  /* Hasta que no duermes ahí, el piso es el del primo: el rótulo del plano lo dice. */
  poi('piso').n='Piso de Yeray';
@@ -8232,21 +8269,53 @@ function guardar(){
   armas:Object.fromEntries(Object.entries(S.armas).map(([k,v])=>[k,v===Infinity?-1:v])),
   armaAct:S.armaAct,misionIdx:S.misionIdx,pinta:S.pinta,
   xp:S.xp,nivel:S.nivel,props:S.props,casera:S.casera,prologo:S.prologo,x:player.x,y:player.y}));}
+/* La carga es atómica y desconfía del archivo. Antes se hacía `Object.assign` nada más
+   parsear: un guardado a medias —la pestaña cerrada mientras escribía, otra versión del
+   juego, un campo a null— reventaba a mitad, `cargar()` devolvía false, y el arranque
+   entendía «aquí no hay partida» y dejaba empezar una nueva **encima del estado ya
+   envenenado**: dinero NaN, reloj NaN y el protagonista en la casilla 99999. Ahora todo
+   se valida y se acota en variables aparte, y S no se toca hasta que sale bien. */
+const num=(v,d,lo,hi)=>typeof v==='number'&&isFinite(v)?clamp(v,lo,hi):d;
+const objDe=v=>v&&typeof v==='object'&&!Array.isArray(v)?v:null;
 async function cargar(){
  const raw=await alm.get(CLAVE);if(!raw)return false;
- try{const d=JSON.parse(raw);
-  Object.assign(S,{dinero:d.dinero,hp:d.hp??100,energia:d.energia,hambre:d.hambre,min:d.min,dia:d.dia,
-   rep:d.rep||S.rep,deuda:d.deuda||0,alquiler:d.alquiler||220,ultCobro:d.ultCobro||1,
-   tiene:d.tiene||S.tiene,contrato:d.contrato||null,misionIdx:d.misionIdx||0,armaAct:d.armaAct||'punos',
-   xp:d.xp||0,nivel:d.nivel||1,props:d.props||{},casera:d.casera||S.casera,prologo:d.prologo||0});
-  S.armas={};Object.entries(d.armas||{punos:-1}).forEach(([k,v])=>S.armas[k]=v===-1?Infinity:v);
-  if(S.armas.punos===undefined)S.armas.punos=Infinity;
-  if(d.pinta)vestir(d.pinta);
+ let d;try{d=JSON.parse(raw);}catch(e){return false;}
+ if(!objDe(d))return false;
+ try{
+  const nuevo={
+   dinero:num(d.dinero,60,-1e6,1e9),hp:num(d.hp,100,0,100),
+   energia:num(d.energia,1,0,1),hambre:num(d.hambre,1,0,1),
+   min:num(d.min,8*60,0,24*60),dia:Math.round(num(d.dia,1,1,1e5)),
+   rep:objDe(d.rep)||S.rep,deuda:num(d.deuda,0,0,1e9),alquiler:num(d.alquiler,220,0,1e6),
+   ultCobro:Math.round(num(d.ultCobro,1,1,1e5)),
+   tiene:objDe(d.tiene)||S.tiene,contrato:objDe(d.contrato),
+   misionIdx:Math.round(num(d.misionIdx,0,0,MISIONES.length)),
+   armaAct:arma(d.armaAct)?d.armaAct:'punos',
+   xp:num(d.xp,0,0,1e9),nivel:Math.round(num(d.nivel,1,1,99)),
+   props:objDe(d.props)||{},casera:objDe(d.casera)||S.casera,
+   prologo:d.prologo?1:0};  /* es bandera, no contador: 1 mientras llegas a Bilbao. */
+  const armas={};
+  Object.entries(objDe(d.armas)||{punos:-1}).forEach(([k,v])=>{
+   if(arma(k))armas[k]=v===-1?Infinity:num(v,0,0,9999);});
+  if(armas.punos===undefined)armas.punos=Infinity;
+  /* Una prenda que no existe deja el arquetipo sin torso y la forja se cae al vestir. La
+     lista buena es la de la tienda: lo que no se puede comprar no se pudo guardar. */
+  const pinta={},dp=objDe(d.pinta)||{};
+  for(const r of ['torso','piernas','calzado','gorro'])
+   if(PRENDAS.some(p=>p.r===r&&p.v===dp[r]))pinta[r]=dp[r];
+  /* Y una posición sin validar saca al jugador del mapa, donde no hay casilla que pisar:
+     se cae a la casilla andable más cercana, y si viene basura, al portal. */
+  const casa=poi('piso').p;
+  const px=num(d.x,casa.x,1,MW-2),py=num(d.y,casa.y,1,MH-2);
+  const p=andable(Tc(Math.floor(px),Math.floor(py)))?{x:px,y:py}
+   :cercaDe((x,y)=>andable(Tc(x,y)),px,py,60);
+  Object.assign(S,nuevo);S.armas=armas;
+  if(Object.keys(pinta).length)vestir(pinta);
   if(S.prologo)retomarPrologo();
-  player.x=d.x;player.y=d.y;
+  player.x=p.x;player.y=p.y;
   if(S.tiene.deportivo){tuCoche.tipo='deportivo';tuCoche.lib=2;tuCoche.vmax=vmaxDe('deportivo');}
   else if(S.tiene.furgo){tuCoche.tipo='furgoLarga';tuCoche.vmax=vmaxDe('furgoLarga');}
-  tuCoche.x=poi('piso').p.x+1.4;tuCoche.y=poi('piso').p.y;
+  tuCoche.x=casa.x+1.4;tuCoche.y=casa.y;
   return true;}catch(e){return false;}}
 
 /*═══════════════ ARRANQUE ═══════════════*/

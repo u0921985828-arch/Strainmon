@@ -41,9 +41,11 @@ public static class Interiores {
         // 62 m² útiles, que es lo que mide un piso de los sesenta en Santutxu. La habitación de
         // la derecha es la del primo. Los pisos que se compran reaprovechan este plano.
         {"piso", new DefInterior{ Nombre="Tu piso", Suelo="parquet", Pared="yeso", Mapa=new[]{
-            "#############","#CCU.#.#.UCC#","#CC..#.#..CC#","#CC..d.d..CC#","#r...#.#...r#",
+            // El escritorio en el cuarto de la izquierda y la bañera en el baño: dos piezas
+            // que estaban dibujadas y sin una sola planta donde ponerse.
+            "#############","#CCUe#.#.UCC#","#CC.e#.#..CC#","#CC..d.d..CC#","#r...#.#...r#",
             "#AAA.#.#.EEE#","######.######","#FFF.#.#KKKN#","#.aa.d.d....#","#g.U.#.#iMSS#",
-            "#....#.######","#MMS.#.d...H#","#MMS.#.#TV..#","######D######"},
+            "#....#.######","#MMS.#.d...H#","#MMS.#.#TVbb#","######D######"},
             Npcs=new NpcInterior[0]}},
         {"portal", new DefInterior{ Nombre="Portal · la casera", Suelo="hidraulico", Pared="yeso", Mapa=new[]{
             "#######","#WW..Y#","#....Y#","#....Y#","#.aa..#","#.aa..#","#J...J#","#.....#","###D###"},
@@ -59,7 +61,8 @@ public static class Interiores {
         {"taller", new DefInterior{ Nombre="Taller Iker", Suelo="chapa", Pared="chapa", Mapa=new[]{
             "###############","#EEEE....EEEE.#","#.............#","#.ZZ.....ZZ...#","#.ZZ.....ZZ...#",
             "#.ZZ.....ZZ...#","#.ZZ.....ZZ...#","#.ZZ.....ZZ...#","#ww.........nn#","#OOO......QQQ.#",
-            "#.............#","#####DDDD######"},
+            // Y los palés en el taller, que es donde están: contra la pared del portón.
+            "#pp...........#","#####DDDD######"},
             Npcs=new[]{ new NpcInterior{ X=11.5f, Y=10.5f, Nombre="Iker", Arq="iker", Tipo="mecanico" }}}},
         {"armeria", new DefInterior{ Nombre="Bazar Nervión", Suelo="chapa", Pared="ladrillo", Mapa=new[]{
             "##########","#XXXXXXX.#","#........#","#EEE..EEE#","#........#","#EEE..EEE#",

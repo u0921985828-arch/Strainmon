@@ -602,6 +602,17 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
         }
       }
       ok(!sinPieza, sinPieza + ' casillas con un código de mobiliario que nadie sabe dibujar');
+      // Y lo mismo dentro: un mueble dibujado que no está en ninguna de las trece plantas
+      // no lo ve nadie. La bañera, el escritorio y los palés estuvieron así.
+      {
+        const enPlano = new Set();
+        for (const id of Object.keys(A.INT))
+          for (const fila of A.INT[id].mapa) for (const ch of fila) enPlano.add(ch);
+        const huerfanos = Object.keys(A.MUEBLES).filter(k => !enPlano.has(k));
+        ok(!huerfanos.length, huerfanos.length + ' muebles no están en ninguna planta: ' +
+           huerfanos.map(k => k + ' (' + A.MUEBLES[k].n + ')').join(', '));
+        bien.push(Object.keys(A.MUEBLES).length + ' muebles de interior, todos en alguna planta');
+      }
       ok(!pasadas, pasadas + ' piezas no caben donde están: ' + peor);
       // 2 · y lo que se siembra fuera de la acera, igual: cada suelo tiene su tope.
       let fuera = '';
@@ -619,10 +630,30 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
             fuera = fuera || (k + ' de ' + alto(k) + ' m en un tejado');
         }
       ok(!fuera, 'se siembra donde no cabe: ' + fuera);
-      // La grúa y el andamio son de muelle y de obra: si alguno acabara en una acera, la
-      // regla de arriba lo cazaría, pero se dice aquí por si un día cambia el tope.
-      ok(alto('grua') > tope[A.ACERA] && alto('andamio') > tope[A.ACERA],
-         'la grúa o el andamio han dejado de ser demasiado altos para una acera');
+      // 2 bis · y no sobra ninguna. Una pieza con medida en MOB_M se forja al arrancar, así
+      // que cuesta arranque y memoria; si además no está en MOB_PIEZA ni en ninguna siembra,
+      // no se planta nunca y no la ve nadie. Es el fallo que dejó la grúa y el contenedor
+      // marítimo forjados durante meses sobre una ciudad que no tenía muelles, y las cinco
+      // piezas de obra sin una acera donde ponerse. O se planta, o no se forja.
+      const nunca = Object.keys(A.MOB_M).filter(k => !piezas.has(k));
+      ok(!nunca.length, nunca.length + ' piezas se forjan y no se plantan nunca: ' + nunca.join(', '));
+      bien.push(piezas.size + ' piezas de mobiliario, todas plantadas en algún sitio');
+      // Y los chasis, igual: siete libreas y un quemado por cada uno son ocho lienzos de
+      // arranque. La ambulancia estuvo forjada y sin salir en ninguna lista de tráfico.
+      {
+        const circulan = new Set([...A.TIPOS_CIVIL, ...A.TIPOS_PESADO,
+          ...Object.values(A.TRAFICO_BARRIO).flat(),
+          'utilitario', 'furgoLarga', 'deportivo', 'berlina',   // los del jugador
+          'patrulla']);                                          // se dibuja por patrullaRot
+        const quietos = Object.keys(A.CHASIS).filter(t => !circulan.has(t));
+        ok(!quietos.length, quietos.length + ' chasis se forjan y no circulan nunca: ' + quietos.join(', '));
+        ok(!A.VEH.patrulla, 'la patrulla vuelve a forjar libreas que no se dibujan');
+        bien.push(Object.keys(A.CHASIS).length + ' chasis, todos con dónde salir');
+      }
+      // La grúa es de muelle: si acabara en una acera, la regla de arriba lo cazaría, pero
+      // se dice aquí por si un día cambia el tope. (El andamio sí es de acera: es el de
+      // picar un bajo, de una planta, y por eso mide 3,80 y no seis.)
+      ok(alto('grua') > tope[A.ACERA], 'la grúa ha dejado de ser demasiado alta para una acera');
 
       // 3 · la silueta. Delante de un árbol de cuatro metros, el jugador no se pierde.
       const g = A.real.getContext('2d');
@@ -1288,7 +1319,104 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
     paso(9000);
     bien.push('150 s de bucle sin excepciones');
 
+    // ── 9bis · y aguanta en tiempo real ────────────────────────────────
+    // El reloj del arnés es virtual (`now+=16.7` por paso), así que «150 s sin excepciones»
+    // no dice nada del coste: un bucle O(n²) nuevo en el tráfico pasaba igual de verde.
+    // El tiempo hay que medirlo desde fuera. El canvas del arnés es de software y sin GPU,
+    // así que estos milisegundos son varias veces los del navegador: el número no es el
+    // presupuesto del juego, es el testigo de que no se ha multiplicado.
+    {
+      const donde = { 'Gran Vía': [729.5, 321.5], 'Casco Viejo': [793, 336],
+                      'Zorrotzaurre': [600, 300], 'monte': [900, 120] };
+      const TOPE = 24;  // medido: entre 5,9 y 7,9 ms según el sitio. Tres veces de margen.
+      const medido = [];
+      for (const [n, [x, y]] of Object.entries(donde)) {
+        P.x = x; P.y = y; S.min = 14 * 60;
+        paso(30);                                   // calentar la caché de tiles
+        const t0 = process.hrtime.bigint();
+        paso(150);
+        const ms = Number(process.hrtime.bigint() - t0) / 1e6 / 150;
+        medido.push([n, ms]);
+        ok(ms < TOPE, 'un fotograma en ' + n + ' cuesta ' + ms.toFixed(1) + ' ms, más del triple de lo medido');
+      }
+      medido.sort((a, b) => b[1] - a[1]);
+      bien.push('el fotograma cuesta ' + medido.map(m => m[0] + ' ' + m[1].toFixed(1)).join(' · ') + ' ms (tope ' + TOPE + ')');
+    }
+
+    // ── 10 · el guardado va y vuelve ───────────────────────────────────
+    // Antes esto era `hay alguna clave en el almacén`: pasaba en verde aunque lo guardado
+    // fuese basura, porque nadie llamaba a cargar(). Un campo nuevo en S que se olvidara
+    // en guardar() se perdía al recargar y la batería seguía contenta.
     ok(Object.keys(global.__store()).length > 0, 'la partida no se guarda');
+    {
+      const marca = { dinero: 4321, hp: 77, energia: .42, hambre: .31, min: 13 * 60 + 7,
+        dia: 9, xp: 1234, nivel: 5, deuda: 330, alquiler: 190, misionIdx: 3,
+        armaAct: 'pistola', prologo: 0 };
+      Object.assign(S, marca);
+      S.armas = { punos: Infinity, pistola: 24 };
+      S.tiene = { furgo: true, deportivo: false, silenciador: true };
+      S.props = { taller: 1 };
+      A.vestir({ torso: 'gabardina', piernas: 'cargo', calzado: 'deportivas', gorro: 'gorra' });
+      P.x = A.poi('piso').p.x; P.y = A.poi('piso').p.y;
+      const px = P.x, py = P.y, pinta = Object.assign({}, S.pinta);
+      A.guardar();
+      // Se ensucia todo antes de recargar: si cargar() no escribe un campo, se ve.
+      Object.assign(S, { dinero: 0, hp: 1, energia: 0, hambre: 0, min: 0, dia: 1,
+        xp: 0, nivel: 1, deuda: 0, alquiler: 0, misionIdx: 0, armaAct: 'punos' });
+      S.armas = { punos: Infinity }; S.tiene = { furgo: false, deportivo: false, silenciador: false };
+      S.props = {}; P.x = 1; P.y = 1;
+      const vuelve = await A.cargar();
+      ok(vuelve === true, 'cargar() no reconoce una partida recién guardada');
+      for (const k of Object.keys(marca))
+        ok(S[k] === marca[k], 'el guardado pierde S.' + k + ': ' + S[k] + ' en vez de ' + marca[k]);
+      ok(S.armas.pistola === 24, 'el guardado pierde la munición');
+      ok(S.armas.punos === Infinity, 'el guardado pierde los puños');
+      ok(S.tiene.furgo && S.tiene.silenciador, 'el guardado pierde lo que has comprado');
+      ok(S.props.taller === 1, 'el guardado pierde las propiedades');
+      for (const r of ['torso', 'piernas', 'calzado', 'gorro'])
+        ok(S.pinta[r] === pinta[r], 'el guardado pierde la ropa (' + r + ')');
+      ok(Math.abs(P.x - px) < 1.5 && Math.abs(P.y - py) < 1.5, 'el guardado pierde dónde estabas');
+      bien.push('la partida vuelve entera del guardado');
+    }
+
+    // ── 11 · un guardado corrupto no envenena la partida ────────────────
+    // El fallo real: cargar() hacía Object.assign nada más parsear y reventaba a medias.
+    // Devolvía false —«aquí no hay partida»—, el arranque dejaba empezar una nueva, y esa
+    // partida nueva salía con el dinero a NaN y el protagonista en la casilla 99999.
+    {
+      const sano = () => {
+        const mal = [];
+        for (const k of ['dinero', 'hp', 'energia', 'hambre', 'min', 'dia', 'xp', 'nivel'])
+          if (typeof S[k] !== 'number' || !isFinite(S[k])) mal.push('S.' + k + '=' + S[k]);
+        for (const k of ['x', 'y']) {
+          const v = P[k], tope = k === 'x' ? A.MW : A.MH;
+          if (typeof v !== 'number' || !isFinite(v) || v < 0 || v >= tope) mal.push('player.' + k + '=' + v);
+        }
+        if (!A.andable(A.Tc(Math.floor(P.x), Math.floor(P.y)))) mal.push('el jugador cae en suelo que no se pisa');
+        return mal;
+      };
+      const basura = {
+        'vacío': '{}',
+        'truncado': '{"dinero":500',
+        'a nulos': '{"dinero":null,"energia":null,"min":null,"dia":null,"hp":null,"x":null,"y":null}',
+        'sin campos': '{"dinero":300}',
+        'con tipos raros': '{"dinero":"x","min":"y","dia":[],"energia":{},"x":"a","y":"b","armas":7,"pinta":3}',
+        'en negativo': '{"dinero":-1e9,"min":-500,"dia":-3,"energia":-40,"x":-10,"y":-10}',
+        'fuera del mapa': '{"dinero":1,"min":10,"dia":1,"x":99999,"y":99999}',
+        'con ropa que no existe': '{"dinero":1,"pinta":{"torso":"armadura","calzado":"aletas"}}',
+        'con un arma que no existe': '{"dinero":1,"armaAct":"bazooka","armas":{"bazooka":9}}',
+      };
+      for (const [n, raw] of Object.entries(basura)) {
+        global.__store()[A.CLAVE] = raw;
+        let e2 = null;
+        try { await A.cargar(); } catch (e) { e2 = e.message; }
+        ok(!e2, 'un guardado ' + n + ' revienta cargar(): ' + e2);
+        const mal = sano();
+        ok(!mal.length, 'un guardado ' + n + ' deja la partida en mal estado: ' + mal.join(' '));
+      }
+      ok(A.arma(S.armaAct) !== undefined, 'un guardado con un arma inventada la deja en la mano');
+      bien.push('un guardado corrupto no envenena la partida (' + Object.keys(basura).length + ' casos)');
+    }
 
   } catch (e) {
     fallos.push('EXCEPCIÓN: ' + e.message + ' | ' + (e.stack.split('\n')[1] || '').trim());
