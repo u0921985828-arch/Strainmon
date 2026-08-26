@@ -15,7 +15,7 @@ public class Jugador : MonoBehaviour {
     public float Cadencia, Herido, GolpeT, Anim;
     public string Arquetipo = "protagonista";
 
-    SpriteRenderer _sr, _srArma, _srFog;
+    SpriteRenderer _sr, _srArma, _srFog, _srSilueta;
     float _fogT;
     string _fogTipo;
 
@@ -25,6 +25,10 @@ public class Jugador : MonoBehaviour {
         _sr.sortingOrder = 0;
         _srArma = Hijo("Arma", 1);
         _srFog  = Hijo("Fogonazo", 2);
+        // Ley 6 · visión: la silueta va apagada por defecto y solo se enciende cuando
+        // Vision.TapaAlJugador dice que algo de más de dos metros lo esconde.
+        _srSilueta = Hijo("Silueta", 3);
+        _srSilueta.enabled = false;
     }
 
     SpriteRenderer Hijo(string nombre, int orden) {
@@ -80,11 +84,24 @@ public class Jugador : MonoBehaviour {
         _sr.enabled = visible;
         _srArma.enabled = visible;
         _srFog.enabled = visible && _fogT > 0;
-        if (!visible) return;
+        if (!visible) { _srSilueta.enabled = false; return; }
 
         var pose = Herido > 0 ? Pose.Herido : PoseAct;
         _sr.sprite = ForjaChar.Frame(Arquetipo, pose, Dir8);
         _sr.sortingOrder = Mundo.OrdenY(Pos.y);
+
+        // Ley 6 · visión: en coche no hace falta —el coche ya es más visible que
+        // cualquier farola— y dentro de un sitio no hay mobiliario urbano que mirar.
+        // Si algo de la calle pasa de dos metros y le pisa la caja, se enciende la
+        // silueta por encima: el sortingOrder de cualquier pieza a menos de cinco
+        // casillas al sur no llega a Pos.y+5, así que con ese margen siempre queda
+        // encima de lo que la tapa.
+        bool tapado = !Estado.I.EnInterior && Vision.TapaAlJugador(Pos);
+        _srSilueta.enabled = tapado;
+        if (tapado) {
+            _srSilueta.sprite = ForjaChar.FrameSilueta(Arquetipo, pose, Dir8);
+            _srSilueta.sortingOrder = Mundo.OrdenY(Pos.y + 5f);
+        }
 
         string arma = Estado.I.ArmaAct;
         if (Forja.ArmaMano.ContainsKey(arma)) {

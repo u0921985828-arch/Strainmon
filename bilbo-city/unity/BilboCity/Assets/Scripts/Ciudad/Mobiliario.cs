@@ -13,7 +13,9 @@ public static class Mobiliario {
     /// <summary>Cuántas piezas se han plantado. Útil para el presupuesto de dibujado.</summary>
     public static int Sembradas { get; private set; }
 
-    struct Pieza { public string Clave; public float Dx, Dy; }
+    /// <summary>Internal, no privado: Vision.TapaAlJugador reaprovecha esta misma tabla de
+    /// siembra para saber qué le taparía al jugador, en vez de duplicarla.</summary>
+    internal struct Pieza { public string Clave; public float Dx, Dy; }
 
     static bool JuntoA(int x, int y, Suelo t) {
         return Ciudad.T(x+1,y) == t || Ciudad.T(x-1,y) == t || Ciudad.T(x,y+1) == t || Ciudad.T(x,y-1) == t;
@@ -63,7 +65,7 @@ public static class Mobiliario {
         {"abierto",   new[]{"fachPortal","fachCiega","fachGaraje","fachCiega"}},
     };
 
-    static bool Elegir(int x, int y, out Pieza p) {
+    internal static bool Elegir(int x, int y, out Pieza p) {
         p = new Pieza();
         var t = Ciudad.T(x,y);
         var Z = Ciudad.BarrioDe(x,y);
@@ -167,6 +169,15 @@ public static class Mobiliario {
                 if (vetado.Contains(y * Ciudad.MW + x)) continue;
                 Pieza p;
                 if (!Elegir(x, y, out p)) continue;
+                // Ley 6 · tope de sitio: una acera de dos metros y medio no admite una
+                // grúa de doce, y algo que pase la altura que cabe en su suelo deja de
+                // ser mobiliario y pasa a ser un muro. No es un límite de estilo, es el
+                // mismo que exige la batería del HTML (TOPE_ALTO/Vision.TopeAlto): si el
+                // día de mañana una pieza nueva de Forja.MedidasMob se cuela por encima,
+                // se frena aquí, no se descubre mirando la calle.
+                float[] medida;
+                if (Forja.MedidasMob.TryGetValue(p.Clave, out medida)
+                    && medida[1] > Vision.TopeAlto(Ciudad.T(x, y)) + 1e-4f) continue;
                 Sprite sp;
                 if (!Forja.Props.TryGetValue(p.Clave, out sp)) continue;
                 var go = new GameObject(p.Clave);

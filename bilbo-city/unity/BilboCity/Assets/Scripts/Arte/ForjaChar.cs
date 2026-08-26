@@ -483,6 +483,10 @@ public static class ForjaChar {
         a.Gorro = gorro; a.GorroCol = Paleta.Carbon;
         Arq["protagonista"] = a;
         Hojas.Remove("protagonista");
+        // La silueta sale de la misma silueta de prenda —un abrigo largo no ocupa lo
+        // mismo que una camiseta— así que también hay que tirarla, o se queda con la
+        // forma de la ropa de antes.
+        HojasSilueta.Remove("protagonista");
     }
 
     /// <summary>Hoja de un arquetipo: 8 columnas × una fila por pose. Se compila la primera vez que hace falta.</summary>
@@ -512,6 +516,47 @@ public static class ForjaChar {
 
     public static Sprite Frame(string arq, Pose pose, int d8) {
         return Hoja(arq)[(int)pose * NDIRS + d8];
+    }
+
+    static readonly Dictionary<string, Sprite[]> HojasSilueta = new Dictionary<string, Sprite[]>();
+
+    /// <summary>Ley 6 · visión: la silueta de un arquetipo, la hoja aplanada a un solo
+    /// tono. Es la misma figura, gorro y bulto incluidos, pero con cada píxel dibujado
+    /// vuelto Paleta.Mostaza — como el prototipo, que la pinta con "source-in" y un
+    /// relleno liso sobre la hoja ya recortada. Se forja una vez por arquetipo, con su
+    /// propia caché aparte de Hojas: recompilar ocho direcciones por dieciséis posturas
+    /// cada vez que el jugador pasa detrás de un árbol no es gratis.</summary>
+    public static Sprite[] HojaSilueta(string arq) {
+        Sprite[] s;
+        if (HojasSilueta.TryGetValue(arq, out s)) return s;
+        int aw = CW * NDIRS, ah = CH * NPOSES;
+        var px = new Color32[aw * ah];
+        var cfg = Arq[arq];
+        for (int p = 0; p < NPOSES; p++)
+            for (int d = 0; d < NDIRS; d++) {
+                var L = Dibujar(cfg, (Pose)p, d);
+                // Aplanar: donde hay figura (alfa>0) el color pasa a ser uno solo. La
+                // forma es lo que importa, no el color, así que el contorno negro se
+                // funde en la misma silueta en vez de quedar como un borde aparte.
+                for (int i = 0; i < L.Px.Length; i++)
+                    if (L.Px[i].a > 0) L.Px[i] = Paleta.Mostaza;
+                L.VolcarEn(px, aw, ah, d * CW, p * CH);
+            }
+        Paleta.Cuantizar(px);
+        var tex = Utiles.Textura(aw, ah, px);
+        s = new Sprite[NPOSES * NDIRS];
+        for (int p = 0; p < NPOSES; p++)
+            for (int d = 0; d < NDIRS; d++) {
+                int rx = d * CW;
+                int ry = ah - (p + 1) * CH;
+                s[p * NDIRS + d] = Utiles.Rebanada(tex, rx, ry, CW, CH, 10f + MG_X, 6f + MG_ABA);
+            }
+        HojasSilueta[arq] = s;
+        return s;
+    }
+
+    public static Sprite FrameSilueta(string arq, Pose pose, int d8) {
+        return HojaSilueta(arq)[(int)pose * NDIRS + d8];
     }
 
     /// <summary>Dirección de 8 sectores. En pantalla la Y crece hacia abajo, como en el prototipo.</summary>

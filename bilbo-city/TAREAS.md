@@ -100,7 +100,10 @@ pantalla. Funciona y las proporciones ya son las buenas, pero el detalle todaví
       junta de adoquín de 1 px, bordillo con canto, marca vial con desgaste, teja por
       pieza. Eso es dibujo nuevo, no escalado.
 - [ ] **Unity va todavía a 32.** `Mundo`/`Lienzo` y los tiles del puerto siguen en la
-      medida vieja: mientras no se suban, las dos implementaciones no se ven igual.
+      medida vieja: mientras no se suban, las dos implementaciones no se ven igual. Al
+      subirlo hay que repasar `Ciudad/Vision.cs`: sus cajas mezclan casillas (`Forja.TS`)
+      con píxeles de sprite (20 px/m), y con la casilla a 32 el jugador queda tapado desde
+      el doble de lejos que en el HTML.
 - [ ] Medir la memoria en un móvil de verdad. Doblar la casilla cuadruplica los píxeles del
       atlas de suelo; las hojas de personaje no cambian, que el personaje no se tocó.
 
