@@ -313,6 +313,23 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       bien.push(enPlaza + ' de ' + total + ' coches aparcados en plaza marcada y en el sentido de la calle');
     }
 
+    // ── 1 ter bis bis · hay quien no va a ningún sitio ─────────────────
+    /* Todos los peatones andaban todo el rato, así que una marquesina era un tejadillo con
+       nadie debajo y un banco, un mueble. Uno de cada cuatro sale esperando: sentado o en la
+       parada. Lo que se comprueba es que estén y que estén donde se espera, no cuántos. */
+    {
+      S.escena = 'ciudad'; A.cerrarDlg(); P.enCoche = null;
+      P.x = 729.5; P.y = 321.5; paso(60);
+      const esp = A.peatones.filter(q => q.espera > 0);
+      ok(esp.length > 0, 'nadie espera en un banco ni en una parada');
+      const fuera = esp.filter(q => {
+        const mb = A.MOB[(q.y | 0) * A.MW + (q.x | 0)];
+        return mb !== 4 && mb !== 9;          // banco y marquesina
+      }).length;
+      ok(!fuera, fuera + ' peatones esperando de pie en mitad de la acera');
+      bien.push(esp.length + ' de ' + A.peatones.length + ' peatones parados en un banco o en la parada');
+    }
+
     // ── 1 ter ter · las gaviotas ───────────────────────────────────────
     /* Bilbao es puerto a catorce kilómetros del mar: hay gaviotas hasta en el Casco. Van
        por la capa de vuelo y planean en círculo, así que lo que se comprueba es que estén,

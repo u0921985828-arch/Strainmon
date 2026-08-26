@@ -3254,7 +3254,7 @@ const MOB_M={deposito:[2.0,2.2],climatizador:[1.2,1.0],antenaTv:[1.2,2.4],tended
   contVidrio:[1.5,1.6],contPapel:[1.4,1.5],bocaMetro:[3.0,2.4],farolaCasco:[1.2,3.6],
   quiosco:[2.4,2.8],fuente:[2.6,1.4],estatua:[1.4,3.2],reloj:[0.7,3.6],noray:[0.5,0.6],
   pilaCont:[12.0,5.2],trastos:[1.6,1.0],columpio:[2.4,2.2],tobogan:[2.6,2.0],
-  arenero:[3.0,0.4],porteria:[3.2,2.0],fuenteBeber:[0.4,1.0],hormigonera:[2.0,2.4],
+  arenero:[3.0,1.2],porteria:[3.2,2.0],fuenteBeber:[0.4,1.0],hormigonera:[2.0,2.4],
   escombros:[2.0,0.8],contObra:[6.0,2.6],
   /* El monte de Bilbao es pino de repoblación y eucalipto, no el plátano de sombra de la
      Gran Vía: siete metros de fuste y copa estrecha. */
@@ -3587,7 +3587,11 @@ function generarProps(){
   P(g,15,15,5,2,C.mostaza);});
  M_('tobogan',(g)=>{P(g,0,2,10,4,C.rojoO);P(g,1,6,2,14,C.acero);P(g,7,6,2,14,C.acero);
   for(let i=0;i<8;i++)P(g,10+i*2,4+i*2,4,3,C.mostaza);P(g,24,17,2,3,C.aceroO);});
- M_('arenero',(g)=>{P(g,0,0,30,4,'#8a7f66');P(g,0,0,30,1,'#9c9078');});
+ /* El arenero, visto desde arriba en escorzo: la arena y el canto de madera que la
+    contiene. Con 40 cm de alto era una tabla en el suelo y no se leía como nada. */
+ M_('arenero',(g)=>{P(g,0,2,30,10,'#8a7f66');P(g,1,3,28,7,'#9c9078');
+  P(g,0,0,30,3,C.maderaO);P(g,0,11,30,1,C.maderaO);
+  P(g,6,5,4,2,'#8a7f66');P(g,20,7,5,2,'#8a7f66');});
  /* Una portería vista desde arriba es el larguero, los dos postes y la red: la red va
     rala y gris, que tupida se lee como una reja. */
  M_('porteria',(g)=>{P(g,0,0,32,3,C.hueso);P(g,0,0,3,20,C.hueso);P(g,29,0,3,20,C.hueso);
@@ -4548,9 +4552,18 @@ function nuevoTrafico(cx,cy){
 function arqPeaton(x,y){
  const l=PEATON_BARRIO[distDe(clamp(x|0,0,MW-1),clamp(y|0,0,MH-1)).estilo];
  return (l||PEATON_ARQ)[rndi(0,(l||PEATON_ARQ).length-1)];}
-function nuevoPeaton(cx,cy){const p=puntoAcera(cx,cy,22);
+function nuevoPeaton(cx,cy){
+ /* Uno de cada cuatro no va a ningún sitio: espera el bus en la marquesina o está sentado
+    en un banco. Sin esto, todo el mundo anda todo el rato y una parada de bus es un tejadillo
+    con nadie debajo. */
+ let p=null,espera=0;
+ if(azar()<.25)for(let i=0;i<90&&!p;i++){
+  const x=clamp(cx+rndi(-20,20),2,MW-3),y=clamp(cy+rndi(-16,16),2,MH-3);
+  const mb=MOB[y*MW+x];
+  if(mb===M_MARQUESINA||mb===M_BANCO){p={x:x+.5,y:y+.5};espera=rnd(8,30);}}
+ if(!p)p=puntoAcera(cx,cy,22);
  return{x:p.x,y:p.y,dx:0,dy:0,t:0,arq:arqPeaton(p.x,p.y),
-  d8:0,pose:'quieto',anim:0,huye:0,hp:30};}
+  d8:espera?4:0,pose:'quieto',anim:0,huye:0,espera,hp:30};}
 function particula(x,y,tipo,n=1){
  for(let i=0;i<n;i++){const a=rnd(0,6.283),v=tipo==='sangre'?rnd(1,4):tipo==='chispa'?rnd(2,7):rnd(.4,2.4);
   parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,vida:tipo==='humo'?rnd(.6,1.6):rnd(.25,.7),
@@ -7332,13 +7345,15 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
    const ang=Math.atan2(p.y-player.y,p.x-player.x);
    mover(p,p.x+Math.cos(ang)*V_HUIDA*dt,p.y+Math.sin(ang)*V_HUIDA*dt,false);
    p.d8=dir8De(Math.cos(ang),Math.sin(ang));poseAndar(p,V_HUIDA,true,dt);
+  }else if(p.espera>0){p.espera-=dt;p.pose='quieto';
   }else{
    p.t-=dt;if(p.t<=0){const a=rnd(0,6.283);p.dx=Math.cos(a);p.dy=Math.sin(a);p.t=rnd(1,4);}
    const nx=p.x+p.dx*.95*dt,ny=p.y+p.dy*.95*dt,t=Tc(Math.floor(nx),Math.floor(ny));
    if(t===ACERA||t===PLAZA||t===MUELLE||t===PARQUE||t===PATIO||t===MONTE){p.x=nx;p.y=ny;
     p.d8=dir8De(p.dx,p.dy);poseAndar(p,V_PEATON,false,dt);}
    else{p.t=0;p.pose='quieto';}}
-  if(dist(p,player)>36){const q=nuevoPeaton(player.x|0,player.y|0);p.x=q.x;p.y=q.y;p.huye=0;}}
+  if(dist(p,player)>36){const q=nuevoPeaton(player.x|0,player.y|0);
+   p.x=q.x;p.y=q.y;p.arq=q.arq;p.espera=q.espera;p.huye=0;}}
  comprobarObjetivos(dt);
  const pc=poiCerca(),cc=cocheCerca();
  pista1=player.enCoche?'ACCIÓN: BAJAR'

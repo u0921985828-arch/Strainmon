@@ -223,6 +223,10 @@ pintado, así que los remates van sueltos y sembrados por hash como las farolas�
 variante cambia **por parches de 6 casillas**, que con un solo tile una manzana así es una
 plancha lisa.
 
+**Y no todo el mundo va a algún sitio.** Uno de cada cuatro peatones sale esperando —sentado
+en un banco o en la parada del bus— y se queda quieto entre ocho y treinta segundos. Sin eso,
+una marquesina es un tejadillo con nadie debajo y un banco es un mueble.
+
 **El tráfico y los peatones también.** `TRAFICO_BARRIO` y `PEATON_BARRIO` reparten trece
 chasis y veintiún arquetipos según el estilo: taxis y gabardinas por la Gran Vía, monos de
 faena y camiones en Zorrotzaurre, motos por el Casco.
@@ -755,6 +759,7 @@ que sobreviven.
 ```bash
 node herramientas/html/estilo.js      # ¿el arte cumple la guía?
 node herramientas/html/iconos.js      # todos los iconos en una hoja, a dos tamaños
+node herramientas/html/atrezzo.js     # las 58 piezas de calle juntas y a la misma escala
 node herramientas/html/personajes.js  # las hojas de personaje, para juzgarlas
 node herramientas/html/personajes.js --esc 8 --que protagonista,ertzaina
 node herramientas/html/captura.js    # el juego en marcha, para ver el arte en la calle
