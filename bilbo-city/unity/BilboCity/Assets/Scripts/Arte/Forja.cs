@@ -21,6 +21,30 @@ public static class Forja {
     static Lienzo T32() { return new Lienzo(TS, TS); }
     static void Reg(string nombre, Lienzo l) { _pendNom.Add(nombre); _pend.Add(l); }
 
+    /// <summary>El asta y la punta de la flecha de carril, forjadas apuntando al norte y
+    /// giradas según el lado —0 arriba, 1 abajo, 2 izquierda, 3 derecha, el mismo orden
+    /// que Mobiliario.DxLado/DyLado—, que a mano las cuatro direcciones se descuadran
+    /// entre sí.</summary>
+    static void FlechaL(Lienzo g, int n, int lado) {
+        float c = n / 2f;
+        int largo = Mathf.RoundToInt(2.5f / (5.16f/n));
+        int ancho = Mathf.Max(2, Mathf.RoundToInt(4f * n / 64f));
+        int puntaAlto = Mathf.Max(3, Mathf.RoundToInt(8f * n / 64f));
+        int puntaAncho = Mathf.Max(4, Mathf.RoundToInt(18f * n / 64f));
+        float ang = new[]{0f, Mathf.PI, -Mathf.PI/2f, Mathf.PI/2f}[lado];
+        var asta = new[] {
+            new Vector2(-ancho/2f, -largo/2f), new Vector2(ancho/2f, -largo/2f),
+            new Vector2(ancho/2f, largo/2f), new Vector2(-ancho/2f, largo/2f),
+        };
+        g.Poligono(Lienzo.Girar(asta, ang, c, c), Paleta.Crema);
+        var punta = new[] {
+            new Vector2(0f, -largo/2f),
+            new Vector2(puntaAncho/2f, -largo/2f + puntaAlto),
+            new Vector2(-puntaAncho/2f, -largo/2f + puntaAlto),
+        };
+        g.Poligono(Lienzo.Girar(punta, ang, c, c), Paleta.Crema);
+    }
+
     public static void GenerarTiles() {
         if (_atlasTiles != null) return;
         var g = T32(); g.Rellenar(Paleta.Asfalto); g.Ruido(new[]{Paleta.AsfaltoO,Paleta.AsfaltoL}, 22); Reg("road", g);
@@ -64,6 +88,16 @@ public static class Forja {
             else if (lado == 2) { g.P(f,0,w,32,Paleta.Crema); g.P(0,0,f,w,Paleta.Crema); g.P(0,32-w,f,w,Paleta.Crema); }
             else { g.P(32-f-w,0,w,32,Paleta.Crema); g.P(32-f,0,f,w,Paleta.Crema); g.P(32-f,32-w,f,w,Paleta.Crema); }
             Reg("aparca"+lado, g);
+        }
+
+        // Flecha de carril: 2,5 m de largo, la que se pinta antes de un cruce para decir
+        // por dónde se sigue. Va en el sentido de la marcha, así que hay una por cada
+        // lado —se forja apuntando al norte y se gira, que a mano las cuatro se
+        // descuadran entre sí—.
+        for (int lado = 0; lado < 4; lado++) {
+            g = T32(); g.Rellenar(Paleta.Asfalto); g.Ruido(new[]{Paleta.AsfaltoO,Paleta.AsfaltoL}, 22);
+            FlechaL(g, TS, lado);
+            Reg("flecha"+lado, g);
         }
 
         g = T32(); g.Rellenar(Paleta.Asfalto); g.Ruido(new[]{Paleta.AsfaltoO}, 18);
@@ -447,7 +481,7 @@ public static class Forja {
         {"reloj", new[]{0.7f,3.6f}},     {"noray", new[]{0.5f,0.6f}},
         {"pilaCont", new[]{12.0f,5.2f}}, {"trastos", new[]{1.6f,1.0f}},
         {"columpio", new[]{2.4f,2.2f}},  {"tobogan", new[]{2.6f,2.0f}},
-        {"arenero", new[]{3.0f,0.4f}},   {"porteria", new[]{3.2f,2.0f}},
+        {"arenero", new[]{3.0f,1.2f}},   {"porteria", new[]{3.2f,2.0f}},
         {"fuenteBeber", new[]{0.4f,1.0f}}, {"hormigonera", new[]{2.0f,2.4f}},
         {"escombros", new[]{2.0f,0.8f}}, {"contObra", new[]{6.0f,2.6f}},
         // El monte de Bilbao es pino de repoblación y eucalipto, no el plátano de sombra
@@ -723,7 +757,11 @@ public static class Forja {
         for (int i = 0; i < 8; i++) L.P(10+i*2,4+i*2,4,3,Paleta.Mostaza);
         L.P(24,17,2,3,Paleta.AceroO);
         Props["tobogan"] = SpriteMob("tobogan", L);
-        L = Mob("arenero"); L.P(0,0,30,4,Paleta.H("#8a7f66")); L.P(0,0,30,1,Paleta.H("#9c9078"));
+        // El arenero, visto desde arriba en escorzo: la arena y el canto de madera que la
+        // contiene. Con 40 cm de alto era una tabla en el suelo y no se leía como nada.
+        L = Mob("arenero"); L.P(0,2,30,10,Paleta.H("#8a7f66")); L.P(1,3,28,7,Paleta.H("#9c9078"));
+        L.P(0,0,30,3,Paleta.MaderaO); L.P(0,11,30,1,Paleta.MaderaO);
+        L.P(6,5,4,2,Paleta.H("#8a7f66")); L.P(20,7,5,2,Paleta.H("#8a7f66"));
         Props["arenero"] = SpriteMob("arenero", L);
         // Una portería vista desde arriba es el larguero, los dos postes y la red: la red
         // va rala y gris, que tupida se lee como una reja.
@@ -745,7 +783,37 @@ public static class Forja {
         L = Mob("matorral"); L.P(0,3,16,7,Paleta.H("#2e5b2c")); L.P(2,1,12,4,Paleta.H("#356b33"));
         L.P(5,0,6,3,Paleta.H("#4a8746")); L.P(1,8,14,2,Paleta.H("#24471f"));
         Props["matorral"] = SpriteMob("matorral", L);
+
+        // ── Vuelo ──
+        // La gaviota, vista desde abajo del todo: dos alas y poco más. Bilbao es puerto a
+        // catorce kilómetros del mar y hay gaviotas hasta en el Casco. No lleva medida en
+        // MedidasMob porque no se planta en el suelo: no tiene huella.
+        L = new Lienzo(22,8);
+        L.P(9,2,4,5,Paleta.Blanco); L.P(10,7,2,1,Paleta.MostazaO);
+        L.P(2,3,8,2,Paleta.Blanco); L.P(12,3,8,2,Paleta.Blanco);
+        L.P(0,2,3,2,Paleta.Carbon); L.P(19,2,3,2,Paleta.Carbon);
+        L.P(2,2,8,1,Paleta.Hueso); L.P(12,2,8,1,Paleta.Hueso);
+        var ave0 = SpriteDe(L);
+        L = new Lienzo(22,12);
+        L.P(9,6,4,5,Paleta.Blanco); L.P(10,11,2,1,Paleta.MostazaO);
+        L.P(4,0,6,7,Paleta.Blanco); L.P(12,0,6,7,Paleta.Blanco);
+        L.P(3,0,3,3,Paleta.Carbon); L.P(16,0,3,3,Paleta.Carbon);
+        var ave1 = SpriteDe(L);
+        SpritesGaviota = new[]{ ave0, ave1 };
+
+        // Su sombra en el suelo: una elipse translúcida, la misma para las diez. Se forja
+        // opaca —la cuantización se come todo lo que baja de media alfa— y la
+        // transparencia se aplica en el SpriteRenderer al pintarla, no aquí.
+        L = new Lienzo(10,5);
+        for (int y = 0; y < 5; y++)
+            for (int x = 0; x < 10; x++) {
+                float dx = (x-4.5f)/5f, dy = (y-2f)/2.5f;
+                if (dx*dx + dy*dy <= 1f) L.P(x,y,1,1,Paleta.Negro);
+            }
+        SombraGaviota = SpriteDe(L);
     }
+    public static Sprite[] SpritesGaviota;
+    public static Sprite SombraGaviota;
 
     // ═══════════ ARMAS EN MANO Y FOGONAZOS ═══════════
     public static readonly Dictionary<string, Sprite[]> ArmaMano = new Dictionary<string, Sprite[]>();

@@ -18,6 +18,7 @@ public class Juego : MonoBehaviour {
     public readonly List<Rejilla> Patrullas = new List<Rejilla>();
     public readonly List<Enemigo> Enemigos = new List<Enemigo>();
     public readonly List<Peaton> Peatones = new List<Peaton>();
+    public readonly List<Gaviota> Gaviotas = new List<Gaviota>();
 
     Camera _cam;
     Transform _mundo, _entidades;
@@ -172,11 +173,14 @@ public class Juego : MonoBehaviour {
 
     void Poblar() {
         NuevoCoche(Estado.Sitio_("piso").Pos + new Vector2(1.4f,0), "utilitario", 0, true, 11f);
-        for (int i = 0; i < 40; i++)
-            {
-                var p = Ciudad.PuntoCalle();
-                NuevoCoche(p, TipoParaBarrio(p), (i+1) % Forja.Libreas.Length, false, 11f);
-            }
+        // Cuarenta coches aparcados repartidos por el término municipal entero son cuarenta
+        // coches que no se ven nunca: se sueltan alrededor del jugador y se arriman a su
+        // plaza —mirando a la calle, no cruzados en mitad del carril—.
+        for (int i = 0; i < 40; i++) {
+            var p = Ciudad.PuntoCalle(Mathf.RoundToInt(Jug.Pos.x), Mathf.RoundToInt(Jug.Pos.y), 48);
+            var v = NuevoCoche(p, TipoParaBarrio(p), (i+1) % Forja.Libreas.Length, false, 11f);
+            AparcarCoche(v, Jug.Pos, 48);
+        }
         for (int i = 0; i < 16; i++) NuevoTrafico();
         for (int i = 0; i < 26; i++) {
             var go = new GameObject("peaton");
@@ -185,6 +189,52 @@ public class Juego : MonoBehaviour {
             p.Preparar();
             p.Recolocar(Jug.Pos);
             Peatones.Add(p);
+        }
+        // Diez gaviotas planeando en círculo, recicladas alrededor del jugador como el
+        // tráfico y los coches.
+        for (int i = 0; i < 10; i++) {
+            var go = new GameObject("gaviota");
+            go.transform.SetParent(_entidades, false);
+            var v = go.AddComponent<Gaviota>();
+            v.Preparar();
+            v.Reciclar(Mathf.RoundToInt(Jug.Pos.x), Mathf.RoundToInt(Jug.Pos.y));
+            Gaviotas.Add(v);
+        }
+    }
+
+    /// <summary>Arrima un coche a su plaza de aparcamiento —del lado que marca el
+    /// bordillo, orientado a lo largo de la calle— y si no hay ninguna cerca, vuelve a
+    /// soltarlo en mitad de la calzada como antes.</summary>
+    bool AparcarCoche(Vehiculo v, Vector2 centro, int rad) {
+        var q = Mobiliario.PuntoAparcamiento(Mathf.RoundToInt(centro.x), Mathf.RoundToInt(centro.y), rad);
+        if (q.HasValue) { v.Pos = q.Value.Pos; v.Ang = q.Value.Ang; return true; }
+        var p = Ciudad.PuntoCalle(Mathf.RoundToInt(centro.x), Mathf.RoundToInt(centro.y), rad);
+        v.Pos = p; v.Ang = Vehiculo.AngCalle(p);
+        return false;
+    }
+
+    /// <summary>Recoloca de dos en dos por vuelta los coches aparcados que se han quedado
+    /// atrás: buscar plaza para los cuarenta el mismo fotograma se nota en el pulso del
+    /// juego. Los ajenos al jugador —ni el suyo ni el que conduce— que se alejan más de 72
+    /// casillas vuelven a aparecer arrimados a una plaza cerca de él.</summary>
+    int _reciclaCoche;
+    void ReciclarCoches() {
+        if (Coches.Count == 0) return;
+        int hechos = 0;
+        for (int n = 0; n < Coches.Count && hechos < 2; n++) {
+            _reciclaCoche = (_reciclaCoche + 1) % Coches.Count;
+            var c = Coches[_reciclaCoche];
+            if (c.Propio || c == Jug.EnCoche || Vector2.Distance(c.Pos, Jug.Pos) <= 72f) continue;
+            int px = Mathf.RoundToInt(Jug.Pos.x), py = Mathf.RoundToInt(Jug.Pos.y);
+            var q = Mobiliario.PuntoAparcamiento(px, py, 54);
+            Vector2 destino; float ang;
+            if (q.HasValue) { destino = q.Value.Pos; ang = q.Value.Ang; }
+            else { destino = Ciudad.PuntoCalle(px, py, 54); ang = Vehiculo.AngCalle(destino); }
+            if (Vector2.Distance(destino, Jug.Pos) < 26f) continue;   // que no aparezca en las narices
+            c.Pos = destino; c.Ang = ang; c.Vel = Vector2.zero; c.Dano = 0; c.Vivo = true;
+            c.Tipo = TipoParaBarrio(destino); c.Librea = (c.Librea + 1) % Forja.Libreas.Length;
+            c.Refrescar();
+            hechos++;
         }
     }
 
@@ -388,6 +438,8 @@ public class Juego : MonoBehaviour {
             e.Tic(dt, Jug.Pos);
         }
         foreach (var p in Peatones) p.Tic(dt, Jug.Pos);
+        foreach (var v in Gaviotas) v.Tic(dt, Jug.Pos);
+        ReciclarCoches();
 
         Combate.I.TicBalas(dt, this);
         Combate.I.TicBusqueda(dt, this);

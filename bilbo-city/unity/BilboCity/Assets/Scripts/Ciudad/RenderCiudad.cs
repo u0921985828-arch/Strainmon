@@ -56,6 +56,7 @@ public class RenderCiudad : MonoBehaviour {
         var camino = TileDe(T["camino"]);
         var stop = new Tile[4]; for (int i = 0; i < 4; i++) stop[i] = TileDe(T["stop"+i]);
         var aparca = new Tile[4]; for (int i = 0; i < 4; i++) aparca[i] = TileDe(T["aparca"+i]);
+        var flecha = new Tile[4]; for (int i = 0; i < 4; i++) flecha[i] = TileDe(T["flecha"+i]);
         var tejados = new Tile[Forja.Tejados.Length];
         for (int i = 0; i < tejados.Length; i++) tejados[i] = TileDe(Forja.Tejados[i]);
 
@@ -85,6 +86,10 @@ public class RenderCiudad : MonoBehaviour {
                         char cb = Mobiliario.Cebra(x,y);
                         if (cb == 'V') { elegido = cebraV; break; }
                         if (cb == 'H') { elegido = cebraH; break; }
+                        // La flecha de carril: antes del cruce y en el sentido de la
+                        // marcha, solo en el cruce que tiene paso al lado.
+                        int ladoFlecha = Mobiliario.Flecha(x,y);
+                        if (ladoFlecha >= 0) { elegido = flecha[ladoFlecha]; break; }
                         // La marca vial: línea de detención delante del paso, y si no,
                         // plaza de aparcamiento en el tramo recto pegado al bordillo.
                         int ladoStop = Mobiliario.Stop(x,y);

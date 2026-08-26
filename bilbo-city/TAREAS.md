@@ -114,6 +114,12 @@ pantalla. Funciona y las proporciones ya son las buenas, pero el detalle todaví
       así que en Unity las manzanas siguen siendo paredes ciegas mientras en el HTML tienen
       escaparates. Portar el bucle del HTML, que ahora rellena la casilla por anchos
       (`ANCHO_FACH`): un local entero de 32 px o dos de medio.
+      De esto cuelgan otras tres del HTML que en Unity no tienen dónde engancharse, porque
+      el puerto pinta el edificio como una sola casilla de tejado y nada más: las **plantas**
+      con sus bandas por tipo (liso, balcón, mirador, persiana), las **ventanas encendidas de
+      noche** y el **rótulo del local** en la fachada. Y al portarlas hay que resolver el
+      desfase de medida: el HTML corrigió el frente a `FACH_H=22` y los sprites de bajo que
+      Unity tiene sin usar siguen dibujados para el 13 de antes.
 - [x] **El puerto no existe en el mapa.** Del plano salían siete tipos de suelo y `MUELLE`,
       `PATIO`, `PLAZA` y `VIA` estaban declarados sin **ni una casilla** en el mapa: la grúa y
       el contenedor marítimo se forjaban y no se plantaban nunca. Ahora se clasifican en el

@@ -56,8 +56,9 @@ public static class Mobiliario {
     }
 
     /// Lado hacia el que mira la marca: 0 norte, 1 sur, 2 oeste, 3 este. El mismo orden que
-    /// usa Cebra() para decidir qué vecino es el paso.
-    static readonly int[] DxLado = {0,0,-1,1}, DyLado = {-1,1,0,0};
+    /// usa Cebra() para decidir qué vecino es el paso. Internal, no privado: Ciudad y Juego
+    /// reaprovechan el mismo orden para orientar los coches aparcados.
+    internal static readonly int[] DxLado = {0,0,-1,1}, DyLado = {-1,1,0,0};
 
     /// <summary>Línea de detención: delante de cada paso de cebra, y solo por donde se llega
     /// a él —la cebra vertical cruza una calle norte-sur, así que se para por arriba y por
@@ -91,6 +92,60 @@ public static class Mobiliario {
             return lado;
         }
         return -1;
+    }
+
+    /// <summary>Flecha de carril: antes del cruce y en el sentido de la marcha, pero solo
+    /// en el cruce que tiene paso al lado —pintada en cada bocacalle salían 36 000, una de
+    /// cada cinco casillas de calzada, y eso no es una ciudad, es un parking; con la
+    /// condición del paso quedan 1 700—. Un cruce es una casilla de calzada con salida por
+    /// tres lados o más, y la flecha va en la casilla de antes, que es donde se pinta de
+    /// verdad. -1 si esta calzada no lleva.</summary>
+    public static int Flecha(int x, int y) {
+        if (Ciudad.T(x,y) != Suelo.Road) return -1;
+        if (Cebra(x,y) != '\0' || Stop(x,y) >= 0) return -1;
+        // La flecha ocupa justo las casillas que Aparca() descarta por vado —de cada tres,
+        // una no lleva plaza—, así que las dos marcas nunca se pisan.
+        if (Utiles.Hash(x,y) % 3 != 0) return -1;
+        for (int lado = 0; lado < 4; lado++) {
+            int dx = DxLado[lado], dy = DyLado[lado];
+            int cx = x+dx, cy = y+dy;
+            if (!Cruce(cx,cy)) continue;
+            if (Cebra(cx-1,cy) == '\0' && Cebra(cx+1,cy) == '\0'
+                && Cebra(cx,cy-1) == '\0' && Cebra(cx,cy+1) == '\0') continue;
+            // Y solo si por detrás sigue habiendo calle: una flecha en una casilla suelta
+            // no señala nada.
+            if (!Ciudad.Rodable(x-dx, y-dy)) continue;
+            return lado;
+        }
+        return -1;
+    }
+
+    /// <summary>Dónde va un coche aparcado y hacia dónde mira, sacados de la marca de
+    /// aparcamiento del suelo: el lado de Aparca() dice de qué lado queda el bordillo, así
+    /// que el coche se arrima a él —0,28 casillas del centro— y se orienta a lo largo de
+    /// la calle.</summary>
+    public struct Aparcamiento { public Vector2 Pos; public float Ang; }
+
+    /// <summary>Busca una plaza de aparcamiento cerca de (cx,cy). Null si no encuentra
+    /// ninguna en los intentos, igual que puntoAparcamiento() del prototipo vuelve
+    /// undefined y quien llama recurre a una casilla de calzada cualquiera.</summary>
+    public static Aparcamiento? PuntoAparcamiento(int cx, int cy, int rad) {
+        for (int i = 0; i < 500; i++) {
+            int x = Mathf.Clamp(cx + Utiles.RndI(-rad, rad), 2, Ciudad.MW-3);
+            int y = Mathf.Clamp(cy + Utiles.RndI(-rad, rad), 2, Ciudad.MH-3);
+            int lado = Aparca(x, y);
+            if (lado < 0) continue;
+            int dx = DxLado[lado], dy = DyLado[lado];
+            // El bordillo a los lados (dx≠0) quiere decir calle de norte a sur, y al
+            // revés. El sentido de la marcha lo da la paridad de la casilla: los coches de
+            // un lado miran a un lado, y los del otro justo al contrario.
+            float ang = dx != 0 ? (y % 2 != 0 ? Mathf.PI/2f : -Mathf.PI/2f)
+                                 : (x % 2 != 0 ? Mathf.PI : 0f);
+            return new Aparcamiento {
+                Pos = new Vector2(x + 0.5f + dx*0.28f, y + 0.5f + dy*0.28f), Ang = ang
+            };
+        }
+        return null;
     }
 
     /// <summary>Qué se puede abrir en cada tipo de barrio. Se repite alguno a propósito: si
