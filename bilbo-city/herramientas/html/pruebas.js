@@ -442,6 +442,31 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
         + 'siempre las mismas, y ninguna a mediodía');
     }
 
+    // ── 1 quater ter · el rótulo del local ─────────────────────────────
+    /* Un bar con chincheta y sin nombre en la puerta es un icono flotando sobre una manzana.
+       El rótulo va en la fachada más cercana con cara a la calle, y aquí se comprueba que
+       cada sitio en el que se entra tenga una: si no la encuentra, no se pinta nada y el
+       local vuelve a ser un icono. */
+    {
+      const conInt = A.POI.filter(p => p.int);
+      let sinFachada = 0, lejos = 0;
+      for (const p of conInt) {
+        const px = p.p.x | 0, py = p.p.y | 0;
+        let md = 99;
+        for (let dy = -5; dy <= 5; dy++) for (let dx = -5; dx <= 5; dx++) {
+          if (A.Tc(px+dx, py+dy) !== A.EDIF) continue;
+          const cara = A.Tc(px+dx, py+dy+1) !== A.EDIF;
+          const d = Math.abs(dx) + Math.abs(dy) * 1.2 + (cara ? 0 : 40);
+          if (d < md) md = d;
+        }
+        if (md === 99) sinFachada++;
+        else if (md >= 40) lejos++;
+      }
+      ok(conInt.length >= 20, 'solo ' + conInt.length + ' sitios en los que entrar');
+      ok(!sinFachada, sinFachada + ' de ' + conInt.length + ' locales sin fachada donde poner el rótulo');
+      bien.push(conInt.length + ' locales con su rótulo en la fachada (' + lejos + ' contra el canto de una manzana sin fachada)');
+    }
+
     // ── 1 quinquies · la ley de las capas ──────────────────────────────
     /* Lo que se pinta después tapa, así que el orden no es una costumbre: es una ley. El
        suelo entero primero, los bloques después, lo que sobresale encima y los rótulos al

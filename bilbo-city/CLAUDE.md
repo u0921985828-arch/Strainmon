@@ -271,6 +271,12 @@ calle. Ahora la casilla de calzada lleva su pintura, calculada con la misma pasa
 Los códigos de pintura van del 200 para arriba (`esPintura`), separados de los muebles: antes
 la cebra era el 20 y el 21 y la primera pieza nueva de atrezzo se habría dibujado como un paso.
 
+**El rótulo del local.** Un bar con chincheta y sin nombre en la puerta es un icono flotando
+sobre una manzana: lo que se lee desde la acera de enfrente es el rótulo, y es lo que hace que
+una calle tenga comercios y no huecos. Va en la fachada con cara a la calle más cercana al
+sitio —no siempre la de delante del portal: en el Casco hay locales metidos en un pasaje— y,
+si no hay ninguna, contra el canto de la manzana.
+
 **El atrezzo.** Una acera con farolas y papeleras no es una calle: es un pasillo. Además de lo
 de siempre hay buzón, parquímetro, señal, hidrante, jardinera, seto, aparcabicis, los iglús del
 vidrio y del papel, la moto y la bici aparcadas, el quiosco de prensa y la **boca de metro** en

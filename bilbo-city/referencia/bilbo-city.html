@@ -7682,6 +7682,33 @@ function dibCiudad(){
  capa=CAPA.EDIFICIO;
  sombraSingulares(x0,y0,x1,y1);
  dibSingulares(x0,y0,x1,y1);
+ /* El rótulo del local, en su fachada. Un bar con chincheta y sin nombre en la puerta es un
+    icono flotando sobre una manzana: lo que se lee desde la acera de enfrente es el rótulo,
+    y es lo que hace que una calle tenga comercios y no huecos. Va en la capa de los bloques
+    —es parte de la fachada— y solo en la fachada que da a la calle. */
+ for(const p of POI){
+  if(!p.int)continue;
+  const px=p.p.x|0,py=p.p.y|0;
+  if(px<x0-2||px>x1+2||py<y0-2||py>y1+2)continue;
+  /* La fachada más cercana con cara a la calle. El sitio está en la acera, y esa acera no
+     siempre es la de delante del portal: en el Casco hay sitios metidos en un pasaje, con
+     la manzana a tres casillas. */
+  /* Se prefiere la fachada con cara a la calle; si no hay ninguna —los sitios metidos en
+     el interior de una manzana del Casco, donde la calle es un pasaje y el juego no pinta
+     fachada— vale el canto de la manzana más cercana, que el rótulo tiene que estar. */
+  let mej=null,md=99;
+  for(let dy=-5;dy<=5;dy++)for(let dx=-5;dx<=5;dx++){
+   const fx=px+dx,fy=py+dy;
+   if(Tc(fx,fy)!==EDIF)continue;
+   const cara=Tc(fx,fy+1)!==EDIF;
+   const d=Math.abs(dx)+Math.abs(dy)*1.2+(cara?0:40);
+   if(d<md){md=d;mej=[fx,fy];}}
+  if(!mej)continue;
+  const s=p.n.length>13?p.n.slice(0,12)+'.':p.n;
+  const w=anchoTexto(s,1)+6, cx=Math.round(mej[0]*TS+TS/2-w/2), cy=mej[1]*TS+TS-FACH_H*ESC-13;
+  ctx.fillStyle='rgba(7,9,12,.86)';ctx.fillRect(cx,cy,w,12);
+  ctx.fillStyle=p.c||C.mostaza;ctx.fillRect(cx,cy,w,1);ctx.fillRect(cx,cy+11,w,1);
+  texto(ctx,s,cx+3,cy+2,1,'hueso');}
  /* Tercera pasada: lo que sobresale del suelo. Iba mezclado con el suelo, casilla a
     casilla, y por eso un árbol de cinco metros —dos casillas de ancho— perdía la mitad
     derecha: la casilla de al lado se pintaba después y le echaba el suelo por encima. Y lo

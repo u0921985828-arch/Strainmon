@@ -126,6 +126,10 @@ pantalla. Funciona y las proporciones ya son las buenas, pero el detalle todaví
 - [ ] **La plaza sale pequeña.** Las plazas peatonales del Casco caben en quince casillas
       porque el plano pinta buena parte de ellas como manzana. Lo que se ve es real, pero
       corto: habría que sacar del plano el recinto peatonal, no solo su acera.
+- [ ] **La fachada solo se pinta en el canto sur de la manzana.** En las Siete Calles, que
+      son un pasaje dentro de la manzana, no se ve ni un escaparate: el interior del bloque
+      es tejado por los cuatro lados. Se nota en que dos locales del Casco tienen que colgar
+      su rótulo del canto de la manzana en vez de una fachada.
 - [ ] Oclusión de interiores de manzana con transición.
 - [ ] Más variedad de diálogo en los parroquianos.
 - [ ] Misiones secundarias no encadenadas.
