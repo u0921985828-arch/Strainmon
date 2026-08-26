@@ -3249,6 +3249,7 @@ const MOB_M={deposito:[2.0,2.2],climatizador:[1.2,1.0],antenaTv:[1.2,2.4],tended
   /* El monte de Bilbao es pino de repoblación y eucalipto, no el plátano de sombra de la
      Gran Vía: siete metros de fuste y copa estrecha. */
   pino:[3.0,7.0],matorral:[1.6,1.0]};
+const AVE=[];
 function generarProps(){
  /* Lo que hay encima de un tejado. Va suelto y sembrado por hash, como el mobiliario de
     la acera: dibujado dentro del tile se repetiría en cada casilla del edificio. */
@@ -3579,6 +3580,19 @@ function generarProps(){
   for(let x=5;x<28;x+=6)P(g,x,3,1,14,C.grisL);
   for(let y=5;y<18;y+=6)P(g,3,y,26,1,C.grisL);});
  M_('fuenteBeber',(g)=>{P(g,1,3,2,7,C.grisO);P(g,0,0,4,4,C.gris);P(g,1,4,1,1,C.azulL);});
+ /*── Vuelo ────────────────────────────────────────────────────────────────*/
+ /* La gaviota, vista desde abajo del todo: dos alas y poco más. Bilbao es puerto a catorce
+    kilómetros del mar y hay gaviotas hasta en el Casco. No lleva medida en MOB_M porque no
+    se planta en el suelo: no tiene huella. */
+ /* Metro y pico de envergadura, que es lo que mide una gaviota patiamarilla, y la punta
+    del ala oscura: sobre una acera clara, una mancha blanca entera no se ve. */
+ AVE[0]=S_(22,8,(g)=>{P(g,9,2,4,5,C.blanco);P(g,10,7,2,1,C.mostazaO);
+  P(g,2,3,8,2,C.blanco);P(g,12,3,8,2,C.blanco);
+  P(g,0,2,3,2,C.carbon);P(g,19,2,3,2,C.carbon);
+  P(g,2,2,8,1,C.hueso);P(g,12,2,8,1,C.hueso);});
+ AVE[1]=S_(22,12,(g)=>{P(g,9,6,4,5,C.blanco);P(g,10,11,2,1,C.mostazaO);
+  P(g,4,0,6,7,C.blanco);P(g,12,0,6,7,C.blanco);
+  P(g,3,0,3,3,C.carbon);P(g,16,0,3,3,C.carbon);});
  /*── Monte ────────────────────────────────────────────────────────────────*/
  M_('pino',(g)=>{P(g,13,52,4,18,'#4a3524');
   P(g,8,34,14,20,'#24471f');P(g,5,40,20,10,'#2b5426');
@@ -6985,6 +6999,27 @@ function rejilla(c,dt,persigue){
   c.dx=el[0];c.dy=el[1];c.tx+=el[0];c.ty+=el[1];}
  c.ang=Math.atan2(c.ty+.5-c.y,c.tx+.5-c.x);
  c.x+=Math.cos(c.ang)*c.vel*dt;c.y+=Math.sin(c.ang)*c.vel*dt;}
+/* Diez gaviotas planeando. Van por la capa de vuelo —no las tapa nada, están por encima
+   de los tejados— y en círculo, que es como planea una gaviota: no aletea, se deja llevar.
+   Se reciclan alrededor del jugador como el tráfico, y si hay ría cerca hacen el corro
+   sobre el agua, que es donde comen. */
+const gaviotas=[];
+function nuevaGaviota(cx,cy){
+ /* Cerca: la pantalla enseña trece casillas de ancho, y diez gaviotas repartidas por
+    noventa no se ven nunca. */
+ let mx=cx+rndi(-10,10),my=cy+rndi(-7,7);
+ for(let i=0;i<40;i++){const x=clamp(cx+rndi(-11,11),2,MW-3),y=clamp(cy+rndi(-8,8),2,MH-3);
+  if(Tc(x,y)===AGUA||Tc(x,y)===MUELLE){mx=x;my=y;break;}}
+ return{cx:clamp(mx,2,MW-3),cy:clamp(my,2,MH-3),r:rnd(2.5,7),a:rnd(0,6.28),
+  w:rnd(.25,.6)*(azar()<.5?1:-1),alto:rnd(6,16),f:0,x:mx,y:my};}
+function actGaviotas(dt){
+ if(S.escena!=='ciudad')return;
+ if(!gaviotas.length)for(let i=0;i<10;i++)gaviotas.push(nuevaGaviota(player.x|0,player.y|0));
+ for(const v of gaviotas){
+  v.a+=v.w*dt;v.f+=dt;
+  v.x=v.cx+Math.cos(v.a)*v.r;
+  v.y=v.cy+Math.sin(v.a)*v.r*.62;
+  if(Math.hypot(v.x-player.x,v.y-player.y)>19)Object.assign(v,nuevaGaviota(player.x|0,player.y|0));}}
 function asustar(p,r){for(const q of peatones)if(dist(q,p)<r){q.huye=3.5;if(azar()<.1)sfx('grito',.3);}}
 function objetivo(){
  if(S.mision){const p=pasoActual();if(!p)return null;return p.t==='robar'?p.coche:p.p;}
@@ -7185,6 +7220,7 @@ function actCiudad(dt,ix,iy,correr,fuerza,apuntando){
   else player.pose=player.sigilo?'agacha':player.herido>0?'herido':(arma(S.armaAct).cuerpo?'quieto':'apunta');
  }
  ojos(dt);
+ actGaviotas(dt);
  reciclarCoches();
  for(const c of trafico){c.frenado=(player.enCoche&&dist(c,player)<2.2)?1:0;rejilla(c,dt,false);
   if(dist(c,player)>56)Object.assign(c,nuevoTrafico(player.x|0,player.y|0));}
@@ -7649,6 +7685,15 @@ function dibCiudad(){
     Cincuenta y siete por fotograma son cincuenta y siete dibujos, y casi todas caen fuera
     de pantalla: el mapa mide siete kilómetros. */
  capa=CAPA.VUELO;
+ /* Primero las gaviotas y su sombra: están sobre la ciudad, pero por debajo de los
+    rótulos, que no son cosas del mundo. */
+ for(const v of gaviotas){
+  if(v.x<x0-2||v.x>x1+2||v.y<y0-2||v.y>y1+2)continue;
+  const so=SOL.elev?sombraSol(v.alto):null;
+  if(so){ctx.fillStyle='rgba(7,9,12,.18)';ctx.beginPath();
+   ctx.ellipse(v.x*TS+so.dx,v.y*TS+so.dy,5,2.5,0,0,6.283);ctx.fill();}
+  const spr=AVE[(v.f*4|0)%2];
+  ctx.drawImage(spr,Math.round(v.x*TS-spr.width/2),Math.round(v.y*TS-spr.height/2-v.alto*2));}
  for(const p of POI){
   if(p.p.x<x0-3||p.p.x>x1+3||p.p.y<y0-3||p.p.y>y1+3)continue;
   const sx=p.p.x*TS,sy=p.p.y*TS;

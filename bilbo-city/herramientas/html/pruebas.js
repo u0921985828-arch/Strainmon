@@ -292,6 +292,37 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       bien.push(enPlaza + ' de ' + total + ' coches aparcados en plaza marcada y en el sentido de la calle');
     }
 
+    // ── 1 ter ter · las gaviotas ───────────────────────────────────────
+    /* Bilbao es puerto a catorce kilómetros del mar: hay gaviotas hasta en el Casco. Van
+       por la capa de vuelo y planean en círculo, así que lo que se comprueba es que estén,
+       que se muevan, que no se queden atrás cuando el jugador se va y que se pinten donde
+       les toca — no que hagan un dibujo bonito. */
+    {
+      S.escena = 'ciudad'; A.cerrarDlg(); P.enCoche = null;
+      P.x = 700.5; P.y = 300.5; paso(20);
+      ok(A.gaviotas.length === 10, 'no hay gaviotas: ' + A.gaviotas.length);
+      const antes = A.gaviotas.map(v => v.x + ',' + v.y);
+      paso(20);
+      const movidas = A.gaviotas.filter((v, i) => v.x + ',' + v.y !== antes[i]).length;
+      ok(movidas === A.gaviotas.length, (A.gaviotas.length - movidas) + ' gaviotas quietas en el aire');
+      let lejos = A.gaviotas.filter(v => Math.hypot(v.x - P.x, v.y - P.y) > 22).length;
+      ok(!lejos, lejos + ' gaviotas se han quedado fuera de la pantalla sin reciclarse');
+      // Y se pintan en vuelo: por encima de la ciudad y por debajo de los rótulos.
+      A.gaviotas.forEach((v, i) => { v.cx = P.x + ((i % 3) - 1) * 2; v.cy = P.y; v.r = 0.5; });
+      const g = A.real.getContext('2d'), ant = g.drawImage;
+      let dibujadas = 0, capas = new Set();
+      g.drawImage = function (im, ...r) {
+        if (A.AVE.includes(im)) { dibujadas++; capas.add(A.capaAct()); }
+        return ant.apply(this, [im, ...r]);
+      };
+      paso(2);
+      g.drawImage = ant;
+      ok(dibujadas > 0, 'las gaviotas no se pintan');
+      ok(capas.size === 1 && capas.has(A.CAPA.VUELO),
+         'las gaviotas se pintan en la capa [' + [...capas].join(',') + '] y no en vuelo');
+      bien.push(A.gaviotas.length + ' gaviotas planeando sobre la ría, en la capa de vuelo');
+    }
+
     // ── 1 quater · el sol y la hora ────────────────────────────────────
     /* Desde arriba, la sombra es lo único que dice cuánto levanta un edificio y hasta
        dónde llega su tejado. Antes era fija —siempre abajo y a la derecha, nueve píxeles—

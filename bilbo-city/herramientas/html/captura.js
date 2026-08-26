@@ -44,6 +44,9 @@ listo().then(() => {
     const [hh, mm] = hora.split(':').map(Number);
     A.S.min = hh * 60 + (mm || 0);
   }
+  // El prólogo arranca con su diálogo abierto y eso deja el juego en pausa: sin cerrarlo,
+  // la captura enseña un mundo congelado —ni gaviotas, ni tráfico moviéndose—.
+  A.cerrarDlg();
   const donde = txt('--donde');
   if (donde) {
     const [x, y] = donde.split(',').map(Number);

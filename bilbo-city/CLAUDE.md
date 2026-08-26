@@ -281,6 +281,16 @@ fuera de ella, que ninguna línea de detención se quede sin su paso delante, qu
 esté lejos del bordillo, que ningún semáforo esté suelto y que la separación entre farolas
 —contada sobre las casillas de bordillo— caiga entre 15 y 45 m.
 
+**Y hay gaviotas.** Diez, planeando en círculo por la capa de vuelo —no las tapa nada— con
+su sombra en el suelo, y haciendo el corro sobre el agua cuando hay ría cerca, que es donde
+comen. Bilbao es puerto a catorce kilómetros del mar: las hay hasta en el Casco. Se reciclan
+alrededor del jugador como el tráfico, y de cerca: la pantalla enseña trece casillas de ancho
+y diez gaviotas repartidas por noventa no se ven nunca.
+
+**Los coches aparcan en su plaza.** Los cuarenta coches aparcados se soltaban en cualquier
+casilla de calzada, en mitad del carril y cruzados. La plaza pintada dice dónde va uno y de
+qué lado queda el bordillo, así que ahora van arrimados y mirando a donde va la calle.
+
 ## El sol, la hora y el canto negro
 
 La pregunta era si lo que faltaba era contorno o sombra. Son dos cosas distintas y hacían
