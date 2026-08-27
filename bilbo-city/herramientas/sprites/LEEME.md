@@ -117,6 +117,10 @@ a cada paso.
 
 ## La tirada, paso a paso
 
+> Si la vas a hacer desde una sesión de Cowork o de Claude Code en tu máquina, el parte de
+> entrega —qué se pide, qué respetar y dónde hay que parar a preguntar— está en
+> [`COWORK.md`](COWORK.md).
+
 Se hace en local: aquí no hay clave ni salida hacia `api.pixellab.ai`. El orden importa,
 porque los tres primeros pasos no cuestan nada y el cuarto sí.
 
