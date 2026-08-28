@@ -150,7 +150,10 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       // La puerta: entre 0,8 m (una de casa) y 3,2 m (el portón de un taller), de una pieza.
       const ds = [];
       for (let y = 0; y < ih; y++) for (let x = 0; x < iw; x++) if (m[y][x] === 'D') ds.push([x, y]);
-      ok(ds.length >= 1 && ds.length <= 4, id + ': puerta de ' + (ds.length * A.M_INT).toFixed(1) + ' m');
+      // En metros, no en casillas: la rejilla de interior se afinó de 80 a 40 cm y el
+      // portón del taller pasó de cuatro casillas a ocho midiendo lo mismo.
+      const anchoP = ds.length * A.M_INT;
+      ok(anchoP >= 0.8 - 1e-6 && anchoP <= 3.2 + 1e-6, id + ': puerta de ' + anchoP.toFixed(1) + ' m');
       ok(ds.every(([, y]) => y === ih - 1), id + ': la salida no está en el muro de abajo');
       // Todo el suelo tiene que ser alcanzable desde delante de la puerta. Una habitación
       // sellada por un mueble no se ve dibujando el plano: se ve cuando no puedes entrar.

@@ -15,8 +15,12 @@ namespace BilboCity {
 /// dibuja de una vez, con su cabecero y su almohada—, igual que los edificios singulares se
 /// dibujan a su tamaño y no a base de baldosas.</summary>
 public static class ForjaInterior {
-    public const int Px = 16;              // píxeles por casilla de interior
-    public const float Metro = 0.8f;       // metros por casilla de interior
+    // La casilla de interior mide 40 cm y se dibuja a 8 px: 20 px/m, la densidad a la que
+    // está dibujada la gente. Medía 80, y como el muro ocupa una casilla entera eso eran
+    // tabiques de 80 cm —uno de verdad son 10 y una medianera 30—. En pantalla no cambia
+    // nada: hay el doble de casillas, a la mitad.
+    public const int Px = 8;               // píxeles por casilla de interior
+    public const float Metro = 0.4f;       // metros por casilla de interior
 
     public static readonly Dictionary<string, Sprite> Suelos = new Dictionary<string, Sprite>();
     public static readonly Dictionary<string, Sprite> Paredes = new Dictionary<string, Sprite>();
@@ -27,73 +31,77 @@ public static class ForjaInterior {
 
     public static void Generar() {
         if (Suelos.Count > 0) return;
-        // Una baldosa hidráulica de 20 cm son 4 px y se ve. Con la casilla de fuera, el suelo
-        // de una casa era un cuadrado de cinco metros con una junta pintada.
+        // La tabla de parqué son 1,2 m por 12 cm; con la junta cada 4 px la tabla sale de
+        // 20 cm de ancho, que es lo estrecho que se puede pintar sin que el suelo se lea
+        // como un muro de ladrillo.
         var g = T(); g.Rellenar(Paleta.MaderaL); g.Ruido(new[]{Paleta.Madera}, 4);
-        // Tabla de 1,2 m por 12 cm: a 20 px/m son veinticuatro píxeles de largo y tres de
-        // ancho. Con la junta cada ocho, la tabla salía cuadrada y el suelo se leía como un
-        // muro de ladrillo.
-        for (int y = 3; y < 16; y += 4) g.P(0, y, 16, 1, Paleta.Madera);
+        for (int y = 3; y < 8; y += 4) g.P(0, y, 8, 1, Paleta.Madera);
         Suelos["parquet"] = Forja.SpriteDe(g);
 
+        // Una baldosa hidráulica de 20 cm son 4 px: cuatro por casilla.
         g = T(); g.Rellenar(Paleta.Crema);
-        for (int y = 0; y < 16; y += 8) for (int x = 0; x < 16; x += 8) {
-            g.P(x+1, y+1, 6, 6, Paleta.AzulL); g.P(x+3, y+3, 2, 2, Paleta.Crema);
-            g.P(x, y, 8, 1, Paleta.HormigonO); g.P(x, y, 1, 8, Paleta.HormigonO);
+        for (int y = 0; y < 8; y += 4) for (int x = 0; x < 8; x += 4) {
+            g.P(x+1, y+1, 2, 2, Paleta.AzulL);
+            g.P(x, y, 4, 1, Paleta.HormigonO); g.P(x, y, 1, 4, Paleta.HormigonO);
         }
         Suelos["hidraulico"] = Forja.SpriteDe(g);
 
-        // La baldosa de terrazo son 40 cm —ocho píxeles—, no ochenta. La junta iba en el
-        // canto del tile, así que dibujaba una cuadrícula de metro; y en HormigonO, dos
-        // tonos por debajo del suelo. Juntas las dos cosas, el bar era papel milimetrado.
+        // La baldosa de terrazo son 40 cm, o sea justo la casilla: la junta va en el canto.
+        // Lleva dos granos, que es como se ve una de verdad —el árido fino, casi del color
+        // del suelo, y encima cuatro chinas de mármol y de basalto—. Con un solo grano denso
+        // y a mucho contraste no era un suelo, era estática.
         g = T(); g.Rellenar(Paleta.HormigonL);
-        g.Ruido(new[]{Paleta.HormigonO,Paleta.Hueso,Paleta.Crema,Paleta.AceroO}, 46);
-        for (int i = 0; i < 16; i += 8) { g.P(0, i, 16, 1, Paleta.AceroO); g.P(i, 0, 1, 16, Paleta.AceroO); }
+        g.Ruido(new[]{Paleta.AceroO,Paleta.Hormigon6}, 30);
+        g.Ruido(new[]{Paleta.HormigonO,Paleta.Hueso}, 10, 3, 5);
+        g.P(0, 0, 8, 1, Paleta.AceroO); g.P(0, 0, 1, 8, Paleta.AceroO);
         Suelos["terrazo"] = Forja.SpriteDe(g);
 
-        g = T(); g.Rellenar(Paleta.H("#4d5157")); g.Ruido(new[]{Paleta.H("#42464b"),Paleta.H("#5b6067")}, 16);
+        g = T(); g.Rellenar(Paleta.GrisL); g.Ruido(new[]{Paleta.Gris,Paleta.Hormigon4}, 16);
         Suelos["chapa"] = Forja.SpriteDe(g);
 
-        // El suelo de un hospital es lámina de vinilo en rollos de dos metros: no tiene una
-        // junta cada ochenta centímetros. Queda el jaspeado, que es lo que sí se ve.
-        g = T(); g.Rellenar(Paleta.H("#8fa8a0"));
-        g.Ruido(new[]{Paleta.H("#7d968e"),Paleta.H("#a3bab2"),Paleta.H("#96afa7")}, 22);
+        // En hexadecimal a mano no se puede: el verde grisáceo de un hospital no está en la
+        // paleta de 61, así que Cuantizar mandaba el fondo y su sombra al mismo gris —el
+        // suelo salía plano— y un tercer tono a un verde de vegetación.
+        g = T(); g.Rellenar(Paleta.Hormigon6);
+        g.Ruido(new[]{Paleta.Hormigon5,Paleta.Hormigon7}, 20);
         Suelos["hospital"] = Forja.SpriteDe(g);
 
         // El muro lleva la luz arriba y la sombra abajo, como todo lo demás: es lo que hace
         // que una habitación se lea como una caja y no como una retícula de cuadros.
         g = T(); g.Rellenar(Paleta.H("#c9c4b6")); g.Ruido(new[]{Paleta.H("#b8b3a5")}, 10);
-        g.P(0, 0, 16, 2, Paleta.Blanco); g.P(0, 14, 16, 2, Paleta.H("#a9a496"));
+        g.P(0, 0, 8, 1, Paleta.Blanco); g.P(0, 7, 8, 1, Paleta.H("#a9a496"));
         Paredes["yeso"] = Forja.SpriteDe(g);
 
+        // El azulejo del bar son 20 cm: cuatro por casilla.
         g = T(); g.Rellenar(Paleta.H("#2f5f5a"));
-        for (int y = 0; y < 16; y += 4) for (int x = 0; x < 16; x += 4) {
+        for (int y = 0; y < 8; y += 4) for (int x = 0; x < 8; x += 4) {
             g.P(x, y, 3, 3, Paleta.H("#3a7570")); g.P(x, y, 3, 1, Paleta.H("#4d908a"));
         }
-        g.P(0, 0, 16, 2, Paleta.H("#4d908a")); g.P(0, 15, 16, 1, Paleta.H("#22403d"));
+        g.P(0, 0, 8, 1, Paleta.H("#4d908a")); g.P(0, 7, 8, 1, Paleta.H("#22403d"));
         Paredes["azulejo"] = Forja.SpriteDe(g);
 
         g = T(); g.Rellenar(Paleta.H("#566060"));
-        for (int x = 0; x < 16; x += 3) g.P(x, 0, 1, 16, Paleta.H("#454e4e"));
-        g.P(0, 0, 16, 2, Paleta.H("#6e7a7a"));
+        for (int x = 0; x < 8; x += 3) g.P(x, 0, 1, 8, Paleta.H("#454e4e"));
+        g.P(0, 0, 8, 1, Paleta.H("#6e7a7a"));
         Paredes["chapa"] = Forja.SpriteDe(g);
 
         g = T(); g.Rellenar(Paleta.H("#4b3b32")); g.Ruido(new[]{Paleta.H("#43342c"),Paleta.H("#57453a")}, 16);
-        for (int y = 0; y < 16; y += 4) {
-            g.P(0, y, 16, 1, Paleta.H("#3a2d26"));
-            for (int x = (y % 8 != 0 ? 4 : 0); x < 16; x += 8) g.P(x, y, 1, 4, Paleta.H("#3a2d26"));
+        for (int y = 0; y < 8; y += 4) {
+            g.P(0, y, 8, 1, Paleta.H("#3a2d26"));
+            for (int x = (y % 8 != 0 ? 2 : 0); x < 8; x += 4) g.P(x, y, 1, 4, Paleta.H("#3a2d26"));
         }
-        g.P(0, 0, 16, 2, Paleta.H("#5e4a3d"));
+        g.P(0, 0, 8, 1, Paleta.H("#5e4a3d"));
         Paredes["ladrillo"] = Forja.SpriteDe(g);
 
-        g = T(); g.P(0, 0, 16, 16, Paleta.MaderaO); g.P(1, 1, 14, 14, Paleta.Madera);
-        g.P(2, 3, 12, 4, Paleta.H("#93663f")); g.P(2, 9, 12, 4, Paleta.H("#93663f"));
-        g.P(12, 7, 2, 2, Paleta.Mostaza);
+        // La hoja de la puerta ocupa las dos casillas del hueco: 80 cm, una puerta de paso.
+        g = T(); g.P(0, 0, 8, 8, Paleta.MaderaO); g.P(1, 1, 6, 6, Paleta.Madera);
+        g.P(1, 2, 6, 2, Paleta.H("#93663f")); g.P(1, 5, 6, 2, Paleta.H("#93663f"));
+        g.P(6, 4, 1, 1, Paleta.Mostaza);
         Puerta = Forja.SpriteDe(g);
 
-        g = T(); g.P(0, 0, 2, 16, Paleta.HormigonL); g.P(14, 0, 2, 16, Paleta.HormigonL);
+        g = T(); g.P(0, 0, 1, 8, Paleta.HormigonL); g.P(7, 0, 1, 8, Paleta.HormigonL);
         PasoV = Forja.SpriteDe(g);
-        g = T(); g.P(0, 0, 16, 2, Paleta.HormigonL); g.P(0, 14, 16, 2, Paleta.HormigonL);
+        g = T(); g.P(0, 0, 8, 1, Paleta.HormigonL); g.P(0, 7, 8, 1, Paleta.HormigonL);
         PasoH = Forja.SpriteDe(g);
     }
 

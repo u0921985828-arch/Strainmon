@@ -3127,55 +3127,50 @@ const SUELO_I={},PARED_I={},PUERTA_I={},PASO_I={};
 const T_I=fn=>{const c=lienzo(TS_INT,TS_INT),g=c.getContext('2d');fn(g);return cuantizar(c);};
 const rellI=(g,col)=>P(g,0,0,TS_INT,TS_INT,col);
 function generarInteriores(){
- /* Una baldosa hidráulica de 20 cm son 4 px y se ve. Con la casilla de fuera, el suelo de
-    una casa era un cuadrado de cinco metros con una junta pintada. */
- SUELO_I.parquet=T_I(g=>{rellI(g,C.maderaL);grano(g,16,16,[C.madera],4);
-  /* Tabla de 1,2 m por 12 cm: a 20 px/m son veinticuatro píxeles de largo y tres de
-     ancho. Con la junta cada ocho, la tabla salía cuadrada y el suelo se leía como un
-     muro de ladrillo. */
-  for(let y=3;y<16;y+=4)P(g,0,y,16,1,C.madera);});
+ /* Todo esto va a 8 px por casilla: la casilla de interior mide 40 cm, así que siguen
+    saliendo los 20 px/m a los que está dibujada la gente. En pantalla mide exactamente lo
+    mismo que antes; lo que hay es el doble de casillas. */
+ /* La tabla de parqué son 1,2 m por 12 cm; con la junta cada 4 px la tabla sale de 20 cm
+    de ancho, que es lo estrecho que se puede pintar sin que el suelo se lea como ladrillo. */
+ SUELO_I.parquet=T_I(g=>{rellI(g,C.maderaL);grano(g,8,8,[C.madera],4);
+  for(let y=3;y<8;y+=4)P(g,0,y,8,1,C.madera);});
+ /* Una baldosa hidráulica de 20 cm son 4 px: cuatro por casilla. */
  SUELO_I.hidraulico=T_I(g=>{rellI(g,C.crema);
-  for(let y=0;y<16;y+=8)for(let x=0;x<16;x+=8){P(g,x+1,y+1,6,6,C.azulL);P(g,x+3,y+3,2,2,C.crema);
-   P(g,x,y,8,1,C.hormigonO);P(g,x,y,1,8,C.hormigonO);}});
- /* La baldosa de terrazo son 40 cm —ocho píxeles—, no ochenta. La junta iba en el canto
-    del tile, así que dibujaba una cuadrícula de metro; y en `hormigonO`, que está dos tonos
-    por debajo del suelo. Las dos cosas juntas convertían el bar en papel milimetrado. Ahora
-    la junta va a su paso y en el gris de al lado: una junta de terrazo se intuye, no se
-    marca. Y el árido es lo que se ve de verdad —chinas oscuras, claras y de mármol—, no
-    tres grises de los que uno era el propio suelo. */
+  for(let y=0;y<8;y+=4)for(let x=0;x<8;x+=4){P(g,x+1,y+1,2,2,C.azulL);
+   P(g,x,y,4,1,C.hormigonO);P(g,x,y,1,4,C.hormigonO);}});
+ /* La baldosa de terrazo son 40 cm, o sea justo la casilla: la junta va en el canto. Lleva
+    dos granos, que es como se ve una de verdad —el árido fino, casi del color del suelo, y
+    encima cuatro chinas de mármol y de basalto—. Con un solo grano denso y a mucho
+    contraste no era un suelo, era estática. */
  SUELO_I.terrazo=T_I(g=>{rellI(g,C.hormigonL);
-  /* Dos granos, que es como se ve una baldosa de terrazo: el árido fino, casi del color
-     del suelo, y encima cuatro chinas grandes de mármol y de basalto. Con un solo grano
-     denso y a mucho contraste no era un suelo, era estática. */
-  grano(g,16,16,[C.aceroO,C.hormigon6],30);
-  grano(g,16,16,[C.hormigonO,C.hueso],10,3,5);
-  for(let i=0;i<16;i+=8){P(g,0,i,16,1,C.aceroO);P(g,i,0,1,16,C.aceroO);}});
- SUELO_I.chapa=T_I(g=>{rellI(g,'#4d5157');grano(g,16,16,['#42464b','#5b6067'],16);});
- /* El suelo de un hospital es lámina de vinilo en rollos de dos metros: no tiene una junta
-    cada ochenta centímetros. La raya del canto del tile dibujaba una cuadrícula que no está
-    en ningún hospital. Queda el jaspeado, que es lo que sí se ve. */
+  grano(g,8,8,[C.aceroO,C.hormigon6],30);
+  grano(g,8,8,[C.hormigonO,C.hueso],10,3,5);
+  P(g,0,0,8,1,C.aceroO);P(g,0,0,1,8,C.aceroO);});
+ SUELO_I.chapa=T_I(g=>{rellI(g,C.grisL);grano(g,8,8,[C.gris,C.hormigon4],16);});
  /* En hexadecimal a mano no se puede: el verde grisáceo de un hospital no está en la
     paleta de 61, así que `cuantizar` mandaba el fondo y su sombra al mismo gris —el suelo
-    salía plano— y el tercer tono a un verde de vegetación. Con tonos de la paleta el
+    salía plano— y un tercer tono a un verde de vegetación. Con tonos de la paleta el
     jaspeado se ve, y de paso el hospital tiene el suelo más claro que el resto, que es lo
     que pasa de verdad. */
- SUELO_I.hospital=T_I(g=>{rellI(g,C.hormigon6);grano(g,16,16,[C.hormigon5,C.hormigon7],20);});
+ SUELO_I.hospital=T_I(g=>{rellI(g,C.hormigon6);grano(g,8,8,[C.hormigon5,C.hormigon7],20);});
  /* El muro lleva la luz arriba y la sombra abajo, como todo lo demás: es lo que hace que
     una habitación se lea como una caja y no como una retícula de cuadros. */
- PARED_I.yeso=T_I(g=>{rellI(g,'#c9c4b6');grano(g,16,16,['#b8b3a5'],10);
-  P(g,0,0,16,2,C.blanco);P(g,0,14,16,2,'#a9a496');});
+ PARED_I.yeso=T_I(g=>{rellI(g,'#c9c4b6');grano(g,8,8,['#b8b3a5'],10);
+  P(g,0,0,8,1,C.blanco);P(g,0,7,8,1,'#a9a496');});
+ /* El azulejo del bar son 20 cm: cuatro por casilla. */
  PARED_I.azulejo=T_I(g=>{rellI(g,'#2f5f5a');
-  for(let y=0;y<16;y+=4)for(let x=0;x<16;x+=4){P(g,x,y,3,3,'#3a7570');P(g,x,y,3,1,'#4d908a');}
-  P(g,0,0,16,2,'#4d908a');P(g,0,15,16,1,'#22403d');});
- PARED_I.chapa=T_I(g=>{rellI(g,'#566060');for(let x=0;x<16;x+=3)P(g,x,0,1,16,'#454e4e');
-  P(g,0,0,16,2,'#6e7a7a');});
- PARED_I.ladrillo=T_I(g=>{rellI(g,'#4b3b32');grano(g,16,16,['#43342c','#57453a'],16);
-  for(let y=0;y<16;y+=4){P(g,0,y,16,1,'#3a2d26');for(let x=(y%8?4:0);x<16;x+=8)P(g,x,y,1,4,'#3a2d26');}
-  P(g,0,0,16,2,'#5e4a3d');});
- PUERTA_I.v=T_I(g=>{P(g,0,0,16,16,C.maderaO);P(g,1,1,14,14,C.madera);
-  P(g,2,3,12,4,'#93663f');P(g,2,9,12,4,'#93663f');P(g,12,7,2,2,C.mostaza);});
- PASO_I.v=T_I(g=>{P(g,0,0,2,16,C.hormigonL);P(g,14,0,2,16,C.hormigonL);});
- PASO_I.h=T_I(g=>{P(g,0,0,16,2,C.hormigonL);P(g,0,14,16,2,C.hormigonL);});
+  for(let y=0;y<8;y+=4)for(let x=0;x<8;x+=4){P(g,x,y,3,3,'#3a7570');P(g,x,y,3,1,'#4d908a');}
+  P(g,0,0,8,1,'#4d908a');P(g,0,7,8,1,'#22403d');});
+ PARED_I.chapa=T_I(g=>{rellI(g,'#566060');for(let x=0;x<8;x+=3)P(g,x,0,1,8,'#454e4e');
+  P(g,0,0,8,1,'#6e7a7a');});
+ PARED_I.ladrillo=T_I(g=>{rellI(g,'#4b3b32');grano(g,8,8,['#43342c','#57453a'],16);
+  for(let y=0;y<8;y+=4){P(g,0,y,8,1,'#3a2d26');for(let x=(y%8?2:0);x<8;x+=4)P(g,x,y,1,4,'#3a2d26');}
+  P(g,0,0,8,1,'#5e4a3d');});
+ /* La hoja de la puerta ocupa las dos casillas del hueco: 80 cm, una puerta de paso. */
+ PUERTA_I.v=T_I(g=>{P(g,0,0,8,8,C.maderaO);P(g,1,1,6,6,C.madera);
+  P(g,1,2,6,2,'#93663f');P(g,1,5,6,2,'#93663f');P(g,6,4,1,1,C.mostaza);});
+ PASO_I.v=T_I(g=>{P(g,0,0,1,8,C.hormigonL);P(g,7,0,1,8,C.hormigonL);});
+ PASO_I.h=T_I(g=>{P(g,0,0,8,1,C.hormigonL);P(g,0,7,8,1,C.hormigonL);});
 }
 /* Cada mueble se dibuja al tamaño que ocupe en el plano, con w y h en píxeles. Los que
    pueden ir en fila o en columna miran cuál es su lado largo: una estantería contra la
@@ -3284,7 +3279,15 @@ function piezasDe(I){
  for(let y=0;y<h;y++)for(let x=0;x<m[y].length;x++){
   const ch=m[y][x];
   if(ch==='#'||BLANDO_I.includes(ch)||visto[y][x])continue;
-  if(UNITARIO_I.includes(ch)){visto[y][x]=true;out.push({ch,x,y,w:1,h:1});continue;}
+  /* Lo que no se junta nunca —sillas, taburetes, plantas— ocupa dos casillas de lado desde
+     que la rejilla es de 40 cm: una silla mide 80. Partiéndolo por casilla salían cuatro
+     medias sillas donde había una. */
+  if(UNITARIO_I.includes(ch)){
+   const u=Math.round(.8/M_INT);
+   let aw=0;while(aw<u&&x+aw<m[y].length&&m[y][x+aw]===ch&&!visto[y][x+aw])aw++;
+   let ah=0;while(ah<u&&y+ah<h&&m[y+ah].length>x&&m[y+ah][x]===ch&&!visto[y+ah][x])ah++;
+   for(let j=0;j<ah;j++)for(let i=0;i<aw;i++)if(m[y+j][x+i]===ch)visto[y+j][x+i]=true;
+   out.push({ch,x,y,w:aw,h:ah});continue;}
   let aw=0;while(x+aw<m[y].length&&m[y][x+aw]===ch&&!visto[y][x+aw])aw++;
   let ah=1;
   while(y+ah<h){let ok=m[y+ah].length>=x+aw;
@@ -4164,7 +4167,12 @@ const puntoCalle=(cx,cy,r)=>buscar((x,y)=>Tc(x,y)===ROAD,cx,cy,r||40);
    entrar no se parecía a una casa. La casilla de interior mide 0,80 m —el ancho de una
    puerta de paso— y se dibuja a 16 px: 20 px/m, la densidad a la que está dibujada la
    gente. Dentro de una casa la vara de medir es una persona, no un coche. */
-const M_INT=.8, TS_INT=16, MS_I=1/M_INT;
+/* La casilla de interior mide 40 cm y se dibuja a 8 px: 20 px/m, la densidad a la que está
+   dibujada la gente. Medía 80, y como el muro ocupa una casilla entera eso eran tabiques de
+   80 cm —uno de verdad son 10 y una medianera 30—: entre el 20 y el 44 % de cada planta era
+   pared, y el piso perdía casi la mitad. Por eso por dentro parecían cajas de cartón con
+   todo apelotonado. En pantalla no cambia nada: hay el doble de casillas, a la mitad. */
+const M_INT=.4, TS_INT=8, MS_I=1/M_INT;
 const V_INTERIOR_C=1.4*MS_I;        /* 1,4 m/s, en casillas de interior por segundo */
 
 /* # pared · . suelo · D salida · d paso · C cama · A armario · U mesita · F sofá · M mesa
@@ -4178,81 +4186,121 @@ const INT={
     62 m² útiles, que es lo que mide un piso de los años sesenta en Santutxu. La habitación
     de la derecha es la del primo. Los pisos que se compran reaprovechan este plano. */
  piso:{n:'Tu piso',suelo:'parquet',pared:'yeso',mapa:[
-  /* El escritorio en el cuarto de la izquierda y la bañera en el baño: dos piezas que
-     estaban dibujadas y sin una sola planta donde ponerse. Un piso de los sesenta en
-     Santutxu tiene bañera; la ducha se queda porque el baño tiene las dos cosas. */
-  '#############','#CCUe#.#.UCC#','#CC.e#.#..CC#','#CC..d.d..CC#','#r...#.#...r#',
-  '#AAA.#.#.EEE#','######.######','#FFF.#.#KKKN#','#.aa.d.d....#','#g.U.#.#iMSS#',
-  '#....#.######','#MMS.#.d...H#','#MMS.#.#TVbb#','######D######'],npcs:[]},
+  '##########################','##########################','##CCCCUUee#...#...UUCCCC##','##CCCCUUee#...#...UUCCCC##',
+  '##CCCC..ee#...#.....CCCC##','##CCCC..ee#...#.....CCCC##','##CCCC....d...d.....CCCC##','##CCCC....d...d.....CCCC##',
+  '##rr......#...#.......rr##','##rr......#...#.......rr##','##AAAAAA..#...#...EEEEEE##','##AAAAAA..#...#...EEEEEE##',
+  '############..############','##........##..##KKKKKKKK##','##FFFFFF..#...#.KKKKKKNN##','##FFFFFF..#...#.KKKKKKNN##',
+  '##..aaaa..d...d.........##','##..aaaa..d...d.........##','##gg..UU..#...#.iiMMSSSS##','##gg..UU..#...#.iiMMSSSS##',
+  '##........#...############','##........#...##........##','##MMMMSS..#...d.......HH##','##MMMMSS..#...d.......HH##',
+  '##MMMMSS..#...#.TTVVbbbb##','##MMMMSS..#...#.TTVVbbbb##','############..############','############DD############'],npcs:[]},
  portal:{n:'Portal · la casera',suelo:'hidraulico',pared:'yeso',mapa:[
-  '#######','#WW..Y#','#....Y#','#....Y#','#.aa..#','#.aa..#','#J...J#','#.....#','###D###'],
-  npcs:[{x:3.5,y:4.5,n:'Amaia',arq:'amaia',tipo:'casera'}]},
+  '##############','##############','##WWWW....YY##','##WWWW....YY##',
+  '##........YY##','##........YY##','##........YY##','##........YY##',
+  '##..aaaa....##','##..aaaa....##','##..aaaa....##','##..aaaa....##',
+  '##JJ......JJ##','##JJ......JJ##','##..........##','##..........##',
+  '######..######','######DD######'],
+  npcs:[{x:7,y:9,n:'Amaia',arq:'amaia',tipo:'casera'}]},
  bar:{n:'Bar Zurito',suelo:'terrazo',pared:'azulejo',mapa:[
-  '############','#EEEEEE..NN#','#..........#','#BBBBBBB...#','#t.t.t.t...#',
-  '#SMS..SMS..#','#..........#','#SMS..SMS..#','#......#####','#SMS...#TV.#',
-  '#......d...#','#ff.x..#...#','#####D######'],
-  npcs:[{x:3.5,y:2.5,n:'Josu',arq:'josu',tipo:'barman'},
-        {x:8.5,y:6.5,n:'Txema',arq:'txema',tipo:'jefe'},
-        {x:5.5,y:10.5,n:'Mikel',arq:'mikel',tipo:'parroquiano'}]},
+  '########################','########################','##EEEEEEEEEEEE....NNNN##','##EEEEEEEEEEEE....NNNN##',
+  '##....................##','##....................##','##BBBBBBBBBBBBBB......##','##BBBBBBBBBBBBBB......##',
+  '##tt..tt..tt..tt......##','##tt..tt..tt..tt......##','##SSMMSS....SSMMSS....##','##SSMMSS....SSMMSS....##',
+  '##....................##','##....................##','##SSMMSS....SSMMSS....##','##SSMMSS....SSMMSS....##',
+  '##............##########','##............##......##','##SSMMSS......#.TTVV..##','##SSMMSS......#.TTVV..##',
+  '##............d.......##','##............d.......##','##ffff..xx....#.......##','##ffff..xx....#.......##',
+  '##########..############','##########DD############'],
+  npcs:[{x:7,y:5,n:'Josu',arq:'josu',tipo:'barman'},
+        {x:17,y:13,n:'Txema',arq:'txema',tipo:'jefe'},
+        {x:11,y:21,n:'Mikel',arq:'mikel',tipo:'parroquiano'}]},
  taller:{n:'Taller Iker',suelo:'chapa',pared:'chapa',mapa:[
-  '###############','#EEEE....EEEE.#','#.............#','#.ZZ.....ZZ...#','#.ZZ.....ZZ...#',
-  '#.ZZ.....ZZ...#','#.ZZ.....ZZ...#','#.ZZ.....ZZ...#','#ww.........nn#','#OOO......QQQ.#',
-  /* Y los palés en el taller, que es donde están: apilados contra la pared del portón. */
-  '#pp...........#','#####DDDD######'],
-  npcs:[{x:11.5,y:10.5,n:'Iker',arq:'iker',tipo:'mecanico'}]},
+  '##############################','##############################','##EEEEEEEE........EEEEEEEE..##','##EEEEEEEE........EEEEEEEE..##',
+  '##..........................##','##..........................##','##..ZZZZ..........ZZZZ......##','##..ZZZZ..........ZZZZ......##',
+  '##..ZZZZ..........ZZZZ......##','##..ZZZZ..........ZZZZ......##','##..ZZZZ..........ZZZZ......##','##..ZZZZ..........ZZZZ......##',
+  '##..ZZZZ..........ZZZZ......##','##..ZZZZ..........ZZZZ......##','##..ZZZZ..........ZZZZ......##','##..ZZZZ..........ZZZZ......##',
+  '##wwww..................nnnn##','##wwww..................nnnn##','##OOOOOO............QQQQQQ..##','##OOOOOO............QQQQQQ..##',
+  '##pppp......................##','##pppp......................##','##########........############','##########DDDDDDDD############'],
+  npcs:[{x:23,y:21,n:'Iker',arq:'iker',tipo:'mecanico'}]},
  armeria:{n:'Bazar Nervión',suelo:'chapa',pared:'ladrillo',mapa:[
-  '##########','#XXXXXXX.#','#........#','#EEE..EEE#','#........#','#EEE..EEE#',
-  '#........#','#.OOOO...#','#........#','####D#####'],
-  npcs:[{x:3.5,y:8.5,n:'Koldo',arq:'koldo',tipo:'armero'}]},
+  '####################','####################','##XXXXXXXXXXXXXX..##','##XXXXXXXXXXXXXX..##',
+  '##................##','##................##','##EEEEEE....EEEEEE##','##EEEEEE....EEEEEE##',
+  '##................##','##................##','##EEEEEE....EEEEEE##','##EEEEEE....EEEEEE##',
+  '##................##','##................##','##..OOOOOOOO......##','##..OOOOOOOO......##',
+  '##................##','##................##','########..##########','########DD##########'],
+  npcs:[{x:7,y:17,n:'Koldo',arq:'koldo',tipo:'armero'}]},
  merca:{n:'Mercado de la Ribera',suelo:'terrazo',pared:'chapa',mapa:[
-  '###################','#PPPP..PPPP..PPPP.#','#PPPP..PPPP..PPPP.#','#.................#',
-  '#.................#','#PPPP..PPPP..PPPP.#','#PPPP..PPPP..PPPP.#','#.................#',
-  '#.................#','#OOOO.............#','#########D#########'],
-  npcs:[{x:2.5,y:8.5,n:'Bego',arq:'bego',tipo:'pescatera'}]},
+  '######################################','######################################','##PPPPPPPP....PPPPPPPP....PPPPPPPP..##','##PPPPPPPP....PPPPPPPP....PPPPPPPP..##',
+  '##PPPPPPPP....PPPPPPPP....PPPPPPPP..##','##PPPPPPPP....PPPPPPPP....PPPPPPPP..##','##..................................##','##..................................##',
+  '##..................................##','##..................................##','##PPPPPPPP....PPPPPPPP....PPPPPPPP..##','##PPPPPPPP....PPPPPPPP....PPPPPPPP..##',
+  '##PPPPPPPP....PPPPPPPP....PPPPPPPP..##','##PPPPPPPP....PPPPPPPP....PPPPPPPP..##','##..................................##','##..................................##',
+  '##..................................##','##..................................##','##OOOOOOOO..........................##','##OOOOOOOO..........................##',
+  '##################..##################','##################DD##################'],
+  npcs:[{x:5,y:17,n:'Bego',arq:'bego',tipo:'pescatera'}]},
  hospital:{n:'Hospital de Basurto',suelo:'hospital',pared:'yeso',mapa:[
-  '################','#LL#LL#LL#LL...#','#..#..#..#.....#','#..............#','#..............#',
-  '#SSSS....OOOO..#','#..............#','#SSSS.........Q#','#..............#','#SSSS..........#',
-  '#..............#','#######D########'],
-  npcs:[{x:9.5,y:4.5,n:'Nekane',arq:'enfermera',tipo:'enfermera'}]},
+  '################################','################################','##LLLL#.LLLL#.LLLL#.LLLL......##','##LLLL#.LLLL#.LLLL#.LLLL......##',
+  '##....#.....#.....#...........##','##....#.....#.....#...........##','##............................##','##............................##',
+  '##............................##','##............................##','##SSSSSSSS........OOOOOOOO....##','##SSSSSSSS........OOOOOOOO....##',
+  '##............................##','##............................##','##SSSSSSSS..................QQ##','##SSSSSSSS..................QQ##',
+  '##............................##','##............................##','##SSSSSSSS....................##','##SSSSSSSS....................##',
+  '##............................##','##............................##','##############..################','##############DD################'],
+  npcs:[{x:19,y:9,n:'Nekane',arq:'enfermera',tipo:'enfermera'}]},
  /* Los cinco de abajo los comparten varios sitios: el rótulo lo pone el POI, no el
     interior. Dos tascas iguales por dentro y con distinto nombre en la puerta es lo que
     hay en cualquier barrio, y así no se duplica el plano por cada esquina. */
  ropa:{n:'Tienda de ropa',suelo:'terrazo',pared:'yeso',mapa:[
-  '###########','#RRRR.RRRR#','#.........#','#.........#','#RRRR.RRRR#','#.........#',
-  '#.........#','#XX....EEE#','#.........#','#.OOO.....#','#.........#','#####D#####'],
-  npcs:[{x:2.5,y:8.5,n:'Nerea',arq:'nerea',tipo:'ropa'}]},
+  '######################','######################','##RRRRRRRR..RRRRRRRR##','##RRRRRRRR..RRRRRRRR##',
+  '##..................##','##..................##','##..................##','##..................##',
+  '##RRRRRRRR..RRRRRRRR##','##RRRRRRRR..RRRRRRRR##','##..................##','##..................##',
+  '##..................##','##..................##','##XXXX........EEEEEE##','##XXXX........EEEEEE##',
+  '##..................##','##..................##','##..OOOOOO..........##','##..OOOOOO..........##',
+  '##..................##','##..................##','##########..##########','##########DD##########'],
+  npcs:[{x:5,y:17,n:'Nerea',arq:'nerea',tipo:'ropa'}]},
  tasca:{n:'Tasca',suelo:'terrazo',pared:'azulejo',mapa:[
-  '##########','#EEEE..NN#','#........#','#BBBBB...#','#t.t.t...#','#SMS..SMS#',
-  '#........#','#SMS..SMS#','#........#','####D#####'],
-  npcs:[{x:3.5,y:2.5,n:'Patxi',arq:'patxi',tipo:'barman'},
-        {x:5.5,y:8.5,n:'Mikel',arq:'mikel',tipo:'parroquiano'}]},
+  '####################','####################','##EEEEEEEE....NNNN##','##EEEEEEEE....NNNN##',
+  '##................##','##................##','##BBBBBBBBBB......##','##BBBBBBBBBB......##',
+  '##tt..tt..tt......##','##tt..tt..tt......##','##SSMMSS....SSMMSS##','##SSMMSS....SSMMSS##',
+  '##................##','##................##','##SSMMSS....SSMMSS##','##SSMMSS....SSMMSS##',
+  '##................##','##................##','########..##########','########DD##########'],
+  npcs:[{x:7,y:5,n:'Patxi',arq:'patxi',tipo:'barman'},
+        {x:11,y:17,n:'Mikel',arq:'mikel',tipo:'parroquiano'}]},
  resto:{n:'Restaurante',suelo:'terrazo',pared:'azulejo',mapa:[
-  '#############','#KKKKN#.EEEE#','#.....#.....#','#..MM.d.....#','######.######',
-  '#SMMS..SMMS.#','#SMMS..SMMS.#','#...........#','#SMMS..SMMS.#','#SMMS..SMMS.#',
-  '#OOO........#','#####D#######'],
-  npcs:[{x:3.5,y:2.5,n:'Patxi',arq:'patxi',tipo:'cocinero'}]},
+  '##########################','##########################','##KKKKKKKKNN#...EEEEEEEE##','##KKKKKKKKNN#...EEEEEEEE##',
+  '##..........#...........##','##..........#...........##','##....MMMM..d...........##','##....MMMM..d...........##',
+  '############..############','##......................##','##SSMMMMSS....SSMMMMSS..##','##SSMMMMSS....SSMMMMSS..##',
+  '##SSMMMMSS....SSMMMMSS..##','##SSMMMMSS....SSMMMMSS..##','##......................##','##......................##',
+  '##SSMMMMSS....SSMMMMSS..##','##SSMMMMSS....SSMMMMSS..##','##SSMMMMSS....SSMMMMSS..##','##SSMMMMSS....SSMMMMSS..##',
+  '##OOOOOO................##','##OOOOOO................##','##########..##############','##########DD##############'],
+  npcs:[{x:7,y:5,n:'Patxi',arq:'patxi',tipo:'cocinero'}]},
  centro:{n:'Galería',suelo:'terrazo',pared:'yeso',mapa:[
-  '###################','#RRRR..EEEE..XXXX.#','#.................#','#.................#',
-  '#OOO....OOO....OOO#','#.................#','#.................#','#YY....J....J...YY#',
-  '#YY.............YY#','#.................#','#EEEE..XXXX..RRRR.#','#.................#',
-  '#########D#########'],
-  npcs:[{x:2.5,y:5.5,n:'Nerea',arq:'nerea',tipo:'ropa'},
-        {x:9.5,y:5.5,n:'Patxi',arq:'patxi',tipo:'cocinero'},
-        {x:16.5,y:5.5,n:'Bego',arq:'bego',tipo:'pescatera'}]},
+  '######################################','######################################','##RRRRRRRR....EEEEEEEE....XXXXXXXX..##','##RRRRRRRR....EEEEEEEE....XXXXXXXX..##',
+  '##..................................##','##..................................##','##..................................##','##..................................##',
+  '##OOOOOO........OOOOOO........OOOOOO##','##OOOOOO........OOOOOO........OOOOOO##','##..................................##','##..................................##',
+  '##..................................##','##..................................##','##YYYY........JJ........JJ......YYYY##','##YYYY........JJ........JJ......YYYY##',
+  '##YYYY..........................YYYY##','##YYYY..........................YYYY##','##..................................##','##..................................##',
+  '##EEEEEEEE....XXXXXXXX....RRRRRRRR..##','##EEEEEEEE....XXXXXXXX....RRRRRRRR..##','##..................................##','##..................................##',
+  '##################..##################','##################DD##################'],
+  npcs:[{x:5,y:11,n:'Nerea',arq:'nerea',tipo:'ropa'},
+        {x:19,y:11,n:'Patxi',arq:'patxi',tipo:'cocinero'},
+        {x:33,y:11,n:'Bego',arq:'bego',tipo:'pescatera'}]},
  /* Los almacenes: la única tienda con más de un mostrador. Las escaleras mecánicas no
     llevan a ninguna planta —no hay pisos— pero dicen que el sitio tiene tres. */
  almacenes:{n:'Almacenes',suelo:'terrazo',pared:'yeso',mapa:[
-  '#####################','#RRRR..RRRR..XXXX..E#','#...................#','#...................#',
-  '#EEEE..EEEE..EEEE..E#','#...................#','#...................#','#OOO....YY....YY.OOO#',
-  '#.......YY....YY....#','#...................#','#XXXX..XXXX..RRRR..R#','#...................#',
-  '#...................#','#EEEE..EEEE..OOOO...#','#...................#','##########D##########'],
-  npcs:[{x:2.5,y:8.5,n:'Nerea',arq:'nerea',tipo:'ropa'},
-        {x:10.5,y:12.5,n:'Maite',arq:'maite',tipo:'encargada'},
-        {x:18.5,y:8.5,n:'Patxi',arq:'patxi',tipo:'cocinero'}]},
+  '##########################################','##########################################','##RRRRRRRR....RRRRRRRR....XXXXXXXX....EE##','##RRRRRRRR....RRRRRRRR....XXXXXXXX....EE##',
+  '##......................................##','##......................................##','##......................................##','##......................................##',
+  '##EEEEEEEE....EEEEEEEE....EEEEEEEE....EE##','##EEEEEEEE....EEEEEEEE....EEEEEEEE....EE##','##......................................##','##......................................##',
+  '##......................................##','##......................................##','##OOOOOO........YYYY........YYYY..OOOOOO##','##OOOOOO........YYYY........YYYY..OOOOOO##',
+  '##..............YYYY........YYYY........##','##..............YYYY........YYYY........##','##......................................##','##......................................##',
+  '##XXXXXXXX....XXXXXXXX....RRRRRRRR....RR##','##XXXXXXXX....XXXXXXXX....RRRRRRRR....RR##','##......................................##','##......................................##',
+  '##......................................##','##......................................##','##EEEEEEEE....EEEEEEEE....OOOOOOOO......##','##EEEEEEEE....EEEEEEEE....OOOOOOOO......##',
+  '##......................................##','##......................................##','####################..####################','####################DD####################'],
+  npcs:[{x:5,y:17,n:'Nerea',arq:'nerea',tipo:'ropa'},
+        {x:21,y:25,n:'Maite',arq:'maite',tipo:'encargada'},
+        {x:37,y:17,n:'Patxi',arq:'patxi',tipo:'cocinero'}]},
  gasoli:{n:'Gasolinera',suelo:'chapa',pared:'chapa',mapa:[
-  '##########','#EEE..NNN#','#........#','#EEE..EEE#','#........#','#XX.....n#',
-  '#........#','#.OOOO...#','#........#','####D#####'],
-  npcs:[{x:3.5,y:8.5,n:'Gorka',arq:'gorka',tipo:'gasolinero'}]},
+  '####################','####################','##EEEEEE....NNNNNN##','##EEEEEE....NNNNNN##',
+  '##................##','##................##','##EEEEEE....EEEEEE##','##EEEEEE....EEEEEE##',
+  '##................##','##................##','##XXXX..........nn##','##XXXX..........nn##',
+  '##................##','##................##','##..OOOOOOOO......##','##..OOOOOOOO......##',
+  '##................##','##................##','########..##########','########DD##########'],
+  npcs:[{x:7,y:17,n:'Gorka',arq:'gorka',tipo:'gasolinero'}]},
 };
 /* Lo que se pisa. Todo lo demás del plano es mueble y frena: la escalera mecánica se anda
    por encima, y el paso de una habitación a otra no tiene hoja. */

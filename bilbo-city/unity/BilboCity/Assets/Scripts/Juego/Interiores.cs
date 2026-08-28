@@ -41,83 +41,124 @@ public static class Interiores {
         // 62 m² útiles, que es lo que mide un piso de los sesenta en Santutxu. La habitación de
         // la derecha es la del primo. Los pisos que se compran reaprovechan este plano.
         {"piso", new DefInterior{ Nombre="Tu piso", Suelo="parquet", Pared="yeso", Mapa=new[]{
-            // El escritorio en el cuarto de la izquierda y la bañera en el baño: dos piezas
-            // que estaban dibujadas y sin una sola planta donde ponerse.
-            "#############","#CCUe#.#.UCC#","#CC.e#.#..CC#","#CC..d.d..CC#","#r...#.#...r#",
-            "#AAA.#.#.EEE#","######.######","#FFF.#.#KKKN#","#.aa.d.d....#","#g.U.#.#iMSS#",
-            "#....#.######","#MMS.#.d...H#","#MMS.#.#TVbb#","######D######"},
+            "##########################","##########################","##CCCCUUee#...#...UUCCCC##","##CCCCUUee#...#...UUCCCC##",
+            "##CCCC..ee#...#.....CCCC##","##CCCC..ee#...#.....CCCC##","##CCCC....d...d.....CCCC##","##CCCC....d...d.....CCCC##",
+            "##rr......#...#.......rr##","##rr......#...#.......rr##","##AAAAAA..#...#...EEEEEE##","##AAAAAA..#...#...EEEEEE##",
+            "############..############","##........##..##KKKKKKKK##","##FFFFFF..#...#.KKKKKKNN##","##FFFFFF..#...#.KKKKKKNN##",
+            "##..aaaa..d...d.........##","##..aaaa..d...d.........##","##gg..UU..#...#.iiMMSSSS##","##gg..UU..#...#.iiMMSSSS##",
+            "##........#...############","##........#...##........##","##MMMMSS..#...d.......HH##","##MMMMSS..#...d.......HH##",
+            "##MMMMSS..#...#.TTVVbbbb##","##MMMMSS..#...#.TTVVbbbb##","############..############","############DD############"},
             Npcs=new NpcInterior[0]}},
         {"portal", new DefInterior{ Nombre="Portal · la casera", Suelo="hidraulico", Pared="yeso", Mapa=new[]{
-            "#######","#WW..Y#","#....Y#","#....Y#","#.aa..#","#.aa..#","#J...J#","#.....#","###D###"},
-            Npcs=new[]{ new NpcInterior{ X=3.5f, Y=4.5f, Nombre="Amaia", Arq="amaia", Tipo="casera" }}}},
+            "##############","##############","##WWWW....YY##","##WWWW....YY##",
+            "##........YY##","##........YY##","##........YY##","##........YY##",
+            "##..aaaa....##","##..aaaa....##","##..aaaa....##","##..aaaa....##",
+            "##JJ......JJ##","##JJ......JJ##","##..........##","##..........##",
+            "######..######","######DD######"},
+            Npcs=new[]{ new NpcInterior{ X=7f, Y=9f, Nombre="Amaia", Arq="amaia", Tipo="casera" }}}},
         {"bar", new DefInterior{ Nombre="Bar Zurito", Suelo="terrazo", Pared="azulejo", Mapa=new[]{
-            "############","#EEEEEE..NN#","#..........#","#BBBBBBB...#","#t.t.t.t...#",
-            "#SMS..SMS..#","#..........#","#SMS..SMS..#","#......#####","#SMS...#TV.#",
-            "#......d...#","#ff.x..#...#","#####D######"},
+            "########################","########################","##EEEEEEEEEEEE....NNNN##","##EEEEEEEEEEEE....NNNN##",
+            "##....................##","##....................##","##BBBBBBBBBBBBBB......##","##BBBBBBBBBBBBBB......##",
+            "##tt..tt..tt..tt......##","##tt..tt..tt..tt......##","##SSMMSS....SSMMSS....##","##SSMMSS....SSMMSS....##",
+            "##....................##","##....................##","##SSMMSS....SSMMSS....##","##SSMMSS....SSMMSS....##",
+            "##............##########","##............##......##","##SSMMSS......#.TTVV..##","##SSMMSS......#.TTVV..##",
+            "##............d.......##","##............d.......##","##ffff..xx....#.......##","##ffff..xx....#.......##",
+            "##########..############","##########DD############"},
             Npcs=new[]{
-                new NpcInterior{ X=3.5f,  Y=2.5f,  Nombre="Josu",  Arq="josu",  Tipo="barman" },
-                new NpcInterior{ X=8.5f,  Y=6.5f,  Nombre="Txema", Arq="txema", Tipo="jefe" },
-                new NpcInterior{ X=5.5f,  Y=10.5f, Nombre="Mikel", Arq="mikel", Tipo="parroquiano" }}}},
+                new NpcInterior{ X=7f,  Y=5f,  Nombre="Josu",  Arq="josu",  Tipo="barman" },
+                new NpcInterior{ X=17f,  Y=13f,  Nombre="Txema", Arq="txema", Tipo="jefe" },
+                new NpcInterior{ X=11f,  Y=21f, Nombre="Mikel", Arq="mikel", Tipo="parroquiano" }}}},
         {"taller", new DefInterior{ Nombre="Taller Iker", Suelo="chapa", Pared="chapa", Mapa=new[]{
-            "###############","#EEEE....EEEE.#","#.............#","#.ZZ.....ZZ...#","#.ZZ.....ZZ...#",
-            "#.ZZ.....ZZ...#","#.ZZ.....ZZ...#","#.ZZ.....ZZ...#","#ww.........nn#","#OOO......QQQ.#",
-            // Y los palés en el taller, que es donde están: contra la pared del portón.
-            "#pp...........#","#####DDDD######"},
-            Npcs=new[]{ new NpcInterior{ X=11.5f, Y=10.5f, Nombre="Iker", Arq="iker", Tipo="mecanico" }}}},
+            "##############################","##############################","##EEEEEEEE........EEEEEEEE..##","##EEEEEEEE........EEEEEEEE..##",
+            "##..........................##","##..........................##","##..ZZZZ..........ZZZZ......##","##..ZZZZ..........ZZZZ......##",
+            "##..ZZZZ..........ZZZZ......##","##..ZZZZ..........ZZZZ......##","##..ZZZZ..........ZZZZ......##","##..ZZZZ..........ZZZZ......##",
+            "##..ZZZZ..........ZZZZ......##","##..ZZZZ..........ZZZZ......##","##..ZZZZ..........ZZZZ......##","##..ZZZZ..........ZZZZ......##",
+            "##wwww..................nnnn##","##wwww..................nnnn##","##OOOOOO............QQQQQQ..##","##OOOOOO............QQQQQQ..##",
+            "##pppp......................##","##pppp......................##","##########........############","##########DDDDDDDD############"},
+            Npcs=new[]{ new NpcInterior{ X=23f, Y=21f, Nombre="Iker", Arq="iker", Tipo="mecanico" }}}},
         {"armeria", new DefInterior{ Nombre="Bazar Nervión", Suelo="chapa", Pared="ladrillo", Mapa=new[]{
-            "##########","#XXXXXXX.#","#........#","#EEE..EEE#","#........#","#EEE..EEE#",
-            "#........#","#.OOOO...#","#........#","####D#####"},
-            Npcs=new[]{ new NpcInterior{ X=3.5f, Y=8.5f, Nombre="Koldo", Arq="koldo", Tipo="armero" }}}},
+            "####################","####################","##XXXXXXXXXXXXXX..##","##XXXXXXXXXXXXXX..##",
+            "##................##","##................##","##EEEEEE....EEEEEE##","##EEEEEE....EEEEEE##",
+            "##................##","##................##","##EEEEEE....EEEEEE##","##EEEEEE....EEEEEE##",
+            "##................##","##................##","##..OOOOOOOO......##","##..OOOOOOOO......##",
+            "##................##","##................##","########..##########","########DD##########"},
+            Npcs=new[]{ new NpcInterior{ X=7f, Y=17f, Nombre="Koldo", Arq="koldo", Tipo="armero" }}}},
         {"merca", new DefInterior{ Nombre="Mercado de la Ribera", Suelo="terrazo", Pared="chapa", Mapa=new[]{
-            "###################","#PPPP..PPPP..PPPP.#","#PPPP..PPPP..PPPP.#","#.................#",
-            "#.................#","#PPPP..PPPP..PPPP.#","#PPPP..PPPP..PPPP.#","#.................#",
-            "#.................#","#OOOO.............#","#########D#########"},
-            Npcs=new[]{ new NpcInterior{ X=2.5f, Y=8.5f, Nombre="Bego", Arq="bego", Tipo="pescatera" }}}},
+            "######################################","######################################","##PPPPPPPP....PPPPPPPP....PPPPPPPP..##","##PPPPPPPP....PPPPPPPP....PPPPPPPP..##",
+            "##PPPPPPPP....PPPPPPPP....PPPPPPPP..##","##PPPPPPPP....PPPPPPPP....PPPPPPPP..##","##..................................##","##..................................##",
+            "##..................................##","##..................................##","##PPPPPPPP....PPPPPPPP....PPPPPPPP..##","##PPPPPPPP....PPPPPPPP....PPPPPPPP..##",
+            "##PPPPPPPP....PPPPPPPP....PPPPPPPP..##","##PPPPPPPP....PPPPPPPP....PPPPPPPP..##","##..................................##","##..................................##",
+            "##..................................##","##..................................##","##OOOOOOOO..........................##","##OOOOOOOO..........................##",
+            "##################..##################","##################DD##################"},
+            Npcs=new[]{ new NpcInterior{ X=5f, Y=17f, Nombre="Bego", Arq="bego", Tipo="pescatera" }}}},
         {"hospital", new DefInterior{ Nombre="Hospital de Basurto", Suelo="hospital", Pared="yeso", Mapa=new[]{
-            "################","#LL#LL#LL#LL...#","#..#..#..#.....#","#..............#","#..............#",
-            "#SSSS....OOOO..#","#..............#","#SSSS.........Q#","#..............#","#SSSS..........#",
-            "#..............#","#######D########"},
-            Npcs=new[]{ new NpcInterior{ X=9.5f, Y=4.5f, Nombre="Nekane", Arq="enfermera", Tipo="enfermera" }}}},
+            "################################","################################","##LLLL#.LLLL#.LLLL#.LLLL......##","##LLLL#.LLLL#.LLLL#.LLLL......##",
+            "##....#.....#.....#...........##","##....#.....#.....#...........##","##............................##","##............................##",
+            "##............................##","##............................##","##SSSSSSSS........OOOOOOOO....##","##SSSSSSSS........OOOOOOOO....##",
+            "##............................##","##............................##","##SSSSSSSS..................QQ##","##SSSSSSSS..................QQ##",
+            "##............................##","##............................##","##SSSSSSSS....................##","##SSSSSSSS....................##",
+            "##............................##","##............................##","##############..################","##############DD################"},
+            Npcs=new[]{ new NpcInterior{ X=19f, Y=9f, Nombre="Nekane", Arq="enfermera", Tipo="enfermera" }}}},
         // Los cinco de abajo los comparten varios sitios: el rótulo lo pone el POI.
         {"ropa", new DefInterior{ Nombre="Tienda de ropa", Suelo="terrazo", Pared="yeso", Mapa=new[]{
-            "###########","#RRRR.RRRR#","#.........#","#.........#","#RRRR.RRRR#","#.........#",
-            "#.........#","#XX....EEE#","#.........#","#.OOO.....#","#.........#","#####D#####"},
-            Npcs=new[]{ new NpcInterior{ X=2.5f, Y=8.5f, Nombre="Nerea", Arq="nerea", Tipo="ropa" }}}},
+            "######################","######################","##RRRRRRRR..RRRRRRRR##","##RRRRRRRR..RRRRRRRR##",
+            "##..................##","##..................##","##..................##","##..................##",
+            "##RRRRRRRR..RRRRRRRR##","##RRRRRRRR..RRRRRRRR##","##..................##","##..................##",
+            "##..................##","##..................##","##XXXX........EEEEEE##","##XXXX........EEEEEE##",
+            "##..................##","##..................##","##..OOOOOO..........##","##..OOOOOO..........##",
+            "##..................##","##..................##","##########..##########","##########DD##########"},
+            Npcs=new[]{ new NpcInterior{ X=5f, Y=17f, Nombre="Nerea", Arq="nerea", Tipo="ropa" }}}},
         {"tasca", new DefInterior{ Nombre="Tasca", Suelo="terrazo", Pared="azulejo", Mapa=new[]{
-            "##########","#EEEE..NN#","#........#","#BBBBB...#","#t.t.t...#","#SMS..SMS#",
-            "#........#","#SMS..SMS#","#........#","####D#####"},
+            "####################","####################","##EEEEEEEE....NNNN##","##EEEEEEEE....NNNN##",
+            "##................##","##................##","##BBBBBBBBBB......##","##BBBBBBBBBB......##",
+            "##tt..tt..tt......##","##tt..tt..tt......##","##SSMMSS....SSMMSS##","##SSMMSS....SSMMSS##",
+            "##................##","##................##","##SSMMSS....SSMMSS##","##SSMMSS....SSMMSS##",
+            "##................##","##................##","########..##########","########DD##########"},
             Npcs=new[]{
-                new NpcInterior{ X=3.5f, Y=2.5f, Nombre="Patxi", Arq="patxi", Tipo="barman" },
-                new NpcInterior{ X=5.5f, Y=8.5f, Nombre="Mikel", Arq="mikel", Tipo="parroquiano" }}}},
+                new NpcInterior{ X=7f, Y=5f, Nombre="Patxi", Arq="patxi", Tipo="barman" },
+                new NpcInterior{ X=11f, Y=17f, Nombre="Mikel", Arq="mikel", Tipo="parroquiano" }}}},
         {"resto", new DefInterior{ Nombre="Restaurante", Suelo="terrazo", Pared="azulejo", Mapa=new[]{
-            "#############","#KKKKN#.EEEE#","#.....#.....#","#..MM.d.....#","######.######",
-            "#SMMS..SMMS.#","#SMMS..SMMS.#","#...........#","#SMMS..SMMS.#","#SMMS..SMMS.#",
-            "#OOO........#","#####D#######"},
-            Npcs=new[]{ new NpcInterior{ X=3.5f, Y=2.5f, Nombre="Patxi", Arq="patxi", Tipo="cocinero" }}}},
+            "##########################","##########################","##KKKKKKKKNN#...EEEEEEEE##","##KKKKKKKKNN#...EEEEEEEE##",
+            "##..........#...........##","##..........#...........##","##....MMMM..d...........##","##....MMMM..d...........##",
+            "############..############","##......................##","##SSMMMMSS....SSMMMMSS..##","##SSMMMMSS....SSMMMMSS..##",
+            "##SSMMMMSS....SSMMMMSS..##","##SSMMMMSS....SSMMMMSS..##","##......................##","##......................##",
+            "##SSMMMMSS....SSMMMMSS..##","##SSMMMMSS....SSMMMMSS..##","##SSMMMMSS....SSMMMMSS..##","##SSMMMMSS....SSMMMMSS..##",
+            "##OOOOOO................##","##OOOOOO................##","##########..##############","##########DD##############"},
+            Npcs=new[]{ new NpcInterior{ X=7f, Y=5f, Nombre="Patxi", Arq="patxi", Tipo="cocinero" }}}},
         {"centro", new DefInterior{ Nombre="Galería", Suelo="terrazo", Pared="yeso", Mapa=new[]{
-            "###################","#RRRR..EEEE..XXXX.#","#.................#","#.................#",
-            "#OOO....OOO....OOO#","#.................#","#.................#","#YY....J....J...YY#",
-            "#YY.............YY#","#.................#","#EEEE..XXXX..RRRR.#","#.................#",
-            "#########D#########"},
+            "######################################","######################################","##RRRRRRRR....EEEEEEEE....XXXXXXXX..##","##RRRRRRRR....EEEEEEEE....XXXXXXXX..##",
+            "##..................................##","##..................................##","##..................................##","##..................................##",
+            "##OOOOOO........OOOOOO........OOOOOO##","##OOOOOO........OOOOOO........OOOOOO##","##..................................##","##..................................##",
+            "##..................................##","##..................................##","##YYYY........JJ........JJ......YYYY##","##YYYY........JJ........JJ......YYYY##",
+            "##YYYY..........................YYYY##","##YYYY..........................YYYY##","##..................................##","##..................................##",
+            "##EEEEEEEE....XXXXXXXX....RRRRRRRR..##","##EEEEEEEE....XXXXXXXX....RRRRRRRR..##","##..................................##","##..................................##",
+            "##################..##################","##################DD##################"},
             Npcs=new[]{
-                new NpcInterior{ X=2.5f,  Y=5.5f, Nombre="Nerea", Arq="nerea", Tipo="ropa" },
-                new NpcInterior{ X=9.5f,  Y=5.5f, Nombre="Patxi", Arq="patxi", Tipo="cocinero" },
-                new NpcInterior{ X=16.5f, Y=5.5f, Nombre="Bego",  Arq="bego",  Tipo="pescatera" }}}},
+                new NpcInterior{ X=5f,  Y=11f, Nombre="Nerea", Arq="nerea", Tipo="ropa" },
+                new NpcInterior{ X=19f,  Y=11f, Nombre="Patxi", Arq="patxi", Tipo="cocinero" },
+                new NpcInterior{ X=33f, Y=11f, Nombre="Bego",  Arq="bego",  Tipo="pescatera" }}}},
         // Los almacenes: la única tienda con más de un mostrador. Las escaleras mecánicas no
         // llevan a ninguna planta —no hay pisos— pero dicen que el sitio tiene tres.
         {"almacenes", new DefInterior{ Nombre="Almacenes", Suelo="terrazo", Pared="yeso", Mapa=new[]{
-            "#####################","#RRRR..RRRR..XXXX..E#","#...................#","#...................#",
-            "#EEEE..EEEE..EEEE..E#","#...................#","#...................#","#OOO....YY....YY.OOO#",
-            "#.......YY....YY....#","#...................#","#XXXX..XXXX..RRRR..R#","#...................#",
-            "#...................#","#EEEE..EEEE..OOOO...#","#...................#","##########D##########"},
+            "##########################################","##########################################","##RRRRRRRR....RRRRRRRR....XXXXXXXX....EE##","##RRRRRRRR....RRRRRRRR....XXXXXXXX....EE##",
+            "##......................................##","##......................................##","##......................................##","##......................................##",
+            "##EEEEEEEE....EEEEEEEE....EEEEEEEE....EE##","##EEEEEEEE....EEEEEEEE....EEEEEEEE....EE##","##......................................##","##......................................##",
+            "##......................................##","##......................................##","##OOOOOO........YYYY........YYYY..OOOOOO##","##OOOOOO........YYYY........YYYY..OOOOOO##",
+            "##..............YYYY........YYYY........##","##..............YYYY........YYYY........##","##......................................##","##......................................##",
+            "##XXXXXXXX....XXXXXXXX....RRRRRRRR....RR##","##XXXXXXXX....XXXXXXXX....RRRRRRRR....RR##","##......................................##","##......................................##",
+            "##......................................##","##......................................##","##EEEEEEEE....EEEEEEEE....OOOOOOOO......##","##EEEEEEEE....EEEEEEEE....OOOOOOOO......##",
+            "##......................................##","##......................................##","####################..####################","####################DD####################"},
             Npcs=new[]{
-                new NpcInterior{ X=2.5f,  Y=8.5f,  Nombre="Nerea", Arq="nerea", Tipo="ropa" },
-                new NpcInterior{ X=10.5f, Y=12.5f, Nombre="Maite", Arq="maite", Tipo="encargada" },
-                new NpcInterior{ X=18.5f, Y=8.5f,  Nombre="Patxi", Arq="patxi", Tipo="cocinero" }}}},
+                new NpcInterior{ X=5f,  Y=17f,  Nombre="Nerea", Arq="nerea", Tipo="ropa" },
+                new NpcInterior{ X=21f, Y=25f, Nombre="Maite", Arq="maite", Tipo="encargada" },
+                new NpcInterior{ X=37f, Y=17f,  Nombre="Patxi", Arq="patxi", Tipo="cocinero" }}}},
         {"gasoli", new DefInterior{ Nombre="Gasolinera", Suelo="chapa", Pared="chapa", Mapa=new[]{
-            "##########","#EEE..NNN#","#........#","#EEE..EEE#","#........#","#XX.....n#",
-            "#........#","#.OOOO...#","#........#","####D#####"},
-            Npcs=new[]{ new NpcInterior{ X=3.5f, Y=8.5f, Nombre="Gorka", Arq="gorka", Tipo="gasolinero" }}}},
+            "####################","####################","##EEEEEE....NNNNNN##","##EEEEEE....NNNNNN##",
+            "##................##","##................##","##EEEEEE....EEEEEE##","##EEEEEE....EEEEEE##",
+            "##................##","##................##","##XXXX..........nn##","##XXXX..........nn##",
+            "##................##","##................##","##..OOOOOOOO......##","##..OOOOOOOO......##",
+            "##................##","##................##","########..##########","########DD##########"},
+            Npcs=new[]{ new NpcInterior{ X=7f, Y=17f, Nombre="Gorka", Arq="gorka", Tipo="gasolinero" }}}},
     };
 
     /// <summary>Lo que se pisa. Todo lo demás del plano es mueble y frena: la escalera
@@ -206,9 +247,19 @@ public static class Interiores {
             for (int x = 0; x < m[y].Length; x++) {
                 char ch = m[y][x];
                 if (ch == '#' || Blando.IndexOf(ch) >= 0 || visto[y][x]) continue;
+                // Lo que no se junta nunca —sillas, taburetes, plantas— ocupa dos casillas
+                // de lado desde que la rejilla es de 40 cm: una silla mide 80. Partiéndolo
+                // por casilla salían cuatro medias sillas donde había una.
                 if (Unitario.IndexOf(ch) >= 0) {
-                    visto[y][x] = true;
-                    salida.Add(new PiezaInterior{ Ch=ch, X=x, Y=y, W=1, H=1 });
+                    int u = Mathf.RoundToInt(0.8f / ForjaInterior.Metro);
+                    int uw = 0;
+                    while (uw < u && x + uw < m[y].Length && m[y][x+uw] == ch && !visto[y][x+uw]) uw++;
+                    int uh = 0;
+                    while (uh < u && y + uh < alto && m[y+uh].Length > x && m[y+uh][x] == ch && !visto[y+uh][x]) uh++;
+                    for (int j = 0; j < uh; j++)
+                        for (int i = 0; i < uw; i++)
+                            if (m[y+j][x+i] == ch) visto[y+j][x+i] = true;
+                    salida.Add(new PiezaInterior{ Ch=ch, X=x, Y=y, W=uw, H=uh });
                     continue;
                 }
                 int aw = 0;

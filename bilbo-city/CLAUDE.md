@@ -566,21 +566,32 @@ soltar y volver a empujar cambiaba de paseo a carrera en un fotograma.
 lanzar eventos, así que mirando solo el estado del botón el coche no arrancaba en las
 pruebas aunque en el juego fuese bien.
 
-## Los interiores: la casilla mide 0,80 m
+## Los interiores: la casilla mide 0,40 m
 
 Fuera, una casilla son **5,16 m**. Dentro no puede serlo, y durante mucho tiempo lo fue: con
 esa vara el piso medía **72×41 m**, una cama 5 m de ancho, la puerta 10 m y cruzar el salón
 costaba cincuenta segundos. Lo que se veía al entrar no se parecía a una casa porque no
 tenía el tamaño de una casa.
 
-Ahora la casilla de interior mide **0,80 m** —el ancho de una puerta de paso— y se dibuja a
-**16 px**: 20 px por metro, que es la densidad a la que está dibujada la gente. Dentro de una
+Ahora la casilla de interior mide **0,40 m** y se dibuja a **8 px**: 20 px por metro, que es
+la densidad a la que está dibujada la gente.
+
+Midió 0,80 durante bastante tiempo, y ahí había otro problema escondido: **un muro ocupa una
+casilla entera**, así que los tabiques medían 80 cm. Uno de verdad son 10 y una medianera 30.
+Entre el 20 y el 44 % de la superficie de cada planta era pared —el piso perdía casi la
+mitad— y por eso por dentro los sitios parecían cajas de cartón con todo apelotonado. Con la
+casilla a 0,40 los tabiques de dentro bajan a 40 cm; **la fachada se queda de 80 a propósito**,
+que en un edificio viejo de Bilbao eso es un muro de carga, y además es lo que tiene el
+mobiliario arrimado detrás. En pantalla no cambia nada: hay el doble de casillas, a la mitad.
+
+Lo que la rejilla fina **no** arregla sola es la colocación: los muebles siguen donde los puso
+la rejilla vieja, así que un armario deja 40 cm de hueco contra la pared. Eso se arregla
+recolocando cada planta a mano, y es trabajo de diseño, no de transformación. Dentro de una
 casa la vara de medir es una persona, no un coche, así que **dentro el personaje sale a
 escala real** y no con la sobreescala que necesita la calle (ver `ESTILO.md`).
 
-De ahí sale todo lo demás sin tocar nada más: 1,4 m/s andando son 1,75 casillas por segundo,
-`npcCerca` a 1,7 casillas es hablar a metro y medio, y la casilla que se mira delante para
-dormir o para que te curen cae a 70 cm.
+De ahí sale todo lo demás sin tocar nada más: las velocidades y las distancias se escriben en
+metros y se convierten con `MS_I`, así que afinar la rejilla no movió ni una.
 
 **Los trece sitios son plantas, no cajas.** El piso compartido tiene dos habitaciones, salón,
 cocina y baño alrededor de un pasillo —62 m² útiles, lo que mide un piso de los sesenta en
