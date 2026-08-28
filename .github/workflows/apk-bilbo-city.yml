@@ -10,8 +10,10 @@ on:
       - 'bilbo-city/referencia/bilbo-city.html'
       - '.github/workflows/apk-bilbo-city.yml'
 
+# Escritura porque el APK se publica en un release: el artifact de Actions caduca a los
+# noventa días y hay que estar dentro de GitHub para bajarlo. El release da una URL directa.
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   apk:
@@ -56,3 +58,16 @@ jobs:
           name: BilboCity-apk
           path: BilboCity.apk
           if-no-files-found: error
+
+      # Y en un release con etiqueta fija, que se reescribe en cada compilación: así hay una
+      # URL estable a la última versión, sin tener que entrar en Actions a buscar el run.
+      # `make_latest: false` para que no desplace a un release de verdad el día que lo haya.
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk
+          name: APK de desarrollo
+          body: |
+            Compilado de `${{ github.sha }}` en la rama `${{ github.ref_name }}`.
+            APK de depuración: sirve para instalar y probar, no para la Play Store.
+          files: BilboCity.apk
+          make_latest: false
