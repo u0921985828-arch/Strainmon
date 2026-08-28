@@ -1346,6 +1346,28 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       bien.push('el fotograma cuesta ' + medido.map(m => m[0] + ' ' + m[1].toFixed(1)).join(' · ') + ' ms (tope ' + TOPE + ')');
     }
 
+    // ── 9 ter · el sonido, que no se ejercitaba nunca ──────────────────
+    // `sfx()` empieza con `if(!AU.ctx) return`, y el arnés no tenía AudioContext: todas
+    // las llamadas a sonido de toda la batería eran no-ops silenciosos y el catálogo
+    // entero se quedaba sin ejercitar. Ahora el arnés trae un contexto de mentira —los
+    // nodos no suenan, pero se construyen, se conectan y se programan, que es donde están
+    // los errores— y aquí se toca el catálogo entero.
+    {
+      A.audioInit();
+      ok(!!A.AU.ctx, 'el audio no arranca: sin contexto, ningún sonido se ejercita');
+      const cat = ['disparo', 'escopeta', 'golpe', 'explosion', 'choque', 'grito',
+                   'claxon', 'dinero', 'caja'];
+      let roto = '';
+      for (const t of cat) {
+        try { A.sfx(t, .8); } catch (e) { roto = roto || (t + ': ' + e.message); }
+      }
+      ok(!roto, 'un sonido del catálogo revienta — ' + roto);
+      // El motor va aparte: es un oscilador que vive todo el rato y se modula.
+      try { A.motorAudio(6, 11); A.motorAudio(null); }
+      catch (e) { ok(false, 'el motor revienta: ' + e.message); }
+      bien.push('los ' + cat.length + ' sonidos del catálogo se producen sin reventar');
+    }
+
     // ── 10 · el guardado va y vuelve ───────────────────────────────────
     // Antes esto era `hay alguna clave en el almacén`: pasaba en verde aunque lo guardado
     // fuese basura, porque nadie llamaba a cargar(). Un campo nuevo en S que se olvidara

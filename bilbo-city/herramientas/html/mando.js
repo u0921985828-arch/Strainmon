@@ -10,6 +10,11 @@
  *
  * La regla de bolsillo: un pulgar adulto pide unos 20 mm de zona de contacto y unos 30 mm
  * de recorrido cómodo. Por debajo de 16 mm el joystick es más pequeño que el dedo.
+ *
+ * Y no solo lo imprime: **falla**. Durante un tiempo esto medía y salía con 0 pasara lo
+ * que pasara, así que el joystick de 14,5 mm que obligó a rehacer el mando entero se
+ * habría podido colar otra vez sin que nadie lo viera. No está dentro de `verificar.sh`
+ * porque necesita navegador; se ejecuta a mano al tocar el mando o la portada.
  */
 // No se usa el arnés: aquí manda el navegador de verdad, no el DOM simulado.
 const fs = require('fs'), path = require('path');
@@ -31,6 +36,7 @@ const MOVILES = [
   const PUESTO = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
   const nav = await chromium.launch(fs.existsSync(PUESTO) ? { executablePath: PUESTO } : {});
   const tomas = [], portadas = [];
+  const medidas = [];
   console.log('móvil            marco   pantalla   joystick   botón A');
   for (const m of MOVILES) {
     const pag = await nav.newPage({ viewport: { width: m.w, height: m.h } });
@@ -64,10 +70,22 @@ const MOVILES = [
       (mm(med.cv.width) + ' mm').padEnd(11),
       (mm(med.joy.width) + ' mm').padEnd(11),
       med.btn ? mm(med.btn.width) + ' mm' : '—');
+    medidas.push({ n: m.n, joy: +mm(med.joy.width), cv: +mm(med.cv.width),
+                   btn: med.btn ? +mm(med.btn.width) : null });
     tomas.push(await pag.screenshot());
     await pag.close();
   }
   await nav.close();
+
+  // Los mínimos, y de dónde salen: por debajo de 16 mm el joystick es más pequeño que el
+  // pulgar que lo usa, y un botón de menos de 9 mm se falla más de lo que se acierta.
+  const fallos = [];
+  for (const m of medidas) {
+    if (m.joy < 16) fallos.push(m.n + ': joystick de ' + m.joy.toFixed(1) + ' mm, menos que el pulgar');
+    if (m.btn && m.btn < 9) fallos.push(m.n + ': botones de ' + m.btn.toFixed(1) + ' mm');
+    if (m.cv < 40) fallos.push(m.n + ': la pantalla del juego se queda en ' + m.cv.toFixed(0) + ' mm');
+  }
+  for (const f of fallos) console.log('  FALLO ' + f);
 
   const salida = process.argv[2] || path.join(__dirname, '..', '..', 'referencia', 'capturas', 'mando.png');
   fs.mkdirSync(path.dirname(salida), { recursive: true });
@@ -78,5 +96,10 @@ const MOVILES = [
     console.log('->', pp);
   }
   console.log('->', salida);
+  if (fallos.length) {
+    console.log('\n' + fallos.length + ' medidas por debajo del mínimo');
+    process.exit(1);
+  }
+  console.log('\n  ok    el mando se puede usar con el pulgar en los ' + medidas.length + ' tamaños');
   process.exit(0);
 })();

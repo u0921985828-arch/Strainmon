@@ -24,6 +24,9 @@ if [ "$QUE" = "todo" ] || [ "$QUE" = "csharp" ]; then
   echo "═══ mobiliario · HTML contra Unity ═══"
   python3 herramientas/plano/mobiliario.py
   echo
+  echo "═══ vehículos · HTML contra Unity ═══"
+  python3 herramientas/plano/vehiculos.py
+  echo
   echo "═══ armas · HTML contra Unity ═══"
   python3 herramientas/plano/armas.py
   echo

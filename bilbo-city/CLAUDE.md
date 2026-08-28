@@ -50,7 +50,12 @@ verifica que los sitios están sobre suelo pisable y cerca de donde los pone el 
 la conectividad de la red viaria, y prueba combate, conducción desde 16 puntos al azar,
 muerte y 150 s de bucle.
 
-Dos cosas de esa batería no se miden solas y hay que decirlas aparte. **El reloj del arnés es
+Tres cosas de esa batería no se miden solas y hay que decirlas aparte. **El sonido no se
+ejercitaba**: `sfx()` empieza con `if(!AU.ctx) return` y el arnés no tenía `AudioContext`, así
+que todas las llamadas a sonido de toda la batería eran no-ops silenciosos y el catálogo
+entero se quedaba sin tocar. Ahora el arnés trae un contexto de mentira —los nodos no suenan,
+aquí no hay tarjeta, pero se construyen, se conectan y se programan, que es donde están los
+errores— y la batería produce los nueve sonidos y el motor. **El reloj del arnés es
 virtual** —`now += 16.7` por paso—, así que «150 s de bucle sin excepciones» no dice nada del
 coste: un bucle O(n²) nuevo pasaba igual de verde. El tiempo se mide desde fuera, con
 `process.hrtime`, en cuatro sitios distintos de la ciudad. El canvas del arnés es de software
@@ -67,6 +72,11 @@ las opciones de Unity 2022.3 (netstandard2.1, C# 9) y la separación de ensambla
 del motor que el remedo no tenga, añádela a `herramientas/compilar/apinado/Api/` con la
 firma exacta de Unity** — una firma inventada de más tapa errores reales, que es lo único
 que puede estropear esta herramienta.
+
+`herramientas/plano/vehiculos.py` compara la punta de los dieciocho chasis. La tabla existía
+solo en el prototipo: en el puerto **todo coche se creaba con `vmax: 11f` fijo**, así que el
+autobús de línea corría lo mismo que el deportivo, y comprarse un deportivo por 1600 € solo
+ponía un booleano —el coche del jugador seguía siendo el mismo utilitario—.
 
 `herramientas/plano/armas.py` compara la tabla de armas —daño, alcance, cadencia, precio y
 munición— entre los dos. Es la trampa de siempre y ya mordió: el alcance del puño y el del
@@ -533,7 +543,10 @@ Dos trampas del arranque, las dos por preguntar lo que no era:
 
 La pantalla en medio y los mandos en el marco. El reparto no se decide de memoria:
 `node herramientas/html/mando.js` abre el juego en Chromium a tamaños de móvil reales,
-mide en píxeles CSS y lo pasa a milímetros. Con el 17 % de marco de la primera versión y el
+mide en píxeles CSS y lo pasa a milímetros. Y **falla**, no solo mide: durante un tiempo salía con 0 pasara lo que pasara, así que el
+joystick que obligó a rehacer el mando se habría podido colar otra vez. No está dentro de
+`verificar.sh` porque necesita navegador; se ejecuta a mano al tocar el mando o la portada.
+Con el 17 % de marco de la primera versión y el
 joystick atado a la altura, en un móvil de 5,4" el joystick salía a **14,5 mm** —más
 pequeño que el pulgar que lo usa— y los botones a 9,1 mm, justo en el mínimo que se puede
 acertar. Ahora el marco es `clamp(112px, 20%, 220px)` y el joystick se mide **desde el

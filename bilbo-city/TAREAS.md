@@ -84,9 +84,10 @@ Repasar comportamiento contra el prototipo, que es el probado:
 - [ ] Tiempos de las misiones con límite.
 - [ ] Economía: precios, pagos de curros, alquiler semanal. Un comparador tipo `armas.py`
       lo sujetaría (`CURROS`, `PROPIEDADES`, `PRENDAS`, `XP_NIVEL`): hoy cuadran, pero sin red.
-- [ ] `VMAX_VEH` no existe en Unity: todo coche del tráfico se crea con `vmax:11f` fijo,
-      así que el autobús corre lo mismo que el deportivo. Y comprar furgoneta o deportivo
-      solo pone un booleano: el coche del jugador no cambia ni de modelo ni de punta.
+- [x] `VMAX_VEH` no existía en Unity: todo coche se creaba con `vmax:11f` fijo, así que el
+      autobús corría lo mismo que el deportivo. Y comprar furgoneta o deportivo solo ponía
+      un booleano: el coche del jugador no cambiaba ni de modelo ni de punta. Con comparador
+      (`herramientas/plano/vehiculos.py`) y en `./verificar.sh`.
 - [ ] Auto-apuntado: solo a enemigos, nunca a viandantes salvo con las manos.
 - [ ] Mobiliario pegado al sitio: la marquesina de la parada, la terraza del bar, el toldo
       del comercio y la placa del singular. En el HTML van en `colocarCalle()`; el puerto
@@ -99,6 +100,12 @@ sin muelles, la celda de PixelLab, y las cinco piezas de obra sin acera—. Ahor
 lo comprueba sola: toda pieza de `MOB_M`, todo mueble de `MUEBLES` y todo chasis de `CHASIS`
 tienen que estar plantados en algún sitio. Lo que quedó al descubierto y sigue abierto:
 
+- [x] El sonido no se ejercitaba en absoluto: `sfx()` sale por `if(!AU.ctx) return` y el
+      arnés no tenía `AudioContext`, así que toda la batería lo tocaba en vacío. El arnés
+      trae ahora un contexto de mentira y la batería produce los nueve sonidos y el motor.
+- [x] `mando.js` medía y salía con 0 pasara lo que pasara. Ahora falla si el joystick baja
+      de 16 mm, un botón de 9 o la pantalla de 40. Sigue fuera de `verificar.sh` porque
+      necesita navegador.
 - [ ] Seis iconos del HUD forjados y sin usar: `pintxo`, `botellin`, `plato`, `botiquin`,
       `llaveInglesa` y `movil`. Las opciones de diálogo son texto sin icono, así que o se
       les pone icono a las opciones —que es lo que pedían estos seis— o se borran. No hay

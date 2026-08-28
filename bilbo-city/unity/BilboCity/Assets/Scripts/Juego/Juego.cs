@@ -174,13 +174,14 @@ public class Juego : MonoBehaviour {
     }
 
     void Poblar() {
-        NuevoCoche(Estado.Sitio_("piso").Pos + new Vector2(1.4f,0), "utilitario", 0, true, 11f);
+        NuevoCoche(Estado.Sitio_("piso").Pos + new Vector2(1.4f,0), "utilitario", 0, true, Velocidades.De("utilitario"));
         // Cuarenta coches aparcados repartidos por el término municipal entero son cuarenta
         // coches que no se ven nunca: se sueltan alrededor del jugador y se arriman a su
         // plaza —mirando a la calle, no cruzados en mitad del carril—.
         for (int i = 0; i < 40; i++) {
             var p = Ciudad.PuntoCalle(Mathf.RoundToInt(Jug.Pos.x), Mathf.RoundToInt(Jug.Pos.y), 48);
-            var v = NuevoCoche(p, TipoParaBarrio(p), (i+1) % Forja.Libreas.Length, false, 11f);
+            string t = TipoParaBarrio(p);
+            var v = NuevoCoche(p, t, (i+1) % Forja.Libreas.Length, false, Velocidades.De(t));
             AparcarCoche(v, Jug.Pos, 48);
         }
         for (int i = 0; i < 16; i++) NuevoTrafico();
@@ -252,6 +253,24 @@ public class Juego : MonoBehaviour {
         }
     }
 
+    /// <summary>El coche del jugador, el que aparece en el portal. Comprarse una furgoneta
+    /// o un deportivo tiene que cambiarlo: antes solo ponía un booleano y pagabas 1600 €
+    /// por un coche que seguía siendo el mismo utilitario y corriendo lo mismo.</summary>
+    public Vehiculo MiCoche() {
+        foreach (var c in Coches) if (c.Propio) return c;
+        return null;
+    }
+
+    /// <summary>Le pone al coche del jugador el modelo que le toca por lo que ha comprado.</summary>
+    public void ActualizarMiCoche() {
+        var c = MiCoche();
+        if (c == null) return;
+        var E = Estado.I;
+        if (E.TieneDeportivo) { c.Tipo = "deportivo"; c.Librea = 2; }
+        else if (E.TieneFurgo) { c.Tipo = "furgoLarga"; }
+        c.VMax = Velocidades.De(c.Tipo);
+    }
+
     public Vehiculo NuevoCoche(Vector2 p, string tipo, int librea, bool propio, float vmax) {
         var go = new GameObject("coche");
         go.transform.SetParent(_entidades, false);
@@ -263,7 +282,7 @@ public class Juego : MonoBehaviour {
     }
 
     public Vehiculo MarcarCoche(Vector2 p) {
-        var v = NuevoCoche(p, "berlina", 3, false, 11f);
+        var v = NuevoCoche(p, "berlina", 3, false, Velocidades.De("berlina"));
         v.Marcado = true;
         return v;
     }

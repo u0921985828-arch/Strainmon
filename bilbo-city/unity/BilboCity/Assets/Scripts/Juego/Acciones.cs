@@ -430,13 +430,13 @@ public static class Acciones {
                                  ? "Necesitas nivel " + Bienes.NivelDe(Bienes.NivelVehiculo, "furgo")
                                  : "Abre mudanzas y entregas grandes.", Precio=700,
                             YaLoTiene=() => E.TieneFurgo || E.NivelPj < Bienes.NivelDe(Bienes.NivelVehiculo, "furgo"),
-                            Comprar=() => { E.TieneFurgo = true; Hud.I.Aviso("FURGONETA COMPRADA"); }},
+                            Comprar=() => { E.TieneFurgo = true; Juego.I.ActualizarMiCoche(); Hud.I.Aviso("FURGONETA COMPRADA"); }},
                         new Articulo{ Icono="deportivo", Titulo="Deportivo",
                             Desc = E.NivelPj < Bienes.NivelDe(Bienes.NivelVehiculo, "deportivo")
                                  ? "Necesitas nivel " + Bienes.NivelDe(Bienes.NivelVehiculo, "deportivo")
                                  : "Más velocidad y mejor agarre.", Precio=1600,
                             YaLoTiene=() => E.TieneDeportivo || E.NivelPj < Bienes.NivelDe(Bienes.NivelVehiculo, "deportivo"),
-                            Comprar=() => { E.TieneDeportivo = true; Hud.I.Aviso("DEPORTIVO COMPRADO"); }}
+                            Comprar=() => { E.TieneDeportivo = true; Juego.I.ActualizarMiCoche(); Hud.I.Aviso("DEPORTIVO COMPRADO"); }}
                     })},
                     new Opcion{ Texto="Repintar el coche", Coste=(Bienes.EsMio("taller") ? 0 : 100) + " €", Accion=() => {
                         int c = Bienes.EsMio("taller") ? 0 : 100;

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BilboCity {
@@ -6,6 +7,29 @@ namespace BilboCity {
 /// Coche con velocidad y orientación separadas: agarre lateral, derrape con el botón de correr,
 /// daño acumulado y explosión. Nada de físicas de Unity, todo a mano para que sea predecible.
 /// </summary>
+/// <summary>
+/// La punta de cada chasis, en km/h de verdad. Todo coche que se creaba salía con
+/// `vmax: 11f` fijo, así que el autobús de línea corría lo mismo que el deportivo y
+/// comprarse un deportivo no cambiaba nada. `herramientas/plano/vehiculos.py` compara
+/// esta tabla con la del prototipo.
+/// </summary>
+public static class Velocidades {
+    public static readonly Dictionary<string, int> KmH = new Dictionary<string, int> {
+        {"utilitario",120}, {"berlina",150}, {"ranchera",145}, {"furgoCorta",110},
+        {"furgoLarga",105}, {"deportivo",200}, {"todoterreno",140}, {"taxi",150},
+        {"patrulla",170}, {"ambulancia",120}, {"basura",80}, {"autobus",80},
+        {"camionObra",90}, {"moto",130}, {"bomberos",90}, {"grua",95},
+        {"microbus",95}, {"furgonPoli",130},
+    };
+
+    /// <summary>De km/h a casillas por segundo, que es en lo que se mueve el juego.</summary>
+    public static float De(string tipo) {
+        int kmh;
+        if (!KmH.TryGetValue(tipo, out kmh)) kmh = 120;
+        return kmh / 3.6f / Movimiento.MetroCalle;
+    }
+}
+
 public class Vehiculo : MonoBehaviour {
     public Vector2 Pos, Vel;
     public float Ang, VMax = 11f, Dano;

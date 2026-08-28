@@ -36,6 +36,25 @@ cache.c=Object.assign(real,{style:{},className:'',classList:{add(){},remove(){},
  addEventListener:()=>{},appendChild:()=>{},querySelector:()=>el(),querySelectorAll:()=>[],
  clientWidth:LIENZO_W,clientHeight:LIENZO_H});
 global.addEventListener=()=>{};global.devicePixelRatio=1;
+/* Un AudioContext de mentira. Sin esto `sfx()` sale por su `if(!AU.ctx) return` en la
+   primera línea y **todas** las llamadas a sonido de toda la batería son no-ops: el
+   catálogo entero se quedaba sin ejercitar y un `sfx` con un tipo nuevo que reventara no
+   lo veía nadie. Los nodos no suenan —aquí no hay tarjeta— pero sí se construyen, se
+   conectan y se programan, que es donde están los errores de verdad. */
+const _param=v=>({value:v,setValueAtTime(){return this;},exponentialRampToValueAtTime(){return this;},
+ linearRampToValueAtTime(){return this;},cancelScheduledValues(){return this;}});
+const _nodo=(extra={})=>Object.assign({connect(){},disconnect(){},start(){},stop(){}},extra);
+global.__sonados=[];
+global.AudioContext=function(){
+ this.currentTime=0; this.sampleRate=44100; this.destination=_nodo();
+ this.state='running'; this.resume=()=>Promise.resolve();
+ this.createGain=()=>_nodo({gain:_param(1)});
+ this.createOscillator=()=>_nodo({frequency:_param(440),detune:_param(0),type:'sine'});
+ this.createBiquadFilter=()=>_nodo({frequency:_param(350),Q:_param(1),gain:_param(0),type:'lowpass'});
+ this.createBufferSource=()=>_nodo({buffer:null,playbackRate:_param(1),loop:false});
+ this.createBuffer=(ch,n)=>({numberOfChannels:ch,length:n,sampleRate:44100,
+  getChannelData:()=>new Float32Array(n)});
+};
 let store={};global.localStorage={getItem:k=>store[k]??null,setItem:(k,v)=>store[k]=v,removeItem:k=>delete store[k]};
 let now=0;global.performance={now:()=>now};
 let raf=null;global.requestAnimationFrame=f=>{raf=f;};
@@ -58,7 +77,7 @@ js=js.slice(0,i)+`global.__={S,player,MISIONES,empezarMision,avanzarPaso,objetiv
  NIVEL_ARMA,NIVEL_VEHICULO,comer,verTab,telC,roof,famDe,familiaTejado,TEJADO_DE,PROP,SINGULARES,PLANO_SINGULAR,TS,CALLES,calleEn,calleDe,LARGO_CALLE,nombrarCalles,
  BASES,cargarSprites,setDe,lutDe,hojaDeSet,TORSOS,PIERNAS,CALZADO,C,COMPLEX,ARMA_MANO,FOG,contorno,sc,ANCHO_FACH,REVOCO,PISO_BARRIO,poseAndar,MS,ZANCADA,ZANCADA_C,ESC_FIG,V_ANDAR,V_CORRER,V_PEATON,PX_M,
  poi,pasoActual,npcCerca,MOB_M,CAPA,capaAct,sombraSol,sombraCorta,calcularSol,luzAmbiente,largoSombra,SOL,MOB_CONTORNO,empezarPrologo,PROLOGO,PRIMO,
- MOB_PIEZA,SIEMBRA,gaviotas,AVE,actGaviotas,SIEMBRA_TEJADO,TOPE_ALTO,ALTO_TAPA,cajaProp,cajaJugador,tapa,plantar,anclaMob,cargar,guardar,CLAVE,andable,CHASIS,TIPOS_CIVIL,TIPOS_PESADO,TRAFICO_BARRIO,MUEBLES,INT,siluetas:()=>siluetas};
+ MOB_PIEZA,SIEMBRA,gaviotas,AVE,actGaviotas,SIEMBRA_TEJADO,TOPE_ALTO,ALTO_TAPA,cajaProp,cajaJugador,tapa,plantar,anclaMob,cargar,guardar,CLAVE,andable,sfx,audioInit,AU,motorAudio,CHASIS,TIPOS_CIVIL,TIPOS_PESADO,TRAFICO_BARRIO,MUEBLES,INT,siluetas:()=>siluetas};
  sembrar(SEMILLA);`+js.slice(i);
 eval(js);
 module.exports={H,step:n=>{for(let k=0;k<n;k++){now+=16.7;const f=raf;raf=null;if(!f)throw new Error('sin frame');f(now);}},

@@ -324,6 +324,8 @@ public static class Guardado {
         }
         E.Contratos.Clear();
         if (p.contratos != null) E.Contratos.AddRange(p.contratos);
+        // Y el coche que te compraste sigue siendo el tuyo al cargar la partida.
+        if (Juego.I != null) Juego.I.ActualizarMiCoche();
         // Y una posición sin validar saca al jugador del mapa, donde no hay casilla que
         // pisar. Se cae a la casilla andable más cercana.
         if (Juego.I != null && Juego.I.Jug != null && p.x > 0) {
