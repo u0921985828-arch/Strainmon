@@ -43,15 +43,21 @@ public static class ForjaInterior {
         }
         Suelos["hidraulico"] = Forja.SpriteDe(g);
 
-        g = T(); g.Rellenar(Paleta.HormigonL); g.Ruido(new[]{Paleta.Acero,Paleta.Crema,Paleta.HormigonO}, 34);
-        g.P(0, 0, 16, 1, Paleta.HormigonO); g.P(0, 0, 1, 16, Paleta.HormigonO);
+        // La baldosa de terrazo son 40 cm —ocho píxeles—, no ochenta. La junta iba en el
+        // canto del tile, así que dibujaba una cuadrícula de metro; y en HormigonO, dos
+        // tonos por debajo del suelo. Juntas las dos cosas, el bar era papel milimetrado.
+        g = T(); g.Rellenar(Paleta.HormigonL);
+        g.Ruido(new[]{Paleta.HormigonO,Paleta.Hueso,Paleta.Crema,Paleta.AceroO}, 46);
+        for (int i = 0; i < 16; i += 8) { g.P(0, i, 16, 1, Paleta.AceroO); g.P(i, 0, 1, 16, Paleta.AceroO); }
         Suelos["terrazo"] = Forja.SpriteDe(g);
 
         g = T(); g.Rellenar(Paleta.H("#4d5157")); g.Ruido(new[]{Paleta.H("#42464b"),Paleta.H("#5b6067")}, 16);
         Suelos["chapa"] = Forja.SpriteDe(g);
 
-        g = T(); g.Rellenar(Paleta.H("#8fa8a0")); g.Ruido(new[]{Paleta.H("#7d968e"),Paleta.H("#a3bab2")}, 12);
-        g.P(0, 0, 1, 16, Paleta.H("#7d968e"));
+        // El suelo de un hospital es lámina de vinilo en rollos de dos metros: no tiene una
+        // junta cada ochenta centímetros. Queda el jaspeado, que es lo que sí se ve.
+        g = T(); g.Rellenar(Paleta.H("#8fa8a0"));
+        g.Ruido(new[]{Paleta.H("#7d968e"),Paleta.H("#a3bab2"),Paleta.H("#96afa7")}, 22);
         Suelos["hospital"] = Forja.SpriteDe(g);
 
         // El muro lleva la luz arriba y la sombra abajo, como todo lo demás: es lo que hace

@@ -207,6 +207,13 @@ Fallos que ya se cazaron y no deben volver:
 - Cinco piezas de calle (valla, andamio, cono, toldo, placa), tres muebles de interior
   (bañera, escritorio, palés), un tile de suelo, dos tablas huérfanas y catorce libreas de
   coche: forjados al arrancar y sin un solo camino de dibujo.
+- **El grano de todo el arte, sin dibujarse nunca.** `ruido` era el grano de las texturas y
+  también el ruido del sigilo; en JavaScript gana la última `function` con ese nombre, así
+  que las 31 llamadas del arte iban a parar a la del sonido. El juego entero llevaba con el
+  asfalto, la acera, el ladrillo y los trece interiores lisos, sin un aviso. Lo caza ahora
+  `herramientas/html/duplicados.js`.
+- Colores escritos en hexadecimal a mano que `cuantizar` mandaba al mismo tono de la paleta:
+  el suelo del hospital y su jaspeado eran el mismo gris.
 
 Los dos primeros errores de compilación reales, con lo que enseñan:
 

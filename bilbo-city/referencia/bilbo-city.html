@@ -2005,7 +2005,7 @@ function lienzo(w,h){const c=document.createElement('canvas');c.width=w;c.height
 /* La escala a la que se forja lo que se dibuje ahora. El mundo se sigue escribiendo en
    espacio de 32 —61 tiles, los props, las fachadas— y sale a 64 recalculando cada
    rectangulo por sus dos cantos, no multiplicando el ancho: asi lo que iba pegado sigue
-   pegado. Lo que NO se escala es el grano: `ruido` pinta a 1 y por eso la textura del
+   pegado. Lo que NO se escala es el grano: `grano` pinta a 1 y por eso la textura del
    asfalto y del ladrillo es fina de verdad, del tamano de pixel del personaje. Antes el
    tile se forjaba a 32 y se subia con `x2()`, y se veian dos tamanos de pixel en la misma
    pantalla: bloques de 2x2 en el suelo y pixeles sueltos en la gente. */
@@ -2017,11 +2017,19 @@ const P=(g,x,y,w,h,c)=>{
 /* El grano va a resolucion de pantalla, no a la de la geometria: se recorre el area ya
    escalada y se pinta de uno en uno con la escala apagada. Es lo unico que distingue una
    textura de un damero de bloques cuando el tile sale al doble. */
-function ruido(g,w,h,cols,d,ox=0,oy=0){
+/* Se llamaba `ruido`, igual que el ruido del sigilo de más abajo. Dos `function` con el
+   mismo nombre en el mismo ámbito no dan error: gana la última, y la última era la del
+   sonido. Así que las treinta y una llamadas del arte le pasaban un lienzo donde esperaba
+   una coordenada, no pintaban nada y el juego entero llevaba sin grano desde entonces —sin
+   que saltara un solo aviso—. Se llama `grano`, que además es como lo llaman los comentarios. */
+function grano(g,w,h,cols,d,ox=0,oy=0){
  const s=ESC_P,W=Math.round(w*s),H=Math.round(h*s),OX=Math.round(ox*s),OY=Math.round(oy*s);
  ESC_P=1;
+ /* La máscara va por `hash`, el mismo que siembra las farolas, y no por una suma de
+    múltiplos: aquella dibujaba rayas en diagonal, y un tile de 16 repetido por toda una
+    habitación convertía la diagonal en pana. Un grano tiene que ser grano. */
  for(let y=0;y<H;y++)for(let x=0;x<W;x++)
-  if(((x*7+y*13+((x*3)^(y*5)))%100)<d)P(g,x+OX,y+OY,1,1,cols[(x*3+y*7)%cols.length]);
+  if(hash(x,y)%100<d)P(g,x+OX,y+OY,1,1,cols[hash(x+7,y+11)%cols.length]);
  ESC_P=s;}
 
 /*═══════════════ PALETA BLOQUEADA ═══════════════*/
@@ -2849,7 +2857,7 @@ function generarTiles(){
     cualquier rasgo con forma se convierte en una trama regular y canta mas que el color
     plano. Lo que da variedad es tener varias casillas distintas (`roadGrieta`), no
     cargar una. */
- const asfalto=(g,N)=>{P(g,0,0,N,N,C.asfalto);ruido(g,N,N,[C.asfaltoO,C.asfaltoL],26);};
+ const asfalto=(g,N)=>{P(g,0,0,N,N,C.asfalto);grano(g,N,N,[C.asfaltoO,C.asfaltoL],26);};
  TILE[ROAD]=T64((g,N)=>asfalto(g,N));
  TILE.roadGrieta=T64((g,N)=>{asfalto(g,N);
   /* Una grieta de verdad no es una senoidal: se abre, se bifurca y se cierra. */
@@ -2904,12 +2912,12 @@ function generarTiles(){
  /* Acera: losa de 1,3 m con junta de 1 px, no de 2. Y la junta no es negra: es la misma
     losa en sombra, que el cemento no tiene lineas negras. */
  const losa=(g,N,base,osc,cl,lado)=>{
-  P(g,0,0,N,N,base);ruido(g,N,N,[osc,cl],18);
+  P(g,0,0,N,N,base);grano(g,N,N,[osc,cl],18);
   for(let i=0;i<N;i+=lado){P(g,i,0,1,N,osc);P(g,0,i,N,1,osc);
    P(g,i+1,0,1,N,cl);P(g,0,i+1,N,1,cl);}};
  TILE[ACERA]=T64((g,N)=>losa(g,N,C.hormigon,C.hormigonO,C.hormigonL,16));
  TILE.aceraGast=T64((g,N)=>{losa(g,N,C.hormigonO,C.carbon,C.hormigon,16);
-  ruido(g,N,N,[C.carbon,C.hormigon],22);});
+  grano(g,N,N,[C.carbon,C.hormigon],22);});
  /* Adoquin de granito: 50x40 cm puestos a matajunta, con el canto claro arriba y la junta
     de arena entre medias. A 32 median casi un metro y parecian bloques de hormigon. */
  const adoq=(g,N,junta,piedra,brillo)=>{P(g,0,0,N,N,junta);
@@ -2917,37 +2925,37 @@ function generarTiles(){
   for(let y=0,f=0;y<N;y+=al+1,f++)for(let x=(f%2?-3:0);x<N;x+=an+1){
    P(g,x,y,an,al,piedra);P(g,x,y,an,1,brillo);P(g,x+an-1,y,1,al,junta);}};
  TILE.adoquin=T64((g,N)=>{adoq(g,N,C.hormigonO,C.hormigon,C.hormigonL);
-  ruido(g,N,N,[C.hormigonO],10);});
+  grano(g,N,N,[C.hormigonO],10);});
  TILE.adoquinRojo=T64((g,N)=>{adoq(g,N,C.tejaO,C.teja,'#96786a');
-  ruido(g,N,N,[C.tejaO],10);});
- TILE[PLAZA]=T32(g=>{rell(g,'#8a8375');ruido(g,32,32,['#7d766a','#968f81'],14);
+  grano(g,N,N,[C.tejaO],10);});
+ TILE[PLAZA]=T32(g=>{rell(g,'#8a8375');grano(g,32,32,['#7d766a','#968f81'],14);
   for(let i=0;i<32;i+=16){P(g,i,0,1,32,'#6d6659');P(g,0,i,32,1,'#6d6659');}P(g,14,14,4,4,'#6d6659');});
- TILE[PATIO]=T32(g=>{rell(g,C.hormigonO);ruido(g,32,32,[C.hormigon,C.cespedO],20);
+ TILE[PATIO]=T32(g=>{rell(g,C.hormigonO);grano(g,32,32,[C.hormigon,C.cespedO],20);
   for(let i=0;i<32;i+=11)P(g,i,0,1,32,C.carbon);});
- TILE[PARQUE]=T32(g=>{rell(g,C.cesped);ruido(g,32,32,[C.cespedO,'#4d7c48'],28);});
- TILE.parqueAlto=T32(g=>{rell(g,C.cespedO);ruido(g,32,32,[C.cesped,'#4d7c48'],34);
+ TILE[PARQUE]=T32(g=>{rell(g,C.cesped);grano(g,32,32,[C.cespedO,'#4d7c48'],28);});
+ TILE.parqueAlto=T32(g=>{rell(g,C.cespedO);grano(g,32,32,[C.cesped,'#4d7c48'],34);
   for(let i=0;i<10;i++)P(g,(i*7)%30,(i*11)%28,1,4,'#4d7c48');});
- TILE.camino=T32(g=>{rell(g,'#8a7f66');ruido(g,32,32,['#79705a','#9c9078'],22);});
+ TILE.camino=T32(g=>{rell(g,'#8a7f66');grano(g,32,32,['#79705a','#9c9078'],22);});
  /* Medio término municipal de Bilbao es ladera. No es parque: es argoma, helecho y
     roca, y se pisa pero no se conduce. */
- TILE[MONTE]=T32(g=>{rell(g,'#4a6340');ruido(g,32,32,['#3f5638','#57704a'],30);});
- TILE.monteMata=T32(g=>{rell(g,'#456039');ruido(g,32,32,['#3a5232','#5b7550'],36);
+ TILE[MONTE]=T32(g=>{rell(g,'#4a6340');grano(g,32,32,['#3f5638','#57704a'],30);});
+ TILE.monteMata=T32(g=>{rell(g,'#456039');grano(g,32,32,['#3a5232','#5b7550'],36);
   for(let i=0;i<8;i++)P(g,(i*11)%29,(i*7)%27,2,3,'#6b7f4a');});
- TILE.monteRoca=T32(g=>{rell(g,'#4a6340');ruido(g,32,32,['#3f5638'],26);
+ TILE.monteRoca=T32(g=>{rell(g,'#4a6340');grano(g,32,32,['#3f5638'],26);
   P(g,9,12,10,7,'#7a7468');P(g,11,10,6,3,'#8a8478');});
  /* La vía va en horizontal; para los tramos verticales se gira al dibujar. */
- TILE[VIA]=T32(g=>{rell(g,'#6e6660');ruido(g,32,32,['#5f5852','#7d746c'],26);
+ TILE[VIA]=T32(g=>{rell(g,'#6e6660');grano(g,32,32,['#5f5852','#7d746c'],26);
   for(let x=1;x<32;x+=5)P(g,x,10,3,12,'#4a423c');
   P(g,0,12,32,2,'#9aa0a4');P(g,0,19,32,2,'#9aa0a4');});
- TILE.viaV=T32(g=>{rell(g,'#6e6660');ruido(g,32,32,['#5f5852','#7d746c'],26);
+ TILE.viaV=T32(g=>{rell(g,'#6e6660');grano(g,32,32,['#5f5852','#7d746c'],26);
   for(let y=1;y<32;y+=5)P(g,10,y,12,3,'#4a423c');
   P(g,12,0,2,32,'#9aa0a4');P(g,19,0,2,32,'#9aa0a4');});
- TILE.agua=[0,1].map(f=>T32(g=>{rell(g,C.agua);ruido(g,32,32,['#193f4a','#20505e'],20);
+ TILE.agua=[0,1].map(f=>T32(g=>{rell(g,C.agua);grano(g,32,32,['#193f4a','#20505e'],20);
   for(let y=(f*4)%8;y<32;y+=8)P(g,0,y,32,1,C.aguaL);
   for(let y=(f*4+4)%8;y<32;y+=8)P(g,4,y,22,1,'#35798a');}));
- TILE[PUENTE]=T32(g=>{rell(g,C.gris);ruido(g,32,32,[C.grisO,C.grisL],18);
+ TILE[PUENTE]=T32(g=>{rell(g,C.gris);grano(g,32,32,[C.grisO,C.grisL],18);
   for(let x=0;x<32;x+=4){P(g,x,0,2,2,C.acero);P(g,x,30,2,2,C.acero);}});
- TILE[MUELLE]=T32(g=>{rell(g,'#5e5346');ruido(g,32,32,['#524839','#6b6052'],18);
+ TILE[MUELLE]=T32(g=>{rell(g,'#5e5346');grano(g,32,32,['#524839','#6b6052'],18);
   for(let y=0;y<32;y+=6)P(g,0,y,32,1,'#463d31');});
  /* Vista desde arriba, un edificio es su tejado. Hasta aquí todos llevaban el mismo, con
     ocho variantes de color repartidas al azar, así que el Casco Viejo, el Ensanche y una
@@ -2958,7 +2966,7 @@ function generarTiles(){
     en el casco, pizarra con buhardillas en el ensanche, azotea de grava con depósitos y
     tendederos en los bloques, y chapa con lucernarios en diente de sierra en la
     industria. El bulto lo pone la ciudad, no el azar. */
- const tej=(b,o,cl)=>T32(g=>{rell(g,b);ruido(g,32,32,[o,cl],14);
+ const tej=(b,o,cl)=>T32(g=>{rell(g,b);grano(g,32,32,[o,cl],14);
   for(let y=6;y<28;y+=7)P(g,3,y,26,1,o);});
  /* Teja árabe: hiladas de canales. Poco contraste a propósito — a treinta y dos píxeles
     por cinco metros, un tejado tiene que leerse como material y no como rayas. La primera
@@ -2967,17 +2975,17 @@ function generarTiles(){
     5x3 px, y por eso a 32 no cabia: las hileras de antes eran de 80 cm y el tejado parecia
     una persiana. Ahora se dibuja pieza a pieza, con la canal entre teja y teja y el solape
     de la hilera de abajo, que es lo que hace que un tejado se lea como tejado. */
- const teja=(b,o)=>T64((g,N)=>{P(g,0,0,N,N,b);ruido(g,N,N,[o],9);
+ const teja=(b,o)=>T64((g,N)=>{P(g,0,0,N,N,b);grano(g,N,N,[o],9);
   for(let y=0;y<N;y+=6){
    P(g,0,y,N,1,o);                                   /* el solape de la hilera */
    for(let x=(y/6%2)*3;x<N;x+=5){P(g,x,y+1,1,5,o);   /* la canal entre tejas */
     P(g,x+1,y+1,3,1,C.ladrillo5);}}});               /* el lomo, que da la luz */
  /* Pizarra: placa de 30x20 cm a matarras, con el clavo visto. */
- const pizarra=(b,o)=>T64((g,N)=>{P(g,0,0,N,N,b);ruido(g,N,N,[o],10);
+ const pizarra=(b,o)=>T64((g,N)=>{P(g,0,0,N,N,b);grano(g,N,N,[o],10);
   for(let y=0;y<N;y+=3)for(let x=(y/3%2)*2;x<N;x+=4){
    P(g,x,y,3,2,o);P(g,x,y,3,1,C.hormigon5);}});
  /* Azotea: grava, y la junta de dilatacion de la lamina cada tres metros. */
- const grava=(b,o)=>T64((g,N)=>{P(g,0,0,N,N,b);ruido(g,N,N,[o],34);
+ const grava=(b,o)=>T64((g,N)=>{P(g,0,0,N,N,b);grano(g,N,N,[o],34);
   for(let i=0;i<N;i+=37)P(g,i,0,1,N,o);});
  /* Nave: chapa grecada de 25 cm de paso, y el diente de sierra con sus lucernarios. */
  const chapa=(b,o)=>T64((g,N)=>{P(g,0,0,N,N,b);
@@ -3121,7 +3129,7 @@ const rellI=(g,col)=>P(g,0,0,TS_INT,TS_INT,col);
 function generarInteriores(){
  /* Una baldosa hidráulica de 20 cm son 4 px y se ve. Con la casilla de fuera, el suelo de
     una casa era un cuadrado de cinco metros con una junta pintada. */
- SUELO_I.parquet=T_I(g=>{rellI(g,C.maderaL);ruido(g,16,16,[C.madera],4);
+ SUELO_I.parquet=T_I(g=>{rellI(g,C.maderaL);grano(g,16,16,[C.madera],4);
   /* Tabla de 1,2 m por 12 cm: a 20 px/m son veinticuatro píxeles de largo y tres de
      ancho. Con la junta cada ocho, la tabla salía cuadrada y el suelo se leía como un
      muro de ladrillo. */
@@ -3129,21 +3137,39 @@ function generarInteriores(){
  SUELO_I.hidraulico=T_I(g=>{rellI(g,C.crema);
   for(let y=0;y<16;y+=8)for(let x=0;x<16;x+=8){P(g,x+1,y+1,6,6,C.azulL);P(g,x+3,y+3,2,2,C.crema);
    P(g,x,y,8,1,C.hormigonO);P(g,x,y,1,8,C.hormigonO);}});
- SUELO_I.terrazo=T_I(g=>{rellI(g,C.hormigonL);ruido(g,16,16,[C.acero,C.crema,C.hormigonO],34);
-  P(g,0,0,16,1,C.hormigonO);P(g,0,0,1,16,C.hormigonO);});
- SUELO_I.chapa=T_I(g=>{rellI(g,'#4d5157');ruido(g,16,16,['#42464b','#5b6067'],16);});
- SUELO_I.hospital=T_I(g=>{rellI(g,'#8fa8a0');ruido(g,16,16,['#7d968e','#a3bab2'],12);
-  P(g,0,0,1,16,'#7d968e');});
+ /* La baldosa de terrazo son 40 cm —ocho píxeles—, no ochenta. La junta iba en el canto
+    del tile, así que dibujaba una cuadrícula de metro; y en `hormigonO`, que está dos tonos
+    por debajo del suelo. Las dos cosas juntas convertían el bar en papel milimetrado. Ahora
+    la junta va a su paso y en el gris de al lado: una junta de terrazo se intuye, no se
+    marca. Y el árido es lo que se ve de verdad —chinas oscuras, claras y de mármol—, no
+    tres grises de los que uno era el propio suelo. */
+ SUELO_I.terrazo=T_I(g=>{rellI(g,C.hormigonL);
+  /* Dos granos, que es como se ve una baldosa de terrazo: el árido fino, casi del color
+     del suelo, y encima cuatro chinas grandes de mármol y de basalto. Con un solo grano
+     denso y a mucho contraste no era un suelo, era estática. */
+  grano(g,16,16,[C.aceroO,C.hormigon6],30);
+  grano(g,16,16,[C.hormigonO,C.hueso],10,3,5);
+  for(let i=0;i<16;i+=8){P(g,0,i,16,1,C.aceroO);P(g,i,0,1,16,C.aceroO);}});
+ SUELO_I.chapa=T_I(g=>{rellI(g,'#4d5157');grano(g,16,16,['#42464b','#5b6067'],16);});
+ /* El suelo de un hospital es lámina de vinilo en rollos de dos metros: no tiene una junta
+    cada ochenta centímetros. La raya del canto del tile dibujaba una cuadrícula que no está
+    en ningún hospital. Queda el jaspeado, que es lo que sí se ve. */
+ /* En hexadecimal a mano no se puede: el verde grisáceo de un hospital no está en la
+    paleta de 61, así que `cuantizar` mandaba el fondo y su sombra al mismo gris —el suelo
+    salía plano— y el tercer tono a un verde de vegetación. Con tonos de la paleta el
+    jaspeado se ve, y de paso el hospital tiene el suelo más claro que el resto, que es lo
+    que pasa de verdad. */
+ SUELO_I.hospital=T_I(g=>{rellI(g,C.hormigon6);grano(g,16,16,[C.hormigon5,C.hormigon7],20);});
  /* El muro lleva la luz arriba y la sombra abajo, como todo lo demás: es lo que hace que
     una habitación se lea como una caja y no como una retícula de cuadros. */
- PARED_I.yeso=T_I(g=>{rellI(g,'#c9c4b6');ruido(g,16,16,['#b8b3a5'],10);
+ PARED_I.yeso=T_I(g=>{rellI(g,'#c9c4b6');grano(g,16,16,['#b8b3a5'],10);
   P(g,0,0,16,2,C.blanco);P(g,0,14,16,2,'#a9a496');});
  PARED_I.azulejo=T_I(g=>{rellI(g,'#2f5f5a');
   for(let y=0;y<16;y+=4)for(let x=0;x<16;x+=4){P(g,x,y,3,3,'#3a7570');P(g,x,y,3,1,'#4d908a');}
   P(g,0,0,16,2,'#4d908a');P(g,0,15,16,1,'#22403d');});
  PARED_I.chapa=T_I(g=>{rellI(g,'#566060');for(let x=0;x<16;x+=3)P(g,x,0,1,16,'#454e4e');
   P(g,0,0,16,2,'#6e7a7a');});
- PARED_I.ladrillo=T_I(g=>{rellI(g,'#4b3b32');ruido(g,16,16,['#43342c','#57453a'],16);
+ PARED_I.ladrillo=T_I(g=>{rellI(g,'#4b3b32');grano(g,16,16,['#43342c','#57453a'],16);
   for(let y=0;y<16;y+=4){P(g,0,y,16,1,'#3a2d26');for(let x=(y%8?4:0);x<16;x+=8)P(g,x,y,1,4,'#3a2d26');}
   P(g,0,0,16,2,'#5e4a3d');});
  PUERTA_I.v=T_I(g=>{P(g,0,0,16,16,C.maderaO);P(g,1,1,14,14,C.madera);
@@ -3187,7 +3213,7 @@ const MUEBLES={
   cols=[C.mostazaO,C.rojoO,C.azul,C.verdeO,C.crema,C.morado];
   if(hz){P(g,0,0,w,2,C.gris);for(let x=1,i=0;x<w-2;x+=4,i++)P(g,x,3,3,h-5,cols[i%cols.length]);}
   else{P(g,0,0,2,h,C.gris);for(let y=1,i=0;y<h-2;y+=4,i++)P(g,3,y,w-5,3,cols[i%cols.length]);}}},
- B:{n:'barra',dib(g,w,h){P(g,0,0,w,h,C.madera);ruido(g,w,h,[C.maderaO,C.maderaL],12);
+ B:{n:'barra',dib(g,w,h){P(g,0,0,w,h,C.madera);grano(g,w,h,[C.maderaO,C.maderaL],12);
   P(g,0,0,w,2,C.maderaL);P(g,0,h-3,w,3,C.maderaO);P(g,0,h-1,w,1,C.acero);}},
  O:{n:'mostrador',dib(g,w,h){P(g,0,2,w,h-2,C.maderaO);P(g,0,0,w,3,C.maderaL);
   P(g,3,5,7,6,C.crema);if(w>16)P(g,w-9,5,6,6,C.carbon);}},
@@ -3496,7 +3522,7 @@ function generarProps(){
  const mancha=(g,W,H,osc)=>{
   for(let x=0;x<W;x++){const alto=((x*13)%5)+2;
    if(((x*7+3)%9)<4)for(let y=0;y<alto;y++)P(g,x,y+2,1,1,osc);}
-  ruido(g,W,H,[osc],8);};
+  grano(g,W,H,[osc],8);};
  const TIPOS=(muro,muroL,muroO,ph,viejo,tex)=>[
   /* liso: ventana y nada mas, la planta de patio o de medianera */
   banda(ph,(g,W,H)=>{pared(g,W,H,muro,muroL,muroO,tex);

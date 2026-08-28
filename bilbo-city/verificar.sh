@@ -39,6 +39,9 @@ if [ "$QUE" = "todo" ] || [ "$QUE" = "csharp" ]; then
 fi
 
 if [ "$QUE" = "todo" ] || [ "$QUE" = "html" ]; then
+  echo "═══ HTML · nombres pisados ═══"
+  ( cd herramientas/html && node duplicados.js )
+  echo
   echo "═══ HTML · batería de juego ═══"
   ( cd herramientas/html && node pruebas.js )
   echo

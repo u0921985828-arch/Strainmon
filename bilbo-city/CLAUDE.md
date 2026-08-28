@@ -917,6 +917,35 @@ es justo lo que tapa el fallo: el juego nunca se queda sin dibujar. Ahora la esc
 lee del HTML. Y `--simular` **escribe las hojas de mentira en el juego**: sirve para probar la
 tubería sin red, pero no se commitea.
 
+## El grano, y por qué no existía
+
+El arte lleva **grano**: la acera no es un gris plano, es piedra; el asfalto tiene diente y
+el ladrillo, mancha. Lo pinta `grano()` píxel a píxel y con la escala apagada, porque un
+grano a escala 2 son bloques de dos por dos y eso es un damero, no una textura.
+
+**No se dibujaba ninguno.** La función se llamaba `ruido`, y más abajo hay otra `function
+ruido` —el ruido del sigilo, el que hace que un disparo oriente a quien lo oye—. Dos
+`function` con el mismo nombre en el mismo ámbito no dan error en JavaScript: se izan las
+dos y **gana la última**, también para las llamadas escritas antes. Así que las treinta y
+una llamadas del arte le pasaban un lienzo donde esperaba una coordenada, no pintaban nada,
+y el juego entero llevaba sin grano —el asfalto, la acera, el ladrillo, el revoco, el suelo
+de los trece interiores— sin que saltara un solo aviso, porque el resultado de no pintar es
+un tile liso, y un tile liso es un tile válido.
+
+Se llama `grano`, que es como lo llamaban los comentarios desde el principio, y
+`herramientas/html/duplicados.js` recorre el fichero contando llaves y falla si dos
+funciones comparten nombre en el mismo ámbito.
+
+Dos cosas que se aprendieron al encenderlo:
+
+- **La máscara va por `hash`**, el mismo que siembra las farolas, y no por una suma de
+  múltiplos: aquella dibujaba rayas en diagonal, y un tile de dieciséis repetido por toda
+  una habitación convertía la diagonal en pana.
+- **En hexadecimal a mano no se puede.** El suelo del hospital era `#8fa8a0` con su sombra
+  en `#7d968e`: `cuantizar` manda los dos al mismo gris de la paleta, así que el jaspeado
+  no existía y el suelo salía plano; y un tercer tono se iba a un verde de vegetación. Los
+  colores se cogen de la paleta por su nombre, que para eso está.
+
 ## Pixel perfect
 
 El arte es pixel art y hay que dibujarlo sin medios píxeles. Tres reglas, y las tres hacen

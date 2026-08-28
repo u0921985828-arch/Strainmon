@@ -224,11 +224,16 @@ public class Lienzo {
             }
     }
 
-    public void Ruido(Color32[] cols, int densidad) {
+    /// <summary>
+    /// El grano. La máscara va por Hash —el mismo que siembra las farolas— y no por una
+    /// suma de múltiplos: aquella dibujaba rayas en diagonal, y un tile repetido por toda
+    /// una habitación convertía la diagonal en pana. Un grano tiene que ser grano.
+    /// </summary>
+    public void Ruido(Color32[] cols, int densidad, int ox = 0, int oy = 0) {
         for (int y = 0; y < H; y++)
             for (int x = 0; x < W; x++) {
-                int v = (x*7 + y*13 + ((x*3)^(y*5))) % 100;
-                if (v < densidad) Px[y*W+x] = cols[(x*3 + y*7) % cols.Length];
+                if (Utiles.Hash(x - ox, y - oy) % 100 < densidad)
+                    Px[y*W+x] = cols[Utiles.Hash(x - ox + 7, y - oy + 11) % cols.Length];
             }
     }
 
