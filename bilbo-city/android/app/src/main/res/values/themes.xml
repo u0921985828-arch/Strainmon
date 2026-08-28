@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Sin barra de título y con el fondo del juego, para que el arranque no dé un
+         fogonazo blanco antes de que cargue el lienzo. -->
+    <style name="TemaJuego" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@color/fondo</item>
+    </style>
+</resources>

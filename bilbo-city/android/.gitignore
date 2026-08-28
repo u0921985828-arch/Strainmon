@@ -1,0 +1,9 @@
+# La copia del juego la pone el build desde referencia/bilbo-city.html: versionarla es
+# tener dos verdades y que la de aquí se quede vieja.
+app/src/main/assets/index.html
+
+.gradle/
+build/
+app/build/
+local.properties
+.idea/

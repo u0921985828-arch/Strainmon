@@ -1,0 +1,58 @@
+# Compila el APK de Bilbo City. Aquí y no en local porque el SDK de Android se baja de
+# dl.google.com, y desde una sesión de Claude esa salida está cerrada: el runner sí la tiene.
+name: APK · Bilbo City
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'bilbo-city/android/**'
+      - 'bilbo-city/referencia/bilbo-city.html'
+      - '.github/workflows/apk-bilbo-city.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      # No hay gradle-wrapper.jar en el repositorio a propósito: es un binario, y aquí no
+      # entra ninguno. Gradle lo pone esta acción.
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Compilar el APK de depuración
+        working-directory: bilbo-city/android
+        run: gradle --no-daemon assembleDebug
+
+      - name: Comprobar que el juego viajó dentro
+        working-directory: bilbo-city/android
+        run: |
+          # El fallo silencioso de esta tubería es un APK que instala y abre en negro porque
+          # el HTML no llegó a assets/. Se mira que esté y que pese lo que tiene que pesar.
+          test -s app/src/main/assets/index.html
+          origen=$(wc -c < ../referencia/bilbo-city.html)
+          copia=$(wc -c < app/src/main/assets/index.html)
+          echo "juego: $origen bytes · copia en el APK: $copia"
+          test "$origen" = "$copia"
+          unzip -l app/build/outputs/apk/debug/app-debug.apk | grep -q 'assets/index.html'
+
+      - name: Renombrar
+        run: cp bilbo-city/android/app/build/outputs/apk/debug/app-debug.apk BilboCity.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BilboCity-apk
+          path: BilboCity.apk
+          if-no-files-found: error

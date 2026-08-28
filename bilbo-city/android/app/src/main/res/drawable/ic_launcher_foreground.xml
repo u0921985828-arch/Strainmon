@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- El meandro de la ría, que es lo que se reconoce de Bilbao desde el aire, y dos manzanas
+     a cada lado. Va en vector y no en PNG: en este repositorio no entra ni una imagen, y el
+     icono adaptativo de API 26 en adelante no la necesita.
+     Lienzo de 108 y zona segura de 72 centrada: lo que salga de ahí se lo come el recorte. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- La ría -->
+    <path
+        android:strokeColor="#4A6E82"
+        android:strokeWidth="11"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 30,26 C 30,44 56,44 56,58 C 56,72 40,74 40,84" />
+    <path
+        android:strokeColor="#6E93A6"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 30,26 C 30,44 56,44 56,58 C 56,72 40,74 40,84" />
+
+    <!-- Dos manzanas en la otra orilla, con la luz de arriba a la izquierda -->
+    <path android:fillColor="#8A7F6E" android:pathData="M 66,36 h 14 v 16 h -14 z" />
+    <path android:fillColor="#B0A594" android:pathData="M 66,36 h 14 v 3 h -14 z" />
+    <path android:fillColor="#8A7F6E" android:pathData="M 68,60 h 12 v 14 h -12 z" />
+    <path android:fillColor="#B0A594" android:pathData="M 68,60 h 12 v 3 h -12 z" />
+</vector>
