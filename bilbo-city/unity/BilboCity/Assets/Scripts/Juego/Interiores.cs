@@ -41,13 +41,13 @@ public static class Interiores {
         // 62 m² útiles, que es lo que mide un piso de los sesenta en Santutxu. La habitación de
         // la derecha es la del primo. Los pisos que se compran reaprovechan este plano.
         {"piso", new DefInterior{ Nombre="Tu piso", Suelo="parquet", Pared="yeso", Mapa=new[]{
-            "##########################","##########################","##CCCCUUee#...#...UUCCCC##","##CCCCUUee#...#...UUCCCC##",
-            "##CCCC..ee#...#.....CCCC##","##CCCC..ee#...#.....CCCC##","##CCCC....d...d.....CCCC##","##CCCC....d...d.....CCCC##",
-            "##rr......#...#.......rr##","##rr......#...#.......rr##","##AAAAAA..#...#...EEEEEE##","##AAAAAA..#...#...EEEEEE##",
-            "############..############","##........##..##KKKKKKKK##","##FFFFFF..#...#.KKKKKKNN##","##FFFFFF..#...#.KKKKKKNN##",
-            "##..aaaa..d...d.........##","##..aaaa..d...d.........##","##gg..UU..#...#.iiMMSSSS##","##gg..UU..#...#.iiMMSSSS##",
-            "##........#...############","##........#...##........##","##MMMMSS..#...d.......HH##","##MMMMSS..#...d.......HH##",
-            "##MMMMSS..#...#.TTVVbbbb##","##MMMMSS..#...#.TTVVbbbb##","############..############","############DD############"},
+            "##########################","##########################","##CCCCUUrr#...#rr.UUCCCC##","##CCCCUU..#...#...UUCCCC##",
+            "##CCCC....#...#.....CCCC##","##CCCC....d...d.....CCCC##","##CCCC....d...d.....CCCC##","##........#...#.........##",
+            "##........#...#.........##","##........#...#.........##","##........#...#EEEEEEEEE##","##AAAA.eee#...#EEEEEEEEE##",
+            "##AAAA.eee#...############","###########...#iiKKKKKNN##","##FFFFF...#...#iiKKKKKNN##","##FFFFF...#...d.........##",
+            "##........#...d.........##","##........#...#.........##","##........d...#...MMMSS.##","##.SSMMMSSd...#...MMMSS.##",
+            "##.SSMMMSS#...############","##........#...#bbbb...TT##","##.aaaa...#...dbbbb...TT##","##.aaaa...#...d.........##",
+            "##.aaaa...#...#HH.....VV##","##gaaaa.rr#...#HH.....VV##","###########..#############","###########DD#############"},
             Npcs=new NpcInterior[0]}},
         {"portal", new DefInterior{ Nombre="Portal · la casera", Suelo="hidraulico", Pared="yeso", Mapa=new[]{
             "##############","##############","##WWWW....YY##","##WWWW....YY##",
