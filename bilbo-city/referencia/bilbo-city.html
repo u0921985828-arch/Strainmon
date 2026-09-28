@@ -3279,9 +3279,7 @@ function colocarPOIs(){
   {id:'puerto',n:'Muelle de Olabeaga',ico:'⚓',c:'#4d9de0',cerca:[384,420]},
   {id:'poli',n:'Comisaría',ico:'🚔',c:'#4dd0e1',cerca:[692,414]},
   /* Los emblemáticos, cada uno donde lo pone el plano */
-  {id:'guggen',n:'El Guggenheim',ico:'🏛',c:'#b8c4cc',mira:1,cerca:[692,183]},
-  {id:'iberdrola',n:'Torre Iberdrola',ico:'🏙',c:'#9fb4c4',mira:1,cerca:[705,205]},
-  {id:'euskalduna',n:'Palacio Euskalduna',ico:'🎼',c:'#8fa0ad',mira:1,cerca:[552,289]},
+  {id:'obraGuggen',n:'La obra del museo',ico:'🏛',c:'#b8c4cc',mira:1,cerca:[692,183]},
   {id:'maritimo',n:'Museo Marítimo',ico:'⚓',c:'#6f9ab5',mira:1,cerca:[575,300]},
   {id:'bellasartes',n:'Museo de Bellas Artes',ico:'🖼',c:'#b09a6e',mira:1,cerca:[661,285]},
   {id:'casilla',n:'Parque de Doña Casilda',ico:'🌳',c:C.cesped,mira:1,cerca:[640,299]},
@@ -3298,7 +3296,6 @@ function colocarPOIs(){
   {id:'funicular',n:'Funicular de Artxanda',ico:'🚡',c:'#7fbf9f',mira:1,cerca:[814,146]},
   {id:'begonia',n:'Basílica de Begoña',ico:'⛪',c:'#cbbf9c',mira:1,cerca:[1087,269]},
   {id:'atxuri',n:'Estación de Atxuri',ico:'🚋',c:'#b58a5a',mira:1,red:'tren',cerca:[1009,424]},
-  {id:'arena',n:'Bilbao Arena',ico:'🏀',c:'#c4693f',mira:1,cerca:[961,484]},
   {id:'zorrotza',n:'Estación de Zorrotza',ico:'🚂',c:'#8fa66b',mira:1,red:'tren',cerca:[120,335]},
   /* Comercios. Nombres inventados, sitios reales: la Gran Vía, las Siete Calles, Pozas,
      Deustu, Abandoibarra, Artxanda, Atxuri y Rekalde. */
@@ -3314,6 +3311,8 @@ function colocarPOIs(){
   {id:'gasorekalde',n:'Gasolinera Rekalde',c:'#e05a3c',int:'gasoli',cerca:[700,560]},
   /* Estaciones de metro. Las de verdad, en el barrio que les toca. Abando está arriba
      porque además es de cercanías: allí se cambia de una red a la otra. */
+  /* Solo la Línea 1, que es lo que hay abierto en 1996: inaugurada el 11/11/1995. El
+     ramal de Casco Viejo a Bolueta —Santutxu y Basarrate— no abre hasta el 97. */
   {id:'mtinazio',n:'Metro San Inazio',c:C.rojoL,red:'metro',cerca:[500,120]},
   {id:'mtsarriko',n:'Metro Sarriko',c:C.rojoL,red:'metro',cerca:[585,150]},
   {id:'mtdeustu',n:'Metro Deustu',c:C.rojoL,red:'metro',cerca:[640,175]},
@@ -3321,9 +3320,6 @@ function colocarPOIs(){
   {id:'mtindautxu',n:'Metro Indautxu',c:C.rojoL,red:'metro',cerca:[628,345]},
   {id:'mtmoyua',n:'Metro Moyúa',c:C.rojoL,red:'metro',cerca:[728,322]},
   {id:'mtcasco',n:'Metro Casco Viejo',c:C.rojoL,red:'metro',cerca:[940,330]},
-  {id:'mtsantutxu',n:'Metro Santutxu',c:C.rojoL,red:'metro',cerca:[1160,420]},
-  {id:'mtbasarrate',n:'Metro Basarrate',c:C.rojoL,red:'metro',cerca:[1110,400]},
-  {id:'mtbolueta',n:'Metro Bolueta',c:C.rojoL,red:'metro',cerca:[1258,400]},
   /* Cercanías: los apeaderos del fondo del valle, que es donde el metro no llega. */
   {id:'trolabeaga',n:'Apeadero de Olabeaga',c:'#8fa66b',red:'tren',cerca:[392,412]},
   {id:'trametzola',n:'Apeadero de Ametzola',c:'#8fa66b',red:'tren',cerca:[640,470]},
@@ -4351,38 +4347,27 @@ const PLANO_SINGULAR={
    T(fx,fy,2,2,C.acero);T(fx+.45,fy+.45,1.1,1.1,C.hueso);}}],
  /* 150×110 m. Chapa de titanio: bandas alabeadas unas sobre otras, cada una con su
     brillo arriba. Desde el aire el museo es eso y poco más. */
- guggen:[29,21,(T,W,H)=>{
-  T(0,0,W,H,C.hormigonO);
-  /* Placas de titanio: velas que se solapan, cada una con su brillo por el canto de
-     arriba y su sombra por el de la derecha. Ninguna alineada con la de al lado — eso es
-     lo único que separa al museo de un tejado de chapa cualquiera, y la primera versión,
-     con las bandas a paso regular, salió persiana. */
-  const velas=[[.7,1,W-8.5,3.4],[3.6,3.4,W-5.8,3],[1,5.9,W-9.5,4],[5.2,9.3,W-7.2,3.2],
-               [.7,12,W-10.5,3.6],[4.4,14.9,W-6.6,3.4],[1.8,17.6,W-8.5,2.4]];
-  velas.forEach(([x,y,an,al],i)=>{
-   T(x,y,an,al,i%2?C.acero:C.aceroO);
-   T(x,y,an,.45,C.hueso);
-   T(x+an-.45,y,.45,al,C.grisO);});
-  T(W-3.4,.7,2.7,H-2.2,C.grisL);T(W-3.4,.7,2.7,.4,C.hueso);
-  T(.6,H-1.1,W-1.2,.8,C.hormigon);}],                /* la lámina de agua del muelle */
- /* 42×42 m. Desde arriba una torre es un cuadrado; lo que la delata es el cristal. */
- iberdrola:[8,8,(T,W,H)=>{
-  T(0,0,W,H,C.grisO);
-  T(.5,.5,W-1,H-1,C.aceroO);
-  T(1,1,W-2,H-2,C.acero);
-  for(let i=1.5;i<W-1.5;i+=.9)T(i,1,.3,H-2,C.hueso);
-  T(1,1,W-2,.4,C.hueso);
-  T(W/2-1,H/2-1,2,2,C.aceroO);}],                    /* el casquete de arriba */
- /* 130×85 m. Casco de barco en acero oxidado, en el sitio del astillero: las cuadernas
-    se ven desde arriba como costillas. */
- euskalduna:[25,16,(T,W,H)=>{
-  T(0,0,W,H,C.hormigonO);
-  T(1,1.6,W-2,H-4,C.tejaO);
-  T(1,1.6,W-2,.45,C.maderaL);
-  for(let x=2;x<W-2;x+=1.6)T(x,2.2,.5,H-5.4,C.maderaO);
-  T(W-4.6,1,3.6,H-2,C.gris);                         /* la caja de escena */
-  T(2.6,H-2.6,W-5.2,1.8,C.grisL);                    /* la plaza de delante */
-  T(2.6,H-2.6,W-5.2,.35,C.hueso);}],
+ /* 1996: aquí no hay museo todavía, hay un solar con grúas. Abre en octubre del 97, así
+    que en el último trimestre del 96 lo que se ve desde la ría son las torres-grúa, las
+    placas de titanio apiladas esperando y el vallado. Sigue siendo el hito de la ría —
+    CONTEXT.md §18.4 le da el único foco frío del mapa— pero es un hito de obra. */
+ obraGuggen:[29,21,(T,W,H)=>{
+  T(0,0,W,H,C.hormigonO);                            /* el solar, tierra removida */
+  T(.6,.6,W-1.2,H-1.2,C.ladrillo1);
+  for(let x=1.4;x<W-1.4;x+=2.2)T(x,1.2,.35,H-2.4,C.ladrillo0);   /* rodadas de camión */
+  /* Las placas de titanio, apiladas por lotes. Es lo único frío del solar. */
+  const lotes=[[2,3,5,2.2],[8.5,2.4,4.5,2],[3.5,7.5,6,2.4],[13,8,4,2]];
+  for(const[x,y,an,al]of lotes){
+   T(x,y,an,al,C.titanio0);T(x,y,an,.4,C.titanio1);T(x+an-.4,y,.4,al,C.hormigon);}
+  /* Dos torres-grúa. La pluma es lo que se ve desde arriba, no el mástil. */
+  for(const[cx,cy,largo]of[[7,13,11],[19,6,9]]){
+   T(cx-.6,cy-.6,1.2,1.2,C.aviso0);                  /* el mástil */
+   T(cx,cy-.25,largo,.5,C.aviso1);                   /* la pluma */
+   T(cx+largo-.8,cy-.6,.8,1.2,C.aviso0);             /* el carro */
+   T(cx-2.4,cy-.25,2.4,.5,C.hormigonL);}             /* el contrapeso */
+  T(.6,.6,W-1.2,.3,C.hormigonL);                     /* el vallado */
+  T(.6,H-.9,W-1.2,.3,C.hormigonL);
+  T(.6,.6,.3,H-1.2,C.hormigonL);T(W-.9,.6,.3,H-1.2,C.hormigonL);}],
  /* 180×80 m. La nave de la estación, con los andenes y las vías debajo. */
  abando:[35,16,(T,W,H)=>{
   T(0,0,W,H,C.hormigonO);
@@ -4482,16 +4467,7 @@ const PLANO_SINGULAR={
   T(1.2,H-2.1,W-2.4,.9,C.mostaza);
   for(let x=2;x<W-2;x+=1.5)T(x,H-1.85,.55,.4,C.carbon);
   T(.8,H-.9,W-1.6,.5,C.carbon);}],                  /* la marquesina */
- /* 105×90 m. Cuenco pequeño y tejado de madera. */
- arena:[20,17,(T,W,H,aro)=>{
-  T(0,0,W,H,C.hormigonO);
-  T(1,1,W-2,H-2,C.maderaO);
-  for(let x=1.6;x<W-1.6;x+=1.2)T(x,1.4,.45,H-2.8,C.madera);
-  T(1,1,W-2,.4,C.maderaL);
-  aro(W/2,H/2,Math.min(W,H)/3.2,.5,C.grisL);
-  T(W/2-3.2,H/2-2.6,6.4,5.2,C.gris);
-  T(W/2-2.8,H/2-2.2,5.6,4.4,C.acero);}],
-};
+ };
 
 /* Dónde se planta cada uno, y de qué tamaño.
 

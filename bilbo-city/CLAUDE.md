@@ -27,7 +27,7 @@ Requisitos, una vez:
 
 ```bash
 pip install -r herramientas/requirements.txt
-cd herramientas/html && npm install    # compila 'canvas' de forma nativa
+cd herramientas/html && npm install    # 'canvas' 3.x, con binario precompilado
 apt-get install -y dotnet-sdk-8.0      # Roslyn, para compilar el C# sin Unity
 ```
 

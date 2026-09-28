@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Comprueba que los edificios singulares miden lo mismo en el HTML y en Unity.
 
+Los nombres se leen con mayúsculas dentro (`obraGuggen`): con `[a-z]+` el singular se
+salía de la comparación sin decir nada, que es peor que no tener comparación.
+
 El estadio, la catedral, el Ayuntamiento y los demás llevan escrita su medida real en
 casillas, y esa medida está en dos ficheros: la tabla PLANO_SINGULAR del prototipo y la
 tabla DePlano de Singulares.cs. Es exactamente la trampa en la que ya se cayó con las
@@ -18,12 +21,12 @@ CS   = RAIZ / 'unity' / 'BilboCity' / 'Assets' / 'Scripts' / 'Ciudad' / 'Singula
 def delHtml():
     s = HTML.read_text()
     return {m.group(1): (int(m.group(2)), int(m.group(3)))
-            for m in re.finditer(r"^ ([a-z]+):\[(\d+),(\d+),\(T,W,H", s, re.M)}
+            for m in re.finditer(r"^ ([a-zA-Z]+):\[(\d+),(\d+),\(T,W,H", s, re.M)}
 
 def delCs():
     s = CS.read_text()
     return {m.group(1): (int(m.group(2)), int(m.group(3)))
-            for m in re.finditer(r'\{"([a-z]+)",\s*new Plano_ \{ W = (\d+), H = (\d+),', s)}
+            for m in re.finditer(r'\{"([a-zA-Z]+)",\s*new Plano_ \{ W = (\d+), H = (\d+),', s)}
 
 def main():
     h, c = delHtml(), delCs()

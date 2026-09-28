@@ -2,3 +2,7 @@ tree_sitter>=0.23
 tree_sitter_c_sharp>=0.23
 # la usa herramientas/sprites/pixellab.py para empaquetar las hojas
 Pillow>=10
+# la usa herramientas/plano/extraer.py y su batería de PDF de mentira. Faltaba aquí, así
+# que un contenedor recién hecho pasaba la verificación entera menos esa prueba, y el
+# error salía en el último paso después de diez minutos.
+pymupdf>=1.24

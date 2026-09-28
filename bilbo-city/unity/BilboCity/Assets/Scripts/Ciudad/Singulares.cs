@@ -115,43 +115,37 @@ public static class Singulares {
                 T.P(focos[i,0]+.45f,focos[i,1]+.45f,1.1f,1.1f,Paleta.Hueso);
             }
         }}},
-        // 150×110 m. Placas de titanio: velas que se solapan, cada una con su brillo por
-        // el canto de arriba y su sombra por el de la derecha. Ninguna alineada con la de
-        // al lado — eso es lo único que separa al museo de un tejado de chapa cualquiera,
-        // y la primera versión, con las bandas a paso regular, salió persiana.
-        {"guggen", new Plano_ { W = 29, H = 21, Dib = (T,W,H) => {
-            T.P(0,0,W,H,Paleta.HormigonO);
-            float[,] velas = {{.7f,1,W-8.5f,3.4f},{3.6f,3.4f,W-5.8f,3},{1,5.9f,W-9.5f,4},
-                              {5.2f,9.3f,W-7.2f,3.2f},{.7f,12,W-10.5f,3.6f},
-                              {4.4f,14.9f,W-6.6f,3.4f},{1.8f,17.6f,W-8.5f,2.4f}};
-            for (int i = 0; i < 7; i++) {
-                float x = velas[i,0], y = velas[i,1], an = velas[i,2], al = velas[i,3];
-                T.P(x,y,an,al, i%2 == 1 ? Paleta.Acero : Paleta.AceroO);
-                T.P(x,y,an,.45f,Paleta.Hueso);
-                T.P(x+an-.45f,y,.45f,al,Paleta.GrisO);
+        // 1996: aquí no hay museo todavía, hay un solar con grúas. Abre en octubre del 97,
+        // así que en el último trimestre del 96 lo que se ve desde la ría son las
+        // torres-grúa, las placas de titanio apiladas esperando y el vallado. Sigue siendo
+        // el hito de la ría — CONTEXT.md §18.4 le da el único foco frío del mapa— pero es
+        // un hito de obra.
+        {"obraGuggen", new Plano_ { W = 29, H = 21, Dib = (T,W,H) => {
+            T.P(0,0,W,H,Paleta.HormigonO);                     // el solar, tierra removida
+            T.P(.6f,.6f,W-1.2f,H-1.2f,Paleta.Ladrillo1);
+            for (float x = 1.4f; x < W-1.4f; x += 2.2f)
+                T.P(x,1.2f,.35f,H-2.4f,Paleta.Ladrillo0);      // rodadas de camión
+            // Las placas de titanio, apiladas por lotes. Lo único frío del solar.
+            float[,] lotes = {{2,3,5,2.2f},{8.5f,2.4f,4.5f,2},{3.5f,7.5f,6,2.4f},{13,8,4,2}};
+            for (int i = 0; i < 4; i++) {
+                float x = lotes[i,0], y = lotes[i,1], an = lotes[i,2], al = lotes[i,3];
+                T.P(x,y,an,al,Paleta.Titanio0);
+                T.P(x,y,an,.4f,Paleta.Titanio1);
+                T.P(x+an-.4f,y,.4f,al,Paleta.Hormigon);
             }
-            T.P(W-3.4f,.7f,2.7f,H-2.2f,Paleta.GrisL); T.P(W-3.4f,.7f,2.7f,.4f,Paleta.Hueso);
-            T.P(.6f,H-1.1f,W-1.2f,.8f,Paleta.Hormigon);        // la lámina de agua
-        }}},
-        // 42×42 m. Desde arriba una torre es un cuadrado; lo que la delata es el cristal.
-        {"iberdrola", new Plano_ { W = 8, H = 8, Dib = (T,W,H) => {
-            T.P(0,0,W,H,Paleta.GrisO);
-            T.P(.5f,.5f,W-1,H-1,Paleta.AceroO);
-            T.P(1,1,W-2,H-2,Paleta.Acero);
-            for (float i = 1.5f; i < W-1.5f; i += .9f) T.P(i,1,.3f,H-2,Paleta.Hueso);
-            T.P(1,1,W-2,.4f,Paleta.Hueso);
-            T.P(W/2f-1,H/2f-1,2,2,Paleta.AceroO);              // el casquete de arriba
-        }}},
-        // 130×85 m. Casco de barco en acero oxidado, en el sitio del astillero: las
-        // cuadernas se ven desde arriba como costillas.
-        {"euskalduna", new Plano_ { W = 25, H = 16, Dib = (T,W,H) => {
-            T.P(0,0,W,H,Paleta.HormigonO);
-            T.P(1,1.6f,W-2,H-4,Paleta.TejaO);
-            T.P(1,1.6f,W-2,.45f,Paleta.MaderaL);
-            for (float x = 2; x < W-2; x += 1.6f) T.P(x,2.2f,.5f,H-5.4f,Paleta.MaderaO);
-            T.P(W-4.6f,1,3.6f,H-2,Paleta.Gris);                // la caja de escena
-            T.P(2.6f,H-2.6f,W-5.2f,1.8f,Paleta.GrisL);         // la plaza de delante
-            T.P(2.6f,H-2.6f,W-5.2f,.35f,Paleta.Hueso);
+            // Dos torres-grúa. La pluma es lo que se ve desde arriba, no el mástil.
+            float[,] gruas = {{7,13,11},{19,6,9}};
+            for (int i = 0; i < 2; i++) {
+                float cx = gruas[i,0], cy = gruas[i,1], largo = gruas[i,2];
+                T.P(cx-.6f,cy-.6f,1.2f,1.2f,Paleta.Aviso0);    // el mástil
+                T.P(cx,cy-.25f,largo,.5f,Paleta.Aviso1);       // la pluma
+                T.P(cx+largo-.8f,cy-.6f,.8f,1.2f,Paleta.Aviso0); // el carro
+                T.P(cx-2.4f,cy-.25f,2.4f,.5f,Paleta.HormigonL);  // el contrapeso
+            }
+            T.P(.6f,.6f,W-1.2f,.3f,Paleta.HormigonL);          // el vallado
+            T.P(.6f,H-.9f,W-1.2f,.3f,Paleta.HormigonL);
+            T.P(.6f,.6f,.3f,H-1.2f,Paleta.HormigonL);
+            T.P(W-.9f,.6f,.3f,H-1.2f,Paleta.HormigonL);
         }}},
         // 180×80 m. La nave de la estación, con los andenes y las vías debajo.
         {"abando", new Plano_ { W = 35, H = 16, Dib = (T,W,H) => {
@@ -265,16 +259,6 @@ public static class Singulares {
             T.P(1.2f,H-2.1f,W-2.4f,.9f,Paleta.Mostaza);
             for (float x = 2; x < W-2; x += 1.5f) T.P(x,H-1.85f,.55f,.4f,Paleta.Carbon);
             T.P(.8f,H-.9f,W-1.6f,.5f,Paleta.Carbon);          // la marquesina
-        }}},
-        // 105×90 m. Cuenco pequeño y tejado de madera.
-        {"arena", new Plano_ { W = 20, H = 17, Dib = (T,W,H) => {
-            T.P(0,0,W,H,Paleta.HormigonO);
-            T.P(1,1,W-2,H-2,Paleta.MaderaO);
-            for (float x = 1.6f; x < W-1.6f; x += 1.2f) T.P(x,1.4f,.45f,H-2.8f,Paleta.Madera);
-            T.P(1,1,W-2,.4f,Paleta.MaderaL);
-            T.Aro(W/2f,H/2f,Mathf.Min(W,H)/3.2f,.5f,Paleta.GrisL);
-            T.P(W/2f-3.2f,H/2f-2.6f,6.4f,5.2f,Paleta.Gris);
-            T.P(W/2f-2.8f,H/2f-2.2f,5.6f,4.4f,Paleta.Acero);
         }}},
     };
 

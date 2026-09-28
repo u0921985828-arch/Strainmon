@@ -170,9 +170,7 @@ public class Estado {
         S("puerto",   "Muelle de Olabeaga",     Paleta.H("#4d9de0"), null,        384,420);
         S("poli",     "Comisaría",              Paleta.H("#4dd0e1"), null,        692,414);
         // Los emblemáticos, cada uno donde lo pone el plano
-        S("guggen",   "El Guggenheim",          Paleta.H("#b8c4cc"), null,        692,183, true);
-        S("iberdrola","Torre Iberdrola",        Paleta.H("#9fb4c4"), null,        705,205, true);
-        S("euskalduna","Palacio Euskalduna",    Paleta.H("#8fa0ad"), null,        552,289, true);
+        S("obraGuggen","La obra del museo",      Paleta.H("#b8c4cc"), null,        692,183, true);
         S("maritimo", "Museo Marítimo",         Paleta.H("#6f9ab5"), null,        575,300, true);
         S("bellasartes","Museo de Bellas Artes",Paleta.H("#b09a6e"), null,        661,285, true);
         S("casilla",  "Parque de Doña Casilda", Paleta.Cesped,       null,        640,299, true);
@@ -189,7 +187,6 @@ public class Estado {
         S("funicular","Funicular de Artxanda",  Paleta.H("#7fbf9f"), null,        814,146, true);
         S("begonia",  "Basílica de Begoña",     Paleta.H("#cbbf9c"), null,       1087,269, true);
         S("atxuri",   "Estación de Atxuri",     Paleta.H("#b58a5a"), null,       1009,424, true, "tren");
-        S("arena",    "Bilbao Arena",           Paleta.H("#c4693f"), null,        961,484, true);
         S("zorrotza", "Estación de Zorrotza",   Paleta.H("#8fa66b"), null,        120,335, true, "tren");
         // Comercios. Nombres inventados, sitios reales: la Gran Vía, las Siete Calles,
         // Pozas, Deustu, Abandoibarra, Artxanda, Atxuri y Rekalde.
@@ -212,9 +209,6 @@ public class Estado {
         S("mtindautxu",  "Metro Indautxu",        Paleta.RojoL, null,  628,345, false, "metro");
         S("mtmoyua",     "Metro Moyúa",           Paleta.RojoL, null,  728,322, false, "metro");
         S("mtcasco",     "Metro Casco Viejo",     Paleta.RojoL, null,  940,330, false, "metro");
-        S("mtsantutxu",  "Metro Santutxu",        Paleta.RojoL, null, 1160,420, false, "metro");
-        S("mtbasarrate", "Metro Basarrate",       Paleta.RojoL, null, 1110,400, false, "metro");
-        S("mtbolueta",   "Metro Bolueta",         Paleta.RojoL, null, 1258,400, false, "metro");
         // Cercanías: los apeaderos del fondo del valle, que es donde el metro no llega.
         S("trolabeaga",  "Apeadero de Olabeaga",  Paleta.H("#8fa66b"), null, 392,412, false, "tren");
         S("trametzola",  "Apeadero de Ametzola",  Paleta.H("#8fa66b"), null, 640,470, false, "tren");
