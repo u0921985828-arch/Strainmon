@@ -87,17 +87,45 @@ public static class Singulares {
     // ═══════════ LOS TRECE ═══════════
 
     static readonly Dictionary<string,Plano_> DePlano = new Dictionary<string,Plano_> {
-        // 227×203 m: el estadio, y lo que más se reconoce de Bilbao desde el aire después
-        // de la ría. No hay otro rectángulo verde en toda la ciudad.
-        {"sanmames", new Plano_ { W = 44, H = 39, Dib = (T,W,H) => {
-            T.P(0,0,W,H,Paleta.HormigonO);
-            T.P(1,1,W-2,H-2,Paleta.GrisL);                     // el anillo de fuera
-            T.P(2.6f,2.6f,W-5.2f,H-5.2f,Paleta.Gris);          // la grada
-            T.P(4.4f,3.8f,W-8.8f,H-7.6f,Paleta.Carbon);        // la boca, en sombra
-            float px = 6, py = 5, pw = W-12, ph = H-10;
+        // 175×145 m: el estadio viejo, La Catedral. El cuenco de 2013 mide 227×203 y
+        // todavía no existe; en el 96 lo que hay es la caja del trece con el arco de acero
+        // de los cincuenta sobre la tribuna. Sigue siendo lo que más se reconoce de Bilbao
+        // desde el aire después de la ría —no hay otro rectángulo verde en la ciudad— y
+        // ahora además lleva encima lo único curvo del mapa.
+        {"sanmames", new Plano_ { W = 34, H = 28, Dib = (T,W,H) => {
+            // Abajo se encogen hasta que caben, y este cabe al 50 %: nada de medidas
+            // absolutas, que a la mitad se salen de la caja. Todo va por `k`, que vale 1
+            // a tamaño de plano.
+            float k = H/28f;
+            T.P(0,0,W,H,Paleta.HormigonO);                     // la explanada de alrededor
+            T.P(k,k,W-2*k,H-2*k,Paleta.GrisL);                 // el muro y el anillo de fuera
+            T.P(2.4f*k,2.4f*k,W-4.8f*k,H-4.8f*k,Paleta.Gris);  // la grada
+            // Los dos fondos son lo único descubierto, así que son lo único donde se ven
+            // las filas: rayas paralelas a la portería. Sin ellas la grada es un gris.
+            for (int i = 0; i < 3; i++) {
+                T.P(3.2f*k+i*.8f*k,3.6f*k,.3f*k,H-7.2f*k,Paleta.GrisO);
+                T.P(W-3.5f*k-i*.8f*k,3.6f*k,.3f*k,H-7.2f*k,Paleta.GrisO);
+            }
+            // 105×70 m, la medida reglamentaria.
+            float pw = 20.3f*k, ph = 13.6f*k, px = (W-pw)/2, py = 7.4f*k;
+            // La boca ciñe el césped: entre la última fila y la banda hay metro y medio,
+            // no treinta. Con la boca a la caja entera el estadio salía siendo un agujero
+            // negro con un sello verde al fondo, que es justo lo que no es un campo.
+            T.P(px-1.4f*k,py-1.4f*k,pw+2.8f*k,ph+2.8f*k,Paleta.Carbon);
+            // Las cubiertas. Tribuna y preferencia van techadas de lado a lado; los dos
+            // fondos no, y las esquinas siguen abiertas, que es como estaba en el 96.
+            T.P(3.2f*k,2.6f*k,W-6.4f*k,2.6f*k,Paleta.Hormigon);
+            T.P(3.2f*k,H-5.2f*k,W-6.4f*k,2.6f*k,Paleta.Hormigon);
+            for (float x = 4.4f*k; x < W-4*k; x += 2.6f*k) {   // las correas de las cubiertas
+                T.P(x,2.6f*k,.3f*k,2.6f*k,Paleta.GrisL);
+                T.P(x,H-5.2f*k,.3f*k,2.6f*k,Paleta.GrisL);
+            }
+            T.P(3.2f*k,4.9f*k,W-6.4f*k,.3f*k,Paleta.GrisL);    // el alero, donde acaba el techo
+            T.P(3.2f*k,H-5.5f*k,W-6.4f*k,.3f*k,Paleta.GrisL);
             T.P(px,py,pw,ph,Paleta.CespedO);
-            for (float i = 0; i < pw; i += 2) T.P(px+i,py,1,ph,Paleta.Cesped);  // la siega
-            const float l = .22f;
+            for (float i = 0; i < pw; i += 2*k)
+                T.P(px+i,py,k,ph,Paleta.Cesped);               // las franjas de siega
+            float l = .22f*k;
             T.P(px,py,pw,l,Paleta.Hueso); T.P(px,py+ph-l,pw,l,Paleta.Hueso);
             T.P(px,py,l,ph,Paleta.Hueso); T.P(px+pw-l,py,l,ph,Paleta.Hueso);
             T.P(px+pw/2-l/2,py,l,ph,Paleta.Hueso);             // el medio campo
@@ -109,10 +137,30 @@ public static class Singulares {
                 T.P(hx,py+ph/2+ph/3,pw/6,l,Paleta.Hueso);
                 T.P(bx,py+ph/2-ph/3,l,ph*2/3,Paleta.Hueso);
             }
-            float[,] focos = {{1.4f,1.4f},{W-3.4f,1.4f},{1.4f,H-3.4f},{W-3.4f,H-3.4f}};
+            // El arco. Cuarenta y cinco metros de acero de punta a punta de la tribuna, y
+            // lo que le da el apodo al campo. Desde arriba no se vería —un arco visto en
+            // planta es una recta— pero esta vista es la de 45°, así que el alto sube por
+            // la pantalla: la curva arranca del borde interior del tejado y su clave se
+            // asoma por encima del estadio.
+            float ax0 = 3.6f*k, ax1 = W-3.6f*k, ay = 4.8f*k, flecha = 4*k;
+            Action<float,float,Color32> arco = (dy, gr, col) => {
+                int n = Mathf.Max(64, Mathf.RoundToInt((ax1-ax0)*Forja.TS/1.5f));
+                for (int i = 0; i <= n; i++) {
+                    float t = i/(float)n;
+                    T.P(ax0+(ax1-ax0)*t-gr/2,
+                        ay - Mathf.Sin(Mathf.PI*t)*flecha + dy - gr/2, gr, gr, col);
+                }
+            };
+            arco(.34f*k,.9f*k,Paleta.AceroO);                  // el canto, en sombra
+            arco(0,.9f*k,Paleta.Acero);
+            arco(-.28f*k,.5f*k,Paleta.Hueso);                  // el brillo de arriba
+            T.P(ax0-.8f*k,ay-.4f*k,1.6f*k,2.4f*k,Paleta.AceroO);   // los dos arranques
+            T.P(ax1-.8f*k,ay-.4f*k,1.6f*k,2.4f*k,Paleta.AceroO);
+            float[,] focos = {{1.4f*k,1.4f*k},{W-3.4f*k,1.4f*k},
+                              {1.4f*k,H-3.4f*k},{W-3.4f*k,H-3.4f*k}};
             for (int i = 0; i < 4; i++) {
-                T.P(focos[i,0],focos[i,1],2,2,Paleta.Acero);
-                T.P(focos[i,0]+.45f,focos[i,1]+.45f,1.1f,1.1f,Paleta.Hueso);
+                T.P(focos[i,0],focos[i,1],2*k,2*k,Paleta.Acero);
+                T.P(focos[i,0]+.45f*k,focos[i,1]+.45f*k,1.1f*k,1.1f*k,Paleta.Hueso);
             }
         }}},
         // 1996: aquí no hay museo todavía, hay un solar con grúas. Abre en octubre del 97,

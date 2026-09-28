@@ -4323,17 +4323,39 @@ function singular(id,w,h,fn){
 
 /* Cada uno con su medida real en metros pasada a casillas, y su dibujo. */
 const PLANO_SINGULAR={
- /* 227×203 m: el estadio, y lo que más se reconoce de Bilbao desde el aire después de la
-    ría. No hay otro rectángulo verde en toda la ciudad. */
- sanmames:[44,39,(T,W,H,aro)=>{
-  T(0,0,W,H,C.hormigonO);
-  T(1,1,W-2,H-2,C.grisL);                            /* el anillo de fuera */
-  T(2.6,2.6,W-5.2,H-5.2,C.gris);                     /* la grada */
-  T(4.4,3.8,W-8.8,H-7.6,C.carbon);                   /* la boca, en sombra */
-  const px=6,py=5,pw=W-12,ph=H-10;
+ /* 175×145 m: el estadio viejo, La Catedral. El cuenco de 2013 mide 227×203 y todavía
+    no existe; en el 96 lo que hay es la caja del trece con el arco de acero de los
+    cincuenta sobre la tribuna. Sigue siendo lo que más se reconoce de Bilbao desde el
+    aire después de la ría —no hay otro rectángulo verde en la ciudad— y ahora además
+    lleva encima lo único curvo del mapa. */
+ sanmames:[34,28,(T,W,H,aro)=>{
+  /* Abajo se encogen hasta que caben, y este cabe al 50 %: nada de medidas absolutas,
+     que a la mitad se salen de la caja. Todo va por `k`, que es 1 a tamaño de plano. */
+  const k=H/28;
+  T(0,0,W,H,C.hormigonO);                            /* la explanada de alrededor */
+  T(k,k,W-2*k,H-2*k,C.grisL);                        /* el muro y el anillo de fuera */
+  T(2.4*k,2.4*k,W-4.8*k,H-4.8*k,C.gris);             /* la grada */
+  /* Los dos fondos son lo único descubierto, así que son lo único donde se ven las
+     filas: rayas paralelas a la portería. Sin ellas la grada es un gris y ya. */
+  for(let i=0;i<3;i++){
+   T(3.2*k+i*.8*k,3.6*k,.3*k,H-7.2*k,C.grisO);
+   T(W-3.5*k-i*.8*k,3.6*k,.3*k,H-7.2*k,C.grisO);}
+  const pw=20.3*k,ph=13.6*k,px=(W-pw)/2,py=7.4*k;    /* 105×70 m, la reglamentaria */
+  /* La boca ciñe el césped: entre la última fila y la banda hay metro y medio, no treinta.
+     Con la boca a la caja entera el estadio salía siendo un agujero negro con un sello
+     verde al fondo, que es justo lo que no es un campo de fútbol. */
+  T(px-1.4*k,py-1.4*k,pw+2.8*k,ph+2.8*k,C.carbon);
+  /* Las cubiertas. Tribuna y preferencia van techadas de lado a lado; los dos fondos no,
+     y las esquinas siguen abiertas, que es como estaba el estadio en el 96. */
+  T(3.2*k,2.6*k,W-6.4*k,2.6*k,C.hormigon);
+  T(3.2*k,H-5.2*k,W-6.4*k,2.6*k,C.hormigon);
+  for(let x=4.4*k;x<W-4*k;x+=2.6*k){                 /* las correas de las dos cubiertas */
+   T(x,2.6*k,.3*k,2.6*k,C.grisL);T(x,H-5.2*k,.3*k,2.6*k,C.grisL);}
+  T(3.2*k,4.9*k,W-6.4*k,.3*k,C.grisL);               /* el alero, donde el techo se acaba */
+  T(3.2*k,H-5.5*k,W-6.4*k,.3*k,C.grisL);
   T(px,py,pw,ph,C.cespedO);
-  for(let i=0;i<pw;i+=2)T(px+i,py,1,ph,C.cesped);    /* las franjas de siega */
-  const l=.22;
+  for(let i=0;i<pw;i+=2*k)T(px+i,py,k,ph,C.cesped);  /* las franjas de siega */
+  const l=.22*k;
   T(px,py,pw,l,C.hueso);T(px,py+ph-l,pw,l,C.hueso);
   T(px,py,l,ph,C.hueso);T(px+pw-l,py,l,ph,C.hueso);
   T(px+pw/2-l/2,py,l,ph,C.hueso);                    /* el medio campo */
@@ -4343,8 +4365,21 @@ const PLANO_SINGULAR={
    T(s?bx:px,py+ph/2-ph/3,pw/6,l,C.hueso);
    T(s?bx:px,py+ph/2+ph/3,pw/6,l,C.hueso);
    T(bx,py+ph/2-ph/3,l,ph*2/3,C.hueso);}
-  for(const[fx,fy]of[[1.4,1.4],[W-3.4,1.4],[1.4,H-3.4],[W-3.4,H-3.4]]){
-   T(fx,fy,2,2,C.acero);T(fx+.45,fy+.45,1.1,1.1,C.hueso);}}],
+  /* El arco. Cuarenta y cinco metros de acero de punta a punta de la tribuna, y lo que le
+     da el apodo al campo. Desde arriba no se vería —un arco visto en planta es una recta—
+     pero esta vista es la de 45°, así que el alto sube por la pantalla: la curva arranca
+     del borde interior del tejado y su clave se asoma por encima del estadio. */
+  const ax0=3.6*k,ax1=W-3.6*k,ay=4.8*k,flecha=4*k;
+  const arco=(dy,gr,col)=>{const n=Math.max(64,Math.round((ax1-ax0)*TS/1.5));
+   for(let i=0;i<=n;i++){const t=i/n;
+    T(ax0+(ax1-ax0)*t-gr/2, ay-Math.sin(Math.PI*t)*flecha+dy-gr/2, gr, gr, col);}};
+  arco(.34*k,.9*k,C.aceroO);                         /* el canto, en sombra */
+  arco(0,.9*k,C.acero);
+  arco(-.28*k,.5*k,C.hueso);                         /* el brillo de arriba */
+  T(ax0-.8*k,ay-.4*k,1.6*k,2.4*k,C.aceroO);          /* los dos arranques */
+  T(ax1-.8*k,ay-.4*k,1.6*k,2.4*k,C.aceroO);
+  for(const[fx,fy]of[[1.4*k,1.4*k],[W-3.4*k,1.4*k],[1.4*k,H-3.4*k],[W-3.4*k,H-3.4*k]]){
+   T(fx,fy,2*k,2*k,C.acero);T(fx+.45*k,fy+.45*k,1.1*k,1.1*k,C.hueso);}}],
  /* 150×110 m. Chapa de titanio: bandas alabeadas unas sobre otras, cada una con su
     brillo arriba. Desde el aire el museo es eso y poco más. */
  /* 1996: aquí no hay museo todavía, hay un solar con grúas. Abre en octubre del 97, así

@@ -44,6 +44,24 @@ Repasar comportamiento contra el prototipo, que es el probado:
 - [ ] Economía: precios, pagos de curros, alquiler semanal.
 - [ ] Auto-apuntado: solo a enemigos, nunca a viandantes salvo con las manos.
 
+## 3 bis · Lo que queda de 1996
+
+CONTEXT.md §3.1 fija el último trimestre del 96. Ya están hechos los edificios: fuera
+Iberdrola, Euskalduna y el Bilbao Arena, el Guggenheim pasa a ser su obra, el metro se
+queda en la Línea 1, y San Mamés vuelve a ser el estadio viejo con su arco.
+
+Lo que falta es **planta**, no dibujo, y la planta sale del plano municipal de 2024: el
+grid comprimido del HTML ya trae la ciudad de hoy. Para retroceder estos sectores hace
+falta la ortofoto del 96 de geoEuskadi y volver a pasar `herramientas/plano/extraer.py`,
+así que no se puede hacer a ojo desde aquí.
+
+- [ ] Abandoibarra: el muelle todavía en uso, sin paseo.
+- [ ] Euskalduna: el astillero, que cierra en el 88 y sigue ahí de ruina.
+- [ ] Zubizuri: no existe hasta el 97. Comprobado que tampoco está en el grid.
+- [ ] Ametzola: playas de vías, no el parque.
+- [ ] Zorrotzaurre: península, no isla. El canal es de 2018.
+- [ ] Barakaldo / AHV: los hornos, no Megapark.
+
 ## 4 · Rendimiento
 
 - [ ] El mobiliario son GameObjects sueltos (varios miles). Si el presupuesto de dibujado
