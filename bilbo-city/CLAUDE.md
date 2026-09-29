@@ -86,8 +86,8 @@ nada, en C# la excepción salta en el siguiente `MoveNext`.
   `herramientas/plano/paleta.py` compara colores y apodos entre el HTML y Unity.
 - **Sin assets importados.** Ni PNG, ni WAV, ni fuentes TTF de terceros en el
   repositorio. Si necesitas algo nuevo, se forja por código en `Assets/Scripts/Arte/`.
-  Las hojas de personaje del bloque `SPRITES` **no son una excepción**: se rasterizan de un
-  esqueleto nuestro (`herramientas/sprites/cuerpos.py`), sin red y sin clave, y entran
+  Las hojas de personaje del bloque `SPRITES` **no son una excepción**: se dibujan en SVG
+  sobre un esqueleto nuestro (`herramientas/sprites/`), sin red y sin clave, y entran
   cuantizadas a la paleta y escritas como índices comprimidos, nunca como archivo de
   imagen. **Excepción con condiciones: también pueden venir de PixelLab**, por el mismo
   camino. Vengan de donde vengan entran por **siluetas**, no por personajes: cada parte del
@@ -473,9 +473,13 @@ python3 herramientas/sprites/pixellab.py --mano      # las 385 celdas, sin red n
 
 ### Los sprites de personaje salen de un esqueleto, aquí, sin red
 
-Las 385 celdas las rasteriza `herramientas/sprites/cuerpos.py` de un **esqueleto**: catorce
-puntos por pose y un grosor por tramo, dibujados como cápsulas que se afilan, a ×4 y
-reducidos por mayoría. Son cien por cien nuestras y no necesitan ni clave ni internet:
+Las 385 celdas salen de un **esqueleto** —catorce puntos por pose y un grosor por tramo,
+en `cuerpos.py`— dibujado en **SVG** por `vector.py` y **fotografiado** con Chromium a ×16,
+reducido por mayoría de submuestras. Un SVG es texto y se escribe aquí, pero deja dibujar
+lo que un rectángulo no puede: el hombro que cae, la cintura, el puño, el flequillo.
+La foto revelada se guarda en `celdas.py` (**generado**, no se edita a mano; se rehace con
+`vector.py --escribe`), porque capturar necesita node y Chromium y el empaquetador tiene
+que poder correr sin ellos. Son cien por cien nuestras y no necesitan ni clave ni internet:
 `python3 herramientas/sprites/pixellab.py --mano`. PixelLab sigue ahí como alternativa,
 no como dependencia.
 
@@ -488,8 +492,9 @@ propia forma y la luz viene siempre de arriba a la izquierda, así que las 385 e
 sombreadas igual. Y se pintan con la luminancia exacta de cada tono de su rampa —ocho
 para la piel, cuatro para la chaqueta—, no con tres apaños.
 
-No lo toques con filas de texto: escribir el cuerpo como rectángulos apilados es lo que
-había antes y salía cuadrado, con los hombros, la cintura y la cadera del mismo ancho.
+No lo toques con filas de texto ni con un `<rect>` por píxel: escribir el cuerpo como
+rectángulos apilados es lo que había antes y salía cuadrado, con los hombros, la cintura y
+la cadera del mismo ancho. Y no edites `celdas.py`: es la foto, no el dibujo.
 
 ### Ni traídos ni forjados: siluetas
 

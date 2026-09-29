@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""El esqueleto de cada pose. De aquí salen las 55 celdas, ya redondeadas.
+"""El esqueleto de cada pose: los huesos de los que sale el dibujo.
 
 Por qué un esqueleto y no un mapa de píxeles
 --------------------------------------------
@@ -10,9 +10,12 @@ después deja de parecer una caja.
 
 Así que lo que se escribe no es el dibujo: son los **huesos**. Catorce puntos —cabeza,
 cuello, hombros, codos, manos, caderas, rodillas, tobillos y puntas— y un grosor por
-tramo. El cuerpo se rasteriza como cápsulas que se afilan del hombro a la mano y del
-muslo al tobillo, la cabeza como una elipse, y todo a ×4 y reducido después por mayoría:
-una diagonal a ×4 baja como una diagonal de píxeles, no como una escalera de bloques.
+tramo.
+
+Quien los dibuja es `vector.py`: trazados SVG en unidades de celda con decimales, que se
+**fotografían** con Chromium a ×16 y se reducen por mayoría de submuestras. Un SVG es
+texto, se escribe aquí igual que estos números, y a cambio deja dibujar lo que un
+rectángulo no puede — el hombro cayendo, la cintura metida, el puño, el flequillo.
 
 Lo que se gana, además de la forma:
 
@@ -67,9 +70,10 @@ PELO = {'south':      (0.0, -2.7, 0.0, .60),
         'north-east': (-1.1, -0.8, 0.5, .92),
         'north':      (0.0, -1.0, 0.8, .90)}
 
-# El grosor de cada tramo, en radio de píxel. Afilándose hacia la punta: es lo que
-# convierte un palo en un brazo.
-GRUESO = {'brazo': (1.8, 1.6, 1.4), 'pierna': (2.0, 1.8, 1.5), 'pie': (1.4, 1.1),
+# El grosor de cada tramo, en radio de píxel. El brazo no se afila del todo: adelgaza en
+# el codo y vuelve a engordar en la mano, y ese bulto es el puño. La pierna sí se afila,
+# del muslo al tobillo. Es lo que convierte un palo en un miembro.
+GRUESO = {'brazo': (1.75, 1.45, 1.6), 'pierna': (2.0, 1.8, 1.5), 'pie': (1.4, 1.1),
           'cuello': (1.6, 1.8)}
 
 # Poses en las que los brazos van **por delante** del tronco. En las demás cuelgan a los
@@ -92,9 +96,9 @@ BASE = {
  'frente': {
   'cabeza':  (12.0, 4.9, 4.8, 4.6),          # centro x, centro y, radio x, radio y
   'cuello':  (12.0, 9.6),
-  'hombro':  ((7.1, 11.2), (16.9, 11.2)),
-  'codo':    ((6.4, 14.8), (17.6, 14.8)),
-  'mano':    ((6.6, 18.0), (17.4, 18.0)),
+  'hombro':  ((8.1, 11.2), (15.9, 11.2)),
+  'codo':    ((7.0, 14.8), (17.0, 14.8)),
+  'mano':    ((7.2, 17.8), (16.8, 17.8)),
   'cadera':  ((9.8, 16.6), (14.2, 16.6)),
   'rodilla': ((9.5, 21.6), (14.5, 21.6)),
   'tobillo': ((9.5, 25.4), (14.5, 25.4)),
@@ -107,9 +111,9 @@ BASE = {
  'tres': {
   'cabeza':  (12.4, 4.9, 4.7, 4.6),
   'cuello':  (12.2, 9.6),
-  'hombro':  ((7.7, 11.2), (17.1, 11.2)),
-  'codo':    ((7.1, 14.8), (17.7, 14.8)),
-  'mano':    ((7.3, 18.0), (17.5, 18.0)),
+  'hombro':  ((8.5, 11.2), (16.2, 11.2)),
+  'codo':    ((7.6, 14.8), (17.2, 14.8)),
+  'mano':    ((7.8, 17.8), (17.0, 17.8)),
   'cadera':  ((10.2, 16.6), (14.5, 16.6)),
   'rodilla': ((10.0, 21.6), (14.8, 21.6)),
   'tobillo': ((10.0, 25.4), (14.8, 25.4)),
@@ -121,9 +125,9 @@ BASE = {
  'perfil': {
   'cabeza':  (12.5, 4.9, 4.6, 4.6),
   'cuello':  (12.3, 9.6),
-  'hombro':  ((9.0, 11.2), (15.2, 11.2)),
-  'codo':    ((8.4, 14.8), (15.8, 14.8)),
-  'mano':    ((8.6, 18.0), (15.8, 18.0)),
+  'hombro':  ((9.6, 11.2), (14.6, 11.2)),
+  'codo':    ((9.0, 14.8), (15.4, 14.8)),
+  'mano':    ((9.2, 17.8), (15.4, 17.8)),
   'cadera':  ((11.3, 16.6), (12.7, 16.6)),
   'rodilla': ((11.2, 21.6), (12.8, 21.6)),
   'tobillo': ((11.2, 25.4), (12.8, 25.4)),
@@ -260,80 +264,6 @@ DIBUJOS = ('quieto', 'andarA', 'andarP', 'andarB', 'correrA', 'correrB',
 VACIO = '.'
 
 
-# ── el rasterizador ────────────────────────────────────────────────────────────────
-
-def _lienzo():
-    return [[VACIO] * (ANCHO * MUESTRA) for _ in range(ALTO * MUESTRA)]
-
-
-def _capsula(li, p0, p1, r0, r1, ch):
-    """Un tramo que se afila: el segmento p0-p1 con radio r0 en un extremo y r1 en el otro.
-
-    Es la primitiva de todo el cuerpo. Un brazo es dos cápsulas, una pierna otras dos y el
-    tronco una sola, y como el radio interpola, el codo y la rodilla salen sin dibujarlos.
-    """
-    m = MUESTRA
-    x0, y0 = p0[0] * m, p0[1] * m
-    x1, y1 = p1[0] * m, p1[1] * m
-    r0, r1 = r0 * m, r1 * m
-    dx, dy = x1 - x0, y1 - y0
-    largo2 = dx * dx + dy * dy
-    rmax = max(r0, r1)
-    xa = max(0, int(min(x0, x1) - rmax) - 1)
-    xb = min(ANCHO * m - 1, int(max(x0, x1) + rmax) + 1)
-    ya = max(0, int(min(y0, y1) - rmax) - 1)
-    yb = min(ALTO * m - 1, int(max(y0, y1) + rmax) + 1)
-    for y in range(ya, yb + 1):
-        py = y + .5
-        for x in range(xa, xb + 1):
-            px = x + .5
-            t = 0. if not largo2 else ((px - x0) * dx + (py - y0) * dy) / largo2
-            t = min(1., max(0., t))
-            ex, ey = px - (x0 + dx * t), py - (y0 + dy * t)
-            r = r0 + (r1 - r0) * t
-            if ex * ex + ey * ey <= r * r:
-                li[y][x] = ch
-
-
-def _elipse(li, cx, cy, rx, ry, ch, solo=None, n=REDONDEZ):
-    """Una superelipse. Con n=2 es una elipse; por encima, un rectángulo redondeado.
-
-    `solo` la limita a pintar encima de un carácter concreto — así el pelo se queda dentro
-    de la cabeza en vez de flotar alrededor de ella.
-    """
-    m = MUESTRA
-    cx, cy, rx, ry = cx * m, cy * m, rx * m, ry * m
-    for y in range(max(0, int(cy - ry) - 1), min(ALTO * m, int(cy + ry) + 2)):
-        for x in range(max(0, int(cx - rx) - 1), min(ANCHO * m, int(cx + rx) + 2)):
-            ex, ey = abs(x + .5 - cx) / rx, abs(y + .5 - cy) / ry
-            if ex ** n + ey ** n <= 1. and (solo is None or li[y][x] == solo):
-                li[y][x] = ch
-
-
-def _reduce(li):
-    """De ×4 a tamaño de celda, por mayoría. Con la mitad de las muestras dentro, el píxel
-    entra; y de los que entran manda el carácter más votado, que es lo que reparte bien un
-    píxel que cae entre la manga y la mano."""
-    m = MUESTRA
-    fuera = []
-    for y in range(ALTO):
-        fila = []
-        for x in range(ANCHO):
-            cuenta = {}
-            for sy in range(y * m, y * m + m):
-                for sx in range(x * m, x * m + m):
-                    c = li[sy][sx]
-                    if c != VACIO:
-                        cuenta[c] = cuenta.get(c, 0) + 1
-            total = sum(cuenta.values())
-            if total < LLENO:
-                fila.append(VACIO)
-            else:
-                fila.append(max(cuenta.items(), key=lambda kv: (kv[1], kv[0]))[0])
-        fuera.append(''.join(fila))
-    return fuera
-
-
 def _mueve(p, d):
     return (p[0] + d[0], p[1] + d[1])
 
@@ -361,51 +291,29 @@ def huesos(dibujo, direccion):
     return h
 
 
-def celda(dibujo, direccion):
-    """Una celda entera, en el alfabeto de `trazos`. Solo forma; ni tonos ni contorno.
+def _celdas():
+    """Las 55 celdas ya dibujadas y capturadas, tal como salen de `celdas.py`.
 
-    El orden de pintado es el orden de profundidad: primero lo de allá, que el tronco tapa,
-    y al final la cabeza, que no la tapa nada. De perfil es lo que hace que solo se vea un
-    brazo sin tener que borrarlo a mano.
+    El dibujo vive en `vector.py` —trazados SVG sobre estos mismos huesos, fotografiados
+    con Chromium y reducidos por mayoría— y aquí solo se lee el resultado. Se guarda
+    revelado en el repositorio porque capturar necesita node y Chromium, y el empaquetador
+    tiene que poder correr sin ninguno de los dos.
+
+    Después de tocar un hueso de aquí arriba o un trazado de allí:
+
+        python3 herramientas/sprites/vector.py --escribe
+
+    Si no se rehace, esto revienta en cuanto falte una celda: más vale un error que una
+    hoja con la mitad de las poses de ayer.
     """
-    vista = VISTA_DE[direccion]
-    h = huesos(dibujo, direccion)
-    li = _lienzo()
-    lejos = None if vista == 'frente' else 0   # de perfil y de tres cuartos, el lado de allá
-    cerca = 1 if lejos == 0 else None
-
-    def brazo(i):
-        _capsula(li, h['hombro'][i], h['codo'][i], GRUESO['brazo'][0], GRUESO['brazo'][1], 'r')
-        _capsula(li, h['codo'][i], h['mano'][i], GRUESO['brazo'][1], GRUESO['brazo'][2], 'r')
-
-    def pierna(i):
-        _capsula(li, h['cadera'][i], h['rodilla'][i],
-                 GRUESO['pierna'][0], GRUESO['pierna'][1], 'p')
-        _capsula(li, h['rodilla'][i], h['tobillo'][i],
-                 GRUESO['pierna'][1], GRUESO['pierna'][2], 'p')
-        _capsula(li, h['tobillo'][i], h['punta'][i], GRUESO['pie'][0], GRUESO['pie'][1], 'c')
-
-    delante = dibujo in DELANTE
-    if not delante:                       # colgando: el tronco les tapa el hombro
-        brazo(0)
-        brazo(1)
-    for i in ((lejos, cerca) if lejos is not None else (0, 1)):
-        pierna(i)
-    a, b = h['torso']
-    _capsula(li, (a[0], a[1]), (b[0], b[1]), a[2], b[2], 't')
-    # El cuello va **después** del tronco. El casquete redondo con el que acaba la cápsula
-    # del tronco sube por encima de la barbilla y, dibujando el cuello antes, se lo traga
-    # entero: de espaldas no quedaba un solo píxel de piel en toda la celda.
-    _capsula(li, h['cuello'], (h['cuello'][0], h['cuello'][1] + 1.2),
-             GRUESO['cuello'][0], GRUESO['cuello'][1], 's')
-    if delante:                           # cruzados o estirados: por encima del pecho
-        brazo(0)
-        brazo(1)
-    cx, cy, rx, ry = h['cabeza']
-    _elipse(li, cx, cy, rx, ry, 's')
-    dx, dy, dr, fy = PELO[direccion]
-    _elipse(li, cx + dx, cy + dy, rx + dr, ry * fy + dr, 'h', solo='s')
-    return '\n'.join(_reduce(li))
+    from celdas import CELDAS
+    faltan = ['%s/%s' % (dib, d) for dib in DIBUJOS for d in DIRS
+              if d not in CELDAS.get(dib, {})]
+    if faltan:
+        raise SystemExit('celdas.py se ha quedado atrás, faltan %d (%s...). '
+                         'Rehazlo: python3 herramientas/sprites/vector.py --escribe'
+                         % (len(faltan), ', '.join(faltan[:3])))
+    return {dib: {d: CELDAS[dib][d].strip('\n') for d in DIRS} for dib in DIBUJOS}
 
 
-TRAZOS = {dib: {d: celda(dib, d) for d in DIRS} for dib in DIBUJOS}
+TRAZOS = _celdas()

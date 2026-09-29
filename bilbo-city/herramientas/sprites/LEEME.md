@@ -8,7 +8,7 @@ escribe en la hoja que el juego ya sabe leer.
 
 | | |
 |---|---|
-| `--mano` | **lo que se usa.** Las celdas se rasterizan aquí mismo, de un esqueleto escrito en `cuerpos.py`. Ni red, ni clave, ni un céntimo, y cien por cien nuestras. |
+| `--mano` | **lo que se usa.** Las celdas se dibujan aquí mismo: trazados SVG sobre un esqueleto (`cuerpos.py` + `vector.py`), fotografiados y reducidos. Ni red, ni clave, ni un céntimo, y cien por cien nuestras. |
 | (nada) | PixelLab. Necesita clave y salida a internet. Queda como alternativa, no como dependencia. |
 | `--simular` | monigotes de relleno. No valen para jugar: valen para ejercitar el empaquetador. |
 
@@ -36,16 +36,31 @@ plantilla en sus rampas, que es justo lo que hay que mirar — piel en tonos car
 marrones, torso en azules, piernas en verdes, calzado en maderas. Una manga en tonos carne
 es el reparto equivocándose.
 
-## Las celdas se dibujan aquí: un esqueleto, no un mapa de píxeles
+## Las celdas se dibujan aquí: un esqueleto y un SVG, no un mapa de píxeles
 
 `cuerpos.py` no guarda dibujos: guarda **huesos**. Catorce puntos por pose —cabeza, cuello,
-hombros, codos, manos, caderas, rodillas, tobillos y puntas— y un grosor por tramo. El
-cuerpo se rasteriza como cápsulas que se afilan del hombro a la mano y del muslo al
-tobillo, la cabeza como una superelipse, y todo a ×4 y reducido después por mayoría de
-muestras: una diagonal a ×4 baja como una diagonal de píxeles y no como una escalera.
+hombros, codos, manos, caderas, rodillas, tobillos y puntas— y un grosor por tramo.
 
-Antes esto eran 55 rejillas de texto escritas a mano, y salía cuadrada: un cuerpo apilado
-a base de rectángulos tiene los hombros, la cintura y la cadera del mismo ancho, y
+Quien los dibuja es `vector.py`, en **SVG**, y ahí está la gracia: un SVG es texto, se
+escribe aquí igual que los números del esqueleto, pero **se fotografía**. Se dibuja en
+unidades de celda con decimales —una cabeza son ocho puntos de una curva, no ciento
+cuarenta rectángulos—, `capturar.js` hace **una sola foto** de las 55 con Chromium a ×16, y
+la reducción por mayoría decide qué píxel se enciende. A ×16 y con `shape-rendering=crispEdges`
+cada submuestra es un color plano y exacto, así que la reducción es una cuenta y no una
+adivinanza.
+
+Lo que da el SVG y no daba la cápsula: el hombro que cae, la cintura metida, el bulto del
+puño, la cuña del zapato y el flequillo. Y se puede abrir y mirar.
+
+    python3 herramientas/sprites/vector.py foto.png   # las 55 en bruto, para mirarlas
+    python3 herramientas/sprites/vector.py --escribe  # revelarlas a celdas.py
+
+`celdas.py` es la foto ya recortada, **generada y guardada en el repositorio**: capturar
+necesita node y el Chromium de Playwright, y el empaquetador tiene que poder correr sin
+ninguno de los dos. No se edita a mano; después de tocar un hueso o un trazado, se rehace.
+
+Antes de todo esto fueron 55 rejillas de texto escritas a mano, y salía cuadrada: un cuerpo
+apilado a base de rectángulos tiene los hombros, la cintura y la cadera del mismo ancho, y
 redondearle las esquinas después no lo arregla.
 
 Lo que se gana, además de la forma:
@@ -58,7 +73,7 @@ Lo que se gana, además de la forma:
   garantiza pedir 385 dibujos sueltos a un generador.
 * **Cinco cabezas y once poses, no 55 dibujos.** La cabeza cambia con la dirección y el
   cuerpo con la pose, y de las cinco direcciones el cuerpo solo distingue tres. Lo único
-  que separa las cinco direcciones de una misma vista es cuánto pelo tapa la cara.
+  que separa las cinco direcciones de una misma vista es por dónde corta el pelo.
 * **El volumen no se dibuja: se calcula.** `trazos.py` saca la normal de cada píxel de la
   propia forma y la ilumina desde arriba a la izquierda, igual en las 385. Sombreadas a
   ojo no saldrían iguales entre sí y el baile se vería al animarlas.
