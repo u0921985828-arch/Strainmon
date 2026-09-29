@@ -1,14 +1,23 @@
-# Sprites traídos de PixelLab
+# Los sprites de personaje
 
-El juego forja su arte por código y seguirá pudiendo hacerlo. Esto es la vía alternativa:
-bajar dibujos de [PixelLab](https://www.pixellab.ai), cuantizarlos a la paleta del juego y
-empaquetarlos en la hoja que el juego ya sabe leer.
+El juego forja su arte por código, y los personajes también. Este directorio es el
+empaquetador: de donde salgan las 385 celdas, las cuantiza a la paleta del juego y las
+escribe en la hoja que el juego ya sabe leer.
+
+**Salen de tres sitios, y el que manda es el primero.**
+
+| | |
+|---|---|
+| `--mano` | **lo que se usa.** Las celdas se rasterizan aquí mismo, de un esqueleto escrito en `cuerpos.py`. Ni red, ni clave, ni un céntimo, y cien por cien nuestras. |
+| (nada) | PixelLab. Necesita clave y salida a internet. Queda como alternativa, no como dependencia. |
+| `--simular` | monigotes de relleno. No valen para jugar: valen para ejercitar el empaquetador. |
 
 ```bash
+python3 herramientas/sprites/pixellab.py --mano           # lo normal: sin red ni clave
 export PIXELLAB_API_KEY=...
 python3 herramientas/sprites/pixellab.py --coste          # solo la cuenta
-python3 herramientas/sprites/pixellab.py --simular        # sin red ni clave
-python3 herramientas/sprites/pixellab.py                  # las siete siluetas
+python3 herramientas/sprites/pixellab.py --simular        # monigotes, sin red ni clave
+python3 herramientas/sprites/pixellab.py                  # las siete siluetas, de PixelLab
 python3 herramientas/sprites/pixellab.py --que largo_pantalon,abrigo_pantalon
 python3 herramientas/sprites/pixellab.py --diag --que largo_pantalon   # reparto por partes
 python3 herramientas/sprites/pixellab.py --lamina hojas.png --esc 4     # verlas sin abrir el juego
@@ -27,7 +36,64 @@ plantilla en sus rampas, que es justo lo que hay que mirar — piel en tonos car
 marrones, torso en azules, piernas en verdes, calzado en maderas. Una manga en tonos carne
 es el reparto equivocándose.
 
-## No se baja un personaje: se baja una silueta
+## Las celdas se dibujan aquí: un esqueleto, no un mapa de píxeles
+
+`cuerpos.py` no guarda dibujos: guarda **huesos**. Catorce puntos por pose —cabeza, cuello,
+hombros, codos, manos, caderas, rodillas, tobillos y puntas— y un grosor por tramo. El
+cuerpo se rasteriza como cápsulas que se afilan del hombro a la mano y del muslo al
+tobillo, la cabeza como una superelipse, y todo a ×4 y reducido después por mayoría de
+muestras: una diagonal a ×4 baja como una diagonal de píxeles y no como una escalera.
+
+Antes esto eran 55 rejillas de texto escritas a mano, y salía cuadrada: un cuerpo apilado
+a base de rectángulos tiene los hombros, la cintura y la cadera del mismo ancho, y
+redondearle las esquinas después no lo arregla.
+
+Lo que se gana, además de la forma:
+
+* **Una pose son catorce números.** Mover un brazo es cambiar un par; antes era reescribir
+  ocho filas de veinticuatro caracteres sin descuadrar ninguna.
+* **Es la misma persona en las 55.** El esqueleto base es uno por vista —de frente, de tres
+  cuartos y de perfil— y las poses solo lo desplazan, así que la estatura, el ancho de
+  hombros y el tamaño de la cabeza no pueden bailar entre celdas. Es justo lo que no
+  garantiza pedir 385 dibujos sueltos a un generador.
+* **Cinco cabezas y once poses, no 55 dibujos.** La cabeza cambia con la dirección y el
+  cuerpo con la pose, y de las cinco direcciones el cuerpo solo distingue tres. Lo único
+  que separa las cinco direcciones de una misma vista es cuánto pelo tapa la cara.
+* **El volumen no se dibuja: se calcula.** `trazos.py` saca la normal de cada píxel de la
+  propia forma y la ilumina desde arriba a la izquierda, igual en las 385. Sombreadas a
+  ojo no saldrían iguales entre sí y el baile se vería al animarlas.
+
+## Cada parte se pinta ya en su rampa
+
+Las rampas de la paleta tienen ocho tonos para la piel y cuatro para chaqueta, pantalón y
+pelo. `luces_rampa()` le pasa al pintor la **luminancia exacta** de cada uno de esos tonos,
+así que cada píxel nace en el escalón en el que va a acabar en vez de aplastarse contra el
+más parecido. Es la diferencia entre una figura de tres colores y una con bulto, y es lo
+que comprueba `pruebas_sprites.py`: si la piel deja de usar cinco de sus ocho tonos, la
+batería lo canta.
+
+El matiz sigue siendo el de plantilla —la piel tono carne, el torso magenta, las piernas
+verdes— porque el reparto por partes va por matiz. Para subir de brillo sin poder subir más
+el color (el azul puro ya está a tope) se mezcla con blanco: baja la saturación pero deja
+el matiz clavado, que es por lo único que el empaquetado reconoce la parte.
+
+Y una costura: donde el brazo toca el torso va el tono más oscuro de la rampa. Comparten
+color, y sin esa raya el brazo y el pecho se funden en un solo bloque.
+
+## Una celda, siete siluetas
+
+Se escribe **un** cuerpo —la chaqueta a la cadera y el pantalón entero— y las otras seis
+siluetas salen de ése por regla, en `trazos.viste`: el abrigo baja el torso hasta la
+rodilla, la falda cierra el hueco entre las piernas y cae con vuelo, el pantalón corto sube
+el bajo por encima de la rodilla y deja la pantorrilla al aire, la manga corta pasa el
+antebrazo a piel. Por eso son 55 celdas y no 385.
+
+La rodilla se mide sobre la parte **maciza** de la pierna, no sobre el primer píxel que
+asoma. De frente el muslo va detrás del tronco y de la cadera solo asoman dos píxeles a
+cada lado: midiendo contra esas migas, el pantalón corto empezaba por encima del faldón y
+la silueta se quedaba sin un solo píxel de pantalón que repintar.
+
+## Y si se baja de PixelLab: no se baja un personaje, se baja una silueta
 
 Un vecino de Bilbao no es un dibujo, es una combinación: complexión, torso, piernas,
 calzado, peinado, gorro y bolsa. Pedirle a PixelLab cada combinación entera son ochenta

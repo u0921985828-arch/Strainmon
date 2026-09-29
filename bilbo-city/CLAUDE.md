@@ -86,12 +86,13 @@ nada, en C# la excepción salta en el siguiente `MoveNext`.
   `herramientas/plano/paleta.py` compara colores y apodos entre el HTML y Unity.
 - **Sin assets importados.** Ni PNG, ni WAV, ni fuentes TTF de terceros en el
   repositorio. Si necesitas algo nuevo, se forja por código en `Assets/Scripts/Arte/`.
-  **Excepción con condiciones: los sprites de personaje pueden venir de PixelLab**
-  (`herramientas/sprites/`), pero entran cuantizados a la paleta y escritos como índices
-  comprimidos en el bloque `SPRITES`, nunca como archivo de imagen. Y entran por
-  **siluetas**, no por personajes: cada parte del cuerpo en su rampa, para poder repintarla
-  (ver *El arte*). Lo que falte se sigue forjando: el juego no puede depender de que haya
-  hoja.
+  Las hojas de personaje del bloque `SPRITES` **no son una excepción**: se rasterizan de un
+  esqueleto nuestro (`herramientas/sprites/cuerpos.py`), sin red y sin clave, y entran
+  cuantizadas a la paleta y escritas como índices comprimidos, nunca como archivo de
+  imagen. **Excepción con condiciones: también pueden venir de PixelLab**, por el mismo
+  camino. Vengan de donde vengan entran por **siluetas**, no por personajes: cada parte del
+  cuerpo en su rampa, para poder repintarla (ver *El arte*). Lo que falte se sigue
+  forjando: el juego no puede depender de que haya hoja.
 - **En artefactos web no uses `localStorage` directamente**: el HTML usa `window.storage` con
   respaldo a `localStorage`.
 - **Nada de `Math.random()` en el prototipo.** Usa `azar()`, o `rnd(a,b)` / `rndi(a,b)`, que
@@ -467,30 +468,52 @@ node herramientas/html/personajes.js  # las hojas de personaje, para juzgarlas
 node herramientas/html/personajes.js --esc 8 --que protagonista,ertzaina
 node herramientas/html/captura.js    # el juego en marcha, para ver el arte en la calle
 node herramientas/html/fuentes.js     # seis fuentes en una imagen, para elegir
-python3 herramientas/sprites/pixellab.py --simular   # sprites de PixelLab, sin gastar red
+python3 herramientas/sprites/pixellab.py --mano      # las 385 celdas, sin red ni clave
 ```
 
-### Los sprites traídos no son personajes: son siluetas
+### Los sprites de personaje salen de un esqueleto, aquí, sin red
 
-Lo que se le pide a PixelLab no es «el protagonista», es **una silueta** — chaqueta con
+Las 385 celdas las rasteriza `herramientas/sprites/cuerpos.py` de un **esqueleto**: catorce
+puntos por pose y un grosor por tramo, dibujados como cápsulas que se afilan, a ×4 y
+reducidos por mayoría. Son cien por cien nuestras y no necesitan ni clave ni internet:
+`python3 herramientas/sprites/pixellab.py --mano`. PixelLab sigue ahí como alternativa,
+no como dependencia.
+
+Dos cosas las sostienen. La primera, que el esqueleto base sea **uno por vista** —de
+frente, de tres cuartos y de perfil, y las cinco direcciones salen de tres— y que las
+poses solo lo desplacen: así la estatura y el ancho de hombros no pueden bailar entre
+celdas, que es lo que no garantiza pedir 385 dibujos sueltos. La segunda, que el volumen
+no se dibuje sino que se **calcule** (`trazos.py`): la normal de cada píxel sale de la
+propia forma y la luz viene siempre de arriba a la izquierda, así que las 385 están
+sombreadas igual. Y se pintan con la luminancia exacta de cada tono de su rampa —ocho
+para la piel, cuatro para la chaqueta—, no con tres apaños.
+
+No lo toques con filas de texto: escribir el cuerpo como rectángulos apilados es lo que
+había antes y salía cuadrado, con los hombros, la cintura y la cadera del mismo ancho.
+
+### Ni traídos ni forjados: siluetas
+
+Lo que se dibuja no es «el protagonista», es **una silueta** — chaqueta con
 pantalón, abrigo largo, falda, pantalón corto, capucha — y de cada una salen todos los
-vecinos que la llevan. La hoja viene pintada con **colores de plantilla**, uno por parte
+vecinos que la llevan. Se escribe **un** cuerpo y las otras seis siluetas salen de él por
+regla (`trazos.viste`). La hoja viene pintada con **colores de plantilla**, uno por parte
 del cuerpo, y el empaquetado guarda cada parte en su propia rampa de la paleta; como las
 rampas no comparten ni un color, repintar es cambiar índices por índices (`lutDe()`). El
 pelo largo, el gorro, la bolsa y el fogonazo no se bajan nunca: se forjan encima, anclados
 a la cabeza que trae la hoja (`capasEncima()`, `anclaCabeza()`). Es lo que evita que las
 hojas se multipliquen por cada peinado y cada sombrero.
 
-Y de cada silueta se baja menos de lo que se ve: **cinco direcciones de ocho** —las otras
+Y de cada silueta se dibuja menos de lo que se ve: **cinco direcciones de ocho** —las otras
 tres son espejo— y **once dibujos de dieciséis poses**, porque los pasos de apoyo del andar
-repiten y disparar es apuntar con el fogonazo encima. Salen 55 llamadas por silueta y **385
+repiten y disparar es apuntar con el fogonazo encima. Salen 55 celdas por silueta y **385
 para el juego entero**; pedir cuatro personajes completos eran 512 y vestían a cuatro. El
 arquetipo número treinta y cinco no cuesta ninguna.
 
 Si no hay hoja de su silueta exacta, el juego busca la más parecida; si no hay ninguna, lo
-forja. **Nunca se queda nadie sin dibujar**, y por eso bajar una sola silueta ya es jugable.
+forja. **Nunca se queda nadie sin dibujar**, y por eso una sola silueta ya es jugable.
 
-Todo esto se sostiene en que el generador respete los colores de plantilla, y ahí hay dos
+El reparto por partes se sostiene en los colores de plantilla —cada parte de un matiz que
+no se parece a ningún otro— vengan las celdas de donde vengan, y ahí hay dos
 trampas que costaron un fallo cada una. El reparto va **por matiz**, no por color
 normalizado: un brillo del pelo azul, aclarado hacia el blanco, se acerca más al magenta
 del torso que al azul del que salió, y media cabeza acababa repintada del color de la
@@ -500,9 +523,9 @@ el arquetipo salía calvo. Los píxeles desvaídos —brillos, sombras apagadas�
 por tono: se contagian del vecino con color. El empaquetador avisa cuando falta un color de
 plantilla o cuando la mayoría de la celda vino apagada, y `--diag` enseña el recuento.
 
-Los sprites de PixelLab necesitan clave (`PIXELLAB_API_KEY`) y salida a `api.pixellab.ai`,
-que **desde una sesión de Claude está cerrada**: eso se ejecuta en local. Ver
-`herramientas/sprites/LEEME.md`.
+`--mano` no necesita nada. La vía de PixelLab sí: clave (`PIXELLAB_API_KEY`) y salida a
+`api.pixellab.ai`, que **desde una sesión de Claude está cerrada**, así que eso se ejecuta
+en local. Ver `herramientas/sprites/LEEME.md`.
 
 ## Pixel perfect
 

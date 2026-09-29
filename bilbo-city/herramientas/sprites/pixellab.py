@@ -274,6 +274,15 @@ DE_POSE = {
 DESPLAZA = {'dispara': -1, 'agacha2': 1}
 
 
+def _dibujados():
+    """Los dibujos que ya están escritos a mano. Vacío si ni siquiera está el módulo."""
+    try:
+        import cuerpos
+    except ImportError:
+        return {}
+    return cuerpos.TRAZOS
+
+
 def _texto_html():
     return open(HTML, encoding='utf-8').read()
 
@@ -544,8 +553,23 @@ def descripcion(ropa, direccion, dibujo):
             f'{MISMA}; {ENCUADRE}; {ESTILO}')
 
 
-def genera(ropa, direccion, dibujo, clave, simular, plantilla=None):
-    """Un PNG de una silueta mirando a una dirección y haciendo algo."""
+def genera(ropa, direccion, dibujo, clave, modo, plantilla=None):
+    """Un PNG de una silueta mirando a una dirección y haciendo algo.
+
+    Tres procedencias, el mismo empaquetado detrás:
+
+    * `api`  — se le pide a PixelLab. Necesita red y clave.
+    * `mano` — está escrita a mano en `cuerpos.py`, píxel a píxel. No necesita nada.
+    * `sim`  — un monigote de relleno, solo para ejercitar la tubería.
+
+    `mano` no es un apaño mientras no haya clave: es la misma tubería con el dibujo
+    decidido aquí en vez de allí. Lo caro de un sprite nunca fue el envase —un SVG de
+    pixel art es un `<rect>` por píxel y habría que rasterizarlo a índices igual— sino
+    decidir cada píxel; y eso, decidido una vez, no se vuelve a pagar ni caduca.
+    """
+    simular = modo == 'sim'
+    if modo == 'mano':
+        return _mano(ropa, direccion, dibujo)
     # La procedencia va en la clave. Sin esto, un --simular previo —que es lo primero que
     # recomienda el LEEME— deja la caché llena de monigotes de relleno, y la tirada de
     # verdad los encuentra ahí, no llama a PixelLab ni una vez y termina diciendo que todo
@@ -597,6 +621,43 @@ def ropa_de(ropa, parte):
     while len(trozos) < 3:
         trozos.append('')
     return {'torso': trozos[0], 'piernas': trozos[1], 'calzado': trozos[2]}[parte]
+
+
+def _mano(ropa, direccion, dibujo):
+    """Una celda escrita a mano, vestida de esa silueta y pintada. Sin red y sin caché.
+
+    Sin caché a propósito: el dibujo está en el repositorio, sale en milisegundos, y una
+    caché solo serviría para seguir usando la versión de ayer después de corregir una
+    fila — que es el fallo que ya se pagó dos veces por otros dos caminos.
+    """
+    import cuerpos, trazos
+    if dibujo not in cuerpos.TRAZOS:
+        raise SystemExit('no hay dibujo a mano de «%s». Los que hay: %s'
+                         % (dibujo, ', '.join(sorted(cuerpos.TRAZOS))))
+    rej = trazos.viste(trazos.rejilla(cuerpos.TRAZOS[dibujo][direccion]), ropa)
+    return _png(trazos.pinta(rej, CLAVES, CEL_W, CEL_H, luces_rampa()))
+
+
+_LUCES = None
+
+
+def luces_rampa():
+    """La luminancia de cada tono de la rampa de cada parte, sacada de la paleta del juego.
+
+    Lo que se dibuja a mano no tiene por qué conformarse con tres tonos: la piel tiene
+    ocho en la paleta y la chaqueta cuatro. Dándole al pintor las luminancias exactas de
+    esos tonos, cada píxel nace ya en el escalón de la rampa en el que va a acabar, y el
+    empaquetado los reconoce uno a uno en vez de aplastar tres apaños contra el más
+    parecido. Es la diferencia entre una figura de tres colores y una con volumen.
+
+    Se calcula una vez: leer la paleta es abrir y escanear el HTML entero del juego.
+    """
+    global _LUCES
+    if _LUCES is None:
+        pal, por_nombre = paleta()
+        ramp = rampas(por_nombre)
+        _LUCES = {p: sorted(_luz(pal[i - 1]) for i in ramp[p]) for p in CLAVES}
+    return _LUCES
 
 
 def _silueta(direccion, dibujo):
@@ -799,7 +860,7 @@ def _avisa(nombre, dib, direccion, rep):
     return bool(avisos)
 
 
-def hoja(nombre, clave, simular, pal, ramp, diag=False, plantilla=None):
+def hoja(nombre, clave, modo, pal, ramp, diag=False, plantilla=None):
     """La hoja entera de una silueta: 8 columnas de dirección × 16 filas de pose."""
     ancho, alto = CEL_W * 8, CEL_H * len(POSES)
     rej = bytearray(ancho * alto)
@@ -807,7 +868,7 @@ def hoja(nombre, clave, simular, pal, ramp, diag=False, plantilla=None):
     for dib in sorted(set(DE_POSE[p] for p in POSES)):
         for fx in range(PEDIDAS):
             celdas[(dib, fx)], rep = a_indices(
-                genera(nombre, DIRECCIONES[fx], dib, clave, simular, plantilla), pal, ramp)
+                genera(nombre, DIRECCIONES[fx], dib, clave, modo, plantilla), pal, ramp)
             print(f'  {nombre:15s} {dib:8s} {DIRECCIONES[fx]}', flush=True)
             if diag:
                 print('     ' + '  '.join(f'{k} {v}' for k, v in sorted(rep.items())),
@@ -888,6 +949,8 @@ if __name__ == '__main__':
     ap.add_argument('--que', default=','.join(SETS), help='siluetas, separadas por coma')
     ap.add_argument('--clave', default=os.environ.get('PIXELLAB_API_KEY', ''))
     ap.add_argument('--simular', action='store_true', help='sin red: monigotes de relleno')
+    ap.add_argument('--mano', action='store_true',
+                    help='sin red: las celdas escritas a mano en cuerpos.py')
     ap.add_argument('--coste', action='store_true', help='solo la cuenta, no baja nada')
     ap.add_argument('--lamina', metavar='SALIDA.PNG',
                     help='vuelca las hojas a un PNG para mirarlas sin abrir el juego')
@@ -913,7 +976,8 @@ if __name__ == '__main__':
     n = len(quiere) * dibujos * PEDIDAS
     entero = len(SETS) * dibujos * PEDIDAS
     print(f'{len(quiere)} siluetas · {dibujos} dibujos × {PEDIDAS} direcciones = {n} '
-          f'imágenes · celda {CEL_W}x{CEL_H}' + (' · SIMULADO' if a.simular else ''))
+          f'imágenes · celda {CEL_W}x{CEL_H}'
+          + (' · SIMULADO' if a.simular else ' · A MANO' if a.mano else ''))
     print(f'  ({len(POSES)} poses y 8 direcciones salen de ahí; el juego entero, '
           f'{len(SETS)} siluetas, son {entero})')
     if a.coste:
@@ -932,15 +996,24 @@ if __name__ == '__main__':
         print(f'\n{len(quiere) * dibujos * PEDIDAS} descripciones · negativo común:'
               f'\n{NEGATIVO}')
         sys.exit(0)
-    if not a.simular and not a.clave:
+    if a.simular and a.mano:
+        raise SystemExit('--simular y --mano son dos procedencias: elige una')
+    modo = 'sim' if a.simular else 'mano' if a.mano else 'api'
+    if modo == 'api' and not a.clave:
         raise SystemExit('falta la clave: PIXELLAB_API_KEY o --clave')
+    if modo == 'mano':
+        faltan = [d for d in set(DE_POSE[p] for p in POSES) if d not in _dibujados()]
+        if faltan:
+            raise SystemExit('dibujos que todavía no están escritos a mano: '
+                             + ', '.join(sorted(faltan)))
 
     plantilla, ntonos = png_plantilla(pal, ramp)
-    print(f'  paleta forzada de {ntonos} tonos: lo que vuelva ya viene en las rampas')
+    if modo == 'api':
+        print(f'  paleta forzada de {ntonos} tonos: lo que vuelva ya viene en las rampas')
     crudas = {}
     for k in quiere:
-        crudas[k] = hoja(k, a.clave, a.simular, pal, ramp, a.diag,
-                         None if a.simular else plantilla)
+        crudas[k] = hoja(k, a.clave, modo, pal, ramp, a.diag,
+                         plantilla if modo == 'api' else None)
     hojas = {k: comprimir(v) for k, v in crudas.items()}
     escribir(hojas, ramp)
     if a.lamina:

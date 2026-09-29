@@ -245,13 +245,82 @@ ok(len(set(PL.NOTAS.values())) == len(PL.NOTAS), 'dos siluetas piden la misma ro
 bien.append('%d descripciones, todas distintas, con su dirección, su pose y su ropa '
             '(la más larga, %d caracteres)' % (len(TODAS), len(larga)))
 
+# ── 5 quinquies · el esqueleto dibujado a mano ─────────────────────────────────────
+# La tercera fuente de celdas —ni red ni clave: los huesos están en el repositorio— tiene
+# que dar exactamente lo mismo que daría una tirada buena: 55 celdas del tamaño de la
+# caja, con las seis partes presentes, apoyadas en el suelo y con las poses distintas
+# entre sí. Y, lo que la hace valer la pena, usando la rampa entera y no tres tonos.
+import cuerpos, trazos
+ok(len(cuerpos.DIBUJOS) * len(cuerpos.DIRS) == 55,
+   'el esqueleto no da 55 celdas sino %d' % (len(cuerpos.DIBUJOS) * len(cuerpos.DIRS)))
+ok(set(cuerpos.DIBUJOS) == set(cuerpos.POSES),
+   'hay poses sin esqueleto o esqueletos sin pose')
+ok(set(cuerpos.VISTA_DE) == set(cuerpos.DIRS) and set(cuerpos.PELO) == set(cuerpos.DIRS),
+   'alguna dirección se ha quedado sin vista o sin pelo')
+huesos = [set(v) for v in cuerpos.BASE.values()]
+ok(all(h == huesos[0] for h in huesos),
+   'las tres vistas no tienen los mismos huesos: no sería la misma persona')
+alfabeto = set(trazos.PARTES) | {trazos.VACIO}
+malas, sin, pisos = [], [], set()
+for dib in cuerpos.DIBUJOS:
+    for d in cuerpos.DIRS:
+        filas = cuerpos.TRAZOS[dib][d].split('\n')
+        if len(filas) != cuerpos.ALTO or any(len(f) != cuerpos.ANCHO for f in filas):
+            malas.append('%s/%s' % (dib, d))
+        if set(''.join(filas)) - alfabeto:
+            malas.append('%s/%s (alfabeto)' % (dib, d))
+        falta = [c for c in trazos.PARTES if c not in ''.join(filas)]
+        if falta:
+            sin.append('%s/%s sin %s' % (dib, d, ''.join(falta)))
+        pisos.add(max(y for y, f in enumerate(filas) if f.strip(trazos.VACIO)))
+ok(not malas, 'celdas descuadradas: %s' % ', '.join(malas[:4]))
+ok(not sin, 'celdas a las que les falta una parte: %s' % ', '.join(sin[:4]))
+ok(pisos <= {cuerpos.ALTO - 1, cuerpos.ALTO - 2},
+   'hay figuras flotando: la fila más baja es %s' % sorted(pisos))
+ok(all(max(y for y, f in enumerate(cuerpos.TRAZOS['quieto'][d].split('\n'))
+           if f.strip(trazos.VACIO)) == cuerpos.ALTO - 1 for d in cuerpos.DIRS),
+   'el que está quieto no pisa la última fila')
+for a, b in (('andarA', 'andarB'), ('andarA', 'quieto'), ('correrA', 'correrB'),
+             ('pega1', 'pega2')):
+    ok(any(cuerpos.TRAZOS[a][d] != cuerpos.TRAZOS[b][d] for d in cuerpos.DIRS),
+       '%s y %s son el mismo dibujo' % (a, b))
+ok(cuerpos.TRAZOS['andarA']['south'] != cuerpos.TRAZOS['andarB']['south'][::-1],
+   'el paso B es el A al revés: al animarlo, el tronco se queda quieto')
+# Vestir: las siete siluetas salen de la misma celda y ninguna se queda sin una parte.
+for ropa in PL.SETS:
+    rej = trazos.viste(trazos.rejilla(cuerpos.TRAZOS['quieto']['south']), ropa)
+    tiene = set(''.join(''.join(f) for f in rej))
+    falta = [p for c, p in trazos.PARTES.items() if c not in tiene]
+    ok(not falta, 'la silueta %s se queda sin %s: no habría qué repintar'
+       % (ropa, '/'.join(falta)))
+# La sofisticación: pintando con las luminancias de la paleta, la piel usa la rampa de
+# ocho tonos entera en vez de los tres apaños de antes. Si esto baja, la figura se aplana.
+luces = PL.luces_rampa()
+im = trazos.pinta(trazos.viste(trazos.rejilla(cuerpos.TRAZOS['quieto']['south']),
+                               'corto_short'), PL.CLAVES, PL.CEL_W, PL.CEL_H, luces)
+px = im.load()
+vistos = {}
+for y in range(PL.CEL_H):
+    for x in range(PL.CEL_W):
+        c = px[x, y]
+        if c[3] and c[:3] != (0, 0, 0):
+            p = min(PL.CLAVES, key=lambda k: PL._dista(PL._tono(PL.CLAVES[k][0]),
+                                                       PL._tono(c[:3])))
+            vistos.setdefault(p, set()).add(c[:3])
+ok(len(vistos.get('piel', ())) >= 5,
+   'la piel solo sale en %d tonos de los 8 de su rampa' % len(vistos.get('piel', ())))
+ok(all(len(v) >= 3 for v in vistos.values()),
+   'alguna parte se pinta plana: %s' % {k: len(v) for k, v in vistos.items()})
+bien.append('las 55 celdas a mano salen del esqueleto, con las seis partes y en su rampa')
+
+
 # ── 6 · el espejo y la repetición de poses arman la hoja de verdad ──────────────────
 # Se monta una hoja simulada entera y se comprueba su estructura: es lo que convierte 55
 # imágenes en 8 direcciones × 16 poses. Si el espejo se hiciera al revés, el juego pintaría
 # a todo el mundo mirando al lado contrario y la batería del HTML no lo vería.
 import contextlib
 with contextlib.redirect_stdout(io.StringIO()):      # 55 líneas de avance que aquí sobran
-    hoja = PL.hoja('largo_pantalon', '', True, pal, ramp)
+    hoja = PL.hoja('largo_pantalon', '', 'sim', pal, ramp)
 W, H = PL.CEL_W * 8, PL.CEL_H
 fila = lambda fy, d, y: bytes(hoja[(fy * H + y) * W + d * PL.CEL_W:
                                    (fy * H + y) * W + (d + 1) * PL.CEL_W])
