@@ -133,11 +133,69 @@ VISTA = 'high top-down'
 #
 # Y aquí no va ni un «no»: lo que no queremos vive en NEGATIVO. Mezclados, el «no» compite
 # con lo que sí queremos y encima el generador dibuja lo que se le nombra.
-ESTILO = ('8-bit indexed pixel art sprite of one single character, full body, centred, '
-          'feet near the bottom edge, orthographic top-down view at 45 degrees, '
-          'chunky proportions with a large head, flat blocks of saturated colour, '
-          'hard pixel edges, light from the upper left, single colour black outline, '
-          'transparent background, bare head, Spain 1996')
+ESTILO = ('8-bit indexed pixel art sprite of one single character, '
+          'orthographic top-down view at 45 degrees, chunky proportions with a large head, '
+          'flat blocks of saturated colour, hard pixel edges, light from the upper left, '
+          'single colour black outline, transparent background, bare head, Spain 1996')
+
+# El encuadre, aparte y en todas las celdas. Las 55 imágenes de una silueta se apilan en
+# una hoja y se animan seguidas: si en una la figura llena la celda y en la siguiente le
+# sobran cuatro filas, el personaje pega un bote a cada paso y ninguna prueba de color lo
+# ve. Antes esto eran tres palabras dentro de ESTILO —«full body, centred, feet near the
+# bottom edge»— y «near» es justo lo que no se puede decir aquí: el empaquetador cuadra
+# los pies en la fila 30 recortando, y cuanto menos tenga que recortar, más figura queda.
+ENCUADRE = ('the whole figure inside the frame, the top of the head on the second row, '
+            'the soles on the bottom row, the hips over the middle column, '
+            'the figure always at the same height')
+
+# Hacia dónde mira, escrito. Viajaba solo como campo `direction` de la API, que es una
+# etiqueta: no dice qué se ve desde ahí. Escribirlo es lo que separa el norte del sur a
+# treinta y dos píxeles, donde la cara son cuatro píxeles y lo que de verdad distingue una
+# dirección de otra es dónde cae el hombro y si se ve nuca o cara.
+#
+# Va en términos de pantalla —«a la derecha del cuadro»— y no del personaje. Su derecha es
+# nuestra izquierda, y el espejo de las tres direcciones que no se piden depende de que
+# esto no se pueda leer de dos maneras.
+MIRADA = {
+    'south':      'seen from the front, facing the viewer, the whole face visible and both '
+                  'shoulders square to the viewer',
+    'south-east': 'turned three quarters towards the viewer and to the right of the frame, '
+                  'the nearer shoulder bigger, three quarters of the face visible',
+    'east':       'in full side profile facing the right of the frame, the far arm behind '
+                  'the torso, one eye and one ear visible',
+    'north-east': 'turned three quarters away from the viewer and to the right of the frame, '
+                  'the back of the head and one cheek towards the viewer',
+    'north':      'seen from directly behind, the back of the head and the shoulders '
+                  'towards the viewer, the heels towards the viewer',
+}
+
+# Qué hace la ropa de cada silueta. Es lo que distingue una silueta de otra a esta escala:
+# no la tela, sino por dónde acaba la prenda y qué tapa. Sin esto, el abrigo largo y la
+# cazadora vuelven el mismo dibujo con otro color, que es tirar seis de las siete tiradas.
+#
+# Y hay un motivo mecánico además del artístico: si el abrigo tapa la pierna entera, la
+# rampa `piernas` se queda sin un solo píxel y el repintado no tiene qué repintar. Por eso
+# la gabardina va abierta y con su franja de falda por el medio.
+NOTAS = {
+    'largo_pantalon':   'the jacket ends at the hip, the two trouser legs read separately',
+    'largo_falda':      'the jumper ends at the hip, the skirt one solid block down to the '
+                        'knee with the calves below it',
+    'corto_pantalon':   'forearms bare below the short sleeves, the two trouser legs read '
+                        'separately',
+    'corto_short':      'arms and legs bare, the shorts ending high on the thigh',
+    'abrigo_pantalon':  'the overcoat falls to the knee over the hips and the thighs, its '
+                        'hem swinging with the stride, the shins below it',
+    'abrigo_falda':     'the raincoat hangs open to the knee with a strip of skirt down the '
+                        'middle, the calves below it',
+    'capucha_pantalon': 'the empty hood folded on the upper back as a lump of cloth, the '
+                        'tracksuit legs loose and straight',
+}
+
+# La misma persona en las 55. La semilla ya lo empuja, pero la semilla fija el ruido de
+# partida y no el contenido: con la pose cambiando tanto de una celda a otra, dos llamadas
+# con la misma semilla se van de complexión. Decirlo cuesta ocho palabras.
+MISMA = 'the same person, the same build and the same clothes in every frame'
+
 # Lo que NO queremos, en su propio campo.
 NEGATIVO = ('gradient, dithering, soft shading, anti-aliasing, outline glow, blurry, '
             'motion blur, 3d render, photo, realistic, watermark, text, signature, '
@@ -177,17 +235,30 @@ ESPEJO = {5: 3, 6: 2, 7: 1}                   # noroeste<-nordeste, oeste<-este,
 # el bulto de la cabeza. Por eso cada dibujo dice qué hacen los brazos y las piernas, que
 # es lo único que se distingue, y no qué expresión pone.
 DIBUJOS = {
-    'quieto':  'standing still, arms hanging at the sides',
-    'andarA':  'mid walk, left leg forward and right arm forward',
-    'andarP':  'mid walk, legs together passing each other, arms at the sides',
-    'andarB':  'mid walk, right leg forward and left arm forward',
-    'correrA': 'running, left leg forward, body leaning ahead, arms bent',
-    'correrB': 'running, right leg forward, body leaning ahead, arms bent',
-    'pega1':   'throwing a punch, fist just leaving the shoulder',
-    'pega2':   'throwing a punch, arm extended forward, shoulders turned into it',
-    'apunta':  'aiming a small pistol straight ahead with both arms',
-    'herido':  'reeling from a blow, shoulders thrown back',
-    'agacha':  'crouching low on the heels, head down, knees bent',
+    'quieto':  'standing still on both feet with the weight even, arms hanging straight '
+               'down at the sides, shoulders level',
+    'andarA':  'mid stride walking, the left leg forward and planted, the right leg '
+               'trailing behind, the right arm swung forward and the left arm back',
+    'andarP':  'mid stride walking, both legs together as they pass each other with both '
+               'feet under the hips, arms hanging close to the body, the body at its '
+               'highest point of the step',
+    'andarB':  'mid stride walking, the right leg forward and planted, the left leg '
+               'trailing behind, the left arm swung forward and the right arm back',
+    'correrA': 'running hard, the left knee lifted high in front, the right leg stretched '
+               'out behind, the torso leaning forward, both arms bent sharp at the elbow',
+    'correrB': 'running hard, the right knee lifted high in front, the left leg stretched '
+               'out behind, the torso leaning forward over it, both arms bent sharp at '
+               'the elbow',
+    'pega1':   'starting a punch, one fist drawn back level with the shoulder, the other '
+               'forearm up as a guard, feet apart and knees soft',
+    'pega2':   'landing a punch, one arm fully extended forward at shoulder height, the '
+               'shoulders turned into the blow, the other fist tucked at the chin',
+    'apunta':  'aiming a small pistol straight ahead, both arms extended and locked '
+               'together at eye level, feet apart, shoulders square behind the hands',
+    'herido':  'taking a hit, the head snapped back, the shoulders thrown backwards, both '
+               'arms flung out wide and the knees buckling',
+    'agacha':  'crouched low on the heels, knees folded up towards the chest, the head '
+               'tucked down between the shoulders, the arms gathered in close',
 }
 DE_POSE = {
     'quieto': 'quieto',
@@ -455,27 +526,46 @@ def _imagen(resp):
     return base64.b64decode(re.sub(r'^data:[^,]+,', '', v))
 
 
+def descripcion(ropa, direccion, dibujo):
+    """Lo que se le pide al generador para una celda. En un sitio y sin red.
+
+    El orden no es decorativo. Delante va el estarcido —quién es y de qué color va cada
+    parte—, que es lo único que el empaquetado no puede arreglar después: si el pantalón
+    vuelve del color de la chaqueta, la celda está perdida. Detrás va lo que sí se puede
+    recortar o cuadrar. Y el estilo cierra, porque lo que se repite en las 385 pesa menos
+    que lo que cambia en cada una.
+    """
+    # «wearing a long sleeved jacket in flat bright magenta» y no «bright magenta,
+    # long sleeved jacket»: suelto, el color se le va a otra prenda o al fondo.
+    colores = ', '.join(f'wearing {ropa_de(ropa, p)} in flat {CLAVES[p][1]}'
+                        for p in ('torso', 'piernas', 'calzado') if ropa_de(ropa, p))
+    return (f'a person {colores}, with {CLAVES["pelo"][1]}, {CLAVES["piel"][1]}; '
+            f'{DIBUJOS[dibujo]}; {MIRADA[direccion]}; {NOTAS[ropa]}; '
+            f'{MISMA}; {ENCUADRE}; {ESTILO}')
+
+
 def genera(ropa, direccion, dibujo, clave, simular, plantilla=None):
     """Un PNG de una silueta mirando a una dirección y haciendo algo."""
     # La procedencia va en la clave. Sin esto, un --simular previo —que es lo primero que
     # recomienda el LEEME— deja la caché llena de monigotes de relleno, y la tirada de
     # verdad los encuentra ahí, no llama a PixelLab ni una vez y termina diciendo que todo
     # ha ido bien. Se paga una tirada para acabar con el mismo dibujo de antes.
+    #
+    # Y va también el texto que se pidió, resumido. Afinar un prompt y encontrarse la
+    # celda de ayer en la caché es pagar la tirada para no cambiar nada: exactamente el
+    # mismo fallo de arriba, con otra causa.
+    texto = None if simular else descripcion(ropa, direccion, dibujo)
     etiqueta = (f'{"sim" if simular else "api"}|{ropa}|{direccion}|{dibujo}'
-                f'|{CEL_W}x{CEL_H}|{"pal" if plantilla else "libre"}')
+                f'|{CEL_W}x{CEL_H}|{"pal" if plantilla else "libre"}'
+                + ('' if simular else f'|{zlib.crc32(texto.encode()):08x}'))
     nombre = os.path.join(CACHE, re.sub(r'\W+', '_', etiqueta)[:120] + '.png')
     if os.path.exists(nombre):
         return open(nombre, 'rb').read()
     if simular:
         datos = _silueta(direccion, dibujo)
     else:
-        # «wearing a long sleeved jacket in flat bright magenta» y no «bright magenta,
-        # long sleeved jacket»: suelto, el color se le va a otra prenda o al fondo.
-        colores = ', '.join(f'wearing {ropa_de(ropa, p)} in flat {CLAVES[p][1]}'
-                            for p in ('torso', 'piernas', 'calzado') if ropa_de(ropa, p))
         cuerpo = {
-            'description': (f'a person {colores}, with {CLAVES["pelo"][1]}, '
-                            f'{CLAVES["piel"][1]}, {DIBUJOS[dibujo]}, {ESTILO}'),
+            'description': texto,
             'negative_description': NEGATIVO,
             'image_size': {'width': CEL_W, 'height': CEL_H},
             'view': VISTA, 'direction': direccion,
@@ -805,6 +895,8 @@ if __name__ == '__main__':
     ap.add_argument('--diag', action='store_true',
                     help='el reparto por partes de cada celda, para ver si el '
                          'generador respetó los colores de plantilla')
+    ap.add_argument('--prompts', action='store_true',
+                    help='escribe lo que se pediría, celda a celda, y no pide nada')
     a = ap.parse_args()
 
     quiere = [q.strip() for q in a.que.split(',') if q.strip()]
@@ -827,6 +919,18 @@ if __name__ == '__main__':
     if a.coste:
         print(f'  {len(ramp)} rampas de plantilla, sin un color compartido; '
               f'{len(POSES)} poses con dibujo asignado')
+        sys.exit(0)
+    # Un prompt que no se puede leer entero no se puede afinar, y los 385 solo se leen
+    # aquí: de la API vuelve la imagen, no lo que se entendió. Sin red ni clave, que es
+    # justo cuando hace falta — se afina antes de gastar la tirada, no después.
+    if a.prompts:
+        for k in quiere:
+            for dib in sorted(set(DE_POSE[p] for p in POSES)):
+                for d in DIRECCIONES[:PEDIDAS]:
+                    t = descripcion(k, d, dib)
+                    print(f'\n── {k} · {dib} · {d} · {len(t)} caracteres\n{t}')
+        print(f'\n{len(quiere) * dibujos * PEDIDAS} descripciones · negativo común:'
+              f'\n{NEGATIVO}')
         sys.exit(0)
     if not a.simular and not a.clave:
         raise SystemExit('falta la clave: PIXELLAB_API_KEY o --clave')

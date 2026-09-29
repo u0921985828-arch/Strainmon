@@ -190,15 +190,60 @@ bien.append('las %d siluetas se parten en torso, piernas y calzado' % len(PL.SET
 # Nombrar algo en la descripción positiva y a la vez en la negativa es pedirle al generador
 # que lo dibuje y que no lo dibuje. Suele ganar la positiva —nombrar algo lo invoca—, así
 # que las siluetas volverían con gorro justo cuando el gorro se forja encima.
-positivo = ' '.join([PL.ESTILO] + list(PL.SETS.values()) + list(PL.DIBUJOS.values())
+positivo = ' '.join([PL.ESTILO, PL.ENCUADRE, PL.MISMA] + list(PL.SETS.values())
+                    + list(PL.DIBUJOS.values()) + list(PL.MIRADA.values())
+                    + list(PL.NOTAS.values())
                     + [d for _, d in PL.CLAVES.values()]).lower()
 for mala in PL.PROHIBIDAS:
     ok(not re.search(r'\b%ss?\b' % re.escape(mala), positivo),
        '«%s» está en la descripción positiva y también en la negativa' % mala)
-ok(PL.NEGATIVO and ' no ' not in ' %s ' % PL.ESTILO.lower(),
-   'la descripción positiva lleva negaciones; van en NEGATIVO')
+# Ni un «no» en lo positivo: mezclado, el «no» compite con lo que sí se quiere y
+# encima el generador dibuja lo que se le nombra.
+for neg in (' no ', ' not ', ' without ', ' never '):
+    ok(neg not in ' %s ' % positivo, 'la descripción positiva lleva «%s»; las\n'
+       'negaciones van en NEGATIVO' % neg.strip())
 bien.append('%d palabras vetadas, y ninguna se cuela en lo que se pide'
             % len(PL.PROHIBIDAS))
+
+# ── 5 quater · las 385 descripciones, una por celda ────────────────────────────────
+# Lo único que el empaquetador no puede arreglar es lo que se pidió mal. Y no se ve: de
+# la API vuelve una imagen, no lo que entendió. Así que el texto se comprueba aquí.
+#
+# El tope de 1250 no es un límite de la API: es una correa, y la más larga va por 1159.
+# Cada vez que una celda salga regular la tentación va a ser añadirle una frase, y a las
+# diez frases el generador reparte la atención entre todas y deja de hacer caso a la
+# primera —la del color de cada parte, que es la única irrecuperable—. Si hace falta más
+# sitio, se quita algo antes. Que una descripción larga sea mejor que una corta no está
+# medido y desde aquí no se puede medir: se mira con --prompts y se prueba una silueta.
+TODAS = {(k, d, dib): PL.descripcion(k, d, dib)
+         for k in PL.SETS
+         for dib in PL.DIBUJOS
+         for d in PL.DIRECCIONES[:PL.PEDIDAS]}
+ok(len(TODAS) == len(PL.SETS) * len(PL.DIBUJOS) * PL.PEDIDAS,
+   'no salen %d descripciones' % (len(PL.SETS) * len(PL.DIBUJOS) * PL.PEDIDAS))
+ok(len(set(TODAS.values())) == len(TODAS),
+   'hay dos celdas distintas pidiendo exactamente lo mismo')
+larga = max(TODAS.values(), key=len)
+ok(len(larga) <= 1250, 'la descripción más larga son %d caracteres: %s'
+   % (len(larga), larga[:120]))
+for (k, d, dib), t in TODAS.items():
+    donde = '%s/%s/%s' % (k, dib, d)
+    ok(PL.MIRADA[d] in t, '%s no dice hacia dónde mira' % donde)
+    ok(PL.DIBUJOS[dib] in t, '%s no dice qué hace' % donde)
+    ok(PL.NOTAS[k] in t, '%s no dice qué hace su ropa' % donde)
+    for parte in ('torso', 'piernas', 'calzado'):
+        ok(PL.ropa_de(k, parte) in t, '%s se deja la prenda de %s' % (donde, parte))
+        ok('in flat %s' % PL.CLAVES[parte][1] in t,
+           '%s no ata el color de plantilla a %s' % (donde, parte))
+# Una dirección sin texto propio, o un dibujo sin texto propio, es una tirada de 55
+# imágenes iguales pagada cinco veces.
+ok(set(PL.MIRADA) == set(PL.DIRECCIONES[:PL.PEDIDAS]),
+   'MIRADA no cubre exactamente las %d direcciones que se piden' % PL.PEDIDAS)
+ok(set(PL.NOTAS) == set(PL.SETS), 'NOTAS y SETS no llevan las mismas siluetas')
+ok(len(set(PL.MIRADA.values())) == len(PL.MIRADA), 'dos direcciones piden lo mismo')
+ok(len(set(PL.NOTAS.values())) == len(PL.NOTAS), 'dos siluetas piden la misma ropa')
+bien.append('%d descripciones, todas distintas, con su dirección, su pose y su ropa '
+            '(la más larga, %d caracteres)' % (len(TODAS), len(larga)))
 
 # ── 6 · el espejo y la repetición de poses arman la hoja de verdad ──────────────────
 # Se monta una hoja simulada entera y se comprueba su estructura: es lo que convierte 55

@@ -12,7 +12,14 @@ python3 herramientas/sprites/pixellab.py                  # las siete siluetas
 python3 herramientas/sprites/pixellab.py --que largo_pantalon,abrigo_pantalon
 python3 herramientas/sprites/pixellab.py --diag --que largo_pantalon   # reparto por partes
 python3 herramientas/sprites/pixellab.py --lamina hojas.png --esc 4     # verlas sin abrir el juego
+python3 herramientas/sprites/pixellab.py --prompts --que abrigo_falda   # qué se pediría
 ```
+
+`--prompts` escribe las descripciones tal cual se mandarían, con su longitud, y no pide
+nada: ni red, ni clave, ni un céntimo. Es el único sitio donde el texto se puede leer —de
+la API vuelve la imagen, no lo que entendió— y por tanto el único sitio donde se afina
+antes de gastar la tirada y no después. Léelo entero de una silueta antes de lanzar las
+siete.
 
 `--lamina` vuelca las hojas empaquetadas a un PNG usando solo Pillow: enseñar una tirada no
 obliga a compilar `node-canvas`. Sale la hoja **tal como se guardó**, con los colores de
@@ -106,6 +113,29 @@ adivinar. Antes se le pedía «magenta vivo» y se confiaba en que no lo apagara
 Y todas las celdas de una silueta van con **la misma semilla**, sacada de su nombre. Sin
 eso, cada una de las 55 llamadas inventa una persona distinta y el que anda cambia de cara
 a cada paso.
+
+## Cómo está escrita cada petición
+
+Una descripción son seis trozos, en este orden, y el orden importa: lo que va delante pesa
+más, y no todo se puede arreglar después.
+
+| | | |
+|---|---|---|
+| **El estarcido** | `SETS` + `CLAVES` | Quién es y de qué color de plantilla va cada parte. Va primero porque es lo único irrecuperable: si el pantalón vuelve del color de la chaqueta, la celda está perdida — el empaquetado reparte por matiz, no adivina. |
+| **Qué hace** | `DIBUJOS` | Brazos y piernas, dicho entero. A 32 píxeles no se lee la cara: se lee el hombro, el paso y el bulto de la cabeza. |
+| **Hacia dónde mira** | `MIRADA` | Escrito, no solo en el campo `direction` de la API, que es una etiqueta y no dice qué se ve desde ahí. Va en términos de pantalla —«a la derecha del cuadro»— y no del personaje: su derecha es nuestra izquierda, y el espejo de las tres direcciones que no se piden depende de que esto no se lea de dos maneras. |
+| **Qué hace su ropa** | `NOTAS` | Por dónde acaba la prenda y qué tapa. Es lo que distingue una silueta de otra a esta escala; sin ello, el abrigo largo y la cazadora vuelven el mismo dibujo con otro color. Y tiene parte mecánica: si el abrigo tapase la pierna entera, la rampa `piernas` se quedaría sin un píxel que repintar. Por eso la gabardina va abierta. |
+| **La misma persona** | `MISMA` | La semilla fija el ruido de partida, no el contenido; con la pose cambiando tanto, dos llamadas con la misma semilla se van de complexión. |
+| **El encuadre y el estilo** | `ENCUADRE`, `ESTILO` | Cierran porque se repiten en las 385. El encuadre es el que hace que las celdas se puedan animar seguidas: cabeza en la segunda fila, suelas en la última, caderas en la columna del medio. |
+
+Ninguna lleva un «no»: lo que no se quiere vive en `NEGATIVO`, en su propio campo. Mezclado
+con lo positivo, el «no» compite con lo que sí se pide y encima el generador dibuja lo que
+se le nombra. `pruebas_sprites.py` lo comprueba en las 385, y comprueba también que ninguna
+pasa de 1250 caracteres — una correa, no un límite de la API: a las diez frases el
+generador reparte la atención y deja de hacer caso a la primera, que es la que importa.
+
+Que más texto salga mejor **no está medido**, y desde una sesión sin red no se puede medir.
+Se mira con `--prompts` y se prueba con una silueta antes de lanzar las siete.
 
 ## Lo que hay que mirar en la primera tirada
 
