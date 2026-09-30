@@ -647,6 +647,27 @@ el del juego, que los colores del icono estén en la paleta, y **la sintaxis del
 leyéndolo con `javac`** — se le pasa sin el SDK y se mira de qué se queja: si todo lo que
 dice es que no encuentra `android.webkit`, la sintaxis está bien.
 
+### El APK se compila en el CI
+
+Aquí dentro no se puede: no hay SDK de Android y `dl.google.com` responde **403** por el
+proxy, así que ni se baja. Lo compila GitHub Actions, en
+`.github/workflows/bilbo-city-apk.yml` (raíz del repositorio, no de `bilbo-city/`):
+**Actions → APK de Bilbo City → Run workflow**, y el `.apk` sale en los artifacts del run.
+
+El workflow genera el proyecto antes de compilarlo (`dist/` no se versiona), así que lo
+que sale es siempre el HTML de ese commit. Pone el JDK **antes** que node, para que el
+chequeo de sintaxis con `javac` se ejecute de verdad en vez de saltárselo, y usa
+`gradle/actions/setup-gradle` con Gradle 8.9 porque no hay wrapper y AGP 8.5.2 no arranca
+con menos de 8.7. Un segundo trabajo instala el APK en un emulador api-30, lo abre,
+falla si hay `FATAL EXCEPTION` y sube una captura de la portada.
+
+Dos escollos típicos de esto no aplican aquí y conviene saber por qué, para no «arreglarlos»:
+el BOM de Kotlin no hace falta (no hay plugin de Kotlin ni dependencia que arrastre
+`kotlin-stdlib`), y los PNG de `mipmap-mdpi…xxxhdpi` tampoco (`minSdk` es 26, y el icono
+adaptativo existe desde Android 8). El que sí aplicaba era el del audio: el `AudioContext`
+nace suspendido en el WebView y `audioInit()` ahora lo reanuda en el primer toque, que si
+no el juego está mudo hasta que tocas dos veces.
+
 ## Estructura
 
 ```

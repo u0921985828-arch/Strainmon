@@ -305,11 +305,22 @@ Con gradle a mano, hace falta un SDK con la plataforma ${SDK}:
 
 \`\`\`bash
 export ANDROID_HOME=/ruta/al/sdk
+echo "sdk.dir=$ANDROID_HOME" > local.properties   # si gradle no encuentra el SDK
 gradle assembleDebug          # app/build/outputs/apk/debug/app-debug.apk
 \`\`\`
 
 No hay \`gradlew\`: el wrapper es un \`.jar\` y en este repositorio no entran binarios.
 Android Studio lo pone solo, o \`gradle wrapper\` una vez.
+
+**Sin SDK a mano**, lo compila el CI: Actions → *APK de Bilbo City* → Run workflow. El
+\`.apk\` sale en los artifacts del run. El workflow está en
+\`.github/workflows/bilbo-city-apk.yml\`, en la raíz del repositorio.
+
+## Instalarlo
+
+Descargar el \`.apk\` al teléfono y abrirlo (pedirá permitir «instalar apps
+desconocidas»), o por USB con \`adb install -r BilboCity.apk\`. Va firmado con la clave
+de depuración, que sirve para probar pero no para publicar.
 
 ## Lo que hace la app
 

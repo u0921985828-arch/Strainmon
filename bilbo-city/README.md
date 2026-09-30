@@ -31,6 +31,8 @@ npx --yes serve dist                     # y «Añadir a la pantalla de inicio»
 
 # o un APK: proyecto de Android con el prototipo dentro de un WebView
 node herramientas/html/apk.js            # escribe dist/android/ (abrir en Android Studio)
+#   sin SDK a mano, lo compila el CI: Actions -> «APK de Bilbo City» -> Run workflow,
+#   y el .apk sale en los artifacts del run
 
 # verificar que todo sigue en pie
 ./verificar.sh

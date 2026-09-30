@@ -4451,7 +4451,10 @@ function cambiarArma(){
 /*═══════════════ AUDIO ═══════════════*/
 const AU={ctx:null,on:true,mus:true,gSfx:null,gMus:null,motor:null,sirena:null,musT:0};
 function audioInit(){
- if(AU.ctx)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+ // El WebView y los navegadores móviles crean el contexto suspendido: sin este resume
+ // en el primer toque, el juego se queda mudo hasta que tocas una segunda vez.
+ if(AU.ctx){if(AU.ctx.state==='suspended')AU.ctx.resume();return;}
+ const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
  AU.ctx=new AC();
  AU.gSfx=AU.ctx.createGain();AU.gSfx.gain.value=.32;AU.gSfx.connect(AU.ctx.destination);
  AU.gMus=AU.ctx.createGain();AU.gMus.gain.value=.12;AU.gMus.connect(AU.ctx.destination);
