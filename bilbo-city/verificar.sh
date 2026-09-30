@@ -52,6 +52,9 @@ if [ "$QUE" = "todo" ] || [ "$QUE" = "html" ]; then
   echo "═══ arte · rejilla de píxeles ═══"
   ( cd herramientas/html && node pixel.js )
   echo
+  echo "═══ web instalable ═══"
+  ( cd herramientas/html && node pwa.js )
+  echo
 fi
 
 echo "═══ todo en orden ═══"

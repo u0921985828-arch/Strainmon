@@ -574,6 +574,46 @@ volante, y apunta cada `drawImage` y cada `fillRect` que cae fuera de la rejilla
 línea del HTML que lo hizo**. Está en `./verificar.sh`. Es lo que hacía falta: a ojo, un
 radar a escala 1,625 y un icono a 20 se ven «un poco sucios» y ya está.
 
+## Jugarlo en el móvil: instalable y sin conexión
+
+No hay APK y no hace falta para probarlo en un teléfono. `referencia/bilbo-city.html` es
+**un archivo suelto y autónomo** —ni un `<script src>`, ni una hoja de estilo, ni una
+fuente de fuera; los iconos del menú son `data:` que forja el propio juego—, así que lo
+único que le falta para instalarse como una app son tres cosas que un archivo suelto no
+puede llevar dentro, porque el navegador las exige como ficheros aparte del mismo origen:
+el manifiesto, el trabajador de servicio y los iconos.
+
+```bash
+node herramientas/html/pwa.js            # escribe dist/
+node herramientas/html/pwa.js --probar   # lo levanta y lo abre en Chromium
+```
+
+Eso deja en `dist/` el juego **sin tocar una línea** —solo con el enlace al manifiesto y
+el registro del trabajador añadidos— más el manifiesto, el trabajador y los iconos. Se
+sirve `dist/` por HTTPS o por localhost, «Añadir a la pantalla de inicio», y desde ahí
+arranca a pantalla completa, apaisado, sin barra del navegador y sin volver a pedir red.
+
+Tres cosas a propósito:
+
+- **El icono se dibuja por código**, en la paleta del juego y a escala entera (32×32
+  ampliado ×6 y ×16). Ningún PNG entra en el repositorio: `dist/` no se versiona, es
+  salida como lo sería un APK.
+- **La paleta se lee ejecutando las dos tablas del juego**, no con una expresión regular:
+  la segunda son apodos que apuntan a la primera (`asfalto: C.hormigon1`), y leyendo solo
+  literales el icono sale entero negro.
+- **La versión de la caché es el hash del HTML.** Si el juego no ha cambiado no hay caché
+  nueva; si ha cambiado, no hay forma de olvidarse de subirla. Al activarse se tiran las
+  viejas, que si no el móvil se queda con la partida de hace tres meses.
+
+Lo barato —que estén los ficheros, que el manifiesto pida pantalla completa y apaisado,
+que el trabajador no prometa cachear un fichero que no existe (`addAll()` falla entero y
+el modo fuera de línea no llega a instalarse nunca)— está en `./verificar.sh`. Lo caro
+—levantar Chromium y comprobar que el trabajador queda activo y el juego arranca— es
+`--probar`, a mano.
+
+**APK es otra cosa** y necesita Unity con el módulo de Android, y el puerto sigue sin
+abrirse nunca en el editor.
+
 ## Estructura
 
 ```

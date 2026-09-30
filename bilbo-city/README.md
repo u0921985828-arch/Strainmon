@@ -25,6 +25,10 @@ apt-get install -y dotnet-sdk-8.0        # para compilar el C# sin Unity
 # jugar al prototipo: abrir en el navegador
 open referencia/bilbo-city.html
 
+# jugarlo en el móvil, instalado y sin conexión
+node herramientas/html/pwa.js            # escribe dist/
+npx --yes serve dist                     # y «Añadir a la pantalla de inicio»
+
 # verificar que todo sigue en pie
 ./verificar.sh
 ```

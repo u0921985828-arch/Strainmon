@@ -24,3 +24,6 @@ __pycache__/
 .DS_Store
 .vs/
 .idea/
+
+# salida del empaquetador web (se rehace con herramientas/html/pwa.js)
+dist/
