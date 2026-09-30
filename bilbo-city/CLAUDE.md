@@ -58,10 +58,10 @@ del motor que el remedo no tenga, añádela a `herramientas/compilar/apinado/Api
 firma exacta de Unity** — una firma inventada de más tapa errores reales, que es lo único
 que puede estropear esta herramienta.
 
-`herramientas/plano/sitios.py`, `singulares.py` y `calles.py` comparan las coordenadas de
-los 57 sitios, las medidas de los 13 singulares y los puntos de paso de las 513 calles entre
-el HTML y el C#. Es la trampa clásica de tener dos implementaciones: el HTML pasa la
-batería, el C# no se ejecuta aquí, y Unity acaba poniendo las cosas en otro lado sin que
+`herramientas/plano/sitios.py`, `singulares.py`, `calles.py` y `siluetas.py` comparan las
+coordenadas de los 57 sitios, las medidas de los 13 singulares, los puntos de paso de las
+513 calles y los bytes de las 7 hojas de silueta entre el HTML y el C#. Es la trampa
+clásica de tener dos implementaciones: el HTML pasa la batería, el C# no se ejecuta aquí, y Unity acaba poniendo las cosas en otro lado sin que
 nadie lo vea.
 
 `herramientas/csharp/` analiza el C# sobre el árbol de sintaxis real (tree-sitter). No es un
@@ -88,9 +88,9 @@ nada, en C# la excepción salta en el siguiente `MoveNext`.
   repositorio. Si necesitas algo nuevo, se forja por código en `Assets/Scripts/Arte/`.
   Las hojas de personaje del bloque `SPRITES` **no son una excepción**: se dibujan en SVG
   sobre un esqueleto nuestro (`herramientas/sprites/`), sin red y sin clave, y entran
-  cuantizadas a la paleta y escritas como índices comprimidos, nunca como archivo de
-  imagen. **Excepción con condiciones: también pueden venir de PixelLab**, por el mismo
-  camino. Vengan de donde vengan entran por **siluetas**, no por personajes: cada parte del
+  cuantizadas a la paleta y escritas como índices comprimidos —en el HTML y en
+  `Siluetas.cs` a la vez—, nunca como archivo de imagen. **Excepción con condiciones:
+  también pueden venir de PixelLab**, por el mismo camino. Vengan de donde vengan entran por **siluetas**, no por personajes: cada parte del
   cuerpo en su rampa, para poder repintarla (ver *El arte*). Lo que falte se sigue
   forjando: el juego no puede depender de que haya hoja.
 - **En artefactos web no uses `localStorage` directamente**: el HTML usa `window.storage` con
@@ -516,6 +516,15 @@ arquetipo número treinta y cinco no cuesta ninguna.
 
 Si no hay hoja de su silueta exacta, el juego busca la más parecida; si no hay ninguna, lo
 forja. **Nunca se queda nadie sin dibujar**, y por eso una sola silueta ya es jugable.
+
+**Las dos implementaciones leen el mismo bloque.** El empaquetador lo escribe a la vez en
+el HTML y en `unity/.../Arte/Siluetas.cs`, igual que el extractor del plano escribe la
+trama en los dos: mismos bytes, misma celda y mismas rampas, y `ForjaChar` hace en C# lo
+que el HTML hace en JS —`SetDe`/`setDe`, `LutDe`/`lutDe`, `AnclaCabeza`/`anclaCabeza`,
+`CapasEncima`/`capasEncima`—. Es la trampa clásica de tener dos versiones y con el arte no
+salta ningún error: sale un juego con otra gente por la calle. Lo compara
+`herramientas/plano/siluetas.py`, dentro de `./verificar.sh`. **El bloque
+`/*<<<SPRITES*/ … /*SPRITES>>>*/` no se edita a mano** en ninguno de los dos.
 
 El reparto por partes se sostiene en los colores de plantilla —cada parte de un matiz que
 no se parece a ningún otro— vengan las celdas de donde vengan, y ahí hay dos

@@ -261,9 +261,15 @@ de la misma silueta no salen clavados. `--coste` revisa las tablas sin tocar nad
 ## Por qué no entra ni un PNG
 
 El repositorio no lleva imágenes, y esto no lo cambia. La hoja se escribe en el bloque
-`/*<<<SPRITES*/` del HTML como **un índice de paleta por píxel**, comprimida con deflate y
-en base64 — el mismo formato que la trama de la ciudad. El juego sigue siendo un archivo
-solo y el arte sigue atado a los 48 colores de la paleta.
+`/*<<<SPRITES*/` como **un índice de paleta por píxel**, comprimida con deflate y en
+base64 — el mismo formato que la trama de la ciudad. El juego sigue siendo un archivo solo
+y el arte sigue atado a los colores de la paleta.
+
+Y se escribe **en los dos sitios a la vez**: el HTML y
+`unity/BilboCity/Assets/Scripts/Arte/Siluetas.cs`, igual que hace el extractor del plano.
+Ninguno de los dos bloques se edita a mano; regenerarlos es volver a correr esto.
+`herramientas/plano/siluetas.py` compara celda, rampas, nombres y bytes, y está dentro de
+`./verificar.sh`: si solo se commitea uno, la verificación se para.
 
 ## Si la API contesta raro
 

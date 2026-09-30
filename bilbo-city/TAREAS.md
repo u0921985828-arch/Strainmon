@@ -43,6 +43,10 @@ Repasar comportamiento contra el prototipo, que es el probado:
 - [ ] Tiempos de las misiones con límite.
 - [ ] Economía: precios, pagos de curros, alquiler semanal.
 - [ ] Auto-apuntado: solo a enemigos, nunca a viandantes salvo con las manos.
+- [x] Las hojas de personaje. El HTML repintaba las siete siluetas del bloque `SPRITES` y
+      Unity forjaba siempre, así que los treinta y cuatro arquetipos se veían distintos en
+      cada implementación. Ahora `Siluetas.cs` lleva el mismo bloque y `ForjaChar` repinta
+      igual; `herramientas/plano/siluetas.py` compara los dos bloques byte a byte.
 
 ## 3 bis · Lo que queda de 1996
 
@@ -67,7 +71,9 @@ así que no se puede hacer a ojo desde aquí.
 - [ ] El mobiliario son GameObjects sueltos (varios miles). Si el presupuesto de dibujado
       aprieta, pasarlo a un tercer Tilemap en modo `Individual` con ordenación por eje Y.
 - [ ] Perfilar el HUD: `SetPixels32` + `Apply` del radar una vez por frame.
-- [ ] Comprobar que las hojas de personaje se compilan bajo demanda y no todas al arrancar.
+- [x] Comprobar que las hojas de personaje se compilan bajo demanda y no todas al arrancar.
+      Las dos lo hacen: `hoja(k)` cachea en `HOJAS` y `ForjaChar.Hoja(arq)` en `Hojas`.
+      Las siluetas traídas se descomprimen también a la primera pregunta, no al arrancar.
 
 ## 5 · Contenido que falta respecto al plan original
 
@@ -102,6 +108,8 @@ Fallos que ya se cazaron y no deben volver:
 - El arnés dando por fallada la última misión sin que el juego tuviera la culpa: `S.hp = 100`
   no deshace un K.O. Ver abajo.
 - `Correr` y `AtacarMantenido` que se quedaban pegados a `true` para siempre.
+- Unity forjando a todo el mundo mientras el HTML repintaba siluetas dibujadas. No daba
+  error: daba dos juegos con distinta gente por la calle.
 
 Los dos primeros errores de compilación reales, con lo que enseñan:
 

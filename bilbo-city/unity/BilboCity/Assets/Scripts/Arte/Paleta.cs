@@ -200,6 +200,24 @@ public class Lienzo {
             }
     }
 
+    /// <summary>Pega otro lienzo encima, respetando lo que traiga transparente.</summary>
+    /// Hace falta desde que hay hojas de silueta: el pelo y el gorro se forjan aparte y
+    /// se posan sobre la cabeza que trae la hoja, y con P() —que pinta rectángulos— el
+    /// recuadro del gorro borraría la cara de alrededor.
+    public void Pegar(Lienzo otro, int ox, int oy) {
+        for (int y = 0; y < otro.H; y++) {
+            int dy = oy + y;
+            if (dy < 0 || dy >= H) continue;
+            for (int x = 0; x < otro.W; x++) {
+                int dx = ox + x;
+                if (dx < 0 || dx >= W) continue;
+                var c = otro.Px[y*otro.W + x];
+                if (c.a == 0) continue;
+                Px[dy*W + dx] = c;
+            }
+        }
+    }
+
     public void Ruido(Color32[] cols, int densidad) {
         for (int y = 0; y < H; y++)
             for (int x = 0; x < W; x++) {

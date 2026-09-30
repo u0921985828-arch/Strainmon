@@ -52,6 +52,8 @@ import argparse, base64, json, os, re, sys, time, zlib
 
 RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 HTML = os.path.join(RAIZ, 'referencia', 'bilbo-city.html')
+CS = os.path.join(RAIZ, 'unity', 'BilboCity', 'Assets', 'Scripts', 'Arte',
+                  'Siluetas.cs')
 CACHE = os.path.join(os.path.dirname(__file__), 'cache')
 
 # ── la API ──────────────────────────────────────────────────────────────────────────
@@ -929,19 +931,51 @@ def comprimir(datos):
     return base64.b64encode(c.compress(bytes(datos)) + c.flush()).decode()
 
 
-def escribir(hojas, ramp):
-    s = _texto_html()
+AVISO = '/* Lo escribe herramientas/sprites/pixellab.py. Vacío = todo forjado. */'
+
+
+def _mete(ruta, cuerpo):
+    """Reemplaza el bloque SPRITES de un archivo, dejando el resto intacto."""
+    s = open(ruta, encoding='utf-8').read()
     a, b = '/*<<<SPRITES*/', '/*SPRITES>>>*/'
+    if a not in s or b not in s:
+        raise SystemExit('no encuentro el bloque SPRITES en %s' % ruta)
     i, j = s.index(a), s.index(b)
+    open(ruta, 'w', encoding='utf-8').write(s[:i + len(a)] + '\n' + cuerpo + '\n' + s[j:])
+
+
+def _cuerpo_js(hojas, ramp):
     filas = []
     for k, b64 in sorted(hojas.items()):
         trozos = ',\n'.join(f"  '{b64[t:t+108]}'" for t in range(0, len(b64), 108))
         filas.append(f" {k}: [\n{trozos}].join('')")
     ramps = ', '.join(f'{p}:[{",".join(str(v) for v in idx)}]' for p, idx in ramp.items())
-    cuerpo = ('/* Lo escribe herramientas/sprites/pixellab.py. Vacío = todo forjado. */\n'
-              f'const SPR={{cel:[{CEL_W},{CEL_H}],\n rampas:{{{ramps}}},\n hojas:{{\n'
-              + ',\n'.join(filas) + '\n}};')
-    open(HTML, 'w', encoding='utf-8').write(s[:i + len(a)] + '\n' + cuerpo + '\n' + s[j:])
+    return (AVISO + '\n'
+            f'const SPR={{cel:[{CEL_W},{CEL_H}],\n rampas:{{{ramps}}},\n hojas:{{\n'
+            + ',\n'.join(filas) + '\n}};')
+
+
+def _cuerpo_cs(hojas, ramp):
+    """El mismo bloque para Unity. Mismos bytes, misma celda y mismas rampas: si los dos
+    no salen de aquí a la vez, el prototipo y el juego acaban vistiendo distinto."""
+    ramps = ',\n'.join('        { "%s", new[] { %s } }' % (p, ', '.join(str(v) for v in idx))
+                       for p, idx in ramp.items())
+    filas = []
+    for k, b64 in sorted(hojas.items()):
+        trozos = ',\n'.join('            "%s"' % b64[t:t + 108]
+                            for t in range(0, len(b64), 108))
+        filas.append('        { "%s", new[] {\n%s } }' % (k, trozos))
+    return (AVISO + '\n'
+            f'    public const int CelW = {CEL_W}, CelH = {CEL_H};\n\n'
+            '    public static readonly Dictionary<string, int[]> Rampas '
+            '= new Dictionary<string, int[]> {\n' + ramps + '\n    };\n\n'
+            '    static readonly Dictionary<string, string[]> _hojas '
+            '= new Dictionary<string, string[]> {\n' + ',\n'.join(filas) + '\n    };')
+
+
+def escribir(hojas, ramp):
+    _mete(HTML, _cuerpo_js(hojas, ramp))
+    _mete(CS, _cuerpo_cs(hojas, ramp))
 
 
 if __name__ == '__main__':
@@ -1020,4 +1054,4 @@ if __name__ == '__main__':
         lamina(crudas, pal, a.lamina, a.esc)
     peso = sum(len(v) for v in hojas.values()) / 1024
     gasto = f' · ${_GASTO[0]:.2f} gastados' if _GASTO[0] else ''
-    print(f'-> {HTML}  ({peso:.0f} KB de hojas{gasto})')
+    print(f'-> {HTML}\n-> {CS}  ({peso:.0f} KB de hojas{gasto})')
