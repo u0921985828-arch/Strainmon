@@ -196,11 +196,15 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
         const d = g.getImageData(cw >> 1, y + 6, 1, 1).data;
         return '#' + [d[0], d[1], d[2]].map(v => v.toString(16).padStart(2, '0')).join('');
       };
+      // La última fila del tronco a propósito: los detalles de prenda —bandas del
+      // chaleco, peto, mandil, placa, bandolera— se dibujan encima en fracciones de la
+      // caja medida y se comen las de en medio. Ahí el que manda sigue siendo el
+      // repintado, que es lo que se quiere comprobar.
       for (const k of ['protagonista', 'ertzaina', 'amaia', 'p6']) {
         const T = A.TORSOS[A.ARQ[k].torso];
         const suyo = [T.s, T.b, T.l].map(x => x.toLowerCase());
-        ok(suyo.includes(color(k, 13)),
-           k + ': la silueta no se repintó con su torso (salió ' + color(k, 13) + ')');
+        ok(suyo.includes(color(k, 17)),
+           k + ': la silueta no se repintó con su torso (salió ' + color(k, 17) + ')');
       }
       // Calvo no lleva hoja propia: el pelo se le manda al color de su piel. Los tonos
       // oscuros de la forja no están entre los 48, así que se compara ya cuantizado.

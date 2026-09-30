@@ -601,6 +601,19 @@ public static class ForjaChar {
 
         if (!hayTor) return;
         int tx = tor.x0, tw = tor.W, ty = tor.y0, th = tor.H, tcx = tx + tw/2;
+
+        // Lo que distingue una prenda de otra dentro de la misma silueta. La hoja trae el
+        // corte —manga larga, abrigo, capucha— pero no la placa del uniforme ni las bandas
+        // del chaleco, y sin eso un ertzaina es un señor de azul y un peón de obra un señor
+        // de rojo. Va aquí y no en la hoja a propósito: son cuatro rectángulos y meterlos
+        // dentro multiplicaría las siluetas por cada prenda.
+        if (T.bandas) { L.P(tx, ty + R(th*.34f), tw, 1, Paleta.Hueso); L.P(tx, ty + R(th*.60f), tw, 1, Paleta.Hueso); }
+        if (T.tieneRaya) { L.P(tx, ty+1, 1, th-2, T.raya); L.P(tx+tw-1, ty+1, 1, th-2, T.raya); }
+        if (T.peto) { L.P(tx + R(tw*.24f), ty + R(th*.14f), R(tw*.52f), R(th*.44f), T.l);
+                      L.P(tcx-1, ty + R(th*.28f), 2, 2, T.s); }
+        if (T.mandil && !arr) L.P(tx + R(tw*.2f), ty + R(th*.3f), R(tw*.6f), R(th*.68f), Paleta.Crema);
+        if (T.placa && !arr) L.P(tx + R(tw*.22f), ty + R(th*.26f), 2, 2, Paleta.Mostaza);
+
         switch (cfg.Acces) {
             case "mochila":
                 if (arr) L.P(tx+1, ty+1, tw-2, R(th*.7f), Paleta.VerdeO);

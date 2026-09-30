@@ -3171,6 +3171,19 @@ function capasSobreHoja(g,cfg,cab,tor,d8,T,fog){
 
  if(!tor)return;
  const tx=tor.x0,tw=tor.x1-tor.x0,ty=tor.y0,th=tor.y1-tor.y0,tcx=tx+(tw>>1);
+
+ /* Lo que distingue una prenda de otra dentro de la misma silueta. La hoja trae el corte
+    —manga larga, abrigo, capucha— pero no la placa del uniforme ni las bandas del
+    chaleco, y sin eso un ertzaina es un señor de azul y un peón de obra un señor de rojo.
+    Va aquí y no en la hoja a propósito: son cuatro rectángulos y multiplicarían las
+    siluetas por cada prenda. */
+ if(T.bandas){P(g,tx,ty+R(th*.34),tw,1,C.hueso);P(g,tx,ty+R(th*.60),tw,1,C.hueso);}
+ if(T.raya){P(g,tx,ty+1,1,th-2,T.raya);P(g,tx+tw-1,ty+1,1,th-2,T.raya);}
+ if(T.peto){P(g,tx+R(tw*.24),ty+R(th*.14),R(tw*.52),R(th*.44),T.l);
+  P(g,tcx-1,ty+R(th*.28),2,2,T.s);}
+ if(T.mandil&&!arr)P(g,tx+R(tw*.2),ty+R(th*.3),R(tw*.6),R(th*.68),C.crema);
+ if(T.placa&&!arr)P(g,tx+R(tw*.22),ty+R(th*.26),2,2,C.mostaza);
+
  const A=cfg.acces;
  if(A==='mochila'){if(arr)P(g,tx+1,ty+1,tw-2,R(th*.7),C.verdeO);
   else{P(g,tx-1,ty+R(th*.15),2,R(th*.5),C.verdeO);P(g,tx+tw-1,ty+R(th*.15),2,R(th*.5),C.verdeO);}}
@@ -3261,7 +3274,13 @@ async function cargarSprites(){
    const bytes=await inflar(SPR.hojas[k]);
    if(bytes.length!==w*h){console.warn('silueta',k,'con medidas raras; se forja');continue;}
    BASES[k]=bytes;
-  }catch(e){console.warn('no pude leer la silueta',k,e);}}}
+  }catch(e){console.warn('no pude leer la silueta',k,e);}}
+ /* Y se tira lo ya forjado. La portada dibuja al protagonista, a la pasma y a dos
+    vecinos en cada paso de la carga, y eso pasa antes de que las siluetas estén
+    descomprimidas: se forjaban, se quedaban en la caché y esos cuatro se pasaban la
+    partida entera forjados mientras los otros treinta iban repintados. Sin esto no
+    salta ningún error — sale un protagonista de otro juego que el resto. */
+ for(const k of Object.keys(HOJAS))delete HOJAS[k];}
 
 function hoja(k){
  if(HOJAS[k])return HOJAS[k];
