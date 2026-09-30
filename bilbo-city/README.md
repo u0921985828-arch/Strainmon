@@ -29,6 +29,9 @@ open referencia/bilbo-city.html
 node herramientas/html/pwa.js            # escribe dist/
 npx --yes serve dist                     # y «Añadir a la pantalla de inicio»
 
+# o un APK: proyecto de Android con el prototipo dentro de un WebView
+node herramientas/html/apk.js            # escribe dist/android/ (abrir en Android Studio)
+
 # verificar que todo sigue en pie
 ./verificar.sh
 ```

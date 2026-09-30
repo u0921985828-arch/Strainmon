@@ -55,6 +55,9 @@ if [ "$QUE" = "todo" ] || [ "$QUE" = "html" ]; then
   echo "═══ web instalable ═══"
   ( cd herramientas/html && node pwa.js )
   echo
+  echo "═══ envoltorio de Android ═══"
+  ( cd herramientas/html && node apk.js )
+  echo
 fi
 
 echo "═══ todo en orden ═══"

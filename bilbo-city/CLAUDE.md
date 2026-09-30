@@ -611,8 +611,41 @@ el modo fuera de línea no llega a instalarse nunca)— está en `./verificar.sh
 —levantar Chromium y comprobar que el trabajador queda activo y el juego arranca— es
 `--probar`, a mano.
 
-**APK es otra cosa** y necesita Unity con el módulo de Android, y el puerto sigue sin
-abrirse nunca en el editor.
+### Y un APK, con el prototipo dentro
+
+El puerto a Unity es el objetivo de producción, pero no se ha abierto nunca en el editor y
+de ahí no sale un APK esta tarde. De aquí sí:
+
+```bash
+node herramientas/html/apk.js              # escribe dist/android/
+node herramientas/html/apk.js --compilar   # y llama a gradle, si hay ANDROID_HOME
+```
+
+Un proyecto de Android de una sola pantalla: un `WebView` a pantalla completa cargando
+`app/src/main/assets/index.html`, que es `referencia/bilbo-city.html` **sin tocar, byte a
+byte** — lo comprueba el verificador. Después, Android Studio → abrir `dist/android` →
+Run, o `gradle assembleDebug` con un SDK que tenga la plataforma 34.
+
+Cuatro decisiones que no son obvias:
+
+- **Los assets se sirven por `https://appassets.androidplatform.net/`** (`WebViewAssetLoader`),
+  no por `file://`. Un origen `file://` tiene el almacenamiento capado según el
+  fabricante y la partida vive en `localStorage`: se perdía sin decir nada.
+- **Ni un permiso en el manifiesto**, ni el de red. El juego no sale fuera, y eso se
+  puede afirmar desde el instalador.
+- **El icono es un `VectorDrawable`, no cinco PNG.** Android pide el icono en cinco
+  densidades —48, 72, 96, 144 y 192— y solo dos son múltiplo entero de 32: las otras
+  saldrían con unos píxeles del doble de alto que otros. Se genera del mismo dibujo de
+  32×32 que el de la web, juntando las tiras horizontales del mismo color.
+- **No hay `gradlew`.** El wrapper es un `.jar` y aquí no entran binarios; lo pone Android
+  Studio, o `gradle wrapper` una vez.
+
+Sin SDK de Android no se puede compilar, así que el verificador comprueba lo que se
+rompe de verdad al tocar esto: XML bien formado, el paquete diciendo lo mismo en los
+cuatro sitios donde se escribe, que cada `R.algo` exista, que el HTML de los assets sea
+el del juego, que los colores del icono estén en la paleta, y **la sintaxis del Java
+leyéndolo con `javac`** — se le pasa sin el SDK y se mira de qué se queja: si todo lo que
+dice es que no encuentra `android.webkit`, la sintaxis está bien.
 
 ## Estructura
 

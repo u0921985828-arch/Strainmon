@@ -229,7 +229,11 @@ async function probar() {
   return quejas.length ? ['consola'] : [];
 }
 
-(async () => {
+/* apk.js reutiliza la paleta y el icono: el envoltorio de WebView tiene que llevar el
+   mismo dibujo que la web instalable, no uno parecido. */
+module.exports = { FUENTE, DIST, paleta, icono32, escalar };
+
+if (require.main === module) (async () => {
   if (!process.argv.includes('--solo-comprobar')) empaquetar();
   let mal = comprobar();
   if (process.argv.includes('--probar')) mal = mal.concat(await probar());
