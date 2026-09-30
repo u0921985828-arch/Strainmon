@@ -19,7 +19,7 @@ on:
       - '.github/workflows/bilbo-city-apk.yml'
 
 permissions:
-  contents: read
+  contents: write   # el paso de release adjunta el .apk a la etiqueta «apk»
 
 jobs:
   apk:
@@ -75,6 +75,17 @@ jobs:
           name: BilboCity-apk
           path: bilbo-city/BilboCity.apk
           if-no-files-found: error
+
+      # Un artifact de Actions solo se baja desde la web, comprimido y caducando a los
+      # 90 días. Adjuntarlo a una release le da una URL directa, que es lo que se puede
+      # abrir desde el propio teléfono.
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk
+          name: APK de Bilbo City
+          body: Compilado del prototipo. Se rehace en cada push que lo toque.
+          files: bilbo-city/BilboCity.apk
+          make_latest: false
 
   emulador:
     name: Abrirlo en un emulador
