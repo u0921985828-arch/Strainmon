@@ -2176,7 +2176,7 @@ function dibChar(cfg,pose,d8){
   else{P(g,cx-1,hy,4,8,cfg.piel);P(g,cx+2,hy+4,1,2,C.negro);P(g,cx-3,hy+6,1,1,cfg.pielS);}}
  if(espalda)P(g,cx-4,hy,8,8,cfg.pielS);
  if(P_.herido&&dir===AB)P(g,cx-2,hy+4,4,1,C.sangre);
- capasEncima(g,cfg,cx,hy,ty,hom,{dir,arr,T,izqV,derV,fog:P_.fog},0);
+ capasEncima(g,cfg,cx,hy,ty,hom,{dir,arr,T,izqV,derV,fog:P_.fog});
  /* Contorno solo por fuera, como los iconos y por lo mismo: la gente cruza del asfalto
     a la acera y de la acera al parque, y una cazadora gris sobre hormigón gris sin borde
     se deshace. Las costuras de la ropa no llevan, que a 20 píxeles taparían el dibujo. */
@@ -2189,11 +2189,13 @@ function dibChar(cfg,pose,d8){
    tenga esa silueta, y el peinado, la txapela y el carro de la compra se le ponen encima.
    Con `soloGrandes` el pelo corto no se repite —ese ya viene en la hoja— y solo se añaden
    los peinados que cambian el contorno de la cabeza. */
+/* Los peinados que asoman por fuera de la cabeza. Son los únicos que hay que forjar
+   encima de una hoja traída: el corto y el rapado ya vienen dibujados en ella. */
 const GRANDES={melena:1,coleta:1,mono:1,afro:1};
-function capasEncima(g,cfg,cx,hy,ty,hom,E,soloGrandes){
+function capasEncima(g,cfg,cx,hy,ty,hom,E){
  const dir=E.dir,arr=E.arr,T=E.T,izqV=E.izqV,derV=E.derV;
  const pc=cfg.pelo==='canoso'?C.pelo5:cfg.pelocol, est=cfg.pelo;
- if(est!=='calvo'&&(!soloGrandes||GRANDES[est])){
+ if(est!=='calvo'){
   if(est==='rapado')P(g,cx-4,hy-1,8,3,pc);
   else if(est==='corto'){P(g,cx-4,hy-2,8,4,pc);if(!arr)P(g,cx-4,hy+2,2,2,pc);}
   else if(est==='melena'){P(g,cx-5,hy-2,10,4,pc);P(g,cx-5,hy+2,2,7,pc);P(g,cx+3,hy+2,2,7,pc);}
@@ -3052,11 +3054,23 @@ function lutDe(cfg){
  pinta(R.piel,[cfg.pielS,cfg.piel]);
  /* Calvo no necesita hoja propia: se le manda el pelo al color de su piel y desaparece. */
  pinta(R.pelo,cfg.pelo==='calvo'?[cfg.pielS,cfg.piel]
-  :[cfg.pelo==='canoso'?C.pelo5:cfg.pelocol]);
+  :rampaFamilia(cfg.pelo==='canoso'?C.pelo5:cfg.pelocol,3));
  pinta(R.torso,[T.s,T.b,T.l]);
  pinta(R.piernas,[PN.s,PN.b]);
- pinta(R.calzado,[CALZADO[cfg.calzado]]);
+ pinta(R.calzado,rampaFamilia(CALZADO[cfg.calzado],3));
  return lut;}
+
+/* Tres tonos alrededor de un color, dentro de su propia familia de la paleta.
+   El pelo y el calzado se pedían con un color solo, y eso aplanaba la hoja: los cuatro
+   tonos que trae dibujado un pelo acababan todos en el mismo y la melena se quedaba en
+   una mancha recortada. Las familias de CONTEXT.md §18.6 son de ocho tonos en fila, así
+   que la rampa está hecha ya; solo hay que quedarse con el trozo que toca. */
+function rampaFamilia(hex,n){
+ const i=indiceDe(hex);
+ if(i>=48||n<2)return [hex];              // los acentos no van en familia
+ const f=i>>3,t=i&7,out=[];
+ for(let k=0;k<n;k++)out.push(PALETA[f*8+Math.max(0,Math.min(7,t-1+k))][3]);
+ return out;}
 
 /* Dónde tiene la cabeza esta casilla de la hoja. No se da por supuesto: el dibujo traído
    no cae píxel a píxel donde lo pone la forja, y un gorro colocado a ojo se queda flotando
@@ -3075,36 +3089,169 @@ function anclaCabeza(bytes,w,cw,ch,d,fy,masc){
   for(let x=0;x<cw;x++)if(masc[bytes[f+x]]&&x<xmin){xmin=x;break;}}
  return {x:xmin,y:arriba};}
 
-/* Las capas de encima, forjadas en la caja de la forja, y dónde queda su cabeza para poder
-   cuadrarlas con la de la hoja traída. */
-function dibEncima(cfg,pose,d8){
- const M=MAPA8[d8],dir=M.b,frente=M.f,espalda=M.e;
- const c=lienzo(FORJA_W,FORJA_H),g=c.getContext('2d');
- g.translate(MG_X,MG_ARR);
- const P_=POSES[pose],comp=COMPLEX[cfg.comp],T=TORSOS[cfg.torso];
- const diag=frente||espalda,lateral=(dir===DE||dir===IZ)&&!diag;
- const cx=10+(diag?(dir===DE?-1:1):0)+(lateral?(dir===DE?1:-1):0);
- const oy=P_.y,yt=P_.yt||0,hom=comp.hom-(diag?1:0)-(lateral?2:0);
- const arr=(dir===AR)||espalda,ty=9+oy+yt,hy=1+oy+yt;
- capasEncima(g,cfg,cx,hy,ty,hom,
-  {dir,arr,T,izqV:dir===IZ,derV:dir===DE,fog:P_.fog},1);
- return {c:contorno(c,C.negro),hx:MG_X+cx-4,hy:MG_ARR+hy};}
+/* Dónde tiene la cabeza esta casilla de la hoja: la caja de verdad, no la de la forja.
+   Se mide desde la coronilla hasta que el ancho cae a la mitad, que es el cuello. Hace
+   falta porque la cabeza dibujada es más pequeña que la forjada —seis píxeles de cara
+   contra ocho— y va tres filas más arriba: nada de lo que va encima se puede colocar por
+   una coordenada fija. */
+function cajaCabeza(bytes,w,cw,ch,d,fy,masc){
+ const x0=d*cw,an=[],iz=[],de=[];
+ for(let y=0;y<ch;y++){
+  const f=(fy*ch+y)*w+x0;let n=0,a=cw,b=-1;
+  for(let x=0;x<cw;x++)if(masc[bytes[f+x]]){n++;if(x<a)a=x;if(x>b)b=x;}
+  an.push(n);iz.push(a);de.push(b);}
+ const y0=an.findIndex(v=>v>0);
+ if(y0<0)return null;
+ let max=0,yM=y0;
+ for(let y=y0;y<ch&&an[y]>0;y++)if(an[y]>max){max=an[y];yM=y;}
+ let y1=yM;
+ while(y1+1<ch&&an[y1+1]>=max/2)y1++;
+ return {x0:iz[yM],x1:de[yM]+1,y0,y1:y1+1};}
+
+/* La caja de lo que pinte una rampa en esta casilla. Para el tronco, que es donde van la
+   bolsa, la bufanda y el fogonazo. */
+function cajaRampa(bytes,w,cw,ch,d,fy,masc){
+ let x0=cw,y0=ch,x1=-1,y1=-1;
+ for(let y=0;y<ch;y++){const f=(fy*ch+y)*w+d*cw;
+  for(let x=0;x<cw;x++)if(masc[bytes[f+x]]){
+   if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}}
+ return x1<0?null:{x0,y0,x1:x1+1,y1:y1+1};}
+
+/* Lo que va encima de una hoja traída, dibujado sobre la cabeza y el tronco que TRAE la
+   hoja y no sobre los de la forja. Trasladar los de la forja fue el primer intento y no
+   vale: una txapela pensada para una cabeza de ocho píxeles le tapa los ojos a una de
+   seis, y una bolsa colgada del pecho de la forja se le sube al cuello a la silueta.
+   Aquí todo va en fracciones de la caja medida, que es como se dibuja el resto del arte.
+
+   No lleva contorno propio: se pinta sobre la celda y el contorno se pasa después a la
+   celda entera, así que el gorro solo se bordea por donde sobresale. Con un contorno por
+   capa, el gorro salía con su propio marco negro por dentro y parecía una boina de luto. */
+function capasSobreHoja(g,cfg,cab,tor,d8,T,fog){
+ const M=MAPA8[d8],dir=M.b,arr=(dir===AR)||!!M.e,derV=dir===DE,izqV=dir===IZ;
+ const R=Math.round;
+ const hx=cab.x0,hw=cab.x1-cab.x0,hy=cab.y0,hh=cab.y1-cab.y0,hcx=hx+(hw>>1);
+ const ala=Math.max(2,R(hh*0.34));                  // lo que baja un gorro sobre la frente
+ const pc=cfg.pelo==='canoso'?C.pelo5:cfg.pelocol;
+
+ /* Solo los peinados que se salen de la cabeza: el corto y el rapado ya vienen en la
+    hoja, y forjarlos otra vez encima solo aplana el volumen que trae dibujado. */
+ const est=cfg.pelo;
+ if(GRANDES[est]){
+  /* Solo el añadido, nunca la coronilla: la hoja ya trae pelo ahí y con su volumen, y
+     repintarla de un color plano la deja como un casco. */
+  if(est==='melena'){P(g,hx-1,hy+R(hh*.35),2,R(hh*.9),pc);
+   P(g,hx+hw-1,hy+R(hh*.35),2,R(hh*.9),pc);}
+  else if(est==='coleta')P(g,hx-2,hy+R(hh*.25),2,R(hh*.8),pc);
+  else if(est==='mono')P(g,hcx-1,hy-2,2,3,pc);
+  else if(est==='afro'){P(g,hx-2,hy-1,hw+4,R(hh*.6)+1,pc);
+   P(g,hx-2,hy-1,R((hw+4)*.5),1,C.pelo5===pc?C.pelo4:pc);}}
+
+ const G=cfg.gorro;
+ /* Cada gorro se mide contra la cabeza que hay debajo. Y ninguno pasa de la cabeza más
+    dos píxeles a cada lado: más ancho deja de parecer un gorro y parece una nube. */
+ if(G==='txapela'){P(g,hx-1,hy,hw+2,ala,C.carbon);P(g,hx-1,hy,R((hw+2)*.6),1,C.gris);
+  P(g,hx-2,hy+ala,hw+4,1,C.carbon);P(g,hx-2,hy+ala,R((hw+4)*.4),1,C.gris);}
+ else if(G==='gorra'){P(g,hx-1,hy,hw+2,ala,cfg.gorroCol);P(g,hx-1,hy,R((hw+2)*.6),1,C.hueso);
+  if(!arr)P(g,hx-1,hy+ala,R(hw*.85),1,cfg.gorroCol);}
+ else if(G==='visera'){P(g,hx-1,hy,hw+2,Math.max(1,ala-1),cfg.gorroCol);
+  P(g,hx-1,hy,R((hw+2)*.6),1,C.hueso);
+  if(!arr)P(g,hx-2,hy+ala-1,R(hw*.9),1,cfg.gorroCol);}
+ else if(G==='cascoObra'){P(g,hx-2,hy-1,hw+4,ala+1,C.mostaza);
+  P(g,hx-2,hy-1,R((hw+4)*.6),1,C.hueso);P(g,hx+hw+1,hy-1,1,ala+1,C.mostazaO);
+  P(g,hx-3,hy+ala,hw+6,1,C.mostazaO);}
+ else if(G==='cascoMoto'){P(g,hx-2,hy-1,hw+4,hh+1,C.rojo);
+  P(g,hx-2,hy-1,R((hw+4)*.6),1,C.rojoL);P(g,hx+hw+1,hy-1,1,hh+1,C.rojoO);
+  if(!arr)P(g,hx,hy+R(hh*.45),hw,Math.max(2,R(hh*.35)),C.carbon);}
+ else if(G==='lana'){P(g,hx-1,hy,hw+2,ala+1,C.rojoO);P(g,hx-1,hy,R((hw+2)*.6),1,C.rojo);
+  P(g,hx-1,hy+ala,hw+2,1,C.rojo);}
+ else if(G==='policia'){P(g,hx-1,hy,hw+2,ala,C.azulO);P(g,hx-1,hy,R((hw+2)*.6),1,C.azul);
+  if(!arr){P(g,hx-2,hy+ala,R(hw*.9),1,C.azulO);P(g,hcx-1,hy+1,2,1,C.mostaza);}}
+ else if(G==='capucha'){P(g,hx-2,hy-1,hw+4,hh+2,T.s);
+  if(!arr)P(g,hx,hy+R(hh*.3),hw,hh-R(hh*.3),cfg.piel);}
+
+ if(!tor)return;
+ const tx=tor.x0,tw=tor.x1-tor.x0,ty=tor.y0,th=tor.y1-tor.y0,tcx=tx+(tw>>1);
+ const A=cfg.acces;
+ if(A==='mochila'){if(arr)P(g,tx+1,ty+1,tw-2,R(th*.7),C.verdeO);
+  else{P(g,tx-1,ty+R(th*.15),2,R(th*.5),C.verdeO);P(g,tx+tw-1,ty+R(th*.15),2,R(th*.5),C.verdeO);}}
+ else if(A==='bolso'){P(g,tx+tw-1,ty+R(th*.55),3,3,C.maderaO);
+  P(g,tcx-1,ty+1,R(tw*.5),1,C.madera);}
+ else if(A==='bandolera'){P(g,tx,ty+1,tw,1,C.maderaO);
+  P(g,tx-1,ty+R(th*.5),2,3,C.madera);}
+ else if(A==='bufanda'){P(g,hx-1,ty-1,hw+2,2,C.rojo);
+  P(g,hx+R(hw*.55),ty+1,2,R(th*.4),C.rojoO);}
+ else if(A==='carrito'&&!arr){P(g,tx+tw+1,ty+R(th*.35),5,8,C.rojoO);
+  P(g,tx+tw+1,ty+R(th*.35),5,2,C.rojo);
+  P(g,tx+tw+2,ty+R(th*.35)+8,1,2,C.carbon);P(g,tx+tw+4,ty+R(th*.35)+8,1,2,C.carbon);}
+ /* El fogonazo sale del cañón, y el cañón está donde acaba la mano. */
+ if(fog){if(derV)P(g,tx+tw+1,ty+R(th*.2),3,3,C.mostaza);
+  else if(izqV)P(g,tx-4,ty+R(th*.2),3,3,C.mostaza);
+  else P(g,tx+tw-2,ty+R(th*.75),3,3,C.mostaza);}}
+
+/* La silueta no trae cara: el SVG dibuja el bulto de la cabeza y se acaba ahí. A veinte
+   píxeles los ojos son lo único que separa a un vecino de un maniquí. Se ponen al final,
+   encima del gorro, porque una capucha o un casco redibujan la cara entera debajo. */
+function caraEncima(g,cfg,cab,d8){
+ const M=MAPA8[d8];
+ if(M.b===AR||M.e)return;                          // de espaldas no hay ojos
+ const R=Math.round,hx=cab.x0,hw=cab.x1-cab.x0,hy=cab.y0,hh=cab.y1-cab.y0;
+ if(cfg.gorro==='cascoMoto')return;                // detrás de la pantalla no se ve nada
+ const y=hy+R(hh*.55),alto=Math.max(1,R(hh*.2)),px=f=>hx+R(hw*f);
+ const ojo=(f)=>P(g,px(f),y,1,alto,C.negro);
+ if(M.b===AB){ojo(.22);ojo(.68);}
+ else if(M.f){if(M.b===DE){ojo(.46);ojo(.82);}else{ojo(.08);ojo(.44);}}
+ else ojo(M.b===DE?.78:.12);
+ if(cfg.acces==='gafas'&&M.b===AB){
+  P(g,px(.14),y,R(hw*.3),alto,C.carbon);P(g,px(.6),y,R(hw*.3),alto,C.carbon);
+  P(g,px(.44),y,R(hw*.16),1,C.carbon);}}
+
+/* Pega las capas sobre la celda y les da contorno SOLO por donde asoman. La silueta ya
+   viene con el suyo dibujado: bordear la celda entera otra vez le ponía un segundo anillo
+   alrededor y todo el mundo salía con dos píxeles de luto. */
+function pegaEncima(cel,sobre,col){
+ const w=cel.width,h=cel.height;
+ const gd=cel.getContext('2d'),D=gd.getImageData(0,0,w,h),d=D.data;
+ const S=sobre.getContext('2d').getImageData(0,0,w,h).data;
+ const rgb=[parseInt(col.slice(1,3),16),parseInt(col.slice(3,5),16),parseInt(col.slice(5,7),16)];
+ const hay=(x,y)=>x>=0&&y>=0&&x<w&&y<h&&S[(y*w+x)*4+3]>0;
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+  const i=(y*w+x)*4;
+  if(S[i+3]){d[i]=S[i];d[i+1]=S[i+1];d[i+2]=S[i+2];d[i+3]=255;continue;}
+  if(d[i+3])continue;                    // ahí ya hay silueta: su contorno vale
+  let v=false;
+  for(let dy=-1;dy<=1&&!v;dy++)for(let dx=-1;dx<=1&&!v;dx++)if(hay(x+dx,y+dy))v=true;
+  if(v){d[i]=rgb[0];d[i+1]=rgb[1];d[i+2]=rgb[2];d[i+3]=255;}}
+ gd.putImageData(D,0,0);return cel;}
 
 /* La hoja de un arquetipo a partir de la silueta que le toca: repintar y poner encima. */
 function hojaDeSet(k){
  const cfg=ARQ[k],s=cfg&&setDe(cfg),base=s&&BASES[s];
  if(!base)return null;
- const cw=CEL_W(),ch=CEL_H(),w=cw*8;
+ const cw=CEL_W(),ch=CEL_H(),w=cw*8,T=TORSOS[cfg.torso];
  const lut=lutDe(cfg),bytes=new Uint8Array(base.length);
  for(let i=0;i<base.length;i++)bytes[i]=lut[base[i]];
- const c=lienzoDeIndices(bytes,w,ch*ORDEN_POSES.length),g=c.getContext('2d');
- const masc=new Uint8Array(256);
+ const pintada=lienzoDeIndices(bytes,w,ch*ORDEN_POSES.length);
+ const c=lienzo(w,ch*ORDEN_POSES.length),g=c.getContext('2d');
+ const masc=new Uint8Array(256),mTor=new Uint8Array(256);
  for(const r of ['piel','pelo'])for(const v of (SPR.rampas||{})[r]||[])masc[v]=1;
+ for(const v of (SPR.rampas||{}).torso||[])mTor[v]=1;
+ /* Celda a celda y no de una pasada: el contorno hay que dárselo a cada una por separado
+    o el gorro de una se bordea contra los pies de la de arriba, que en el atlas están
+    pegados sin una fila de aire en medio. */
+ const cel=lienzo(cw,ch),gc=cel.getContext('2d');
+ const sob=lienzo(cw,ch),gs=sob.getContext('2d');
  ORDEN_POSES.forEach((p,fy)=>{for(let d=0;d<8;d++){
-  const a=anclaCabeza(base,w,cw,ch,d,fy,masc);
-  if(!a)continue;
-  const e=dibEncima(cfg,p,d);
-  g.drawImage(e.c,d*cw+a.x-e.hx,fy*ch+a.y-e.hy);}});
+  gc.clearRect(0,0,cw,ch);gs.clearRect(0,0,cw,ch);
+  gc.drawImage(pintada,d*cw,fy*ch,cw,ch,0,0,cw,ch);
+  const cab=cajaCabeza(base,w,cw,ch,d,fy,masc);
+  if(cab){
+   const tor=cajaRampa(base,w,cw,ch,d,fy,mTor);
+   capasSobreHoja(gs,cfg,cab,tor,d,T,!!POSES[p].fog);
+   pegaEncima(cel,sob,C.negro);
+   /* La cara va después de pegar: no lleva contorno, que dos píxeles negros con marco
+      negro son una mancha. */
+   caraEncima(gc,cfg,cab,d);}
+  g.drawImage(cel,d*cw,fy*ch);}});
  return cuantizar(c);}
 
 async function cargarSprites(){

@@ -209,17 +209,15 @@ public static class ForjaChar {
     /// se dibuja dos veces — sobre la figura forjada y sobre la silueta traída, que viene
     /// con el cuerpo pero no con el sombrero.
     ///
-    /// Con `soloGrandes` se salta los peinados que la hoja ya trae dibujados y deja solo
-    /// los que se salen de la cabeza: el moño, la coleta, la melena y el afro. Un pelo
-    /// corto forjado encima del pelo corto de la hoja no aporta nada y le come el volumen.
+    /// Sobre una hoja traída no se usa esta: la figura dibujada tiene otra cabeza y otro
+    /// tronco, y para eso está CapasSobreHoja.
     /// </summary>
     static void CapasEncima(Lienzo L, Arquetipo cfg, int cx, int hy, int ty, int hom,
-                            int dir, bool arr, Prenda T, bool izqV, bool derV, bool fog,
-                            bool soloGrandes) {
+                            int dir, bool arr, Prenda T, bool izqV, bool derV, bool fog) {
         // ── pelo ──
         Color32 pc = cfg.Pelo == "canoso" ? Paleta.Pelo5 : cfg.PeloCol;
         string est = cfg.Pelo;
-        if (est != "calvo" && (!soloGrandes || PelosGrandes.Contains(est))) {
+        if (est != "calvo") {
             if (est == "rapado") L.P(cx - 4, hy - 1, 8, 3, pc);
             else if (est == "corto") { L.P(cx - 4, hy - 2, 8, 4, pc); if (!arr) L.P(cx - 4, hy + 2, 2, 2, pc); }
             else if (est == "melena") { L.P(cx - 5, hy - 2, 10, 4, pc); L.P(cx - 5, hy + 2, 2, 7, pc); L.P(cx + 3, hy + 2, 2, 7, pc); }
@@ -390,7 +388,7 @@ public static class ForjaChar {
         if (espalda) L.P(cx - 4, hy, 8, 8, cfg.PielS);
         if (P_.herido && dir == AB) L.P(cx - 2, hy + 4, 4, 1, Paleta.Sangre);
 
-        CapasEncima(L, cfg, cx, hy, ty, hom, dir, arr, T, izqV, derV, P_.fog, false);
+        CapasEncima(L, cfg, cx, hy, ty, hom, dir, arr, T, izqV, derV, P_.fog);
 
         // Contorno solo por fuera, como los iconos y por lo mismo: la gente cruza del
         // asfalto a la acera y de la acera al parque, y una cazadora gris sobre hormigón
@@ -479,49 +477,206 @@ public static class ForjaChar {
     }
 
     /// <summary>
-    /// Dónde tiene la cabeza esta casilla de la hoja. No se da por supuesto: el dibujo
-    /// traído no cae píxel a píxel donde lo pone la forja, y un gorro colocado a ojo se
-    /// queda flotando o le tapa los ojos. Se busca la primera fila con piel o pelo y el
-    /// borde izquierdo de esa cabeza.
+    /// Dónde tiene la cabeza esta casilla de la hoja: la caja de verdad, no la de la
+    /// forja. Se mide desde la coronilla hasta que el ancho cae a la mitad, que es el
+    /// cuello. Hace falta porque la cabeza dibujada es más pequeña que la forjada —seis
+    /// píxeles de cara contra ocho— y va tres filas más arriba: nada de lo que va encima
+    /// se puede colocar por una coordenada fija.
     /// </summary>
-    static bool AnclaCabeza(byte[] bytes, int w, int cw, int ch, int d, int fy, bool[] masc,
-                            out int ax, out int ay) {
-        ax = 0; ay = 0;
-        int x0 = d * cw, arriba = -1;
-        for (int y = 0; y < ch && arriba < 0; y++) {
-            int f = (fy*ch + y)*w + x0;
-            for (int x = 0; x < cw; x++) if (masc[bytes[f + x]]) { arriba = y; break; }
+    struct Caja { public int x0, y0, x1, y1; public int W { get { return x1-x0; } } public int H { get { return y1-y0; } } }
+
+    static bool CajaCabeza(byte[] bytes, int w, int cw, int ch, int d, int fy, bool[] masc,
+                           out Caja caja) {
+        caja = new Caja();
+        var an = new int[ch]; var iz = new int[ch]; var de = new int[ch];
+        for (int y = 0; y < ch; y++) {
+            int f = (fy*ch + y)*w + d*cw, n = 0, a = cw, b = -1;
+            for (int x = 0; x < cw; x++) if (masc[bytes[f + x]]) { n++; if (x < a) a = x; if (x > b) b = x; }
+            an[y] = n; iz[y] = a; de[y] = b;
         }
-        if (arriba < 0) return false;
-        int xmin = cw;
-        for (int y = arriba; y < Mathf.Min(ch, arriba + 8); y++) {
-            int f = (fy*ch + y)*w + x0;
-            for (int x = 0; x < cw; x++) if (masc[bytes[f + x]]) { if (x < xmin) xmin = x; break; }
-        }
-        ax = xmin; ay = arriba;
+        int y0 = -1;
+        for (int y = 0; y < ch && y0 < 0; y++) if (an[y] > 0) y0 = y;
+        if (y0 < 0) return false;
+        int max = 0, yM = y0;
+        for (int y = y0; y < ch && an[y] > 0; y++) if (an[y] > max) { max = an[y]; yM = y; }
+        int y1 = yM;
+        while (y1 + 1 < ch && an[y1 + 1] >= max/2f) y1++;
+        caja = new Caja { x0 = iz[yM], x1 = de[yM] + 1, y0 = y0, y1 = y1 + 1 };
         return true;
     }
 
-    /// <summary>Las capas de encima solas, y dónde queda su cabeza para poder cuadrarlas
-    /// con la de la hoja traída.</summary>
-    static Lienzo DibujarEncima(Arquetipo cfg, Pose pose, int d8, out int hx, out int hyOut) {
-        var L = new Lienzo(CW, CH);
-        int dir = BaseDir[d8];
-        bool frente = Frente[d8], espalda = Espalda[d8];
-        var P_ = Posturas[(int)pose];
-        var T = Torsos[cfg.Torso];
-        int hom0 = cfg.Complexion == "delgada" ? 7 : cfg.Complexion == "corpulenta" ? 11 : 9;
-        bool diag = frente || espalda;
-        bool lateral = (dir == DE || dir == IZ) && !diag;
-        int cx = MG_X + 10 + (diag ? (dir == DE ? -1 : 1) : 0) + (lateral ? (dir == DE ? 1 : -1) : 0);
-        int hom = hom0 - (diag ? 1 : 0) - (lateral ? 2 : 0);
-        bool arr = (dir == AR) || espalda;
-        int ty = MG_ARR + 9 + P_.y + P_.yt, hy = MG_ARR + 1 + P_.y + P_.yt;
-        CapasEncima(L, cfg, cx, hy, ty, hom, dir, arr, T, dir == IZ, dir == DE, P_.fog, true);
-        L.Contorno(Paleta.Negro);
-        hx = cx - 4; hyOut = hy;
-        return L;
+    /// <summary>La caja de lo que pinte una rampa en esta casilla. Para el tronco, que es
+    /// donde van la bolsa, la bufanda y el fogonazo.</summary>
+    static bool CajaRampa(byte[] bytes, int w, int cw, int ch, int d, int fy, bool[] masc,
+                          out Caja caja) {
+        int x0 = cw, y0 = ch, x1 = -1, y1 = -1;
+        for (int y = 0; y < ch; y++) {
+            int f = (fy*ch + y)*w + d*cw;
+            for (int x = 0; x < cw; x++) if (masc[bytes[f + x]]) {
+                if (x < x0) x0 = x; if (x > x1) x1 = x;
+                if (y < y0) y0 = y; if (y > y1) y1 = y;
+            }
+        }
+        caja = new Caja { x0 = x0, y0 = y0, x1 = x1 + 1, y1 = y1 + 1 };
+        return x1 >= 0;
     }
+
+    /// <summary>
+    /// Lo que va encima de una hoja traída, dibujado sobre la cabeza y el tronco que TRAE
+    /// la hoja y no sobre los de la forja. Trasladar los de la forja fue el primer intento
+    /// y no vale: una txapela pensada para una cabeza de ocho píxeles le tapa los ojos a
+    /// una de seis, y una bolsa colgada del pecho de la forja se le sube al cuello a la
+    /// silueta. Aquí todo va en fracciones de la caja medida, que es como se dibuja el
+    /// resto del arte del juego.
+    ///
+    /// No lleva contorno propio: se pinta aparte y Pegar/contorno se lo dan solo por donde
+    /// asoma. Con un contorno por capa, el gorro salía con su propio marco negro por
+    /// dentro y parecía una boina de luto.
+    /// </summary>
+    static void CapasSobreHoja(Lienzo L, Arquetipo cfg, Caja cab, bool hayTor, Caja tor,
+                               int d8, Prenda T, bool fog) {
+        int dir = BaseDir[d8];
+        bool arr = dir == AR || Espalda[d8], derV = dir == DE, izqV = dir == IZ;
+        int hx = cab.x0, hw = cab.W, hy = cab.y0, hh = cab.H, hcx = hx + hw/2;
+        int ala = Mathf.Max(2, R(hh*0.34f));         // lo que baja un gorro sobre la frente
+        Color32 pc = cfg.Pelo == "canoso" ? Paleta.Pelo5 : cfg.PeloCol;
+
+        // Solo los peinados que se salen de la cabeza, y solo el añadido: el corto y el
+        // rapado ya vienen en la hoja, y repintar la coronilla de un color plano se lleva
+        // por delante el volumen que trae dibujado.
+        string est = cfg.Pelo;
+        if (PelosGrandes.Contains(est)) {
+            if (est == "melena") {
+                L.P(hx-1, hy + R(hh*.35f), 2, R(hh*.9f), pc);
+                L.P(hx+hw-1, hy + R(hh*.35f), 2, R(hh*.9f), pc);
+            } else if (est == "coleta") L.P(hx-2, hy + R(hh*.25f), 2, R(hh*.8f), pc);
+            else if (est == "mono") L.P(hcx-1, hy-2, 2, 3, pc);
+            else if (est == "afro") {
+                L.P(hx-2, hy-1, hw+4, R(hh*.6f)+1, pc);
+                L.P(hx-2, hy-1, R((hw+4)*.5f), 1, Igual(Paleta.Pelo5, pc) ? Paleta.Pelo4 : pc);
+            }
+        }
+
+        // Cada gorro se mide contra la cabeza que hay debajo. Y ninguno pasa de la cabeza
+        // más dos píxeles a cada lado: más ancho deja de parecer un gorro y parece una nube.
+        switch (cfg.Gorro) {
+            case "txapela":
+                L.P(hx-1, hy, hw+2, ala, Paleta.Carbon); L.P(hx-1, hy, R((hw+2)*.6f), 1, Paleta.Gris);
+                L.P(hx-2, hy+ala, hw+4, 1, Paleta.Carbon); L.P(hx-2, hy+ala, R((hw+4)*.4f), 1, Paleta.Gris);
+                break;
+            case "gorra":
+                L.P(hx-1, hy, hw+2, ala, cfg.GorroCol); L.P(hx-1, hy, R((hw+2)*.6f), 1, Paleta.Hueso);
+                if (!arr) L.P(hx-1, hy+ala, R(hw*.85f), 1, cfg.GorroCol);
+                break;
+            case "visera":
+                L.P(hx-1, hy, hw+2, Mathf.Max(1, ala-1), cfg.GorroCol);
+                L.P(hx-1, hy, R((hw+2)*.6f), 1, Paleta.Hueso);
+                if (!arr) L.P(hx-2, hy+ala-1, R(hw*.9f), 1, cfg.GorroCol);
+                break;
+            case "cascoObra":
+                L.P(hx-2, hy-1, hw+4, ala+1, Paleta.Mostaza);
+                L.P(hx-2, hy-1, R((hw+4)*.6f), 1, Paleta.Hueso);
+                L.P(hx+hw+1, hy-1, 1, ala+1, Paleta.MostazaO);
+                L.P(hx-3, hy+ala, hw+6, 1, Paleta.MostazaO);
+                break;
+            case "cascoMoto":
+                L.P(hx-2, hy-1, hw+4, hh+1, Paleta.Rojo);
+                L.P(hx-2, hy-1, R((hw+4)*.6f), 1, Paleta.RojoL);
+                L.P(hx+hw+1, hy-1, 1, hh+1, Paleta.RojoO);
+                if (!arr) L.P(hx, hy + R(hh*.45f), hw, Mathf.Max(2, R(hh*.35f)), Paleta.Carbon);
+                break;
+            case "lana":
+                L.P(hx-1, hy, hw+2, ala+1, Paleta.RojoO); L.P(hx-1, hy, R((hw+2)*.6f), 1, Paleta.Rojo);
+                L.P(hx-1, hy+ala, hw+2, 1, Paleta.Rojo);
+                break;
+            case "policia":
+                L.P(hx-1, hy, hw+2, ala, Paleta.AzulO); L.P(hx-1, hy, R((hw+2)*.6f), 1, Paleta.Azul);
+                if (!arr) { L.P(hx-2, hy+ala, R(hw*.9f), 1, Paleta.AzulO); L.P(hcx-1, hy+1, 2, 1, Paleta.Mostaza); }
+                break;
+            case "capucha":
+                L.P(hx-2, hy-1, hw+4, hh+2, T.s);
+                if (!arr) L.P(hx, hy + R(hh*.3f), hw, hh - R(hh*.3f), cfg.Piel);
+                break;
+        }
+
+        if (!hayTor) return;
+        int tx = tor.x0, tw = tor.W, ty = tor.y0, th = tor.H, tcx = tx + tw/2;
+        switch (cfg.Acces) {
+            case "mochila":
+                if (arr) L.P(tx+1, ty+1, tw-2, R(th*.7f), Paleta.VerdeO);
+                else { L.P(tx-1, ty + R(th*.15f), 2, R(th*.5f), Paleta.VerdeO);
+                       L.P(tx+tw-1, ty + R(th*.15f), 2, R(th*.5f), Paleta.VerdeO); }
+                break;
+            case "bolso":
+                L.P(tx+tw-1, ty + R(th*.55f), 3, 3, Paleta.MaderaO);
+                L.P(tcx-1, ty+1, R(tw*.5f), 1, Paleta.Madera);
+                break;
+            case "bandolera":
+                L.P(tx, ty+1, tw, 1, Paleta.MaderaO); L.P(tx-1, ty + R(th*.5f), 2, 3, Paleta.Madera);
+                break;
+            case "bufanda":
+                L.P(hx-1, ty-1, hw+2, 2, Paleta.Rojo);
+                L.P(hx + R(hw*.55f), ty+1, 2, R(th*.4f), Paleta.RojoO);
+                break;
+            case "carrito":
+                if (!arr) {
+                    L.P(tx+tw+1, ty + R(th*.35f), 5, 8, Paleta.RojoO);
+                    L.P(tx+tw+1, ty + R(th*.35f), 5, 2, Paleta.Rojo);
+                    L.P(tx+tw+2, ty + R(th*.35f) + 8, 1, 2, Paleta.Carbon);
+                    L.P(tx+tw+4, ty + R(th*.35f) + 8, 1, 2, Paleta.Carbon);
+                }
+                break;
+        }
+        // El fogonazo sale del cañón, y el cañón está donde acaba la mano.
+        if (fog) {
+            if (derV) L.P(tx+tw+1, ty + R(th*.2f), 3, 3, Paleta.Mostaza);
+            else if (izqV) L.P(tx-4, ty + R(th*.2f), 3, 3, Paleta.Mostaza);
+            else L.P(tx+tw-2, ty + R(th*.75f), 3, 3, Paleta.Mostaza);
+        }
+    }
+
+    /// <summary>
+    /// La silueta no trae cara: el SVG dibuja el bulto de la cabeza y se acaba ahí. A
+    /// veinte píxeles los ojos son lo único que separa a un vecino de un maniquí. Se
+    /// ponen al final, encima del gorro, porque una capucha o un casco redibujan la cara
+    /// entera debajo, y sin contorno: dos píxeles negros con marco negro son una mancha.
+    /// </summary>
+    static void CaraEncima(Lienzo L, Arquetipo cfg, Caja cab, int d8) {
+        int dir = BaseDir[d8];
+        if (dir == AR || Espalda[d8]) return;          // de espaldas no hay ojos
+        if (cfg.Gorro == "cascoMoto") return;          // detrás de la pantalla no se ve nada
+        int hx = cab.x0, hw = cab.W, hy = cab.y0, hh = cab.H;
+        int y = hy + R(hh*.55f), alto = Mathf.Max(1, R(hh*.2f));
+        System.Action<float> ojo = f => L.P(hx + R(hw*f), y, 1, alto, Paleta.Negro);
+        if (dir == AB) { ojo(.22f); ojo(.68f); }
+        else if (Frente[d8]) { if (dir == DE) { ojo(.46f); ojo(.82f); } else { ojo(.08f); ojo(.44f); } }
+        else ojo(dir == DE ? .78f : .12f);
+        if (cfg.Acces == "gafas" && dir == AB) {
+            L.P(hx + R(hw*.14f), y, R(hw*.3f), alto, Paleta.Carbon);
+            L.P(hx + R(hw*.6f), y, R(hw*.3f), alto, Paleta.Carbon);
+            L.P(hx + R(hw*.44f), y, R(hw*.16f), 1, Paleta.Carbon);
+        }
+    }
+
+    /// <summary>
+    /// Tres tonos alrededor de un color, dentro de su propia familia de la paleta.
+    /// El pelo y el calzado se pedían con un color solo, y eso aplanaba la hoja: los
+    /// cuatro tonos que trae dibujado un pelo acababan todos en el mismo y la melena se
+    /// quedaba en una mancha recortada. Las familias de CONTEXT.md §18.6 son de ocho
+    /// tonos en fila, así que la rampa está hecha ya; solo hay que quedarse con el trozo.
+    /// </summary>
+    static Color32[] RampaFamilia(Color32 c, int n) {
+        int i = IndiceDe(c);
+        if (i >= 48 || n < 2) return new[] { c };
+        int f = i >> 3, t = i & 7;
+        var pal = Paleta.Lista;
+        var r = new Color32[n];
+        for (int k = 0; k < n; k++) r[k] = pal[f*8 + Mathf.Clamp(t - 1 + k, 0, 7)];
+        return r;
+    }
+
+    static int R(float v) { return Mathf.FloorToInt(v + 0.5f); }
+    static bool Igual(Color32 a, Color32 b) { return a.r == b.r && a.g == b.g && a.b == b.b; }
 
     /// <summary>
     /// La hoja de un arquetipo a partir de la silueta que le toca: repintar y poner
@@ -531,41 +686,76 @@ public static class ForjaChar {
         aw = 0; ah = 0;
         Arquetipo cfg;
         if (!Arq.TryGetValue(arq, out cfg)) return null;
-        // La celda de la hoja tiene que ser la de la forja: las capas de encima se forjan
-        // en ella y mezclar medidas descolocaría los pies. No se comprueba aquí porque
+        // La celda de la hoja tiene que ser la de la forja. No se comprueba aquí porque
         // son dos constantes —el generador lee la celda del propio HTML—; lo comprueban
         // el tamaño de cada base en Siluetas.Bases y herramientas/plano/siluetas.py.
         string s = SetDe(cfg);
         if (s == null) return null;
         var bas = Siluetas.Bases[s];
+        var T = Torsos[cfg.Torso];
 
         int w = CW * NDIRS, h = CH * NPOSES;
         var lut = LutDe(cfg);
         var pal = Paleta.Lista;
-        var lienzo = new Lienzo(w, h);
+        var atlas = new Lienzo(w, h);
         for (int i = 0; i < bas.Length; i++) {
             int v = lut[bas[i]];
             if (v == 0) continue;                    // 0 es transparente, no un color
-            lienzo.Px[i] = pal[(v - 1) % pal.Length];
+            atlas.Px[i] = pal[(v - 1) % pal.Length];
         }
-        var masc = new bool[256];
+        var masc = new bool[256]; var mTor = new bool[256];
         foreach (var r in new[] { "piel", "pelo" }) {
             int[] idx;
             if (Siluetas.Rampas.TryGetValue(r, out idx)) foreach (var v in idx) masc[v] = true;
         }
+        { int[] idx; if (Siluetas.Rampas.TryGetValue("torso", out idx)) foreach (var v in idx) mTor[v] = true; }
+
+        var sobre = new Lienzo(CW, CH);
         for (int p = 0; p < NPOSES; p++)
             for (int d = 0; d < NDIRS; d++) {
-                int ax, ay;
-                if (!AnclaCabeza(bas, w, CW, CH, d, p, masc, out ax, out ay)) continue;
-                int hx, hy;
-                var e = DibujarEncima(cfg, (Pose)p, d, out hx, out hy);
-                lienzo.Pegar(e, d*CW + ax - hx, p*CH + ay - hy);
+                Caja cab;
+                if (!CajaCabeza(bas, w, CW, CH, d, p, masc, out cab)) continue;
+                Caja tor; bool hayTor = CajaRampa(bas, w, CW, CH, d, p, mTor, out tor);
+                System.Array.Clear(sobre.Px, 0, sobre.Px.Length);
+                CapasSobreHoja(sobre, cfg, cab, hayTor, tor, d, T, Posturas[p].fog);
+                PegaEncima(atlas, d*CW, p*CH, sobre, Paleta.Negro);
+                CaraEncima(atlas, cfg, DesplazadaCaja(cab, d*CW, p*CH), d);
             }
         aw = w; ah = h;
         var px = new Color32[w*h];
-        lienzo.VolcarEn(px, w, h, 0, 0);
+        atlas.VolcarEn(px, w, h, 0, 0);
         Paleta.Cuantizar(px);
         return px;
+    }
+
+    static Caja DesplazadaCaja(Caja c, int dx, int dy) {
+        return new Caja { x0 = c.x0 + dx, x1 = c.x1 + dx, y0 = c.y0 + dy, y1 = c.y1 + dy };
+    }
+
+    /// <summary>
+    /// Pega las capas sobre la celda y les da contorno SOLO por donde asoman. La silueta
+    /// ya viene con el suyo dibujado: bordear la celda entera otra vez le ponía un segundo
+    /// anillo alrededor y todo el mundo salía con dos píxeles de luto.
+    /// </summary>
+    static void PegaEncima(Lienzo dest, int ox, int oy, Lienzo sobre, Color32 col) {
+        int w = sobre.W, h = sobre.H;
+        System.Func<int,int,bool> hay = (x,y) =>
+            x >= 0 && y >= 0 && x < w && y < h && sobre.Px[y*w + x].a > 0;
+        for (int y = 0; y < h; y++) {
+            int dy = oy + y;
+            if (dy < 0 || dy >= dest.H) continue;
+            for (int x = 0; x < w; x++) {
+                int dx = ox + x;
+                if (dx < 0 || dx >= dest.W) continue;
+                var c = sobre.Px[y*w + x];
+                if (c.a > 0) { dest.Px[dy*dest.W + dx] = c; continue; }
+                if (dest.Px[dy*dest.W + dx].a > 0) continue;   // ahí ya hay silueta
+                bool v = false;
+                for (int jy = -1; jy <= 1 && !v; jy++)
+                    for (int jx = -1; jx <= 1 && !v; jx++) if (hay(x+jx, y+jy)) v = true;
+                if (v) dest.Px[dy*dest.W + dx] = col;
+            }
+        }
     }
 
     static readonly Dictionary<string, Sprite[]> Hojas = new Dictionary<string, Sprite[]>();
