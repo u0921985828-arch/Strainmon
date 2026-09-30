@@ -3395,8 +3395,12 @@ function glifo(ch,tinta){
  for(let y=0;y<7;y++)for(let x=0;x<6;x++)if(on(x,y))P(g,x,y,1,1,T[0]);
  return FUENTE[k]=cuantizar(c);
 }
+/* El origen se redondea aquí y no en cada llamada: media docena de cajas del HUD se
+   centran con (W-w)/2 y con ancho impar eso cae en medio píxel, que a escala 1 deja la
+   fila de arriba de cada letra a medio tono. El avance es múltiplo de la escala, así que
+   con el origen entero la cadena entera cae en la rejilla. */
 function texto(g,s,x,y,esc,tinta){
- s=String(s).toUpperCase();let cx=x;
+ s=String(s).toUpperCase();let cx=Math.round(x);y=Math.round(y);
  for(const ch of s){
   if(ch===' '){cx+=5*esc;continue;}
   g.drawImage(glifo(ch,tinta||'ambar'),cx,y,8*esc,9*esc);cx+=7*esc;}
@@ -7011,27 +7015,33 @@ function dibCiudad(){
     caen fuera de la pantalla: el mapa mide siete kilómetros. */
  for(const p of POI){
   if(p.p.x<x0-3||p.p.x>x1+3||p.p.y<y0-3||p.p.y>y1+3)continue;
-  const sx=p.p.x*TS,sy=p.p.y*TS;
+  /* Todo lo que va encima del mundo se redondea al píxel de textura. El bote del
+     marcador también: subirlo en fracciones lo deja medio fotograma a caballo de dos
+     filas y el triángulo parece que vibra en vez de botar. */
+  const sx=Math.round(p.p.x*TS),sy=Math.round(p.p.y*TS);
   ctx.drawImage(MARCA[p.id]||(MARCA[p.id]=marcaAbajo(p.c)),sx-7,sy-30);
   if(p.int&&!S.mision){const m=MISIONES[S.misionIdx];
    if(m&&((m.giver==='Txema'&&p.id==='bar')||(m.giver==='Iker'&&p.id==='taller'))){
-    ctx.fillStyle=C.mostaza;ctx.fillRect(sx-2,sy-46-Math.abs(Math.sin(performance.now()/300))*4,4,10);
-    ctx.fillRect(sx-2,sy-33-Math.abs(Math.sin(performance.now()/300))*4,4,3);}}}
+    const bo=Math.round(Math.abs(Math.sin(performance.now()/300))*4);
+    ctx.fillStyle=C.mostaza;ctx.fillRect(sx-2,sy-46-bo,4,10);
+    ctx.fillRect(sx-2,sy-33-bo,4,3);}}}
  const o=objetivo();
- if(o){const pu=Math.abs(Math.sin(performance.now()/300));
-  ctx.drawImage(MARCA.obj||(MARCA.obj=marcaAbajo(C.mostaza)),o.x*TS-7,o.y*TS-32-pu*5);}
+ if(o){const pu=Math.round(Math.abs(Math.sin(performance.now()/300))*5);
+  ctx.drawImage(MARCA.obj||(MARCA.obj=marcaAbajo(C.mostaza)),Math.round(o.x*TS)-7,Math.round(o.y*TS)-32-pu);}
  const L=[];
  for(const p of peatones)L.push([p.y,()=>pintaSombraChar(p)]);
  for(const e of enemigos)L.push([e.y,()=>{pintaSombraChar(e);
-  ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(e.x*TS-9,e.y*TS-26,18,3);
-  ctx.fillStyle=C.sangre;ctx.fillRect(e.x*TS-9,e.y*TS-26,18*clamp(e.hp/60,0,1),3);}]);
+  const bx=Math.round(e.x*TS)-9,by=Math.round(e.y*TS)-26;
+  ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(bx,by,18,3);
+  ctx.fillStyle=C.sangre;ctx.fillRect(bx,by,Math.round(18*clamp(e.hp/60,0,1)),3);}]);
  for(const c of coches)if(c!==player.enCoche)L.push([c.y,()=>pintaCoche(c)]);
  for(const c of trafico)L.push([c.y,()=>pintaCoche(c)]);
  for(const p of policia)L.push([p.y,()=>pintaCoche(p,true)]);
  if(player.enCoche)L.push([player.y,()=>pintaCoche(player.enCoche,false,true)]);
  else L.push([player.y,()=>pintaSombraChar(player,true)]);
  L.sort((a,b)=>a[0]-b[0]).forEach(l=>l[1]());
- for(const b of balas){ctx.fillStyle=C.mostaza;ctx.fillRect(b.x*TS-1.5,b.y*TS-1.5,3,3);}
+ for(const b of balas){ctx.fillStyle=C.mostaza;
+  ctx.fillRect(Math.round(b.x*TS)-1,Math.round(b.y*TS)-1,3,3);}
  for(const p of parts){const a=clamp(p.vida/.7,0,1);
   ctx.fillStyle=p.tipo==='sangre'?`rgba(149,31,24,${a})`:p.tipo==='chispa'?`rgba(232,197,71,${a})`:`rgba(109,120,131,${a*.5})`;
   ctx.beginPath();ctx.arc(p.x*TS,p.y*TS,p.r,0,6.283);ctx.fill();}
@@ -7054,13 +7064,17 @@ function pintaSombraChar(e,esJugador){
 function pintaCoche(c,esPoli,mio){
  const spr=esPoli?VEH.patrullaRot[Math.sin(c.luz)>0?0:1]
   :(!c.vivo?VEH_QUEMADO[c.tipo]:VEH[c.tipo][c.lib%LIBREAS.length]);
- const w=spr.width,h=spr.height;
- ctx.save();ctx.translate(c.x*TS,c.y*TS);
- ctx.fillStyle='rgba(0,0,0,.32)';ctx.fillRect(-w/2+2,-h/2+3,w-2,h-2);
- ctx.rotate(c.ang);ctx.drawImage(spr,-w/2,-h/2);
- if(mio){ctx.strokeStyle='rgba(232,197,71,.55)';ctx.lineWidth=1;ctx.strokeRect(-w/2,-h/2,w,h);}
+ /* El coche gira, que es del diseño, pero el eje del giro cae en un píxel entero y el
+    sprite se centra con división entera: con -w/2 y ancho impar el chasis sale medio
+    píxel corrido y el contorno se ve de dos grosores a la vez. */
+ const w=spr.width,h=spr.height,mx=w>>1,my=h>>1;
+ ctx.save();ctx.translate(Math.round(c.x*TS),Math.round(c.y*TS));
+ ctx.fillStyle='rgba(0,0,0,.32)';ctx.fillRect(-mx+2,-my+3,w-2,h-2);
+ ctx.rotate(c.ang);ctx.drawImage(spr,-mx,-my);
+ if(mio){ctx.strokeStyle='rgba(232,197,71,.55)';ctx.lineWidth=1;ctx.strokeRect(-mx,-my,w,h);}
  if(c.marcado){ctx.restore();
-  ctx.drawImage(MARCA.obj||(MARCA.obj=marcaAbajo(C.mostaza)),c.x*TS-7,c.y*TS-34-Math.abs(Math.sin(performance.now()/300))*5);
+  const bo=Math.round(Math.abs(Math.sin(performance.now()/300))*5);
+  ctx.drawImage(MARCA.obj||(MARCA.obj=marcaAbajo(C.mostaza)),Math.round(c.x*TS)-7,Math.round(c.y*TS)-34-bo);
   return;}
  ctx.restore();}
 function dibInterior(){
@@ -7101,7 +7115,10 @@ function mapaBase(){
    :t===MUELLE?'#453d33':t===PATIO?'#3a3630':t===PUENTE?C.grisL:'#4a505a';
   g.fillRect(x,y,1,1);}
  return _mb;}
+/* Redondea aquí: varias cajas se centran con (W-w)/2 y con ancho impar el marco de 1 px
+   caía a medio píxel y se veía de dos tonos distintos en lados opuestos. */
 function cajaHUD(x,y,w,h){
+ x=Math.round(x);y=Math.round(y);w=Math.round(w);h=Math.round(h);
  ctx.fillStyle='rgba(7,9,12,.72)';ctx.fillRect(x,y,w,h);
  ctx.fillStyle='rgba(141,153,164,.35)';ctx.fillRect(x,y,w,1);ctx.fillRect(x,y+h-1,w,1);
  ctx.fillRect(x,y,1,h);ctx.fillRect(x+w-1,y,1,h);}
@@ -7111,22 +7128,31 @@ function dibHUD(){
  const marg=8;
  const zi=marg, zd=W-marg;
  /* ── radar circular con anillo de salud ── */
- const R=Math.min(52,H*.19), cxr=zi+R, cyr=marg+R+2;
+ /* Redondo a propósito, pero con el radio entero: de él salen el centro y la escala, y
+    con 52,4 de radio el minimapa entero se dibujaba a ×1,625. */
+ const R=Math.round(Math.min(52,H*.19)), cxr=zi+R, cyr=marg+R+2;
  ctx.save();
  ctx.beginPath();ctx.arc(cxr,cyr,R,0,6.283);ctx.closePath();
  ctx.fillStyle='rgba(7,9,12,.85)';ctx.fill();
  ctx.save();ctx.clip();
- const esc=R*2/64;
+ /* Escala entera y barrido a saltos de casilla: el radar es una textura como las
+    demás. A ×1,625 la trama de la ciudad se veía con casillas de uno y de dos píxeles
+    mezcladas, y el dibujo entero reptaba al andar. Se ve menos ciudad y se ve nítida. */
+ const esc=Math.max(1,Math.round(R*2/64));
  ctx.imageSmoothingEnabled=false;
- ctx.translate(cxr,cyr);ctx.scale(esc,esc);ctx.translate(-player.x,-player.y);
+ ctx.translate(cxr,cyr);ctx.scale(esc,esc);
+ ctx.translate(-Math.round(player.x*esc)/esc,-Math.round(player.y*esc)/esc);
  ctx.drawImage(mapaBase(),0,0);
- POI.forEach(p=>{ctx.fillStyle=C.carbon;ctx.fillRect(p.p.x-2,p.p.y-2,4,4);
-  ctx.fillStyle=p.c;ctx.fillRect(p.p.x-1.3,p.p.y-1.3,2.6,2.6);});
+ /* Los puntos van en tamaños enteros y centrados con división entera: uno de 2,6 se
+    reparte distinto según dónde caiga y unos salen gordos y otros flacos. */
+ const pip=(x,y,n,col)=>{ctx.fillStyle=col;
+  ctx.fillRect(Math.round(x)-(n>>1),Math.round(y)-(n>>1),n,n);};
+ POI.forEach(p=>{pip(p.p.x,p.p.y,4,C.carbon);pip(p.p.x,p.p.y,2,p.c);});
  const ob=objetivo();
- if(ob){ctx.fillStyle=C.mostaza;ctx.fillRect(ob.x-2.2,ob.y-2.2,4.4,4.4);}
- policia.forEach(p=>{ctx.fillStyle='#4d9dff';ctx.fillRect(p.x-1.5,p.y-1.5,3,3);});
- enemigos.forEach(e=>{ctx.fillStyle='#ff5a3c';ctx.fillRect(e.x-1.3,e.y-1.3,2.6,2.6);});
- ctx.fillStyle=C.blanco;ctx.fillRect(player.x-1.6,player.y-1.6,3.2,3.2);
+ if(ob)pip(ob.x,ob.y,4,C.mostaza);
+ policia.forEach(p=>pip(p.x,p.y,3,'#4d9dff'));
+ enemigos.forEach(e=>pip(e.x,e.y,3,'#ff5a3c'));
+ pip(player.x,player.y,3,C.blanco);
  ctx.restore();
  /* anillo de salud */
  ctx.lineWidth=5;
@@ -7140,63 +7166,67 @@ function dibHUD(){
  if(ob){const ang=Math.atan2(ob.y-player.y,ob.x-player.x);
   const d8=((2-Math.round(ang/(Math.PI/4)))%8+8)%8;
   const fl=MARCA['f'+d8]||(MARCA['f'+d8]=flechaDir(d8,C.mostaza));
-  ctx.drawImage(fl,cxr+Math.cos(ang)*(R-11)-8,cyr+Math.sin(ang)*(R-11)-8);}
+  ctx.drawImage(fl,Math.round(cxr+Math.cos(ang)*(R-11))-8,Math.round(cyr+Math.sin(ang)*(R-11))-8);}
  ctx.restore();
- /* ── estrellas ── */
- const exd=zd;
- for(let i=0;i<5;i++)ctx.drawImage(i<S.estrellas?ICO.estrella:ICO.estrellaOff,exd-24-i*20,marg+2,20,20);
+ /* ── estrellas ──
+    Los iconos van a 24, que es como están dibujados. Encogerlos a 20 o a 14 con la
+    interpolación apagada no los hace más pequeños: tira filas enteras, y el icono sale
+    con unos píxeles del doble de alto que otros. El hueco se hace a la medida del
+    icono, no al revés. */
+ const IW=24, exd=zd;
+ for(let i=0;i<5;i++)ctx.drawImage(i<S.estrellas?ICO.estrella:ICO.estrellaOff,exd-IW-i*IW,marg+2);
  /* ── dinero ── */
  const din=String(Math.round(S.dinero));
- const wd=anchoTexto(din,2)+34;
- cajaHUD(exd-wd,marg+26,wd,26);
- ctx.drawImage(ICO.euro,exd-wd+3,marg+29,20,20);
- texto(ctx,din,exd-wd+26,marg+29,2,'ambar');
+ const wd=anchoTexto(din,2)+40;
+ cajaHUD(exd-wd,marg+30,wd,32);
+ ctx.drawImage(ICO.euro,exd-wd+4,marg+34);
+ texto(ctx,din,exd-wd+32,marg+37,2,'ambar');
  /* ── reloj y día ── */
  const hr=String((S.min/60)|0).padStart(2,'0')+':'+String(S.min%60).padStart(2,'0');
  const wh=Math.max(anchoTexto(hr,2),anchoTexto('DIA '+S.dia,1))+10;
- cajaHUD(exd-wh,marg+58,wh,36);
- texto(ctx,hr,exd-wh+5,marg+61,2,'hueso');
- texto(ctx,'DIA '+S.dia,exd-wh+5,marg+81,1,'hueso');
+ cajaHUD(exd-wh,marg+66,wh,36);
+ texto(ctx,hr,exd-wh+5,marg+69,2,'hueso');
+ texto(ctx,'DIA '+S.dia,exd-wh+5,marg+89,1,'hueso');
  /* ── energía y hambre bajo el radar ── */
  const by=cyr+R+14;
  const barra=(y,v,col,ico)=>{
-  ctx.drawImage(ico,zi,y-3,14,14);
-  ctx.fillStyle='rgba(7,9,12,.8)';ctx.fillRect(zi+18,y,74,8);
-  ctx.fillStyle='rgba(141,153,164,.4)';ctx.fillRect(zi+18,y,74,1);ctx.fillRect(zi+18,y+7,74,1);
-  ctx.fillStyle=col;ctx.fillRect(zi+19,y+1,72*clamp(v,0,1),6);};
+  ctx.drawImage(ico,zi,y-6);
+  ctx.fillStyle='rgba(7,9,12,.8)';ctx.fillRect(zi+28,y,74,12);
+  ctx.fillStyle='rgba(141,153,164,.4)';ctx.fillRect(zi+28,y,74,1);ctx.fillRect(zi+28,y+11,74,1);
+  ctx.fillStyle=col;ctx.fillRect(zi+29,y+1,Math.round(72*clamp(v,0,1)),10);};
  barra(by,S.energia,'#4d9de0',ICO.energia);
- barra(by+16,S.hambre,'#e0a14d',ICO.hambre);
+ barra(by+28,S.hambre,'#e0a14d',ICO.hambre);
  /* ── dónde estás: la calle, y debajo el barrio ──
     La calle solo cuando se sabe cuál es. Nombrar de menos es mejor que nombrar mal: la
     mayor parte de la trama son calles que no se pueden afirmar sin el callejero, y una
     inventada en el sitio de una que existe es peor que no poner nada. */
  const D=distDe(clamp(player.x|0,0,MW-1),clamp(player.y|0,0,MH-1));
- if(S.escena==='interior')texto(ctx,S.interior.n,zi,by+32,1,'hueso');
+ if(S.escena==='interior')texto(ctx,S.interior.n,zi,by+48,1,'hueso');
  else{
   const cl=calleEn(player.x|0,player.y|0);
-  if(cl){texto(ctx,cl,zi,by+32,1,'hueso');texto(ctx,D.n,zi,by+44,1,'ambar');}
-  else texto(ctx,D.n,zi,by+32,1,'hueso');}
+  if(cl){texto(ctx,cl,zi,by+48,1,'hueso');texto(ctx,D.n,zi,by+60,1,'ambar');}
+  else texto(ctx,D.n,zi,by+48,1,'hueso');}
  /* ── arma y munición ── */
  const a=arma(S.armaAct);
  const mun=a.inf?'∞':String(S.armas[a.id]||0);
- const wa=Math.max(anchoTexto(a.n,1),anchoTexto(mun,2))+34;
- const ay=marg+98;
+ const wa=Math.max(anchoTexto(a.n,1),anchoTexto(mun,2))+40;
+ const ay=marg+106;
  cajaHUD(zd-wa,ay,wa,36);
- ctx.drawImage(ICO[a.id]||ICO.punos,zd-wa+3,ay+8,22,22);
- texto(ctx,a.n,zd-wa+28,ay+4,1,'hueso');
- texto(ctx,mun,zd-wa+28,ay+16,2,'ambar');
+ ctx.drawImage(ICO[a.id]||ICO.punos,zd-wa+4,ay+6);
+ texto(ctx,a.n,zd-wa+32,ay+4,1,'hueso');
+ texto(ctx,mun,zd-wa+32,ay+16,2,'ambar');
  /* ── el ojo ──
     Sin esto el sigilo se juega a ciegas: no hay forma de saber si el que está ahí
     enfrente te ha visto o está mirando al escaparate. El ojo se abre según lo que le
     falta a la sospecha para llenarse, y se pone en rojo cuando ya te tienen. Va debajo
     del arma, que es la esquina que queda libre. */
  if(S.escena==='ciudad'&&(S.sospecha>.02||S.visto)){
-  const an=64,oy=ay+40;
-  cajaHUD(zd-an,oy,an,26);
-  ctx.drawImage(S.visto?ICO.ojo:ICO.ojoTachado,zd-an+3,oy+3,20,20);
-  ctx.fillStyle=C.carbon;ctx.fillRect(zd-an+26,oy+9,32,8);
+  const an=72,oy=ay+40;
+  cajaHUD(zd-an,oy,an,32);
+  ctx.drawImage(S.visto?ICO.ojo:ICO.ojoTachado,zd-an+4,oy+4);
+  ctx.fillStyle=C.carbon;ctx.fillRect(zd-an+32,oy+12,32,8);
   ctx.fillStyle=S.sospecha>=1?C.sangre:S.sospecha>.5?C.mostaza:C.acero;
-  ctx.fillRect(zd-an+26,oy+9,Math.round(32*clamp(S.sospecha,0,1)),8);}
+  ctx.fillRect(zd-an+32,oy+12,Math.round(32*clamp(S.sospecha,0,1)),8);}
  /* ── misión o curro ── */
  if(S.escena==='ciudad'&&(S.mision||S.job)){
   const o=objetivo(),dm=o?Math.round(dist(o,player)*8):0;
@@ -7206,7 +7236,7 @@ function dibHUD(){
   const t3=dm+' M'+(S.mision&&S.mision.limite?'  '+Math.max(0,Math.ceil(S.mision.limite-S.mision.t))+' S':
    (S.job?'  '+S.job.pago+' €':''));
   const wm=Math.max(anchoTexto(t1,1),anchoTexto(t2,1),anchoTexto(t3,1))+12;
-  const mx=clamp((W-wm)/2,zi,zd-wm), my=H-58;
+  const mx=Math.round(clamp((W-wm)/2,zi,zd-wm)), my=H-58;
   cajaHUD(mx,my,wm,42);
   ctx.fillStyle=C.mostaza;ctx.fillRect(mx,my,wm,2);
   texto(ctx,t1,mx+6,my+4,1,'ambar');

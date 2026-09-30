@@ -144,15 +144,25 @@ public class Juego : MonoBehaviour {
         Hud.I.Aviso("VIVE DONDE PUEDAS. COBRA DONDE TOQUE", 3.4f);
     }
 
+    CanvasScaler _escalador;
+    /* La misma cuenta que la de la cámara, pero contra la resolución de referencia del
+       HUD (400×840): el número entero de veces que cabe. Nunca menos de uno. */
+    static int EscalaHud() =>
+        Mathf.Max(1, Mathf.FloorToInt(Mathf.Min(Screen.width / 400f, Screen.height / 840f)));
+
     Canvas MontarCanvas() {
         var go = new GameObject("HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         go.transform.SetParent(transform, false);
         var c = go.GetComponent<Canvas>();
         c.renderMode = RenderMode.ScreenSpaceOverlay;
+        /* El HUD es arte de píxel como el resto, así que su escala también es entera.
+           ScaleWithScreenSize daba factores como 2,7 en cualquier móvil de verdad, y con
+           eso el icono de 24 px ocupa 64,8 de pantalla: unas filas salen de dos píxeles y
+           otras de tres, y la fuente de bits se descuadra letra a letra. */
         var sc = go.GetComponent<CanvasScaler>();
-        sc.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        sc.referenceResolution = new Vector2(400, 840);
-        sc.matchWidthOrHeight = 0.5f;
+        sc.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+        sc.scaleFactor = EscalaHud();
+        _escalador = sc;
         if (UnityEngine.EventSystems.EventSystem.current == null) {
             var es = new GameObject("EventSystem", typeof(UnityEngine.EventSystems.EventSystem),
                                     typeof(UnityEngine.EventSystems.StandaloneInputModule));
@@ -416,6 +426,9 @@ public class Juego : MonoBehaviour {
         //    esté bien dibujado.
         int escala = Mathf.Max(1, Mathf.RoundToInt(Screen.height / (2f * Mundo.PPU * zoom)));
         _cam.orthographicSize = Screen.height / (2f * Mundo.PPU * escala);
+        // La pantalla puede cambiar de tamaño (girar el móvil, una ventana): el HUD se
+        // reajusta aquí, donde ya se está reajustando la cámara por lo mismo.
+        if (_escalador != null) _escalador.scaleFactor = EscalaHud();
 
         float paso = 1f / Mundo.PPU;
         _cam.transform.position = new Vector3(

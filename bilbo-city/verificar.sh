@@ -49,6 +49,9 @@ if [ "$QUE" = "todo" ] || [ "$QUE" = "html" ]; then
   echo "═══ arte · guía de estilo ═══"
   ( cd herramientas/html && node estilo.js )
   echo
+  echo "═══ arte · rejilla de píxeles ═══"
+  ( cd herramientas/html && node pixel.js )
+  echo
 fi
 
 echo "═══ todo en orden ═══"

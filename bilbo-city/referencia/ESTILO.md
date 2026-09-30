@@ -2,8 +2,9 @@
 
 Una sola estética para todo: ciudad, personajes, coches, iconos, tipografía y menús. Lo
 que sigue no es una lista de gustos, es lo que ya hace el juego, escrito para que no se
-vaya. Lo marcado **[V]** lo comprueba `node herramientas/html/estilo.js` y falla si se
-incumple; lo demás se respeta a mano.
+vaya. Lo marcado **[V]** lo comprueban `node herramientas/html/estilo.js` —el arte
+forjado— y `node herramientas/html/pixel.js` —cómo se pinta en pantalla—, y `verificar.sh`
+falla si se incumple; lo demás se respeta a mano.
 
 ## La idea
 
@@ -100,6 +101,8 @@ con otras hasta no poder leerlas.
 ## Interfaz
 
 - **Rejilla de 4 px.** Márgenes, separaciones y alturas, múltiplos de 4.
+- **El icono se enseña a 24×24**, que es como está dibujado. Nunca a 20 ni a 14: sin
+  interpolación, encoger tira filas y el icono sale con píxeles de dos alturas. **[V]**
 - **Bordes de 2 px.** Nada de 1 px: a la resolución de un móvil desaparece.
 - La barra de color a la izquierda de cada fila mide **5 px** y dice de qué tipo es.
 - El icono va en un **hueco hundido** de 30×30, como una casilla de inventario.

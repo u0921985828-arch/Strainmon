@@ -555,6 +555,24 @@ falta a la vez:
   `Mundo.AMundoPixel`, no con `Mundo.AMundo`.
 
 Y `DPR` entero en el HTML: con 1,5 un píxel de textura cae a caballo de dos de pantalla.
+En Unity el HUD va en `ConstantPixelSize` con factor entero por lo mismo:
+`ScaleWithScreenSize` daba 2,7 en cualquier móvil de verdad.
+
+**El HUD también es arte de píxel.** Un icono está dibujado a 24×24 y se enseña a 24×24:
+encogerlo a 20 con la interpolación apagada no lo hace más pequeño, tira filas enteras y
+deja unos píxeles del doble de alto que otros. El hueco se hace a la medida del icono.
+Y todo lo que cuelgue de un seno, de una media o de una velocidad —el bote de un
+marcador, la flecha de la brújula, una caja centrada con `(W-w)/2`— se redondea antes de
+pintarse.
+
+```bash
+node herramientas/html/pixel.js   # ¿se dibuja todo en la rejilla?
+```
+
+Eso envuelve el contexto de verdad, juega ciudad, interior, portada, tienda, móvil y
+volante, y apunta cada `drawImage` y cada `fillRect` que cae fuera de la rejilla **con la
+línea del HTML que lo hizo**. Está en `./verificar.sh`. Es lo que hacía falta: a ojo, un
+radar a escala 1,625 y un icono a 20 se ven «un poco sucios» y ya está.
 
 ## Estructura
 

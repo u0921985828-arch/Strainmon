@@ -117,7 +117,12 @@ public class Hud : MonoBehaviour {
     Color32[] _fondoRadar, _bufRadar;
 
     const int RADAR = 104;      // diámetro en píxeles de pantalla
-    const int RADIO_TILES = 32; // cuánta ciudad se ve en el radar
+    // 26 y no 32 para que la textura del radar (52x52) entre en los 104 a ×2 exactos. A
+    // ×1,625 la trama salía con casillas de uno y de dos píxeles mezcladas y el dibujo
+    // entero reptaba al andar. Se ve menos ciudad y se ve nítida.
+    const int RADIO_TILES = 26; // cuánta ciudad se ve en el radar
+
+    const int ICO = 24;         // los iconos se dibujan a 24 y se enseñan a 24
 
     void Awake() { I = this; }
 
@@ -151,43 +156,47 @@ public class Hud : MonoBehaviour {
         _flechaObj.enabled = false;
 
         // estrellas
+        // Los iconos van a 24, que es como están dibujados. Encogerlos a 20 o a 14 no los
+        // hace más pequeños con el filtro en Point: tira filas enteras, y el icono sale
+        // con unos píxeles del doble de alto que otros. El hueco se hace a la medida del
+        // icono, no al revés.
         for (int i = 0; i < 5; i++)
             _estrellas[i] = UiFab.Img(raiz, Fuente.Ico["estrellaOff"], new Vector2(1,1),
-                                      new Vector2(-26-i*20, -10), new Vector2(20,20));
+                                      new Vector2(-24-i*ICO, -10), new Vector2(ICO,ICO));
 
         // el ojo del sigilo
-        _icoOjo   = UiFab.Img(raiz, Fuente.Ico["ojoTachado"], new Vector2(1,1), new Vector2(-58,-120), new Vector2(20,20));
-        _fondoOjo = UiFab.Img(raiz, null, new Vector2(1,1), new Vector2(-34,-125), new Vector2(32,8));
-        _barraOjo = UiFab.Img(raiz, null, new Vector2(1,1), new Vector2(-34,-125), new Vector2(32,8));
+        _icoOjo   = UiFab.Img(raiz, Fuente.Ico["ojoTachado"], new Vector2(1,1), new Vector2(-68,-124), new Vector2(ICO,ICO));
+        _fondoOjo = UiFab.Img(raiz, null, new Vector2(1,1), new Vector2(-40,-132), new Vector2(32,8));
+        _barraOjo = UiFab.Img(raiz, null, new Vector2(1,1), new Vector2(-40,-132), new Vector2(32,8));
         _fondoOjo.color = Paleta.Carbon;
 
         // cartera, reloj
-        _icoEuro = UiFab.Img(raiz, Fuente.Ico["euro"], new Vector2(1,1), new Vector2(-136,-38), new Vector2(20,20));
+        _icoEuro = UiFab.Img(raiz, Fuente.Ico["euro"], new Vector2(1,1), new Vector2(-140,-42), new Vector2(ICO,ICO));
         _tDinero = Nuevo(raiz, new Vector2(0,0), 2, Fuente.Tinta.Ambar);
         _tReloj  = Nuevo(raiz, new Vector2(0,0), 2, Fuente.Tinta.Hueso);
         _tDia    = Nuevo(raiz, new Vector2(0,0), 1, Fuente.Tinta.Hueso);
 
         // barras
-        _icoEnergia = UiFab.Img(raiz, Fuente.Ico["energia"], new Vector2(0,1), new Vector2(10,-124), new Vector2(14,14));
-        _icoHambre  = UiFab.Img(raiz, Fuente.Ico["hambre"],  new Vector2(0,1), new Vector2(10,-142), new Vector2(14,14));
-        _barEnergia = Barra(raiz, new Vector2(28,-127), Paleta.H("#4d9de0"));
-        _barHambre  = Barra(raiz, new Vector2(28,-145), Paleta.H("#e0a14d"));
+        _icoEnergia = UiFab.Img(raiz, Fuente.Ico["energia"], new Vector2(0,1), new Vector2(10,-124), new Vector2(ICO,ICO));
+        _icoHambre  = UiFab.Img(raiz, Fuente.Ico["hambre"],  new Vector2(0,1), new Vector2(10,-152), new Vector2(ICO,ICO));
+        _barEnergia = Barra(raiz, new Vector2(38,-130), Paleta.H("#4d9de0"));
+        _barHambre  = Barra(raiz, new Vector2(38,-158), Paleta.H("#e0a14d"));
 
         // La calle arriba y el barrio debajo: la calle es lo que cambia al doblar la
         // esquina y el barrio es el contexto. Sin calle, el barrio sube a su sitio.
-        _tCalle  = Nuevo(raiz, new Vector2(10,164), 1, Fuente.Tinta.Hueso);
-        _tBarrio = Nuevo(raiz, new Vector2(10,176), 1, Fuente.Tinta.Ambar);
-        _tDeuda  = Nuevo(raiz, new Vector2(10,192), 1, Fuente.Tinta.Rojo);
+        _tCalle  = Nuevo(raiz, new Vector2(10,180), 1, Fuente.Tinta.Hueso);
+        _tBarrio = Nuevo(raiz, new Vector2(10,192), 1, Fuente.Tinta.Ambar);
+        _tDeuda  = Nuevo(raiz, new Vector2(10,208), 1, Fuente.Tinta.Rojo);
 
         // panel de misión
-        _panelMision = UiFab.Img(raiz, Plano(new Color32(7,9,12,190)), new Vector2(0,1), new Vector2(10,-196), new Vector2(220,44));
-        _tMision1 = Nuevo(raiz, new Vector2(16,200), 1, Fuente.Tinta.Ambar);
-        _tMision2 = Nuevo(raiz, new Vector2(16,212), 1, Fuente.Tinta.Hueso);
-        _tMision3 = Nuevo(raiz, new Vector2(16,224), 1, Fuente.Tinta.Ambar);
+        _panelMision = UiFab.Img(raiz, Plano(new Color32(7,9,12,190)), new Vector2(0,1), new Vector2(10,-212), new Vector2(220,44));
+        _tMision1 = Nuevo(raiz, new Vector2(16,216), 1, Fuente.Tinta.Ambar);
+        _tMision2 = Nuevo(raiz, new Vector2(16,228), 1, Fuente.Tinta.Hueso);
+        _tMision3 = Nuevo(raiz, new Vector2(16,240), 1, Fuente.Tinta.Ambar);
 
         // arma
         _panelArma = UiFab.Img(raiz, Plano(new Color32(7,9,12,190)), new Vector2(1,0), new Vector2(-150,236), new Vector2(140,38));
-        _icoArma = UiFab.Img(raiz, Fuente.Ico["punos"], new Vector2(1,0), new Vector2(-146,232), new Vector2(22,22));
+        _icoArma = UiFab.Img(raiz, Fuente.Ico["punos"], new Vector2(1,0), new Vector2(-146,230), new Vector2(ICO,ICO));
         _tArma = Nuevo(raiz, new Vector2(0,0), 1, Fuente.Tinta.Hueso);
         _tMun  = Nuevo(raiz, new Vector2(0,0), 2, Fuente.Tinta.Ambar);
 
@@ -232,8 +241,8 @@ public class Hud : MonoBehaviour {
     }
 
     Image Barra(Transform raiz, Vector2 pos, Color32 col) {
-        UiFab.Img(raiz, Plano(new Color32(7,9,12,200)), new Vector2(0,1), pos, new Vector2(76,8));
-        var im = UiFab.Img(raiz, Plano(col), new Vector2(0,1), pos + new Vector2(1,-1), new Vector2(74,6));
+        UiFab.Img(raiz, Plano(new Color32(7,9,12,200)), new Vector2(0,1), pos, new Vector2(76,12));
+        var im = UiFab.Img(raiz, Plano(col), new Vector2(0,1), pos + new Vector2(1,-1), new Vector2(74,10));
         im.type = Image.Type.Filled;
         im.fillMethod = Image.FillMethod.Horizontal;
         return im;
@@ -266,9 +275,11 @@ public class Hud : MonoBehaviour {
             float ang = Mathf.Atan2(d.y, d.x);
             _flechaObj.enabled = true;
             _flechaObj.sprite = Forja.Flecha(d8, Paleta.Mostaza);
+            // Redondeada: colgada del seno y del coseno, la flecha caía a medio píxel y
+            // se veía de dos grosores según el rumbo.
             _flechaObj.rectTransform.anchoredPosition =
-                new Vector2(10 + RADAR/2f + Mathf.Cos(ang)*(RADAR/2f-14) - 8,
-                            -(10 + RADAR/2f + Mathf.Sin(ang)*(RADAR/2f-14) - 8));
+                new Vector2(Mathf.Round(10 + RADAR/2f + Mathf.Cos(ang)*(RADAR/2f-14)) - 8,
+                            -(Mathf.Round(10 + RADAR/2f + Mathf.Sin(ang)*(RADAR/2f-14)) - 8));
         } else _flechaObj.enabled = false;
 
         // ── estrellas ──
@@ -294,10 +305,10 @@ public class Hud : MonoBehaviour {
         int h = Mathf.RoundToInt(rtC.rect.height);
 
         string din = Mathf.RoundToInt(E.Dinero).ToString();
-        _tDinero.Pos = new Vector2(w - 112, 40); _tDinero.Escribir(din);
+        _tDinero.Pos = new Vector2(w - 108, 45); _tDinero.Escribir(din);
         string hr = (E.Min/60).ToString("00") + ":" + (E.Min%60).ToString("00");
-        _tReloj.Pos = new Vector2(w - 112, 66); _tReloj.Escribir(hr);
-        _tDia.Pos = new Vector2(w - 112, 88); _tDia.Escribir("DIA " + E.Dia);
+        _tReloj.Pos = new Vector2(w - 112, 74); _tReloj.Escribir(hr);
+        _tDia.Pos = new Vector2(w - 112, 96); _tDia.Escribir("DIA " + E.Dia);
 
         _barEnergia.fillAmount = Mathf.Clamp01(E.Energia);
         _barHambre.fillAmount = Mathf.Clamp01(E.Hambre);
