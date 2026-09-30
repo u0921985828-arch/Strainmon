@@ -53,7 +53,11 @@ jobs:
       - name: Generar el proyecto de Android
         run: node herramientas/html/apk.js
 
+      # `packages` a mano: por defecto la acción instala el paquete `tools`, que Google
+      # retiró del repositorio, y el paso entero se cae con «Failed to find package».
       - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
 
       - uses: gradle/actions/setup-gradle@v4
         with:
