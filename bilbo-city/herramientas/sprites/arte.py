@@ -416,9 +416,36 @@ def iconos(pal, nombres, aviso):
     return fuera
 
 
+LOGO = ('c', 64)   # qué variante de las bajadas vale, y a qué tamaño vive
+
+
+def marca(pal, nombres, aviso):
+    """El emblema de la portada. Una pieza, y no es un icono: no pasa por la R2.
+
+    El rótulo BILBO CITY sigue siendo la fuente del juego —un rótulo traído traería letras
+    inventadas, que es la regla de toda la casa— así que lo que se pide es solo el escudo:
+    el monte, la torre, las dos chimeneas y el meandro. Lo demás lo pone la portada.
+    """
+    k, lado = LOGO
+    im = _abre(os.path.join(PIEZAS, 'marca', k + '.png'))
+    if im is None:
+        aviso('marca: no está bajada')
+        return {}
+    # Dos píxeles de margen porque lleva dos contornos: el negro de siempre y, por fuera,
+    # un aro ámbar. El aro no es adorno — el escudo es verde oscuro sobre una portada
+    # oscura y sin él no despega del fondo; de paso lo ata al color del rótulo.
+    im = _cabe(im, lado - 2, 1)
+    if im is None:
+        aviso('marca: vino en blanco')
+        return {}
+    im = _contorno(_centra(_acolores(im, pal, 7), lado), pal[nombres['tinta']])
+    im = _contorno(im, pal[nombres['aviso1']])
+    return {'logo': (lado, lado, _indices(im, pal))}
+
+
 # ── la escritura ────────────────────────────────────────────────────────────────────
 AVISO = '/* Lo escribe herramientas/sprites/arte.py. Vacío = todo forjado. */'
-FAMILIAS = ('singulares', 'muebles', 'suelos', 'iconos')
+FAMILIAS = ('singulares', 'muebles', 'suelos', 'iconos', 'marca')
 
 
 def _trozos(b64, sangria, comilla="'"):
@@ -589,7 +616,8 @@ if __name__ == '__main__':
         avisos.append(t)
         print('  ¡ojo!', t, flush=True)
     arte = {'singulares': singulares(pal, aviso), 'muebles': muebles(pal, aviso),
-            'suelos': suelos(pal, aviso), 'iconos': iconos(pal, nombres, aviso)}
+            'suelos': suelos(pal, aviso), 'iconos': iconos(pal, nombres, aviso),
+            'marca': marca(pal, nombres, aviso)}
     for fam in FAMILIAS:
         print('%-11s %d piezas · %d KB sin comprimir'
               % (fam, len(arte[fam]), sum(len(b) for _, _, b in arte[fam].values()) / 1024))

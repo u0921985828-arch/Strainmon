@@ -15,39 +15,40 @@
  */
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
 const { execFileSync } = require('child_process');
-const { FUENTE, DIST, paleta, icono32 } = require('./pwa.js');
+const { FUENTE, DIST, paleta, icono32, emblema } = require('./pwa.js');
 
 const PAQ = 'eus.bilbocity.juego';
 const RAIZ = path.join(DIST, 'android');
 const AGP = '8.5.2', SDK = 34, MIN_SDK = 26;   // 26 = Android 8, el primero con icono adaptativo
 
-/* Del dibujo de 32×32 a un VectorDrawable.
+/* Del dibujo del icono a un VectorDrawable.
  *
  * Y no a un PNG, que sería lo evidente: Android pide el icono en cinco densidades —48,
- * 72, 96, 144 y 192— y solo dos de ellas son múltiplo entero de 32. Las otras tres
- * saldrían con unos píxeles del doble de alto que otros, que es justo lo que este
- * proyecto no hace. Un vector son rectángulos exactos y el lanzador lo pinta a la
- * resolución que le toque. Se juntan las tiras horizontales del mismo color para no
- * escribir mil veinticuatro rectángulos. */
-function vectorDe(c32, esc, desp) {
-  const d = c32.getContext('2d').getImageData(0, 0, 32, 32).data;
+ * 72, 96, 144 y 192— y ninguna de ellas es múltiplo entero de 64. Saldrían con unos
+ * píxeles del doble de alto que otros, que es justo lo que este proyecto no hace. Un
+ * vector son rectángulos exactos y el lanzador lo pinta a la resolución que le toque.
+ * Se juntan las tiras horizontales del mismo color para no escribir cuatro mil
+ * rectángulos. */
+function vectorDe(base, esc, desp) {
+  const n = base.width;
+  const d = base.getContext('2d').getImageData(0, 0, n, n).data;
   const hex = i => '#' + [0,1,2].map(j => d[i+j].toString(16).padStart(2,'0')).join('');
   const porColor = new Map();
-  for (let y = 0; y < 32; y++) {
+  for (let y = 0; y < n; y++) {
     let x = 0;
-    while (x < 32) {
-      const i = (y*32 + x)*4;
+    while (x < n) {
+      const i = (y*n + x)*4;
       if (d[i+3] < 8) { x++; continue; }
       const col = hex(i);
       let an = 1;
-      while (x + an < 32 && d[(y*32 + x + an)*4 + 3] >= 8 && hex((y*32 + x + an)*4) === col) an++;
+      while (x + an < n && d[(y*n + x + an)*4 + 3] >= 8 && hex((y*n + x + an)*4) === col) an++;
       const X = desp + x*esc, Y = desp + y*esc, W = an*esc, H = esc;
       if (!porColor.has(col)) porColor.set(col, []);
       porColor.get(col).push(`M${X},${Y}h${W}v${H}h${-W}z`);
       x += an;
     }
   }
-  const lado = desp*2 + 32*esc;
+  const lado = desp*2 + n*esc;
   return `<?xml version="1.0" encoding="utf-8"?>
 <!-- Generado por herramientas/html/apk.js. No se edita a mano. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -271,9 +272,11 @@ dependencies {
     </style>
 </resources>
 `);
-  /* El fondo del icono adaptativo lleva el dibujo a sangre y el primer plano va vacío: el
-     lanzador recorta la máscara sobre el fondo, y con el dibujo en el primer plano se
-     queda encogido dentro de la zona segura y no llena el círculo. */
+  /* El icono adaptativo, con el emblema de la portada. Ahora sí en el primer plano y no
+     en el fondo: el emblema es un escudo con esquinas, y a sangre el lanzador le recorta
+     las puntas con cualquier máscara. Va a 72 de los 108, que es la zona segura, y detrás
+     una plancha negra que llena lo que recorte. Sin emblema se vuelve a lo de antes —el
+     dibujo a sangre en el fondo—, que para una mancha abstracta sí valía. */
   const adaptativo = `<?xml version="1.0" encoding="utf-8"?>
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@drawable/icono_fondo"/>
@@ -282,12 +285,24 @@ dependencies {
 `;
   A('app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml', adaptativo);
   A('app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml', adaptativo);
-  A('app/src/main/res/drawable/icono_fondo.xml', vectorDe(icono32(C, 0), 3.375, 0));
-  A('app/src/main/res/drawable/icono_frente.xml', `<?xml version="1.0" encoding="utf-8"?>
+  const vacio = `<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp"
     android:viewportWidth="108" android:viewportHeight="108"/>
-`);
+`;
+  const emb = emblema();
+  A('app/src/main/res/drawable/icono_fondo.xml', emb
+    ? `<?xml version="1.0" encoding="utf-8"?>
+<!-- Generado por herramientas/html/apk.js. No se edita a mano. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="${C.negro}" android:pathData="M0,0h108v108h-108z"/>
+</vector>
+`
+    : vectorDe(icono32(C, 0), 3.375, 0));
+  // 64×1.125 = 72, y 18 de banda a cada lado: 108 justos y a escala entera de medio píxel.
+  A('app/src/main/res/drawable/icono_frente.xml', emb ? vectorDe(emb, 1.125, 18) : vacio);
 
   A('LEEME.md', `# Bilbo City · envoltorio de Android
 
@@ -415,8 +430,9 @@ function comprobar() {
 
   /* Un vector con un color fuera de la paleta sería el primero del proyecto. */
   const C = paleta(), hay = new Set(Object.values(C).map(h => h.toLowerCase()));
-  const cols = [...leer('app/src/main/res/drawable/icono_fondo.xml')
-    .matchAll(/fillColor="(#[0-9a-f]{6})"/g)].map(m => m[1]);
+  const cols = ['icono_fondo', 'icono_frente'].flatMap(n =>
+    [...leer('app/src/main/res/drawable/' + n + '.xml')
+      .matchAll(/fillColor="(#[0-9a-f]{6})"/g)].map(m => m[1]));
   ok(cols.length > 0 && cols.every(c => hay.has(c)),
      'los ' + cols.length + ' colores del icono están en la paleta');
   return mal;

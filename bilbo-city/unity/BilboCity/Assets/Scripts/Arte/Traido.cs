@@ -586,6 +586,19 @@ public static class Traido {
             "pZLLDcQgEEORc3QV08EU4P7rykz4hMDuYTfvANLDYxGFUl6goG6Ld88j+erplT3/g8/ipvXQ9A8+0uwHpjkt0C5NjoG8NWOg0Qeyg8Ybjeon",
             "uhqMm9+j3zSCqFmsoXnM5YgC5FJyx8iq0r9IOAKs/0mD/5/ACQ==" }) }
     };
+
+    public static readonly Dictionary<string, Estampa> Marca = new Dictionary<string, Estampa> {
+        { "logo", new Estampa(64, 64, new[] {
+            "nZdtcoQgDIY7uYFMGE7iL7z/uZpPDCiom0633V2eNy8BNfz9TWP3+PshmDs0fpAweONQiW+Zd4EB+BdY4v08zDaRmwUp+DzepRbIUGhvnivh",
+            "qQ0S4/aPvVuYuKTW8edURGZiwlfLUvuU+1KeoqOCw11qzTMoBBOR13kOKfY9bKKwJCbf8adBg33rHUel0P/OytKwgb9MGin4ba0qQF9EExf+",
+            "hOUDLFgKOu4ewq6+4X1leBynh46vzdqUD6tB2Sl/jXy1oi54L3mtWDbmJQr9tCKseC97FZ5eGp+FF4kVL2jjy8C7iSl/lgslIF35uuLbICyq",
+            "8ok/Ik+QFDC95uNSSWLiERN85gG88pgSepwKDzwAUUWCsicpRWGtlzx2QQYK8wiA8MRb2iHYvLyahRmP97gqhP0w4bHkC5j70CpO+DxJ3iss",
+            "+DxT6CUWfC+Rb/mUJnxKppAZKC5nkgbTDOY8mkLuEha3xblpzJTnFbrhlaZX4BFp4Z+/zpDvI6HhK/+IOU3wJCz/mfIWHQcaCTPzsokX8zc+",
+            "NVY2bJaLSvG5f7ve1CPBejH7ugmel/NHuV0Ij4qD45g1+bp+mlslQvKsnJt7qp9NNZi3T9/xXga+WYDjgZ7wQcCHtwqkk6XQHuamf9jCICHo",
+            "IVCh0I0vfOFtytV/p2BLUYo8iKCj5Vkz9E/HKKB15IdIELBB29BRW1dxUeDJysVvCht4lzS2kPu9BePFhPfT903sfq8A1fhSvfGatcA6iSjA",
+            "l0+7BcKJL/tvV5Dnb/Hs9unDUaSr44Ten08fQUA8tMK9OMMEC5taeGe9t7DpSnf461OcN/yyVz4mj3vBzzKfkt8sxMfzY5iE+P+cvLPwU/J4",
+            "qtp/xf0Avx7zDw==" }) }
+    };
 /*ARTE>>>*/
 
     /// <summary>La pieza de una familia, o null si no se trajo. El juego nunca depende

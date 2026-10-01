@@ -646,7 +646,7 @@ Cuatro cosas que hay que saber antes de tocarlo:
   `lutDe()` deja de servir.
 - **Lo que no es personaje va en su propio bloque `/*<<<ARTE*/`**, en el HTML y en
   `unity/.../Arte/Traido.cs` a la vez, con el formato de siempre (índice de paleta por
-  píxel, deflate, base64). Cuatro familias: singulares, muebles, suelos e iconos. **El
+  píxel, deflate, base64). Cinco familias: singulares, muebles, suelos, iconos y marca. **El
   juego no depende de que estén**: si falta una pieza o el bloque entero, se forja como siempre.
   Lo compara `herramientas/plano/arte.py`, dentro de `./verificar.sh`.
 - **El asfalto, la tierra y el césped tampoco se traen, y esto está probado dos veces.**
@@ -706,6 +706,40 @@ o 40 generaciones, sale de 192 px para arriba y hay que encogerlo —que en pixe
 destruirlo—, y sobre todo la caja del HUD es **translúcida** a propósito, para que se vea
 la ciudad por debajo. Un panel opaco con textura tapa el juego. Lo mismo con los menús, que
 son DOM con su CSS y ya tienen una materia coherente.
+
+### El emblema, y por qué el icono de la aplicación es el mismo
+
+La portada era rótulo y nada más: BILBO CITY en la fuente del juego sobre el plano. Un
+juego sin marca. Ahora lleva a su izquierda un **escudo hexagonal** —monte, torre, dos
+chimeneas y el meandro— que también viene de PixelLab, en la familia `marca`, pieza única
+a 64×64.
+
+- **El escudo no lleva letras.** El rótulo sigue siendo la fuente del juego, por la regla
+  de arriba: un emblema con texto traería texto inventado.
+- **Dos contornos, no uno.** El negro de siempre y, por fuera, un aro en `aviso1`. El aro
+  no es adorno: el escudo es verde oscuro sobre una portada oscura y sin él no despega del
+  fondo. De paso lo ata al ámbar del rótulo. Por eso la pieza se recorta a 62 antes de
+  centrarla en 64: cada contorno crece un píxel por lado.
+- **No pasa por la R2.** No es un icono del HUD: ni 24×24 ni siete colores.
+
+**Y el icono de la aplicación es ese mismo escudo**, leído del bloque `/*<<<ARTE*/` —no de
+un PNG aparte, que este repositorio no los tiene—, inflado y pintado por `pwa.js`. Lo que
+se ve en el lanzador tiene que ser lo que se ve al arrancar, o son dos marcas. Tres cosas
+que costaron un intento:
+
+1. **Debajo va una plancha negra.** El escudo tiene las esquinas transparentes y un icono
+   de aplicación no puede ser medio transparente.
+2. **La escala es entera o no es.** El recortable se generó encajando el emblema de 64 en
+   el hueco exacto y el redimensionado se comió filas sueltas: el aro ámbar salió a
+   trozos. Ahora se busca la mayor escala entera que quepa —×3 para 192, ×8 para 512, ×6
+   para el recortable con sus 64 de banda— y se pinta por vecino más próximo.
+3. **En Android va en el primer plano, no en el fondo.** Lo contrario de lo que pedía la
+   mancha abstracta anterior: aquella llenaba el círculo a sangre, pero a un escudo con
+   puntas el lanzador se las recorta con cualquier máscara. Va a 72 de los 108 —la zona
+   segura— y detrás una plancha negra que llena lo que la máscara descubra.
+
+Si el bloque `ARTE` no trae `marca`, la portada vuelve al rótulo centrado y el icono al
+dibujo a mano de `icono32()`. Como todo lo traído: no es un requisito, es una mejora.
 
 ```bash
 python3 herramientas/sprites/iconos.py                       # lo que falte

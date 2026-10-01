@@ -13,7 +13,7 @@
  * Desde ahí arranca a pantalla completa, apaisado y sin barra del navegador, y una vez
  * abierto no vuelve a pedir red.
  */
-const fs = require('fs'), path = require('path'), crypto = require('crypto');
+const fs = require('fs'), path = require('path'), crypto = require('crypto'), zlib = require('zlib');
 const { createCanvas } = require('canvas');
 
 const RAIZ = path.join(__dirname, '..', '..');
@@ -34,6 +34,81 @@ function paleta() {
   for (const k of ['negro','asfalto','carbon','ladrillo2','verde2','verde4','ria1','ria3','ria5','hueso'])
     if (!C[k]) throw new Error('la paleta del juego ya no tiene ' + k);
   return C;
+}
+
+/* La paleta otra vez, pero en orden y sin repetidos: es el índice que escribe
+   `herramientas/sprites/arte.py` en el bloque ARTE, y tiene que valer igual aquí que en
+   el juego. Mismo descarte que hace el Set del juego, mismo orden de aparición. */
+function paletaOrdenada() {
+  const html = fs.readFileSync(FUENTE, 'utf8');
+  const a = html.indexOf('const C={');
+  const bloque = html.slice(a, html.indexOf('};', a));
+  const fuera = [], vistos = new Set();
+  for (const m of bloque.matchAll(/(\w+):'(#[0-9a-fA-F]{6})'/g)) {
+    const h = m[2].toLowerCase();
+    if (vistos.has(h)) continue;
+    vistos.add(h);
+    fuera.push([parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]);
+  }
+  return fuera;
+}
+
+/* El emblema de la portada, sacado del mismo sitio del que lo saca el juego: el bloque
+   ARTE. No se vuelve a generar ni se copia a un PNG aparte —un PNG en el repositorio es
+   justo lo que este proyecto no tiene— sino que se lee de ahí, se infla y se pinta.
+   Si el bloque no lo lleva, devuelve null y el icono vuelve al dibujado a mano. */
+function emblema() {
+  const html = fs.readFileSync(FUENTE, 'utf8');
+  const m = /marca:\{\s*logo:\[(\d+),(\d+),\[([^\]]*)\]\.join\(''\)\]/.exec(html);
+  if (!m) return null;
+  const w = +m[1], h = +m[2];
+  const b64 = [...m[3].matchAll(/'([^']*)'/g)].map(t => t[1]).join('');
+  let bytes;
+  try { bytes = zlib.inflateRawSync(Buffer.from(b64, 'base64')); } catch (e) { return null; }
+  if (bytes.length !== w * h) return null;
+  const pal = paletaOrdenada();
+  const c = createCanvas(w, h), g = c.getContext('2d'), img = g.createImageData(w, h), d = img.data;
+  for (let i = 0, j = 0; i < bytes.length; i++, j += 4) {
+    const v = bytes[i];
+    if (!v) { d[j+3] = 0; continue; }          // 0 es transparente, como en el juego
+    const p = pal[(v - 1) % pal.length];
+    d[j] = p[0]; d[j+1] = p[1]; d[j+2] = p[2]; d[j+3] = 255;
+  }
+  g.putImageData(img, 0, 0);
+  return c;
+}
+
+/* El icono de la aplicación es el emblema de la portada, no un dibujo aparte: lo que se
+   ve en el lanzador tiene que ser lo que se ve al arrancar el juego, o son dos marcas.
+   El escudo tiene las esquinas transparentes, así que debajo va una plancha negra: un
+   icono de aplicación no puede ser medio transparente. */
+
+/* El emblema centrado en un lienzo de `lado`, a la escala entera más grande que quepa
+   dejando `margen` por banda. Entera y por vecino más próximo, no a la medida exacta
+   del hueco: a escala rota el redimensionado se come filas sueltas y el aro ámbar sale a
+   trozos, que es justo como salió el recortable el primer intento. */
+function emblemaEn(lado, margen) {
+  const emb = emblema();
+  if (!emb) return null;
+  const esc = Math.floor((lado - margen * 2) / emb.width);
+  if (esc < 1) return null;
+  const n = emb.width * esc, o = Math.round((lado - n) / 2);
+  const c = createCanvas(lado, lado), g = c.getContext('2d');
+  g.imageSmoothingEnabled = false;
+  g.drawImage(emb, o, o, n, n);
+  return c;
+}
+
+/* Plancha y emblema encima. Si no hay emblema en el bloque ARTE, el dibujado a mano de
+   aquí abajo, que es lo que había antes y sigue valiendo. */
+function iconoApp(C, lado, margen) {
+  const c = createCanvas(lado, lado), g = c.getContext('2d');
+  g.fillStyle = C.negro; g.fillRect(0, 0, lado, lado);
+  const emb = emblemaEn(lado, margen);
+  if (emb) { g.drawImage(emb, 0, 0); return c; }
+  g.imageSmoothingEnabled = false;
+  g.drawImage(icono32(C, margen ? 4 : 0), 0, 0, lado, lado);
+  return c;
 }
 
 /* El icono se dibuja en 32×32 y se amplía a escala entera, como todo lo demás: 32×6=192 y
@@ -74,10 +149,11 @@ function icono32(C, margen) {
   return c;
 }
 
-function escalar(c32, esc) {
-  const c = createCanvas(32 * esc, 32 * esc), g = c.getContext('2d');
+function escalar(base, esc) {
+  const l = base.width * esc;
+  const c = createCanvas(l, l), g = c.getContext('2d');
   g.imageSmoothingEnabled = false;
-  g.drawImage(c32, 0, 0, 32 * esc, 32 * esc);
+  g.drawImage(base, 0, 0, l, l);
   return c.toBuffer('image/png');
 }
 
@@ -112,10 +188,12 @@ function empaquetar() {
 
   fs.mkdirSync(DIST, { recursive: true });
   fs.writeFileSync(path.join(DIST, 'index.html'), html);
-  const ico = icono32(C, 0), mask = icono32(C, 4);
-  fs.writeFileSync(path.join(DIST, 'icono-192.png'), escalar(ico, 6));
-  fs.writeFileSync(path.join(DIST, 'icono-512.png'), escalar(ico, 16));
-  fs.writeFileSync(path.join(DIST, 'icono-maskable-512.png'), escalar(mask, 16));
+  /* El recortable lleva banda: el lanzador recorta hasta el 66 % del lado y sin margen
+     se come las puntas del escudo. 64 de banda sobre 512 dejan el emblema al sexto. */
+  fs.writeFileSync(path.join(DIST, 'icono-192.png'), iconoApp(C, 192, 0).toBuffer('image/png'));
+  fs.writeFileSync(path.join(DIST, 'icono-512.png'), iconoApp(C, 512, 0).toBuffer('image/png'));
+  fs.writeFileSync(path.join(DIST, 'icono-maskable-512.png'),
+                   iconoApp(C, 512, 64).toBuffer('image/png'));
 
   fs.writeFileSync(path.join(DIST, 'bilbo.webmanifest'), JSON.stringify({
     name: 'Bilbo City', short_name: 'Bilbo City',
@@ -231,7 +309,7 @@ async function probar() {
 
 /* apk.js reutiliza la paleta y el icono: el envoltorio de WebView tiene que llevar el
    mismo dibujo que la web instalable, no uno parecido. */
-module.exports = { FUENTE, DIST, paleta, icono32, escalar };
+module.exports = { FUENTE, DIST, paleta, icono32, emblema, iconoApp, escalar };
 
 if (require.main === module) (async () => {
   if (!process.argv.includes('--solo-comprobar')) empaquetar();
