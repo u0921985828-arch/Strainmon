@@ -144,14 +144,15 @@ def bajar():
             P.bajar(P.URL + '/map-objects/%s/download' % oid, f); print('bajado', nombre)
         except Exception as e:
             print('pendiente', nombre, e)
-    for nombre, jid in m['pro'].items():
-        f = os.path.join(dest, nombre + '-pro.png')
-        if os.path.exists(f):
-            continue
-        try:
-            P.bajar(P.URL + '/images/%s/download' % jid, f); print('bajado', nombre + '-pro')
-        except Exception as e:
-            print('pendiente', nombre + '-pro', e)
+    for nombre, jid in m['pro'].items():          # pro devuelve cuatro variantes por trabajo
+        for i in range(4):
+            f = os.path.join(dest, '%s-pro%d.png' % (nombre, i))
+            if os.path.exists(f):
+                continue
+            try:
+                P.bajar(P.URL + '/images/%s/download?index=%d' % (jid, i), f); print('bajado', nombre, i)
+            except Exception as e:
+                print('pendiente', nombre, i, e); break
 
 
 if __name__ == '__main__':
