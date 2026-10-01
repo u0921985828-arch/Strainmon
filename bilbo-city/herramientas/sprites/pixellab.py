@@ -24,16 +24,31 @@ Sale a 55 imágenes por silueta. Siete siluetas visten a los treinta y cuatro ar
 Para comparar: pedir cuatro personajes enteros, de ocho direcciones y dieciséis poses,
 eran 512 llamadas y vestían a cuatro.
 
+De dónde salen los píxeles
+--------------------------
+Cuatro procedencias, el mismo empaquetado detrás. La que manda hoy es `--mcp`.
+
+* `--mcp`   — recorta las hojas que `lote.py` ya bajó del MCP: un personaje entero con
+              sus ocho direcciones y sus seis animaciones cuesta **siete** generaciones
+              en vez de 55 llamadas, y trae las ocho direcciones dibujadas, no cuatro
+              reflejadas. A cambio hay que estarcirlo al llegar: esa herramienta no
+              acepta paleta y devuelve la ropa del color que le parece. Ver `_estarcido`.
+* (nada)    — la API v1, imagen a imagen, con la paleta de plantilla forzada. Es lo que
+              había antes del MCP y sigue funcionando; cuesta veinte veces más.
+* `--mano`  — las celdas escritas a mano en `cuerpos.py`, píxel a píxel. Sin red.
+* `--simular` — monigotes de relleno con los mismos colores de plantilla y el mismo
+              recorrido: comprueba el troceado, el repintado, la compresión, la escritura
+              y la carga en el juego sin gastar una llamada.
+
 Uso
 ---
+    python3 herramientas/sprites/lote.py                        # baja el lote (una vez)
+    python3 herramientas/sprites/pixellab.py --mcp              # y lo mete en el juego
+
     export PIXELLAB_API_KEY=...
     python3 herramientas/sprites/pixellab.py --que largo_pantalon,abrigo_pantalon
     python3 herramientas/sprites/pixellab.py --simular          # sin red ni clave
     python3 herramientas/sprites/pixellab.py --coste            # solo la cuenta
-
-`--simular` no llama a nadie: dibuja monigotes de relleno con los mismos colores de
-plantilla y el mismo recorrido, y sirve para comprobar que el troceado, el repintado, la
-compresión, la escritura y la carga en el juego funcionan antes de gastar una llamada.
 
 Bajar una sola silueta ya es jugable: el juego busca la más parecida a la ropa de cada
 arquetipo y, si no hay ninguna, lo forja como siempre. Nunca se queda nadie sin dibujar.
@@ -48,7 +63,7 @@ sitio, porque son lo único que puede haber cambiado desde que se escribió esto
 llamada devuelve algo inesperado, el error trae el cuerpo entero de la respuesta: es más
 rápido leerlo que adivinar.
 """
-import argparse, base64, json, os, re, sys, time, zlib
+import argparse, base64, io, json, os, re, sys, time, zlib
 
 RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 HTML = os.path.join(RAIZ, 'referencia', 'bilbo-city.html')
@@ -560,7 +575,8 @@ def genera(ropa, direccion, dibujo, clave, modo, plantilla=None):
 
     Tres procedencias, el mismo empaquetado detrás:
 
-    * `api`  — se le pide a PixelLab. Necesita red y clave.
+    * `api`  — se le pide a PixelLab, celda a celda, con la API v1. Necesita red y clave.
+    * `mcp`  — se recorta de la hoja que `lote.py` ya bajó del MCP. Necesita el disco.
     * `mano` — está escrita a mano en `cuerpos.py`, píxel a píxel. No necesita nada.
     * `sim`  — un monigote de relleno, solo para ejercitar la tubería.
 
@@ -572,6 +588,8 @@ def genera(ropa, direccion, dibujo, clave, modo, plantilla=None):
     simular = modo == 'sim'
     if modo == 'mano':
         return _mano(ropa, direccion, dibujo)
+    if modo == 'mcp':
+        return _mcp(ropa, direccion, dibujo)
     # La procedencia va en la clave. Sin esto, un --simular previo —que es lo primero que
     # recomienda el LEEME— deja la caché llena de monigotes de relleno, y la tirada de
     # verdad los encuentra ahí, no llama a PixelLab ni una vez y termina diciendo que todo
@@ -638,6 +656,452 @@ def _mano(ropa, direccion, dibujo):
                          % (dibujo, ', '.join(sorted(cuerpos.TRAZOS))))
     rej = trazos.viste(trazos.rejilla(cuerpos.TRAZOS[dibujo][direccion]), ropa)
     return _png(trazos.pinta(rej, CLAVES, CEL_W, CEL_H, luces_rampa()))
+
+
+# ── las hojas traídas del MCP ───────────────────────────────────────────────────────
+# `lote.py` baja una hoja por silueta: ocho rotaciones en la fila 0 y, debajo, una fila
+# por dirección de cada animación de plantilla. Celda de 48×48 con el pivote en el
+# centro. Lo que falta para que eso sea una hoja del juego es escoger qué fotograma vale
+# para cada dibujo y meterlo en la celda de 24×32 — y eso es lo de aquí abajo.
+HOJAS_MCP = os.path.join(RAIZ, 'dist', 'pixellab', 'personajes')
+# La caja en la que dibuja la forja, dentro de la celda. Es la misma de `_celda_forja`:
+# la figura traída se escala a esta altura para que un vecino traído y uno forjado midan
+# lo mismo andando por la misma acera.
+CAJA_FORJA = (20, 26)
+# Qué fotograma de la hoja traída hace de cada dibujo del juego. La primera pareja que
+# esté en la hoja es la que vale; las de detrás son el recambio para cuando una animación
+# todavía no se ha generado. `-1` es el último fotograma de la fila.
+#
+# Dos poses no tienen plantilla propia en el MCP y se sirven de la que más se les parece:
+# `apunta` reutiliza el brazo estirado del puñetazo —no hay plantilla de apuntar con
+# pistola— y el recambio de `agacha` es el fotograma en que el que cae dobla las rodillas.
+FOTOGRAMA = {
+    'quieto':  [('rot', 0)],
+    'andarA':  [('andar', 0)],
+    'andarP':  [('andar', 2)],
+    'andarB':  [('andar', 4)],
+    'correrA': [('correr', 0)],
+    'correrB': [('correr', 3)],
+    'pega1':   [('punetazo', 0)],
+    'pega2':   [('punetazo', 1)],
+    'apunta':  [('punetazo', 1)],
+    'herido':  [('golpe', 2), ('muerte', 1)],
+    'agacha':  [('agacha', -1), ('muerte', 3)],
+}
+_MCP = {}
+
+
+def _hoja_mcp(ropa):
+    """La hoja traída de una silueta, abierta una sola vez: imagen, filas, escala.
+
+    La escala y el anclaje salen **de la rotación sur y valen para toda la hoja**. Si
+    cada fotograma se escalara por su propia caja, el que corre —que se estira— saldría
+    más pequeño que el que está quieto, y la figura encogería y crecería a cada paso.
+    """
+    if ropa in _MCP:
+        return _MCP[ropa]
+    import zipfile
+    from PIL import Image
+    ruta = os.path.join(HOJAS_MCP, ropa + '.zip')
+    if not os.path.exists(ruta):
+        raise SystemExit('falta la hoja traída de «%s» (%s).\n'
+                         'Bájala antes con `python3 herramientas/sprites/lote.py`.'
+                         % (ropa, ruta))
+    z = zipfile.ZipFile(ruta)
+    nj = [n for n in z.namelist() if n.endswith('.json')]
+    if not nj:
+        raise SystemExit('la hoja de «%s» no trae su JSON: %s' % (ropa, ruta))
+    meta = json.loads(z.read(nj[0]))['spritesheet']
+    im = Image.open(io.BytesIO(z.read(meta['path']))).convert('RGBA')
+    lado = meta['cell_size']['width']
+    filas, rot = {}, []
+    for r in meta['rows']:
+        if r['type'] == 'rotations':
+            rot = r['directions']
+            filas[('rot', None)] = (r['row'], r['frame_count'])
+        else:
+            filas[(r['animation'], r['direction'])] = (r['row'], r['frame_count'])
+    if 'south' not in rot:
+        raise SystemExit('la hoja de «%s» no trae la rotación sur' % ropa)
+    c = rot.index('south')
+    caja = im.crop((c * lado, 0, c * lado + lado, lado)).getbbox()
+    if not caja:
+        raise SystemExit('la rotación sur de «%s» vino vacía' % ropa)
+    mapa = _estarcido(im.load(), lado, len(rot))
+    h = _MCP[ropa] = {
+        'im': im, 'lado': lado, 'filas': filas, 'rot': rot, 'mapa': mapa,
+        # Tres filas de origen son dos del juego: el alto de un zapato. Solo se recorta
+        # cuando el generador no dejó un calzado que se pueda distinguir por color.
+        'zapato': ZAPATO,
+        's': CAJA_FORJA[1] / float(caja[3] - caja[1]),
+        'cx': (caja[0] + caja[2] - 1) / 2., 'fy': caja[3] - 1,
+    }
+    partes = {}
+    for k, p in mapa.items():
+        partes.setdefault(p, []).append(k * 20)
+    h['dicho'] = ' · '.join('%s %s' % (p, '/'.join(str(g) for g in sorted(v)))
+                            for p, v in sorted(partes.items()))
+    return h
+
+
+
+# El generador del MCP **no respeta los colores de plantilla**. Se le piden el magenta, el
+# verde y el cian de `CLAVES` y devuelve lo que le parece: de siete siluetas, seis traen
+# el pantalón en un verdeazulado que por tono cae del lado del calzado, y el zapato se le
+# va al negro del contorno. Pedido y comprobado: no es un prompt que se pueda afinar, es
+# que esa herramienta no acepta paleta.
+#
+# Así que el estarcido se hace aquí, al traer. Lo que no se puede fiar es **qué color**
+# puso en cada prenda; lo que sí es **dónde** está cada prenda, porque un cuerpo visto
+# desde arriba siempre lleva el pelo arriba, la cara debajo, el torso en medio y las
+# piernas abajo. Se agrupan los colores de la hoja por tono, se decide qué parte es cada
+# grupo por su altura media, y se repinta cada píxel con el tono de plantilla de su parte
+# conservando su propio brillo. Lo que sale es exactamente lo que se le había pedido al
+# generador, y a partir de ahí el reparto por tono de `_reparte` vuelve a valer tal cual.
+TONO_PIEL = 24.          # el tono de CLAVES['piel']; la cara es lo único que no se repinta
+LUZ_PIEL = 90            # ...y por debajo de esto no es una cara, es una sombra parda
+MINIMO_GRUPO = .02       # un grupo con menos de esto de la hoja es ruido, no una prenda
+JUNTOS = .18             # dos casillas de tono vecinas son la misma prenda si además
+                         # están a la misma altura: esto, en altos de figura
+CORONILLA = .33          # la franja de arriba de la figura donde manda el pelo
+ZAPATO = 3               # filas de origen que son zapato, contadas desde el pie
+
+
+def _sinfondo(celda):
+    """Quita el fondo liso y la mota suelta que traen algunas filas de animación.
+
+    No todas las filas: de una misma hoja, andar hacia el oeste vuelve con un cartón
+    blanco detrás y correr viene transparente. El cartón ni siquiera llena la celda —deja
+    aire a los lados—, así que no vale mirar las esquinas: se busca el color que más
+    repite el borde de la celda, y solo se le hace caso si es claro y sin color, que es lo
+    que es un fondo y no lo que es una prenda. Se borra por inundación desde el borde,
+    para no llevarse por delante el blanco de una camisa, que no toca el canto.
+
+    De paso se van las motas: píxeles sueltos que el generador deja alrededor de la
+    figura y que al encoger se convierten en suciedad a un palmo del personaje.
+    """
+    celda = celda.copy()
+    px = celda.load()
+    w, h = celda.size
+    borde = [(x, y) for x in range(w) for y in (0, h - 1)] + \
+            [(x, y) for y in range(h) for x in (0, w - 1)]
+    cuenta = {}
+    for x, y in borde:
+        c = px[x, y]
+        if c[3] >= 128:
+            cuenta[c[:3]] = cuenta.get(c[:3], 0) + 1
+    fondo = max(cuenta, key=cuenta.get) if cuenta else None
+    if fondo and cuenta[fondo] >= len(borde) * .15 \
+            and _sat(fondo) < .15 and _luz(fondo) > 170:
+        cola = [p for p in borde
+                if px[p][3] >= 128
+                and max(abs(a - b) for a, b in zip(px[p][:3], fondo)) <= 24]
+        visto = set(cola)
+        while cola:
+            x, y = cola.pop()
+            px[x, y] = (0, 0, 0, 0)
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                n = (x + dx, y + dy)
+                if not (0 <= n[0] < w and 0 <= n[1] < h) or n in visto:
+                    continue
+                c = px[n]
+                if c[3] >= 128 and max(abs(a - b) for a, b in zip(c[:3], fondo)) <= 24:
+                    visto.add(n)
+                    cola.append(n)
+    # Las motas: cada mancha opaca que no está pegada a ninguna otra, y es de dos
+    # píxeles o menos, se va. La figura es una sola mancha grande; esto no la toca.
+    vistos = set()
+    for y0 in range(h):
+        for x0 in range(w):
+            if (x0, y0) in vistos or px[x0, y0][3] < 128:
+                continue
+            mancha, cola = [], [(x0, y0)]
+            vistos.add((x0, y0))
+            while cola:
+                x, y = cola.pop()
+                mancha.append((x, y))
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    n = (x + dx, y + dy)
+                    if (0 <= n[0] < w and 0 <= n[1] < h and n not in vistos
+                            and px[n][3] >= 128):
+                        vistos.add(n)
+                        cola.append(n)
+            if len(mancha) <= 2:
+                for p in mancha:
+                    px[p] = (0, 0, 0, 0)
+    return celda
+
+
+def _pintables(px, lado, cols):
+    """Los píxeles de la hoja que llevan color de prenda, con su tono y su altura.
+
+    Fuera quedan el contorno y los grises: el contorno ya es del color que le toca, y un
+    gris no dice de qué prenda es —lo dirá su vecindad, más tarde, en `_reparte`.
+    """
+    fuera = []
+    for col in range(cols):
+        for y in range(lado):
+            for x in range(col * lado, col * lado + lado):
+                r, g, b, a = px[x, y]
+                if a < 128:
+                    continue
+                c = (r, g, b)
+                if _sat(c) < SAT_MINIMA or (_luz(c) < LUZ_CONTORNO and _sat(c) < SAT_CONTORNO):
+                    continue
+                fuera.append((int(_tono(c)) // 20, y, _luz(c)))
+    return fuera
+
+
+def _grupos(pint, alto):
+    """Las casillas de tono juntadas en prendas: por tono vecino **y por altura**.
+
+    Las dos condiciones hacen falta. Solo por tono, el azul del pelo y el verdeazulado
+    del pantalón son casillas contiguas y acaban siendo la misma prenda, que es
+    exactamente el fallo que se vio: la figura entera de un color. Solo por altura, la
+    manga y la pernera se juntan en cuanto el brazo cuelga. Juntas, una prenda es una
+    mancha de un tono que está a una altura: que es lo que es.
+
+    Las casillas con cuatro píxeles no juntan nada. Son el filo donde dos prendas se
+    tocan, y dejarlas hacer de puente uniría media figura en un solo grupo.
+    """
+    casillas = {}
+    for k, y, l in pint:
+        e = casillas.setdefault(k, [0, 0, 0, []])
+        e[0] += 1; e[1] += y; e[2] += l; e[3].append(y)
+    vivas = sorted(k for k, e in casillas.items()
+                   if e[0] >= max(8, len(pint) * MINIMO_GRUPO))
+    def medio(k):
+        v = sorted(casillas[k][3])
+        return v[len(v) // 2]
+    grupos = []
+    for k in vivas:
+        pega = (grupos and (k - grupos[-1][-1]) % 18 == 1
+                and abs(medio(k) - medio(grupos[-1][-1])) <= JUNTOS * alto)
+        (grupos[-1].append if pega else grupos.append)([k] if not pega else k)
+    # La rueda de tonos cierra: el 350 y el 10 son vecinos aunque en la lista estén en
+    # las dos puntas. Sin esto, una cazadora roja sale partida en dos prendas.
+    if len(grupos) > 1 and (vivas[0] - grupos[-1][-1]) % 18 == 1 \
+            and abs(medio(vivas[0]) - medio(grupos[-1][-1])) <= JUNTOS * alto:
+        grupos[0] = grupos.pop() + grupos[0]
+    fuera = []
+    for g in grupos:
+        n = sum(casillas[k][0] for k in g)
+        ys = sorted(y for k in g for y in casillas[k][3])
+        fuera.append({'casillas': g, 'n': n, 'medio': ys[len(ys) // 2], 'ys': ys,
+                      'luz': sum(casillas[k][2] for k in g) / n})
+    return fuera
+
+
+def _estarcido(px, lado, cols):
+    """Qué parte del cuerpo es cada casilla de tono de la hoja. Tono -> parte.
+
+    Tres reglas, por este orden, y ninguna mira el color que se había pedido:
+
+    1. **La piel** es el grupo pardo y claro. Es la única parte de un cuerpo cuyo color no
+       se elige, así que es la única que se puede reconocer por el tono a secas.
+    2. **El pelo** es el grupo que más pegado está a la coronilla. Desde arriba la cabeza
+       es lo que más se ve, y lo que la tapa es el pelo.
+    3. **El torso** es el grupo más grande de los que quedan —una cazadora es lo que más
+       superficie ocupa de una figura vista desde arriba— y **las piernas**, el que queda
+       más abajo. Lo que sobra se pega al grupo de tono más cercano, que es de donde salió:
+       son las sombras y los brillos de una prenda que el contador separó.
+
+    El **calzado** no sale de aquí: ningún generador lo dibujó de un color distinguible, y
+    se saca de la anatomía —las últimas filas de la pierna— en `_estarcir`.
+    """
+    pint = _pintables(px, lado, cols)
+    if not pint:
+        return {}
+    ys = sorted(y for _, y, _ in pint)
+    arriba, alto = ys[0], ys[-1] - ys[0] + 1
+    grupos = _grupos(pint, alto)
+    mapa, libres = {}, []
+    for g in grupos:
+        if _dista(TONO_PIEL, g['casillas'][0] * 20 + 10) <= 40 and g['luz'] >= LUZ_PIEL:
+            for k in g['casillas']:
+                mapa[k] = 'piel'
+        else:
+            libres.append(g)
+    def coronilla(g):
+        tope = arriba + CORONILLA * alto
+        return sum(1 for y in g['ys'] if y <= tope) / float(g['n'])
+    for parte, elige in (('pelo', lambda: max(libres, key=lambda g: (coronilla(g), g['n']))),
+                         ('torso', lambda: max(libres, key=lambda g: g['n'])),
+                         ('piernas', lambda: max(libres, key=lambda g: g['medio']))):
+        if not libres:
+            break
+        g = elige()
+        libres.remove(g)
+        for k in g['casillas']:
+            mapa[k] = parte
+    for g in libres:                      # sombras y brillos sueltos, a su prenda
+        for k in g['casillas']:
+            mapa[k] = mapa[min(mapa, key=lambda j: _dista(j * 20, k * 20))]
+    return mapa
+
+
+def _estarcir(celda, mapa, zapato):
+    """La celda repintada con los colores de plantilla, brillo por brillo.
+
+    Se cambian el tono y la saturación por los de la plantilla y **se conserva la claridad
+    del píxel**: el volumen que trae el dibujo no se pierde, y cada píxel nace ya en el
+    escalón de la rampa en el que va a acabar. El contorno y los grises se quedan como
+    están — el contorno porque ya es el color que le toca, y los grises porque los reparte
+    la vecindad, no el tono.
+
+    `zapato` son las filas de abajo de la pierna que pasan a ser calzado. Es anatomía y no
+    color a propósito: ninguna de las siete siluetas volvió con un zapato de un tono que
+    se pueda distinguir del contorno, y sin esta regla esa rampa se queda vacía y a un
+    arquetipo al que el juego le cambia el color de los zapatos no le cambia nada.
+    """
+    from PIL import Image
+    fuera = Image.new('RGBA', celda.size, (0, 0, 0, 0))
+    o, d = celda.load(), fuera.load()
+    piernas = []
+    for y in range(celda.height):
+        for x in range(celda.width):
+            r, g, b, a = o[x, y]
+            if a < 128:
+                continue
+            c = (r, g, b)
+            if _sat(c) < SAT_MINIMA or (_luz(c) < LUZ_CONTORNO and _sat(c) < SAT_CONTORNO):
+                d[x, y] = (r, g, b, 255)
+                continue
+            parte = mapa.get(int(_tono(c)) // 20)
+            if not parte:
+                continue
+            if parte == 'piernas':
+                piernas.append((x, y))
+            d[x, y] = _pinta(c, parte)
+    if zapato and piernas:
+        suelo = max(y for _, y in piernas)
+        for x, y in piernas:
+            if y > suelo - zapato:
+                d[x, y] = _pinta(o[x, y][:3], 'calzado')
+    _entinta(d, celda.size)
+    return fuera
+
+
+def _entinta(d, tam):
+    """El contorno de la figura, sea del color que sea, pasa a ser tinta.
+
+    El generador dibuja contorno, pero no siempre negro: a veces es un magenta muy
+    oscuro, o un azul casi negro. Mirando el color absoluto, ese borde no es contorno y
+    acaba en la rampa de la prenda; y entonces la figura sale de la ciudad sin línea que
+    la separe del hormigón, que es del mismo gris que media ropa.
+
+    Se mira **en relativo**: un píxel del perfil que es de los oscuros de su propia celda
+    es el contorno de esa celda. No se añade ni un píxel —solo se repintan los que ya
+    estaban, y solo los del perfil—, así que el contorno no engorda a dos píxeles.
+    """
+    w, h = tam
+    luces = sorted(_luz(d[x, y][:3]) for y in range(h) for x in range(w) if d[x, y][3])
+    if not luces:
+        return
+    tope = luces[len(luces) // 2] * .62
+    for y in range(h):
+        for x in range(w):
+            if not d[x, y][3] or _luz(d[x, y][:3]) > tope:
+                continue
+            if any(not (0 <= x + dx < w and 0 <= y + dy < h) or not d[x + dx, y + dy][3]
+                   for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                d[x, y] = (8, 8, 10, 255)
+
+
+def _pinta(c, parte):
+    """Un píxel con el tono y la saturación de plantilla de su parte, y su propio brillo."""
+    import colorsys
+    hr, hg, hb = CLAVES[parte][0]
+    h, _, s = colorsys.rgb_to_hls(hr / 255., hg / 255., hb / 255.)
+    l = colorsys.rgb_to_hls(c[0] / 255., c[1] / 255., c[2] / 255.)[1]
+    r, g, b = colorsys.hls_to_rgb(h, min(.92, max(.15, l)), s)
+    return (int(round(r * 255)), int(round(g * 255)), int(round(b * 255)), 255)
+
+
+def _reduce(celda, s, cx, fy):
+    """La celda de 48×48 metida en la del juego, reduciendo por mayoría.
+
+    No se interpola: un píxel del destino se queda con **el color que más veces aparece**
+    entre los de origen que le tocan. Interpolar inventaría colores fuera de los de
+    plantilla —un magenta mezclado con el negro del contorno deja de ser magenta— y el
+    reparto por tono, que es lo que hace posible el repintado, los mandaría a la parte
+    equivocada. Por mayoría, todo píxel que sale es un color que ya estaba.
+
+    Lo transparente cuenta como un color más, pero empatando pierde: a esta escala una
+    pierna tiene dos píxeles de ancho y redondear a favor del fondo la parte en dos.
+
+    Y el contorno se rescata. Viene de un píxel de grueso, así que reduciendo a tres
+    cuartos pierde uno de cada cuatro por mayoría simple y la figura sale medio
+    desbordada: sobre el hormigón de la ciudad, que es del gris de media ropa, eso es una
+    figura que se deshace. Donde el cubo traía contorno y el píxel cae en el perfil, se
+    le devuelve. No es repasar el borde —no se pinta ni un píxel fuera de la silueta, ni
+    se inventa un color que no estuviera en el origen—: es no perderlo al encoger.
+    """
+    from PIL import Image
+    px = celda.load()
+    cubos = {}
+    for y in range(celda.height):
+        oy = int(round((y - fy) * s)) + BASE_PIES
+        if not 0 <= oy < CEL_H:
+            continue
+        for x in range(celda.width):
+            ox = int(round((x - cx) * s)) + EJE_X
+            if not 0 <= ox < CEL_W:
+                continue
+            r, g, b, a = px[x, y]
+            c = None if a < 128 else (r, g, b)
+            d = cubos.setdefault((ox, oy), {})
+            d[c] = d.get(c, 0) + 1
+    elegido = {}
+    for p, d in cubos.items():
+        opacos = {c: n for c, n in d.items() if c}
+        if not opacos or sum(opacos.values()) * 2 < sum(d.values()):
+            continue                                        # mayoría de fondo: se cae
+        elegido[p] = max(opacos, key=opacos.get)
+    for (ox, oy), d in cubos.items():
+        if (ox, oy) not in elegido:
+            continue
+        perfil = any((ox + dx, oy + dy) not in elegido
+                     for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+        if not perfil:
+            continue
+        oscuros = [c for c in d if c and _luz(c) < LUZ_CONTORNO and _sat(c) < SAT_CONTORNO]
+        if oscuros:
+            elegido[(ox, oy)] = min(oscuros, key=_luz)
+    im = Image.new('RGBA', (CEL_W, CEL_H), (0, 0, 0, 0))
+    fuera = im.load()
+    for (ox, oy), c in elegido.items():
+        fuera[ox, oy] = c + (255,)
+    return im
+
+
+def _mcp(ropa, direccion, dibujo):
+    """Una celda sacada de la hoja traída del MCP. Sin red y sin caché.
+
+    Sin caché por lo mismo que `_mano`: la fuente está en el disco, el recorte sale en
+    milisegundos, y una caché solo serviría para seguir usando el recorte de ayer después
+    de bajar una animación nueva.
+    """
+    h = _hoja_mcp(ropa)
+    for anim, idx in FOTOGRAMA[dibujo]:
+        if anim == 'rot':
+            fila, n = h['filas'][('rot', None)]
+            col = h['rot'].index(direccion)
+            break
+        if (anim, direccion) in h['filas']:
+            fila, n = h['filas'][(anim, direccion)]
+            col = max(0, min(n - 1, idx if idx >= 0 else n + idx))
+            break
+    else:
+        # Último recambio: la rotación. Una dirección suelta puede faltar —de siete hojas,
+        # una volvió con 48 filas en vez de 49—, y perder el juego entero por una celda
+        # sería absurdo cuando esa misma figura, quieta y mirando ahí, sí está.
+        fila, n = h['filas'][('rot', None)]
+        col = h['rot'].index(direccion)
+    lado = h['lado']
+    celda = h['im'].crop((col * lado, fila * lado, col * lado + lado, fila * lado + lado))
+    celda = _estarcir(_sinfondo(celda), h['mapa'], h['zapato'])
+    return _png(_reduce(celda, h['s'], h['cx'], h['fy']))
 
 
 _LUCES = None
@@ -863,12 +1327,20 @@ def _avisa(nombre, dib, direccion, rep):
 
 
 def hoja(nombre, clave, modo, pal, ramp, diag=False, plantilla=None):
-    """La hoja entera de una silueta: 8 columnas de dirección × 16 filas de pose."""
+    """La hoja entera de una silueta: 8 columnas de dirección × 16 filas de pose.
+
+    Las cuatro direcciones de la izquierda salen reflejando las de la derecha, que es lo
+    que convierte 88 llamadas en 55 — salvo con el MCP, que trae las ocho dibujadas en la
+    misma generación. Reflejar ahí sería tirar a la basura arte ya pagado, y encima peor:
+    una figura reflejada lleva la raya del pelo y el bolsillo en el lado contrario.
+    """
     ancho, alto = CEL_W * 8, CEL_H * len(POSES)
     rej = bytearray(ancho * alto)
+    espejo = {} if modo == 'mcp' else ESPEJO
+    pedidas = 8 if modo == 'mcp' else PEDIDAS
     celdas, dudosas = {}, 0
     for dib in sorted(set(DE_POSE[p] for p in POSES)):
-        for fx in range(PEDIDAS):
+        for fx in range(pedidas):
             celdas[(dib, fx)], rep = a_indices(
                 genera(nombre, DIRECCIONES[fx], dib, clave, modo, plantilla), pal, ramp)
             print(f'  {nombre:15s} {dib:8s} {DIRECCIONES[fx]}', flush=True)
@@ -882,7 +1354,7 @@ def hoja(nombre, clave, modo, pal, ramp, diag=False, plantilla=None):
     for fy, pose in enumerate(POSES):
         dib, dy = DE_POSE[pose], DESPLAZA.get(pose, 0)
         for fx in range(8):
-            fuente, esp = ESPEJO.get(fx, fx), fx in ESPEJO
+            fuente, esp = espejo.get(fx, fx), fx in espejo
             celda = celdas[(dib, fuente)]
             for y in range(CEL_H):
                 oy = y - dy
@@ -985,6 +1457,8 @@ if __name__ == '__main__':
     ap.add_argument('--simular', action='store_true', help='sin red: monigotes de relleno')
     ap.add_argument('--mano', action='store_true',
                     help='sin red: las celdas escritas a mano en cuerpos.py')
+    ap.add_argument('--mcp', action='store_true',
+                    help='sin red: recorta las hojas que lote.py bajó del MCP')
     ap.add_argument('--coste', action='store_true', help='solo la cuenta, no baja nada')
     ap.add_argument('--lamina', metavar='SALIDA.PNG',
                     help='vuelca las hojas a un PNG para mirarlas sin abrir el juego')
@@ -1007,11 +1481,13 @@ if __name__ == '__main__':
     pal, por_nombre = paleta()
     ramp = rampas(por_nombre)          # aquí revienta si dos partes comparten rampa
     dibujos = len(set(DE_POSE[p] for p in POSES))
-    n = len(quiere) * dibujos * PEDIDAS
-    entero = len(SETS) * dibujos * PEDIDAS
-    print(f'{len(quiere)} siluetas · {dibujos} dibujos × {PEDIDAS} direcciones = {n} '
+    dirs = 8 if a.mcp else PEDIDAS
+    n = len(quiere) * dibujos * dirs
+    entero = len(SETS) * dibujos * dirs
+    print(f'{len(quiere)} siluetas · {dibujos} dibujos × {dirs} direcciones = {n} '
           f'imágenes · celda {CEL_W}x{CEL_H}'
-          + (' · SIMULADO' if a.simular else ' · A MANO' if a.mano else ''))
+          + (' · SIMULADO' if a.simular else ' · A MANO' if a.mano
+             else ' · DEL MCP' if a.mcp else ''))
     print(f'  ({len(POSES)} poses y 8 direcciones salen de ahí; el juego entero, '
           f'{len(SETS)} siluetas, son {entero})')
     if a.coste:
@@ -1030,9 +1506,9 @@ if __name__ == '__main__':
         print(f'\n{len(quiere) * dibujos * PEDIDAS} descripciones · negativo común:'
               f'\n{NEGATIVO}')
         sys.exit(0)
-    if a.simular and a.mano:
-        raise SystemExit('--simular y --mano son dos procedencias: elige una')
-    modo = 'sim' if a.simular else 'mano' if a.mano else 'api'
+    if sum((a.simular, a.mano, a.mcp)) > 1:
+        raise SystemExit('--simular, --mano y --mcp son tres procedencias: elige una')
+    modo = 'sim' if a.simular else 'mano' if a.mano else 'mcp' if a.mcp else 'api'
     if modo == 'api' and not a.clave:
         raise SystemExit('falta la clave: PIXELLAB_API_KEY o --clave')
     if modo == 'mano':
