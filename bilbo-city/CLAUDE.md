@@ -399,13 +399,19 @@ Los botones siguen siendo `<div>`: la lógica no cambia, solo se colocan encima 
 dibujado y se quedan transparentes. Así el clic sigue funcionando igual en el navegador,
 en la batería y en `mando.js`.
 
-Dos trampas del arranque, las dos por preguntar lo que no era:
+Tres trampas del arranque:
 
 - **`map` está preasignado**, así que `map.length` dice que sí desde el primer paso de la
   carga. El fondo se cacheaba vacío y la portada salía negra. Hay una bandera,
   `ciudadLista`, y `cargarCiudad` tira la caché del mapa.
 - **A una casilla por píxel el recorte cae entero sobre manzanas**: 320 casillas son
   kilómetro y medio de edificios y sale una plancha oscura. Se coge el doble de ciudad.
+- **El lienzo se quedó con un `opacity:.28` de cuando solo era el fondo.** Esa regla venía
+  de la portada vieja, cuando `#tcv` era el plano apagado **detrás** de un `<h1>` del DOM.
+  Al pasar la portada entera al lienzo —emblema, rótulo, vecinos y botones— el `.28` se
+  quedó puesto y apagaba la pantalla principal entera: se veía casi negra. El plano ya se
+  oscurece dentro de `pintarPortada()`, que es el único sitio donde se puede oscurecer
+  **solo el plano**. Si algo de la portada se ve muerto, mira primero el CSS de `#tcv`.
 
 ## El mando
 
