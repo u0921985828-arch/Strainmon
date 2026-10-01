@@ -546,6 +546,7 @@ node herramientas/html/personajes.js --esc 8 --que protagonista,ertzaina
 node herramientas/html/captura.js    # el juego en marcha, para ver el arte en la calle
 node herramientas/html/calzada.js     # las marcas viales, calle por calle y ancho por ancho
 node herramientas/html/fuentes.js     # seis fuentes en una imagen, para elegir
+node herramientas/html/menus.js       # el móvil y la pausa, con el navegador de verdad
 python3 herramientas/sprites/pixellab.py --mcp       # recorta las hojas traídas del MCP
 python3 herramientas/sprites/pixellab.py --mano      # las 385 celdas, sin red ni clave
 ```
@@ -631,7 +632,8 @@ direcciones de verdad en vez de cinco y tres espejadas.
 python3 herramientas/sprites/lote.py             # baja el lote (reanudable; una vez)
 python3 herramientas/sprites/cenital.py          # repite lo que volvió de perfil
 python3 herramientas/sprites/pixellab.py --mcp   # recorta las hojas a la celda de 24×32
-python3 herramientas/sprites/arte.py             # suelos, muebles y singulares al juego
+python3 herramientas/sprites/iconos.py           # los 43 iconos del HUD (reanudable)
+python3 herramientas/sprites/arte.py             # suelos, muebles, singulares e iconos al juego
 ```
 
 Cuatro cosas que hay que saber antes de tocarlo:
@@ -644,8 +646,8 @@ Cuatro cosas que hay que saber antes de tocarlo:
   `lutDe()` deja de servir.
 - **Lo que no es personaje va en su propio bloque `/*<<<ARTE*/`**, en el HTML y en
   `unity/.../Arte/Traido.cs` a la vez, con el formato de siempre (índice de paleta por
-  píxel, deflate, base64). Tres familias: singulares, muebles y suelos. **El juego no
-  depende de que estén**: si falta una pieza o el bloque entero, se forja como siempre.
+  píxel, deflate, base64). Cuatro familias: singulares, muebles, suelos e iconos. **El
+  juego no depende de que estén**: si falta una pieza o el bloque entero, se forja como siempre.
   Lo compara `herramientas/plano/arte.py`, dentro de `./verificar.sh`.
 - **Los vehículos no se traen.** Dos tiradas, 36 generaciones, y las dos volvieron de
   perfil o a medias. Media flota traída y media forjada es peor que la flota entera
@@ -655,6 +657,51 @@ Cuatro cosas que hay que saber antes de tocarlo:
 - **Nada de texto traído.** El generador rellenó el rótulo de los Almacenes Ibaizabal con
   cuatro letras inventadas; se aplanan al importar, fila a fila, con el color que manda en
   cada una.
+
+### Los 43 iconos del HUD también vienen de PixelLab
+
+Eran lo último forjado a mano de la interfaz: cuarenta y tres dibujos de rectángulos. A 24
+píxeles un rectángulo se lee, pero no dice qué es —el puño parecía una caja de cartón, el
+plato una moneda y el pintxo una tostada—, y un icono que necesita leyenda no es un icono.
+
+Cómo entran, que tiene tres pasos y ninguno es evidente:
+
+1. **Se piden a 96×96, no a 24.** El generador no trabaja a 24 (y por debajo de 32×32 de
+   área la API ni acepta el lienzo). Bajar luego de 96 a 24 **por mayoría** sale más limpio
+   que pedir 24 directamente.
+2. **Con los 61 colores forzados.** `color_image_base64` admite un PNG del que solo se leen
+   los colores: se le manda una tira con la paleta del juego. Lo que vuelve ya está casi en
+   casa y el redondeo al color más cercano casi no mueve nada.
+3. **El contorno se pone aquí, no allí.** Se pidió `single color black outline` y volvieron
+   varios sin él. Lo pone `arte.py` al traer, que además es lo que hace que cumplan la R2
+   de `estilo.js`: 24×24, contorno negro y **siete colores como mucho** —de ahí que la
+   pieza se recorte a 22×22 antes de centrarla, porque el contorno crece un píxel por lado
+   y el que toca el canto se quedaría sin.
+
+**Dos no se piden: se derivan.** `estrellaOff` es `estrella` en gris y `ojoTachado` es `ojo`
+apagado con el tachón encima. Son la mitad apagada de una pareja y tienen que ser el mismo
+dibujo que la encendida: con dos dibujos distintos, al cambiar de estado parece que cambia
+el icono y no el estado.
+
+**Lo que costó varias tiradas.** Diez volvieron ilegibles a la primera y tres a la segunda.
+No por el generador: por la descripción. «a city taxi car» da un borrón amarillo a 24 px;
+el **piloto de techo** del taxi, no. Lo mismo con la fuga (una rosa de los vientos no se
+entiende; el **muñeco verde de salida de emergencia**, sí) y con el reparto (una caja de
+cartón se confundía con la mudanza; una **moto con baúl**, no). A este tamaño la silueta es
+todo: si un icono no se distingue en negro sobre blanco, no se distingue.
+
+**El marco del HUD sigue forjado**, y no por falta de ganas: un panel de PixelLab cuesta 20
+o 40 generaciones, sale de 192 px para arriba y hay que encogerlo —que en pixel art es
+destruirlo—, y sobre todo la caja del HUD es **translúcida** a propósito, para que se vea
+la ciudad por debajo. Un panel opaco con textura tapa el juego. Lo mismo con los menús, que
+son DOM con su CSS y ya tienen una materia coherente.
+
+```bash
+python3 herramientas/sprites/iconos.py                       # lo que falte
+python3 herramientas/sprites/iconos.py estado                # cuánto hay y cuánto queda
+python3 herramientas/sprites/iconos.py --rehacer taxi,fuga --semilla 3031
+node herramientas/html/iconos.js                             # los 43, sobre claro y oscuro
+```
 
 ## Pixel perfect
 

@@ -318,6 +318,14 @@ public static class Fuente {
         Guardar("hambre", L);
         L = I24();
         L.P(9,4,6,16,Paleta.Sangre); L.P(4,9,16,6,Paleta.Sangre); Guardar("salud", L);
+
+        // Y encima, el icono traído. Viene ya a 24, con su contorno negro puesto y en
+        // siete colores como mucho, así que entra donde estaba el forjado y el HUD no se
+        // entera. Lo que no esté traído se queda con el dibujo de aquí arriba.
+        foreach (var par in Traido.Iconos) {
+            if (!Ico.ContainsKey(par.Key)) continue;
+            Ico[par.Key] = Forja.SpriteDe(Traido.ComoLienzo(par.Value, par.Value.W, par.Value.H));
+        }
     }
 }
 

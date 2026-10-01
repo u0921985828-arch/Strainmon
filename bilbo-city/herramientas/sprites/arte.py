@@ -273,9 +273,152 @@ def suelos(pal, aviso):
     return fuera
 
 
+def _cabe(im, lado, hueco):
+    """Recortado a lo que ocupa y reducido para que quepa en `lado-2*hueco`, sin agrandar."""
+    caja = im.getbbox()
+    if not caja:
+        return None
+    im = im.crop(caja)
+    c = lado - hueco * 2
+    if im.width > c or im.height > c:
+        k = min(c / float(im.width), c / float(im.height))
+        im = _mayoria(im, max(1, int(round(im.width * k))), max(1, int(round(im.height * k))))
+    return im
+
+
+def _acolores(im, pal, tope):
+    """Deja la pieza en `tope` colores de la paleta como mucho, sin inventar ninguno.
+
+    A 24 px el ojo no distingue una rampa de cinco tonos: la ve sucia. Se guardan los que
+    m\u00e1s superficie ocupan y los dem\u00e1s se arriman al m\u00e1s parecido de los que quedan, que
+    es lo mismo que hace el juego al cuantizar, solo que con menos colores donde elegir.
+    """
+    px = im.load()
+    cuenta = {}
+    for y in range(im.height):
+        for x in range(im.width):
+            r, g, b, a = px[x, y]
+            if a < 128:
+                continue
+            v = min(range(len(pal)), key=lambda i: (pal[i][0] - r) ** 2
+                    + (pal[i][1] - g) ** 2 + (pal[i][2] - b) ** 2)
+            cuenta[v] = cuenta.get(v, 0) + 1
+    quedan = sorted(cuenta, key=lambda v: -cuenta[v])[:tope]
+    cerca = {}
+    for v in cuenta:
+        cerca[v] = min(quedan, key=lambda q: (pal[q][0] - pal[v][0]) ** 2
+                       + (pal[q][1] - pal[v][1]) ** 2 + (pal[q][2] - pal[v][2]) ** 2)
+    for y in range(im.height):
+        for x in range(im.width):
+            r, g, b, a = px[x, y]
+            if a < 128:
+                px[x, y] = (0, 0, 0, 0)
+                continue
+            v = min(range(len(pal)), key=lambda i: (pal[i][0] - r) ** 2
+                    + (pal[i][1] - g) ** 2 + (pal[i][2] - b) ** 2)
+            px[x, y] = tuple(pal[cerca[v]]) + (255,)
+    return im
+
+
+def _contorno(im, neg):
+    """El mismo contorno que pone el juego: un p\u00edxel negro alrededor de la silueta.
+
+    No es adorno. Un icono se mira sobre la caja del HUD, sobre la fila oscura del m\u00f3vil
+    y sobre el marco claro de la tienda, y sin contorno la mitad se pierden contra el
+    fondo. El generador lo pone cuando quiere —se le pidi\u00f3 y volvieron varios sin \u00e9l—,
+    as\u00ed que se pone aqu\u00ed, que es donde se puede garantizar.
+    """
+    from PIL import Image
+    px = im.load()
+    fuera = im.copy()
+    d = fuera.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            if px[x, y][3] >= 128:
+                continue
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    a, b = x + dx, y + dy
+                    if 0 <= a < im.width and 0 <= b < im.height and px[a, b][3] >= 128:
+                        d[x, y] = tuple(neg) + (255,)
+                        break
+                else:
+                    continue
+                break
+    return fuera
+
+
+def _centra(im, lado):
+    from PIL import Image
+    fuera = Image.new('RGBA', (lado, lado), (0, 0, 0, 0))
+    fuera.alpha_composite(im, ((lado - im.width) // 2, (lado - im.height) // 2))
+    return fuera
+
+
+def _gris(im, pal, grises):
+    """Todo lo opaco al gris de la misma luz. Es el icono apagado, no otro icono."""
+    px = im.load()
+    luz = lambda c: .299 * c[0] + .587 * c[1] + .114 * c[2]
+    orden = sorted(grises, key=lambda i: luz(pal[i]))
+    for y in range(im.height):
+        for x in range(im.width):
+            r, g, b, a = px[x, y]
+            if a < 128:
+                continue
+            L = luz((r, g, b))
+            px[x, y] = tuple(pal[min(orden, key=lambda i: abs(luz(pal[i]) - L))]) + (255,)
+    return im
+
+
+def iconos(pal, nombres, aviso):
+    """Los 43 del HUD a 24x24, con su contorno y en siete colores como mucho.
+
+    Dos no se piden al generador: son la mitad apagada de una pareja y tienen que ser el
+    mismo dibujo que la encendida, o al cambiar de estado parecer\u00eda que cambia el icono.
+    """
+    from PIL import Image
+    sys.path.insert(0, os.path.dirname(__file__))
+    import iconos as IC
+    # Los nombres de la paleta son los de la rampa, no los apodos del juego: `C.negro`
+    # es `tinta`, `C.carbon` es `hormigon0`. El apodo no llega hasta aquí.
+    neg = pal[nombres['tinta']]
+    # Tres grises y no seis: el apagado lleva encima el tachón en carbón y el contorno
+    # en negro, y de los siete que admite un icono ya solo quedan tres libres.
+    grises = [nombres[n] for n in ('hormigon0', 'hormigon1', 'hormigon7')]
+    fuera, limpio = {}, {}
+    for k in sorted(IC.DESCRIPCIONES):
+        im = _abre(os.path.join(PIEZAS, 'iconos', k + '.png'))
+        if im is None:
+            aviso('icono %s: no est\u00e1 bajado' % k)
+            continue
+        im = _cabe(im, IC.DESTINO, 1)
+        if im is None:
+            aviso('icono %s: vino en blanco' % k)
+            continue
+        limpio[k] = _acolores(im, pal, 6)
+    for k, de in sorted(IC.DERIVADOS.items()):
+        if de not in limpio:
+            continue
+        limpio[k] = _gris(limpio[de].copy(), pal, grises)
+        if k == 'ojoTachado':   # y encima el tach\u00f3n, que es lo que lo distingue
+            d = limpio[k].load()
+            car = tuple(pal[nombres['hormigon0']]) + (255,)
+            n = limpio[k].width
+            for i in range(n):
+                for t in range(2):
+                    x, y = i, n - 1 - i + t
+                    if 0 <= y < n:
+                        d[x, y] = car
+    for k, im in sorted(limpio.items()):
+        # Primero a la caja y luego el contorno: si no, el que toca el canto se queda sin.
+        im = _contorno(_centra(im, IC.DESTINO), neg)
+        fuera[k] = (IC.DESTINO, IC.DESTINO, _indices(im, pal))
+    return fuera
+
+
 # ── la escritura ────────────────────────────────────────────────────────────────────
 AVISO = '/* Lo escribe herramientas/sprites/arte.py. Vacío = todo forjado. */'
-FAMILIAS = ('singulares', 'muebles', 'suelos')
+FAMILIAS = ('singulares', 'muebles', 'suelos', 'iconos')
 
 
 def _trozos(b64, sangria, comilla="'"):
@@ -440,13 +583,13 @@ if __name__ == '__main__':
     ap.add_argument('--esc', type=int, default=3)
     a = ap.parse_args()
 
-    pal, _ = PL.paleta()
+    pal, nombres = PL.paleta()
     avisos = []
     def aviso(t):
         avisos.append(t)
         print('  ¡ojo!', t, flush=True)
     arte = {'singulares': singulares(pal, aviso), 'muebles': muebles(pal, aviso),
-            'suelos': suelos(pal, aviso)}
+            'suelos': suelos(pal, aviso), 'iconos': iconos(pal, nombres, aviso)}
     for fam in FAMILIAS:
         print('%-11s %d piezas · %d KB sin comprimir'
               % (fam, len(arte[fam]), sum(len(b) for _, _, b in arte[fam].values()) / 1024))

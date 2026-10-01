@@ -459,6 +459,133 @@ public static class Traido {
             "P6uq8Eb8JBwr5OaKTeTGYu1mMz8zvyPusb7X73NvXZD7Q8ZZF3FGRMd54co+H9jKZ+R4THg8780ysq4xxj/93s7TsXMpbALu46B71ulZ6Hr5",
             "txEH0/UX/4mUf1Q9QToANQEhadXFnd90kmiEnQuqP7IObwf90wnrctdHz2lzdF/9Zxf/mP5t+1/87t+evc8z8pP/xtzsOPXA8IRP/h4=" }) }
     };
+
+    public static readonly Dictionary<string, Estampa> Iconos = new Dictionary<string, Estampa> {
+        { "aviso", new Estampa(24, 24, new[] {
+            "hZJBDoAwCAT7mCb0AeXG/98l0EKxYNyDh2FnjYmt/YQkFUfE4kCEAPmgWA5pBWCMJEh9ML8FfqnwW1h1Ij2kdeUQhL0u/LVEfR4+O3m9T9Sv",
+            "lSdzchy5CYY3N8FWPFvwuvWXEOrORTj1sMRCyeXAPEeFIvriKp+/xwM=" }) },
+        { "bate", new Estampa(24, 24, new[] {
+            "jdHBCQAxCERRIZ3IDGsR9l/XmrAnnYV4fPlIQLPbyT2KH2I+FAfhKTgedj9Msu356smh6xNfMxhbO1fq5TYY7imWHO41gBHvn3DGxWtFSlax",
+            "ZEtItnS6PJtLNn3k/3kB" }) },
+        { "botellin", new Estampa(24, 24, new[] {
+            "tdLBCcAwDANAz2CtkIcX8Mdo/7lal35KlFAo1fOwQ1Bidocdm8PMIb1WXpAOKOdinr5zanfOx6PUQo+rBdbleO0eETm0R/7rmfh+/y7C5x7o",
+            "53s5RaHPj3IA" }) },
+        { "botiquin", new Estampa(24, 24, new[] {
+            "Y2CgDrDBBayxAgrEjYyMKBc3ggEKxanlHiqGD5q4Dbu1NRsKsLZmt7HBEWEkxzsA" }) },
+        { "bus", new Estampa(24, 24, new[] {
+            "zZDRDcAgCEQNE3SDm4H74Mv95yqntprUfrcXQHgkxrOUr1R3Ej+eykWtdKfSZ3pyRgRVUmgRbBydi0ERSJ7XACA5sh/JudML987NFpaD3lOh",
+            "1lZu7tbMZTudGuwyLHz/yhzGejP8SCc=" }) },
+        { "camisa", new Estampa(24, 24, new[] {
+            "3Y/BEYAwCAQpJVXcfei/LnNAMjGMDbgv2dUEzQJf2IFmjOBM7iShAIDcQXp6yOuxQryeH6TPIJ3jGCwU4vDL0+vS5muX02OHy+euMzRfC91+",
+            "/UDz9vLFf3zDvnkA" }) },
+        { "cargador", new Estampa(24, 24, new[] {
+            "Y2AAARsQgJIIAOQxMQnCSYSwoKCkpKAgoyAQSArCJWwEmZGBIDHiVsxWEIAsLkm6OaPiVBS3kQQBRjCJFL+Q9IEAYDEA" }) },
+        { "contrato", new Estampa(24, 24, new[] {
+            "1dExDgAhCERRAoXcibn/uZSsG8BIucX+yrzRSqIdVnQJIseAJ/EB6ZlLLtzMtvmpePQ/569dGx/dfe08DVz8XVST11D/PXKc" }) },
+        { "deportivo", new Estampa(24, 24, new[] {
+            "1ZHRDQAhCEMhbNBN4Jv95zohgF6cwCYa+opGItFr8tJFLXWkWZhJiCsi707V2PYh0RVoK3NdaC3Ah5cLzizYHOniCly83oQuxs1A//Ee+o0P" }) },
+        { "diana", new Estampa(24, 24, new[] {
+            "lVLBAQMhCHODu1map+w/V4+EKLX9NB+BgGBwDCIWRsPjvgqd2VExPTwFbCLDmAsmMnxXJvkiYnlEEUyn7evpxPgIl8Vp00CVQyaSUEI1uJ4T",
+            "Ktjx/2xoSvR7pjp6surLgltjXk5f78L0kemnDjKpj1W22JTnkP9rAWaOhUVfY/xY/PEh9kex/wY=" }) },
+        { "energia", new Estampa(24, 24, new[] {
+            "ddLBEcAgCARA6zgesQs/139dgWhGxZPnDt6AWsosehVRBJSTVbmz8mDhJLQHu6eRvhR3pCNEC29t99HunLyOemzN53TdXu0Sg21MmgFHer9I",
+            "BKd9Y0scKf89HO3dg5VLDpePe3lb98tfSPwC" }) },
+        { "escopeta", new Estampa(24, 24, new[] {
+            "1Y/RCcAwCERVnMTfcwT3n6tnQouhC7QPCeHJoYp8lhocWhfOGg1q93ZuZj6igC9gmdrhzARfwLZHBDqNhq0yLX3iywer//oMpI+GXuaC21fp",
+            "sfP2r1PuI+W/XA==" }) },
+        { "estrella", new Estampa(24, 24, new[] {
+            "dZLLAYAwCEM7Tq+08cb+cxmgH9Sa4wtgoJYypVT5SlXkyAX90KAK9K6n8np9G6yc/NXAJCyvlzWMFnWJIHhnqIHgqtU4DRfN1pwN7oomGsg4",
+            "ZjGgGcCEA9v+bhDCVhs4GXA+cRhYkr1zcBttfF/VI0XwF5+YxpPb96iIs67WnNqZaG0ubV9Lcr2k6+b56Zl+/oqlGw==" }) },
+        { "estrellaOff", new Estampa(24, 24, new[] {
+            "dZJBEsAgCAOdnHhU/v+uUsEalObSmSVB0I6xRNe4RQIth6EJkGZdwO3WBF77HfBJXvsMZIRTCOwBgIlMhdS21iLvQth9QC2sLrE/Ko+RSmHj",
+            "KEinvXNwID+Vx4kH3wsdHCLKS63dC9fbqn65Xe0vz/TzV3x6AA==" }) },
+        { "euro", new Estampa(24, 24, new[] {
+            "dZLJEcAgDANdTYYCpB/031biM4ZM9GJWvsCIuGZIuhQM02YFBMIqvNZSRhKvodEeaQ7D6DgMqjHHJuOc2dN0wROMN9wLfcuocPDExnU0vxca",
+            "z+MPZxU5OA/eErLxeLC0hKdFhkvjRGHlzYgqmP7OrAEtGrUA1Oh4cRqhfcFpnT/i809u" }) },
+        { "fuga", new Estampa(24, 24, new[] {
+            "bZLRFcAgCAOdI6Pwsv9cLahokHweJAXsGCmGRhWJX2+BsF9g7e44I+ThTs0mpmDbEn7wnRPtWTtLOAKPA8tDZjsky50rpMy6OEg90vXV5jZS",
+            "mEY888d1EQTKr4Ua7qBw7OE4R935FG9eoa7RPH08fPdLJP0A" }) },
+        { "furgo", new Estampa(24, 24, new[] {
+            "zY/bDQAhCAR5hK7W/ttSxMspWIDzN5OsEaIHQWHllsA9Nx94FpE8mFm1DOoj0e2W1TuOUQggArO9DxvNMeP/Ig7xf/J3IB2GLWd7hg4=" }) },
+        { "gorra", new Estampa(24, 24, new[] {
+            "rZFBEoAgDAO58pyk1/z/XVLraCl40lwYNqEwobUP0tCOCSjW2JkLZj07QS/129DEDdrFSWqNg87DEKY0iZUjcyv5uEDLHOdSfY3PKfThwMqj",
+            "KkwnFM2di5jwps3U2O2MI3z7FrXfdQA=" }) },
+        { "hambre", new Estampa(24, 24, new[] {
+            "xdJJDgAhCARAjjyq+f+3RhpxQTNXubQpjcFFRARRfSCjoF5ozDidgerI+ep6uJn9OIw5HWTO694ol7WdbOV0z5Vf+61PXxjneuCojrhebM8b",
+            "P6VH8gc=" }) },
+        { "libro", new Estampa(24, 24, new[] {
+            "rZExDoAwDAM7O4nymKz5/7twKAWB6ICoh8i+eHNr35Rdz5wJcffjV9cYBZlavPyAlCq5du8hEf7GY8Lxs3/0Bme0wXchTjfhtpCb4cndgn0T",
+            "EfjgCsbqoxsFDUSFNdpzBdSDJ29D5aW2Vhs=" }) },
+        { "llave", new Estampa(24, 24, new[] {
+            "vZA7DsAgDEM5S5QlO97C/a9VzCctSmcsBvQcOZ9SrsqXEhUxQE6j04YKaDd+MOUHxpb5gYfBoMj3WV35NNr6iFYyvHhSqCmprumD8mPmUUyK",
+            "UfXddA+XVpcK6wu2dBJTE6aXbHjG+7Tlsh4=" }) },
+        { "llaveInglesa", new Estampa(24, 24, new[] {
+            "lZHRDQAhCENFYAHn6f5zXfW+tJjc9fNBmkJb+ypMVdjddUBssECxncgBwRnqAwTlXXBmRIdiLpvQaeJDsOfV2nHDxzvgsYLsm5k8Zd9u6xJa",
+            "nPnIbQ4kHxPb4kUL5MXH3yxakFFFc7gU+k8P" }) },
+        { "lonja", new Estampa(24, 24, new[] {
+            "pZBBDsQwCAMr3/mDJS78gfz/XWto2m2UnnY5IGWMHcnH8eOMORsHwgJjuyaN5OLQw5iZcAcuoUKJwkloRVu0IuQXwelw2mjaEQmyFpL0kOLh",
+            "KSKKMwy6LG4eaEunZ9HmmgDmBw1vLsXu04VL+cKFP6l5//siVAMb71prPfmj61O46Nqy73RaXuhs+/hjPg==" }) },
+        { "meta", new Estampa(24, 24, new[] {
+            "dZJREsQgCEOdEBgOxf3PtYC21d0uH532GSTGRkSMlwr1GDHr4EASVh0rAQszdwPULl7NUMKbp6I78qkRIri5Ws8xkdwaDwcoOQhYXLsHvWaO",
+            "5gpRdE/hxdOb0v2bM+eqP9zYnH5xirC4Wb2kpDnXuYrnzMU3/5xc8eM/Rbt/VSFO//mtM2bT3T8rrhnirWdHf8WeGU5epPIfT+x5kLzAGAcf",
+            "24WefFMY3/mf/+QD" }) },
+        { "metro", new Estampa(24, 24, new[] {
+            "bZJBDsUgCES9x8TAGWDL/c/1kSpgf9+iKW8aY0fHWFhjJD5oUomZaEN24JpVp+NPVT6BkUAjwIoUQo9nUSogwseDCw++PJWfzcdC88/T289j",
+            "m8f2uSGU59k2ml6Zgdp/eW8Fp570fNXW/9fLSvjq4du/2J5W9xPF9nj7fS5mMa3MwtYBx2TPF/eFsLov8fYD" }) },
+        { "movil", new Estampa(24, 24, new[] {
+            "Y2AAAhsUwAAHNswgwMQExMxMGOJgOWZmFHEzOKC1ONNQFGeiujgTqjgSwBAHxSRWcRzqsZiDmU4A" }) },
+        { "mudanza", new Estampa(24, 24, new[] {
+            "xdKxFcAgCEBBpgE6BwD3XytKQAXThy73fRZBAB+dA3WGMXMtr7KVxCKygh6HRa7iV+QynfxrF3w9ghfEcOo7tHZ6j8LV7TbElpym0wA03m6D",
+            "a351vTx+qCZPG1iuZWNqfq9+BPx6EFCeyQM=" }) },
+        { "obra", new Estampa(24, 24, new[] {
+            "rZDBEcAgCAQpxwLCj/TfViBwgyh+MtmX7nFjAtE3xNk1G0ui18FDqYnawDtF3/AIclq9N9xzKMxHAZ6hvWBfmKOTf08nX7EHOq8F6f2irwyY",
+            "+8JBi+xR7BR/ho1OC63Qjzw=" }) },
+        { "ojo", new Estampa(24, 24, new[] {
+            "bZLRDcAgCET9YolLjHvI/nOVQ6Vge4kfvAOiYGtLutQuqYK6HcPThWIErkbCxciYRqTPyvUvPQpWOjqFzBF4O6uR8955qCggB2Ogj8GClzOP",
+            "cximi/t88OEDkS+pv8WbI/M5QlNk35PvwsEQ42kOy7AmImdwqiL+fvMdvwO1UBxm7IsRObQu8n/v33/yAA==" }) },
+        { "ojoTachado", new Estampa(24, 24, new[] {
+            "bZJLEgQhCENpVh6K+59rDNEYuycLS54UXyOootY1QjghoKqnDI8WXh5xYTxMXB88xsFx4zxRHCPFx31ipDD3LrOxeB48j2ms9sg7JXmKwwam",
+            "w8V3kJc/g+SbOzaOAndS46xb2mtA85onOPti86JnDmtuqubfQA37YtKX3rG091v2T1o/" }) },
+        { "pantalon", new Estampa(24, 24, new[] {
+            "jZLRDQQhCEQN3JSBlUz/dR2irqiby82HhCeMBi3FxayyRAAKMfW4cRUVfKSFjXsu5lKzbNTqLQTJRuwwWuzm9sJrDRucHLXZ+Jo4O9eLD4fm",
+            "VtNFe/nkxuPYYWdnPef+C8e/HLcPxxieuE+Ha3/n5WhY2W8+n5Lh3DLGOzJPNLL0T74=" }) },
+        { "pintxo", new Estampa(24, 24, new[] {
+            "dZBLDsQwCMVyFgRiH6m7d/9zDR/RoS3x0nFJylodOOsLeNPsmUdPdJgzj8EpxykfJDA8BtjwMa//Mr038WW0A4vUvWoe4B+74fAqdbvP8NC/",
+            "UUNQ+ZWkl3wVIBFHb5ole0jcpok4zYdkluZJrHLJL0/ERerJ35t4+LYe2y6VeywNRV/kDw==" }) },
+        { "pistola", new Estampa(24, 24, new[] {
+            "rZDBDcAgDANJvUHm8f5zNQiiKsVUfXAvchgFubVjMBAjJUr78AAuB2JEkt4dhf4KgunNbBzLGnj68uG4CC80exw6vuQf/S5n+qU0+/DcelU+",
+            "+d+f4gY=" }) },
+        { "plato", new Estampa(24, 24, new[] {
+            "lZI7FsUgCETtxmaWY4Xsf1vh84jE7k3hiXcIIjhGaJdGl+0xQ92yz9lUxpceIzEAEeAYb7iYbCmj41AYFS5yc1UtvtayFVnu4WulkScYB8nG",
+            "5U+OzhlxHs1581PnryB2g3lh5x9D415jozLRDqTvsj9puOOJNXj23w37xbqpkbQGkEaJ7yT35iyKPnufts8KuF/EuN/JAw==" }) },
+        { "prohibido", new Estampa(24, 24, new[] {
+            "lZLBEcAgCAQdKrAUBp6h/7oCSCaI5JF97uVGA46xkGBkTICzJSY5SIlqTkAErhFrEBq3hnnVE3EmT1ZwP7Nm0oIIV4hIyl0er0cD8bXzePrr",
+            "6csf2JQ6rz/WFWwQXWENDrrPfaDHoaMJIC3sTeqGu7137+QG" }) },
+        { "puerto", new Estampa(24, 24, new[] {
+            "lZBLCsAwCEQD0p14gaE3mfufq5o05A/tbGIeOn5SGkRXWuTQjCskXNxAos+vMJ7GazkLx9uZVJtUOGzPo1qLjdsp2ga129i38T76kh/+W24H",
+            "jn/+p3kmHnsaOUSZa1wuvn4QtZriB43xLEeKXBET3K5rkh8PgltEFn7QAw==" }) },
+        { "punos", new Estampa(24, 24, new[] {
+            "tZBLCsAwCERdFwSP4TIHMPe/Vv3FmlDoqrNxfDOBIMD/EtObZR6SngdHYlTVvS9pw4+1VMWC5kHIJqlQxAZlpzgJLq4+OnTR1D5OQvLUObr0",
+            "bRg8OGSw9/2f0vuFW7D4c5SD1w2/eGq7edv/0g0=" }) },
+        { "recado", new Estampa(24, 24, new[] {
+            "rZLBDcAgCEUZgANLEDw5AfvPVWxVhGrSQ9/xgZDwBQDNwIOWAL68GAV5egm4V3YEfb6OGQ3G/V7mX7ytHouz7w/05MvBy6Lli/eCRC/znMkv",
+            "19x7Ht5ii/1owTSoGu7RIKK7VBM9ez19iB0X" }) },
+        { "reparto", new Estampa(24, 24, new[] {
+            "lVHRFcQgCHONDMAA6C/7z9UErD7v/GmebWmAGKW1j4gXv7wV4i258Aiuk/esx244dOA24qYzhl3rw//4xBhLH0ZZd0Cb+kqweYG8vQkVMeVa",
+            "DJnw4tnae+fjKhHyDIGecPJNPOM00Tcfk1cIumGgfyBFyln50bu0pzNtABimXX1i81jTiaJjHmyPoy57TfKca/uMBw==" }) },
+        { "taxi", new Estampa(24, 24, new[] {
+            "3ZLBDQAhCAQJoQrePmiA3/Zfl4ImF5EKbhI/g0RcJdrgQDfASEoB8E0pYLibWRaKt+R/Pu87vOTw5dPm2QXNzI+NZ0mPZre8HWARYV2rzBM+",
+            "WB2XVz5omR+aNCff/2QC" }) },
+        { "tren", new Estampa(24, 24, new[] {
+            "zZDRDcAgCERN2IDLOc3tP1cRxWq6QN+P+AIItvYLFBzhi9n2feIRXB4U2QkYwqM6SaEA9mJWKPJvlq8rLAE8G23vBUZBdKciQ6lyUl8DR4Bq",
+            "wiHc1i5y2n7UhtBn33ncv3Kov/EA" }) },
+        { "uzi", new Estampa(24, 24, new[] {
+            "xZBLDsAgCEQd4ALch/ufq4zYNlYX3TQdEyJP5Nfa1wrqAbpFnkkSxKoCOFAmoA5yWcTvLbQcUzs53DMZBreLixqr4NbIE8V5IwrvMdXTKAyY",
+            "nW2OKRKmo+YxjyvVVsZv1rDyWseG1yN7frPUv3QA" }) },
+        { "zapato", new Estampa(24, 24, new[] {
+            "pZLLDcQgEEORc3QV08EU4P7rykz4hMDuYTfvANLDYxGFUl6goG6Ld88j+erplT3/g8/ipvXQ9A8+0uwHpjkt0C5NjoG8NWOg0Qeyg8Ybjeon",
+            "uhqMm9+j3zSCqFmsoXnM5YgC5FJyx8iq0r9IOAKs/0mD/5/ACQ==" }) }
+    };
 /*ARTE>>>*/
 
     /// <summary>La pieza de una familia, o null si no se trajo. El juego nunca depende
