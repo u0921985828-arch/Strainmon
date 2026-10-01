@@ -99,7 +99,12 @@ def _guarda(m):
 def _llamar_paciente(nombre, args, intentos=12):
     """Reintenta con 'rate limit' y 'job slots', que el cliente devuelve como texto sin isError."""
     for i in range(intentos):
-        t = P.llamar(nombre, args)
+        try:
+            t = P.llamar(nombre, args)
+        except RuntimeError as e:          # el cliente lanza cuando el servidor marca isError
+            t = str(e)
+            if 'rate limit' not in t and 'job slots' not in t:
+                raise
         if 'rate limit' in t or 'job slots' in t:
             time.sleep(20 + 10 * i); continue
         return t
