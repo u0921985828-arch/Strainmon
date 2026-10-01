@@ -219,6 +219,17 @@ public static class Forja {
         g.P(8,6,15,11,Paleta.Carbon); g.P(10,8,11,4,Paleta.Mostaza); g.P(10,13,7,2,Paleta.Acero);
         g.P(27,12,4,9,Paleta.Carbon); g.P(4,20,24,3,Paleta.GrisO); Reg("surtidor", g);
 
+        // ── los suelos traídos ──
+        // Encima de lo forjado y antes del atlas: de cada tileset Wang se guardaron las
+        // dos casillas puras, que es lo único que este juego necesita —pone un tile por
+        // casilla y no autotilea por esquinas. Lo que no se trajo —el asfalto con sus
+        // rayas y sus pasos de cebra, los suelos de interior— se queda forjado.
+        for (int i = 0; i < _pend.Count; i++) {
+            var tr = Traido.De(Traido.Suelos, _pendNom[i]);
+            if (tr != null && tr.W == TS && tr.H == TS)
+                _pend[i] = Traido.ComoLienzo(tr, TS, TS);
+        }
+
         // ── volcado al atlas ──
         int cols = 8;
         int filas = Mathf.CeilToInt(_pend.Count / (float)cols);
@@ -468,6 +479,14 @@ public static class Forja {
         L = new Lienzo(20,18); L.P(3,3,14,12,Paleta.Crema); L.P(3,3,14,3,Paleta.Blanco);
         L.P(5,15,2,3,Paleta.Acero); L.P(13,15,2,3,Paleta.Acero); L.P(8,6,4,4,Paleta.VerdeL);
         Props["terraza"] = SpriteBase(L);
+
+        // Y encima, el mobiliario traído: cada pieza viene ya recortada a la caja que
+        // tiene aquí arriba y apoyada por el pie, así que entra donde estaba la forjada
+        // y se planta igual. Las fachadas no se tocan: van por tramos y no son muebles.
+        foreach (var par in Traido.Muebles) {
+            if (!Props.ContainsKey(par.Key)) continue;
+            Props[par.Key] = SpriteBase(Traido.ComoLienzo(par.Value, par.Value.W, par.Value.H));
+        }
     }
 
     // ═══════════ ARMAS EN MANO Y FOGONAZOS ═══════════

@@ -4,16 +4,18 @@ El juego forja su arte por código, y los personajes también. Este directorio e
 empaquetador: de donde salgan las 385 celdas, las cuantiza a la paleta del juego y las
 escribe en la hoja que el juego ya sabe leer.
 
-**Salen de tres sitios, y el que manda es el primero.**
+**Salen de cuatro sitios, y hoy manda el segundo.**
 
 | | |
 |---|---|
-| `--mano` | **lo que se usa.** Las celdas se dibujan aquí mismo: trazados SVG sobre un esqueleto (`cuerpos.py` + `vector.py`), fotografiados y reducidos. Ni red, ni clave, ni un céntimo, y cien por cien nuestras. |
-| (nada) | PixelLab. Necesita clave y salida a internet. Queda como alternativa, no como dependencia. |
+| `--mcp` | **lo que está puesto.** Recorta las hojas de ocho direcciones que bajó `lote.py` por el MCP de PixelLab. Una silueta entera cuesta **nueve** generaciones en vez de 55 llamadas. Ver *Las hojas del MCP*. |
+| `--mano` | Las celdas se dibujan aquí mismo: trazados SVG sobre un esqueleto (`cuerpos.py` + `vector.py`), fotografiados y reducidos. Ni red, ni clave, ni un céntimo, y cien por cien nuestras. Es el respaldo, y sigue entero. |
+| (nada) | PixelLab por la API v1, celda a celda. Necesita clave y salida a internet. Queda como alternativa, no como dependencia. |
 | `--simular` | monigotes de relleno. No valen para jugar: valen para ejercitar el empaquetador. |
 
 ```bash
-python3 herramientas/sprites/pixellab.py --mano           # lo normal: sin red ni clave
+python3 herramientas/sprites/pixellab.py --mcp            # lo puesto: recorta lo del MCP
+python3 herramientas/sprites/pixellab.py --mano           # el respaldo: sin red ni clave
 export PIXELLAB_API_KEY=...
 python3 herramientas/sprites/pixellab.py --coste          # solo la cuenta
 python3 herramientas/sprites/pixellab.py --simular        # monigotes, sin red ni clave
@@ -257,6 +259,129 @@ La batería del HTML monta una hoja de mentira con las rampas y verifica el otro
 que los nombres de silueta que espera el juego son los que baja el empaquetador, que cada
 arquetipo encuentra silueta, que el repintado le pone a cada uno su ropa y que dos vecinos
 de la misma silueta no salen clavados. `--coste` revisa las tablas sin tocar nada.
+
+## Las hojas del MCP: ocho direcciones de verdad
+
+La API v1 es un extremo —texto a imagen— y hay que pedirle las 385 celdas una a una.
+Por debajo del **MCP** de PixelLab hay ciento diez herramientas que la v1 no expone, y
+tres cambian la cuenta:
+
+* `create_character` devuelve **las ocho direcciones por una sola generación**;
+* `animate_character` aplica una animación de plantilla —andar, correr, agacharse,
+  encajar un golpe, un directo, caer muerto— y cuesta una por dirección;
+* `create_topdown_tileset` devuelve un Wang de 4×4 con sus transiciones, y
+  `create_map_object` un objeto con el fondo ya transparente.
+
+Lo que se bajó para el juego, de una vez:
+
+| | Generaciones | |
+|---|---|---|
+| 7 siluetas | 7 | ocho direcciones cada una |
+| 6 animaciones × 8 direcciones × 7 siluetas | 336 | 49 filas por hoja |
+| 9 tilesets de suelo | 9 | de cada uno salen dos casillas puras |
+| 28 muebles de calle | 28 | |
+| 10 singulares, cuatro variantes | 40 | el Bilbao del 96, con referencias reales |
+| 18 vehículos, dos tiradas | 36 | **las dos salieron mal** (abajo) |
+
+```bash
+python3 herramientas/sprites/pixellab_mcp.py saldo    # cuánto queda
+python3 herramientas/sprites/lote.py                  # baja el lote entero, reanudable
+python3 herramientas/sprites/cenital.py               # repite lo que vino de perfil
+python3 herramientas/sprites/pixellab.py --mcp        # recorta las hojas al formato
+python3 herramientas/sprites/arte.py                  # suelos, muebles y singulares
+```
+
+Tres cosas de la casa que cuestan una tarde si no se saben:
+
+* **`backblaze.pixellab.ai` está cortado** desde aquí (403 del proxy). Las descargas van
+  por `api.pixellab.ai/mcp/...`, que sirve lo mismo.
+* **Ocho trabajos a la vez por cuenta.** Pedir ocho direcciones de golpe con la cuenta
+  ocupada contesta «need 8 job slots» y **no encola nada**: hay que mirar `list_jobs`
+  antes. Por eso `lote.py` lleva su propio manifiesto y es reanudable — una tirada de
+  cuatrocientas generaciones no se puede empezar de cero cada vez que se corta.
+* **El `spritesheet` viene en un zip** con su JSON al lado: celdas de 48×48, ocho
+  columnas, la fila 0 son las rotaciones en el orden `sur, sureste, este, noreste, norte,
+  noroeste, oeste, suroeste`, y después una fila por animación y dirección. Una hoja vino
+  con 48 filas en vez de 49 —le faltaba una dirección de una animación— y el recorte cae
+  a la fila de rotación para esa casilla en vez de reventar.
+
+### Lo que hubo que arreglar al traerlas: el generador ignora los colores de plantilla
+
+`create_character` **no tiene campo de paleta**. Se le pidieron por escrito —magenta el
+torso, verde las piernas, cian el calzado— y de siete siluetas volvieron seis con el
+pantalón **turquesa** y ninguna con verde; el calzado se fundió con el contorno. Sin
+rampas separables no hay repintado, y sin repintado una silueta viste a uno y no a
+treinta y cuatro.
+
+Así que el reparto por partes no se cree el color: lo **vuelve a estarcir** al recortar
+(`_estarcido` / `_estarcir` en `pixellab.py`). Agrupa los píxeles por matiz, y cada grupo
+va a una parte **por anatomía**, no por color:
+
+| | |
+|---|---|
+| **piel** | el grupo tostado y claro a la vez |
+| **pelo** | el que más ocupa la coronilla, el tercio de arriba |
+| **torso** | el mayor de los que quedan |
+| **piernas** | el más bajo de los que quedan |
+| **calzado** | las tres últimas filas de las piernas, siempre |
+
+Cada píxel conserva **su** luminancia y recibe el matiz y la saturación de su rampa: lo
+que se corrige es el color, no el volumen que el generador ya dibujó.
+
+Cuatro trampas, una por cada intento fallido:
+
+* **Los matices contiguos se pegan.** Pelo azul (180°) y pantalón turquesa (200°) son
+  vecinos y se fundían en un grupo. Dos matices solo se juntan si además sus medianas de
+  altura están a menos del 18 % de la figura: el pelo está arriba y el pantalón abajo.
+* **Ordenar por altura descoloca.** Repartiendo torso, piernas y calzado por su altura
+  media, un abrigo magenta quedaba de piernas y un brillo violeta de torso. El torso es
+  el **mayor**, las piernas las **más bajas**, y lo que sobra se pega al grupo de matiz
+  más cercano.
+* **Algunas filas vienen sobre un fondo opaco.** Una tarjeta blanca que no llega al canto
+  de la celda pasa la prueba de las cuatro esquinas. Se quita por color mayoritario del
+  borde —con el fondo claro y desvaído como condición, para no comerse una pared— y
+  relleno por inundación, más las motas sueltas de dos píxeles o menos.
+* **Reducir 48 a 32 se come el contorno.** La celda del juego es de 24×32 y la caja de
+  forja de 20×26: el factor es 0,72 y la línea negra de un píxel desaparece por mayoría.
+  Hay dos remiendos: en la reducción, un píxel del perímetro cuyo cubo traía negro se
+  queda con el negro; y después, todo píxel del perímetro más oscuro que el 62 % de la
+  luminancia mediana se pasa a tinta.
+
+### Los vehículos no se traen
+
+Se pidieron dos veces, 36 generaciones. La primera tirada volvió **de perfil** los
+dieciocho. La segunda, con `view='high top-down'` y la vista repetida al principio de la
+descripción —lo que sí enderezó los singulares—, enderezó la mitad, y de los que salieron
+bien unos apuntan a la derecha y otros hacia arriba.
+
+Media flota traída y media forjada es peor que la flota entera forjada: por la misma calle
+pasarían dos dibujos distintos del mismo coche. Y el chasis forjado es el que lleva librea
+—siete colores, más sirena, abollado y quemado—, mientras que un coche traído tiene el
+color con el que vino. Se quedan en `dist/` por si otra herramienta los endereza.
+
+Por lo mismo se quedan fuera dos muebles (la placa de calle volvió como un cuadrado azul
+liso, la caseta de escalera como una ruina ardiendo) y un suelo: el parque trae **un**
+arbusto legible y, repetido cada 32 píxeles, el Arenal sale de papel pintado. El monte sí
+entra, porque vino sin motivo reconocible.
+
+### Dónde acaba todo esto
+
+Lo que no es personaje lo mete `arte.py`, en su propio bloque `/*<<<ARTE*/` del HTML y en
+`unity/.../Arte/Traido.cs`, con el mismo formato de siempre: un índice de paleta por
+píxel, deflate crudo en base64. Tres familias —singulares, muebles y suelos—, y el juego
+las usa **si están**: `singular()` coge la estampa traída en vez de llamar al dibujo,
+`generarTiles()` sustituye el tile por el traído y `generarProps()` lo mismo con los
+muebles. Si falta una pieza, o el bloque entero, se forja como siempre.
+
+Los singulares se escalan por **vecino más cercano** hasta la caja de casillas que les dio
+el colocador —son de 3 a 5 aumentos—, con una función propia y no con `drawImage`: así no
+aparece ni un color que no esté en la paleta ni un píxel a medias, que es lo que mira
+`pixel.js`. Y la vía vertical no se pidió: es la horizontal girada un cuarto de vuelta, que
+es la misma vía y pedirla aparte habría dado otro balasto.
+
+`herramientas/plano/arte.py` compara las tres familias, pieza a pieza y byte a byte, entre
+el HTML y Unity, dentro de `./verificar.sh` — la misma trampa de siempre: con el arte no
+salta ningún error, sale un juego con otra ciudad.
 
 ## Por qué no entra ni un PNG
 

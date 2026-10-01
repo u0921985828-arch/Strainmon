@@ -392,9 +392,18 @@ public static class Singulares {
     /// mil píxeles de ancho sin salirse de la rejilla, y partido se resuelve solo el
     /// recorte de lo que no se ve.
     static void Forjar(string id, int x, int y, int w, int h, Dibujo dib) {
-        var L = new Lienzo(w*Forja.TS, h*Forja.TS);
-        dib(new Pincel(L), w, h);
-        Paleta.Cuantizar(L.Px);
+        // Si hay planta traída, esa manda: es el mismo edificio con tejado, torre y
+        // patio en vez de un rectángulo gris, y la huella es la misma porque se generó
+        // con este dibujo delante. El dibujo sigue aquí: es lo que sale sin arte bajado.
+        Lienzo L;
+        var tr = Traido.De(Traido.Singulares, id);
+        if (tr != null) {
+            L = Traido.ComoLienzo(tr, w*Forja.TS, h*Forja.TS);
+        } else {
+            L = new Lienzo(w*Forja.TS, h*Forja.TS);
+            dib(new Pincel(L), w, h);
+            Paleta.Cuantizar(L.Px);
+        }
         var px = new Color32[L.W*L.H];
         L.VolcarEn(px, L.W, L.H, 0, 0);
         var tex = Utiles.Textura(L.W, L.H, px);

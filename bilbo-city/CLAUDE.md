@@ -468,6 +468,7 @@ node herramientas/html/personajes.js  # las hojas de personaje, para juzgarlas
 node herramientas/html/personajes.js --esc 8 --que protagonista,ertzaina
 node herramientas/html/captura.js    # el juego en marcha, para ver el arte en la calle
 node herramientas/html/fuentes.js     # seis fuentes en una imagen, para elegir
+python3 herramientas/sprites/pixellab.py --mcp       # recorta las hojas traídas del MCP
 python3 herramientas/sprites/pixellab.py --mano      # las 385 celdas, sin red ni clave
 ```
 
@@ -480,8 +481,9 @@ lo que un rectángulo no puede: el hombro que cae, la cintura, el puño, el fleq
 La foto revelada se guarda en `celdas.py` (**generado**, no se edita a mano; se rehace con
 `vector.py --escribe`), porque capturar necesita node y Chromium y el empaquetador tiene
 que poder correr sin ellos. Son cien por cien nuestras y no necesitan ni clave ni internet:
-`python3 herramientas/sprites/pixellab.py --mano`. PixelLab sigue ahí como alternativa,
-no como dependencia.
+`python3 herramientas/sprites/pixellab.py --mano`. **Es el respaldo y sigue entero**: lo
+que hay puesto hoy en el bloque `SPRITES` viene del MCP de PixelLab (más abajo), y el día
+que haya que rehacerlo sin clave, esto lo rehace.
 
 Dos cosas las sostienen. La primera, que el esqueleto base sea **uno por vista** —de
 frente, de tres cuartos y de perfil, y las cinco direcciones salen de tres— y que las
@@ -537,9 +539,44 @@ el arquetipo salía calvo. Los píxeles desvaídos —brillos, sombras apagadas�
 por tono: se contagian del vecino con color. El empaquetador avisa cuando falta un color de
 plantilla o cuando la mayoría de la celda vino apagada, y `--diag` enseña el recuento.
 
-`--mano` no necesita nada. La vía de PixelLab sí: clave (`PIXELLAB_API_KEY`) y salida a
-`api.pixellab.ai`, que **desde una sesión de Claude está cerrada**, así que eso se ejecuta
-en local. Ver `herramientas/sprites/LEEME.md`.
+`--mano` no necesita nada. La vía de PixelLab sí: clave (`PIXELLAB_API_KEY`), que **nunca
+va en el repositorio**. Ver `herramientas/sprites/LEEME.md`.
+
+### Lo que hay puesto viene del MCP de PixelLab, y entra por el mismo sitio
+
+Las siete hojas de silueta de ahora y el arte de ciudad vienen del **MCP** de PixelLab, no
+de la API v1: `create_character` da **las ocho direcciones por una generación** y
+`animate_character` una animación entera por dirección, así que las hojas tienen ocho
+direcciones de verdad en vez de cinco y tres espejadas.
+
+```bash
+python3 herramientas/sprites/lote.py             # baja el lote (reanudable; una vez)
+python3 herramientas/sprites/cenital.py          # repite lo que volvió de perfil
+python3 herramientas/sprites/pixellab.py --mcp   # recorta las hojas a la celda de 24×32
+python3 herramientas/sprites/arte.py             # suelos, muebles y singulares al juego
+```
+
+Cuatro cosas que hay que saber antes de tocarlo:
+
+- **El generador no respeta los colores de plantilla y no hay campo de paleta.** Volvieron
+  seis pantalones turquesa y ningún verde. El recorte **vuelve a estarcir** cada celda:
+  agrupa por matiz y reparte las partes por anatomía —piel el grupo tostado, pelo el que
+  manda en la coronilla, torso el mayor, piernas el más bajo, calzado las tres últimas
+  filas—, y cada píxel conserva su luminancia. Sin eso no hay rampas separables y
+  `lutDe()` deja de servir.
+- **Lo que no es personaje va en su propio bloque `/*<<<ARTE*/`**, en el HTML y en
+  `unity/.../Arte/Traido.cs` a la vez, con el formato de siempre (índice de paleta por
+  píxel, deflate, base64). Tres familias: singulares, muebles y suelos. **El juego no
+  depende de que estén**: si falta una pieza o el bloque entero, se forja como siempre.
+  Lo compara `herramientas/plano/arte.py`, dentro de `./verificar.sh`.
+- **Los vehículos no se traen.** Dos tiradas, 36 generaciones, y las dos volvieron de
+  perfil o a medias. Media flota traída y media forjada es peor que la flota entera
+  forjada, y el chasis forjado es el que lleva las siete libreas. Por lo mismo se quedan
+  fuera la placa de calle, la caseta de escalera y el **parque**: su casilla trae un
+  arbusto legible y, repetida cada 32 px, el Arenal sale de papel pintado.
+- **Nada de texto traído.** El generador rellenó el rótulo de los Almacenes Ibaizabal con
+  cuatro letras inventadas; se aplanan al importar, fila a fila, con el color que manda en
+  cada una.
 
 ## Pixel perfect
 
