@@ -37,7 +37,7 @@ BASE = 'https://api.pixellab.ai/mcp'
 HUECOS = 10
 
 DIRECCIONES = ['south', 'east', 'north', 'west', 'south-east', 'north-east', 'north-west', 'south-west']
-ANIMACIONES = {'andar': 'walking-8-frames', 'correr': 'running-6-frames',
+ANIMACIONES = {'andar': 'walking-8-frames', 'correr': 'running-6-frames', 'agacha': 'crouching', 'golpe': 'taking-punch',
                'punetazo': 'lead-jab', 'muerte': 'falling-back-death'}
 
 # Los colores de plantilla, en palabras: cada parte de un color que no se parece a otro.
