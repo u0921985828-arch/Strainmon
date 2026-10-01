@@ -217,13 +217,22 @@ def animaciones(l):
 
 def bajar(l):
     P.esperar(40)
+    def _baja(url, destino):
+        """Idempotente y tolerante: lo que ya está no se vuelve a pedir; un 423 (aún procesando)
+        o un corte del proxy se apuntan y se sigue con el resto. Relanzar el script lo completa."""
+        if os.path.exists(destino):
+            return
+        try:
+            P.bajar(url, destino); _log('bajado', os.path.basename(destino))
+        except Exception as e:
+            _log('pendiente', os.path.basename(destino), str(e)[:80])
     for nombre, cid in l['personajes'].items():
-        P.bajar(f'{BASE}/characters/{cid}/spritesheet', os.path.join(SALIDA, 'personajes', nombre + '.zip'))
+        _baja(f'{BASE}/characters/{cid}/spritesheet', os.path.join(SALIDA, 'personajes', nombre + '.zip'))
     for nombre, tid in l['suelos'].items():
-        P.bajar(f'{BASE}/tilesets/{tid}/image?inline=true', os.path.join(SALIDA, 'suelos', nombre + '.png'))
+        _baja(f'{BASE}/tilesets/{tid}/image?inline=true', os.path.join(SALIDA, 'suelos', nombre + '.png'))
     for clave in ('muebles', 'vehiculos', 'edificios'):
         for nombre, oid in l[clave].items():
-            P.bajar(f'{BASE}/map-objects/{oid}/download', os.path.join(SALIDA, clave, nombre + '.png'))
+            _baja(f'{BASE}/map-objects/{oid}/download', os.path.join(SALIDA, clave, nombre + '.png'))
     _log('bajado todo a', SALIDA)
 
 
