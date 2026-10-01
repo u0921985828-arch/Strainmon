@@ -609,6 +609,81 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       bien.push('red viaria conectada al ' + pct.toFixed(1) + '% en ' + trozos + ' trozos');
     }
 
+    // ── 5bis · la calzada: anchos, marcas y disciplina de carril ───────
+    {
+      // El ancho de cada calle lo trae el plano; lo que se comprueba aquí es que de ahí
+      // sale geometría utilizable y no una mancha. Tres cosas, y las tres se rompen
+      // calladas: que la mayoría de la calzada tenga eje, que los códigos de marca sean
+      // un puñado —si se disparan es que la medida está dando un ancho distinto en cada
+      // casilla— y que el tráfico circule de verdad por su derecha.
+      let calzada = 0, conCarril = 0;
+      for (let i = 0; i < A.MW * A.MH; i++) {
+        if (A.map[i] !== A.ROAD) continue;
+        calzada++;
+        if (A.viaSentido[i]) conCarril++;
+      }
+      const pct = conCarril / calzada * 100;
+      ok(pct > 55, 'solo el ' + pct.toFixed(0) + '% de la calzada tiene carril medido');
+      ok(A.VIA_COD.length > 6 && A.VIA_COD.length < 64,
+        A.VIA_COD.length + ' códigos de marca vial: o no se está midiendo o se mide mal');
+      ok(A.TILE.calzada.length === A.VIA_COD.length, 'falta algún tile de calzada por forjar');
+
+      // El bordillo: toda acera pegada a la calzada tiene que llevarlo, y ninguna otra.
+      let sobran = 0, faltan = 0;
+      for (let y = 1; y < A.MH - 1 && !sobran && !faltan; y += 7)
+        for (let x = 1; x < A.MW - 1; x += 7) {
+          if (A.map[y * A.MW + x] !== A.ACERA) continue;
+          const pegada = [[1,0],[-1,0],[0,1],[0,-1]]
+            .some(([dx, dy]) => A.map[(y+dy) * A.MW + x+dx] === A.ROAD);
+          const b = A.bordeDe(x, y);
+          if (b && !pegada) sobran++;
+          if (!b && pegada) {
+            // salvo el vado: donde cruza un paso de cebra el bordillo está rebajado
+            const cebra = [[1,0],[-1,0],[0,1],[0,-1]].some(([dx, dy]) => {
+              const i = (y+dy) * A.MW + x+dx;
+              return A.map[i] === A.ROAD && A.VIA_CEBRA[A.viaMarca[i]];
+            });
+            if (!cebra) faltan++;
+          }
+        }
+      ok(!sobran, 'hay bordillo en una acera que no da a la calzada');
+      ok(!faltan, 'hay acera pegada a la calzada sin bordillo');
+
+      // Y la disciplina de carril. Se mide solo cuando el coche se mueve POR el eje del
+      // carril: atravesarlo para girar o para cruzar un cruce es legal y contarlo como
+      // infracción daba un 50 % que no quería decir nada.
+      let porSuCarril = 0, contramano = 0, parados = 0;
+      const rec = A.trafico.map(() => 0), ult = A.trafico.map(c => ({ x: c.x, y: c.y }));
+      for (let k = 0; k < 600; k++) {
+        paso(1);
+        A.trafico.forEach((c, i) => {
+          rec[i] += Math.hypot(c.x - ult[i].x, c.y - ult[i].y);
+          ult[i].x = c.x; ult[i].y = c.y;
+        });
+        if (k % 10) continue;
+        for (const c of A.trafico) {
+          const s = A.sentidoDe(c.tx, c.ty);
+          if (!s) continue;
+          const ejeH = s === A.SEN_E || s === A.SEN_O;
+          if (ejeH !== (c.dx !== 0)) continue;
+          if (s === (c.dx > 0 ? A.SEN_E : c.dx < 0 ? A.SEN_O : c.dy > 0 ? A.SEN_S : A.SEN_N))
+            porSuCarril++; else contramano++;
+        }
+      }
+      parados = rec.filter(v => v < 2).length;
+      const cum = porSuCarril / (porSuCarril + contramano || 1) * 100;
+      ok(!parados, parados + ' coches de tráfico se quedaron clavados');
+      // El listón es 80 y no 95 a propósito. El resto son maniobras legítimas que la
+      // medida no sabe separar: el fondo de saco, donde dar media vuelta es lo único que
+      // se puede hacer, y los metros que un coche tarda en volver a su mitad después.
+      // Lo que esta prueba tiene que cazar es que la regla deje de aplicarse, y eso se
+      // ve enseguida — sin ella el tráfico sale a la mitad, que es echarlo a suertes.
+      ok(cum > 80, 'el tráfico circula por su carril solo el ' + cum.toFixed(0) + '% de las veces');
+      if (!sobran && !faltan && !parados && cum > 80)
+        bien.push('calzada: ' + pct.toFixed(0) + '% con carril en ' + A.VIA_COD.length
+          + ' marcas, bordillo correcto y tráfico por la derecha el ' + cum.toFixed(0) + '%');
+    }
+
     // ── 6 · combate ────────────────────────────────────────────────────
     {
       // La prueba es si la pistola mata a 3 casillas, no si hay una pared en medio: hay

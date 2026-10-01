@@ -28,17 +28,10 @@ public static class Forja {
         g = T32(); g.Rellenar(Paleta.Asfalto); g.Ruido(new[]{Paleta.AsfaltoO,Paleta.AsfaltoL}, 22);
         for (int i = 0; i < 26; i++) g.P(4 + i*0.9f, 6 + Mathf.Sin(i/3f)*4, 1, 1, Paleta.AsfaltoO); Reg("roadGrieta", g);
 
-        g = T32(); g.Rellenar(Paleta.Asfalto); g.Ruido(new[]{Paleta.AsfaltoO,Paleta.AsfaltoL}, 22);
-        g.P(8,15,16,2,Paleta.Crema); Reg("lineaH", g);
-
-        g = T32(); g.Rellenar(Paleta.Asfalto); g.Ruido(new[]{Paleta.AsfaltoO,Paleta.AsfaltoL}, 22);
-        g.P(15,8,2,16,Paleta.Crema); Reg("lineaV", g);
-
-        g = T32(); g.Rellenar(Paleta.Asfalto);
-        for (int y = 2; y < 32; y += 8) g.P(0,y,32,5,Paleta.Crema); Reg("cebraH", g);
-
-        g = T32(); g.Rellenar(Paleta.Asfalto);
-        for (int x = 2; x < 32; x += 8) g.P(x,0,5,32,Paleta.Crema); Reg("cebraV", g);
+        // Las marcas viales ya no son cuatro tiles fijos —una raya al medio y un paso de
+        // cebra— sino uno por combinación de eje, carriles y sentido que de verdad sale en
+        // el mapa. Se forjan en GenerarCalzada(), que tiene que esperar a que la ciudad
+        // esté cargada para saber cuáles hacen falta.
 
         g = T32(); g.Rellenar(Paleta.Asfalto); g.Ruido(new[]{Paleta.AsfaltoO}, 18);
         g.P(9,9,14,14,Paleta.Gris);
@@ -230,6 +223,11 @@ public static class Forja {
                 _pend[i] = Traido.ComoLienzo(tr, TS, TS);
         }
 
+        // El asfalto ya definitivo —forjado o traído— se guarda aparte: las marcas viales
+        // se pintan copiándolo, no volviéndolo a forjar, y así el grano casa exactamente
+        // con la casilla de al lado y una raya no deja una costura de tono a cada lado.
+        for (int i = 0; i < _pend.Count; i++) if (_pendNom[i] == "road") _roadBase = _pend[i];
+
         // ── volcado al atlas ──
         int cols = 8;
         int filas = Mathf.CeilToInt(_pend.Count / (float)cols);
@@ -247,6 +245,122 @@ public static class Forja {
         Tejados = new Sprite[19]; for (int i = 0; i < 19; i++) Tejados[i] = Tiles["tejado"+i];
         AguaFrames = new[]{ Tiles["agua0"], Tiles["agua1"] };
         _pend.Clear(); _pendNom.Clear();
+    }
+
+    // ═══════════ CALZADA, BORDILLO Y FLECHAS ═══════════
+    /// Un tile por código de marca de los que salen en el mapa, los dieciséis bordillos y
+    /// las cuatro flechas. Van en su propio atlas porque hasta que la ciudad no está
+    /// cargada no se sabe cuántos son.
+    public static Sprite[] Calzada, Borde, FlechaVia;
+    static Lienzo _roadBase;
+    static Texture2D _atlasVia;
+
+    public static void GenerarCalzada() {
+        if (_atlasVia != null || _roadBase == null) return;
+        int n = Ciudad.ViaCod.Count;
+        var hojas = new List<Lienzo>(n + 20);
+        for (int i = 0; i < n; i++) hojas.Add(TileCalzada(Ciudad.ViaCod[i]));
+        var bord = Bordillos(); for (int i = 0; i < 16; i++) hojas.Add(bord[i]);
+        var flec = Flechas();   for (int i = 0; i < 4;  i++) hojas.Add(flec[i]);
+
+        int cols = 8, filas = Mathf.CeilToInt(hojas.Count / (float)cols);
+        int aw = cols * TS, ah = filas * TS;
+        var px = new Color32[aw * ah];
+        for (int i = 0; i < hojas.Count; i++)
+            hojas[i].VolcarEn(px, aw, ah, (i % cols) * TS, (i / cols) * TS);
+        Paleta.Cuantizar(px);
+        _atlasVia = Utiles.Textura(aw, ah, px);
+
+        Calzada = new Sprite[n]; Borde = new Sprite[16]; FlechaVia = new Sprite[5];
+        for (int i = 0; i < hojas.Count; i++) {
+            var sp = Utiles.Rebanada(_atlasVia, (i % cols) * TS, ah - ((i / cols) + 1) * TS, TS, TS, 0f, 0f);
+            if (i < n) Calzada[i] = sp;
+            else if (i < n + 16) Borde[i - n] = sp;
+            // Las flechas se guardan por sentido, no por orden: así el render indexa con
+            // lo que trae la casilla y no hay tabla que mantener en dos sitios.
+            else FlechaVia[i - n - 16 + Ciudad.SenE] = sp;
+        }
+    }
+
+    /// <summary>Una casilla de calzada con sus marcas.</summary>
+    static Lienzo TileCalzada(int cod) {
+        var L = new Lienzo(TS, TS);
+        System.Array.Copy(_roadBase.Px, L.Px, L.Px.Length);
+        if (cod == 0) return L;
+        int eje = cod & 7, canto = (cod>>3) & 7, centro = (cod>>6) & 7, cebra = (cod>>9) & 1;
+        bool h = eje == Ciudad.EjeH;
+        if (cebra != 0) {
+            // Las bandas van en el sentido de la marcha del peatón, que cruza de acera a
+            // acera: perpendiculares a la calle. Estrechas y espaciadas: con bandas gordas,
+            // y habiendo un cruce cada seis casillas, la ciudad entera salía a rayas blancas.
+            for (int k = 1; k < 32; k += 8) {
+                if (h) L.P(k,0,3,32,Paleta.Crema); else L.P(0,k,32,3,Paleta.Crema);
+            }
+        } else {
+            Pinta(L, h, canto, 0);
+            Pinta(L, h, centro, 15);
+        }
+        return L;
+    }
+    static void Pinta(Lienzo L, bool h, int m, int d) {
+        if (m == Ciudad.MEje) { if (h) L.P(0,d,32,2,Paleta.Crema); else L.P(d,0,2,32,Paleta.Crema); }
+        // Un trazo discontinuo: uno por casilla y centrado. La cadencia sale sola de un
+        // tile al siguiente y no hay que llevar la cuenta de la fase en ningún sitio.
+        else if (m == Ciudad.MEjeDis) Trazo(L, h, d, 2, 18);
+        // El separador de carril es la mitad de grueso y la mitad de largo que el eje: en
+        // una avenida de seis carriles, con todas las rayas iguales no se ve cuál separa
+        // los dos sentidos. Del mismo blanco, eso sí — con un gris apagado desaparecía al jugar.
+        else if (m == Ciudad.MCarril) Trazo(L, h, d, 1, 12);
+    }
+    static void Trazo(Lienzo L, bool h, int d, int gr, int lg) {
+        int o = (32 - lg) >> 1;
+        if (h) L.P(o,d,lg,gr,Paleta.Crema); else L.P(d,o,gr,lg,Paleta.Crema);
+    }
+
+    /// <summary>El bordillo, por máscara de cantos que dan a la calzada.</summary>
+    /// La acera y el asfalto estaban al mismo nivel y solo los separaba el color; con el
+    /// canto de piedra y la sombra del caz, la calle se lee de un vistazo. Va suelto,
+    /// encima del tile, y no dentro de él: la acera cambia de material según el barrio
+    /// —losa, adoquín, adoquín rojo, losa gastada— y metido en el tile harían falta cuatro
+    /// juegos de dieciséis. Encima vale uno.
+    static Lienzo[] Bordillos() {
+        var r = new Lienzo[16];
+        for (int m = 0; m < 16; m++) {
+            var L = new Lienzo(TS, TS);
+            // La tapa del bordillo es piedra limpia y va clara en los cuatro cantos:
+            // oscurecer la del lado en sombra no la pone en sombra, la borra. Lo que dice
+            // de qué lado viene la luz es la sombra que el bordillo ECHA, y con la luz de
+            // arriba a la izquierda esa sombra cae al sur y al este, sobre el asfalto.
+            if ((m & 1) != 0) { L.P(0,0,32,2,Paleta.Hueso); L.P(0,2,32,1,Paleta.HormigonO); }
+            if ((m & 8) != 0) { L.P(0,0,2,32,Paleta.Hueso); L.P(2,0,1,32,Paleta.HormigonO); }
+            if ((m & 2) != 0) { L.P(28,0,2,32,Paleta.Hueso); L.P(30,0,2,32,Paleta.AsfaltoO); }
+            if ((m & 4) != 0) { L.P(0,28,32,2,Paleta.Hueso); L.P(0,30,32,2,Paleta.AsfaltoO); }
+            r[m] = L;
+        }
+        return r;
+    }
+
+    /// <summary>La flecha del carril, pintada en el suelo, en los cuatro sentidos.</summary>
+    /// Es lo que dice de un vistazo que una calle tiene dos sentidos y cuál es el tuyo; sin
+    /// ella, las rayas dicen cuántos carriles hay pero no hacia dónde van.
+    static Lienzo[] Flechas() {
+        var e = new Lienzo(TS, TS);
+        e.P(8,15,13,2,Paleta.Crema);
+        for (int k = 0; k < 7; k++) { int h = 2*(7-k); e.P(20+k, 16-(h>>1), 1, h, Paleta.Crema); }
+        return new[]{ e, GiroCuarto(e,1), GiroCuarto(e,2), GiroCuarto(e,3) };
+    }
+    /// <summary>Un giro de n cuartos de vuelta, píxel a píxel.</summary>
+    /// Una rotación de ángulo recto es exacta sobre el papel, pero en cuanto el motor
+    /// interpola deja medios píxeles, y aquí todo tiene que caer en la rejilla.
+    static Lienzo GiroCuarto(Lienzo src, int n) {
+        var d = new Lienzo(n % 2 != 0 ? src.H : src.W, n % 2 != 0 ? src.W : src.H);
+        for (int y = 0; y < src.H; y++)
+            for (int x = 0; x < src.W; x++) {
+                int nx = n == 1 ? src.H-1-y : n == 2 ? src.W-1-x : y;
+                int ny = n == 1 ? x         : n == 2 ? src.H-1-y : src.W-1-x;
+                d.Px[ny*d.W + nx] = src.Px[y*src.W + x];
+            }
+        return d;
     }
 
     // ═══════════ VEHÍCULOS ═══════════

@@ -4000,10 +4000,11 @@ function generarTiles(){
  TILE[ROAD]=T32(g=>{rell(g,C.asfalto);ruido(g,32,32,[C.asfaltoO,C.asfaltoL],22);});
  TILE.roadGrieta=T32(g=>{rell(g,C.asfalto);ruido(g,32,32,[C.asfaltoO,C.asfaltoL],22);
   for(let i=0;i<26;i++)P(g,4+i*.9,6+Math.sin(i/3)*4,1,1,C.asfaltoO);});
- TILE.lineaH=T32(g=>{rell(g,C.asfalto);ruido(g,32,32,[C.asfaltoO,C.asfaltoL],22);P(g,8,15,16,2,C.crema);});
- TILE.lineaV=T32(g=>{rell(g,C.asfalto);ruido(g,32,32,[C.asfaltoO,C.asfaltoL],22);P(g,15,8,2,16,C.crema);});
- TILE.cebraH=T32(g=>{rell(g,C.asfalto);for(let y=2;y<32;y+=8)P(g,0,y,32,5,C.crema);});
- TILE.cebraV=T32(g=>{rell(g,C.asfalto);for(let x=2;x<32;x+=8)P(g,x,0,5,32,C.crema);});
+ /* Las rayas de la calzada ya no se forjan aquí. Antes había una línea horizontal, una
+    vertical y dos pasos de cebra, y se ponían mirando solo a las cuatro vecinas: una
+    calle de una casilla de ancho llevaba raya en medio —que es justo donde no cabe— y una
+    avenida de cinco no llevaba ninguna. Ahora el ancho y el carril se miden sobre el
+    plano al cargar la ciudad (`trazarCalzada`) y el tile sale del código de marca. */
  TILE.alcantarilla=T32(g=>{rell(g,C.asfalto);ruido(g,32,32,[C.asfaltoO],18);P(g,9,9,14,14,C.gris);
   for(let i=11;i<22;i+=3)P(g,i,11,1,10,C.carbon);});
  TILE[ACERA]=T32(g=>{rell(g,C.hormigon);ruido(g,32,32,[C.hormigonO,C.hormigonL],16);
@@ -4346,7 +4347,69 @@ function generarProps(){
     aquí arriba y apoyada por el pie, así que entra donde estaba la forjada y se planta
     igual. Las fachadas no se tocan — van por tramos de doce píxeles y no son muebles. */
  for(const k in (ARTE_IMG.muebles||{}))if(PROP[k])PROP[k]=ARTE_IMG.muebles[k];
+ generarBordillos();generarFlechas();
 }
+
+/*═══════════════ BORDILLO Y FLECHAS DE CARRIL ═══════════════*/
+/* El bordillo. La acera y el asfalto estaban al mismo nivel y solo los separaba el color;
+   con el canto de piedra y la sombra del caz, la calle se lee de un vistazo y se ve por
+   dónde se puede andar sin mirar el suelo.
+
+   Va suelto, encima del tile, y no dentro de él: la acera cambia de material según el
+   barrio —losa, adoquín, adoquín rojo, losa gastada— y metido en el tile harían falta
+   cuatro juegos de dieciséis. Encima vale uno. */
+const BORDE=[];
+function generarBordillos(){
+ for(let m=0;m<16;m++){
+  if(!m){BORDE[m]=null;continue;}
+  const c=lienzo(32,32),g=c.getContext('2d');
+  /* La tapa del bordillo es piedra limpia y va clara en los cuatro cantos: oscurecer la
+     del lado en sombra —que fue el primer intento— no la pone en sombra, la borra. Lo
+     que dice de qué lado viene la luz es la sombra que el bordillo ECHA, y con la luz de
+     arriba a la izquierda esa sombra cae al sur y al este, sobre el asfalto. Así que esos
+     dos cantos llevan dos píxeles de sombra por fuera de la piedra, y el norte y el oeste
+     llevan por dentro un píxel apagado, que es el canto de la losa contra el bordillo. */
+  if(m&1){P(g,0,0,32,2,C.hueso);P(g,0,2,32,1,C.hormigonO);}
+  if(m&8){P(g,0,0,2,32,C.hueso);P(g,2,0,1,32,C.hormigonO);}
+  if(m&2){P(g,28,0,2,32,C.hueso);P(g,30,0,2,32,C.asfaltoO);}
+  if(m&4){P(g,0,28,32,2,C.hueso);P(g,0,30,32,2,C.asfaltoO);}
+  BORDE[m]=cuantizar(c);}}
+/* Qué cantos de una acera dan a la calzada. Donde hay paso de cebra no se pone bordillo:
+   ahí está rebajado, que es por donde se cruza. */
+const aBordillo=(x,y)=>{
+ if(x<0||y<0||x>=MW||y>=MH)return false;
+ const i=y*MW+x;
+ return map[i]===ROAD&&!VIA_CEBRA[viaMarca[i]];};
+function bordeDe(x,y){let m=0;
+ if(aBordillo(x,y-1))m|=1;
+ if(aBordillo(x+1,y))m|=2;
+ if(aBordillo(x,y+1))m|=4;
+ if(aBordillo(x-1,y))m|=8;
+ return m;}
+/* La flecha del carril, pintada en el suelo. Es lo que dice de un vistazo que una calle
+   tiene dos sentidos y cuál es el tuyo; sin ella, las rayas dicen cuántos carriles hay
+   pero no hacia dónde van. */
+const FLECHA_VIA={};
+function generarFlechas(){
+ const c=lienzo(32,32),g=c.getContext('2d');
+ P(g,8,15,13,2,C.crema);
+ for(let k=0;k<7;k++){const h=2*(7-k);P(g,20+k,16-(h>>1),1,h,C.crema);}
+ FLECHA_VIA[SEN_E]=cuantizar(c);
+ FLECHA_VIA[SEN_S]=giroCuarto(FLECHA_VIA[SEN_E],1);
+ FLECHA_VIA[SEN_O]=giroCuarto(FLECHA_VIA[SEN_E],2);
+ FLECHA_VIA[SEN_N]=giroCuarto(FLECHA_VIA[SEN_E],3);}
+/* Un giro de n cuartos de vuelta, píxel a píxel. No se gira con el contexto: una rotación
+   de ángulo recto es exacta sobre el papel, pero en cuanto el motor interpola deja medios
+   píxeles, y aquí todo tiene que caer en la rejilla. */
+function giroCuarto(src,n){
+ const w=src.width,h=src.height;
+ const a=src.getContext('2d').getImageData(0,0,w,h).data;
+ const d=lienzo(n%2?h:w,n%2?w:h),b=d.getContext('2d'),o=b.createImageData(d.width,d.height);
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+  const nx=n===1?h-1-y:n===2?w-1-x:y, ny=n===1?x:n===2?h-1-y:w-1-x;
+  const i=(y*w+x)*4, j=(ny*d.width+nx)*4;
+  o.data[j]=a[i];o.data[j+1]=a[i+1];o.data[j+2]=a[i+2];o.data[j+3]=a[i+3];}
+ b.putImageData(o,0,0);return d;}
 
 /*═══════════════ ICONOS HUD ═══════════════*/
 const ICO={};
@@ -4508,6 +4571,153 @@ const barrioDe=new Uint8Array(MW*MH);
 function pon(x,y,t){if(x>=0&&y>=0&&x<MW&&y<MH)map[y*MW+x]=t;}
 const distDe=(x,y)=>BARRIOS[barrioDe[clamp(y|0,0,MH-1)*MW+clamp(x|0,0,MW-1)]]||BARRIOS[0];
 
+/*═══════════════ LA CALZADA: ANCHO, CARRILES Y SENTIDO ═══════════════*/
+/* El plano trae el ancho real de cada calle —un callejón del Casco Viejo y la Gran Vía
+   son la misma línea con distinto grosor— pero el juego lo pintaba todo del mismo gris y
+   solo rayaba las calles de UNA casilla de ancho, que es justo donde no cabe una raya.
+   Desde arriba, una avenida de cinco carriles y un callejón eran la misma mancha.
+
+   Aquí se mide el corredor: para cada casilla de asfalto, cuánto mide la calle a lo
+   ancho, en qué posición de ese ancho cae y hacia dónde circula su carril. De ahí salen
+   las marcas viales —eje, separadores de carril, flechas y pasos de cebra— y también la
+   disciplina de carril del tráfico, que es lo que hace que las rayas no sean un adorno.
+
+   Cómo se mide, que tiene truco: la calle es la tirada CORTA. De cada casilla se mide la
+   tirada de asfalto en horizontal y en vertical; la pequeña de las dos es el ancho y la
+   otra dice por dónde va la calle. Y el nudo sale gratis: en un cruce las dos tiradas son
+   largas, así que la pequeña también lo es, y por encima de ANCHO_MAX no hay calle que
+   valga. Eso es lo único que impide pintar un eje continuo a través de una intersección,
+   y no hizo falta detectar cruces por ningún otro lado.
+
+   Las diagonales no llevan tratamiento aparte y no lo necesitan: una calle tendida —la
+   Gran Vía, Autonomía— corta en vertical poco más que su ancho y en horizontal el triple,
+   así que la pasada por filas y columnas ya la da por horizontal. Lo que se queda sin
+   marcar son los 45° de verdad, que en Bilbao son las revueltas de Artxanda. */
+const EJE_NO=0, EJE_H=1, EJE_V=2, EJE_CRUCE=3;
+/* Ocho casillas son 41 m de calzada. Por encima de eso en las dos direcciones a la vez no
+   es una calle: es un cruce, una plaza o una explanada. Sale de medir el plano — el 94 %
+   de la calzada de Bilbao tiene ocho casillas o menos de ancho. */
+const ANCHO_MAX=8;
+const SEN_NO=0, SEN_E=1, SEN_O=2, SEN_S=3, SEN_N=4;
+/* Por casilla, dos bytes y no cinco: el índice de su tile de calzada —que ya resume el
+   eje y las marcas— y el sentido de su carril, que hace falta suelto para el tráfico. */
+const viaMarca=new Uint8Array(MW*MH), viaSentido=new Uint8Array(MW*MH);
+/* Los códigos de marca que de verdad salen en el mapa. Son unas decenas de los dos mil
+   posibles, así que se forja un tile por código que aparece y la casilla guarda el
+   índice. */
+const VIA_COD=[0], VIA_CEBRA=[false], _viaIdx=new Map([[0,0]]);
+/* Qué puede llevar el canto de arriba (o de la izquierda) de una casilla, y su centro. */
+const M_NADA=0, M_EJE=1, M_EJE_DIS=2, M_CARRIL=3;
+const codPack=(eje,canto,centro,cebra)=>eje|(canto<<3)|(centro<<6)|(cebra<<9);
+function _codigo(cod){
+ let i=_viaIdx.get(cod);
+ if(i===undefined){
+  if(VIA_COD.length>=256)return 0;        /* red de seguridad: el índice es un byte */
+  i=VIA_COD.length;VIA_COD.push(cod);VIA_CEBRA.push(!!((cod>>9)&1));_viaIdx.set(cod,i);}
+ return i;}
+const sentidoDe=(x,y)=>(x>=0&&y>=0&&x<MW&&y<MH)?viaSentido[y*MW+x]:SEN_NO;
+
+function trazarCalzada(){
+ viaMarca.fill(0);viaSentido.fill(0);
+ VIA_COD.length=1;VIA_CEBRA.length=1;_viaIdx.clear();_viaIdx.set(0,0);
+ /* Primera pasada, por filas: la tirada horizontal de cada casilla y su posición dentro
+    de ella. Se guardan porque la segunda pasada va por columnas y las necesita a la vez. */
+ const rh=new Uint8Array(MW*MH), ih=new Uint8Array(MW*MH);
+ for(let y=0;y<MH;y++){
+  const f=y*MW;
+  for(let x=0;x<MW;){
+   if(map[f+x]!==ROAD){x++;continue;}
+   let e=x;while(e<MW&&map[f+e]===ROAD)e++;
+   const n=Math.min(e-x,255);
+   for(let k=x;k<e;k++){rh[f+k]=n;ih[f+k]=Math.min(k-x,255);}
+   x=e;}}
+ /* Segunda, por columnas: con las dos tiradas ya se sabe por dónde va la calle. */
+ const eje=new Uint8Array(MW*MH), anch=new Uint8Array(MW*MH), pos=new Uint8Array(MW*MH);
+ for(let x=0;x<MW;x++){
+  for(let y=0;y<MH;){
+   if(map[y*MW+x]!==ROAD){y++;continue;}
+   let e=y;while(e<MH&&map[e*MW+x]===ROAD)e++;
+   const nv=Math.min(e-y,255);
+   for(let k=y;k<e;k++){
+    const i=k*MW+x, nh=rh[i];
+    if(Math.min(nh,nv)>ANCHO_MAX||nh===nv){eje[i]=EJE_CRUCE;continue;}
+    if(nv<nh){eje[i]=EJE_H;anch[i]=nv;pos[i]=k-y;}
+    else     {eje[i]=EJE_V;anch[i]=nh;pos[i]=ih[i];}}
+   y=e;}}
+ /* Y la tercera: de la geometría a la pintura. Va aparte porque el paso de cebra mira a
+    la casilla de al lado y en la segunda pasada todavía no está medida. */
+ for(let i=0;i<MW*MH;i++){
+  const e=eje[i];
+  if(e!==EJE_H&&e!==EJE_V)continue;
+  const an=anch[i], po=pos[i];
+  let canto=M_NADA, centro=M_NADA;
+  if(an>=2){
+   /* Cada casilla pinta SOLO su canto de arriba (o de la izquierda). Así una línea la
+      dibuja una casilla y no media cada una de las dos vecinas, que a 32 píxeles es la
+      diferencia entre una raya y dos rayas finas. El canto 0 es el bordillo y no lleva
+      pintura: ahí el límite lo pone la acera. */
+   const c=an/2;
+   /* Con una calzada de dos casillas hay un carril por sentido y se puede adelantar: eje
+      discontinuo. De tres para arriba, continuo. */
+   const cont=an>=3;
+   if(an%2===0){ if(po===c)canto=cont?M_EJE:M_EJE_DIS; }
+   else if(po===(an-1)/2)centro=cont?M_EJE:M_EJE_DIS;
+   /* Separadores de carril: los cantos interiores que no son el eje y que caen a una
+      casilla o más del centro. Más cerca sobran — la raya quedaría pegada al eje. */
+   if(canto===M_NADA&&po>=1&&Math.abs(po-c)>=1)canto=M_CARRIL;
+   /* Se circula por la derecha. Mirando al este la derecha cae al sur, así que la mitad
+      de abajo de una calle este-oeste va al este; mirando al sur la derecha cae al oeste,
+      así que la mitad izquierda de una calle norte-sur baja. */
+   /* La casilla por la que pasa el eje es mitad de cada sentido, así que no tiene uno:
+      ni lleva flecha pintada ni le dice nada al tráfico. Dársela a uno de los dos ponía
+      una flecha encima de la línea continua, que es lo contrario de lo que significa. */
+   if(centro===M_NADA)viaSentido[i]=e===EJE_H?(po+.5>c?SEN_E:SEN_O):(po+.5<c?SEN_S:SEN_N);}
+  /* El paso de cebra va pegado al nudo y cruza la calle entera, y se come las marcas de
+     esa casilla. El sentido del carril NO se pierde: se calcula antes, porque si no el
+     tráfico se quedaba sin disciplina justo en el sitio donde más falta hace.
+
+     Que la casilla de al lado sea un nudo no basta para pintar un paso: la calzada sale
+     de erosionar el trazo del plano y queda dentada, así que cualquier casilla de más a
+     un lado se mide como nudo. Se exige que el nudo tenga DOS casillas de fondo en la
+     dirección de la calle, que es lo que distingue un cruce de verdad —la calle que
+     corta tiene su ancho— de un diente del rasterizado. */
+  const p1=e===EJE_H?1:MW, hueco=d=>eje[i+d]===EJE_CRUCE&&eje[i+2*d]===EJE_CRUCE;
+  if(an>=2&&(hueco(-p1)||hueco(p1)))viaMarca[i]=_codigo(codPack(e,M_NADA,M_NADA,1));
+  else viaMarca[i]=_codigo(codPack(e,canto,centro,0));}
+ TILE.calzada=VIA_COD.map(tileCalzada);}
+
+/* Una casilla de calzada con sus marcas. El asfalto se copia del tile liso en vez de
+   volver a forjarlo: así el grano casa exactamente con la casilla de al lado y una raya
+   no deja una costura de tono a cada lado. */
+function tileCalzada(cod){
+ if(!cod)return TILE[ROAD];
+ const eje=cod&7, canto=(cod>>3)&7, centro=(cod>>6)&7, cebra=(cod>>9)&1;
+ const c=lienzo(32,32), g=c.getContext('2d');
+ g.drawImage(TILE[ROAD],0,0);
+ const H=eje===EJE_H;
+ /* Una raya a lo largo de la calle, a la altura (o en la columna) que se le diga. */
+ const raya=(d,gr,col)=>H?P(g,0,d,32,gr,col):P(g,d,0,gr,32,col);
+ /* Un trazo discontinuo: uno por casilla y centrado. La cadencia sale sola de un tile al
+    siguiente y no hay que llevar la cuenta de la fase en ningún sitio. */
+ const trazo=(d,gr,col,lg)=>{const o=(32-lg)>>1;
+  if(H)P(g,o,d,lg,gr,col);else P(g,d,o,gr,lg,col);};
+ if(cebra){
+  /* Las bandas van en el sentido de la marcha del peatón, que cruza de acera a acera:
+     perpendiculares a la calle. Estrechas y espaciadas: con bandas gordas, y habiendo un
+     cruce cada seis casillas, la ciudad entera salía a rayas blancas. */
+  for(let k=1;k<32;k+=8){if(H)P(g,k,0,3,32,C.crema);else P(g,0,k,32,3,C.crema);}
+ }else{
+  const pinta=(m,d)=>{
+   if(m===M_EJE)raya(d,2,C.crema);
+   else if(m===M_EJE_DIS)trazo(d,2,C.crema,18);
+   /* El separador de carril es la mitad de grueso y la mitad de largo que el eje: en una
+      avenida de seis carriles, con todas las rayas iguales no se ve cuál separa los dos
+      sentidos. Del mismo blanco, eso sí — con un gris apagado desaparecía al jugar. */
+   else if(m===M_CARRIL)trazo(d,1,C.crema,12);};
+  pinta(canto,0);
+  pinta(centro,15);}
+ return cuantizar(c);}
+
 /* Deflate crudo, sin cabecera: lo descomprime el navegador con DecompressionStream y
    C# con DeflateStream, los mismos bytes en los dos sitios y sin biblioteca en ninguno.
    Sin comprimir, una casilla por byte, serían 1,1 MB metidos en este archivo. */
@@ -4552,6 +4762,9 @@ async function cargarCiudad(){
  /* borde cerrado: fuera del término municipal no hay nada que visitar */
  for(let x=0;x<MW;x++){pon(x,0,EDIF);pon(x,MH-1,EDIF);}
  for(let y=0;y<MH;y++){pon(0,y,EDIF);pon(MW-1,y,EDIF);}
+ /* Y con la trama ya cerrada, el ancho y los carriles de cada calle. Después del borde a
+    propósito: la medida de una calle que llega al canto del mapa tiene que pararse ahí. */
+ trazarCalzada();
 }
 /* Qué sombrero le toca a un edificio. El tamaño manda sobre el estilo cuando el edificio
    es claramente otra cosa: una nave de sesenta casillas en un barrio de bloques sigue
@@ -7227,8 +7440,26 @@ function rejilla(c,dt,persigue){
   if(!d.length){c.tx++;return;}
   let el;
   if(persigue){d.sort((a,b)=>Math.hypot(c.tx+a[0]-player.x,c.ty+a[1]-player.y)-Math.hypot(c.tx+b[0]-player.x,c.ty+b[1]-player.y));el=d[0];}
-  else{const r=d.find(([dx,dy])=>dx===c.dx&&dy===c.dy);
-   el=(r&&azar()<.82)?r:(d.filter(([dx,dy])=>!(dx===-c.dx&&dy===-c.dy))[0]||d[0]);}
+  else{
+   /* Circular por la derecha. Cada casilla de calzada sabe el sentido de su carril, así
+      que se descartan las que vienen de cara y las rayas pintadas dejan de ser un adorno.
+
+      Lo que se prohíbe es meterse A CONTRAMANO, no cruzar. Exigir que el carril de
+      destino fuera exactamente el del movimiento —que fue el primer intento— dejaba al
+      tráfico encerrado: un coche del carril este de una calle de dos no podía pasar al
+      otro para girar, porque ese carril va al oeste, y en los cruces, donde las casillas
+      de alrededor son de cuatro calles distintas, no quedaba ningún movimiento válido y
+      el coche se ponía a dar marcha atrás contra sí mismo. Siete de dieciséis se
+      quedaban clavados. Un carril solo dice algo del movimiento que va por su eje; de
+      atravesarlo, nada.
+
+      Y si aun así no queda ninguno —puede pasar en un fondo de saco— se elige como
+      siempre: el tráfico no se puede quedar parado por una regla de pintura. */
+   const bien=d.filter(([dx,dy])=>{const s=sentidoDe(c.tx+dx,c.ty+dy);
+    return s!==(dx>0?SEN_O:dx<0?SEN_E:dy>0?SEN_N:SEN_S);});
+   const dd=bien.length?bien:d;
+   const r=dd.find(([dx,dy])=>dx===c.dx&&dy===c.dy);
+   el=(r&&azar()<.82)?r:(dd.filter(([dx,dy])=>!(dx===-c.dx&&dy===-c.dy))[0]||dd[0]);}
   c.dx=el[0];c.dy=el[1];c.tx+=el[0];c.ty+=el[1];}
  c.ang=Math.atan2(c.ty+.5-c.y,c.tx+.5-c.x);
  c.x+=Math.cos(c.ang)*c.vel*dt;c.y+=Math.sin(c.ang)*c.vel*dt;}
@@ -7498,13 +7729,13 @@ function tileDe(x,y,fa){
  if(t===EDIF)return TILE.tejados[roof[y*MW+x]]||TILE.tejados[0];
  if(t===AGUA)return TILE.agua[fa];
  if(t===ROAD){
+  const m=viaMarca[y*MW+x];
+  /* La tapa de registro y la grieta solo donde no hay pintura: una alcantarilla en mitad
+     del eje parte la línea y se ve desde el otro lado de la calle. */
+  if(m)return TILE.calzada[m];
   const h=hash(x,y);
   if(h%37===0)return TILE.alcantarilla;
   if(h%19===0)return TILE.roadGrieta;
-  const vertical=rodable(x,y-1)&&rodable(x,y+1)&&!rodable(x-1,y)&&!rodable(x+1,y);
-  const horiz=rodable(x-1,y)&&rodable(x+1,y)&&!rodable(x,y-1)&&!rodable(x,y+1);
-  if(vertical)return TILE.lineaV;
-  if(horiz)return TILE.lineaH;
   return TILE[ROAD];}
  if(t===ACERA){const D=distDe(x,y);
   if(D.estilo==='denso')return TILE.adoquin;
@@ -7545,7 +7776,14 @@ function dibCiudad(){
  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
   ctx.drawImage(tileDe(x,y,fa),x*TS,y*TS);
   const t=map[y*MW+x],h=hash(x,y);
-  if(t===ACERA){
+  if(t===ROAD){
+   /* Una flecha cada tantas casillas del mismo carril. Pintarlas todas sería una alfombra
+      de flechas; esto deja una cada ocho o nueve casillas de carril, que es más o menos
+      lo que hay en la calle. */
+   const s=viaSentido[y*MW+x];
+   if(s&&h%23===0)ctx.drawImage(FLECHA_VIA[s],x*TS,y*TS);}
+  else if(t===ACERA){
+   const b=bordeDe(x,y);if(b)ctx.drawImage(BORDE[b],x*TS,y*TS);
    if(h%29===0)ctx.drawImage(PROP.farola,x*TS+10,y*TS+2);
    else if(h%43===0)ctx.drawImage(PROP.contenedor,x*TS+5,y*TS+8);
    else if(h%47===0)ctx.drawImage(PROP.contenedor2,x*TS+5,y*TS+8);

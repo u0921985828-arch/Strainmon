@@ -70,6 +70,9 @@ public class Juego : MonoBehaviour {
 
         // ── ciudad ──
         Ciudad.Generar();          yield return null;
+        // Después de la ciudad y antes del render: las marcas viales se forjan a la carta,
+        // una por combinación de carriles que de verdad sale en el plano.
+        Forja.GenerarCalzada();    yield return null;
 
         // Los sitios van antes que el render: los singulares se colocan alrededor del
         // rótulo de su sitio, y es el render el que los pinta.

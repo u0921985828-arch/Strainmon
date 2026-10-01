@@ -206,6 +206,69 @@ plancha lisa.
 chasis y dieciocho arquetipos según el estilo: taxis y gabardinas por la Gran Vía, monos de
 faena y camiones en Zorrotzaurre, motos por el Casco.
 
+### La calle tiene ancho, carriles y sentido
+
+El plano trae el **ancho real** de cada calle —un callejón del Casco Viejo y la Gran Vía
+son la misma línea con distinto grosor— pero el juego lo pintaba todo del mismo gris y
+solo rayaba las calles de **una** casilla de ancho, que es justo donde no cabe una raya.
+Desde arriba, una avenida de cinco carriles y un callejón eran la misma mancha.
+
+`trazarCalzada()` (HTML) y `Ciudad.TrazarCalzada()` (Unity) miden el corredor en tres
+pasadas y dejan dos bytes por casilla: el índice de su tile de marca y el sentido de su
+carril.
+
+**La calle es la tirada corta.** De cada casilla se mide la tirada de asfalto en
+horizontal y en vertical; la pequeña es el ancho y la otra dice por dónde va la calle.
+El nudo sale gratis: en un cruce las dos son largas, así que la pequeña pasa de
+`ANCHO_MAX` y la casilla queda sin pintar. **No hay detector de cruces en ningún sitio.**
+`ANCHO_MAX = 8` (41 m) sale de medir el plano: el 94 % de la calzada de Bilbao tiene ocho
+casillas o menos.
+
+Las **diagonales** no llevan tratamiento aparte y no lo necesitan: la Gran Vía corta en
+vertical poco más que su ancho y en horizontal el triple, así que la pasada por filas y
+columnas ya la da por horizontal. Se quedan sin marcar los 45° de verdad, que son las
+revueltas de Artxanda.
+
+Lo que se pinta, de la geometría:
+
+| ancho | qué sale |
+|---|---|
+| 1 | nada: no cabe |
+| 2 | eje **discontinuo** — un carril por sentido, se puede adelantar |
+| 3+ | eje **continuo**, y un separador de carril por cada canto interior a una casilla o más del centro |
+
+Tres cosas que costaron un intento cada una:
+
+- **Cada casilla pinta solo su canto de arriba** (o de la izquierda), más su centro si el
+  ancho es impar. Si las dos vecinas pintan media línea cada una, a 32 píxeles salen dos
+  rayas finas en vez de una. El canto 0 es el bordillo y no lleva pintura.
+- **La casilla por la que pasa el eje no tiene sentido**: es mitad de cada uno. Dárselo a
+  uno ponía una flecha encima de la línea continua, que es lo contrario de lo que
+  significa.
+- **El paso de cebra exige que el nudo tenga dos casillas de fondo.** La calzada sale de
+  erosionar el trazo del plano y queda dentada, así que con una sola casilla la ciudad
+  entera salía a rayas blancas.
+
+**Se circula por la derecha**, y las rayas no son un adorno: el tráfico de rejilla
+descarta el movimiento que se mete **a contramano**. Solo eso — exigir que el carril de
+destino fuera el del movimiento dejaba siete de dieciséis coches clavados, porque un
+coche no podía cruzar el carril contrario para girar. Un carril dice algo del movimiento
+que va por su eje; de atravesarlo, nada.
+
+El **bordillo** y las **flechas** van sueltos, encima del tile, y no dentro de él: la
+acera cambia de material según el barrio y metido en el tile harían falta cuatro juegos
+de dieciséis. La tapa del bordillo es piedra clara en los cuatro cantos —oscurecer la del
+lado en sombra no la pone en sombra, la borra—; lo que dice de dónde viene la luz es la
+sombra que **echa**, al sur y al este.
+
+El arte de la calle no se puede juzgar en una captura del juego: siempre hay un coche, un
+contenedor o una farola encima. Para eso está la hoja de contacto:
+
+```bash
+node herramientas/html/calzada.js            # una calle de cada ancho, el paso y los 16 bordillos
+node herramientas/html/calzada.js --esc 4
+```
+
 ## Los edificios singulares
 
 Trece sitios —San Mamés, el Guggenheim, el Arriaga, el Ayuntamiento, la catedral, Begoña,
@@ -467,6 +530,7 @@ node herramientas/html/iconos.js      # todos los iconos en una hoja, a dos tama
 node herramientas/html/personajes.js  # las hojas de personaje, para juzgarlas
 node herramientas/html/personajes.js --esc 8 --que protagonista,ertzaina
 node herramientas/html/captura.js    # el juego en marcha, para ver el arte en la calle
+node herramientas/html/calzada.js     # las marcas viales, calle por calle y ancho por ancho
 node herramientas/html/fuentes.js     # seis fuentes en una imagen, para elegir
 python3 herramientas/sprites/pixellab.py --mcp       # recorta las hojas traídas del MCP
 python3 herramientas/sprites/pixellab.py --mano      # las 385 celdas, sin red ni clave

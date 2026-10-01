@@ -9,7 +9,7 @@ namespace BilboCity {
 /// de los bloques). Usa Tiles creados en memoria a partir de los sprites de la forja.
 /// </summary>
 public class RenderCiudad : MonoBehaviour {
-    Tilemap _suelo, _detalle;
+    Tilemap _suelo, _viario, _detalle;
     Tile _sombraAbajo, _luzArriba;
     Tile _aguaA, _aguaB;
     float _relojAgua;
@@ -36,13 +36,15 @@ public class RenderCiudad : MonoBehaviour {
         grid.cellSize = new Vector3(1,1,0);
 
         _suelo   = NuevoTilemap(grid.transform, "Suelo", 0);
-        _detalle = NuevoTilemap(grid.transform, "Detalle", 1);
+        // El bordillo y las flechas van en su propia capa, encima del suelo y debajo de la
+        // sombra de los bloques: son transparentes y no pueden ser el tile de la casilla.
+        _viario  = NuevoTilemap(grid.transform, "Viario", 1);
+        _detalle = NuevoTilemap(grid.transform, "Detalle", 2);
 
         // cache de tiles por nombre de sprite
         var T = Forja.Tiles;
         _aguaA = TileDe(T["agua0"]); _aguaB = TileDe(T["agua1"]);
         var road = TileDe(T["road"]); var roadG = TileDe(T["roadGrieta"]);
-        var lineaH = TileDe(T["lineaH"]); var lineaV = TileDe(T["lineaV"]);
         var alcant = TileDe(T["alcantarilla"]);
         var acera = TileDe(T["acera"]); var aceraG = TileDe(T["aceraGast"]);
         var adoquin = TileDe(T["adoquin"]); var adoquinR = TileDe(T["adoquinRojo"]);
@@ -54,9 +56,16 @@ public class RenderCiudad : MonoBehaviour {
         var puente = TileDe(T["puente"]); var muelle = TileDe(T["muelle"]);
         var tejados = new Tile[Forja.Tejados.Length];
         for (int i = 0; i < tejados.Length; i++) tejados[i] = TileDe(Forja.Tejados[i]);
+        var calzada = new Tile[Forja.Calzada.Length];
+        for (int i = 1; i < calzada.Length; i++) calzada[i] = TileDe(Forja.Calzada[i]);
+        var bordes = new Tile[16];
+        for (int i = 1; i < 16; i++) bordes[i] = TileDe(Forja.Borde[i]);
+        var flechas = new Tile[5];
+        for (int i = Ciudad.SenE; i <= Ciudad.SenN; i++) flechas[i] = TileDe(Forja.FlechaVia[i]);
 
         int MW = Ciudad.MW, MH = Ciudad.MH;
         var bloque = new TileBase[MW*MH];
+        var viario = new TileBase[MW*MH];
         // Un tile por trozo de singular. Se cachean porque el estadio son ochocientas
         // casillas y crear un Tile por cada una en el bucle grande es tirar memoria.
         var singular = new Dictionary<Sprite,Tile>();
@@ -64,6 +73,19 @@ public class RenderCiudad : MonoBehaviour {
             for (int x = 0; x < MW; x++) {
                 var t = Ciudad.T(x,y);
                 Tile elegido;
+                // El viario se decide antes que el suelo y aparte de él: un singular puede
+                // ocupar una acera, y el bordillo de esa acera se sigue viendo.
+                if (t == Suelo.Road) {
+                    // Una flecha cada tantas casillas del mismo carril. Pintarlas todas
+                    // sería una alfombra; esto deja una cada ocho o nueve casillas de
+                    // carril, que es más o menos lo que hay en la calle.
+                    int sen = Ciudad.ViaSentido[y*MW+x];
+                    if (sen != Ciudad.SenNo && Utiles.Hash(x,y) % 23 == 0)
+                        viario[(MH-1-y)*MW + x] = flechas[sen];
+                } else if (t == Suelo.Acera) {
+                    int b = Ciudad.BordeDe(x,y);
+                    if (b != 0) viario[(MH-1-y)*MW + x] = bordes[b];
+                }
                 // El estadio, la catedral, el Ayuntamiento: donde hay singular manda el
                 // singular, y el tejado genérico no llega a verse.
                 var trozo = Singulares.En(x,y);
@@ -77,14 +99,14 @@ public class RenderCiudad : MonoBehaviour {
                     case Suelo.Edif: elegido = tejados[Ciudad.Roof[y*MW+x]]; break;
                     case Suelo.Agua: elegido = _aguaA; break;
                     case Suelo.Road: {
+                        // La marca manda sobre el detalle: una tapa de alcantarilla en
+                        // mitad de la línea continua la partiría.
+                        int m = Ciudad.ViaMarca[y*MW+x];
+                        if (m != 0) { elegido = calzada[m]; break; }
                         int h = Utiles.Hash(x,y);
                         if (h % 37 == 0) elegido = alcant;
                         else if (h % 19 == 0) elegido = roadG;
-                        else {
-                            bool vert = Ciudad.Rodable(x,y-1) && Ciudad.Rodable(x,y+1) && !Ciudad.Rodable(x-1,y) && !Ciudad.Rodable(x+1,y);
-                            bool horz = Ciudad.Rodable(x-1,y) && Ciudad.Rodable(x+1,y) && !Ciudad.Rodable(x,y-1) && !Ciudad.Rodable(x,y+1);
-                            elegido = vert ? lineaV : (horz ? lineaH : road);
-                        }
+                        else elegido = road;
                         break;
                     }
                     case Suelo.Acera: {
@@ -113,6 +135,7 @@ public class RenderCiudad : MonoBehaviour {
                 bloque[(MH-1-y)*MW + x] = elegido;
             }
         _suelo.SetTilesBlock(new BoundsInt(0, 0, 0, MW, MH, 1), bloque);
+        _viario.SetTilesBlock(new BoundsInt(0, 0, 0, MW, MH, 1), viario);
 
         // contorno y sombra proyectada de los bloques
         _sombraAbajo   = TilePlano(new Color32(0,0,0,86), Forja.TS);

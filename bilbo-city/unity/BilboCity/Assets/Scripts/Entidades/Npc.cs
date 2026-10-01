@@ -168,12 +168,33 @@ public class Rejilla : MonoBehaviour {
                 if (dd < mejor) { mejor = dd; el = d; }
             }
         } else {
+            // Circular por la derecha. Cada casilla de calzada sabe el sentido de su
+            // carril, así que se descartan las que vienen de cara y las rayas pintadas
+            // dejan de ser un adorno.
+            //
+            // Lo que se prohíbe es meterse A CONTRAMANO, no cruzar. Exigir que el carril
+            // de destino fuera exactamente el del movimiento dejaba al tráfico encerrado:
+            // un coche del carril este de una calle de dos no podía pasar al otro para
+            // girar, porque ese carril va al oeste, y en los cruces, donde las casillas de
+            // alrededor son de cuatro calles distintas, no quedaba ningún movimiento
+            // válido. Un carril solo dice algo del movimiento que va por su eje; de
+            // atravesarlo, nada.
+            //
+            // Y si aun así no queda ninguno —puede pasar en un fondo de saco— se elige
+            // como siempre: el tráfico no se puede quedar parado por una regla de pintura.
+            var bien = new List<Vector2Int>();
+            foreach (var d in opciones) {
+                int contra = d.x > 0 ? Ciudad.SenO : d.x < 0 ? Ciudad.SenE
+                           : d.y > 0 ? Ciudad.SenN : Ciudad.SenS;
+                if (Ciudad.SentidoDe(Tx + d.x, Ty + d.y) != contra) bien.Add(d);
+            }
+            var dd = bien.Count > 0 ? bien : opciones;
             Vector2Int recto = new Vector2Int(Dx, Dy);
-            bool puedeRecto = opciones.Contains(recto);
+            bool puedeRecto = dd.Contains(recto);
             if (puedeRecto && Random.value < 0.82f) el = recto;
             else {
-                el = opciones[0];
-                foreach (var d in opciones) if (!(d.x == -Dx && d.y == -Dy)) { el = d; break; }
+                el = dd[0];
+                foreach (var d in dd) if (!(d.x == -Dx && d.y == -Dy)) { el = d; break; }
             }
         }
         Dx = el.x; Dy = el.y; Tx += el.x; Ty += el.y;
