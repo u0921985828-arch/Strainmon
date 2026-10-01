@@ -649,6 +649,53 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       ok(!sobran, 'hay bordillo en una acera que no da a la calzada');
       ok(!faltan, 'hay acera pegada a la calzada sin bordillo');
 
+      // El vado y la línea de detención son las dos marcas que dicen DÓNDE empieza el
+      // cruce, y las dos cuelgan del paso de cebra: si el paso se deja de detectar, las
+      // dos desaparecen calladas y la calle vuelve a ser una mancha con rayas.
+      let pasos = 0, llegadas = 0, sinParada = 0, vados = 0, vadoSinPaso = 0;
+      for (let y = 1; y < A.MH - 1; y++)
+        for (let x = 1; x < A.MW - 1; x++) {
+          const i = y * A.MW + x;
+          if (A.map[i] === A.ROAD) {
+            const cod = A.VIA_COD[A.viaMarca[i]];
+            if (!((cod >> 9) & 1)) continue;
+            pasos++;
+            // Lo que de verdad importa no es cuántas líneas hay, sino que no falte
+            // ninguna donde toca y que no sobre ninguna donde no: la lleva el carril que
+            // DESEMBOCA en el paso, y no el que sale de él. Esa es toda la diferencia
+            // entre pintura y pintura con sentido, y es lo que se rompe callado.
+            const p1 = (cod & 7) === A.EJE_H ? 1 : A.MW;
+            for (const d of [-p1, p1]) {
+              const j = i + d, v = A.VIA_COD[A.viaMarca[j]];
+              // Mismo eje: en los bordes dentados del rasterizado la casilla de al
+              // lado se mide a veces por la otra dirección, y entonces el paso no cae en
+              // su calle y no tiene por qué pararla.
+              if (v === undefined || (v & 7) !== (cod & 7) || ((v >> 9) & 1)) continue;
+              const s = A.viaSentido[j];
+              const hacia = d > 0 ? (s === A.SEN_O || s === A.SEN_N)
+                                  : (s === A.SEN_E || s === A.SEN_S);
+              if (!hacia && s) continue;        // el carril de salida: no lleva línea
+              llegadas++;
+              if (!((v >> 10) & 3)) sinParada++;
+            }
+          } else if (A.map[i] === A.ACERA) {
+            const mv = A.bordeDe(x, y) >> 4;
+            if (!mv) continue;
+            vados++;
+            const pegado = [[0,-1,1],[1,0,2],[0,1,4],[-1,0,8]].some(([dx, dy, bit]) => {
+              if (!(mv & bit)) return false;
+              const j = (y+dy) * A.MW + x+dx;
+              return A.map[j] === A.ROAD && A.VIA_CEBRA[A.viaMarca[j]];
+            });
+            if (!pegado) vadoSinPaso++;
+          }
+        }
+      ok(pasos > 200 && llegadas > 200 && !sinParada,
+        pasos + ' pasos de cebra, ' + sinParada + ' de ' + llegadas +
+        ' llegadas sin línea de detención');
+      ok(vados > 100 && !vadoSinPaso,
+        vados + ' vados, ' + vadoSinPaso + ' de ellos sin paso de cebra al lado');
+
       // Y la disciplina de carril. Se mide solo cuando el coche se mueve POR el eje del
       // carril: atravesarlo para girar o para cruzar un cruce es legal y contarlo como
       // infracción daba un 50 % que no quería decir nada.
@@ -679,9 +726,10 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       // Lo que esta prueba tiene que cazar es que la regla deje de aplicarse, y eso se
       // ve enseguida — sin ella el tráfico sale a la mitad, que es echarlo a suertes.
       ok(cum > 80, 'el tráfico circula por su carril solo el ' + cum.toFixed(0) + '% de las veces');
-      if (!sobran && !faltan && !parados && cum > 80)
+      if (!sobran && !faltan && !parados && !sinParada && !vadoSinPaso && cum > 80)
         bien.push('calzada: ' + pct.toFixed(0) + '% con carril en ' + A.VIA_COD.length
-          + ' marcas, bordillo correcto y tráfico por la derecha el ' + cum.toFixed(0) + '%');
+          + ' marcas, ' + pasos + ' pasos con su línea de detención y su vado, y tráfico'
+          + ' por la derecha el ' + cum.toFixed(0) + '%');
     }
 
     // ── 6 · combate ────────────────────────────────────────────────────

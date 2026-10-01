@@ -258,10 +258,11 @@ public static class Forja {
     public static void GenerarCalzada() {
         if (_atlasVia != null || _roadBase == null) return;
         int n = Ciudad.ViaCod.Count;
-        var hojas = new List<Lienzo>(n + 20);
+        var hojas = new List<Lienzo>(n + Ciudad.BordeCod.Count + 4);
         for (int i = 0; i < n; i++) hojas.Add(TileCalzada(Ciudad.ViaCod[i]));
-        var bord = Bordillos(); for (int i = 0; i < 16; i++) hojas.Add(bord[i]);
-        var flec = Flechas();   for (int i = 0; i < 4;  i++) hojas.Add(flec[i]);
+        int nb = Ciudad.BordeCod.Count;
+        for (int i = 0; i < nb; i++) hojas.Add(TileBordillo(Ciudad.BordeCod[i]));
+        var flec = Flechas(); for (int i = 0; i < 4; i++) hojas.Add(flec[i]);
 
         int cols = 8, filas = Mathf.CeilToInt(hojas.Count / (float)cols);
         int aw = cols * TS, ah = filas * TS;
@@ -271,14 +272,14 @@ public static class Forja {
         Paleta.Cuantizar(px);
         _atlasVia = Utiles.Textura(aw, ah, px);
 
-        Calzada = new Sprite[n]; Borde = new Sprite[16]; FlechaVia = new Sprite[5];
+        Calzada = new Sprite[n]; Borde = new Sprite[nb]; FlechaVia = new Sprite[5];
         for (int i = 0; i < hojas.Count; i++) {
             var sp = Utiles.Rebanada(_atlasVia, (i % cols) * TS, ah - ((i / cols) + 1) * TS, TS, TS, 0f, 0f);
             if (i < n) Calzada[i] = sp;
-            else if (i < n + 16) Borde[i - n] = sp;
+            else if (i < n + nb) Borde[i - n] = sp;
             // Las flechas se guardan por sentido, no por orden: así el render indexa con
             // lo que trae la casilla y no hay tabla que mantener en dos sitios.
-            else FlechaVia[i - n - 16 + Ciudad.SenE] = sp;
+            else FlechaVia[i - n - nb + Ciudad.SenE] = sp;
         }
     }
 
@@ -287,7 +288,8 @@ public static class Forja {
         var L = new Lienzo(TS, TS);
         System.Array.Copy(_roadBase.Px, L.Px, L.Px.Length);
         if (cod == 0) return L;
-        int eje = cod & 7, canto = (cod>>3) & 7, centro = (cod>>6) & 7, cebra = (cod>>9) & 1;
+        int eje = cod & 7, canto = (cod>>3) & 7, centro = (cod>>6) & 7,
+            cebra = (cod>>9) & 1, parada = (cod>>10) & 3;
         bool h = eje == Ciudad.EjeH;
         if (cebra != 0) {
             // Las bandas van en el sentido de la marcha del peatón, que cruza de acera a
@@ -299,6 +301,14 @@ public static class Forja {
         } else {
             Pinta(L, h, canto, 0);
             Pinta(L, h, centro, 15);
+        }
+        // La línea de detención: gorda y atravesada, y RETRANQUEADA seis píxeles —poco más
+        // de un metro— y no pegada al paso. Tres píxeles, que es más que el eje: en la
+        // calle es la raya más ancha que hay, y a ras del canto se leería como una banda
+        // más de la cebra.
+        if (parada != 0) {
+            int d = parada == Ciudad.DAlto ? 23 : 6;
+            if (h) L.P(d,0,3,32,Paleta.Crema); else L.P(0,d,32,3,Paleta.Crema);
         }
         return L;
     }
@@ -323,10 +333,10 @@ public static class Forja {
     /// encima del tile, y no dentro de él: la acera cambia de material según el barrio
     /// —losa, adoquín, adoquín rojo, losa gastada— y metido en el tile harían falta cuatro
     /// juegos de dieciséis. Encima vale uno.
-    static Lienzo[] Bordillos() {
-        var r = new Lienzo[16];
-        for (int m = 0; m < 16; m++) {
-            var L = new Lienzo(TS, TS);
+    static Lienzo TileBordillo(int cod) {
+        var L = new Lienzo(TS, TS);
+        {
+            int m = cod & 15, mv = (cod>>4) & 15;
             // La tapa del bordillo es piedra limpia y va clara en los cuatro cantos:
             // oscurecer la del lado en sombra no la pone en sombra, la borra. Lo que dice
             // de qué lado viene la luz es la sombra que el bordillo ECHA, y con la luz de
@@ -335,9 +345,24 @@ public static class Forja {
             if ((m & 8) != 0) { L.P(0,0,2,32,Paleta.Hueso); L.P(2,0,1,32,Paleta.HormigonO); }
             if ((m & 2) != 0) { L.P(28,0,2,32,Paleta.Hueso); L.P(30,0,2,32,Paleta.AsfaltoO); }
             if ((m & 4) != 0) { L.P(0,28,32,2,Paleta.Hueso); L.P(0,30,32,2,Paleta.AsfaltoO); }
-            r[m] = L;
+            // El vado. Donde cae el paso de cebra el bordillo está rebajado, y eso se
+            // contaba NO dibujando nada: la acera llegaba al asfalto a hueso y el hueco
+            // parecía un olvido. Un vado se ve desde arriba por dos cosas, y las dos caben
+            // en tres píxeles: la rampa, que baja y queda en sombra con una junta oscura a
+            // ras —al revés que la piedra clara del bordillo, y esa inversión es la que se
+            // lee de lejos— y el pavimento táctil de botones, que lo confirma de cerca.
+            if ((mv & 1) != 0) Vado(L, 0,0,32,1,  0,1,32,2,  3,3,  5,0);
+            if ((mv & 4) != 0) Vado(L, 0,31,32,1, 0,29,32,2, 3,27, 5,0);
+            if ((mv & 8) != 0) Vado(L, 0,0,1,32,  1,0,2,32,  3,3,  0,5);
+            if ((mv & 2) != 0) Vado(L, 31,0,1,32, 29,0,2,32, 27,3, 0,5);
         }
-        return r;
+        return L;
+    }
+    static void Vado(Lienzo L, int jx, int jy, int jw, int jh,
+                     int rx, int ry, int rw, int rh, int bx, int by, int px, int py) {
+        L.P(rx,ry,rw,rh,Paleta.HormigonO);
+        L.P(jx,jy,jw,jh,Paleta.AsfaltoO);
+        for (int k = 0; k < 6; k++) L.P(bx + k*px, by + k*py, 2, 2, Paleta.Hueso);
     }
 
     /// <summary>La flecha del carril, pintada en el suelo, en los cuatro sentidos.</summary>

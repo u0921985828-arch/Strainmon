@@ -54,7 +54,8 @@ js=js.slice(0,i)+`global.__={S,player,MISIONES,empezarMision,avanzarPaso,objetiv
  BASES,cargarSprites,setDe,lutDe,hojaDeSet,TORSOS,PIERNAS,CALZADO,C,COMPLEX,
  viaMarca,viaSentido,VIA_COD,VIA_CEBRA,sentidoDe,BORDE,FLECHA_VIA,bordeDe,trazarCalzada,
  EJE_H,EJE_V,EJE_CRUCE,SEN_NO,SEN_E,SEN_O,SEN_S,SEN_N,ANCHO_MAX,
- codPack,tileCalzada,M_NADA,M_EJE,M_EJE_DIS,M_CARRIL,trafico};
+ codPack,tileCalzada,M_NADA,M_EJE,M_EJE_DIS,M_CARRIL,trafico,
+ D_NO,D_BAJO,D_ALTO,bordeMarca,BORDE_COD,tileBordillo,trazarBordillos};
  sembrar(SEMILLA);`+js.slice(i);
 eval(js);
 module.exports={H,step:n=>{for(let k=0;k<n;k++){now+=16.7;const f=raf;raf=null;if(!f)throw new Error('sin frame');f(now);}},

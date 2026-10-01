@@ -114,6 +114,9 @@ public static class Ciudad {
     public const int SenNo = 0, SenE = 1, SenO = 2, SenS = 3, SenN = 4;
     /// <summary>Qué puede llevar el canto de arriba (o de la izquierda) de una casilla, y su centro.</summary>
     public const int MNada = 0, MEje = 1, MEjeDis = 2, MCarril = 3;
+    /// <summary>Y dónde para la línea de detención: en el canto bajo de la casilla, en el
+    /// alto, o en ninguno. Es la única marca que va ATRAVESADA a la calle y no a lo largo.</summary>
+    public const int DNo = 0, DBajo = 1, DAlto = 2;
 
     /// Por casilla, dos bytes y no cinco: el índice de su tile de calzada —que ya resume el
     /// eje y las marcas— y el sentido de su carril, que hace falta suelto para el tráfico.
@@ -128,8 +131,8 @@ public static class Ciudad {
     static readonly System.Collections.Generic.Dictionary<int,int> _viaIdx =
         new System.Collections.Generic.Dictionary<int,int> { {0,0} };
 
-    public static int CodPack(int eje, int canto, int centro, int cebra) {
-        return eje | (canto<<3) | (centro<<6) | (cebra<<9);
+    public static int CodPack(int eje, int canto, int centro, int cebra, int parada) {
+        return eje | (canto<<3) | (centro<<6) | (cebra<<9) | (parada<<10);
     }
     static int Codigo(int cod) {
         int i;
@@ -145,20 +148,50 @@ public static class Ciudad {
         return ViaSentido[y*MW+x];
     }
 
-    /// <summary>Qué cantos de una acera dan a la calzada. Donde hay paso de cebra no se pone
-    /// bordillo: ahí está rebajado, que es por donde se cruza.</summary>
-    static bool ABordillo(int x, int y) {
+    /// <summary>Qué cantos de una acera dan a la calzada y cuáles dan a un paso de cebra.</summary>
+    /// Los cuatro bits bajos son bordillo y los cuatro altos vado: donde cruza el paso, el
+    /// bordillo está rebajado, que es por donde se baja a la calle.
+    static bool ACalzada(int x, int y) {
         if (x < 0 || y < 0 || x >= MW || y >= MH) return false;
-        int i = y*MW+x;
-        return Map[i] == (byte)Suelo.Road && !ViaCebra[ViaMarca[i]];
+        return Map[y*MW+x] == (byte)Suelo.Road;
     }
+    static bool ACebra(int x, int y) { return ACalzada(x,y) && ViaCebra[ViaMarca[y*MW+x]]; }
+    static readonly int[] _ladoX = {0,1,0,-1}, _ladoY = {-1,0,1,0};
     public static int BordeDe(int x, int y) {
-        int m = 0;
-        if (ABordillo(x, y-1)) m |= 1;
-        if (ABordillo(x+1, y)) m |= 2;
-        if (ABordillo(x, y+1)) m |= 4;
-        if (ABordillo(x-1, y)) m |= 8;
-        return m;
+        int m = 0, mv = 0;
+        for (int k = 0; k < 4; k++) {
+            int nx = x + _ladoX[k], ny = y + _ladoY[k];
+            if (!ACalzada(nx,ny)) continue;
+            if (ACebra(nx,ny)) mv |= 1<<k; else m |= 1<<k;
+        }
+        return m | (mv<<4);
+    }
+
+    /// <summary>El índice del tile de bordillo de cada casilla, calculado de una vez con la
+    /// calzada: el render deja de mirar a los cuatro vecinos en cada fotograma.</summary>
+    public static readonly byte[] BordeMarca = new byte[MW*MH];
+    public static readonly System.Collections.Generic.List<int> BordeCod =
+        new System.Collections.Generic.List<int> { 0 };
+    static readonly System.Collections.Generic.Dictionary<int,int> _bordeIdx =
+        new System.Collections.Generic.Dictionary<int,int> { {0,0} };
+
+    static void TrazarBordillos() {
+        Array.Clear(BordeMarca, 0, BordeMarca.Length);
+        BordeCod.Clear(); BordeCod.Add(0);
+        _bordeIdx.Clear(); _bordeIdx[0] = 0;
+        for (int y = 0; y < MH; y++)
+            for (int x = 0; x < MW; x++) {
+                int i = y*MW+x;
+                if (Map[i] != (byte)Suelo.Acera) continue;
+                int cod = BordeDe(x,y);
+                if (cod == 0) continue;
+                int k;
+                if (!_bordeIdx.TryGetValue(cod, out k)) {
+                    if (BordeCod.Count >= 256) continue;
+                    k = BordeCod.Count; BordeCod.Add(cod); _bordeIdx[cod] = k;
+                }
+                BordeMarca[i] = (byte)k;
+            }
     }
 
     public static void TrazarCalzada() {
@@ -201,6 +234,7 @@ public static class Ciudad {
         }
         // Y la tercera: de la geometría a la pintura. Va aparte porque el paso de cebra mira
         // a la casilla de al lado y en la segunda pasada todavía no está medida.
+        var cebra = new byte[MW*MH]; var cantoDe = new byte[MW*MH]; var centroDe = new byte[MW*MH];
         for (int i = 0; i < MW*MH; i++) {
             int e = eje[i];
             if (e != EjeH && e != EjeV) continue;
@@ -244,10 +278,32 @@ public static class Ciudad {
             // cruce de verdad —la calle que corta tiene su ancho— de un diente del
             // rasterizado.
             int p1 = e == EjeH ? 1 : MW;
-            bool cebra = an >= 2 && (Hueco(eje, i, -p1) || Hueco(eje, i, p1));
-            ViaMarca[i] = (byte)(cebra ? Codigo(CodPack(e, MNada, MNada, 1))
-                                       : Codigo(CodPack(e, canto, centro, 0)));
+            if (an >= 2 && (Hueco(eje, i, -p1) || Hueco(eje, i, p1))) cebra[i] = 1;
+            cantoDe[i] = (byte)canto; centroDe[i] = (byte)centro;
         }
+        // Cuarta: la línea de detención. Va en su propia pasada porque mira si la casilla
+        // de al lado es un paso de cebra, y eso no se sabe hasta que la tercera ha terminado.
+        //
+        // Solo la pinta el que LLEGA al paso: es lo que distingue la entrada del cruce de
+        // la salida, y sin ella el paso de cebra flota en mitad del asfalto. La casilla por
+        // la que va el eje no tiene sentido —es mitad de cada uno— y ahí la línea se pinta
+        // igual del lado donde esté el paso, que es lo que hace la pintura de verdad: las
+        // dos se tocan en el eje en vez de dejar un hueco de cinco metros.
+        for (int i = 0; i < MW*MH; i++) {
+            int e = eje[i];
+            if (e != EjeH && e != EjeV) continue;
+            if (cebra[i] != 0) { ViaMarca[i] = (byte)Codigo(CodPack(e, MNada, MNada, 1, DNo)); continue; }
+            int p1 = e == EjeH ? 1 : MW;
+            bool alta = i+p1 < cebra.Length && cebra[i+p1] != 0;
+            bool baja = i-p1 >= 0 && cebra[i-p1] != 0;
+            int s = ViaSentido[i];
+            int parada = DNo;
+            if ((s == SenE || s == SenS) && alta) parada = DAlto;
+            else if ((s == SenO || s == SenN) && baja) parada = DBajo;
+            else if (s == SenNo) parada = alta ? DAlto : baja ? DBajo : DNo;
+            ViaMarca[i] = (byte)Codigo(CodPack(e, cantoDe[i], centroDe[i], 0, parada));
+        }
+        TrazarBordillos();
     }
     static bool Hueco(byte[] eje, int i, int d) {
         int a = i+d, b = i+2*d;

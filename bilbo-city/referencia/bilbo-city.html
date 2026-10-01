@@ -4347,7 +4347,7 @@ function generarProps(){
     aquí arriba y apoyada por el pie, así que entra donde estaba la forjada y se planta
     igual. Las fachadas no se tocan — van por tramos de doce píxeles y no son muebles. */
  for(const k in (ARTE_IMG.muebles||{}))if(PROP[k])PROP[k]=ARTE_IMG.muebles[k];
- generarBordillos();generarFlechas();
+ generarFlechas();
 }
 
 /*═══════════════ BORDILLO Y FLECHAS DE CARRIL ═══════════════*/
@@ -4358,10 +4358,14 @@ function generarProps(){
    Va suelto, encima del tile, y no dentro de él: la acera cambia de material según el
    barrio —losa, adoquín, adoquín rojo, losa gastada— y metido en el tile harían falta
    cuatro juegos de dieciséis. Encima vale uno. */
-const BORDE=[];
-function generarBordillos(){
- for(let m=0;m<16;m++){
-  if(!m){BORDE[m]=null;continue;}
+/* Como la calzada: un tile por combinación que de verdad sale en el mapa, y la casilla
+   guarda el índice. Con el vado son dos máscaras de cuatro bits —los cantos que dan a la
+   calzada y los que dan a un paso de cebra— y las 256 parejas no se forjan todas. */
+const BORDE=[], BORDE_COD=[0], _bordeIdx=new Map([[0,0]]);
+function tileBordillo(cod){
+ if(!cod)return null;
+ {
+  const m=cod&15, mv=(cod>>4)&15;
   const c=lienzo(32,32),g=c.getContext('2d');
   /* La tapa del bordillo es piedra limpia y va clara en los cuatro cantos: oscurecer la
      del lado en sombra —que fue el primer intento— no la pone en sombra, la borra. Lo
@@ -4373,19 +4377,49 @@ function generarBordillos(){
   if(m&8){P(g,0,0,2,32,C.hueso);P(g,2,0,1,32,C.hormigonO);}
   if(m&2){P(g,28,0,2,32,C.hueso);P(g,30,0,2,32,C.asfaltoO);}
   if(m&4){P(g,0,28,32,2,C.hueso);P(g,0,30,32,2,C.asfaltoO);}
-  BORDE[m]=cuantizar(c);}}
-/* Qué cantos de una acera dan a la calzada. Donde hay paso de cebra no se pone bordillo:
-   ahí está rebajado, que es por donde se cruza. */
-const aBordillo=(x,y)=>{
- if(x<0||y<0||x>=MW||y>=MH)return false;
- const i=y*MW+x;
- return map[i]===ROAD&&!VIA_CEBRA[viaMarca[i]];};
-function bordeDe(x,y){let m=0;
- if(aBordillo(x,y-1))m|=1;
- if(aBordillo(x+1,y))m|=2;
- if(aBordillo(x,y+1))m|=4;
- if(aBordillo(x-1,y))m|=8;
- return m;}
+  /* El vado. Donde cae el paso de cebra el bordillo está rebajado, y hasta ahora eso se
+     contaba NO dibujando nada: la acera llegaba al asfalto a hueso y el hueco parecía un
+     olvido. Un vado de verdad se ve desde arriba por dos cosas, y las dos caben en tres
+     píxeles: la rampa, que baja y queda en sombra, y el pavimento táctil de botones que
+     avisa al que no ve de que ahí se acaba la acera. */
+  /* El canto del vado va al revés que el del bordillo: una junta OSCURA a ras en vez de
+     una piedra clara que sobresale. Esa inversión es la que se lee de lejos —donde la
+     línea blanca se corta, se puede bajar— y los botones la confirman de cerca. */
+  const vado=(jx,jy,jw,jh,rx,ry,rw,rh,bx,by,px,py)=>{
+   P(g,rx,ry,rw,rh,C.hormigonO);
+   P(g,jx,jy,jw,jh,C.asfaltoO);
+   for(let k=0;k<6;k++)P(g,bx+k*px,by+k*py,2,2,C.hueso);};
+  if(mv&1)vado(0,0,32,1,0,1,32,2,3,3,5,0);
+  if(mv&4)vado(0,31,32,1,0,29,32,2,3,27,5,0);
+  if(mv&8)vado(0,0,1,32,1,0,2,32,3,3,0,5);
+  if(mv&2)vado(31,0,1,32,29,0,2,32,27,3,0,5);
+  return cuantizar(c);}}
+/* Qué cantos de una acera dan a la calzada y cuáles dan a un paso de cebra. */
+const aCalzada=(x,y)=>(x>=0&&y>=0&&x<MW&&y<MH)&&map[y*MW+x]===ROAD;
+const aCebra=(x,y)=>aCalzada(x,y)&&VIA_CEBRA[viaMarca[y*MW+x]];
+function bordeDe(x,y){let m=0,mv=0;
+ const lado=(dx,dy,bit)=>{
+  if(!aCalzada(x+dx,y+dy))return;
+  if(aCebra(x+dx,y+dy))mv|=bit;else m|=bit;};
+ lado(0,-1,1);lado(1,0,2);lado(0,1,4);lado(-1,0,8);
+ return m|(mv<<4);}
+/* El índice del tile de bordillo de cada casilla, calculado de una vez con la calzada:
+   el render deja de mirar a los cuatro vecinos en cada fotograma. */
+const bordeMarca=new Uint8Array(MW*MH);
+function trazarBordillos(){
+ bordeMarca.fill(0);
+ BORDE_COD.length=1;_bordeIdx.clear();_bordeIdx.set(0,0);
+ for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){
+  const i=y*MW+x;
+  if(map[i]!==ACERA)continue;
+  const cod=bordeDe(x,y);
+  if(!cod)continue;
+  let k=_bordeIdx.get(cod);
+  if(k===undefined){
+   if(BORDE_COD.length>=256)continue;
+   k=BORDE_COD.length;BORDE_COD.push(cod);_bordeIdx.set(cod,k);}
+  bordeMarca[i]=k;}
+ BORDE.length=0;for(const cod of BORDE_COD)BORDE.push(tileBordillo(cod));}
 /* La flecha del carril, pintada en el suelo. Es lo que dice de un vistazo que una calle
    tiene dos sentidos y cuál es el tuyo; sin ella, las rayas dicen cuántos carriles hay
    pero no hacia dónde van. */
@@ -4608,7 +4642,11 @@ const viaMarca=new Uint8Array(MW*MH), viaSentido=new Uint8Array(MW*MH);
 const VIA_COD=[0], VIA_CEBRA=[false], _viaIdx=new Map([[0,0]]);
 /* Qué puede llevar el canto de arriba (o de la izquierda) de una casilla, y su centro. */
 const M_NADA=0, M_EJE=1, M_EJE_DIS=2, M_CARRIL=3;
-const codPack=(eje,canto,centro,cebra)=>eje|(canto<<3)|(centro<<6)|(cebra<<9);
+/* Y dónde para la línea de detención: en el canto bajo de la casilla, en el alto, o en
+   ninguno. Es la única marca que va ATRAVESADA a la calle y no a lo largo. */
+const D_NO=0, D_BAJO=1, D_ALTO=2;
+const codPack=(eje,canto,centro,cebra,parada)=>
+ eje|(canto<<3)|(centro<<6)|(cebra<<9)|((parada||0)<<10);
 function _codigo(cod){
  let i=_viaIdx.get(cod);
  if(i===undefined){
@@ -4646,6 +4684,7 @@ function trazarCalzada(){
    y=e;}}
  /* Y la tercera: de la geometría a la pintura. Va aparte porque el paso de cebra mira a
     la casilla de al lado y en la segunda pasada todavía no está medida. */
+ const cebra=new Uint8Array(MW*MH), cantoDe=new Uint8Array(MW*MH), centroDe=new Uint8Array(MW*MH);
  for(let i=0;i<MW*MH;i++){
   const e=eje[i];
   if(e!==EJE_H&&e!==EJE_V)continue;
@@ -4682,16 +4721,37 @@ function trazarCalzada(){
      dirección de la calle, que es lo que distingue un cruce de verdad —la calle que
      corta tiene su ancho— de un diente del rasterizado. */
   const p1=e===EJE_H?1:MW, hueco=d=>eje[i+d]===EJE_CRUCE&&eje[i+2*d]===EJE_CRUCE;
-  if(an>=2&&(hueco(-p1)||hueco(p1)))viaMarca[i]=_codigo(codPack(e,M_NADA,M_NADA,1));
-  else viaMarca[i]=_codigo(codPack(e,canto,centro,0));}
- TILE.calzada=VIA_COD.map(tileCalzada);}
+  if(an>=2&&(hueco(-p1)||hueco(p1)))cebra[i]=1;
+  cantoDe[i]=canto;centroDe[i]=centro;}
+ /* Cuarta: la línea de detención. Va en su propia pasada porque mira si la casilla de al
+    lado es un paso de cebra, y eso no se sabe hasta que la tercera ha terminado.
+
+    Solo la pinta el que LLEGA al paso: es lo que distingue la entrada del cruce de la
+    salida, y sin ella el paso de cebra flota en mitad del asfalto. La casilla por la que
+    va el eje no tiene sentido —es mitad de cada uno— y ahí la línea se pinta igual del
+    lado donde esté el paso, que es lo que hace la pintura de verdad: las dos líneas se
+    tocan en el eje en vez de dejar un hueco de cinco metros. */
+ for(let i=0;i<MW*MH;i++){
+  const e=eje[i];
+  if(e!==EJE_H&&e!==EJE_V)continue;
+  if(cebra[i]){viaMarca[i]=_codigo(codPack(e,M_NADA,M_NADA,1,D_NO));continue;}
+  const p1=e===EJE_H?1:MW;
+  const alta=cebra[i+p1]===1, baja=cebra[i-p1]===1, s=viaSentido[i];
+  const haciaAlto=s===SEN_E||s===SEN_S, haciaBajo=s===SEN_O||s===SEN_N;
+  let parada=D_NO;
+  if(haciaAlto&&alta)parada=D_ALTO;
+  else if(haciaBajo&&baja)parada=D_BAJO;
+  else if(s===SEN_NO)parada=alta?D_ALTO:baja?D_BAJO:D_NO;
+  viaMarca[i]=_codigo(codPack(e,cantoDe[i],centroDe[i],0,parada));}
+ TILE.calzada=VIA_COD.map(tileCalzada);
+ trazarBordillos();}
 
 /* Una casilla de calzada con sus marcas. El asfalto se copia del tile liso en vez de
    volver a forjarlo: así el grano casa exactamente con la casilla de al lado y una raya
    no deja una costura de tono a cada lado. */
 function tileCalzada(cod){
  if(!cod)return TILE[ROAD];
- const eje=cod&7, canto=(cod>>3)&7, centro=(cod>>6)&7, cebra=(cod>>9)&1;
+ const eje=cod&7, canto=(cod>>3)&7, centro=(cod>>6)&7, cebra=(cod>>9)&1, parada=(cod>>10)&3;
  const c=lienzo(32,32), g=c.getContext('2d');
  g.drawImage(TILE[ROAD],0,0);
  const H=eje===EJE_H;
@@ -4716,6 +4776,14 @@ function tileCalzada(cod){
    else if(m===M_CARRIL)trazo(d,1,C.crema,12);};
   pinta(canto,0);
   pinta(centro,15);}
+ /* La línea de detención: gorda y atravesada, pegada al borde que da al paso. Tres
+    píxeles, que es más que el eje — en la calle es la raya más ancha que hay, y a esta
+    escala si fuera igual que las demás se leería como un trozo de carril torcido. */
+ /* Y va RETRANQUEADA seis píxeles —poco más de un metro— y no pegada al paso: a ras del
+    canto se lee como una banda más de la cebra, y separada se ve lo que es, una raya
+    que corta la calle. */
+ if(parada){const d=parada===D_ALTO?23:6;
+  if(H)P(g,d,0,3,32,C.crema);else P(g,0,d,32,3,C.crema);}
  return cuantizar(c);}
 
 /* Deflate crudo, sin cabecera: lo descomprime el navegador con DecompressionStream y
@@ -7783,7 +7851,7 @@ function dibCiudad(){
    const s=viaSentido[y*MW+x];
    if(s&&h%23===0)ctx.drawImage(FLECHA_VIA[s],x*TS,y*TS);}
   else if(t===ACERA){
-   const b=bordeDe(x,y);if(b)ctx.drawImage(BORDE[b],x*TS,y*TS);
+   const b=bordeMarca[y*MW+x];if(b)ctx.drawImage(BORDE[b],x*TS,y*TS);
    if(h%29===0)ctx.drawImage(PROP.farola,x*TS+10,y*TS+2);
    else if(h%43===0)ctx.drawImage(PROP.contenedor,x*TS+5,y*TS+8);
    else if(h%47===0)ctx.drawImage(PROP.contenedor2,x*TS+5,y*TS+8);

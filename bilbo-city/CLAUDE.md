@@ -237,6 +237,20 @@ Lo que se pinta, de la geometría:
 | 2 | eje **discontinuo** — un carril por sentido, se puede adelantar |
 | 3+ | eje **continuo**, y un separador de carril por cada canto interior a una casilla o más del centro |
 
+El bordillo va por el mismo camino: `trazarBordillos()` deja un índice por casilla de
+acera, y el código son dos máscaras de cuatro bits —los cantos que dan a la calzada y los
+que dan a un paso de cebra—, así que una esquina con vado es un tile y no dos capas.
+
+La **línea de detención** la pinta solo el carril que **desemboca** en el paso, no el que
+sale de él: es lo que distingue la entrada del cruce de la salida, y sin ella el paso de
+cebra flota en mitad del asfalto. Va retranqueada seis píxeles —poco más de un metro—
+porque a ras del canto se lee como una banda más de la cebra.
+
+El **vado** es la otra mitad de lo mismo, en la acera: donde cruza el paso el bordillo
+está rebajado, y eso se contaba **no dibujando nada**, así que el hueco parecía un olvido.
+Ahora la junta es oscura y a ras —al revés que la piedra clara del bordillo, y esa
+inversión es la que se lee de lejos— con el pavimento táctil de botones encima.
+
 Tres cosas que costaron un intento cada una:
 
 - **Cada casilla pinta solo su canto de arriba** (o de la izquierda), más su centro si el

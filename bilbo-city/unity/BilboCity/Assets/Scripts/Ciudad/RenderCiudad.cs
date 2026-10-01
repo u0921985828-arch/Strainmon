@@ -58,8 +58,8 @@ public class RenderCiudad : MonoBehaviour {
         for (int i = 0; i < tejados.Length; i++) tejados[i] = TileDe(Forja.Tejados[i]);
         var calzada = new Tile[Forja.Calzada.Length];
         for (int i = 1; i < calzada.Length; i++) calzada[i] = TileDe(Forja.Calzada[i]);
-        var bordes = new Tile[16];
-        for (int i = 1; i < 16; i++) bordes[i] = TileDe(Forja.Borde[i]);
+        var bordes = new Tile[Forja.Borde.Length];
+        for (int i = 1; i < bordes.Length; i++) bordes[i] = TileDe(Forja.Borde[i]);
         var flechas = new Tile[5];
         for (int i = Ciudad.SenE; i <= Ciudad.SenN; i++) flechas[i] = TileDe(Forja.FlechaVia[i]);
 
@@ -83,7 +83,7 @@ public class RenderCiudad : MonoBehaviour {
                     if (sen != Ciudad.SenNo && Utiles.Hash(x,y) % 23 == 0)
                         viario[(MH-1-y)*MW + x] = flechas[sen];
                 } else if (t == Suelo.Acera) {
-                    int b = Ciudad.BordeDe(x,y);
+                    int b = Ciudad.BordeMarca[y*MW+x];
                     if (b != 0) viario[(MH-1-y)*MW + x] = bordes[b];
                 }
                 // El estadio, la catedral, el Ayuntamiento: donde hay singular manda el
