@@ -58,11 +58,22 @@ del motor que el remedo no tenga, añádela a `herramientas/compilar/apinado/Api
 firma exacta de Unity** — una firma inventada de más tapa errores reales, que es lo único
 que puede estropear esta herramienta.
 
-`herramientas/plano/sitios.py`, `singulares.py`, `calles.py` y `siluetas.py` comparan las
-coordenadas de los 57 sitios, las medidas de los 13 singulares, los puntos de paso de las
-513 calles y los bytes de las 7 hojas de silueta entre el HTML y el C#. Es la trampa
-clásica de tener dos implementaciones: el HTML pasa la batería, el C# no se ejecuta aquí, y Unity acaba poniendo las cosas en otro lado sin que
+`herramientas/plano/sitios.py`, `singulares.py`, `calles.py`, `siluetas.py` y `reglas.py`
+comparan las coordenadas de los 57 sitios, las medidas de los 13 singulares, los puntos de
+paso de las 513 calles, los bytes de las 7 hojas de silueta y **los números del juego**
+entre el HTML y el C#. Es la trampa clásica de tener dos implementaciones: el HTML pasa la
+batería, el C# no se ejecuta aquí, y Unity acaba poniendo las cosas en otro lado sin que
 nadie lo vea.
+
+`reglas.py` es la cara de esa trampa que menos se ve, porque no desplaza nada: compara el
+daño y el alcance de las 5 armas, las puertas de nivel, los 8 curros, las 10 propiedades,
+las 18 prendas, lo que pagan las 8 misiones con sus límites de tiempo, y 15 constantes
+sueltas (dinero inicial, alquiler, curva de experiencia, conos de auto-apuntado, lo que se
+queda el hospital). **Números, nunca textos**: el HTML y Unity pueden redactar un rótulo
+distinto sin que el juego cambie, y exigir la coma en el mismo sitio sería un verificador
+que falla por nada. Y una constante que **deja de encontrarse** es un fallo por sí sola —
+si no, el día que alguien renombre `XpNivel` el careo pasa a comparar `None` con `None` y
+sigue dando verde.
 
 `herramientas/csharp/` analiza el C# sobre el árbol de sintaxis real (tree-sitter). No es un
 compilador, pero verifica sintaxis, miembros inexistentes, aridad de llamadas y

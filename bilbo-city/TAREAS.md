@@ -39,10 +39,19 @@ herramientas/compilar/compilar.sh     # o ./verificar.sh csharp
 
 Repasar comportamiento contra el prototipo, que es el probado:
 
-- [ ] Escalado del daño y de las estrellas de búsqueda.
-- [ ] Tiempos de las misiones con límite.
-- [ ] Economía: precios, pagos de curros, alquiler semanal.
-- [ ] Auto-apuntado: solo a enemigos, nunca a viandantes salvo con las manos.
+- [x] Escalado del daño. Las cinco armas tienen los mismos nueve números en los dos.
+- [x] Tiempos de las misiones con límite. Los ocho pagos y sus límites, iguales.
+- [x] Economía: precios, pagos de curros, alquiler. Ocho curros, diez propiedades,
+      dieciocho prendas y la curva de experiencia, iguales.
+- [x] Auto-apuntado: solo a enemigos, nunca a viandantes salvo con las manos. En Unity ya
+      era así —`obj` es de tipo `Enemigo` y solo sale de `J.Enemigos`—, pero el **cono**
+      estaba a 1,05 contra el 1,15 del prototipo: Unity apuntaba más tacaño que el HTML
+      probado. Corregido, y los dos conos son ahora constantes con nombre.
+
+Esto ya no se repasa a mano: lo compara `herramientas/plano/reglas.py`, dentro de
+`./verificar.sh`. Compara números, nunca textos —el HTML y Unity pueden redactar distinto
+sin que el juego cambie—, y una constante que deja de encontrarse es un fallo por sí sola,
+que es como estos verificadores se vuelven decorativos.
 - [x] Las hojas de personaje. El HTML repintaba las siete siluetas del bloque `SPRITES` y
       Unity forjaba siempre, así que los treinta y cuatro arquetipos se veían distintos en
       cada implementación. Ahora `Siluetas.cs` lleva el mismo bloque y `ForjaChar` repinta
@@ -110,6 +119,9 @@ Fallos que ya se cazaron y no deben volver:
 - `Correr` y `AtacarMantenido` que se quedaban pegados a `true` para siempre.
 - Unity forjando a todo el mundo mientras el HTML repintaba siluetas dibujadas. No daba
   error: daba dos juegos con distinta gente por la calle.
+- El cono de auto-apuntado de Unity a 1,05 contra el 1,15 del prototipo. Tampoco daba
+  error: daba un juego al que le costaba un poco más enganchar al enemigo que tienes
+  delante, y eso no se ve jugando una de las dos versiones por separado.
 
 Los dos primeros errores de compilación reales, con lo que enseñan:
 

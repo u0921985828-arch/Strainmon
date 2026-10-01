@@ -112,7 +112,12 @@ public static class Acciones {
         if (!a.Infinita && E.Mun(a.Id) <= 0) { Hud.I.Aviso("SIN MUNICIÓN"); return; }
         J.Jug.Cadencia = a.Cad;
 
-        // auto-apuntado solo a enemigos; a los viandantes solo con las manos
+        // auto-apuntado solo a enemigos; a los viandantes solo con las manos.
+        // El cono con un enemigo es más ancho que con un viandante a propósito: encarar
+        // a un enemigo es la intención evidente, y pegarle a un viandante que pasaba por
+        // ahí no lo es. El prototipo tiene además un cono estrecho (0,62) para cuando se
+        // apunta con las flechas del teclado; aquí no hay teclado, así que no hay.
+        const float CONO_ENEMIGO = 1.15f, CONO_VIANDANTE = 1.05f;
         Enemigo obj = null;
         float md = a.Alc + 0.6f;
         foreach (var e in J.Enemigos) {
@@ -120,7 +125,7 @@ public static class Acciones {
             if (d > md) continue;
             float ang = Mathf.Atan2(e.Pos.y - J.Jug.Pos.y, e.Pos.x - J.Jug.Pos.x);
             float df = Mathf.Abs(Mathf.DeltaAngle(ang * Mathf.Rad2Deg, DirAng(J.Jug.Dir8) * Mathf.Rad2Deg)) * Mathf.Deg2Rad;
-            if (df < 1.05f && Combate.LineaVista(J.Jug.Pos, e.Pos)) { md = d; obj = e; }
+            if (df < CONO_ENEMIGO && Combate.LineaVista(J.Jug.Pos, e.Pos)) { md = d; obj = e; }
         }
         Peaton victima = null;
         if (a.Cuerpo && obj == null) {
@@ -129,7 +134,7 @@ public static class Acciones {
                 if (d > a.Alc + 0.4f) continue;
                 float ang = Mathf.Atan2(p.Pos.y - J.Jug.Pos.y, p.Pos.x - J.Jug.Pos.x);
                 float df = Mathf.Abs(Mathf.DeltaAngle(ang * Mathf.Rad2Deg, DirAng(J.Jug.Dir8) * Mathf.Rad2Deg)) * Mathf.Deg2Rad;
-                if (df < 1.05f) { victima = p; break; }
+                if (df < CONO_VIANDANTE) { victima = p; break; }
             }
         }
 
