@@ -649,6 +649,17 @@ Cuatro cosas que hay que saber antes de tocarlo:
   píxel, deflate, base64). Cuatro familias: singulares, muebles, suelos e iconos. **El
   juego no depende de que estén**: si falta una pieza o el bloque entero, se forja como siempre.
   Lo compara `herramientas/plano/arte.py`, dentro de `./verificar.sh`.
+- **El asfalto, la tierra y el césped tampoco se traen, y esto está probado dos veces.**
+  Son los tres suelos que más superficie cubren —el asfalto solo son decenas de miles de
+  casillas— y ahí la regla se invierte: una textura con motivo, repetida cada 32 px, no es
+  textura, es papel pintado. La primera tirada dio asfalto azulado y tierra con un glifo
+  que al cuantizar a los 61 colores **se queda en dos**, y lo único que sobrevive es el
+  motivo. La segunda, pidiendo expresamente «very fine uniform grain, no pattern, no
+  motif», dio baldosas azules con la cuadrícula de 32 px marcada, tierra con un tejido aún
+  más visible y un césped que **colapsa a un solo color**. El tile forjado es ruido sin
+  motivo sobre un color plano, y a esta escala eso es exactamente lo que hace falta: no se
+  ve la rejilla. No volver a intentarlo sin una herramienta que garantice continuidad
+  entre casillas, que `create_topdown_tileset` no la da dentro de la casilla pura.
 - **Los vehículos no se traen.** Dos tiradas, 36 generaciones, y las dos volvieron de
   perfil o a medias. Media flota traída y media forjada es peor que la flota entera
   forjada, y el chasis forjado es el que lleva las siete libreas. Por lo mismo se quedan
