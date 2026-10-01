@@ -111,10 +111,21 @@ def herramientas():
             for t in d.get('result', {}).get('tools', [])]
 
 
-def bajar(url, destino):
+def bajar(url, destino, intentos=4):
+    """Descarga con reintento: el proxy corta conexiones de vez en cuando (reset by peer).
+    Un 423 (todavía procesando) o un 404 se devuelven al llamante sin reintentar."""
     req = urllib.request.Request(url, headers={'Authorization': 'Bearer ' + _clave()})
-    with urllib.request.urlopen(req, timeout=300) as r:
-        datos = r.read()
+    for i in range(intentos):
+        try:
+            with urllib.request.urlopen(req, timeout=300) as r:
+                datos = r.read()
+            break
+        except urllib.error.HTTPError:
+            raise
+        except (urllib.error.URLError, ConnectionError, TimeoutError):
+            if i == intentos - 1:
+                raise
+            time.sleep(2 ** (i + 1))
     os.makedirs(os.path.dirname(destino) or '.', exist_ok=True)
     open(destino, 'wb').write(datos)
     return len(datos)
