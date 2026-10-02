@@ -352,7 +352,10 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
       sordo.sosp = 0; sordo.oido = null;
       for (let k = 0; k < 120; k++) A.ojos(1 / 60);
       ok(sordo.sosp >= 1 && S.visto, 'mirándote dos segundos no acaba de verte');
-      // Perdido de vista, se vacía.
+      // Perdido de vista, se vacía. La patrulla que acaba de llamar el delito de arriba
+      // se quita primero: está a menos de 28 casillas y mirando, así que S.visto seguiría
+      // puesto por ella y esto dejaría de medir lo que dice que mide.
+      A.policia.length = 0;
       sordo.x = P.x + 400;
       for (let k = 0; k < 240; k++) A.ojos(1 / 60);
       ok(sordo.sosp === 0 && !S.visto, 'la sospecha no baja al perderte de vista');
@@ -472,6 +475,93 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
         ok(manda(est) === esperada,
            'en los barrios «' + est + '» manda el tejado «' + manda(est) + '», no «' + esperada + '»');
       bien.push('4 familias de tejado, cada una mandando en su tipo de barrio');
+    }
+
+    // ── 2 decies · el interior de manzana: patio, portal y oclusión ─
+    {
+      const PS = A.PATIOS, MWm = A.MW;
+      ok(PS.length > 150, 'solo ' + PS.length + ' patios en toda la ciudad');
+      // Un patio con dos bocas no es un patio, es un pasadizo que atraviesa la manzana;
+      // y uno con cero es un agujero al que no se puede entrar. Tiene que haber una.
+      let rotos = 0, bocas = 0, sueltos = 0, celdas = 0;
+      for (const q of PS) {
+        const cel = A.patioDe(q.bx, q.by);
+        if (!cel) { rotos++; continue; }
+        celdas += cel.size;
+        let b = 0;
+        for (const i of cel) if (A.esBoca(i % MWm, (i / MWm) | 0)) b++;
+        if (b !== 1) bocas++;
+        if (!cel.has((q.y + (q.h >> 1)) * MWm + q.x + (q.w >> 1))) sueltos++;
+      }
+      ok(!rotos, rotos + ' patios sin casilla de patio en su boca');
+      ok(!bocas, bocas + ' patios con más de una boca o con ninguna');
+      ok(!sueltos, sueltos + ' patios a los que su portal no llega');
+      // Y ni uno de más ni uno de menos: si dos patios se unieran por sus portales
+      // saldrían menos trozos que patios, y ese trozo sería un pasadizo que cruza la
+      // manzana de lado a lado.
+      let trozos = 0;
+      const visto = new Set();
+      for (let i = 0; i < A.map.length; i++) {
+        if (A.map[i] !== A.PATIO || visto.has(i)) continue;
+        trozos++;
+        for (const j of A.patioDe(i % MWm, (i / MWm) | 0)) visto.add(j);
+      }
+      ok(trozos === PS.length, trozos + ' trozos de patio para ' + PS.length + ' patios');
+
+      // Y la oclusión. Se mide llamando al paso directamente: así el reloj es exacto y
+      // no depende de cuántos fotogramas haya tardado el resto del juego.
+      const guardado = { x: A.player.x, y: A.player.y };
+      const q = PS[PS.length >> 1];
+      const cx = q.x + (q.w >> 1), cy = q.y + (q.h >> 1);
+      let fx = q.bx, fy = q.by;
+      for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+        const t = A.Tc(q.bx + dx, q.by + dy);
+        if (t !== A.PATIO && A.andable(t)) { fx = q.bx + dx; fy = q.by + dy; break; }
+      }
+      const fuera = () => { A.player.x = fx + .5; A.player.y = fy + .5; };
+      fuera();
+      for (let k = 0; k < 60; k++) A.pasoPatios(1 / 60);
+      ok(A.tapaDe(cx, cy) === 1, 'desde la calle el patio no está tapado');
+      ok(A.tapaDe(q.bx, q.by) === 0, 'la boca del portal también se tapa: no se ve por dónde entrar');
+
+      A.player.x = cx + .5; A.player.y = cy + .5;
+      A.pasoPatios(0);
+      ok(A.tapaDe(cx, cy) === 1, 'el patio se destapa de golpe al entrar');
+      for (let k = 0; k < 30; k++) A.pasoPatios(A.PATIO_SEG / 60);
+      const medio = A.tapaDe(cx, cy);
+      ok(medio > .2 && medio < .8, 'abrirse no es gradual (a media transición, ' + medio.toFixed(2) + ')');
+      for (let k = 0; k < 40; k++) A.pasoPatios(A.PATIO_SEG / 60);
+      ok(A.tapaDe(cx, cy) === 0, 'dentro del patio la tapa no acaba de irse');
+
+      fuera();
+      for (let k = 0; k < 30; k++) A.pasoPatios(A.PATIO_SEG / 60);
+      const vuelta = A.tapaDe(cx, cy);
+      ok(vuelta > .2 && vuelta < .8, 'cerrarse no es gradual (a media transición, ' + vuelta.toFixed(2) + ')');
+      for (let k = 0; k < 40; k++) A.pasoPatios(A.PATIO_SEG / 60);
+      ok(A.tapaDe(cx, cy) === 1, 'al salir el patio no se vuelve a tapar');
+
+      // Y quien está dentro no se ve desde fuera: el portal es pisable, así que los
+      // peatones se meten, y sin esconderlos salen paseando por encima del tejado. Se
+      // mide pintando el mismo fotograma dos veces, con peatón y sin él.
+      for (let k = 0; k < 80; k++) A.dib();      // que la cámara acabe de llegar
+      const g2 = A.real.getContext('2d'), an = A.real.width, al = A.real.height;
+      A.dib();
+      const sin = g2.getImageData(0, 0, an, al).data.slice();
+      A.peatones.push({ x: cx + .5, y: cy + .5, arq: 'maton', d8: 0, pose: 'quieto',
+                        anim: 0, cad: 0, herido: 0, arma: null });
+      A.dib();
+      const con = g2.getImageData(0, 0, an, al).data;
+      A.peatones.pop();
+      let cambiados = 0;
+      for (let i = 0; i < con.length; i += 4) if (con[i] !== sin[i]) cambiados++;
+      ok(cambiados === 0,
+         'un peatón dentro del patio tapado se ve desde la calle (' + cambiados + ' px)');
+
+      A.player.x = guardado.x; A.player.y = guardado.y;
+      A.pasoPatios(1);
+
+      bien.push(PS.length + ' patios de manzana, con su portal, tapados desde la calle ('
+                + celdas + ' casillas)');
     }
 
     // ── 3 · los sitios están sobre suelo pisable ───────────────────────

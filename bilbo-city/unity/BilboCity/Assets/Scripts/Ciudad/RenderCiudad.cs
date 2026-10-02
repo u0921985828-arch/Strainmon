@@ -9,10 +9,15 @@ namespace BilboCity {
 /// de los bloques). Usa Tiles creados en memoria a partir de los sprites de la forja.
 /// </summary>
 public class RenderCiudad : MonoBehaviour {
-    Tilemap _suelo, _viario, _detalle;
+    public static RenderCiudad I;
+
+    Tilemap _suelo, _viario, _detalle, _tapa;
     Tile _sombraAbajo, _luzArriba;
     Tile _aguaA, _aguaB;
     float _relojAgua;
+    /// Casillas del patio en el que está el jugador, y cuánto se ha ido su tapa.
+    HashSet<int> _patioAbierto;
+    float _patioF;
 
     static Tile TileDe(Sprite s) {
         var t = ScriptableObject.CreateInstance<Tile>();
@@ -31,6 +36,7 @@ public class RenderCiudad : MonoBehaviour {
     }
 
     public void Construir() {
+        I = this;
         var grid = new GameObject("Rejilla").AddComponent<Grid>();
         grid.transform.SetParent(transform, false);
         grid.cellSize = new Vector3(1,1,0);
@@ -145,12 +151,81 @@ public class RenderCiudad : MonoBehaviour {
         for (int y = 0; y < MH; y++)
             for (int x = 0; x < MW; x++) {
                 if (Ciudad.T(x,y) != Suelo.Edif) continue;
-                bool abajo = Ciudad.T(x,y+1) != Suelo.Edif;
-                bool arriba = Ciudad.T(x,y-1) != Suelo.Edif;
+                // El patio cuenta como bloque aquí, y no solo cuando está tapado: esta
+                // capa se hornea una vez. Si el patio contara como hueco, el filo claro
+                // caería sobre la casilla de edificio que lo bordea —que NO la tapa el
+                // tejado del patio— y desde la calle se vería una raya de luz en mitad de
+                // una manzana maciza, que es justo lo que la oclusión quiere evitar. Lo
+                // que se pierde a cambio es la sombra dentro del patio al entrar; el
+                // prototipo sí la tiene porque dibuja esta pasada cada fotograma.
+                bool abajo = !Macizo(x,y+1), arriba = !Macizo(x,y-1);
                 if (abajo && y+1 < MH) det[(MH-1-(y+1))*MW + x] = _sombraAbajo;
                 else if (arriba) det[(MH-1-y)*MW + x] = _luzArriba;
             }
         _detalle.SetTilesBlock(new BoundsInt(0, 0, 0, MW, MH, 1), det);
+
+        // La tapa del interior de manzana: el tejado del propio bloque encima del patio.
+        // Va por encima del detalle para esconder lo que el bloque echa hacia dentro, y
+        // se destapa casilla a casilla con el color del tile, que es lo único que un
+        // Tilemap deja animar sin rehacerlo.
+        _tapa = NuevoTilemap(grid.transform, "Tapa", 3);
+        var tapa = new TileBase[MW*MH];
+        for (int y = 0; y < MH; y++)
+            for (int x = 0; x < MW; x++) {
+                if (Ciudad.T(x,y) != Suelo.Patio || Ciudad.EsBoca(x,y)) continue;
+                tapa[(MH-1-y)*MW + x] = tejados[Ciudad.Roof[y*MW+x]];
+            }
+        _tapa.SetTilesBlock(new BoundsInt(0, 0, 0, MW, MH, 1), tapa);
+    }
+
+    /// <summary>Cuánto tapa el tejado esa casilla: 1 maciza, 0 patio a la vista. Lo
+    /// preguntan los sprites que puedan estar dentro, que van por encima de la tapa.</summary>
+    public static float TapaDe(int x, int y) {
+        if (Ciudad.T(x,y) != Suelo.Patio || Ciudad.EsBoca(x,y)) return 0;
+        if (I == null || I._patioAbierto == null) return 1;
+        return I._patioAbierto.Contains(y*Ciudad.MW + x) ? 1 - I._patioF : 1;
+    }
+
+    /// <summary>Para la capa de detalle: edificio o patio, que desde fuera es lo mismo.</summary>
+    static bool Macizo(int x, int y) {
+        var t = Ciudad.T(x,y);
+        return t == Suelo.Edif || t == Suelo.Patio;
+    }
+
+    /// <summary>Destapa el patio en el que entra el jugador y lo vuelve a tapar al salir.
+    /// Solo se repintan las casillas de ese patio: son treinta contadas.</summary>
+    void PasoPatios() {
+        var j = Juego.I != null ? Juego.I.Jug : null;
+        if (j == null || _tapa == null) return;
+        int px = Mathf.FloorToInt(j.Pos.x), py = Mathf.FloorToInt(j.Pos.y);
+        bool dentro = Ciudad.T(px,py) == Suelo.Patio;
+        int i = py*Ciudad.MW + px;
+        if (dentro && (_patioAbierto == null || !_patioAbierto.Contains(i))) {
+            if (_patioAbierto != null) VerDentro(false);
+            _patioAbierto = Ciudad.PatioDe(px, py);
+            _patioF = 0;
+            VerDentro(true);
+        }
+        if (_patioAbierto == null) return;
+        float antes = _patioF;
+        _patioF = Mathf.Clamp01(_patioF + (dentro ? Time.deltaTime : -Time.deltaTime) / Ciudad.PatioSeg);
+        if (Mathf.Approximately(antes, _patioF)) return;
+        var c = new Color(1, 1, 1, 1 - _patioF);
+        foreach (int k in _patioAbierto) {
+            var pos = new Vector3Int(k % Ciudad.MW, Ciudad.MH - 1 - k / Ciudad.MW, 0);
+            _tapa.SetTileFlags(pos, TileFlags.None);
+            _tapa.SetColor(pos, c);
+        }
+        if (!dentro && _patioF <= 0) { VerDentro(false); _patioAbierto = null; }
+    }
+
+    /// <summary>Enciende o apaga lo que hay plantado dentro del patio abierto.</summary>
+    void VerDentro(bool si) {
+        if (_patioAbierto == null) return;
+        foreach (int k in _patioAbierto) {
+            GameObject go;
+            if (Mobiliario.EnPatio.TryGetValue(k, out go) && go != null) go.SetActive(si);
+        }
     }
 
     static Tilemap NuevoTilemap(Transform padre, string nombre, int orden) {
@@ -164,6 +239,7 @@ public class RenderCiudad : MonoBehaviour {
     }
 
     void Update() {
+        PasoPatios();
         // animación del agua: se cambia el tile cada 0,38 s
         _relojAgua += Time.deltaTime;
         if (_relojAgua < 0.38f) return;

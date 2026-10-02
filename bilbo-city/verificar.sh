@@ -33,6 +33,9 @@ if [ "$QUE" = "todo" ] || [ "$QUE" = "csharp" ]; then
   echo "═══ números del juego · HTML contra Unity ═══"
   python3 herramientas/plano/reglas.py
   echo
+  echo "═══ interior de manzana · HTML contra Unity ═══"
+  python3 herramientas/plano/patios.py
+  echo
   echo "═══ C# · sintaxis ═══"
   python3 herramientas/csharp/sintaxis.py
   echo

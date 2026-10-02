@@ -147,7 +147,13 @@ si la partida está corrupta o es de una versión más nueva, se descarta sin pe
 
 - **Abrir el proyecto en Unity y compilar de verdad.** Roslyn ya dice que sí; el editor
   todavía no ha opinado. Es el paso pendiente de verdad.
-- Sin oclusión de interiores de manzana: los patios se ven, pero sin transición.
+- La oclusión del interior de manzana está, y es la única parte del render que diverge a
+  propósito del prototipo. La tapa es un cuarto Tilemap («Tapa») con el tejado del bloque
+  encima de cada casilla de patio menos la boca del portal, y se destapa cambiando el
+  color de esos tiles uno a uno, que es lo único que un Tilemap deja animar sin rehacerlo.
+  Lo que no está: la capa de detalle se hornea una vez, así que el patio cuenta como
+  bloque siempre y dentro del patio no hay sombra proyectada; y Unity sigue sin dibujar
+  fachadas (`FachBarrio` está escrito y no lo usa nadie), así que tampoco hay traseras.
 - El mobiliario son GameObjects sueltos (unos cuantos miles). Funciona y Unity los culla,
   pero si el presupuesto de dibujado aprieta, el siguiente paso es un tercer Tilemap en modo
   `Individual` con ordenación por eje Y.

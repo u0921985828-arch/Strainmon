@@ -27,6 +27,12 @@ public class Andante : MonoBehaviour {
         transform.position = Mundo.AMundoPixel(Pos);
         Sr.sprite = ForjaChar.Frame(Arq, Herido > 0 ? Pose.Herido : PoseAct, Dir8);
         Sr.sortingOrder = Mundo.OrdenY(Pos.y);
+        // Quien está en un patio tapado está bajo techo y desde la calle no se le ve. El
+        // portal es pisable, así que los peatones se meten; sin esto salen paseando por
+        // encima del tejado. Se desvanece con la tapa, como todo lo demás del patio.
+        float tapa = RenderCiudad.TapaDe(Mathf.FloorToInt(Pos.x), Mathf.FloorToInt(Pos.y));
+        var c = Sr.color; c.a = 1 - tapa; Sr.color = c;
+        Sr.enabled = tapa < 1;
     }
 }
 

@@ -77,9 +77,122 @@ public static class Ciudad {
         // borde cerrado: fuera del término municipal no hay nada que visitar
         for (int x = 0; x < MW; x++) { Map[x] = (byte)Suelo.Edif; Map[(MH-1)*MW+x] = (byte)Suelo.Edif; }
         for (int y = 0; y < MH; y++) { Map[y*MW] = (byte)Suelo.Edif; Map[y*MW+MW-1] = (byte)Suelo.Edif; }
+        // Los patios se abren con los tejados ya repartidos: la casilla deja de ser Edif
+        // pero conserva su índice de tejado, que es con el que se la tapa desde la calle.
+        AbrirPatios();
         // Lo último: las marcas viales se miden sobre el mapa ya cerrado, o una calle que
         // sale del término se mediría llegando hasta el borde.
         TrazarCalzada();
+    }
+
+    // ═══════════ EL INTERIOR DE MANZANA ═══════════
+    /// <summary>
+    /// El plano municipal dibuja la manzana maciza: por fuera es un polígono y por dentro
+    /// no hay nada. En Bilbao casi todas tienen patio, y se entra por un portal que
+    /// atraviesa el edificio. Eso no se puede sacar del plano —no lo dibuja— pero sí se
+    /// puede abrir aquí, y a cambio la manzana deja de ser un rectángulo de tejado de
+    /// cuarenta casillas.
+    ///
+    /// El patio no se ve desde la calle: lo tapa el tejado del propio bloque hasta que
+    /// entras (RenderCiudad). Lo único que asoma es la boca del portal.
+    ///
+    /// Dos reglas sostienen el trazado. Una, que alrededor del patio queden DOS casillas
+    /// de edificio por los cuatro lados: con una, el patio se come la fachada y desde la
+    /// calle se ve el agujero. Y como una casilla abierta deja de ser Edif, esa misma
+    /// comprobación impide que dos patios se toquen sin llevar cuentas. Dos, que el portal
+    /// sea recto y salga al lado más cercano: un portal en ele es un pasadizo, y un
+    /// pasadizo invita a atravesar la manzana, que es justo lo que un patio no es.
+    ///
+    /// Esto tiene que dar CASILLA POR CASILLA lo mismo que abrirPatios() del prototipo, y
+    /// por eso Utiles.Hash y hash() del HTML tienen que coincidir: ver patios.py.
+    /// </summary>
+    public const int PatioSembrado = 17;   // se intenta en una de cada diecisiete casillas de edificio
+    public const int PatioLado = 3, PatioVar = 3;   // el patio mide de 3 a 5 casillas de lado
+    public const int PatioMuro = 2;        // anillos de edificio que quedan alrededor
+    public const int PatioPortal = 10;     // el portal no cruza más de diez casillas de edificio
+    /// <summary>Lo que tarda la tapa del patio en irse y en volver. Aparecer de golpe
+    /// treinta metros de patio delante de las narices se lee como un fallo de dibujo.</summary>
+    public const float PatioSeg = .35f;
+
+    public struct Patio { public int X, Y, W, H, Bx, By; }
+    public static readonly System.Collections.Generic.List<Patio> Patios =
+        new System.Collections.Generic.List<Patio>();
+
+    static void AbrirPatios() {
+        Patios.Clear();
+        // El orden del empate es sur, norte, este y oeste: la cara sur es la que se ve de
+        // pie en la calle, así que es la que mejor cuenta que ahí hay una entrada.
+        int[] ddx = {0,0,1,-1}, ddy = {1,-1,0,0};
+        for (int y = 0; y < MH; y++)
+            for (int x = 0; x < MW; x++) {
+                if (Map[y*MW+x] != (byte)Suelo.Edif || Utiles.Hash(x,y) % PatioSembrado != 0) continue;
+                int w = PatioLado + Utiles.Hash(x, y*3) % PatioVar;
+                int h = PatioLado + Utiles.Hash(y*3, x) % PatioVar;
+                bool cabe = true;
+                for (int j = y-PatioMuro; j <= y+h-1+PatioMuro && cabe; j++)
+                    for (int i = x-PatioMuro; i <= x+w-1+PatioMuro; i++)
+                        if (T(i,j) != Suelo.Edif) { cabe = false; break; }
+                if (!cabe) continue;
+                int cx = x + (w>>1), cy = y + (h>>1);
+                int[] bxs = {cx, cx, x+w-1, x}, bys = {y+h-1, y, cy, cy};
+                int mn = 0, mdx = 0, mdy = 0, mbx = 0, mby = 0;
+                for (int k = 0; k < 4; k++) {
+                    int dx = ddx[k], dy = ddy[k], bx = bxs[k], by = bys[k];
+                    for (int n = 1; n <= PatioPortal; n++) {
+                        int px = bx + dx*n, py = by + dy*n;
+                        var t = T(px,py);
+                        if (t == Suelo.Edif) {
+                            // El portal no puede ir pegado a otro patio ni desembocar en él:
+                            // dos patios unidos por sus portales son un pasadizo que
+                            // atraviesa la manzana, y eso ya no es un interior de manzana.
+                            if (T(px+dy,py+dx) == Suelo.Patio || T(px-dy,py-dx) == Suelo.Patio) break;
+                            continue;
+                        }
+                        if (t != Suelo.Patio && Andable(t) && t != Suelo.Monte && t != Suelo.Parque
+                            && (mn == 0 || n < mn)) { mn = n; mdx = dx; mdy = dy; mbx = bx; mby = by; }
+                        break;
+                    }
+                }
+                if (mn == 0) continue;
+                for (int j = y; j < y+h; j++)
+                    for (int i = x; i < x+w; i++) Map[j*MW+i] = (byte)Suelo.Patio;
+                for (int n = 1; n < mn; n++) Map[(mby+mdy*n)*MW + mbx + mdx*n] = (byte)Suelo.Patio;
+                Patios.Add(new Patio { X = x, Y = y, W = w, H = h,
+                                       Bx = mbx + mdx*(mn-1), By = mby + mdy*(mn-1) });
+            }
+    }
+
+    /// <summary>La boca del portal no se tapa nunca: es lo único que se ve desde la calle,
+    /// y sin ella no hay manera de saber que esa manzana tiene por dónde entrar. Es la
+    /// casilla de patio que da a algo pisable que no es patio, y hay exactamente una.</summary>
+    public static bool EsBoca(int x, int y) {
+        int[] dx = {1,-1,0,0}, dy = {0,0,1,-1};
+        for (int k = 0; k < 4; k++) {
+            var t = T(x+dx[k], y+dy[k]);
+            if (t != Suelo.Patio && Andable(t)) return true;
+        }
+        return false;
+    }
+
+    /// <summary>Las casillas del patio al que pertenece una: son treinta contadas, y
+    /// recorrerlas sale más barato que llevar un índice de componente por casilla.</summary>
+    public static System.Collections.Generic.HashSet<int> PatioDe(int x, int y) {
+        int i0 = y*MW + x;
+        if (T(x,y) != Suelo.Patio) return null;
+        var s = new System.Collections.Generic.HashSet<int> { i0 };
+        var pila = new System.Collections.Generic.Stack<int>();
+        pila.Push(i0);
+        int[] dx = {1,-1,0,0}, dy = {0,0,1,-1};
+        while (pila.Count > 0) {
+            int i = pila.Pop(), cx = i % MW, cy = i / MW;
+            for (int k = 0; k < 4; k++) {
+                int nx = cx + dx[k], ny = cy + dy[k];
+                if (nx < 0 || ny < 0 || nx >= MW || ny >= MH) continue;
+                int j = ny*MW + nx;
+                if (Map[j] == (byte)Suelo.Patio && s.Add(j)) pila.Push(j);
+            }
+        }
+        return s;
     }
 
     // ═══════════ LA CALZADA: ANCHO, CARRILES Y SENTIDO ═══════════

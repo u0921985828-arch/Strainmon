@@ -58,10 +58,10 @@ del motor que el remedo no tenga, añádela a `herramientas/compilar/apinado/Api
 firma exacta de Unity** — una firma inventada de más tapa errores reales, que es lo único
 que puede estropear esta herramienta.
 
-`herramientas/plano/sitios.py`, `singulares.py`, `calles.py`, `siluetas.py` y `reglas.py`
-comparan las coordenadas de los 57 sitios, las medidas de los 13 singulares, los puntos de
-paso de las 513 calles, los bytes de las 7 hojas de silueta y **los números del juego**
-entre el HTML y el C#. Es la trampa clásica de tener dos implementaciones: el HTML pasa la
+`herramientas/plano/sitios.py`, `singulares.py`, `calles.py`, `siluetas.py`, `reglas.py` y
+`patios.py` comparan las coordenadas de los 57 sitios, las medidas de los 13 singulares,
+los puntos de paso de las 513 calles, los bytes de las 7 hojas de silueta, **los números
+del juego** y **el interior de manzana con el hash que lo siembra** entre el HTML y el C#. Es la trampa clásica de tener dos implementaciones: el HTML pasa la
 batería, el C# no se ejecuta aquí, y Unity acaba poniendo las cosas en otro lado sin que
 nadie lo vea.
 
@@ -74,6 +74,15 @@ distinto sin que el juego cambie, y exigir la coma en el mismo sitio sería un v
 que falla por nada. Y una constante que **deja de encontrarse** es un fallo por sí sola —
 si no, el día que alguien renombre `XpNivel` el careo pasa a comparar `None` con `None` y
 sigue dando verde.
+
+`patios.py` es el único que no compara datos sino **la forma de una función**, y lo hace
+porque aquí el C# no se puede ejecutar. Carea el trazado de los patios y, sobre todo,
+`hash()` contra `Utiles.Hash()`: eran la misma función escrita de dos maneras y daban
+cosas distintas en el **98 %** de las casillas, porque el segundo producto en JS iba con
+`*` —coma flotante, pasa de 2⁵³ y pierde justo los bits bajos que luego se piden con un
+módulo— y en C# con enteros de 32 bits con vuelta. Tejados, farolas y flechas en otro
+sitio en cada versión, sin un solo error. Ahora el HTML usa `Math.imul` y las dos hacen lo
+mismo; un `*` suelto vuelve a canonizar distinto y el verificador lo canta.
 
 `herramientas/csharp/` analiza el C# sobre el árbol de sintaxis real (tree-sitter). No es un
 compilador, pero verifica sintaxis, miembros inexistentes, aridad de llamadas y
@@ -175,6 +184,61 @@ repositorio**; solo entra la rejilla derivada, y el juego la pinta con arte prop
   los puentes tampoco — así que Deustu no se come Olabeaga aunque estén a doscientos metros
   a vuelo de pájaro. Es una aproximación: el plano no dibuja los límites de barrio, solo
   los rotula, y en la frontera entre dos hay casillas que caen en el vecino.
+
+### El interior de manzana
+
+El plano municipal dibuja la manzana **maciza**: por fuera es un polígono y por dentro no
+hay nada. En Bilbao casi todas tienen patio, y se entra por un portal que atraviesa el
+edificio. Eso no se puede sacar del plano —no lo dibuja— pero sí se puede abrir después,
+y a cambio la manzana deja de ser un rectángulo de tejado de cuarenta casillas. Son
+**419 patios**, uno por manzana grande, y entre todos 7867 casillas.
+
+`abrirPatios()` / `Ciudad.AbrirPatios()` recorren el mapa con los tejados ya repartidos
+—la casilla deja de ser `EDIF` pero conserva su índice de tejado, que es con el que se la
+tapa— y en una de cada diecisiete casillas de edificio intentan meter un cuadrado de 3 a
+5 casillas de lado. Dos reglas lo sostienen:
+
+- **Dos casillas de edificio alrededor, por los cuatro lados.** Con una, el patio se come
+  la fachada y desde la calle se ve el agujero. Y como una casilla abierta deja de ser
+  `EDIF`, esa misma comprobación impide que dos patios se toquen sin llevar ninguna
+  cuenta aparte.
+- **El portal es recto y sale por el lado más cercano.** Un portal en ele es un pasadizo,
+  y un pasadizo invita a atravesar la manzana, que es justo lo que un patio no es. Por lo
+  mismo el portal no puede ir pegado a otro patio ni desembocar en él: eso uniría dos
+  manzanas. Costó un intento, y gordo: sin esa regla salen 421 patios en **360 trozos**,
+  o sea sesenta y un pares de manzanas cosidas por un pasadizo. La batería lo mide
+  contando trozos de patio y exigiendo que sean tantos como patios.
+
+**La oclusión, que es para lo que están.** Desde la calle la manzana tiene que seguir
+siendo maciza: el patio y su portal van tapados con el tejado del propio bloque y se
+destapan al entrar, en 0,35 s. Lo único que asoma siempre es **la boca del portal** —la
+casilla de patio que da a la acera—, que es lo que te dice que ahí se puede entrar.
+
+Cuatro cosas, y tres son de un intento fallido cada una:
+
+- **Solo se desvanece la tapa.** La geometría del bloque —fachadas, sombras y los filos de
+  dos píxeles— cambia de golpe, pero cambia en el instante en que la tapa está opaca del
+  todo: al entrar `patioF` arranca en 0, y al salir el patio no se cierra hasta que vuelve
+  a 0. Con la geometría cambiando a mitad de la transición, los filos parpadeaban.
+- **Lo que da al patio no es escaparate.** Con la lista de fachadas del barrio, el
+  interior salía con toldos y rótulos y parecía otra calle. `FACH_PATIO` son pared ciega,
+  portal, persiana y garaje: lo que cuenta que has entrado en algo privado es justo que
+  ahí no haya tienda.
+- **Quien está dentro no se ve desde fuera.** El portal es pisable, así que los peatones
+  se meten —en una pasada de cuarenta segundos, quince mil fotogramas de peatón dentro de
+  un patio tapado— y sin esconderlos salen **paseando por encima del tejado**. Se
+  desvanecen con la tapa. La batería lo mide pintando el mismo fotograma con peatón y sin
+  él y exigiendo que no cambie un píxel.
+- **El radar va del color del edificio.** Un plano que te enseña los patios se salta la
+  oclusión por la puerta de atrás.
+
+En Unity la tapa es un **cuarto Tilemap** por encima del detalle, y se destapa cambiando
+el color de sus tiles una a una: es lo único que un Tilemap deja animar sin rehacerlo.
+Hay una diferencia a propósito, anotada en el código: la capa de detalle se hornea una
+sola vez, así que ahí el patio cuenta como bloque siempre —si contara como hueco, el filo
+claro caería sobre la casilla de edificio que lo bordea, que no la tapa nada, y desde la
+calle se vería una raya de luz en mitad de una manzana maciza—. Lo que se pierde es la
+sombra dentro del patio al entrar.
 
 **Hay monte.** `MONTE` / `Suelo.Monte` es un tipo de suelo propio y es la mitad del mapa:
 se pisa pero no se conduce, y va más tupido de árboles que un parque urbano.

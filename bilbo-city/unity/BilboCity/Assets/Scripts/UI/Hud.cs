@@ -398,11 +398,14 @@ public class Hud : MonoBehaviour {
                 else {
                     switch (Ciudad.T(mx,my)) {
                         case Suelo.Agua:   c = Paleta.Agua; break;
-                        case Suelo.Edif:   c = Paleta.H("#262a30"); break;
+                        // El patio va del color del edificio y no del suyo: el radar es
+                        // un plano de la ciudad, y un plano que te enseña los patios se
+                        // salta la oclusión por la puerta de atrás.
+                        case Suelo.Edif:
+                        case Suelo.Patio:  c = Paleta.H("#262a30"); break;
                         case Suelo.Parque: c = Paleta.H("#2e4a2e"); break;
                         case Suelo.Plaza:  c = Paleta.H("#5c574d"); break;
                         case Suelo.Muelle: c = Paleta.H("#453d33"); break;
-                        case Suelo.Patio:  c = Paleta.H("#3a3630"); break;
                         case Suelo.Puente: c = Paleta.GrisL; break;
                         default:           c = Paleta.H("#4a505a"); break;
                     }

@@ -13,6 +13,12 @@ public static class Mobiliario {
     /// <summary>Cuántas piezas se han plantado. Útil para el presupuesto de dibujado.</summary>
     public static int Sembradas { get; private set; }
 
+    /// <summary>Lo que hay dentro de un patio tapado, por casilla. Nace apagado: la tapa
+    /// es un Tilemap y va por debajo de los sprites, así que un árbol dentro de un patio
+    /// cerrado se vería encima del tejado. Lo enciende RenderCiudad al entrar, con la
+    /// tapa todavía opaca, que es cuando no se nota.</summary>
+    public static readonly Dictionary<int,GameObject> EnPatio = new Dictionary<int,GameObject>();
+
     struct Pieza { public string Clave; public float Dx, Dy; }
 
     static bool JuntoA(int x, int y, Suelo t) {
@@ -114,8 +120,12 @@ public static class Mobiliario {
         }
 
         if (t == Suelo.Patio) {
-            if (h % 13 == 0) { p.Clave = "arbolPodado"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
-            if (h % 21 == 0) { p.Clave = "contenedor";  p.Dx = 0.5f; p.Dy = 0.9f;  return true; }
+            // Aquí la semilla es Hash(x,y) y no la de arriba, y los restos son 7 y 9:
+            // son los del prototipo, que es el que se ve. El patio es lo único nuevo de
+            // esta tabla, así que al menos esto empieza igual en los dos.
+            int hp = Utiles.Hash(x,y);
+            if (hp % 7 == 0) { p.Clave = "arbolPodado"; p.Dx = 0.5f; p.Dy = 0.95f; return true; }
+            if (hp % 9 == 0) { p.Clave = "pales";       p.Dx = 0.5f; p.Dy = 0.9f;  return true; }
             return false;
         }
         return false;
@@ -127,6 +137,7 @@ public static class Mobiliario {
     /// </summary>
     public static void Sembrar(Transform padre) {
         Sembradas = 0;
+        EnPatio.Clear();
         var vetado = new HashSet<int>();
         foreach (var s in Estado.Sitios) {
             int sx = Mathf.RoundToInt(s.Pos.x), sy = Mathf.RoundToInt(s.Pos.y);
@@ -149,6 +160,10 @@ public static class Mobiliario {
                 var sr = go.AddComponent<SpriteRenderer>();
                 sr.sprite = sp;
                 sr.sortingOrder = Mundo.OrdenY(y + p.Dy);
+                if (Ciudad.T(x,y) == Suelo.Patio && !Ciudad.EsBoca(x,y)) {
+                    EnPatio[y * Ciudad.MW + x] = go;
+                    go.SetActive(false);
+                }
                 Sembradas++;
             }
     }

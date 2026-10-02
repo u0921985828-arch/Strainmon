@@ -1988,7 +1988,15 @@ const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const modp=(a,n)=>((a%n)+n)%n;   /* el % de JS devuelve negativos y aquí no valen */
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const lerp=(a,b,t)=>a+(b-a)*t;
-function hash(a,b){let h=(a*73856093)^(b*19349663);h=(h^(h>>13))*1274126177;return Math.abs(h^(h>>16));}
+/* El segundo producto va con Math.imul y no con `*`, y no es una micro-optimización:
+   `*` multiplica en coma flotante y el resultado pasa de 2^53, así que los bits bajos
+   —que son justo los que luego se piden con un módulo— se pierden en el redondeo. C#
+   multiplica enteros de 32 bits con vuelta, que es lo que esta función quiere decir, y
+   mientras el HTML usó `*` el 98 % de las casillas daban un hash distinto en las dos
+   implementaciones: otros tejados, otras farolas, otras flechas. No daba ningún error:
+   daba dos ciudades. Lo compara herramientas/plano/patios.py. */
+function hash(a,b){let h=Math.imul(a,73856093)^Math.imul(b,19349663);
+ h=Math.imul(h^(h>>13),1274126177);return Math.abs(h^(h>>16));}
 function lienzo(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;
  const g=c.getContext('2d');g.imageSmoothingEnabled=false;return c;}
 const P=(g,x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x|0,y|0,w|0,h|0);};
@@ -4152,8 +4160,10 @@ function generarTiles(){
   for(let y=0;y<32;y+=6)for(let x=(y%12?3:0);x<32;x+=7){P(g,x,y,6,5,C.teja);P(g,x,y,6,1,'#96786a');}});
  TILE[PLAZA]=T32(g=>{rell(g,'#8a8375');ruido(g,32,32,['#7d766a','#968f81'],14);
   for(let i=0;i<32;i+=16){P(g,i,0,1,32,'#6d6659');P(g,0,i,32,1,'#6d6659');}P(g,14,14,4,4,'#6d6659');});
+ /* Las juntas van en los dos sentidos. Solo verticales eran rayas, y mientras el patio
+    no se podía ver daba igual; en cuanto se entra, un suelo a rayas se lee como chapa. */
  TILE[PATIO]=T32(g=>{rell(g,C.hormigonO);ruido(g,32,32,[C.hormigon,C.cespedO],20);
-  for(let i=0;i<32;i+=11)P(g,i,0,1,32,C.carbon);});
+  for(let i=0;i<32;i+=11){P(g,i,0,1,32,C.carbon);P(g,0,i,32,1,C.carbon);}});
  TILE[PARQUE]=T32(g=>{rell(g,C.cesped);ruido(g,32,32,[C.cespedO,'#4d7c48'],28);});
  TILE.parqueAlto=T32(g=>{rell(g,C.cespedO);ruido(g,32,32,[C.cesped,'#4d7c48'],34);
   for(let i=0;i<10;i++)P(g,(i*7)%30,(i*11)%28,1,4,'#4d7c48');});
@@ -4387,6 +4397,10 @@ const FACH_BARRIO={
  industrial:['porton','porton','garaje','ciega','persiana','porton'],
  abierto:   ['portal','ciega','garaje','ciega'],
 };
+/* Lo que da al patio es la trasera de la manzana, no un escaparate. Con la lista del
+   barrio, el interior salía con toldos y rótulos y parecía otra calle; y lo que cuenta
+   que has entrado en algo privado es justo que ahí no haya tienda. */
+const FACH_PATIO=['ciega','portal','persiana','ciega','garaje','ciega'];
 
 function generarProps(){
  /* Lo que hay encima de un tejado. Va suelto y sembrado por hash, como el mobiliario de
@@ -4972,7 +4986,66 @@ async function cargarCiudad(){
  for(let y=0;y<MH;y++){pon(0,y,EDIF);pon(MW-1,y,EDIF);}
  /* Y con la trama ya cerrada, el ancho y los carriles de cada calle. Después del borde a
     propósito: la medida de una calle que llega al canto del mapa tiene que pararse ahí. */
+ /* Los patios se abren con los tejados ya repartidos: la casilla deja de ser EDIF pero
+    conserva su índice de tejado, que es con el que se la tapa desde la calle. */
+ abrirPatios();
  trazarCalzada();
+}
+
+/*═══════════════ EL INTERIOR DE MANZANA ═══════════════*/
+/* El plano municipal dibuja la manzana maciza: por fuera es un polígono y por dentro no
+   hay nada. En Bilbao casi todas tienen patio, y se entra por un portal que atraviesa el
+   edificio. Eso no se puede sacar del plano —no lo dibuja— pero sí se puede abrir aquí,
+   y a cambio la manzana deja de ser un rectángulo de tejado de cuarenta casillas.
+
+   El patio no se ve desde la calle: lo tapa el tejado del propio bloque hasta que entras
+   (ver `tapaDe`). Lo único que asoma es la boca del portal, que es lo que te dice que ahí
+   se puede entrar.
+
+   Dos reglas sostienen el trazado. Una, que alrededor del patio queden DOS casillas de
+   edificio por los cuatro lados: con una, el patio se come la fachada y desde la calle se
+   ve el agujero; con dos es interior de verdad. Y como una casilla abierta deja de ser
+   EDIF, esa misma comprobación impide que dos patios se toquen sin tener que llevar
+   cuentas. Dos, que el portal sea recto y salga al lado más cercano: un portal en ele es
+   un pasadizo, y un pasadizo invita a atravesar la manzana, que es justo lo que un patio
+   no es. */
+const PATIO_SEMBRADO=17;      /* se intenta en una de cada diecisiete casillas de edificio */
+const PATIO_LADO=3, PATIO_VAR=3;   /* el patio mide de 3 a 5 casillas de lado */
+const PATIO_MURO=2;           /* anillos de edificio que quedan alrededor */
+const PATIO_PORTAL=10;        /* el portal no cruza más de diez casillas de edificio */
+const PATIOS=[];
+function abrirPatios(){
+ PATIOS.length=0;
+ for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){
+  if(map[y*MW+x]!==EDIF||hash(x,y)%PATIO_SEMBRADO)continue;
+  const w=PATIO_LADO+hash(x,y*3)%PATIO_VAR, h=PATIO_LADO+hash(y*3,x)%PATIO_VAR;
+  let cabe=true;
+  for(let j=y-PATIO_MURO;j<=y+h-1+PATIO_MURO&&cabe;j++)
+   for(let i=x-PATIO_MURO;i<=x+w-1+PATIO_MURO;i++)
+    if(Tc(i,j)!==EDIF){cabe=false;break;}
+  if(!cabe)continue;
+  /* Por dónde sale el portal: de las cuatro caras, la que antes da a algo pisable que no
+     sea monte ni parque — un portal que desemboca en la ladera no lo usa nadie. El orden
+     del empate es sur, norte, este y oeste: la cara sur es la que se ve de pie en la
+     calle, así que es la que mejor cuenta que ahí hay una entrada. */
+  const cx=x+(w>>1), cy=y+(h>>1);
+  let sal=null;
+  for(const[dx,dy,bx,by]of[[0,1,cx,y+h-1],[0,-1,cx,y],[1,0,x+w-1,cy],[-1,0,x,cy]]){
+   for(let n=1;n<=PATIO_PORTAL;n++){
+    const px=bx+dx*n, py=by+dy*n, t=Tc(px,py);
+    if(t===EDIF){
+     /* El portal no puede ir pegado a otro patio ni desembocar en él: dos patios unidos
+        por sus portales son un pasadizo que atraviesa la manzana, y eso ya no es un
+        interior de manzana sino un atajo. Es el único sitio donde hay que mirarlo — el
+        hueco del patio ya lo garantizan las dos casillas de muro. */
+     if(Tc(px+dy,py+dx)===PATIO||Tc(px-dy,py-dx)===PATIO)break;
+     continue;}
+    if(t!==PATIO&&andable(t)&&t!==MONTE&&t!==PARQUE&&(!sal||n<sal.n))sal={n,dx,dy,bx,by};
+    break;}}
+  if(!sal)continue;
+  for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)map[j*MW+i]=PATIO;
+  for(let n=1;n<sal.n;n++)map[(sal.by+sal.dy*n)*MW+sal.bx+sal.dx*n]=PATIO;
+  PATIOS.push({x,y,w,h,bx:sal.bx+sal.dx*(sal.n-1),by:sal.by+sal.dy*(sal.n-1)});}
 }
 /* Qué sombrero le toca a un edificio. El tamaño manda sobre el estilo cuando el edificio
    es claramente otra cosa: una nave de sesenta casillas en un barrio de bloques sigue
@@ -7688,6 +7761,7 @@ function act(dt){
  if(player.herido>0)player.herido-=dt;
  if(player.golpeT>0)player.golpeT-=dt;
  musica(dt);
+ if(S.escena==='ciudad')pasoPatios(dt);
  if(S.muerto>0){S.muerto-=dt;motorAudio(null,1);sirenaAudio(dt,false);
   if(S.muerto<=0){
    S.hp=60;S.dinero=Math.max(0,S.dinero-Math.round(S.dinero*.2));
@@ -7932,9 +8006,60 @@ const cam={x:0,y:0,z:1,tinte:[0,0,0]};
 function nocheF(){const h=S.min/60;
  if(h>21.5||h<5.5)return .58;if(h>19.5)return .58*(h-19.5)/2;if(h<7.5)return .58*(7.5-h)/2;return 0;}
 const hexRGB=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+
+/*═══════════════ OCLUSIÓN DEL INTERIOR DE MANZANA ═══════════════*/
+/* Desde la calle la manzana tiene que ser maciza. El patio y su portal van tapados con
+   el tejado del propio bloque y se destapan al entrar, con una transición: aparecer de
+   golpe treinta metros de patio delante de las narices se lee como un fallo de dibujo.
+
+   Lo que se desvanece es SOLO la tapa. La geometría del bloque —fachadas, sombras y los
+   filos de dos píxeles— cambia de golpe, pero cambia en el instante en que la tapa está
+   opaca del todo: al entrar, `patioF` arranca en 0, y al salir el patio no se cierra
+   hasta que `patioF` vuelve a 0. Así el salto queda debajo de la tapa y no se ve. Fue el
+   segundo intento: con la geometría cambiando a mitad de la transición, los filos de la
+   manzana parpadeaban. */
+const PATIO_SEG=.35;               /* lo que tarda la tapa en irse y en volver */
+let patioAbierto=null, patioF=0;   /* casillas del patio en el que estás · 0 tapado, 1 abierto */
+/* La boca del portal no se tapa nunca: es lo único que se ve desde la calle, y sin ella
+   no hay manera de saber que esa manzana tiene por dónde entrar. Es la casilla de patio
+   que da a algo pisable que no es patio, y por construcción hay exactamente una. */
+function esBoca(x,y){
+ for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const t=Tc(x+dx,y+dy);
+  if(t!==PATIO&&andable(t))return true;}
+ return false;}
+/* Cuánto tapa el tejado esta casilla: 1 maciza, 0 patio a la vista. */
+function tapaDe(x,y){
+ if(map[y*MW+x]!==PATIO)return 0;
+ if(esBoca(x,y))return 0;
+ return patioAbierto&&patioAbierto.has(y*MW+x)?1-patioF:1;}
+/* Para la segunda pasada: una casilla cuenta como bloque si es edificio o si es patio
+   tapado del todo. Media tapa cuenta como patio abierto a propósito — la geometría se ve
+   por debajo de la tapa mientras se desvanece, que es lo que hace la transición. */
+const macizo=(x,y)=>{const t=Tc(x,y);return t===EDIF||(t===PATIO&&tapaDe(x,y)===1);};
+/* Las casillas del patio en el que está el jugador, de una vez: son treinta contadas y
+   recorrerlas sale más barato que llevar un índice de componente por casilla del mapa. */
+function patioDe(x,y){
+ const i=y*MW+x;if(map[i]!==PATIO)return null;
+ const s=new Set([i]),pila=[i];
+ while(pila.length){const j=pila.pop(),cx=j%MW,cy=(j/MW)|0;
+  for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){
+   const nx=cx+dx,ny=cy+dy;if(nx<0||ny<0||nx>=MW||ny>=MH)continue;
+   const k=ny*MW+nx;if(map[k]===PATIO&&!s.has(k)){s.add(k);pila.push(k);}}}
+ return s;}
+function pasoPatios(dt){
+ const i=(player.y|0)*MW+(player.x|0);
+ const dentro=map[i]===PATIO;
+ if(dentro&&(!patioAbierto||!patioAbierto.has(i))){patioAbierto=patioDe(player.x|0,player.y|0);patioF=0;}
+ patioF=clamp(patioF+(dentro?dt:-dt)/PATIO_SEG,0,1);
+ if(!dentro&&patioF<=0)patioAbierto=null;}
+
 function tileDe(x,y,fa){
  const t=map[y*MW+x];
  if(t===EDIF)return TILE.tejados[roof[y*MW+x]]||TILE.tejados[0];
+ /* El patio tapado no es una casilla aparte que se parezca al tejado: ES el tejado del
+    bloque, con el índice que le tocó cuando era edificio. Si no, el parche de seis
+    casillas se corta justo donde hay patio y la manzana se delata sin abrirla. */
+ if(t===PATIO&&tapaDe(x,y)===1)return TILE.tejados[roof[y*MW+x]]||TILE.tejados[0];
  if(t===AGUA)return TILE.agua[fa];
  if(t===ROAD){
   const m=viaMarca[y*MW+x];
@@ -8008,8 +8133,11 @@ function dibCiudad(){
    else if(h%17===0)ctx.drawImage(PROP.contMaritimo,x*TS-4,y*TS+6);
    else if(h%13===0)ctx.drawImage(PROP.pales,x*TS+5,y*TS+8);
    else if(h%11===0)ctx.drawImage(PROP.bidon,x*TS+10,y*TS+9);}
-  else if(t===PATIO){if(h%7===0)ctx.drawImage(PROP.arbolPodado,x*TS+6,y*TS+3);
-   else if(h%9===0)ctx.drawImage(PROP.pales,x*TS+5,y*TS+8);}
+  else if(t===PATIO){
+   /* Si la tapa está entera, el árbol del patio se vería encima del tejado. */
+   if(tapaDe(x,y)<1){
+    if(h%7===0)ctx.drawImage(PROP.arbolPodado,x*TS+6,y*TS+3);
+    else if(h%9===0)ctx.drawImage(PROP.pales,x*TS+5,y*TS+8);}}
   else if(t===EDIF){
    /* Cada familia de tejado lleva lo suyo: en la teja, chimeneas; en la azotea, depósitos
       y tendederos; en la nave, lucernarios. Con eso, un bloque de Santutxu y una nave de
@@ -8027,13 +8155,23 @@ function dibCiudad(){
    else if(h%29===0)ctx.drawImage(PROP.lucernario,x*TS+4,y*TS+8);}}
  /* segunda pasada: los edificios se leen como bloques, no como casillas sueltas */
  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
-  if(map[y*MW+x]!==EDIF)continue;
-  const arriba=Tc(x,y-1)!==EDIF,abajo=Tc(x,y+1)!==EDIF;
-  const izq=Tc(x-1,y)!==EDIF,der=Tc(x+1,y)!==EDIF;
+  const t2=map[y*MW+x];
+  if(t2===PATIO){
+   /* La tapa va aquí, después de las fachadas y las sombras de las casillas de alrededor
+      —que se dibujan DENTRO de esta— y antes de lo que vaya encima del mundo. Entera no
+      hace falta pintarla: ya la puso `tileDe` en la primera pasada. */
+   const f=tapaDe(x,y);
+   if(f>0&&f<1){ctx.globalAlpha=f;
+    ctx.drawImage(TILE.tejados[roof[y*MW+x]]||TILE.tejados[0],x*TS,y*TS);ctx.globalAlpha=1;}
+   if(f<1)continue;}
+  else if(t2!==EDIF)continue;
+  const arriba=!macizo(x,y-1),abajo=!macizo(x,y+1);
+  const izq=!macizo(x-1,y),der=!macizo(x+1,y);
   /* La cara sur es la única que se ve de pie en la calle: ahí van los locales. Solo si
      hay dónde pararse a mirarlos — contra el agua o contra el monte no hay escaparate. */
   if(abajo&&andable(Tc(x,y+1))&&Tc(x,y+1)!==AGUA){
-   const l=FACH_BARRIO[(BARRIOS[barrioDe[y*MW+x]]||BARRIOS[0]).estilo]||FACH_BARRIO.bloques;
+   const l=Tc(x,y+1)===PATIO?FACH_PATIO
+    :FACH_BARRIO[(BARRIOS[barrioDe[y*MW+x]]||BARRIOS[0]).estilo]||FACH_BARRIO.bloques;
    const h2=hash(x*7,y*13);
    ctx.drawImage(PROP.fachadas[l[h2%l.length]],x*TS,y*TS+TS-FACH_H);
    ctx.drawImage(PROP.fachadas[l[(h2>>3)%l.length]],x*TS+16,y*TS+TS-FACH_H);}
@@ -8064,16 +8202,16 @@ function dibCiudad(){
  if(o){const pu=Math.round(Math.abs(Math.sin(performance.now()/300))*5);
   ctx.drawImage(MARCA.obj||(MARCA.obj=marcaAbajo(C.mostaza)),Math.round(o.x*TS)-7,Math.round(o.y*TS)-32-pu);}
  const L=[];
- for(const p of peatones)L.push([p.y,()=>pintaSombraChar(p)]);
- for(const e of enemigos)L.push([e.y,()=>{pintaSombraChar(e);
+ for(const p of peatones)L.push([p.y,()=>bajoTecho(p,()=>pintaSombraChar(p))]);
+ for(const e of enemigos)L.push([e.y,()=>bajoTecho(e,()=>{pintaSombraChar(e);
   const bx=Math.round(e.x*TS)-9,by=Math.round(e.y*TS)-26;
   ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(bx,by,18,3);
-  ctx.fillStyle=C.sangre;ctx.fillRect(bx,by,Math.round(18*clamp(e.hp/60,0,1)),3);}]);
+  ctx.fillStyle=C.sangre;ctx.fillRect(bx,by,Math.round(18*clamp(e.hp/60,0,1)),3);})]);
  for(const c of coches)if(c!==player.enCoche)L.push([c.y,()=>pintaCoche(c)]);
  for(const c of trafico)L.push([c.y,()=>pintaCoche(c)]);
  for(const p of policia)L.push([p.y,()=>pintaCoche(p,true)]);
  if(player.enCoche)L.push([player.y,()=>pintaCoche(player.enCoche,false,true)]);
- else L.push([player.y,()=>pintaSombraChar(player,true)]);
+ else L.push([player.y,()=>bajoTecho(player,()=>pintaSombraChar(player,true))]);
  L.sort((a,b)=>a[0]-b[0]).forEach(l=>l[1]());
  for(const b of balas){ctx.fillStyle=C.mostaza;
   ctx.fillRect(Math.round(b.x*TS)-1,Math.round(b.y*TS)-1,3,3);}
@@ -8088,6 +8226,17 @@ function dibCiudad(){
  cam.tinte[2]=lerp(cam.tinte[2],rgb[2],.02);
  ctx.fillStyle=`rgba(${cam.tinte[0]|0},${cam.tinte[1]|0},${cam.tinte[2]|0},.13)`;
  ctx.fillRect(0,0,W,H);}
+/* Quien está en un patio tapado está bajo techo y desde la calle no se le ve. Sin esto
+   —y pasa mucho, porque el portal es acera para quien anda— un peatón que se mete por el
+   portal sale paseando por encima del tejado. Se desvanece con la tapa y no de golpe:
+   todo lo demás del patio hace lo mismo. Los coches no entran (`rodable` no cuenta el
+   patio), así que esto solo hace falta para la gente. */
+function bajoTecho(e,pinta){
+ const x=clamp(e.x|0,0,MW-1), y=clamp(e.y|0,0,MH-1);
+ const a=map[y*MW+x]===PATIO?1-tapaDe(x,y):1;
+ if(a<=0)return;
+ if(a>=1){pinta();return;}
+ ctx.globalAlpha=a;pinta();ctx.globalAlpha=1;}
 function pintaSombraChar(e,esJugador){
  ctx.fillStyle='rgba(0,0,0,.34)';
  ctx.beginPath();ctx.ellipse(e.x*TS,e.y*TS+8,9,4,0,0,6.283);ctx.fill();
@@ -8146,8 +8295,11 @@ function mapaBase(){
  if(_mb)return _mb;
  _mb=lienzo(MW,MH);const g=_mb.getContext('2d');
  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=map[y*MW+x];
-  g.fillStyle=t===AGUA?C.agua:t===EDIF?'#262a30':t===PARQUE?'#2e4a2e':t===MONTE?'#23361f':t===PLAZA?'#5c574d'
-   :t===MUELLE?'#453d33':t===PATIO?'#3a3630':t===PUENTE?C.grisL:'#4a505a';
+  /* El patio va del color del edificio y no del suyo: el radar es un plano de la ciudad,
+     y un plano que te enseña los patios se salta la oclusión por la puerta de atrás. */
+  g.fillStyle=t===AGUA?C.agua:(t===EDIF||t===PATIO)?'#262a30':t===PARQUE?'#2e4a2e'
+   :t===MONTE?'#23361f':t===PLAZA?'#5c574d'
+   :t===MUELLE?'#453d33':t===PUENTE?C.grisL:'#4a505a';
   g.fillRect(x,y,1,1);}
  return _mb;}
 /* Redondea aquí: varias cajas se centran con (W-w)/2 y con ancho impar el marco de 1 px

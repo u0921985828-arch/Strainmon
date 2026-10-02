@@ -86,7 +86,12 @@ así que no se puede hacer a ojo desde aquí.
 
 ## 5 · Contenido que falta respecto al plan original
 
-- [ ] Oclusión de interiores de manzana con transición.
+- [x] Oclusión de interiores de manzana con transición. No había interiores que ocluir:
+      el plano municipal dibuja la manzana maciza y `PATIO` era un tipo de suelo con
+      textura y sin una sola casilla en el mapa. Ahora `abrirPatios()` abre 419 patios con
+      su portal, y desde la calle la manzana sigue siendo maciza: la tapa el tejado del
+      propio bloque y se destapa en 0,35 s al entrar. Ver *El interior de manzana* en
+      `CLAUDE.md`.
 - [ ] Más variedad de diálogo en los parroquianos.
 - [ ] Misiones secundarias no encadenadas.
 
@@ -122,6 +127,21 @@ Fallos que ya se cazaron y no deben volver:
 - El cono de auto-apuntado de Unity a 1,05 contra el 1,15 del prototipo. Tampoco daba
   error: daba un juego al que le costaba un poco más enganchar al enemigo que tienes
   delante, y eso no se ve jugando una de las dos versiones por separado.
+- `hash()` del HTML y `Utiles.Hash()` de Unity dando distinto en el **98 %** de las
+  casillas. Era la misma función escrita de dos maneras: el segundo producto en JS iba
+  con `*`, que multiplica en coma flotante, pasa de 2⁵³ y pierde justo los bits bajos que
+  luego se piden con un módulo; en C# es un producto de enteros de 32 bits con vuelta.
+  Tejados, farolas, flechas y tapas de alcantarilla en otro sitio en cada versión. El HTML
+  usa ya `Math.imul` y lo carea `herramientas/plano/patios.py`. Salió buscando otra cosa:
+  los patios se siembran por hash, y con los dos hash distintos las dos ciudades habrían
+  abierto los portales en manzanas distintas.
+- Peatones paseando por encima de un tejado. En cuanto los patios existieron, el portal
+  pasó a ser pisable y los vecinos se metían dentro; como los sprites van por encima de la
+  tapa, se veían caminando sobre la manzana. Se desvanecen con la tapa.
+- Un `ok()` del sigilo que medía otra cosa: `delito(1)` llama a `estrellas(1)`, que planta
+  una patrulla a menos de 28 casillas, y esa patrulla dejaba `S.visto` puesto mientras se
+  comprobaba que la sospecha baja al perderte de vista. Pasaba por casualidad, según dónde
+  cayera la patrulla, y dejó de pasar al mover un edificio.
 
 Los dos primeros errores de compilación reales, con lo que enseñan:
 

@@ -56,7 +56,11 @@ public static class Forja {
         g.P(14,14,4,4,Paleta.H("#6d6659")); Reg("plaza", g);
 
         g = T32(); g.Rellenar(Paleta.HormigonO); g.Ruido(new[]{Paleta.Hormigon,Paleta.CespedO}, 20);
-        for (int i = 0; i < 32; i += 11) g.P(i,0,1,32,Paleta.Carbon); Reg("patio", g);
+        // Las juntas van en los dos sentidos. Solo verticales eran rayas, y mientras el
+        // patio no se podía ver daba igual; en cuanto se entra, un suelo a rayas se lee
+        // como chapa.
+        for (int i = 0; i < 32; i += 11) { g.P(i,0,1,32,Paleta.Carbon); g.P(0,i,32,1,Paleta.Carbon); }
+        Reg("patio", g);
 
         // La vía se forja en las dos orientaciones y al volcar se elige según por dónde
         // sigue el trazado: una sola horizontal quedaría con las traviesas atravesadas.
