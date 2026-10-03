@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BILBO CITY · Forja de sprites</title>
+<style>
+:root{--hueso:#e6e2d6;--acero:#8d99a4;--oxido:#b7451f;--neon:#e8c547;--fondo:#0b0e12;--panel:#12181e;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{margin:0;background:var(--fondo);color:var(--hueso);
+ font-family:"Barlow Condensed","Oswald","Arial Narrow",system-ui,sans-serif;}
+header{position:sticky;top:0;z-index:5;background:rgba(11,14,18,.97);
+ border-bottom:1px solid rgba(141,153,164,.3);padding:calc(env(safe-area-inset-top) + 10px) 12px 0;}
+h1{margin:0;font-size:22px;letter-spacing:4px;text-transform:uppercase;}
+.sub{font-size:11px;letter-spacing:2px;color:var(--acero);text-transform:uppercase;margin:1px 0 9px;}
+nav{display:flex;gap:5px;overflow-x:auto;padding-bottom:9px;scrollbar-width:none;}
+nav::-webkit-scrollbar{display:none;}
+nav div{white-space:nowrap;padding:6px 11px;font-size:11px;letter-spacing:2px;text-transform:uppercase;
+ border:1px solid rgba(141,153,164,.3);cursor:pointer;}
+nav div.on{background:var(--oxido);border-color:var(--oxido);}
+.barra{display:flex;gap:6px;align-items:center;padding:0 0 9px;flex-wrap:wrap;}
+.bt{padding:6px 11px;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;
+ border:1px solid rgba(230,226,214,.35);cursor:pointer;}
+.bt:active{background:var(--oxido);}
+.bt.pri{background:var(--neon);color:#12181e;border-color:var(--neon);}
+main{padding:12px;}
+h2{font-size:15px;letter-spacing:3px;text-transform:uppercase;color:var(--neon);
+ margin:20px 0 4px;border-bottom:1px solid rgba(232,197,71,.25);padding-bottom:4px;}
+h2:first-child{margin-top:0;}
+.nota{font-size:11px;color:var(--acero);line-height:1.4;margin-bottom:9px;}
+.rej{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:7px;}
+.cel{background:var(--panel);border:1px solid rgba(141,153,164,.22);padding:5px 3px 4px;text-align:center;}
+.cel canvas{display:block;margin:0 auto;image-rendering:pixelated;
+ background:repeating-conic-gradient(#1a2027 0 25%,#141a20 0 50%) 0 0/12px 12px;}
+.cel .n{font-size:9px;color:var(--acero);margin-top:4px;word-break:break-all;line-height:1.15;}
+.tira{display:flex;gap:3px;justify-content:center;}
+footer{padding:24px 12px calc(env(safe-area-inset-bottom) + 30px);font-size:11px;color:var(--acero);line-height:1.5;}
+#salida{width:100%;height:110px;background:#0c1116;color:var(--acero);border:1px solid rgba(141,153,164,.3);
+ font-family:ui-monospace,monospace;font-size:10px;padding:6px;display:none;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Forja de sprites</h1>
+  <div class="sub">Bilbo City · catálogo y atlas</div>
+  <nav id="nav"></nav>
+  <div class="barra">
+    <div class="bt" id="zoomM">Zoom −</div><div class="bt" id="zoomP">Zoom +</div>
+    <div class="bt pri" id="expPng">Exportar atlas PNG</div>
+    <div class="bt" id="expJson">Exportar JSON</div>
+    <div class="bt" id="semilla">Otros vecinos</div>
+  </div>
+</header>
+<main id="main"></main>
+<textarea id="salida" readonly></textarea>
+<footer id="pie"></footer>
+
+<script>
+(()=>{
+"use strict";
+/*══════════ PALETA BLOQUEADA (40) ══════════*/
+const C={
+ negro:'#0b0e12',carbon:'#1c2229',asfalto:'#33383e',asfaltoO:'#2a2f34',asfaltoL:'#3f454c',
+ gris:'#4a444c',grisO:'#3a353c',grisL:'#5f5a63',acero:'#8d99a4',aceroO:'#6d7883',hueso:'#e6e2d6',
+ hormigon:'#7b7669',hormigonO:'#655f55',hormigonL:'#948e80',
+ piel1:'#f0cfae',piel2:'#e0b48c',piel3:'#c69068',piel4:'#a87247',piel5:'#8d6142',piel6:'#6b482f',
+ pelo1:'#2a2018',pelo2:'#4a3520',pelo3:'#7a5a2a',pelo4:'#b09a72',pelo5:'#8d99a4',
+ azul:'#1f3a5f',azulO:'#152741',azulL:'#2f5182',
+ rojo:'#b7451f',rojoO:'#8e3316',rojoL:'#d05c33',sangre:'#951f18',
+ verde:'#3d6b4a',verdeO:'#2d5137',verdeL:'#508a5f',cesped:'#3c6338',cespedO:'#2f5330',
+ agua:'#1c4652',aguaL:'#2a6473',
+ mostaza:'#e8c547',mostazaO:'#b89a2c',
+ morado:'#5b4a76',teja:'#7a5f52',tejaO:'#5f4840',madera:'#6b4326',maderaO:'#4d3019',maderaL:'#8a5c37',
+ blanco:'#f4f2ea',crema:'#d8d4c4',
+};
+function lienzo(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;
+ const g=c.getContext('2d');g.imageSmoothingEnabled=false;return c;}
+const P=(g,x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x|0,y|0,w|0,h|0);};
+let SEM=1;
+function h32(a,b){let h=(a*73856093)^(b*19349663)^(SEM*83492791);h=(h^(h>>13))*1274126177;return Math.abs(h^(h>>16));}
+function ruido(g,w,h,cols,d,ox=0,oy=0){for(let y=0;y<h;y++)for(let x=0;x<w;x++)
+ if(((x*7+y*13+((x*3)^(y*5)))%100)<d)P(g,x+ox,y+oy,1,1,cols[(x*3+y*7)%cols.length]);}
+
+/*══════════ 1 · PERSONAJES POR CAPAS ══════════*/
+/* Lienzo 20×26. Pies en (10,25).
+   8 direcciones como en los GTA portátiles: S SE E NE N NO O SO.
+   Las diagonales se resuelven como vista lateral con pista de frente o de espalda,
+   que es como se hacía en los sprites pequeños de verdad. */
+const AB=0,AR=1,IZ=2,DE=3;
+const DIR8=['s','se','e','ne','n','no','o','so'];
+/* base cardinal + si vemos la cara o el cogote */
+const MAPA8=[
+ {b:AB,f:0,e:0},{b:DE,f:1,e:0},{b:DE,f:0,e:0},{b:DE,f:0,e:1},
+ {b:AR,f:0,e:0},{b:IZ,f:0,e:1},{b:IZ,f:0,e:0},{b:IZ,f:1,e:0}];
+const POSES={
+ quieto:{p:[0,0],b:[0,0],y:0},
+ andar1:{p:[0,1],b:[1,-1],y:0}, andar2:{p:[1,0],b:[0,0],y:-1},
+ andar3:{p:[1,0],b:[-1,1],y:0}, andar4:{p:[0,1],b:[0,0],y:-1},
+ correr1:{p:[-2,2],b:[2,-2],y:-1}, correr2:{p:[2,-2],b:[-2,2],y:-1},
+ correr3:{p:[-3,3],b:[3,-3],y:-2}, correr4:{p:[3,-3],b:[-3,3],y:-2},
+ pega1:{p:[0,0],b:[0,0],y:0,ataque:1}, pega2:{p:[0,1],b:[0,0],y:0,ataque:2},
+ apunta:{p:[0,0],b:[0,0],y:0,apunta:1}, dispara:{p:[0,0],b:[0,0],y:-1,apunta:1,fog:1},
+ herido:{p:[1,1],b:[2,2],y:1,herido:1},
+};
+const ORDEN_POSES=['quieto','andar1','andar2','andar3','andar4','correr1','correr2','correr3','correr4','pega1','pega2','apunta','dispara','herido'];
+
+const COMPLEX={delgada:{w:6,hom:7},media:{w:8,hom:9},corpulenta:{w:10,hom:11}};
+const TORSOS={
+ camisa:{b:C.blanco,s:C.crema,l:C.blanco,manga:'larga'},
+ camisaRem:{b:C.blanco,s:C.crema,l:C.blanco,manga:'corta'},
+ chaqueta:{b:C.azul,s:C.azulO,l:C.azulL,manga:'larga'},
+ cazadora:{b:C.carbon,s:C.negro,l:C.gris,manga:'larga'},
+ sudadera:{b:C.grisL,s:C.gris,l:C.acero,manga:'larga',capucha:1},
+ chandal:{b:C.verde,s:C.verdeO,l:C.verdeL,manga:'larga',raya:C.hueso},
+ mono:{b:C.azulL,s:C.azul,l:C.acero,manga:'larga',peto:1},
+ abrigo:{b:C.tejaO,s:C.maderaO,l:C.teja,manga:'larga',largo:1},
+ gabardina:{b:C.crema,s:C.hormigonO,l:C.hueso,manga:'larga',largo:1},
+ jersey:{b:C.rojoO,s:C.sangre,l:C.rojo,manga:'larga'},
+ bata:{b:C.blanco,s:C.crema,l:C.blanco,manga:'larga',largo:1},
+ uniforme:{b:C.azulO,s:C.negro,l:C.azul,manga:'larga',placa:1},
+ camiseta:{b:C.mostaza,s:C.mostazaO,l:C.mostaza,manga:'corta'},
+ polo:{b:C.verdeL,s:C.verde,l:C.verdeL,manga:'corta'},
+ reflectante:{b:C.rojo,s:C.rojoO,l:C.mostaza,manga:'corta',bandas:1},
+ delantal:{b:C.carbon,s:C.negro,l:C.gris,manga:'corta',mandil:1},
+};
+const PIERNAS={
+ vaquero:{b:'#3a4f6b',s:'#2c3d53'},vestir:{b:C.carbon,s:C.negro},
+ chandalP:{b:C.verdeO,s:'#24422a',raya:C.hueso},monoP:{b:C.azulL,s:C.azul},
+ falda:{b:C.morado,s:'#443759',falda:1},short:{b:C.crema,s:C.hormigonO,corto:1},
+ cargo:{b:'#5d5b45',s:'#474535'},uniformeP:{b:C.azulO,s:C.negro},
+};
+const CALZADO={deportivas:C.blanco,botas:'#3a2d22',zapatos:C.negro,katiuskas:C.mostazaO};
+const PELOS=['rapado','corto','melena','coleta','mono','afro','calvo','canoso'];
+const GORROS=['ninguno','txapela','gorra','visera','cascoObra','cascoMoto','lana','policia','capucha'];
+const ACCES=['ninguno','mochila','bolso','bandolera','bufanda','gafas','carrito'];
+
+function dibChar(cfg,pose,d8){
+ const M=MAPA8[d8], dir=M.b, frente=M.f, espalda=M.e;
+ const c=lienzo(20,26),g=c.getContext('2d');
+ const P_=POSES[pose],comp=COMPLEX[cfg.comp],T=TORSOS[cfg.torso],PN=PIERNAS[cfg.piernas];
+ const diag=frente||espalda;
+ const lateral=(dir===DE||dir===IZ)&&!diag;
+ const cx=10+(diag?(dir===DE?-1:1):0)+(lateral?(dir===DE?1:-1):0);
+ const oy=P_.y, w=comp.w, hom=comp.hom-(diag?1:0)-(lateral?2:0);
+ const izqV=dir===IZ, derV=dir===DE, arr=(dir===AR)||espalda;
+ /* sombra de contacto la pinta el juego */
+ /* piernas */
+ const py=17+oy;
+ const l1=P_.p[0],l2=P_.p[1];
+ if(PN.falda){P(g,cx-w/2-1,py-1,w+2,6,PN.b);P(g,cx-w/2-1,py+4,w+2,1,PN.s);
+  P(g,cx-3,py+5,2,4,cfg.piel);P(g,cx+1,py+5,2,4,cfg.piel);}
+ else if(lateral){
+  /* de perfil las piernas se solapan: la trasera más oscura da profundidad */
+  const dx=derV?1:-1;
+  P(g,cx-2-dx,py+l2,3,8-l2,PN.s);
+  P(g,cx-2+dx,py+l1,3,8-l1,PN.b);
+  if(PN.corto){P(g,cx-2+dx,py+4,3,4,cfg.piel);}
+ }
+ else{
+  P(g,cx-3,py+l1,3,8-l1,PN.b);P(g,cx,py+l2,3,8-l2,PN.s);
+  if(PN.raya){P(g,cx-3,py+l1,1,8-l1,PN.raya);P(g,cx+2,py+l2,1,8-l2,PN.raya);}
+  if(PN.corto){P(g,cx-3,py+4,3,4-l1<0?0:4,cfg.piel);P(g,cx,py+4,3,4,cfg.piel);}
+ }
+ if(lateral){const dx=derV?1:-1;
+  P(g,cx-2-dx,24+oy,3,2,CALZADO[cfg.calzado]);P(g,cx-2+dx,24+oy,4,2,CALZADO[cfg.calzado]);}
+ else P(g,cx-3,24+oy,3,2,CALZADO[cfg.calzado]),P(g,cx,24+oy,3,2,CALZADO[cfg.calzado]);
+ /* torso */
+ const ty=9+oy,th=T.largo?10:8;
+ P(g,cx-hom/2,ty,hom,th,T.b);
+ P(g,cx-hom/2,ty,hom,2,T.l);
+ P(g,cx+hom/2-1,ty,1,th,T.s);
+ if(T.raya)P(g,cx-hom/2,ty,1,th,T.raya);
+ if(T.peto){P(g,cx-hom/2+1,ty+2,hom-2,5,T.l);P(g,cx-1,ty+3,2,2,T.s);}
+ if(T.bandas){P(g,cx-hom/2,ty+3,hom,1,C.hueso);P(g,cx-hom/2,ty+6,hom,1,C.hueso);}
+ if(T.mandil&&!arr){P(g,cx-hom/2+1,ty+2,hom-2,th-1,C.crema);}
+ if(T.placa&&!arr)P(g,cx-hom/2+1,ty+3,2,2,C.mostaza);
+ if(T.capucha)P(g,cx-hom/2,ty-1,hom,3,T.s);
+ /* brazos */
+ const b1=P_.b[0],b2=P_.b[1];
+ const mangaCol=T.manga==='corta'?T.b:T.b, manoY=T.manga==='corta'?ty+4:ty+7;
+ const bx1=cx-hom/2-2,bx2=cx+hom/2;
+ if(P_.ataque){
+  const ex=P_.ataque===2?4:2;
+  if(derV||dir===AB){P(g,bx2,ty+2,2+ex,3,mangaCol);P(g,bx2+2+ex,ty+2,2,3,cfg.piel);}
+  else{P(g,bx1-ex,ty+2,2+ex,3,mangaCol);P(g,bx1-ex-2,ty+2,2,3,cfg.piel);}
+  P(g,bx1,ty+2+b2,2,6,T.s);
+ }else if(P_.apunta){
+  if(derV){P(g,bx2,ty+3,5,2,mangaCol);P(g,bx2+5,ty+3,2,2,cfg.piel);}
+  else if(izqV){P(g,bx1-3,ty+3,5,2,mangaCol);P(g,bx1-5,ty+3,2,2,cfg.piel);}
+  else{P(g,bx2-1,ty+2,3,5,mangaCol);P(g,bx2-1,ty+7,3,2,cfg.piel);}
+  P(g,bx1,ty+3,2,5,T.s);
+ }else if(lateral){
+  /* de perfil solo se ve el brazo cercano; el otro queda tapado por el cuerpo */
+  const bf=derV?bx2:bx1;
+  P(g,bf,ty+1+b1,2,6,T.l);P(g,bf,manoY+b1,2,2,cfg.piel);
+ }else{
+  P(g,bx1,ty+1+b1,2,6,T.l);P(g,bx2,ty+1+b2,2,6,T.s);
+  P(g,bx1,manoY+b1,2,2,cfg.piel);P(g,bx2,manoY+b2,2,2,cfg.piel);
+ }
+ /* cabeza */
+ const hy=1+oy;
+ P(g,cx-4,hy,8,8,cfg.piel);
+ P(g,cx+3,hy,1,8,cfg.pielS);P(g,cx-4,hy,8,1,cfg.pielS);
+ if(dir===AB){P(g,cx-2,hy+4,1,2,C.negro);P(g,cx+1,hy+4,1,2,C.negro);P(g,cx-1,hy+7,2,1,cfg.pielS);}
+ if(izqV){P(g,cx-4,hy+4,1,2,C.negro);P(g,cx-4,hy,4,8,cfg.pielS);}
+ if(derV){P(g,cx+3,hy+4,1,2,C.negro);P(g,cx,hy,4,8,cfg.pielS);}
+ /* diagonal hacia el jugador: asoma el segundo ojo y la nariz */
+ if(frente){
+  if(derV){P(g,cx,hy,4,8,cfg.piel);P(g,cx,hy+4,1,2,C.negro);P(g,cx+2,hy+6,1,1,cfg.pielS);}
+  else{P(g,cx-1,hy,4,8,cfg.piel);P(g,cx+2,hy+4,1,2,C.negro);P(g,cx-3,hy+6,1,1,cfg.pielS);}}
+ /* diagonal de espaldas: sin cara, solo cogote */
+ if(espalda){P(g,cx-4,hy,8,8,cfg.pielS);}
+ if(P_.herido&&dir===AB){P(g,cx-2,hy+4,4,1,C.sangre);}
+ /* pelo */
+ const pc=cfg.pelo==='canoso'?C.pelo5:cfg.pelocol;
+ const est=cfg.pelo;
+ if(est!=='calvo'){
+  if(est==='rapado')P(g,cx-4,hy-1,8,3,pc);
+  else if(est==='corto'){P(g,cx-4,hy-2,8,4,pc);if(!arr)P(g,cx-4,hy+2,2,2,pc);}
+  else if(est==='melena'){P(g,cx-5,hy-2,10,4,pc);P(g,cx-5,hy+2,2,7,pc);P(g,cx+3,hy+2,2,7,pc);}
+  else if(est==='coleta'){P(g,cx-4,hy-2,8,4,pc);P(g,cx-6,hy+1,2,6,pc);}
+  else if(est==='mono'){P(g,cx-4,hy-2,8,4,pc);P(g,cx-2,hy-5,4,3,pc);}
+  else if(est==='afro'){P(g,cx-6,hy-4,12,7,pc);}
+  else P(g,cx-4,hy-2,8,4,pc);
+  if(arr&&est!=='calvo')P(g,cx-4,hy-2,8,8,pc);
+ }
+ /* gorro */
+ const G=cfg.gorro;
+ if(G==='txapela'){P(g,cx-5,hy-3,10,3,C.carbon);P(g,cx-6,hy-1,12,2,C.carbon);P(g,cx-1,hy-4,2,1,C.gris);}
+ else if(G==='gorra'){P(g,cx-4,hy-3,8,3,cfg.gorroCol);if(!arr)P(g,cx-4,hy,6,1,cfg.gorroCol);}
+ else if(G==='visera'){P(g,cx-4,hy-2,8,2,cfg.gorroCol);if(!arr)P(g,cx-5,hy,7,1,cfg.gorroCol);}
+ else if(G==='cascoObra'){P(g,cx-5,hy-4,10,5,C.mostaza);P(g,cx-6,hy,12,1,C.mostazaO);P(g,cx-1,hy-5,2,1,C.mostazaO);}
+ else if(G==='cascoMoto'){P(g,cx-5,hy-3,10,9,C.rojo);if(!arr)P(g,cx-3,hy+2,6,3,C.carbon);}
+ else if(G==='lana'){P(g,cx-4,hy-3,8,4,C.rojoO);P(g,cx-4,hy+1,8,1,C.rojo);}
+ else if(G==='policia'){P(g,cx-4,hy-3,8,3,C.azulO);if(!arr){P(g,cx-5,hy,8,1,C.azulO);P(g,cx-1,hy-2,2,1,C.mostaza);}}
+ else if(G==='capucha'){P(g,cx-5,hy-2,10,6,TORSOS[cfg.torso].s);if(!arr)P(g,cx-3,hy+1,6,5,cfg.piel);}
+ /* accesorio */
+ const A=cfg.acces;
+ if(A==='mochila'){if(arr)P(g,cx-4,ty+1,8,7,C.verdeO);else{P(g,cx-hom/2-1,ty+2,2,5,C.verdeO);P(g,cx+hom/2-1,ty+2,2,5,C.verdeO);}}
+ else if(A==='bolso'){P(g,cx+hom/2-1,ty+5,3,3,C.maderaO);P(g,cx-1,ty+1,hom/2,1,C.madera);}
+ else if(A==='bandolera'){P(g,cx-hom/2,ty+1,hom,1,C.maderaO);P(g,cx-hom/2-1,ty+5,2,3,C.madera);}
+ else if(A==='bufanda'){P(g,cx-4,ty-1,8,2,C.rojo);P(g,cx+1,ty+1,2,4,C.rojoO);}
+ else if(A==='gafas'&&dir===AB){P(g,cx-3,hy+4,2,2,C.carbon);P(g,cx+1,hy+4,2,2,C.carbon);P(g,cx-1,hy+4,2,1,C.carbon);}
+ else if(A==='carrito'&&!arr){P(g,cx+5,ty+5,5,8,C.rojoO);P(g,cx+5,ty+5,5,2,C.rojo);P(g,cx+6,ty+13,1,2,C.carbon);P(g,cx+8,ty+13,1,2,C.carbon);}
+ /* fogonazo */
+ if(P_.fog){
+  if(derV)P(g,cx+hom/2+7,ty+2,3,3,C.mostaza);
+  else if(izqV)P(g,cx-hom/2-8,ty+2,3,3,C.mostaza);
+  else P(g,cx+hom/2-1,ty+9,3,3,C.mostaza);}
+ return c;
+}
+/* --- Arquetipos --- */
+function A(nombre,comp,pielI,pelo,pelocol,gorro,gorroCol,torso,piernas,calzado,acces){
+ const pieles=[C.piel1,C.piel2,C.piel3,C.piel4,C.piel5,C.piel6];
+ const oscuras=['#d2ac89','#c1946e','#a5734f','#8a5b36','#6f4a31','#523524'];
+ return {nombre,comp,piel:pieles[pielI],pielS:oscuras[pielI],pelo,pelocol,gorro,gorroCol,torso,piernas,calzado,acces};
+}
+const ARQUETIPOS=[
+ A('protagonista','media',1,'corto',C.pelo1,'txapela',null,'cazadora','vaquero','botas','ninguno'),
+ A('ertzaina','corpulenta',1,'rapado',C.pelo1,'policia',null,'uniforme','uniformeP','botas','ninguno'),
+ A('ertzaina_asalto','corpulenta',2,'rapado',C.pelo1,'cascoMoto',null,'uniforme','uniformeP','botas','bandolera'),
+ A('maton_a','corpulenta',2,'rapado',C.pelo1,'gorra',C.carbon,'cazadora','vaquero','deportivas','ninguno'),
+ A('maton_b','media',4,'corto',C.pelo1,'capucha',null,'sudadera','chandalP','deportivas','ninguno'),
+ A('josu_barman','media',1,'corto',C.pelo2,'ninguno',null,'camisaRem','vestir','zapatos','ninguno'),
+ A('txema_jefe','corpulenta',2,'corto',C.pelo1,'ninguno',null,'abrigo','vestir','zapatos','ninguno'),
+ A('mikel_parroquiano','media',1,'canoso',C.pelo5,'txapela',null,'jersey','vestir','zapatos','bufanda'),
+ A('iker_mecanico','media',2,'corto',C.pelo2,'gorra',C.azul,'mono','monoP','botas','ninguno'),
+ A('bego_pescatera','media',0,'mono',C.pelo2,'ninguno',null,'bata','vestir','katiuskas','ninguno'),
+ A('koldo_armero','corpulenta',1,'calvo',C.pelo1,'ninguno',null,'camisa','cargo','botas','ninguno'),
+ A('amaia_casera','media',0,'mono',C.pelo5,'ninguno',null,'jersey','falda','zapatos','bolso'),
+ A('medico','media',1,'corto',C.pelo3,'ninguno',null,'bata','vestir','zapatos','ninguno'),
+ A('enfermera','delgada',3,'coleta',C.pelo1,'ninguno',null,'bata','vestir','deportivas','ninguno'),
+ A('obrero','corpulenta',2,'corto',C.pelo2,'cascoObra',null,'reflectante','cargo','botas','ninguno'),
+ A('estibador','corpulenta',4,'rapado',C.pelo1,'lana',null,'reflectante','monoP','botas','ninguno'),
+ A('taxista','media',1,'calvo',C.pelo5,'ninguno',null,'camisaRem','vestir','zapatos','gafas'),
+ A('repartidor','delgada',2,'corto',C.pelo1,'cascoMoto',null,'chaqueta','cargo','deportivas','mochila'),
+ A('oficinista','media',0,'corto',C.pelo2,'ninguno',null,'camisa','vestir','zapatos','bandolera'),
+ A('ejecutiva','delgada',1,'melena',C.pelo2,'ninguno',null,'gabardina','falda','zapatos','bolso'),
+ A('ama_de_casa','media',1,'mono',C.pelo3,'ninguno',null,'jersey','falda','zapatos','carrito'),
+ A('aitite','media',0,'canoso',C.pelo5,'txapela',null,'abrigo','vestir','zapatos','ninguno'),
+ A('amama','delgada',0,'mono',C.pelo5,'ninguno',null,'abrigo','falda','zapatos','bolso'),
+ A('adolescente','delgada',2,'corto',C.pelo1,'gorra',C.rojo,'chandal','chandalP','deportivas','mochila'),
+ A('turista','corpulenta',0,'corto',C.pelo4,'visera',C.blanco,'camiseta','short','deportivas','bandolera'),
+ A('ciclista','delgada',1,'corto',C.pelo2,'cascoMoto',null,'polo','short','deportivas','ninguno'),
+ A('camarera','delgada',3,'coleta',C.pelo1,'ninguno',null,'delantal','vestir','deportivas','ninguno'),
+ A('tendero','corpulenta',2,'calvo',C.pelo1,'ninguno',null,'delantal','vaquero','zapatos','ninguno'),
+ A('vigilante','corpulenta',5,'rapado',C.pelo1,'gorra',C.carbon,'uniforme','uniformeP','botas','ninguno'),
+ A('marinero','media',3,'corto',C.pelo1,'lana',null,'jersey','vaquero','katiuskas','ninguno'),
+];
+
+/*══════════ 2 · ARMAS ══════════*/
+const ARMAS=[
+ {id:'navaja',l:4,col:C.acero,mango:C.maderaO},
+ {id:'bate',l:9,col:C.maderaL,mango:C.maderaO,grosor:2},
+ {id:'llave',l:6,col:C.acero,mango:C.gris,grosor:2},
+ {id:'botella',l:5,col:C.verdeL,mango:C.verde,grosor:3},
+ {id:'pistola',l:5,col:C.carbon,mango:C.negro,fuego:1},
+ {id:'revolver',l:5,col:C.gris,mango:C.maderaO,fuego:1},
+ {id:'uzi',l:7,col:C.carbon,mango:C.negro,fuego:1,grosor:2},
+ {id:'escopeta',l:11,col:C.maderaO,mango:C.carbon,fuego:1,grosor:2},
+ {id:'fusil',l:12,col:C.verdeO,mango:C.carbon,fuego:1,grosor:2},
+ {id:'molotov',l:4,col:C.verde,mango:C.crema},
+ {id:'extintor',l:6,col:C.rojo,mango:C.carbon,grosor:4},
+];
+function dibArmaMano(a,d8){
+ const M=MAPA8[d8],dir=M.b;
+ const c=lienzo(20,26),g=c.getContext('2d');
+ const gr=a.grosor||1, y=13, dg=(M.f||M.e)?1:0;
+ if(dir===DE){P(g,13-dg,y+dg,a.l,gr,a.col);P(g,11-dg,y+dg,2,gr+1,a.mango);}
+ else if(dir===IZ){P(g,7+dg-a.l,y+dg,a.l,gr,a.col);P(g,7+dg,y+dg,2,gr+1,a.mango);}
+ else if(dir===AB){P(g,12,y+2,gr,a.l,a.col);P(g,12,y,gr+1,2,a.mango);}
+ else{P(g,7,y-a.l,gr,a.l,a.col);P(g,7,y,gr+1,2,a.mango);}
+ return c;
+}
+function dibArmaSuelo(a){
+ const c=lienzo(16,16),g=c.getContext('2d');
+ P(g,3,7,a.l+2,(a.grosor||1)+1,a.col);P(g,2,7,2,(a.grosor||1)+2,a.mango);
+ P(g,3,7,a.l+2,1,C.hueso);
+ return c;
+}
+
+/*══════════ 3 · VEHÍCULOS ══════════*/
+const CHASIS={
+ utilitario:{l:32,an:18,morro:4,cabina:[9,11]},
+ berlina:{l:38,an:18,morro:6,cabina:[12,12]},
+ ranchera:{l:40,an:18,morro:6,cabina:[11,18]},
+ monovolumen:{l:36,an:20,morro:4,cabina:[8,18]},
+ furgoCorta:{l:36,an:20,morro:5,cabina:[8,8],caja:[17,15]},
+ furgoLarga:{l:44,an:20,morro:5,cabina:[8,8],caja:[17,24]},
+ deportivo:{l:38,an:17,morro:8,cabina:[14,11],bajo:1},
+ todoterreno:{l:38,an:21,morro:5,cabina:[11,16],alto:1},
+ taxi:{l:38,an:18,morro:6,cabina:[12,12],taxi:1},
+ patrulla:{l:38,an:18,morro:6,cabina:[12,12],rotativo:1},
+ ambulancia:{l:44,an:21,morro:5,cabina:[8,8],caja:[16,26],rotativo:1},
+ bombero:{l:48,an:22,morro:6,cabina:[9,10],caja:[20,26],rotativo:1},
+ basura:{l:46,an:21,morro:5,cabina:[8,9],caja:[18,26]},
+ autobus:{l:56,an:22,morro:3,cabina:[6,46],bus:1},
+ camionObra:{l:46,an:21,morro:6,cabina:[9,10],volquete:1},
+ gruaVeh:{l:44,an:20,morro:6,cabina:[9,10],brazo:1},
+ moto:{l:22,an:10,moto:1},
+ scooter:{l:19,an:10,moto:1,scooter:1},
+ bici:{l:18,an:8,bici:1},
+ barca:{l:34,an:16,barca:1},
+};
+const LIBREAS=[
+ ['rojo','#c23b22','#952914','#e05b3c'],['azul','#3f6f8f','#2f5469','#5b93b5'],
+ ['verde','#3f8f6f','#2f6c53','#5bb392'],['blanco','#d8d4c4','#aca894','#f0ece0'],
+ ['negro','#2f3f4f','#22303c','#48606f'],['mostaza','#c9a13f','#9c7a2c','#e8c547'],
+];
+function dibVehiculo(tipo,lib,estado){
+ const K=CHASIS[tipo];
+ const c=lienzo(K.l+6,K.an+6),g=c.getContext('2d');
+ const ox=3,oy=3,L=K.l,AN=K.an;
+ let base=lib[1],osc=lib[2],cl=lib[3];
+ if(estado==='quemado'){base='#2a2622';osc='#191612';cl='#3a352f';}
+ if(K.bici||K.moto){
+  P(g,ox+2,oy+AN/2-1,L-4,2,base);
+  P(g,ox,oy+AN/2-3,4,6,C.carbon);P(g,ox+L-5,oy+AN/2-3,5,6,C.carbon);
+  if(!K.bici){P(g,ox+L/2-3,oy+AN/2-3,7,6,cl);P(g,ox+L-8,oy+AN/2-2,3,4,C.acero);}
+  if(K.scooter)P(g,ox+4,oy+AN/2-4,7,8,base);
+  return c;}
+ if(K.barca){
+  P(g,ox+2,oy+2,L-4,AN-4,base);P(g,ox,oy+AN/2-3,4,6,base);
+  P(g,ox+2,oy+2,L-4,2,cl);P(g,ox+2,oy+AN-4,L-4,2,osc);
+  P(g,ox+L-14,oy+4,8,AN-8,C.crema);P(g,ox+L-4,oy+AN/2-2,4,4,C.carbon);
+  return c;}
+ /* sombra base */
+ P(g,ox,oy+1,L,AN-2,C.negro);
+ P(g,ox+1,oy+1,L-2,AN-2,base);
+ P(g,ox+1,oy+1,L-2,2,cl);
+ P(g,ox+1,oy+AN-3,L-2,2,osc);
+ P(g,ox+2,oy+3,K.morro,AN-6,cl);
+ /* cabina */
+ const [cxp,cw]=K.cabina;
+ P(g,ox+cxp,oy+3,cw,AN-6,C.carbon);
+ P(g,ox+cxp+1,oy+4,3,AN-8,'#3f5566');
+ P(g,ox+cxp+cw-3,oy+4,2,AN-8,'#31424f');
+ if(K.caja){const[bx,bw]=K.caja;P(g,ox+bx,oy+2,bw,AN-4,cl);P(g,ox+bx+1,oy+3,bw-2,AN-6,base);}
+ if(K.bus){for(let i=8;i<L-6;i+=7)P(g,ox+i,oy+2,5,2,'#3f5566');}
+ if(K.volquete)P(g,ox+cxp+cw,oy+2,L-cxp-cw-2,AN-4,C.mostazaO);
+ if(K.brazo){P(g,ox+cxp+cw,oy+AN/2-2,L-cxp-cw-2,4,C.mostaza);P(g,ox+L-8,oy+AN/2-4,3,8,C.gris);}
+ /* faros */
+ P(g,ox+L-4,oy+4,3,3,'#e8dfa8');P(g,ox+L-4,oy+AN-7,3,3,'#e8dfa8');
+ P(g,ox+1,oy+4,2,3,'#f4eec8');P(g,ox+1,oy+AN-7,2,3,'#f4eec8');
+ /* ruedas */
+ const rw=K.alto?4:3;
+ P(g,ox+5,oy-1,6,rw,C.negro);P(g,ox+L-12,oy-1,6,rw,C.negro);
+ P(g,ox+5,oy+AN-2,6,rw,C.negro);P(g,ox+L-12,oy+AN-2,6,rw,C.negro);
+ /* extras */
+ if(K.taxi){P(g,ox+cxp+2,oy-1,6,3,C.mostaza);
+  for(let i=0;i<L-8;i+=4)P(g,ox+2+i,oy+AN/2-1,2,2,C.carbon);}
+ if(K.rotativo){P(g,ox+cxp,oy+1,3,AN-2,estado==='rotA'?'#2f6bff':C.gris);
+  P(g,ox+cxp+3,oy+1,3,AN-2,estado==='rotA'?C.gris:'#ff3b30');}
+ if(tipo==='ambulancia'){P(g,ox+18,oy+AN/2-1,10,2,C.rojo);P(g,ox+22,oy+AN/2-5,2,10,C.rojo);}
+ if(tipo==='bombero'){P(g,ox+2,oy+2,L-4,1,C.rojo);}
+ if(estado==='abollado'){for(let i=0;i<9;i++)P(g,ox+4+((i*7)%(L-8)),oy+3+((i*5)%(AN-6)),2,2,osc);}
+ if(estado==='humo'||estado==='quemado'){for(let i=0;i<14;i++)P(g,ox+2+((i*5)%(L-4)),oy+2+((i*3)%(AN-4)),2,2,'#1a1714');}
+ return c;
+}
+
+/*══════════ 4 · TILES ══════════*/
+function T(fn){const c=lienzo(32,32),g=c.getContext('2d');fn(g);return c;}
+const rell=(g,col)=>P(g,0,0,32,32,col);
+const TILES={
+ calzada:()=>T(g=>{rell(g,C.asfalto);ruido(g,32,32,[C.asfaltoO,C.asfaltoL],22);}),
+ calzada_grieta:()=>T(g=>{rell(g,C.asfalto);ruido(g,32,32,[C.asfaltoO,C.asfaltoL],22);
+  for(let i=0;i<26;i++)P(g,4+i*.9,6+Math.sin(i/3)*4,1,1,C.asfaltoO);}),
+ calzada_linea_h:()=>T(g=>{rell(g,C.asfalto);ruido(g,32,32,[C.asfaltoO,C.asfaltoL],22);P(g,8,15,16,2,C.crema);}),
+ calzada_linea_v:()=>T(g=>{rell(g,C.asfalto);ruido(g,32,32,[C.asfaltoO,C.asfaltoL],22);P(g,15,8,2,16,C.crema);}),
+ cebra_h:()=>T(g=>{rell(g,C.asfalto);for(let y=2;y<32;y+=8)P(g,0,y,32,5,C.crema);}),
+ cebra_v:()=>T(g=>{rell(g,C.asfalto);for(let x=2;x<32;x+=8)P(g,x,0,5,32,C.crema);}),
+ stop_pintado:()=>T(g=>{rell(g,C.asfalto);ruido(g,32,32,[C.asfaltoO],18);P(g,4,12,24,3,C.crema);P(g,7,18,18,6,C.crema);}),
+ bache:()=>T(g=>{rell(g,C.asfalto);ruido(g,32,32,[C.asfaltoO],20);P(g,10,10,12,10,C.asfaltoO);P(g,12,12,8,6,C.negro);}),
+ alcantarilla:()=>T(g=>{rell(g,C.asfalto);P(g,9,9,14,14,C.gris);
+  for(let i=11;i<22;i+=3)P(g,i,11,1,10,C.carbon);}),
+ acera:()=>T(g=>{rell(g,C.hormigon);ruido(g,32,32,[C.hormigonO,C.hormigonL],16);
+  for(let i=0;i<32;i+=8){P(g,i,0,1,32,C.hormigonO);P(g,0,i,32,1,C.hormigonO);}}),
+ acera_gastada:()=>T(g=>{rell(g,C.hormigonO);ruido(g,32,32,[C.hormigon,C.carbon],26);
+  for(let i=0;i<32;i+=8)P(g,0,i,32,1,C.carbon);}),
+ adoquin:()=>T(g=>{rell(g,C.hormigonO);
+  for(let y=0;y<32;y+=6)for(let x=(y%12?3:0);x<32;x+=7){P(g,x,y,6,5,C.hormigon);P(g,x,y,6,1,C.hormigonL);}}),
+ adoquin_rojo:()=>T(g=>{rell(g,C.tejaO);
+  for(let y=0;y<32;y+=6)for(let x=(y%12?3:0);x<32;x+=7){P(g,x,y,6,5,C.teja);P(g,x,y,6,1,'#96786a');}}),
+ vado:()=>T(g=>{rell(g,C.hormigon);ruido(g,32,32,[C.hormigonO],14);P(g,0,24,32,8,C.hormigonO);
+  for(let i=0;i<32;i+=4)P(g,i,24,2,8,C.hormigonL);}),
+ bordillo:()=>T(g=>{rell(g,C.hormigon);P(g,0,26,32,6,C.hormigonL);P(g,0,24,32,2,C.hormigonO);}),
+ rejilla_arbol:()=>T(g=>{rell(g,C.hormigon);P(g,7,7,18,18,C.carbon);
+  for(let i=9;i<24;i+=3)P(g,i,9,1,14,C.gris);}),
+ cesped:()=>T(g=>{rell(g,C.cesped);ruido(g,32,32,[C.cespedO,'#4d7c48'],28);}),
+ cesped_alto:()=>T(g=>{rell(g,C.cespedO);ruido(g,32,32,[C.cesped,'#4d7c48'],34);
+  for(let i=0;i<10;i++)P(g,(i*7)%30,(i*11)%28,1,4,'#4d7c48');}),
+ tierra:()=>T(g=>{rell(g,'#6b5236');ruido(g,32,32,['#5a4429','#7d6244'],26);}),
+ camino:()=>T(g=>{rell(g,'#8a7f66');ruido(g,32,32,['#79705a','#9c9078'],22);}),
+ seto:()=>T(g=>{rell(g,C.cespedO);ruido(g,32,32,['#254528','#4d7c48'],40);P(g,0,0,32,2,'#4d7c48');}),
+ agua_a:()=>T(g=>{rell(g,C.agua);ruido(g,32,32,['#193f4a','#20505e'],20);
+  for(let y=0;y<32;y+=8)P(g,0,y,32,1,C.aguaL);}),
+ agua_b:()=>T(g=>{rell(g,C.agua);ruido(g,32,32,['#193f4a','#20505e'],20);
+  for(let y=4;y<32;y+=8)P(g,4,y,22,1,'#35798a');}),
+ orilla:()=>T(g=>{rell(g,C.agua);P(g,0,0,32,12,C.hormigonO);P(g,0,12,32,2,C.hormigon);
+  ruido(g,32,12,[C.hormigon],18);}),
+ muelle:()=>T(g=>{rell(g,'#5e5346');ruido(g,32,32,['#524839','#6b6052'],18);
+  for(let y=0;y<32;y+=6)P(g,0,y,32,1,'#463d31');}),
+ pantalan:()=>T(g=>{rell(g,C.madera);for(let y=0;y<32;y+=8){P(g,0,y,32,7,C.maderaL);P(g,0,y+7,32,1,C.maderaO);}}),
+ teja_marron:()=>T(g=>{rell(g,'#6b5d52');ruido(g,32,32,['#554a41','#867567'],14);
+  for(let y=4;y<32;y+=6)P(g,0,y,32,1,'#554a41');}),
+ teja_roja:()=>T(g=>{rell(g,C.teja);ruido(g,32,32,[C.tejaO,'#95776a'],14);
+  for(let y=4;y<32;y+=6)P(g,0,y,32,1,C.tejaO);}),
+ teja_vieja:()=>T(g=>{rell(g,'#6e6656');ruido(g,32,32,['#5a5346','#3c6338'],24);
+  for(let y=4;y<32;y+=6)P(g,0,y,32,1,'#5a5346');}),
+ grava:()=>T(g=>{rell(g,'#5c5a63');ruido(g,32,32,['#4a4850','#75727d'],34);}),
+ chapa:()=>T(g=>{rell(g,'#566060');for(let x=0;x<32;x+=4){P(g,x,0,1,32,'#454e4e');P(g,x+1,0,1,32,'#6e7a7a');}}),
+ chapa_oxido:()=>T(g=>{rell(g,'#6b4f3a');for(let x=0;x<32;x+=4)P(g,x,0,1,32,'#4d3728');
+  ruido(g,32,32,['#8a5c37',C.rojoO],22);}),
+ azotea_luz:()=>T(g=>{rell(g,'#5c5a63');ruido(g,32,32,['#4a4850'],16);P(g,9,9,14,14,'#7f9aa8');P(g,11,11,10,10,'#a8c4d0');}),
+ azotea_aire:()=>T(g=>{rell(g,'#5c5a63');ruido(g,32,32,['#4a4850'],16);P(g,6,8,14,12,C.acero);
+  P(g,8,10,10,8,C.aceroO);for(let i=9;i<18;i+=3)P(g,i,10,1,8,C.acero);}),
+ pizarra:()=>T(g=>{rell(g,'#3f4348');ruido(g,32,32,['#33373b','#4d5257'],20);
+  for(let y=0;y<32;y+=8)P(g,0,y,32,1,'#2c3033');}),
+ azotea_tendedero:()=>T(g=>{rell(g,'#6e6656');ruido(g,32,32,['#5a5346'],14);
+  P(g,4,10,24,1,C.acero);for(let i=0;i<4;i++)P(g,6+i*6,11,4,7,[C.rojo,C.blanco,C.azul,C.mostaza][i]);}),
+ azotea_antena:()=>T(g=>{rell(g,'#5c5a63');ruido(g,32,32,['#4a4850'],16);
+  P(g,15,6,2,20,C.acero);for(let y=8;y<22;y+=4)P(g,10,y,12,1,C.acero);}),
+ azotea_deposito:()=>T(g=>{rell(g,'#5c5a63');ruido(g,32,32,['#4a4850'],16);
+  P(g,8,8,16,16,C.crema);P(g,10,10,12,12,C.hormigon);P(g,14,4,4,5,C.acero);}),
+ parquet:()=>T(g=>{rell(g,C.madera);for(let y=0;y<32;y+=8){P(g,0,y,32,7,C.maderaL);P(g,0,y+7,32,1,C.maderaO);
+  for(let x=(y%16?8:0);x<32;x+=16)P(g,x,y,1,7,C.maderaO);}}),
+ tarima_bar:()=>T(g=>{rell(g,'#7a5f3f');ruido(g,32,32,['#654e33','#8f7150'],14);
+  for(let i=0;i<32;i+=8)P(g,0,i,32,1,'#654e33');}),
+ hidraulico:()=>T(g=>{rell(g,C.crema);
+  for(let y=0;y<32;y+=16)for(let x=0;x<32;x+=16){P(g,x,y,16,16,C.crema);P(g,x+2,y+2,12,12,C.azulL);
+   P(g,x+5,y+5,6,6,C.crema);P(g,x,y,16,1,C.hormigonO);P(g,x,y,1,16,C.hormigonO);}}),
+ terrazo:()=>T(g=>{rell(g,C.hormigonL);ruido(g,32,32,[C.acero,C.crema,C.hormigonO],40);
+  for(let i=0;i<32;i+=16){P(g,i,0,1,32,C.hormigonO);P(g,0,i,32,1,C.hormigonO);}}),
+ hormigon_taller:()=>T(g=>{rell(g,'#4d5157');ruido(g,32,32,['#42464b','#5b6067'],18);
+  P(g,0,15,32,2,C.mostazaO);}),
+ linoleo:()=>T(g=>{rell(g,'#8fa8a0');ruido(g,32,32,['#7d968e','#a3bab2'],14);
+  for(let i=0;i<32;i+=16)P(g,i,0,1,32,'#7d968e');}),
+ moqueta:()=>T(g=>{rell(g,'#5b3f42');ruido(g,32,32,['#4a3236','#6e4f52'],40);}),
+ pared_ladrillo:()=>T(g=>{rell(g,'#4b3b32');ruido(g,32,32,['#43342c','#57453a'],16);
+  for(let y=0;y<32;y+=8){P(g,0,y,32,1,'#3a2d26');for(let x=(y%16?8:0);x<32;x+=16)P(g,x,y,1,8,'#3a2d26');}
+  P(g,0,0,32,3,'#5e4a3d');}),
+ pared_gotele:()=>T(g=>{rell(g,'#b8ac97');ruido(g,32,32,['#a89c88','#c9bda8'],36);P(g,0,0,32,3,'#c9bda8');}),
+ pared_azulejo_bar:()=>T(g=>{rell(g,'#2f5f5a');
+  for(let y=0;y<32;y+=8)for(let x=0;x<32;x+=8){P(g,x,y,7,7,'#3a7570');P(g,x,y,7,1,'#4d908a');}
+  P(g,0,0,32,3,'#4d908a');}),
+ pared_azulejo_bano:()=>T(g=>{rell(g,C.crema);
+  for(let y=0;y<32;y+=8)for(let x=0;x<32;x+=8){P(g,x,y,7,7,C.blanco);}P(g,0,0,32,3,C.hormigonL);}),
+ pared_madera:()=>T(g=>{rell(g,C.maderaO);for(let x=0;x<32;x+=6){P(g,x,0,5,32,C.madera);P(g,x+5,0,1,32,C.maderaO);}
+  P(g,0,0,32,3,C.maderaL);}),
+ pared_chapa:()=>T(g=>{rell(g,'#566060');for(let x=0;x<32;x+=4)P(g,x,0,2,32,'#454e4e');P(g,0,0,32,3,'#6e7a7a');}),
+ pared_pladur:()=>T(g=>{rell(g,'#c9c4b6');ruido(g,32,32,['#b8b3a5'],10);P(g,0,0,32,3,C.blanco);}),
+ pared_piedra:()=>T(g=>{rell(g,C.hormigonO);
+  for(let y=0;y<32;y+=8)for(let x=(y%16?5:0);x<32;x+=11){P(g,x,y,10,7,C.hormigon);P(g,x,y,10,1,C.hormigonL);}
+  P(g,0,0,32,3,C.hormigonL);}),
+};
+
+/*══════════ 5 · PROPS DE CALLE ══════════*/
+function S_(w,h,fn){const c=lienzo(w,h),g=c.getContext('2d');fn(g);return c;}
+const PROPS={
+ farola_brazo:()=>S_(12,28,g=>{P(g,5,8,2,20,C.asfaltoL);P(g,4,27,4,1,C.carbon);
+  P(g,5,6,5,2,C.asfaltoL);P(g,8,7,4,3,C.gris);P(g,9,8,2,2,'#f2e2a8');}),
+ farola_bola:()=>S_(10,26,g=>{P(g,4,8,2,18,C.asfaltoL);P(g,3,25,4,1,C.carbon);
+  P(g,2,3,6,6,'#f2e2a8');P(g,3,2,4,1,C.gris);}),
+ semaforo_peaton:()=>S_(10,28,g=>{P(g,4,10,2,18,C.carbon);P(g,2,2,6,10,C.grisO);
+  P(g,3,3,4,4,'#c1362b');P(g,3,7,4,4,'#3d8a5f');}),
+ semaforo_coche:()=>S_(10,30,g=>{P(g,4,13,2,17,C.carbon);P(g,2,1,6,13,C.grisO);
+  P(g,3,2,4,3,'#c1362b');P(g,3,6,4,3,C.mostaza);P(g,3,10,4,3,'#3d8a5f');}),
+ arbol_copa:()=>S_(28,30,g=>{P(g,12,18,4,12,'#4a3524');P(g,6,4,16,16,'#2e5b2c');
+  P(g,8,2,12,4,'#3a7038');P(g,4,8,20,8,'#356b33');P(g,9,6,8,5,'#4a8746');}),
+ arbol_podado:()=>S_(20,26,g=>{P(g,9,14,3,12,'#4a3524');P(g,5,5,11,10,'#356b33');P(g,7,3,7,4,'#4a8746');}),
+ palmera:()=>S_(26,32,g=>{P(g,12,14,3,18,'#6b5236');
+  [[2,8],[20,8],[4,4],[18,4],[11,2]].forEach(([x,y])=>P(g,x,y,7,4,'#3a7038'));
+  P(g,10,10,7,4,'#4a8746');}),
+ seto_prop:()=>S_(24,14,g=>{P(g,0,2,24,12,'#2e5b2c');P(g,0,1,24,3,'#4a8746');}),
+ contenedor_verde:()=>S_(22,18,g=>{P(g,1,3,20,15,'#2f6b4a');P(g,2,4,18,4,'#3d8a60');P(g,1,1,20,3,'#22503a');}),
+ contenedor_amarillo:()=>S_(22,18,g=>{P(g,1,3,20,15,C.mostazaO);P(g,2,4,18,4,C.mostaza);P(g,1,1,20,3,'#8c7420');}),
+ contenedor_carton:()=>S_(22,18,g=>{P(g,1,3,20,15,'#2f5b8a');P(g,2,4,18,4,'#3f74ad');P(g,1,1,20,3,'#22456b');}),
+ papelera:()=>S_(12,16,g=>{P(g,2,4,8,12,C.grisO);P(g,1,2,10,3,C.gris);
+  for(let i=3;i<9;i+=2)P(g,i,6,1,8,C.carbon);}),
+ banco_madera:()=>S_(24,12,g=>{P(g,1,2,22,8,C.madera);P(g,1,2,22,2,C.maderaL);
+  P(g,3,10,3,2,C.carbon);P(g,18,10,3,2,C.carbon);}),
+ banco_piedra:()=>S_(24,12,g=>{P(g,1,2,22,9,C.hormigon);P(g,1,2,22,2,C.hormigonL);P(g,1,10,22,2,C.hormigonO);}),
+ marquesina:()=>S_(40,20,g=>{P(g,0,0,40,4,C.grisO);P(g,1,4,2,16,C.gris);P(g,37,4,2,16,C.gris);
+  P(g,4,5,32,10,'#7f9aa8');P(g,6,15,28,3,C.madera);}),
+ cabina_telefono:()=>S_(16,22,g=>{P(g,1,1,14,21,C.rojoO);P(g,3,3,10,14,'#7f9aa8');P(g,1,0,14,3,C.rojo);}),
+ buzon:()=>S_(12,18,g=>{P(g,2,4,8,14,C.mostazaO);P(g,1,2,10,3,C.mostaza);P(g,4,7,4,1,C.carbon);}),
+ bolardo:()=>S_(8,14,g=>{P(g,2,3,4,11,C.carbon);P(g,2,2,4,2,C.mostaza);}),
+ valla_obra:()=>S_(30,16,g=>{P(g,0,2,30,4,C.mostaza);P(g,0,8,30,4,C.rojo);
+  P(g,2,12,3,4,C.carbon);P(g,25,12,3,4,C.carbon);}),
+ andamio:()=>S_(34,30,g=>{for(let x=1;x<34;x+=10)P(g,x,0,2,30,C.acero);
+  for(let y=2;y<30;y+=9)P(g,0,y,34,2,C.aceroO);P(g,0,11,34,2,C.madera);}),
+ pales:()=>S_(22,16,g=>{P(g,1,4,20,10,C.madera);
+  for(let x=2;x<20;x+=5)P(g,x,4,3,10,C.maderaL);P(g,1,2,20,3,C.maderaO);}),
+ sacos_cemento:()=>S_(22,16,g=>{P(g,1,6,20,10,C.crema);P(g,3,3,16,6,C.hormigonL);
+  P(g,5,1,12,5,C.crema);}),
+ hormigonera:()=>S_(20,20,g=>{P(g,4,4,12,12,C.mostazaO);P(g,6,2,8,4,C.mostaza);
+  P(g,2,16,16,3,C.carbon);}),
+ senal_stop:()=>S_(12,24,g=>{P(g,5,8,2,16,C.acero);P(g,2,1,8,8,C.rojoO);P(g,3,3,6,4,C.hueso);}),
+ senal_direccion:()=>S_(16,24,g=>{P(g,7,8,2,16,C.acero);P(g,1,1,14,7,C.azul);P(g,3,3,10,2,C.hueso);}),
+ placa_calle:()=>S_(24,10,g=>{P(g,0,0,24,10,C.blanco);P(g,1,1,22,8,C.azul);P(g,3,4,18,2,C.hueso);}),
+ terraza_mesa:()=>S_(20,18,g=>{P(g,3,3,14,12,C.crema);P(g,3,3,14,3,C.blanco);
+  P(g,5,15,2,3,C.acero);P(g,13,15,2,3,C.acero);P(g,8,6,4,4,C.verdeL);}),
+ toldo:()=>S_(36,14,g=>{for(let x=0;x<36;x+=6){P(g,x,0,3,12,C.rojoO);P(g,x+3,0,3,12,C.crema);}
+  P(g,0,12,36,2,C.carbon);}),
+ sombrilla:()=>S_(24,24,g=>{P(g,11,10,2,14,C.madera);
+  for(let x=0;x<24;x+=6){P(g,x,2,3,8,C.verdeL);P(g,x+3,2,3,8,C.crema);}P(g,0,0,24,3,C.verde);}),
+ bicicletero:()=>S_(26,12,g=>{for(let x=2;x<26;x+=6)P(g,x,2,2,9,C.acero);P(g,0,10,26,2,C.aceroO);}),
+ patinete:()=>S_(20,10,g=>{P(g,2,5,14,2,C.grisL);P(g,14,1,2,6,C.acero);
+  P(g,1,6,3,3,C.carbon);P(g,15,6,3,3,C.carbon);}),
+ cono:()=>S_(12,14,g=>{P(g,3,2,6,10,C.rojo);P(g,4,5,4,3,C.crema);P(g,1,12,10,2,C.rojoO);}),
+ grua_portuaria:()=>S_(48,48,g=>{P(g,4,20,10,10,C.rojo);P(g,8,4,3,26,C.crema);
+  P(g,8,4,36,3,C.crema);P(g,40,7,2,14,C.acero);P(g,38,20,6,4,C.mostaza);}),
+ contenedor_maritimo:()=>S_(40,20,g=>{P(g,0,0,40,20,C.rojoO);
+  for(let x=2;x<40;x+=4)P(g,x,1,2,18,C.rojo);P(g,0,0,40,3,'#7a2c12');}),
+ bidon:()=>S_(12,14,g=>{P(g,2,2,8,12,C.azulL);P(g,2,4,8,1,C.azul);P(g,2,9,8,1,C.azul);P(g,3,1,6,2,C.acero);}),
+ bolardo_amarre:()=>S_(12,12,g=>{P(g,3,4,6,8,C.carbon);P(g,2,2,8,3,C.gris);}),
+ red_pesca:()=>S_(20,16,g=>{P(g,1,3,18,12,'#5f6b4a');
+  for(let i=2;i<18;i+=3){P(g,i,3,1,12,'#4a5438');}for(let y=4;y<15;y+=3)P(g,1,y,18,1,'#4a5438');}),
+ caja_pescado:()=>S_(18,12,g=>{P(g,1,2,16,10,'#9fb4c4');P(g,2,3,14,3,C.blanco);
+  P(g,4,5,4,3,'#5f7f96');P(g,10,5,4,3,'#5f7f96');}),
+ charco:()=>S_(20,10,g=>{P(g,2,3,16,5,'#2c3a42');P(g,4,4,12,2,'#3f5560');}),
+};
+
+/*══════════ 6 · INTERIORES ══════════*/
+const MUEBLES={
+ barra_bar:()=>T(g=>{rell(g,C.madera);ruido(g,32,32,[C.maderaO,C.maderaL],14);
+  P(g,0,0,32,4,C.maderaL);P(g,0,28,32,4,C.maderaO);}),
+ tirador_cerveza:()=>S_(16,18,g=>{P(g,3,10,10,8,C.acero);P(g,6,2,2,9,C.hueso);P(g,5,1,4,2,C.mostaza);}),
+ cafetera:()=>S_(20,18,g=>{P(g,2,4,16,14,C.acero);P(g,4,6,12,6,C.carbon);P(g,2,2,16,3,C.aceroO);
+  P(g,8,12,4,4,C.grisL);}),
+ vitrina_pintxos:()=>T(g=>{P(g,1,8,30,20,C.acero);P(g,3,10,26,10,'#a8c4d0');
+  for(let i=0;i<5;i++)P(g,5+i*5,13,4,4,[C.mostaza,C.rojoO,C.crema,C.verdeL,C.teja][i]);}),
+ estante_botellas:()=>T(g=>{rell(g,C.maderaO);
+  for(let y=2;y<32;y+=10){P(g,0,y+8,32,2,C.madera);
+   for(let x=2;x<30;x+=5)P(g,x,y,3,8,[C.verde,C.teja,C.carbon,C.mostazaO][(x+y)%4]);}}),
+ taburete:()=>S_(14,16,g=>{P(g,2,3,10,4,C.maderaL);P(g,4,7,2,9,C.acero);P(g,8,7,2,9,C.acero);}),
+ mesa_alta:()=>T(g=>{P(g,6,4,20,20,C.maderaL);P(g,6,4,20,3,'#a37a4c');P(g,14,24,4,6,C.acero);}),
+ mesa_mantel:()=>T(g=>{P(g,3,4,26,24,C.blanco);P(g,5,6,22,20,C.rojoO);
+  P(g,10,12,5,5,C.crema);P(g,18,14,4,7,C.verdeL);}),
+ tragaperras:()=>S_(20,26,g=>{P(g,2,2,16,24,C.rojoO);P(g,4,4,12,8,'#a8c4d0');
+  P(g,5,14,10,6,C.carbon);P(g,6,15,2,4,C.mostaza);P(g,9,15,2,4,C.verdeL);P(g,12,15,2,4,C.rojo);}),
+ futbolin:()=>T(g=>{P(g,1,4,30,24,C.cespedO);P(g,1,4,30,2,C.madera);P(g,1,26,30,2,C.madera);
+  for(let x=5;x<30;x+=6)P(g,x,4,1,24,C.acero);}),
+ cama:()=>T(g=>{P(g,3,2,26,28,'#5a4433');P(g,5,4,22,24,'#8a9bb0');
+  P(g,5,4,22,8,'#c9d2dd');P(g,8,5,16,5,C.blanco);}),
+ armario:()=>T(g=>{P(g,2,4,28,24,'#5c4630');P(g,4,6,11,20,'#6d543a');P(g,17,6,11,20,'#6d543a');
+  P(g,13,14,3,3,C.mostaza);P(g,16,14,3,3,C.mostaza);}),
+ mesilla:()=>S_(18,16,g=>{P(g,2,3,14,13,C.madera);P(g,3,5,12,4,C.maderaL);P(g,8,10,3,1,C.mostaza);}),
+ sofa:()=>T(g=>{P(g,1,6,30,22,'#4d5b6b');P(g,3,8,26,14,'#5f7182');
+  P(g,1,4,30,4,'#3f4c59');P(g,5,10,10,10,'#6b7f92');P(g,17,10,10,10,'#6b7f92');}),
+ tele:()=>S_(22,18,g=>{P(g,1,1,20,14,C.carbon);P(g,3,3,16,10,'#3f5566');
+  P(g,8,15,6,3,C.negro);P(g,4,5,5,3,'#7f9aa8');}),
+ cocina:()=>T(g=>{P(g,1,4,30,24,C.crema);P(g,3,6,26,10,C.carbon);
+  [[6,8],[16,8],[6,12],[16,12]].forEach(([x,y])=>P(g,x,y,6,3,C.grisL));P(g,3,18,26,8,C.hormigonL);}),
+ nevera:()=>T(g=>{P(g,4,2,24,28,C.blanco);P(g,4,12,24,1,C.hormigonO);P(g,24,6,2,5,C.acero);P(g,24,16,2,5,C.acero);}),
+ elevador:()=>T(g=>{P(g,2,10,28,12,C.mostazaO);P(g,4,12,24,8,C.grisO);
+  P(g,14,2,4,10,C.acero);P(g,10,22,12,6,C.carbon);}),
+ carro_herramientas:()=>S_(22,20,g=>{P(g,2,2,18,16,C.rojoO);
+  for(let y=4;y<17;y+=4){P(g,3,y,16,3,C.rojo);P(g,9,y+1,4,1,C.acero);}
+  P(g,4,18,3,2,C.carbon);P(g,15,18,3,2,C.carbon);}),
+ neumaticos:()=>S_(22,20,g=>{[0,5,10].forEach(y=>{P(g,2,4+y,18,5,C.carbon);P(g,5,5+y,12,3,C.negro);});}),
+ bidon_aceite:()=>S_(14,18,g=>{P(g,2,3,10,15,C.verdeO);P(g,2,6,10,1,C.verde);P(g,2,12,10,1,C.verde);
+  P(g,4,1,6,3,C.acero);}),
+ banco_trabajo:()=>T(g=>{P(g,1,8,30,16,C.madera);P(g,1,8,30,3,C.maderaL);
+  P(g,4,12,6,4,C.acero);P(g,14,13,10,2,C.grisL);P(g,26,11,4,6,C.carbon);}),
+ vitrina_armas:()=>T(g=>{P(g,1,4,30,24,C.grisO);P(g,3,6,26,14,'#66727f');
+  P(g,5,9,10,2,C.carbon);P(g,5,14,13,2,C.carbon);P(g,20,9,8,3,C.acero);P(g,1,2,30,3,C.rojoO);}),
+ panel_escopetas:()=>T(g=>{P(g,1,2,30,28,C.maderaO);
+  for(let x=4;x<28;x+=7){P(g,x,5,2,20,C.carbon);P(g,x,5,2,7,C.madera);}}),
+ mostrador:()=>T(g=>{P(g,1,10,30,18,C.maderaO);P(g,1,8,30,4,C.maderaL);P(g,6,14,8,6,C.crema);}),
+ caja_registradora:()=>S_(20,16,g=>{P(g,2,4,16,12,C.grisO);P(g,4,6,12,4,'#a8c4d0');
+  for(let i=0;i<4;i++)P(g,5+i*3,11,2,2,C.hueso);}),
+ estante_municion:()=>T(g=>{rell(g,C.grisO);
+  for(let y=2;y<30;y+=9){P(g,0,y+7,32,2,C.gris);for(let x=2;x<30;x+=6)P(g,x,y,4,7,C.mostazaO);}}),
+ diana:()=>S_(20,20,g=>{P(g,2,2,16,16,C.crema);P(g,5,5,10,10,C.rojoO);P(g,8,8,4,4,C.blanco);}),
+ puesto_pescado:()=>T(g=>{P(g,1,6,30,22,C.acero);P(g,3,8,26,10,'#cfd6dd');
+  for(let i=0;i<5;i++)P(g,4+i*5,10,4,6,'#7fa8c4');P(g,1,4,30,3,C.rojoO);}),
+ puesto_fruta:()=>T(g=>{P(g,1,6,30,22,C.madera);P(g,3,8,26,10,C.maderaL);
+  [[5,C.rojo],[10,C.mostaza],[15,C.verdeL],[20,'#c96f2f']].forEach(([x,c])=>P(g,x,10,4,6,c));}),
+ bascula:()=>S_(18,20,g=>{P(g,8,0,2,8,C.acero);P(g,3,8,12,6,C.crema);P(g,5,10,8,3,C.carbon);
+  P(g,6,14,6,5,C.acero);}),
+ cajas_apiladas:()=>S_(22,20,g=>{[0,7,14].forEach((y,i)=>{P(g,1+i,2+y,18,6,'#9fb4c4');P(g,2+i,3+y,16,2,C.blanco);});}),
+ camilla:()=>T(g=>{P(g,3,4,26,24,C.blanco);P(g,5,6,22,20,'#8fa8a0');P(g,5,6,22,6,C.crema);
+  P(g,4,28,3,3,C.acero);P(g,25,28,3,3,C.acero);}),
+ taquillas:()=>T(g=>{rell(g,'#5f7182');for(let x=0;x<32;x+=8){P(g,x,0,7,32,'#6b7f92');
+  P(g,x+5,6,1,3,C.acero);P(g,x+5,20,1,3,C.acero);}}),
+};
+
+/*══════════ 7 · EFECTOS ══════════*/
+const EFECTOS={};
+/* fogonazo por dirección y por calibre: cono sólido con núcleo blanco */
+[['pistola',6,3.2],['subfusil',8,4],['escopeta',11,6]].forEach(([nom,largo,ancho])=>{
+ for(let d=0;d<8;d++){
+  EFECTOS[`fogonazo_${nom}_${DIR8[d]}`]=()=>S_(24,24,g=>{
+   const ang=d*Math.PI/4-Math.PI/2;
+   const cono=[[0,-1.6],[0,1.6],[largo,ancho],[largo,-ancho]];
+   const nucleo=[[0,-1],[0,1],[largo*.5,ancho*.5],[largo*.5,-ancho*.5]];
+   poligono(g,girar(cono,ang,12,12),C.rojoL,0,0,24,24);
+   poligono(g,girar(nucleo,ang,12,12),C.mostaza,0,0,24,24);
+   poligono(g,girar(nucleo.map(([x,y])=>[x*.55,y*.6]),ang,12,12),C.blanco,0,0,24,24);
+  });}
+});
+Object.assign(EFECTOS,{
+ impacto_pared_1:()=>S_(10,10,g=>{P(g,4,4,2,2,C.hueso);P(g,3,3,1,1,C.acero);P(g,6,6,1,1,C.acero);}),
+ impacto_pared_2:()=>S_(12,12,g=>{P(g,4,4,4,4,C.acero);P(g,2,2,2,2,C.hueso);P(g,8,7,2,2,C.hueso);}),
+ impacto_pared_3:()=>S_(14,14,g=>{P(g,5,5,4,4,C.hormigonO);
+  [[2,3],[10,4],[3,10],[11,9]].forEach(([x,y])=>P(g,x,y,2,2,C.hormigon));}),
+ sangre_1:()=>S_(10,10,g=>{P(g,4,4,3,3,C.sangre);}),
+ sangre_2:()=>S_(14,14,g=>{P(g,5,5,4,4,C.sangre);P(g,2,3,2,2,C.sangre);P(g,10,8,2,2,C.sangre);}),
+ sangre_3:()=>S_(18,18,g=>{P(g,6,6,6,6,C.sangre);
+  [[2,4],[14,5],[4,14],[13,13],[9,1]].forEach(([x,y])=>P(g,x,y,2,2,C.sangre));}),
+ sangre_4:()=>S_(22,22,g=>{P(g,7,7,8,8,C.sangre);
+  for(let i=0;i<8;i++)P(g,2+((i*7)%18),2+((i*5)%18),2,2,C.sangre);}),
+ charco_sangre_a:()=>S_(20,14,g=>{P(g,3,4,14,6,C.sangre);P(g,6,2,8,10,C.sangre);}),
+ charco_sangre_b:()=>S_(26,18,g=>{P(g,3,5,20,8,C.sangre);P(g,8,2,12,14,C.sangre);P(g,1,8,4,3,C.sangre);}),
+ humo_1:()=>S_(14,14,g=>{P(g,5,5,4,4,C.acero);}),
+ humo_2:()=>S_(18,18,g=>{P(g,6,6,6,6,C.acero);P(g,4,8,3,3,C.aceroO);}),
+ humo_3:()=>S_(24,24,g=>{P(g,7,7,10,10,C.aceroO);P(g,4,10,4,4,C.acero);P(g,16,8,4,4,C.acero);}),
+ humo_4:()=>S_(30,30,g=>{P(g,8,8,14,14,C.grisO);P(g,4,12,6,6,C.aceroO);P(g,20,10,6,6,C.aceroO);}),
+ chispa_1:()=>S_(8,8,g=>{P(g,3,3,2,2,C.mostaza);}),
+ chispa_2:()=>S_(12,12,g=>{P(g,5,5,2,2,C.blanco);P(g,2,4,1,1,C.mostaza);P(g,9,7,1,1,C.mostaza);}),
+ chispa_3:()=>S_(16,16,g=>{P(g,7,7,2,2,C.blanco);
+  for(let i=0;i<6;i++)P(g,2+((i*5)%13),2+((i*7)%13),1,1,C.mostaza);}),
+ explosion_1:()=>S_(20,20,g=>{P(g,7,7,6,6,C.mostaza);P(g,9,9,2,2,C.blanco);}),
+ explosion_2:()=>S_(32,32,g=>{P(g,10,10,12,12,C.rojoL);P(g,13,13,6,6,C.mostaza);P(g,15,15,2,2,C.blanco);}),
+ explosion_3:()=>S_(44,44,g=>{P(g,12,12,20,20,C.rojoO);P(g,17,17,10,10,C.mostaza);
+  for(let i=0;i<10;i++)P(g,4+((i*9)%36),4+((i*13)%36),3,3,C.rojoL);}),
+ explosion_4:()=>S_(48,48,g=>{P(g,14,14,20,20,C.carbon);P(g,18,18,12,12,C.rojoO);
+  for(let i=0;i<12;i++)P(g,3+((i*11)%42),3+((i*7)%42),3,3,C.aceroO);}),
+ explosion_5:()=>S_(52,52,g=>{P(g,16,16,20,20,C.grisO);
+  for(let i=0;i<16;i++)P(g,2+((i*13)%48),2+((i*9)%48),4,4,C.aceroO);}),
+ cristal_a:()=>S_(14,14,g=>{[[3,3],[7,4],[5,8],[9,9],[2,10]].forEach(([x,y])=>P(g,x,y,2,2,'#a8c4d0'));}),
+ cristal_b:()=>S_(20,20,g=>{for(let i=0;i<10;i++)P(g,2+((i*7)%16),2+((i*5)%16),2,2,'#a8c4d0');}),
+ derrape:()=>S_(32,12,g=>{P(g,0,2,32,2,'#1a1d21');P(g,0,8,32,2,'#1a1d21');}),
+ onda_a:()=>S_(30,30,g=>{const r=13;for(let a=0;a<64;a++){const t=a/64*6.283;
+  P(g,15+Math.cos(t)*r-1,15+Math.sin(t)*r-1,2,2,C.crema);}}),
+ onda_b:()=>S_(40,40,g=>{const r=18;for(let a=0;a<80;a++){const t=a/80*6.283;
+  P(g,20+Math.cos(t)*r-1,20+Math.sin(t)*r-1,2,2,C.hormigon);}}),
+ lluvia_a:()=>T(g=>{for(let i=0;i<16;i++)P(g,(i*11)%32,(i*7)%32,1,3,'#6b8c9c');}),
+ lluvia_b:()=>T(g=>{for(let i=0;i<16;i++)P(g,(i*13+4)%32,(i*5+9)%32,1,3,'#6b8c9c');}),
+});
+
+/*══════════ 8 · HUD ══════════*/
+function I(fn){const c=lienzo(24,24),g=c.getContext('2d');fn(g);return c;}
+const HUD={
+ icono_punos:()=>I(g=>{P(g,7,9,10,8,C.piel2);P(g,7,9,10,2,C.piel1);P(g,5,11,2,4,C.piel3);}),
+ icono_navaja:()=>I(g=>{P(g,5,14,6,3,C.maderaO);P(g,10,12,9,3,C.acero);P(g,10,12,9,1,C.hueso);}),
+ icono_bate:()=>I(g=>{P(g,4,16,6,3,C.maderaO);P(g,9,8,10,10,C.maderaL);}),
+ icono_pistola:()=>I(g=>{P(g,5,9,13,4,C.carbon);P(g,6,13,4,7,C.negro);P(g,5,9,13,1,C.gris);}),
+ icono_revolver:()=>I(g=>{P(g,5,9,13,4,C.gris);P(g,9,8,4,6,C.acero);P(g,6,13,4,7,C.maderaO);}),
+ icono_uzi:()=>I(g=>{P(g,4,8,15,5,C.carbon);P(g,8,13,4,8,C.negro);P(g,15,4,3,5,C.gris);}),
+ icono_escopeta:()=>I(g=>{P(g,3,10,18,4,C.maderaO);P(g,3,10,18,1,C.acero);P(g,4,14,6,5,C.carbon);}),
+ icono_fusil:()=>I(g=>{P(g,2,10,20,4,C.verdeO);P(g,7,14,5,6,C.carbon);P(g,14,6,3,5,C.gris);}),
+ icono_molotov:()=>I(g=>{P(g,8,8,8,12,C.verde);P(g,10,4,4,5,C.verdeO);P(g,11,1,2,4,C.mostaza);}),
+ icono_extintor:()=>I(g=>{P(g,7,6,10,15,C.rojo);P(g,9,3,6,4,C.carbon);P(g,15,5,6,2,C.gris);}),
+ icono_llave:()=>I(g=>{P(g,6,10,13,4,C.acero);P(g,3,7,5,4,C.aceroO);P(g,17,12,5,4,C.aceroO);}),
+ icono_botella:()=>I(g=>{P(g,8,9,8,12,C.verdeL);P(g,10,4,4,6,C.verde);P(g,8,7,8,2,C.hueso);}),
+ estrella_llena:()=>I(g=>{P(g,10,2,4,20,'#ff5a3c');P(g,2,10,20,4,'#ff5a3c');P(g,6,6,12,12,'#ff5a3c');}),
+ estrella_vacia:()=>I(g=>{P(g,10,2,4,20,C.grisO);P(g,2,10,20,4,C.grisO);P(g,6,6,12,12,C.grisO);}),
+ icono_salud:()=>I(g=>{P(g,9,4,6,16,C.sangre);P(g,4,9,16,6,C.sangre);}),
+ icono_energia:()=>I(g=>{P(g,12,2,6,10,'#4d9de0');P(g,6,10,6,12,'#4d9de0');P(g,8,9,8,4,'#4d9de0');}),
+ icono_hambre:()=>I(g=>{P(g,5,4,3,10,C.crema);P(g,10,4,2,7,C.crema);P(g,13,4,2,7,C.crema);
+  P(g,10,10,5,3,C.crema);P(g,11,13,3,8,C.crema);P(g,5,14,3,7,C.crema);}),
+ icono_euro:()=>I(g=>{P(g,7,5,10,3,C.mostaza);P(g,5,8,4,8,C.mostaza);P(g,7,16,10,3,C.mostaza);
+  P(g,3,10,10,2,C.mostaza);P(g,3,13,10,2,C.mostaza);}),
+ blip_objetivo:()=>I(g=>{P(g,9,9,6,6,C.mostaza);P(g,7,7,10,2,C.mostaza);P(g,7,15,10,2,C.mostaza);}),
+ blip_tienda:()=>I(g=>{P(g,5,8,14,12,C.verdeL);P(g,5,5,14,4,C.crema);}),
+ blip_mision:()=>I(g=>{P(g,10,3,4,12,C.mostaza);P(g,10,17,4,4,C.mostaza);}),
+ flecha_brujula:()=>I(g=>{P(g,10,2,4,4,C.hueso);P(g,8,6,8,4,C.hueso);P(g,6,10,12,4,C.hueso);
+  P(g,4,14,16,3,C.hueso);P(g,9,17,6,5,C.hueso);}),
+ marca_exclamacion:()=>I(g=>{P(g,9,2,6,13,C.mostaza);P(g,9,17,6,5,C.mostaza);}),
+ icono_candado:()=>I(g=>{P(g,5,10,14,11,C.mostazaO);P(g,8,4,8,7,C.acero);P(g,10,6,4,5,C.grisO);}),
+ icono_reloj:()=>I(g=>{P(g,4,4,16,16,C.crema);P(g,6,6,12,12,C.carbon);P(g,11,8,2,5,C.crema);P(g,11,11,5,2,C.crema);}),
+};
+
+/* Relleno de polígono por test de interior: sólido, sin huecos ni anti-alias.
+   Rotar un rectángulo píxel a píxel dejaba agujeros; esto no. */
+function poligono(g,pts,col,x0,y0,x1,y1){
+ const dentro=(px,py)=>{let d=false;
+  for(let i=0,j=pts.length-1;i<pts.length;j=i++){
+   const[xi,yi]=pts[i],[xj,yj]=pts[j];
+   if((yi>py)!==(yj>py)&&px<(xj-xi)*(py-yi)/(yj-yi)+xi)d=!d;}
+  return d;};
+ for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++)
+  if(dentro(x+.5,y+.5))P(g,x,y,1,1,typeof col==='function'?col(x,y):col);
+}
+const girar=(pts,ang,cx,cy)=>pts.map(([x,y])=>{
+ const ca=Math.cos(ang),sa=Math.sin(ang);return[cx+x*ca-y*sa,cy+x*sa+y*ca];});
+
+/*══════════ 9 · FUENTE DE MAPA DE BITS ══════════*/
+/* Rejilla 5×7 con bisel de 3 tonos y contorno. Diseño propio, no calcado de nada.
+   Se renderiza en celdas de 9×11 con el contorno incluido. */
+const GLIFOS={
+ A:[14,17,17,31,17,17,17],B:[30,17,17,30,17,17,30],C:[14,17,16,16,16,17,14],
+ D:[30,17,17,17,17,17,30],E:[31,16,16,30,16,16,31],F:[31,16,16,30,16,16,16],
+ G:[14,17,16,23,17,17,14],H:[17,17,17,31,17,17,17],I:[14,4,4,4,4,4,14],
+ J:[7,2,2,2,2,18,12],K:[17,18,20,24,20,18,17],L:[16,16,16,16,16,16,31],
+ M:[17,27,21,21,17,17,17],N:[17,25,21,19,17,17,17],O:[14,17,17,17,17,17,14],
+ P:[30,17,17,30,16,16,16],Q:[14,17,17,17,21,18,13],R:[30,17,17,30,20,18,17],
+ S:[15,16,16,14,1,1,30],T:[31,4,4,4,4,4,4],U:[17,17,17,17,17,17,14],
+ V:[17,17,17,17,17,10,4],W:[17,17,17,21,21,27,17],X:[17,17,10,4,10,17,17],
+ Y:[17,17,10,4,4,4,4],Z:[31,1,2,4,8,16,31],
+ '0':[14,17,19,21,25,17,14],'1':[4,12,4,4,4,4,14],'2':[14,17,1,2,4,8,31],
+ '3':[31,2,4,2,1,17,14],'4':[2,6,10,18,31,2,2],'5':[31,16,30,1,1,17,14],
+ '6':[6,8,16,30,17,17,14],'7':[31,1,2,4,8,8,8],'8':[14,17,17,14,17,17,14],
+ '9':[14,17,17,15,1,2,12],
+ 'punto':[0,0,0,0,0,12,12],'coma':[0,0,0,0,12,4,8],'dospuntos':[0,12,12,0,12,12,0],
+ 'exclama':[4,4,4,4,4,0,4],'interro':[14,17,1,2,4,0,4],'apostrofe':[4,4,0,0,0,0,0],
+ 'guion':[0,0,0,31,0,0,0],'mas':[0,4,4,31,4,4,0],'barra':[1,2,2,4,8,8,16],
+ 'abre':[2,4,8,8,8,4,2],'cierra':[8,4,2,2,2,4,8],'euro':[7,8,30,8,30,8,7],
+ 'por':[0,17,10,4,10,17,0],'flechader':[0,4,2,31,2,4,0],
+ 'Ntilde':[14,0,17,25,21,19,17],'Aacento':[2,0,14,17,31,17,17],'Eacento':[2,0,31,16,30,16,31],
+ 'Iacento':[2,0,14,4,4,4,14],'Oacento':[2,0,14,17,17,17,14],'Uacento':[2,0,17,17,17,17,14],
+};
+function dibGlifo(filas){
+ const c=lienzo(9,11),g=c.getContext('2d');
+ const on=(x,y)=>y>=0&&y<7&&x>=0&&x<5&&((filas[y]>>(4-x))&1);
+ /* contorno en los 8 vecinos */
+ for(let y=-1;y<8;y++)for(let x=-1;x<6;x++){
+  if(on(x,y))continue;
+  let v=false;
+  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)if(on(x+dx,y+dy))v=true;
+  if(v)P(g,x+2,y+2,1,1,C.carbon);}
+ /* cuerpo con degradado vertical de 3 tonos */
+ for(let y=0;y<7;y++)for(let x=0;x<5;x++)if(on(x,y))
+  P(g,x+2,y+2,1,1, y<2?C.mostaza : y<5?'#d9891f' : C.rojoO);
+ /* brillo en la fila superior */
+ for(let x=0;x<5;x++)if(on(x,0))P(g,x+2,1,1,1,C.crema);
+ return c;
+}
+
+/*══════════ 10 · MARCADORES ══════════*/
+/* Flecha de objetivo colgando sobre el mundo, en varios colores,
+   y flecha de brújula en las 8 direcciones. */
+const COLORES_MARCA=[['objetivo',C.mostaza],['tienda',C.verdeL],['mision',C.rojo],
+ ['aliado',C.azulL],['coche',C.crema],['peligro',C.rojoO],['dinero',C.verde],['neutro',C.acero]];
+function dibMarcaAbajo(col){
+ const c=lienzo(14,18),g=c.getContext('2d');
+ for(let i=0;i<6;i++)P(g,2+i,2+i,14-4-i*2,1,C.carbon);
+ P(g,3,2,8,1,C.crema);
+ for(let i=0;i<5;i++)P(g,3+i,3+i,14-6-i*2,1,col);
+ P(g,4,3,6,1,C.hueso);
+ return c;
+}
+function dibFlechaDir(d8,col){
+ const c=lienzo(16,16),g=c.getContext('2d');
+ const ang=d8*Math.PI/4-Math.PI/2;
+ /* silueta de flecha en espacio local, punta hacia la derecha antes de girar */
+ const cuerpo=[[6,0],[-1,-5],[-1,-2],[-6,-2],[-6,2],[-1,2],[-1,5]];
+ const borde=[[7.6,0],[-2,-6.4],[-2,-3.3],[-7.4,-3.3],[-7.4,3.3],[-2,3.3],[-2,6.4]];
+ poligono(g,girar(borde,ang,8,8),C.carbon,0,0,16,16);
+ poligono(g,girar(cuerpo,ang,8,8),col,0,0,16,16);
+ return c;
+}
+
+/*══════════ CUANTIZADOR A PALETA BLOQUEADA ══════════*/
+/* Cualquier color que se cuele fuera de la paleta se ajusta al más cercano.
+   Además el alfa se fuerza a binario: o el píxel existe o no existe. */
+const PALETA=[...new Set(Object.values(C))].map(h=>[
+ parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16),h]);
+const cacheCol=new Map();
+function masCercano(r,g,b){
+ const k=(r<<16)|(g<<8)|b;
+ let v=cacheCol.get(k);if(v!==undefined)return v;
+ let mej=PALETA[0],md=1e9;
+ for(const p of PALETA){const d=(p[0]-r)**2+(p[1]-g)**2+(p[2]-b)**2;if(d<md){md=d;mej=p;}}
+ cacheCol.set(k,mej);return mej;}
+function cuantizar(c){
+ const g=c.getContext('2d'),img=g.getImageData(0,0,c.width,c.height),d=img.data;
+ for(let i=0;i<d.length;i+=4){
+  if(d[i+3]<128){d[i+3]=0;continue;}
+  d[i+3]=255;
+  const p=masCercano(d[i],d[i+1],d[i+2]);
+  d[i]=p[0];d[i+1]=p[1];d[i+2]=p[2];}
+ g.putImageData(img,0,0);return c;}
+
+/*══════════ CATÁLOGO ══════════*/
+const CAT={};
+function construir(){
+ /* 1 personajes */
+ const chars=[];
+ ARQUETIPOS.forEach(a=>{
+  ORDEN_POSES.forEach(p=>{for(let d=0;d<8;d++){
+   chars.push({n:`char_${a.nombre}_${p}_${DIR8[d]}`,c:dibChar(a,p,d),grupo:a.nombre});}});
+ });
+ CAT.personajes={titulo:'Personajes',nota:`${ARQUETIPOS.length} arquetipos × ${ORDEN_POSES.length} poses × 8 direcciones = ${chars.length} fotogramas, montados desde 74 piezas de capa.`,items:chars,tira:8};
+ /* 2 armas */
+ const arm=[];
+ ARMAS.forEach(a=>{for(let d=0;d<8;d++)arm.push({n:`arma_${a.id}_mano_${DIR8[d]}`,c:dibArmaMano(a,d)});});
+ ARMAS.forEach(a=>arm.push({n:`arma_${a.id}_suelo`,c:dibArmaSuelo(a)}));
+ CAT.armas={titulo:'Armas',nota:`${ARMAS.length} armas en mano por 8 direcciones, más su versión recogible en el suelo.`,items:arm,tira:8};
+ /* 3 vehículos */
+ const veh=[];
+ Object.keys(CHASIS).forEach(t=>{
+  const K=CHASIS[t];
+  const libs=K.rotativo?[LIBREAS[3]]:LIBREAS.slice(0,K.moto||K.bici||K.barca?2:4);
+  libs.forEach(l=>veh.push({n:`veh_${t}_${l[0]}`,c:dibVehiculo(t,l,'normal')}));
+  if(K.rotativo){veh.push({n:`veh_${t}_rot_a`,c:dibVehiculo(t,LIBREAS[3],'rotA')});
+   veh.push({n:`veh_${t}_rot_b`,c:dibVehiculo(t,LIBREAS[3],'rotB')});}
+ });
+ ['utilitario','berlina','furgoCorta','deportivo'].forEach(t=>{
+  ['abollado','humo','quemado'].forEach(e=>veh.push({n:`veh_${t}_${e}`,c:dibVehiculo(t,LIBREAS[0],e)}));});
+ CAT.vehiculos={titulo:'Vehículos',nota:`${Object.keys(CHASIS).length} chasis con libreas intercambiables y estados de daño.`,items:veh};
+ /* 4 tiles */
+ CAT.tiles={titulo:'Tiles de entorno',nota:'Todos de 32×32 y tileables. Calzada, aceras, verde, agua, techos, suelos y paredes.',
+  items:Object.keys(TILES).map(k=>({n:'tile_'+k,c:TILES[k]()}))};
+ /* 5 props */
+ CAT.props={titulo:'Props de calle',nota:'Mobiliario urbano, obra y puerto. Anclaje abajo-centro.',
+  items:Object.keys(PROPS).map(k=>({n:'prop_'+k,c:PROPS[k]()}))};
+ /* 6 interiores */
+ CAT.interiores={titulo:'Interiores y establecimientos',nota:'Bar, piso, taller, armería, mercado, comisaría y hospital.',
+  items:Object.keys(MUEBLES).map(k=>({n:'int_'+k,c:MUEBLES[k]()}))};
+ /* 7 efectos */
+ CAT.efectos={titulo:'Efectos',nota:'Fogonazos, impactos, sangre, humo, explosión de 5 fotogramas y ambiente.',
+  items:Object.keys(EFECTOS).map(k=>({n:'fx_'+k,c:EFECTOS[k]()}))};
+ /* 8 hud */
+ CAT.hud={titulo:'HUD e iconos',nota:'Iconos de 24×24 para armas, estado y marcadores del radar.',
+  items:Object.keys(HUD).map(k=>({n:'hud_'+k,c:HUD[k]()}))};
+ /* 9 fuente */
+ CAT.fuente={titulo:'Fuente',nota:'Fuente de mapa de bits propia, 5×7 con contorno y bisel de tres tonos. Mayúsculas, cifras, signos y vocales acentuadas más la eñe.',
+  items:Object.keys(GLIFOS).map(k=>({n:'font_'+k,c:dibGlifo(GLIFOS[k])}))};
+ /* 10 marcadores */
+ const marcas=[];
+ COLORES_MARCA.forEach(([n,col])=>marcas.push({n:'marca_'+n,c:dibMarcaAbajo(col)}));
+ COLORES_MARCA.forEach(([n,col])=>{for(let d=0;d<8;d++)
+  marcas.push({n:`flecha_${n}_${DIR8[d]}`,c:dibFlechaDir(d,col)});});
+ CAT.marcadores={titulo:'Marcadores',nota:'Flechas colgantes de objetivo en 8 colores y flechas de brújula en 8 direcciones.',items:marcas,tira:8};
+ /* paleta bloqueada sobre absolutamente todo */
+ Object.values(CAT).forEach(b=>b.items.forEach(it=>cuantizar(it.c)));
+}
+construir();
+
+/*══════════ INTERFAZ ══════════*/
+let zoom=4, actual='personajes';
+const nav=document.getElementById('nav'),main=document.getElementById('main');
+Object.keys(CAT).forEach(k=>{
+ const d=document.createElement('div');d.textContent=CAT[k].titulo;
+ d.className=k===actual?'on':'';
+ d.addEventListener('click',()=>{actual=k;[...nav.children].forEach(x=>x.classList.remove('on'));
+  d.classList.add('on');pintar();});
+ nav.appendChild(d);});
+function pintar(){
+ const cat=CAT[actual];
+ main.innerHTML='';
+ const h=document.createElement('h2');h.textContent=cat.titulo+' · '+cat.items.length+' sprites';main.appendChild(h);
+ const n=document.createElement('div');n.className='nota';n.textContent=cat.nota;main.appendChild(n);
+ if(actual==='personajes'){
+  const grupos={};cat.items.forEach(i=>{(grupos[i.grupo]=grupos[i.grupo]||[]).push(i);});
+  Object.keys(grupos).forEach(gk=>{
+   const sh=document.createElement('h2');sh.textContent=gk.replace(/_/g,' ');main.appendChild(sh);
+   const rej=document.createElement('div');rej.className='rej';
+   for(let p=0;p<ORDEN_POSES.length;p++){
+    const cel=document.createElement('div');cel.className='cel';
+    const tira=document.createElement('div');tira.className='tira';
+    for(let d=0;d<8;d++){
+     const it=grupos[gk][p*8+d];
+     const cc=document.createElement('canvas');cc.width=it.c.width*zoom;cc.height=it.c.height*zoom;
+     const g=cc.getContext('2d');g.imageSmoothingEnabled=false;
+     g.drawImage(it.c,0,0,cc.width,cc.height);tira.appendChild(cc);}
+    cel.appendChild(tira);
+    const nn=document.createElement('div');nn.className='n';nn.textContent=ORDEN_POSES[p];cel.appendChild(nn);
+    rej.appendChild(cel);}
+   main.appendChild(rej);});
+ }else{
+  const rej=document.createElement('div');rej.className='rej';
+  cat.items.forEach(it=>{
+   const cel=document.createElement('div');cel.className='cel';
+   const cc=document.createElement('canvas');cc.width=it.c.width*zoom;cc.height=it.c.height*zoom;
+   const g=cc.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(it.c,0,0,cc.width,cc.height);
+   cel.appendChild(cc);
+   const nn=document.createElement('div');nn.className='n';nn.textContent=it.n;cel.appendChild(nn);
+   rej.appendChild(cel);});
+  main.appendChild(rej);}
+ const total=Object.values(CAT).reduce((a,c)=>a+c.items.length,0);
+ document.getElementById('pie').textContent=
+  `Total del catálogo: ${total} sprites en ${Object.keys(CAT).length} bloques. `+
+  `Todo generado por código con la paleta bloqueada de 40 colores, sin anti-alias. `+
+  `«Exportar atlas PNG» descarga una lámina con todos los sprites del bloque actual y «Exportar JSON» sus coordenadas.`;
+}
+document.getElementById('zoomP').addEventListener('click',()=>{zoom=Math.min(8,zoom+1);pintar();});
+document.getElementById('zoomM').addEventListener('click',()=>{zoom=Math.max(1,zoom-1);pintar();});
+document.getElementById('semilla').addEventListener('click',()=>{SEM=(SEM*7+13)%9973;construir();pintar();});
+
+function atlas(){
+ const items=CAT[actual].items;
+ const ANCHO=512;let x=0,y=0,fila=0;const meta=[];
+ items.forEach(it=>{
+  if(x+it.c.width>ANCHO){x=0;y+=fila+1;fila=0;}
+  meta.push({n:it.n,x,y,w:it.c.width,h:it.c.height});
+  x+=it.c.width+1;fila=Math.max(fila,it.c.height);});
+ const alto=y+fila+1;
+ const c=lienzo(ANCHO,alto),g=c.getContext('2d');
+ items.forEach((it,i)=>g.drawImage(it.c,meta[i].x,meta[i].y));
+ return{canvas:c,meta};
+}
+document.getElementById('expPng').addEventListener('click',()=>{
+ const{canvas}=atlas();const a=document.createElement('a');
+ a.download='bilbo_atlas_'+actual+'.png';a.href=canvas.toDataURL('image/png');a.click();});
+document.getElementById('expJson').addEventListener('click',()=>{
+ const{meta}=atlas();const s=document.getElementById('salida');
+ s.style.display='block';s.value=JSON.stringify({bloque:actual,sprites:meta},null,1);
+ s.select();});
+pintar();
+})();
+</script>
+</body>
+</html>

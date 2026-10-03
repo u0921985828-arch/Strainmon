@@ -1,0 +1,132 @@
+# El APK de Bilbo City, compilado aquí porque aquí sí hay internet.
+#
+# El proyecto de Android no está versionado: lo escribe `herramientas/html/apk.js` a
+# partir del prototipo, y `dist/` está en el .gitignore. Así que el primer paso del
+# trabajo es generarlo, y lo que se compila es siempre el HTML de este commit.
+#
+# No hay `gradlew` en el repositorio: el wrapper es un `.jar` y aquí no entran binarios.
+# Lo pone la acción de Gradle, que además cachea las dependencias entre runs.
+name: APK de Bilbo City
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ claude/new-session-e7mg1m ]
+    paths:
+      - 'bilbo-city/referencia/bilbo-city.html'
+      - 'bilbo-city/herramientas/html/apk.js'
+      - 'bilbo-city/herramientas/html/pwa.js'
+      - '.github/workflows/bilbo-city-apk.yml'
+
+permissions:
+  contents: write   # el paso de release adjunta el .apk a la etiqueta «apk»
+
+jobs:
+  apk:
+    name: Compilar
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: bilbo-city
+    steps:
+      - uses: actions/checkout@v4
+
+      # Java antes que node: el generador lee el Java con `javac` para comprobar que no
+      # tiene fallos de sintaxis, y sin JDK ese chequeo se lo salta en silencio.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: bilbo-city/herramientas/html/package-lock.json
+
+      - name: Dependencias del generador
+        working-directory: bilbo-city/herramientas/html
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'   # aquí no se juega, solo se dibuja el icono
+        run: npm ci
+
+      - name: Generar el proyecto de Android
+        run: node herramientas/html/apk.js
+
+      # `packages` a mano: por defecto la acción instala el paquete `tools`, que Google
+      # retiró del repositorio, y el paso entero se cae con «Failed to find package».
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'    # AGP 8.5.2 no arranca con menos de 8.7
+
+      - name: Compilar el APK de depuración
+        working-directory: bilbo-city/dist/android
+        run: gradle --no-daemon assembleDebug
+
+      - name: Ponerle nombre
+        run: cp dist/android/app/build/outputs/apk/debug/app-debug.apk BilboCity.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BilboCity-apk
+          path: bilbo-city/BilboCity.apk
+          if-no-files-found: error
+
+      # Un artifact de Actions solo se baja desde la web, comprimido y caducando a los
+      # 90 días. Adjuntarlo a una release le da una URL directa, que es lo que se puede
+      # abrir desde el propio teléfono.
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk
+          name: APK de Bilbo City
+          body: Compilado del prototipo. Se rehace en cada push que lo toque.
+          files: bilbo-city/BilboCity.apk
+          make_latest: false
+
+  emulador:
+    name: Abrirlo en un emulador
+    needs: apk
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: BilboCity-apk
+
+      # El emulador x86_64 necesita virtualización, y en los runners el nodo /dev/kvm
+      # existe pero no deja escribir a quien no esté en el grupo kvm.
+      - name: Permitir KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: |
+            adb install -r BilboCity.apk
+            adb shell am start -n eus.bilbocity.juego/.Principal
+            sleep 15
+            adb exec-out screencap -p > portada.png
+            if adb logcat -d | grep -q 'FATAL EXCEPTION'; then adb logcat -d | tail -60; exit 1; fi
+            adb shell dumpsys activity activities | grep -q 'eus.bilbocity.juego/.Principal'
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: portada-emulador
+          path: portada.png
+          if-no-files-found: warn

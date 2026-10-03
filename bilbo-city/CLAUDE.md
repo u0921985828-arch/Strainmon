@@ -1,0 +1,1092 @@
+# Bilbo City
+
+Juego sandbox 2D cenital ambientado en **Bilbao**, para móvil: ciudad abierta, historia
+que no obliga, nivel de personaje y propiedades que se compran. Además del crimen se
+pueden hacer curros honrados. Todo el arte y el audio se generan por código: **no hay ni
+una imagen ni un archivo de sonido en el repositorio**.
+
+## Las dos implementaciones
+
+| | |
+|---|---|
+| `referencia/bilbo-city.html` | Prototipo completo, **ejecutado y probado**. Es la fuente de la verdad. |
+| `unity/BilboCity/` | Puerto a Unity. **Compila** (Roslyn contra remedo de la API), pero **no se ha abierto en el editor**. Es el objetivo de producción. |
+
+Cuando el comportamiento de los dos no coincida, **gana el HTML**: es el que está validado.
+No cambies la lógica de juego en Unity sin comprobar antes qué hace el HTML.
+
+## Antes de dar nada por terminado
+
+```bash
+./verificar.sh          # todo
+./verificar.sh html     # solo el prototipo
+./verificar.sh csharp   # solo Unity
+```
+
+Requisitos, una vez:
+
+```bash
+pip install -r herramientas/requirements.txt
+cd herramientas/html && npm install    # 'canvas' 3.x, con binario precompilado
+apt-get install -y dotnet-sdk-8.0      # Roslyn, para compilar el C# sin Unity
+```
+
+**No des por buena una tarea sin que `./verificar.sh` pase en verde.** Si tocas la trama
+de la ciudad, saca también el plano y míralo (ver *La ciudad*):
+
+```bash
+node herramientas/html/plano.js
+```
+
+## Qué comprueba cada cosa
+
+`herramientas/html/pruebas.js` arranca el juego de verdad sobre un DOM simulado con canvas
+real: juega las 8 misiones, entra y sale de **todos** los interiores —la lista sale del
+juego, así que uno nuevo se prueba solo— comprobando que tienen puerta, que las filas del
+plano miden lo mismo y que no hay ningún tendero empotrado en una pared; compra ropa y
+verifica que el sprite cambia; recorre las tres redes de transporte; comprueba el sigilo
+—postura, cono, línea de vista, ruido y que un delito sin testigos no da estrellas—;
+verifica que los sitios están sobre suelo pisable y cerca de donde los pone el plano; mide
+la conectividad de la red viaria, y prueba combate, conducción desde 16 puntos al azar,
+muerte y 150 s de bucle.
+
+`herramientas/compilar/` compila el C# de verdad, sin tener Unity: hay un remedo de la API
+del motor — solo firmas, nunca se ejecuta — y el juego se compila contra él con Roslyn, con
+las opciones de Unity 2022.3 (netstandard2.1, C# 9) y la separación de ensamblados de los
+`.asmdef`, así que el runtime no ve `UnityEditor`. Va con `-warnaserror`. **Si añades API
+del motor que el remedo no tenga, añádela a `herramientas/compilar/apinado/Api/` con la
+firma exacta de Unity** — una firma inventada de más tapa errores reales, que es lo único
+que puede estropear esta herramienta.
+
+`herramientas/plano/sitios.py`, `singulares.py`, `calles.py`, `siluetas.py`, `reglas.py` y
+`patios.py` comparan las coordenadas de los 57 sitios, las medidas de los 13 singulares,
+los puntos de paso de las 513 calles, los bytes de las 7 hojas de silueta, **los números
+del juego** y **el interior de manzana con el hash que lo siembra** entre el HTML y el C#. Es la trampa clásica de tener dos implementaciones: el HTML pasa la
+batería, el C# no se ejecuta aquí, y Unity acaba poniendo las cosas en otro lado sin que
+nadie lo vea.
+
+`reglas.py` es la cara de esa trampa que menos se ve, porque no desplaza nada: compara el
+daño y el alcance de las 5 armas, las puertas de nivel, los 8 curros, las 10 propiedades,
+las 18 prendas, lo que pagan las 8 misiones con sus límites de tiempo, y 16 constantes
+sueltas (dinero inicial, alquiler, curva de experiencia, conos de auto-apuntado, lo que se
+queda el hospital). **Números, nunca textos**: el HTML y Unity pueden redactar un rótulo
+distinto sin que el juego cambie, y exigir la coma en el mismo sitio sería un verificador
+que falla por nada. Y una constante que **deja de encontrarse** es un fallo por sí sola —
+si no, el día que alguien renombre `XpNivel` el careo pasa a comparar `None` con `None` y
+sigue dando verde.
+
+La única excepción a lo de los textos está en el mismo fichero y tiene la raya en un sitio
+concreto: de las 34 frases del parroquiano compara las **etiquetas** —la etiqueta es la
+condición, o sea código— y jamás el texto. Que Unity lo escriba con otras palabras no
+cambia el juego; que allí falte la frase de la deuda, sí: el parroquiano de Unity no se
+entera de que debes dos recibos. Por lo mismo carea quién es el habitual de cada barra,
+nombre incluido, que un nombre propio no es redacción.
+
+`patios.py` es el único que no compara datos sino **la forma de una función**, y lo hace
+porque aquí el C# no se puede ejecutar. Carea el trazado de los patios y, sobre todo,
+`hash()` contra `Utiles.Hash()`: eran la misma función escrita de dos maneras y daban
+cosas distintas en el **98 %** de las casillas, porque el segundo producto en JS iba con
+`*` —coma flotante, pasa de 2⁵³ y pierde justo los bits bajos que luego se piden con un
+módulo— y en C# con enteros de 32 bits con vuelta. Tejados, farolas y flechas en otro
+sitio en cada versión, sin un solo error. Ahora el HTML usa `Math.imul` y las dos hacen lo
+mismo; un `*` suelto vuelve a canonizar distinto y el verificador lo canta.
+
+`herramientas/csharp/` analiza el C# sobre el árbol de sintaxis real (tree-sitter). No es un
+compilador, pero verifica sintaxis, miembros inexistentes, aridad de llamadas y
+constructores, miembros de enum, tipos desconocidos y **listas modificadas mientras se
+recorren** — este último es el fallo que más aparece al portar de JS a C#: en JS no pasa
+nada, en C# la excepción salta en el siguiente `MoveNext`.
+
+## Convenciones que hay que respetar
+
+- **Código en español.** Nombres de clases, métodos, variables y comentarios. `Ciudad`,
+  `Jugador`, `Rodable()`, `PuntoAcera()`. No mezcles inglés.
+- **Comentarios que expliquen el porqué**, no el qué. Si un comentario repite lo que dice
+  la línea siguiente, sobra.
+- **Nada de físicas de Unity.** Ni `Rigidbody2D` ni `Collider2D`. La colisión es por casilla
+  con deslizamiento por ejes (`Movimiento.Deslizar`). Es predecible y va rápido en móvil.
+- **Paleta bloqueada de 61 colores, la de CONTEXT.md §18.6.** Seis familias de ocho tonos
+  —hormigón, ladrillo, verde industrial, ría, luz artificial y tez— más los acentos. Todo
+  sprite pasa por `cuantizar` / `Paleta.Cuantizar`. No introduzcas colores nuevos.
+  Los nombres de siempre (`C.asfalto`, `C.piel1`) siguen valiendo: ahora son **apodos** que
+  apuntan a un color de familia, repartidos por significado y no por color más cercano.
+  `herramientas/plano/paleta.py` compara colores y apodos entre el HTML y Unity.
+- **Sin assets importados.** Ni PNG, ni WAV, ni fuentes TTF de terceros en el
+  repositorio. Si necesitas algo nuevo, se forja por código en `Assets/Scripts/Arte/`.
+  Las hojas de personaje del bloque `SPRITES` **no son una excepción**: se dibujan en SVG
+  sobre un esqueleto nuestro (`herramientas/sprites/`), sin red y sin clave, y entran
+  cuantizadas a la paleta y escritas como índices comprimidos —en el HTML y en
+  `Siluetas.cs` a la vez—, nunca como archivo de imagen. **Excepción con condiciones:
+  también pueden venir de PixelLab**, por el mismo camino. Vengan de donde vengan entran por **siluetas**, no por personajes: cada parte del
+  cuerpo en su rampa, para poder repintarla (ver *El arte*). Lo que falte se sigue
+  forjando: el juego no puede depender de que haya hoja.
+- **En artefactos web no uses `localStorage` directamente**: el HTML usa `window.storage` con
+  respaldo a `localStorage`.
+- **Nada de `Math.random()` en el prototipo.** Usa `azar()`, o `rnd(a,b)` / `rndi(a,b)`, que
+  van por encima. El generador es sembrable (`sembrar(n)`) y la batería lo siembra, así que
+  dos pasadas dan lo mismo. Un `Math.random()` suelto rompe eso y devuelve los rojos
+  intermitentes que costó quitar.
+
+## La trampa de la Y
+
+En el mundo del juego la **Y crece hacia abajo** (como en un canvas). En Unity crece hacia
+arriba. La conversión está centralizada:
+
+- `Mundo.AMundo(Vector2)` / `Mundo.ACasilla(Vector3)` para posiciones.
+- `Lienzo.VolcarEn(...)` voltea la Y al construir los atlas de textura.
+- El ángulo de un vehículo se pasa a Unity con signo cambiado: `-Ang * Mathf.Rad2Deg`.
+
+Si algo sale espejado o al revés, empieza mirando ahí.
+
+## La ciudad
+
+Bilbao no es procedural ni está trazada a mano: **está sacada del plano municipal**. El
+plano oficial es un PDF vectorial y trae la ciudad en dos capas que se separan limpias:
+
+- las **manzanas**, los parques y la ría son polígonos con su color de relleno;
+- la **calzada** es un trazo blanco con el ancho real de cada calle — un callejón del
+  Casco Viejo y la Gran Vía son la misma línea con distinto grosor.
+
+`herramientas/plano/extraer.py` separa esas capas, las pasa a casillas y escribe el
+resultado comprimido en el HTML y en `unity/.../Ciudad/Plano.cs` a la vez. Lo que se
+dibuja son **las calles de Bilbao**, no unas calles verosímiles: la retícula del Ensanche,
+la diagonal de la Gran Vía, la elipse de Moyúa, el meandro de Deusto, la Ribera de Deustu
+entre el Canal de Deusto y la ría, las revueltas de Artxanda y las autopistas cruzando el
+monte.
+
+```bash
+python3 herramientas/plano/extraer.py ruta/al/plano_bilbao.pdf
+```
+
+El mapa mide **1440×776 casillas a 5,16 m cada una**: 7,4 km de este a oeste por 4 de
+norte a sur, el término municipal entero. Es rectangular porque el valle lo es.
+
+**El bloque `/*<<<PLANO*/ … /*PLANO>>>*/` no se edita a mano** — ni en el HTML ni en
+`Plano.cs`. Se vuelve a ejecutar el extractor.
+
+### Qué se toma del plano y qué no
+
+Se toma la **geometría**: por dónde va cada calle, dónde acaba una manzana, dónde está el
+parque, dónde pone el ayuntamiento el rótulo de cada barrio. Eso son hechos geográficos de
+la ciudad, no una creación de quien dibujó el plano. No se toma nada de su forma de
+dibujarlo: ni colores, ni tipografías, ni símbolos, ni composición. **El PDF no entra en el
+repositorio**; solo entra la rejilla derivada, y el juego la pinta con arte propio.
+
+### Cuatro cosas que no son obvias y cuestan de encontrar
+
+- **El plano pinta la ría de una vez y le devuelve el suelo encima.** La mancha de agua se
+  come Zorrotzaurre, y la isla reaparece porque después le pintan el suelo blanco por
+  encima. Por eso los rellenos se redibujan **en el orden del plano** (`seqno`) y el blanco
+  es una clase más. Reordenando por clases, la Ribera de Deustu queda bajo el agua.
+- **Las calles peatonales no llevan trazo blanco.** Las Siete Calles, media Bilbao la Vieja
+  y los pasajes de los grupos de viviendas son el hueco entre manzanas y nada más. Lo que
+  queda en blanco a menos de seis casillas de una casa es calle; el mismo blanco lejos de
+  toda casa es monte.
+- **La acera se saca erosionando la calzada, y eso parte la red.** En una calle de tres
+  casillas en diagonal el interior queda en una hilera que solo se toca por la esquina, y
+  los coches se mueven en cruz. Hay dos remiendos después del corte, uno local para las
+  diagonales y otro global; la cifra a vigilar es la que imprime el extractor
+  (`calzada en una pieza`, ahora 95,6 %) y la que mide la batería.
+- **Los barrios se reparten por cercanía al rótulo, pero andando.** El agua no se cruza —
+  los puentes tampoco — así que Deustu no se come Olabeaga aunque estén a doscientos metros
+  a vuelo de pájaro. Es una aproximación: el plano no dibuja los límites de barrio, solo
+  los rotula, y en la frontera entre dos hay casillas que caen en el vecino.
+
+### El interior de manzana
+
+El plano municipal dibuja la manzana **maciza**: por fuera es un polígono y por dentro no
+hay nada. En Bilbao casi todas tienen patio, y se entra por un portal que atraviesa el
+edificio. Eso no se puede sacar del plano —no lo dibuja— pero sí se puede abrir después,
+y a cambio la manzana deja de ser un rectángulo de tejado de cuarenta casillas. Son
+**419 patios**, uno por manzana grande, y entre todos 7867 casillas.
+
+`abrirPatios()` / `Ciudad.AbrirPatios()` recorren el mapa con los tejados ya repartidos
+—la casilla deja de ser `EDIF` pero conserva su índice de tejado, que es con el que se la
+tapa— y en una de cada diecisiete casillas de edificio intentan meter un cuadrado de 3 a
+5 casillas de lado. Dos reglas lo sostienen:
+
+- **Dos casillas de edificio alrededor, por los cuatro lados.** Con una, el patio se come
+  la fachada y desde la calle se ve el agujero. Y como una casilla abierta deja de ser
+  `EDIF`, esa misma comprobación impide que dos patios se toquen sin llevar ninguna
+  cuenta aparte.
+- **El portal es recto y sale por el lado más cercano.** Un portal en ele es un pasadizo,
+  y un pasadizo invita a atravesar la manzana, que es justo lo que un patio no es. Por lo
+  mismo el portal no puede ir pegado a otro patio ni desembocar en él: eso uniría dos
+  manzanas. Costó un intento, y gordo: sin esa regla salen 421 patios en **360 trozos**,
+  o sea sesenta y un pares de manzanas cosidas por un pasadizo. La batería lo mide
+  contando trozos de patio y exigiendo que sean tantos como patios.
+
+**La oclusión, que es para lo que están.** Desde la calle la manzana tiene que seguir
+siendo maciza: el patio y su portal van tapados con el tejado del propio bloque y se
+destapan al entrar, en 0,35 s. Lo único que asoma siempre es **la boca del portal** —la
+casilla de patio que da a la acera—, que es lo que te dice que ahí se puede entrar.
+
+Cuatro cosas, y tres son de un intento fallido cada una:
+
+- **Solo se desvanece la tapa.** La geometría del bloque —fachadas, sombras y los filos de
+  dos píxeles— cambia de golpe, pero cambia en el instante en que la tapa está opaca del
+  todo: al entrar `patioF` arranca en 0, y al salir el patio no se cierra hasta que vuelve
+  a 0. Con la geometría cambiando a mitad de la transición, los filos parpadeaban.
+- **Lo que da al patio no es escaparate.** Con la lista de fachadas del barrio, el
+  interior salía con toldos y rótulos y parecía otra calle. `FACH_PATIO` son pared ciega,
+  portal, persiana y garaje: lo que cuenta que has entrado en algo privado es justo que
+  ahí no haya tienda.
+- **Quien está dentro no se ve desde fuera.** El portal es pisable, así que los peatones
+  se meten —en una pasada de cuarenta segundos, quince mil fotogramas de peatón dentro de
+  un patio tapado— y sin esconderlos salen **paseando por encima del tejado**. Se
+  desvanecen con la tapa. La batería lo mide pintando el mismo fotograma con peatón y sin
+  él y exigiendo que no cambie un píxel.
+- **El radar va del color del edificio.** Un plano que te enseña los patios se salta la
+  oclusión por la puerta de atrás.
+
+En Unity la tapa es un **cuarto Tilemap** por encima del detalle, y se destapa cambiando
+el color de sus tiles una a una: es lo único que un Tilemap deja animar sin rehacerlo.
+Hay una diferencia a propósito, anotada en el código: la capa de detalle se hornea una
+sola vez, así que ahí el patio cuenta como bloque siempre —si contara como hueco, el filo
+claro caería sobre la casilla de edificio que lo bordea, que no la tapa nada, y desde la
+calle se vería una raya de luz en mitad de una manzana maciza—. Lo que se pierde es la
+sombra dentro del patio al entrar.
+
+**Hay monte.** `MONTE` / `Suelo.Monte` es un tipo de suelo propio y es la mitad del mapa:
+se pisa pero no se conduce, y va más tupido de árboles que un parque urbano.
+
+**Los sitios llevan la coordenada del plano**, no una pista. Por eso se colocan buscando la
+casilla pisable **más cercana** (`cercaDe` / `Ciudad.CercaDe`), no una al azar del
+vecindario: correr la catedral cien metros la saca del Casco Viejo. La batería comprueba
+que ninguno se va más de 30 casillas de donde lo pone el plano, y
+`herramientas/plano/sitios.py` que el HTML y Unity tengan las mismas coordenadas.
+
+Si tocas el extractor, **comprueba tres cosas**: que la red viaria siga por encima del
+90 % (lo mide la batería), que los sitios sigan cerca de su coordenada, y saca el plano y
+míralo:
+
+```bash
+node herramientas/html/plano.js                      # con rótulos y chinchetas
+node herramientas/html/plano.js salida.png --zoom 2 --sin-nombres
+node herramientas/html/manzanas.js                   # el grano de la trama
+```
+
+## El mundo: tejados, tráfico y gente
+
+Tres cosas que salen del plano sin escribir una coordenada, porque el estilo de cada
+barrio ya viene del extractor:
+
+**Los tejados dicen en qué barrio estás.** Cuatro familias —teja, pizarra, azotea y nave—
+y la elige el barrio de **cada casilla**, no el del rincón por el que el recorrido empezó
+el edificio: la manzana del Casco Viejo es una sola pieza de 6366 casillas que cruza a
+Abando, y tomando el estilo del origen el casco entero salía de pizarra. Los umbrales
+(`familiaTejado`) salen de medir el plano: la mediana de una manzana son 44 casillas y el
+percentil 90 son 220.
+
+Dos cosas que costaron un intento cada una: los tejados son **materia, no objetos** —un
+depósito dibujado dentro del tile se repite en cada casilla y la azotea parece papel
+pintado, así que los remates van sueltos y sembrados por hash como las farolas—; y la
+variante cambia **por parches de 6 casillas**, que con un solo tile una manzana así es una
+plancha lisa.
+
+**El tráfico y los peatones también.** `TRAFICO_BARRIO` y `PEATON_BARRIO` reparten trece
+chasis y dieciocho arquetipos según el estilo: taxis y gabardinas por la Gran Vía, monos de
+faena y camiones en Zorrotzaurre, motos por el Casco.
+
+### La calle tiene ancho, carriles y sentido
+
+El plano trae el **ancho real** de cada calle —un callejón del Casco Viejo y la Gran Vía
+son la misma línea con distinto grosor— pero el juego lo pintaba todo del mismo gris y
+solo rayaba las calles de **una** casilla de ancho, que es justo donde no cabe una raya.
+Desde arriba, una avenida de cinco carriles y un callejón eran la misma mancha.
+
+`trazarCalzada()` (HTML) y `Ciudad.TrazarCalzada()` (Unity) miden el corredor en tres
+pasadas y dejan dos bytes por casilla: el índice de su tile de marca y el sentido de su
+carril.
+
+**La calle es la tirada corta.** De cada casilla se mide la tirada de asfalto en
+horizontal y en vertical; la pequeña es el ancho y la otra dice por dónde va la calle.
+El nudo sale gratis: en un cruce las dos son largas, así que la pequeña pasa de
+`ANCHO_MAX` y la casilla queda sin pintar. **No hay detector de cruces en ningún sitio.**
+`ANCHO_MAX = 8` (41 m) sale de medir el plano: el 94 % de la calzada de Bilbao tiene ocho
+casillas o menos.
+
+Las **diagonales** no llevan tratamiento aparte y no lo necesitan: la Gran Vía corta en
+vertical poco más que su ancho y en horizontal el triple, así que la pasada por filas y
+columnas ya la da por horizontal. Se quedan sin marcar los 45° de verdad, que son las
+revueltas de Artxanda.
+
+Lo que se pinta, de la geometría:
+
+| ancho | qué sale |
+|---|---|
+| 1 | nada: no cabe |
+| 2 | eje **discontinuo** — un carril por sentido, se puede adelantar |
+| 3+ | eje **continuo**, y un separador de carril por cada canto interior a una casilla o más del centro |
+
+El bordillo va por el mismo camino: `trazarBordillos()` deja un índice por casilla de
+acera, y el código son dos máscaras de cuatro bits —los cantos que dan a la calzada y los
+que dan a un paso de cebra—, así que una esquina con vado es un tile y no dos capas.
+
+La **línea de detención** la pinta solo el carril que **desemboca** en el paso, no el que
+sale de él: es lo que distingue la entrada del cruce de la salida, y sin ella el paso de
+cebra flota en mitad del asfalto. Va retranqueada seis píxeles —poco más de un metro—
+porque a ras del canto se lee como una banda más de la cebra.
+
+El **vado** es la otra mitad de lo mismo, en la acera: donde cruza el paso el bordillo
+está rebajado, y eso se contaba **no dibujando nada**, así que el hueco parecía un olvido.
+Ahora la junta es oscura y a ras —al revés que la piedra clara del bordillo, y esa
+inversión es la que se lee de lejos— con el pavimento táctil de botones encima.
+
+Tres cosas que costaron un intento cada una:
+
+- **Cada casilla pinta solo su canto de arriba** (o de la izquierda), más su centro si el
+  ancho es impar. Si las dos vecinas pintan media línea cada una, a 32 píxeles salen dos
+  rayas finas en vez de una. El canto 0 es el bordillo y no lleva pintura.
+- **La casilla por la que pasa el eje no tiene sentido**: es mitad de cada uno. Dárselo a
+  uno ponía una flecha encima de la línea continua, que es lo contrario de lo que
+  significa.
+- **El paso de cebra exige que el nudo tenga dos casillas de fondo.** La calzada sale de
+  erosionar el trazo del plano y queda dentada, así que con una sola casilla la ciudad
+  entera salía a rayas blancas.
+
+**Se circula por la derecha**, y las rayas no son un adorno: el tráfico de rejilla
+descarta el movimiento que se mete **a contramano**. Solo eso — exigir que el carril de
+destino fuera el del movimiento dejaba siete de dieciséis coches clavados, porque un
+coche no podía cruzar el carril contrario para girar. Un carril dice algo del movimiento
+que va por su eje; de atravesarlo, nada.
+
+El **bordillo** y las **flechas** van sueltos, encima del tile, y no dentro de él: la
+acera cambia de material según el barrio y metido en el tile harían falta cuatro juegos
+de dieciséis. La tapa del bordillo es piedra clara en los cuatro cantos —oscurecer la del
+lado en sombra no la pone en sombra, la borra—; lo que dice de dónde viene la luz es la
+sombra que **echa**, al sur y al este.
+
+El arte de la calle no se puede juzgar en una captura del juego: siempre hay un coche, un
+contenedor o una farola encima. Para eso está la hoja de contacto:
+
+```bash
+node herramientas/html/calzada.js            # una calle de cada ancho, el paso y los 16 bordillos
+node herramientas/html/calzada.js --esc 4
+```
+
+## Los edificios singulares
+
+Trece sitios —San Mamés, el Guggenheim, el Arriaga, el Ayuntamiento, la catedral, Begoña,
+la torre Iberdrola, el Euskalduna, Abando, la Ribera, la Alhóndiga, el Arena y los
+Almacenes Ibaizabal— **se dibujan enteros y a su tamaño real**, encima del tejado
+genérico. Antes eran una chincheta sobre una manzana igual que las demás: el juego te
+decía dónde estaban y desde arriba no se veía nada. La estación de Abando ocupa 35 casillas
+de largo porque la nave mide 180 m; no cabe en pantalla de una vez, y así debe ser.
+
+Tres cosas que hay que respetar al tocarlos:
+
+**Se dibujan en casillas, no en píxeles.** El pincel que recibe cada dibujo (`T`) trabaja en
+unidades de casilla, con decimales. La primera versión iba en píxeles absolutos y valía
+mientras un singular medía ocho casillas; a treinta y cinco, un remate de tres píxeles sobre
+un lienzo de mil se pierde. Esto no es un detalle de estilo: **el tamaño final no se conoce
+hasta que carga la ciudad**, porque se encogen hasta que caben.
+
+**Se colocan solos, y por eso hay que fiarse del plano hasta cierto punto.** El rótulo del
+plano trae un error de unas casillas, y en dos casos es gordo: los de San Mamés y el Arena
+caen literalmente en mitad de la ría. `colocarSingulares()` desliza la caja alrededor del
+rótulo (tabla de sumas acumuladas, cada candidato son cuatro restas), se queda donde más
+manzana pisa y menos agua toca, y si a 10 casillas no hay suelo busca a 20; si aún así no
+cabe, encoge el edificio de 10 en 10 %. El tope de 20 es a propósito: la batería exige que
+ningún sitio se aleje más de 30 del plano, así que la colocación no puede ser nunca la que
+rompa eso.
+
+**No pintan sobre la calle ni sobre el agua.** `dibSingulares` va casilla a casilla, no de un
+trazo: la caja de un edificio de 180 m siempre pilla un trozo de calle por medio y esa calle
+tiene que seguir estando. `pintable()` es la lista de lo que se respeta — calle, acera de
+enfrente, ría, muelle, puente y monte.
+
+Las medidas están escritas en dos sitios (`PLANO_SINGULAR` en el HTML, `DePlano` en
+`Singulares.cs`) y `herramientas/plano/singulares.py` las compara, igual que
+`sitios.py` compara las coordenadas.
+
+Sobre nombres: los edificios públicos van con el suyo, que es un hecho de la ciudad. **Las
+marcas comerciales no**: no hay ningún Corte Inglés ni ninguna otra cadena en el mapa. Los
+grandes almacenes de la Gran Vía son los **Almacenes Ibaizabal**, inventados, con su
+interior de tres mostradores y su encargada; igual que Trapos Gran Vía, la Tasca Ondarra o
+la Galería Abandoibarra. Sitio real, nombre nuestro.
+
+## El callejero
+
+El HUD dice por qué calle vas, y son **513 calles de Bilbao sacadas del plano municipal**:
+nombre oficial y sitio real, no una lista escrita a mano.
+
+**Cómo se sacan, que tiene truco.** Sobre el mapa el plano no escribe «ALAMEDA URQUIJO» de
+un tirón: reparte las letras a lo largo de la calle, una a una y siguiendo su curva. Al
+extraer el texto llegan hechas picadillo — la primera versión sacó mil seiscientas «calles»
+llamadas `E R O S` u `O T E R O`. Pero el plano trae además, en el margen derecho, el
+**índice alfabético del callejero** con el nombre entero y su casilla de la cuadrícula
+(A-G × 1-7). Así que se usan los dos: del mapa sale **dónde**, del índice sale **qué**.
+
+1. Las letras del mapa se encadenan por geometría — mismo cuerpo, misma línea de base,
+   hacia delante y a menos de dos cuerpos. Las tolerancias son apretadas a propósito: con
+   margen de sobra la cadena salta al rótulo de al lado y salen dos calles entrelazadas.
+2. Cada cadena se busca en el índice, **solo entre las calles de su casilla o una vecina**.
+   Vale que un nombre contenga al otro —el mapa pone «URQUIJO» y el índice «Urquijo
+   Alameda»— pero solo si el trozo común pasa de cinco letras y no hay empate.
+3. Las dos condiciones a la vez son las que tiran la basura: los números de portal, las
+   letras de la cuadrícula y los equipamientos no están en el índice, y un nombre que sí
+   está pero aparece en la otra punta de Bilbao no es esa calle.
+
+```bash
+python3 herramientas/plano/extraer.py ruta/al/plano_bilbao.pdf
+```
+
+Eso reescribe la tabla entera en los dos ficheros, entre `/*<<<CALLES*/` y `/*CALLES>>>*/`:
+**no la edites a mano esperando que sobreviva**. El PDF no entra en el repositorio, así que
+esa parte se prueba con un **PDF de mentira** —mapa con rótulos repetidos, un equipamiento
+sobre una manzana, un número, un barrio, y su índice de margen— en
+`herramientas/plano/pruebas_extraer.py`, dentro de `./verificar.sh`.
+
+**Del rótulo a las casillas.** Cada calle llega como unos cuantos puntos de paso: los sitios
+donde el plano la rotula. El juego busca el camino de calle que los une, así que lo que se
+afirma no es una coordenada sino un trazado. Tres cosas, cada una de un intento fallido:
+
+- **La acera es calle.** Con solo calzada, el Casco Viejo se quedaba mudo —las Siete Calles
+  son peatonales y el plano no les pinta trazo de rodadura— y andando, que es la mitad del
+  rato, el rótulo no salía nunca. El camino va por calzada ∪ acera ∪ plaza.
+- **Pero la calzada vale menos.** Dijkstra con dos precios (calzada 1, acera 4): a igual
+  precio el camino se va por la acera y la Gran Vía sale nombrada por el portal.
+- **Dos pasadas: primero los trazados, después las faldas.** En una sola, la falda de una
+  calle se comía el trazado de la vecina. Y si aun así alguna se queda a cero, se le da la
+  casilla de su propio rótulo: que dos calles se disputen una esquina pasa en Bilbao
+  también; que una desaparezca del juego, no.
+
+La caja de búsqueda es proporcional al tramo, no fija: con sesenta casillas fijas, mil
+calles eran minutos de carga. `node herramientas/html/escala-calles.js 1200` lo mide —
+**1234 calles se nombran en medio segundo**.
+
+Para verlo:
+
+```bash
+node herramientas/html/plano.js salida.png --calles
+node herramientas/html/plano.js ensanche.png --calles --zoom 3 --zona 560,250,380,170
+```
+
+**Lo que no está rotulado en el plano no se nombra.** El índice trae unas mil cuatrocientas
+calles y se recuperan 513: el resto son las que el plano no rotula sobre el mapa, o cuyo
+rótulo queda tan partido que no se puede afirmar cuál es. Donde no hay calle, el HUD enseña
+el barrio. Una calle inventada en el sitio de una que existe es peor que no poner nada.
+
+## La portada
+
+El título iba en HTML: tipografía del sistema, degradados y el mapa teñido de rojo. Nada
+de eso está en el juego, así que la primera pantalla mentía sobre lo que venía después.
+Ahora se dibuja entera en su lienzo con **la fuente BLOQUE, la paleta y los sprites
+forjados**, sobre un trozo del plano de verdad —con la ría dentro, que es lo que se
+reconoce de Bilbao desde arriba— y a **escala entera**, para que un píxel del rótulo mida
+lo mismo que un píxel del juego. La barra de carga dice qué se está forjando.
+
+Los botones siguen siendo `<div>`: la lógica no cambia, solo se colocan encima de lo
+dibujado y se quedan transparentes. Así el clic sigue funcionando igual en el navegador,
+en la batería y en `mando.js`.
+
+Tres trampas del arranque:
+
+- **`map` está preasignado**, así que `map.length` dice que sí desde el primer paso de la
+  carga. El fondo se cacheaba vacío y la portada salía negra. Hay una bandera,
+  `ciudadLista`, y `cargarCiudad` tira la caché del mapa.
+- **A una casilla por píxel el recorte cae entero sobre manzanas**: 320 casillas son
+  kilómetro y medio de edificios y sale una plancha oscura. Se coge el doble de ciudad.
+- **El lienzo se quedó con un `opacity:.28` de cuando solo era el fondo.** Esa regla venía
+  de la portada vieja, cuando `#tcv` era el plano apagado **detrás** de un `<h1>` del DOM.
+  Al pasar la portada entera al lienzo —emblema, rótulo, vecinos y botones— el `.28` se
+  quedó puesto y apagaba la pantalla principal entera: se veía casi negra. El plano ya se
+  oscurece dentro de `pintarPortada()`, que es el único sitio donde se puede oscurecer
+  **solo el plano**. Si algo de la portada se ve muerto, mira primero el CSS de `#tcv`.
+
+## El mando
+
+La pantalla en medio y los mandos en el marco. El reparto no se decide de memoria:
+`node herramientas/html/mando.js` abre el juego en Chromium a tamaños de móvil reales,
+mide en píxeles CSS y lo pasa a milímetros. Con el 17 % de marco de la primera versión y el
+joystick atado a la altura, en un móvil de 5,4" el joystick salía a **14,5 mm** —más
+pequeño que el pulgar que lo usa— y los botones a 9,1 mm, justo en el mínimo que se puede
+acertar. Ahora el marco es `clamp(112px, 20%, 220px)` y el joystick se mide **desde el
+marco**: 21 mm y 14,5 mm en ese mismo móvil.
+
+El mando **no lleva ni un degradado de CSS**: los sprites los forja el juego (`forjarMando`)
+en la paleta y con la luz de arriba a la izquierda, como todo lo demás, y el tamaño en
+pantalla va en múltiplos enteros del sprite (`ajustarMando`) para que no salgan píxeles a
+medias. La letra va dentro del sprite y en negro, que sobre plástico de hueso es lo único
+que se lee.
+
+## Comercio y transporte
+
+Los sitios donde se entra son **trece**, y los cinco últimos los comparten varios POI: el
+rótulo de la puerta lo pone el sitio (`entrar(id, desde, nombre)`), no el plano de dentro.
+Dos tascas iguales por dentro y con distinto nombre en la puerta es lo que hay en
+cualquier barrio, y así no se duplica un plano por cada esquina.
+
+**La ropa cambia al personaje de verdad.** No es un icono ni una estadística: la forja ya
+sabe montar cualquier combinación de torso, piernas, calzado y gorro —es como se dibujan
+los veinte peatones—, así que comprar una prenda cambia cuatro campos del arquetipo del
+protagonista y tira su hoja (`delete HOJAS.protagonista` / `Hojas.Remove`) para que se
+vuelva a forjar. Cambiarse **quita una estrella**, como repintar el coche: la descripción
+que la pasma va pasando por la emisora deja de valer.
+
+**Tres redes de transporte**, y lo que las diferencia es la cobertura:
+
+| | Tarifa | Paradas | Velocidad |
+|---|---|---|---|
+| **Bilbobus** | 2 € | los 34 barrios | lenta |
+| **Metro** | 3 € | 11 estaciones | la más rápida |
+| **Cercanías** | 3 € | 6 apeaderos | rápida, y baja al fondo del valle |
+
+Viajar cuesta dinero y **reloj** (`S.min`), y con estrellas no te dejan subir: si no, un
+billete de dos euros sería la mejor huida del juego. Abando es de las dos redes, que es lo
+que pasa de verdad.
+
+Las paradas de bus **no son POIs** y no llevan coordenada escrita: se sacan del rótulo de
+cada barrio en el plano, con la acera más cercana. Treinta y cuatro chinchetas más taparían
+la ciudad en el radar, así que se encuentran estando encima.
+
+### Lo que cuenta el parroquiano
+
+El de la barra es la única boca del juego que no vende nada ni manda a ningún sitio, así
+que es donde cabe contar cómo va la partida. Eran **cinco** frases al azar: a la tercera
+tasca te las sabías, y ninguna se enteraba de que entrabas sangrando, con tres estrellas
+y debiendo dos recibos. Ahora son **34 con 21 condiciones**, y nada más empezar ya hay 13
+distintas.
+
+Cada frase lleva una **etiqueta** —su condición, que es código— y un texto, que es
+redacción. Sin condición es charla de barra y vale siempre; con condición habla de lo que
+te pasa ahora: que te buscan, que es de noche, que debes el recibo, que te han cambiado la
+cerradura, que vas sin comer, que llevas un hierro encima, que ya tienes local.
+
+Tres cosas, y las tres salieron de medir:
+
+- **Lo concreto se prefiere tres de cada cuatro veces** (`PARROQ_CONTEXTO`). En el mismo
+  saco que las doce de charla, con dos o tres condiciones ciertas, lo concreto salía una
+  de cada seis y el parroquiano volvía a parecer una máquina de refranes.
+- **Nunca dos veces seguidas la misma, y se descarta la última antes de elegir, no
+  después.** Con una sola condición cierta el saco de lo concreto tiene una frase, y
+  filtrar al final lo dejaba vacío y obligaba a repetirla. Si pasa, se dice una de barra:
+  de esas siempre quedan once.
+- **Cada barra tiene su habitual.** El interior `tasca` lo comparten varios bares, así que
+  con un solo parroquiano el mismo señor estaba en tres sitios a la vez. Va a mano
+  (`PARROQUIANO_DE`) y no por hash: con tres barras, repartir cuatro nombres por hash deja
+  dos bares con la misma persona —probado—. Salen de arquetipos que ya existen: tres
+  personas distintas sin un dibujo nuevo.
+
+La batería barre 21 estados, uno por condición, y exige tres cosas: que ninguna frase se
+diga con su condición falsa —hablarte de una deuda que no debes es peor que no tener la
+frase—, que **todas** salgan alguna vez (una condición inalcanzable es una frase muerta) y
+que la etiqueta y el `si` cuadren, porque una frase etiquetada que se quede sin condición
+pasa a charla de barra sin que falle nada.
+
+Y hay una cuarta que no se puede comprobar sin navegador: **que quepa en el cuadro**. El
+diálogo es DOM y crece hacia arriba sin tope. Desde que va en BLOQUE a 16 px cada letra
+mide 14 de ancho, así que el cuadro va de marco a marco —con el `min(560px,50%)` de antes
+cabían veintinueve letras por renglón— y el renglón a 20 px. Las 34 frases y los 17
+renglones de las misiones caben en dos filas en los tres móviles y el cuadro no pasa del
+42 % de la pantalla; la única que no cabía —la de las tres patrullas— se recortó, porque
+la regla es la herramienta y el texto la obedece. Lo mide:
+
+```bash
+node herramientas/html/dialogo.js            # ¿cabe lo que dice la gente?
+node herramientas/html/dialogo.js --filas 2
+```
+
+## Nivel, propiedades y alquiler
+
+La fama por gremio (`S.rep`) ya existía y desbloquea curros, pero es local. El **nivel de
+personaje** (`S.nivel`) es el resumen de todo — misiones, curros, golpes limpios — y es lo
+que abre las armas grandes (uzi a nivel 4, escopeta a 6), los vehículos (furgoneta 2,
+deportivo 5) y, sobre todo, **lo que te dejan comprar**. La curva sube deprisa a propósito:
+si el dinero llega antes que el nivel, comprar deja de ser una meta y pasa a ser un trámite.
+
+**Diez propiedades**, cuatro viviendas y seis negocios. No hay inmobiliaria ni menú de
+compra: las viviendas se compran **en su puerta** y los negocios **a su dueño, dentro**. Si
+quieres el taller, vas al taller y se lo dices a Iker. Un negocio renta cada día —se cobra
+al dormir— y en un local tuyo no se paga: comer, vestirte o que te arreglen el coche sale
+gratis en tu propia casa, que se nota más que un número en una pantalla de estadísticas.
+
+**El alquiler tiene a alguien al otro lado.** Amaia lleva la cuenta del piso de Santutxu, y
+los estados van en orden y sin callejones sin salida:
+
+| | |
+|---|---|
+| `aldia` | Al día. Solo aquí te vende el piso, y solo con paciencia ≥ 3. |
+| `debiendo` | Un recibo sin pagar. Duermes peor. |
+| `avisado` | Dos recibos: te avisa de que la próxima te cambia la cerradura. |
+| `desahuciado` | Tres: la llave ya no entra. Volver cuesta la deuda **más** la cerradura. |
+| `okupa` | Has forzado la puerta. Es un delito, se oye, duermes en el suelo y a veces viene la pasma. |
+
+Pagando se vuelve siempre, aunque el precio de volver suba. Y hay salida limpia: **dejar el
+piso** corta el recibo, y **comprarlo** lo corta para siempre. El estado de la casera es
+precondición de la compra: eso ata las dos cosas y hace que comprar dependa de cómo te has
+portado, no solo de la cartera.
+
+## Sigilo
+
+Hasta que se metió esto, el juego repartía estrellas por el hecho de hacer algo, mirara
+quien mirara: robar un coche en un descampado a las cuatro de la mañana costaba lo mismo
+que robarlo delante de una patrulla. **Ahora lo que cuenta es que te vean**, y esa es la
+regla entera: `delito(n)` solo llama a `estrellas(n)` si `testigos()` dice que sí.
+
+Todo cuelga de tres cosas que ya estaban: `lineaVista`, hacia dónde mira cada uno y el
+reloj.
+
+- **La postura la decide el propio joystick**, sin botón nuevo: por debajo de `AGACHA`
+  (0,34) vas agachado, por encima de `CORRE` (0,82) corriendo. Se queda puesta al soltar,
+  que si no, agacharse para mirar una esquina y levantarse solo al parar sería inservible.
+  Agachado se te ve **la mitad de lejos** y andas a 1,25 casillas/s en vez de a 4,8.
+- **Cono de 60° y línea de vista.** A menos de 2,2 casillas no hace falta cono: te tiene
+  encima. Un coche se ve venir aunque vayas despacio; **de noche** (antes de las 7 y
+  después de las 21) el alcance baja de 15 casillas a 9.
+- **La sospecha se llena mirando y se vacía al perderte de vista.** El HUD lo pinta en un
+  ojo debajo del arma: sin eso, el sigilo se juega a ciegas.
+- **El ruido no ve, pero orienta.** Un disparo son 18 casillas —5 con silenciador, que se
+  compra en el Bazar por 520 €—, un cristal roto 7, el claxon 12, una explosión 30. Quien
+  lo oye va a mirar ahí.
+- **Los enemigos de misión nacen sin saber que existes** y dan vueltas por donde están.
+  Sin eso el sigilo no serviría de nada: toda la banda te vendría encima al aparecer.
+- **Golpe por la espalda**: cuerpo a cuerpo, a menos de 1,4 casillas, por detrás y a
+  alguien desprevenido — cae de un golpe y casi sin ruido. Es el premio de haber ido
+  despacio; si no, el sigilo solo serviría para tardar más en llegar al mismo tiroteo.
+- **Despistar a la pasma** ya no es alejarse: es que ninguno te tenga a la vista. Agachado
+  detrás de un contenedor, con la patrulla a diez metros pero mirando a otro lado, la
+  cuenta corre — y baja a 8 segundos por estrella en vez de 12.
+
+Agachado no lleva dibujo nuevo: se acortan las dos piernas y baja **el cuerpo**, no la
+figura entera. Esa distinción (`yt` en la tabla de posturas) hace falta desde que la celda
+es la de 24×32 de CONTEXT.md §18.1: bajando la figura entera, el contorno de las botas se
+quedaba fuera. Y de paso es más correcto — al ponerse en cuclillas los pies no se mueven.
+
+## El arte
+
+**La celda de personaje es de 24×32 con el pivote en (12,30)**, y la paleta la de 61
+colores: las dos las fija `CONTEXT.md` §18. La celda es apretada a propósito y el arte la
+llena, así que la regla del verificador no es «no tocar el canto» —el contorno de los pies
+cae en la última fila por diseño— sino **no salirse**: un píxel de color en el borde es un
+píxel al que le recortaron el contorno. Por eso el puñetazo, el fogonazo y el carro de la
+compra van recogidos: los de antes contaban con siete píxeles de margen lateral y ahora
+hay dos.
+
+**Todo el juego sigue una sola guía de estilo: [`referencia/ESTILO.md`](referencia/ESTILO.md).**
+Proporciones, vista, dirección de la luz, uso del color, contorno, tipografía, rejilla de
+la interfaz y animación. Léela antes de dibujar nada.
+
+No es un documento de buenas intenciones: la mitad de sus reglas las comprueba
+`herramientas/html/estilo.js` sobre el arte de verdad —el que se forja al arrancar— y
+`./verificar.sh` falla si alguna se incumple. Las reglas que se comprueban solas son las
+que sobreviven.
+
+```bash
+node herramientas/html/estilo.js      # ¿el arte cumple la guía?
+node herramientas/html/iconos.js      # todos los iconos en una hoja, a dos tamaños
+node herramientas/html/personajes.js  # las hojas de personaje, para juzgarlas
+node herramientas/html/personajes.js --esc 8 --que protagonista,ertzaina
+node herramientas/html/captura.js    # el juego en marcha, para ver el arte en la calle
+node herramientas/html/calzada.js     # las marcas viales, calle por calle y ancho por ancho
+node herramientas/html/fuentes.js     # seis fuentes en una imagen, para elegir
+node herramientas/html/menus.js       # el móvil y la pausa, con el navegador de verdad
+node herramientas/html/dialogo.js     # ¿caben en el cuadro las frases, en un móvil?
+python3 herramientas/sprites/pixellab.py --mcp       # recorta las hojas traídas del MCP
+python3 herramientas/sprites/pixellab.py --mano      # las 385 celdas, sin red ni clave
+```
+
+### Los sprites de personaje salen de un esqueleto, aquí, sin red
+
+Las 385 celdas salen de un **esqueleto** —catorce puntos por pose y un grosor por tramo,
+en `cuerpos.py`— dibujado en **SVG** por `vector.py` y **fotografiado** con Chromium a ×16,
+reducido por mayoría de submuestras. Un SVG es texto y se escribe aquí, pero deja dibujar
+lo que un rectángulo no puede: el hombro que cae, la cintura, el puño, el flequillo.
+La foto revelada se guarda en `celdas.py` (**generado**, no se edita a mano; se rehace con
+`vector.py --escribe`), porque capturar necesita node y Chromium y el empaquetador tiene
+que poder correr sin ellos. Son cien por cien nuestras y no necesitan ni clave ni internet:
+`python3 herramientas/sprites/pixellab.py --mano`. **Es el respaldo y sigue entero**: lo
+que hay puesto hoy en el bloque `SPRITES` viene del MCP de PixelLab (más abajo), y el día
+que haya que rehacerlo sin clave, esto lo rehace.
+
+Dos cosas las sostienen. La primera, que el esqueleto base sea **uno por vista** —de
+frente, de tres cuartos y de perfil, y las cinco direcciones salen de tres— y que las
+poses solo lo desplacen: así la estatura y el ancho de hombros no pueden bailar entre
+celdas, que es lo que no garantiza pedir 385 dibujos sueltos. La segunda, que el volumen
+no se dibuje sino que se **calcule** (`trazos.py`): la normal de cada píxel sale de la
+propia forma y la luz viene siempre de arriba a la izquierda, así que las 385 están
+sombreadas igual. Y se pintan con la luminancia exacta de cada tono de su rampa —ocho
+para la piel, cuatro para la chaqueta—, no con tres apaños.
+
+No lo toques con filas de texto ni con un `<rect>` por píxel: escribir el cuerpo como
+rectángulos apilados es lo que había antes y salía cuadrado, con los hombros, la cintura y
+la cadera del mismo ancho. Y no edites `celdas.py`: es la foto, no el dibujo.
+
+### Ni traídos ni forjados: siluetas
+
+Lo que se dibuja no es «el protagonista», es **una silueta** — chaqueta con
+pantalón, abrigo largo, falda, pantalón corto, capucha — y de cada una salen todos los
+vecinos que la llevan. Se escribe **un** cuerpo y las otras seis siluetas salen de él por
+regla (`trazos.viste`). La hoja viene pintada con **colores de plantilla**, uno por parte
+del cuerpo, y el empaquetado guarda cada parte en su propia rampa de la paleta; como las
+rampas no comparten ni un color, repintar es cambiar índices por índices (`lutDe()`). El
+pelo largo, el gorro, la bolsa y el fogonazo no se bajan nunca: se forjan encima, anclados
+a la cabeza que trae la hoja (`capasEncima()`, `anclaCabeza()`). Es lo que evita que las
+hojas se multipliquen por cada peinado y cada sombrero.
+
+Y de cada silueta se dibuja menos de lo que se ve: **cinco direcciones de ocho** —las otras
+tres son espejo— y **once dibujos de dieciséis poses**, porque los pasos de apoyo del andar
+repiten y disparar es apuntar con el fogonazo encima. Salen 55 celdas por silueta y **385
+para el juego entero**; pedir cuatro personajes completos eran 512 y vestían a cuatro. El
+arquetipo número treinta y cinco no cuesta ninguna.
+
+Si no hay hoja de su silueta exacta, el juego busca la más parecida; si no hay ninguna, lo
+forja. **Nunca se queda nadie sin dibujar**, y por eso una sola silueta ya es jugable.
+
+**Las dos implementaciones leen el mismo bloque.** El empaquetador lo escribe a la vez en
+el HTML y en `unity/.../Arte/Siluetas.cs`, igual que el extractor del plano escribe la
+trama en los dos: mismos bytes, misma celda y mismas rampas, y `ForjaChar` hace en C# lo
+que el HTML hace en JS —`SetDe`/`setDe`, `LutDe`/`lutDe`, `AnclaCabeza`/`anclaCabeza`,
+`CapasEncima`/`capasEncima`—. Es la trampa clásica de tener dos versiones y con el arte no
+salta ningún error: sale un juego con otra gente por la calle. Lo compara
+`herramientas/plano/siluetas.py`, dentro de `./verificar.sh`. **El bloque
+`/*<<<SPRITES*/ … /*SPRITES>>>*/` no se edita a mano** en ninguno de los dos.
+
+El reparto por partes se sostiene en los colores de plantilla —cada parte de un matiz que
+no se parece a ningún otro— vengan las celdas de donde vengan, y ahí hay dos
+trampas que costaron un fallo cada una. El reparto va **por matiz**, no por color
+normalizado: un brillo del pelo azul, aclarado hacia el blanco, se acerca más al magenta
+del torso que al azul del que salió, y media cabeza acababa repintada del color de la
+chaqueta. Y el **contorno se reconoce por no tener color**, no por ser oscuro: el azul puro
+tiene luminancia 29, así que con un umbral por oscuridad el pelo se iba entero al contorno y
+el arquetipo salía calvo. Los píxeles desvaídos —brillos, sombras apagadas— no se reparten
+por tono: se contagian del vecino con color. El empaquetador avisa cuando falta un color de
+plantilla o cuando la mayoría de la celda vino apagada, y `--diag` enseña el recuento.
+
+`--mano` no necesita nada. La vía de PixelLab sí: clave (`PIXELLAB_API_KEY`), que **nunca
+va en el repositorio**. Ver `herramientas/sprites/LEEME.md`.
+
+### Lo que hay puesto viene del MCP de PixelLab, y entra por el mismo sitio
+
+Las siete hojas de silueta de ahora y el arte de ciudad vienen del **MCP** de PixelLab, no
+de la API v1: `create_character` da **las ocho direcciones por una generación** y
+`animate_character` una animación entera por dirección, así que las hojas tienen ocho
+direcciones de verdad en vez de cinco y tres espejadas.
+
+```bash
+python3 herramientas/sprites/lote.py             # baja el lote (reanudable; una vez)
+python3 herramientas/sprites/cenital.py          # repite lo que volvió de perfil
+python3 herramientas/sprites/pixellab.py --mcp   # recorta las hojas a la celda de 24×32
+python3 herramientas/sprites/iconos.py           # los 43 iconos del HUD (reanudable)
+python3 herramientas/sprites/arte.py             # suelos, muebles, singulares e iconos al juego
+```
+
+Cuatro cosas que hay que saber antes de tocarlo:
+
+- **El generador no respeta los colores de plantilla y no hay campo de paleta.** Volvieron
+  seis pantalones turquesa y ningún verde. El recorte **vuelve a estarcir** cada celda:
+  agrupa por matiz y reparte las partes por anatomía —piel el grupo tostado, pelo el que
+  manda en la coronilla, torso el mayor, piernas el más bajo, calzado las tres últimas
+  filas—, y cada píxel conserva su luminancia. Sin eso no hay rampas separables y
+  `lutDe()` deja de servir.
+- **Lo que no es personaje va en su propio bloque `/*<<<ARTE*/`**, en el HTML y en
+  `unity/.../Arte/Traido.cs` a la vez, con el formato de siempre (índice de paleta por
+  píxel, deflate, base64). Cinco familias: singulares, muebles, suelos, iconos y marca. **El
+  juego no depende de que estén**: si falta una pieza o el bloque entero, se forja como siempre.
+  Lo compara `herramientas/plano/arte.py`, dentro de `./verificar.sh`.
+- **El asfalto, la tierra y el césped tampoco se traen, y esto está probado dos veces.**
+  Son los tres suelos que más superficie cubren —el asfalto solo son decenas de miles de
+  casillas— y ahí la regla se invierte: una textura con motivo, repetida cada 32 px, no es
+  textura, es papel pintado. La primera tirada dio asfalto azulado y tierra con un glifo
+  que al cuantizar a los 61 colores **se queda en dos**, y lo único que sobrevive es el
+  motivo. La segunda, pidiendo expresamente «very fine uniform grain, no pattern, no
+  motif», dio baldosas azules con la cuadrícula de 32 px marcada, tierra con un tejido aún
+  más visible y un césped que **colapsa a un solo color**. El tile forjado es ruido sin
+  motivo sobre un color plano, y a esta escala eso es exactamente lo que hace falta: no se
+  ve la rejilla. No volver a intentarlo sin una herramienta que garantice continuidad
+  entre casillas, que `create_topdown_tileset` no la da dentro de la casilla pura.
+- **Los vehículos no se traen.** Dos tiradas, 36 generaciones, y las dos volvieron de
+  perfil o a medias. Media flota traída y media forjada es peor que la flota entera
+  forjada, y el chasis forjado es el que lleva las siete libreas. Por lo mismo se quedan
+  fuera la placa de calle, la caseta de escalera y el **parque**: su casilla trae un
+  arbusto legible y, repetida cada 32 px, el Arenal sale de papel pintado.
+- **Nada de texto traído.** El generador rellenó el rótulo de los Almacenes Ibaizabal con
+  cuatro letras inventadas; se aplanan al importar, fila a fila, con el color que manda en
+  cada una.
+
+### Los 43 iconos del HUD también vienen de PixelLab
+
+Eran lo último forjado a mano de la interfaz: cuarenta y tres dibujos de rectángulos. A 24
+píxeles un rectángulo se lee, pero no dice qué es —el puño parecía una caja de cartón, el
+plato una moneda y el pintxo una tostada—, y un icono que necesita leyenda no es un icono.
+
+Cómo entran, que tiene tres pasos y ninguno es evidente:
+
+1. **Se piden a 96×96, no a 24.** El generador no trabaja a 24 (y por debajo de 32×32 de
+   área la API ni acepta el lienzo). Bajar luego de 96 a 24 **por mayoría** sale más limpio
+   que pedir 24 directamente.
+2. **Con los 61 colores forzados.** `color_image_base64` admite un PNG del que solo se leen
+   los colores: se le manda una tira con la paleta del juego. Lo que vuelve ya está casi en
+   casa y el redondeo al color más cercano casi no mueve nada.
+3. **El contorno se pone aquí, no allí.** Se pidió `single color black outline` y volvieron
+   varios sin él. Lo pone `arte.py` al traer, que además es lo que hace que cumplan la R2
+   de `estilo.js`: 24×24, contorno negro y **siete colores como mucho** —de ahí que la
+   pieza se recorte a 22×22 antes de centrarla, porque el contorno crece un píxel por lado
+   y el que toca el canto se quedaría sin.
+
+**Dos no se piden: se derivan.** `estrellaOff` es `estrella` en gris y `ojoTachado` es `ojo`
+apagado con el tachón encima. Son la mitad apagada de una pareja y tienen que ser el mismo
+dibujo que la encendida: con dos dibujos distintos, al cambiar de estado parece que cambia
+el icono y no el estado.
+
+**Lo que costó varias tiradas.** Diez volvieron ilegibles a la primera y tres a la segunda.
+No por el generador: por la descripción. «a city taxi car» da un borrón amarillo a 24 px;
+el **piloto de techo** del taxi, no. Lo mismo con la fuga (una rosa de los vientos no se
+entiende; el **muñeco verde de salida de emergencia**, sí) y con el reparto (una caja de
+cartón se confundía con la mudanza; una **moto con baúl**, no). A este tamaño la silueta es
+todo: si un icono no se distingue en negro sobre blanco, no se distingue.
+
+**El marco del HUD sigue forjado**, y no por falta de ganas: un panel de PixelLab cuesta 20
+o 40 generaciones, sale de 192 px para arriba y hay que encogerlo —que en pixel art es
+destruirlo—, y sobre todo la caja del HUD es **translúcida** a propósito, para que se vea
+la ciudad por debajo. Un panel opaco con textura tapa el juego. Lo mismo con los menús, que
+son DOM con su CSS (ver *La interfaz, del mismo juego*).
+
+### El emblema, y por qué el icono de la aplicación es el mismo
+
+La portada era rótulo y nada más: BILBO CITY en la fuente del juego sobre el plano. Un
+juego sin marca. Ahora lleva a su izquierda un **escudo hexagonal** —monte, torre, dos
+chimeneas y el meandro— que también viene de PixelLab, en la familia `marca`, pieza única
+a 64×64.
+
+- **El escudo no lleva letras.** El rótulo sigue siendo la fuente del juego, por la regla
+  de arriba: un emblema con texto traería texto inventado.
+- **Dos contornos, no uno.** El negro de siempre y, por fuera, un aro en `aviso1`. El aro
+  no es adorno: el escudo es verde oscuro sobre una portada oscura y sin él no despega del
+  fondo. De paso lo ata al ámbar del rótulo. Por eso la pieza se recorta a 62 antes de
+  centrarla en 64: cada contorno crece un píxel por lado.
+- **No pasa por la R2.** No es un icono del HUD: ni 24×24 ni siete colores.
+
+**Y el icono de la aplicación es ese mismo escudo**, leído del bloque `/*<<<ARTE*/` —no de
+un PNG aparte, que este repositorio no los tiene—, inflado y pintado por `pwa.js`. Lo que
+se ve en el lanzador tiene que ser lo que se ve al arrancar, o son dos marcas. Tres cosas
+que costaron un intento:
+
+1. **Debajo va una plancha negra.** El escudo tiene las esquinas transparentes y un icono
+   de aplicación no puede ser medio transparente.
+2. **La escala es entera o no es.** El recortable se generó encajando el emblema de 64 en
+   el hueco exacto y el redimensionado se comió filas sueltas: el aro ámbar salió a
+   trozos. Ahora se busca la mayor escala entera que quepa —×3 para 192, ×8 para 512, ×6
+   para el recortable con sus 64 de banda— y se pinta por vecino más próximo.
+3. **En Android va en el primer plano, no en el fondo.** Lo contrario de lo que pedía la
+   mancha abstracta anterior: aquella llenaba el círculo a sangre, pero a un escudo con
+   puntas el lanzador se las recorta con cualquier máscara. Va a 72 de los 108 —la zona
+   segura— y detrás una plancha negra que llena lo que la máscara descubra.
+
+Si el bloque `ARTE` no trae `marca`, la portada vuelve al rótulo centrado y el icono al
+dibujo a mano de `icono32()`. Como todo lo traído: no es un requisito, es una mejora.
+
+```bash
+python3 herramientas/sprites/iconos.py                       # lo que falte
+python3 herramientas/sprites/iconos.py estado                # cuánto hay y cuánto queda
+python3 herramientas/sprites/iconos.py --rehacer taxi,fuga --semilla 3031
+node herramientas/html/iconos.js                             # los 43, sobre claro y oscuro
+```
+
+## Pixel perfect
+
+El arte es pixel art y hay que dibujarlo sin medios píxeles. Tres reglas, y las tres hacen
+falta a la vez:
+
+- **Escala entera.** Un píxel de textura ocupa un número entero de píxeles de pantalla. En
+  el HTML el zoom se redondea (con histéresis, para que no baile); en Unity el tamaño
+  ortográfico se despeja de `Screen.height / (2 · PPU · escala)` con `escala` entera.
+- **Cámara clavada al píxel.** Si la cámara se traslada en fracciones, el mundo entero
+  tiembla al andar aunque cada sprite esté bien.
+- **Sprites clavados al píxel.** Todo lo que lleve `SpriteRenderer` se coloca con
+  `Mundo.AMundoPixel`, no con `Mundo.AMundo`.
+
+Y `DPR` entero en el HTML: con 1,5 un píxel de textura cae a caballo de dos de pantalla.
+En Unity el HUD va en `ConstantPixelSize` con factor entero por lo mismo:
+`ScaleWithScreenSize` daba 2,7 en cualquier móvil de verdad.
+
+**El HUD también es arte de píxel.** Un icono está dibujado a 24×24 y se enseña a 24×24:
+encogerlo a 20 con la interpolación apagada no lo hace más pequeño, tira filas enteras y
+deja unos píxeles del doble de alto que otros. El hueco se hace a la medida del icono.
+Y todo lo que cuelgue de un seno, de una media o de una velocidad —el bote de un
+marcador, la flecha de la brújula, una caja centrada con `(W-w)/2`— se redondea antes de
+pintarse.
+
+```bash
+node herramientas/html/pixel.js   # ¿se dibuja todo en la rejilla?
+```
+
+Eso envuelve el contexto de verdad, juega ciudad, interior, portada, tienda, móvil y
+volante, y apunta cada `drawImage` y cada `fillRect` que cae fuera de la rejilla **con la
+línea del HTML que lo hizo**. Está en `./verificar.sh`. Es lo que hacía falta: a ojo, un
+radar a escala 1,625 y un icono a 20 se ven «un poco sucios» y ya está.
+
+Y mira el **color** de todo lo que se pinta en ese lienzo. El arte forjado pasa por
+`cuantizar()` y lo vigila `estilo.js`, pero el HUD, el radar, el anillo de salud y el plano
+de la pausa se pintan con un `fillStyle` a pelo, y ahí se habían colado catorce colores
+inventados. Las cajas del HUD siguen siendo translúcidas —hay que ver la ciudad por
+debajo—, así que el alfa es libre y el color no: se escribe `conAlfa(C.negro,.72)`, nunca
+`'rgba(7,9,12,.72)'`. La única excepción es el tinte de barrio, que es un velo mezclándose
+entre dos barrios y por definición cae entre dos colores; va por `velo()`, que es lo que
+levanta la guardia, y un `rgba()` puesto a mano sigue cantando.
+
+## La interfaz, del mismo juego
+
+La calle era pixel art y los menús no: la tipografía del sistema, siete colores
+inventados en el CSS, bordes de 1 px a medio transparente, esquinas redondeadas,
+degradados suaves, sombras desenfocadas y un emoji para «gira el móvil». Cada cosa por
+separado es pequeña; juntas, la pantalla parecía de dos sitios. Lo que la guía ya decía
+—rejilla de 4, bordes de 2, la paleta, BLOQUE a escala entera, nada de emoji— no lo
+comprobaba nadie. Ahora sí, y en el mismo idioma que el resto: `estilo.js` (R7) lee la
+hoja de estilo de verdad y falla en cualquiera de esas cosas.
+
+**La fuente del DOM es la del lienzo, construida en el arranque.** No entra ningún `.ttf`
+en el repositorio: `construirTTF()` arma un TrueType de 13 kB con los mismos `GLIFOS_B`
+—una caja por tirada horizontal de píxeles, ocho píxeles del dibujo por em— y
+`fuenteDom()` lo registra con `FontFace`. Código, no archivo. De ahí salen dos reglas:
+
+- **Los tamaños son 8, 16, 24 y 32**, escalas 1 a 4. Un 15 saca filas del glifo del doble
+  de alto que otras.
+- **La sombra dura va en `calc(1em / 8)`**, en el selector universal, que da el píxel del
+  dibujo exacto a cualquier tamaño. No se hereda a propósito: `text-shadow` se hereda ya
+  resuelto y un hijo más pequeño llevaría la sombra del padre. El color, en `--sombra`.
+
+Lo que se enseña tiene que existir en la fuente, o sale de interrogación. Por eso BLOQUE
+ganó `¿ ¡ « » ° “ ” "` —media conversación del juego empieza por `¿`— y se fueron el `⇄`, el
+`▸`, el `✔`, el `💾`, el `🗑`, el `📱` y los veintiocho emoji muertos de los POI. La R7 mira el
+marcado; el texto que genera el juego lo pinta igual la fuente, con su `?` donde falte.
+
+Tres cosas más, una por intento:
+
+- **Las rayas de tubo van en el fondo del panel, no en una capa encima.** Encima tenían
+  que ser medio transparentes para dejar leer; debajo salen opacas y en la paleta, y lo
+  que va encima las tapa solo.
+- **El aro de correr es otro sprite del plato** (`joyBase(1)`), no un `box-shadow`: un halo
+  de CSS alrededor de un dibujo de píxeles sale con el borde suave.
+- **Los paneles, el diálogo y el curro usan el mismo `--marco` que la pantalla.** Iban con
+  un 17 % a ojo de cuando el marco medía eso, y se salían por los lados; el diálogo se
+  apoyaba en el cristal del móvil y se comía el marco de abajo.
+
+En Unity, el HUD tiene los mismos colores y `Paleta.ConAlfa()`; el mando de Unity sigue con
+redondeles translúcidos dibujados a mano y no con los sprites de `forjarMando`.
+
+## Jugarlo en el móvil: instalable y sin conexión
+
+No hay APK y no hace falta para probarlo en un teléfono. `referencia/bilbo-city.html` es
+**un archivo suelto y autónomo** —ni un `<script src>`, ni una hoja de estilo, ni una
+fuente de fuera; los iconos del menú son `data:` que forja el propio juego—, así que lo
+único que le falta para instalarse como una app son tres cosas que un archivo suelto no
+puede llevar dentro, porque el navegador las exige como ficheros aparte del mismo origen:
+el manifiesto, el trabajador de servicio y los iconos.
+
+```bash
+node herramientas/html/pwa.js            # escribe dist/
+node herramientas/html/pwa.js --probar   # lo levanta y lo abre en Chromium
+```
+
+Eso deja en `dist/` el juego **sin tocar una línea** —solo con el enlace al manifiesto y
+el registro del trabajador añadidos— más el manifiesto, el trabajador y los iconos. Se
+sirve `dist/` por HTTPS o por localhost, «Añadir a la pantalla de inicio», y desde ahí
+arranca a pantalla completa, apaisado, sin barra del navegador y sin volver a pedir red.
+
+Tres cosas a propósito:
+
+- **El icono se dibuja por código**, en la paleta del juego y a escala entera (32×32
+  ampliado ×6 y ×16). Ningún PNG entra en el repositorio: `dist/` no se versiona, es
+  salida como lo sería un APK.
+- **La paleta se lee ejecutando las dos tablas del juego**, no con una expresión regular:
+  la segunda son apodos que apuntan a la primera (`asfalto: C.hormigon1`), y leyendo solo
+  literales el icono sale entero negro.
+- **La versión de la caché es el hash del HTML.** Si el juego no ha cambiado no hay caché
+  nueva; si ha cambiado, no hay forma de olvidarse de subirla. Al activarse se tiran las
+  viejas, que si no el móvil se queda con la partida de hace tres meses.
+
+Lo barato —que estén los ficheros, que el manifiesto pida pantalla completa y apaisado,
+que el trabajador no prometa cachear un fichero que no existe (`addAll()` falla entero y
+el modo fuera de línea no llega a instalarse nunca)— está en `./verificar.sh`. Lo caro
+—levantar Chromium y comprobar que el trabajador queda activo y el juego arranca— es
+`--probar`, a mano.
+
+### Y un APK, con el prototipo dentro
+
+El puerto a Unity es el objetivo de producción, pero no se ha abierto nunca en el editor y
+de ahí no sale un APK esta tarde. De aquí sí:
+
+```bash
+node herramientas/html/apk.js              # escribe dist/android/
+node herramientas/html/apk.js --compilar   # y llama a gradle, si hay ANDROID_HOME
+```
+
+Un proyecto de Android de una sola pantalla: un `WebView` a pantalla completa cargando
+`app/src/main/assets/index.html`, que es `referencia/bilbo-city.html` **sin tocar, byte a
+byte** — lo comprueba el verificador. Después, Android Studio → abrir `dist/android` →
+Run, o `gradle assembleDebug` con un SDK que tenga la plataforma 34.
+
+Cuatro decisiones que no son obvias:
+
+- **Los assets se sirven por `https://appassets.androidplatform.net/`** (`WebViewAssetLoader`),
+  no por `file://`. Un origen `file://` tiene el almacenamiento capado según el
+  fabricante y la partida vive en `localStorage`: se perdía sin decir nada.
+- **Ni un permiso en el manifiesto**, ni el de red. El juego no sale fuera, y eso se
+  puede afirmar desde el instalador.
+- **El icono es un `VectorDrawable`, no cinco PNG.** Android pide el icono en cinco
+  densidades —48, 72, 96, 144 y 192— y solo dos son múltiplo entero de 32: las otras
+  saldrían con unos píxeles del doble de alto que otros. Se genera del mismo dibujo de
+  32×32 que el de la web, juntando las tiras horizontales del mismo color.
+- **No hay `gradlew`.** El wrapper es un `.jar` y aquí no entran binarios; lo pone Android
+  Studio, o `gradle wrapper` una vez.
+
+Sin SDK de Android no se puede compilar, así que el verificador comprueba lo que se
+rompe de verdad al tocar esto: XML bien formado, el paquete diciendo lo mismo en los
+cuatro sitios donde se escribe, que cada `R.algo` exista, que el HTML de los assets sea
+el del juego, que los colores del icono estén en la paleta, y **la sintaxis del Java
+leyéndolo con `javac`** — se le pasa sin el SDK y se mira de qué se queja: si todo lo que
+dice es que no encuentra `android.webkit`, la sintaxis está bien.
+
+### El APK se compila en el CI
+
+Aquí dentro no se puede: no hay SDK de Android y `dl.google.com` responde **403** por el
+proxy, así que ni se baja. Lo compila GitHub Actions, en
+`.github/workflows/bilbo-city-apk.yml` (raíz del repositorio, no de `bilbo-city/`):
+**Actions → APK de Bilbo City → Run workflow**, y el `.apk` sale en los artifacts del run.
+
+El workflow genera el proyecto antes de compilarlo (`dist/` no se versiona), así que lo
+que sale es siempre el HTML de ese commit. Pone el JDK **antes** que node, para que el
+chequeo de sintaxis con `javac` se ejecute de verdad en vez de saltárselo, y usa
+`gradle/actions/setup-gradle` con Gradle 8.9 porque no hay wrapper y AGP 8.5.2 no arranca
+con menos de 8.7. Un segundo trabajo instala el APK en un emulador api-30, lo abre,
+falla si hay `FATAL EXCEPTION` y sube una captura de la portada.
+
+Dos escollos típicos de esto no aplican aquí y conviene saber por qué, para no «arreglarlos»:
+el BOM de Kotlin no hace falta (no hay plugin de Kotlin ni dependencia que arrastre
+`kotlin-stdlib`), y los PNG de `mipmap-mdpi…xxxhdpi` tampoco (`minSdk` es 26, y el icono
+adaptativo existe desde Android 8). El que sí aplicaba era el del audio: el `AudioContext`
+nace suspendido en el WebView y `audioInit()` ahora lo reanuda en el primer toque, que si
+no el juego está mudo hasta que tocas dos veces.
+
+## Estructura
+
+```
+referencia/          prototipo HTML probado, forja de sprites, estudio de arte, capturas
+unity/BilboCity/     proyecto Unity 2022.3 LTS
+  Assets/Scripts/
+    Arte/            paleta, forja de personajes, tiles, vehículos, fuente de bits
+    Ciudad/          carga de la trama de Bilbao, volcado a Tilemaps, mobiliario urbano
+    Entidades/       jugador, vehículo, peatones, enemigos, tráfico
+    Juego/           estado, combate, misiones, curros, interiores, acciones, bootstrap
+    UI/              HUD, controles táctiles, menús, audio, guardado
+  Assets/Editor/     script que prepara la escena
+herramientas/        verificadores de C# y arnés de pruebas del HTML
+TAREAS.md            lo que queda por hacer, por orden
+```
+
+## Cómo abrir el proyecto Unity
+
+Unity 2022.3 LTS → abrir `unity/BilboCity` → menú **BilboCity → Preparar escena** → Play.
+
+No hay ningún `.unity` en el repositorio a propósito: lo crea el script del editor. Una
+escena serializada a mano es la mejor forma de acabar con un proyecto que no carga.
+
+## Qué NO hacer
+
+- No reescribas el HTML para "modernizarlo". Es la referencia probada, no deuda técnica.
+- No metas dependencias nuevas de Unity sin una razón fuerte. El proyecto va con paquetes
+  base a propósito.
+- No sustituyas la trama por algo procedural. La gracia es que sea Bilbao de verdad.
+- No añadas `.unity`, `.meta` ni `Library/` al repositorio.

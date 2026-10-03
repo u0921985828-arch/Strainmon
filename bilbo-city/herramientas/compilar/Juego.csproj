@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Compila Assets/Scripts como lo haría Unity: ensamblado de runtime,
+       sin ver UnityEditor. Equivale al asmdef BilboCity. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <AssemblyName>BilboCity</AssemblyName>
+    <RootNamespace>BilboCity</RootNamespace>
+    <Nullable>disable</Nullable>
+    <DefineConstants>$(DefineConstants);UNITY_2022_3_OR_NEWER;UNITY_2022_3;UNITY_ANDROID</DefineConstants>
+    <NoWarn>CS0649</NoWarn>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../unity/BilboCity/Assets/Scripts/**/*.cs" />
+    <ProjectReference Include="apinado/ApiUnity.csproj" />
+  </ItemGroup>
+</Project>

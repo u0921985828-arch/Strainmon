@@ -1,0 +1,192 @@
+# Tareas pendientes
+
+Por orden de importancia. La primera bloquea a todas las demás.
+
+---
+
+## 1 · Compilar el proyecto Unity  ⟵ empieza aquí
+
+El C# ya pasa por un compilador de verdad. No por Unity: por Roslyn, contra un remedo de
+la API del motor que está en `herramientas/compilar/`. Eso ya resuelve sobrecargas,
+conversiones implícitas y genéricos, que es justo lo que el analizador de sintaxis no
+podía. Los 20 ficheros compilan, con la misma separación de ensamblados que los `.asmdef`
+(el runtime no ve `UnityEditor`) y sin un solo aviso.
+
+```bash
+apt-get install -y dotnet-sdk-8.0     # una vez
+herramientas/compilar/compilar.sh     # o ./verificar.sh csharp
+```
+
+- [x] Compilar el C# y arreglar los errores. Salieron dos, los dos aburridos, anotados
+      abajo en el registro.
+- [x] Dejar la compilación dentro de `./verificar.sh` para que no vuelva a pasar un año
+      sin compilar.
+- [ ] Abrir `unity/BilboCity` en Unity 2022.3 LTS y compilar **de verdad**. El remedo no
+      es el motor: no cubre las versiones de los paquetes, ni IL2CPP, ni los `.meta`, ni
+      diferencias finas de firma. Cuenta con que aún salga algo, pero ya no la lista larga.
+- [ ] Menú **BilboCity → Preparar escena** y comprobar que arranca.
+- [ ] Anotar abajo lo que salga en Unity, para seguir afinando los verificadores.
+
+## 2 · Primera pasada de juego real
+
+- [ ] ¿Se ve Bilbao? Comparar con `referencia/capturas/plano-bilbo.png`.
+- [ ] ¿El jugador anda en las 8 direcciones con las poses correctas?
+- [ ] ¿Los coches arrancan en la dirección de la calle y no contra la pared?
+- [ ] ¿El HUD se lee en un móvil de verdad, no solo en el editor?
+- [ ] ¿Cuántos fps da en un dispositivo real con el mobiliario sembrado?
+
+## 3 · Diferencias con el HTML
+
+Repasar comportamiento contra el prototipo, que es el probado:
+
+- [x] Escalado del daño. Las cinco armas tienen los mismos nueve números en los dos.
+- [x] Tiempos de las misiones con límite. Los ocho pagos y sus límites, iguales.
+- [x] Economía: precios, pagos de curros, alquiler. Ocho curros, diez propiedades,
+      dieciocho prendas y la curva de experiencia, iguales.
+- [x] Auto-apuntado: solo a enemigos, nunca a viandantes salvo con las manos. En Unity ya
+      era así —`obj` es de tipo `Enemigo` y solo sale de `J.Enemigos`—, pero el **cono**
+      estaba a 1,05 contra el 1,15 del prototipo: Unity apuntaba más tacaño que el HTML
+      probado. Corregido, y los dos conos son ahora constantes con nombre.
+
+Esto ya no se repasa a mano: lo compara `herramientas/plano/reglas.py`, dentro de
+`./verificar.sh`. Compara números, nunca textos —el HTML y Unity pueden redactar distinto
+sin que el juego cambie—, y una constante que deja de encontrarse es un fallo por sí sola,
+que es como estos verificadores se vuelven decorativos.
+- [x] Las hojas de personaje. El HTML repintaba las siete siluetas del bloque `SPRITES` y
+      Unity forjaba siempre, así que los treinta y cuatro arquetipos se veían distintos en
+      cada implementación. Ahora `Siluetas.cs` lleva el mismo bloque y `ForjaChar` repinta
+      igual; `herramientas/plano/siluetas.py` compara los dos bloques byte a byte.
+
+## 3 bis · Lo que queda de 1996
+
+CONTEXT.md §3.1 fija el último trimestre del 96. Ya están hechos los edificios: fuera
+Iberdrola, Euskalduna y el Bilbao Arena, el Guggenheim pasa a ser su obra, el metro se
+queda en la Línea 1, y San Mamés vuelve a ser el estadio viejo con su arco.
+
+Lo que falta es **planta**, no dibujo, y la planta sale del plano municipal de 2024: el
+grid comprimido del HTML ya trae la ciudad de hoy. Para retroceder estos sectores hace
+falta la ortofoto del 96 de geoEuskadi y volver a pasar `herramientas/plano/extraer.py`,
+así que no se puede hacer a ojo desde aquí.
+
+- [ ] Abandoibarra: el muelle todavía en uso, sin paseo.
+- [ ] Euskalduna: el astillero, que cierra en el 88 y sigue ahí de ruina.
+- [ ] Zubizuri: no existe hasta el 97. Comprobado que tampoco está en el grid.
+- [ ] Ametzola: playas de vías, no el parque.
+- [ ] Zorrotzaurre: península, no isla. El canal es de 2018.
+- [ ] Barakaldo / AHV: los hornos, no Megapark.
+
+## 4 · Rendimiento
+
+- [ ] El mobiliario son GameObjects sueltos (varios miles). Si el presupuesto de dibujado
+      aprieta, pasarlo a un tercer Tilemap en modo `Individual` con ordenación por eje Y.
+- [ ] Perfilar el HUD: `SetPixels32` + `Apply` del radar una vez por frame.
+- [x] Comprobar que las hojas de personaje se compilan bajo demanda y no todas al arrancar.
+      Las dos lo hacen: `hoja(k)` cachea en `HOJAS` y `ForjaChar.Hoja(arq)` en `Hojas`.
+      Las siluetas traídas se descomprimen también a la primera pregunta, no al arrancar.
+
+## 5 · Contenido que falta respecto al plan original
+
+- [x] Oclusión de interiores de manzana con transición. No había interiores que ocluir:
+      el plano municipal dibuja la manzana maciza y `PATIO` era un tipo de suelo con
+      textura y sin una sola casilla en el mapa. Ahora `abrirPatios()` abre 419 patios con
+      su portal, y desde la calle la manzana sigue siendo maciza: la tapa el tejado del
+      propio bloque y se destapa en 0,35 s al entrar. Ver *El interior de manzana* en
+      `CLAUDE.md`.
+- [x] Más variedad de diálogo en los parroquianos. Eran cinco frases al azar y el mismo
+      Mikel en los tres bares. Ahora son 34 con 21 condiciones —te buscan, es de noche,
+      debes el recibo, vas sin comer, llevas un hierro—, lo concreto sale tres de cada
+      cuatro veces, nunca se repite seguida y cada barra tiene su habitual. Ver *Lo que
+      cuenta el parroquiano* en `CLAUDE.md`.
+- [x] La interfaz, en la estética del juego: BLOQUE en el DOM (TrueType construido en el
+      arranque con los mismos glifos), la paleta en el CSS y en el HUD, bordes de 2,
+      nada redondeado ni desenfocado, sin emoji. Ver *La interfaz, del mismo juego*.
+- [ ] El mando de Unity (`Controles.cs`) sigue con redondeles translúcidos dibujados a
+      mano: portar `forjarMando` —botones de hueso, plato, seta, pastillas y el aro de
+      correr— para que en Unity sea el mismo cacharro que en el HTML.
+- [ ] Misiones secundarias no encadenadas.
+
+## 6 · Publicación
+
+Esto es trabajo de tienda, no de juego. No empezar hasta que 1–3 estén cerrados.
+
+- [ ] Icono y capturas de tienda.
+- [ ] Compras integradas, si procede.
+- [ ] Reporte de fallos en producción.
+- [ ] Política de privacidad y ficha de la tienda.
+
+---
+
+## Registro de lo arreglado
+
+Fallos que ya se cazaron y no deben volver:
+
+- Interfaz con otra estética que el juego: tipografía del sistema, siete colores
+  inventados en el CSS, bordes de 1 px, esquinas redondeadas, degradados, un emoji y
+  catorce colores fuera de la paleta pintados a mano en el HUD. Lo vigilan la R7 de
+  `estilo.js` y la guardia de color de `pixel.js`. De paso: el diálogo se apoyaba en el
+  cristal del móvil y se comía el marco de abajo.
+
+- Salud negativa por daño doble en el mismo frame.
+- Balas atravesando enemigos de cerca (se resolvió con 3 subpasos por frame).
+- Auto-apuntado enganchándose a viandantes.
+- Coches aparcados mirando todos al este y arrancando contra la pared.
+- Manzanas tan pequeñas que había más asfalto que edificio.
+- Sitios plantados en descampados en vez de pegados a una fachada.
+- Flechas de dirección dentadas al rotar píxel a píxel.
+- Un campo llamado `Lienzo` que tapaba a la clase `Lienzo`.
+- Dos listas recorridas mientras se borraba de ellas (explosión y atropello).
+- El arnés dando por fallada la última misión sin que el juego tuviera la culpa: `S.hp = 100`
+  no deshace un K.O. Ver abajo.
+- `Correr` y `AtacarMantenido` que se quedaban pegados a `true` para siempre.
+- Unity forjando a todo el mundo mientras el HTML repintaba siluetas dibujadas. No daba
+  error: daba dos juegos con distinta gente por la calle.
+- El cono de auto-apuntado de Unity a 1,05 contra el 1,15 del prototipo. Tampoco daba
+  error: daba un juego al que le costaba un poco más enganchar al enemigo que tienes
+  delante, y eso no se ve jugando una de las dos versiones por separado.
+- `hash()` del HTML y `Utiles.Hash()` de Unity dando distinto en el **98 %** de las
+  casillas. Era la misma función escrita de dos maneras: el segundo producto en JS iba
+  con `*`, que multiplica en coma flotante, pasa de 2⁵³ y pierde justo los bits bajos que
+  luego se piden con un módulo; en C# es un producto de enteros de 32 bits con vuelta.
+  Tejados, farolas, flechas y tapas de alcantarilla en otro sitio en cada versión. El HTML
+  usa ya `Math.imul` y lo carea `herramientas/plano/patios.py`. Salió buscando otra cosa:
+  los patios se siembran por hash, y con los dos hash distintos las dos ciudades habrían
+  abierto los portales en manzanas distintas.
+- Peatones paseando por encima de un tejado. En cuanto los patios existieron, el portal
+  pasó a ser pisable y los vecinos se metían dentro; como los sprites van por encima de la
+  tapa, se veían caminando sobre la manzana. Se desvanecen con la tapa.
+- El parroquiano diciendo «Mikel» aunque el NPC se llamara de otra manera: el nombre iba
+  escrito a pelo en la llamada a `hablar()` y no salía del propio NPC. Daba lo mismo
+  mientras hubiera un solo parroquiano; en cuanto hay tres, el de Deustu se presentaba con
+  el nombre del de la Gran Vía.
+- Un `ok()` del sigilo que medía otra cosa: `delito(1)` llama a `estrellas(1)`, que planta
+  una patrulla a menos de 28 casillas, y esa patrulla dejaba `S.visto` puesto mientras se
+  comprobaba que la sospecha baja al perderte de vista. Pasaba por casualidad, según dónde
+  cayera la patrulla, y dejó de pasar al mover un edificio.
+
+Los dos primeros errores de compilación reales, con lo que enseñan:
+
+- `Misiones.cs:320` · **CS0104**: `Random.value` era ambiguo entre `UnityEngine.Random` y
+  `System.Random`. Es el único fichero del proyecto que tiene `using System;` *y* usa
+  `Random`, así que era el único sitio donde podía saltar. Arreglado calificándolo:
+  `UnityEngine.Random.value`. El analizador de sintaxis no lo veía porque resuelve
+  nombres, no espacios de nombres en competencia.
+- `RenderCiudad.cs:12` · **CS0169**: el campo `Tile[] _cache` no se usaba en ninguna parte.
+  Borrado. Ahora `compilar.sh` va con `-warnaserror`, así que el siguiente campo muerto
+  detiene la verificación en vez de pasar desapercibido.
+
+Lo que buscaría un verificador nuevo, a la vista de esto: nombres de tipo que existan a la
+vez en `System` y en `UnityEngine` (`Random`, `Object`, `Debug`) usados sin calificar en un
+fichero que importe los dos espacios de nombres.
+
+Y el rojo intermitente de la batería del HTML, que resultó no ser del juego:
+
+- El arnés reponía `S.hp = 100` en cada vuelta para que una muerte de paso no estropeara la
+  prueba, pero un K.O. deja además `S.muerto` contando 2,2 s. Mientras corre, `act()` vuelve
+  antes de llegar a `comprobarObjetivos`, así que la misión no avanza aunque el jugador esté
+  encima del objetivo; al agotarse, manda al hospital y da la misión por fallada. Salía en
+  *El último puente* por ser la última: era la que estaba activa cuando vencía el contador.
+  El juego hacía lo correcto. Arreglado poniendo también `S.muerto = 0`.
+- De paso, el prototipo ya no usa `Math.random()` sino un generador propio sembrable
+  (`sembrar` / `azar`, mulberry32). En el navegador arranca de la hora, como siempre; la
+  batería lo siembra con 20250823, y `BILBO_SEMILLA` cambia la tirada. Dos pasadas dan
+  ahora exactamente lo mismo, que es lo que hacía falta para poder depurar esto.
