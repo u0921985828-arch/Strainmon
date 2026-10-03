@@ -176,6 +176,72 @@ listo().then(() => {
     if (!malos) bien.push(Object.keys(SING).length + ' edificios singulares a su medida y tapando su celda');
   }
 
+  // ── R7 · la interfaz, del mismo juego que la calle ─────────────────────────────
+  // Las reglas de «Interfaz», «Color» y «Tipografía» de la guía no las comprobaba nadie,
+  // y la hoja de estilo se había ido por su cuenta: siete colores inventados, la
+  // tipografía del sistema, bordes de 1 px, esquinas redondeadas, degradados suaves y
+  // sombras desenfocadas. Nada de eso existe en el juego que hay detrás, y la pantalla
+  // parecía de dos sitios. Esto se mira sobre el CSS de verdad, no sobre el arte.
+  {
+    const html = require('fs').readFileSync(require('path').join(__dirname, '..', '..',
+      'referencia', 'bilbo-city.html'), 'utf8');
+    const css = html.slice(html.indexOf('<style>') + 7, html.indexOf('</style>'));
+    // Sin comentarios: dentro hay ejemplos de lo que ya no se hace, y acusarían al texto
+    // que explica por qué no se hace.
+    const limpio = css.replace(/\/\*[\s\S]*?\*\//g, '');
+    const linea = i => css.slice(0, i).split('\n').length;
+    const pon = (i, t) => fallos.push('estilo, línea ' + linea(i) + ': ' + t);
+    const antes = fallos.length;
+
+    const PAL = new Set(A.PALETA.map(p => '#' + [p[0], p[1], p[2]]
+      .map(v => v.toString(16).padStart(2, '0')).join('')));
+    for (const m of limpio.matchAll(/#[0-9a-fA-F]{6}\b/g))
+      if (!PAL.has(m[0].toLowerCase())) pon(m.index, m[0] + ' no está en la paleta');
+    for (const m of limpio.matchAll(/\b(rgba?|hsla?)\(/g))
+      pon(m.index, m[1] + '() — el color sale de la paleta, no de una mezcla');
+    // La tipografía es BLOQUE o no es: una condensada del sistema al lado del HUD canta.
+    for (const m of limpio.matchAll(/font-family:\s*([^;}]+)/g))
+      if (!/^BLOQUE\b/.test(m[1].trim())) pon(m.index, 'font-family sin BLOQUE delante');
+    // Ocho píxeles del dibujo son un em, así que solo las escalas enteras 1..4 caen en
+    // la rejilla. Un 15 saca unas filas del glifo del doble de alto que otras.
+    for (const m of limpio.matchAll(/font-size:\s*([0-9.]+)px/g))
+      if (!['0', '8', '16', '24', '32'].includes(m[1]))
+        pon(m.index, 'font-size ' + m[1] + 'px — las escalas enteras son 8, 16, 24 y 32');
+    for (const m of limpio.matchAll(/border-radius:\s*([^;}]+)/g))
+      if (m[1].trim() !== '0') pon(m.index, 'border-radius ' + m[1].trim() + ' — nada redondeado');
+    for (const m of limpio.matchAll(/border(?:-(?:top|right|bottom|left|width))?:\s*([0-9.]+)px/g))
+      if (Number(m[1]) < 2) pon(m.index, 'borde de ' + m[1] + 'px — a la resolución de un móvil desaparece');
+    // Un degradado suave no existe en pixel art. El de tope duro sí: es la trama de
+    // rayas de los paneles, que son dos colores planos y ningún tono intermedio.
+    for (const m of limpio.matchAll(/(?<!repeating-)(linear|radial|conic)-gradient/g))
+      pon(m.index, m[0] + ' — un degradado suave no está en la paleta');
+    // Una sombra con desenfoque es un borde a medio tono, que es lo mismo que un píxel
+    // a medio transparente. La sombra dura —el tercer valor a cero— sí es del juego.
+    for (const m of limpio.matchAll(/box-shadow:\s*([^;}]+)/g))
+      for (const cap of m[1].split(','))
+        { // El cero va sin unidad la mitad de las veces: '0 0 0 8px' y '0 0 6px 8px'
+          // solo se distinguen si el tercer valor se lee con el px opcional.
+          const n = cap.trim().replace(/^inset\s+/, '')
+            .match(/^(-?[0-9.]+)(?:px)?\s+(-?[0-9.]+)(?:px)?(?:\s+(-?[0-9.]+)(?:px)?)?/);
+          if (n && n[3] && Number(n[3]) !== 0) pon(m.index, 'box-shadow con ' + n[3] + 'px de desenfoque'); }
+    // Rejilla de 4: márgenes, separaciones y relleno. Los anchos no, que el hueco del
+    // icono mide 30 porque el icono mide 24 más dos de canto por lado.
+    for (const m of limpio.matchAll(/\b(padding|margin|gap)(?:-(?:top|right|bottom|left))?:\s*([^;}]+)/g))
+      for (const v of m[2].match(/-?[0-9.]+px/g) || [])
+        if (Number(v.replace('px', '')) % 4) pon(m.index, m[1] + ' de ' + v + ' — la rejilla es de 4');
+
+    // Y lo que se enseña tiene que existir en la fuente: un emoji del sistema lo dibuja
+    // cada móvil a su manera, y un carácter que BLOQUE no tiene sale de interrogación.
+    const cuerpo = html.slice(html.indexOf('<body>'), html.indexOf('<script>'));
+    const falta = new Set();
+    for (const ch of cuerpo.replace(/<[^>]*>/g, '').replace(/\s/g, ''))
+      if (!A.GLIFOS_B[ch] && !A.GLIFOS_B[ch.toUpperCase()]) falta.add(ch);
+    if (falta.size) fallos.push('la interfaz enseña ' + [...falta].join(' ') + ', que BLOQUE no dibuja');
+
+    if (fallos.length === antes)
+      bien.push('la hoja de estilo, en la paleta, con BLOQUE y sin un borde de 1 px');
+  }
+
   bien.forEach(b => console.log('  ok    ' + b));
   if (fallos.length) {
     console.log('');

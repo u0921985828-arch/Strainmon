@@ -39,8 +39,49 @@ function falla(regla, det) {
   v.n++; fallos.set(k, v);
 }
 
+/* Los 61 colores, tal cual los escribe el CSS de un lienzo: '#rrggbb'. Se leen del
+   juego, no se copian aquí, que es lo mismo que hace estilo.js con el negro. */
+const PAL = new Set(A.PALETA.map(p => '#' + [p[0], p[1], p[2]]
+  .map(v => v.toString(16).padStart(2, '0')).join('')));
+/* El tinte de barrio es la excepción, y una sola: un velo del 13 % sobre la pantalla
+   entera que no dibuja nada, tiñe, y que además va mezclándose de un barrio al
+   siguiente, así que cae entre dos colores de la paleta por definición. El juego lo
+   pone con velo(), que es lo que levanta esta guardia; un rgba() puesto a pelo sigue
+   cantando. */
+
+/* La paleta, en lo que se pinta de verdad. El arte forjado pasa por cuantizar() y lo
+   comprueba estilo.js; el HUD, el radar, el plano de la pausa y el anillo de salud no
+   pasan por ningún sitio: se pintan directamente sobre el lienzo de pantalla con un
+   fillStyle a pelo. Ahí se habían colado catorce colores inventados —un azul de pip,
+   dos rojos de salud, los seis grises del plano— y a ojo son «un poco distintos» y ya
+   está, que es exactamente lo que pasaba con la rejilla. */
+function color(valor, cual) {
+  if (typeof valor !== 'string') return;          // un degradado o un patrón
+  const v = valor.trim().toLowerCase();
+  if (v.startsWith('rgba(') || v.startsWith('rgb(')) {
+    /* El alfa es libre: las cajas del HUD son translúcidas a propósito, para que se vea
+       la ciudad por debajo. El color de debajo, no. */
+    const n = v.replace(/[^0-9.,]/g, '').split(',').map(Number);
+    if (n.length < 3) return;
+    const h = '#' + n.slice(0, 3).map(x => (x | 0).toString(16).padStart(2, '0')).join('');
+    if (!PAL.has(h)) falla(cual + ' fuera de la paleta', v);
+    return;
+  }
+  if (/^#[0-9a-f]{6}$/.test(v) && !PAL.has(v)) falla(cual + ' fuera de la paleta', v);
+}
+
 function vigilar(ctx) {
   const T = () => ctx.getTransform();
+  for (const cual of ['fillStyle', 'strokeStyle']) {
+    const d = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(ctx), cual)
+           || Object.getOwnPropertyDescriptor(ctx, cual);
+    if (!d || !d.set) continue;
+    Object.defineProperty(ctx, cual, {
+      get: d.get.bind(ctx),
+      set(v) { if (!ctx.velo) color(v, cual); d.set.call(ctx, v); },
+      configurable: true,
+    });
+  }
   const oDI = ctx.drawImage.bind(ctx), oFR = ctx.fillRect.bind(ctx);
   ctx.drawImage = function (im, ...a) {
     const m = T(), gira = m.b !== 0 || m.c !== 0;

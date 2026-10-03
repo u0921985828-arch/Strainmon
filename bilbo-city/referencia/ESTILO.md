@@ -100,6 +100,10 @@ con otras hasta no poder leerlas.
 
 ## Interfaz
 
+Lo de esta sección —y la paleta y la tipografía de arriba aplicadas a los menús— lo
+comprueba **[V]** la R7 de `estilo.js` sobre la hoja de estilo de verdad. Los colores que
+el HUD pinta a mano en el lienzo los vigila `pixel.js`.
+
 - **Rejilla de 4 px.** Márgenes, separaciones y alturas, múltiplos de 4.
 - **El icono se enseña a 24×24**, que es como está dibujado. Nunca a 20 ni a 14: sin
   interpolación, encoger tira filas y el icono sale con píxeles de dos alturas. **[V]**

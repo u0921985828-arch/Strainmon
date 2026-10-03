@@ -15,7 +15,7 @@ public static class UiFab {
         var rt = go.GetComponent<RectTransform>();
         rt.anchorMin = anchorMin; rt.anchorMax = anchorMax;
         rt.offsetMin = offMin; rt.offsetMax = offMax;
-        go.GetComponent<Image>().color = new Color(0.03f,0.04f,0.05f,0.96f);
+        go.GetComponent<Image>().color = Paleta.ConAlfa(Paleta.Negro, 245);
         return go;
     }
 
@@ -36,7 +36,7 @@ public static class UiFab {
     public static GameObject Boton(Transform padre, string etiqueta, UnityEngine.Events.UnityAction accion) {
         var go = new GameObject("btn", typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement));
         go.transform.SetParent(padre, false);
-        go.GetComponent<Image>().color = new Color(0.12f,0.15f,0.19f,0.9f);
+        go.GetComponent<Image>().color = Paleta.ConAlfa(Paleta.Asfalto, 230);
         go.GetComponent<Button>().onClick.AddListener(accion);
         var t = Texto(go.transform, "txt", 16, TextAnchor.MiddleCenter, Vector2.zero, 260, 40);
         t.text = etiqueta;
@@ -179,8 +179,8 @@ public class Hud : MonoBehaviour {
         // barras
         _icoEnergia = UiFab.Img(raiz, Fuente.Ico["energia"], new Vector2(0,1), new Vector2(10,-124), new Vector2(ICO,ICO));
         _icoHambre  = UiFab.Img(raiz, Fuente.Ico["hambre"],  new Vector2(0,1), new Vector2(10,-152), new Vector2(ICO,ICO));
-        _barEnergia = Barra(raiz, new Vector2(38,-130), Paleta.H("#4d9de0"));
-        _barHambre  = Barra(raiz, new Vector2(38,-158), Paleta.H("#e0a14d"));
+        _barEnergia = Barra(raiz, new Vector2(38,-130), Paleta.Ria7);
+        _barHambre  = Barra(raiz, new Vector2(38,-158), Paleta.Luz5);
 
         // La calle arriba y el barrio debajo: la calle es lo que cambia al doblar la
         // esquina y el barrio es el contexto. Sin calle, el barrio sube a su sitio.
@@ -189,29 +189,29 @@ public class Hud : MonoBehaviour {
         _tDeuda  = Nuevo(raiz, new Vector2(10,208), 1, Fuente.Tinta.Rojo);
 
         // panel de misión
-        _panelMision = UiFab.Img(raiz, Plano(new Color32(7,9,12,190)), new Vector2(0,1), new Vector2(10,-212), new Vector2(220,44));
+        _panelMision = UiFab.Img(raiz, Plano(Paleta.ConAlfa(Paleta.Negro, 190)), new Vector2(0,1), new Vector2(10,-212), new Vector2(220,44));
         _tMision1 = Nuevo(raiz, new Vector2(16,216), 1, Fuente.Tinta.Ambar);
         _tMision2 = Nuevo(raiz, new Vector2(16,228), 1, Fuente.Tinta.Hueso);
         _tMision3 = Nuevo(raiz, new Vector2(16,240), 1, Fuente.Tinta.Ambar);
 
         // arma
-        _panelArma = UiFab.Img(raiz, Plano(new Color32(7,9,12,190)), new Vector2(1,0), new Vector2(-150,236), new Vector2(140,38));
+        _panelArma = UiFab.Img(raiz, Plano(Paleta.ConAlfa(Paleta.Negro, 190)), new Vector2(1,0), new Vector2(-150,236), new Vector2(140,38));
         _icoArma = UiFab.Img(raiz, Fuente.Ico["punos"], new Vector2(1,0), new Vector2(-146,230), new Vector2(ICO,ICO));
         _tArma = Nuevo(raiz, new Vector2(0,0), 1, Fuente.Tinta.Hueso);
         _tMun  = Nuevo(raiz, new Vector2(0,0), 2, Fuente.Tinta.Ambar);
 
         // avisos
-        _panelAviso = UiFab.Img(raiz, Plano(new Color32(7,9,12,200)), new Vector2(0,1), Vector2.zero, new Vector2(10,26));
+        _panelAviso = UiFab.Img(raiz, Plano(Paleta.ConAlfa(Paleta.Negro, 200)), new Vector2(0,1), Vector2.zero, new Vector2(10,26));
         _tAviso  = Nuevo(raiz, Vector2.zero, 2, Fuente.Tinta.Ambar);
         _tGrande = Nuevo(raiz, Vector2.zero, 3, Fuente.Tinta.Ambar);
         _tPista  = Nuevo(raiz, Vector2.zero, 1, Fuente.Tinta.Hueso);
 
         // flash de daño
-        _flash = UiFab.Img(raiz, Plano(new Color32(193,54,43,255)), new Vector2(0,1), Vector2.zero, Vector2.zero);
+        _flash = UiFab.Img(raiz, Plano(Paleta.Rojo), new Vector2(0,1), Vector2.zero, Vector2.zero);
         var rtF = _flash.rectTransform;
         rtF.anchorMin = Vector2.zero; rtF.anchorMax = Vector2.one;
         rtF.offsetMin = Vector2.zero; rtF.offsetMax = Vector2.zero;
-        _flash.color = new Color(0.75f,0.21f,0.17f,0);
+        _flash.color = (Color)Paleta.ConAlfa(Paleta.Rojo, 0);
     }
 
     TextoBits Nuevo(Transform raiz, Vector2 pos, int esc, Fuente.Tinta tinta) {
@@ -241,7 +241,7 @@ public class Hud : MonoBehaviour {
     }
 
     Image Barra(Transform raiz, Vector2 pos, Color32 col) {
-        UiFab.Img(raiz, Plano(new Color32(7,9,12,200)), new Vector2(0,1), pos, new Vector2(76,12));
+        UiFab.Img(raiz, Plano(Paleta.ConAlfa(Paleta.Negro, 200)), new Vector2(0,1), pos, new Vector2(76,12));
         var im = UiFab.Img(raiz, Plano(col), new Vector2(0,1), pos + new Vector2(1,-1), new Vector2(74,10));
         im.type = Image.Type.Filled;
         im.fillMethod = Image.FillMethod.Horizontal;
@@ -266,7 +266,7 @@ public class Hud : MonoBehaviour {
         // ── radar ──
         PintarRadar(J);
         _anillo.fillAmount = Mathf.Clamp01(E.Hp / 100f);
-        _anillo.color = E.Hp > 50 ? (Color)Paleta.Sangre : E.Hp > 25 ? (Color)Paleta.RojoL : new Color(1f,0.23f,0.19f);
+        _anillo.color = E.Hp > 50 ? (Color)Paleta.Sangre : E.Hp > 25 ? (Color)Paleta.Aviso0 : (Color)Paleta.Peligro2;
 
         var obj = J.ObjetivoActual();
         if (obj.HasValue && !E.EnInterior) {
@@ -402,12 +402,12 @@ public class Hud : MonoBehaviour {
                         // un plano de la ciudad, y un plano que te enseña los patios se
                         // salta la oclusión por la puerta de atrás.
                         case Suelo.Edif:
-                        case Suelo.Patio:  c = Paleta.H("#262a30"); break;
-                        case Suelo.Parque: c = Paleta.H("#2e4a2e"); break;
-                        case Suelo.Plaza:  c = Paleta.H("#5c574d"); break;
-                        case Suelo.Muelle: c = Paleta.H("#453d33"); break;
+                        case Suelo.Patio:  c = Paleta.GrisO; break;
+                        case Suelo.Parque: c = Paleta.CespedO; break;
+                        case Suelo.Plaza:  c = Paleta.HormigonO; break;
+                        case Suelo.Muelle: c = Paleta.Madera; break;
                         case Suelo.Puente: c = Paleta.GrisL; break;
-                        default:           c = Paleta.H("#4a505a"); break;
+                        default:           c = Paleta.Gris; break;
                     }
                 }
                 // fuera del círculo, transparente
@@ -435,8 +435,8 @@ public class Hud : MonoBehaviour {
         foreach (var s in Estado.Sitios) Punto(s.Pos, s.Color, 1);
         var obj = J.ObjetivoActual();
         if (obj.HasValue) Punto(obj.Value, Paleta.Mostaza, 2);
-        foreach (var p in J.Patrullas) Punto(p.Pos, Paleta.H("#4d9dff"), 1);
-        foreach (var e in J.Enemigos) Punto(e.Pos, Paleta.H("#ff5a3c"), 1);
+        foreach (var p in J.Patrullas) Punto(p.Pos, Paleta.Policia1, 1);
+        foreach (var e in J.Enemigos) Punto(e.Pos, Paleta.RojoL, 1);
         Punto(J.Jug.Pos, Paleta.Blanco, 1);
         _texRadar.SetPixels32(buf);
         _texRadar.Apply();

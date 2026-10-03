@@ -88,7 +88,7 @@ public class MenuMovil : MonoBehaviour {
                     Action alTocar, Color32 borde) {
         var go = new GameObject("fila", typeof(RectTransform), typeof(Image), typeof(LayoutElement), typeof(Button));
         go.transform.SetParent(padre, false);
-        go.GetComponent<Image>().color = new Color(0.08f,0.10f,0.13f,0.95f);
+        go.GetComponent<Image>().color = Paleta.ConAlfa(Paleta.Carbon, 242);
         go.GetComponent<LayoutElement>().minHeight = 56;
         if (alTocar != null) go.GetComponent<Button>().onClick.AddListener(() => alTocar());
 

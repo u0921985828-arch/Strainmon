@@ -576,10 +576,12 @@ que la etiqueta y el `si` cuadren, porque una frase etiquetada que se quede sin 
 pasa a charla de barra sin que falle nada.
 
 Y hay una cuarta que no se puede comprobar sin navegador: **que quepa en el cuadro**. El
-diálogo es DOM, `width:min(560px,50%)`, así que en un móvil apaisado mide la mitad que en
-el escritorio y crece hacia arriba sin tope. Las 34 frases y los 17 renglones de las
-misiones caben en dos filas en los tres móviles, y el cuadro no pasa del 41 % de la
-pantalla; una frase de 150 caracteres sube a cuatro filas y al 54 %. Lo mide:
+diálogo es DOM y crece hacia arriba sin tope. Desde que va en BLOQUE a 16 px cada letra
+mide 14 de ancho, así que el cuadro va de marco a marco —con el `min(560px,50%)` de antes
+cabían veintinueve letras por renglón— y el renglón a 20 px. Las 34 frases y los 17
+renglones de las misiones caben en dos filas en los tres móviles y el cuadro no pasa del
+42 % de la pantalla; la única que no cabía —la de las tres patrullas— se recortó, porque
+la regla es la herramienta y el texto la obedece. Lo mide:
 
 ```bash
 node herramientas/html/dialogo.js            # ¿cabe lo que dice la gente?
@@ -839,7 +841,7 @@ todo: si un icono no se distingue en negro sobre blanco, no se distingue.
 o 40 generaciones, sale de 192 px para arriba y hay que encogerlo —que en pixel art es
 destruirlo—, y sobre todo la caja del HUD es **translúcida** a propósito, para que se vea
 la ciudad por debajo. Un panel opaco con textura tapa el juego. Lo mismo con los menús, que
-son DOM con su CSS y ya tienen una materia coherente.
+son DOM con su CSS (ver *La interfaz, del mismo juego*).
 
 ### El emblema, y por qué el icono de la aplicación es el mismo
 
@@ -914,6 +916,55 @@ Eso envuelve el contexto de verdad, juega ciudad, interior, portada, tienda, mó
 volante, y apunta cada `drawImage` y cada `fillRect` que cae fuera de la rejilla **con la
 línea del HTML que lo hizo**. Está en `./verificar.sh`. Es lo que hacía falta: a ojo, un
 radar a escala 1,625 y un icono a 20 se ven «un poco sucios» y ya está.
+
+Y mira el **color** de todo lo que se pinta en ese lienzo. El arte forjado pasa por
+`cuantizar()` y lo vigila `estilo.js`, pero el HUD, el radar, el anillo de salud y el plano
+de la pausa se pintan con un `fillStyle` a pelo, y ahí se habían colado catorce colores
+inventados. Las cajas del HUD siguen siendo translúcidas —hay que ver la ciudad por
+debajo—, así que el alfa es libre y el color no: se escribe `conAlfa(C.negro,.72)`, nunca
+`'rgba(7,9,12,.72)'`. La única excepción es el tinte de barrio, que es un velo mezclándose
+entre dos barrios y por definición cae entre dos colores; va por `velo()`, que es lo que
+levanta la guardia, y un `rgba()` puesto a mano sigue cantando.
+
+## La interfaz, del mismo juego
+
+La calle era pixel art y los menús no: la tipografía del sistema, siete colores
+inventados en el CSS, bordes de 1 px a medio transparente, esquinas redondeadas,
+degradados suaves, sombras desenfocadas y un emoji para «gira el móvil». Cada cosa por
+separado es pequeña; juntas, la pantalla parecía de dos sitios. Lo que la guía ya decía
+—rejilla de 4, bordes de 2, la paleta, BLOQUE a escala entera, nada de emoji— no lo
+comprobaba nadie. Ahora sí, y en el mismo idioma que el resto: `estilo.js` (R7) lee la
+hoja de estilo de verdad y falla en cualquiera de esas cosas.
+
+**La fuente del DOM es la del lienzo, construida en el arranque.** No entra ningún `.ttf`
+en el repositorio: `construirTTF()` arma un TrueType de 13 kB con los mismos `GLIFOS_B`
+—una caja por tirada horizontal de píxeles, ocho píxeles del dibujo por em— y
+`fuenteDom()` lo registra con `FontFace`. Código, no archivo. De ahí salen dos reglas:
+
+- **Los tamaños son 8, 16, 24 y 32**, escalas 1 a 4. Un 15 saca filas del glifo del doble
+  de alto que otras.
+- **La sombra dura va en `calc(1em / 8)`**, en el selector universal, que da el píxel del
+  dibujo exacto a cualquier tamaño. No se hereda a propósito: `text-shadow` se hereda ya
+  resuelto y un hijo más pequeño llevaría la sombra del padre. El color, en `--sombra`.
+
+Lo que se enseña tiene que existir en la fuente, o sale de interrogación. Por eso BLOQUE
+ganó `¿ ¡ « » ° “ ” "` —media conversación del juego empieza por `¿`— y se fueron el `⇄`, el
+`▸`, el `✔`, el `💾`, el `🗑`, el `📱` y los veintiocho emoji muertos de los POI. La R7 mira el
+marcado; el texto que genera el juego lo pinta igual la fuente, con su `?` donde falte.
+
+Tres cosas más, una por intento:
+
+- **Las rayas de tubo van en el fondo del panel, no en una capa encima.** Encima tenían
+  que ser medio transparentes para dejar leer; debajo salen opacas y en la paleta, y lo
+  que va encima las tapa solo.
+- **El aro de correr es otro sprite del plato** (`joyBase(1)`), no un `box-shadow`: un halo
+  de CSS alrededor de un dibujo de píxeles sale con el borde suave.
+- **Los paneles, el diálogo y el curro usan el mismo `--marco` que la pantalla.** Iban con
+  un 17 % a ojo de cuando el marco medía eso, y se salían por los lados; el diálogo se
+  apoyaba en el cristal del móvil y se comía el marco de abajo.
+
+En Unity, el HUD tiene los mismos colores y `Paleta.ConAlfa()`; el mando de Unity sigue con
+redondeles translúcidos dibujados a mano y no con los sprites de `forjarMando`.
 
 ## Jugarlo en el móvil: instalable y sin conexión
 

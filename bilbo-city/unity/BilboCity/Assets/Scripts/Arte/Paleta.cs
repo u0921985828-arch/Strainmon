@@ -4,6 +4,11 @@ namespace BilboCity {
 
 /// <summary>Paleta bloqueada de 48 colores y cuantizador. Ningún sprite se sale de aquí.</summary>
 public static class Paleta {
+    /* Las cajas del HUD son translúcidas a propósito, para que se vea la ciudad por
+       debajo; el color de la caja, no: sale de la paleta y solo el alfa es libre. Es
+       conAlfa() del HTML. */
+    public static Color32 ConAlfa(Color32 c, byte a) => new Color32(c.r, c.g, c.b, a);
+
     public static Color32 H(string hex) {
         int r = System.Convert.ToInt32(hex.Substring(1,2),16);
         int g = System.Convert.ToInt32(hex.Substring(3,2),16);

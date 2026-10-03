@@ -97,6 +97,12 @@ así que no se puede hacer a ojo desde aquí.
       debes el recibo, vas sin comer, llevas un hierro—, lo concreto sale tres de cada
       cuatro veces, nunca se repite seguida y cada barra tiene su habitual. Ver *Lo que
       cuenta el parroquiano* en `CLAUDE.md`.
+- [x] La interfaz, en la estética del juego: BLOQUE en el DOM (TrueType construido en el
+      arranque con los mismos glifos), la paleta en el CSS y en el HUD, bordes de 2,
+      nada redondeado ni desenfocado, sin emoji. Ver *La interfaz, del mismo juego*.
+- [ ] El mando de Unity (`Controles.cs`) sigue con redondeles translúcidos dibujados a
+      mano: portar `forjarMando` —botones de hueso, plato, seta, pastillas y el aro de
+      correr— para que en Unity sea el mismo cacharro que en el HTML.
 - [ ] Misiones secundarias no encadenadas.
 
 ## 6 · Publicación
@@ -113,6 +119,12 @@ Esto es trabajo de tienda, no de juego. No empezar hasta que 1–3 estén cerrad
 ## Registro de lo arreglado
 
 Fallos que ya se cazaron y no deben volver:
+
+- Interfaz con otra estética que el juego: tipografía del sistema, siete colores
+  inventados en el CSS, bordes de 1 px, esquinas redondeadas, degradados, un emoji y
+  catorce colores fuera de la paleta pintados a mano en el HUD. Lo vigilan la R7 de
+  `estilo.js` y la guardia de color de `pixel.js`. De paso: el diálogo se apoyaba en el
+  cristal del móvil y se comía el marco de abajo.
 
 - Salud negativa por daño doble en el mismo frame.
 - Balas atravesando enemigos de cerca (se resolvió con 3 subpasos por frame).
