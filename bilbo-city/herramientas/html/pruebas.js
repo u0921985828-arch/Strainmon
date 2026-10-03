@@ -564,6 +564,105 @@ const listo = async (que = 'btnNuevo:click', topeMs = 20000) => {
                 + celdas + ' casillas)');
     }
 
+    // ── 2 undecies · lo que cuenta el parroquiano ──────────────────
+    {
+      const F = A.FRASES_PARROQ;
+      const porTexto = new Map(F.map(f => [f.l, f]));
+      ok(porTexto.size === F.length, 'hay frases de parroquiano repetidas palabra por palabra');
+      // La etiqueta y la condición son la misma cosa dicha dos veces, y tienen que
+      // cuadrar: una frase etiquetada que se quede sin `si` pasa a charla de barra sin
+      // que falle nada, y una de barra con condición deja de salir siempre.
+      const descuadra = F.filter(f => (f.t === 'barra') !== !f.si);
+      ok(!descuadra.length, 'frases con etiqueta y condición que no cuadran: '
+         + descuadra.map(f => f.t).join(', '));
+
+      // Esto corre en mitad de la batería, así que se guarda todo lo que se toca.
+      const g = { estrellas: S.estrellas, min: S.min, deuda: S.deuda, dinero: S.dinero,
+                  hambre: S.hambre, hp: S.hp, mision: S.mision, nivel: S.nivel,
+                  props: S.props, dia: S.dia, calle: S.rep.calle,
+                  casera: { ...S.casera }, tiene: { ...S.tiene }, armas: { ...S.armas } };
+      // Mediodía, con dinero y sin deber nada: ni de noche ni de mañana ni pobre.
+      const limpio = () => {
+        S.estrellas = 0; S.min = 12 * 60; S.deuda = 0; S.dinero = 500; S.hambre = 1;
+        S.hp = 100; S.mision = null; S.nivel = 1; S.props = {}; S.dia = 1; S.rep.calle = 0;
+        S.casera.desahucio = false; S.casera.okupa = false;
+        S.tiene.silenciador = false; S.tiene.deportivo = false; S.tiene.furgo = false;
+        for (const k of Object.keys(S.armas)) if (k !== 'punos') delete S.armas[k];
+      };
+
+      // Un estado por condición: si una no se puede provocar desde aquí, su frase sale
+      // como muerta más abajo, que es la manera de que no se quede sin probar.
+      const ESTADOS = [
+        () => {},
+        () => S.estrellas = 1,
+        () => S.estrellas = 4,
+        () => S.min = 23 * 60,
+        () => S.min = 8 * 60,
+        () => S.deuda = 220,
+        () => S.casera.desahucio = true,
+        () => S.casera.okupa = true,
+        () => S.dinero = 5,
+        () => S.dinero = 5000,
+        () => S.hambre = .1,
+        () => S.hp = 20,
+        () => S.mision = { pasos: [], paso: 0 },
+        () => S.nivel = 6,
+        () => S.props = { taller: true },
+        () => S.armas.pistola = 30,
+        () => S.tiene.silenciador = true,
+        () => S.tiene.deportivo = true,
+        () => S.tiene.furgo = true,
+        () => S.dia = 20,
+        () => S.rep.calle = 8,
+      ];
+
+      const vistas = new Set();
+      let mienten = 0, seguidas = 0;
+      for (const pon of ESTADOS) {
+        limpio(); pon();
+        let ant = null;
+        for (let i = 0; i < 500; i++) {
+          const l = A.fraseParroquiano(), f = porTexto.get(l);
+          // Una frase que se dice con su condición falsa es peor que no tenerla: el
+          // parroquiano te habla de una deuda que no debes y el juego parece roto.
+          if (!f || (f.si && !f.si())) mienten++;
+          if (l === ant) seguidas++;
+          ant = l; vistas.add(l);
+        }
+      }
+      ok(!mienten, mienten + ' frases del parroquiano dichas con su condición falsa');
+      ok(!seguidas, 'el parroquiano repite frase dos veces seguidas (' + seguidas + ' veces)');
+      const muertas = F.filter(f => !vistas.has(f.l));
+      ok(!muertas.length,
+         'frases del parroquiano que no salen nunca: ' + muertas.map(f => f.t).join(', '));
+
+      // Y variedad nada más empezar, que es cuando menos condiciones se cumplen y donde
+      // más se notaba: eran cinco frases y en la primera tasca ya te las sabías.
+      // Con el estado exacto del primer día: las ocho de la mañana y sesenta euros.
+      limpio(); S.min = 8 * 60; S.dinero = 60;
+      const arranque = new Set();
+      for (let i = 0; i < 400; i++) arranque.add(A.fraseParroquiano());
+      ok(arranque.size >= 13, 'solo ' + arranque.size + ' frases distintas nada más empezar');
+
+      // El interior `tasca` lo comparten varios sitios: si todos llevaran el mismo
+      // parroquiano, el mismo señor estaría en tres bares a la vez.
+      const quien = Object.values(A.PARROQUIANO_DE);
+      ok(new Set(quien.map(q => q.n)).size === quien.length,
+         'dos barras con el mismo parroquiano');
+      ok(quien.every(q => A.ARQ[q.arq]), 'un parroquiano con un arquetipo que no existe');
+
+      S.estrellas = g.estrellas; S.min = g.min; S.deuda = g.deuda; S.dinero = g.dinero;
+      S.hambre = g.hambre; S.hp = g.hp; S.mision = g.mision; S.nivel = g.nivel;
+      S.props = g.props; S.dia = g.dia; S.rep.calle = g.calle;
+      Object.assign(S.casera, g.casera); Object.assign(S.tiene, g.tiene);
+      for (const k of Object.keys(S.armas)) if (!(k in g.armas)) delete S.armas[k];
+      Object.assign(S.armas, g.armas);
+
+      bien.push(F.length + ' frases de parroquiano con ' + new Set(F.map(f => f.t)).size
+                + ' condiciones, todas alcanzables y ninguna repetida seguida ('
+                + arranque.size + ' distintas al empezar)');
+    }
+
     // ── 3 · los sitios están sobre suelo pisable ───────────────────────
     let accesibles = 0;
     A.POI.forEach(p => {

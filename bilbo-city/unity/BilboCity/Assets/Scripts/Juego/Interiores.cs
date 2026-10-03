@@ -121,11 +121,25 @@ public static class Interiores {
     /// plano pero no dueño.</summary>
     public static string PoiActual;
 
+    /// <summary>El interior `tasca` lo comparten varios bares, así que con un solo
+    /// parroquiano el mismo señor estaba en todos ellos a la vez. Quién es el habitual de
+    /// cada sitio va a mano y no por hash: con tres barras, repartir cuatro nombres por
+    /// hash deja dos bares con la misma persona —probado—, que es justo lo que se quería
+    /// quitar. Salen de arquetipos que ya existen: no hace falta dibujo nuevo. El sitio
+    /// que no esté aquí se queda con el de la plantilla.</summary>
+    public static readonly Dictionary<string, NpcInterior> ParroquianoDe =
+        new Dictionary<string, NpcInterior> {
+            {"bar",         new NpcInterior{ Nombre="Mikel",  Arq="mikel" }},
+            {"tascapozas",  new NpcInterior{ Nombre="Josune", Arq="p10" }},
+            {"tascadeustu", new NpcInterior{ Nombre="Imanol", Arq="p12" }},
+        };
+
     public static void Entrar(string id, Vector2 desde, string nombre = null, string poi = null) {
         PoiActual = poi;
         var d = Todos[id];
-        Actual = nombre == null ? d : new DefInterior{
-            Nombre=nombre, Suelo=d.Suelo, Pared=d.Pared, Mapa=d.Mapa, Npcs=d.Npcs };
+        var npcs = ConParroquiano(d.Npcs, poi ?? id);
+        Actual = nombre == null && npcs == d.Npcs ? d : new DefInterior{
+            Nombre=nombre ?? d.Nombre, Suelo=d.Suelo, Pared=d.Pared, Mapa=d.Mapa, Npcs=npcs };
         Volver = desde;
         Estado.I.EnInterior = true;
         var J = Juego.I;
@@ -136,6 +150,21 @@ public static class Interiores {
         J.Jug.Dir8 = 4;
         Construir();
         J.MostrarCiudad(false);
+    }
+
+    /// <summary>La lista de NPC de un interior es la plantilla y se comparte entre todos
+    /// los sitios que usan ese plano: escribir encima dejaría el parroquiano del último
+    /// bar puesto en todos. Se copia.</summary>
+    static NpcInterior[] ConParroquiano(NpcInterior[] npcs, string clave) {
+        NpcInterior q;
+        if (!ParroquianoDe.TryGetValue(clave, out q)) return npcs;
+        var fuera = new NpcInterior[npcs.Length];
+        for (int i = 0; i < npcs.Length; i++) {
+            var n = npcs[i];
+            fuera[i] = n.Tipo != "parroquiano" ? n
+                     : new NpcInterior{ X=n.X, Y=n.Y, Nombre=q.Nombre, Arq=q.Arq, Tipo=n.Tipo };
+        }
+        return fuera;
     }
 
     public static void Salir() {

@@ -92,7 +92,11 @@ así que no se puede hacer a ojo desde aquí.
       su portal, y desde la calle la manzana sigue siendo maciza: la tapa el tejado del
       propio bloque y se destapa en 0,35 s al entrar. Ver *El interior de manzana* en
       `CLAUDE.md`.
-- [ ] Más variedad de diálogo en los parroquianos.
+- [x] Más variedad de diálogo en los parroquianos. Eran cinco frases al azar y el mismo
+      Mikel en los tres bares. Ahora son 34 con 21 condiciones —te buscan, es de noche,
+      debes el recibo, vas sin comer, llevas un hierro—, lo concreto sale tres de cada
+      cuatro veces, nunca se repite seguida y cada barra tiene su habitual. Ver *Lo que
+      cuenta el parroquiano* en `CLAUDE.md`.
 - [ ] Misiones secundarias no encadenadas.
 
 ## 6 · Publicación
@@ -138,6 +142,10 @@ Fallos que ya se cazaron y no deben volver:
 - Peatones paseando por encima de un tejado. En cuanto los patios existieron, el portal
   pasó a ser pisable y los vecinos se metían dentro; como los sprites van por encima de la
   tapa, se veían caminando sobre la manzana. Se desvanecen con la tapa.
+- El parroquiano diciendo «Mikel» aunque el NPC se llamara de otra manera: el nombre iba
+  escrito a pelo en la llamada a `hablar()` y no salía del propio NPC. Daba lo mismo
+  mientras hubiera un solo parroquiano; en cuanto hay tres, el de Deustu se presentaba con
+  el nombre del de la Gran Vía.
 - Un `ok()` del sigilo que medía otra cosa: `delito(1)` llama a `estrellas(1)`, que planta
   una patrulla a menos de 28 casillas, y esa patrulla dejaba `S.visto` puesto mientras se
   comprobaba que la sospecha baja al perderte de vista. Pasaba por casualidad, según dónde

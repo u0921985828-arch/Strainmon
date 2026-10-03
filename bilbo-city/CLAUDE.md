@@ -67,13 +67,20 @@ nadie lo vea.
 
 `reglas.py` es la cara de esa trampa que menos se ve, porque no desplaza nada: compara el
 daño y el alcance de las 5 armas, las puertas de nivel, los 8 curros, las 10 propiedades,
-las 18 prendas, lo que pagan las 8 misiones con sus límites de tiempo, y 15 constantes
+las 18 prendas, lo que pagan las 8 misiones con sus límites de tiempo, y 16 constantes
 sueltas (dinero inicial, alquiler, curva de experiencia, conos de auto-apuntado, lo que se
 queda el hospital). **Números, nunca textos**: el HTML y Unity pueden redactar un rótulo
 distinto sin que el juego cambie, y exigir la coma en el mismo sitio sería un verificador
 que falla por nada. Y una constante que **deja de encontrarse** es un fallo por sí sola —
 si no, el día que alguien renombre `XpNivel` el careo pasa a comparar `None` con `None` y
 sigue dando verde.
+
+La única excepción a lo de los textos está en el mismo fichero y tiene la raya en un sitio
+concreto: de las 34 frases del parroquiano compara las **etiquetas** —la etiqueta es la
+condición, o sea código— y jamás el texto. Que Unity lo escriba con otras palabras no
+cambia el juego; que allí falte la frase de la deuda, sí: el parroquiano de Unity no se
+entera de que debes dos recibos. Por lo mismo carea quién es el habitual de cada barra,
+nombre incluido, que un nombre propio no es redacción.
 
 `patios.py` es el único que no compara datos sino **la forma de una función**, y lo hace
 porque aquí el C# no se puede ejecutar. Carea el trazado de los patios y, sobre todo,
@@ -534,6 +541,51 @@ Las paradas de bus **no son POIs** y no llevan coordenada escrita: se sacan del 
 cada barrio en el plano, con la acera más cercana. Treinta y cuatro chinchetas más taparían
 la ciudad en el radar, así que se encuentran estando encima.
 
+### Lo que cuenta el parroquiano
+
+El de la barra es la única boca del juego que no vende nada ni manda a ningún sitio, así
+que es donde cabe contar cómo va la partida. Eran **cinco** frases al azar: a la tercera
+tasca te las sabías, y ninguna se enteraba de que entrabas sangrando, con tres estrellas
+y debiendo dos recibos. Ahora son **34 con 21 condiciones**, y nada más empezar ya hay 13
+distintas.
+
+Cada frase lleva una **etiqueta** —su condición, que es código— y un texto, que es
+redacción. Sin condición es charla de barra y vale siempre; con condición habla de lo que
+te pasa ahora: que te buscan, que es de noche, que debes el recibo, que te han cambiado la
+cerradura, que vas sin comer, que llevas un hierro encima, que ya tienes local.
+
+Tres cosas, y las tres salieron de medir:
+
+- **Lo concreto se prefiere tres de cada cuatro veces** (`PARROQ_CONTEXTO`). En el mismo
+  saco que las doce de charla, con dos o tres condiciones ciertas, lo concreto salía una
+  de cada seis y el parroquiano volvía a parecer una máquina de refranes.
+- **Nunca dos veces seguidas la misma, y se descarta la última antes de elegir, no
+  después.** Con una sola condición cierta el saco de lo concreto tiene una frase, y
+  filtrar al final lo dejaba vacío y obligaba a repetirla. Si pasa, se dice una de barra:
+  de esas siempre quedan once.
+- **Cada barra tiene su habitual.** El interior `tasca` lo comparten varios bares, así que
+  con un solo parroquiano el mismo señor estaba en tres sitios a la vez. Va a mano
+  (`PARROQUIANO_DE`) y no por hash: con tres barras, repartir cuatro nombres por hash deja
+  dos bares con la misma persona —probado—. Salen de arquetipos que ya existen: tres
+  personas distintas sin un dibujo nuevo.
+
+La batería barre 21 estados, uno por condición, y exige tres cosas: que ninguna frase se
+diga con su condición falsa —hablarte de una deuda que no debes es peor que no tener la
+frase—, que **todas** salgan alguna vez (una condición inalcanzable es una frase muerta) y
+que la etiqueta y el `si` cuadren, porque una frase etiquetada que se quede sin condición
+pasa a charla de barra sin que falle nada.
+
+Y hay una cuarta que no se puede comprobar sin navegador: **que quepa en el cuadro**. El
+diálogo es DOM, `width:min(560px,50%)`, así que en un móvil apaisado mide la mitad que en
+el escritorio y crece hacia arriba sin tope. Las 34 frases y los 17 renglones de las
+misiones caben en dos filas en los tres móviles, y el cuadro no pasa del 41 % de la
+pantalla; una frase de 150 caracteres sube a cuatro filas y al 54 %. Lo mide:
+
+```bash
+node herramientas/html/dialogo.js            # ¿cabe lo que dice la gente?
+node herramientas/html/dialogo.js --filas 2
+```
+
 ## Nivel, propiedades y alquiler
 
 La fama por gremio (`S.rep`) ya existía y desbloquea curros, pero es local. El **nivel de
@@ -628,6 +680,7 @@ node herramientas/html/captura.js    # el juego en marcha, para ver el arte en l
 node herramientas/html/calzada.js     # las marcas viales, calle por calle y ancho por ancho
 node herramientas/html/fuentes.js     # seis fuentes en una imagen, para elegir
 node herramientas/html/menus.js       # el móvil y la pausa, con el navegador de verdad
+node herramientas/html/dialogo.js     # ¿caben en el cuadro las frases, en un móvil?
 python3 herramientas/sprites/pixellab.py --mcp       # recorta las hojas traídas del MCP
 python3 herramientas/sprites/pixellab.py --mano      # las 385 celdas, sin red ni clave
 ```

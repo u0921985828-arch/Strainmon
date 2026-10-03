@@ -26,6 +26,8 @@ ESTADO = CS / 'Juego' / 'Estado.cs'
 BIENES = CS / 'Juego' / 'Bienes.cs'
 ACCIONES = CS / 'Juego' / 'Acciones.cs'
 MISIONES = CS / 'Juego' / 'Misiones.cs'
+PARROQ = CS / 'Juego' / 'Parroquiano.cs'
+INTERIORES = CS / 'Juego' / 'Interiores.cs'
 
 
 def _bloque(texto, abre, cierra):
@@ -231,6 +233,8 @@ CONSTANTES = {
                                 r'DarXp\(Mathf\.RoundToInt\(def\.Pago \* ([\d.]+)f\)'),
     'xp al acabar un curro': (r'darXp\(Math\.max\(6,Math\.round\(j\.pago\*\.(\d+)\)',
                               r'DarXp\(Mathf\.Max\(6, Mathf\.RoundToInt\(Pago \* 0\.(\d+)f\)'),
+    'cuánto tira el parroquiano de lo concreto':
+        (r'const PARROQ_CONTEXTO=(\.?[\d.]+);', r'Contexto = (\.?[\d.]+)f;'),
 }
 
 
@@ -243,6 +247,45 @@ def constantes(hs, cs):
         a[nombre] = _num(mh.group(1)) if mh else None
         b[nombre] = _num(mc.group(1)) if mc else None
     return a, b
+
+
+# ── el parroquiano ─────────────────────────────────────────────────────────────────────
+# Aquí sí se mira algo que no es un número, y la raya está en un sitio concreto: se
+# comparan las **etiquetas** de las frases —la etiqueta es la condición, o sea código— y
+# nunca su texto, que es redacción y puede escribirse distinto en cada lado sin que el
+# juego cambie. Una frase que falte en Unity sí lo cambia: el parroquiano de allí no se
+# entera de que debes dos recibos. Y se comparan los habitantes de cada barra, nombre
+# incluido, porque un nombre propio no es redacción: es quién está detrás del vaso.
+
+def _trozo(texto, abre, cierra):
+    """Como `_bloque`, pero vacío si el ancla ya no está. Quien lo llame tiene que tratar
+    el vacío como un fallo: un comparador que no encuentra su tabla no puede dar verde."""
+    i = texto.find(abre)
+    if i < 0:
+        return ''
+    j = texto.find(cierra, i + len(abre))
+    return texto[i + len(abre):j if j >= 0 else len(texto)]
+
+
+def frases_html(h):
+    return re.findall(r"\{t:'(\w+)'", _trozo(h, 'const FRASES_PARROQ=[', '\n];'))
+
+
+def frases_cs(c):
+    return re.findall(r'F\("(\w+)"',
+                      _trozo(c, 'public static readonly FraseParroquiano[] Frases = {', '\n    };'))
+
+
+def habituales_html(h):
+    return {k: (n, a) for k, n, a in
+            re.findall(r"(\w+):\s*\{n:'([^']+)',\s*arq:'([^']+)'\}",
+                       _trozo(h, 'const PARROQUIANO_DE={', '\n};'))}
+
+
+def habituales_cs(c):
+    return {k: (n, a) for k, n, a in
+            re.findall(r'\{"(\w+)",\s*new NpcInterior\{ Nombre="([^"]+)",\s*Arq="([^"]+)" \}\}',
+                       _trozo(c, 'ParroquianoDe =', '\n        };'))}
 
 
 # ── el careo ───────────────────────────────────────────────────────────────────────────
@@ -268,6 +311,7 @@ def main():
     h = HTML.read_text()
     estado, bienes, acciones, misiones = (p.read_text() for p in
                                           (ESTADO, BIENES, ACCIONES, MISIONES))
+    parroq, interiores = PARROQ.read_text(), INTERIORES.read_text()
 
     mh, mc = misiones_html(h), misiones_cs(misiones)
     problemas = (
@@ -279,11 +323,24 @@ def main():
         + compara('curro', curros_html(h), curros_cs(estado))
         + compara('propiedad', props_html(h), props_cs(bienes))
         + compara('prenda', prendas_html(h), prendas_cs(acciones))
-        + compara('misión', dict(enumerate(mh)), dict(enumerate(mc))))
+        + compara('misión', dict(enumerate(mh)), dict(enumerate(mc)))
+        + compara('habitual de la barra', habituales_html(h), habituales_cs(interiores)))
+
+    # Las etiquetas van en orden y se comparan como secuencia: dos frases con la misma
+    # etiqueta son dos frases distintas, y un diccionario se las comería.
+    eh, ec = frases_html(h), frases_cs(parroq)
+    hh, hc = habituales_html(h), habituales_cs(interiores)
+    if not eh or not ec or not hh or not hc:
+        sys.exit('no encontré las tablas del parroquiano: frases HTML %d · Unity %d, '
+                 'barras HTML %d · Unity %d' % (len(eh), len(ec), len(hh), len(hc)))
+    if eh != ec:
+        problemas.append('  las frases del parroquiano no son las mismas:'
+                         '\n    HTML  %s\n    Unity %s' % (eh, ec))
 
     # Las constantes, aparte: aquí «no encontrada» es un fallo por sí solo, y con el
     # careo normal pasaría por un None igual a otro None.
-    ch, cc = constantes(h, estado + bienes + acciones + misiones + (CS / 'Juego' / 'Juego.cs').read_text())
+    ch, cc = constantes(h, estado + bienes + acciones + misiones + parroq
+                        + (CS / 'Juego' / 'Juego.cs').read_text())
     for k in sorted(CONSTANTES):
         if ch[k] is None or cc[k] is None:
             problemas.append('  ya no encuentro: %s (HTML %s · Unity %s)'
@@ -300,6 +357,8 @@ def main():
         sys.exit('los números del juego no cuadran entre el HTML y Unity')
     print('%d armas · %d curros · %d propiedades · %d prendas · %d misiones y %d '
           'constantes, con los mismos números en los dos' % (cuantos + (len(CONSTANTES),)))
+    print('%d frases de parroquiano con las mismas %d etiquetas y %d barras con el mismo '
+          'habitual' % (len(eh), len(set(eh)), len(habituales_html(h))))
 
 
 if __name__ == '__main__':

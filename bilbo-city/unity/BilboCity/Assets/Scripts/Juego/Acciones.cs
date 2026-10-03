@@ -408,17 +408,11 @@ public static class Acciones {
                 Dialogo.I.Abrir("Gorka", new[]{"Surtidor libre el tres. ¿Lleno?"}, ops.ToArray());
                 return;
             }
-            case "parroquiano": {
-                var frases = new[]{
-                    "El puente viejo se cierra cuando la pasma se pone seria.",
-                    "En el hospital te cosen por dinero y sin preguntas.",
-                    "Koldo vende cosas que no salen en el escaparate.",
-                    "Si te escondes y no te ven un rato, se olvidan de ti.",
-                    "Iker repinta coches. Eso quita una estrella."
-                };
-                Dialogo.I.Abrir("Mikel", new[]{ frases[Utiles.RndI(0, frases.Length-1)] }, null);
+            case "parroquiano":
+                // El nombre sale del propio NPC: cada barra tiene su habitual, y antes
+                // estaba escrito a pelo y los tres se llamaban Mikel.
+                Dialogo.I.Abrir(n.Nombre, new[]{ Parroquiano.Frase() }, null);
                 return;
-            }
             case "mecanico": {
                 var m = Misiones.I.Siguiente();
                 var opsBase = new List<Opcion>{

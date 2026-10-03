@@ -5113,6 +5113,17 @@ const puntoCalle=(cx,cy,r)=>buscar((x,y)=>Tc(x,y)===ROAD,cx,cy,r||40);
 /*═══════════════ INTERIORES ═══════════════*/
 /* # pared · . suelo · B barra · M mesa · C cama · W mueble · X vitrina · P puesto · V coche
    O mostrador · Q taquilla · S sillas · E estante · L camilla · D puerta */
+/* El interior `tasca` lo comparten varios bares, así que con un solo parroquiano el
+   mismo señor estaba en todos ellos a la vez. Quién es el habitual de cada sitio va a
+   mano y no por hash: con tres barras, repartir cuatro nombres por hash deja dos bares
+   con la misma persona —probado—, que es exactamente lo que se quería quitar. Salen de
+   arquetipos que ya existen: no hace falta dibujo nuevo para que sean tres personas
+   distintas. El sitio que no esté aquí se queda con el de la plantilla. */
+const PARROQUIANO_DE={
+ bar:         {n:'Mikel',  arq:'mikel'},
+ tascapozas:  {n:'Josune', arq:'p10'},
+ tascadeustu: {n:'Imanol', arq:'p12'},
+};
 const INT={
  bar:{n:'Bar Zurito',suelo:'terrazo',pared:'paredAzul',mapa:[
   '################','#BBBBBBBB.....W#','#..............#','#..MM....MM....#',
@@ -6050,7 +6061,9 @@ function tileInt(x,y){const m=S.interior.mapa,fy=Math.floor(y),fx=Math.floor(x);
 /* El nombre viene de fuera a propósito: dos tascas iguales por dentro se llaman
    distinto en la puerta, que es lo que pasa en cualquier barrio. */
 function entrar(id,desde,nombre,poiId){fundir(()=>{
- S.interior={...INT[id],id,poi:poiId||null};if(nombre)S.interior.n=nombre;
+ S.interior={...INT[id],id,poi:poiId||null,
+  npcs:(q=>INT[id].npcs.map(x=>x.tipo==='parroquiano'&&q?{...x,...q}:x))(PARROQUIANO_DE[poiId||id])};
+ if(nombre)S.interior.n=nombre;
  const m=S.interior.mapa;let px=2,py=2;
  for(let y=0;y<m.length;y++)for(let x=0;x<m[y].length;x++)if(m[y][x]==='D'){px=x+.5;py=y-.7;}
  S.escena='interior';player.enCoche=null;player.x=px;player.y=py;player.d8=4;S.volver=desde;});}
@@ -6116,6 +6129,71 @@ function dormir(){
   aviso('Debes '+S.deuda+' €. Duermes fatal',3);}
  guardar();}
 const tieneArmaFuego=()=>ARMAS.some(a=>!a.cuerpo&&S.armas[a.id]>0);
+
+/*═══════════════ LO QUE CUENTA EL PARROQUIANO ═══════════════*/
+/* El de la barra es la única boca del juego que no vende nada ni manda a ningún sitio,
+   así que es donde cabe contar cómo va la partida. Eran cinco frases al azar: a la
+   tercera tasca te las sabías, y ninguna se enteraba de que entrabas sangrando, con tres
+   estrellas y debiendo dos recibos.
+
+   Cada frase lleva una **etiqueta** —su condición, que es código— y un texto, que es
+   redacción. Por eso `herramientas/plano/reglas.py` carea las etiquetas y jamás los
+   textos: Unity puede escribirlo con otras palabras sin que el juego cambie, pero una
+   frase que allí no exista sí lo cambia.
+
+   Sin condición es charla de barra y vale siempre; con condición habla de lo que te pasa
+   ahora. Lo concreto se prefiere tres de cada cuatro veces, y no es un capricho: en el
+   mismo saco que las doce de charla, con dos o tres condiciones ciertas, lo concreto
+   salía una de cada seis y el parroquiano volvía a parecer una máquina de refranes. */
+const PARROQ_CONTEXTO=.75;
+const FRASES_PARROQ=[
+ {t:'barra',l:'El puente viejo se cierra cuando la pasma se pone seria.'},
+ {t:'barra',l:'En el hospital te cosen por dinero y sin preguntas.'},
+ {t:'barra',l:'Koldo vende cosas que no salen en el escaparate.'},
+ {t:'barra',l:'Si te escondes y no te ven un rato, se olvidan de ti.'},
+ {t:'barra',l:'Iker repinta coches. Eso quita una estrella.'},
+ {t:'barra',l:'Agachado se ve menos. Mirar una esquina es gratis; doblarla, no.'},
+ {t:'barra',l:'De noche se ve la mitad. Eso vale para ellos y para ti.'},
+ {t:'barra',l:'En el metro no te dejan subir si te buscan.'},
+ {t:'barra',l:'Txema no manda a nadie ahí fuera con las manos vacías.'},
+ {t:'barra',l:'Cambiarte de ropa despista. La descripción deja de valer.'},
+ {t:'barra',l:'Aquí se bebe de pie. El que se sienta es que espera a alguien.'},
+ {t:'barra',l:'La ría separa más que el mapa. Para cruzar, al puente.'},
+ {t:'buscado',si:()=>S.estrellas>0,l:'Baja la voz. Por la puerta no ha pasado una patrulla, han pasado tres.'},
+ {t:'buscado',si:()=>S.estrellas>0,l:'Quédate quieto. Se cansan antes ellos que tú.'},
+ {t:'acosado',si:()=>S.estrellas>=3,l:'Lo tuyo ya no es una multa. Lo tuyo sale por la emisora.'},
+ {t:'noche',si:()=>esDeNoche(),l:'A estas horas, el que anda por la calle es que no quiere ir a casa.'},
+ {t:'noche',si:()=>esDeNoche(),l:'Cierro cuando se vaya el último. Hoy pareces tú.'},
+ {t:'manana',si:()=>S.min<10*60,l:'Café y a currar. El que empieza el día en la barra lo acaba aquí.'},
+ {t:'deuda',si:()=>S.deuda>0,l:'Amaia pregunta por ti. Sin mala idea, pero pregunta.'},
+ {t:'desahucio',si:()=>S.casera.desahucio,l:'Te han cambiado la cerradura. Aquí se sabe antes que en el portal.'},
+ {t:'okupa',si:()=>S.casera.okupa,l:'Dormir en tu propia casa sin llave tiene delito. Literalmente.'},
+ {t:'pobre',si:()=>S.dinero<20,l:'Si no te llega para el zurito, el agua de la barra es gratis.'},
+ {t:'rico',si:()=>S.dinero>=3000,l:'Con lo que llevas encima ya no hace falta que robes nada.'},
+ {t:'hambre',si:()=>S.hambre<.35,l:'Come algo. Luego andas lento, y lento te cogen.'},
+ {t:'herido',si:()=>S.hp<45,l:'Esa pinta no es de resaca. En Basurto no preguntan.'},
+ {t:'mision',si:()=>!!S.mision,l:'Tienes cara de que te esperan en otro sitio.'},
+ {t:'nivel',si:()=>S.nivel>=4,l:'Ya no eres el chaval que entró preguntando por Txema.'},
+ {t:'casero',si:()=>Object.keys(S.props).length>0,l:'Dicen que ahora tienes local. Enhorabuena y que dure.'},
+ {t:'hierro',si:()=>tieneArmaFuego(),l:'Eso de la cazadora se nota. Siéntate de espaldas a la pared.'},
+ {t:'silencio',si:()=>S.tiene.silenciador,l:'Un hierro que no suena no es más seguro. Es que te confías.'},
+ {t:'deportivo',si:()=>S.tiene.deportivo,l:'Ese coche lo oye medio barrio. Para algo discreto, coge el bus.'},
+ {t:'furgo',si:()=>S.tiene.furgo,l:'Con furgoneta hay curro de verdad. Lo que pesa paga mejor.'},
+ {t:'rutina',si:()=>S.dia>=10,l:'Llevas aquí lo tuyo ya. Antes ni saludabas.'},
+ {t:'fama',si:()=>S.rep.calle>=4,l:'Por la calle te conocen. Eso abre puertas y cierra otras.'},
+];
+let ultParroq='';
+function fraseParroquiano(){
+ /* Nunca dos veces seguidas la misma, y por eso se descarta la última de los dos sacos
+    antes de elegir y no después: con una sola condición cierta, el saco de lo concreto
+    tiene una frase, y filtrar al final lo dejaba vacío y obligaba a repetirla. Si eso
+    pasa se dice una de barra, que de esas siempre quedan once. */
+ const ult=f=>f.l!==ultParroq;
+ const con=FRASES_PARROQ.filter(f=>f.si&&f.si()&&ult(f)), barra=FRASES_PARROQ.filter(f=>!f.si&&ult(f));
+ const b=(con.length&&azar()<PARROQ_CONTEXTO)?con:(barra.length?barra:con);
+ ultParroq=b[rndi(0,b.length-1)].l;
+ return ultParroq;}
+
 function hablarCon(n){
  if(n.tipo==='jefe'){
   const m=MISIONES[S.misionIdx];
@@ -6132,10 +6210,7 @@ function hablarCon(n){
    S.dinero-=12;S.hambre=1;S.energia=Math.min(1,S.energia+.45);S.hp=Math.min(100,S.hp+22);aviso('−12 €');}},
   ...(S.interior.poi==='tascapozas'?[opcionComprar('tascapozas','Ver las cuentas')]:[]),
   {txt:'Firmar contrato de hostelería',fn:()=>firmar('hosteleria',3,140)}]);
- if(n.tipo==='parroquiano'){const p=['El puente viejo se cierra cuando la pasma se pone seria.',
-  'En el hospital te cosen por dinero y sin preguntas.','Koldo vende cosas que no salen en el escaparate.',
-  'Si te escondes y no te ven un rato, se olvidan de ti.','Iker repinta coches. Eso quita una estrella.'];
-  return hablar('Mikel',[p[rndi(0,p.length-1)]]);}
+ if(n.tipo==='parroquiano')return hablar(n.n,[fraseParroquiano()]);
  if(n.tipo==='mecanico'){
   const m=MISIONES[S.misionIdx];
   const ops=[{txt:'Ver vehículos',fn:()=>abrirTienda('Taller Iker','Vehículos',[
