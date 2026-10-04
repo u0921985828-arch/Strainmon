@@ -2,3 +2,7 @@ tree_sitter>=0.23
 tree_sitter_c_sharp>=0.23
 # la usa herramientas/sprites/pixellab.py para empaquetar las hojas
 Pillow>=10
+# la usa herramientas/plano/extraer.py para leer el PDF del plano, y la importan también
+# sus pruebas (pruebas_extraer.py) dentro de ./verificar.sh: sin ella, una instalación limpia
+# siguiendo el CLAUDE.md no pasaba el verificador
+pymupdf>=1.24
