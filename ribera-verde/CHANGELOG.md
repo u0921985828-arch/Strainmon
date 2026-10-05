@@ -1,5 +1,37 @@
 # Cambios
 
+## 1.3.0 · 5 de octubre de 2026
+
+- **Nuevo: el motor ya usa sprites (F2).** `src/js/01b-arte.js` carga el atlas que incrusta el build y dibuja con él personajes, tiles, objetos, edificios, plantas, combate y efectos; lo que falte sigue saliendo procedural. Incluye:
+  - caminar y correr sincronizados con el paso, `idle` con fase propia por NPC;
+  - acciones de ambiente (los fumadores fuman con su humo aparte; Unai nunca);
+  - acciones del jugador (regar, plantar, cosechar, oler, cruzar, vender) y animaciones de combate;
+  - cogollos del color de cada variedad, planta seca y plaga;
+  - `?arte=procedural` para comparar.
+- **Nuevo:** catálogo de sprites por familia de PixelLab (`docs/CATALOGO-SPRITES.md`, `npm run sprites:catalogo`).
+  - Cada sprite va a la herramienta que mejor lo resuelve.
+  - Fachadas, carpa, árbol, farola y fuente se pintan con `create_map_object` sobre recortes del mapa con máscara.
+  - Personajes de combate con paso previo `create_image_pro` + `create_character` v3 para no perder la identidad.
+  - Fondos y título con img2img.
+  - Dos lotes compartidos de `create_1_direction_object`.
+  - Coste documentado: ~410 generaciones (antes ~460) y herramientas descartadas con su motivo.
+- **Nuevo:** `tools/sprites/calco.js` y `npm run test:arte`: atlas de calco sin gastar créditos y 16 comprobaciones del motor. Con ese atlas la historia completa también da 34/34.
+- **Cambiado:**
+  - `procesar.js` cuenta el tope de colores por sprite en tiles y objetos, encaja los efectos que crecen y admite `ajuste_por_sprite`.
+  - `atlas.json` pasa a la versión 2, con `cubre`, `ambiente`, `fumador` y `menores`.
+  - `validar.js` comprueba familias, lotes, pasos previos, máscaras y dependencias.
+  - Las animaciones de balanceo de la planta tienen nombre propio.
+  - Los scripts de Playwright aceptan `CHROMIUM_PATH`, `RV_HTML` y `RV_SALIDA`.
+
+## 1.2.0 · 5 de octubre de 2026
+
+- **Nuevo:** kit pro de sprites y animaciones con PixelLab para Claude Code. El juego no cambia.
+  - `docs/PIXELLAB.md` (guía): dirección de arte, fases, animaciones, comportamientos de ambiente (fumadores con humo aparte), integración en el motor, QA, presupuesto y problemas típicos.
+  - `art/manifest.json` (47 assets + 14 items, cobertura del 100 %).
+  - `art/inventario.json`, `art/referencias/` y `art/paleta/`.
+  - `tools/sprites/` (`referencias`, `paleta`, `validar`, `procesar`).
+  - Comando `/sprites` y `.mcp.json.ejemplo`.
+
 ## 1.1.0 · 5 de octubre de 2026
 
 - **Arreglado:** los cruces sin receta fallaban. Se gastaban las semillas y no salía el híbrido propio.

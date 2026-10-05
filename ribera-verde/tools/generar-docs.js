@@ -10,7 +10,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 
 (async () => {
-  const browser = await chromium.launch();
+  const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   const page = await browser.newPage();
   await page.goto('file://' + path.join(ROOT, 'index.html'));
   await page.waitForFunction(() => typeof mode !== 'undefined' && mode === 'title');

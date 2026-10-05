@@ -148,6 +148,7 @@ canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixela
 <p class="keys">Mover <kbd>←↑↓→</kbd>/<kbd>WASD</kbd> · A <kbd>Z</kbd>/<kbd>Espacio</kbd>/<kbd>Intro</kbd> · B <kbd>X</kbd>/<kbd>Esc</kbd> (mantén B para correr) · Menú <kbd>M</kbd></p>
 
 <script>
+const ATLAS = null;
 'use strict';
 /* =========================================================
    RIBERA VERDE — motor gráfico estilo 16-bit portátil (240x160)
@@ -283,6 +284,228 @@ function drawLeafPx(t,cx,cy,s,col){
 const SOLID_G=/^(water|roof|wall|win|iwT|iwB|void)/;
 const COUNTERS=new Set(['counter','barcounter','btable']);
 
+/* =========================================================
+   ARTE — sprites y animaciones de PixelLab desde el atlas
+   (assets/sprites/atlas.*, incrustado por tools/build.js como ATLAS).
+   Todo lo que no esté en el atlas se dibuja con el procedural de siempre.
+   ?arte=procedural en la URL fuerza el procedural para comparar.
+   ========================================================= */
+const ARTE={ok:false,fr:{},mir:{},rec:new WeakMap(),vfx:[],st:new WeakMap(),sobre:{},cubre:{},prisa:1};
+const DIR4={down:'south',up:'north',left:'west',right:'east'};
+const FASES=['germinando','plantula','vegetativo','floracion','lista'];
+const FUMA=/fum|puro|pipa|vap/;
+function arteListo(){
+  if(ARTE.p)return ARTE.p;
+  let off=false;try{off=/[?&]arte=procedural/.test(location.search);}catch(e){}
+  if(typeof ATLAS==='undefined'||!ATLAS||off)return ARTE.p=Promise.resolve(false);
+  return ARTE.p=new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{try{
+      const d=ATLAS.def;
+      for(const k in d.frames){const f=d.frames[k];const [c,x]=mkCanvas(f.w,f.h);x.drawImage(img,f.x,f.y,f.w,f.h,0,0,f.w,f.h);ARTE.fr[k]=c;}
+      for(const g in d.anims)for(const s in d.anims[g]){const a=d.anims[g][s];if(a.sobre)(ARTE.sobre[a.sobre]=ARTE.sobre[a.sobre]||[]).push([g,s]);}
+      ARTE.d=d;ARTE.cubre=d.cubre||{};ARTE.ok=true;res(true);
+    }catch(e){console.error(e);res(false);}};
+    img.onerror=()=>{console.warn('atlas: no se pudo cargar la imagen');res(false);};
+    img.src=ATLAS.png;
+  });
+}
+const animDe=(g,s)=>!!g&&ARTE.ok&&ARTE.d.anims[g]?ARTE.d.anims[g][s]||null:null;
+// fotogramas de una dirección; si falta, la más cercana (este ↔ oeste en espejo, después sur)
+function clavesDe(g,s,dir){
+  const a=animDe(g,s);if(!a)return null;const D=a.dirs;
+  if(D[dir])return [D[dir],false];
+  if(dir==='east'&&D.west)return [D.west,true];
+  if(dir==='west'&&D.east)return [D.east,true];
+  return [D.south||D.unica||D[Object.keys(D)[0]],false];
+}
+function espejo(k){
+  if(ARTE.mir[k])return ARTE.mir[k];
+  const s=ARTE.fr[k];const [c,x]=mkCanvas(s.width,s.height);x.translate(s.width,0);x.scale(-1,1);x.drawImage(s,0,0);return ARTE.mir[k]=c;
+}
+function nFotos(g,s){const a=animDe(g,s);if(!a)return 0;return Math.max(...Object.values(a.dirs).map(v=>v.length));}
+const duracion=(g,s)=>{const a=animDe(g,s);return a?nFotos(g,s)*1000/(a.fps||8):0;};
+// o.i: índice fijo · o.ph: fase 0-1 del ciclo · si no, por tiempo t (ms) con fps y bucle del atlas
+function frameDe(g,s,dir,t,o={}){
+  const r=clavesDe(g,s,dir);if(!r)return null;
+  const [ks,m]=r,a=animDe(g,s),n=ks.length;let i;
+  if(o.i!=null)i=((o.i%n)+n)%n;
+  else if(o.ph!=null)i=Math.floor(o.ph*n)%n;
+  else{i=Math.floor(Math.max(0,t)*(a.fps||8)/1000);i=(o.bucle??a.bucle)?i%n:Math.min(n-1,i);}
+  return {c:m?espejo(ks[i]):ARTE.fr[ks[i]],i,n,cel:a.celda||ARTE.d.celdas[g]};
+}
+// cambia colores exactos (rampa clave → rampa destino); se calcula una vez por fotograma y rampa
+function conRampa(c,map,id){
+  let m=ARTE.rec.get(c);if(!m){m=new Map();ARTE.rec.set(c,m);}
+  if(m.has(id))return m.get(id);
+  const [o,x]=mkCanvas(c.width,c.height);x.drawImage(c,0,0);
+  const im=x.getImageData(0,0,c.width,c.height),px=im.data,tb={};
+  for(const k in map){const a=parseInt(k.slice(1),16),b=parseInt(map[k].slice(1),16);tb[a]=[b>>16,(b>>8)&255,b&255];}
+  for(let j=0;j<px.length;j+=4){if(!px[j+3])continue;const t=tb[(px[j]<<16)|(px[j+1]<<8)|px[j+2]];if(t){px[j]=t[0];px[j+1]=t[1];px[j+2]=t[2];}}
+  x.putImageData(im,0,0);m.set(id,o);return o;
+}
+function pinta(f,xP,yP,c){ctx.drawImage(c||f.c,Math.round(xP-f.cel.ancla[0]),Math.round(yP-f.cel.ancla[1]));}
+function dibujar(g,s,dir,t,xP,yP,o){const f=frameDe(g,s,dir,t,o);if(f)pinta(f,xP,yP);return f;}
+function sombra(x,y){ctx.fillStyle='rgba(0,0,0,.22)';ctx.fillRect(x-4,y-1,8,3);ctx.fillRect(x-5,y,10,1);}
+
+/* ---------- personajes ---------- */
+function grupoLook(look){
+  if(!ARTE.ok||!look)return null;
+  const g=ARTE.cubre['look:'+look.id];if(g)return g;
+  const id=String(look.id);
+  if(id[0]==='n')return ARTE.cubre['look:cliente'+(1+hashStr(id)%6)]||null;   // clientes aleatorios → 6 familias
+  if(id[0]==='t')return ARTE.cubre['look:ladron'+(1+hashStr(id)%3)]||null;     // ladrones aleatorios → 3 familias
+  return null;
+}
+function pjFrame(e,g,now,isP,dur){
+  if(e.act&&!isP&&e.moving)e.act=null;
+  if(e.act){const t=now-e.act.t0,f=frameDe(g,e.act.n,DIR4[e.dir],t);if(f&&t<duracion(g,e.act.n))return f;e.act=null;}
+  if(e.moving){
+    const s=isP&&dur<200&&animDe(g,'run')?'run':animDe(g,'walk')?'walk':null;
+    if(s){const par=isP?e.parity:(e.x+e.y)&1;return frameDe(g,s,DIR4[e.dir],0,{ph:(par+Math.min(1,e.t/dur))/2});}   // un ciclo cada 2 casillas
+  }
+  if(animDe(g,'idle'))return frameDe(g,'idle',DIR4[e.dir],now+hashStr(String(e.id||'p'))%5000,{bucle:true}); // fase propia por NPC
+  return frameDe(g,'base',DIR4[e.dir],0,{i:0});
+}
+function dibujarPJ(e,look,now,cam,isP,dur){
+  const g=grupoLook(look);if(!g)return false;
+  const f=pjFrame(e,g,now,isP,dur);if(!f)return false;
+  const xp=Math.round(e.px-cam.x)+8,yp=Math.round(e.py-cam.y)+15;   // pies en la última fila de la casilla
+  sombra(xp,yp);pinta(f,xp,yp);
+  const a=e.act;
+  if(a&&a.humo&&!a.humoHecho&&f.i>=a.humo.frame){a.humoHecho=1;lanzarVfx(a.humo.vfx,e.px+8+a.humo.off[0],e.py+15+a.humo.off[1],now,S.map,true);}
+  return true;
+}
+// ambiente: solo quieto, en pantalla y sin diálogo; al hablarle se corta
+function ambiente(e,now,cam){
+  const g=grupoLook(e.look);if(!g)return;
+  const am=ARTE.d.ambiente&&ARTE.d.ambiente[g];if(!am)return;
+  const dt=()=>(am.cada_s[0]+Math.random()*(am.cada_s[1]-am.cada_s[0]))*1000*ARTE.prisa;
+  let s=ARTE.st.get(e);if(!s){s={next:now+dt()};ARTE.st.set(e,s);}
+  if(!isFree()){if(e.act){e.act=null;s.next=now+dt();}return;}
+  const sx=e.px-cam.x,sy=e.py-cam.y;
+  if(e.act||e.moving||sx<-16||sy<-16||sx>SW||sy>SH||now<s.next)return;
+  s.next=now+dt();
+  const menor=(ARTE.d.menores||[]).includes(g);
+  const ops=am.acciones.filter(n=>animDe(g,n)&&!(menor&&FUMA.test(n)));if(!ops.length)return;
+  const n=ops[Math.floor(Math.random()*ops.length)],fu=!menor&&ARTE.d.fumador&&ARTE.d.fumador[g];
+  e.act={n,t0:now};
+  if(fu&&FUMA.test(n))e.act.humo={vfx:fu.vfx,frame:fu.frame_humo,off:fu.offset_boca};
+  if(e.id){ARTE.log=ARTE.log||[];ARTE.log.push(e.id+':'+n);if(ARTE.log.length>300)ARTE.log.shift();}
+}
+// acciones del jugador: devuelve una promesa que acaba con la animación (inmediata sin atlas)
+function accion(n,vfx){
+  const g=grupoLook(LOOKS.player);
+  if(!g||!animDe(g,n))return Promise.resolve();
+  const now=performance.now();P.act={n,t0:now};
+  if(vfx)lanzarVfx(vfx.id,vfx.x,vfx.y,now,S.map,false);
+  return wait(duracion(g,n)).then(()=>{if(P.act&&P.act.n===n)P.act=null;});
+}
+
+/* ---------- efectos ---------- */
+function lanzarVfx(id,x,y,now,capa,sube){if(animDe(id,'efecto'))ARTE.vfx.push({id,x,y,t0:now,capa,sube});}
+function pintarVfx(now,cam,capa){
+  ARTE.vfx=ARTE.vfx.filter(v=>now-v.t0<duracion(v.id,'efecto'));
+  for(const v of ARTE.vfx){
+    if(v.capa!==capa)continue;
+    const t=now-v.t0,fi=Math.floor(t*(animDe(v.id,'efecto').fps||10)/1000);
+    const dy=v.sube?Math.floor(fi/3):0,dx=v.sube&&capa==='town'?Math.floor(fi/6):0;   // sube 1 px cada 3 fotogramas; viento en la calle
+    dibujar(v.id,'efecto','unica',t,v.x-cam.x+dx,v.y-cam.y-dy);
+  }
+}
+
+/* ---------- mundo: tiles, objetos, edificios, plantas ---------- */
+function arteTile(k,tx,ty,sx,sy,now){
+  if(!ARTE.ok)return false;
+  const an=ARTE.sobre['tile:'+k];
+  if(an){
+    const [g,s]=an[0],a=animDe(g,s);
+    const pis=!a.bucle;   // p. ej. hierba pisada: solo con el jugador encima
+    if(!pis||(P.x===tx&&P.y===ty)){
+      const f=frameDe(g,s,'unica',pis?now-(P.pisT||now):now,{bucle:!pis});
+      if(f){if(f.c.width>=32)ctx.drawImage(f.c,(tx&1)*16,(ty&1)*16,16,16,sx,sy,16,16);else ctx.drawImage(f.c,sx,sy);return true;}
+    }
+  }
+  const f=frameDe(ARTE.cubre['tile:'+k],k,'unica',0,{i:0});if(!f)return false;
+  ctx.drawImage(f.c,sx,sy,16,16);return true;
+}
+// objetos: los de 1 casilla en el suelo; los altos van a la lista ordenada por Y (tapan al jugador si está detrás)
+function arteObj(o,tx,ty,cam,now,list){
+  if(!ARTE.ok)return false;
+  const g=ARTE.cubre['obj:'+o];if(!g)return false;
+  const an=ARTE.sobre['obj:'+o];
+  const f=an?frameDe(an[0][0],an[0][1],'unica',now,{bucle:true}):frameDe(g,o,'unica',0,{i:0});
+  if(!f)return false;
+  const xp=tx*16+8-cam.x,yp=ty*16+15-cam.y;
+  if(f.cel.h>16&&list)list.push([ty*16,()=>pinta(f,xp,yp)]);else pinta(f,xp,yp);
+  return true;
+}
+function arteEdificios(m,cam){
+  if(!ARTE.ok||!m.blds)return;
+  for(const b of m.blds){
+    const g='edificio-'+b.id,f=frameDe(g,'base','unica',0,{i:0});if(!f)continue;
+    ctx.drawImage(f.c,b.x0*16-cam.x,b.y0*16-cam.y);
+    if(b.doorX!=null&&animDe(g,'puerta')){
+      const dy=b.y0+b.h-1,abierta=P.x===b.doorX&&(P.y===dy||P.y===dy+1);
+      const p=frameDe(g,'puerta','unica',0,{i:abierta?-1:0});
+      if(p)ctx.drawImage(p.c,b.doorX*16-8-cam.x,(dy+1)*16-32-cam.y);
+    }
+  }
+}
+function arteCarpa(cam){
+  const f=ARTE.ok&&frameDe('carpa-cultivo','base','unica',0,{i:0});if(!f)return false;
+  ctx.drawImage(f.c,7*16-cam.x,3*16-16-cam.y);return true;
+}
+// planta en la casilla (x, y de pantalla = esquina de la casilla); p null = maceta vacía
+function artePlanta(p,x,y,now){
+  if(!ARTE.ok)return false;
+  const st=p?(p.dead?'muerta':FASES[plantStage(p)]):'maceta-vacia';
+  const g=ARTE.cubre[p?'planta:'+st:'misc:maceta-vacia'];if(!g)return false;
+  const dry=p&&!p.dead&&p.water<=0;
+  const sw=!dry&&p&&!p.dead&&ARTE.sobre['planta:'+st];
+  const f=sw?frameDe(sw[0][0],sw[0][1],'unica',now+(x*37),{bucle:true}):frameDe(g,st,'unica',0,{i:0});
+  if(!f)return false;
+  let c=f.c,map=null;
+  const rk=ARTE.d.rampas&&ARTE.d.rampas[g]&&ARTE.d.rampas[g].cogollo;
+  if(p&&rk){const s=getStrain(p.sid),col=s?s.c:'#9bd35a';map={[rk.rampa[0]]:shade(col,50),[rk.rampa[1]]:col,[rk.rampa[2]]:shade(col,-60)};}
+  const seca=dry&&ARTE.d.rampas_cambio&&ARTE.d.rampas_cambio[g]&&ARTE.d.rampas_cambio[g].seca;
+  if(seca)map=Object.assign(map||{},seca);
+  if(map)c=conRampa(f.c,map,(p?p.sid:'')+(seca?'|s':''));
+  pinta(f,x+8,y+15,c);
+  if(p&&p.pest&&!p.dead)dibujar('vfx-acaros','efecto','unica',now,x+8,y+8,{bucle:true});
+  return true;
+}
+// criaturas de ambiente: paloma junto a Patxi, gaviotas en el muelle
+function arteCriaturas(now,cam,list){
+  if(!ARTE.ok||S.map!=='town')return;
+  const m=MAPS.town;
+  if(animDe('paloma','idle')){const e=ents.find(e=>e.id==='patxi');if(e)list.push([e.py,()=>dibujar('paloma','idle','unica',now,e.px+24-cam.x,e.py+15-cam.y)]);}
+  if(animDe('gaviota','idle')){
+    if(!m.docks){m.docks=[];for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++)if(m.g[y][x]==='dock'&&!m.o[y][x])m.docks.push([x,y]);m.docks=m.docks.filter((_,i)=>i%5===2).slice(0,2);}
+    for(const [x,y] of m.docks)list.push([y*16,()=>dibujar('gaviota','idle','unica',now+x*311,x*16+8-cam.x,y*16+15-cam.y)]);
+  }
+}
+
+/* ---------- combate ---------- */
+function grupoCombate(who){
+  if(!ARTE.ok||!B)return null;
+  if(who==='P')return ARTE.cubre['combate:espalda:player']||null;
+  if(B.kind==='thief')return grupoLook(B.look)||ARTE.cubre['combate:frente:ladron']||null;
+  return ARTE.cubre['combate:frente:policia']||null;
+}
+// lanza una animación de combate; devuelve su duración en ms (0 sin atlas)
+function bAnim(who,n){const g=grupoCombate(who);if(!g||!animDe(g,n))return 0;B['a'+who]={n,t0:performance.now()};return duracion(g,n);}
+function vfxCombate(id,x,y){if(ARTE.ok)lanzarVfx(id,x,y,performance.now(),'*',false);}
+function combFrame(who,now){
+  const g=grupoCombate(who);if(!g)return null;
+  const a=B['a'+who],dir=who==='P'?'north':'south';
+  if(a){const t=now-a.t0;if(t<duracion(g,a.n)||a.n==='desmayo')return frameDe(g,a.n,a.n==='huir'?'east':dir,t,{bucle:a.n==='huir'});B['a'+who]=null;}
+  return frameDe(g,'idle',dir,now,{bucle:true})||frameDe(g,'base',dir,0,{i:0});
+}
+function arteFondoCombate(){
+  const g=ARTE.ok&&ARTE.cubre['combate:fondo-'+(B.kind==='thief'?'ladron':'policia')];if(!g)return false;
+  const f=frameDe(g,'base','unica',0,{i:0});if(!f)return false;ctx.drawImage(f.c,0,0);return true;
+}
 /* ---------- characters ---------- */
 const OUT='#26262e';
 const sprCache={};
@@ -345,8 +568,9 @@ function spriteFor(look,dir,frame){
 }
 /* ---------- plants ---------- */
 const plantCache={};
+const plantStage=p=>p.prog>=1?4:p.prog<.12?0:p.prog<.35?1:p.prog<.65?2:3;
 function plantSprite(p){
-  const s=getStrain(p.sid);const stage=p.dead?9:p.prog>=1?4:p.prog<.12?0:p.prog<.35?1:p.prog<.65?2:3;
+  const s=getStrain(p.sid);const stage=p.dead?9:plantStage(p);
   const dry=p.water<=0||p.dead,pest=!!p.pest;
   const key=p.sid+stage+dry+pest;if(plantCache[key])return plantCache[key];
   const [c,x]=mkCanvas(16,26);const t=painter(x,rngSeed(hashStr(key)));
@@ -467,6 +691,7 @@ const gr=(m,x,y,k)=>{if(x>=0&&y>=0&&x<m.w&&y<m.h)m.g[y][x]=k;};
 const ob=(m,x,y,k)=>{if(x>=0&&y>=0&&x<m.w&&y<m.h)m.o[y][x]=k;};
 const rect=(m,x0,y0,x1,y1,fn)=>{for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)fn(x,y);};
 function building(m,id,x0,y0,w,h,doorX,warp){
+  (m.blds=m.blds||[]).push({id,x0,y0,w,h,doorX});
   for(let x=x0;x<x0+w;x++){gr(m,x,y0,'roofT_'+id);gr(m,x,y0+1,'roofB_'+id);for(let y=y0+2;y<y0+h;y++)gr(m,x,y,'wall_'+id);
     if((x-x0)%3===1&&x!==doorX){gr(m,x,y0+3,'win_'+id);}}
   if(doorX!=null){gr(m,doorX,y0+h-1,'door_'+id);m.doors[doorX+','+(y0+h-1)]=warp;}
@@ -746,7 +971,7 @@ function tryMove(d){
   if(d==='down'&&ex){P.chain=false;run(()=>warp(ex));return;}
   const nx=P.x+dx,ny=P.y+dy;
   if(tileSolid(m,nx,ny)||entAt(nx,ny)){const n=performance.now();if(n-P.bumpT>350){sfx('bump');P.bumpT=n;}P.chain=false;return;}
-  P.fx=P.x;P.fy=P.y;P.x=nx;P.y=ny;P.t=0;P.moving=true;P.dur=held.B?130:240;P.parity^=1;
+  P.fx=P.x;P.fy=P.y;P.x=nx;P.y=ny;P.t=0;P.moving=true;P.pisT=performance.now();P.dur=held.B?130:240;P.parity^=1;
 }
 function onStepEnd(){
   S.x=P.x;S.y=P.y;S.dir=P.dir;S.steps++;if(S.cool>0)S.cool--;
@@ -852,7 +1077,7 @@ async function potAction(i){
     if(j<0||j>=own.length)return;
     const sid=own[j][0];S.seeds[sid]--;if(!S.seeds[sid])delete S.seeds[sid];
     S.pots[i]={sid,prog:0,water:70,health:100,fert:false,pest:false};sfx('sel');
-    return say(`Has plantado ${getStrain(sid).n}. ¡A crecer!`);
+    await accion('plantar');return say(`Has plantado ${getStrain(sid).n}. ¡A crecer!`);
   }
   const s=getStrain(p.sid);
   if(p.dead){await say(`La ${s.n} se ha secado del todo. Una pena.`);S.pots[i]=null;return say('Retiras la planta muerta.');}
@@ -860,7 +1085,7 @@ async function potAction(i){
   const opts=['Regar'];if(!p.fert)opts.push('Abonar');if(p.pest)opts.push('Tratar plaga');opts.push('Arrancar','Salir');
   const c=await ask(`${s.n} · ${stageName(p)} ${Math.floor(p.prog*100)}%\nAgua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%${p.pest?' · ¡PLAGA!':''}`,opts);
   const op=opts[c];
-  if(op==='Regar'){p.water=100;sfx('sel');await say('Riegas la planta. Agua al 100%.');}
+  if(op==='Regar'){await accion('regar',{id:'vfx-gotas',x:POTS[i][0]*16+8,y:POTS[i][1]*16+8});p.water=100;sfx('sel');await say('Riegas la planta. Agua al 100%.');}
   else if(op==='Abonar'){if(S.items.fert>0){S.items.fert--;p.fert=true;sfx('sel');await say('Echas FERTILIZANTE. Dará más cogollos.');}else await say('No te queda FERTILIZANTE.');}
   else if(op==='Tratar plaga'){if(S.items.insect>0){S.items.insect--;p.pest=false;sfx('sel');await say('Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.');}else await say('No tienes INSECTICIDA. Kiko lo vende.');}
   else if(op==='Arrancar'){if(await ask('¿Seguro que quieres arrancarla?',['Sí','No'])===0){S.pots[i]=null;await say('Arrancas la planta.');}}
@@ -869,6 +1094,7 @@ async function harvest(i){
   const p=S.pots[i],s=getStrain(p.sid);
   const g=Math.max(1,Math.round(s.y*(.4+.6*p.health/100)*(p.fert?1.25:1)*(S.led?1.3:1)));
   const thc=Math.round((s.thc*(.85+.15*p.health/100)+(S.led?.5:0)+(p.fert?.3:0))*10)/10;
+  await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:P.px+8,y:P.py+2});
   const n=1+ri(0,2);addBuds(p.sid,g,thc);addSeeds(p.sid,n);S.pots[i]=null;sfx('get');
   await say(`¡Cosechas ${g} g de ${s.n} con ${pct(thc)}% de THC!`);
   await say(`También recoges ${n} semilla${n>1?'s':''} de ${s.n}.`);
@@ -904,6 +1130,7 @@ async function labAction(){
   if(await ask(`¿Cruzar ${getStrain(A).n} × ${getStrain(Bk).n}? Gastas 1 semilla de cada.`,['Cruzar','Cancelar'])!==0)return;
   S.seeds[A]--;S.seeds[Bk]--;for(const k of [A,Bk])if(!S.seeds[k])delete S.seeds[k];
   const r=crossResult(A,Bk),isNew=!S.disc[r],s=getStrain(r);
+  await accion('cruzar',{id:'vfx-polen',x:P.px+8,y:P.py-4});
   sfx('enc');await fade(1,true);await wait(450);await fade(0,true);
   addSeeds(r,2);
   if(isNew){sfx('get');await say(`¡NUEVA VARIEDAD! ${s.n}`);await say(`THC ${pct(s.thc)}% · ${s.y} g/planta · ${String(s.d).replace('.',',')} días.\nObtienes 2 semillas.`);
@@ -940,6 +1167,7 @@ async function talkClient(c){
   const acc=[1,.92,clamp(.3+(b.thc-(c.minThc||14))*.05+(c.type==='pij'?.25:0)+(c.type==='tur'?.15:0),.1,.9)][j];
   if(Math.random()<acc){
     useBuds(sid,c.want);S.money+=pr[j];S.sales+=pr[j];S.heat=Math.min(100,S.heat+3+c.want*.5);S.rep+=[3,2,1][j];sfx('coin');
+    await accion('vender',{id:'vfx-monedas',x:P.px+8,y:P.py+2});
     removeClient(c.id);
     await say(pick(['¡Trato hecho!','Genial. Nos vemos.','Perfecto. Se lo diré a mis colegas.']),N);
     toast(`+${eur(pr[j])} · ${c.want} g vendidos`,1600);
@@ -1229,7 +1457,7 @@ async function battle(kind){
     mode='battle';updateHUD();w.hidden=true;w.classList.remove('go');
     await wait(650);bhudBuild();
     if(kind==='thief'){await say(`¡${B.name} te corta el paso!`);await say(pick(['«Suelta la mercancía y nadie sale herido.»','«Eh, tú. Esa mochila huele a dinero.»','«Por aquí no se pasa gratis, colega.»']),B.name);}
-    else{await say(`¡${B.name} te da el alto!`);await say(pick(['«Control rutinario. ¿Llevas algo encima?»','«Documentación. Y vacía los bolsillos.»','«Huele raro por aquí. Muy raro.»']),B.name);}
+    else{bAnim('E','alto');await say(`¡${B.name} te da el alto!`);await say(pick(['«Control rutinario. ¿Llevas algo encima?»','«Documentación. Y vacía los bolsillos.»','«Huele raro por aquí. Muy raro.»']),B.name);}
     while(!res)res=kind==='thief'?await thiefRound():await copRound();
   }catch(e){console.error(e);res=res||'flee';}
   finally{
@@ -1243,10 +1471,11 @@ async function battle(kind){
 }
 async function enemyHits(){
   const dmg=ri(B.atk[0],B.atk[1]);
+  bAnim('E','ataque');
   await say(`¡${B.name} ${pick(['te suelta un guantazo','te empuja contra un portal','te da una patada','te arrea con una riñonera'])}!`);
-  B.shakeP=450;sfx('hurt');S.hp=Math.max(0,S.hp-dmg);bhud();await wait(450);
+  bAnim('P','herido');vfxCombate('vfx-golpe',64,112);B.shakeP=450;sfx('hurt');S.hp=Math.max(0,S.hp-dmg);bhud();await wait(450);
   if(S.hp<=0){
-    await say(`¡${S.name} se desmaya!`);
+    bAnim('P','desmayo');await say(`¡${S.name} se desmaya!`);
     let lost=0;for(const b of Object.values(S.buds)){const l=Math.floor(b.g/2);lost+=l;b.g-=l;}
     for(const k of Object.keys(S.buds))if(S.buds[k].g<.5)delete S.buds[k];
     const lm=Math.round(S.money*.3);S.money-=lm;
@@ -1262,14 +1491,14 @@ async function thiefRound(){
     prompt('Elige un golpe.');
     const m=await menu(['PUÑETAZO','PATADA'],{cls:'battle'});if(m<0)return null;
     const mv=m?{n:'PATADA',acc:.65,d:[8,12]}:{n:'PUÑETAZO',acc:.92,d:[4,7]};
-    await say(`¡${S.name} usa ${mv.n}!`);
-    if(Math.random()<mv.acc){const d=ri(mv.d[0],mv.d[1]);B.flashE=500;sfx('hit');B.hp-=d;bhud();await wait(500);if(m&&d>=11)await say('¡Es muy eficaz!');}
+    await wait(bAnim('P',m?'patada':'golpe')*.6);await say(`¡${S.name} usa ${mv.n}!`);
+    if(Math.random()<mv.acc){const d=ri(mv.d[0],mv.d[1]);bAnim('E','herido');vfxCombate('vfx-golpe',178,40);B.flashE=500;sfx('hit');B.hp-=d;bhud();await wait(500);if(m&&d>=11)await say('¡Es muy eficaz!');}
     else await say('¡Pero falla!');
   }else if(c===1){
     prompt('¿Qué usas?');
     const it=await menu([`SPRAY ×${S.items.spray}`,`BOCATA ×${S.items.bocata}`],{cls:'battle'});if(it<0)return null;
-    if(it===0){if(!S.items.spray){await say('No te queda SPRAY.');return null;}S.items.spray--;await say(`¡${S.name} usa SPRAY DE PIMIENTA!`);B.flashE=700;sfx('hit');B.hp-=ri(12,16);bhud();await wait(500);await say(`¡A ${B.name} le lloran los ojos!`);}
-    else{if(!S.items.bocata){await say('No te quedan BOCATAS.');return null;}S.items.bocata--;S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');bhud();await say(`¡${S.name} se come un BOCATA! Recupera vida.`);}
+    if(it===0){if(!S.items.spray){await say('No te queda SPRAY.');return null;}S.items.spray--;bAnim('P','spray');vfxCombate('vfx-spray',178,48);await say(`¡${S.name} usa SPRAY DE PIMIENTA!`);bAnim('E','herido');B.flashE=700;sfx('hit');B.hp-=ri(12,16);bhud();await wait(500);await say(`¡A ${B.name} le lloran los ojos!`);}
+    else{if(!S.items.bocata){await say('No te quedan BOCATAS.');return null;}S.items.bocata--;bAnim('P','comer');S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');bhud();await say(`¡${S.name} se come un BOCATA! Recupera vida.`);}
   }else if(c===2){
     await say(`${S.name}: «Tranqui, que somos del mismo barrio...»`);
     if(Math.random()<clamp(.25+S.rep/300,.25,.7)){await say(`${B.name}: «Vale, vale... Tú eres el de Maite. Me piro.»`);return 'talk';}
@@ -1279,7 +1508,7 @@ async function thiefRound(){
     await say('¡No puedes escapar!');
   }
   if(B.hp<=0){
-    B.gone=true;await say(`¡${B.name} sale corriendo!`);
+    B.gone=true;bAnim('E','huir');await say(`¡${B.name} sale corriendo!`);
     const loot=ri(20,40)+S.ch*10;S.money+=loot;S.rep+=2;sfx('coin');bhud();
     await say(`Se le cae la cartera: +${eur(loot)}.`);
     if(S.hpMax<60){S.hpMax+=2;S.hp+=2;bhud();await say(`Te sientes más curtido. VIDA máxima: ${S.hpMax}.`);}
@@ -1289,7 +1518,7 @@ async function thiefRound(){
 }
 function confiscate(extraFine=true){
   const g=Math.floor(totalBuds()),fine=extraFine?Math.min(S.money,Math.round(60+S.heat*1.5)):0;
-  S.buds={};S.money-=fine;S.heat=Math.max(0,S.heat-15);return [g,fine];
+  if(B)bAnim('E','multa');S.buds={};S.money-=fine;S.heat=Math.max(0,S.heat-15);return [g,fine];
 }
 async function copRound(){
   const cost=Math.round(40+S.heat*4+totalBuds()*.5);
@@ -1301,7 +1530,7 @@ async function copRound(){
     if(!S.protect&&S.ch>=3&&Math.random()<.15){
       await say(`${B.name}: «¿Me intentas sobornar a mí? Esto me lo quedo.»`);
       const [g,f]=confiscate();S.heat=Math.min(100,S.heat+20);sfx('bad');await say(`Te requisan ${g} g y te multan con ${eur(f)}.`);return 'caught';}
-    S.money-=cost;S.heat=Math.max(0,S.heat-10);sfx('coin');bhud();
+    S.money-=cost;S.heat=Math.max(0,S.heat-10);sfx('coin');bhud();bAnim('E','soborno');
     await say(`${B.name} se guarda el sobre. «Aquí no ha pasado nada.»`);return 'bribe';
   }
   if(c===1){
@@ -1312,7 +1541,7 @@ async function copRound(){
   }
   if(c===2){
     if(Math.random()<.45+(isNight()?.15:0)){sfx('door');S.heat=Math.min(100,S.heat+8);await say('¡Sales corriendo entre los coches y lo pierdes!');return 'flee';}
-    await say(`¡${B.name} te placa contra el suelo!`);
+    bAnim('E','perseguir');await say(`¡${B.name} te placa contra el suelo!`);
     const [g,f]=confiscate();S.hp=Math.max(1,S.hp-5);sfx('hurt');bhud();await say(`Te requisan ${g} g y te multan con ${eur(f)}.`);return 'caught';
   }
   const [g]=confiscate(false);bhud();await say(`Le entregas ${g} g. «Buena decisión. Por esta vez, sin multa.»`);return 'caught';
@@ -1336,25 +1565,31 @@ function renderWorld(now){
   const m=MAPS[S.map],cam=camera();
   ctx.fillStyle='#000';ctx.fillRect(0,0,SW,SH);
   const wf=Math.floor(now/500)%2,tx0=Math.floor(cam.x/16),ty0=Math.floor(cam.y/16);
-  for(let ty=ty0;ty<=ty0+10;ty++)for(let tx=tx0;tx<=tx0+15;tx++){
+  const list=[];
+  for(let ty=ty0;ty<=ty0+11;ty++)for(let tx=tx0;tx<=tx0+15;tx++){
     if(tx<0||ty<0||tx>=m.w||ty>=m.h)continue;
-    const sx=tx*16-cam.x,sy=ty*16-cam.y,a=TILES[m.g[ty][tx]];ctx.drawImage(a[a.length>1?wf:0],sx,sy);
-    const o=m.o[ty][tx];if(o)ctx.drawImage(TILES[o][0],sx,sy);
+    const sx=tx*16-cam.x,sy=ty*16-cam.y,k=m.g[ty][tx],a=TILES[k];
+    if(!arteTile(k,tx,ty,sx,sy,now))ctx.drawImage(a[a.length>1?wf:0],sx,sy);
+    const o=m.o[ty][tx];if(o&&!arteObj(o,tx,ty,cam,now,list))ctx.drawImage(TILES[o][0],sx,sy);
   }
+  arteEdificios(m,cam);
   if(S.map==='home'){
     const x0=7*16-cam.x,y0=3*16-cam.y;
-    ctx.fillStyle='rgba(255,246,214,.13)';ctx.fillRect(x0,y0,64,96);ctx.strokeStyle='#2c3038';ctx.lineWidth=1;ctx.strokeRect(x0+.5,y0+.5,63,95);
-    ctx.fillStyle='#22262e';ctx.fillRect(x0+4,y0-3,56,4);ctx.fillStyle='#fff4c0';ctx.fillRect(x0+6,y0,52,1);
+    if(!arteCarpa(cam)){ctx.fillStyle='rgba(255,246,214,.13)';ctx.fillRect(x0,y0,64,96);ctx.strokeStyle='#2c3038';ctx.lineWidth=1;ctx.strokeRect(x0+.5,y0+.5,63,95);
+    ctx.fillStyle='#22262e';ctx.fillRect(x0+4,y0-3,56,4);ctx.fillStyle='#fff4c0';ctx.fillRect(x0+6,y0,52,1);}
     POTS.forEach(([px,py],i)=>{if(i>=S.potsOwned){ctx.strokeStyle='rgba(60,70,90,.5)';ctx.setLineDash([2,2]);ctx.strokeRect(px*16-cam.x+3.5,py*16-cam.y+9.5,9,6);ctx.setLineDash([]);}});
     if(!S.flags.letter){const lx=3*16-cam.x,ly=6*16-cam.y;ctx.fillStyle='#fafaf2';ctx.fillRect(lx+5,ly+5,7,5);ctx.fillStyle='#c04040';ctx.fillRect(lx+8,ly+7,2,1);}
   }
-  const list=[];
   const fr=(e,dur)=>e.moving&&e.t/dur<.5?1+((e.x+e.y)&1):0;
-  for(const e of ents)list.push([e.py,()=>ctx.drawImage(spriteFor(e.look,e.dir,fr(e,320)),Math.round(e.px-cam.x),Math.round(e.py-cam.y-4))]);
-  list.push([P.py,()=>ctx.drawImage(spriteFor(LOOKS.player,P.dir,P.moving&&P.t/P.dur<.5?1+P.parity:0),Math.round(P.px-cam.x),Math.round(P.py-cam.y-4))]);
-  if(S.map==='home')POTS.forEach(([px,py],i)=>{if(i<S.potsOwned)list.push([py*16,()=>{const p=S.pots[i];ctx.drawImage(p?plantSprite(p):emptyPot,px*16-cam.x,py*16-cam.y-10);}]);});
-  for(const it of ITEMS)if(!it.hidden&&it.map===S.map&&!S.taken[it.id])list.push([it.y*16,()=>ctx.drawImage(bagSprite,it.x*16-cam.x,it.y*16-cam.y)]);
+  if(ARTE.ok)for(const e of ents)ambiente(e,now,cam);
+  for(const e of ents)list.push([e.py,()=>{if(!dibujarPJ(e,e.look,now,cam,false,320))ctx.drawImage(spriteFor(e.look,e.dir,fr(e,320)),Math.round(e.px-cam.x),Math.round(e.py-cam.y-4));}]);
+  list.push([P.py,()=>{if(!dibujarPJ(P,LOOKS.player,now,cam,true,P.dur))ctx.drawImage(spriteFor(LOOKS.player,P.dir,P.moving&&P.t/P.dur<.5?1+P.parity:0),Math.round(P.px-cam.x),Math.round(P.py-cam.y-4));}]);
+  if(S.map==='home')POTS.forEach(([px,py],i)=>{if(i<S.potsOwned)list.push([py*16,()=>{const p=S.pots[i],x=px*16-cam.x,y=py*16-cam.y;if(!artePlanta(p,x,y,now))ctx.drawImage(p?plantSprite(p):emptyPot,x,y-10);}]);});
+  const bolsa=ARTE.ok&&frameDe(ARTE.cubre['misc:bolsa'],'bolsa','unica',0,{i:0});
+  for(const it of ITEMS)if(!it.hidden&&it.map===S.map&&!S.taken[it.id])list.push([it.y*16,()=>{const x=it.x*16-cam.x,y=it.y*16-cam.y;if(bolsa)pinta(bolsa,x+8,y+8);else ctx.drawImage(bagSprite,x,y);}]);
+  arteCriaturas(now,cam,list);
   list.sort((a,b)=>a[0]-b[0]).forEach(o=>o[1]());
+  if(ARTE.ok)pintarVfx(now,cam,S.map);
   const bob=Math.floor(now/400)%2;
   for(const e of ents){const bx=Math.round(e.px-cam.x)+4,by=Math.round(e.py-cam.y)-16+bob;
     if(e.def.client)bubble(bx,by,'$','#2a9a4a');else if(storyMark(e.id))bubble(bx,by,'!','#e03030');}
@@ -1387,12 +1622,16 @@ function makeArt(){
   LAMPS=[];const m=MAPS.town;for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++)if(m.o[y][x]==='lamp')LAMPS.push([x,y]);
 }
 function renderBattle(now){
-  ctx.drawImage(battleBg[B.kind],0,0);
+  if(!arteFondoCombate())ctx.drawImage(battleBg[B.kind],0,0);
   const k=Math.min(1,B.t/700),e=1-Math.pow(1-k,3);
   const ex=Math.round(154-(1-e)*180),px=Math.round(40+(1-e)*190);
-  if(!B.gone&&!(B.flashE>0&&Math.floor(B.flashE/70)%2===0))ctx.drawImage(spriteFor(B.look,'down',0),ex,6,48,60);
+  const fE=combFrame('E',now),fP=combFrame('P',now);
   const sh=B.shakeP>0?Math.round(Math.sin(B.shakeP/18)*3):0;
-  ctx.drawImage(spriteFor(LOOKS.player,'up',0),px+sh,82,48,60);
+  if(fE){if(B.gone&&B.aE&&B.aE.n==='huir')pinta(fE,ex+24+Math.round((now-B.aE.t0)*.12),66);
+    else if(!B.gone&&!(B.flashE>0&&Math.floor(B.flashE/70)%2===0))pinta(fE,ex+24,66);}
+  else if(!B.gone&&!(B.flashE>0&&Math.floor(B.flashE/70)%2===0))ctx.drawImage(spriteFor(B.look,'down',0),ex,6,48,60);
+  if(fP)pinta(fP,px+24+sh,142);else ctx.drawImage(spriteFor(LOOKS.player,'up',0),px+sh,82,48,60);
+  if(ARTE.ok)pintarVfx(now,{x:0,y:0},'*');
 }
 function renderTitle(now){
   const t=now/1000;
@@ -1459,7 +1698,7 @@ function render(now){if(mode==='world'&&S)renderWorld(now);else if(mode==='battl
 let last=performance.now();
 function loop(now){const dt=Math.min(50,now-last);last=now;try{update(dt);render(now);}catch(e){console.error(e);}requestAnimationFrame(loop);}
 function boot(data){
-  buildTiles();makeMisc();buildMaps();computeClientTiles();makeArt();
+  buildTiles();makeMisc();buildMaps();computeClientTiles();makeArt();arteListo();
   try{if(localStorage.getItem('rv_sound')==='0')setSound(false);}catch(e){}
   if(data&&data.S){S=data.S;migrate();enterGame();}else showTitle();
   requestAnimationFrame(loop);

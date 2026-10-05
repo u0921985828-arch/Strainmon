@@ -1,0 +1,3771 @@
+{
+ "version": 1,
+ "descripcion": "Biblia de assets de Ribera Verde para generar sprites con PixelLab sin perder el estilo acordado. La lee Claude Code (comando /sprites) y la comprueba tools/sprites/validar.js.",
+ "estilo": {
+  "pantalla": [
+   240,
+   160
+  ],
+  "tile": 16,
+  "vista": "low top-down",
+  "luz": "arriba-izquierda",
+  "contorno": "single color black outline",
+  "sombreado": "basic shading",
+  "detalle": "medium detail",
+  "proporciones": "chibi",
+  "max_colores_sprite": 15,
+  "paleta": "art/paleta/ribera.png",
+  "paleta_json": "art/paleta/ribera.json",
+  "prompt_base": "16-bit handheld RPG sprite in the style of early-2000s portable console games, chibi proportions with a big head, 3/4 low top-down view, clean 1px dark outline, 3-tone cel shading with light from the top-left, limited flat palette, no anti-aliasing, no gradients, no dithering, transparent background",
+  "prohibido": [
+   "anti-aliasing",
+   "gradients",
+   "soft glow",
+   "realistic proportions",
+   "text or logos",
+   "characters, names or logos from existing games",
+   "minors smoking or near drugs"
+  ]
+ },
+ "celdas": {
+  "tile": {
+   "w": 16,
+   "h": 16,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto"
+  },
+  "tile_bloque": {
+   "w": 32,
+   "h": 32,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "bloque de 2×2 casillas para tiles animados"
+  },
+  "personaje": {
+   "w": 32,
+   "h": 32,
+   "ancla": [
+    16,
+    30
+   ],
+   "ajuste": "pies",
+   "nota": "pies en (16,30); el motor dibuja la celda en (px−8, py−15) para que los pies caigan en la última fila de la casilla"
+  },
+  "combate": {
+   "w": 64,
+   "h": 64,
+   "ancla": [
+    32,
+    62
+   ],
+   "ajuste": "pies"
+  },
+  "planta": {
+   "w": 32,
+   "h": 32,
+   "ancla": [
+    16,
+    31
+   ],
+   "ajuste": "pies"
+  },
+  "objeto_1x1": {
+   "w": 16,
+   "h": 16,
+   "ancla": [
+    8,
+    15
+   ],
+   "ajuste": "pies"
+  },
+  "objeto_alto": {
+   "w": 32,
+   "h": 32,
+   "ancla": [
+    16,
+    31
+   ],
+   "ajuste": "pies"
+  },
+  "carpa": {
+   "w": 64,
+   "h": 112,
+   "ancla": [
+    32,
+    111
+   ],
+   "ajuste": "pies",
+   "nota": "igual que los edificios"
+  },
+  "edificio_7x6": {
+   "w": 112,
+   "h": 96,
+   "ancla": [
+    56,
+    95
+   ],
+   "ajuste": "pies",
+   "nota": "create_map_object con fondo devuelve el lienzo del recorte (con margen); se encaja por la base"
+  },
+  "edificio_6x6": {
+   "w": 96,
+   "h": 96,
+   "ancla": [
+    48,
+    95
+   ],
+   "ajuste": "pies",
+   "nota": "create_map_object con fondo devuelve el lienzo del recorte (con margen); se encaja por la base"
+  },
+  "puerta": {
+   "w": 32,
+   "h": 32,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto"
+  },
+  "icono": {
+   "w": 16,
+   "h": 16,
+   "ancla": [
+    8,
+    8
+   ],
+   "ajuste": "centro"
+  },
+  "cogollo": {
+   "w": 32,
+   "h": 32,
+   "ancla": [
+    16,
+    16
+   ],
+   "ajuste": "centro"
+  },
+  "vfx": {
+   "w": 16,
+   "h": 16,
+   "ancla": [
+    8,
+    15
+   ],
+   "ajuste": "pies"
+  },
+  "vfx_grande": {
+   "w": 32,
+   "h": 32,
+   "ancla": [
+    16,
+    31
+   ],
+   "ajuste": "pies"
+  },
+  "pantalla": {
+   "w": 240,
+   "h": 160,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto"
+  }
+ },
+ "fases": [
+  {
+   "id": "F0",
+   "nombre": "Preparación",
+   "incluye": "MCP, saldo, referencias, paleta, validación del manifiesto"
+  },
+  {
+   "id": "F1",
+   "nombre": "Ancla de estilo",
+   "incluye": "player: base + idle + walk, integración mínima, aprobación a mano"
+  },
+  {
+   "id": "F2",
+   "nombre": "Motor",
+   "incluye": "atlas, animaciones, ambiente, VFX, fallback procedural"
+  },
+  {
+   "id": "F3",
+   "nombre": "Personajes",
+   "incluye": "NPC, clientes, animaciones de ambiente (fumar, etc.), humos y efectos (vfx-16, vfx-32), gaviotas y palomas"
+  },
+  {
+   "id": "F4",
+   "nombre": "Entorno",
+   "incluye": "tiles, interiores, edificios, props, carpa, tiles animados"
+  },
+  {
+   "id": "F4b",
+   "nombre": "Transiciones (opcional)",
+   "incluye": "tilesets Wang + autotiling"
+  },
+  {
+   "id": "F5",
+   "nombre": "Plantas",
+   "incluye": "fases, balanceo, rampa de cogollo por variedad, seca y plaga"
+  },
+  {
+   "id": "F6",
+   "nombre": "Combate",
+   "incluye": "jugador de espaldas, ladrones, policía, fondos"
+  },
+  {
+   "id": "F7",
+   "nombre": "Iconos y título",
+   "incluye": "iconos de objetos, cogollos de la Genoteca, pantalla de título"
+  },
+  {
+   "id": "F8",
+   "nombre": "Pulido y cierre",
+   "incluye": "QA global, capturas, test, build, CHANGELOG"
+  }
+ ],
+ "assets": [
+  {
+   "id": "player",
+   "tipo": "personaje",
+   "fase": "F1",
+   "cubre": [
+    "look:player"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/player_south_x2.png"
+   ],
+   "descripcion": "young adult street grower, green baseball cap with darker green brim, short dark brown hair, light skin, red t-shirt, navy blue jeans, dark sneakers",
+   "colores_identidad": [
+    "#2fa868",
+    "#1a6a40",
+    "#3a2a20",
+    "#f6c8a0",
+    "#e65040",
+    "#36466e",
+    "#26262e"
+   ],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "walk",
+     "herramienta": "animate_character",
+     "plantilla": "walking-4-frames",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": true,
+     "sincronia": "un ciclo cada 2 casillas"
+    },
+    {
+     "nombre": "run",
+     "herramienta": "animate_character",
+     "plantilla": "running-6-frames",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 12,
+     "bucle": true,
+     "sincronia": "un ciclo cada 2 casillas"
+    },
+    {
+     "nombre": "regar",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "watering a potted plant with a small green watering can, water drips from the spout",
+     "frames": 8,
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "plantar",
+     "herramienta": "animate_character",
+     "plantilla": "crouching",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "cosechar",
+     "herramienta": "animate_character",
+     "plantilla": "picking-up",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "cruzar",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "looking into a microscope on a desk and turning the focus knob",
+     "frames": 8,
+     "direcciones": [
+      "north"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "oler",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "lifting a freshly harvested cannabis bud to the nose and smelling it, pleased",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "vender",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "discreetly handing over a small bag and receiving folded banknotes",
+     "frames": 8,
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "telefono",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "checking a mobile phone message",
+     "frames": 6,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "notas": "Es el ancla de estilo: todo lo demás se compara con él. Se aprueba a mano antes de seguir.",
+   "familia": "personaje"
+  },
+  {
+   "id": "kiko",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:kiko",
+    "npc:kiko"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/kiko_south_x2.png"
+   ],
+   "descripcion": "hippie seed hunter in his fifties, long sandy-blond hair and full beard, tanned skin, green shirt, brown trousers, relaxed friendly posture",
+   "colores_identidad": [
+    "#c48a3a",
+    "#e8b088",
+    "#5aa848",
+    "#7a5a3a",
+    "#26262e"
+   ],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "fumar",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "rolling a joint with both hands, lighting it and taking a slow drag, then exhaling",
+     "frames": 12,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "semillas",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "sorting small seed packets on a counter",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "fumar",
+     "semillas"
+    ],
+    "cada_s": [
+     12,
+     30
+    ],
+    "solo_quieto": true
+   },
+   "fumador": {
+    "tipo": "porro",
+    "vfx": "vfx-humo-porro",
+    "frame_humo": 9,
+    "offset_boca": [
+     4,
+     -18
+    ]
+   },
+   "familia": "personaje"
+  },
+  {
+   "id": "josune",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:josune",
+    "npc:josune"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/josune_south_x2.png"
+   ],
+   "descripcion": "bartender woman, black hair in a bun, white shirt with black vest, black trousers",
+   "colores_identidad": [
+    "#2a1a14",
+    "#f0c0a0",
+    "#f4f4f4",
+    "#2a2a30",
+    "#26262e"
+   ],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "secar_vaso",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "wiping a drinking glass with a cloth",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": true
+    },
+    {
+     "nombre": "servir",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "pouring a drink from a bottle",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "secar_vaso",
+     "servir"
+    ],
+    "cada_s": [
+     8,
+     20
+    ],
+    "solo_quieto": true
+   },
+   "familia": "personaje"
+  },
+  {
+   "id": "baltasar",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:baltasar",
+    "npc:baltasar"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/baltasar_south_x2.png"
+   ],
+   "descripcion": "bald loan shark in his sixties, short grey beard, purple suit over a white shirt, gold ring, menacing calm",
+   "colores_identidad": [
+    "#e0aa84",
+    "#9a9aa4",
+    "#4a2a5a",
+    "#e8e8e8",
+    "#2a2030",
+    "#26262e"
+   ],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "puro",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "smoking a thick cigar, puffing slowly",
+     "frames": 10,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "contar",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "counting a stack of banknotes",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "puro",
+     "contar"
+    ],
+    "cada_s": [
+     12,
+     30
+    ],
+    "solo_quieto": true
+   },
+   "fumador": {
+    "tipo": "puro",
+    "vfx": "vfx-humo-puro",
+    "frame_humo": 7,
+    "offset_boca": [
+     5,
+     -17
+    ]
+   },
+   "familia": "personaje"
+  },
+  {
+   "id": "tono",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:tono",
+    "npc:tono"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/tono_south_x2.png"
+   ],
+   "descripcion": "huge bald bodyguard, thick black moustache, black tracksuit, broad shoulders",
+   "colores_identidad": [
+    "#d49a74",
+    "#1a1a1a",
+    "#202024",
+    "#3a3a48",
+    "#26262e"
+   ],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "nudillos",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "cracking knuckles menacingly",
+     "frames": 6,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "fumar",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "smoking a cigarette, taking a drag and exhaling",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "nudillos",
+     "fumar"
+    ],
+    "cada_s": [
+     12,
+     30
+    ],
+    "solo_quieto": true
+   },
+   "fumador": {
+    "tipo": "cigarro",
+    "vfx": "vfx-humo-cigarro",
+    "frame_humo": 6,
+    "offset_boca": [
+     4,
+     -18
+    ]
+   },
+   "familia": "personaje"
+  },
+  {
+   "id": "begona",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:begona",
+    "npc:begona"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/begona_south_x2.png"
+   ],
+   "descripcion": "middle-aged neighbour woman, curly auburn hair, pink blouse, violet trousers",
+   "colores_identidad": [
+    "#8a4a2a",
+    "#f6cca8",
+    "#e078a8",
+    "#5a5a9a",
+    "#26262e"
+   ],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "walk",
+     "herramienta": "animate_character",
+     "plantilla": "walking-4-frames",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": true,
+     "sincronia": "un ciclo cada 2 casillas"
+    },
+    {
+     "nombre": "cotillear",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "chatting animatedly with expressive hand gestures",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "cotillear"
+    ],
+    "cada_s": [
+     15,
+     35
+    ],
+    "solo_quieto": true
+   },
+   "familia": "personaje"
+  },
+  {
+   "id": "unai",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:kid",
+    "npc:unai"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/kid_south_x2.png"
+   ],
+   "descripcion": "young boy around ten, short black hair, yellow t-shirt, blue shorts, energetic",
+   "colores_identidad": [
+    "#2a2a2a",
+    "#f6cca8",
+    "#f0c838",
+    "#4a6aa8",
+    "#26262e"
+   ],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "walk",
+     "herramienta": "animate_character",
+     "plantilla": "walking-4-frames",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": true,
+     "sincronia": "un ciclo cada 2 casillas"
+    },
+    {
+     "nombre": "pelota",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "bouncing a small ball with his foot",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": true
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "pelota"
+    ],
+    "cada_s": [
+     10,
+     25
+    ],
+    "solo_quieto": true
+   },
+   "menor": true,
+   "familia": "personaje"
+  },
+  {
+   "id": "patxi",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:oldman",
+    "npc:patxi"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/oldman_south_x2.png"
+   ],
+   "descripcion": "old man, bald with a white beard, beige jacket, brown trousers, wooden walking cane",
+   "colores_identidad": [
+    "#e8b894",
+    "#d8d8d8",
+    "#b8a070",
+    "#5a5048",
+    "#26262e"
+   ],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "palomas",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "throwing breadcrumbs to the ground for pigeons",
+     "frames": 8,
+     "direcciones": [
+      "north",
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "palomas"
+    ],
+    "cada_s": [
+     10,
+     25
+    ],
+    "solo_quieto": true
+   },
+   "familia": "personaje"
+  },
+  {
+   "id": "txaro",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:granny",
+    "npc:txaro"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/granny_south_x2.png"
+   ],
+   "descripcion": "elderly woman, grey hair in a bun, round glasses, purple cardigan, dark skirt",
+   "colores_identidad": [
+    "#f0c8a8",
+    "#e0e0e8",
+    "#8a5aa8",
+    "#4a3a5a",
+    "#26262e"
+   ],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "punto",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "knitting with two needles",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": true
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "punto"
+    ],
+    "cada_s": [
+     6,
+     15
+    ],
+    "solo_quieto": true
+   },
+   "familia": "personaje"
+  },
+  {
+   "id": "inaki",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:sailor",
+    "npc:inaki"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/sailor_south_x2.png"
+   ],
+   "descripcion": "weathered sailor, navy cap with a white band, white sweater with blue stripes, brown beard, navy trousers",
+   "colores_identidad": [
+    "#d8a07a",
+    "#5a3a24",
+    "#24346a",
+    "#f4f4f4",
+    "#3050a0",
+    "#26262e"
+   ],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "pipa",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "smoking a wooden pipe, puffing",
+     "frames": 8,
+     "direcciones": [
+      "west",
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "cabo",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "coiling a rope",
+     "frames": 8,
+     "direcciones": [
+      "west"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "pipa",
+     "cabo"
+    ],
+    "cada_s": [
+     12,
+     30
+    ],
+    "solo_quieto": true
+   },
+   "fumador": {
+    "tipo": "pipa",
+    "vfx": "vfx-humo-pipa",
+    "frame_humo": 6,
+    "offset_boca": [
+     -5,
+     -17
+    ]
+   },
+   "familia": "personaje"
+  },
+  {
+   "id": "cop",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:cop",
+    "npc:cop"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/cop_south_x2.png"
+   ],
+   "descripcion": "police officer, navy peaked cap, light blue shirt, navy tie and trousers, radio on the shoulder",
+   "colores_identidad": [
+    "#eab890",
+    "#2a2a2a",
+    "#1e2a5a",
+    "#0e1430",
+    "#8ab0e0",
+    "#26262e"
+   ],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "walk",
+     "herramienta": "animate_character",
+     "plantilla": "walking-4-frames",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": true,
+     "sincronia": "un ciclo cada 2 casillas"
+    },
+    {
+     "nombre": "radio",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "talking into a shoulder radio",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "radio"
+    ],
+    "cada_s": [
+     15,
+     35
+    ],
+    "solo_quieto": true
+   },
+   "familia": "personaje"
+  },
+  {
+   "id": "molina",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:molina",
+    "npc:molina"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/molina_south_x2.png"
+   ],
+   "descripcion": "corrupt police sergeant with a belly, navy cap with a gold band, darker blue shirt with a gold badge, grey moustache, smug",
+   "colores_identidad": [
+    "#dca07c",
+    "#4a4a4a",
+    "#1e2a5a",
+    "#f0c040",
+    "#6a8ac0",
+    "#3a3a3a",
+    "#26262e"
+   ],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "fumar",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "leaning back and smoking a cigarette, smug exhale",
+     "frames": 10,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "fumar"
+    ],
+    "cada_s": [
+     12,
+     30
+    ],
+    "solo_quieto": true
+   },
+   "fumador": {
+    "tipo": "cigarro",
+    "vfx": "vfx-humo-cigarro",
+    "frame_humo": 7,
+    "offset_boca": [
+     4,
+     -18
+    ]
+   },
+   "familia": "personaje"
+  },
+  {
+   "id": "darko",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:darko",
+    "npc:darko"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/darko_south_x2.png"
+   ],
+   "descripcion": "cocky young rival, black hoodie with the hood up and red drawstrings, dark trousers, smirk",
+   "colores_identidad": [
+    "#f2c4a0",
+    "#101014",
+    "#202024",
+    "#c02828",
+    "#303038",
+    "#26262e"
+   ],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "vapear",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "vaping and blowing a big cloud of vapor",
+     "frames": 10,
+     "direcciones": [
+      "south",
+      "north"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "vapear"
+    ],
+    "cada_s": [
+     10,
+     22
+    ],
+    "solo_quieto": true
+   },
+   "fumador": {
+    "tipo": "vaper",
+    "vfx": "vfx-nube-vaper",
+    "frame_humo": 6,
+    "offset_boca": [
+     4,
+     -18
+    ]
+   },
+   "familia": "personaje"
+  },
+  {
+   "id": "jurado",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:judge",
+    "npc:jurado"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/judge_south_x2.png"
+   ],
+   "descripcion": "competition judge, short brown hair, glasses, charcoal suit, gold tie, holding a clipboard",
+   "colores_identidad": [
+    "#f0c4a0",
+    "#6a4a2a",
+    "#3a3a48",
+    "#c0a040",
+    "#2a2a34",
+    "#26262e"
+   ],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "notas",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "writing notes on a clipboard",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "notas"
+    ],
+    "cada_s": [
+     12,
+     30
+    ],
+    "solo_quieto": true
+   },
+   "familia": "personaje"
+  },
+  {
+   "id": "cliente1",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:cliente1"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/cliente1_south_x2.png"
+   ],
+   "descripcion": "ordinary townsperson in casual clothes, varied hairstyle (see reference image for colours)",
+   "colores_identidad": [],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "walk",
+     "herramienta": "animate_character",
+     "plantilla": "walking-4-frames",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": true,
+     "sincronia": "un ciclo cada 2 casillas"
+    },
+    {
+     "nombre": "movil",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "checking a mobile phone",
+     "frames": 6,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "movil"
+    ],
+    "cada_s": [
+     12,
+     30
+    ],
+    "solo_quieto": true
+   },
+   "notas": "Variantes de cliente: los colores salen de la referencia (randLook). Usa reference_image y create_character con mode v3 si el modo standard cambia demasiado los colores.",
+   "familia": "personaje"
+  },
+  {
+   "id": "cliente2",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:cliente2"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/cliente2_south_x2.png"
+   ],
+   "descripcion": "ordinary townsperson in casual clothes, varied hairstyle (see reference image for colours)",
+   "colores_identidad": [],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "walk",
+     "herramienta": "animate_character",
+     "plantilla": "walking-4-frames",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": true,
+     "sincronia": "un ciclo cada 2 casillas"
+    },
+    {
+     "nombre": "fumar",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "smoking a cigarette, taking a drag and exhaling",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "fumar"
+    ],
+    "cada_s": [
+     12,
+     30
+    ],
+    "solo_quieto": true
+   },
+   "fumador": {
+    "tipo": "cigarro",
+    "vfx": "vfx-humo-cigarro",
+    "frame_humo": 6,
+    "offset_boca": [
+     4,
+     -18
+    ]
+   },
+   "notas": "Variantes de cliente: los colores salen de la referencia (randLook). Usa reference_image y create_character con mode v3 si el modo standard cambia demasiado los colores.",
+   "familia": "personaje"
+  },
+  {
+   "id": "cliente3",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:cliente3"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/cliente3_south_x2.png"
+   ],
+   "descripcion": "ordinary townsperson in casual clothes, varied hairstyle (see reference image for colours)",
+   "colores_identidad": [],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "walk",
+     "herramienta": "animate_character",
+     "plantilla": "walking-4-frames",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": true,
+     "sincronia": "un ciclo cada 2 casillas"
+    },
+    {
+     "nombre": "movil",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "checking a mobile phone",
+     "frames": 6,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "movil"
+    ],
+    "cada_s": [
+     12,
+     30
+    ],
+    "solo_quieto": true
+   },
+   "notas": "Variantes de cliente: los colores salen de la referencia (randLook). Usa reference_image y create_character con mode v3 si el modo standard cambia demasiado los colores.",
+   "familia": "personaje"
+  },
+  {
+   "id": "cliente4",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:cliente4"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/cliente4_south_x2.png"
+   ],
+   "descripcion": "ordinary townsperson in casual clothes, varied hairstyle (see reference image for colours)",
+   "colores_identidad": [],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "walk",
+     "herramienta": "animate_character",
+     "plantilla": "walking-4-frames",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": true,
+     "sincronia": "un ciclo cada 2 casillas"
+    },
+    {
+     "nombre": "movil",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "checking a mobile phone",
+     "frames": 6,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "movil"
+    ],
+    "cada_s": [
+     12,
+     30
+    ],
+    "solo_quieto": true
+   },
+   "notas": "Variantes de cliente: los colores salen de la referencia (randLook). Usa reference_image y create_character con mode v3 si el modo standard cambia demasiado los colores.",
+   "familia": "personaje"
+  },
+  {
+   "id": "cliente5",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:cliente5"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/cliente5_south_x2.png"
+   ],
+   "descripcion": "ordinary townsperson in casual clothes, varied hairstyle (see reference image for colours)",
+   "colores_identidad": [],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "walk",
+     "herramienta": "animate_character",
+     "plantilla": "walking-4-frames",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": true,
+     "sincronia": "un ciclo cada 2 casillas"
+    },
+    {
+     "nombre": "fumar",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "smoking a cigarette, taking a drag and exhaling",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "fumar"
+    ],
+    "cada_s": [
+     12,
+     30
+    ],
+    "solo_quieto": true
+   },
+   "fumador": {
+    "tipo": "cigarro",
+    "vfx": "vfx-humo-cigarro",
+    "frame_humo": 6,
+    "offset_boca": [
+     4,
+     -18
+    ]
+   },
+   "notas": "Variantes de cliente: los colores salen de la referencia (randLook). Usa reference_image y create_character con mode v3 si el modo standard cambia demasiado los colores.",
+   "familia": "personaje"
+  },
+  {
+   "id": "cliente6",
+   "tipo": "personaje",
+   "fase": "F3",
+   "cubre": [
+    "look:cliente6"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 32,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/cliente6_south_x2.png"
+   ],
+   "descripcion": "ordinary townsperson in casual clothes, varied hairstyle (see reference image for colours)",
+   "colores_identidad": [],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "walk",
+     "herramienta": "animate_character",
+     "plantilla": "walking-4-frames",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": true,
+     "sincronia": "un ciclo cada 2 casillas"
+    },
+    {
+     "nombre": "movil",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "checking a mobile phone",
+     "frames": 6,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "ambiente": {
+    "acciones": [
+     "movil"
+    ],
+    "cada_s": [
+     12,
+     30
+    ],
+    "solo_quieto": true
+   },
+   "notas": "Variantes de cliente: los colores salen de la referencia (randLook). Usa reference_image y create_character con mode v3 si el modo standard cambia demasiado los colores.",
+   "familia": "personaje"
+  },
+  {
+   "id": "player-combate",
+   "tipo": "combate",
+   "fase": "F6",
+   "cubre": [
+    "combate:espalda:player"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "v3",
+    "size": 64,
+    "view": "low top-down",
+    "outline": "single color black outline",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/procesado/player/base/south/00.png",
+    "art/referencias/estilo/player_south_x2.png"
+   ],
+   "descripcion": "young adult street grower, green baseball cap with darker green brim, short dark brown hair, light skin, red t-shirt, navy blue jeans, dark sneakers, battle stance",
+   "celda": "combate",
+   "colores_identidad": [
+    "#2fa868",
+    "#1a6a40",
+    "#3a2a20",
+    "#f6c8a0",
+    "#e65040",
+    "#36466e",
+    "#26262e"
+   ],
+   "notas": "Se usa la dirección north (de espaldas). Dos pasos para no perder la identidad: create_image_pro con el sprite aprobado como referencia (16 candidatos a 64 px, con detalle real, no un ×2) y create_character v3 con el elegido, que lo rota a 8 direcciones y queda animable.",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "fight-stance-idle-8-frames",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 8,
+     "bucle": true
+    },
+    {
+     "nombre": "golpe",
+     "herramienta": "animate_character",
+     "plantilla": "cross-punch",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "patada",
+     "herramienta": "animate_character",
+     "plantilla": "high-kick",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "spray",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "spraying pepper spray forward from a small can",
+     "frames": 8,
+     "direcciones": [
+      "north"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "comer",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "eating a sandwich quickly",
+     "frames": 6,
+     "direcciones": [
+      "north"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "herido",
+     "herramienta": "animate_character",
+     "plantilla": "taking-punch",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 10,
+     "bucle": false
+    },
+    {
+     "nombre": "desmayo",
+     "herramienta": "animate_character",
+     "plantilla": "falling-back-death",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "pendiente",
+   "familia": "personaje",
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 64,
+     "height": 64,
+     "no_background": true,
+     "description": "young adult street grower, green baseball cap with darker green brim, short dark brown hair, light skin, red t-shirt, navy blue jeans, dark sneakers, battle stance, full body, front view, same outfit and colors"
+    },
+    "entrada": {
+     "reference_images": [
+      {
+       "archivo": "art/procesado/player/base/south/00.png",
+       "usage": "character base: same person, outfit and colors"
+      }
+     ]
+    },
+    "elegir": "1 de los 16 candidatos",
+    "guarda": "art/crudo/_ref/player-combate.png"
+   },
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/player-combate.png"
+   },
+   "depende_de": [
+    "player"
+   ]
+  },
+  {
+   "id": "ladron1-combate",
+   "tipo": "combate",
+   "fase": "F6",
+   "cubre": [
+    "look:ladron1",
+    "combate:frente:ladron"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 64,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"cartoon\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/ladron1_south_x2.png"
+   ],
+   "descripcion": "street thief in a dark grey hoodie with the hood up, scarf over the mouth, menacing stance",
+   "celda": "combate",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "fight-stance-idle-8-frames",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": true
+    },
+    {
+     "nombre": "ataque",
+     "herramienta": "animate_character",
+     "plantilla": "lead-jab",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "herido",
+     "herramienta": "animate_character",
+     "plantilla": "taking-punch",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 10,
+     "bucle": false
+    },
+    {
+     "nombre": "huir",
+     "herramienta": "animate_character",
+     "plantilla": "running-6-frames",
+     "direcciones": [
+      "east"
+     ],
+     "fps": 12,
+     "bucle": true
+    }
+   ],
+   "estado": "pendiente",
+   "familia": "personaje"
+  },
+  {
+   "id": "ladron2-combate",
+   "tipo": "combate",
+   "fase": "F6",
+   "cubre": [
+    "look:ladron2",
+    "combate:frente:ladron"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 64,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"cartoon\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/ladron2_south_x2.png"
+   ],
+   "descripcion": "street thief in a dark purple hoodie with the hood up, scarf over the mouth, menacing stance",
+   "celda": "combate",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "fight-stance-idle-8-frames",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": true
+    },
+    {
+     "nombre": "ataque",
+     "herramienta": "animate_character",
+     "plantilla": "lead-jab",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "herido",
+     "herramienta": "animate_character",
+     "plantilla": "taking-punch",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 10,
+     "bucle": false
+    },
+    {
+     "nombre": "huir",
+     "herramienta": "animate_character",
+     "plantilla": "running-6-frames",
+     "direcciones": [
+      "east"
+     ],
+     "fps": 12,
+     "bucle": true
+    }
+   ],
+   "estado": "pendiente",
+   "familia": "personaje"
+  },
+  {
+   "id": "ladron3-combate",
+   "tipo": "combate",
+   "fase": "F6",
+   "cubre": [
+    "look:ladron3",
+    "combate:frente:ladron"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "standard",
+    "n_directions": 4,
+    "size": 64,
+    "view": "low top-down",
+    "proportions": "{\"type\": \"preset\", \"name\": \"cartoon\"}",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/ladron3_south_x2.png"
+   ],
+   "descripcion": "street thief in a dark green hoodie with the hood up, scarf over the mouth, menacing stance",
+   "celda": "combate",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "fight-stance-idle-8-frames",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": true
+    },
+    {
+     "nombre": "ataque",
+     "herramienta": "animate_character",
+     "plantilla": "lead-jab",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "herido",
+     "herramienta": "animate_character",
+     "plantilla": "taking-punch",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 10,
+     "bucle": false
+    },
+    {
+     "nombre": "huir",
+     "herramienta": "animate_character",
+     "plantilla": "running-6-frames",
+     "direcciones": [
+      "east"
+     ],
+     "fps": 12,
+     "bucle": true
+    }
+   ],
+   "estado": "pendiente",
+   "familia": "personaje"
+  },
+  {
+   "id": "policia-combate",
+   "tipo": "combate",
+   "fase": "F6",
+   "cubre": [
+    "combate:frente:policia"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "v3",
+    "size": 64,
+    "view": "low top-down",
+    "outline": "single color black outline",
+    "detail": "medium detail"
+   },
+   "referencias": [
+    "art/referencias/estilo/cop_south_x2.png"
+   ],
+   "descripcion": "police officer, navy peaked cap, light blue shirt, navy tie, notebook in hand, stern",
+   "celda": "combate",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "plantilla": "breathing-idle",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "alto",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "pointing a finger forward and shouting stop",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 10,
+     "bucle": false
+    },
+    {
+     "nombre": "multa",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "writing a fine in a small notebook",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "soborno",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "glancing around and slipping an envelope into the pocket",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "perseguir",
+     "herramienta": "animate_character",
+     "plantilla": "running-6-frames",
+     "direcciones": [
+      "east"
+     ],
+     "fps": 12,
+     "bucle": true
+    }
+   ],
+   "estado": "pendiente",
+   "familia": "personaje",
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 64,
+     "height": 64,
+     "no_background": true,
+     "description": "police officer, navy peaked cap, light blue shirt, navy tie, notebook in hand, stern, full body, front view, same outfit and colors"
+    },
+    "entrada": {
+     "reference_images": [
+      {
+       "archivo": "art/procesado/cop/base/south/00.png",
+       "usage": "character base: same person, outfit and colors"
+      }
+     ]
+    },
+    "elegir": "1 de los 16 candidatos",
+    "guarda": "art/crudo/_ref/policia-combate.png"
+   },
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/policia-combate.png"
+   },
+   "depende_de": [
+    "cop"
+   ],
+   "notas": "Dos pasos para no perder la identidad: create_image_pro con el sprite aprobado como referencia (16 candidatos a 64 px, con detalle real, no un ×2) y create_character v3 con el elegido, que lo rota a 8 direcciones y queda animable."
+  },
+  {
+   "id": "fondo-combate-ladron",
+   "tipo": "fondo",
+   "fase": "F6",
+   "cubre": [
+    "combate:fondo-ladron"
+   ],
+   "herramienta": "create_image_pixflux",
+   "parametros": {
+    "width": 240,
+    "height": 160,
+    "no_background": false,
+    "view": "side",
+    "outline": "lineless",
+    "shading": "medium shading",
+    "detail": "medium detail",
+    "init_image_strength": 150
+   },
+   "referencias": [
+    "art/referencias/combate/fondo-ladron.png"
+   ],
+   "entrada": {
+    "init_image_base64": "art/referencias/combate/fondo-ladron.png",
+    "color_image_base64": "art/paleta/ribera.png"
+   },
+   "descripcion": "dark city alley at night, brick walls, lit windows, wet asphalt ground, empty foreground, 16-bit handheld battle background, two flat oval ground platforms (top right and bottom left)",
+   "celda": "pantalla",
+   "estado": "pendiente",
+   "familia": "imagen",
+   "notas": "img2img: init_image = el fondo actual (mantiene horizonte y plataformas donde el motor pone a los luchadores); init_image_strength 150 deja redibujar con detalle sin mover la composición."
+  },
+  {
+   "id": "fondo-combate-policia",
+   "tipo": "fondo",
+   "fase": "F6",
+   "cubre": [
+    "combate:fondo-policia"
+   ],
+   "herramienta": "create_image_pixflux",
+   "parametros": {
+    "width": 240,
+    "height": 160,
+    "no_background": false,
+    "view": "side",
+    "outline": "lineless",
+    "shading": "medium shading",
+    "detail": "medium detail",
+    "init_image_strength": 150
+   },
+   "referencias": [
+    "art/referencias/combate/fondo-policia.png"
+   ],
+   "entrada": {
+    "init_image_base64": "art/referencias/combate/fondo-policia.png",
+    "color_image_base64": "art/paleta/ribera.png"
+   },
+   "descripcion": "sunny city street by day, building facades, sidewalk and asphalt ground, empty foreground, 16-bit handheld battle background, two flat oval ground platforms (top right and bottom left)",
+   "celda": "pantalla",
+   "estado": "pendiente",
+   "familia": "imagen",
+   "notas": "img2img: init_image = el fondo actual (mantiene horizonte y plataformas donde el motor pone a los luchadores); init_image_strength 150 deja redibujar con detalle sin mover la composición."
+  },
+  {
+   "id": "tiles-exterior",
+   "tipo": "tiles",
+   "fase": "F4",
+   "herramienta": "create_tiles_pro",
+   "cubre": [
+    "tile:grass",
+    "tile:flowers",
+    "tile:tallgrass",
+    "tile:dirt",
+    "tile:walk",
+    "tile:roadT",
+    "tile:roadB",
+    "tile:plaza",
+    "tile:water",
+    "tile:bridgeT",
+    "tile:bridgeB",
+    "tile:dock"
+   ],
+   "parametros": {
+    "tile_type": "square_topdown",
+    "tile_size": 16,
+    "tile_view": "top-down",
+    "style_options": "{\"color_palette\": true, \"outline\": true, \"detail\": true, \"shading\": true}"
+   },
+   "referencias": [
+    "art/referencias/tiles/grass.png",
+    "art/referencias/tiles/flowers.png",
+    "art/referencias/tiles/tallgrass.png",
+    "art/referencias/tiles/dirt.png",
+    "art/referencias/tiles/walk.png",
+    "art/referencias/tiles/roadT.png",
+    "art/referencias/tiles/roadB.png",
+    "art/referencias/tiles/plaza.png",
+    "art/referencias/tiles/water_f0.png",
+    "art/referencias/tiles/water_f1.png",
+    "art/referencias/tiles/bridgeT.png",
+    "art/referencias/tiles/bridgeB.png",
+    "art/referencias/tiles/dock.png"
+   ],
+   "descripcion": "1). short green grass with small tufts 2). grass with tiny red, yellow and white flowers 3). dense tall grass blades 4). packed dirt path 5). light paving stone sidewalk 6). asphalt road, dark curb along the top edge, yellow dashed line along the bottom edge 7). asphalt road, dark curb along the bottom edge 8). warm beige square stone plaza 9). calm river water with small ripples 10). wooden bridge planks with a rail along the top 11). wooden bridge planks with a rail along the bottom 12). wooden pier planks",
+   "entrada": {
+    "style_images": [
+     "art/referencias/tiles/grass.png",
+     "art/referencias/tiles/walk.png",
+     "art/referencias/tiles/plaza.png",
+     "art/referencias/tiles/dirt.png"
+    ]
+   },
+   "celda": "tile",
+   "notas": "Cada tile tiene que ser repetible (bordes que casan): revísalo en mosaico 3×3. Las animaciones se hacen sobre un bloque de 2×2 casillas (tile_bloque) y el motor pinta el cuadrante que toca según (x%2, y%2).",
+   "estado": "pendiente",
+   "animaciones": [
+    {
+     "nombre": "agua",
+     "herramienta": "animate_image",
+     "accion": "calm river water gently rippling, seamless loop",
+     "frames": 4,
+     "fps": 4,
+     "bucle": true,
+     "sobre": "tile:water",
+     "lienzo": [
+      32,
+      32
+     ],
+     "celda": "tile_bloque"
+    },
+    {
+     "nombre": "flores",
+     "herramienta": "animate_image",
+     "accion": "tiny flowers swaying in the breeze",
+     "frames": 4,
+     "fps": 3,
+     "bucle": true,
+     "sobre": "tile:flowers",
+     "lienzo": [
+      32,
+      32
+     ],
+     "celda": "tile_bloque"
+    },
+    {
+     "nombre": "hierba-pisada",
+     "herramienta": "animate_image",
+     "accion": "tall grass rustling as someone steps in",
+     "frames": 4,
+     "fps": 12,
+     "bucle": false,
+     "sobre": "tile:tallgrass",
+     "lienzo": [
+      32,
+      32
+     ],
+     "celda": "tile_bloque"
+    }
+   ],
+   "familia": "mapa-terreno"
+  },
+  {
+   "id": "tileset-transiciones",
+   "tipo": "tileset",
+   "fase": "F4b",
+   "opcional": true,
+   "herramienta": "create_topdown_tileset",
+   "cubre": [],
+   "parametros": {
+    "mode": "standard",
+    "tile_size": {
+     "width": 16,
+     "height": 16
+    },
+    "view": "low top-down",
+    "outline": "single color outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+   },
+   "descripcion": "Tres juegos Wang de 16 px encadenados por la misma hierba (upper_base_tile_id), para que las tres orillas compartan el mismo tile de hierba.",
+   "notas": "Opcional: necesita autotiling por esquinas en el motor (ver docs/PIXELLAB.md, fase F4b).",
+   "celda": "tile",
+   "estado": "pendiente",
+   "familia": "mapa-terreno",
+   "llamadas": [
+    {
+     "id": "wang-agua-hierba",
+     "lower_description": "calm blue river water",
+     "upper_description": "short green grass",
+     "transition_size": 0.25,
+     "transition_description": "grassy riverbank with a thin wet edge",
+     "guarda_base": "hierba"
+    },
+    {
+     "id": "wang-tierra-hierba",
+     "lower_description": "packed brown dirt path",
+     "upper_description": "short green grass",
+     "transition_size": 0.25,
+     "upper_base_tile_id": "<hierba de wang-agua-hierba>"
+    },
+    {
+     "id": "wang-plaza-hierba",
+     "lower_description": "light grey stone plaza pavement",
+     "upper_description": "short green grass",
+     "transition_size": 0,
+     "upper_base_tile_id": "<hierba de wang-agua-hierba>"
+    }
+   ]
+  },
+  {
+   "id": "interior-home",
+   "tipo": "tiles",
+   "fase": "F4",
+   "herramienta": "create_building_kit",
+   "cubre": [
+    "tile:floor",
+    "tile:iwT_home",
+    "tile:iwB_home"
+   ],
+   "parametros": {
+    "wall_description": "cream wallpaper walls with thin vertical stripes",
+    "floor_description": "light wooden plank floor",
+    "tile_type": "square_topdown",
+    "tile_size": 16,
+    "wall_tiles": 2,
+    "layout": "materials"
+   },
+   "referencias": [
+    "art/referencias/tiles/iwT_home.png",
+    "art/referencias/tiles/iwB_home.png",
+    "art/referencias/tiles/floor.png"
+   ],
+   "descripcion": "cream wallpaper walls with thin vertical stripes and light wooden plank floor",
+   "celda": "tile",
+   "estado": "pendiente",
+   "familia": "mapa-terreno"
+  },
+  {
+   "id": "interior-shop",
+   "tipo": "tiles",
+   "fase": "F4",
+   "herramienta": "create_building_kit",
+   "cubre": [
+    "tile:floorS",
+    "tile:iwT_shop",
+    "tile:iwB_shop"
+   ],
+   "parametros": {
+    "wall_description": "mint green wallpaper walls",
+    "floor_description": "light checkered shop floor tiles",
+    "tile_type": "square_topdown",
+    "tile_size": 16,
+    "wall_tiles": 2,
+    "layout": "materials"
+   },
+   "referencias": [
+    "art/referencias/tiles/iwT_shop.png",
+    "art/referencias/tiles/iwB_shop.png",
+    "art/referencias/tiles/floorS.png"
+   ],
+   "descripcion": "mint green wallpaper walls and light checkered shop floor tiles",
+   "celda": "tile",
+   "estado": "pendiente",
+   "familia": "mapa-terreno"
+  },
+  {
+   "id": "interior-bar",
+   "tipo": "tiles",
+   "fase": "F4",
+   "herramienta": "create_building_kit",
+   "cubre": [
+    "tile:floorB",
+    "tile:iwT_bar",
+    "tile:iwB_bar"
+   ],
+   "parametros": {
+    "wall_description": "dark wood panel walls",
+    "floor_description": "dark wooden plank floor",
+    "tile_type": "square_topdown",
+    "tile_size": 16,
+    "wall_tiles": 2,
+    "layout": "materials"
+   },
+   "referencias": [
+    "art/referencias/tiles/iwT_bar.png",
+    "art/referencias/tiles/iwB_bar.png",
+    "art/referencias/tiles/floorB.png"
+   ],
+   "descripcion": "dark wood panel walls and dark wooden plank floor",
+   "celda": "tile",
+   "estado": "pendiente",
+   "familia": "mapa-terreno"
+  },
+  {
+   "id": "tiles-interior-extra",
+   "tipo": "tiles",
+   "fase": "F4",
+   "herramienta": "create_tiles_pro",
+   "cubre": [
+    "tile:mat",
+    "tile:tent"
+   ],
+   "parametros": {
+    "tile_type": "square_topdown",
+    "tile_size": 16,
+    "tile_view": "top-down"
+   },
+   "referencias": [
+    "art/referencias/tiles/mat.png",
+    "art/referencias/tiles/tent.png"
+   ],
+   "entrada": {
+    "style_images": [
+     "art/referencias/tiles/mat.png",
+     "art/referencias/tiles/tent.png"
+    ]
+   },
+   "descripcion": "1). red door mat on wooden floor 2). reflective silver mylar grow tent floor",
+   "celda": "tile",
+   "estado": "pendiente",
+   "familia": "mapa-terreno"
+  },
+  {
+   "id": "edificio-home",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "create_map_object",
+   "cubre": [
+    "tile:roofT_home",
+    "tile:roofB_home",
+    "tile:wall_home",
+    "tile:win_home",
+    "tile:door_home"
+   ],
+   "parametros": {
+    "view": "high top-down",
+    "outline": "single color outline",
+    "shading": "basic shading",
+    "detail": "medium detail",
+    "inpainting": "{\"type\": \"mask\", \"mask_image\": \"<entrada.inpainting.mask_image en base64>\"}"
+   },
+   "referencias": [
+    "art/referencias/tiles/roofT_home.png",
+    "art/referencias/tiles/wall_home.png"
+   ],
+   "descripcion": "small two-storey town building seen from a high top-down angle, red tiled roof, cream walls, white-framed windows, wooden door, a small brass number plate",
+   "celda": "edificio_7x6",
+   "notas": "Se dibuja como un solo objeto encima de las casillas del edificio; las colisiones siguen siendo las del mapa. La puerta tiene que caer en la columna de la puerta del mapa. Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
+   "estado": "pendiente",
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "herramienta": "animate_image",
+     "accion": "the door swings open",
+     "frames": 4,
+     "fps": 12,
+     "bucle": false,
+     "recorte": "bloque de 32×32 recortado del edificio con la puerta centrada abajo",
+     "lienzo": [
+      32,
+      32
+     ],
+     "celda": "puerta"
+    }
+   ],
+   "familia": "mapa-objeto",
+   "entrada": {
+    "background_image": "art/referencias/mapa/edificio-home.png",
+    "inpainting.mask_image": "art/referencias/mapa/edificio-home_mascara.png"
+   },
+   "depende_de": [
+    "tiles-exterior"
+   ]
+  },
+  {
+   "id": "edificio-shop",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "create_map_object",
+   "cubre": [
+    "tile:roofT_shop",
+    "tile:roofB_shop",
+    "tile:wall_shop",
+    "tile:win_shop",
+    "tile:door_shop"
+   ],
+   "parametros": {
+    "view": "high top-down",
+    "outline": "single color outline",
+    "shading": "basic shading",
+    "detail": "medium detail",
+    "inpainting": "{\"type\": \"mask\", \"mask_image\": \"<entrada.inpainting.mask_image en base64>\"}"
+   },
+   "referencias": [
+    "art/referencias/tiles/roofT_shop.png",
+    "art/referencias/tiles/wall_shop.png"
+   ],
+   "descripcion": "small two-storey town building seen from a high top-down angle, green tiled roof, pale green walls, white-framed windows, glass shop door, a green cross sign and seed posters in the windows",
+   "celda": "edificio_7x6",
+   "notas": "Se dibuja como un solo objeto encima de las casillas del edificio; las colisiones siguen siendo las del mapa. La puerta tiene que caer en la columna de la puerta del mapa. Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
+   "estado": "pendiente",
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "herramienta": "animate_image",
+     "accion": "the door swings open",
+     "frames": 4,
+     "fps": 12,
+     "bucle": false,
+     "recorte": "bloque de 32×32 recortado del edificio con la puerta centrada abajo",
+     "lienzo": [
+      32,
+      32
+     ],
+     "celda": "puerta"
+    }
+   ],
+   "familia": "mapa-objeto",
+   "entrada": {
+    "background_image": "art/referencias/mapa/edificio-shop.png",
+    "inpainting.mask_image": "art/referencias/mapa/edificio-shop_mascara.png"
+   },
+   "depende_de": [
+    "tiles-exterior"
+   ]
+  },
+  {
+   "id": "edificio-bar",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "create_map_object",
+   "cubre": [
+    "tile:roofT_bar",
+    "tile:roofB_bar",
+    "tile:wall_bar",
+    "tile:win_bar",
+    "tile:door_bar"
+   ],
+   "parametros": {
+    "view": "high top-down",
+    "outline": "single color outline",
+    "shading": "basic shading",
+    "detail": "medium detail",
+    "inpainting": "{\"type\": \"mask\", \"mask_image\": \"<entrada.inpainting.mask_image en base64>\"}"
+   },
+   "referencias": [
+    "art/referencias/tiles/roofT_bar.png",
+    "art/referencias/tiles/wall_bar.png"
+   ],
+   "descripcion": "small two-storey town building seen from a high top-down angle, blue tiled roof, pale blue-grey walls, white-framed windows, dark wooden door, an anchor-shaped sign",
+   "celda": "edificio_7x6",
+   "notas": "Se dibuja como un solo objeto encima de las casillas del edificio; las colisiones siguen siendo las del mapa. La puerta tiene que caer en la columna de la puerta del mapa. Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
+   "estado": "pendiente",
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "herramienta": "animate_image",
+     "accion": "the door swings open",
+     "frames": 4,
+     "fps": 12,
+     "bucle": false,
+     "recorte": "bloque de 32×32 recortado del edificio con la puerta centrada abajo",
+     "lienzo": [
+      32,
+      32
+     ],
+     "celda": "puerta"
+    }
+   ],
+   "familia": "mapa-objeto",
+   "entrada": {
+    "background_image": "art/referencias/mapa/edificio-bar.png",
+    "inpainting.mask_image": "art/referencias/mapa/edificio-bar_mascara.png"
+   },
+   "depende_de": [
+    "tiles-exterior"
+   ]
+  },
+  {
+   "id": "edificio-gray",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "create_map_object",
+   "cubre": [
+    "tile:roofT_gray",
+    "tile:roofB_gray",
+    "tile:wall_gray",
+    "tile:win_gray"
+   ],
+   "parametros": {
+    "view": "high top-down",
+    "outline": "single color outline",
+    "shading": "basic shading",
+    "detail": "medium detail",
+    "inpainting": "{\"type\": \"mask\", \"mask_image\": \"<entrada.inpainting.mask_image en base64>\"}"
+   },
+   "referencias": [
+    "art/referencias/tiles/roofT_gray.png",
+    "art/referencias/tiles/wall_gray.png"
+   ],
+   "descripcion": "small two-storey town building seen from a high top-down angle, grey slate roof, pink-beige walls, white-framed windows, no door, closed shutters",
+   "celda": "edificio_6x6",
+   "notas": "Se dibuja como un solo objeto encima de las casillas del edificio; las colisiones siguen siendo las del mapa. La puerta tiene que caer en la columna de la puerta del mapa. Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
+   "estado": "pendiente",
+   "familia": "mapa-objeto",
+   "entrada": {
+    "background_image": "art/referencias/mapa/edificio-gray.png",
+    "inpainting.mask_image": "art/referencias/mapa/edificio-gray_mascara.png"
+   },
+   "depende_de": [
+    "tiles-exterior"
+   ]
+  },
+  {
+   "id": "props-16",
+   "tipo": "objeto",
+   "fase": "F4",
+   "herramienta": "create_1_direction_object",
+   "cubre": [
+    "obj:fence",
+    "obj:sign",
+    "obj:bench",
+    "obj:crate",
+    "obj:bush",
+    "obj:pc",
+    "obj:lab",
+    "obj:lab2",
+    "obj:table",
+    "obj:shelfW",
+    "obj:counter",
+    "obj:display",
+    "obj:plantDeco",
+    "obj:barcounter",
+    "obj:bottles",
+    "obj:stool",
+    "obj:btable",
+    "obj:jukebox",
+    "obj:iwin",
+    "obj:poster"
+   ],
+   "parametros": {
+    "view": "top-down",
+    "item_descriptions": [
+     "short wooden fence segment",
+     "small wooden signboard on a post",
+     "wooden park bench",
+     "wooden fish crate",
+     "round leafy bush",
+     "desk with an old computer monitor",
+     "lab table with a microscope",
+     "lab table with glass flasks",
+     "small wooden table",
+     "wall shelf with jars",
+     "shop counter segment",
+     "rack of seed packets",
+     "potted monstera plant",
+     "dark wooden bar counter segment",
+     "wall shelf with liquor bottles",
+     "red bar stool",
+     "small round bar table with a glass",
+     "retro jukebox with lights",
+     "wall window with sky view",
+     "framed poster with a green leaf"
+    ]
+   },
+   "referencias": [
+    "art/referencias/_hoja-objetos.png"
+   ],
+   "entrada": {
+    "style_images": [
+     "art/referencias/objetos/bench.png",
+     "art/referencias/objetos/sign.png",
+     "art/referencias/objetos/crate.png",
+     "art/referencias/objetos/bush.png",
+     "art/referencias/objetos/counter.png",
+     "art/referencias/objetos/stool.png",
+     "art/referencias/objetos/jukebox.png",
+     "art/referencias/objetos/plantDeco.png"
+    ]
+   },
+   "descripcion": "set of small 16-bit town and interior props, same style as the reference sheet",
+   "celda": "objeto_1x1",
+   "notas": "Sin size: las imágenes de estilo (16×16) fijan el tamaño, así que salen 64 candidatos en revisión. Elige con select_object_frames y descarta el resto con dismiss_review. Lo que cuelga de la pared (botellas, ventana interior, póster) se encaja con «exacto» (ajuste_por_sprite): conserva su altura en la casilla en vez de apoyarse en el suelo.",
+   "estado": "pendiente",
+   "animaciones": [
+    {
+     "nombre": "luces",
+     "herramienta": "animate_object",
+     "sobre": "obj:jukebox",
+     "accion": "lights blinking in sequence",
+     "frames": 4,
+     "fps": 6,
+     "bucle": true
+    }
+   ],
+   "ajuste_por_sprite": {
+    "bottles": "exacto",
+    "iwin": "exacto",
+    "poster": "exacto"
+   },
+   "familia": "objeto-lote"
+  },
+  {
+   "id": "props-32",
+   "tipo": "objeto",
+   "fase": "F4",
+   "herramienta": "create_1_direction_object",
+   "cubre": [
+    "obj:fridge",
+    "obj:bedT",
+    "obj:bedB"
+   ],
+   "parametros": {
+    "size": 32,
+    "view": "top-down",
+    "item_descriptions": [
+     "tall white fridge",
+     "single bed with blue blanket and white pillow, top-down"
+    ]
+   },
+   "referencias": [
+    "art/referencias/_hoja-objetos.png"
+   ],
+   "descripcion": "larger 16-bit indoor props that overhang their tile",
+   "celda": "objeto_alto",
+   "notas": "La cama ocupa bedT+bedB (16×32). Los props altos de exterior (árbol, farola, fuente) van aparte con create_map_object para casar con el suelo.",
+   "estado": "pendiente",
+   "familia": "objeto-lote",
+   "lote": "lote-32"
+  },
+  {
+   "id": "prop-arbol",
+   "tipo": "objeto",
+   "fase": "F4",
+   "cubre": [
+    "obj:tree"
+   ],
+   "descripcion": "round leafy town tree with a short trunk, casting a small shadow on the grass",
+   "celda": "objeto_alto",
+   "referencias": [
+    "art/referencias/objetos/tree.png"
+   ],
+   "estado": "pendiente",
+   "herramienta": "create_map_object",
+   "familia": "mapa-objeto",
+   "parametros": {
+    "view": "high top-down",
+    "outline": "single color outline",
+    "shading": "basic shading",
+    "detail": "medium detail",
+    "inpainting": "{\"type\": \"mask\", \"mask_image\": \"<entrada.inpainting.mask_image en base64>\"}"
+   },
+   "entrada": {
+    "background_image": "art/referencias/mapa/tree.png",
+    "inpainting.mask_image": "art/referencias/mapa/tree_mascara.png"
+   },
+   "notas": " Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
+   "depende_de": [
+    "tiles-exterior"
+   ]
+  },
+  {
+   "id": "prop-farola",
+   "tipo": "objeto",
+   "fase": "F4",
+   "cubre": [
+    "obj:lamp"
+   ],
+   "descripcion": "tall black iron street lamp on the sidewalk",
+   "celda": "objeto_alto",
+   "referencias": [
+    "art/referencias/objetos/lamp.png"
+   ],
+   "estado": "pendiente",
+   "herramienta": "create_map_object",
+   "familia": "mapa-objeto",
+   "parametros": {
+    "view": "high top-down",
+    "outline": "single color outline",
+    "shading": "basic shading",
+    "detail": "medium detail",
+    "inpainting": "{\"type\": \"mask\", \"mask_image\": \"<entrada.inpainting.mask_image en base64>\"}"
+   },
+   "entrada": {
+    "background_image": "art/referencias/mapa/lamp.png",
+    "inpainting.mask_image": "art/referencias/mapa/lamp_mascara.png"
+   },
+   "notas": " Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
+   "depende_de": [
+    "tiles-exterior"
+   ]
+  },
+  {
+   "id": "prop-fuente",
+   "tipo": "objeto",
+   "fase": "F4",
+   "cubre": [
+    "obj:fountain"
+   ],
+   "descripcion": "small round stone fountain with a water spout in a paved plaza",
+   "celda": "objeto_alto",
+   "referencias": [
+    "art/referencias/objetos/fountain.png"
+   ],
+   "estado": "pendiente",
+   "herramienta": "create_map_object",
+   "familia": "mapa-objeto",
+   "parametros": {
+    "view": "high top-down",
+    "outline": "single color outline",
+    "shading": "basic shading",
+    "detail": "medium detail",
+    "inpainting": "{\"type\": \"mask\", \"mask_image\": \"<entrada.inpainting.mask_image en base64>\"}"
+   },
+   "entrada": {
+    "background_image": "art/referencias/mapa/fountain.png",
+    "inpainting.mask_image": "art/referencias/mapa/fountain_mascara.png"
+   },
+   "notas": " Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
+   "depende_de": [
+    "tiles-exterior"
+   ],
+   "animaciones": [
+    {
+     "nombre": "agua",
+     "herramienta": "animate_image",
+     "sobre": "obj:fountain",
+     "accion": "water splashing from the spout and falling into the basin, seamless loop",
+     "frames": 6,
+     "fps": 8,
+     "bucle": true,
+     "lienzo": [
+      32,
+      32
+     ]
+    }
+   ]
+  },
+  {
+   "id": "carpa-cultivo",
+   "tipo": "objeto",
+   "fase": "F4",
+   "herramienta": "create_map_object",
+   "cubre": [],
+   "parametros": {
+    "view": "high top-down",
+    "outline": "single color outline",
+    "shading": "basic shading",
+    "detail": "medium detail",
+    "inpainting": "{\"type\": \"mask\", \"mask_image\": \"<entrada.inpainting.mask_image en base64>\"}"
+   },
+   "descripcion": "open indoor grow tent frame seen from above, silver reflective walls, a hanging LED grow lamp at the top",
+   "celda": "carpa",
+   "notas": "Sustituye al marco dibujado por código en renderWorld (casa). Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
+   "estado": "pendiente",
+   "familia": "mapa-objeto",
+   "entrada": {
+    "background_image": "art/referencias/mapa/carpa.png",
+    "inpainting.mask_image": "art/referencias/mapa/carpa_mascara.png"
+   },
+   "depende_de": [
+    "interior-home"
+   ]
+  },
+  {
+   "id": "planta-fases",
+   "tipo": "planta",
+   "fase": "F5",
+   "herramienta": "create_1_direction_object",
+   "cubre": [
+    "planta:germinando",
+    "planta:plantula",
+    "planta:vegetativo",
+    "planta:floracion",
+    "planta:lista",
+    "planta:muerta",
+    "misc:maceta-vacia",
+    "planta-variante:sana",
+    "planta-variante:seca"
+   ],
+   "parametros": {
+    "size": 32,
+    "view": "top-down",
+    "item_descriptions": [
+     "empty black fabric grow pot with soil",
+     "tiny cannabis sprout in a black fabric pot",
+     "cannabis seedling with two pairs of leaves in a black fabric pot",
+     "bushy vegetative cannabis plant in a black fabric pot",
+     "flowering cannabis plant with small MAGENTA buds in a black fabric pot",
+     "harvest-ready cannabis plant with big dense MAGENTA buds in a black fabric pot",
+     "dead dry brown cannabis plant in a black fabric pot"
+    ]
+   },
+   "referencias": [
+    "art/referencias/plantas/_hoja.png"
+   ],
+   "descripcion": "cannabis growth stages for a 16-bit grow game, same pot and scale in every stage",
+   "celda": "planta",
+   "rampas_clave": {
+    "cogollo": {
+     "tono": [
+      280,
+      340
+     ],
+     "saturacion_min": 0.25,
+     "rampa": [
+      "#ff5cff",
+      "#d020c8",
+      "#80107a"
+     ]
+    }
+   },
+   "rampas_cambio": {
+    "seca": {
+     "#3c9a3e": "#b8aa48",
+     "#22662a": "#8a7c30",
+     "#74d064": "#d8cc78"
+    }
+   },
+   "notas": "Los cogollos se piden en magenta para poder cambiarlos de color por variedad (rampa clave). Variante seca: el motor cambia la rampa de hojas por la seca. Plaga: capa vfx-acaros encima.",
+   "animaciones": [
+    {
+     "nombre": "balanceo-vegetativo",
+     "herramienta": "animate_object",
+     "sobre": "planta:vegetativo",
+     "accion": "leaves swaying gently",
+     "frames": 4,
+     "fps": 3,
+     "bucle": true
+    },
+    {
+     "nombre": "balanceo-floracion",
+     "herramienta": "animate_object",
+     "sobre": "planta:floracion",
+     "accion": "leaves swaying gently",
+     "frames": 4,
+     "fps": 3,
+     "bucle": true
+    },
+    {
+     "nombre": "balanceo-lista",
+     "herramienta": "animate_object",
+     "sobre": "planta:lista",
+     "accion": "leaves swaying gently",
+     "frames": 4,
+     "fps": 3,
+     "bucle": true
+    }
+   ],
+   "estado": "pendiente",
+   "familia": "objeto-lote",
+   "lote": "lote-32"
+  },
+  {
+   "id": "iconos",
+   "tipo": "icono",
+   "fase": "F7",
+   "herramienta": "create_1_direction_object",
+   "cubre": [
+    "misc:bolsa"
+   ],
+   "nuevo": true,
+   "parametros": {
+    "size": 16,
+    "view": "top-down",
+    "item_descriptions": [
+     "fertilizer sack",
+     "insecticide spray bottle",
+     "pepper spray can",
+     "sandwich",
+     "seed packet",
+     "cannabis bud",
+     "folded banknotes",
+     "LED grow lamp panel",
+     "black fabric plant pot",
+     "pollination kit with brush",
+     "golden trophy cup",
+     "stack of coins"
+    ]
+   },
+   "descripcion": "16-bit inventory item icons",
+   "celda": "icono",
+   "notas": "Para la Mochila, la tienda y los objetos del suelo (la bolsa del suelo se sustituye por el icono del objeto).",
+   "estado": "pendiente",
+   "familia": "objeto-lote",
+   "lote": "lote-16"
+  },
+  {
+   "id": "cogollos-genoteca",
+   "tipo": "icono",
+   "fase": "F7",
+   "herramienta": "create_1_direction_object",
+   "cubre": [],
+   "nuevo": true,
+   "parametros": {
+    "size": 32,
+    "view": "top-down",
+    "item_descriptions": [
+     "dense round indica cannabis bud, MAGENTA",
+     "long airy sativa cannabis bud, MAGENTA",
+     "balanced hybrid cannabis bud, MAGENTA",
+     "legendary glowing cannabis bud with sparkles, MAGENTA"
+    ]
+   },
+   "rampas_clave": {
+    "cogollo": {
+     "tono": [
+      280,
+      340
+     ],
+     "saturacion_min": 0.25,
+     "rampa": [
+      "#ff5cff",
+      "#d020c8",
+      "#80107a"
+     ]
+    }
+   },
+   "descripcion": "cannabis bud icons for a strain collection",
+   "celda": "cogollo",
+   "notas": "Una forma por tipo; el color de cada variedad sale de STRAINS[*].c con la rampa clave.",
+   "estado": "pendiente",
+   "familia": "objeto-lote",
+   "lote": "lote-32"
+  },
+  {
+   "id": "vfx-16",
+   "tipo": "vfx",
+   "fase": "F3",
+   "herramienta": "create_1_direction_object",
+   "nuevo": true,
+   "cubre": [],
+   "parametros": {
+    "size": 16,
+    "view": "top-down",
+    "item_descriptions": [
+     "thin wisp of cigarette smoke, 16-bit effect sprite",
+     "thick puff of cigar smoke, 16-bit effect sprite",
+     "soft curl of pale smoke, 16-bit effect sprite",
+     "small round puff of pipe smoke, 16-bit effect sprite",
+     "white and yellow impact spark, 16-bit effect sprite",
+     "small water drops falling, 16-bit effect sprite",
+     "sparkle of light, 16-bit effect sprite",
+     "golden pollen dust particles, 16-bit effect sprite",
+     "tiny red spider mites crawling, 16-bit effect sprite",
+     "coins popping up, 16-bit effect sprite",
+     "white seagull standing, tiny 16-bit sprite",
+     "grey pigeon, tiny 16-bit sprite"
+    ]
+   },
+   "items": [
+    {
+     "id": "vfx-humo-cigarro",
+     "descripcion": "thin wisp of cigarette smoke",
+     "animaciones": [
+      {
+       "nombre": "efecto",
+       "herramienta": "animate_object",
+       "accion": "thin wisp of cigarette smoke dissipating",
+       "frames": 6,
+       "fps": 10,
+       "bucle": false
+      }
+     ]
+    },
+    {
+     "id": "vfx-humo-puro",
+     "descripcion": "thick puff of cigar smoke",
+     "animaciones": [
+      {
+       "nombre": "efecto",
+       "herramienta": "animate_object",
+       "accion": "thick puff of cigar smoke dissipating",
+       "frames": 6,
+       "fps": 10,
+       "bucle": false
+      }
+     ]
+    },
+    {
+     "id": "vfx-humo-porro",
+     "descripcion": "soft curl of pale smoke",
+     "animaciones": [
+      {
+       "nombre": "efecto",
+       "herramienta": "animate_object",
+       "accion": "soft curl of pale smoke dissipating",
+       "frames": 6,
+       "fps": 10,
+       "bucle": false
+      }
+     ]
+    },
+    {
+     "id": "vfx-humo-pipa",
+     "descripcion": "small round puff of pipe smoke",
+     "animaciones": [
+      {
+       "nombre": "efecto",
+       "herramienta": "animate_object",
+       "accion": "small round puff of pipe smoke dissipating",
+       "frames": 6,
+       "fps": 10,
+       "bucle": false
+      }
+     ]
+    },
+    {
+     "id": "vfx-golpe",
+     "descripcion": "white and yellow impact spark",
+     "animaciones": [
+      {
+       "nombre": "efecto",
+       "herramienta": "animate_object",
+       "accion": "white and yellow impact spark dissipating",
+       "frames": 4,
+       "fps": 10,
+       "bucle": false
+      }
+     ]
+    },
+    {
+     "id": "vfx-gotas",
+     "descripcion": "small water drops falling",
+     "animaciones": [
+      {
+       "nombre": "efecto",
+       "herramienta": "animate_object",
+       "accion": "small water drops falling dissipating",
+       "frames": 4,
+       "fps": 10,
+       "bucle": false
+      }
+     ]
+    },
+    {
+     "id": "vfx-brillo",
+     "descripcion": "sparkle of light",
+     "animaciones": [
+      {
+       "nombre": "efecto",
+       "herramienta": "animate_object",
+       "accion": "sparkle of light dissipating",
+       "frames": 4,
+       "fps": 10,
+       "bucle": false
+      }
+     ]
+    },
+    {
+     "id": "vfx-polen",
+     "descripcion": "golden pollen dust particles",
+     "animaciones": [
+      {
+       "nombre": "efecto",
+       "herramienta": "animate_object",
+       "accion": "golden pollen dust particles dissipating",
+       "frames": 6,
+       "fps": 10,
+       "bucle": false
+      }
+     ]
+    },
+    {
+     "id": "vfx-acaros",
+     "descripcion": "tiny red spider mites crawling",
+     "animaciones": [
+      {
+       "nombre": "efecto",
+       "herramienta": "animate_object",
+       "accion": "tiny red spider mites crawling dissipating",
+       "frames": 4,
+       "fps": 10,
+       "bucle": false
+      }
+     ],
+     "cubre": [
+      "planta-variante:plaga",
+      "planta-variante:seca-plaga"
+     ]
+    },
+    {
+     "id": "vfx-monedas",
+     "descripcion": "coins popping up",
+     "animaciones": [
+      {
+       "nombre": "efecto",
+       "herramienta": "animate_object",
+       "accion": "coins popping up dissipating",
+       "frames": 6,
+       "fps": 10,
+       "bucle": false
+      }
+     ]
+    },
+    {
+     "id": "gaviota",
+     "descripcion": "white seagull standing",
+     "animaciones": [
+      {
+       "nombre": "idle",
+       "herramienta": "animate_object",
+       "accion": "seagull flapping its wings",
+       "frames": 4,
+       "fps": 6,
+       "bucle": true
+      }
+     ]
+    },
+    {
+     "id": "paloma",
+     "descripcion": "grey pigeon",
+     "animaciones": [
+      {
+       "nombre": "idle",
+       "herramienta": "animate_object",
+       "accion": "pigeon pecking at the ground",
+       "frames": 4,
+       "fps": 6,
+       "bucle": true
+      }
+     ]
+    }
+   ],
+   "descripcion": "small 16-bit effect sprites and tiny ambient creatures (seagull for the docks, pigeon next to Patxi)",
+   "celda": "vfx",
+   "notas": "Una sola llamada: size 16 da 64 candidatos. Elige uno por item con select_object_frames; después anima cada objeto con animate_object.",
+   "estado": "pendiente",
+   "familia": "objeto-lote",
+   "lote": "lote-16"
+  },
+  {
+   "id": "vfx-32",
+   "tipo": "vfx",
+   "fase": "F3",
+   "herramienta": "create_1_direction_object",
+   "nuevo": true,
+   "cubre": [],
+   "parametros": {
+    "size": 32,
+    "view": "top-down",
+    "item_descriptions": [
+     "big fluffy cloud of white vapor, 16-bit effect sprite",
+     "orange pepper spray mist, 16-bit effect sprite"
+    ]
+   },
+   "items": [
+    {
+     "id": "vfx-nube-vaper",
+     "descripcion": "big fluffy cloud of white vapor",
+     "animaciones": [
+      {
+       "nombre": "efecto",
+       "herramienta": "animate_object",
+       "accion": "big fluffy cloud of white vapor dissipating",
+       "frames": 8,
+       "fps": 10,
+       "bucle": false
+      }
+     ]
+    },
+    {
+     "id": "vfx-spray",
+     "descripcion": "orange pepper spray mist",
+     "animaciones": [
+      {
+       "nombre": "efecto",
+       "herramienta": "animate_object",
+       "accion": "orange pepper spray mist dissipating",
+       "frames": 6,
+       "fps": 10,
+       "bucle": false
+      }
+     ]
+    }
+   ],
+   "descripcion": "larger 16-bit effect sprites",
+   "celda": "vfx_grande",
+   "estado": "pendiente",
+   "familia": "objeto-lote",
+   "lote": "lote-32"
+  },
+  {
+   "id": "titulo",
+   "tipo": "fondo",
+   "fase": "F7",
+   "herramienta": "create_image_pixflux",
+   "cubre": [
+    "misc:hoja-titulo"
+   ],
+   "parametros": {
+    "width": 240,
+    "height": 160,
+    "no_background": false,
+    "view": "side",
+    "outline": "lineless",
+    "shading": "medium shading",
+    "detail": "medium detail",
+    "init_image_strength": 150
+   },
+   "referencias": [
+    "art/referencias/misc/titulo.png",
+    "art/referencias/misc/hoja-titulo.png"
+   ],
+   "entrada": {
+    "init_image_base64": "art/referencias/misc/titulo.png",
+    "color_image_base64": "art/paleta/ribera.png"
+   },
+   "descripcion": "night skyline of a riverside working-class town, lit windows reflected on the river, a large stylised green cannabis leaf glowing softly in the sky",
+   "celda": "pantalla",
+   "estado": "pendiente",
+   "familia": "imagen",
+   "notas": "img2img sobre la pantalla de título actual: conserva el skyline, el río y el hueco central del logo."
+  },
+  {
+   "id": "burbujas",
+   "tipo": "icono",
+   "fase": "F7",
+   "herramienta": "procedural",
+   "cubre": [
+    "misc:burbuja-$",
+    "misc:burbuja-!"
+   ],
+   "descripcion": "Se mantienen procedurales: ya son fieles al estilo y se leen perfectamente a 8 px.",
+   "celda": "icono",
+   "estado": "hecho",
+   "familia": "procedural"
+  }
+ ],
+ "familias": {
+  "personaje": {
+   "nombre": "Personajes",
+   "herramientas": [
+    "create_character",
+    "animate_character",
+    "create_image_pro (paso previo)"
+   ],
+   "por_que": "Rig humanoide: rotaciones coherentes y plantillas de animación a 1 generación por dirección. Standard (1 gen) para los 20 del mundo; v3 con referencia para los de combate."
+  },
+  "mapa-terreno": {
+   "nombre": "Mapa · terreno",
+   "herramientas": [
+    "create_tiles_pro",
+    "create_building_kit",
+    "create_topdown_tileset",
+    "animate_image"
+   ],
+   "por_que": "Lo que se repite en casillas: tiles_pro numerados en una sola llamada, kit de edificio para suelo+pared de interiores, Wang encadenados para orillas."
+  },
+  "mapa-objeto": {
+   "nombre": "Mapa · objetos con el estilo del mapa",
+   "herramientas": [
+    "create_map_object (background_image + máscara)",
+    "animate_image"
+   ],
+   "por_que": "Lo grande que se apoya en el suelo (fachadas, carpa, árbol, farola, fuente): inpainting sobre un recorte real del mapa para que case luz, paleta y perspectiva."
+  },
+  "objeto-lote": {
+   "nombre": "Objetos sueltos en lote",
+   "herramientas": [
+    "create_1_direction_object (item_descriptions)",
+    "select_object_frames",
+    "animate_object"
+   ],
+   "por_que": "Muchos objetos pequeños del mismo estilo en una sola llamada (hasta 64 candidatos a ≤42 px): props, plantas, iconos, cogollos, VFX, gaviota y paloma."
+  },
+  "imagen": {
+   "nombre": "Imágenes simples",
+   "herramientas": [
+    "create_image_pixflux (init_image + color_image)"
+   ],
+   "por_que": "Pantallas completas sin rig: img2img sobre la composición actual y paleta forzada, 1 generación."
+  },
+  "procedural": {
+   "nombre": "Se queda procedural",
+   "herramientas": [],
+   "por_que": "Burbujas $ y ! de 7×8: más nítidas a mano que generadas."
+  }
+ },
+ "descartadas": [
+  {
+   "herramienta": "create_path_tiles",
+   "motivo": "Solo genera tiles de 32 px en square_topdown; el juego usa 16 px."
+  },
+  {
+   "herramienta": "create_ui_asset",
+   "motivo": "Paneles de 192 px como mínimo; la interfaz es DOM a escala de 240×160."
+  },
+  {
+   "herramienta": "create_isometric_tile / create_sidescroller_tileset",
+   "motivo": "Otra perspectiva: el juego es vista 3/4 cenital."
+  },
+  {
+   "herramienta": "create_8_direction_object",
+   "motivo": "Los objetos del juego solo se ven desde un lado."
+  },
+  {
+   "herramienta": "create_character_state / create_object_state",
+   "motivo": "Nadie cambia de ropa en el guion y la planta seca o con cogollos de color la resuelve el motor con rampas. Plan B si las fases de la planta salen incoherentes en el lote: generar «lista» y sacar el resto como estados."
+  },
+  {
+   "herramienta": "create_font",
+   "motivo": "Ya hay fuentes OFL (Pixelify Sans, Press Start 2P)."
+  },
+  {
+   "herramienta": "create_portrait_character / create_vocal_animation",
+   "motivo": "Opcional (F9): retratos con boca animada en los diálogos. ~20 generaciones por retrato; no es estética de portátil de 16 bits."
+  },
+  {
+   "herramienta": "create_map / edit_map / place_map_object / view_map",
+   "motivo": "No se usan en el juego (el mapa es del motor), pero sirven de maqueta opcional en F4b: pintar el barrio con los Wang, colocar edificios y props y revisar con view_map antes de integrar."
+  },
+  {
+   "herramienta": "*_pro_flash",
+   "motivo": "Alternativa de pago por imagen a create_character/objetos; no mejora a 16-32 px."
+  }
+ ],
+ "lotes": {
+  "lote-16": {
+   "herramienta": "create_1_direction_object",
+   "size": 16,
+   "se_genera_en": "F3",
+   "nota": "iconos + VFX de 16 px en una sola llamada (24 de 64 huecos). Los props de 16 px van aparte porque llevan style_images."
+  },
+  "lote-32": {
+   "herramienta": "create_1_direction_object",
+   "size": 32,
+   "se_genera_en": "F3",
+   "nota": "plantas, nevera y cama, cogollos de la Genoteca y VFX grandes en una sola llamada (15 de 64 huecos)."
+  }
+ }
+}

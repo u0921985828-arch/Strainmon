@@ -9,14 +9,16 @@ Juego web de un solo archivo: HTML, CSS y JavaScript sin frameworks ni dependenc
 - `npm run docs`: compila y regenera `docs/GENETICA.md` y `docs/MAPA.md` leyendo los datos de `index.html`. Ejecútalo si tocas variedades, mapas, personajes, objetos o la tienda. El texto «cómo se consigue» de las variedades de tienda y landraces está a mano en `ORIGIN` (`tools/generar-docs.js`).
 - `npm run capturas`: compila y regenera `screenshots/`.
 - `test`, `docs` y `capturas` leen `index.html`. Si los lanzas con `node tools/...` en vez de `npm run`, ejecuta antes `node tools/build.js`.
+- `npm run test:arte`: prueba el motor de sprites con un atlas «de calco» (16 comprobaciones). No toca el `index.html` de la raíz: compila en `tools/salida/arte/`.
+- Los scripts de Playwright aceptan `CHROMIUM_PATH` (otro Chromium), `RV_HTML` (otro HTML) y `RV_SALIDA` (otra carpeta de salida). `tools/build.js` acepta `--atlas-dir` y `--salida`.
 
 ## Módulos (`src/js`, se concatenan en orden alfabético dentro de un único `<script>`)
 
-`00-nucleo` utilidades · `01-tiles` casillas procedurales (`TILES`, `T()`, `SOLID_G`) · `02-sprites` personajes 16×20 y plantas 16×26 · `03-datos` `STRAINS`, `DEX`, `RECIPES`, `crossResult`, `LOOKS`, `CTYPES` · `04-mapas` `MAPS` (`town`, `home`, `shop`, `bar`), `POTS` · `05-audio` chiptune y efectos (WebAudio) · `06-controles` teclado y botones táctiles · `07-interfaz` `say`/`talk`/`ask`/`menu`/`toast`/`fade` · `08-mundo` estado `S`, `NPCDEF`, `ITEMS`, movimiento, interacción · `09-cultivo` tiempo, plantas, cama, PC, carta, mesa de genética · `10-calle` clientes y venta · `11-historia` tienda, diálogos de personajes, capítulos, eventos y final · `12-menus` menú START · `13-combate` ladrones y policía · `14-render` dibujo del mundo, del combate y del título · `15-arranque` guardado, título, partida nueva, bucle y `boot`.
+`00-nucleo` utilidades · `01-tiles` casillas procedurales (`TILES`, `T()`, `SOLID_G`) · `01b-arte` sprites del atlas de PixelLab (`ARTE`, `frameDe`, `dibujarPJ`, `ambiente`, `accion`, `bAnim`, `artePlanta`…; sin atlas no hace nada) · `02-sprites` personajes 16×20 y plantas 16×26 · `03-datos` `STRAINS`, `DEX`, `RECIPES`, `crossResult`, `LOOKS`, `CTYPES` · `04-mapas` `MAPS` (`town`, `home`, `shop`, `bar`), `POTS` · `05-audio` chiptune y efectos (WebAudio) · `06-controles` teclado y botones táctiles · `07-interfaz` `say`/`talk`/`ask`/`menu`/`toast`/`fade` · `08-mundo` estado `S`, `NPCDEF`, `ITEMS`, movimiento, interacción · `09-cultivo` tiempo, plantas, cama, PC, carta, mesa de genética · `10-calle` clientes y venta · `11-historia` tienda, diálogos de personajes, capítulos, eventos y final · `12-menus` menú START · `13-combate` ladrones y policía · `14-render` dibujo del mundo, del combate y del título · `15-arranque` guardado, título, partida nueva, bucle y `boot`.
 
 ## Convenciones
 
-- Resolución interna 240×160, casilla 16 px. Los personajes se dibujan en `y − 4` y las plantas en `y − 10`. En combate el sprite de 16×20 se escala ×3.
+- Resolución interna 240×160, casilla 16 px. En procedural, los personajes se dibujan en `y − 4` y las plantas en `y − 10`, y en combate el sprite de 16×20 se escala ×3. Con atlas mandan las celdas de `manifest.celdas` (ver «Sprites»).
 - Toda la UI se mide en «píxeles de consola»: `--u = 100cqw / 240` (la `.screen` es `container-type: inline-size`).
 - Los guiones son `async` y se escriben de forma lineal: `await say(texto, NOMBRE)`, `await ask(texto, opciones, NOMBRE)` devuelve un índice y `await menu(items, {cls, title, desc})` devuelve el índice o −1. `{N}` se sustituye por el nombre del jugador.
 - La entrada va a una pila de manejadores (`push`/`pop`). Sin manejador, la recibe el mundo (`worldPress`).
@@ -47,3 +49,18 @@ Hierba `#84cc6c` `#62aa56` `#b0e48c` `#3f8a46` · tierra `#dcc08a` · acera `#dc
 - **Objeto:** entrada en `ITEMS`. Con `hidden:1`, el objeto va dentro de un arbusto (`bush`) en esa casilla.
 - **Mapa:** `newMap()` + `gr`/`ob`/`rect`/`building` en `buildMaps()`, `doors` para entrar y `exits` (felpudo + abajo) para salir.
 - **Capítulo:** `CH_TITLES`, `objectiveText()`, la transición en `checkStory()` o en el diálogo que lo dispare, y un paso nuevo en `tools/test-historia.js`.
+
+## Sprites (PixelLab)
+
+- Guía: `docs/PIXELLAB.md`. Qué generar y con qué parámetros: `art/manifest.json`. Qué herramienta para cada sprite, en qué orden y cuánto cuesta: `docs/CATALOGO-SPRITES.md` (se genera con `npm run sprites:catalogo`; no lo edites a mano). Comando: `/sprites [F0..F8|id|estado]` (`.claude/skills/sprites/SKILL.md`). El servidor MCP tiene que llamarse `pixellab`.
+- Flujo único: PixelLab → `art/crudo/<grupo>/<sprite>/<dir>/<NN>.png` → `npm run sprites:procesar` → `art/procesado/` → `--atlas` → `assets/sprites/atlas.{png,json}` → build (lo incrusta como `ATLAS`). No edites `art/crudo` ni el atlas a mano. `art/crudo/_ref/` guarda los PNG intermedios de los pasos `previo`.
+- Celdas y anclas fijas (`manifest.celdas`): personaje 32×32 con los pies en (16,30), dibujado en (px−8, py−15); planta 32×32 (16,31); combate 64×64 (32,62), pies del rival en (ex+24, 66) y del jugador en (px+24, 142); tiles 16×16; tiles animados en bloques de 32×32; edificios y carpa por la base.
+- `referencias` sirve para revisar y para los colores de identidad. A PixelLab solo se envía `entrada`, con el nombre exacto del parámetro de la herramienta; `sprites:validar` lo comprueba. `art/referencias/mapa/` son recortes del mapa + máscara para `create_map_object` (con atlas en el build salen con los tiles aprobados).
+- Familias (`manifest.familias`): personaje, mapa-terreno, mapa-objeto, objeto-lote, imagen, procedural. Los assets con el mismo `lote` van en una sola llamada; `depende_de` marca el orden; `previo` es un paso anterior con su propia herramienta.
+- Partes frágiles:
+  - El bloqueo de color va así: colores de identidad del asset (declarados + los de sus referencias), luego los colores que ya usa el juego (`existentes`). La maestra (121) es solo para PixelLab. Si se bloqueara solo contra la maestra, la tierra acabaría convertida en tono de piel. `paleta.js` deja fuera `mapa/` y la pantalla de título: si entraran, el blanco y negro de las máscaras se colarían en los sprites.
+  - Los cogollos se piden en magenta: es la rampa clave que el motor cambia por el color de cada variedad.
+  - Máximo 15 colores: por grupo en personajes, combate y VFX; por sprite en tiles, objetos, plantas, edificios y fondos.
+  - El nombre de cada animación es su carpeta en `art/crudo/<grupo>/`: no se puede repetir dentro de un asset (las tres de balanceo de la planta se llaman `balanceo-<fase>`).
+  - Ningún menor fuma: lo comprueba `sprites:validar`, `procesar.js` no exporta `fumador` para un menor y el motor filtra las acciones de fumar de los grupos de `menores`.
+  - Las acciones del jugador (`accion()`) se esperan dentro de los guiones; sin atlas resuelven al instante y los tests no cambian.

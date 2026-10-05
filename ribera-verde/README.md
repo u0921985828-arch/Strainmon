@@ -31,11 +31,12 @@ RPG de cultivo en pixel art, con pantalla de 240 × 160 al estilo de las portát
 ```
 index.html                    el juego completo (lo genera tools/build.js)
 src/                          código fuente: shell.html + styles.css + js/ (16 módulos)
-tools/                        build, test de la historia, generador de docs y capturas
+tools/                        build, test de la historia, generador de docs, capturas y tools/sprites (kit PixelLab)
 docs/                         diseño, guion, genética, mapa y prompts de sprites
 dist/ribera-verde.artifact.html   la misma página en formato Artifact de Claude
 assets/fonts/                 Pixelify Sans y Press Start 2P (woff2 + licencia OFL)
 screenshots/                  13 capturas
+art/                          manifiesto de sprites, inventario, referencias PNG y paleta (kit PixelLab)
 CONTEXTO.md                   qué se pidió, qué se decidió y en qué estado está
 CLAUDE.md                     notas para seguir el desarrollo con Claude Code
 CHANGELOG.md                  versiones
@@ -52,6 +53,11 @@ npm run build      # src/ → index.html y dist/ribera-verde.artifact.html
 npm test           # compila y recorre la historia completa (34 pasos) en Chromium sin ventana
 npm run docs       # compila y regenera docs/GENETICA.md y docs/MAPA.md desde los datos del juego
 npm run capturas   # compila y regenera screenshots/
+npm run sprites:ref       # referencias PNG + paleta para PixelLab
+npm run sprites:validar   # comprueba art/manifest.json
+npm run sprites:procesar -- <grupo> [--atlas]   # salida de PixelLab → sprites listos
+npm run sprites:catalogo  # catálogo de sprites por herramienta de PixelLab
+npm run test:arte         # prueba el motor de sprites con un atlas de calco
 ```
 
 Edita siempre en `src/` y después ejecuta `npm run build`. `index.html` y `dist/` se generan con el build y no se tocan a mano.
@@ -63,7 +69,8 @@ Edita siempre en `src/` y después ejecuta `npm run build`. `index.html` y `dist
 - [docs/GUION.md](docs/GUION.md): historia y diálogos por capítulo.
 - [docs/GENETICA.md](docs/GENETICA.md): las 23 variedades y el árbol de cruces.
 - [docs/MAPA.md](docs/MAPA.md): mapas con coordenadas, personajes, objetos y tienda.
-- [docs/PIXELLAB.md](docs/PIXELLAB.md): prompts para sustituir el arte procedural por sprites de PixelLab.
+- [docs/PIXELLAB.md](docs/PIXELLAB.md): kit pro para cambiar todo el arte por sprites y animaciones de PixelLab con Claude Code (comando `/sprites`), sin salirse de la estética. El motor ya los usa en cuanto hay atlas.
+- [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md): cada sprite del juego con su herramienta de PixelLab (personajes, terreno, objetos sobre el mapa, lotes e imágenes), su orden y su coste.
 - [CLAUDE.md](CLAUDE.md): arquitectura y partes delicadas del código.
 
 ## Capturas
@@ -76,6 +83,6 @@ Edita siempre en `src/` y después ejecuta `npm run build`. `index.html` y `dist
 
 ## Créditos y licencias
 
-- El código y todo el arte son originales y se dibujan por código: no hay imágenes externas.
+- El código y todo el arte son originales y se dibujan por código: no hay imágenes externas. Si se añade un atlas de PixelLab (`assets/sprites/`), se incrusta en el HTML y sustituye al dibujo por código donde lo cubra.
 - Las mecánicas se inspiran en *Weed Firm* y la estética en los RPG de portátil de 16 bits. No se usa ningún asset, personaje, nombre ni marca de esos juegos.
 - Fuentes: [Pixelify Sans](https://github.com/eifetx/Pixelify-Sans) y [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P), ambas con licencia SIL Open Font License 1.1 (`assets/fonts/`).

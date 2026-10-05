@@ -16,25 +16,31 @@ function renderWorld(now){
   const m=MAPS[S.map],cam=camera();
   ctx.fillStyle='#000';ctx.fillRect(0,0,SW,SH);
   const wf=Math.floor(now/500)%2,tx0=Math.floor(cam.x/16),ty0=Math.floor(cam.y/16);
-  for(let ty=ty0;ty<=ty0+10;ty++)for(let tx=tx0;tx<=tx0+15;tx++){
+  const list=[];
+  for(let ty=ty0;ty<=ty0+11;ty++)for(let tx=tx0;tx<=tx0+15;tx++){
     if(tx<0||ty<0||tx>=m.w||ty>=m.h)continue;
-    const sx=tx*16-cam.x,sy=ty*16-cam.y,a=TILES[m.g[ty][tx]];ctx.drawImage(a[a.length>1?wf:0],sx,sy);
-    const o=m.o[ty][tx];if(o)ctx.drawImage(TILES[o][0],sx,sy);
+    const sx=tx*16-cam.x,sy=ty*16-cam.y,k=m.g[ty][tx],a=TILES[k];
+    if(!arteTile(k,tx,ty,sx,sy,now))ctx.drawImage(a[a.length>1?wf:0],sx,sy);
+    const o=m.o[ty][tx];if(o&&!arteObj(o,tx,ty,cam,now,list))ctx.drawImage(TILES[o][0],sx,sy);
   }
+  arteEdificios(m,cam);
   if(S.map==='home'){
     const x0=7*16-cam.x,y0=3*16-cam.y;
-    ctx.fillStyle='rgba(255,246,214,.13)';ctx.fillRect(x0,y0,64,96);ctx.strokeStyle='#2c3038';ctx.lineWidth=1;ctx.strokeRect(x0+.5,y0+.5,63,95);
-    ctx.fillStyle='#22262e';ctx.fillRect(x0+4,y0-3,56,4);ctx.fillStyle='#fff4c0';ctx.fillRect(x0+6,y0,52,1);
+    if(!arteCarpa(cam)){ctx.fillStyle='rgba(255,246,214,.13)';ctx.fillRect(x0,y0,64,96);ctx.strokeStyle='#2c3038';ctx.lineWidth=1;ctx.strokeRect(x0+.5,y0+.5,63,95);
+    ctx.fillStyle='#22262e';ctx.fillRect(x0+4,y0-3,56,4);ctx.fillStyle='#fff4c0';ctx.fillRect(x0+6,y0,52,1);}
     POTS.forEach(([px,py],i)=>{if(i>=S.potsOwned){ctx.strokeStyle='rgba(60,70,90,.5)';ctx.setLineDash([2,2]);ctx.strokeRect(px*16-cam.x+3.5,py*16-cam.y+9.5,9,6);ctx.setLineDash([]);}});
     if(!S.flags.letter){const lx=3*16-cam.x,ly=6*16-cam.y;ctx.fillStyle='#fafaf2';ctx.fillRect(lx+5,ly+5,7,5);ctx.fillStyle='#c04040';ctx.fillRect(lx+8,ly+7,2,1);}
   }
-  const list=[];
   const fr=(e,dur)=>e.moving&&e.t/dur<.5?1+((e.x+e.y)&1):0;
-  for(const e of ents)list.push([e.py,()=>ctx.drawImage(spriteFor(e.look,e.dir,fr(e,320)),Math.round(e.px-cam.x),Math.round(e.py-cam.y-4))]);
-  list.push([P.py,()=>ctx.drawImage(spriteFor(LOOKS.player,P.dir,P.moving&&P.t/P.dur<.5?1+P.parity:0),Math.round(P.px-cam.x),Math.round(P.py-cam.y-4))]);
-  if(S.map==='home')POTS.forEach(([px,py],i)=>{if(i<S.potsOwned)list.push([py*16,()=>{const p=S.pots[i];ctx.drawImage(p?plantSprite(p):emptyPot,px*16-cam.x,py*16-cam.y-10);}]);});
-  for(const it of ITEMS)if(!it.hidden&&it.map===S.map&&!S.taken[it.id])list.push([it.y*16,()=>ctx.drawImage(bagSprite,it.x*16-cam.x,it.y*16-cam.y)]);
+  if(ARTE.ok)for(const e of ents)ambiente(e,now,cam);
+  for(const e of ents)list.push([e.py,()=>{if(!dibujarPJ(e,e.look,now,cam,false,320))ctx.drawImage(spriteFor(e.look,e.dir,fr(e,320)),Math.round(e.px-cam.x),Math.round(e.py-cam.y-4));}]);
+  list.push([P.py,()=>{if(!dibujarPJ(P,LOOKS.player,now,cam,true,P.dur))ctx.drawImage(spriteFor(LOOKS.player,P.dir,P.moving&&P.t/P.dur<.5?1+P.parity:0),Math.round(P.px-cam.x),Math.round(P.py-cam.y-4));}]);
+  if(S.map==='home')POTS.forEach(([px,py],i)=>{if(i<S.potsOwned)list.push([py*16,()=>{const p=S.pots[i],x=px*16-cam.x,y=py*16-cam.y;if(!artePlanta(p,x,y,now))ctx.drawImage(p?plantSprite(p):emptyPot,x,y-10);}]);});
+  const bolsa=ARTE.ok&&frameDe(ARTE.cubre['misc:bolsa'],'bolsa','unica',0,{i:0});
+  for(const it of ITEMS)if(!it.hidden&&it.map===S.map&&!S.taken[it.id])list.push([it.y*16,()=>{const x=it.x*16-cam.x,y=it.y*16-cam.y;if(bolsa)pinta(bolsa,x+8,y+8);else ctx.drawImage(bagSprite,x,y);}]);
+  arteCriaturas(now,cam,list);
   list.sort((a,b)=>a[0]-b[0]).forEach(o=>o[1]());
+  if(ARTE.ok)pintarVfx(now,cam,S.map);
   const bob=Math.floor(now/400)%2;
   for(const e of ents){const bx=Math.round(e.px-cam.x)+4,by=Math.round(e.py-cam.y)-16+bob;
     if(e.def.client)bubble(bx,by,'$','#2a9a4a');else if(storyMark(e.id))bubble(bx,by,'!','#e03030');}
@@ -67,12 +73,16 @@ function makeArt(){
   LAMPS=[];const m=MAPS.town;for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++)if(m.o[y][x]==='lamp')LAMPS.push([x,y]);
 }
 function renderBattle(now){
-  ctx.drawImage(battleBg[B.kind],0,0);
+  if(!arteFondoCombate())ctx.drawImage(battleBg[B.kind],0,0);
   const k=Math.min(1,B.t/700),e=1-Math.pow(1-k,3);
   const ex=Math.round(154-(1-e)*180),px=Math.round(40+(1-e)*190);
-  if(!B.gone&&!(B.flashE>0&&Math.floor(B.flashE/70)%2===0))ctx.drawImage(spriteFor(B.look,'down',0),ex,6,48,60);
+  const fE=combFrame('E',now),fP=combFrame('P',now);
   const sh=B.shakeP>0?Math.round(Math.sin(B.shakeP/18)*3):0;
-  ctx.drawImage(spriteFor(LOOKS.player,'up',0),px+sh,82,48,60);
+  if(fE){if(B.gone&&B.aE&&B.aE.n==='huir')pinta(fE,ex+24+Math.round((now-B.aE.t0)*.12),66);
+    else if(!B.gone&&!(B.flashE>0&&Math.floor(B.flashE/70)%2===0))pinta(fE,ex+24,66);}
+  else if(!B.gone&&!(B.flashE>0&&Math.floor(B.flashE/70)%2===0))ctx.drawImage(spriteFor(B.look,'down',0),ex,6,48,60);
+  if(fP)pinta(fP,px+24+sh,142);else ctx.drawImage(spriteFor(LOOKS.player,'up',0),px+sh,82,48,60);
+  if(ARTE.ok)pintarVfx(now,{x:0,y:0},'*');
 }
 function renderTitle(now){
   const t=now/1000;

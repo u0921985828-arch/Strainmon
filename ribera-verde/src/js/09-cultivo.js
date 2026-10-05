@@ -35,7 +35,7 @@ async function potAction(i){
     if(j<0||j>=own.length)return;
     const sid=own[j][0];S.seeds[sid]--;if(!S.seeds[sid])delete S.seeds[sid];
     S.pots[i]={sid,prog:0,water:70,health:100,fert:false,pest:false};sfx('sel');
-    return say(`Has plantado ${getStrain(sid).n}. ¡A crecer!`);
+    await accion('plantar');return say(`Has plantado ${getStrain(sid).n}. ¡A crecer!`);
   }
   const s=getStrain(p.sid);
   if(p.dead){await say(`La ${s.n} se ha secado del todo. Una pena.`);S.pots[i]=null;return say('Retiras la planta muerta.');}
@@ -43,7 +43,7 @@ async function potAction(i){
   const opts=['Regar'];if(!p.fert)opts.push('Abonar');if(p.pest)opts.push('Tratar plaga');opts.push('Arrancar','Salir');
   const c=await ask(`${s.n} · ${stageName(p)} ${Math.floor(p.prog*100)}%\nAgua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%${p.pest?' · ¡PLAGA!':''}`,opts);
   const op=opts[c];
-  if(op==='Regar'){p.water=100;sfx('sel');await say('Riegas la planta. Agua al 100%.');}
+  if(op==='Regar'){await accion('regar',{id:'vfx-gotas',x:POTS[i][0]*16+8,y:POTS[i][1]*16+8});p.water=100;sfx('sel');await say('Riegas la planta. Agua al 100%.');}
   else if(op==='Abonar'){if(S.items.fert>0){S.items.fert--;p.fert=true;sfx('sel');await say('Echas FERTILIZANTE. Dará más cogollos.');}else await say('No te queda FERTILIZANTE.');}
   else if(op==='Tratar plaga'){if(S.items.insect>0){S.items.insect--;p.pest=false;sfx('sel');await say('Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.');}else await say('No tienes INSECTICIDA. Kiko lo vende.');}
   else if(op==='Arrancar'){if(await ask('¿Seguro que quieres arrancarla?',['Sí','No'])===0){S.pots[i]=null;await say('Arrancas la planta.');}}
@@ -52,6 +52,7 @@ async function harvest(i){
   const p=S.pots[i],s=getStrain(p.sid);
   const g=Math.max(1,Math.round(s.y*(.4+.6*p.health/100)*(p.fert?1.25:1)*(S.led?1.3:1)));
   const thc=Math.round((s.thc*(.85+.15*p.health/100)+(S.led?.5:0)+(p.fert?.3:0))*10)/10;
+  await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:P.px+8,y:P.py+2});
   const n=1+ri(0,2);addBuds(p.sid,g,thc);addSeeds(p.sid,n);S.pots[i]=null;sfx('get');
   await say(`¡Cosechas ${g} g de ${s.n} con ${pct(thc)}% de THC!`);
   await say(`También recoges ${n} semilla${n>1?'s':''} de ${s.n}.`);
@@ -87,6 +88,7 @@ async function labAction(){
   if(await ask(`¿Cruzar ${getStrain(A).n} × ${getStrain(Bk).n}? Gastas 1 semilla de cada.`,['Cruzar','Cancelar'])!==0)return;
   S.seeds[A]--;S.seeds[Bk]--;for(const k of [A,Bk])if(!S.seeds[k])delete S.seeds[k];
   const r=crossResult(A,Bk),isNew=!S.disc[r],s=getStrain(r);
+  await accion('cruzar',{id:'vfx-polen',x:P.px+8,y:P.py-4});
   sfx('enc');await fade(1,true);await wait(450);await fade(0,true);
   addSeeds(r,2);
   if(isNew){sfx('get');await say(`¡NUEVA VARIEDAD! ${s.n}`);await say(`THC ${pct(s.thc)}% · ${s.y} g/planta · ${String(s.d).replace('.',',')} días.\nObtienes 2 semillas.`);

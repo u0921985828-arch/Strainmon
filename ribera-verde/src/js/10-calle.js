@@ -26,6 +26,7 @@ async function talkClient(c){
   const acc=[1,.92,clamp(.3+(b.thc-(c.minThc||14))*.05+(c.type==='pij'?.25:0)+(c.type==='tur'?.15:0),.1,.9)][j];
   if(Math.random()<acc){
     useBuds(sid,c.want);S.money+=pr[j];S.sales+=pr[j];S.heat=Math.min(100,S.heat+3+c.want*.5);S.rep+=[3,2,1][j];sfx('coin');
+    await accion('vender',{id:'vfx-monedas',x:P.px+8,y:P.py+2});
     removeClient(c.id);
     await say(pick(['¡Trato hecho!','Genial. Nos vemos.','Perfecto. Se lo diré a mis colegas.']),N);
     toast(`+${eur(pr[j])} · ${c.want} g vendidos`,1600);

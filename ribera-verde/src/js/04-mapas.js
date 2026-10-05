@@ -7,6 +7,7 @@ const gr=(m,x,y,k)=>{if(x>=0&&y>=0&&x<m.w&&y<m.h)m.g[y][x]=k;};
 const ob=(m,x,y,k)=>{if(x>=0&&y>=0&&x<m.w&&y<m.h)m.o[y][x]=k;};
 const rect=(m,x0,y0,x1,y1,fn)=>{for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)fn(x,y);};
 function building(m,id,x0,y0,w,h,doorX,warp){
+  (m.blds=m.blds||[]).push({id,x0,y0,w,h,doorX});
   for(let x=x0;x<x0+w;x++){gr(m,x,y0,'roofT_'+id);gr(m,x,y0+1,'roofB_'+id);for(let y=y0+2;y<y0+h;y++)gr(m,x,y,'wall_'+id);
     if((x-x0)%3===1&&x!==doorX){gr(m,x,y0+3,'win_'+id);}}
   if(doorX!=null){gr(m,doorX,y0+h-1,'door_'+id);m.doors[doorX+','+(y0+h-1)]=warp;}

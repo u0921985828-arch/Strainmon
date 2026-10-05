@@ -45,7 +45,7 @@ function render(now){if(mode==='world'&&S)renderWorld(now);else if(mode==='battl
 let last=performance.now();
 function loop(now){const dt=Math.min(50,now-last);last=now;try{update(dt);render(now);}catch(e){console.error(e);}requestAnimationFrame(loop);}
 function boot(data){
-  buildTiles();makeMisc();buildMaps();computeClientTiles();makeArt();
+  buildTiles();makeMisc();buildMaps();computeClientTiles();makeArt();arteListo();
   try{if(localStorage.getItem('rv_sound')==='0')setSound(false);}catch(e){}
   if(data&&data.S){S=data.S;migrate();enterGame();}else showTitle();
   requestAnimationFrame(loop);

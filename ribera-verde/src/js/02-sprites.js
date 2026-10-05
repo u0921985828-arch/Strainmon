@@ -60,8 +60,9 @@ function spriteFor(look,dir,frame){
 }
 /* ---------- plants ---------- */
 const plantCache={};
+const plantStage=p=>p.prog>=1?4:p.prog<.12?0:p.prog<.35?1:p.prog<.65?2:3;
 function plantSprite(p){
-  const s=getStrain(p.sid);const stage=p.dead?9:p.prog>=1?4:p.prog<.12?0:p.prog<.35?1:p.prog<.65?2:3;
+  const s=getStrain(p.sid);const stage=p.dead?9:plantStage(p);
   const dry=p.water<=0||p.dead,pest=!!p.pest;
   const key=p.sid+stage+dry+pest;if(plantCache[key])return plantCache[key];
   const [c,x]=mkCanvas(16,26);const t=painter(x,rngSeed(hashStr(key)));

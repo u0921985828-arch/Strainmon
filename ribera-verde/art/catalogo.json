@@ -1,0 +1,1184 @@
+{
+ "generado": "tools/sprites/catalogo.js",
+ "claves": 124,
+ "catalogo": {
+  "look:player": [
+   {
+    "asset": "player",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F1",
+    "depende_de": []
+   }
+  ],
+  "look:kiko": [
+   {
+    "asset": "kiko",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:kiko": [
+   {
+    "asset": "kiko",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:josune": [
+   {
+    "asset": "josune",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:josune": [
+   {
+    "asset": "josune",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:baltasar": [
+   {
+    "asset": "baltasar",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:baltasar": [
+   {
+    "asset": "baltasar",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:tono": [
+   {
+    "asset": "tono",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:tono": [
+   {
+    "asset": "tono",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:begona": [
+   {
+    "asset": "begona",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:begona": [
+   {
+    "asset": "begona",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:kid": [
+   {
+    "asset": "unai",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:unai": [
+   {
+    "asset": "unai",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:oldman": [
+   {
+    "asset": "patxi",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:patxi": [
+   {
+    "asset": "patxi",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:granny": [
+   {
+    "asset": "txaro",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:txaro": [
+   {
+    "asset": "txaro",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:sailor": [
+   {
+    "asset": "inaki",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:inaki": [
+   {
+    "asset": "inaki",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:cop": [
+   {
+    "asset": "cop",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:cop": [
+   {
+    "asset": "cop",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:molina": [
+   {
+    "asset": "molina",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:molina": [
+   {
+    "asset": "molina",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:darko": [
+   {
+    "asset": "darko",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:darko": [
+   {
+    "asset": "darko",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:judge": [
+   {
+    "asset": "jurado",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:jurado": [
+   {
+    "asset": "jurado",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:cliente1": [
+   {
+    "asset": "cliente1",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:cliente2": [
+   {
+    "asset": "cliente2",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:cliente3": [
+   {
+    "asset": "cliente3",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:cliente4": [
+   {
+    "asset": "cliente4",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:cliente5": [
+   {
+    "asset": "cliente5",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:cliente6": [
+   {
+    "asset": "cliente6",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "combate:espalda:player": [
+   {
+    "asset": "player-combate",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F6",
+    "depende_de": [
+     "player"
+    ]
+   }
+  ],
+  "look:ladron1": [
+   {
+    "asset": "ladron1-combate",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F6",
+    "depende_de": []
+   }
+  ],
+  "combate:frente:ladron": [
+   {
+    "asset": "ladron1-combate",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F6",
+    "depende_de": []
+   },
+   {
+    "asset": "ladron2-combate",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F6",
+    "depende_de": []
+   },
+   {
+    "asset": "ladron3-combate",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F6",
+    "depende_de": []
+   }
+  ],
+  "look:ladron2": [
+   {
+    "asset": "ladron2-combate",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F6",
+    "depende_de": []
+   }
+  ],
+  "look:ladron3": [
+   {
+    "asset": "ladron3-combate",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F6",
+    "depende_de": []
+   }
+  ],
+  "combate:frente:policia": [
+   {
+    "asset": "policia-combate",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F6",
+    "depende_de": [
+     "cop"
+    ]
+   }
+  ],
+  "combate:fondo-ladron": [
+   {
+    "asset": "fondo-combate-ladron",
+    "familia": "imagen",
+    "herramienta": "create_image_pixflux",
+    "fase": "F6",
+    "depende_de": []
+   }
+  ],
+  "combate:fondo-policia": [
+   {
+    "asset": "fondo-combate-policia",
+    "familia": "imagen",
+    "herramienta": "create_image_pixflux",
+    "fase": "F6",
+    "depende_de": []
+   }
+  ],
+  "tile:grass": [
+   {
+    "asset": "tiles-exterior",
+    "familia": "mapa-terreno",
+    "herramienta": "create_tiles_pro",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:flowers": [
+   {
+    "asset": "tiles-exterior",
+    "familia": "mapa-terreno",
+    "herramienta": "create_tiles_pro",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:tallgrass": [
+   {
+    "asset": "tiles-exterior",
+    "familia": "mapa-terreno",
+    "herramienta": "create_tiles_pro",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:dirt": [
+   {
+    "asset": "tiles-exterior",
+    "familia": "mapa-terreno",
+    "herramienta": "create_tiles_pro",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:walk": [
+   {
+    "asset": "tiles-exterior",
+    "familia": "mapa-terreno",
+    "herramienta": "create_tiles_pro",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roadT": [
+   {
+    "asset": "tiles-exterior",
+    "familia": "mapa-terreno",
+    "herramienta": "create_tiles_pro",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roadB": [
+   {
+    "asset": "tiles-exterior",
+    "familia": "mapa-terreno",
+    "herramienta": "create_tiles_pro",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:plaza": [
+   {
+    "asset": "tiles-exterior",
+    "familia": "mapa-terreno",
+    "herramienta": "create_tiles_pro",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:water": [
+   {
+    "asset": "tiles-exterior",
+    "familia": "mapa-terreno",
+    "herramienta": "create_tiles_pro",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:bridgeT": [
+   {
+    "asset": "tiles-exterior",
+    "familia": "mapa-terreno",
+    "herramienta": "create_tiles_pro",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:bridgeB": [
+   {
+    "asset": "tiles-exterior",
+    "familia": "mapa-terreno",
+    "herramienta": "create_tiles_pro",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:dock": [
+   {
+    "asset": "tiles-exterior",
+    "familia": "mapa-terreno",
+    "herramienta": "create_tiles_pro",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:floor": [
+   {
+    "asset": "interior-home",
+    "familia": "mapa-terreno",
+    "herramienta": "create_building_kit",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:iwT_home": [
+   {
+    "asset": "interior-home",
+    "familia": "mapa-terreno",
+    "herramienta": "create_building_kit",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:iwB_home": [
+   {
+    "asset": "interior-home",
+    "familia": "mapa-terreno",
+    "herramienta": "create_building_kit",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:floorS": [
+   {
+    "asset": "interior-shop",
+    "familia": "mapa-terreno",
+    "herramienta": "create_building_kit",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:iwT_shop": [
+   {
+    "asset": "interior-shop",
+    "familia": "mapa-terreno",
+    "herramienta": "create_building_kit",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:iwB_shop": [
+   {
+    "asset": "interior-shop",
+    "familia": "mapa-terreno",
+    "herramienta": "create_building_kit",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:floorB": [
+   {
+    "asset": "interior-bar",
+    "familia": "mapa-terreno",
+    "herramienta": "create_building_kit",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:iwT_bar": [
+   {
+    "asset": "interior-bar",
+    "familia": "mapa-terreno",
+    "herramienta": "create_building_kit",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:iwB_bar": [
+   {
+    "asset": "interior-bar",
+    "familia": "mapa-terreno",
+    "herramienta": "create_building_kit",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:mat": [
+   {
+    "asset": "tiles-interior-extra",
+    "familia": "mapa-terreno",
+    "herramienta": "create_tiles_pro",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:tent": [
+   {
+    "asset": "tiles-interior-extra",
+    "familia": "mapa-terreno",
+    "herramienta": "create_tiles_pro",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_home": [
+   {
+    "asset": "edificio-home",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:roofB_home": [
+   {
+    "asset": "edificio-home",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:wall_home": [
+   {
+    "asset": "edificio-home",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:win_home": [
+   {
+    "asset": "edificio-home",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:door_home": [
+   {
+    "asset": "edificio-home",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:roofT_shop": [
+   {
+    "asset": "edificio-shop",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:roofB_shop": [
+   {
+    "asset": "edificio-shop",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:wall_shop": [
+   {
+    "asset": "edificio-shop",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:win_shop": [
+   {
+    "asset": "edificio-shop",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:door_shop": [
+   {
+    "asset": "edificio-shop",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:roofT_bar": [
+   {
+    "asset": "edificio-bar",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:roofB_bar": [
+   {
+    "asset": "edificio-bar",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:wall_bar": [
+   {
+    "asset": "edificio-bar",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:win_bar": [
+   {
+    "asset": "edificio-bar",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:door_bar": [
+   {
+    "asset": "edificio-bar",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:roofT_gray": [
+   {
+    "asset": "edificio-gray",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:roofB_gray": [
+   {
+    "asset": "edificio-gray",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:wall_gray": [
+   {
+    "asset": "edificio-gray",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "tile:win_gray": [
+   {
+    "asset": "edificio-gray",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "obj:fence": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:sign": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:bench": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:crate": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:bush": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:pc": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:lab": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:lab2": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:table": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:shelfW": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:counter": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:display": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:plantDeco": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:barcounter": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:bottles": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:stool": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:btable": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:jukebox": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:iwin": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:poster": [
+   {
+    "asset": "props-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:fridge": [
+   {
+    "asset": "props-32",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:bedT": [
+   {
+    "asset": "props-32",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:bedB": [
+   {
+    "asset": "props-32",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:tree": [
+   {
+    "asset": "prop-arbol",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "obj:lamp": [
+   {
+    "asset": "prop-farola",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "obj:fountain": [
+   {
+    "asset": "prop-fuente",
+    "familia": "mapa-objeto",
+    "herramienta": "create_map_object",
+    "fase": "F4",
+    "depende_de": [
+     "tiles-exterior"
+    ]
+   }
+  ],
+  "planta:germinando": [
+   {
+    "asset": "planta-fases",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F5",
+    "depende_de": []
+   }
+  ],
+  "planta:plantula": [
+   {
+    "asset": "planta-fases",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F5",
+    "depende_de": []
+   }
+  ],
+  "planta:vegetativo": [
+   {
+    "asset": "planta-fases",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F5",
+    "depende_de": []
+   }
+  ],
+  "planta:floracion": [
+   {
+    "asset": "planta-fases",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F5",
+    "depende_de": []
+   }
+  ],
+  "planta:lista": [
+   {
+    "asset": "planta-fases",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F5",
+    "depende_de": []
+   }
+  ],
+  "planta:muerta": [
+   {
+    "asset": "planta-fases",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F5",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-vacia": [
+   {
+    "asset": "planta-fases",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F5",
+    "depende_de": []
+   }
+  ],
+  "planta-variante:sana": [
+   {
+    "asset": "planta-fases",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F5",
+    "depende_de": []
+   }
+  ],
+  "planta-variante:seca": [
+   {
+    "asset": "planta-fases",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F5",
+    "depende_de": []
+   }
+  ],
+  "misc:bolsa": [
+   {
+    "asset": "iconos",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F7",
+    "depende_de": []
+   }
+  ],
+  "planta-variante:plaga": [
+   {
+    "asset": "vfx-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "planta-variante:seca-plaga": [
+   {
+    "asset": "vfx-16",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "misc:hoja-titulo": [
+   {
+    "asset": "titulo",
+    "familia": "imagen",
+    "herramienta": "create_image_pixflux",
+    "fase": "F7",
+    "depende_de": []
+   }
+  ],
+  "misc:burbuja-$": [
+   {
+    "asset": "burbujas",
+    "familia": "procedural",
+    "herramienta": "procedural",
+    "fase": "F7",
+    "depende_de": []
+   }
+  ],
+  "misc:burbuja-!": [
+   {
+    "asset": "burbujas",
+    "familia": "procedural",
+    "herramienta": "procedural",
+    "fase": "F7",
+    "depende_de": []
+   }
+  ]
+ }
+}

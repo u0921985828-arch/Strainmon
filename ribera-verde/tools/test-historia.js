@@ -13,15 +13,15 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
-const OUT = path.join(__dirname, 'salida');
+const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.join(__dirname, 'salida');
 
 (async () => {
-  const browser = await chromium.launch();
+  const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   const page = await browser.newPage({ viewport: { width: 1000, height: 700 } });
   const errors = [];
   page.on('pageerror', e => errors.push('pageerror: ' + e.message));
   page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
-  await page.goto('file://' + path.join(ROOT, 'index.html'));
+  await page.goto('file://' + (process.env.RV_HTML ? path.resolve(process.env.RV_HTML) : path.join(ROOT, 'index.html')));
   await page.waitForFunction(() => typeof mode !== 'undefined' && mode === 'title');
 
   // ---------- piloto automático dentro de la página ----------

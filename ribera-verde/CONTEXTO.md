@@ -7,6 +7,10 @@
 > **20:56** · «Inspirado en las mecánicas d juego de Weed Firm, con los gráficos de Pokémon Esmeralda»
 >
 > **21:31** · «Quiero que recojas todo esto en un Zip con contexto y todo»
+>
+> **22:24** · «Quiero que me des instrucciones para que en Claude Code con la API de Pixel Lab pueda mejorar mediante sprites todos los gráficos del juego, pero a nivel bastante pro, del palo de animaciones y, y eso, pues si hay alguien que, que sea fumador, pues igual que salga en algún momento fumando o lo que sea, o ese tipo de cosas. Pero que se guarde la estética que hemos acordado. Eso sí.»
+>
+> **23:24** · «En la API de Pixel Lab tienes opciones de crear tanto mapas como personajes, como objetos y también creaciones simples. Entonces deberíamos de catalogar todos los sprites que necesitamos para poder optimizar las creaciones y aprovechar al máximo las herramientas.»
 
 ## Cómo se interpretó
 
@@ -27,14 +31,20 @@
 - **Ambientación propia.** «Ribera Verde» es un barrio ficticio a orillas de una ría, con guiños vascos: txoko, kalimotxo, pintxos, «aupa», «eskerrik asko». Ningún personaje está basado en una persona real.
 - **«Genoteca» como Pokédex.** Es el álbum de variedades que da el objetivo de coleccionar.
 - **Combates de policía sin vida.** La barra enemiga mide la sospecha (el calor policial). Contra la policía se negocia o se huye; no se le pega.
+- **Sprites por familia de PixelLab (v1.3).** Cada sprite sale de la herramienta que mejor lo resuelve. Los personajes llevan rig y plantillas. El terreno va en tiles, kits de edificio y Wang. Lo que se apoya en el suelo se pinta con `create_map_object` sobre el propio mapa. Lo pequeño va en lotes compartidos y las pantallas en img2img. Detalle en [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md).
+- **El motor de sprites va antes que los sprites (v1.3).** Se probó con un atlas «de calco» del arte actual: si las capturas salen iguales, las anclas cuadran y los créditos se gastan solo en arte.
 - **Ajustes tras la prueba automática (v1.1).** Los ladrones de los capítulos altos ganaban casi siempre, así que se suavizaron y ahora la VIDA máxima sube 2 puntos por cada ladrón vencido. Además se corrigieron tres fallos; están en [CHANGELOG.md](CHANGELOG.md).
 
-## Estado (v1.1.0)
+## Estado (v1.3.0)
 
 - Se juega de principio a fin: capítulos 1 a 7, final y juego libre (capítulo 8).
-- `npm test` recorre la historia entera y los sistemas sueltos en 34 pasos (cultivo, venta, multa por retraso, redada con y sin protección, Copa perdida y ganada, combates, menús, guardado): **34/34, 0 errores de JavaScript**.
+- `npm test` recorre la historia entera y los sistemas sueltos en 34 pasos: **34/34, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
+- **Sprites:**
+  - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
+  - el motor ya usa el atlas (F2) y `npm run test:arte` da 16/16;
+  - todavía no se ha generado ningún sprite con créditos: se empieza por F1.
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
-- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) sigue en la **v1.0**, sin los arreglos de la v1.1. `dist/ribera-verde.artifact.html` es la v1.1 lista para republicar en esa misma dirección.
+- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.3, con arte procedural porque aún no hay atlas.
 
 ## Limitaciones conocidas
 
@@ -48,8 +58,8 @@
 
 ## Siguientes pasos sugeridos
 
-1. Sustituir el arte procedural por sprites de PixelLab con los prompts de [docs/PIXELLAB.md](docs/PIXELLAB.md).
-2. Republicar el Artifact con `dist/ribera-verde.artifact.html` (v1.1).
+1. Generar los sprites con Claude Code y PixelLab, empezando por F1, el protagonista como ancla de estilo. Están listos la guía [docs/PIXELLAB.md](docs/PIXELLAB.md), el catálogo [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md) y el comando `/sprites`.
+2. Opcional (F4b): orillas con los tres Wang encadenados y autotiling en el motor.
 3. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.
 4. Añadir zonas: polígono industrial, monte con cultivo exterior por estaciones y puerto con contrabando.
 5. Añadir profundidad al estilo Weed Firm: secado y curado, clientes fijos con encargos, empleados y un segundo local.

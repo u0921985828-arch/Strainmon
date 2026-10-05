@@ -1,0 +1,276 @@
+{
+  "generado": "2026-10-05",
+  "tiles_suelo": [
+    "bridgeB",
+    "bridgeT",
+    "dirt",
+    "dock",
+    "door_bar",
+    "door_home",
+    "door_shop",
+    "floor",
+    "floorB",
+    "floorS",
+    "flowers",
+    "grass",
+    "iwB_bar",
+    "iwB_home",
+    "iwB_shop",
+    "iwT_bar",
+    "iwT_home",
+    "iwT_shop",
+    "mat",
+    "plaza",
+    "roadB",
+    "roadT",
+    "roofB_bar",
+    "roofB_gray",
+    "roofB_home",
+    "roofB_shop",
+    "roofT_bar",
+    "roofT_gray",
+    "roofT_home",
+    "roofT_shop",
+    "tallgrass",
+    "tent",
+    "walk",
+    "wall_bar",
+    "wall_gray",
+    "wall_home",
+    "wall_shop",
+    "water",
+    "win_bar",
+    "win_gray",
+    "win_home",
+    "win_shop"
+  ],
+  "objetos": [
+    "barcounter",
+    "bedB",
+    "bedT",
+    "bench",
+    "bottles",
+    "btable",
+    "bush",
+    "counter",
+    "crate",
+    "display",
+    "fence",
+    "fountain",
+    "fridge",
+    "iwin",
+    "jukebox",
+    "lab",
+    "lab2",
+    "lamp",
+    "pc",
+    "plantDeco",
+    "poster",
+    "shelfW",
+    "sign",
+    "stool",
+    "table",
+    "tree"
+  ],
+  "tiles_animados": [
+    {
+      "clave": "water",
+      "fotogramas": 2
+    }
+  ],
+  "personajes": [
+    "player",
+    "kiko",
+    "josune",
+    "baltasar",
+    "tono",
+    "begona",
+    "kid",
+    "oldman",
+    "granny",
+    "sailor",
+    "cop",
+    "molina",
+    "darko",
+    "judge",
+    "cliente1",
+    "cliente2",
+    "cliente3",
+    "cliente4",
+    "cliente5",
+    "cliente6",
+    "ladron1",
+    "ladron2",
+    "ladron3"
+  ],
+  "personajes_fijos": [
+    "player",
+    "kiko",
+    "josune",
+    "baltasar",
+    "tono",
+    "begona",
+    "kid",
+    "oldman",
+    "granny",
+    "sailor",
+    "cop",
+    "molina",
+    "darko",
+    "judge"
+  ],
+  "npcs": [
+    {
+      "id": "kiko",
+      "look": "kiko",
+      "mapa": "shop",
+      "deambula": false
+    },
+    {
+      "id": "josune",
+      "look": "josune",
+      "mapa": "bar",
+      "deambula": false
+    },
+    {
+      "id": "baltasar",
+      "look": "baltasar",
+      "mapa": "bar",
+      "deambula": false
+    },
+    {
+      "id": "tono",
+      "look": "tono",
+      "mapa": "bar",
+      "deambula": false
+    },
+    {
+      "id": "begona",
+      "look": "begona",
+      "mapa": "town",
+      "deambula": true
+    },
+    {
+      "id": "unai",
+      "look": "kid",
+      "mapa": "town",
+      "deambula": true
+    },
+    {
+      "id": "patxi",
+      "look": "oldman",
+      "mapa": "town",
+      "deambula": false
+    },
+    {
+      "id": "txaro",
+      "look": "granny",
+      "mapa": "town",
+      "deambula": false
+    },
+    {
+      "id": "inaki",
+      "look": "sailor",
+      "mapa": "town",
+      "deambula": false
+    },
+    {
+      "id": "cop",
+      "look": "cop",
+      "mapa": "town",
+      "deambula": true
+    },
+    {
+      "id": "darko",
+      "look": "darko",
+      "mapa": "town",
+      "deambula": false
+    },
+    {
+      "id": "molina",
+      "look": "molina",
+      "mapa": "town",
+      "deambula": false
+    },
+    {
+      "id": "jurado",
+      "look": "judge",
+      "mapa": "town",
+      "deambula": false
+    }
+  ],
+  "plantas": {
+    "fases": [
+      "germinando",
+      "plantula",
+      "vegetativo",
+      "floracion",
+      "lista",
+      "muerta"
+    ],
+    "variantes": [
+      "sana",
+      "plaga",
+      "seca",
+      "seca-plaga"
+    ],
+    "colores_cogollo": {
+      "ria": "#9bd35a",
+      "limon": "#e8e05a",
+      "txoko": "#6fb04a",
+      "niebla": "#7aa6e0",
+      "mango": "#f0a048",
+      "purpura": "#a070d0",
+      "rif": "#c8b070",
+      "hindu": "#4a8a3a",
+      "acapulco": "#f0c838",
+      "malawi": "#d8e070",
+      "citrus": "#c8e050",
+      "bluetx": "#5a90c8",
+      "sollimon": "#f0e878",
+      "kushrif": "#a8a050",
+      "purpurah": "#8050b0",
+      "orotrop": "#f8b030",
+      "nieblamor": "#9080e0",
+      "brumaog": "#70b0b0",
+      "reina": "#b060a0",
+      "amanecer": "#f8d050",
+      "tormenta": "#7058d0",
+      "dragon": "#e05050",
+      "leyenda": "#40e0a0"
+    }
+  },
+  "combate": [
+    "fondo-ladron",
+    "fondo-policia",
+    "frente:ladron",
+    "frente:policia",
+    "espalda:player"
+  ],
+  "misc": [
+    "bolsa",
+    "maceta-vacia",
+    "hoja-titulo",
+    "burbuja-$",
+    "burbuja-!"
+  ],
+  "tamanos": {
+    "tile": [
+      16,
+      16
+    ],
+    "personaje": [
+      16,
+      20
+    ],
+    "planta": [
+      16,
+      26
+    ],
+    "combate_escala": 3,
+    "pantalla": [
+      240,
+      160
+    ]
+  }
+}

@@ -7,15 +7,15 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 const ROOT = path.join(__dirname, '..');
-const OUT = path.join(ROOT, 'screenshots');
+const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.join(ROOT, 'screenshots');
 
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
-  const browser = await chromium.launch();
+  const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   const page = await browser.newPage({ viewport: { width: 1100, height: 760 }, deviceScaleFactor: 1 });
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
-  await page.goto('file://' + path.join(ROOT, 'index.html'));
+  await page.goto('file://' + (process.env.RV_HTML ? path.resolve(process.env.RV_HTML) : path.join(ROOT, 'index.html')));
   await page.waitForFunction(() => typeof mode !== 'undefined' && mode === 'title');
   await page.evaluate(() => document.fonts.ready);
   const screen = page.locator('#screen');
