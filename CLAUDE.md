@@ -33,3 +33,8 @@ informe técnico directo + código refactorizado, sin relleno.
 - Build (bundle inline autocontenido): `node <scratchpad>/build.js` → `dist/PhenoHunter.html`.
 - Consola: LCD 10:9 (matriz 160×144, píxeles cuadrados), modo DMG 4 tonos.
 - Rama de trabajo: `claude/pheno-hunter-game-wzl06e`.
+
+## Subproyecto `ribera-verde/`
+
+- RPG de cultivo 240×160 independiente (v1.1.0). Notas propias en `ribera-verde/CLAUDE.md`.
+- `cd ribera-verde && npm test` → 34/34, 0 errores JS (Playwright global: `NODE_PATH=/opt/node22/lib/node_modules`).

@@ -1,0 +1,44 @@
+/* =========================================================
+   MENÚ START
+   ========================================================= */
+async function startMenu(){
+  let i=0;
+  for(;;){
+    i=await menu(['GENOTECA','MOCHILA','PLANTAS','OBJETIVO','GUARDAR',soundOn?'SONIDO: SÍ':'SONIDO: NO','SALIR'],{cls:'start',initial:i,startCloses:true});
+    if(i<0||i===6)return;
+    if(i===0)await genoteca();else if(i===1)await mochila();else if(i===2)await plantas();
+    else if(i===3){await say(`CAPÍTULO ${S.ch}: ${CH_TITLES[S.ch]||''}\n${objectiveText()}`);await say(`Deuda: ${eur(S.debt)} · Ventas: ${eur(S.sales)}\nReputación ${S.rep} · Calor ${Math.round(S.heat)}%`);}
+    else if(i===4)await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');
+    else if(i===5)setSound(!soundOn);
+  }
+}
+async function genoteca(){
+  const items=DEX.map((k,n)=>{const s=STRAINS[k],nn=String(n+1).padStart(2,'0');return S.disc[k]?{label:`${nn} ${s.n}`,right:pct(s.thc)+'%',sw:s.c,desc:strainLine(k)}:{label:`${nn} ??????`,desc:'Sin descubrir.'};});
+  const cust=Object.keys(S.custom).filter(k=>S.disc[k]);
+  cust.forEach(k=>{const s=S.custom[k];items.push({label:'★ '+s.n,right:pct(s.thc)+'%',sw:s.c,desc:strainLine(k)});});
+  let i=0;
+  do{i=await menu(items,{cls:'full',title:'GENOTECA',title2:`${DEX.filter(k=>S.disc[k]).length}/${DEX.length} · ${cust.length} propias`,desc:true,initial:i});}while(i>=0);
+}
+async function mochila(){
+  let i=0;
+  for(;;){
+    const rows=[{label:'Dinero',right:eur(S.money),desc:'Tu capital. Don Baltasar también lo cuenta.'},{label:'Vida',right:`${S.hp}/${S.hpMax}`,desc:'Se recupera durmiendo, comiendo o con el tiempo.'},
+      {label:'Fertilizante',right:'×'+S.items.fert,desc:'Úsalo en una maceta: +25% de cosecha.'},{label:'Insecticida',right:'×'+S.items.insect,desc:'Úsalo en una maceta con plaga.'},
+      {label:'Spray de pimienta',right:'×'+S.items.spray,desc:'Solo en combate.'},{label:'Bocata',right:'×'+S.items.bocata,desc:'Pulsa A para comerlo: +15 de vida.',k:'bocata'}];
+    if(S.led)rows.push({label:'Lámpara LED',right:'instalada',desc:'+30% de cosecha.'});
+    for(const [k,v] of Object.entries(S.seeds))rows.push({label:'Semilla '+getStrain(k).n,right:'×'+v,sw:getStrain(k).c,desc:strainLine(k)});
+    for(const [k,b] of Object.entries(S.buds))rows.push({label:getStrain(k).n,right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(k).c,desc:'Cogollos listos para vender.\n'+getStrain(k).o});
+    i=await menu(rows,{cls:'full',title:'MOCHILA',title2:`${Math.floor(totalBuds())} g encima`,desc:true,initial:i});
+    if(i<0)return;
+    if(rows[i].k==='bocata'){if(S.items.bocata>0&&S.hp<S.hpMax){S.items.bocata--;S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');toast('Ñam. +15 de vida',1200);}else sfx('bump');}
+  }
+}
+async function plantas(){
+  const rows=[];
+  for(let i=0;i<S.potsOwned;i++){const p=S.pots[i];
+    if(!p){rows.push({label:`Maceta ${i+1} · vacía`,desc:'Planta algo desde el armario de tu piso.'});continue;}
+    const s=getStrain(p.sid);
+    rows.push({label:`${i+1} · ${s.n}`,sw:s.c,right:p.dead?'muerta':p.prog>=1?'¡LISTA!':`${Math.floor(p.prog*100)}%`,desc:p.dead?'Se ha secado. Retírala.':`${p.prog>=1?'Lista para cosechar':stageName(p)} · Agua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%\n${p.pest?'¡PLAGA! Trátala con insecticida. ':''}${p.fert?'Abonada.':'Sin abonar.'}`});}
+  let i=0;do{i=await menu(rows,{cls:'full',title:'ARMARIO DE CULTIVO',title2:S.led?'LED':'',desc:true,initial:i});}while(i>=0);
+}
+
