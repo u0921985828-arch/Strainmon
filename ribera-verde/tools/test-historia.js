@@ -130,8 +130,8 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   }, () => Object.keys(S.custom).length === 1 && discCount() >= 8 && S.ch === 5 && S.due === 2000 || { custom: S.custom, disc: discCount(), ch: S.ch });
 
   await step('Estabilizar Critical Mass: F1 → F2 → F3 → estable', ['^Critical Mass', 'estabilizar', 'Estabilizar', '^Critical Mass', 'estabilizar', 'Estabilizar', '^Critical Mass', 'estabilizar', 'Estabilizar'], async () => {
-    window.R = []; for (let k = 0; k < 3; k++) { await run(labAction); R.push(genDe('kushrif')); }
-  }, () => R.join() === '2,3,4' && !('kushrif' in S.gen) && S.seeds.kushrif === 2 || { R, gen: S.gen, seeds: S.seeds.kushrif });
+    window.R = []; for (let k = 0; k < 3; k++) { if (k) addSeeds('kushrif', 1); await run(labAction); R.push(genDe('kushrif') + ':' + S.seeds.kushrif); }
+  }, () => R.join() === '2:1,3:1,4:1' && !('kushrif' in S.gen) || { R, gen: S.gen, seeds: S.seeds.kushrif });
   await step('Banco de semillas del PC: Punto Rojo y Thai, llegan al día siguiente', ['Banco de semillas', '^Punto Rojo', '^Thai', 'Salir'], async () => {
     S.money = 500; await run(pcAction); window.R = { pedido: S.pedido.slice(), money: S.money, antes: !!S.seeds.thai }; newDay();
   }, () => R.pedido.join() === 'punto,thai' && R.money === 385 && !R.antes && S.seeds.punto === 3 && S.seeds.thai === 3 && S.disc.thai && !S.pedido.length || { R, seeds: S.seeds, pedido: S.pedido });

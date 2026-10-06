@@ -66,6 +66,7 @@
 
 ## Siguientes pasos sugeridos
 
+0. Decidir D1–D6 de [docs/PLAN-PRODUCCION.md](docs/PLAN-PRODUCCION.md) (vista de carpa, carpas nuevas, extras, plantas propias, objetos de la casa y presupuesto) y seguir sus pasos P1–P6.
 1. Probar el APK en un móvil real (la vista de carpa incluida).
 2. Revisar el arte nuevo jugando y repetir lo que no convenza (cada asset del manifiesto guarda sus ids, semillas y descartes). Guía: [docs/PIXELLAB.md](docs/PIXELLAB.md); comando `/sprites`.
 3. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.

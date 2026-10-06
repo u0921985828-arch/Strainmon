@@ -75,6 +75,7 @@ Edita siempre en `src/` y después ejecuta `npm run build`. `index.html` y `dist
 - [docs/GUION.md](docs/GUION.md): historia y diálogos por capítulo.
 - [docs/GENETICA.md](docs/GENETICA.md): las 41 variedades, su historia y el árbol de cruces.
 - [docs/MAPA.md](docs/MAPA.md): mapas con coordenadas, personajes, objetos y tienda.
+- [docs/PLAN-PRODUCCION.md](docs/PLAN-PRODUCCION.md): plan de lo que falta. Recoge el catálogo de carpas, focos, macetas y extras con sus medidas reales, la escala de cada vista, las láminas que hay que pedir a PixelLab con su coste y su orden, la historia y los desbloqueos por capítulo y las decisiones pendientes.
 - [docs/PIXELLAB.md](docs/PIXELLAB.md): kit pro para cambiar todo el arte por sprites y animaciones de PixelLab con Claude Code (comando `/sprites`), sin salirse de la estética. El motor ya los usa en cuanto hay atlas.
 - [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md): cada sprite del juego con su herramienta de PixelLab (personajes, terreno, objetos sobre el mapa, lotes e imágenes), su orden y su coste.
 - [CLAUDE.md](CLAUDE.md): arquitectura y partes delicadas del código.

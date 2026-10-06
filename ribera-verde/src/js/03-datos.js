@@ -29,7 +29,7 @@ const STRAINS={
   tormenta:{n:'Amnesia Haze',thc:26,y:36,d:4.5,r:65,c:'#bcd468',o:'Super Lemon Haze × Trainwreck'},
   dragon:{n:'Fire OG',thc:27,y:40,d:3.5,r:75,c:'#90b448',o:'Critical Kush × Blueberry Kush'},
   leyenda:{n:'Ghost Train Haze',thc:29,y:42,d:4.5,r:75,c:'#d8ecb0',o:'Amnesia Haze × Fire OG · LEGENDARIA'},
-  // landraces de Strainmon (1.9): se piden desde el PC de la tía (pedidoAction)
+  // landraces de Strainmon (1.9): se piden desde el PC de la tía (bancoSemillas)
   mich:{n:'Michoacán',thc:15,y:30,d:4,r:55,c:'#b8d860',o:'Landrace · altiplano de Michoacán, México',h:'Sativa de altura, espigada y cerebral. Aguanta bien el sol fuerte.'},
   punto:{n:'Punto Rojo',thc:16,y:30,d:4.5,r:45,c:'#b4a24c',o:'Landrace · cordillera de Colombia',h:'Sativa colombiana de pistilos rojizos. Floración larga y efecto eufórico.'},
   thai:{n:'Thai',thc:17,y:26,d:5,r:40,c:'#b0d468',o:'Landrace · selvas del norte de Tailandia',h:'Sativa esbelta, de floración larguísima y aroma especiado. Es madre de la Haze y de la Northern Lights.'},

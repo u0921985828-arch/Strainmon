@@ -151,8 +151,8 @@ flowchart LR
 
 Lo que sale de un cruce nuevo (receta o híbrido propio) es una **F1**: una línea inestable en la que cada planta sale distinta.
 
-- En la mesa de genética, al elegir como padre la misma variedad («· estabilizar»), se cruzan dos plantas de la línea: gasta 2 semillas, da 2 semillas y sube una generación (F1 → F2 → F3 → **estable** en la F4).
-- **Cosecha de una línea inestable:** gramos × (0,8 a 1,1 al azar) y THC × (0,96 a 1,02). Estable, ×1.
+- En la mesa de genética, al elegir como padre la misma variedad («· estabilizar»), se cruzan dos plantas de la línea: gasta 2 semillas, guarda 1 y sube una generación (F1 → F2 → F3 → **estable** en la F4). Entre generaciones hay que cultivar la línea para tener otra vez 2 semillas.
+- **Cosecha de una línea inestable:** gramos × (0,8 a 1,1 al azar); el THC no cambia. Estable, ×1.
 - Las landraces, las de la tienda y las variedades de partidas anteriores a la 1.9 son estables.
 
 ## Híbridos propios (cruces sin receta)
@@ -172,5 +172,5 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
 - **Salud:** −4/h sin agua, −2,5/h con plaga, +1/h si agua > 30 % y sin plaga. A 0 la planta muere.
 - **Plagas:** probabilidad por hora `0,006 × (100 − resistencia) / 40` mientras no está madura.
 - **Cosecha (g):** `rinde × (0,4 + 0,6 × salud/100) × (abono ? 1,25 : 1) × rend × v` (v = 1 si la línea es estable; 0,8–1,1 si no).
-- **THC final:** `THC × (0,85 + 0,15 × salud/100) × (1 + 0,2 × (v − 1)) + thc + (abono ? 0,3 : 0)`.
+- **THC final:** `THC × (0,85 + 0,15 × salud/100) + thc + (abono ? 0,3 : 0)`.
 - **Semillas al cosechar:** 1 + (0 a 2).
