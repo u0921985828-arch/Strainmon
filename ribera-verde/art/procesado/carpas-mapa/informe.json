@@ -1,0 +1,18 @@
+{
+  "grupo": "carpas-mapa",
+  "celda": [
+    32,
+    48
+  ],
+  "secuencias": 3,
+  "fotogramas": 3,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 6.42,
+  "colores_finales": 7,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

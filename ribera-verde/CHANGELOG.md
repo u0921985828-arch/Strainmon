@@ -1,5 +1,24 @@
 # Cambios
 
+## 1.8.0 · 6 de octubre de 2026
+
+- **Cambiado: una sola escala (opción A de `docs/PLANO.md`).**
+  - El piso pasa a 12 × 8 casillas a 1 casilla = 1 m (72 m²; antes 20 × 12, 240 m²). Dormitorio a la izquierda, escritorio y mesa de genética al fondo, carpas al fondo a la derecha y la salida en (5,7).
+  - Las carpas son muebles sólidos: el armario 60 y la carpa 100 ocupan 1 casilla, la carpa 150 ocupa 2 (sprites nuevos `carpa-<t>-mapa`, a ×1 de su tamaño real).
+  - Fuera la bandeja de cultivo, las mesitas y las plazas como casillas del mapa.
+- **Nuevo: vista de carpa.** Con A delante de una carpa se abre de frente, a 64 px por metro, sobre el fondo de un cuarto de cultivo.
+  - La cruceta elige la plaza (las filas de atrás, al tresbolillo) o el foco; A riega, abona, cosecha o cambia maceta y foco como antes; B sale. El tiempo no corre mientras miras.
+  - Ficha a la izquierda con la variedad, la fase, el agua, la salud y la plaga; con el foco, su potencia y la luz que gasta al día.
+  - Luz de cada foco sobre las plantas, plantas recortadas al interior de la carpa y la luz que se escapa bajo la puerta en el piso.
+- **Nuevo: plantas por variedad.** Las plantas de la vista son el arte de cepas del repositorio (`../assets/plants`, 18 cepas × 5 fases) sin su tiesto y a escala: cada variedad con la cepa más parecida en porte y color de cogollo (los híbridos propios, por hash). Secas, amarillean; muertas, se quedan pardas.
+- **Arte:** 4 generaciones de PixelLab (carpas del piso, carpas de la vista, macetas y el cuarto), frente a las 120–180 previstas. Retirados los sprites de carpas, mesa, macetas y plantas de la 1.6–1.7.
+- **Partidas viejas:** una partida de la 1.7 carga con sus carpas y sus plantas intactas; si el jugador estaba fuera del piso nuevo, aparece en una casilla libre.
+- **Plano** (`docs/PLANO.md`, `npm run plano`) rehecho: decisión A aplicada, carpas a ×1,0 en el piso y la vista medida a 64 px/m (carpas, macetas y focos ×0,76–×1,09; plantas ×0,85–×2,3, estilizadas).
+- **Tests:**
+  - `npm test` 39/39: paso nuevo de la vista de carpa (A abre, ▶ plaza 2, A riega, B sale).
+  - `npm run test:arte` 22/22: carpas como muebles en el piso de 12 × 8, plantas de la vista (23 variedades × 5 fases, seca y muerta sin verdes) y la vista con el arte del atlas.
+- **Capturas:** nueva `03b-vista-carpa.png`.
+
 ## 1.7.0 · 6 de octubre de 2026
 
 - **Nuevo: plano del juego** (`npm run plano`, `docs/PLANO.md`).

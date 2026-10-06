@@ -133,8 +133,7 @@ const SIGNS={'town:9,8':'Calle Ribera, 3.\nPiso de la tía Maite.','town:13,8':'
 async function objectAction(x,y){
   const m=MAPS[S.map],o=m.o[y]&&m.o[y][x];
   if(S.map==='home'){
-    const pi=huecos().findIndex(h=>h.x===x&&h.y===y);if(pi>=0)return potAction(pi);
-    const ci=(m.carpas||[]).findIndex(t=>x>=t.x0&&x<=t.x1&&y>=t.y0&&y<=t.y1);if(ci>=0)return carpaAction(m.carpas[ci].ci);
+    const t=(m.carpas||[]).find(t=>x>=t.x0&&x<=t.x1&&y===t.y);if(t)return abrirCarpa(t.ci);
     if(sitioLibre(x,y))return say('Aquí cabe una carpa de cultivo. Kiko vende carpas de 100×100.');
     if(o==='bedT'||o==='bedB')return bedAction();
     if(o==='pc')return pcAction();

@@ -122,34 +122,33 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     const acc = await page.evaluate(async () => { VFXLOG.length = 0; enterMap('home', 5, 6, 'up'); const t = performance.now(); await accion('regar', { id: 'vfx-gotas', x: 80, y: 80 }); return { ms: Math.round(performance.now() - t), libre: P.act === null, vfx: VFXLOG.slice() }; });
     check('Regar: animación de 1 s y gotas', acc.ms >= 950 && acc.ms < 1600 && acc.libre && acc.vfx.includes('vfx-gotas'), acc);
 
-    // cogollos del color de la variedad, planta seca y plaga
-    const planta = await page.evaluate(async () => {
-      enterMap('home', 8, 5, 'up'); S.pots[0] = { sid: 'purpura', prog: 1, water: 60, health: 100 }; S.pots[1] = { sid: 'mango', prog: 0.5, water: 0, health: 80, pest: true };
-      await new Promise(r => setTimeout(r, 120));
-      const x = ctx, cam = camera(), cols = new Set();
-      for (const h of huecos().slice(0, 2)) { const d = x.getImageData(h.x * 16 - cam.x - 8, h.y * 16 - cam.y - 16 - MESA_ALTO, 32, 32).data; for (let i = 0; i < d.length; i += 4) cols.add('#' + [d[i], d[i + 1], d[i + 2]].map(v => v.toString(16).padStart(2, '0')).join('')); }
-      return { purpura: cols.has(getStrain('purpura').c.toLowerCase()), magenta: ['#ff5cff', '#d020c8', '#80107a'].some(k => cols.has(k)), seca: cols.has('#b8aa48') };
-    });
-    check('Cogollos con el color de la variedad (sin rastro de la rampa magenta)', planta.purpura && !planta.magenta, planta);
-    check('Planta sin agua con la rampa seca', planta.seca, planta);
-
-    // carpas (1.6): cerradas desde fuera, abiertas por dentro con la bandeja de cultivo, macetas del atlas y focos colgando
+    // carpas (1.8): muebles del piso a 16 px/m y, con A delante, la vista de carpa a 64 px/m con arte del atlas
     const carpa = await page.evaluate(async () => {
+      const espera = ms => new Promise(r => setTimeout(r, ms)), hasta = f => new Promise(r => { const i = setInterval(() => { if (f()) { clearInterval(i); r(); } }, 20); });
       S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'led720' }]; S.macetas = ['plastico7', 'tela11', 'plastico18', 'tela25', 'tela11', 'tela11', 'tela11', 'tela11'];
-      S.pots = Array(8).fill(null); S.pots[0] = { sid: 'ria', prog: .5, water: 80, health: 100 }; S.pots[2] = { sid: 'limon', prog: .8, water: 80, health: 100 };
-      const m = MAPS.home, r = {}; enterMap('home', 3, 8, 'up'); const [A, B] = m.carpas;
-      r.fuera = [A, B].every(t => !dentroCarpa(t) && arteCarpaFuera(t, 0, 0)); r.tamanos = [A.x1 - A.x0 + 1, B.x1 - B.x0 + 1].join();
-      r.solidas = tileSolid(m, A.x0, A.y0 + 2) && tileSolid(m, A.x0 + 1, A.y0 + 2) && !tileSolid(m, A.door, A.y1) && !tileSolid(m, A.x0 + 1, A.y0 + 3);
-      enterMap('home', B.door, B.y0 + 3, 'up'); r.dentroB = dentroCarpa(B) && !dentroCarpa(A);
-      r.interior = arteCarpaTile(m, B.x0, B.y0, 0, 0) && arteCarpaTile(m, B.x1, B.y1, 0, 0) && !arteCarpaTile(m, 0, 9, 0, 0);
-      r.focos = ['cfl', 'sodio', 'led'].every(t => arteFoco(t, 50, 40, 20)); r.mesa = TILES.mesa.length === 4 && m.o[B.y0 + 2].slice(B.x0 + 1, B.x1).every(o => o === 'mesa');   // bandeja continua (procedural)
-      r.macetas = Object.keys(MACETAS).every(k => !!ARTE.cubre['misc:maceta-' + k]);
-      // la planta en su maceta del atlas: sin la maceta de tela (colores de maceta-vacia que no tocan hojas) y con la nueva debajo
-      const v = frameDe(ARTE.cubre['misc:maceta-vacia'], 'maceta-vacia', 'unica', 0, { i: 0 }), f = frameDe(ARTE.cubre['planta:floracion'], 'floracion', 'unica', 0, { i: 0 });
-      const opacos = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i]) n++; return n; };
-      r.quitados = opacos(f.c) - opacos(sinMaceta(f.c)); r.vacia = opacos(v.c); r.sinMaceta = r.quitados >= r.vacia * .5 && opacos(sinMaceta(v.c)) === 0;
-      await new Promise(res => setTimeout(res, 150)); r.errores = 0; return r; });
-    check('Carpas: cerradas por fuera, por dentro sin techo, bandeja continua, macetas y focos del atlas', carpa.fuera && carpa.tamanos === '4,8' && carpa.solidas && carpa.dentroB && carpa.interior && carpa.focos && carpa.mesa && carpa.macetas && carpa.sinMaceta, carpa);
+      S.pots = Array(8).fill(null); S.pots[0] = { sid: 'purpura', prog: 1, water: 80, health: 100 }; S.pots[1] = { sid: 'mango', prog: .5, water: 0, health: 80, pest: true };
+      S.pots[2] = { sid: 'ria', prog: .5, water: 80, health: 100 }; S.pots[3] = { sid: 'ria', prog: .5, water: 80, health: 100, dead: true };
+      const m = MAPS.home, r = {}; enterMap('home', 5, 5, 'up'); const [A, B] = m.carpas;
+      r.mapa = ['p60', 'm100', 'g150'].every(t => arteCarpaMapa(t, 50, 50)); r.anchos = [A.x1 - A.x0 + 1, B.x1 - B.x0 + 1].join();
+      r.solidas = tileSolid(m, A.x0, A.y) && tileSolid(m, B.x0, B.y) && tileSolid(m, B.x1, B.y) && !tileSolid(m, A.x0, A.y + 1);
+      r.piso = [m.w, m.h].join('×');
+      // las 23 variedades × 5 fases tienen planta; los híbridos propios, una por hash
+      const g = ARTE.cubre['misc:planta-vista'];
+      r.plantas = DEX.every(k => [1, 2, 3, 4, 5].every(f => !!frameDe(g, 'sm' + smDe(k) + '-' + f, 'unica', 0, { i: 0 }))) && !!frameDe(g, 'sm' + smDe('xq9') + '-3', 'unica', 0, { i: 0 });
+      const alto = (sid, prog) => { ctx.save(); const h = artePlantaVista({ sid, prog, water: 80, health: 100 }, 60, 100, 0); ctx.restore(); return h; };
+      r.alturas = [.05, .2, .5, .8, 1].map(p => alto('malawi', p)); r.crece = r.alturas.every((h, i) => h > 0 && (!i || h >= r.alturas[i - 1])) && r.alturas[4] <= 56;
+      const f = frameDe(g, 'sm08-3', 'unica', 0, { i: 0 }), colores = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, o = new Set(); for (let i = 0; i < d.length; i += 4) if (d[i + 3]) o.add(d[i] + ',' + d[i + 1] + ',' + d[i + 2]); return o; };
+      const verdes = c => [...colores(c)].filter(k => { const [R, G, B] = k.split(',').map(Number); return G > R + 12 && G > B + 12; }).length;
+      r.seca = verdes(f.c) > 3 && verdes(secar(f.c, 0)) === 0 && verdes(secar(f.c, 1)) === 0;
+      // la escena: A delante del armario, ▶ plaza 2, ▲ el foco, B sale
+      enterMap('home', A.x0, A.y + 1, 'up'); press('A'); await hasta(() => mode === 'carpa' && handlers.length === 1); await espera(150);
+      r.escena = arteFondoCuarto() && arteCarpaVista('p60', 120, 149) && Object.keys(MACETAS).every(k => arteMacetaVista(k, 50, 100) !== null) && ['cfl', 'sodio', 'led'].every(t => arteFoco(t, 50, 40, 20));
+      r.sel = [VC.sel]; press('right'); r.sel.push(VC.sel); press('up'); r.sel.push(VC.sel); r.info = document.getElementById('vcInfo').textContent;
+      press('B'); await hasta(() => mode === 'world' && isFree()); r.sale = !VC && document.getElementById('vcInfo').hidden;
+      return r; });
+    check('Carpas: muebles del piso (1-2 casillas, sólidos) con su arte, piso de 12×8', carpa.mapa && carpa.anchos === '1,2' && carpa.solidas && carpa.piso === '12×8', carpa);
+    check('Plantas de la vista: 23 variedades × 5 fases, alturas que crecen hasta 56 px, seca y muerta sin verdes', carpa.plantas && carpa.crece && carpa.seca, carpa);
+    check('Vista de carpa: A abre, ▶ plaza 2, ▲ el foco, B sale; fondo, carpa, macetas y focos del atlas', carpa.escena && carpa.sel.join() === '0,1,-1' && /CFL/.test(carpa.info) && carpa.sale, carpa);
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
       for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }
       r.rio = mascaraOrilla(m, 31, 15); r.centro = mascaraOrilla(m, 35, 27); r.sinAtlas = (() => { const ok = ARTE.ok; ARTE.ok = false; const v = arteOrilla(m, 'water', 31, 15, 0, 0); ARTE.ok = ok; return v; })(); return r; });

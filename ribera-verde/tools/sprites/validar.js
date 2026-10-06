@@ -13,6 +13,8 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..', '..');
 const argi = process.argv.indexOf('--manifiesto');
 const M = JSON.parse(fs.readFileSync(argi > 0 ? process.argv[argi + 1] : path.join(ROOT, 'art', 'manifest.json'), 'utf8'));
+// los assets retirados (estado «retirado») se quedan en el manifiesto como historia: no se validan ni cubren nada
+const RETIRADOS = M.assets.filter(a => a.estado === 'retirado').map(a => a.id); M.assets = M.assets.filter(a => a.estado !== 'retirado');
 const INV = JSON.parse(fs.readFileSync(path.join(ROOT, 'art', 'inventario.json'), 'utf8'));
 
 // Límites de las herramientas del MCP oficial de PixelLab (comprobados contra https://api.pixellab.ai/mcp, oct. 2026)
@@ -39,7 +41,7 @@ const ENTRADA_OK = {
   create_1_direction_object: ['style_images'],
   create_image_pixflux: ['color_image_base64', 'init_image_base64'],
   create_map_object: ['background_image', 'inpainting.mask_image'],
-  create_topdown_tileset: [], create_building_kit: [], procedural: [],
+  create_topdown_tileset: [], create_building_kit: [], procedural: [], importado: [],
 };
 function checkEntrada(a) {
   const e = a.entrada; if (!e) return;
@@ -127,6 +129,7 @@ function checkTool(a) {
       if (!inRange(p.width, 16, 400) || !inRange(p.height, 16, 400) || p.width * p.height < 1024) E(id, 'pixflux: 16-400 por lado y área ≥ 32×32');
       break;
     case 'procedural': break;
+    case 'importado': if (!a.origen) E(id, 'importado: falta «origen» (de dónde sale el arte)'); break;
     default: E(id, `herramienta «${a.herramienta}» no está en el kit`);
   }
 }
@@ -210,8 +213,6 @@ INV.personajes.forEach(k => want.personajes.push('look:' + k));
 INV.npcs.forEach(n => want.personajes.push('npc:' + n.id));
 INV.tiles_suelo.forEach(k => want.resto.push('tile:' + k));
 INV.objetos.forEach(k => want.resto.push('obj:' + k));
-INV.plantas.fases.forEach(k => want.resto.push('planta:' + k));
-INV.plantas.variantes.forEach(k => want.resto.push('planta-variante:' + k));
 INV.combate.forEach(k => want.resto.push('combate:' + k));
 INV.misc.forEach(k => want.resto.push('misc:' + k));
 const covered = new Set(M.assets.flatMap(a => [...(a.cubre || []), ...(a.items || []).flatMap(i => i.cubre || [])]));
@@ -245,7 +246,7 @@ for (const a of M.assets) {
 }
 
 const out = [
-  `assets: ${M.assets.length} (+${M.assets.reduce((n, a) => n + (a.items || []).length, 0)} items) · animaciones: ${M.assets.reduce((n, a) => n + (a.animaciones || []).length + (a.items || []).reduce((m, i) => m + (i.animaciones || []).length, 0), 0)}`,
+  `assets: ${M.assets.length}${RETIRADOS.length ? ` (+${RETIRADOS.length} retirados)` : ''} (+${M.assets.reduce((n, a) => n + (a.items || []).length, 0)} items) · animaciones: ${M.assets.reduce((n, a) => n + (a.animaciones || []).length + (a.items || []).reduce((m, i) => m + (i.animaciones || []).length, 0), 0)}`,
   `cobertura_personajes: ${pct(want.personajes)} (${want.personajes.length} claves)`,
   `cobertura_resto: ${pct(want.resto)} (${want.resto.length} claves)`,
   `coste_conocido: ~${known} generaciones · sin coste documentado: ${[...unknown].join(', ') || '—'}`,

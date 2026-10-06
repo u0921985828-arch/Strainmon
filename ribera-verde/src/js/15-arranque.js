@@ -54,7 +54,7 @@ function update(dt){
     hudT-=dt;if(hudT<=0){hudT=250;updateHUD();}
   }else if(mode==='battle'&&B){B.t+=dt;if(B.flashE>0)B.flashE-=dt;if(B.shakeP>0)B.shakeP-=dt;}
 }
-function render(now){if(mode==='world'&&S)renderWorld(now);else if(mode==='battle'&&B)renderBattle(now);else if(mode==='title'||mode==='intro')renderTitle(now);}
+function render(now){if(mode==='world'&&S)renderWorld(now);else if(mode==='battle'&&B)renderBattle(now);else if(mode==='carpa'&&VC)renderCarpa(now);else if(mode==='title'||mode==='intro')renderTitle(now);}
 let last=performance.now();
 function loop(now){const dt=Math.min(50,now-last);last=now;try{update(dt);render(now);}catch(e){console.error(e);}requestAnimationFrame(loop);}
 function boot(data){

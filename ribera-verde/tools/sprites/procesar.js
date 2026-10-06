@@ -14,7 +14,7 @@
    1. Alfa binario (≥128 opaco, el resto transparente).
    2. Bloqueo de paleta: primero los colores de identidad del asset (declarados + los de sus referencias);
       si no hay uno cerca, el color más cercano de los que ya usa el juego (paleta «existentes»);
-      las rampas clave (p. ej. cogollos) van aparte.
+      las rampas clave (p. ej. cogollos) van aparte; con «paleta»: «propia» en el asset se queda con sus colores.
    3. Tope de colores (estilo.max_colores_sprite): funde los menos usados en el más cercano.
    4. Limpieza de píxeles huérfanos (sin vecinos opacos).
    5. Encaje en la celda (la de la animación si declara «celda», si no la del asset), según su «ajuste»:
@@ -112,6 +112,7 @@ function processGroup(id) {
         const [h, sat, l] = hsl(c);
         if (h >= r.tono[0] && h <= r.tono[1] && sat >= (r.saturacion_min || 0)) { out = rgb(r.rampa[l > 0.62 ? 0 : l > 0.38 ? 1 : 2]); break; }
       }
+      if (!out && asset.paleta === 'propia') out = c;   // arte importado con su propia paleta (solo pasa por el tope de colores)
       if (!out) { // 1º identidad (si está cerca), 2º toda la paleta
         let best = null, bd = Infinity;
         for (const p of identity) { const dd = dist(c, p); if (dd < bd) { bd = dd; best = p; } }

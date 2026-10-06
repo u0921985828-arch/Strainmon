@@ -87,6 +87,11 @@ canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixela
 .bhp .num{text-align:right;font-variant-numeric:tabular-nums}
 #bE{left:calc(var(--u)*6);top:calc(var(--u)*8)}
 #bP{right:calc(var(--u)*6);bottom:calc(var(--u)*49)}
+/* vista de carpa: ficha de la plaza o del foco elegido */
+.vcinfo{position:absolute;left:calc(var(--u)*3);top:calc(var(--u)*3);width:calc(var(--u)*66);padding:calc(var(--u)*3) calc(var(--u)*4);font-size:calc(var(--u)*6.5);line-height:calc(var(--u)*8.5);z-index:15}
+.vcinfo div,.vcinfo b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vcinfo b{display:block;color:var(--boxLine);font-size:calc(var(--u)*7);border-bottom:calc(var(--u)*1) solid var(--boxLine2);margin-bottom:calc(var(--u)*1.5)}
+.vcinfo em{font-style:normal;font-weight:700;color:#e04040}
 .title{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:calc(var(--u)*20);z-index:12;pointer-events:none;text-align:center}
 .title h1{margin:0;font-family:var(--display);font-weight:400;font-size:calc(var(--u)*17);line-height:1.15;color:#ffe680;text-shadow:calc(var(--u)*1.5) calc(var(--u)*1.5) 0 #2a7a40,calc(var(--u)*3) calc(var(--u)*3) 0 #10301c;letter-spacing:.04em}
 .title h1 span{display:block;color:#9cf0a8;font-size:calc(var(--u)*10);margin-top:calc(var(--u)*5)}

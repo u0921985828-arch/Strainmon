@@ -22,7 +22,7 @@ En el PC también vale el teclado (flechas o WASD, Z/Espacio = A, X/Esc = B, M =
 
 ## Qué incluye
 
-- **Cultivo:** carpas en el piso (el armario de 60 con 2 plantas, la de 100 con 4 y la de 150 con 6), cerradas por fuera y abiertas al entrar; una bandeja de cultivo por carpa, macetas de plástico o de tela de 7 a 25 L, focos CFL, sodio y LED de 125 a 720 W con su cobertura y su factura de la luz; riego, abono, plagas y cinco fases de crecimiento. La cosecha da gramos con su % de THC y semillas.
+- **Cultivo:** carpas en el piso (el armario de 60 con 2 plantas, la de 100 con 4 y la de 150 con 6); con A delante se abre la carpa de frente y eliges planta o foco con la cruceta. Macetas de plástico o de tela de 7 a 25 L, focos CFL, sodio y LED de 125 a 720 W con su cobertura y su factura de la luz; riego, abono, plagas y cinco fases de crecimiento. La cosecha da gramos con su % de THC y semillas.
 - **Genética:** mesa de cruces y Genoteca con 23 variedades: 6 del growshop, 4 landraces (una te la da Kiko y tres se consiguen por el barrio) y 13 que salen de cruces, entre ellas la legendaria *Ghost Train Haze* (Amnesia Haze × Fire OG). Los cruces sin receta generan híbridos propios.
 - **Calle:** clientes con `$` (estudiante, currela, turista y pijo) a los que les pides precio de rebaja, justo o caro. Cada venta sube el **calor policial** y a 90 llega una redada.
 - **Combates por turnos:** contra ladrones (luchar, mochila, hablar, huir) y contra la policía (sobornar, hablar, huir, entregar).
@@ -39,7 +39,7 @@ docs/                         diseño, guion, genética, mapa, plano de escala (
 dist/ribera-verde.artifact.html   la misma página en formato Artifact de Claude
 dist/ribera-verde.apk         el juego como app de Android (lo genera tools/build-apk.js)
 assets/fonts/                 Atkinson Hyperlegible y Press Start 2P (woff2 + licencia OFL)
-screenshots/                  13 capturas
+screenshots/                  14 capturas
 art/                          manifiesto de sprites, inventario, referencias PNG y paleta (kit PixelLab)
 CONTEXTO.md                   qué se pidió, qué se decidió y en qué estado está
 CLAUDE.md                     notas para seguir el desarrollo con Claude Code
@@ -83,12 +83,13 @@ Edita siempre en `src/` y después ejecuta `npm run build`. `index.html` y `dist
 
 | | |
 |---|---|
-| ![Piso y armario](screenshots/03-piso-armario.png) | ![Plaza de noche](screenshots/05-plaza-noche.png) |
+| ![Piso y carpas](screenshots/03-piso-armario.png) | ![Vista de carpa](screenshots/03b-vista-carpa.png) |
+| ![Plaza de noche](screenshots/05-plaza-noche.png) | ![Barrio de día](screenshots/04-barrio-dia.png) |
 | ![Venta](screenshots/06-venta.png) | ![Combate contra un ladrón](screenshots/07-combate-ladron.png) |
 | ![Genoteca](screenshots/09-genoteca.png) | ![Growshop](screenshots/11-growshop.png) |
 
 ## Créditos y licencias
 
-- El código y todo el arte son originales y se dibujan por código: no hay imágenes externas. Si se añade un atlas de PixelLab (`assets/sprites/`), se incrusta en el HTML y sustituye al dibujo por código donde lo cubra.
+- El código y todo el arte son originales. El atlas de PixelLab (`assets/sprites/`) va incrustado en el HTML y sustituye al dibujo por código donde lo cubre; las plantas de la vista de carpa salen del arte de cepas del propio repositorio (`../assets/plants`). Sin atlas, todo se dibuja por código.
 - Las mecánicas se inspiran en *Weed Firm* y la estética en los RPG de portátil de 16 bits. No se usa ningún asset, personaje, nombre ni marca de esos juegos.
 - Fuentes: [Atkinson Hyperlegible](https://fonts.google.com/specimen/Atkinson+Hyperlegible) (diálogos, menús y HUD, pensada para leerse bien) y [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) (rótulos), ambas con licencia SIL Open Font License 1.1 (`assets/fonts/`).

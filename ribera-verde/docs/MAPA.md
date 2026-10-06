@@ -4,7 +4,7 @@
 
 Leyenda: `.` suelo/hierba · `*` flores · `"` hierba alta (ladrones ×3, a cualquier hora) · `:` tierra · `-` acera · `=` carretera · `+` plaza · `~` agua · `H` puente · `#` muelle
 `^` tejado · `█` pared/ventana · `D` puerta · `T` árbol · `b` arbusto · `$` arbusto con objeto oculto · `i` objeto en el suelo · `f` valla · `S` cartel · `L` farola · `n` banco · `O` fuente · `c` cajas · `@` personaje
-Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F` nevera · `▒` pared de la carpa · `z` puerta de la carpa · `o` suelo de la carpa · `1-8` plazas (mesa + maceta; 1-2 el armario de 60, 3-8 la carpa de 150) · `C` mostrador · `s` estantería · `d` expositor · `x` taburete · `J` gramola · `v` ventana/póster · `m` felpudo (salida)
+Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F` nevera · `K` carpa (mueble: el armario de 60 en x 8 y la carpa de 150 en x 10-11; sus 2 + 6 plazas se ven por dentro, en la vista de carpa) · `C` mostrador · `s` estantería · `d` expositor · `x` taburete · `J` gramola · `v` ventana/póster · `m` felpudo (salida)
 
 ## Barrio (exterior) — 40 × 30
 
@@ -43,30 +43,26 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 29  TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 ```
 
-- puerta (5,8) → home (5,10)
+- puerta (5,8) → home (5,6)
 - puerta (17,8) → shop (4,6)
 - puerta (26,8) → bar (4,6)
 
-## Piso de la tía Maite — 20 × 12 (con el armario de 60 y la carpa de 150)
+## Piso de la tía Maite — 12 × 8 (1 casilla = 1 m; con el armario de 60 y la carpa de 150)
 
 ```
-    0         1         
-    01234567890123456789
- 0  ████████████████████
- 1  ██v███v████v████████
- 2  .B.PGG.▒▒▒▒p▒▒▒▒▒▒▒▒
- 3  .B.....▒▒▒▒.▒▒▒▒▒▒▒▒
- 4  .......▒12▒.▒345678▒
- 5  .......▒oo▒.▒oooooo▒
- 6  ...t...▒z▒▒.▒z▒▒▒▒▒▒
- 7  .F..................
- 8  p...................
- 9  ....................
-10  ...................p
-11  .....m..............
+    0         1 
+    012345678901
+ 0  ████████████
+ 1  ██vv██v█████
+ 2  Bp..PGG.K.KK
+ 3  B...........
+ 4  ............
+ 5  ...t........
+ 6  F...........
+ 7  .....m.....p
 ```
 
-- salida (5,11) pulsando abajo → town (5,9)
+- salida (5,7) pulsando abajo → town (5,9)
 
 ## Growshop Kiko — 10 × 8
 

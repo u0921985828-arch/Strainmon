@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /*
-  Ribera Verde — plano del juego (1.7.0)
+  Ribera Verde — plano del juego (1.8.0)
   Pinta cada mapa entero a 1 casilla = 32 px (×2) con la rejilla, las coordenadas y lo que hay en él (edificios, puertas,
-  salidas, NPC, objetos, carpas y plazas), y una hoja de escala con todos los sprites junto al jugador, medidos contra su
-  tamaño real. Salida: docs/plano/<mapa>.png, docs/plano/escala.png y docs/plano/medidas.json (lo usa docs/PLANO.md).
+  salidas, NPC, objetos y carpas), y una hoja de escala con todos los sprites junto al jugador, medidos contra su
+  tamaño real (en el mapa, 16 px = 1 m; en la vista de carpa, 64 px = 1 m). Salida: docs/plano/<mapa>.png, docs/plano/escala.png y docs/plano/medidas.json (lo usa docs/PLANO.md).
   Uso:  node tools/build.js && node tools/plano.js
 */
 const { chromium } = require('playwright');
@@ -19,11 +19,13 @@ const REAL = {
     ['Mesa genética 2', 'lab2', 'ancho', 1.2], ['Mesa', 'table', 'ancho', .8], ['Planta deco', 'plantDeco', 'alto', .9], ['Estantería', 'shelfW', 'ancho', .9],
     ['Mostrador', 'counter', 'alto', 1.0], ['Expositor', 'display', 'ancho', .8], ['Botellero', 'bottles', 'ancho', 1.0], ['Taburete', 'stool', 'alto', .75],
     ['Mesa de bar', 'btable', 'ancho', .7], ['Gramola', 'jukebox', 'ancho', .7], ['Cajas', 'crate', 'ancho', .6]],
-  cultivo: [['Armario 60×60', 'carpa:p60', 'ancho', .6], ['Carpa 100×100', 'carpa:m100', 'ancho', 1.0], ['Carpa 150×100', 'carpa:g150', 'ancho', 1.5],
-    ['Bandeja (2 plazas)', 'bandeja', 'ancho', .6], ['Maceta 7 L', 'maceta:plastico7', 'ancho', .22], ['Maceta 11 L', 'maceta:tela11', 'ancho', .25],
-    ['Maceta 18 L', 'maceta:plastico18', 'ancho', .30], ['Maceta 25 L', 'maceta:tela25', 'ancho', .35], ['Germinando', 'planta:germinando', 'alto', .25],
-    ['Plántula', 'planta:plantula', 'alto', .35], ['Vegetativo', 'planta:vegetativo', 'alto', .6], ['Floración', 'planta:floracion', 'alto', 1.0],
-    ['Lista', 'planta:lista', 'alto', 1.1], ['Foco CFL', 'foco:cfl', 'ancho', .45], ['Foco sodio', 'foco:sodio', 'ancho', .55], ['Panel LED', 'foco:led', 'ancho', .6]],
+  cultivo: [['Armario 60×60', 'carpa:p60', 'ancho', .6], ['Carpa 100×100', 'carpa:m100', 'ancho', 1.0], ['Carpa 150×100', 'carpa:g150', 'ancho', 1.5]],
+  // vista de carpa (64 px/m); las plantas, Skunk #1 (cepa sm08) en sus 5 fases
+  vista: [['Armario 60×60', 'carpav:p60', 'ancho', .6, 64], ['Carpa 100×100', 'carpav:m100', 'ancho', 1.0, 64], ['Carpa 150×100', 'carpav:g150', 'ancho', 1.5, 64],
+    ['Maceta 7 L', 'maceta:plastico7', 'ancho', .22, 64], ['Maceta 11 L', 'maceta:tela11', 'ancho', .25, 64], ['Maceta 18 L', 'maceta:plastico18', 'ancho', .30, 64],
+    ['Maceta 25 L', 'maceta:tela25', 'ancho', .35, 64], ['Germinando', 'planta:1', 'alto', .06, 64], ['Plántula', 'planta:2', 'alto', .16, 64],
+    ['Vegetativo', 'planta:3', 'alto', .40, 64], ['Floración', 'planta:4', 'alto', .78, 64], ['Lista', 'planta:5', 'alto', .88, 64],
+    ['Foco CFL', 'foco:cfl', 'ancho', .45, 64], ['Foco sodio', 'foco:sodio', 'ancho', .55, 64], ['Panel LED', 'foco:led', 'ancho', .6, 64]],
   exterior: [['Árbol', 'tree', 'alto', 6], ['Farola', 'lamp', 'alto', 4], ['Banco', 'bench', 'ancho', 1.8], ['Fuente', 'fountain', 'ancho', 3], ['Arbusto', 'bush', 'ancho', 1.2],
     ['Valla', 'fence', 'alto', 1.0], ['Edificio (piso)', 'edificio:home', 'ancho', 14], ['Edificio (bar)', 'edificio:bar', 'ancho', 14]],
 };
@@ -64,7 +66,7 @@ const REAL = {
       x.strokeText(s, px, py); x.fillStyle = col; x.fillText(s, px, py);
     }
     function anotar(name, titulo) {
-      K = name === 'town' ? 2 : 3; const usados = [];
+      K = name === 'town' ? 2 : name === 'home' ? 4 : 3; const usados = [];
       const m = MAPS[name], base = mapaEntero(name), W = m.w * 16 * K, H = m.h * 16 * K;
       const [c, x] = mkCanvas(W + MG * 2, H + MG * 2 + 64); x.imageSmoothingEnabled = false;
       x.fillStyle = '#14161c'; x.fillRect(0, 0, c.width, c.height); x.drawImage(base, MG, MG, W, H);
@@ -81,10 +83,10 @@ const REAL = {
         x.stroke(); x.fill(); if (rot) texto(x, rot, cx - 3, cy + 4, '#0a0c12', 10); };
       // rótulos sin pisarse: si choca con uno ya puesto, baja una línea (hasta 4 veces)
       const rotulo = (tx, ty, s, col, dx = L - 4, dy = 12) => { const [a, b] = T(tx, ty); x.font = 'bold 11px system-ui, sans-serif';
-        const w = x.measureText(s).width + 4, px = a + dx; let py = b + dy;
+        const w = x.measureText(s).width + 4, px = Math.min(a + dx, W + MG * 2 - w); let py = b + dy;   // sin salirse por la derecha
         for (let k = 0; k < 4 && usados.some(r => px < r[0] + r[2] && r[0] < px + w && py - 10 < r[1] + 12 && r[1] < py + 2); k++) py += 12;
         usados.push([px, py - 10, w, 12]); texto(x, s, px, py, col, 11); };
-      const inv = { nombre: name, titulo, w: m.w, h: m.h, edificios: [], puertas: [], salidas: [], npcs: [], objetos: [], carpas: [], plazas: [] };
+      const inv = { nombre: name, titulo, w: m.w, h: m.h, edificios: [], puertas: [], salidas: [], npcs: [], objetos: [], carpas: [] };
       (ZONAS[name] || []).forEach(([n, x0, y0, x1, y1]) => { caja(x0, y0, x1, y1, 'rgba(160,220,255,.75)', true); rotulo(x0, y0, n, '#a0dcff', 4, 13); });
       (m.blds || []).forEach(b => { caja(b.x0, b.y0, b.x0 + b.w - 1, b.y0 + b.h - 1, '#ffd84a'); rotulo(b.x0, b.y0, `EDIFICIO ${b.id.toUpperCase()} · ${b.w}×${b.h}`, '#ffd84a', 4, 13); inv.edificios.push({ id: b.id, x: b.x0, y: b.y0, w: b.w, h: b.h, puerta: b.doorX }); });
       for (const [k, w] of Object.entries(m.doors)) { const [tx, ty] = k.split(',').map(Number); marca(tx, ty, '#58e070', 's', '↑'); rotulo(tx, ty, `→ ${w.to} (${w.x},${w.y})`, '#78f090', L + 2, 30); inv.puertas.push({ x: tx, y: ty, a: w.to }); }
@@ -96,9 +98,10 @@ const REAL = {
         if (NOMBRE[o] && !(o === m.o[ty][tx - 1])) { rotulo(tx, ty, NOMBRE[o], '#f0e0ff', 2, L - 3); inv.objetos.push({ o, x: tx, y: ty }); }
       }
       if (name === 'home') {
-        m.carpas.forEach(t => { const C = CARPAS[t.t]; caja(t.x0, t.y0, t.x1, t.y1, '#a8ff60'); rotulo(t.x0, t.y1, C.n.toUpperCase(), '#a8ff60', 6, L - 18); rotulo(t.x0, t.y1, `${t.x1 - t.x0 + 1}×${t.y1 - t.y0 + 1} casillas · ${C.plazas} plazas`, '#a8ff60', 6, L - 6);
-          inv.carpas.push({ t: t.t, x: t.x0, y: t.y0, w: t.x1 - t.x0 + 1, h: t.y1 - t.y0 + 1, plazas: C.plazas }); });
-        huecos().forEach((h, i) => { marca(h.x, h.y, '#a8ff60', 'o', String(i + 1)); inv.plazas.push({ i: i + 1, x: h.x, y: h.y, carpa: h.c }); });
+        m.carpas.forEach(t => { const C = CARPAS[t.t], w = t.x1 - t.x0 + 1, pl = huecos().map((h, i) => h.c === t.ci ? i + 1 : 0).filter(Boolean);
+          caja(t.x0, t.y, t.x1, t.y, '#a8ff60'); rotulo(t.x0, t.y, C.n.toUpperCase(), '#a8ff60', 2, L + 12); rotulo(t.x0, t.y, `${w}×1 casillas · plazas ${pl[0]}-${pl[pl.length - 1]}`, '#a8ff60', 2, L + 24);
+          inv.carpas.push({ t: t.t, x: t.x0, y: t.y, w, h: 1, plazas: C.plazas }); });
+        SITIOS.forEach((st, ci) => { if (!S.carpas[ci]) caja(st.x, st.y, st.x + st.w - 1, st.y, '#a8ff60', true); });
       }
       if (name === 'town') CLIENT_TILES.forEach(([tx, ty]) => { const [a, b] = T(tx, ty); x.fillStyle = 'rgba(120,255,160,.55)'; x.fillRect(a + L / 2 - 2, b + L / 2 - 2, 4, 4); });
       NPCDEF.filter(d => d.map === name).forEach(d => { marca(d.x, d.y, '#ff6ad5', 'o'); rotulo(d.x, d.y, NPCN[d.id] || d.id, '#ff9ae5', L - 4, -2); inv.npcs.push({ id: d.id, x: d.x, y: d.y, deambula: d.wander || 0 }); });
@@ -106,11 +109,11 @@ const REAL = {
       // leyenda
       const ly = MG + H + 36; let lx = MG; texto(x, `${titulo} · ${m.w}×${m.h} casillas · 1 casilla = 16 px (aquí ×${K}) ≈ 1 m`, lx, ly, '#ffffff', 13);
       const ley = [['#ffd84a', 'edificio'], ['#58e070', 'puerta'], ['#40d8e8', 'salida'], ['#ff6ad5', 'NPC'], ['#ffe14a', 'objeto'], ['#ff9a3a', 'escondido'], ['#ffffff', 'cartel']]
-        .concat(name === 'home' ? [['#a8ff60', 'carpa y plazas']] : name === 'town' ? [['rgba(120,255,160,.9)', 'casillas de clientes'], ['#a0dcff', 'zona']] : []);
+        .concat(name === 'home' ? [['#a8ff60', 'carpa']] : name === 'town' ? [['rgba(120,255,160,.9)', 'casillas de clientes'], ['#a0dcff', 'zona']] : []);
       lx = MG; ley.forEach(([col, n]) => { x.fillStyle = col; x.fillRect(lx, ly + 10, 12, 12); texto(x, n, lx + 16, ly + 21, '#d8dce6', 11, 'normal'); lx += 30 + n.length * 6.4; });
       out.mapas[name] = { png: c.toDataURL('image/png'), inv };
     }
-    anotar('town', 'RIBERA VERDE · barrio'); anotar('home', 'PISO DE LA TÍA MAITE (carpas al máximo: armario 60 + carpa 150)'); anotar('shop', 'GROWSHOP KIKO'); anotar('bar', 'BAR EL ANCLA');
+    anotar('town', 'RIBERA VERDE · barrio'); anotar('home', 'PISO DE LA TÍA MAITE (armario 60 + carpa 150)'); anotar('shop', 'GROWSHOP KIKO'); anotar('bar', 'BAR EL ANCLA');
 
     // ---------- hoja de escala ----------
     function caja(c) { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
@@ -120,40 +123,43 @@ const REAL = {
       const [tipo, k] = clave.includes(':') ? clave.split(':') : ['obj', clave];
       const fr = (g, s, d = 'unica') => { const f = g && frameDe(g, s, d, 0, { i: 0 }); return f ? f.c : null; };
       if (tipo === 'look') { const g = grupoLook(LOOKS[k]); return g && ((tieneDir(g, 'idle', 'south') && fr(g, 'idle', 'south')) || fr(g, 'base', 'south')); }
-      if (tipo === 'carpa') return fr('carpa-' + k + '-fuera', 'base');
-      if (tipo === 'maceta') return fr(ARTE.cubre['misc:maceta-' + k], 'maceta-' + k);
-      if (tipo === 'planta') return fr(ARTE.cubre['planta:' + k], k);
+      if (tipo === 'carpa') return fr(ARTE.cubre['misc:carpa-' + k + '-mapa'], 'carpa-' + k + '-mapa');
+      if (tipo === 'carpav') return fr(ARTE.cubre['misc:carpa-' + k + '-vista'], 'carpa-' + k + '-vista');
+      if (tipo === 'maceta') return fr(ARTE.cubre['misc:maceta-vista-' + k], 'maceta-vista-' + k);
+      if (tipo === 'planta') return fr(ARTE.cubre['misc:planta-vista'], 'sm08-' + k);
       if (tipo === 'foco') return fr(ARTE.cubre['misc:foco-' + k], 'foco-' + k);
       if (tipo === 'edificio') return fr('edificio-' + k, 'base');
-      if (k === 'bandeja') { const [c, x] = mkCanvas(32, 16); x.drawImage(TILES.mesa[1], 0, 0); x.drawImage(TILES.mesa[3], 16, 0); return c; }
       if (k === 'bed') { const a = sprite('bedT'), b = sprite('bedB'); if (!a || !b) return null; const [c, x] = mkCanvas(Math.max(a.width, b.width), a.height + 16);
         const ca = caja(a), cb = caja(b); x.drawImage(a, 0, 0); x.drawImage(b, 0, ca ? ca.y0 + ca.h - cb.y0 : 16); return c; }
       return fr(ARTE.cubre['obj:' + k], k) || (TILES[k] && TILES[k][0]);
     }
     const filas = [
       ['PERSONAJES · altura de pie', REAL.personajes.map(([n, k, r]) => [n, 'look:' + k, 'alto', r])],
-      ['MOBILIARIO · interiores', REAL.muebles], ['CULTIVO · carpas, bandeja, macetas, plantas y focos', REAL.cultivo], ['EXTERIOR · calle, parque y edificios', REAL.exterior]];
+      ['MOBILIARIO · interiores', REAL.muebles], ['CULTIVO · carpas en el piso (16 px/m)', REAL.cultivo],
+      ['VISTA DE CARPA · 64 px/m: carpas, macetas, plantas y focos', REAL.vista], ['EXTERIOR · calle, parque y edificios', REAL.exterior]];
     const E = 3, PAD = 14, cols = [];
     let H = 40;
     for (const [titulo, items] of filas) {
       const fila = { titulo, items: [], alto: 0 };
-      for (const [n, clave, eje, real] of items) {
+      fila.ppm = items[0][4] || 16;
+      for (const [n, clave, eje, real, ppm = 16] of items) {
         const c = sprite(clave); if (!c) { fila.items.push({ n, clave, falta: true }); continue; }
-        const b = caja(c); const px = eje === 'alto' ? b.h : b.w, m = px / 16, ratio = m / real;
+        const b = caja(c); const px = eje === 'alto' ? b.h : b.w, m = px / ppm, ratio = m / real;
         const it = { n, clave, eje, real, px, w: b.w, h: b.h, m: +m.toFixed(2), ratio: +ratio.toFixed(2), c, b };
-        fila.items.push(it); fila.alto = Math.max(fila.alto, b.h); out.medidas.push({ grupo: titulo.split(' ·')[0], n, clave, eje, real, w: b.w, h: b.h, m: it.m, ratio: it.ratio });
+        fila.items.push(it); fila.alto = Math.max(fila.alto, b.h); out.medidas.push({ grupo: titulo.split(' ·')[0], n, clave, eje, real, ppm, w: b.w, h: b.h, m: it.m, ratio: it.ratio });
       }
       cols.push(fila); H += fila.alto * E + 120;
     }
     const jug = sprite('look:player'), bj = caja(jug);
     let W = 0; for (const f of cols) { let w = 90 + bj.w * E + PAD * 2; for (const it of f.items) if (!it.falta) w += Math.max(it.b.w * E, 92) + PAD * 2; W = Math.max(W, w); }
     const [hc, x] = mkCanvas(Math.min(W, 4000), H + 60); x.imageSmoothingEnabled = false; x.fillStyle = '#1a1d24'; x.fillRect(0, 0, hc.width, hc.height);
-    texto(x, 'HOJA DE ESCALA · todos los sprites a ×3 sobre la misma línea de suelo · regla: 1 casilla = 16 px = 1 m · ratio = tamaño en juego / tamaño real', 16, 26, '#ffffff', 14);
+    texto(x, 'HOJA DE ESCALA · todos los sprites a ×3 sobre la misma línea de suelo · mapa: 1 casilla = 16 px = 1 m · vista de carpa: 64 px = 1 m · ratio = tamaño en juego / tamaño real', 16, 26, '#ffffff', 14);
     let y = 40;
     for (const f of cols) {
       const base = y + 34 + f.alto * E; texto(x, f.titulo, 16, y + 18, '#ffd84a', 13);
-      for (let mtr = 0; mtr * 16 <= f.alto; mtr++) { const yy = base - mtr * 16 * E; x.fillStyle = mtr ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.5)'; x.fillRect(60, yy, hc.width - 70, 1); texto(x, mtr + ' m', 18, yy + 4, '#9aa3b5', 11, 'normal'); }
-      let cx = 90; x.drawImage(jug, bj.x0, bj.y0, bj.w, bj.h, cx, base - bj.h * E, bj.w * E, bj.h * E); texto(x, 'jugador', cx, base + 16, '#9aa3b5', 11, 'normal'); cx += bj.w * E + PAD * 2;
+      const paso = f.ppm > 16 ? f.ppm / 4 : 16, unidad = f.ppm > 16 ? .25 : 1;   // en la vista, una raya cada 25 cm
+      for (let mtr = 0; mtr * paso <= f.alto; mtr++) { const yy = base - mtr * paso * E; x.fillStyle = mtr ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.5)'; x.fillRect(60, yy, hc.width - 70, 1); texto(x, String(+(mtr * unidad).toFixed(2)).replace('.', ',') + ' m', 18, yy + 4, '#9aa3b5', 11, 'normal'); }
+      let cx = 90; if (f.ppm === 16) { x.drawImage(jug, bj.x0, bj.y0, bj.w, bj.h, cx, base - bj.h * E, bj.w * E, bj.h * E); texto(x, 'jugador', cx, base + 16, '#9aa3b5', 11, 'normal'); } cx += bj.w * E + PAD * 2;
       for (const it of f.items) {
         if (it.falta) continue; const ww = Math.max(it.b.w * E, 92);
         x.drawImage(it.c, it.b.x0, it.b.y0, it.b.w, it.b.h, cx + (ww - it.b.w * E) / 2, base - it.b.h * E, it.b.w * E, it.b.h * E);
@@ -172,7 +178,7 @@ const REAL = {
   for (const [n, m] of Object.entries(res.mapas)) { png(n + '.png', m.png); console.log('  docs/plano/' + n + '.png'); }
   png('escala.png', res.escala); console.log('  docs/plano/escala.png');
   const inv = Object.fromEntries(Object.entries(res.mapas).map(([n, m]) => [n, m.inv]));
-  fs.writeFileSync(path.join(OUT, 'medidas.json'), JSON.stringify({ escala: '1 casilla = 16 px = 1 m', mapas: inv, sprites: res.medidas }, null, 1) + '\n');
+  fs.writeFileSync(path.join(OUT, 'medidas.json'), JSON.stringify({ escala: 'mapa: 1 casilla = 16 px = 1 m · vista de carpa: 64 px = 1 m', mapas: inv, sprites: res.medidas }, null, 1) + '\n');
   console.log('  docs/plano/medidas.json · ' + res.medidas.length + ' sprites medidos');
   await browser.close();
   if (errors.length) { console.log('Errores:', errors); process.exit(1); }

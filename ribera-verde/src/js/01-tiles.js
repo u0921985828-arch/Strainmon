@@ -69,41 +69,6 @@ function buildTiles(){
   T('floor',t=>{t.F(0,0,16,16,'#d8a868');for(let y=3;y<16;y+=4)t.F(0,y,16,1,'#b48446');for(let r=0;r<4;r++){const x=Math.floor(t.R()*14)+1;t.F(x,r*4,1,3,'#b48446');}t.noise(4,['#e6bc80']);});
   T('floorB',t=>{t.F(0,0,16,16,'#8e623e');for(let y=3;y<16;y+=4)t.F(0,y,16,1,'#6e4a2c');for(let r=0;r<4;r++){const x=Math.floor(t.R()*14)+1;t.F(x,r*4,1,3,'#6e4a2c');}t.noise(4,['#a0744c']);});
   T('floorS',t=>{for(let y=0;y<2;y++)for(let x=0;x<2;x++)t.F(x*8,y*8,8,8,(x+y)%2?'#e8eadc':'#cfdcc4');});
-  T('tent',t=>{t.F(0,0,16,16,'#d4d8e2');t.F(0,7,16,1,'#b2b8c4');t.F(7,0,1,16,'#b2b8c4');for(let i=0;i<5;i++)t.P(2+i,10-i,'#f2f4f8');for(let i=0;i<4;i++)t.P(10+i,5-i,'#f2f4f8');});
-  // carpa de cultivo por dentro (montarCasa): capas sobre el suelo del piso (lo transparente deja ver el suelo).
-  // Borde de la carpa a 8 px del borde de las casillas de los lados y de la fila de delante; las paredes de delante
-  // y de la derecha están cortadas (se ve solo el riel del suelo) y no hay techo: se mira desde fuera de la carpa.
-  {const K={pole:'#5a5e68',hi:'#8a8e98',tela:'#26272c',osc:'#1c1d22',my:'#d4d8e2',my2:'#b2b8c4',my3:'#f2f4f8',som:'#a8aebb'};
-   const suelo=(t,x,y,w,h)=>{t.F(x,y,w,h,K.my);for(let i=0;i<3;i++)if(2+i*4<w)t.P(x+2+i*4,y+Math.min(h-1,4+i),K.my3);};
-   // pared del fondo: mylar en vertical (arrugas en columnas claras y oscuras), más oscura abajo
-   const fondo=(t,x,w,alto)=>{t.F(x,0,w,16,'#c8ccd6');for(let i=x;i<x+w;i++){const r=(i*7+3)%11;if(r<2)t.F(i,0,1,16,'#e6e9f0');else if(r===5)t.F(i,0,1,16,K.my2);}
-     if(alto){t.F(x,0,w,2,K.pole);t.F(x,0,w,1,K.hi);t.F(x,2,w,1,K.som);}else{t.F(x,10,w,3,K.my2);t.F(x,13,w,2,K.som);t.F(x,15,w,1,K.pole);}};
-   const izq=(t,h)=>{t.F(8,0,1,h,K.osc);t.F(9,0,1,h,K.pole);t.F(10,0,1,h,K.tela);t.F(11,0,2,h,K.som);};
-   const dch=(t,h,poste)=>{t.F(5,0,1,h,poste?K.hi:K.pole);t.F(6,0,1,h,K.pole);t.F(7,0,1,h,K.osc);};
-   const riel=(t,x,w)=>{t.F(x,6,w,1,K.hi);t.F(x,7,w,1,K.pole);t.F(x,8,w,1,K.osc);};
-   T('cpT',t=>fondo(t,0,16,1));T('cpM',t=>fondo(t,0,16,0));
-   T('cpTL',t=>{fondo(t,13,3,1);izq(t,16);});T('cpML',t=>{fondo(t,13,3,0);izq(t,16);});
-   T('cpTR',t=>{fondo(t,0,5,1);dch(t,16,1);});T('cpMR',t=>{fondo(t,0,5,0);dch(t,16,1);});
-   T('cpL',t=>{suelo(t,13,0,3,16);izq(t,16);});
-   T('cpR',t=>{suelo(t,0,0,5,16);dch(t,16,0);});
-   T('cpB',t=>{suelo(t,0,0,16,6);riel(t,0,16);});
-   T('cpBL',t=>{suelo(t,13,0,3,6);izq(t,9);riel(t,8,8);});
-   T('cpBR',t=>{suelo(t,0,0,5,6);t.F(5,0,3,6,K.pole);riel(t,0,8);});
-   T('cpPuerta',t=>{suelo(t,0,0,16,9);t.F(0,6,2,3,K.hi);t.F(14,6,2,3,K.hi);t.F(2,8,12,1,K.my2);});}
-  // bandeja de cultivo: una casilla por plaza, pero las de una carpa se unen en una sola bandeja de plástico sobre un bastidor
-  // metálico (paleta de la carpa). Fotogramas: 0 suelta · 1 extremo izquierdo · 2 tramo central · 3 extremo derecho (14-render elige).
-  // La maceta se apoya dentro de la cubeta, MESA_ALTO px más arriba que en el suelo.
-  T('mesa',t=>{const iz=t.f<2,de=t.f===0||t.f===3,O='#2a2d34',a=iz?1:0,b=de?15:16;
-    t.F(a,13,b-a,3,'rgba(60,66,84,.22)');                                   // sombra en el mylar
-    t.F(a,14,b-a,1,'#5a5e68');                                              // larguero del bastidor
-    if(iz){t.F(1,12,2,4,'#5a5e68');t.F(1,12,1,4,'#8a8e98');}if(de){t.F(13,12,2,4,'#5a5e68');t.F(13,12,1,4,'#8a8e98');}
-    t.F(a,5,b-a,1,O);t.F(a,12,b-a,1,O);                                     // canto de arriba y de abajo
-    t.F(a,6,b-a,1,'#f2f4f8');t.F(a,7,b-a,1,'#7d8492');t.F(a,8,b-a,1,'#9aa1ae'); // borde trasero, sombra y fondo de la cubeta
-    t.F(a,9,b-a,1,'#f2f4f8');t.F(a,10,b-a,1,'#d4d8e2');t.F(a,11,b-a,1,'#b2b8c4'); // labio delantero con volumen
-    if(iz){t.F(0,6,1,6,O);t.F(1,6,1,6,'#e6e9f0');}
-    if(de){t.F(15,6,1,6,O);t.F(14,6,1,6,'#b2b8c4');t.F(14,9,1,1,'#d4d8e2');t.F(11,10,2,2,'#3a3e47');t.P(11,10,'#5a5e68');}   // desagüe
-    if(!iz&&!de&&t.f===2)for(let x=3;x<16;x+=8)t.P(x,8,'#8b92a0');           // marcas del molde
-  },4);
   T('mat',t=>{t.F(0,0,16,16,'#d8a868');t.box(1,3,14,11,'#c44a4a','#7a2626');for(let x=3;x<13;x+=3)t.F(x,5,1,7,'#a83636');});
   // objects (transparent)
   T('tree',t=>{t.F(6,11,4,5,C.wood4);t.F(7,11,1,5,'#8c6438');t.blob(8,6.5,7.6,6.6,'#3e9446','#1f4f2a','#72c868','#2c6e36');t.noise(6,['#2c6e36'],3,2,10,8);});
@@ -143,7 +108,6 @@ function drawLeafPx(t,cx,cy,s,col){
       const d=Math.abs(vx*dy-vy*dx);if(d<=w*Math.sin(Math.PI*tt)+.15)t.P(px,py,col);}}
   t.F(Math.round(cx)-0,Math.round(cy),1,Math.max(2,Math.round(s)),col);
 }
-const SOLID_G=/^(water|roof|wall|win|iwT|iwB|void|cp(?!Puerta))/;
-const MESA_ALTO=6;
+const SOLID_G=/^(water|roof|wall|win|iwT|iwB|void)/;
 const COUNTERS=new Set(['counter','barcounter','btable']);
 

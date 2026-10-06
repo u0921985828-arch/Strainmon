@@ -19,9 +19,9 @@ const ROOT = path.join(__dirname, '..');
     const strains = DEX.map((k, i) => ({ k, idx: i + 1, ...STRAINS[k] }));
     const recipes = Object.entries(RECIPES).map(([pair, out]) => ({ a: pair.split('+')[0], b: pair.split('+')[1], out }));
     const G = { grass: '.', flowers: '*', tallgrass: '"', dirt: ':', walk: '-', roadT: '=', roadB: '=', plaza: '+', water: '~', bridgeT: 'H', bridgeB: 'H', dock: '#',
-      floor: '.', floorB: '.', floorS: '.', tent: 'o', mat: 'm', void: ' ' };
+      floor: '.', floorB: '.', floorS: '.', mat: 'm', void: ' ' };
     const O = { tree: 'T', bush: 'b', fence: 'f', sign: 'S', lamp: 'L', bench: 'n', fountain: 'O', crate: 'c', bedT: 'B', bedB: 'B', pc: 'P', lab: 'G', lab2: 'G',
-      table: 't', fridge: 'F', shelfW: 's', counter: 'C', display: 'd', plantDeco: 'p', barcounter: 'C', bottles: 's', stool: 'x', btable: 't', jukebox: 'J', iwin: 'v', poster: 'v' };
+      table: 't', fridge: 'F', shelfW: 's', counter: 'C', display: 'd', plantDeco: 'p', barcounter: 'C', bottles: 's', stool: 'x', btable: 't', jukebox: 'J', iwin: 'v', poster: 'v', carpa: 'K' };
     const maps = {};
     for (const [name, m] of Object.entries(MAPS)) {
       const rows = [];
@@ -32,7 +32,6 @@ const ROOT = path.join(__dirname, '..');
           let ch = o ? (O[o] || '?') : (G[g] ?? (/^roof/.test(g) ? '^' : /^door/.test(g) ? 'D' : /^(wall|win|iw)/.test(g) ? '█' : '?'));
           const it = ITEMS.find(i => i.map === name && i.x === x && i.y === y);
           if (it) ch = it.hidden ? '$' : 'i';
-          if (name === 'home') { if (/^cp(?!Puerta)/.test(g)) ch = '▒'; if (g === 'cpPuerta') ch = 'z'; const pi = huecos().findIndex(h => h.x === x && h.y === y); if (pi >= 0) ch = String(pi + 1); }
           const npc = NPCDEF.find(d => d.map === name && d.x === x && d.y === y);
           if (npc) ch = '@';
           r += ch;
@@ -111,14 +110,14 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
   // ---------- MAPA.md ----------
   const legend = `Leyenda: \`.\` suelo/hierba · \`*\` flores · \`"\` hierba alta (ladrones ×3, a cualquier hora) · \`:\` tierra · \`-\` acera · \`=\` carretera · \`+\` plaza · \`~\` agua · \`H\` puente · \`#\` muelle
 \`^\` tejado · \`█\` pared/ventana · \`D\` puerta · \`T\` árbol · \`b\` arbusto · \`$\` arbusto con objeto oculto · \`i\` objeto en el suelo · \`f\` valla · \`S\` cartel · \`L\` farola · \`n\` banco · \`O\` fuente · \`c\` cajas · \`@\` personaje
-Interiores: \`B\` cama · \`P\` ordenador · \`G\` mesa de genética · \`t\` mesa · \`F\` nevera · \`▒\` pared de la carpa · \`z\` puerta de la carpa · \`o\` suelo de la carpa · \`1-8\` plazas (mesa + maceta; 1-2 el armario de 60, 3-8 la carpa de 150) · \`C\` mostrador · \`s\` estantería · \`d\` expositor · \`x\` taburete · \`J\` gramola · \`v\` ventana/póster · \`m\` felpudo (salida)`;
+Interiores: \`B\` cama · \`P\` ordenador · \`G\` mesa de genética · \`t\` mesa · \`F\` nevera · \`K\` carpa (mueble: el armario de 60 en x 8 y la carpa de 150 en x 10-11; sus 2 + 6 plazas se ven por dentro, en la vista de carpa) · \`C\` mostrador · \`s\` estantería · \`d\` expositor · \`x\` taburete · \`J\` gramola · \`v\` ventana/póster · \`m\` felpudo (salida)`;
   let m = `# Mapa de Ribera Verde
 
 > Generado automáticamente con \`node tools/generar-docs.js\`. Coordenadas (x, y) en casillas de 16 px; (0,0) es la esquina superior izquierda.
 
 ${legend}
 `;
-  const titles = { town: 'Barrio (exterior) — 40 × 30', home: 'Piso de la tía Maite — 20 × 12 (con el armario de 60 y la carpa de 150)', shop: 'Growshop Kiko — 10 × 8', bar: 'Bar El Ancla — 10 × 8' };
+  const titles = { town: 'Barrio (exterior) — 40 × 30', home: 'Piso de la tía Maite — 12 × 8 (1 casilla = 1 m; con el armario de 60 y la carpa de 150)', shop: 'Growshop Kiko — 10 × 8', bar: 'Bar El Ancla — 10 × 8' };
   for (const [k, mp] of Object.entries(D.maps)) {
     const pad = String(mp.w - 1).length;
     let header = '    ' + Array.from({ length: mp.w }, (_, x) => x % 10 === 0 ? String(x / 10 % 10) : ' ').join('') + '\n    ' + Array.from({ length: mp.w }, (_, x) => x % 10).join('');

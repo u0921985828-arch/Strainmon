@@ -1,5 +1,5 @@
 {
- "escala": "1 casilla = 16 px = 1 m",
+ "escala": "mapa: 1 casilla = 16 px = 1 m · vista de carpa: 64 px = 1 m",
  "mapas": {
   "town": {
    "nombre": "town",
@@ -172,20 +172,19 @@
      "item": 1
     }
    ],
-   "carpas": [],
-   "plazas": []
+   "carpas": []
   },
   "home": {
    "nombre": "home",
-   "titulo": "PISO DE LA TÍA MAITE (carpas al máximo: armario 60 + carpa 150)",
-   "w": 20,
-   "h": 12,
+   "titulo": "PISO DE LA TÍA MAITE (armario 60 + carpa 150)",
+   "w": 12,
+   "h": 8,
    "edificios": [],
    "puertas": [],
    "salidas": [
     {
      "x": 5,
-     "y": 11,
+     "y": 7,
      "a": "town"
     }
    ],
@@ -198,126 +197,71 @@
     },
     {
      "o": "poster",
-     "x": 6,
+     "x": 3,
      "y": 1
     },
     {
      "o": "iwin",
-     "x": 11,
+     "x": 6,
      "y": 1
     },
     {
      "o": "bedT",
+     "x": 0,
+     "y": 2
+    },
+    {
+     "o": "plantDeco",
      "x": 1,
      "y": 2
     },
     {
      "o": "pc",
-     "x": 3,
-     "y": 2
-    },
-    {
-     "o": "lab",
      "x": 4,
      "y": 2
     },
     {
-     "o": "lab2",
+     "o": "lab",
      "x": 5,
      "y": 2
     },
     {
-     "o": "plantDeco",
-     "x": 11,
+     "o": "lab2",
+     "x": 6,
      "y": 2
     },
     {
      "o": "table",
      "x": 3,
-     "y": 6
+     "y": 5
     },
     {
      "o": "fridge",
-     "x": 1,
-     "y": 7
-    },
-    {
-     "o": "plantDeco",
      "x": 0,
-     "y": 8
+     "y": 6
     },
     {
      "o": "plantDeco",
-     "x": 19,
-     "y": 10
+     "x": 11,
+     "y": 7
     }
    ],
    "carpas": [
     {
      "t": "p60",
-     "x": 7,
+     "x": 8,
      "y": 2,
-     "w": 4,
-     "h": 5,
+     "w": 1,
+     "h": 1,
      "plazas": 2
     },
     {
      "t": "g150",
-     "x": 12,
+     "x": 10,
      "y": 2,
-     "w": 8,
-     "h": 5,
+     "w": 2,
+     "h": 1,
      "plazas": 6
-    }
-   ],
-   "plazas": [
-    {
-     "i": 1,
-     "x": 8,
-     "y": 4,
-     "carpa": 0
-    },
-    {
-     "i": 2,
-     "x": 9,
-     "y": 4,
-     "carpa": 0
-    },
-    {
-     "i": 3,
-     "x": 13,
-     "y": 4,
-     "carpa": 1
-    },
-    {
-     "i": 4,
-     "x": 14,
-     "y": 4,
-     "carpa": 1
-    },
-    {
-     "i": 5,
-     "x": 15,
-     "y": 4,
-     "carpa": 1
-    },
-    {
-     "i": 6,
-     "x": 16,
-     "y": 4,
-     "carpa": 1
-    },
-    {
-     "i": 7,
-     "x": 17,
-     "y": 4,
-     "carpa": 1
-    },
-    {
-     "i": 8,
-     "x": 18,
-     "y": 4,
-     "carpa": 1
     }
    ]
   },
@@ -385,8 +329,7 @@
      "y": 7
     }
    ],
-   "carpas": [],
-   "plazas": []
+   "carpas": []
   },
   "bar": {
    "nombre": "bar",
@@ -464,8 +407,7 @@
      "y": 5
     }
    ],
-   "carpas": [],
-   "plazas": []
+   "carpas": []
   }
  },
  "sprites": [
@@ -475,6 +417,7 @@
    "clave": "look:player",
    "eje": "alto",
    "real": 1.75,
+   "ppm": 16,
    "w": 16,
    "h": 27,
    "m": 1.69,
@@ -486,6 +429,7 @@
    "clave": "look:kiko",
    "eje": "alto",
    "real": 1.78,
+   "ppm": 16,
    "w": 18,
    "h": 28,
    "m": 1.75,
@@ -497,6 +441,7 @@
    "clave": "look:baltasar",
    "eje": "alto",
    "real": 1.8,
+   "ppm": 16,
    "w": 16,
    "h": 27,
    "m": 1.69,
@@ -508,6 +453,7 @@
    "clave": "look:granny",
    "eje": "alto",
    "real": 1.55,
+   "ppm": 16,
    "w": 16,
    "h": 28,
    "m": 1.75,
@@ -519,6 +465,7 @@
    "clave": "look:kid",
    "eje": "alto",
    "real": 1.35,
+   "ppm": 16,
    "w": 14,
    "h": 28,
    "m": 1.75,
@@ -530,6 +477,7 @@
    "clave": "look:cop",
    "eje": "alto",
    "real": 1.8,
+   "ppm": 16,
    "w": 16,
    "h": 28,
    "m": 1.75,
@@ -541,6 +489,7 @@
    "clave": "bed",
    "eje": "ancho",
    "real": 0.9,
+   "ppm": 16,
    "w": 19,
    "h": 32,
    "m": 1.19,
@@ -552,6 +501,7 @@
    "clave": "fridge",
    "eje": "ancho",
    "real": 0.6,
+   "ppm": 16,
    "w": 18,
    "h": 31,
    "m": 1.13,
@@ -563,6 +513,7 @@
    "clave": "pc",
    "eje": "ancho",
    "real": 1.2,
+   "ppm": 16,
    "w": 16,
    "h": 15,
    "m": 1,
@@ -574,6 +525,7 @@
    "clave": "lab",
    "eje": "ancho",
    "real": 1.2,
+   "ppm": 16,
    "w": 16,
    "h": 15,
    "m": 1,
@@ -585,6 +537,7 @@
    "clave": "lab2",
    "eje": "ancho",
    "real": 1.2,
+   "ppm": 16,
    "w": 16,
    "h": 14,
    "m": 1,
@@ -596,6 +549,7 @@
    "clave": "table",
    "eje": "ancho",
    "real": 0.8,
+   "ppm": 16,
    "w": 14,
    "h": 13,
    "m": 0.88,
@@ -607,6 +561,7 @@
    "clave": "plantDeco",
    "eje": "alto",
    "real": 0.9,
+   "ppm": 16,
    "w": 14,
    "h": 16,
    "m": 1,
@@ -618,6 +573,7 @@
    "clave": "shelfW",
    "eje": "ancho",
    "real": 0.9,
+   "ppm": 16,
    "w": 16,
    "h": 9,
    "m": 1,
@@ -629,6 +585,7 @@
    "clave": "counter",
    "eje": "alto",
    "real": 1,
+   "ppm": 16,
    "w": 16,
    "h": 11,
    "m": 0.69,
@@ -640,6 +597,7 @@
    "clave": "display",
    "eje": "ancho",
    "real": 0.8,
+   "ppm": 16,
    "w": 14,
    "h": 15,
    "m": 0.88,
@@ -651,6 +609,7 @@
    "clave": "bottles",
    "eje": "ancho",
    "real": 1,
+   "ppm": 16,
    "w": 16,
    "h": 11,
    "m": 1,
@@ -662,6 +621,7 @@
    "clave": "stool",
    "eje": "alto",
    "real": 0.75,
+   "ppm": 16,
    "w": 8,
    "h": 14,
    "m": 0.88,
@@ -673,6 +633,7 @@
    "clave": "btable",
    "eje": "ancho",
    "real": 0.7,
+   "ppm": 16,
    "w": 14,
    "h": 14,
    "m": 0.88,
@@ -684,6 +645,7 @@
    "clave": "jukebox",
    "eje": "ancho",
    "real": 0.7,
+   "ppm": 16,
    "w": 12,
    "h": 16,
    "m": 0.75,
@@ -695,6 +657,7 @@
    "clave": "crate",
    "eje": "ancho",
    "real": 0.6,
+   "ppm": 16,
    "w": 14,
    "h": 15,
    "m": 0.88,
@@ -706,10 +669,11 @@
    "clave": "carpa:p60",
    "eje": "ancho",
    "real": 0.6,
-   "w": 48,
-   "h": 72,
-   "m": 3,
-   "ratio": 5
+   "ppm": 16,
+   "w": 10,
+   "h": 31,
+   "m": 0.63,
+   "ratio": 1.04
   },
   {
    "grupo": "CULTIVO",
@@ -717,10 +681,11 @@
    "clave": "carpa:m100",
    "eje": "ancho",
    "real": 1,
-   "w": 80,
-   "h": 72,
-   "m": 5,
-   "ratio": 5
+   "ppm": 16,
+   "w": 16,
+   "h": 39,
+   "m": 1,
+   "ratio": 1
   },
   {
    "grupo": "CULTIVO",
@@ -728,153 +693,191 @@
    "clave": "carpa:g150",
    "eje": "ancho",
    "real": 1.5,
-   "w": 112,
-   "h": 72,
-   "m": 7,
-   "ratio": 4.67
+   "ppm": 16,
+   "w": 24,
+   "h": 39,
+   "m": 1.5,
+   "ratio": 1
   },
   {
-   "grupo": "CULTIVO",
-   "n": "Bandeja (2 plazas)",
-   "clave": "bandeja",
+   "grupo": "VISTA DE CARPA",
+   "n": "Armario 60×60",
+   "clave": "carpav:p60",
    "eje": "ancho",
    "real": 0.6,
-   "w": 32,
-   "h": 11,
-   "m": 2,
-   "ratio": 3.33
+   "ppm": 64,
+   "w": 42,
+   "h": 105,
+   "m": 0.66,
+   "ratio": 1.09
   },
   {
-   "grupo": "CULTIVO",
+   "grupo": "VISTA DE CARPA",
+   "n": "Carpa 100×100",
+   "clave": "carpav:m100",
+   "eje": "ancho",
+   "real": 1,
+   "ppm": 64,
+   "w": 68,
+   "h": 133,
+   "m": 1.06,
+   "ratio": 1.06
+  },
+  {
+   "grupo": "VISTA DE CARPA",
+   "n": "Carpa 150×100",
+   "clave": "carpav:g150",
+   "eje": "ancho",
+   "real": 1.5,
+   "ppm": 64,
+   "w": 100,
+   "h": 133,
+   "m": 1.56,
+   "ratio": 1.04
+  },
+  {
+   "grupo": "VISTA DE CARPA",
    "n": "Maceta 7 L",
    "clave": "maceta:plastico7",
    "eje": "ancho",
    "real": 0.22,
-   "w": 10,
-   "h": 11,
-   "m": 0.63,
-   "ratio": 2.84
+   "ppm": 64,
+   "w": 15,
+   "h": 13,
+   "m": 0.23,
+   "ratio": 1.07
   },
   {
-   "grupo": "CULTIVO",
+   "grupo": "VISTA DE CARPA",
    "n": "Maceta 11 L",
    "clave": "maceta:tela11",
    "eje": "ancho",
    "real": 0.25,
-   "w": 12,
-   "h": 14,
-   "m": 0.75,
-   "ratio": 3
+   "ppm": 64,
+   "w": 17,
+   "h": 15,
+   "m": 0.27,
+   "ratio": 1.06
   },
   {
-   "grupo": "CULTIVO",
+   "grupo": "VISTA DE CARPA",
    "n": "Maceta 18 L",
    "clave": "maceta:plastico18",
    "eje": "ancho",
    "real": 0.3,
-   "w": 14,
-   "h": 14,
-   "m": 0.88,
-   "ratio": 2.92
+   "ppm": 64,
+   "w": 19,
+   "h": 16,
+   "m": 0.3,
+   "ratio": 0.99
   },
   {
-   "grupo": "CULTIVO",
+   "grupo": "VISTA DE CARPA",
    "n": "Maceta 25 L",
    "clave": "maceta:tela25",
    "eje": "ancho",
    "real": 0.35,
-   "w": 14,
-   "h": 14,
-   "m": 0.88,
-   "ratio": 2.5
+   "ppm": 64,
+   "w": 24,
+   "h": 18,
+   "m": 0.38,
+   "ratio": 1.07
   },
   {
-   "grupo": "CULTIVO",
+   "grupo": "VISTA DE CARPA",
    "n": "Germinando",
-   "clave": "planta:germinando",
+   "clave": "planta:1",
    "eje": "alto",
-   "real": 0.25,
-   "w": 16,
-   "h": 19,
-   "m": 1.19,
-   "ratio": 4.75
+   "real": 0.06,
+   "ppm": 64,
+   "w": 13,
+   "h": 9,
+   "m": 0.14,
+   "ratio": 2.34
   },
   {
-   "grupo": "CULTIVO",
+   "grupo": "VISTA DE CARPA",
    "n": "Plántula",
-   "clave": "planta:plantula",
+   "clave": "planta:2",
    "eje": "alto",
-   "real": 0.35,
-   "w": 16,
-   "h": 25,
-   "m": 1.56,
-   "ratio": 4.46
+   "real": 0.16,
+   "ppm": 64,
+   "w": 25,
+   "h": 21,
+   "m": 0.33,
+   "ratio": 2.05
   },
   {
-   "grupo": "CULTIVO",
+   "grupo": "VISTA DE CARPA",
    "n": "Vegetativo",
-   "clave": "planta:vegetativo",
+   "clave": "planta:3",
    "eje": "alto",
-   "real": 0.6,
-   "w": 26,
-   "h": 30,
-   "m": 1.88,
-   "ratio": 3.13
-  },
-  {
-   "grupo": "CULTIVO",
-   "n": "Floración",
-   "clave": "planta:floracion",
-   "eje": "alto",
-   "real": 1,
-   "w": 22,
-   "h": 30,
-   "m": 1.88,
+   "real": 0.4,
+   "ppm": 64,
+   "w": 32,
+   "h": 48,
+   "m": 0.75,
    "ratio": 1.88
   },
   {
-   "grupo": "CULTIVO",
-   "n": "Lista",
-   "clave": "planta:lista",
+   "grupo": "VISTA DE CARPA",
+   "n": "Floración",
+   "clave": "planta:4",
    "eje": "alto",
-   "real": 1.1,
-   "w": 24,
-   "h": 32,
-   "m": 2,
-   "ratio": 1.82
+   "real": 0.78,
+   "ppm": 64,
+   "w": 32,
+   "h": 48,
+   "m": 0.75,
+   "ratio": 0.96
   },
   {
-   "grupo": "CULTIVO",
+   "grupo": "VISTA DE CARPA",
+   "n": "Lista",
+   "clave": "planta:5",
+   "eje": "alto",
+   "real": 0.88,
+   "ppm": 64,
+   "w": 32,
+   "h": 48,
+   "m": 0.75,
+   "ratio": 0.85
+  },
+  {
+   "grupo": "VISTA DE CARPA",
    "n": "Foco CFL",
    "clave": "foco:cfl",
    "eje": "ancho",
    "real": 0.45,
+   "ppm": 64,
    "w": 22,
    "h": 29,
-   "m": 1.38,
-   "ratio": 3.06
+   "m": 0.34,
+   "ratio": 0.76
   },
   {
-   "grupo": "CULTIVO",
+   "grupo": "VISTA DE CARPA",
    "n": "Foco sodio",
    "clave": "foco:sodio",
    "eje": "ancho",
    "real": 0.55,
+   "ppm": 64,
    "w": 30,
    "h": 23,
-   "m": 1.88,
-   "ratio": 3.41
+   "m": 0.47,
+   "ratio": 0.85
   },
   {
-   "grupo": "CULTIVO",
+   "grupo": "VISTA DE CARPA",
    "n": "Panel LED",
    "clave": "foco:led",
    "eje": "ancho",
    "real": 0.6,
+   "ppm": 64,
    "w": 30,
    "h": 25,
-   "m": 1.88,
-   "ratio": 3.13
+   "m": 0.47,
+   "ratio": 0.78
   },
   {
    "grupo": "EXTERIOR",
@@ -882,6 +885,7 @@
    "clave": "tree",
    "eje": "alto",
    "real": 6,
+   "ppm": 16,
    "w": 18,
    "h": 24,
    "m": 1.5,
@@ -893,6 +897,7 @@
    "clave": "lamp",
    "eje": "alto",
    "real": 4,
+   "ppm": 16,
    "w": 6,
    "h": 27,
    "m": 1.69,
@@ -904,6 +909,7 @@
    "clave": "bench",
    "eje": "ancho",
    "real": 1.8,
+   "ppm": 16,
    "w": 16,
    "h": 12,
    "m": 1,
@@ -915,6 +921,7 @@
    "clave": "fountain",
    "eje": "ancho",
    "real": 3,
+   "ppm": 16,
    "w": 26,
    "h": 27,
    "m": 1.63,
@@ -926,6 +933,7 @@
    "clave": "bush",
    "eje": "ancho",
    "real": 1.2,
+   "ppm": 16,
    "w": 14,
    "h": 11,
    "m": 0.88,
@@ -937,6 +945,7 @@
    "clave": "fence",
    "eje": "alto",
    "real": 1,
+   "ppm": 16,
    "w": 16,
    "h": 12,
    "m": 0.75,
@@ -948,6 +957,7 @@
    "clave": "edificio:home",
    "eje": "ancho",
    "real": 14,
+   "ppm": 16,
    "w": 112,
    "h": 96,
    "m": 7,
@@ -959,6 +969,7 @@
    "clave": "edificio:bar",
    "eje": "ancho",
    "real": 14,
+   "ppm": 16,
    "w": 112,
    "h": 96,
    "m": 7,

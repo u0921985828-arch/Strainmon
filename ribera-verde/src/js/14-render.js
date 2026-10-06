@@ -20,35 +20,23 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
   for(let ty=ty0;ty<=ty0+SH/16;ty++)for(let tx=tx0;tx<=tx0+Math.ceil(SW/16);tx++){
     if(tx<0||ty<0||tx>=m.w||ty>=m.h)continue;
     const sx=tx*16-cam.x,sy=ty*16-cam.y,k=m.g[ty][tx],a=TILES[k];
-    if(m.carpas&&/^(cp|tent)/.test(k)){   // carpa por dentro: suelo del piso debajo y la carpa encima (atlas o procedural)
-      if(!arteTile('floor',tx,ty,sx,sy,now))ctx.drawImage(TILES.floor[0],sx,sy);
-      if(!arteCarpaTile(m,tx,ty,sx,sy)&&!arteTile(k,tx,ty,sx,sy,now))ctx.drawImage(a[0],sx,sy);
-    }
-    else if(!arteTile(k,tx,ty,sx,sy,now))ctx.drawImage(a[a.length>1?wf:0],sx,sy);
+    if(!arteTile(k,tx,ty,sx,sy,now))ctx.drawImage(a[a.length>1?wf:0],sx,sy);
     else arteOrilla(m,k,tx,ty,sx,sy);
     const o=m.o[ty][tx];
-    if(o==='mesa'){const r=m.o[ty],l=r[tx-1]==='mesa',d=r[tx+1]==='mesa';ctx.drawImage(TILES.mesa[l&&d?2:l?3:d?1:0],sx,sy);}   // bandeja continua (procedural, F10)
-    else if(o&&!arteObj(o,tx,ty,cam,now,list))ctx.drawImage(TILES[o][0],sx,sy);
+    if(o&&o!=='carpa'&&!arteObj(o,tx,ty,cam,now,list))ctx.drawImage(TILES[o][0],sx,sy);
   }
   arteEdificios(m,cam);
   if(S.map==='home'){
-    // carpas: desde fuera, cerradas (fachada con la puerta); con el jugador dentro, sin techo ni paredes de delante/derecha
-    for(const t of m.carpas){
-      if(dentroCarpa(t)){list.push([(t.y0+2)*16-1,()=>pintarFocos(t,cam,true)],[(t.y0+2)*16+1,()=>pintarFocos(t,cam,false)]);continue;}   // luz detrás de las plantas, focos delante
-      const x=t.x0*16-cam.x,y=t.y0*16-cam.y;
-      if(!arteCarpaFuera(t,x,y))ctx.drawImage(carpaFuera(t.x1-t.x0+1),x,y);
-      if(plantasVivas(t.ci)){ctx.fillStyle=FOCO_LUZ[FOCOS[S.carpas[t.ci].foco].tipo]+'.55)';ctx.fillRect((t.door)*16+3-cam.x,t.y1*16+7-cam.y,10,1);}   // la luz se escapa bajo la puerta
-    }
-    SITIOS.forEach((st,ci)=>{if(S.carpas[ci])return;ctx.strokeStyle='rgba(60,70,90,.45)';ctx.setLineDash([3,2]);ctx.strokeRect(st.x*16+8.5-cam.x,st.y*16+.5-cam.y,6*16-17,71);ctx.setLineDash([]);});
-    if(!S.flags.letter){const lx=3*16-cam.x,ly=6*16-cam.y;ctx.fillStyle='#fafaf2';ctx.fillRect(lx+5,ly+5,7,5);ctx.fillStyle='#c04040';ctx.fillRect(lx+8,ly+7,2,1);}
+    // carpas: muebles de 1-2 casillas, pintados enteros desde su base (tapan al jugador si pasa por detrás); con plantas,
+    // la luz se escapa bajo la puerta. Sitio libre: el hueco marcado en el suelo.
+    for(const t of m.carpas)list.push([t.y*16,()=>pintarCarpaMapa(t,cam)]);
+    SITIOS.forEach((st,ci)=>{if(S.carpas[ci])return;ctx.strokeStyle='rgba(60,70,90,.45)';ctx.setLineDash([3,2]);ctx.strokeRect(st.x*16+1.5-cam.x,st.y*16+.5-cam.y,st.w*16-3,15);ctx.setLineDash([]);});
+    if(!S.flags.letter){const lx=3*16-cam.x,ly=5*16-cam.y;ctx.fillStyle='#fafaf2';ctx.fillRect(lx+5,ly+5,7,5);ctx.fillStyle='#c04040';ctx.fillRect(lx+8,ly+7,2,1);}
   }
   const fr=(e,dur)=>e.moving&&e.t/dur<.5?1+((e.x+e.y)&1):0;
   if(ARTE.ok)for(const e of ents)ambiente(e,now,cam);
   for(const e of ents)list.push([e.py,()=>{if(!dibujarPJ(e,e.look,now,cam,false,320))ctx.drawImage(spriteFor(e.look,e.dir,fr(e,320)),Math.round(e.px-cam.x),Math.round(e.py-cam.y-4));}]);
   if(!camFija)list.push([P.py,()=>{if(!dibujarPJ(P,LOOKS.player,now,cam,true,P.dur))ctx.drawImage(spriteFor(LOOKS.player,P.dir,P.moving&&P.t/P.dur<.5?1+P.parity:0),Math.round(P.px-cam.x),Math.round(P.py-cam.y-4));}]);
-  if(S.map==='home'){const vis=new Set(m.carpas.filter(dentroCarpa).map(t=>t.ci));   // plantas sobre su mesa, solo en la carpa abierta
-    huecos().forEach((h,i)=>{if(!vis.has(h.c))return;list.push([h.y*16,()=>{const p=S.pots[i],k=S.macetas[i],x=h.x*16-cam.x,y=h.y*16-cam.y-MESA_ALTO;
-      if(!artePlanta(p,x,y,now,k))ctx.drawImage(p?plantSprite(p,k):potVacia(k),x,y-10);}]);});}
   const bolsa=ARTE.ok&&frameDe(ARTE.cubre['misc:bolsa'],'bolsa','unica',0,{i:0});
   for(const it of ITEMS)if(!it.hidden&&it.map===S.map&&!S.taken[it.id])list.push([it.y*16,()=>{const x=it.x*16-cam.x,y=it.y*16-cam.y;if(bolsa)pinta(bolsa,x+8,y+8);else ctx.drawImage(bagSprite,x,y);}]);
   arteCriaturas(now,cam,list);
@@ -66,44 +54,15 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
         ctx.globalCompositeOperation='source-over';}}
   }
 }
-/* ---------- carpa: fachada cerrada y focos colgando (procedurales; con atlas, arteCarpaFuera/arteFoco) ---------- */
+/* ---------- focos (procedurales; con atlas, arteFoco) ---------- */
 const FOCO_LUZ={cfl:'rgba(220,240,255,',sodio:'rgba(255,170,70,',led:'rgba(240,170,255,'};
 const carpaCache={};
-function carpaFuera(w){
-  if(carpaCache[w])return carpaCache[w];
-  const W=w*16,[c,x]=mkCanvas(W,80),t=painter(x,rngSeed(w)),L=8,R=W-8,ww=R-L;
-  const pole='#5a5e68',hi='#8a8e98',tela='#26272c',osc='#1c1d22',techo='#3e4048';
-  // techo visto desde arriba (y 0-23) y frente (y 24-71) con la puerta de cremallera en la columna 1
-  t.F(L,0,ww,24,techo);t.F(L,2,ww,1,'#4a4c54');for(let sx=L+16;sx<R-4;sx+=16)t.F(sx,2,1,20,'#33353c');
-  t.F(L,0,ww,2,pole);t.F(L,0,ww,1,hi);t.F(L,22,ww,2,hi);t.F(L,23,ww,1,pole);t.F(L,0,2,24,pole);t.F(R-2,0,2,24,pole);
-  t.blob(R-14,10,4.5,3.4,osc,'#4a4c54');t.F(R-16,4,4,5,'#b2b8c4');t.F(R-16,5,4,1,'#8a8e98');t.F(R-16,7,4,1,'#8a8e98');   // salida del extractor
-  t.F(L,24,ww,48,tela);t.F(L,70,ww,2,osc);t.F(L,24,2,48,pole);t.F(R-2,24,2,48,pole);t.F(L+2,24,1,46,'#3a3c44');
-  for(let sx=L+16;sx<R-4;sx+=16)if(sx!==24)t.F(sx,26,1,44,osc);
-  const dx=17,dy=30;t.F(dx,dy+3,14,38,'#2e3036');t.F(dx,dy+2,14,1,'#a0a4ac');t.F(dx-1,dy+3,1,38,'#a0a4ac');t.F(dx+14,dy+3,1,38,'#a0a4ac');
-  t.F(dx+1,dy+1,12,1,'#a0a4ac');t.F(dx+12,dy+4,2,3,'#e0e2e8');t.F(dx+5,dy+20,4,1,'#3a3c44');
-  if(ww>48){const vx=R-22;t.F(vx,58,14,8,osc);for(let i=0;i<14;i+=3)t.F(vx+i,58,1,8,'#3a3c44');t.F(vx,58,14,1,'#3a3c44');}   // rejilla de ventilación
-  return carpaCache[w]=c;
-}
 function focoProc(tipo){
   const key='foco|'+tipo;if(carpaCache[key])return carpaCache[key];const [c,x]=mkCanvas(32,12),t=painter(x,rngSeed(9));
   if(tipo==='led'){t.F(4,2,24,5,'#1c1d22');t.F(5,3,22,3,'#2a2b30');for(let i=6;i<26;i+=3)t.F(i,0,1,2,'#5a5e68');const d=['#ff70c0','#f4f0ff','#c070ff'];for(let i=0;i<7;i++)t.F(6+i*3,6,2,1,d[i%3]);}
   else if(tipo==='sodio'){t.F(8,1,16,2,'#5a5e68');t.F(5,3,22,3,'#c8ccd6');t.F(5,3,22,1,'#e8eaf0');t.F(4,6,24,1,'#5a5e68');for(let i=7;i<26;i+=4)t.P(i,4,'#a8aebb');t.F(10,7,12,2,'#ffb040');t.F(11,7,10,1,'#ffe0a0');}
   else{t.F(11,1,10,2,'#5a5e68');t.F(9,3,14,2,'#e8eaf0');t.F(8,5,16,1,'#5a5e68');for(let i=0;i<3;i++){t.F(11+i*4,6,2,4,'#fffbe8');t.P(11+i*4,7,'#d8d8c8');t.P(12+i*4,9,'#d8d8c8');}}
   return carpaCache[key]=c;
-}
-// focos de la carpa abierta: medio transparentes para que se vean las plantas; luz encendida si hay alguna planta viva.
-// Dos pasadas: luz (cono sobre la pared y el suelo, por detrás de las plantas) y focos (por delante)
-function pintarFocos(t,cam,luz){
-  const c=S.carpas[t.ci],C=CARPAS[c.t],F=FOCOS[c.foco],n=Math.max(1,Math.round(Math.min(F.cubre,C.plazas)/2));
-  const ix=(t.x0+1)*16-cam.x,iw=C.plazas*16,top=t.y0*16-cam.y,on=plantasVivas(t.ci),a=.08+.14*Math.min(1,F.w/600);
-  for(let k=0;k<n;k++){
-    const cx=Math.round(ix+(k+.5)*iw/n),y=top+14,hw=iw/n/2;   // y: parte de abajo del foco, justo por encima de las plantas más altas
-    if(luz){if(on){ctx.globalCompositeOperation='lighter';const g=ctx.createLinearGradient(0,y,0,y+44);g.addColorStop(0,FOCO_LUZ[F.tipo]+a+')');g.addColorStop(1,FOCO_LUZ[F.tipo]+'0)');
-      ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(cx-9,y);ctx.lineTo(cx+9,y);ctx.lineTo(cx+hw,y+44);ctx.lineTo(cx-hw,y+44);ctx.fill();ctx.globalCompositeOperation='source-over';}continue;}
-    ctx.globalAlpha=.55;
-    if(!arteFoco(F.tipo,cx,y,top)){ctx.fillStyle='#2a2b30';ctx.fillRect(cx-7,top+1,1,y-top-8);ctx.fillRect(cx+6,top+1,1,y-top-8);ctx.drawImage(focoProc(F.tipo),cx-16,y-10);}
-    ctx.globalAlpha=1;
-  }
 }
 let titleArt,battleBg={};
 function makeArt(){

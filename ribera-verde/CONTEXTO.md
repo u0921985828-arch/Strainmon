@@ -35,11 +35,11 @@
 - **El motor de sprites va antes que los sprites (v1.3).** Se probó con un atlas «de calco» del arte actual: si las capturas salen iguales, las anclas cuadran y los créditos se gastan solo en arte.
 - **Ajustes tras la prueba automática (v1.1).** Los ladrones de los capítulos altos ganaban casi siempre, así que se suavizaron y ahora la VIDA máxima sube 2 puntos por cada ladrón vencido. Además se corrigieron tres fallos; están en [CHANGELOG.md](CHANGELOG.md).
 
-## Estado (v1.7.0)
+## Estado (v1.8.0)
 
 - Se juega de principio a fin: capítulos 1 a 7, final y juego libre (capítulo 8).
-- `npm test` recorre la historia entera y los sistemas sueltos en 38 pasos: **38/38, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
-- **Plano (1.7.0):** [docs/PLANO.md](docs/PLANO.md) mide todos los sprites contra su tamaño real y deja la decisión de escala pendiente.
+- `npm test` recorre la historia entera y los sistemas sueltos en 39 pasos: **39/39, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
+- **Escala (1.8.0):** decidida y aplicada la opción A de [docs/PLANO.md](docs/PLANO.md): piso de 12 × 8 a 1 casilla = 1 m, carpas como muebles y vista de carpa a 64 px/m con las plantas de cepas de Strainmon (`../assets/plants`).
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
   - el motor ya usa el atlas (F2) y `npm run test:arte` da 22/22;
@@ -47,10 +47,11 @@
   - F3 (personajes) con la misma receta: los 13 NPC y los 6 clientes salen del atlas con `idle`, `walk` (los que caminan) y sus acciones de ambiente;
   - F3-resto, F4, F5, F6 y F7 (1.5): humos y efectos, gaviotas y palomas, tiles, interiores, fachadas, objetos, carpa, plantas, combate, iconos, cogollos y título salen del atlas, y el protagonista ya tiene sus 8 acciones;
   - F4b (1.5): orillas del río, del camino de tierra y de la plaza con tres Wang encadenados y autotiling por esquinas;
-  - F8 (1.6): carpas de 3 tamaños por dentro y cerradas (pixflux img2img sobre su huella), 4 macetas, 3 focos y la mesa de cultivo (lotes de `create_1_direction_object`). Atlas completo: 1099 fotogramas.
+  - F8 (1.6): carpas de 3 tamaños por dentro y cerradas (pixflux img2img sobre su huella), 4 macetas, 3 focos y la mesa de cultivo (lotes de `create_1_direction_object`). 
+  - 1.8: carpas del piso y de la vista, macetas y cuarto de cultivo (4 generaciones pixflux) y las plantas de la vista importadas de Strainmon; retirados los sprites de cultivo de la 1.6–1.7. Atlas: 1169 fotogramas.
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
-- **Android:** `dist/ribera-verde.apk` (1.7.0, código 10700, siempre en horizontal), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
-- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.7.0, con el atlas completo de PixelLab (1099 fotogramas). Es privado: se comparte desde su menú Compartir.
+- **Android:** `dist/ribera-verde.apk` (1.8.0, código 10800, siempre en horizontal), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
+- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.8.0, con el atlas completo (1169 fotogramas). Es privado: se comparte desde su menú Compartir.
 
 ## Limitaciones conocidas
 
@@ -64,7 +65,7 @@
 
 ## Siguientes pasos sugeridos
 
-1. Decidir la escala con [docs/PLANO.md](docs/PLANO.md) (opción A, B o C) y rehacer lo que toque.
+1. Probar el APK en un móvil real (la vista de carpa incluida).
 2. Revisar el arte nuevo jugando y repetir lo que no convenza (cada asset del manifiesto guarda sus ids, semillas y descartes). Guía: [docs/PIXELLAB.md](docs/PIXELLAB.md); comando `/sprites`.
 3. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.
 4. Añadir zonas: polígono industrial, monte con cultivo exterior por estaciones y puerto con contrabando.

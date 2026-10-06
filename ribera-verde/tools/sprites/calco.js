@@ -63,6 +63,7 @@ const DIRS = { south: 'down', north: 'up', west: 'left', east: 'right' };
 const lookOf = a => ((a.cubre || []).find(c => c.startsWith('look:')) || '').slice(5);
 
 for (const a of M.assets) {
+  if (a.estado === 'retirado') continue;   // fuera del juego (1.8: carpas por casillas, mesas, macetas y plantas del mapa)
   // ---------- personajes (celda 32×32) ----------
   if (a.tipo === 'personaje') {
     const L = lookOf(a); if (!has(`personajes/${L}/down_0.png`)) continue;
@@ -93,6 +94,7 @@ for (const a of M.assets) {
     const c = (a.cubre || [])[0] || ''; const m = c.match(/^combate:(fondo-\w+)$/);
     if (m && has(`combate/${m[1]}.png`)) wr(a.id, 'base', 'unica', 0, rd(`combate/${m[1]}.png`));
     if (c === 'misc:hoja-titulo' && has('misc/titulo.png')) wr(a.id, 'base', 'unica', 0, rd('misc/titulo.png'));
+    if (c === 'misc:cuarto-cultivo' && has('misc/cuarto-cultivo.png')) wr(a.id, 'cuarto-cultivo', 'unica', 0, rd('misc/cuarto-cultivo.png'));
   }
   // ---------- tiles (16×16 exacto; los animados en bloques de 32×32) ----------
   if (a.tipo === 'tiles') {
@@ -145,6 +147,8 @@ for (const a of M.assets) {
         copy(src, o, [0, 1, 0, -1][i % 4], 0, 0, 0, src.width, h); copy(src, o, 0, h, 0, h, src.width, 6);   // la maceta quieta, las hojas se mecen
         wr(a.id, an.nombre, 'unica', i, o); } }
   }
+  // ---------- arte importado (plantas de la vista): el mismo recorte que en art/crudo ----------
+  if (a.id === 'plantas-vista' && (!SOLO || SOLO.includes(a.id))) { require('child_process').execFileSync(process.execPath, [path.join(__dirname, 'plantas-vista.js'), '--crudo', OUT]); n += 90; }
   // ---------- iconos ----------
   if (a.id === 'iconos' && has('misc/bolsa.png')) wr(a.id, 'bolsa', 'unica', 0, rd('misc/bolsa.png'));
   // el resto de iconos y los cogollos de la Genoteca no tienen versión procedural: un disco de color por icono (los cogollos, en la rampa magenta)

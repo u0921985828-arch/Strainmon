@@ -4,7 +4,7 @@
    Todo lo que no esté en el atlas se dibuja con el procedural de siempre.
    ?arte=procedural en la URL fuerza el procedural para comparar.
    ========================================================= */
-const ARTE={ok:false,fr:{},mir:{},rec:new WeakMap(),sin:new WeakMap(),top:new WeakMap(),vfx:[],st:new WeakMap(),sobre:{},cubre:{},prisa:1};
+const ARTE={ok:false,fr:{},mir:{},rec:new WeakMap(),top:new WeakMap(),vfx:[],st:new WeakMap(),sobre:{},cubre:{},prisa:1};
 const DIR4={down:'south',up:'north',left:'west',right:'east'};
 const FASES=['germinando','plantula','vegetativo','floracion','lista'];
 const FUMA=/fum|puro|pipa|vap/;
@@ -182,60 +182,54 @@ function arteEdificios(m,cam){
     }
   }
 }
-// carpas (1.6): 'carpa-<t>' es la carpa por dentro (sin techo ni paredes de delante/derecha) y 'carpa-<t>-fuera', cerrada;
-// las dos del tamaño de la huella entera (w×16 × 80) y transparentes donde se ve el suelo del piso; el interior va casilla a casilla
-function carpaEn(m,tx,ty){for(const t of m.carpas||[])if(tx>=t.x0&&tx<=t.x1&&ty>=t.y0&&ty<=t.y1)return t;return null;}
-function arteCarpaTile(m,tx,ty,sx,sy){
-  if(!ARTE.ok)return false;const t=carpaEn(m,tx,ty);if(!t)return false;
-  const f=frameDe('carpa-'+t.t,'base','unica',0,{i:0});if(!f)return false;
-  ctx.drawImage(f.c,(tx-t.x0)*16,(ty-t.y0)*16,16,16,sx,sy,16,16);return true;
+// carpas (1.8): en el piso, un mueble ('carpa-<t>-mapa', celda carpa_mapa, pies en el centro de su base); por dentro,
+// la vista de frente a 64 px/m ('carpa-<t>-vista', con su fondo 'cuarto-cultivo'), con macetas y plantas de esa escala
+const fotoMisc=n=>ARTE.ok&&frameDe(ARTE.cubre['misc:'+n],n,'unica',0,{i:0});
+function arteCarpaMapa(t,xc,yb){const f=fotoMisc('carpa-'+t+'-mapa');if(!f)return false;pinta(f,xc,yb);return true;}
+function arteCarpaVista(t,xc,yb){const f=fotoMisc('carpa-'+t+'-vista');if(!f)return false;pinta(f,xc,yb);return true;}
+function arteFondoCuarto(){const f=fotoMisc('cuarto-cultivo');if(!f)return false;fondoAncho(f.c);return true;}
+// maceta de la vista con la base en (xc, yb); devuelve la fila de su borde (donde arranca la planta) o null sin atlas
+function arteMacetaVista(k,xc,yb){const f=fotoMisc('maceta-vista-'+k);if(!f)return null;pinta(f,xc,yb);return yb-(f.cel.ancla[1]-filaSup(f.c));}
+// planta de la vista (misc:planta-vista, sprites smNN-F): cada variedad con la cepa de Strainmon más parecida en porte y
+// color de cogollo (los híbridos propios, una por hash) y la fase 1-5 (germinando y plántula, 1 y 2; vegetativo, 3;
+// floración, 4; lista, 5; muerta, la 3 parda). Seca: los verdes amarillean. Balanceo por filas y ácaros si hay plaga.
+// La base del tallo en (xc, yb); devuelve el alto que se ve o false sin atlas
+const PLANTA_SM={ria:8,limon:4,txoko:15,niebla:7,mango:12,purpura:16,rif:11,hindu:6,acapulco:2,malawi:9,citrus:1,bluetx:7,sollimon:5,
+  kushrif:12,purpurah:16,orotrop:0,nieblamor:7,brumaog:4,reina:15,amanecer:13,tormenta:3,dragon:14,leyenda:10};
+const smDe=sid=>String(PLANTA_SM[sid]??hashStr(sid)%18).padStart(2,'0');
+function artePlantaVista(p,xc,yb,now){
+  const g=ARTE.ok&&ARTE.cubre['misc:planta-vista'];if(!g)return false;
+  const n='sm'+smDe(p.sid)+'-'+(p.dead?3:plantStage(p)+1),f=frameDe(g,n,'unica',0,{i:0});if(!f)return false;
+  const dry=!p.dead&&p.water<=0,c=p.dead?secar(f.c,1):dry?secar(f.c,0):f.c,st=plantStage(p);
+  balanceo(c,xc-f.cel.ancla[0],yb-f.cel.ancla[1],f.cel.ancla[1],!p.dead&&!dry&&st>=2?(st>=3?1.4:1):0,now+xc*37);
+  const h=f.cel.ancla[1]-filaSup(f.c);
+  if(p.pest&&!p.dead)dibujar('vfx-acaros','efecto','unica',now,xc,yb-Math.round(h/2),{bucle:true});
+  return h;
 }
-function arteCarpaFuera(t,x,y){const f=ARTE.ok&&frameDe('carpa-'+t.t+'-fuera','base','unica',0,{i:0});if(!f)return false;ctx.drawImage(f.c,x,y);return true;}
-// foco colgado con la parte de abajo en y; el cable sube hasta el borde de arriba de la carpa (top), donde se corta
+// verdes (tono 55-170°) hacia el pajizo (seca) o el pardo (muerta), con su luz; el resto (cogollos, tallo) se apaga un poco
+function secar(c,muerta){
+  let m=ARTE.rec.get(c);if(!m){m=new Map();ARTE.rec.set(c,m);}const id='seco'+muerta;if(m.has(id))return m.get(id);
+  const [o,x]=mkCanvas(c.width,c.height);x.drawImage(c,0,0);const im=x.getImageData(0,0,c.width,c.height),d=im.data;
+  const [hr,hg,hb]=muerta?[122,92,52]:[184,170,72];
+  for(let j=0;j<d.length;j+=4){if(!d[j+3])continue;const r=d[j],g=d[j+1],b=d[j+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/510;
+    let h=0;if(mx!==mn)h=mx===r?((g-b)/(mx-mn))%6:mx===g?(b-r)/(mx-mn)+2:(r-g)/(mx-mn)+4;h=(h*60+360)%360;
+    const k=Math.min(1.3,l*2.1),v=h>=55&&h<=170&&mx-mn>18?1:.35;
+    d[j]=Math.round(r+(hr*k-r)*v);d[j+1]=Math.round(g+(hg*k-g)*v);d[j+2]=Math.round(b+(hb*k-b)*v);}
+  x.putImageData(im,0,0);m.set(id,o);return o;
+}
+// pinta c en (x, y) por franjas de 2 filas desplazadas con un seno: la base (fila b) quieta y la copa hasta ±a px
+function balanceo(c,x,y,b,a,t){
+  if(!a){ctx.drawImage(c,Math.round(x),Math.round(y));return;}
+  const s=Math.sin(t/950)*.7+Math.sin(t/410)*.3;
+  for(let r=0;r<c.height;r+=2){const dx=Math.round(a*s*Math.max(0,(b-r)/b)**1.5);ctx.drawImage(c,0,r,c.width,2,Math.round(x)+dx,Math.round(y)+r,c.width,2);}
+}
+// foco colgado con la parte de abajo en y; el cable sube hasta top
 function arteFoco(tipo,cx,y,top){
   const f=ARTE.ok&&frameDe(ARTE.cubre['misc:foco-'+tipo],'foco-'+tipo,'unica',0,{i:0});if(!f)return false;
-  ctx.save();ctx.beginPath();ctx.rect(0,top,SW,SH);ctx.clip();pinta(f,cx,y-filaInf(f.c));ctx.restore();return true;
-}
-// la maceta de la planta del atlas (tela negra) se quita: el contorno y el cuerpo de la maceta (colores de 'maceta-vacia')
-// que no tocan hojas; así la planta se puede poner en cualquier maceta sin perder las hojas que caen por el borde
-function sinMaceta(c){
-  if(ARTE.sin.has(c))return ARTE.sin.get(c);
-  const v=frameDe(ARTE.cubre['misc:maceta-vacia'],'maceta-vacia','unica',0,{i:0});if(!v)return c;
-  if(!ARTE.potPal){const im=v.c.getContext('2d').getImageData(0,0,v.c.width,v.c.height).data;ARTE.potPal=new Set();ARTE.potTop=99;
-    for(let j=0;j<im.length;j+=4)if(im[j+3]){ARTE.potPal.add((im[j]<<16)|(im[j+1]<<8)|im[j+2]);ARTE.potTop=Math.min(ARTE.potTop,Math.floor(j/4/v.c.width));}}
-  const [k,x]=mkCanvas(c.width,c.height);x.drawImage(c,0,0);const im=x.getImageData(0,0,c.width,c.height),d=im.data,W=c.width,H=c.height;
-  const pot=(px,py)=>{const j=(py*W+px)*4;return d[j+3]&&ARTE.potPal.has((d[j]<<16)|(d[j+1]<<8)|d[j+2]);};
-  const hoja=(px,py)=>px>=0&&py>=0&&px<W&&py<H&&d[(py*W+px)*4+3]&&!pot(px,py);
-  const quita=[];
-  for(let py=ARTE.potTop-2;py<H;py++)for(let px=0;px<W;px++)if(pot(px,py)&&!(py<ARTE.potTop+8&&(hoja(px-1,py)||hoja(px+1,py)||hoja(px,py-1)||hoja(px,py+1))))quita.push((py*W+px)*4+3);
-  for(const j of quita)d[j]=0;x.putImageData(im,0,0);
-  ARTE.sin.set(c,k);return k;
+  ctx.save();ctx.beginPath();ctx.rect(-SW,top,SW*3,SH);ctx.clip();pinta(f,cx,y-filaInf(f.c));ctx.restore();return true;
 }
 function filaInf(c){const k='i';let m=ARTE.top.get(c);if(m&&m[k]!=null)return m[k];const im=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let r=c.height-1;for(let j=im.length-4;j>=0;j-=4)if(im[j+3]){r=Math.floor(j/4/c.width);break;}m=m||{};m[k]=r;ARTE.top.set(c,m);return r;}
 function filaSup(c){const k='s';let m=ARTE.top.get(c);if(m&&m[k]!=null)return m[k];const im=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let r=0;for(let j=0;j<im.length;j+=4)if(im[j+3]){r=Math.floor(j/4/c.width);break;}m=m||{};m[k]=r;ARTE.top.set(c,m);return r;}
-// planta en la casilla (x, y de pantalla = esquina de la casilla); p null = maceta vacía; mk = tipo de maceta (misc:maceta-<mk>)
-function artePlanta(p,x,y,now,mk){
-  if(!ARTE.ok)return false;
-  const st=p?(p.dead?'muerta':FASES[plantStage(p)]):'maceta-vacia';
-  const mt=mk&&frameDe(ARTE.cubre['misc:maceta-'+mk],'maceta-'+mk,'unica',0,{i:0});
-  if(!p&&mt){pinta(mt,x+8,y+15);return true;}
-  const g=ARTE.cubre[p?'planta:'+st:'misc:maceta-vacia'];if(!g)return false;
-  const dry=p&&!p.dead&&p.water<=0;
-  const sw=!dry&&p&&!p.dead&&ARTE.sobre['planta:'+st];
-  const f=sw?frameDe(sw[0][0],sw[0][1],'unica',now+(x*37),{bucle:true}):frameDe(g,st,'unica',0,{i:0});
-  if(!f)return false;
-  let c=mt?sinMaceta(f.c):f.c,map=null;
-  const rk=ARTE.d.rampas&&ARTE.d.rampas[g]&&ARTE.d.rampas[g].cogollo;
-  if(p&&rk){const s=getStrain(p.sid),col=s?s.c:'#9bd35a';map={[rk.rampa[0]]:shade(col,50),[rk.rampa[1]]:col,[rk.rampa[2]]:shade(col,-60)};}
-  const seca=dry&&ARTE.d.rampas_cambio&&ARTE.d.rampas_cambio[g]&&ARTE.d.rampas_cambio[g].seca;
-  if(seca)map=Object.assign(map||{},seca);
-  if(map)c=conRampa(c,map,(p?p.sid:'')+(seca?'|s':''));
-  let dy=0;
-  if(mt){pinta(mt,x+8,y+15);dy=filaSup(mt.c)-(ARTE.potTop??filaSup(mt.c));}   // la planta baja o sube con el borde de la maceta
-  pinta(f,x+8,y+15+dy,c);
-  if(p&&p.pest&&!p.dead)dibujar('vfx-acaros','efecto','unica',now,x+8,y+8+dy,{bucle:true});
-  return true;
-}
 // criaturas de ambiente: paloma junto a Patxi, gaviotas en el muelle
 function arteCriaturas(now,cam,list){
   if(!ARTE.ok||S.map!=='town')return;

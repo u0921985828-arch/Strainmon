@@ -27,7 +27,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
 
   await page.evaluate(() => arteListo());   // si el build lleva atlas, los recortes de mapa/ salen con los tiles ya aprobados
   const data = await page.evaluate(() => {
-    S = newState(); S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'cfl' }]; montarCasa();   // el piso con las dos carpas (suelo de mylar y mesas)
+    S = newState(); S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'cfl' }]; montarCasa();   // el piso con las dos carpas
     const png = c => c.toDataURL('image/png');
     const up = (c, k) => { const [o, x] = mkCanvas(c.width * k, c.height * k); x.drawImage(c, 0, 0, c.width * k, c.height * k); return o; };
     // qué claves de TILES se usan como suelo y cuáles como objeto
@@ -49,22 +49,11 @@ const OUT = path.join(ROOT, 'art', 'referencias');
       files[`personajes/${id}.png`] = png(sheet);
       files[`estilo/${id}_south_x2.png`] = png(up(spriteFor(L, 'down', 0), 2));
     }
-    // plantas: 6 fases × 4 variantes (sana, plaga, seca, seca+plaga) con la Ría Skunk
-    const stages = [['germinando', .05], ['plantula', .2], ['vegetativo', .5], ['floracion', .8], ['lista', 1], ['muerta', 1]];
-    const variants = [['sana', 60, false], ['plaga', 60, true], ['seca', 0, false], ['seca-plaga', 0, true]];
-    const [psheet, px] = mkCanvas(16 * stages.length, 26 * variants.length);
-    stages.forEach(([sn, prog], c) => variants.forEach(([vn, water, pest], r) => {
-      const p = { sid: 'ria', prog, water, health: 80, pest, dead: sn === 'muerta' };
-      const cv = plantSprite(p); px.drawImage(cv, c * 16, r * 26);
-      if (sn !== 'muerta') files[`plantas/${sn}_${vn}.png`] = png(cv); else if (vn === 'sana') files['plantas/muerta.png'] = png(cv);
-    }));
-    files['plantas/_hoja.png'] = png(psheet);
     files['combate/fondo-ladron.png'] = png(battleBg.thief);
     files['combate/fondo-policia.png'] = png(battleBg.police);
     files['misc/bolsa.png'] = png(bagSprite);
-    files['misc/maceta-vacia.png'] = png(potVacia());
     files['misc/hoja-titulo.png'] = png(titleArt);
-    { renderTitle(0); const [c, x] = mkCanvas(SW, SH); x.drawImage(ctx.canvas, 0, 0); files['misc/titulo.png'] = png(c); }   // pantalla de título entera (init_image de F7)
+    { renderTitle(0); const [c, x] = mkCanvas(240, SH); x.drawImage(ctx.canvas, -OX(), 0); files['misc/titulo.png'] = png(c); }   // los 240 px del centro (SW cambia con la ventana)   // pantalla de título entera (init_image de F7)
     // mapa: recortes del suelo para create_map_object con estilo del mapa (inpainting; máscara BLANCA = lo que genera PixelLab)
     const region = (mapN, x0, y0, w, h, quitar) => { const m = MAPS[mapN], [c, x] = mkCanvas(w * 16, h * 16);
       for (let ty = 0; ty < h; ty++) for (let tx = 0; tx < w; tx++) { const X = x0 + tx, Y = y0 + ty; if (X < 0 || Y < 0 || X >= m.w || Y >= m.h) continue;
@@ -76,13 +65,13 @@ const OUT = path.join(ROOT, 'art', 'referencias');
     const mascara = (w, h, [rx, ry, rw, rh]) => { const [c, x] = mkCanvas(w, h); x.fillStyle = '#000000'; x.fillRect(0, 0, w, h); x.fillStyle = '#ffffff'; x.fillRect(rx, ry, rw, rh); return c; };
     for (const b of MAPS.town.blds) { const c = region('town', b.x0 - 1, b.y0 - 1, b.w + 2, b.h + 2);
       files[`mapa/edificio-${b.id}.png`] = png(c); files[`mapa/edificio-${b.id}_mascara.png`] = png(mascara(c.width, c.height, [16, 16, b.w * 16, b.h * 16])); }
-    // carpas (huella entera de cada tamaño, transparente donde se ve el suelo del piso), macetas y focos
-    for (const t of Object.keys(CARPAS)) { const w = CARPAS[t].w, x1 = w - 1, [c, x] = mkCanvas(w * 16, 80);
-      for (let y = 0; y < 5; y++) for (let i = 0; i < w; i++) { const e = i === 0 ? 'L' : i === x1 ? 'R' : '';
-        const k = y === 0 ? 'cpT' + e : y === 1 ? 'cpM' + e : y === 4 ? (i === 1 ? 'cpPuerta' : 'cpB' + e) : i === 0 ? 'cpL' : i === x1 ? 'cpR' : 'tent';
-        x.drawImage(TILES[k][0], i * 16, y * 16); }
-      files[`misc/carpa-${t}.png`] = png(c); files[`misc/carpa-${t}-fuera.png`] = png(carpaFuera(w)); }
-    for (const k of Object.keys(MACETAS)) files[`misc/maceta-${k}.png`] = png(potVacia(k));
+    // carpas (1.8): el mueble del piso (16 px/m) y la vista de frente (64 px/m) de cada tamaño, el cuarto de la vista,
+    // las macetas y las plantas de la vista (cogollos en el verde de referencia) y los focos
+    for (const t of Object.keys(CARPAS)) { files[`misc/carpa-${t}-mapa.png`] = png(carpaMapa(t)); files[`misc/carpa-${t}-vista.png`] = png(carpaVista(t)); }
+    files['misc/cuarto-cultivo.png'] = png(fondoCuarto());
+    for (const k of Object.keys(MACETAS)) files[`misc/maceta-vista-${k}.png`] = png(macetaVista(k));
+    FASES.forEach((f, st) => { files[`misc/planta-vista-${f}.png`] = png(plantaVistaProc(st, false, '#9bd35a')); });
+    files['misc/planta-vista-muerta.png'] = png(plantaVistaProc(9, false, '#9bd35a'));
     for (const t of ['cfl', 'sodio', 'led']) { const [c, x] = mkCanvas(32, 32); x.drawImage(focoProc(t), 0, 8); files[`misc/foco-${t}.png`] = png(c); }
     for (const [k, X, Y] of [['tree', 28, 15], ['lamp', 14, 14], ['fountain', 20, 19]]) {
       const c = region('town', X - 1, Y - 2, 3, 4, (x, y) => x === X && y === Y);
@@ -90,15 +79,16 @@ const OUT = path.join(ROOT, 'art', 'referencias');
     }
     const inventario = {
       generado: new Date().toISOString().slice(0, 10),
-      tiles_suelo: [...ground].filter(k => !/^cp/.test(k)).sort(),   // las paredes de la carpa (cp*) salen de su imagen entera (misc:carpa-*)
-      objetos: [...objects].sort(),
+      tiles_suelo: [...ground].sort(),
+      objetos: [...objects].filter(k => k !== 'carpa').sort(),   // la carpa del piso es misc:carpa-<t>-mapa
       tiles_animados: Object.entries(TILES).filter(([, f]) => f.length > 1).map(([k, f]) => ({ clave: k, fotogramas: f.length })),
       personajes: Object.keys(looks),
       personajes_fijos: Object.keys(LOOKS),
       npcs: NPCDEF.map(d => ({ id: d.id, look: d.look, mapa: d.map, deambula: !!d.wander })),
-      plantas: { fases: stages.map(s => s[0]), variantes: variants.map(v => v[0]), colores_cogollo: Object.fromEntries(Object.entries(STRAINS).map(([k, s]) => [k, s.c])) },
+      plantas: { vista: 'misc:planta-vista (cepa × fase, de ../assets/plants)', colores_cogollo: Object.fromEntries(Object.entries(STRAINS).map(([k, s]) => [k, s.c])) },
       combate: ['fondo-ladron', 'fondo-policia', 'frente:ladron', 'frente:policia', 'espalda:player'],
-      misc: ['bolsa', 'maceta-vacia', 'hoja-titulo', 'burbuja-$', 'burbuja-!', ...Object.keys(CARPAS).flatMap(t => ['carpa-' + t, 'carpa-' + t + '-fuera']), ...Object.keys(MACETAS).map(k => 'maceta-' + k), 'foco-cfl', 'foco-sodio', 'foco-led'],
+      misc: ['bolsa', 'hoja-titulo', 'burbuja-$', 'burbuja-!', ...Object.keys(CARPAS).flatMap(t => ['carpa-' + t + '-mapa', 'carpa-' + t + '-vista']), 'cuarto-cultivo',
+        ...Object.keys(MACETAS).map(k => 'maceta-vista-' + k), 'planta-vista', 'foco-cfl', 'foco-sodio', 'foco-led'],
       tamanos: { tile: [16, 16], personaje: [16, 20], planta: [16, 26], combate_escala: 3, pantalla: [240, 160] },
     };
     return { files, inventario, origenMapa: ARTE.ok ? 'tiles del atlas' : 'tiles procedurales' };

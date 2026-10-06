@@ -39,11 +39,11 @@ informe técnico directo + código refactorizado, sin relleno.
 
 ## Subproyecto `ribera-verde/`
 
-- RPG de cultivo independiente (v1.7.0): 160 px de alto y de 240 a 400 de ancho, solo en horizontal, con mandos flotantes. Notas propias en `ribera-verde/CLAUDE.md`.
+- RPG de cultivo independiente (v1.8.0): 160 px de alto y de 240 a 400 de ancho, solo en horizontal, con mandos flotantes; piso a 1 casilla = 1 m y vista de carpa a 64 px/m. Notas propias en `ribera-verde/CLAUDE.md`.
 - Tests: `cd ribera-verde && npm install` y, con el Chromium preinstalado
   (`export CHROMIUM_PATH=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome | head -1)`):
-  `npm test` → 38/38, 0 errores JS · `npm run test:arte` → 22/22.
-- Plano de escala: `npm run plano` → `docs/plano/` + `docs/PLANO.md` (decisión de escala A/B/C pendiente).
+  `npm test` → 39/39, 0 errores JS · `npm run test:arte` → 22/22.
+- Plano de escala: `npm run plano` → `docs/plano/` + `docs/PLANO.md` (escala decidida: opción A, aplicada en la 1.8.0).
 - Android: `npm run apk` → `dist/ribera-verde.apk` (WebView + index.html, `sensorLandscape`; sin Android SDK, ver `ribera-verde/CLAUDE.md`).
 - Sprites: MCP `pixellab` en `.mcp.json` (raíz; habilitado en `.claude/settings.json`), token en la variable `PIXELLAB_TOKEN`,
   nunca en el repo. En sesiones cloud exige `api.pixellab.ai` en los dominios permitidos.

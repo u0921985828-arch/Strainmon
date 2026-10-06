@@ -40,7 +40,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
     };
     const _tt = typeText;
     window.typeText = function (t, n) { LOG.push((n ? n + ': ' : '') + nm(t)); return _tt(t, n); };
-    setInterval(() => { if (!HOLD && handlers.length) press('A'); }, 12);
+    setInterval(() => { if (!HOLD && handlers.length && !(mode === 'carpa' && VC && !VC.ocupado)) press('A'); }, 12);   // en la vista de carpa, las teclas las pulsa el paso
     window.idle = () => new Promise(r => { const t = setInterval(() => { if (isFree() && !pending.length) { clearInterval(t); r(); } }, 25); });
     window.want = w => { WANT = w.map(s => s === '<B>' ? s : new RegExp(s)); };
   });
@@ -64,7 +64,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   // ---------- capítulo 1 ----------
   await step('Nueva partida e intro', [], async () => { await run(newGame); },
     () => S.ch === 1 && S.map === 'home' && S.name === 'EDDIE' || { ch: S.ch, map: S.map, name: S.name });
-  await step('Leer la carta de la tía', [], async () => { await run(() => objectAction(3, 6)); },
+  await step('Leer la carta de la tía', [], async () => { await run(() => objectAction(3, 5)); },
     () => S.flags.letter === true);
   await step('Kiko regala semillas y abono', [], async () => { await run(talkKiko); },
     () => S.seeds.ria === 3 && S.items.fert === 2 && S.flags.kiko1 || { seeds: S.seeds, items: S.items });
@@ -113,6 +113,15 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   await step('Factura de la luz: solo paga la carpa con plantas', [], async () => {
     S.money = 100; S.pots[2] = { sid: 'ria', prog: .2, water: 100, health: 100, fert: false, pest: false }; advanceTime(24 * 60); await idle(); S.pots[2] = null;
   }, () => S.luz.e === 8 && S.money === 92 || { luz: S.luz, money: S.money });
+  await step('Vista de carpa: A delante del armario, ▶ plaza 2, A → Regar, B sale', ['Regar'], async () => {
+    const hasta = f => new Promise(r => { const i = setInterval(() => { if (f()) { clearInterval(i); r(); } }, 20); });
+    S.pots[1] = { sid: 'ria', prog: .5, water: 20, health: 100, fert: false, pest: false };
+    const t = MAPS.home.carpas.find(t => t.ci === 0); enterMap('home', t.x0, t.y + 1, 'up');
+    press('A'); await hasta(() => mode === 'carpa' && handlers.length === 1);
+    window.R = { sel0: VC.sel, x0: vcGeo(0).pl.map(q => q.x) }; press('right'); R.sel = VC.sel; R.info = document.getElementById('vcInfo').textContent;
+    press('A'); await hasta(() => VC && !VC.ocupado && handlers.length === 1); R.agua = S.pots[1].water;
+    press('B'); await hasta(() => mode === 'world' && isFree());
+  }, () => R.sel0 === 0 && R.sel === 1 && /Plaza 2/.test(R.info) && R.agua === 100 && !VC && document.getElementById('vcInfo').hidden || R);
   await step('Cruce de receta: Afghani × Skunk #1 → Critical Mass', ['^Afghani', '^Skunk #1', 'Cruzar'], async () => {
     addSeeds('ria', 2); addSeeds('txoko', 2); await run(labAction);
   }, () => S.seeds.kushrif === 2 && S.disc.kushrif || { seeds: S.seeds });

@@ -206,6 +206,46 @@
    ],
    "ajuste": "exacto",
    "nota": "foco colgado: el motor lo pinta con la esquina de arriba en (cx−16, y) y tira el cable hasta su primera fila"
+  },
+  "carpa_mapa": {
+   "w": 32,
+   "h": 48,
+   "ancla": [
+    16,
+    47
+   ],
+   "ajuste": "pies",
+   "nota": "carpa del piso (1.8) a 16 px/m: frente de tela y techo; pies en el centro de su base"
+  },
+  "carpa_vista": {
+   "w": 104,
+   "h": 136,
+   "ancla": [
+    52,
+    135
+   ],
+   "ajuste": "pies",
+   "nota": "carpa abierta de frente en la vista de carpa (64 px/m); la última fila es el riel del suelo"
+  },
+  "maceta_vista": {
+   "w": 32,
+   "h": 24,
+   "ancla": [
+    16,
+    23
+   ],
+   "ajuste": "pies",
+   "nota": "maceta de la vista de carpa (64 px/m)"
+  },
+  "planta_vista": {
+   "w": 48,
+   "h": 64,
+   "ancla": [
+    24,
+    63
+   ],
+   "ajuste": "pies",
+   "nota": "planta sin maceta de la vista de carpa (64 px/m); la base del tallo en la última fila"
   }
  },
  "fases": [
@@ -3683,8 +3723,7 @@
    "fase": "F4",
    "herramienta": "create_tiles_pro",
    "cubre": [
-    "tile:mat",
-    "tile:tent"
+    "tile:mat"
    ],
    "parametros": {
     "tile_type": "square_topdown",
@@ -3694,13 +3733,11 @@
     "seed": 402
    },
    "referencias": [
-    "art/referencias/tiles/mat.png",
-    "art/referencias/tiles/tent.png"
+    "art/referencias/tiles/mat.png"
    ],
    "entrada": {
     "style_images": [
-     "art/referencias/tiles/mat.png",
-     "art/referencias/tiles/tent.png"
+     "art/referencias/tiles/mat.png"
     ]
    },
    "descripcion": "1). red door mat lying on a light wooden plank floor 2). reflective silver mylar grow tent floor sheet",
@@ -3714,7 +3751,8 @@
    "pixellab": {
     "tiles_pro_id": "4133a7c9-404f-4222-82f6-e5cfcba146a3"
    },
-   "coste_real": 20
+   "coste_real": 20,
+   "notas": "Se pidió junto a la tile «tent» (suelo de mylar de la carpa; style_images: mat.png + tent.png). Desde la 1.8.0 la carpa es un mueble y esa tile ya no se usa: fuera del atlas."
   },
   {
    "id": "carpa-g150",
@@ -3736,7 +3774,7 @@
    },
    "descripcion": "inside of an open indoor grow tent seen from above, cutaway view for a 16-bit handheld RPG room: silver reflective mylar back wall with a black frame pole along its top, black metal frame poles at the corners, light silver mylar floor sheet, the front wall and right wall are cut down to a low black rail on the floor, wooden plank floor of the room around it, empty tent, no plants, no lamp, crisp detailed pixel art, clean dark outline, light from the top-left",
    "celda": "carpa_g150",
-   "estado": "aprobado",
+   "estado": "retirado",
    "familia": "mapa-objeto",
    "entrada": {
     "init_image_base64": "art/crudo/_ref/huella-carpa-interior.png"
@@ -3756,7 +3794,8 @@
     "interior-home",
     "tiles-interior-extra"
    ],
-   "notas": "Con el jugador dentro (o en la puerta): sin techo y sin las paredes de delante y de la derecha; el motor la pinta casilla a casilla debajo de las mesas."
+   "notas": "Con el jugador dentro (o en la puerta): sin techo y sin las paredes de delante y de la derecha; el motor la pinta casilla a casilla debajo de las mesas.",
+   "retirado": "1.8.0: escala única (1 casilla = 1 m). Las carpas son muebles del piso (carpas-mapa) y por dentro se ven en la vista de carpa (carpas-vista, macetas-vista, plantas-vista); su arte ya no entra en el atlas (crudo en art/crudo/_retirado)."
   },
   {
    "id": "carpa-g150-fuera",
@@ -3778,7 +3817,7 @@
    },
    "descripcion": "closed black indoor grow tent seen from above for a 16-bit handheld RPG room: dark grey fabric roof with silver frame poles along its edges and a round ventilation duct port, tall black fabric front wall with a silver zipper door shaped like an arch on the left and a small mesh vent on the right, silver corner poles, wooden plank floor of the room around it, crisp detailed pixel art, clean dark outline, light from the top-left",
    "celda": "carpa_g150",
-   "estado": "aprobado",
+   "estado": "retirado",
    "familia": "mapa-objeto",
    "entrada": {
     "init_image_base64": "art/crudo/_ref/huella-carpa-exterior.png"
@@ -3798,7 +3837,8 @@
     "interior-home",
     "tiles-interior-extra"
    ],
-   "notas": "Con el jugador fuera: la carpa cerrada tapa mesas, macetas y focos. Si hay plantas vivas, el motor pinta la luz que se escapa bajo la puerta."
+   "notas": "Con el jugador fuera: la carpa cerrada tapa mesas, macetas y focos. Si hay plantas vivas, el motor pinta la luz que se escapa bajo la puerta.",
+   "retirado": "1.8.0: escala única (1 casilla = 1 m). Las carpas son muebles del piso (carpas-mapa) y por dentro se ven en la vista de carpa (carpas-vista, macetas-vista, plantas-vista); su arte ya no entra en el atlas (crudo en art/crudo/_retirado)."
   },
   {
    "id": "carpa-m100",
@@ -3820,7 +3860,7 @@
    },
    "descripcion": "inside of an open indoor grow tent seen from above, cutaway view for a 16-bit handheld RPG room: silver reflective mylar back wall with a black frame pole along its top, black metal frame poles at the corners, light silver mylar floor sheet, the front wall and right wall are cut down to a low black rail on the floor, wooden plank floor of the room around it, empty tent, no plants, no lamp, crisp detailed pixel art, clean dark outline, light from the top-left",
    "celda": "carpa_m100",
-   "estado": "aprobado",
+   "estado": "retirado",
    "familia": "mapa-objeto",
    "entrada": {
     "init_image_base64": "art/crudo/_ref/huella-carpa-interior.png"
@@ -3834,7 +3874,8 @@
    "depende_de": [
     "carpa-g150"
    ],
-   "notas": "Con el jugador dentro (o en la puerta): sin techo y sin las paredes de delante y de la derecha; el motor la pinta casilla a casilla debajo de las mesas."
+   "notas": "Con el jugador dentro (o en la puerta): sin techo y sin las paredes de delante y de la derecha; el motor la pinta casilla a casilla debajo de las mesas.",
+   "retirado": "1.8.0: escala única (1 casilla = 1 m). Las carpas son muebles del piso (carpas-mapa) y por dentro se ven en la vista de carpa (carpas-vista, macetas-vista, plantas-vista); su arte ya no entra en el atlas (crudo en art/crudo/_retirado)."
   },
   {
    "id": "carpa-m100-fuera",
@@ -3856,7 +3897,7 @@
    },
    "descripcion": "closed black indoor grow tent seen from above for a 16-bit handheld RPG room: dark grey fabric roof with silver frame poles along its edges and a round ventilation duct port, tall black fabric front wall with a silver zipper door shaped like an arch on the left and a small mesh vent on the right, silver corner poles, wooden plank floor of the room around it, crisp detailed pixel art, clean dark outline, light from the top-left",
    "celda": "carpa_m100",
-   "estado": "aprobado",
+   "estado": "retirado",
    "familia": "mapa-objeto",
    "entrada": {
     "init_image_base64": "art/crudo/_ref/huella-carpa-exterior.png"
@@ -3870,7 +3911,8 @@
    "depende_de": [
     "carpa-g150-fuera"
    ],
-   "notas": "Con el jugador fuera: la carpa cerrada tapa mesas, macetas y focos. Si hay plantas vivas, el motor pinta la luz que se escapa bajo la puerta."
+   "notas": "Con el jugador fuera: la carpa cerrada tapa mesas, macetas y focos. Si hay plantas vivas, el motor pinta la luz que se escapa bajo la puerta.",
+   "retirado": "1.8.0: escala única (1 casilla = 1 m). Las carpas son muebles del piso (carpas-mapa) y por dentro se ven en la vista de carpa (carpas-vista, macetas-vista, plantas-vista); su arte ya no entra en el atlas (crudo en art/crudo/_retirado)."
   },
   {
    "id": "carpa-p60",
@@ -3892,7 +3934,7 @@
    },
    "descripcion": "inside of an open indoor grow tent seen from above, cutaway view for a 16-bit handheld RPG room: silver reflective mylar back wall with a black frame pole along its top, black metal frame poles at the corners, light silver mylar floor sheet, the front wall and right wall are cut down to a low black rail on the floor, wooden plank floor of the room around it, empty tent, no plants, no lamp, crisp detailed pixel art, clean dark outline, light from the top-left",
    "celda": "carpa_p60",
-   "estado": "aprobado",
+   "estado": "retirado",
    "familia": "mapa-objeto",
    "entrada": {
     "init_image_base64": "art/crudo/_ref/huella-carpa-interior.png"
@@ -3906,7 +3948,8 @@
    "depende_de": [
     "carpa-g150"
    ],
-   "notas": "Con el jugador dentro (o en la puerta): sin techo y sin las paredes de delante y de la derecha; el motor la pinta casilla a casilla debajo de las mesas."
+   "notas": "Con el jugador dentro (o en la puerta): sin techo y sin las paredes de delante y de la derecha; el motor la pinta casilla a casilla debajo de las mesas.",
+   "retirado": "1.8.0: escala única (1 casilla = 1 m). Las carpas son muebles del piso (carpas-mapa) y por dentro se ven en la vista de carpa (carpas-vista, macetas-vista, plantas-vista); su arte ya no entra en el atlas (crudo en art/crudo/_retirado)."
   },
   {
    "id": "carpa-p60-fuera",
@@ -3928,7 +3971,7 @@
    },
    "descripcion": "closed black indoor grow tent seen from above for a 16-bit handheld RPG room: dark grey fabric roof with silver frame poles along its edges and a round ventilation duct port, tall black fabric front wall with a silver zipper door shaped like an arch on the left and a small mesh vent on the right, silver corner poles, wooden plank floor of the room around it, crisp detailed pixel art, clean dark outline, light from the top-left",
    "celda": "carpa_p60",
-   "estado": "aprobado",
+   "estado": "retirado",
    "familia": "mapa-objeto",
    "entrada": {
     "init_image_base64": "art/crudo/_ref/huella-carpa-exterior.png"
@@ -3942,7 +3985,8 @@
    "depende_de": [
     "carpa-g150-fuera"
    ],
-   "notas": "Con el jugador fuera: la carpa cerrada tapa mesas, macetas y focos. Si hay plantas vivas, el motor pinta la luz que se escapa bajo la puerta."
+   "notas": "Con el jugador fuera: la carpa cerrada tapa mesas, macetas y focos. Si hay plantas vivas, el motor pinta la luz que se escapa bajo la puerta.",
+   "retirado": "1.8.0: escala única (1 casilla = 1 m). Las carpas son muebles del piso (carpas-mapa) y por dentro se ven en la vista de carpa (carpas-vista, macetas-vista, plantas-vista); su arte ya no entra en el atlas (crudo en art/crudo/_retirado)."
   },
   {
    "id": "macetas",
@@ -4015,7 +4059,7 @@
    },
    "descripcion": "16-bit handheld pixel-art RPG plant pots filled with dark soil for an indoor grow game, same style and scale as the reference pot, clean dark outline, transparent background",
    "celda": "planta",
-   "estado": "aprobado",
+   "estado": "retirado",
    "familia": "objeto-lote",
    "pixellab": {
     "object_id": "568d3740-1373-4231-b229-8528302537ca",
@@ -4041,7 +4085,8 @@
     "id": "41a55937-8922-4ca5-bbe9-5e5ffb487801",
     "motivo": "con estilo de 32 px las macetas salen de 16-32 px de ancho: no caben en una plaza de 16"
    },
-   "notas": "Estilo: la maceta de tela de planta-fases recortada a 16×16 (estilo-maceta-16.png), así salen a escala (10-14 px). En la celda de planta por los pies. El motor quita la maceta de tela de cada fotograma de la planta (los colores de maceta-vacia que no tocan hojas), pinta esta y sube o baja la planta con el borde de la maceta."
+   "notas": "Estilo: la maceta de tela de planta-fases recortada a 16×16 (estilo-maceta-16.png), así salen a escala (10-14 px). En la celda de planta por los pies. El motor quita la maceta de tela de cada fotograma de la planta (los colores de maceta-vacia que no tocan hojas), pinta esta y sube o baja la planta con el borde de la maceta.",
+   "retirado": "1.8.0: escala única (1 casilla = 1 m). Las carpas son muebles del piso (carpas-mapa) y por dentro se ven en la vista de carpa (carpas-vista, macetas-vista, plantas-vista); su arte ya no entra en el atlas (crudo en art/crudo/_retirado)."
   },
   {
    "id": "focos",
@@ -4108,7 +4153,7 @@
    },
    "entrada": {
     "style_images": [
-     "art/procesado/planta-fases/maceta-vacia/unica/00.png"
+     "art/crudo/_ref/maceta-vacia-32.png"
     ]
    },
    "descripcion": "16-bit handheld pixel-art RPG props for an indoor grow game: plant pots filled with soil and hanging grow lamps, same style and scale as the reference pot, clean dark outline, transparent background",
@@ -4177,7 +4222,7 @@
    },
    "descripcion": "small 16-bit indoor props for a handheld pixel-art RPG, same style as the reference table, clean dark outline, transparent background",
    "celda": "objeto_1x1",
-   "estado": "aprobado",
+   "estado": "retirado",
    "familia": "objeto-lote",
    "pixellab": {
     "object_id": "1c7ff1cb-6f4b-4d98-8d3d-df7fba0f26dc",
@@ -4189,7 +4234,8 @@
      "candidato": 3
     }
    },
-   "notas": "Una mesa por plaza en la fila de las mesas de cada carpa; la maceta se apoya en el tablero (MESA_ALTO = 6 px). Desde la 1.7.0 el juego no la usa: pinta una bandeja continua por carpa (procedural, TILES.mesa) porque los taburetes sueltos quedaban en otra escala que la carpa."
+   "notas": "Una mesa por plaza en la fila de las mesas de cada carpa; la maceta se apoya en el tablero (MESA_ALTO = 6 px). Desde la 1.7.0 el juego no la usa: pinta una bandeja continua por carpa (procedural, TILES.mesa) porque los taburetes sueltos quedaban en otra escala que la carpa.",
+   "retirado": "1.8.0: escala única (1 casilla = 1 m). Las carpas son muebles del piso (carpas-mapa) y por dentro se ven en la vista de carpa (carpas-vista, macetas-vista, plantas-vista); su arte ya no entra en el atlas (crudo en art/crudo/_retirado)."
   },
   {
    "id": "edificio-home",
@@ -4921,7 +4967,7 @@
      "animation_group_id": "c5b3b7d2-fc9d-4567-ac04-f9ec6c1f5f42"
     }
    ],
-   "estado": "aprobado",
+   "estado": "retirado",
    "familia": "objeto-lote",
    "lote": "lote-32",
    "elegidos": {
@@ -4951,7 +4997,163 @@
     },
     "maceta-vacia": "derivada de germinando: lo que asoma por encima del borde de la maceta, fuera; el verde de dentro, a tierra"
    },
-   "coste_real": 11.6
+   "coste_real": 11.6,
+   "retirado": "1.8.0: escala única (1 casilla = 1 m). Las carpas son muebles del piso (carpas-mapa) y por dentro se ven en la vista de carpa (carpas-vista, macetas-vista, plantas-vista); su arte ya no entra en el atlas (crudo en art/crudo/_retirado)."
+  },
+  {
+   "tipo": "objeto",
+   "fase": "F9",
+   "herramienta": "create_image_pixflux",
+   "estado": "aprobado",
+   "familia": "imagen",
+   "coste_real": 1,
+   "id": "carpas-mapa",
+   "cubre": [
+    "misc:carpa-p60-mapa",
+    "misc:carpa-m100-mapa",
+    "misc:carpa-g150-mapa"
+   ],
+   "parametros": {
+    "init_image_strength": 130,
+    "view": "low top-down",
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": true,
+    "width": 96,
+    "height": 64
+   },
+   "descripcion": "three closed black fabric indoor grow tents of different sizes standing on the floor, seen from the front and slightly above for a 16-bit handheld RPG room: small narrow tall one, medium one, wide one; dark grey fabric roof edge with silver frame poles, black fabric front with a silver zipper door, crisp pixel art, clean dark outline, light from the top-left, transparent background",
+   "entrada": {
+    "init_image_base64": "art/crudo/_ref/huella-carpas-mapa.png"
+   },
+   "entrada_origen": "carpaMapa() de 09b-carpa.js para p60, m100 y g150 a 16 px/m (10×31, 16×40, 24×40), en fila sobre transparente",
+   "celda": "carpa_mapa",
+   "pixellab": {
+    "image_job": "2620fb5b-7cd8-4dac-aec0-cb2e0cb85d14"
+   },
+   "montaje": "Lámina cortada por columnas vacías (scratchpad f11/cortar.py) en carpa-<t>-mapa.",
+   "notas": "Mueble del piso: ocupa 1 casilla (p60, m100) o 2 (g150) en la pared del fondo; el motor la pinta desde el centro de su base y, si hay plantas vivas, la luz que se escapa bajo la puerta."
+  },
+  {
+   "tipo": "objeto",
+   "fase": "F9",
+   "herramienta": "create_image_pixflux",
+   "estado": "aprobado",
+   "familia": "imagen",
+   "coste_real": 1,
+   "id": "carpas-vista",
+   "cubre": [
+    "misc:carpa-p60-vista",
+    "misc:carpa-m100-vista",
+    "misc:carpa-g150-vista"
+   ],
+   "parametros": {
+    "init_image_strength": 130,
+    "view": "side",
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": true,
+    "width": 256,
+    "height": 152
+   },
+   "descripcion": "three open indoor grow tents seen straight from the front for a 16-bit handheld game scene: black fabric door rolled up at the top, inside lined with silver reflective mylar walls in perspective, silver mylar floor, black metal frame poles and a hanging bar at the top, empty tents, no plants, no lamps; small narrow one, medium one, wide one; crisp detailed pixel art, clean dark outline, light from the top-left, transparent background",
+   "entrada": {
+    "init_image_base64": "art/crudo/_ref/huella-carpas-vista.png"
+   },
+   "entrada_origen": "carpaVista() de 09b-carpa.js a 64 px/m (42×104, 68×130, 100×130), PNG de 4 bits (16 colores) para que el base64 no se corte",
+   "celda": "carpa_vista",
+   "pixellab": {
+    "image_job": "1d59d0ce-9c48-485b-90d4-26231f375dd0"
+   },
+   "montaje": "Lámina cortada por columnas vacías (scratchpad f11/cortar.py) en carpa-<t>-vista.",
+   "notas": "Vista de carpa: se pinta con la base en (120, 149) sobre cuarto-cultivo; dentro, macetas, plantas y focos a la misma escala."
+  },
+  {
+   "tipo": "objeto",
+   "fase": "F9",
+   "herramienta": "create_image_pixflux",
+   "estado": "aprobado",
+   "familia": "imagen",
+   "coste_real": 1,
+   "id": "macetas-vista",
+   "cubre": [
+    "misc:maceta-vista-plastico7",
+    "misc:maceta-vista-tela11",
+    "misc:maceta-vista-plastico18",
+    "misc:maceta-vista-tela25"
+   ],
+   "parametros": {
+    "init_image_strength": 130,
+    "view": "side",
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": true,
+    "width": 128,
+    "height": 32
+   },
+   "descripcion": "four plant pots filled with dark soil seen from the front, for an indoor grow game: small black plastic pot, grey fabric grow bag, large black plastic pot with thick rim, big tan khaki fabric grow bag with small handles; 16-bit handheld pixel art, clean dark outline, light from the top-left, transparent background",
+   "entrada": {
+    "init_image_base64": "art/crudo/_ref/huella-macetas-vista.png"
+   },
+   "entrada_origen": "macetaVista() de 09b-carpa.js a 64 px/m (7 L 14×12, 11 L 16×14, 18 L 19×16, 25 L 22×17)",
+   "celda": "maceta_vista",
+   "pixellab": {
+    "image_job": "fe509231-c912-4a5a-8cde-0f934b6e77d3"
+   },
+   "montaje": "Lámina cortada por columnas vacías (scratchpad f11/cortar.py).",
+   "notas": "La planta arranca 2 filas por debajo de la primera fila de la maceta (la tierra)."
+  },
+  {
+   "tipo": "fondo",
+   "fase": "F9",
+   "herramienta": "create_image_pixflux",
+   "estado": "aprobado",
+   "familia": "imagen",
+   "coste_real": 1,
+   "id": "cuarto-cultivo",
+   "cubre": [
+    "misc:cuarto-cultivo"
+   ],
+   "parametros": {
+    "init_image_strength": 130,
+    "view": "side",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": false,
+    "width": 240,
+    "height": 160
+   },
+   "descripcion": "plain empty corner of a small city flat seen straight from the front for a 16-bit handheld game scene background: cream painted wall with subtle vertical stripes, white skirting board, warm light wooden plank floor, a white wall power socket with a grey cable running down; no furniture, no people, soft daylight, crisp detailed pixel art",
+   "entrada": {
+    "init_image_base64": "art/crudo/_ref/huella-cuarto-cultivo.png"
+   },
+   "entrada_origen": "fondoCuarto() de 09b-carpa.js (240×160 = 3,75 × 2,5 m a 64 px/m), PNG de 4 bits",
+   "celda": "pantalla",
+   "pixellab": {
+    "image_job": "7c49c363-2e37-4865-be80-cad50c2af94b"
+   },
+   "notas": "Fondo de la vista de carpa; en pantallas anchas se estira por fondoAncho como los fondos de combate."
+  },
+  {
+   "id": "plantas-vista",
+   "tipo": "objeto",
+   "fase": "F9",
+   "herramienta": "importado",
+   "cubre": [
+    "misc:planta-vista"
+   ],
+   "origen": "../assets/plants/SM-000_1.png … SM-017_5.png (Strainmon, commit 676b8cc: 18 láminas por cepa generadas con Gemini y recortadas a 5 fases)",
+   "descripcion": "plantas de cannabis por cepa en 5 fases (plántula, vegetativo temprano, vegetativo tardío, floración, cosecha), sin tiesto, a la escala de la vista de carpa",
+   "celda": "planta_vista",
+   "paleta": "propia",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "montaje": "tools/sprites/plantas-vista.js: quita el tiesto de barro (bloque de filas rojas de abajo), reduce ×0,45 por media de área con alfa premultiplicado y alfa binario (umbral 0,43) → art/crudo/plantas-vista/smNN-F; procesar.js con paleta propia y tope de 15 colores.",
+   "notas": "Sprites smNN-F (NN = SM-0NN, F = fase 1-5). El motor (01b-arte, PLANTA_SM) da a cada variedad del juego la cepa más parecida en porte y color de cogollo; los híbridos propios, una por hash. Germinando y plántula usan la fase 1 y 2; vegetativo la 3; floración la 4; lista la 5. Seca y muerta: el motor amarillea o pardea los verdes por tono. Plaga: vfx-acaros encima."
   },
   {
    "id": "iconos",
@@ -5275,10 +5477,6 @@
        "animation_group_id": "b19516a8-cebc-4b2a-8dc0-1bd73b3bbda7"
       }
      ],
-     "cubre": [
-      "planta-variante:plaga",
-      "planta-variante:seca-plaga"
-     ],
      "candidato": 33,
      "object_id": "1988dd11-c4ae-4960-9fcb-842567a10c95"
     },
@@ -5499,6 +5697,13 @@
    "nombre": "Se queda procedural",
    "herramientas": [],
    "por_que": "Burbujas $ y ! de 7×8: más nítidas a mano que generadas."
+  },
+  "importado": {
+   "nombre": "Importado",
+   "herramientas": [
+    "importado"
+   ],
+   "por_que": "Arte propio del repositorio que ya existe (Strainmon): se adapta en local (recorte y escala) sin gastar generaciones."
   }
  },
  "descartadas": [

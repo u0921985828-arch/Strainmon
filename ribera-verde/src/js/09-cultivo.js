@@ -2,16 +2,17 @@
    TIEMPO Y CULTIVO
    ========================================================= */
 /* ---------- equipo: carpas, focos y macetas ----------
-   Carpa: w casillas de ancho (paredes incluidas), 5 de fondo; plazas = w − 2 mesas con una maceta cada una.
+   Carpa: en el piso es un mueble (w casillas de ancho, 1 de fondo; 1 casilla = 1 m) y por dentro se ve en su vista de frente
+   (09b-carpa): cm = ancho y alto reales; las plazas van en filas de cols macetas (fila 0 delante).
    wmax: el foco más potente que admite (calor) · lmax: la maceta más grande que cabe.
    Foco: cubre N plazas a pleno rendimiento; si la carpa tiene más, la luz se reparte (cob < 1) y rinde menos.
    Maceta: la de tela airea las raíces (más cosecha y menos plagas, bebe más); la grande da más pero crece algo más lenta.
    Lo de serie (CFL + plástico 7 L en el armario) da justo lo de antes de la 1.6: factores 1. */
 const CARPAS={
-  p60:{n:'Armario 60×60',w:4,plazas:2,wmax:250,lmax:11},
-  m100:{n:'Carpa 100×100',w:6,plazas:4,wmax:480,lmax:25},
-  g150:{n:'Carpa 150×100',w:8,plazas:6,wmax:720,lmax:25}};
-const SITIOS=[{x:7,y:2,w:4},{x:12,y:2,w:8}];   // A: el armario de la tía · B: la carpa que compras (100 y, después, 150)
+  p60:{n:'Armario 60×60',w:1,cm:[60,160],cols:2,filas:1,plazas:2,wmax:250,lmax:11},
+  m100:{n:'Carpa 100×100',w:1,cm:[100,200],cols:2,filas:2,plazas:4,wmax:480,lmax:25},
+  g150:{n:'Carpa 150×100',w:2,cm:[150,200],cols:3,filas:2,plazas:6,wmax:720,lmax:25}};
+const SITIOS=[{x:8,y:2,w:1},{x:10,y:2,w:2}];   // A: el armario de la tía · B: la carpa que compras (100 y, después, 150), al fondo del piso
 const FOCOS={
   cfl:{n:'CFL 125 W',tipo:'cfl',w:125,cubre:2,rend:1,crec:1,thc:0,agua:1},
   sodio250:{n:'Sodio 250 W',tipo:'sodio',w:250,cubre:2,rend:1.25,crec:1.05,thc:.3,agua:1.3},
@@ -33,7 +34,7 @@ const descMaceta=k=>{const M=MACETAS[k];return `${M.l} L${pc('cosecha',M.rend)}$
 let _hk='',_hu=[];
 function huecos(){
   const k=S.carpas.map(c=>c?c.t:'-').join();if(k===_hk)return _hu;_hk=k;_hu=[];
-  S.carpas.forEach((c,ci)=>{if(!c)return;const s=SITIOS[ci];for(let j=0;j<CARPAS[c.t].plazas;j++)_hu.push({c:ci,j,x:s.x+1+j,y:s.y+2});});
+  S.carpas.forEach((c,ci)=>{if(!c)return;for(let j=0;j<CARPAS[c.t].plazas;j++)_hu.push({c:ci,j});});
   return _hu;
 }
 function factores(i){
@@ -88,7 +89,7 @@ async function potAction(i){
   const opts=['Regar'];if(!p.fert)opts.push('Abonar');if(p.pest)opts.push('Tratar plaga');opts.push('Arrancar','Salir');
   const c=await ask(`${s.n} · ${stageName(p)} ${Math.floor(p.prog*100)}%\nAgua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%${p.pest?' · PLAGA':''}`,opts);
   const op=opts[c];
-  if(op==='Regar'){const h=huecos()[i];await accion('regar',{id:'vfx-gotas',x:h.x*16+8,y:h.y*16+8-MESA_ALTO});p.water=100;sfx('sel');await say('Riegas la planta. Agua al 100%.');}
+  if(op==='Regar'){const [vx,vy]=posPlaza(i);await accion('regar',{id:'vfx-gotas',x:vx,y:vy-6});p.water=100;sfx('sel');await say('Riegas la planta. Agua al 100%.');}
   else if(op==='Abonar'){if(S.items.fert>0){S.items.fert--;p.fert=true;sfx('sel');await say('Echas FERTILIZANTE. Dará más cosecha.');}else await say('No te queda FERTILIZANTE.');}
   else if(op==='Tratar plaga'){if(S.items.insect>0){S.items.insect--;p.pest=false;sfx('sel');await say('Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.');}else await say('No tienes INSECTICIDA. Kiko lo vende.');}
   else if(op==='Arrancar'){if(await ask('¿Seguro que quieres arrancarla?',['Sí','No'])===0){S.pots[i]=null;await say('Arrancas la planta.');}}
@@ -118,7 +119,7 @@ async function harvest(i){
   const p=S.pots[i],s=getStrain(p.sid),f=factores(i);
   const g=Math.max(1,Math.round(s.y*(.4+.6*p.health/100)*(p.fert?1.25:1)*f.rend));
   const thc=Math.round((s.thc*(.85+.15*p.health/100)+f.thc+(p.fert?.3:0))*10)/10;
-  await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:P.px+8,y:P.py+2});
+  const [vx,vy]=posPlaza(i);await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:vx,y:vy-12});
   const n=1+ri(0,2);addBuds(p.sid,g,thc);addSeeds(p.sid,n);S.pots[i]=null;sfx('get');
   await say(`Cosechas ${g} g de ${s.n}. THC: ${pct(thc)}%.`);
   await say(`También recoges ${n} semilla${n>1?'s':''} de ${s.n}.`);
