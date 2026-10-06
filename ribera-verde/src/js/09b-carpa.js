@@ -69,10 +69,11 @@ const vcAnchos=pre=>Object.keys(ARTE.cubre||{}).filter(k=>k.startsWith('misc:'+p
 function vcSprite(pre,px){let m=null;for(const a of vcAnchos(pre))if(Math.abs(a-px)<=px*.25&&(!m||Math.abs(a-px)<Math.abs(m.a-px)))m={a,n:pre+a};return m&&{...m,f:fotoMisc(m.n)};}
 // la planta: el sprite de su porte y fase más ancho que no pasa de su copa (distancia segura) ni baja de ×0,75. Floración y lista
 // comparten sprite (planta-c-<porte>-NN); germinando, plántula y vegetativo llevan la fase (planta-c-<porte><fase>-NN). Si ninguno
-// cabe, el más estrecho de los más anchos hasta ×1,33 (la tolerancia de la vista B) que no pase del sitio (tope); si no, la vista B
+// cabe, el más estrecho de los más anchos hasta ×1,33 (la tolerancia de la vista B) que no pase del sitio (tope), y entonces se dibuja
+// así de grande también de alto (k = su ancho / el real: no se aplasta para meterla en el alto real); si no, la vista B
 function vcPlantaSprite(po,st,px,tope){const pre='planta-c-'+po+(st>=3?'':st)+'-';let m=null,e=null;
   for(const a of vcAnchos(pre)){if(a<=px+1&&a>=px*.75&&(!m||a>m.a))m={a,n:pre+a};if(a>px+1&&a<=Math.min(px*1.33,tope)&&(!e||a<e.a))e={a,n:pre+a};}
-  m=m||e;return m&&{...m,f:fotoMisc(m.n)};}
+  m=m||e&&{...e,k:e.a/px};return m&&{...m,f:fotoMisc(m.n)};}
 const vcAltos=new WeakMap();   // alto del dibujo (de la última fila a la primera con algo) de cada celda
 function vcAlto(c){if(vcAltos.has(c))return vcAltos.get(c);const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let y=0;
   for(let i=3;i<d.length;i+=4)if(d[i]){y=Math.floor((i>>2)/c.width);break;}vcAltos.set(c,c.height-y);return c.height-y;}
@@ -89,7 +90,7 @@ function vistaC(g){
     if(p){const st=p.dead?9:plantStage(p),po=porteDe(p.sid),D=PLANTA_CM[po];if(st>4)return null;
       const s=vcPlantaSprite(po,st,Math.min(D.w[st],q.cw)*Z,q.cw*Z+1);if(!s||!s.f)return null;
       // tope: su alto real (ch) y, en pantalla, la distancia segura a la boca del foco (el sprite de la maceta es más alto que la real)
-      r.p=s;r.hp=Math.min(vcAlto(s.f.c),Math.round(Math.min(D.h[st],q.ch)*Z),Math.floor(y-r.tierra-VCA.boca-FOCO_SEP[c.foco]*Z));}
+      r.p=s;r.hp=Math.min(vcAlto(s.f.c),Math.round(Math.min(D.h[st]*(s.k||1),q.ch)*Z),Math.floor(y-r.tierra-VCA.boca-FOCO_SEP[c.foco]*Z));}
     v.push(r);}
   pl.forEach((q,j)=>{q.v=v[j];q.x=v[j].x;q.y=v[j].y;q.alto=v[j].tierra+4+v[j].hp;});
   return {Z,w,xl:120-(w>>1),foco,tipo};
@@ -108,18 +109,24 @@ function vcLuz(t,vc){const L=vcFondo(t,vc,'luz'),k=LUZ_C[vc.tipo];if(!k)return L
   const [c,x]=mkCanvas(240,160),[r,g,b]=k[0],lk=.299*r+.587*g+.114*b;x.drawImage(L,0,0);const im=x.getImageData(0,0,240,160),d=im.data;
   for(let i=0;i<d.length;i+=4)if(d[i+3]){const l=(.299*d[i]+.587*d[i+1]+.114*d[i+2])/lk;d[i]=Math.min(255,r*l);d[i+1]=Math.min(255,g*l);d[i+2]=Math.min(255,b*l);}
   x.putImageData(im,0,0);return carpaCache[key]=c;}
-// la planta más baja que su sprite pierde filas enteras, nunca se escala (los píxeles no se aplastan): primero las de menos píxeles
-// (tallo pelado y entrenudos: los nudos se juntan) de abajo; la cola de arriba (el 40 %) solo si no basta. La base del tallo (las 2
+// la planta más baja que su sprite pierde filas enteras, nunca se escala (los píxeles no se aplastan). Primero pisos de ramas enteros
+// (VC_PISOS), de abajo arriba, como al quitar las ramas bajas: más baja = menos nudos; siempre queda el 1.º. Lo que falte, las filas con
+// menos píxeles (tallo pelado y entrenudos) de debajo de la cola; la cola (el 40 % de arriba) solo si no basta. La base del tallo (las 2
 // últimas filas) se queda, en la última fila de la celda; las demás, en su orden
+// pisos de cada sprite (filas desde arriba del dibujo, ambas incluidas; la cola y el tallo pelado no son pisos). La híbrida está montada
+// con los de la índica (ver el manifiesto)
+const VC_PISOS={'planta-c-i-24':[[18,29],[30,46],[47,57],[58,73]],'planta-c-h-24':[[18,29],[30,46],[47,63],[64,74],[75,90]],'planta-c-h2-24':[[18,29],[30,36],[37,47]]};
 const vcBajas=new WeakMap();
-function vcAplasta(c,h){
-  const a=vcAlto(c);if(h>=a)return c;let m=vcBajas.get(c);if(!m)vcBajas.set(c,m=new Map());if(m.has(h))return m.get(h);
-  const W=c.width,H=c.height,d=c.getContext('2d').getImageData(0,0,W,H).data,cola=H-a+Math.round(a*.4),n=[],filas=[];
-  for(let y=H-a;y<H-2;y++){let k=0;for(let x=0;x<W;x++)if(d[(y*W+x)*4+3])k++;n[y]=k;filas.push(y);}
-  const fuera=new Set(filas.sort((p,q)=>(p<cola)-(q<cola)||n[p]-n[q]||q-p).slice(0,a-h));
-  const [o,x]=mkCanvas(W,H);let y=H;for(let s=H-1;s>=H-a;s--)if(!fuera.has(s))x.drawImage(c,0,s,W,1,0,--y,W,1);
-  m.set(h,o);return o;
+function vcAplasta(c,h,pisos){
+  const a=vcAlto(c),key=(pisos?'p':'')+h;if(h>=a)return c;let m=vcBajas.get(c);if(!m)vcBajas.set(c,m=new Map());if(m.has(key))return m.get(key);
+  const W=c.width,H=c.height,y0=H-a,d=c.getContext('2d').getImageData(0,0,W,H).data,cola=y0+Math.round(a*.4),n=[],filas=[],fuera=new Set();let falta=a-h;
+  const P=pisos||[];for(let i=P.length-1;i>0&&falta>0;i--){const k=P[i][1]-P[i][0]+1;if(k<=falta){for(let y=P[i][0];y<=P[i][1];y++)fuera.add(y0+y);falta-=k;}}
+  for(let y=y0;y<H-2;y++){if(fuera.has(y))continue;let k=0;for(let x=0;x<W;x++)if(d[(y*W+x)*4+3])k++;n[y]=k;filas.push(y);}
+  filas.sort((p,q)=>(p<cola)-(q<cola)||n[p]-n[q]||q-p).slice(0,falta).forEach(y=>fuera.add(y));
+  const [o,x]=mkCanvas(W,H);let y=H;for(let s=H-1;s>=y0;s--)if(!fuera.has(s))x.drawImage(c,0,s,W,1,0,--y,W,1);
+  m.set(key,o);return o;
 }
+
 // la campana con la boca apagada: los tonos cálidos y los casi blancos (el tubo del CFL) pasan a gris oscuro
 function vcApagado(c){let m=vcBajas.get(c);if(!m)vcBajas.set(c,m=new Map());if(m.has('off'))return m.get('off');
   const [o,x]=mkCanvas(c.width,c.height);x.drawImage(c,0,0);const im=x.getImageData(0,0,c.width,c.height),d=im.data;
@@ -146,7 +153,7 @@ function vcPlantaC(q,now){
   const s=getStrain(p.sid),rk=((ARTE.d.rampas||{})['carpa-c-plantas']||{}).cogollo,c0=v.p.f.c,yb=q.y-v.tierra;
   const c1=rk&&s?conRampa(c0,{[rk.rampa[0]]:shade(s.c,50),[rk.rampa[1]]:s.c,[rk.rampa[2]]:shade(s.c,-60)},'g|'+s.c):c0;
   if(p.water<=0)ctx.filter='saturate(.4) sepia(.7)';   // seca: amarillenta
-  const pc=vcAplasta(c1,v.hp),b=pc.height-1;balanceo(pc,q.x-24,yb-b,b,p.water>0?1:0,now+q.x*37);
+  const pc=vcAplasta(c1,v.hp,VC_PISOS[v.p.n]),b=pc.height-1;balanceo(pc,q.x-24,yb-b,b,p.water>0?1:0,now+q.x*37);
   ctx.filter='none';
   if(p.pest){ctx.fillStyle='#e02828';for(let n=0;n<6;n++)ctx.fillRect(q.x-8+((n*5+Math.floor(now/300))%16),yb-12-((n*7)%20),1,1);}
 }
