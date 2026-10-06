@@ -10,12 +10,12 @@ Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: 
 |---|---|---|---|---|
 | Personajes | 39 | 25 | create_character · animate_character · create_image_pro (paso previo) | 1111 |
 | Mapa · terreno | 23 | 6 | create_tiles_pro · create_building_kit · create_topdown_tileset · animate_image | 15 + sin documentar |
-| Mapa · objetos con el estilo del mapa | 22 | 8 | create_map_object (background_image + máscara) · animate_image | 9 + sin documentar |
-| Objetos sueltos en lote | 35 | 7 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 90 + sin documentar |
+| Mapa · objetos con el estilo del mapa | 28 | 13 | create_map_object (background_image + máscara) · animate_image | 14 + sin documentar |
+| Objetos sueltos en lote | 43 | 10 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 180 + sin documentar |
 | Imágenes simples | 3 | 3 | create_image_pixflux (init_image + color_image) | 3 |
 | Se queda procedural | 2 | 1 | — | 0 |
 
-**Total documentado: ~1228 generaciones** (más create_tiles_pro, create_map_object, animate_object, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 124/124 claves.
+**Total documentado: ~1323 generaciones** (más create_tiles_pro, create_map_object, animate_object, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 138/138 claves.
 
 ## Orden de creación
 
@@ -23,11 +23,12 @@ Las dependencias mandan: nada que use el estilo de otra cosa se genera antes de 
 
 - **F1 · Ancla de estilo:** player.
 - **F3 · Personajes:** kiko, josune, baltasar, tono, begona, unai, patxi, txaro, inaki, cop, molina, darko, jurado, cliente1, cliente2, cliente3, cliente4, cliente5, cliente6, vfx-16, vfx-32.
-- **F4 · Entorno:** tiles-exterior, interior-home, interior-shop, interior-bar, tiles-interior-extra, edificio-home (tras tiles-exterior), edificio-shop (tras tiles-exterior), edificio-bar (tras tiles-exterior), edificio-gray (tras tiles-exterior), props-16, props-32, prop-arbol (tras tiles-exterior), prop-farola (tras tiles-exterior), prop-fuente (tras tiles-exterior), carpa-cultivo (tras interior-home).
+- **F4 · Entorno:** tiles-exterior, interior-home, interior-shop, interior-bar, tiles-interior-extra, edificio-home (tras tiles-exterior), edificio-shop (tras tiles-exterior), edificio-bar (tras tiles-exterior), edificio-gray (tras tiles-exterior), props-16, props-32, prop-arbol (tras tiles-exterior), prop-farola (tras tiles-exterior), prop-fuente (tras tiles-exterior).
 - **F4b · Transiciones (opcional):** tileset-transiciones — opcional.
 - **F5 · Plantas:** planta-fases.
 - **F6 · Combate:** player-combate (tras player), ladron1-combate, ladron2-combate, ladron3-combate, policia-combate (tras cop), fondo-combate-ladron, fondo-combate-policia.
 - **F7 · Iconos y título:** iconos, cogollos-genoteca, titulo, burbujas.
+- **F8 · Pulido y cierre:** carpa-g150 (tras interior-home, tiles-interior-extra), carpa-g150-fuera (tras interior-home, tiles-interior-extra), carpa-m100 (tras carpa-g150), carpa-m100-fuera (tras carpa-g150-fuera), carpa-p60 (tras carpa-g150), carpa-p60-fuera (tras carpa-g150-fuera), macetas, focos, mesa-cultivo.
 
 ## Personajes
 
@@ -82,6 +83,12 @@ Lo grande que se apoya en el suelo (fachadas, carpa, árbol, farola, fuente): in
 
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
+| carpa-g150 | carpa-g150 | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-carpa-interior.png | F8 · tras interior-home, tiles-interior-extra | — | 1 |
+| carpa-g150-fuera | carpa-g150-fuera | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-carpa-exterior.png | F8 · tras interior-home, tiles-interior-extra | — | 1 |
+| carpa-m100 | carpa-m100 | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-carpa-interior.png | F8 · tras carpa-g150 | — | 1 |
+| carpa-m100-fuera | carpa-m100-fuera | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-carpa-exterior.png | F8 · tras carpa-g150-fuera | — | 1 |
+| carpa-p60 | carpa-p60 | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-carpa-interior.png | F8 · tras carpa-g150 | — | 1 |
+| carpa-p60-fuera | carpa-p60-fuera | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-carpa-exterior.png | F8 · tras carpa-g150-fuera | — | 1 |
 | edificio-home | roofT_home, roofB_home, wall_home, win_home, door_home | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-edificio-home.png | F4 · tras tiles-exterior | puerta | 2 |
 | edificio-shop | roofT_shop, roofB_shop, wall_shop, win_shop, door_shop | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-edificio-shop.png | F4 · tras tiles-exterior | puerta | 2 |
 | edificio-bar | roofT_bar, roofB_bar, wall_bar, win_bar, door_bar | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-edificio-bar.png | F4 · tras tiles-exterior | puerta | 2 |
@@ -89,7 +96,6 @@ Lo grande que se apoya en el suelo (fachadas, carpa, árbol, farola, fuente): in
 | prop-arbol | tree | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: tree.png · inpainting.mask_image: tree_mascara.png | F4 · tras tiles-exterior | — | 0+? |
 | prop-farola | lamp | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: lamp.png · inpainting.mask_image: lamp_mascara.png | F4 · tras tiles-exterior | — | 0+? |
 | prop-fuente | fountain | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: fountain.png · inpainting.mask_image: fountain_mascara.png | F4 · tras tiles-exterior | agua | 1+? |
-| carpa-cultivo | — | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-carpa.png | F4 · tras interior-home | — | 1 |
 
 ## Objetos sueltos en lote
 
@@ -97,6 +103,9 @@ Muchos objetos pequeños del mismo estilo en una sola llamada (hasta 64 candidat
 
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
+| macetas | maceta-plastico7, maceta-tela11, maceta-plastico18, maceta-tela25 | create_1_direction_object | 48 objetos en 1 llamada (64 candidatos a 16 px) | style_images: estilo-maceta-16.png | F8 | — | 30 |
+| focos | foco-cfl, foco-sodio, foco-led | create_1_direction_object | 48 objetos en 1 llamada (64 candidatos a 32 px) | style_images: 00.png | F8 | — | 30 |
+| mesa-cultivo | mesa | create_1_direction_object | 24 objetos en 1 llamada (64 candidatos a 16 px) | style_images: 00.png | F8 | — | 30 |
 | props-16 | fence, sign, bench, crate, bush, pc, lab, lab2, table, shelfW, counter, display, plantDeco, barcounter, bottles, stool, btable, jukebox, iwin, poster | create_1_direction_object | 64 objetos en 1 llamada (64 candidatos a 16 px) | style_images: bench.png, sign.png, crate.png, bush.png, counter.png, stool.png, jukebox.png, plantDeco.png | F4 | luces | 30+? |
 | props-32 | fridge, bedT, bedB | create_1_direction_object | 2 objetos · **comparte lote-32** (15 objetos de 4 assets en 1 llamada de 64 candidatos a 32 px) | solo texto | F4 | — | 30 |
 | planta-fases | germinando, plantula, vegetativo, floracion, lista, muerta, maceta-vacia, sana, seca | create_1_direction_object | 7 objetos · **comparte lote-32** (15 objetos de 4 assets en 1 llamada de 64 candidatos a 32 px) | solo texto | F5 | balanceo-vegetativo, balanceo-floracion, balanceo-lista | 0+? |
@@ -252,3 +261,4 @@ Una llamada a `create_1_direction_object` de ≤42 px devuelve 64 candidatos y c
 | create_portrait_character / create_vocal_animation | Opcional (F9): retratos con boca animada en los diálogos. ~20 generaciones por retrato; no es estética de portátil de 16 bits. |
 | create_map / edit_map / place_map_object / view_map | No se usan en el juego (el mapa es del motor), pero sirven de maqueta opcional en F4b: pintar el barrio con los Wang, colocar edificios y props y revisar con view_map antes de integrar. |
 | *_pro_flash | Alternativa de pago por imagen a create_character/objetos; no mejora a 16-32 px. |
+| create_image_pixflux (carpa-cultivo, 1.5) | Una sola carpa abierta de 64×112 con el panel LED pintado encima. En la 1.6 hay carpas de 3 tamaños, cerradas desde fuera y abiertas por dentro, con focos y macetas aparte: carpa-p60/m100/g150 (+ -fuera), focos, macetas y mesa-cultivo. |

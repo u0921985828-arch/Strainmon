@@ -16,7 +16,7 @@
 
 | Pedido | Cómo está en el juego |
 |---|---|
-| Mecánicas de Weed Firm: cultivar | Armario con 2 a 6 macetas: riego, abono, plagas, fases de crecimiento, cosecha con % de THC |
+| Mecánicas de Weed Firm: cultivar | Carpas en el piso (armario de 60 con 2 plantas → carpa de 100 con 4 → de 150 con 6), mesas, macetas de plástico y de tela de 7 a 25 L, focos CFL, sodio y LED de 125 a 720 W con cobertura y factura de la luz; riego, abono, plagas, fases de crecimiento, cosecha con % de THC |
 | Descubrir y cruzar genéticas | Mesa de genética y **Genoteca** de 23 variedades (6 de tienda, 4 landraces —1 regalo de Kiko y 3 repartidas por el barrio—, 13 recetas de cruce) + híbridos propios ilimitados |
 | Venderlo en la calle | Clientes con `$` que cambian cada día; tú eliges precio (rebaja, justo o caro) y pueden rechazarlo |
 | Ladrones y policía | Encuentros aleatorios al andar por el barrio con mercancía o dinero, y combates por turnos |
@@ -35,20 +35,21 @@
 - **El motor de sprites va antes que los sprites (v1.3).** Se probó con un atlas «de calco» del arte actual: si las capturas salen iguales, las anclas cuadran y los créditos se gastan solo en arte.
 - **Ajustes tras la prueba automática (v1.1).** Los ladrones de los capítulos altos ganaban casi siempre, así que se suavizaron y ahora la VIDA máxima sube 2 puntos por cada ladrón vencido. Además se corrigieron tres fallos; están en [CHANGELOG.md](CHANGELOG.md).
 
-## Estado (v1.5.0)
+## Estado (v1.6.0)
 
 - Se juega de principio a fin: capítulos 1 a 7, final y juego libre (capítulo 8).
-- `npm test` recorre la historia entera y los sistemas sueltos en 34 pasos: **34/34, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
+- `npm test` recorre la historia entera y los sistemas sueltos en 38 pasos: **38/38, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
-  - el motor ya usa el atlas (F2) y `npm run test:arte` da 19/19;
+  - el motor ya usa el atlas (F2) y `npm run test:arte` da 20/20;
   - F1 generada con PixelLab Pro: el protagonista ya sale del atlas (`base`, `idle`, `walk`), aprobado;
   - F3 (personajes) con la misma receta: los 13 NPC y los 6 clientes salen del atlas con `idle`, `walk` (los que caminan) y sus acciones de ambiente;
   - F3-resto, F4, F5, F6 y F7 (1.5): humos y efectos, gaviotas y palomas, tiles, interiores, fachadas, objetos, carpa, plantas, combate, iconos, cogollos y título salen del atlas, y el protagonista ya tiene sus 8 acciones;
-  - F4b (1.5): orillas del río, del camino de tierra y de la plaza con tres Wang encadenados y autotiling por esquinas. Atlas completo: 1086 fotogramas.
+  - F4b (1.5): orillas del río, del camino de tierra y de la plaza con tres Wang encadenados y autotiling por esquinas;
+  - F8 (1.6): carpas de 3 tamaños por dentro y cerradas (pixflux img2img sobre su huella), 4 macetas, 3 focos y la mesa de cultivo (lotes de `create_1_direction_object`). Atlas completo: 1099 fotogramas.
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
-- **Android:** `dist/ribera-verde.apk` (1.5.0, código 10500), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
-- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.5, con el atlas completo de PixelLab (1086 fotogramas). Es privado: se comparte desde su menú Compartir.
+- **Android:** `dist/ribera-verde.apk` (1.6.0, código 10600), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
+- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.6, con el atlas completo de PixelLab (1099 fotogramas). Es privado: se comparte desde su menú Compartir.
 
 ## Limitaciones conocidas
 

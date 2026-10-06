@@ -27,7 +27,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
 
   await page.evaluate(() => arteListo());   // si el build lleva atlas, los recortes de mapa/ salen con los tiles ya aprobados
   const data = await page.evaluate(() => {
-    S = newState();
+    S = newState(); S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'cfl' }]; montarCasa();   // el piso con las dos carpas (suelo de mylar y mesas)
     const png = c => c.toDataURL('image/png');
     const up = (c, k) => { const [o, x] = mkCanvas(c.width * k, c.height * k); x.drawImage(c, 0, 0, c.width * k, c.height * k); return o; };
     // qué claves de TILES se usan como suelo y cuáles como objeto
@@ -62,7 +62,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
     files['combate/fondo-ladron.png'] = png(battleBg.thief);
     files['combate/fondo-policia.png'] = png(battleBg.police);
     files['misc/bolsa.png'] = png(bagSprite);
-    files['misc/maceta-vacia.png'] = png(emptyPot);
+    files['misc/maceta-vacia.png'] = png(potVacia());
     files['misc/hoja-titulo.png'] = png(titleArt);
     { renderTitle(0); const [c, x] = mkCanvas(SW, SH); x.drawImage(ctx.canvas, 0, 0); files['misc/titulo.png'] = png(c); }   // pantalla de título entera (init_image de F7)
     // mapa: recortes del suelo para create_map_object con estilo del mapa (inpainting; máscara BLANCA = lo que genera PixelLab)
@@ -76,14 +76,21 @@ const OUT = path.join(ROOT, 'art', 'referencias');
     const mascara = (w, h, [rx, ry, rw, rh]) => { const [c, x] = mkCanvas(w, h); x.fillStyle = '#000000'; x.fillRect(0, 0, w, h); x.fillStyle = '#ffffff'; x.fillRect(rx, ry, rw, rh); return c; };
     for (const b of MAPS.town.blds) { const c = region('town', b.x0 - 1, b.y0 - 1, b.w + 2, b.h + 2);
       files[`mapa/edificio-${b.id}.png`] = png(c); files[`mapa/edificio-${b.id}_mascara.png`] = png(mascara(c.width, c.height, [16, 16, b.w * 16, b.h * 16])); }
-    { const c = region('home', 6, 2, 6, 8); files['mapa/carpa.png'] = png(c); files['mapa/carpa_mascara.png'] = png(mascara(c.width, c.height, [16, 0, 64, 112])); }
+    // carpas (huella entera de cada tamaño, transparente donde se ve el suelo del piso), macetas y focos
+    for (const t of Object.keys(CARPAS)) { const w = CARPAS[t].w, x1 = w - 1, [c, x] = mkCanvas(w * 16, 80);
+      for (let y = 0; y < 5; y++) for (let i = 0; i < w; i++) { const e = i === 0 ? 'L' : i === x1 ? 'R' : '';
+        const k = y === 0 ? 'cpT' + e : y === 1 ? 'cpM' + e : y === 4 ? (i === 1 ? 'cpPuerta' : 'cpB' + e) : i === 0 ? 'cpL' : i === x1 ? 'cpR' : 'tent';
+        x.drawImage(TILES[k][0], i * 16, y * 16); }
+      files[`misc/carpa-${t}.png`] = png(c); files[`misc/carpa-${t}-fuera.png`] = png(carpaFuera(w)); }
+    for (const k of Object.keys(MACETAS)) files[`misc/maceta-${k}.png`] = png(potVacia(k));
+    for (const t of ['cfl', 'sodio', 'led']) { const [c, x] = mkCanvas(32, 32); x.drawImage(focoProc(t), 0, 8); files[`misc/foco-${t}.png`] = png(c); }
     for (const [k, X, Y] of [['tree', 28, 15], ['lamp', 14, 14], ['fountain', 20, 19]]) {
       const c = region('town', X - 1, Y - 2, 3, 4, (x, y) => x === X && y === Y);
       files[`mapa/${k}.png`] = png(c); files[`mapa/${k}_mascara.png`] = png(mascara(c.width, c.height, [8, 16, 32, 32]));
     }
     const inventario = {
       generado: new Date().toISOString().slice(0, 10),
-      tiles_suelo: [...ground].sort(),
+      tiles_suelo: [...ground].filter(k => !/^cp/.test(k)).sort(),   // las paredes de la carpa (cp*) salen de su imagen entera (misc:carpa-*)
       objetos: [...objects].sort(),
       tiles_animados: Object.entries(TILES).filter(([, f]) => f.length > 1).map(([k, f]) => ({ clave: k, fotogramas: f.length })),
       personajes: Object.keys(looks),
@@ -91,7 +98,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
       npcs: NPCDEF.map(d => ({ id: d.id, look: d.look, mapa: d.map, deambula: !!d.wander })),
       plantas: { fases: stages.map(s => s[0]), variantes: variants.map(v => v[0]), colores_cogollo: Object.fromEntries(Object.entries(STRAINS).map(([k, s]) => [k, s.c])) },
       combate: ['fondo-ladron', 'fondo-policia', 'frente:ladron', 'frente:policia', 'espalda:player'],
-      misc: ['bolsa', 'maceta-vacia', 'hoja-titulo', 'burbuja-$', 'burbuja-!'],
+      misc: ['bolsa', 'maceta-vacia', 'hoja-titulo', 'burbuja-$', 'burbuja-!', ...Object.keys(CARPAS).flatMap(t => ['carpa-' + t, 'carpa-' + t + '-fuera']), ...Object.keys(MACETAS).map(k => 'maceta-' + k), 'foco-cfl', 'foco-sodio', 'foco-led'],
       tamanos: { tile: [16, 16], personaje: [16, 20], planta: [16, 26], combate_escala: 3, pantalla: [240, 160] },
     };
     return { files, inventario, origenMapa: ARTE.ok ? 'tiles del atlas' : 'tiles procedurales' };

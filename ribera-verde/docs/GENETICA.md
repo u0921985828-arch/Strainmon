@@ -95,10 +95,10 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
 
 ## Fórmulas de cultivo
 
-- **Crecimiento por hora:** `1 / (días × 24)`, ×0,4 si el agua < 20 %, 0 si el agua llega a 0, ×1,1 con abono, ×1,1 con LED.
-- **Agua:** baja 3,5 puntos por hora (una planta regada aguanta ~28 h).
+- **Crecimiento por hora:** `1 / (días × 24) × crec`, ×0,4 si el agua < 20 %, 0 si el agua llega a 0, ×1,1 con abono. `crec`, `rend`, `thc` y `riego` salen del foco y de la maceta de cada plaza (ver la sección 4 del [GDD](GDD.md)).
+- **Agua:** baja 3,5 × riego puntos por hora (con CFL y maceta de 7 L una planta regada aguanta ~28 h).
 - **Salud:** −4/h sin agua, −2,5/h con plaga, +1/h si agua > 30 % y sin plaga. A 0 la planta muere.
 - **Plagas:** probabilidad por hora `0,006 × (100 − resistencia) / 40` mientras no está madura.
-- **Cosecha (g):** `rinde × (0,4 + 0,6 × salud/100) × (abono ? 1,25 : 1) × (LED ? 1,3 : 1)`.
-- **THC final:** `THC × (0,85 + 0,15 × salud/100) + (LED ? 0,5 : 0) + (abono ? 0,3 : 0)`.
+- **Cosecha (g):** `rinde × (0,4 + 0,6 × salud/100) × (abono ? 1,25 : 1) × rend`.
+- **THC final:** `THC × (0,85 + 0,15 × salud/100) + thc + (abono ? 0,3 : 0)`.
 - **Semillas al cosechar:** 1 + (0 a 2).

@@ -8,9 +8,19 @@ const SHOP=[
   {lbl:'Insecticida',p:20,ch:1,item:'insect',desc:'Elimina una plaga de araña roja.'},
   {lbl:'Bocata',p:6,ch:1,item:'bocata',desc:'Recupera 15 de vida. En combate o desde la mochila.'},
   {lbl:'Spray de pimienta',p:25,ch:2,item:'spray',desc:'En combate: 12-16 de daño seguro a un ladrón.'},
-  {lbl:'Maceta extra',p:150,ch:2,pot:1,desc:'Una maceta más en el armario (máximo 6).',cond:()=>S.potsOwned<6},
-  {lbl:'Lámpara LED',p:500,ch:3,led:1,desc:'+30% de cosecha y algo más de THC. Para siempre.',cond:()=>!S.led},
+  {lbl:'Maceta de tela 11 L',p:20,ch:1,maceta:'tela11'},{lbl:'Maceta de plástico 18 L',p:30,ch:2,maceta:'plastico18'},{lbl:'Maceta de tela 25 L',p:45,ch:3,maceta:'tela25'},
+  {lbl:'Foco sodio 250 W',p:120,ch:2,foco:'sodio250'},{lbl:'Foco LED 200 W',p:260,ch:2,foco:'led200'},
+  {lbl:'Foco sodio 400 W',p:220,ch:3,foco:'sodio400'},{lbl:'Foco LED 480 W',p:600,ch:3,foco:'led480'},
+  {lbl:'Foco sodio 600 W',p:350,ch:4,foco:'sodio600'},{lbl:'Foco LED 720 W',p:1000,ch:5,foco:'led720'},
+  {lbl:'Carpa 100×100',p:450,ch:2,carpa:'m100',desc:'Segunda carpa para el piso: 4 plantas, focos de hasta 480 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L.',cond:()=>!S.carpas[1]},
+  {lbl:'Carpa 150×100',p:900,ch:4,carpa:'g150',desc:'Cambia tu carpa de 100 por una de 150: 6 plantas y focos de hasta 720 W. Tus plantas, foco y macetas se quedan.',cond:()=>S.carpas[1]&&S.carpas[1].t==='m100'},
 ];
+for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+(FOCOS[it.foco].w<=250?'60, 100 y 150':FOCOS[it.foco].w<=480?'100 y 150':'150')+'.';}
+// carpa comprada (o ampliada): plazas nuevas al final, con maceta de 7 L; la casa se vuelve a montar al entrar
+function comprarCarpa(t){
+  if(t==='m100')S.carpas[1]={t,foco:'cfl'};else S.carpas[1].t=t;
+  const n=huecos().length;while(S.pots.length<n)S.pots.push(null);while(S.macetas.length<n)S.macetas.push('plastico7');
+}
 async function shop(){
   let i=0;
   for(;;){
@@ -22,8 +32,13 @@ async function shop(){
     const it=list[i];
     if(S.money<it.p){sfx('bad');await say('No te llega, colega.','KIKO');continue;}
     S.money-=it.p;sfx('coin');
-    if(it.sid)addSeeds(it.sid,1);if(it.item)S.items[it.item]++;if(it.pot)S.potsOwned++;if(it.led)S.led=true;
-    if(!it.sid)toast('Comprado: '+it.lbl,1200);
+    if(it.sid)addSeeds(it.sid,1);if(it.item)S.items[it.item]++;if(it.maceta)S.items['m_'+it.maceta]++;
+    if(!it.sid&&!it.foco&&!it.carpa)toast('Comprado: '+it.lbl,1200);
+    if(it.carpa){comprarCarpa(it.carpa);await say(it.carpa==='m100'?'Te la monto esta tarde en el piso, al lado del armario de tu tía. Viene con un CFL; si quieres más luz, aquí tienes focos.':'Me llevo la de 100 y te monto la de 150 en su sitio. Las plantas ni se enteran.','KIKO');}
+    if(it.foco){S.items['f_'+it.foco]++;const ok=S.carpas.map((c,ci)=>c&&FOCOS[it.foco].w<=CARPAS[c.t].wmax?ci:-1).filter(ci=>ci>=0);
+      if(!ok.length)await say('Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande.','KIKO');
+      else{const c=await ask('¿Lo cuelgo ya? El que quites va a tu mochila.',ok.map(ci=>`${CARPAS[S.carpas[ci].t].n} (${FOCOS[S.carpas[ci].foco].n})`).concat(['Luego']),'KIKO');
+        if(c>=0&&c<ok.length){instalarFoco(ok[c],it.foco);toast('Instalado: '+it.lbl,1200);}}}
     await checkStory();
   }
   await say('¡Buenos humos!','KIKO');
@@ -31,8 +46,8 @@ async function shop(){
 const RECIPE_HINTS=['Ría Skunk con Limón Haze da un cítrico de los buenos.','Un Txoko Kush con Niebla Blue sale azul como la ría en invierno.','Lo del Rif con el Txoko... eso sí que pega fuerte.','Púrpura Monte y Hindú Valle: morado de reyes.','Acapulco Oro con Mango: oro tropical, chaval.','Niebla Blue y Púrpura Monte: una niebla morada.','Limón Haze con Malawi Sol: el sol metido en un cogollo.','Si cruzas las de segunda generación entre ellas, salen cosas que no vienen ni en los libros.','La LEYENDA DE LA RÍA nace de una tormenta y un dragón. O eso cuentan.'];
 function kikoTip(){
   const t=[['Riega cuando el agua baje del 30%. Sin agua, la planta enferma.','El FERTILIZANTE solo se echa una vez por planta, pero merece la pena.','Duerme para que pase el tiempo. Las plantas crecen igual.'],
-    ['Los clientes con $ cambian cada día. No los hagas esperar.','Pedir CARO funciona mejor con turistas, pijos y cogollos potentes.','Si el CALOR policial se dispara, deja de vender un par de días.','Una maceta extra es la mejor inversión que puedes hacer.'],
-    ['La LÁMPARA LED sube la cosecha un 30% y el THC un poco.','Lleva SPRAY DE PIMIENTA. De noche, en el parque, lo agradecerás.'],
+    ['Los clientes con $ cambian cada día. No los hagas esperar.','Pedir CARO funciona mejor con turistas, pijos y cogollos potentes.','Si el CALOR policial se dispara, deja de vender un par de días.','Una carpa más grande es la mejor inversión que puedes hacer.','Las macetas de tela airean las raíces: más cosecha y menos bichos, pero beben más.'],
+    ['El LED cuesta más, pero sube la cosecha y el THC y casi no calienta. El sodio es barato y seca las macetas.','Un foco pequeño en una carpa grande no llega a todas las plantas: rinden menos.','La luz se paga: cada carpa con plantas suma su factura cada día.','Lleva SPRAY DE PIMIENTA. De noche, en el parque, lo agradecerás.'],
     RECIPE_HINTS.concat(['Las landraces no las vendo yo. Pregunta por el barrio: la abuela Txaro, el marinero Iñaki, los arbustos del parque...'])];
   return pick(t[Math.min(3,Math.max(0,S.ch-1))].concat(S.ch>3?t[1]:[]));
 }

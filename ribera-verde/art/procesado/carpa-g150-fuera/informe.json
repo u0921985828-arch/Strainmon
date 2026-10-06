@@ -1,0 +1,18 @@
+{
+  "grupo": "carpa-g150-fuera",
+  "celda": [
+    128,
+    80
+  ],
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 5.41,
+  "colores_finales": 9,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

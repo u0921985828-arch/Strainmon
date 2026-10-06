@@ -63,6 +63,7 @@
     "lab",
     "lab2",
     "lamp",
+    "mesa",
     "pc",
     "plantDeco",
     "poster",
@@ -252,7 +253,20 @@
     "maceta-vacia",
     "hoja-titulo",
     "burbuja-$",
-    "burbuja-!"
+    "burbuja-!",
+    "carpa-p60",
+    "carpa-p60-fuera",
+    "carpa-m100",
+    "carpa-m100-fuera",
+    "carpa-g150",
+    "carpa-g150-fuera",
+    "maceta-plastico7",
+    "maceta-tela11",
+    "maceta-plastico18",
+    "maceta-tela25",
+    "foco-cfl",
+    "foco-sodio",
+    "foco-led"
   ],
   "tamanos": {
     "tile": [

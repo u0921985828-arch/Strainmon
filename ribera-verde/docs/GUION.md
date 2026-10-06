@@ -234,8 +234,8 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio de antiguos
 
 - **Kiko, consejos** (opción «Un consejo»):
   - *Capítulo 1:* riego por debajo del 30 %, abono una vez por planta, dormir para pasar el tiempo.
-  - *Capítulo 2:* los clientes cambian cada día, pedir caro funciona con turistas, pijos y cogollos potentes, parar de vender si sube el calor, la maceta extra.
-  - *Capítulo 3:* la LED, llevar spray de noche en el parque.
+  - *Capítulo 2:* los clientes cambian cada día, pedir caro funciona con turistas, pijos y cogollos potentes, parar de vender si sube el calor, una carpa más grande, las macetas de tela.
+  - *Capítulo 3:* LED frente a sodio, un foco pequeño en una carpa grande rinde menos, la factura de la luz, llevar spray de noche en el parque.
   - *Desde el capítulo 4:* las pistas de recetas y dónde buscar landraces, más los consejos del capítulo 2.
   - *Al despedirse:* «¡Buenos humos!»
 - **Josune:** «¡Kaixo! ¿Qué te pongo?»

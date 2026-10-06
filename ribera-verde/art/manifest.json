@@ -93,16 +93,6 @@
    ],
    "ajuste": "pies"
   },
-  "carpa": {
-   "w": 72,
-   "h": 112,
-   "ancla": [
-    36,
-    111
-   ],
-   "ajuste": "pies",
-   "nota": "72 de ancho: el marco sobresale 4 px por cada lado de las 4 casillas de la carpa (x 7-10), así las macetas de las columnas 7 y 9 quedan dentro"
-  },
   "edificio_7x6": {
    "w": 112,
    "h": 96,
@@ -176,6 +166,46 @@
     0
    ],
    "ajuste": "exacto"
+  },
+  "carpa_p60": {
+   "w": 64,
+   "h": 80,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "huella entera de la carpa de 4×5 casillas; transparente donde se ve el suelo del piso"
+  },
+  "carpa_m100": {
+   "w": 96,
+   "h": 80,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "carpa de 6×5 casillas"
+  },
+  "carpa_g150": {
+   "w": 128,
+   "h": 80,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "carpa de 8×5 casillas"
+  },
+  "foco": {
+   "w": 32,
+   "h": 32,
+   "ancla": [
+    16,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "foco colgado: el motor lo pinta con la esquina de arriba en (cx−16, y) y tira el cable hasta su primera fila"
   }
  },
  "fases": [
@@ -3687,6 +3717,481 @@
    "coste_real": 20
   },
   {
+   "id": "carpa-g150",
+   "tipo": "carpa",
+   "fase": "F8",
+   "herramienta": "create_image_pixflux",
+   "cubre": [
+    "misc:carpa-g150"
+   ],
+   "parametros": {
+    "init_image_strength": 80,
+    "view": "high top-down",
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": false,
+    "width": 128,
+    "height": 80
+   },
+   "descripcion": "inside of an open indoor grow tent seen from above, cutaway view for a 16-bit handheld RPG room: silver reflective mylar back wall with a black frame pole along its top, black metal frame poles at the corners, light silver mylar floor sheet, the front wall and right wall are cut down to a low black rail on the floor, wooden plank floor of the room around it, empty tent, no plants, no lamp, crisp detailed pixel art, clean dark outline, light from the top-left",
+   "celda": "carpa_g150",
+   "estado": "aprobado",
+   "familia": "mapa-objeto",
+   "entrada": {
+    "init_image_base64": "art/crudo/_ref/huella-carpa-interior.png"
+   },
+   "entrada_origen": "huella procedural de la carpa de 150×100 (8×5 casillas) sobre el suelo del piso: tiles cp* de 01-tiles.js (pared del fondo y lateral izquierda de mylar, rieles de las paredes quitadas) + tent",
+   "pixellab": {
+    "image_job": "19f3dd91-49ce-4595-947b-c4a9f971274d"
+   },
+   "coste_real": 1,
+   "descartado": {
+    "herramienta": "create_image_pixflux",
+    "id": "ba085c74-dd18-4ef2-bee4-2e750f26446a",
+    "motivo": "init_image_strength 140: casi la huella tal cual, plano"
+   },
+   "montaje": "La pared lateral derecha en perspectiva (x 100-115, filas 2-43) se cambia por la pared del fondo y el suelo de 32 px a la izquierda (el mylar repite cada 32 px): de la derecha queda solo el poste. Fuera de la huella (suelo del piso) y los píxeles de madera, transparentes (scratchpad f8/carpas.js).",
+   "depende_de": [
+    "interior-home",
+    "tiles-interior-extra"
+   ],
+   "notas": "Con el jugador dentro (o en la puerta): sin techo y sin las paredes de delante y de la derecha; el motor la pinta casilla a casilla debajo de las mesas."
+  },
+  {
+   "id": "carpa-g150-fuera",
+   "tipo": "carpa",
+   "fase": "F8",
+   "herramienta": "create_image_pixflux",
+   "cubre": [
+    "misc:carpa-g150-fuera"
+   ],
+   "parametros": {
+    "init_image_strength": 80,
+    "view": "high top-down",
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": false,
+    "width": 128,
+    "height": 80
+   },
+   "descripcion": "closed black indoor grow tent seen from above for a 16-bit handheld RPG room: dark grey fabric roof with silver frame poles along its edges and a round ventilation duct port, tall black fabric front wall with a silver zipper door shaped like an arch on the left and a small mesh vent on the right, silver corner poles, wooden plank floor of the room around it, crisp detailed pixel art, clean dark outline, light from the top-left",
+   "celda": "carpa_g150",
+   "estado": "aprobado",
+   "familia": "mapa-objeto",
+   "entrada": {
+    "init_image_base64": "art/crudo/_ref/huella-carpa-exterior.png"
+   },
+   "entrada_origen": "huella procedural de la carpa de 150×100 (8×5 casillas) sobre el suelo del piso: carpaFuera(8) de 14-render.js (techo, frente negro, puerta de cremallera, rejilla)",
+   "pixellab": {
+    "image_job": "8d0ac16c-8ef4-4a80-b68c-d27f1237ac7f"
+   },
+   "coste_real": 1,
+   "descartado": {
+    "herramienta": "create_image_pixflux",
+    "id": "7e09a3b1-49ab-4b88-a03f-03cbf17ad64b",
+    "motivo": "init_image_strength 140: casi la huella tal cual, plano"
+   },
+   "montaje": "Fuera de la huella (suelo del piso) y los píxeles de madera, transparentes (scratchpad f8/carpas.js).",
+   "depende_de": [
+    "interior-home",
+    "tiles-interior-extra"
+   ],
+   "notas": "Con el jugador fuera: la carpa cerrada tapa mesas, macetas y focos. Si hay plantas vivas, el motor pinta la luz que se escapa bajo la puerta."
+  },
+  {
+   "id": "carpa-m100",
+   "tipo": "carpa",
+   "fase": "F8",
+   "herramienta": "create_image_pixflux",
+   "cubre": [
+    "misc:carpa-m100"
+   ],
+   "parametros": {
+    "init_image_strength": 80,
+    "view": "high top-down",
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": false,
+    "width": 128,
+    "height": 80
+   },
+   "descripcion": "inside of an open indoor grow tent seen from above, cutaway view for a 16-bit handheld RPG room: silver reflective mylar back wall with a black frame pole along its top, black metal frame poles at the corners, light silver mylar floor sheet, the front wall and right wall are cut down to a low black rail on the floor, wooden plank floor of the room around it, empty tent, no plants, no lamp, crisp detailed pixel art, clean dark outline, light from the top-left",
+   "celda": "carpa_m100",
+   "estado": "aprobado",
+   "familia": "mapa-objeto",
+   "entrada": {
+    "init_image_base64": "art/crudo/_ref/huella-carpa-interior.png"
+   },
+   "entrada_origen": "huella procedural de la carpa de 150×100 (8×5 casillas) sobre el suelo del piso: tiles cp* de 01-tiles.js (pared del fondo y lateral izquierda de mylar, rieles de las paredes quitadas) + tent",
+   "pixellab": {
+    "image_job": "19f3dd91-49ce-4595-947b-c4a9f971274d"
+   },
+   "coste_real": 0,
+   "montaje": "Recorte de carpa-g150 (la misma generación): x 0-63 + 96-127; la puerta y su hueco (x 16-31) se conservan. La pared lateral derecha en perspectiva (x 100-115, filas 2-43) se cambia por la pared del fondo y el suelo de 32 px a la izquierda (el mylar repite cada 32 px): de la derecha queda solo el poste. Fuera de la huella (suelo del piso) y los píxeles de madera, transparentes (scratchpad f8/carpas.js).",
+   "depende_de": [
+    "carpa-g150"
+   ],
+   "notas": "Con el jugador dentro (o en la puerta): sin techo y sin las paredes de delante y de la derecha; el motor la pinta casilla a casilla debajo de las mesas."
+  },
+  {
+   "id": "carpa-m100-fuera",
+   "tipo": "carpa",
+   "fase": "F8",
+   "herramienta": "create_image_pixflux",
+   "cubre": [
+    "misc:carpa-m100-fuera"
+   ],
+   "parametros": {
+    "init_image_strength": 80,
+    "view": "high top-down",
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": false,
+    "width": 128,
+    "height": 80
+   },
+   "descripcion": "closed black indoor grow tent seen from above for a 16-bit handheld RPG room: dark grey fabric roof with silver frame poles along its edges and a round ventilation duct port, tall black fabric front wall with a silver zipper door shaped like an arch on the left and a small mesh vent on the right, silver corner poles, wooden plank floor of the room around it, crisp detailed pixel art, clean dark outline, light from the top-left",
+   "celda": "carpa_m100",
+   "estado": "aprobado",
+   "familia": "mapa-objeto",
+   "entrada": {
+    "init_image_base64": "art/crudo/_ref/huella-carpa-exterior.png"
+   },
+   "entrada_origen": "huella procedural de la carpa de 150×100 (8×5 casillas) sobre el suelo del piso: carpaFuera(8) de 14-render.js (techo, frente negro, puerta de cremallera, rejilla)",
+   "pixellab": {
+    "image_job": "8d0ac16c-8ef4-4a80-b68c-d27f1237ac7f"
+   },
+   "coste_real": 0,
+   "montaje": "Recorte de carpa-g150-fuera (la misma generación): x 0-63 + 96-127; la puerta y su hueco (x 16-31) se conservan. Fuera de la huella (suelo del piso) y los píxeles de madera, transparentes (scratchpad f8/carpas.js).",
+   "depende_de": [
+    "carpa-g150-fuera"
+   ],
+   "notas": "Con el jugador fuera: la carpa cerrada tapa mesas, macetas y focos. Si hay plantas vivas, el motor pinta la luz que se escapa bajo la puerta."
+  },
+  {
+   "id": "carpa-p60",
+   "tipo": "carpa",
+   "fase": "F8",
+   "herramienta": "create_image_pixflux",
+   "cubre": [
+    "misc:carpa-p60"
+   ],
+   "parametros": {
+    "init_image_strength": 80,
+    "view": "high top-down",
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": false,
+    "width": 128,
+    "height": 80
+   },
+   "descripcion": "inside of an open indoor grow tent seen from above, cutaway view for a 16-bit handheld RPG room: silver reflective mylar back wall with a black frame pole along its top, black metal frame poles at the corners, light silver mylar floor sheet, the front wall and right wall are cut down to a low black rail on the floor, wooden plank floor of the room around it, empty tent, no plants, no lamp, crisp detailed pixel art, clean dark outline, light from the top-left",
+   "celda": "carpa_p60",
+   "estado": "aprobado",
+   "familia": "mapa-objeto",
+   "entrada": {
+    "init_image_base64": "art/crudo/_ref/huella-carpa-interior.png"
+   },
+   "entrada_origen": "huella procedural de la carpa de 150×100 (8×5 casillas) sobre el suelo del piso: tiles cp* de 01-tiles.js (pared del fondo y lateral izquierda de mylar, rieles de las paredes quitadas) + tent",
+   "pixellab": {
+    "image_job": "19f3dd91-49ce-4595-947b-c4a9f971274d"
+   },
+   "coste_real": 0,
+   "montaje": "Recorte de carpa-g150 (la misma generación): x 0-31 + 96-127; la puerta y su hueco (x 16-31) se conservan. La pared lateral derecha en perspectiva (x 100-115, filas 2-43) se cambia por la pared del fondo y el suelo de 32 px a la izquierda (el mylar repite cada 32 px): de la derecha queda solo el poste. Fuera de la huella (suelo del piso) y los píxeles de madera, transparentes (scratchpad f8/carpas.js).",
+   "depende_de": [
+    "carpa-g150"
+   ],
+   "notas": "Con el jugador dentro (o en la puerta): sin techo y sin las paredes de delante y de la derecha; el motor la pinta casilla a casilla debajo de las mesas."
+  },
+  {
+   "id": "carpa-p60-fuera",
+   "tipo": "carpa",
+   "fase": "F8",
+   "herramienta": "create_image_pixflux",
+   "cubre": [
+    "misc:carpa-p60-fuera"
+   ],
+   "parametros": {
+    "init_image_strength": 80,
+    "view": "high top-down",
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": false,
+    "width": 128,
+    "height": 80
+   },
+   "descripcion": "closed black indoor grow tent seen from above for a 16-bit handheld RPG room: dark grey fabric roof with silver frame poles along its edges and a round ventilation duct port, tall black fabric front wall with a silver zipper door shaped like an arch on the left and a small mesh vent on the right, silver corner poles, wooden plank floor of the room around it, crisp detailed pixel art, clean dark outline, light from the top-left",
+   "celda": "carpa_p60",
+   "estado": "aprobado",
+   "familia": "mapa-objeto",
+   "entrada": {
+    "init_image_base64": "art/crudo/_ref/huella-carpa-exterior.png"
+   },
+   "entrada_origen": "huella procedural de la carpa de 150×100 (8×5 casillas) sobre el suelo del piso: carpaFuera(8) de 14-render.js (techo, frente negro, puerta de cremallera, rejilla)",
+   "pixellab": {
+    "image_job": "8d0ac16c-8ef4-4a80-b68c-d27f1237ac7f"
+   },
+   "coste_real": 0,
+   "montaje": "Recorte de carpa-g150-fuera (la misma generación): x 0-31 + 96-127; la puerta y su hueco (x 16-31) se conservan. Fuera de la huella (suelo del piso) y los píxeles de madera, transparentes (scratchpad f8/carpas.js).",
+   "depende_de": [
+    "carpa-g150-fuera"
+   ],
+   "notas": "Con el jugador fuera: la carpa cerrada tapa mesas, macetas y focos. Si hay plantas vivas, el motor pinta la luz que se escapa bajo la puerta."
+  },
+  {
+   "id": "macetas",
+   "tipo": "objeto",
+   "fase": "F8",
+   "herramienta": "create_1_direction_object",
+   "cubre": [
+    "misc:maceta-plastico7",
+    "misc:maceta-tela11",
+    "misc:maceta-plastico18",
+    "misc:maceta-tela25"
+   ],
+   "parametros": {
+    "view": "top-down",
+    "item_descriptions": [
+     "small narrow black plastic plant pot filled with dark soil, glossy",
+     "small narrow black plastic plant pot filled with dark soil, glossy",
+     "small narrow black plastic plant pot filled with dark soil, glossy",
+     "small narrow black plastic plant pot filled with dark soil, glossy",
+     "small narrow black plastic plant pot filled with dark soil, glossy",
+     "small narrow black plastic plant pot filled with dark soil, glossy",
+     "small narrow black plastic plant pot filled with dark soil, glossy",
+     "small narrow black plastic plant pot filled with dark soil, glossy",
+     "small narrow black plastic plant pot filled with dark soil, glossy",
+     "small narrow black plastic plant pot filled with dark soil, glossy",
+     "small narrow black plastic plant pot filled with dark soil, glossy",
+     "small narrow black plastic plant pot filled with dark soil, glossy",
+     "medium grey fabric grow bag pot filled with dark soil, soft cloth",
+     "medium grey fabric grow bag pot filled with dark soil, soft cloth",
+     "medium grey fabric grow bag pot filled with dark soil, soft cloth",
+     "medium grey fabric grow bag pot filled with dark soil, soft cloth",
+     "medium grey fabric grow bag pot filled with dark soil, soft cloth",
+     "medium grey fabric grow bag pot filled with dark soil, soft cloth",
+     "medium grey fabric grow bag pot filled with dark soil, soft cloth",
+     "medium grey fabric grow bag pot filled with dark soil, soft cloth",
+     "medium grey fabric grow bag pot filled with dark soil, soft cloth",
+     "medium grey fabric grow bag pot filled with dark soil, soft cloth",
+     "medium grey fabric grow bag pot filled with dark soil, soft cloth",
+     "medium grey fabric grow bag pot filled with dark soil, soft cloth",
+     "large black plastic plant pot filled with dark soil, glossy thick rim",
+     "large black plastic plant pot filled with dark soil, glossy thick rim",
+     "large black plastic plant pot filled with dark soil, glossy thick rim",
+     "large black plastic plant pot filled with dark soil, glossy thick rim",
+     "large black plastic plant pot filled with dark soil, glossy thick rim",
+     "large black plastic plant pot filled with dark soil, glossy thick rim",
+     "large black plastic plant pot filled with dark soil, glossy thick rim",
+     "large black plastic plant pot filled with dark soil, glossy thick rim",
+     "large black plastic plant pot filled with dark soil, glossy thick rim",
+     "large black plastic plant pot filled with dark soil, glossy thick rim",
+     "large black plastic plant pot filled with dark soil, glossy thick rim",
+     "large black plastic plant pot filled with dark soil, glossy thick rim",
+     "big wide tan khaki fabric grow bag pot filled with dark soil, soft cloth with small handles",
+     "big wide tan khaki fabric grow bag pot filled with dark soil, soft cloth with small handles",
+     "big wide tan khaki fabric grow bag pot filled with dark soil, soft cloth with small handles",
+     "big wide tan khaki fabric grow bag pot filled with dark soil, soft cloth with small handles",
+     "big wide tan khaki fabric grow bag pot filled with dark soil, soft cloth with small handles",
+     "big wide tan khaki fabric grow bag pot filled with dark soil, soft cloth with small handles",
+     "big wide tan khaki fabric grow bag pot filled with dark soil, soft cloth with small handles",
+     "big wide tan khaki fabric grow bag pot filled with dark soil, soft cloth with small handles",
+     "big wide tan khaki fabric grow bag pot filled with dark soil, soft cloth with small handles",
+     "big wide tan khaki fabric grow bag pot filled with dark soil, soft cloth with small handles",
+     "big wide tan khaki fabric grow bag pot filled with dark soil, soft cloth with small handles",
+     "big wide tan khaki fabric grow bag pot filled with dark soil, soft cloth with small handles"
+    ]
+   },
+   "entrada": {
+    "style_images": [
+     "art/crudo/_ref/estilo-maceta-16.png"
+    ]
+   },
+   "descripcion": "16-bit handheld pixel-art RPG plant pots filled with dark soil for an indoor grow game, same style and scale as the reference pot, clean dark outline, transparent background",
+   "celda": "planta",
+   "estado": "aprobado",
+   "familia": "objeto-lote",
+   "pixellab": {
+    "object_id": "568d3740-1373-4231-b229-8528302537ca",
+    "reduce_colors_job": "87a02346-2d31-4ba0-9457-0d8e8fbf1b81"
+   },
+   "coste_real": 20,
+   "elegidos": {
+    "maceta-plastico7": {
+     "candidato": 3
+    },
+    "maceta-tela11": {
+     "candidato": 19
+    },
+    "maceta-plastico18": {
+     "candidato": 29
+    },
+    "maceta-tela25": {
+     "candidato": 42
+    }
+   },
+   "descartado": {
+    "herramienta": "create_1_direction_object",
+    "id": "41a55937-8922-4ca5-bbe9-5e5ffb487801",
+    "motivo": "con estilo de 32 px las macetas salen de 16-32 px de ancho: no caben en una plaza de 16"
+   },
+   "notas": "Estilo: la maceta de tela de planta-fases recortada a 16×16 (estilo-maceta-16.png), así salen a escala (10-14 px). En la celda de planta por los pies. El motor quita la maceta de tela de cada fotograma de la planta (los colores de maceta-vacia que no tocan hojas), pinta esta y sube o baja la planta con el borde de la maceta."
+  },
+  {
+   "id": "focos",
+   "tipo": "objeto",
+   "fase": "F8",
+   "herramienta": "create_1_direction_object",
+   "cubre": [
+    "misc:foco-cfl",
+    "misc:foco-sodio",
+    "misc:foco-led"
+   ],
+   "parametros": {
+    "view": "top-down",
+    "item_descriptions": [
+     "small black plastic plant pot filled with dark soil, glossy, narrow",
+     "small black plastic plant pot filled with dark soil, glossy, narrow",
+     "small black plastic plant pot filled with dark soil, glossy, narrow",
+     "small black plastic plant pot filled with dark soil, glossy, narrow",
+     "small black plastic plant pot filled with dark soil, glossy, narrow",
+     "small black plastic plant pot filled with dark soil, glossy, narrow",
+     "grey fabric grow bag pot filled with dark soil, soft cloth with two small handles",
+     "grey fabric grow bag pot filled with dark soil, soft cloth with two small handles",
+     "grey fabric grow bag pot filled with dark soil, soft cloth with two small handles",
+     "grey fabric grow bag pot filled with dark soil, soft cloth with two small handles",
+     "grey fabric grow bag pot filled with dark soil, soft cloth with two small handles",
+     "grey fabric grow bag pot filled with dark soil, soft cloth with two small handles",
+     "large black plastic plant pot filled with dark soil, glossy thick rim, wide",
+     "large black plastic plant pot filled with dark soil, glossy thick rim, wide",
+     "large black plastic plant pot filled with dark soil, glossy thick rim, wide",
+     "large black plastic plant pot filled with dark soil, glossy thick rim, wide",
+     "large black plastic plant pot filled with dark soil, glossy thick rim, wide",
+     "large black plastic plant pot filled with dark soil, glossy thick rim, wide",
+     "big tan khaki fabric grow bag pot filled with dark soil, soft cloth with handles, wide",
+     "big tan khaki fabric grow bag pot filled with dark soil, soft cloth with handles, wide",
+     "big tan khaki fabric grow bag pot filled with dark soil, soft cloth with handles, wide",
+     "big tan khaki fabric grow bag pot filled with dark soil, soft cloth with handles, wide",
+     "big tan khaki fabric grow bag pot filled with dark soil, soft cloth with handles, wide",
+     "big tan khaki fabric grow bag pot filled with dark soil, soft cloth with handles, wide",
+     "compact fluorescent grow lamp: small white reflector dome with three white spiral bulbs below it, hanging, wide and short",
+     "compact fluorescent grow lamp: small white reflector dome with three white spiral bulbs below it, hanging, wide and short",
+     "compact fluorescent grow lamp: small white reflector dome with three white spiral bulbs below it, hanging, wide and short",
+     "compact fluorescent grow lamp: small white reflector dome with three white spiral bulbs below it, hanging, wide and short",
+     "compact fluorescent grow lamp: small white reflector dome with three white spiral bulbs below it, hanging, wide and short",
+     "compact fluorescent grow lamp: small white reflector dome with three white spiral bulbs below it, hanging, wide and short",
+     "compact fluorescent grow lamp: small white reflector dome with three white spiral bulbs below it, hanging, wide and short",
+     "compact fluorescent grow lamp: small white reflector dome with three white spiral bulbs below it, hanging, wide and short",
+     "high pressure sodium grow lamp: wide hammered silver wing reflector with a long glowing orange bulb underneath, hanging, wide and short",
+     "high pressure sodium grow lamp: wide hammered silver wing reflector with a long glowing orange bulb underneath, hanging, wide and short",
+     "high pressure sodium grow lamp: wide hammered silver wing reflector with a long glowing orange bulb underneath, hanging, wide and short",
+     "high pressure sodium grow lamp: wide hammered silver wing reflector with a long glowing orange bulb underneath, hanging, wide and short",
+     "high pressure sodium grow lamp: wide hammered silver wing reflector with a long glowing orange bulb underneath, hanging, wide and short",
+     "high pressure sodium grow lamp: wide hammered silver wing reflector with a long glowing orange bulb underneath, hanging, wide and short",
+     "high pressure sodium grow lamp: wide hammered silver wing reflector with a long glowing orange bulb underneath, hanging, wide and short",
+     "high pressure sodium grow lamp: wide hammered silver wing reflector with a long glowing orange bulb underneath, hanging, wide and short",
+     "LED grow light: flat black rectangular panel with a row of glowing pink and white diodes underneath and cooling fins on top, hanging, wide and thin",
+     "LED grow light: flat black rectangular panel with a row of glowing pink and white diodes underneath and cooling fins on top, hanging, wide and thin",
+     "LED grow light: flat black rectangular panel with a row of glowing pink and white diodes underneath and cooling fins on top, hanging, wide and thin",
+     "LED grow light: flat black rectangular panel with a row of glowing pink and white diodes underneath and cooling fins on top, hanging, wide and thin",
+     "LED grow light: flat black rectangular panel with a row of glowing pink and white diodes underneath and cooling fins on top, hanging, wide and thin",
+     "LED grow light: flat black rectangular panel with a row of glowing pink and white diodes underneath and cooling fins on top, hanging, wide and thin",
+     "LED grow light: flat black rectangular panel with a row of glowing pink and white diodes underneath and cooling fins on top, hanging, wide and thin",
+     "LED grow light: flat black rectangular panel with a row of glowing pink and white diodes underneath and cooling fins on top, hanging, wide and thin"
+    ]
+   },
+   "entrada": {
+    "style_images": [
+     "art/procesado/planta-fases/maceta-vacia/unica/00.png"
+    ]
+   },
+   "descripcion": "16-bit handheld pixel-art RPG props for an indoor grow game: plant pots filled with soil and hanging grow lamps, same style and scale as the reference pot, clean dark outline, transparent background",
+   "celda": "foco",
+   "estado": "aprobado",
+   "familia": "objeto-lote",
+   "pixellab": {
+    "object_id": "41a55937-8922-4ca5-bbe9-5e5ffb487801",
+    "reduce_colors_job": "fd3e2577-ba7c-49e8-9380-55e19d0ea3dc"
+   },
+   "coste_real": 20,
+   "elegidos": {
+    "foco-cfl": {
+     "candidato": 31
+    },
+    "foco-sodio": {
+     "candidato": 33
+    },
+    "foco-led": {
+     "candidato": 45
+    }
+   },
+   "notas": "Un foco por cada 2 plazas que cubre (como mucho las de la carpa). Con el jugador dentro de la carpa se pintan al 60 % de opacidad, con su cable hasta el techo quitado y un cono de luz (naranja el sodio, rosa el LED, blanco el CFL) si hay alguna planta viva. Las macetas de esta llamada salieron demasiado grandes (ver macetas)."
+  },
+  {
+   "id": "mesa-cultivo",
+   "tipo": "objeto",
+   "fase": "F8",
+   "herramienta": "create_1_direction_object",
+   "cubre": [
+    "obj:mesa"
+   ],
+   "parametros": {
+    "view": "top-down",
+    "item_descriptions": [
+     "small square wooden table with four short legs, flat top seen from above at a slight angle, fills the whole width",
+     "small square wooden table with four short legs, flat top seen from above at a slight angle, fills the whole width",
+     "small square wooden table with four short legs, flat top seen from above at a slight angle, fills the whole width",
+     "small square wooden table with four short legs, flat top seen from above at a slight angle, fills the whole width",
+     "small square wooden table with four short legs, flat top seen from above at a slight angle, fills the whole width",
+     "small square wooden table with four short legs, flat top seen from above at a slight angle, fills the whole width",
+     "small square wooden table with four short legs, flat top seen from above at a slight angle, fills the whole width",
+     "small square wooden table with four short legs, flat top seen from above at a slight angle, fills the whole width",
+     "low wooden plant stand bench, flat rectangular top and two pairs of legs, fills the whole width",
+     "low wooden plant stand bench, flat rectangular top and two pairs of legs, fills the whole width",
+     "low wooden plant stand bench, flat rectangular top and two pairs of legs, fills the whole width",
+     "low wooden plant stand bench, flat rectangular top and two pairs of legs, fills the whole width",
+     "low wooden plant stand bench, flat rectangular top and two pairs of legs, fills the whole width",
+     "low wooden plant stand bench, flat rectangular top and two pairs of legs, fills the whole width",
+     "low wooden plant stand bench, flat rectangular top and two pairs of legs, fills the whole width",
+     "low wooden plant stand bench, flat rectangular top and two pairs of legs, fills the whole width",
+     "small grey metal grow table with a white plastic tray on top and thin legs, fills the whole width",
+     "small grey metal grow table with a white plastic tray on top and thin legs, fills the whole width",
+     "small grey metal grow table with a white plastic tray on top and thin legs, fills the whole width",
+     "small grey metal grow table with a white plastic tray on top and thin legs, fills the whole width",
+     "small grey metal grow table with a white plastic tray on top and thin legs, fills the whole width",
+     "small grey metal grow table with a white plastic tray on top and thin legs, fills the whole width",
+     "small grey metal grow table with a white plastic tray on top and thin legs, fills the whole width",
+     "small grey metal grow table with a white plastic tray on top and thin legs, fills the whole width"
+    ]
+   },
+   "entrada": {
+    "style_images": [
+     "art/procesado/props-16/table/unica/00.png"
+    ]
+   },
+   "descripcion": "small 16-bit indoor props for a handheld pixel-art RPG, same style as the reference table, clean dark outline, transparent background",
+   "celda": "objeto_1x1",
+   "estado": "aprobado",
+   "familia": "objeto-lote",
+   "pixellab": {
+    "object_id": "1c7ff1cb-6f4b-4d98-8d3d-df7fba0f26dc",
+    "reduce_colors_job": "1000ca5c-c2a6-40ad-b9fa-d5965b794c91"
+   },
+   "coste_real": 20,
+   "elegidos": {
+    "mesa": {
+     "candidato": 3
+    }
+   },
+   "notas": "Una mesa por plaza en la fila de las mesas de cada carpa; la maceta se apoya en el tablero (MESA_ALTO = 6 px)."
+  },
+  {
    "id": "edificio-home",
    "tipo": "edificio",
    "fase": "F4",
@@ -4324,46 +4829,6 @@
     "map_object_id": "9dc1a027-cec4-46b3-92e8-d73ab59ea743"
    },
    "coste_real": 2
-  },
-  {
-   "id": "carpa-cultivo",
-   "tipo": "objeto",
-   "fase": "F4",
-   "herramienta": "create_image_pixflux",
-   "cubre": [],
-   "parametros": {
-    "init_image_strength": 60,
-    "view": "high top-down",
-    "outline": "single color black outline",
-    "shading": "medium shading",
-    "detail": "highly detailed",
-    "no_background": false,
-    "seed": 438,
-    "width": 64,
-    "height": 112
-   },
-   "descripcion": "open indoor grow tent seen from above for a 16-bit handheld RPG room, black metal frame poles at the corners, silver reflective mylar walls, a rectangular LED grow light panel hanging above the top edge with glowing yellow-white diodes, light silver floor inside, detailed crisp pixel art, clean dark outline, light from the top-left",
-   "celda": "carpa",
-   "notas": "Sustituye al marco dibujado por código en renderWorld (casa). Por encima del marco (y<17) el fondo liso se vuelve transparente por relleno desde los bordes; el interior plateado se queda opaco y las macetas se pintan encima. La primera versión era una carpa vista de frente (pared trasera de 2/3 de alto): las macetas de arriba parecían colgadas de la pared.",
-   "estado": "aprobado",
-   "familia": "mapa-objeto",
-   "entrada": {
-    "init_image_base64": "art/crudo/_ref/huella-carpa.png"
-   },
-   "depende_de": [
-    "interior-home"
-   ],
-   "descartado": {
-    "herramienta": "create_map_object",
-    "id": "44f29671-73e9-4e03-a3fd-9acf6c8ae8e7",
-    "motivo": "forma rara (lámpara en cúpula y cortina negra justo donde van las macetas)"
-   },
-   "entrada_origen": "huella dibujada por script: marco, pared trasera de mylar, panel LED colgado y suelo con el tile tent",
-   "pixellab": {
-    "image_job": "64d4150e-bb3a-47d4-bd54-fbfe7c9be36c"
-   },
-   "coste_real": 2,
-   "montaje": "Vista desde arriba: del pixflux se conservan el panel LED, las cadenas, el marco, la franja de pared trasera (filas 20-31) y las paredes laterales (7 px); el interior se vacía para que se vea el suelo de mylar (tile tent) y las macetas apoyen en el suelo. Pie de pared: 1 px gris en la fila 32. Se ensancha de 64 a 72 px repitiendo el par de columnas 30-31 (la rejilla de diodos es un damero), para que las macetas de las columnas 7 y 9 queden dentro del marco."
   },
   {
    "id": "planta-fases",
@@ -5072,6 +5537,11 @@
   {
    "herramienta": "*_pro_flash",
    "motivo": "Alternativa de pago por imagen a create_character/objetos; no mejora a 16-32 px."
+  },
+  {
+   "herramienta": "create_image_pixflux (carpa-cultivo, 1.5)",
+   "motivo": "Una sola carpa abierta de 64×112 con el panel LED pintado encima. En la 1.6 hay carpas de 3 tamaños, cerradas desde fuera y abiertas por dentro, con focos y macetas aparte: carpa-p60/m100/g150 (+ -fuera), focos, macetas y mesa-cultivo.",
+   "id": "64d4150e-bb3a-47d4-bd54-fbfe7c9be36c"
   }
  ],
  "lotes": {

@@ -25,7 +25,8 @@ const lote = a => {
   switch (a.herramienta) {
     case 'create_character': return p.mode === 'standard' ? `${p.n_directions} direcciones, ${p.size} px` : `${p.mode}: 8 direcciones, ${p.size} px`;
     case 'create_1_direction_object': {
-      const n = (p.item_descriptions || []).length, sz = p.size || 16, cand = sz <= 42 ? 64 : sz <= 85 ? 16 : sz <= 170 ? 4 : 1;
+      const est = ((a.entrada || {}).style_images || []).map(f => { try { const i = require('pngjs').PNG.sync.read(require('fs').readFileSync(require('path').join(__dirname, '..', '..', f))); return Math.max(i.width, i.height); } catch (e) { return 0; } });
+      const n = (p.item_descriptions || []).length, sz = p.size || Math.max(16, ...est), cand = sz <= 42 ? 64 : sz <= 85 ? 16 : sz <= 170 ? 4 : 1;
       if (a.lote) { const as = M.assets.filter(b => b.lote === a.lote), tot = as.reduce((s, b) => s + ((b.parametros || {}).item_descriptions || []).length, 0);
         return `${n} objetos · **comparte ${a.lote}** (${tot} objetos de ${as.length} assets en 1 llamada de ${cand} candidatos a ${sz} px)`; }
       return `${n} objetos en 1 llamada (${cand} candidatos a ${sz} px)`; }

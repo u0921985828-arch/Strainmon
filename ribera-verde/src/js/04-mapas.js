@@ -19,7 +19,7 @@ function buildMaps(){
   for(let y=0;y<30;y++){ob(m,0,y,'tree');ob(m,39,y,'tree');}
   [[3,2],[10,2],[12,2],[22,2],[31,2],[36,2]].forEach(([x,y])=>gr(m,x,y,'flowers'));
   for(let x=1;x<39;x++){gr(m,x,9,'walk');gr(m,x,10,'roadT');gr(m,x,11,'roadB');gr(m,x,12,'walk');}
-  building(m,'home',2,3,7,6,5,{to:'home',x:5,y:8,dir:'up'});
+  building(m,'home',2,3,7,6,5,{to:'home',x:5,y:10,dir:'up'});
   building(m,'shop',14,3,7,6,17,{to:'shop',x:4,y:6,dir:'up'});
   building(m,'bar',23,3,7,6,26,{to:'bar',x:4,y:6,dir:'up'});
   building(m,'gray',32,3,6,6,null);
@@ -48,13 +48,13 @@ function buildMaps(){
   ob(m,38,17,'crate');ob(m,38,18,'crate');ob(m,34,25,'crate');
 
   // ---------- HOME ----------
-  const h=newMap('home',12,10,'floor');h.music='home';
-  rect(h,0,0,11,0,(x,y)=>gr(h,x,y,'iwT_home'));rect(h,0,1,11,1,(x,y)=>gr(h,x,y,'iwB_home'));
-  ob(h,2,1,'iwin');ob(h,9,1,'iwin');ob(h,6,1,'poster');
+  // las carpas (montarCasa) van al fondo, a la derecha: A en x 7-10 y B en x 12-19, filas 2-6
+  const h=newMap('home',20,12,'floor');h.music='home';
+  rect(h,0,0,19,0,(x,y)=>gr(h,x,y,'iwT_home'));rect(h,0,1,19,1,(x,y)=>gr(h,x,y,'iwB_home'));
+  ob(h,2,1,'iwin');ob(h,11,1,'iwin');ob(h,6,1,'poster');
   ob(h,1,2,'bedT');ob(h,1,3,'bedB');ob(h,3,2,'pc');ob(h,4,2,'lab');ob(h,5,2,'lab2');
-  ob(h,3,6,'table');ob(h,1,7,'fridge');ob(h,11,2,'plantDeco');ob(h,0,8,'plantDeco');
-  rect(h,7,3,10,8,(x,y)=>gr(h,x,y,'tent'));
-  gr(h,5,9,'mat');h.exits['5,9']={to:'town',x:5,y:9,dir:'down'};
+  ob(h,3,6,'table');ob(h,1,7,'fridge');ob(h,11,2,'plantDeco');ob(h,0,8,'plantDeco');ob(h,19,10,'plantDeco');
+  gr(h,5,11,'mat');h.exits['5,11']={to:'town',x:5,y:9,dir:'down'};
   // ---------- SHOP ----------
   const s=newMap('shop',10,8,'floorS');s.music='home';
   rect(s,0,0,9,0,(x,y)=>gr(s,x,y,'iwT_shop'));rect(s,0,1,9,1,(x,y)=>gr(s,x,y,'iwB_shop'));
@@ -70,7 +70,25 @@ function buildMaps(){
   ob(b,7,5,'btable');ob(b,9,2,'jukebox');ob(b,8,2,'btable');
   gr(b,4,7,'mat');b.exits['4,7']={to:'town',x:26,y:9,dir:'down'};
 }
-const POTS=[[7,4],[9,4],[7,6],[9,6],[7,8],[9,8]];
+// carpas del piso según S.carpas: paredes (cp*, sólidas salvo la puerta), suelo de mylar (tent) y una mesa por plaza.
+// Filas: y0-y0+1 pared del fondo · y0+2 mesas · y0+3 pasillo · y0+4 pared de delante con la puerta en x0+1.
+function montarCasa(){
+  const h=MAPS.home;if(!h||!S)return;
+  const key=S.carpas.map(c=>c?c.t:'-').join();if(h.carpasK===key)return;h.carpasK=key;
+  SITIOS.forEach(s=>rect(h,s.x,s.y,s.x+s.w-1,s.y+4,(x,y)=>{gr(h,x,y,'floor');ob(h,x,y,null);}));
+  h.carpas=[];
+  S.carpas.forEach((c,ci)=>{
+    if(!c)return;const s=SITIOS[ci],x0=s.x,y0=s.y,x1=x0+CARPAS[c.t].w-1,y1=y0+4,door=x0+1;
+    for(let x=x0;x<=x1;x++){const e=x===x0?'L':x===x1?'R':'';
+      gr(h,x,y0,'cpT'+e);gr(h,x,y0+1,'cpM'+e);gr(h,x,y1,x===door?'cpPuerta':'cpB'+e);}
+    for(let y=y0+2;y<y1;y++){gr(h,x0,y,'cpL');gr(h,x1,y,'cpR');for(let x=x0+1;x<x1;x++)gr(h,x,y,'tent');}
+    for(let x=x0+1;x<x1;x++)ob(h,x,y0+2,'mesa');
+    h.carpas.push({ci,t:c.t,x0,y0,x1,y1,door});
+  });
+}
+const sitioLibre=(x,y)=>SITIOS.some((s,ci)=>!S.carpas[ci]&&x>=s.x&&x<s.x+6&&y>=s.y&&y<=s.y+4);
+// ¿el jugador está dentro de la carpa t (o en su puerta)? Entonces se ve por dentro, sin techo ni las paredes de delante y derecha
+const dentroCarpa=t=>(P.x>t.x0&&P.x<t.x1&&P.y>=t.y0+2&&P.y<t.y1)||(P.x===t.door&&P.y===t.y1);
 let CLIENT_TILES=[];
 function computeClientTiles(){
   const m=MAPS.town;CLIENT_TILES=[];

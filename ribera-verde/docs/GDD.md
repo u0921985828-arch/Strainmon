@@ -12,7 +12,7 @@ Todas las cifras están sacadas del código de `src/js`. Si cambias un número a
 
 ## 2. Bucle principal
 
-Plantar → cuidar (agua, abono, plagas) → cosechar (gramos + semillas) → vender en la calle (dinero, calor, reputación) → pagar plazos e invertir (macetas, LED, semillas) → cruzar variedades más potentes → Copa → libertad.
+Plantar → cuidar (agua, abono, plagas) → cosechar (gramos + semillas) → vender en la calle (dinero, calor, reputación) → pagar plazos e invertir (carpas, focos, macetas, semillas) → cruzar variedades más potentes → Copa → libertad.
 
 ## 3. Tiempo
 
@@ -33,16 +33,47 @@ Plantar → cuidar (agua, abono, plagas) → cosechar (gramos + semillas) → ve
 | Lista | 100 % |
 
 - Al plantar: agua 70 %, salud 100 %. Se gasta 1 semilla.
-- **Agua:** −3,5 puntos por hora. Regar la pone al 100 %.
-- **Crecimiento por hora:** `1 / (días × 24)`. Se multiplica ×0,4 con agua < 20 %, ×0 sin agua, ×1,1 con abono y ×1,1 con LED.
+- **Agua:** −3,5 × `riego` puntos por hora (foco × maceta). Regar la pone al 100 %.
+- **Crecimiento por hora:** `1 / (días × 24) × crec`. Se multiplica ×0,4 con agua < 20 %, ×0 sin agua y ×1,1 con abono; `crec` sale del foco y de la maceta (ver «Equipo»).
 - **Salud:** −4/h sin agua y −2,5/h con plaga; +1/h con agua > 30 % y sin plaga. A 0 la planta muere.
-- **Plaga** (araña roja, puntos rojos en las hojas): probabilidad por hora `0,006 × (100 − resistencia) / 40` mientras la planta no está lista. Se quita con insecticida.
+- **Plaga** (araña roja, puntos rojos en las hojas): probabilidad por hora `0,006 × (100 − resistencia) / 40` (×0,8 en maceta de tela) mientras la planta no está lista. Se quita con insecticida.
 - **Abono:** una dosis por planta. Da +25 % de cosecha, +10 % de velocidad y +0,3 de THC.
-- **LED** (500 €, una vez): +30 % de cosecha, +10 % de velocidad y +0,5 de THC.
-- **Cosecha:** `g = rinde × (0,4 + 0,6 × salud/100) × abono 1,25 × LED 1,3`.
-- **THC final:** `THC × (0,85 + 0,15 × salud/100) + 0,5 (LED) + 0,3 (abono)`.
+- **Cosecha:** `g = rinde × (0,4 + 0,6 × salud/100) × abono 1,25 × rend`.
+- **THC final:** `THC × (0,85 + 0,15 × salud/100) + thc (foco) + 0,3 (abono)`.
 - **Semillas al cosechar:** entre 1 y 3.
-- **Macetas:** empiezas con 2 y puedes llegar a 6 (150 € cada una, desde el capítulo 2).
+
+### Equipo (1.6): carpas, focos y macetas
+
+El cultivo va en carpas dentro del piso. Desde fuera se ven cerradas (techo, frente negro y puerta de cremallera); al entrar desaparecen el techo y las paredes de delante y de la derecha, se ven la pared del fondo y la izquierda, una mesa por plaza con su maceta y los focos colgando medio transparentes. Con plantas vivas el foco está encendido (cono de luz y una línea de luz bajo la puerta).
+
+| Carpa | Plazas | Foco máximo | Maceta máxima | Cómo se consigue |
+|---|---|---|---|---|
+| Armario 60×60 | 2 | 250 W | 11 L | el de la tía (con un CFL y macetas de plástico de 7 L) |
+| Carpa 100×100 | 4 | 480 W | 25 L | growshop, 450 €, desde el capítulo 2 (trae CFL y macetas de 7 L) |
+| Carpa 150×100 | 6 | 720 W | 25 L | growshop, 900 €, desde el capítulo 4: sustituye a la de 100 (se quedan plantas, foco y macetas) |
+
+| Foco | W | Cubre | Cosecha | Crece | THC | Riego | Precio |
+|---|---|---|---|---|---|---|---|
+| CFL 125 W | 125 | 2 | — | — | — | ×1 | de serie |
+| Sodio 250 W | 250 | 2 | +25 % | +5 % | +0,3 | ×1,3 | 120 € (cap. 2) |
+| Sodio 400 W | 400 | 4 | +35 % | +5 % | +0,5 | ×1,4 | 220 € (cap. 3) |
+| Sodio 600 W | 600 | 6 | +45 % | +5 % | +0,7 | ×1,5 | 350 € (cap. 4) |
+| LED 200 W | 200 | 2 | +30 % | +10 % | +0,6 | ×1,05 | 260 € (cap. 2) |
+| LED 480 W | 480 | 4 | +45 % | +10 % | +1,0 | ×1,1 | 600 € (cap. 3) |
+| LED 720 W | 720 | 6 | +60 % | +15 % | +1,4 | ×1,15 | 1000 € (cap. 5) |
+
+| Maceta | Cosecha | Crece | Riego | Plagas | Precio |
+|---|---|---|---|---|---|
+| Plástico 7 L | — | — | ×1 | ×1 | de serie |
+| Tela 11 L | +15 % | +5 % | ×1,25 | ×0,8 | 20 € (cap. 1) |
+| Plástico 18 L | +25 % | −5 % | ×0,8 | ×1 | 30 € (cap. 2) |
+| Tela 25 L | +40 % | — | ×1,1 | ×0,8 | 45 € (cap. 3) |
+
+- **Cobertura:** `cob = min(1, cubre / plazas)`. `rend = (1 + (foco.cosecha − 1) × cob) × (0,6 + 0,4 × cob) × maceta.cosecha`; `crec = foco.crece × (0,85 + 0,15 × cob) × maceta.crece`; `thc = foco.thc × cob`; `riego = foco.riego × maceta.riego`. Un foco pequeño en una carpa grande no llega a todas las plantas y rinden menos que con el CFL bien puesto.
+- **Límites:** el foco no puede pasar de los vatios de la carpa (calor) y la maceta, de sus litros.
+- **Cambiar:** las macetas, en una plaza vacía (A en la mesa → «Cambiar maceta»); los focos, desde la pared de la carpa (A → «Cambiar foco») o al comprarlos («¿Lo cuelgo ya?»). Lo que se quita va a la mochila.
+- **Factura de la luz:** cada día, `vatios × 0,02 €` por cada carpa con alguna planta viva (las vacías van apagadas).
+- Lo de serie (CFL en el armario y macetas de 7 L) da exactamente el cultivo de antes de la 1.6.
 
 ## 5. Genética
 

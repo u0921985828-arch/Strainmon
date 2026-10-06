@@ -20,7 +20,7 @@ RPG de cultivo en pixel art, con pantalla de 240 × 160 al estilo de las portát
 
 ## Qué incluye
 
-- **Cultivo:** de 2 a 6 macetas, riego, abono, plagas, cinco fases de crecimiento y lámpara LED. La cosecha da gramos con su % de THC y semillas.
+- **Cultivo:** carpas en el piso (el armario de 60 con 2 plantas, la de 100 con 4 y la de 150 con 6), cerradas por fuera y abiertas al entrar; mesas, macetas de plástico o de tela de 7 a 25 L, focos CFL, sodio y LED de 125 a 720 W con su cobertura y su factura de la luz; riego, abono, plagas y cinco fases de crecimiento. La cosecha da gramos con su % de THC y semillas.
 - **Genética:** mesa de cruces y Genoteca con 23 variedades: 6 del growshop, 4 landraces (una te la da Kiko y tres se consiguen por el barrio) y 13 que salen de cruces, entre ellas la legendaria *Leyenda de la Ría*. Los cruces sin receta generan híbridos propios.
 - **Calle:** clientes con `$` (estudiante, currela, turista y pijo) a los que les pides precio de rebaja, justo o caro. Cada venta sube el **calor policial** y a 90 llega una redada.
 - **Combates por turnos:** contra ladrones (luchar, mochila, hablar, huir) y contra la policía (sobornar, hablar, huir, entregar).

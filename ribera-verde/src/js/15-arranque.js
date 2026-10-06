@@ -4,7 +4,16 @@
 const SAVE_KEY='riberaVerde_v1';
 function save(){try{S.x=P.x;S.y=P.y;S.dir=P.dir;localStorage.setItem(SAVE_KEY,JSON.stringify(S));return true;}catch(e){return false;}}
 function loadSave(){try{const t=localStorage.getItem(SAVE_KEY);return t?JSON.parse(t):null;}catch(e){return null;}}
-function migrate(){const d=newState();for(const k in d)if(!(k in S))S[k]=d[k];for(const k in d.items)if(!(k in S.items))S.items[k]=0;}
+function migrate(){
+  if(!S.carpas){   // partidas de antes de la 1.6: macetas extra → carpa de 100; lámpara LED → LED en cada carpa; plantas, en el mismo orden
+    S.carpas=[{t:'p60',foco:S.led?'led200':'cfl'}];if((S.potsOwned||2)>2)S.carpas[1]={t:'m100',foco:S.led?'led480':'cfl'};
+    const n=S.carpas.reduce((a,c)=>a+CARPAS[c.t].plazas,0),old=S.pots||[];
+    S.pots=Array.from({length:n},(_,i)=>i<(S.potsOwned||2)?old[i]||null:null);S.macetas=Array(n).fill('plastico7');
+    delete S.potsOwned;delete S.led;
+  }
+  const d=newState();for(const k in d)if(!(k in S))S[k]=d[k];for(const k in d.items)if(!(k in S.items))S.items[k]=0;
+  const n=huecos().length;while(S.pots.length<n)S.pots.push(null);while(S.macetas.length<n)S.macetas.push('plastico7');
+}
 function showTitle(){mode='title';$('title').hidden=false;updateHUD();music('title');}
 async function titlePress(b){
   if((b!=='A'&&b!=='START')||lock)return;lock++;
@@ -32,7 +41,11 @@ async function newGame(){
   await fade(1);enterGame();await wait(300);await fade(0);
   await chapter(1);await wait(2600);showObjective();
 }
-function enterGame(){mode='world';enterMap(S.map,S.x,S.y,S.dir);if(S.clientsDay!==S.day)spawnClients();updateHUD();}
+function enterGame(){
+  mode='world';enterMap(S.map,S.x,S.y,S.dir);
+  if(tileSolid(MAPS[S.map],P.x,P.y))enterMap(S.map,...(S.map==='home'?[2,4]:[5,9]),'down');   // partidas viejas: la casilla puede ser ahora una carpa
+  if(S.clientsDay!==S.day)spawnClients();updateHUD();
+}
 function update(dt){
   if(mode==='world'&&S){
     updatePlayer(dt);updateEnts(dt);

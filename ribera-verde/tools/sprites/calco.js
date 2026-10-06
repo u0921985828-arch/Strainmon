@@ -123,9 +123,12 @@ for (const a of M.assets) {
     if (doorX != null) for (let i = 0; i < 4; i++) { const p = blank(32, 32); copy(o, p, 0, 0, doorX * 16 - 8, (h - 2) * 16, 32, 32);
       for (let y = 0; y < 13; y++) for (let x = 0; x < Math.min(10, i * 4); x++) dot(p, 11 + x, 18 + y, '#26262e'); wr(a.id, 'puerta', 'unica', i, p); }
   }
-  // ---------- objetos ----------
+  // ---------- carpas (1.6): la huella entera, por dentro o cerrada ----------
+  if (a.tipo === 'carpa') for (const c of a.cubre || []) { const k = c.slice(5); if (has(`misc/${k}.png`)) wr(a.id, 'base', 'unica', 0, rd(`misc/${k}.png`)); }
+  // ---------- objetos (y macetas y focos, que van como misc:) ----------
   if (a.tipo === 'objeto') {
-    for (const c of a.cubre || []) { const k = c.slice(4); if (has(`objetos/${k}.png`)) wr(a.id, k, 'unica', 0, rd(`objetos/${k}.png`)); }
+    for (const c of a.cubre || []) { if (c.startsWith('misc:')) { const k = c.slice(5); if (has(`misc/${k}.png`)) wr(a.id, k, 'unica', 0, rd(`misc/${k}.png`)); continue; }
+      const k = c.slice(4); if (has(`objetos/${k}.png`)) wr(a.id, k, 'unica', 0, rd(`objetos/${k}.png`)); }
     for (const an of a.animaciones || []) { const k = (an.sobre || '').slice(4); if (!has(`objetos/${k}.png`)) continue;
       for (let i = 0; i < (an.frames || 4); i++) { const o = rd(`objetos/${k}.png`); if (an.nombre === 'luces') dot(o, 4 + (i % 4) * 2, 4, ['#e04040', '#f0d070', '#58d080', '#4a92e0'][i % 4]); wr(a.id, an.nombre, 'unica', i, o); } }
   }

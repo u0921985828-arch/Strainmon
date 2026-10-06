@@ -1,0 +1,25 @@
+{
+  "grupo": "macetas",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 4,
+  "fotogramas": 4,
+  "semitransparentes": 0,
+  "en_paleta_antes": 2.3,
+  "distancia_media": 14.93,
+  "colores_finales": 15,
+  "fundidos": [
+    "maceta-plastico18: #0e1a12→#18181c",
+    "maceta-plastico18: #18181c→#181822",
+    "maceta-tela11: #d8d8d8→#9a9aa4",
+    "maceta-tela11: #5a6070→#5a5e68",
+    "maceta-tela11: #4c5560→#4a515c",
+    "maceta-tela11: #18181c→#1a1a1a"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

@@ -1,6 +1,6 @@
 {
  "generado": "tools/sprites/catalogo.js",
- "claves": 124,
+ "claves": 138,
  "catalogo": {
   "look:player": [
    {
@@ -593,6 +593,146 @@
     "familia": "mapa-terreno",
     "herramienta": "create_tiles_pro",
     "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "misc:carpa-g150": [
+   {
+    "asset": "carpa-g150",
+    "familia": "mapa-objeto",
+    "herramienta": "create_image_pixflux",
+    "fase": "F8",
+    "depende_de": [
+     "interior-home",
+     "tiles-interior-extra"
+    ]
+   }
+  ],
+  "misc:carpa-g150-fuera": [
+   {
+    "asset": "carpa-g150-fuera",
+    "familia": "mapa-objeto",
+    "herramienta": "create_image_pixflux",
+    "fase": "F8",
+    "depende_de": [
+     "interior-home",
+     "tiles-interior-extra"
+    ]
+   }
+  ],
+  "misc:carpa-m100": [
+   {
+    "asset": "carpa-m100",
+    "familia": "mapa-objeto",
+    "herramienta": "create_image_pixflux",
+    "fase": "F8",
+    "depende_de": [
+     "carpa-g150"
+    ]
+   }
+  ],
+  "misc:carpa-m100-fuera": [
+   {
+    "asset": "carpa-m100-fuera",
+    "familia": "mapa-objeto",
+    "herramienta": "create_image_pixflux",
+    "fase": "F8",
+    "depende_de": [
+     "carpa-g150-fuera"
+    ]
+   }
+  ],
+  "misc:carpa-p60": [
+   {
+    "asset": "carpa-p60",
+    "familia": "mapa-objeto",
+    "herramienta": "create_image_pixflux",
+    "fase": "F8",
+    "depende_de": [
+     "carpa-g150"
+    ]
+   }
+  ],
+  "misc:carpa-p60-fuera": [
+   {
+    "asset": "carpa-p60-fuera",
+    "familia": "mapa-objeto",
+    "herramienta": "create_image_pixflux",
+    "fase": "F8",
+    "depende_de": [
+     "carpa-g150-fuera"
+    ]
+   }
+  ],
+  "misc:maceta-plastico7": [
+   {
+    "asset": "macetas",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F8",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-tela11": [
+   {
+    "asset": "macetas",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F8",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-plastico18": [
+   {
+    "asset": "macetas",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F8",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-tela25": [
+   {
+    "asset": "macetas",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F8",
+    "depende_de": []
+   }
+  ],
+  "misc:foco-cfl": [
+   {
+    "asset": "focos",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F8",
+    "depende_de": []
+   }
+  ],
+  "misc:foco-sodio": [
+   {
+    "asset": "focos",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F8",
+    "depende_de": []
+   }
+  ],
+  "misc:foco-led": [
+   {
+    "asset": "focos",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F8",
+    "depende_de": []
+   }
+  ],
+  "obj:mesa": [
+   {
+    "asset": "mesa-cultivo",
+    "familia": "objeto-lote",
+    "herramienta": "create_1_direction_object",
+    "fase": "F8",
     "depende_de": []
    }
   ],

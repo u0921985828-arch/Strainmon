@@ -1,0 +1,18 @@
+{
+  "grupo": "carpa-p60-fuera",
+  "celda": [
+    64,
+    80
+  ],
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 5.38,
+  "colores_finales": 8,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

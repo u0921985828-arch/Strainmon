@@ -4,7 +4,7 @@
 
 Leyenda: `.` suelo/hierba · `*` flores · `"` hierba alta (ladrones ×3, a cualquier hora) · `:` tierra · `-` acera · `=` carretera · `+` plaza · `~` agua · `H` puente · `#` muelle
 `^` tejado · `█` pared/ventana · `D` puerta · `T` árbol · `b` arbusto · `$` arbusto con objeto oculto · `i` objeto en el suelo · `f` valla · `S` cartel · `L` farola · `n` banco · `O` fuente · `c` cajas · `@` personaje
-Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F` nevera · `o` suelo del armario · `1-6` macetas · `C` mostrador · `s` estantería · `d` expositor · `x` taburete · `J` gramola · `v` ventana/póster · `m` felpudo (salida)
+Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F` nevera · `▒` pared de la carpa · `z` puerta de la carpa · `o` suelo de la carpa · `1-8` plazas (mesa + maceta; 1-2 el armario de 60, 3-8 la carpa de 150) · `C` mostrador · `s` estantería · `d` expositor · `x` taburete · `J` gramola · `v` ventana/póster · `m` felpudo (salida)
 
 ## Barrio (exterior) — 40 × 30
 
@@ -43,28 +43,30 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 29  TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 ```
 
-- puerta (5,8) → home (5,8)
+- puerta (5,8) → home (5,10)
 - puerta (17,8) → shop (4,6)
 - puerta (26,8) → bar (4,6)
 
-## Piso de la tía Maite — 12 × 10
+## Piso de la tía Maite — 20 × 12 (con el armario de 60 y la carpa de 150)
 
 ```
-    0         1 
-    012345678901
- 0  ████████████
- 1  ██v███v██v██
- 2  .B.PGG.....p
- 3  .B.....oooo.
- 4  .......1o2o.
- 5  .......oooo.
- 6  ...t...3o4o.
- 7  .F.....oooo.
- 8  p......5o6o.
- 9  .....m......
+    0         1         
+    01234567890123456789
+ 0  ████████████████████
+ 1  ██v███v████v████████
+ 2  .B.PGG.▒▒▒▒p▒▒▒▒▒▒▒▒
+ 3  .B.....▒▒▒▒.▒▒▒▒▒▒▒▒
+ 4  .......▒12▒.▒345678▒
+ 5  .......▒oo▒.▒oooooo▒
+ 6  ...t...▒z▒▒.▒z▒▒▒▒▒▒
+ 7  .F..................
+ 8  p...................
+ 9  ....................
+10  ...................p
+11  .....m..............
 ```
 
-- salida (5,9) pulsando abajo → town (5,9)
+- salida (5,11) pulsando abajo → town (5,9)
 
 ## Growshop Kiko — 10 × 8
 
@@ -154,5 +156,14 @@ Los **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acer
 | Insecticida | 20 € | 1 | Elimina una plaga de araña roja. |
 | Bocata | 6 € | 1 | Recupera 15 de vida. En combate o desde la mochila. |
 | Spray de pimienta | 25 € | 2 | En combate: 12-16 de daño seguro a un ladrón. |
-| Maceta extra | 150 € | 2 | Una maceta más en el armario (máximo 6). |
-| Lámpara LED | 500 € | 3 | +30% de cosecha y algo más de THC. Para siempre. |
+| Maceta de tela 11 L | 20 € | 1 | 11 L · cosecha +15% · crece +5% · riego ×1,25 · menos plagas · Se cambia en una plaza vacía de la carpa. |
+| Maceta de plástico 18 L | 30 € | 2 | 18 L · cosecha +25% · crece −5% · riego ×0,8 · Se cambia en una plaza vacía de la carpa. |
+| Maceta de tela 25 L | 45 € | 3 | 25 L · cosecha +40% · riego ×1,1 · menos plagas · Se cambia en una plaza vacía de la carpa. |
+| Foco sodio 250 W | 120 € | 2 | 250 W · cubre 2 plantas · cosecha +25% · crece +5% · THC +0,3 · riego ×1,3 · Luz: 5 € al día con plantas. · Aguanta en carpas de 60, 100 y 150. |
+| Foco LED 200 W | 260 € | 2 | 200 W · cubre 2 plantas · cosecha +30% · crece +10% · THC +0,6 · riego ×1,05 · Luz: 4 € al día con plantas. · Aguanta en carpas de 60, 100 y 150. |
+| Foco sodio 400 W | 220 € | 3 | 400 W · cubre 4 plantas · cosecha +35% · crece +5% · THC +0,5 · riego ×1,4 · Luz: 8 € al día con plantas. · Aguanta en carpas de 100 y 150. |
+| Foco LED 480 W | 600 € | 3 | 480 W · cubre 4 plantas · cosecha +45% · crece +10% · THC +1,0 · riego ×1,1 · Luz: 10 € al día con plantas. · Aguanta en carpas de 100 y 150. |
+| Foco sodio 600 W | 350 € | 4 | 600 W · cubre 6 plantas · cosecha +45% · crece +5% · THC +0,7 · riego ×1,5 · Luz: 12 € al día con plantas. · Aguanta en carpas de 150. |
+| Foco LED 720 W | 1000 € | 5 | 720 W · cubre 6 plantas · cosecha +60% · crece +15% · THC +1,4 · riego ×1,15 · Luz: 14 € al día con plantas. · Aguanta en carpas de 150. |
+| Carpa 100×100 | 450 € | 2 | Segunda carpa para el piso: 4 plantas, focos de hasta 480 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. |
+| Carpa 150×100 | 900 € | 4 | Cambia tu carpa de 100 por una de 150: 6 plantas y focos de hasta 720 W. Tus plantas, foco y macetas se quedan. |

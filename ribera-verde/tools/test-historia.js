@@ -102,6 +102,17 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
     () => S.flags.lab && S.seeds.rif === 3 || { lab: S.flags.lab, seeds: S.seeds });
   await step('Comprar en el growshop (abono)', ['Fertilizante', 'Salir'], async () => { await run(shop); },
     () => S.items.fert === 2 || { items: S.items });
+  await step('Growshop: carpa de 100, foco LED 200 W colgado en el armario y una maceta de tela', ['Carpa 100', 'Foco LED 200', '^Armario', 'Maceta de tela 11', 'Salir'], async () => {
+    S.money = 2000; await run(shop);
+  }, () => S.carpas[1]?.t === 'm100' && S.carpas[0].foco === 'led200' && S.items.f_cfl === 1 && S.items.m_tela11 === 1 && S.pots.length === 6 && S.macetas.length === 6 && S.money === 2000 - 450 - 260 - 20
+    || { carpas: S.carpas, items: S.items, pots: S.pots.length, money: S.money });
+  await step('Plaza vacía: cambiar la maceta de 7 L por la de tela', ['Cambiar maceta', 'Tela 11'], async () => { await run(() => potAction(2)); },
+    () => S.macetas[2] === 'tela11' && S.items.m_tela11 === 0 && S.items.m_plastico7 === 1 || { macetas: S.macetas, items: S.items });
+  await step('Carpa: cambiar el foco desde la pared (sodio 400 W)', ['Cambiar foco', 'Sodio 400'], async () => { S.items.f_sodio400 = 1; await run(() => carpaAction(1)); },
+    () => S.carpas[1].foco === 'sodio400' && S.items.f_cfl === 2 && S.items.f_sodio400 === 0 || { carpas: S.carpas, items: S.items });
+  await step('Factura de la luz: solo paga la carpa con plantas', [], async () => {
+    S.money = 100; S.pots[2] = { sid: 'ria', prog: .2, water: 100, health: 100, fert: false, pest: false }; advanceTime(24 * 60); await idle(); S.pots[2] = null;
+  }, () => S.luz.e === 8 && S.money === 92 || { luz: S.luz, money: S.money });
   await step('Cruce de receta: Atlas Rif × Txoko Kush', ['Atlas Rif', 'Txoko Kush', 'Cruzar'], async () => {
     addSeeds('txoko', 2); await run(labAction);
   }, () => S.seeds.kushrif === 2 && S.disc.kushrif || { seeds: S.seeds });
@@ -152,7 +163,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   await step('Menú START: Genoteca, Mochila, Plantas, Objetivo', ['GENOTECA', '<B>', 'MOCHILA', '<B>', 'PLANTAS', '<B>', 'OBJETIVO', 'SALIR'],
     async () => { await run(startMenu); }, () => handlers.length === 0);
   await step('Cama: siesta de 3 horas', ['Siesta'], async () => { S.min = 600; S.hp = 5; await run(bedAction); },
-    () => S.min === 780 && S.hp === S.hpMax || { min: S.min, hp: S.hp });
+    () => (S.min === 780 || S.min === 781) && S.hp === S.hpMax || { min: S.min, hp: S.hp });   // 780 = 600 + 180; entre la siesta y la comprobación puede pasar un minuto de reloj real
   await step('8.ª variedad desde un arbusto → capítulo 5 sin más acciones', [], async () => {
     S.ch = 4; S.flags.lab = true; S.due = 0; S.disc = { ria: true, limon: true, txoko: true, niebla: true, mango: true, purpura: true, rif: true };
     S.custom = {}; delete S.taken.h_acap; S.map = 'town'; await run(() => objectAction(2, 26)); S.map = 'home'; await idle();

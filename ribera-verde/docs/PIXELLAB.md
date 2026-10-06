@@ -32,7 +32,7 @@ npm run sprites:ref        # build + referencias + paleta
 npm run sprites:validar    # comprueba el manifiesto (0 errores para empezar)
 npm run sprites:procesar -- <grupo> [--atlas]      # o -- --todos --atlas
 npm run sprites:catalogo   # catálogo por herramienta (docs/CATALOGO-SPRITES.md)
-npm run test:arte          # motor de sprites con un atlas de calco (19 comprobaciones)
+npm run test:arte          # motor de sprites con un atlas de calco (20 comprobaciones)
 ```
 
 ## 2. Dirección de arte (no negociable)
@@ -58,7 +58,8 @@ Es lo que mantiene «la estética que hemos acordado». Todo está también en `
 | `objeto_1x1` / `objeto_alto` | 16 × 16 / 32 × 32 | abajo-centro | pies | props (los altos sobresalen de su casilla) |
 | `edificio_7x6` / `edificio_6x6` | 112 × 96 / 96 × 96 | base (56, 95) / (48, 95) | pies | fachadas completas encima de las casillas del edificio |
 | `puerta` | 32 × 32 | — | exacto | animación de la puerta, recortada del edificio |
-| `carpa` | 64 × 112 | base (32, 111) | pies | armario de cultivo del piso |
+| `carpa_p60` / `carpa_m100` / `carpa_g150` | 64 / 96 / 128 × 80 | — | exacto | carpas del piso (huella entera de 4/6/8 × 5 casillas): por dentro (`carpa-<t>`) y cerrada (`carpa-<t>-fuera`) |
+| `foco` | 32 × 32 | (16, 0) | exacto | focos CFL, sodio y LED colgados (el motor los apoya por abajo y corta el cable en el techo de la carpa) |
 | `combate` | 64 × 64 | (32, 62) | pies | sprites de combate |
 | `icono` / `cogollo` | 16 × 16 / 32 × 32 | centro | centro | mochila, tienda, Genoteca |
 | `vfx` / `vfx_grande` | 16 × 16 / 32 × 32 | abajo-centro | pies | humo, golpes, brillos |
@@ -287,7 +288,7 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 - **Combate:** fondos, jugador de espaldas y rival desde el atlas; `bAnim(quién, nombre)` dispara golpe, patada, spray, comer, herido, desmayo, ataque, huida, alto, multa, soborno y persecución desde `13-combate.js`, con `vfx-golpe` y `vfx-spray`.
 - **Reserva:** si una clave no está en el atlas, se usa el dibujo procedural. `?arte=procedural` en la URL ignora el atlas para comparar.
 
-**Pruebas:** `npm test` (34/34 sin atlas) y `npm run test:arte`, que calca el arte procedural a `art/crudo`, lo procesa, compila el juego con ese atlas en `tools/salida/arte/` y comprueba 19 cosas (el título del atlas y las orillas entre ellas) y un atlas parcial (solo el player y sin «east»). Con el atlas de calco la historia completa también da 34/34, y las capturas salen casi idénticas a las procedurales: así se sabe que las anclas cuadran antes de gastar un crédito.
+**Pruebas:** `npm test` (38/38 sin atlas) y `npm run test:arte`, que calca el arte procedural a `art/crudo`, lo procesa, compila el juego con ese atlas en `tools/salida/arte/` y comprueba 19 cosas (el título del atlas y las orillas entre ellas) y un atlas parcial (solo el player y sin «east»). Con el atlas de calco la historia completa también da 34/34, y las capturas salen casi idénticas a las procedurales: así se sabe que las anclas cuadran antes de gastar un crédito.
 
 ## 8. QA y criterio de aprobado
 
@@ -317,7 +318,7 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 - `inpaint_image` para rehacer una zona.
 - `save_to_asset` para guardar el arreglo en el personaje u objeto de PixelLab.
 
-**Global**: capturas antes/después de cada fase, `npm test` 34/34, `npm run build` y peso del HTML final.
+**Global**: capturas antes/después de cada fase, `npm test` 38/38, `npm run build` y peso del HTML final.
 
 ## 9. Presupuesto
 
@@ -372,5 +373,5 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 - [ ] `npm run sprites:validar` → 0 errores y `npm run sprites:catalogo` → todas las claves
 - [ ] Todos los assets de la fase en `aprobado`, con `pixellab` (y `seed` si la herramienta la acepta) y `coste_real`
 - [ ] `npm run sprites:procesar -- --todos --atlas` → `ATLAS OK`
-- [ ] `npm run build`, `npm test` 34/34 (con y sin atlas), `npm run test:arte` 19/19 y `npm run capturas` revisadas
+- [ ] `npm run build`, `npm test` 38/38 (con y sin atlas), `npm run test:arte` 20/20 y `npm run capturas` revisadas
 - [ ] `CHANGELOG.md` actualizado y capturas nuevas en `screenshots/`

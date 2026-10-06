@@ -34,7 +34,8 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
 
   // partida de muestra
   await page.evaluate(() => {
-    S = newState(); S.ch = 4; S.name = 'EDDIE'; S.flags = { letter: 1, kiko1: 1, harvest1: 1, darko1: 1, metB: 1, lab: 1 }; S.money = 1840; S.heat = 35; S.rep = 30; S.potsOwned = 6; S.led = true;
+    S = newState(); S.ch = 4; S.name = 'EDDIE'; S.flags = { letter: 1, kiko1: 1, harvest1: 1, darko1: 1, metB: 1, lab: 1 }; S.money = 1840; S.heat = 35; S.rep = 30;
+    S.carpas = [{ t: 'p60', foco: 'led200' }, { t: 'm100', foco: 'sodio400' }]; S.macetas = ['tela11', 'tela11', 'tela25', 'plastico18', 'tela25', 'tela11'];
     ['ria', 'limon', 'txoko', 'niebla', 'mango', 'purpura', 'rif', 'hindu', 'citrus', 'bluetx', 'kushrif'].forEach(k => addSeeds(k, 2));
     addBuds('citrus', 46, 18.4); addBuds('bluetx', 22, 20.1);
     S.pots = [
@@ -44,10 +45,11 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
       { sid: 'purpura', prog: .25, water: 90, health: 100, fert: false, pest: false },
       { sid: 'mango', prog: .7, water: 40, health: 70, fert: false, pest: true },
       { sid: 'niebla', prog: .05, water: 100, health: 100, fert: false, pest: false }];
-    S.min = 11 * 60; mode = 'world'; enterMap('home', 6, 5, 'right'); spawnClients(); updateHUD();
-    document.getElementById('toast').hidden = true;
+    S.min = 11 * 60; mode = 'world'; enterMap('home', 13, 5, 'up'); spawnClients(); updateHUD();   // dentro de la carpa de 100; el armario, cerrado
+    document.getElementById('toast').hidden = true; pending.length = 0; queued.clear();   // el cambio de capítulo, después de la foto
   });
   await shot('03-piso-armario.png');
+  await page.evaluate(() => queue('historia', checkStory));
 
   await page.evaluate(() => { enterMap('town', 17, 9, 'down'); S.min = 12 * 60; ents = ents.filter(e => !e.def.client); });
   await shot('04-barrio-dia.png');

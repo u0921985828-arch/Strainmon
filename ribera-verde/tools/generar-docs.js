@@ -15,7 +15,7 @@ const ROOT = path.join(__dirname, '..');
   await page.goto('file://' + path.join(ROOT, 'index.html'));
   await page.waitForFunction(() => typeof mode !== 'undefined' && mode === 'title');
   const D = await page.evaluate(() => {
-    S = newState();
+    S = newState(); S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'cfl' }]; montarCasa();   // el piso con el armario y la carpa grande
     const strains = DEX.map((k, i) => ({ k, idx: i + 1, ...STRAINS[k] }));
     const recipes = Object.entries(RECIPES).map(([pair, out]) => ({ a: pair.split('+')[0], b: pair.split('+')[1], out }));
     const G = { grass: '.', flowers: '*', tallgrass: '"', dirt: ':', walk: '-', roadT: '=', roadB: '=', plaza: '+', water: '~', bridgeT: 'H', bridgeB: 'H', dock: '#',
@@ -32,7 +32,7 @@ const ROOT = path.join(__dirname, '..');
           let ch = o ? (O[o] || '?') : (G[g] ?? (/^roof/.test(g) ? '^' : /^door/.test(g) ? 'D' : /^(wall|win|iw)/.test(g) ? '█' : '?'));
           const it = ITEMS.find(i => i.map === name && i.x === x && i.y === y);
           if (it) ch = it.hidden ? '$' : 'i';
-          if (name === 'home') { const pi = POTS.findIndex(p => p[0] === x && p[1] === y); if (pi >= 0) ch = String(pi + 1); }
+          if (name === 'home') { if (/^cp(?!Puerta)/.test(g)) ch = '▒'; if (g === 'cpPuerta') ch = 'z'; const pi = huecos().findIndex(h => h.x === x && h.y === y); if (pi >= 0) ch = String(pi + 1); }
           const npc = NPCDEF.find(d => d.map === name && d.x === x && d.y === y);
           if (npc) ch = '@';
           r += ch;
@@ -43,7 +43,7 @@ const ROOT = path.join(__dirname, '..');
     }
     const npcs = NPCDEF.map(d => ({ id: d.id, map: d.map, x: d.x, y: d.y, wander: d.wander || 0, cond: d.cond ? d.cond.toString().replace(/^\(\)=>/, '') : '' }));
     const items = ITEMS.map(i => ({ id: i.id, map: i.map, x: i.x, y: i.y, hidden: !!i.hidden, give: i.give.toString().match(/got\('([^']+)'/)?.[1] || i.give.toString().match(/money\+=(\d+)/)?.[0] }));
-    const shop = SHOP.map(s => ({ lbl: s.lbl, p: s.p, ch: s.ch, desc: s.desc || '' }));
+    const shop = SHOP.map(s => ({ lbl: s.lbl, p: s.p, ch: s.ch, desc: (s.desc || '').replace(/\n/g, ' · ') }));
     const signs = SIGNS;
     return { strains, recipes, maps, npcs, items, shop, signs };
   });
@@ -98,12 +98,12 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
 
 ## Fórmulas de cultivo
 
-- **Crecimiento por hora:** \`1 / (días × 24)\`, ×0,4 si el agua < 20 %, 0 si el agua llega a 0, ×1,1 con abono, ×1,1 con LED.
-- **Agua:** baja 3,5 puntos por hora (una planta regada aguanta ~28 h).
+- **Crecimiento por hora:** \`1 / (días × 24) × crec\`, ×0,4 si el agua < 20 %, 0 si el agua llega a 0, ×1,1 con abono. \`crec\`, \`rend\`, \`thc\` y \`riego\` salen del foco y de la maceta de cada plaza (ver la sección 4 del [GDD](GDD.md)).
+- **Agua:** baja 3,5 × riego puntos por hora (con CFL y maceta de 7 L una planta regada aguanta ~28 h).
 - **Salud:** −4/h sin agua, −2,5/h con plaga, +1/h si agua > 30 % y sin plaga. A 0 la planta muere.
 - **Plagas:** probabilidad por hora \`0,006 × (100 − resistencia) / 40\` mientras no está madura.
-- **Cosecha (g):** \`rinde × (0,4 + 0,6 × salud/100) × (abono ? 1,25 : 1) × (LED ? 1,3 : 1)\`.
-- **THC final:** \`THC × (0,85 + 0,15 × salud/100) + (LED ? 0,5 : 0) + (abono ? 0,3 : 0)\`.
+- **Cosecha (g):** \`rinde × (0,4 + 0,6 × salud/100) × (abono ? 1,25 : 1) × rend\`.
+- **THC final:** \`THC × (0,85 + 0,15 × salud/100) + thc + (abono ? 0,3 : 0)\`.
 - **Semillas al cosechar:** 1 + (0 a 2).
 `;
   fs.writeFileSync(path.join(ROOT, 'docs/GENETICA.md'), g);
@@ -111,14 +111,14 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
   // ---------- MAPA.md ----------
   const legend = `Leyenda: \`.\` suelo/hierba · \`*\` flores · \`"\` hierba alta (ladrones ×3, a cualquier hora) · \`:\` tierra · \`-\` acera · \`=\` carretera · \`+\` plaza · \`~\` agua · \`H\` puente · \`#\` muelle
 \`^\` tejado · \`█\` pared/ventana · \`D\` puerta · \`T\` árbol · \`b\` arbusto · \`$\` arbusto con objeto oculto · \`i\` objeto en el suelo · \`f\` valla · \`S\` cartel · \`L\` farola · \`n\` banco · \`O\` fuente · \`c\` cajas · \`@\` personaje
-Interiores: \`B\` cama · \`P\` ordenador · \`G\` mesa de genética · \`t\` mesa · \`F\` nevera · \`o\` suelo del armario · \`1-6\` macetas · \`C\` mostrador · \`s\` estantería · \`d\` expositor · \`x\` taburete · \`J\` gramola · \`v\` ventana/póster · \`m\` felpudo (salida)`;
+Interiores: \`B\` cama · \`P\` ordenador · \`G\` mesa de genética · \`t\` mesa · \`F\` nevera · \`▒\` pared de la carpa · \`z\` puerta de la carpa · \`o\` suelo de la carpa · \`1-8\` plazas (mesa + maceta; 1-2 el armario de 60, 3-8 la carpa de 150) · \`C\` mostrador · \`s\` estantería · \`d\` expositor · \`x\` taburete · \`J\` gramola · \`v\` ventana/póster · \`m\` felpudo (salida)`;
   let m = `# Mapa de Ribera Verde
 
 > Generado automáticamente con \`node tools/generar-docs.js\`. Coordenadas (x, y) en casillas de 16 px; (0,0) es la esquina superior izquierda.
 
 ${legend}
 `;
-  const titles = { town: 'Barrio (exterior) — 40 × 30', home: 'Piso de la tía Maite — 12 × 10', shop: 'Growshop Kiko — 10 × 8', bar: 'Bar El Ancla — 10 × 8' };
+  const titles = { town: 'Barrio (exterior) — 40 × 30', home: 'Piso de la tía Maite — 20 × 12 (con el armario de 60 y la carpa de 150)', shop: 'Growshop Kiko — 10 × 8', bar: 'Bar El Ancla — 10 × 8' };
   for (const [k, mp] of Object.entries(D.maps)) {
     const pad = String(mp.w - 1).length;
     let header = '    ' + Array.from({ length: mp.w }, (_, x) => x % 10 === 0 ? String(x / 10 % 10) : ' ').join('') + '\n    ' + Array.from({ length: mp.w }, (_, x) => x % 10).join('');

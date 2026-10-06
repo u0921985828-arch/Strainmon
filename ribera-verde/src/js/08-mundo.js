@@ -8,7 +8,8 @@ const P={x:0,y:0,px:0,py:0,dir:'down',moving:false,fx:0,fy:0,t:0,dur:240,parity:
 const DV={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]},OPP={up:'down',down:'up',left:'right',right:'left'};
 const CH_TITLES={1:'La herencia',2:'La calle',3:'La deuda',4:'Genética',5:'El sargento',6:'La Copa de Ribera',7:'Libertad',8:'Leyenda'};
 function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,min:8*60,money:150,hp:30,hpMax:30,heat:0,rep:0,ch:0,flags:{},sales:0,
-  seeds:{},buds:{},items:{fert:0,insect:0,spray:0,bocata:1},pots:[null,null,null,null,null,null],potsOwned:2,led:false,protect:false,
+  seeds:{},buds:{},items:Object.assign({fert:0,insect:0,spray:0,bocata:1},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0}))),
+  carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},debt:5000,due:0,deadline:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0};}
 const isFree=()=>mode==='world'&&lock===0&&handlers.length===0;
 const isNight=()=>S.min>=21*60||S.min<6*60;
@@ -60,11 +61,10 @@ async function pickItem(it){S.taken[it.id]=true;await it.give();}
 function tileSolid(m,x,y){
   if(x<0||y<0||x>=m.w||y>=m.h)return true;
   if(SOLID_G.test(m.g[y][x])||m.o[y][x])return true;
-  if(S.map==='home'){const i=POTS.findIndex(p=>p[0]===x&&p[1]===y);if(i>=0&&i<S.potsOwned)return true;}
   return !!itemAt(x,y);
 }
 const entAt=(x,y)=>ents.find(e=>(e.x===x&&e.y===y)||(e.moving&&e.fx===x&&e.fy===y));
-function enterMap(name,x,y,dir){S.map=name;Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];buildEnts();music(mapMusic());}
+function enterMap(name,x,y,dir){S.map=name;if(name==='home')montarCasa();Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];buildEnts();music(mapMusic());}
 const mapMusic=()=>S.map==='town'?(isNight()?'night':'town'):'home';
 async function warp(w){sfx('door');await fade(1);enterMap(w.to,w.x,w.y,w.dir);updateHUD();await wait(80);await fade(0);}
 
@@ -133,8 +133,9 @@ const SIGNS={'town:9,8':'Calle Ribera, 3.\nPiso de la tía Maite.','town:13,8':'
 async function objectAction(x,y){
   const m=MAPS[S.map],o=m.o[y]&&m.o[y][x];
   if(S.map==='home'){
-    const pi=POTS.findIndex(p=>p[0]===x&&p[1]===y);
-    if(pi>=0)return pi<S.potsOwned?potAction(pi):say('Aquí cabe otra maceta. Kiko vende macetas extra.');
+    const pi=huecos().findIndex(h=>h.x===x&&h.y===y);if(pi>=0)return potAction(pi);
+    const ci=(m.carpas||[]).findIndex(t=>x>=t.x0&&x<=t.x1&&y>=t.y0&&y<=t.y1);if(ci>=0)return carpaAction(m.carpas[ci].ci);
+    if(sitioLibre(x,y))return say('Aquí cabe una carpa de cultivo. Kiko vende carpas de 100×100.');
     if(o==='bedT'||o==='bedB')return bedAction();
     if(o==='pc')return pcAction();
     if(o==='lab'||o==='lab2')return labAction();

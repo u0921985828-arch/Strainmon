@@ -61,15 +61,23 @@ function spriteFor(look,dir,frame){
 /* ---------- plants ---------- */
 const plantCache={};
 const plantStage=p=>p.prog>=1?4:p.prog<.12?0:p.prog<.35?1:p.prog<.65?2:3;
-function plantSprite(p){
+// macetas: ancho, alto, cuerpo, borde y costura (tela) o brillo (plástico); el fondo siempre en la fila 25
+const POT_PROC={plastico7:[8,5,'#2c2c30','#4a4a52',0],tela11:[10,6,'#45474e','#5e6068',1],plastico18:[12,7,'#2c2c30','#4a4a52',0],tela25:[14,7,'#7a6c50','#988a6c',1]};
+function potProc(t,k){
+  if(!POT_PROC[k]){t.F(3,20,10,6,'#2c2c30');t.F(3,20,10,1,'#4a4a52');t.F(4,21,8,1,'#5a3a20');t.F(3,25,10,1,'#18181c');return;}   // sin tipo: la de tela de siempre
+  const [w,h,c,r,tela]=POT_PROC[k],x=8-w/2,y=26-h;
+  t.F(x,y,w,h,c);t.F(x,y,w,1,r);t.F(x+1,y+1,w-2,1,'#5a3a20');t.F(x,25,w,1,'#18181c');
+  if(tela){t.F(x,y+3,w,1,shade(c,-18));t.P(x,y+1,r);t.P(x+w-1,y+1,r);}else t.F(x+1,y+2,1,h-3,'#6a6a74');
+}
+const potVacia=k=>{const key='vacia|'+k;if(plantCache[key])return plantCache[key];const [c,x]=mkCanvas(16,26);potProc(painter(x,rngSeed(1)),k);return plantCache[key]=c;};
+function plantSprite(p,k){
   const s=getStrain(p.sid);const stage=p.dead?9:plantStage(p);
   const dry=p.water<=0||p.dead,pest=!!p.pest;
-  const key=p.sid+stage+dry+pest;if(plantCache[key])return plantCache[key];
+  const key=p.sid+stage+dry+pest+(k||'');if(plantCache[key])return plantCache[key];
   const [c,x]=mkCanvas(16,26);const t=painter(x,rngSeed(hashStr(key)));
   const g1=dry?'#b8aa48':'#3c9a3e',g2=dry?'#8a7c30':'#22662a',g3=dry?'#d8cc78':'#74d064';
   const bud=s?s.c:'#9bd35a';
-  // pot (fabric)
-  t.F(3,20,10,6,'#2c2c30');t.F(3,20,10,1,'#4a4a52');t.F(4,21,8,1,'#5a3a20');t.F(3,25,10,1,'#18181c');
+  potProc(t,k);
   const stem=(h)=>t.F(7,21-h,2,h,g2);
   if(stage===9){stem(6);t.F(4,16,4,1,'#8a7040');t.F(9,15,4,1,'#8a7040');}
   else if(stage===0){t.P(7,19,g1);t.P(8,19,g1);t.P(6,18,g3);t.P(9,18,g3);}

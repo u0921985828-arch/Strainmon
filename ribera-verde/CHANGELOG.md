@@ -1,5 +1,19 @@
 # Cambios
 
+## 1.6.0 · 6 de octubre de 2026
+
+- **Nuevo: carpas de cultivo de verdad en el piso.** El armario de la tía (60×60, 2 plantas) es el de serie; en el growshop se compra una **carpa de 100×100** (450 €, capítulo 2, 4 plantas) y después se cambia por una **de 150×100** (900 €, capítulo 4, 6 plantas: se quedan plantas, foco y macetas). El piso pasa a 20 × 12 casillas, con las dos carpas al fondo.
+  - **Desde fuera** la carpa está cerrada: techo con la salida del extractor, frente negro con puerta de cremallera y rejilla. Si hay plantas vivas, se escapa una línea de luz bajo la puerta.
+  - **Al entrar** (por la puerta) desaparecen el techo y las paredes de delante y de la derecha: se ven la pared del fondo y la izquierda, de mylar, el suelo, **una mesa por plaza con su maceta encima** y los **focos colgando, medio transparentes**, con su cono de luz detrás de las plantas.
+- **Nuevo: macetas de 4 tipos** (plástico 7 L de serie; tela 11 L, plástico 18 L y tela 25 L en la tienda). La de tela airea las raíces: más cosecha y menos plagas, pero bebe más; la grande da más y crece algo más lenta. Se cambian en una plaza vacía; la vieja va a la mochila. Cada carpa admite una maceta máxima (11 L en el armario).
+- **Nuevo: 7 focos** (CFL 125 W de serie; sodio 250/400/600 W y LED 200/480/720 W). Cada uno cubre 2, 4 o 6 plantas: un foco pequeño en una carpa grande no llega a todas y rinden menos. El sodio es barato pero calienta y seca las macetas; el LED cuesta más, rinde más, sube más el THC y casi no seca. Cada carpa aguanta unos vatios como mucho. Al comprarlos, Kiko pregunta si los cuelga ya; también se cambian desde la pared de la carpa.
+- **Nuevo: factura de la luz.** Cada día, 0,02 € por vatio de cada carpa con alguna planta viva.
+- **Cambiado:** fuera «Maceta extra» y «Lámpara LED». Las partidas guardadas se convierten solas: con macetas extra tienes la carpa de 100, la LED pasa a un LED en cada carpa y las plantas siguen donde estaban. Lo de serie da exactamente el cultivo de antes.
+- **Menús:** PLANTAS enseña cada carpa con su foco, su factura y sus plazas con la maceta; la mochila enseña las macetas y los focos de repuesto; consejos nuevos de Kiko.
+- **Arte (F8):** carpa por dentro y cerrada con `create_image_pixflux` img2img sobre su huella procedural (una generación de cada vista para la de 150; la de 100 y la de 60 se recortan de ella), macetas con `create_1_direction_object` usando la maceta de tela recortada a 16 px como estilo, focos y mesa en otros dos lotes. El motor quita la maceta de tela de cada fotograma de la planta y pinta la nueva debajo. Atlas: 1099 fotogramas. La carpa de la 1.5 queda en `descartadas`.
+- **Tests:** `npm test` 38/38 (carpa, focos, macetas y factura) y `npm run test:arte` 20/20 (carpas, focos, macetas y mesa del atlas).
+- **Coste:** 64 generaciones (4 pixflux y 3 lotes; uno descartado porque las macetas salían demasiado grandes).
+
 ## 1.5.0 · 6 de octubre de 2026
 
 - **Nuevo: el resto del mundo sale de PixelLab (F3-resto, F4, F5, F6 y F7).** El atlas pasa de 569 a 1086 fotogramas; lo procedural queda de reserva.

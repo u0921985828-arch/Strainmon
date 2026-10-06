@@ -25,7 +25,8 @@ async function mochila(){
     const rows=[{label:'Dinero',right:eur(S.money),desc:'Tu capital. Don Baltasar también lo cuenta.'},{label:'Vida',right:`${S.hp}/${S.hpMax}`,desc:'Se recupera durmiendo, comiendo o con el tiempo.'},
       {label:'Fertilizante',right:'×'+S.items.fert,desc:'Úsalo en una maceta: +25% de cosecha.'},{label:'Insecticida',right:'×'+S.items.insect,desc:'Úsalo en una maceta con plaga.'},
       {label:'Spray de pimienta',right:'×'+S.items.spray,desc:'Solo en combate.'},{label:'Bocata',right:'×'+S.items.bocata,desc:'Pulsa A para comerlo: +15 de vida.',k:'bocata'}];
-    if(S.led)rows.push({label:'Lámpara LED',right:'instalada',desc:'+30% de cosecha.'});
+    for(const k in MACETAS)if(S.items['m_'+k]>0)rows.push({label:'Maceta '+MACETAS[k].n,right:'×'+S.items['m_'+k],desc:descMaceta(k)+'\nSe cambia en una plaza vacía de la carpa.'});
+    for(const k in FOCOS)if(S.items['f_'+k]>0)rows.push({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],desc:descFoco(k)+'\nSe cuelga desde la carpa (A en la pared).'});
     for(const [k,v] of Object.entries(S.seeds))rows.push({label:'Semilla '+getStrain(k).n,right:'×'+v,sw:getStrain(k).c,desc:strainLine(k)});
     for(const [k,b] of Object.entries(S.buds))rows.push({label:getStrain(k).n,right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(k).c,desc:'Cogollos listos para vender.\n'+getStrain(k).o});
     i=await menu(rows,{cls:'full',title:'MOCHILA',title2:`${Math.floor(totalBuds())} g encima`,desc:true,initial:i});
@@ -34,11 +35,15 @@ async function mochila(){
   }
 }
 async function plantas(){
-  const rows=[];
-  for(let i=0;i<S.potsOwned;i++){const p=S.pots[i];
-    if(!p){rows.push({label:`Maceta ${i+1} · vacía`,desc:'Planta algo desde el armario de tu piso.'});continue;}
-    const s=getStrain(p.sid);
-    rows.push({label:`${i+1} · ${s.n}`,sw:s.c,right:p.dead?'muerta':p.prog>=1?'¡LISTA!':`${Math.floor(p.prog*100)}%`,desc:p.dead?'Se ha secado. Retírala.':`${p.prog>=1?'Lista para cosechar':stageName(p)} · Agua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%\n${p.pest?'¡PLAGA! Trátala con insecticida. ':''}${p.fert?'Abonada.':'Sin abonar.'}`});}
-  let i=0;do{i=await menu(rows,{cls:'full',title:'ARMARIO DE CULTIVO',title2:S.led?'LED':'',desc:true,initial:i});}while(i>=0);
+  const rows=[],H=huecos();
+  S.carpas.forEach((c,ci)=>{
+    if(!c)return;const C=CARPAS[c.t],F=FOCOS[c.foco],cob=Math.min(1,F.cubre/C.plazas);
+    rows.push({label:C.n,right:F.n,desc:`${C.plazas} plantas · foco ${F.n}${cob<1?` (solo llega a ${F.cubre}: rinden menos)`:''}\nLuz: ${eur(luzCarpa(ci))} al día con plantas · hasta ${C.wmax} W y macetas de ${C.lmax} L.`});
+    H.forEach((h,i)=>{if(h.c!==ci)return;const p=S.pots[i],M=MACETAS[S.macetas[i]];
+      if(!p){rows.push({label:`  ${h.j+1} · vacía`,right:M.l+' L',desc:`Maceta de ${M.n}. Planta algo desde la carpa de tu piso.`});return;}
+      const s=getStrain(p.sid);
+      rows.push({label:`  ${h.j+1} · ${s.n}`,sw:s.c,right:p.dead?'muerta':p.prog>=1?'¡LISTA!':`${Math.floor(p.prog*100)}%`,desc:p.dead?'Se ha secado. Retírala.':`${p.prog>=1?'Lista para cosechar':stageName(p)} · Agua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%\n${p.pest?'¡PLAGA! Trátala con insecticida. ':''}${p.fert?'Abonada':'Sin abonar'} · maceta de ${M.n}.`});});
+  });
+  const luz=facturaLuz();
+  let i=0;do{i=await menu(rows,{cls:'full',title:'CULTIVO',title2:luz?'Luz '+eur(luz)+'/día':'Luz apagada',desc:true,initial:i});}while(i>=0);
 }
-
