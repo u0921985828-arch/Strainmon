@@ -175,7 +175,7 @@ async function carpaAction(ci){
 }
 // cosecha: gramos y THC con el fenotipo de la planta; un fenotipo estrella va a un lote aparte (clave sid + '*', ver lotSid).
 // Semillas: las de tienda (SHOP) son feminizadas y salen sin semilla salvo alguna flor hermafrodita (SEMILLA_HERMA); las
-// demás (landraces, las de Kiko y tus líneas fijadas) son regulares: algún macho poliniza unas flores y dan 1-3; una línea sin
+// demás (las landraces, como el Afghani que te da Kiko, y tus líneas fijadas) son regulares: algún macho poliniza unas flores y dan 1-3; una línea sin
 // fijar (F1-F3) la estás criando: se polinizan entre ellas y das 2-5 semillas por planta para seguir estabilizando
 const SEMILLA_HERMA=.12;
 async function harvest(i){

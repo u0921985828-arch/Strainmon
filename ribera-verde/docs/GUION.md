@@ -116,7 +116,7 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 
 > **DON BALTASAR:** Siéntate, {N}. Vamos al grano.
 > **DON BALTASAR:** Tu tía Maite me debía 30.000 euros. Las deudas no se mueren con la gente.
-> **DON BALTASAR:** Me los vas a pagar a plazos. El primero, 3000 €.
+> **DON BALTASAR:** Me los vas a pagar a plazos. El primero, 3.000 €.
 > **DON BALTASAR:** Tienes siete días. Si no, Toño te hará una visita. Y Toño cobra intereses.
 
 *En cada visita:* «Me debes X € para el día D. Te quedan N días.» (o «Es HOY.»). Si te llega el dinero: «¿Pagar ahora?». Si no: «Vuelve cuando tengas el dinero.»
@@ -169,8 +169,8 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 
 > **SARGENTO MOLINA:** Así que eres tú quien vende en la plaza.
 > **SARGENTO MOLINA:** Podría detenerte ahora mismo. O podemos entendernos.
-> **SARGENTO MOLINA:** Por 1500 € mis patrullas no pasan por tu calle. Y nada de registros en tu piso.
-> **SARGENTO MOLINA:** ¿Aceptas el trato del sargento? → *Pagar 1500 € / No*
+> **SARGENTO MOLINA:** Por 1.500 € mis patrullas no pasan por tu calle. Y nada de registros en tu piso.
+> **SARGENTO MOLINA:** ¿Aceptas el trato del sargento? → *Pagar 1.500 € / No*
 > *Si pagas:* «Bien. Mis agentes mirarán hacia otro lado.» *(Molina desaparece de la plaza.)*
 > *Si no:* «Tú sabrás. Mis agentes van a estar muy atentos.» *(+10 de calor; sigue en la plaza por si cambias de idea.)*
 > *Sin dinero:* «¿Con qué dinero? Vuelve cuando lo tengas.»
@@ -182,7 +182,7 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 *Al pagar los 12.000 €:*
 > **DON BALTASAR:** Me sorprendes, {N}.
 > **DON BALTASAR:** Quedan 15.000. Te propongo algo.
-> **DON BALTASAR:** El sábado es la COPA DE RIBERA. Premio: 5000 €.
+> **DON BALTASAR:** El sábado es la COPA DE RIBERA. Premio: 5.000 €.
 > **DON BALTASAR:** Mi sobrino Darko compite. No ha perdido nunca.
 > **DON BALTASAR:** Gana la Copa y, con el premio y lo que vendas, me pagas lo que queda. Si puedes.
 
@@ -199,7 +199,7 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 > **JURADO:** Resultado del laboratorio. AMNESIA HAZE de Darko: 26,8 % de THC.
 > **JURADO:** [variedad] de {N}: X % de THC.
 > *Si pierdes:* «Gana DARKO. La Copa sigue abierta: vuelve con algo más potente.»
-> *Si ganas:* «Nueva marca. {N} gana la COPA DE RIBERA.» → Consigues 5000 € y el trofeo de la Copa.
+> *Si ganas:* «Nueva marca. {N} gana la COPA DE RIBERA.» → Consigues 5.000 € y el trofeo de la Copa.
 > **DARKO:** Esto no se acaba aquí.
 > **DARKO:** Mi tío se va a enterar.
 
@@ -280,7 +280,7 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 - **Cultivo (1.10):**
   - *Cosecha:* «Cosechas X g de [variedad]. THC: Y%.»
   - *Fenotipo estrella:* «¡Fenotipo estrella! THC ×A y cosecha ×B sobre la media de la [variedad].» / «Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.» · *Flojo:* «Fenotipo flojo: THC ×A y cosecha ×B de la media.»
-  - *Semillas:* línea sin fijar, «Las plantas de la línea se han polinizado entre ellas: recoges N semillas de [variedad].» · regular (landrace, de Kiko o línea fijada), «Son semillas regulares: algún macho ha polinizado unas flores. Recoges N semillas de [variedad].» · feminizada, a veces, «Una flor hermafrodita ha polinizado unas pocas: recoges N semillas de [variedad].»
+  - *Semillas:* línea sin fijar, «Las plantas de la línea se han polinizado entre ellas: recoges N semillas de [variedad].» · regular (landrace, como el Afghani de Kiko, o línea fijada), «Son semillas regulares: algún macho ha polinizado unas flores. Recoges N semillas de [variedad].» · feminizada, a veces, «Una flor hermafrodita ha polinizado unas pocas: recoges N semillas de [variedad].»
   - *Esqueje:* «Cortas una punta de la [variedad] y la pones a enraizar. Plántala antes del día D: es la misma planta.» · propagador lleno, «El propagador está lleno: 12 esquejes. Planta alguno antes.» · al plantarlo, «Plantas el esqueje de [variedad].» · si se seca, aviso al cambiar de día: «Se ha secado un esqueje sin plantar».
   - *Abono e insecticida:* «Echas una dosis de ABONO. Dará más cosecha.» / «No te queda ABONO.» · «Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.»
 - **Objetos del piso:**

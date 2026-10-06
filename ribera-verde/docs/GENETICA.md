@@ -152,7 +152,7 @@ flowchart LR
 Lo que sale de un cruce nuevo (receta o híbrido propio) es una **F1**: una línea inestable en la que cada planta sale distinta.
 
 - En la mesa de genética, al elegir como padre la misma variedad («· estabilizar»), se cruzan dos plantas de la línea: gasta 2 semillas, guarda 1 y sube una generación (F1 → F2 → F3 → **estable** en la F4). Entre generaciones hay que cultivar la línea para tener otra vez 2 semillas.
-- Una línea sin fijar la estás criando: sus plantas se polinizan entre ellas y cada una da 2-5 semillas al cosecharla (las demás: las de tienda son feminizadas y casi nunca dan, 12 % de que una flor hermafrodita deje 1-3; las landraces, las de Kiko y tus líneas ya fijadas son regulares y algún macho poliniza unas flores: 1-3 por planta).
+- Una línea sin fijar la estás criando: sus plantas se polinizan entre ellas y cada una da 2-5 semillas al cosecharla (las demás: las de tienda son feminizadas y casi nunca dan, 12 % de que una flor hermafrodita deje 1-3; las landraces (como el Afghani que te da Kiko) y tus líneas ya fijadas son regulares y algún macho poliniza unas flores: 1-3 por planta).
 - Las landraces y las de la tienda llevan su tipo genético (abajo); las de receta, estabilizadas, son líneas estables.
 
 ## Fenotipos (1.10)

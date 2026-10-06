@@ -43,7 +43,7 @@ Plantar → cuidar (agua, abono, plagas) y sacar esquejes de las buenas → cose
 - **Abono:** una dosis por planta (la botella de 1 L trae 4). Da +25 % de cosecha, +10 % de velocidad y +0,3 de THC.
 - **Cosecha (g por planta):** `mín(tope de la maceta, W × g/W ÷ plazas × rend de la maceta × rinde/34 × (0,4 + 0,6 × salud/100) × abono 1,25 × fenotipo.y)`. 34 g es el rinde medio de las variedades: la ficha enseña el de cada una en g/m² (LED a 400 W/m², abonada). Una plaza vacía es luz perdida.
 - **THC final:** `THC × fenotipo.t × (0,85 + 0,15 × salud/100) + thc del foco + 0,3 (abono)`, con un tope de 35 %.
-- **Semillas al cosechar:** las de tienda son feminizadas: un 12 % de las plantas sale hermafrodita y da 1-3 semillas; las demás, ninguna. Las landraces, las de Kiko y tus líneas ya fijadas son regulares: algún macho poliniza unas flores y cada planta da 1-3. Una línea sin fijar (F1-F3) se poliniza entre ella y da 2-5.
+- **Semillas al cosechar:** las de tienda son feminizadas: un 12 % de las plantas sale hermafrodita y da 1-3 semillas; las demás, ninguna. Las landraces (como el Afghani que te da Kiko) y tus líneas ya fijadas son regulares: algún macho poliniza unas flores y cada planta da 1-3. Una línea sin fijar (F1-F3) se poliniza entre ella y da 2-5.
 - **Esquejes:** en crecimiento (del 20 %, ya plántula hecha, al 65 %, antes de florecer) se le saca un esqueje a una planta (−5 de salud). Es la misma planta, con su fenotipo. Enraíza en el propagador (hasta 12) y se seca si no se planta antes de que acabe el día siguiente.
 
 ### Equipo: carpas, focos y macetas (1.6; cifras reales en la 1.10)
@@ -102,7 +102,7 @@ El cultivo va en carpas dentro del piso. Desde fuera se ven cerradas (techo, fre
 - Hay 20 recetas fijas (ver [GENETICA.md](GENETICA.md)): 13 llevan hasta la *Ghost Train Haze* (29 % de THC) y 7 son los híbridos clásicos que salieron de las landraces (Haze, Northern Lights, Afghan Kush, Shiva Skunk, Silver Haze y Super Silver Haze).
 - **Estabilizar (1.9):** lo que sale de un cruce nuevo es una F1 inestable: sus plantas salen muy distintas entre sí (ver «Fenotipos»). Cruzándola consigo misma en la mesa (2 semillas → 1) sube a F2, F3 y queda estable en la F4; entre generaciones hay que cultivarla para tener semillas.
 - **Tipo genético (1.10):** cada variedad dice en su ficha si es landrace, línea estable, cruce F1 de tienda (con sus padres), polihíbrido o una línea propia F1-F3. Lemon Haze y OG Kush son polihíbridos, Mango es un cruce F1 (KC 33 × Afghani) y Skunk #1, Blueberry, Purple Afghani y las variedades de receta son líneas estables.
-- **Fenotipos (1.10):** cada semilla es una planta distinta. Al germinar tira su fenotipo, THC × (1 + σ·z) y gramos × (1 + σ·z), cada uno por su lado (z normal, entre ×0,6 y ×1,5). σ sale del tipo: estable 0,06 · cruce F1 de tienda 0,07 · F1 propia 0,08 · F3 0,10 · landrace 0,10 · polihíbrido 0,11 · F2 0,12. Con THC × gramos ≥ 1,35 es **estrella**: 1 de cada ~16.000 en una línea estable, ~2000 en un F1 de tienda, ~100 en una landrace, ~60 en un polihíbrido y ~40 en una F2 (la ficha lo dice). Su cosecha va a un lote aparte (★) que se vende y se presenta a la Copa por separado; con THC × gramos ≤ 0,75 es **floja**. El fenotipo se sabe al cosecharla: para quedarse con una estrella hay que haberle sacado esquejes antes.
+- **Fenotipos (1.10):** cada semilla es una planta distinta. Al germinar tira su fenotipo, THC × (1 + σ·z) y gramos × (1 + σ·z), cada uno por su lado (z normal, entre ×0,6 y ×1,5). σ sale del tipo: estable 0,06 · cruce F1 de tienda 0,07 · F1 propia 0,08 · F3 0,10 · landrace 0,10 · polihíbrido 0,11 · F2 0,12. Con THC × gramos ≥ 1,35 es **estrella**: 1 de cada ~16.000 en una línea estable, ~2.000 en un F1 de tienda, ~100 en una landrace, ~60 en un polihíbrido y ~40 en una F2 (la ficha lo dice). Su cosecha va a un lote aparte (★) que se vende y se presenta a la Copa por separado; con THC × gramos ≤ 0,75 es **floja**. El fenotipo se sabe al cosecharla: para quedarse con una estrella hay que haberle sacado esquejes antes.
 - Cualquier otra pareja da un **híbrido propio** determinista: misma pareja, mismo resultado. THC = media de los padres −1,5 / +2,0 (tope 33 %).
 - Una variedad queda **descubierta** al conseguir su semilla o su cogollo. Los híbridos propios cuentan para el objetivo del capítulo 4.
 - **Landraces:** Afghani (Kiko, capítulo 4), Hindu Kush (abuela Txaro a cambio de 5 g), Acapulco Gold (arbusto del parque en 2,26) y Malawi Gold (Iñaki, tras venderle 10 g).
@@ -180,17 +180,17 @@ La barra del agente mide la **sospecha**, que es tu calor.
 |---|---|---|
 | 1 La herencia | partida nueva | leer la carta → visitar a Kiko → primera cosecha |
 | 2 La calle | primera cosecha | 300 € en ventas |
-| 3 La deuda | 300 € vendidos (aparece Toño) | ir al bar y pagar **3000 €** en 7 días |
+| 3 La deuda | 300 € vendidos (aparece Toño) | ir al bar y pagar **3.000 €** en 7 días |
 | 4 Genética | primer pago | recoger la mesa de Kiko y descubrir 8 variedades |
 | 5 El sargento | 8 variedades descubiertas | pagar **12.000 €** en 10 días; Molina ofrece protección |
 | 6 La Copa de Ribera | segundo pago | ganar la Copa (20 g con más de 26,8 % de THC) |
-| 7 Libertad | ganar la Copa (+5000 €) | pagar **15.000 €** en 7 días |
+| 7 Libertad | ganar la Copa (+5.000 €) | pagar **15.000 €** en 7 días |
 | 8 Tu imperio | último pago: «DEUDA SALDADA» | facturar para subir de rango y completar la Genoteca |
 
 - **Deuda (1.10):** 30.000 €, a escala de los precios reales. Con ellos, un jugador que reinvierte paga los plazos en unas 4, 8 y 9 cosechas, lo mismo que la deuda de 5.000 € con los números de la 1.9 (simulación y tabla en [ECONOMIA.md](ECONOMIA.md#la-deuda)). Las partidas viejas pasan a la deuda nueva del capítulo en que están.
 - **Retraso:** el primer día después del plazo llega Toño. Suma un 20 % del plazo (redondeado a 100 €) al plazo y a la deuda, quita 15 de vida y da 5 días más. Puede repetirse.
-- **Protección de Molina** (desde el capítulo 5, 1500 € una sola vez): encuentros con la policía ×0,4, ningún agente rechaza sobornos, el calor baja 20 al día y no hay redadas.
-- **Copa:** se presentan 20 g de un lote (los fenotipos estrella van aparte) y se pierden ganes o no. Gana con más de 26,8 % (redondeado a una décima); premio, 5000 €. Se puede repetir.
+- **Protección de Molina** (desde el capítulo 5, 1.500 € una sola vez): encuentros con la policía ×0,4, ningún agente rechaza sobornos, el calor baja 20 al día y no hay redadas.
+- **Copa:** se presentan 20 g de un lote (los fenotipos estrella van aparte) y se pierden ganes o no. Gana con más de 26,8 % (redondeado a una décima); premio, 5.000 €. Se puede repetir.
 - **Tu imperio (capítulo 8):** saldada la deuda, el juego sigue. Lo facturado desde el último pago da el rango, y cada rango sube lo que Iñaki carga al día; al subir, Iñaki avisa por SMS.
 
 | Rango | Facturado | Carga al por mayor al día |

@@ -54,7 +54,7 @@ Hace falta Node 18 o superior. Los comandos funcionan igual en `cmd` de Windows.
 npm install
 npx playwright install chromium
 npm run build      # src/ → index.html y dist/ribera-verde.artifact.html
-npm test           # compila y recorre la historia completa (50 pasos) en Chromium sin ventana
+npm test           # compila y recorre la historia completa (52 pasos) en Chromium sin ventana
 npm run docs       # compila y regenera docs/GENETICA.md, MAPA.md y ECONOMIA.md desde los datos del juego
 npm run capturas   # compila y regenera screenshots/
 npm run plano      # compila y regenera docs/plano/ (mapas con rejilla, hoja de escala y vista de carpa B)

@@ -17,6 +17,8 @@ function migrate(){
     if(S.due>0){S.due=S.ch===3||S.ch===5?PLAZOS[S.ch]:S.debt;S.deadline=Math.max(S.deadline,S.day+(S.ch===5?10:7));}
     if(S.ch>=8){S.imp0=S.sales;S.impN=0;}
   }
+  // partidas guardadas por chapter() antes de poner el plazo (hasta la 1.10): capítulo 5 o 7 sin nada que pagar
+  if((S.ch===5||S.ch===7)&&!(S.due>0)&&S.debt>0){S.due=S.ch===5?Math.min(PLAZOS[5],S.debt):S.debt;S.deadline=Math.max(S.deadline||0,S.day+(S.ch===5?10:7));}
   const d=newState();for(const k in d)if(!(k in S))S[k]=d[k];for(const k in d.items)if(!(k in S.items))S.items[k]=0;
   const n=huecos().length;while(S.pots.length<n)S.pots.push(null);while(S.macetas.length<n)S.macetas.push('plastico7');
 }

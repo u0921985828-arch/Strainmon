@@ -184,7 +184,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
     () => S.ch === 6 && Math.round(S.buds.ria.g) === 5 || { ch: S.ch, buds: S.buds });
   await step('Copa: presentar Fire OG (27,2%) → gana → capítulo 7', ['Fire OG'], async () => {
     S.money = 0; addBuds('dragon', 25, 27.2); await run(talkJurado);
-  }, () => S.ch === 7 && S.money === 5000 && S.due === 15000 && S.flags.copa || { ch: S.ch, money: S.money, due: S.due });
+  }, () => S.ch === 7 && S.money === 5000 && S.due === 15000 && S.flags.copa && loadSave().due === 15000 || { ch: S.ch, money: S.money, due: S.due, guardado: loadSave().due });
 
   // ---------- capítulo 7 → final ----------
   await step('Pagar los últimos 15.000 € → deuda saldada: empieza tu imperio (capítulo 8, con su rótulo)', ['^Pagar'], async () => {
@@ -238,14 +238,15 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
       await run(() => harvest(0)); Math.random = r0; return S.seeds[sid] || 0; };
     R.hindu = [await cos('hindu', .99), await cos('hindu', .5), await cos('hindu', .01)]; R.skunk = [await cos('ria', .5), await cos('ria', .05)]; S.seeds = sd;
   }, () => R.hindu.every(n => n >= 1 && n <= 3) && R.skunk[0] === 0 && R.skunk[1] >= 1 || R);
-  await step('Partida de la 1.9 en el capítulo 7 (2.000 € en 3 días) → 15.000 € con 7 días; cifras con punto de miles', [], async () => {
+  await step('Partida de la 1.9 en el capítulo 7 (2.000 € en 3 días) → 15.000 € con 7 días; guardada sin plazo en el 5 → 12.000 €; punto de miles', [], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 7, debt: 2000, due: 2000, deadline: S.day + 3 }); delete S.eco; migrate();
-    window.R = { due: S.due, dias: S.deadline - S.day, eco: S.eco, eur: [eur(999), eur(3000), eur(1500.4), eur(-1234), eur(30000)].join('|') }; S = S0;
-  }, () => R.due === 15000 && R.dias === 7 && R.eco === 2 && R.eur === '999 €|3.000 €|1.500 €|-1.234 €|30.000 €' || R);
+    window.R = { due: S.due, dias: S.deadline - S.day, eco: S.eco, eur: [eur(999), eur(3000), eur(1500.4), eur(-1234), eur(30000)].join('|') };
+    Object.assign(S, { ch: 5, debt: 27000, due: 0, deadline: S.day - 2 }); migrate(); R.due5 = S.due; R.dias5 = S.deadline - S.day; S = S0;
+  }, () => R.due === 15000 && R.dias === 7 && R.eco === 2 && R.eur === '999 €|3.000 €|1.500 €|-1.234 €|30.000 €' && R.due5 === 12000 && R.dias5 === 10 || R);
   await step('8.ª variedad desde un arbusto → capítulo 5 sin más acciones', [], async () => {
     S.ch = 4; S.flags.lab = true; S.due = 0; S.disc = { ria: true, limon: true, txoko: true, niebla: true, mango: true, purpura: true, rif: true };
     S.custom = {}; delete S.taken.h_acap; S.map = 'town'; await run(() => objectAction(2, 26)); S.map = 'home'; await idle();
-  }, () => S.ch === 5 && S.due === 12000 || { ch: S.ch, disc: discCount() });
+  }, () => S.ch === 5 && S.due === 12000 && loadSave().due === 12000 || { ch: S.ch, disc: discCount(), guardado: loadSave().due });
   await step('Guardar y cargar la partida', [], async () => { save(); },
     () => { const sv = loadSave(); return sv && sv.ch === S.ch && sv.money === S.money && JSON.stringify(sv.disc) === JSON.stringify(S.disc) || 'no coincide'; });
 

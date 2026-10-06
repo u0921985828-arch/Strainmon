@@ -192,7 +192,7 @@ async function talkJurado(){
     sfx('get');await say('Nueva marca. {N} gana la COPA DE RIBERA.',N);
     S.money+=PREMIO_COPA;S.rep+=20;await got(eur(PREMIO_COPA)+' y el trofeo de la Copa');
     await talk('DARKO',['Esto no se acaba aquí.','Mi tío se va a enterar.']);
-    S.flags.copa=true;await chapter(7);S.due=S.debt;S.deadline=S.day+7;showObjective();
+    S.flags.copa=true;S.due=S.debt;S.deadline=S.day+7;await chapter(7);showObjective();   // el plazo, antes: chapter() guarda
   }else{sfx('bad');await say('Gana DARKO. La Copa sigue abierta: vuelve con algo más potente.',N);}
 }
 async function talkBaltasar(){
@@ -221,7 +221,9 @@ async function talkBaltasar(){
     S.debt=0;S.imp0=S.sales;S.impN=0;await ending();
   }
 }
-async function chapter(n){S.ch=n;sfx('get');toast(`<small>CAPÍTULO ${n}</small>${CH_TITLES[n]}`,2800);buildEnts();await wait(400);save();}
+// el rótulo del capítulo dura 2,8 s: el objetivo que se pida mientras tanto sale cuando acaba (sin parar el juego)
+let capHasta=0;
+async function chapter(n){S.ch=n;sfx('get');toast(`<small>CAPÍTULO ${n}</small>${CH_TITLES[n]}`,2800);capHasta=Date.now()+2800;buildEnts();await wait(400);save();}
 function objectiveText(){
   switch(S.ch){
     case 1:return !S.flags.letter?'Lee la carta que hay en la mesa.':!S.flags.kiko1?'Visita el growshop de Kiko, al lado de casa.':'Planta y consigue tu primera cosecha.';
@@ -235,7 +237,7 @@ function objectiveText(){
       return sig?`Tu imperio · ${IMPERIO[n].n}. Facturado desde la deuda: ${eur(Math.min(sig.meta,facturado()))} de ${eur(sig.meta)} para ser ${sig.n.toLowerCase()}. ${gen}.`:`Tu imperio · ${IMPERIO[n].n}. Completa la ${gen}.`;}
   }
 }
-function showObjective(){toast(`<small>OBJETIVO</small>${esc(objectiveText())}`,3200);}
+function showObjective(){const d=capHasta-Date.now();if(d>0){setTimeout(showObjective,d);return;}toast(`<small>OBJETIVO</small>${esc(objectiveText())}`,3200);}
 // el imperio (1.10): saldada la deuda, empieza. Cada rango se gana facturando desde el último pago (S.imp0) y sube lo que
 // Iñaki carga al día
 const IMPERIO=[{n:'Cultivador',meta:0,mayor:1000},{n:'Proveedor del barrio',meta:25000,mayor:2000},{n:'Distribuidor de la ría',meta:100000,mayor:5000},{n:'Mayorista del norte',meta:250000,mayor:10000}];
@@ -256,7 +258,7 @@ async function checkStory(){
     await talk('SMS · IÑAKI',[`Se corre la voz: ${eur(facturado())} vendidos desde que pagaste a Baltasar.`,`Desde hoy te cargo hasta ${r.mayor>=1000?coma(r.mayor/1000)+' kg':r.mayor+' g'} al día en el barco.`]);showObjective();
   }
   if(S.ch===4&&S.flags.lab&&discCount()>=8){
-    await chapter(5);S.due=PLAZOS[5];S.deadline=S.day+10;
+    S.due=PLAZOS[5];S.deadline=S.day+10;await chapter(5);
     await talk('SMS · TOÑO',[`Don Baltasar quiere ${eur(PLAZOS[5])} en diez días.`,'Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza.']);showObjective();
   }
 }
@@ -280,6 +282,6 @@ async function ending(){
   e.innerHTML=`<h2>DEUDA SALDADA</h2><div>Has saldado los ${eur(DEUDA)} de tu tía Maite en ${S.day} días.</div><div>Variedades: ${discCount()} · Ventas totales: ${eur(S.sales)}</div><div>Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.<br>¿Completarás la GENOTECA? ¿Conseguirás la GHOST TRAIN HAZE?</div><div style="opacity:.7">Pulsa A</div>`;
   e.hidden=false;await fade(0);sfx('get');
   await new Promise(r=>push(b=>{if(b==='A'||b==='START'){pop();r();}}));
-  await fade(1);e.hidden=true;await fade(0);await chapter(8);await wait(2400);showObjective();
+  await fade(1);e.hidden=true;await fade(0);await chapter(8);showObjective();
 }
 

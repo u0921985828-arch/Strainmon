@@ -43,11 +43,11 @@ Todo está **hecho**. Lo que añadió P1 va marcado con **(P1)**.
 |---|---|---|---|---|---|---|
 | 1 | La herencia | Leer la carta, ir a ver a Kiko y sacar la primera cosecha | Heredas el piso de la tía Maite con su armario de 60 | Skunk #1 5 €/semilla, abono 1 L 14 €, insecticida 12 €, bocata 5 €, maceta de tela 11 L 3 € · (P1) ventilador 20 €, LED 100 W 110 € | — | 2 |
 | 2 | La calle | Ganar 300 € vendiendo en la calle | Clientes con `$`, primeros ladrones | Lemon Haze 9 €, OG Kush 10 €, spray de pimienta 15 €, maceta de plástico 18 L 2 €, sodio 250 W 85 €, LED 200 W 220 €, carpa 100 × 100 120 € (sitio B) · (P1) extractor con filtro 110 € | Michoacán, Punto Rojo, Thai, Kif y Beldia | 6 |
-| 3 | La deuda | Pagar 3000 € a Don Baltasar en 7 días | Toño te lleva al bar El Ancla: la tía debía 30.000 €. (1.10) Iñaki compra al por mayor | Blueberry 8 €, Mango 7 €, maceta de tela 25 L 4 €, sodio 400 W 100 €, LED 480 W 500 €, bolsas de 50 semillas · (P1) armario 80 90 € (sitio A), riego por goteo 55 € | + Chitral Kush, Nepalese, Congolese, Lamb's Bread y Oaxaca | 6 · (P1) 7 con el armario 80 |
+| 3 | La deuda | Pagar 3.000 € a Don Baltasar en 7 días | Toño te lleva al bar El Ancla: la tía debía 30.000 €. (1.10) Iñaki compra al por mayor | Blueberry 8 €, Mango 7 €, maceta de tela 25 L 4 €, sodio 400 W 100 €, LED 480 W 500 €, bolsas de 50 semillas · (P1) armario 80 90 € (sitio A), riego por goteo 55 € | + Chitral Kush, Nepalese, Congolese, Lamb's Bread y Oaxaca | 6 · (P1) 7 con el armario 80 |
 | 4 | Genética | Recoger la mesa de genética y descubrir 8 variedades | Kiko te enseña a cruzar; las líneas nuevas se estabilizan de F1 a F4 | Purple Afghani 8 €, sodio 600 W 120 €, carpa 150 × 100 140 € (sitio B) | + Luang Prabang y Panama Red | 8 · (P1) 9 con el armario 80 |
-| 5 | El sargento | Pagar 12.000 € en 10 días | El sargento Molina ofrece su «protección» por 1500 € | LED 720 W 950 € · (P1) carpa 120 150 € (sitio C) | — | 8 · (P1) 15 con la carpa 120 |
+| 5 | El sargento | Pagar 12.000 € en 10 días | El sargento Molina ofrece su «protección» por 1.500 € | LED 720 W 950 € · (P1) carpa 120 150 € (sitio C) | — | 8 · (P1) 15 con la carpa 120 |
 | 6 | La Copa de Ribera | Llevar al jurado 20 g con más de 26,8 % de THC | Darko compite con su Amnesia Haze (26,8 %) | — | — | igual |
-| 7 | Libertad | Pagar los últimos 15.000 € en 7 días (la Copa da 5000 €) | Saldas la deuda de la tía; Baltasar te ofrece trabajo | — | — | igual |
+| 7 | Libertad | Pagar los últimos 15.000 € en 7 días (la Copa da 5.000 €) | Saldas la deuda de la tía; Baltasar te ofrece trabajo | — | — | igual |
 | 8 | Tu imperio (1.10) | Facturar para subir de rango (25.000, 100.000 y 250.000 €) y completar las 41 variedades | Sin deudas; cada rango sube lo que Iñaki carga al día (1, 2, 5 y 10 kg) | — | — | igual |
 
 ## 3. Equipo de cultivo
