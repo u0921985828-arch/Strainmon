@@ -35,7 +35,7 @@ Rig humanoide: rotaciones coherentes y plantillas de animación a 1 generación 
 
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
-| player | player | create_character (standard) | 4 direcciones, 32 px | solo texto | F1 | idle, walk, run, regar*, plantar, cosechar, cruzar*, oler*, vender*, telefono* | 32 |
+| player | player | create_character (standard) | 4 direcciones, 22 px | solo texto | F1 | idle, walk, run, regar*, plantar, cosechar, cruzar*, oler*, vender*, telefono* | 32 |
 | kiko | kiko | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, fumar*, semillas* | 7 |
 | josune | josune | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, secar_vaso*, servir* | 7 |
 | baltasar | baltasar | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, puro*, contar* | 7 |

@@ -35,14 +35,14 @@
 - **El motor de sprites va antes que los sprites (v1.3).** Se probó con un atlas «de calco» del arte actual: si las capturas salen iguales, las anclas cuadran y los créditos se gastan solo en arte.
 - **Ajustes tras la prueba automática (v1.1).** Los ladrones de los capítulos altos ganaban casi siempre, así que se suavizaron y ahora la VIDA máxima sube 2 puntos por cada ladrón vencido. Además se corrigieron tres fallos; están en [CHANGELOG.md](CHANGELOG.md).
 
-## Estado (v1.3.0)
+## Estado (v1.4.0)
 
 - Se juega de principio a fin: capítulos 1 a 7, final y juego libre (capítulo 8).
 - `npm test` recorre la historia entera y los sistemas sueltos en 34 pasos: **34/34, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
   - el motor ya usa el atlas (F2) y `npm run test:arte` da 16/16;
-  - todavía no se ha generado ningún sprite con créditos: se empieza por F1.
+  - F1 generada: el protagonista ya sale del atlas (`base`, `idle`, `walk`), pendiente de aprobación; el resto sigue procedural.
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
 - **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.3, con arte procedural porque aún no hay atlas.
 

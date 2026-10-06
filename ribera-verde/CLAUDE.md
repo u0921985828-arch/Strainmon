@@ -64,3 +64,6 @@ Hierba `#84cc6c` `#62aa56` `#b0e48c` `#3f8a46` · tierra `#dcc08a` · acera `#dc
   - El nombre de cada animación es su carpeta en `art/crudo/<grupo>/`: no se puede repetir dentro de un asset (las tres de balanceo de la planta se llaman `balanceo-<fase>`).
   - Ningún menor fuma: lo comprueba `sprites:validar`, `procesar.js` no exporta `fumador` para un menor y el motor filtra las acciones de fumar de los grupos de `menores`.
   - Las acciones del jugador (`accion()`) se esperan dentro de los guiones; sin atlas resuelven al instante y los tests no cambian.
+  - `create_character` estándar: `size` es el lienzo antes de ampliarlo. Con `size: 32` el personaje mide 34-35 px y no cabe en la celda 32×32 (pies en 30); con 26, al caminar se sale. Usa los `parametros` del player (`size: 22`, proporciones a medida): 24-27 px.
+  - Las animaciones de plantilla cambian los tonos respecto a la rotación. Antes de procesar, `reduce_colors` con `num_colors: 15` y **todos** los fotogramas del personaje en una sola llamada; su salida va a `art/crudo` y el job queda en `pixellab.reduce_colors_job`.
+  - En sesiones cloud, `backblaze.pixellab.ai` está bloqueado: descarga con `https://api.pixellab.ai/mcp/characters/<id>/download` (zip) y `https://api.pixellab.ai/mcp/images/<job>/download?index=N`, que no piden token.

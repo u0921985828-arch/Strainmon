@@ -242,9 +242,9 @@
    "parametros": {
     "mode": "standard",
     "n_directions": 4,
-    "size": 32,
+    "size": 22,
     "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
+    "proportions": "{\"type\":\"custom\",\"head_size\":2,\"arms_length\":0.75,\"legs_length\":0.6,\"shoulder_width\":1,\"hip_width\":1}",
     "outline": "single color black outline",
     "shading": "basic shading",
     "detail": "medium detail"
@@ -252,7 +252,7 @@
    "referencias": [
     "art/referencias/estilo/player_south_x2.png"
    ],
-   "descripcion": "young adult street grower, green baseball cap with darker green brim, short dark brown hair, light skin, red t-shirt, navy blue jeans, dark sneakers",
+   "descripcion": "small chibi character that fits in a 32x32 tile: short and stocky, big round head about 40% of the body height, short legs. young adult street grower, green baseball cap with darker green brim, short dark brown hair, light skin, red t-shirt, navy blue jeans, dark sneakers",
    "colores_identidad": [
     "#2fa868",
     "#1a6a40",
@@ -398,9 +398,27 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
-   "notas": "Es el ancla de estilo: todo lo demás se compara con él. Se aprueba a mano antes de seguir.",
-   "familia": "personaje"
+   "estado": "procesado",
+   "notas": "Es el ancla de estilo: todo lo demás se compara con él. Se aprueba a mano antes de seguir. F1: generado y procesado (base + idle + walk, 36 fotogramas, 14 colores); pendiente de aprobación. run y acciones (regar…) tras aprobar.",
+   "familia": "personaje",
+   "pixellab": {
+    "character_id": "84497682-97b8-4329-b6a1-ede1acbba4ae",
+    "animation_group_id": {
+     "idle": "5ec5108b-a08b-4bd5-b5aa-5fbc25557b8f",
+     "walk": "73253f9c-a48c-44d9-8196-81533fef95df"
+    },
+    "reduce_colors_job": "98068b7b-5a35-4230-8563-41c72911cb55",
+    "descartados": {
+     "fcb0e6ed-b020-44a3-87fb-6188883c4694": "size 32 preset chibi: 34-35 px, no cabe",
+     "fb449cd4-f866-4583-9a91-ee1d03188dee": "size 32: 34-35 px",
+     "4d9b4107-255c-4e62-bf2b-d543b89d36ef": "size 32: 34-35 px",
+     "079f4022-71ca-4efa-9aa8-a4f12d0199c1": "size 28 preset: poco chibi",
+     "86d1eced-d89a-4410-857e-7278ced1ecdb": "size 28 custom: 33-34 px",
+     "3be02f10-7279-4e1e-aa3b-9530cf69b4a7": "size 26 custom: al caminar se sale de la celda y supera la escala de puerta",
+     "b18c37c2-9665-414d-adac-1ada2c1d9a74": "size 24: 28-30 px"
+    }
+   },
+   "coste_real": 25
   },
   {
    "id": "kiko",

@@ -1,5 +1,12 @@
 # Cambios
 
+## 1.4.0 · 6 de octubre de 2026
+
+- **Nuevo: F1, protagonista generado con PixelLab** (pendiente de aprobación). `base` + `idle` + `walk` en 4 direcciones (36 fotogramas, 14 colores), en el atlas `assets/sprites/atlas.{png,json}` e incrustado en el build. El resto del juego sigue procedural.
+  - `create_character` estándar con `size: 22` y proporciones a medida (cabeza 2.0, piernas 0.6): con `size: 32` salía de 34-35 px y no cabía en la celda 32×32.
+  - Paleta unificada con `reduce_colors` (15 colores, los 36 fotogramas juntos): las animaciones de plantilla cambiaban el tono de la gorra.
+  - Coste real: 25 generaciones (8 personajes de prueba, 16 direcciones animadas, 0,1 de paleta).
+
 ## 1.3.0 · 5 de octubre de 2026
 
 - **Nuevo: el motor ya usa sprites (F2).** `src/js/01b-arte.js` carga el atlas que incrusta el build y dibuja con él personajes, tiles, objetos, edificios, plantas, combate y efectos; lo que falte sigue saliendo procedural. Incluye:
