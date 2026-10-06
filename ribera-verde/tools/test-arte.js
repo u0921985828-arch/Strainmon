@@ -132,9 +132,9 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       r.mapa = ['p60', 'm100', 'g150'].every(t => arteCarpaMapa(t, 50, 50)); r.anchos = [A.x1 - A.x0 + 1, B.x1 - B.x0 + 1].join();
       r.solidas = tileSolid(m, A.x0, A.y) && tileSolid(m, B.x0, B.y) && tileSolid(m, B.x1, B.y) && !tileSolid(m, A.x0, A.y + 1);
       r.piso = [m.w, m.h].join('×');
-      // las 23 variedades × 5 fases tienen planta; los híbridos propios, una por hash
+      // todas las variedades (con su cepa en PLANTA_SM) × 5 fases tienen planta; los híbridos propios, una por hash
       const g = ARTE.cubre['misc:planta-vista'];
-      r.plantas = DEX.every(k => [1, 2, 3, 4, 5].every(f => !!frameDe(g, 'sm' + smDe(k) + '-' + f, 'unica', 0, { i: 0 }))) && !!frameDe(g, 'sm' + smDe('xq9') + '-3', 'unica', 0, { i: 0 });
+      r.n = DEX.length; r.plantas = DEX.every(k => k in PLANTA_SM && [1, 2, 3, 4, 5].every(f => !!frameDe(g, 'sm' + smDe(k) + '-' + f, 'unica', 0, { i: 0 }))) && !!frameDe(g, 'sm' + smDe('xq9') + '-3', 'unica', 0, { i: 0 });
       const alto = (sid, prog) => { ctx.save(); const h = artePlantaVista({ sid, prog, water: 80, health: 100 }, 60, 100, 0); ctx.restore(); return h; };
       r.alturas = [.05, .2, .5, .8, 1].map(p => alto('malawi', p)); r.crece = r.alturas.every((h, i) => h > 0 && (!i || h >= r.alturas[i - 1])) && r.alturas[4] <= 56;
       const f = frameDe(g, 'sm08-3', 'unica', 0, { i: 0 }), colores = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, o = new Set(); for (let i = 0; i < d.length; i += 4) if (d[i + 3]) o.add(d[i] + ',' + d[i + 1] + ',' + d[i + 2]); return o; };
@@ -147,7 +147,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       press('B'); await hasta(() => mode === 'world' && isFree()); r.sale = !VC && document.getElementById('vcInfo').hidden;
       return r; });
     check('Carpas: muebles del piso (1-2 casillas, sólidos) con su arte, piso de 12×8', carpa.mapa && carpa.anchos === '1,2' && carpa.solidas && carpa.piso === '12×8', carpa);
-    check('Plantas de la vista: 23 variedades × 5 fases, alturas que crecen hasta 56 px, seca y muerta sin verdes', carpa.plantas && carpa.crece && carpa.seca, carpa);
+    check(`Plantas de la vista: ${carpa.n} variedades × 5 fases, alturas que crecen hasta 56 px, seca y muerta sin verdes`, carpa.plantas && carpa.crece && carpa.seca, carpa);
     check('Vista de carpa: A abre, ▶ plaza 2, ▲ el foco, B sale; fondo, carpa, macetas y focos del atlas', carpa.escena && carpa.sel.join() === '0,1,-1' && /CFL/.test(carpa.info) && carpa.sale, carpa);
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
       for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }

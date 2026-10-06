@@ -79,10 +79,12 @@ El cultivo va en carpas dentro del piso. Desde fuera se ven cerradas (techo, fre
 ## 5. Genética
 
 - La **mesa de genética** se desbloquea en el capítulo 4. Gasta 1 semilla de la madre y 1 del padre y da **2 semillas** del resultado.
-- Hay 13 recetas fijas (ver [GENETICA.md](GENETICA.md)) que llevan hasta la *Ghost Train Haze* (29 % de THC).
+- Hay 20 recetas fijas (ver [GENETICA.md](GENETICA.md)): 13 llevan hasta la *Ghost Train Haze* (29 % de THC) y 7 son los híbridos clásicos que salieron de las landraces (Haze, Northern Lights, Afghan Kush, Shiva Skunk, Silver Haze y Super Silver Haze).
+- **Estabilizar (1.9):** lo que sale de un cruce nuevo es una F1 inestable (cosechas de 0,8 a 1,1 veces lo normal). Cruzándola consigo misma en la mesa (2 semillas → 2 semillas) sube a F2, F3 y queda estable en la F4.
 - Cualquier otra pareja da un **híbrido propio** determinista: misma pareja, mismo resultado. THC = media de los padres −1,5 / +2,0 (tope 33 %).
 - Una variedad queda **descubierta** al conseguir su semilla o su cogollo. Los híbridos propios cuentan para el objetivo del capítulo 4.
 - **Landraces:** Afghani (Kiko, capítulo 4), Hindu Kush (abuela Txaro a cambio de 5 g), Acapulco Gold (arbusto del parque en 2,26) y Malawi Gold (Iñaki, tras venderle 10 g).
+- **Banco de semillas (1.9):** desde el capítulo 2, el PC de la tía pide sobres de 3 semillas de las 12 landraces del catálogo de Strainmon (Michoacán, Punto Rojo, Thai, Kif y Beldia; en el 3, Chitral Kush, Nepalese, Congolese, Lamb's Bread y Oaxaca; en el 4, Luang Prabang y Panama Red), de 35 a 90 €. El pedido llega al día siguiente.
 
 ## 6. Venta en la calle
 

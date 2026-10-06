@@ -1,5 +1,20 @@
 # Cambios
 
+## 1.9.0 · 6 de octubre de 2026
+
+- **Nuevo: las genéticas de Strainmon.** La Genoteca pasa de 23 a 41 variedades con la información de `../src/species.js`, todas con nombre real y su historia (se lee en la Genoteca y en el banco).
+  - 12 landraces: Michoacán, Punto Rojo, Thai, Luang Prabang, Chitral Kush, Nepalese, Congolese, Lamb's Bread, Kif, Beldia, Oaxaca y Panama Red.
+  - 6 híbridos clásicos que salen de cruzarlas: Haze (Punto Rojo × Thai o Michoacán × Thai), Northern Lights (Afghani × Thai), Afghan Kush (Afghani × Hindu Kush), Shiva Skunk (Northern Lights × Skunk #1), Silver Haze (Haze × Northern Lights) y Super Silver Haze (Silver Haze × Skunk #1). 20 recetas en total.
+  - Fuera las dos reliquias inventadas de Strainmon y las variedades con nombre de persona.
+- **Nuevo: estabilizar.** Lo que sale de un cruce nuevo es una F1: sus cosechas salen desiguales (gramos ×0,8–1,1 y THC ×0,96–1,02). En la mesa de genética, «estabilizar» cruza la variedad consigo misma (gasta 2 semillas y da 2 de la generación siguiente); en la F4 la línea queda fija. La Genoteca dice en qué generación va cada una.
+- **Nuevo: banco de semillas.** Desde el capítulo 2, el ordenador de la tía vende sobres de 3 semillas de landraces (35–90 €; 5 en el capítulo 2, 10 en el 3 y las 12 en el 4) que llegan al día siguiente.
+- **Corregido:** en los menús a toda altura, una descripción de 4 líneas tapaba la lista; ahora se ven las filas que caben.
+- **Partidas viejas:** una partida de la 1.8 carga igual; las variedades que ya tenías cuentan como estables.
+- **Tests:**
+  - `npm test` 42/42: estabilizar Critical Mass (F1 → F2 → F3 → estable), el banco (Punto Rojo y Thai, llegan al día siguiente) y el cruce Punto Rojo × Thai → Haze con cosechas desiguales.
+  - `npm run test:arte` 22/22: plantas de la vista para las 41 variedades.
+- **Docs:** `docs/GENETICA.md` con la historia de cada variedad y la regla de estabilizar; `docs/GDD.md` al día.
+
 ## 1.8.0 · 6 de octubre de 2026
 
 - **Cambiado: una sola escala (opción A de `docs/PLANO.md`).**

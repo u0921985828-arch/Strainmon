@@ -23,7 +23,7 @@ En el PC también vale el teclado (flechas o WASD, Z/Espacio = A, X/Esc = B, M =
 ## Qué incluye
 
 - **Cultivo:** carpas en el piso (el armario de 60 con 2 plantas, la de 100 con 4 y la de 150 con 6); con A delante se abre la carpa de frente y eliges planta o foco con la cruceta. Macetas de plástico o de tela de 7 a 25 L, focos CFL, sodio y LED de 125 a 720 W con su cobertura y su factura de la luz; riego, abono, plagas y cinco fases de crecimiento. La cosecha da gramos con su % de THC y semillas.
-- **Genética:** mesa de cruces y Genoteca con 23 variedades: 6 del growshop, 4 landraces (una te la da Kiko y tres se consiguen por el barrio) y 13 que salen de cruces, entre ellas la legendaria *Ghost Train Haze* (Amnesia Haze × Fire OG). Los cruces sin receta generan híbridos propios.
+- **Genética:** mesa de cruces y Genoteca con 41 variedades reales, cada una con su historia: 6 del growshop, 16 landraces (una te la da Kiko, tres se consiguen por el barrio y doce, de Michoacán a Panama Red, se piden al banco de semillas del ordenador de la tía) y 19 que salen de cruces, de Haze y Northern Lights a la legendaria *Ghost Train Haze* (Amnesia Haze × Fire OG). Lo que sale de un cruce es una F1 de cosechas desiguales hasta que la estabilizas (F4). Los cruces sin receta generan híbridos propios.
 - **Calle:** clientes con `$` (estudiante, currela, turista y pijo) a los que les pides precio de rebaja, justo o caro. Cada venta sube el **calor policial** y a 90 llega una redada.
 - **Combates por turnos:** contra ladrones (luchar, mochila, hablar, huir) y contra la policía (sobornar, hablar, huir, entregar).
 - **Historia:** la herencia de la tía Maite, la deuda de 5.000 € con Don Baltasar, el sargento Molina, el rival Darko y la Copa de Ribera.
@@ -73,7 +73,7 @@ Edita siempre en `src/` y después ejecuta `npm run build`. `index.html` y `dist
 - [CONTEXTO.md](CONTEXTO.md): la petición, las decisiones, el estado y los siguientes pasos.
 - [docs/GDD.md](docs/GDD.md): mecánicas, fórmulas y economía.
 - [docs/GUION.md](docs/GUION.md): historia y diálogos por capítulo.
-- [docs/GENETICA.md](docs/GENETICA.md): las 23 variedades y el árbol de cruces.
+- [docs/GENETICA.md](docs/GENETICA.md): las 41 variedades, su historia y el árbol de cruces.
 - [docs/MAPA.md](docs/MAPA.md): mapas con coordenadas, personajes, objetos y tienda.
 - [docs/PIXELLAB.md](docs/PIXELLAB.md): kit pro para cambiar todo el arte por sprites y animaciones de PixelLab con Claude Code (comando `/sprites`), sin salirse de la estética. El motor ya los usa en cuanto hay atlas.
 - [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md): cada sprite del juego con su herramienta de PixelLab (personajes, terreno, objetos sobre el mapa, lotes e imágenes), su orden y su coste.

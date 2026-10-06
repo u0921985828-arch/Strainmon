@@ -22,16 +22,18 @@ function menu(items,o={}){return new Promise(res=>{
   items=items.map(it=>typeof it==='string'?{label:it}:it);
   let i=clamp(o.initial||0,0,items.length-1),top=0;const rows=o.rows||(o.cls==='full'?(o.desc?5:8):items.length);
   menuEl.className='box menu '+(o.cls||'right');
-  const draw=()=>{
-    if(i<top)top=i;if(i>=top+rows)top=i-rows+1;
+  // menú a toda altura: si la descripción ocupa más líneas, caben menos filas (vis) y la lista no se monta sobre ella
+  const draw=(vis=rows)=>{
+    if(i<top)top=i;if(i>=top+vis)top=i-vis+1;
     let h='';if(o.title)h+=`<div class="ttl"><span>${o.title}</span>${o.title2?`<span>${o.title2}</span>`:''}</div>`;
     if(o.cls==='full')h+=`<div class="arr">${top>0?'▲':''}</div><div class="list">`;
-    items.slice(top,top+rows).forEach((it,k)=>{const idx=top+k;h+=`<div class="it ${idx===i?'sel':''} ${it.disabled?'dis':''}" data-i="${idx}"><span>${it.ic?`<i class="ic" style="background-image:url(${it.ic})"></i>`:it.sw?`<i class="sw" style="background:${it.sw}"></i>`:''}${esc(it.label)}</span>${it.right!=null?`<span class="r">${esc(it.right)}</span>`:''}</div>`;});
-    if(o.cls==='full')h+=`</div><div class="arr">${top+rows<items.length?'▼':''}</div>`;
+    items.slice(top,top+vis).forEach((it,k)=>{const idx=top+k;h+=`<div class="it ${idx===i?'sel':''} ${it.disabled?'dis':''}" data-i="${idx}"><span>${it.ic?`<i class="ic" style="background-image:url(${it.ic})"></i>`:it.sw?`<i class="sw" style="background:${it.sw}"></i>`:''}${esc(it.label)}</span>${it.right!=null?`<span class="r">${esc(it.right)}</span>`:''}</div>`;});
+    if(o.cls==='full')h+=`</div><div class="arr">${top+vis<items.length?'▼':''}</div>`;
     if(o.desc)h+=`<div class="desc">${esc(items[i].desc||'')}</div>`;
     menuEl.innerHTML=h;
+    const l=o.cls==='full'&&!menuEl.hidden&&menuEl.querySelector('.list');if(l&&vis>1&&l.scrollHeight>l.clientHeight+1)draw(vis-1);
   };
-  draw();menuEl.hidden=false;
+  menuEl.hidden=false;draw();
   const done=v=>{pop();menuEl.hidden=true;menuEl.onclick=null;res(v);};
   menuEl.onclick=e=>{const it=e.target.closest('.it');if(!it)return;const n=+it.dataset.i;if(n===i)handler('A');else{i=n;draw();}};
   const handler=b=>{const g=o.cls==='battle';const n=items.length;

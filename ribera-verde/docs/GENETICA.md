@@ -2,7 +2,7 @@
 
 > Generado automáticamente con `node tools/generar-docs.js` a partir de los datos del juego. No editar a mano: cambia `src/js/03-datos.js` y regenera.
 
-## Las 23 variedades de la Genoteca
+## Las 41 variedades de la Genoteca
 
 | # | Variedad | THC | Rinde (g/planta) | Días | Resist. | Color | Cómo se consigue |
 |---|---|---|---|---|---|---|---|
@@ -29,8 +29,51 @@
 | 21 | Amnesia Haze | 26% | 36 | 4,5 | 65% | `#bcd468` | Cruce: Super Lemon Haze × Trainwreck |
 | 22 | Fire OG | 27% | 40 | 3,5 | 75% | `#90b448` | Cruce: Critical Kush × Blueberry Kush |
 | 23 | Ghost Train Haze | 29% | 42 | 4,5 | 75% | `#d8ecb0` | Cruce: Amnesia Haze × Fire OG · **legendaria** |
+| 24 | Michoacán | 15% | 30 | 4 | 55% | `#b8d860` | Banco de semillas del PC, sobre de 3 por 40 € (cap. 2; llega al día siguiente) |
+| 25 | Punto Rojo | 16% | 30 | 4,5 | 45% | `#b4a24c` | Banco de semillas del PC, sobre de 3 por 55 € (cap. 2; llega al día siguiente) |
+| 26 | Thai | 17% | 26 | 5 | 40% | `#b0d468` | Banco de semillas del PC, sobre de 3 por 60 € (cap. 2; llega al día siguiente) |
+| 27 | Luang Prabang | 15% | 30 | 4,5 | 50% | `#8a9a5c` | Banco de semillas del PC, sobre de 3 por 80 € (cap. 4; llega al día siguiente) |
+| 28 | Chitral Kush | 17% | 32 | 3 | 70% | `#7a9a48` | Banco de semillas del PC, sobre de 3 por 70 € (cap. 3; llega al día siguiente) |
+| 29 | Nepalese | 16% | 28 | 3,5 | 65% | `#88906a` | Banco de semillas del PC, sobre de 3 por 65 € (cap. 3; llega al día siguiente) |
+| 30 | Congolese | 16% | 32 | 3,5 | 55% | `#b4d058` | Banco de semillas del PC, sobre de 3 por 60 € (cap. 3; llega al día siguiente) |
+| 31 | Lamb's Bread | 16% | 30 | 4 | 60% | `#a8d070` | Banco de semillas del PC, sobre de 3 por 60 € (cap. 3; llega al día siguiente) |
+| 32 | Kif | 13% | 28 | 3 | 80% | `#a8c060` | Banco de semillas del PC, sobre de 3 por 35 € (cap. 2; llega al día siguiente) |
+| 33 | Beldia | 12% | 24 | 3 | 75% | `#98b45c` | Banco de semillas del PC, sobre de 3 por 35 € (cap. 2; llega al día siguiente) |
+| 34 | Oaxaca | 15% | 32 | 4 | 65% | `#b0a84a` | Banco de semillas del PC, sobre de 3 por 55 € (cap. 3; llega al día siguiente) |
+| 35 | Panama Red | 17% | 28 | 4,5 | 50% | `#b8984c` | Banco de semillas del PC, sobre de 3 por 90 € (cap. 4; llega al día siguiente) |
+| 36 | Haze | 20% | 32 | 5 | 45% | `#c8dc68` | Cruce: Punto Rojo × Thai (o Michoacán × Thai) |
+| 37 | Northern Lights | 18% | 42 | 3 | 80% | `#7cae4c` | Cruce: Afghani × Thai |
+| 38 | Afghan Kush | 19% | 40 | 3 | 85% | `#6e9a44` | Cruce: Afghani × Hindu Kush |
+| 39 | Shiva Skunk | 19% | 44 | 3 | 85% | `#8cbc50` | Cruce: Northern Lights × Skunk #1 |
+| 40 | Silver Haze | 21% | 36 | 4,5 | 55% | `#c0d880` | Cruce: Haze × Northern Lights |
+| 41 | Super Silver Haze | 23% | 40 | 4 | 70% | `#c8e090` | Cruce: Silver Haze × Skunk #1 |
 
-## Recetas de cruce (13)
+## Historia de cada variedad
+
+Las landraces y los híbridos clásicos de la 1.9 salen del catálogo de Strainmon (`../src/species.js`): mismas regiones y perfiles, con su nombre real. Se lee en la Genoteca.
+
+| Variedad | Origen | Historia |
+|---|---|---|
+| Michoacán | Landrace · altiplano de Michoacán, México | Sativa de altura, espigada y cerebral. Aguanta bien el sol fuerte. |
+| Punto Rojo | Landrace · cordillera de Colombia | Sativa colombiana de pistilos rojizos. Floración larga y efecto eufórico. |
+| Thai | Landrace · selvas del norte de Tailandia | Sativa esbelta, de floración larguísima y aroma especiado. Es madre de la Haze y de la Northern Lights. |
+| Luang Prabang | Landrace · montes del norte de Laos | Sativa de las tierras altas de Laos. Muy vigorosa, con aroma dulce y a madera. |
+| Chitral Kush | Landrace · valle de Chitral, Pakistán | Índica de charas: su resina se frota a mano. Puede salir con tonos morados. |
+| Nepalese | Landrace · colinas del Himalaya, Nepal | Planta de altura, compacta y resinosa, con aroma a incienso. |
+| Congolese | Landrace · cuenca del Congo | Sativa africana rápida para su tipo. Efecto claro y aroma a fruta ácida. |
+| Lamb's Bread | Landrace · costa de Jamaica | Sativa caribeña que tolera la brisa salina. Aroma dulce, tropical y marino. |
+| Kif | Landrace · montañas del Rif, Marruecos | La planta del hachís marroquí: seca, compacta y cargada de tricomas. |
+| Beldia | Landrace · Ketama, en el Rif | La vieja landrace del Rif, casi desplazada por los híbridos. Rústica y aromática. |
+| Oaxaca | Landrace · sierra de Oaxaca, México | Sativa de suelo volcánico, vigorosa, con aroma ahumado y terroso. |
+| Panama Red | Landrace · istmo de Panamá | La sativa legendaria de los setenta, veteada de rojo. Muy cerebral y de floración lenta. |
+| Haze | Punto Rojo × Thai (o Michoacán × Thai) | Se estabilizó en California a finales de los sesenta con sativas de Colombia, México, Tailandia y el sur de la India. |
+| Northern Lights | Afghani × Thai | Índica estabilizada en el noroeste de EE. UU. y fijada en Holanda en los ochenta. Compacta y muy resinosa. |
+| Afghan Kush | Afghani × Hindu Kush | Las dos índicas de montaña juntas: compacta, resinosa y de floración corta. |
+| Shiva Skunk | Northern Lights × Skunk #1 | Northern Lights con Skunk #1: robusta, rápida y muy productiva. |
+| Silver Haze | Haze × Northern Lights | La Haze domada con Northern Lights: conserva el efecto y acorta la floración. |
+| Super Silver Haze | Silver Haze × Skunk #1 | Haze, Northern Lights y Skunk #1 en una sola línea. Una de las sativas más premiadas de los noventa. |
+
+## Recetas de cruce (20)
 
 El orden de los padres da igual. Cada cruce gasta 1 semilla de cada padre y da 2 semillas del resultado.
 
@@ -49,6 +92,13 @@ El orden de los padres da igual. Cada cruce gasta 1 semilla de cada padre y da 2
 | Super Lemon Haze | Trainwreck | **Amnesia Haze** | 26% |
 | Blueberry Kush | Critical Kush | **Fire OG** | 27% |
 | Fire OG | Amnesia Haze | **Ghost Train Haze** | 29% |
+| Punto Rojo | Thai | **Haze** | 20% |
+| Michoacán | Thai | **Haze** | 20% |
+| Afghani | Thai | **Northern Lights** | 18% |
+| Hindu Kush | Afghani | **Afghan Kush** | 19% |
+| Northern Lights | Skunk #1 | **Shiva Skunk** | 19% |
+| Haze | Northern Lights | **Silver Haze** | 21% |
+| Skunk #1 | Silver Haze | **Super Silver Haze** | 23% |
 
 ## Árbol hasta la Ghost Train Haze
 
@@ -80,8 +130,30 @@ flowchart LR
   reina["Critical Kush"] --> dragon
   dragon["Fire OG"] --> leyenda["Ghost Train Haze"]
   tormenta["Amnesia Haze"] --> leyenda
+  punto["Punto Rojo"] --> haze["Haze"]
+  thai["Thai"] --> haze
+  mich["Michoacán"] --> haze["Haze"]
+  thai["Thai"] --> haze
+  rif["Afghani"] --> nl["Northern Lights"]
+  thai["Thai"] --> nl
+  hindu["Hindu Kush"] --> afkush["Afghan Kush"]
+  rif["Afghani"] --> afkush
+  nl["Northern Lights"] --> shiva["Shiva Skunk"]
+  ria["Skunk #1"] --> shiva
+  haze["Haze"] --> silver["Silver Haze"]
+  nl["Northern Lights"] --> silver
+  ria["Skunk #1"] --> ssh["Super Silver Haze"]
+  silver["Silver Haze"] --> ssh
   style leyenda fill:#40e0a0,color:#062
 ```
+
+## Estabilizar (F1 → estable)
+
+Lo que sale de un cruce nuevo (receta o híbrido propio) es una **F1**: una línea inestable en la que cada planta sale distinta.
+
+- En la mesa de genética, al elegir como padre la misma variedad («· estabilizar»), se cruzan dos plantas de la línea: gasta 2 semillas, da 2 semillas y sube una generación (F1 → F2 → F3 → **estable** en la F4).
+- **Cosecha de una línea inestable:** gramos × (0,8 a 1,1 al azar) y THC × (0,96 a 1,02). Estable, ×1.
+- Las landraces, las de la tienda y las variedades de partidas anteriores a la 1.9 son estables.
 
 ## Híbridos propios (cruces sin receta)
 
@@ -99,6 +171,6 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
 - **Agua:** baja 3,5 × riego puntos por hora (con CFL y maceta de 7 L una planta regada aguanta ~28 h).
 - **Salud:** −4/h sin agua, −2,5/h con plaga, +1/h si agua > 30 % y sin plaga. A 0 la planta muere.
 - **Plagas:** probabilidad por hora `0,006 × (100 − resistencia) / 40` mientras no está madura.
-- **Cosecha (g):** `rinde × (0,4 + 0,6 × salud/100) × (abono ? 1,25 : 1) × rend`.
-- **THC final:** `THC × (0,85 + 0,15 × salud/100) + thc + (abono ? 0,3 : 0)`.
+- **Cosecha (g):** `rinde × (0,4 + 0,6 × salud/100) × (abono ? 1,25 : 1) × rend × v` (v = 1 si la línea es estable; 0,8–1,1 si no).
+- **THC final:** `THC × (0,85 + 0,15 × salud/100) × (1 + 0,2 × (v − 1)) + thc + (abono ? 0,3 : 0)`.
 - **Semillas al cosechar:** 1 + (0 a 2).

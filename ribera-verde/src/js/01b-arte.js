@@ -195,7 +195,8 @@ function arteMacetaVista(k,xc,yb){const f=fotoMisc('maceta-vista-'+k);if(!f)retu
 // floración, 4; lista, 5; muerta, la 3 parda). Seca: los verdes amarillean. Balanceo por filas y ácaros si hay plaga.
 // La base del tallo en (xc, yb); devuelve el alto que se ve o false sin atlas
 const PLANTA_SM={ria:8,limon:4,txoko:15,niebla:7,mango:12,purpura:16,rif:11,hindu:6,acapulco:2,malawi:9,citrus:1,bluetx:7,sollimon:5,
-  kushrif:12,purpurah:16,orotrop:0,nieblamor:7,brumaog:4,reina:15,amanecer:13,tormenta:3,dragon:14,leyenda:10};
+  kushrif:12,purpurah:16,orotrop:0,nieblamor:7,brumaog:4,reina:15,amanecer:13,tormenta:3,dragon:14,leyenda:10,
+  mich:1,punto:3,thai:4,lao:5,chitral:6,nepal:7,congo:8,lamb:10,kif:11,beldia:12,oaxaca:13,panama:14,haze:4,nl:15,afkush:15,shiva:8,silver:1,ssh:4};   // landraces 1.9: su cepa de Strainmon
 const smDe=sid=>String(PLANTA_SM[sid]??hashStr(sid)%18).padStart(2,'0');
 function artePlantaVista(p,xc,yb,now){
   const g=ARTE.ok&&ARTE.cubre['misc:planta-vista'];if(!g)return false;

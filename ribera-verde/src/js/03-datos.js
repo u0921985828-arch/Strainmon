@@ -3,6 +3,8 @@
    ========================================================= */
 // Variedades reales (nombres de uso común entre cultivadores; ninguna marca de banco de semillas). Los ids internos son
 // los de las primeras versiones para no romper partidas guardadas. c = tono del cogollo (verde con el matiz de la variedad).
+// h = historia (Genoteca). Las landraces y los híbridos clásicos de la 1.9 salen del catálogo de Strainmon (src/species.js):
+// mismas regiones y perfiles, con su nombre real; sus «reliquias» (inventadas) no entran.
 const STRAINS={
   ria:{n:'Skunk #1',thc:12,y:40,d:2.5,r:75,c:'#9bd35a',o:'Growshop · un clásico de los setenta: robusta, estable y fácil'},
   limon:{n:'Lemon Haze',thc:15,y:30,d:3.5,r:50,c:'#d8e060',o:'Growshop · sativa cítrica, de floración lenta'},
@@ -27,16 +29,42 @@ const STRAINS={
   tormenta:{n:'Amnesia Haze',thc:26,y:36,d:4.5,r:65,c:'#bcd468',o:'Super Lemon Haze × Trainwreck'},
   dragon:{n:'Fire OG',thc:27,y:40,d:3.5,r:75,c:'#90b448',o:'Critical Kush × Blueberry Kush'},
   leyenda:{n:'Ghost Train Haze',thc:29,y:42,d:4.5,r:75,c:'#d8ecb0',o:'Amnesia Haze × Fire OG · LEGENDARIA'},
+  // landraces de Strainmon (1.9): se piden desde el PC de la tía (pedidoAction)
+  mich:{n:'Michoacán',thc:15,y:30,d:4,r:55,c:'#b8d860',o:'Landrace · altiplano de Michoacán, México',h:'Sativa de altura, espigada y cerebral. Aguanta bien el sol fuerte.'},
+  punto:{n:'Punto Rojo',thc:16,y:30,d:4.5,r:45,c:'#b4a24c',o:'Landrace · cordillera de Colombia',h:'Sativa colombiana de pistilos rojizos. Floración larga y efecto eufórico.'},
+  thai:{n:'Thai',thc:17,y:26,d:5,r:40,c:'#b0d468',o:'Landrace · selvas del norte de Tailandia',h:'Sativa esbelta, de floración larguísima y aroma especiado. Es madre de la Haze y de la Northern Lights.'},
+  lao:{n:'Luang Prabang',thc:15,y:30,d:4.5,r:50,c:'#8a9a5c',o:'Landrace · montes del norte de Laos',h:'Sativa de las tierras altas de Laos. Muy vigorosa, con aroma dulce y a madera.'},
+  chitral:{n:'Chitral Kush',thc:17,y:32,d:3,r:70,c:'#7a9a48',o:'Landrace · valle de Chitral, Pakistán',h:'Índica de charas: su resina se frota a mano. Puede salir con tonos morados.'},
+  nepal:{n:'Nepalese',thc:16,y:28,d:3.5,r:65,c:'#88906a',o:'Landrace · colinas del Himalaya, Nepal',h:'Planta de altura, compacta y resinosa, con aroma a incienso.'},
+  congo:{n:'Congolese',thc:16,y:32,d:3.5,r:55,c:'#b4d058',o:'Landrace · cuenca del Congo',h:'Sativa africana rápida para su tipo. Efecto claro y aroma a fruta ácida.'},
+  lamb:{n:"Lamb's Bread",thc:16,y:30,d:4,r:60,c:'#a8d070',o:'Landrace · costa de Jamaica',h:'Sativa caribeña que tolera la brisa salina. Aroma dulce, tropical y marino.'},
+  kif:{n:'Kif',thc:13,y:28,d:3,r:80,c:'#a8c060',o:'Landrace · montañas del Rif, Marruecos',h:'La planta del hachís marroquí: seca, compacta y cargada de tricomas.'},
+  beldia:{n:'Beldia',thc:12,y:24,d:3,r:75,c:'#98b45c',o:'Landrace · Ketama, en el Rif',h:'La vieja landrace del Rif, casi desplazada por los híbridos. Rústica y aromática.'},
+  oaxaca:{n:'Oaxaca',thc:15,y:32,d:4,r:65,c:'#b0a84a',o:'Landrace · sierra de Oaxaca, México',h:'Sativa de suelo volcánico, vigorosa, con aroma ahumado y terroso.'},
+  panama:{n:'Panama Red',thc:17,y:28,d:4.5,r:50,c:'#b8984c',o:'Landrace · istmo de Panamá',h:'La sativa legendaria de los setenta, veteada de rojo. Muy cerebral y de floración lenta.'},
+  // híbridos clásicos que salieron de cruzar y estabilizar esas landraces (linaje real)
+  haze:{n:'Haze',thc:20,y:32,d:5,r:45,c:'#c8dc68',o:'Punto Rojo × Thai (o Michoacán × Thai)',h:'Se estabilizó en California a finales de los sesenta con sativas de Colombia, México, Tailandia y el sur de la India.'},
+  nl:{n:'Northern Lights',thc:18,y:42,d:3,r:80,c:'#7cae4c',o:'Afghani × Thai',h:'Índica estabilizada en el noroeste de EE. UU. y fijada en Holanda en los ochenta. Compacta y muy resinosa.'},
+  afkush:{n:'Afghan Kush',thc:19,y:40,d:3,r:85,c:'#6e9a44',o:'Afghani × Hindu Kush',h:'Las dos índicas de montaña juntas: compacta, resinosa y de floración corta.'},
+  shiva:{n:'Shiva Skunk',thc:19,y:44,d:3,r:85,c:'#8cbc50',o:'Northern Lights × Skunk #1',h:'Northern Lights con Skunk #1: robusta, rápida y muy productiva.'},
+  silver:{n:'Silver Haze',thc:21,y:36,d:4.5,r:55,c:'#c0d880',o:'Haze × Northern Lights',h:'La Haze domada con Northern Lights: conserva el efecto y acorta la floración.'},
+  ssh:{n:'Super Silver Haze',thc:23,y:40,d:4,r:70,c:'#c8e090',o:'Silver Haze × Skunk #1',h:'Haze, Northern Lights y Skunk #1 en una sola línea. Una de las sativas más premiadas de los noventa.'},
 };
 const DEX=Object.keys(STRAINS);
 // forma del cogollo en los menús (cogollos-genoteca del atlas)
 const TIPO_COGOLLO={ria:'hibrido',limon:'sativa',txoko:'indica',niebla:'indica',mango:'indica',purpura:'indica',rif:'indica',hindu:'indica',acapulco:'sativa',malawi:'sativa',
-  citrus:'sativa',bluetx:'indica',sollimon:'sativa',kushrif:'indica',purpurah:'indica',orotrop:'hibrido',nieblamor:'hibrido',brumaog:'sativa',reina:'indica',amanecer:'sativa',tormenta:'sativa',dragon:'legendario',leyenda:'legendario'};
+  citrus:'sativa',bluetx:'indica',sollimon:'sativa',kushrif:'indica',purpurah:'indica',orotrop:'hibrido',nieblamor:'hibrido',brumaog:'sativa',reina:'indica',amanecer:'sativa',tormenta:'sativa',dragon:'legendario',leyenda:'legendario',
+  mich:'sativa',punto:'sativa',thai:'sativa',lao:'sativa',chitral:'indica',nepal:'hibrido',congo:'sativa',lamb:'sativa',kif:'indica',beldia:'indica',oaxaca:'sativa',panama:'sativa',
+  haze:'sativa',nl:'indica',afkush:'indica',shiva:'indica',silver:'sativa',ssh:'sativa'};
 const RECIPES={};
 [['ria','limon','citrus'],['txoko','niebla','bluetx'],['acapulco','rif','sollimon'],['rif','ria','kushrif'],['hindu','purpura','purpurah'],
  ['mango','hindu','orotrop'],['niebla','limon','nieblamor'],['citrus','limon','brumaog'],['kushrif','txoko','reina'],
- ['purpurah','limon','amanecer'],['brumaog','sollimon','tormenta'],['reina','bluetx','dragon'],['tormenta','dragon','leyenda']]
+ ['purpurah','limon','amanecer'],['brumaog','sollimon','tormenta'],['reina','bluetx','dragon'],['tormenta','dragon','leyenda'],
+ ['punto','thai','haze'],['mich','thai','haze'],['rif','thai','nl'],['rif','hindu','afkush'],['nl','ria','shiva'],['haze','nl','silver'],['silver','ria','ssh']]
  .forEach(([a,b,c])=>{RECIPES[[a,b].sort().join('+')]=c;});
+// estabilizar (1.9): lo que sale de un cruce nuevo es F1, una línea inestable (S.gen[id] = 1..3); cruzándola consigo misma
+// en la mesa sube de generación y en la F4 queda fijada (se borra de S.gen). Landraces, tienda y partidas viejas: estables
+const GEN_ESTABLE=4,genDe=id=>(S&&S.gen&&S.gen[id])||GEN_ESTABLE;
 function getStrain(id){return STRAINS[id]||(S&&S.custom[id])||null;}
 function crossResult(a,b){
   const key=[a,b].sort().join('+');

@@ -124,10 +124,21 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   }, () => R.sel0 === 0 && R.sel === 1 && /Plaza 2/.test(R.info) && R.agua === 100 && !VC && document.getElementById('vcInfo').hidden || R);
   await step('Cruce de receta: Afghani × Skunk #1 → Critical Mass', ['^Afghani', '^Skunk #1', 'Cruzar'], async () => {
     addSeeds('ria', 2); addSeeds('txoko', 2); await run(labAction);
-  }, () => S.seeds.kushrif === 2 && S.disc.kushrif || { seeds: S.seeds });
+  }, () => S.seeds.kushrif === 2 && S.disc.kushrif && S.gen.kushrif === 1 || { seeds: S.seeds, gen: S.gen });
   await step('Cruce libre: Skunk #1 × Hindu Kush → híbrido propio → capítulo 5', ['^Skunk #1', '^Hindu Kush', 'Cruzar'], async () => {
     await run(labAction);
   }, () => Object.keys(S.custom).length === 1 && discCount() >= 8 && S.ch === 5 && S.due === 2000 || { custom: S.custom, disc: discCount(), ch: S.ch });
+
+  await step('Estabilizar Critical Mass: F1 → F2 → F3 → estable', ['^Critical Mass', 'estabilizar', 'Estabilizar', '^Critical Mass', 'estabilizar', 'Estabilizar', '^Critical Mass', 'estabilizar', 'Estabilizar'], async () => {
+    window.R = []; for (let k = 0; k < 3; k++) { await run(labAction); R.push(genDe('kushrif')); }
+  }, () => R.join() === '2,3,4' && !('kushrif' in S.gen) && S.seeds.kushrif === 2 || { R, gen: S.gen, seeds: S.seeds.kushrif });
+  await step('Banco de semillas del PC: Punto Rojo y Thai, llegan al día siguiente', ['Banco de semillas', '^Punto Rojo', '^Thai', 'Salir'], async () => {
+    S.money = 500; await run(pcAction); window.R = { pedido: S.pedido.slice(), money: S.money, antes: !!S.seeds.thai }; newDay();
+  }, () => R.pedido.join() === 'punto,thai' && R.money === 385 && !R.antes && S.seeds.punto === 3 && S.seeds.thai === 3 && S.disc.thai && !S.pedido.length || { R, seeds: S.seeds, pedido: S.pedido });
+  await step('Cruce de landraces: Punto Rojo × Thai → Haze (F1, cosechas desiguales)', ['^Punto Rojo', '^Thai', 'Cruzar'], async () => {
+    await run(labAction); S.pots[0] = { sid: 'haze', prog: 1, water: 80, health: 100, fert: false, pest: false };
+    window.R = []; for (let k = 0; k < 12; k++) { S.pots[0] = { sid: 'haze', prog: 1, water: 80, health: 100, fert: false, pest: false }; const b = S.buds.haze ? S.buds.haze.g : 0; await run(() => harvest(0)); R.push(S.buds.haze.g - b); }
+  }, () => S.disc.haze && S.gen.haze === 1 && new Set(R).size > 2 && R.every(g => g >= Math.floor(32 * factores(0).rend * .8) && g <= Math.ceil(32 * factores(0).rend * 1.1)) && /F1: línea inestable/.test(strainLine('haze')) || { R, gen: S.gen.haze, rend: factores(0).rend });
 
   // ---------- capítulo 5 ----------
   await step('Sargento Molina: pagar protección', ['Pagar 500'], async () => { S.money = 600; await run(talkMolina); },

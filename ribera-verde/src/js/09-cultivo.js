@@ -67,7 +67,7 @@ function newDay(){
   if(S.heat>=90)queue('raid',raidEvent); // se comprueba antes de que el calor baje con el nuevo día
   S.heat=Math.max(0,S.heat-(S.protect?20:12));
   const luz=facturaLuz();S.luz={d:S.day,e:luz};if(luz>0){S.money=Math.max(0,S.money-luz);if(mode==='world')toast('Factura de la luz: −'+eur(luz),1600);}
-  spawnClients();
+  spawnClients();recibirPedido();
   if(S.due>0&&S.flags.metB&&S.day>S.deadline)queue('penalty',penaltyEvent);
 }
 function stageName(p){return p.prog<.12?'Germinando':p.prog<.35?'Plántula':p.prog<.65?'Vegetativo':'Floración';}
@@ -117,13 +117,23 @@ async function carpaAction(ci){
 }
 async function harvest(i){
   const p=S.pots[i],s=getStrain(p.sid),f=factores(i);
-  const g=Math.max(1,Math.round(s.y*(.4+.6*p.health/100)*(p.fert?1.25:1)*f.rend));
-  const thc=Math.round((s.thc*(.85+.15*p.health/100)+f.thc+(p.fert?.3:0))*10)/10;
+  const v=genDe(p.sid)<GEN_ESTABLE?.8+Math.random()*.3:1;   // línea inestable: cada planta sale distinta
+  const g=Math.max(1,Math.round(s.y*(.4+.6*p.health/100)*(p.fert?1.25:1)*f.rend*v));
+  const thc=Math.round((s.thc*(.85+.15*p.health/100)*(1+.2*(v-1))+f.thc+(p.fert?.3:0))*10)/10;
   const [vx,vy]=posPlaza(i);await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:vx,y:vy-12});
   const n=1+ri(0,2);addBuds(p.sid,g,thc);addSeeds(p.sid,n);S.pots[i]=null;sfx('get');
   await say(`Cosechas ${g} g de ${s.n}. THC: ${pct(thc)}%.`);
   await say(`También recoges ${n} semilla${n>1?'s':''} de ${s.n}.`);
   S.flags.harvest1=true;await checkStory();
+}
+// estabilizar: la línea cruzada consigo misma sube una generación (F1 → F2 → F3 → estable)
+async function estabilizar(k){
+  const s=getStrain(k),g=genDe(k);
+  if(await ask(`¿Estabilizar ${s.n} (F${g})? Gastas 2 semillas.`,['Estabilizar','Cancelar'])!==0)return;
+  S.seeds[k]-=2;if(!S.seeds[k])delete S.seeds[k];
+  await accion('cruzar',{id:'vfx-polen',x:P.px+8,y:P.py-4});sfx('enc');await fade(1,true);await wait(450);await fade(0,true);
+  if(g+1>=GEN_ESTABLE){delete S.gen[k];sfx('get');addSeeds(k,2);await say(`${s.n} ya es una línea estable: todas sus plantas salen iguales.\nObtienes 2 semillas.`);}
+  else{S.gen[k]=g+1;addSeeds(k,2);await say(`Obtienes 2 semillas F${g+1} de ${s.n}.\n${GEN_ESTABLE-g-1===1?'Falta una generación':'Faltan '+(GEN_ESTABLE-g-1)+' generaciones'} para fijarla.`);}
 }
 async function bedAction(){
   const c=await ask('Tu cama. Todavía huele a la colonia de la tía.',['Dormir hasta las 7','Siesta de 3 h','Nada']);
@@ -134,8 +144,30 @@ async function bedAction(){
   save();toast('Has descansado'+(S.luz&&S.luz.d===S.day&&S.luz.e?' · Luz −'+eur(S.luz.e):'')+' · Partida guardada',1800);
 }
 async function pcAction(){
-  const c=await ask('El ordenador de la tía. Tiene su registro de cultivos de veinte años.',['Genoteca','Guardar partida','Apagar']);
-  if(c===0)await genoteca();else if(c===1){await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');}
+  const o=['Genoteca'].concat(S.ch>=2?['Banco de semillas']:[],['Guardar partida','Apagar']);
+  const c=o[await ask('El ordenador de la tía. Tiene su registro de cultivos de veinte años.',o)];
+  if(c==='Genoteca')await genoteca();else if(c==='Banco de semillas')await bancoSemillas();
+  else if(c==='Guardar partida')await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');
+}
+// banco de semillas (1.9): las landraces de Strainmon, en sobres de 3; el pedido llega por mensajero al día siguiente (newDay)
+const BANCO=[['mich',40,2],['punto',55,2],['thai',60,2],['kif',35,2],['beldia',35,2],['chitral',70,3],['nepal',65,3],['congo',60,3],['lamb',60,3],['oaxaca',55,3],['lao',80,4],['panama',90,4]];
+async function bancoSemillas(){
+  let i=0;
+  for(;;){
+    const l=BANCO.filter(([,,ch])=>S.ch>=ch);
+    const items=l.map(([k,p])=>{const s=STRAINS[k],n=S.pedido.filter(x=>x===k).length;return {label:s.n+(n?' · pedida':''),right:eur(p),sw:s.c,ic:iconoCogollo(k),desc:strainLine(k)+'\n'+s.h};});
+    items.push({label:'Salir',desc:'Los pedidos llegan mañana por la mañana.'});
+    i=await menu(items,{cls:'full',title:'BANCO DE SEMILLAS',title2:'Sobres de 3 · tienes '+eur(S.money),desc:true,initial:i});
+    if(i<0||i>=l.length)return;
+    const [k,p]=l[i];
+    if(S.money<p){sfx('bad');await say('No te llega el dinero.');continue;}
+    S.money-=p;S.pedido.push(k);sfx('coin');toast('Pedido: '+STRAINS[k].n+' · llega mañana',1400);
+  }
+}
+function recibirPedido(){
+  if(!S.pedido.length)return;
+  const n=S.pedido.map(k=>{S.seeds[k]=(S.seeds[k]||0)+3;S.disc[k]=true;return STRAINS[k].n;});S.pedido=[];
+  queue('pedido',async()=>{sfx('get');await say(`Llega el paquete del banco de semillas: ${n.join(', ')}.\nTres semillas de cada.`);await checkStory();});
 }
 async function letterAction(){
   if(S.flags.letter)return say('La carta de la tía Maite. «Cuida el armario. Y perdona lo de Baltasar.»');
@@ -149,16 +181,19 @@ async function labAction(){
   if(own().length<2)return say('MESA DE GENÉTICA: necesitas semillas de dos variedades distintas para cruzar.');
   const mk=l=>l.map(([k,v])=>({label:getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:iconoCogollo(k),desc:strainLine(k)}));
   const l1=own();const a=await menu(mk(l1),{cls:'full',title:'CRUCE · MADRE',desc:true});if(a<0)return;
-  const A=l1[a][0];const l2=own().filter(([k])=>k!==A);
-  const b=await menu(mk(l2),{cls:'full',title:'CRUCE · PADRE',title2:getStrain(A).n,desc:true});if(b<0)return;
-  const Bk=l2[b][0];
+  const A=l1[a][0];const l2=own().filter(([k])=>k!==A),ga=genDe(A);
+  const it2=mk(l2);if(ga<GEN_ESTABLE&&S.seeds[A]>=2)it2.unshift({label:`${getStrain(A).n} · estabilizar`,right:`F${ga}→${ga+1<GEN_ESTABLE?'F'+(ga+1):'estable'}`,sw:getStrain(A).c,ic:iconoCogollo(A),
+    desc:`Cruzas dos plantas de la misma línea y te quedas con las mejores. Gastas 2 semillas.\nEn la F${GEN_ESTABLE} la variedad queda fijada: todas sus plantas salen iguales.`});
+  const b=await menu(it2,{cls:'full',title:'CRUCE · PADRE',title2:getStrain(A).n,desc:true});if(b<0)return;
+  if(it2.length>l2.length&&b===0)return estabilizar(A);
+  const Bk=l2[b-(it2.length-l2.length)][0];
   if(await ask(`¿Cruzar ${getStrain(A).n} × ${getStrain(Bk).n}? Gastas 1 semilla de cada.`,['Cruzar','Cancelar'])!==0)return;
   S.seeds[A]--;S.seeds[Bk]--;for(const k of [A,Bk])if(!S.seeds[k])delete S.seeds[k];
-  const r=crossResult(A,Bk),isNew=!S.disc[r],s=getStrain(r);
+  const r=crossResult(A,Bk),isNew=!S.disc[r],s=getStrain(r);if(isNew)S.gen[r]=1;
   await accion('cruzar',{id:'vfx-polen',x:P.px+8,y:P.py-4});
   sfx('enc');await fade(1,true);await wait(450);await fade(0,true);
   addSeeds(r,2);
-  if(isNew){sfx('get');await say(`Nueva variedad: ${s.n}.`);await say(`THC ${pct(s.thc)}% · ${s.y} g/planta · ${String(s.d).replace('.',',')} días.\nObtienes 2 semillas.`);
+  if(isNew){sfx('get');await say(`Nueva variedad: ${s.n}.`);await say(`THC ${pct(s.thc)}% · ${s.y} g/planta · ${String(s.d).replace('.',',')} días.\nObtienes 2 semillas F1: la línea aún no es estable.`);
     if(r==='leyenda'){await say('Te tiemblan las manos: es GHOST TRAIN HAZE.');await talk('SMS · KIKO',['¿Ghost Train Haze? ¿Estable, de semilla propia? Llevo veinte años detrás de ella.','Tu tía estaría orgullosa. Guárdala bien: eso vale más que el piso.']);}}
   else await say(`Obtienes 2 semillas de ${s.n}.`);
   await checkStory();

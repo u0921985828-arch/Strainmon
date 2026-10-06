@@ -17,7 +17,7 @@
 | Pedido | Cómo está en el juego |
 |---|---|
 | Mecánicas de Weed Firm: cultivar | Carpas en el piso (armario de 60 con 2 plantas → carpa de 100 con 4 → de 150 con 6), una bandeja por carpa, macetas de plástico y de tela de 7 a 25 L, focos CFL, sodio y LED de 125 a 720 W con cobertura y factura de la luz; riego, abono, plagas, fases de crecimiento, cosecha con % de THC |
-| Descubrir y cruzar genéticas | Mesa de genética y **Genoteca** de 23 variedades (6 de tienda, 4 landraces —1 regalo de Kiko y 3 repartidas por el barrio—, 13 recetas de cruce) + híbridos propios ilimitados |
+| Descubrir y cruzar genéticas | Mesa de genética y **Genoteca** de 41 variedades (6 de tienda, 16 landraces —1 regalo de Kiko, 3 repartidas por el barrio y 12 en el banco de semillas—, 19 que salen de 20 recetas de cruce) + híbridos propios ilimitados; los cruces nuevos salen F1 y se estabilizan hasta F4 |
 | Venderlo en la calle | Clientes con `$` que cambian cada día; tú eliges precio (rebaja, justo o caro) y pueden rechazarlo |
 | Ladrones y policía | Encuentros aleatorios al andar por el barrio con mercancía o dinero, y combates por turnos |
 | Sobornar | Opción SOBORNAR contra la policía y la «protección» del sargento Molina |
@@ -35,11 +35,12 @@
 - **El motor de sprites va antes que los sprites (v1.3).** Se probó con un atlas «de calco» del arte actual: si las capturas salen iguales, las anclas cuadran y los créditos se gastan solo en arte.
 - **Ajustes tras la prueba automática (v1.1).** Los ladrones de los capítulos altos ganaban casi siempre, así que se suavizaron y ahora la VIDA máxima sube 2 puntos por cada ladrón vencido. Además se corrigieron tres fallos; están en [CHANGELOG.md](CHANGELOG.md).
 
-## Estado (v1.8.0)
+## Estado (v1.9.0)
 
 - Se juega de principio a fin: capítulos 1 a 7, final y juego libre (capítulo 8).
-- `npm test` recorre la historia entera y los sistemas sueltos en 39 pasos: **39/39, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
+- `npm test` recorre la historia entera y los sistemas sueltos en 42 pasos: **42/42, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
 - **Escala (1.8.0):** decidida y aplicada la opción A de [docs/PLANO.md](docs/PLANO.md): piso de 12 × 8 a 1 casilla = 1 m, carpas como muebles y vista de carpa a 64 px/m con las plantas de cepas de Strainmon (`../assets/plants`).
+- **Genética (1.9.0):** las landraces y los híbridos clásicos de Strainmon (`../src/species.js`, sus textos, no sus sprites), con su historia; estabilizar F1 → F4 en la mesa y banco de semillas en el PC desde el capítulo 2.
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
   - el motor ya usa el atlas (F2) y `npm run test:arte` da 22/22;
@@ -50,8 +51,8 @@
   - F8 (1.6): carpas de 3 tamaños por dentro y cerradas (pixflux img2img sobre su huella), 4 macetas, 3 focos y la mesa de cultivo (lotes de `create_1_direction_object`). 
   - 1.8: carpas del piso y de la vista, macetas y cuarto de cultivo (4 generaciones pixflux) y las plantas de la vista importadas de Strainmon; retirados los sprites de cultivo de la 1.6–1.7. Atlas: 1169 fotogramas.
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
-- **Android:** `dist/ribera-verde.apk` (1.8.0, código 10800, siempre en horizontal), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
-- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.8.0, con el atlas completo (1169 fotogramas). Es privado: se comparte desde su menú Compartir.
+- **Android:** `dist/ribera-verde.apk` (1.9.0, código 10900, siempre en horizontal), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
+- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.9.0, con el atlas completo (1169 fotogramas). Es privado: se comparte desde su menú Compartir.
 
 ## Limitaciones conocidas
 

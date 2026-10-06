@@ -44,7 +44,7 @@ const ROOT = path.join(__dirname, '..');
     const items = ITEMS.map(i => ({ id: i.id, map: i.map, x: i.x, y: i.y, hidden: !!i.hidden, give: i.give.toString().match(/got\('([^']+)'/)?.[1] || i.give.toString().match(/money\+=(\d+)/)?.[0] }));
     const shop = SHOP.map(s => ({ lbl: s.lbl, p: s.p, ch: s.ch, desc: (s.desc || '').replace(/\n/g, ' · ') }));
     const signs = SIGNS;
-    return { strains, recipes, maps, npcs, items, shop, signs };
+    return { strains, recipes, maps, npcs, items, shop, signs, banco: BANCO };
   });
   await browser.close();
 
@@ -52,6 +52,8 @@ const ROOT = path.join(__dirname, '..');
   const name = k => D.strains.find(s => s.k === k).n;
   const ORIGIN = { ria: 'Growshop (cap. 1)', limon: 'Growshop (cap. 2)', txoko: 'Growshop (cap. 2)', niebla: 'Growshop (cap. 3)', mango: 'Growshop (cap. 3)', purpura: 'Growshop (cap. 4)',
     rif: 'Kiko, al montar la mesa de genética: de un amigo de Mazar-i-Sharif (cap. 4)', hindu: 'Txaro, a cambio de 5 g para hacer aceite (parque): del viaje de su marido a Pakistán en 1976', acapulco: 'En un bote de carrete escondido en un arbusto del parque (2,26), «Guerrero, 1979»', malawi: 'Iñaki, el marinero, tras venderle 10 g (muelle): de un marinero de Malaui en Mombasa' };
+
+  for (const [k, p, ch] of D.banco) ORIGIN[k] = `Banco de semillas del PC, sobre de 3 por ${p} € (cap. ${ch}; llega al día siguiente)`;
 
   // ---------- GENETICA.md ----------
   let g = `# Genética de Ribera Verde
@@ -67,6 +69,15 @@ const ROOT = path.join(__dirname, '..');
     const how = ORIGIN[s.k] || 'Cruce: ' + s.o.replace(' · LEGENDARIA', '') + (s.o.includes('LEGENDARIA') ? ' · **legendaria**' : '');
     g += `| ${String(s.idx).padStart(2, '0')} | ${s.n} | ${pct(s.thc)}% | ${s.y} | ${pct(s.d)} | ${s.r}% | \`${s.c}\` | ${how} |\n`;
   }
+  g += `
+## Historia de cada variedad
+
+Las landraces y los híbridos clásicos de la 1.9 salen del catálogo de Strainmon (\`../src/species.js\`): mismas regiones y perfiles, con su nombre real. Se lee en la Genoteca.
+
+| Variedad | Origen | Historia |
+|---|---|---|
+`;
+  for (const s of D.strains.filter(s => s.h)) g += `| ${s.n} | ${s.o} | ${s.h} |\n`;
   g += `
 ## Recetas de cruce (${D.recipes.length})
 
@@ -85,6 +96,14 @@ flowchart LR
   for (const r of D.recipes) g += `  ${r.a}["${name(r.a)}"] --> ${r.out}["${name(r.out)}"]\n  ${r.b}["${name(r.b)}"] --> ${r.out}\n`;
   g += `  style leyenda fill:#40e0a0,color:#062\n\`\`\`
 
+## Estabilizar (F1 → estable)
+
+Lo que sale de un cruce nuevo (receta o híbrido propio) es una **F1**: una línea inestable en la que cada planta sale distinta.
+
+- En la mesa de genética, al elegir como padre la misma variedad («· estabilizar»), se cruzan dos plantas de la línea: gasta 2 semillas, da 2 semillas y sube una generación (F1 → F2 → F3 → **estable** en la F4).
+- **Cosecha de una línea inestable:** gramos × (0,8 a 1,1 al azar) y THC × (0,96 a 1,02). Estable, ×1.
+- Las landraces, las de la tienda y las variedades de partidas anteriores a la 1.9 son estables.
+
 ## Híbridos propios (cruces sin receta)
 
 Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio», determinista (la misma pareja da siempre el mismo resultado) y guardado en \`S.custom\`:
@@ -101,8 +120,8 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
 - **Agua:** baja 3,5 × riego puntos por hora (con CFL y maceta de 7 L una planta regada aguanta ~28 h).
 - **Salud:** −4/h sin agua, −2,5/h con plaga, +1/h si agua > 30 % y sin plaga. A 0 la planta muere.
 - **Plagas:** probabilidad por hora \`0,006 × (100 − resistencia) / 40\` mientras no está madura.
-- **Cosecha (g):** \`rinde × (0,4 + 0,6 × salud/100) × (abono ? 1,25 : 1) × rend\`.
-- **THC final:** \`THC × (0,85 + 0,15 × salud/100) + thc + (abono ? 0,3 : 0)\`.
+- **Cosecha (g):** \`rinde × (0,4 + 0,6 × salud/100) × (abono ? 1,25 : 1) × rend × v\` (v = 1 si la línea es estable; 0,8–1,1 si no).
+- **THC final:** \`THC × (0,85 + 0,15 × salud/100) × (1 + 0,2 × (v − 1)) + thc + (abono ? 0,3 : 0)\`.
 - **Semillas al cosechar:** 1 + (0 a 2).
 `;
   fs.writeFileSync(path.join(ROOT, 'docs/GENETICA.md'), g);
