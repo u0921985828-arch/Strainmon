@@ -60,7 +60,8 @@
      "motivo": "«a little smaller»: la campana salió de 18 px en 44; se repitió «spans the full canvas width»"
     }
    ],
-   "decision": "vista de carpa a toda la altura de la pantalla como la imagen A (vista C): el arte sale de la imagen A (recortes y ediciones con edit_image_pixen), no de las huellas. La pared lleva solo la tela, con sus brillos y sombras, sin la forma del cono; macetas y plantas, sin la luz pintada; la luz del foco es una capa aparte (misc:carpa-c-luz) que se pinta delante de todo en «overlay»"
+   "decision": "vista de carpa a toda la altura de la pantalla como la imagen A (vista C): el arte sale de la imagen A (recortes y ediciones con edit_image_pixen), no de las huellas. La pared lleva solo la tela, con sus brillos y sombras, sin la forma del cono; macetas y plantas, sin la luz pintada; la luz del foco es una capa aparte (misc:carpa-c-luz) que se pinta delante de todo en «overlay»",
+   "aprobado": "2026-10-06: corte de prueba aprobado (2.ª versión). Lo que se haga después para la vista C sale de este arte: mismo estilo, tela neutra, objetos sin luz pintada y la luz en su capa"
   }
  },
  "celdas": {
@@ -5717,7 +5718,7 @@
   {
    "fase": "F9",
    "herramienta": "edit_image_pixen",
-   "estado": "pendiente de aprobación",
+   "estado": "aprobado",
    "familia": "imagen",
    "paleta": "propia",
    "estilo_ref": "imagen A (estilo.carpa_p3.referencia)",
@@ -5767,12 +5768,13 @@
     }
    ],
    "montaje": "scratchpad f22/capas.py separa la imagen A vacía en pared y luz. f23/tela.py: la pared del fondo (x 46-193, y 3-138) sale de la llamada 3 (tela sin la forma del cono), con los tonos de la pared de la imagen A; laterales, cortinas y suelo, los de capas.py. f23/cono.py: la luz de la imagen A (solo sus tonos claros) recortada a un cono recto desde la boca del foco (y 16, x 97-143) hasta el pie de la pared, con la banda tenue #c6824d en los huecos; fuera del cono, transparente salvo el charco del suelo y los brillos de las cortinas.",
-   "notas": "Vista C: la pared se recorta a lo ancho de cada carpa (columnas 0-43 y 196-239 fijas, la pared del fondo centrada) y la luz igual. La pared lleva solo la tela, sin la forma del cono (la 1.ª versión pasaba los tonos de la luz a grises y se quedaba su silueta). La luz se pinta delante de todo (pared, macetas y plantas) en «overlay», debajo de la campana; con el foco apagado no se pinta. Hasta 32 colores (max_colores): son fondos de pantalla entera."
+   "notas": "Vista C: la pared se recorta a lo ancho de cada carpa (columnas 0-43 y 196-239 fijas, la pared del fondo centrada) y la luz igual. La pared lleva solo la tela, sin la forma del cono (la 1.ª versión pasaba los tonos de la luz a grises y se quedaba su silueta). La luz se pinta delante de todo (pared, macetas y plantas) en «overlay», debajo de la campana; con el foco apagado no se pinta. Hasta 32 colores (max_colores): son fondos de pantalla entera.",
+   "aprobado": "2026-10-06: corte de prueba de la vista C (p60, p80, m100, g150 y m100 vacía), aprobado por la persona tras la 2.ª versión (pared solo de tela y luz delante de todo)"
   },
   {
    "fase": "F9",
    "herramienta": "edit_image_pixen",
-   "estado": "pendiente de aprobación",
+   "estado": "aprobado",
    "familia": "imagen",
    "paleta": "propia",
    "estilo_ref": "imagen A (estilo.carpa_p3.referencia)",
@@ -5810,12 +5812,13 @@
     }
    ],
    "montaje": "foco-c-46 es el recorte de la imagen A sin tocar; foco-c-40 y foco-c-44, sus ediciones.",
-   "notas": "Campana del foco de sodio a su ancho real en la vista C (FOCO_CM × la escala de la carpa): el motor elige la más cercana."
+   "notas": "Campana del foco de sodio a su ancho real en la vista C (FOCO_CM × la escala de la carpa): el motor elige la más cercana.",
+   "aprobado": "2026-10-06: corte de prueba de la vista C (p60, p80, m100, g150 y m100 vacía), aprobado por la persona tras la 2.ª versión (pared solo de tela y luz delante de todo)"
   },
   {
    "fase": "F9",
    "herramienta": "edit_image_pixen",
-   "estado": "pendiente de aprobación",
+   "estado": "aprobado",
    "familia": "imagen",
    "paleta": "propia",
    "estilo_ref": "imagen A (estilo.carpa_p3.referencia)",
@@ -5855,12 +5858,13 @@
     }
    ],
    "montaje": "Se quita el tallo que asomaba del borde y los brillos cálidos de la luz del foco pasan a gris frío de la misma luminosidad (la tierra, más oscura, se queda) (scratchpad f22/scripts/prep.py). La luz la pone el motor.",
-   "notas": "Maceta de plástico de 7 L (22 cm) a la escala de la carpa: 22 px en la de 60 y 15 en las de 200 cm de alto."
+   "notas": "Maceta de plástico de 7 L (22 cm) a la escala de la carpa: 22 px en la de 60 y 15 en las de 200 cm de alto.",
+   "aprobado": "2026-10-06: corte de prueba de la vista C (p60, p80, m100, g150 y m100 vacía), aprobado por la persona tras la 2.ª versión (pared solo de tela y luz delante de todo)"
   },
   {
    "fase": "F9",
    "herramienta": "edit_image_pixen",
-   "estado": "pendiente de aprobación",
+   "estado": "aprobado",
    "familia": "imagen",
    "paleta": "propia",
    "estilo_ref": "imagen A (estilo.carpa_p3.referencia)",
@@ -5912,7 +5916,8 @@
     }
    },
    "notas": "Índica lista a su tope de la plaza (cw × ch por la escala): 24 × 84 en la carpa de 60 y 36 × 68 en las de 200 cm. Los cogollos van en la rampa clave y el motor les pone el color de la cepa.",
-   "montaje": "Los verdes amarillentos de la luz del foco (tono 60-88°) pasan a verde (92°) con la misma saturación y valor (scratchpad f22/scripts/prep.py). La luz la pone el motor."
+   "montaje": "Los verdes amarillentos de la luz del foco (tono 60-88°) pasan a verde (92°) con la misma saturación y valor (scratchpad f22/scripts/prep.py). La luz la pone el motor.",
+   "aprobado": "2026-10-06: corte de prueba de la vista C (p60, p80, m100, g150 y m100 vacía), aprobado por la persona tras la 2.ª versión (pared solo de tela y luz delante de todo)"
   }
  ],
  "familias": {

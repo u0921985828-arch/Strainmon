@@ -50,7 +50,7 @@
 - **Cifras reales (1.10, sin versión todavía):** precios de growshop, vatios, kWh, gramos por vatio y tope de la maceta, semillas feminizadas por unidad y en sobres, fenotipos y esquejes, venta al por mayor, multas reales y deuda de 30.000 € (sus plazos se pagan en las mismas cosechas que antes, según la simulación). Tablas en [docs/ECONOMIA.md](docs/ECONOMIA.md), que se genera con `npm run docs`.
 - **Escala (1.8.0):** decidida y aplicada la opción A de [docs/PLANO.md](docs/PLANO.md): piso de 12 × 8 a 1 casilla = 1 m, carpas como muebles y vista de carpa a 64 px/m con las plantas de cepas de Strainmon (`../assets/plants`).
 - **Genética (1.9.0):** las landraces y los híbridos clásicos de Strainmon (`../src/species.js`, sus textos, no sus sprites), con su historia; estabilizar F1 → F4 en la mesa y banco de semillas en el PC desde el capítulo 2.
-- **Plan de producción (en desarrollo, sin versión todavía):** D1–D6 aprobadas. P1 hecho: el armario 80, la carpa 120 en el sitio C, el LED 100 W y los extras (ventilador, filtro de carbón y goteo), con la regla del olor. P2 hecho: la vista de carpa B (3/4 a 48 px/m) con arte procedural, medida en [docs/PLANO.md](docs/PLANO.md). P3 en marcha: vista C (la carpa por dentro a toda la altura, desde la imagen A del tablero de estilos; la pared solo con la tela y la luz del foco en una capa aparte, delante de todo). Corte de prueba con sodio, macetas de 7 L e índicas en floración, pendiente de aprobación; sin arte para algo de la carpa, vista B.
+- **Plan de producción (en desarrollo, sin versión todavía):** D1–D6 aprobadas. P1 hecho: el armario 80, la carpa 120 en el sitio C, el LED 100 W y los extras (ventilador, filtro de carbón y goteo), con la regla del olor. P2 hecho: la vista de carpa B (3/4 a 48 px/m) con arte procedural, medida en [docs/PLANO.md](docs/PLANO.md). P3 en marcha: vista C (la carpa por dentro a toda la altura, desde la imagen A del tablero de estilos; la pared solo con la tela y la luz del foco en una capa aparte, delante de todo). Corte de prueba con sodio, macetas de 7 L e índicas en floración, aprobado (falta el resto de su arte); sin arte para algo de la carpa, vista B.
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
   - el motor ya usa el atlas (F2) y `npm run test:arte` da 24/24;
@@ -77,7 +77,7 @@
 
 ## Siguientes pasos sugeridos
 
-0. Seguir [docs/PLAN-PRODUCCION.md](docs/PLAN-PRODUCCION.md): aprobar el corte de la vista C (§5.2) y seguir con el resto de su arte desde la imagen A (focos, macetas, extras, fases y portes), P4–P6.
+0. Seguir [docs/PLAN-PRODUCCION.md](docs/PLAN-PRODUCCION.md): corte de la vista C aprobado (§5.2); seguir con el resto de su arte desde ese corte (focos, macetas, extras, fases y portes), P4–P6.
 1. Probar el APK en un móvil real (la vista de carpa incluida).
 2. Revisar el arte nuevo jugando y repetir lo que no convenza (cada asset del manifiesto guarda sus ids, semillas y descartes). Guía: [docs/PIXELLAB.md](docs/PIXELLAB.md); comando `/sprites`.
 3. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.
