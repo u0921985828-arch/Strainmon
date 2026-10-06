@@ -25,7 +25,7 @@ Hasta que lleguen las láminas de P3–P4, lo nuevo se dibuja con el arte proced
 - **P3, lámina A (pendiente de aprobación): el CFL y la híbrida en el armario 60.** La vista C ya sale con el foco CFL y con la Skunk #1 (híbrida) en sus 5 fases: germinando, plántula, vegetativo, floración y lista.
   - La luz del CFL es la misma capa de luz con su color frío y más suave. Apagado, el tubo se ve gris.
   - Cada fase tiene su sprite a su tamaño real; floración y lista comparten sprite (en floración, aplastado). Con el CFL la planta sube hasta 10 cm del foco; con el sodio de 250 W, hasta 30.
-  - Las otras variedades en germinando, plántula y vegetativo, y el CFL en las carpas de 200 cm, siguen en la vista B hasta que llegue su arte.
+  - Todas las híbridas comparten ese arte (cada una con el color de sus cogollos). Las índicas siguen en la vista B hasta la floración y las sativas, siempre. En las carpas de 200 cm, el CFL, la plántula híbrida y la híbrida en floración y lista de la 100 y la 150 también, hasta que llegue su arte.
 - **P2 del plan de producción: vista de carpa B.** La carpa se abre recortada en 3/4, como en la 1.6–1.7, pero a escala real (48 px/m de ancho y alto, 24 px/m de fondo), con un foco centrado y la luz recortada a la carpa. Plantas en 3 portes (índica, sativa e híbrida). Todo procedural hasta P3–P4: `npm run sprites:huellas` saca las huellas de las láminas. `npm run plano` mide la vista B (29 de 35 piezas entre ×0,94 y ×1,06; germinando y plántula, ×2) y saca `docs/plano/vista-b.png`.
 - **P1 del plan de producción** (decisiones D1–D6 aprobadas): datos y reglas del equipo nuevo.
   - **Armario 80×80** (90 €, capítulo 3): sustituye al de 60 en el sitio A. 3 plazas (la de atrás centrada), focos de hasta 400 W y macetas de hasta 18 L.

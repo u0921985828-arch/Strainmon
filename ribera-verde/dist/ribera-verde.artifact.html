@@ -1499,18 +1499,18 @@ const altoPlanta=(p,q)=>{const D=PLANTA_CM[porteDe(p.sid)];return Math.min(Math.
    real sobre el suelo (y 150, a medio fondo). La pared del fondo se recorta al ancho de la carpa (W·Z px) alrededor de x 120, entre
    los laterales de la imagen A (columnas 0-43 y 196-239); el suelo baja de y 140 a 159 y se abre 16 px por lado. Macetas y copas,
    como en la vista B: en el centro de su parte y como mucho de cw × ch (distancia segura), a escala Z.
-   Solo se usa si hay arte para todo lo que hay en la carpa (por ahora, foco de sodio, macetas de 7 L sin extras e índicas en
-   floración); si no, la vista B. */
+   Solo se usa si hay arte para todo lo que hay en la carpa (por ahora, focos de sodio y CFL, macetas de 7 L sin extras, índicas en
+   floración y lista, e híbridas en sus fases); si no, la vista B. */
 const VCA={lado:44,boca:16,base:150,fondo:140},VC_FILA=[[152],[156,146]];   // y de la base de las macetas: una fila · dos (delante, detrás)
 const VC_TIERRA={'maceta-c-22':23,'maceta-c-15':10};                         // px de la base de la maceta a la tierra, donde nace el tallo
 const vcAnchos=pre=>Object.keys(ARTE.cubre||{}).filter(k=>k.startsWith('misc:'+pre)).map(k=>+k.slice(5+pre.length)).filter(n=>n>0);
 // el sprite de la familia (prefijo + ancho en px) más cercano a «px», si se aparta como mucho un 25 %
 function vcSprite(pre,px){let m=null;for(const a of vcAnchos(pre))if(Math.abs(a-px)<=px*.25&&(!m||Math.abs(a-px)<Math.abs(m.a-px)))m={a,n:pre+a};return m&&{...m,f:fotoMisc(m.n)};}
-// la planta: el sprite de su porte y fase más ancho que no pasa de su copa (distancia segura). Floración y lista comparten sprite
-// (planta-c-<porte>-NN); germinando, plántula y vegetativo llevan la fase (planta-c-<porte><fase>-NN). Si ninguno cabe en su ancho
-// real, el más estrecho hasta ×1,33 (la tolerancia de la vista B) que no pase del sitio (tope)
+// la planta: el sprite de su porte y fase más ancho que no pasa de su copa (distancia segura) ni baja de ×0,75. Floración y lista
+// comparten sprite (planta-c-<porte>-NN); germinando, plántula y vegetativo llevan la fase (planta-c-<porte><fase>-NN). Si ninguno
+// cabe, el más estrecho de los más anchos hasta ×1,33 (la tolerancia de la vista B) que no pase del sitio (tope); si no, la vista B
 function vcPlantaSprite(po,st,px,tope){const pre='planta-c-'+po+(st>=3?'':st)+'-';let m=null,e=null;
-  for(const a of vcAnchos(pre)){if(a<=px+1&&(!m||a>m.a))m={a,n:pre+a};if(a<=Math.min(px*1.33,tope)&&(!e||a<e.a))e={a,n:pre+a};}
+  for(const a of vcAnchos(pre)){if(a<=px+1&&a>=px*.75&&(!m||a>m.a))m={a,n:pre+a};if(a>px+1&&a<=Math.min(px*1.33,tope)&&(!e||a<e.a))e={a,n:pre+a};}
   m=m||e;return m&&{...m,f:fotoMisc(m.n)};}
 const vcAltos=new WeakMap();   // alto del dibujo (de la última fila a la primera con algo) de cada celda
 function vcAlto(c){if(vcAltos.has(c))return vcAltos.get(c);const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let y=0;
