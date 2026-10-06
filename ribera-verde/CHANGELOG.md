@@ -1,18 +1,33 @@
 # Cambios
 
-## En desarrollo (próxima versión, sale con el arte de `docs/PLAN-PRODUCCION.md`)
+## En desarrollo (1.10; sale con el arte de `docs/PLAN-PRODUCCION.md`)
 
-- **P1 del plan de producción** (decisiones D1–D6 aprobadas): datos y reglas del equipo nuevo. Hasta P2–P3 lo nuevo se dibuja con el arte procedural, por eso no hay versión ni Artifact nuevos.
-  - **Armario 80×80** (300 €, capítulo 3): sustituye al de 60 en el sitio A. 3 plazas (la de atrás centrada), focos de hasta 400 W y macetas de hasta 18 L.
-  - **Carpa 120×120** (700 €, capítulo 5): tercera carpa, en el sitio C nuevo, junto a la cama, cuando ya hay carpa en B. 6 plazas, hasta 720 W y 25 L. El máximo pasa de 8 plantas a 15.
-  - **LED 100 W** (140 €, capítulo 1): cubre 2 plazas, cosecha +15 %, crece +5 %, THC +0,3.
-  - **Extras**, uno de cada por carpa: ventilador de pinza (25 €, cap. 1, plagas ×0,7), extractor con filtro de carbón (120 €, cap. 2) y riego por goteo (80 €, cap. 3, el agua baja a la mitad). Al comprarlos, «¿Te lo pongo ya?»; si no, desde la vista de carpa (▲ hasta el foco y A). La ficha del foco enseña los que tiene la carpa.
+Hasta que lleguen las láminas de P3–P4, lo nuevo se dibuja con el arte procedural, así que no hay versión ni Artifact nuevos.
+
+- **Nuevo: cifras reales** (`docs/ECONOMIA.md`, generado con `npm run docs`). Lo único comprimido es el tiempo: un día de juego son unas 4 semanas de cultivo.
+  - **Cosecha por gramos por vatio:** cada foco da `W × g/W` por cosecha (CFL 0,25, sodio 0,45–0,55, LED 0,65–0,85; abonando, ×1,25), repartidos entre las plazas de la carpa (una plaza vacía es luz perdida), con el rinde de la variedad y un tope por maceta de unos 8 g por litro (56 g en 7 L, 210 g en 25 L). La carpa enseña sus W/m² y la ficha de cada variedad, sus g/m².
+  - **Luz:** 392 h de foco y 672 h de extras por día de juego a 0,16 €/kWh: CFL 8 €, sodio 400 W 25 €, LED 720 W 45 €. El ventilador (25 W) y el extractor (75 W) también gastan.
+  - **Precios de growshop:** focos de 85 a 950 €, carpas de 90 a 150 €, macetas de 2 a 4 €, abono de 1 L (4 dosis) 14 €, insecticida de neem (3 tratamientos) 12 €.
+  - **Calle:** 6,4–10 €/g según el THC. **Multas:** 601 € en la calle (la mínima de la Ley de Seguridad Ciudadana) y hasta 3.000 € en una redada.
+- **Nuevo: semillas como en un growshop.** Feminizadas, a precio por semilla (5–10 €), en sobres de 1, 3, 5 y 10 con descuento y, desde el capítulo 3, bolsas de 50 a granel. El banco del PC vende sobres de 10 (20–45 €). Al cosechar, una feminizada casi nunca da semilla (12 % hermafroditas, 1–3); una línea sin fijar se poliniza entre ella y da 2–5.
+- **Nuevo: fenotipos.** Cada semilla es una planta distinta (THC y gramos, cada uno por su lado). La ficha de cada variedad dice su tipo (landrace, línea estable, cruce F1 con sus padres, polihíbrido o F1–F3 propia) y cada cuántas plantas sale un **fenotipo estrella** según su pureza: 1 de cada ~16.000 en una línea estable, ~2000 en un F1 de tienda, ~100 en una landrace, ~60 en un polihíbrido y ~40 en una F2. La estrella va a un lote aparte (★), que se vende y se presenta a la Copa por separado. Sustituye al ×0,8–1,1 de las F1 de la 1.9.
+- **Nuevo: esquejes.** A una planta en crecimiento se le saca un esqueje: es la misma planta, con su fenotipo. Se planta desde el menú de semillas (empieza de plántula) y se seca si no se planta antes de que acabe el día siguiente. Así se guarda una estrella.
+- **Nuevo: venta al por mayor.** Desde el capítulo 3, Iñaki carga lotes de 100 g para arriba a 3,2–5 €/g, una vez al día y hasta 1 kg.
+- **Cambiado: la deuda, a escala.** 30.000 € en plazos de 3000, 12.000 y 15.000 €; intereses del 20 % del plazo, Copa de 5000 € y protección de Molina por 1500 €. Con las cifras nuevas, los plazos se pagan en unas 4, 8 y 9 cosechas, lo mismo que antes (simulación en `docs/ECONOMIA.md`).
+- **Nuevo: tu imperio.** Saldada la deuda («DEUDA SALDADA» en vez de «FIN»), el capítulo 8 sigue con rangos por lo facturado desde el último pago: Cultivador, Proveedor del barrio (25.000 €), Distribuidor de la ría (100.000 €) y Mayorista del norte (250.000 €). Cada uno sube lo que Iñaki carga al día (1, 2, 5 y 10 kg) y llega con un SMS.
+- **P2 del plan de producción: vista de carpa B.** La carpa se abre recortada en 3/4, como en la 1.6–1.7, pero a escala real (48 px/m de ancho y alto, 24 px/m de fondo), con un foco centrado y la luz recortada a la carpa. Plantas en 3 portes (índica, sativa e híbrida). Todo procedural hasta P3–P4: `npm run sprites:huellas` saca las huellas de las láminas. `npm run plano` mide la vista B (29 de 35 piezas entre ×0,94 y ×1,06; germinando y plántula, ×2) y saca `docs/plano/vista-b.png`.
+- **P1 del plan de producción** (decisiones D1–D6 aprobadas): datos y reglas del equipo nuevo.
+  - **Armario 80×80** (90 €, capítulo 3): sustituye al de 60 en el sitio A. 3 plazas (la de atrás centrada), focos de hasta 400 W y macetas de hasta 18 L.
+  - **Carpa 120×120** (150 €, capítulo 5): tercera carpa, en el sitio C nuevo, junto a la cama, cuando ya hay carpa en B. 6 plazas, hasta 720 W y 25 L. El máximo pasa de 8 plantas a 15.
+  - **LED 100 W** (110 €, capítulo 1): el primer paso por encima del CFL.
+  - **Extras**, uno de cada por carpa: ventilador de pinza (20 €, cap. 1, plagas ×0,7), extractor con filtro de carbón (110 €, cap. 2) y riego por goteo (55 €, cap. 3, el agua baja a la mitad). Al comprarlos, «¿Te lo pongo ya?»; si no, desde la vista de carpa (▲ hasta el foco y A). La ficha del foco enseña los que tiene la carpa.
   - **Regla nueva, el olor:** cada carpa sin filtro con alguna planta en floración suma +2 de calor al día (sale también en el aviso de la cama).
   - **Piso:** la ventana y el diploma de la pared pasan a (9,1) y (7,1), donde no los tapa ninguna carpa. El hueco de C se marca en el suelo cuando ya tienes carpa en B.
   - **Tienda:** un extra solo se ofrece si alguna carpa lo necesita y no lo llevas ya en la mochila.
   - **Cambiar de carpa:** cada planta y cada maceta se quedan en su carpa y su plaza (antes las plazas nuevas iban al final de la lista, lo que con el armario 80 habría movido las plantas de la carpa del fondo).
-- **Partidas viejas:** una partida de la 1.9 carga igual (mismas plazas, plantas y macetas; extras a 0).
-- **Tests:** `npm test` 45/45: comprar el armario 80 (las plantas se quedan donde estaban), poner ventilador, filtro y goteo (el filtro anula el calor por olor) y montar la carpa 120 en C. `npm run test:arte` 22/22.
+- **Corregido:** el menú se redibuja al girar o cambiar el tamaño de la pantalla. El abono se llama igual en la tienda, la mochila, el suelo y los diálogos (antes, «fertilizante» en unos sitios).
+- **Partidas viejas:** una partida de la 1.9 carga igual (mismas plazas, plantas y macetas; extras a 0). La deuda pasa a la escala nueva del capítulo en que estás (los intereses ya cobrados se pierden); una partida acabada empieza el imperio desde cero.
+- **Tests:** `npm test` 50/50: armario 80, extras y carpa 120; Iñaki al por mayor; el imperio a 25.000 €; fenotipos (200.000 plantas por tipo: la frecuencia de estrellas cuadra con la de la ficha y va de la línea estable a la F2); esquejes (el clon guarda el fenotipo y su cosecha va al lote ★; sin plantar se seca); cifras reales (CFL ≈ 0,3 g/W, LED 720 W ≈ 1–1,35 g/W y 45 € de luz, tope de la maceta). `npm run test:arte` 22/22, con la vista B.
 
 ## 1.9.0 · 6 de octubre de 2026
 

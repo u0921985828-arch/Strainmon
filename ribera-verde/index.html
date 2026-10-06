@@ -675,6 +675,23 @@ const TIPO_COGOLLO={ria:'hibrido',limon:'sativa',txoko:'indica',niebla:'indica',
   citrus:'sativa',bluetx:'indica',sollimon:'sativa',kushrif:'indica',purpurah:'indica',orotrop:'hibrido',nieblamor:'hibrido',brumaog:'sativa',reina:'indica',amanecer:'sativa',tormenta:'sativa',dragon:'legendario',leyenda:'legendario',
   mich:'sativa',punto:'sativa',thai:'sativa',lao:'sativa',chitral:'indica',nepal:'hibrido',congo:'sativa',lamb:'sativa',kif:'indica',beldia:'indica',oaxaca:'sativa',panama:'sativa',
   haze:'sativa',nl:'indica',afkush:'indica',shiva:'indica',silver:'sativa',ssh:'sativa'};
+// tipo genético (1.10): cuánto se parecen entre sí las plantas de una misma semilla. Cada planta tira su fenotipo al germinar
+// (rollFeno, 09-cultivo): THC y gramos × (1 + σ·z), cada uno por su lado. Estrella si THC × gramos ≥ FENO_ESTRELLA; floja si
+// ≤ FENO_FLOJO. Las de tienda llevan el suyo en TIPO_GEN; las que empiezan por «Landrace», landrace; las de receta y los
+// híbridos propios salen de la mesa como F1-F3 (S.gen) y, estabilizadas, son líneas estables. uno = 1 estrella de cada N
+// plantas (lo comprueba test:arte con 40.000 plantas por tipo)
+const TIPO_GEN={ria:'estable',limon:'poli',txoko:'poli',niebla:'estable',mango:'f1',purpura:'estable'};
+const PADRES={limon:'Lemon Skunk × Silver Haze',txoko:'Chemdawg × Hindu Kush',mango:'KC 33 × Afghani'};
+const GENETICA={
+  estable:{n:'Línea estable',sigma:.06,uno:16000,d:'fijada a lo largo de generaciones: casi todas las plantas salen iguales'},
+  f1:{n:'Cruce F1',sigma:.07,uno:2000,d:'hijo directo de dos líneas estables: uniforme y con vigor híbrido'},
+  F1:{n:'F1',sigma:.08,uno:500,d:'línea inestable, cosechas desiguales. Estabilízala en la mesa'},
+  F2:{n:'F2',sigma:.12,uno:40,d:'línea inestable, la generación que más se separa. Estabilízala en la mesa'},
+  F3:{n:'F3',sigma:.1,uno:100,d:'línea inestable, ya seleccionada. Estabilízala en la mesa'},
+  landrace:{n:'Landrace',sigma:.1,uno:100,d:'población silvestre de su región: plantas variadas'},
+  poli:{n:'Polihíbrido',sigma:.11,uno:60,d:'cruce de cruces: cada planta sale distinta'}};
+const FENO_ESTRELLA=1.35,FENO_FLOJO=.75;
+function tipoGen(id){const g=genDe(id);if(g<GEN_ESTABLE)return 'F'+g;if(TIPO_GEN[id])return TIPO_GEN[id];const s=getStrain(id);return s&&/^Landrace/.test(s.o)?'landrace':'estable';}
 const RECIPES={};
 [['ria','limon','citrus'],['txoko','niebla','bluetx'],['acapulco','rif','sollimon'],['rif','ria','kushrif'],['hindu','purpura','purpurah'],
  ['mango','hindu','orotrop'],['niebla','limon','nieblamor'],['citrus','limon','brumaog'],['kushrif','txoko','reina'],
@@ -1005,24 +1022,27 @@ const pending=[],queued=new Set();
 const MS_PER_MIN=1000/6;
 const P={x:0,y:0,px:0,py:0,dir:'down',moving:false,fx:0,fy:0,t:0,dur:240,parity:0,hold:0,chain:false,bumpT:0};
 const DV={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]},OPP={up:'down',down:'up',left:'right',right:'left'};
-const CH_TITLES={1:'La herencia',2:'La calle',3:'La deuda',4:'Genética',5:'El sargento',6:'La Copa de Ribera',7:'Libertad',8:'La genoteca'};
+const CH_TITLES={1:'La herencia',2:'La calle',3:'La deuda',4:'Genética',5:'El sargento',6:'La Copa de Ribera',7:'Libertad',8:'Tu imperio'};
 function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,min:8*60,money:150,hp:30,hpMax:30,heat:0,rep:0,ch:0,flags:{},sales:0,
   seeds:{},buds:{},items:Object.assign({fert:0,insect:0,spray:0,bocata:1},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
-  disc:{},custom:{},gen:{},pedido:[],debt:5000,due:0,deadline:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0};}
+  disc:{},custom:{},gen:{},pedido:[],esquejes:[],fenos:{},fenoN:0,eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0};}
 const isFree=()=>mode==='world'&&lock===0&&handlers.length===0;
 const isNight=()=>S.min>=21*60||S.min<6*60;
 async function run(fn){lock++;try{await fn();}catch(e){console.error(e);}finally{lock--;}}
 function queue(key,fn){if(queued.has(key))return;queued.add(key);pending.push(async()=>{try{await fn();}finally{queued.delete(key);}});}
 const totalBuds=()=>Object.values(S.buds).reduce((a,b)=>a+b.g,0);
 const discCount=()=>Object.keys(S.disc).length;
-function strainLine(k){const s=getStrain(k),g=genDe(k);return `THC ${pct(s.thc)}% · ${s.y} g/planta · ${String(s.d).replace('.',',')} días · Resist. ${s.r}%\n${s.o}`+(g<GEN_ESTABLE?`\nF${g}: línea inestable, cosechas desiguales. Estabilízala en la mesa.`:'');}
+// ficha de una variedad: cifras, tipo genético (si es un cruce y qué fenotipos da) y origen
+function strainLine(k){const s=getStrain(k),G=GENETICA[tipoGen(k)];return `THC ${pct(s.thc)}% · ~${gm2(s)} g/m² · ${coma(s.d)} días · Resist. ${s.r}%\n${G.n}${PADRES[k]?' ('+PADRES[k]+')':''}: ${G.d}. Estrella: 1 de cada ~${G.uno.toLocaleString('es-ES')}.\n${s.o}`;}
 function discover(sid){if(!S.disc[sid]){S.disc[sid]=true;toast(`<small>NUEVA EN LA GENOTECA</small>${esc(getStrain(sid).n)}`);queue('historia',checkStory);}}
 function addSeeds(sid,n){S.seeds[sid]=(S.seeds[sid]||0)+n;discover(sid);}
-function addBuds(sid,g,thc){const b=S.buds[sid];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;}else S.buds[sid]={g,thc};discover(sid);}
-function useBuds(sid,g){const b=S.buds[sid];b.g-=g;if(b.g<.5)delete S.buds[sid];}
+// cogollos por lotes: clave = variedad, o variedad + '*' para lo de un fenotipo estrella (se vende y se presenta aparte)
+const lotSid=k=>k.replace(/\*$/,''),lotNombre=k=>getStrain(lotSid(k)).n+(k.endsWith('*')?' ★':'');
+function addBuds(k,g,thc){const b=S.buds[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;}else S.buds[k]={g,thc};discover(lotSid(k));}
+function useBuds(k,g){const b=S.buds[k];b.g-=g;if(b.g<.5)delete S.buds[k];}
 function budLots(min,minThc=0){return Object.entries(S.buds).filter(([k,b])=>b.g>=min&&b.thc>=minThc);}
-const lotItem=([k,b])=>({label:getStrain(k).n,right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(k).c,ic:iconoCogollo(k)});
+const lotItem=([k,b])=>({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k))});
 async function got(t){sfx('get');await say(`Consigues ${t}.`);}
 
 /* ---------- NPCs ---------- */
@@ -1049,11 +1069,11 @@ function buildEnts(){
 }
 const ITEMS=[
   {id:'i_spray',map:'town',x:8,y:25,give:async()=>{S.items.spray+=2;await got('2 × SPRAY DE PIMIENTA');}},
-  {id:'i_fert',map:'town',x:36,y:24,give:async()=>{S.items.fert+=3;await got('3 × FERTILIZANTE');}},
+  {id:'i_fert',map:'town',x:36,y:24,give:async()=>{S.items.fert+=3;await got('3 dosis de ABONO');}},
   {id:'i_boc',map:'town',x:15,y:23,give:async()=>{S.items.bocata+=2;await got('2 × BOCATA');}},
   {id:'h_acap',map:'town',x:2,y:26,hidden:1,give:async()=>{addSeeds('acapulco',2);await got('2 semillas de ACAPULCO GOLD');await say('Un bote de carrete con dos semillas y una etiqueta a boli: «Guerrero, 1979».');}},
   {id:'h_50',map:'town',x:9,y:16,hidden:1,give:async()=>{S.money+=50;await got('50 € en billetes doblados');}},
-  {id:'h_ins',map:'town',x:10,y:24,hidden:1,give:async()=>{S.items.insect+=1;await got('1 × INSECTICIDA');}},
+  {id:'h_ins',map:'town',x:10,y:24,hidden:1,give:async()=>{S.items.insect+=1;await got('1 tratamiento de INSECTICIDA');}},
 ];
 const itemAt=(x,y)=>ITEMS.find(it=>!it.hidden&&it.map===S.map&&it.x===x&&it.y===y&&!S.taken[it.id]);
 async function pickItem(it){S.taken[it.id]=true;await it.give();}
@@ -1158,12 +1178,14 @@ async function objectAction(x,y){
    TIEMPO Y CULTIVO
    ========================================================= */
 /* ---------- equipo: carpas, focos y macetas ----------
-   Carpa: en el piso es un mueble (w casillas de ancho, 1 de fondo; 1 casilla = 1 m) y por dentro se ve en su vista de frente
-   (09b-carpa): cm = ancho y alto reales; las plazas van en filas de cols macetas (fila 0 delante).
+   Carpa: en el piso es un mueble (w casillas de ancho, 1 de fondo; 1 casilla = 1 m) y por dentro se ve en su vista B
+   (09b-carpa): cm = ancho, alto y fondo reales; las plazas van en filas de cols macetas (fila 0 delante).
    wmax: el foco más potente que admite (calor) · lmax: la maceta más grande que cabe.
-   Foco: cubre N plazas a pleno rendimiento; si la carpa tiene más, la luz se reparte (cob < 1) y rinde menos.
-   Maceta: la de tela airea las raíces (más cosecha y menos plagas, bebe más); la grande da más pero crece algo más lenta.
-   Lo de serie (CFL + plástico 7 L en el armario) da justo lo de antes de la 1.6: factores 1. */
+   Cifras reales (1.10): una cosecha da gramos por vatio (gpw) según el foco, repartidos entre las plazas de la carpa (una
+   plaza vacía es luz perdida), con el tope de la maceta (≈ 8 g por litro de tierra; la de tela, +5 %) y × el vigor de la
+   variedad (s.y / Y_MEDIA), la salud, el abono y el fenotipo. Cultivador medio y bien abonado: CFL ≈ 0,3 g/W, sodio
+   0,55-0,7, LED 0,8-1,05. Un día de juego son unas 4 semanas de cultivo: el foco gasta H_LUZ horas (18 h en crecimiento y
+   12 en floración) y el extractor y el ventilador, H_24. */
 const CARPAS={
   p60:{n:'Armario 60×60',w:1,cm:[60,160,60],cols:2,filas:1,plazas:2,wmax:250,lmax:11},
   p80:{n:'Armario 80×80',w:1,cm:[80,180,80],cols:2,filas:2,plazas:3,wmax:400,lmax:18},
@@ -1171,30 +1193,34 @@ const CARPAS={
   m120:{n:'Carpa 120×120',w:2,cm:[120,200,120],cols:3,filas:2,plazas:6,wmax:720,lmax:25},
   g150:{n:'Carpa 150×100',w:2,cm:[150,200,100],cols:3,filas:2,plazas:6,wmax:720,lmax:25}};
 const SITIOS=[{x:8,y:2,w:1},{x:10,y:2,w:2},{x:2,y:2,w:2}];   // A: el armario de la tía (60 y, después, 80) · B: la carpa que compras (100 y, después, 150), al fondo · C: la carpa 120, junto a la cama
+// lado: el cuadrado (cm) que ilumina bien · gpw: g/W sin abono · crec, thc (puntos de THC) y agua: a plena intensidad (W/m² ≥ W_M2)
 const FOCOS={
-  cfl:{n:'CFL 125 W',tipo:'cfl',w:125,cubre:2,rend:1,crec:1,thc:0,agua:1},
-  sodio250:{n:'Sodio 250 W',tipo:'sodio',w:250,cubre:2,rend:1.25,crec:1.05,thc:.3,agua:1.3},
-  sodio400:{n:'Sodio 400 W',tipo:'sodio',w:400,cubre:4,rend:1.35,crec:1.05,thc:.5,agua:1.4},
-  sodio600:{n:'Sodio 600 W',tipo:'sodio',w:600,cubre:6,rend:1.45,crec:1.05,thc:.7,agua:1.5},
-  led100:{n:'LED 100 W',tipo:'led',w:100,cubre:2,rend:1.15,crec:1.05,thc:.3,agua:1},
-  led200:{n:'LED 200 W',tipo:'led',w:200,cubre:2,rend:1.3,crec:1.1,thc:.6,agua:1.05},
-  led480:{n:'LED 480 W',tipo:'led',w:480,cubre:4,rend:1.45,crec:1.1,thc:1,agua:1.1},
-  led720:{n:'LED 720 W',tipo:'led',w:720,cubre:6,rend:1.6,crec:1.15,thc:1.4,agua:1.15}};
+  cfl:{n:'CFL 125 W',tipo:'cfl',w:125,gpw:.25,lado:60,crec:1,thc:0,agua:1},
+  sodio250:{n:'Sodio 250 W',tipo:'sodio',w:250,gpw:.45,lado:70,crec:1.05,thc:.3,agua:1.3},
+  sodio400:{n:'Sodio 400 W',tipo:'sodio',w:400,gpw:.5,lado:100,crec:1.05,thc:.5,agua:1.4},
+  sodio600:{n:'Sodio 600 W',tipo:'sodio',w:600,gpw:.55,lado:120,crec:1.05,thc:.7,agua:1.5},
+  led100:{n:'LED 100 W',tipo:'led',w:100,gpw:.65,lado:60,crec:1.05,thc:.3,agua:1},
+  led200:{n:'LED 200 W',tipo:'led',w:200,gpw:.7,lado:80,crec:1.1,thc:.6,agua:1.05},
+  led480:{n:'LED 480 W',tipo:'led',w:480,gpw:.8,lado:120,crec:1.1,thc:1,agua:1.1},
+  led720:{n:'LED 720 W',tipo:'led',w:720,gpw:.85,lado:150,crec:1.15,thc:1.4,agua:1.15}};
+// rend: la de tela airea las raíces · cap: gramos como mucho por planta · la grande crece algo más lenta
 const MACETAS={
-  plastico7:{n:'Plástico 7 L',l:7,rend:1,crec:1,agua:1,plaga:1},
-  tela11:{n:'Tela 11 L',l:11,rend:1.15,crec:1.05,agua:1.25,plaga:.8},
-  plastico18:{n:'Plástico 18 L',l:18,rend:1.25,crec:.95,agua:.8,plaga:1},
-  tela25:{n:'Tela 25 L',l:25,rend:1.4,crec:1,agua:1.1,plaga:.8}};
+  plastico7:{n:'Plástico 7 L',l:7,rend:1,cap:56,crec:1,agua:1,plaga:1},
+  tela11:{n:'Tela 11 L',l:11,rend:1.05,cap:92,crec:1.05,agua:1.25,plaga:.8},
+  plastico18:{n:'Plástico 18 L',l:18,rend:1,cap:144,crec:.95,agua:.8,plaga:1},
+  tela25:{n:'Tela 25 L',l:25,rend:1.05,cap:210,crec:1,agua:1.1,plaga:.8}};
 // extras (1.10): uno de cada por carpa (S.carpas[ci][k] = true); se compran en el growshop (S.items['x_'+k]) y se ponen desde la vista de carpa
 const EXTRAS={
-  vent:{n:'Ventilador de pinza',c:'Ventilador',d:'Mueve el aire de la carpa: plagas ×0,7.'},
-  filtro:{n:'Extractor con filtro de carbón',c:'Filtro de carbón',d:'Sin filtro, cada carpa con plantas en floración suma +2 de calor policial al día por el olor. Con él, nada.'},
-  goteo:{n:'Riego por goteo',c:'Goteo',d:'Depósito con goteros: el agua baja a la mitad de rápido.'}};
+  vent:{n:'Ventilador de pinza',c:'Ventilador',w:25,d:'Mueve el aire de la carpa: plagas ×0,7. Gasta 25 W día y noche.'},
+  filtro:{n:'Extractor con filtro de carbón',c:'Filtro de carbón',w:75,d:'Sin filtro, cada carpa con plantas en floración suma +2 de calor policial al día por el olor. Con él, nada. Gasta 75 W día y noche.'},
+  goteo:{n:'Riego por goteo',c:'Goteo',w:0,d:'Depósito con goteros: el agua baja a la mitad de rápido.'}};
 const OLOR=2;   // calor al día por carpa sin filtro con alguna planta en floración (o lista)
-const TARIFA=.02;   // € por vatio y día, solo en las carpas con alguna planta viva (vacías, el foco va apagado)
-const signo=v=>(v>=0?'+':'−')+String(Math.abs(Math.round(v))),pc=(t,f)=>Math.abs(f-1)<.001?'':` · ${t} ${signo((f-1)*100)}%`;
-const descFoco=k=>{const F=FOCOS[k];return `${F.w} W · cubre ${F.cubre} plantas${pc('cosecha',F.rend)}${pc('crece',F.crec)}${F.thc?' · THC +'+pct(F.thc):''} · riego ×${String(F.agua).replace('.',',')}\nLuz: ${eur(Math.round(F.w*TARIFA))} al día con plantas.`;};
-const descMaceta=k=>{const M=MACETAS[k];return `${M.l} L${pc('cosecha',M.rend)}${pc('crece',M.crec)} · riego ×${String(M.agua).replace('.',',')}${M.plaga<1?' · menos plagas':''}`;};
+const KWH=.16,H_LUZ=392,H_24=672,W_M2=400,Y_MEDIA=34;   // €/kWh (tarifa doméstica) · horas por día de juego · W/m² a plena intensidad · g/planta medio de STRAINS
+const signo=v=>(v>=0?'+':'−')+String(Math.abs(Math.round(v))),pc=(t,f)=>Math.abs(f-1)<.001?'':` · ${t} ${signo((f-1)*100)}%`,coma=n=>String(n).replace('.',',');
+const gm2=s=>Math.round(W_M2*.85*1.25*s.y/Y_MEDIA/10)*10;   // g/m² de la ficha: LED a 400 W/m², abonada, variedad sana
+const kwhFoco=k=>Math.round(FOCOS[k].w*H_LUZ/1000);
+const descFoco=k=>{const F=FOCOS[k];return `${F.w} W · ilumina ${F.lado}×${F.lado} cm · ${coma(F.gpw)} g/W (${coma(Math.round(F.gpw*1.25*100)/100)} abonando)${pc('crece',F.crec)}${F.thc?' · THC +'+pct(F.thc):''} · riego ×${coma(F.agua)}\nLuz: ${kwhFoco(k)} kWh (${eur(kwhFoco(k)*KWH)}) al día con plantas.`;};
+const descMaceta=k=>{const M=MACETAS[k];return `${M.l} L · hasta ${M.cap} g por planta${pc('cosecha',M.rend)}${pc('crece',M.crec)} · riego ×${coma(M.agua)}${M.plaga<1?' · menos plagas':''}`;};
 // plazas de cultivo de todas las carpas, en orden: S.pots[i] y S.macetas[i] son la planta y la maceta de la plaza i
 let _hk='',_hu=[];
 function huecos(){
@@ -1202,15 +1228,18 @@ function huecos(){
   S.carpas.forEach((c,ci)=>{if(!c)return;for(let j=0;j<CARPAS[c.t].plazas;j++)_hu.push({c:ci,j});});
   return _hu;
 }
+// g: gramos por planta de la variedad media, sana y sin abono, antes del tope de la maceta · dens: intensidad (W/m² ÷ W_M2, hasta 1)
 function factores(i){
   const h=huecos()[i],c=S.carpas[h.c],C=CARPAS[c.t],F=FOCOS[c.foco],M=MACETAS[S.macetas[i]]||MACETAS.plastico7;
-  const cob=Math.min(1,F.cubre/C.plazas);
-  return {rend:(1+(F.rend-1)*cob)*(.6+.4*cob)*M.rend,crec:F.crec*(.85+.15*cob)*M.crec,thc:F.thc*cob,agua:F.agua*M.agua*(c.goteo?.5:1),plaga:M.plaga*(c.vent?.7:1),cob};
+  const dens=Math.min(1,F.w/(C.cm[0]*C.cm[2]/1e4*W_M2));
+  return {g:F.w*F.gpw/C.plazas*M.rend,cap:M.cap,crec:F.crec*(.85+.15*dens)*M.crec,thc:F.thc*dens,agua:F.agua*M.agua*(c.goteo?.5:1),plaga:M.plaga*(c.vent?.7:1),dens};
 }
+// gramos de una planta al cosecharla (f: factores de su plaza)
+const gramosPlanta=(p,f)=>{const s=getStrain(p.sid),fe=p.f||{y:1};return Math.max(1,Math.round(Math.min(f.cap,f.g*s.y/Y_MEDIA*(.4+.6*p.health/100)*(p.fert?1.25:1)*fe.y)));};
 const plantasVivas=ci=>huecos().some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead);
 const enFlor=ci=>huecos().some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead&&S.pots[i].prog>=.65);
 const olorDia=()=>S.carpas.reduce((a,c,ci)=>a+(c&&!c.filtro&&enFlor(ci)?OLOR:0),0);
-const luzCarpa=ci=>Math.round(FOCOS[S.carpas[ci].foco].w*TARIFA);
+const luzCarpa=ci=>{const c=S.carpas[ci];return Math.round((FOCOS[c.foco].w*H_LUZ+Object.keys(EXTRAS).reduce((a,k)=>a+(c[k]?EXTRAS[k].w:0),0)*H_24)/1000*KWH);};
 function facturaLuz(){let e=0;S.carpas.forEach((c,ci)=>{if(c&&plantasVivas(ci))e+=luzCarpa(ci);});return e;}
 function plantStep(p,h,f){
   if(p.dead)return;const s=getStrain(p.sid);
@@ -1235,32 +1264,64 @@ function newDay(){
   S.heat=Math.max(0,S.heat-(S.protect?20:12));
   const luz=facturaLuz(),olor=olorDia(),av=[];S.luz={d:S.day,e:luz,o:olor};if(luz>0){S.money=Math.max(0,S.money-luz);av.push('Factura de la luz: −'+eur(luz));}
   if(olor){S.heat=Math.min(100,S.heat+olor);av.push('Olor a cogollo: calor +'+olor);}   // después de bajar el calor: cuenta para la redada de mañana
+  const sec=S.esquejes.filter(e=>S.day-e.dia>ESQUEJE_DIAS).length;if(sec){S.esquejes=S.esquejes.filter(e=>S.day-e.dia<=ESQUEJE_DIAS);av.push(`Se ${sec>1?'han secado '+sec+' esquejes':'ha secado un esqueje'} sin plantar`);}
   if(av.length&&mode==='world')toast(av.join('<br>'),1600);
   spawnClients();recibirPedido();
   if(S.due>0&&S.flags.metB&&S.day>S.deadline)queue('penalty',penaltyEvent);
+}
+/* ---------- fenotipo (1.10) ----------
+   Cada planta de semilla tira el suyo al germinar (t: THC, y: gramos; σ según tipoGen, 03-datos). Un esqueje es la misma
+   planta: copia el fenotipo de su madre, id incluido. Se sabe al cosechar (S.fenos[id] = 'estrella' | 'floja' | 'normal'),
+   así que de una planta que sale estrella solo te quedas con ella si antes le sacaste esquejes. */
+const ESQUEJE_DIAS=1;   // días que aguanta un esqueje enraizando sin plantar (un día de juego ≈ 4 semanas)
+const gauss=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+const tiraFeno=sg=>{const m=()=>Math.round(clamp(1+sg*gauss(),.6,1.5)*100)/100;return {t:m(),y:m()};};
+function rollFeno(sid){S.fenoN++;return Object.assign({id:S.fenoN},tiraFeno(GENETICA[tipoGen(sid)].sigma));}
+const claseFeno=f=>!f?'normal':f.t*f.y>=FENO_ESTRELLA?'estrella':f.t*f.y<=FENO_FLOJO?'floja':'normal';
+const fenoVisto=f=>f&&f.id&&S.fenos[f.id];   // undefined hasta que se cosecha esa planta o uno de sus esquejes
+const marcaFeno=f=>fenoVisto(f)==='estrella'?' ★':fenoVisto(f)==='floja'?' (floja)':'';
+async function plantar(i){
+  const own=Object.entries(S.seeds).filter(([,v])=>v>0),esq=S.esquejes;
+  if(!own.length&&!esq.length)return say('Maceta vacía. No tienes semillas: cómpralas en el growshop de Kiko.');
+  const items=own.map(([k,v])=>({label:getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:iconoCogollo(k),desc:strainLine(k)}))
+    .concat(esq.map(e=>{const s=getStrain(e.sid),v=fenoVisto(e.f);return {label:'Esqueje '+s.n+marcaFeno(e.f),right:'esqueje',sw:s.c,ic:iconoCogollo(e.sid),
+      desc:`Clon enraizado: la misma planta que su madre, con su fenotipo.\n${v==='estrella'?`Fenotipo estrella: THC ×${coma(e.f.t)} y cosecha ×${coma(e.f.y)}.`:v==='floja'?'Fenotipo flojo: rinde menos que la media.':'Su fenotipo se sabrá cuando coseches a la madre o a un clon suyo.'}\nSe seca si no lo plantas antes del día ${e.dia+ESQUEJE_DIAS+1}.`};}))
+    .concat([{label:'Cancelar',desc:''}]);
+  const j=await menu(items,{cls:'full',title:'¿QUÉ PLANTAS?',desc:true});
+  if(j<0||j>=own.length+esq.length)return;
+  if(j>=own.length){
+    const e=esq.splice(j-own.length,1)[0];
+    S.pots[i]={sid:e.sid,prog:.12,water:70,health:100,fert:false,pest:false,f:e.f};sfx('sel');   // ya enraizado: empieza de plántula
+    await accion('plantar');return say(`Plantas el esqueje de ${getStrain(e.sid).n}${marcaFeno(e.f)}.`);
+  }
+  const sid=own[j][0];S.seeds[sid]--;if(!S.seeds[sid])delete S.seeds[sid];
+  S.pots[i]={sid,prog:0,water:70,health:100,fert:false,pest:false,f:rollFeno(sid)};sfx('sel');
+  await accion('plantar');return say(`Has plantado ${getStrain(sid).n}.`);
+}
+async function sacarEsqueje(i){
+  const p=S.pots[i],s=getStrain(p.sid);
+  if(S.esquejes.length>=12)return say('El propagador está lleno: 12 esquejes. Planta alguno antes.');
+  S.esquejes.push({sid:p.sid,f:p.f||rollFeno(p.sid),dia:S.day});if(!p.f)p.f=S.esquejes[S.esquejes.length-1].f;
+  p.health=Math.max(1,p.health-5);sfx('sel');
+  return say(`Cortas una punta de la ${s.n} y la pones a enraizar.\nPlántala antes del día ${S.day+ESQUEJE_DIAS+1}: es la misma planta.`);
 }
 function stageName(p){return p.prog<.12?'Germinando':p.prog<.35?'Plántula':p.prog<.65?'Vegetativo':'Floración';}
 async function potAction(i){
   const p=S.pots[i];
   if(!p){
     if(macetasLibres(i).length){const c=await ask(`Plaza vacía con una maceta de ${MACETAS[S.macetas[i]].n}.`,['Plantar','Cambiar maceta','Salir']);if(c===1)return cambiarMaceta(i);if(c!==0)return;}
-    const own=Object.entries(S.seeds).filter(([,v])=>v>0);
-    if(!own.length)return say('Maceta vacía. No tienes semillas: cómpralas en el growshop de Kiko.');
-    const j=await menu(own.map(([k,v])=>({label:getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:iconoCogollo(k),desc:strainLine(k)})).concat([{label:'Cancelar',desc:''}]),{cls:'full',title:'¿QUÉ PLANTAS?',desc:true});
-    if(j<0||j>=own.length)return;
-    const sid=own[j][0];S.seeds[sid]--;if(!S.seeds[sid])delete S.seeds[sid];
-    S.pots[i]={sid,prog:0,water:70,health:100,fert:false,pest:false};sfx('sel');
-    await accion('plantar');return say(`Has plantado ${getStrain(sid).n}.`);
+    return plantar(i);
   }
   const s=getStrain(p.sid);
   if(p.dead){await say(`La ${s.n} se ha secado del todo.`);S.pots[i]=null;return say('Retiras la planta muerta.');}
-  if(p.prog>=1){const c=await ask(`${s.n} lista para cosechar.\nSalud ${Math.round(p.health)}% · Agua ${Math.round(p.water)}%`,['Cosechar','Esperar']);if(c===0)await harvest(i);return;}
-  const opts=['Regar'];if(!p.fert)opts.push('Abonar');if(p.pest)opts.push('Tratar plaga');opts.push('Arrancar','Salir');
-  const c=await ask(`${s.n} · ${stageName(p)} ${Math.floor(p.prog*100)}%\nAgua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%${p.pest?' · PLAGA':''}`,opts);
+  if(p.prog>=1){const c=await ask(`${s.n}${marcaFeno(p.f)} lista para cosechar.\nSalud ${Math.round(p.health)}% · Agua ${Math.round(p.water)}%`,['Cosechar','Esperar']);if(c===0)await harvest(i);return;}
+  const opts=['Regar'];if(!p.fert)opts.push('Abonar');if(p.pest)opts.push('Tratar plaga');if(p.prog>=.2&&p.prog<.65)opts.push('Sacar esqueje');opts.push('Arrancar','Salir');
+  const c=await ask(`${s.n}${marcaFeno(p.f)} · ${stageName(p)} ${Math.floor(p.prog*100)}%\nAgua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%${p.pest?' · PLAGA':''}`,opts);
   const op=opts[c];
   if(op==='Regar'){const [vx,vy]=posPlaza(i);await accion('regar',{id:'vfx-gotas',x:vx,y:vy-6});p.water=100;sfx('sel');await say('Riegas la planta. Agua al 100%.');}
-  else if(op==='Abonar'){if(S.items.fert>0){S.items.fert--;p.fert=true;sfx('sel');await say('Echas FERTILIZANTE. Dará más cosecha.');}else await say('No te queda FERTILIZANTE.');}
+  else if(op==='Abonar'){if(S.items.fert>0){S.items.fert--;p.fert=true;sfx('sel');await say('Echas una dosis de ABONO. Dará más cosecha.');}else await say('No te queda ABONO.');}
   else if(op==='Tratar plaga'){if(S.items.insect>0){S.items.insect--;p.pest=false;sfx('sel');await say('Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.');}else await say('No tienes INSECTICIDA. Kiko lo vende.');}
+  else if(op==='Sacar esqueje')await sacarEsqueje(i);
   else if(op==='Arrancar'){if(await ask('¿Seguro que quieres arrancarla?',['Sí','No'])===0){S.pots[i]=null;await say('Arrancas la planta.');}}
 }
 // macetas de repuesto que caben en la carpa de la plaza i (y no son la que ya tiene)
@@ -1283,20 +1344,26 @@ function ponerExtra(ci,k){S.items['x_'+k]--;S.carpas[ci][k]=true;sfx('sel');}
 async function carpaAction(ci){
   const c=S.carpas[ci],C=CARPAS[c.t],F=FOCOS[c.foco],f=focosLibres(ci).length,ex=extrasLibres(ci);
   const opts=(f?['Cambiar foco']:[]).concat(ex.map(k=>'Poner '+EXTRAS[k].c.toLowerCase()),['Salir']);
-  const k=await ask(`${C.n} · ${C.plazas} plantas\nFoco ${F.n} · luz ${eur(luzCarpa(ci))} al día con plantas`,opts);
+  const k=await ask(`${C.n} · ${C.plazas} plantas · ${F.n}\n${Math.round(F.w/(C.cm[0]*C.cm[2]/1e4))} W/m² · luz ${eur(luzCarpa(ci))} al día con plantas`,opts);
   if(opts[k]==='Cambiar foco')return cambiarFoco(ci);
   const x=ex[k-(f?1:0)];if(k<0||!x)return;
   ponerExtra(ci,x);return say(`Pones el ${EXTRAS[x].n.toLowerCase()} en ${/^Armario/.test(C.n)?'el':'la'} ${C.n.toLowerCase()}.\n${EXTRAS[x].d}`);
 }
+// cosecha: gramos y THC con el fenotipo de la planta; un fenotipo estrella va a un lote aparte (clave sid + '*', ver lotSid).
+// Semillas: las de tienda son feminizadas y salen sin semilla salvo alguna flor hermafrodita (SEMILLA_HERMA); una línea sin
+// fijar (F1-F3) la estás criando: se polinizan entre ellas y das 2-5 semillas por planta para seguir estabilizando
+const SEMILLA_HERMA=.12;
 async function harvest(i){
-  const p=S.pots[i],s=getStrain(p.sid),f=factores(i);
-  const v=genDe(p.sid)<GEN_ESTABLE?.8+Math.random()*.3:1;   // línea inestable: cada planta sale distinta
-  const g=Math.max(1,Math.round(s.y*(.4+.6*p.health/100)*(p.fert?1.25:1)*f.rend*v));
-  const thc=Math.round((s.thc*(.85+.15*p.health/100)+f.thc+(p.fert?.3:0))*10)/10;
+  const p=S.pots[i],s=getStrain(p.sid),f=factores(i),fe=p.f||{t:1,y:1},cl=claseFeno(p.f);
+  const g=gramosPlanta(p,f);
+  const thc=Math.min(35,Math.round((s.thc*fe.t*(.85+.15*p.health/100)+f.thc+(p.fert?.3:0))*10)/10);
   const [vx,vy]=posPlaza(i);await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:vx,y:vy-12});
-  const n=1+ri(0,2);addBuds(p.sid,g,thc);addSeeds(p.sid,n);S.pots[i]=null;sfx('get');
+  const cria=genDe(p.sid)<GEN_ESTABLE,n=cria?ri(2,5):Math.random()<SEMILLA_HERMA?ri(1,3):0;
+  addBuds(cl==='estrella'?p.sid+'*':p.sid,g,thc);if(n)addSeeds(p.sid,n);if(p.f&&p.f.id)S.fenos[p.f.id]=cl;S.pots[i]=null;sfx('get');
   await say(`Cosechas ${g} g de ${s.n}. THC: ${pct(thc)}%.`);
-  await say(`También recoges ${n} semilla${n>1?'s':''} de ${s.n}.`);
+  if(cl==='estrella'){sfx('enc');await say(`¡Fenotipo estrella! THC ×${coma(fe.t)} y cosecha ×${coma(fe.y)} sobre la media de la ${s.n}.`);await say('Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.');}
+  else if(cl==='floja')await say(`Fenotipo flojo: THC ×${coma(fe.t)} y cosecha ×${coma(fe.y)} de la media.`);
+  if(n)await say(cria?`Las plantas de la línea se han polinizado entre ellas: recoges ${n} semillas de ${s.n}.`:`Una flor hermafrodita ha polinizado unas pocas: recoges ${n} semilla${n>1?'s':''} de ${s.n}.`);
   S.flags.harvest1=true;await checkStory();
 }
 // estabilizar: la línea cruzada consigo misma sube una generación (F1 → F2 → F3 → estable)
@@ -1323,15 +1390,16 @@ async function pcAction(){
   if(c==='Genoteca')await genoteca();else if(c==='Banco de semillas')await bancoSemillas();
   else if(c==='Guardar partida')await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');
 }
-// banco de semillas (1.9): las landraces de Strainmon, en sobres de 3; el pedido llega por mensajero al día siguiente (newDay)
-const BANCO=[['mich',40,2],['punto',55,2],['thai',60,2],['kif',35,2],['beldia',35,2],['chitral',70,3],['nepal',65,3],['congo',60,3],['lamb',60,3],['oaxaca',55,3],['lao',80,4],['panama',90,4]];
+// banco de semillas (1.9): las landraces de Strainmon en sobres de SOBRE semillas, a precio de bancos de conservación
+// (1.10: 2-4,50 € la semilla); el pedido llega por mensajero al día siguiente (newDay)
+const SOBRE=10,BANCO=[['mich',25,2],['punto',30,2],['thai',30,2],['kif',20,2],['beldia',20,2],['chitral',35,3],['nepal',30,3],['congo',30,3],['lamb',30,3],['oaxaca',25,3],['lao',40,4],['panama',45,4]];
 async function bancoSemillas(){
   let i=0;
   for(;;){
     const l=BANCO.filter(([,,ch])=>S.ch>=ch);
     const items=l.map(([k,p])=>{const s=STRAINS[k],n=S.pedido.filter(x=>x===k).length;return {label:s.n+(n?' · pedida':''),right:eur(p),sw:s.c,ic:iconoCogollo(k),desc:strainLine(k)+'\n'+s.h};});
     items.push({label:'Salir',desc:'Los pedidos llegan mañana por la mañana.'});
-    i=await menu(items,{cls:'full',title:'BANCO DE SEMILLAS',title2:'Sobres de 3 · tienes '+eur(S.money),desc:true,initial:i});
+    i=await menu(items,{cls:'full',title:'BANCO DE SEMILLAS',title2:`Sobres de ${SOBRE} · tienes `+eur(S.money),desc:true,initial:i});
     if(i<0||i>=l.length)return;
     const [k,p]=l[i];
     if(S.money<p){sfx('bad');await say('No te llega el dinero.');continue;}
@@ -1340,7 +1408,7 @@ async function bancoSemillas(){
 }
 function recibirPedido(){
   if(!S.pedido.length)return;
-  const c={};for(const k of S.pedido)c[k]=(c[k]||0)+3;S.pedido=[];
+  const c={};for(const k of S.pedido)c[k]=(c[k]||0)+SOBRE;S.pedido=[];
   const n=Object.entries(c).map(([k,v])=>{S.seeds[k]=(S.seeds[k]||0)+v;discover(k);return `${STRAINS[k].n} ×${v}`;});
   queue('pedido',async()=>{sfx('get');await say(`Llega el paquete del banco de semillas:\n${n.join(', ')} semillas.`);await checkStory();});
 }
@@ -1369,7 +1437,7 @@ async function labAction(){
   await accion('cruzar',{id:'vfx-polen',x:P.px+8,y:P.py-4});
   sfx('enc');await fade(1,true);await wait(450);await fade(0,true);
   addSeeds(r,2);
-  if(isNew){sfx('get');await say(`Nueva variedad: ${s.n}.`);await say(`THC ${pct(s.thc)}% · ${s.y} g/planta · ${String(s.d).replace('.',',')} días.\nObtienes 2 semillas F1: la línea aún no es estable.`);
+  if(isNew){sfx('get');await say(`Nueva variedad: ${s.n}.`);await say(`THC ${pct(s.thc)}% · ~${gm2(s)} g/m² · ${coma(s.d)} días.\nObtienes 2 semillas F1: la línea aún no es estable.`);
     if(r==='leyenda'){await say('Te tiemblan las manos: es GHOST TRAIN HAZE.');await talk('SMS · KIKO',['¿Ghost Train Haze? ¿De semilla propia? Llevo veinte años detrás de ella.','Tu tía estaría orgullosa. Estabilízala y guárdala bien: eso vale más que el piso.']);}}
   else await say(`Obtienes 2 semillas de ${s.n}.`);
   await checkStory();
@@ -1608,7 +1676,10 @@ async function abrirCarpa(ci){
   }));
   VC.ocupado=true;vcInfo();await fade(1);mode='world';VC=null;updateHUD();await fade(0);
 }
-/* ---------- clientes y venta ---------- */
+/* ---------- clientes y venta ----------
+   Precios reales (1.10): en la calle, el gramo a 6-10 € según el THC (× el tipo de cliente y lo que pidas); al por mayor,
+   3,50-5 € (ventaMayor, 11-historia). */
+const precioCalle=thc=>4+thc*.2,precioMayor=thc=>2+thc*.1;
 function spawnClients(){
   S.clientsDay=S.day;S.clients=[];
   if(S.ch>=2){
@@ -1629,9 +1700,9 @@ async function talkClient(c){
   if(!lots.length)return say(totalBuds()>0?'Eso no me vale. Vuelve cuando tengas lo que busco.':'¿No llevas nada? Vale.',N);
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué le vendes?'});
   if(i<0||i>=lots.length)return say('Vale, otro día.',N);
-  const [sid,b]=lots[i],base=(3+b.thc*.4)*ct.mult*c.want;
+  const [sid,b]=lots[i],base=precioCalle(b.thc)*ct.mult*c.want;
   const pr=[Math.round(base*.85),Math.round(base),Math.round(base*1.3)];
-  const j=await ask(`${c.want} g de ${getStrain(sid).n}. ¿Cuánto le pides?`,[`Rebaja · ${pr[0]} €`,`Justo · ${pr[1]} €`,`Caro · ${pr[2]} €`,'Cancelar']);
+  const j=await ask(`${c.want} g de ${lotNombre(sid)}. ¿Cuánto le pides?`,[`Rebaja · ${pr[0]} €`,`Justo · ${pr[1]} €`,`Caro · ${pr[2]} €`,'Cancelar']);
   if(j===3)return say('Entonces me voy.',N);
   const acc=[1,.92,clamp(.3+(b.thc-(c.minThc||14))*.05+(c.type==='pij'?.25:0)+(c.type==='tur'?.15:0),.1,.9)][j];
   if(Math.random()<acc){
@@ -1648,24 +1719,39 @@ function heatWarn(){if(S.heat>=70&&!S.flags.heatW){S.flags.heatW=true;toast('<sm
 /* =========================================================
    PERSONAJES Y GUION
    ========================================================= */
+// precios de growshop reales (1.10). Semillas: lo que cuesta una feminizada; se venden en sobres (SOBRES), más baratas cuanto
+// más grande el sobre, y desde el capítulo 3 en bolsas de 50 a granel. n: dosis que trae el bote
 const SHOP=[
-  {lbl:'Semilla Skunk #1',p:15,ch:1,sid:'ria'},{lbl:'Semilla Lemon Haze',p:25,ch:2,sid:'limon'},{lbl:'Semilla OG Kush',p:30,ch:2,sid:'txoko'},
-  {lbl:'Semilla Blueberry',p:40,ch:3,sid:'niebla'},{lbl:'Semilla Mango',p:35,ch:3,sid:'mango'},{lbl:'Semilla Purple Afghani',p:50,ch:4,sid:'purpura'},
-  {lbl:'Fertilizante',p:15,ch:1,item:'fert',desc:'Una dosis por planta: +25% de cosecha.'},
-  {lbl:'Insecticida',p:20,ch:1,item:'insect',desc:'Elimina una plaga de araña roja.'},
-  {lbl:'Bocata',p:6,ch:1,item:'bocata',desc:'Recupera 15 de vida. En combate o desde la mochila.'},
-  {lbl:'Spray de pimienta',p:25,ch:2,item:'spray',desc:'En combate: 12-16 de daño seguro a un ladrón.'},
-  {lbl:'Maceta de tela 11 L',p:20,ch:1,maceta:'tela11'},{lbl:'Maceta de plástico 18 L',p:30,ch:2,maceta:'plastico18'},{lbl:'Maceta de tela 25 L',p:45,ch:3,maceta:'tela25'},
-  {lbl:'Foco LED 100 W',p:140,ch:1,foco:'led100'},{lbl:'Ventilador de pinza',p:25,ch:1,extra:'vent'},
-  {lbl:'Extractor con filtro de carbón',p:120,ch:2,extra:'filtro'},{lbl:'Riego por goteo',p:80,ch:3,extra:'goteo'},
-  {lbl:'Foco sodio 250 W',p:120,ch:2,foco:'sodio250'},{lbl:'Foco LED 200 W',p:260,ch:2,foco:'led200'},
-  {lbl:'Foco sodio 400 W',p:220,ch:3,foco:'sodio400'},{lbl:'Foco LED 480 W',p:600,ch:3,foco:'led480'},
-  {lbl:'Foco sodio 600 W',p:350,ch:4,foco:'sodio600'},{lbl:'Foco LED 720 W',p:1000,ch:5,foco:'led720'},
-  {lbl:'Armario 80×80',p:300,ch:3,carpa:'p80',ci:0,desc:'Cambia el armario de tu tía por uno de 80: 3 plantas, focos de hasta 400 W y macetas de hasta 18 L. Tus plantas, foco y macetas se quedan.',cond:()=>S.carpas[0].t==='p60'},
-  {lbl:'Carpa 100×100',p:450,ch:2,carpa:'m100',ci:1,desc:'Segunda carpa para el piso: 4 plantas, focos de hasta 480 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L.',cond:()=>!S.carpas[1]},
-  {lbl:'Carpa 150×100',p:900,ch:4,carpa:'g150',ci:1,desc:'Cambia tu carpa de 100 por una de 150: 6 plantas y focos de hasta 720 W. Tus plantas, foco y macetas se quedan.',cond:()=>S.carpas[1]&&S.carpas[1].t==='m100'},
-  {lbl:'Carpa 120×120',p:700,ch:5,carpa:'m120',ci:2,desc:'Tercera carpa, junto a la cama: 6 plantas, focos de hasta 720 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. Antes necesitas la del fondo.',cond:()=>!!S.carpas[1]&&!S.carpas[2]},
+  {lbl:'Semillas Skunk #1',p:5,ch:1,sid:'ria'},{lbl:'Semillas Lemon Haze',p:9,ch:2,sid:'limon'},{lbl:'Semillas OG Kush',p:10,ch:2,sid:'txoko'},
+  {lbl:'Semillas Blueberry',p:8,ch:3,sid:'niebla'},{lbl:'Semillas Mango',p:7,ch:3,sid:'mango'},{lbl:'Semillas Purple Afghani',p:8,ch:4,sid:'purpura'},
+  {lbl:'Abono de floración 1 L',p:14,ch:1,item:'fert',n:4,desc:'4 dosis. Una por planta: +25% de cosecha.'},
+  {lbl:'Insecticida de neem 500 ml',p:12,ch:1,item:'insect',n:3,desc:'3 tratamientos. Cada uno elimina una plaga de araña roja.'},
+  {lbl:'Bocata',p:5,ch:1,item:'bocata',desc:'Recupera 15 de vida. En combate o desde la mochila.'},
+  {lbl:'Spray de pimienta',p:15,ch:2,item:'spray',desc:'En combate: 12-16 de daño seguro a un ladrón.'},
+  {lbl:'Maceta de tela 11 L',p:3,ch:1,maceta:'tela11'},{lbl:'Maceta de plástico 18 L',p:2,ch:2,maceta:'plastico18'},{lbl:'Maceta de tela 25 L',p:4,ch:3,maceta:'tela25'},
+  {lbl:'Foco LED 100 W',p:110,ch:1,foco:'led100'},{lbl:'Ventilador de pinza',p:20,ch:1,extra:'vent'},
+  {lbl:'Extractor con filtro de carbón',p:110,ch:2,extra:'filtro'},{lbl:'Riego por goteo',p:55,ch:3,extra:'goteo'},
+  {lbl:'Foco sodio 250 W',p:85,ch:2,foco:'sodio250'},{lbl:'Foco LED 200 W',p:220,ch:2,foco:'led200'},
+  {lbl:'Foco sodio 400 W',p:100,ch:3,foco:'sodio400'},{lbl:'Foco LED 480 W',p:500,ch:3,foco:'led480'},
+  {lbl:'Foco sodio 600 W',p:120,ch:4,foco:'sodio600'},{lbl:'Foco LED 720 W',p:950,ch:5,foco:'led720'},
+  {lbl:'Armario 80×80',p:90,ch:3,carpa:'p80',ci:0,desc:'Cambia el armario de tu tía por uno de 80: 3 plantas, focos de hasta 400 W y macetas de hasta 18 L. Tus plantas, foco y macetas se quedan.',cond:()=>S.carpas[0].t==='p60'},
+  {lbl:'Carpa 100×100',p:120,ch:2,carpa:'m100',ci:1,desc:'Segunda carpa para el piso: 4 plantas, focos de hasta 480 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L.',cond:()=>!S.carpas[1]},
+  {lbl:'Carpa 150×100',p:140,ch:4,carpa:'g150',ci:1,desc:'Cambia tu carpa de 100 por una de 150: 6 plantas y focos de hasta 720 W. Tus plantas, foco y macetas se quedan.',cond:()=>S.carpas[1]&&S.carpas[1].t==='m100'},
+  {lbl:'Carpa 120×120',p:150,ch:5,carpa:'m120',ci:2,desc:'Tercera carpa, junto a la cama: 6 plantas, focos de hasta 720 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. Antes necesitas la del fondo.',cond:()=>!!S.carpas[1]&&!S.carpas[2]},
 ];
+const SOBRES=[[1,1],[3,.95],[5,.9],[10,.85]],GRANEL=[50,.6];   // [semillas, precio por semilla relativo]
+const precioSobre=(it,[n,f])=>Math.round(it.p*n*f);
+async function comprarSemillas(it){
+  const l=SOBRES.concat(S.ch>=3?[GRANEL]:[]);
+  const j=await ask(`Semillas feminizadas de ${STRAINS[it.sid].n}. ¿Cuántas?`,l.map(([n,f])=>`${n===1?'1 semilla':n>=50?'Bolsa de '+n:'Sobre de '+n} · ${eur(precioSobre(it,[n,f]))}`).concat(['Nada']),'KIKO');
+  if(j<0||j>=l.length)return;
+  const e=precioSobre(it,l[j]);if(S.money<e){sfx('bad');return say('No te llega el dinero.','KIKO');}
+  S.money-=e;sfx('coin');addSeeds(it.sid,l[j][0]);toast(`Comprado: ${l[j][0]} × ${STRAINS[it.sid].n}`,1200);
+}
+// la deuda de la tía (1.10, a escala real): 30.000 € en tres plazos (capítulos 3, 5 y 7). Con equipo y precios reales, un
+// jugador que reinvierte paga cada plazo en las mismas cosechas que antes (simulación en docs/ECONOMIA.md). Si un plazo
+// vence, Toño suma INTERES. META_VENTAS: lo que hay que vender en la calle en el capítulo 2
+const DEUDA=30000,PLAZOS={3:3000,5:12000,7:15000},INTERES=.2,PREMIO_COPA=5000,SOBORNO=1500,MULTA_REDADA=3000,META_VENTAS=300;
 const yLista=l=>l.length>1?l.slice(0,-1).join(', ')+' y '+l[l.length-1]:l[0];
 for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+yLista(Object.values(CARPAS).filter(C=>FOCOS[it.foco].w<=C.wmax).map(C=>C.cm[0]))+'.';if(it.extra){const k=it.extra;it.desc=EXTRAS[k].d+'\nUno por carpa.';it.cond=()=>S.carpas.filter(c=>c&&!c[k]).length>S.items['x_'+k];}}
 // carpa comprada (en un sitio libre) o ampliada (mismo sitio, se quedan foco, extras, plantas y macetas): cada plaza
@@ -1685,15 +1771,16 @@ async function shop(){
   for(;;){
     const list=SHOP.filter(it=>S.ch>=it.ch&&(!it.cond||it.cond()));
     const IC={fert:'abono',insect:'insecticida',spray:'spray',bocata:'bocadillo'};
-    const items=list.map(it=>({label:it.lbl,right:eur(it.p),sw:it.sid?STRAINS[it.sid].c:null,ic:it.sid?icono('semillas'):it.item?icono(IC[it.item]):it.maceta?icono('maceta'):it.foco?icono('lampara'):null,desc:it.sid?strainLine(it.sid):it.desc}));
+    const items=list.map(it=>({label:it.lbl,right:eur(it.p)+(it.sid?'/u':''),sw:it.sid?STRAINS[it.sid].c:null,ic:it.sid?icono('semillas'):it.item?icono(IC[it.item]):it.maceta?icono('maceta'):it.foco?icono('lampara'):null,desc:it.sid?strainLine(it.sid):it.desc}));
     items.push({label:'Salir',desc:'Volver al mostrador.'});
     i=await menu(items,{cls:'full',title:'GROWSHOP KIKO',title2:'Tienes '+eur(S.money),desc:true,initial:i});
     if(i<0||i>=list.length)break;
     const it=list[i];
+    if(it.sid){await comprarSemillas(it);await checkStory();continue;}
     if(S.money<it.p){sfx('bad');await say('No te llega el dinero.','KIKO');continue;}
     S.money-=it.p;sfx('coin');
-    if(it.sid)addSeeds(it.sid,1);if(it.item)S.items[it.item]++;if(it.maceta)S.items['m_'+it.maceta]++;
-    if(!it.sid&&!it.foco&&!it.carpa&&!it.extra)toast('Comprado: '+it.lbl,1200);
+    if(it.item)S.items[it.item]+=it.n||1;if(it.maceta)S.items['m_'+it.maceta]++;
+    if(!it.foco&&!it.carpa&&!it.extra)toast('Comprado: '+it.lbl,1200);
     if(it.carpa){comprarCarpa(it.carpa,it.ci);await say(DICHO_CARPA[it.carpa],'KIKO');}
     if(it.extra){S.items['x_'+it.extra]++;const ok=S.carpas.map((c,ci)=>c&&!c[it.extra]?ci:-1).filter(ci=>ci>=0);
       if(!ok.length)await say('Ya tienes uno en cada carpa. Te lo guardo en la mochila.','KIKO');
@@ -1709,9 +1796,9 @@ async function shop(){
 }
 const RECIPE_HINTS=['Skunk #1 polinizada con Lemon Haze: así salió la Lemon Skunk.','OG Kush con Blueberry da Blueberry Kush. Índica, de color azulado.','Afghani con Skunk #1 es la Critical Mass. Produce como ninguna.','Hindu Kush con Purple Afghani: la Purple Kush.','Mango con Hindu Kush: Mango Kush.','Blueberry con una Haze da Blue Dream. Con la Lemon Haze te vale.','Acapulco Gold con Afghani: así se hizo la Trainwreck.','Las de segunda generación se cruzan entre ellas: Critical Kush, Super Lemon Haze, Purple Haze...','La Amnesia Haze de Darko viene de una Super Lemon Haze y una Trainwreck.','La Fire OG sale de Critical Kush con Blueberry Kush. Hace falta paciencia.','Una Amnesia Haze con una Fire OG... de ahí sale la Ghost Train Haze. Yo nunca lo he conseguido.'];
 function kikoTip(){
-  const t=[['Riega cuando el agua baje del 30 %. Una planta seca enferma.','El fertilizante se echa una vez por planta. Merece la pena.','Las plantas crecen mientras duermes. No hace falta mirarlas cada hora.'],
-    ['Los clientes cambian cada día. No los hagas esperar.','Pedir caro funciona con turistas, con gente de dinero y con cogollo potente.','Si la presión policial (CALOR) sube mucho, deja de vender unos días.','Una carpa más grande es la mejor inversión que puedes hacer.','Tu tía pedía landraces a un banco de semillas por internet. Mira en su ordenador.','Lo que sale de un cruce es una F1: cada planta sale distinta. Crúzala consigo misma hasta fijarla.','Las macetas de tela airean las raíces: más cosecha y menos plagas, pero hay que regar más.'],
-    ['El LED cuesta más, pero rinde más y apenas da calor. El sodio es barato y seca las macetas.','Un foco pequeño en una carpa grande no llega a todas las plantas.','La luz se paga: cada carpa con plantas suma su factura cada día.','De noche, en el parque, roban. Lleva el spray de pimienta.'],
+  const t=[['Riega cuando el agua baje del 30 %. Una planta seca enferma.','El abono se echa una vez por planta. Merece la pena.','Las plantas crecen mientras duermes. No hace falta mirarlas cada hora.','Un CFL da poco: unos 0,3 gramos por vatio. Un LED, el triple.'],
+    ['Los clientes cambian cada día. No los hagas esperar.','Pedir caro funciona con turistas, con gente de dinero y con cogollo potente.','Si la presión policial (CALOR) sube mucho, deja de vender unos días.','Una carpa más grande es la mejor inversión que puedes hacer.','Tu tía pedía landraces a un banco de semillas por internet. Mira en su ordenador.','Lo que sale de un cruce es una F1: cada planta sale distinta. Crúzala consigo misma hasta fijarla.','Las macetas de tela airean las raíces: más cosecha y menos plagas, pero hay que regar más.','Cada semilla es una planta distinta. Si compras muchas, alguna sale estrella: más potente y más productiva.','Si una planta promete, sácale esquejes en crecimiento. Un esqueje es la misma planta: así se guarda un fenotipo estrella.','Una maceta pequeña no da más de unos 8 gramos por litro de tierra, por mucho foco que le pongas.'],
+    ['El LED cuesta más, pero rinde más y apenas da calor. El sodio es barato y seca las macetas.','Un foco pequeño en una carpa grande no llega a todas las plantas.','La luz se paga: cada carpa con plantas suma su factura cada día. Un LED de 720 W gasta unos 280 kWh al día: 45 €.','Una plaza vacía es luz que pagas y no aprovechas.','Iñaki, el del muelle, compra cantidad. Paga menos por gramo que la calle, pero se lo lleva todo.','De noche, en el parque, roban. Lleva el spray de pimienta.'],
     RECIPE_HINTS.concat(['Las landraces no las vendo. Pregunta por el barrio: Txaro, Iñaki el del muelle... y mira bien en el parque.'])];
   return pick(t[Math.min(3,Math.max(0,S.ch-1))].concat(S.ch>3?t[1]:[]));
 }
@@ -1719,8 +1806,8 @@ async function talkKiko(){
   const N='KIKO';
   if(!S.flags.kiko1){
     await talk(N,['{N}, pasa. Te pareces a tu tía.','Maite y yo cultivamos juntos desde que cerraron los astilleros. Ella tenía mano; yo, paciencia.','Para empezar, toma esto.']);
-    addSeeds('ria',3);await got('3 semillas de SKUNK #1');S.items.fert+=2;await got('2 × FERTILIZANTE');
-    await talk(N,['La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.','Planta en las macetas del armario de tu tía y riega cuando baje el agua.','El fertilizante da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.','Cuando esté lista, cosecha. Guarda las semillas que salgan: siempre se poliniza alguna flor.','Las plantas siguen creciendo mientras duermes.']);
+    addSeeds('ria',3);await got('3 semillas de SKUNK #1');S.items.fert+=2;await got('2 dosis de ABONO');
+    await talk(N,['La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.','Planta en las macetas del armario de tu tía y riega cuando baje el agua.','El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.','Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.','Las plantas siguen creciendo mientras duermes.']);
     S.flags.kiko1=true;showObjective();return;
   }
   if(S.ch===4&&!S.flags.lab){
@@ -1755,19 +1842,40 @@ async function talkTxaro(){
   await say('Gracias. Toma: las trajo mi Paco de Pakistán en el setenta y seis. Nunca supe qué hacer con ellas.',N);
   addSeeds('hindu',2);await got('2 semillas de HINDU KUSH');S.items.bocata+=3;await say('Y llévate estos bocadillos, que comes poco.',N);await got('3 × BOCATA');S.flags.txaro=true;
 }
+// Iñaki: 10 g para el viaje, una vez al día; desde el capítulo 3 también compra al por mayor (ventaMayor)
 async function talkInaki(){
   const N='IÑAKI';
+  if(S.ch>=3){const c=await ask('Aupa. ¿Qué traes?',['10 g para el viaje','Venta al por mayor','Nada'],N);if(c===1)return ventaMayor(N);if(c!==0)return;}
   if(S.iDay===S.day)return say('Ya me has vendido hoy. Mañana más, que el barco sale temprano.',N);
   await say('Aupa. Me voy tres semanas a la mar. ¿Tienes 10 g para el viaje? Pago bien.',N);
   const lots=budLots(10);if(!lots.length)return say('Pues nada. Si consigues 10 g, aquí estaré.',N);
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué le vendes?'});
   if(i<0||i>=lots.length)return;
-  const [sid,b]=lots[i],amt=Math.round((3+b.thc*.4)*1.2*10);
-  if(await ask(`Te doy ${amt} € por 10 g de ${getStrain(sid).n}. ¿Hecho?`,['Hecho','No'],N)!==0)return;
+  const [sid,b]=lots[i],amt=Math.round(precioCalle(b.thc)*1.2*10);
+  if(await ask(`Te doy ${amt} € por 10 g de ${lotNombre(sid)}. ¿Hecho?`,['Hecho','No'],N)!==0)return;
   useBuds(sid,10);S.money+=amt;S.sales+=amt;S.heat=Math.min(100,S.heat+3);S.iDay=S.day;S.rep+=2;sfx('coin');
   if(!S.flags.inaki){S.flags.inaki=true;await say('Toma. Me las dio un marinero de Malaui en Mombasa, en el último viaje.',N);addSeeds('malawi',2);await got('2 semillas de MALAWI GOLD');}
   else await say('Eskerrik asko. Hasta la vuelta.',N);
   await checkStory();
+}
+// al por mayor (1.10): lotes de 100 g para arriba a precioMayor (10-calle), una carga al día y hasta mayorDia() gramos;
+// sube poco el calor (es una sola entrega) pero algo más cuanto más grande
+const mayorDia=()=>IMPERIO[S.ch>=8?imperioNivel():0].mayor;
+async function ventaMayor(N){
+  if(S.mDay===S.day)return say('Hoy ya he cargado. Mañana sale otro barco.',N);
+  const lots=budLots(100);
+  if(!lots.length)return say(`Al por mayor, de 100 g para arriba. Pago entre ${coma(precioMayor(12).toFixed(2))} y ${coma(precioMayor(30).toFixed(2))} € el gramo, según lo bueno que sea. Hasta ${mayorDia()>=1000?coma(mayorDia()/1000)+' kg':mayorDia()+' g'} por carga.`,N);
+  const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote?'});
+  if(i<0||i>=lots.length)return say('Otro día.',N);
+  const [k,b]=lots[i],pg=Math.round(precioMayor(b.thc)*100)/100,tope=Math.min(Math.floor(b.g),mayorDia());
+  const ops=[100,250,500,1000,2000,5000,10000].filter(g=>g<tope).concat([tope]),kg=g=>g>=1000?coma(g/1000)+' kg':g+' g';
+  const j=await ask(`${lotNombre(k)} a ${coma(pg.toFixed(2))} € el gramo. ¿Cuánto cargas?`,ops.map(g=>`${kg(g)} · ${eur(g*pg)}`).concat(['Nada']),N);
+  if(j<0||j>=ops.length)return;
+  const g=ops[j],e=Math.round(g*pg);
+  useBuds(k,g);S.money+=e;S.sales+=e;S.mDay=S.day;S.heat=Math.min(100,S.heat+2+g/250);S.rep+=1;sfx('coin');
+  await accion('vender',{id:'vfx-monedas',x:P.px+8,y:P.py+2});
+  toast(`+${eur(e)} · ${kg(g)} al por mayor`,1600);
+  await say('Cargado. Esta noche sale en el barco.',N);heatWarn();await checkStory();
 }
 async function talkCop(){
   if(totalBuds()>0&&!S.protect){await say('¿Y ese olor? Quieto ahí.','AGENTE');await battle('police');return;}
@@ -1782,10 +1890,10 @@ async function talkDarko(){
 }
 async function talkMolina(){
   const N='SARGENTO MOLINA';
-  if(!S.flags.molina1){S.flags.molina1=true;await talk(N,['Así que eres tú quien vende en la plaza.','Podría detenerte ahora mismo. O podemos entendernos.','Por 500 € mis patrullas no pasan por tu calle. Y nada de registros en tu piso.']);}
-  const c=await ask('¿Aceptas el trato del sargento?',['Pagar 500 €','No'],N);
-  if(c===0){if(S.money<500)return say('¿Con qué dinero? Vuelve cuando lo tengas.',N);
-    S.money-=500;S.protect=true;sfx('coin');await say('Bien. Mis agentes mirarán hacia otro lado.',N);await fade(1);buildEnts();await fade(0);}
+  if(!S.flags.molina1){S.flags.molina1=true;await talk(N,['Así que eres tú quien vende en la plaza.','Podría detenerte ahora mismo. O podemos entendernos.',`Por ${eur(SOBORNO)} mis patrullas no pasan por tu calle. Y nada de registros en tu piso.`]);}
+  const c=await ask('¿Aceptas el trato del sargento?',['Pagar '+eur(SOBORNO),'No'],N);
+  if(c===0){if(S.money<SOBORNO)return say('¿Con qué dinero? Vuelve cuando lo tengas.',N);
+    S.money-=SOBORNO;S.protect=true;sfx('coin');await say('Bien. Mis agentes mirarán hacia otro lado.',N);await fade(1);buildEnts();await fade(0);}
   else{S.heat=Math.min(100,S.heat+10);await say('Tú sabrás. Mis agentes van a estar muy atentos.',N);heatWarn();}
 }
 async function talkJurado(){
@@ -1794,23 +1902,23 @@ async function talkJurado(){
   const lots=budLots(20);if(!lots.length)return say('Vuelve cuando tengas 20 g de algo.',N);
   const i=await menu(lots.map(lotItem).concat([{label:'Todavía no'}]),{cls:'right',title:'¿Qué presentas?'});
   if(i<0||i>=lots.length)return;
-  const [sid,b]=lots[i],thc=Math.round(b.thc*10)/10,name=getStrain(sid).n;useBuds(sid,20);
+  const [sid,b]=lots[i],thc=Math.round(b.thc*10)/10,name=lotNombre(sid).replace(' ★','');useBuds(sid,20);
   await fade(1);await wait(500);await fade(0);
   await say('Resultado del laboratorio. AMNESIA HAZE de Darko: 26,8 % de THC.',N);
   await say(`${name} de {N}: ${pct(thc)} % de THC.`,N);
   if(thc>26.8){
     sfx('get');await say('Nueva marca. {N} gana la COPA DE RIBERA.',N);
-    S.money+=2500;S.rep+=20;await got('2.500 € y el trofeo de la Copa');
+    S.money+=PREMIO_COPA;S.rep+=20;await got(eur(PREMIO_COPA)+' y el trofeo de la Copa');
     await talk('DARKO',['Esto no se acaba aquí.','Mi tío se va a enterar.']);
-    S.flags.copa=true;await chapter(7);S.due=2000;S.deadline=S.day+7;showObjective();
+    S.flags.copa=true;await chapter(7);S.due=S.debt;S.deadline=S.day+7;showObjective();
   }else{sfx('bad');await say('Gana DARKO. La Copa sigue abierta: vuelve con algo más potente.',N);}
 }
 async function talkBaltasar(){
   const N='DON BALTASAR';
   if(S.ch<3)return say('¿Y tú quién eres? No tengo nada que hablar contigo.',N);
   if(S.ch===3&&!S.flags.metB){
-    await talk(N,['Siéntate, {N}. Vamos al grano.','Tu tía Maite me debía 5.000 euros. Las deudas no se mueren con la gente.','Me los vas a pagar a plazos. El primero, 1.000 €.','Tienes siete días. Si no, Toño te hará una visita. Y Toño cobra intereses.']);
-    S.flags.metB=true;S.due=1000;S.deadline=S.day+7;showObjective();return;
+    await talk(N,['Siéntate, {N}. Vamos al grano.',`Tu tía Maite me debía ${eur(DEUDA).replace(' €',' euros')}. Las deudas no se mueren con la gente.`,`Me los vas a pagar a plazos. El primero, ${eur(PLAZOS[3])}.`,'Tienes siete días. Si no, Toño te hará una visita. Y Toño cobra intereses.']);
+    S.flags.metB=true;S.due=PLAZOS[3];S.deadline=S.day+7;showObjective();return;
   }
   if(S.ch>=8)return say('Ya no me debes nada. Que te vaya bien, {N}.',N);
   if(S.ch===4)return say('Tranquilo. Ya te avisaré cuando toque el siguiente pago.',N);
@@ -1821,62 +1929,73 @@ async function talkBaltasar(){
   if(await ask('¿Pagar ahora?',['Pagar','Todavía no'],N)!==0)return;
   S.money-=S.due;S.debt-=S.due;const paid=S.due;S.due=0;sfx('coin');toast(`Pagado: ${eur(paid)}`,1500);
   if(S.ch===3){
-    await talk(N,['Puntual. Así me gusta.','Quedan 4.000. Ya te avisaré del siguiente plazo.']);
+    await talk(N,['Puntual. Así me gusta.',`Quedan ${eur(S.debt).replace(' €','')}. Ya te avisaré del siguiente plazo.`]);
     await chapter(4);await talk('SMS · KIKO',['Pásate por el growshop. Tengo algo para ti.']);showObjective();
   }else if(S.ch===5){
-    await talk(N,['Me sorprendes, {N}.','Quedan 2.000. Te propongo algo.','El sábado es la COPA DE RIBERA. Premio: 2.500 €.','Mi sobrino Darko compite. No ha perdido nunca.','Gana la Copa y págame con el premio. Si puedes.']);
+    await talk(N,['Me sorprendes, {N}.',`Quedan ${eur(S.debt).replace(' €','')}. Te propongo algo.`,`El sábado es la COPA DE RIBERA. Premio: ${eur(PREMIO_COPA)}.`,'Mi sobrino Darko compite. No ha perdido nunca.','Gana la Copa y, con el premio y lo que vendas, me pagas lo que queda. Si puedes.']);
     await chapter(6);showObjective();
   }else if(S.ch===7){
-    await talk(N,['Dos mil. Contados.','Deuda saldada. Lo de tu tía queda cerrado.','Una cosa más, {N}: si algún día quieres trabajar para mí, ya sabes dónde estoy.']);
-    S.ch=8;S.debt=0;await ending();
+    await talk(N,[`${eur(paid)}. Contados.`,'Deuda saldada. Lo de tu tía queda cerrado.','Una cosa más, {N}: si algún día quieres trabajar para mí, ya sabes dónde estoy.']);
+    S.ch=8;S.debt=0;S.imp0=S.sales;S.impN=0;await ending();
   }
 }
 async function chapter(n){S.ch=n;sfx('get');toast(`<small>CAPÍTULO ${n}</small>${CH_TITLES[n]}`,2800);buildEnts();await wait(400);save();}
 function objectiveText(){
   switch(S.ch){
     case 1:return !S.flags.letter?'Lee la carta que hay en la mesa.':!S.flags.kiko1?'Visita el growshop de Kiko, al lado de casa.':'Planta y consigue tu primera cosecha.';
-    case 2:return `Gana 300 € vendiendo en la calle (${Math.min(300,Math.round(S.sales))}/300).`;
+    case 2:return `Gana ${META_VENTAS} € vendiendo en la calle (${Math.min(META_VENTAS,Math.round(S.sales))}/${META_VENTAS}).`;
     case 3:return !S.flags.metB?'Ve al bar El Ancla.':`Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
     case 4:return !S.flags.lab?'Kiko quiere verte en el growshop.':`Descubre 8 variedades (${discCount()}/8).`;
     case 5:return `Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
     case 6:return 'Gana la Copa: 20 g con más de 26,8% de THC al jurado de la plaza.';
     case 7:return `Paga los últimos ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
-    default:return `Juego libre: completa la Genoteca (${DEX.filter(k=>S.disc[k]).length}/${DEX.length}).`;
+    default:{const n=imperioNivel(),sig=IMPERIO[n+1],gen=`Genoteca ${DEX.filter(k=>S.disc[k]).length}/${DEX.length}`;
+      return sig?`Tu imperio · ${IMPERIO[n].n}. Facturado desde la deuda: ${eur(Math.min(sig.meta,facturado()))} de ${eur(sig.meta)} para ser ${sig.n.toLowerCase()}. ${gen}.`:`Tu imperio · ${IMPERIO[n].n}. Completa la ${gen}.`;}
   }
 }
 function showObjective(){toast(`<small>OBJETIVO</small>${esc(objectiveText())}`,3200);}
+// el imperio (1.10): saldada la deuda, empieza. Cada rango se gana facturando desde el último pago (S.imp0) y sube lo que
+// Iñaki carga al día
+const IMPERIO=[{n:'Cultivador',meta:0,mayor:1000},{n:'Proveedor del barrio',meta:25000,mayor:2000},{n:'Distribuidor de la ría',meta:100000,mayor:5000},{n:'Mayorista del norte',meta:250000,mayor:10000}];
+const facturado=()=>Math.max(0,S.sales-(S.imp0||0));
+const imperioNivel=()=>{let n=0;IMPERIO.forEach((r,i)=>{if(facturado()>=r.meta)n=i;});return n;};
 async function checkStory(){
   if(S.ch===1&&S.flags.harvest1){
     await chapter(2);spawnClients();
     await talk('SMS · KIKO',['Primera cosecha. Bien hecho.','La gente que busca material lleva un $ encima. Puedes venderles en la calle.','Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba.']);showObjective();
   }
-  if(S.ch===2&&S.sales>=300){
+  if(S.ch===2&&S.sales>=META_VENTAS){
     await chapter(3);
     await say('Un hombre enorme en chándal te corta el paso.');
     await talk('TOÑO',['Tú vives en el piso de Maite, ¿no?','Don Baltasar quiere verte. En el bar El Ancla. Hoy.','No me hagas venir a buscarte.']);showObjective();
   }
+  if(S.ch>=8&&imperioNivel()>(S.impN||0)){
+    S.impN=imperioNivel();const r=IMPERIO[S.impN];sfx('get');toast(`<small>TU IMPERIO</small>${r.n}`,2800);
+    await talk('SMS · IÑAKI',[`Se corre la voz: ${eur(facturado())} vendidos desde que pagaste a Baltasar.`,`Desde hoy te cargo hasta ${r.mayor>=1000?coma(r.mayor/1000)+' kg':r.mayor+' g'} al día en el barco.`]);showObjective();
+  }
   if(S.ch===4&&S.flags.lab&&discCount()>=8){
-    await chapter(5);S.due=2000;S.deadline=S.day+10;
-    await talk('SMS · TOÑO',['Don Baltasar quiere 2.000 € en diez días.','Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza.']);showObjective();
+    await chapter(5);S.due=PLAZOS[5];S.deadline=S.day+10;
+    await talk('SMS · TOÑO',[`Don Baltasar quiere ${eur(PLAZOS[5])} en diez días.`,'Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza.']);showObjective();
   }
 }
 async function penaltyEvent(){
   await say('TOÑO te estaba esperando.');
-  await talk('TOÑO',['Don Baltasar dice que llegas tarde.','Son 300 € más de intereses. Y esto, para que no se te olvide.']);
-  sfx('hurt');S.hp=Math.max(1,S.hp-15);S.due+=300;S.debt+=300;S.deadline=S.day+5;
+  const int=Math.round(S.due*INTERES/100)*100;
+  await talk('TOÑO',['Don Baltasar dice que llegas tarde.',`Son ${eur(int)} más de intereses. Y esto, para que no se te olvide.`]);
+  sfx('hurt');S.hp=Math.max(1,S.hp-15);S.due+=int;S.debt+=int;S.deadline=S.day+5;
   await say(`La deuda del plazo sube a ${eur(S.due)}. Nuevo límite: día ${S.deadline}.`);
 }
 async function raidEvent(){
   if(S.protect){S.heat=50;return talk('SMS · MOLINA',['Esta noche había orden de entrada en tu piso. La he parado.','Baja el ritmo.']);}
   sfx('bad');await say('REDADA. La policía entra en tu piso.');
-  const g=Math.floor(totalBuds()),fine=Math.min(S.money,300);
+  const g=Math.floor(totalBuds()),fine=Math.min(S.money,MULTA_REDADA);
   S.pots=S.pots.map(()=>null);S.buds={};S.heat=30;S.money-=fine;
   await say(`Se llevan todas las plantas y ${g} g. Multa: ${eur(fine)}.`);
   await say('Toca empezar de nuevo. Y vender menos una temporada.');
 }
 async function ending(){
   await fade(1);const e=$('endcard');
-  e.innerHTML=`<h2>FIN</h2><div>Has saldado la deuda de tu tía Maite en ${S.day} días.</div><div>Variedades: ${discCount()} · Ventas totales: ${eur(S.sales)}</div><div>El barrio sigue. ¿Completarás la GENOTECA?<br>¿Conseguirás la GHOST TRAIN HAZE?</div><div style="opacity:.7">Pulsa A</div>`;
+  e.innerHTML=`<h2>DEUDA SALDADA</h2><div>Has saldado los ${eur(DEUDA)} de tu tía Maite en ${S.day} días.</div><div>Variedades: ${discCount()} · Ventas totales: ${eur(S.sales)}</div><div>Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.<br>¿Completarás la GENOTECA? ¿Conseguirás la GHOST TRAIN HAZE?</div><div style="opacity:.7">Pulsa A</div>`;
   e.hidden=false;await fade(0);sfx('get');
   await new Promise(r=>push(b=>{if(b==='A'||b==='START'){pop();r();}}));
   await fade(1);e.hidden=true;await fade(0);save();showObjective();
@@ -1907,13 +2026,14 @@ async function mochila(){
   let i=0;
   for(;;){
     const rows=[{label:'Dinero',right:eur(S.money),ic:icono('billetes'),desc:'Tu capital. Don Baltasar también lo cuenta.'},{label:'Vida',right:`${S.hp}/${S.hpMax}`,desc:'Se recupera durmiendo, comiendo o con el tiempo.'},
-      {label:'Fertilizante',right:'×'+S.items.fert,ic:icono('abono'),desc:'Úsalo en una maceta: +25% de cosecha.'},{label:'Insecticida',right:'×'+S.items.insect,ic:icono('insecticida'),desc:'Úsalo en una maceta con plaga.'},
+      {label:'Abono (dosis)',right:'×'+S.items.fert,ic:icono('abono'),desc:'Una por planta: +25% de cosecha.'},{label:'Insecticida (tratamientos)',right:'×'+S.items.insect,ic:icono('insecticida'),desc:'Úsalo en una maceta con plaga.'},
       {label:'Spray de pimienta',right:'×'+S.items.spray,ic:icono('spray'),desc:'Solo en combate.'},{label:'Bocata',right:'×'+S.items.bocata,ic:icono('bocadillo'),desc:'Pulsa A para comerlo: +15 de vida.',k:'bocata'}];
     for(const k in MACETAS)if(S.items['m_'+k]>0)rows.push({label:'Maceta '+MACETAS[k].n,right:'×'+S.items['m_'+k],ic:icono('maceta'),desc:descMaceta(k)+'\nSe cambia en una plaza vacía de la carpa.'});
     for(const k in FOCOS)if(S.items['f_'+k]>0)rows.push({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],ic:icono('lampara'),desc:descFoco(k)+'\nSe cuelga desde la vista de carpa: ▲ hasta el foco y A.'});
     for(const k in EXTRAS)if(S.items['x_'+k]>0)rows.push({label:EXTRAS[k].n,right:'×'+S.items['x_'+k],desc:EXTRAS[k].d+'\nSe pone desde la vista de carpa: ▲ hasta el foco y A.'});
     for(const [k,v] of Object.entries(S.seeds))rows.push({label:'Semilla '+getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:icono('semillas'),desc:strainLine(k)});
-    for(const [k,b] of Object.entries(S.buds))rows.push({label:getStrain(k).n,right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(k).c,ic:iconoCogollo(k),desc:'Cogollos listos para vender.\n'+getStrain(k).o});
+    for(const e of S.esquejes)rows.push({label:'Esqueje '+getStrain(e.sid).n+marcaFeno(e.f),right:'día '+(e.dia+ESQUEJE_DIAS),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),desc:`Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+ESQUEJE_DIAS}.`});
+    for(const [k,b] of Object.entries(S.buds))rows.push({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k)),desc:(k.endsWith('*')?'Cogollos de un fenotipo estrella, en lote aparte.\n':'Cogollos listos para vender.\n')+getStrain(lotSid(k)).o});
     i=await menu(rows,{cls:'full',title:'MOCHILA',title2:`${Math.floor(totalBuds())} g encima`,desc:true,initial:i});
     if(i<0)return;
     if(rows[i].k==='bocata'){if(S.items.bocata>0&&S.hp<S.hpMax){S.items.bocata--;S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');toast('Te comes el bocata. +15 de vida',1200);}else sfx('bump');}
@@ -1922,12 +2042,12 @@ async function mochila(){
 async function plantas(){
   const rows=[],H=huecos();
   S.carpas.forEach((c,ci)=>{
-    if(!c)return;const C=CARPAS[c.t],F=FOCOS[c.foco],cob=Math.min(1,F.cubre/C.plazas);
-    rows.push({label:C.n,right:F.n,ic:icono('lampara'),desc:`${C.plazas} plantas · foco ${F.n}${cob<1?` (solo llega a ${F.cubre}: rinden menos)`:''}\nLuz: ${eur(luzCarpa(ci))} al día con plantas · hasta ${C.wmax} W y macetas de ${C.lmax} L.`});
+    if(!c)return;const C=CARPAS[c.t],F=FOCOS[c.foco],wm2=Math.round(F.w/(C.cm[0]*C.cm[2]/1e4));
+    rows.push({label:C.n,right:F.n,ic:icono('lampara'),desc:`${C.plazas} plantas · foco ${F.n}, ${wm2} W/m²${wm2<W_M2?' (poca luz: crecen más despacio y con menos THC)':''}\nLuz: ${eur(luzCarpa(ci))} al día con plantas · hasta ${C.wmax} W y macetas de ${C.lmax} L.`});
     H.forEach((h,i)=>{if(h.c!==ci)return;const p=S.pots[i],M=MACETAS[S.macetas[i]];
       if(!p){rows.push({label:`  ${h.j+1} · vacía`,right:M.l+' L',ic:icono('maceta'),desc:`Maceta de ${M.n}. Planta algo desde la carpa de tu piso.`});return;}
       const s=getStrain(p.sid);
-      rows.push({label:`  ${h.j+1} · ${s.n}`,sw:s.c,ic:iconoCogollo(p.sid),right:p.dead?'muerta':p.prog>=1?'LISTA':`${Math.floor(p.prog*100)}%`,desc:p.dead?'Se ha secado. Retírala.':`${p.prog>=1?'Lista para cosechar':stageName(p)} · Agua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%\n${p.pest?'PLAGA: trátala con insecticida. ':''}${p.fert?'Abonada':'Sin abonar'} · maceta de ${M.n}.`});});
+      rows.push({label:`  ${h.j+1} · ${s.n}${marcaFeno(p.f)}`,sw:s.c,ic:iconoCogollo(p.sid),right:p.dead?'muerta':p.prog>=1?'LISTA':`${Math.floor(p.prog*100)}%`,desc:p.dead?'Se ha secado. Retírala.':`${p.prog>=1?'Lista para cosechar':stageName(p)} · Agua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%\n${p.pest?'PLAGA: trátala con insecticida. ':''}${p.fert?'Abonada':'Sin abonar'} · maceta de ${M.n}.`});});
   });
   const luz=facturaLuz();
   let i=0;do{i=await menu(rows,{cls:'full',title:'CULTIVO',title2:luz?'Luz '+eur(luz)+'/día':'Luz apagada',desc:true,initial:i});}while(i>=0);
@@ -2023,8 +2143,9 @@ async function thiefRound(){
   }
   return enemyHits();
 }
+const MULTA_CALLE=601;   // tenencia en la vía pública: la mínima de la Ley de Seguridad Ciudadana (601-30.000 €)
 function confiscate(extraFine=true){
-  const g=Math.floor(totalBuds()),fine=extraFine?Math.min(S.money,Math.round(60+S.heat*1.5)):0;
+  const g=Math.floor(totalBuds()),fine=extraFine?Math.min(S.money,MULTA_CALLE):0;
   if(B)bAnim('E','multa');S.buds={};S.money-=fine;S.heat=Math.max(0,S.heat-15);return [g,fine];
 }
 async function copRound(){
@@ -2195,6 +2316,11 @@ function migrate(){
     const n=S.carpas.reduce((a,c)=>a+CARPAS[c.t].plazas,0),old=S.pots||[];
     S.pots=Array.from({length:n},(_,i)=>i<(S.potsOwned||2)?old[i]||null:null);S.macetas=Array(n).fill('plastico7');
     delete S.potsOwned;delete S.led;
+  }
+  if(!S.eco){   // partidas de antes de la 1.10: la deuda pasa a la escala real del capítulo en que estás (los intereses cobrados se pierden)
+    S.debt=S.ch>=8?0:{4:DEUDA-PLAZOS[3],5:DEUDA-PLAZOS[3],6:PLAZOS[7],7:PLAZOS[7]}[S.ch]||DEUDA;
+    if(S.due>0)S.due=S.ch===3||S.ch===5?PLAZOS[S.ch]:S.debt;
+    if(S.ch>=8){S.imp0=S.sales;S.impN=0;}
   }
   const d=newState();for(const k in d)if(!(k in S))S[k]=d[k];for(const k in d.items)if(!(k in S.items))S.items[k]=0;
   const n=huecos().length;while(S.pots.length<n)S.pots.push(null);while(S.macetas.length<n)S.macetas.push('plastico7');

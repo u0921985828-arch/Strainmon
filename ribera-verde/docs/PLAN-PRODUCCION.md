@@ -2,7 +2,7 @@
 
 Este documento ordena lo que falta antes de pedir más sprites a PixelLab: qué equipo de cultivo tendrá el juego, cómo se verá, qué láminas hay que pedir, en qué orden y cuánto cuestan. También organiza la historia, los desbloqueos y las ideas.
 
-**Estado:** D1–D6 aprobadas con la recomendación (★) el 6 de octubre de 2026. **P1 hecho** (datos y reglas en el juego; sale en la próxima versión, junto con el arte). Siguiente: P2. Todavía no se ha generado nada. PixelLab tiene 1041 generaciones hasta el 12 de octubre; ese día la cuota vuelve a 5000.
+**Estado:** D1–D6 aprobadas con la recomendación (★) el 6 de octubre de 2026. **P1 y P2 hechos** (datos y reglas en el juego; vista B con arte procedural y medida en el plano). Además, la 1.10 pasa todas las cifras a las reales ([ECONOMIA.md](ECONOMIA.md)): precios, vatios, consumo, gramos, deuda (30.000 €), venta al por mayor, fenotipos, esquejes y el imperio tras la deuda. Sale en la próxima versión, junto con el arte. **P3 parado:** el arte de plantas y carpas de las pruebas no se aprobó («no me gusta ninguno»); hace falta una referencia antes de pedir láminas. Gastadas 4 de las 53 generaciones de D6.
 
 Leyenda: **hecho** = ya está en el juego · **aprobado** = decidido, falta hacerlo · **idea** = para más adelante.
 
@@ -41,14 +41,14 @@ Todo está **hecho**. Lo que añadió P1 va marcado con **(P1)**.
 
 | Cap. | Título | Objetivo | Qué pasa | Growshop | Banco de semillas (PC) | Plazas |
 |---|---|---|---|---|---|---|
-| 1 | La herencia | Leer la carta, ir a ver a Kiko y sacar la primera cosecha | Heredas el piso de la tía Maite con su armario de 60 | Skunk #1 15 €, fertilizante 15 €, insecticida 20 €, bocata 6 €, maceta de tela 11 L 20 € · (P1) ventilador 25 €, LED 100 W 140 € | — | 2 |
-| 2 | La calle | Ganar 300 € vendiendo en la calle | Clientes con `$`, primeros ladrones | Lemon Haze 25 €, OG Kush 30 €, spray de pimienta 25 €, maceta de plástico 18 L 30 €, sodio 250 W 120 €, LED 200 W 260 €, carpa 100 × 100 450 € (sitio B) · (P1) extractor con filtro 120 € | Michoacán, Punto Rojo, Thai, Kif y Beldia | 6 |
-| 3 | La deuda | Pagar 1.000 € a Don Baltasar en 7 días | Toño te lleva al bar El Ancla: la tía debía 5.000 € | Blueberry 40 €, Mango 35 €, maceta de tela 25 L 45 €, sodio 400 W 220 €, LED 480 W 600 € · (P1) armario 80 300 € (sitio A), riego por goteo 80 € | + Chitral Kush, Nepalese, Congolese, Lamb's Bread y Oaxaca | 6 · (P1) 7 con el armario 80 |
-| 4 | Genética | Recoger la mesa de genética y descubrir 8 variedades | Kiko te enseña a cruzar; las líneas nuevas se estabilizan de F1 a F4 | Purple Afghani 50 €, sodio 600 W 350 €, carpa 150 × 100 900 € (sitio B) | + Luang Prabang y Panama Red | 8 · (P1) 9 con el armario 80 |
-| 5 | El sargento | Pagar 2.000 € en 10 días | El sargento Molina ofrece su «protección» por 500 € | LED 720 W 1000 € · (P1) carpa 120 700 € (sitio C) | — | 8 · (P1) 15 con la carpa 120 |
+| 1 | La herencia | Leer la carta, ir a ver a Kiko y sacar la primera cosecha | Heredas el piso de la tía Maite con su armario de 60 | Skunk #1 5 €/semilla, abono 1 L 14 €, insecticida 12 €, bocata 5 €, maceta de tela 11 L 3 € · (P1) ventilador 20 €, LED 100 W 110 € | — | 2 |
+| 2 | La calle | Ganar 300 € vendiendo en la calle | Clientes con `$`, primeros ladrones | Lemon Haze 9 €, OG Kush 10 €, spray de pimienta 15 €, maceta de plástico 18 L 2 €, sodio 250 W 85 €, LED 200 W 220 €, carpa 100 × 100 120 € (sitio B) · (P1) extractor con filtro 110 € | Michoacán, Punto Rojo, Thai, Kif y Beldia | 6 |
+| 3 | La deuda | Pagar 3000 € a Don Baltasar en 7 días | Toño te lleva al bar El Ancla: la tía debía 30.000 €. (1.10) Iñaki compra al por mayor | Blueberry 8 €, Mango 7 €, maceta de tela 25 L 4 €, sodio 400 W 100 €, LED 480 W 500 €, bolsas de 50 semillas · (P1) armario 80 90 € (sitio A), riego por goteo 55 € | + Chitral Kush, Nepalese, Congolese, Lamb's Bread y Oaxaca | 6 · (P1) 7 con el armario 80 |
+| 4 | Genética | Recoger la mesa de genética y descubrir 8 variedades | Kiko te enseña a cruzar; las líneas nuevas se estabilizan de F1 a F4 | Purple Afghani 8 €, sodio 600 W 120 €, carpa 150 × 100 140 € (sitio B) | + Luang Prabang y Panama Red | 8 · (P1) 9 con el armario 80 |
+| 5 | El sargento | Pagar 12.000 € en 10 días | El sargento Molina ofrece su «protección» por 1500 € | LED 720 W 950 € · (P1) carpa 120 150 € (sitio C) | — | 8 · (P1) 15 con la carpa 120 |
 | 6 | La Copa de Ribera | Llevar al jurado 20 g con más de 26,8 % de THC | Darko compite con su Amnesia Haze (26,8 %) | — | — | igual |
-| 7 | Libertad | Pagar los últimos 2.000 € en 7 días | Saldas la deuda de la tía; Baltasar te ofrece trabajo | — | — | igual |
-| 8 | La genoteca | Completar las 41 variedades (juego libre) | Sin deudas | — | — | igual |
+| 7 | Libertad | Pagar los últimos 15.000 € en 7 días (la Copa da 5000 €) | Saldas la deuda de la tía; Baltasar te ofrece trabajo | — | — | igual |
+| 8 | Tu imperio (1.10) | Facturar para subir de rango (25.000, 100.000 y 250.000 €) y completar las 41 variedades | Sin deudas; cada rango sube lo que Iñaki carga al día (1, 2, 5 y 10 kg) | — | — | igual |
 
 ## 3. Equipo de cultivo
 
@@ -61,10 +61,10 @@ Cada objeto tiene tres cosas: una medida real (para dibujarlo a escala), un efec
 | id | Modelo | Medida real | Casillas | Plazas | Foco máx. | Maceta máx. | Precio | Sitio |
 |---|---|---|---|---|---|---|---|---|
 | `p60` | Armario 60×60 | 60 × 60 × 160 cm | 1 | 2 | 250 W | 11 L | de serie (la tía) | A |
-| `p80` | Armario 80×80 | 80 × 80 × 180 cm | 1 | 3 (al tresbolillo) | 400 W | 18 L | 300 € · cap. 3 | A: sustituye al de 60 (plantas, foco y macetas se quedan) |
-| `m100` | Carpa 100×100 | 100 × 100 × 200 cm | 1 | 4 | 480 W | 25 L | 450 € · cap. 2 | B |
-| `g150` | Carpa 150×100 | 150 × 100 × 200 cm | 2 | 6 | 720 W | 25 L | 900 € · cap. 4 | B: sustituye a la de 100 |
-| `m120` | Carpa 120×120 | 120 × 120 × 200 cm | 2 | 6 (3 × 2) | 720 W | 25 L | 700 € · cap. 5 | C, cuando ya hay carpa en B |
+| `p80` | Armario 80×80 | 80 × 80 × 180 cm | 1 | 3 (al tresbolillo) | 400 W | 18 L | 90 € · cap. 3 | A: sustituye al de 60 (plantas, foco y macetas se quedan) |
+| `m100` | Carpa 100×100 | 100 × 100 × 200 cm | 1 | 4 | 480 W | 25 L | 120 € · cap. 2 | B |
+| `g150` | Carpa 150×100 | 150 × 100 × 200 cm | 2 | 6 | 720 W | 25 L | 140 € · cap. 4 | B: sustituye a la de 100 |
+| `m120` | Carpa 120×120 | 120 × 120 × 200 cm | 2 | 6 (3 × 2) | 720 W | 25 L | 150 € · cap. 5 | C, cuando ya hay carpa en B |
 
 Cada sitio va mejorando así:
 - **Sitio A:** `p60` (2 plazas) → `p80` (3).
@@ -85,18 +85,18 @@ El piso mide 12 × 8 casillas (1 casilla = 1 m). Las carpas van contra la pared 
 
 ### 3.3 Focos
 
-**Hechos** (`FOCOS`). «Cubre» es el número de plazas que ilumina entero.
+**Hechos** (`FOCOS`). Desde la 1.10, con cifras reales: «g/W» son los gramos por vatio de una cosecha (sin abono; abonando, ×1,25), repartidos entre las plazas de la carpa; «ilumina» es el cuadrado que cubre bien; crece y THC, a plena intensidad (400 W/m²). Luz al día con plantas, kWh y montajes de ejemplo en [ECONOMIA.md](ECONOMIA.md).
 
-| id | Foco | Cubre | Cosecha | Crece | THC | Riego | Precio |
+| id | Foco | Ilumina | g/W | Crece | THC | Riego | Precio |
 |---|---|---|---|---|---|---|---|
-| `cfl` | CFL 125 W | 2 | — | — | — | ×1 | de serie |
-| `sodio250` | Sodio 250 W | 2 | +25 % | +5 % | +0,3 | ×1,3 | 120 € · cap. 2 |
-| `sodio400` | Sodio 400 W | 4 | +35 % | +5 % | +0,5 | ×1,4 | 220 € · cap. 3 |
-| `sodio600` | Sodio 600 W | 6 | +45 % | +5 % | +0,7 | ×1,5 | 350 € · cap. 4 |
-| `led100` | LED 100 W | 2 | +15 % | +5 % | +0,3 | ×1 | 140 € · cap. 1 (P1): el primer paso por encima del CFL |
-| `led200` | LED 200 W | 2 | +30 % | +10 % | +0,6 | ×1,05 | 260 € · cap. 2 |
-| `led480` | LED 480 W | 4 | +45 % | +10 % | +1 | ×1,1 | 600 € · cap. 3 |
-| `led720` | LED 720 W | 6 | +60 % | +15 % | +1,4 | ×1,15 | 1000 € · cap. 5 |
+| `cfl` | CFL 125 W | 60×60 cm | 0,25 | — | — | ×1 | de serie |
+| `sodio250` | Sodio 250 W | 70×70 cm | 0,45 | +5 % | +0,3 | ×1,3 | 85 € · cap. 2 |
+| `sodio400` | Sodio 400 W | 100×100 cm | 0,5 | +5 % | +0,5 | ×1,4 | 100 € · cap. 3 |
+| `sodio600` | Sodio 600 W | 120×120 cm | 0,55 | +5 % | +0,7 | ×1,5 | 120 € · cap. 4 |
+| `led100` | LED 100 W | 60×60 cm | 0,65 | +5 % | +0,3 | ×1 | 110 € · cap. 1 (P1): el primer paso por encima del CFL |
+| `led200` | LED 200 W | 80×80 cm | 0,7 | +10 % | +0,6 | ×1,05 | 220 € · cap. 2 |
+| `led480` | LED 480 W | 120×120 cm | 0,8 | +10 % | +1 | ×1,1 | 500 € · cap. 3 |
+| `led720` | LED 720 W | 150×150 cm | 0,85 | +15 % | +1,4 | ×1,15 | 950 € · cap. 5 |
 
 **Cómo es cada foco por fuera** (para dibujarlo):
 
@@ -108,14 +108,14 @@ El piso mide 12 × 8 casillas (1 casilla = 1 m). Las carpas van contra la pared 
 
 ### 3.4 Macetas
 
-**Hechas** (`MACETAS`):
+**Hechas** (`MACETAS`). Desde la 1.10, la maceta pone el tope de gramos por planta (unos 8 g por litro de tierra):
 
-| id | Maceta | Cosecha | Crece | Riego | Plagas | Precio |
-|---|---|---|---|---|---|---|
-| `plastico7` | Plástico 7 L | — | — | ×1 | ×1 | de serie |
-| `tela11` | Tela 11 L | +15 % | +5 % | ×1,25 | ×0,8 | 20 € · cap. 1 |
-| `plastico18` | Plástico 18 L | +25 % | −5 % | ×0,8 | ×1 | 30 € · cap. 2 |
-| `tela25` | Tela 25 L | +40 % | — | ×1,1 | ×0,8 | 45 € · cap. 3 |
+| id | Maceta | Tope | Cosecha | Crece | Riego | Plagas | Precio |
+|---|---|---|---|---|---|---|---|
+| `plastico7` | Plástico 7 L | 56 g | — | — | ×1 | ×1 | de serie |
+| `tela11` | Tela 11 L | 92 g | +5 % | +5 % | ×1,25 | ×0,8 | 3 € · cap. 1 |
+| `plastico18` | Plástico 18 L | 144 g | — | −5 % | ×0,8 | ×1 | 2 € · cap. 2 |
+| `tela25` | Tela 25 L | 210 g | +5 % | — | ×1,1 | ×0,8 | 4 € · cap. 3 |
 
 Medidas reales para dibujarlas (diámetro × alto):
 - 7 L: 22 × 20 cm.
@@ -131,9 +131,9 @@ Van uno por carpa (`EXTRAS` y `S.carpas[ci][id]`). Se compran en el growshop («
 
 | id | Extra | Medida real | Efecto en el juego | Precio |
 |---|---|---|---|---|
-| `vent` | Ventilador de pinza | Ø 15–20 cm | plagas ×0,7 en esa carpa | 25 € · cap. 1 |
-| `filtro` | Extractor con filtro de carbón | filtro Ø 20 × 50 cm y extractor Ø 15 cm | Sin filtro, cada carpa con alguna planta en floración suma +2 de calor policial al día por el olor. Con filtro, 0. Se suma después de la bajada diaria del calor (lo prueba el test) | 120 € · cap. 2 |
-| `goteo` | Riego por goteo | depósito de 20 L (30 × 25 × 35 cm) con goteros | el agua baja a la mitad de velocidad | 80 € · cap. 3 |
+| `vent` | Ventilador de pinza | Ø 15–20 cm | plagas ×0,7 en esa carpa; gasta 25 W día y noche | 20 € · cap. 1 |
+| `filtro` | Extractor con filtro de carbón | filtro Ø 20 × 50 cm y extractor Ø 15 cm | Sin filtro, cada carpa con alguna planta en floración suma +2 de calor policial al día por el olor. Con filtro, 0. Se suma después de la bajada diaria del calor (lo prueba el test). Gasta 75 W día y noche | 110 € · cap. 2 |
+| `goteo` | Riego por goteo | depósito de 20 L (30 × 25 × 35 cm) con goteros | el agua baja a la mitad de velocidad | 55 € · cap. 3 |
 
 **Ideas:** temporizador y fotoperiodo (18/6 en crecimiento y 12/12 en floración), termohigrómetro (temperatura y humedad en la ficha), malla SCROG (+cosecha, +días) y deshumidificador (moho).
 
@@ -142,8 +142,8 @@ Van uno por carpa (`EXTRAS` y `S.carpas[ci][id]`). Se compran en el growshop («
 | Dónde | Escala | Qué se ve | Estado |
 |---|---|---|---|
 | Barrio, piso, tiendas | 1 casilla = 16 px = 1 m (3/4) | Personajes de 27–28 px y carpas cerradas como muebles de 1–2 casillas | hecho (1.8) |
-| Vista de carpa, opción A | 64 px/m, de frente | La carpa abierta de frente sobre el fondo de un cuarto | hecho (1.8) |
-| **Vista de carpa, opción B ★** | **48 px/m de ancho y de alto, y 24 px/m de fondo (3/4, como el piso)** | La carpa recortada como en la 1.6–1.7: sin techo, sin frente y sin lateral derecho. Se ven el fondo y la pared izquierda de mylar, el suelo, las macetas, las plantas y los focos colgando medio transparentes | aprobado (D1) · P2 |
+| Vista de carpa, opción A | 64 px/m, de frente | La carpa abierta de frente sobre el fondo de un cuarto | hecho (1.8) · sustituida por la B en P2 |
+| **Vista de carpa, opción B ★** | **48 px/m de ancho y de alto, y 24 px/m de fondo (3/4, como el piso)** | La carpa recortada como en la 1.6–1.7: sin techo, sin frente y sin lateral derecho. Se ven el fondo y la pared izquierda de mylar, el suelo, las macetas, las plantas y los focos colgando medio transparentes | **hecho con arte procedural (P2)**; medidas en [PLANO.md §6](PLANO.md#6-vista-de-carpa-b-p2-del-plan-de-producción) y `plano/vista-b.png` |
 
 **Por qué la B.** Recupera el aspecto de las carpas de la 1.6–1.7 (paredes de mylar acolchado, bastidor negro, suelo claro, vistas desde arriba como las paredes de la casa). Las proporciones, en cambio, son reales: una carpa de 150 × 100 × 200 cm mide 72 × 120 px y cabe en los 160 px de alto con margen.
 
@@ -176,17 +176,17 @@ Límites de `create_image_pixflux` (comprobados en la herramienta el 6 de octubr
 - `init_image_url` con una URL `data:` evita que el base64 largo se corte por el camino.
 - `color_image_base64` fuerza la paleta. Hay que darle los colores aprobados del juego.
 
-Para la vista B, la huella sale de los sprites de la 1.6–1.7 guardados en `art/crudo/_retirado/carpa-*` (mylar, bastidor y suelo) llevados a la medida nueva, para conservar su aspecto. Es arte propio.
+Para la vista B, las huellas salen del arte procedural del motor (P2): `npm run sprites:huellas` las deja en `art/crudo/_ref/huella-*-34.png` y `huella-carpas-mapa-5.png`, en la rejilla de celdas de §5.1, con 16 colores como mucho y los cogollos en magenta. Imitan el aspecto de los sprites de la 1.6–1.7 (mylar, bastidor y suelo). Es arte propio.
 
 ### 5.1 Láminas (con D1 = B y D2–D5 aprobadas)
 
 | # | Lámina | Contenido | Tamaño | Celda nueva (ancho × alto, ancla) | Gen. | Reintentos |
 |---|---|---|---|---|---|---|
 | 1 | `cuarto-cultivo-34` | rincón del piso en 3/4: pared, rodapié, suelo de tarima y enchufe | 240 × 160 | `pantalla` | 1 | 2 |
-| 2 | `carpas-vista-34` | las 5 carpas recortadas y vacías (60, 80, 100, 120 y 150) | 320 × 128 | `carpa_vista34` 80 × 128, (40, 127) | 1 | 2 |
-| 3 | `carpas-mapa` (rehecha) | las 5 carpas cerradas del piso, con la puerta de cremallera | 128 × 48 | `carpa_mapa` 32 × 48, (16, 47) | 1 | 2 |
-| 4 | `focos-34` | CFL, 3 de sodio y 4 LED (100, 200, 480 y 720), apagados | 320 × 32 | `foco34` 48 × 16, (24, 0) | 1 | 2 |
-| 5 | `macetas-34` | las 4 macetas con tierra y su plato | 96 × 24 | `maceta34` 24 × 16, (12, 15) | 1 | 2 |
+| 2 | `carpas-vista-34` | las 5 carpas recortadas y vacías (60, 80, 100, 120 y 150) | 400 × 128 | `carpa_vista34` 80 × 128, (40, 127) | 1 | 2 |
+| 3 | `carpas-mapa` (rehecha) | las 5 carpas cerradas del piso, con la puerta de cremallera | 160 × 48 | `carpa_mapa` 32 × 48, (16, 47) | 1 | 2 |
+| 4 | `focos-34` | CFL, 3 de sodio y 4 LED (100, 200, 480 y 720), apagados | 192 × 32 (4 × 2) | `foco34` 48 × 16, (24, 0) | 1 | 2 |
+| 5 | `macetas-34` | las 4 macetas con tierra y su plato | 96 × 24 | `maceta34` 24 × 24, (12, 23) | 1 | 2 |
 | 6 | `extras-34` | ventilador de pinza, extractor con filtro y depósito de goteo | 96 × 32 | `extra34` 32 × 32, (16, 31) | 1 | 2 |
 | 7–9 | `plantas-34-indica` / `-sativa` / `-hibrida` | 5 fases en fila (germinando → lista), cogollos en magenta | 240 × 80 cada una | `planta34` 48 × 80, (24, 79) | 3 | 6 |
 | 10 | balanceo | 3 fases (vegetativo, floración y lista) × 3 portes, 4 fotogramas, con `animate_image` | — | `planta34` | 9 | 9 |
@@ -227,8 +227,8 @@ Las descripciones van en inglés, que es como las entiende PixelLab. A todas se 
 |---|---|---|---|---|
 | P0 | Decidir D1–D6 | 0 | están respondidas en este documento | hecho |
 | P1 | Datos: `p80`, `m120`, sitio C, `led100` y extras en `09-cultivo.js` y en la tienda; reglas en el GDD; migración de partidas | 0 | `npm test` en verde con pasos nuevos (comprar el armario 80, montar la carpa 120 en C, el filtro anula el calor por olor) y una partida de la 1.9 que carga igual | hecho |
-| P2 | Vista B con el arte procedural (huellas) y medidas en `npm run plano` | 0 | todas las piezas entre ×0,75 y ×1,33 de su medida real (salvo lo estilizado de §4) y capturas de las 5 carpas | pendiente |
-| P3 | Láminas 1–6 | 6 (+12) | cada lámina cumple §5 y [PIXELLAB.md §8](PIXELLAB.md) (≤ 15 colores por sprite, contorno, sin texto) y tú la apruebas viendo la captura | pendiente |
+| P2 | Vista B con el arte procedural (huellas) y medidas en `npm run plano` | 0 | todas las piezas entre ×0,75 y ×1,33 de su medida real (salvo lo estilizado de §4) y capturas de las 5 carpas | **hecho**: 29 de 35 piezas entre ×0,94 y ×1,06; germinando y plántula a ×2 (estilizado); `plano/vista-b.png`; huellas de las láminas 1–9 con `npm run sprites:huellas` |
+| P3 | Láminas 1–6 | 6 (+12) | cada lámina cumple §5 y [PIXELLAB.md §8](PIXELLAB.md) (≤ 15 colores por sprite, contorno, sin texto) y tú la apruebas viendo la captura | **parado**: las pruebas de plantas y carpas no se aprobaron; falta una referencia |
 | P4 | Plantas, láminas 7–10 | 12 (+15) | 3 portes × 5 fases a escala, con el cogollo en la rampa magenta (lo comprueba el test de la rampa) | pendiente |
 | P5 | Láminas 11–13, luces y sombras | 3 (+5) | `npm run test:arte` en verde y capturas de día y de noche | pendiente |
 | P6 | Cierre: docs, `npm run plano`, capturas, APK y Artifact | 0 | CHANGELOG, CONTEXTO y CLAUDE.md al día; APK y Artifact publicados | pendiente |
@@ -245,6 +245,10 @@ Las descripciones van en inglés, que es como las entiende PixelLab. A todas se 
 | Área | Idea | Estado |
 |---|---|---|
 | Genética | Landraces e híbridos clásicos de Strainmon con su historia, estabilizar de F1 a F4 y banco de semillas | hecho (1.9) |
+| Genética | Fenotipos (estrella y floja, con la probabilidad según la pureza de la genética), esquejes y semillas en sobres y a granel | hecho (1.10) |
+| Genética | Semillas regulares y machos; cruces nuevos en el growshop | idea |
+| Economía | Cifras reales: precios, vatios, consumo, gramos por vatio, tope de la maceta, multas y deuda de 30.000 € | hecho (1.10) |
+| Calle | Venta al por mayor (Iñaki) e imperio tras la deuda: rangos por facturación que suben la carga diaria | hecho (1.10) |
 | Cultivo | Secado y curado (los gramos y el THC mejoran con los días) | idea |
 | Cultivo | Fotoperiodo con temporizador, termohigrómetro, malla SCROG y deshumidificador | idea (§3.5) |
 | Cultivo | Segundo local (bajo o nave) con la carpa de 240 × 120 | idea |

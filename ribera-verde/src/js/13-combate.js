@@ -89,8 +89,9 @@ async function thiefRound(){
   }
   return enemyHits();
 }
+const MULTA_CALLE=601;   // tenencia en la vía pública: la mínima de la Ley de Seguridad Ciudadana (601-30.000 €)
 function confiscate(extraFine=true){
-  const g=Math.floor(totalBuds()),fine=extraFine?Math.min(S.money,Math.round(60+S.heat*1.5)):0;
+  const g=Math.floor(totalBuds()),fine=extraFine?Math.min(S.money,MULTA_CALLE):0;
   if(B)bAnim('E','multa');S.buds={};S.money-=fine;S.heat=Math.max(0,S.heat-15);return [g,fine];
 }
 async function copRound(){

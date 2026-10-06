@@ -4,7 +4,7 @@
 
 ## Premisa
 
-La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a orillas de la ría. En el piso hay un armario de cultivo y, además, una deuda: 5.000 € con Don Baltasar, el del bar El Ancla. Con la ayuda de Kiko, el del growshop, que cultivaba con tu tía, aprendes a cultivar, a cruzar genéticas y a vender en la calle mientras esquivas a la policía, a los ladrones del parque y al sargento Molina. Al final tienes que ganarle la Copa de Ribera a Darko, el sobrino de Baltasar, para pagar el último plazo.
+La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a orillas de la ría. En el piso hay un armario de cultivo y, además, una deuda: 30.000 € con Don Baltasar, el del bar El Ancla. Con la ayuda de Kiko, el del growshop, que cultivaba con tu tía, aprendes a cultivar, a cruzar genéticas y a vender en la calle mientras esquivas a la policía, a los ladrones del parque y al sargento Molina. Al final tienes que ganarle la Copa de Ribera a Darko, el sobrino de Baltasar, para pagar el último plazo. Saldada la deuda, empieza tu imperio.
 
 ## Personajes
 
@@ -13,7 +13,7 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 | **{N}** | Protagonista. Hereda el piso y la deuda | — |
 | **Kiko** | Mentor. Lleva treinta años con el growshop, conserva genéticas y cultivaba con Maite | Growshop |
 | **Tía Maite** | Solo aparece en su carta y en un diploma enmarcado (2.º premio de la Copa 1998) | Piso |
-| **Don Baltasar** | Antagonista. Maite le debía 5.000 € | Bar El Ancla |
+| **Don Baltasar** | Antagonista. Maite le debía 30.000 € | Bar El Ancla |
 | **Toño** | Matón de Baltasar | Bar y mensajes |
 | **Darko** | Rival. Sobrino de Baltasar y campeón de la Copa | Plaza (desde el cap. 2 hasta que te cruzas con él, y en el cap. 6) |
 | **Sargento Molina** | Policía corrupto que vende «protección» | Plaza (desde el cap. 5) |
@@ -56,11 +56,11 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 > **KIKO:** {N}, pasa. Te pareces a tu tía.
 > **KIKO:** Maite y yo cultivamos juntos desde que cerraron los astilleros. Ella tenía mano; yo, paciencia.
 > **KIKO:** Para empezar, toma esto.
-> Consigues 3 semillas de SKUNK #1. · Consigues 2 × FERTILIZANTE.
+> Consigues 3 semillas de SKUNK #1. · Consigues 2 dosis de ABONO.
 > **KIKO:** La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.
 > **KIKO:** Planta en las macetas del armario de tu tía y riega cuando baje el agua.
-> **KIKO:** El fertilizante da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.
-> **KIKO:** Cuando esté lista, cosecha. Guarda las semillas que salgan: siempre se poliniza alguna flor.
+> **KIKO:** El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.
+> **KIKO:** Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.
 > **KIKO:** Las plantas siguen creciendo mientras duermes.
 
 *Objetivo: plantar y conseguir la primera cosecha. Con ella empieza el capítulo 2.*
@@ -93,6 +93,8 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 > **IÑAKI:** Te doy X € por 10 g de [variedad]. ¿Hecho?
 > *La primera vez:* **IÑAKI:** Toma. Me las dio un marinero de Malaui en Mombasa, en el último viaje. → Consigues 2 semillas de MALAWI GOLD.
 > *Después:* **IÑAKI:** Eskerrik asko. Hasta la vuelta. · *Sin 10 g:* «Pues nada. Si consigues 10 g, aquí estaré.» · *Si ya le vendiste ese día:* «Ya me has vendido hoy. Mañana más, que el barco sale temprano.»
+> *Desde el capítulo 3, primero:* **IÑAKI:** Aupa. ¿Qué traes? → *10 g para el viaje / Venta al por mayor / Nada*
+> *Al por mayor:* **IÑAKI:** [variedad] a X € el gramo. ¿Cuánto cargas? → *100 g · X € / 250 g · X € / … / Nada* → «Cargado. Esta noche sale en el barco.» · *Sin un lote de 100 g:* «Al por mayor, de 100 g para arriba. Pago entre 3,20 y 5,00 € el gramo, según lo bueno que sea. Hasta 1 kg por carga.» · *Si ya cargó ese día:* «Hoy ya he cargado. Mañana sale otro barco.» · *Si eliges lote y luego nada:* «Otro día.»
 
 **Abuela Txaro** (parque, una sola vez):
 > **ABUELA TXARO:** Tú vives en el piso de Maite. Tu tía me ayudaba con... ya sabes.
@@ -113,8 +115,8 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 ## Capítulo 3 · La deuda
 
 > **DON BALTASAR:** Siéntate, {N}. Vamos al grano.
-> **DON BALTASAR:** Tu tía Maite me debía 5.000 euros. Las deudas no se mueren con la gente.
-> **DON BALTASAR:** Me los vas a pagar a plazos. El primero, 1.000 €.
+> **DON BALTASAR:** Tu tía Maite me debía 30.000 euros. Las deudas no se mueren con la gente.
+> **DON BALTASAR:** Me los vas a pagar a plazos. El primero, 3000 €.
 > **DON BALTASAR:** Tienes siete días. Si no, Toño te hará una visita. Y Toño cobra intereses.
 
 *En cada visita:* «Me debes X € para el día D. Te quedan N días.» (o «Es HOY.»). Si te llega el dinero: «¿Pagar ahora?». Si no: «Vuelve cuando tengas el dinero.»
@@ -124,12 +126,12 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 *Si vence el plazo:*
 > TOÑO te estaba esperando.
 > **TOÑO:** Don Baltasar dice que llegas tarde.
-> **TOÑO:** Son 300 € más de intereses. Y esto, para que no se te olvide.
+> **TOÑO:** Son X € más de intereses. Y esto, para que no se te olvide. *(un 20 % del plazo, redondeado a 100 €: 600 € sobre el primero)*
 > La deuda del plazo sube a X €. Nuevo límite: día D.
 
 *Al pagar:*
 > **DON BALTASAR:** Puntual. Así me gusta.
-> **DON BALTASAR:** Quedan 4.000. Ya te avisaré del siguiente plazo.
+> **DON BALTASAR:** Quedan 27.000. Ya te avisaré del siguiente plazo.
 > **SMS · KIKO:** Pásate por el growshop. Tengo algo para ti.
 
 ## Capítulo 4 · Genética
@@ -160,15 +162,15 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 *(Antes del capítulo 4 Patxi solo dice: «Cuando tengas una mesa de genética, ven a verme. Algo sé de cruces.»)*
 
 *En cuanto descubres la 8.ª variedad (por cruce, compra, cosecha o regalo) empieza el capítulo 5:*
-> **SMS · TOÑO:** Don Baltasar quiere 2.000 € en diez días.
+> **SMS · TOÑO:** Don Baltasar quiere 12.000 € en diez días.
 > **SMS · TOÑO:** Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza.
 
 ## Capítulo 5 · El sargento
 
 > **SARGENTO MOLINA:** Así que eres tú quien vende en la plaza.
 > **SARGENTO MOLINA:** Podría detenerte ahora mismo. O podemos entendernos.
-> **SARGENTO MOLINA:** Por 500 € mis patrullas no pasan por tu calle. Y nada de registros en tu piso.
-> **SARGENTO MOLINA:** ¿Aceptas el trato del sargento? → *Pagar 500 € / No*
+> **SARGENTO MOLINA:** Por 1500 € mis patrullas no pasan por tu calle. Y nada de registros en tu piso.
+> **SARGENTO MOLINA:** ¿Aceptas el trato del sargento? → *Pagar 1500 € / No*
 > *Si pagas:* «Bien. Mis agentes mirarán hacia otro lado.» *(Molina desaparece de la plaza.)*
 > *Si no:* «Tú sabrás. Mis agentes van a estar muy atentos.» *(+10 de calor; sigue en la plaza por si cambias de idea.)*
 > *Sin dinero:* «¿Con qué dinero? Vuelve cuando lo tengas.»
@@ -177,12 +179,12 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 - *Sin protección:* «REDADA. La policía entra en tu piso.» / «Se llevan todas las plantas y X g. Multa: Y €.» / «Toca empezar de nuevo. Y vender menos una temporada.»
 - *Con protección:* **SMS · MOLINA:** «Esta noche había orden de entrada en tu piso. La he parado.» / «Baja el ritmo.»
 
-*Al pagar los 2.000 €:*
+*Al pagar los 12.000 €:*
 > **DON BALTASAR:** Me sorprendes, {N}.
-> **DON BALTASAR:** Quedan 2.000. Te propongo algo.
-> **DON BALTASAR:** El sábado es la COPA DE RIBERA. Premio: 2.500 €.
+> **DON BALTASAR:** Quedan 15.000. Te propongo algo.
+> **DON BALTASAR:** El sábado es la COPA DE RIBERA. Premio: 5000 €.
 > **DON BALTASAR:** Mi sobrino Darko compite. No ha perdido nunca.
-> **DON BALTASAR:** Gana la Copa y págame con el premio. Si puedes.
+> **DON BALTASAR:** Gana la Copa y, con el premio y lo que vendas, me pagas lo que queda. Si puedes.
 
 ## Capítulo 6 · La Copa de Ribera
 
@@ -197,7 +199,7 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 > **JURADO:** Resultado del laboratorio. AMNESIA HAZE de Darko: 26,8 % de THC.
 > **JURADO:** [variedad] de {N}: X % de THC.
 > *Si pierdes:* «Gana DARKO. La Copa sigue abierta: vuelve con algo más potente.»
-> *Si ganas:* «Nueva marca. {N} gana la COPA DE RIBERA.» → Consigues 2.500 € y el trofeo de la Copa.
+> *Si ganas:* «Nueva marca. {N} gana la COPA DE RIBERA.» → Consigues 5000 € y el trofeo de la Copa.
 > **DARKO:** Esto no se acaba aquí.
 > **DARKO:** Mi tío se va a enterar.
 
@@ -205,20 +207,25 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 
 ## Capítulo 7 · Libertad
 
-*Objetivo: pagar los últimos 2.000 € en 7 días.*
-> **DON BALTASAR:** Dos mil. Contados.
+*Objetivo: pagar los últimos 15.000 € en 7 días.*
+> **DON BALTASAR:** 15.000 €. Contados.
 > **DON BALTASAR:** Deuda saldada. Lo de tu tía queda cerrado.
 > **DON BALTASAR:** Una cosa más, {N}: si algún día quieres trabajar para mí, ya sabes dónde estoy.
 
 **Pantalla final:**
-> FIN
-> Has saldado la deuda de tu tía Maite en N días.
+> DEUDA SALDADA
+> Has saldado los 30.000 € de tu tía Maite en N días.
 > Variedades: X · Ventas totales: Y €
-> El barrio sigue. ¿Completarás la GENOTECA? ¿Conseguirás la GHOST TRAIN HAZE?
+> Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco. ¿Completarás la GENOTECA? ¿Conseguirás la GHOST TRAIN HAZE?
 
-## Capítulo 8 · La genoteca (juego libre)
+## Capítulo 8 · Tu imperio
 
-*Objetivo: completar la Genoteca (23). Baltasar: «Ya no me debes nada. Que te vaya bien, {N}.»*
+*Objetivo: «Tu imperio · [rango]. Facturado desde la deuda: Y € de X € para ser [rango siguiente]. Genoteca N/41.» Baltasar: «Ya no me debes nada. Que te vaya bien, {N}.»*
+
+*Al subir de rango (Proveedor del barrio con 25.000 € facturados desde el último pago, Distribuidor de la ría con 100.000 € y Mayorista del norte con 250.000 €):*
+> TU IMPERIO · [rango]
+> **SMS · IÑAKI:** Se corre la voz: X € vendidos desde que pagaste a Baltasar.
+> **SMS · IÑAKI:** Desde hoy te cargo hasta 2 kg al día en el barco. *(5 kg y 10 kg en los rangos siguientes)*
 
 *La primera vez que sale la Ghost Train Haze en la mesa de genética (desde el capítulo 4):*
 > Te tiemblan las manos: es GHOST TRAIN HAZE.
@@ -248,11 +255,11 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 
 - **Kiko** (growshop): «¿Qué necesitas?» → *Comprar / Un consejo / Nada*.
   - *Sin semillas, plantas, cogollos ni 15 €:* «¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.» → Consigues 2 semillas de SKUNK #1.
-  - *Tienda:* sin dinero, «No te llega el dinero.» · carpa de 100: «Te la monto esta tarde en el piso, al lado del armario de tu tía. Viene con un CFL; si quieres más luz, aquí tienes focos.» · carpa de 150: «Me llevo la de 100 y te monto la de 150 en su sitio. Las plantas ni se enteran.» · foco: «¿Lo cuelgo ya? El que quites va a tu mochila.» (si no aguanta en ninguna carpa: «Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande.»)
+  - *Tienda:* semillas, «Semillas feminizadas de [variedad]. ¿Cuántas?» → *1 semilla / Sobre de 3 / Sobre de 5 / Sobre de 10 / Bolsa de 50 (desde el capítulo 3) / Nada* · sin dinero, «No te llega el dinero.» · carpa de 100: «Te la monto esta tarde en el piso, al lado del armario de tu tía. Viene con un CFL; si quieres más luz, aquí tienes focos.» · carpa de 150: «Me llevo la de 100 y te monto la de 150 en su sitio. Las plantas ni se enteran.» · foco: «¿Lo cuelgo ya? El que quites va a tu mochila.» (si no aguanta en ninguna carpa: «Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande.»)
   - *Consejos* (opción «Un consejo»):
-    - *Capítulo 1:* «Riega cuando el agua baje del 30 %. Una planta seca enferma.» / «El fertilizante se echa una vez por planta. Merece la pena.» / «Las plantas crecen mientras duermes. No hace falta mirarlas cada hora.»
-    - *Capítulo 2:* «Los clientes cambian cada día. No los hagas esperar.» / «Pedir caro funciona con turistas, con gente de dinero y con cogollo potente.» / «Si la presión policial (CALOR) sube mucho, deja de vender unos días.» / «Una carpa más grande es la mejor inversión que puedes hacer.» / «Las macetas de tela airean las raíces: más cosecha y menos plagas, pero hay que regar más.»
-    - *Capítulo 3:* «El LED cuesta más, pero rinde más y apenas da calor. El sodio es barato y seca las macetas.» / «Un foco pequeño en una carpa grande no llega a todas las plantas.» / «La luz se paga: cada carpa con plantas suma su factura cada día.» / «De noche, en el parque, roban. Lleva el spray de pimienta.»
+    - *Capítulo 1:* «Riega cuando el agua baje del 30 %. Una planta seca enferma.» / «El abono se echa una vez por planta. Merece la pena.» / «Las plantas crecen mientras duermes. No hace falta mirarlas cada hora.» / «Un CFL da poco: unos 0,3 gramos por vatio. Un LED, el triple.»
+    - *Capítulo 2:* «Los clientes cambian cada día. No los hagas esperar.» / «Pedir caro funciona con turistas, con gente de dinero y con cogollo potente.» / «Si la presión policial (CALOR) sube mucho, deja de vender unos días.» / «Una carpa más grande es la mejor inversión que puedes hacer.» / «Tu tía pedía landraces a un banco de semillas por internet. Mira en su ordenador.» / «Lo que sale de un cruce es una F1: cada planta sale distinta. Crúzala consigo misma hasta fijarla.» / «Las macetas de tela airean las raíces: más cosecha y menos plagas, pero hay que regar más.» / «Cada semilla es una planta distinta. Si compras muchas, alguna sale estrella: más potente y más productiva.» / «Si una planta promete, sácale esquejes en crecimiento. Un esqueje es la misma planta: así se guarda un fenotipo estrella.» / «Una maceta pequeña no da más de unos 8 gramos por litro de tierra, por mucho foco que le pongas.»
+    - *Capítulo 3:* «El LED cuesta más, pero rinde más y apenas da calor. El sodio es barato y seca las macetas.» / «Un foco pequeño en una carpa grande no llega a todas las plantas.» / «La luz se paga: cada carpa con plantas suma su factura cada día. Un LED de 720 W gasta unos 280 kWh al día: 45 €.» / «Una plaza vacía es luz que pagas y no aprovechas.» / «Iñaki, el del muelle, compra cantidad. Paga menos por gramo que la calle, pero se lo lleva todo.» / «De noche, en el parque, roban. Lleva el spray de pimienta.»
     - *Desde el capítulo 4:* las pistas de recetas (la lista de Patxi, en el capítulo 4), «Las landraces no las vendo. Pregunta por el barrio: Txaro, Iñaki el del muelle... y mira bien en el parque.» y los consejos del capítulo 2.
   - *Al despedirse:* «Ten cuidado ahí fuera.»
 - **Josune:** «¡Kaixo! ¿Qué te pongo?»
@@ -270,6 +277,12 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
   - «PARQUE DE LOS SAUCES · Horario: de 7:00 a 23:00.»
   - «PLAZA DE RIBERA VERDE · Fuente inaugurada en 1987.»
   - «MUELLE VIEJO → · Peligro: borde sin barandilla.»
+- **Cultivo (1.10):**
+  - *Cosecha:* «Cosechas X g de [variedad]. THC: Y%.»
+  - *Fenotipo estrella:* «¡Fenotipo estrella! THC ×A y cosecha ×B sobre la media de la [variedad].» / «Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.» · *Flojo:* «Fenotipo flojo: THC ×A y cosecha ×B de la media.»
+  - *Semillas:* línea sin fijar, «Las plantas de la línea se han polinizado entre ellas: recoges N semillas de [variedad].» · feminizada, a veces, «Una flor hermafrodita ha polinizado unas pocas: recoges N semillas de [variedad].»
+  - *Esqueje:* «Cortas una punta de la [variedad] y la pones a enraizar. Plántala antes del día D: es la misma planta.» · propagador lleno, «El propagador está lleno: 12 esquejes. Planta alguno antes.» · al plantarlo, «Plantas el esqueje de [variedad].» · si se seca, aviso al cambiar de día: «Se ha secado un esqueje sin plantar».
+  - *Abono e insecticida:* «Echas una dosis de ABONO. Dará más cosecha.» / «No te queda ABONO.» · «Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.»
 - **Objetos del piso:**
   - *Cama:* «Tu cama. Todavía huele a la colonia de la tía.»
   - *Ordenador:* «El ordenador de la tía. Tiene su registro de cultivos de veinte años.»

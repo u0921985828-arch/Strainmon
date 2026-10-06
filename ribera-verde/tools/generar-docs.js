@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
-  Ribera Verde — regenera docs/GENETICA.md y docs/MAPA.md leyendo los datos reales del juego
+  Ribera Verde — regenera docs/GENETICA.md, docs/ECONOMIA.md y docs/MAPA.md leyendo los datos reales del juego
   (STRAINS, RECIPES, MAPS, NPCDEF, ITEMS, SHOP) desde index.html. Así la documentación no se desfasa.
   Uso:  node tools/build.js && node tools/generar-docs.js
 */
@@ -16,7 +16,10 @@ const ROOT = path.join(__dirname, '..');
   await page.waitForFunction(() => typeof mode !== 'undefined' && mode === 'title');
   const D = await page.evaluate(() => {
     S = newState(); S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'cfl' }]; montarCasa();   // el piso con el armario y la carpa grande
-    const strains = DEX.map((k, i) => ({ k, idx: i + 1, ...STRAINS[k] }));
+    const strains = DEX.map((k, i) => ({ k, idx: i + 1, ...STRAINS[k], tipo: TIPO_GEN[k] || (/^Landrace/.test(STRAINS[k].o) ? 'landrace' : 'cruce'), padres: PADRES[k], gm2: gm2(STRAINS[k]) }));
+    const gen = Object.entries(GENETICA).map(([k, G]) => ({ k, ...G }));
+    const focos = Object.entries(FOCOS).map(([k, F]) => ({ k, ...F, kwh: kwhFoco(k), eur: Math.round(kwhFoco(k) * KWH) }));
+    const macetas = Object.entries(MACETAS).map(([k, M]) => ({ k, ...M }));
     const recipes = Object.entries(RECIPES).map(([pair, out]) => ({ a: pair.split('+')[0], b: pair.split('+')[1], out }));
     const G = { grass: '.', flowers: '*', tallgrass: '"', dirt: ':', walk: '-', roadT: '=', roadB: '=', plaza: '+', water: '~', bridgeT: 'H', bridgeB: 'H', dock: '#',
       floor: '.', floorB: '.', floorS: '.', mat: 'm', void: ' ' };
@@ -42,9 +45,20 @@ const ROOT = path.join(__dirname, '..');
     }
     const npcs = NPCDEF.map(d => ({ id: d.id, map: d.map, x: d.x, y: d.y, wander: d.wander || 0, cond: d.cond ? d.cond.toString().replace(/^\(\)=>/, '') : '' }));
     const items = ITEMS.map(i => ({ id: i.id, map: i.map, x: i.x, y: i.y, hidden: !!i.hidden, give: i.give.toString().match(/got\('([^']+)'/)?.[1] || i.give.toString().match(/money\+=(\d+)/)?.[0] }));
-    const shop = SHOP.map(s => ({ lbl: s.lbl, p: s.p, ch: s.ch, desc: (s.desc || '').replace(/\n/g, ' · ') }));
+    const shop = SHOP.map(s => ({ lbl: s.lbl, p: s.p, ch: s.ch, sid: s.sid, foco: s.foco, maceta: s.maceta, carpa: s.carpa, desc: (s.desc || '').replace(/\n/g, ' · ') }));
+    const carpas = Object.entries(CARPAS).map(([k, C]) => ({ k, ...C }));
+    // montajes de ejemplo: Skunk #1 sana y abonada, fenotipo medio, ciclo de 2,5 días
+    const S0 = S, sk = { sid: 'ria', prog: 1, water: 100, health: 100, fert: true, pest: false, f: { t: 1, y: 1 } };
+    const montajes = [['Armario 60 + CFL 125 W, 2 × 7 L', 'p60', 'cfl', 'plastico7'], ['Armario 60 + LED 200 W, 2 × 7 L', 'p60', 'led200', 'plastico7'],
+      ['Carpa 100 + LED 480 W, 4 × 18 L', 'm100', 'led480', 'plastico18'], ['Carpa 150 + LED 720 W, 6 × 25 L', 'g150', 'led720', 'tela25']].map(([n, t, foco, mac]) => {
+      S = JSON.parse(JSON.stringify(S0)); S.carpas = [{ t, foco }]; S.macetas = Array(CARPAS[t].plazas).fill(mac);
+      const g = huecos().reduce((a, h, i) => a + gramosPlanta(sk, factores(i)), 0), tope = huecos().every((h, i) => gramosPlanta(sk, factores(i)) === MACETAS[mac].cap);
+      return { n, g, gw: g / FOCOS[foco].w, luz: luzCarpa(0) * STRAINS.ria.d, tope };
+    });
+    S = S0;
     const signs = SIGNS;
-    return { strains, recipes, maps, npcs, items, shop, signs, banco: BANCO };
+    return { strains, recipes, maps, npcs, items, shop, signs, banco: BANCO, sobre: SOBRE, gen, focos, macetas, carpas,
+      montajes, c: { KWH, H_LUZ, H_24, W_M2, Y_MEDIA, FENO_ESTRELLA, FENO_FLOJO, ESQUEJE_DIAS, SEMILLA_HERMA, DEUDA, PLAZOS, INTERES, PREMIO_COPA, mayor: [precioMayor(12), precioMayor(30)], calle: [precioCalle(12), precioCalle(30)], IMPERIO, SOBRES, GRANEL } };
   });
   await browser.close();
 
@@ -53,7 +67,10 @@ const ROOT = path.join(__dirname, '..');
   const ORIGIN = { ria: 'Growshop (cap. 1)', limon: 'Growshop (cap. 2)', txoko: 'Growshop (cap. 2)', niebla: 'Growshop (cap. 3)', mango: 'Growshop (cap. 3)', purpura: 'Growshop (cap. 4)',
     rif: 'Kiko, al montar la mesa de genética: de un amigo de Mazar-i-Sharif (cap. 4)', hindu: 'Txaro, a cambio de 5 g para hacer aceite (parque): del viaje de su marido a Pakistán en 1976', acapulco: 'En un bote de carrete escondido en un arbusto del parque (2,26), «Guerrero, 1979»', malawi: 'Iñaki, el marinero, tras venderle 10 g (muelle): de un marinero de Malaui en Mombasa' };
 
-  for (const [k, p, ch] of D.banco) ORIGIN[k] = `Banco de semillas del PC, sobre de 3 por ${p} € (cap. ${ch}; llega al día siguiente)`;
+  for (const [k, p, ch] of D.banco) ORIGIN[k] = `Banco de semillas del PC, sobre de ${D.sobre} por ${p} € (cap. ${ch}; llega al día siguiente)`;
+  for (const it of D.shop) if (it.sid) ORIGIN[it.sid] = `Growshop (cap. ${it.ch}), ${it.p} € la semilla`;
+  const TIPO = { estable: 'línea estable', f1: 'cruce F1', poli: 'polihíbrido', landrace: 'landrace', cruce: 'cruce (F1 en la mesa)' };
+  const n0 = n => Math.round(n).toLocaleString('es-ES');
 
   // ---------- GENETICA.md ----------
   let g = `# Genética de Ribera Verde
@@ -62,12 +79,12 @@ const ROOT = path.join(__dirname, '..');
 
 ## Las ${D.strains.length} variedades de la Genoteca
 
-| # | Variedad | THC | Rinde (g/planta) | Días | Resist. | Color | Cómo se consigue |
-|---|---|---|---|---|---|---|---|
+| # | Variedad | THC | Rinde (g/m²) | Días | Resist. | Tipo | Color | Cómo se consigue |
+|---|---|---|---|---|---|---|---|---|
 `;
   for (const s of D.strains) {
     const how = ORIGIN[s.k] || 'Cruce: ' + s.o.replace(' · LEGENDARIA', '') + (s.o.includes('LEGENDARIA') ? ' · **legendaria**' : '');
-    g += `| ${String(s.idx).padStart(2, '0')} | ${s.n} | ${pct(s.thc)}% | ${s.y} | ${pct(s.d)} | ${s.r}% | \`${s.c}\` | ${how} |\n`;
+    g += `| ${String(s.idx).padStart(2, '0')} | ${s.n} | ${pct(s.thc)}% | ${s.gm2} | ${pct(s.d)} | ${s.r}% | ${TIPO[s.tipo]}${s.padres ? ' (' + s.padres + ')' : ''} | \`${s.c}\` | ${how} |\n`;
   }
   g += `
 ## Historia de cada variedad
@@ -101,8 +118,23 @@ flowchart LR
 Lo que sale de un cruce nuevo (receta o híbrido propio) es una **F1**: una línea inestable en la que cada planta sale distinta.
 
 - En la mesa de genética, al elegir como padre la misma variedad («· estabilizar»), se cruzan dos plantas de la línea: gasta 2 semillas, guarda 1 y sube una generación (F1 → F2 → F3 → **estable** en la F4). Entre generaciones hay que cultivar la línea para tener otra vez 2 semillas.
-- **Cosecha de una línea inestable:** gramos × (0,8 a 1,1 al azar); el THC no cambia. Estable, ×1.
-- Las landraces, las de la tienda y las variedades de partidas anteriores a la 1.9 son estables.
+- Una línea sin fijar la estás criando: sus plantas se polinizan entre ellas y cada una da 2-5 semillas al cosecharla (las demás, feminizadas, casi nunca dan: ${pct(D.c.SEMILLA_HERMA * 100)} % de que una flor hermafrodita deje 1-3).
+- Las landraces y las de la tienda llevan su tipo genético (abajo); las de receta, estabilizadas, son líneas estables.
+
+## Fenotipos (1.10)
+
+Cada semilla es una planta distinta. Al germinar, tira su fenotipo: THC × (1 + σ·z) y gramos × (1 + σ·z), cada uno por su lado (z normal; entre ×0,6 y ×1,5). σ depende de lo pura que sea la genética. Si THC × gramos ≥ ${pct(D.c.FENO_ESTRELLA)}, es un **fenotipo estrella**: va a un lote aparte (★) que se vende y se presenta a la Copa por separado. Si ≤ ${pct(D.c.FENO_FLOJO)}, es **floja**. El fenotipo se sabe al cosecharla.
+
+| Tipo | σ | Estrella | Qué es |
+|---|---|---|---|
+`;
+  for (const t of D.gen) g += `| ${t.n} | ${pct(t.sigma)} | 1 de cada ~${n0(t.uno)} | ${t.d} |\n`;
+  g += `
+Con 50 semillas de un polihíbrido sale de media casi 1 estrella (58 % de que salga al menos una); con 50 de una línea estable, casi nunca. \`test-historia\` tira 200.000 plantas de cada tipo y comprueba esas tasas.
+
+**Esquejes:** a una planta en crecimiento (20-65 %) se le saca un esqueje (−5 de salud): es la misma planta, con su fenotipo. Enraíza en el propagador (hasta 12) y hay que plantarlo antes de que acabe el día siguiente (${D.c.ESQUEJE_DIAS} día de juego ≈ 4 semanas); entra ya de plántula (12 %). Cuando cosechas la madre o un clon y sale estrella, sus esquejes se marcan con ★: así se guarda un fenotipo.
+`;
+  g += `
 
 ## Híbridos propios (cruces sin receta)
 
@@ -116,15 +148,86 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
 
 ## Fórmulas de cultivo
 
-- **Crecimiento por hora:** \`1 / (días × 24) × crec\`, ×0,4 si el agua < 20 %, 0 si el agua llega a 0, ×1,1 con abono. \`crec\`, \`rend\`, \`thc\` y \`riego\` salen del foco y de la maceta de cada plaza (ver la sección 4 del [GDD](GDD.md)).
+- **Crecimiento por hora:** \`1 / (días × 24) × crec\`, ×0,4 si el agua < 20 %, 0 si el agua llega a 0, ×1,1 con abono. \`crec\`, \`thc\` y \`riego\` salen del foco (a plena intensidad desde ${D.c.W_M2} W/m²) y de la maceta de cada plaza. Equipo, precios y luz: [ECONOMIA.md](ECONOMIA.md).
 - **Agua:** baja 3,5 × riego puntos por hora (con CFL y maceta de 7 L una planta regada aguanta ~28 h).
 - **Salud:** −4/h sin agua, −2,5/h con plaga, +1/h si agua > 30 % y sin plaga. A 0 la planta muere.
 - **Plagas:** probabilidad por hora \`0,006 × (100 − resistencia) / 40\` mientras no está madura.
-- **Cosecha (g):** \`rinde × (0,4 + 0,6 × salud/100) × (abono ? 1,25 : 1) × rend × v\` (v = 1 si la línea es estable; 0,8–1,1 si no).
-- **THC final:** \`THC × (0,85 + 0,15 × salud/100) + thc + (abono ? 0,3 : 0)\`.
-- **Semillas al cosechar:** 1 + (0 a 2).
+- **Cosecha (g):** \`mín(tope de la maceta, W × g/W ÷ plazas de la carpa × rend de la maceta × rinde/${D.c.Y_MEDIA} × (0,4 + 0,6 × salud/100) × (abono ? 1,25 : 1) × fenotipo)\`. Una plaza vacía es luz perdida.
+- **THC final:** \`THC × fenotipo × (0,85 + 0,15 × salud/100) + thc del foco + (abono ? 0,3 : 0)\` (tope 35 %).
+- **Rinde (g/m²) de la tabla:** lo que daría con un LED a ${D.c.W_M2} W/m², abonada y sana.
 `;
   fs.writeFileSync(path.join(ROOT, 'docs/GENETICA.md'), g);
+
+  // ---------- ECONOMIA.md ----------
+  const c = D.c, eu = n => n0(n) + ' €', dec = n => String(Math.round(n * 100) / 100).replace('.', ',');
+  const precio = f => (D.shop.find(f) || {}).p;
+  let e = `# Economía de Ribera Verde (1.10)
+
+> Generado automáticamente con \`node tools/generar-docs.js\` a partir de los datos del juego. No editar a mano: cambia \`src/js/09-cultivo.js\`, \`10-calle.js\` u \`11-historia.js\` y regenera.
+
+Desde la 1.10, unidades, precios y potencias son los reales de un growshop y un cultivo de interior en España. Lo único comprimido es el tiempo: una cosecha dura de 2,5 a 5 días de juego (unas 4 semanas reales por día), así que lo que va «por día» (la luz) cuenta las horas de esas 4 semanas.
+
+## Focos
+
+Un día de juego cuenta ${c.H_LUZ} h de foco (4 semanas a 18 h en crecimiento y 12 h en floración) a ${dec(c.KWH)} €/kWh. g/W: gramos por vatio de una cosecha con la carpa llena, sin abono (abonando, ×1,25).
+
+| Foco | Precio | Ilumina | g/W | kWh/día | Luz/día | Desde |
+|---|---|---|---|---|---|---|
+`;
+  for (const F of D.focos) { const it = D.shop.find(s => s.foco === F.k); e += `| ${F.n} | ${it ? eu(it.p) : 'de serie'} | ${F.lado}×${F.lado} cm | ${dec(F.gpw)} | ${F.kwh} | ${eu(F.eur)} | ${it ? 'cap. ' + it.ch : '—'} |\n`; }
+  e += `
+## Carpas y macetas
+
+| Carpa | Precio | Plazas | Foco máx. | Maceta máx. |
+|---|---|---|---|---|
+`;
+  for (const C of D.carpas) { const it = D.shop.find(s => s.carpa === C.k); e += `| ${C.n}×${C.cm[1]} | ${it ? eu(it.p) + ' (cap. ' + it.ch + ')' : 'la de la tía'} | ${C.plazas} | ${C.wmax} W | ${C.lmax} L |\n`; }
+  e += `
+| Maceta | Precio | Tope por planta | Extra |
+|---|---|---|---|
+`;
+  for (const M of D.macetas) { const it = D.shop.find(s => s.maceta === M.k); e += `| ${M.n} | ${it ? eu(it.p) : 'de serie'} | ${M.cap} g | ${M.rend > 1 ? 'tela: +5 % y menos plagas' : '—'} |\n`; }
+  e += `
+Tope: unos 8 g por litro de tierra (la de tela, +5 %). Por mucho foco que pongas, una planta en 7 L no pasa de ${D.macetas[0].cap} g.
+
+Extras: ventilador ${eu(precio(s => s.lbl.startsWith('Ventilador')))} (25 W día y noche), extractor con filtro de carbón ${eu(precio(s => s.lbl.startsWith('Extractor')))} (75 W día y noche; ${c.H_24} h por día de juego), goteo ${eu(precio(s => s.lbl.startsWith('Riego')))}.
+
+## Cuánto da una cosecha
+
+\`gramos por planta = mín(tope de la maceta, W × g/W ÷ plazas × rend de la maceta × rinde de la variedad / ${c.Y_MEDIA} × salud × abono × fenotipo)\`
+
+Skunk #1 sana y abonada, fenotipo medio (cosecha de 2,5 días):
+
+| Montaje | Gramos por cosecha | g/W | Luz por cosecha |
+|---|---|---|---|
+`;
+  for (const m of D.montajes) e += `| ${m.n} | ${m.g} g${m.tope ? ' (tope de la maceta)' : ''} | ${dec(m.gw)} | ${eu(m.luz)} |\n`;
+  e += `
+## Vender
+
+- **Calle:** ${dec(c.calle[0])}-${dec(c.calle[1])} €/g según el THC (× 0,85 estudiante, × 1 currela, × 1,15 turista, × 1,35 pijo; rebaja × 0,85, caro × 1,3). Cada cliente quiere 2-12 g.
+- **Al por mayor (Iñaki, en el muelle, desde el capítulo 3):** ${dec(c.mayor[0])}-${dec(c.mayor[1])} €/g, lotes de 100 g para arriba, una carga al día de hasta ${dec(c.IMPERIO[0].mayor / 1000)} kg (más en el imperio).
+- **Multas:** policía en la calle, 601 € (la mínima de la Ley de Seguridad Ciudadana); redada en el piso, hasta 3.000 € y se llevan plantas y cogollos.
+
+## Semillas
+
+Feminizadas de tienda, ${D.shop.filter(s => s.sid).map(s => s.lbl.replace('Semillas ', '') + ' ' + eu(s.p)).join(', ')} la semilla. Sobres: ${c.SOBRES.map(([n, f]) => n + (f < 1 ? ' (−' + Math.round((1 - f) * 100) + ' %)' : '')).join(', ')}; desde el capítulo 3, bolsa de ${c.GRANEL[0]} a granel (−${Math.round((1 - c.GRANEL[1]) * 100)} %). Landraces del banco del PC: sobres de ${D.sobre} por 20-45 €.
+
+## La deuda
+
+${eu(c.DEUDA)} en tres plazos: ${eu(c.PLAZOS[3])} en 7 días (capítulo 3), ${eu(c.PLAZOS[5])} en 10 días (capítulo 5) y ${eu(c.PLAZOS[7])} en 7 días tras la Copa (capítulo 7; el premio de la Copa son ${eu(c.PREMIO_COPA)}). Si un plazo vence, Toño suma un ${Math.round(c.INTERES * 100)} % del plazo y da 5 días más.
+
+Por qué ${eu(c.DEUDA)}: con equipo, precios y venta al por mayor reales, un jugador que reinvierte cada cosecha en lo que más rinde por euro (focos LED, macetas grandes, carpas) paga el primer plazo en unas 4 cosechas (6 días), el segundo en unas 8 y el último en unas 9: lo mismo que la deuda de 5.000 € con los números de la 1.9 (3, 5 y 11 cosechas). Con los plazos viejos, la historia se acabaría en 7 cosechas.
+
+## Tu imperio
+
+Saldada la deuda, el juego sigue: cada rango se gana facturando desde el último pago y sube lo que Iñaki carga al día.
+
+| Rango | Facturado | Carga al día |
+|---|---|---|
+`;
+  for (const r of c.IMPERIO) e += `| ${r.n} | ${eu(r.meta)} | ${r.mayor >= 1000 ? dec(r.mayor / 1000) + ' kg' : r.mayor + ' g'} |\n`;
+  fs.writeFileSync(path.join(ROOT, 'docs/ECONOMIA.md'), e);
 
   // ---------- MAPA.md ----------
   const legend = `Leyenda: \`.\` suelo/hierba · \`*\` flores · \`"\` hierba alta (ladrones ×3, a cualquier hora) · \`:\` tierra · \`-\` acera · \`=\` carretera · \`+\` plaza · \`~\` agua · \`H\` puente · \`#\` muelle
@@ -155,5 +258,5 @@ ${legend}
   m += `\n## Tienda de Kiko\n\n| Artículo | Precio | Desde cap. | Nota |\n|---|---|---|---|\n`;
   for (const s of D.shop) m += `| ${s.lbl} | ${s.p} € | ${s.ch} | ${s.desc} |\n`;
   fs.writeFileSync(path.join(ROOT, 'docs/MAPA.md'), m);
-  console.log('docs/GENETICA.md y docs/MAPA.md regenerados');
+  console.log('docs/GENETICA.md, docs/ECONOMIA.md y docs/MAPA.md regenerados');
 })();

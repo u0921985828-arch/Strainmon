@@ -1,4 +1,7 @@
-/* ---------- clientes y venta ---------- */
+/* ---------- clientes y venta ----------
+   Precios reales (1.10): en la calle, el gramo a 6-10 € según el THC (× el tipo de cliente y lo que pidas); al por mayor,
+   3,50-5 € (ventaMayor, 11-historia). */
+const precioCalle=thc=>4+thc*.2,precioMayor=thc=>2+thc*.1;
 function spawnClients(){
   S.clientsDay=S.day;S.clients=[];
   if(S.ch>=2){
@@ -19,9 +22,9 @@ async function talkClient(c){
   if(!lots.length)return say(totalBuds()>0?'Eso no me vale. Vuelve cuando tengas lo que busco.':'¿No llevas nada? Vale.',N);
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué le vendes?'});
   if(i<0||i>=lots.length)return say('Vale, otro día.',N);
-  const [sid,b]=lots[i],base=(3+b.thc*.4)*ct.mult*c.want;
+  const [sid,b]=lots[i],base=precioCalle(b.thc)*ct.mult*c.want;
   const pr=[Math.round(base*.85),Math.round(base),Math.round(base*1.3)];
-  const j=await ask(`${c.want} g de ${getStrain(sid).n}. ¿Cuánto le pides?`,[`Rebaja · ${pr[0]} €`,`Justo · ${pr[1]} €`,`Caro · ${pr[2]} €`,'Cancelar']);
+  const j=await ask(`${c.want} g de ${lotNombre(sid)}. ¿Cuánto le pides?`,[`Rebaja · ${pr[0]} €`,`Justo · ${pr[1]} €`,`Caro · ${pr[2]} €`,'Cancelar']);
   if(j===3)return say('Entonces me voy.',N);
   const acc=[1,.92,clamp(.3+(b.thc-(c.minThc||14))*.05+(c.type==='pij'?.25:0)+(c.type==='tur'?.15:0),.1,.9)][j];
   if(Math.random()<acc){

@@ -56,6 +56,23 @@ const TIPO_COGOLLO={ria:'hibrido',limon:'sativa',txoko:'indica',niebla:'indica',
   citrus:'sativa',bluetx:'indica',sollimon:'sativa',kushrif:'indica',purpurah:'indica',orotrop:'hibrido',nieblamor:'hibrido',brumaog:'sativa',reina:'indica',amanecer:'sativa',tormenta:'sativa',dragon:'legendario',leyenda:'legendario',
   mich:'sativa',punto:'sativa',thai:'sativa',lao:'sativa',chitral:'indica',nepal:'hibrido',congo:'sativa',lamb:'sativa',kif:'indica',beldia:'indica',oaxaca:'sativa',panama:'sativa',
   haze:'sativa',nl:'indica',afkush:'indica',shiva:'indica',silver:'sativa',ssh:'sativa'};
+// tipo genético (1.10): cuánto se parecen entre sí las plantas de una misma semilla. Cada planta tira su fenotipo al germinar
+// (rollFeno, 09-cultivo): THC y gramos × (1 + σ·z), cada uno por su lado. Estrella si THC × gramos ≥ FENO_ESTRELLA; floja si
+// ≤ FENO_FLOJO. Las de tienda llevan el suyo en TIPO_GEN; las que empiezan por «Landrace», landrace; las de receta y los
+// híbridos propios salen de la mesa como F1-F3 (S.gen) y, estabilizadas, son líneas estables. uno = 1 estrella de cada N
+// plantas (lo comprueba test:arte con 40.000 plantas por tipo)
+const TIPO_GEN={ria:'estable',limon:'poli',txoko:'poli',niebla:'estable',mango:'f1',purpura:'estable'};
+const PADRES={limon:'Lemon Skunk × Silver Haze',txoko:'Chemdawg × Hindu Kush',mango:'KC 33 × Afghani'};
+const GENETICA={
+  estable:{n:'Línea estable',sigma:.06,uno:16000,d:'fijada a lo largo de generaciones: casi todas las plantas salen iguales'},
+  f1:{n:'Cruce F1',sigma:.07,uno:2000,d:'hijo directo de dos líneas estables: uniforme y con vigor híbrido'},
+  F1:{n:'F1',sigma:.08,uno:500,d:'línea inestable, cosechas desiguales. Estabilízala en la mesa'},
+  F2:{n:'F2',sigma:.12,uno:40,d:'línea inestable, la generación que más se separa. Estabilízala en la mesa'},
+  F3:{n:'F3',sigma:.1,uno:100,d:'línea inestable, ya seleccionada. Estabilízala en la mesa'},
+  landrace:{n:'Landrace',sigma:.1,uno:100,d:'población silvestre de su región: plantas variadas'},
+  poli:{n:'Polihíbrido',sigma:.11,uno:60,d:'cruce de cruces: cada planta sale distinta'}};
+const FENO_ESTRELLA=1.35,FENO_FLOJO=.75;
+function tipoGen(id){const g=genDe(id);if(g<GEN_ESTABLE)return 'F'+g;if(TIPO_GEN[id])return TIPO_GEN[id];const s=getStrain(id);return s&&/^Landrace/.test(s.o)?'landrace':'estable';}
 const RECIPES={};
 [['ria','limon','citrus'],['txoko','niebla','bluetx'],['acapulco','rif','sollimon'],['rif','ria','kushrif'],['hindu','purpura','purpurah'],
  ['mango','hindu','orotrop'],['niebla','limon','nieblamor'],['citrus','limon','brumaog'],['kushrif','txoko','reina'],

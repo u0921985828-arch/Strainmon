@@ -22,11 +22,11 @@ En el PC también vale el teclado (flechas o WASD, Z/Espacio = A, X/Esc = B, M =
 
 ## Qué incluye
 
-- **Cultivo:** carpas en el piso (el armario de 60 con 2 plantas, la de 100 con 4 y la de 150 con 6); con A delante se abre la carpa de frente y eliges planta o foco con la cruceta. Macetas de plástico o de tela de 7 a 25 L, focos CFL, sodio y LED de 125 a 720 W con su cobertura y su factura de la luz; riego, abono, plagas y cinco fases de crecimiento. La cosecha da gramos con su % de THC y semillas.
-- **Genética:** mesa de cruces y Genoteca con 41 variedades reales, cada una con su historia: 6 del growshop, 16 landraces (una te la da Kiko, tres se consiguen por el barrio y doce, de Michoacán a Panama Red, se piden al banco de semillas del ordenador de la tía) y 19 que salen de cruces, de Haze y Northern Lights a la legendaria *Ghost Train Haze* (Amnesia Haze × Fire OG). Lo que sale de un cruce es una F1 de cosechas desiguales hasta que la estabilizas (F4). Los cruces sin receta generan híbridos propios.
-- **Calle:** clientes con `$` (estudiante, currela, turista y pijo) a los que les pides precio de rebaja, justo o caro. Cada venta sube el **calor policial** y a 90 llega una redada.
+- **Cultivo:** carpas en el piso (armario de 60 u 80, carpa de 100 o 150 y carpa de 120: hasta 15 plantas); con A delante se abre la carpa en 3/4 y eliges planta o foco con la cruceta. Macetas de plástico o de tela de 7 a 25 L, focos CFL, sodio y LED de 100 a 720 W y extras (ventilador, filtro de carbón y goteo), con cifras reales: gramos por vatio, tope por litro de maceta, kWh y precios de growshop ([docs/ECONOMIA.md](docs/ECONOMIA.md)). Riego, abono, plagas y cinco fases de crecimiento. La cosecha da gramos con su % de THC y, a veces, semillas.
+- **Genética:** mesa de cruces y Genoteca con 41 variedades reales, cada una con su historia: 6 del growshop, 16 landraces (una te la da Kiko, tres se consiguen por el barrio y doce, de Michoacán a Panama Red, se piden al banco de semillas del ordenador de la tía) y 19 que salen de cruces, de Haze y Northern Lights a la legendaria *Ghost Train Haze* (Amnesia Haze × Fire OG). Lo que sale de un cruce es una F1 de cosechas desiguales hasta que la estabilizas (F4). Los cruces sin receta generan híbridos propios. Cada semilla es una planta distinta: según la pureza de la genética, alguna sale **fenotipo estrella**, y con esquejes te la quedas.
+- **Calle:** clientes con `$` (estudiante, currela, turista y pijo) a los que les pides precio de rebaja, justo o caro, y desde el capítulo 3, venta al por mayor a Iñaki. Cada venta sube el **calor policial** y a 90 llega una redada.
 - **Combates por turnos:** contra ladrones (luchar, mochila, hablar, huir) y contra la policía (sobornar, hablar, huir, entregar).
-- **Historia:** la herencia de la tía Maite, la deuda de 5.000 € con Don Baltasar, el sargento Molina, el rival Darko y la Copa de Ribera.
+- **Historia:** la herencia de la tía Maite, la deuda de 30.000 € con Don Baltasar, el sargento Molina, el rival Darko y la Copa de Ribera. Saldada la deuda, empieza tu imperio.
 - Día y noche, chiptune propio y guardado local.
 
 ## Carpetas
@@ -54,14 +54,15 @@ Hace falta Node 18 o superior. Los comandos funcionan igual en `cmd` de Windows.
 npm install
 npx playwright install chromium
 npm run build      # src/ → index.html y dist/ribera-verde.artifact.html
-npm test           # compila y recorre la historia completa (38 pasos) en Chromium sin ventana
-npm run docs       # compila y regenera docs/GENETICA.md y docs/MAPA.md desde los datos del juego
+npm test           # compila y recorre la historia completa (50 pasos) en Chromium sin ventana
+npm run docs       # compila y regenera docs/GENETICA.md, MAPA.md y ECONOMIA.md desde los datos del juego
 npm run capturas   # compila y regenera screenshots/
-npm run plano      # compila y regenera docs/plano/ (mapas con rejilla y hoja de escala)
+npm run plano      # compila y regenera docs/plano/ (mapas con rejilla, hoja de escala y vista de carpa B)
 npm run sprites:ref       # referencias PNG + paleta para PixelLab
 npm run sprites:validar   # comprueba art/manifest.json
 npm run sprites:procesar -- <grupo> [--atlas]   # salida de PixelLab → sprites listos
 npm run sprites:catalogo  # catálogo de sprites por herramienta de PixelLab
+npm run sprites:huellas   # huellas procedurales de las láminas de la vista B (init_image para PixelLab)
 npm run test:arte         # prueba el motor de sprites con un atlas de calco
 npm run apk               # compila y empaqueta dist/ribera-verde.apk (Java 17+; sin Android SDK)
 ```
@@ -75,6 +76,7 @@ Edita siempre en `src/` y después ejecuta `npm run build`. `index.html` y `dist
 - [docs/GUION.md](docs/GUION.md): historia y diálogos por capítulo.
 - [docs/GENETICA.md](docs/GENETICA.md): las 41 variedades, su historia y el árbol de cruces.
 - [docs/MAPA.md](docs/MAPA.md): mapas con coordenadas, personajes, objetos y tienda.
+- [docs/ECONOMIA.md](docs/ECONOMIA.md): focos, carpas, macetas, montajes de ejemplo, precios de venta, semillas, la deuda y el imperio, con las cifras reales del juego.
 - [docs/PLAN-PRODUCCION.md](docs/PLAN-PRODUCCION.md): plan de lo que falta. Recoge el catálogo de carpas, focos, macetas y extras con sus medidas reales, la escala de cada vista, las láminas que hay que pedir a PixelLab con su coste y su orden, la historia y los desbloqueos por capítulo y las decisiones pendientes.
 - [docs/PIXELLAB.md](docs/PIXELLAB.md): kit pro para cambiar todo el arte por sprites y animaciones de PixelLab con Claude Code (comando `/sprites`), sin salirse de la estética. El motor ya los usa en cuanto hay atlas.
 - [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md): cada sprite del juego con su herramienta de PixelLab (personajes, terreno, objetos sobre el mapa, lotes e imágenes), su orden y su coste.
