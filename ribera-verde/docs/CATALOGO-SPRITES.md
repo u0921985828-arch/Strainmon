@@ -133,7 +133,7 @@ Una llamada a `create_1_direction_object` de ≤42 px devuelve 64 candidatos y c
 ## Llamadas encadenadas
 
 **player**
-1. `create_image_pro` 16×24 solo con texto. Elige 1 de los 64 candidatos (se eligió el 0) y guárdalo en `art/crudo/_ref/player.png`.
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 17) y guárdalo en `art/crudo/_ref/player.png`.
 2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
 
 **player-combate**

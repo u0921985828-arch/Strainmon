@@ -2,9 +2,10 @@
 
 ## 1.4.0 · 6 de octubre de 2026
 
-- **Nuevo: F1, protagonista generado con PixelLab** (pendiente de aprobación), a escala de RPG de portátil de 2004: figura de 16×16 px, cabeza grande y cara de dos ojos sin boca. `base` en 3 vistas (el oeste es el espejo del este) + `walk` (paso, base, paso, base), 15 fotogramas, 14 colores, en el atlas `assets/sprites/atlas.{png,json}` e incrustado en el build. El resto del juego sigue procedural.
-  - Frontal: `create_image_pro` 16×24 (64 candidatos), el 0. Lado, espalda y pasos de caminar: `edit_image_pixen` sobre ese frontal, que conserva tamaño y estilo. Paleta unificada con `reduce_colors`.
-  - Coste real: unas 195 generaciones, incluidas tres versiones descartadas (estándar de 24-27 px, editada de 22-23 px y Pro de 27-28 px) y las pruebas de v3 y de hojas Pro a 16 px.
+- **Nuevo: F1, protagonista generado con PixelLab** (aprobado). `base` + `idle` + `walk` en 4 direcciones (36 fotogramas, 14 colores), en el atlas `assets/sprites/atlas.{png,json}` e incrustado en el build. El resto del juego sigue procedural.
+  - `create_image_pro` (64 candidatos de 32×32, prompt de RPG de portátil pulido) → el candidato 17 → `create_character` v3 con esa referencia → `idle` y `walk` con animación v3 a medida (las plantillas lo ponían de espaldas mirando al sur).
+  - 27-28 px de alto y 16 de ancho, cabeza grande, ojos legibles, contorno limpio, 13 colores (`reduce_colors` con los 36 fotogramas juntos).
+  - Coste real: unas 195 generaciones, incluidas tres versiones descartadas (estándar de 24-27 px, editada de 22-23 px y de 16 px).
 
 ## 1.3.0 · 5 de octubre de 2026
 

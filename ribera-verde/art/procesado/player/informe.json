@@ -4,18 +4,23 @@
     32,
     32
   ],
-  "secuencias": 6,
-  "fotogramas": 15,
+  "secuencias": 12,
+  "fotogramas": 36,
   "semitransparentes": 0,
   "en_paleta_antes": 0,
-  "distancia_media": 20.45,
-  "colores_finales": 14,
+  "distancia_media": 18.6,
+  "colores_finales": 13,
   "fundidos": [],
   "huerfanos_quitados": 0,
   "deriva_pies": {
+    "idle/east": 0,
+    "idle/north": 1,
+    "idle/south": 0,
+    "idle/west": 0,
     "walk/east": 0,
     "walk/north": 0,
-    "walk/south": 0
+    "walk/south": 0,
+    "walk/west": 0
   },
   "errores": [],
   "avisos": [
