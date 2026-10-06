@@ -23,7 +23,8 @@ const node = (...a) => execFileSync(process.execPath, a, { cwd: ROOT, stdio: ['i
 
 if (!fs.existsSync(path.join(ROOT, 'art', 'referencias', 'personajes'))) { console.error('Faltan las referencias: npm run sprites:ref'); process.exit(1); }
 for (const d of [CAL, ART, PAR]) fs.rmSync(d, { recursive: true, force: true });
-console.log(node('tools/sprites/calco.js', '--salida', path.join(CAL, 'crudo')).trim());
+const calco = node('tools/sprites/calco.js', '--salida', path.join(CAL, 'crudo')).trim(); console.log(calco);
+const N_CALCO = +(calco.match(/(\d+) PNG/) || [])[1];   // el atlas calcado tiene que traer todos los PNG que declara el manifiesto
 const pr = node('tools/sprites/procesar.js', '--todos', '--crudo', path.join(CAL, 'crudo'), '--salida', path.join(CAL, 'procesado'), '--atlas-dir', path.join(CAL, 'atlas'), '--atlas');
 console.log(pr.split('\n').filter(l => l.startsWith('ATLAS')).join('\n'));
 node('tools/build.js', '--atlas-dir', path.join(CAL, 'atlas'), '--salida', ART);
@@ -59,7 +60,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
   {
     const { page, errors } = await abrir(html);
     const r0 = await page.evaluate(() => ({ ok: ARTE.ok, n: Object.keys(ARTE.fr).length, esperado: Object.keys(ATLAS.def.frames).length }));
-    check('Atlas cargado y recortado', r0.ok && r0.n === r0.esperado && r0.n > 1000, r0);
+    check('Atlas cargado y recortado', r0.ok && r0.n === r0.esperado && r0.n === N_CALCO, { ...r0, calco: N_CALCO });
 
     const walk = await page.evaluate(() => {
       const g = grupoLook(LOOKS.player), idx = new Set(), keys = ATLAS.def.anims[g].walk.dirs.south;
@@ -69,6 +70,11 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     });
     check('Caminar: los 4 fotogramas, un ciclo cada 2 casillas', walk.idx.join() === '0,1,2,3' && walk.walkN === 4, walk);
     check('Correr (B) usa la animación run', walk.run, walk);
+    // idle solo donde se generó: de espaldas y sin idle norte, el NPC se queda con su base norte (no gira al idle sur)
+    const quieto = await page.evaluate(() => { const g = 'unai', A = ATLAS.def.anims[g];
+      const n = pjFrame({ id: 'unai', dir: 'up', moving: false }, g, 0, false, 240), s = pjFrame({ id: 'unai', dir: 'down', moving: false }, g, 0, false, 240);
+      return { idleNorte: !!A.idle.dirs.north, norteBase: ARTE.fr[A.base.dirs.north[0]] === n.c, surIdle: A.idle.dirs.south.some(k => ARTE.fr[k] === s.c) }; });
+    check('Idle solo en sus direcciones: sin idle norte, la base norte', !quieto.idleNorte && quieto.norteBase && quieto.surIdle, quieto);
 
     // Kiko en el growshop: fuma o pone semillas; el porro suelta su humo
     await page.evaluate(() => { ARTE.prisa = 0.0003; enterMap('shop', 4, 5, 'up'); });

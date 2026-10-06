@@ -39,6 +39,6 @@ informe técnico directo + código refactorizado, sin relleno.
 - RPG de cultivo 240×160 independiente (v1.4.0). Notas propias en `ribera-verde/CLAUDE.md`.
 - Tests: `cd ribera-verde && npm install` y, con el Chromium preinstalado
   (`export CHROMIUM_PATH=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome | head -1)`):
-  `npm test` → 34/34, 0 errores JS · `npm run test:arte` → 16/16.
+  `npm test` → 34/34, 0 errores JS · `npm run test:arte` → 17/17.
 - Sprites: MCP `pixellab` en `.mcp.json` (raíz; habilitado en `.claude/settings.json`), token en la variable `PIXELLAB_TOKEN`,
   nunca en el repo. En sesiones cloud exige `api.pixellab.ai` en los dominios permitidos.

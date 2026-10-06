@@ -8,14 +8,14 @@ Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: 
 
 | Familia | Claves del juego | Assets | Herramientas | Generaciones aprox. |
 |---|---|---|---|---|
-| Personajes | 39 | 25 | create_character · animate_character · create_image_pro (paso previo) | 333 |
+| Personajes | 39 | 25 | create_character · animate_character · create_image_pro (paso previo) | 997 |
 | Mapa · terreno | 23 | 6 | create_tiles_pro · create_building_kit · create_topdown_tileset · animate_image | 15 + sin documentar |
 | Mapa · objetos con el estilo del mapa | 22 | 8 | create_map_object (background_image + máscara) · animate_image | 4 + sin documentar |
 | Objetos sueltos en lote | 35 | 7 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 90 + sin documentar |
 | Imágenes simples | 3 | 3 | create_image_pixflux (init_image + color_image) | 3 |
 | Se queda procedural | 2 | 1 | — | 0 |
 
-**Total documentado: ~445 generaciones** (más create_tiles_pro, create_building_kit, create_map_object, animate_object, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 124/124 claves.
+**Total documentado: ~1109 generaciones** (más create_tiles_pro, create_building_kit, create_map_object, animate_object, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 124/124 claves.
 
 ## Orden de creación
 
@@ -36,25 +36,25 @@ Rig humanoide: rotaciones coherentes y plantillas de animación a 1 generación 
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
 | player | player | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: player.png | F1 | idle*, walk*, run, regar*, plantar, cosechar, cruzar*, oler*, vender*, telefono* | 70 |
-| kiko | kiko | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, fumar*, semillas* | 7 |
-| josune | josune | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, secar_vaso*, servir* | 7 |
-| baltasar | baltasar | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, puro*, contar* | 7 |
-| tono | tono | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, nudillos*, fumar* | 7 |
-| begona | begona | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, walk, cotillear* | 10 |
-| unai | kid, unai | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, walk, pelota* | 10 |
-| patxi | oldman, patxi | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, palomas* | 7 |
-| txaro | granny, txaro | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, punto* | 6 |
-| inaki | sailor, inaki | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, pipa*, cabo* | 8 |
-| cop | cop | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, walk, radio* | 10 |
-| molina | molina | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, fumar* | 6 |
-| darko | darko | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, vapear* | 7 |
-| jurado | judge, jurado | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, notas* | 6 |
-| cliente1 | cliente1 | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, walk, movil* | 10 |
-| cliente2 | cliente2 | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, walk, fumar* | 10 |
-| cliente3 | cliente3 | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, walk, movil* | 10 |
-| cliente4 | cliente4 | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, walk, movil* | 10 |
-| cliente5 | cliente5 | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, walk, fumar* | 10 |
-| cliente6 | cliente6 | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, walk, movil* | 10 |
+| kiko | kiko | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: kiko.png | F3 | idle*, fumar*, semillas* | 44 |
+| josune | josune | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: josune.png | F3 | idle*, secar_vaso*, servir* | 44 |
+| baltasar | baltasar | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: baltasar.png | F3 | idle*, puro*, contar* | 44 |
+| tono | tono | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: tono.png | F3 | idle*, nudillos*, fumar* | 44 |
+| begona | begona | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: begona.png | F3 | idle*, walk*, cotillear* | 44 |
+| unai | kid, unai | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: unai.png | F3 | idle*, walk*, pelota* | 44 |
+| patxi | oldman, patxi | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: patxi.png | F3 | idle*, palomas* | 42 |
+| txaro | granny, txaro | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: txaro.png | F3 | idle*, punto* | 41 |
+| inaki | sailor, inaki | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: inaki.png | F3 | idle*, pipa*, cabo* | 43 |
+| cop | cop | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cop.png | F3 | idle*, walk*, radio* | 44 |
+| molina | molina | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: molina.png | F3 | idle*, fumar* | 41 |
+| darko | darko | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: darko.png | F3 | idle*, vapear* | 42 |
+| jurado | judge, jurado | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: jurado.png | F3 | idle*, notas* | 41 |
+| cliente1 | cliente1 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente1.png | F3 | idle*, walk*, movil* | 44 |
+| cliente2 | cliente2 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente2.png | F3 | idle*, walk*, fumar* | 44 |
+| cliente3 | cliente3 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente3.png | F3 | idle*, walk*, movil* | 44 |
+| cliente4 | cliente4 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente4.png | F3 | idle*, walk*, movil* | 44 |
+| cliente5 | cliente5 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente5.png | F3 | idle*, walk*, fumar* | 44 |
+| cliente6 | cliente6 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente6.png | F3 | idle*, walk*, movil* | 44 |
 | player-combate | espalda:player | create_character (v3) | v3: 8 direcciones, 64 px | previo create_image_pro ← player aprobado · reference_image_base64: player-combate.png | F6 · tras player | idle, golpe, patada, spray*, comer*, herido, desmayo | 46 |
 | ladron1-combate | ladron1, frente:ladron | create_character (standard) | 4 direcciones, 64 px | solo texto | F6 | idle, ataque, herido, huir | 5 |
 | ladron2-combate | ladron2, frente:ladron | create_character (standard) | 4 direcciones, 64 px | solo texto | F6 | idle, ataque, herido, huir | 5 |
@@ -134,6 +134,82 @@ Una llamada a `create_1_direction_object` de ≤42 px devuelve 64 candidatos y c
 
 **player**
 1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 17) y guárdalo en `art/crudo/_ref/player.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**kiko**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 4) y guárdalo en `art/crudo/_ref/kiko.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**josune**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 0) y guárdalo en `art/crudo/_ref/josune.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**baltasar**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 0) y guárdalo en `art/crudo/_ref/baltasar.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**tono**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 0) y guárdalo en `art/crudo/_ref/tono.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**begona**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 0) y guárdalo en `art/crudo/_ref/begona.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**unai**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 17) y guárdalo en `art/crudo/_ref/unai.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**patxi**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 16) y guárdalo en `art/crudo/_ref/patxi.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**txaro**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 4) y guárdalo en `art/crudo/_ref/txaro.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**inaki**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 20) y guárdalo en `art/crudo/_ref/inaki.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**cop**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 0) y guárdalo en `art/crudo/_ref/cop.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**molina**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 0) y guárdalo en `art/crudo/_ref/molina.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**darko**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 1) y guárdalo en `art/crudo/_ref/darko.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**jurado**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 0) y guárdalo en `art/crudo/_ref/jurado.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**cliente1**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 0) y guárdalo en `art/crudo/_ref/cliente1.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**cliente2**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 0) y guárdalo en `art/crudo/_ref/cliente2.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**cliente3**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 2) y guárdalo en `art/crudo/_ref/cliente3.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**cliente4**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 16) y guárdalo en `art/crudo/_ref/cliente4.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**cliente5**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 0) y guárdalo en `art/crudo/_ref/cliente5.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**cliente6**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 4) y guárdalo en `art/crudo/_ref/cliente6.png`.
 2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
 
 **player-combate**

@@ -1,0 +1,26 @@
+{
+  "grupo": "cop",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 9,
+  "fotogramas": 28,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 21.1,
+  "colores_finales": 14,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "idle/south": 0,
+    "radio/south": 0,
+    "walk/east": 0,
+    "walk/north": 0,
+    "walk/south": 0
+  },
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #2a2a2a≈#2a2a30, #26262e≈#2a2a30"
+  ]
+}

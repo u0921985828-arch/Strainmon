@@ -170,7 +170,7 @@ Descartadas, con su motivo en el catálogo: `create_path_tiles` (solo 32 px), `c
 | **F0** Preparación | MCP, saldo, referencias, paleta, validación | `ERRORES: 0` |
 | **F1** Ancla de estilo | protagonista: base + `idle` + `walk`, e integración mínima | **la apruebas tú** viendo la captura antes y después |
 | **F2** Motor | atlas, animaciones, ambiente, VFX, arte procedural de reserva (sección 7). **Hecho en la 1.3** | `npm test` 34/34 con y sin atlas y `npm run test:arte` 16/16 |
-| **F3** Personajes | 13 NPC, 6 clientes, acciones de ambiente, humos y efectos (`vfx-16`, `vfx-32`), gaviotas y palomas | revisión visual y capturas |
+| **F3** Personajes | 13 NPC, 6 clientes, acciones de ambiente, humos y efectos (`vfx-16`, `vfx-32`), gaviotas y palomas | revisión visual y capturas. **Personajes hechos en la 1.4**; faltan humos, gaviotas y palomas |
 | **F4** Entorno | primero tiles e interiores; después, con los recortes regenerados, las 4 fachadas, árbol, farola, fuente y carpa sobre el mapa; props pequeños y tiles animados | mosaico 3×3 sin costuras |
 | **F4b** Transiciones *(opcional)* | tilesets Wang + autotiling en el motor | — |
 | **F5** Plantas | 6 fases, balanceo, cogollo por variedad, seca, plaga | las 23 variedades se distinguen |
@@ -366,5 +366,5 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 - [ ] `npm run sprites:validar` → 0 errores y `npm run sprites:catalogo` → todas las claves
 - [ ] Todos los assets de la fase en `aprobado`, con `pixellab` (y `seed` si la herramienta la acepta) y `coste_real`
 - [ ] `npm run sprites:procesar -- --todos --atlas` → `ATLAS OK`
-- [ ] `npm run build`, `npm test` 34/34 (con y sin atlas), `npm run test:arte` 16/16 y `npm run capturas` revisadas
+- [ ] `npm run build`, `npm test` 34/34 (con y sin atlas), `npm run test:arte` 17/17 y `npm run capturas` revisadas
 - [ ] `CHANGELOG.md` actualizado y capturas nuevas en `screenshots/`

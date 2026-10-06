@@ -33,6 +33,7 @@ function clavesDe(g,s,dir){
   if(dir==='west'&&D.east)return [D.east,true];
   return [D.south||D.unica||D[Object.keys(D)[0]],false];
 }
+function tieneDir(g,s,dir){const a=animDe(g,s);if(!a)return false;const D=a.dirs;return !!(D[dir]||(dir==='east'&&D.west)||(dir==='west'&&D.east));}
 function espejo(k){
   if(ARTE.mir[k])return ARTE.mir[k];
   const s=ARTE.fr[k];const [c,x]=mkCanvas(s.width,s.height);x.translate(s.width,0);x.scale(-1,1);x.drawImage(s,0,0);return ARTE.mir[k]=c;
@@ -78,7 +79,7 @@ function pjFrame(e,g,now,isP,dur){
     const s=isP&&dur<200&&animDe(g,'run')?'run':animDe(g,'walk')?'walk':null;
     if(s){const par=isP?e.parity:(e.x+e.y)&1;return frameDe(g,s,DIR4[e.dir],0,{ph:(par+Math.min(1,e.t/dur))/2});}   // un ciclo cada 2 casillas
   }
-  if(animDe(g,'idle'))return frameDe(g,'idle',DIR4[e.dir],now+hashStr(String(e.id||'p'))%5000,{bucle:true}); // fase propia por NPC
+  if(tieneDir(g,'idle',DIR4[e.dir]))return frameDe(g,'idle',DIR4[e.dir],now+hashStr(String(e.id||'p'))%5000,{bucle:true}); // fase propia por NPC; sin idle en esa dirección, base
   return frameDe(g,'base',DIR4[e.dir],0,{i:0});
 }
 function dibujarPJ(e,look,now,cam,isP,dur){

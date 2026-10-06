@@ -41,8 +41,9 @@
 - `npm test` recorre la historia entera y los sistemas sueltos en 34 pasos: **34/34, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
-  - el motor ya usa el atlas (F2) y `npm run test:arte` da 16/16;
-  - F1 generada con PixelLab Pro: el protagonista ya sale del atlas (`base`, `idle`, `walk`), aprobado; el resto sigue procedural.
+  - el motor ya usa el atlas (F2) y `npm run test:arte` da 17/17;
+  - F1 generada con PixelLab Pro: el protagonista ya sale del atlas (`base`, `idle`, `walk`), aprobado;
+  - F3 (personajes) con la misma receta: los 13 NPC y los 6 clientes salen del atlas con `idle`, `walk` (los que caminan) y sus acciones de ambiente. Faltan los humos (VFX), gaviotas y palomas; el resto del mundo sigue procedural.
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
 - **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.3, con arte procedural porque aún no hay atlas.
 
@@ -58,7 +59,7 @@
 
 ## Siguientes pasos sugeridos
 
-1. Generar los sprites con Claude Code y PixelLab, empezando por F1, el protagonista como ancla de estilo. Están listos la guía [docs/PIXELLAB.md](docs/PIXELLAB.md), el catálogo [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md) y el comando `/sprites`.
+1. Seguir con los sprites (F1 y F3 hechos): VFX de humo, gaviotas y palomas, y después tiles y objetos. Están listos la guía [docs/PIXELLAB.md](docs/PIXELLAB.md), el catálogo [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md) y el comando `/sprites`.
 2. Opcional (F4b): orillas con los tres Wang encadenados y autotiling en el motor.
 3. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.
 4. Añadir zonas: polígono industrial, monte con cultivo exterior por estaciones y puerto con contrabando.

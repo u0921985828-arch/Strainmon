@@ -452,19 +452,14 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/kiko_south_x2.png"
    ],
-   "descripcion": "hippie seed hunter in his fifties, long sandy-blond hair and full beard, tanned skin, green shirt, brown trousers, relaxed friendly posture",
+   "descripcion": "laid-back hippie seed hunter in his fifties, long sandy-blond hair and beard, tanned skin, green shirt, brown trousers, sandals; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [
     "#c48a3a",
     "#e8b088",
@@ -477,21 +472,22 @@
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
       "south",
       "north",
-      "east",
-      "west"
+      "east"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "fumar",
      "herramienta": "animate_character",
      "modo": "v3",
-     "accion": "rolling a joint with both hands, lighting it and taking a slow drag, then exhaling",
+     "accion": "rolling a cigarette with both hands, lighting it and taking a slow drag, then exhaling",
      "frames": 12,
      "direcciones": [
       "south"
@@ -503,7 +499,7 @@
      "nombre": "semillas",
      "herramienta": "animate_character",
      "modo": "v3",
-     "accion": "sorting small seed packets on a counter",
+     "accion": "sorting small seed packets in his hands",
      "frames": 8,
      "direcciones": [
       "south"
@@ -512,7 +508,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "fumar",
@@ -533,7 +529,40 @@
      -18
     ]
    },
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/kiko.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 301,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head (about 45% of the height), figure about 26 pixels tall and 15 pixels wide, clear dark eyes with a tiny white highlight. A laid-back hippie seed hunter in his fifties: long sandy-blond hair and a full sandy beard, tanned skin, friendly half-smile, green shirt, brown trousers, sandals. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 4)",
+    "guarda": "art/crudo/_ref/kiko.png"
+   },
+   "pixellab": {
+    "character_id": "09896cec-3f39-4b07-a3c5-56cfbeb6569a",
+    "create_image_pro_job": "d4abfdb2-e983-4afa-a6c4-61452d59a9dc",
+    "animation_group_id": {
+     "idle": "2a0bc17e-4ff5-4275-9944-3032f98e2097",
+     "fumar": "ba8d1a0b-cfa0-4ed2-b7dd-5b0732c63896",
+     "semillas": "dfe6586b-cd25-407e-906b-3eeb260c5b0e"
+    },
+    "reduce_colors_job": "667cd016-ec09-4a8a-9b34-faeb703b34c1",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 25.1
   },
   {
    "id": "josune",
@@ -545,19 +574,14 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/josune_south_x2.png"
    ],
-   "descripcion": "bartender woman, black hair in a bun, white shirt with black vest, black trousers",
+   "descripcion": "bartender woman, black hair in a bun (bun visible on the back of the head), white shirt with black waistcoat, black trousers; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [
     "#2a1a14",
     "#f0c0a0",
@@ -570,15 +594,16 @@
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
       "south",
       "north",
-      "east",
-      "west"
+      "east"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "secar_vaso",
@@ -605,7 +630,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "secar_vaso",
@@ -617,7 +642,40 @@
     ],
     "solo_quieto": true
    },
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/josune.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 302,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head (about 45% of the height), figure about 26 pixels tall and 14 pixels wide, clear dark eyes with a tiny white highlight. A bartender woman: black hair in a neat bun, white shirt with a black waistcoat, black trousers, black shoes, calm smile. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 0)",
+    "guarda": "art/crudo/_ref/josune.png"
+   },
+   "pixellab": {
+    "character_id": "a15a975a-f00b-4dad-aa42-79467b9333c3",
+    "create_image_pro_job": "b6383b24-28b2-4aa1-90ec-d2625a88c7fa",
+    "animation_group_id": {
+     "idle": "c2e7ec23-bd35-4119-8f4f-181003a3f280",
+     "secar_vaso": "76d4b8a8-accc-4167-9ded-b5205d4df01b",
+     "servir": "0ec47bc9-4a43-400a-b5f1-b39f03d2bec4"
+    },
+    "reduce_colors_job": "72c16fc1-0b49-49fc-ac89-61aa6afd7b0e",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 26.1
   },
   {
    "id": "baltasar",
@@ -629,19 +687,14 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/baltasar_south_x2.png"
    ],
-   "descripcion": "bald loan shark in his sixties, short grey beard, purple suit over a white shirt, gold ring, menacing calm",
+   "descripcion": "bald loan shark in his sixties, short grey beard, purple suit jacket over white shirt, dark purple trousers; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [
     "#e0aa84",
     "#9a9aa4",
@@ -655,15 +708,16 @@
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
       "south",
       "north",
-      "east",
-      "west"
+      "east"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "puro",
@@ -690,7 +744,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "puro",
@@ -711,7 +765,40 @@
      -17
     ]
    },
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/baltasar.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 303,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head (about 45% of the height), figure about 26 pixels tall and 15 pixels wide, narrow dark eyes with a tiny white highlight. A bald loan shark in his sixties: short grey beard, menacing calm look, purple suit jacket over a white shirt, dark purple trousers, black shoes, gold ring. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 0)",
+    "guarda": "art/crudo/_ref/baltasar.png"
+   },
+   "pixellab": {
+    "character_id": "f081b9df-3f4e-4261-8369-125c69d2064e",
+    "create_image_pro_job": "677f73bf-9094-42bc-811f-99b58da0f149",
+    "animation_group_id": {
+     "idle": "2bbf2285-9dd4-4f8e-a88e-b224e8f2e0a0",
+     "puro": "deee94b3-ea06-42a1-99f2-c23d98d07923",
+     "contar": "42135950-1989-481a-b656-7189e5710672"
+    },
+    "reduce_colors_job": "aeca3958-b010-4229-a9f2-50464a472306",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 26.1
   },
   {
    "id": "tono",
@@ -723,19 +810,14 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/tono_south_x2.png"
    ],
-   "descripcion": "huge bald bodyguard, thick black moustache, black tracksuit, broad shoulders",
+   "descripcion": "huge bald bodyguard, thick black moustache, black tracksuit with grey stripes, very broad shoulders; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [
     "#d49a74",
     "#1a1a1a",
@@ -748,15 +830,16 @@
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
       "south",
       "north",
-      "east",
-      "west"
+      "east"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "nudillos",
@@ -783,7 +866,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "nudillos",
@@ -804,7 +887,40 @@
      -18
     ]
    },
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/tono.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 304,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, chibi proportions with a big head, figure about 27 pixels tall and 20 pixels wide (bigger and wider than normal people), small stern dark eyes. A huge bald bodyguard: thick black moustache, stern frown, black tracksuit with grey stripes, very broad shoulders and thick arms, black trainers. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 0)",
+    "guarda": "art/crudo/_ref/tono.png"
+   },
+   "pixellab": {
+    "character_id": "79a43454-44d2-4d77-a023-7ae282d1f960",
+    "create_image_pro_job": "664456f1-f8f3-41d1-a6f2-cd6d32b90234",
+    "animation_group_id": {
+     "idle": "59a21e08-9f0f-418f-9a51-a3d0381aedcd",
+     "nudillos": "c2b056fa-1ce0-42b8-b1c8-26ee7312baad",
+     "fumar": "3875341a-49d0-4554-8dd6-6cf2ff99ac31"
+    },
+    "reduce_colors_job": "0f64a672-6831-4a1a-b005-967347af09eb",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 26.1
   },
   {
    "id": "begona",
@@ -816,19 +932,14 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/begona_south_x2.png"
    ],
-   "descripcion": "middle-aged neighbour woman, curly auburn hair, pink blouse, violet trousers",
+   "descripcion": "middle-aged neighbour woman, curly auburn hair, pink blouse, violet trousers; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [
     "#8a4a2a",
     "#f6cca8",
@@ -841,29 +952,30 @@
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "walk",
      "herramienta": "animate_character",
-     "plantilla": "walking-4-frames",
      "direcciones": [
       "south",
       "north",
-      "east",
-      "west"
+      "east"
      ],
      "fps": 8,
      "bucle": true,
-     "sincronia": "un ciclo cada 2 casillas"
+     "sincronia": "un ciclo cada 2 casillas",
+     "modo": "v3",
+     "accion": "walking at a normal pace, simple 4-frame walk cycle with alternating legs and small arm swing, keeps facing the same direction",
+     "frames": 4,
+     "accion_sur": "walking straight toward the viewer, body and face stay fully front-facing in every frame, simple 4-frame walk cycle with alternating legs and small arm swing"
     },
     {
      "nombre": "cotillear",
@@ -878,7 +990,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "cotillear"
@@ -889,7 +1001,41 @@
     ],
     "solo_quieto": true
    },
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/begona.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 305,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head (about 45% of the height), figure about 26 pixels tall and 14 pixels wide, clear dark eyes with a tiny white highlight. A middle-aged chatty neighbour woman: big curly auburn hair, pink blouse, violet trousers, flat shoes, chatty smile. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 0)",
+    "guarda": "art/crudo/_ref/begona.png"
+   },
+   "pixellab": {
+    "character_id": "2bf24501-bb19-4132-9014-001a7cd67681",
+    "create_image_pro_job": "20357a7d-0c6d-4652-ba2f-73cfc9cf1139",
+    "animation_group_id": {
+     "idle": "fb3bfc41-cba1-43c0-b797-f2b6f656e826",
+     "walk": "c52a36bf-359f-453e-afe2-96563faf28df",
+     "cotillear": "0dae6406-ae73-4875-8f3a-61cb1d4553d3",
+     "walk_sur": "0015e548-8aaa-47d1-83c6-47cc74004165"
+    },
+    "reduce_colors_job": "c38b58b6-e029-4c9f-8017-f17e498e99ae",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta. walk sur repetido (el primero giraba de lado)."
+   },
+   "coste_real": 27.1
   },
   {
    "id": "unai",
@@ -901,19 +1047,14 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/kid_south_x2.png"
    ],
-   "descripcion": "young boy around ten, short black hair, yellow t-shirt, blue shorts, energetic",
+   "descripcion": "ten-year-old boy, short black hair, yellow t-shirt, blue shorts, sneakers; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [
     "#2a2a2a",
     "#f6cca8",
@@ -926,29 +1067,29 @@
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "walk",
      "herramienta": "animate_character",
-     "plantilla": "walking-4-frames",
      "direcciones": [
       "south",
       "north",
-      "east",
-      "west"
+      "east"
      ],
      "fps": 8,
      "bucle": true,
-     "sincronia": "un ciclo cada 2 casillas"
+     "sincronia": "un ciclo cada 2 casillas",
+     "modo": "v3",
+     "accion": "walking at a normal pace, simple 4-frame walk cycle with alternating legs and small arm swing, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "pelota",
@@ -963,7 +1104,7 @@
      "bucle": true
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "pelota"
@@ -975,7 +1116,40 @@
     "solo_quieto": true
    },
    "menor": true,
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/unai.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 306,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, chibi proportions with a big head, a ten-year-old boy clearly shorter than adults: figure about 22 pixels tall and 13 pixels wide, big bright eyes with a white highlight, energetic grin. Short black hair, yellow t-shirt, blue shorts, white socks and sneakers. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 17)",
+    "guarda": "art/crudo/_ref/unai.png"
+   },
+   "pixellab": {
+    "character_id": "7dbfe44a-b104-40d9-b2e7-0de9f8b1b39a",
+    "create_image_pro_job": "96e3143a-2adb-4fa3-a8fb-6c5d5f053417",
+    "animation_group_id": {
+     "idle": "a5759df7-2414-4a77-b6f2-b2e3f2d888d7",
+     "walk": "0c733f76-0da0-4418-8de3-1507f912bac5",
+     "pelota": "9131b728-cb0e-4620-aad9-f649d6c91999"
+    },
+    "reduce_colors_job": "60214fd5-fb9c-4622-a114-bf1c115701ea",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 26.1
   },
   {
    "id": "patxi",
@@ -987,19 +1161,14 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/oldman_south_x2.png"
    ],
-   "descripcion": "old man, bald with a white beard, beige jacket, brown trousers, wooden walking cane",
+   "descripcion": "old man, bald with a white beard, beige jacket, brown trousers, wooden walking cane; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [
     "#e8b894",
     "#d8d8d8",
@@ -1012,31 +1181,30 @@
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "palomas",
      "herramienta": "animate_character",
      "modo": "v3",
-     "accion": "throwing breadcrumbs to the ground for pigeons",
+     "accion": "throwing breadcrumbs to the ground",
      "frames": 8,
      "direcciones": [
-      "north",
-      "south"
+      "south",
+      "north"
      ],
      "fps": 8,
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "palomas"
@@ -1047,7 +1215,39 @@
     ],
     "solo_quieto": true
    },
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/patxi.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 307,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head, figure about 25 pixels tall and 15 pixels wide, kind small dark eyes. An old man, slightly hunched: bald head with a bushy white beard, beige jacket, brown trousers, brown shoes, holding a wooden walking cane in one hand. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 16)",
+    "guarda": "art/crudo/_ref/patxi.png"
+   },
+   "pixellab": {
+    "character_id": "f8980934-993a-45fb-91f7-6fbd148f3b41",
+    "create_image_pro_job": "aef3b11f-75bd-470c-ae2b-9a7f54dd2136",
+    "animation_group_id": {
+     "idle": "b1fb0a07-79e9-4f7a-968f-6a709ae9d266",
+     "palomas": "a60f0040-7875-4878-bd0d-c5ca7c03f014"
+    },
+    "reduce_colors_job": "96c4f113-e64c-4fb3-83b7-6abb7ae8f0a3",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 24.1
   },
   {
    "id": "txaro",
@@ -1059,19 +1259,14 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/granny_south_x2.png"
    ],
-   "descripcion": "elderly woman, grey hair in a bun, round glasses, purple cardigan, dark skirt",
+   "descripcion": "elderly grandmother, grey hair in a bun, round glasses, purple cardigan, dark plum skirt; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [
     "#f0c8a8",
     "#e0e0e8",
@@ -1084,15 +1279,14 @@
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "punto",
@@ -1107,7 +1301,7 @@
      "bucle": true
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "punto"
@@ -1118,7 +1312,39 @@
     ],
     "solo_quieto": true
    },
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/txaro.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 308,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head, an elderly grandmother a little shorter than adults: figure about 24 pixels tall and 14 pixels wide, kind smile. Grey hair in a bun, round glasses, purple cardigan, dark plum skirt, dark shoes. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 4)",
+    "guarda": "art/crudo/_ref/txaro.png"
+   },
+   "pixellab": {
+    "character_id": "9fb775e3-5e14-4565-bd3f-d0702a8f6793",
+    "create_image_pro_job": "1c8795d1-b758-4180-88b1-5951ba441a01",
+    "animation_group_id": {
+     "idle": "fa8b7308-3eae-4533-a3b2-02b214e93a45",
+     "punto": "8bdc1652-08d3-49e7-9eef-34737c3376e2"
+    },
+    "reduce_colors_job": "afbf0228-529d-49ea-aa91-ccbee0bd00b8",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 23.1
   },
   {
    "id": "inaki",
@@ -1130,19 +1356,14 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/sailor_south_x2.png"
    ],
-   "descripcion": "weathered sailor, navy cap with a white band, white sweater with blue stripes, brown beard, navy trousers",
+   "descripcion": "weathered sailor, navy captain cap with the peak in front, brown beard, white sweater with blue stripes, navy trousers; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [
     "#d8a07a",
     "#5a3a24",
@@ -1156,15 +1377,14 @@
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "pipa",
@@ -1173,8 +1393,8 @@
      "accion": "smoking a wooden pipe, puffing",
      "frames": 8,
      "direcciones": [
-      "west",
-      "south"
+      "south",
+      "west"
      ],
      "fps": 8,
      "bucle": false
@@ -1192,7 +1412,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "pipa",
@@ -1213,7 +1433,40 @@
      -17
     ]
    },
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/inaki.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 309,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head (about 45% of the height), figure about 26 pixels tall and 15 pixels wide, small dark eyes with a white highlight. A weathered old sailor: navy captain cap with a white band, bushy brown beard, white sweater with blue horizontal stripes, navy trousers, dark boots. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 20)",
+    "guarda": "art/crudo/_ref/inaki.png"
+   },
+   "pixellab": {
+    "character_id": "19d939ba-6847-4c02-89ee-81b3a17dfc26",
+    "create_image_pro_job": "2323eedf-44fd-4458-89d0-2972aa6b7a71",
+    "animation_group_id": {
+     "idle": "2da3d9a9-cfd3-4223-8fdb-e39f4bdc9aa9",
+     "pipa": "8fe340b1-de42-4943-b8f4-f777d589e27d",
+     "cabo": "8b410713-2425-4e86-a3e8-9cbff90e929f"
+    },
+    "reduce_colors_job": "798cb6ab-9d68-4e8a-837b-955ea6cc4f62",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 25.1
   },
   {
    "id": "cop",
@@ -1225,19 +1478,14 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/cop_south_x2.png"
    ],
-   "descripcion": "police officer, navy peaked cap, light blue shirt, navy tie and trousers, radio on the shoulder",
+   "descripcion": "police officer, navy peaked cap with the peak in front, light blue shirt, navy tie and trousers, radio on the shoulder; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [
     "#eab890",
     "#2a2a2a",
@@ -1251,29 +1499,29 @@
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "walk",
      "herramienta": "animate_character",
-     "plantilla": "walking-4-frames",
      "direcciones": [
       "south",
       "north",
-      "east",
-      "west"
+      "east"
      ],
      "fps": 8,
      "bucle": true,
-     "sincronia": "un ciclo cada 2 casillas"
+     "sincronia": "un ciclo cada 2 casillas",
+     "modo": "v3",
+     "accion": "walking at a normal pace, simple 4-frame walk cycle with alternating legs and small arm swing, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "radio",
@@ -1288,7 +1536,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "radio"
@@ -1299,7 +1547,40 @@
     ],
     "solo_quieto": true
    },
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/cop.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 310,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head (about 45% of the height), figure about 26 pixels tall and 15 pixels wide, serious dark eyes. A police officer: navy peaked cap, light blue short-sleeve shirt, navy tie, navy trousers, black shoes, small black radio on the shoulder. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 0)",
+    "guarda": "art/crudo/_ref/cop.png"
+   },
+   "pixellab": {
+    "character_id": "2a3cc069-a412-4f9e-aa43-249b218ec67f",
+    "create_image_pro_job": "819202a7-3498-4c6f-ae86-9aae0ca1e27b",
+    "animation_group_id": {
+     "idle": "09e3eac0-1d1b-46fb-9c72-383a508b7162",
+     "walk": "1bf8b335-7934-4b14-85d9-8ae6b52dacfd",
+     "radio": "70743f33-596c-4767-9155-f7d7e59714b2"
+    },
+    "reduce_colors_job": "88139e4e-d822-49b4-b474-5a24a073683f",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 26.1
   },
   {
    "id": "molina",
@@ -1311,19 +1592,14 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/molina_south_x2.png"
    ],
-   "descripcion": "corrupt police sergeant with a belly, navy cap with a gold band, darker blue shirt with a gold badge, grey moustache, smug",
+   "descripcion": "corrupt police sergeant with a round belly, navy peaked cap with gold band and the peak in front, navy shirt with gold badge, grey moustache, navy trousers; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [
     "#dca07c",
     "#4a4a4a",
@@ -1338,15 +1614,14 @@
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "fumar",
@@ -1361,7 +1636,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "fumar"
@@ -1381,7 +1656,39 @@
      -18
     ]
    },
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/molina.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 311,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing and facing the viewer, full body, feet at the bottom. Polished professional pixel art, chibi proportions with a big head, figure about 26 pixels tall and 17 pixels wide, smug half-closed eyes and a smug grin. A corrupt police sergeant with a round belly: navy peaked cap with a gold band, darker blue shirt with a gold badge, thick grey moustache, navy trousers, black shoes. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 0)",
+    "guarda": "art/crudo/_ref/molina.png"
+   },
+   "pixellab": {
+    "character_id": "dd962961-37e9-4e66-954c-c05b6d44fabc",
+    "create_image_pro_job": "f6e0747b-8041-4351-83ee-0c710e14a825",
+    "animation_group_id": {
+     "idle": "32bac8c1-56e6-4660-831e-89575aa3406c",
+     "fumar": "e6b220f1-0b29-40fe-843f-f655d4343ecb"
+    },
+    "reduce_colors_job": "887c7bc5-b2c7-48be-a4fe-6c28b8d48e31",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 23.1
   },
   {
    "id": "darko",
@@ -1393,19 +1700,14 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/darko_south_x2.png"
    ],
-   "descripcion": "cocky young rival, black hoodie with the hood up and red drawstrings, dark trousers, smirk",
+   "descripcion": "cocky young rival, black hoodie with the hood up and red drawstrings, dark grey trousers, white sneakers; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [
     "#f2c4a0",
     "#101014",
@@ -1419,15 +1721,14 @@
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "vapear",
@@ -1443,7 +1744,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "vapear"
@@ -1463,7 +1764,39 @@
      -18
     ]
    },
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/darko.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 312,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head (about 45% of the height), figure about 26 pixels tall and 14 pixels wide, cocky narrow eyes and a smirk. A cocky young rival: black hoodie with the hood up and red drawstrings, dark grey trousers, white sneakers, hands in the hoodie pocket. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 1)",
+    "guarda": "art/crudo/_ref/darko.png"
+   },
+   "pixellab": {
+    "character_id": "cb542372-a943-46ae-aae9-e2a26ba7f478",
+    "create_image_pro_job": "39227d2e-2687-4f1a-9aef-9af676e51498",
+    "animation_group_id": {
+     "idle": "ca5c8f25-1f7f-4fd9-99ea-6bbaaf355de4",
+     "vapear": "42d3ddc9-273d-416a-8910-b4bfcd776381"
+    },
+    "reduce_colors_job": "d53e530b-874e-4696-b75a-b309cc03140d",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 24.1
   },
   {
    "id": "jurado",
@@ -1475,19 +1808,14 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/judge_south_x2.png"
    ],
-   "descripcion": "competition judge, short brown hair, glasses, charcoal suit, gold tie, holding a clipboard",
+   "descripcion": "competition judge, short brown hair, glasses, charcoal suit, gold tie, holding a clipboard; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [
     "#f0c4a0",
     "#6a4a2a",
@@ -1501,15 +1829,14 @@
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "notas",
@@ -1524,7 +1851,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "notas"
@@ -1535,7 +1862,39 @@
     ],
     "solo_quieto": true
    },
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/jurado.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 313,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head (about 45% of the height), figure about 26 pixels tall and 14 pixels wide, serious eyes behind small glasses. A competition judge: short brown hair, glasses, charcoal grey suit, gold tie, white shirt, black shoes, holding a clipboard. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 0)",
+    "guarda": "art/crudo/_ref/jurado.png"
+   },
+   "pixellab": {
+    "character_id": "d9285e6a-b9df-4ef7-85bd-13aece68fcb0",
+    "create_image_pro_job": "faeff09a-4c1e-4b4e-81c5-3d2030e7b195",
+    "animation_group_id": {
+     "idle": "091084d8-ef92-4ee0-9531-49f8c7c7e95c",
+     "notas": "ff73ba75-4aa6-4ba2-8ce2-b46c2088c237"
+    },
+    "reduce_colors_job": "cec56d7b-949b-43db-ac58-80d33a321779",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 23.1
   },
   {
    "id": "cliente1",
@@ -1546,48 +1905,43 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/cliente1_south_x2.png"
    ],
-   "descripcion": "ordinary townsperson in casual clothes, varied hairstyle (see reference image for colours)",
+   "descripcion": "university student, messy brown hair, blue hoodie, grey jeans, backpack, white sneakers; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [],
    "celda": "personaje",
    "animaciones": [
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "walk",
      "herramienta": "animate_character",
-     "plantilla": "walking-4-frames",
      "direcciones": [
       "south",
       "north",
-      "east",
-      "west"
+      "east"
      ],
      "fps": 8,
      "bucle": true,
-     "sincronia": "un ciclo cada 2 casillas"
+     "sincronia": "un ciclo cada 2 casillas",
+     "modo": "v3",
+     "accion": "walking at a normal pace, simple 4-frame walk cycle with alternating legs and small arm swing, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "movil",
@@ -1602,7 +1956,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "movil"
@@ -1614,7 +1968,40 @@
     "solo_quieto": true
    },
    "notas": "Variantes de cliente: los colores salen de la referencia (randLook). Usa reference_image y create_character con mode v3 si el modo standard cambia demasiado los colores.",
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/cliente1.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 314,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head (about 45% of the height), figure about 26 pixels tall and 14 pixels wide, clear dark eyes with a tiny white highlight. A university student: messy brown hair, blue hoodie, grey jeans, backpack straps on the shoulders, white sneakers. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 0)",
+    "guarda": "art/crudo/_ref/cliente1.png"
+   },
+   "pixellab": {
+    "character_id": "51ea77ef-2f48-4e4e-9d61-bb213a4da342",
+    "create_image_pro_job": "fdaad482-da3c-4389-a512-934d56816813",
+    "animation_group_id": {
+     "idle": "3996f26f-28fb-4738-be7b-c9d6d33f5106",
+     "walk": "9689b274-99ce-4d68-9ae7-1689385ca59d",
+     "movil": "b922cf7a-d1d2-4c63-9f6a-edcdd4c512f8"
+    },
+    "reduce_colors_job": "d6e61147-a039-4e3a-9f8a-102a428fad09",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 26.1
   },
   {
    "id": "cliente2",
@@ -1625,48 +2012,44 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/cliente2_south_x2.png"
    ],
-   "descripcion": "ordinary townsperson in casual clothes, varied hairstyle (see reference image for colours)",
+   "descripcion": "adult construction worker, short black hair, orange high-visibility vest over grey t-shirt, dark work trousers, brown boots; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [],
    "celda": "personaje",
    "animaciones": [
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "walk",
      "herramienta": "animate_character",
-     "plantilla": "walking-4-frames",
      "direcciones": [
       "south",
       "north",
-      "east",
-      "west"
+      "east"
      ],
      "fps": 8,
      "bucle": true,
-     "sincronia": "un ciclo cada 2 casillas"
+     "sincronia": "un ciclo cada 2 casillas",
+     "modo": "v3",
+     "accion": "walking at a normal pace, simple 4-frame walk cycle with alternating legs and small arm swing, keeps facing the same direction",
+     "frames": 4,
+     "accion_sur": "walking straight toward the viewer, body and face stay fully front-facing in every frame, simple 4-frame walk cycle with alternating legs and small arm swing"
     },
     {
      "nombre": "fumar",
@@ -1681,7 +2064,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "fumar"
@@ -1702,7 +2085,40 @@
     ]
    },
    "notas": "Variantes de cliente: los colores salen de la referencia (randLook). Usa reference_image y create_character con mode v3 si el modo standard cambia demasiado los colores.",
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/cliente2.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 315,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head (about 45% of the height), figure about 26 pixels tall and 15 pixels wide, tired dark eyes. An adult construction worker: short black hair, stubble, orange high-visibility vest over a grey t-shirt, dark work trousers, brown work boots. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 0)",
+    "guarda": "art/crudo/_ref/cliente2.png"
+   },
+   "pixellab": {
+    "character_id": "9eb85a5c-690f-45d6-b956-b1412f1b5e49",
+    "create_image_pro_job": "b2980113-35c6-4ea7-bf1f-326df37d2e2a",
+    "animation_group_id": {
+     "idle": "f257d028-6a7c-48a1-a80d-ae9980eb16a5",
+     "walk": "f34f0adf-8d1d-45b3-9977-5d6be49e6521",
+     "fumar": "3a56a779-8b44-4b9b-814e-7a0e0d1eb942"
+    },
+    "reduce_colors_job": "c2179d77-6c32-4b71-adc9-e7b1069e17a0",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 26.1
   },
   {
    "id": "cliente3",
@@ -1713,48 +2129,44 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/cliente3_south_x2.png"
    ],
-   "descripcion": "ordinary townsperson in casual clothes, varied hairstyle (see reference image for colours)",
+   "descripcion": "tourist, straw sun hat, teal flowered short-sleeve shirt, khaki shorts, sandals; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [],
    "celda": "personaje",
    "animaciones": [
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "walk",
      "herramienta": "animate_character",
-     "plantilla": "walking-4-frames",
      "direcciones": [
       "south",
       "north",
-      "east",
-      "west"
+      "east"
      ],
      "fps": 8,
      "bucle": true,
-     "sincronia": "un ciclo cada 2 casillas"
+     "sincronia": "un ciclo cada 2 casillas",
+     "modo": "v3",
+     "accion": "walking at a normal pace, simple 4-frame walk cycle with alternating legs and small arm swing, keeps facing the same direction",
+     "frames": 4,
+     "accion_sur": "walking straight toward the viewer, body and face stay fully front-facing in every frame, simple 4-frame walk cycle with alternating legs and small arm swing"
     },
     {
      "nombre": "movil",
@@ -1769,7 +2181,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "movil"
@@ -1781,7 +2193,40 @@
     "solo_quieto": true
    },
    "notas": "Variantes de cliente: los colores salen de la referencia (randLook). Usa reference_image y create_character con mode v3 si el modo standard cambia demasiado los colores.",
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/cliente3.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 316,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head (about 45% of the height), figure about 26 pixels tall and 15 pixels wide, cheerful eyes. A tourist: straw sun hat, teal flowered short-sleeve shirt, khaki shorts, sandals, a small camera hanging on the chest. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 2)",
+    "guarda": "art/crudo/_ref/cliente3.png"
+   },
+   "pixellab": {
+    "character_id": "5d07b967-fd14-4a34-bb43-5cfc6f34669f",
+    "create_image_pro_job": "b1c99cdc-233a-4b3f-ba6a-568b87387b13",
+    "animation_group_id": {
+     "idle": "21fbf712-9d22-4875-aa01-893226f06892",
+     "walk": "908c35bc-dc5b-4d2e-85be-15d11b6d0318",
+     "movil": "659bd01b-0227-4a30-b584-7eea759b93bd"
+    },
+    "reduce_colors_job": "9dfcfa84-e4f9-4df3-ae1d-b364cd8e45c7",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 26.1
   },
   {
    "id": "cliente4",
@@ -1792,48 +2237,44 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/cliente4_south_x2.png"
    ],
-   "descripcion": "ordinary townsperson in casual clothes, varied hairstyle (see reference image for colours)",
+   "descripcion": "posh young man, slicked-back blond hair, pink polo shirt, beige chinos, loafers; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [],
    "celda": "personaje",
    "animaciones": [
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "walk",
      "herramienta": "animate_character",
-     "plantilla": "walking-4-frames",
      "direcciones": [
       "south",
       "north",
-      "east",
-      "west"
+      "east"
      ],
      "fps": 8,
      "bucle": true,
-     "sincronia": "un ciclo cada 2 casillas"
+     "sincronia": "un ciclo cada 2 casillas",
+     "modo": "v3",
+     "accion": "walking at a normal pace, simple 4-frame walk cycle with alternating legs and small arm swing, keeps facing the same direction",
+     "frames": 4,
+     "accion_sur": "walking straight toward the viewer, body and face stay fully front-facing in every frame, simple 4-frame walk cycle with alternating legs and small arm swing"
     },
     {
      "nombre": "movil",
@@ -1848,7 +2289,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "movil"
@@ -1860,7 +2301,40 @@
     "solo_quieto": true
    },
    "notas": "Variantes de cliente: los colores salen de la referencia (randLook). Usa reference_image y create_character con mode v3 si el modo standard cambia demasiado los colores.",
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/cliente4.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 317,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head (about 45% of the height), figure about 26 pixels tall and 14 pixels wide, confident eyes. A posh young man: slicked-back blond hair, pink polo shirt with a collar, beige chinos, brown loafers, sweater tied over the shoulders. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 16)",
+    "guarda": "art/crudo/_ref/cliente4.png"
+   },
+   "pixellab": {
+    "character_id": "880e9641-a0be-47e1-8947-475c71025930",
+    "create_image_pro_job": "2e47f334-d8c5-4592-8763-969fcb1e6030",
+    "animation_group_id": {
+     "idle": "a5ebffc0-2937-4ba0-8dd3-0337b9487292",
+     "walk": "21e42537-8837-41d8-8616-53c304096e2c",
+     "movil": "fc65ff3f-b79e-4b38-8d41-ede57013849a"
+    },
+    "reduce_colors_job": "c5eab3cf-81b8-406c-af2b-3d08b0d2239f",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 26.1
   },
   {
    "id": "cliente5",
@@ -1871,48 +2345,44 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/cliente5_south_x2.png"
    ],
-   "descripcion": "ordinary townsperson in casual clothes, varied hairstyle (see reference image for colours)",
+   "descripcion": "adult woman, long dark red hair, black leather jacket over white top, black jeans, black boots; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [],
    "celda": "personaje",
    "animaciones": [
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "walk",
      "herramienta": "animate_character",
-     "plantilla": "walking-4-frames",
      "direcciones": [
       "south",
       "north",
-      "east",
-      "west"
+      "east"
      ],
      "fps": 8,
      "bucle": true,
-     "sincronia": "un ciclo cada 2 casillas"
+     "sincronia": "un ciclo cada 2 casillas",
+     "modo": "v3",
+     "accion": "walking at a normal pace, simple 4-frame walk cycle with alternating legs and small arm swing, keeps facing the same direction",
+     "frames": 4,
+     "accion_sur": "walking straight toward the viewer, body and face stay fully front-facing in every frame, simple 4-frame walk cycle with alternating legs and small arm swing"
     },
     {
      "nombre": "fumar",
@@ -1927,7 +2397,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "fumar"
@@ -1948,7 +2418,40 @@
     ]
    },
    "notas": "Variantes de cliente: los colores salen de la referencia (randLook). Usa reference_image y create_character con mode v3 si el modo standard cambia demasiado los colores.",
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/cliente5.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 318,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head (about 45% of the height), figure about 26 pixels tall and 14 pixels wide, clear eyes with a white highlight. An adult woman in her thirties: long dark red hair, black leather jacket over a white top, black jeans, black boots. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 0)",
+    "guarda": "art/crudo/_ref/cliente5.png"
+   },
+   "pixellab": {
+    "character_id": "5d7cfe60-706c-4d32-b781-1d36fb51facc",
+    "create_image_pro_job": "75ddba10-065a-4cd3-8851-27f07afb3b61",
+    "animation_group_id": {
+     "idle": "3213518d-c2f0-4c27-82aa-12c83833bd8d",
+     "walk": "acaefbc9-9623-4ed3-baaf-0c9eddc2f0aa",
+     "fumar": "8b7fc725-a0bd-49e3-b22f-b113455e0958"
+    },
+    "reduce_colors_job": "d7cb360c-5ceb-4f97-a382-77ce70eb6d0f",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 26.1
   },
   {
    "id": "cliente6",
@@ -1959,48 +2462,44 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 32,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"chibi\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/cliente6_south_x2.png"
    ],
-   "descripcion": "ordinary townsperson in casual clothes, varied hairstyle (see reference image for colours)",
+   "descripcion": "young woman, blonde hair in a high ponytail, purple sweatshirt, light blue jeans, white sneakers; 32-bit handheld RPG overworld sprite, chibi, clean outline",
    "colores_identidad": [],
    "celda": "personaje",
    "animaciones": [
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
-      "south",
-      "north",
-      "east",
-      "west"
+      "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "walk",
      "herramienta": "animate_character",
-     "plantilla": "walking-4-frames",
      "direcciones": [
       "south",
       "north",
-      "east",
-      "west"
+      "east"
      ],
      "fps": 8,
      "bucle": true,
-     "sincronia": "un ciclo cada 2 casillas"
+     "sincronia": "un ciclo cada 2 casillas",
+     "modo": "v3",
+     "accion": "walking at a normal pace, simple 4-frame walk cycle with alternating legs and small arm swing, keeps facing the same direction",
+     "frames": 4,
+     "accion_sur": "walking straight toward the viewer, body and face stay fully front-facing in every frame, simple 4-frame walk cycle with alternating legs and small arm swing"
     },
     {
      "nombre": "movil",
@@ -2015,7 +2514,7 @@
      "bucle": false
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "ambiente": {
     "acciones": [
      "movil"
@@ -2027,7 +2526,40 @@
     "solo_quieto": true
    },
    "notas": "Variantes de cliente: los colores salen de la referencia (randLook). Usa reference_image y create_character con mode v3 si el modo standard cambia demasiado los colores.",
-   "familia": "personaje"
+   "familia": "personaje",
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/cliente6.png"
+   },
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 32,
+     "height": 32,
+     "no_background": true,
+     "seed": 319,
+     "description": "Front-facing overworld walking sprite for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art, compact chibi proportions with a big head (about 45% of the height), figure about 26 pixels tall and 14 pixels wide, bright eyes with a white highlight. A young woman: blonde hair in a high ponytail, purple sweatshirt, light blue jeans, white sneakers. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, no text, transparent background.",
+     "style_image": "art/crudo/_ref/player.png",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 64 candidatos (se eligió el 4)",
+    "guarda": "art/crudo/_ref/cliente6.png"
+   },
+   "pixellab": {
+    "character_id": "3c65edf2-8782-404f-95e2-af46de2b2ef9",
+    "create_image_pro_job": "5493b34e-0e17-4625-8be3-9a0ba1626b43",
+    "animation_group_id": {
+     "idle": "a488a578-9024-4b16-8a09-3c180efe6fe7",
+     "walk": "210f79ef-504b-4e3f-9edc-384d060cf22b",
+     "movil": "b44883bb-5ffe-4d74-87e5-13943372d9be"
+    },
+    "reduce_colors_job": "6b2edccb-c295-42d7-b22d-4ea8acfeff94",
+    "notas_animacion": "v3 a medida, keep_first_frame false. idle solo en las direcciones listadas (el motor dibuja base en las demás); walk sur/norte/este, oeste en espejo. reduce_colors (15) con los fotogramas del tamaño mayoritario; el resto y las rotaciones, al color más cercano de esa paleta."
+   },
+   "coste_real": 26.1
   },
   {
    "id": "player-combate",
