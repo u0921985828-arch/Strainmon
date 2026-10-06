@@ -12,6 +12,9 @@ Reglas:
 3. PROHIBIDO emitir mensajes intermedios.
 4. Excepción: bloqueo crítico → preguntar máx. 1 línea.
 5. Estilo: frases ultracortas, máxima densidad técnica.
+6. Aviso de progreso `(trabajando · NN.N %)`: % calculado por script con sub-pasos
+   (cada llamada o job cuenta), estrictamente creciente. Nunca repetir un % ni escribirlo
+   a mano; si el estado no cambió, no se emite.
 
 Variante `[MODO:Ejecutor_Absoluto]` (auditoría/refactor): mismas reglas + salida =
 informe técnico directo + código refactorizado, sin relleno.
