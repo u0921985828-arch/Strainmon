@@ -3,7 +3,7 @@
  "imagen": "atlas.png",
  "tamano": [
   1024,
-  64
+  32
  ],
  "frames": {
   "player/base/east/00": {
@@ -24,201 +24,75 @@
    "w": 32,
    "h": 32
   },
-  "player/base/west/00": {
-   "x": 96,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/east/00": {
-   "x": 128,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/east/01": {
-   "x": 160,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/east/02": {
-   "x": 192,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/east/03": {
-   "x": 224,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/north/00": {
-   "x": 256,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/north/01": {
-   "x": 288,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/north/02": {
-   "x": 320,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/north/03": {
-   "x": 352,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/south/00": {
-   "x": 384,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/south/01": {
-   "x": 416,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/south/02": {
-   "x": 448,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/south/03": {
-   "x": 480,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/west/00": {
-   "x": 512,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/west/01": {
-   "x": 544,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/west/02": {
-   "x": 576,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/idle/west/03": {
-   "x": 608,
-   "y": 0,
-   "w": 32,
-   "h": 32
-  },
   "player/walk/east/00": {
-   "x": 640,
+   "x": 96,
    "y": 0,
    "w": 32,
    "h": 32
   },
   "player/walk/east/01": {
-   "x": 672,
+   "x": 128,
    "y": 0,
    "w": 32,
    "h": 32
   },
   "player/walk/east/02": {
-   "x": 704,
+   "x": 160,
    "y": 0,
    "w": 32,
    "h": 32
   },
   "player/walk/east/03": {
-   "x": 736,
+   "x": 192,
    "y": 0,
    "w": 32,
    "h": 32
   },
   "player/walk/north/00": {
-   "x": 768,
+   "x": 224,
    "y": 0,
    "w": 32,
    "h": 32
   },
   "player/walk/north/01": {
-   "x": 800,
+   "x": 256,
    "y": 0,
    "w": 32,
    "h": 32
   },
   "player/walk/north/02": {
-   "x": 832,
+   "x": 288,
    "y": 0,
    "w": 32,
    "h": 32
   },
   "player/walk/north/03": {
-   "x": 864,
+   "x": 320,
    "y": 0,
    "w": 32,
    "h": 32
   },
   "player/walk/south/00": {
-   "x": 896,
+   "x": 352,
    "y": 0,
    "w": 32,
    "h": 32
   },
   "player/walk/south/01": {
-   "x": 928,
+   "x": 384,
    "y": 0,
    "w": 32,
    "h": 32
   },
   "player/walk/south/02": {
-   "x": 960,
+   "x": 416,
    "y": 0,
    "w": 32,
    "h": 32
   },
   "player/walk/south/03": {
-   "x": 992,
+   "x": 448,
    "y": 0,
-   "w": 32,
-   "h": 32
-  },
-  "player/walk/west/00": {
-   "x": 0,
-   "y": 32,
-   "w": 32,
-   "h": 32
-  },
-  "player/walk/west/01": {
-   "x": 32,
-   "y": 32,
-   "w": 32,
-   "h": 32
-  },
-  "player/walk/west/02": {
-   "x": 64,
-   "y": 32,
-   "w": 32,
-   "h": 32
-  },
-  "player/walk/west/03": {
-   "x": 96,
-   "y": 32,
    "w": 32,
    "h": 32
   }
@@ -247,39 +121,6 @@
      ],
      "south": [
       "player/base/south/00"
-     ],
-     "west": [
-      "player/base/west/00"
-     ]
-    }
-   },
-   "idle": {
-    "fps": 4,
-    "bucle": true,
-    "dirs": {
-     "east": [
-      "player/idle/east/00",
-      "player/idle/east/01",
-      "player/idle/east/02",
-      "player/idle/east/03"
-     ],
-     "north": [
-      "player/idle/north/00",
-      "player/idle/north/01",
-      "player/idle/north/02",
-      "player/idle/north/03"
-     ],
-     "south": [
-      "player/idle/south/00",
-      "player/idle/south/01",
-      "player/idle/south/02",
-      "player/idle/south/03"
-     ],
-     "west": [
-      "player/idle/west/00",
-      "player/idle/west/01",
-      "player/idle/west/02",
-      "player/idle/west/03"
      ]
     }
    },
@@ -304,12 +145,6 @@
       "player/walk/south/01",
       "player/walk/south/02",
       "player/walk/south/03"
-     ],
-     "west": [
-      "player/walk/west/00",
-      "player/walk/west/01",
-      "player/walk/west/02",
-      "player/walk/west/03"
      ]
     }
    }

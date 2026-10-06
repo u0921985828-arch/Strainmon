@@ -247,7 +247,7 @@
    "referencias": [
     "art/referencias/estilo/player_south_x2.png"
    ],
-   "descripcion": "same chibi young man rotated: green baseball cap with the visor in front (side views: visor sticks out toward the facing direction; back view: round back of the cap), dark brown hair, light skin, red t-shirt, navy jeans, sneakers. 32-bit handheld RPG overworld sprite, clean outline.",
+   "descripcion": "tiny chibi overworld boy (16×16 px figure): green cap with visor in front, black hair, two 1×2 black eye dashes and no mouth, red t-shirt, navy jeans, dark shoes; black 1px outline, flat 2-3 tone shading",
    "colores_identidad": [
     "#2fa868",
     "#1a6a40",
@@ -272,7 +272,8 @@
      "bucle": true,
      "modo": "v3",
      "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
-     "frames": 4
+     "frames": 4,
+     "omitida": "estático, como en los RPG de portátil: sin idle se dibuja base"
     },
     {
      "nombre": "walk",
@@ -288,7 +289,8 @@
      "sincronia": "un ciclo cada 2 casillas",
      "modo": "v3",
      "accion": "walking at a normal pace, simple 4-frame walk cycle with alternating legs and small arm swing, keeps facing the same direction",
-     "frames": 4
+     "frames": 4,
+     "hecho_con": "edit_image_pixen sobre cada vista (pie izquierdo / pie derecho); ciclo paso, base, paso, base; norte: el segundo paso es el espejo del primero"
     },
     {
      "nombre": "run",
@@ -398,17 +400,32 @@
     }
    ],
    "estado": "procesado",
-   "notas": "Es el ancla de estilo: todo lo demás se compara con él. Se aprueba a mano antes de seguir. F1c: create_image_pro (64 candidatos) → v3 con referencia → idle y walk v3 a medida; 27-28 px, 13 colores; pendiente de aprobación. run y acciones (regar…) tras aprobar.",
+   "notas": "Es el ancla de estilo: todo lo demás se compara con él. Se aprueba a mano antes de seguir. F1d: escala de RPG de portátil 2004 (figura de 16×16 px, cara de dos ojos sin boca); base en 3 vistas + walk; sin idle; oeste en espejo; 14 colores; pendiente de aprobación. Los NPC procedurales (16×20) quedan más altos hasta F3.",
    "familia": "personaje",
    "pixellab": {
-    "character_id": "e2d276ce-8b08-49d8-89c8-b20f77cb1a8c",
-    "create_image_pro_job": "60afdb75-af23-4158-9fdd-74c0161e5b53",
-    "animation_group_id": {
-     "idle": "01068679-4a5c-4a2f-ac07-e1ee5e05091a",
-     "walk": "3d617030-d465-4fb9-9bdd-7a3d043812ee"
+    "create_image_pro_job": "92321c32-6d12-430a-b8a8-ae22197949a2",
+    "vistas": {
+     "south": "create_image_pro 92321c32 #0",
+     "east": "edit_image_pixen 1e7a5dbd",
+     "north": "edit_image_pixen 26e4a9e4",
+     "west": "espejo del este (motor)"
     },
-    "reduce_colors_job": "b30799bd-ef31-4816-a023-a1f28da79452",
-    "notas_animacion": "keep_first_frame false. Las plantillas breathing-idle/walking-4-frames sobre este personaje v3 salían de espaldas mirando al sur: no usarlas. Las rotaciones (32×32) se rellenaron a 40×40 sin tocar píxeles para el reduce_colors conjunto.",
+    "walk": {
+     "south": [
+      "7d832545-c74e-4421-90d9-54d86b203944",
+      "11ae7fe8-4918-485f-9ae5-cc36c9e69219"
+     ],
+     "north": [
+      "4115a4cf-8fe3-4622-b3a1-a167efd9cf84",
+      "espejo"
+     ],
+     "east": [
+      "e4bb12f4-f8a3-4299-b5d5-42404364ba8b",
+      "acb2a0c0-59ea-4fc1-bf26-4521ff8f5e53"
+     ]
+    },
+    "reduce_colors_job": "4c02ebb3-bd18-4f81-a786-2fbe6664407c",
+    "notas": "A 16 px, create_character v3 desdibuja los perfiles y create_image_pro con referencia (hoja de 4 vistas o vistas sueltas) sale troceado o a otra escala; edit_image_pixen sobre el frontal conserva tamaño y estilo (1 gen por vista o paso).",
     "descartados": {
      "fcb0e6ed-b020-44a3-87fb-6188883c4694": "size 32 preset chibi: 34-35 px, no cabe",
      "fb449cd4-f866-4583-9a91-ee1d03188dee": "size 32: 34-35 px",
@@ -421,23 +438,29 @@
      "92cf0316-228f-47ab-800c-74c24b39f22e": "v3: gorra del revés en perfiles",
      "6c1d762c-f33c-4c9f-890f-9411a8bea603": "v3: visera a los dos lados",
      "db0d3880-f02c-410d-948d-2ace05f278d3": "F1b (22-23 px): «feos», caras, proporciones, color y contorno",
-     "8353c2bf-5984-465c-8d01-b4038a2a951f": "v3 del Pro 17: camiseta más apagada"
+     "8353c2bf-5984-465c-8d01-b4038a2a951f": "v3 del Pro 17: camiseta más apagada",
+     "e2d276ce-8b08-49d8-89c8-b20f77cb1a8c": "F1c Pro 27-28 px: «no es estilo de portátil 2004», caras raras",
+     "dcf4fd9c-24ea-45c1-ac85-b36bb21eb21a": "v3 a 16 px: perfiles emborronados y flotando",
+     "a86db90b-2da0-4517-b685-69ea3e224357": "v3 a 16 px: pelo emborronado",
+     "16d4894e-e289-4863-9132-56a5ff7ca7fa": "hoja de 4 vistas: escalas distintas y armas",
+     "d436739d-7dbb-42e9-9d59-7760a47ac2a4": "vista lateral Pro: troceada",
+     "4846d168-95b3-40a7-be6e-6bfd12343158": "vista de espaldas Pro: troceada"
     }
    },
-   "coste_real": 99,
+   "coste_real": 195,
    "entrada": {
     "reference_image_base64": "art/crudo/_ref/player.png"
    },
    "previo": {
     "herramienta": "create_image_pro",
     "parametros": {
-     "width": 32,
-     "height": 32,
+     "width": 16,
+     "height": 24,
      "no_background": true,
-     "seed": 2026,
-     "description": "Front-facing overworld walking sprite of a young man for an early-2000s 32-bit handheld top-down RPG, standing straight and facing the viewer, full body, feet at the bottom. Polished professional pixel art: compact chibi proportions, figure about 22 pixels tall and 14 pixels wide, big head about 45% of the height, large friendly dark eyes with a tiny white highlight, small smile. Green baseball cap worn forwards with a darker green visor, short dark brown hair, light skin, bright red t-shirt, navy blue jeans, white and dark sneakers. Clean continuous 1px dark outline, 3 to 4 tone cel shading per material with light from the top-left, bright saturated limited palette, crisp pixels, no anti-aliasing, no dithering, no gradients, transparent background."
+     "seed": 2004,
+     "description": "Tiny overworld town-map character sprite for a 2004-era handheld RPG, 16 pixels wide and about 22 pixels tall, standing and facing the viewer, feet at the bottom. Classic handheld overworld style: very large round head (about half of the total height) and a short compact body with short legs. Minimal face: only two small black vertical eye dashes (1x2 pixels each), NO mouth, NO nose. Green baseball cap with a darker green visor over the forehead, short dark brown hair showing at the sides, light skin, red t-shirt, navy blue jeans, small dark shoes. Clean black 1px outline, 2 to 3 flat shading tones per color with light from the top-left, bright cheerful saturated palette, at most 15 colors, no anti-aliasing, no dithering, transparent background."
     },
-    "elegir": "1 de los 64 candidatos (se eligió el 17)",
+    "elegir": "1 de los 64 candidatos (se eligió el 0)",
     "guarda": "art/crudo/_ref/player.png"
    }
   },

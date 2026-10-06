@@ -42,7 +42,7 @@
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
   - el motor ya usa el atlas (F2) y `npm run test:arte` da 16/16;
-  - F1 generada con PixelLab Pro: el protagonista ya sale del atlas (`base`, `idle`, `walk`), pendiente de aprobación; el resto sigue procedural.
+  - F1 generada: el protagonista (16×16 px, estilo de portátil de 2004) ya sale del atlas (`base`, `walk`), pendiente de aprobación; el resto sigue procedural.
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
 - **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.3, con arte procedural porque aún no hay atlas.
 
