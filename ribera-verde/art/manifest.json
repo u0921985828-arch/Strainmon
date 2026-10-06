@@ -313,6 +313,16 @@
    ],
    "ajuste": "pies",
    "nota": "planta sin maceta de la vista C; la base del tallo en (24, 87)"
+  },
+  "planta_c_alta": {
+   "w": 48,
+   "h": 112,
+   "ancla": [
+    24,
+    111
+   ],
+   "ajuste": "pies",
+   "nota": "planta sin maceta de la vista C con el foco CFL (cabe más alta: 10 cm de distancia segura); la base del tallo en (24, 111)"
   }
  },
  "fases": [
@@ -5918,6 +5928,120 @@
    "notas": "Índica lista a su tope de la plaza (cw × ch por la escala): 24 × 84 en la carpa de 60 y 36 × 68 en las de 200 cm. Los cogollos van en la rampa clave y el motor les pone el color de la cepa.",
    "montaje": "Los verdes amarillentos de la luz del foco (tono 60-88°) pasan a verde (92°) con la misma saturación y valor (scratchpad f22/scripts/prep.py). La luz la pone el motor.",
    "aprobado": "2026-10-06: corte de prueba de la vista C (p60, p80, m100, g150 y m100 vacía), aprobado por la persona tras la 2.ª versión (pared solo de tela y luz delante de todo)"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "edit_image_pixen",
+   "estado": "pendiente de aprobación",
+   "familia": "imagen",
+   "paleta": "propia",
+   "estilo_ref": "imagen A (estilo.carpa_p3.referencia) y el corte aprobado de la vista C",
+   "tipo": "objeto",
+   "id": "carpa-c-focos-cfl",
+   "coste_real": 1,
+   "cubre": [
+    "misc:foco-c-cfl-36"
+   ],
+   "celda": "foco_c",
+   "parametros": {
+    "seed": 1101,
+    "width": 36,
+    "height": 16
+   },
+   "descripcion": "Same hanging grow lamp in exactly the same pixel style, colors and dark outline, but as a small compact fluorescent grow lamp: a small bell-shaped grey metal reflector with a white spiral CFL bulb inside, the lower coils of the spiral bulb showing at the open mouth, glowing cool white. Switched on. The lamp spans the full canvas width edge to edge. Transparent background.",
+   "entrada": {
+    "image_url": "art/crudo/_ref/vista-c-foco-48.png"
+   },
+   "entrada_origen": "foco-c-46 aprobado (crudo, 46 × 15) en un lienzo de 48 × 16",
+   "llamadas": [
+    {
+     "sprite": "foco-c-cfl-36",
+     "image_job": "f7bbf60f-509e-49f8-830a-233bc1aa65cf",
+     "asset_id": "c221c9a0-edaa-58d5-b4c9-7d3ba6eeb3bb",
+     "width": 36,
+     "height": 16
+    }
+   ],
+   "notas": "CFL de 125 W (35 cm): 36 px en el armario 60 (Z 1,02) y vale para el 80 (31 px, dentro del 25 %). Su luz es la capa carpa-c-luz con el color del CFL y al 60 % (LUZ_C en 09b-carpa). Apagado, el tubo blanco pasa a gris (vcApagado).",
+   "montaje": "tal cual (scratchpad f24/scripts/prep.py)"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "edit_image_pixen",
+   "estado": "pendiente de aprobación",
+   "familia": "imagen",
+   "paleta": "propia",
+   "estilo_ref": "imagen A (estilo.carpa_p3.referencia) y el corte aprobado de la vista C",
+   "tipo": "objeto",
+   "id": "carpa-c-plantas-h",
+   "coste_real": 4,
+   "cubre": [
+    "misc:planta-c-h-24",
+    "misc:planta-c-h2-24",
+    "misc:planta-c-h1-20",
+    "misc:planta-c-h0-8"
+   ],
+   "celda": "planta_c_alta",
+   "parametros": {
+    "seed": 1101
+   },
+   "descripcion": "Same flowering cannabis plant in exactly the same pixel style, colors and dark outline, but a hybrid ready to harvest: taller, slightly slimmer leaflets, a long central cola on top and several medium buds along the side branches, buds in the same orange-yellow. Even neutral lighting. The stem reaches the bottom edge and the plant fills the whole canvas height. Transparent background.",
+   "entrada": {
+    "image_url": "art/crudo/_ref/vista-c-planta-i-24.png"
+   },
+   "entrada_origen": "planta-c-i-24 aprobada (crudo, cogollos naranjas y hojas sin la luz), en 15 colores para el data URL",
+   "llamadas": [
+    {
+     "sprite": "planta-c-h-24",
+     "image_job": "971afb46-2c75-4192-b8eb-cd68102a7633",
+     "asset_id": "0ad7425b-467e-5a9c-bd5c-6b3769d4403b",
+     "width": 24,
+     "height": 104
+    },
+    {
+     "sprite": "planta-c-h2-24",
+     "image_job": "4e487282-1b7e-4cd6-9882-62c43bec896a",
+     "asset_id": "190594ad-66c3-54c6-8866-8250fabe0057",
+     "width": 24,
+     "height": 56,
+     "entrada": "art/crudo/_ref/vista-c-planta-h-24.png",
+     "descripcion": "Same cannabis plant in exactly the same pixel style, colors and dark outline, but younger, in the vegetative growth stage: no buds or flowers at all, only green fan leaves with slim leaflets, bushy and leafy, shorter. Even neutral lighting. The stem reaches the bottom edge and the plant fills the whole canvas. Transparent background."
+    },
+    {
+     "sprite": "planta-c-h1-20",
+     "image_job": "08cf8afa-0014-412f-a257-75242fefba47",
+     "asset_id": "590eb595-ac5a-5d34-903f-cf7daf2db1bb",
+     "width": 20,
+     "height": 32,
+     "entrada": "art/crudo/_ref/vista-c-planta-h2-24.png",
+     "descripcion": "Same cannabis plant in exactly the same pixel style, colors and dark outline, but a young seedling: a thin short stem with three or four small pairs of serrated leaves, no buds. Even neutral lighting. The stem reaches the bottom edge and the plant fills the whole canvas. Transparent background."
+    },
+    {
+     "sprite": "planta-c-h0-8",
+     "image_job": "0a202eee-e340-473d-adca-4c1563bfd79e",
+     "asset_id": "1a49c22e-8c9e-53b6-bd45-00d54951ba7f",
+     "width": 16,
+     "height": 16,
+     "entrada": "art/crudo/_ref/vista-c-planta-h2-24.png",
+     "descripcion": "Same cannabis plant in exactly the same pixel style, colors and dark outline, but a tiny sprout that has just germinated: a very short thin stem with two small round seed leaves and one tiny pair of serrated leaves on top. The sprout is small, about 10 pixels tall and 8 pixels wide, standing at the bottom centre of the canvas with its stem touching the bottom edge. Even neutral lighting. Transparent background."
+    }
+   ],
+   "rampas_clave": {
+    "cogollo": {
+     "tono": [
+      25,
+      52
+     ],
+     "saturacion_min": 0.4,
+     "rampa": [
+      "#ff5cff",
+      "#d020c8",
+      "#80107a"
+     ]
+    }
+   },
+   "notas": "Híbrida (Skunk #1, ria, la variedad del principio) en el armario 60 con el CFL: lista y floración 24 × 104 (copa de 26 cm y 102 cm de alto a Z 1,02; floración se aplasta a 96), vegetativo 24 × 56, plántula 20 × 32 (18 cm reales: se elige con la tolerancia ×1,33 de la vista B) y germinando 8 × 8 (salió en 16 × 16 y se reduce a su ancho real). El número del nombre es el ancho nominal en px; la fase va pegada al porte (h0 germinando, h1 plántula, h2 vegetativo; sin número, floración y lista). Se encadenan: lista ← índica aprobada, vegetativo ← lista, plántula y germinando ← vegetativo. Pixen no baja de 16 × 16 de área: la llamada de 8 × 12 se rechazó sin coste.",
+   "montaje": "los verdes amarillentos (53-88°) pasan a verde (92°) y los ocres apagados (20-53°, saturación HSL < 0,4: no son cogollo) también; la germinación, de 16 × 16 a 8 × 8 (cada 2 × 2 → 1) (scratchpad f24/scripts/prep.py). La luz la pone el motor."
   }
  ],
  "familias": {
