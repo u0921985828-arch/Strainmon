@@ -2,7 +2,7 @@
 
 Este documento ordena lo que falta antes de pedir más sprites a PixelLab: qué equipo de cultivo tendrá el juego, cómo se verá, qué láminas hay que pedir, en qué orden y cuánto cuestan. También organiza la historia, los desbloqueos y las ideas.
 
-**Estado:** D1–D6 aprobadas con la recomendación (★) el 6 de octubre de 2026. **P1 y P2 hechos** (datos y reglas en el juego; vista B con arte procedural y medida en el plano). Además, la 1.10 pasa todas las cifras a las reales ([ECONOMIA.md](ECONOMIA.md)): precios, vatios, consumo, gramos, deuda (30.000 €), venta al por mayor, fenotipos, esquejes y el imperio tras la deuda. Sale en la próxima versión, junto con el arte. **P3 en curso con el estilo Clásico:** el arte de plantas y carpas de las pruebas no se aprobó («no me gusta ninguno»), así que se pidió un tablero de 4 estilos de la misma escena (carpa abierta con 2 plantas, `create_image_pixen` 240 × 160) y elegiste el 1, **Clásico**: contorno negro, colores vivos y sombreado plano (seed 1101, asset `775bda50`). Los otros 3 quedan descartados. Lámina 1 (cuarto) hecha y pendiente de tu aprobación. Gastadas 9 de las 53 generaciones de D6 (4 de pruebas, 4 del tablero y 1 de la lámina 1).
+**Estado:** D1–D6 aprobadas con la recomendación (★) el 6 de octubre de 2026. **P1 y P2 hechos** (datos y reglas en el juego; vista B con arte procedural y medida en el plano). Además, la 1.10 pasa todas las cifras a las reales ([ECONOMIA.md](ECONOMIA.md)): precios, vatios, consumo, gramos, deuda (30.000 €), venta al por mayor, fenotipos, esquejes y el imperio tras la deuda. Sale en la próxima versión, junto con el arte. **P3 en marcha con la vista C (§5.2):** la referencia es la imagen A del tablero de estilos (Clásico). La carpa se ve por dentro a pantalla completa, como en la imagen A, y su arte sale de esa imagen (recortes y `edit_image_pixen`), no de las huellas. La pared solo lleva la tela, con sus brillos y sombras; la luz del foco es otro sprite y se pinta por delante. El corte de prueba (sodio, macetas de 7 L e índicas en floración) está pendiente de aprobación. Se han gastado 20 de las 53 generaciones de D6.
 
 Leyenda: **hecho** = ya está en el juego · **aprobado** = decidido, falta hacerlo · **idea** = para más adelante.
 
@@ -198,11 +198,35 @@ Para la vista B, las huellas salen del arte procedural del motor (P2): `npm run 
 
 `animate_image` no tiene coste publicado. Hay que medir el saldo antes y después de la primera llamada y apuntarlo en `coste_real`.
 
+### 5.2 Vista C: la carpa por dentro, desde la imagen A (P3)
+
+La lámina 1 (`cuarto-cultivo-34`, pixflux sobre la huella) no se aprobó porque no se parecía a la imagen A. La vista elegida es la **C**: la carpa por dentro a pantalla completa, como la imagen A. Todo su arte sale de la imagen A.
+
+**Cómo se hace:**
+1. **Fondo.** La imagen A se vació con `edit_image_pixen` (sin plantas ni macetas; otra edición sin el foco). `capas.py` la separa en dos sprites de 240 × 160 (`carpa-c-fondo`):
+   - `carpa-c-pared`: la tela con sus brillos y sombras. Cada tono cálido pasa al gris de la tela de su luminosidad, sin el charco de luz ni el halo del foco.
+   - `carpa-c-luz`: los píxeles de luz. Se pinta por delante de la pared y del suelo, detrás de las macetas, y no se pinta con el foco apagado.
+   - Pared, luz y campana juntas dan otra vez la imagen A vacía.
+2. **Escala de cada carpa.** Es `Z = 134 / (alto − 28)` px/cm: 1,02 en la de 60, 0,88 en la de 80 y 0,78 en las de 200 cm. Así la boca del foco (y = 16, como en la imagen A) queda a su altura real sobre el suelo (y = 150).
+   - La pared del fondo se recorta al ancho de la carpa, centrada entre los laterales de la imagen A. Mide 61, 71, 78, 93 y 117 px.
+   - Las macetas van en el centro de su parte: una fila en y = 152, o dos filas, en 146 (detrás) y 156 (delante).
+   - La copa y el alto de cada planta respetan la distancia segura de §4 (`q.cw` × `q.ch`) a esa escala.
+3. **Sprites.** Se hacen con `edit_image_pixen` (1 generación) sobre los recortes de la imagen A. Se piden al tamaño real, con «spans the full canvas» (con «smaller», PixelLab encoge el dibujo y deja margen).
+
+| Sprite | De dónde sale | Tamaño | Gen. |
+|---|---|---|---|
+| `carpa-c-pared`, `carpa-c-luz` | 2 ediciones de la imagen A + `capas.py` | 240 × 160 | 2 |
+| `foco-c-46` / `-40` / `-44` | la campana de la imagen A (recorte) y 2 ediciones | 46, 40 y 44 px | 2 (+2 descartes) |
+| `maceta-c-22` / `-15` | la maceta de la imagen A, a 22 y 15 px (7 L a escala 1,02 y 0,78) | 24 × 28, 16 × 16 | 2 (+1 descarte) |
+| `planta-c-i-24` / `-36` | la planta de la imagen A: índica en floración con la copa de la carpa de 60 y de las de 200 cm | 24 × 84, 36 × 68 | 2 |
+
+- Los cogollos van en la rampa clave magenta y el motor les pone el color de la cepa.
+- Si la planta es más baja que su sprite, se aplasta por abajo y la cola de arriba no se toca.
+- **Mientras falte arte** para algo de la carpa, se ve la vista B. Faltan los focos CFL y LED, las macetas de tela y de 18 L, los extras, las otras fases y los portes sativa e híbrido.
+
 ### 5.2 Descripción base de cada lámina
 
 Las descripciones van en inglés, que es como las entiende PixelLab. A todas se les añade la cola de estilo del manifiesto: contorno oscuro de 1 px, sombreado de 3 tonos con la luz arriba a la izquierda, sin antialiasing, sin texto y fondo transparente salvo en el fondo del cuarto.
-
-**Estilo Clásico (elegido el 6 de octubre):** la cola pasa a «retro 16-bit handheld RPG style, bright colors, clean dark outline, flat shading, light from the top left, no text», con `outline` «single color black outline», `shading` «flat shading», `detail` «medium detail» y `view` «low top-down». La paleta forzada (`color_image_url`) son los colores de la huella más 6 de la imagen elegida (contorno `#142022` y tonos cálidos `#7a4a20`, `#bc8c5f`, `#c59b66`, `#f9b772` y `#ffda94`). La huella va sin moteado y en 16 colores para que el `data:` no se corte por el camino.
 
 1. **Cuarto:** «plain corner of a small city flat seen from the front and slightly above (3/4 view) for a 16-bit handheld game scene: cream painted wall, white skirting board, warm light wooden plank floor in perspective, one wall power socket; no furniture, no people».
 2. **Carpas abiertas:** «five open indoor grow tents of different sizes in a row, 3/4 view from the front and above, cut-away: roof, front wall and right wall removed; quilted silver reflective mylar back and left walls, black metal frame poles, light silver floor sheet, a hanging bar on top; empty, no plants, no lamps».
@@ -231,7 +255,7 @@ Las descripciones van en inglés, que es como las entiende PixelLab. A todas se 
 | P0 | Decidir D1–D6 | 0 | están respondidas en este documento | hecho |
 | P1 | Datos: `p80`, `m120`, sitio C, `led100` y extras en `09-cultivo.js` y en la tienda; reglas en el GDD; migración de partidas | 0 | `npm test` en verde con pasos nuevos (comprar el armario 80, montar la carpa 120 en C, el filtro anula el calor por olor) y una partida de la 1.9 que carga igual | hecho |
 | P2 | Vista B con el arte procedural (huellas) y medidas en `npm run plano` | 0 | todas las piezas entre ×0,75 y ×1,33 de su medida real (salvo lo estilizado de §4) y capturas de las 5 carpas | **hecho**: 29 de 35 piezas entre ×0,94 y ×1,06; germinando y plántula a ×2 (estilizado); `plano/vista-b.png`; huellas de las láminas 1–9 con `npm run sprites:huellas` |
-| P3 | Láminas 1–6 | 6 (+12) | cada lámina cumple §5 y [PIXELLAB.md §8](PIXELLAB.md) (≤ 15 colores por sprite, contorno, sin texto) y tú la apruebas viendo la captura | **en curso**: estilo Clásico elegido; lámina 1 (cuarto) en el atlas, pendiente de aprobación |
+| P3 | Láminas 1–6 | 6 (+12) | cada lámina cumple §5 y [PIXELLAB.md §8](PIXELLAB.md) (≤ 15 colores por sprite, contorno, sin texto) y tú la apruebas viendo la captura | **en marcha**: vista C desde la imagen A (§5.2); el corte de prueba (p60, m100 y g150 con sodio) está pendiente de aprobación |
 | P4 | Plantas, láminas 7–10 | 12 (+15) | 3 portes × 5 fases a escala, con el cogollo en la rampa magenta (lo comprueba el test de la rampa) | pendiente |
 | P5 | Láminas 11–13, luces y sombras | 3 (+5) | `npm run test:arte` en verde y capturas de día y de noche | pendiente |
 | P6 | Cierre: docs, `npm run plano`, capturas, APK y Artifact | 0 | CHANGELOG, CONTEXTO y CLAUDE.md al día; APK y Artifact publicados | pendiente |

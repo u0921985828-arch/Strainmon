@@ -15,7 +15,7 @@
    2. Bloqueo de paleta: primero los colores de identidad del asset (declarados + los de sus referencias);
       si no hay uno cerca, el color más cercano de los que ya usa el juego (paleta «existentes»);
       las rampas clave (p. ej. cogollos) van aparte; con «paleta»: «propia» en el asset se queda con sus colores.
-   3. Tope de colores (estilo.max_colores_sprite): funde los menos usados en el más cercano.
+   3. Tope de colores (estilo.max_colores_sprite, o «max_colores» del asset): funde los menos usados en el más cercano.
    4. Limpieza de píxeles huérfanos (sin vecinos opacos).
    5. Encaje en la celda (la de la animación si declara «celda», si no la del asset), según su «ajuste»:
       · pies   → el centro del contorno y la fila más baja del primer fotograma van al ancla;
@@ -79,6 +79,7 @@ function processGroup(id) {
   // 2º nivel: todos los colores que ya usa el juego (la maestra es un subconjunto: es la que se pasa a PixelLab)
   const palette = [...new Set([...PAL.existentes, ...PAL.maestra, ...ident, ...Object.values(ramps).flatMap(r => r.rampa)])].map(rgb);
   const rampSet = new Set(Object.values(ramps).flatMap(r => r.rampa));
+  const maxc = asset.max_colores || MAXC;   // un fondo entero puede declarar su propio tope
   const dir0 = path.join(CRUDO, id);
   const seqs = [];
   for (const sprite of listDir(dir0)) for (const dir of listDir(path.join(dir0, sprite))) {
@@ -86,7 +87,7 @@ function processGroup(id) {
     if (files.length) seqs.push({ sprite, dir, frames: files.map(f => ({ name: f, png: readPNG(path.join(dir0, sprite, dir, f)) })) });
   }
   if (!seqs.length) throw new Error(`${id}: no hay PNG en ${path.relative(ROOT, dir0)}`);
-  const rep = { grupo: id, celda: [cell0.w, cell0.h], secuencias: seqs.length, fotogramas: 0, semitransparentes: 0, en_paleta_antes: 0, distancia_media: 0,
+  const rep = { grupo: id, celda: [cell0.w, cell0.h], tope_colores: maxc, secuencias: seqs.length, fotogramas: 0, semitransparentes: 0, en_paleta_antes: 0, distancia_media: 0,
     colores_finales: 0, fundidos: [], huerfanos_quitados: 0, deriva_pies: {}, errores: [], avisos: [] };
   if (casiIguales.length) rep.avisos.push(`colores de identidad casi iguales (pueden confundirse): ${casiIguales.join(', ')}`);
   let opaque = 0, inPal = 0, dsum = 0;
@@ -130,7 +131,7 @@ function processGroup(id) {
   for (const [sc, counts] of countsBy) {
   const remap = new Map(); remaps.set(sc, remap);
   let used = [...counts.entries()].sort((a, b) => a[1] - b[1]);
-  while (used.length > MAXC) {
+  while (used.length > maxc) {
     const idx = used.findIndex(([k]) => !rampSet.has(k)); if (idx < 0) break;
     const [k] = used.splice(idx, 1)[0];
     let best = null, bd = Infinity; for (const [k2] of used) { if (rampSet.has(k2)) continue; const dd = dist(rgb(k), rgb(k2)); if (dd < bd) { bd = dd; best = k2; } }
@@ -206,7 +207,7 @@ function processGroup(id) {
     if (feetY.length > 1) { const dev = Math.max(...feetY) - Math.min(...feetY); rep.deriva_pies[`${s.sprite}/${s.dir}`] = dev;
       if (dev > 2 && /^(base|idle|walk|run)$/.test(s.sprite)) rep.avisos.push(`${s.sprite}/${s.dir}: los pies bailan ${dev} px entre fotogramas`); }
   }
-  if (rep.colores_finales > MAXC) rep.errores.push(`${rep.colores_finales} colores (máximo ${MAXC})`);
+  if (rep.colores_finales > maxc) rep.errores.push(`${rep.colores_finales} colores (máximo ${maxc})`);
   if (!rep.errores.length) {
     fs.rmSync(path.join(SALIDA, id), { recursive: true, force: true });
     for (const o of out) { const f = path.join(SALIDA, o.rel); fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, PNG.sync.write(o.png)); }
@@ -261,7 +262,7 @@ for (const id of groups) {
   try {
     const r = processGroup(id);
     const ok = !r.errores.length;
-    console.log(`${ok ? 'OK   ' : 'FALLO'} ${id}: ${r.fotogramas} fotogramas · colores ${r.colores_finales}/${MAXC} · en paleta antes ${r.en_paleta_antes}% · semitransparentes ${r.semitransparentes} · huérfanos ${r.huerfanos_quitados}${r.fundidos.length ? ' · fundidos ' + r.fundidos.length : ''}`);
+    console.log(`${ok ? 'OK   ' : 'FALLO'} ${id}: ${r.fotogramas} fotogramas · colores ${r.colores_finales}/${r.tope_colores || MAXC} · en paleta antes ${r.en_paleta_antes}% · semitransparentes ${r.semitransparentes} · huérfanos ${r.huerfanos_quitados}${r.fundidos.length ? ' · fundidos ' + r.fundidos.length : ''}`);
     r.avisos.forEach(a => console.log('   aviso: ' + a)); r.errores.forEach(e => console.log('   error: ' + e));
     if (!ok) bad++;
   } catch (e) { console.log(`FALLO ${id}: ${e.message}`); bad++; }

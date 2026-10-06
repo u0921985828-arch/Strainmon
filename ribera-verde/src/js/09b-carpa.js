@@ -11,6 +11,7 @@
    ◀ ▶ cambian de plaza y ▲ ▼ de fila; desde la fila de atrás, ▲ elige el foco. A cuida la planta (potAction) o abre el
    foco y los extras (carpaAction); B sale. El tiempo no corre mientras se mira.
    Todo es procedural (y es la huella de las láminas de P3-P4, tools/sprites/huellas.js) hasta que lleguen esas láminas.
+   Con el arte de la imagen A en el atlas, la carpa se ve por dentro a pantalla completa (vista C, abajo).
    ========================================================= */
 const VB_M=.48,VB_F=.24,VB_X=.06,VB_PARED=126;   // px por cm de ancho y alto · de fondo · corrimiento a la derecha por cm de fondo · y de la pared
 // porte de cada variedad para dibujar su planta (i: índica, s: sativa, h: híbrida); los híbridos propios, por sus días de floración
@@ -39,15 +40,97 @@ function vcGeo(ci){
   for(const a of pl){let d=2*Math.min(a.cx,W-a.cx,a.cy,D-a.cy);for(const b of pl)if(b!==a)d=Math.min(d,Math.hypot(a.cx-b.cx,a.cy-b.cy));
     a.cw=d-HOLGURA;a.ch=H-28-(FOCO_SEP[c.foco]||40)-(MACETA_CM[S.macetas[a.i]]||MACETA_CM.plastico7)[1];[a.x,a.y]=P(a.cx,a.cy,0);}
   // el foco, en el centro a medio fondo: fx su centro y fy su parte de abajo (a 28 cm del techo); barra: la barra de la que cuelga
-  return {c,C,W,H,D,w,s,x0,yf,P,pl,fx:P(W/2,D/2,0)[0],fy:P(0,D/2,H-28)[1],barra:P(0,D/2,H-4)[1]};
+  const g={c,C,W,H,D,w,s,x0,yf,P,pl,fx:P(W/2,D/2,0)[0],fy:P(0,D/2,H-28)[1],barra:P(0,D/2,H-4)[1]};
+  g.vc=vistaC(g);if(g.vc){g.fx=120;g.fy=VCA.boca;g.fw=g.vc.foco.a;}
+  return g;
 }
 // dónde lanzar un efecto sobre la plaza i (riego, cosecha): en la vista, sobre la planta; si no, sobre el jugador
 function posPlaza(i){
   const q=VC&&vcGeo(VC.ci).pl.find(q=>q.i===i);if(!q)return [P.px+8,P.py+2];
+  if(q.v)return [q.x,q.y-q.v.tierra-(q.v.hp>>1)];
   const p=S.pots[i],h=p?altoPlanta(p,q):0;return [q.x,q.y-macetaPx(S.macetas[i]).hb-Math.round(h/2)];
 }
 // alto en px de la planta; en una plaza q, con el tope de alto de la plaza (q.ch)
 const altoPlanta=(p,q)=>{const D=PLANTA_CM[porteDe(p.sid)];return Math.min(Math.round(D.h[p.dead?2:plantStage(p)]*VB_M),q?Math.floor(q.ch*VB_M):1e9)-(p.dead?4:0);};
+
+/* ---------- vista C (P3): la carpa por dentro a pantalla completa, como la imagen A ----------
+   La pared (misc:carpa-c-pared) es la imagen A sin plantas, sin foco y sin su luz: solo la tela, con sus brillos y sombras. La luz
+   del foco (misc:carpa-c-luz) es otro sprite, por delante de la pared y detrás de las macetas; con el foco apagado no se pinta.
+   Cada carpa va a su escala (px/cm): Z = 134 / (alto − 28), así la boca del foco (y 16, donde está en la imagen A) queda a su altura
+   real sobre el suelo (y 150, a medio fondo). La pared del fondo se recorta al ancho de la carpa (W·Z px) alrededor de x 120, entre
+   los laterales de la imagen A (columnas 0-43 y 196-239); el suelo baja de y 140 a 159 y se abre 16 px por lado. Macetas y copas,
+   como en la vista B: en el centro de su parte y como mucho de cw × ch (distancia segura), a escala Z.
+   Solo se usa si hay arte para todo lo que hay en la carpa (por ahora, foco de sodio, macetas de 7 L sin extras e índicas en
+   floración); si no, la vista B. */
+const VCA={lado:44,boca:16,base:150,fondo:140},VC_FILA=[[152],[156,146]];   // y de la base de las macetas: una fila · dos (delante, detrás)
+const VC_TIERRA={'maceta-c-22':23,'maceta-c-15':10};                         // px de la base de la maceta a la tierra, donde nace el tallo
+const vcAnchos=pre=>Object.keys(ARTE.cubre||{}).filter(k=>k.startsWith('misc:'+pre)).map(k=>+k.slice(5+pre.length)).filter(n=>n>0);
+// el sprite de la familia (prefijo + ancho en px) más cercano a «px», si se aparta como mucho un 25 %
+function vcSprite(pre,px){let m=null;for(const a of vcAnchos(pre))if(Math.abs(a-px)<=px*.25&&(!m||Math.abs(a-px)<Math.abs(m.a-px)))m={a,n:pre+a};return m&&{...m,f:fotoMisc(m.n)};}
+// la planta: el sprite más ancho que no pasa de su copa (distancia segura)
+function vcPlantaSprite(po,px){let m=null;for(const a of vcAnchos('planta-c-'+po+'-'))if(a<=px+1&&(!m||a>m.a))m={a,n:'planta-c-'+po+'-'+a};return m&&{...m,f:fotoMisc(m.n)};}
+const vcAltos=new WeakMap();   // alto del dibujo (de la última fila a la primera con algo) de cada celda
+function vcAlto(c){if(vcAltos.has(c))return vcAltos.get(c);const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let y=0;
+  for(let i=3;i<d.length;i+=4)if(d[i]){y=Math.floor((i>>2)/c.width);break;}vcAltos.set(c,c.height-y);return c.height-y;}
+// la geometría de la vista C sobre la de la vista B (g), o null si falta arte para algo de la carpa
+function vistaC(g){
+  const {c,W,H,pl}=g;if(!ARTE.ok||FOCOS[c.foco].tipo!=='sodio'||Object.keys(EXTRAS).some(k=>c[k]))return null;
+  const Z=(VCA.base-VCA.boca)/(H-28),w=Math.round(W*Z),foco=vcSprite('foco-c-',(FOCO_CM[c.foco]||45)*Z);
+  if(!fotoMisc('carpa-c-pared')||!fotoMisc('carpa-c-luz')||!foco||!foco.f)return null;
+  const filas=VC_FILA[CARPAS[c.t].filas-1],v=[];
+  for(const q of pl){
+    const k=S.macetas[q.i],m=k==='plastico7'&&vcSprite('maceta-c-',MACETA_CM[k][0]*Z),p=S.pots[q.i];if(!m||!m.f)return null;
+    const y=filas[Math.min(q.fila,filas.length-1)],x=Math.round(120+(q.cx/W-.5)*(w+32*(y-VCA.fondo)/19)),r={x,y,m,tierra:VC_TIERRA[m.n]||Math.round(m.f.c.height*.7),hp:0};
+    if(p){const st=p.dead?9:plantStage(p),po=porteDe(p.sid),D=PLANTA_CM[po];if(st<3||st>4)return null;
+      const s=vcPlantaSprite(po,Math.min(D.w[st],q.cw)*Z);if(!s||!s.f)return null;
+      r.p=s;r.hp=Math.min(vcAlto(s.f.c),Math.round(Math.min(D.h[st],q.ch)*Z));}
+    v.push(r);}
+  pl.forEach((q,j)=>{q.v=v[j];q.x=v[j].x;q.y=v[j].y;q.alto=v[j].tierra+4+v[j].hp;});
+  return {Z,w,xl:120-(w>>1),foco};
+}
+// pared o luz de la carpa t: la de la imagen A con la pared del fondo recortada a su ancho (240 × 160)
+function vcFondo(t,vc,capa){
+  const key='vc|'+t+'|'+capa;if(carpaCache[key])return carpaCache[key];
+  const s=fotoMisc('carpa-c-'+capa).c,[c,x]=mkCanvas(240,160),L=VCA.lado,xl=vc.xl,xr=xl+vc.w;
+  x.drawImage(s,0,0,L,160,xl-L,0,L,160);x.drawImage(s,xl,0,vc.w,160,xl,0,vc.w,160);x.drawImage(s,240-L,0,L,160,xr,0,L,160);
+  return carpaCache[key]=c;
+}
+// la planta más baja que su sprite se aplasta por abajo (la cola de arriba no se toca); celda de 48 × 88 con la base en la última fila
+const vcBajas=new WeakMap();
+function vcAplasta(c,h){
+  const a=vcAlto(c);if(h>=a)return c;let m=vcBajas.get(c);if(!m)vcBajas.set(c,m=new Map());if(m.has(h))return m.get(h);
+  const [o,x]=mkCanvas(c.width,c.height),k=Math.round(a*.4),H=c.height;
+  x.drawImage(c,0,H-a,c.width,k,0,H-h,c.width,k);x.drawImage(c,0,H-a+k,c.width,a-k,0,H-h+k,c.width,h-k);m.set(h,o);return o;
+}
+// la campana con la boca apagada: los tonos cálidos pasan a gris oscuro
+function vcApagado(c){let m=vcBajas.get(c);if(!m)vcBajas.set(c,m=new Map());if(m.has('off'))return m.get('off');
+  const [o,x]=mkCanvas(c.width,c.height);x.drawImage(c,0,0);const im=x.getImageData(0,0,c.width,c.height),d=im.data;
+  for(let i=0;i<d.length;i+=4)if(d[i+3]&&d[i]>d[i+2]+40){const l=Math.round((d[i]*.3+d[i+1]*.59+d[i+2]*.11)*.3);d[i]=l;d[i+1]=l+2;d[i+2]=l+4;}
+  x.putImageData(im,0,0);m.set('off',o);return o;}
+function renderCarpaC(g,now){
+  const {c,vc}=g,on=plantasVivas(VC.ci);
+  ctx.fillStyle='#000';ctx.fillRect(0,0,SW,SH);
+  ctx.save();ctx.translate(OX(),0);
+  ctx.drawImage(vcFondo(c.t,vc,'pared'),0,0);
+  if(on)ctx.drawImage(vcFondo(c.t,vc,'luz'),0,0);
+  const fsel=(g.pl.find(q=>q.i===VC.sel)||{fila:0}).fila;
+  for(const q of [...g.pl].sort((a,b)=>a.y-b.y||a.x-b.x)){ctx.globalAlpha=q.fila<fsel?.35:1;vcPlantaC(q,now);}
+  ctx.globalAlpha=1;
+  const fc=vc.foco.f.c;ctx.drawImage(on?fc:vcApagado(fc),120-24,VCA.boca-15);
+  vcCursor(g,now);
+  if(ARTE.ok)pintarVfx(now,{x:0,y:0},'home');
+  ctx.restore();
+}
+function vcPlantaC(q,now){
+  const v=q.v,p=S.pots[q.i];ctx.drawImage(v.m.f.c,q.x-16,q.y-31);
+  if(!p)return;
+  const s=getStrain(p.sid),rk=((ARTE.d.rampas||{})['carpa-c-plantas']||{}).cogollo,c0=v.p.f.c,yb=q.y-v.tierra;
+  const c1=rk&&s?conRampa(c0,{[rk.rampa[0]]:shade(s.c,50),[rk.rampa[1]]:s.c,[rk.rampa[2]]:shade(s.c,-60)},'g|'+s.c):c0;
+  if(p.water<=0)ctx.filter='saturate(.4) sepia(.7)';   // seca: amarillenta
+  balanceo(vcAplasta(c1,v.hp),q.x-24,yb-87,87,p.water>0?1:0,now+q.x*37);
+  ctx.filter='none';
+  if(p.pest){ctx.fillStyle='#e02828';for(let n=0;n<6;n++)ctx.fillRect(q.x-8+((n*5+Math.floor(now/300))%16),yb-12-((n*7)%20),1,1);}
+}
 
 /* ---------- arte procedural ---------- */
 const VK={pole:'#5a5e68',hi:'#8a8e98',tela:'#26272c',osc:'#1c1d22',techo:'#3e4048',my:'#d4d8e2',my2:'#b2b8c4',my3:'#f2f4f8',my4:'#c8ccd6',som:'#a8aebb',
@@ -93,11 +176,9 @@ function carpa34(tk){
   const [px,py]=P(W-12,D,H-14);t.blob(px,py,3.5,3.5,'#26272c',VK.som);                          // boca del extractor
   return carpaCache[key]=c;
 }
-// el cuarto: pared del piso y suelo de tarima en 3/4, a 48 px/m (240 × 160: la pared llega a VB_PARED). Con el atlas, la
-// lámina 1 de P3 (misc:cuarto-cultivo-34); si no, a mano
+// el cuarto: pared del piso y suelo de tarima en 3/4, a 48 px/m (240 × 160: la pared llega a VB_PARED)
 let cuartoC=null;
 function cuarto34(){
-  const f=fotoMisc('cuarto-cultivo-34');if(f)return f.c;
   if(cuartoC)return cuartoC;const [c,x]=mkCanvas(240,160),t=painter(x,rngSeed(11)),col='#ead8b4',y0=VB_PARED;
   t.F(0,0,240,y0,col);for(let i=3;i<240;i+=8)t.F(i,0,1,y0-5,shade(col,-8));
   t.F(0,y0-5,240,5,'#f4ecd8');t.F(0,y0-5,240,1,'#c8b896');t.F(0,y0-1,240,1,'#a89470');           // rodapié de 10 cm
@@ -173,6 +254,7 @@ function extra34(k){
 /* ---------- la escena ---------- */
 function renderCarpa(now){
   const g=vcGeo(VC.ci),{c,P,W,H,D}=g,F=FOCOS[c.foco],on=plantasVivas(VC.ci);
+  if(g.vc)return renderCarpaC(g,now);
   fondoAncho(cuarto34());
   ctx.save();ctx.translate(OX(),0);
   if(c.goteo){const e=extra34('goteo'),gx=g.x0+g.w+g.s+12,gy=VB_PARED+8;ctx.drawImage(e,gx-(e.width>>1),gy-e.height+1);   // el depósito, fuera de la carpa
@@ -209,7 +291,7 @@ function vcPlanta(q,now){
 }
 function vcCursor(g,now){
   const b=Math.floor(now/300)%2;let x,y;
-  if(VC.sel<0){const fc=foco34(g.c.foco);x=g.fx-(fc.width>>1)-8;y=g.fy-5;ctx.fillStyle='#26262e';ctx.fillRect(x-1,y-4,6,9);ctx.fillStyle='#f8f8f0';for(let k=0;k<4;k++)ctx.fillRect(x+b+k,y-3+k,1,7-2*k);return;}
+  if(VC.sel<0){const fw=g.fw||foco34(g.c.foco).width;x=g.fx-(fw>>1)-8;y=g.fy-5;ctx.fillStyle='#26262e';ctx.fillRect(x-1,y-4,6,9);ctx.fillStyle='#f8f8f0';for(let k=0;k<4;k++)ctx.fillRect(x+b+k,y-3+k,1,7-2*k);return;}
   const q=g.pl.find(q=>q.i===VC.sel);if(!q)return;
   ctx.fillStyle='rgba(255,255,240,.35)';ctx.fillRect(q.x-7,q.y,14,2);
   x=q.x;y=q.y-(q.alto||12)-9+b;

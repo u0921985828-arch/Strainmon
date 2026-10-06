@@ -88,7 +88,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
       npcs: NPCDEF.map(d => ({ id: d.id, look: d.look, mapa: d.map, deambula: !!d.wander })),
       plantas: { vista: 'misc:planta-vista (cepa × fase, de ../assets/plants)', colores_cogollo: Object.fromEntries(Object.entries(STRAINS).map(([k, s]) => [k, s.c])) },
       combate: ['fondo-ladron', 'fondo-policia', 'frente:ladron', 'frente:policia', 'espalda:player'],
-      misc: ['bolsa', 'hoja-titulo', 'burbuja-$', 'burbuja-!', ...Object.keys(CARPAS).flatMap(t => ['carpa-' + t + '-mapa', 'carpa-' + t + '-vista']), 'cuarto-cultivo', 'cuarto-cultivo-34',
+      misc: ['bolsa', 'hoja-titulo', 'burbuja-$', 'burbuja-!', ...Object.keys(CARPAS).flatMap(t => ['carpa-' + t + '-mapa', 'carpa-' + t + '-vista']), 'cuarto-cultivo', 'carpa-c-pared', 'carpa-c-luz', 'foco-c-40', 'foco-c-44', 'foco-c-46', 'maceta-c-15', 'maceta-c-22', 'planta-c-i-24', 'planta-c-i-36',
         ...Object.keys(MACETAS).map(k => 'maceta-vista-' + k), 'planta-vista', 'foco-cfl', 'foco-sodio', 'foco-led'],
       tamanos: { tile: [16, 16], personaje: [16, 20], planta: [16, 26], combate_escala: 3, pantalla: [240, 160] },
     };

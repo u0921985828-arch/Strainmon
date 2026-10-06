@@ -26,18 +26,41 @@
    "characters, names or logos from existing games",
    "minors smoking or near drugs"
   ],
-  "vista_b_p3": {
-   "elegido": "Clásico: tablero de 4 estilos de la misma escena (create_image_pixen 240 × 160, view low top-down), el 1",
+  "carpa_p3": {
    "referencia": {
+    "que": "imagen A del tablero de 4 estilos (Clásico): carpa abierta con 2 plantas en floración, create_image_pixen 240 × 160, view low top-down, outline single color black outline, detail medium detail, seed 1101",
     "asset_id": "775bda50-79e2-58dd-8958-110fbb79e2c2",
     "image_job": "ce445b95-382f-4fab-9be1-6406775eb1a8",
-    "seed": 1101,
-    "outline": "single color black outline",
-    "detail": "medium detail"
+    "coste_real": 4,
+    "descartes": "estilos 2, 3 y 4 del tablero: se eligió el 1"
    },
-   "cola": "retro 16-bit handheld RPG style, bright colors, clean dark outline, flat shading, light from the top left, no text",
-   "descartes": "estilos 2, 3 y 4 del tablero: elegiste el 1 («Clasico»)",
-   "coste_real": 4
+   "descartadas": [
+    {
+     "id": "cuarto-cultivo-34",
+     "image_job": "c4b1190a-46c3-481e-b45f-badf528829e6",
+     "coste_real": 1,
+     "motivo": "no se parece a la imagen A: img2img sobre la huella a fuerza 130 conserva el dibujo a mano"
+    },
+    {
+     "id": "maceta-c-17",
+     "image_job": "3509e9d1-40aa-42d1-b8b5-d5d9609a6cab",
+     "coste_real": 1,
+     "motivo": "«redrawn smaller»: la maceta salió de 12 px en un lienzo de 20 (hacía falta 17); se repitió a 16 × 16 «edge to edge»"
+    },
+    {
+     "id": "foco-c-40",
+     "image_job": "c079d2f7-68d4-4ff0-8a73-e6fa830b9bbb",
+     "coste_real": 1,
+     "motivo": "«a little smaller»: la campana salió de 28 px en 40; se repitió «spans the full canvas width»"
+    },
+    {
+     "id": "foco-c-44",
+     "image_job": "dd2025c4-3372-48a9-bc40-5e6f012b0633",
+     "coste_real": 1,
+     "motivo": "«a little smaller»: la campana salió de 18 px en 44; se repitió «spans the full canvas width»"
+    }
+   ],
+   "decision": "vista de carpa a pantalla completa como la imagen A (vista C): el arte sale de la imagen A (recortes y ediciones con edit_image_pixen), no de las huellas. La pared lleva solo la tela, con sus brillos y sombras; la luz del foco es un sprite aparte que se pinta por delante (misc:carpa-c-luz)"
   }
  },
  "celdas": {
@@ -259,6 +282,36 @@
    ],
    "ajuste": "pies",
    "nota": "planta sin maceta de la vista de carpa (64 px/m); la base del tallo en la última fila"
+  },
+  "foco_c": {
+   "w": 48,
+   "h": 16,
+   "ancla": [
+    24,
+    15
+   ],
+   "ajuste": "pies",
+   "nota": "foco de la vista C: centro de la boca en (24, 15); el motor la pone en (120, 16), donde está en la imagen A"
+  },
+  "maceta_c": {
+   "w": 32,
+   "h": 32,
+   "ancla": [
+    16,
+    31
+   ],
+   "ajuste": "pies",
+   "nota": "maceta de la vista C; el centro de su base en (16, 31)"
+  },
+  "planta_c": {
+   "w": 48,
+   "h": 88,
+   "ancla": [
+    24,
+    87
+   ],
+   "ajuste": "pies",
+   "nota": "planta sin maceta de la vista C; la base del tallo en (24, 87)"
   }
  },
  "fases": [
@@ -5151,43 +5204,6 @@
    "notas": "Fondo de la vista de carpa; en pantallas anchas se estira por fondoAncho como los fondos de combate."
   },
   {
-   "tipo": "fondo",
-   "fase": "F9",
-   "herramienta": "create_image_pixflux",
-   "estado": "pendiente de aprobación",
-   "familia": "imagen",
-   "coste_real": 1,
-   "id": "cuarto-cultivo-34",
-   "cubre": [
-    "misc:cuarto-cultivo-34"
-   ],
-   "parametros": {
-    "init_image_strength": 130,
-    "view": "low top-down",
-    "outline": "single color black outline",
-    "shading": "flat shading",
-    "detail": "medium detail",
-    "no_background": false,
-    "seed": 1101,
-    "width": 240,
-    "height": 160
-   },
-   "descripcion": "plain corner of a small city flat seen from the front and slightly above (3/4 view) for a 16-bit handheld game scene: cream painted wall, white skirting board, warm light wooden plank floor in perspective, one wall power socket; no furniture, no people, empty room; retro 16-bit handheld RPG style, bright colors, clean dark outline, flat shading, light from the top left, no text",
-   "entrada": {
-    "init_image_base64": "art/crudo/_ref/huella-cuarto-cultivo-34.png"
-   },
-   "entrada_origen": "cuarto34() de 09b-carpa.js (240 × 160 a 48 px/m), sin el moteado del suelo y en 16 colores para que el data: no se corte",
-   "estilo_ref": "Clásico (tablero de estilos, imagen 1: create_image_pixen 240 × 160, seed 1101, asset 775bda50-79e2-58dd-8958-110fbb79e2c2)",
-   "celda": "pantalla",
-   "pixellab": {
-    "image_job": "c4b1190a-46c3-481e-b45f-badf528829e6",
-    "asset_id": "b40c369f-dd4a-522f-b540-04e24d66b91e"
-   },
-   "montaje": "El enchufe que dibujó PixelLab medía 16 px (33 cm, ×4): se tapó con la pared de 40 px a la derecha y se puso el de la huella a escala (scratchpad f20/scripts/enchufe.py).",
-   "notas": "Lámina 1 de P3. Fondo de la vista B; en pantallas anchas se estira por fondoAncho. Sin él, cuarto34() lo dibuja a mano.",
-   "paleta_forzada": "color_image: los colores de la huella + 6 del estilo Clásico (#142022 #7a4a20 #bc8c5f #c59b66 #f9b772 #ffda94); se mandaron las dos como URL data:"
-  },
-  {
    "id": "plantas-vista",
    "tipo": "objeto",
    "fase": "F9",
@@ -5697,6 +5713,195 @@
    "celda": "icono",
    "estado": "hecho",
    "familia": "procedural"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "edit_image_pixen",
+   "estado": "pendiente de aprobación",
+   "familia": "imagen",
+   "paleta": "propia",
+   "estilo_ref": "imagen A (estilo.carpa_p3.referencia)",
+   "tipo": "fondo",
+   "id": "carpa-c-fondo",
+   "coste_real": 2,
+   "cubre": [
+    "misc:carpa-c-pared",
+    "misc:carpa-c-luz"
+   ],
+   "celda": "pantalla",
+   "max_colores": 32,
+   "parametros": {
+    "seed": 1101,
+    "width": 240,
+    "height": 160
+   },
+   "descripcion": "Remove the two cannabis plants, their black pots and the hanging lamp. Keep the empty grow tent exactly as it is: wrinkled silver mylar back and side walls, empty light floor, dark rolled-up curtains at both sides, same outline and colors. Replace the orange lamp glow on the walls with even neutral light.",
+   "entrada": {
+    "image_url": "art/crudo/_ref/imagen-a.png"
+   },
+   "entrada_origen": "la imagen A tal cual (https://api.pixellab.ai/mcp/images/ce445b95-382f-4fab-9be1-6406775eb1a8/download)",
+   "llamadas": [
+    {
+     "que": "imagen A sin plantas ni macetas; el foco y su luz se quedan",
+     "image_job": "3f9e18db-ea51-4084-b580-8d74d91a7c41",
+     "asset_id": "598af2b7-4fec-52b7-8b40-db49b866835c",
+     "width": 240,
+     "height": 160
+    },
+    {
+     "que": "sin el foco (de aquí sale la tela que queda detrás de la campana)",
+     "image_job": "8b381c7c-70b6-43f7-b467-bd48f1d31c39",
+     "width": 240,
+     "height": 160,
+     "descripcion": "Remove the hanging lamp and all the orange light and glow. The mylar walls and the floor become plain neutral silver-grey, evenly lit, keeping the same wrinkles, the dark rolled-up curtains, the black outline and the pixel style. Nothing else changes."
+    }
+   ],
+   "montaje": "scratchpad f22/capas.py: la luz (cada píxel cálido de la imagen A vacía) va a carpa-c-luz; en la pared cada tono cálido pasa al gris de la tela de su escalón de luminosidad (sombra, medio, claro), sin el charco de luz del suelo ni el halo del foco. Pared + luz + foco = la imagen A vacía.",
+   "notas": "Vista C: la pared se recorta a lo ancho de cada carpa (columnas 0-43 y 196-239 fijas, la pared del fondo centrada) y la luz igual, por delante de la pared y detrás de las macetas. Con el foco apagado no se pinta la luz."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "edit_image_pixen",
+   "estado": "pendiente de aprobación",
+   "familia": "imagen",
+   "paleta": "propia",
+   "estilo_ref": "imagen A (estilo.carpa_p3.referencia)",
+   "tipo": "objeto",
+   "id": "carpa-c-focos",
+   "coste_real": 2,
+   "cubre": [
+    "misc:foco-c-40",
+    "misc:foco-c-44",
+    "misc:foco-c-46"
+   ],
+   "celda": "foco_c",
+   "parametros": {
+    "seed": 1102
+   },
+   "descripcion": "Redraw the same hanging dome grow lamp so it spans the full canvas width edge to edge: same pixel style, colors, black outline and glowing bottom, same shape. Transparent background.",
+   "entrada": {
+    "image_url": "art/crudo/_ref/imagen-a-foco.png"
+   },
+   "entrada_origen": "la campana del foco de sodio de la imagen A (scratchpad f21/scripts/foco.py), 46 × 15 en un lienzo de 48 × 16",
+   "llamadas": [
+    {
+     "sprite": "foco-c-40",
+     "image_job": "ebb0add5-1046-4a13-ac17-a599372f9620",
+     "asset_id": "3b998ecb-0fb4-5045-be15-5f4fcd518f57",
+     "width": 40,
+     "height": 16
+    },
+    {
+     "sprite": "foco-c-44",
+     "image_job": "83126591-7ddc-4500-aebe-04b0dc167127",
+     "asset_id": "d1d3499c-1d36-561a-a33b-7a4cc6ad9a72",
+     "width": 44,
+     "height": 16
+    }
+   ],
+   "montaje": "foco-c-46 es el recorte de la imagen A sin tocar; foco-c-40 y foco-c-44, sus ediciones.",
+   "notas": "Campana del foco de sodio a su ancho real en la vista C (FOCO_CM × la escala de la carpa): el motor elige la más cercana."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "edit_image_pixen",
+   "estado": "pendiente de aprobación",
+   "familia": "imagen",
+   "paleta": "propia",
+   "estilo_ref": "imagen A (estilo.carpa_p3.referencia)",
+   "tipo": "objeto",
+   "id": "carpa-c-macetas",
+   "coste_real": 2,
+   "cubre": [
+    "misc:maceta-c-15",
+    "misc:maceta-c-22"
+   ],
+   "celda": "maceta_c",
+   "parametros": {
+    "seed": 1101
+   },
+   "descripcion": "Redraw the same black plastic plant pot so it spans the full canvas width and height edge to edge: same pixel style, colors and outline, soil inside the round rim seen slightly from above, tapered body. Transparent background.",
+   "entrada": {
+    "image_url": "art/crudo/_ref/imagen-a-maceta.png"
+   },
+   "entrada_origen": "la maceta de la izquierda de la imagen A (scratchpad f21/scripts/maceta.py), 43 × 40 en un lienzo de 44 × 40",
+   "llamadas": [
+    {
+     "sprite": "maceta-c-22",
+     "image_job": "7fe35e85-e603-4549-be0d-d69520f68ac7",
+     "asset_id": "f6ecd0fb-ba8d-5300-8ba7-2467c37cbe88",
+     "width": 24,
+     "height": 28,
+     "seed": 1101,
+     "descripcion": "Same black plastic plant pot with soil, exactly the same pixel style, colors and outline, redrawn smaller to fill this canvas: round rim seen slightly from above, tapered body. Transparent background."
+    },
+    {
+     "sprite": "maceta-c-15",
+     "image_job": "5027fec9-9904-4ae9-9251-fecd5cba86bd",
+     "asset_id": "fcddf6f4-8611-50f6-958f-2bd39550971c",
+     "width": 16,
+     "height": 16,
+     "seed": 1102
+    }
+   ],
+   "montaje": "Se quita el tallo que asomaba del borde (scratchpad f22/scripts/prep.py).",
+   "notas": "Maceta de plástico de 7 L (22 cm) a la escala de la carpa: 22 px en la de 60 y 15 en las de 200 cm de alto."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "edit_image_pixen",
+   "estado": "pendiente de aprobación",
+   "familia": "imagen",
+   "paleta": "propia",
+   "estilo_ref": "imagen A (estilo.carpa_p3.referencia)",
+   "tipo": "objeto",
+   "id": "carpa-c-plantas",
+   "coste_real": 2,
+   "cubre": [
+    "misc:planta-c-i-24",
+    "misc:planta-c-i-36"
+   ],
+   "celda": "planta_c",
+   "parametros": {
+    "seed": 1101
+   },
+   "descripcion": "Same flowering cannabis plant in exactly the same pixel style, colors and dark outline, but trained tall and narrow (columnar): one central cola on top, short side branches with fan leaves and small buds near the tips, the stem reaching the bottom edge. Fills the whole canvas height. Transparent background.",
+   "entrada": {
+    "image_url": "art/crudo/_ref/imagen-a-planta.png"
+   },
+   "entrada_origen": "la planta de la izquierda de la imagen A (scratchpad f21/scripts/recorte.py), 67 × 90 en un lienzo de 68 × 92",
+   "llamadas": [
+    {
+     "sprite": "planta-c-i-24",
+     "image_job": "13a3b14c-e65d-41a9-902a-2a80707068d6",
+     "asset_id": "30ea73c7-858f-5d6d-a59c-6e8a8472b592",
+     "width": 24,
+     "height": 84
+    },
+    {
+     "sprite": "planta-c-i-36",
+     "image_job": "007b28e5-7a07-494d-a3a8-d07d2fc98d9b",
+     "asset_id": "5c19e102-cd8d-5617-81a4-411f0fd61083",
+     "width": 36,
+     "height": 68,
+     "descripcion": "Same flowering cannabis plant in exactly the same pixel style, colors and dark outline, a bit narrower: one central cola on top, side branches with fan leaves and buds near the tips, the stem reaching the bottom edge. Fills the whole canvas. Transparent background."
+    }
+   ],
+   "rampas_clave": {
+    "cogollo": {
+     "tono": [
+      25,
+      52
+     ],
+     "saturacion_min": 0.4,
+     "rampa": [
+      "#ff5cff",
+      "#d020c8",
+      "#80107a"
+     ]
+    }
+   },
+   "notas": "Índica lista a su tope de la plaza (cw × ch por la escala): 24 × 84 en la carpa de 60 y 36 × 68 en las de 200 cm. Los cogollos van en la rampa clave y el motor les pone el color de la cepa."
   }
  ],
  "familias": {

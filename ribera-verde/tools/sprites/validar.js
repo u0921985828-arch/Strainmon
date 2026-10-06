@@ -40,6 +40,7 @@ const ENTRADA_OK = {
   create_tiles_pro: ['style_images'],
   create_1_direction_object: ['style_images'],
   create_image_pixflux: ['color_image_base64', 'init_image_base64'],
+  edit_image_pixen: ['image_url', 'image_base64'],
   create_map_object: ['background_image', 'inpainting.mask_image'],
   create_topdown_tileset: [], create_building_kit: [], procedural: [], importado: [],
 };
@@ -128,6 +129,13 @@ function checkTool(a) {
     case 'create_image_pixflux':
       if (!inRange(p.width, 16, 400) || !inRange(p.height, 16, 400) || p.width * p.height < 1024) E(id, 'pixflux: 16-400 por lado y área ≥ 32×32');
       break;
+    case 'edit_image_pixen': {   // entrada ≤ 256 px por lado; salida ≤ 256 × 256 de área; todo en múltiplos de 4
+      const ent = a.entrada && dims(Object.values(a.entrada)[0]);
+      if (ent && (ent[0] > 256 || ent[1] > 256 || ent[0] % 4 || ent[1] % 4)) E(id, `entrada de ${ent[0]} × ${ent[1]}: como mucho 256 por lado y en múltiplos de 4`);
+      for (const l of a.llamadas || [p]) { const w = l.width, h = l.height; if (w == null) continue;
+        if (w % 4 || h % 4) E(id, `${w} × ${h}: la salida va en múltiplos de 4`); if (w * h > 65536) E(id, `${w} × ${h}: la salida no puede pasar de 256 × 256 de área`); }
+      break;
+    }
     case 'procedural': break;
     case 'importado': if (!a.origen) E(id, 'importado: falta «origen» (de dónde sale el arte)'); break;
     default: E(id, `herramienta «${a.herramienta}» no está en el kit`);
@@ -235,6 +243,7 @@ for (const a of M.assets) {
   if (a.herramienta === 'create_character') known += a.parametros.mode === 'standard' ? 1 : a.parametros.mode === 'v3' ? 9 : 40;
   else if (a.herramienta === 'create_1_direction_object') { if (!a.lote || M.assets.find(b => b.lote === a.lote) === a) known += 30; }
   else if (a.herramienta === 'create_image_pixflux') known += 1;
+  else if (a.herramienta === 'edit_image_pixen') known += Math.max(1, (a.llamadas || []).length);
   else if (a.herramienta === 'create_topdown_tileset') known += 4 * Math.max(1, (a.llamadas || []).length);
   else if (a.herramienta !== 'procedural') unknown.add(a.herramienta);
   if (a.previo) known += 30;

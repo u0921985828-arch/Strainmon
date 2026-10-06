@@ -5,7 +5,7 @@
   2. Compila el juego con ese atlas en tools/salida/arte/ (el index.html de la raíz no se toca).
   3. Comprueba en Chromium: atlas cargado, caminar y correr, ambiente de los fumadores con su humo,
      que al hablar se corta, que un menor nunca fuma, acciones del jugador, cogollos con el color de la
-     variedad, planta seca, agua animada, orillas Wang, carpas, combate, título, ?arte=procedural y un atlas parcial (solo el player, sin «east»).
+     variedad, planta seca, agua animada, orillas Wang, carpas (vistas B y C), combate, título, ?arte=procedural y un atlas parcial (solo el player, sin «east»).
   Salida: lista OK/FALLO + tools/salida/arte/kiko-fuma.png (tira de fotogramas para revisarla a ojo).
 
   Requisitos: npm run sprites:ref (referencias)   Uso: node tools/test-arte.js
@@ -157,14 +157,36 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       // la escena: A delante del armario, ▶ plaza 2, ▲ el foco, B sale
       enterMap('home', A.x0, A.y + 1, 'up'); press('A'); await hasta(() => mode === 'carpa' && handlers.length === 1); await espera(150);
       const hay = c => c && c.width > 0 && colores(c).size > 2;
-      r.escena = hay(cuarto34()) && cuarto34() === fotoMisc('cuarto-cultivo-34').c && Object.keys(CARPAS).every(t => hay(carpa34(t))) && Object.keys(MACETAS).every(k => hay(maceta34(k))) && Object.keys(FOCOS).every(k => hay(foco34(k))) && Object.keys(EXTRAS).every(k => hay(extra34(k)));
+      r.escena = hay(cuarto34()) && Object.keys(CARPAS).every(t => hay(carpa34(t))) && Object.keys(MACETAS).every(k => hay(maceta34(k))) && Object.keys(FOCOS).every(k => hay(foco34(k))) && Object.keys(EXTRAS).every(k => hay(extra34(k)));
       r.sel = [VC.sel]; press('right'); r.sel.push(VC.sel); press('up'); r.sel.push(VC.sel); r.info = document.getElementById('vcInfo').textContent;
       press('B'); await hasta(() => mode === 'world' && isFree()); r.sale = !VC && document.getElementById('vcInfo').hidden;
       return r; });
     check('Carpas: muebles del piso (1-2 casillas, sólidos) con su arte, piso de 12×8', carpa.mapa && carpa.anchos === '1,2' && carpa.solidas && carpa.piso === '12×8', carpa);
     check(`Plantas de la vista B: ${carpa.n} variedades con porte, alto y ancho reales (×0,75-1,33) de vegetativo a lista, seca y muerta sin verdes`, carpa.portes && carpa.crece && carpa.seca, carpa);
     check('Vista B, distancia segura: en las 5 carpas, con cada foco y maceta, ni las copas en floración ni las macetas se tocan ni tocan las paredes, y la cima queda a su distancia del foco', carpa.espacio.length === 5 && carpa.espacio.every(e => +e.split(' ')[1] >= 0), carpa.espacio);
-    check('Vista de carpa B: A abre, ▶ plaza 2, ▲ el foco, B sale; cuarto (lámina 1 del atlas), carpas, macetas, focos y extras', carpa.escena && carpa.sel.join() === '0,1,-1' && /CFL/.test(carpa.info) && carpa.sale, carpa);
+    check('Vista de carpa B: A abre, ▶ plaza 2, ▲ el foco, B sale; cuarto, carpas, macetas, focos y extras', carpa.escena && carpa.sel.join() === '0,1,-1' && /CFL/.test(carpa.info) && carpa.sale, carpa);
+    // vista C (P3, imagen A): la pared solo lleva la tela y la luz va en su propio sprite, por delante; macetas y copas a la escala
+    // de la carpa sin pasar de su sitio (cw) ni de su distancia al foco (ch); sin arte para algo de la carpa, la vista B
+    const vc = await page.evaluate(() => {
+      const r = { escenas: [], fallos: [] }, C0 = S.carpas, M0 = S.macetas, P0 = S.pots;
+      const calidos = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 3] && d[i] > d[i + 2] + 40) n++; return n; };
+      const ancho = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, x1 = -1; for (let i = 0; i < d.length; i += 4) if (d[i + 3]) { const x = (i / 4) % c.width; x0 = Math.min(x0, x); x1 = Math.max(x1, x); } return x1 - x0 + 1; };
+      const pon = (t, foco, sids, prog = 1, extra = {}) => { S.carpas = [{ t, foco, ...extra }]; S.macetas = Array(CARPAS[t].plazas).fill('plastico7'); S.pots = sids.map(s => s && { sid: s, prog, water: 80, health: 100 }); return vcGeo(0); };
+      for (const [t, f, ss] of [['p60', 'sodio250', ['mango', 'purpura']], ['m100', 'sodio400', ['txoko', 'niebla', 'rif', 'hindu']], ['g150', 'sodio600', ['mango', 'purpura', 'txoko', 'niebla', 'rif', 'afkush']]]) {
+        const g = pon(t, f, ss); if (!g.vc) { r.fallos.push(t + ' sin vista C'); continue; }
+        const { Z } = g.vc, boca = VCA.boca, e = { t, pared: calidos(vcFondo(t, g.vc, 'pared')), luz: calidos(vcFondo(t, g.vc, 'luz')), foco: g.vc.foco.a, focoReal: Math.round(FOCO_CM[f] * Z) };
+        for (const q of g.pl) { const v = q.v, w = ancho(v.p.f.c), cima = q.y - v.tierra - v.hp;
+          if (w > q.cw * Z + 1) r.fallos.push(`${t} plaza ${q.i}: copa de ${w} px y caben ${(q.cw * Z).toFixed(1)}`);
+          if (v.hp > q.ch * Z + .5) r.fallos.push(`${t} plaza ${q.i}: ${v.hp} px de alto y el tope es ${(q.ch * Z).toFixed(1)}`);
+          if ((cima - boca) / Z < FOCO_SEP[f] - 2) r.fallos.push(`${t} plaza ${q.i}: cima a ${((cima - boca) / Z).toFixed(0)} cm del foco (${FOCO_SEP[f]})`); }
+        for (const a of g.pl) for (const b of g.pl) if (a.i < b.i && a.y === b.y && Math.abs(a.x - b.x) < ancho(a.v.m.f.c)) r.fallos.push(`${t}: macetas ${a.i} y ${b.i} se tocan`);
+        if (e.pared || e.luz < 2000 || Math.abs(e.foco - e.focoReal) > 2) r.fallos.push(JSON.stringify(e));
+        VC = { ci: 0, sel: 0, ocupado: false }; renderCarpa(1000); VC = null; r.escenas.push(t);
+      }
+      r.b = { cfl: !pon('p60', 'cfl', ['mango', null]).vc, extras: !pon('p60', 'sodio250', ['mango', null], 1, { vent: true }).vc, plantula: !pon('p60', 'sodio250', ['mango', null], .2).vc,
+        sativa: !pon('p60', 'sodio250', ['malawi', null]).vc, tela: (() => { pon('p60', 'sodio250', [null, null]); S.macetas[0] = 'tela11'; return !vcGeo(0).vc; })(), vacia: !!pon('m100', 'sodio600', [null, null, null, null]).vc };
+      S.carpas = C0; S.macetas = M0; S.pots = P0; return r; });
+    check('Vista C (imagen A): en p60, m100 y g150 la pared no lleva luz y la luz es su propio sprite; copas y macetas sin tocarse ni pasar de su distancia al foco; sin arte, la vista B', vc.escenas.length === 3 && !vc.fallos.length && Object.values(vc.b).every(Boolean), vc);
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
       for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }
       r.rio = mascaraOrilla(m, 31, 15); r.centro = mascaraOrilla(m, 35, 27); r.sinAtlas = (() => { const ok = ARTE.ok; ARTE.ok = false; const v = arteOrilla(m, 'water', 31, 15, 0, 0); ARTE.ok = ok; return v; })(); return r; });

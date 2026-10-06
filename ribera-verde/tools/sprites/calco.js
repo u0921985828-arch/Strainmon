@@ -95,10 +95,10 @@ for (const a of M.assets) {
     if (m && has(`combate/${m[1]}.png`)) wr(a.id, 'base', 'unica', 0, rd(`combate/${m[1]}.png`));
     if (c === 'misc:hoja-titulo' && has('misc/titulo.png')) wr(a.id, 'base', 'unica', 0, rd('misc/titulo.png'));
     if (c === 'misc:cuarto-cultivo' && has('misc/cuarto-cultivo.png')) wr(a.id, 'cuarto-cultivo', 'unica', 0, rd('misc/cuarto-cultivo.png'));
-    // láminas de P3 ya hechas: se calca la procesada (no hay referencia procedural aparte)
-    const pro = path.join(ROOT, 'art', 'procesado', a.id, 'cuarto-cultivo-34', 'unica', '00.png');
-    if (c === 'misc:cuarto-cultivo-34' && fs.existsSync(pro)) wr(a.id, 'cuarto-cultivo-34', 'unica', 0, PNG.sync.read(fs.readFileSync(pro)));
   }
+  // ---------- vista C (P3): sale de la imagen A y no tiene referencia procedural; se calca la lámina ya procesada ----------
+  if (/^carpa-c-/.test(a.id)) for (const c of a.cubre || []) { const n = c.slice(5), f = path.join(ROOT, 'art', 'procesado', a.id, n, 'unica', '00.png');
+    if (fs.existsSync(f)) wr(a.id, n, 'unica', 0, PNG.sync.read(fs.readFileSync(f))); }
   // ---------- tiles (16×16 exacto; los animados en bloques de 32×32) ----------
   if (a.tipo === 'tiles') {
     for (const c of a.cubre || []) { const k = c.slice(5); const f = has(`tiles/${k}.png`) ? `tiles/${k}.png` : has(`tiles/${k}_f0.png`) ? `tiles/${k}_f0.png` : null; if (f) wr(a.id, k, 'unica', 0, rd(f)); }
