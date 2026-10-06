@@ -280,7 +280,7 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 - **Cultivo (1.10):**
   - *Cosecha:* «Cosechas X g de [variedad]. THC: Y%.»
   - *Fenotipo estrella:* «¡Fenotipo estrella! THC ×A y cosecha ×B sobre la media de la [variedad].» / «Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.» · *Flojo:* «Fenotipo flojo: THC ×A y cosecha ×B de la media.»
-  - *Semillas:* línea sin fijar, «Las plantas de la línea se han polinizado entre ellas: recoges N semillas de [variedad].» · feminizada, a veces, «Una flor hermafrodita ha polinizado unas pocas: recoges N semillas de [variedad].»
+  - *Semillas:* línea sin fijar, «Las plantas de la línea se han polinizado entre ellas: recoges N semillas de [variedad].» · regular (landrace, de Kiko o línea fijada), «Son semillas regulares: algún macho ha polinizado unas flores. Recoges N semillas de [variedad].» · feminizada, a veces, «Una flor hermafrodita ha polinizado unas pocas: recoges N semillas de [variedad].»
   - *Esqueje:* «Cortas una punta de la [variedad] y la pones a enraizar. Plántala antes del día D: es la misma planta.» · propagador lleno, «El propagador está lleno: 12 esquejes. Planta alguno antes.» · al plantarlo, «Plantas el esqueje de [variedad].» · si se seca, aviso al cambiar de día: «Se ha secado un esqueje sin plantar».
   - *Abono e insecticida:* «Echas una dosis de ABONO. Dará más cosecha.» / «No te queda ABONO.» · «Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.»
 - **Objetos del piso:**

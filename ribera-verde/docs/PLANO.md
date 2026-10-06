@@ -48,7 +48,7 @@ Patxi (21,21) e Iñaki (37,21).
 |---|---|---|---|---|---|
 | Armario 60 × 60 | 0,6 × 0,6 × 1,6 m | 1 casilla (A) | 2 en 1 fila | 2 | hasta 250 W |
 | Armario 80 × 80 | 0,8 × 0,8 × 1,8 m | 1 casilla (A) | 2 delante y 1 detrás, centrada | 3 | hasta 400 W |
-| Carpa 100 × 100 | 1 × 1 × 2 m | 1 casilla (B) | 2 × 2 (fila de atrás al tresbolillo) | 4 | hasta 480 W |
+| Carpa 100 × 100 | 1 × 1 × 2 m | 1 casilla (B) | 2 × 2 (en rejilla, a 50 cm) | 4 | hasta 480 W |
 | Carpa 150 × 100 | 1,5 × 1 × 2 m | 2 casillas (B) | 3 × 2 | 6 | hasta 720 W |
 | Carpa 120 × 120 | 1,2 × 1,2 × 2 m | 2 casillas (C) | 3 × 2 | 6 | hasta 720 W |
 
@@ -106,17 +106,17 @@ En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho de la carpa abi
 |  | Depósito de goteo | 14×24 | alto | 0,5 m | 0,5 m | ×1,00 |
 |  | Germinando (índica) | 9×5 | alto | 0,1 m | 0,05 m | **×2,08** |
 |  | Plántula (índica) | 10×15 | alto | 0,31 m | 0,15 m | **×2,08** |
-|  | Vegetativo (índica) | 22×23 | alto | 0,48 m | 0,45 m | ×1,06 |
-|  | Floración (índica) | 32×36 | alto | 0,75 m | 0,75 m | ×1,00 |
-|  | Lista (índica) | 34×43 | alto | 0,9 m | 0,9 m | ×1,00 |
+|  | Vegetativo (índica) | 22×22 | alto | 0,46 m | 0,45 m | ×1,02 |
+|  | Floración (índica) | 32×35 | alto | 0,73 m | 0,75 m | ×0,97 |
+|  | Lista (índica) | 34×42 | alto | 0,88 m | 0,9 m | ×0,97 |
 |  | Germinando (sativa) | 9×5 | alto | 0,1 m | 0,05 m | **×2,08** |
 |  | Plántula (sativa) | 10×15 | alto | 0,31 m | 0,15 m | **×2,08** |
-|  | Vegetativo (sativa) | 18×35 | alto | 0,73 m | 0,7 m | ×1,04 |
-|  | Floración (sativa) | 28×59 | alto | 1,23 m | 1,2 m | ×1,02 |
-|  | Lista (sativa) | 30×68 | alto | 1,42 m | 1,4 m | ×1,01 |
+|  | Vegetativo (sativa) | 18×34 | alto | 0,71 m | 0,7 m | ×1,01 |
+|  | Floración (sativa) | 28×57 | alto | 1,19 m | 1,2 m | ×0,99 |
+|  | Lista (sativa) | 30×66 | alto | 1,38 m | 1,4 m | ×0,98 |
 |  | Germinando (híbrida) | 9×5 | alto | 0,1 m | 0,05 m | **×2,08** |
 |  | Plántula (híbrida) | 10×15 | alto | 0,31 m | 0,15 m | **×2,08** |
-|  | Vegetativo (híbrida) | 20×27 | alto | 0,56 m | 0,55 m | ×1,02 |
+|  | Vegetativo (híbrida) | 20×26 | alto | 0,54 m | 0,55 m | ×0,98 |
 |  | Floración (híbrida) | 28×45 | alto | 0,94 m | 0,95 m | ×0,99 |
 |  | Lista (híbrida) | 30×52 | alto | 1,08 m | 1,1 m | ×0,98 |
 | Exterior | Árbol | 18×24 | alto | 1,5 m | 6 m | **×0,25** |
@@ -161,8 +161,26 @@ macetas, las plantas y el foco colgando) pero a escala real.
 
 - **Escala:** 48 px/m de ancho y de alto y 24 px/m de fondo, en una escena de 240 px centrada con `OX()`. La carpa
   apoya la espalda en la pared del cuarto (y 126). Las medidas reales de cada carpa están en `CARPAS[t].cm`.
-- **Plazas:** filas de `CARPAS[t].cols` macetas; la de delante y la de atrás al tresbolillo (una fila incompleta va
-  centrada). ◀ ▶ cambian de plaza, ▲ ▼ de fila y, desde la de atrás, ▲ elige el foco.
+- **Plazas:** filas de `CARPAS[t].cols` macetas, la 0 delante y la 1 detrás. ◀ ▶ cambian de plaza, ▲ ▼ de fila y,
+  desde la de atrás, ▲ elige el foco. Con una plaza de atrás elegida, la fila de delante se ve en transparencia.
+- **Distancia segura (1.10):** cada maceta va en el centro de su parte de la carpa (una fila incompleta se reparte todo el
+  ancho), lo más separada posible de las demás. Cada planta se dibuja de su tamaño real (`PLANTA_CM`), pero su copa,
+  como mucho del círculo que no toca a ninguna vecina ni las paredes, menos 4 cm de aire (`q.cw`), y su alto, como
+  mucho lo que deja el foco: alto de la carpa − 28 cm (el foco) − la distancia de seguridad del foco (`FOCO_SEP`) − el alto
+  de la maceta (`q.ch`). Así una planta grande en una carpa llena se ve podada y doblada, como lo haría un cultivador.
+  `npm run test:arte` comprueba en las 5 carpas, con cada foco y maceta, que nada se toca.
+
+| Carpa | Plazas | Centros de las macetas (cm) | Entre centros | Del centro a la pared | Copa máx. | Alto máx. de la planta con cada foco (en la maceta más alta que admite) |
+|---|---|---|---|---|---|---|
+| Armario 60×60 | 2 | 15,30 · 45,30 | 30 cm | 15 cm | 26 cm | CFL 100 · Sodio 250 80 · LED 100 85 · LED 200 85 cm (tela 11 L) |
+| Armario 80×80 | 3 | 20,20 · 60,20 · 40,60 | 40 cm | 20 cm | 36 cm | CFL 114 · Sodio 250 94 · Sodio 400 84 · LED 100 99 · LED 200 99 cm (18 L) |
+| Carpa 100×100 | 4 | 25,25 · 75,25 · 25,75 · 75,75 | 50 cm | 25 cm | 46 cm | CFL 134 · Sodio 250 114 · Sodio 400 104 · LED 100 119 · LED 200 119 · LED 480 109 cm (18 L) |
+| Carpa 120×120 | 6 | 20,30 · 60,30 · 100,30 · 20,90 · 60,90 · 100,90 | 40 cm | 20 cm | 36 cm | CFL 134 · Sodio 250 114 · Sodio 400 104 · Sodio 600 94 · LED 100 119 · LED 200 119 · LED 480 109 · LED 720 104 cm (18 L) |
+| Carpa 150×100 | 6 | 25,25 · 75,25 · 125,25 · 25,75 · 75,75 · 125,75 | 50 cm | 25 cm | 46 cm | CFL 134 · Sodio 250 114 · Sodio 400 104 · Sodio 600 94 · LED 100 119 · LED 200 119 · LED 480 109 · LED 720 104 cm (18 L) |
+
+Distancia de seguridad de la cima al foco: CFL 10 cm · Sodio 250 30 cm · LED 100 25 cm · LED 200 25 cm · Sodio 400 40 cm · LED 480 35 cm · Sodio 600 50 cm · LED 720 40 cm.
+Las plantas más grandes, lista: índica 70 cm de ancho y 90 de alto, sativa 60 × 140 e híbrida 60 × 110.
+
 - **Piezas procedurales** (son también las huellas de las láminas de P3–P4, `npm run sprites:huellas`): `carpa34`,
   `cuarto34`, `maceta34` (`MACETA_CM`), `planta34` por porte (`PORTE`, `PLANTA_CM`), `foco34` (`FOCO_CM`) y
   `extra34`. Un foco centrado a 28 cm del techo; su luz, recortada a la carpa y detrás de las plantas.

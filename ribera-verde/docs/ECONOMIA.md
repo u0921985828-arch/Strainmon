@@ -65,7 +65,7 @@ Feminizadas de tienda, Skunk #1 5 €, Lemon Haze 9 €, OG Kush 10 €, Blueber
 
 ## La deuda
 
-30.000 € en tres plazos: 3000 € en 7 días (capítulo 3), 12.000 € en 10 días (capítulo 5) y 15.000 € en 7 días tras la Copa (capítulo 7; el premio de la Copa son 5000 €). Si un plazo vence, Toño suma un 20 % del plazo y da 5 días más.
+30.000 € en tres plazos: 3.000 € en 7 días (capítulo 3), 12.000 € en 10 días (capítulo 5) y 15.000 € en 7 días tras la Copa (capítulo 7; el premio de la Copa son 5.000 €). Si un plazo vence, Toño suma un 20 % del plazo y da 5 días más.
 
 Por qué 30.000 €: con equipo, precios y venta al por mayor reales, un jugador que reinvierte cada cosecha en lo que más rinde por euro (focos LED, macetas grandes, carpas) paga el primer plazo en unas 4 cosechas (6 días), el segundo en unas 8 y el último en unas 9: lo mismo que la deuda de 5.000 € con los números de la 1.9 (3, 5 y 11 cosechas). Con los plazos viejos, la historia se acabaría en 7 cosechas.
 

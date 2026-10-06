@@ -46,14 +46,14 @@
 ## Estado (v1.9.0 publicada; 1.10 en desarrollo)
 
 - Se juega de principio a fin: capítulos 1 a 7, final («DEUDA SALDADA») y el imperio (capítulo 8).
-- `npm test` recorre la historia entera y los sistemas sueltos en 50 pasos: **50/50, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
+- `npm test` recorre la historia entera y los sistemas sueltos en 52 pasos: **52/52, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
 - **Cifras reales (1.10, sin versión todavía):** precios de growshop, vatios, kWh, gramos por vatio y tope de la maceta, semillas feminizadas por unidad y en sobres, fenotipos y esquejes, venta al por mayor, multas reales y deuda de 30.000 € (sus plazos se pagan en las mismas cosechas que antes, según la simulación). Tablas en [docs/ECONOMIA.md](docs/ECONOMIA.md), que se genera con `npm run docs`.
 - **Escala (1.8.0):** decidida y aplicada la opción A de [docs/PLANO.md](docs/PLANO.md): piso de 12 × 8 a 1 casilla = 1 m, carpas como muebles y vista de carpa a 64 px/m con las plantas de cepas de Strainmon (`../assets/plants`).
 - **Genética (1.9.0):** las landraces y los híbridos clásicos de Strainmon (`../src/species.js`, sus textos, no sus sprites), con su historia; estabilizar F1 → F4 en la mesa y banco de semillas en el PC desde el capítulo 2.
 - **Plan de producción (en desarrollo, sin versión todavía):** D1–D6 aprobadas. P1 hecho: el armario 80, la carpa 120 en el sitio C, el LED 100 W y los extras (ventilador, filtro de carbón y goteo), con la regla del olor. P2 hecho: la vista de carpa B (3/4 a 48 px/m) con arte procedural, medida en [docs/PLANO.md](docs/PLANO.md). P3 parado: el arte de plantas y carpas de las pruebas no se aprobó y falta una referencia.
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
-  - el motor ya usa el atlas (F2) y `npm run test:arte` da 22/22;
+  - el motor ya usa el atlas (F2) y `npm run test:arte` da 23/23;
   - F1 generada con PixelLab Pro: el protagonista ya sale del atlas (`base`, `idle`, `walk`), aprobado;
   - F3 (personajes) con la misma receta: los 13 NPC y los 6 clientes salen del atlas con `idle`, `walk` (los que caminan) y sus acciones de ambiente;
   - F3-resto, F4, F5, F6 y F7 (1.5): humos y efectos, gaviotas y palomas, tiles, interiores, fachadas, objetos, carpa, plantas, combate, iconos, cogollos y título salen del atlas, y el protagonista ya tiene sus 8 acciones;
@@ -67,7 +67,7 @@
 ## Limitaciones conocidas
 
 - El equilibrio de la economía y de la dificultad solo se ha probado con el test automático y una simulación de un jugador que reinvierte, no con jugadores.
-- No hay semillas regulares ni machos: todo lo de tienda es feminizado y las semillas salen de hermafroditas o de líneas sin fijar.
+- Los machos no se ven ni se gestionan: lo de tienda es feminizado (semilla solo si sale hermafrodita); lo demás es regular y da 1-3 semillas por planta, como si un macho hubiera polinizado unas flores.
 - Sin atlas (`?arte=procedural`) el arte es el procedural sencillo: personajes de 16 × 20 px con 3 fotogramas y plantas en 5 fases.
 - La música son 5 bucles cortos. No hay efectos de pasos.
 - No hay soporte de mando. En el navegador, la pantalla completa y el bloqueo en horizontal se piden al primer toque y dependen del navegador (en iPhone, Safari no deja bloquear el giro: sale «Gira el móvil»).

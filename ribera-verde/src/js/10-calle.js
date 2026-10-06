@@ -1,6 +1,6 @@
 /* ---------- clientes y venta ----------
    Precios reales (1.10): en la calle, el gramo a 6-10 € según el THC (× el tipo de cliente y lo que pidas); al por mayor,
-   3,50-5 € (ventaMayor, 11-historia). */
+   3,20-5 € (ventaMayor, 11-historia). */
 const precioCalle=thc=>4+thc*.2,precioMayor=thc=>2+thc*.1;
 function spawnClients(){
   S.clientsDay=S.day;S.clients=[];

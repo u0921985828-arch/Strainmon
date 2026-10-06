@@ -187,8 +187,9 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   }, () => S.ch === 7 && S.money === 5000 && S.due === 15000 && S.flags.copa || { ch: S.ch, money: S.money, due: S.due });
 
   // ---------- capítulo 7 → final ----------
-  await step('Pagar los últimos 15.000 € → deuda saldada: empieza tu imperio (capítulo 8)', ['^Pagar'], async () => { S.money += 10000; await run(talkBaltasar); },
-    () => S.ch === 8 && S.debt === 0 && S.imp0 === S.sales && imperioNivel() === 0 && mayorDia() === 1000 && /^Tu imperio · Cultivador/.test(objectiveText()) && document.getElementById('endcard').hidden || { ch: S.ch, debt: S.debt, o: objectiveText() });
+  await step('Pagar los últimos 15.000 € → deuda saldada: empieza tu imperio (capítulo 8, con su rótulo)', ['^Pagar'], async () => {
+    S.money += 10000; window.TO = []; const _t = toast; window.toast = (h, ms) => { TO.push(h); _t(h, ms); }; await run(talkBaltasar); window.toast = _t;
+  }, () => TO.some(h => /CAPÍTULO 8.*Tu imperio/.test(h)) && S.ch === 8 && S.debt === 0 && S.imp0 === S.sales && imperioNivel() === 0 && mayorDia() === 1000 && /^Tu imperio · Cultivador/.test(objectiveText()) && document.getElementById('endcard').hidden || { ch: S.ch, debt: S.debt, o: objectiveText() });
   await step('Imperio: 25.000 € facturados → Proveedor del barrio; Iñaki carga 2 kg al día', [], async () => {
     S.sales += 25000; await run(checkStory);
   }, () => S.impN === 1 && mayorDia() === 2000 && /Proveedor del barrio/.test(objectiveText()) || { impN: S.impN, o: objectiveText() });
@@ -231,6 +232,16 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
     window.R = { cfl: gw(0, 2, 125), led: gw(2, 8, 720), luz: luzCarpa(1) };
     S.carpas[0].foco = 'led200'; R.tope = gramosPlanta(sk(100), factores(0)); S = S0;
   }, () => R.cfl >= .25 && R.cfl <= .4 && R.led >= 1 && R.led <= 1.35 && R.luz === 45 && R.tope === 56 || R);
+  await step('Semillas al cosechar: Hindu Kush (regular) da 1-3 siempre; Skunk #1 (feminizada de tienda) solo si sale hermafrodita', [], async () => {
+    const r0 = Math.random, sd = S.seeds; window.R = {}; const cos = async (sid, x) => {
+      S.seeds = {}; Math.random = () => x; S.pots[0] = { sid, prog: 1, water: 100, health: 100, fert: false, pest: false, f: { t: 1, y: 1 } };
+      await run(() => harvest(0)); Math.random = r0; return S.seeds[sid] || 0; };
+    R.hindu = [await cos('hindu', .99), await cos('hindu', .5), await cos('hindu', .01)]; R.skunk = [await cos('ria', .5), await cos('ria', .05)]; S.seeds = sd;
+  }, () => R.hindu.every(n => n >= 1 && n <= 3) && R.skunk[0] === 0 && R.skunk[1] >= 1 || R);
+  await step('Partida de la 1.9 en el capítulo 7 (2.000 € en 3 días) → 15.000 € con 7 días; cifras con punto de miles', [], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 7, debt: 2000, due: 2000, deadline: S.day + 3 }); delete S.eco; migrate();
+    window.R = { due: S.due, dias: S.deadline - S.day, eco: S.eco, eur: [eur(999), eur(3000), eur(1500.4), eur(-1234), eur(30000)].join('|') }; S = S0;
+  }, () => R.due === 15000 && R.dias === 7 && R.eco === 2 && R.eur === '999 €|3.000 €|1.500 €|-1.234 €|30.000 €' || R);
   await step('8.ª variedad desde un arbusto → capítulo 5 sin más acciones', [], async () => {
     S.ch = 4; S.flags.lab = true; S.due = 0; S.disc = { ria: true, limon: true, txoko: true, niebla: true, mango: true, purpura: true, rif: true };
     S.custom = {}; delete S.taken.h_acap; S.map = 'town'; await run(() => objectAction(2, 26)); S.map = 'home'; await idle();

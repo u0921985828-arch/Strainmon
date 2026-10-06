@@ -152,7 +152,7 @@ flowchart LR
 Lo que sale de un cruce nuevo (receta o híbrido propio) es una **F1**: una línea inestable en la que cada planta sale distinta.
 
 - En la mesa de genética, al elegir como padre la misma variedad («· estabilizar»), se cruzan dos plantas de la línea: gasta 2 semillas, guarda 1 y sube una generación (F1 → F2 → F3 → **estable** en la F4). Entre generaciones hay que cultivar la línea para tener otra vez 2 semillas.
-- Una línea sin fijar la estás criando: sus plantas se polinizan entre ellas y cada una da 2-5 semillas al cosecharla (las demás, feminizadas, casi nunca dan: 12 % de que una flor hermafrodita deje 1-3).
+- Una línea sin fijar la estás criando: sus plantas se polinizan entre ellas y cada una da 2-5 semillas al cosecharla (las demás: las de tienda son feminizadas y casi nunca dan, 12 % de que una flor hermafrodita deje 1-3; las landraces, las de Kiko y tus líneas ya fijadas son regulares y algún macho poliniza unas flores: 1-3 por planta).
 - Las landraces y las de la tienda llevan su tipo genético (abajo); las de receta, estabilizadas, son líneas estables.
 
 ## Fenotipos (1.10)
@@ -162,7 +162,7 @@ Cada semilla es una planta distinta. Al germinar, tira su fenotipo: THC × (1 + 
 | Tipo | σ | Estrella | Qué es |
 |---|---|---|---|
 | Línea estable | 0,06 | 1 de cada ~16.000 | fijada a lo largo de generaciones: casi todas las plantas salen iguales |
-| Cruce F1 | 0,07 | 1 de cada ~2000 | hijo directo de dos líneas estables: uniforme y con vigor híbrido |
+| Cruce F1 | 0,07 | 1 de cada ~2.000 | hijo directo de dos líneas estables: uniforme y con vigor híbrido |
 | F1 | 0,08 | 1 de cada ~500 | línea inestable, cosechas desiguales. Estabilízala en la mesa |
 | F2 | 0,12 | 1 de cada ~40 | línea inestable, la generación que más se separa. Estabilízala en la mesa |
 | F3 | 0,1 | 1 de cada ~100 | línea inestable, ya seleccionada. Estabilízala en la mesa |

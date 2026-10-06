@@ -174,7 +174,8 @@ async function carpaAction(ci){
   ponerExtra(ci,x);return say(`Pones el ${EXTRAS[x].n.toLowerCase()} en ${/^Armario/.test(C.n)?'el':'la'} ${C.n.toLowerCase()}.\n${EXTRAS[x].d}`);
 }
 // cosecha: gramos y THC con el fenotipo de la planta; un fenotipo estrella va a un lote aparte (clave sid + '*', ver lotSid).
-// Semillas: las de tienda son feminizadas y salen sin semilla salvo alguna flor hermafrodita (SEMILLA_HERMA); una línea sin
+// Semillas: las de tienda (SHOP) son feminizadas y salen sin semilla salvo alguna flor hermafrodita (SEMILLA_HERMA); las
+// demás (landraces, las de Kiko y tus líneas fijadas) son regulares: algún macho poliniza unas flores y dan 1-3; una línea sin
 // fijar (F1-F3) la estás criando: se polinizan entre ellas y das 2-5 semillas por planta para seguir estabilizando
 const SEMILLA_HERMA=.12;
 async function harvest(i){
@@ -182,12 +183,12 @@ async function harvest(i){
   const g=gramosPlanta(p,f);
   const thc=Math.min(35,Math.round((s.thc*fe.t*(.85+.15*p.health/100)+f.thc+(p.fert?.3:0))*10)/10);
   const [vx,vy]=posPlaza(i);await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:vx,y:vy-12});
-  const cria=genDe(p.sid)<GEN_ESTABLE,n=cria?ri(2,5):Math.random()<SEMILLA_HERMA?ri(1,3):0;
+  const cria=genDe(p.sid)<GEN_ESTABLE,fem=SHOP.some(it=>it.sid===p.sid),n=cria?ri(2,5):!fem||Math.random()<SEMILLA_HERMA?ri(1,3):0;
   addBuds(cl==='estrella'?p.sid+'*':p.sid,g,thc);if(n)addSeeds(p.sid,n);if(p.f&&p.f.id)S.fenos[p.f.id]=cl;S.pots[i]=null;sfx('get');
   await say(`Cosechas ${g} g de ${s.n}. THC: ${pct(thc)}%.`);
   if(cl==='estrella'){sfx('enc');await say(`¡Fenotipo estrella! THC ×${coma(fe.t)} y cosecha ×${coma(fe.y)} sobre la media de la ${s.n}.`);await say('Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.');}
   else if(cl==='floja')await say(`Fenotipo flojo: THC ×${coma(fe.t)} y cosecha ×${coma(fe.y)} de la media.`);
-  if(n)await say(cria?`Las plantas de la línea se han polinizado entre ellas: recoges ${n} semillas de ${s.n}.`:`Una flor hermafrodita ha polinizado unas pocas: recoges ${n} semilla${n>1?'s':''} de ${s.n}.`);
+  if(n)await say(cria?`Las plantas de la línea se han polinizado entre ellas: recoges ${n} semillas de ${s.n}.`:!fem?`Son semillas regulares: algún macho ha polinizado unas flores. Recoges ${n} semilla${n>1?'s':''} de ${s.n}.`:`Una flor hermafrodita ha polinizado unas pocas: recoges ${n} semilla${n>1?'s':''} de ${s.n}.`);
   S.flags.harvest1=true;await checkStory();
 }
 // estabilizar: la línea cruzada consigo misma sube una generación (F1 → F2 → F3 → estable)

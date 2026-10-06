@@ -61,7 +61,7 @@ Cada objeto tiene tres cosas: una medida real (para dibujarlo a escala), un efec
 | id | Modelo | Medida real | Casillas | Plazas | Foco máx. | Maceta máx. | Precio | Sitio |
 |---|---|---|---|---|---|---|---|---|
 | `p60` | Armario 60×60 | 60 × 60 × 160 cm | 1 | 2 | 250 W | 11 L | de serie (la tía) | A |
-| `p80` | Armario 80×80 | 80 × 80 × 180 cm | 1 | 3 (al tresbolillo) | 400 W | 18 L | 90 € · cap. 3 | A: sustituye al de 60 (plantas, foco y macetas se quedan) |
+| `p80` | Armario 80×80 | 80 × 80 × 180 cm | 1 | 3 (2 delante y 1 detrás, centrada) | 400 W | 18 L | 90 € · cap. 3 | A: sustituye al de 60 (plantas, foco y macetas se quedan) |
 | `m100` | Carpa 100×100 | 100 × 100 × 200 cm | 1 | 4 | 480 W | 25 L | 120 € · cap. 2 | B |
 | `g150` | Carpa 150×100 | 150 × 100 × 200 cm | 2 | 6 | 720 W | 25 L | 140 € · cap. 4 | B: sustituye a la de 100 |
 | `m120` | Carpa 120×120 | 120 × 120 × 200 cm | 2 | 6 (3 × 2) | 720 W | 25 L | 150 € · cap. 5 | C, cuando ya hay carpa en B |
@@ -163,6 +163,7 @@ Medidas en la vista B (ancho × alto en px, contando el suelo y la pared):
 | Foco CFL / sodio / LED 480 | 35 / 50 / 60 cm | 17 / 24 / 29 de ancho |
 
 - **Estilizado permitido:** germinando y plántula a ×2, para que se vean (5 y 15 cm reales darían 2 y 7 px).
+- **Distancia segura (1.10):** cada maceta va en el centro de su parte de la carpa (separación entre centros: 30 cm en el armario 60, 40 en el 80 y la carpa 120, 50 en las de 100 y 150). La copa de cada planta se dibuja como mucho de lo que cabe sin tocar a las vecinas ni las paredes, menos 4 cm (26, 36 o 46 cm), y su alto, como mucho hasta la distancia de seguridad del foco (`FOCO_SEP`: CFL 10 cm, LED 25–40, sodio 30–50). Las láminas de plantas de P4 tienen que caber en esas cajas: tabla completa en [PLANO.md §6](PLANO.md#6-vista-de-carpa-b-p2-del-plan-de-producción).
 - **En el piso no cambia nada:** las carpas cerradas siguen a 16 px/m (celda `carpa_mapa` de 32 × 48). El armario 80 mide 13 × 35 px y la carpa 120, 19 × 42.
 
 ## 5. Sprites a pedir a PixelLab

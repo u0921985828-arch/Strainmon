@@ -195,6 +195,16 @@ const REAL = {
       texto(vx, `${CARPAS[t].n} · ${FOCOS[foco].n}`, px, 160 * VE + 36, '#e8ecf4', 12);
     });
     out.vistaB = vc.toDataURL('image/png');
+    // distancia segura de cada carpa: centros de las macetas (cm), separación mínima entre ellas y a la pared, copa máxima de
+    // la planta y alto máximo sobre la maceta más alta que admite, con cada foco (FOCO_SEP)
+    out.holgura = HOLGURA; out.espacio = Object.keys(CARPAS).map(t => {
+      const C = CARPAS[t], mx = Object.keys(MACETAS).filter(k => MACETAS[k].l <= C.lmax).sort((a, b) => MACETA_CM[b][1] - MACETA_CM[a][1])[0];
+      S.carpas = [{ t, foco: 'cfl' }]; S.macetas = Array(C.plazas).fill(mx); const pl = vcGeo(0).pl; let sep = 1e9, pared = 1e9;
+      pl.forEach((a, i) => { pared = Math.min(pared, a.cx, C.cm[0] - a.cx, a.cy, C.cm[2] - a.cy); pl.forEach((b, j) => { if (j > i) sep = Math.min(sep, Math.hypot(a.cx - b.cx, a.cy - b.cy)); }); });
+      const altos = Object.keys(FOCOS).filter(f => FOCOS[f].w <= C.wmax).map(f => { S.carpas[0].foco = f; return { foco: f, sep: FOCO_SEP[f], alto: Math.round(vcGeo(0).pl[0].ch) }; });
+      return { t, n: C.n, cm: C.cm, plazas: C.plazas, centros: pl.map(q => [Math.round(q.cx), Math.round(q.cy)]), sep: Math.round(sep), pared: Math.round(pared),
+        copa: Math.round(Math.min(...pl.map(q => q.cw))), maceta: mx, altoMaceta: MACETA_CM[mx][1], altos };
+    });
     return out;
   }, REAL);
 
@@ -203,7 +213,7 @@ const REAL = {
   png('escala.png', res.escala); console.log('  docs/plano/escala.png');
   png('vista-b.png', res.vistaB); console.log('  docs/plano/vista-b.png');
   const inv = Object.fromEntries(Object.entries(res.mapas).map(([n, m]) => [n, m.inv]));
-  fs.writeFileSync(path.join(OUT, 'medidas.json'), JSON.stringify({ escala: 'mapa: 1 casilla = 16 px = 1 m · vista de carpa B: 48 px = 1 m de ancho y alto, 24 px/m de fondo', mapas: inv, sprites: res.medidas }, null, 1) + '\n');
+  fs.writeFileSync(path.join(OUT, 'medidas.json'), JSON.stringify({ escala: 'mapa: 1 casilla = 16 px = 1 m · vista de carpa B: 48 px = 1 m de ancho y alto, 24 px/m de fondo', mapas: inv, sprites: res.medidas, espacio: { holgura: res.holgura, carpas: res.espacio } }, null, 1) + '\n');
   console.log('  docs/plano/medidas.json · ' + res.medidas.length + ' sprites medidos');
   await browser.close();
   if (errors.length) { console.log('Errores:', errors); process.exit(1); }

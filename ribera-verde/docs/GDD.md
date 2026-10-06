@@ -43,8 +43,8 @@ Plantar → cuidar (agua, abono, plagas) y sacar esquejes de las buenas → cose
 - **Abono:** una dosis por planta (la botella de 1 L trae 4). Da +25 % de cosecha, +10 % de velocidad y +0,3 de THC.
 - **Cosecha (g por planta):** `mín(tope de la maceta, W × g/W ÷ plazas × rend de la maceta × rinde/34 × (0,4 + 0,6 × salud/100) × abono 1,25 × fenotipo.y)`. 34 g es el rinde medio de las variedades: la ficha enseña el de cada una en g/m² (LED a 400 W/m², abonada). Una plaza vacía es luz perdida.
 - **THC final:** `THC × fenotipo.t × (0,85 + 0,15 × salud/100) + thc del foco + 0,3 (abono)`, con un tope de 35 %.
-- **Semillas al cosechar:** las de tienda son feminizadas: un 12 % de las plantas sale hermafrodita y da 1-3 semillas; las demás, ninguna. Una línea sin fijar (F1-F3) se poliniza entre ella y da 2-5.
-- **Esquejes:** en vegetativo (20-65 %) se le saca un esqueje a una planta (−5 de salud). Es la misma planta, con su fenotipo. Enraíza en el propagador (hasta 12) y se seca si no se planta antes de que acabe el día siguiente.
+- **Semillas al cosechar:** las de tienda son feminizadas: un 12 % de las plantas sale hermafrodita y da 1-3 semillas; las demás, ninguna. Las landraces, las de Kiko y tus líneas ya fijadas son regulares: algún macho poliniza unas flores y cada planta da 1-3. Una línea sin fijar (F1-F3) se poliniza entre ella y da 2-5.
+- **Esquejes:** en crecimiento (del 20 %, ya plántula hecha, al 65 %, antes de florecer) se le saca un esqueje a una planta (−5 de salud). Es la misma planta, con su fenotipo. Enraíza en el propagador (hasta 12) y se seca si no se planta antes de que acabe el día siguiente.
 
 ### Equipo: carpas, focos y macetas (1.6; cifras reales en la 1.10)
 

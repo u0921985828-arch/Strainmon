@@ -60,7 +60,7 @@ const TIPO_COGOLLO={ria:'hibrido',limon:'sativa',txoko:'indica',niebla:'indica',
 // (rollFeno, 09-cultivo): THC y gramos × (1 + σ·z), cada uno por su lado. Estrella si THC × gramos ≥ FENO_ESTRELLA; floja si
 // ≤ FENO_FLOJO. Las de tienda llevan el suyo en TIPO_GEN; las que empiezan por «Landrace», landrace; las de receta y los
 // híbridos propios salen de la mesa como F1-F3 (S.gen) y, estabilizadas, son líneas estables. uno = 1 estrella de cada N
-// plantas (lo comprueba test:arte con 40.000 plantas por tipo)
+// plantas (lo comprueba test-historia con 200.000 plantas por tipo)
 const TIPO_GEN={ria:'estable',limon:'poli',txoko:'poli',niebla:'estable',mango:'f1',purpura:'estable'};
 const PADRES={limon:'Lemon Skunk × Silver Haze',txoko:'Chemdawg × Hindu Kush',mango:'KC 33 × Afghani'};
 const GENETICA={

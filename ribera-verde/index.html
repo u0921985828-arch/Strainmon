@@ -179,7 +179,8 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const pct=n=>n.toFixed(1).replace('.',',');
-const eur=n=>Math.round(n).toLocaleString('es-ES')+' €';
+// miles con punto también en cifras de 4 cifras (toLocaleString('es-ES') deja «3000» junto a «12.000»)
+const miles=n=>String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,'.'),eur=n=>miles(n)+' €';
 function mkCanvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.imageSmoothingEnabled=false;return [c,x];}
 function rngSeed(s){let t=s>>>0;return()=>{t=(t+0x6D2B79F5)>>>0;let r=Math.imul(t^(t>>>15),1|t);r^=r+Math.imul(r^(r>>>7),61|r);return((r^(r>>>14))>>>0)/4294967296;};}
 function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
@@ -679,7 +680,7 @@ const TIPO_COGOLLO={ria:'hibrido',limon:'sativa',txoko:'indica',niebla:'indica',
 // (rollFeno, 09-cultivo): THC y gramos × (1 + σ·z), cada uno por su lado. Estrella si THC × gramos ≥ FENO_ESTRELLA; floja si
 // ≤ FENO_FLOJO. Las de tienda llevan el suyo en TIPO_GEN; las que empiezan por «Landrace», landrace; las de receta y los
 // híbridos propios salen de la mesa como F1-F3 (S.gen) y, estabilizadas, son líneas estables. uno = 1 estrella de cada N
-// plantas (lo comprueba test:arte con 40.000 plantas por tipo)
+// plantas (lo comprueba test-historia con 200.000 plantas por tipo)
 const TIPO_GEN={ria:'estable',limon:'poli',txoko:'poli',niebla:'estable',mango:'f1',purpura:'estable'};
 const PADRES={limon:'Lemon Skunk × Silver Haze',txoko:'Chemdawg × Hindu Kush',mango:'KC 33 × Afghani'};
 const GENETICA={
@@ -1034,7 +1035,7 @@ function queue(key,fn){if(queued.has(key))return;queued.add(key);pending.push(as
 const totalBuds=()=>Object.values(S.buds).reduce((a,b)=>a+b.g,0);
 const discCount=()=>Object.keys(S.disc).length;
 // ficha de una variedad: cifras, tipo genético (si es un cruce y qué fenotipos da) y origen
-function strainLine(k){const s=getStrain(k),G=GENETICA[tipoGen(k)];return `THC ${pct(s.thc)}% · ~${gm2(s)} g/m² · ${coma(s.d)} días · Resist. ${s.r}%\n${G.n}${PADRES[k]?' ('+PADRES[k]+')':''}: ${G.d}. Estrella: 1 de cada ~${G.uno.toLocaleString('es-ES')}.\n${s.o}`;}
+function strainLine(k){const s=getStrain(k),G=GENETICA[tipoGen(k)];return `THC ${pct(s.thc)}% · ~${gm2(s)} g/m² · ${coma(s.d)} días · Resist. ${s.r}%\n${G.n}${PADRES[k]?' ('+PADRES[k]+')':''}: ${G.d}. Estrella: 1 de cada ~${miles(G.uno)}.\n${s.o}`;}
 function discover(sid){if(!S.disc[sid]){S.disc[sid]=true;toast(`<small>NUEVA EN LA GENOTECA</small>${esc(getStrain(sid).n)}`);queue('historia',checkStory);}}
 function addSeeds(sid,n){S.seeds[sid]=(S.seeds[sid]||0)+n;discover(sid);}
 // cogollos por lotes: clave = variedad, o variedad + '*' para lo de un fenotipo estrella (se vende y se presenta aparte)
@@ -1350,7 +1351,8 @@ async function carpaAction(ci){
   ponerExtra(ci,x);return say(`Pones el ${EXTRAS[x].n.toLowerCase()} en ${/^Armario/.test(C.n)?'el':'la'} ${C.n.toLowerCase()}.\n${EXTRAS[x].d}`);
 }
 // cosecha: gramos y THC con el fenotipo de la planta; un fenotipo estrella va a un lote aparte (clave sid + '*', ver lotSid).
-// Semillas: las de tienda son feminizadas y salen sin semilla salvo alguna flor hermafrodita (SEMILLA_HERMA); una línea sin
+// Semillas: las de tienda (SHOP) son feminizadas y salen sin semilla salvo alguna flor hermafrodita (SEMILLA_HERMA); las
+// demás (landraces, las de Kiko y tus líneas fijadas) son regulares: algún macho poliniza unas flores y dan 1-3; una línea sin
 // fijar (F1-F3) la estás criando: se polinizan entre ellas y das 2-5 semillas por planta para seguir estabilizando
 const SEMILLA_HERMA=.12;
 async function harvest(i){
@@ -1358,12 +1360,12 @@ async function harvest(i){
   const g=gramosPlanta(p,f);
   const thc=Math.min(35,Math.round((s.thc*fe.t*(.85+.15*p.health/100)+f.thc+(p.fert?.3:0))*10)/10);
   const [vx,vy]=posPlaza(i);await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:vx,y:vy-12});
-  const cria=genDe(p.sid)<GEN_ESTABLE,n=cria?ri(2,5):Math.random()<SEMILLA_HERMA?ri(1,3):0;
+  const cria=genDe(p.sid)<GEN_ESTABLE,fem=SHOP.some(it=>it.sid===p.sid),n=cria?ri(2,5):!fem||Math.random()<SEMILLA_HERMA?ri(1,3):0;
   addBuds(cl==='estrella'?p.sid+'*':p.sid,g,thc);if(n)addSeeds(p.sid,n);if(p.f&&p.f.id)S.fenos[p.f.id]=cl;S.pots[i]=null;sfx('get');
   await say(`Cosechas ${g} g de ${s.n}. THC: ${pct(thc)}%.`);
   if(cl==='estrella'){sfx('enc');await say(`¡Fenotipo estrella! THC ×${coma(fe.t)} y cosecha ×${coma(fe.y)} sobre la media de la ${s.n}.`);await say('Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.');}
   else if(cl==='floja')await say(`Fenotipo flojo: THC ×${coma(fe.t)} y cosecha ×${coma(fe.y)} de la media.`);
-  if(n)await say(cria?`Las plantas de la línea se han polinizado entre ellas: recoges ${n} semillas de ${s.n}.`:`Una flor hermafrodita ha polinizado unas pocas: recoges ${n} semilla${n>1?'s':''} de ${s.n}.`);
+  if(n)await say(cria?`Las plantas de la línea se han polinizado entre ellas: recoges ${n} semillas de ${s.n}.`:!fem?`Son semillas regulares: algún macho ha polinizado unas flores. Recoges ${n} semilla${n>1?'s':''} de ${s.n}.`:`Una flor hermafrodita ha polinizado unas pocas: recoges ${n} semilla${n>1?'s':''} de ${s.n}.`);
   S.flags.harvest1=true;await checkStory();
 }
 // estabilizar: la línea cruzada consigo misma sube una generación (F1 → F2 → F3 → estable)
@@ -1450,7 +1452,9 @@ async function labAction(){
    ancho y de alto y 24 px/m de fondo; lo de atrás se corre 6 px/m a la derecha, así la pared izquierda se ve por dentro.
    La carpa tiene la espalda contra la pared del cuarto (y VB_PARED): la de 150 × 100 × 200 cm mide 72 × 120 px y una
    sativa lista, 67 px más su maceta.
-   Las plazas van en filas de CARPAS[t].cols macetas: la fila 0 delante y la 1 detrás (pintada antes, al tresbolillo).
+   Las plazas van en filas de CARPAS[t].cols macetas: la fila 0 delante y la 1 detrás (pintada antes). Cada maceta va en el centro
+   de su parte de la carpa, lo más separada posible, y la copa de su planta se dibuja como mucho del ancho que cabe sin tocar a las
+   vecinas ni las paredes (distancia segura, q.cw) y como mucho del alto que deja la distancia al foco (FOCO_SEP, q.ch).
    ◀ ▶ cambian de plaza y ▲ ▼ de fila; desde la fila de atrás, ▲ elige el foco. A cuida la planta (potAction) o abre el
    foco y los extras (carpaAction); B sale. El tiempo no corre mientras se mira.
    Todo es procedural (y es la huella de las láminas de P3-P4, tools/sprites/huellas.js) hasta que lleguen esas láminas.
@@ -1466,25 +1470,31 @@ const PLANTA_CM={i:{h:[10,30,45,75,90],w:[8,20,45,65,70]},s:{h:[10,30,70,120,140
 // macetas: diámetro y alto (cm), cuerpo, borde y si es de tela
 const MACETA_CM={plastico7:[22,20,'#2c2c30','#4a4a52',0],tela11:[25,22,'#45474e','#5e6068',1],plastico18:[30,28,'#2c2c30','#4a4a52',0],tela25:[35,26,'#7a6c50','#988a6c',1]};
 const FOCO_CM={cfl:35,sodio250:45,sodio400:50,sodio600:55,led100:25,led200:30,led480:60,led720:100};   // ancho real de cada foco
+// distancia segura (cm) de la cima de la planta al foco, la que se recomienda para no quemarla: el CFL casi no calienta; el sodio, mucho
+const FOCO_SEP={cfl:10,led100:25,led200:25,led480:35,led720:40,sodio250:30,sodio400:40,sodio600:50},HOLGURA=4;   // HOLGURA: aire entre copas (cm)
 const macetaPx=k=>{const [d,h]=MACETA_CM[k]||MACETA_CM.plastico7;return {w:Math.round(d*VB_M),e:Math.max(3,Math.round(d*VB_F)),hb:Math.round(h*VB_M)};};
 let VC=null;                              // carpa abierta: {ci, sel: plaza (índice de huecos()) o −1 = el foco, ocupado}
 // geometría de la carpa ci en la escena de 240: P(x, y, z) pasa cm (x desde la izquierda, y de fondo desde el frente, z de alto) a px
 function vcGeo(ci){
   const c=S.carpas[ci],C=CARPAS[c.t],[W,H,D]=C.cm,w=Math.round(W*VB_M),s=Math.round(D*VB_X),x0=120-((w+s)>>1),yf=VB_PARED+Math.round(D*VB_F);
   const P=(x,y,z)=>[Math.round(x0+x*VB_M+y*VB_X),Math.round(yf-y*VB_F-z*VB_M)];
+  // cada maceta en el centro de su parte (cx, cy en cm; una fila incompleta se reparte todo el ancho). La copa (cw) cabe en el
+  // círculo que no toca a ninguna vecina ni las paredes, menos la HOLGURA; la planta (ch), bajo el foco a su FOCO_SEP sobre la maceta
   const pl=[];huecos().forEach((q,i)=>{if(q.c!==ci)return;
-    const col=q.j%C.cols,fila=Math.floor(q.j/C.cols),n=Math.min(C.cols,C.plazas-fila*C.cols),off=C.filas>1?(fila?.65:.4):.5;
-    const [x,y]=P(n<C.cols?(col+.5)*W/n:(col+off)*W/C.cols,C.filas>1?(fila?.72:.3)*D:.5*D,0);   // una fila incompleta va centrada
-    pl.push({i,col,fila,x,y});});
+    const col=q.j%C.cols,fila=Math.floor(q.j/C.cols),n=Math.min(C.cols,C.plazas-fila*C.cols);
+    pl.push({i,col,fila,cx:(col+.5)*W/n,cy:(fila+.5)*D/C.filas});});
+  for(const a of pl){let d=2*Math.min(a.cx,W-a.cx,a.cy,D-a.cy);for(const b of pl)if(b!==a)d=Math.min(d,Math.hypot(a.cx-b.cx,a.cy-b.cy));
+    a.cw=d-HOLGURA;a.ch=H-28-(FOCO_SEP[c.foco]||40)-(MACETA_CM[S.macetas[a.i]]||MACETA_CM.plastico7)[1];[a.x,a.y]=P(a.cx,a.cy,0);}
   // el foco, en el centro a medio fondo: fx su centro y fy su parte de abajo (a 28 cm del techo); barra: la barra de la que cuelga
   return {c,C,W,H,D,w,s,x0,yf,P,pl,fx:P(W/2,D/2,0)[0],fy:P(0,D/2,H-28)[1],barra:P(0,D/2,H-4)[1]};
 }
 // dónde lanzar un efecto sobre la plaza i (riego, cosecha): en la vista, sobre la planta; si no, sobre el jugador
 function posPlaza(i){
   const q=VC&&vcGeo(VC.ci).pl.find(q=>q.i===i);if(!q)return [P.px+8,P.py+2];
-  const p=S.pots[i],h=p?altoPlanta(p):0;return [q.x,q.y-macetaPx(S.macetas[i]).hb-Math.round(h/2)];
+  const p=S.pots[i],h=p?altoPlanta(p,q):0;return [q.x,q.y-macetaPx(S.macetas[i]).hb-Math.round(h/2)];
 }
-const altoPlanta=p=>{const D=PLANTA_CM[porteDe(p.sid)];return Math.round(D.h[p.dead?2:plantStage(p)]*VB_M)-(p.dead?4:0);};
+// alto en px de la planta; en una plaza q, con el tope de alto de la plaza (q.ch)
+const altoPlanta=(p,q)=>{const D=PLANTA_CM[porteDe(p.sid)];return Math.min(Math.round(D.h[p.dead?2:plantStage(p)]*VB_M),q?Math.floor(q.ch*VB_M):1e9)-(p.dead?4:0);};
 
 /* ---------- arte procedural ---------- */
 const VK={pole:'#5a5e68',hi:'#8a8e98',tela:'#26272c',osc:'#1c1d22',techo:'#3e4048',my:'#d4d8e2',my2:'#b2b8c4',my3:'#f2f4f8',my4:'#c8ccd6',som:'#a8aebb',
@@ -1557,11 +1567,12 @@ function maceta34(k){
 }
 // planta en 3/4 de un porte y una fase (9 = muerta): tallo y pisos de ramas que suben en diagonal, con su hoja de abanico en la
 // punta (en abeto en índicas e híbridas, más parejos y espaciados en sativas) y, en floración, cogollos en las puntas y la cola
-// arriba. Ocupa el alto y el ancho reales de PLANTA_CM. Lienzo 48 × 80 con la base del tallo en (24, 79)
-function planta34(po,st,dry,bud){
-  const key='p34|'+po+st+dry+bud;if(plantCache[key])return plantCache[key];
+// arriba. Ocupa el alto y el ancho reales de PLANTA_CM, como mucho cw de ancho y ch de alto (cm: lo que cabe en su plaza, ver
+// vcGeo). Lienzo 48 × 80 con la base del tallo en (24, 79)
+function planta34(po,st,dry,bud,cw=1e9,ch=1e9){
+  const key='p34|'+po+st+dry+bud+'|'+Math.round(Math.min(cw,999))+'|'+Math.round(Math.min(ch,999));if(plantCache[key])return plantCache[key];
   const [c,x]=mkCanvas(48,80),t=painter(x,rngSeed(st*7+po.charCodeAt(0))),B=79,cx=24,mu=st===9,f=mu?2:st,D=PLANTA_CM[po];
-  const H=Math.round(D.h[f]*VB_M)-(mu?4:0),A=D.w[f]*VB_M/2,top=B-H+1;
+  const H=Math.min(Math.round(D.h[f]*VB_M),Math.floor(ch*VB_M))-(mu?4:0),A=Math.min(D.w[f],cw)*VB_M/2,top=B-H+1;
   const g1=dry?'#b8aa48':'#3c9a3e',g2=dry?'#8a7c30':'#22662a',g3=dry?'#d8cc78':'#74d064',ta=mu?'#6a5430':g2;
   const hoja=(hx,hy,s)=>{if(mu){drawLeafPx(t,hx,hy+s*.8,s*.8,'#5a4a28');return;}drawLeafPx(t,hx,hy,s+.6,g2);drawLeafPx(t,hx,hy,s,g1);if(s>2.2)drawLeafPx(t,hx,hy-.5,s*.45,g3);};
   const cogollo=(bx,by,rx,ry)=>t.blob(bx,by,rx,ry,bud,shade(bud,-60),shade(bud,50));
@@ -1572,9 +1583,10 @@ function planta34(po,st,dry,bud){
   t.F(cx-(f>=3?1:0),cima,f>=3?2:1,B-cima,ta);
   for(let n=0;n<pisos;n++){
     const k=n/(pisos-1),y=Math.round(B-H*(.22+.62*k))+(mu?2:0),hw=A*(1-abeto*k),s=Math.max(1.3,Math.min(4.2,hw*.3)),bx=hw-s*1.1,by=Math.round(bx*(mu?-.1:.45));
-    for(const d of [-1,1]){linea(t,[cx,y],[Math.round(cx+d*bx),y-by],ta);hoja(cx+d*bx,y-by,s);
+    const ty=Math.max(y-by,top+Math.ceil((s+.6)*1.75)),r=1.1+s*.28;   // ni la hoja ni el cogollo de la punta suben por encima de la planta
+    for(const d of [-1,1]){linea(t,[cx,y],[Math.round(cx+d*bx),ty],ta);hoja(cx+d*bx,ty,s);
       if(k<.7&&!mu)hoja(cx+d*bx*.45,y-Math.round(by*.45)+1,s*.7);
-      if(flor&&n>0){const r=1.1+s*.28;cogollo(cx+d*bx,y-by-s*1.3,r,r*ry*1.3);}}
+      if(flor&&n>0)cogollo(cx+d*bx,Math.max(ty-s*1.3,top+r*ry*1.3),r,r*ry*1.3);}
   }
   if(flor){const r=st===4?2.6:2,rr=r*ry*1.9;cogollo(cx+.5,top+rr,r,rr);if(st===4)for(let i=0;i<8;i++)t.P(cx-2+Math.floor(t.R()*5),top+1+Math.floor(t.R()*rr*1.6),'#ffffff');}
   else hoja(cx+.5,top+4.5,mu?1.6:2.2);
@@ -1618,7 +1630,10 @@ function renderCarpa(now){
     const gr=ctx.createLinearGradient(0,g.fy,0,g.yf);gr.addColorStop(0,FOCO_LUZ[F.tipo]+a+')');gr.addColorStop(1,FOCO_LUZ[F.tipo]+'0)');
     ctx.fillStyle=gr;ctx.beginPath();ctx.moveTo(g.fx-lw,g.fy);ctx.lineTo(g.fx+lw,g.fy);ctx.lineTo(g.fx+hw,g.yf);ctx.lineTo(g.fx-hw,g.yf);ctx.fill();
     ctx.globalCompositeOperation='source-over';}
-  for(const q of [...g.pl].sort((a,b)=>a.y-b.y||a.x-b.x))vcPlanta(q,now);
+  // con una plaza de atrás elegida, la fila de delante se pinta en transparencia para que se vea la planta que tapa
+  const fsel=(g.pl.find(q=>q.i===VC.sel)||{fila:0}).fila;
+  for(const q of [...g.pl].sort((a,b)=>a.y-b.y||a.x-b.x)){ctx.globalAlpha=q.fila<fsel?.35:1;vcPlanta(q,now);}
+  ctx.globalAlpha=1;
   ctx.restore();
   const fc=foco34(c.foco),x0=g.fx-(fc.width>>1),y0=g.fy-fc.height+1,ty=y0+(F.tipo==='led'?4:0);   // cuelga de dos cuerdas
   ctx.fillStyle='#2a2b30';if(ty>g.barra){ctx.fillRect(x0+2,g.barra,1,ty-g.barra);ctx.fillRect(x0+fc.width-3,g.barra,1,ty-g.barra);}
@@ -1632,8 +1647,8 @@ function vcPlanta(q,now){
   const p=S.pots[q.i],k=S.macetas[q.i],m=maceta34(k),{e,hb}=macetaPx(k);
   ctx.drawImage(m,q.x-(m.width>>1),q.y-Math.round(e/2+hb));q.alto=hb+Math.round(e/2);
   if(!p)return;
-  const s=getStrain(p.sid),st=p.dead?9:plantStage(p),pc=planta34(porteDe(p.sid),st,!p.dead&&p.water<=0,s?s.c:'#9bd35a'),yb=q.y-hb+1;
-  q.alto+=altoPlanta(p);
+  const s=getStrain(p.sid),st=p.dead?9:plantStage(p),pc=planta34(porteDe(p.sid),st,!p.dead&&p.water<=0,s?s.c:'#9bd35a',q.cw,q.ch),yb=q.y-hb+1;
+  q.alto+=altoPlanta(p,q);
   balanceo(pc,q.x-24,yb-79,79,!p.dead&&p.water>0&&st>=2?1:0,now+q.x*37);
   if(p.pest&&!p.dead){ctx.fillStyle='#e02828';for(let n=0;n<6;n++)ctx.fillRect(q.x-6+((n*5+Math.floor(now/300))%12),yb-8-((n*7)%14),1,1);}
 }
@@ -1678,7 +1693,7 @@ async function abrirCarpa(ci){
 }
 /* ---------- clientes y venta ----------
    Precios reales (1.10): en la calle, el gramo a 6-10 € según el THC (× el tipo de cliente y lo que pidas); al por mayor,
-   3,50-5 € (ventaMayor, 11-historia). */
+   3,20-5 € (ventaMayor, 11-historia). */
 const precioCalle=thc=>4+thc*.2,precioMayor=thc=>2+thc*.1;
 function spawnClients(){
   S.clientsDay=S.day;S.clients=[];
@@ -1936,7 +1951,7 @@ async function talkBaltasar(){
     await chapter(6);showObjective();
   }else if(S.ch===7){
     await talk(N,[`${eur(paid)}. Contados.`,'Deuda saldada. Lo de tu tía queda cerrado.','Una cosa más, {N}: si algún día quieres trabajar para mí, ya sabes dónde estoy.']);
-    S.ch=8;S.debt=0;S.imp0=S.sales;S.impN=0;await ending();
+    S.debt=0;S.imp0=S.sales;S.impN=0;await ending();
   }
 }
 async function chapter(n){S.ch=n;sfx('get');toast(`<small>CAPÍTULO ${n}</small>${CH_TITLES[n]}`,2800);buildEnts();await wait(400);save();}
@@ -1998,7 +2013,7 @@ async function ending(){
   e.innerHTML=`<h2>DEUDA SALDADA</h2><div>Has saldado los ${eur(DEUDA)} de tu tía Maite en ${S.day} días.</div><div>Variedades: ${discCount()} · Ventas totales: ${eur(S.sales)}</div><div>Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.<br>¿Completarás la GENOTECA? ¿Conseguirás la GHOST TRAIN HAZE?</div><div style="opacity:.7">Pulsa A</div>`;
   e.hidden=false;await fade(0);sfx('get');
   await new Promise(r=>push(b=>{if(b==='A'||b==='START'){pop();r();}}));
-  await fade(1);e.hidden=true;await fade(0);save();showObjective();
+  await fade(1);e.hidden=true;await fade(0);await chapter(8);await wait(2400);showObjective();
 }
 
 /* =========================================================
@@ -2317,9 +2332,10 @@ function migrate(){
     S.pots=Array.from({length:n},(_,i)=>i<(S.potsOwned||2)?old[i]||null:null);S.macetas=Array(n).fill('plastico7');
     delete S.potsOwned;delete S.led;
   }
-  if(!S.eco){   // partidas de antes de la 1.10: la deuda pasa a la escala real del capítulo en que estás (los intereses cobrados se pierden)
+  if(!S.eco){   // partidas de antes de la 1.10: la deuda pasa a la escala real del capítulo en que estás (los intereses cobrados se
+    // pierden) y el plazo abierto vuelve a contar desde hoy, con los días que da Baltasar (7, 10 o 7), para pagar la cifra nueva
     S.debt=S.ch>=8?0:{4:DEUDA-PLAZOS[3],5:DEUDA-PLAZOS[3],6:PLAZOS[7],7:PLAZOS[7]}[S.ch]||DEUDA;
-    if(S.due>0)S.due=S.ch===3||S.ch===5?PLAZOS[S.ch]:S.debt;
+    if(S.due>0){S.due=S.ch===3||S.ch===5?PLAZOS[S.ch]:S.debt;S.deadline=Math.max(S.deadline,S.day+(S.ch===5?10:7));}
     if(S.ch>=8){S.imp0=S.sales;S.impN=0;}
   }
   const d=newState();for(const k in d)if(!(k in S))S[k]=d[k];for(const k in d.items)if(!(k in S.items))S.items[k]=0;

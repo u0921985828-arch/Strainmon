@@ -1003,9 +1003,9 @@
    "real": 0.45,
    "ppm": 48,
    "w": 22,
-   "h": 23,
-   "m": 0.48,
-   "ratio": 1.06
+   "h": 22,
+   "m": 0.46,
+   "ratio": 1.02
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1015,9 +1015,9 @@
    "real": 0.75,
    "ppm": 48,
    "w": 32,
-   "h": 36,
-   "m": 0.75,
-   "ratio": 1
+   "h": 35,
+   "m": 0.73,
+   "ratio": 0.97
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1027,9 +1027,9 @@
    "real": 0.9,
    "ppm": 48,
    "w": 34,
-   "h": 43,
-   "m": 0.9,
-   "ratio": 1
+   "h": 42,
+   "m": 0.88,
+   "ratio": 0.97
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1063,9 +1063,9 @@
    "real": 0.7,
    "ppm": 48,
    "w": 18,
-   "h": 35,
-   "m": 0.73,
-   "ratio": 1.04
+   "h": 34,
+   "m": 0.71,
+   "ratio": 1.01
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1075,9 +1075,9 @@
    "real": 1.2,
    "ppm": 48,
    "w": 28,
-   "h": 59,
-   "m": 1.23,
-   "ratio": 1.02
+   "h": 57,
+   "m": 1.19,
+   "ratio": 0.99
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1087,9 +1087,9 @@
    "real": 1.4,
    "ppm": 48,
    "w": 30,
-   "h": 68,
-   "m": 1.42,
-   "ratio": 1.01
+   "h": 66,
+   "m": 1.38,
+   "ratio": 0.98
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1123,9 +1123,9 @@
    "real": 0.55,
    "ppm": 48,
    "w": 20,
-   "h": 27,
-   "m": 0.56,
-   "ratio": 1.02
+   "h": 26,
+   "m": 0.54,
+   "ratio": 0.98
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1247,5 +1247,344 @@
    "m": 7,
    "ratio": 0.5
   }
- ]
+ ],
+ "espacio": {
+  "holgura": 4,
+  "carpas": [
+   {
+    "t": "p60",
+    "n": "Armario 60×60",
+    "cm": [
+     60,
+     160,
+     60
+    ],
+    "plazas": 2,
+    "centros": [
+     [
+      15,
+      30
+     ],
+     [
+      45,
+      30
+     ]
+    ],
+    "sep": 30,
+    "pared": 15,
+    "copa": 26,
+    "maceta": "tela11",
+    "altoMaceta": 22,
+    "altos": [
+     {
+      "foco": "cfl",
+      "sep": 10,
+      "alto": 100
+     },
+     {
+      "foco": "sodio250",
+      "sep": 30,
+      "alto": 80
+     },
+     {
+      "foco": "led100",
+      "sep": 25,
+      "alto": 85
+     },
+     {
+      "foco": "led200",
+      "sep": 25,
+      "alto": 85
+     }
+    ]
+   },
+   {
+    "t": "p80",
+    "n": "Armario 80×80",
+    "cm": [
+     80,
+     180,
+     80
+    ],
+    "plazas": 3,
+    "centros": [
+     [
+      20,
+      20
+     ],
+     [
+      60,
+      20
+     ],
+     [
+      40,
+      60
+     ]
+    ],
+    "sep": 40,
+    "pared": 20,
+    "copa": 36,
+    "maceta": "plastico18",
+    "altoMaceta": 28,
+    "altos": [
+     {
+      "foco": "cfl",
+      "sep": 10,
+      "alto": 114
+     },
+     {
+      "foco": "sodio250",
+      "sep": 30,
+      "alto": 94
+     },
+     {
+      "foco": "sodio400",
+      "sep": 40,
+      "alto": 84
+     },
+     {
+      "foco": "led100",
+      "sep": 25,
+      "alto": 99
+     },
+     {
+      "foco": "led200",
+      "sep": 25,
+      "alto": 99
+     }
+    ]
+   },
+   {
+    "t": "m100",
+    "n": "Carpa 100×100",
+    "cm": [
+     100,
+     200,
+     100
+    ],
+    "plazas": 4,
+    "centros": [
+     [
+      25,
+      25
+     ],
+     [
+      75,
+      25
+     ],
+     [
+      25,
+      75
+     ],
+     [
+      75,
+      75
+     ]
+    ],
+    "sep": 50,
+    "pared": 25,
+    "copa": 46,
+    "maceta": "plastico18",
+    "altoMaceta": 28,
+    "altos": [
+     {
+      "foco": "cfl",
+      "sep": 10,
+      "alto": 134
+     },
+     {
+      "foco": "sodio250",
+      "sep": 30,
+      "alto": 114
+     },
+     {
+      "foco": "sodio400",
+      "sep": 40,
+      "alto": 104
+     },
+     {
+      "foco": "led100",
+      "sep": 25,
+      "alto": 119
+     },
+     {
+      "foco": "led200",
+      "sep": 25,
+      "alto": 119
+     },
+     {
+      "foco": "led480",
+      "sep": 35,
+      "alto": 109
+     }
+    ]
+   },
+   {
+    "t": "m120",
+    "n": "Carpa 120×120",
+    "cm": [
+     120,
+     200,
+     120
+    ],
+    "plazas": 6,
+    "centros": [
+     [
+      20,
+      30
+     ],
+     [
+      60,
+      30
+     ],
+     [
+      100,
+      30
+     ],
+     [
+      20,
+      90
+     ],
+     [
+      60,
+      90
+     ],
+     [
+      100,
+      90
+     ]
+    ],
+    "sep": 40,
+    "pared": 20,
+    "copa": 36,
+    "maceta": "plastico18",
+    "altoMaceta": 28,
+    "altos": [
+     {
+      "foco": "cfl",
+      "sep": 10,
+      "alto": 134
+     },
+     {
+      "foco": "sodio250",
+      "sep": 30,
+      "alto": 114
+     },
+     {
+      "foco": "sodio400",
+      "sep": 40,
+      "alto": 104
+     },
+     {
+      "foco": "sodio600",
+      "sep": 50,
+      "alto": 94
+     },
+     {
+      "foco": "led100",
+      "sep": 25,
+      "alto": 119
+     },
+     {
+      "foco": "led200",
+      "sep": 25,
+      "alto": 119
+     },
+     {
+      "foco": "led480",
+      "sep": 35,
+      "alto": 109
+     },
+     {
+      "foco": "led720",
+      "sep": 40,
+      "alto": 104
+     }
+    ]
+   },
+   {
+    "t": "g150",
+    "n": "Carpa 150×100",
+    "cm": [
+     150,
+     200,
+     100
+    ],
+    "plazas": 6,
+    "centros": [
+     [
+      25,
+      25
+     ],
+     [
+      75,
+      25
+     ],
+     [
+      125,
+      25
+     ],
+     [
+      25,
+      75
+     ],
+     [
+      75,
+      75
+     ],
+     [
+      125,
+      75
+     ]
+    ],
+    "sep": 50,
+    "pared": 25,
+    "copa": 46,
+    "maceta": "plastico18",
+    "altoMaceta": 28,
+    "altos": [
+     {
+      "foco": "cfl",
+      "sep": 10,
+      "alto": 134
+     },
+     {
+      "foco": "sodio250",
+      "sep": 30,
+      "alto": 114
+     },
+     {
+      "foco": "sodio400",
+      "sep": 40,
+      "alto": 104
+     },
+     {
+      "foco": "sodio600",
+      "sep": 50,
+      "alto": 94
+     },
+     {
+      "foco": "led100",
+      "sep": 25,
+      "alto": 119
+     },
+     {
+      "foco": "led200",
+      "sep": 25,
+      "alto": 119
+     },
+     {
+      "foco": "led480",
+      "sep": 35,
+      "alto": 109
+     },
+     {
+      "foco": "led720",
+      "sep": 40,
+      "alto": 104
+     }
+    ]
+   }
+  ]
+ }
 }

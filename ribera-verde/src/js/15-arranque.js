@@ -11,9 +11,10 @@ function migrate(){
     S.pots=Array.from({length:n},(_,i)=>i<(S.potsOwned||2)?old[i]||null:null);S.macetas=Array(n).fill('plastico7');
     delete S.potsOwned;delete S.led;
   }
-  if(!S.eco){   // partidas de antes de la 1.10: la deuda pasa a la escala real del capítulo en que estás (los intereses cobrados se pierden)
+  if(!S.eco){   // partidas de antes de la 1.10: la deuda pasa a la escala real del capítulo en que estás (los intereses cobrados se
+    // pierden) y el plazo abierto vuelve a contar desde hoy, con los días que da Baltasar (7, 10 o 7), para pagar la cifra nueva
     S.debt=S.ch>=8?0:{4:DEUDA-PLAZOS[3],5:DEUDA-PLAZOS[3],6:PLAZOS[7],7:PLAZOS[7]}[S.ch]||DEUDA;
-    if(S.due>0)S.due=S.ch===3||S.ch===5?PLAZOS[S.ch]:S.debt;
+    if(S.due>0){S.due=S.ch===3||S.ch===5?PLAZOS[S.ch]:S.debt;S.deadline=Math.max(S.deadline,S.day+(S.ch===5?10:7));}
     if(S.ch>=8){S.imp0=S.sales;S.impN=0;}
   }
   const d=newState();for(const k in d)if(!(k in S))S[k]=d[k];for(const k in d.items)if(!(k in S.items))S.items[k]=0;

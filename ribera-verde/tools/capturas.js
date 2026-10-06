@@ -90,7 +90,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   await page.waitForTimeout(200); for (let i = 0; i < 2; i++) { await page.keyboard.press('ArrowDown'); await page.waitForTimeout(40); }
   await shot('11-growshop.png'); await reset();
 
-  await page.evaluate(() => { S.ch = 5; S.due = 2000; S.deadline = S.day + 6; enterMap('bar', 7, 6, 'up'); say('Me debes 2000 € para el día 7. Te quedan 6 días.', 'DON BALTASAR'); });
+  await page.evaluate(() => { S.ch = 5; S.due = PLAZOS[5]; S.deadline = S.day + 6; enterMap('bar', 7, 6, 'up'); say(`Me debes ${eur(S.due)} para el día ${S.deadline}. Te quedan 6 días.`, 'DON BALTASAR'); });
   await page.waitForTimeout(1500); await shot('12-bar-baltasar.png'); await reset();
 
   await page.setViewportSize({ width: 844, height: 390 });   // móvil en horizontal: el mundo a lo ancho y los mandos flotando

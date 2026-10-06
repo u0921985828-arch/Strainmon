@@ -218,7 +218,7 @@ async function talkBaltasar(){
     await chapter(6);showObjective();
   }else if(S.ch===7){
     await talk(N,[`${eur(paid)}. Contados.`,'Deuda saldada. Lo de tu tía queda cerrado.','Una cosa más, {N}: si algún día quieres trabajar para mí, ya sabes dónde estoy.']);
-    S.ch=8;S.debt=0;S.imp0=S.sales;S.impN=0;await ending();
+    S.debt=0;S.imp0=S.sales;S.impN=0;await ending();
   }
 }
 async function chapter(n){S.ch=n;sfx('get');toast(`<small>CAPÍTULO ${n}</small>${CH_TITLES[n]}`,2800);buildEnts();await wait(400);save();}
@@ -280,6 +280,6 @@ async function ending(){
   e.innerHTML=`<h2>DEUDA SALDADA</h2><div>Has saldado los ${eur(DEUDA)} de tu tía Maite en ${S.day} días.</div><div>Variedades: ${discCount()} · Ventas totales: ${eur(S.sales)}</div><div>Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.<br>¿Completarás la GENOTECA? ¿Conseguirás la GHOST TRAIN HAZE?</div><div style="opacity:.7">Pulsa A</div>`;
   e.hidden=false;await fade(0);sfx('get');
   await new Promise(r=>push(b=>{if(b==='A'||b==='START'){pop();r();}}));
-  await fade(1);e.hidden=true;await fade(0);save();showObjective();
+  await fade(1);e.hidden=true;await fade(0);await chapter(8);await wait(2400);showObjective();
 }
 
