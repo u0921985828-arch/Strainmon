@@ -38,9 +38,10 @@
 ## Estado (v1.9.0)
 
 - Se juega de principio a fin: capítulos 1 a 7, final y juego libre (capítulo 8).
-- `npm test` recorre la historia entera y los sistemas sueltos en 42 pasos: **42/42, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
+- `npm test` recorre la historia entera y los sistemas sueltos en 45 pasos: **45/45, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
 - **Escala (1.8.0):** decidida y aplicada la opción A de [docs/PLANO.md](docs/PLANO.md): piso de 12 × 8 a 1 casilla = 1 m, carpas como muebles y vista de carpa a 64 px/m con las plantas de cepas de Strainmon (`../assets/plants`).
 - **Genética (1.9.0):** las landraces y los híbridos clásicos de Strainmon (`../src/species.js`, sus textos, no sus sprites), con su historia; estabilizar F1 → F4 en la mesa y banco de semillas en el PC desde el capítulo 2.
+- **Plan de producción, P1 (en desarrollo, sin versión todavía):** D1–D6 aprobadas; ya están en el juego el armario 80, la carpa 120 en el sitio C, el LED 100 W y los extras (ventilador, filtro de carbón y goteo), con la regla del olor. Se dibujan con el arte procedural hasta P2–P3.
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
   - el motor ya usa el atlas (F2) y `npm run test:arte` da 22/22;
@@ -66,7 +67,7 @@
 
 ## Siguientes pasos sugeridos
 
-0. Decidir D1–D6 de [docs/PLAN-PRODUCCION.md](docs/PLAN-PRODUCCION.md) (vista de carpa, carpas nuevas, extras, plantas propias, objetos de la casa y presupuesto) y seguir sus pasos P1–P6.
+0. Seguir [docs/PLAN-PRODUCCION.md](docs/PLAN-PRODUCCION.md): P2 (vista B con arte procedural y medidas en `npm run plano`), luego P3–P6 con PixelLab.
 1. Probar el APK en un móvil real (la vista de carpa incluida).
 2. Revisar el arte nuevo jugando y repetir lo que no convenza (cada asset del manifiesto guarda sus ids, semillas y descartes). Guía: [docs/PIXELLAB.md](docs/PIXELLAB.md); comando `/sprites`.
 3. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.

@@ -42,7 +42,7 @@ informe técnico directo + código refactorizado, sin relleno.
 - RPG de cultivo independiente (v1.9.0): 160 px de alto y de 240 a 400 de ancho, solo en horizontal, con mandos flotantes; piso a 1 casilla = 1 m y vista de carpa a 64 px/m. Notas propias en `ribera-verde/CLAUDE.md`.
 - Tests: `cd ribera-verde && npm install` y, con el Chromium preinstalado
   (`export CHROMIUM_PATH=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome | head -1)`):
-  `npm test` → 42/42, 0 errores JS · `npm run test:arte` → 22/22.
+  `npm test` → 45/45, 0 errores JS · `npm run test:arte` → 22/22.
 - Plano de escala: `npm run plano` → `docs/plano/` + `docs/PLANO.md` (escala decidida: opción A, aplicada en la 1.8.0).
 - Genética (1.9.0): landraces e híbridos clásicos de `src/species.js` (solo texto e información), estabilizar F1 → F4 y banco de semillas.
 - Android: `npm run apk` → `dist/ribera-verde.apk` (WebView + index.html, `sensorLandscape`; sin Android SDK, ver `ribera-verde/CLAUDE.md`).

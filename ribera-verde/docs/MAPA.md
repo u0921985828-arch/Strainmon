@@ -155,11 +155,17 @@ Los **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acer
 | Maceta de tela 11 L | 20 € | 1 | 11 L · cosecha +15% · crece +5% · riego ×1,25 · menos plagas · Se cambia en una plaza vacía de la carpa. |
 | Maceta de plástico 18 L | 30 € | 2 | 18 L · cosecha +25% · crece −5% · riego ×0,8 · Se cambia en una plaza vacía de la carpa. |
 | Maceta de tela 25 L | 45 € | 3 | 25 L · cosecha +40% · riego ×1,1 · menos plagas · Se cambia en una plaza vacía de la carpa. |
-| Foco sodio 250 W | 120 € | 2 | 250 W · cubre 2 plantas · cosecha +25% · crece +5% · THC +0,3 · riego ×1,3 · Luz: 5 € al día con plantas. · Aguanta en carpas de 60, 100 y 150. |
-| Foco LED 200 W | 260 € | 2 | 200 W · cubre 2 plantas · cosecha +30% · crece +10% · THC +0,6 · riego ×1,05 · Luz: 4 € al día con plantas. · Aguanta en carpas de 60, 100 y 150. |
-| Foco sodio 400 W | 220 € | 3 | 400 W · cubre 4 plantas · cosecha +35% · crece +5% · THC +0,5 · riego ×1,4 · Luz: 8 € al día con plantas. · Aguanta en carpas de 100 y 150. |
-| Foco LED 480 W | 600 € | 3 | 480 W · cubre 4 plantas · cosecha +45% · crece +10% · THC +1,0 · riego ×1,1 · Luz: 10 € al día con plantas. · Aguanta en carpas de 100 y 150. |
-| Foco sodio 600 W | 350 € | 4 | 600 W · cubre 6 plantas · cosecha +45% · crece +5% · THC +0,7 · riego ×1,5 · Luz: 12 € al día con plantas. · Aguanta en carpas de 150. |
-| Foco LED 720 W | 1000 € | 5 | 720 W · cubre 6 plantas · cosecha +60% · crece +15% · THC +1,4 · riego ×1,15 · Luz: 14 € al día con plantas. · Aguanta en carpas de 150. |
+| Foco LED 100 W | 140 € | 1 | 100 W · cubre 2 plantas · cosecha +15% · crece +5% · THC +0,3 · riego ×1 · Luz: 2 € al día con plantas. · Aguanta en carpas de 60, 80, 100, 120 y 150. |
+| Ventilador de pinza | 25 € | 1 | Mueve el aire de la carpa: plagas ×0,7. · Uno por carpa. |
+| Extractor con filtro de carbón | 120 € | 2 | Sin filtro, cada carpa con plantas en floración suma +2 de calor policial al día por el olor. Con él, nada. · Uno por carpa. |
+| Riego por goteo | 80 € | 3 | Depósito con goteros: el agua baja a la mitad de rápido. · Uno por carpa. |
+| Foco sodio 250 W | 120 € | 2 | 250 W · cubre 2 plantas · cosecha +25% · crece +5% · THC +0,3 · riego ×1,3 · Luz: 5 € al día con plantas. · Aguanta en carpas de 60, 80, 100, 120 y 150. |
+| Foco LED 200 W | 260 € | 2 | 200 W · cubre 2 plantas · cosecha +30% · crece +10% · THC +0,6 · riego ×1,05 · Luz: 4 € al día con plantas. · Aguanta en carpas de 60, 80, 100, 120 y 150. |
+| Foco sodio 400 W | 220 € | 3 | 400 W · cubre 4 plantas · cosecha +35% · crece +5% · THC +0,5 · riego ×1,4 · Luz: 8 € al día con plantas. · Aguanta en carpas de 80, 100, 120 y 150. |
+| Foco LED 480 W | 600 € | 3 | 480 W · cubre 4 plantas · cosecha +45% · crece +10% · THC +1,0 · riego ×1,1 · Luz: 10 € al día con plantas. · Aguanta en carpas de 100, 120 y 150. |
+| Foco sodio 600 W | 350 € | 4 | 600 W · cubre 6 plantas · cosecha +45% · crece +5% · THC +0,7 · riego ×1,5 · Luz: 12 € al día con plantas. · Aguanta en carpas de 120 y 150. |
+| Foco LED 720 W | 1000 € | 5 | 720 W · cubre 6 plantas · cosecha +60% · crece +15% · THC +1,4 · riego ×1,15 · Luz: 14 € al día con plantas. · Aguanta en carpas de 120 y 150. |
+| Armario 80×80 | 300 € | 3 | Cambia el armario de tu tía por uno de 80: 3 plantas, focos de hasta 400 W y macetas de hasta 18 L. Tus plantas, foco y macetas se quedan. |
 | Carpa 100×100 | 450 € | 2 | Segunda carpa para el piso: 4 plantas, focos de hasta 480 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. |
 | Carpa 150×100 | 900 € | 4 | Cambia tu carpa de 100 por una de 150: 6 plantas y focos de hasta 720 W. Tus plantas, foco y macetas se quedan. |
+| Carpa 120×120 | 700 € | 5 | Tercera carpa, junto a la cama: 6 plantas, focos de hasta 720 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. Antes necesitas la del fondo. |

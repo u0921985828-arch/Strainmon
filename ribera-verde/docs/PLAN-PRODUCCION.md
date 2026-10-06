@@ -2,13 +2,13 @@
 
 Este documento ordena lo que falta antes de pedir más sprites a PixelLab: qué equipo de cultivo tendrá el juego, cómo se verá, qué láminas hay que pedir, en qué orden y cuánto cuestan. También organiza la historia, los desbloqueos y las ideas.
 
-**Estado:** propuesta para aprobar (6 de octubre de 2026, versión 1.9.0). Todavía no se ha generado nada. PixelLab tiene 1041 generaciones hasta el 12 de octubre; ese día la cuota vuelve a 5000.
+**Estado:** D1–D6 aprobadas con la recomendación (★) el 6 de octubre de 2026. **P1 hecho** (datos y reglas en el juego; sale en la próxima versión, junto con el arte). Siguiente: P2. Todavía no se ha generado nada. PixelLab tiene 1041 generaciones hasta el 12 de octubre; ese día la cuota vuelve a 5000.
 
-Leyenda: **hecho** = ya está en el juego · **propuesto** = pendiente de aprobar · **idea** = para más adelante.
+Leyenda: **hecho** = ya está en el juego · **aprobado** = decidido, falta hacerlo · **idea** = para más adelante.
 
-## 0. Decisiones que faltan
+## 0. Decisiones (aprobadas)
 
-Hasta que se decidan, no se gasta ninguna generación. Cada una tiene una recomendación (★).
+Se aprobaron todas con la recomendación (★).
 
 | # | Decisión | Opciones |
 |---|---|---|
@@ -37,15 +37,15 @@ Hasta que se decidan, no se gasta ninguna generación. Cada una tiene una recome
 
 ## 2. Historia y desbloqueos por capítulo
 
-Lo que no lleva marca está **hecho**. Lo marcado con **(p)** está **propuesto** en este plan.
+Todo está **hecho**. Lo que añadió P1 va marcado con **(P1)**.
 
 | Cap. | Título | Objetivo | Qué pasa | Growshop | Banco de semillas (PC) | Plazas |
 |---|---|---|---|---|---|---|
-| 1 | La herencia | Leer la carta, ir a ver a Kiko y sacar la primera cosecha | Heredas el piso de la tía Maite con su armario de 60 | Skunk #1 15 €, fertilizante 15 €, insecticida 20 €, bocata 6 €, maceta de tela 11 L 20 € · (p) ventilador 25 €, LED 100 W 140 € | — | 2 |
-| 2 | La calle | Ganar 300 € vendiendo en la calle | Clientes con `$`, primeros ladrones | Lemon Haze 25 €, OG Kush 30 €, spray de pimienta 25 €, maceta de plástico 18 L 30 €, sodio 250 W 120 €, LED 200 W 260 €, carpa 100 × 100 450 € (sitio B) · (p) extractor con filtro 120 € | Michoacán, Punto Rojo, Thai, Kif y Beldia | 6 |
-| 3 | La deuda | Pagar 1.000 € a Don Baltasar en 7 días | Toño te lleva al bar El Ancla: la tía debía 5.000 € | Blueberry 40 €, Mango 35 €, maceta de tela 25 L 45 €, sodio 400 W 220 €, LED 480 W 600 € · (p) armario 80 300 € (sitio A), riego por goteo 80 € | + Chitral Kush, Nepalese, Congolese, Lamb's Bread y Oaxaca | 6 · (p) 7 |
-| 4 | Genética | Recoger la mesa de genética y descubrir 8 variedades | Kiko te enseña a cruzar; las líneas nuevas se estabilizan de F1 a F4 | Purple Afghani 50 €, sodio 600 W 350 €, carpa 150 × 100 900 € (sitio B) | + Luang Prabang y Panama Red | 8 · (p) 9 |
-| 5 | El sargento | Pagar 2.000 € en 10 días | El sargento Molina ofrece su «protección» por 500 € | LED 720 W 1000 € · (p) carpa 120 700 € (sitio C) | — | 8 · (p) 15 |
+| 1 | La herencia | Leer la carta, ir a ver a Kiko y sacar la primera cosecha | Heredas el piso de la tía Maite con su armario de 60 | Skunk #1 15 €, fertilizante 15 €, insecticida 20 €, bocata 6 €, maceta de tela 11 L 20 € · (P1) ventilador 25 €, LED 100 W 140 € | — | 2 |
+| 2 | La calle | Ganar 300 € vendiendo en la calle | Clientes con `$`, primeros ladrones | Lemon Haze 25 €, OG Kush 30 €, spray de pimienta 25 €, maceta de plástico 18 L 30 €, sodio 250 W 120 €, LED 200 W 260 €, carpa 100 × 100 450 € (sitio B) · (P1) extractor con filtro 120 € | Michoacán, Punto Rojo, Thai, Kif y Beldia | 6 |
+| 3 | La deuda | Pagar 1.000 € a Don Baltasar en 7 días | Toño te lleva al bar El Ancla: la tía debía 5.000 € | Blueberry 40 €, Mango 35 €, maceta de tela 25 L 45 €, sodio 400 W 220 €, LED 480 W 600 € · (P1) armario 80 300 € (sitio A), riego por goteo 80 € | + Chitral Kush, Nepalese, Congolese, Lamb's Bread y Oaxaca | 6 · (P1) 7 con el armario 80 |
+| 4 | Genética | Recoger la mesa de genética y descubrir 8 variedades | Kiko te enseña a cruzar; las líneas nuevas se estabilizan de F1 a F4 | Purple Afghani 50 €, sodio 600 W 350 €, carpa 150 × 100 900 € (sitio B) | + Luang Prabang y Panama Red | 8 · (P1) 9 con el armario 80 |
+| 5 | El sargento | Pagar 2.000 € en 10 días | El sargento Molina ofrece su «protección» por 500 € | LED 720 W 1000 € · (P1) carpa 120 700 € (sitio C) | — | 8 · (P1) 15 con la carpa 120 |
 | 6 | La Copa de Ribera | Llevar al jurado 20 g con más de 26,8 % de THC | Darko compite con su Amnesia Haze (26,8 %) | — | — | igual |
 | 7 | Libertad | Pagar los últimos 2.000 € en 7 días | Saldas la deuda de la tía; Baltasar te ofrece trabajo | — | — | igual |
 | 8 | La genoteca | Completar las 41 variedades (juego libre) | Sin deudas | — | — | igual |
@@ -56,20 +56,15 @@ Cada objeto tiene tres cosas: una medida real (para dibujarlo a escala), un efec
 
 ### 3.1 Armarios y carpas
 
-**Hechas** (`CARPAS` en `src/js/09-cultivo.js`; «casillas» = lo que ocupa en el piso):
-
-| id | Modelo | Medida real | Casillas | Plazas | Foco máx. | Maceta máx. | Precio |
-|---|---|---|---|---|---|---|---|
-| `p60` | Armario 60×60 | 60 × 60 × 160 cm | 1 | 2 | 250 W | 11 L | de serie (la tía) |
-| `m100` | Carpa 100×100 | 100 × 100 × 200 cm | 1 | 4 | 480 W | 25 L | 450 € · cap. 2 |
-| `g150` | Carpa 150×100 | 150 × 100 × 200 cm | 2 | 6 | 720 W | 25 L | 900 € · cap. 4 |
-
-**Propuestas** (D2). Son medidas de carpa habituales en tiendas y caben en los sitios del piso:
+**Hechas** (`CARPAS` en `src/js/09-cultivo.js`; «casillas» = lo que ocupa en el piso). `p80` y `m120` son de P1 (D2): medidas de carpa habituales en tiendas que caben en los sitios del piso.
 
 | id | Modelo | Medida real | Casillas | Plazas | Foco máx. | Maceta máx. | Precio | Sitio |
 |---|---|---|---|---|---|---|---|---|
+| `p60` | Armario 60×60 | 60 × 60 × 160 cm | 1 | 2 | 250 W | 11 L | de serie (la tía) | A |
 | `p80` | Armario 80×80 | 80 × 80 × 180 cm | 1 | 3 (al tresbolillo) | 400 W | 18 L | 300 € · cap. 3 | A: sustituye al de 60 (plantas, foco y macetas se quedan) |
-| `m120` | Carpa 120×120 | 120 × 120 × 200 cm | 2 | 6 (3 × 2) | 720 W | 25 L | 700 € · cap. 5 | C, el sitio nuevo |
+| `m100` | Carpa 100×100 | 100 × 100 × 200 cm | 1 | 4 | 480 W | 25 L | 450 € · cap. 2 | B |
+| `g150` | Carpa 150×100 | 150 × 100 × 200 cm | 2 | 6 | 720 W | 25 L | 900 € · cap. 4 | B: sustituye a la de 100 |
+| `m120` | Carpa 120×120 | 120 × 120 × 200 cm | 2 | 6 (3 × 2) | 720 W | 25 L | 700 € · cap. 5 | C, cuando ya hay carpa en B |
 
 Cada sitio va mejorando así:
 - **Sitio A:** `p60` (2 plazas) → `p80` (3).
@@ -86,7 +81,7 @@ El piso mide 12 × 8 casillas (1 casilla = 1 m). Las carpas van contra la pared 
 |---|---|---|---|
 | A | (8,2) | hecho | mesas de genética en (5,2) y (6,2) |
 | B | (10,2)–(11,2) | hecho | esquina derecha |
-| C | (2,2)–(3,2) | **propuesto** | entre la cama (0,2) y el ordenador (4,2). La planta de adorno de (1,2) se queda |
+| C | (2,2)–(3,2) | hecho (P1) | entre la cama (0,2) y el ordenador (4,2). La planta de adorno de (1,2) se queda |
 
 ### 3.3 Focos
 
@@ -98,14 +93,10 @@ El piso mide 12 × 8 casillas (1 casilla = 1 m). Las carpas van contra la pared 
 | `sodio250` | Sodio 250 W | 2 | +25 % | +5 % | +0,3 | ×1,3 | 120 € · cap. 2 |
 | `sodio400` | Sodio 400 W | 4 | +35 % | +5 % | +0,5 | ×1,4 | 220 € · cap. 3 |
 | `sodio600` | Sodio 600 W | 6 | +45 % | +5 % | +0,7 | ×1,5 | 350 € · cap. 4 |
+| `led100` | LED 100 W | 2 | +15 % | +5 % | +0,3 | ×1 | 140 € · cap. 1 (P1): el primer paso por encima del CFL |
 | `led200` | LED 200 W | 2 | +30 % | +10 % | +0,6 | ×1,05 | 260 € · cap. 2 |
 | `led480` | LED 480 W | 4 | +45 % | +10 % | +1 | ×1,1 | 600 € · cap. 3 |
 | `led720` | LED 720 W | 6 | +60 % | +15 % | +1,4 | ×1,15 | 1000 € · cap. 5 |
-
-**Propuesto:** `led100`, LED 100 W para el armario de 60.
-- Cubre 2 plazas.
-- Cosecha +15 %, crecimiento +5 %, THC +0,3 y riego ×1.
-- Cuesta 140 € desde el capítulo 1: es el primer paso por encima del CFL.
 
 **Cómo es cada foco por fuera** (para dibujarlo):
 
@@ -134,14 +125,14 @@ Medidas reales para dibujarlas (diámetro × alto):
 
 **Idea:** una maceta de aire de 15 L (poda las raíces: más crecimiento y más riego).
 
-### 3.5 Extras (propuestos, D3)
+### 3.5 Extras (hechos en P1, D3)
 
-Van uno por carpa. Se compran en el growshop y se ponen desde la vista de carpa, igual que el foco.
+Van uno por carpa (`EXTRAS` y `S.carpas[ci][id]`). Se compran en el growshop («¿Te lo pongo ya?») y se ponen desde la vista de carpa, igual que el foco.
 
 | id | Extra | Medida real | Efecto en el juego | Precio |
 |---|---|---|---|---|
 | `vent` | Ventilador de pinza | Ø 15–20 cm | plagas ×0,7 en esa carpa | 25 € · cap. 1 |
-| `filtro` | Extractor con filtro de carbón | filtro Ø 20 × 50 cm y extractor Ø 15 cm | Sin filtro, cada carpa con alguna planta en floración suma +2 de calor policial al día por el olor. Con filtro, 0. Es una regla nueva y hay que probarla con el test | 120 € · cap. 2 |
+| `filtro` | Extractor con filtro de carbón | filtro Ø 20 × 50 cm y extractor Ø 15 cm | Sin filtro, cada carpa con alguna planta en floración suma +2 de calor policial al día por el olor. Con filtro, 0. Se suma después de la bajada diaria del calor (lo prueba el test) | 120 € · cap. 2 |
 | `goteo` | Riego por goteo | depósito de 20 L (30 × 25 × 35 cm) con goteros | el agua baja a la mitad de velocidad | 80 € · cap. 3 |
 
 **Ideas:** temporizador y fotoperiodo (18/6 en crecimiento y 12/12 en floración), termohigrómetro (temperatura y humedad en la ficha), malla SCROG (+cosecha, +días) y deshumidificador (moho).
@@ -152,7 +143,7 @@ Van uno por carpa. Se compran en el growshop y se ponen desde la vista de carpa,
 |---|---|---|---|
 | Barrio, piso, tiendas | 1 casilla = 16 px = 1 m (3/4) | Personajes de 27–28 px y carpas cerradas como muebles de 1–2 casillas | hecho (1.8) |
 | Vista de carpa, opción A | 64 px/m, de frente | La carpa abierta de frente sobre el fondo de un cuarto | hecho (1.8) |
-| **Vista de carpa, opción B ★** | **48 px/m de ancho y de alto, y 24 px/m de fondo (3/4, como el piso)** | La carpa recortada como en la 1.6–1.7: sin techo, sin frente y sin lateral derecho. Se ven el fondo y la pared izquierda de mylar, el suelo, las macetas, las plantas y los focos colgando medio transparentes | propuesto (D1) |
+| **Vista de carpa, opción B ★** | **48 px/m de ancho y de alto, y 24 px/m de fondo (3/4, como el piso)** | La carpa recortada como en la 1.6–1.7: sin techo, sin frente y sin lateral derecho. Se ven el fondo y la pared izquierda de mylar, el suelo, las macetas, las plantas y los focos colgando medio transparentes | aprobado (D1) · P2 |
 
 **Por qué la B.** Recupera el aspecto de las carpas de la 1.6–1.7 (paredes de mylar acolchado, bastidor negro, suelo claro, vistas desde arriba como las paredes de la casa). Las proporciones, en cambio, son reales: una carpa de 150 × 100 × 200 cm mide 72 × 120 px y cabe en los 160 px de alto con margen.
 
@@ -222,25 +213,25 @@ Las descripciones van en inglés, que es como las entiende PixelLab. A todas se 
 
 | Qué | Cómo | Estado |
 |---|---|---|
-| Luz del foco | Cono con `lighter` detrás de las plantas, del color de cada tipo (`FOCO_LUZ`). Si fuera delante, cambiaría los colores de los cogollos | hecho (1.8) · **propuesto**: pasarlo a la vista B |
+| Luz del foco | Cono con `lighter` detrás de las plantas, del color de cada tipo (`FOCO_LUZ`). Si fuera delante, cambiaría los colores de los cogollos | hecho (1.8) · **aprobado**: pasarlo a la vista B (P2) |
 | Luz bajo la puerta | En el piso, con plantas vivas | hecho |
-| Sombras | Bajo los personajes (`sombra()`) | hecho · **propuesto**: también bajo macetas y muebles, y el suelo de la carpa más oscuro lejos del foco |
-| Noche | El piso se oscurece y las carpas encendidas dejan una mancha de luz delante | propuesto |
-| Balanceo de las plantas | Fotogramas de `animate_image` (lámina 10), con el ventilador encendido más rápido | propuesto |
-| Ventilador y extractor | Aspas en bucle (lámina 11). El extractor tiembla 1 px | propuesto |
+| Sombras | Bajo los personajes (`sombra()`) | hecho · **aprobado** (P5): también bajo macetas y muebles, y el suelo de la carpa más oscuro lejos del foco |
+| Noche | El piso se oscurece y las carpas encendidas dejan una mancha de luz delante | aprobado (P5) |
+| Balanceo de las plantas | Fotogramas de `animate_image` (lámina 10), con el ventilador encendido más rápido | aprobado (P4) |
+| Ventilador y extractor | Aspas en bucle (lámina 11). El extractor tiembla 1 px | aprobado (P5) |
 | Riego, polen y brillo de cosecha | VFX del atlas (`vfx-gotas`, `vfx-polen`, `vfx-brillo`) | hecho |
 
 ## 6. Orden de producción y criterios de aprobado
 
-| Paso | Qué | Gen. | Se da por bueno cuando… |
-|---|---|---|---|
-| P0 | Decidir D1–D6 | 0 | están respondidas en este documento |
-| P1 | Datos: `p80`, `m120`, sitio C, `led100` y extras en `09-cultivo.js` y en la tienda; reglas en el GDD; migración de partidas | 0 | `npm test` en verde con pasos nuevos (comprar el armario 80, montar la carpa 120 en C, el filtro anula el calor por olor) y una partida de la 1.9 que carga igual |
-| P2 | Vista B con el arte procedural (huellas) y medidas en `npm run plano` | 0 | todas las piezas entre ×0,75 y ×1,33 de su medida real (salvo lo estilizado de §4) y capturas de las 5 carpas |
-| P3 | Láminas 1–6 | 6 (+12) | cada lámina cumple §5 y [PIXELLAB.md §8](PIXELLAB.md) (≤ 15 colores por sprite, contorno, sin texto) y tú la apruebas viendo la captura |
-| P4 | Plantas, láminas 7–10 | 12 (+15) | 3 portes × 5 fases a escala, con el cogollo en la rampa magenta (lo comprueba el test de la rampa) |
-| P5 | Láminas 11–13, luces y sombras | 3 (+5) | `npm run test:arte` en verde y capturas de día y de noche |
-| P6 | Cierre: docs, `npm run plano`, capturas, APK y Artifact | 0 | CHANGELOG, CONTEXTO y CLAUDE.md al día; APK y Artifact publicados |
+| Paso | Qué | Gen. | Se da por bueno cuando… | Estado |
+|---|---|---|---|---|
+| P0 | Decidir D1–D6 | 0 | están respondidas en este documento | hecho |
+| P1 | Datos: `p80`, `m120`, sitio C, `led100` y extras en `09-cultivo.js` y en la tienda; reglas en el GDD; migración de partidas | 0 | `npm test` en verde con pasos nuevos (comprar el armario 80, montar la carpa 120 en C, el filtro anula el calor por olor) y una partida de la 1.9 que carga igual | hecho |
+| P2 | Vista B con el arte procedural (huellas) y medidas en `npm run plano` | 0 | todas las piezas entre ×0,75 y ×1,33 de su medida real (salvo lo estilizado de §4) y capturas de las 5 carpas | pendiente |
+| P3 | Láminas 1–6 | 6 (+12) | cada lámina cumple §5 y [PIXELLAB.md §8](PIXELLAB.md) (≤ 15 colores por sprite, contorno, sin texto) y tú la apruebas viendo la captura | pendiente |
+| P4 | Plantas, láminas 7–10 | 12 (+15) | 3 portes × 5 fases a escala, con el cogollo en la rampa magenta (lo comprueba el test de la rampa) | pendiente |
+| P5 | Láminas 11–13, luces y sombras | 3 (+5) | `npm run test:arte` en verde y capturas de día y de noche | pendiente |
+| P6 | Cierre: docs, `npm run plano`, capturas, APK y Artifact | 0 | CHANGELOG, CONTEXTO y CLAUDE.md al día; APK y Artifact publicados | pendiente |
 
 **Reglas:**
 - No se regenera nada que ya esté aprobado.

@@ -9,18 +9,30 @@ const SHOP=[
   {lbl:'Bocata',p:6,ch:1,item:'bocata',desc:'Recupera 15 de vida. En combate o desde la mochila.'},
   {lbl:'Spray de pimienta',p:25,ch:2,item:'spray',desc:'En combate: 12-16 de daño seguro a un ladrón.'},
   {lbl:'Maceta de tela 11 L',p:20,ch:1,maceta:'tela11'},{lbl:'Maceta de plástico 18 L',p:30,ch:2,maceta:'plastico18'},{lbl:'Maceta de tela 25 L',p:45,ch:3,maceta:'tela25'},
+  {lbl:'Foco LED 100 W',p:140,ch:1,foco:'led100'},{lbl:'Ventilador de pinza',p:25,ch:1,extra:'vent'},
+  {lbl:'Extractor con filtro de carbón',p:120,ch:2,extra:'filtro'},{lbl:'Riego por goteo',p:80,ch:3,extra:'goteo'},
   {lbl:'Foco sodio 250 W',p:120,ch:2,foco:'sodio250'},{lbl:'Foco LED 200 W',p:260,ch:2,foco:'led200'},
   {lbl:'Foco sodio 400 W',p:220,ch:3,foco:'sodio400'},{lbl:'Foco LED 480 W',p:600,ch:3,foco:'led480'},
   {lbl:'Foco sodio 600 W',p:350,ch:4,foco:'sodio600'},{lbl:'Foco LED 720 W',p:1000,ch:5,foco:'led720'},
-  {lbl:'Carpa 100×100',p:450,ch:2,carpa:'m100',desc:'Segunda carpa para el piso: 4 plantas, focos de hasta 480 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L.',cond:()=>!S.carpas[1]},
-  {lbl:'Carpa 150×100',p:900,ch:4,carpa:'g150',desc:'Cambia tu carpa de 100 por una de 150: 6 plantas y focos de hasta 720 W. Tus plantas, foco y macetas se quedan.',cond:()=>S.carpas[1]&&S.carpas[1].t==='m100'},
+  {lbl:'Armario 80×80',p:300,ch:3,carpa:'p80',ci:0,desc:'Cambia el armario de tu tía por uno de 80: 3 plantas, focos de hasta 400 W y macetas de hasta 18 L. Tus plantas, foco y macetas se quedan.',cond:()=>S.carpas[0].t==='p60'},
+  {lbl:'Carpa 100×100',p:450,ch:2,carpa:'m100',ci:1,desc:'Segunda carpa para el piso: 4 plantas, focos de hasta 480 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L.',cond:()=>!S.carpas[1]},
+  {lbl:'Carpa 150×100',p:900,ch:4,carpa:'g150',ci:1,desc:'Cambia tu carpa de 100 por una de 150: 6 plantas y focos de hasta 720 W. Tus plantas, foco y macetas se quedan.',cond:()=>S.carpas[1]&&S.carpas[1].t==='m100'},
+  {lbl:'Carpa 120×120',p:700,ch:5,carpa:'m120',ci:2,desc:'Tercera carpa, junto a la cama: 6 plantas, focos de hasta 720 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. Antes necesitas la del fondo.',cond:()=>!!S.carpas[1]&&!S.carpas[2]},
 ];
-for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+(FOCOS[it.foco].w<=250?'60, 100 y 150':FOCOS[it.foco].w<=480?'100 y 150':'150')+'.';}
-// carpa comprada (o ampliada): plazas nuevas al final, con maceta de 7 L; la casa se vuelve a montar al entrar
-function comprarCarpa(t){
-  if(t==='m100')S.carpas[1]={t,foco:'cfl'};else S.carpas[1].t=t;
-  const n=huecos().length;while(S.pots.length<n)S.pots.push(null);while(S.macetas.length<n)S.macetas.push('plastico7');
+const yLista=l=>l.length>1?l.slice(0,-1).join(', ')+' y '+l[l.length-1]:l[0];
+for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+yLista(Object.values(CARPAS).filter(C=>FOCOS[it.foco].w<=C.wmax).map(C=>C.cm[0]))+'.';if(it.extra)it.desc=EXTRAS[it.extra].d+'\nUno por carpa.';}
+// carpa comprada (en un sitio libre) o ampliada (mismo sitio, se quedan foco, extras, plantas y macetas): cada plaza
+// conserva su planta y su maceta por (carpa, plaza); las nuevas, vacías y con maceta de 7 L. La casa se vuelve a montar al entrar
+function comprarCarpa(t,ci){
+  const antes=huecos().map(h=>h.c+':'+h.j),pots=S.pots,mac=S.macetas;
+  if(S.carpas[ci])S.carpas[ci].t=t;else S.carpas[ci]={t,foco:'cfl'};
+  const k=huecos().map(h=>antes.indexOf(h.c+':'+h.j));
+  S.pots=k.map(j=>j>=0?pots[j]||null:null);S.macetas=k.map(j=>j>=0?mac[j]||'plastico7':'plastico7');
 }
+const DICHO_CARPA={m100:'Te la monto esta tarde en el piso, al lado del armario de tu tía. Viene con un CFL; si quieres más luz, aquí tienes focos.',
+  g150:'Me llevo la de 100 y te monto la de 150 en su sitio. Las plantas ni se enteran.',
+  p80:'Te guardo el armario de tu tía en el trastero y te monto uno de 80 en su sitio. Las plantas ni se enteran.',
+  m120:'Te la monto junto a la cama. Viene con un CFL y macetas de 7 L.'};
 async function shop(){
   let i=0;
   for(;;){
@@ -34,8 +46,12 @@ async function shop(){
     if(S.money<it.p){sfx('bad');await say('No te llega el dinero.','KIKO');continue;}
     S.money-=it.p;sfx('coin');
     if(it.sid)addSeeds(it.sid,1);if(it.item)S.items[it.item]++;if(it.maceta)S.items['m_'+it.maceta]++;
-    if(!it.sid&&!it.foco&&!it.carpa)toast('Comprado: '+it.lbl,1200);
-    if(it.carpa){comprarCarpa(it.carpa);await say(it.carpa==='m100'?'Te la monto esta tarde en el piso, al lado del armario de tu tía. Viene con un CFL; si quieres más luz, aquí tienes focos.':'Me llevo la de 100 y te monto la de 150 en su sitio. Las plantas ni se enteran.','KIKO');}
+    if(!it.sid&&!it.foco&&!it.carpa&&!it.extra)toast('Comprado: '+it.lbl,1200);
+    if(it.carpa){comprarCarpa(it.carpa,it.ci);await say(DICHO_CARPA[it.carpa],'KIKO');}
+    if(it.extra){S.items['x_'+it.extra]++;const ok=S.carpas.map((c,ci)=>c&&!c[it.extra]?ci:-1).filter(ci=>ci>=0);
+      if(!ok.length)await say('Ya tienes uno en cada carpa. Te lo guardo en la mochila.','KIKO');
+      else{const c=await ask('¿Te lo pongo ya?',ok.map(ci=>CARPAS[S.carpas[ci].t].n).concat(['Luego']),'KIKO');
+        if(c>=0&&c<ok.length){ponerExtra(ok[c],it.extra);toast('Puesto: '+it.lbl,1200);}}}
     if(it.foco){S.items['f_'+it.foco]++;const ok=S.carpas.map((c,ci)=>c&&FOCOS[it.foco].w<=CARPAS[c.t].wmax?ci:-1).filter(ci=>ci>=0);
       if(!ok.length)await say('Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande.','KIKO');
       else{const c=await ask('¿Lo cuelgo ya? El que quites va a tu mochila.',ok.map(ci=>`${CARPAS[S.carpas[ci].t].n} (${FOCOS[S.carpas[ci].foco].n})`).concat(['Luego']),'KIKO');

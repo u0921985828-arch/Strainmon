@@ -14,8 +14,8 @@ let VC=null;                              // carpa abierta: {ci, sel: plaza (ín
 const vcCm=t=>CARPAS[t].cm.map(v=>Math.round(v*VC_M/100));
 function vcGeo(ci){
   const c=S.carpas[ci],C=CARPAS[c.t],[w,h]=vcCm(c.t),x0=120-(w>>1),top=VC_SUELO-h,cw=w/C.cols;
-  const pl=[];huecos().forEach((q,i)=>{if(q.c!==ci)return;const col=q.j%C.cols,fila=Math.floor(q.j/C.cols),off=C.filas>1?(fila?.3:.7):.5;
-    pl.push({i,col,fila,x:Math.round(x0+(col+off)*cw),y:VC_SUELO-(fila?VC_FONDO:2)});});
+  const pl=[];huecos().forEach((q,i)=>{if(q.c!==ci)return;const col=q.j%C.cols,fila=Math.floor(q.j/C.cols),off=C.filas>1?(fila?.3:.7):.5,n=Math.min(C.cols,C.plazas-fila*C.cols);
+    pl.push({i,col,fila,x:Math.round(n<C.cols?x0+(col+.5)*w/n:x0+(col+off)*cw),y:VC_SUELO-(fila?VC_FONDO:2)});});   // una fila incompleta va centrada
   const n=Math.max(1,Math.round(Math.min(FOCOS[c.foco].cubre,C.plazas)/2)),focos=[];
   for(let k=0;k<n;k++)focos.push(Math.round(x0+(k+.5)*w/n));
   return {c,C,w,h,x0,top,pl,focos,fy:top+(c.t==='p60'?20:26)};   // fy: parte de abajo de los focos (~40 cm por encima de una planta lista)
@@ -154,7 +154,7 @@ function vcCursor(g,now){
 function vcInfo(){
   const el=$('vcInfo');if(!VC||VC.ocupado){el.hidden=true;return;}
   const c=S.carpas[VC.ci],L=[];
-  if(VC.sel<0)L.push(esc(FOCOS[c.foco].n),plantasVivas(VC.ci)?'Luz '+eur(luzCarpa(VC.ci))+' al día':'Apagado');
+  if(VC.sel<0){L.push(esc(FOCOS[c.foco].n),plantasVivas(VC.ci)?'Luz '+eur(luzCarpa(VC.ci))+' al día':'Apagado');for(const k in EXTRAS)if(c[k])L.push(EXTRAS[k].c);}
   else{const i=VC.sel,p=S.pots[i];L.push(`Plaza ${huecos()[i].j+1} · ${MACETAS[S.macetas[i]].l} L`);
     if(!p)L.push('Vacía');
     else{L.push(esc(getStrain(p.sid).n));

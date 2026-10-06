@@ -34,10 +34,10 @@ Plantar → cuidar (agua, abono, plagas) → cosechar (gramos + semillas) → ve
 | Lista | 100 % |
 
 - Al plantar: agua 70 %, salud 100 %. Se gasta 1 semilla.
-- **Agua:** −3,5 × `riego` puntos por hora (foco × maceta). Regar la pone al 100 %.
+- **Agua:** −3,5 × `riego` puntos por hora (foco × maceta × goteo). Regar la pone al 100 %.
 - **Crecimiento por hora:** `1 / (días × 24) × crec`. Se multiplica ×0,4 con agua < 20 %, ×0 sin agua y ×1,1 con abono; `crec` sale del foco y de la maceta (ver «Equipo»).
 - **Salud:** −4/h sin agua y −2,5/h con plaga; +1/h con agua > 30 % y sin plaga. A 0 la planta muere.
-- **Plaga** (araña roja, puntos rojos en las hojas): probabilidad por hora `0,006 × (100 − resistencia) / 40` (×0,8 en maceta de tela) mientras la planta no está lista. Se quita con insecticida.
+- **Plaga** (araña roja, puntos rojos en las hojas): probabilidad por hora `0,006 × (100 − resistencia) / 40` (×0,8 en maceta de tela y ×0,7 con ventilador) mientras la planta no está lista. Se quita con insecticida.
 - **Abono:** una dosis por planta. Da +25 % de cosecha, +10 % de velocidad y +0,3 de THC.
 - **Cosecha:** `g = rinde × (0,4 + 0,6 × salud/100) × abono 1,25 × rend`.
 - **THC final:** `THC × (0,85 + 0,15 × salud/100) + thc (foco) + 0,3 (abono)`.
@@ -50,8 +50,13 @@ El cultivo va en carpas dentro del piso. Desde fuera se ven cerradas (techo, fre
 | Carpa | Plazas | Foco máximo | Maceta máxima | Cómo se consigue |
 |---|---|---|---|---|
 | Armario 60×60 | 2 | 250 W | 11 L | el de la tía (con un CFL y macetas de plástico de 7 L) |
-| Carpa 100×100 | 4 | 480 W | 25 L | growshop, 450 €, desde el capítulo 2 (trae CFL y macetas de 7 L) |
+| Armario 80×80 | 3 | 400 W | 18 L | growshop, 300 €, desde el capítulo 3: sustituye al de 60 en el sitio A (se quedan plantas, foco y macetas) |
+| Carpa 100×100 | 4 | 480 W | 25 L | growshop, 450 €, desde el capítulo 2, en el sitio B (trae CFL y macetas de 7 L) |
 | Carpa 150×100 | 6 | 720 W | 25 L | growshop, 900 €, desde el capítulo 4: sustituye a la de 100 (se quedan plantas, foco y macetas) |
+| Carpa 120×120 | 6 | 720 W | 25 L | growshop, 700 €, desde el capítulo 5, en el sitio C, junto a la cama, cuando ya hay carpa en B (trae CFL y macetas de 7 L) |
+
+- **Sitios del piso:** A (el armario, 1 casilla), B (al fondo, 2 casillas) y C (junto a la cama, 2 casillas). Cada carpa tiene su sitio y como mucho hay una por sitio.
+- **Orden de las plazas:** las de A, luego las de B y luego las de C. Al cambiar una carpa por otra mayor, cada planta y cada maceta se quedan en su carpa y en su plaza; las plazas nuevas salen vacías y con maceta de 7 L.
 
 | Foco | W | Cubre | Cosecha | Crece | THC | Riego | Precio |
 |---|---|---|---|---|---|---|---|
@@ -59,6 +64,7 @@ El cultivo va en carpas dentro del piso. Desde fuera se ven cerradas (techo, fre
 | Sodio 250 W | 250 | 2 | +25 % | +5 % | +0,3 | ×1,3 | 120 € (cap. 2) |
 | Sodio 400 W | 400 | 4 | +35 % | +5 % | +0,5 | ×1,4 | 220 € (cap. 3) |
 | Sodio 600 W | 600 | 6 | +45 % | +5 % | +0,7 | ×1,5 | 350 € (cap. 4) |
+| LED 100 W | 100 | 2 | +15 % | +5 % | +0,3 | ×1 | 140 € (cap. 1) |
 | LED 200 W | 200 | 2 | +30 % | +10 % | +0,6 | ×1,05 | 260 € (cap. 2) |
 | LED 480 W | 480 | 4 | +45 % | +10 % | +1,0 | ×1,1 | 600 € (cap. 3) |
 | LED 720 W | 720 | 6 | +60 % | +15 % | +1,4 | ×1,15 | 1000 € (cap. 5) |
@@ -70,10 +76,19 @@ El cultivo va en carpas dentro del piso. Desde fuera se ven cerradas (techo, fre
 | Plástico 18 L | +25 % | −5 % | ×0,8 | ×1 | 30 € (cap. 2) |
 | Tela 25 L | +40 % | — | ×1,1 | ×0,8 | 45 € (cap. 3) |
 
-- **Cobertura:** `cob = min(1, cubre / plazas)`. `rend = (1 + (foco.cosecha − 1) × cob) × (0,6 + 0,4 × cob) × maceta.cosecha`; `crec = foco.crece × (0,85 + 0,15 × cob) × maceta.crece`; `thc = foco.thc × cob`; `riego = foco.riego × maceta.riego`. Un foco pequeño en una carpa grande no llega a todas las plantas y rinden menos que con el CFL bien puesto.
+- **Cobertura:** `cob = min(1, cubre / plazas)`. `rend = (1 + (foco.cosecha − 1) × cob) × (0,6 + 0,4 × cob) × maceta.cosecha`; `crec = foco.crece × (0,85 + 0,15 × cob) × maceta.crece`; `thc = foco.thc × cob`; `riego = foco.riego × maceta.riego × (0,5 con goteo)`; las plagas, `maceta.plagas × (0,7 con ventilador)`. Un foco pequeño en una carpa grande no llega a todas las plantas y rinden menos que con el CFL bien puesto.
 - **Límites:** el foco no puede pasar de los vatios de la carpa (calor) y la maceta, de sus litros.
 - **Cambiar:** las macetas, en una plaza vacía (A en la bandeja → «Cambiar maceta»); los focos, desde la pared de la carpa (A → «Cambiar foco») o al comprarlos («¿Lo cuelgo ya?»). Lo que se quita va a la mochila.
 - **Factura de la luz:** cada día, `vatios × 0,02 €` por cada carpa con alguna planta viva (las vacías van apagadas).
+- **Extras** (uno de cada por carpa; se compran en el growshop, «¿Te lo pongo ya?», o se ponen luego desde la vista de carpa: ▲ hasta el foco y A):
+
+| Extra | Efecto en su carpa | Precio |
+|---|---|---|
+| Ventilador de pinza | plagas ×0,7 | 25 € (cap. 1) |
+| Extractor con filtro de carbón | anula el olor (ver abajo) | 120 € (cap. 2) |
+| Riego por goteo | riego ×0,5 (el agua baja a la mitad de rápido) | 80 € (cap. 3) |
+
+- **Olor:** cada día, cada carpa sin filtro con alguna planta viva en floración (progreso ≥ 65 %) suma **+2 de calor**. Se aplica después de la bajada diaria, así que cuenta para la redada del día siguiente.
 - Lo de serie (CFL en el armario y macetas de 7 L) da exactamente el cultivo de antes de la 1.6.
 
 ## 5. Genética
@@ -107,7 +122,7 @@ Desde el capítulo 2 aparecen cada día **min(10, 4 + reputación/15 + 1 desde e
 
 ## 7. Calor policial y reputación
 
-- **El calor sube:** con cada venta, al huir de la policía (+8), si un agente honrado rechaza tu soborno (la requisa resta 15 y después suma 20: +5 neto si tenías 15 o más) y si rechazas a Molina (+10).
+- **El calor sube:** con cada venta, con el olor de cada carpa en floración sin filtro de carbón (+2 al día), al huir de la policía (+8), si un agente honrado rechaza tu soborno (la requisa resta 15 y después suma 20: +5 neto si tenías 15 o más) y si rechazas a Molina (+10).
 - **El calor baja:** −12 cada día (−20 con protección), −10 al sobornar y −15 en cada requisa.
 - Con 70 o más salta un aviso.
 - **Redada:** al cambiar de día con **calor ≥ 90**. Sin protección pierdes todas las plantas y los cogollos, pagas una multa de hasta 300 € y el calor queda en 30. Con la protección de Molina no hay redada y el calor queda en 50.

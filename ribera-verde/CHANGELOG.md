@@ -1,5 +1,17 @@
 # Cambios
 
+## En desarrollo (próxima versión, sale con el arte de `docs/PLAN-PRODUCCION.md`)
+
+- **P1 del plan de producción** (decisiones D1–D6 aprobadas): datos y reglas del equipo nuevo. Hasta P2–P3 lo nuevo se dibuja con el arte procedural, por eso no hay versión ni Artifact nuevos.
+  - **Armario 80×80** (300 €, capítulo 3): sustituye al de 60 en el sitio A. 3 plazas (la de atrás centrada), focos de hasta 400 W y macetas de hasta 18 L.
+  - **Carpa 120×120** (700 €, capítulo 5): tercera carpa, en el sitio C nuevo, junto a la cama, cuando ya hay carpa en B. 6 plazas, hasta 720 W y 25 L. El máximo pasa de 8 plantas a 15.
+  - **LED 100 W** (140 €, capítulo 1): cubre 2 plazas, cosecha +15 %, crece +5 %, THC +0,3.
+  - **Extras**, uno de cada por carpa: ventilador de pinza (25 €, cap. 1, plagas ×0,7), extractor con filtro de carbón (120 €, cap. 2) y riego por goteo (80 €, cap. 3, el agua baja a la mitad). Al comprarlos, «¿Te lo pongo ya?»; si no, desde la vista de carpa (▲ hasta el foco y A). La ficha del foco enseña los que tiene la carpa.
+  - **Regla nueva, el olor:** cada carpa sin filtro con alguna planta en floración suma +2 de calor al día.
+  - **Cambiar de carpa:** cada planta y cada maceta se quedan en su carpa y su plaza (antes las plazas nuevas iban al final de la lista, lo que con el armario 80 habría movido las plantas de la carpa del fondo).
+- **Partidas viejas:** una partida de la 1.9 carga igual (mismas plazas, plantas y macetas; extras a 0).
+- **Tests:** `npm test` 45/45: comprar el armario 80 (las plantas se quedan donde estaban), poner ventilador, filtro y goteo (el filtro anula el calor por olor) y montar la carpa 120 en C. `npm run test:arte` 22/22.
+
 ## 1.9.0 · 6 de octubre de 2026
 
 - **Nuevo: las genéticas de Strainmon.** La Genoteca pasa de 23 a 41 variedades con la información de `../src/species.js`, todas con nombre real y su historia (se lee en la Genoteca y en el banco).

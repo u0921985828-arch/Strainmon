@@ -10,14 +10,17 @@
    Lo de serie (CFL + plástico 7 L en el armario) da justo lo de antes de la 1.6: factores 1. */
 const CARPAS={
   p60:{n:'Armario 60×60',w:1,cm:[60,160],cols:2,filas:1,plazas:2,wmax:250,lmax:11},
+  p80:{n:'Armario 80×80',w:1,cm:[80,180],cols:2,filas:2,plazas:3,wmax:400,lmax:18},
   m100:{n:'Carpa 100×100',w:1,cm:[100,200],cols:2,filas:2,plazas:4,wmax:480,lmax:25},
+  m120:{n:'Carpa 120×120',w:2,cm:[120,200],cols:3,filas:2,plazas:6,wmax:720,lmax:25},
   g150:{n:'Carpa 150×100',w:2,cm:[150,200],cols:3,filas:2,plazas:6,wmax:720,lmax:25}};
-const SITIOS=[{x:8,y:2,w:1},{x:10,y:2,w:2}];   // A: el armario de la tía · B: la carpa que compras (100 y, después, 150), al fondo del piso
+const SITIOS=[{x:8,y:2,w:1},{x:10,y:2,w:2},{x:2,y:2,w:2}];   // A: el armario de la tía (60 y, después, 80) · B: la carpa que compras (100 y, después, 150), al fondo · C: la carpa 120, junto a la cama
 const FOCOS={
   cfl:{n:'CFL 125 W',tipo:'cfl',w:125,cubre:2,rend:1,crec:1,thc:0,agua:1},
   sodio250:{n:'Sodio 250 W',tipo:'sodio',w:250,cubre:2,rend:1.25,crec:1.05,thc:.3,agua:1.3},
   sodio400:{n:'Sodio 400 W',tipo:'sodio',w:400,cubre:4,rend:1.35,crec:1.05,thc:.5,agua:1.4},
   sodio600:{n:'Sodio 600 W',tipo:'sodio',w:600,cubre:6,rend:1.45,crec:1.05,thc:.7,agua:1.5},
+  led100:{n:'LED 100 W',tipo:'led',w:100,cubre:2,rend:1.15,crec:1.05,thc:.3,agua:1},
   led200:{n:'LED 200 W',tipo:'led',w:200,cubre:2,rend:1.3,crec:1.1,thc:.6,agua:1.05},
   led480:{n:'LED 480 W',tipo:'led',w:480,cubre:4,rend:1.45,crec:1.1,thc:1,agua:1.1},
   led720:{n:'LED 720 W',tipo:'led',w:720,cubre:6,rend:1.6,crec:1.15,thc:1.4,agua:1.15}};
@@ -26,6 +29,12 @@ const MACETAS={
   tela11:{n:'Tela 11 L',l:11,rend:1.15,crec:1.05,agua:1.25,plaga:.8},
   plastico18:{n:'Plástico 18 L',l:18,rend:1.25,crec:.95,agua:.8,plaga:1},
   tela25:{n:'Tela 25 L',l:25,rend:1.4,crec:1,agua:1.1,plaga:.8}};
+// extras (1.10): uno de cada por carpa (S.carpas[ci][k] = true); se compran en el growshop (S.items['x_'+k]) y se ponen desde la vista de carpa
+const EXTRAS={
+  vent:{n:'Ventilador de pinza',c:'Ventilador',d:'Mueve el aire de la carpa: plagas ×0,7.'},
+  filtro:{n:'Extractor con filtro de carbón',c:'Filtro de carbón',d:'Sin filtro, cada carpa con plantas en floración suma +2 de calor policial al día por el olor. Con él, nada.'},
+  goteo:{n:'Riego por goteo',c:'Goteo',d:'Depósito con goteros: el agua baja a la mitad de rápido.'}};
+const OLOR=2;   // calor al día por carpa sin filtro con alguna planta en floración (o lista)
 const TARIFA=.02;   // € por vatio y día, solo en las carpas con alguna planta viva (vacías, el foco va apagado)
 const signo=v=>(v>=0?'+':'−')+String(Math.abs(Math.round(v))),pc=(t,f)=>Math.abs(f-1)<.001?'':` · ${t} ${signo((f-1)*100)}%`;
 const descFoco=k=>{const F=FOCOS[k];return `${F.w} W · cubre ${F.cubre} plantas${pc('cosecha',F.rend)}${pc('crece',F.crec)}${F.thc?' · THC +'+pct(F.thc):''} · riego ×${String(F.agua).replace('.',',')}\nLuz: ${eur(Math.round(F.w*TARIFA))} al día con plantas.`;};
@@ -40,9 +49,11 @@ function huecos(){
 function factores(i){
   const h=huecos()[i],c=S.carpas[h.c],C=CARPAS[c.t],F=FOCOS[c.foco],M=MACETAS[S.macetas[i]]||MACETAS.plastico7;
   const cob=Math.min(1,F.cubre/C.plazas);
-  return {rend:(1+(F.rend-1)*cob)*(.6+.4*cob)*M.rend,crec:F.crec*(.85+.15*cob)*M.crec,thc:F.thc*cob,agua:F.agua*M.agua,plaga:M.plaga,cob};
+  return {rend:(1+(F.rend-1)*cob)*(.6+.4*cob)*M.rend,crec:F.crec*(.85+.15*cob)*M.crec,thc:F.thc*cob,agua:F.agua*M.agua*(c.goteo?.5:1),plaga:M.plaga*(c.vent?.7:1),cob};
 }
 const plantasVivas=ci=>huecos().some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead);
+const enFlor=ci=>huecos().some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead&&S.pots[i].prog>=.65);
+const olorDia=()=>S.carpas.reduce((a,c,ci)=>a+(c&&!c.filtro&&enFlor(ci)?OLOR:0),0);
 const luzCarpa=ci=>Math.round(FOCOS[S.carpas[ci].foco].w*TARIFA);
 function facturaLuz(){let e=0;S.carpas.forEach((c,ci)=>{if(c&&plantasVivas(ci))e+=luzCarpa(ci);});return e;}
 function plantStep(p,h,f){
@@ -66,7 +77,9 @@ function newDay(){
   S.day++;
   if(S.heat>=90)queue('raid',raidEvent); // se comprueba antes de que el calor baje con el nuevo día
   S.heat=Math.max(0,S.heat-(S.protect?20:12));
-  const luz=facturaLuz();S.luz={d:S.day,e:luz};if(luz>0){S.money=Math.max(0,S.money-luz);if(mode==='world')toast('Factura de la luz: −'+eur(luz),1600);}
+  const luz=facturaLuz(),olor=olorDia(),av=[];S.luz={d:S.day,e:luz};if(luz>0){S.money=Math.max(0,S.money-luz);av.push('Factura de la luz: −'+eur(luz));}
+  if(olor){S.heat=Math.min(100,S.heat+olor);av.push('Olor a cogollo: calor +'+olor);}   // después de bajar el calor: cuenta para la redada de mañana
+  if(av.length&&mode==='world')toast(av.join('<br>'),1600);
   spawnClients();recibirPedido();
   if(S.due>0&&S.flags.metB&&S.day>S.deadline)queue('penalty',penaltyEvent);
 }
@@ -109,11 +122,15 @@ async function cambiarFoco(ci){
   const j=await menu(l.map(k=>({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],ic:icono('lampara'),desc:descFoco(k)})),{cls:'full',title:'CAMBIAR FOCO',title2:'Ahora: '+FOCOS[S.carpas[ci].foco].n,desc:true});
   if(j<0)return;instalarFoco(ci,l[j]);return say(`Cuelgas el foco ${FOCOS[l[j]].n}. El viejo va a la mochila.`);
 }
+const extrasLibres=ci=>Object.keys(EXTRAS).filter(k=>!S.carpas[ci][k]&&S.items['x_'+k]>0);
+function ponerExtra(ci,k){S.items['x_'+k]--;S.carpas[ci][k]=true;sfx('sel');}
 async function carpaAction(ci){
-  const c=S.carpas[ci],C=CARPAS[c.t],F=FOCOS[c.foco],f=focosLibres(ci).length;
-  const opts=f?['Cambiar foco','Salir']:['Salir'];
+  const c=S.carpas[ci],C=CARPAS[c.t],F=FOCOS[c.foco],f=focosLibres(ci).length,ex=extrasLibres(ci);
+  const opts=(f?['Cambiar foco']:[]).concat(ex.map(k=>'Poner '+EXTRAS[k].c.toLowerCase()),['Salir']);
   const k=await ask(`${C.n} · ${C.plazas} plantas\nFoco ${F.n} · luz ${eur(luzCarpa(ci))} al día con plantas`,opts);
-  if(opts[k]==='Cambiar foco')await cambiarFoco(ci);
+  if(opts[k]==='Cambiar foco')return cambiarFoco(ci);
+  const x=ex[k-(f?1:0)];if(k<0||!x)return;
+  ponerExtra(ci,x);return say(`Pones el ${EXTRAS[x].n.toLowerCase()} en ${/^Armario/.test(C.n)?'el':'la'} ${C.n.toLowerCase()}.\n${EXTRAS[x].d}`);
 }
 async function harvest(i){
   const p=S.pots[i],s=getStrain(p.sid),f=factores(i);

@@ -122,6 +122,20 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
     press('A'); await hasta(() => VC && !VC.ocupado && handlers.length === 1); R.agua = S.pots[1].water;
     press('B'); await hasta(() => mode === 'world' && isFree());
   }, () => R.sel0 === 0 && R.sel === 1 && /Plaza 2/.test(R.info) && R.agua === 100 && !VC && document.getElementById('vcInfo').hidden || R);
+  await step('Growshop: armario 80 en el sitio A; cada planta se queda en su carpa y su plaza', ['Armario 80', 'Salir'], async () => {
+    S.money = 1000; S.pots[3] = { sid: 'txoko', prog: .3, water: 90, health: 100, fert: false, pest: false };
+    window.R = { antes: S.pots.map(p => JSON.stringify(p)), mac: S.macetas.slice() }; await run(shop); enterMap('home', 5, 5, 'up');
+    const g = vcGeo(0).pl; R.filas = g.map(q => q.fila).join(); R.atras = g[2].x > g[0].x && g[2].x < g[1].x; S.pots[3] = null;
+  }, () => S.carpas[0].t === 'p80' && S.carpas[0].foco === 'led200' && S.money === 700 && S.pots.length === 7 && R.filas === '0,0,1' && R.atras
+    && [0, 1].every(i => JSON.stringify(S.pots[i]) === R.antes[i]) && R.antes[3] !== 'null' && S.macetas[2] === 'plastico7' && S.macetas[3] === R.mac[2] && MAPS.home.carpas.length === 2
+    || { carpas: S.carpas, money: S.money, R, pots: S.pots.map(p => JSON.stringify(p)), macetas: S.macetas });
+  await step('Extras: ventilador, filtro y goteo en la carpa de 100; sin filtro, el olor de la floración sube el calor', ['Ventilador', '^Carpa 100', 'Extractor', '^Carpa 100', 'Riego por goteo', '^Carpa 100', 'Salir', 'Poner filtro'], async () => {
+    S.money = 1000; await run(shop); const flor = () => ({ sid: 'ria', prog: .8, water: 100, health: 100, fert: false, pest: false });
+    window.R = { money: S.money, f: factores(4), m: MACETAS[S.macetas[4]], F: FOCOS[S.carpas[1].foco] };
+    S.protect = false; S.pots[0] = flor(); S.pots[4] = flor(); S.heat = 30; advanceTime(24 * 60); await idle(); R.h1 = S.heat;
+    S.items.x_filtro = 1; await run(() => carpaAction(0)); advanceTime(24 * 60); await idle(); R.h2 = S.heat; S.pots[0] = S.pots[4] = null;
+  }, () => S.carpas[1].vent && S.carpas[1].filtro && S.carpas[1].goteo && R.money === 1000 - 25 - 120 - 80 && Math.abs(R.f.plaga - R.m.plaga * .7) < 1e-9 && Math.abs(R.f.agua - R.F.agua * R.m.agua * .5) < 1e-9
+    && R.h1 === 30 - 12 + 2 && R.h2 === R.h1 - 12 && S.carpas[0].filtro && !S.items.x_filtro || { carpas: S.carpas, R, items: S.items });
   await step('Cruce de receta: Afghani × Skunk #1 → Critical Mass', ['^Afghani', '^Skunk #1', 'Cruzar'], async () => {
     addSeeds('ria', 2); addSeeds('txoko', 2); await run(labAction);
   }, () => S.seeds.kushrif === 2 && S.disc.kushrif && S.gen.kushrif === 1 || { seeds: S.seeds, gen: S.gen });
@@ -141,6 +155,10 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   }, () => S.disc.haze && S.gen.haze === 1 && new Set(R).size > 2 && R.every(g => g >= Math.floor(32 * factores(0).rend * .8) && g <= Math.ceil(32 * factores(0).rend * 1.1)) && /F1: línea inestable/.test(strainLine('haze')) || { R, gen: S.gen.haze, rend: factores(0).rend });
 
   // ---------- capítulo 5 ----------
+  await step('Growshop: carpa 120 en el sitio C, junto a la cama (6 plazas más)', ['Carpa 120', 'Salir'], async () => {
+    S.money = 1000; await run(shop); enterMap('home', 5, 5, 'up');
+  }, () => S.carpas[2]?.t === 'm120' && S.carpas[2].foco === 'cfl' && huecos().length === 13 && S.pots.length === 13 && S.macetas.length === 13 && S.money === 300
+    && MAPS.home.carpas.some(t => t.ci === 2 && t.x0 === 2 && t.x1 === 3) && tileSolid(MAPS.home, 2, 2) && tileSolid(MAPS.home, 3, 2) || { carpas: S.carpas, money: S.money, n: huecos().length, mapa: MAPS.home.carpas });
   await step('Sargento Molina: pagar protección', ['Pagar 500'], async () => { S.money = 600; await run(talkMolina); },
     () => S.protect === true && S.money === 100 || { protect: S.protect, money: S.money });
   await step('Calor 95 con protección → Molina para la redada', ['Skunk'], async () => {
