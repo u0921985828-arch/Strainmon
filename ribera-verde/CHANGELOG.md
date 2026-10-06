@@ -1,5 +1,16 @@
 # Cambios
 
+## 1.6.1 · 6 de octubre de 2026
+
+- **Corregido: el marco en el móvil.** La pantalla del juego quedaba pequeña y los mandos se comían el resto; en horizontal la pantalla se quedaba en 90 × 60 px. Ahora la consola es la app entera, sin scroll, y `ajustarPantalla()` reparte el hueco real (`visualViewport`, con barras del sistema y muescas) con límites fijos para cada parte:
+  - **vertical:** pantalla arriba a todo el ancho (332 × 221 en un móvil de 360 × 740; antes 288 × 192) y cruceta, A/B, SONIDO y START debajo, con al menos un tercio del alto para ellos;
+  - **horizontal:** cruceta | pantalla a toda la altura | A/B (449 × 299 en 740 × 360; antes 90 × 60), con SONIDO y START debajo de cada lado;
+  - los mandos se escalan con el hueco (cruceta de 96 a 210 px) y la pantalla se ajusta a un múltiplo entero de 240 píxeles físicos cuando está a menos de un 8 % (píxeles nítidos).
+- **Quitado:** la línea de ayuda del teclado bajo la consola (es una app de móvil; el teclado sigue funcionando en el PC). Sin zoom con dos dedos ni doble toque.
+- **Corregido: sprites antiguos.** En la intro, Kiko salía con el muñeco procedural ampliado; ahora es el de PixelLab (×2, con su animación). Los menús usan por fin los iconos y los cogollos que ya estaban en el atlas: mochila, tienda, cultivo, combate, venta y Genoteca (el cogollo de cada variedad con su forma y su color).
+- **Corregido (herramientas):** `npm run capturas` podía quedarse colgado tras el combate (el cambio de capítulo encolado acababa con `lock` en −1).
+- **Tests:** `npm run test:arte` 22/22 (intro y menús con el arte del atlas; marco en 7 tamaños, vertical y horizontal).
+
 ## 1.6.0 · 6 de octubre de 2026
 
 - **Nuevo: carpas de cultivo de verdad en el piso.** El armario de la tía (60×60, 2 plantas) es el de serie; en el growshop se compra una **carpa de 100×100** (450 €, capítulo 2, 4 plantas) y después se cambia por una **de 150×100** (900 €, capítulo 4, 6 plantas: se quedan plantas, foco y macetas). El piso pasa a 20 × 12 casillas, con las dos carpas al fondo.

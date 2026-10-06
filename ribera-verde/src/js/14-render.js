@@ -145,7 +145,7 @@ function renderTitle(now){
   }
   for(let y=112;y<160;y+=4){const o=Math.sin(t*1.5+y)*6;ctx.fillStyle='#1e3a64';ctx.fillRect(20+o+(y*7)%60,y,30,1);ctx.fillRect(140-o+(y*5)%50,y,24,1);}
   if(mode==='title'){if(!art){const by=Math.round(Math.sin(t*1.6)*2);ctx.globalAlpha=.55;ctx.drawImage(titleArt,88,62+by,64,64);ctx.globalAlpha=1;}}
-  else{ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,SW,SH);ctx.fillStyle='#2a6a48';ctx.beginPath();ctx.ellipse(120,104,34,7,0,0,Math.PI*2);ctx.fill();ctx.drawImage(spriteFor(LOOKS.kiko,'down',0),96,44,48,60);}
+  else{ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,SW,SH);ctx.fillStyle='#2a6a48';ctx.beginPath();ctx.ellipse(120,104,34,7,0,0,Math.PI*2);ctx.fill();if(!arteRetrato(LOOKS.kiko,120,104,now))ctx.drawImage(spriteFor(LOOKS.kiko,'down',0),96,44,48,60);}
 }
 function updateHUD(){
   const h=$('hud');if(mode!=='world'||!S){h.hidden=true;return;}h.hidden=false;

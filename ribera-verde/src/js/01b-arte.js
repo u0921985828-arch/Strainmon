@@ -263,6 +263,25 @@ function combFrame(who,now){
   if(a){const t=now-a.t0;if(t<duracion(g,a.n)||a.n==='desmayo')return frameDe(g,a.n,a.n==='huir'?'east':dir,t,{bucle:a.n==='huir'});B['a'+who]=null;}
   return frameDe(g,'idle',dir,now,{bucle:true})||frameDe(g,'base',dir,0,{i:0});
 }
+// personaje del atlas a ×k (intro: Kiko presentándose), de frente, con su idle si lo tiene; pies en (cx, fy)
+function arteRetrato(look,cx,fy,now,k=2){
+  const g=grupoLook(look);if(!g)return false;
+  const f=(tieneDir(g,'idle','south')&&frameDe(g,'idle','south',now,{bucle:true}))||frameDe(g,'base','south',0,{i:0});if(!f)return false;
+  ctx.drawImage(f.c,Math.round(cx-f.cel.ancla[0]*k),Math.round(fy-f.cel.ancla[1]*k),f.c.width*k,f.c.height*k);return true;
+}
+// iconos de PixelLab para los menús (DOM): data URL de un fotograma; el cogollo de la Genoteca con el color de la variedad
+const ICO={};
+function icono(n){
+  if(!ARTE.ok)return null;if(n in ICO)return ICO[n];
+  const f=frameDe('iconos',n,'unica',0,{i:0});return ICO[n]=f?f.c.toDataURL():null;
+}
+function iconoCogollo(sid){
+  if(!ARTE.ok)return null;const s=getStrain(sid),key='c|'+sid+'|'+(s&&s.c);if(key in ICO)return ICO[key];
+  const t=TIPO_COGOLLO[sid]||'hibrido',f=frameDe('cogollos-genoteca',t,'unica',0,{i:0});if(!f||!s)return ICO[key]=null;
+  const rk=ARTE.d.rampas&&ARTE.d.rampas['cogollos-genoteca']&&ARTE.d.rampas['cogollos-genoteca'].cogollo;
+  const c=rk?conRampa(f.c,{[rk.rampa[0]]:shade(s.c,50),[rk.rampa[1]]:s.c,[rk.rampa[2]]:shade(s.c,-60)},'g|'+s.c):f.c;
+  return ICO[key]=c.toDataURL();
+}
 function arteTitulo(){
   const g=ARTE.ok&&ARTE.cubre['misc:hoja-titulo'];if(!g)return false;
   const f=frameDe(g,'base','unica',0,{i:0});if(!f)return false;ctx.drawImage(f.c,0,0);return true;

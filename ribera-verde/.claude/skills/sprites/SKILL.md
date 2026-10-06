@@ -74,7 +74,7 @@ Argumento: `$ARGUMENTS` (una fase `F0`…`F8`, el id de un asset del manifiesto,
    - Píxeles sueltos o borde sucio: `pixelart_workbench` (`lint`, `repair`) o `correct_pixelart`, y guarda con `save_to_asset`.
    - Fuera de celda o mal encuadrado: regenera.
 8. **Revisión visual.** Abre los PNG procesados (amplíalos) junto a su referencia de `art/referencias/` y aplica la lista de la guía (sección «QA»). Si falla algo, vuelve al paso 2 y regenera.
-9. **Atlas y juego.** `npm run sprites:procesar -- --todos --atlas`, después `npm run build`, `npm test` (38/38), `npm run test:arte` (20/20) y `npm run capturas`. Mira las capturas.
+9. **Atlas y juego.** `npm run sprites:procesar -- --todos --atlas`, después `npm run build`, `npm test` (38/38), `npm run test:arte` (22/22) y `npm run capturas`. Mira las capturas.
 10. **Anotar** en el manifiesto:
     - `estado: "aprobado"`;
     - `pixellab` con los ids devueltos (`character_id`, `animation_group_id`, `object_id`…) y la `seed` si la herramienta la acepta;

@@ -5,7 +5,7 @@ Todas las cifras están sacadas del código de `src/js`. Si cambias un número a
 ## 1. Ficha
 
 - **Género:** RPG de gestión y cultivo con combates por turnos.
-- **Plataforma:** navegador de escritorio o móvil, en un único archivo HTML.
+- **Plataforma:** móvil primero (APK de Android y navegador), en un único archivo HTML; también se juega en tablet y PC. La consola se ajusta a la pantalla en vertical y en horizontal.
 - **Pantalla:** 240 × 160 px escalados sin suavizado; casillas de 16 px.
 - **Público:** adulto (trata de cannabis, venta ilegal y sobornos, en tono de comedia).
 - **Objetivo:** pagar los 5.000 € que debía la tía Maite a Don Baltasar en tres plazos, ganar la Copa de Ribera y completar la Genoteca.

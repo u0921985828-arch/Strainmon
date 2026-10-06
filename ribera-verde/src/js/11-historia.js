@@ -25,7 +25,8 @@ async function shop(){
   let i=0;
   for(;;){
     const list=SHOP.filter(it=>S.ch>=it.ch&&(!it.cond||it.cond()));
-    const items=list.map(it=>({label:it.lbl,right:eur(it.p),sw:it.sid?STRAINS[it.sid].c:null,desc:it.sid?strainLine(it.sid):it.desc}));
+    const IC={fert:'abono',insect:'insecticida',spray:'spray',bocata:'bocadillo'};
+    const items=list.map(it=>({label:it.lbl,right:eur(it.p),sw:it.sid?STRAINS[it.sid].c:null,ic:it.sid?icono('semillas'):it.item?icono(IC[it.item]):it.maceta?icono('maceta'):it.foco?icono('lampara'):null,desc:it.sid?strainLine(it.sid):it.desc}));
     items.push({label:'Salir',desc:'Volver al mostrador.'});
     i=await menu(items,{cls:'full',title:'GROWSHOP KIKO',title2:'Tienes '+eur(S.money),desc:true,initial:i});
     if(i<0||i>=list.length)break;

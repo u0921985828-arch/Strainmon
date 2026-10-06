@@ -8,15 +8,17 @@ RPG de cultivo en pixel art, con pantalla de 240 × 160 al estilo de las portát
 
 - Abre **`index.html`** con doble clic (Chrome, Edge o Firefox). Funciona sin conexión porque las fuentes van dentro del archivo.
 - La partida se guarda en el navegador al dormir, al cambiar de capítulo y desde START → GUARDAR o desde el ordenador del piso. No se comparte entre navegadores ni entre equipos.
-- En el móvil se juega con la cruceta y los botones de la pantalla.
+- Está pensado para el **móvil**: la consola ocupa toda la pantalla, en vertical (juego arriba a todo el ancho, mandos debajo) o en horizontal (cruceta | juego a toda la altura | A/B). Cada parte tiene su hueco medido y nada se sale ni hace scroll, en cualquier tamaño (también en tablet y PC).
 - **Android:** instala `dist/ribera-verde.apk` (activa «Instalar apps desconocidas» para el navegador o el gestor de archivos). Es el mismo juego en pantalla completa, sin conexión y sin permisos; el botón Atrás hace de B. La partida se guarda dentro de la app.
 
-| Acción | Teclado | Pantalla |
-|---|---|---|
-| Moverse | Flechas o WASD | Cruceta |
-| A: hablar, usar, aceptar | Z, Espacio o Intro | A |
-| B: cancelar · mantener para correr | X, Esc o Mayús | B |
-| Menú (Genoteca, Mochila, Plantas, Objetivo, Guardar) | M o Tab | START |
+| Acción | Botón |
+|---|---|
+| Moverse | Cruceta |
+| Hablar, usar, aceptar | A |
+| Cancelar · mantener para correr | B |
+| Menú (Genoteca, Mochila, Plantas, Objetivo, Guardar) | START |
+
+En el PC también vale el teclado (flechas o WASD, Z/Espacio = A, X/Esc = B, M = START), aunque ya no se muestra en pantalla.
 
 ## Qué incluye
 

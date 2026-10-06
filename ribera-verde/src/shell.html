@@ -5,16 +5,7 @@
 <style>
 /*@@CSS@@*/</style>
 
-<main class="console" aria-label="Ribera Verde, juego">
-  <div class="sideL">
-    <div class="dpad" id="dpad" aria-label="Cruceta">
-      <button class="u" data-b="up" aria-label="Arriba">▲</button>
-      <button class="l" data-b="left" aria-label="Izquierda">◀</button>
-      <div class="m"></div>
-      <button class="r" data-b="right" aria-label="Derecha">▶</button>
-      <button class="d" data-b="down" aria-label="Abajo">▼</button>
-    </div>
-  </div>
+<main class="console" id="consola" aria-label="Ribera Verde, juego">
   <div class="center">
     <div class="bezel">
       <div class="screen" id="screen">
@@ -30,7 +21,7 @@
         <div class="box toast" id="toast" hidden></div>
         <div class="box dlg" id="dlg" hidden><div class="nm" id="dlgName" hidden></div><span id="dlgText"></span><div class="more" id="dlgMore" hidden></div></div>
         <div class="box menu" id="menu" hidden></div>
-        <div class="box namebox" id="nameBox" hidden><label for="nameInput">¿Cómo te llamas?</label><input id="nameInput" maxlength="8" autocomplete="off" spellcheck="false"><small>Intro para aceptar</small></div>
+        <div class="box namebox" id="nameBox" hidden><label for="nameInput">¿Cómo te llamas?</label><input id="nameInput" maxlength="8" autocomplete="off" spellcheck="false"><small>Pulsa A para aceptar</small></div>
         <div class="endcard" id="endcard" hidden></div>
         <div class="fade" id="fade"></div>
         <div class="wipe" id="wipe" hidden></div>
@@ -38,15 +29,21 @@
       <div class="lbl"><span><i></i>RIBERA <b>VERDE</b></span><span>GROW·BOY</span></div>
     </div>
   </div>
+  <div class="sideL">
+    <div class="dpad" id="dpad" aria-label="Cruceta">
+      <button class="u" data-b="up" aria-label="Arriba">▲</button>
+      <button class="l" data-b="left" aria-label="Izquierda">◀</button>
+      <div class="m"></div>
+      <button class="r" data-b="right" aria-label="Derecha">▶</button>
+      <button class="d" data-b="down" aria-label="Abajo">▼</button>
+    </div>
+  </div>
   <div class="sideR">
     <div class="ab"><button data-b="B" aria-label="Botón B">B</button><button data-b="A" aria-label="Botón A">A</button></div>
   </div>
-  <div class="pills">
-    <button id="bSound" aria-label="Activar o quitar sonido">SONIDO</button>
-    <button data-b="START" aria-label="Start, menú">START</button>
-  </div>
+  <div class="pillL"><button id="bSound" aria-label="Activar o quitar sonido">SONIDO</button></div>
+  <div class="pillR"><button data-b="START" aria-label="Start, menú">START</button></div>
 </main>
-<p class="keys">Mover <kbd>←↑↓→</kbd>/<kbd>WASD</kbd> · A <kbd>Z</kbd>/<kbd>Espacio</kbd>/<kbd>Intro</kbd> · B <kbd>X</kbd>/<kbd>Esc</kbd> (mantén B para correr) · Menú <kbd>M</kbd></p>
 
 <script>
 //@@ATLAS@@

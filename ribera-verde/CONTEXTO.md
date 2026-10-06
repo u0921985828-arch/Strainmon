@@ -41,22 +41,22 @@
 - `npm test` recorre la historia entera y los sistemas sueltos en 38 pasos: **38/38, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
-  - el motor ya usa el atlas (F2) y `npm run test:arte` da 20/20;
+  - el motor ya usa el atlas (F2) y `npm run test:arte` da 22/22;
   - F1 generada con PixelLab Pro: el protagonista ya sale del atlas (`base`, `idle`, `walk`), aprobado;
   - F3 (personajes) con la misma receta: los 13 NPC y los 6 clientes salen del atlas con `idle`, `walk` (los que caminan) y sus acciones de ambiente;
   - F3-resto, F4, F5, F6 y F7 (1.5): humos y efectos, gaviotas y palomas, tiles, interiores, fachadas, objetos, carpa, plantas, combate, iconos, cogollos y título salen del atlas, y el protagonista ya tiene sus 8 acciones;
   - F4b (1.5): orillas del río, del camino de tierra y de la plaza con tres Wang encadenados y autotiling por esquinas;
   - F8 (1.6): carpas de 3 tamaños por dentro y cerradas (pixflux img2img sobre su huella), 4 macetas, 3 focos y la mesa de cultivo (lotes de `create_1_direction_object`). Atlas completo: 1099 fotogramas.
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
-- **Android:** `dist/ribera-verde.apk` (1.6.0, código 10600), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
-- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.6, con el atlas completo de PixelLab (1099 fotogramas). Es privado: se comparte desde su menú Compartir.
+- **Android:** `dist/ribera-verde.apk` (1.6.1, código 10601), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
+- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.6.1, con el atlas completo de PixelLab (1099 fotogramas). Es privado: se comparte desde su menú Compartir.
 
 ## Limitaciones conocidas
 
 - El equilibrio de la economía y de la dificultad solo se ha probado con el test automático, no con jugadores.
 - Sin atlas (`?arte=procedural`) el arte es el procedural sencillo: personajes de 16 × 20 px con 3 fotogramas y plantas en 5 fases.
 - La música son 5 bucles cortos. No hay efectos de pasos.
-- No hay soporte de mando ni pantalla completa.
+- No hay soporte de mando. En el navegador no se pide pantalla completa (en el APK sí).
 - El guardado vive en el navegador: si se borran los datos del sitio, se pierde la partida.
 - En las listas, los nombres de híbrido muy largos se cortan con «…».
 - Las fuentes embebidas solo traen el alfabeto latino. Los símbolos ★ ▲ ▼ → salen con la fuente del sistema.

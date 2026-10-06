@@ -168,6 +168,27 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       return { g, e, golpe, pol, alto };
     });
     check('Combate: golpe, ataque, huida y policía desde el atlas', comb.g && comb.e && comb.golpe && comb.pol === 'policia-combate' && comb.alto, comb);
+    // intro y menús: nada de sprites procedurales si el atlas los trae (Kiko de la intro, iconos y cogollos de la Genoteca)
+    const ui = await page.evaluate(async () => {
+      const r = {}; mode = 'intro'; r.kiko = arteRetrato(LOOKS.kiko, 120, 104, performance.now()); mode = 'world';
+      r.iconos = ['abono', 'insecticida', 'spray', 'bocadillo', 'semillas', 'billetes', 'maceta', 'lampara'].every(n => !!icono(n));
+      r.cogollos = ['ria', 'leyenda', 'txoko', 'limon'].every(k => !!iconoCogollo(k)) && iconoCogollo('ria') !== iconoCogollo('txoko');
+      S.items.fert = 2; addBuds('ria', 5, 12); mochila(); await new Promise(res => setTimeout(res, 60));
+      r.mochila = document.querySelectorAll('#menu .ic').length; while (handlers.length) handlers.pop(); document.getElementById('menu').hidden = true; return r; });
+    check('Intro y menús con el arte del atlas: Kiko, iconos y cogollos de la Genoteca', ui.kiko && ui.iconos && ui.cogollos && ui.mochila >= 4, ui);
+    // marco de móvil: pantalla y mandos dentro del hueco, sin taparse ni hacer scroll, en vertical y en horizontal
+    const marco = [];
+    for (const [w, h] of [[320, 568], [360, 740], [412, 915], [740, 360], [915, 412], [768, 1024], [1366, 768]]) {
+      await page.setViewportSize({ width: w, height: h }); await page.waitForTimeout(80);
+      marco.push(await page.evaluate(([w, h]) => { ajustarPantalla(); const R = q => document.querySelector(q).getBoundingClientRect();
+        const s = R('#screen'), d = R('#dpad'), a = R('.ab'), st = R('[data-b=START]'), so = R('#bSound');
+        const dentro = b => b.left >= 0 && b.top >= 0 && b.right <= w + .5 && b.bottom <= h + .5, cruza = (p, q) => p.left < q.right && q.left < p.right && p.top < q.bottom && q.top < p.bottom;
+        const land = w > h, frac = s.width * s.height / (w * h);
+        return { w, h, ok: [s, d, a, st, so].every(dentro) && ![d, a, st, so].some(b => cruza(b, s)) && !cruza(d, a) && document.documentElement.scrollHeight <= h && document.documentElement.scrollWidth <= w
+          && frac >= (land ? .4 : .2) && d.width >= 96 && Math.abs(s.width / s.height - 1.5) < .02, pantalla: Math.round(s.width) + '×' + Math.round(s.height), frac: +frac.toFixed(2), cruceta: Math.round(d.width) }; }, [w, h]));
+    }
+    await page.setViewportSize({ width: 1000, height: 700 });
+    check('Marco de móvil: pantalla grande y mandos dentro en 7 tamaños (vertical y horizontal)', marco.every(m => m.ok), marco.filter(m => !m.ok).concat(marco.length ? [] : ['sin datos']));
     await page.waitForTimeout(300);
     check('Con atlas: 0 errores de JavaScript', errors.length === 0, errors.slice(0, 5));
     await page.close();

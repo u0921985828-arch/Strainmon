@@ -26,7 +26,7 @@ function menu(items,o={}){return new Promise(res=>{
     if(i<top)top=i;if(i>=top+rows)top=i-rows+1;
     let h='';if(o.title)h+=`<div class="ttl"><span>${o.title}</span>${o.title2?`<span>${o.title2}</span>`:''}</div>`;
     if(o.cls==='full')h+=`<div class="arr">${top>0?'▲':''}</div><div class="list">`;
-    items.slice(top,top+rows).forEach((it,k)=>{const idx=top+k;h+=`<div class="it ${idx===i?'sel':''} ${it.disabled?'dis':''}" data-i="${idx}"><span>${it.sw?`<i class="sw" style="background:${it.sw}"></i>`:''}${esc(it.label)}</span>${it.right!=null?`<span class="r">${esc(it.right)}</span>`:''}</div>`;});
+    items.slice(top,top+rows).forEach((it,k)=>{const idx=top+k;h+=`<div class="it ${idx===i?'sel':''} ${it.disabled?'dis':''}" data-i="${idx}"><span>${it.ic?`<i class="ic" style="background-image:url(${it.ic})"></i>`:it.sw?`<i class="sw" style="background:${it.sw}"></i>`:''}${esc(it.label)}</span>${it.right!=null?`<span class="r">${esc(it.right)}</span>`:''}</div>`;});
     if(o.cls==='full')h+=`</div><div class="arr">${top+rows<items.length?'▼':''}</div>`;
     if(o.desc)h+=`<div class="desc">${esc(items[i].desc||'')}</div>`;
     menuEl.innerHTML=h;

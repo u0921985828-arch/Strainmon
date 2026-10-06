@@ -22,7 +22,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   const shot = async (name, full) => { await page.waitForTimeout(350); await (full ? page : screen).screenshot({ path: path.join(OUT, name) }); console.log('  ' + name); };
   const z = async (n = 1) => { for (let i = 0; i < n; i++) { await page.keyboard.press('z'); await page.waitForTimeout(90); } };
   const untilMenu = async () => { for (let i = 0; i < 60; i++) { if (await page.evaluate(() => !document.getElementById('menu').hidden)) return; await z(); } };
-  const finishBattle = async () => { for (let i = 0; i < 200; i++) { if (await page.evaluate(() => mode === 'world' && lock === 0 && handlers.length === 0)) return; await z(); } throw new Error('el combate no termina'); };
+  const finishBattle = async () => { for (let i = 0; i < 900; i++) { if (await page.evaluate(() => mode === 'world' && lock === 0 && handlers.length === 0)) return; await z(); } throw new Error('el juego no queda libre: ' + await page.evaluate(() => JSON.stringify({ mode, lock, h: handlers.length, pend: pending.length, txt: document.getElementById('dlgText').textContent.slice(0, 60), menu: document.getElementById('menu').hidden }))); };
   const reset = () => page.evaluate(() => { while (handlers.length) handlers.pop(); dlg.hidden = true; menuEl.hidden = true; document.getElementById('toast').hidden = true; lock = 0; });
 
   await page.waitForTimeout(900);
@@ -49,7 +49,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
     document.getElementById('toast').hidden = true; pending.length = 0; queued.clear();   // el cambio de capítulo, después de la foto
   });
   await shot('03-piso-armario.png');
-  await page.evaluate(() => queue('historia', checkStory));
+  await page.evaluate(() => { run(checkStory); }); await finishBattle();   // el cambio de capítulo, entero antes de seguir (si no, reset() lo deja con lock negativo)
 
   await page.evaluate(() => { enterMap('town', 17, 9, 'down'); S.min = 12 * 60; ents = ents.filter(e => !e.def.client); });
   await shot('04-barrio-dia.png');

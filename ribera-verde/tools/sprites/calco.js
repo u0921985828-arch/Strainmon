@@ -147,6 +147,9 @@ for (const a of M.assets) {
   }
   // ---------- iconos ----------
   if (a.id === 'iconos' && has('misc/bolsa.png')) wr(a.id, 'bolsa', 'unica', 0, rd('misc/bolsa.png'));
+  // el resto de iconos y los cogollos de la Genoteca no tienen versión procedural: un disco de color por icono (los cogollos, en la rampa magenta)
+  if (a.id === 'iconos') Object.keys(a.elegidos || {}).filter(k => k !== 'bolsa').forEach((k, i) => { const o = blank(16, 16); dot(o, 8, 8, ['#c48a52', '#58c070', '#e06060', '#f0c040', '#80b0f0', '#c080e0'][i % 6], 5); dot(o, 8, 8, '#26262e', 1); wr(a.id, k, 'unica', 0, o); });
+  if (a.id === 'cogollos-genoteca') Object.keys(a.elegidos || {}).forEach((k, i) => { const o = blank(32, 32), rk = a.rampas_clave.cogollo.rampa; dot(o, 16, 16, rk[2], 9 + i % 2); dot(o, 16, 15, rk[1], 7); dot(o, 14, 12, rk[0], 2); wr(a.id, k, 'unica', 0, o); });
   // ---------- VFX y criaturas (formas simples) ----------
   for (const it of a.items || []) {
     const W = a.celda === 'vfx_grande' ? 32 : 16;

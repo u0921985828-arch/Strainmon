@@ -32,7 +32,7 @@ npm run sprites:ref        # build + referencias + paleta
 npm run sprites:validar    # comprueba el manifiesto (0 errores para empezar)
 npm run sprites:procesar -- <grupo> [--atlas]      # o -- --todos --atlas
 npm run sprites:catalogo   # catálogo por herramienta (docs/CATALOGO-SPRITES.md)
-npm run test:arte          # motor de sprites con un atlas de calco (20 comprobaciones)
+npm run test:arte          # motor de sprites con un atlas de calco (22 comprobaciones)
 ```
 
 ## 2. Dirección de arte (no negociable)
@@ -373,5 +373,5 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 - [ ] `npm run sprites:validar` → 0 errores y `npm run sprites:catalogo` → todas las claves
 - [ ] Todos los assets de la fase en `aprobado`, con `pixellab` (y `seed` si la herramienta la acepta) y `coste_real`
 - [ ] `npm run sprites:procesar -- --todos --atlas` → `ATLAS OK`
-- [ ] `npm run build`, `npm test` 38/38 (con y sin atlas), `npm run test:arte` 20/20 y `npm run capturas` revisadas
+- [ ] `npm run build`, `npm test` 38/38 (con y sin atlas), `npm run test:arte` 22/22 y `npm run capturas` revisadas
 - [ ] `CHANGELOG.md` actualizado y capturas nuevas en `screenshots/`

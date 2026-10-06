@@ -23,7 +23,7 @@ function addSeeds(sid,n){S.seeds[sid]=(S.seeds[sid]||0)+n;discover(sid);}
 function addBuds(sid,g,thc){const b=S.buds[sid];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;}else S.buds[sid]={g,thc};discover(sid);}
 function useBuds(sid,g){const b=S.buds[sid];b.g-=g;if(b.g<.5)delete S.buds[sid];}
 function budLots(min,minThc=0){return Object.entries(S.buds).filter(([k,b])=>b.g>=min&&b.thc>=minThc);}
-const lotItem=([k,b])=>({label:getStrain(k).n,right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(k).c});
+const lotItem=([k,b])=>({label:getStrain(k).n,right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(k).c,ic:iconoCogollo(k)});
 async function got(t){sfx('get');await say(`¡${S.name} obtiene ${t}!`);}
 
 /* ---------- NPCs ---------- */

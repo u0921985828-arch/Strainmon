@@ -69,7 +69,7 @@ async function thiefRound(){
     else await say('¡Pero falla!');
   }else if(c===1){
     prompt('¿Qué usas?');
-    const it=await menu([`SPRAY ×${S.items.spray}`,`BOCATA ×${S.items.bocata}`],{cls:'battle'});if(it<0)return null;
+    const it=await menu([{label:`SPRAY ×${S.items.spray}`,ic:icono('spray')},{label:`BOCATA ×${S.items.bocata}`,ic:icono('bocadillo')}],{cls:'battle'});if(it<0)return null;
     if(it===0){if(!S.items.spray){await say('No te queda SPRAY.');return null;}S.items.spray--;bAnim('P','spray');vfxCombate('vfx-spray',178,48);await say(`¡${S.name} usa SPRAY DE PIMIENTA!`);bAnim('E','herido');B.flashE=700;sfx('hit');B.hp-=ri(12,16);bhud();await wait(500);await say(`¡A ${B.name} le lloran los ojos!`);}
     else{if(!S.items.bocata){await say('No te quedan BOCATAS.');return null;}S.items.bocata--;bAnim('P','comer');S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');bhud();await say(`¡${S.name} se come un BOCATA! Recupera vida.`);}
   }else if(c===2){

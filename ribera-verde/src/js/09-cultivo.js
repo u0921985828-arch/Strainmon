@@ -76,7 +76,7 @@ async function potAction(i){
     if(macetasLibres(i).length){const c=await ask(`Plaza vacía con una maceta de ${MACETAS[S.macetas[i]].n}.`,['Plantar','Cambiar maceta','Salir']);if(c===1)return cambiarMaceta(i);if(c!==0)return;}
     const own=Object.entries(S.seeds).filter(([,v])=>v>0);
     if(!own.length)return say('Maceta vacía. No tienes semillas: cómpralas en el growshop de Kiko.');
-    const j=await menu(own.map(([k,v])=>({label:getStrain(k).n,right:'×'+v,sw:getStrain(k).c,desc:strainLine(k)})).concat([{label:'Cancelar',desc:''}]),{cls:'full',title:'¿QUÉ PLANTAS?',desc:true});
+    const j=await menu(own.map(([k,v])=>({label:getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:iconoCogollo(k),desc:strainLine(k)})).concat([{label:'Cancelar',desc:''}]),{cls:'full',title:'¿QUÉ PLANTAS?',desc:true});
     if(j<0||j>=own.length)return;
     const sid=own[j][0];S.seeds[sid]--;if(!S.seeds[sid])delete S.seeds[sid];
     S.pots[i]={sid,prog:0,water:70,health:100,fert:false,pest:false};sfx('sel');
@@ -97,7 +97,7 @@ async function potAction(i){
 function macetasLibres(i){const h=huecos()[i],C=CARPAS[S.carpas[h.c].t];return Object.keys(MACETAS).filter(k=>S.items['m_'+k]>0&&MACETAS[k].l<=C.lmax&&k!==S.macetas[i]);}
 async function cambiarMaceta(i){
   const l=macetasLibres(i);if(!l.length)return say('No tienes otra maceta que quepa aquí.');
-  const j=await menu(l.map(k=>({label:'Maceta '+MACETAS[k].n,right:'×'+S.items['m_'+k],desc:descMaceta(k)})),{cls:'full',title:'CAMBIAR MACETA',title2:'Ahora: '+MACETAS[S.macetas[i]].n,desc:true});
+  const j=await menu(l.map(k=>({label:'Maceta '+MACETAS[k].n,right:'×'+S.items['m_'+k],ic:icono('maceta'),desc:descMaceta(k)})),{cls:'full',title:'CAMBIAR MACETA',title2:'Ahora: '+MACETAS[S.macetas[i]].n,desc:true});
   if(j<0)return;const k=l[j];S.items['m_'+k]--;S.items['m_'+S.macetas[i]]=(S.items['m_'+S.macetas[i]]||0)+1;S.macetas[i]=k;sfx('sel');
   return say(`Pones la maceta de ${MACETAS[k].n}. La vieja va a la mochila.`);
 }
@@ -105,7 +105,7 @@ const focosLibres=ci=>Object.keys(FOCOS).filter(k=>S.items['f_'+k]>0&&FOCOS[k].w
 function instalarFoco(ci,k){const c=S.carpas[ci];S.items['f_'+k]--;S.items['f_'+c.foco]=(S.items['f_'+c.foco]||0)+1;c.foco=k;sfx('sel');}
 async function cambiarFoco(ci){
   const l=focosLibres(ci);if(!l.length)return say('No tienes otro foco que aguante esta carpa.');
-  const j=await menu(l.map(k=>({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],desc:descFoco(k)})),{cls:'full',title:'CAMBIAR FOCO',title2:'Ahora: '+FOCOS[S.carpas[ci].foco].n,desc:true});
+  const j=await menu(l.map(k=>({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],ic:icono('lampara'),desc:descFoco(k)})),{cls:'full',title:'CAMBIAR FOCO',title2:'Ahora: '+FOCOS[S.carpas[ci].foco].n,desc:true});
   if(j<0)return;instalarFoco(ci,l[j]);return say(`Cuelgas el foco ${FOCOS[l[j]].n}. El viejo va a la mochila.`);
 }
 async function carpaAction(ci){
@@ -146,7 +146,7 @@ async function labAction(){
   if(!S.flags.lab)return say('Una mesa con un microscopio viejo y frascos. Kiko sabrá qué hacer con esto.');
   const own=()=>Object.entries(S.seeds).filter(([,v])=>v>0);
   if(own().length<2)return say('MESA DE GENÉTICA: necesitas semillas de dos variedades distintas para cruzar.');
-  const mk=l=>l.map(([k,v])=>({label:getStrain(k).n,right:'×'+v,sw:getStrain(k).c,desc:strainLine(k)}));
+  const mk=l=>l.map(([k,v])=>({label:getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:iconoCogollo(k),desc:strainLine(k)}));
   const l1=own();const a=await menu(mk(l1),{cls:'full',title:'CRUCE · MADRE',desc:true});if(a<0)return;
   const A=l1[a][0];const l2=own().filter(([k])=>k!==A);
   const b=await menu(mk(l2),{cls:'full',title:'CRUCE · PADRE',title2:getStrain(A).n,desc:true});if(b<0)return;

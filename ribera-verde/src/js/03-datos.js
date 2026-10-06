@@ -27,6 +27,9 @@ const STRAINS={
   leyenda:{n:'Leyenda de la Ría',thc:31,y:45,d:4,r:80,c:'#40e0a0',o:'Tormenta Violeta × Dragón de Ribera · LEGENDARIA'},
 };
 const DEX=Object.keys(STRAINS);
+// forma del cogollo en los menús (cogollos-genoteca del atlas); los híbridos propios, 'hibrido'
+const TIPO_COGOLLO={ria:'hibrido',limon:'sativa',txoko:'indica',niebla:'hibrido',mango:'sativa',purpura:'indica',rif:'indica',hindu:'indica',acapulco:'sativa',malawi:'sativa',
+  citrus:'sativa',bluetx:'hibrido',sollimon:'sativa',kushrif:'indica',purpurah:'indica',orotrop:'sativa',nieblamor:'hibrido',brumaog:'hibrido',reina:'indica',amanecer:'sativa',tormenta:'hibrido',dragon:'legendario',leyenda:'legendario'};
 const RECIPES={};
 [['ria','limon','citrus'],['txoko','niebla','bluetx'],['limon','malawi','sollimon'],['rif','txoko','kushrif'],['hindu','purpura','purpurah'],
  ['acapulco','mango','orotrop'],['niebla','purpura','nieblamor'],['citrus','bluetx','brumaog'],['kushrif','purpurah','reina'],
