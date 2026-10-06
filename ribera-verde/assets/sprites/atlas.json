@@ -72,7 +72,7 @@
    "w": 48,
    "h": 112
   },
-  "carpa-c-plantas-h/planta-c-h1-20/unica/00": {
+  "carpa-c-plantas-h/planta-c-h1-18/unica/00": {
    "x": 888,
    "y": 160,
    "w": 48,
@@ -7788,12 +7788,12 @@
      ]
     }
    },
-   "planta-c-h1-20": {
+   "planta-c-h1-18": {
     "fps": 0,
     "bucle": false,
     "dirs": {
      "unica": [
-      "carpa-c-plantas-h/planta-c-h1-20/unica/00"
+      "carpa-c-plantas-h/planta-c-h1-18/unica/00"
      ]
     }
    },
@@ -12261,7 +12261,7 @@
   "misc:carpa-g150-vista": "carpas-vista",
   "misc:planta-c-h-24": "carpa-c-plantas-h",
   "misc:planta-c-h2-24": "carpa-c-plantas-h",
-  "misc:planta-c-h1-20": "carpa-c-plantas-h",
+  "misc:planta-c-h1-18": "carpa-c-plantas-h",
   "misc:planta-c-h0-8": "carpa-c-plantas-h",
   "tile:roofT_bar": "edificio-bar",
   "tile:roofB_bar": "edificio-bar",

@@ -185,9 +185,18 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       // p80 con el sodio de 400 es el caso justo (dos filas con la maceta de 22 px); m120 en floración (prog ,8) aplasta las plantas;
       // p60 con el CFL y la Skunk #1 (híbrida) en sus 5 fases: germinando y plántula, vegetativo y floración, lista; p80 con el CFL y la
       // híbrida en plántula, vegetativo y lista (dos filas). Lo esperado, escrito a mano: la híbrida, su sprite de cada fase; el resto, índicas en floración
-      const ESP_H = ['planta-c-h0-8', 'planta-c-h1-20', 'planta-c-h2-24', 'planta-c-h-24', 'planta-c-h-24'];
+      // aplastada sin escalar: sus filas son filas enteras del sprite, en orden, y pierde lo mínimo (las filas con menos píxeles de debajo de la
+      // cola, el 40 % de arriba; la base del tallo, las 2 últimas, se queda). Escalando se pierden filas al azar, con hojas y cogollos
+      const aplastaBien = (a, b, h) => { const W = a.width, H = a.height, A = a.getContext('2d').getImageData(0, 0, W, H).data, B = b.getContext('2d').getImageData(0, 0, W, H).data,
+          fila = (D, y) => D.slice(y * W * 4, (y + 1) * W * 4).join(), cuenta = (D, y) => { let k = 0; for (let x = 0; x < W; x++) if (D[(y * W + x) * 4 + 3]) k++; return k; }, alto = vcAlto(a);
+        let j = H - alto, perdidos = 0, enteras = true; for (let y = 0; y < H; y++) perdidos += cuenta(A, y) - cuenta(B, y);
+        for (let y = H - h; y < H; y++) { const f = fila(B, y); while (j < H && fila(A, j) !== f) j++; if (j++ >= H) enteras = false; }
+        const cola = H - alto + Math.round(alto * .4), abajo = [], arriba = []; for (let y = H - alto; y < H - 2; y++) (y < cola ? arriba : abajo).push(cuenta(A, y));
+        const minimo = [...abajo.sort((x, y) => x - y), ...arriba.sort((x, y) => x - y)].slice(0, alto - h).reduce((x, y) => x + y, 0);
+        return { enteras, perdidos, minimo, ok: enteras && perdidos <= minimo }; };
+      const ESP_H = ['planta-c-h0-8', 'planta-c-h1-18', 'planta-c-h2-24', 'planta-c-h-24', 'planta-c-h-24'];
       for (const [t, f, ss, prog] of [['p60', 'sodio250', ['mango', 'purpura'], 1], ['p80', 'sodio400', ['txoko', 'niebla', 'hindu'], 1], ['m100', 'sodio400', ['txoko', 'niebla', 'rif', 'hindu'], 1],
-        ['m120', 'sodio600', seis, .8], ['g150', 'sodio600', seis, 1], ['p60', 'cfl', ['ria', 'ria'], [.05, .2]], ['p60', 'cfl', ['ria', 'ria'], [.5, .8]], ['p60', 'cfl', ['ria', null], 1], ['p80', 'cfl', ['ria', 'ria', 'ria'], [.2, .5, 1]]]) {
+        ['m120', 'sodio600', seis, .8], ['g150', 'sodio600', seis, 1], ['p60', 'cfl', ['ria', 'ria'], [.05, .2]], ['p60', 'cfl', ['ria', 'ria'], [.5, .8]], ['p60', 'cfl', ['ria', null], 1], ['p80', 'cfl', ['ria', 'ria', 'ria'], [.2, .5, 1]], ['p60', 'sodio250', ['ria', 'mango'], 1], ['m120', 'sodio600', Array(6).fill('ria'), [.05, .2, .5, .8, 1, 1]]]) {
         const g = pon(t, f, ss, prog), n = t + '/' + f; if (!g.vc) { r.fallos.push(n + ' sin vista C'); continue; }
         const { Z } = g.vc, boca = VCA.boca, e = { t, pared: calidos(vcFondo(t, g.vc, 'pared')), luz: calidos(vcFondo(t, g.vc, 'luz')), foco: ancho(g.vc.foco.f.c), focoReal: Math.round(FOCO_CM[f] * Z),
           sigue: sigue(vcFondo(t, g.vc, 'pared'), vcFondo(t, g.vc, 'luz')), objetos: g.pl.reduce((n, q) => n + conLuz(q.v.m.f.c) + (q.v.p ? conLuz(q.v.p.f.c) : 0), 0),
@@ -201,7 +210,8 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
           if (w > real * 1.33 + 1 || w < real * .75 - 1) r.fallos.push(`${n} plaza ${q.i}: ${w} px de ancho en la fase ${st} (real ${real.toFixed(1)})`);
           if (h > q.ch * Z + .5) r.fallos.push(`${t} plaza ${q.i}: ${h} px de alto y el tope es ${(q.ch * Z).toFixed(1)}`);
           if ((cima - boca) / Z < FOCO_SEP[f]) r.fallos.push(`${t} plaza ${q.i}: cima a ${((cima - boca) / Z).toFixed(1)} cm del foco (${FOCO_SEP[f]})`);
-          if (st === 3 && h >= vcAlto(v.p.f.c)) r.fallos.push(`${t} plaza ${q.i}: en floración no se aplasta (${h} px)`); }
+          if (st === 3 && h >= vcAlto(v.p.f.c)) r.fallos.push(`${t} plaza ${q.i}: en floración no se aplasta (${h} px)`);
+          if (v.hp < vcAlto(v.p.f.c)) { const k = aplastaBien(v.p.f.c, vcAplasta(v.p.f.c, v.hp), v.hp); r.aplastadas = (r.aplastadas || 0) + 1; if (!k.ok) r.fallos.push(`${n} plaza ${q.i}: aplastada ${JSON.stringify(k)}`); } }
         for (const a of g.pl) for (const b of g.pl) if (a.i < b.i && a.y === b.y && Math.abs(a.x - b.x) < ancho(a.v.m.f.c)) r.fallos.push(`${t}: macetas ${a.i} y ${b.i} se tocan`);
         if (e.pared || e.luz < 2000 || Math.abs(e.sigue) > .25 || e.objetos || e.luzTipo || Math.abs(e.foco - e.focoReal) > 3) r.fallos.push(JSON.stringify(e));
         // la luz se pinta después de todas las macetas y plantas, en 'overlay', y antes de la campana
@@ -220,12 +230,12 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
         r.cflApagado = g.vc && { encendidos: vivos(fc), apagados: vivos(off), dib, luzD }; if (!g.vc || !r.cflApagado.encendidos || r.cflApagado.apagados || !dib || luzD) r.fallos.push('p60/cfl apagado: ' + JSON.stringify(r.cflApagado)); }
       r.b = { led100: !pon('p60', 'led100', ['mango', null]).vc, extras: !pon('p60', 'sodio250', ['mango', null], 1, { vent: true }).vc, plantula: !pon('p60', 'sodio250', ['mango', null], .2).vc,
         sativa: !pon('p60', 'sodio250', ['malawi', null]).vc, cfl200: !pon('m100', 'cfl', ['ria', null, null, null]).vc,
-        hibrida150: !pon('g150', 'sodio600', Array(6).fill('ria'), 1).vc, plantula200: !pon('m120', 'sodio600', Array(6).fill('ria'), .2).vc, tela: (() => { pon('p60', 'sodio250', [null, null]); S.macetas[0] = 'tela11'; return !vcGeo(0).vc; })(), vacia: (() => { const g = pon('m100', 'sodio600', [null, null, null, null]); if (!g.vc) return false;   // vacía: vista C con el foco apagado, sin luz
+        hibrida150: !pon('g150', 'sodio600', Array(6).fill('ria'), 1).vc, tela: (() => { pon('p60', 'sodio250', [null, null]); S.macetas[0] = 'tela11'; return !vcGeo(0).vc; })(), vacia: (() => { const g = pon('m100', 'sodio600', [null, null, null, null]); if (!g.vc) return false;   // vacía: vista C con el foco apagado, sin luz
           const luz = vcFondo('m100', g.vc, 'luz'), di = ctx.drawImage; let n = 0, encendido = 0;
           ctx.drawImage = function (im, ...a) { if (im === luz) n++; if (im === g.vc.foco.f.c) encendido++; return di.call(this, im, ...a); };
           VC = { ci: 0, sel: 0, ocupado: false }; renderCarpa(1000); VC = null; ctx.drawImage = di; return !n && !encendido; })() };
       S.carpas = C0; S.macetas = M0; S.pots = P0; return r; });
-    check('Vista C (imagen A): en p60, p80, m100, m120 y g150, y la p60 y la p80 con el CFL y la Skunk #1 de germinando a lista, la pared solo lleva tela (ni luz ni la forma del cono), macetas y plantas sin luz pintada y la luz es su propio sprite, por delante en «overlay» (la del CFL, fría y al 60 %); cada fase con su sprite; copas y macetas sin tocarse ni pasar de su distancia al foco; el CFL apagado, gris; sin arte, la vista B', vc.escenas.length === 9 && !vc.fallos.length && Object.values(vc.b).every(Boolean), vc);
+    check('Vista C (imagen A): en p60, p80, m100, m120 y g150, la p60 y la p80 con el CFL y la Skunk #1 de germinando a lista, y la m120 con la Skunk #1 en sus fases, la pared solo lleva tela (ni luz ni la forma del cono), macetas y plantas sin luz pintada y la luz es su propio sprite, por delante en «overlay» (la del CFL, fría y al 60 %); cada fase con su sprite, y si es más baja, pierde filas enteras (las de menos píxeles), sin escalar; copas y macetas sin tocarse ni pasar de su distancia al foco; el CFL apagado, gris; sin arte, la vista B', vc.escenas.length === 11 && vc.aplastadas >= 8 && !vc.fallos.length && Object.values(vc.b).every(Boolean), vc);
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
       for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }
       r.rio = mascaraOrilla(m, 31, 15); r.centro = mascaraOrilla(m, 35, 27); r.sinAtlas = (() => { const ok = ARTE.ok; ARTE.ok = false; const v = arteOrilla(m, 'water', 31, 15, 0, 0); ARTE.ok = ok; return v; })(); return r; });

@@ -220,13 +220,13 @@ La lámina 1 (`cuarto-cultivo-34`, pixflux sobre la huella) no se aprobó porque
 | `maceta-c-22` / `-15` | la maceta de la imagen A, a 22 y 15 px (7 L: la de 22 en las carpas de 60 y 80, la de 15 en las de 200 cm) | 24 × 28, 16 × 16 | 2 (+1 descarte) |
 | `planta-c-i-24` / `-36` | la planta de la imagen A: índica en floración con la copa de la carpa de 60 y de las de 200 cm | 24 × 84, 36 × 68 | 2 |
 | `foco-c-cfl-36` | lámina A: edición de `foco-c-46` en un CFL de 125 W (35 cm); vale para la de 60 y la de 80 | 34 px en un lienzo de 36 × 16 | 1 |
-| `planta-c-h-24`, `-h2-24`, `-h1-20`, `-h0-8` | lámina A: la híbrida (Skunk #1) de la carpa de 60, encadenada desde `planta-c-i-24`: lista y floración, vegetativo, plántula y germinando (esta salió en 16 × 16, el mínimo de pixen, y se reduce a 8 × 8) | dibujos de 24 × 102, 24 × 55, 20 × 31 y 8 × 8 | 4 |
+| `planta-c-h-24`, `-h2-24`, `-h1-18`, `-h0-8` | lámina A: la híbrida (Skunk #1) de la carpa de 60. Más alta = más nudos: lista y floración (5 pisos de ramas), vegetativo (3, sin cogollos) y plántula (la punta y el primer par de hojas) se montan con tramos de filas enteras de `planta-c-i-24`, a su escala. Germinando sale de pixen (16 × 16, el mínimo) y se reduce a 8 × 8. Las 3 ediciones de pixen de lista, vegetativo y plántula se descartan: reescalaban la entrada y dejaban las mismas ramas estiradas | 24 × 99, 24 × 56, 18 × 32 y 8 × 8 | 4 (3 descartadas) |
 
 - Los cogollos van en la rampa clave magenta y el motor les pone el color de la cepa.
-- Si la planta es más baja que su sprite, se aplasta por abajo y la cola de arriba no se toca.
+- Si la planta es más baja que su sprite, pierde filas enteras, sin escalar: primero las de menos píxeles de debajo de la cola (tallo pelado y entrenudos, como si los nudos se juntaran). La cola de arriba y la base del tallo no se tocan.
 - **Nombres.** Las campanas de sodio son `foco-c-NN`; las demás llevan su tipo (`foco-c-cfl-NN`). Floración y lista comparten `planta-c-<porte>-NN`; germinando, plántula y vegetativo llevan la fase pegada al porte (`planta-c-h0-`, `-h1-`, `-h2-`). NN es el ancho en px: se elige el más ancho que no pasa del ancho real de la copa en su sitio ni baja de ×0,75 y, si ninguno cabe, el más estrecho hasta ×1,33 (la tolerancia de la vista B) sin pasar de su sitio.
 - **Luz de cada tipo de foco.** La del sodio es `carpa-c-luz` tal cual; la del CFL, la misma capa con su color frío y al 60 % (`LUZ_C`). Apagado, el tubo del CFL pasa a gris.
-- **Mientras falte arte** para algo de la carpa, se ve la vista B. Faltan los focos LED, el CFL en las carpas de 200 cm (su campana sería de 27 px), las macetas de tela y de 18 L, los extras, las fases de la índica, la sativa entera y, en las carpas de 200 cm, la plántula híbrida (14 px) y la híbrida en floración y lista de la 100 y la 150 (36 px).
+- **Mientras falte arte** para algo de la carpa, se ve la vista B. Faltan los focos LED, el CFL en las carpas de 200 cm (su campana sería de 27 px), las macetas de tela y de 18 L, los extras, las fases de la índica, la sativa entera y la híbrida en floración y lista de las carpas de 100 y 150 (36 px).
 
 ### 5.3 Descripción base de cada lámina
 

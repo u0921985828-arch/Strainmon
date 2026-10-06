@@ -108,12 +108,17 @@ function vcLuz(t,vc){const L=vcFondo(t,vc,'luz'),k=LUZ_C[vc.tipo];if(!k)return L
   const [c,x]=mkCanvas(240,160),[r,g,b]=k[0],lk=.299*r+.587*g+.114*b;x.drawImage(L,0,0);const im=x.getImageData(0,0,240,160),d=im.data;
   for(let i=0;i<d.length;i+=4)if(d[i+3]){const l=(.299*d[i]+.587*d[i+1]+.114*d[i+2])/lk;d[i]=Math.min(255,r*l);d[i+1]=Math.min(255,g*l);d[i+2]=Math.min(255,b*l);}
   x.putImageData(im,0,0);return carpaCache[key]=c;}
-// la planta más baja que su sprite se aplasta por abajo (la cola de arriba no se toca); la base del tallo en la última fila de la celda
+// la planta más baja que su sprite pierde filas enteras, nunca se escala (los píxeles no se aplastan): primero las de menos píxeles
+// (tallo pelado y entrenudos: los nudos se juntan) de abajo; la cola de arriba (el 40 %) solo si no basta. La base del tallo (las 2
+// últimas filas) se queda, en la última fila de la celda; las demás, en su orden
 const vcBajas=new WeakMap();
 function vcAplasta(c,h){
   const a=vcAlto(c);if(h>=a)return c;let m=vcBajas.get(c);if(!m)vcBajas.set(c,m=new Map());if(m.has(h))return m.get(h);
-  const [o,x]=mkCanvas(c.width,c.height),k=Math.round(a*.4),H=c.height;
-  x.drawImage(c,0,H-a,c.width,k,0,H-h,c.width,k);x.drawImage(c,0,H-a+k,c.width,a-k,0,H-h+k,c.width,h-k);m.set(h,o);return o;
+  const W=c.width,H=c.height,d=c.getContext('2d').getImageData(0,0,W,H).data,cola=H-a+Math.round(a*.4),n=[],filas=[];
+  for(let y=H-a;y<H-2;y++){let k=0;for(let x=0;x<W;x++)if(d[(y*W+x)*4+3])k++;n[y]=k;filas.push(y);}
+  const fuera=new Set(filas.sort((p,q)=>(p<cola)-(q<cola)||n[p]-n[q]||q-p).slice(0,a-h));
+  const [o,x]=mkCanvas(W,H);let y=H;for(let s=H-1;s>=H-a;s--)if(!fuera.has(s))x.drawImage(c,0,s,W,1,0,--y,W,1);
+  m.set(h,o);return o;
 }
 // la campana con la boca apagada: los tonos cálidos y los casi blancos (el tubo del CFL) pasan a gris oscuro
 function vcApagado(c){let m=vcBajas.get(c);if(!m)vcBajas.set(c,m=new Map());if(m.has('off'))return m.get('off');
