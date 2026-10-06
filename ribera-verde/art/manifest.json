@@ -240,19 +240,14 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
-    "size": 22,
-    "view": "low top-down",
-    "proportions": "{\"type\":\"custom\",\"head_size\":2,\"arms_length\":0.75,\"legs_length\":0.6,\"shoulder_width\":1,\"hip_width\":1}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "mode": "v3",
+    "size": 32,
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/player_south_x2.png"
    ],
-   "descripcion": "small chibi character that fits in a 32x32 tile: short and stocky, big round head about 40% of the body height, short legs. young adult street grower, green baseball cap with darker green brim, short dark brown hair, light skin, red t-shirt, navy blue jeans, dark sneakers",
+   "descripcion": "young adult street grower wearing a green baseball cap FORWARDS with the darker green brim pointing to the front over the eyes (not backwards), short dark brown hair, big blue eyes, light skin, red t-shirt, navy blue jeans, dark sneakers; chibi 16-bit handheld RPG overworld sprite, big head, short body, 1px dark outline",
    "colores_identidad": [
     "#2fa868",
     "#1a6a40",
@@ -399,15 +394,24 @@
     }
    ],
    "estado": "procesado",
-   "notas": "Es el ancla de estilo: todo lo demás se compara con él. Se aprueba a mano antes de seguir. F1: generado y procesado (base + idle + walk, 36 fotogramas, 14 colores); pendiente de aprobación. run y acciones (regar…) tras aprobar.",
+   "notas": "Es el ancla de estilo: todo lo demás se compara con él. Se aprueba a mano antes de seguir. F1b: 22-23 px con la cara del candidato fcb0e6ed (pedido de la persona); base + idle + walk, 36 fotogramas, 14 colores; pendiente de aprobación. run y acciones (regar…) tras aprobar.",
    "familia": "personaje",
    "pixellab": {
-    "character_id": "84497682-97b8-4329-b6a1-ede1acbba4ae",
+    "character_id": "db0d3880-f02c-410d-948d-2ace05f278d3",
     "animation_group_id": {
-     "idle": "5ec5108b-a08b-4bd5-b5aa-5fbc25557b8f",
-     "walk": "73253f9c-a48c-44d9-8196-81533fef95df"
+     "idle": "c03bb04d-c58e-43eb-9f88-1c89bbd95774",
+     "walk": "8968bfa1-b66d-4c84-abbc-d2007d0ecaa4"
     },
-    "reduce_colors_job": "98068b7b-5a35-4230-8563-41c72911cb55",
+    "reduce_colors_job": "b159bec2-1274-4594-854d-0e7b82eef308",
+    "cadena": [
+     "create_character standard (size 32) fcb0e6ed: cara y ojos aprobados, pero 34 px",
+     "edit_image_pixen c63de7d3 (seed 22): el mismo, de 23 px → art/crudo/_ref/player.png",
+     "create_character v3 + reference_image (size 32): db0d3880",
+     "edit_image_pixen c3695599: perfil este con visera al frente; oeste = espejo; ambos con save_to_asset",
+     "animate_character breathing-idle + walking-4-frames, 4 direcciones",
+     "edit_image_pixen f40d1aad: walk/north/01 enseñaba la cara",
+     "reduce_colors b159bec2 (15 colores, 36 fotogramas)"
+    ],
     "descartados": {
      "fcb0e6ed-b020-44a3-87fb-6188883c4694": "size 32 preset chibi: 34-35 px, no cabe",
      "fb449cd4-f866-4583-9a91-ee1d03188dee": "size 32: 34-35 px",
@@ -415,10 +419,16 @@
      "079f4022-71ca-4efa-9aa8-a4f12d0199c1": "size 28 preset: poco chibi",
      "86d1eced-d89a-4410-857e-7278ced1ecdb": "size 28 custom: 33-34 px",
      "3be02f10-7279-4e1e-aa3b-9530cf69b4a7": "size 26 custom: al caminar se sale de la celda y supera la escala de puerta",
-     "b18c37c2-9665-414d-adac-1ada2c1d9a74": "size 24: 28-30 px"
+     "b18c37c2-9665-414d-adac-1ada2c1d9a74": "size 24: 28-30 px",
+     "84497682-97b8-4329-b6a1-ede1acbba4ae": "F1 v1 (size 22 standard): 24-27 px, demasiado estirado para el estilo",
+     "92cf0316-228f-47ab-800c-74c24b39f22e": "v3: gorra del revés en perfiles",
+     "6c1d762c-f33c-4c9f-890f-9411a8bea603": "v3: visera a los dos lados"
     }
    },
-   "coste_real": 25
+   "coste_real": 43,
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/player.png"
+   }
   },
   {
    "id": "kiko",

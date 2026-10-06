@@ -8,14 +8,14 @@ Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: 
 
 | Familia | Claves del juego | Assets | Herramientas | Generaciones aprox. |
 |---|---|---|---|---|
-| Personajes | 39 | 25 | create_character · animate_character · create_image_pro (paso previo) | 295 |
+| Personajes | 39 | 25 | create_character · animate_character · create_image_pro (paso previo) | 303 |
 | Mapa · terreno | 23 | 6 | create_tiles_pro · create_building_kit · create_topdown_tileset · animate_image | 15 + sin documentar |
 | Mapa · objetos con el estilo del mapa | 22 | 8 | create_map_object (background_image + máscara) · animate_image | 4 + sin documentar |
 | Objetos sueltos en lote | 35 | 7 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 90 + sin documentar |
 | Imágenes simples | 3 | 3 | create_image_pixflux (init_image + color_image) | 3 |
 | Se queda procedural | 2 | 1 | — | 0 |
 
-**Total documentado: ~407 generaciones** (más create_tiles_pro, create_building_kit, create_map_object, animate_object, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 124/124 claves.
+**Total documentado: ~415 generaciones** (más create_tiles_pro, create_building_kit, create_map_object, animate_object, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 124/124 claves.
 
 ## Orden de creación
 
@@ -35,7 +35,7 @@ Rig humanoide: rotaciones coherentes y plantillas de animación a 1 generación 
 
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
-| player | player | create_character (standard) | 4 direcciones, 22 px | solo texto | F1 | idle, walk, run, regar*, plantar, cosechar, cruzar*, oler*, vender*, telefono* | 32 |
+| player | player | create_character (v3) | v3: 8 direcciones, 32 px | reference_image_base64: player.png | F1 | idle, walk, run, regar*, plantar, cosechar, cruzar*, oler*, vender*, telefono* | 40 |
 | kiko | kiko | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, fumar*, semillas* | 7 |
 | josune | josune | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, secar_vaso*, servir* | 7 |
 | baltasar | baltasar | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, puro*, contar* | 7 |

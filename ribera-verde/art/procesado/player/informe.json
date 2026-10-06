@@ -8,7 +8,7 @@
   "fotogramas": 36,
   "semitransparentes": 0,
   "en_paleta_antes": 0,
-  "distancia_media": 21.78,
+  "distancia_media": 16.81,
   "colores_finales": 14,
   "fundidos": [],
   "huerfanos_quitados": 0,
@@ -19,7 +19,7 @@
     "idle/west": 0,
     "walk/east": 0,
     "walk/north": 1,
-    "walk/south": 0,
+    "walk/south": 1,
     "walk/west": 0
   },
   "errores": [],
