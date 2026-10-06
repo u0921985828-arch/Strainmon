@@ -105,6 +105,14 @@ for (const a of M.assets) {
         wr(a.id, an.nombre, 'unica', i, o); }
     }
   }
+  // ---------- orillas Wang (F4b): la hierba en los cuartos de las esquinas «hierba»; lo demás, transparente ----------
+  if (a.tipo === 'tileset' && a.terrenos && has('tiles/grass.png')) {
+    const g = rd('tiles/grass.png');
+    for (const t of Object.keys(a.terrenos)) for (let mk = 1; mk < 15; mk++) {
+      const o = blank(16, 16); [[0, 0], [8, 0], [0, 8], [8, 8]].forEach(([x, y], b) => { if (mk >> b & 1) copy(g, o, x, y, x, y, 8, 8); });
+      wr(a.id, `${t}-${String(mk).padStart(2, '0')}`, 'unica', 0, o);
+    }
+  }
   // ---------- edificios (una pieza de 7×6 o 6×6 casillas, montada como en building()) ----------
   if (a.tipo === 'edificio') {
     const id = a.id.replace('edificio-', ''), w = a.celda === 'edificio_6x6' ? 6 : 7, h = 6, doorX = id === 'gray' ? null : 3;

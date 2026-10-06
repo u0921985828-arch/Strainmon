@@ -32,7 +32,7 @@ npm run sprites:ref        # build + referencias + paleta
 npm run sprites:validar    # comprueba el manifiesto (0 errores para empezar)
 npm run sprites:procesar -- <grupo> [--atlas]      # o -- --todos --atlas
 npm run sprites:catalogo   # catálogo por herramienta (docs/CATALOGO-SPRITES.md)
-npm run test:arte          # motor de sprites con un atlas de calco (18 comprobaciones)
+npm run test:arte          # motor de sprites con un atlas de calco (19 comprobaciones)
 ```
 
 ## 2. Dirección de arte (no negociable)
@@ -172,7 +172,7 @@ Descartadas, con su motivo en el catálogo: `create_path_tiles` (solo 32 px), `c
 | **F2** Motor | atlas, animaciones, ambiente, VFX, arte procedural de reserva (sección 7). **Hecho en la 1.3** | `npm test` 34/34 con y sin atlas y `npm run test:arte` 16/16 |
 | **F3** Personajes | 13 NPC, 6 clientes, acciones de ambiente, humos y efectos (`vfx-16`, `vfx-32`), gaviotas y palomas | revisión visual y capturas. **Personajes hechos en la 1.4; humos, efectos, gaviotas y palomas en la 1.5** |
 | **F4** Entorno | primero tiles e interiores; después, con los recortes regenerados, las 4 fachadas, árbol, farola, fuente y carpa sobre el mapa; props pequeños y tiles animados | mosaico 3×3 sin costuras. **Hecho en la 1.5** (fachadas y carpa con pixflux img2img, ver sección 10) |
-| **F4b** Transiciones *(opcional)* | tilesets Wang + autotiling en el motor | — *(pendiente)* |
+| **F4b** Transiciones *(opcional)* | tilesets Wang + autotiling en el motor | — **Hecho en la 1.5**: agua, tierra y plaza como superposiciones sobre el tile de siempre (`arteOrilla`) |
 | **F5** Plantas | 6 fases, balanceo, cogollo por variedad, seca, plaga | las 23 variedades se distinguen. **Hecho en la 1.5** |
 | **F6** Combate | jugador de espaldas y policía (paso previo con el sprite aprobado), 3 ladrones, 2 fondos img2img | combates de prueba enteros. **Hecho en la 1.5** |
 | **F7** Iconos y título | iconos de objetos, cogollos de la Genoteca, pantalla de título | — **Hecho en la 1.5** (el motor dibuja el título del atlas) |
@@ -282,12 +282,12 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 - **Personajes** (`dibujarPJ`): celda 32 × 32 en (px − 8, py − 15), sombra del motor, `walk`/`run` sincronizados con el paso (un ciclo cada 2 casillas), `idle` con fase propia por NPC. Clientes y ladrones aleatorios se reparten en las 6 y 3 familias del atlas.
 - **Ambiente** (`ambiente`): solo con el NPC quieto, en pantalla y sin diálogo; al hablarle se corta. Los fumadores sueltan su VFX de humo en `frame_humo` desde `offset_boca`; sube 1 px cada 3 fotogramas y en la calle el viento lo lleva. Un grupo de `menores` nunca hace acciones de fumar aunque el atlas las traiga.
 - **Jugador** (`accion(nombre, vfx)`): regar, plantar, cosechar + oler, cruzar y vender, con su VFX. Devuelve una promesa que acaba con la animación (inmediata sin atlas), así que los guiones esperan.
-- **Mundo:** tiles por clave, tiles animados por reloj en bloques de 2 × 2 casillas, hierba pisada al entrar, objetos de 1 casilla en el suelo y los altos ordenados por Y (tapan al jugador si está detrás), edificios como una pieza encima de sus casillas con la puerta abierta al pasar, carpa, bolsa de los objetos, paloma junto a Patxi y gaviotas en el muelle.
+- **Mundo:** tiles por clave, tiles animados por reloj en bloques de 2 × 2 casillas, hierba pisada al entrar, orillas Wang sobre el agua, la tierra y la plaza que tocan hierba (`arteOrilla`), objetos de 1 casilla en el suelo y los altos ordenados por Y (tapan al jugador si está detrás), edificios como una pieza encima de sus casillas con la puerta abierta al pasar, carpa, bolsa de los objetos, paloma junto a Patxi y gaviotas en el muelle.
 - **Plantas** (`artePlanta`): fase desde el atlas, balanceo en vegetativo, floración y lista, cogollos del color de la variedad (rampa magenta → `STRAINS[k].c`), rampa seca sin agua y ácaros con plaga.
 - **Combate:** fondos, jugador de espaldas y rival desde el atlas; `bAnim(quién, nombre)` dispara golpe, patada, spray, comer, herido, desmayo, ataque, huida, alto, multa, soborno y persecución desde `13-combate.js`, con `vfx-golpe` y `vfx-spray`.
 - **Reserva:** si una clave no está en el atlas, se usa el dibujo procedural. `?arte=procedural` en la URL ignora el atlas para comparar.
 
-**Pruebas:** `npm test` (34/34 sin atlas) y `npm run test:arte`, que calca el arte procedural a `art/crudo`, lo procesa, compila el juego con ese atlas en `tools/salida/arte/` y comprueba 18 cosas (el título del atlas entre ellas) y un atlas parcial (solo el player y sin «east»). Con el atlas de calco la historia completa también da 34/34, y las capturas salen casi idénticas a las procedurales: así se sabe que las anclas cuadran antes de gastar un crédito.
+**Pruebas:** `npm test` (34/34 sin atlas) y `npm run test:arte`, que calca el arte procedural a `art/crudo`, lo procesa, compila el juego con ese atlas en `tools/salida/arte/` y comprueba 19 cosas (el título del atlas y las orillas entre ellas) y un atlas parcial (solo el player y sin «east»). Con el atlas de calco la historia completa también da 34/34, y las capturas salen casi idénticas a las procedurales: así se sabe que las anclas cuadran antes de gastar un crédito.
 
 ## 8. QA y criterio de aprobado
 
@@ -372,5 +372,5 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 - [ ] `npm run sprites:validar` → 0 errores y `npm run sprites:catalogo` → todas las claves
 - [ ] Todos los assets de la fase en `aprobado`, con `pixellab` (y `seed` si la herramienta la acepta) y `coste_real`
 - [ ] `npm run sprites:procesar -- --todos --atlas` → `ATLAS OK`
-- [ ] `npm run build`, `npm test` 34/34 (con y sin atlas), `npm run test:arte` 18/18 y `npm run capturas` revisadas
+- [ ] `npm run build`, `npm test` 34/34 (con y sin atlas), `npm run test:arte` 19/19 y `npm run capturas` revisadas
 - [ ] `CHANGELOG.md` actualizado y capturas nuevas en `screenshots/`

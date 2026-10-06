@@ -234,8 +234,8 @@ Una llamada a `create_1_direction_object` de ≤42 px devuelve 64 candidatos y c
 
 **tileset-transiciones** (create_topdown_tileset, opcional)
 1. `wang-agua-hierba`: lower «calm blue river water» → upper «short green grass», transition_size 0.25 — guarda el id del tile de hierba (get_topdown_tileset).
-2. `wang-tierra-hierba`: lower «packed brown dirt path» → upper «short green grass», transition_size 0.25, `upper_base_tile_id` = <hierba de wang-agua-hierba>.
-3. `wang-plaza-hierba`: lower «light grey stone plaza pavement» → upper «short green grass», transition_size 0, `upper_base_tile_id` = <hierba de wang-agua-hierba>.
+2. `wang-tierra-hierba`: lower «packed light brown dirt path» → upper «short green grass», transition_size 0.25, `upper_base_tile_id` = 4e6ae897-6f8a-4ead-b17c-3fe3cbcb51ba.
+3. `wang-plaza-hierba`: lower «warm beige square stone plaza pavement» → upper «short green grass», transition_size 0, `upper_base_tile_id` = 4e6ae897-6f8a-4ead-b17c-3fe3cbcb51ba.
 
 **Objetos con el estilo del mapa** (`create_map_object`): `background_image` = recorte del mapa de `art/referencias/mapa/` y `inpainting` = `{"type": "mask", "mask_image": "<máscara en base64>"}` con la máscara `*_mascara.png` (blanco = lo que genera, negro = suelo que se conserva). Las fachadas y los props de exterior se generan después de aprobar `tiles-exterior`: regenera antes los recortes con los tiles nuevos (`npm run sprites:ref` con el atlas puesto) para que el contexto ya sea el arte final.
 

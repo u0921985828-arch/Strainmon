@@ -144,6 +144,21 @@ function arteTile(k,tx,ty,sx,sy,now){
   const f=frameDe(ARTE.cubre['tile:'+k],k,'unica',0,{i:0});if(!f)return false;
   ctx.drawImage(f.c,sx,sy,16,16);return true;
 }
+// orillas (F4b): sobre el agua, la tierra o la plaza que toca hierba, la transición Wang de PixelLab.
+// Cada esquina es «hierba» si alguna de las 3 casillas que la comparten es hierba; máscara NW=1 NE=2 SW=4 SE=8.
+// La superposición deja ver el tile de debajo (el agua sigue animada); rodeada del todo (15) no se pinta.
+const TRANS={water:'agua',dirt:'tierra',plaza:'plaza'},HIERBA=/^(grass|flowers|tallgrass)$/;
+function mascaraOrilla(m,tx,ty){
+  const H=(x,y)=>x>=0&&y>=0&&x<m.w&&y<m.h&&HIERBA.test(m.g[y][x]);
+  const n=H(tx,ty-1),s=H(tx,ty+1),w=H(tx-1,ty),e=H(tx+1,ty);
+  return (w||n||H(tx-1,ty-1))|(e||n||H(tx+1,ty-1))<<1|(w||s||H(tx-1,ty+1))<<2|(e||s||H(tx+1,ty+1))<<3;
+}
+function arteOrilla(m,k,tx,ty,sx,sy){
+  const t=TRANS[k];if(!t||!ARTE.ok)return false;
+  const mk=mascaraOrilla(m,tx,ty);if(!mk||mk===15)return false;
+  const f=frameDe('tileset-transiciones',t+'-'+String(mk).padStart(2,'0'),'unica',0,{i:0});if(!f)return false;
+  ctx.drawImage(f.c,sx,sy,16,16);return true;
+}
 // objetos: los de 1 casilla en el suelo; los altos van a la lista ordenada por Y (tapan al jugador si está detrás)
 function arteObj(o,tx,ty,cam,now,list){
   if(!ARTE.ok)return false;

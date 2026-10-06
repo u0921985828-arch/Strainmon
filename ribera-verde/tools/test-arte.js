@@ -5,7 +5,7 @@
   2. Compila el juego con ese atlas en tools/salida/arte/ (el index.html de la raíz no se toca).
   3. Comprueba en Chromium: atlas cargado, caminar y correr, ambiente de los fumadores con su humo,
      que al hablar se corta, que un menor nunca fuma, acciones del jugador, cogollos con el color de la
-     variedad, planta seca, agua animada, combate, título, ?arte=procedural y un atlas parcial (solo el player, sin «east»).
+     variedad, planta seca, agua animada, orillas Wang, combate, título, ?arte=procedural y un atlas parcial (solo el player, sin «east»).
   Salida: lista OK/FALLO + tools/salida/arte/kiko-fuma.png (tira de fotogramas para revisarla a ojo).
 
   Requisitos: npm run sprites:ref (referencias)   Uso: node tools/test-arte.js
@@ -133,6 +133,10 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     check('Cogollos con el color de la variedad (sin rastro de la rampa magenta)', planta.purpura && !planta.magenta, planta);
     check('Planta sin agua con la rampa seca', planta.seca, planta);
 
+    const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
+      for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }
+      r.rio = mascaraOrilla(m, 31, 15); r.centro = mascaraOrilla(m, 35, 27); r.sinAtlas = (() => { const ok = ARTE.ok; ARTE.ok = false; const v = arteOrilla(m, 'water', 31, 15, 0, 0); ARTE.ok = ok; return v; })(); return r; });
+    check('Orillas Wang: agua, tierra y plaza con la máscara de esquinas', orilla.rio === 5 && orilla.centro === 0 && orilla.pintadas > 40 && orilla.quince === 0 && !orilla.sinAtlas, orilla);
     const agua = await page.evaluate(() => { const [g, s] = ARTE.sobre['tile:water'][0]; return frameDe(g, s, 'unica', 0, { bucle: true }).c !== frameDe(g, s, 'unica', 300, { bucle: true }).c; });
     check('Agua animada por reloj (bloque de 2×2 casillas)', agua);
 

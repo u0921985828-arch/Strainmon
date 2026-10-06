@@ -21,6 +21,7 @@ function renderWorld(now){
     if(tx<0||ty<0||tx>=m.w||ty>=m.h)continue;
     const sx=tx*16-cam.x,sy=ty*16-cam.y,k=m.g[ty][tx],a=TILES[k];
     if(!arteTile(k,tx,ty,sx,sy,now))ctx.drawImage(a[a.length>1?wf:0],sx,sy);
+    else arteOrilla(m,k,tx,ty,sx,sy);
     const o=m.o[ty][tx];if(o&&!arteObj(o,tx,ty,cam,now,list))ctx.drawImage(TILES[o][0],sx,sy);
   }
   arteEdificios(m,cam);

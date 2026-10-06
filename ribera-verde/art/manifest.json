@@ -3436,15 +3436,15 @@
      "width": 16,
      "height": 16
     },
-    "view": "low top-down",
+    "view": "high top-down",
     "outline": "single color outline",
     "shading": "basic shading",
     "detail": "medium detail"
    },
    "descripcion": "Tres juegos Wang de 16 px encadenados por la misma hierba (upper_base_tile_id), para que las tres orillas compartan el mismo tile de hierba.",
-   "notas": "Opcional: necesita autotiling por esquinas en el motor (ver docs/PIXELLAB.md, fase F4b).",
+   "notas": "El motor (arteOrilla en 01b-arte.js) pinta la superposición sobre el agua, la tierra o la plaza que toca hierba (grass, flowers o tallgrass): cada esquina es hierba si alguna de las 3 casillas que la comparten lo es. Las colisiones no cambian.",
    "celda": "tile",
-   "estado": "pendiente",
+   "estado": "aprobado",
    "familia": "mapa-terreno",
    "llamadas": [
     {
@@ -3452,24 +3452,47 @@
      "lower_description": "calm blue river water",
      "upper_description": "short green grass",
      "transition_size": 0.25,
-     "transition_description": "grassy riverbank with a thin wet edge",
-     "guarda_base": "hierba"
+     "transition_description": "grassy riverbank with a thin wet earth edge",
+     "guarda_base": "hierba",
+     "tileset_id": "89669f94-0d26-4a68-9187-e6ae000402eb",
+     "base_tile_ids": {
+      "lower": "c47ca038-8377-4a6b-b863-621a82995d51",
+      "upper": "4e6ae897-6f8a-4ead-b17c-3fe3cbcb51ba"
+     }
     },
     {
      "id": "wang-tierra-hierba",
-     "lower_description": "packed brown dirt path",
+     "lower_description": "packed light brown dirt path",
      "upper_description": "short green grass",
      "transition_size": 0.25,
-     "upper_base_tile_id": "<hierba de wang-agua-hierba>"
+     "transition_description": "grass tufts thinning out over the dirt",
+     "upper_base_tile_id": "4e6ae897-6f8a-4ead-b17c-3fe3cbcb51ba",
+     "tileset_id": "94643db1-60c5-40da-ac90-ae4a31a440b9",
+     "base_tile_ids": {
+      "lower": "20156d46-6dc8-4a02-b102-47cd48e9e18d",
+      "upper": "4e6ae897-6f8a-4ead-b17c-3fe3cbcb51ba"
+     }
     },
     {
      "id": "wang-plaza-hierba",
-     "lower_description": "light grey stone plaza pavement",
+     "lower_description": "warm beige square stone plaza pavement",
      "upper_description": "short green grass",
      "transition_size": 0,
-     "upper_base_tile_id": "<hierba de wang-agua-hierba>"
+     "upper_base_tile_id": "4e6ae897-6f8a-4ead-b17c-3fe3cbcb51ba",
+     "tileset_id": "9d881737-cc58-41d8-a5bb-a5a0b973af7d",
+     "base_tile_ids": {
+      "lower": "a1d51515-844b-4192-a416-69751ebbc8f6",
+      "upper": "4e6ae897-6f8a-4ead-b17c-3fe3cbcb51ba"
+     }
     }
-   ]
+   ],
+   "terrenos": {
+    "agua": "water",
+    "tierra": "dirt",
+    "plaza": "plaza"
+   },
+   "montaje": "De cada Wang (16 tiles, esquinas en /mcp/tilesets/<id>/metadata) salen 14 superposiciones <terreno>-<máscara> (máscara 1..14, NW=1 NE=2 SW=4 SE=8 = esquinas con hierba; 0 y 15 no se usan). Colores: los que solo están en el tile todo-hierba son hierba, los que solo están en el todo-abajo son abajo, el resto es orilla. Hierba de dentro → el tile grass aprobado en el mismo (x,y) (sin costura); abajo de dentro → transparente (el motor pinta debajo el tile de siempre, y el agua sigue animada); la franja de 1 px junto a la orilla se conserva con los tonos llevados por luminancia a las paletas de grass y del tile de abajo; los verdes de la orilla, al verde de grass más parecido.",
+   "coste_real": 9
   },
   {
    "id": "interior-home",

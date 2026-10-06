@@ -41,17 +41,18 @@
 - `npm test` recorre la historia entera y los sistemas sueltos en 34 pasos: **34/34, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
-  - el motor ya usa el atlas (F2) y `npm run test:arte` da 18/18;
+  - el motor ya usa el atlas (F2) y `npm run test:arte` da 19/19;
   - F1 generada con PixelLab Pro: el protagonista ya sale del atlas (`base`, `idle`, `walk`), aprobado;
   - F3 (personajes) con la misma receta: los 13 NPC y los 6 clientes salen del atlas con `idle`, `walk` (los que caminan) y sus acciones de ambiente;
-  - F3-resto, F4, F5, F6 y F7 (1.5): humos y efectos, gaviotas y palomas, tiles, interiores, fachadas, objetos, carpa, plantas, combate, iconos, cogollos y título salen del atlas (1044 fotogramas), y el protagonista ya tiene sus 8 acciones. Solo queda la F4b opcional (orillas Wang).
+  - F3-resto, F4, F5, F6 y F7 (1.5): humos y efectos, gaviotas y palomas, tiles, interiores, fachadas, objetos, carpa, plantas, combate, iconos, cogollos y título salen del atlas, y el protagonista ya tiene sus 8 acciones;
+  - F4b (1.5): orillas del río, del camino de tierra y de la plaza con tres Wang encadenados y autotiling por esquinas. Atlas completo: 1086 fotogramas.
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
 - **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.3, con arte procedural porque aún no hay atlas.
 
 ## Limitaciones conocidas
 
 - El equilibrio de la economía y de la dificultad solo se ha probado con el test automático, no con jugadores.
-- Sin atlas (`?arte=procedural`) el arte es el procedural sencillo: personajes de 16 × 20 px con 3 fotogramas y plantas en 5 fases. Las orillas del río aún no tienen transición (F4b).
+- Sin atlas (`?arte=procedural`) el arte es el procedural sencillo: personajes de 16 × 20 px con 3 fotogramas y plantas en 5 fases.
 - La música son 5 bucles cortos. No hay efectos de pasos.
 - No hay soporte de mando ni pantalla completa.
 - El guardado vive en el navegador: si se borran los datos del sitio, se pierde la partida.
@@ -61,8 +62,6 @@
 ## Siguientes pasos sugeridos
 
 1. Revisar el arte nuevo jugando y repetir lo que no convenza (cada asset del manifiesto guarda sus ids, semillas y descartes). Guía: [docs/PIXELLAB.md](docs/PIXELLAB.md); comando `/sprites`.
-2. Opcional (F4b): orillas con los tres Wang encadenados y autotiling en el motor.
-3. Publicar la 1.5 en el Artifact (sigue en la 1.3, con arte procedural).
-4. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.
-5. Añadir zonas: polígono industrial, monte con cultivo exterior por estaciones y puerto con contrabando.
-6. Añadir profundidad al estilo Weed Firm: secado y curado, clientes fijos con encargos, empleados y un segundo local.
+2. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.
+3. Añadir zonas: polígono industrial, monte con cultivo exterior por estaciones y puerto con contrabando.
+4. Añadir profundidad al estilo Weed Firm: secado y curado, clientes fijos con encargos, empleados y un segundo local.

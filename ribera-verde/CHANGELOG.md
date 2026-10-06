@@ -2,7 +2,7 @@
 
 ## 1.5.0 · 6 de octubre de 2026
 
-- **Nuevo: el resto del mundo sale de PixelLab (F3-resto, F4, F5, F6 y F7).** El atlas pasa de 569 a 1044 fotogramas; lo procedural queda de reserva.
+- **Nuevo: el resto del mundo sale de PixelLab (F3-resto, F4, F5, F6 y F7).** El atlas pasa de 569 a 1086 fotogramas; lo procedural queda de reserva.
   - **Humos y efectos:** cigarro, puro, porro, pipa, nube de vaper, golpe, gotas, brillo, polen, ácaros, monedas y spray, cada uno animado con `animate_object`. **Gaviotas y palomas** animadas (aleteo y picoteo).
   - **Tiles:** 12 del barrio con `create_tiles_pro` (dos llamadas: tierra y puentes se repitieron con la barandilla en su borde), agua, flores y hierba pisada animadas con `animate_image`; paredes y suelos de los tres interiores, felpudo y suelo de la carpa, también con `create_tiles_pro`.
   - **Fachadas:** piso, growshop, bar y casa gris con `create_image_pixflux` img2img sobre la huella del edificio (strength 30); las puertas se abren con `animate_image`. La casa gris no tiene puerta (se tapó la que pintó PixelLab con una ventana).
@@ -11,9 +11,10 @@
   - **Combate:** jugador de espaldas, policía y 3 ladrones con `create_image_pro` → `create_character` v3 → animaciones v3 a medida (golpe, patada, spray, comer, herido, desmayo; ataque, herido, huida; alto, multa, soborno, persecución). Fondos del callejón y de la calle con img2img.
   - **Iconos y título:** la bolsa y 12 iconos más, 4 cogollos de la Genoteca y la pantalla de título.
   - **Protagonista:** las 8 acciones que faltaban (correr, regar, plantar, cosechar, cruzar, oler, vender y móvil), con los 13 colores del sprite aprobado.
-- **Nuevo:** el título sale del atlas cuando está (`arteTitulo`); sin atlas, el procedural. El calco incluye el título y `npm run test:arte` lo comprueba (18/18).
+- **Nuevo: orillas (F4b).** Tres Wang de `create_topdown_tileset` encadenados por la misma hierba (agua, tierra y plaza). El motor (`arteOrilla`) pinta la transición sobre el agua, la tierra o la plaza que toca hierba, con máscara de esquinas; debajo sigue el tile de siempre (el agua, animada). La hierba de las orillas es la del tile aprobado, así que no hay costuras.
+- **Nuevo:** el título sale del atlas cuando está (`arteTitulo`); sin atlas, el procedural. El calco incluye el título y las orillas, y `npm run test:arte` los comprueba (19/19).
 - **Descartado:** `create_building_kit` (piezas en perspectiva de 24×42 que no casan con la rejilla de 16 px) y, para fachadas y carpa, `create_map_object` y `create_image_pro` (casas estrechas, carpa rara). Están en el manifiesto con su motivo.
-- **Coste:** 416 generaciones en esta fase (de 1534 a 1118).
+- **Coste:** 425 generaciones en esta fase (de 1534 a 1109), 9 de ellas en las orillas.
 
 ## 1.4.0 · 6 de octubre de 2026
 
