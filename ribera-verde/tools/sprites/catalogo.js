@@ -54,7 +54,8 @@ const gen = a => { // generaciones aproximadas (null = sin coste documentado)
 };
 const entrada = a => {
   const e = Object.entries(a.entrada || {}).map(([k, v]) => `${k}: ${(Array.isArray(v) ? v : [v]).map(f => path.basename(f)).join(', ')}`);
-  if (a.previo) e.unshift(`previo create_image_pro ← ${a.previo.entrada.reference_images.map(r => path.basename(path.dirname(path.dirname(path.dirname(r.archivo)))) + ' aprobado').join(', ')}`);
+  const refs = a.previo && ((a.previo.entrada || {}).reference_images || []);
+  if (a.previo) e.unshift(refs.length ? `previo create_image_pro ← ${refs.map(r => path.basename(path.dirname(path.dirname(path.dirname(r.archivo)))) + ' aprobado').join(', ')}` : 'previo create_image_pro (solo texto)');
   return e.join(' · ') || 'solo texto';
 };
 const anims = a => {
@@ -122,7 +123,8 @@ for (const [lid, l] of Object.entries(M.lotes || {})) {
 L.push('');
 L.push('## Llamadas encadenadas', '');
 for (const a of M.assets.filter(a => a.previo)) {
-  L.push(`**${a.id}**`, `1. \`create_image_pro\` ${a.previo.parametros.width}×${a.previo.parametros.height} con \`reference_images\` = ${a.previo.entrada.reference_images.map(r => '`' + r.archivo + '` («' + r.usage + '»)').join(', ')}. Elige ${a.previo.elegir} y guárdalo en \`${a.previo.guarda}\`.`,
+  const refs = (a.previo.entrada || {}).reference_images || [];
+  L.push(`**${a.id}**`, `1. \`create_image_pro\` ${a.previo.parametros.width}×${a.previo.parametros.height} ${refs.length ? `con \`reference_images\` = ${refs.map(r => '`' + r.archivo + '` («' + r.usage + '»)').join(', ')}` : 'solo con texto'}. Elige ${a.previo.elegir} y guárdalo en \`${a.previo.guarda}\`.`,
     `2. \`create_character\` mode v3, size ${a.parametros.size}, \`reference_image_base64\` = ese PNG: lo rota a 8 direcciones y queda animable.`, '');
 }
 for (const a of M.assets.filter(a => a.llamadas)) {

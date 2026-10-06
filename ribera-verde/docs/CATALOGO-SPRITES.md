@@ -8,14 +8,14 @@ Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: 
 
 | Familia | Claves del juego | Assets | Herramientas | Generaciones aprox. |
 |---|---|---|---|---|
-| Personajes | 39 | 25 | create_character · animate_character · create_image_pro (paso previo) | 303 |
+| Personajes | 39 | 25 | create_character · animate_character · create_image_pro (paso previo) | 333 |
 | Mapa · terreno | 23 | 6 | create_tiles_pro · create_building_kit · create_topdown_tileset · animate_image | 15 + sin documentar |
 | Mapa · objetos con el estilo del mapa | 22 | 8 | create_map_object (background_image + máscara) · animate_image | 4 + sin documentar |
 | Objetos sueltos en lote | 35 | 7 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 90 + sin documentar |
 | Imágenes simples | 3 | 3 | create_image_pixflux (init_image + color_image) | 3 |
 | Se queda procedural | 2 | 1 | — | 0 |
 
-**Total documentado: ~415 generaciones** (más create_tiles_pro, create_building_kit, create_map_object, animate_object, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 124/124 claves.
+**Total documentado: ~445 generaciones** (más create_tiles_pro, create_building_kit, create_map_object, animate_object, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 124/124 claves.
 
 ## Orden de creación
 
@@ -35,7 +35,7 @@ Rig humanoide: rotaciones coherentes y plantillas de animación a 1 generación 
 
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
-| player | player | create_character (v3) | v3: 8 direcciones, 32 px | reference_image_base64: player.png | F1 | idle, walk, run, regar*, plantar, cosechar, cruzar*, oler*, vender*, telefono* | 40 |
+| player | player | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: player.png | F1 | idle*, walk*, run, regar*, plantar, cosechar, cruzar*, oler*, vender*, telefono* | 70 |
 | kiko | kiko | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, fumar*, semillas* | 7 |
 | josune | josune | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, secar_vaso*, servir* | 7 |
 | baltasar | baltasar | create_character (standard) | 4 direcciones, 32 px | solo texto | F3 | idle, puro*, contar* | 7 |
@@ -131,6 +131,10 @@ Una llamada a `create_1_direction_object` de ≤42 px devuelve 64 candidatos y c
 - **lote-32** (32 px, se genera en F3): props-32 (2), planta-fases (7), cogollos-genoteca (4), vfx-32 (2) → 15 objetos, 1 llamada. Ahorro: 90 generaciones. plantas, nevera y cama, cogollos de la Genoteca y VFX grandes en una sola llamada (15 de 64 huecos).
 
 ## Llamadas encadenadas
+
+**player**
+1. `create_image_pro` 32×32 solo con texto. Elige 1 de los 64 candidatos (se eligió el 17) y guárdalo en `art/crudo/_ref/player.png`.
+2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
 
 **player-combate**
 1. `create_image_pro` 64×64 con `reference_images` = `art/procesado/player/base/south/00.png` («character base: same person, outfit and colors»). Elige 1 de los 16 candidatos y guárdalo en `art/crudo/_ref/player-combate.png`.
