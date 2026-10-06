@@ -8,14 +8,14 @@ Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: 
 
 | Familia | Claves del juego | Assets | Herramientas | Generaciones aprox. |
 |---|---|---|---|---|
-| Personajes | 39 | 25 | create_character · animate_character · create_image_pro (paso previo) | 997 |
+| Personajes | 39 | 25 | create_character · animate_character · create_image_pro (paso previo) | 1111 |
 | Mapa · terreno | 23 | 6 | create_tiles_pro · create_building_kit · create_topdown_tileset · animate_image | 15 + sin documentar |
-| Mapa · objetos con el estilo del mapa | 22 | 8 | create_map_object (background_image + máscara) · animate_image | 4 + sin documentar |
+| Mapa · objetos con el estilo del mapa | 22 | 8 | create_map_object (background_image + máscara) · animate_image | 9 + sin documentar |
 | Objetos sueltos en lote | 35 | 7 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 90 + sin documentar |
 | Imágenes simples | 3 | 3 | create_image_pixflux (init_image + color_image) | 3 |
 | Se queda procedural | 2 | 1 | — | 0 |
 
-**Total documentado: ~1109 generaciones** (más create_tiles_pro, create_building_kit, create_map_object, animate_object, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 124/124 claves.
+**Total documentado: ~1228 generaciones** (más create_tiles_pro, create_map_object, animate_object, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 124/124 claves.
 
 ## Orden de creación
 
@@ -35,7 +35,7 @@ Rig humanoide: rotaciones coherentes y plantillas de animación a 1 generación 
 
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
-| player | player | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: player.png | F1 | idle*, walk*, run, regar*, plantar, cosechar, cruzar*, oler*, vender*, telefono* | 70 |
+| player | player | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: player.png | F1 | idle*, walk*, run*, regar*, plantar*, cosechar*, cruzar*, oler*, vender*, telefono* | 70 |
 | kiko | kiko | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: kiko.png | F3 | idle*, fumar*, semillas* | 44 |
 | josune | josune | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: josune.png | F3 | idle*, secar_vaso*, servir* | 44 |
 | baltasar | baltasar | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: baltasar.png | F3 | idle*, puro*, contar* | 44 |
@@ -55,11 +55,11 @@ Rig humanoide: rotaciones coherentes y plantillas de animación a 1 generación 
 | cliente4 | cliente4 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente4.png | F3 | idle*, walk*, movil* | 44 |
 | cliente5 | cliente5 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente5.png | F3 | idle*, walk*, fumar* | 44 |
 | cliente6 | cliente6 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente6.png | F3 | idle*, walk*, movil* | 44 |
-| player-combate | espalda:player | create_character (v3) | v3: 8 direcciones, 64 px | previo create_image_pro ← player aprobado · reference_image_base64: player-combate.png | F6 · tras player | idle, golpe, patada, spray*, comer*, herido, desmayo | 46 |
-| ladron1-combate | ladron1, frente:ladron | create_character (standard) | 4 direcciones, 64 px | solo texto | F6 | idle, ataque, herido, huir | 5 |
-| ladron2-combate | ladron2, frente:ladron | create_character (standard) | 4 direcciones, 64 px | solo texto | F6 | idle, ataque, herido, huir | 5 |
-| ladron3-combate | ladron3, frente:ladron | create_character (standard) | 4 direcciones, 64 px | solo texto | F6 | idle, ataque, herido, huir | 5 |
-| policia-combate | frente:policia | create_character (v3) | v3: 8 direcciones, 64 px | previo create_image_pro ← cop aprobado · reference_image_base64: policia-combate.png | F6 · tras cop | idle, alto*, multa*, soborno*, perseguir | 44 |
+| player-combate | espalda:player | create_character (v3) | v3: 8 direcciones, 64 px | previo create_image_pro (solo texto) · reference_image_base64: player-combate.png | F6 · tras player | idle*, golpe*, patada*, spray*, comer*, herido*, desmayo* | 46 |
+| ladron1-combate | ladron1, frente:ladron | create_character (v3) | v3: 8 direcciones, 64 px | previo create_image_pro (solo texto) · reference_image_base64: ladron1-combate.png | F6 | idle*, ataque*, herido*, huir* | 43 |
+| ladron2-combate | ladron2, frente:ladron | create_character (v3) | v3: 8 direcciones, 64 px | previo create_image_pro (solo texto) · reference_image_base64: ladron2-combate.png | F6 | idle*, ataque*, herido*, huir* | 43 |
+| ladron3-combate | ladron3, frente:ladron | create_character (v3) | v3: 8 direcciones, 64 px | previo create_image_pro (solo texto) · reference_image_base64: ladron3-combate.png | F6 | idle*, ataque*, herido*, huir* | 43 |
+| policia-combate | frente:policia | create_character (v3) | v3: 8 direcciones, 64 px | previo create_image_pro (solo texto) · reference_image_base64: policia-combate.png | F6 · tras cop | idle*, alto*, multa*, soborno*, perseguir* | 44 |
 
 `*` = animación a medida (`action_description`, modo v3); el resto son plantillas a 1 generación por dirección.
 
@@ -71,9 +71,9 @@ Lo que se repite en casillas: tiles_pro numerados en una sola llamada, kit de ed
 |---|---|---|---|---|---|---|---|
 | tiles-exterior | grass, flowers, tallgrass, dirt, walk, roadT, roadB, plaza, water, bridgeT, bridgeB, dock | create_tiles_pro | 12 tiles numerados en 1 llamada | style_images: grass.png, walk.png, plaza.png, dirt.png | F4 | agua, flores, hierba-pisada | 3+? |
 | tileset-transiciones | — | create_topdown_tileset (standard) | 3 juegos Wang de 16 tiles | solo texto | F4b | — | 12 |
-| interior-home | floor, iwT_home, iwB_home | create_building_kit | kit: suelo + paredes conectables | solo texto | F4 | — | 0+? |
-| interior-shop | floorS, iwT_shop, iwB_shop | create_building_kit | kit: suelo + paredes conectables | solo texto | F4 | — | 0+? |
-| interior-bar | floorB, iwT_bar, iwB_bar | create_building_kit | kit: suelo + paredes conectables | solo texto | F4 | — | 0+? |
+| interior-home | floor, iwT_home, iwB_home | create_tiles_pro | 3 tiles numerados en 1 llamada | style_images: iwT_home.png, iwB_home.png, floor.png, floorS.png | F4 | — | 0+? |
+| interior-shop | floorS, iwT_shop, iwB_shop | create_tiles_pro | 3 tiles numerados en 1 llamada | style_images: iwT_home.png, iwB_home.png, floor.png, floorS.png | F4 | — | 0+? |
+| interior-bar | floorB, iwT_bar, iwB_bar | create_tiles_pro | 3 tiles numerados en 1 llamada | style_images: iwT_home.png, iwB_home.png, floor.png, floorS.png | F4 | — | 0+? |
 | tiles-interior-extra | mat, tent | create_tiles_pro | 2 tiles numerados en 1 llamada | style_images: mat.png, tent.png | F4 | — | 0+? |
 
 ## Mapa · objetos con el estilo del mapa
@@ -82,14 +82,14 @@ Lo grande que se apoya en el suelo (fachadas, carpa, árbol, farola, fuente): in
 
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
-| edificio-home | roofT_home, roofB_home, wall_home, win_home, door_home | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: edificio-home.png · inpainting.mask_image: edificio-home_mascara.png | F4 · tras tiles-exterior | puerta | 1+? |
-| edificio-shop | roofT_shop, roofB_shop, wall_shop, win_shop, door_shop | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: edificio-shop.png · inpainting.mask_image: edificio-shop_mascara.png | F4 · tras tiles-exterior | puerta | 1+? |
-| edificio-bar | roofT_bar, roofB_bar, wall_bar, win_bar, door_bar | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: edificio-bar.png · inpainting.mask_image: edificio-bar_mascara.png | F4 · tras tiles-exterior | puerta | 1+? |
-| edificio-gray | roofT_gray, roofB_gray, wall_gray, win_gray | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: edificio-gray.png · inpainting.mask_image: edificio-gray_mascara.png | F4 · tras tiles-exterior | — | 0+? |
+| edificio-home | roofT_home, roofB_home, wall_home, win_home, door_home | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-edificio-home.png | F4 · tras tiles-exterior | puerta | 2 |
+| edificio-shop | roofT_shop, roofB_shop, wall_shop, win_shop, door_shop | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-edificio-shop.png | F4 · tras tiles-exterior | puerta | 2 |
+| edificio-bar | roofT_bar, roofB_bar, wall_bar, win_bar, door_bar | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-edificio-bar.png | F4 · tras tiles-exterior | puerta | 2 |
+| edificio-gray | roofT_gray, roofB_gray, wall_gray, win_gray | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-edificio-gray.png | F4 · tras tiles-exterior | — | 1 |
 | prop-arbol | tree | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: tree.png · inpainting.mask_image: tree_mascara.png | F4 · tras tiles-exterior | — | 0+? |
 | prop-farola | lamp | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: lamp.png · inpainting.mask_image: lamp_mascara.png | F4 · tras tiles-exterior | — | 0+? |
 | prop-fuente | fountain | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: fountain.png · inpainting.mask_image: fountain_mascara.png | F4 · tras tiles-exterior | agua | 1+? |
-| carpa-cultivo | — | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: carpa.png · inpainting.mask_image: carpa_mascara.png | F4 · tras interior-home | — | 0+? |
+| carpa-cultivo | — | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-carpa.png | F4 · tras interior-home | — | 1 |
 
 ## Objetos sueltos en lote
 
@@ -97,7 +97,7 @@ Muchos objetos pequeños del mismo estilo en una sola llamada (hasta 64 candidat
 
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
-| props-16 | fence, sign, bench, crate, bush, pc, lab, lab2, table, shelfW, counter, display, plantDeco, barcounter, bottles, stool, btable, jukebox, iwin, poster | create_1_direction_object | 20 objetos en 1 llamada (64 candidatos a 16 px) | style_images: bench.png, sign.png, crate.png, bush.png, counter.png, stool.png, jukebox.png, plantDeco.png | F4 | luces | 30+? |
+| props-16 | fence, sign, bench, crate, bush, pc, lab, lab2, table, shelfW, counter, display, plantDeco, barcounter, bottles, stool, btable, jukebox, iwin, poster | create_1_direction_object | 64 objetos en 1 llamada (64 candidatos a 16 px) | style_images: bench.png, sign.png, crate.png, bush.png, counter.png, stool.png, jukebox.png, plantDeco.png | F4 | luces | 30+? |
 | props-32 | fridge, bedT, bedB | create_1_direction_object | 2 objetos · **comparte lote-32** (15 objetos de 4 assets en 1 llamada de 64 candidatos a 32 px) | solo texto | F4 | — | 30 |
 | planta-fases | germinando, plantula, vegetativo, floracion, lista, muerta, maceta-vacia, sana, seca | create_1_direction_object | 7 objetos · **comparte lote-32** (15 objetos de 4 assets en 1 llamada de 64 candidatos a 32 px) | solo texto | F5 | balanceo-vegetativo, balanceo-floracion, balanceo-lista | 0+? |
 | iconos | bolsa | create_1_direction_object | 12 objetos · **comparte lote-16** (24 objetos de 2 assets en 1 llamada de 64 candidatos a 16 px) | solo texto | F7 | — | 30 |
@@ -111,9 +111,9 @@ Pantallas completas sin rig: img2img sobre la composición actual y paleta forza
 
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
-| fondo-combate-ladron | fondo-ladron | create_image_pixflux | pantalla entera, img2img | init_image_base64: fondo-ladron.png · color_image_base64: ribera.png | F6 | — | 1 |
-| fondo-combate-policia | fondo-policia | create_image_pixflux | pantalla entera, img2img | init_image_base64: fondo-policia.png · color_image_base64: ribera.png | F6 | — | 1 |
-| titulo | hoja-titulo | create_image_pixflux | pantalla entera, img2img | init_image_base64: titulo.png · color_image_base64: ribera.png | F7 | — | 1 |
+| fondo-combate-ladron | fondo-ladron | create_image_pixflux | pantalla entera, img2img | init_image_base64: fondo-ladron.png | F6 | — | 1 |
+| fondo-combate-policia | fondo-policia | create_image_pixflux | pantalla entera, img2img | init_image_base64: fondo-policia.png | F6 | — | 1 |
+| titulo | hoja-titulo | create_image_pixflux | pantalla entera, img2img | init_image_base64: titulo.png | F7 | — | 1 |
 
 ## Se queda procedural
 
@@ -213,11 +213,23 @@ Una llamada a `create_1_direction_object` de ≤42 px devuelve 64 candidatos y c
 2. `create_character` mode v3, size 32, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
 
 **player-combate**
-1. `create_image_pro` 64×64 con `reference_images` = `art/procesado/player/base/south/00.png` («character base: same person, outfit and colors»). Elige 1 de los 16 candidatos y guárdalo en `art/crudo/_ref/player-combate.png`.
+1. `create_image_pro` 64×64 solo con texto. Elige 1 de los 16 candidatos (se eligió el 1) y guárdalo en `art/crudo/_ref/player-combate.png`.
+2. `create_character` mode v3, size 64, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**ladron1-combate**
+1. `create_image_pro` 64×64 solo con texto. Elige 1 de los 16 candidatos (se eligió el 0) y guárdalo en `art/crudo/_ref/ladron1-combate.png`.
+2. `create_character` mode v3, size 64, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**ladron2-combate**
+1. `create_image_pro` 64×64 solo con texto. Elige 1 de los 16 candidatos (se eligió el 0) y guárdalo en `art/crudo/_ref/ladron2-combate.png`.
+2. `create_character` mode v3, size 64, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
+
+**ladron3-combate**
+1. `create_image_pro` 64×64 solo con texto. Elige 1 de los 16 candidatos (se eligió el 0) y guárdalo en `art/crudo/_ref/ladron3-combate.png`.
 2. `create_character` mode v3, size 64, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
 
 **policia-combate**
-1. `create_image_pro` 64×64 con `reference_images` = `art/procesado/cop/base/south/00.png` («character base: same person, outfit and colors»). Elige 1 de los 16 candidatos y guárdalo en `art/crudo/_ref/policia-combate.png`.
+1. `create_image_pro` 64×64 solo con texto. Elige 1 de los 16 candidatos (se eligió el 3) y guárdalo en `art/crudo/_ref/policia-combate.png`.
 2. `create_character` mode v3, size 64, `reference_image_base64` = ese PNG: lo rota a 8 direcciones y queda animable.
 
 **tileset-transiciones** (create_topdown_tileset, opcional)

@@ -32,7 +32,7 @@ npm run sprites:ref        # build + referencias + paleta
 npm run sprites:validar    # comprueba el manifiesto (0 errores para empezar)
 npm run sprites:procesar -- <grupo> [--atlas]      # o -- --todos --atlas
 npm run sprites:catalogo   # catálogo por herramienta (docs/CATALOGO-SPRITES.md)
-npm run test:arte          # motor de sprites con un atlas de calco (16 comprobaciones)
+npm run test:arte          # motor de sprites con un atlas de calco (18 comprobaciones)
 ```
 
 ## 2. Dirección de arte (no negociable)
@@ -156,8 +156,8 @@ El detalle sprite a sprite está en **[CATALOGO-SPRITES.md](CATALOGO-SPRITES.md)
 | Familia | Qué | Herramientas | Por qué |
 |---|---|---|---|
 | **Personajes** | protagonista, 13 NPC, 6 clientes, combate | `create_character` estándar (1 gen) + plantillas; combate: `create_image_pro` con referencia → `create_character` v3 | rig humanoide: rotaciones coherentes y animaciones a 1 gen por dirección; el paso previo conserva la identidad a 64 px |
-| **Mapa · terreno** | suelos del barrio, interiores, agua y flores animadas, orillas | `create_tiles_pro` (tiles numerados en 1 llamada), `create_building_kit` (suelo + pared de cada interior), `create_topdown_tileset` (3 Wang encadenados por la hierba), `animate_image` | lo que se repite en casillas |
-| **Mapa · objetos con el estilo del mapa** | 4 fachadas, carpa, árbol, farola, fuente | `create_map_object` con `background_image` + máscara | se pintan sobre el suelo real: casan luz, paleta y perspectiva |
+| **Mapa · terreno** | suelos del barrio, interiores, agua y flores animadas, orillas | `create_tiles_pro` (tiles numerados en 1 llamada; también paredes y suelos de interior, porque `create_building_kit` no casa con la rejilla), `create_topdown_tileset` (3 Wang encadenados por la hierba), `animate_image` | lo que se repite en casillas |
+| **Mapa · objetos con el estilo del mapa** | árbol, farola, fuente; 4 fachadas y carpa | árbol, farola y fuente: `create_map_object` con `background_image` + máscara; fachadas y carpa: `create_image_pixflux` img2img sobre su huella (strength 30 y 60) | se pintan sobre el suelo real o sobre la huella: casan luz, paleta, perspectiva y columna de la puerta |
 | **Objetos sueltos en lote** | props pequeños, plantas, iconos, cogollos, VFX, gaviota y paloma | `create_1_direction_object` con `item_descriptions` y **lotes compartidos** | 64 candidatos por llamada: dos lotes (16 y 32 px) ahorran ~120 generaciones |
 | **Imágenes simples** | fondos de combate y título | `create_image_pixflux` img2img + paleta | 1 generación por pantalla, sin mover la composición |
 
@@ -170,12 +170,12 @@ Descartadas, con su motivo en el catálogo: `create_path_tiles` (solo 32 px), `c
 | **F0** Preparación | MCP, saldo, referencias, paleta, validación | `ERRORES: 0` |
 | **F1** Ancla de estilo | protagonista: base + `idle` + `walk`, e integración mínima | **la apruebas tú** viendo la captura antes y después |
 | **F2** Motor | atlas, animaciones, ambiente, VFX, arte procedural de reserva (sección 7). **Hecho en la 1.3** | `npm test` 34/34 con y sin atlas y `npm run test:arte` 16/16 |
-| **F3** Personajes | 13 NPC, 6 clientes, acciones de ambiente, humos y efectos (`vfx-16`, `vfx-32`), gaviotas y palomas | revisión visual y capturas. **Personajes hechos en la 1.4**; faltan humos, gaviotas y palomas |
-| **F4** Entorno | primero tiles e interiores; después, con los recortes regenerados, las 4 fachadas, árbol, farola, fuente y carpa sobre el mapa; props pequeños y tiles animados | mosaico 3×3 sin costuras |
-| **F4b** Transiciones *(opcional)* | tilesets Wang + autotiling en el motor | — |
-| **F5** Plantas | 6 fases, balanceo, cogollo por variedad, seca, plaga | las 23 variedades se distinguen |
-| **F6** Combate | jugador de espaldas y policía (paso previo con el sprite aprobado), 3 ladrones, 2 fondos img2img | combates de prueba enteros |
-| **F7** Iconos y título | iconos de objetos, cogollos de la Genoteca, pantalla de título | — |
+| **F3** Personajes | 13 NPC, 6 clientes, acciones de ambiente, humos y efectos (`vfx-16`, `vfx-32`), gaviotas y palomas | revisión visual y capturas. **Personajes hechos en la 1.4; humos, efectos, gaviotas y palomas en la 1.5** |
+| **F4** Entorno | primero tiles e interiores; después, con los recortes regenerados, las 4 fachadas, árbol, farola, fuente y carpa sobre el mapa; props pequeños y tiles animados | mosaico 3×3 sin costuras. **Hecho en la 1.5** (fachadas y carpa con pixflux img2img, ver sección 10) |
+| **F4b** Transiciones *(opcional)* | tilesets Wang + autotiling en el motor | — *(pendiente)* |
+| **F5** Plantas | 6 fases, balanceo, cogollo por variedad, seca, plaga | las 23 variedades se distinguen. **Hecho en la 1.5** |
+| **F6** Combate | jugador de espaldas y policía (paso previo con el sprite aprobado), 3 ladrones, 2 fondos img2img | combates de prueba enteros. **Hecho en la 1.5** |
+| **F7** Iconos y título | iconos de objetos, cogollos de la Genoteca, pantalla de título | — **Hecho en la 1.5** (el motor dibuja el título del atlas) |
 | **F8** Pulido | QA global, capturas, test, build, CHANGELOG | todo en verde |
 
 **F1 es la que manda.** El protagonista se genera con `create_character`:
@@ -287,7 +287,7 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 - **Combate:** fondos, jugador de espaldas y rival desde el atlas; `bAnim(quién, nombre)` dispara golpe, patada, spray, comer, herido, desmayo, ataque, huida, alto, multa, soborno y persecución desde `13-combate.js`, con `vfx-golpe` y `vfx-spray`.
 - **Reserva:** si una clave no está en el atlas, se usa el dibujo procedural. `?arte=procedural` en la URL ignora el atlas para comparar.
 
-**Pruebas:** `npm test` (34/34 sin atlas) y `npm run test:arte`, que calca el arte procedural a `art/crudo`, lo procesa, compila el juego con ese atlas en `tools/salida/arte/` y comprueba 16 cosas, entre ellas un atlas parcial (solo el player y sin «east»). Con el atlas de calco la historia completa también da 34/34, y las capturas salen casi idénticas a las procedurales: así se sabe que las anclas cuadran antes de gastar un crédito.
+**Pruebas:** `npm test` (34/34 sin atlas) y `npm run test:arte`, que calca el arte procedural a `art/crudo`, lo procesa, compila el juego con ese atlas en `tools/salida/arte/` y comprueba 18 cosas (el título del atlas entre ellas) y un atlas parcial (solo el player y sin «east»). Con el atlas de calco la historia completa también da 34/34, y las capturas salen casi idénticas a las procedurales: así se sabe que las anclas cuadran antes de gastar un crédito.
 
 ## 8. QA y criterio de aprobado
 
@@ -355,7 +355,13 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 | Cara distinta en cada dirección | `create_character` con `mode: "v3"`, `reference_image_base64` de la rotación sur aprobada y `size: 32`. |
 | `select_object_frames` pendiente | Los objetos con `size ≤ 170` quedan en revisión hasta que eliges. |
 | Trabajo atascado | `list_jobs` y `cancel_job`. Según PixelLab, los tilesets fallidos no se cobran; en lo demás, mira el saldo antes y después. |
-| Fuera de celda en `procesar.js` | El sprite es demasiado grande para su celda. Regenera con un `size` menor o pide «fits in a 32x32 tile». |
+| Fuera de celda en `procesar.js` | El sprite es demasiado grande para su celda. Regenera con un `size` menor o pide «fits in a 32x32 tile». En combate, si solo un fotograma sube 1-2 px por encima (un bote del `idle`), bájalo lo justo en el crudo. |
+| `keyframe image is incomplete` / `did not decode` | El base64 se copió mal (no siempre es el cliente). Cuantiza el PNG en paleta (`convert in.png -colors 24 -define png:color-type=3 -strip out.png`, 300-1200 bytes), imprímelo en líneas de 80 caracteres y cópialo línea a línea. `-strip` quita el alfa: el fondo vuelve negro y hay que vaciarlo después. |
+| Casa estrecha con `create_map_object` o `create_image_pro` | Salen de ~76 px y no cubren una huella de 112. Usa `create_image_pixflux` img2img con la huella procedural (el edificio del calco) como `init_image` e `init_image_strength` 30: redibuja todo a lo ancho y deja la puerta en su columna (150/100 apenas cambia nada). |
+| `create_building_kit` no encaja | Da piezas de 24×42 en perspectiva con suelo de 16×12: no casan con la rejilla cenital de 16 px. Paredes y suelos de interior con `create_tiles_pro` y referencias. |
+| Caja opaca en un fotograma de VFX | `animate_object` a veces devuelve un fotograma con fondo: vacía por relleno lo que toca el borde (si hay ≥ 8 píxeles opacos en el borde). |
+| Descarga de un objeto sin animación no es un zip | `objects/<id>/download` devuelve el PNG directamente cuando el objeto no tiene animaciones. |
+| Un objeto trae lo que no es (gancho, bola de fuego) | La acción se lee literal: «hook punch» le dio un gancho en la mano. Quita la palabra y añade «empty hands, no effects». |
 
 ## 11. Comando de Claude Code
 
@@ -366,5 +372,5 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 - [ ] `npm run sprites:validar` → 0 errores y `npm run sprites:catalogo` → todas las claves
 - [ ] Todos los assets de la fase en `aprobado`, con `pixellab` (y `seed` si la herramienta la acepta) y `coste_real`
 - [ ] `npm run sprites:procesar -- --todos --atlas` → `ATLAS OK`
-- [ ] `npm run build`, `npm test` 34/34 (con y sin atlas), `npm run test:arte` 17/17 y `npm run capturas` revisadas
+- [ ] `npm run build`, `npm test` 34/34 (con y sin atlas), `npm run test:arte` 18/18 y `npm run capturas` revisadas
 - [ ] `CHANGELOG.md` actualizado y capturas nuevas en `screenshots/`

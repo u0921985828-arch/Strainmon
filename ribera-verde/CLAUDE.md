@@ -1,6 +1,6 @@
 # Ribera Verde — notas para Claude Code
 
-Juego web de un solo archivo: HTML, CSS y JavaScript sin frameworks ni dependencias en tiempo de ejecución. Todo el arte se dibuja por código en canvas. La interfaz (diálogos, menús, HUD) es DOM superpuesto al canvas.
+Juego web de un solo archivo: HTML, CSS y JavaScript sin frameworks ni dependencias en tiempo de ejecución. El arte sale del atlas de PixelLab incrustado en el build; lo que falte (o todo, con `?arte=procedural`) se dibuja por código en canvas. La interfaz (diálogos, menús, HUD) es DOM superpuesto al canvas.
 
 ## Comandos
 
@@ -9,12 +9,12 @@ Juego web de un solo archivo: HTML, CSS y JavaScript sin frameworks ni dependenc
 - `npm run docs`: compila y regenera `docs/GENETICA.md` y `docs/MAPA.md` leyendo los datos de `index.html`. Ejecútalo si tocas variedades, mapas, personajes, objetos o la tienda. El texto «cómo se consigue» de las variedades de tienda y landraces está a mano en `ORIGIN` (`tools/generar-docs.js`).
 - `npm run capturas`: compila y regenera `screenshots/`.
 - `test`, `docs` y `capturas` leen `index.html`. Si los lanzas con `node tools/...` en vez de `npm run`, ejecuta antes `node tools/build.js`.
-- `npm run test:arte`: prueba el motor de sprites con un atlas «de calco» (16 comprobaciones). No toca el `index.html` de la raíz: compila en `tools/salida/arte/`.
+- `npm run test:arte`: prueba el motor de sprites con un atlas «de calco» (18 comprobaciones). No toca el `index.html` de la raíz: compila en `tools/salida/arte/`.
 - Los scripts de Playwright aceptan `CHROMIUM_PATH` (otro Chromium), `RV_HTML` (otro HTML) y `RV_SALIDA` (otra carpeta de salida). `tools/build.js` acepta `--atlas-dir` y `--salida`.
 
 ## Módulos (`src/js`, se concatenan en orden alfabético dentro de un único `<script>`)
 
-`00-nucleo` utilidades · `01-tiles` casillas procedurales (`TILES`, `T()`, `SOLID_G`) · `01b-arte` sprites del atlas de PixelLab (`ARTE`, `frameDe`, `dibujarPJ`, `ambiente`, `accion`, `bAnim`, `artePlanta`…; sin atlas no hace nada) · `02-sprites` personajes 16×20 y plantas 16×26 · `03-datos` `STRAINS`, `DEX`, `RECIPES`, `crossResult`, `LOOKS`, `CTYPES` · `04-mapas` `MAPS` (`town`, `home`, `shop`, `bar`), `POTS` · `05-audio` chiptune y efectos (WebAudio) · `06-controles` teclado y botones táctiles · `07-interfaz` `say`/`talk`/`ask`/`menu`/`toast`/`fade` · `08-mundo` estado `S`, `NPCDEF`, `ITEMS`, movimiento, interacción · `09-cultivo` tiempo, plantas, cama, PC, carta, mesa de genética · `10-calle` clientes y venta · `11-historia` tienda, diálogos de personajes, capítulos, eventos y final · `12-menus` menú START · `13-combate` ladrones y policía · `14-render` dibujo del mundo, del combate y del título · `15-arranque` guardado, título, partida nueva, bucle y `boot`.
+`00-nucleo` utilidades · `01-tiles` casillas procedurales (`TILES`, `T()`, `SOLID_G`) · `01b-arte` sprites del atlas de PixelLab (`ARTE`, `frameDe`, `dibujarPJ`, `ambiente`, `accion`, `bAnim`, `artePlanta`…; sin atlas no hace nada) · `02-sprites` personajes 16×20 y plantas 16×26 · `03-datos` `STRAINS`, `DEX`, `RECIPES`, `crossResult`, `LOOKS`, `CTYPES` · `04-mapas` `MAPS` (`town`, `home`, `shop`, `bar`), `POTS` · `05-audio` chiptune y efectos (WebAudio) · `06-controles` teclado y botones táctiles · `07-interfaz` `say`/`talk`/`ask`/`menu`/`toast`/`fade` · `08-mundo` estado `S`, `NPCDEF`, `ITEMS`, movimiento, interacción · `09-cultivo` tiempo, plantas, cama, PC, carta, mesa de genética · `10-calle` clientes y venta · `11-historia` tienda, diálogos de personajes, capítulos, eventos y final · `12-menus` menú START · `13-combate` ladrones y policía · `14-render` dibujo del mundo, del combate y del título (`arteTitulo` si el atlas trae `titulo`) · `15-arranque` guardado, título, partida nueva, bucle y `boot`.
 
 ## Convenciones
 
@@ -73,4 +73,14 @@ Hierba `#84cc6c` `#62aa56` `#b0e48c` `#3f8a46` · tierra `#dcc08a` · acera `#dc
   - Las plantillas (`breathing-idle`, `walking-4-frames`) sobre un personaje v3 con referencia pueden salir de espaldas mirando al sur o enseñar la cara de espaldas: revisa cada dirección fotograma a fotograma. Repetir la misma plantilla en la misma dirección no regenera nada.
   - `reduce_colors` exige el mismo tamaño en todos los fotogramas: las animaciones v3 salen a 40×40 y las rotaciones a 32×32; rellena las rotaciones a 40×40 (centradas, sin tocar píxeles) y mándalas como `data:` URL.
   - Las animaciones de plantilla cambian los tonos respecto a la rotación. Antes de procesar, `reduce_colors` con `num_colors: 15` y **todos** los fotogramas del personaje en una sola llamada; su salida va a `art/crudo` y el job queda en `pixellab.reduce_colors_job`.
+  - F3-resto, F4-F7 (1.5), lo que funcionó:
+    - Fachadas y carpa: `create_image_pixflux` img2img con la huella como `init_image_base64` (la de cada edificio es su base del calco; la de la carpa, marco + pared trasera + panel LED + tile `tent`), `init_image_strength` 30 (edificios) o 60 (carpa). `create_map_object` y `create_image_pro` daban casas de ~76 px; strength 150/100 casi no cambiaba nada. La puerta cae en la columna 3 (x 48-64): el recorte 32×32 de `puerta` es x40 y64, fotograma 0 = ese recorte y 1-3 = `animate_image`.
+    - Interiores: `create_tiles_pro` con las paredes partidas en «upper part»/«lower part» numeradas; `create_building_kit` da piezas en perspectiva (descartado).
+    - Árbol, farola y fuente: `create_map_object` con recorte + máscara de `art/referencias/mapa/`.
+    - Lotes: los 64 candidatos de `create_1_direction_object` se eligen con `select_object_frames` (repite cada item 2-4 veces en `item_descriptions` para tener donde elegir). Los candidatos en revisión no se descargan directos: `reduce_colors` con `num_colors` 256 sobre sus URL y `images/<job>/download?index=N`.
+    - `objects/<id>/download` es un zip si el objeto tiene animaciones y un PNG suelto si no.
+    - `animate_image` devuelve `frame_count + 1` imágenes: la 0 es la entrada.
+    - Base64 largos: se copian mal a mano. Cuantiza en paleta (`convert in.png -colors 24 -define png:color-type=3 -strip out.png`), imprime en líneas de 80 y copia línea a línea. `-strip` quita el alfa (fondo negro que luego se vacía).
+    - Montaje del crudo (pasos que hay que repetir si se regenera algo): cajas de fondo de VFX fuera por relleno desde el borde; el último fotograma vacío de polen repite el anterior (frames par); negros con tinte morado de las macetas → gris (si no, caen en la rampa del cogollo); fotogramas de combate que se salen 1 px por arriba, bajados; la cama de 19×32 se parte en `bedT` (arriba) y `bedB` (16 filas de abajo); las acciones del player van al color más cercano de sus 13 colores aprobados (si no, el tope de 15 del grupo cambia base/idle/walk).
+    - v3 lee la acción al pie de la letra: «hook punch» le puso un gancho en la mano y un «herido» trajo una bola de fuego; pide «empty hands, no effects».
   - En sesiones cloud, `backblaze.pixellab.ai` está bloqueado: descarga con `https://api.pixellab.ai/mcp/characters/<id>/download` (zip) y `https://api.pixellab.ai/mcp/images/<job>/download?index=N`, que no piden token.

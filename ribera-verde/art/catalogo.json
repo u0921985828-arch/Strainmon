@@ -501,7 +501,7 @@
    {
     "asset": "interior-home",
     "familia": "mapa-terreno",
-    "herramienta": "create_building_kit",
+    "herramienta": "create_tiles_pro",
     "fase": "F4",
     "depende_de": []
    }
@@ -510,7 +510,7 @@
    {
     "asset": "interior-home",
     "familia": "mapa-terreno",
-    "herramienta": "create_building_kit",
+    "herramienta": "create_tiles_pro",
     "fase": "F4",
     "depende_de": []
    }
@@ -519,7 +519,7 @@
    {
     "asset": "interior-home",
     "familia": "mapa-terreno",
-    "herramienta": "create_building_kit",
+    "herramienta": "create_tiles_pro",
     "fase": "F4",
     "depende_de": []
    }
@@ -528,7 +528,7 @@
    {
     "asset": "interior-shop",
     "familia": "mapa-terreno",
-    "herramienta": "create_building_kit",
+    "herramienta": "create_tiles_pro",
     "fase": "F4",
     "depende_de": []
    }
@@ -537,7 +537,7 @@
    {
     "asset": "interior-shop",
     "familia": "mapa-terreno",
-    "herramienta": "create_building_kit",
+    "herramienta": "create_tiles_pro",
     "fase": "F4",
     "depende_de": []
    }
@@ -546,7 +546,7 @@
    {
     "asset": "interior-shop",
     "familia": "mapa-terreno",
-    "herramienta": "create_building_kit",
+    "herramienta": "create_tiles_pro",
     "fase": "F4",
     "depende_de": []
    }
@@ -555,7 +555,7 @@
    {
     "asset": "interior-bar",
     "familia": "mapa-terreno",
-    "herramienta": "create_building_kit",
+    "herramienta": "create_tiles_pro",
     "fase": "F4",
     "depende_de": []
    }
@@ -564,7 +564,7 @@
    {
     "asset": "interior-bar",
     "familia": "mapa-terreno",
-    "herramienta": "create_building_kit",
+    "herramienta": "create_tiles_pro",
     "fase": "F4",
     "depende_de": []
    }
@@ -573,7 +573,7 @@
    {
     "asset": "interior-bar",
     "familia": "mapa-terreno",
-    "herramienta": "create_building_kit",
+    "herramienta": "create_tiles_pro",
     "fase": "F4",
     "depende_de": []
    }
@@ -600,7 +600,7 @@
    {
     "asset": "edificio-home",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -611,7 +611,7 @@
    {
     "asset": "edificio-home",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -622,7 +622,7 @@
    {
     "asset": "edificio-home",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -633,7 +633,7 @@
    {
     "asset": "edificio-home",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -644,7 +644,7 @@
    {
     "asset": "edificio-home",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -655,7 +655,7 @@
    {
     "asset": "edificio-shop",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -666,7 +666,7 @@
    {
     "asset": "edificio-shop",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -677,7 +677,7 @@
    {
     "asset": "edificio-shop",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -688,7 +688,7 @@
    {
     "asset": "edificio-shop",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -699,7 +699,7 @@
    {
     "asset": "edificio-shop",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -710,7 +710,7 @@
    {
     "asset": "edificio-bar",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -721,7 +721,7 @@
    {
     "asset": "edificio-bar",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -732,7 +732,7 @@
    {
     "asset": "edificio-bar",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -743,7 +743,7 @@
    {
     "asset": "edificio-bar",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -754,7 +754,7 @@
    {
     "asset": "edificio-bar",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -765,7 +765,7 @@
    {
     "asset": "edificio-gray",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -776,7 +776,7 @@
    {
     "asset": "edificio-gray",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -787,7 +787,7 @@
    {
     "asset": "edificio-gray",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"
@@ -798,7 +798,7 @@
    {
     "asset": "edificio-gray",
     "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "herramienta": "create_image_pixflux",
     "fase": "F4",
     "depende_de": [
      "tiles-exterior"

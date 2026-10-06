@@ -217,6 +217,10 @@ function combFrame(who,now){
   if(a){const t=now-a.t0;if(t<duracion(g,a.n)||a.n==='desmayo')return frameDe(g,a.n,a.n==='huir'?'east':dir,t,{bucle:a.n==='huir'});B['a'+who]=null;}
   return frameDe(g,'idle',dir,now,{bucle:true})||frameDe(g,'base',dir,0,{i:0});
 }
+function arteTitulo(){
+  const g=ARTE.ok&&ARTE.cubre['misc:hoja-titulo'];if(!g)return false;
+  const f=frameDe(g,'base','unica',0,{i:0});if(!f)return false;ctx.drawImage(f.c,0,0);return true;
+}
 function arteFondoCombate(){
   const g=ARTE.ok&&ARTE.cubre['combate:fondo-'+(B.kind==='thief'?'ladron':'policia')];if(!g)return false;
   const f=frameDe(g,'base','unica',0,{i:0});if(!f)return false;ctx.drawImage(f.c,0,0);return true;

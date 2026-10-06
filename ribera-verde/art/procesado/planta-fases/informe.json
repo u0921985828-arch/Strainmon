@@ -1,0 +1,47 @@
+{
+  "grupo": "planta-fases",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 10,
+  "fotogramas": 19,
+  "semitransparentes": 0,
+  "en_paleta_antes": 17.9,
+  "distancia_media": 10.39,
+  "colores_finales": 15,
+  "fundidos": [
+    "balanceo-floracion: #3f8a46→#3a8a3a",
+    "balanceo-floracion: #4c5560→#5a5a66",
+    "balanceo-floracion: #6c3c8a→#5a5a66",
+    "balanceo-floracion: #26262e→#2c2c30",
+    "balanceo-floracion: #4a2a2a→#2c2c30",
+    "balanceo-lista: #4a2a2a→#2c2c30",
+    "balanceo-lista: #4a4a4a→#4c5560",
+    "balanceo-lista: #4c5560→#2c6e36",
+    "floracion: #4c5560→#5a5a66",
+    "floracion: #26262e→#2c2c30",
+    "lista: #4a4a4a→#3c444e",
+    "lista: #3c444e→#4c5560",
+    "lista: #357a3c→#2c6e36",
+    "muerta: #8a5a3a→#8a5a36",
+    "muerta: #c48a52→#b48446",
+    "muerta: #b48446→#b07a4a",
+    "muerta: #9a6a40→#986240",
+    "muerta: #4a2a2a→#4a2c1c",
+    "muerta: #8a4a2a→#86502e",
+    "muerta: #8f6741→#8e623e",
+    "muerta: #5a5a66→#6c4632",
+    "muerta: #3a2414→#4a2c1c",
+    "plantula: #22662a→#2c6e36",
+    "plantula: #0e1a12→#18181c"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "balanceo-floracion/unica": 0,
+    "balanceo-lista/unica": 0,
+    "balanceo-vegetativo/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}

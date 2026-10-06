@@ -293,7 +293,6 @@
     {
      "nombre": "run",
      "herramienta": "animate_character",
-     "plantilla": "running-6-frames",
      "direcciones": [
       "south",
       "north",
@@ -302,13 +301,16 @@
      ],
      "fps": 12,
      "bucle": true,
-     "sincronia": "un ciclo cada 2 casillas"
+     "sincronia": "un ciclo cada 2 casillas",
+     "modo": "v3",
+     "accion": "running fast, simple 6-frame run cycle with long strides and pumping arms, keeps facing the same direction",
+     "frames": 6
     },
     {
      "nombre": "regar",
      "herramienta": "animate_character",
      "modo": "v3",
-     "accion": "watering a potted plant with a small green watering can, water drips from the spout",
+     "accion": "watering a potted plant on the floor in front with a small green watering can, tilting it so water drips from the spout, keeps facing the same direction",
      "frames": 8,
      "direcciones": [
       "south",
@@ -322,7 +324,6 @@
     {
      "nombre": "plantar",
      "herramienta": "animate_character",
-     "plantilla": "crouching",
      "direcciones": [
       "south",
       "north",
@@ -330,12 +331,14 @@
       "west"
      ],
      "fps": 8,
-     "bucle": false
+     "bucle": false,
+     "modo": "v3",
+     "accion": "crouching down to plant a small seedling in a pot on the floor in front, pressing the soil with both hands, then standing up, keeps facing the same direction",
+     "frames": 6
     },
     {
      "nombre": "cosechar",
      "herramienta": "animate_character",
-     "plantilla": "picking-up",
      "direcciones": [
       "south",
       "north",
@@ -343,13 +346,16 @@
       "west"
      ],
      "fps": 8,
-     "bucle": false
+     "bucle": false,
+     "modo": "v3",
+     "accion": "bending down to a plant on the floor in front, cutting and picking the buds with both hands, then standing up holding them, keeps facing the same direction",
+     "frames": 6
     },
     {
      "nombre": "cruzar",
      "herramienta": "animate_character",
      "modo": "v3",
-     "accion": "looking into a microscope on a desk and turning the focus knob",
+     "accion": "bending over a microscope on a desk in front, looking into it and turning the focus knob, keeps facing the same direction",
      "frames": 8,
      "direcciones": [
       "north"
@@ -361,7 +367,7 @@
      "nombre": "oler",
      "herramienta": "animate_character",
      "modo": "v3",
-     "accion": "lifting a freshly harvested cannabis bud to the nose and smelling it, pleased",
+     "accion": "lifting a small green bud to the nose with one hand and smelling it, pleased, then lowering the hand, keeps facing the same direction",
      "frames": 8,
      "direcciones": [
       "south"
@@ -373,7 +379,7 @@
      "nombre": "vender",
      "herramienta": "animate_character",
      "modo": "v3",
-     "accion": "discreetly handing over a small bag and receiving folded banknotes",
+     "accion": "discreetly handing over a small bag with one hand and receiving folded banknotes with the other, then pocketing them, keeps facing the same direction",
      "frames": 8,
      "direcciones": [
       "south",
@@ -388,7 +394,7 @@
      "nombre": "telefono",
      "herramienta": "animate_character",
      "modo": "v3",
-     "accion": "checking a mobile phone message",
+     "accion": "taking a mobile phone out of the pocket, looking at the screen and reading a message, then putting it away, keeps facing the same direction",
      "frames": 6,
      "direcciones": [
       "south"
@@ -405,10 +411,49 @@
     "create_image_pro_job": "60afdb75-af23-4158-9fdd-74c0161e5b53",
     "animation_group_id": {
      "idle": "01068679-4a5c-4a2f-ac07-e1ee5e05091a",
-     "walk": "3d617030-d465-4fb9-9bdd-7a3d043812ee"
+     "walk": "3d617030-d465-4fb9-9bdd-7a3d043812ee",
+     "run": {
+      "south": "5bfcc748-5673-4810-bfc4-345c570a604c",
+      "north": "0d9f6413-b14b-4eeb-8d08-db3d490ffae1",
+      "east": "e4e1d8f1-98b7-40d9-bed8-3650212152c5",
+      "west": "18595ebe-5c8e-4cb6-9344-c45257652c9f"
+     },
+     "regar": {
+      "south": "2fdef803-4538-4742-959b-179f1866efca",
+      "north": "4e787d02-c7e7-498e-aa5c-4087ed115453",
+      "east": "d8cc8141-1218-4b78-b982-1b90f7fa85b5",
+      "west": "ea620344-a477-45ca-a7de-a1bea680a54e"
+     },
+     "plantar": {
+      "south": "48f3a398-17e2-412a-9936-b6db9f2ebfa8",
+      "north": "e5ce8299-a8a6-43a8-8d12-2b4357aa2b86",
+      "east": "733a556d-e6f6-4355-a635-8320e4dde7cf",
+      "west": "cd565047-b7bd-41b8-b76d-24143a184952"
+     },
+     "cosechar": {
+      "south": "94502792-800c-4190-acf1-00bcc75d8b3f",
+      "north": "f5f8cf70-8a7d-4bec-bcc4-6c69ee2ea447",
+      "east": "e601fef2-1f12-45b8-98ab-000b3088e53d",
+      "west": "c953a0b4-15f3-4e8b-ac7c-ad81e6865ba1"
+     },
+     "cruzar": {
+      "north": "4f0feccb-9d32-4f8b-b15a-e197c5bf5419"
+     },
+     "oler": {
+      "south": "610111e2-74d2-449f-834e-ebca0da8a76e"
+     },
+     "vender": {
+      "south": "b264b10a-3f4f-4de1-9466-fb3d8249e8dd",
+      "north": "083bb366-af03-47de-bb9d-ba2256887bb7",
+      "east": "bb819bf4-b6f8-4990-93cc-70b26f636f28",
+      "west": "8bdbef6c-93df-4ddd-8795-40a9d365b72a"
+     },
+     "telefono": {
+      "south": "13d861a0-313f-48a3-88f0-19dd5139881e"
+     }
     },
     "reduce_colors_job": "b30799bd-ef31-4816-a023-a1f28da79452",
-    "notas_animacion": "keep_first_frame false. Las plantillas breathing-idle/walking-4-frames sobre este personaje v3 salían de espaldas mirando al sur: no usarlas. Las rotaciones (32×32) se rellenaron a 40×40 sin tocar píxeles para el reduce_colors conjunto.",
+    "notas_animacion": "keep_first_frame false. Las plantillas breathing-idle/walking-4-frames sobre este personaje v3 salían de espaldas mirando al sur: no usarlas. Las rotaciones (32×32) se rellenaron a 40×40 sin tocar píxeles para el reduce_colors conjunto. Acciones (1.5): v3 a medida por dirección; al montar el crudo cada píxel va al más cercano de los 13 colores del player aprobado, para que el tope de 15 del grupo no cambie base/idle/walk.",
     "descartados": {
      "fcb0e6ed-b020-44a3-87fb-6188883c4694": "size 32 preset chibi: 34-35 px, no cabe",
      "fb449cd4-f866-4583-9a91-ee1d03188dee": "size 32: 34-35 px",
@@ -425,7 +470,7 @@
      "F1d 92321c32 #0 + edit_image_pixen": "16×16 px: cuerpo demasiado corto"
     }
    },
-   "coste_real": 195,
+   "coste_real": 218,
    "entrada": {
     "reference_image_base64": "art/crudo/_ref/player.png"
    },
@@ -2572,15 +2617,13 @@
    "parametros": {
     "mode": "v3",
     "size": 64,
-    "view": "low top-down",
-    "outline": "single color black outline",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/procesado/player/base/south/00.png",
     "art/referencias/estilo/player_south_x2.png"
    ],
-   "descripcion": "young adult street grower, green baseball cap with darker green brim, short dark brown hair, light skin, red t-shirt, navy blue jeans, dark sneakers, battle stance",
+   "descripcion": "young man in a fighting stance with fists up: green baseball cap worn forwards (back view: round back of the cap), dark brown hair, light skin, bright red t-shirt, navy jeans, white sneakers. 32-bit handheld RPG battle sprite, clean dark outline.",
    "celda": "combate",
    "colores_identidad": [
     "#2fa868",
@@ -2596,38 +2639,44 @@
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "fight-stance-idle-8-frames",
      "direcciones": [
       "north"
      ],
      "fps": 8,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "fighting stance idle, fists up, bouncing lightly on the feet, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "golpe",
      "herramienta": "animate_character",
-     "plantilla": "cross-punch",
      "direcciones": [
       "north"
      ],
      "fps": 12,
-     "bucle": false
+     "bucle": false,
+     "frames": 6,
+     "modo": "v3",
+     "accion": "throwing a quick straight punch forward with the right fist and pulling back to guard, keeps facing the same direction"
     },
     {
      "nombre": "patada",
      "herramienta": "animate_character",
-     "plantilla": "high-kick",
      "direcciones": [
       "north"
      ],
      "fps": 12,
-     "bucle": false
+     "bucle": false,
+     "frames": 6,
+     "modo": "v3",
+     "accion": "a high front kick forward with the right leg and back to guard, keeps facing the same direction"
     },
     {
      "nombre": "spray",
      "herramienta": "animate_character",
      "modo": "v3",
-     "accion": "spraying pepper spray forward from a small can",
+     "accion": "raising a small spray can and spraying it forward, then lowering it, keeps facing the same direction",
      "frames": 8,
      "direcciones": [
       "north"
@@ -2639,7 +2688,7 @@
      "nombre": "comer",
      "herramienta": "animate_character",
      "modo": "v3",
-     "accion": "eating a sandwich quickly",
+     "accion": "quickly eating a sandwich with both hands, keeps facing the same direction",
      "frames": 6,
      "direcciones": [
       "north"
@@ -2650,25 +2699,29 @@
     {
      "nombre": "herido",
      "herramienta": "animate_character",
-     "plantilla": "taking-punch",
      "direcciones": [
       "north"
      ],
      "fps": 10,
-     "bucle": false
+     "bucle": false,
+     "modo": "v3",
+     "accion": "flinching backwards after being punched and recovering the guard, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "desmayo",
      "herramienta": "animate_character",
-     "plantilla": "falling-back-death",
      "direcciones": [
       "north"
      ],
      "fps": 8,
-     "bucle": false
+     "bucle": false,
+     "frames": 6,
+     "modo": "v3",
+     "accion": "staggering, dropping to the knees and collapsing to the ground, keeps facing the same direction"
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "familia": "personaje",
    "previo": {
     "herramienta": "create_image_pro",
@@ -2676,25 +2729,41 @@
      "width": 64,
      "height": 64,
      "no_background": true,
-     "description": "young adult street grower, green baseball cap with darker green brim, short dark brown hair, light skin, red t-shirt, navy blue jeans, dark sneakers, battle stance, full body, front view, same outfit and colors"
-    },
-    "entrada": {
-     "reference_images": [
-      {
-       "archivo": "art/procesado/player/base/south/00.png",
-       "usage": "character base: same person, outfit and colors"
-      }
+     "seed": 601,
+     "description": "Front-facing battle sprite of the same young man as the reference, for an early-2000s 32-bit handheld RPG battle screen: full body, standing in a fighting stance with fists up, facing the viewer, feet at the bottom. Polished professional pixel art, same face, hair, green baseball cap worn forwards with darker green visor, bright red t-shirt, navy jeans and sneakers as the reference, proportions about 3 heads tall, figure about 56 pixels tall. Clean continuous 1px dark outline, 3-4 tone cel shading with light from the top-left, crisp pixels, no anti-aliasing, transparent background.",
+     "reference_image": "character base: same person, face, outfit and colors",
+     "style_image": "player F1 (create_image_pro 60afdb75, candidato 17)",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
      ]
     },
-    "elegir": "1 de los 16 candidatos",
-    "guarda": "art/crudo/_ref/player-combate.png"
+    "elegir": "1 de los 16 candidatos (se eligió el 1)",
+    "guarda": "art/crudo/_ref/player-combate.png",
+    "job": "36b0d7f3-60e5-4fc5-af80-ee74b122484c"
    },
    "entrada": {
     "reference_image_base64": "art/crudo/_ref/player-combate.png"
    },
    "depende_de": [
     "player"
-   ]
+   ],
+   "pixellab": {
+    "create_image_pro_job": "36b0d7f3-60e5-4fc5-af80-ee74b122484c",
+    "character_id": "624ec064-aec5-449a-82b6-e3b534641acf",
+    "animation_group_id": {
+     "idle": "7b2863dc-4d0c-4037-a7a8-6eff16478782",
+     "golpe": "0ef2b762-0ab9-45c2-b907-ae86fcebe0e9",
+     "patada": "89746b68-208f-4348-bde7-a31f08f500d5",
+     "spray": "983d1449-765a-42f8-bb9e-be4cca35babb",
+     "comer": "f30502ad-2de1-43e0-8ce4-bc7fb92fd2ea",
+     "herido": "b66585db-1ee4-471e-94ea-a28a1dcea78e",
+     "desmayo": "095d5f15-36c0-485e-bcd8-0dafbece7948"
+    },
+    "notas_animacion": "v3 a medida, keep_first_frame false; plantillas no (en F1 salían de espaldas). Si un fotograma (encajado por los pies del primero) se sale de la celda por arriba, se baja lo justo (1 px en 3 fotogramas de ladrones)."
+   },
+   "coste_real": 28
   },
   {
    "id": "ladron1-combate",
@@ -2706,64 +2775,103 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 64,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"cartoon\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/ladron1_south_x2.png"
    ],
-   "descripcion": "street thief in a dark grey hoodie with the hood up, scarf over the mouth, menacing stance",
+   "descripcion": "street thief in a dark grey hoodie with the hood up, grey scarf over the mouth, dark jeans, worn sneakers, fists up, menacing. 32-bit handheld RPG battle sprite, clean dark outline.",
    "celda": "combate",
    "animaciones": [
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "fight-stance-idle-8-frames",
      "direcciones": [
       "south"
      ],
      "fps": 8,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "menacing fighting stance idle, shoulders hunched, bouncing lightly on the feet, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "ataque",
      "herramienta": "animate_character",
-     "plantilla": "lead-jab",
      "direcciones": [
       "south"
      ],
      "fps": 12,
-     "bucle": false
+     "bucle": false,
+     "frames": 6,
+     "modo": "v3",
+     "accion": "stepping forward and throwing a fast straight punch with the right fist, then pulling back into the fighting stance, empty hands, keeps facing the same direction",
+     "notas": "repetida: «hook punch» le sacó un gancho/palanca en la mano; sin «hook» y con «empty hands, no effects»."
     },
     {
      "nombre": "herido",
      "herramienta": "animate_character",
-     "plantilla": "taking-punch",
      "direcciones": [
       "south"
      ],
      "fps": 10,
-     "bucle": false
+     "bucle": false,
+     "modo": "v3",
+     "accion": "flinching backwards after being punched and recovering the stance, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "huir",
      "herramienta": "animate_character",
-     "plantilla": "running-6-frames",
      "direcciones": [
       "east"
      ],
      "fps": 12,
-     "bucle": true
+     "bucle": true,
+     "frames": 6,
+     "modo": "v3",
+     "accion": "running away fast, fleeing, arms pumping, keeps facing the same direction"
     }
    ],
-   "estado": "pendiente",
-   "familia": "personaje"
+   "estado": "aprobado",
+   "familia": "personaje",
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 64,
+     "height": 64,
+     "no_background": true,
+     "seed": 603,
+     "description": "Front-facing battle sprite of a street thief for an early-2000s 32-bit handheld RPG battle screen: full body, menacing fighting stance facing the viewer, feet at the bottom. Dark grey hoodie with the hood up, grey scarf over the mouth, dark jeans, worn sneakers, narrow angry eyes. Polished professional pixel art, proportions about 3 heads tall, figure about 56 pixels tall, clean continuous 1px dark outline, 3-4 tone cel shading with light from the top-left, crisp pixels, no anti-aliasing, transparent background.",
+     "reference_image": "only body proportions and drawing style; not the face, clothes or colors",
+     "style_image": "player F1 (create_image_pro 60afdb75, candidato 17)",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 16 candidatos (se eligió el 0)",
+    "guarda": "art/crudo/_ref/ladron1-combate.png",
+    "job": "47ca304b-2bcb-46fc-ba0b-44e21036b517"
+   },
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/ladron1-combate.png"
+   },
+   "pixellab": {
+    "create_image_pro_job": "47ca304b-2bcb-46fc-ba0b-44e21036b517",
+    "character_id": "e1746633-5958-4374-9bff-970065aac5d2",
+    "animation_group_id": {
+     "idle": "232aee1d-bb81-4e81-b8e2-dd82d6c8bd55",
+     "ataque": "f90adaa9-f151-4596-9140-a4eae9d81bf5",
+     "herido": "cce540d4-2864-4ac9-a3ef-ea964edcf653",
+     "huir": "3105daaf-0f68-49c2-8af7-186c10ca78bd"
+    },
+    "notas_animacion": "v3 a medida, keep_first_frame false; plantillas no (en F1 salían de espaldas). Si un fotograma (encajado por los pies del primero) se sale de la celda por arriba, se baja lo justo (1 px en 3 fotogramas de ladrones)."
+   },
+   "coste_real": 26
   },
   {
    "id": "ladron2-combate",
@@ -2775,64 +2883,102 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 64,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"cartoon\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/ladron2_south_x2.png"
    ],
-   "descripcion": "street thief in a dark purple hoodie with the hood up, scarf over the mouth, menacing stance",
+   "descripcion": "street thief in a dark purple hoodie with the hood up, black scarf over the mouth, black trousers, white sneakers, fists up, menacing. 32-bit handheld RPG battle sprite, clean dark outline.",
    "celda": "combate",
    "animaciones": [
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "fight-stance-idle-8-frames",
      "direcciones": [
       "south"
      ],
      "fps": 8,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "menacing fighting stance idle, shoulders hunched, bouncing lightly on the feet, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "ataque",
      "herramienta": "animate_character",
-     "plantilla": "lead-jab",
      "direcciones": [
       "south"
      ],
      "fps": 12,
-     "bucle": false
+     "bucle": false,
+     "frames": 6,
+     "modo": "v3",
+     "accion": "lunging forward with a quick hook punch and pulling back to guard, keeps facing the same direction"
     },
     {
      "nombre": "herido",
      "herramienta": "animate_character",
-     "plantilla": "taking-punch",
      "direcciones": [
       "south"
      ],
      "fps": 10,
-     "bucle": false
+     "bucle": false,
+     "modo": "v3",
+     "accion": "flinching backwards after being punched and recovering the stance, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "huir",
      "herramienta": "animate_character",
-     "plantilla": "running-6-frames",
      "direcciones": [
       "east"
      ],
      "fps": 12,
-     "bucle": true
+     "bucle": true,
+     "frames": 6,
+     "modo": "v3",
+     "accion": "running away fast, fleeing, arms pumping, keeps facing the same direction"
     }
    ],
-   "estado": "pendiente",
-   "familia": "personaje"
+   "estado": "aprobado",
+   "familia": "personaje",
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 64,
+     "height": 64,
+     "no_background": true,
+     "seed": 604,
+     "description": "Front-facing battle sprite of a street thief for an early-2000s 32-bit handheld RPG battle screen: full body, menacing fighting stance facing the viewer, feet at the bottom. Dark purple hoodie with the hood up, black scarf over the mouth, black trousers, white sneakers, narrow angry eyes. Polished professional pixel art, proportions about 3 heads tall, figure about 56 pixels tall, clean continuous 1px dark outline, 3-4 tone cel shading with light from the top-left, crisp pixels, no anti-aliasing, transparent background.",
+     "reference_image": "only body proportions and drawing style; not the face, clothes or colors",
+     "style_image": "player F1 (create_image_pro 60afdb75, candidato 17)",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 16 candidatos (se eligió el 0)",
+    "guarda": "art/crudo/_ref/ladron2-combate.png",
+    "job": "9e60ced0-552f-4250-87e8-be8be0cb5078"
+   },
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/ladron2-combate.png"
+   },
+   "pixellab": {
+    "create_image_pro_job": "9e60ced0-552f-4250-87e8-be8be0cb5078",
+    "character_id": "67412c16-24fd-4d36-91b7-1c60991e324a",
+    "animation_group_id": {
+     "idle": "fa0948af-be71-4438-bd9c-5613bc0e3169",
+     "ataque": "74ea02ff-00ac-499e-b969-883e0d8e45c6",
+     "herido": "fd9301ef-9d5a-4cf9-a188-936788bd7c23",
+     "huir": "648c25d2-d8cf-4151-ad60-794a75c5a500"
+    },
+    "notas_animacion": "v3 a medida, keep_first_frame false; plantillas no (en F1 salían de espaldas). Si un fotograma (encajado por los pies del primero) se sale de la celda por arriba, se baja lo justo (1 px en 3 fotogramas de ladrones)."
+   },
+   "coste_real": 25
   },
   {
    "id": "ladron3-combate",
@@ -2844,64 +2990,103 @@
    ],
    "herramienta": "create_character",
    "parametros": {
-    "mode": "standard",
-    "n_directions": 4,
+    "mode": "v3",
     "size": 64,
-    "view": "low top-down",
-    "proportions": "{\"type\": \"preset\", \"name\": \"cartoon\"}",
-    "outline": "single color black outline",
-    "shading": "basic shading",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/ladron3_south_x2.png"
    ],
-   "descripcion": "street thief in a dark green hoodie with the hood up, scarf over the mouth, menacing stance",
+   "descripcion": "street thief in a dark green hoodie with the hood up, brown scarf over the mouth, grey cargo trousers, black boots, fists up, menacing. 32-bit handheld RPG battle sprite, clean dark outline.",
    "celda": "combate",
    "animaciones": [
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "fight-stance-idle-8-frames",
      "direcciones": [
       "south"
      ],
      "fps": 8,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "menacing fighting stance idle, shoulders hunched, bouncing lightly on the feet, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "ataque",
      "herramienta": "animate_character",
-     "plantilla": "lead-jab",
      "direcciones": [
       "south"
      ],
      "fps": 12,
-     "bucle": false
+     "bucle": false,
+     "frames": 6,
+     "modo": "v3",
+     "accion": "lunging forward with a quick hook punch and pulling back to guard, keeps facing the same direction"
     },
     {
      "nombre": "herido",
      "herramienta": "animate_character",
-     "plantilla": "taking-punch",
      "direcciones": [
       "south"
      ],
      "fps": 10,
-     "bucle": false
+     "bucle": false,
+     "modo": "v3",
+     "accion": "recoiling backwards from a hit to the face, head snapping back, then recovering the fighting stance, empty hands, no effects, keeps facing the same direction",
+     "frames": 4,
+     "notas": "repetida: la primera traía una bola de fuego; sin «hook» y con «empty hands, no effects»."
     },
     {
      "nombre": "huir",
      "herramienta": "animate_character",
-     "plantilla": "running-6-frames",
      "direcciones": [
       "east"
      ],
      "fps": 12,
-     "bucle": true
+     "bucle": true,
+     "frames": 6,
+     "modo": "v3",
+     "accion": "running away fast, fleeing, arms pumping, keeps facing the same direction"
     }
    ],
-   "estado": "pendiente",
-   "familia": "personaje"
+   "estado": "aprobado",
+   "familia": "personaje",
+   "previo": {
+    "herramienta": "create_image_pro",
+    "parametros": {
+     "width": 64,
+     "height": 64,
+     "no_background": true,
+     "seed": 605,
+     "description": "Front-facing battle sprite of a street thief for an early-2000s 32-bit handheld RPG battle screen: full body, menacing fighting stance facing the viewer, feet at the bottom. Dark green hoodie with the hood up, brown scarf over the mouth, grey cargo trousers, black boots, narrow angry eyes. Polished professional pixel art, proportions about 3 heads tall, figure about 56 pixels tall, clean continuous 1px dark outline, 3-4 tone cel shading with light from the top-left, crisp pixels, no anti-aliasing, transparent background.",
+     "reference_image": "only body proportions and drawing style; not the face, clothes or colors",
+     "style_image": "player F1 (create_image_pro 60afdb75, candidato 17)",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
+     ]
+    },
+    "elegir": "1 de los 16 candidatos (se eligió el 0)",
+    "guarda": "art/crudo/_ref/ladron3-combate.png",
+    "job": "f6be4391-7259-499c-a7a0-0798636733c2"
+   },
+   "entrada": {
+    "reference_image_base64": "art/crudo/_ref/ladron3-combate.png"
+   },
+   "pixellab": {
+    "create_image_pro_job": "f6be4391-7259-499c-a7a0-0798636733c2",
+    "character_id": "5e5ddab0-5e2b-4536-ac21-1df1860ee8a0",
+    "animation_group_id": {
+     "idle": "fa18d0a9-5a4e-4e95-9c7d-a91bc801afdd",
+     "ataque": "e30c35ad-fff6-4551-8414-3ec872962f70",
+     "herido": "58d75d35-da26-4fd3-9b7a-4b5ed950138d",
+     "huir": "c25507dc-23cc-4c99-bcea-1ac279108a8f"
+    },
+    "notas_animacion": "v3 a medida, keep_first_frame false; plantillas no (en F1 salían de espaldas). Si un fotograma (encajado por los pies del primero) se sale de la celda por arriba, se baja lo justo (1 px en 3 fotogramas de ladrones)."
+   },
+   "coste_real": 26
   },
   {
    "id": "policia-combate",
@@ -2914,31 +3099,31 @@
    "parametros": {
     "mode": "v3",
     "size": 64,
-    "view": "low top-down",
-    "outline": "single color black outline",
-    "detail": "medium detail"
+    "view": "low top-down"
    },
    "referencias": [
     "art/referencias/estilo/cop_south_x2.png"
    ],
-   "descripcion": "police officer, navy peaked cap, light blue shirt, navy tie, notebook in hand, stern",
+   "descripcion": "police officer holding a small notebook: navy peaked cap with the peak in front, light blue short-sleeve shirt, navy tie and trousers, radio on the shoulder, stern. 32-bit handheld RPG battle sprite, clean dark outline.",
    "celda": "combate",
    "animaciones": [
     {
      "nombre": "idle",
      "herramienta": "animate_character",
-     "plantilla": "breathing-idle",
      "direcciones": [
       "south"
      ],
      "fps": 4,
-     "bucle": true
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, stern, keeps facing the same direction",
+     "frames": 4
     },
     {
      "nombre": "alto",
      "herramienta": "animate_character",
      "modo": "v3",
-     "accion": "pointing a finger forward and shouting stop",
+     "accion": "pointing a finger forward and shouting stop, keeps facing the same direction",
      "frames": 8,
      "direcciones": [
       "south"
@@ -2950,7 +3135,7 @@
      "nombre": "multa",
      "herramienta": "animate_character",
      "modo": "v3",
-     "accion": "writing a fine in a small notebook",
+     "accion": "taking out a small notepad and writing a fine ticket with a pen, then tearing the page off and holding it out, keeps facing the same direction",
      "frames": 8,
      "direcciones": [
       "south"
@@ -2962,7 +3147,7 @@
      "nombre": "soborno",
      "herramienta": "animate_character",
      "modo": "v3",
-     "accion": "glancing around and slipping an envelope into the pocket",
+     "accion": "glancing left and right, then reaching out a hand palm up and quickly pocketing something, keeps facing the same direction",
      "frames": 8,
      "direcciones": [
       "south"
@@ -2973,15 +3158,17 @@
     {
      "nombre": "perseguir",
      "herramienta": "animate_character",
-     "plantilla": "running-6-frames",
      "direcciones": [
       "east"
      ],
      "fps": 12,
-     "bucle": true
+     "bucle": true,
+     "frames": 6,
+     "modo": "v3",
+     "accion": "running fast in pursuit, arms pumping, keeps facing the same direction"
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "familia": "personaje",
    "previo": {
     "herramienta": "create_image_pro",
@@ -2989,18 +3176,19 @@
      "width": 64,
      "height": 64,
      "no_background": true,
-     "description": "police officer, navy peaked cap, light blue shirt, navy tie, notebook in hand, stern, full body, front view, same outfit and colors"
-    },
-    "entrada": {
-     "reference_images": [
-      {
-       "archivo": "art/procesado/cop/base/south/00.png",
-       "usage": "character base: same person, outfit and colors"
-      }
+     "seed": 602,
+     "description": "Front-facing battle sprite of the same police officer as the reference, for an early-2000s 32-bit handheld RPG battle screen: full body, standing stern and facing the viewer, holding a small notebook, feet at the bottom. Polished professional pixel art, same navy peaked cap with the peak in front, light blue short-sleeve shirt, navy tie and trousers, radio on the shoulder as the reference, proportions about 3 heads tall, figure about 56 pixels tall. Clean continuous 1px dark outline, 3-4 tone cel shading with light from the top-left, crisp pixels, no anti-aliasing, transparent background.",
+     "reference_image": "character base: same person, face, uniform and colors",
+     "style_image": "player F1 (create_image_pro 60afdb75, candidato 17)",
+     "style_copy": [
+      "outline",
+      "detail",
+      "shading"
      ]
     },
-    "elegir": "1 de los 16 candidatos",
-    "guarda": "art/crudo/_ref/policia-combate.png"
+    "elegir": "1 de los 16 candidatos (se eligió el 3)",
+    "guarda": "art/crudo/_ref/policia-combate.png",
+    "job": "6bef7fc7-a98f-4b11-9d31-b7e04fd25c11"
    },
    "entrada": {
     "reference_image_base64": "art/crudo/_ref/policia-combate.png"
@@ -3008,7 +3196,20 @@
    "depende_de": [
     "cop"
    ],
-   "notas": "Dos pasos para no perder la identidad: create_image_pro con el sprite aprobado como referencia (16 candidatos a 64 px, con detalle real, no un ×2) y create_character v3 con el elegido, que lo rota a 8 direcciones y queda animable."
+   "notas": "Dos pasos para no perder la identidad: create_image_pro con el sprite aprobado como referencia (16 candidatos a 64 px, con detalle real, no un ×2) y create_character v3 con el elegido, que lo rota a 8 direcciones y queda animable.",
+   "pixellab": {
+    "create_image_pro_job": "6bef7fc7-a98f-4b11-9d31-b7e04fd25c11",
+    "character_id": "c17a4648-c4f0-4d9f-9187-87d6f1c85956",
+    "animation_group_id": {
+     "idle": "a112289f-a187-49e7-8c70-214e3fa1108f",
+     "alto": "ba6be0b4-0dd8-4811-a004-55149c3873be",
+     "multa": "8687cc84-7190-4255-921e-46675f23fd20",
+     "soborno": "054635af-0868-4fbb-841f-8e2e865fb5fd",
+     "perseguir": "0a44695a-e6c2-44b5-a74e-d237df35f7a0"
+    },
+    "notas_animacion": "v3 a medida, keep_first_frame false; plantillas no (en F1 salían de espaldas). Si un fotograma (encajado por los pies del primero) se sale de la celda por arriba, se baja lo justo (1 px en 3 fotogramas de ladrones)."
+   },
+   "coste_real": 26
   },
   {
    "id": "fondo-combate-ladron",
@@ -3019,27 +3220,34 @@
    ],
    "herramienta": "create_image_pixflux",
    "parametros": {
-    "width": 240,
-    "height": 160,
-    "no_background": false,
+    "init_image_strength": 250,
     "view": "side",
-    "outline": "lineless",
     "shading": "medium shading",
-    "detail": "medium detail",
-    "init_image_strength": 150
+    "detail": "highly detailed",
+    "no_background": false,
+    "seed": 453,
+    "width": 240,
+    "height": 160
    },
    "referencias": [
     "art/referencias/combate/fondo-ladron.png"
    ],
    "entrada": {
-    "init_image_base64": "art/referencias/combate/fondo-ladron.png",
-    "color_image_base64": "art/paleta/ribera.png"
+    "init_image_base64": "art/referencias/combate/fondo-ladron.png"
    },
-   "descripcion": "dark city alley at night, brick walls, lit windows, wet asphalt ground, empty foreground, 16-bit handheld battle background, two flat oval ground platforms (top right and bottom left)",
+   "descripcion": "dark city alley at night, brick walls, lit windows, wet asphalt ground, empty foreground, 16-bit handheld battle background, two flat oval ground platforms: one on the right side in the middle distance and one bottom left, detailed crisp pixel art",
    "celda": "pantalla",
-   "estado": "pendiente",
+   "estado": "aprobado",
    "familia": "imagen",
-   "notas": "img2img: init_image = el fondo actual (mantiene horizonte y plataformas donde el motor pone a los luchadores); init_image_strength 150 deja redibujar con detalle sin mover la composición."
+   "notas": "img2img: init_image = el fondo actual (mantiene horizonte y plataformas donde el motor pone a los luchadores); init_image_strength 150 deja redibujar con detalle sin mover la composición. Sin color_image: el procesado ya bloquea la paleta. La entrada se mandó cuantizada a 32 colores en paleta (~1,5 KB de base64).",
+   "pixellab": {
+    "image_job": "dc43b457-c210-40a9-8808-02a964676e7a"
+   },
+   "descartado": {
+    "id": "c96a4747-60df-4a0d-9720-33f9bc47f5d0",
+    "motivo": "con init_image_strength 150 desapareció la plataforma del rival"
+   },
+   "coste_real": 2
   },
   {
    "id": "fondo-combate-policia",
@@ -3050,27 +3258,30 @@
    ],
    "herramienta": "create_image_pixflux",
    "parametros": {
-    "width": 240,
-    "height": 160,
-    "no_background": false,
+    "init_image_strength": 150,
     "view": "side",
-    "outline": "lineless",
     "shading": "medium shading",
-    "detail": "medium detail",
-    "init_image_strength": 150
+    "detail": "highly detailed",
+    "no_background": false,
+    "seed": 451,
+    "width": 240,
+    "height": 160
    },
    "referencias": [
     "art/referencias/combate/fondo-policia.png"
    ],
    "entrada": {
-    "init_image_base64": "art/referencias/combate/fondo-policia.png",
-    "color_image_base64": "art/paleta/ribera.png"
+    "init_image_base64": "art/referencias/combate/fondo-policia.png"
    },
-   "descripcion": "sunny city street by day, building facades, sidewalk and asphalt ground, empty foreground, 16-bit handheld battle background, two flat oval ground platforms (top right and bottom left)",
+   "descripcion": "sunny city street by day, building facades, sidewalk and asphalt ground, empty foreground, 16-bit handheld battle background, two flat oval ground platforms (top right and bottom left), detailed crisp pixel art",
    "celda": "pantalla",
-   "estado": "pendiente",
+   "estado": "aprobado",
    "familia": "imagen",
-   "notas": "img2img: init_image = el fondo actual (mantiene horizonte y plataformas donde el motor pone a los luchadores); init_image_strength 150 deja redibujar con detalle sin mover la composición."
+   "notas": "img2img: init_image = el fondo actual (mantiene horizonte y plataformas donde el motor pone a los luchadores); init_image_strength 150 deja redibujar con detalle sin mover la composición. Sin color_image: el procesado ya bloquea la paleta. La entrada se mandó cuantizada a 32 colores en paleta (~1,5 KB de base64).",
+   "pixellab": {
+    "image_job": "2cc3534d-ea3c-48a2-b56b-d1663fe96aaa"
+   },
+   "coste_real": 1
   },
   {
    "id": "tiles-exterior",
@@ -3095,7 +3306,8 @@
     "tile_type": "square_topdown",
     "tile_size": 16,
     "tile_view": "top-down",
-    "style_options": "{\"color_palette\": true, \"outline\": true, \"detail\": true, \"shading\": true}"
+    "style_options": "{\"color_palette\": true, \"outline\": true, \"detail\": true, \"shading\": true}",
+    "seed": 401
    },
    "referencias": [
     "art/referencias/tiles/grass.png",
@@ -3123,12 +3335,12 @@
    },
    "celda": "tile",
    "notas": "Cada tile tiene que ser repetible (bordes que casan): revísalo en mosaico 3×3. Las animaciones se hacen sobre un bloque de 2×2 casillas (tile_bloque) y el motor pinta el cuadrante que toca según (x%2, y%2).",
-   "estado": "pendiente",
+   "estado": "aprobado",
    "animaciones": [
     {
      "nombre": "agua",
      "herramienta": "animate_image",
-     "accion": "calm river water gently rippling, seamless loop",
+     "accion": "calm river water gently rippling and shimmering in place, seamless loop, the tile pattern stays aligned",
      "frames": 4,
      "fps": 4,
      "bucle": true,
@@ -3137,12 +3349,15 @@
       32,
       32
      ],
-     "celda": "tile_bloque"
+     "celda": "tile_bloque",
+     "seed": 421,
+     "job": "f441e96e-076e-4d09-ab40-5546f627d07a",
+     "notas": "animate_image sobre el bloque 2×2 del tile; devuelve frame_count+1 imágenes, la 0 es la entrada y no se usa."
     },
     {
      "nombre": "flores",
      "herramienta": "animate_image",
-     "accion": "tiny flowers swaying in the breeze",
+     "accion": "tiny flowers and grass blades swaying gently in a light breeze, seamless loop, the tile pattern stays aligned",
      "frames": 4,
      "fps": 3,
      "bucle": true,
@@ -3151,12 +3366,15 @@
       32,
       32
      ],
-     "celda": "tile_bloque"
+     "celda": "tile_bloque",
+     "seed": 422,
+     "job": "f6e839e6-f149-4bcf-881b-01f1c0908060",
+     "notas": "animate_image sobre el bloque 2×2 del tile; devuelve frame_count+1 imágenes, la 0 es la entrada y no se usa."
     },
     {
      "nombre": "hierba-pisada",
      "herramienta": "animate_image",
-     "accion": "tall grass rustling as someone steps in",
+     "accion": "tall grass rustling and bending outward as someone steps into it, then settling back, the tile pattern stays aligned",
      "frames": 4,
      "fps": 12,
      "bucle": false,
@@ -3165,10 +3383,45 @@
       32,
       32
      ],
-     "celda": "tile_bloque"
+     "celda": "tile_bloque",
+     "seed": 423,
+     "job": "b59c23bc-72c4-4c48-997e-4ac36a48db5b",
+     "notas": "animate_image sobre el bloque 2×2 del tile; devuelve frame_count+1 imágenes, la 0 es la entrada y no se usa."
     }
    ],
-   "familia": "mapa-terreno"
+   "familia": "mapa-terreno",
+   "segunda_llamada": {
+    "descripcion": "1). packed light brown dirt path with tiny pebbles 2). packed light brown dirt path, plain 3). wooden bridge planks running vertically with a dark wooden rail along the BOTTOM edge 4). wooden bridge planks running vertically with a dark wooden rail along the TOP edge",
+    "seed": 403,
+    "style_images": [
+     "(png enviado en línea)",
+     "(png enviado en línea)",
+     "(png enviado en línea)",
+     "art/referencias/tiles/dirt.png"
+    ],
+    "motivo": "tierra y puentes con la barandilla en el borde correcto (en la primera salían al revés)"
+   },
+   "elegidos": {
+    "grass": "1.ª llamada, tile 0",
+    "flowers": "1.ª llamada, tile 4",
+    "tallgrass": "1.ª llamada, tile 8",
+    "walk": "1.ª llamada, tile 1",
+    "roadT": "1.ª llamada, tile 9",
+    "roadB": "1.ª llamada, tile 13",
+    "plaza": "1.ª llamada, tile 10",
+    "water": "1.ª llamada, tile 2",
+    "dock": "1.ª llamada, tile 15",
+    "dirt": "2.ª llamada, tile 4",
+    "bridgeB": "2.ª llamada, tile 2",
+    "bridgeT": "2.ª llamada, tile 3"
+   },
+   "pixellab": {
+    "tiles_pro_id": [
+     "73bdb899-4473-4f8e-91fe-620704e58cc3",
+     "dadbfb00-a983-4607-8499-f9caab8114dc"
+    ]
+   },
+   "coste_real": 43
   },
   {
    "id": "tileset-transiciones",
@@ -3222,19 +3475,18 @@
    "id": "interior-home",
    "tipo": "tiles",
    "fase": "F4",
-   "herramienta": "create_building_kit",
+   "herramienta": "create_tiles_pro",
    "cubre": [
     "tile:floor",
     "tile:iwT_home",
     "tile:iwB_home"
    ],
    "parametros": {
-    "wall_description": "cream wallpaper walls with thin vertical stripes",
-    "floor_description": "light wooden plank floor",
     "tile_type": "square_topdown",
     "tile_size": 16,
-    "wall_tiles": 2,
-    "layout": "materials"
+    "tile_view": "top-down",
+    "style_options": "{\"color_palette\": true, \"outline\": true, \"detail\": true, \"shading\": true}",
+    "seed": 404
    },
    "referencias": [
     "art/referencias/tiles/iwT_home.png",
@@ -3243,26 +3495,49 @@
    ],
    "descripcion": "cream wallpaper walls with thin vertical stripes and light wooden plank floor",
    "celda": "tile",
-   "estado": "pendiente",
-   "familia": "mapa-terreno"
+   "estado": "aprobado",
+   "familia": "mapa-terreno",
+   "descartado": {
+    "herramienta": "create_building_kit",
+    "id": "a0faa398-f027-434b-8ac2-29f23410d8e0",
+    "motivo": "piezas de 24×42 en perspectiva con suelo de 16×12: no casan con la rejilla cenital de 16 px"
+   },
+   "entrada": {
+    "style_images": [
+     "art/referencias/tiles/iwT_home.png",
+     "art/referencias/tiles/iwB_home.png",
+     "art/referencias/tiles/floor.png",
+     "art/referencias/tiles/floorS.png"
+    ]
+   },
+   "descripcion_lote": "1). upper part of a cream wallpaper wall with thin vertical stripes and a darker cornice band along the top edge 2). lower part of a cream wallpaper wall with thin vertical stripes and a white skirting board along the bottom edge 3). light wooden plank floor 4). upper part of a mint green wallpaper wall with thin vertical stripes and a darker cornice band along the top edge 5). lower part of a mint green wallpaper wall with thin vertical stripes and a white skirting board along the bottom edge 6). light checkered shop floor tiles 7). upper part of a dark wood panel wall with a darker cornice band along the top edge 8). lower part of a dark wood panel wall with a dark skirting board along the bottom edge 9). dark wooden plank floor",
+   "elegidos": {
+    "iwT_home": "tile 0",
+    "iwB_home": "tile 1",
+    "floor": "tile 2"
+   },
+   "pixellab": {
+    "tiles_pro_id": "d356aa99-1baa-46a9-9ef6-0e2ef82c9087",
+    "building_kit_descartado": "a0faa398-f027-434b-8ac2-29f23410d8e0"
+   },
+   "coste_real": 26.7
   },
   {
    "id": "interior-shop",
    "tipo": "tiles",
    "fase": "F4",
-   "herramienta": "create_building_kit",
+   "herramienta": "create_tiles_pro",
    "cubre": [
     "tile:floorS",
     "tile:iwT_shop",
     "tile:iwB_shop"
    ],
    "parametros": {
-    "wall_description": "mint green wallpaper walls",
-    "floor_description": "light checkered shop floor tiles",
     "tile_type": "square_topdown",
     "tile_size": 16,
-    "wall_tiles": 2,
-    "layout": "materials"
+    "tile_view": "top-down",
+    "style_options": "{\"color_palette\": true, \"outline\": true, \"detail\": true, \"shading\": true}",
+    "seed": 404
    },
    "referencias": [
     "art/referencias/tiles/iwT_shop.png",
@@ -3271,26 +3546,49 @@
    ],
    "descripcion": "mint green wallpaper walls and light checkered shop floor tiles",
    "celda": "tile",
-   "estado": "pendiente",
-   "familia": "mapa-terreno"
+   "estado": "aprobado",
+   "familia": "mapa-terreno",
+   "descartado": {
+    "herramienta": "create_building_kit",
+    "id": "93f72f1c-bad4-43d4-99d3-579622261ccc",
+    "motivo": "piezas de 24×42 en perspectiva con suelo de 16×12: no casan con la rejilla cenital de 16 px"
+   },
+   "entrada": {
+    "style_images": [
+     "art/referencias/tiles/iwT_home.png",
+     "art/referencias/tiles/iwB_home.png",
+     "art/referencias/tiles/floor.png",
+     "art/referencias/tiles/floorS.png"
+    ]
+   },
+   "descripcion_lote": "1). upper part of a cream wallpaper wall with thin vertical stripes and a darker cornice band along the top edge 2). lower part of a cream wallpaper wall with thin vertical stripes and a white skirting board along the bottom edge 3). light wooden plank floor 4). upper part of a mint green wallpaper wall with thin vertical stripes and a darker cornice band along the top edge 5). lower part of a mint green wallpaper wall with thin vertical stripes and a white skirting board along the bottom edge 6). light checkered shop floor tiles 7). upper part of a dark wood panel wall with a darker cornice band along the top edge 8). lower part of a dark wood panel wall with a dark skirting board along the bottom edge 9). dark wooden plank floor",
+   "elegidos": {
+    "iwT_shop": "tile 3",
+    "iwB_shop": "tile 4",
+    "floorS": "tile 5"
+   },
+   "pixellab": {
+    "tiles_pro_id": "d356aa99-1baa-46a9-9ef6-0e2ef82c9087",
+    "building_kit_descartado": "93f72f1c-bad4-43d4-99d3-579622261ccc"
+   },
+   "coste_real": 26.7
   },
   {
    "id": "interior-bar",
    "tipo": "tiles",
    "fase": "F4",
-   "herramienta": "create_building_kit",
+   "herramienta": "create_tiles_pro",
    "cubre": [
     "tile:floorB",
     "tile:iwT_bar",
     "tile:iwB_bar"
    ],
    "parametros": {
-    "wall_description": "dark wood panel walls",
-    "floor_description": "dark wooden plank floor",
     "tile_type": "square_topdown",
     "tile_size": 16,
-    "wall_tiles": 2,
-    "layout": "materials"
+    "tile_view": "top-down",
+    "style_options": "{\"color_palette\": true, \"outline\": true, \"detail\": true, \"shading\": true}",
+    "seed": 404
    },
    "referencias": [
     "art/referencias/tiles/iwT_bar.png",
@@ -3299,8 +3597,32 @@
    ],
    "descripcion": "dark wood panel walls and dark wooden plank floor",
    "celda": "tile",
-   "estado": "pendiente",
-   "familia": "mapa-terreno"
+   "estado": "aprobado",
+   "familia": "mapa-terreno",
+   "descartado": {
+    "herramienta": "create_building_kit",
+    "id": "9beb41ae-a174-4853-b9a4-af2308d6d0aa",
+    "motivo": "piezas de 24×42 en perspectiva con suelo de 16×12: no casan con la rejilla cenital de 16 px"
+   },
+   "entrada": {
+    "style_images": [
+     "art/referencias/tiles/iwT_home.png",
+     "art/referencias/tiles/iwB_home.png",
+     "art/referencias/tiles/floor.png",
+     "art/referencias/tiles/floorS.png"
+    ]
+   },
+   "descripcion_lote": "1). upper part of a cream wallpaper wall with thin vertical stripes and a darker cornice band along the top edge 2). lower part of a cream wallpaper wall with thin vertical stripes and a white skirting board along the bottom edge 3). light wooden plank floor 4). upper part of a mint green wallpaper wall with thin vertical stripes and a darker cornice band along the top edge 5). lower part of a mint green wallpaper wall with thin vertical stripes and a white skirting board along the bottom edge 6). light checkered shop floor tiles 7). upper part of a dark wood panel wall with a darker cornice band along the top edge 8). lower part of a dark wood panel wall with a dark skirting board along the bottom edge 9). dark wooden plank floor",
+   "elegidos": {
+    "iwT_bar": "tile 6",
+    "iwB_bar": "tile 7",
+    "floorB": "tile 8"
+   },
+   "pixellab": {
+    "tiles_pro_id": "d356aa99-1baa-46a9-9ef6-0e2ef82c9087",
+    "building_kit_descartado": "9beb41ae-a174-4853-b9a4-af2308d6d0aa"
+   },
+   "coste_real": 26.7
   },
   {
    "id": "tiles-interior-extra",
@@ -3314,7 +3636,9 @@
    "parametros": {
     "tile_type": "square_topdown",
     "tile_size": 16,
-    "tile_view": "top-down"
+    "tile_view": "top-down",
+    "style_options": "{\"color_palette\": true, \"outline\": true, \"detail\": true, \"shading\": true}",
+    "seed": 402
    },
    "referencias": [
     "art/referencias/tiles/mat.png",
@@ -3326,16 +3650,24 @@
      "art/referencias/tiles/tent.png"
     ]
    },
-   "descripcion": "1). red door mat on wooden floor 2). reflective silver mylar grow tent floor",
+   "descripcion": "1). red door mat lying on a light wooden plank floor 2). reflective silver mylar grow tent floor sheet",
    "celda": "tile",
-   "estado": "pendiente",
-   "familia": "mapa-terreno"
+   "estado": "aprobado",
+   "familia": "mapa-terreno",
+   "elegidos": {
+    "mat": "tile 0",
+    "tent": "tile 1"
+   },
+   "pixellab": {
+    "tiles_pro_id": "4133a7c9-404f-4222-82f6-e5cfcba146a3"
+   },
+   "coste_real": 20
   },
   {
    "id": "edificio-home",
    "tipo": "edificio",
    "fase": "F4",
-   "herramienta": "create_map_object",
+   "herramienta": "create_image_pixflux",
    "cubre": [
     "tile:roofT_home",
     "tile:roofB_home",
@@ -3344,25 +3676,29 @@
     "tile:door_home"
    ],
    "parametros": {
+    "init_image_strength": 30,
     "view": "high top-down",
-    "outline": "single color outline",
-    "shading": "basic shading",
-    "detail": "medium detail",
-    "inpainting": "{\"type\": \"mask\", \"mask_image\": \"<entrada.inpainting.mask_image en base64>\"}"
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": false,
+    "seed": 434,
+    "width": 112,
+    "height": 96
    },
    "referencias": [
     "art/referencias/tiles/roofT_home.png",
     "art/referencias/tiles/wall_home.png"
    ],
-   "descripcion": "small two-storey town building seen from a high top-down angle, red tiled roof, cream walls, white-framed windows, wooden door, a small brass number plate",
+   "descripcion": "wide two-storey town house facade for a 16-bit handheld RPG town map, filling the whole image: red clay tiled roof with rounded tile rows and a dark eave across the full width, cream walls with siding, two white-framed windows with blue glass and window sills, a wooden front door with a small porch light and brass number plate at the bottom center, detailed crisp pixel art, clean dark outline, light from the top-left",
    "celda": "edificio_7x6",
-   "notas": "Se dibuja como un solo objeto encima de las casillas del edificio; las colisiones siguen siendo las del mapa. La puerta tiene que caer en la columna de la puerta del mapa. Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
-   "estado": "pendiente",
+   "notas": "Se dibuja como un solo objeto encima de las casillas del edificio; las colisiones siguen siendo las del mapa. La puerta tiene que caer en la columna de la puerta del mapa. create_map_object y create_image_pro devuelven casas estrechas: img2img de pixflux con init_image_strength 30 sobre la huella redibuja con detalle a todo lo ancho y deja la puerta en su columna.",
+   "estado": "aprobado",
    "animaciones": [
     {
      "nombre": "puerta",
      "herramienta": "animate_image",
-     "accion": "the door swings open",
+     "accion": "the wooden front door swinging open inwards, revealing a dark doorway",
      "frames": 4,
      "fps": 12,
      "bucle": false,
@@ -3371,23 +3707,51 @@
       32,
       32
      ],
-     "celda": "puerta"
+     "celda": "puerta",
+     "seed": 440,
+     "job": "2c685d3c-239f-4560-9049-39f0a62aa307",
+     "notas": "0 = recorte exacto de la fachada (puerta cerrada, x40 y64 32×32); 1-3 = fotogramas 2-4 de animate_image (abriéndose). La entrada se mandó cuantizada a ≤24 colores en paleta para que el base64 quepa."
     }
    ],
    "familia": "mapa-objeto",
    "entrada": {
-    "background_image": "art/referencias/mapa/edificio-home.png",
-    "inpainting.mask_image": "art/referencias/mapa/edificio-home_mascara.png"
+    "init_image_base64": "art/crudo/_ref/huella-edificio-home.png"
    },
    "depende_de": [
     "tiles-exterior"
-   ]
+   ],
+   "entrada_origen": "calco: el edificio montado con los tiles procedurales (tools/sprites/calco.js), 112×96",
+   "pixellab": {
+    "image_job": "e739c7ac-8df5-4657-ac86-be7b7b35313b"
+   },
+   "descartados": {
+    "create_map_object": {
+     "id": "dbd7ef5e-abd4-416a-9188-1b8a82773e17",
+     "motivo": "casa estrecha (~76 px) que no cubre la huella de 112 px"
+    },
+    "create_image_pro": {
+     "id": "1d10875c-2f13-43b1-a0ce-fcde8b74d8cb",
+     "motivo": "igual de estrecha"
+    },
+    "pixflux_150_100": {
+     "ids": [
+      "fd914eae-41f1-48e0-8c70-1ed4ea7b9dec",
+      "c61f9ad3-2f2e-45c8-9193-137a4b6be65c"
+     ],
+     "motivo": "init_image_strength 150/100: casi sin cambios"
+    },
+    "pixflux_50": {
+     "id": "3a0fde64-f255-455c-9e4c-f886c0e3292a",
+     "motivo": "menos detalle que con 30"
+    }
+   },
+   "coste_real": 26
   },
   {
    "id": "edificio-shop",
    "tipo": "edificio",
    "fase": "F4",
-   "herramienta": "create_map_object",
+   "herramienta": "create_image_pixflux",
    "cubre": [
     "tile:roofT_shop",
     "tile:roofB_shop",
@@ -3396,25 +3760,29 @@
     "tile:door_shop"
    ],
    "parametros": {
+    "init_image_strength": 30,
     "view": "high top-down",
-    "outline": "single color outline",
-    "shading": "basic shading",
-    "detail": "medium detail",
-    "inpainting": "{\"type\": \"mask\", \"mask_image\": \"<entrada.inpainting.mask_image en base64>\"}"
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": false,
+    "seed": 435,
+    "width": 112,
+    "height": 96
    },
    "referencias": [
     "art/referencias/tiles/roofT_shop.png",
     "art/referencias/tiles/wall_shop.png"
    ],
-   "descripcion": "small two-storey town building seen from a high top-down angle, green tiled roof, pale green walls, white-framed windows, glass shop door, a green cross sign and seed posters in the windows",
+   "descripcion": "wide two-storey grow shop facade for a 16-bit handheld RPG town map, filling the whole image: green clay tiled roof with rounded tile rows and a dark eave across the full width, mint green walls with siding, shop windows with white frames, a glass shop door at the bottom center with a small green leaf sign above it, detailed crisp pixel art, clean dark outline, light from the top-left",
    "celda": "edificio_7x6",
-   "notas": "Se dibuja como un solo objeto encima de las casillas del edificio; las colisiones siguen siendo las del mapa. La puerta tiene que caer en la columna de la puerta del mapa. Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
-   "estado": "pendiente",
+   "notas": "Se dibuja como un solo objeto encima de las casillas del edificio; las colisiones siguen siendo las del mapa. La puerta tiene que caer en la columna de la puerta del mapa. create_map_object y create_image_pro devuelven casas estrechas: img2img de pixflux con init_image_strength 30 sobre la huella redibuja con detalle a todo lo ancho y deja la puerta en su columna.",
+   "estado": "aprobado",
    "animaciones": [
     {
      "nombre": "puerta",
      "herramienta": "animate_image",
-     "accion": "the door swings open",
+     "accion": "the glass shop door sliding open to the side, revealing a dark doorway",
      "frames": 4,
      "fps": 12,
      "bucle": false,
@@ -3423,23 +3791,30 @@
       32,
       32
      ],
-     "celda": "puerta"
+     "celda": "puerta",
+     "seed": 441,
+     "job": "ad4fec48-ad7e-48ea-a91f-2ae83b78be99",
+     "notas": "0 = recorte exacto de la fachada (puerta cerrada, x40 y64 32×32); 1-3 = fotogramas 2-4 de animate_image (abriéndose). La entrada se mandó cuantizada a ≤24 colores en paleta para que el base64 quepa."
     }
    ],
    "familia": "mapa-objeto",
    "entrada": {
-    "background_image": "art/referencias/mapa/edificio-shop.png",
-    "inpainting.mask_image": "art/referencias/mapa/edificio-shop_mascara.png"
+    "init_image_base64": "art/crudo/_ref/huella-edificio-shop.png"
    },
    "depende_de": [
     "tiles-exterior"
-   ]
+   ],
+   "entrada_origen": "calco: el edificio montado con los tiles procedurales (tools/sprites/calco.js), 112×96",
+   "pixellab": {
+    "image_job": "860b53b7-418e-405b-aa73-a8bcf9a706de"
+   },
+   "coste_real": 2
   },
   {
    "id": "edificio-bar",
    "tipo": "edificio",
    "fase": "F4",
-   "herramienta": "create_map_object",
+   "herramienta": "create_image_pixflux",
    "cubre": [
     "tile:roofT_bar",
     "tile:roofB_bar",
@@ -3448,25 +3823,29 @@
     "tile:door_bar"
    ],
    "parametros": {
+    "init_image_strength": 30,
     "view": "high top-down",
-    "outline": "single color outline",
-    "shading": "basic shading",
-    "detail": "medium detail",
-    "inpainting": "{\"type\": \"mask\", \"mask_image\": \"<entrada.inpainting.mask_image en base64>\"}"
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": false,
+    "seed": 436,
+    "width": 112,
+    "height": 96
    },
    "referencias": [
     "art/referencias/tiles/roofT_bar.png",
     "art/referencias/tiles/wall_bar.png"
    ],
-   "descripcion": "small two-storey town building seen from a high top-down angle, blue tiled roof, pale blue-grey walls, white-framed windows, dark wooden door, an anchor-shaped sign",
+   "descripcion": "wide two-storey neighbourhood bar facade for a 16-bit handheld RPG town map, filling the whole image: blue slate tiled roof with tile rows and a dark eave across the full width, pale blue-grey walls with siding, windows with white frames and warm light inside, a dark wooden bar door at the bottom center with a small hanging sign, detailed crisp pixel art, clean dark outline, light from the top-left",
    "celda": "edificio_7x6",
-   "notas": "Se dibuja como un solo objeto encima de las casillas del edificio; las colisiones siguen siendo las del mapa. La puerta tiene que caer en la columna de la puerta del mapa. Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
-   "estado": "pendiente",
+   "notas": "Se dibuja como un solo objeto encima de las casillas del edificio; las colisiones siguen siendo las del mapa. La puerta tiene que caer en la columna de la puerta del mapa. create_map_object y create_image_pro devuelven casas estrechas: img2img de pixflux con init_image_strength 30 sobre la huella redibuja con detalle a todo lo ancho y deja la puerta en su columna.",
+   "estado": "aprobado",
    "animaciones": [
     {
      "nombre": "puerta",
      "herramienta": "animate_image",
-     "accion": "the door swings open",
+     "accion": "the wooden bar door swinging open inwards, revealing a dark doorway",
      "frames": 4,
      "fps": 12,
      "bucle": false,
@@ -3475,23 +3854,30 @@
       32,
       32
      ],
-     "celda": "puerta"
+     "celda": "puerta",
+     "seed": 442,
+     "job": "6de49b33-cd93-454c-8b13-6610d82dde74",
+     "notas": "0 = recorte exacto de la fachada (puerta cerrada, x40 y64 32×32); 1-3 = fotogramas 2-4 de animate_image (abriéndose). La entrada se mandó cuantizada a ≤24 colores en paleta para que el base64 quepa."
     }
    ],
    "familia": "mapa-objeto",
    "entrada": {
-    "background_image": "art/referencias/mapa/edificio-bar.png",
-    "inpainting.mask_image": "art/referencias/mapa/edificio-bar_mascara.png"
+    "init_image_base64": "art/crudo/_ref/huella-edificio-bar.png"
    },
    "depende_de": [
     "tiles-exterior"
-   ]
+   ],
+   "entrada_origen": "calco: el edificio montado con los tiles procedurales (tools/sprites/calco.js), 112×96",
+   "pixellab": {
+    "image_job": "f43b0083-61cf-48c6-bae1-93140a4373c5"
+   },
+   "coste_real": 2
   },
   {
    "id": "edificio-gray",
    "tipo": "edificio",
    "fase": "F4",
-   "herramienta": "create_map_object",
+   "herramienta": "create_image_pixflux",
    "cubre": [
     "tile:roofT_gray",
     "tile:roofB_gray",
@@ -3499,28 +3885,36 @@
     "tile:win_gray"
    ],
    "parametros": {
+    "init_image_strength": 30,
     "view": "high top-down",
-    "outline": "single color outline",
-    "shading": "basic shading",
-    "detail": "medium detail",
-    "inpainting": "{\"type\": \"mask\", \"mask_image\": \"<entrada.inpainting.mask_image en base64>\"}"
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": false,
+    "seed": 437,
+    "width": 96,
+    "height": 96
    },
    "referencias": [
     "art/referencias/tiles/roofT_gray.png",
     "art/referencias/tiles/wall_gray.png"
    ],
-   "descripcion": "small two-storey town building seen from a high top-down angle, grey slate roof, pink-beige walls, white-framed windows, no door, closed shutters",
+   "descripcion": "two-storey old closed-down town house facade for a 16-bit handheld RPG town map, filling the whole image: grey slate tiled roof with tile rows and a dark eave across the full width, faded pink-beige plaster walls, windows with closed grey wooden shutters, no door, a small crack and a drainpipe, detailed crisp pixel art, clean dark outline, light from the top-left",
    "celda": "edificio_6x6",
-   "notas": "Se dibuja como un solo objeto encima de las casillas del edificio; las colisiones siguen siendo las del mapa. La puerta tiene que caer en la columna de la puerta del mapa. Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
-   "estado": "pendiente",
+   "notas": "Se dibuja como un solo objeto encima de las casillas del edificio; las colisiones siguen siendo las del mapa. La puerta tiene que caer en la columna de la puerta del mapa. Sin puerta: PixelLab pintó una; se sustituyó por la ventana de la izquierda clonada (bloque 40×32 de x10,y64 a x50,y64). create_map_object y create_image_pro devuelven casas estrechas: img2img de pixflux con init_image_strength 30 sobre la huella redibuja con detalle a todo lo ancho y deja la puerta en su columna.",
+   "estado": "aprobado",
    "familia": "mapa-objeto",
    "entrada": {
-    "background_image": "art/referencias/mapa/edificio-gray.png",
-    "inpainting.mask_image": "art/referencias/mapa/edificio-gray_mascara.png"
+    "init_image_base64": "art/crudo/_ref/huella-edificio-gray.png"
    },
    "depende_de": [
     "tiles-exterior"
-   ]
+   ],
+   "entrada_origen": "calco: el edificio montado con los tiles procedurales (tools/sprites/calco.js), 96×96",
+   "pixellab": {
+    "image_job": "c1b3849c-9e8f-4266-9a54-1b6566c921eb"
+   },
+   "coste_real": 1
   },
   {
    "id": "props-16",
@@ -3571,7 +3965,51 @@
      "small round bar table with a glass",
      "retro jukebox with lights",
      "wall window with sky view",
-     "framed poster with a green leaf"
+     "framed poster with a green leaf",
+     "short wooden fence segment",
+     "small wooden signboard on a post",
+     "wooden park bench",
+     "wooden fish crate",
+     "round leafy bush",
+     "desk with an old computer monitor",
+     "lab table with a microscope",
+     "lab table with glass flasks",
+     "small wooden table",
+     "wall shelf with jars",
+     "shop counter segment",
+     "rack of seed packets",
+     "potted monstera plant",
+     "dark wooden bar counter segment",
+     "wall shelf with liquor bottles",
+     "red bar stool",
+     "small round bar table with a glass",
+     "retro jukebox with lights",
+     "wall window with sky view",
+     "framed poster with a green leaf",
+     "short wooden fence segment",
+     "small wooden signboard on a post",
+     "wooden park bench",
+     "wooden fish crate",
+     "round leafy bush",
+     "desk with an old computer monitor",
+     "lab table with a microscope",
+     "lab table with glass flasks",
+     "small wooden table",
+     "wall shelf with jars",
+     "shop counter segment",
+     "rack of seed packets",
+     "potted monstera plant",
+     "dark wooden bar counter segment",
+     "wall shelf with liquor bottles",
+     "red bar stool",
+     "small round bar table with a glass",
+     "retro jukebox with lights",
+     "wall window with sky view",
+     "framed poster with a green leaf",
+     "wooden park bench",
+     "retro jukebox with lights",
+     "rack of seed packets",
+     "lab table with glass flasks"
     ]
    },
    "referencias": [
@@ -3592,16 +4030,18 @@
    "descripcion": "set of small 16-bit town and interior props, same style as the reference sheet",
    "celda": "objeto_1x1",
    "notas": "Sin size: las imágenes de estilo (16×16) fijan el tamaño, así que salen 64 candidatos en revisión. Elige con select_object_frames y descarta el resto con dismiss_review. Lo que cuelga de la pared (botellas, ventana interior, póster) se encaja con «exacto» (ajuste_por_sprite): conserva su altura en la casilla en vez de apoyarse en el suelo.",
-   "estado": "pendiente",
+   "estado": "aprobado",
    "animaciones": [
     {
      "nombre": "luces",
      "herramienta": "animate_object",
      "sobre": "obj:jukebox",
-     "accion": "lights blinking in sequence",
+     "accion": "jukebox lights blinking in sequence, the jukebox itself stays still, seamless loop",
      "frames": 4,
      "fps": 6,
-     "bucle": true
+     "bucle": true,
+     "object_id": "d7579f26-7339-4a08-a4f7-f2afe4fd782a",
+     "animation_group_id": "b8ab5959-409b-4b9a-8f69-64720b38da2d"
     }
    ],
    "ajuste_por_sprite": {
@@ -3609,7 +4049,94 @@
     "iwin": "exacto",
     "poster": "exacto"
    },
-   "familia": "objeto-lote"
+   "familia": "objeto-lote",
+   "descripcion_lote": "set of small 16-bit town and interior props for a handheld pixel-art RPG, same style as the reference images, clean dark outline, transparent background",
+   "elegidos": {
+    "fence": {
+     "candidato": 20,
+     "object_id": "a67b4099-e96a-42c3-98b1-94377d7b4087"
+    },
+    "sign": {
+     "candidato": 1,
+     "object_id": "c751945c-4bd2-42a1-8c1d-a4d0fc66fd22"
+    },
+    "bench": {
+     "candidato": 2,
+     "object_id": "964909b4-3049-4c34-867d-c8a53302cb71"
+    },
+    "crate": {
+     "candidato": 3,
+     "object_id": "756efbb5-b34a-446b-b173-d1102b22e051"
+    },
+    "bush": {
+     "candidato": 4,
+     "object_id": "2fee9ea4-29e9-4473-9347-69fca32ad98b"
+    },
+    "pc": {
+     "candidato": 5,
+     "object_id": "8d767bc3-13c0-4082-acf5-fd5d495484c1"
+    },
+    "lab": {
+     "candidato": 6,
+     "object_id": "c6efbe9f-285e-4a14-9853-4be8253b47a1"
+    },
+    "lab2": {
+     "candidato": 27,
+     "object_id": "b382eed5-f710-410f-8c77-48caed8aa2eb"
+    },
+    "table": {
+     "candidato": 8,
+     "object_id": "af1c298f-2c6b-4855-bd46-bc46f19fb71c"
+    },
+    "shelfW": {
+     "candidato": 29,
+     "object_id": "13e1823e-b9a0-48e1-a3b6-a2333121dfa0"
+    },
+    "counter": {
+     "candidato": 10,
+     "object_id": "728b1e55-1c43-42e5-a6b7-b3caad203423"
+    },
+    "display": {
+     "candidato": 51,
+     "object_id": "95de7560-aa93-4544-8814-3d85b5a0d820"
+    },
+    "plantDeco": {
+     "candidato": 12,
+     "object_id": "dd4a7d9b-7c5b-4b31-a436-93bffe46d5d7"
+    },
+    "barcounter": {
+     "candidato": 13,
+     "object_id": "7e8aafee-4c1e-4e6e-b903-e38d4adf6c32"
+    },
+    "bottles": {
+     "candidato": 34,
+     "object_id": "d5113ca4-e3c9-4de1-8e9c-dc60b183d7a7"
+    },
+    "stool": {
+     "candidato": 15,
+     "object_id": "63d8eb75-fd19-4148-aa92-49429edd0446"
+    },
+    "btable": {
+     "candidato": 16,
+     "object_id": "5395cf0c-7e3d-47ec-8253-2a833cc6b1fc"
+    },
+    "jukebox": {
+     "candidato": 17,
+     "object_id": "d7579f26-7339-4a08-a4f7-f2afe4fd782a"
+    },
+    "iwin": {
+     "candidato": 18,
+     "object_id": "21986af6-f984-4d2c-9f04-cfb8cb2d0bb9"
+    },
+    "poster": {
+     "candidato": 59,
+     "object_id": "c626989e-a788-4f92-8c50-556f0e029407"
+    }
+   },
+   "pixellab": {
+    "object_id": "9b59e169-9bd8-4def-a225-b7b080fdef22"
+   },
+   "coste_real": 21
   },
   {
    "id": "props-32",
@@ -3635,9 +4162,21 @@
    "descripcion": "larger 16-bit indoor props that overhang their tile",
    "celda": "objeto_alto",
    "notas": "La cama ocupa bedT+bedB (16×32). Los props altos de exterior (árbol, farola, fuente) van aparte con create_map_object para casar con el suelo.",
-   "estado": "pendiente",
+   "estado": "aprobado",
    "familia": "objeto-lote",
-   "lote": "lote-32"
+   "lote": "lote-32",
+   "elegidos": {
+    "fridge": {
+     "candidato": 17,
+     "object_id": "cfc7ae6a-131a-4f0c-931a-e2cf3a743349"
+    },
+    "bed": {
+     "candidato": 33,
+     "object_id": "ada92429-163f-4ec9-a077-db2af344085e",
+     "notas": "una cama de 19×32: bedT = las filas de arriba, bedB = las 16 de abajo"
+    }
+   },
+   "coste_real": 2.9
   },
   {
    "id": "prop-arbol",
@@ -3646,12 +4185,12 @@
    "cubre": [
     "obj:tree"
    ],
-   "descripcion": "round leafy town tree with a short trunk, casting a small shadow on the grass",
+   "descripcion": "round leafy town tree with a short brown trunk, dense green canopy with highlights on the top-left, casting a small shadow on the grass, clean 16-bit handheld RPG pixel art, same style and light as the surrounding map",
    "celda": "objeto_alto",
    "referencias": [
     "art/referencias/objetos/tree.png"
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "herramienta": "create_map_object",
    "familia": "mapa-objeto",
    "parametros": {
@@ -3665,10 +4204,14 @@
     "background_image": "art/referencias/mapa/tree.png",
     "inpainting.mask_image": "art/referencias/mapa/tree_mascara.png"
    },
-   "notas": " Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
+   "notas": " Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera. Recorte y máscara en base64 (los PNG de art/referencias/mapa caben; si no, se cuantizan en paleta).",
    "depende_de": [
     "tiles-exterior"
-   ]
+   ],
+   "pixellab": {
+    "map_object_id": "15df7a0c-ef08-436b-a971-4e9652703f71"
+   },
+   "coste_real": 1
   },
   {
    "id": "prop-farola",
@@ -3677,12 +4220,12 @@
    "cubre": [
     "obj:lamp"
    ],
-   "descripcion": "tall black iron street lamp on the sidewalk",
+   "descripcion": "tall black iron street lamp on the sidewalk, thin pole with a small square glass lantern on top, clean 16-bit handheld RPG pixel art, same style and light as the surrounding map",
    "celda": "objeto_alto",
    "referencias": [
     "art/referencias/objetos/lamp.png"
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "herramienta": "create_map_object",
    "familia": "mapa-objeto",
    "parametros": {
@@ -3696,10 +4239,14 @@
     "background_image": "art/referencias/mapa/lamp.png",
     "inpainting.mask_image": "art/referencias/mapa/lamp_mascara.png"
    },
-   "notas": " Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
+   "notas": " Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera. Recorte y máscara en base64 (los PNG de art/referencias/mapa caben; si no, se cuantizan en paleta).",
    "depende_de": [
     "tiles-exterior"
-   ]
+   ],
+   "pixellab": {
+    "map_object_id": "d2dccb60-6f91-443e-a722-a73560ec4097"
+   },
+   "coste_real": 1
   },
   {
    "id": "prop-fuente",
@@ -3708,12 +4255,12 @@
    "cubre": [
     "obj:fountain"
    ],
-   "descripcion": "small round stone fountain with a water spout in a paved plaza",
+   "descripcion": "small round stone fountain with a water spout in a paved plaza, grey stone basin with blue water, clean 16-bit handheld RPG pixel art, same style and light as the surrounding map",
    "celda": "objeto_alto",
    "referencias": [
     "art/referencias/objetos/fountain.png"
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "herramienta": "create_map_object",
    "familia": "mapa-objeto",
    "parametros": {
@@ -3727,7 +4274,7 @@
     "background_image": "art/referencias/mapa/fountain.png",
     "inpainting.mask_image": "art/referencias/mapa/fountain_mascara.png"
    },
-   "notas": " Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
+   "notas": " Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera. Recorte y máscara en base64 (los PNG de art/referencias/mapa caben; si no, se cuantizan en paleta).",
    "depende_de": [
     "tiles-exterior"
    ],
@@ -3736,42 +4283,63 @@
      "nombre": "agua",
      "herramienta": "animate_image",
      "sobre": "obj:fountain",
-     "accion": "water splashing from the spout and falling into the basin, seamless loop",
+     "accion": "water splashing from the spout and falling into the basin, the stone fountain stays still, seamless loop",
      "frames": 6,
      "fps": 8,
      "bucle": true,
      "lienzo": [
       32,
       32
-     ]
+     ],
+     "seed": 460,
+     "job": "c20612b5-4f6e-49b2-a9d0-ad844d06a55d",
+     "entrada": "art/crudo/_ref/fuente-32.png (la fuente generada recortada a 32×32: x8 y12)",
+     "notas": "La entrada viajó sin alfa (fondo negro): el negro pegado a los bordes se vuelve transparente al montar el crudo."
     }
-   ]
+   ],
+   "pixellab": {
+    "map_object_id": "9dc1a027-cec4-46b3-92e8-d73ab59ea743"
+   },
+   "coste_real": 2
   },
   {
    "id": "carpa-cultivo",
    "tipo": "objeto",
    "fase": "F4",
-   "herramienta": "create_map_object",
+   "herramienta": "create_image_pixflux",
    "cubre": [],
    "parametros": {
+    "init_image_strength": 60,
     "view": "high top-down",
-    "outline": "single color outline",
-    "shading": "basic shading",
-    "detail": "medium detail",
-    "inpainting": "{\"type\": \"mask\", \"mask_image\": \"<entrada.inpainting.mask_image en base64>\"}"
+    "outline": "single color black outline",
+    "shading": "medium shading",
+    "detail": "highly detailed",
+    "no_background": false,
+    "seed": 438,
+    "width": 64,
+    "height": 112
    },
-   "descripcion": "open indoor grow tent frame seen from above, silver reflective walls, a hanging LED grow lamp at the top",
+   "descripcion": "open indoor grow tent seen from above for a 16-bit handheld RPG room, black metal frame poles at the corners, silver reflective mylar walls, a rectangular LED grow light panel hanging above the top edge with glowing yellow-white diodes, light silver floor inside, detailed crisp pixel art, clean dark outline, light from the top-left",
    "celda": "carpa",
-   "notas": "Sustituye al marco dibujado por código en renderWorld (casa). Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera.",
-   "estado": "pendiente",
+   "notas": "Sustituye al marco dibujado por código en renderWorld (casa). Por encima del marco (y<17) el fondo liso se vuelve transparente por relleno desde los bordes; el interior plateado se queda opaco y las macetas se pintan encima.",
+   "estado": "aprobado",
    "familia": "mapa-objeto",
    "entrada": {
-    "background_image": "art/referencias/mapa/carpa.png",
-    "inpainting.mask_image": "art/referencias/mapa/carpa_mascara.png"
+    "init_image_base64": "art/crudo/_ref/huella-carpa.png"
    },
    "depende_de": [
     "interior-home"
-   ]
+   ],
+   "descartado": {
+    "herramienta": "create_map_object",
+    "id": "44f29671-73e9-4e03-a3fd-9acf6c8ae8e7",
+    "motivo": "forma rara (lámpara en cúpula y cortina negra justo donde van las macetas)"
+   },
+   "entrada_origen": "huella dibujada por script: marco, pared trasera de mylar, panel LED colgado y suelo con el tile tent",
+   "pixellab": {
+    "image_job": "64d4150e-bb3a-47d4-bd54-fbfe7c9be36c"
+   },
+   "coste_real": 2
   },
   {
    "id": "planta-fases",
@@ -3828,39 +4396,73 @@
      "#74d064": "#d8cc78"
     }
    },
-   "notas": "Los cogollos se piden en magenta para poder cambiarlos de color por variedad (rampa clave). Variante seca: el motor cambia la rampa de hojas por la seca. Plaga: capa vfx-acaros encima.",
+   "notas": "Los cogollos se piden en magenta para poder cambiarlos de color por variedad (rampa clave). Variante seca: el motor cambia la rampa de hojas por la seca. Plaga: capa vfx-acaros encima. Los negros con un leve tinte morado del contorno de la maceta caían en la rampa clave del cogollo (salían del color de la variedad): al montar el crudo se pasan a gris.",
    "animaciones": [
     {
      "nombre": "balanceo-vegetativo",
      "herramienta": "animate_object",
      "sobre": "planta:vegetativo",
-     "accion": "leaves swaying gently",
+     "accion": "leaves swaying gently in a light breeze, pot stays still, seamless loop",
      "frames": 4,
      "fps": 3,
-     "bucle": true
+     "bucle": true,
+     "object_id": "7087e84a-4b5b-4c3e-833e-7b50f0770af1",
+     "animation_group_id": "3683602b-eb13-4e73-8706-f5dd284168d6"
     },
     {
      "nombre": "balanceo-floracion",
      "herramienta": "animate_object",
      "sobre": "planta:floracion",
-     "accion": "leaves swaying gently",
+     "accion": "leaves and buds swaying gently in a light breeze, pot stays still, seamless loop",
      "frames": 4,
      "fps": 3,
-     "bucle": true
+     "bucle": true,
+     "object_id": "7db5dbf8-0381-496c-9ae6-b357a7517ef6",
+     "animation_group_id": "930b3f7a-1b36-44a6-9295-b2179d86d6ee"
     },
     {
      "nombre": "balanceo-lista",
      "herramienta": "animate_object",
      "sobre": "planta:lista",
-     "accion": "leaves swaying gently",
+     "accion": "leaves and heavy buds swaying gently in a light breeze, pot stays still, seamless loop",
      "frames": 4,
      "fps": 3,
-     "bucle": true
+     "bucle": true,
+     "object_id": "fcd86fa3-1e30-407d-9ed7-146bf618e6f3",
+     "animation_group_id": "c5b3b7d2-fc9d-4567-ac04-f9ec6c1f5f42"
     }
    ],
-   "estado": "pendiente",
+   "estado": "aprobado",
    "familia": "objeto-lote",
-   "lote": "lote-32"
+   "lote": "lote-32",
+   "elegidos": {
+    "germinando": {
+     "candidato": 35,
+     "object_id": "d5f3f304-456d-4988-8e81-8bbaa8b4e9e4"
+    },
+    "plantula": {
+     "candidato": 21,
+     "object_id": "a20f3e5b-7dc6-4f11-8de8-818f73a7ccec"
+    },
+    "vegetativo": {
+     "candidato": 22,
+     "object_id": "7087e84a-4b5b-4c3e-833e-7b50f0770af1"
+    },
+    "floracion": {
+     "candidato": 23,
+     "object_id": "7db5dbf8-0381-496c-9ae6-b357a7517ef6"
+    },
+    "lista": {
+     "candidato": 24,
+     "object_id": "fcd86fa3-1e30-407d-9ed7-146bf618e6f3"
+    },
+    "muerta": {
+     "candidato": 25,
+     "object_id": "902296de-1dda-4318-bc74-81a051a6e6ee"
+    },
+    "maceta-vacia": "derivada de germinando: lo que asoma por encima del borde de la maceta, fuera; el verde de dentro, a tierra"
+   },
+   "coste_real": 11.6
   },
   {
    "id": "iconos",
@@ -3891,10 +4493,65 @@
    },
    "descripcion": "16-bit inventory item icons",
    "celda": "icono",
-   "notas": "Para la Mochila, la tienda y los objetos del suelo (la bolsa del suelo se sustituye por el icono del objeto).",
-   "estado": "pendiente",
+   "notas": "Para la Mochila, la tienda y los objetos del suelo (la bolsa del suelo se sustituye por el icono del objeto). El motor solo usa la bolsa; los otros 12 iconos van al atlas para la Mochila.",
+   "estado": "aprobado",
    "familia": "objeto-lote",
-   "lote": "lote-16"
+   "lote": "lote-16",
+   "elegidos": {
+    "bolsa": {
+     "candidato": 24,
+     "object_id": "e60acf7d-f2fa-45d1-9e0e-dfd9d460a30f"
+    },
+    "abono": {
+     "candidato": 12,
+     "object_id": "1dd5e201-2e63-4fb2-90c5-d104775bdc6e"
+    },
+    "insecticida": {
+     "candidato": 13,
+     "object_id": "96af985c-799a-4474-bc50-73879e16d7f9"
+    },
+    "spray": {
+     "candidato": 14,
+     "object_id": "47a7ee5d-3c96-473e-8387-290ca13a4ac0"
+    },
+    "bocadillo": {
+     "candidato": 15,
+     "object_id": "76a30f82-7e41-4fab-9494-6acf6986fa28"
+    },
+    "semillas": {
+     "candidato": 16,
+     "object_id": "78e8b497-062e-4352-9d0f-f540244092db"
+    },
+    "cogollo": {
+     "candidato": 42,
+     "object_id": "ff8419a9-00c8-446f-8b23-09112fb9d2f9"
+    },
+    "billetes": {
+     "candidato": 18,
+     "object_id": "6891dcff-1c1b-43c7-aa76-be128ee4037a"
+    },
+    "lampara": {
+     "candidato": 44,
+     "object_id": "befe33b8-9190-4f50-a1e4-3b0b1ded0132"
+    },
+    "maceta": {
+     "candidato": 20,
+     "object_id": "63ec43db-6f7b-4d64-a2a0-544aaa5705e7"
+    },
+    "polinizador": {
+     "candidato": 21,
+     "object_id": "edb735fa-ad3e-4cf7-9520-ac12a5777896"
+    },
+    "trofeo": {
+     "candidato": 47,
+     "object_id": "14029955-a1e2-4be2-af3e-4ad076bd157e"
+    },
+    "monedas": {
+     "candidato": 23,
+     "object_id": "5e80d41f-24d7-4e17-a55f-27f31534023c"
+    }
+   },
+   "coste_real": 10.4
   },
   {
    "id": "cogollos-genoteca",
@@ -3929,10 +4586,29 @@
    },
    "descripcion": "cannabis bud icons for a strain collection",
    "celda": "cogollo",
-   "notas": "Una forma por tipo; el color de cada variedad sale de STRAINS[*].c con la rampa clave.",
-   "estado": "pendiente",
+   "notas": "Una forma por tipo; el color de cada variedad sale de STRAINS[*].c con la rampa clave. En el atlas para la Genoteca; el motor aún no los dibuja.",
+   "estado": "aprobado",
    "familia": "objeto-lote",
-   "lote": "lote-32"
+   "lote": "lote-32",
+   "elegidos": {
+    "indica": {
+     "candidato": 26,
+     "object_id": "686bd564-e424-4778-a3d7-2d3f2880ddb8"
+    },
+    "sativa": {
+     "candidato": 12,
+     "object_id": "5f373f5f-f200-4174-a3a0-5a9be16cc43b"
+    },
+    "hibrido": {
+     "candidato": 13,
+     "object_id": "14874b8c-a1b0-407d-8009-57e39cf0a342"
+    },
+    "legendario": {
+     "candidato": 29,
+     "object_id": "3ab95299-2818-4aa3-b32c-994d8d091bdf"
+    }
+   },
+   "coste_real": 5.7
   },
   {
    "id": "vfx-16",
@@ -3967,12 +4643,15 @@
       {
        "nombre": "efecto",
        "herramienta": "animate_object",
-       "accion": "thin wisp of cigarette smoke dissipating",
+       "accion": "thin wisp of cigarette smoke rising and dissipating into the air",
        "frames": 6,
        "fps": 10,
-       "bucle": false
+       "bucle": false,
+       "animation_group_id": "4007da0b-846c-4bf2-b36c-b9764a2c0205"
       }
-     ]
+     ],
+     "candidato": 27,
+     "object_id": "ba712f6d-b842-44da-ae69-a89a0480c82f"
     },
     {
      "id": "vfx-humo-puro",
@@ -3981,12 +4660,15 @@
       {
        "nombre": "efecto",
        "herramienta": "animate_object",
-       "accion": "thick puff of cigar smoke dissipating",
+       "accion": "thick puff of cigar smoke rising, expanding and dissipating",
        "frames": 6,
        "fps": 10,
-       "bucle": false
+       "bucle": false,
+       "animation_group_id": "0aabfead-606a-4d26-b0a7-18d2f1ac1dc0"
       }
-     ]
+     ],
+     "candidato": 26,
+     "object_id": "aa9197cc-0303-4c35-bb5b-ddae3d931dc8"
     },
     {
      "id": "vfx-humo-porro",
@@ -3995,12 +4677,15 @@
       {
        "nombre": "efecto",
        "herramienta": "animate_object",
-       "accion": "soft curl of pale smoke dissipating",
+       "accion": "soft curl of pale smoke rising, curling and dissipating",
        "frames": 6,
        "fps": 10,
-       "bucle": false
+       "bucle": false,
+       "animation_group_id": "716aac72-35dc-466e-a9ff-5a02d11bc636"
       }
-     ]
+     ],
+     "candidato": 52,
+     "object_id": "66aca9dd-3851-4267-8006-1726e78e07e3"
     },
     {
      "id": "vfx-humo-pipa",
@@ -4009,12 +4694,15 @@
       {
        "nombre": "efecto",
        "herramienta": "animate_object",
-       "accion": "small round puff of pipe smoke dissipating",
+       "accion": "small round puff of pipe smoke rising and dissipating",
        "frames": 6,
        "fps": 10,
-       "bucle": false
+       "bucle": false,
+       "animation_group_id": "e0e9655d-0bd0-4ebb-a7fd-acf734494218"
       }
-     ]
+     ],
+     "candidato": 28,
+     "object_id": "1f151cde-dffc-4b38-88bf-36c262f0ea78"
     },
     {
      "id": "vfx-golpe",
@@ -4023,12 +4711,15 @@
       {
        "nombre": "efecto",
        "herramienta": "animate_object",
-       "accion": "white and yellow impact spark dissipating",
+       "accion": "impact spark flashing bright, bursting outward and fading",
        "frames": 4,
        "fps": 10,
-       "bucle": false
+       "bucle": false,
+       "animation_group_id": "418a615f-2353-4a0a-a1f3-d8aad97508ab"
       }
-     ]
+     ],
+     "candidato": 29,
+     "object_id": "f031058f-9a8b-4b4d-a5e4-ca425ed4186a"
     },
     {
      "id": "vfx-gotas",
@@ -4037,12 +4728,15 @@
       {
        "nombre": "efecto",
        "herramienta": "animate_object",
-       "accion": "small water drops falling dissipating",
+       "accion": "small water drops falling down and splashing, then disappearing",
        "frames": 4,
        "fps": 10,
-       "bucle": false
+       "bucle": false,
+       "animation_group_id": "b7ed418d-de18-4f30-bf1d-72d987bc8861"
       }
-     ]
+     ],
+     "candidato": 30,
+     "object_id": "557cee2d-347c-4628-bcd1-e4fba357c8c9"
     },
     {
      "id": "vfx-brillo",
@@ -4051,12 +4745,15 @@
       {
        "nombre": "efecto",
        "herramienta": "animate_object",
-       "accion": "sparkle of light dissipating",
+       "accion": "sparkle of light twinkling, growing and fading out",
        "frames": 4,
        "fps": 10,
-       "bucle": false
+       "bucle": false,
+       "animation_group_id": "c368e8a2-7056-49d5-a5c9-9eefed16ce9e"
       }
-     ]
+     ],
+     "candidato": 6,
+     "object_id": "ed2e5a16-485d-40e6-af2c-0d2be543b340"
     },
     {
      "id": "vfx-polen",
@@ -4065,12 +4762,15 @@
       {
        "nombre": "efecto",
        "herramienta": "animate_object",
-       "accion": "golden pollen dust particles dissipating",
+       "accion": "golden pollen dust particles drifting outward and fading away",
        "frames": 6,
        "fps": 10,
-       "bucle": false
+       "bucle": false,
+       "animation_group_id": "7160729c-2299-4e52-a1fb-07086488d467"
       }
-     ]
+     ],
+     "candidato": 32,
+     "object_id": "e63d752e-20c5-4109-b94d-e7332b5c090c"
     },
     {
      "id": "vfx-acaros",
@@ -4079,16 +4779,19 @@
       {
        "nombre": "efecto",
        "herramienta": "animate_object",
-       "accion": "tiny red spider mites crawling dissipating",
+       "accion": "tiny red spider mites crawling around in place",
        "frames": 4,
        "fps": 10,
-       "bucle": false
+       "bucle": false,
+       "animation_group_id": "b19516a8-cebc-4b2a-8dc0-1bd73b3bbda7"
       }
      ],
      "cubre": [
       "planta-variante:plaga",
       "planta-variante:seca-plaga"
-     ]
+     ],
+     "candidato": 33,
+     "object_id": "1988dd11-c4ae-4960-9fcb-842567a10c95"
     },
     {
      "id": "vfx-monedas",
@@ -4097,12 +4800,15 @@
       {
        "nombre": "efecto",
        "herramienta": "animate_object",
-       "accion": "coins popping up dissipating",
+       "accion": "gold coins popping up, spinning and fading out",
        "frames": 6,
        "fps": 10,
-       "bucle": false
+       "bucle": false,
+       "animation_group_id": "3e49389b-d288-4980-a7ab-9abe5eecd500"
       }
-     ]
+     ],
+     "candidato": 34,
+     "object_id": "593e9d32-f49f-4697-b80b-6e20f70012e7"
     },
     {
      "id": "gaviota",
@@ -4111,12 +4817,15 @@
       {
        "nombre": "idle",
        "herramienta": "animate_object",
-       "accion": "seagull flapping its wings",
+       "accion": "seagull standing in place and flapping its wings, seamless loop",
        "frames": 4,
        "fps": 6,
-       "bucle": true
+       "bucle": true,
+       "animation_group_id": "261c872c-40aa-4245-aaa2-47624c123500"
       }
-     ]
+     ],
+     "candidato": 35,
+     "object_id": "a49571fb-4950-4dd1-8690-9b3e517bb3a2"
     },
     {
      "id": "paloma",
@@ -4125,20 +4834,24 @@
       {
        "nombre": "idle",
        "herramienta": "animate_object",
-       "accion": "pigeon pecking at the ground",
+       "accion": "pigeon standing in place pecking at the ground, seamless loop",
        "frames": 4,
        "fps": 6,
-       "bucle": true
+       "bucle": true,
+       "animation_group_id": "edd813c8-cf7a-4be7-9d76-79f6d286613d"
       }
-     ]
+     ],
+     "candidato": 36,
+     "object_id": "647fa02b-c1ec-487f-8055-d18201f5243c"
     }
    ],
    "descripcion": "small 16-bit effect sprites and tiny ambient creatures (seagull for the docks, pigeon next to Patxi)",
    "celda": "vfx",
-   "notas": "Una sola llamada: size 16 da 64 candidatos. Elige uno por item con select_object_frames; después anima cada objeto con animate_object.",
-   "estado": "pendiente",
+   "notas": "Una sola llamada: size 16 da 64 candidatos. Elige uno por item con select_object_frames; después anima cada objeto con animate_object. Algunos fotogramas traen una caja de fondo opaca pegada al borde (humo-cigarro 2, humo-porro 3, gotas 3): se vacía por relleno desde el borde al montar el crudo. El último de polen sale vacío y repite el anterior.",
+   "estado": "aprobado",
    "familia": "objeto-lote",
-   "lote": "lote-16"
+   "lote": "lote-16",
+   "coste_real": 21.6
   },
   {
    "id": "vfx-32",
@@ -4163,12 +4876,15 @@
       {
        "nombre": "efecto",
        "herramienta": "animate_object",
-       "accion": "big fluffy cloud of white vapor dissipating",
+       "accion": "big cloud of white vapor puffing out, billowing and dissipating",
        "frames": 8,
        "fps": 10,
-       "bucle": false
+       "bucle": false,
+       "animation_group_id": "c71032db-751e-4cbf-a53d-e6e0a3ff1086"
       }
-     ]
+     ],
+     "candidato": 15,
+     "object_id": "1152ac4f-b2df-42bf-a1e8-8414073c5aca"
     },
     {
      "id": "vfx-spray",
@@ -4177,19 +4893,24 @@
       {
        "nombre": "efecto",
        "herramienta": "animate_object",
-       "accion": "orange pepper spray mist dissipating",
+       "accion": "orange pepper spray mist spraying forward, spreading and dissipating",
        "frames": 6,
        "fps": 10,
-       "bucle": false
+       "bucle": false,
+       "animation_group_id": "5c2395b0-f205-4def-b15a-06da8cdd1b9c"
       }
-     ]
+     ],
+     "candidato": 16,
+     "object_id": "ecafea02-a0de-4508-97c9-e9cbb059df57"
     }
    ],
    "descripcion": "larger 16-bit effect sprites",
    "celda": "vfx_grande",
-   "estado": "pendiente",
+   "estado": "aprobado",
    "familia": "objeto-lote",
-   "lote": "lote-32"
+   "lote": "lote-32",
+   "notas": "Algunos fotogramas traen una caja de fondo opaca pegada al borde (humo-cigarro 2, humo-porro 3, gotas 3): se vacía por relleno desde el borde al montar el crudo. El último de polen sale vacío y repite el anterior.",
+   "coste_real": 4.9
   },
   {
    "id": "titulo",
@@ -4200,28 +4921,31 @@
     "misc:hoja-titulo"
    ],
    "parametros": {
-    "width": 240,
-    "height": 160,
-    "no_background": false,
+    "init_image_strength": 150,
     "view": "side",
-    "outline": "lineless",
     "shading": "medium shading",
-    "detail": "medium detail",
-    "init_image_strength": 150
+    "detail": "highly detailed",
+    "no_background": false,
+    "seed": 452,
+    "width": 240,
+    "height": 160
    },
    "referencias": [
     "art/referencias/misc/titulo.png",
     "art/referencias/misc/hoja-titulo.png"
    ],
    "entrada": {
-    "init_image_base64": "art/referencias/misc/titulo.png",
-    "color_image_base64": "art/paleta/ribera.png"
+    "init_image_base64": "art/referencias/misc/titulo.png"
    },
-   "descripcion": "night skyline of a riverside working-class town, lit windows reflected on the river, a large stylised green cannabis leaf glowing softly in the sky",
+   "descripcion": "night skyline of a riverside working-class town, lit windows reflected on the river, a large stylised green cannabis leaf glowing softly in the sky, starry night, 16-bit handheld title screen background, detailed crisp pixel art",
    "celda": "pantalla",
-   "estado": "pendiente",
+   "estado": "aprobado",
    "familia": "imagen",
-   "notas": "img2img sobre la pantalla de título actual: conserva el skyline, el río y el hueco central del logo."
+   "notas": "img2img sobre la pantalla de título actual: conserva el skyline, el río y el hueco central del logo. Sin color_image: el procesado ya bloquea la paleta. La entrada se mandó cuantizada a 32 colores en paleta (~1,5 KB de base64). El motor lo dibuja en la pantalla de título si está en el atlas (arteTitulo); sin atlas, el procedural.",
+   "pixellab": {
+    "image_job": "eed483f2-665a-4a16-9b8f-2c3eb929d421"
+   },
+   "coste_real": 1
   },
   {
    "id": "burbujas",
@@ -4331,13 +5055,27 @@
    "herramienta": "create_1_direction_object",
    "size": 16,
    "se_genera_en": "F3",
-   "nota": "iconos + VFX de 16 px en una sola llamada (24 de 64 huecos). Los props de 16 px van aparte porque llevan style_images."
+   "nota": "iconos + VFX de 16 px en una sola llamada (24 de 64 huecos). Los props de 16 px van aparte porque llevan style_images.",
+   "hecho": {
+    "object_id": "96fd85e5-83a5-4b39-b544-ad4a55268e25",
+    "descripcion": "small 16-bit effect sprites, tiny ambient birds and inventory item icons for a handheld pixel-art RPG, clean dark outline, limited bright palette, transparent background",
+    "seed": null,
+    "item_descriptions": "64 huecos (cada item repetido 2-4 veces para tener varios candidatos)",
+    "coste": 20
+   }
   },
   "lote-32": {
    "herramienta": "create_1_direction_object",
    "size": 32,
    "se_genera_en": "F3",
-   "nota": "plantas, nevera y cama, cogollos de la Genoteca y VFX grandes en una sola llamada (15 de 64 huecos)."
+   "nota": "plantas, nevera y cama, cogollos de la Genoteca y VFX grandes en una sola llamada (15 de 64 huecos).",
+   "hecho": {
+    "object_id": "803f5703-47a6-4eb4-bbb5-e003754ee706",
+    "descripcion": "16-bit handheld pixel-art RPG sprites: indoor grow game props, potted plants and effects, same pot and scale for every plant stage, clean dark outline, limited bright palette, transparent background",
+    "seed": null,
+    "item_descriptions": "64 huecos (cada item repetido 2-4 veces para tener varios candidatos)",
+    "coste": 20
+   }
   }
  }
 }

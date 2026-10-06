@@ -5,7 +5,7 @@
   2. Compila el juego con ese atlas en tools/salida/arte/ (el index.html de la raíz no se toca).
   3. Comprueba en Chromium: atlas cargado, caminar y correr, ambiente de los fumadores con su humo,
      que al hablar se corta, que un menor nunca fuma, acciones del jugador, cogollos con el color de la
-     variedad, planta seca, agua animada, combate, ?arte=procedural y un atlas parcial (solo el player, sin «east»).
+     variedad, planta seca, agua animada, combate, título, ?arte=procedural y un atlas parcial (solo el player, sin «east»).
   Salida: lista OK/FALLO + tools/salida/arte/kiko-fuma.png (tira de fotogramas para revisarla a ojo).
 
   Requisitos: npm run sprites:ref (referencias)   Uso: node tools/test-arte.js
@@ -61,6 +61,8 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     const { page, errors } = await abrir(html);
     const r0 = await page.evaluate(() => ({ ok: ARTE.ok, n: Object.keys(ARTE.fr).length, esperado: Object.keys(ATLAS.def.frames).length }));
     check('Atlas cargado y recortado', r0.ok && r0.n === r0.esperado && r0.n === N_CALCO, { ...r0, calco: N_CALCO });
+    const titulo = await page.evaluate(() => { const g = ARTE.cubre['misc:hoja-titulo'], m0 = mode; mode = 'title'; renderTitle(performance.now()); const d = ctx.getImageData(0, 0, 1, 1).data, f = frameDe(g, 'base', 'unica', 0, { i: 0 }), e = f.c.getContext('2d').getImageData(0, 0, 1, 1).data; mode = m0; return { g, igual: [0, 1, 2].every(i => d[i] === e[i]) }; });
+    check('Título: el fondo sale del atlas', titulo.g === 'titulo' && titulo.igual, titulo);
 
     const walk = await page.evaluate(() => {
       const g = grupoLook(LOOKS.player), idx = new Set(), keys = ATLAS.def.anims[g].walk.dirs.south;

@@ -1,5 +1,20 @@
 # Cambios
 
+## 1.5.0 · 6 de octubre de 2026
+
+- **Nuevo: el resto del mundo sale de PixelLab (F3-resto, F4, F5, F6 y F7).** El atlas pasa de 569 a 1044 fotogramas; lo procedural queda de reserva.
+  - **Humos y efectos:** cigarro, puro, porro, pipa, nube de vaper, golpe, gotas, brillo, polen, ácaros, monedas y spray, cada uno animado con `animate_object`. **Gaviotas y palomas** animadas (aleteo y picoteo).
+  - **Tiles:** 12 del barrio con `create_tiles_pro` (dos llamadas: tierra y puentes se repitieron con la barandilla en su borde), agua, flores y hierba pisada animadas con `animate_image`; paredes y suelos de los tres interiores, felpudo y suelo de la carpa, también con `create_tiles_pro`.
+  - **Fachadas:** piso, growshop, bar y casa gris con `create_image_pixflux` img2img sobre la huella del edificio (strength 30); las puertas se abren con `animate_image`. La casa gris no tiene puerta (se tapó la que pintó PixelLab con una ventana).
+  - **Objetos:** árbol, farola y fuente (con agua animada) con `create_map_object` sobre el mapa; carpa de cultivo con pixflux sobre una huella; 20 props pequeños (con las luces de la gramola), nevera y cama.
+  - **Plantas:** 6 fases, maceta vacía (sale de la germinación sin el brote) y balanceo en vegetativo, floración y lista. Los cogollos siguen en la rampa magenta y salen del color de cada variedad.
+  - **Combate:** jugador de espaldas, policía y 3 ladrones con `create_image_pro` → `create_character` v3 → animaciones v3 a medida (golpe, patada, spray, comer, herido, desmayo; ataque, herido, huida; alto, multa, soborno, persecución). Fondos del callejón y de la calle con img2img.
+  - **Iconos y título:** la bolsa y 12 iconos más, 4 cogollos de la Genoteca y la pantalla de título.
+  - **Protagonista:** las 8 acciones que faltaban (correr, regar, plantar, cosechar, cruzar, oler, vender y móvil), con los 13 colores del sprite aprobado.
+- **Nuevo:** el título sale del atlas cuando está (`arteTitulo`); sin atlas, el procedural. El calco incluye el título y `npm run test:arte` lo comprueba (18/18).
+- **Descartado:** `create_building_kit` (piezas en perspectiva de 24×42 que no casan con la rejilla de 16 px) y, para fachadas y carpa, `create_map_object` y `create_image_pro` (casas estrechas, carpa rara). Están en el manifiesto con su motivo.
+- **Coste:** 416 generaciones en esta fase (de 1534 a 1118).
+
 ## 1.4.0 · 6 de octubre de 2026
 
 - **Nuevo: F1, protagonista generado con PixelLab** (aprobado). `base` + `idle` + `walk` en 4 direcciones (36 fotogramas, 14 colores), en el atlas `assets/sprites/atlas.{png,json}` e incrustado en el build. El resto del juego sigue procedural.

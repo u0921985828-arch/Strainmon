@@ -1,0 +1,20 @@
+{
+  "grupo": "vfx-humo-porro",
+  "celda": [
+    16,
+    16
+  ],
+  "secuencias": 1,
+  "fotogramas": 6,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 18.26,
+  "colores_finales": 7,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "efecto/unica": 2
+  },
+  "errores": [],
+  "avisos": []
+}

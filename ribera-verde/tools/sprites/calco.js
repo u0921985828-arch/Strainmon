@@ -92,6 +92,7 @@ for (const a of M.assets) {
   if (a.tipo === 'fondo') {
     const c = (a.cubre || [])[0] || ''; const m = c.match(/^combate:(fondo-\w+)$/);
     if (m && has(`combate/${m[1]}.png`)) wr(a.id, 'base', 'unica', 0, rd(`combate/${m[1]}.png`));
+    if (c === 'misc:hoja-titulo' && has('misc/titulo.png')) wr(a.id, 'base', 'unica', 0, rd('misc/titulo.png'));
   }
   // ---------- tiles (16×16 exacto; los animados en bloques de 32×32) ----------
   if (a.tipo === 'tiles') {

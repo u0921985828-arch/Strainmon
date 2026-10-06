@@ -1,6 +1,6 @@
 {
   "name": "ribera-verde",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "description": "RPG de cultivo en pixel art estilo portátil de 16 bits, inspirado en las mecánicas de Weed Firm.",
   "scripts": {

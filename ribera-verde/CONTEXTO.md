@@ -31,26 +31,27 @@
 - **Ambientación propia.** «Ribera Verde» es un barrio ficticio a orillas de una ría, con guiños vascos: txoko, kalimotxo, pintxos, «aupa», «eskerrik asko». Ningún personaje está basado en una persona real.
 - **«Genoteca» como Pokédex.** Es el álbum de variedades que da el objetivo de coleccionar.
 - **Combates de policía sin vida.** La barra enemiga mide la sospecha (el calor policial). Contra la policía se negocia o se huye; no se le pega.
-- **Sprites por familia de PixelLab (v1.3).** Cada sprite sale de la herramienta que mejor lo resuelve. Los personajes llevan rig y plantillas. El terreno va en tiles, kits de edificio y Wang. Lo que se apoya en el suelo se pinta con `create_map_object` sobre el propio mapa. Lo pequeño va en lotes compartidos y las pantallas en img2img. Detalle en [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md).
+- **Sprites por familia de PixelLab (v1.3).** Cada sprite sale de la herramienta que mejor lo resuelve. Los personajes llevan rig y plantillas. El terreno va en tiles, kits de edificio y Wang. Lo que se apoya en el suelo se pinta con `create_map_object` sobre el propio mapa. Lo pequeño va en lotes compartidos y las pantallas en img2img. Detalle en [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md). En la 1.5 los kits de edificio se cambiaron por `create_tiles_pro` y las fachadas y la carpa por img2img sobre su huella: lo demás salía en perspectiva o estrecho.
 - **El motor de sprites va antes que los sprites (v1.3).** Se probó con un atlas «de calco» del arte actual: si las capturas salen iguales, las anclas cuadran y los créditos se gastan solo en arte.
 - **Ajustes tras la prueba automática (v1.1).** Los ladrones de los capítulos altos ganaban casi siempre, así que se suavizaron y ahora la VIDA máxima sube 2 puntos por cada ladrón vencido. Además se corrigieron tres fallos; están en [CHANGELOG.md](CHANGELOG.md).
 
-## Estado (v1.4.0)
+## Estado (v1.5.0)
 
 - Se juega de principio a fin: capítulos 1 a 7, final y juego libre (capítulo 8).
 - `npm test` recorre la historia entera y los sistemas sueltos en 34 pasos: **34/34, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
-  - el motor ya usa el atlas (F2) y `npm run test:arte` da 17/17;
+  - el motor ya usa el atlas (F2) y `npm run test:arte` da 18/18;
   - F1 generada con PixelLab Pro: el protagonista ya sale del atlas (`base`, `idle`, `walk`), aprobado;
-  - F3 (personajes) con la misma receta: los 13 NPC y los 6 clientes salen del atlas con `idle`, `walk` (los que caminan) y sus acciones de ambiente. Faltan los humos (VFX), gaviotas y palomas; el resto del mundo sigue procedural.
+  - F3 (personajes) con la misma receta: los 13 NPC y los 6 clientes salen del atlas con `idle`, `walk` (los que caminan) y sus acciones de ambiente;
+  - F3-resto, F4, F5, F6 y F7 (1.5): humos y efectos, gaviotas y palomas, tiles, interiores, fachadas, objetos, carpa, plantas, combate, iconos, cogollos y título salen del atlas (1044 fotogramas), y el protagonista ya tiene sus 8 acciones. Solo queda la F4b opcional (orillas Wang).
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
 - **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.3, con arte procedural porque aún no hay atlas.
 
 ## Limitaciones conocidas
 
 - El equilibrio de la economía y de la dificultad solo se ha probado con el test automático, no con jugadores.
-- El arte procedural es sencillo: personajes de 16 × 20 px con 3 fotogramas y plantas en 5 fases.
+- Sin atlas (`?arte=procedural`) el arte es el procedural sencillo: personajes de 16 × 20 px con 3 fotogramas y plantas en 5 fases. Las orillas del río aún no tienen transición (F4b).
 - La música son 5 bucles cortos. No hay efectos de pasos.
 - No hay soporte de mando ni pantalla completa.
 - El guardado vive en el navegador: si se borran los datos del sitio, se pierde la partida.
@@ -59,8 +60,9 @@
 
 ## Siguientes pasos sugeridos
 
-1. Seguir con los sprites (F1 y F3 hechos): VFX de humo, gaviotas y palomas, y después tiles y objetos. Están listos la guía [docs/PIXELLAB.md](docs/PIXELLAB.md), el catálogo [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md) y el comando `/sprites`.
+1. Revisar el arte nuevo jugando y repetir lo que no convenza (cada asset del manifiesto guarda sus ids, semillas y descartes). Guía: [docs/PIXELLAB.md](docs/PIXELLAB.md); comando `/sprites`.
 2. Opcional (F4b): orillas con los tres Wang encadenados y autotiling en el motor.
-3. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.
-4. Añadir zonas: polígono industrial, monte con cultivo exterior por estaciones y puerto con contrabando.
-5. Añadir profundidad al estilo Weed Firm: secado y curado, clientes fijos con encargos, empleados y un segundo local.
+3. Publicar la 1.5 en el Artifact (sigue en la 1.3, con arte procedural).
+4. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.
+5. Añadir zonas: polígono industrial, monte con cultivo exterior por estaciones y puerto con contrabando.
+6. Añadir profundidad al estilo Weed Firm: secado y curado, clientes fijos con encargos, empleados y un segundo local.

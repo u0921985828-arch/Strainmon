@@ -85,15 +85,17 @@ function renderBattle(now){
   if(ARTE.ok)pintarVfx(now,{x:0,y:0},'*');
 }
 function renderTitle(now){
-  const t=now/1000;
-  const sky=['#0e1638','#162250','#20306a','#2c3e7c','#3a4a86'];
-  for(let y=0;y<110;y++){ctx.fillStyle=sky[Math.min(4,Math.floor(y/22))];ctx.fillRect(0,y,SW,1);}
-  for(let i=0;i<40;i++){const sx=(i*53)%240,sy=(i*29)%90;if(((i*7+Math.floor(t*2))%9)>1){ctx.fillStyle=i%5?'#c8d0ff':'#ffffff';ctx.fillRect(sx,sy,1,1);}}
-  ctx.fillStyle='#0a0f1e';for(let i=0;i<14;i++){const w=14+(i*37)%20,h=18+(i*53)%34;ctx.fillRect(i*18-6,110-h,w,h);}
-  ctx.fillStyle='#f0d070';for(let i=0;i<40;i++){const wx=(i*61)%240,wy=82+(i*13)%24;if((i+Math.floor(t))%7)ctx.fillRect(wx,wy,1,2);}
-  ctx.fillStyle='#14284a';ctx.fillRect(0,110,SW,50);
+  const t=now/1000,art=arteTitulo();   // con atlas: el fondo de PixelLab (cielo, barrio, río y hoja); sin él, el procedural
+  if(!art){
+    const sky=['#0e1638','#162250','#20306a','#2c3e7c','#3a4a86'];
+    for(let y=0;y<110;y++){ctx.fillStyle=sky[Math.min(4,Math.floor(y/22))];ctx.fillRect(0,y,SW,1);}
+    for(let i=0;i<40;i++){const sx=(i*53)%240,sy=(i*29)%90;if(((i*7+Math.floor(t*2))%9)>1){ctx.fillStyle=i%5?'#c8d0ff':'#ffffff';ctx.fillRect(sx,sy,1,1);}}
+    ctx.fillStyle='#0a0f1e';for(let i=0;i<14;i++){const w=14+(i*37)%20,h=18+(i*53)%34;ctx.fillRect(i*18-6,110-h,w,h);}
+    ctx.fillStyle='#f0d070';for(let i=0;i<40;i++){const wx=(i*61)%240,wy=82+(i*13)%24;if((i+Math.floor(t))%7)ctx.fillRect(wx,wy,1,2);}
+    ctx.fillStyle='#14284a';ctx.fillRect(0,110,SW,50);
+  }
   for(let y=112;y<160;y+=4){const o=Math.sin(t*1.5+y)*6;ctx.fillStyle='#1e3a64';ctx.fillRect(20+o+(y*7)%60,y,30,1);ctx.fillRect(140-o+(y*5)%50,y,24,1);}
-  if(mode==='title'){const by=Math.round(Math.sin(t*1.6)*2);ctx.globalAlpha=.55;ctx.drawImage(titleArt,88,62+by,64,64);ctx.globalAlpha=1;}
+  if(mode==='title'){if(!art){const by=Math.round(Math.sin(t*1.6)*2);ctx.globalAlpha=.55;ctx.drawImage(titleArt,88,62+by,64,64);ctx.globalAlpha=1;}}
   else{ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,SW,SH);ctx.fillStyle='#2a6a48';ctx.beginPath();ctx.ellipse(120,104,34,7,0,0,Math.PI*2);ctx.fill();ctx.drawImage(spriteFor(LOOKS.kiko,'down',0),96,44,48,60);}
 }
 function updateHUD(){

@@ -1,0 +1,20 @@
+{
+  "grupo": "vfx-brillo",
+  "celda": [
+    16,
+    16
+  ],
+  "secuencias": 1,
+  "fotogramas": 4,
+  "semitransparentes": 0,
+  "en_paleta_antes": 27.4,
+  "distancia_media": 17.65,
+  "colores_finales": 15,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "efecto/unica": 4
+  },
+  "errores": [],
+  "avisos": []
+}

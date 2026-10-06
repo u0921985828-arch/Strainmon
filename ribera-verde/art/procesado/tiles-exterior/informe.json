@@ -1,0 +1,22 @@
+{
+  "grupo": "tiles-exterior",
+  "celda": [
+    16,
+    16
+  ],
+  "secuencias": 15,
+  "fotogramas": 24,
+  "semitransparentes": 0,
+  "en_paleta_antes": 87,
+  "distancia_media": 2.81,
+  "colores_finales": 14,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "agua/unica": 0,
+    "flores/unica": 0,
+    "hierba-pisada/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}
