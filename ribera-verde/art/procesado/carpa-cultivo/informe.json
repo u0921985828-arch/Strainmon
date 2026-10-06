@@ -1,19 +1,19 @@
 {
   "grupo": "carpa-cultivo",
   "celda": [
-    64,
+    72,
     112
   ],
   "secuencias": 1,
   "fotogramas": 1,
   "semitransparentes": 0,
   "en_paleta_antes": 0,
-  "distancia_media": 11.28,
+  "distancia_media": 13.83,
   "colores_finales": 15,
   "fundidos": [
-    "base: #9a8252→#8a7c30",
-    "base: #7e8694→#a0a8b8",
-    "base: #8a7c30→#d2aa1a"
+    "base: #e8eef4→#f0f0f8",
+    "base: #f8f8f8→#f0f0f8",
+    "base: #9a8252→#8a7c30"
   ],
   "huerfanos_quitados": 4,
   "deriva_pies": {},

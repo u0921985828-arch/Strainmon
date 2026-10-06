@@ -94,14 +94,14 @@
    "ajuste": "pies"
   },
   "carpa": {
-   "w": 64,
+   "w": 72,
    "h": 112,
    "ancla": [
-    32,
+    36,
     111
    ],
    "ajuste": "pies",
-   "nota": "igual que los edificios"
+   "nota": "72 de ancho: el marco sobresale 4 px por cada lado de las 4 casillas de la carpa (x 7-10), así las macetas de las columnas 7 y 9 quedan dentro"
   },
   "edificio_7x6": {
    "w": 112,
@@ -4344,7 +4344,7 @@
    },
    "descripcion": "open indoor grow tent seen from above for a 16-bit handheld RPG room, black metal frame poles at the corners, silver reflective mylar walls, a rectangular LED grow light panel hanging above the top edge with glowing yellow-white diodes, light silver floor inside, detailed crisp pixel art, clean dark outline, light from the top-left",
    "celda": "carpa",
-   "notas": "Sustituye al marco dibujado por código en renderWorld (casa). Por encima del marco (y<17) el fondo liso se vuelve transparente por relleno desde los bordes; el interior plateado se queda opaco y las macetas se pintan encima.",
+   "notas": "Sustituye al marco dibujado por código en renderWorld (casa). Por encima del marco (y<17) el fondo liso se vuelve transparente por relleno desde los bordes; el interior plateado se queda opaco y las macetas se pintan encima. La primera versión era una carpa vista de frente (pared trasera de 2/3 de alto): las macetas de arriba parecían colgadas de la pared.",
    "estado": "aprobado",
    "familia": "mapa-objeto",
    "entrada": {
@@ -4362,7 +4362,8 @@
    "pixellab": {
     "image_job": "64d4150e-bb3a-47d4-bd54-fbfe7c9be36c"
    },
-   "coste_real": 2
+   "coste_real": 2,
+   "montaje": "Vista desde arriba: del pixflux se conservan el panel LED, las cadenas, el marco, la franja de pared trasera (filas 20-31) y las paredes laterales (7 px); el interior se vacía para que se vea el suelo de mylar (tile tent) y las macetas apoyen en el suelo. Pie de pared: 1 px gris en la fila 32. Se ensancha de 64 a 72 px repitiendo el par de columnas 30-31 (la rejilla de diodos es un damero), para que las macetas de las columnas 7 y 9 queden dentro del marco."
   },
   {
    "id": "planta-fases",

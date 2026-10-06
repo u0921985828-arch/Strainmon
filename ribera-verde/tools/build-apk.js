@@ -33,7 +33,7 @@ const PAQUETE = 'com.riberaverde.juego';
 
 const HERRAMIENTAS = {
   apktool: { url: 'https://github.com/iBotPeaches/Apktool/releases/download/v2.9.3/apktool_2.9.3.jar', sha256: '7956eb04194300ce0d0a84ad18771eebc94b89fb8d1ddcce8ea4c056818646f4' },
-  dx: { url: 'https://repo1.maven.org/maven2/com/jakewharton/android/repackaged/dalvik-dx/9.0.0_r3/dalvik-dx-9.0.0_r3.jar', sha256: null, sha1url: 'https://repo1.maven.org/maven2/com/jakewharton/android/repackaged/dalvik-dx/9.0.0_r3/dalvik-dx-9.0.0_r3.jar.sha1' },
+  dx: { url: 'https://repo1.maven.org/maven2/com/jakewharton/android/repackaged/dalvik-dx/9.0.0_r3/dalvik-dx-9.0.0_r3.jar', sha256: 'b29c1c21e52ed6238cd3fed39d880a17ecf2360118604548cea8821be6801e1c' },   // sha1 de Maven Central: df4b3258ddb4c7d531143405505a9396949bbb51
   signer: { url: 'https://github.com/patrickfav/uber-apk-signer/releases/download/v1.3.0/uber-apk-signer-1.3.0.jar', sha256: 'e1299fd6fcf4da527dd53735b56127e8ea922a321128123b9c32d619bba1d835' },
 };
 const run = (cmd, args, opts = {}) => execFileSync(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'], ...opts }).toString();
@@ -47,7 +47,6 @@ function herramienta(n) {
     run('curl', ['-sSLf', '--max-time', '300', '-o', f, h.url]);
   }
   if (h.sha256 && hash(f, 'sha256') !== h.sha256) throw new Error(`${n}: la huella sha256 no coincide; borra ${f} y vuelve a intentarlo`);
-  if (h.sha1url) { const s = run('curl', ['-sSLf', '--max-time', '60', h.sha1url]).trim().slice(0, 40); if (hash(f, 'sha1') !== s) throw new Error(`${n}: la huella sha1 no coincide con Maven Central`); }
   return f;
 }
 

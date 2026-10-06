@@ -184,7 +184,7 @@ function arteEdificios(m,cam){
 }
 function arteCarpa(cam){
   const f=ARTE.ok&&frameDe('carpa-cultivo','base','unica',0,{i:0});if(!f)return false;
-  ctx.drawImage(f.c,7*16-cam.x,3*16-16-cam.y);return true;
+  ctx.drawImage(f.c,7*16-4-cam.x,3*16-16-cam.y);return true;   // 72 px: el marco sobresale 4 px por cada lado
 }
 // planta en la casilla (x, y de pantalla = esquina de la casilla); p null = maceta vacía
 function artePlanta(p,x,y,now){

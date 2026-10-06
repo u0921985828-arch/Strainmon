@@ -27,17 +27,17 @@
   "carpa-cultivo/base/unica/00": {
    "x": 720,
    "y": 0,
-   "w": 64,
+   "w": 72,
    "h": 112
   },
   "edificio-bar/base/unica/00": {
-   "x": 784,
+   "x": 792,
    "y": 0,
    "w": 112,
    "h": 96
   },
   "edificio-gray/base/unica/00": {
-   "x": 896,
+   "x": 904,
    "y": 0,
    "w": 96,
    "h": 96
@@ -6549,10 +6549,10 @@
    ]
   },
   "carpa-cultivo": {
-   "w": 64,
+   "w": 72,
    "h": 112,
    "ancla": [
-    32,
+    36,
     111
    ]
   },
