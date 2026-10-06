@@ -823,10 +823,11 @@ function buildMaps(){
 
   // ---------- HOME ----------
   // 1 casilla = 1 m: 12 × 6 m de suelo (72 m²). Dormitorio a la izquierda, escritorio y mesa de genética al fondo,
-  // las carpas (montarCasa) al fondo a la derecha (A en x 8, B en x 10-11), cocina abajo a la izquierda y la puerta en (5,7)
+  // las carpas (montarCasa) al fondo (A en x 8, B en x 10-11 y C en x 2-3, junto a la cama), cocina abajo a la izquierda y la puerta en (5,7).
+  // En la pared, solo encima de casillas que no puede tapar una carpa: ventanas en x 6 y x 9, diploma en x 7
   const h=newMap('home',12,8,'floor');h.music='home';
   rect(h,0,0,11,0,(x,y)=>gr(h,x,y,'iwT_home'));rect(h,0,1,11,1,(x,y)=>gr(h,x,y,'iwB_home'));
-  ob(h,2,1,'iwin');ob(h,6,1,'iwin');ob(h,3,1,'poster');
+  ob(h,6,1,'iwin');ob(h,9,1,'iwin');ob(h,7,1,'poster');
   ob(h,0,2,'bedT');ob(h,0,3,'bedB');ob(h,1,2,'plantDeco');ob(h,4,2,'pc');ob(h,5,2,'lab');ob(h,6,2,'lab2');
   ob(h,0,6,'fridge');ob(h,3,5,'table');ob(h,11,7,'plantDeco');
   gr(h,5,7,'mat');h.exits['5,7']={to:'town',x:5,y:9,dir:'down'};
@@ -858,7 +859,8 @@ function montarCasa(){
     h.carpas.push({ci,t:c.t,x0,x1,y:s.y});
   });
 }
-const sitioLibre=(x,y)=>SITIOS.some((s,ci)=>!S.carpas[ci]&&x>=s.x&&x<s.x+s.w&&y===s.y);
+const sitioVisible=ci=>!S.carpas[ci]&&(ci<2||!!S.carpas[1]);   // C, junto a la cama, después de B
+const sitioLibre=(x,y)=>SITIOS.findIndex((s,ci)=>sitioVisible(ci)&&x>=s.x&&x<s.x+s.w&&y===s.y);
 let CLIENT_TILES=[];
 function computeClientTiles(){
   const m=MAPS.town;CLIENT_TILES=[];
@@ -1168,7 +1170,8 @@ async function objectAction(x,y){
   const m=MAPS[S.map],o=m.o[y]&&m.o[y][x];
   if(S.map==='home'){
     const t=(m.carpas||[]).find(t=>x>=t.x0&&x<=t.x1&&y===t.y);if(t)return abrirCarpa(t.ci);
-    if(sitioLibre(x,y))return say('Aquí cabe una carpa de cultivo. Kiko vende carpas de 100×100.');
+    const sl=sitioLibre(x,y);
+    if(sl>=0)return say(sl===2?'Hueco junto a la cama: aquí cabe una carpa de 120×120.'+(S.ch<5?' Kiko las tendrá más adelante.':' Kiko las vende.'):'Aquí cabe una carpa de cultivo. Kiko vende carpas de 100×100.');
     if(o==='bedT'||o==='bedB')return bedAction();
     if(o==='pc')return pcAction();
     if(o==='lab'||o==='lab2')return labAction();
@@ -1267,7 +1270,7 @@ function newDay(){
   S.day++;
   if(S.heat>=90)queue('raid',raidEvent); // se comprueba antes de que el calor baje con el nuevo día
   S.heat=Math.max(0,S.heat-(S.protect?20:12));
-  const luz=facturaLuz(),olor=olorDia(),av=[];S.luz={d:S.day,e:luz};if(luz>0){S.money=Math.max(0,S.money-luz);av.push('Factura de la luz: −'+eur(luz));}
+  const luz=facturaLuz(),olor=olorDia(),av=[];S.luz={d:S.day,e:luz,o:olor};if(luz>0){S.money=Math.max(0,S.money-luz);av.push('Factura de la luz: −'+eur(luz));}
   if(olor){S.heat=Math.min(100,S.heat+olor);av.push('Olor a cogollo: calor +'+olor);}   // después de bajar el calor: cuenta para la redada de mañana
   if(av.length&&mode==='world')toast(av.join('<br>'),1600);
   spawnClients();recibirPedido();
@@ -1348,7 +1351,8 @@ async function bedAction(){
   await fade(1);
   const mins=c===1?180:(((7*60-S.min)+1440)%1440||1440);
   advanceTime(mins);S.hp=S.hpMax;buildEnts();updateHUD();await wait(500);await fade(0);
-  save();toast('Has descansado'+(S.luz&&S.luz.d===S.day&&S.luz.e?' · Luz −'+eur(S.luz.e):'')+' · Partida guardada',1800);
+  const hoy=S.luz&&S.luz.d===S.day&&S.luz;
+  save();toast('Has descansado'+(hoy&&hoy.e?' · Luz −'+eur(hoy.e):'')+(hoy&&hoy.o?' · Olor: calor +'+hoy.o:'')+' · Partida guardada',1800);
 }
 async function pcAction(){
   const o=['Genoteca'].concat(S.ch>=2?['Banco de semillas']:[],['Guardar partida','Apagar']);
@@ -1651,7 +1655,7 @@ const SHOP=[
   {lbl:'Carpa 120×120',p:700,ch:5,carpa:'m120',ci:2,desc:'Tercera carpa, junto a la cama: 6 plantas, focos de hasta 720 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. Antes necesitas la del fondo.',cond:()=>!!S.carpas[1]&&!S.carpas[2]},
 ];
 const yLista=l=>l.length>1?l.slice(0,-1).join(', ')+' y '+l[l.length-1]:l[0];
-for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+yLista(Object.values(CARPAS).filter(C=>FOCOS[it.foco].w<=C.wmax).map(C=>C.cm[0]))+'.';if(it.extra)it.desc=EXTRAS[it.extra].d+'\nUno por carpa.';}
+for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+yLista(Object.values(CARPAS).filter(C=>FOCOS[it.foco].w<=C.wmax).map(C=>C.cm[0]))+'.';if(it.extra){const k=it.extra;it.desc=EXTRAS[k].d+'\nUno por carpa.';it.cond=()=>S.carpas.filter(c=>c&&!c[k]).length>S.items['x_'+k];}}
 // carpa comprada (en un sitio libre) o ampliada (mismo sitio, se quedan foco, extras, plantas y macetas): cada plaza
 // conserva su planta y su maceta por (carpa, plaza); las nuevas, vacías y con maceta de 7 L. La casa se vuelve a montar al entrar
 function comprarCarpa(t,ci){
@@ -1660,7 +1664,7 @@ function comprarCarpa(t,ci){
   const k=huecos().map(h=>antes.indexOf(h.c+':'+h.j));
   S.pots=k.map(j=>j>=0?pots[j]||null:null);S.macetas=k.map(j=>j>=0?mac[j]||'plastico7':'plastico7');
 }
-const DICHO_CARPA={m100:'Te la monto esta tarde en el piso, al lado del armario de tu tía. Viene con un CFL; si quieres más luz, aquí tienes focos.',
+const DICHO_CARPA={m100:'Te la monto esta tarde en el piso, al fondo, al lado del armario. Viene con un CFL; si quieres más luz, aquí tienes focos.',
   g150:'Me llevo la de 100 y te monto la de 150 en su sitio. Las plantas ni se enteran.',
   p80:'Te guardo el armario de tu tía en el trastero y te monto uno de 80 en su sitio. Las plantas ni se enteran.',
   m120:'Te la monto junto a la cama. Viene con un CFL y macetas de 7 L.'};
@@ -2070,7 +2074,7 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
     // carpas: muebles de 1-2 casillas, pintados enteros desde su base (tapan al jugador si pasa por detrás); con plantas,
     // la luz se escapa bajo la puerta. Sitio libre: el hueco marcado en el suelo.
     for(const t of m.carpas)list.push([t.y*16,()=>pintarCarpaMapa(t,cam)]);
-    SITIOS.forEach((st,ci)=>{if(S.carpas[ci])return;ctx.strokeStyle='rgba(60,70,90,.45)';ctx.setLineDash([3,2]);ctx.strokeRect(st.x*16+1.5-cam.x,st.y*16+.5-cam.y,st.w*16-3,15);ctx.setLineDash([]);});
+    SITIOS.forEach((st,ci)=>{if(!sitioVisible(ci))return;ctx.strokeStyle='rgba(60,70,90,.45)';ctx.setLineDash([3,2]);ctx.strokeRect(st.x*16+1.5-cam.x,st.y*16+.5-cam.y,st.w*16-3,15);ctx.setLineDash([]);});
     if(!S.flags.letter){const lx=3*16-cam.x,ly=5*16-cam.y;ctx.fillStyle='#fafaf2';ctx.fillRect(lx+5,ly+5,7,5);ctx.fillStyle='#c04040';ctx.fillRect(lx+8,ly+7,2,1);}
   }
   const fr=(e,dur)=>e.moving&&e.t/dur<.5?1+((e.x+e.y)&1):0;

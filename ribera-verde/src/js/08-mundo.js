@@ -134,7 +134,8 @@ async function objectAction(x,y){
   const m=MAPS[S.map],o=m.o[y]&&m.o[y][x];
   if(S.map==='home'){
     const t=(m.carpas||[]).find(t=>x>=t.x0&&x<=t.x1&&y===t.y);if(t)return abrirCarpa(t.ci);
-    if(sitioLibre(x,y))return say('Aquí cabe una carpa de cultivo. Kiko vende carpas de 100×100.');
+    const sl=sitioLibre(x,y);
+    if(sl>=0)return say(sl===2?'Hueco junto a la cama: aquí cabe una carpa de 120×120.'+(S.ch<5?' Kiko las tendrá más adelante.':' Kiko las vende.'):'Aquí cabe una carpa de cultivo. Kiko vende carpas de 100×100.');
     if(o==='bedT'||o==='bedB')return bedAction();
     if(o==='pc')return pcAction();
     if(o==='lab'||o==='lab2')return labAction();

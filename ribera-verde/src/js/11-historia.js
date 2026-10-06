@@ -20,7 +20,7 @@ const SHOP=[
   {lbl:'Carpa 120×120',p:700,ch:5,carpa:'m120',ci:2,desc:'Tercera carpa, junto a la cama: 6 plantas, focos de hasta 720 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. Antes necesitas la del fondo.',cond:()=>!!S.carpas[1]&&!S.carpas[2]},
 ];
 const yLista=l=>l.length>1?l.slice(0,-1).join(', ')+' y '+l[l.length-1]:l[0];
-for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+yLista(Object.values(CARPAS).filter(C=>FOCOS[it.foco].w<=C.wmax).map(C=>C.cm[0]))+'.';if(it.extra)it.desc=EXTRAS[it.extra].d+'\nUno por carpa.';}
+for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+yLista(Object.values(CARPAS).filter(C=>FOCOS[it.foco].w<=C.wmax).map(C=>C.cm[0]))+'.';if(it.extra){const k=it.extra;it.desc=EXTRAS[k].d+'\nUno por carpa.';it.cond=()=>S.carpas.filter(c=>c&&!c[k]).length>S.items['x_'+k];}}
 // carpa comprada (en un sitio libre) o ampliada (mismo sitio, se quedan foco, extras, plantas y macetas): cada plaza
 // conserva su planta y su maceta por (carpa, plaza); las nuevas, vacías y con maceta de 7 L. La casa se vuelve a montar al entrar
 function comprarCarpa(t,ci){
@@ -29,7 +29,7 @@ function comprarCarpa(t,ci){
   const k=huecos().map(h=>antes.indexOf(h.c+':'+h.j));
   S.pots=k.map(j=>j>=0?pots[j]||null:null);S.macetas=k.map(j=>j>=0?mac[j]||'plastico7':'plastico7');
 }
-const DICHO_CARPA={m100:'Te la monto esta tarde en el piso, al lado del armario de tu tía. Viene con un CFL; si quieres más luz, aquí tienes focos.',
+const DICHO_CARPA={m100:'Te la monto esta tarde en el piso, al fondo, al lado del armario. Viene con un CFL; si quieres más luz, aquí tienes focos.',
   g150:'Me llevo la de 100 y te monto la de 150 en su sitio. Las plantas ni se enteran.',
   p80:'Te guardo el armario de tu tía en el trastero y te monto uno de 80 en su sitio. Las plantas ni se enteran.',
   m120:'Te la monto junto a la cama. Viene con un CFL y macetas de 7 L.'};

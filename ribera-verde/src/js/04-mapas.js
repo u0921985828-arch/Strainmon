@@ -49,10 +49,11 @@ function buildMaps(){
 
   // ---------- HOME ----------
   // 1 casilla = 1 m: 12 × 6 m de suelo (72 m²). Dormitorio a la izquierda, escritorio y mesa de genética al fondo,
-  // las carpas (montarCasa) al fondo a la derecha (A en x 8, B en x 10-11), cocina abajo a la izquierda y la puerta en (5,7)
+  // las carpas (montarCasa) al fondo (A en x 8, B en x 10-11 y C en x 2-3, junto a la cama), cocina abajo a la izquierda y la puerta en (5,7).
+  // En la pared, solo encima de casillas que no puede tapar una carpa: ventanas en x 6 y x 9, diploma en x 7
   const h=newMap('home',12,8,'floor');h.music='home';
   rect(h,0,0,11,0,(x,y)=>gr(h,x,y,'iwT_home'));rect(h,0,1,11,1,(x,y)=>gr(h,x,y,'iwB_home'));
-  ob(h,2,1,'iwin');ob(h,6,1,'iwin');ob(h,3,1,'poster');
+  ob(h,6,1,'iwin');ob(h,9,1,'iwin');ob(h,7,1,'poster');
   ob(h,0,2,'bedT');ob(h,0,3,'bedB');ob(h,1,2,'plantDeco');ob(h,4,2,'pc');ob(h,5,2,'lab');ob(h,6,2,'lab2');
   ob(h,0,6,'fridge');ob(h,3,5,'table');ob(h,11,7,'plantDeco');
   gr(h,5,7,'mat');h.exits['5,7']={to:'town',x:5,y:9,dir:'down'};
@@ -84,7 +85,8 @@ function montarCasa(){
     h.carpas.push({ci,t:c.t,x0,x1,y:s.y});
   });
 }
-const sitioLibre=(x,y)=>SITIOS.some((s,ci)=>!S.carpas[ci]&&x>=s.x&&x<s.x+s.w&&y===s.y);
+const sitioVisible=ci=>!S.carpas[ci]&&(ci<2||!!S.carpas[1]);   // C, junto a la cama, después de B
+const sitioLibre=(x,y)=>SITIOS.findIndex((s,ci)=>sitioVisible(ci)&&x>=s.x&&x<s.x+s.w&&y===s.y);
 let CLIENT_TILES=[];
 function computeClientTiles(){
   const m=MAPS.town;CLIENT_TILES=[];

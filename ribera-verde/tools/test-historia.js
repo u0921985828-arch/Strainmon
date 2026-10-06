@@ -125,9 +125,9 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   await step('Growshop: armario 80 en el sitio A; cada planta se queda en su carpa y su plaza', ['Armario 80', 'Salir'], async () => {
     S.money = 1000; S.pots[3] = { sid: 'txoko', prog: .3, water: 90, health: 100, fert: false, pest: false };
     window.R = { antes: S.pots.map(p => JSON.stringify(p)), mac: S.macetas.slice() }; await run(shop); enterMap('home', 5, 5, 'up');
-    const g = vcGeo(0).pl; R.filas = g.map(q => q.fila).join(); R.atras = g[2].x > g[0].x && g[2].x < g[1].x; S.pots[3] = null;
+    const g = vcGeo(0).pl; R.filas = g.map(q => q.fila).join(); R.atras = g[2].x > g[0].x && g[2].x < g[1].x; R.movida = JSON.stringify(S.pots[4]); S.pots[4] = null;
   }, () => S.carpas[0].t === 'p80' && S.carpas[0].foco === 'led200' && S.money === 700 && S.pots.length === 7 && R.filas === '0,0,1' && R.atras
-    && [0, 1].every(i => JSON.stringify(S.pots[i]) === R.antes[i]) && R.antes[3] !== 'null' && S.macetas[2] === 'plastico7' && S.macetas[3] === R.mac[2] && MAPS.home.carpas.length === 2
+    && [0, 1].every(i => JSON.stringify(S.pots[i]) === R.antes[i]) && R.antes[3] !== 'null' && R.movida === R.antes[3] && S.pots[3] === null && S.macetas[2] === 'plastico7' && S.macetas[3] === R.mac[2] && MAPS.home.carpas.length === 2
     || { carpas: S.carpas, money: S.money, R, pots: S.pots.map(p => JSON.stringify(p)), macetas: S.macetas });
   await step('Extras: ventilador, filtro y goteo en la carpa de 100; sin filtro, el olor de la floración sube el calor', ['Ventilador', '^Carpa 100', 'Extractor', '^Carpa 100', 'Riego por goteo', '^Carpa 100', 'Salir', 'Poner filtro'], async () => {
     S.money = 1000; await run(shop); const flor = () => ({ sid: 'ria', prog: .8, water: 100, health: 100, fert: false, pest: false });

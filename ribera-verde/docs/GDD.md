@@ -55,7 +55,7 @@ El cultivo va en carpas dentro del piso. Desde fuera se ven cerradas (techo, fre
 | Carpa 150×100 | 6 | 720 W | 25 L | growshop, 900 €, desde el capítulo 4: sustituye a la de 100 (se quedan plantas, foco y macetas) |
 | Carpa 120×120 | 6 | 720 W | 25 L | growshop, 700 €, desde el capítulo 5, en el sitio C, junto a la cama, cuando ya hay carpa en B (trae CFL y macetas de 7 L) |
 
-- **Sitios del piso:** A (el armario, 1 casilla), B (al fondo, 2 casillas) y C (junto a la cama, 2 casillas). Cada carpa tiene su sitio y como mucho hay una por sitio.
+- **Sitios del piso:** A (el armario, 1 casilla), B (al fondo, 2 casillas) y C (junto a la cama, 2 casillas; se marca en el suelo cuando ya hay carpa en B). Cada carpa tiene su sitio y como mucho hay una por sitio.
 - **Orden de las plazas:** las de A, luego las de B y luego las de C. Al cambiar una carpa por otra mayor, cada planta y cada maceta se quedan en su carpa y en su plaza; las plazas nuevas salen vacías y con maceta de 7 L.
 
 | Foco | W | Cubre | Cosecha | Crece | THC | Riego | Precio |
@@ -87,6 +87,8 @@ El cultivo va en carpas dentro del piso. Desde fuera se ven cerradas (techo, fre
 | Ventilador de pinza | plagas ×0,7 | 25 € (cap. 1) |
 | Extractor con filtro de carbón | anula el olor (ver abajo) | 120 € (cap. 2) |
 | Riego por goteo | riego ×0,5 (el agua baja a la mitad de rápido) | 80 € (cap. 3) |
+
+  La tienda solo ofrece un extra si alguna carpa lo necesita y no lo llevas ya en la mochila.
 
 - **Olor:** cada día, cada carpa sin filtro con alguna planta viva en floración (progreso ≥ 65 %) suma **+2 de calor**. Se aplica después de la bajada diaria, así que cuenta para la redada del día siguiente.
 - Lo de serie (CFL en el armario y macetas de 7 L) da exactamente el cultivo de antes de la 1.6.

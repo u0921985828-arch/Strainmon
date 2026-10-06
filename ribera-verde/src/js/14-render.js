@@ -30,7 +30,7 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
     // carpas: muebles de 1-2 casillas, pintados enteros desde su base (tapan al jugador si pasa por detrás); con plantas,
     // la luz se escapa bajo la puerta. Sitio libre: el hueco marcado en el suelo.
     for(const t of m.carpas)list.push([t.y*16,()=>pintarCarpaMapa(t,cam)]);
-    SITIOS.forEach((st,ci)=>{if(S.carpas[ci])return;ctx.strokeStyle='rgba(60,70,90,.45)';ctx.setLineDash([3,2]);ctx.strokeRect(st.x*16+1.5-cam.x,st.y*16+.5-cam.y,st.w*16-3,15);ctx.setLineDash([]);});
+    SITIOS.forEach((st,ci)=>{if(!sitioVisible(ci))return;ctx.strokeStyle='rgba(60,70,90,.45)';ctx.setLineDash([3,2]);ctx.strokeRect(st.x*16+1.5-cam.x,st.y*16+.5-cam.y,st.w*16-3,15);ctx.setLineDash([]);});
     if(!S.flags.letter){const lx=3*16-cam.x,ly=5*16-cam.y;ctx.fillStyle='#fafaf2';ctx.fillRect(lx+5,ly+5,7,5);ctx.fillStyle='#c04040';ctx.fillRect(lx+8,ly+7,2,1);}
   }
   const fr=(e,dur)=>e.moving&&e.t/dur<.5?1+((e.x+e.y)&1):0;

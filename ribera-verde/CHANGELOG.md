@@ -7,7 +7,9 @@
   - **Carpa 120×120** (700 €, capítulo 5): tercera carpa, en el sitio C nuevo, junto a la cama, cuando ya hay carpa en B. 6 plazas, hasta 720 W y 25 L. El máximo pasa de 8 plantas a 15.
   - **LED 100 W** (140 €, capítulo 1): cubre 2 plazas, cosecha +15 %, crece +5 %, THC +0,3.
   - **Extras**, uno de cada por carpa: ventilador de pinza (25 €, cap. 1, plagas ×0,7), extractor con filtro de carbón (120 €, cap. 2) y riego por goteo (80 €, cap. 3, el agua baja a la mitad). Al comprarlos, «¿Te lo pongo ya?»; si no, desde la vista de carpa (▲ hasta el foco y A). La ficha del foco enseña los que tiene la carpa.
-  - **Regla nueva, el olor:** cada carpa sin filtro con alguna planta en floración suma +2 de calor al día.
+  - **Regla nueva, el olor:** cada carpa sin filtro con alguna planta en floración suma +2 de calor al día (sale también en el aviso de la cama).
+  - **Piso:** la ventana y el diploma de la pared pasan a (9,1) y (7,1), donde no los tapa ninguna carpa. El hueco de C se marca en el suelo cuando ya tienes carpa en B.
+  - **Tienda:** un extra solo se ofrece si alguna carpa lo necesita y no lo llevas ya en la mochila.
   - **Cambiar de carpa:** cada planta y cada maceta se quedan en su carpa y su plaza (antes las plazas nuevas iban al final de la lista, lo que con el armario 80 habría movido las plantas de la carpa del fondo).
 - **Partidas viejas:** una partida de la 1.9 carga igual (mismas plazas, plantas y macetas; extras a 0).
 - **Tests:** `npm test` 45/45: comprar el armario 80 (las plantas se quedan donde estaban), poner ventilador, filtro y goteo (el filtro anula el calor por olor) y montar la carpa 120 en C. `npm run test:arte` 22/22.

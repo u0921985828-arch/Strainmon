@@ -81,7 +81,7 @@ El piso mide 12 × 8 casillas (1 casilla = 1 m). Las carpas van contra la pared 
 |---|---|---|---|
 | A | (8,2) | hecho | mesas de genética en (5,2) y (6,2) |
 | B | (10,2)–(11,2) | hecho | esquina derecha |
-| C | (2,2)–(3,2) | hecho (P1) | entre la cama (0,2) y el ordenador (4,2). La planta de adorno de (1,2) se queda |
+| C | (2,2)–(3,2) | hecho (P1) | entre la cama (0,2) y el ordenador (4,2). La planta de adorno de (1,2) se queda; la ventana y el diploma que tapaba pasan a (9,1) y (7,1). Se marca en el suelo cuando ya hay carpa en B |
 
 ### 3.3 Focos
 

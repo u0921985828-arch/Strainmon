@@ -77,7 +77,7 @@ function newDay(){
   S.day++;
   if(S.heat>=90)queue('raid',raidEvent); // se comprueba antes de que el calor baje con el nuevo día
   S.heat=Math.max(0,S.heat-(S.protect?20:12));
-  const luz=facturaLuz(),olor=olorDia(),av=[];S.luz={d:S.day,e:luz};if(luz>0){S.money=Math.max(0,S.money-luz);av.push('Factura de la luz: −'+eur(luz));}
+  const luz=facturaLuz(),olor=olorDia(),av=[];S.luz={d:S.day,e:luz,o:olor};if(luz>0){S.money=Math.max(0,S.money-luz);av.push('Factura de la luz: −'+eur(luz));}
   if(olor){S.heat=Math.min(100,S.heat+olor);av.push('Olor a cogollo: calor +'+olor);}   // después de bajar el calor: cuenta para la redada de mañana
   if(av.length&&mode==='world')toast(av.join('<br>'),1600);
   spawnClients();recibirPedido();
@@ -158,7 +158,8 @@ async function bedAction(){
   await fade(1);
   const mins=c===1?180:(((7*60-S.min)+1440)%1440||1440);
   advanceTime(mins);S.hp=S.hpMax;buildEnts();updateHUD();await wait(500);await fade(0);
-  save();toast('Has descansado'+(S.luz&&S.luz.d===S.day&&S.luz.e?' · Luz −'+eur(S.luz.e):'')+' · Partida guardada',1800);
+  const hoy=S.luz&&S.luz.d===S.day&&S.luz;
+  save();toast('Has descansado'+(hoy&&hoy.e?' · Luz −'+eur(hoy.e):'')+(hoy&&hoy.o?' · Olor: calor +'+hoy.o:'')+' · Partida guardada',1800);
 }
 async function pcAction(){
   const o=['Genoteca'].concat(S.ch>=2?['Banco de semillas']:[],['Guardar partida','Apagar']);
