@@ -10,6 +10,7 @@
      si SONIDO/START le caen encima, empieza debajo de ellos (--ut).
    En vertical sale el aviso de girar el móvil (la app de Android ya va fija en horizontal).
    ========================================================= */
+let menuRedraw=null;   // menú abierto (07-interfaz): al cambiar el tamaño se vuelve a medir cuántas filas caben
 function ajustarPantalla(){
   const el=$('consola');if(!el)return;
   const vv=window.visualViewport,W=vv?vv.width:innerWidth,H=vv?vv.height:innerHeight;
@@ -29,6 +30,7 @@ function ajustarPantalla(){
   const P=el.querySelector('.pills');let ut=0;
   if(P){const p=P.getBoundingClientRect(),der=x+cw/2+Math.min(cw,Math.round(240*us))/2;if(p.left<der&&p.bottom>y)ut=Math.round(p.bottom-y+m*.4);}
   set('--ut',ut);
+  if(menuRedraw)menuRedraw();
 }
 ajustarPantalla();
 addEventListener('resize',ajustarPantalla);addEventListener('orientationchange',()=>setTimeout(ajustarPantalla,120));

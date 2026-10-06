@@ -122,7 +122,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     const acc = await page.evaluate(async () => { VFXLOG.length = 0; enterMap('home', 5, 6, 'up'); const t = performance.now(); await accion('regar', { id: 'vfx-gotas', x: 80, y: 80 }); return { ms: Math.round(performance.now() - t), libre: P.act === null, vfx: VFXLOG.slice() }; });
     check('Regar: animación de 1 s y gotas', acc.ms >= 950 && acc.ms < 1600 && acc.libre && acc.vfx.includes('vfx-gotas'), acc);
 
-    // carpas (1.8): muebles del piso a 16 px/m y, con A delante, la vista de carpa a 64 px/m con arte del atlas
+    // carpas: muebles del piso a 16 px/m y, con A delante, la vista B en 3/4 a 48 px/m (procedural hasta las láminas de P3-P4)
     const carpa = await page.evaluate(async () => {
       const espera = ms => new Promise(r => setTimeout(r, ms)), hasta = f => new Promise(r => { const i = setInterval(() => { if (f()) { clearInterval(i); r(); } }, 20); });
       S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'led720' }]; S.macetas = ['plastico7', 'tela11', 'plastico18', 'tela25', 'tela11', 'tela11', 'tela11', 'tela11'];
@@ -132,23 +132,27 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       r.mapa = ['p60', 'm100', 'g150'].every(t => arteCarpaMapa(t, 50, 50)); r.anchos = [A.x1 - A.x0 + 1, B.x1 - B.x0 + 1].join();
       r.solidas = tileSolid(m, A.x0, A.y) && tileSolid(m, B.x0, B.y) && tileSolid(m, B.x1, B.y) && !tileSolid(m, A.x0, A.y + 1);
       r.piso = [m.w, m.h].join('×');
-      // todas las variedades (con su cepa en PLANTA_SM) × 5 fases tienen planta; los híbridos propios, una por hash
-      const g = ARTE.cubre['misc:planta-vista'];
-      r.n = DEX.length; r.plantas = DEX.every(k => k in PLANTA_SM && [1, 2, 3, 4, 5].every(f => !!frameDe(g, 'sm' + smDe(k) + '-' + f, 'unica', 0, { i: 0 }))) && !!frameDe(g, 'sm' + smDe('xq9') + '-3', 'unica', 0, { i: 0 });
-      const alto = (sid, prog) => { ctx.save(); const h = artePlantaVista({ sid, prog, water: 80, health: 100 }, 60, 100, 0); ctx.restore(); return h; };
-      r.alturas = [.05, .2, .5, .8, 1].map(p => alto('malawi', p)); r.crece = r.alturas.every((h, i) => h > 0 && (!i || h >= r.alturas[i - 1])) && r.alturas[4] <= 56;
-      const f = frameDe(g, 'sm08-3', 'unica', 0, { i: 0 }), colores = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, o = new Set(); for (let i = 0; i < d.length; i += 4) if (d[i + 3]) o.add(d[i] + ',' + d[i + 1] + ',' + d[i + 2]); return o; };
+      // todas las variedades tienen porte (los híbridos propios, por sus días de floración); de vegetativo a lista, alto y ancho
+      // reales (PLANTA_CM a 48 px/m) entre ×0,75 y ×1,33; la que crece no encoge
+      r.n = DEX.length; r.portes = DEX.every(k => k in PORTE) && ['i', 's', 'h'].includes(porteDe('xq9'));
+      const caja = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, x1 = -1, y0 = 1e9;
+        for (let i = 0; i < d.length; i += 4) if (d[i + 3]) { const x = (i / 4) % c.width; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, Math.floor(i / 4 / c.width)); }
+        return [x1 - x0 + 1, c.height - y0]; };
+      r.razones = []; for (const po of ['i', 's', 'h']) for (const st of [2, 3, 4]) { const [w, h] = caja(planta34(po, st, false, '#e0c050')), D = PLANTA_CM[po]; r.razones.push(+(w / D.w[st] / VB_M).toFixed(2), +(h / D.h[st] / VB_M).toFixed(2)); }
+      r.alturas = [.05, .2, .5, .8, 1].map(prog => altoPlanta({ sid: 'malawi', prog })); r.crece = r.alturas.every((h, i) => h > 0 && (!i || h >= r.alturas[i - 1])) && r.razones.every(k => k >= .75 && k <= 1.33);
+      const colores = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, o = new Set(); for (let i = 0; i < d.length; i += 4) if (d[i + 3]) o.add(d[i] + ',' + d[i + 1] + ',' + d[i + 2]); return o; };
       const verdes = c => [...colores(c)].filter(k => { const [R, G, B] = k.split(',').map(Number); return G > R + 12 && G > B + 12; }).length;
-      r.seca = verdes(f.c) > 3 && verdes(secar(f.c, 0)) === 0 && verdes(secar(f.c, 1)) === 0;
+      r.seca = verdes(planta34('h', 3, false, '#e0c050')) >= 3 && verdes(planta34('h', 3, true, '#e0c050')) === 0 && verdes(planta34('h', 9, false, '#e0c050')) === 0;
       // la escena: A delante del armario, ▶ plaza 2, ▲ el foco, B sale
       enterMap('home', A.x0, A.y + 1, 'up'); press('A'); await hasta(() => mode === 'carpa' && handlers.length === 1); await espera(150);
-      r.escena = arteFondoCuarto() && arteCarpaVista('p60', 120, 149) && Object.keys(MACETAS).every(k => arteMacetaVista(k, 50, 100) !== null) && ['cfl', 'sodio', 'led'].every(t => arteFoco(t, 50, 40, 20));
+      const hay = c => c && c.width > 0 && colores(c).size > 2;
+      r.escena = hay(cuarto34()) && Object.keys(CARPAS).every(t => hay(carpa34(t))) && Object.keys(MACETAS).every(k => hay(maceta34(k))) && Object.keys(FOCOS).every(k => hay(foco34(k))) && Object.keys(EXTRAS).every(k => hay(extra34(k)));
       r.sel = [VC.sel]; press('right'); r.sel.push(VC.sel); press('up'); r.sel.push(VC.sel); r.info = document.getElementById('vcInfo').textContent;
       press('B'); await hasta(() => mode === 'world' && isFree()); r.sale = !VC && document.getElementById('vcInfo').hidden;
       return r; });
     check('Carpas: muebles del piso (1-2 casillas, sólidos) con su arte, piso de 12×8', carpa.mapa && carpa.anchos === '1,2' && carpa.solidas && carpa.piso === '12×8', carpa);
-    check(`Plantas de la vista: ${carpa.n} variedades × 5 fases, alturas que crecen hasta 56 px, seca y muerta sin verdes`, carpa.plantas && carpa.crece && carpa.seca, carpa);
-    check('Vista de carpa: A abre, ▶ plaza 2, ▲ el foco, B sale; fondo, carpa, macetas y focos del atlas', carpa.escena && carpa.sel.join() === '0,1,-1' && /CFL/.test(carpa.info) && carpa.sale, carpa);
+    check(`Plantas de la vista B: ${carpa.n} variedades con porte, alto y ancho reales (×0,75-1,33) de vegetativo a lista, seca y muerta sin verdes`, carpa.portes && carpa.crece && carpa.seca, carpa);
+    check('Vista de carpa B: A abre, ▶ plaza 2, ▲ el foco, B sale; cuarto, carpas, macetas, focos y extras', carpa.escena && carpa.sel.join() === '0,1,-1' && /CFL/.test(carpa.info) && carpa.sale, carpa);
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
       for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }
       r.rio = mascaraOrilla(m, 31, 15); r.centro = mascaraOrilla(m, 35, 27); r.sinAtlas = (() => { const ok = ARTE.ok; ARTE.ok = false; const v = arteOrilla(m, 'water', 31, 15, 0, 0); ARTE.ok = ok; return v; })(); return r; });

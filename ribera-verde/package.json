@@ -10,6 +10,7 @@
     "capturas": "node tools/build.js && node tools/capturas.js",
     "plano": "node tools/build.js && node tools/plano.js",
     "sprites:ref": "node tools/build.js && node tools/sprites/referencias.js && node tools/sprites/paleta.js",
+    "sprites:huellas": "node tools/build.js && node tools/sprites/huellas.js",
     "sprites:validar": "node tools/sprites/validar.js",
     "sprites:procesar": "node tools/sprites/procesar.js",
     "sprites:catalogo": "node tools/sprites/catalogo.js",

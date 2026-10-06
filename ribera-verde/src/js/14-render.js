@@ -54,16 +54,9 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
         ctx.globalCompositeOperation='source-over';}}
   }
 }
-/* ---------- focos (procedurales; con atlas, arteFoco) ---------- */
+/* ---------- luz de los focos y caché de la carpa (09b-carpa.js) ---------- */
 const FOCO_LUZ={cfl:'rgba(220,240,255,',sodio:'rgba(255,170,70,',led:'rgba(240,170,255,'};
 const carpaCache={};
-function focoProc(tipo){
-  const key='foco|'+tipo;if(carpaCache[key])return carpaCache[key];const [c,x]=mkCanvas(32,12),t=painter(x,rngSeed(9));
-  if(tipo==='led'){t.F(4,2,24,5,'#1c1d22');t.F(5,3,22,3,'#2a2b30');for(let i=6;i<26;i+=3)t.F(i,0,1,2,'#5a5e68');const d=['#ff70c0','#f4f0ff','#c070ff'];for(let i=0;i<7;i++)t.F(6+i*3,6,2,1,d[i%3]);}
-  else if(tipo==='sodio'){t.F(8,1,16,2,'#5a5e68');t.F(5,3,22,3,'#c8ccd6');t.F(5,3,22,1,'#e8eaf0');t.F(4,6,24,1,'#5a5e68');for(let i=7;i<26;i+=4)t.P(i,4,'#a8aebb');t.F(10,7,12,2,'#ffb040');t.F(11,7,10,1,'#ffe0a0');}
-  else{t.F(11,1,10,2,'#5a5e68');t.F(9,3,14,2,'#e8eaf0');t.F(8,5,16,1,'#5a5e68');for(let i=0;i<3;i++){t.F(11+i*4,6,2,4,'#fffbe8');t.P(11+i*4,7,'#d8d8c8');t.P(12+i*4,9,'#d8d8c8');}}
-  return carpaCache[key]=c;
-}
 let titleArt,battleBg={};
 function makeArt(){
   {const [c,x]=mkCanvas(64,64);const t=painter(x,rngSeed(2));drawLeafPx(t,32,38,13.6,'#164a26');drawLeafPx(t,32,38,12.4,'#4cc066');drawLeafPx(t,32,38,7,'#7ee08a');titleArt=c;}

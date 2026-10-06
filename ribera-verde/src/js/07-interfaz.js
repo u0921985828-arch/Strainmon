@@ -33,8 +33,8 @@ function menu(items,o={}){return new Promise(res=>{
     menuEl.innerHTML=h;
     const l=o.cls==='full'&&!menuEl.hidden&&menuEl.querySelector('.list');if(l&&vis>1&&l.scrollHeight>l.clientHeight+1)draw(vis-1);
   };
-  menuEl.hidden=false;draw();
-  const done=v=>{pop();menuEl.hidden=true;menuEl.onclick=null;res(v);};
+  menuEl.hidden=false;draw();menuRedraw=()=>draw();
+  const done=v=>{pop();menuRedraw=null;menuEl.hidden=true;menuEl.onclick=null;res(v);};
   menuEl.onclick=e=>{const it=e.target.closest('.it');if(!it)return;const n=+it.dataset.i;if(n===i)handler('A');else{i=n;draw();}};
   const handler=b=>{const g=o.cls==='battle';const n=items.length;
     if(b==='up'){i=g?(i>=2?i-2:i):(i-1+n)%n;sfx('tick');draw();}

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /*
-  Ribera Verde — plano del juego (1.8.0)
+  Ribera Verde — plano del juego (1.8.0; vista de carpa B desde P2)
   Pinta cada mapa entero a 1 casilla = 32 px (×2) con la rejilla, las coordenadas y lo que hay en él (edificios, puertas,
   salidas, NPC, objetos y carpas), y una hoja de escala con todos los sprites junto al jugador, medidos contra su
-  tamaño real (en el mapa, 16 px = 1 m; en la vista de carpa, 64 px = 1 m). Salida: docs/plano/<mapa>.png, docs/plano/escala.png y docs/plano/medidas.json (lo usa docs/PLANO.md).
+  tamaño real (en el mapa, 16 px = 1 m; en la vista de carpa B, 48 px = 1 m de ancho y de alto). Salida: docs/plano/<mapa>.png, docs/plano/escala.png, docs/plano/vista-b.png (las 5 carpas abiertas) y docs/plano/medidas.json (lo usa docs/PLANO.md).
   Uso:  node tools/build.js && node tools/plano.js
 */
 const { chromium } = require('playwright');
@@ -19,13 +19,19 @@ const REAL = {
     ['Mesa genética 2', 'lab2', 'ancho', 1.2], ['Mesa', 'table', 'ancho', .8], ['Planta deco', 'plantDeco', 'alto', .9], ['Estantería', 'shelfW', 'ancho', .9],
     ['Mostrador', 'counter', 'alto', 1.0], ['Expositor', 'display', 'ancho', .8], ['Botellero', 'bottles', 'ancho', 1.0], ['Taburete', 'stool', 'alto', .75],
     ['Mesa de bar', 'btable', 'ancho', .7], ['Gramola', 'jukebox', 'ancho', .7], ['Cajas', 'crate', 'ancho', .6]],
-  cultivo: [['Armario 60×60', 'carpa:p60', 'ancho', .6], ['Carpa 100×100', 'carpa:m100', 'ancho', 1.0], ['Carpa 150×100', 'carpa:g150', 'ancho', 1.5]],
-  // vista de carpa (64 px/m); las plantas, Skunk #1 (cepa sm08) en sus 5 fases
-  vista: [['Armario 60×60', 'carpav:p60', 'ancho', .6, 64], ['Carpa 100×100', 'carpav:m100', 'ancho', 1.0, 64], ['Carpa 150×100', 'carpav:g150', 'ancho', 1.5, 64],
-    ['Maceta 7 L', 'maceta:plastico7', 'ancho', .22, 64], ['Maceta 11 L', 'maceta:tela11', 'ancho', .25, 64], ['Maceta 18 L', 'maceta:plastico18', 'ancho', .30, 64],
-    ['Maceta 25 L', 'maceta:tela25', 'ancho', .35, 64], ['Germinando', 'planta:1', 'alto', .06, 64], ['Plántula', 'planta:2', 'alto', .16, 64],
-    ['Vegetativo', 'planta:3', 'alto', .40, 64], ['Floración', 'planta:4', 'alto', .78, 64], ['Lista', 'planta:5', 'alto', .88, 64],
-    ['Foco CFL', 'foco:cfl', 'ancho', .45, 64], ['Foco sodio', 'foco:sodio', 'ancho', .55, 64], ['Panel LED', 'foco:led', 'ancho', .6, 64]],
+  cultivo: [['Armario 60×60', 'carpa:p60', 'ancho', .6], ['Armario 80×80', 'carpa:p80', 'ancho', .8], ['Carpa 100×100', 'carpa:m100', 'ancho', 1.0],
+    ['Carpa 120×120', 'carpa:m120', 'ancho', 1.2], ['Carpa 150×100', 'carpa:g150', 'ancho', 1.5]],
+  // vista de carpa B (48 px/m de ancho y alto; el fondo, a 24 px/m y corrido a la derecha): de las carpas se mide el frente
+  vista: [['Armario 60', 'c34:p60', 'frente', .6, 48], ['Armario 80', 'c34:p80', 'frente', .8, 48], ['Carpa 100', 'c34:m100', 'frente', 1.0, 48],
+    ['Carpa 120', 'c34:m120', 'frente', 1.2, 48], ['Carpa 150', 'c34:g150', 'frente', 1.5, 48],
+    ['Maceta 7 L', 'm34:plastico7', 'ancho', .22, 48], ['Maceta 11 L', 'm34:tela11', 'ancho', .25, 48], ['Maceta 18 L', 'm34:plastico18', 'ancho', .30, 48],
+    ['Maceta 25 L', 'm34:tela25', 'ancho', .35, 48], ['CFL 125', 'f34:cfl', 'ancho', .35, 48], ['Sodio 250', 'f34:sodio250', 'ancho', .45, 48],
+    ['Sodio 400', 'f34:sodio400', 'ancho', .5, 48], ['Sodio 600', 'f34:sodio600', 'ancho', .55, 48], ['LED 100', 'f34:led100', 'ancho', .25, 48],
+    ['LED 200', 'f34:led200', 'ancho', .3, 48], ['LED 480', 'f34:led480', 'ancho', .6, 48], ['LED 720', 'f34:led720', 'ancho', 1.0, 48],
+    ['Ventilador', 'x34:vent', 'ancho', .2, 48], ['Filtro y extractor', 'x34:filtro', 'ancho', .65, 48], ['Depósito de goteo', 'x34:goteo', 'alto', .5, 48]],
+  // plantas de la vista B por porte; germinando y plántula, estilizadas a ×2 (plan de producción, §4)
+  plantas: ['i', 's', 'h'].flatMap(po => [['Germinando', 0, .05], ['Plántula', 1, .15], ['Vegetativo', 2], ['Floración', 3], ['Lista', 4]]
+    .map(([n, st, r]) => [`${n} (${{ i: 'índica', s: 'sativa', h: 'híbrida' }[po]})`, `p34:${po}${st}`, 'alto', r || { i: [0, 0, .45, .75, .9], s: [0, 0, .7, 1.2, 1.4], h: [0, 0, .55, .95, 1.1] }[po][st], 48])),
   exterior: [['Árbol', 'tree', 'alto', 6], ['Farola', 'lamp', 'alto', 4], ['Banco', 'bench', 'ancho', 1.8], ['Fuente', 'fountain', 'ancho', 3], ['Arbusto', 'bush', 'ancho', 1.2],
     ['Valla', 'fence', 'alto', 1.0], ['Edificio (piso)', 'edificio:home', 'ancho', 14], ['Edificio (bar)', 'edificio:bar', 'ancho', 14]],
 };
@@ -50,7 +56,7 @@ const REAL = {
     const ZONAS = { town: [['PARQUE DE LOS SAUCES', 1, 13, 11, 27], ['PLAZA', 14, 13, 26, 24], ['RÍA', 31, 14, 38, 28], ['MUELLE', 34, 16, 38, 25], ['CALLE', 1, 9, 38, 12]] };
 
     mode = 'plano'; S = newState(); S.ch = 6; S.protect = false; S.flags = { letter: 1, kiko1: 1, harvest1: 1, metB: 1, lab: 1 }; S.min = 12 * 60; S.clients = [];
-    S.carpas = [{ t: 'p60', foco: 'led200' }, { t: 'g150', foco: 'led720' }]; S.macetas = Array(8).fill('tela11'); S.pots = Array(8).fill(null);
+    S.carpas = [{ t: 'p80', foco: 'sodio250' }, { t: 'g150', foco: 'led720' }, { t: 'm120', foco: 'led480' }]; S.macetas = Array(15).fill('tela11'); S.pots = Array(15).fill(null);
     const espera = ms => new Promise(r => setTimeout(r, ms));
 
     function mapaEntero(name) {
@@ -113,7 +119,7 @@ const REAL = {
       lx = MG; ley.forEach(([col, n]) => { x.fillStyle = col; x.fillRect(lx, ly + 10, 12, 12); texto(x, n, lx + 16, ly + 21, '#d8dce6', 11, 'normal'); lx += 30 + n.length * 6.4; });
       out.mapas[name] = { png: c.toDataURL('image/png'), inv };
     }
-    anotar('town', 'RIBERA VERDE · barrio'); anotar('home', 'PISO DE LA TÍA MAITE (armario 60 + carpa 150)'); anotar('shop', 'GROWSHOP KIKO'); anotar('bar', 'BAR EL ANCLA');
+    anotar('town', 'RIBERA VERDE · barrio'); anotar('home', 'PISO DE LA TÍA MAITE (armario 80 + carpa 150 + carpa 120)'); anotar('shop', 'GROWSHOP KIKO'); anotar('bar', 'BAR EL ANCLA');
 
     // ---------- hoja de escala ----------
     function caja(c) { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
@@ -123,11 +129,12 @@ const REAL = {
       const [tipo, k] = clave.includes(':') ? clave.split(':') : ['obj', clave];
       const fr = (g, s, d = 'unica') => { const f = g && frameDe(g, s, d, 0, { i: 0 }); return f ? f.c : null; };
       if (tipo === 'look') { const g = grupoLook(LOOKS[k]); return g && ((tieneDir(g, 'idle', 'south') && fr(g, 'idle', 'south')) || fr(g, 'base', 'south')); }
-      if (tipo === 'carpa') return fr(ARTE.cubre['misc:carpa-' + k + '-mapa'], 'carpa-' + k + '-mapa');
-      if (tipo === 'carpav') return fr(ARTE.cubre['misc:carpa-' + k + '-vista'], 'carpa-' + k + '-vista');
-      if (tipo === 'maceta') return fr(ARTE.cubre['misc:maceta-vista-' + k], 'maceta-vista-' + k);
-      if (tipo === 'planta') return fr(ARTE.cubre['misc:planta-vista'], 'sm08-' + k);
-      if (tipo === 'foco') return fr(ARTE.cubre['misc:foco-' + k], 'foco-' + k);
+      if (tipo === 'carpa') return fr(ARTE.cubre['misc:carpa-' + k + '-mapa'], 'carpa-' + k + '-mapa') || carpaMapa(k);
+      if (tipo === 'c34') return carpa34(k);
+      if (tipo === 'm34') return maceta34(k);
+      if (tipo === 'p34') return planta34(k[0], +k.slice(1), false, '#e0c050');
+      if (tipo === 'f34') return foco34(k);
+      if (tipo === 'x34') return extra34(k);
       if (tipo === 'edificio') return fr('edificio-' + k, 'base');
       if (k === 'bed') { const a = sprite('bedT'), b = sprite('bedB'); if (!a || !b) return null; const [c, x] = mkCanvas(Math.max(a.width, b.width), a.height + 16);
         const ca = caja(a), cb = caja(b); x.drawImage(a, 0, 0); x.drawImage(b, 0, ca ? ca.y0 + ca.h - cb.y0 : 16); return c; }
@@ -136,7 +143,8 @@ const REAL = {
     const filas = [
       ['PERSONAJES · altura de pie', REAL.personajes.map(([n, k, r]) => [n, 'look:' + k, 'alto', r])],
       ['MOBILIARIO · interiores', REAL.muebles], ['CULTIVO · carpas en el piso (16 px/m)', REAL.cultivo],
-      ['VISTA DE CARPA · 64 px/m: carpas, macetas, plantas y focos', REAL.vista], ['EXTERIOR · calle, parque y edificios', REAL.exterior]];
+      ['VISTA DE CARPA B · 48 px/m: carpas (el frente), macetas, focos y extras', REAL.vista],
+      ['VISTA DE CARPA B · 48 px/m: plantas por porte (germinando y plántula, a ×2)', REAL.plantas], ['EXTERIOR · calle, parque y edificios', REAL.exterior]];
     const E = 3, PAD = 14, cols = [];
     let H = 40;
     for (const [titulo, items] of filas) {
@@ -144,16 +152,16 @@ const REAL = {
       fila.ppm = items[0][4] || 16;
       for (const [n, clave, eje, real, ppm = 16] of items) {
         const c = sprite(clave); if (!c) { fila.items.push({ n, clave, falta: true }); continue; }
-        const b = caja(c); const px = eje === 'alto' ? b.h : b.w, m = px / ppm, ratio = m / real;
+        const b = caja(c); const px = eje === 'alto' ? b.h : eje === 'frente' ? b.w - Math.round(CARPAS[clave.split(':')[1]].cm[2] * VB_X) - 1 : b.w, m = px / ppm, ratio = m / real;
         const it = { n, clave, eje, real, px, w: b.w, h: b.h, m: +m.toFixed(2), ratio: +ratio.toFixed(2), c, b };
         fila.items.push(it); fila.alto = Math.max(fila.alto, b.h); out.medidas.push({ grupo: titulo.split(' ·')[0], n, clave, eje, real, ppm, w: b.w, h: b.h, m: it.m, ratio: it.ratio });
       }
       cols.push(fila); H += fila.alto * E + 120;
     }
     const jug = sprite('look:player'), bj = caja(jug);
-    let W = 0; for (const f of cols) { let w = 90 + bj.w * E + PAD * 2; for (const it of f.items) if (!it.falta) w += Math.max(it.b.w * E, 92) + PAD * 2; W = Math.max(W, w); }
+    let W = 0; for (const f of cols) { let w = 90 + bj.w * E + PAD * 2; for (const it of f.items) if (!it.falta) w += Math.max(it.b.w * E, 110) + PAD * 2; W = Math.max(W, w); }
     const [hc, x] = mkCanvas(Math.min(W, 4000), H + 60); x.imageSmoothingEnabled = false; x.fillStyle = '#1a1d24'; x.fillRect(0, 0, hc.width, hc.height);
-    texto(x, 'HOJA DE ESCALA · todos los sprites a ×3 sobre la misma línea de suelo · mapa: 1 casilla = 16 px = 1 m · vista de carpa: 64 px = 1 m · ratio = tamaño en juego / tamaño real', 16, 26, '#ffffff', 14);
+    texto(x, 'HOJA DE ESCALA · todos los sprites a ×3 sobre la misma línea de suelo · mapa: 1 casilla = 16 px = 1 m · vista de carpa B: 48 px = 1 m · ratio = tamaño en juego / tamaño real', 16, 26, '#ffffff', 14);
     let y = 40;
     for (const f of cols) {
       const base = y + 34 + f.alto * E; texto(x, f.titulo, 16, y + 18, '#ffd84a', 13);
@@ -161,7 +169,7 @@ const REAL = {
       for (let mtr = 0; mtr * paso <= f.alto; mtr++) { const yy = base - mtr * paso * E; x.fillStyle = mtr ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.5)'; x.fillRect(60, yy, hc.width - 70, 1); texto(x, String(+(mtr * unidad).toFixed(2)).replace('.', ',') + ' m', 18, yy + 4, '#9aa3b5', 11, 'normal'); }
       let cx = 90; if (f.ppm === 16) { x.drawImage(jug, bj.x0, bj.y0, bj.w, bj.h, cx, base - bj.h * E, bj.w * E, bj.h * E); texto(x, 'jugador', cx, base + 16, '#9aa3b5', 11, 'normal'); } cx += bj.w * E + PAD * 2;
       for (const it of f.items) {
-        if (it.falta) continue; const ww = Math.max(it.b.w * E, 92);
+        if (it.falta) continue; const ww = Math.max(it.b.w * E, 110);
         x.drawImage(it.c, it.b.x0, it.b.y0, it.b.w, it.b.h, cx + (ww - it.b.w * E) / 2, base - it.b.h * E, it.b.w * E, it.b.h * E);
         const col = it.ratio >= .75 && it.ratio <= 1.34 ? '#78f090' : it.ratio >= .5 && it.ratio <= 2.5 ? '#ffd84a' : '#ff6a6a';
         texto(x, it.n, cx, base + 16, '#e8ecf4', 11); texto(x, `${it.w}×${it.h} px`, cx, base + 31, '#9aa3b5', 10, 'normal');
@@ -171,14 +179,31 @@ const REAL = {
       y = base + 92;
     }
     out.escala = hc.toDataURL('image/png');
+
+    // ---------- vista B: las 5 carpas abiertas, con plantas de los 3 portes, extras y focos (plan de producción, P2) ----------
+    const MUESTRA = {
+      p60: ['led100', {}, [['limon', 1], ['txoko', 1]], ['plastico7', 'tela11']],
+      p80: ['sodio250', { vent: 1 }, [['acapulco', 1], ['ria', .8], ['hindu', 1]], ['tela11', 'plastico18', 'tela11']],
+      m100: ['led480', { vent: 1, filtro: 1 }, [['haze', 1], ['nepal', 1], ['afkush', 1], ['thai', .7]], ['tela25', 'plastico18', 'tela25', 'tela25']],
+      m120: ['led720', { filtro: 1, goteo: 1 }, [['limon', 1], ['citrus', 1], ['mango', 1], ['malawi', .5], ['ria', .25], ['txoko', .05]], ['tela25', 'tela25', 'tela25', 'plastico18', 'tela11', 'plastico7']],
+      g150: ['sodio600', { vent: 1, filtro: 1, goteo: 1 }, [['oaxaca', 1], ['dragon', .8], ['kif', 1], ['lamb', .5], ['nl', .2], null], ['tela25', 'tela25', 'tela25', 'plastico18', 'tela11', 'plastico7']] };
+    const VE = 2, [vc, vx] = mkCanvas(5 * (240 * VE + 16) + 16, 160 * VE + 56); vx.imageSmoothingEnabled = false; vx.fillStyle = '#1a1d24'; vx.fillRect(0, 0, vc.width, vc.height);
+    Object.entries(MUESTRA).forEach(([t, [foco, ex, pots, mac]], i) => {
+      S.carpas = [Object.assign({ t, foco }, ex)]; S.macetas = mac; S.pots = pots.map(p => p && { sid: p[0], prog: p[1], water: 80, health: 100 });
+      VC = { ci: 0, sel: 99, ocupado: true }; renderCarpa(1000); VC = null;   // sel 99: sin cursor
+      const px = 16 + i * (240 * VE + 16); vx.drawImage(cv, OX(), 0, 240, 160, px, 16, 240 * VE, 160 * VE);
+      texto(vx, `${CARPAS[t].n} · ${FOCOS[foco].n}`, px, 160 * VE + 36, '#e8ecf4', 12);
+    });
+    out.vistaB = vc.toDataURL('image/png');
     return out;
   }, REAL);
 
   const png = (f, d) => fs.writeFileSync(path.join(OUT, f), Buffer.from(d.split(',')[1], 'base64'));
   for (const [n, m] of Object.entries(res.mapas)) { png(n + '.png', m.png); console.log('  docs/plano/' + n + '.png'); }
   png('escala.png', res.escala); console.log('  docs/plano/escala.png');
+  png('vista-b.png', res.vistaB); console.log('  docs/plano/vista-b.png');
   const inv = Object.fromEntries(Object.entries(res.mapas).map(([n, m]) => [n, m.inv]));
-  fs.writeFileSync(path.join(OUT, 'medidas.json'), JSON.stringify({ escala: 'mapa: 1 casilla = 16 px = 1 m · vista de carpa: 64 px = 1 m', mapas: inv, sprites: res.medidas }, null, 1) + '\n');
+  fs.writeFileSync(path.join(OUT, 'medidas.json'), JSON.stringify({ escala: 'mapa: 1 casilla = 16 px = 1 m · vista de carpa B: 48 px = 1 m de ancho y alto, 24 px/m de fondo', mapas: inv, sprites: res.medidas }, null, 1) + '\n');
   console.log('  docs/plano/medidas.json · ' + res.medidas.length + ' sprites medidos');
   await browser.close();
   if (errors.length) { console.log('Errores:', errors); process.exit(1); }

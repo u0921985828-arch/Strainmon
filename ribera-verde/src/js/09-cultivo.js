@@ -9,11 +9,11 @@
    Maceta: la de tela airea las raíces (más cosecha y menos plagas, bebe más); la grande da más pero crece algo más lenta.
    Lo de serie (CFL + plástico 7 L en el armario) da justo lo de antes de la 1.6: factores 1. */
 const CARPAS={
-  p60:{n:'Armario 60×60',w:1,cm:[60,160],cols:2,filas:1,plazas:2,wmax:250,lmax:11},
-  p80:{n:'Armario 80×80',w:1,cm:[80,180],cols:2,filas:2,plazas:3,wmax:400,lmax:18},
-  m100:{n:'Carpa 100×100',w:1,cm:[100,200],cols:2,filas:2,plazas:4,wmax:480,lmax:25},
-  m120:{n:'Carpa 120×120',w:2,cm:[120,200],cols:3,filas:2,plazas:6,wmax:720,lmax:25},
-  g150:{n:'Carpa 150×100',w:2,cm:[150,200],cols:3,filas:2,plazas:6,wmax:720,lmax:25}};
+  p60:{n:'Armario 60×60',w:1,cm:[60,160,60],cols:2,filas:1,plazas:2,wmax:250,lmax:11},
+  p80:{n:'Armario 80×80',w:1,cm:[80,180,80],cols:2,filas:2,plazas:3,wmax:400,lmax:18},
+  m100:{n:'Carpa 100×100',w:1,cm:[100,200,100],cols:2,filas:2,plazas:4,wmax:480,lmax:25},
+  m120:{n:'Carpa 120×120',w:2,cm:[120,200,120],cols:3,filas:2,plazas:6,wmax:720,lmax:25},
+  g150:{n:'Carpa 150×100',w:2,cm:[150,200,100],cols:3,filas:2,plazas:6,wmax:720,lmax:25}};
 const SITIOS=[{x:8,y:2,w:1},{x:10,y:2,w:2},{x:2,y:2,w:2}];   // A: el armario de la tía (60 y, después, 80) · B: la carpa que compras (100 y, después, 150), al fondo · C: la carpa 120, junto a la cama
 const FOCOS={
   cfl:{n:'CFL 125 W',tipo:'cfl',w:125,cubre:2,rend:1,crec:1,thc:0,agua:1},

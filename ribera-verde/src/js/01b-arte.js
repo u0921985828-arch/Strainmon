@@ -4,7 +4,7 @@
    Todo lo que no esté en el atlas se dibuja con el procedural de siempre.
    ?arte=procedural en la URL fuerza el procedural para comparar.
    ========================================================= */
-const ARTE={ok:false,fr:{},mir:{},rec:new WeakMap(),top:new WeakMap(),vfx:[],st:new WeakMap(),sobre:{},cubre:{},prisa:1};
+const ARTE={ok:false,fr:{},mir:{},rec:new WeakMap(),vfx:[],st:new WeakMap(),sobre:{},cubre:{},prisa:1};
 const DIR4={down:'south',up:'north',left:'west',right:'east'};
 const FASES=['germinando','plantula','vegetativo','floracion','lista'];
 const FUMA=/fum|puro|pipa|vap/;
@@ -182,55 +182,16 @@ function arteEdificios(m,cam){
     }
   }
 }
-// carpas (1.8): en el piso, un mueble ('carpa-<t>-mapa', celda carpa_mapa, pies en el centro de su base); por dentro,
-// la vista de frente a 64 px/m ('carpa-<t>-vista', con su fondo 'cuarto-cultivo'), con macetas y plantas de esa escala
+// carpas: en el piso, un mueble ('carpa-<t>-mapa', celda carpa_mapa, pies en el centro de su base); por dentro, la
+// vista B (09b-carpa.js), procedural hasta las láminas de P3-P4
 const fotoMisc=n=>ARTE.ok&&frameDe(ARTE.cubre['misc:'+n],n,'unica',0,{i:0});
 function arteCarpaMapa(t,xc,yb){const f=fotoMisc('carpa-'+t+'-mapa');if(!f)return false;pinta(f,xc,yb);return true;}
-function arteCarpaVista(t,xc,yb){const f=fotoMisc('carpa-'+t+'-vista');if(!f)return false;pinta(f,xc,yb);return true;}
-function arteFondoCuarto(){const f=fotoMisc('cuarto-cultivo');if(!f)return false;fondoAncho(f.c);return true;}
-// maceta de la vista con la base en (xc, yb); devuelve la fila de su borde (donde arranca la planta) o null sin atlas
-function arteMacetaVista(k,xc,yb){const f=fotoMisc('maceta-vista-'+k);if(!f)return null;pinta(f,xc,yb);return yb-(f.cel.ancla[1]-filaSup(f.c));}
-// planta de la vista (misc:planta-vista, sprites smNN-F): cada variedad con la cepa de Strainmon más parecida en porte y
-// color de cogollo (los híbridos propios, una por hash) y la fase 1-5 (germinando y plántula, 1 y 2; vegetativo, 3;
-// floración, 4; lista, 5; muerta, la 3 parda). Seca: los verdes amarillean. Balanceo por filas y ácaros si hay plaga.
-// La base del tallo en (xc, yb); devuelve el alto que se ve o false sin atlas
-const PLANTA_SM={ria:8,limon:4,txoko:15,niebla:7,mango:12,purpura:16,rif:11,hindu:6,acapulco:2,malawi:9,citrus:1,bluetx:7,sollimon:5,
-  kushrif:12,purpurah:16,orotrop:0,nieblamor:7,brumaog:4,reina:15,amanecer:13,tormenta:3,dragon:14,leyenda:10,
-  mich:1,punto:3,thai:4,lao:5,chitral:6,nepal:7,congo:8,lamb:10,kif:11,beldia:12,oaxaca:13,panama:14,haze:4,nl:15,afkush:15,shiva:8,silver:1,ssh:4};   // landraces 1.9: su cepa de Strainmon
-const smDe=sid=>String(PLANTA_SM[sid]??hashStr(sid)%18).padStart(2,'0');
-function artePlantaVista(p,xc,yb,now){
-  const g=ARTE.ok&&ARTE.cubre['misc:planta-vista'];if(!g)return false;
-  const n='sm'+smDe(p.sid)+'-'+(p.dead?3:plantStage(p)+1),f=frameDe(g,n,'unica',0,{i:0});if(!f)return false;
-  const dry=!p.dead&&p.water<=0,c=p.dead?secar(f.c,1):dry?secar(f.c,0):f.c,st=plantStage(p);
-  balanceo(c,xc-f.cel.ancla[0],yb-f.cel.ancla[1],f.cel.ancla[1],!p.dead&&!dry&&st>=2?(st>=3?1.4:1):0,now+xc*37);
-  const h=f.cel.ancla[1]-filaSup(f.c);
-  if(p.pest&&!p.dead)dibujar('vfx-acaros','efecto','unica',now,xc,yb-Math.round(h/2),{bucle:true});
-  return h;
-}
-// verdes (tono 55-170°) hacia el pajizo (seca) o el pardo (muerta), con su luz; el resto (cogollos, tallo) se apaga un poco
-function secar(c,muerta){
-  let m=ARTE.rec.get(c);if(!m){m=new Map();ARTE.rec.set(c,m);}const id='seco'+muerta;if(m.has(id))return m.get(id);
-  const [o,x]=mkCanvas(c.width,c.height);x.drawImage(c,0,0);const im=x.getImageData(0,0,c.width,c.height),d=im.data;
-  const [hr,hg,hb]=muerta?[122,92,52]:[184,170,72];
-  for(let j=0;j<d.length;j+=4){if(!d[j+3])continue;const r=d[j],g=d[j+1],b=d[j+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/510;
-    let h=0;if(mx!==mn)h=mx===r?((g-b)/(mx-mn))%6:mx===g?(b-r)/(mx-mn)+2:(r-g)/(mx-mn)+4;h=(h*60+360)%360;
-    const k=Math.min(1.3,l*2.1),v=h>=55&&h<=170&&mx-mn>18?1:.35;
-    d[j]=Math.round(r+(hr*k-r)*v);d[j+1]=Math.round(g+(hg*k-g)*v);d[j+2]=Math.round(b+(hb*k-b)*v);}
-  x.putImageData(im,0,0);m.set(id,o);return o;
-}
 // pinta c en (x, y) por franjas de 2 filas desplazadas con un seno: la base (fila b) quieta y la copa hasta ±a px
 function balanceo(c,x,y,b,a,t){
   if(!a){ctx.drawImage(c,Math.round(x),Math.round(y));return;}
   const s=Math.sin(t/950)*.7+Math.sin(t/410)*.3;
   for(let r=0;r<c.height;r+=2){const dx=Math.round(a*s*Math.max(0,(b-r)/b)**1.5);ctx.drawImage(c,0,r,c.width,2,Math.round(x)+dx,Math.round(y)+r,c.width,2);}
 }
-// foco colgado con la parte de abajo en y; el cable sube hasta top
-function arteFoco(tipo,cx,y,top){
-  const f=ARTE.ok&&frameDe(ARTE.cubre['misc:foco-'+tipo],'foco-'+tipo,'unica',0,{i:0});if(!f)return false;
-  ctx.save();ctx.beginPath();ctx.rect(-SW,top,SW*3,SH);ctx.clip();pinta(f,cx,y-filaInf(f.c));ctx.restore();return true;
-}
-function filaInf(c){const k='i';let m=ARTE.top.get(c);if(m&&m[k]!=null)return m[k];const im=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let r=c.height-1;for(let j=im.length-4;j>=0;j-=4)if(im[j+3]){r=Math.floor(j/4/c.width);break;}m=m||{};m[k]=r;ARTE.top.set(c,m);return r;}
-function filaSup(c){const k='s';let m=ARTE.top.get(c);if(m&&m[k]!=null)return m[k];const im=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let r=0;for(let j=0;j<im.length;j+=4)if(im[j+3]){r=Math.floor(j/4/c.width);break;}m=m||{};m[k]=r;ARTE.top.set(c,m);return r;}
 // criaturas de ambiente: paloma junto a Patxi, gaviotas en el muelle
 function arteCriaturas(now,cam,list){
   if(!ARTE.ok||S.map!=='town')return;
