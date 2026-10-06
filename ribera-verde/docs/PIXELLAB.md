@@ -45,7 +45,7 @@ Es lo que mantiene «la estética que hemos acordado». Todo está también en `
 - **Contorno** oscuro de 1 px (`#26262e`, contorno selectivo permitido por dentro). **Sombreado** de 3 tonos con luz desde arriba a la izquierda. Sin antialias, sin degradados y sin tramados.
 - **Color:**
   - Paleta maestra `art/paleta/ribera.png`.
-  - **Como mucho 15 colores + transparencia por sprite**, el mismo límite que una paleta de 16 colores de la época.
+  - **Como mucho 15 colores + transparencia por sprite**, el mismo límite que una paleta de 16 colores de la época. Única excepción: los fondos de pantalla entera de la vista C (`carpa-c-fondo`, `max_colores: 32` en el manifiesto).
   - Cada personaje conserva sus **colores de identidad** actuales (gorra verde y camiseta roja del protagonista, traje morado de Baltasar…) para que se le reconozca.
 - **Celdas:**
 
@@ -294,7 +294,7 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 
 **Automático** (`procesar.js`):
 - 0 errores;
-- ≤ 15 colores;
+- ≤ 15 colores (o los `max_colores` del asset);
 - todo dentro de la celda;
 - pies estables (≤ 2 px de deriva en `base`, `idle`, `walk` y `run`);
 - sin semitransparencias ni píxeles sueltos;

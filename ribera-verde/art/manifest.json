@@ -60,7 +60,7 @@
      "motivo": "«a little smaller»: la campana salió de 18 px en 44; se repitió «spans the full canvas width»"
     }
    ],
-   "decision": "vista de carpa a pantalla completa como la imagen A (vista C): el arte sale de la imagen A (recortes y ediciones con edit_image_pixen), no de las huellas. La pared lleva solo la tela, con sus brillos y sombras; la luz del foco es un sprite aparte que se pinta por delante (misc:carpa-c-luz)"
+   "decision": "vista de carpa a toda la altura de la pantalla como la imagen A (vista C): el arte sale de la imagen A (recortes y ediciones con edit_image_pixen), no de las huellas. La pared lleva solo la tela, con sus brillos y sombras, sin la forma del cono; macetas y plantas, sin la luz pintada; la luz del foco es una capa aparte (misc:carpa-c-luz) que se pinta delante de todo en «overlay»"
   }
  },
  "celdas": {
@@ -5723,7 +5723,7 @@
    "estilo_ref": "imagen A (estilo.carpa_p3.referencia)",
    "tipo": "fondo",
    "id": "carpa-c-fondo",
-   "coste_real": 2,
+   "coste_real": 3,
    "cubre": [
     "misc:carpa-c-pared",
     "misc:carpa-c-luz"
@@ -5754,10 +5754,20 @@
      "width": 240,
      "height": 160,
      "descripcion": "Remove the hanging lamp and all the orange light and glow. The mylar walls and the floor become plain neutral silver-grey, evenly lit, keeping the same wrinkles, the dark rolled-up curtains, the black outline and the pixel style. Nothing else changes."
+    },
+    {
+     "que": "la pared solo con la tela: la zona del cono, aplanada al tono de la tela (recorte de la pared del fondo, 152 × 140), y pixen le pone arrugas como las de las esquinas",
+     "image_job": "9ee52ba5-bd8c-4f1f-9593-c5da28e777fe",
+     "asset_id": "649c914c-0947-5069-90ca-e0ef24136aa4",
+     "entrada": "art/crudo/_ref/imagen-a-muro-plano.png",
+     "width": 152,
+     "height": 140,
+     "seed": 1101,
+     "descripcion": "This is the back wall of a grow tent: blue-grey canvas fabric seen straight on. Fill the whole plain flat area with soft fabric wrinkles, subtle vertical folds and slight sag, in the same blue-grey tones and pixel style as the wrinkles in the top corners. Even neutral lighting, no light beam, no cone, no curved bands, no glow, no warm colours. Keep the top corner wrinkles, the black outline and the image edge to edge."
     }
    ],
-   "montaje": "scratchpad f22/capas.py: la luz (cada píxel cálido de la imagen A vacía) va a carpa-c-luz; en la pared cada tono cálido pasa al gris de la tela de su escalón de luminosidad (sombra, medio, claro), sin el charco de luz del suelo ni el halo del foco. Pared + luz + foco = la imagen A vacía.",
-   "notas": "Vista C: la pared se recorta a lo ancho de cada carpa (columnas 0-43 y 196-239 fijas, la pared del fondo centrada) y la luz igual, por delante de la pared y detrás de las macetas. Con el foco apagado no se pinta la luz."
+   "montaje": "scratchpad f22/capas.py separa la imagen A vacía en pared y luz. f23/tela.py: la pared del fondo (x 46-193, y 3-138) sale de la llamada 3 (tela sin la forma del cono), con los tonos de la pared de la imagen A; laterales, cortinas y suelo, los de capas.py. f23/cono.py: la luz de la imagen A (solo sus tonos claros) recortada a un cono recto desde la boca del foco (y 16, x 97-143) hasta el pie de la pared, con la banda tenue #c6824d en los huecos; fuera del cono, transparente salvo el charco del suelo y los brillos de las cortinas.",
+   "notas": "Vista C: la pared se recorta a lo ancho de cada carpa (columnas 0-43 y 196-239 fijas, la pared del fondo centrada) y la luz igual. La pared lleva solo la tela, sin la forma del cono (la 1.ª versión pasaba los tonos de la luz a grises y se quedaba su silueta). La luz se pinta delante de todo (pared, macetas y plantas) en «overlay», debajo de la campana; con el foco apagado no se pinta. Hasta 32 colores (max_colores): son fondos de pantalla entera."
   },
   {
    "fase": "F9",
@@ -5844,7 +5854,7 @@
      "seed": 1102
     }
    ],
-   "montaje": "Se quita el tallo que asomaba del borde (scratchpad f22/scripts/prep.py).",
+   "montaje": "Se quita el tallo que asomaba del borde y los brillos cálidos de la luz del foco pasan a gris frío de la misma luminosidad (la tierra, más oscura, se queda) (scratchpad f22/scripts/prep.py). La luz la pone el motor.",
    "notas": "Maceta de plástico de 7 L (22 cm) a la escala de la carpa: 22 px en la de 60 y 15 en las de 200 cm de alto."
   },
   {
@@ -5901,7 +5911,8 @@
      ]
     }
    },
-   "notas": "Índica lista a su tope de la plaza (cw × ch por la escala): 24 × 84 en la carpa de 60 y 36 × 68 en las de 200 cm. Los cogollos van en la rampa clave y el motor les pone el color de la cepa."
+   "notas": "Índica lista a su tope de la plaza (cw × ch por la escala): 24 × 84 en la carpa de 60 y 36 × 68 en las de 200 cm. Los cogollos van en la rampa clave y el motor les pone el color de la cepa.",
+   "montaje": "Los verdes amarillentos de la luz del foco (tono 60-88°) pasan a verde (92°) con la misma saturación y valor (scratchpad f22/scripts/prep.py). La luz la pone el motor."
   }
  ],
  "familias": {

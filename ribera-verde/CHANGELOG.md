@@ -15,9 +15,11 @@ Hasta que lleguen las láminas de P3–P4, lo nuevo se dibuja con el arte proced
 - **Nuevo: venta al por mayor.** Desde el capítulo 3, Iñaki carga lotes de 100 g para arriba a 3,2–5 €/g, una vez al día y hasta 1 kg.
 - **Cambiado: la deuda, a escala.** 30.000 € en plazos de 3.000, 12.000 y 15.000 €; intereses del 20 % del plazo, Copa de 5.000 € y protección de Molina por 1.500 €. Con las cifras nuevas, los plazos se pagan en unas 4, 8 y 9 cosechas, lo mismo que antes (simulación en `docs/ECONOMIA.md`).
 - **Nuevo: tu imperio.** Saldada la deuda («DEUDA SALDADA» en vez de «FIN»), el capítulo 8 sigue con rangos por lo facturado desde el último pago: Cultivador, Proveedor del barrio (25.000 €), Distribuidor de la ría (100.000 €) y Mayorista del norte (250.000 €). Cada uno sube lo que Iñaki carga al día (1, 2, 5 y 10 kg) y llega con un SMS.
-- **P3 del plan de producción: vista C (pendiente de aprobación).** La carpa se ve por dentro a pantalla completa, como la imagen A del tablero de estilos, y su arte sale de esa imagen: pared, luz, campana del foco de sodio, maceta de 7 L e índica en floración.
-  - La pared solo lleva la tela, con sus brillos y sombras. La luz del foco es otro sprite que se pinta por delante y se apaga con el foco.
-  - Cada carpa va a su escala, con la boca del foco a su altura real. Las copas no pasan de la distancia segura.
+- **P3 del plan de producción: vista C (pendiente de aprobación).** La carpa se ve por dentro a toda la altura de la pantalla, como la imagen A del tablero de estilos, y su arte sale de esa imagen: pared, luz, campana del foco de sodio, maceta de 7 L e índica en floración.
+  - La pared solo lleva la tela, con sus brillos y sombras, sin la forma del cono de luz. Macetas y plantas tampoco llevan la luz pintada.
+  - La luz del foco es una capa aparte que se pinta delante de todo (pared, macetas y plantas) y se apaga con el foco.
+  - Cada carpa va a su escala, con la boca del foco a su altura real. Las copas no pasan de la distancia segura, tampoco en el armario 80 con dos filas.
+  - A los lados de la carpa, el cuarto queda a oscuras.
   - Mientras falte arte para algo de la carpa (otros focos, macetas, extras, fases o portes), se ve la vista B.
   - Se descarta la lámina 1 (fondo del cuarto para la vista B), porque no se parecía a la imagen A.
 - **P2 del plan de producción: vista de carpa B.** La carpa se abre recortada en 3/4, como en la 1.6–1.7, pero a escala real (48 px/m de ancho y alto, 24 px/m de fondo), con un foco centrado y la luz recortada a la carpa. Plantas en 3 portes (índica, sativa e híbrida). Todo procedural hasta P3–P4: `npm run sprites:huellas` saca las huellas de las láminas. `npm run plano` mide la vista B (29 de 35 piezas entre ×0,94 y ×1,06; germinando y plántula, ×2) y saca `docs/plano/vista-b.png`.

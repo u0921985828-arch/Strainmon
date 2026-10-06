@@ -83,7 +83,8 @@ function vistaC(g){
     const y=filas[Math.min(q.fila,filas.length-1)],x=Math.round(120+(q.cx/W-.5)*(w+32*(y-VCA.fondo)/19)),r={x,y,m,tierra:VC_TIERRA[m.n]||Math.round(m.f.c.height*.7),hp:0};
     if(p){const st=p.dead?9:plantStage(p),po=porteDe(p.sid),D=PLANTA_CM[po];if(st<3||st>4)return null;
       const s=vcPlantaSprite(po,Math.min(D.w[st],q.cw)*Z);if(!s||!s.f)return null;
-      r.p=s;r.hp=Math.min(vcAlto(s.f.c),Math.round(Math.min(D.h[st],q.ch)*Z));}
+      // tope: su alto real (ch) y, en pantalla, la distancia segura a la boca del foco (el sprite de la maceta es más alto que la real)
+      r.p=s;r.hp=Math.min(vcAlto(s.f.c),Math.round(Math.min(D.h[st],q.ch)*Z),Math.floor(y-r.tierra-VCA.boca-FOCO_SEP[c.foco]*Z));}
     v.push(r);}
   pl.forEach((q,j)=>{q.v=v[j];q.x=v[j].x;q.y=v[j].y;q.alto=v[j].tierra+4+v[j].hp;});
   return {Z,w,xl:120-(w>>1),foco};
@@ -112,10 +113,11 @@ function renderCarpaC(g,now){
   ctx.fillStyle='#000';ctx.fillRect(0,0,SW,SH);
   ctx.save();ctx.translate(OX(),0);
   ctx.drawImage(vcFondo(c.t,vc,'pared'),0,0);
-  if(on)ctx.drawImage(vcFondo(c.t,vc,'luz'),0,0);
   const fsel=(g.pl.find(q=>q.i===VC.sel)||{fila:0}).fila;
   for(const q of [...g.pl].sort((a,b)=>a.y-b.y||a.x-b.x)){ctx.globalAlpha=q.fila<fsel?.35:1;vcPlantaC(q,now);}
   ctx.globalAlpha=1;
+  // la luz del foco es su propia capa y va delante de pared, macetas y plantas (ninguna lleva la luz pintada); la campana, encima
+  if(on){ctx.globalCompositeOperation='overlay';ctx.drawImage(vcFondo(c.t,vc,'luz'),0,0);ctx.globalCompositeOperation='source-over';}
   const fc=vc.foco.f.c;ctx.drawImage(on?fc:vcApagado(fc),120-24,VCA.boca-15);
   vcCursor(g,now);
   if(ARTE.ok)pintarVfx(now,{x:0,y:0},'home');

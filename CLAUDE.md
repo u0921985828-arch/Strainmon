@@ -39,10 +39,10 @@ informe técnico directo + código refactorizado, sin relleno.
 
 ## Subproyecto `ribera-verde/`
 
-- RPG de cultivo independiente (v1.9.0 publicada; 1.10 en desarrollo): 160 px de alto y de 240 a 400 de ancho, solo en horizontal, con mandos flotantes; piso a 1 casilla = 1 m, vista de carpa B en 3/4 a 48 px/m y vista C (la carpa por dentro, desde la imagen A; la luz del foco en sprite aparte). Notas propias en `ribera-verde/CLAUDE.md`.
+- RPG de cultivo independiente (v1.9.0 publicada; 1.10 en desarrollo): 160 px de alto y de 240 a 400 de ancho, solo en horizontal, con mandos flotantes; piso a 1 casilla = 1 m, vista de carpa B en 3/4 a 48 px/m y vista C (la carpa por dentro, desde la imagen A; pared solo con la tela y la luz del foco en una capa aparte, delante de todo). Notas propias en `ribera-verde/CLAUDE.md`.
 - Tests: `cd ribera-verde && npm install` y, con el Chromium preinstalado
   (`export CHROMIUM_PATH=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome | head -1)`):
-  `npm test` → 52/52, 0 errores JS · `npm run test:arte` → 23/23.
+  `npm test` → 52/52, 0 errores JS · `npm run test:arte` → 24/24.
 - Plano de escala: `npm run plano` → `docs/plano/` (con `vista-b.png`) + `docs/PLANO.md` (opción A en la 1.8.0; vista de carpa B en P2).
 - Genética (1.9.0): landraces e híbridos clásicos de `src/species.js` (solo texto e información), estabilizar F1 → F4 y banco de semillas.
 - Economía (1.10): cifras reales (precios, W, kWh, g/W, tope por maceta), fenotipos estrella según la pureza, esquejes, venta al por mayor, deuda de 30.000 € e imperio tras la deuda. Tablas en `docs/ECONOMIA.md` (`npm run docs`).

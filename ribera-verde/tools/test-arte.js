@@ -170,23 +170,46 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     const vc = await page.evaluate(() => {
       const r = { escenas: [], fallos: [] }, C0 = S.carpas, M0 = S.macetas, P0 = S.pots;
       const calidos = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 3] && d[i] > d[i + 2] + 40) n++; return n; };
+      // la pared no sigue a la luz: correlación de luminancias pared ↔ luz donde hay luz (la pared de la 1.ª versión, con la forma del cono: 0,8)
+      const sigue = (p, l) => { const P = p.getContext('2d').getImageData(0, 0, 240, 160).data, L = l.getContext('2d').getImageData(0, 0, 240, 160).data, a = [], b = [], Y = (d, i) => .299 * d[i] + .587 * d[i + 1] + .114 * d[i + 2];
+        for (let y = 18; y < 138; y++) for (let x = 46; x < 194; x++) { const i = (y * 240 + x) * 4; if (L[i + 3] && P[i + 3]) { a.push(Y(P, i)); b.push(Y(L, i)); } }
+        const m = v => v.reduce((s, x) => s + x, 0) / v.length, ma = m(a), mb = m(b); let c = 0, va = 0, vb = 0;
+        a.forEach((x, k) => { c += (x - ma) * (b[k] - mb); va += (x - ma) ** 2; vb += (b[k] - mb) ** 2; }); return +(c / Math.sqrt(va * vb)).toFixed(2); };
+      // brillos cálidos (no la tierra, más oscura): la luz del foco pintada en el sprite
+      const conLuz = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0;
+        for (let i = 0; i < d.length; i += 4) { if (!d[i + 3]) continue; const [r, g, b] = [d[i], d[i + 1], d[i + 2]], M = Math.max(r, g, b), m = Math.min(r, g, b); if (M < 46 || M - m < .25 * M) continue;
+          const h = M === r ? 60 * (((g - b) / (M - m)) % 6) : M === g ? 60 * ((b - r) / (M - m) + 2) : 60 * ((r - g) / (M - m) + 4); if ((h + 360) % 360 < 88 || (h + 360) % 360 > 340) n++; } return n; };
       const ancho = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, x1 = -1; for (let i = 0; i < d.length; i += 4) if (d[i + 3]) { const x = (i / 4) % c.width; x0 = Math.min(x0, x); x1 = Math.max(x1, x); } return x1 - x0 + 1; };
       const pon = (t, foco, sids, prog = 1, extra = {}) => { S.carpas = [{ t, foco, ...extra }]; S.macetas = Array(CARPAS[t].plazas).fill('plastico7'); S.pots = sids.map(s => s && { sid: s, prog, water: 80, health: 100 }); return vcGeo(0); };
-      for (const [t, f, ss] of [['p60', 'sodio250', ['mango', 'purpura']], ['m100', 'sodio400', ['txoko', 'niebla', 'rif', 'hindu']], ['g150', 'sodio600', ['mango', 'purpura', 'txoko', 'niebla', 'rif', 'afkush']]]) {
-        const g = pon(t, f, ss); if (!g.vc) { r.fallos.push(t + ' sin vista C'); continue; }
-        const { Z } = g.vc, boca = VCA.boca, e = { t, pared: calidos(vcFondo(t, g.vc, 'pared')), luz: calidos(vcFondo(t, g.vc, 'luz')), foco: g.vc.foco.a, focoReal: Math.round(FOCO_CM[f] * Z) };
-        for (const q of g.pl) { const v = q.v, w = ancho(v.p.f.c), cima = q.y - v.tierra - v.hp;
+      const seis = ['mango', 'purpura', 'txoko', 'niebla', 'rif', 'afkush'];
+      // p80 con el sodio de 400 es el caso justo (dos filas con la maceta de 22 px); m120 en floración (prog ,8) aplasta las plantas
+      for (const [t, f, ss, prog] of [['p60', 'sodio250', ['mango', 'purpura'], 1], ['p80', 'sodio400', ['txoko', 'niebla', 'hindu'], 1], ['m100', 'sodio400', ['txoko', 'niebla', 'rif', 'hindu'], 1],
+        ['m120', 'sodio600', seis, .8], ['g150', 'sodio600', seis, 1]]) {
+        const g = pon(t, f, ss, prog); if (!g.vc) { r.fallos.push(t + ' sin vista C'); continue; }
+        const { Z } = g.vc, boca = VCA.boca, e = { t, pared: calidos(vcFondo(t, g.vc, 'pared')), luz: calidos(vcFondo(t, g.vc, 'luz')), foco: ancho(g.vc.foco.f.c), focoReal: Math.round(FOCO_CM[f] * Z),
+          sigue: sigue(vcFondo(t, g.vc, 'pared'), vcFondo(t, g.vc, 'luz')), objetos: g.pl.reduce((n, q) => n + conLuz(q.v.m.f.c) + conLuz(q.v.p.f.c), 0) };
+        // lo dibujado (ya aplastado), no lo calculado: ancho de la copa, alto de la planta y cima a la boca del foco en pantalla
+        for (const q of g.pl) { const v = q.v, w = ancho(v.p.f.c), h = vcAlto(vcAplasta(v.p.f.c, v.hp)), cima = q.y - v.tierra - h;
           if (w > q.cw * Z + 1) r.fallos.push(`${t} plaza ${q.i}: copa de ${w} px y caben ${(q.cw * Z).toFixed(1)}`);
-          if (v.hp > q.ch * Z + .5) r.fallos.push(`${t} plaza ${q.i}: ${v.hp} px de alto y el tope es ${(q.ch * Z).toFixed(1)}`);
-          if ((cima - boca) / Z < FOCO_SEP[f] - 2) r.fallos.push(`${t} plaza ${q.i}: cima a ${((cima - boca) / Z).toFixed(0)} cm del foco (${FOCO_SEP[f]})`); }
+          if (h > q.ch * Z + .5) r.fallos.push(`${t} plaza ${q.i}: ${h} px de alto y el tope es ${(q.ch * Z).toFixed(1)}`);
+          if ((cima - boca) / Z < FOCO_SEP[f]) r.fallos.push(`${t} plaza ${q.i}: cima a ${((cima - boca) / Z).toFixed(1)} cm del foco (${FOCO_SEP[f]})`);
+          if (prog < 1 && h >= vcAlto(v.p.f.c)) r.fallos.push(`${t} plaza ${q.i}: en floración no se aplasta (${h} px)`); }
         for (const a of g.pl) for (const b of g.pl) if (a.i < b.i && a.y === b.y && Math.abs(a.x - b.x) < ancho(a.v.m.f.c)) r.fallos.push(`${t}: macetas ${a.i} y ${b.i} se tocan`);
-        if (e.pared || e.luz < 2000 || Math.abs(e.foco - e.focoReal) > 2) r.fallos.push(JSON.stringify(e));
-        VC = { ci: 0, sel: 0, ocupado: false }; renderCarpa(1000); VC = null; r.escenas.push(t);
+        if (e.pared || e.luz < 2000 || Math.abs(e.sigue) > .25 || e.objetos || Math.abs(e.foco - e.focoReal) > 3) r.fallos.push(JSON.stringify(e));
+        // la luz se pinta después de todas las macetas y plantas, en 'overlay', y antes de la campana
+        const orden = [], di = ctx.drawImage, luz = vcFondo(t, g.vc, 'luz'), suyas = new Set(g.pl.flatMap(q => [q.v.m.f.c, q.v.p.f.c]));
+        ctx.drawImage = function (im, ...a) { orden.push(im === luz ? 'luz:' + ctx.globalCompositeOperation : im === g.vc.foco.f.c ? 'foco' : suyas.has(im) || im.width === 48 ? 'obj' : '-'); return di.call(this, im, ...a); };
+        VC = { ci: 0, sel: 0, ocupado: false }; renderCarpa(1000); VC = null; ctx.drawImage = di; r.escenas.push(t);
+        const iL = orden.indexOf('luz:overlay');
+        if (iL < 0 || orden.lastIndexOf('obj') > iL || orden.indexOf('foco') < iL) r.fallos.push(t + ': orden ' + orden.join(','));
       }
       r.b = { cfl: !pon('p60', 'cfl', ['mango', null]).vc, extras: !pon('p60', 'sodio250', ['mango', null], 1, { vent: true }).vc, plantula: !pon('p60', 'sodio250', ['mango', null], .2).vc,
-        sativa: !pon('p60', 'sodio250', ['malawi', null]).vc, tela: (() => { pon('p60', 'sodio250', [null, null]); S.macetas[0] = 'tela11'; return !vcGeo(0).vc; })(), vacia: !!pon('m100', 'sodio600', [null, null, null, null]).vc };
+        sativa: !pon('p60', 'sodio250', ['malawi', null]).vc, tela: (() => { pon('p60', 'sodio250', [null, null]); S.macetas[0] = 'tela11'; return !vcGeo(0).vc; })(), vacia: (() => { const g = pon('m100', 'sodio600', [null, null, null, null]); if (!g.vc) return false;   // vacía: vista C con el foco apagado, sin luz
+          const luz = vcFondo('m100', g.vc, 'luz'), di = ctx.drawImage; let n = 0, encendido = 0;
+          ctx.drawImage = function (im, ...a) { if (im === luz) n++; if (im === g.vc.foco.f.c) encendido++; return di.call(this, im, ...a); };
+          VC = { ci: 0, sel: 0, ocupado: false }; renderCarpa(1000); VC = null; ctx.drawImage = di; return !n && !encendido; })() };
       S.carpas = C0; S.macetas = M0; S.pots = P0; return r; });
-    check('Vista C (imagen A): en p60, m100 y g150 la pared no lleva luz y la luz es su propio sprite; copas y macetas sin tocarse ni pasar de su distancia al foco; sin arte, la vista B', vc.escenas.length === 3 && !vc.fallos.length && Object.values(vc.b).every(Boolean), vc);
+    check('Vista C (imagen A): en p60, p80, m100, m120 y g150 la pared solo lleva tela (ni luz ni la forma del cono), macetas y plantas sin luz pintada y la luz es su propio sprite, por delante en «overlay»; copas y macetas sin tocarse ni pasar de su distancia al foco; sin arte, la vista B', vc.escenas.length === 5 && !vc.fallos.length && Object.values(vc.b).every(Boolean), vc);
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
       for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }
       r.rio = mascaraOrilla(m, 31, 15); r.centro = mascaraOrilla(m, 35, 27); r.sinAtlas = (() => { const ok = ARTE.ok; ARTE.ok = false; const v = arteOrilla(m, 'water', 31, 15, 0, 0); ARTE.ok = ok; return v; })(); return r; });
