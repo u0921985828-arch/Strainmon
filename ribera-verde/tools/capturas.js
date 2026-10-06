@@ -12,7 +12,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
-  const page = await browser.newPage({ viewport: { width: 1100, height: 760 }, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport: { width: 730, height: 496 }, deviceScaleFactor: 1 });   // pantalla de 240×160 a ×3 exacto (720×480)
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.goto('file://' + (process.env.RV_HTML ? path.resolve(process.env.RV_HTML) : path.join(ROOT, 'index.html')));
@@ -29,7 +29,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   await shot('01-titulo.png', true);
 
   // intro
-  await page.evaluate(() => { S = newState(); document.getElementById('title').hidden = true; mode = 'intro'; say('Me llamo KIKO. En el barrio me llaman el Cazasemillas.', '???'); });
+  await page.evaluate(() => { S = newState(); document.getElementById('title').hidden = true; mode = 'intro'; say('Me llamo Kiko. Llevo treinta años con el growshop de la esquina.', '???'); });
   await page.waitForTimeout(1600); await shot('02-intro.png'); await reset();
 
   // partida de muestra
@@ -60,7 +60,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   });
   await shot('05-plaza-noche.png');
 
-  await page.evaluate(() => { ask('6 g de Citrus Bruma. ¿Cuánto le pides?', ['Rebaja · 51 €', 'Justo · 60 €', 'Caro · 78 €', 'Cancelar']); });
+  await page.evaluate(() => { ask('6 g de Lemon Skunk. ¿Cuánto le pides?', ['Rebaja · 51 €', 'Justo · 60 €', 'Caro · 78 €', 'Cancelar']); });
   await untilMenu(); await shot('06-venta.png'); await reset();
 
   await page.evaluate(() => { S.min = 23 * 60; run(() => battle('thief')); });
@@ -77,7 +77,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   await page.waitForTimeout(200); for (let i = 0; i < 10; i++) { await page.keyboard.press('ArrowDown'); await page.waitForTimeout(40); }
   await shot('09-genoteca.png'); await reset();
 
-  await page.evaluate(() => { say('¡NUEVA VARIEDAD! Reina del Atlas'); discover('reina'); });
+  await page.evaluate(() => { say('Nueva variedad: Critical Kush.'); discover('reina'); });
   await page.waitForTimeout(1200); await shot('10-cruce.png'); await reset();
 
   await page.evaluate(() => { enterMap('shop', 4, 4, 'up'); shop(); });
@@ -87,7 +87,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   await page.evaluate(() => { S.ch = 5; S.due = 2000; S.deadline = S.day + 6; enterMap('bar', 7, 6, 'up'); say('Me debes 2000 € para el día 7. Te quedan 6 días.', 'DON BALTASAR'); });
   await page.waitForTimeout(1500); await shot('12-bar-baltasar.png'); await reset();
 
-  await page.setViewportSize({ width: 400, height: 820 });
+  await page.setViewportSize({ width: 844, height: 390 });   // móvil en horizontal: el mundo a lo ancho y los mandos flotando
   await page.evaluate(() => { enterMap('town', 18, 18, 'left'); S.min = 18 * 60 + 30; });
   await shot('13-movil.png', true);
 

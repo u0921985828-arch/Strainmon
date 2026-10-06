@@ -34,10 +34,10 @@ async function chooseName(){
 }
 async function newGame(){
   S=newState();await fade(1);$('title').hidden=true;mode='intro';music('home');await fade(0);
-  await talk('???',['¡Aupa! Bienvenido a RIBERA VERDE, un barrio a orillas de la ría.','Me llamo KIKO. En el barrio me llaman el Cazasemillas.']);
-  await talk('KIKO',['Este mundo está lleno de variedades de cannabis. Unas crecen en cualquier balcón...','...y otras solo en valles perdidos del Rif o del Hindu Kush.','Yo me dedico a buscarlas, cruzarlas y catalogarlas en una GENOTECA.','Pero cuéntame de ti. ¿Cómo te llamas?']);
+  await talk('???',['Ribera Verde. Un barrio obrero a orillas de la ría.','Me llamo Kiko. Llevo treinta años con el growshop de la esquina.']);
+  await talk('KIKO',['Conservo genéticas: variedades locales de Afganistán, México o la India, y los cruces que salen de ellas.','Las apunto todas en un registro, una GENOTECA. Tu tía Maite me ayudaba a mantenerla.','Perdona. ¿Cómo te llamabas?']);
   S.name=await chooseName();
-  await talk('KIKO',['¡{N}! Claro, el sobrino de Maite... o la sobrina, que con esa gorra no se ve bien.','Tu tía nos dejó hace unas semanas. Te ha dejado su piso... y algo más.','Tu historia en Ribera Verde está a punto de empezar.','¡Te espero en el growshop!']);
+  await talk('KIKO',['{N}. Hacía años que no te veía por el barrio.','Maite murió hace tres semanas. Te ha dejado su piso, su armario de cultivo... y una deuda.','Lee la carta que te dejó. Después pásate por el growshop.']);
   await fade(1);enterGame();await wait(300);await fade(0);
   await chapter(1);await wait(2600);showObjective();
 }

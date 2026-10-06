@@ -284,9 +284,9 @@ function iconoCogollo(sid){
 }
 function arteTitulo(){
   const g=ARTE.ok&&ARTE.cubre['misc:hoja-titulo'];if(!g)return false;
-  const f=frameDe(g,'base','unica',0,{i:0});if(!f)return false;ctx.drawImage(f.c,0,0);return true;
+  const f=frameDe(g,'base','unica',0,{i:0});if(!f)return false;fondoAncho(f.c);return true;
 }
 function arteFondoCombate(){
   const g=ARTE.ok&&ARTE.cubre['combate:fondo-'+(B.kind==='thief'?'ladron':'policia')];if(!g)return false;
-  const f=frameDe(g,'base','unica',0,{i:0});if(!f)return false;ctx.drawImage(f.c,0,0);return true;
+  const f=frameDe(g,'base','unica',0,{i:0});if(!f)return false;fondoAncho(f.c,CORTES_COMBATE);return true;
 }

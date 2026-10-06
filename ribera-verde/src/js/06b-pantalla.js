@@ -1,38 +1,38 @@
 /* =========================================================
-   PANTALLA: encaja la consola en cualquier móvil (y en tablet o PC)
-   Mide el hueco real (visualViewport, sin las barras del sistema ni el teclado) y fija los límites de cada parte:
-   --sw ancho de la pantalla del juego (3:2) · --d cruceta · --ab botones A/B · --pill SONIDO/START · --pb marco · --lbl etiqueta.
-   Vertical: pantalla arriba a todo el ancho y mandos debajo (mínimo un tercio del alto para ellos).
-   Horizontal (.land): cruceta | pantalla a toda la altura | A/B, con SONIDO y START debajo de cada lado.
-   Si el ancho escalado queda a menos de un 8 % de un múltiplo entero de 240 píxeles físicos, se ajusta a él (píxeles nítidos).
+   PANTALLA: el juego a pantalla completa, en horizontal, con los mandos flotando encima
+   Mide el hueco real (visualViewport, menos los márgenes seguros del notch) y fija:
+   · la resolución del juego: 160 px de alto y el ancho que pida el móvil (SW, de 240 a 400, par), así la imagen llena
+     la pantalla sin deformarse; en tablets más cuadradas que 3:2 se queda en 240 y sobran bandas arriba y abajo;
+   · --u (CSS px por píxel del juego), con píxeles enteros si se pierde menos de un 6 % de alto;
+   · los mandos a tamaño de pulgar (--d cruceta, --ab A/B, --pill SONIDO/START, --m margen);
+   · el escenario de diálogos y menús (--uiw, --us): 240 px del juego centrados; si los mandos lo pisarían, se encoge
+     hasta un 72 % para dejarlos libres.
+   En vertical sale el aviso de girar el móvil (la app de Android ya va fija en horizontal).
    ========================================================= */
 function ajustarPantalla(){
   const el=$('consola');if(!el)return;
-  const vv=window.visualViewport,W=vv?vv.width:innerWidth,H=vv?vv.height:innerHeight,m=Math.min(W,H);
-  const gap=Math.round(clamp(m*.025,6,14));el.style.setProperty('--gap',gap+'px');
-  const cs=getComputedStyle(el),w=W-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight),h=H-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
-  const land=w>h*1.05,pb=Math.round(clamp(m*.015,4,10)),pill=Math.round(clamp(m*.075,24,34));
-  let sw,d,ab,lbl;
-  if(land){
-    lbl=h<420?0:Math.round(Math.min(16,h*.03));                       // horizontal bajo: sin etiqueta, todo el alto para el juego
-    const lado=clamp(w*.17,120,260);                                     // ancho mínimo de cada lado para los mandos
-    sw=Math.min(w-2*lado-2*gap-2*pb,(h-pb-lbl)*1.5,960);
-    const side=(w-sw-2*pb-2*gap)/2;
-    d=Math.min(side*.92,(h-pill-gap)*.62,200);ab=Math.min(d*.42,side/2.4);
-  }else{
-    lbl=Math.round(clamp(w*.035,10,16));
-    const ctl=clamp(h*.34,170,330);                                      // alto mínimo para cruceta, A/B y START
-    sw=Math.min(w-2*pb,(h-ctl-gap-pb-lbl)*1.5,960);
-    const hc=h-(sw*2/3+pb+lbl)-2*gap-pill;
-    d=Math.min(hc*.9,w*.44,210);ab=Math.min(d*.42,w*.2);
-  }
-  const dpr=window.devicePixelRatio||1,k=Math.floor(sw*dpr/240);
-  if(k>=1&&k*240/dpr>=sw*.92)sw=k*240/dpr;
-  sw=Math.max(120,Math.floor(sw*dpr)/dpr);
-  el.classList.toggle('land',land);
-  const set=(k,v)=>el.style.setProperty(k,Math.max(0,Math.round(v))+'px');
-  el.style.setProperty('--sw',sw+'px');set('--d',Math.max(96,d));set('--ab',Math.max(40,ab));set('--pill',pill);set('--pb',pb);set('--lbl',lbl);
+  const vv=window.visualViewport,W=vv?vv.width:innerWidth,H=vv?vv.height:innerHeight;
+  const cs=getComputedStyle(el),pl=parseFloat(cs.paddingLeft)||0,pr=parseFloat(cs.paddingRight)||0,pt=parseFloat(cs.paddingTop)||0,pb=parseFloat(cs.paddingBottom)||0;
+  const rim=Math.round(clamp(Math.min(W,H)*.008,2,5)),w=W-pl-pr-2*rim,h=H-pt-pb-2*rim;
+  const girar=$('girar');if(girar)girar.hidden=!(h>w);
+  const dpr=window.devicePixelRatio||1;
+  let s=h/160;const k=Math.floor(s*dpr);if(k>=2&&k/dpr>=s*.94)s=k/dpr;
+  let sw=clamp(Math.floor(w/s/2)*2,240,400);if(sw*s>w)s=w/sw;
+  const cw=Math.floor(sw*s),ch=Math.floor(160*s),x=Math.round(pl+rim+(w-cw)/2),y=Math.round(pt+rim+(h-ch)/2);
+  if(SW!==sw){SW=sw;cv.width=sw;ctx.imageSmoothingEnabled=false;}
+  const d=Math.round(clamp(H*.34,104,150)),ab=Math.round(d*.44),m=Math.round(clamp(H*.035,8,22)),pill=Math.round(clamp(H*.07,24,34));
+  const col=Math.max(pl,pr)+m+Math.max(d,ab*2.25)+m*.5,us=clamp((W-2*col)/240,s*.72,s);
+  const set=(n,v)=>el.style.setProperty(n,v+'px');
+  set('--u',s);set('--us',us);set('--uiw',Math.min(cw,Math.round(240*us)));
+  set('--sw',cw);set('--sh',ch);set('--sx',x);set('--sy',y);set('--d',d);set('--ab',ab);set('--m',m);set('--pill',pill);
 }
 ajustarPantalla();
 addEventListener('resize',ajustarPantalla);addEventListener('orientationchange',()=>setTimeout(ajustarPantalla,120));
 if(window.visualViewport)visualViewport.addEventListener('resize',ajustarPantalla);
+// web en el móvil: al primer toque, pantalla completa y bloqueo en horizontal (si el navegador lo deja; si no, queda el aviso)
+addEventListener('pointerdown',function fijar(){
+  removeEventListener('pointerdown',fijar);
+  if(!matchMedia('(pointer:coarse)').matches)return;
+  const de=document.documentElement;
+  try{const p=de.requestFullscreen&&de.requestFullscreen({navigationUI:'hide'});if(p&&p.then)p.then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape').catch(()=>{})).catch(()=>{});}catch(e){}
+},{passive:true});

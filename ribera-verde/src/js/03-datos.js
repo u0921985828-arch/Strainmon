@@ -1,39 +1,41 @@
 /* =========================================================
    DATOS: variedades, recetas, personajes
    ========================================================= */
+// Variedades reales (nombres de uso común entre cultivadores; ninguna marca de banco de semillas). Los ids internos son
+// los de las primeras versiones para no romper partidas guardadas. c = tono del cogollo (verde con el matiz de la variedad).
 const STRAINS={
-  ria:{n:'Ría Skunk',thc:12,y:40,d:2.5,r:75,c:'#9bd35a',o:'Growshop · robusta, ideal para empezar'},
-  limon:{n:'Limón Haze',thc:15,y:30,d:3.5,r:50,c:'#e8e05a',o:'Growshop · cítrica y lenta'},
-  txoko:{n:'Txoko Kush',thc:16,y:34,d:3,r:65,c:'#6fb04a',o:'Growshop · índica de sobremesa'},
-  niebla:{n:'Niebla Blue',thc:17,y:32,d:3.5,r:55,c:'#7aa6e0',o:'Growshop · azulada, olor a bruma'},
-  mango:{n:'Mango Rompeolas',thc:15,y:45,d:3,r:60,c:'#f0a048',o:'Growshop · productiva y afrutada'},
-  purpura:{n:'Púrpura Monte',thc:18,y:28,d:4,r:45,c:'#a070d0',o:'Growshop · delicada, tonos morados'},
-  rif:{n:'Atlas Rif',thc:16,y:38,d:3,r:85,c:'#c8b070',o:'Landrace · montañas del Rif'},
-  hindu:{n:'Hindú Valle',thc:18,y:30,d:3,r:80,c:'#4a8a3a',o:'Landrace · valles del Hindu Kush'},
-  acapulco:{n:'Acapulco Oro',thc:19,y:26,d:4.5,r:60,c:'#f0c838',o:'Landrace · costa del Pacífico'},
-  malawi:{n:'Malawi Sol',thc:20,y:24,d:5,r:55,c:'#d8e070',o:'Landrace · África oriental'},
-  citrus:{n:'Citrus Bruma',thc:18,y:40,d:3,r:70,c:'#c8e050',o:'Ría Skunk × Limón Haze'},
-  bluetx:{n:'Blue Txoko',thc:20,y:36,d:3,r:65,c:'#5a90c8',o:'Txoko Kush × Niebla Blue'},
-  sollimon:{n:'Sol de Limón',thc:21,y:30,d:4,r:55,c:'#f0e878',o:'Limón Haze × Malawi Sol'},
-  kushrif:{n:'Kush del Rif',thc:21,y:40,d:3,r:85,c:'#a8a050',o:'Atlas Rif × Txoko Kush'},
-  purpurah:{n:'Púrpura Hindú',thc:22,y:32,d:3.5,r:70,c:'#8050b0',o:'Hindú Valle × Púrpura Monte'},
-  orotrop:{n:'Oro Tropical',thc:21,y:38,d:3.5,r:60,c:'#f8b030',o:'Acapulco Oro × Mango Rompeolas'},
-  nieblamor:{n:'Niebla Morada',thc:22,y:30,d:4,r:55,c:'#9080e0',o:'Niebla Blue × Púrpura Monte'},
-  brumaog:{n:'Bruma Azul OG',thc:23,y:40,d:3,r:70,c:'#70b0b0',o:'Citrus Bruma × Blue Txoko'},
-  reina:{n:'Reina del Atlas',thc:25,y:38,d:3.5,r:80,c:'#b060a0',o:'Kush del Rif × Púrpura Hindú'},
-  amanecer:{n:'Amanecer Dorado',thc:24,y:36,d:3.5,r:60,c:'#f8d050',o:'Sol de Limón × Oro Tropical'},
-  tormenta:{n:'Tormenta Violeta',thc:26,y:36,d:3.5,r:65,c:'#7058d0',o:'Niebla Morada × Bruma Azul OG'},
-  dragon:{n:'Dragón de Ribera',thc:27,y:42,d:3.5,r:75,c:'#e05050',o:'Reina del Atlas × Amanecer Dorado'},
-  leyenda:{n:'Leyenda de la Ría',thc:31,y:45,d:4,r:80,c:'#40e0a0',o:'Tormenta Violeta × Dragón de Ribera · LEGENDARIA'},
+  ria:{n:'Skunk #1',thc:12,y:40,d:2.5,r:75,c:'#9bd35a',o:'Growshop · un clásico de los setenta: robusta, estable y fácil'},
+  limon:{n:'Lemon Haze',thc:15,y:30,d:3.5,r:50,c:'#d8e060',o:'Growshop · sativa cítrica, de floración lenta'},
+  txoko:{n:'OG Kush',thc:16,y:34,d:3,r:65,c:'#6fb04a',o:'Growshop · índica dominante, olor a gasóleo y pino'},
+  niebla:{n:'Blueberry',thc:17,y:32,d:3.5,r:55,c:'#7a9ec8',o:'Growshop · índica afrutada; con frío de noche azulea'},
+  mango:{n:'Mango',thc:15,y:45,d:3,r:60,c:'#b8c850',o:'Growshop · índica muy productiva, aroma a fruta madura'},
+  purpura:{n:'Purple Afghani',thc:18,y:28,d:4,r:45,c:'#9070b8',o:'Growshop · índica delicada que se vuelve morada al final'},
+  rif:{n:'Afghani',thc:16,y:38,d:3,r:85,c:'#88a050',o:'Landrace · montañas del norte de Afganistán'},
+  hindu:{n:'Hindu Kush',thc:18,y:30,d:3,r:80,c:'#4a8a3a',o:'Landrace · cordillera del Hindu Kush, entre Afganistán y Pakistán'},
+  acapulco:{n:'Acapulco Gold',thc:19,y:26,d:4.5,r:60,c:'#d0c048',o:'Landrace · costa de Guerrero, México'},
+  malawi:{n:'Malawi Gold',thc:20,y:24,d:5,r:55,c:'#c8d068',o:'Landrace · sativa de África oriental, floración muy larga'},
+  citrus:{n:'Lemon Skunk',thc:18,y:40,d:3,r:70,c:'#c0dc50',o:'Skunk #1 × Lemon Haze'},
+  bluetx:{n:'Blueberry Kush',thc:20,y:36,d:3,r:65,c:'#6a94b8',o:'OG Kush × Blueberry'},
+  sollimon:{n:'Trainwreck',thc:21,y:30,d:4,r:55,c:'#a8cc58',o:'Acapulco Gold × Afghani'},
+  kushrif:{n:'Critical Mass',thc:21,y:40,d:3,r:85,c:'#8cbc4c',o:'Afghani × Skunk #1'},
+  purpurah:{n:'Purple Kush',thc:22,y:32,d:3.5,r:70,c:'#7a5aa8',o:'Hindu Kush × Purple Afghani'},
+  orotrop:{n:'Mango Kush',thc:21,y:38,d:3.5,r:60,c:'#a8c040',o:'Mango × Hindu Kush'},
+  nieblamor:{n:'Blue Dream',thc:22,y:34,d:4,r:55,c:'#80a8c0',o:'Blueberry × Lemon Haze'},
+  brumaog:{n:'Super Lemon Haze',thc:23,y:38,d:4,r:65,c:'#d0e458',o:'Lemon Skunk × Lemon Haze'},
+  reina:{n:'Critical Kush',thc:24,y:42,d:3.5,r:80,c:'#78ac44',o:'Critical Mass × OG Kush'},
+  amanecer:{n:'Purple Haze',thc:23,y:34,d:4,r:60,c:'#8a64b0',o:'Purple Kush × Lemon Haze'},
+  tormenta:{n:'Amnesia Haze',thc:26,y:36,d:4.5,r:65,c:'#bcd468',o:'Super Lemon Haze × Trainwreck'},
+  dragon:{n:'Fire OG',thc:27,y:40,d:3.5,r:75,c:'#90b448',o:'Critical Kush × Blueberry Kush'},
+  leyenda:{n:'Ghost Train Haze',thc:29,y:42,d:4.5,r:75,c:'#d8ecb0',o:'Amnesia Haze × Fire OG · LEGENDARIA'},
 };
 const DEX=Object.keys(STRAINS);
-// forma del cogollo en los menús (cogollos-genoteca del atlas); los híbridos propios, 'hibrido'
-const TIPO_COGOLLO={ria:'hibrido',limon:'sativa',txoko:'indica',niebla:'hibrido',mango:'sativa',purpura:'indica',rif:'indica',hindu:'indica',acapulco:'sativa',malawi:'sativa',
-  citrus:'sativa',bluetx:'hibrido',sollimon:'sativa',kushrif:'indica',purpurah:'indica',orotrop:'sativa',nieblamor:'hibrido',brumaog:'hibrido',reina:'indica',amanecer:'sativa',tormenta:'hibrido',dragon:'legendario',leyenda:'legendario'};
+// forma del cogollo en los menús (cogollos-genoteca del atlas)
+const TIPO_COGOLLO={ria:'hibrido',limon:'sativa',txoko:'indica',niebla:'indica',mango:'indica',purpura:'indica',rif:'indica',hindu:'indica',acapulco:'sativa',malawi:'sativa',
+  citrus:'sativa',bluetx:'indica',sollimon:'sativa',kushrif:'indica',purpurah:'indica',orotrop:'hibrido',nieblamor:'hibrido',brumaog:'sativa',reina:'indica',amanecer:'sativa',tormenta:'sativa',dragon:'legendario',leyenda:'legendario'};
 const RECIPES={};
-[['ria','limon','citrus'],['txoko','niebla','bluetx'],['limon','malawi','sollimon'],['rif','txoko','kushrif'],['hindu','purpura','purpurah'],
- ['acapulco','mango','orotrop'],['niebla','purpura','nieblamor'],['citrus','bluetx','brumaog'],['kushrif','purpurah','reina'],
- ['sollimon','orotrop','amanecer'],['nieblamor','brumaog','tormenta'],['reina','amanecer','dragon'],['tormenta','dragon','leyenda']]
+[['ria','limon','citrus'],['txoko','niebla','bluetx'],['acapulco','rif','sollimon'],['rif','ria','kushrif'],['hindu','purpura','purpurah'],
+ ['mango','hindu','orotrop'],['niebla','limon','nieblamor'],['citrus','limon','brumaog'],['kushrif','txoko','reina'],
+ ['purpurah','limon','amanecer'],['brumaog','sollimon','tormenta'],['reina','bluetx','dragon'],['tormenta','dragon','leyenda']]
  .forEach(([a,b,c])=>{RECIPES[[a,b].sort().join('+')]=c;});
 function getStrain(id){return STRAINS[id]||(S&&S.custom[id])||null;}
 function crossResult(a,b){
@@ -42,9 +44,11 @@ function crossResult(a,b){
   const id='x'+hashStr(key).toString(36);
   if(!S.custom[id]){
     const A=getStrain(a),B=getStrain(b),R=rngSeed(hashStr(key));
-    const w=s=>s.n.split(' ');const wa=w(A),wb=w(B);
-    let name=wa[0]+' '+wb[wb.length-1];if(name===A.n||name===B.n)name=wb[0]+' '+wa[wa.length-1];
-    if(Object.values(S.custom).some(c=>c.n===name))name+=' F'+(2+Math.floor(R()*7));
+    const w=s=>s.n.split(' ').filter(p=>!p.startsWith('#'));const wa=w(A),wb=w(B);
+    const usado=n=>n===A.n||n===B.n||DEX.some(k=>STRAINS[k].n===n)||Object.values(S.custom).some(c=>c.n===n);
+    let name=wa[0]+' '+wb[wb.length-1];if(wa[0]===wb[wb.length-1]||usado(name))name=wb[0]+' '+wa[wa.length-1];
+    if(usado(name))name=A.n+' × '+B.n;
+    if(usado(name))name+=' F'+(2+Math.floor(R()*7));
     S.custom[id]={n:name,thc:Math.min(33,Math.round(((A.thc+B.thc)/2+R()*3.5-1.5)*10)/10),y:Math.round((A.y+B.y)/2+R()*8-4),
       d:Math.round(((A.d+B.d)/2+R()*.6-.3)*2)/2,r:clamp(Math.round((A.r+B.r)/2+R()*10-5),20,95),c:mix(A.c,B.c,.5),o:A.n+' × '+B.n+' · híbrido propio'};
   }
@@ -76,9 +80,9 @@ function randLook(seed,kind){
   return {id:'n'+seed,skin:p(SKINS),hair:p(HAIRS),style:p(['short','short','long','curly','bun','cap','bald']),hat:p(CLOTH),shirt:p(CLOTH),pants:p(['#36466e','#3a3a44','#5a4a3a','#4a6aa8','#2a2a30']),beard:R()<.15?1:0,glasses:R()<.15?1:0};
 }
 const CTYPES={
-  est:{label:'ESTUDIANTE',mult:.85,g:[2,5],greet:['¡Ey! Tengo examen el lunes, necesito relajarme.','Aupa, ¿tienes algo? Voy justo de pasta.']},
-  cur:{label:'CURRELA',mult:1,g:[3,8],greet:['Buenas. Salgo de doble turno y me lo merezco.','Qué pasa. Lo de siempre, sin líos.']},
-  tur:{label:'TURISTA',mult:1.15,g:[4,9],greet:['Hello! Eh... ¿tú tienes... marihuana? Pago bien.','Bonjour! Me han dicho que aquí hay de la buena.']},
-  pij:{label:'PIJO',mult:1.35,g:[5,12],greet:['Busco algo premium para una fiesta en Neguri.','Solo quiero lo mejor. El precio me da igual.']},
+  est:{label:'ESTUDIANTE',mult:.85,g:[2,5],greet:['Hola. Me ha dicho un amigo que tienes.','Aupa, ¿tienes algo? Voy justo de dinero.']},
+  cur:{label:'CURRELA',mult:1,g:[3,8],greet:['Buenas. Salgo de doble turno.','Qué tal. Lo de siempre, sin líos.']},
+  tur:{label:'TURISTA',mult:1.15,g:[4,9],greet:['Hello. ¿Tú vendes... marihuana? Pago bien.','Bonjour. Me han dicho que aquí se cultiva bien.']},
+  pij:{label:'PIJO',mult:1.35,g:[5,12],greet:['Busco algo de calidad para una cena en Neguri.','Solo quiero lo mejor. El precio me da igual.']},
 };
 

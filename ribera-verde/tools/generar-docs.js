@@ -52,7 +52,7 @@ const ROOT = path.join(__dirname, '..');
   const pct = n => String(n).replace('.', ',');
   const name = k => D.strains.find(s => s.k === k).n;
   const ORIGIN = { ria: 'Growshop (cap. 1)', limon: 'Growshop (cap. 2)', txoko: 'Growshop (cap. 2)', niebla: 'Growshop (cap. 3)', mango: 'Growshop (cap. 3)', purpura: 'Growshop (cap. 4)',
-    rif: 'Regalo de Kiko al abrir la mesa de genética (cap. 4)', hindu: 'Abuela Txaro, a cambio de 5 g (parque)', acapulco: 'Escondida en un arbusto del parque (2,26)', malawi: 'Iñaki, el marinero, tras venderle 10 g (muelle)' };
+    rif: 'Kiko, al montar la mesa de genética: de un amigo de Mazar-i-Sharif (cap. 4)', hindu: 'Txaro, a cambio de 5 g para hacer aceite (parque): del viaje de su marido a Pakistán en 1976', acapulco: 'En un bote de carrete escondido en un arbusto del parque (2,26), «Guerrero, 1979»', malawi: 'Iñaki, el marinero, tras venderle 10 g (muelle): de un marinero de Malaui en Mombasa' };
 
   // ---------- GENETICA.md ----------
   let g = `# Genética de Ribera Verde
@@ -78,7 +78,7 @@ El orden de los padres da igual. Cada cruce gasta 1 semilla de cada padre y da 2
 `;
   for (const r of D.recipes) g += `| ${name(r.a)} | ${name(r.b)} | **${name(r.out)}** | ${pct(D.strains.find(s => s.k === r.out).thc)}% |\n`;
   g += `
-## Árbol hasta la Leyenda
+## Árbol hasta la Ghost Train Haze
 
 \`\`\`mermaid
 flowchart LR

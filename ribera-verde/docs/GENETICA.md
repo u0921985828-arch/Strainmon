@@ -6,29 +6,29 @@
 
 | # | Variedad | THC | Rinde (g/planta) | Días | Resist. | Color | Cómo se consigue |
 |---|---|---|---|---|---|---|---|
-| 01 | Ría Skunk | 12% | 40 | 2,5 | 75% | `#9bd35a` | Growshop (cap. 1) |
-| 02 | Limón Haze | 15% | 30 | 3,5 | 50% | `#e8e05a` | Growshop (cap. 2) |
-| 03 | Txoko Kush | 16% | 34 | 3 | 65% | `#6fb04a` | Growshop (cap. 2) |
-| 04 | Niebla Blue | 17% | 32 | 3,5 | 55% | `#7aa6e0` | Growshop (cap. 3) |
-| 05 | Mango Rompeolas | 15% | 45 | 3 | 60% | `#f0a048` | Growshop (cap. 3) |
-| 06 | Púrpura Monte | 18% | 28 | 4 | 45% | `#a070d0` | Growshop (cap. 4) |
-| 07 | Atlas Rif | 16% | 38 | 3 | 85% | `#c8b070` | Regalo de Kiko al abrir la mesa de genética (cap. 4) |
-| 08 | Hindú Valle | 18% | 30 | 3 | 80% | `#4a8a3a` | Abuela Txaro, a cambio de 5 g (parque) |
-| 09 | Acapulco Oro | 19% | 26 | 4,5 | 60% | `#f0c838` | Escondida en un arbusto del parque (2,26) |
-| 10 | Malawi Sol | 20% | 24 | 5 | 55% | `#d8e070` | Iñaki, el marinero, tras venderle 10 g (muelle) |
-| 11 | Citrus Bruma | 18% | 40 | 3 | 70% | `#c8e050` | Cruce: Ría Skunk × Limón Haze |
-| 12 | Blue Txoko | 20% | 36 | 3 | 65% | `#5a90c8` | Cruce: Txoko Kush × Niebla Blue |
-| 13 | Sol de Limón | 21% | 30 | 4 | 55% | `#f0e878` | Cruce: Limón Haze × Malawi Sol |
-| 14 | Kush del Rif | 21% | 40 | 3 | 85% | `#a8a050` | Cruce: Atlas Rif × Txoko Kush |
-| 15 | Púrpura Hindú | 22% | 32 | 3,5 | 70% | `#8050b0` | Cruce: Hindú Valle × Púrpura Monte |
-| 16 | Oro Tropical | 21% | 38 | 3,5 | 60% | `#f8b030` | Cruce: Acapulco Oro × Mango Rompeolas |
-| 17 | Niebla Morada | 22% | 30 | 4 | 55% | `#9080e0` | Cruce: Niebla Blue × Púrpura Monte |
-| 18 | Bruma Azul OG | 23% | 40 | 3 | 70% | `#70b0b0` | Cruce: Citrus Bruma × Blue Txoko |
-| 19 | Reina del Atlas | 25% | 38 | 3,5 | 80% | `#b060a0` | Cruce: Kush del Rif × Púrpura Hindú |
-| 20 | Amanecer Dorado | 24% | 36 | 3,5 | 60% | `#f8d050` | Cruce: Sol de Limón × Oro Tropical |
-| 21 | Tormenta Violeta | 26% | 36 | 3,5 | 65% | `#7058d0` | Cruce: Niebla Morada × Bruma Azul OG |
-| 22 | Dragón de Ribera | 27% | 42 | 3,5 | 75% | `#e05050` | Cruce: Reina del Atlas × Amanecer Dorado |
-| 23 | Leyenda de la Ría | 31% | 45 | 4 | 80% | `#40e0a0` | Cruce: Tormenta Violeta × Dragón de Ribera · **legendaria** |
+| 01 | Skunk #1 | 12% | 40 | 2,5 | 75% | `#9bd35a` | Growshop (cap. 1) |
+| 02 | Lemon Haze | 15% | 30 | 3,5 | 50% | `#d8e060` | Growshop (cap. 2) |
+| 03 | OG Kush | 16% | 34 | 3 | 65% | `#6fb04a` | Growshop (cap. 2) |
+| 04 | Blueberry | 17% | 32 | 3,5 | 55% | `#7a9ec8` | Growshop (cap. 3) |
+| 05 | Mango | 15% | 45 | 3 | 60% | `#b8c850` | Growshop (cap. 3) |
+| 06 | Purple Afghani | 18% | 28 | 4 | 45% | `#9070b8` | Growshop (cap. 4) |
+| 07 | Afghani | 16% | 38 | 3 | 85% | `#88a050` | Kiko, al montar la mesa de genética: de un amigo de Mazar-i-Sharif (cap. 4) |
+| 08 | Hindu Kush | 18% | 30 | 3 | 80% | `#4a8a3a` | Txaro, a cambio de 5 g para hacer aceite (parque): del viaje de su marido a Pakistán en 1976 |
+| 09 | Acapulco Gold | 19% | 26 | 4,5 | 60% | `#d0c048` | En un bote de carrete escondido en un arbusto del parque (2,26), «Guerrero, 1979» |
+| 10 | Malawi Gold | 20% | 24 | 5 | 55% | `#c8d068` | Iñaki, el marinero, tras venderle 10 g (muelle): de un marinero de Malaui en Mombasa |
+| 11 | Lemon Skunk | 18% | 40 | 3 | 70% | `#c0dc50` | Cruce: Skunk #1 × Lemon Haze |
+| 12 | Blueberry Kush | 20% | 36 | 3 | 65% | `#6a94b8` | Cruce: OG Kush × Blueberry |
+| 13 | Trainwreck | 21% | 30 | 4 | 55% | `#a8cc58` | Cruce: Acapulco Gold × Afghani |
+| 14 | Critical Mass | 21% | 40 | 3 | 85% | `#8cbc4c` | Cruce: Afghani × Skunk #1 |
+| 15 | Purple Kush | 22% | 32 | 3,5 | 70% | `#7a5aa8` | Cruce: Hindu Kush × Purple Afghani |
+| 16 | Mango Kush | 21% | 38 | 3,5 | 60% | `#a8c040` | Cruce: Mango × Hindu Kush |
+| 17 | Blue Dream | 22% | 34 | 4 | 55% | `#80a8c0` | Cruce: Blueberry × Lemon Haze |
+| 18 | Super Lemon Haze | 23% | 38 | 4 | 65% | `#d0e458` | Cruce: Lemon Skunk × Lemon Haze |
+| 19 | Critical Kush | 24% | 42 | 3,5 | 80% | `#78ac44` | Cruce: Critical Mass × OG Kush |
+| 20 | Purple Haze | 23% | 34 | 4 | 60% | `#8a64b0` | Cruce: Purple Kush × Lemon Haze |
+| 21 | Amnesia Haze | 26% | 36 | 4,5 | 65% | `#bcd468` | Cruce: Super Lemon Haze × Trainwreck |
+| 22 | Fire OG | 27% | 40 | 3,5 | 75% | `#90b448` | Cruce: Critical Kush × Blueberry Kush |
+| 23 | Ghost Train Haze | 29% | 42 | 4,5 | 75% | `#d8ecb0` | Cruce: Amnesia Haze × Fire OG · **legendaria** |
 
 ## Recetas de cruce (13)
 
@@ -36,50 +36,50 @@ El orden de los padres da igual. Cada cruce gasta 1 semilla de cada padre y da 2
 
 | Madre | Padre | Resultado | THC |
 |---|---|---|---|
-| Limón Haze | Ría Skunk | **Citrus Bruma** | 18% |
-| Niebla Blue | Txoko Kush | **Blue Txoko** | 20% |
-| Limón Haze | Malawi Sol | **Sol de Limón** | 21% |
-| Atlas Rif | Txoko Kush | **Kush del Rif** | 21% |
-| Hindú Valle | Púrpura Monte | **Púrpura Hindú** | 22% |
-| Acapulco Oro | Mango Rompeolas | **Oro Tropical** | 21% |
-| Niebla Blue | Púrpura Monte | **Niebla Morada** | 22% |
-| Blue Txoko | Citrus Bruma | **Bruma Azul OG** | 23% |
-| Kush del Rif | Púrpura Hindú | **Reina del Atlas** | 25% |
-| Oro Tropical | Sol de Limón | **Amanecer Dorado** | 24% |
-| Bruma Azul OG | Niebla Morada | **Tormenta Violeta** | 26% |
-| Amanecer Dorado | Reina del Atlas | **Dragón de Ribera** | 27% |
-| Dragón de Ribera | Tormenta Violeta | **Leyenda de la Ría** | 31% |
+| Lemon Haze | Skunk #1 | **Lemon Skunk** | 18% |
+| Blueberry | OG Kush | **Blueberry Kush** | 20% |
+| Acapulco Gold | Afghani | **Trainwreck** | 21% |
+| Skunk #1 | Afghani | **Critical Mass** | 21% |
+| Hindu Kush | Purple Afghani | **Purple Kush** | 22% |
+| Hindu Kush | Mango | **Mango Kush** | 21% |
+| Lemon Haze | Blueberry | **Blue Dream** | 22% |
+| Lemon Skunk | Lemon Haze | **Super Lemon Haze** | 23% |
+| Critical Mass | OG Kush | **Critical Kush** | 24% |
+| Lemon Haze | Purple Kush | **Purple Haze** | 23% |
+| Super Lemon Haze | Trainwreck | **Amnesia Haze** | 26% |
+| Blueberry Kush | Critical Kush | **Fire OG** | 27% |
+| Fire OG | Amnesia Haze | **Ghost Train Haze** | 29% |
 
-## Árbol hasta la Leyenda
+## Árbol hasta la Ghost Train Haze
 
 ```mermaid
 flowchart LR
-  limon["Limón Haze"] --> citrus["Citrus Bruma"]
-  ria["Ría Skunk"] --> citrus
-  niebla["Niebla Blue"] --> bluetx["Blue Txoko"]
-  txoko["Txoko Kush"] --> bluetx
-  limon["Limón Haze"] --> sollimon["Sol de Limón"]
-  malawi["Malawi Sol"] --> sollimon
-  rif["Atlas Rif"] --> kushrif["Kush del Rif"]
-  txoko["Txoko Kush"] --> kushrif
-  hindu["Hindú Valle"] --> purpurah["Púrpura Hindú"]
-  purpura["Púrpura Monte"] --> purpurah
-  acapulco["Acapulco Oro"] --> orotrop["Oro Tropical"]
-  mango["Mango Rompeolas"] --> orotrop
-  niebla["Niebla Blue"] --> nieblamor["Niebla Morada"]
-  purpura["Púrpura Monte"] --> nieblamor
-  bluetx["Blue Txoko"] --> brumaog["Bruma Azul OG"]
-  citrus["Citrus Bruma"] --> brumaog
-  kushrif["Kush del Rif"] --> reina["Reina del Atlas"]
-  purpurah["Púrpura Hindú"] --> reina
-  orotrop["Oro Tropical"] --> amanecer["Amanecer Dorado"]
-  sollimon["Sol de Limón"] --> amanecer
-  brumaog["Bruma Azul OG"] --> tormenta["Tormenta Violeta"]
-  nieblamor["Niebla Morada"] --> tormenta
-  amanecer["Amanecer Dorado"] --> dragon["Dragón de Ribera"]
-  reina["Reina del Atlas"] --> dragon
-  dragon["Dragón de Ribera"] --> leyenda["Leyenda de la Ría"]
-  tormenta["Tormenta Violeta"] --> leyenda
+  limon["Lemon Haze"] --> citrus["Lemon Skunk"]
+  ria["Skunk #1"] --> citrus
+  niebla["Blueberry"] --> bluetx["Blueberry Kush"]
+  txoko["OG Kush"] --> bluetx
+  acapulco["Acapulco Gold"] --> sollimon["Trainwreck"]
+  rif["Afghani"] --> sollimon
+  ria["Skunk #1"] --> kushrif["Critical Mass"]
+  rif["Afghani"] --> kushrif
+  hindu["Hindu Kush"] --> purpurah["Purple Kush"]
+  purpura["Purple Afghani"] --> purpurah
+  hindu["Hindu Kush"] --> orotrop["Mango Kush"]
+  mango["Mango"] --> orotrop
+  limon["Lemon Haze"] --> nieblamor["Blue Dream"]
+  niebla["Blueberry"] --> nieblamor
+  citrus["Lemon Skunk"] --> brumaog["Super Lemon Haze"]
+  limon["Lemon Haze"] --> brumaog
+  kushrif["Critical Mass"] --> reina["Critical Kush"]
+  txoko["OG Kush"] --> reina
+  limon["Lemon Haze"] --> amanecer["Purple Haze"]
+  purpurah["Purple Kush"] --> amanecer
+  brumaog["Super Lemon Haze"] --> tormenta["Amnesia Haze"]
+  sollimon["Trainwreck"] --> tormenta
+  bluetx["Blueberry Kush"] --> dragon["Fire OG"]
+  reina["Critical Kush"] --> dragon
+  dragon["Fire OG"] --> leyenda["Ghost Train Haze"]
+  tormenta["Amnesia Haze"] --> leyenda
   style leyenda fill:#40e0a0,color:#062
 ```
 

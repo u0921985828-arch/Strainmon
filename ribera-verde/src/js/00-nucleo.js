@@ -1,9 +1,10 @@
 'use strict';
 /* =========================================================
-   RIBERA VERDE — motor gráfico estilo 16-bit portátil (240x160)
+   RIBERA VERDE — motor gráfico estilo 16-bit portátil (160 px de alto; 240-400 de ancho)
    Todo el arte es procedural y original.
    ========================================================= */
-const TS=16, SW=240, SH=160;
+const TS=16, SH=160;
+let SW=240;   // ancho del juego: 06b-pantalla.js lo ajusta al móvil (240-400)
 const $=id=>document.getElementById(id);
 const cv=$('c'), ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));

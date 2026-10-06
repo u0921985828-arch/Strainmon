@@ -39,8 +39,8 @@ const font = (file, family, weight) =>
   `@font-face{font-family:"${family}";font-style:normal;font-weight:${weight};font-display:swap;` +
   `src:url(data:font/woff2;base64,${read('assets/fonts/' + file, null).toString('base64')}) format("woff2")}`;
 const fontCss = [
-  font('pixelify-sans-latin-400-normal.woff2', 'Pixelify Sans', 400),
-  font('pixelify-sans-latin-600-normal.woff2', 'Pixelify Sans', 600),
+  font('atkinson-hyperlegible-latin-400-normal.woff2', 'Atkinson Hyperlegible', 400),
+  font('atkinson-hyperlegible-latin-700-normal.woff2', 'Atkinson Hyperlegible', 700),
   font('press-start-2p-latin-400-normal.woff2', 'Press Start 2P', 400),
 ].join('\n');
 

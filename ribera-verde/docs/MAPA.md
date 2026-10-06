@@ -129,29 +129,29 @@ Los **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acer
 | i_spray | town (8,25) | bolsa en el suelo | 2 × SPRAY DE PIMIENTA |
 | i_fert | town (36,24) | bolsa en el suelo | 3 × FERTILIZANTE |
 | i_boc | town (15,23) | bolsa en el suelo | 2 × BOCATA |
-| h_acap | town (2,26) | oculto en arbusto (pulsa A delante) | 2 semillas de ACAPULCO ORO |
-| h_50 | town (9,16) | oculto en arbusto (pulsa A delante) | 50 € arrugados |
+| h_acap | town (2,26) | oculto en arbusto (pulsa A delante) | 2 semillas de ACAPULCO GOLD |
+| h_50 | town (9,16) | oculto en arbusto (pulsa A delante) | 50 € en billetes doblados |
 | h_ins | town (10,24) | oculto en arbusto (pulsa A delante) | 1 × INSECTICIDA |
 
 ## Carteles
 
 - **town:9,8** — Calle Ribera, 3. · Piso de la tía Maite.
 - **town:13,8** — GROWSHOP KIKO · Semillas, abonos y consejos gratis.
-- **town:22,8** — BAR EL ANCLA · Pintxos, kalimotxo y negocios turbios.
-- **town:4,13** — PARQUE DE LOS SAUCES · Prohibido pisar el césped. Nadie hace caso.
+- **town:22,8** — BAR EL ANCLA · Pintxos y menú del día.
+- **town:4,13** — PARQUE DE LOS SAUCES · Horario: de 7:00 a 23:00.
 - **town:17,13** — PLAZA DE RIBERA VERDE · Fuente inaugurada en 1987.
-- **town:29,18** — MUELLE VIEJO → · Cuidado con las gaviotas.
+- **town:29,18** — MUELLE VIEJO → · Peligro: borde sin barandilla.
 
 ## Tienda de Kiko
 
 | Artículo | Precio | Desde cap. | Nota |
 |---|---|---|---|
-| Semilla Ría Skunk | 15 € | 1 |  |
-| Semilla Limón Haze | 25 € | 2 |  |
-| Semilla Txoko Kush | 30 € | 2 |  |
-| Semilla Niebla Blue | 40 € | 3 |  |
-| Semilla Mango Rompeolas | 35 € | 3 |  |
-| Semilla Púrpura Monte | 50 € | 4 |  |
+| Semilla Skunk #1 | 15 € | 1 |  |
+| Semilla Lemon Haze | 25 € | 2 |  |
+| Semilla OG Kush | 30 € | 2 |  |
+| Semilla Blueberry | 40 € | 3 |  |
+| Semilla Mango | 35 € | 3 |  |
+| Semilla Purple Afghani | 50 € | 4 |  |
 | Fertilizante | 15 € | 1 | Una dosis por planta: +25% de cosecha. |
 | Insecticida | 20 € | 1 | Elimina una plaga de araña roja. |
 | Bocata | 6 € | 1 | Recupera 15 de vida. En combate o desde la mochila. |

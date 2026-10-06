@@ -90,8 +90,20 @@ function buildTiles(){
    T('cpBL',t=>{suelo(t,13,0,3,6);izq(t,9);riel(t,8,8);});
    T('cpBR',t=>{suelo(t,0,0,5,6);t.F(5,0,3,6,K.pole);riel(t,0,8);});
    T('cpPuerta',t=>{suelo(t,0,0,16,9);t.F(0,6,2,3,K.hi);t.F(14,6,2,3,K.hi);t.F(2,8,12,1,K.my2);});}
-  // mesa de cultivo: una por plaza; la maceta se apoya en el tablero (MESA_ALTO px más arriba que en el suelo)
-  T('mesa',t=>{t.F(2,10,2,6,C.wood4);t.F(12,10,2,6,C.wood4);t.F(1,6,14,5,'#a26c3e');t.F(1,6,14,4,'#c48a52');t.F(2,6,12,1,'#dcac6c');t.F(1,10,14,1,C.wood4);});
+  // bandeja de cultivo: una casilla por plaza, pero las de una carpa se unen en una sola bandeja de plástico sobre un bastidor
+  // metálico (paleta de la carpa). Fotogramas: 0 suelta · 1 extremo izquierdo · 2 tramo central · 3 extremo derecho (14-render elige).
+  // La maceta se apoya dentro de la cubeta, MESA_ALTO px más arriba que en el suelo.
+  T('mesa',t=>{const iz=t.f<2,de=t.f===0||t.f===3,O='#2a2d34',a=iz?1:0,b=de?15:16;
+    t.F(a,13,b-a,3,'rgba(60,66,84,.22)');                                   // sombra en el mylar
+    t.F(a,14,b-a,1,'#5a5e68');                                              // larguero del bastidor
+    if(iz){t.F(1,12,2,4,'#5a5e68');t.F(1,12,1,4,'#8a8e98');}if(de){t.F(13,12,2,4,'#5a5e68');t.F(13,12,1,4,'#8a8e98');}
+    t.F(a,5,b-a,1,O);t.F(a,12,b-a,1,O);                                     // canto de arriba y de abajo
+    t.F(a,6,b-a,1,'#f2f4f8');t.F(a,7,b-a,1,'#7d8492');t.F(a,8,b-a,1,'#9aa1ae'); // borde trasero, sombra y fondo de la cubeta
+    t.F(a,9,b-a,1,'#f2f4f8');t.F(a,10,b-a,1,'#d4d8e2');t.F(a,11,b-a,1,'#b2b8c4'); // labio delantero con volumen
+    if(iz){t.F(0,6,1,6,O);t.F(1,6,1,6,'#e6e9f0');}
+    if(de){t.F(15,6,1,6,O);t.F(14,6,1,6,'#b2b8c4');t.F(14,9,1,1,'#d4d8e2');t.F(11,10,2,2,'#3a3e47');t.P(11,10,'#5a5e68');}   // desagüe
+    if(!iz&&!de&&t.f===2)for(let x=3;x<16;x+=8)t.P(x,8,'#8b92a0');           // marcas del molde
+  },4);
   T('mat',t=>{t.F(0,0,16,16,'#d8a868');t.box(1,3,14,11,'#c44a4a','#7a2626');for(let x=3;x<13;x+=3)t.F(x,5,1,7,'#a83636');});
   // objects (transparent)
   T('tree',t=>{t.F(6,11,4,5,C.wood4);t.F(7,11,1,5,'#8c6438');t.blob(8,6.5,7.6,6.6,'#3e9446','#1f4f2a','#72c868','#2c6e36');t.noise(6,['#2c6e36'],3,2,10,8);});

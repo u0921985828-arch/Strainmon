@@ -1,6 +1,6 @@
 {
   "name": "ribera-verde",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "private": true,
   "description": "RPG de cultivo en pixel art estilo portátil de 16 bits, inspirado en las mecánicas de Weed Firm.",
   "scripts": {
@@ -8,6 +8,7 @@
     "test": "node tools/build.js && node tools/test-historia.js",
     "docs": "node tools/build.js && node tools/generar-docs.js",
     "capturas": "node tools/build.js && node tools/capturas.js",
+    "plano": "node tools/build.js && node tools/plano.js",
     "sprites:ref": "node tools/build.js && node tools/sprites/referencias.js && node tools/sprites/paleta.js",
     "sprites:validar": "node tools/sprites/validar.js",
     "sprites:procesar": "node tools/sprites/procesar.js",

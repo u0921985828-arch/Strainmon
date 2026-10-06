@@ -4189,7 +4189,7 @@
      "candidato": 3
     }
    },
-   "notas": "Una mesa por plaza en la fila de las mesas de cada carpa; la maceta se apoya en el tablero (MESA_ALTO = 6 px)."
+   "notas": "Una mesa por plaza en la fila de las mesas de cada carpa; la maceta se apoya en el tablero (MESA_ALTO = 6 px). Desde la 1.7.0 el juego no la usa: pinta una bandeja continua por carpa (procedural, TILES.mesa) porque los taburetes sueltos quedaban en otra escala que la carpa."
   },
   {
    "id": "edificio-home",

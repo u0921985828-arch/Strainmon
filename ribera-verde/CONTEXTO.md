@@ -16,13 +16,13 @@
 
 | Pedido | Cómo está en el juego |
 |---|---|
-| Mecánicas de Weed Firm: cultivar | Carpas en el piso (armario de 60 con 2 plantas → carpa de 100 con 4 → de 150 con 6), mesas, macetas de plástico y de tela de 7 a 25 L, focos CFL, sodio y LED de 125 a 720 W con cobertura y factura de la luz; riego, abono, plagas, fases de crecimiento, cosecha con % de THC |
+| Mecánicas de Weed Firm: cultivar | Carpas en el piso (armario de 60 con 2 plantas → carpa de 100 con 4 → de 150 con 6), una bandeja por carpa, macetas de plástico y de tela de 7 a 25 L, focos CFL, sodio y LED de 125 a 720 W con cobertura y factura de la luz; riego, abono, plagas, fases de crecimiento, cosecha con % de THC |
 | Descubrir y cruzar genéticas | Mesa de genética y **Genoteca** de 23 variedades (6 de tienda, 4 landraces —1 regalo de Kiko y 3 repartidas por el barrio—, 13 recetas de cruce) + híbridos propios ilimitados |
 | Venderlo en la calle | Clientes con `$` que cambian cada día; tú eliges precio (rebaja, justo o caro) y pueden rechazarlo |
 | Ladrones y policía | Encuentros aleatorios al andar por el barrio con mercancía o dinero, y combates por turnos |
 | Sobornar | Opción SOBORNAR contra la policía y la «protección» del sargento Molina |
 | Historia con guion | 7 capítulos con objetivos, personajes y diálogos: ver [docs/GUION.md](docs/GUION.md) |
-| Gráficos tipo Pokémon Esmeralda, pixel art | Resolución de portátil de 16 bits (240 × 160), casillas de 16 px, contorno oscuro, cajas de diálogo con borde azul y flecha roja, combates con plataformas y barras de vida |
+| Gráficos tipo Pokémon Esmeralda, pixel art | Resolución de portátil de 16 bits (160 px de alto; de 240 a 400 de ancho según el móvil, solo en horizontal), casillas de 16 px, contorno oscuro, cajas de diálogo con borde azul y flecha roja, combates con plataformas y barras de vida |
 
 ## Decisiones
 
@@ -35,10 +35,11 @@
 - **El motor de sprites va antes que los sprites (v1.3).** Se probó con un atlas «de calco» del arte actual: si las capturas salen iguales, las anclas cuadran y los créditos se gastan solo en arte.
 - **Ajustes tras la prueba automática (v1.1).** Los ladrones de los capítulos altos ganaban casi siempre, así que se suavizaron y ahora la VIDA máxima sube 2 puntos por cada ladrón vencido. Además se corrigieron tres fallos; están en [CHANGELOG.md](CHANGELOG.md).
 
-## Estado (v1.6.0)
+## Estado (v1.7.0)
 
 - Se juega de principio a fin: capítulos 1 a 7, final y juego libre (capítulo 8).
 - `npm test` recorre la historia entera y los sistemas sueltos en 38 pasos: **38/38, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
+- **Plano (1.7.0):** [docs/PLANO.md](docs/PLANO.md) mide todos los sprites contra su tamaño real y deja la decisión de escala pendiente.
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
   - el motor ya usa el atlas (F2) y `npm run test:arte` da 22/22;
@@ -48,22 +49,23 @@
   - F4b (1.5): orillas del río, del camino de tierra y de la plaza con tres Wang encadenados y autotiling por esquinas;
   - F8 (1.6): carpas de 3 tamaños por dentro y cerradas (pixflux img2img sobre su huella), 4 macetas, 3 focos y la mesa de cultivo (lotes de `create_1_direction_object`). Atlas completo: 1099 fotogramas.
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
-- **Android:** `dist/ribera-verde.apk` (1.6.1, código 10601), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
-- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.6.1, con el atlas completo de PixelLab (1099 fotogramas). Es privado: se comparte desde su menú Compartir.
+- **Android:** `dist/ribera-verde.apk` (1.7.0, código 10700, siempre en horizontal), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
+- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.7.0, con el atlas completo de PixelLab (1099 fotogramas). Es privado: se comparte desde su menú Compartir.
 
 ## Limitaciones conocidas
 
 - El equilibrio de la economía y de la dificultad solo se ha probado con el test automático, no con jugadores.
 - Sin atlas (`?arte=procedural`) el arte es el procedural sencillo: personajes de 16 × 20 px con 3 fotogramas y plantas en 5 fases.
 - La música son 5 bucles cortos. No hay efectos de pasos.
-- No hay soporte de mando. En el navegador no se pide pantalla completa (en el APK sí).
+- No hay soporte de mando. En el navegador, la pantalla completa y el bloqueo en horizontal se piden al primer toque y dependen del navegador (en iPhone, Safari no deja bloquear el giro: sale «Gira el móvil»).
 - El guardado vive en el navegador: si se borran los datos del sitio, se pierde la partida.
 - En las listas, los nombres de híbrido muy largos se cortan con «…».
 - Las fuentes embebidas solo traen el alfabeto latino. Los símbolos ★ ▲ ▼ → salen con la fuente del sistema.
 
 ## Siguientes pasos sugeridos
 
-1. Revisar el arte nuevo jugando y repetir lo que no convenza (cada asset del manifiesto guarda sus ids, semillas y descartes). Guía: [docs/PIXELLAB.md](docs/PIXELLAB.md); comando `/sprites`.
-2. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.
-3. Añadir zonas: polígono industrial, monte con cultivo exterior por estaciones y puerto con contrabando.
-4. Añadir profundidad al estilo Weed Firm: secado y curado, clientes fijos con encargos, empleados y un segundo local.
+1. Decidir la escala con [docs/PLANO.md](docs/PLANO.md) (opción A, B o C) y rehacer lo que toque.
+2. Revisar el arte nuevo jugando y repetir lo que no convenza (cada asset del manifiesto guarda sus ids, semillas y descartes). Guía: [docs/PIXELLAB.md](docs/PIXELLAB.md); comando `/sprites`.
+3. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.
+4. Añadir zonas: polígono industrial, monte con cultivo exterior por estaciones y puerto con contrabando.
+5. Añadir profundidad al estilo Weed Firm: secado y curado, clientes fijos con encargos, empleados y un segundo local.

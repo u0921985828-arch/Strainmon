@@ -1,5 +1,40 @@
 # Cambios
 
+## 1.7.0 · 6 de octubre de 2026
+
+- **Nuevo: plano del juego** (`npm run plano`, `docs/PLANO.md`).
+  - Cada mapa sale entero con rejilla, coordenadas y rótulos de edificios, puertas, salidas, NPC, objetos, carpas y plazas (`docs/plano/*.png`).
+  - Una hoja de escala pone todos los sprites junto al jugador y los mide contra su tamaño real (`docs/plano/escala.png`, `medidas.json`).
+  - Conclusión: con 1 casilla = 1 m, personajes y muebles cuadran (×0,8–×1,3), la zona de cultivo va a ×2,5–×5 y el exterior a ×0,25–×0,5.
+  - El documento propone tres maneras de dejar una sola escala (A: vista de carpa a escala de detalle; B: interiores a ×2; C: ajuste dentro del estilo actual), con su coste en PixelLab, **para decidir**.
+- **Cambiado: pantalla completa, solo en horizontal.**
+  - Fuera el chasis de la consola: la pantalla ocupa el móvil entero, con un reborde fino.
+  - Los mandos flotan encima, fijos: cruceta abajo a la izquierda, A/B abajo a la derecha, SONIDO y START arriba a la derecha.
+  - El ancho del juego se adapta al móvil (de 240 a 400 px, siempre 160 de alto y píxeles cuadrados): en un móvil de 844 × 390 se ven 358 px de mundo.
+  - Diálogos y menús van en un escenario de 240 centrado, que encoge si haría falta para no quedar debajo de los mandos.
+  - Título y combate siguen compuestos a 240 y su fondo se alarga a los lados. En el combate, sin repetir trozos de las tarimas.
+  - En vertical sale «Gira el móvil».
+  - Al primer toque se pide pantalla completa y se bloquea el giro. El APK va en `sensorLandscape`.
+- **Cambiado: variedades con nombres reales y guion serio.**
+  - Las 23 variedades son reales, con su linaje: Skunk #1, Lemon Haze, OG Kush, Blueberry, Mango y Purple Afghani en la tienda; Afghani, Hindu Kush, Acapulco Gold y Malawi Gold como landraces; y cruces como Lemon Skunk, Critical Mass, Blue Dream, Super Lemon Haze, Amnesia Haze y Fire OG, hasta la legendaria Ghost Train Haze (29 %).
+  - Cogollos en tonos verdes realistas.
+  - Los híbridos propios se nombran con las variedades de los padres (Skunk #1 × Hindu Kush → «Skunk Kush»).
+  - Todo el guion, reescrito en serio:
+    - intro de Kiko sin presentador;
+    - carta de Maite con la deuda;
+    - uso medicinal de Txaro durante la quimio;
+    - Copa de la asociación cannábica con análisis de laboratorio;
+    - Darko, Molina y Baltasar sin chistes;
+    - ladrones sin apodos (encapuchado, atracador, carterista…);
+    - combate sin coletillas («Fallas.», «¿Qué haces?», «Consigues…»).
+  - Subtítulo: «genética de barrio».
+- **Cambiado: fuente más legible.** Atkinson Hyperlegible (400 y 700) en diálogos, menús y HUD; Press Start 2P solo en rótulos. Sale Pixelify Sans.
+- **Cambiado: bandeja de cultivo.** Las «mesitas» de madera por plaza (otra escala y otra calidad que la carpa) se cambian por una bandeja continua por carpa: cubeta de plástico sobre bastidor metálico con desagüe, con la paleta de la carpa.
+- **Tests:**
+  - `npm test` 38/38, con los nombres nuevos.
+  - `npm run test:arte` 22/22: pantalla completa en 7 tamaños horizontales (pantalla ≥ 90 % del móvil, píxeles cuadrados, mandos dentro y sin tapar los diálogos a partir de 2:1) y «Gira el móvil» en 2 verticales; bandeja continua.
+- **Capturas** de 720 × 480 (×3 exacto) y la del móvil en horizontal (844 × 390).
+
 ## 1.6.1 · 6 de octubre de 2026
 
 - **Corregido: el marco en el móvil.** La pantalla del juego quedaba pequeña y los mandos se comían el resto; en horizontal la pantalla se quedaba en 90 × 60 px. Ahora la consola es la app entera, sin scroll, y `ajustarPantalla()` reparte el hueco real (`visualViewport`, con barras del sistema y muescas) con límites fijos para cada parte:

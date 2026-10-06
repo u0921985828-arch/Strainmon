@@ -31,7 +31,7 @@ async function mochila(){
     for(const [k,b] of Object.entries(S.buds))rows.push({label:getStrain(k).n,right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(k).c,ic:iconoCogollo(k),desc:'Cogollos listos para vender.\n'+getStrain(k).o});
     i=await menu(rows,{cls:'full',title:'MOCHILA',title2:`${Math.floor(totalBuds())} g encima`,desc:true,initial:i});
     if(i<0)return;
-    if(rows[i].k==='bocata'){if(S.items.bocata>0&&S.hp<S.hpMax){S.items.bocata--;S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');toast('Ñam. +15 de vida',1200);}else sfx('bump');}
+    if(rows[i].k==='bocata'){if(S.items.bocata>0&&S.hp<S.hpMax){S.items.bocata--;S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');toast('Te comes el bocata. +15 de vida',1200);}else sfx('bump');}
   }
 }
 async function plantas(){
@@ -42,7 +42,7 @@ async function plantas(){
     H.forEach((h,i)=>{if(h.c!==ci)return;const p=S.pots[i],M=MACETAS[S.macetas[i]];
       if(!p){rows.push({label:`  ${h.j+1} · vacía`,right:M.l+' L',ic:icono('maceta'),desc:`Maceta de ${M.n}. Planta algo desde la carpa de tu piso.`});return;}
       const s=getStrain(p.sid);
-      rows.push({label:`  ${h.j+1} · ${s.n}`,sw:s.c,ic:iconoCogollo(p.sid),right:p.dead?'muerta':p.prog>=1?'¡LISTA!':`${Math.floor(p.prog*100)}%`,desc:p.dead?'Se ha secado. Retírala.':`${p.prog>=1?'Lista para cosechar':stageName(p)} · Agua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%\n${p.pest?'¡PLAGA! Trátala con insecticida. ':''}${p.fert?'Abonada':'Sin abonar'} · maceta de ${M.n}.`});});
+      rows.push({label:`  ${h.j+1} · ${s.n}`,sw:s.c,ic:iconoCogollo(p.sid),right:p.dead?'muerta':p.prog>=1?'LISTA':`${Math.floor(p.prog*100)}%`,desc:p.dead?'Se ha secado. Retírala.':`${p.prog>=1?'Lista para cosechar':stageName(p)} · Agua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%\n${p.pest?'PLAGA: trátala con insecticida. ':''}${p.fert?'Abonada':'Sin abonar'} · maceta de ${M.n}.`});});
   });
   const luz=facturaLuz();
   let i=0;do{i=await menu(rows,{cls:'full',title:'CULTIVO',title2:luz?'Luz '+eur(luz)+'/día':'Luz apagada',desc:true,initial:i});}while(i>=0);

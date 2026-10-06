@@ -1,0 +1,968 @@
+{
+ "escala": "1 casilla = 16 px = 1 m",
+ "mapas": {
+  "town": {
+   "nombre": "town",
+   "titulo": "RIBERA VERDE · barrio",
+   "w": 40,
+   "h": 30,
+   "edificios": [
+    {
+     "id": "home",
+     "x": 2,
+     "y": 3,
+     "w": 7,
+     "h": 6,
+     "puerta": 5
+    },
+    {
+     "id": "shop",
+     "x": 14,
+     "y": 3,
+     "w": 7,
+     "h": 6,
+     "puerta": 17
+    },
+    {
+     "id": "bar",
+     "x": 23,
+     "y": 3,
+     "w": 7,
+     "h": 6,
+     "puerta": 26
+    },
+    {
+     "id": "gray",
+     "x": 32,
+     "y": 3,
+     "w": 6,
+     "h": 6,
+     "puerta": null
+    }
+   ],
+   "puertas": [
+    {
+     "x": 5,
+     "y": 8,
+     "a": "home"
+    },
+    {
+     "x": 17,
+     "y": 8,
+     "a": "shop"
+    },
+    {
+     "x": 26,
+     "y": 8,
+     "a": "bar"
+    }
+   ],
+   "salidas": [],
+   "npcs": [
+    {
+     "id": "begona",
+     "x": 10,
+     "y": 12,
+     "deambula": 2
+    },
+    {
+     "id": "unai",
+     "x": 17,
+     "y": 18,
+     "deambula": 3
+    },
+    {
+     "id": "patxi",
+     "x": 21,
+     "y": 21,
+     "deambula": 0
+    },
+    {
+     "id": "txaro",
+     "x": 3,
+     "y": 18,
+     "deambula": 0
+    },
+    {
+     "id": "inaki",
+     "x": 37,
+     "y": 21,
+     "deambula": 0
+    },
+    {
+     "id": "cop",
+     "x": 22,
+     "y": 17,
+     "deambula": 3
+    },
+    {
+     "id": "darko",
+     "x": 20,
+     "y": 14,
+     "deambula": 0
+    },
+    {
+     "id": "molina",
+     "x": 23,
+     "y": 15,
+     "deambula": 0
+    },
+    {
+     "id": "jurado",
+     "x": 18,
+     "y": 15,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "crate",
+     "x": 38,
+     "y": 17
+    },
+    {
+     "o": "crate",
+     "x": 38,
+     "y": 18
+    },
+    {
+     "o": "fountain",
+     "x": 20,
+     "y": 19
+    },
+    {
+     "o": "crate",
+     "x": 34,
+     "y": 25
+    },
+    {
+     "o": "i_spray",
+     "x": 8,
+     "y": 25,
+     "item": 1
+    },
+    {
+     "o": "i_fert",
+     "x": 36,
+     "y": 24,
+     "item": 1
+    },
+    {
+     "o": "i_boc",
+     "x": 15,
+     "y": 23,
+     "item": 1
+    },
+    {
+     "o": "h_acap",
+     "x": 2,
+     "y": 26,
+     "item": 1
+    },
+    {
+     "o": "h_50",
+     "x": 9,
+     "y": 16,
+     "item": 1
+    },
+    {
+     "o": "h_ins",
+     "x": 10,
+     "y": 24,
+     "item": 1
+    }
+   ],
+   "carpas": [],
+   "plazas": []
+  },
+  "home": {
+   "nombre": "home",
+   "titulo": "PISO DE LA TÍA MAITE (carpas al máximo: armario 60 + carpa 150)",
+   "w": 20,
+   "h": 12,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 5,
+     "y": 11,
+     "a": "town"
+    }
+   ],
+   "npcs": [],
+   "objetos": [
+    {
+     "o": "iwin",
+     "x": 2,
+     "y": 1
+    },
+    {
+     "o": "poster",
+     "x": 6,
+     "y": 1
+    },
+    {
+     "o": "iwin",
+     "x": 11,
+     "y": 1
+    },
+    {
+     "o": "bedT",
+     "x": 1,
+     "y": 2
+    },
+    {
+     "o": "pc",
+     "x": 3,
+     "y": 2
+    },
+    {
+     "o": "lab",
+     "x": 4,
+     "y": 2
+    },
+    {
+     "o": "lab2",
+     "x": 5,
+     "y": 2
+    },
+    {
+     "o": "plantDeco",
+     "x": 11,
+     "y": 2
+    },
+    {
+     "o": "table",
+     "x": 3,
+     "y": 6
+    },
+    {
+     "o": "fridge",
+     "x": 1,
+     "y": 7
+    },
+    {
+     "o": "plantDeco",
+     "x": 0,
+     "y": 8
+    },
+    {
+     "o": "plantDeco",
+     "x": 19,
+     "y": 10
+    }
+   ],
+   "carpas": [
+    {
+     "t": "p60",
+     "x": 7,
+     "y": 2,
+     "w": 4,
+     "h": 5,
+     "plazas": 2
+    },
+    {
+     "t": "g150",
+     "x": 12,
+     "y": 2,
+     "w": 8,
+     "h": 5,
+     "plazas": 6
+    }
+   ],
+   "plazas": [
+    {
+     "i": 1,
+     "x": 8,
+     "y": 4,
+     "carpa": 0
+    },
+    {
+     "i": 2,
+     "x": 9,
+     "y": 4,
+     "carpa": 0
+    },
+    {
+     "i": 3,
+     "x": 13,
+     "y": 4,
+     "carpa": 1
+    },
+    {
+     "i": 4,
+     "x": 14,
+     "y": 4,
+     "carpa": 1
+    },
+    {
+     "i": 5,
+     "x": 15,
+     "y": 4,
+     "carpa": 1
+    },
+    {
+     "i": 6,
+     "x": 16,
+     "y": 4,
+     "carpa": 1
+    },
+    {
+     "i": 7,
+     "x": 17,
+     "y": 4,
+     "carpa": 1
+    },
+    {
+     "i": 8,
+     "x": 18,
+     "y": 4,
+     "carpa": 1
+    }
+   ]
+  },
+  "shop": {
+   "nombre": "shop",
+   "titulo": "GROWSHOP KIKO",
+   "w": 10,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 4,
+     "y": 7,
+     "a": "town"
+    }
+   ],
+   "npcs": [
+    {
+     "id": "kiko",
+     "x": 4,
+     "y": 2,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "shelfW",
+     "x": 0,
+     "y": 1
+    },
+    {
+     "o": "poster",
+     "x": 4,
+     "y": 1
+    },
+    {
+     "o": "shelfW",
+     "x": 8,
+     "y": 1
+    },
+    {
+     "o": "counter",
+     "x": 2,
+     "y": 3
+    },
+    {
+     "o": "display",
+     "x": 0,
+     "y": 5
+    },
+    {
+     "o": "display",
+     "x": 9,
+     "y": 5
+    },
+    {
+     "o": "plantDeco",
+     "x": 0,
+     "y": 7
+    },
+    {
+     "o": "plantDeco",
+     "x": 9,
+     "y": 7
+    }
+   ],
+   "carpas": [],
+   "plazas": []
+  },
+  "bar": {
+   "nombre": "bar",
+   "titulo": "BAR EL ANCLA",
+   "w": 10,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 4,
+     "y": 7,
+     "a": "town"
+    }
+   ],
+   "npcs": [
+    {
+     "id": "josune",
+     "x": 2,
+     "y": 2,
+     "deambula": 0
+    },
+    {
+     "id": "baltasar",
+     "x": 7,
+     "y": 4,
+     "deambula": 0
+    },
+    {
+     "id": "tono",
+     "x": 5,
+     "y": 4,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "bottles",
+     "x": 0,
+     "y": 1
+    },
+    {
+     "o": "iwin",
+     "x": 6,
+     "y": 1
+    },
+    {
+     "o": "btable",
+     "x": 8,
+     "y": 2
+    },
+    {
+     "o": "jukebox",
+     "x": 9,
+     "y": 2
+    },
+    {
+     "o": "barcounter",
+     "x": 0,
+     "y": 3
+    },
+    {
+     "o": "stool",
+     "x": 1,
+     "y": 4
+    },
+    {
+     "o": "stool",
+     "x": 3,
+     "y": 4
+    },
+    {
+     "o": "btable",
+     "x": 7,
+     "y": 5
+    }
+   ],
+   "carpas": [],
+   "plazas": []
+  }
+ },
+ "sprites": [
+  {
+   "grupo": "PERSONAJES",
+   "n": "Jugador",
+   "clave": "look:player",
+   "eje": "alto",
+   "real": 1.75,
+   "w": 16,
+   "h": 27,
+   "m": 1.69,
+   "ratio": 0.96
+  },
+  {
+   "grupo": "PERSONAJES",
+   "n": "Kiko",
+   "clave": "look:kiko",
+   "eje": "alto",
+   "real": 1.78,
+   "w": 18,
+   "h": 28,
+   "m": 1.75,
+   "ratio": 0.98
+  },
+  {
+   "grupo": "PERSONAJES",
+   "n": "Baltasar",
+   "clave": "look:baltasar",
+   "eje": "alto",
+   "real": 1.8,
+   "w": 16,
+   "h": 27,
+   "m": 1.69,
+   "ratio": 0.94
+  },
+  {
+   "grupo": "PERSONAJES",
+   "n": "Txaro",
+   "clave": "look:granny",
+   "eje": "alto",
+   "real": 1.55,
+   "w": 16,
+   "h": 28,
+   "m": 1.75,
+   "ratio": 1.13
+  },
+  {
+   "grupo": "PERSONAJES",
+   "n": "Unai (niño)",
+   "clave": "look:kid",
+   "eje": "alto",
+   "real": 1.35,
+   "w": 14,
+   "h": 28,
+   "m": 1.75,
+   "ratio": 1.3
+  },
+  {
+   "grupo": "PERSONAJES",
+   "n": "Agente",
+   "clave": "look:cop",
+   "eje": "alto",
+   "real": 1.8,
+   "w": 16,
+   "h": 28,
+   "m": 1.75,
+   "ratio": 0.97
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Cama",
+   "clave": "bed",
+   "eje": "ancho",
+   "real": 0.9,
+   "w": 19,
+   "h": 32,
+   "m": 1.19,
+   "ratio": 1.32
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Nevera",
+   "clave": "fridge",
+   "eje": "ancho",
+   "real": 0.6,
+   "w": 18,
+   "h": 31,
+   "m": 1.13,
+   "ratio": 1.88
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Ordenador",
+   "clave": "pc",
+   "eje": "ancho",
+   "real": 1.2,
+   "w": 16,
+   "h": 15,
+   "m": 1,
+   "ratio": 0.83
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Mesa genética",
+   "clave": "lab",
+   "eje": "ancho",
+   "real": 1.2,
+   "w": 16,
+   "h": 15,
+   "m": 1,
+   "ratio": 0.83
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Mesa genética 2",
+   "clave": "lab2",
+   "eje": "ancho",
+   "real": 1.2,
+   "w": 16,
+   "h": 14,
+   "m": 1,
+   "ratio": 0.83
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Mesa",
+   "clave": "table",
+   "eje": "ancho",
+   "real": 0.8,
+   "w": 14,
+   "h": 13,
+   "m": 0.88,
+   "ratio": 1.09
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Planta deco",
+   "clave": "plantDeco",
+   "eje": "alto",
+   "real": 0.9,
+   "w": 14,
+   "h": 16,
+   "m": 1,
+   "ratio": 1.11
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Estantería",
+   "clave": "shelfW",
+   "eje": "ancho",
+   "real": 0.9,
+   "w": 16,
+   "h": 9,
+   "m": 1,
+   "ratio": 1.11
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Mostrador",
+   "clave": "counter",
+   "eje": "alto",
+   "real": 1,
+   "w": 16,
+   "h": 11,
+   "m": 0.69,
+   "ratio": 0.69
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Expositor",
+   "clave": "display",
+   "eje": "ancho",
+   "real": 0.8,
+   "w": 14,
+   "h": 15,
+   "m": 0.88,
+   "ratio": 1.09
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Botellero",
+   "clave": "bottles",
+   "eje": "ancho",
+   "real": 1,
+   "w": 16,
+   "h": 11,
+   "m": 1,
+   "ratio": 1
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Taburete",
+   "clave": "stool",
+   "eje": "alto",
+   "real": 0.75,
+   "w": 8,
+   "h": 14,
+   "m": 0.88,
+   "ratio": 1.17
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Mesa de bar",
+   "clave": "btable",
+   "eje": "ancho",
+   "real": 0.7,
+   "w": 14,
+   "h": 14,
+   "m": 0.88,
+   "ratio": 1.25
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Gramola",
+   "clave": "jukebox",
+   "eje": "ancho",
+   "real": 0.7,
+   "w": 12,
+   "h": 16,
+   "m": 0.75,
+   "ratio": 1.07
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Cajas",
+   "clave": "crate",
+   "eje": "ancho",
+   "real": 0.6,
+   "w": 14,
+   "h": 15,
+   "m": 0.88,
+   "ratio": 1.46
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Armario 60×60",
+   "clave": "carpa:p60",
+   "eje": "ancho",
+   "real": 0.6,
+   "w": 48,
+   "h": 72,
+   "m": 3,
+   "ratio": 5
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Carpa 100×100",
+   "clave": "carpa:m100",
+   "eje": "ancho",
+   "real": 1,
+   "w": 80,
+   "h": 72,
+   "m": 5,
+   "ratio": 5
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Carpa 150×100",
+   "clave": "carpa:g150",
+   "eje": "ancho",
+   "real": 1.5,
+   "w": 112,
+   "h": 72,
+   "m": 7,
+   "ratio": 4.67
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Bandeja (2 plazas)",
+   "clave": "bandeja",
+   "eje": "ancho",
+   "real": 0.6,
+   "w": 32,
+   "h": 11,
+   "m": 2,
+   "ratio": 3.33
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Maceta 7 L",
+   "clave": "maceta:plastico7",
+   "eje": "ancho",
+   "real": 0.22,
+   "w": 10,
+   "h": 11,
+   "m": 0.63,
+   "ratio": 2.84
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Maceta 11 L",
+   "clave": "maceta:tela11",
+   "eje": "ancho",
+   "real": 0.25,
+   "w": 12,
+   "h": 14,
+   "m": 0.75,
+   "ratio": 3
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Maceta 18 L",
+   "clave": "maceta:plastico18",
+   "eje": "ancho",
+   "real": 0.3,
+   "w": 14,
+   "h": 14,
+   "m": 0.88,
+   "ratio": 2.92
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Maceta 25 L",
+   "clave": "maceta:tela25",
+   "eje": "ancho",
+   "real": 0.35,
+   "w": 14,
+   "h": 14,
+   "m": 0.88,
+   "ratio": 2.5
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Germinando",
+   "clave": "planta:germinando",
+   "eje": "alto",
+   "real": 0.25,
+   "w": 16,
+   "h": 19,
+   "m": 1.19,
+   "ratio": 4.75
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Plántula",
+   "clave": "planta:plantula",
+   "eje": "alto",
+   "real": 0.35,
+   "w": 16,
+   "h": 25,
+   "m": 1.56,
+   "ratio": 4.46
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Vegetativo",
+   "clave": "planta:vegetativo",
+   "eje": "alto",
+   "real": 0.6,
+   "w": 26,
+   "h": 30,
+   "m": 1.88,
+   "ratio": 3.13
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Floración",
+   "clave": "planta:floracion",
+   "eje": "alto",
+   "real": 1,
+   "w": 22,
+   "h": 30,
+   "m": 1.88,
+   "ratio": 1.88
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Lista",
+   "clave": "planta:lista",
+   "eje": "alto",
+   "real": 1.1,
+   "w": 24,
+   "h": 32,
+   "m": 2,
+   "ratio": 1.82
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Foco CFL",
+   "clave": "foco:cfl",
+   "eje": "ancho",
+   "real": 0.45,
+   "w": 22,
+   "h": 29,
+   "m": 1.38,
+   "ratio": 3.06
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Foco sodio",
+   "clave": "foco:sodio",
+   "eje": "ancho",
+   "real": 0.55,
+   "w": 30,
+   "h": 23,
+   "m": 1.88,
+   "ratio": 3.41
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Panel LED",
+   "clave": "foco:led",
+   "eje": "ancho",
+   "real": 0.6,
+   "w": 30,
+   "h": 25,
+   "m": 1.88,
+   "ratio": 3.13
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Árbol",
+   "clave": "tree",
+   "eje": "alto",
+   "real": 6,
+   "w": 18,
+   "h": 24,
+   "m": 1.5,
+   "ratio": 0.25
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Farola",
+   "clave": "lamp",
+   "eje": "alto",
+   "real": 4,
+   "w": 6,
+   "h": 27,
+   "m": 1.69,
+   "ratio": 0.42
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Banco",
+   "clave": "bench",
+   "eje": "ancho",
+   "real": 1.8,
+   "w": 16,
+   "h": 12,
+   "m": 1,
+   "ratio": 0.56
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Fuente",
+   "clave": "fountain",
+   "eje": "ancho",
+   "real": 3,
+   "w": 26,
+   "h": 27,
+   "m": 1.63,
+   "ratio": 0.54
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Arbusto",
+   "clave": "bush",
+   "eje": "ancho",
+   "real": 1.2,
+   "w": 14,
+   "h": 11,
+   "m": 0.88,
+   "ratio": 0.73
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Valla",
+   "clave": "fence",
+   "eje": "alto",
+   "real": 1,
+   "w": 16,
+   "h": 12,
+   "m": 0.75,
+   "ratio": 0.75
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Edificio (piso)",
+   "clave": "edificio:home",
+   "eje": "ancho",
+   "real": 14,
+   "w": 112,
+   "h": 96,
+   "m": 7,
+   "ratio": 0.5
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Edificio (bar)",
+   "clave": "edificio:bar",
+   "eje": "ancho",
+   "real": 14,
+   "w": 112,
+   "h": 96,
+   "m": 7,
+   "ratio": 0.5
+  }
+ ]
+}

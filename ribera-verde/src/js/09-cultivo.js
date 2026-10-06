@@ -80,16 +80,16 @@ async function potAction(i){
     if(j<0||j>=own.length)return;
     const sid=own[j][0];S.seeds[sid]--;if(!S.seeds[sid])delete S.seeds[sid];
     S.pots[i]={sid,prog:0,water:70,health:100,fert:false,pest:false};sfx('sel');
-    await accion('plantar');return say(`Has plantado ${getStrain(sid).n}. ¡A crecer!`);
+    await accion('plantar');return say(`Has plantado ${getStrain(sid).n}.`);
   }
   const s=getStrain(p.sid);
-  if(p.dead){await say(`La ${s.n} se ha secado del todo. Una pena.`);S.pots[i]=null;return say('Retiras la planta muerta.');}
-  if(p.prog>=1){const c=await ask(`¡${s.n} lista para cosechar!\nSalud ${Math.round(p.health)}% · Agua ${Math.round(p.water)}%`,['Cosechar','Esperar']);if(c===0)await harvest(i);return;}
+  if(p.dead){await say(`La ${s.n} se ha secado del todo.`);S.pots[i]=null;return say('Retiras la planta muerta.');}
+  if(p.prog>=1){const c=await ask(`${s.n} lista para cosechar.\nSalud ${Math.round(p.health)}% · Agua ${Math.round(p.water)}%`,['Cosechar','Esperar']);if(c===0)await harvest(i);return;}
   const opts=['Regar'];if(!p.fert)opts.push('Abonar');if(p.pest)opts.push('Tratar plaga');opts.push('Arrancar','Salir');
-  const c=await ask(`${s.n} · ${stageName(p)} ${Math.floor(p.prog*100)}%\nAgua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%${p.pest?' · ¡PLAGA!':''}`,opts);
+  const c=await ask(`${s.n} · ${stageName(p)} ${Math.floor(p.prog*100)}%\nAgua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%${p.pest?' · PLAGA':''}`,opts);
   const op=opts[c];
   if(op==='Regar'){const h=huecos()[i];await accion('regar',{id:'vfx-gotas',x:h.x*16+8,y:h.y*16+8-MESA_ALTO});p.water=100;sfx('sel');await say('Riegas la planta. Agua al 100%.');}
-  else if(op==='Abonar'){if(S.items.fert>0){S.items.fert--;p.fert=true;sfx('sel');await say('Echas FERTILIZANTE. Dará más cogollos.');}else await say('No te queda FERTILIZANTE.');}
+  else if(op==='Abonar'){if(S.items.fert>0){S.items.fert--;p.fert=true;sfx('sel');await say('Echas FERTILIZANTE. Dará más cosecha.');}else await say('No te queda FERTILIZANTE.');}
   else if(op==='Tratar plaga'){if(S.items.insect>0){S.items.insect--;p.pest=false;sfx('sel');await say('Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.');}else await say('No tienes INSECTICIDA. Kiko lo vende.');}
   else if(op==='Arrancar'){if(await ask('¿Seguro que quieres arrancarla?',['Sí','No'])===0){S.pots[i]=null;await say('Arrancas la planta.');}}
 }
@@ -120,7 +120,7 @@ async function harvest(i){
   const thc=Math.round((s.thc*(.85+.15*p.health/100)+f.thc+(p.fert?.3:0))*10)/10;
   await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:P.px+8,y:P.py+2});
   const n=1+ri(0,2);addBuds(p.sid,g,thc);addSeeds(p.sid,n);S.pots[i]=null;sfx('get');
-  await say(`¡Cosechas ${g} g de ${s.n} con ${pct(thc)}% de THC!`);
+  await say(`Cosechas ${g} g de ${s.n}. THC: ${pct(thc)}%.`);
   await say(`También recoges ${n} semilla${n>1?'s':''} de ${s.n}.`);
   S.flags.harvest1=true;await checkStory();
 }
@@ -133,13 +133,13 @@ async function bedAction(){
   save();toast('Has descansado'+(S.luz&&S.luz.d===S.day&&S.luz.e?' · Luz −'+eur(S.luz.e):'')+' · Partida guardada',1800);
 }
 async function pcAction(){
-  const c=await ask('El ordenador de la tía. Tiene una pegatina de un cogollo.',['Genoteca','Guardar partida','Apagar']);
+  const c=await ask('El ordenador de la tía. Tiene su registro de cultivos de veinte años.',['Genoteca','Guardar partida','Apagar']);
   if(c===0)await genoteca();else if(c===1){await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');}
 }
 async function letterAction(){
   if(S.flags.letter)return say('La carta de la tía Maite. «Cuida el armario. Y perdona lo de Baltasar.»');
   await say('Hay una carta encima de la mesa. Es de la tía Maite.');
-  await talk('CARTA',['«{N}: si lees esto, el piso es tuyo. Cuídalo, que la escalera cruje.»','«Al fondo del salón está mi armario de cultivo. Ya sabes de qué hablo.»','«Pásate por el growshop de Kiko, aquí al lado. Él te enseñará.»','«P.D.: Si alguien pregunta por mí en el bar El Ancla... yo no estoy. Lo siento.»']);
+  await talk('CARTA',['«{N}: si lees esto, el piso es tuyo. Cuídalo.»','«Al fondo del salón está mi armario de cultivo. Lo he tenido treinta años y nunca me ha fallado.»','«Pásate por el growshop de Kiko, aquí al lado. Él te enseñará lo que yo no pude.»','«Le debo dinero a Baltasar, el del bar El Ancla. No es buena gente. Lo siento.»']);
   S.flags.letter=true;showObjective();
 }
 async function labAction(){
@@ -157,8 +157,8 @@ async function labAction(){
   await accion('cruzar',{id:'vfx-polen',x:P.px+8,y:P.py-4});
   sfx('enc');await fade(1,true);await wait(450);await fade(0,true);
   addSeeds(r,2);
-  if(isNew){sfx('get');await say(`¡NUEVA VARIEDAD! ${s.n}`);await say(`THC ${pct(s.thc)}% · ${s.y} g/planta · ${String(s.d).replace('.',',')} días.\nObtienes 2 semillas.`);
-    if(r==='leyenda'){await say('Te tiemblan las manos. Es la LEYENDA DE LA RÍA.');await talk('SMS · KIKO',['¿¿LA LEYENDA DE LA RÍA?? La busco desde hace veinte años.','Tu tía estaría dando saltos. Yo estoy llorando un poco.']);}}
+  if(isNew){sfx('get');await say(`Nueva variedad: ${s.n}.`);await say(`THC ${pct(s.thc)}% · ${s.y} g/planta · ${String(s.d).replace('.',',')} días.\nObtienes 2 semillas.`);
+    if(r==='leyenda'){await say('Te tiemblan las manos: es GHOST TRAIN HAZE.');await talk('SMS · KIKO',['¿Ghost Train Haze? ¿Estable, de semilla propia? Llevo veinte años detrás de ella.','Tu tía estaría orgullosa. Guárdala bien: eso vale más que el piso.']);}}
   else await say(`Obtienes 2 semillas de ${s.n}.`);
   await checkStory();
 }

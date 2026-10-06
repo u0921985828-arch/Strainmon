@@ -68,7 +68,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
     () => S.flags.letter === true);
   await step('Kiko regala semillas y abono', [], async () => { await run(talkKiko); },
     () => S.seeds.ria === 3 && S.items.fert === 2 && S.flags.kiko1 || { seeds: S.seeds, items: S.items });
-  await step('Plantar dos Ría Skunk y abonar una', ['Ría', 'Ría', 'Abonar'], async () => {
+  await step('Plantar dos Skunk #1 y abonar una', ['Skunk', 'Skunk', 'Abonar'], async () => {
     await run(() => potAction(0)); await run(() => potAction(1)); await run(() => potAction(1));
   }, () => S.pots[0]?.sid === 'ria' && S.pots[1]?.fert === true && S.items.fert === 1 || { pots: S.pots });
   await step('Cuidar 3 días y cosechar → capítulo 2', ['Cosechar', 'Cosechar'], async () => {
@@ -77,16 +77,16 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   }, () => S.ch === 2 && S.buds.ria?.g > 30 && S.seeds.ria >= 1 && S.clients.length > 0 || { ch: S.ch, buds: S.buds, clients: S.clients.length });
 
   // ---------- capítulo 2 ----------
-  await step('Vender a un cliente (rebaja) → 300 € → capítulo 3', ['Ría', 'Rebaja'], async () => {
+  await step('Vender a un cliente (rebaja) → 300 € → capítulo 3', ['Skunk', 'Rebaja'], async () => {
     S.sales = 290; await run(() => talkClient(S.clients[0]));
   }, () => S.ch === 3 && S.sales >= 300 && S.heat > 0 || { ch: S.ch, sales: S.sales });
   await step('Hablar con Josune (pintxo)', ['Pintxo'], async () => { S.hp = 10; await run(talkJosune); },
     () => S.hp === 22 || { hp: S.hp });
-  await step('Abuela Txaro: dar 5 g → Hindú Valle', ['Ría'], async () => { await run(talkTxaro); },
+  await step('Abuela Txaro: dar 5 g → Hindu Kush', ['Skunk'], async () => { await run(talkTxaro); },
     () => S.flags.txaro && S.seeds.hindu === 2 || { seeds: S.seeds });
-  await step('Iñaki: vender 10 g → Malawi Sol', ['Ría', 'Hecho'], async () => { addBuds('ria', 10, 12); await run(talkInaki); },
+  await step('Iñaki: vender 10 g → Malawi Gold', ['Skunk', 'Hecho'], async () => { addBuds('ria', 10, 12); await run(talkInaki); },
     () => S.flags.inaki && S.seeds.malawi === 2 || { seeds: S.seeds });
-  await step('Arbusto escondido → Acapulco Oro', [], async () => { S.map = 'town'; await run(() => objectAction(2, 26)); S.map = 'home'; },
+  await step('Arbusto escondido → Acapulco Gold', [], async () => { S.map = 'town'; await run(() => objectAction(2, 26)); S.map = 'home'; },
     () => S.seeds.acapulco === 2 || { seeds: S.seeds });
 
   // ---------- capítulo 3 ----------
@@ -113,17 +113,17 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   await step('Factura de la luz: solo paga la carpa con plantas', [], async () => {
     S.money = 100; S.pots[2] = { sid: 'ria', prog: .2, water: 100, health: 100, fert: false, pest: false }; advanceTime(24 * 60); await idle(); S.pots[2] = null;
   }, () => S.luz.e === 8 && S.money === 92 || { luz: S.luz, money: S.money });
-  await step('Cruce de receta: Atlas Rif × Txoko Kush', ['Atlas Rif', 'Txoko Kush', 'Cruzar'], async () => {
-    addSeeds('txoko', 2); await run(labAction);
+  await step('Cruce de receta: Afghani × Skunk #1 → Critical Mass', ['^Afghani', '^Skunk #1', 'Cruzar'], async () => {
+    addSeeds('ria', 2); addSeeds('txoko', 2); await run(labAction);
   }, () => S.seeds.kushrif === 2 && S.disc.kushrif || { seeds: S.seeds });
-  await step('Cruce libre: Ría Skunk × Hindú Valle → híbrido propio → capítulo 5', ['Ría Skunk', 'Hindú Valle', 'Cruzar'], async () => {
+  await step('Cruce libre: Skunk #1 × Hindu Kush → híbrido propio → capítulo 5', ['^Skunk #1', '^Hindu Kush', 'Cruzar'], async () => {
     await run(labAction);
   }, () => Object.keys(S.custom).length === 1 && discCount() >= 8 && S.ch === 5 && S.due === 2000 || { custom: S.custom, disc: discCount(), ch: S.ch });
 
   // ---------- capítulo 5 ----------
   await step('Sargento Molina: pagar protección', ['Pagar 500'], async () => { S.money = 600; await run(talkMolina); },
     () => S.protect === true && S.money === 100 || { protect: S.protect, money: S.money });
-  await step('Calor 95 con protección → Molina para la redada', ['Ría'], async () => {
+  await step('Calor 95 con protección → Molina para la redada', ['Skunk'], async () => {
     addSeeds('ria', 1); await run(() => potAction(0)); S.heat = 95; advanceTime(24 * 60); await idle();
   }, () => S.heat === 50 && S.pots[0] !== null || { heat: S.heat, pot: S.pots[0] });
   await step('Calor 95 sin protección → redada', [], async () => {
@@ -134,9 +134,9 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
 
   // ---------- capítulo 6 ----------
   await step('Darko presume', [], async () => { await run(talkDarko); }, () => S.ch === 6);
-  await step('Copa: presentar Ría Skunk (12%) → pierde', ['Ría'], async () => { addBuds('ria', 25, 12); await run(talkJurado); },
+  await step('Copa: presentar Skunk #1 (12%) → pierde', ['Skunk'], async () => { addBuds('ria', 25, 12); await run(talkJurado); },
     () => S.ch === 6 && Math.round(S.buds.ria.g) === 5 || { ch: S.ch, buds: S.buds });
-  await step('Copa: presentar Dragón de Ribera (27,2%) → gana → capítulo 7', ['Dragón'], async () => {
+  await step('Copa: presentar Fire OG (27,2%) → gana → capítulo 7', ['Fire OG'], async () => {
     S.money = 0; addBuds('dragon', 25, 27.2); await run(talkJurado);
   }, () => S.ch === 7 && S.money === 2500 && S.due === 2000 && S.flags.copa || { ch: S.ch, money: S.money, due: S.due });
 
