@@ -25,7 +25,20 @@
    "text or logos",
    "characters, names or logos from existing games",
    "minors smoking or near drugs"
-  ]
+  ],
+  "vista_b_p3": {
+   "elegido": "Clásico: tablero de 4 estilos de la misma escena (create_image_pixen 240 × 160, view low top-down), el 1",
+   "referencia": {
+    "asset_id": "775bda50-79e2-58dd-8958-110fbb79e2c2",
+    "image_job": "ce445b95-382f-4fab-9be1-6406775eb1a8",
+    "seed": 1101,
+    "outline": "single color black outline",
+    "detail": "medium detail"
+   },
+   "cola": "retro 16-bit handheld RPG style, bright colors, clean dark outline, flat shading, light from the top left, no text",
+   "descartes": "estilos 2, 3 y 4 del tablero: elegiste el 1 («Clasico»)",
+   "coste_real": 4
+  }
  },
  "celdas": {
   "tile": {
@@ -5136,6 +5149,43 @@
     "image_job": "7c49c363-2e37-4865-be80-cad50c2af94b"
    },
    "notas": "Fondo de la vista de carpa; en pantallas anchas se estira por fondoAncho como los fondos de combate."
+  },
+  {
+   "tipo": "fondo",
+   "fase": "F9",
+   "herramienta": "create_image_pixflux",
+   "estado": "pendiente de aprobación",
+   "familia": "imagen",
+   "coste_real": 1,
+   "id": "cuarto-cultivo-34",
+   "cubre": [
+    "misc:cuarto-cultivo-34"
+   ],
+   "parametros": {
+    "init_image_strength": 130,
+    "view": "low top-down",
+    "outline": "single color black outline",
+    "shading": "flat shading",
+    "detail": "medium detail",
+    "no_background": false,
+    "seed": 1101,
+    "width": 240,
+    "height": 160
+   },
+   "descripcion": "plain corner of a small city flat seen from the front and slightly above (3/4 view) for a 16-bit handheld game scene: cream painted wall, white skirting board, warm light wooden plank floor in perspective, one wall power socket; no furniture, no people, empty room; retro 16-bit handheld RPG style, bright colors, clean dark outline, flat shading, light from the top left, no text",
+   "entrada": {
+    "init_image_base64": "art/crudo/_ref/huella-cuarto-cultivo-34.png"
+   },
+   "entrada_origen": "cuarto34() de 09b-carpa.js (240 × 160 a 48 px/m), sin el moteado del suelo y en 16 colores para que el data: no se corte",
+   "estilo_ref": "Clásico (tablero de estilos, imagen 1: create_image_pixen 240 × 160, seed 1101, asset 775bda50-79e2-58dd-8958-110fbb79e2c2)",
+   "celda": "pantalla",
+   "pixellab": {
+    "image_job": "c4b1190a-46c3-481e-b45f-badf528829e6",
+    "asset_id": "b40c369f-dd4a-522f-b540-04e24d66b91e"
+   },
+   "montaje": "El enchufe que dibujó PixelLab medía 16 px (33 cm, ×4): se tapó con la pared de 40 px a la derecha y se puso el de la huella a escala (scratchpad f20/scripts/enchufe.py).",
+   "notas": "Lámina 1 de P3. Fondo de la vista B; en pantallas anchas se estira por fondoAncho. Sin él, cuarto34() lo dibuja a mano.",
+   "paleta_forzada": "color_image: los colores de la huella + 6 del estilo Clásico (#142022 #7a4a20 #bc8c5f #c59b66 #f9b772 #ffda94); se mandaron las dos como URL data:"
   },
   {
    "id": "plantas-vista",

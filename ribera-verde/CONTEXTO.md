@@ -50,7 +50,7 @@
 - **Cifras reales (1.10, sin versión todavía):** precios de growshop, vatios, kWh, gramos por vatio y tope de la maceta, semillas feminizadas por unidad y en sobres, fenotipos y esquejes, venta al por mayor, multas reales y deuda de 30.000 € (sus plazos se pagan en las mismas cosechas que antes, según la simulación). Tablas en [docs/ECONOMIA.md](docs/ECONOMIA.md), que se genera con `npm run docs`.
 - **Escala (1.8.0):** decidida y aplicada la opción A de [docs/PLANO.md](docs/PLANO.md): piso de 12 × 8 a 1 casilla = 1 m, carpas como muebles y vista de carpa a 64 px/m con las plantas de cepas de Strainmon (`../assets/plants`).
 - **Genética (1.9.0):** las landraces y los híbridos clásicos de Strainmon (`../src/species.js`, sus textos, no sus sprites), con su historia; estabilizar F1 → F4 en la mesa y banco de semillas en el PC desde el capítulo 2.
-- **Plan de producción (en desarrollo, sin versión todavía):** D1–D6 aprobadas. P1 hecho: el armario 80, la carpa 120 en el sitio C, el LED 100 W y los extras (ventilador, filtro de carbón y goteo), con la regla del olor. P2 hecho: la vista de carpa B (3/4 a 48 px/m) con arte procedural, medida en [docs/PLANO.md](docs/PLANO.md). P3 parado: el arte de plantas y carpas de las pruebas no se aprobó y falta una referencia.
+- **Plan de producción (en desarrollo, sin versión todavía):** D1–D6 aprobadas. P1 hecho: el armario 80, la carpa 120 en el sitio C, el LED 100 W y los extras (ventilador, filtro de carbón y goteo), con la regla del olor. P2 hecho: la vista de carpa B (3/4 a 48 px/m) con arte procedural, medida en [docs/PLANO.md](docs/PLANO.md). P3 en curso con el estilo Clásico (contorno negro, colores vivos, sombreado plano; elegido en un tablero de 4): lámina 1 (fondo del cuarto) en el atlas, pendiente de aprobación.
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
   - el motor ya usa el atlas (F2) y `npm run test:arte` da 23/23;
@@ -77,7 +77,7 @@
 
 ## Siguientes pasos sugeridos
 
-0. Seguir [docs/PLAN-PRODUCCION.md](docs/PLAN-PRODUCCION.md): P3–P6 con PixelLab, con una referencia nueva para plantas y carpas.
+0. Seguir [docs/PLAN-PRODUCCION.md](docs/PLAN-PRODUCCION.md): P3–P6 con PixelLab en estilo Clásico (§5.2), una lámina aprobada antes de pedir la siguiente.
 1. Probar el APK en un móvil real (la vista de carpa incluida).
 2. Revisar el arte nuevo jugando y repetir lo que no convenza (cada asset del manifiesto guarda sus ids, semillas y descartes). Guía: [docs/PIXELLAB.md](docs/PIXELLAB.md); comando `/sprites`.
 3. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.

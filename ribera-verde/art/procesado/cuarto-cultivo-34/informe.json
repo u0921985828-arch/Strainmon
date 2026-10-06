@@ -1,0 +1,18 @@
+{
+  "grupo": "cuarto-cultivo-34",
+  "celda": [
+    240,
+    160
+  ],
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 81.5,
+  "distancia_media": 2.08,
+  "colores_finales": 12,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

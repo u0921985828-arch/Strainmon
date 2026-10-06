@@ -157,14 +157,14 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       // la escena: A delante del armario, ▶ plaza 2, ▲ el foco, B sale
       enterMap('home', A.x0, A.y + 1, 'up'); press('A'); await hasta(() => mode === 'carpa' && handlers.length === 1); await espera(150);
       const hay = c => c && c.width > 0 && colores(c).size > 2;
-      r.escena = hay(cuarto34()) && Object.keys(CARPAS).every(t => hay(carpa34(t))) && Object.keys(MACETAS).every(k => hay(maceta34(k))) && Object.keys(FOCOS).every(k => hay(foco34(k))) && Object.keys(EXTRAS).every(k => hay(extra34(k)));
+      r.escena = hay(cuarto34()) && cuarto34() === fotoMisc('cuarto-cultivo-34').c && Object.keys(CARPAS).every(t => hay(carpa34(t))) && Object.keys(MACETAS).every(k => hay(maceta34(k))) && Object.keys(FOCOS).every(k => hay(foco34(k))) && Object.keys(EXTRAS).every(k => hay(extra34(k)));
       r.sel = [VC.sel]; press('right'); r.sel.push(VC.sel); press('up'); r.sel.push(VC.sel); r.info = document.getElementById('vcInfo').textContent;
       press('B'); await hasta(() => mode === 'world' && isFree()); r.sale = !VC && document.getElementById('vcInfo').hidden;
       return r; });
     check('Carpas: muebles del piso (1-2 casillas, sólidos) con su arte, piso de 12×8', carpa.mapa && carpa.anchos === '1,2' && carpa.solidas && carpa.piso === '12×8', carpa);
     check(`Plantas de la vista B: ${carpa.n} variedades con porte, alto y ancho reales (×0,75-1,33) de vegetativo a lista, seca y muerta sin verdes`, carpa.portes && carpa.crece && carpa.seca, carpa);
     check('Vista B, distancia segura: en las 5 carpas, con cada foco y maceta, ni las copas en floración ni las macetas se tocan ni tocan las paredes, y la cima queda a su distancia del foco', carpa.espacio.length === 5 && carpa.espacio.every(e => +e.split(' ')[1] >= 0), carpa.espacio);
-    check('Vista de carpa B: A abre, ▶ plaza 2, ▲ el foco, B sale; cuarto, carpas, macetas, focos y extras', carpa.escena && carpa.sel.join() === '0,1,-1' && /CFL/.test(carpa.info) && carpa.sale, carpa);
+    check('Vista de carpa B: A abre, ▶ plaza 2, ▲ el foco, B sale; cuarto (lámina 1 del atlas), carpas, macetas, focos y extras', carpa.escena && carpa.sel.join() === '0,1,-1' && /CFL/.test(carpa.info) && carpa.sale, carpa);
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
       for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }
       r.rio = mascaraOrilla(m, 31, 15); r.centro = mascaraOrilla(m, 35, 27); r.sinAtlas = (() => { const ok = ARTE.ok; ARTE.ok = false; const v = arteOrilla(m, 'water', 31, 15, 0, 0); ARTE.ok = ok; return v; })(); return r; });

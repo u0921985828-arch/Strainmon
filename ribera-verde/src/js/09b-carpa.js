@@ -93,9 +93,11 @@ function carpa34(tk){
   const [px,py]=P(W-12,D,H-14);t.blob(px,py,3.5,3.5,'#26272c',VK.som);                          // boca del extractor
   return carpaCache[key]=c;
 }
-// el cuarto: pared del piso y suelo de tarima en 3/4, a 48 px/m (240 × 160: la pared llega a VB_PARED)
+// el cuarto: pared del piso y suelo de tarima en 3/4, a 48 px/m (240 × 160: la pared llega a VB_PARED). Con el atlas, la
+// lámina 1 de P3 (misc:cuarto-cultivo-34); si no, a mano
 let cuartoC=null;
 function cuarto34(){
+  const f=fotoMisc('cuarto-cultivo-34');if(f)return f.c;
   if(cuartoC)return cuartoC;const [c,x]=mkCanvas(240,160),t=painter(x,rngSeed(11)),col='#ead8b4',y0=VB_PARED;
   t.F(0,0,240,y0,col);for(let i=3;i<240;i+=8)t.F(i,0,1,y0-5,shade(col,-8));
   t.F(0,y0-5,240,5,'#f4ecd8');t.F(0,y0-5,240,1,'#c8b896');t.F(0,y0-1,240,1,'#a89470');           // rodapié de 10 cm

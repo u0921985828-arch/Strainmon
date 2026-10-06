@@ -95,6 +95,9 @@ for (const a of M.assets) {
     if (m && has(`combate/${m[1]}.png`)) wr(a.id, 'base', 'unica', 0, rd(`combate/${m[1]}.png`));
     if (c === 'misc:hoja-titulo' && has('misc/titulo.png')) wr(a.id, 'base', 'unica', 0, rd('misc/titulo.png'));
     if (c === 'misc:cuarto-cultivo' && has('misc/cuarto-cultivo.png')) wr(a.id, 'cuarto-cultivo', 'unica', 0, rd('misc/cuarto-cultivo.png'));
+    // láminas de P3 ya hechas: se calca la procesada (no hay referencia procedural aparte)
+    const pro = path.join(ROOT, 'art', 'procesado', a.id, 'cuarto-cultivo-34', 'unica', '00.png');
+    if (c === 'misc:cuarto-cultivo-34' && fs.existsSync(pro)) wr(a.id, 'cuarto-cultivo-34', 'unica', 0, PNG.sync.read(fs.readFileSync(pro)));
   }
   // ---------- tiles (16×16 exacto; los animados en bloques de 32×32) ----------
   if (a.tipo === 'tiles') {
