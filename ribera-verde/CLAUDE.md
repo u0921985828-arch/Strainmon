@@ -10,6 +10,7 @@ Juego web de un solo archivo: HTML, CSS y JavaScript sin frameworks ni dependenc
 - `npm run capturas`: compila y regenera `screenshots/`.
 - `test`, `docs` y `capturas` leen `index.html`. Si los lanzas con `node tools/...` en vez de `npm run`, ejecuta antes `node tools/build.js`.
 - `npm run test:arte`: prueba el motor de sprites con un atlas «de calco» (19 comprobaciones). No toca el `index.html` de la raíz: compila en `tools/salida/arte/`.
+- `npm run apk`: compila y genera `dist/ribera-verde.apk` sin Android SDK (`tools/build-apk.js`): WebView a pantalla completa con `assets/index.html`, `tools/apk/java` compilado contra los stubs de `tools/apk/stubs` (solo firmas de la API real; si usas un método nuevo, añade su firma exacta, con el tipo de vuelta, o fallará en el móvil con `NoSuchMethodError`) → dalvik-dx → apktool (aapt2 + framework) → uber-apk-signer (zipalign, firma v1/v2/v3 con su clave de depuración fija para que las versiones nuevas se instalen encima). Las herramientas se descargan a `tools/salida/apk-cache` con su huella comprobada. `versionCode` sale de la versión de `package.json` (1.5.0 → 10500).
 - Los scripts de Playwright aceptan `CHROMIUM_PATH` (otro Chromium), `RV_HTML` (otro HTML) y `RV_SALIDA` (otra carpeta de salida). `tools/build.js` acepta `--atlas-dir` y `--salida`.
 
 ## Módulos (`src/js`, se concatenan en orden alfabético dentro de un único `<script>`)

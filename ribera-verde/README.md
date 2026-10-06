@@ -9,6 +9,7 @@ RPG de cultivo en pixel art, con pantalla de 240 × 160 al estilo de las portát
 - Abre **`index.html`** con doble clic (Chrome, Edge o Firefox). Funciona sin conexión porque las fuentes van dentro del archivo.
 - La partida se guarda en el navegador al dormir, al cambiar de capítulo y desde START → GUARDAR o desde el ordenador del piso. No se comparte entre navegadores ni entre equipos.
 - En el móvil se juega con la cruceta y los botones de la pantalla.
+- **Android:** instala `dist/ribera-verde.apk` (activa «Instalar apps desconocidas» para el navegador o el gestor de archivos). Es el mismo juego en pantalla completa, sin conexión y sin permisos; el botón Atrás hace de B. La partida se guarda dentro de la app.
 
 | Acción | Teclado | Pantalla |
 |---|---|---|
@@ -34,6 +35,7 @@ src/                          código fuente: shell.html + styles.css + js/ (16 
 tools/                        build, test de la historia, generador de docs, capturas y tools/sprites (kit PixelLab)
 docs/                         diseño, guion, genética, mapa y prompts de sprites
 dist/ribera-verde.artifact.html   la misma página en formato Artifact de Claude
+dist/ribera-verde.apk         el juego como app de Android (lo genera tools/build-apk.js)
 assets/fonts/                 Pixelify Sans y Press Start 2P (woff2 + licencia OFL)
 screenshots/                  13 capturas
 art/                          manifiesto de sprites, inventario, referencias PNG y paleta (kit PixelLab)
@@ -58,6 +60,7 @@ npm run sprites:validar   # comprueba art/manifest.json
 npm run sprites:procesar -- <grupo> [--atlas]   # salida de PixelLab → sprites listos
 npm run sprites:catalogo  # catálogo de sprites por herramienta de PixelLab
 npm run test:arte         # prueba el motor de sprites con un atlas de calco
+npm run apk               # compila y empaqueta dist/ribera-verde.apk (Java 17+; sin Android SDK)
 ```
 
 Edita siempre en `src/` y después ejecuta `npm run build`. `index.html` y `dist/` se generan con el build y no se tocan a mano.

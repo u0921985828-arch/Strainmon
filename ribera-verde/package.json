@@ -12,7 +12,8 @@
     "sprites:validar": "node tools/sprites/validar.js",
     "sprites:procesar": "node tools/sprites/procesar.js",
     "sprites:catalogo": "node tools/sprites/catalogo.js",
-    "test:arte": "node tools/test-arte.js"
+    "test:arte": "node tools/test-arte.js",
+    "apk": "node tools/build.js && node tools/build-apk.js"
   },
   "devDependencies": {
     "playwright": "^1.56.0",

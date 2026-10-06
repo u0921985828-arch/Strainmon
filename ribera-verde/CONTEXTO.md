@@ -47,6 +47,7 @@
   - F3-resto, F4, F5, F6 y F7 (1.5): humos y efectos, gaviotas y palomas, tiles, interiores, fachadas, objetos, carpa, plantas, combate, iconos, cogollos y título salen del atlas, y el protagonista ya tiene sus 8 acciones;
   - F4b (1.5): orillas del río, del camino de tierra y de la plaza con tres Wang encadenados y autotiling por esquinas. Atlas completo: 1086 fotogramas.
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
+- **Android:** `dist/ribera-verde.apk` (1.5.0, código 10500), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
 - **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está actualizado a la 1.5, con el atlas completo de PixelLab (1086 fotogramas). Es privado: se comparte desde su menú Compartir.
 
 ## Limitaciones conocidas
