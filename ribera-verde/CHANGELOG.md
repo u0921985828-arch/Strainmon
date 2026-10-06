@@ -11,7 +11,7 @@
   - Fuera el chasis de la consola: la pantalla ocupa el móvil entero, con un reborde fino.
   - Los mandos flotan encima, fijos: cruceta abajo a la izquierda, A/B abajo a la derecha, SONIDO y START arriba a la derecha.
   - El ancho del juego se adapta al móvil (de 240 a 400 px, siempre 160 de alto y píxeles cuadrados): en un móvil de 844 × 390 se ven 358 px de mundo.
-  - Diálogos y menús van en un escenario de 240 centrado, que encoge si haría falta para no quedar debajo de los mandos.
+  - Diálogos y menús van en un escenario de 240 centrado que encoge lo justo para caber entre la cruceta y A/B (letra de 13 px como mínimo) y empieza debajo de SONIDO/START. Con un menú a toda altura abierto, el HUD se aparta.
   - Título y combate siguen compuestos a 240 y su fondo se alarga a los lados. En el combate, sin repetir trozos de las tarimas.
   - En vertical sale «Gira el móvil».
   - Al primer toque se pide pantalla completa y se bloquea el giro. El APK va en `sensorLandscape`.
@@ -32,7 +32,7 @@
 - **Cambiado: bandeja de cultivo.** Las «mesitas» de madera por plaza (otra escala y otra calidad que la carpa) se cambian por una bandeja continua por carpa: cubeta de plástico sobre bastidor metálico con desagüe, con la paleta de la carpa.
 - **Tests:**
   - `npm test` 38/38, con los nombres nuevos.
-  - `npm run test:arte` 22/22: pantalla completa en 7 tamaños horizontales (pantalla ≥ 90 % del móvil, píxeles cuadrados, mandos dentro y sin tapar los diálogos a partir de 2:1) y «Gira el móvil» en 2 verticales; bandeja continua.
+  - `npm run test:arte` 22/22: pantalla completa en 7 tamaños horizontales (pantalla ≥ 90 % del móvil, píxeles cuadrados, mandos dentro y sin tapar diálogos ni menús en ningún tamaño) y «Gira el móvil» en 2 verticales; bandeja continua.
 - **Capturas** de 720 × 480 (×3 exacto) y la del móvil en horizontal (844 × 390).
 
 ## 1.6.1 · 6 de octubre de 2026

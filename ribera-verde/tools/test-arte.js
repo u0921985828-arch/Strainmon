@@ -176,20 +176,20 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       S.items.fert = 2; addBuds('ria', 5, 12); mochila(); await new Promise(res => setTimeout(res, 60));
       r.mochila = document.querySelectorAll('#menu .ic').length; while (handlers.length) handlers.pop(); document.getElementById('menu').hidden = true; return r; });
     check('Intro y menús con el arte del atlas: Kiko, iconos y cogollos de la Genoteca', ui.kiko && ui.iconos && ui.cogollos && ui.mochila >= 4, ui);
-    // pantalla completa en horizontal (1.7): solo el reborde, píxeles cuadrados, mandos flotando dentro del viewport sin tapar la
-    // caja de diálogo en móviles anchos (≥ 2:1), sin scroll; en vertical, el aviso de «Gira el móvil»
+    // pantalla completa en horizontal (1.7): solo el reborde, píxeles cuadrados, mandos flotando dentro del viewport sin tapar el
+    // escenario de diálogos y menús en ningún tamaño horizontal, sin scroll; en vertical, el aviso de «Gira el móvil»
     const marco = [];
     for (const [w, h] of [[568, 320], [640, 360], [740, 360], [844, 390], [915, 412], [1024, 768], [1366, 768], [360, 740], [412, 915]]) {
       await page.setViewportSize({ width: w, height: h }); await page.waitForTimeout(80);
       marco.push(await page.evaluate(([w, h]) => { ajustarPantalla(); const R = q => document.querySelector(q).getBoundingClientRect();
-        const s = R('#screen'), u = R('#ui'), d = R('#dpad'), a = R('.ab'), st = R('[data-b=START]'), so = R('#bSound'), gi = document.getElementById('girar');
+        const s = R('#screen'), u = R('#ui'), d = R('#dpad'), a = R('.ab'), pi = R('.pills'), st = R('[data-b=START]'), so = R('#bSound'), gi = document.getElementById('girar');
         const dentro = b => b.left >= 0 && b.top >= 0 && b.right <= w + .5 && b.bottom <= h + .5, cruza = (p, q) => p.left < q.right && q.left < p.right && p.top < q.bottom && q.top < p.bottom;
         const sinScroll = document.documentElement.scrollHeight <= h && document.documentElement.scrollWidth <= w;
         if (h > w) return { w, h, ok: !gi.hidden && R('#girar').width >= w - 1 && sinScroll, girar: !gi.hidden };
         const frac = s.width * s.height / (w * h), ancho = w / h >= 1.6, cuadrado = Math.abs(cv.width / 160 - s.width / s.height) < .02;
-        const libre = w / h < 2 || ![d, a].some(b => cruza(b, u));
+        const libre = ![d, a, pi].some(b => cruza(b, u));
         return { w, h, ok: gi.hidden && [s, d, a, st, so].every(dentro) && sinScroll && cuadrado && libre && !cruza(d, a) && frac >= (ancho ? .9 : .8) && d.width >= 96,
-          SW, pantalla: Math.round(s.width) + '×' + Math.round(s.height), frac: +frac.toFixed(2), cuadrado, libre, cruceta: Math.round(d.width) }; }, [w, h]));
+          SW, us: +(u.width / 240).toFixed(2), pantalla: Math.round(s.width) + '×' + Math.round(s.height), frac: +frac.toFixed(2), cuadrado, libre, cruceta: Math.round(d.width) }; }, [w, h]));
     }
     await page.setViewportSize({ width: 1000, height: 700 });
     check('Pantalla completa en horizontal: reborde, píxeles cuadrados y mandos flotando en 7 tamaños; en vertical, «Gira el móvil»', marco.every(m => m.ok), marco.filter(m => !m.ok).concat(marco.length ? [] : ['sin datos']));

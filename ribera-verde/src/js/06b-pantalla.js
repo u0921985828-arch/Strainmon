@@ -6,7 +6,8 @@
    · --u (CSS px por píxel del juego), con píxeles enteros si se pierde menos de un 6 % de alto;
    · los mandos a tamaño de pulgar (--d cruceta, --ab A/B, --pill SONIDO/START, --m margen);
    · el escenario de diálogos y menús (--uiw, --us): 240 px del juego centrados; si los mandos lo pisarían, se encoge
-     hasta un 72 % para dejarlos libres.
+     hasta caber entre la cruceta y A/B (hasta la mitad, sin bajar de 1,3 px por píxel: letra de 13 px como mínimo) y,
+     si SONIDO/START le caen encima, empieza debajo de ellos (--ut).
    En vertical sale el aviso de girar el móvil (la app de Android ya va fija en horizontal).
    ========================================================= */
 function ajustarPantalla(){
@@ -21,10 +22,13 @@ function ajustarPantalla(){
   const cw=Math.floor(sw*s),ch=Math.floor(160*s),x=Math.round(pl+rim+(w-cw)/2),y=Math.round(pt+rim+(h-ch)/2);
   if(SW!==sw){SW=sw;cv.width=sw;ctx.imageSmoothingEnabled=false;}
   const d=Math.round(clamp(H*.34,104,150)),ab=Math.round(d*.44),m=Math.round(clamp(H*.035,8,22)),pill=Math.round(clamp(H*.07,24,34));
-  const col=Math.max(pl,pr)+m+Math.max(d,ab*2.25)+m*.5,us=clamp((W-2*col)/240,s*.72,s);
+  const col=Math.max(pl,pr)+m+Math.max(d,ab*2.25)+m*.5,us=clamp((W-2*col)/240,Math.min(s,Math.max(s*.5,1.3)),s);
   const set=(n,v)=>el.style.setProperty(n,v+'px');
   set('--u',s);set('--us',us);set('--uiw',Math.min(cw,Math.round(240*us)));
   set('--sw',cw);set('--sh',ch);set('--sx',x);set('--sy',y);set('--d',d);set('--ab',ab);set('--m',m);set('--pill',pill);
+  const P=el.querySelector('.pills');let ut=0;
+  if(P){const p=P.getBoundingClientRect(),der=x+cw/2+Math.min(cw,Math.round(240*us))/2;if(p.left<der&&p.bottom>y)ut=Math.round(p.bottom-y+m*.4);}
+  set('--ut',ut);
 }
 ajustarPantalla();
 addEventListener('resize',ajustarPantalla);addEventListener('orientationchange',()=>setTimeout(ajustarPantalla,120));
