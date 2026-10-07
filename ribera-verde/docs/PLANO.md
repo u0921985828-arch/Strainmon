@@ -5,7 +5,8 @@ personajes), medido contra su tamaño real. En la 1.7.0 sirvió para decidir la 
 **opción A** (sección 5). En P2 del [plan de producción](PLAN-PRODUCCION.md) la vista de carpa pasó a la **B**
 (sección 6): carpa abierta en 3/4 a 48 px/m.
 
-- Imágenes: `docs/plano/town.png`, `home.png`, `shop.png`, `bar.png` (rejilla, coordenadas y rótulos),
+- Imágenes: `docs/plano/town.png`, `home.png`, `shop.png`, `bar.png` y, desde la 1.10, `alto.png`, `astilleros.png`,
+  `txaro.png`, `comisaria.png` y `almacen.png` (rejilla, coordenadas y rótulos),
   `docs/plano/escala.png` (todos los sprites junto al jugador sobre la misma línea de suelo) y
   `docs/plano/vista-b.png` (las 5 carpas abiertas de la vista B).
 - Datos: `docs/plano/medidas.json` (posiciones de cada mapa y las 69 medidas de abajo).
@@ -29,10 +30,15 @@ personajes), medido contra su tamaño real. En la 1.7.0 sirvió para decidir la 
 
 | Mapa | Casillas | Qué hay (x, y) |
 |---|---|---|
-| Barrio (`town`) | 40 × 30 | Edificios de 7 × 6 en y 3–8: piso (2), growshop (14), bar (23); bloque gris 6 × 6 (32). Puertas: piso (5,8), growshop (17,8), bar (26,8). Calle: acera y 9, calzada y 10–11, acera y 12. Parque de los Sauces (1,13)–(11,27), con hierba alta en (7–10, 18–20) y (1–3, 21–23). Plaza (14,13)–(26,24), con la fuente en (20,19). Ría (31–38, 14–28), muelle (34–38, 16–25) y puente (31–33, 19–20). |
+| Barrio (`town`) | 40 × 30 | Edificios de 7 × 6 en y 3–8: piso (2), growshop (14), bar (23); casa de Txaro, gris, 6 × 6 (32). Puertas: piso (5,8), growshop (17,8), bar (26,8) y casa de Txaro (34–35,8). Al barrio alto, por el camino del norte (11–12, 0); a los astilleros, por el muelle (39, 20–21). Calle: acera y 9, calzada y 10–11, acera y 12. Parque de los Sauces (1,13)–(11,27), con hierba alta en (7–10, 18–20) y (1–3, 21–23). Plaza (14,13)–(26,24), con la fuente en (20,19). Ría (31–38, 14–28), muelle (34–38, 16–25) y puente (31–33, 19–20). |
 | Piso (`home`) | 12 × 8 (72 m²) | Paredes en y 0–1, con ventanas en (6,1) y (9,1) y el diploma en (7,1); suelo de 12 × 6 m. Cama (0,2–3), planta (1,2), ordenador (4,2), mesas de genética (5,2) y (6,2), mesa (3,5), nevera (0,6) y planta (11,7). Sitio A (8,2), 1 casilla: el armario 60 o el 80. Sitio B (10–11,2), 2 casillas: la carpa 100 (en x 10) o la 150 (x 10–11). Sitio C (2–3,2), 2 casillas: la carpa 120, cuando ya hay carpa en B. Salida en (5,7). |
 | Growshop (`shop`) | 10 × 8 | Estanterías (0,1) y (8,1), mostrador (2–7, 3), expositores (0,5) y (9,5), Kiko (4,2). Salida en (4,7). |
 | Bar El Ancla (`bar`) | 10 × 8 | Botellero (0–3, 1), barra (0–3, 3), taburetes (1,4) y (3,4), mesas (8,2) y (7,5), gramola (9,2). Josune (2,2), Toño (5,4) y Baltasar (7,4). Salida en (4,7). |
+| Barrio alto (`alto`, 1.10) | 40 × 30 | Plaza del Ensanche (3–19, 4–17) con la fuente en (11,11) y 4 bancos. Comisaría gris 6 × 6 (24, 13–18), puerta ancha en (26–27,18). Jardines (22–38, 3–11) y flores (31–37, 14–18). Calle: acera y 20, calzada y 21–22, acera y 23. Camino al barrio en (11–12, 24–29). Arbusto con 80 € en (2,10). |
+| Astilleros (`astilleros`, 1.10) | 40 × 30 | Tierra; astilleros cerrados (24–37, 4–10) con valla; almacén gris 6 × 6 (16, 8–13), puerta ancha en (18–19,13). Hierba alta en (2–6, 3–7) y (30–35, 13–15). Muelle de carga en y 19–22 y dos diques (6–8 y 26–28, 23–27); agua abajo. Darko (24,16) desde el capítulo 7. Bolsa con 2 sprays en (4,5). |
+| Casa de Txaro (`txaro`, 1.10) | 10 × 8 | Cama (0,2–3), mesa (5,4), nevera (9,6) y plantas. Txaro (6,3) desde su primera misión. Salida en (4,7). |
+| Comisaría (`comisaria`, 1.10) | 10 × 8 | Estanterías, mostrador (2–7, 3) y bancos (0,5) y (9,5). Molina (4,2) desde el capítulo 5. Salida en (4,7). |
+| Almacén (`almacen`, 1.10) | 10 × 8 | Cajas en las esquinas, mesa (5,4) y taburete (4,4). Toño (5,2) mientras hay un encargo de Baltasar. Salida en (4,7). |
 
 **NPC del barrio:** Begoña (10,12), Txaro (3,18), Unai (17,18), Darko (20,14), Jurado (18,15), Molina (23,15), agente (22,17),
 Patxi (21,21) e Iñaki (37,21).

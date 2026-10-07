@@ -10,13 +10,16 @@ const CH_TITLES={1:'La herencia',2:'La calle',3:'La deuda',4:'Genética',5:'El s
 function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,min:8*60,money:150,hp:30,hpMax:30,heat:0,rep:0,ch:0,flags:{},sales:0,
   seeds:{},buds:{},items:Object.assign({fert:0,insect:0,spray:0,bocata:1},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
-  disc:{},custom:{},gen:{},pedido:[],esquejes:[],fenos:{},fenoN:0,eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0};}
+  disc:{},custom:{},gen:{},pedido:[],esquejes:[],fenos:{},fenoN:0,eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
+  caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0};}
 const isFree=()=>mode==='world'&&lock===0&&handlers.length===0;
 const isNight=()=>S.min>=21*60||S.min<6*60;
 async function run(fn){lock++;try{await fn();}catch(e){console.error(e);}finally{lock--;}}
 function queue(key,fn){if(queued.has(key))return;queued.add(key);pending.push(async()=>{try{await fn();}finally{queued.delete(key);}});}
 const totalBuds=()=>Object.values(S.buds).reduce((a,b)=>a+b.g,0);
 const discCount=()=>Object.keys(S.disc).length;
+// variedades de receta (RECIPES) sacadas en la mesa (S.rec[sid] = 1) y ya cosechadas (2): el capítulo 4 pide 2 (1.10)
+const recCount=()=>Object.values(S.rec).filter(v=>v===2).length;
 // ficha de una variedad: cifras, tipo genético (si es un cruce y qué fenotipos da) y origen
 // % índica de la variedad y, en un híbrido propio, lo que sacó de la madre (la 1.ª del cruce, la de la izquierda en «o») y del padre
 const lineaInd=k=>{const s=getStrain(k),i=indDe(k);return `Índica ${i} % · sativa ${100-i} %${s.m?` · ${s.m} % madre · ${100-s.m} % padre`:''}`;};
@@ -40,18 +43,22 @@ const NPCDEF=[
   {id:'begona',map:'town',x:10,y:12,wander:2,look:'begona',talk:()=>say(pick(['Bajo una lámpara las plantas beben mucho. Riégalas a diario, majo.','Si se te ponen amarillas las hojas de abajo, les falta agua o abono.','Tu tía siempre tenía el piso oliendo a limón. Ahora sé por qué.']),'BEGOÑA')},
   {id:'unai',map:'town',x:17,y:18,wander:3,look:'kid',talk:()=>say(pick(['Si mantienes pulsado B, corres.','Mi hermano dice que de noche, en la hierba alta del parque, roban a la gente.','Con START abres tu GENOTECA y la mochila.','En los arbustos del parque la gente esconde cosas. Mira delante de ellos con A.']),'UNAI')},
   {id:'patxi',map:'town',x:21,y:21,dir:'up',look:'oldman',talk:()=>talkPatxi()},
-  {id:'txaro',map:'town',x:3,y:18,look:'granny',talk:()=>talkTxaro()},
+  {id:'txaro',map:'town',x:3,y:18,look:'granny',cond:()=>!S.flags.txaro,talk:()=>talkTxaro()},
+  {id:'txaro',map:'txaro',x:6,y:3,look:'granny',cond:()=>!!S.flags.txaro,talk:()=>talkTxaro()},   // después del aceite, en su casa (1.10)
   {id:'inaki',map:'town',x:37,y:21,dir:'left',look:'sailor',cond:()=>S.ch>=2,talk:()=>talkInaki()},
   {id:'cop',map:'town',x:22,y:17,wander:3,look:'cop',cond:()=>S.ch>=2,talk:()=>talkCop()},
   {id:'darko',map:'town',x:20,y:14,dir:'up',look:'darko',cond:()=>(S.ch>=2&&!S.flags.darko1)||S.ch===6,talk:()=>talkDarko()},
-  {id:'molina',map:'town',x:23,y:15,look:'molina',cond:()=>S.ch>=5&&!S.protect,talk:()=>talkMolina()},
+  {id:'darko2',map:'astilleros',x:24,y:16,look:'darko',cond:()=>S.ch>=7,talk:()=>talkDarko()},   // sus esquinas (1.10)
+  {id:'molina',map:'town',x:23,y:15,look:'molina',cond:()=>S.ch>=5&&!S.flags.molina1,talk:()=>talkMolina()},
+  {id:'molina',map:'comisaria',x:4,y:2,look:'molina',cond:()=>S.ch>=5&&!!S.flags.molina1,talk:()=>talkMolina()},   // la cuota, en la comisaría (1.10)
+  {id:'tono2',map:'almacen',x:5,y:2,look:'tono',cond:()=>!!S.encargo,talk:()=>talkTonoAlmacen()},   // los encargos de Baltasar (1.10)
   {id:'jurado',map:'town',x:18,y:15,look:'judge',cond:()=>S.ch===6,talk:()=>talkJurado()},
 ];
 function mkEnt(d){return{id:d.id,x:d.x,y:d.y,px:d.x*16,py:d.y*16,hx:d.x,hy:d.y,dir:d.dir||'down',look:d.lookObj||LOOKS[d.look],def:d,wander:d.wander||0,wt:800+Math.random()*2400,moving:false,t:0,fx:d.x,fy:d.y};}
 function buildEnts(){
   const old={};ents.forEach(e=>old[e.id]=e);ents=[];
   for(const d of NPCDEF){if(d.map!==S.map||(d.cond&&!d.cond()))continue;ents.push(old[d.id]&&old[d.id].def===d?old[d.id]:mkEnt(d));}
-  if(S.map==='town')for(const c of S.clients){const o=old[c.id];ents.push(o||mkEnt({id:c.id,x:c.x,y:c.y,wander:2,lookObj:c.look,client:c}));}
+  for(const c of S.clients)if((c.map||'town')===S.map){const o=old[c.id];ents.push(o||mkEnt({id:c.id,x:c.x,y:c.y,wander:2,lookObj:c.look,client:c}));}
 }
 const ITEMS=[
   {id:'i_spray',map:'town',x:8,y:25,give:async()=>{S.items.spray+=2;await got('2 × SPRAY DE PIMIENTA');}},
@@ -60,6 +67,8 @@ const ITEMS=[
   {id:'h_acap',map:'town',x:2,y:26,hidden:1,give:async()=>{addSeeds('acapulco',2);await got('2 semillas de ACAPULCO GOLD');await say('Un bote de carrete con dos semillas y una etiqueta a boli: «Guerrero, 1979».');}},
   {id:'h_50',map:'town',x:9,y:16,hidden:1,give:async()=>{S.money+=50;await got('50 € en billetes doblados');}},
   {id:'h_ins',map:'town',x:10,y:24,hidden:1,give:async()=>{S.items.insect+=1;await got('1 tratamiento de INSECTICIDA');}},
+  {id:'i_ast',map:'astilleros',x:4,y:5,give:async()=>{S.items.spray+=2;await got('2 × SPRAY DE PIMIENTA');}},
+  {id:'h_alto',map:'alto',x:2,y:10,hidden:1,give:async()=>{S.money+=80;await got('80 € en un sobre arrugado');}},
 ];
 const itemAt=(x,y)=>ITEMS.find(it=>!it.hidden&&it.map===S.map&&it.x===x&&it.y===y&&!S.taken[it.id]);
 async function pickItem(it){S.taken[it.id]=true;await it.give();}
@@ -70,7 +79,7 @@ function tileSolid(m,x,y){
 }
 const entAt=(x,y)=>ents.find(e=>(e.x===x&&e.y===y)||(e.moving&&e.fx===x&&e.fy===y));
 function enterMap(name,x,y,dir){S.map=name;if(name==='home')montarCasa();Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];buildEnts();music(mapMusic());}
-const mapMusic=()=>S.map==='town'?(isNight()?'night':'town'):'home';
+const mapMusic=()=>ZONAS[S.map]?(isNight()?'night':'town'):'home';
 async function warp(w){sfx('door');await fade(1);enterMap(w.to,w.x,w.y,w.dir);updateHUD();await wait(80);await fade(0);}
 
 /* ---------- movement ---------- */
@@ -96,15 +105,15 @@ function onStepEnd(){
   S.x=P.x;S.y=P.y;S.dir=P.dir;S.steps++;if(S.cool>0)S.cool--;
   const m=MAPS[S.map],door=m.doors[P.x+','+P.y];
   if(door){run(()=>warp(door));return;}
-  if(S.map!=='town')return;
-  if(P.y>=13&&P.y<=14&&P.x>=18&&P.x<=22){
+  const Z=ZONAS[S.map];if(!Z)return;
+  if(S.map==='town'&&P.y>=13&&P.y<=14&&P.x>=18&&P.x<=22){
     if(S.ch>=2&&!S.flags.darko1){queue('darko',async()=>{const e=ents.find(e=>e.id==='darko');if(e)e.dir='up';await talkDarko();});return;}
-    if(S.ch>=5&&!S.flags.molina1&&!S.protect){queue('molina',talkMolina);return;}
+    if(S.ch>=5&&!S.flags.molina1){queue('molina',talkMolina);return;}
   }
   if(S.ch>=2&&S.cool<=0){
     const g=totalBuds(),tall=m.g[P.y][P.x]==='tallgrass';
-    const pp=g>0?(.002+S.heat*.00025)*(S.protect?.4:1):0;
-    const pt=(g>=5||S.money>=150)?.004*(isNight()?2.5:1)*(tall?3:1):0;
+    const pp=g>0?(.002+S.heat*.00025)*(S.protect?.4:1)*Z.pol:0;
+    const pt=(g>=5||S.money>=150)?.004*(isNight()?2.5:1)*(tall?3:1)*Z.lad:0;
     const r=Math.random();
     if(r<pp){S.cool=25;run(()=>battle('police'));}else if(r<pp+pt){S.cool=25;run(()=>battle('thief'));}
   }
@@ -134,7 +143,10 @@ function interact(){
   run(()=>objectAction(tx,ty));
 }
 const SIGNS={'town:9,8':'Calle Ribera, 3.\nPiso de la tía Maite.','town:13,8':'GROWSHOP KIKO\nSemillas, abonos y consejos gratis.','town:22,8':'BAR EL ANCLA\nPintxos y menú del día.',
-  'town:4,13':'PARQUE DE LOS SAUCES\nHorario: de 7:00 a 23:00.','town:17,13':'PLAZA DE RIBERA VERDE\nFuente inaugurada en 1987.','town:29,18':'MUELLE VIEJO →\nPeligro: borde sin barandilla.'};
+  'town:4,13':'PARQUE DE LOS SAUCES\nHorario: de 7:00 a 23:00.','town:17,13':'PLAZA DE RIBERA VERDE\nFuente inaugurada en 1987.','town:29,18':'MUELLE VIEJO →\nPeligro: borde sin barandilla.',
+  'town:10,4':'↑ BARRIO ALTO\nPlaza del Ensanche · Comisaría.','town:38,19':'ASTILLEROS DE RIBERA →\nZona industrial. Sin salida.',
+  'alto:10,18':'PLAZA DEL ENSANCHE\nUrbanizada en 1964.','alto:22,7':'JARDINES DEL ENSANCHE\nNo pisar el césped.','alto:23,19':'COMISARÍA DE RIBERA\nAtención al público: de 9:00 a 14:00.',
+  'astilleros:15,13':'ALMACÉN 3\nPropiedad privada. Prohibido el paso.','astilleros:2,18':'ASTILLEROS DE RIBERA\nCerrados desde 1992.'};
 async function objectAction(x,y){
   const m=MAPS[S.map],o=m.o[y]&&m.o[y][x];
   if(S.map==='home'){
@@ -148,7 +160,22 @@ async function objectAction(x,y){
     if(o==='fridge')return say('La nevera: medio limón, leche y un táper de alubias que dejó la tía.');
     if(o==='plantDeco')return say('Una monstera. La tía Maite le hablaba cada mañana.');
     if(o==='iwin')return say('Por la ventana se ve la ría. Huele a salitre.');
-    if(o==='poster')return say('Un diploma enmarcado: «COPA DE RIBERA 1998 · 2º PREMIO: MAITE».');
+    if(o==='poster')return diplomaAction();
+  }
+  if(S.map==='txaro'){
+    if(o==='bedT'||o==='bedB')return say('Una cama con colcha de ganchillo.');
+    if(o==='table')return say('Un bote de aceite con una etiqueta a mano: «Para dormir. 2 gotas».');
+    if(o==='fridge')return say('Nevera de las de antes. No es tuya.');
+    if(o==='iwin')return say('Por la ventana se ve el parque de los Sauces.');
+  }
+  if(S.map==='comisaria'){
+    if(o==='iwin')return say('Por la ventana se ve la plaza del Ensanche.');
+    if(o==='shelfW')return say('Archivadores con expedientes. Hay uno con tu calle.');
+    if(o==='counter')return say('El mostrador de denuncias. No hay nadie detrás.');
+  }
+  if(S.map==='almacen'){
+    if(o==='crate')return say('Cajas precintadas con el sello de una conservera que cerró hace años.');
+    if(o==='btable')return say('Una mesa con una báscula y rollos de film transparente.');
   }
   if(o==='sign')return say(SIGNS[S.map+':'+x+','+y]||'Está tan desgastado que no se lee.');
   if(o==='bush'){const h=ITEMS.find(it=>it.hidden&&it.map===S.map&&it.x===x&&it.y===y&&!S.taken[it.id]);if(h)return pickItem(h);return;}
@@ -157,6 +184,6 @@ async function objectAction(x,y){
   if(o==='display')return say('Sobres de semillas de bancos de todo el mundo, ordenados por tipo.');
   if(o==='bottles')return say('Txakoli, pacharán y orujo casero.');
   if(o==='jukebox'){sfx('get');return say('La gramola suena: rock vasco de los 80.');}
-  if(o==='crate')return say('Cajas de pescado vacías del puerto.');
+  if(o==='crate')return say(S.map==='astilleros'?'Cajas de madera de los astilleros, podridas por la humedad.':'Cajas de pescado vacías del puerto.');
 }
 

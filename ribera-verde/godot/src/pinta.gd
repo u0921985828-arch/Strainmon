@@ -173,11 +173,12 @@ func story_mark(id: String) -> bool:
 	var F: Dictionary = S.flags
 	match id:
 		"kiko": return not F.get("kiko1") or (S.ch == 4 and not F.get("lab"))
-		"baltasar": return (S.ch == 3 and not F.get("metB")) or (S.due > 0 and S.money >= S.due)
+		"baltasar": return (S.ch == 3 and not F.get("metB")) or (S.due > 0 and S.money >= S.due) or (S.ch >= 8 and not S.get("encargo") and not (S.get("encVeto", 0) > S.day))
+		"tono2": return J.is_night()
 		"jurado": return true
-		"molina": return not F.get("molina1")
+		"molina": return not F.get("molina1") or not S.protect
 		"darko": return S.ch < 6
-		"txaro": return S.ch >= 2 and not F.get("txaro")
+		"txaro": return (S.ch >= 2 and not F.get("txaro")) or (S.ch >= 4 and not F.get("txaro2"))
 		"inaki": return not F.get("inaki")
 	return false
 
@@ -240,7 +241,7 @@ func _mundo() -> void:
 			_bocadillo(bx, by, "$", css("#2a9a4a"))
 		elif story_mark(e.id):
 			_bocadillo(bx, by, "!", css("#e03030"))
-	if S.map == "town":
+	if J.D.ZONAS.has(S.map):
 		var h: float = S.min / 60.0
 		if h >= 17.5 and h < 20.5:
 			_rect(0, 0, J.SW, SH, Color8(255, 130, 50, Datos.jsround(.13 * sin((h - 17.5) / 3 * PI) * 255)))
@@ -254,13 +255,13 @@ func noche() -> float:
 
 # las farolas con la noche cerrada: un degradado radial (r 1 → 28) sumado a lo que hay ('lighter')
 func _farolas() -> void:
-	if J.S.map != "town":
+	if not J.D.ZONAS.has(J.S.map):   # farolas de cada zona de fuera (1.10)
 		return
 	var a := noche()
 	if a <= .2:
 		return
 	var im := _farola(a)
-	for l in J.D.LAMPS:
+	for l in J.D.LAMPS[J.S.map]:
 		var x: int = l[0] * 16 + 8 - cam.x
 		var y: int = l[1] * 16 + 2 - cam.y
 		if x < -30 or y < -30 or x > J.SW + 30 or y > SH + 30:
@@ -345,12 +346,50 @@ func _arte_edificios(m: Dictionary) -> void:
 		if f == null:
 			continue
 		_img(f.c, b.x0 * 16 - cam.x, b.y0 * 16 - cam.y)
-		if b.get("doorX") != null and Atlas.anim_de(gr, "puerta"):
+		var gp: String = "edificio-" + b.get("puerta", b.id)
+		if b.get("doorX") != null and Atlas.anim_de(gp, "puerta"):
 			var dy: int = b.y0 + b.h - 1
-			var abierta: bool = J.P.x == b.doorX and (J.P.y == dy or J.P.y == dy + 1)
-			var p = Atlas.frame_de(gr, "puerta", "unica", 0, {"i": -1 if abierta else 0})
+			var abierta: bool = J.P.x >= b.doorX and J.P.x <= b.doorX + (1 if b.get("ancha") else 0) and (J.P.y == dy or J.P.y == dy + 1)
+			var p = Atlas.frame_de(gp, "puerta", "unica", 0, {"i": -1 if abierta else 0})
 			if p:
-				_img(p.c, b.doorX * 16 - 8 - cam.x, (dy + 1) * 16 - 32 - cam.y)
+				_img(_sin_pared(p.c, "%s|%d" % [gp, p.i]) if b.get("mascara") else p.c, b.doorX * 16 - 8 + b.get("dx", 0) - cam.x, (dy + 1) * 16 - 32 - cam.y)
+
+# edificios grises con puerta (1.10): la puerta de otra fachada (b.puerta) y, con b.mascara, sin su trozo de pared (PARED: los
+# colores de la fachada del piso, quitados desde el borde del fotograma hacia dentro mientras sigan siendo pared; puertaSinPared)
+const PARED := {"248,248,240": 1, "246,232,200": 1, "224,206,170": 1, "220,214,198": 1}
+var _sin_pared_c := {}
+func _sin_pared(c: Image, k: String) -> Image:
+	if _sin_pared_c.has(k):
+		return _sin_pared_c[k]
+	var w := c.get_width()
+	var h := c.get_height()
+	var d: Image = c.duplicate()
+	d.convert(Image.FORMAT_RGBA8)
+	var st := []
+	for i in w:
+		st.append(i)
+		st.append((h - 1) * w + i)
+	for j in h:
+		st.append(j * w)
+		st.append(j * w + w - 1)
+	while not st.is_empty():
+		var i: int = st.pop_back()
+		var xi := i % w
+		var yi := i / w
+		var px := d.get_pixel(xi, yi)
+		if px.a8 == 0 or not PARED.has("%d,%d,%d" % [px.r8, px.g8, px.b8]):
+			continue
+		d.set_pixel(xi, yi, Color(px.r, px.g, px.b, 0))
+		if xi > 0:
+			st.append(i - 1)
+		if xi < w - 1:
+			st.append(i + 1)
+		if yi > 0:
+			st.append(i - w)
+		if yi < h - 1:
+			st.append(i + w)
+	_sin_pared_c[k] = d
+	return d
 
 # la carpa del piso, entera desde su base (sprite del atlas o la procedural); con plantas, la luz se escapa bajo la puerta
 func _carpa_mapa(t: Dictionary) -> void:

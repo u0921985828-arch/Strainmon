@@ -52,8 +52,11 @@ const REAL = {
       iwin: 'ventana', poster: 'diploma', shelfW: 'estantería', counter: 'mostrador', display: 'expositor', bottles: 'botellero', barcounter: 'barra', stool: 'taburete',
       btable: 'mesa', jukebox: 'gramola', crate: 'cajas', lamp: 'farola', fountain: 'fuente', sign: 'cartel', bench: 'banco', mesa: '' };
     const NPCN = { kiko: 'Kiko', josune: 'Josune', baltasar: 'Baltasar', tono: 'Toño', begona: 'Begoña', unai: 'Unai', patxi: 'Patxi', txaro: 'Txaro', inaki: 'Iñaki',
-      cop: 'Agente', darko: 'Darko', molina: 'Sgto. Molina', jurado: 'Jurado' };
-    const ZONAS = { town: [['PARQUE DE LOS SAUCES', 1, 13, 11, 27], ['PLAZA', 14, 13, 26, 24], ['RÍA', 31, 14, 38, 28], ['MUELLE', 34, 16, 38, 25], ['CALLE', 1, 9, 38, 12]] };
+      cop: 'Agente', darko: 'Darko', darko2: 'Darko', molina: 'Sgto. Molina', tono2: 'Toño', jurado: 'Jurado' };
+    const ZONAS = { town: [['PARQUE DE LOS SAUCES', 1, 13, 11, 27], ['PLAZA', 14, 13, 26, 24], ['RÍA', 31, 14, 38, 28], ['MUELLE', 34, 16, 38, 25], ['CALLE', 1, 9, 38, 12]],
+      alto: [['PLAZA DEL ENSANCHE', 3, 4, 19, 17], ['JARDINES', 22, 3, 38, 11], ['CALLE', 1, 20, 38, 23]],
+      astilleros: [['ASTILLEROS CERRADOS', 24, 4, 37, 10], ['MUELLE DE CARGA', 0, 19, 39, 22], ['DIQUES', 6, 23, 28, 27]] };
+    const FUERA = n => !!CLIENT_TILES[n];   // los mapas de fuera (barrio, barrio alto y astilleros)
 
     mode = 'plano'; S = newState(); S.ch = 6; S.protect = false; S.flags = { letter: 1, kiko1: 1, harvest1: 1, metB: 1, lab: 1 }; S.min = 12 * 60; S.clients = [];
     S.carpas = [{ t: 'p80', foco: 'sodio250' }, { t: 'g150', foco: 'led720' }, { t: 'm120', foco: 'led480' }]; S.macetas = Array(15).fill('tela11'); S.pots = Array(15).fill(null);
@@ -72,7 +75,7 @@ const REAL = {
       x.strokeText(s, px, py); x.fillStyle = col; x.fillText(s, px, py);
     }
     function anotar(name, titulo) {
-      K = name === 'town' ? 2 : name === 'home' ? 4 : 3; const usados = [];
+      K = FUERA(name) ? 2 : name === 'home' ? 4 : 3; const usados = [];
       const m = MAPS[name], base = mapaEntero(name), W = m.w * 16 * K, H = m.h * 16 * K;
       const [c, x] = mkCanvas(W + MG * 2, H + MG * 2 + 64); x.imageSmoothingEnabled = false;
       x.fillStyle = '#14161c'; x.fillRect(0, 0, c.width, c.height); x.drawImage(base, MG, MG, W, H);
@@ -100,7 +103,7 @@ const REAL = {
       for (let ty = 0; ty < m.h; ty++) for (let tx = 0; tx < m.w; tx++) {
         const o = m.o[ty][tx]; if (!o || !(o in NOMBRE)) continue;
         if (o === 'sign') { marca(tx, ty, '#ffffff', 'd', 'i'); const t = (SIGNS[name + ':' + tx + ',' + ty] || '').split('\n')[0]; if (t) rotulo(tx, ty, t, '#ffffff', L - 2, 26); continue; }
-        if (name === 'town' && (o === 'lamp' || o === 'bench')) continue;
+        if (FUERA(name) && (o === 'lamp' || o === 'bench' || o === 'crate')) continue;
         if (NOMBRE[o] && !(o === m.o[ty][tx - 1])) { rotulo(tx, ty, NOMBRE[o], '#f0e0ff', 2, L - 3); inv.objetos.push({ o, x: tx, y: ty }); }
       }
       if (name === 'home') {
@@ -109,17 +112,18 @@ const REAL = {
           inv.carpas.push({ t: t.t, x: t.x0, y: t.y, w, h: 1, plazas: C.plazas }); });
         SITIOS.forEach((st, ci) => { if (!S.carpas[ci]) caja(st.x, st.y, st.x + st.w - 1, st.y, '#a8ff60', true); });
       }
-      if (name === 'town') CLIENT_TILES.forEach(([tx, ty]) => { const [a, b] = T(tx, ty); x.fillStyle = 'rgba(120,255,160,.55)'; x.fillRect(a + L / 2 - 2, b + L / 2 - 2, 4, 4); });
+      if (FUERA(name)) CLIENT_TILES[name].forEach(([tx, ty]) => { const [a, b] = T(tx, ty); x.fillStyle = 'rgba(120,255,160,.55)'; x.fillRect(a + L / 2 - 2, b + L / 2 - 2, 4, 4); });
       NPCDEF.filter(d => d.map === name).forEach(d => { marca(d.x, d.y, '#ff6ad5', 'o'); rotulo(d.x, d.y, NPCN[d.id] || d.id, '#ff9ae5', L - 4, -2); inv.npcs.push({ id: d.id, x: d.x, y: d.y, deambula: d.wander || 0 }); });
       ITEMS.filter(it => it.map === name).forEach(it => { marca(it.x, it.y, it.hidden ? '#ff9a3a' : '#ffe14a', 'd'); rotulo(it.x, it.y, it.id + (it.hidden ? ' (escondido)' : ''), it.hidden ? '#ffb46a' : '#fff07a', L - 2, 26); inv.objetos.push({ o: it.id, x: it.x, y: it.y, item: 1 }); });
       // leyenda
       const ly = MG + H + 36; let lx = MG; texto(x, `${titulo} · ${m.w}×${m.h} casillas · 1 casilla = 16 px (aquí ×${K}) ≈ 1 m`, lx, ly, '#ffffff', 13);
       const ley = [['#ffd84a', 'edificio'], ['#58e070', 'puerta'], ['#40d8e8', 'salida'], ['#ff6ad5', 'NPC'], ['#ffe14a', 'objeto'], ['#ff9a3a', 'escondido'], ['#ffffff', 'cartel']]
-        .concat(name === 'home' ? [['#a8ff60', 'carpa']] : name === 'town' ? [['rgba(120,255,160,.9)', 'casillas de clientes'], ['#a0dcff', 'zona']] : []);
+        .concat(name === 'home' ? [['#a8ff60', 'carpa']] : FUERA(name) ? [['rgba(120,255,160,.9)', 'casillas de clientes'], ['#a0dcff', 'zona']] : []);
       lx = MG; ley.forEach(([col, n]) => { x.fillStyle = col; x.fillRect(lx, ly + 10, 12, 12); texto(x, n, lx + 16, ly + 21, '#d8dce6', 11, 'normal'); lx += 30 + n.length * 6.4; });
       out.mapas[name] = { png: c.toDataURL('image/png'), inv };
     }
     anotar('town', 'RIBERA VERDE · barrio'); anotar('home', 'PISO DE LA TÍA MAITE (armario 80 + carpa 150 + carpa 120)'); anotar('shop', 'GROWSHOP KIKO'); anotar('bar', 'BAR EL ANCLA');
+    anotar('alto', 'BARRIO ALTO'); anotar('astilleros', 'ASTILLEROS'); anotar('txaro', 'CASA DE TXARO'); anotar('comisaria', 'COMISARÍA DEL BARRIO ALTO'); anotar('almacen', 'ALMACÉN DE LOS ASTILLEROS');
 
     // ---------- hoja de escala ----------
     function caja(c) { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;

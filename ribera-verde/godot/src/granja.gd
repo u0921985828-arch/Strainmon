@@ -88,11 +88,15 @@ func tick_minute() -> void:
 	if S.min >= 1440:
 		S.min -= 1440
 		new_day()
-	if S.min % 30 == 0 and S.map == "town":
+	if S.min % 30 == 0 and D.ZONAS.has(S.map):
 		music(map_music())
 
 func new_day() -> void:
 	S.day += 1
+	# la cuota de Molina (1.10): pasado el último día pagado, se acaba la protección (antes de la redada de esta noche)
+	if S.protect and S.get("protHasta") and S.day > S.protHasta:
+		S.protect = false
+		queue("cuota", func(): await talk("SMS · MOLINA", ["Se acabó lo pagado.", "Si quieres que mis agentes sigan mirando hacia otro lado, ya sabes dónde está la comisaría."]))
 	if S.heat >= 90:
 		queue("raid", raid_event)   # antes de que el calor baje con el nuevo día
 	S.heat = max(0, S.heat - (20 if S.protect else 12))
@@ -101,7 +105,7 @@ func new_day() -> void:
 	var av := []
 	S.luz = {"d": S.day, "e": luz, "o": olor}
 	if luz > 0:
-		S.money = max(0, S.money - luz)
+		pagar_casa(luz)    # de lo de fuera y, si no llega, de la caja (1.10)
 		av.append("Factura de la luz: −" + Datos.eur(luz))
 	if olor:
 		S.heat = min(100, S.heat + olor)
@@ -117,7 +121,9 @@ func new_day() -> void:
 		toast("<br>".join(av), 1600)
 	spawn_clients()
 	recibir_pedido()
-	if S.due > 0 and S.flags.get("metB") and S.day > S.deadline:
+	instalar_caja()
+	vencer_encargo()
+	if S.due > 0 and S.day > S.deadline:   # 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
 		queue("penalty", penalty_event)
 
 # ---------- fenotipo ----------
@@ -390,6 +396,8 @@ func harvest(i: int) -> void:
 		S.fenos[str(int(p.f.id))] = cl
 	S.pots[i] = null
 	sfx("get")
+	if S.rec.get(p.sid) == 1:   # una variedad de receta sacada en la mesa, cosechada (capítulo 4)
+		S.rec[p.sid] = 2
 	await say("Cosechas %d g de %s. THC: %s%%." % [g, s.n, Datos.pct(thc)])
 	if cl == "estrella":
 		sfx("enc")
@@ -452,6 +460,8 @@ func bed_action():
 	var hoy = S.luz if S.get("luz") and S.luz.d == S.day else null
 	save()
 	toast("Has descansado" + ((" · Luz −" + Datos.eur(hoy.e)) if hoy and hoy.e else "") + ((" · Olor: calor +" + n(hoy.o)) if hoy and hoy.o else "") + " · Partida guardada", 1800)
+	if S.ch == 7 and not S.flags.get("robo") and (S.money > 1000 or total_buds() > 100):
+		await robo_darko()   # la amenaza de Darko (1.10)
 	await aviso_plaga(antes)
 
 static func _lista(L: Array) -> String:
@@ -494,12 +504,19 @@ func pc_action():
 	var o := ["Genoteca"]
 	if S.ch >= 2:
 		o.append("Banco de semillas")
+	o.append("Notas de la tía")
+	if S.ch >= 4 and S.get("caja") and S.caja.nivel == 1 and not S.caja.get("mejora"):
+		o.append("Caja empotrada")
 	o.append_array(["Guardar partida", "Apagar"])
 	var c: String = o[await ask("El ordenador de la tía. Tiene su registro de cultivos de veinte años.", o)]
 	if c == "Genoteca":
 		await genoteca()
 	elif c == "Banco de semillas":
 		await banco_semillas()
+	elif c == "Notas de la tía":
+		await notas_tia()
+	elif c == "Caja empotrada":
+		await pedir_caja()
 	elif c == "Guardar partida":
 		await say("Partida guardada." if save() else "No se ha podido guardar en este navegador.")
 
@@ -517,16 +534,16 @@ func banco_semillas() -> void:
 			var np: int = S.pedido.count(b[0])
 			items.append({"label": s.n + (" · pedida" if np else ""), "right": Datos.eur(b[1]), "sw": s.c, "ic": ic_cog(b[0]), "desc": strain_line(b[0]) + "\n" + s.h})
 		items.append({"label": "Salir", "desc": "Los pedidos llegan mañana por la mañana."})
-		i = await menu(items, {"cls": "full", "title": "BANCO DE SEMILLAS", "title2": "Sobres de %s · tienes %s" % [n(D.SOBRE), Datos.eur(S.money)], "desc": true, "initial": i})
+		i = await menu(items, {"cls": "full", "title": "BANCO DE SEMILLAS", "title2": "Sobres de %s · tienes %s" % [n(D.SOBRE), Datos.eur(S.money + caja_e())], "desc": true, "initial": i})
 		if i < 0 or i >= l.size():
 			return
 		var k: String = l[i][0]
 		var pr := int(l[i][1])
-		if S.money < pr:
+		if S.money + caja_e() < pr:
 			sfx("bad")
 			await say("No te llega el dinero.")
 			continue
-		S.money -= pr
+		pagar_casa(pr)
 		S.pedido.append(k)
 		sfx("coin")
 		toast("Pedido: " + D.STRAINS[k].n + " · llega mañana", 1400)
@@ -611,6 +628,10 @@ func lab_action():
 	var s = strain(r)
 	if is_new:
 		S.gen[r] = 1
+	var kr := [A, Bk]
+	kr.sort()
+	if D.RECIPES.has("+".join(kr)) and not S.rec.get(r):   # de receta, sacada en la mesa: falta cosecharla (capítulo 4)
+		S.rec[r] = 1
 	await accion("cruzar", {"id": "vfx-polen", "x": P.px + 8, "y": P.py - 4})
 	sfx("enc")
 	await fade(1, true)

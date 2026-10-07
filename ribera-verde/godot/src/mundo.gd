@@ -78,6 +78,49 @@ func total_buds() -> float:
 func disc_count() -> int:
 	return S.disc.size()
 
+# variedades de receta (RECIPES) sacadas en la mesa (S.rec[sid] = 1) y ya cosechadas (2): el capítulo 4 pide 2 (1.10)
+func rec_count() -> int:
+	var nn := 0
+	for k in S.rec:
+		if S.rec[k] == 2:
+			nn += 1
+	return nn
+
+# la caja fuerte (1.10, 11b-caja): lo de dentro no va encima
+func caja_g() -> float:
+	var t := 0.0
+	if S.get("caja"):
+		for k in S.caja.buds:
+			t += S.caja.buds[k].g
+	return t
+
+func caja_e() -> float:
+	return S.caja.money if S.get("caja") else 0
+
+# pagar desde el piso: primero lo de fuera y después la caja. Devuelve lo que falta
+func pagar_casa(e: float) -> float:
+	var a: float = minf(S.money, e)
+	S.money -= a
+	e -= a
+	if e > 0 and S.get("caja"):
+		var b: float = minf(S.caja.money, e)
+		S.caja.money -= b
+		e -= b
+	return e
+
+# g gramos del lote k de «de» a «a»: si el lote ya está, se juntan con el THC medio por gramos
+func mover_lote(de: Dictionary, a: Dictionary, k: String, g: float) -> void:
+	var b: Dictionary = de[k]
+	if a.has(k):
+		var t: Dictionary = a[k]
+		t.thc = (t.thc * t.g + b.thc * g) / (t.g + g)
+		t.g += g
+	else:
+		a[k] = {"g": g, "thc": b.thc}
+	b.g -= g
+	if b.g < .5:
+		de.erase(k)
+
 func gm2(s) -> int:
 	return Datos.jsround(D.W_M2 * .85 * 1.25 * s.y / D.Y_MEDIA / 10) * 10
 
@@ -186,8 +229,14 @@ func npc_cond(d: Dictionary) -> bool:
 			return S.ch >= 2
 		"darko":
 			return (S.ch >= 2 and not S.flags.get("darko1")) or S.ch == 6
-		"molina":
-			return S.ch >= 5 and not S.protect
+		"darko2":
+			return S.ch >= 7
+		"txaro":    # 1.10: después del aceite, en su casa
+			return (d.map == "txaro") == (true if S.flags.get("txaro") else false)
+		"molina":   # 1.10: la primera vez en la plaza; después, en la comisaría
+			return S.ch >= 5 and (d.map == "comisaria") == (true if S.flags.get("molina1") else false)
+		"tono2":
+			return S.get("encargo") != null
 		"jurado":
 			return S.ch == 6
 	return true
@@ -214,8 +263,10 @@ func npc_talk(d: Dictionary) -> void:
 			await talk_inaki()
 		"cop":
 			await talk_cop()
-		"darko":
+		"darko", "darko2":
 			await talk_darko()
+		"tono2":
+			await talk_tono_almacen()
 		"molina":
 			await talk_molina()
 		"jurado":
@@ -237,8 +288,8 @@ func build_ents() -> void:
 		if d.map != S.map or not npc_cond(d):
 			continue
 		ents.append(old[d.id] if old.has(d.id) and is_same(old[d.id].def, d) else mk_ent(d))
-	if S.map == "town":
-		for c in S.clients:
+	for c in S.clients:
+		if c.get("map", "town") == S.map:
 			ents.append(old[c.id] if old.has(c.id) else mk_ent({"id": c.id, "x": c.x, "y": c.y, "wander": 2, "lookObj": c.look, "client": c}))
 
 func item_give(id: String) -> void:
@@ -262,6 +313,12 @@ func item_give(id: String) -> void:
 		"h_ins":
 			S.items.insect += 1
 			await got("1 tratamiento de INSECTICIDA")
+		"i_ast":
+			S.items.spray += 2
+			await got("2 × SPRAY DE PIMIENTA")
+		"h_alto":
+			S.money += 80
+			await got("80 € en un sobre arrugado")
 
 func item_at(x: int, y: int):
 	for it in D.ITEMS:
@@ -309,7 +366,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	music(map_music())
 
 func map_music() -> String:
-	return ("night" if is_night() else "town") if S.map == "town" else "home"
+	return ("night" if is_night() else "town") if D.ZONAS.has(S.map) else "home"
 
 func warp(w: Dictionary) -> void:
 	sfx("door")
@@ -389,9 +446,10 @@ func on_step_end() -> void:
 	if door:
 		run(func(): await warp(door))
 		return
-	if S.map != "town":
+	if not D.ZONAS.has(S.map):
 		return
-	if P.y >= 13 and P.y <= 14 and P.x >= 18 and P.x <= 22:
+	var Z: Dictionary = D.ZONAS[S.map]
+	if S.map == "town" and P.y >= 13 and P.y <= 14 and P.x >= 18 and P.x <= 22:
 		if S.ch >= 2 and not S.flags.get("darko1"):
 			queue("darko", func():
 				for e in ents:
@@ -399,14 +457,14 @@ func on_step_end() -> void:
 						e.dir = "up"
 				await talk_darko())
 			return
-		if S.ch >= 5 and not S.flags.get("molina1") and not S.protect:
+		if S.ch >= 5 and not S.flags.get("molina1"):
 			queue("molina", talk_molina)
 			return
 	if S.ch >= 2 and S.cool <= 0:
 		var g := total_buds()
 		var tall: bool = m.g[P.y][P.x] == "tallgrass"
-		var pp: float = (.002 + S.heat * .00025) * (.4 if S.protect else 1.0) if g > 0 else 0.0
-		var pt: float = .004 * (2.5 if is_night() else 1.0) * (3.0 if tall else 1.0) if (g >= 5 or S.money >= 150) else 0.0
+		var pp: float = (.002 + S.heat * .00025) * (.4 if S.protect else 1.0) * Z.pol if g > 0 else 0.0
+		var pt: float = .004 * (2.5 if is_night() else 1.0) * (3.0 if tall else 1.0) * Z.lad if (g >= 5 or S.money >= 150) else 0.0
 		var r := Cultivo.azar()
 		if r < pp:
 			S.cool = 25
@@ -520,8 +578,19 @@ func object_action(x: int, y: int) -> void:
 				await say("Por la ventana se ve la ría. Huele a salitre.")
 				return
 			"poster":
-				await say("Un diploma enmarcado: «COPA DE RIBERA 1998 · 2º PREMIO: MAITE».")
+				await diploma_action()
 				return
+	var txt := ""
+	if S.map == "txaro":
+		txt = {"bedT": "Una cama con colcha de ganchillo.", "bedB": "Una cama con colcha de ganchillo.", "table": "Un bote de aceite con una etiqueta a mano: «Para dormir. 2 gotas».",
+			"fridge": "Nevera de las de antes. No es tuya.", "iwin": "Por la ventana se ve el parque de los Sauces."}.get(o, "")
+	elif S.map == "comisaria":
+		txt = {"iwin": "Por la ventana se ve la plaza del Ensanche.", "shelfW": "Archivadores con expedientes. Hay uno con tu calle.", "counter": "El mostrador de denuncias. No hay nadie detrás."}.get(o, "")
+	elif S.map == "almacen":
+		txt = {"crate": "Cajas precintadas con el sello de una conservera que cerró hace años.", "btable": "Una mesa con una báscula y rollos de film transparente."}.get(o, "")
+	if txt:
+		await say(txt)
+		return
 	match o:
 		"sign":
 			await say(D.SIGNS.get("%s:%d,%d" % [S.map, x, y], "Está tan desgastado que no se lee."))
@@ -542,7 +611,7 @@ func object_action(x: int, y: int) -> void:
 			sfx("get")
 			await say("La gramola suena: rock vasco de los 80.")
 		"crate":
-			await say("Cajas de pescado vacías del puerto.")
+			await say("Cajas de madera de los astilleros, podridas por la humedad." if S.map == "astilleros" else "Cajas de pescado vacías del puerto.")
 
 # ---------- acciones y efectos del atlas (01b-arte accion, lanzarVfx) ----------
 func accion(nn: String, vf = null) -> void:
@@ -567,40 +636,48 @@ func precio_calle(thc: float) -> float:
 func precio_mayor(thc: float) -> float:
 	return 2 + thc * .1
 
+# clientes del día por zona (1.10): en el barrio, como siempre; en el barrio alto, pijos y turistas desde el capítulo 3; en los
+# astilleros (las esquinas de Darko), estudiantes y currelas
 func spawn_clients() -> void:
 	S.clientsDay = S.day
 	S.clients = []
 	if S.ch >= 2:
 		var nn := mini(10, 4 + int(floor(S.rep / 15.0)) + (1 if S.ch >= 4 else 0))
-		var used := {}
-		for d in D.NPCDEF:
-			if d.map == "town":
-				used["%d,%d" % [d.x, d.y]] = true
-		for it in D.ITEMS:
-			used["%d,%d" % [it.x, it.y]] = true
-		for i in nn:
-			var t: Array = []
-			for k in 30:
-				t = pick(D.CLIENT_TILES)
-				if not used.has("%d,%d" % [t[0], t[1]]):
-					break
-			used["%d,%d" % [t[0], t[1]]] = true
-			var types := ["est", "est", "cur", "cur"]
-			if S.ch >= 3:
-				types.append("tur")
-			if S.ch >= 4:
-				types.append_array(["pij", "pij"])
-			var type: String = pick(types)
-			var ct: Dictionary = D.CTYPES[type]
-			var id := "c%d_%d" % [S.day, i]
-			var want := ri(int(ct.g[0]), int(ct.g[1]))
-			var mt := 0
-			if type == "pij":
-				mt = mini(24, 15 + S.ch)
-			elif type == "tur" and Cultivo.azar() < .4:
-				mt = 15
-			S.clients.append({"id": id, "x": int(t[0]), "y": int(t[1]), "type": type, "want": want, "minThc": mt, "look": Datos.rand_look(id, "client")})
-	if S.map == "town":
+		var tipos := ["est", "est", "cur", "cur"]
+		if S.ch >= 3:
+			tipos.append("tur")
+		if S.ch >= 4:
+			tipos.append_array(["pij", "pij"])
+		var zonas := [["town", nn, tipos], ["astilleros", 2 + (1 if S.ch >= 4 else 0), ["est", "cur"]]]
+		if S.ch >= 3:
+			zonas.append(["alto", 2 + (1 if S.ch >= 4 else 0), ["pij", "tur"]])
+		for zz in zonas:
+			var map_: String = zz[0]
+			var used := {}
+			for d in D.NPCDEF:
+				if d.map == map_:
+					used["%d,%d" % [d.x, d.y]] = true
+			for it in D.ITEMS:
+				if it.map == map_:
+					used["%d,%d" % [it.x, it.y]] = true
+			for i in int(zz[1]):
+				var t: Array = []
+				for k in 30:
+					t = pick(D.CLIENT_TILES[map_])
+					if not used.has("%d,%d" % [t[0], t[1]]):
+						break
+				used["%d,%d" % [t[0], t[1]]] = true
+				var type: String = pick(zz[2])
+				var ct: Dictionary = D.CTYPES[type]
+				var id := "c%d_%s%d" % [S.day, {"town": "", "alto": "b", "astilleros": "s"}[map_], i]
+				var want := ri(int(ct.g[0]), int(ct.g[1]))
+				var mt := 0
+				if type == "pij":
+					mt = mini(24, 15 + S.ch)
+				elif type == "tur" and Cultivo.azar() < .4:
+					mt = 15
+				S.clients.append({"id": id, "map": map_, "x": int(t[0]), "y": int(t[1]), "type": type, "want": want, "minThc": mt, "look": Datos.rand_look(id, "client")})
+	if D.ZONAS.has(S.map):
 		build_ents()
 
 func remove_client(id: String) -> void:
@@ -624,7 +701,7 @@ func talk_client(c: Dictionary) -> void:
 		return
 	var sid: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
-	var base: float = precio_calle(b.thc) * ct.mult * c.want
+	var base: float = precio_calle(b.thc) * ct.mult * D.ZONAS[c.get("map", "town")].precio * c.want
 	var pr := [Datos.jsround(base * .85), Datos.jsround(base), Datos.jsround(base * 1.3)]
 	var j: int = await ask("%s g de %s. ¿Cuánto le pides?" % [n(c.want), lot_nombre(sid)], ["Rebaja · %d €" % pr[0], "Justo · %d €" % pr[1], "Caro · %d €" % pr[2], "Cancelar"])
 	if j == 3:
@@ -645,6 +722,11 @@ func talk_client(c: Dictionary) -> void:
 		toast("+%s · %s g vendidos" % [Datos.eur(pr[j]), n(c.want)], 1600)
 		heat_warn()
 		await check_story()
+		# en las esquinas de Darko (1.10), 1 de cada 3 ventas acaba con uno de sus chicos encima
+		if c.get("map") == "astilleros" and Cultivo.azar() < 1.0 / 3:
+			await say("Uno de los chicos de Darko te ha visto vender.")
+			await say("«Te dijimos que lejos de nuestras esquinas.»", "CHICO DE DARKO")
+			await battle("thief")
 	else:
 		S.rep = maxi(0, S.rep - 1)
 		sfx("bad")
@@ -680,6 +762,20 @@ func talk_darko():
 func talk_molina():
 	pass
 func talk_jurado():
+	pass
+func talk_tono_almacen():
+	pass
+func diploma_action():
+	pass
+func instalar_caja():
+	pass
+func vencer_encargo():
+	pass
+func robo_darko():
+	pass
+func notas_tia():
+	pass
+func pedir_caja():
 	pass
 func battle(_kind):
 	pass

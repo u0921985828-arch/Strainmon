@@ -80,18 +80,20 @@ function tickMinute(){
   S.min++;if(S.min%10===0)plantsAdvance(10);
   if(S.min%30===0&&S.hp<S.hpMax)S.hp++;
   if(S.min>=1440){S.min-=1440;newDay();}
-  if(S.min%30===0&&S.map==='town')music(mapMusic());
+  if(S.min%30===0&&ZONAS[S.map])music(mapMusic());
 }
 function newDay(){
   S.day++;
+  // la cuota de Molina (1.10): pasado el último día pagado, se acaba la protección (antes de la redada de esta noche)
+  if(S.protect&&S.protHasta&&S.day>S.protHasta){S.protect=false;queue('cuota',()=>talk('SMS · MOLINA',['Se acabó lo pagado.','Si quieres que mis agentes sigan mirando hacia otro lado, ya sabes dónde está la comisaría.']));}
   if(S.heat>=90)queue('raid',raidEvent); // se comprueba antes de que el calor baje con el nuevo día
   S.heat=Math.max(0,S.heat-(S.protect?20:12));
-  const luz=facturaLuz(),olor=olorDia(),av=[];S.luz={d:S.day,e:luz,o:olor};if(luz>0){S.money=Math.max(0,S.money-luz);av.push('Factura de la luz: −'+eur(luz));}
+  const luz=facturaLuz(),olor=olorDia(),av=[];S.luz={d:S.day,e:luz,o:olor};if(luz>0){pagarCasa(luz);av.push('Factura de la luz: −'+eur(luz));}   // de lo de fuera y, si no llega, de la caja (1.10)
   if(olor){S.heat=Math.min(100,S.heat+olor);av.push('Olor a cogollo: calor +'+olor);}   // después de bajar el calor: cuenta para la redada de mañana
   const sec=S.esquejes.filter(e=>S.day-e.dia>ESQUEJE_DIAS).length;if(sec){S.esquejes=S.esquejes.filter(e=>S.day-e.dia<=ESQUEJE_DIAS);av.push(`Se ${sec>1?'han secado '+sec+' esquejes':'ha secado un esqueje'} sin plantar`);}
   if(av.length&&mode==='world')toast(av.join('<br>'),1600);
-  spawnClients();recibirPedido();
-  if(S.due>0&&S.flags.metB&&S.day>S.deadline)queue('penalty',penaltyEvent);
+  spawnClients();recibirPedido();instalarCaja();vencerEncargo();
+  if(S.due>0&&S.day>S.deadline)queue('penalty',penaltyEvent);   // 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
 }
 /* ---------- fenotipo (1.10) ----------
    Cada planta de semilla tira el suyo al germinar (t: THC, y: gramos; σ según tipoGen, 03-datos). Un esqueje es la misma
@@ -192,6 +194,7 @@ async function harvest(i){
   const [vx,vy]=posPlaza(i);await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:vx,y:vy-12});
   const cria=genDe(p.sid)<GEN_ESTABLE,fem=SHOP.some(it=>it.sid===p.sid),n=cria?ri(2,5):!fem||Math.random()<SEMILLA_HERMA?ri(1,3):0;
   addBuds(cl==='estrella'?p.sid+'*':p.sid,g,thc);if(n)addSeeds(p.sid,n);if(p.f&&p.f.id)S.fenos[p.f.id]=cl;S.pots[i]=null;sfx('get');
+  if(S.rec[p.sid]===1)S.rec[p.sid]=2;   // una variedad de receta sacada en la mesa, cosechada (capítulo 4)
   await say(`Cosechas ${g} g de ${s.n}. THC: ${pct(thc)}%.`);
   if(cl==='estrella'){sfx('enc');await say(`¡Fenotipo estrella! THC ×${coma(fe.t)} y cosecha ×${coma(fe.y)} sobre la media de la ${s.n}.`);await say('Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.');}
   else if(cl==='floja')await say(`Fenotipo flojo: THC ×${coma(fe.t)} y cosecha ×${coma(fe.y)} de la media.`);
@@ -215,6 +218,7 @@ async function bedAction(){
   advanceTime(mins);S.hp=S.hpMax;buildEnts();updateHUD();await wait(500);await fade(0);
   const hoy=S.luz&&S.luz.d===S.day&&S.luz;
   save();toast('Has descansado'+(hoy&&hoy.e?' · Luz −'+eur(hoy.e):'')+(hoy&&hoy.o?' · Olor: calor +'+hoy.o:'')+' · Partida guardada',1800);
+  if(S.ch===7&&!S.flags.robo&&(S.money>1000||totalBuds()>100))await roboDarko();   // la amenaza de Darko (1.10)
   await avisoPlaga(antes);
 }
 // al despertar (1.10): las plantas que han cogido plaga mientras dormías (y el insecticida que te queda), las que la siguen teniendo
@@ -231,9 +235,10 @@ async function avisoPlaga(antes){
   if(muertas.length)await say(`Se ha${n(muertas)} secado del todo ${lista(muertas)}. Retírala${s(muertas)} con A.`);
 }
 async function pcAction(){
-  const o=['Genoteca'].concat(S.ch>=2?['Banco de semillas']:[],['Guardar partida','Apagar']);
+  const o=['Genoteca'].concat(S.ch>=2?['Banco de semillas']:[],['Notas de la tía'],S.ch>=4&&S.caja&&S.caja.nivel===1&&!S.caja.mejora?['Caja empotrada']:[],['Guardar partida','Apagar']);
   const c=o[await ask('El ordenador de la tía. Tiene su registro de cultivos de veinte años.',o)];
   if(c==='Genoteca')await genoteca();else if(c==='Banco de semillas')await bancoSemillas();
+  else if(c==='Notas de la tía')await notasTia();else if(c==='Caja empotrada')await pedirCaja();
   else if(c==='Guardar partida')await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');
 }
 // banco de semillas (1.9): las landraces de Strainmon en sobres de SOBRE semillas, a precio de bancos de conservación
@@ -245,11 +250,11 @@ async function bancoSemillas(){
     const l=BANCO.filter(([,,ch])=>S.ch>=ch);
     const items=l.map(([k,p])=>{const s=STRAINS[k],n=S.pedido.filter(x=>x===k).length;return {label:s.n+(n?' · pedida':''),right:eur(p),sw:s.c,ic:iconoCogollo(k),desc:strainLine(k)+'\n'+s.h};});
     items.push({label:'Salir',desc:'Los pedidos llegan mañana por la mañana.'});
-    i=await menu(items,{cls:'full',title:'BANCO DE SEMILLAS',title2:`Sobres de ${SOBRE} · tienes `+eur(S.money),desc:true,initial:i});
+    i=await menu(items,{cls:'full',title:'BANCO DE SEMILLAS',title2:`Sobres de ${SOBRE} · tienes `+eur(S.money+cajaE()),desc:true,initial:i});
     if(i<0||i>=l.length)return;
     const [k,p]=l[i];
-    if(S.money<p){sfx('bad');await say('No te llega el dinero.');continue;}
-    S.money-=p;S.pedido.push(k);sfx('coin');toast('Pedido: '+STRAINS[k].n+' · llega mañana',1400);
+    if(S.money+cajaE()<p){sfx('bad');await say('No te llega el dinero.');continue;}
+    pagarCasa(p);S.pedido.push(k);sfx('coin');toast('Pedido: '+STRAINS[k].n+' · llega mañana',1400);
   }
 }
 function recibirPedido(){
@@ -280,6 +285,7 @@ async function labAction(){
   if(await ask(`¿Cruzar ${getStrain(A).n} × ${getStrain(Bk).n}? Gastas 1 semilla de cada.`,['Cruzar','Cancelar'])!==0)return;
   S.seeds[A]--;S.seeds[Bk]--;for(const k of [A,Bk])if(!S.seeds[k])delete S.seeds[k];
   const r=crossResult(A,Bk),isNew=!S.disc[r],s=getStrain(r);if(isNew)S.gen[r]=1;
+  if(RECIPES[[A,Bk].sort().join('+')]&&!S.rec[r])S.rec[r]=1;   // de receta, sacada en la mesa: falta cosecharla (capítulo 4)
   await accion('cruzar',{id:'vfx-polen',x:P.px+8,y:P.py-4});
   sfx('enc');await fade(1,true);await wait(450);await fade(0,true);
   addSeeds(r,2);

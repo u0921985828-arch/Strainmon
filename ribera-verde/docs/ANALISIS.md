@@ -3,31 +3,31 @@
 Este documento revisa:
 
 - la historia y sus misiones;
-- lo que puede pasarte por la calle: ladrones, controles de policía, sobornos, calor y redadas;
-- una propuesta de **caja fuerte** en el piso.
+- lo que puede pasarte por la calle (ladrones, controles de policía, sobornos, calor y redadas) en las tres zonas: el barrio, el barrio alto y los astilleros;
+- la **caja fuerte** del piso.
 
-Las cifras salen del código de la 1.10. `node tools/analisis-riesgos.js` escribe las tablas generadas con un modelo exacto, que aplica las mismas reglas que el código. Después, el mismo script juega cada caso con las funciones de verdad del juego (`onStepEnd`, `battle` y `thiefRound`, `copRound`, `newDay` y `raidEvent`, `talkClient`, `talkInaki`, `ventaMayor`, `harvest`, `addBuds` y `talkJurado`). Si alguna cifra no cuadra, para con un error y no escribe nada.
+La primera versión de este análisis encontró 10 problemas (el resumen de abajo). La 1.10 los resuelve todos, y el documento ya describe el juego tal como queda.
 
-La excepción es la tabla de la caja fuerte (§ 3.4). La caja todavía no existe en el juego, así que esa tabla sale solo del modelo.
+Las cifras salen del código de la 1.10. `node tools/analisis-riesgos.js` escribe las tablas generadas con un modelo exacto, que aplica las mismas reglas que el código. Después, el mismo script juega cada caso con las funciones de verdad del juego (`onStepEnd`, `battle` y `thiefRound`, `copRound`, `newDay` y `raidEvent`, `talkClient`, `talkInaki`, `ventaMayor`, `harvest`, `addBuds` y `talkJurado`), también con la caja llena (`S.caja`). Si alguna cifra no cuadra, para con un error y no escribe nada.
 
 <!-- auto:meta -->
-Generado con `npm run analisis`: 561 cifras comprobadas con el juego (20.000 combates, controles, ventas o trayectos simulados por celda, 100.000 pasos por situación y 5.000 carpas por fila de la Copa). Gramos a 7,60 €/g (precio de calle de una variedad del 18 %), salvo donde se dice.
+Generado con `npm run analisis`: 669 cifras comprobadas con el juego (20.000 combates, controles, ventas o trayectos simulados por celda, 100.000 pasos por situación y 5.000 carpas por fila de la Copa). Gramos a 7,60 €/g (precio de calle de una variedad del 18 %), salvo donde se dice.
 <!-- /auto:meta -->
 
 ## Resumen
 
-| # | Hallazgo | Gravedad | Propuesta |
+| # | Hallazgo (antes de la 1.10) | Gravedad | En la 1.10 |
 |---|---|---|---|
-| 1 | **Todo lo que tienes va siempre encima.** Hay un solo dinero (`S.money`) y una sola bolsa de cogollos (`S.buds`). La mochila dice «N g encima», pero son todos tus gramos. Un control se los lleva todos, aunque la cosecha «esté en casa». Un ladrón que te deja KO se lleva la mitad de cada lote y el 30 % de todo tu dinero. | Alta | La caja fuerte (§ 3) |
-| 2 | **El capítulo 4 se salta solo.** Pide tener 8 variedades descubiertas, y una variedad se descubre en cuanto tienes sus semillas (`addSeeds` → `discover`). Puedes llegar a 8 sin cruzar nada: Skunk #1, Lemon Haze, OG Kush y 5 landraces del ordenador, todas al alcance en el capítulo 2. En cuanto Kiko te da la mesa, empieza el capítulo 5. | Alta | Pedir que coseches 2 variedades de receta sacadas en la mesa (§ 1.3, punto 1) |
-| 3 | **El plazo del capítulo 3 no empieza hasta que hablas con Baltasar.** Toño dice «Hoy», pero el juego no fija el plazo (`S.due`, `S.deadline`) hasta `talkBaltasar`, y el castigo exige haberle visto (`flags.metB`). Si no vas al bar, no hay plazo. | Media | Fijar el plazo cuando aparece Toño |
-| 4 | **No hay derrota.** Si vence un plazo, Toño suma un 20 % de lo que debes (que se acumula: 3.000 → 3.600 → 4.300 → 5.200 €), te quita 15 de vida y te da 5 días más. Puede repetirse sin límite. | Media (puede ser a propósito) | A la tercera vez, que Toño se lleve algo del piso (una carpa o la caja) |
-| 5 | **Tres hilos sin cerrar.** Darko dice «Vende lo tuyo si quieres, pero lejos de mis esquinas», pero ninguna regla lo aplica. Al perder la Copa dice «Mi tío se va a enterar», pero `flags.copa` no se lee en ningún sitio. Baltasar te ofrece trabajo al saldar la deuda y no pasa nada más. | Media | Un robo de Darko en el capítulo 7 (§ 3.6) y encargos de Baltasar en el imperio |
-| 6 | **Al por mayor da unas 70 veces más euros por punto de calor que la calle.** Por gramo, en cambio, la calle paga el doble (7,63 € frente a 3,80 €). Desde el capítulo 3, la calle solo sirve para ganar reputación. | Media | Subir el calor del por mayor o limitarlo por reputación |
-| 7 | **El soborno casi siempre es lo mejor en un control, y su precio no depende de tu dinero.** Cuesta 40 + 4 × calor + 0,5 × gramos. En el capítulo 8 son 1.740 € aunque lleves 40.000 €. Con pocos gramos sale más barato entregarlos: por debajo de 49 g, con calor 50. | Media | Que el precio suba con el dinero que llevas encima, o que haya más agentes honrados con más calor |
-| 8 | **Con spray, los ladrones casi nunca ganan.** Con 2 sprays y un bocata, menos del 0,1 % de los combates acaba en KO, también en el capítulo 8. Sin spray es otra cosa: en el capítulo 8, con 30 de vida, pelear a puñetazos acaba en KO 2 de cada 3 veces, y lo mejor es huir (2,5 %). | Baja | Ladrones que pegan más desde el capítulo 5, o un spray que pierde fuerza con cada uso |
-| 9 | **La Copa se prepara en cuanto tienes la mesa** (capítulo 4): son 4 cruces sin cultivar nada. Pero el último cruce da solo 2 semillas. Con esas 2 plantas en el armario, la Amnesia Haze gana algo más de 1 de cada 4 veces. Para una carpa llena hacen falta unos 8 cruces o esquejes. | Baja | Aceptable. Si se quiere más reto, que Darko suba su marca cada vez que pierdes |
-| 10 | El objetivo del capítulo 2 dice «vendiendo en la calle», pero también cuentan las ventas a Iñaki (`S.sales`). | Muy baja | Cambiar el texto a «vendiendo» |
+| 1 | **Todo lo que tenías iba siempre encima.** Había un solo dinero y una sola bolsa de cogollos. Un control se llevaba todos tus gramos, aunque la cosecha «estuviera en casa». Un ladrón que te dejaba KO se llevaba la mitad de cada lote y el 30 % de todo tu dinero. | Alta | **La caja fuerte** (§ 3). La de la tía Maite, detrás del diploma (la pista está en el ordenador), y la empotrada, por el ordenador desde el capítulo 4. Lo que guardas no va encima |
+| 2 | **El capítulo 4 se saltaba solo.** Pedía 8 variedades descubiertas, y se llegaba a 8 solo comprando semillas. | Alta | El capítulo 4 pide sacar en la mesa 2 variedades de receta y cosechar una planta de cada |
+| 3 | **El plazo del capítulo 3 no empezaba hasta que hablabas con Baltasar.** Si no ibas al bar, no había plazo. | Media | El plazo de 7 días empieza cuando aparece Toño. Si tardas más de 2 días en ir al bar, Baltasar te recibe con «Llegas tarde» |
+| 4 | **No había derrota.** Un plazo vencido sumaba intereses y te daba 5 días más, sin límite. | Media | Al tercer plazo vencido, Toño se lleva la carpa más grande (B o C) con su foco y sus plantas. Sin carpas, la mitad del dinero que llevas encima |
+| 5 | **Tres hilos sin cerrar:** las esquinas de Darko, su «Mi tío se va a enterar» y la oferta de trabajo de Baltasar. | Media | Darko vigila sus esquinas en los astilleros y roba el piso en el capítulo 7 (§ 3.6). Baltasar da encargos en el imperio (§ 1.2) |
+| 6 | **Al por mayor daba unas 70 veces más euros por punto de calor que la calle.** | Media | Cada carga suma 2 de calor más 1 por cada 100 g (antes, por cada 250 g). Sigue rindiendo más, unas 35 veces |
+| 7 | **El soborno casi siempre era lo mejor en un control, y su precio no dependía de tu dinero.** | Media | El soborno suma el 5 % del dinero que llevas encima. En el capítulo 8, con 40.000 € encima, cuesta 3.740 € (antes, 1.740 €) |
+| 8 | **Con spray, los ladrones casi nunca ganaban.** | Baja | Desde el capítulo 5, los ladrones tienen 4 de vida más y pegan 1 más. Con spray siguen perdiendo casi siempre; sin spray, ya no |
+| 9 | **La Copa se prepara en cuanto tienes la mesa,** con 4 cruces. | Baja | Sin cambios: aceptable. Baltasar ya no dice «El sábado» (el juego no tiene días de la semana) |
+| 10 | El objetivo del capítulo 2 decía «vendiendo en la calle», pero también cuentan las ventas a Iñaki. | Muy baja | «Gana 300 € vendiendo» |
 
 ## 1. Guion y misiones
 
@@ -36,68 +36,54 @@ Generado con `npm run analisis`: 561 cifras comprobadas con el juego (20.000 com
 | Cap. | Objetivo | Qué lo cumple (código) | Plazo | Al cumplirlo |
 |---|---|---|---|---|
 | 1 · La herencia | Leer la carta, ir a ver a Kiko (te da 3 semillas de Skunk #1 y 2 dosis de abono) y cosechar | `flags.letter`, `flags.kiko1` y `flags.harvest1` | — | Capítulo 2. Kiko te escribe. Empiezan los clientes, los controles y los ladrones |
-| 2 · La calle | Vender por 300 € | `S.sales ≥ META_VENTAS` (cuentan también las ventas a Iñaki) | — | Capítulo 3. Toño te corta el paso y te cita en el bar «hoy» |
-| 3 · La deuda | Pagar 3.000 € a Baltasar | Pagar en el bar | 7 días, **desde que hablas con él** | Capítulo 4. Kiko te llama: en el growshop te da la mesa de genética y 3 semillas de Afghani |
-| 4 · Genética | Tener 8 variedades descubiertas | `discCount() ≥ 8`, que se mira en cuanto tienes la mesa | — | Capítulo 5. Toño te escribe: 12.000 € en 10 días. Aparece Molina |
-| 5 · El sargento | Pagar 12.000 €. Molina te ofrece protección por 1.500 € (si dices que no, +10 de calor) | Pagar en el bar | 10 días | Capítulo 6. Baltasar te habla de la Copa |
+| 2 · La calle | Ganar 300 € vendiendo | `S.sales ≥ META_VENTAS` (la calle e Iñaki) | — | Capítulo 3. Toño te corta el paso: «tienes siete días para el primer pago». El plazo empieza ahí (`S.due`, `S.deadline`, `flags.tono`) |
+| 3 · La deuda | Ir al bar El Ancla y pagar 3.000 € a Baltasar | Pagar en el bar | 7 días desde que aparece Toño. Si tardas más de 2 días en ir, «Llegas tarde» | Capítulo 4. Kiko te llama: en el growshop te da la mesa de genética y 3 semillas de Afghani |
+| 4 · Genética | Sacar en la mesa 2 variedades de receta y cosechar una planta de cada | `recCount() ≥ 2`: `S.rec[id]` vale 1 al sacarla en la mesa y 2 al cosecharla | — | Capítulo 5. Toño te escribe: 12.000 € en 10 días. Aparece Molina |
+| 5 · El sargento | Pagar 12.000 €. Molina te ofrece protección: 1.500 € cada 10 días. Si dices que no, +10 de calor | Pagar en el bar | 10 días | Capítulo 6. Baltasar: «La COPA DE RIBERA se juega estos días en la plaza» |
 | 6 · La Copa | Llevar 20 g de un lote con más del 26,8 % de THC | `talkJurado`: `round(thc·10)/10 > 26,8` | Ninguno (se puede repetir) | 5.000 € y +20 de reputación. Capítulo 7, con todo lo que queda (15.000 €) en 7 días |
-| 7 · Libertad | Pagar 15.000 € | Pagar en el bar | 7 días | Pantalla final y capítulo 8. Baltasar te ofrece trabajo |
-| 8 · Tu imperio | Facturar 25.000, 100.000 y 250.000 € desde el último pago | `imperioNivel()` | — | Iñaki te carga 2, 5 y 10 kg al día. La meta final es completar la genoteca de 41 y sacar la Ghost Train Haze |
+| 7 · Libertad | Pagar 15.000 €. La primera vez que duermas con más de 1.000 € o 100 g fuera de la caja, Darko te roba | Pagar en el bar | 7 días | Pantalla final y capítulo 8. Baltasar te ofrece trabajo |
+| 8 · Tu imperio | Facturar 25.000, 100.000 y 250.000 € desde el último pago. Los encargos de Baltasar | `imperioNivel()` | Cada encargo, 2 días | Iñaki te carga 2, 5 y 10 kg al día. La meta final es completar la genoteca de 41 y sacar la Ghost Train Haze |
 
 Si un plazo vence (capítulos 3, 5 y 7), Toño se presenta al cambiar de día:
 
 - Suma un 20 % de lo que debes en ese plazo, redondeado a 100 €. Como el 20 % se calcula sobre lo que ya debes, la deuda crece así: 3.000 → 3.600 → 4.300 → 5.200 €. Ese interés también se suma a la deuda total.
 - Te quita 15 de vida, sin bajarte nunca de 1.
 - Te da 5 días más.
-
-Puede pasar una y otra vez, sin límite.
+- Cuenta los plazos vencidos de toda la partida (`S.vencidos`). Al tercero, además, Don Baltasar «se cobra en especie»: Toño se lleva la carpa más grande del piso (la del fondo, B, o la de junto a la cama, C) con su foco, sus extras y sus plantas. Las demás plantas siguen en su carpa y su plaza. Si no tienes ninguna de las dos, se lleva la mitad del dinero que llevas encima. Después, la cuenta vuelve a 0.
 
 ### 1.2 Misiones secundarias y secretos
 
 | Quién o qué | Dónde | Pide | Da | Notas |
 |---|---|---|---|---|
-| Abuela Txaro | Parque (3, 18) | 5 g, una sola vez | 2 semillas de Hindu Kush y 3 bocatas | La única misión con historia propia. No tiene continuación |
+| Abuela Txaro | Parque (3, 18) | 5 g, una sola vez | 2 semillas de Hindu Kush y 3 bocatas | Después se va a su casa, en la calle (puerta en 34, 8) |
+| Abuela Txaro, en casa | Su casa, desde el capítulo 4 | 10 g de una índica (70 % o más) | 3 semillas de Chitral Kush, 3 bocatas y +5 de reputación | Le sirve cualquier lote con un 70 % índica o más, también un cruce propio |
 | Iñaki | Muelle (37, 21), desde el capítulo 2 | 10 g al día | 1,2 veces el precio de la calle. La primera vez, también 2 semillas de Malawi Gold | Desde el capítulo 3 también compra al por mayor (§ 1.4) |
-| Ordenador de la tía | Piso | Dinero | Sobres de 10 semillas de 12 landraces: 5 desde el capítulo 2, 5 desde el 3 y 2 desde el 4. Llegan al día siguiente | Cuentan para el objetivo del capítulo 4 |
-| Arbustos del parque | (2, 26), (9, 16) y (10, 24): pulsa A delante | — | 2 semillas de Acapulco Gold, 50 € y 1 insecticida | Josune y Unai dan la pista. La Acapulco Gold no se vende en ningún sitio |
-| Bolsas en el suelo | (8, 25), (36, 24) y (15, 23) | — | 2 sprays, 3 abonos y 2 bocatas | — |
+| Ordenador de la tía | Piso | Dinero | Sobres de 10 semillas de 12 landraces: 5 desde el capítulo 2, 5 desde el 3 y 2 desde el 4. Llegan al día siguiente | Las notas de la tía dan la pista de la caja. Desde el capítulo 4, con la caja de la tía abierta, la caja empotrada (§ 3) |
+| Diploma de la tía | Piso (7, 1) | La combinación: el año del premio (1998) | La caja fuerte de la tía, con 300 € dentro | La rueda ofrece 1976, 1979, 1987 y 1998 |
+| Arbustos | Parque: (2, 26), (9, 16) y (10, 24). Barrio alto: (2, 10). Pulsa A delante | — | 2 semillas de Acapulco Gold, 50 €, 1 insecticida y 80 € | Josune y Unai dan la pista del parque. La Acapulco Gold no se vende en ningún sitio |
+| Bolsas en el suelo | Barrio: (8, 25), (36, 24) y (15, 23). Astilleros: (4, 5) | — | 2 sprays, 3 abonos, 2 bocatas y 2 sprays más | — |
 | Patxi | Fuente de la plaza | — | Desde el capítulo 4, una pista de receta en cada visita (11 en total) | Antes del capítulo 4 solo te dice que vuelvas |
-| Kiko | Growshop | — | Un consejo por capítulo. Si te quedas sin nada (sin semillas, sin plantas, sin gramos y con menos de 15 €), 2 semillas de Skunk #1 | Así la partida no se puede atascar |
+| Kiko | Growshop | — | Un consejo por capítulo. Si te quedas sin nada (sin semillas, sin plantas, sin gramos y con menos de 15 € contando la caja), 2 semillas de Skunk #1 | Así la partida no se puede atascar |
 | Josune | Bar | 3-4 € | Vida y rumores | Los rumores adelantan lo de Molina y Darko |
+| Sargento Molina | La primera vez, en la plaza (capítulo 5). Después, en la comisaría del barrio alto | 1.500 € cada 10 días | Protección (§ 2.1) | Se puede pagar por adelantado: cada pago suma 10 días. Al acabarse, un SMS |
+| Darko | Astilleros (24, 16), desde el capítulo 7 | — | — | Sus chicos vigilan las esquinas de los astilleros: 1 de cada 3 ventas allí acaba en pelea |
+| Don Baltasar | Bar, capítulo 8 | Llevar 2 kg (5 kg desde el 2.º rango del imperio y 10 kg desde el 3.º) al almacén de los astilleros, de noche, en 2 días | 6 €/g (12.000 € por 2 kg), +2 de reputación y +3 de calor | Toño espera en el almacén de 21:00 a 6:00 y se lleva primero los lotes más flojos. Si no llegas, reputación −10 y 5 días sin encargos |
 | Ghost Train Haze | Mesa de genética | Cruzar Amnesia Haze × Fire OG | Un SMS de Kiko | Es la meta del final, junto con la genoteca |
 
-### 1.3 Problemas del guion y propuestas
+### 1.3 Problemas del guion: cómo quedan
 
-1. **El capítulo 4 no se juega.**
-   - Lo que pasa: «descubrir» una variedad es tener sus semillas, así que basta con comprar. Cuando Kiko te da la mesa, lo normal es tener ya 8 variedades o más:
-     - Skunk #1: Kiko te la regala en el capítulo 1, y además está en la tienda;
-     - Lemon Haze y OG Kush (tienda, capítulo 2);
-     - Blueberry y Mango (tienda, capítulo 3);
-     - Malawi Gold (Iñaki), Hindu Kush (Txaro) y Acapulco Gold (arbusto);
-     - las 10 landraces del ordenador de los capítulos 2 y 3.
-
-     `checkStory` mira `discCount() ≥ 8` en cuanto tienes la mesa, así que el capítulo dura lo que un diálogo.
-   - Por qué no basta con pedir «4 cruces nuevos»: cualquier cruce sin receta da al instante un híbrido nuevo (`crossResult`). Serían 4 pulsaciones en la mesa.
-   - **Propuesta:** que el objetivo sea «Cosecha 2 variedades de receta que hayas sacado en la mesa» (Lemon Skunk o Critical Mass, por ejemplo). Las pistas de Patxi empiezan justo en este capítulo. Así hay que cruzar, plantar y cultivar al menos una tanda.
-2. **Toño dice «Hoy» y no pasa nada.** El plazo de 3.000 € no empieza hasta que te sientas con Baltasar. Hasta entonces `S.due` vale 0, y `penaltyEvent` además exige `flags.metB`.
-   - **Propuesta:** fijar `S.due` y `S.deadline = S.day + 7` cuando aparece Toño. Si tardas más de 2 días en ir al bar, Baltasar te recibe con «Llegas tarde».
-3. **Darko amenaza dos veces y no cumple.**
-   - En el capítulo 2: «Vende lo tuyo si quieres, pero lejos de mis esquinas».
-   - Al perder la Copa: «Esto no se acaba aquí. Mi tío se va a enterar».
-   - **Propuesta:** en el capítulo 7, una noche entran a robar en el piso (§ 3.6). Así la amenaza tiene consecuencias y la caja fuerte tiene su momento en la historia.
-4. **La oferta de Baltasar se queda en el aire.** «Si algún día quieres trabajar para mí, ya sabes dónde estoy».
-   - **Propuesta (capítulo 8):** encargos de Baltasar. Por ejemplo, llevar 2 kg al muelle de noche, mejor pagado que con Iñaki pero con más riesgo. Encaja con el imperio y con las tablas de trayectos (§ 2.3).
-5. **No hay derrota.** Los intereses se acumulan sin fin (§ 1.1). Es coherente con un juego tranquilo, pero así la presión del plazo es solo de texto.
-   - **Propuesta:** al tercer plazo vencido, Toño se lleva la carpa más grande o, si la tienes, la caja fuerte de sobremesa.
-6. **La Copa «del sábado».** Baltasar dice «El sábado es la COPA», pero el juego no tiene días de la semana y el jurado está en la plaza todo el capítulo 6.
-   - **Propuesta:** quitar «El sábado», o dar a la Copa un día fijo como plazo.
-7. **Molina cobra una vez y protege para siempre.** Con pagarle 1.500 € una sola vez, durante toda la partida:
-   - no hay redadas;
-   - los controles bajan al 40 % y desaparecen los agentes honrados;
-   - el calor baja 20 al día en vez de 12.
-
-   **Propuesta:** que la cuota se pague cada 10 días o que suba después de la Copa.
-8. **Texto del capítulo 2.** El objetivo dice «vendiendo en la calle», pero también cuentan las ventas a Iñaki. Basta con cambiar el texto.
+1. **El capítulo 4 ya se juega.**
+   - Antes: «descubrir» una variedad era tener sus semillas, y el capítulo pedía 8. Al recibir la mesa, lo normal era tener ya 8 o más, así que el capítulo duraba lo que un diálogo.
+   - Ahora pide sacar en la mesa 2 variedades de receta (Critical Mass o Lemon Skunk, por ejemplo) y cosechar una planta de cada. Hay que cruzar, plantar y cultivar al menos una tanda, y las pistas de Patxi empiezan justo aquí. Un cruce libre, un arbusto o las semillas del ordenador no cuentan.
+2. **Toño ya no dice «Hoy» en vano.** El plazo de 3.000 € (7 días) empieza cuando aparece. Si tardas más de 2 días en ir al bar, Baltasar te recibe con «Llegas tarde». Las partidas guardadas en el capítulo 3 sin plazo lo reciben al cargarlas: 7 días desde ese día.
+3. **Darko cumple su amenaza.**
+   - Desde el capítulo 2: «Vende lo tuyo si quieres, pero lejos de mis esquinas». Sus esquinas son los astilleros, donde 1 de cada 3 ventas acaba con uno de sus chicos encima (un combate de ladrón).
+   - Al perder la Copa: «Mi tío se va a enterar». En el capítulo 7 entra a robar en el piso (§ 3.6). Desde ese capítulo está en los astilleros.
+4. **La oferta de Baltasar tiene continuación:** los encargos del imperio (§ 1.2). Pagan más por gramo que Iñaki, pero hay que cruzar los astilleros de noche con la carga encima.
+5. **Ya hay derrota parcial.** Al tercer plazo vencido, Toño se lleva la carpa más grande (§ 1.1). Sigue sin haber «fin de partida»: el juego es tranquilo, pero el plazo ya no es solo texto.
+6. **La Copa «del sábado».** Baltasar dice ahora que la Copa «se juega estos días en la plaza»: el jurado está todo el capítulo 6.
+7. **Molina cobra cada 10 días.** La protección dura 10 días por pago (`S.protHasta`, el último día cubierto) y se renueva en la comisaría del barrio alto. Cuando se acaba, Molina te manda un SMS y vuelven las redadas, los agentes honrados y la bajada de calor de 12. Las partidas guardadas con protección reciben 10 días al cargarlas.
+8. **Texto del capítulo 2:** «Gana 300 € vendiendo».
 
 ### 1.4 Vender: euros por punto de calor
 
@@ -108,26 +94,41 @@ El calor baja 12 al día (20 con la protección de Molina), y cada carpa con pla
 |---|---|---|---|---|
 | Calle · currela, 8 g a precio justo (acepta el 92 %) | 61 € | 7,63 | +7 | 9 € |
 | Calle · pijo del cap. 6 (pide 21 % de THC), 12 g de THC 24 a precio caro (acepta el 70 %) | 185 € | 15,42 | +9 | 21 € |
+| Astilleros · currela, 8 g a precio justo (1 de cada 3 ventas, un chico de Darko) (acepta el 92 %) | 73 € | 9,13 | +7 | 10 € |
 | Iñaki · 10 g para el viaje (una vez al día) | 91 € | 9,10 | +3 | 30 € |
-| Al por mayor · 1 kg (una carga al día, hasta 1 kg antes del imperio) | 3.800 € | 3,80 | +6 | 633 € |
-| Al por mayor · 10 kg (Mayorista del norte) | 38.000 € | 3,80 | +42 | 905 € |
+| Al por mayor · 1 kg (una carga al día, hasta 1 kg antes del imperio) | 3.800 € | 3,80 | +12 | 317 € |
+| Al por mayor · 10 kg (Mayorista del norte; el calor no pasa de 100) | 38.000 € | 3,80 | +100 | 380 € |
+| Encargo de Don Baltasar · 2 kg (cap. 8, Proveedor del barrio) | 12.000 € | 6,00 | +3 | 4.000 € |
 <!-- /auto:eficiencia -->
 
-Por gramo, la calle paga el doble que el por mayor. Pero cada venta en la calle suma 3 de calor más medio punto por gramo, mientras que una carga al por mayor suma solo 2 más 1 por cada 250 g. Por eso una carga de 1 kg da tanto dinero como unas 60 ventas en la calle y sube el calor lo que una sola.
+Por gramo, la calle paga el doble que el por mayor. Pero cada venta en la calle suma 3 de calor más medio punto por gramo, mientras que una carga al por mayor suma 2 más 1 por cada 100 g. Una carga de 1 kg da tanto dinero como unas 60 ventas en la calle y sube el calor lo que menos de dos.
 
-Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo todo a Iñaki. La calle solo compensa por la reputación: cada venta da de +1 a +3. La reputación ayuda a salir hablando de un control y trae más clientes.
+- **Astilleros:** el gramo se paga un 20 % más, pero 1 de cada 3 ventas acaba en pelea con un chico de Darko.
+- **Barrio alto:** clientes con más dinero (pijos y turistas) desde el capítulo 3, pero con un 50 % más de policía.
+- **Encargos de Baltasar:** lo que más rinde por punto de calor, pero solo uno a la vez, de noche y con 2 a 10 kg encima por los astilleros.
+
+Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo a Iñaki. La calle compensa por la reputación: cada venta da de +1 a +3. La reputación ayuda a salir hablando de un control y trae más clientes.
 
 ## 2. Riesgos de la calle
 
 ### 2.1 Las reglas (08-mundo, 13-combate, 09-cultivo)
 
+- **Zonas.** Hay tres, cada una con su factor de policía, de ladrones y de precio (`ZONAS`):
+
+  | Zona | Cómo se llega | Policía | Ladrones | Precio del gramo |
+  |---|---|---|---|---|
+  | Ribera Verde (el barrio) | — | ×1 | ×1 | ×1 |
+  | Barrio alto | Por el camino del norte de la calle (11-12, 0) | ×1,5 | ×0,5 | ×1 |
+  | Astilleros | Por el muelle, al este (39, 20-21) | ×0,5 | ×2 | ×1,2 |
+
 - **Encuentros.**
-  - Solo en el barrio y desde el capítulo 2.
+  - En las tres zonas, desde el capítulo 2. No hay encuentros dentro de las casas.
   - Después de un encuentro vienen 24 pasos tranquilos (`S.cool` se pone a 25 y baja antes de mirar). Los pasos dentro de casa, del growshop o del bar también descuentan.
   - Cada paso tira un único número al azar: si sale por debajo de *pp*, hay control; si cae entre *pp* y *pp* + *pt*, hay ladrón.
-  - Control: *pp* = (0,002 + 0,00025 × calor) × (0,4 con protección). Si no llevas ni un gramo, es 0.
-  - Ladrón: *pt* = 0,004 × (2,5 de noche, de 21:00 a 6:00) × (3 en hierba alta). Solo si llevas 5 g o más, o 150 € o más.
-- **Ladrón.** Tiene 12 + 2 × capítulo + (de 0 a 4) de vida. Pega entre 2 + cap/4 y 4 + cap/2 (divisiones enteras).
+  - Control: *pp* = (0,002 + 0,00025 × calor) × (0,4 con protección) × policía de la zona. Si no llevas ni un gramo encima, es 0.
+  - Ladrón: *pt* = 0,004 × (2,5 de noche, de 21:00 a 6:00) × (3 en hierba alta) × ladrones de la zona. Solo si llevas encima 5 g o más, o 150 € o más.
+  - Lo que está en la caja fuerte no cuenta.
+- **Ladrón.** Tiene 12 + 2 × capítulo + (de 0 a 4) de vida. Pega entre 2 + cap/4 y 4 + cap/2 (divisiones enteras). Desde el capítulo 5, 4 de vida más y 1 más de golpe.
   - Puñetazo: acierta un 92 % y quita 4-7.
   - Patada: acierta un 65 % y quita 8-12.
   - Spray: acierta siempre y quita 12-16.
@@ -136,17 +137,17 @@ Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo todo a I
   - Huir: sale bien un 50 %.
   - Tu vida máxima empieza en 30 y sube 2 con cada ladrón que vences, hasta 60.
   - Si ganas: 20-40 € + 10 × capítulo y +2 de reputación.
-  - Si caes KO: se lleva la mitad de cada lote y el 30 % del dinero, y despiertas en casa 6 horas después.
+  - Si caes KO: se lleva la mitad de cada lote y el 30 % del dinero que llevas encima, y despiertas en casa 6 horas después.
 - **Control.**
-  - Sobornar cuesta 40 + 4 × calor + 0,5 × gramos. Depende de lo que llevas, no del dinero que tengas. Si no te llega el dinero, el agente no lo acepta y vuelves a elegir.
+  - Sobornar cuesta 40 + 4 × calor + 0,5 × gramos + 5 % del dinero que llevas encima. Si no te llega lo que llevas, el agente no lo acepta y vuelves a elegir.
     - Sale bien: −10 de calor.
     - Agente honrado (15 %, desde el capítulo 3 y sin protección): requisa, multa y +20 de calor. Con el −15 de la requisa, son +5 en total.
   - Hablar convence un 30 % + reputación/250 − calor/300, entre el 10 y el 85 %. Si no convence: requisa y multa.
   - Huir sale bien un 45 % (un 60 % de noche) y suma 8 de calor. Si falla: requisa, multa y −5 de vida.
   - Entregar: te quitan los gramos, sin multa, y el calor baja 15.
-  - Una requisa se lleva **todos** los gramos y baja el calor 15. La multa es de 601 € (o lo que lleves, si es menos).
+  - Una requisa se lleva **todos** los gramos que llevas encima y baja el calor 15. La multa es de 601 € (o lo que lleves, si es menos).
 - **Calor y redada.** Al cambiar de día (00:00), duermas o no, el juego mira el calor *antes* de bajarlo:
-  - con 90 o más, hay redada: se llevan todas las plantas y todos los gramos, hay una multa de hasta 3.000 € y el calor queda en 30;
+  - con 90 o más, hay redada: se llevan todas las plantas y todos los gramos de fuera de la caja, hay una multa de hasta 3.000 € y el calor queda en 30. La caja la encuentran 1 de cada 4 veces (§ 2.6);
   - con la protección de Molina, la redada se para y el calor queda en 50.
 
 ### 2.2 Por paso
@@ -164,6 +165,20 @@ Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo todo a I
 | Con gramos, calor 50, de noche en hierba alta | 1,45 % | 3,00 % | 22 | 1,45 % · 3,00 % |
 <!-- /auto:paso -->
 
+Las mismas situaciones en las tres zonas:
+
+<!-- auto:zonas -->
+| Situación (cap. 5) | Ribera Verde (el barrio): control / ladrón | Barrio alto: control / ladrón | Astilleros: control / ladrón |
+|---|---|---|---|
+| Con gramos, calor 50, de día | 1,45 % / 0,40 % | 2,18 % / 0,20 % | 0,73 % / 0,80 % |
+| Con gramos, calor 50, de noche | 1,45 % / 1,00 % | 2,18 % / 0,50 % | 0,73 % / 2,00 % |
+| Con gramos, calor 50, con protección | 0,58 % / 0,40 % | 0,87 % / 0,20 % | 0,29 % / 0,80 % |
+| Solo dinero (0 g, ≥ 150 €), de noche | 0,00 % / 1,00 % | 0,00 % / 0,50 % | 0,00 % / 2,00 % |
+| Precio del gramo en la calle | ×1,0 | ×1,0 | ×1,2 |
+<!-- /auto:zonas -->
+
+El barrio alto es la zona para ir con dinero (la mitad de ladrones) y los astilleros, para ir sin gramos encima (la mitad de controles, pero el doble de ladrones).
+
 ### 2.3 Por trayecto desde casa
 
 Los trayectos siguen el camino más corto desde la salida del piso, que está en (5, 9), justo debajo de la puerta (5, 8). Se usan las paredes de verdad del mapa (`tileSolid`). Cada cifra da la probabilidad de que el primer encuentro de la ida sea un control o un ladrón, llevando 50 g y 2.000 € encima. No cuentan los personajes que se cruzan.
@@ -180,7 +195,7 @@ Los trayectos siguen el camino más corto desde la salida del piso, que está en
 | Arbusto de la Acapulco Gold (delante, en 2, 25) | 19 | 0 | 16,0 % / 6,7 % | 31,7 % / 14,4 % | 14,9 % / 6,8 % |
 <!-- /auto:rutas -->
 
-El muelle es lo más lejano: 43 pasos. Con 80 de calor y de noche, una de cada dos idas a ver a Iñaki acaba en control. Ninguna ruta normal pisa la hierba alta; solo la que va hasta ella (2 casillas).
+El muelle es lo más lejano del barrio: 43 pasos. Con 80 de calor y de noche, una de cada dos idas a ver a Iñaki acaba en control. Ninguna ruta normal pisa la hierba alta; solo la que va hasta ella (2 casillas).
 
 ### 2.4 Ladrones
 
@@ -188,26 +203,26 @@ El muelle es lo más lejano: 43 pasos. Con 80 de calor y de noche, una de cada d
 | Cap. | Ladrón: vida · golpe | Tu vida | Puñetazo | Patada | 2 sprays, luego puñetazo | Huir | Hablar (rep. 0) | Hablar (rep. 60) | La mejor, sin spray ni bocata | La mejor, con 2 sprays y 1 bocata |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 2 | 16-20 · 2-5 | 30 | < 0,1 % | 0,4 % | 0,0 % | 0,2 % | 7,8 % | 0,5 % | < 0,1 % | 0,0 % |
-| 5 | 22-26 · 3-6 | 30 | 2,6 % | 5,6 % | < 0,1 % | 0,8 % | 13,3 % | 1,6 % | 0,7 % | < 0,1 % |
-| 5 | 22-26 · 3-6 | 40 | 0,1 % | 1,0 % | < 0,1 % | 0,2 % | 7,0 % | 0,4 % | < 0,1 % | < 0,1 % |
-| 8 | 28-32 · 4-8 | 30 | 63,9 % | 31,2 % | 0,1 % | 2,5 % | 21,2 % | 4,1 % | 2,5 % | < 0,1 % |
-| 8 | 28-32 · 4-8 | 40 | 14,5 % | 11,9 % | < 0,1 % | 0,8 % | 13,2 % | 1,5 % | 0,8 % | < 0,1 % |
-| 8 | 28-32 · 4-8 | 60 | 0,1 % | 1,2 % | < 0,1 % | 0,1 % | 5,1 % | 0,2 % | < 0,1 % | < 0,1 % |
+| 5 | 26-30 · 4-7 | 30 | 32,6 % | 18,5 % | < 0,1 % | 1,8 % | 18,6 % | 3,1 % | 1,8 % | < 0,1 % |
+| 5 | 26-30 · 4-7 | 40 | 3,6 % | 5,6 % | < 0,1 % | 0,5 % | 11,1 % | 1,1 % | 0,5 % | < 0,1 % |
+| 8 | 32-36 · 5-9 | 30 | 98,2 % | 60,5 % | 4,1 % | 4,0 % | 25,9 % | 6,2 % | 4,0 % | 0,3 % |
+| 8 | 32-36 · 5-9 | 40 | 65,3 % | 31,4 % | 0,3 % | 1,5 % | 17,2 % | 2,6 % | 1,5 % | < 0,1 % |
+| 8 | 32-36 · 5-9 | 60 | 3,8 % | 5,5 % | < 0,1 % | 0,2 % | 7,6 % | 0,5 % | 0,2 % | < 0,1 % |
 <!-- /auto:ladron -->
 
 <!-- auto:optima -->
 Primera acción de «la mejor» (la que menos veces acaba en KO):
-- Cap. 8, 30 de vida, sin spray ni bocata: huir si el ladrón tiene 28-32 de vida (KO 2,5 %).
-- Cap. 8, 40 de vida, sin spray ni bocata: huir si el ladrón tiene 28-32 de vida (KO 0,8 %).
-- Cap. 8, 30 de vida, con 2 sprays y 1 bocata: puñetazo si el ladrón tiene 28-32 de vida (KO < 0,1 %).
-- Cap. 5, 30 de vida, sin spray ni bocata: puñetazo si el ladrón tiene 22 de vida; patada si el ladrón tiene 23-25 de vida; huir si el ladrón tiene 26 de vida (KO 0,7 %).
+- Cap. 8, 30 de vida, sin spray ni bocata: huir si el ladrón tiene 32-36 de vida (KO 4,0 %).
+- Cap. 8, 40 de vida, sin spray ni bocata: huir si el ladrón tiene 32-36 de vida (KO 1,5 %).
+- Cap. 8, 30 de vida, con 2 sprays y 1 bocata: puñetazo si el ladrón tiene 32-36 de vida (KO 0,3 %).
+- Cap. 5, 30 de vida, sin spray ni bocata: huir si el ladrón tiene 26-30 de vida (KO 1,8 %).
 <!-- /auto:optima -->
 
-- **El spray decide.** Cuesta 15 € en la tienda de Kiko desde el capítulo 2. Dos sprays quitan 24-32 de vida, casi toda la del ladrón más fuerte. Con 2 sprays y un bocata, el KO baja de 1 entre 1.000 en todos los capítulos.
-- **Sin spray, pelear no siempre compensa.** En el capítulo 8, con 30 de vida, un ladrón de 28-32 de vida que pega 4-8 te deja KO 2 de cada 3 veces a puñetazos y 1 de cada 3 a patadas. Lo mejor es huir. Con 40 de vida, lo mejor sigue siendo huir. Con 60, pelear ya sale bien.
+- **El spray decide.** Cuesta 15 € en la tienda de Kiko desde el capítulo 2. Dos sprays quitan 24-32 de vida, casi toda la del ladrón más fuerte. Con 2 sprays y un bocata, el KO llega como mucho a unas 3 de cada 1.000 veces (capítulo 8, con 30 de vida).
+- **Sin spray, desde el capítulo 5 pelear sale caro.** Con 30 de vida, en el capítulo 5 los puñetazos acaban en KO 1 de cada 3 veces y, en el capítulo 8, casi siempre. Lo mejor es huir. Con 60 de vida, pelear vuelve a salir bien.
 - **Hablar**, con poca reputación, es peor que huir: si no convence, el ladrón pega igual. Con 60 de reputación queda cerca de huir.
 - **Huir** no da dinero ni vida máxima. Ganar sí: así se sube la vida para los capítulos altos.
-- Lo que hace daño de verdad es el **KO**: la mitad de todos los gramos y el 30 % de todo el dinero. En el capítulo 8, con 40.000 €, son 12.000 € de una vez.
+- Lo que hace daño de verdad es el **KO**: la mitad de los gramos y el 30 % del dinero que llevas encima. Con la caja, solo lo del viaje.
 
 ### 2.5 Policía: control y soborno
 
@@ -216,33 +231,33 @@ En la tabla, «requisa» es la probabilidad de perder los gramos, y «−€» e
 <!-- auto:policia -->
 | Situación | Sobornar | Hablar | Huir | Entregar | Mejor (en euros) |
 |---|---|---|---|---|---|
-| Cap. 2 · calor 20 · rep. 10 · 30 g · 300 € | 135 € · requisa 0 % · −135 € · calor −10 | requisa 73 % · −384 € · calor −11 | requisa 55 % · −290 € · calor −5 | requisa 100 % · −228 € · calor −15 | Sobornar |
-| Cap. 3 · calor 0 · rep. 150 · 5 g · 300 € | 43 € · requisa 15 % · −87 € · calor +3 | requisa 15 % · −51 € · calor ±0 | requisa 55 % · −186 € · calor +4 | requisa 100 % · −38 € · calor ±0 | Entregar |
-| Cap. 3 · calor 85 · rep. 0 · 10 g · 450 € | 385 € · requisa 15 % · −406 € · calor −8 | requisa 90 % · −473 € · calor −14 | requisa 55 % · −289 € · calor −5 | requisa 100 % · −76 € · calor −15 | Entregar |
-| Cap. 4 · calor 50 · rep. 40 · 40 g · 300 € | 260 € · requisa 15 % · −312 € · calor −8 | requisa 71 % · −427 € · calor −11 | requisa 55 % · −332 € · calor −5 | requisa 100 % · −304 € · calor −15 | Entregar |
-| Cap. 4 · calor 60 · rep. 40 · 200 g · 2.000 € · noche | 380 € · requisa 15 % · −641 € · calor −8 | requisa 74 % · −1.570 € · calor −11 | requisa 40 % · −848 € · calor −1 | requisa 100 % · −1.520 € · calor −15 | Sobornar |
-| Cap. 5 · calor 85 · rep. 60 · 600 g · 8.000 € | 680 € · requisa 15 % · −1.352 € · calor −8 | requisa 74 % · −3.836 € · calor −11 | requisa 55 % · −2.839 € · calor −5 | requisa 100 % · −4.560 € · calor −15 | Sobornar |
-| Cap. 5 · igual, con protección | 680 € · requisa 0 % · −680 € · calor −10 | requisa 74 % · −3.836 € · calor −11 | requisa 55 % · −2.839 € · calor −5 | requisa 100 % · −4.560 € · calor −15 | Sobornar |
-| Cap. 8 · calor 50 · rep. 150 · 3.000 g · 40.000 € | 1.740 € · requisa 15 % · −4.989 € · calor −8 | requisa 27 % · −6.240 € · calor −4 | requisa 55 % · −12.871 € · calor −5 | requisa 100 % · −22.800 € · calor −15 | Sobornar |
+| Cap. 2 · calor 20 · rep. 10 · 30 g · 300 € | 150 € · requisa 0 % · −150 € · calor −10 | requisa 73 % · −384 € · calor −11 | requisa 55 % · −290 € · calor −5 | requisa 100 % · −228 € · calor −15 | Sobornar |
+| Cap. 3 · calor 0 · rep. 150 · 5 g · 300 € | 58 € · requisa 15 % · −100 € · calor +3 | requisa 15 % · −51 € · calor ±0 | requisa 55 % · −186 € · calor +4 | requisa 100 % · −38 € · calor ±0 | Entregar |
+| Cap. 3 · calor 85 · rep. 0 · 10 g · 450 € | 408 € · requisa 15 % · −426 € · calor −8 | requisa 90 % · −473 € · calor −14 | requisa 55 % · −289 € · calor −5 | requisa 100 % · −76 € · calor −15 | Entregar |
+| Cap. 4 · calor 50 · rep. 40 · 40 g · 300 € | 275 € · requisa 15 % · −324 € · calor −8 | requisa 71 % · −427 € · calor −11 | requisa 55 % · −332 € · calor −5 | requisa 100 % · −304 € · calor −15 | Entregar |
+| Cap. 4 · calor 60 · rep. 40 · 200 g · 2.000 € · noche | 480 € · requisa 15 % · −726 € · calor −8 | requisa 74 % · −1.570 € · calor −11 | requisa 40 % · −848 € · calor −1 | requisa 100 % · −1.520 € · calor −15 | Sobornar |
+| Cap. 5 · calor 85 · rep. 60 · 600 g · 8.000 € | 1.080 € · requisa 15 % · −1.692 € · calor −8 | requisa 74 % · −3.836 € · calor −11 | requisa 55 % · −2.839 € · calor −5 | requisa 100 % · −4.560 € · calor −15 | Sobornar |
+| Cap. 5 · igual, con protección | 1.080 € · requisa 0 % · −1.080 € · calor −10 | requisa 74 % · −3.836 € · calor −11 | requisa 55 % · −2.839 € · calor −5 | requisa 100 % · −4.560 € · calor −15 | Sobornar |
+| Cap. 8 · calor 50 · rep. 150 · 3.000 g · 40.000 € | 3.740 € · requisa 15 % · −6.689 € · calor −8 | requisa 27 % · −6.240 € · calor −4 | requisa 55 % · −12.871 € · calor −5 | requisa 100 % · −22.800 € · calor −15 | Hablar |
 <!-- /auto:policia -->
 
-A partir de cuántos gramos encima sale más a cuenta sobornar que entregar, en euros (gramos a 7,60 €/g):
+A partir de cuántos gramos encima sale más a cuenta sobornar que entregar, en euros (gramos a 7,60 €/g), según el dinero que llevas encima:
 
 <!-- auto:umbral -->
-| Calor | Cap. 2 | Cap. 3 en adelante, sin protección | Con protección |
+| Dinero encima (calor 50) | Cap. 2 | Cap. 3 en adelante, sin protección | Con protección |
 |---|---|---|---|
-| 0 | 6 g | 21 g | 6 g |
-| 25 | 20 g | 35 g | 20 g |
-| 50 | 34 g | 49 g | 34 g |
-| 75 | 48 g | 63 g | 48 g |
-| 89 | 56 g | 71 g | 56 g |
+| 300 € | 36 g | 44 g | 36 g |
+| 2.000 € | 48 g | 63 g | 48 g |
+| 10.000 € | 105 g | 120 g | 105 g |
+| 40.000 € | 316 g | 331 g | 316 g |
 <!-- /auto:umbral -->
 
-- **Sobornar o entregar.** El soborno sube con el calor y con los gramos, pero no con tu dinero. Entregar te cuesta solo los gramos y baja el calor 15; el soborno lo baja 10 (8 de media desde el capítulo 3, por los agentes honrados).
+- **Sobornar o entregar.** El soborno sube con el calor, con los gramos y con el dinero que llevas encima. Entregar te cuesta solo los gramos y baja el calor 15; el soborno lo baja 10 (8 de media desde el capítulo 3, por los agentes honrados).
   - Con pocos gramos sale mejor entregarlos.
-  - Con mucha carga, sobornar gana siempre: en el capítulo 8 cuesta 1.740 €, frente a 22.800 € de mercancía.
-  - Desde el capítulo 3, los agentes honrados suben 15 g el punto a partir del cual compensa sobornar.
-- **Hablar** solo compensa con mucha reputación y poco calor. Con 150 de reputación y 50 de calor, convence 3 de cada 4 veces. Con 150 de reputación, calor 0 y 5 g encima, solo entregar te quita menos.
+  - Con mucha carga, sobornar sigue ganando, pero cuanto más dinero llevas, más gramos hacen falta para que compense: el dinero encima ya no sale gratis.
+  - Desde el capítulo 3, los agentes honrados suben el punto a partir del cual compensa sobornar.
+  - Con la caja, se puede llevar solo lo que cuesta el soborno del viaje (§ 3.4).
+- **Hablar** solo compensa con mucha reputación y poco calor. Con 150 de reputación y 50 de calor, convence 3 de cada 4 veces, y en el capítulo 8, con 40.000 € encima, ya es lo mejor.
 - **Huir** tiene sentido de noche (60 %) y con mucha carga, si te da igual el calor (+8).
 - El agente que patrulla la plaza (`talkCop`) te hace un control siempre que le hablas con algún gramo encima y sin protección.
 
@@ -252,7 +267,18 @@ A partir de cuántos gramos encima sale más a cuenta sobornar que entregar, en 
 Comprobado con el juego: redada con calor 90 y no con 89,9 (se lleva las plantas, los gramos y hasta 3.000 € de multa, y deja el calor en 30); −12 al día; con protección, −20 y la redada se para (calor 50, sin quitar nada); +2 por carpa en flor sin filtro.
 <!-- /auto:calorOk -->
 
+<!-- auto:redada -->
+| En el piso (gramos a 7,60 €/g; las plantas se pierden igual) | Encuentran la caja | Pérdida media (modelo) | Juego |
+|---|---|---|---|
+| Sin caja: 10.000 € y 500 g en el piso | — | −6.800 € | −6.800 € |
+| Con caja: todo dentro | 25 % | −5.200 € | −5.274 € |
+| Con caja: 1.000 € y 100 g fuera, el resto dentro | 25 % | −5.645 € | −5.708 € |
+| Con caja: 3.000 € fuera (pagan la multa), el resto dentro | 25 % | −4.825 € | −4.886 € |
+<!-- /auto:redada -->
+
 La redada se decide al cambiar de día, a las 00:00, duermas o no. A esa hora, el calor tiene que estar por debajo de 90. Durante el día, el calor solo baja de tres formas: con un soborno (−10), con una requisa o entregando (−15). Todo lo demás lo hace la bajada diaria (−12, o −20 con protección), y esa bajada llega *después* de mirar la redada. Con 3 carpas en flor sin filtro, el olor suma 6 al día y deja muy poco margen para vender en la calle.
+
+Con la caja, una redada cuesta menos: 3 de cada 4 veces no la ven, y la multa sale primero de lo de fuera. Si la encuentran, se llevan sus gramos y la mitad de su dinero. Las plantas se pierden igual.
 
 ### 2.7 La Copa
 
@@ -300,74 +326,72 @@ Con la carpa de 120 y el LED de 720 W, abonando:
 
 Estabilizar la Amnesia Haze sube algo sus opciones (de 84 a 91 de cada 100), pero cuesta 3 generaciones más. Lo que más cuenta es la luz.
 
-## 3. Propuesta: una caja fuerte en el piso
+## 3. La caja fuerte del piso
 
-### 3.1 El problema
+### 3.1 El problema que resuelve
 
-Hoy el juego no distingue entre lo que llevas encima y lo que guardas en casa. Por eso:
+Antes de la 1.10, el juego no distinguía entre lo que llevabas encima y lo que guardabas en casa:
 
-- en cuanto tienes un gramo, cualquier paso por el barrio puede acabar en control, y el control se lleva **toda** tu cosecha;
-- con 150 € o más, ya hay ladrones;
-- un KO se lleva el 30 % de todo lo que has ahorrado, incluidos los 12.000 € del plazo que llevas al bar.
+- en cuanto tenías un gramo, cualquier paso por el barrio podía acabar en control, y el control se llevaba **toda** tu cosecha;
+- con 150 € o más, ya había ladrones;
+- un KO se llevaba el 30 % de todo lo ahorrado, incluidos los 12.000 € del plazo que llevabas al bar.
 
-Así que **no hay nada que decidir** sobre qué sacar de casa, y esa decisión es justo lo que daría tensión a cada salida.
+No había nada que decidir sobre qué sacar de casa, y esa decisión es justo lo que da tensión a cada salida.
 
-### 3.2 Diseño
+### 3.2 Cómo es
 
-Una caja en el piso con dos compartimentos: uno para el dinero y otro para los cogollos (`S.caja = { money, buds }`).
+Una caja en el piso, detrás del diploma de la tía, con dinero y cogollos (`S.caja = { money, buds, nivel }`). Lo que está dentro no va encima: no cuenta para los encuentros, ni para el soborno, ni para lo que te quitan en la calle.
 
-- Lo que guardas no cuenta como «encima» para nada: ni para los encuentros, ni para el soborno, ni para lo que te quitan.
-- Se abre pulsando A delante de ella: «Guardar todo / Guardar dinero / Guardar cogollos / Sacar…».
-- La mochila separa las dos cosas: «N g encima · M g en la caja».
+- Se abre pulsando A delante del diploma: «Guardar todo / Guardar dinero / Guardar cogollos / Sacar dinero / Sacar cogollos / Sacar todo / Cerrar». Dinero y gramos se eligen en pasos (100, 500, 1.000 € o 10, 50, 100 g…, y «todo lo que cabe»).
+- La mochila enseña las dos cosas: lo de encima y lo de la caja.
 
-| Variante | Cómo se consigue | Capacidad | En una redada | Robo de Darko (cap. 7) |
+| Caja | Cómo se consigue | Capacidad | En una redada | Robo de Darko (cap. 7) |
 |---|---|---|---|---|
-| **A · Caja de sobremesa** | En la tienda de Kiko, desde el capítulo 2, por 120 € | 5.000 € y 1 kg | La encuentran siempre: se llevan los gramos y la mitad del dinero | Se la llevan entera |
-| **B · Caja empotrada** | Por el ordenador, desde el capítulo 4, por 380 €. Llega al día siguiente y la instala Kiko | 50.000 € y 2,5 kg | La encuentran 1 de cada 4 veces | Resiste: se llevan lo que esté fuera |
-| **C · La caja de Maite** | Detrás del diploma de la Copa de 1998 (7, 1). La pista está en el registro del ordenador: «20 años de cultivos… y la combinación es el año de mi premio» | 20.000 € y 2 kg | La encuentran 1 de cada 4 veces | Resiste |
+| **C · La caja de la tía** | Detrás del diploma de la Copa de 1998 (7, 1). La pista está en las notas del ordenador: «La combinación, el año en que lo gané». Dentro hay 300 € | 20.000 € y 2 kg | La encuentran 1 de cada 4 veces: sus gramos y la mitad de su dinero | Resiste |
+| **B · La caja empotrada** | Por el ordenador, desde el capítulo 4 y con la de la tía abierta, por 380 € (de fuera y, si no llega, de la caja). Kiko la instala al día siguiente, con lo que ya tuvieras dentro | 50.000 € y 2,5 kg | Igual: 1 de cada 4 veces | Resiste |
 
-La **C** es la que mejor encaja en la historia: da sentido al diploma de la tía, no necesita tienda y conecta con la Copa. Se puede combinar con la A como paso intermedio, o con la B como mejora en el imperio.
+La caja de sobremesa de la tienda (la A de la propuesta) se descartó: la de la tía da sentido al diploma y conecta con la Copa, y la empotrada es la mejora para el imperio.
 
 ### 3.3 Reglas que cambian
 
-| Dónde | Hoy | Con la caja |
+| Dónde | Antes | Con la caja |
 |---|---|---|
-| `onStepEnd` (encuentros) | Cuentan `totalBuds()` y `S.money`, es decir, todo | Solo lo que llevas fuera de la caja. La fórmula no cambia: lo guardado sale de `S.buds` y de `S.money` |
-| `copRound` (soborno) | Pagas con todo tu dinero: si tienes bastante, siempre llegas | Solo con el que llevas encima. Hay que decidir cuánto sacar «por si acaso», y ese dinero atrae ladrones si pasa de 150 €. El juego ya tiene el texto: «No llevas tanto dinero encima» |
-| `confiscate` y el KO del ladrón | Se llevan de todo | Solo de lo que llevas fuera |
-| `raidEvent` | Todas las plantas, todos los gramos y una multa de hasta 3.000 € | Lo de fuera, siempre. Lo de la caja, según la variante. La multa sale primero de lo de fuera y después de la caja |
-| `newDay` (luz) | La factura de la luz sale de `S.money` | De lo de fuera y, si no llega, de la caja. Si no, guardándolo todo la luz saldría gratis |
-| Kiko (regalo) | Con menos de 15 €, sin semillas, sin plantas y sin gramos, te da 2 semillas de Skunk #1 | Que cuente también lo de la caja. Si no, guardando el dinero tendrías semillas gratis cada vez |
-| Kiko, ordenador, plazos de Baltasar, Iñaki, jurado | Pagas o vendes con todo lo que tienes | Solo con lo que llevas encima. El ordenador, que está en el piso, paga de la caja |
-| `harvest` | Los cogollos van a la mochila | Igual. Opcional: «Guardar en la caja» al cosechar, si cabe |
-| Partida guardada | — | `S.caja` en `newState` y migración de las partidas viejas (con la caja vacía) |
+| `onStepEnd` (encuentros) | Contaban `totalBuds()` y `S.money`, es decir, todo | Solo lo de fuera de la caja. La fórmula no cambia: lo guardado sale de `S.buds` y de `S.money` |
+| `copRound` (soborno) | Pagabas con todo tu dinero | Solo con el que llevas encima: «No llevas tanto dinero encima». Y el precio suma el 5 % de ese dinero |
+| `confiscate` y el KO del ladrón | Se llevaban de todo | Solo de lo que llevas fuera |
+| `raidEvent` | Todas las plantas, todos los gramos y una multa de hasta 3.000 € | Lo de fuera, siempre. La caja, 1 de cada 4 veces (`CAJA_REDADA`). La multa sale primero de lo de fuera y después de la caja (`pagarCasa`) |
+| `newDay` (luz) | La factura de la luz salía de `S.money` | De lo de fuera y, si no llega, de la caja |
+| Kiko (regalo) | Con menos de 15 €, sin semillas, sin plantas y sin gramos | Cuenta también lo de la caja |
+| Ordenador | Pagabas con lo que llevabas | Paga de lo de fuera y, si no llega, de la caja: el ordenador está en el piso |
+| Kiko, plazos de Baltasar, Iñaki, jurado | Pagabas o vendías con todo lo que tenías | Solo con lo que llevas encima |
+| Partida guardada | — | `S.caja` (null hasta abrirla) en `newState`; `migrate()` la rellena en las partidas viejas |
 
 ### 3.4 Efecto: lo mismo, con y sin caja
 
 La tabla compara viajes de ida y vuelta en tres casos:
 
-- **Hoy:** llevas encima todo lo que tienes.
+- **Sin caja:** llevas encima todo lo que tienes.
 - **Con caja:** llevas solo lo que hace falta para el viaje.
-- **Con caja y el soborno encima:** además, llevas el precio del soborno, para poder pagarlo si te paran.
+- **Con caja y el soborno encima:** además, llevas el precio del soborno, para poder pagarlo si te paran (el 5 % de ese dinero también entra en el precio).
 
-Cada celda da tres cifras: la probabilidad de cruzarte con un control, la de cruzarte con un ladrón y lo que pierdes de media. Se cuenta el primer encuentro de cada tramo (después vienen 24 pasos tranquilos). En el control se elige la mejor opción en euros y, con el ladrón, la mejor forma de pelear. Los supuestos de cada fila están en la lista de debajo. La tabla sale solo del modelo, porque la caja todavía no existe en el juego.
+Cada celda da tres cifras: la probabilidad de cruzarte con un control, la de cruzarte con un ladrón y lo que pierdes de media. Se cuenta el primer encuentro de cada tramo (después vienen 24 pasos tranquilos). En el control se elige la mejor opción en euros y, con el ladrón, la mejor forma de pelear. Los supuestos de cada fila están en la lista de debajo. Los encuentros de cada tramo se juegan en el juego, andando con lo demás dentro de la caja; lo que se pierde en cada encuentro sale del modelo.
 
 <!-- auto:caja -->
-| Ida y vuelta | Hoy: control / ladrón · pérdida media | Con caja | Con caja y el soborno encima |
+| Ida y vuelta | Sin caja: control / ladrón · pérdida media | Con caja | Con caja y el soborno encima |
 |---|---|---|---|
-| Cap. 3 · ir a comprar a Kiko (200 €) | 22,9 % / 10,0 % · −170 € | 0,0 % / 5,5 % · 0 € | igual |
-| Cap. 4 · vender 10 g a Iñaki | 67,8 % / 22,4 % · −789 € | 43,3 % / 11,9 % · −18 € | 43,3 % / 25,9 % · −33 € |
-| Cap. 4 · vender 40 g en la plaza, de noche | 55,0 % / 35,0 % · −607 € | 32,9 % / 38,5 % · −40 € | 32,9 % / 38,5 % · −79 € |
-| Cap. 5 · pagar 12.000 € a Baltasar | 57,7 % / 13,8 % · −910 € | 0,0 % / 8,8 % · 0 € | igual |
-| Cap. 8 · cargar 2 kg a Iñaki | 67,8 % / 22,4 % · −3.646 € | 43,3 % / 25,9 % · −877 € | 43,3 % / 25,9 % · −946 € |
+| Cap. 3 · ir a comprar a Kiko (200 €) | 22,9 % / 10,0 % · −189 € | 0,0 % / 5,5 % · 0 € | igual |
+| Cap. 4 · vender 10 g a Iñaki | 67,8 % / 22,4 % · −975 € | 43,3 % / 11,9 % · −18 € | 43,3 % / 25,9 % · −33 € |
+| Cap. 4 · vender 40 g en la plaza, de noche | 55,0 % / 35,0 % · −751 € | 32,9 % / 38,5 % · −40 € | 32,9 % / 38,5 % · −84 € |
+| Cap. 5 · pagar 12.000 € a Baltasar | 57,7 % / 13,8 % · −1.118 € | 0,0 % / 8,8 % · 0 € | igual |
+| Cap. 8 · cargar 2 kg a Iñaki | 67,8 % / 22,4 % · −3.208 € | 43,3 % / 25,9 % · −877 € | 43,3 % / 25,9 % · −946 € |
 <!-- /auto:caja -->
 
 <!-- auto:cajaSup -->
-- **Cap. 3 · ir a comprar a Kiko (200 €):** calor 30, reputación 20, vida 30, sin spray y 1 bocata; gramos a 7,60 €/g. Hoy: 300 g y 2.000 € a la ida, 300 g y 1.800 € a la vuelta. Con caja: 200 € a la ida, 0 € a la vuelta.
-- **Cap. 4 · vender 10 g a Iñaki:** calor 50, reputación 40, vida 36, sin spray y 1 bocata; gramos a 7,60 €/g. Hoy: 400 g y 5.000 € a la ida, 390 g y 5.091 € a la vuelta. Con caja: 10 g y 0 € a la ida, 91 € a la vuelta; con el soborno, 245 € más en cada tramo.
-- **Cap. 4 · vender 40 g en la plaza, de noche:** calor 60, reputación 40, vida 36, 1 spray y 1 bocata, de noche; gramos a 7,60 €/g. Hoy: 400 g y 5.000 € a la ida, 360 g y 5.300 € a la vuelta. Con caja: 40 g y 0 € a la ida, 300 € a la vuelta; con el soborno, 300 € más en cada tramo.
-- **Cap. 5 · pagar 12.000 € a Baltasar:** calor 70, reputación 60, vida 44, 2 sprays y 1 bocata; gramos a 7,60 €/g. Hoy: 600 g y 13.000 € a la ida, 600 g y 1.000 € a la vuelta. Con caja: 12.000 € a la ida, 0 € a la vuelta.
-- **Cap. 8 · cargar 2 kg a Iñaki:** calor 50, reputación 150, vida 60, 2 sprays y 1 bocata; gramos a 3,80 €/g. Hoy: 5.000 g y 40.000 € a la ida, 3.000 g y 47.600 € a la vuelta. Con caja: 2.000 g y 0 € a la ida, 7.600 € a la vuelta; con el soborno, 1.240 € más en cada tramo.
+- **Cap. 3 · ir a comprar a Kiko (200 €):** calor 30, reputación 20, vida 30, sin spray y 1 bocata; gramos a 7,60 €/g. Sin caja: 300 g y 2.000 € a la ida, 300 g y 1.800 € a la vuelta. Con caja: 200 € a la ida, 0 € a la vuelta.
+- **Cap. 4 · vender 10 g a Iñaki:** calor 50, reputación 40, vida 36, sin spray y 1 bocata; gramos a 7,60 €/g. Sin caja: 400 g y 5.000 € a la ida, 390 g y 5.091 € a la vuelta. Con caja: 10 g y 0 € a la ida, 91 € a la vuelta; con el soborno, 263 € más en cada tramo.
+- **Cap. 4 · vender 40 g en la plaza, de noche:** calor 60, reputación 40, vida 36, 1 spray y 1 bocata, de noche; gramos a 7,60 €/g. Sin caja: 400 g y 5.000 € a la ida, 360 g y 5.300 € a la vuelta. Con caja: 40 g y 0 € a la ida, 300 € a la vuelta; con el soborno, 332 € más en cada tramo.
+- **Cap. 5 · pagar 12.000 € a Baltasar:** calor 70, reputación 60, vida 44, 2 sprays y 1 bocata; gramos a 7,60 €/g. Sin caja: 600 g y 13.000 € a la ida, 600 g y 1.000 € a la vuelta. Con caja: 12.000 € a la ida, 0 € a la vuelta.
+- **Cap. 8 · cargar 2 kg a Iñaki:** calor 50, reputación 150, vida 60, 2 sprays y 1 bocata; gramos a 3,80 €/g. Sin caja: 4.500 g y 40.000 € a la ida, 2.500 g y 47.600 € a la vuelta. Con caja: 2.000 g y 0 € a la ida, 7.600 € a la vuelta; con el soborno, 1.705 € más en cada tramo.
 <!-- /auto:cajaSup -->
 
 Cómo leer la tabla:
@@ -385,28 +409,19 @@ La caja no quita los encuentros del todo: hay que llevar la mercancía para vend
 - si llevar el dinero del soborno;
 - cuándo hacer el viaje grande.
 
-### 3.5 Implementación (si se aprueba)
+### 3.5 Dónde está en el código
 
-- **HTML:**
-  - `08-mundo.js`: `S.caja` y la migración;
-  - `11-historia.js` o `09-cultivo.js`: el menú de la caja, la tienda o el ordenador, `raidEvent`, la factura de la luz y el regalo de Kiko;
-  - `12-menus.js`: la mochila;
-  - `04-mapas.js`: el mueble (variantes A y B). La C usa el diploma que ya existe;
-  - arte original: un sprite de caja de 16 × 16 o el diploma abierto.
-- **Godot (0.2.0):** lo mismo en `src/` y en los oráculos. `npm run godot` regenera datos, arte y pantallas, y `tests/historia.gd` tiene que seguir dando 0 diferencias.
-- **Tests:**
-  - un paso nuevo en `test-historia.js`: guardar, salir con 0 g y que no haya ningún control, y una redada con la caja;
-  - en `analisis-riesgos.js`, jugar también los viajes de § 3.4 con la caja de verdad (hoy, esa tabla solo sale del modelo);
-  - un caso reservado nuevo, con la caja.
-- **Docs:** GUION (textos de la caja), GDD, MAPA y CHANGELOG.
+- **HTML:** `11b-caja.js` (la caja, el robo de Darko y los encargos de Baltasar); `08-mundo.js` (`S.caja`, `S.rec`, `S.vencidos`, `S.protHasta`, `S.encargo` y la migración); `09-cultivo.js` (el ordenador, la luz, la instalación de la empotrada y el robo al dormir); `11-historia.js` (`raidEvent`, el embargo, Molina y el capítulo 4); `12-menus.js` (la mochila); `04-mapas.js` (el barrio alto, los astilleros y los tres interiores).
+- **Godot:** lo mismo en `godot/src/trama.gd`, `juego.gd` y `pinta.gd`. `tests/historia.gd` juega los mismos 66 pasos que `npm test` y compara cada uno con el HTML, y `tests/pantallas.gd` compara las zonas nuevas y sus interiores píxel a píxel.
+- **Tests:** los pasos de la caja, el robo, el embargo, la cuota, los encargos y las zonas en `tools/test-historia.js`; y en `analisis-riesgos.js`, los viajes de § 3.4 y la redada de § 2.6 jugados con la caja.
 
-### 3.6 El robo de Darko (opcional, capítulo 7)
+### 3.6 El robo de Darko (capítulo 7)
 
-1. La primera noche del capítulo 7 en que duermas con más de 1.000 € o 100 g fuera de la caja, entran en el piso: «Te despierta un ruido. La puerta está forzada».
-2. Se llevan la mitad de lo que haya fuera de la caja, y la caja entera si es la de sobremesa.
-3. A la mañana siguiente llega un SMS de Darko: «Te dije que esto no se acababa ahí».
+1. La primera vez que duermes en el capítulo 7 (hasta las 7 o una siesta) con más de 1.000 € o más de 100 g fuera de la caja, entran en el piso: «Te despierta un portazo. La cerradura está forzada y el piso, revuelto».
+2. Se llevan la mitad del dinero y la mitad de cada lote que haya fuera de la caja. La caja, de la tía o empotrada, sigue cerrada.
+3. Llega un SMS de Darko: «Te dije que esto no se acababa ahí». Si aún no has abierto la caja de la tía, el juego te recuerda que la tía guardaba sus cosas en algún sitio.
 
-Así se cierra el hilo de la Copa y la caja tiene su momento en la historia.
+Pasa una sola vez (`flags.robo`). Así se cierra el hilo de la Copa y la caja tiene su momento en la historia.
 
 ## Cómo regenerar
 

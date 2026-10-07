@@ -96,9 +96,9 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   }, () => S.ch === 2 && S.buds.ria?.g > 30 && S.seeds.ria >= 1 && S.clients.length > 0 || { ch: S.ch, buds: S.buds, clients: S.clients.length });
 
   // ---------- capítulo 2 ----------
-  await step('Vender a un cliente (rebaja) → 300 € → capítulo 3', ['Skunk', 'Rebaja'], async () => {
+  await step('Vender a un cliente (rebaja) → 300 € → capítulo 3; el plazo de 3.000 € corre desde que aparece Toño', ['Skunk', 'Rebaja'], async () => {
     S.sales = META_VENTAS - 1; await run(() => talkClient(S.clients[0]));
-  }, () => S.ch === 3 && S.sales >= META_VENTAS && S.heat > 0 || { ch: S.ch, sales: S.sales });
+  }, () => S.ch === 3 && S.sales >= META_VENTAS && S.heat > 0 && S.due === 3000 && S.deadline === S.day + 7 && S.flags.tono === S.day && !S.flags.metB || { ch: S.ch, sales: S.sales, due: S.due, deadline: S.deadline });
   await step('Hablar con Josune (pintxo)', ['Pintxo'], async () => { S.hp = 10; await run(talkJosune); },
     () => S.hp === 22 || { hp: S.hp });
   await step('Abuela Txaro: dar 5 g → Hindu Kush', ['Skunk'], async () => { await run(talkTxaro); },
@@ -113,9 +113,9 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
 
   // ---------- capítulo 3 ----------
   await step('Don Baltasar explica la deuda', [], async () => { await run(talkBaltasar); },
-    () => S.flags.metB && S.due === 3000 && S.debt === 30000 && S.deadline === S.day + 7 || { due: S.due, deadline: S.deadline, day: S.day });
-  await step('Plazo vencido → Toño cobra intereses', [], async () => { S.deadline = S.day; advanceTime(24 * 60); await idle(); },
-    () => S.due === 3600 && S.debt === 30600 && S.deadline === S.day + 5 || { due: S.due, debt: S.debt });
+    () => S.flags.metB && S.due === 3000 && S.debt === 30000 && S.deadline === S.flags.tono + 7 || { due: S.due, deadline: S.deadline, day: S.day });
+  await step('Plazo vencido → Toño cobra intereses (1.er plazo vencido)', [], async () => { S.deadline = S.day; advanceTime(24 * 60); await idle(); },
+    () => S.due === 3600 && S.debt === 30600 && S.deadline === S.day + 5 && S.vencidos === 1 || { due: S.due, debt: S.debt, vencidos: S.vencidos });
   await step('Pagar 3.600 € → capítulo 4', ['^Pagar'], async () => { S.money = 6000; await run(talkBaltasar); },
     () => S.ch === 4 && S.debt === 27000 && S.due === 0 || { ch: S.ch, debt: S.debt });
 
@@ -159,13 +159,13 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.items.x_filtro = 1; await run(() => carpaAction(0)); advanceTime(24 * 60); await idle(); R.h2 = S.heat; S.pots[0] = S.pots[4] = null;
   }, () => S.carpas[1].vent && S.carpas[1].filtro && S.carpas[1].goteo && R.money === 1000 - 20 - 110 - 55 && Math.abs(R.f.plaga - R.m.plaga * .7) < 1e-9 && Math.abs(R.f.agua - R.F.agua * R.m.agua * .5) < 1e-9
     && R.h1 === 30 - 12 + 2 && R.h2 === R.h1 - 12 && S.carpas[0].filtro && !S.items.x_filtro || { carpas: S.carpas, R, items: S.items });
-  await step('Cruce de receta: Afghani × Skunk #1 → Critical Mass', ['^Afghani', '^Skunk #1', 'Cruzar'], async () => {
+  await step('Cruce de receta: Afghani × Skunk #1 → Critical Mass (de receta, sacada en la mesa: falta cosecharla)', ['^Afghani', '^Skunk #1', 'Cruzar'], async () => {
     addSeeds('ria', 2); addSeeds('txoko', 2); await run(labAction);
-  }, () => S.seeds.kushrif === 2 && S.disc.kushrif && S.gen.kushrif === 1 || { seeds: S.seeds, gen: S.gen });
+  }, () => S.seeds.kushrif === 2 && S.disc.kushrif && S.gen.kushrif === 1 && S.rec.kushrif === 1 && recCount() === 0 || { seeds: S.seeds, gen: S.gen, rec: S.rec });
   // de la madre (la Skunk #1, 65 % índica) saca el m % (30-70) y del padre (la Hindu Kush, 100 %) el resto: % índica, tono de hoja y cogollo
-  await step('Cruce libre: Skunk #1 × Hindu Kush → híbrido propio (m % de la madre, el resto del padre) → capítulo 5', ['^Skunk #1', '^Hindu Kush', 'Cruzar'], async () => {
+  await step('Cruce libre: Skunk #1 × Hindu Kush → híbrido propio (m % de la madre, el resto del padre); 8 variedades ya no pasan de capítulo', ['^Skunk #1', '^Hindu Kush', 'Cruzar'], async () => {
     await run(labAction); const k = Object.keys(S.custom)[0]; window.R = { k, c: S.custom[k], linea: k && strainLine(k).split('\n')[1] };
-  }, () => Object.keys(S.custom).length === 1 && discCount() >= 8 && S.ch === 5 && S.due === 12000 && R.c.ma === 'ria' && R.c.pa === 'hindu' && R.c.m >= 30 && R.c.m <= 70
+  }, () => Object.keys(S.custom).length === 1 && discCount() >= 8 && S.ch === 4 && S.due === 0 && !(R.k in S.rec) && /\(0\/2\)/.test(objectiveText()) && R.c.ma === 'ria' && R.c.pa === 'hindu' && R.c.m >= 30 && R.c.m <= 70
     && R.c.ind === Math.round((R.c.m * 65 + (100 - R.c.m) * 100) / 100) && R.c.hj === mix(STRAINS.hindu.hj, STRAINS.ria.hj, R.c.m / 100) && R.c.c === mix(STRAINS.hindu.c, STRAINS.ria.c, R.c.m / 100)
     && R.linea === `Índica ${R.c.ind} % · sativa ${100 - R.c.ind} % · ${R.c.m} % madre · ${100 - R.c.m} % padre` || { custom: S.custom, disc: discCount(), ch: S.ch, R });
 
@@ -181,15 +181,19 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
       S.pots[0] = { sid: 'haze', prog: 1, water: 80, health: 100, fert: false, pest: false, f: rollFeno('haze') }; const e = gramosPlanta(S.pots[0], factores(0)), y = S.pots[0].f.y;
       const b = Object.entries(S.buds).filter(([k]) => lotSid(k) === 'haze').reduce((a, [, v]) => a + v.g, 0), sd = S.seeds.haze || 0; await run(() => harvest(0));
       R.push({ g: Object.entries(S.buds).filter(([k]) => lotSid(k) === 'haze').reduce((a, [, v]) => a + v.g, 0) - b, e, y, sd: S.seeds.haze - sd }); }
-  }, () => S.disc.haze && S.gen.haze === 1 && new Set(R.map(r => r.g)).size > 2 && R.every(r => r.g === r.e && r.sd >= 2 && r.sd <= 5) && /F1: línea inestable/.test(strainLine('haze')) && tipoGen('haze') === 'F1' || { R, gen: S.gen.haze });
+  }, () => S.disc.haze && S.gen.haze === 1 && new Set(R.map(r => r.g)).size > 2 && R.every(r => r.g === r.e && r.sd >= 2 && r.sd <= 5) && /F1: línea inestable/.test(strainLine('haze')) && tipoGen('haze') === 'F1'
+    && S.rec.haze === 2 && recCount() === 1 && S.ch === 4 || { R, gen: S.gen.haze, rec: S.rec, ch: S.ch });
+  await step('Cosechar una Critical Mass, la 2.ª de receta sacada en la mesa → capítulo 5', [], async () => {
+    S.pots[0] = { sid: 'kushrif', prog: 1, water: 80, health: 100, fert: false, pest: false, f: rollFeno('kushrif') }; await run(() => harvest(0));
+  }, () => S.rec.kushrif === 2 && recCount() === 2 && S.ch === 5 && S.due === 12000 && loadSave().due === 12000 || { rec: S.rec, ch: S.ch, due: S.due });
 
   // ---------- capítulo 5 ----------
   await step('Growshop: carpa 120 en el sitio C, junto a la cama (6 plazas más)', ['Carpa 120', 'Salir'], async () => {
     S.money = 1000; await run(shop); enterMap('home', 5, 5, 'up');
   }, () => S.carpas[2]?.t === 'm120' && S.carpas[2].foco === 'cfl' && huecos().length === 13 && S.pots.length === 13 && S.macetas.length === 13 && S.money === 1000 - 150
     && MAPS.home.carpas.some(t => t.ci === 2 && t.x0 === 2 && t.x1 === 3) && tileSolid(MAPS.home, 2, 2) && tileSolid(MAPS.home, 3, 2) || { carpas: S.carpas, money: S.money, n: huecos().length, mapa: MAPS.home.carpas });
-  await step('Sargento Molina: pagar protección (1.500 €)', ['^Pagar'], async () => { S.money = 1600; await run(talkMolina); },
-    () => S.protect === true && S.money === 100 || { protect: S.protect, money: S.money });
+  await step('Sargento Molina: pagar protección (1.500 € cada 10 días)', ['^Pagar'], async () => { S.money = 1600; await run(talkMolina); },
+    () => S.protect === true && S.money === 100 && S.protHasta === S.day + 10 && S.flags.molina1 || { protect: S.protect, money: S.money, hasta: S.protHasta });
   await step('Calor 95 con protección → Molina para la redada', ['Skunk'], async () => {
     addSeeds('ria', 1); await run(() => potAction(0)); S.heat = 95; advanceTime(24 * 60); await idle();
   }, () => S.heat === 50 && S.pots[0] !== null || { heat: S.heat, pot: S.pots[0] });
@@ -225,9 +229,9 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   await step('Ladrón vencido sube la VIDA máxima', ['LUCHAR', 'PATADA'].concat(Array(20).fill(['MOCHILA', 'SPRAY']).flat()), async () => {
     S.hpMax = 40; S.hp = 40; S.items.spray = 20; await run(() => battle('thief')); WANT = [];
   }, () => S.hpMax === 42 || { hpMax: S.hpMax });
-  await step('Policía: soborno con protección', ['SOBORNAR', '^Sí'], async () => {
-    S.protect = true; S.heat = 40; S.money = 1000; addBuds('ria', 10, 12); await run(() => battle('police'));
-  }, () => S.money < 1000 && S.heat === 30 && !!S.buds.ria || { money: S.money, heat: S.heat });
+  await step('Policía: soborno con protección (40 + 4 × calor + 0,5 × gramos + 5 % del dinero encima)', ['SOBORNAR', '^Sí'], async () => {
+    S.protect = true; S.heat = 40; S.money = 1000; addBuds('ria', 10, 12); window.R = { p: precioSoborno(), g: totalBuds() }; await run(() => battle('police'));
+  }, () => R.p === Math.round(40 + 160 + R.g * .5 + 50) && S.money === 1000 - R.p && S.heat === 30 && !!S.buds.ria || { money: S.money, heat: S.heat, R });
   await step('Agente en la plaza: entregar la mercancía', ['ENTREGAR'], async () => {
     S.protect = false; addBuds('ria', 5, 12); await run(talkCop);
   }, () => Object.keys(S.buds).length === 0 || { buds: S.buds });
@@ -267,10 +271,100 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     window.R = { due: S.due, dias: S.deadline - S.day, eco: S.eco, eur: [eur(999), eur(3000), eur(1500.4), eur(-1234), eur(30000)].join('|') };
     Object.assign(S, { ch: 5, debt: 27000, due: 0, deadline: S.day - 2 }); migrate(); R.due5 = S.due; R.dias5 = S.deadline - S.day; S = S0;
   }, () => R.due === 15000 && R.dias === 7 && R.eco === 2 && R.eur === '999 €|3.000 €|1.500 €|-1.234 €|30.000 €' && R.due5 === 12000 && R.dias5 === 10 || R);
-  await step('8.ª variedad desde un arbusto → capítulo 5 sin más acciones', [], async () => {
+  await step('Capítulo 4: la 8.ª variedad (de un arbusto) no pasa de capítulo; la 2.ª de receta cosechada, sí', [], async () => {
     S.ch = 4; S.flags.lab = true; S.due = 0; S.disc = { ria: true, limon: true, txoko: true, niebla: true, mango: true, purpura: true, rif: true };
-    S.custom = {}; delete S.taken.h_acap; S.map = 'town'; await run(() => objectAction(2, 26)); S.map = 'home'; await idle();
-  }, () => S.ch === 5 && S.due === 12000 && loadSave().due === 12000 || { ch: S.ch, disc: discCount(), guardado: loadSave().due });
+    S.custom = {}; S.rec = { kushrif: 2, citrus: 1 }; delete S.taken.h_acap; S.map = 'town'; await run(() => objectAction(2, 26)); S.map = 'home'; await idle();
+    window.R = { ch: S.ch, disc: discCount() }; S.pots[0] = { sid: 'citrus', prog: 1, water: 80, health: 100, fert: false, pest: false, f: rollFeno('citrus') }; await run(() => harvest(0));
+  }, () => R.ch === 4 && R.disc === 8 && S.ch === 5 && S.due === 12000 && loadSave().due === 12000 || { R, ch: S.ch, guardado: loadSave().due });
+  // ---------- 1.10: la caja fuerte, el guion completo y el mapa ampliado ----------
+  await step('Caja de la tía: la pista en el PC («el año en que lo gané»); detrás del diploma, 1987 no abre y 1998 sí (300 € dentro)', ['Notas de la tía', 'Mirar detrás', '^1987', 'Mirar detrás', '^1998'], async () => {
+    for (const k in S.seeds) if (!getStrain(k)) delete S.seeds[k];   // el paso de la 8.ª variedad vació S.custom: fuera las semillas del híbrido
+    S.map = 'home'; S.ch = 5; S.caja = null; S.money = 0; const l0 = LOG.length; await run(pcAction); await run(() => objectAction(7, 1));
+    window.R = { pista: /el año en que lo gané/.test(LOG.slice(l0).join('\n')), tras1987: S.caja }; await run(() => objectAction(7, 1));
+  }, () => R.pista && R.tras1987 === null && S.caja && S.caja.nivel === 1 && S.caja.money === 300 && cajaG() === 0 && S.money === 0 || { R, caja: S.caja });
+  await step('Caja: guardar todo (5.000 € y 300 g); sin nada encima no hay ladrones ni policía en la calle; la mochila la enseña', ['Guardar todo', 'Cerrar', 'MOCHILA', '<B>', 'SALIR'], async () => {
+    S.money = 5000; S.buds = {}; addBuds('ria', 200, 12); addBuds('dragon', 100, 27); S.protect = false; S.heat = 100;
+    const enc = () => { const r0 = Math.random, b0 = battle, n = []; window.battle = async t => { n.push(t); }; Math.random = () => 0; S.map = 'town';
+      const [x, y] = CLIENT_TILES.town[0]; for (let k = 0; k < 20; k++) { P.x = x; P.y = y; S.cool = 0; onStepEnd(); } Math.random = r0; window.battle = b0; S.map = 'home'; S.cool = 0; return n.length; };
+    window.R = { antes: enc() }; await run(() => objectAction(7, 1)); R.despues = enc(); R.caja = JSON.parse(JSON.stringify(S.caja)); R.m = S.money; R.g = totalBuds();
+    const l0 = LOG.length; await run(startMenu); R.mochila = LOG.slice(l0).find(l => /\[menú\] Dinero/.test(l)) || '';
+  }, () => R.antes === 20 && R.despues === 0 && R.caja.money === 5300 && R.caja.buds.ria.g === 200 && R.caja.buds.dragon.g === 100 && R.m === 0 && R.g === 0 && /Caja fuerte/.test(R.mochila) || R);
+  await step('Caja: sacar 1.000 € y 100 g de Fire OG; el soborno cuenta lo de encima (+5 % del dinero)', ['Sacar dinero', '^1\\.000 €', 'Sacar cogollos', '^Fire OG', '^100 g', 'Cerrar'], async () => {
+    S.heat = 20; await run(() => objectAction(7, 1)); window.R = { p: precioSoborno() };
+  }, () => S.money === 1000 && S.caja.money === 4300 && S.buds.dragon.g === 100 && !S.caja.buds.dragon && S.caja.buds.ria.g === 200 && R.p === Math.round(40 + 80 + 50 + 50) || { R, money: S.money, caja: S.caja, buds: S.buds });
+  await step('Redada con la caja: 3 de cada 4 veces no la ven; si la ven, sus gramos y la mitad de su dinero; la multa sale de la caja si fuera no llega', [], async () => {
+    const r0 = Math.random, mira = () => ({ m: S.money, cm: S.caja.money, cg: cajaG(), g: totalBuds(), h: S.heat, pots: S.pots.filter(p => p).length });
+    S.protect = false; S.pots = S.pots.map(() => null); S.pots[1] = { sid: 'ria', prog: .5, water: 90, health: 100, fert: false, pest: false };
+    S.caja.money = 4000; S.money = 200; S.heat = 95; Math.random = () => .9; await run(raidEvent); Math.random = r0; window.R = { a: mira() };
+    addBuds('ria', 30, 12); S.heat = 95; Math.random = () => .1; await run(raidEvent); Math.random = r0; R.b = mira();
+  }, () => R.a.m === 0 && R.a.cm === 4000 - (MULTA_REDADA - 200) && R.a.cg === 200 && R.a.g === 0 && R.a.h === 30 && R.a.pots === 0
+    && R.b.cg === 0 && R.b.g === 0 && R.b.cm === Math.max(0, R.a.cm - Math.floor(R.a.cm / 2) - MULTA_REDADA) && R.b.m === 0 && R.b.h === 30 || R);
+  await step('Caja empotrada por el ordenador (380 €, de fuera y el resto de la caja): Kiko la instala al día siguiente', ['Caja empotrada', 'Pedirla'], async () => {
+    S.caja.money = 1000; S.money = 100; await run(pcAction); window.R = { m: S.money, cm: S.caja.money, mejora: S.caja.mejora, nivel: S.caja.nivel };
+    const l0 = LOG.length; newDay(); await idle(); R.sms = LOG.slice(l0).some(l => /caja empotrada/.test(l));
+  }, () => R.m === 0 && R.cm === 1000 - 280 && R.mejora === 1 && R.nivel === 1 && S.caja.nivel === 2 && !S.caja.mejora && S.caja.money === 720 && R.sms || { R, caja: S.caja });
+  await step('Capítulo 7: Darko roba el piso la primera noche con dinero o cogollos fuera de la caja (la mitad); la caja, intacta; la segunda noche, nada', ['Dormir', 'Dormir'], async () => {
+    S.ch = 7; S.flags.robo = false; S.deadline = S.day + 20; S.money = 3001; S.buds = {}; addBuds('ria', 120, 12); addBuds('kushrif', 81, 20);
+    S.caja.money = 720; S.caja.buds = { dragon: { g: 50, thc: 27 } }; S.pots = S.pots.map(() => null); S.min = 23 * 60;
+    await run(bedAction); window.R = { m: S.money, ria: S.buds.ria.g, kr: S.buds.kushrif.g, cm: S.caja.money, cg: cajaG(), robo: S.flags.robo };
+    S.min = 23 * 60; await run(bedAction); R.m2 = S.money; R.g2 = totalBuds();
+  }, () => R.robo && R.m === 1501 && R.ria === 60 && R.kr === 41 && R.cm === 720 && R.cg === 50 && R.m2 === 1501 && R.g2 === 101 || R);
+  await step('Tercer plazo vencido: Toño se lleva la carpa más grande (la de 120, no la de 100) y cada planta sigue en su plaza; después, la otra; sin carpas, la mitad del dinero', [], async () => {
+    S.ch = 5; const pl = sid => ({ sid, prog: .3, water: 90, health: 100, fert: false, pest: false });
+    S.pots = S.pots.map(() => null); S.pots[0] = pl('ria'); S.pots[3] = pl('hindu'); S.pots[8] = pl('thai'); S.pots[12] = pl('haze');
+    window.R = { t: S.carpas.map(c => c && c.t).join(), h0: huecos().length }; S.vencidos = 2; S.due = 1000; S.money = 901; await run(penaltyEvent);
+    R.a = { t: S.carpas.map(c => c && c.t).join(), n: huecos().length, v: S.vencidos, p0: S.pots[0] && S.pots[0].sid, p3: S.pots[3] && S.pots[3].sid, vivas: S.pots.filter(p => p).length, mapa: MAPS.home.carpas.length };
+    for (const k of [1, 2]) { S.vencidos = 2; await run(penaltyEvent); R['v' + k] = S.carpas.map(c => c && c.t).join() + '|' + S.money + '|' + S.pots.length; }
+  }, () => R.t === 'p80,m100,m120' && R.h0 === 13 && R.a.t === 'p80,m100,' && R.a.n === 7 && R.a.v === 0 && R.a.p0 === 'ria' && R.a.p3 === 'hindu' && R.a.vivas === 2 && R.a.mapa === 2
+    && R.v1 === 'p80,,|901|3' && R.v2 === 'p80,,|451|3' || R);
+  await step('Cuota de Molina: se acaba a los 10 días (SMS) y se renueva en la comisaría del barrio alto, de 10 en 10', ['^Pagar', '^Pagar'], async () => {
+    S.protect = true; S.protHasta = S.day; S.flags.molina1 = true; const l0 = LOG.length; newDay(); await idle(); window.R = { p: S.protect, sms: LOG.slice(l0).some(l => /Se acabó lo pagado/.test(l)) };
+    S.map = 'comisaria'; buildEnts(); R.ent = ents.filter(e => e.id === 'molina').map(e => e.x + ',' + e.y).join(); S.money = 3000; await run(talkMolina); R.h1 = S.protHasta - S.day; await run(talkMolina);
+    R.cub = LOG.slice(l0).some(l => /Estás cubierto hasta el día/.test(l)); S.map = 'home';
+  }, () => R.p === false && R.sms && R.ent === '4,2' && R.h1 === 10 && R.cub && S.protect && S.protHasta === S.day + 20 && S.money === 0 || { R, hasta: S.protHasta, day: S.day, money: S.money });
+  await step('Imperio: encargo de Don Baltasar (2 kg al almacén de los astilleros, de noche, a 6 €/g); Toño se lleva primero lo más flojo; si no llegas, reputación −10 y 5 días sin encargos', ['Aceptar', 'Entregar', 'Aceptar'], async () => {
+    S.ch = 8; S.due = 0; S.encargo = null; S.encVeto = 0; S.rep = 50; S.map = 'bar'; await run(talkBaltasar); window.R = { e: S.encargo && Object.assign({}, S.encargo), d: S.day };
+    S.map = 'almacen'; buildEnts(); R.tono = ents.some(e => e.id === 'tono2'); S.buds = {}; addBuds('ria', 1500, 12); addBuds('dragon', 800, 27);
+    S.min = 600; await run(talkTonoAlmacen); R.dia = S.encargo && totalBuds(); S.min = 22 * 60; R.m = S.money; R.s = S.sales; R.rep = S.rep; R.heat = S.heat;
+    await run(talkTonoAlmacen); R.d1 = { m: S.money - R.m, s: S.sales - R.s, rep: S.rep - R.rep, heat: S.heat - R.heat, ria: S.buds.ria, dragon: S.buds.dragon.g, enc: S.encargo, tono: ents.some(e => e.id === 'tono2') };
+    S.map = 'bar'; S.min = 600; await run(talkBaltasar); R.e2 = S.encargo && S.encargo.hasta - S.day; R.rep2 = S.rep;
+    for (let k = 0; k < 3; k++) { newDay(); await idle(); } R.veto = S.encVeto - S.day; R.rep3 = S.rep; R.enc3 = S.encargo; const l0 = LOG.length; await run(talkBaltasar); R.fallo = LOG.slice(l0).some(l => /Me fallaste/.test(l)); S.map = 'home';
+  }, () => R.e && R.e.g === 2000 && R.e.hasta === R.d + 2 && R.tono && R.dia === 2300 && R.d1.m === 12000 && R.d1.s === 12000 && R.d1.rep === 2 && R.d1.heat === 3 && !R.d1.ria && R.d1.dragon === 300 && R.d1.enc === null && !R.d1.tono
+    && R.e2 === 2 && R.rep3 === R.rep2 - 10 && R.enc3 === null && R.veto === 5 && R.fallo || R);
+  await step('Mapa ampliado: barrio alto y astilleros con sus puertas; policía y ladrones según la zona; clientes de cada zona', [], async () => {
+    S.ch = 5; S.protect = false; S.heat = 0; S.min = 600; S.money = 200; S.buds = {}; addBuds('ria', 10, 12);
+    const r0 = Math.random, b0 = battle; window.R = { enc: {} }; let n; window.battle = async t => { n = t; };
+    for (const [z, rs] of [['town', [.0019, .0059, .0061]], ['alto', [.0029, .0049, .0051]], ['astilleros', [.0009, .0089, .0091]]]) {
+      S.map = z; const [x, y] = CLIENT_TILES[z][0]; R.enc[z] = rs.map(r => { n = null; Math.random = () => r; P.x = x; P.y = y; S.cool = 0; onStepEnd(); Math.random = r0; return n; }).join(); }
+    window.battle = b0; S.cool = 0;
+    const W = (m, k) => { const d = MAPS[m].doors[k]; return d && [d.to, d.x, d.y, d.dir].join(); };
+    R.puertas = [W('town', '11,0'), W('town', '12,0'), W('alto', '12,29'), W('town', '39,21'), W('astilleros', '0,20'), W('alto', '26,18'), W('astilleros', '18,13'), W('town', '34,8')].join('|');
+    R.salidas = ['comisaria', 'almacen', 'txaro'].map(m => { const e = MAPS[m].exits['4,7']; return [e.to, e.x, e.y].join(); }).join('|');
+    S.map = 'alto'; R.m0 = S.money; await run(() => objectAction(2, 10)); R.sobre = S.money - R.m0; S.map = 'astilleros'; R.sp = S.items.spray; const it = itemAt(4, 5); if (it) await run(() => pickItem(it)); R.sp = S.items.spray - R.sp;
+    S.map = 'town'; await run(() => warp(MAPS.town.doors['11,0'])); R.warp = [S.map, P.x, P.y].join();
+    S.ch = 2; spawnClients(); R.c2 = ['town', 'alto', 'astilleros'].map(z => S.clients.filter(c => c.map === z).length).join();
+    S.ch = 5; spawnClients(); R.c5 = ['alto', 'astilleros'].map(z => S.clients.filter(c => c.map === z).length).join();
+    R.tipos = S.clients.every(c => (c.map === 'alto' ? ['pij', 'tur'] : c.map === 'astilleros' ? ['est', 'cur'] : Object.keys(CTYPES)).includes(c.type) && CLIENT_TILES[c.map].some(t => t[0] === c.x && t[1] === c.y));
+    R.ents = ents.filter(e => /^c/.test(e.id) && !/^c\d+_b/.test(e.id)).length; R.entsB = ents.filter(e => /^c\d+_b/.test(e.id)).length; S.map = 'home'; enterMap('home', 5, 5, 'up');
+  }, () => R.enc.town === 'police,thief,' && R.enc.alto === 'police,thief,' && R.enc.astilleros === 'police,thief,'
+    && R.puertas === 'alto,11,28,up|alto,12,28,up|town,12,1,down|astilleros,1,21,right|town,38,20,left|comisaria,4,6,up|almacen,4,6,up|txaro,4,6,up'
+    && R.salidas === 'alto,26,19|astilleros,18,14|town,34,9' && R.warp === 'alto,11,28' && R.c2.endsWith(',0,2') && R.c5 === '3,3' && R.tipos && R.ents === 0 && R.entsB === 3 && R.sobre === 80 && R.sp === 2 || R);
+  await step('Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas', ['^Hindu Kush'], async () => {
+    S.ch = 5; S.flags.txaro = true; S.flags.txaro2 = false; S.map = 'txaro'; buildEnts(); window.R = { ent: ents.filter(e => e.id === 'txaro').map(e => e.x + ',' + e.y).join() };
+    S.buds = {}; addBuds('ria', 20, 12); addBuds('hindu', 15, 18); addBuds('thai', 20, 16); R.ch = S.seeds.chitral || 0; R.boc = S.items.bocata; R.rep = S.rep;
+    const l0 = LOG.length; await run(talkTxaro); R.menu = LOG.slice(l0).find(l => /\[menú\].*Ahora no/.test(l)) || ''; S.map = 'home';
+  }, () => R.ent === '6,3' && S.flags.txaro2 && S.seeds.chitral === R.ch + 3 && S.items.bocata === R.boc + 3 && S.rep === R.rep + 5 && S.buds.hindu.g === 5 && S.buds.ria.g === 20
+    && /Hindu Kush/.test(R.menu) && !/Skunk|Thai/.test(R.menu) || R);
+  await step('Astilleros: el gramo, un 20 % más caro; 1 de cada 3 ventas, un chico de Darko te sale al paso', ['Justo', 'Justo'], async () => {
+    S.ch = 5; S.map = 'astilleros'; S.buds = {}; addBuds('ria', 20, 12); const r0 = Math.random, b0 = battle; window.R = { b: [] }; window.battle = async t => { R.b.push(t); };
+    const cl = (id, r) => { const c = { id, map: 'astilleros', x: 5, y: 20, type: 'cur', want: 10, minThc: 0 }; S.clients.push(c); return async () => { Math.random = () => r; await talkClient(c); Math.random = r0; }; };
+    R.m = S.money; await run(cl('cx1', .2)); R.m1 = S.money - R.m; R.b1 = R.b.length; await run(cl('cx2', .5)); R.m2 = S.money - R.m - R.m1; window.battle = b0; S.map = 'home';
+  }, () => R.m1 === Math.round(precioCalle(12) * CTYPES.cur.mult * 1.2 * 10) && R.m2 === R.m1 && R.b1 === 1 && R.b.join() === 'thief' && ZONAS.astilleros.precio === 1.2 || R);
+  await step('Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor', [], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 3, due: 0, deadline: 0, protect: true }); S.flags.metB = false; delete S.flags.tono;
+    for (const k of ['caja', 'rec', 'vencidos', 'protHasta', 'encargo', 'encVeto']) delete S[k]; migrate();
+    window.R = { due: S.due, dias: S.deadline - S.day, tono: S.flags.tono === S.day, hasta: S.protHasta - S.day, campos: JSON.stringify([S.caja, S.rec, S.vencidos, S.encargo, S.encVeto]) }; S = S0;
+  }, () => R.due === 3000 && R.dias === 7 && R.tono && R.hasta === 10 && R.campos === '[null,{},0,null,0]' || R);
   await step('Guardar y cargar la partida', [], async () => { save(); },
     () => { const sv = loadSave(); return sv && sv.ch === S.ch && sv.money === S.money && JSON.stringify(sv.disc) === JSON.stringify(S.disc) || 'no coincide'; });
 

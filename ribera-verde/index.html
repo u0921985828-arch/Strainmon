@@ -236,7 +236,7 @@ function buildTiles(){
   T('dock',t=>{t.F(0,0,16,16,C.wood3);for(let y=3;y<16;y+=4)t.F(0,y,16,1,C.wood2);t.P(2,1,C.wood4);t.P(13,5,C.wood4);t.P(6,9,C.wood4);t.P(10,13,C.wood4);t.noise(5,[C.wood1]);});
   T('void',t=>t.F(0,0,16,16,'#000'));
   // buildings
-  const B={home:['#d65a4a','#f0dcae','doorW'],shop:['#46a262','#d8ecc4','doorG'],bar:['#4a72c2','#d4dbe8','doorD'],gray:['#8a92a2','#e4cec4','none']};
+  const B={home:['#d65a4a','#f0dcae','doorW'],shop:['#46a262','#d8ecc4','doorG'],bar:['#4a72c2','#d4dbe8','doorD'],gray:['#8a92a2','#e4cec4','doorW']};
   for(const [id,[roof,wall,door]] of Object.entries(B)){
     const shingles=(t)=>{t.F(0,0,16,16,roof);for(let y=3;y<16;y+=4){t.F(0,y,16,1,shade(roof,-38));for(let x=((y>>2)%2)*4;x<16;x+=8)t.F(x,y-3,1,3,shade(roof,-22));}t.noise(4,[shade(roof,22)]);};
     T('roofT_'+id,t=>{shingles(t);t.F(0,0,16,2,shade(roof,30));t.F(0,2,16,1,shade(roof,-45));});
@@ -472,15 +472,27 @@ function arteObj(o,tx,ty,cam,now,list){
   if(f.cel.h>16&&list)list.push([ty*16,()=>pinta(f,xp,yp)]);else pinta(f,xp,yp);
   return true;
 }
+// edificios grises con puerta (1.10): la puerta de otra fachada (b.puerta) y, con b.mascara, sin su trozo de pared (PARED: los
+// colores de la fachada del piso, quitados desde el borde del fotograma hacia dentro mientras sigan siendo pared)
+const PARED=new Set(['248,248,240','246,232,200','224,206,170','220,214,198']),_sinPared=new Map();
+function puertaSinPared(c){
+  let o=_sinPared.get(c);if(o)return o;
+  const w=c.width,h=c.height,[d,x]=mkCanvas(w,h);x.drawImage(c,0,0);const im=x.getImageData(0,0,w,h),p=im.data,st=[];
+  for(let i=0;i<w;i++)st.push(i,(h-1)*w+i);for(let j=0;j<h;j++)st.push(j*w,j*w+w-1);
+  while(st.length){const i=st.pop();if(!p[i*4+3]||!PARED.has(p[i*4]+','+p[i*4+1]+','+p[i*4+2]))continue;p[i*4+3]=0;
+    const xi=i%w,yi=(i-xi)/w;if(xi>0)st.push(i-1);if(xi<w-1)st.push(i+1);if(yi>0)st.push(i-w);if(yi<h-1)st.push(i+w);}
+  x.putImageData(im,0,0);_sinPared.set(c,d);return d;
+}
 function arteEdificios(m,cam){
   if(!ARTE.ok||!m.blds)return;
   for(const b of m.blds){
     const g='edificio-'+b.id,f=frameDe(g,'base','unica',0,{i:0});if(!f)continue;
     ctx.drawImage(f.c,b.x0*16-cam.x,b.y0*16-cam.y);
-    if(b.doorX!=null&&animDe(g,'puerta')){
-      const dy=b.y0+b.h-1,abierta=P.x===b.doorX&&(P.y===dy||P.y===dy+1);
-      const p=frameDe(g,'puerta','unica',0,{i:abierta?-1:0});
-      if(p)ctx.drawImage(p.c,b.doorX*16-8-cam.x,(dy+1)*16-32-cam.y);
+    const gp='edificio-'+(b.puerta||b.id);
+    if(b.doorX!=null&&animDe(gp,'puerta')){
+      const dy=b.y0+b.h-1,abierta=P.x>=b.doorX&&P.x<=b.doorX+(b.ancha?1:0)&&(P.y===dy||P.y===dy+1);
+      const p=frameDe(gp,'puerta','unica',0,{i:abierta?-1:0});
+      if(p)ctx.drawImage(b.mascara?puertaSinPared(p.c):p.c,b.doorX*16-8+(b.dx||0)-cam.x,(dy+1)*16-32-cam.y);
     }
   }
 }
@@ -770,12 +782,16 @@ function newMap(name,w,h,g){const m={name,w,h,g:[],o:[],exits:{},doors:{},music:
 const gr=(m,x,y,k)=>{if(x>=0&&y>=0&&x<m.w&&y<m.h)m.g[y][x]=k;};
 const ob=(m,x,y,k)=>{if(x>=0&&y>=0&&x<m.w&&y<m.h)m.o[y][x]=k;};
 const rect=(m,x0,y0,x1,y1,fn)=>{for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)fn(x,y);};
-function building(m,id,x0,y0,w,h,doorX,warp){
-  (m.blds=m.blds||[]).push({id,x0,y0,w,h,doorX});
+// op (1.10, edificios grises con puerta): ancha, la puerta ocupa doorX y doorX + 1 (se pinta centrada entre las dos: dx 8);
+// puerta, la fachada de la que sale la animación de la puerta ('home' o 'bar'); mascara, sin el trozo de pared de esa fachada
+function building(m,id,x0,y0,w,h,doorX,warp,op){
+  (m.blds=m.blds||[]).push(Object.assign({id,x0,y0,w,h,doorX},op));
   for(let x=x0;x<x0+w;x++){gr(m,x,y0,'roofT_'+id);gr(m,x,y0+1,'roofB_'+id);for(let y=y0+2;y<y0+h;y++)gr(m,x,y,'wall_'+id);
     if((x-x0)%3===1&&x!==doorX){gr(m,x,y0+3,'win_'+id);}}
-  if(doorX!=null){gr(m,doorX,y0+h-1,'door_'+id);m.doors[doorX+','+(y0+h-1)]=warp;}
+  if(doorX!=null)for(let x=doorX;x<=doorX+(op&&op.ancha?1:0);x++){gr(m,x,y0+h-1,'door_'+id);m.doors[x+','+(y0+h-1)]=Object.assign({},warp,{x:warp.x+x-doorX});}
 }
+// las tres zonas de fuera (1.10): policía y ladrones por paso (× pol y × lad), precio de la calle (× precio) y música de calle
+const ZONAS={town:{n:'Ribera Verde',pol:1,lad:1,precio:1},alto:{n:'Barrio alto',pol:1.5,lad:.5,precio:1},astilleros:{n:'Astilleros',pol:.5,lad:2,precio:1.2}};
 function buildMaps(){
   // ---------- TOWN ----------
   const m=newMap('town',40,30,'grass');m.music='town';
@@ -786,7 +802,7 @@ function buildMaps(){
   building(m,'home',2,3,7,6,5,{to:'home',x:5,y:6,dir:'up'});
   building(m,'shop',14,3,7,6,17,{to:'shop',x:4,y:6,dir:'up'});
   building(m,'bar',23,3,7,6,26,{to:'bar',x:4,y:6,dir:'up'});
-  building(m,'gray',32,3,6,6,null);
+  building(m,'gray',32,3,6,6,34,{to:'txaro',x:4,y:6,dir:'up'},{ancha:1,puerta:'home',mascara:1,dx:8});   // casa de Txaro (1.10)
   ob(m,9,8,'sign');ob(m,13,8,'sign');ob(m,22,8,'sign');
   [11,21,31].forEach(x=>ob(m,x,9,'lamp'));
   // park
@@ -810,6 +826,47 @@ function buildMaps(){
   rect(m,27,19,30,20,(x,y)=>gr(m,x,y,'walk'));ob(m,29,18,'sign');
   [[28,15],[29,24],[28,27]].forEach(([x,y])=>ob(m,x,y,'tree'));
   ob(m,38,17,'crate');ob(m,38,18,'crate');ob(m,34,25,'crate');
+  // salidas (1.10): al norte, la cuesta al barrio alto; al este, por el muelle, los astilleros
+  rect(m,11,0,12,8,(x,y)=>{gr(m,x,y,'walk');ob(m,x,y,null);});
+  [11,12].forEach(x=>m.doors[x+',0']={to:'alto',x,y:28,dir:'up'});
+  [20,21].forEach(y=>{ob(m,39,y,null);gr(m,39,y,'dock');m.doors['39,'+y]={to:'astilleros',x:1,y,dir:'right'};});
+  ob(m,10,4,'sign');ob(m,38,19,'sign');
+
+  // ---------- BARRIO ALTO (1.10) ----------
+  // al norte del barrio, cuesta arriba: la plaza del Ensanche, los jardines y la comisaría del sargento Molina.
+  // Más policía y menos ladrones; clientes con dinero (pijos y turistas) desde el capítulo 3
+  const a=newMap('alto',40,30,'grass');a.music='town';
+  for(let x=0;x<40;x++){ob(a,x,0,'tree');ob(a,x,1,'tree');if(x!==11&&x!==12)ob(a,x,29,'tree');}
+  for(let y=0;y<30;y++){ob(a,0,y,'tree');ob(a,39,y,'tree');}
+  for(let x=1;x<39;x++){gr(a,x,20,'walk');gr(a,x,21,'roadT');gr(a,x,22,'roadB');gr(a,x,23,'walk');}
+  rect(a,11,24,12,29,(x,y)=>gr(a,x,y,'walk'));[11,12].forEach(x=>a.doors[x+',29']={to:'town',x,y:1,dir:'down'});
+  rect(a,3,4,19,4,(x,y)=>gr(a,x,y,'flowers'));rect(a,3,5,19,17,(x,y)=>gr(a,x,y,'plaza'));rect(a,11,18,12,19,(x,y)=>gr(a,x,y,'walk'));
+  ob(a,11,11,'fountain');[[7,8],[15,8],[7,14],[15,14]].forEach(([x,y])=>ob(a,x,y,'bench'));
+  [[3,5],[19,5],[3,17],[19,17]].forEach(([x,y])=>ob(a,x,y,'lamp'));[[4,3],[8,3],[14,3],[18,3]].forEach(([x,y])=>ob(a,x,y,'tree'));
+  [[2,6],[2,10],[2,14],[20,7],[20,12]].forEach(([x,y])=>ob(a,x,y,'bush'));ob(a,10,18,'sign');
+  building(a,'gray',24,13,6,6,26,{to:'comisaria',x:4,y:6,dir:'up'},{ancha:1,puerta:'bar',dx:8});
+  rect(a,23,19,30,19,(x,y)=>gr(a,x,y,'walk'));ob(a,23,19,'sign');
+  rect(a,31,14,37,18,(x,y)=>gr(a,x,y,'flowers'));rect(a,31,12,37,12,(x,y)=>ob(a,x,y,'fence'));[[32,15],[35,17],[36,14]].forEach(([x,y])=>ob(a,x,y,'bush'));
+  [[24,4],[28,3],[33,4],[37,6],[26,8],[31,7],[35,9],[23,10],[29,10]].forEach(([x,y])=>ob(a,x,y,'tree'));
+  [[25,6],[30,5],[34,7],[27,10],[32,9]].forEach(([x,y])=>gr(a,x,y,'flowers'));ob(a,22,7,'sign');ob(a,30,8,'bench');
+  [6,17,32].forEach(x=>ob(a,x,20,'lamp'));
+  [[3,25],[7,27],[2,28],[16,25],[21,27],[27,25],[33,27],[37,25]].forEach(([x,y])=>ob(a,x,y,'tree'));
+  rect(a,14,24,38,24,(x,y)=>{if(x%4===2)ob(a,x,y,'bush');});[[5,26],[19,26],[30,26],[24,28]].forEach(([x,y])=>gr(a,x,y,'flowers'));
+
+  // ---------- ASTILLEROS (1.10) ----------
+  // al este del muelle: los astilleros cerrados, el muelle de carga y el almacén donde Toño recoge los encargos de Baltasar.
+  // Pocos controles y muchos ladrones; las esquinas de Darko: los clientes pagan más, pero sus chicos vigilan
+  const t=newMap('astilleros',40,30,'dirt');t.music='town';
+  for(let x=0;x<40;x++){ob(t,x,0,'tree');ob(t,x,1,'tree');}
+  for(let y=0;y<23;y++){if(y!==20&&y!==21)ob(t,0,y,'tree');ob(t,39,y,'tree');}
+  rect(t,0,23,39,29,(x,y)=>gr(t,x,y,'water'));rect(t,0,19,39,22,(x,y)=>gr(t,x,y,'dock'));
+  rect(t,6,23,8,27,(x,y)=>gr(t,x,y,'dock'));rect(t,26,23,28,27,(x,y)=>gr(t,x,y,'dock'));
+  [20,21].forEach(y=>t.doors['0,'+y]={to:'town',x:38,y,dir:'left'});
+  building(t,'gray',16,8,6,6,18,{to:'almacen',x:4,y:6,dir:'up'},{ancha:1,puerta:'home',mascara:1,dx:8});ob(t,15,13,'sign');ob(t,2,18,'sign');
+  rect(t,2,3,6,7,(x,y)=>gr(t,x,y,'tallgrass'));rect(t,30,13,35,15,(x,y)=>gr(t,x,y,'tallgrass'));rect(t,9,3,13,4,(x,y)=>gr(t,x,y,'grass'));
+  rect(t,24,4,37,4,(x,y)=>ob(t,x,y,'fence'));rect(t,24,10,37,10,(x,y)=>{if(x!==30&&x!==31)ob(t,x,y,'fence');});rect(t,24,5,24,9,(x,y)=>ob(t,x,y,'fence'));rect(t,37,5,37,9,(x,y)=>ob(t,x,y,'fence'));
+  [[25,5],[26,5],[25,6],[36,5],[36,6],[35,5],[28,8],[33,8],[3,17],[4,17],[10,16],[11,16],[10,15],[33,18],[34,18],[35,18],[7,27],[27,27],[22,17]].forEach(([x,y])=>ob(t,x,y,'crate'));
+  [[9,19],[20,19],[31,19],[14,8]].forEach(([x,y])=>ob(t,x,y,'lamp'));[[10,3],[12,4],[2,10],[37,14]].forEach(([x,y])=>ob(t,x,y,'tree'));
 
   // ---------- HOME ----------
   // 1 casilla = 1 m: 12 × 6 m de suelo (72 m²). Dormitorio a la izquierda, escritorio y mesa de genética al fondo,
@@ -835,6 +892,23 @@ function buildMaps(){
   rect(b,0,3,3,3,(x,y)=>ob(b,x,y,'barcounter'));ob(b,1,4,'stool');ob(b,3,4,'stool');
   ob(b,7,5,'btable');ob(b,9,2,'jukebox');ob(b,8,2,'btable');
   gr(b,4,7,'mat');b.exits['4,7']={to:'town',x:26,y:9,dir:'down'};
+  // ---------- CASA DE TXARO (1.10) ----------
+  const tx=newMap('txaro',10,8,'floor');tx.music='home';
+  rect(tx,0,0,9,0,(x,y)=>gr(tx,x,y,'iwT_home'));rect(tx,0,1,9,1,(x,y)=>gr(tx,x,y,'iwB_home'));
+  ob(tx,2,1,'iwin');ob(tx,7,1,'iwin');ob(tx,0,2,'bedT');ob(tx,0,3,'bedB');ob(tx,9,6,'fridge');
+  ob(tx,5,4,'table');ob(tx,1,2,'plantDeco');ob(tx,9,2,'plantDeco');ob(tx,0,7,'plantDeco');
+  gr(tx,4,7,'mat');tx.exits['4,7']={to:'town',x:34,y:9,dir:'down'};
+  // ---------- COMISARÍA (1.10) ----------
+  const c=newMap('comisaria',10,8,'floorS');c.music='home';
+  rect(c,0,0,9,0,(x,y)=>gr(c,x,y,'iwT_shop'));rect(c,0,1,9,1,(x,y)=>gr(c,x,y,'iwB_shop'));
+  [0,1,8,9].forEach(x=>ob(c,x,1,'shelfW'));ob(c,4,1,'iwin');rect(c,2,3,7,3,(x,y)=>ob(c,x,y,'counter'));
+  ob(c,0,5,'bench');ob(c,9,5,'bench');ob(c,0,7,'plantDeco');ob(c,9,7,'plantDeco');
+  gr(c,4,7,'mat');c.exits['4,7']={to:'alto',x:26,y:19,dir:'down'};
+  // ---------- ALMACÉN DE LOS ASTILLEROS (1.10) ----------
+  const w=newMap('almacen',10,8,'floorB');w.music='home';
+  rect(w,0,0,9,0,(x,y)=>gr(w,x,y,'iwT_bar'));rect(w,0,1,9,1,(x,y)=>gr(w,x,y,'iwB_bar'));ob(w,6,1,'iwin');
+  [[0,2],[1,2],[0,3],[8,2],[9,2],[9,3],[8,6],[9,6],[0,6]].forEach(([x,y])=>ob(w,x,y,'crate'));ob(w,5,4,'btable');ob(w,4,4,'stool');
+  gr(w,4,7,'mat');w.exits['4,7']={to:'astilleros',x:18,y:14,dir:'down'};
 }
 // carpas del piso según S.carpas: un mueble sólido ('carpa') en las casillas de su sitio; se pinta entero desde su base
 // (14-render) y por dentro se ve en la vista de carpa (09b-carpa)
@@ -851,10 +925,16 @@ function montarCasa(){
 }
 const sitioVisible=ci=>!S.carpas[ci]&&(ci<2||!!S.carpas[1]);   // C, junto a la cama, después de B
 const sitioLibre=(x,y)=>SITIOS.findIndex((s,ci)=>sitioVisible(ci)&&x>=s.x&&x<s.x+s.w&&y===s.y);
-let CLIENT_TILES=[];
+// casillas donde puede salir un cliente, por zona (1.10): en el barrio, de la calle para abajo y fuera de la entrada de la plaza
+// (Darko y Molina); en el barrio alto, la plaza del Ensanche y la avenida; en los astilleros, el patio y el muelle de carga
+let CLIENT_TILES={};
 function computeClientTiles(){
-  const m=MAPS.town;CLIENT_TILES=[];
-  for(let y=12;y<m.h;y++)for(let x=1;x<m.w-1;x++){const g=m.g[y][x];if((g==='plaza'||g==='walk'||g==='dirt')&&!m.o[y][x]&&!(y===13&&x>=18&&x<=22))CLIENT_TILES.push([x,y]);}
+  CLIENT_TILES={};
+  const zona={town:(x,y,g)=>y>=12&&(g==='plaza'||g==='walk'||g==='dirt')&&!(y===13&&x>=18&&x<=22),
+    alto:(x,y,g)=>y<=23&&y!==21&&y!==22&&(g==='plaza'||g==='walk')&&!(y===19&&x>=23)&&!(x>=10&&x<=13&&y>=18),
+    astilleros:(x,y,g)=>y>=12&&y<=21&&x>=2&&(g==='dirt'||g==='dock')&&!(x>=15&&x<=22&&y<=14)};
+  for(const k in zona){const m=MAPS[k],l=CLIENT_TILES[k]=[];
+    for(let y=1;y<m.h-1;y++)for(let x=1;x<m.w-1;x++){const g=m.g[y][x];if(zona[k](x,y,g)&&!m.o[y][x]&&!m.doors[x+','+y])l.push([x,y]);}}
 }
 
 /* =========================================================
@@ -1038,13 +1118,16 @@ const CH_TITLES={1:'La herencia',2:'La calle',3:'La deuda',4:'Genética',5:'El s
 function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,min:8*60,money:150,hp:30,hpMax:30,heat:0,rep:0,ch:0,flags:{},sales:0,
   seeds:{},buds:{},items:Object.assign({fert:0,insect:0,spray:0,bocata:1},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
-  disc:{},custom:{},gen:{},pedido:[],esquejes:[],fenos:{},fenoN:0,eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0};}
+  disc:{},custom:{},gen:{},pedido:[],esquejes:[],fenos:{},fenoN:0,eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
+  caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0};}
 const isFree=()=>mode==='world'&&lock===0&&handlers.length===0;
 const isNight=()=>S.min>=21*60||S.min<6*60;
 async function run(fn){lock++;try{await fn();}catch(e){console.error(e);}finally{lock--;}}
 function queue(key,fn){if(queued.has(key))return;queued.add(key);pending.push(async()=>{try{await fn();}finally{queued.delete(key);}});}
 const totalBuds=()=>Object.values(S.buds).reduce((a,b)=>a+b.g,0);
 const discCount=()=>Object.keys(S.disc).length;
+// variedades de receta (RECIPES) sacadas en la mesa (S.rec[sid] = 1) y ya cosechadas (2): el capítulo 4 pide 2 (1.10)
+const recCount=()=>Object.values(S.rec).filter(v=>v===2).length;
 // ficha de una variedad: cifras, tipo genético (si es un cruce y qué fenotipos da) y origen
 // % índica de la variedad y, en un híbrido propio, lo que sacó de la madre (la 1.ª del cruce, la de la izquierda en «o») y del padre
 const lineaInd=k=>{const s=getStrain(k),i=indDe(k);return `Índica ${i} % · sativa ${100-i} %${s.m?` · ${s.m} % madre · ${100-s.m} % padre`:''}`;};
@@ -1068,18 +1151,22 @@ const NPCDEF=[
   {id:'begona',map:'town',x:10,y:12,wander:2,look:'begona',talk:()=>say(pick(['Bajo una lámpara las plantas beben mucho. Riégalas a diario, majo.','Si se te ponen amarillas las hojas de abajo, les falta agua o abono.','Tu tía siempre tenía el piso oliendo a limón. Ahora sé por qué.']),'BEGOÑA')},
   {id:'unai',map:'town',x:17,y:18,wander:3,look:'kid',talk:()=>say(pick(['Si mantienes pulsado B, corres.','Mi hermano dice que de noche, en la hierba alta del parque, roban a la gente.','Con START abres tu GENOTECA y la mochila.','En los arbustos del parque la gente esconde cosas. Mira delante de ellos con A.']),'UNAI')},
   {id:'patxi',map:'town',x:21,y:21,dir:'up',look:'oldman',talk:()=>talkPatxi()},
-  {id:'txaro',map:'town',x:3,y:18,look:'granny',talk:()=>talkTxaro()},
+  {id:'txaro',map:'town',x:3,y:18,look:'granny',cond:()=>!S.flags.txaro,talk:()=>talkTxaro()},
+  {id:'txaro',map:'txaro',x:6,y:3,look:'granny',cond:()=>!!S.flags.txaro,talk:()=>talkTxaro()},   // después del aceite, en su casa (1.10)
   {id:'inaki',map:'town',x:37,y:21,dir:'left',look:'sailor',cond:()=>S.ch>=2,talk:()=>talkInaki()},
   {id:'cop',map:'town',x:22,y:17,wander:3,look:'cop',cond:()=>S.ch>=2,talk:()=>talkCop()},
   {id:'darko',map:'town',x:20,y:14,dir:'up',look:'darko',cond:()=>(S.ch>=2&&!S.flags.darko1)||S.ch===6,talk:()=>talkDarko()},
-  {id:'molina',map:'town',x:23,y:15,look:'molina',cond:()=>S.ch>=5&&!S.protect,talk:()=>talkMolina()},
+  {id:'darko2',map:'astilleros',x:24,y:16,look:'darko',cond:()=>S.ch>=7,talk:()=>talkDarko()},   // sus esquinas (1.10)
+  {id:'molina',map:'town',x:23,y:15,look:'molina',cond:()=>S.ch>=5&&!S.flags.molina1,talk:()=>talkMolina()},
+  {id:'molina',map:'comisaria',x:4,y:2,look:'molina',cond:()=>S.ch>=5&&!!S.flags.molina1,talk:()=>talkMolina()},   // la cuota, en la comisaría (1.10)
+  {id:'tono2',map:'almacen',x:5,y:2,look:'tono',cond:()=>!!S.encargo,talk:()=>talkTonoAlmacen()},   // los encargos de Baltasar (1.10)
   {id:'jurado',map:'town',x:18,y:15,look:'judge',cond:()=>S.ch===6,talk:()=>talkJurado()},
 ];
 function mkEnt(d){return{id:d.id,x:d.x,y:d.y,px:d.x*16,py:d.y*16,hx:d.x,hy:d.y,dir:d.dir||'down',look:d.lookObj||LOOKS[d.look],def:d,wander:d.wander||0,wt:800+Math.random()*2400,moving:false,t:0,fx:d.x,fy:d.y};}
 function buildEnts(){
   const old={};ents.forEach(e=>old[e.id]=e);ents=[];
   for(const d of NPCDEF){if(d.map!==S.map||(d.cond&&!d.cond()))continue;ents.push(old[d.id]&&old[d.id].def===d?old[d.id]:mkEnt(d));}
-  if(S.map==='town')for(const c of S.clients){const o=old[c.id];ents.push(o||mkEnt({id:c.id,x:c.x,y:c.y,wander:2,lookObj:c.look,client:c}));}
+  for(const c of S.clients)if((c.map||'town')===S.map){const o=old[c.id];ents.push(o||mkEnt({id:c.id,x:c.x,y:c.y,wander:2,lookObj:c.look,client:c}));}
 }
 const ITEMS=[
   {id:'i_spray',map:'town',x:8,y:25,give:async()=>{S.items.spray+=2;await got('2 × SPRAY DE PIMIENTA');}},
@@ -1088,6 +1175,8 @@ const ITEMS=[
   {id:'h_acap',map:'town',x:2,y:26,hidden:1,give:async()=>{addSeeds('acapulco',2);await got('2 semillas de ACAPULCO GOLD');await say('Un bote de carrete con dos semillas y una etiqueta a boli: «Guerrero, 1979».');}},
   {id:'h_50',map:'town',x:9,y:16,hidden:1,give:async()=>{S.money+=50;await got('50 € en billetes doblados');}},
   {id:'h_ins',map:'town',x:10,y:24,hidden:1,give:async()=>{S.items.insect+=1;await got('1 tratamiento de INSECTICIDA');}},
+  {id:'i_ast',map:'astilleros',x:4,y:5,give:async()=>{S.items.spray+=2;await got('2 × SPRAY DE PIMIENTA');}},
+  {id:'h_alto',map:'alto',x:2,y:10,hidden:1,give:async()=>{S.money+=80;await got('80 € en un sobre arrugado');}},
 ];
 const itemAt=(x,y)=>ITEMS.find(it=>!it.hidden&&it.map===S.map&&it.x===x&&it.y===y&&!S.taken[it.id]);
 async function pickItem(it){S.taken[it.id]=true;await it.give();}
@@ -1098,7 +1187,7 @@ function tileSolid(m,x,y){
 }
 const entAt=(x,y)=>ents.find(e=>(e.x===x&&e.y===y)||(e.moving&&e.fx===x&&e.fy===y));
 function enterMap(name,x,y,dir){S.map=name;if(name==='home')montarCasa();Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];buildEnts();music(mapMusic());}
-const mapMusic=()=>S.map==='town'?(isNight()?'night':'town'):'home';
+const mapMusic=()=>ZONAS[S.map]?(isNight()?'night':'town'):'home';
 async function warp(w){sfx('door');await fade(1);enterMap(w.to,w.x,w.y,w.dir);updateHUD();await wait(80);await fade(0);}
 
 /* ---------- movement ---------- */
@@ -1124,15 +1213,15 @@ function onStepEnd(){
   S.x=P.x;S.y=P.y;S.dir=P.dir;S.steps++;if(S.cool>0)S.cool--;
   const m=MAPS[S.map],door=m.doors[P.x+','+P.y];
   if(door){run(()=>warp(door));return;}
-  if(S.map!=='town')return;
-  if(P.y>=13&&P.y<=14&&P.x>=18&&P.x<=22){
+  const Z=ZONAS[S.map];if(!Z)return;
+  if(S.map==='town'&&P.y>=13&&P.y<=14&&P.x>=18&&P.x<=22){
     if(S.ch>=2&&!S.flags.darko1){queue('darko',async()=>{const e=ents.find(e=>e.id==='darko');if(e)e.dir='up';await talkDarko();});return;}
-    if(S.ch>=5&&!S.flags.molina1&&!S.protect){queue('molina',talkMolina);return;}
+    if(S.ch>=5&&!S.flags.molina1){queue('molina',talkMolina);return;}
   }
   if(S.ch>=2&&S.cool<=0){
     const g=totalBuds(),tall=m.g[P.y][P.x]==='tallgrass';
-    const pp=g>0?(.002+S.heat*.00025)*(S.protect?.4:1):0;
-    const pt=(g>=5||S.money>=150)?.004*(isNight()?2.5:1)*(tall?3:1):0;
+    const pp=g>0?(.002+S.heat*.00025)*(S.protect?.4:1)*Z.pol:0;
+    const pt=(g>=5||S.money>=150)?.004*(isNight()?2.5:1)*(tall?3:1)*Z.lad:0;
     const r=Math.random();
     if(r<pp){S.cool=25;run(()=>battle('police'));}else if(r<pp+pt){S.cool=25;run(()=>battle('thief'));}
   }
@@ -1162,7 +1251,10 @@ function interact(){
   run(()=>objectAction(tx,ty));
 }
 const SIGNS={'town:9,8':'Calle Ribera, 3.\nPiso de la tía Maite.','town:13,8':'GROWSHOP KIKO\nSemillas, abonos y consejos gratis.','town:22,8':'BAR EL ANCLA\nPintxos y menú del día.',
-  'town:4,13':'PARQUE DE LOS SAUCES\nHorario: de 7:00 a 23:00.','town:17,13':'PLAZA DE RIBERA VERDE\nFuente inaugurada en 1987.','town:29,18':'MUELLE VIEJO →\nPeligro: borde sin barandilla.'};
+  'town:4,13':'PARQUE DE LOS SAUCES\nHorario: de 7:00 a 23:00.','town:17,13':'PLAZA DE RIBERA VERDE\nFuente inaugurada en 1987.','town:29,18':'MUELLE VIEJO →\nPeligro: borde sin barandilla.',
+  'town:10,4':'↑ BARRIO ALTO\nPlaza del Ensanche · Comisaría.','town:38,19':'ASTILLEROS DE RIBERA →\nZona industrial. Sin salida.',
+  'alto:10,18':'PLAZA DEL ENSANCHE\nUrbanizada en 1964.','alto:22,7':'JARDINES DEL ENSANCHE\nNo pisar el césped.','alto:23,19':'COMISARÍA DE RIBERA\nAtención al público: de 9:00 a 14:00.',
+  'astilleros:15,13':'ALMACÉN 3\nPropiedad privada. Prohibido el paso.','astilleros:2,18':'ASTILLEROS DE RIBERA\nCerrados desde 1992.'};
 async function objectAction(x,y){
   const m=MAPS[S.map],o=m.o[y]&&m.o[y][x];
   if(S.map==='home'){
@@ -1176,7 +1268,22 @@ async function objectAction(x,y){
     if(o==='fridge')return say('La nevera: medio limón, leche y un táper de alubias que dejó la tía.');
     if(o==='plantDeco')return say('Una monstera. La tía Maite le hablaba cada mañana.');
     if(o==='iwin')return say('Por la ventana se ve la ría. Huele a salitre.');
-    if(o==='poster')return say('Un diploma enmarcado: «COPA DE RIBERA 1998 · 2º PREMIO: MAITE».');
+    if(o==='poster')return diplomaAction();
+  }
+  if(S.map==='txaro'){
+    if(o==='bedT'||o==='bedB')return say('Una cama con colcha de ganchillo.');
+    if(o==='table')return say('Un bote de aceite con una etiqueta a mano: «Para dormir. 2 gotas».');
+    if(o==='fridge')return say('Nevera de las de antes. No es tuya.');
+    if(o==='iwin')return say('Por la ventana se ve el parque de los Sauces.');
+  }
+  if(S.map==='comisaria'){
+    if(o==='iwin')return say('Por la ventana se ve la plaza del Ensanche.');
+    if(o==='shelfW')return say('Archivadores con expedientes. Hay uno con tu calle.');
+    if(o==='counter')return say('El mostrador de denuncias. No hay nadie detrás.');
+  }
+  if(S.map==='almacen'){
+    if(o==='crate')return say('Cajas precintadas con el sello de una conservera que cerró hace años.');
+    if(o==='btable')return say('Una mesa con una báscula y rollos de film transparente.');
   }
   if(o==='sign')return say(SIGNS[S.map+':'+x+','+y]||'Está tan desgastado que no se lee.');
   if(o==='bush'){const h=ITEMS.find(it=>it.hidden&&it.map===S.map&&it.x===x&&it.y===y&&!S.taken[it.id]);if(h)return pickItem(h);return;}
@@ -1185,7 +1292,7 @@ async function objectAction(x,y){
   if(o==='display')return say('Sobres de semillas de bancos de todo el mundo, ordenados por tipo.');
   if(o==='bottles')return say('Txakoli, pacharán y orujo casero.');
   if(o==='jukebox'){sfx('get');return say('La gramola suena: rock vasco de los 80.');}
-  if(o==='crate')return say('Cajas de pescado vacías del puerto.');
+  if(o==='crate')return say(S.map==='astilleros'?'Cajas de madera de los astilleros, podridas por la humedad.':'Cajas de pescado vacías del puerto.');
 }
 
 /* =========================================================
@@ -1270,18 +1377,20 @@ function tickMinute(){
   S.min++;if(S.min%10===0)plantsAdvance(10);
   if(S.min%30===0&&S.hp<S.hpMax)S.hp++;
   if(S.min>=1440){S.min-=1440;newDay();}
-  if(S.min%30===0&&S.map==='town')music(mapMusic());
+  if(S.min%30===0&&ZONAS[S.map])music(mapMusic());
 }
 function newDay(){
   S.day++;
+  // la cuota de Molina (1.10): pasado el último día pagado, se acaba la protección (antes de la redada de esta noche)
+  if(S.protect&&S.protHasta&&S.day>S.protHasta){S.protect=false;queue('cuota',()=>talk('SMS · MOLINA',['Se acabó lo pagado.','Si quieres que mis agentes sigan mirando hacia otro lado, ya sabes dónde está la comisaría.']));}
   if(S.heat>=90)queue('raid',raidEvent); // se comprueba antes de que el calor baje con el nuevo día
   S.heat=Math.max(0,S.heat-(S.protect?20:12));
-  const luz=facturaLuz(),olor=olorDia(),av=[];S.luz={d:S.day,e:luz,o:olor};if(luz>0){S.money=Math.max(0,S.money-luz);av.push('Factura de la luz: −'+eur(luz));}
+  const luz=facturaLuz(),olor=olorDia(),av=[];S.luz={d:S.day,e:luz,o:olor};if(luz>0){pagarCasa(luz);av.push('Factura de la luz: −'+eur(luz));}   // de lo de fuera y, si no llega, de la caja (1.10)
   if(olor){S.heat=Math.min(100,S.heat+olor);av.push('Olor a cogollo: calor +'+olor);}   // después de bajar el calor: cuenta para la redada de mañana
   const sec=S.esquejes.filter(e=>S.day-e.dia>ESQUEJE_DIAS).length;if(sec){S.esquejes=S.esquejes.filter(e=>S.day-e.dia<=ESQUEJE_DIAS);av.push(`Se ${sec>1?'han secado '+sec+' esquejes':'ha secado un esqueje'} sin plantar`);}
   if(av.length&&mode==='world')toast(av.join('<br>'),1600);
-  spawnClients();recibirPedido();
-  if(S.due>0&&S.flags.metB&&S.day>S.deadline)queue('penalty',penaltyEvent);
+  spawnClients();recibirPedido();instalarCaja();vencerEncargo();
+  if(S.due>0&&S.day>S.deadline)queue('penalty',penaltyEvent);   // 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
 }
 /* ---------- fenotipo (1.10) ----------
    Cada planta de semilla tira el suyo al germinar (t: THC, y: gramos; σ según tipoGen, 03-datos). Un esqueje es la misma
@@ -1382,6 +1491,7 @@ async function harvest(i){
   const [vx,vy]=posPlaza(i);await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:vx,y:vy-12});
   const cria=genDe(p.sid)<GEN_ESTABLE,fem=SHOP.some(it=>it.sid===p.sid),n=cria?ri(2,5):!fem||Math.random()<SEMILLA_HERMA?ri(1,3):0;
   addBuds(cl==='estrella'?p.sid+'*':p.sid,g,thc);if(n)addSeeds(p.sid,n);if(p.f&&p.f.id)S.fenos[p.f.id]=cl;S.pots[i]=null;sfx('get');
+  if(S.rec[p.sid]===1)S.rec[p.sid]=2;   // una variedad de receta sacada en la mesa, cosechada (capítulo 4)
   await say(`Cosechas ${g} g de ${s.n}. THC: ${pct(thc)}%.`);
   if(cl==='estrella'){sfx('enc');await say(`¡Fenotipo estrella! THC ×${coma(fe.t)} y cosecha ×${coma(fe.y)} sobre la media de la ${s.n}.`);await say('Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.');}
   else if(cl==='floja')await say(`Fenotipo flojo: THC ×${coma(fe.t)} y cosecha ×${coma(fe.y)} de la media.`);
@@ -1405,6 +1515,7 @@ async function bedAction(){
   advanceTime(mins);S.hp=S.hpMax;buildEnts();updateHUD();await wait(500);await fade(0);
   const hoy=S.luz&&S.luz.d===S.day&&S.luz;
   save();toast('Has descansado'+(hoy&&hoy.e?' · Luz −'+eur(hoy.e):'')+(hoy&&hoy.o?' · Olor: calor +'+hoy.o:'')+' · Partida guardada',1800);
+  if(S.ch===7&&!S.flags.robo&&(S.money>1000||totalBuds()>100))await roboDarko();   // la amenaza de Darko (1.10)
   await avisoPlaga(antes);
 }
 // al despertar (1.10): las plantas que han cogido plaga mientras dormías (y el insecticida que te queda), las que la siguen teniendo
@@ -1421,9 +1532,10 @@ async function avisoPlaga(antes){
   if(muertas.length)await say(`Se ha${n(muertas)} secado del todo ${lista(muertas)}. Retírala${s(muertas)} con A.`);
 }
 async function pcAction(){
-  const o=['Genoteca'].concat(S.ch>=2?['Banco de semillas']:[],['Guardar partida','Apagar']);
+  const o=['Genoteca'].concat(S.ch>=2?['Banco de semillas']:[],['Notas de la tía'],S.ch>=4&&S.caja&&S.caja.nivel===1&&!S.caja.mejora?['Caja empotrada']:[],['Guardar partida','Apagar']);
   const c=o[await ask('El ordenador de la tía. Tiene su registro de cultivos de veinte años.',o)];
   if(c==='Genoteca')await genoteca();else if(c==='Banco de semillas')await bancoSemillas();
+  else if(c==='Notas de la tía')await notasTia();else if(c==='Caja empotrada')await pedirCaja();
   else if(c==='Guardar partida')await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');
 }
 // banco de semillas (1.9): las landraces de Strainmon en sobres de SOBRE semillas, a precio de bancos de conservación
@@ -1435,11 +1547,11 @@ async function bancoSemillas(){
     const l=BANCO.filter(([,,ch])=>S.ch>=ch);
     const items=l.map(([k,p])=>{const s=STRAINS[k],n=S.pedido.filter(x=>x===k).length;return {label:s.n+(n?' · pedida':''),right:eur(p),sw:s.c,ic:iconoCogollo(k),desc:strainLine(k)+'\n'+s.h};});
     items.push({label:'Salir',desc:'Los pedidos llegan mañana por la mañana.'});
-    i=await menu(items,{cls:'full',title:'BANCO DE SEMILLAS',title2:`Sobres de ${SOBRE} · tienes `+eur(S.money),desc:true,initial:i});
+    i=await menu(items,{cls:'full',title:'BANCO DE SEMILLAS',title2:`Sobres de ${SOBRE} · tienes `+eur(S.money+cajaE()),desc:true,initial:i});
     if(i<0||i>=l.length)return;
     const [k,p]=l[i];
-    if(S.money<p){sfx('bad');await say('No te llega el dinero.');continue;}
-    S.money-=p;S.pedido.push(k);sfx('coin');toast('Pedido: '+STRAINS[k].n+' · llega mañana',1400);
+    if(S.money+cajaE()<p){sfx('bad');await say('No te llega el dinero.');continue;}
+    pagarCasa(p);S.pedido.push(k);sfx('coin');toast('Pedido: '+STRAINS[k].n+' · llega mañana',1400);
   }
 }
 function recibirPedido(){
@@ -1470,6 +1582,7 @@ async function labAction(){
   if(await ask(`¿Cruzar ${getStrain(A).n} × ${getStrain(Bk).n}? Gastas 1 semilla de cada.`,['Cruzar','Cancelar'])!==0)return;
   S.seeds[A]--;S.seeds[Bk]--;for(const k of [A,Bk])if(!S.seeds[k])delete S.seeds[k];
   const r=crossResult(A,Bk),isNew=!S.disc[r],s=getStrain(r);if(isNew)S.gen[r]=1;
+  if(RECIPES[[A,Bk].sort().join('+')]&&!S.rec[r])S.rec[r]=1;   // de receta, sacada en la mesa: falta cosecharla (capítulo 4)
   await accion('cruzar',{id:'vfx-polen',x:P.px+8,y:P.py-4});
   sfx('enc');await fade(1,true);await wait(450);await fade(0,true);
   addSeeds(r,2);
@@ -1928,16 +2041,22 @@ async function abrirCarpa(ci){
    Precios reales (1.10): en la calle, el gramo a 6-10 € según el THC (× el tipo de cliente y lo que pidas); al por mayor,
    3,20-5 € (ventaMayor, 11-historia). */
 const precioCalle=thc=>4+thc*.2,precioMayor=thc=>2+thc*.1;
+// clientes del día por zona (1.10): en el barrio, como siempre; en el barrio alto, pijos y turistas desde el capítulo 3; en los
+// astilleros (las esquinas de Darko), estudiantes y currelas
 function spawnClients(){
   S.clientsDay=S.day;S.clients=[];
   if(S.ch>=2){
-    const n=Math.min(10,4+Math.floor(S.rep/15)+(S.ch>=4?1:0)),used=new Set(NPCDEF.filter(d=>d.map==='town').map(d=>d.x+','+d.y).concat(ITEMS.map(it=>it.x+','+it.y)));
-    for(let i=0;i<n;i++){let t;for(let k=0;k<30;k++){t=pick(CLIENT_TILES);if(!used.has(t+''))break;}used.add(t+'');
-      const types=['est','est','cur','cur'];if(S.ch>=3)types.push('tur');if(S.ch>=4)types.push('pij','pij');
-      const type=pick(types),ct=CTYPES[type],id='c'+S.day+'_'+i;
-      S.clients.push({id,x:t[0],y:t[1],type,want:ri(ct.g[0],ct.g[1]),minThc:type==='pij'?Math.min(24,15+S.ch):(type==='tur'&&Math.random()<.4?15:0),look:randLook(id,'client')});}
+    const n=Math.min(10,4+Math.floor(S.rep/15)+(S.ch>=4?1:0));
+    const tipos=()=>{const t=['est','est','cur','cur'];if(S.ch>=3)t.push('tur');if(S.ch>=4)t.push('pij','pij');return t;};
+    const zonas=[['town',n,tipos()],['astilleros',2+(S.ch>=4?1:0),['est','cur']]];if(S.ch>=3)zonas.push(['alto',2+(S.ch>=4?1:0),['pij','tur']]);
+    for(const [map,nz,types] of zonas){
+      const used=new Set(NPCDEF.filter(d=>d.map===map).map(d=>d.x+','+d.y).concat(ITEMS.filter(it=>it.map===map).map(it=>it.x+','+it.y)));
+      for(let i=0;i<nz;i++){let t;for(let k=0;k<30;k++){t=pick(CLIENT_TILES[map]);if(!used.has(t+''))break;}used.add(t+'');
+        const type=pick(types),ct=CTYPES[type],id='c'+S.day+'_'+{town:'',alto:'b',astilleros:'s'}[map]+i;
+        S.clients.push({id,map,x:t[0],y:t[1],type,want:ri(ct.g[0],ct.g[1]),minThc:type==='pij'?Math.min(24,15+S.ch):(type==='tur'&&Math.random()<.4?15:0),look:randLook(id,'client')});}
+    }
   }
-  if(S.map==='town')buildEnts();
+  if(ZONAS[S.map])buildEnts();
 }
 function removeClient(id){S.clients=S.clients.filter(c=>c.id!==id);ents=ents.filter(e=>e.id!==id);}
 async function talkClient(c){
@@ -1948,7 +2067,7 @@ async function talkClient(c){
   if(!lots.length)return say(totalBuds()>0?'Eso no me vale. Vuelve cuando tengas lo que busco.':'¿No llevas nada? Vale.',N);
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué le vendes?'});
   if(i<0||i>=lots.length)return say('Vale, otro día.',N);
-  const [sid,b]=lots[i],base=precioCalle(b.thc)*ct.mult*c.want;
+  const [sid,b]=lots[i],base=precioCalle(b.thc)*ct.mult*ZONAS[c.map||'town'].precio*c.want;
   const pr=[Math.round(base*.85),Math.round(base),Math.round(base*1.3)];
   const j=await ask(`${c.want} g de ${lotNombre(sid)}. ¿Cuánto le pides?`,[`Rebaja · ${pr[0]} €`,`Justo · ${pr[1]} €`,`Caro · ${pr[2]} €`,'Cancelar']);
   if(j===3)return say('Entonces me voy.',N);
@@ -1960,6 +2079,8 @@ async function talkClient(c){
     await say(pick(['Trato hecho.','Gracias. Nos vemos.','Bien. Se lo diré a mis amigos.']),N);
     toast(`+${eur(pr[j])} · ${c.want} g vendidos`,1600);
     heatWarn();await checkStory();
+    // en las esquinas de Darko (1.10), 1 de cada 3 ventas acaba con uno de sus chicos encima
+    if(c.map==='astilleros'&&Math.random()<1/3){await say('Uno de los chicos de Darko te ha visto vender.');await say('«Te dijimos que lejos de nuestras esquinas.»','CHICO DE DARKO');await battle('thief');}
   }else{S.rep=Math.max(0,S.rep-1);sfx('bad');removeClient(c.id);await say(pick(['¿Tanto? No.','A ese precio, paso.','Eso es demasiado. Adiós.']),N);}
 }
 function heatWarn(){if(S.heat>=70&&!S.flags.heatW){S.flags.heatW=true;toast('<small>CUIDADO</small>Mucha presión policial. Si llega a 90 habrá registro.',3200);}if(S.heat<60)S.flags.heatW=false;}
@@ -2062,10 +2183,11 @@ async function talkKiko(){
     await talk(N,['Ya me han contado que has pagado a Baltasar. Bien hecho.','Te he montado en el piso mi equipo de polinización: pinceles, bolsas de papel y una lupa.']);
     S.flags.lab=true;await got('la MESA DE GENÉTICA');
     addSeeds('rif',3);await got('3 semillas de AFGHANI');
-    await talk(N,['Me las trajo un amigo de Mazar-i-Sharif en los ochenta. Las he ido renovando desde entonces.','En la mesa polinizas una variedad con otra: gastas una semilla de cada y obtienes 2 del cruce.','Algunos cruces dan variedades conocidas. Otros, híbridos que solo tendrás tú.','Apúntalo todo en la GENOTECA. Las mejores genéticas salen de cruzar cruces.']);
+    await talk(N,['Me las trajo un amigo de Mazar-i-Sharif en los ochenta. Las he ido renovando desde entonces.','En la mesa polinizas una variedad con otra: gastas una semilla de cada y obtienes 2 del cruce.','Algunos cruces dan variedades conocidas. Otros, híbridos que solo tendrás tú.','Apúntalo todo en la GENOTECA. Las mejores genéticas salen de cruzar cruces.',
+      'Empieza por las conocidas: saca dos de receta en la mesa y cosecha una planta de cada. Patxi, el de la plaza, se sabe unas cuantas.']);
     showObjective();await checkStory();return;
   }
-  if(!Object.keys(S.seeds).length&&!S.pots.some(Boolean)&&!totalBuds()&&S.money<15){
+  if(!Object.keys(S.seeds).length&&!S.pots.some(Boolean)&&!totalBuds()&&!cajaG()&&S.money+cajaE()<15){   // lo de la caja también cuenta (1.10)
     await say('¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.',N);addSeeds('ria',2);await got('2 semillas de SKUNK #1');
   }
   const c=await ask('¿Qué necesitas?',['Comprar','Un consejo','Nada'],N);
@@ -2081,7 +2203,17 @@ async function talkJosune(){
 async function talkPatxi(){S.patxi=(S.patxi||0)+1;await say(S.ch<4?'Cuando tengas una mesa de genética, ven a verme. Algo sé de cruces.':'Cuarenta años cultivando en el monte. Te digo una cosa: '+RECIPE_HINTS[S.patxi%RECIPE_HINTS.length],'PATXI');}
 async function talkTxaro(){
   const N='ABUELA TXARO';
-  if(S.flags.txaro)return say(pick(['Ya duermo de un tirón. Gracias, de verdad.','Tu tía me ayudaba igual. No se lo contábamos a nadie.']),N);
+  if(S.flags.txaro&&(S.flags.txaro2||S.ch<4))return say(pick(['Ya duermo de un tirón. Gracias, de verdad.','Tu tía me ayudaba igual. No se lo contábamos a nadie.']),N);
+  // segunda misión (1.10), en su casa desde el capítulo 4: 10 g de una índica (70 % o más)
+  if(S.flags.txaro){
+    await talk(N,['El aceite me ha devuelto el sueño. Gracias, de verdad.','Pero el dolor no se va. El médico dice que, para eso, mejor una índica: relaja más.','¿Me traerías 10 gramos de una índica? De las de hoja ancha.']);
+    const lots=budLots(10).filter(([k])=>indDe(lotSid(k))>=70);if(!lots.length)return say('Cuando tengas 10 gramos de una índica, ven a verme. Aquí estaré.',N);
+    const i=await menu(lots.map(lotItem).concat([{label:'Ahora no'}]),{cls:'right',title:'¿Qué le das?'});
+    if(i<0||i>=lots.length)return say('No pasa nada. Aquí estaré.',N);
+    useBuds(lots[i][0],10);S.rep+=5;
+    await say('Toma, las últimas de mi Paco. Las trajo de Chitral, en las montañas de Pakistán.',N);
+    addSeeds('chitral',3);await got('3 semillas de CHITRAL KUSH');S.items.bocata+=3;await got('3 × BOCATA');S.flags.txaro2=true;return;
+  }
   await talk(N,['Tú vives en el piso de Maite. Tu tía me ayudaba con... ya sabes.','Desde la quimio apenas duermo y no tengo hambre. Las pastillas no me hacen nada.','Me vendrían bien 5 gramos, para hacer aceite como me enseñó ella. ¿Me los das?']);
   const lots=budLots(5);if(!lots.length)return say('Cuando tengas 5 gramos, acuérdate de mí.',N);
   const i=await menu(lots.map(lotItem).concat([{label:'Ahora no'}]),{cls:'right',title:'¿Qué le das?'});
@@ -2089,6 +2221,8 @@ async function talkTxaro(){
   useBuds(lots[i][0],5);
   await say('Gracias. Toma: las trajo mi Paco de Pakistán en el setenta y seis. Nunca supe qué hacer con ellas.',N);
   addSeeds('hindu',2);await got('2 semillas de HINDU KUSH');S.items.bocata+=3;await say('Y llévate estos bocadillos, que comes poco.',N);await got('3 × BOCATA');S.flags.txaro=true;
+  await say('Me voy a casa a preparar el aceite. Vivo en la casa gris, al lado del bar. Pásate cuando quieras.',N);
+  if(S.map==='town'){await fade(1);buildEnts();await fade(0);}
 }
 // Iñaki: 10 g para el viaje, una vez al día; desde el capítulo 3 también compra al por mayor (ventaMayor)
 async function talkInaki(){
@@ -2107,8 +2241,9 @@ async function talkInaki(){
   await checkStory();
 }
 // al por mayor (1.10): lotes de 100 g para arriba a precioMayor (10-calle), una carga al día y hasta mayorDia() gramos;
-// sube poco el calor (es una sola entrega) pero algo más cuanto más grande
+// sube el calor 2 + 1 por cada 100 g (1.10: antes, por cada 250 g)
 const mayorDia=()=>IMPERIO[S.ch>=8?imperioNivel():0].mayor;
+const kgTxt=g=>g>=1000?coma(g/1000)+' kg':g+' g';
 async function ventaMayor(N){
   if(S.mDay===S.day)return say('Hoy ya he cargado. Mañana sale otro barco.',N);
   const lots=budLots(100);
@@ -2116,11 +2251,11 @@ async function ventaMayor(N){
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote?'});
   if(i<0||i>=lots.length)return say('Otro día.',N);
   const [k,b]=lots[i],pg=Math.round(precioMayor(b.thc)*100)/100,tope=Math.min(Math.floor(b.g),mayorDia());
-  const ops=[100,250,500,1000,2000,5000,10000].filter(g=>g<tope).concat([tope]),kg=g=>g>=1000?coma(g/1000)+' kg':g+' g';
+  const ops=[100,250,500,1000,2000,5000,10000].filter(g=>g<tope).concat([tope]),kg=kgTxt;
   const j=await ask(`${lotNombre(k)} a ${coma(pg.toFixed(2))} € el gramo. ¿Cuánto cargas?`,ops.map(g=>`${kg(g)} · ${eur(g*pg)}`).concat(['Nada']),N);
   if(j<0||j>=ops.length)return;
   const g=ops[j],e=Math.round(g*pg);
-  useBuds(k,g);S.money+=e;S.sales+=e;S.mDay=S.day;S.heat=Math.min(100,S.heat+2+g/250);S.rep+=1;sfx('coin');
+  useBuds(k,g);S.money+=e;S.sales+=e;S.mDay=S.day;S.heat=Math.min(100,S.heat+2+g/100);S.rep+=1;sfx('coin');
   await accion('vender',{id:'vfx-monedas',x:P.px+8,y:P.py+2});
   toast(`+${eur(e)} · ${kg(g)} al por mayor`,1600);
   await say('Cargado. Esta noche sale en el barco.',N);heatWarn();await checkStory();
@@ -2132,17 +2267,23 @@ async function talkCop(){
 async function talkDarko(){
   const N='DARKO';
   if(S.ch===6)return talk(N,['¿Vienes a la Copa? Mi AMNESIA HAZE dio un 26,8 % de THC en el laboratorio.','Nadie en Ribera ha pasado del 26. No vas a ser tú el primero.']);
+  if(S.ch>=7)return talk(N,[S.flags.robo?'¿Has dormido bien últimamente?':'Mi tío dice que ya no le debes nada. A mí, sí.','Estas esquinas son mías. Si vendes aquí, mis chicos te lo van a recordar.']);   // en los astilleros (1.10)
   S.flags.darko1=true;
   await talk(N,['Así que tú te has quedado el piso de Maite.','Soy DARKO. La hierba de este barrio la muevo yo.','Vende lo tuyo si quieres, pero lejos de mis esquinas.','No me hagas repetirlo.']);
   await fade(1);buildEnts();await fade(0);
 }
+// la cuota de Molina (1.10): SOBORNO cada CUOTA_DIAS días (S.protHasta, el último día cubierto; newDay la da por acabada).
+// La primera vez, en la plaza; después, en la comisaría del barrio alto
+const CUOTA_DIAS=10;
 async function talkMolina(){
-  const N='SARGENTO MOLINA';
-  if(!S.flags.molina1){S.flags.molina1=true;await talk(N,['Así que eres tú quien vende en la plaza.','Podría detenerte ahora mismo. O podemos entendernos.',`Por ${eur(SOBORNO)} mis patrullas no pasan por tu calle. Y nada de registros en tu piso.`]);}
-  const c=await ask('¿Aceptas el trato del sargento?',['Pagar '+eur(SOBORNO),'No'],N);
-  if(c===0){if(S.money<SOBORNO)return say('¿Con qué dinero? Vuelve cuando lo tengas.',N);
-    S.money-=SOBORNO;S.protect=true;sfx('coin');await say('Bien. Mis agentes mirarán hacia otro lado.',N);await fade(1);buildEnts();await fade(0);}
-  else{S.heat=Math.min(100,S.heat+10);await say('Tú sabrás. Mis agentes van a estar muy atentos.',N);heatWarn();}
+  const N='SARGENTO MOLINA',plaza=S.map==='town';
+  if(!S.flags.molina1){S.flags.molina1=true;await talk(N,['Así que eres tú quien vende en la plaza.','Podría detenerte ahora mismo. O podemos entendernos.',`Por ${eur(SOBORNO)} cada ${CUOTA_DIAS} días, mis patrullas no pasan por tu calle. Y nada de registros en tu piso.`]);}
+  else if(S.protect)await say(`Estás cubierto hasta el día ${S.protHasta}. ${S.protHasta>S.day?`Te quedan ${S.protHasta-S.day} días.`:'Se acaba HOY.'}`,N);
+  const c=await ask(S.protect?'¿Pagar ya los diez días siguientes?':'¿Aceptas el trato del sargento?',['Pagar '+eur(SOBORNO),'No'],N);
+  if(c===0){if(S.money<SOBORNO)await say('¿Con qué dinero? Vuelve cuando lo tengas.',N);
+    else{S.money-=SOBORNO;S.protHasta=Math.max(S.day,S.protect?S.protHasta:0)+CUOTA_DIAS;S.protect=true;sfx('coin');await say(`Bien. Mis agentes mirarán hacia otro lado hasta el día ${S.protHasta}.`,N);}}
+  else if(!S.protect){S.heat=Math.min(100,S.heat+10);await say('Tú sabrás. Mis agentes van a estar muy atentos.',N);heatWarn();}
+  if(plaza){await say('Si me necesitas, estoy en la comisaría del barrio alto.',N);await fade(1);buildEnts();await fade(0);}
 }
 async function talkJurado(){
   const N='JURADO';
@@ -2164,11 +2305,12 @@ async function talkJurado(){
 async function talkBaltasar(){
   const N='DON BALTASAR';
   if(S.ch<3)return say('¿Y tú quién eres? No tengo nada que hablar contigo.',N);
+  // el plazo corre desde que Toño te avisa (1.10): si tardas más de 2 días en venir, «Llegas tarde»
   if(S.ch===3&&!S.flags.metB){
-    await talk(N,['Siéntate, {N}. Vamos al grano.',`Tu tía Maite me debía ${eur(DEUDA).replace(' €',' euros')}. Las deudas no se mueren con la gente.`,`Me los vas a pagar a plazos. El primero, ${eur(PLAZOS[3])}.`,'Tienes siete días. Si no, Toño te hará una visita. Y Toño cobra intereses.']);
-    S.flags.metB=true;S.due=PLAZOS[3];S.deadline=S.day+7;showObjective();return;
+    await talk(N,[S.day-S.flags.tono>2?'Llegas tarde, {N}. Toño te dijo «hoy».':'Siéntate, {N}. Vamos al grano.',`Tu tía Maite me debía ${eur(DEUDA).replace(' €',' euros')}. Las deudas no se mueren con la gente.`,`Me los vas a pagar a plazos. El primero, ${eur(S.due)}${S.due>PLAZOS[3]?', con los intereses de tu retraso':''}.`,`Tienes hasta el día ${S.deadline}. Si no, Toño te hará una visita. Y Toño cobra intereses.`]);
+    S.flags.metB=true;showObjective();return;
   }
-  if(S.ch>=8)return say('Ya no me debes nada. Que te vaya bien, {N}.',N);
+  if(S.ch>=8)return encargoBaltasar(N);
   if(S.ch===4)return say('Tranquilo. Ya te avisaré cuando toque el siguiente pago.',N);
   if(S.ch===6)return say('Primero, la Copa. Darko te espera en la plaza.',N);
   const left=S.deadline-S.day;
@@ -2180,7 +2322,7 @@ async function talkBaltasar(){
     await talk(N,['Puntual. Así me gusta.',`Quedan ${eur(S.debt).replace(' €','')}. Ya te avisaré del siguiente plazo.`]);
     await chapter(4);await talk('SMS · KIKO',['Pásate por el growshop. Tengo algo para ti.']);showObjective();
   }else if(S.ch===5){
-    await talk(N,['Me sorprendes, {N}.',`Quedan ${eur(S.debt).replace(' €','')}. Te propongo algo.`,`El sábado es la COPA DE RIBERA. Premio: ${eur(PREMIO_COPA)}.`,'Mi sobrino Darko compite. No ha perdido nunca.','Gana la Copa y, con el premio y lo que vendas, me pagas lo que queda. Si puedes.']);
+    await talk(N,['Me sorprendes, {N}.',`Quedan ${eur(S.debt).replace(' €','')}. Te propongo algo.`,`La COPA DE RIBERA se juega estos días en la plaza. Premio: ${eur(PREMIO_COPA)}.`,'Mi sobrino Darko compite. No ha perdido nunca.','Gana la Copa y, con el premio y lo que vendas, me pagas lo que queda. Si puedes.']);
     await chapter(6);showObjective();
   }else if(S.ch===7){
     await talk(N,[`${eur(paid)}. Contados.`,'Deuda saldada. Lo de tu tía queda cerrado.','Una cosa más, {N}: si algún día quieres trabajar para mí, ya sabes dónde estoy.']);
@@ -2193,13 +2335,14 @@ async function chapter(n){S.ch=n;sfx('get');toast(`<small>CAPÍTULO ${n}</small>
 function objectiveText(){
   switch(S.ch){
     case 1:return !S.flags.letter?'Lee la carta que hay en la mesa.':!S.flags.kiko1?'Visita el growshop de Kiko, al lado de casa.':'Planta y consigue tu primera cosecha.';
-    case 2:return `Gana ${META_VENTAS} € vendiendo en la calle (${Math.min(META_VENTAS,Math.round(S.sales))}/${META_VENTAS}).`;
-    case 3:return !S.flags.metB?'Ve al bar El Ancla.':`Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
-    case 4:return !S.flags.lab?'Kiko quiere verte en el growshop.':`Descubre 8 variedades (${discCount()}/8).`;
+    case 2:return `Gana ${META_VENTAS} € vendiendo (${Math.min(META_VENTAS,Math.round(S.sales))}/${META_VENTAS}).`;
+    case 3:return !S.flags.metB?`Ve al bar El Ancla antes del día ${S.deadline}: Don Baltasar quiere ${eur(S.due)}.`:`Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
+    case 4:return !S.flags.lab?'Kiko quiere verte en el growshop.':`Saca en la mesa 2 variedades de receta y cosecha una planta de cada (${recCount()}/2).`;
     case 5:return `Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
     case 6:return 'Gana la Copa: 20 g con más de 26,8% de THC al jurado de la plaza.';
     case 7:return `Paga los últimos ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
-    default:{const n=imperioNivel(),sig=IMPERIO[n+1],gen=`Genoteca ${DEX.filter(k=>S.disc[k]).length}/${DEX.length}`;
+    default:{if(S.encargo)return `Encargo de Don Baltasar: lleva ${kgTxt(S.encargo.g)} al almacén de los astilleros, de noche, antes de que acabe el día ${S.encargo.hasta}.`;
+      const n=imperioNivel(),sig=IMPERIO[n+1],gen=`Genoteca ${DEX.filter(k=>S.disc[k]).length}/${DEX.length}`;
       return sig?`Tu imperio · ${IMPERIO[n].n}. Facturado desde la deuda: ${eur(Math.min(sig.meta,facturado()))} de ${eur(sig.meta)} para ser ${sig.n.toLowerCase()}. ${gen}.`:`Tu imperio · ${IMPERIO[n].n}. Completa la ${gen}.`;}
   }
 }
@@ -2215,32 +2358,54 @@ async function checkStory(){
     await talk('SMS · KIKO',['Primera cosecha. Bien hecho.','La gente que busca material lleva un $ encima. Puedes venderles en la calle.','Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba.']);showObjective();
   }
   if(S.ch===2&&S.sales>=META_VENTAS){
-    await chapter(3);
+    S.due=PLAZOS[3];S.deadline=S.day+7;S.flags.tono=S.day;await chapter(3);   // el plazo, desde ya (1.10)
     await say('Un hombre enorme en chándal te corta el paso.');
-    await talk('TOÑO',['Tú vives en el piso de Maite, ¿no?','Don Baltasar quiere verte. En el bar El Ancla. Hoy.','No me hagas venir a buscarte.']);showObjective();
+    await talk('TOÑO',['Tú vives en el piso de Maite, ¿no?','Don Baltasar quiere verte. En el bar El Ancla. Hoy.','Y ve contando: tienes siete días para el primer pago.','No me hagas venir a buscarte.']);showObjective();
   }
   if(S.ch>=8&&imperioNivel()>(S.impN||0)){
     S.impN=imperioNivel();const r=IMPERIO[S.impN];sfx('get');toast(`<small>TU IMPERIO</small>${r.n}`,2800);
     await talk('SMS · IÑAKI',[`Se corre la voz: ${eur(facturado())} vendidos desde que pagaste a Baltasar.`,`Desde hoy te cargo hasta ${r.mayor>=1000?coma(r.mayor/1000)+' kg':r.mayor+' g'} al día en el barco.`]);showObjective();
   }
-  if(S.ch===4&&S.flags.lab&&discCount()>=8){
+  if(S.ch===4&&S.flags.lab&&recCount()>=2){
     S.due=PLAZOS[5];S.deadline=S.day+10;await chapter(5);
     await talk('SMS · TOÑO',[`Don Baltasar quiere ${eur(PLAZOS[5])} en diez días.`,'Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza.']);showObjective();
   }
 }
 async function penaltyEvent(){
   await say('TOÑO te estaba esperando.');
-  const int=Math.round(S.due*INTERES/100)*100;
+  const int=Math.round(S.due*INTERES/100)*100;S.vencidos++;
   await talk('TOÑO',['Don Baltasar dice que llegas tarde.',`Son ${eur(int)} más de intereses. Y esto, para que no se te olvide.`]);
   sfx('hurt');S.hp=Math.max(1,S.hp-15);S.due+=int;S.debt+=int;S.deadline=S.day+5;
   await say(`La deuda del plazo sube a ${eur(S.due)}. Nuevo límite: día ${S.deadline}.`);
+  if(S.vencidos>=3){S.vencidos=0;await embargo();}
 }
+// al tercer plazo vencido (1.10), Toño se lleva la carpa más grande del fondo o de junto a la cama (B o C), con su foco, sus
+// extras y sus plantas; sin ninguna de las dos, la mitad del dinero que llevas encima
+const areaCarpa=ci=>CARPAS[S.carpas[ci].t].cm[0]*CARPAS[S.carpas[ci].t].cm[2];
+function quitarCarpa(ci){
+  const antes=huecos().map(h=>h.c+':'+h.j),pots=S.pots,mac=S.macetas;
+  S.carpas[ci]=null;
+  const k=huecos().map(h=>antes.indexOf(h.c+':'+h.j));
+  S.pots=k.map(j=>pots[j]||null);S.macetas=k.map(j=>mac[j]||'plastico7');montarCasa();
+}
+async function embargo(){
+  const l=[1,2].filter(ci=>S.carpas[ci]),ci=l.length?l.reduce((a,b)=>areaCarpa(b)>areaCarpa(a)?b:a):-1;
+  await talk('TOÑO',['Tres plazos tarde. Don Baltasar se cobra en especie.']);
+  if(ci>=0){const n=CARPAS[S.carpas[ci].t].n;quitarCarpa(ci);sfx('bad');await say(`TOÑO se lleva tu ${n}, con su foco y sus plantas.`);}
+  else{const e=Math.floor(S.money/2);S.money-=e;sfx('bad');await say(`TOÑO te vacía los bolsillos: se lleva ${eur(e)}.`);}
+}
+// la redada (1.10, con la caja): lo de fuera, siempre; la caja, 1 de cada 4 veces (sus gramos y la mitad de su dinero). La
+// multa sale de lo de fuera y, si no llega, de la caja
 async function raidEvent(){
   if(S.protect){S.heat=50;return talk('SMS · MOLINA',['Esta noche había orden de entrada en tu piso. La he parado.','Baja el ritmo.']);}
   sfx('bad');await say('REDADA. La policía entra en tu piso.');
-  const g=Math.floor(totalBuds()),fine=Math.min(S.money,MULTA_REDADA);
-  S.pots=S.pots.map(()=>null);S.buds={};S.heat=30;S.money-=fine;
+  const g=Math.floor(totalBuds());
+  S.pots=S.pots.map(()=>null);S.buds={};S.heat=30;
+  const hallada=!!S.caja&&Math.random()<CAJA_REDADA,cg=hallada?Math.floor(cajaG()):0,ce=hallada?Math.floor(S.caja.money/2):0;
+  if(hallada){S.caja.buds={};S.caja.money-=ce;}
+  const fine=MULTA_REDADA-pagarCasa(MULTA_REDADA);
   await say(`Se llevan todas las plantas y ${g} g. Multa: ${eur(fine)}.`);
+  if(S.caja)await say(hallada?`Encuentran la caja de detrás del diploma: se llevan ${cg} g y ${eur(ce)}.`:'La caja de detrás del diploma ni la ven.');
   await say('Toca empezar de nuevo. Y vender menos una temporada.');
 }
 async function ending(){
@@ -2251,6 +2416,118 @@ async function ending(){
   await fade(1);e.hidden=true;await fade(0);await chapter(8);showObjective();
 }
 
+/* =========================================================
+   LA CAJA FUERTE, EL ROBO DE DARKO Y LOS ENCARGOS DE BALTASAR (1.10)
+   ========================================================= */
+// la caja: C, la de la tía Maite, detrás del diploma de la Copa de 1998 (la pista está en sus notas del ordenador): 20.000 € y
+// 2 kg; B, la empotrada, por el ordenador desde el capítulo 4 (CAJA_P, la instala Kiko al día siguiente): 50.000 € y 2,5 kg.
+// Lo que hay dentro no va encima: no cuenta para los encuentros ni te lo quitan un control, un ladrón o Darko. En una redada la
+// encuentran 1 de cada 4 veces (CAJA_REDADA). La luz y lo que se compra por el ordenador se pagan de fuera y, si no llega, de la caja
+const CAJA=[null,{n:'La caja de la tía',money:20000,g:2000},{n:'La caja empotrada',money:50000,g:2500}],CAJA_P=380,CAJA_REDADA=.25,CAJA_ANIO=1998,MAITE_CAJA=300;
+const cajaG=()=>S.caja?Object.values(S.caja.buds).reduce((a,b)=>a+b.g,0):0,cajaE=()=>S.caja?S.caja.money:0;
+// pagar desde el piso: primero lo de fuera y después la caja. Devuelve lo que falta
+function pagarCasa(e){const a=Math.min(S.money,e);S.money-=a;e-=a;if(e>0&&S.caja){const b=Math.min(S.caja.money,e);S.caja.money-=b;e-=b;}return e;}
+// g gramos del lote k de «de» a «a»: si el lote ya está, se juntan con el THC medio por gramos
+function moverLote(de,a,k,g){const b=de[k],t=a[k];if(t){t.thc=(t.thc*t.g+b.thc*g)/(t.g+g);t.g+=g;}else a[k]={g,thc:b.thc};b.g-=g;if(b.g<.5)delete de[k];}
+async function diplomaAction(){
+  if(S.caja)return cajaAction();
+  if(await ask('Un diploma enmarcado: «COPA DE RIBERA 1998 · 2º PREMIO: MAITE».',['Mirar detrás','Dejarlo'])!==0)return;
+  await say('Detrás del marco hay una caja fuerte empotrada en la pared. Tiene una rueda de cuatro cifras.');
+  const ops=['1976','1979','1987','1998'],j=await ask('¿Qué combinación pruebas?',ops.concat(['Dejarlo']));
+  if(j<0||j>=ops.length)return;
+  if(+ops[j]!==CAJA_ANIO){sfx('bump');return say('Clac. No se abre.');}
+  S.caja={money:MAITE_CAJA,buds:{},nivel:1};sfx('get');
+  await say('Clic. La caja se abre.');
+  await say(`Dentro hay ${eur(MAITE_CAJA)} y una nota de la tía: «Para ti, {N}. Lo que guardes aquí no te lo quita nadie en la calle».`);
+  await say(`Caben ${eur(CAJA[1].money)} y ${kgTxt(CAJA[1].g)}. Lo que está dentro no lo llevas encima.`);
+}
+// cuánto: los pasos que caben por debajo del máximo y el máximo; 0 si no eliges nada
+async function cuanto(txt,max,pasos,fmt){
+  const ops=pasos.filter(v=>v<max).concat([max]),j=await ask(txt,ops.map(fmt).concat(['Nada']));
+  return j>=0&&j<ops.length?ops[j]:0;
+}
+const gTxt=g=>Math.floor(g)+' g';
+async function cajaAction(){
+  for(;;){
+    const C=CAJA[S.caja.nivel],ops=['Guardar todo','Guardar dinero','Guardar cogollos','Sacar dinero','Sacar cogollos','Sacar todo','Cerrar'];
+    const op=ops[await ask(`${C.n}: ${eur(S.caja.money)} y ${gTxt(cajaG())} (caben ${eur(C.money)} y ${kgTxt(C.g)}).\nEncima: ${eur(S.money)} y ${gTxt(totalBuds())}.`,ops)];
+    if(!op||op==='Cerrar')return;
+    const hueco=()=>C.g-cajaG();
+    if(op==='Guardar todo'){
+      const e=Math.min(S.money,C.money-S.caja.money);S.money-=e;S.caja.money+=e;let g=0;
+      for(const [k,b] of Object.entries(S.buds)){const q=Math.min(b.g,hueco());if(q<=0)break;g+=q;moverLote(S.buds,S.caja.buds,k,q);}
+      sfx('sel');await say(`Guardas ${eur(e)} y ${gTxt(g)}.${S.money>=1||totalBuds()>=1?' No cabe todo: el resto se queda fuera.':''}`);
+    }else if(op==='Sacar todo'){
+      const e=S.caja.money,g=cajaG();S.money+=e;S.caja.money=0;for(const k of Object.keys(S.caja.buds))moverLote(S.caja.buds,S.buds,k,S.caja.buds[k].g);
+      sfx('sel');await say(`Sacas ${eur(e)} y ${gTxt(g)}.`);
+    }else if(op==='Guardar dinero'||op==='Sacar dinero'){
+      const mete=op==='Guardar dinero',max=mete?Math.min(S.money,C.money-S.caja.money):S.caja.money;
+      if(max<1){await say(mete?(S.money<1?'No llevas dinero encima.':'No cabe más dinero.'):'La caja no tiene dinero.');continue;}
+      const e=await cuanto(mete?'¿Cuánto guardas?':'¿Cuánto sacas?',max,[100,500,1000,5000,10000,20000],eur);if(!e)continue;
+      S.money+=mete?-e:e;S.caja.money+=mete?e:-e;sfx('sel');
+    }else{
+      const mete=op==='Guardar cogollos',de=mete?S.buds:S.caja.buds,a=mete?S.caja.buds:S.buds,lots=Object.entries(de);
+      if(!lots.length){await say(mete?'No llevas cogollos encima.':'La caja no tiene cogollos.');continue;}
+      if(mete&&hueco()<1){await say('No caben más cogollos.');continue;}
+      const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:mete?'¿Qué guardas?':'¿Qué sacas?'});
+      if(i<0||i>=lots.length)continue;
+      const [k,b]=lots[i],g=await cuanto(`${lotNombre(k)}: ¿cuánto?`,mete?Math.min(b.g,hueco()):b.g,[10,50,100,500,1000],gTxt);if(!g)continue;
+      moverLote(de,a,k,g);sfx('sel');
+    }
+  }
+}
+// el ordenador: las notas de la tía (la pista de la combinación) y la caja empotrada
+async function notasTia(){await talk('NOTAS DE LA TÍA',['«Veinte años de cultivos, apuntados día a día.»','«Lo que no quiero llevar a la calle lo guardo detrás de mi premio. La combinación, el año en que lo gané.»']);}
+async function pedirCaja(){
+  if(await ask(`Caja empotrada: ${eur(CAJA[2].money)} y ${kgTxt(CAJA[2].g)}. Kiko la instala mañana detrás del diploma, con lo que ya tengas dentro. ${eur(CAJA_P)}.`,['Pedirla','Nada'])!==0)return;
+  if(S.money+cajaE()<CAJA_P){sfx('bad');return say('No te llega el dinero.');}
+  pagarCasa(CAJA_P);S.caja.mejora=1;sfx('coin');toast('Pedida: caja empotrada · llega mañana',1400);
+}
+function instalarCaja(){
+  if(!S.caja||!S.caja.mejora)return;
+  delete S.caja.mejora;S.caja.nivel=2;
+  queue('caja',async()=>{sfx('get');await talk('SMS · KIKO',['Ya está: la caja empotrada, detrás del diploma. Lo de la vieja lo tienes dentro.',`Caben ${eur(CAJA[2].money)} y ${kgTxt(CAJA[2].g)}.`]);});
+}
+// el robo de Darko: la primera noche del capítulo 7 que duermes con más de 1.000 € o 100 g fuera de la caja, se llevan la mitad
+async function roboDarko(){
+  S.flags.robo=true;const e=Math.floor(S.money/2);let g=0;
+  for(const b of Object.values(S.buds)){const l=Math.floor(b.g/2);g+=l;b.g-=l;}
+  for(const k of Object.keys(S.buds))if(S.buds[k].g<.5)delete S.buds[k];
+  S.money-=e;sfx('bad');
+  await say('Te despierta un portazo. La cerradura está forzada y el piso, revuelto.');
+  await say(`Se han llevado ${eur(e)} y ${g} g.${S.caja?' La caja de detrás del diploma sigue cerrada.':''}`);
+  await talk('SMS · DARKO',['Te dije que esto no se acababa ahí.']);
+  if(!S.caja)await say('Si la tía guardaba sus cosas en algún sitio, ahora te vendría bien saber dónde.');
+  save();
+}
+// los encargos de Baltasar (capítulo 8): llevar ENCARGO[nivel del imperio] gramos al almacén de los astilleros, de noche, en 2 días,
+// a PAGO_ENCARGO €/g. Si no llegas, reputación −10 y 5 días sin encargos
+const ENCARGO=[2000,2000,5000,10000],PAGO_ENCARGO=6,ENCARGO_DIAS=2,ENCARGO_VETO=5;
+async function encargoBaltasar(N){
+  if(S.encargo)return say(`Toño te espera en el almacén de los astilleros, de noche, con ${kgTxt(S.encargo.g)}. Hasta el día ${S.encargo.hasta}.`,N);
+  if(S.encVeto>S.day)return say(`Me fallaste, {N}. Vuelve el día ${S.encVeto}.`,N);
+  const g=ENCARGO[imperioNivel()];
+  await talk(N,['Ya no me debes nada, {N}. Pero tengo trabajo, si lo quieres.',`${kgTxt(g)} en el almacén de los astilleros, de noche. Toño los recoge.`,`Pago ${PAGO_ENCARGO} € el gramo: ${eur(g*PAGO_ENCARGO)}. Tienes ${ENCARGO_DIAS} días.`]);
+  if(await ask('¿Aceptas el encargo?',['Aceptar','No'],N)!==0)return say('Tú sabrás. La oferta sigue en pie.',N);
+  S.encargo={g,hasta:S.day+ENCARGO_DIAS};
+  await say(`Toño estará allí cada noche hasta el día ${S.encargo.hasta}. No le hagas esperar.`,N);showObjective();
+}
+async function talkTonoAlmacen(){
+  const N='TOÑO',E=S.encargo;
+  if(!isNight())return say('¿De día? ¿Tú estás loco? Vuelve de noche, a partir de las nueve.',N);
+  if(totalBuds()<E.g)return say(`Don Baltasar dijo ${kgTxt(E.g)}. Llevas ${gTxt(totalBuds())}. Vuelve con todo.`,N);
+  if(await ask(`¿Entregas ${kgTxt(E.g)}? Toño se lleva primero los lotes más flojos.`,['Entregar','Todavía no'],N)!==0)return;
+  let q=E.g;
+  for(const [k] of Object.entries(S.buds).sort((a,b)=>a[1].thc-b[1].thc)){const t=Math.min(q,S.buds[k].g);useBuds(k,t);q-=t;if(q<=0)break;}
+  const e=E.g*PAGO_ENCARGO;S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+3);S.rep+=2;S.encargo=null;sfx('coin');
+  toast(`+${eur(e)} · encargo de Don Baltasar`,1600);
+  await say('Contado. Don Baltasar estará contento.',N);await fade(1);buildEnts();await fade(0);showObjective();await checkStory();
+}
+function vencerEncargo(){
+  if(!S.encargo||S.day<=S.encargo.hasta)return;
+  S.encargo=null;S.rep=Math.max(0,S.rep-10);S.encVeto=S.day+ENCARGO_VETO;
+  queue('encargo',()=>talk('SMS · TOÑO',['No apareciste. Don Baltasar no se olvida.',`Reputación −10. Nada de encargos hasta el día ${S.encVeto}.`]));
+}
 /* =========================================================
    MENÚ START
    ========================================================= */
@@ -2275,16 +2552,17 @@ async function genoteca(){
 async function mochila(){
   let i=0;
   for(;;){
-    const rows=[{label:'Dinero',right:eur(S.money),ic:icono('billetes'),desc:'Tu capital. Don Baltasar también lo cuenta.'},{label:'Vida',right:`${S.hp}/${S.hpMax}`,desc:'Se recupera durmiendo, comiendo o con el tiempo.'},
+    const rows=[{label:'Dinero',right:eur(S.money),ic:icono('billetes'),desc:'Lo que llevas encima. Don Baltasar también lo cuenta.'}].concat(S.caja?[{label:'Caja fuerte',right:`${eur(cajaE())} · ${Math.floor(cajaG())} g`,ic:icono('billetes'),
+      desc:`${CAJA[S.caja.nivel].n}, detrás del diploma. Caben ${eur(CAJA[S.caja.nivel].money)} y ${kgTxt(CAJA[S.caja.nivel].g)}.\nLo que está dentro no lo llevas encima.`}]:[],[{label:'Vida',right:`${S.hp}/${S.hpMax}`,desc:'Se recupera durmiendo, comiendo o con el tiempo.'},
       {label:'Abono (dosis)',right:'×'+S.items.fert,ic:icono('abono'),desc:'Una por planta: +25% de cosecha.'},{label:'Insecticida (tratamientos)',right:'×'+S.items.insect,ic:icono('insecticida'),desc:'Úsalo en una maceta con plaga.'},
-      {label:'Spray de pimienta',right:'×'+S.items.spray,ic:icono('spray'),desc:'Solo en combate.'},{label:'Bocata',right:'×'+S.items.bocata,ic:icono('bocadillo'),desc:'Pulsa A para comerlo: +15 de vida.',k:'bocata'}];
+      {label:'Spray de pimienta',right:'×'+S.items.spray,ic:icono('spray'),desc:'Solo en combate.'},{label:'Bocata',right:'×'+S.items.bocata,ic:icono('bocadillo'),desc:'Pulsa A para comerlo: +15 de vida.',k:'bocata'}]);
     for(const k in MACETAS)if(S.items['m_'+k]>0)rows.push({label:'Maceta '+MACETAS[k].n,right:'×'+S.items['m_'+k],ic:icono('maceta'),desc:descMaceta(k)+'\nSe cambia en una plaza vacía de la carpa.'});
     for(const k in FOCOS)if(S.items['f_'+k]>0)rows.push({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],ic:icono('lampara'),desc:descFoco(k)+'\nSe cuelga desde la vista de carpa: ▲ hasta el foco y A.'});
     for(const k in EXTRAS)if(S.items['x_'+k]>0)rows.push({label:EXTRAS[k].n,right:'×'+S.items['x_'+k],desc:EXTRAS[k].d+'\nSe pone desde la vista de carpa: ▲ hasta el foco y A.'});
     for(const [k,v] of Object.entries(S.seeds))rows.push({label:'Semilla '+getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:icono('semillas'),desc:strainLine(k)});
     for(const e of S.esquejes)rows.push({label:'Esqueje '+getStrain(e.sid).n+marcaFeno(e.f),right:'día '+(e.dia+ESQUEJE_DIAS),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),desc:`Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+ESQUEJE_DIAS}.`});
     for(const [k,b] of Object.entries(S.buds))rows.push({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k)),desc:(k.endsWith('*')?'Cogollos de un fenotipo estrella, en lote aparte.\n':'Cogollos listos para vender.\n')+getStrain(lotSid(k)).o});
-    i=await menu(rows,{cls:'full',title:'MOCHILA',title2:`${Math.floor(totalBuds())} g encima`,desc:true,initial:i});
+    i=await menu(rows,{cls:'full',title:'MOCHILA',title2:`${Math.floor(totalBuds())} g encima`+(S.caja?` · ${Math.floor(cajaG())} g en la caja`:''),desc:true,initial:i});
     if(i<0)return;
     if(rows[i].k==='bocata'){if(S.items.bocata>0&&S.hp<S.hpMax){S.items.bocata--;S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');toast('Te comes el bocata. +15 de vida',1200);}else sfx('bump');}
   }
@@ -2330,7 +2608,8 @@ async function battle(kind){
     const w=$('wipe');w.hidden=false;w.classList.remove('go');void w.offsetWidth;w.classList.add('go');await wait(480);
     const ch=S.ch;
     B=kind==='thief'?{kind,name:pick(THIEVES),look:randLook('th'+Math.random(),'thief'),t:0,flashE:0,shakeP:0}:{kind,name:pick(COPS),look:LOOKS.cop,t:0,flashE:0,shakeP:0};
-    if(kind==='thief'){B.hpMax=12+ch*2+ri(0,4);B.hp=B.hpMax;B.atk=[2+(ch>>2),4+(ch>>1)];}
+    // desde el capítulo 5 (1.10), ladrones más duros: +4 de vida y +1 a cada golpe
+    if(kind==='thief'){const d=ch>=5?1:0;B.hpMax=12+ch*2+ri(0,4)+4*d;B.hp=B.hpMax;B.atk=[2+(ch>>2)+d,4+(ch>>1)+d];}
     mode='battle';updateHUD();w.hidden=true;w.classList.remove('go');
     await wait(650);bhudBuild();
     if(kind==='thief'){await say(`Un ${B.name.toLowerCase()} te corta el paso.`);await say(pick(['«La mochila. Dámela y no pasa nada.»','«Eh, tú. Sé lo que llevas encima.»','«Quieto. El dinero y lo que lleves.»']),B.name);}
@@ -2398,8 +2677,10 @@ function confiscate(extraFine=true){
   const g=Math.floor(totalBuds()),fine=extraFine?Math.min(S.money,MULTA_CALLE):0;
   if(B)bAnim('E','multa');S.buds={};S.money-=fine;S.heat=Math.max(0,S.heat-15);return [g,fine];
 }
+// el soborno (1.10) sube también con el dinero que llevas encima: un 5 %
+const precioSoborno=()=>Math.round(40+S.heat*4+totalBuds()*.5+S.money*.05);
 async function copRound(){
-  const cost=Math.round(40+S.heat*4+totalBuds()*.5);
+  const cost=precioSoborno();
   prompt('¿Qué haces?');
   const c=await menu(['SOBORNAR','HABLAR','HUIR','ENTREGAR'],{cls:'battle',cancel:false});
   if(c===0){
@@ -2434,11 +2715,11 @@ const GLYPH={'$':['..#..','.####','#.#..','.###.','..#.#','####.','..#..'],'!':[
 function bubble(x,y,ch,col){ctx.fillStyle='#26262e';ctx.fillRect(x-1,y-1,9,10);ctx.fillStyle='#ffffff';ctx.fillRect(x,y,7,8);ctx.fillRect(x+2,y+8,3,1);
   ctx.fillStyle=col;GLYPH[ch].forEach((r,j)=>{for(let i=0;i<5;i++)if(r[i]==='#')ctx.fillRect(x+1+i,y+(j>3?j-0:j)+0,1,1);});}
 function storyMark(id){
-  switch(id){case 'kiko':return !S.flags.kiko1||(S.ch===4&&!S.flags.lab);case 'baltasar':return (S.ch===3&&!S.flags.metB)||(S.due>0&&S.money>=S.due);
-    case 'jurado':return true;case 'molina':return !S.flags.molina1;case 'darko':return S.ch<6;case 'txaro':return S.ch>=2&&!S.flags.txaro;case 'inaki':return !S.flags.inaki;}
+  switch(id){case 'kiko':return !S.flags.kiko1||(S.ch===4&&!S.flags.lab);case 'baltasar':return (S.ch===3&&!S.flags.metB)||(S.due>0&&S.money>=S.due)||(S.ch>=8&&!S.encargo&&!(S.encVeto>S.day));case 'tono2':return isNight();
+    case 'jurado':return true;case 'molina':return !S.flags.molina1||!S.protect;case 'darko':return S.ch<6;case 'txaro':return S.ch>=2&&!S.flags.txaro||S.ch>=4&&!S.flags.txaro2;case 'inaki':return !S.flags.inaki;}
   return false;
 }
-let LAMPS=[];
+let LAMPS={};   // farolas de cada zona de fuera (1.10): su luz de noche
 function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugador (tools/plano.js pinta los mapas enteros a trozos)
   const m=MAPS[S.map],cam=camFija||camera();
   ctx.fillStyle='#000';ctx.fillRect(0,0,SW,SH);
@@ -2472,11 +2753,11 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
   const bob=Math.floor(now/400)%2;
   for(const e of ents){const bx=Math.round(e.px-cam.x)+4,by=Math.round(e.py-cam.y)-16+bob;
     if(e.def.client)bubble(bx,by,'$','#2a9a4a');else if(storyMark(e.id))bubble(bx,by,'!','#e03030');}
-  if(S.map==='town'){
+  if(ZONAS[S.map]){
     const h=S.min/60;let a=h>=21||h<5?.5:h>=19?(h-19)/2*.5:h<7?(7-h)/2*.5:0;
     if(h>=17.5&&h<20.5){ctx.fillStyle=`rgba(255,130,50,${.13*Math.sin((h-17.5)/3*Math.PI)})`;ctx.fillRect(0,0,SW,SH);}
     if(a>0){ctx.fillStyle=`rgba(14,20,72,${a})`;ctx.fillRect(0,0,SW,SH);
-      if(a>.2){ctx.globalCompositeOperation='lighter';for(const [lx,ly] of LAMPS){const x=lx*16+8-cam.x,y=ly*16+2-cam.y;if(x<-30||y<-30||x>SW+30||y>SH+30)continue;
+      if(a>.2){ctx.globalCompositeOperation='lighter';for(const [lx,ly] of LAMPS[S.map]){const x=lx*16+8-cam.x,y=ly*16+2-cam.y;if(x<-30||y<-30||x>SW+30||y>SH+30)continue;
         const g=ctx.createRadialGradient(x,y+8,1,x,y+8,28);g.addColorStop(0,`rgba(255,214,120,${a*.7})`);g.addColorStop(1,'rgba(255,214,120,0)');ctx.fillStyle=g;ctx.fillRect(x-30,y-22,60,60);}
         ctx.globalCompositeOperation='source-over';}}
   }
@@ -2500,7 +2781,7 @@ function makeArt(){
     ell(178,64,44,10,nite?'#4a4a5e':'#a8b0be',nite?'#2a2a38':'#6a7282');ell(66,142,56,12,nite?'#4a4a5e':'#a8b0be',nite?'#2a2a38':'#6a7282');
     battleBg[kind]=c;
   }
-  LAMPS=[];const m=MAPS.town;for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++)if(m.o[y][x]==='lamp')LAMPS.push([x,y]);
+  LAMPS={};for(const k in ZONAS){const m=MAPS[k],l=LAMPS[k]=[];for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++)if(m.o[y][x]==='lamp')l.push([x,y]);}
 }
 // escenas compuestas a 240 px (título, intro y combate): van centradas y el fondo se alarga a los lados con su reflejo.
 // cortes: franjas [y0,y1,lado] que toman las dos bandas del mismo borde ('izq'/'dch': reflejo en su lado, copia en el otro),
@@ -2576,6 +2857,9 @@ function migrate(){
   // partidas guardadas por chapter() antes de poner el plazo (hasta la 1.10): capítulo 5 o 7 sin nada que pagar
   if((S.ch===5||S.ch===7)&&!(S.due>0)&&S.debt>0){S.due=S.ch===5?Math.min(PLAZOS[5],S.debt):S.debt;S.deadline=Math.max(S.deadline||0,S.day+(S.ch===5?10:7));}
   const d=newState();for(const k in d)if(!(k in S))S[k]=d[k];for(const k in d.items)if(!(k in S.items))S.items[k]=0;
+  // 1.10: el plazo del capítulo 3 corre desde Toño (las partidas sin él, desde hoy) y la protección de Molina dura 10 días desde hoy
+  if(S.ch===3&&!S.flags.metB&&!(S.due>0)){S.due=PLAZOS[3];S.deadline=S.day+7;S.flags.tono=S.day;}
+  if(S.protect&&!S.protHasta)S.protHasta=S.day+CUOTA_DIAS;
   const n=huecos().length;while(S.pots.length<n)S.pots.push(null);while(S.macetas.length<n)S.macetas.push('plastico7');
 }
 function showTitle(){mode='title';$('title').hidden=false;updateHUD();music('title');}

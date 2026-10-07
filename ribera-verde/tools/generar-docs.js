@@ -57,8 +57,8 @@ const ROOT = path.join(__dirname, '..');
     });
     S = S0;
     const signs = SIGNS;
-    return { strains, recipes, maps, npcs, items, shop, signs, banco: BANCO, sobre: SOBRE, gen, focos, macetas, carpas,
-      montajes, c: { KWH, H_LUZ, H_24, W_M2, Y_MEDIA, FENO_ESTRELLA, FENO_FLOJO, ESQUEJE_DIAS, SEMILLA_HERMA, DEUDA, PLAZOS, INTERES, PREMIO_COPA, mayor: [precioMayor(12), precioMayor(30)], calle: [precioCalle(12), precioCalle(30)], IMPERIO, SOBRES, GRANEL } };
+    return { strains, recipes, maps, npcs, items, shop, signs, banco: BANCO, sobre: SOBRE, gen, focos, macetas, carpas, zonas: ZONAS,
+      montajes, c: { CAJA, CAJA_P, CAJA_REDADA, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, ENCARGO_DIAS, SOBORNO, CUOTA_DIAS, KWH, H_LUZ, H_24, W_M2, Y_MEDIA, FENO_ESTRELLA, FENO_FLOJO, ESQUEJE_DIAS, SEMILLA_HERMA, DEUDA, PLAZOS, INTERES, PREMIO_COPA, mayor: [precioMayor(12), precioMayor(30)], calle: [precioCalle(12), precioCalle(30)], IMPERIO, SOBRES, GRANEL } };
   });
   await browser.close();
 
@@ -210,8 +210,20 @@ Skunk #1 sana y abonada, fenotipo medio (cosecha de 2,5 días):
 ## Vender
 
 - **Calle:** ${dec(c.calle[0])}-${dec(c.calle[1])} €/g según el THC (× 0,85 estudiante, × 1 currela, × 1,15 turista, × 1,35 pijo; rebaja × 0,85, caro × 1,3). Cada cliente quiere 2-12 g.
-- **Al por mayor (Iñaki, en el muelle, desde el capítulo 3):** ${dec(c.mayor[0])}-${dec(c.mayor[1])} €/g, lotes de 100 g para arriba, una carga al día de hasta ${dec(c.IMPERIO[0].mayor / 1000)} kg (más en el imperio).
-- **Multas:** policía en la calle, 601 € (la mínima de la Ley de Seguridad Ciudadana); redada en el piso, hasta 3.000 € y se llevan plantas y cogollos.
+- **Al por mayor (Iñaki, en el muelle, desde el capítulo 3):** ${dec(c.mayor[0])}-${dec(c.mayor[1])} €/g, lotes de 100 g para arriba, una carga al día de hasta ${dec(c.IMPERIO[0].mayor / 1000)} kg (más en el imperio). Cada carga sube el calor 2 + 1 por cada 100 g.
+- **Zonas:** ${Object.values(D.zonas).filter(z => z.precio !== 1).map(z => `en ${z.n === 'Astilleros' ? 'los astilleros' : z.n}, el gramo × ${dec(z.precio)}`).join('; ')} (las esquinas de Darko: 1 de cada 3 ventas acaba en pelea).
+- **Encargos de Don Baltasar (capítulo 8):** ${c.PAGO_ENCARGO} €/g por ${[...new Set(c.ENCARGO)].map(g => dec(g / 1000)).join(', ').replace(/, ([^,]*)$/, ' o $1')} kg según el rango del imperio, entregados de noche en el almacén de los astilleros en ${c.ENCARGO_DIAS} días.
+- **Multas:** policía en la calle, 601 € (la mínima de la Ley de Seguridad Ciudadana); redada en el piso, hasta 3.000 € y se llevan las plantas y los cogollos de fuera de la caja fuerte.
+- **Protección del sargento Molina:** ${eu(c.SOBORNO)} cada ${c.CUOTA_DIAS} días.
+
+## La caja fuerte
+
+Lo que hay dentro no va encima: no cuenta para los encuentros ni se lo llevan un control, un ladrón o Darko. En una redada la encuentran ${Math.round(c.CAJA_REDADA * 100)} de cada 100 veces (sus gramos y la mitad de su dinero).
+
+| Caja | Cómo se consigue | Capacidad |
+|---|---|---|
+| ${c.CAJA[1].n} | Detrás del diploma (la combinación, en las notas del ordenador), con ${eu(c.MAITE_CAJA)} dentro | ${eu(c.CAJA[1].money)} y ${dec(c.CAJA[1].g / 1000)} kg |
+| ${c.CAJA[2].n} | Por el ordenador desde el capítulo 4, con la de la tía ya abierta: ${eu(c.CAJA_P)}. La instala Kiko al día siguiente, con lo que ya hubiera dentro | ${eu(c.CAJA[2].money)} y ${dec(c.CAJA[2].g / 1000)} kg |
 
 ## Semillas
 
@@ -219,7 +231,7 @@ Feminizadas de tienda, ${D.shop.filter(s => s.sid).map(s => s.lbl.replace('Semil
 
 ## La deuda
 
-${eu(c.DEUDA)} en tres plazos: ${eu(c.PLAZOS[3])} en 7 días (capítulo 3), ${eu(c.PLAZOS[5])} en 10 días (capítulo 5) y ${eu(c.PLAZOS[7])} en 7 días tras la Copa (capítulo 7; el premio de la Copa son ${eu(c.PREMIO_COPA)}). Si un plazo vence, Toño suma un ${Math.round(c.INTERES * 100)} % del plazo y da 5 días más.
+${eu(c.DEUDA)} en tres plazos: ${eu(c.PLAZOS[3])} en 7 días (capítulo 3), ${eu(c.PLAZOS[5])} en 10 días (capítulo 5) y ${eu(c.PLAZOS[7])} en 7 días tras la Copa (capítulo 7; el premio de la Copa son ${eu(c.PREMIO_COPA)}). El primer plazo corre desde que aparece Toño. Si un plazo vence, Toño suma un ${Math.round(c.INTERES * 100)} % del plazo y da 5 días más; al tercer plazo vencido, además, se lleva la carpa más grande del piso (sin carpas, la mitad del dinero que llevas encima).
 
 Por qué ${eu(c.DEUDA)}: con equipo, precios y venta al por mayor reales, un jugador que reinvierte cada cosecha en lo que más rinde por euro (focos LED, macetas grandes, carpas) paga el primer plazo en unas 4 cosechas (6 días), el segundo en unas 8 y el último en unas 9: lo mismo que la deuda de 5.000 € con los números de la 1.9 (3, 5 y 11 cosechas). Con los plazos viejos, la historia se acabaría en 7 cosechas.
 
@@ -243,7 +255,9 @@ Interiores: \`B\` cama · \`P\` ordenador · \`G\` mesa de genética · \`t\` me
 
 ${legend}
 `;
-  const titles = { town: 'Barrio (exterior) — 40 × 30', home: 'Piso de la tía Maite — 12 × 8 (1 casilla = 1 m; con el armario de 60 y la carpa de 150)', shop: 'Growshop Kiko — 10 × 8', bar: 'Bar El Ancla — 10 × 8' };
+  const titles = { town: 'Barrio (exterior) — 40 × 30', home: 'Piso de la tía Maite — 12 × 8 (1 casilla = 1 m; con el armario de 60 y la carpa de 150)', shop: 'Growshop Kiko — 10 × 8', bar: 'Bar El Ancla — 10 × 8',
+    alto: 'Barrio alto (exterior, al norte) — 40 × 30', astilleros: 'Astilleros (exterior, al este del muelle) — 40 × 30', txaro: 'Casa de la abuela Txaro — 10 × 8',
+    comisaria: 'Comisaría del barrio alto — 10 × 8', almacen: 'Almacén de los astilleros — 10 × 8' };
   for (const [k, mp] of Object.entries(D.maps)) {
     const pad = String(mp.w - 1).length;
     let header = '    ' + Array.from({ length: mp.w }, (_, x) => x % 10 === 0 ? String(x / 10 % 10) : ' ').join('') + '\n    ' + Array.from({ length: mp.w }, (_, x) => x % 10).join('');
@@ -254,7 +268,8 @@ ${legend}
   }
   m += `\n## Personajes\n\n| id | Mapa | Posición | Deambula | Aparece cuando |\n|---|---|---|---|---|\n`;
   for (const n of D.npcs) m += `| ${n.id} | ${n.map} | (${n.x},${n.y}) | ${n.wander ? 'radio ' + n.wander : 'no'} | ${n.cond ? '`' + n.cond + '`' : 'siempre'} |\n`;
-  m += `\nLos **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acera, plaza y tierra (4 + reputación/15, +1 desde el capítulo 4, máximo 10).\n`;
+  m += `\nLos **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acera, plaza y tierra: en el barrio, 4 + reputación/15 (+1 desde el capítulo 4, máximo 10); en los astilleros, 2 (3 desde el capítulo 4), estudiantes y currelas, que pagan el gramo un 20 % más; y en el barrio alto, desde el capítulo 3, 2 (3 desde el 4), pijos y turistas.\n`;
+  m += `\n**Zonas** (\`ZONAS\`): factor de policía, de ladrones y de precio en cada mapa de fuera. ${Object.entries(D.zonas).map(([k, z]) => `${z.n}: policía ×${String(z.pol).replace('.', ',')}, ladrones ×${String(z.lad).replace('.', ',')}, precio ×${String(z.precio).replace('.', ',')}`).join(' · ')}. Dentro de las casas no hay encuentros.\n`;
   m += `\n## Objetos\n\n| id | Posición | Tipo | Contenido |\n|---|---|---|---|\n`;
   for (const i of D.items) m += `| ${i.id} | ${i.map} (${i.x},${i.y}) | ${i.hidden ? 'oculto en arbusto (pulsa A delante)' : 'bolsa en el suelo'} | ${i.give || ''} |\n`;
   m += `\n## Carteles\n\n`;

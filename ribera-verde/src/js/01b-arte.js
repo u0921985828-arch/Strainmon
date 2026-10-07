@@ -170,15 +170,27 @@ function arteObj(o,tx,ty,cam,now,list){
   if(f.cel.h>16&&list)list.push([ty*16,()=>pinta(f,xp,yp)]);else pinta(f,xp,yp);
   return true;
 }
+// edificios grises con puerta (1.10): la puerta de otra fachada (b.puerta) y, con b.mascara, sin su trozo de pared (PARED: los
+// colores de la fachada del piso, quitados desde el borde del fotograma hacia dentro mientras sigan siendo pared)
+const PARED=new Set(['248,248,240','246,232,200','224,206,170','220,214,198']),_sinPared=new Map();
+function puertaSinPared(c){
+  let o=_sinPared.get(c);if(o)return o;
+  const w=c.width,h=c.height,[d,x]=mkCanvas(w,h);x.drawImage(c,0,0);const im=x.getImageData(0,0,w,h),p=im.data,st=[];
+  for(let i=0;i<w;i++)st.push(i,(h-1)*w+i);for(let j=0;j<h;j++)st.push(j*w,j*w+w-1);
+  while(st.length){const i=st.pop();if(!p[i*4+3]||!PARED.has(p[i*4]+','+p[i*4+1]+','+p[i*4+2]))continue;p[i*4+3]=0;
+    const xi=i%w,yi=(i-xi)/w;if(xi>0)st.push(i-1);if(xi<w-1)st.push(i+1);if(yi>0)st.push(i-w);if(yi<h-1)st.push(i+w);}
+  x.putImageData(im,0,0);_sinPared.set(c,d);return d;
+}
 function arteEdificios(m,cam){
   if(!ARTE.ok||!m.blds)return;
   for(const b of m.blds){
     const g='edificio-'+b.id,f=frameDe(g,'base','unica',0,{i:0});if(!f)continue;
     ctx.drawImage(f.c,b.x0*16-cam.x,b.y0*16-cam.y);
-    if(b.doorX!=null&&animDe(g,'puerta')){
-      const dy=b.y0+b.h-1,abierta=P.x===b.doorX&&(P.y===dy||P.y===dy+1);
-      const p=frameDe(g,'puerta','unica',0,{i:abierta?-1:0});
-      if(p)ctx.drawImage(p.c,b.doorX*16-8-cam.x,(dy+1)*16-32-cam.y);
+    const gp='edificio-'+(b.puerta||b.id);
+    if(b.doorX!=null&&animDe(gp,'puerta')){
+      const dy=b.y0+b.h-1,abierta=P.x>=b.doorX&&P.x<=b.doorX+(b.ancha?1:0)&&(P.y===dy||P.y===dy+1);
+      const p=frameDe(gp,'puerta','unica',0,{i:abierta?-1:0});
+      if(p)ctx.drawImage(b.mascara?puertaSinPared(p.c):p.c,b.doorX*16-8+(b.dx||0)-cam.x,(dy+1)*16-32-cam.y);
     }
   }
 }

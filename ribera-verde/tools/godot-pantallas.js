@@ -48,6 +48,17 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
     ents: { kiko: { act: { n: 'semillas', t0: T + 50 - 400 } } } },
   { k: 'bar', sw: 240, mode: 'world', now: T + 3000, S: { ch: 5, flags: {} }, map: 'bar', P: { x: 4, y: 6, dir: 'up' },
     ents: { baltasar: { act: { n: 'puro', t0: T + 3000 - 950, humo: { vfx: 'vfx-humo-puro', frame: 7, off: [5, -17] } } }, josune: { act: { n: 'servir', t0: T + 2700 } } } },
+  // el mapa ampliado (1.10): el barrio alto de día con sus clientes y la puerta ancha de la comisaría abierta (el jugador delante);
+  // los astilleros de noche (farolas de su zona, Darko en su esquina y la puerta del almacén, con la pared de la máscara);
+  // y los tres interiores nuevos con su personaje
+  { k: 'alto', sw: 360, mode: 'world', now: T + 2222, seed: 31, S: { ch: 5, min: 11 * 60, day: 6, flags: { molina1: true } }, clientes: true, map: 'alto',
+    P: { x: 27, y: 19, dir: 'up' } },
+  { k: 'astilleros-noche', sw: 400, mode: 'world', now: T + 5555, seed: 77, S: { ch: 8, min: 22 * 60 + 30, day: 40, flags: {}, encargo: { g: 2000, hasta: 41 } },
+    clientes: true, map: 'astilleros', P: { x: 18, y: 14, dir: 'up' } },
+  { k: 'comisaria', sw: 240, mode: 'world', now: T + 300, S: { ch: 5, flags: { molina1: true } }, map: 'comisaria', P: { x: 4, y: 6, dir: 'up' } },
+  { k: 'almacen', sw: 280, mode: 'world', now: T + 900, S: { ch: 8, min: 23 * 60, day: 40, flags: {}, encargo: { g: 2000, hasta: 41 } }, map: 'almacen',
+    P: { x: 4, y: 6, dir: 'up' } },
+  { k: 'casa-txaro', sw: 240, mode: 'world', now: T + 60, S: { ch: 4, flags: { txaro: true } }, map: 'txaro', P: { x: 4, y: 6, dir: 'up' } },
   // la vista B: carpa de 150 con extras (goteo, filtro y ventilador), macetas de todo tipo, fases, plaga, seca y muerta; elegida
   // una plaza de atrás (la fila de delante en transparencia)
   { k: 'carpa-b-g150', sw: 240, mode: 'carpa', now: T + 1234, S: { ch: 5, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },

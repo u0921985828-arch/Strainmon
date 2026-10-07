@@ -22,16 +22,17 @@ async function genoteca(){
 async function mochila(){
   let i=0;
   for(;;){
-    const rows=[{label:'Dinero',right:eur(S.money),ic:icono('billetes'),desc:'Tu capital. Don Baltasar también lo cuenta.'},{label:'Vida',right:`${S.hp}/${S.hpMax}`,desc:'Se recupera durmiendo, comiendo o con el tiempo.'},
+    const rows=[{label:'Dinero',right:eur(S.money),ic:icono('billetes'),desc:'Lo que llevas encima. Don Baltasar también lo cuenta.'}].concat(S.caja?[{label:'Caja fuerte',right:`${eur(cajaE())} · ${Math.floor(cajaG())} g`,ic:icono('billetes'),
+      desc:`${CAJA[S.caja.nivel].n}, detrás del diploma. Caben ${eur(CAJA[S.caja.nivel].money)} y ${kgTxt(CAJA[S.caja.nivel].g)}.\nLo que está dentro no lo llevas encima.`}]:[],[{label:'Vida',right:`${S.hp}/${S.hpMax}`,desc:'Se recupera durmiendo, comiendo o con el tiempo.'},
       {label:'Abono (dosis)',right:'×'+S.items.fert,ic:icono('abono'),desc:'Una por planta: +25% de cosecha.'},{label:'Insecticida (tratamientos)',right:'×'+S.items.insect,ic:icono('insecticida'),desc:'Úsalo en una maceta con plaga.'},
-      {label:'Spray de pimienta',right:'×'+S.items.spray,ic:icono('spray'),desc:'Solo en combate.'},{label:'Bocata',right:'×'+S.items.bocata,ic:icono('bocadillo'),desc:'Pulsa A para comerlo: +15 de vida.',k:'bocata'}];
+      {label:'Spray de pimienta',right:'×'+S.items.spray,ic:icono('spray'),desc:'Solo en combate.'},{label:'Bocata',right:'×'+S.items.bocata,ic:icono('bocadillo'),desc:'Pulsa A para comerlo: +15 de vida.',k:'bocata'}]);
     for(const k in MACETAS)if(S.items['m_'+k]>0)rows.push({label:'Maceta '+MACETAS[k].n,right:'×'+S.items['m_'+k],ic:icono('maceta'),desc:descMaceta(k)+'\nSe cambia en una plaza vacía de la carpa.'});
     for(const k in FOCOS)if(S.items['f_'+k]>0)rows.push({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],ic:icono('lampara'),desc:descFoco(k)+'\nSe cuelga desde la vista de carpa: ▲ hasta el foco y A.'});
     for(const k in EXTRAS)if(S.items['x_'+k]>0)rows.push({label:EXTRAS[k].n,right:'×'+S.items['x_'+k],desc:EXTRAS[k].d+'\nSe pone desde la vista de carpa: ▲ hasta el foco y A.'});
     for(const [k,v] of Object.entries(S.seeds))rows.push({label:'Semilla '+getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:icono('semillas'),desc:strainLine(k)});
     for(const e of S.esquejes)rows.push({label:'Esqueje '+getStrain(e.sid).n+marcaFeno(e.f),right:'día '+(e.dia+ESQUEJE_DIAS),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),desc:`Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+ESQUEJE_DIAS}.`});
     for(const [k,b] of Object.entries(S.buds))rows.push({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k)),desc:(k.endsWith('*')?'Cogollos de un fenotipo estrella, en lote aparte.\n':'Cogollos listos para vender.\n')+getStrain(lotSid(k)).o});
-    i=await menu(rows,{cls:'full',title:'MOCHILA',title2:`${Math.floor(totalBuds())} g encima`,desc:true,initial:i});
+    i=await menu(rows,{cls:'full',title:'MOCHILA',title2:`${Math.floor(totalBuds())} g encima`+(S.caja?` · ${Math.floor(cajaG())} g en la caja`:''),desc:true,initial:i});
     if(i<0)return;
     if(rows[i].k==='bocata'){if(S.items.bocata>0&&S.hp<S.hpMax){S.items.bocata--;S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');toast('Te comes el bocata. +15 de vida',1200);}else sfx('bump');}
   }

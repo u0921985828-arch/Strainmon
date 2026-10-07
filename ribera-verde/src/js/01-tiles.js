@@ -47,7 +47,7 @@ function buildTiles(){
   T('dock',t=>{t.F(0,0,16,16,C.wood3);for(let y=3;y<16;y+=4)t.F(0,y,16,1,C.wood2);t.P(2,1,C.wood4);t.P(13,5,C.wood4);t.P(6,9,C.wood4);t.P(10,13,C.wood4);t.noise(5,[C.wood1]);});
   T('void',t=>t.F(0,0,16,16,'#000'));
   // buildings
-  const B={home:['#d65a4a','#f0dcae','doorW'],shop:['#46a262','#d8ecc4','doorG'],bar:['#4a72c2','#d4dbe8','doorD'],gray:['#8a92a2','#e4cec4','none']};
+  const B={home:['#d65a4a','#f0dcae','doorW'],shop:['#46a262','#d8ecc4','doorG'],bar:['#4a72c2','#d4dbe8','doorD'],gray:['#8a92a2','#e4cec4','doorW']};
   for(const [id,[roof,wall,door]] of Object.entries(B)){
     const shingles=(t)=>{t.F(0,0,16,16,roof);for(let y=3;y<16;y+=4){t.F(0,y,16,1,shade(roof,-38));for(let x=((y>>2)%2)*4;x<16;x+=8)t.F(x,y-3,1,3,shade(roof,-22));}t.noise(4,[shade(roof,22)]);};
     T('roofT_'+id,t=>{shingles(t);t.F(0,0,16,2,shade(roof,30));t.F(0,2,16,1,shade(roof,-45));});

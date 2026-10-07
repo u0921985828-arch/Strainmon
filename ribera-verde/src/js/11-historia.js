@@ -96,10 +96,11 @@ async function talkKiko(){
     await talk(N,['Ya me han contado que has pagado a Baltasar. Bien hecho.','Te he montado en el piso mi equipo de polinización: pinceles, bolsas de papel y una lupa.']);
     S.flags.lab=true;await got('la MESA DE GENÉTICA');
     addSeeds('rif',3);await got('3 semillas de AFGHANI');
-    await talk(N,['Me las trajo un amigo de Mazar-i-Sharif en los ochenta. Las he ido renovando desde entonces.','En la mesa polinizas una variedad con otra: gastas una semilla de cada y obtienes 2 del cruce.','Algunos cruces dan variedades conocidas. Otros, híbridos que solo tendrás tú.','Apúntalo todo en la GENOTECA. Las mejores genéticas salen de cruzar cruces.']);
+    await talk(N,['Me las trajo un amigo de Mazar-i-Sharif en los ochenta. Las he ido renovando desde entonces.','En la mesa polinizas una variedad con otra: gastas una semilla de cada y obtienes 2 del cruce.','Algunos cruces dan variedades conocidas. Otros, híbridos que solo tendrás tú.','Apúntalo todo en la GENOTECA. Las mejores genéticas salen de cruzar cruces.',
+      'Empieza por las conocidas: saca dos de receta en la mesa y cosecha una planta de cada. Patxi, el de la plaza, se sabe unas cuantas.']);
     showObjective();await checkStory();return;
   }
-  if(!Object.keys(S.seeds).length&&!S.pots.some(Boolean)&&!totalBuds()&&S.money<15){
+  if(!Object.keys(S.seeds).length&&!S.pots.some(Boolean)&&!totalBuds()&&!cajaG()&&S.money+cajaE()<15){   // lo de la caja también cuenta (1.10)
     await say('¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.',N);addSeeds('ria',2);await got('2 semillas de SKUNK #1');
   }
   const c=await ask('¿Qué necesitas?',['Comprar','Un consejo','Nada'],N);
@@ -115,7 +116,17 @@ async function talkJosune(){
 async function talkPatxi(){S.patxi=(S.patxi||0)+1;await say(S.ch<4?'Cuando tengas una mesa de genética, ven a verme. Algo sé de cruces.':'Cuarenta años cultivando en el monte. Te digo una cosa: '+RECIPE_HINTS[S.patxi%RECIPE_HINTS.length],'PATXI');}
 async function talkTxaro(){
   const N='ABUELA TXARO';
-  if(S.flags.txaro)return say(pick(['Ya duermo de un tirón. Gracias, de verdad.','Tu tía me ayudaba igual. No se lo contábamos a nadie.']),N);
+  if(S.flags.txaro&&(S.flags.txaro2||S.ch<4))return say(pick(['Ya duermo de un tirón. Gracias, de verdad.','Tu tía me ayudaba igual. No se lo contábamos a nadie.']),N);
+  // segunda misión (1.10), en su casa desde el capítulo 4: 10 g de una índica (70 % o más)
+  if(S.flags.txaro){
+    await talk(N,['El aceite me ha devuelto el sueño. Gracias, de verdad.','Pero el dolor no se va. El médico dice que, para eso, mejor una índica: relaja más.','¿Me traerías 10 gramos de una índica? De las de hoja ancha.']);
+    const lots=budLots(10).filter(([k])=>indDe(lotSid(k))>=70);if(!lots.length)return say('Cuando tengas 10 gramos de una índica, ven a verme. Aquí estaré.',N);
+    const i=await menu(lots.map(lotItem).concat([{label:'Ahora no'}]),{cls:'right',title:'¿Qué le das?'});
+    if(i<0||i>=lots.length)return say('No pasa nada. Aquí estaré.',N);
+    useBuds(lots[i][0],10);S.rep+=5;
+    await say('Toma, las últimas de mi Paco. Las trajo de Chitral, en las montañas de Pakistán.',N);
+    addSeeds('chitral',3);await got('3 semillas de CHITRAL KUSH');S.items.bocata+=3;await got('3 × BOCATA');S.flags.txaro2=true;return;
+  }
   await talk(N,['Tú vives en el piso de Maite. Tu tía me ayudaba con... ya sabes.','Desde la quimio apenas duermo y no tengo hambre. Las pastillas no me hacen nada.','Me vendrían bien 5 gramos, para hacer aceite como me enseñó ella. ¿Me los das?']);
   const lots=budLots(5);if(!lots.length)return say('Cuando tengas 5 gramos, acuérdate de mí.',N);
   const i=await menu(lots.map(lotItem).concat([{label:'Ahora no'}]),{cls:'right',title:'¿Qué le das?'});
@@ -123,6 +134,8 @@ async function talkTxaro(){
   useBuds(lots[i][0],5);
   await say('Gracias. Toma: las trajo mi Paco de Pakistán en el setenta y seis. Nunca supe qué hacer con ellas.',N);
   addSeeds('hindu',2);await got('2 semillas de HINDU KUSH');S.items.bocata+=3;await say('Y llévate estos bocadillos, que comes poco.',N);await got('3 × BOCATA');S.flags.txaro=true;
+  await say('Me voy a casa a preparar el aceite. Vivo en la casa gris, al lado del bar. Pásate cuando quieras.',N);
+  if(S.map==='town'){await fade(1);buildEnts();await fade(0);}
 }
 // Iñaki: 10 g para el viaje, una vez al día; desde el capítulo 3 también compra al por mayor (ventaMayor)
 async function talkInaki(){
@@ -141,8 +154,9 @@ async function talkInaki(){
   await checkStory();
 }
 // al por mayor (1.10): lotes de 100 g para arriba a precioMayor (10-calle), una carga al día y hasta mayorDia() gramos;
-// sube poco el calor (es una sola entrega) pero algo más cuanto más grande
+// sube el calor 2 + 1 por cada 100 g (1.10: antes, por cada 250 g)
 const mayorDia=()=>IMPERIO[S.ch>=8?imperioNivel():0].mayor;
+const kgTxt=g=>g>=1000?coma(g/1000)+' kg':g+' g';
 async function ventaMayor(N){
   if(S.mDay===S.day)return say('Hoy ya he cargado. Mañana sale otro barco.',N);
   const lots=budLots(100);
@@ -150,11 +164,11 @@ async function ventaMayor(N){
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote?'});
   if(i<0||i>=lots.length)return say('Otro día.',N);
   const [k,b]=lots[i],pg=Math.round(precioMayor(b.thc)*100)/100,tope=Math.min(Math.floor(b.g),mayorDia());
-  const ops=[100,250,500,1000,2000,5000,10000].filter(g=>g<tope).concat([tope]),kg=g=>g>=1000?coma(g/1000)+' kg':g+' g';
+  const ops=[100,250,500,1000,2000,5000,10000].filter(g=>g<tope).concat([tope]),kg=kgTxt;
   const j=await ask(`${lotNombre(k)} a ${coma(pg.toFixed(2))} € el gramo. ¿Cuánto cargas?`,ops.map(g=>`${kg(g)} · ${eur(g*pg)}`).concat(['Nada']),N);
   if(j<0||j>=ops.length)return;
   const g=ops[j],e=Math.round(g*pg);
-  useBuds(k,g);S.money+=e;S.sales+=e;S.mDay=S.day;S.heat=Math.min(100,S.heat+2+g/250);S.rep+=1;sfx('coin');
+  useBuds(k,g);S.money+=e;S.sales+=e;S.mDay=S.day;S.heat=Math.min(100,S.heat+2+g/100);S.rep+=1;sfx('coin');
   await accion('vender',{id:'vfx-monedas',x:P.px+8,y:P.py+2});
   toast(`+${eur(e)} · ${kg(g)} al por mayor`,1600);
   await say('Cargado. Esta noche sale en el barco.',N);heatWarn();await checkStory();
@@ -166,17 +180,23 @@ async function talkCop(){
 async function talkDarko(){
   const N='DARKO';
   if(S.ch===6)return talk(N,['¿Vienes a la Copa? Mi AMNESIA HAZE dio un 26,8 % de THC en el laboratorio.','Nadie en Ribera ha pasado del 26. No vas a ser tú el primero.']);
+  if(S.ch>=7)return talk(N,[S.flags.robo?'¿Has dormido bien últimamente?':'Mi tío dice que ya no le debes nada. A mí, sí.','Estas esquinas son mías. Si vendes aquí, mis chicos te lo van a recordar.']);   // en los astilleros (1.10)
   S.flags.darko1=true;
   await talk(N,['Así que tú te has quedado el piso de Maite.','Soy DARKO. La hierba de este barrio la muevo yo.','Vende lo tuyo si quieres, pero lejos de mis esquinas.','No me hagas repetirlo.']);
   await fade(1);buildEnts();await fade(0);
 }
+// la cuota de Molina (1.10): SOBORNO cada CUOTA_DIAS días (S.protHasta, el último día cubierto; newDay la da por acabada).
+// La primera vez, en la plaza; después, en la comisaría del barrio alto
+const CUOTA_DIAS=10;
 async function talkMolina(){
-  const N='SARGENTO MOLINA';
-  if(!S.flags.molina1){S.flags.molina1=true;await talk(N,['Así que eres tú quien vende en la plaza.','Podría detenerte ahora mismo. O podemos entendernos.',`Por ${eur(SOBORNO)} mis patrullas no pasan por tu calle. Y nada de registros en tu piso.`]);}
-  const c=await ask('¿Aceptas el trato del sargento?',['Pagar '+eur(SOBORNO),'No'],N);
-  if(c===0){if(S.money<SOBORNO)return say('¿Con qué dinero? Vuelve cuando lo tengas.',N);
-    S.money-=SOBORNO;S.protect=true;sfx('coin');await say('Bien. Mis agentes mirarán hacia otro lado.',N);await fade(1);buildEnts();await fade(0);}
-  else{S.heat=Math.min(100,S.heat+10);await say('Tú sabrás. Mis agentes van a estar muy atentos.',N);heatWarn();}
+  const N='SARGENTO MOLINA',plaza=S.map==='town';
+  if(!S.flags.molina1){S.flags.molina1=true;await talk(N,['Así que eres tú quien vende en la plaza.','Podría detenerte ahora mismo. O podemos entendernos.',`Por ${eur(SOBORNO)} cada ${CUOTA_DIAS} días, mis patrullas no pasan por tu calle. Y nada de registros en tu piso.`]);}
+  else if(S.protect)await say(`Estás cubierto hasta el día ${S.protHasta}. ${S.protHasta>S.day?`Te quedan ${S.protHasta-S.day} días.`:'Se acaba HOY.'}`,N);
+  const c=await ask(S.protect?'¿Pagar ya los diez días siguientes?':'¿Aceptas el trato del sargento?',['Pagar '+eur(SOBORNO),'No'],N);
+  if(c===0){if(S.money<SOBORNO)await say('¿Con qué dinero? Vuelve cuando lo tengas.',N);
+    else{S.money-=SOBORNO;S.protHasta=Math.max(S.day,S.protect?S.protHasta:0)+CUOTA_DIAS;S.protect=true;sfx('coin');await say(`Bien. Mis agentes mirarán hacia otro lado hasta el día ${S.protHasta}.`,N);}}
+  else if(!S.protect){S.heat=Math.min(100,S.heat+10);await say('Tú sabrás. Mis agentes van a estar muy atentos.',N);heatWarn();}
+  if(plaza){await say('Si me necesitas, estoy en la comisaría del barrio alto.',N);await fade(1);buildEnts();await fade(0);}
 }
 async function talkJurado(){
   const N='JURADO';
@@ -198,11 +218,12 @@ async function talkJurado(){
 async function talkBaltasar(){
   const N='DON BALTASAR';
   if(S.ch<3)return say('¿Y tú quién eres? No tengo nada que hablar contigo.',N);
+  // el plazo corre desde que Toño te avisa (1.10): si tardas más de 2 días en venir, «Llegas tarde»
   if(S.ch===3&&!S.flags.metB){
-    await talk(N,['Siéntate, {N}. Vamos al grano.',`Tu tía Maite me debía ${eur(DEUDA).replace(' €',' euros')}. Las deudas no se mueren con la gente.`,`Me los vas a pagar a plazos. El primero, ${eur(PLAZOS[3])}.`,'Tienes siete días. Si no, Toño te hará una visita. Y Toño cobra intereses.']);
-    S.flags.metB=true;S.due=PLAZOS[3];S.deadline=S.day+7;showObjective();return;
+    await talk(N,[S.day-S.flags.tono>2?'Llegas tarde, {N}. Toño te dijo «hoy».':'Siéntate, {N}. Vamos al grano.',`Tu tía Maite me debía ${eur(DEUDA).replace(' €',' euros')}. Las deudas no se mueren con la gente.`,`Me los vas a pagar a plazos. El primero, ${eur(S.due)}${S.due>PLAZOS[3]?', con los intereses de tu retraso':''}.`,`Tienes hasta el día ${S.deadline}. Si no, Toño te hará una visita. Y Toño cobra intereses.`]);
+    S.flags.metB=true;showObjective();return;
   }
-  if(S.ch>=8)return say('Ya no me debes nada. Que te vaya bien, {N}.',N);
+  if(S.ch>=8)return encargoBaltasar(N);
   if(S.ch===4)return say('Tranquilo. Ya te avisaré cuando toque el siguiente pago.',N);
   if(S.ch===6)return say('Primero, la Copa. Darko te espera en la plaza.',N);
   const left=S.deadline-S.day;
@@ -214,7 +235,7 @@ async function talkBaltasar(){
     await talk(N,['Puntual. Así me gusta.',`Quedan ${eur(S.debt).replace(' €','')}. Ya te avisaré del siguiente plazo.`]);
     await chapter(4);await talk('SMS · KIKO',['Pásate por el growshop. Tengo algo para ti.']);showObjective();
   }else if(S.ch===5){
-    await talk(N,['Me sorprendes, {N}.',`Quedan ${eur(S.debt).replace(' €','')}. Te propongo algo.`,`El sábado es la COPA DE RIBERA. Premio: ${eur(PREMIO_COPA)}.`,'Mi sobrino Darko compite. No ha perdido nunca.','Gana la Copa y, con el premio y lo que vendas, me pagas lo que queda. Si puedes.']);
+    await talk(N,['Me sorprendes, {N}.',`Quedan ${eur(S.debt).replace(' €','')}. Te propongo algo.`,`La COPA DE RIBERA se juega estos días en la plaza. Premio: ${eur(PREMIO_COPA)}.`,'Mi sobrino Darko compite. No ha perdido nunca.','Gana la Copa y, con el premio y lo que vendas, me pagas lo que queda. Si puedes.']);
     await chapter(6);showObjective();
   }else if(S.ch===7){
     await talk(N,[`${eur(paid)}. Contados.`,'Deuda saldada. Lo de tu tía queda cerrado.','Una cosa más, {N}: si algún día quieres trabajar para mí, ya sabes dónde estoy.']);
@@ -227,13 +248,14 @@ async function chapter(n){S.ch=n;sfx('get');toast(`<small>CAPÍTULO ${n}</small>
 function objectiveText(){
   switch(S.ch){
     case 1:return !S.flags.letter?'Lee la carta que hay en la mesa.':!S.flags.kiko1?'Visita el growshop de Kiko, al lado de casa.':'Planta y consigue tu primera cosecha.';
-    case 2:return `Gana ${META_VENTAS} € vendiendo en la calle (${Math.min(META_VENTAS,Math.round(S.sales))}/${META_VENTAS}).`;
-    case 3:return !S.flags.metB?'Ve al bar El Ancla.':`Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
-    case 4:return !S.flags.lab?'Kiko quiere verte en el growshop.':`Descubre 8 variedades (${discCount()}/8).`;
+    case 2:return `Gana ${META_VENTAS} € vendiendo (${Math.min(META_VENTAS,Math.round(S.sales))}/${META_VENTAS}).`;
+    case 3:return !S.flags.metB?`Ve al bar El Ancla antes del día ${S.deadline}: Don Baltasar quiere ${eur(S.due)}.`:`Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
+    case 4:return !S.flags.lab?'Kiko quiere verte en el growshop.':`Saca en la mesa 2 variedades de receta y cosecha una planta de cada (${recCount()}/2).`;
     case 5:return `Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
     case 6:return 'Gana la Copa: 20 g con más de 26,8% de THC al jurado de la plaza.';
     case 7:return `Paga los últimos ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
-    default:{const n=imperioNivel(),sig=IMPERIO[n+1],gen=`Genoteca ${DEX.filter(k=>S.disc[k]).length}/${DEX.length}`;
+    default:{if(S.encargo)return `Encargo de Don Baltasar: lleva ${kgTxt(S.encargo.g)} al almacén de los astilleros, de noche, antes de que acabe el día ${S.encargo.hasta}.`;
+      const n=imperioNivel(),sig=IMPERIO[n+1],gen=`Genoteca ${DEX.filter(k=>S.disc[k]).length}/${DEX.length}`;
       return sig?`Tu imperio · ${IMPERIO[n].n}. Facturado desde la deuda: ${eur(Math.min(sig.meta,facturado()))} de ${eur(sig.meta)} para ser ${sig.n.toLowerCase()}. ${gen}.`:`Tu imperio · ${IMPERIO[n].n}. Completa la ${gen}.`;}
   }
 }
@@ -249,32 +271,54 @@ async function checkStory(){
     await talk('SMS · KIKO',['Primera cosecha. Bien hecho.','La gente que busca material lleva un $ encima. Puedes venderles en la calle.','Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba.']);showObjective();
   }
   if(S.ch===2&&S.sales>=META_VENTAS){
-    await chapter(3);
+    S.due=PLAZOS[3];S.deadline=S.day+7;S.flags.tono=S.day;await chapter(3);   // el plazo, desde ya (1.10)
     await say('Un hombre enorme en chándal te corta el paso.');
-    await talk('TOÑO',['Tú vives en el piso de Maite, ¿no?','Don Baltasar quiere verte. En el bar El Ancla. Hoy.','No me hagas venir a buscarte.']);showObjective();
+    await talk('TOÑO',['Tú vives en el piso de Maite, ¿no?','Don Baltasar quiere verte. En el bar El Ancla. Hoy.','Y ve contando: tienes siete días para el primer pago.','No me hagas venir a buscarte.']);showObjective();
   }
   if(S.ch>=8&&imperioNivel()>(S.impN||0)){
     S.impN=imperioNivel();const r=IMPERIO[S.impN];sfx('get');toast(`<small>TU IMPERIO</small>${r.n}`,2800);
     await talk('SMS · IÑAKI',[`Se corre la voz: ${eur(facturado())} vendidos desde que pagaste a Baltasar.`,`Desde hoy te cargo hasta ${r.mayor>=1000?coma(r.mayor/1000)+' kg':r.mayor+' g'} al día en el barco.`]);showObjective();
   }
-  if(S.ch===4&&S.flags.lab&&discCount()>=8){
+  if(S.ch===4&&S.flags.lab&&recCount()>=2){
     S.due=PLAZOS[5];S.deadline=S.day+10;await chapter(5);
     await talk('SMS · TOÑO',[`Don Baltasar quiere ${eur(PLAZOS[5])} en diez días.`,'Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza.']);showObjective();
   }
 }
 async function penaltyEvent(){
   await say('TOÑO te estaba esperando.');
-  const int=Math.round(S.due*INTERES/100)*100;
+  const int=Math.round(S.due*INTERES/100)*100;S.vencidos++;
   await talk('TOÑO',['Don Baltasar dice que llegas tarde.',`Son ${eur(int)} más de intereses. Y esto, para que no se te olvide.`]);
   sfx('hurt');S.hp=Math.max(1,S.hp-15);S.due+=int;S.debt+=int;S.deadline=S.day+5;
   await say(`La deuda del plazo sube a ${eur(S.due)}. Nuevo límite: día ${S.deadline}.`);
+  if(S.vencidos>=3){S.vencidos=0;await embargo();}
 }
+// al tercer plazo vencido (1.10), Toño se lleva la carpa más grande del fondo o de junto a la cama (B o C), con su foco, sus
+// extras y sus plantas; sin ninguna de las dos, la mitad del dinero que llevas encima
+const areaCarpa=ci=>CARPAS[S.carpas[ci].t].cm[0]*CARPAS[S.carpas[ci].t].cm[2];
+function quitarCarpa(ci){
+  const antes=huecos().map(h=>h.c+':'+h.j),pots=S.pots,mac=S.macetas;
+  S.carpas[ci]=null;
+  const k=huecos().map(h=>antes.indexOf(h.c+':'+h.j));
+  S.pots=k.map(j=>pots[j]||null);S.macetas=k.map(j=>mac[j]||'plastico7');montarCasa();
+}
+async function embargo(){
+  const l=[1,2].filter(ci=>S.carpas[ci]),ci=l.length?l.reduce((a,b)=>areaCarpa(b)>areaCarpa(a)?b:a):-1;
+  await talk('TOÑO',['Tres plazos tarde. Don Baltasar se cobra en especie.']);
+  if(ci>=0){const n=CARPAS[S.carpas[ci].t].n;quitarCarpa(ci);sfx('bad');await say(`TOÑO se lleva tu ${n}, con su foco y sus plantas.`);}
+  else{const e=Math.floor(S.money/2);S.money-=e;sfx('bad');await say(`TOÑO te vacía los bolsillos: se lleva ${eur(e)}.`);}
+}
+// la redada (1.10, con la caja): lo de fuera, siempre; la caja, 1 de cada 4 veces (sus gramos y la mitad de su dinero). La
+// multa sale de lo de fuera y, si no llega, de la caja
 async function raidEvent(){
   if(S.protect){S.heat=50;return talk('SMS · MOLINA',['Esta noche había orden de entrada en tu piso. La he parado.','Baja el ritmo.']);}
   sfx('bad');await say('REDADA. La policía entra en tu piso.');
-  const g=Math.floor(totalBuds()),fine=Math.min(S.money,MULTA_REDADA);
-  S.pots=S.pots.map(()=>null);S.buds={};S.heat=30;S.money-=fine;
+  const g=Math.floor(totalBuds());
+  S.pots=S.pots.map(()=>null);S.buds={};S.heat=30;
+  const hallada=!!S.caja&&Math.random()<CAJA_REDADA,cg=hallada?Math.floor(cajaG()):0,ce=hallada?Math.floor(S.caja.money/2):0;
+  if(hallada){S.caja.buds={};S.caja.money-=ce;}
+  const fine=MULTA_REDADA-pagarCasa(MULTA_REDADA);
   await say(`Se llevan todas las plantas y ${g} g. Multa: ${eur(fine)}.`);
+  if(S.caja)await say(hallada?`Encuentran la caja de detrás del diploma: se llevan ${cg} g y ${eur(ce)}.`:'La caja de detrás del diploma ni la ven.');
   await say('Toca empezar de nuevo. Y vender menos una temporada.');
 }
 async function ending(){

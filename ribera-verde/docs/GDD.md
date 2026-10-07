@@ -111,7 +111,7 @@ El cultivo va en carpas dentro del piso. Desde fuera se ven cerradas (techo, fre
 
 ## 6. Venta en la calle
 
-Desde el capítulo 2 aparecen cada día **min(10, 4 + reputación/15 + 1 desde el capítulo 4)** clientes con `$` en aceras, plaza y caminos.
+Desde el capítulo 2 aparecen cada día **min(10, 4 + reputación/15 + 1 desde el capítulo 4)** clientes con `$` en aceras, plaza y caminos del barrio. Desde la 1.10, además, 2 (3 desde el capítulo 4) en los astilleros, estudiantes y currelas, y otros tantos en el barrio alto desde el capítulo 3, pijos y turistas.
 
 | Cliente | Multiplicador | Gramos | THC mínimo | Desde |
 |---|---|---|---|---|
@@ -126,30 +126,38 @@ Desde el capítulo 2 aparecen cada día **min(10, 4 + reputación/15 + 1 desde e
 - **Caro** (×1,3): aceptación `0,30 + (THC − mínimo) × 0,05`, donde «mínimo» es el THC que pide el cliente (14 si no pide nada); +0,25 si es pijo y +0,15 si es turista, entre 10 % y 90 %. +1 de reputación.
 - Si rechaza: −1 de reputación y el cliente se va.
 - **Cada venta:** calor +3 + 0,5 × gramos.
+- **Zonas (1.10):** en los astilleros, el gramo × 1,2, pero son las esquinas de Darko: 1 de cada 3 ventas acaba en un combate con uno de sus chicos.
 - **Iñaki** (muelle, desde el capítulo 2): compra 10 g al día a ×1,2. Suma +3 de calor y +2 de reputación. La primera vez regala Malawi Gold.
-- **Al por mayor (1.10, Iñaki desde el capítulo 3):** `(2 + THC × 0,1)` €/g, de 3,2 a 5 €/g, en cargas de 100 g, 250 g, 500 g, 1 kg… hasta lo que admite al día (1 kg; más en el imperio). Una carga al día: calor +2 + gramos/250 y +1 de reputación. Es lo que hace falta para mover las cosechas de las carpas grandes.
+- **Al por mayor (1.10, Iñaki desde el capítulo 3):** `(2 + THC × 0,1)` €/g, de 3,2 a 5 €/g, en cargas de 100 g, 250 g, 500 g, 1 kg… hasta lo que admite al día (1 kg; más en el imperio). Una carga al día: calor +2 + gramos/100 (1.10; antes, /250) y +1 de reputación. Es lo que hace falta para mover las cosechas de las carpas grandes.
+- **Encargos de Don Baltasar (1.10, capítulo 8):** 2 kg (5 y 10 kg en los dos últimos rangos) a 6 €/g, entregados a Toño de noche en el almacén de los astilleros en 2 días; +3 de calor y +2 de reputación. Toño se lleva primero los lotes más flojos. Si no llegas: reputación −10 y 5 días sin encargos.
 
 ## 7. Calor policial y reputación
 
 - **El calor sube:** con cada venta, con el olor de cada carpa en floración sin filtro de carbón (+2 al día), al huir de la policía (+8), si un agente honrado rechaza tu soborno (la requisa resta 15 y después suma 20: +5 neto si tenías 15 o más) y si rechazas a Molina (+10).
-- **El calor baja:** −12 cada día (−20 con protección), −10 al sobornar y −15 en cada requisa.
+- **El calor baja:** −12 cada día (−20 con protección), −10 al sobornar y −15 en cada requisa o al entregar.
 - Con 70 o más salta un aviso.
-- **Redada:** al cambiar de día con **calor ≥ 90**. Sin protección pierdes todas las plantas y los cogollos, pagas una multa de hasta 3.000 € y el calor queda en 30. Con la protección de Molina no hay redada y el calor queda en 50.
+- **Redada:** al cambiar de día con **calor ≥ 90**. Sin protección pierdes todas las plantas y los cogollos de fuera de la caja fuerte, pagas una multa de hasta 3.000 € (de lo de fuera y, si no llega, de la caja) y el calor queda en 30. La caja la encuentran 1 de cada 4 veces: se llevan sus gramos y la mitad de su dinero. Con la protección de Molina no hay redada y el calor queda en 50.
 - **Reputación:** sube con las ventas, al vencer ladrones (+2), con Iñaki (+2) y con la Copa (+20). Trae más clientes y facilita HABLAR con policías y ladrones.
 
 ## 8. Encuentros
 
-Solo en el barrio, desde el capítulo 2. Se comprueban en cada paso y, tras un encuentro, hay 25 pasos de calma.
+En los tres mapas de fuera, desde el capítulo 2; dentro de las casas, nunca. Se comprueban en cada paso y, tras un encuentro, hay 25 pasos de calma. Solo cuenta lo que llevas encima: lo de la caja fuerte, no.
 
-- **Policía**, si llevas gramos: `(0,002 + calor × 0,00025) × 0,4 con protección`.
-- **Ladrón**, si llevas 5 g o más o 150 € o más: `0,004 × 2,5 de noche × 3 en hierba alta`.
+- **Policía**, si llevas gramos: `(0,002 + calor × 0,00025) × 0,4 con protección × policía de la zona`.
+- **Ladrón**, si llevas 5 g o más o 150 € o más: `0,004 × 2,5 de noche × 3 en hierba alta × ladrones de la zona`.
+
+| Zona (1.10, `ZONAS`) | Policía | Ladrones | Precio del gramo |
+|---|---|---|---|
+| Ribera Verde (el barrio) | ×1 | ×1 | ×1 |
+| Barrio alto (al norte: plaza del Ensanche y comisaría) | ×1,5 | ×0,5 | ×1 |
+| Astilleros (al este del muelle: almacén y esquinas de Darko) | ×0,5 | ×2 | ×1,2 |
 - El **agente que patrulla** la plaza te para si le hablas con gramos encima y sin protección.
 
 ## 9. Combate contra ladrones
 
 Probabilidades de cada encuentro, de cada estrategia y del soborno, por paso y por trayecto: [ANALISIS.md](ANALISIS.md).
 
-- **Ladrón:** vida `12 + 2 × capítulo + 0…4`; golpea entre `2 + capítulo/4` y `4 + capítulo/2` (divisiones redondeadas hacia abajo).
+- **Ladrón:** vida `12 + 2 × capítulo + 0…4`; golpea entre `2 + capítulo/4` y `4 + capítulo/2` (divisiones redondeadas hacia abajo). Desde el capítulo 5 (1.10), +4 de vida y +1 de golpe.
 
 | Opción | Efecto |
 |---|---|
@@ -161,7 +169,7 @@ Probabilidades de cada encuentro, de cada estrategia y del soborno, por paso y p
 | HUIR | 50 % |
 
 - **Victoria:** 20–40 € + 10 × capítulo, +2 de reputación y **+2 de VIDA máxima** (tope 60).
-- **Derrota:** pierdes la mitad de los gramos de cada variedad y el 30 % del dinero, y te despiertas en casa 6 horas después con la vida llena.
+- **Derrota:** pierdes la mitad de los gramos de cada variedad y el 30 % del dinero que llevas encima, y te despiertas en casa 6 horas después con la vida llena.
 
 ## 10. Combate contra la policía
 
@@ -169,7 +177,7 @@ La barra del agente mide la **sospecha**, que es tu calor.
 
 | Opción | Efecto |
 |---|---|
-| SOBORNAR | Cuesta `40 + 4 × calor + 0,5 × gramos`. Funciona y baja el calor 10, salvo un 15 % de agentes honrados (sin protección y desde el capítulo 3), que requisan, multan y suben el calor. |
+| SOBORNAR | Cuesta `40 + 4 × calor + 0,5 × gramos + 0,05 × dinero encima` (1.10), y se paga con lo que llevas encima. Funciona y baja el calor 10, salvo un 15 % de agentes honrados (sin protección y desde el capítulo 3), que requisan, multan y suben el calor. |
 | HABLAR | Te deja ir con probabilidad `0,30 + reputación/250 − calor/300` (10 %–85 %). Si falla, requisa y multa. |
 | HUIR | 45 % (+15 % de noche). Si sale bien, calor +8; si falla, requisa, multa y −5 de vida. |
 | ENTREGAR | Pierdes los gramos sin multa. |
@@ -182,17 +190,18 @@ La barra del agente mide la **sospecha**, que es tu calor.
 |---|---|---|
 | 1 La herencia | partida nueva | leer la carta → visitar a Kiko → primera cosecha |
 | 2 La calle | primera cosecha | 300 € en ventas |
-| 3 La deuda | 300 € vendidos (aparece Toño) | ir al bar y pagar **3.000 €** en 7 días |
-| 4 Genética | primer pago | recoger la mesa de Kiko y descubrir 8 variedades |
-| 5 El sargento | 8 variedades descubiertas | pagar **12.000 €** en 10 días; Molina ofrece protección |
+| 3 La deuda | 300 € vendidos (aparece Toño) | ir al bar y pagar **3.000 €** en 7 días, desde que aparece Toño |
+| 4 Genética | primer pago | recoger la mesa de Kiko, sacar en ella 2 variedades de receta y cosechar una planta de cada |
+| 5 El sargento | la 2.ª de receta cosechada | pagar **12.000 €** en 10 días; Molina ofrece protección |
 | 6 La Copa de Ribera | segundo pago | ganar la Copa (20 g con más de 26,8 % de THC) |
-| 7 Libertad | ganar la Copa (+5.000 €) | pagar **15.000 €** en 7 días |
-| 8 Tu imperio | último pago: «DEUDA SALDADA» | facturar para subir de rango y completar la Genoteca |
+| 7 Libertad | ganar la Copa (+5.000 €) | pagar **15.000 €** en 7 días; Darko roba el piso |
+| 8 Tu imperio | último pago: «DEUDA SALDADA» | facturar para subir de rango, los encargos de Baltasar y completar la Genoteca |
 
 - **Deuda (1.10):** 30.000 €, a escala de los precios reales. Con ellos, un jugador que reinvierte paga los plazos en unas 4, 8 y 9 cosechas, lo mismo que la deuda de 5.000 € con los números de la 1.9 (simulación y tabla en [ECONOMIA.md](ECONOMIA.md#la-deuda)). Las partidas viejas pasan a la deuda nueva del capítulo en que están.
-- **Retraso:** el primer día después del plazo llega Toño. Suma un 20 % del plazo (redondeado a 100 €) al plazo y a la deuda, quita 15 de vida y da 5 días más. Puede repetirse.
-- **Protección de Molina** (desde el capítulo 5, 1.500 € una sola vez): encuentros con la policía ×0,4, ningún agente rechaza sobornos, el calor baja 20 al día y no hay redadas.
+- **Retraso:** el primer día después del plazo llega Toño. Suma un 20 % del plazo (redondeado a 100 €) al plazo y a la deuda, quita 15 de vida y da 5 días más. Puede repetirse, pero al tercer plazo vencido de la partida (`S.vencidos`) Toño se lleva además la carpa más grande del piso (B o C) con su foco, sus extras y sus plantas; sin ninguna de las dos, la mitad del dinero que llevas encima. Después, la cuenta vuelve a 0.
+- **Protección de Molina** (desde el capítulo 5, 1.500 € cada 10 días; 1.10): encuentros con la policía ×0,4, ningún agente rechaza sobornos, el calor baja 20 al día y no hay redadas. La primera vez se paga en la plaza y después en la comisaría del barrio alto, también por adelantado (cada pago suma 10 días a `S.protHasta`). Al acabarse, un SMS.
 - **Copa:** se presentan 20 g de un lote (los fenotipos estrella van aparte) y se pierden ganes o no. Gana con más de 26,8 % (redondeado a una décima); premio, 5.000 €. Se puede repetir.
+- **El robo de Darko (1.10, capítulo 7):** la primera vez que duermes con más de 1.000 € o 100 g fuera de la caja fuerte, se llevan la mitad del dinero y de cada lote de fuera. Una sola vez.
 - **Tu imperio (capítulo 8):** saldada la deuda, el juego sigue. Lo facturado desde el último pago da el rango, y cada rango sube lo que Iñaki carga al día; al subir, Iñaki avisa por SMS.
 
 | Rango | Facturado | Carga al por mayor al día |
@@ -206,9 +215,23 @@ La barra del agente mide la **sospecha**, que es tu calor.
 
 - **Growshop:** precios y capítulos en [MAPA.md](MAPA.md#tienda-de-kiko).
 - **Bar El Ancla (Josune):** pintxo 4 € (+12 de vida), kalimotxo 3 € (+6 de vida) y rumores con pistas.
-- **Objetos del barrio:** spray de pimienta ×2, abono (3 dosis) y bocata ×2 en el suelo; 50 €, insecticida y Acapulco Gold escondidos en arbustos. Ver [MAPA.md](MAPA.md#objetos).
-- **Kiko** regala 3 semillas de Skunk #1 y 2 dosis de abono al conocerlo, y 2 semillas más si no tienes semillas, plantas ni cogollos y llevas menos de 15 €.
+- **Objetos de fuera:** spray de pimienta ×2, abono (3 dosis) y bocata ×2 en el suelo; 50 €, insecticida y Acapulco Gold escondidos en arbustos; en el barrio alto, 80 € en un arbusto, y en los astilleros, 2 sprays más en el suelo. Ver [MAPA.md](MAPA.md#objetos).
+- **Kiko** regala 3 semillas de Skunk #1 y 2 dosis de abono al conocerlo, y 2 semillas más si no tienes semillas, plantas ni cogollos y tienes menos de 15 €, contando la caja fuerte.
+- **Abuela Txaro:** 5 g en el parque → 2 semillas de Hindu Kush y 3 bocatas; desde el capítulo 4, en su casa, 10 g de una índica (70 % o más) → 3 semillas de Chitral Kush, 3 bocatas y +5 de reputación.
 
 ## 13. Guardado
 
 `localStorage`: la partida va en `riberaVerde_v1` y la preferencia de sonido en `rv_sound`. Se guarda al dormir, al cambiar de capítulo, en el final, desde START → GUARDAR y desde el ordenador del piso. Si el navegador bloquea el almacenamiento, el juego funciona igual pero no guarda.
+
+## 14. Caja fuerte (1.10)
+
+Lo que hay dentro (`S.caja = {money, buds, nivel}`) no va encima: no cuenta para los encuentros ni para el soborno, y no se lo llevan un control, un ladrón ni el robo de Darko. Se abre con A delante del diploma: guardar o sacar dinero, cogollos o todo.
+
+| Caja | Cómo se consigue | Capacidad |
+|---|---|---|
+| La caja de la tía | Detrás del diploma, con la combinación 1998 (la pista, en las notas del ordenador). Dentro hay 300 € | 20.000 € y 2 kg |
+| La caja empotrada | Por el ordenador desde el capítulo 4, con la de la tía abierta: 380 €. Kiko la instala al día siguiente, con lo que ya hubiera dentro | 50.000 € y 2,5 kg |
+
+- **Redada:** la encuentran 1 de cada 4 veces (sus gramos y la mitad de su dinero).
+- **Lo que se paga desde el piso** (la luz, el ordenador y la multa de la redada) sale de lo de fuera y, si no llega, de la caja. Todo lo demás (tienda, plazos, Iñaki, jurado, sobornos), solo de lo de encima.
+- Probabilidades de cada viaje con y sin caja: [ANALISIS.md](ANALISIS.md#3-la-caja-fuerte-del-piso).

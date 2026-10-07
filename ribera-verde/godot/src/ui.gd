@@ -31,6 +31,7 @@ var oraculo := false            # pruebas sin pantalla: no se pinta ni suena nad
 var gancho_menu := Callable()    # (items, o) → o · el piloto de las pruebas elige la opción
 var gancho_texto := Callable()   # (texto, nombre) · transcripción
 var gancho_toast := Callable()   # (html, ms)
+var gancho_combate := Callable() # (tipo) · las pruebas cambian el combate por una función (window.battle en el HTML)
 
 var handlers: Array = []
 var held := {"up": false, "down": false, "left": false, "right": false, "A": false, "B": false}

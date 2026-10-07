@@ -113,6 +113,13 @@ func migrate() -> void:
 	for k in d.items:
 		if not S.items.has(k):
 			S.items[k] = 0
+	# 1.10: el plazo del capítulo 3 corre desde Toño (las partidas sin él, desde hoy) y la protección de Molina dura 10 días desde hoy
+	if S.ch == 3 and not S.flags.get("metB") and not (S.get("due", 0) > 0):
+		S.due = int(D.PLAZOS["3"])
+		S.deadline = S.day + 7
+		S.flags.tono = S.day
+	if S.get("protect") and not S.get("protHasta"):
+		S.protHasta = S.day + int(D.CUOTA_DIAS)
 	var nh := huecos().size()
 	while S.pots.size() < nh:
 		S.pots.append(null)

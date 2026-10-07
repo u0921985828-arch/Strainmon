@@ -56,8 +56,20 @@ Skunk #1 sana y abonada, fenotipo medio (cosecha de 2,5 días):
 ## Vender
 
 - **Calle:** 6,4-10 €/g según el THC (× 0,85 estudiante, × 1 currela, × 1,15 turista, × 1,35 pijo; rebaja × 0,85, caro × 1,3). Cada cliente quiere 2-12 g.
-- **Al por mayor (Iñaki, en el muelle, desde el capítulo 3):** 3,2-5 €/g, lotes de 100 g para arriba, una carga al día de hasta 1 kg (más en el imperio).
-- **Multas:** policía en la calle, 601 € (la mínima de la Ley de Seguridad Ciudadana); redada en el piso, hasta 3.000 € y se llevan plantas y cogollos.
+- **Al por mayor (Iñaki, en el muelle, desde el capítulo 3):** 3,2-5 €/g, lotes de 100 g para arriba, una carga al día de hasta 1 kg (más en el imperio). Cada carga sube el calor 2 + 1 por cada 100 g.
+- **Zonas:** en los astilleros, el gramo × 1,2 (las esquinas de Darko: 1 de cada 3 ventas acaba en pelea).
+- **Encargos de Don Baltasar (capítulo 8):** 6 €/g por 2, 5 o 10 kg según el rango del imperio, entregados de noche en el almacén de los astilleros en 2 días.
+- **Multas:** policía en la calle, 601 € (la mínima de la Ley de Seguridad Ciudadana); redada en el piso, hasta 3.000 € y se llevan las plantas y los cogollos de fuera de la caja fuerte.
+- **Protección del sargento Molina:** 1.500 € cada 10 días.
+
+## La caja fuerte
+
+Lo que hay dentro no va encima: no cuenta para los encuentros ni se lo llevan un control, un ladrón o Darko. En una redada la encuentran 25 de cada 100 veces (sus gramos y la mitad de su dinero).
+
+| Caja | Cómo se consigue | Capacidad |
+|---|---|---|
+| La caja de la tía | Detrás del diploma (la combinación, en las notas del ordenador), con 300 € dentro | 20.000 € y 2 kg |
+| La caja empotrada | Por el ordenador desde el capítulo 4, con la de la tía ya abierta: 380 €. La instala Kiko al día siguiente, con lo que ya hubiera dentro | 50.000 € y 2,5 kg |
 
 ## Semillas
 
@@ -65,7 +77,7 @@ Feminizadas de tienda, Skunk #1 5 €, Lemon Haze 9 €, OG Kush 10 €, Blueber
 
 ## La deuda
 
-30.000 € en tres plazos: 3.000 € en 7 días (capítulo 3), 12.000 € en 10 días (capítulo 5) y 15.000 € en 7 días tras la Copa (capítulo 7; el premio de la Copa son 5.000 €). Si un plazo vence, Toño suma un 20 % del plazo y da 5 días más.
+30.000 € en tres plazos: 3.000 € en 7 días (capítulo 3), 12.000 € en 10 días (capítulo 5) y 15.000 € en 7 días tras la Copa (capítulo 7; el premio de la Copa son 5.000 €). El primer plazo corre desde que aparece Toño. Si un plazo vence, Toño suma un 20 % del plazo y da 5 días más; al tercer plazo vencido, además, se lleva la carpa más grande del piso (sin carpas, la mitad del dinero que llevas encima).
 
 Por qué 30.000 €: con equipo, precios y venta al por mayor reales, un jugador que reinvierte cada cosecha en lo que más rinde por euro (focos LED, macetas grandes, carpas) paga el primer plazo en unas 4 cosechas (6 días), el segundo en unas 8 y el último en unas 9: lo mismo que la deuda de 5.000 € con los números de la 1.9 (3, 5 y 11 cosechas). Con los plazos viejos, la historia se acabaría en 7 cosechas.
 

@@ -37,7 +37,7 @@
      "y": 3,
      "w": 6,
      "h": 6,
-     "puerta": null
+     "puerta": 34
     }
    ],
    "puertas": [
@@ -55,6 +55,36 @@
      "x": 26,
      "y": 8,
      "a": "bar"
+    },
+    {
+     "x": 34,
+     "y": 8,
+     "a": "txaro"
+    },
+    {
+     "x": 35,
+     "y": 8,
+     "a": "txaro"
+    },
+    {
+     "x": 11,
+     "y": 0,
+     "a": "alto"
+    },
+    {
+     "x": 12,
+     "y": 0,
+     "a": "alto"
+    },
+    {
+     "x": 39,
+     "y": 20,
+     "a": "astilleros"
+    },
+    {
+     "x": 39,
+     "y": 21,
+     "a": "astilleros"
     }
    ],
    "salidas": [],
@@ -116,24 +146,9 @@
    ],
    "objetos": [
     {
-     "o": "crate",
-     "x": 38,
-     "y": 17
-    },
-    {
-     "o": "crate",
-     "x": 38,
-     "y": 18
-    },
-    {
      "o": "fountain",
      "x": 20,
      "y": 19
-    },
-    {
-     "o": "crate",
-     "x": 34,
-     "y": 25
     },
     {
      "o": "i_spray",
@@ -413,6 +428,319 @@
      "o": "btable",
      "x": 7,
      "y": 5
+    }
+   ],
+   "carpas": []
+  },
+  "alto": {
+   "nombre": "alto",
+   "titulo": "BARRIO ALTO",
+   "w": 40,
+   "h": 30,
+   "edificios": [
+    {
+     "id": "gray",
+     "x": 24,
+     "y": 13,
+     "w": 6,
+     "h": 6,
+     "puerta": 26
+    }
+   ],
+   "puertas": [
+    {
+     "x": 11,
+     "y": 29,
+     "a": "town"
+    },
+    {
+     "x": 12,
+     "y": 29,
+     "a": "town"
+    },
+    {
+     "x": 26,
+     "y": 18,
+     "a": "comisaria"
+    },
+    {
+     "x": 27,
+     "y": 18,
+     "a": "comisaria"
+    }
+   ],
+   "salidas": [],
+   "npcs": [],
+   "objetos": [
+    {
+     "o": "fountain",
+     "x": 11,
+     "y": 11
+    },
+    {
+     "o": "h_alto",
+     "x": 2,
+     "y": 10,
+     "item": 1
+    }
+   ],
+   "carpas": []
+  },
+  "astilleros": {
+   "nombre": "astilleros",
+   "titulo": "ASTILLEROS",
+   "w": 40,
+   "h": 30,
+   "edificios": [
+    {
+     "id": "gray",
+     "x": 16,
+     "y": 8,
+     "w": 6,
+     "h": 6,
+     "puerta": 18
+    }
+   ],
+   "puertas": [
+    {
+     "x": 0,
+     "y": 20,
+     "a": "town"
+    },
+    {
+     "x": 0,
+     "y": 21,
+     "a": "town"
+    },
+    {
+     "x": 18,
+     "y": 13,
+     "a": "almacen"
+    },
+    {
+     "x": 19,
+     "y": 13,
+     "a": "almacen"
+    }
+   ],
+   "salidas": [],
+   "npcs": [
+    {
+     "id": "darko2",
+     "x": 24,
+     "y": 16,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "i_ast",
+     "x": 4,
+     "y": 5,
+     "item": 1
+    }
+   ],
+   "carpas": []
+  },
+  "txaro": {
+   "nombre": "txaro",
+   "titulo": "CASA DE TXARO",
+   "w": 10,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 4,
+     "y": 7,
+     "a": "town"
+    }
+   ],
+   "npcs": [
+    {
+     "id": "txaro",
+     "x": 6,
+     "y": 3,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "iwin",
+     "x": 2,
+     "y": 1
+    },
+    {
+     "o": "iwin",
+     "x": 7,
+     "y": 1
+    },
+    {
+     "o": "bedT",
+     "x": 0,
+     "y": 2
+    },
+    {
+     "o": "plantDeco",
+     "x": 1,
+     "y": 2
+    },
+    {
+     "o": "plantDeco",
+     "x": 9,
+     "y": 2
+    },
+    {
+     "o": "table",
+     "x": 5,
+     "y": 4
+    },
+    {
+     "o": "fridge",
+     "x": 9,
+     "y": 6
+    },
+    {
+     "o": "plantDeco",
+     "x": 0,
+     "y": 7
+    }
+   ],
+   "carpas": []
+  },
+  "comisaria": {
+   "nombre": "comisaria",
+   "titulo": "COMISARÍA DEL BARRIO ALTO",
+   "w": 10,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 4,
+     "y": 7,
+     "a": "alto"
+    }
+   ],
+   "npcs": [
+    {
+     "id": "molina",
+     "x": 4,
+     "y": 2,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "shelfW",
+     "x": 0,
+     "y": 1
+    },
+    {
+     "o": "iwin",
+     "x": 4,
+     "y": 1
+    },
+    {
+     "o": "shelfW",
+     "x": 8,
+     "y": 1
+    },
+    {
+     "o": "counter",
+     "x": 2,
+     "y": 3
+    },
+    {
+     "o": "bench",
+     "x": 0,
+     "y": 5
+    },
+    {
+     "o": "bench",
+     "x": 9,
+     "y": 5
+    },
+    {
+     "o": "plantDeco",
+     "x": 0,
+     "y": 7
+    },
+    {
+     "o": "plantDeco",
+     "x": 9,
+     "y": 7
+    }
+   ],
+   "carpas": []
+  },
+  "almacen": {
+   "nombre": "almacen",
+   "titulo": "ALMACÉN DE LOS ASTILLEROS",
+   "w": 10,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 4,
+     "y": 7,
+     "a": "astilleros"
+    }
+   ],
+   "npcs": [
+    {
+     "id": "tono2",
+     "x": 5,
+     "y": 2,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "iwin",
+     "x": 6,
+     "y": 1
+    },
+    {
+     "o": "crate",
+     "x": 0,
+     "y": 2
+    },
+    {
+     "o": "crate",
+     "x": 8,
+     "y": 2
+    },
+    {
+     "o": "crate",
+     "x": 0,
+     "y": 3
+    },
+    {
+     "o": "crate",
+     "x": 9,
+     "y": 3
+    },
+    {
+     "o": "stool",
+     "x": 4,
+     "y": 4
+    },
+    {
+     "o": "btable",
+     "x": 5,
+     "y": 4
+    },
+    {
+     "o": "crate",
+     "x": 0,
+     "y": 6
+    },
+    {
+     "o": "crate",
+     "x": 8,
+     "y": 6
     }
    ],
    "carpas": []

@@ -7,11 +7,11 @@ const GLYPH={'$':['..#..','.####','#.#..','.###.','..#.#','####.','..#..'],'!':[
 function bubble(x,y,ch,col){ctx.fillStyle='#26262e';ctx.fillRect(x-1,y-1,9,10);ctx.fillStyle='#ffffff';ctx.fillRect(x,y,7,8);ctx.fillRect(x+2,y+8,3,1);
   ctx.fillStyle=col;GLYPH[ch].forEach((r,j)=>{for(let i=0;i<5;i++)if(r[i]==='#')ctx.fillRect(x+1+i,y+(j>3?j-0:j)+0,1,1);});}
 function storyMark(id){
-  switch(id){case 'kiko':return !S.flags.kiko1||(S.ch===4&&!S.flags.lab);case 'baltasar':return (S.ch===3&&!S.flags.metB)||(S.due>0&&S.money>=S.due);
-    case 'jurado':return true;case 'molina':return !S.flags.molina1;case 'darko':return S.ch<6;case 'txaro':return S.ch>=2&&!S.flags.txaro;case 'inaki':return !S.flags.inaki;}
+  switch(id){case 'kiko':return !S.flags.kiko1||(S.ch===4&&!S.flags.lab);case 'baltasar':return (S.ch===3&&!S.flags.metB)||(S.due>0&&S.money>=S.due)||(S.ch>=8&&!S.encargo&&!(S.encVeto>S.day));case 'tono2':return isNight();
+    case 'jurado':return true;case 'molina':return !S.flags.molina1||!S.protect;case 'darko':return S.ch<6;case 'txaro':return S.ch>=2&&!S.flags.txaro||S.ch>=4&&!S.flags.txaro2;case 'inaki':return !S.flags.inaki;}
   return false;
 }
-let LAMPS=[];
+let LAMPS={};   // farolas de cada zona de fuera (1.10): su luz de noche
 function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugador (tools/plano.js pinta los mapas enteros a trozos)
   const m=MAPS[S.map],cam=camFija||camera();
   ctx.fillStyle='#000';ctx.fillRect(0,0,SW,SH);
@@ -45,11 +45,11 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
   const bob=Math.floor(now/400)%2;
   for(const e of ents){const bx=Math.round(e.px-cam.x)+4,by=Math.round(e.py-cam.y)-16+bob;
     if(e.def.client)bubble(bx,by,'$','#2a9a4a');else if(storyMark(e.id))bubble(bx,by,'!','#e03030');}
-  if(S.map==='town'){
+  if(ZONAS[S.map]){
     const h=S.min/60;let a=h>=21||h<5?.5:h>=19?(h-19)/2*.5:h<7?(7-h)/2*.5:0;
     if(h>=17.5&&h<20.5){ctx.fillStyle=`rgba(255,130,50,${.13*Math.sin((h-17.5)/3*Math.PI)})`;ctx.fillRect(0,0,SW,SH);}
     if(a>0){ctx.fillStyle=`rgba(14,20,72,${a})`;ctx.fillRect(0,0,SW,SH);
-      if(a>.2){ctx.globalCompositeOperation='lighter';for(const [lx,ly] of LAMPS){const x=lx*16+8-cam.x,y=ly*16+2-cam.y;if(x<-30||y<-30||x>SW+30||y>SH+30)continue;
+      if(a>.2){ctx.globalCompositeOperation='lighter';for(const [lx,ly] of LAMPS[S.map]){const x=lx*16+8-cam.x,y=ly*16+2-cam.y;if(x<-30||y<-30||x>SW+30||y>SH+30)continue;
         const g=ctx.createRadialGradient(x,y+8,1,x,y+8,28);g.addColorStop(0,`rgba(255,214,120,${a*.7})`);g.addColorStop(1,'rgba(255,214,120,0)');ctx.fillStyle=g;ctx.fillRect(x-30,y-22,60,60);}
         ctx.globalCompositeOperation='source-over';}}
   }
@@ -73,7 +73,7 @@ function makeArt(){
     ell(178,64,44,10,nite?'#4a4a5e':'#a8b0be',nite?'#2a2a38':'#6a7282');ell(66,142,56,12,nite?'#4a4a5e':'#a8b0be',nite?'#2a2a38':'#6a7282');
     battleBg[kind]=c;
   }
-  LAMPS=[];const m=MAPS.town;for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++)if(m.o[y][x]==='lamp')LAMPS.push([x,y]);
+  LAMPS={};for(const k in ZONAS){const m=MAPS[k],l=LAMPS[k]=[];for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++)if(m.o[y][x]==='lamp')l.push([x,y]);}
 }
 // escenas compuestas a 240 px (título, intro y combate): van centradas y el fondo se alarga a los lados con su reflejo.
 // cortes: franjas [y0,y1,lado] que toman las dos bandas del mismo borde ('izq'/'dch': reflejo en su lado, copia en el otro),

@@ -4,7 +4,7 @@
 
 ## Premisa
 
-La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a orillas de la ría. En el piso hay un armario de cultivo y, además, una deuda: 30.000 € con Don Baltasar, el del bar El Ancla. Con la ayuda de Kiko, el del growshop, que cultivaba con tu tía, aprendes a cultivar, a cruzar genéticas y a vender en la calle mientras esquivas a la policía, a los ladrones del parque y al sargento Molina. Al final tienes que ganarle la Copa de Ribera a Darko, el sobrino de Baltasar, para pagar el último plazo. Saldada la deuda, empieza tu imperio.
+La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a orillas de la ría. En el piso hay un armario de cultivo y, además, una deuda: 30.000 € con Don Baltasar, el del bar El Ancla. Con la ayuda de Kiko, el del growshop, que cultivaba con tu tía, aprendes a cultivar, a cruzar genéticas y a vender en la calle mientras esquivas a la policía, a los ladrones del parque y de los astilleros y al sargento Molina. Lo que no quieras llevar a la calle, guárdalo en la caja fuerte de la tía, detrás de su diploma. Al final tienes que ganarle la Copa de Ribera a Darko, el sobrino de Baltasar, para pagar el último plazo. Saldada la deuda, empieza tu imperio.
 
 ## Personajes
 
@@ -14,11 +14,11 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 | **Kiko** | Mentor. Lleva treinta años con el growshop, conserva genéticas y cultivaba con Maite | Growshop |
 | **Tía Maite** | Solo aparece en su carta y en un diploma enmarcado (2.º premio de la Copa 1998) | Piso |
 | **Don Baltasar** | Antagonista. Maite le debía 30.000 € | Bar El Ancla |
-| **Toño** | Matón de Baltasar | Bar y mensajes |
-| **Darko** | Rival. Sobrino de Baltasar y campeón de la Copa | Plaza (desde el cap. 2 hasta que te cruzas con él, y en el cap. 6) |
-| **Sargento Molina** | Policía corrupto que vende «protección» | Plaza (desde el cap. 5) |
+| **Toño** | Matón de Baltasar | Bar, mensajes y, en el imperio, el almacén de los astilleros |
+| **Darko** | Rival. Sobrino de Baltasar y campeón de la Copa | Plaza (desde el cap. 2 hasta que te cruzas con él, y en el cap. 6) y astilleros (desde el cap. 7) |
+| **Sargento Molina** | Policía corrupto que vende «protección» | Plaza (la primera vez, en el cap. 5) y comisaría del barrio alto |
 | **Josune** | Camarera del bar | Bar El Ancla |
-| **Abuela Txaro** | Vecina con quimioterapia; Maite la ayudaba. Tiene semillas de Pakistán | Parque |
+| **Abuela Txaro** | Vecina con quimioterapia; Maite la ayudaba. Tiene semillas de Pakistán | Parque y, después, su casa (la gris, al lado del bar) |
 | **Iñaki** | Marinero y comprador fijo. Trae semillas de sus viajes | Muelle (desde el cap. 2) |
 | **Patxi** | Anciano que lleva cuarenta años cultivando en el monte. Sabe de cruces | Plaza, junto a la fuente |
 | **Begoña** y **Unai** | Vecina y niño, dan consejos | Calle y plaza |
@@ -102,22 +102,26 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 > **ABUELA TXARO:** Me vendrían bien 5 gramos, para hacer aceite como me enseñó ella. ¿Me los das?
 > **ABUELA TXARO:** Gracias. Toma: las trajo mi Paco de Pakistán en el setenta y seis. Nunca supe qué hacer con ellas. → Consigues 2 semillas de HINDU KUSH.
 > **ABUELA TXARO:** Y llévate estos bocadillos, que comes poco. → Consigues 3 × BOCATA.
+> **ABUELA TXARO:** Me voy a casa a preparar el aceite. Vivo en la casa gris, al lado del bar. Pásate cuando quieras.
 > *Sin 5 g:* «Cuando tengas 5 gramos, acuérdate de mí.» · *Si no le das nada:* «No pasa nada. Aquí estaré.»
-> *Después:* «Ya duermo de un tirón. Gracias, de verdad.» / «Tu tía me ayudaba igual. No se lo contábamos a nadie.»
+> *Después, en su casa:* «Ya duermo de un tirón. Gracias, de verdad.» / «Tu tía me ayudaba igual. No se lo contábamos a nadie.» *(Desde el capítulo 4 tiene otra misión: ver «Capítulo 4».)*
 
 *Al llegar a 300 € empieza el capítulo 3:*
 
 > Un hombre enorme en chándal te corta el paso.
 > **TOÑO:** Tú vives en el piso de Maite, ¿no?
 > **TOÑO:** Don Baltasar quiere verte. En el bar El Ancla. Hoy.
+> **TOÑO:** Y ve contando: tienes siete días para el primer pago.
 > **TOÑO:** No me hagas venir a buscarte.
+
+*El plazo de 3.000 € (7 días) empieza aquí. Objetivo: «Ve al bar El Ancla antes del día D: Don Baltasar quiere 3.000 €.»*
 
 ## Capítulo 3 · La deuda
 
-> **DON BALTASAR:** Siéntate, {N}. Vamos al grano.
+> **DON BALTASAR:** Siéntate, {N}. Vamos al grano. *(Si tardas más de 2 días en ir: «Llegas tarde, {N}. Toño te dijo «hoy».»)*
 > **DON BALTASAR:** Tu tía Maite me debía 30.000 euros. Las deudas no se mueren con la gente.
-> **DON BALTASAR:** Me los vas a pagar a plazos. El primero, 3.000 €.
-> **DON BALTASAR:** Tienes siete días. Si no, Toño te hará una visita. Y Toño cobra intereses.
+> **DON BALTASAR:** Me los vas a pagar a plazos. El primero, 3.000 €. *(Si el plazo ya venció: «X €, con los intereses de tu retraso».)*
+> **DON BALTASAR:** Tienes hasta el día D. Si no, Toño te hará una visita. Y Toño cobra intereses.
 
 *En cada visita:* «Me debes X € para el día D. Te quedan N días.» (o «Es HOY.»). Si te llega el dinero: «¿Pagar ahora?». Si no: «Vuelve cuando tengas el dinero.»
 
@@ -128,6 +132,11 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 > **TOÑO:** Don Baltasar dice que llegas tarde.
 > **TOÑO:** Son X € más de intereses. Y esto, para que no se te olvide. *(un 20 % del plazo, redondeado a 100 €: 600 € sobre el primero)*
 > La deuda del plazo sube a X €. Nuevo límite: día D.
+
+*Al tercer plazo vencido de la partida (en cualquier capítulo), además:*
+> **TOÑO:** Tres plazos tarde. Don Baltasar se cobra en especie.
+> TOÑO se lleva tu [carpa], con su foco y sus plantas. *(la más grande de las del fondo y de junto a la cama)*
+> *Sin esas carpas:* TOÑO te vacía los bolsillos: se lleva X €. *(la mitad de lo que llevas encima)*
 
 *Al pagar:*
 > **DON BALTASAR:** Puntual. Así me gusta.
@@ -143,10 +152,11 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 > **KIKO:** En la mesa polinizas una variedad con otra: gastas una semilla de cada y obtienes 2 del cruce.
 > **KIKO:** Algunos cruces dan variedades conocidas. Otros, híbridos que solo tendrás tú.
 > **KIKO:** Apúntalo todo en la GENOTECA. Las mejores genéticas salen de cruzar cruces.
+> **KIKO:** Empieza por las conocidas: saca dos de receta en la mesa y cosecha una planta de cada. Patxi, el de la plaza, se sabe unas cuantas.
 
 *(Si hablas con Baltasar en este capítulo: «Tranquilo. Ya te avisaré cuando toque el siguiente pago.»)*
 
-*Objetivo: descubrir 8 variedades. Patxi, en la fuente, da una pista de receta cada vez que le hablas («Cuarenta años cultivando en el monte. Te digo una cosa: …»). Van por turnos, de esta lista (`RECIPE_HINTS`, la misma que usa Kiko en sus consejos desde el capítulo 4):*
+*Objetivo: «Saca en la mesa 2 variedades de receta y cosecha una planta de cada (N/2).» Patxi, en la fuente, da una pista de receta cada vez que le hablas («Cuarenta años cultivando en el monte. Te digo una cosa: …»). Van por turnos, de esta lista (`RECIPE_HINTS`, la misma que usa Kiko en sus consejos desde el capítulo 4):*
 1. Skunk #1 polinizada con Lemon Haze: así salió la Lemon Skunk.
 2. OG Kush con Blueberry da Blueberry Kush. Índica, de color azulado.
 3. Afghani con Skunk #1 es la Critical Mass. Produce como ninguna.
@@ -161,7 +171,14 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 
 *(Antes del capítulo 4 Patxi solo dice: «Cuando tengas una mesa de genética, ven a verme. Algo sé de cruces.»)*
 
-*En cuanto descubres la 8.ª variedad (por cruce, compra, cosecha o regalo) empieza el capítulo 5:*
+**Abuela Txaro** (en su casa, desde el capítulo 4, una sola vez):
+> **ABUELA TXARO:** El aceite me ha devuelto el sueño. Gracias, de verdad.
+> **ABUELA TXARO:** Pero el dolor no se va. El médico dice que, para eso, mejor una índica: relaja más.
+> **ABUELA TXARO:** ¿Me traerías 10 gramos de una índica? De las de hoja ancha. *(un lote del 70 % índica o más)*
+> **ABUELA TXARO:** Toma, las últimas de mi Paco. Las trajo de Chitral, en las montañas de Pakistán. → Consigues 3 semillas de CHITRAL KUSH y 3 × BOCATA (+5 de reputación).
+> *Sin 10 g de una índica:* «Cuando tengas 10 gramos de una índica, ven a verme. Aquí estaré.»
+
+*Al cosechar la 2.ª variedad de receta sacada en la mesa empieza el capítulo 5:*
 > **SMS · TOÑO:** Don Baltasar quiere 12.000 € en diez días.
 > **SMS · TOÑO:** Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza.
 
@@ -169,20 +186,25 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 
 > **SARGENTO MOLINA:** Así que eres tú quien vende en la plaza.
 > **SARGENTO MOLINA:** Podría detenerte ahora mismo. O podemos entendernos.
-> **SARGENTO MOLINA:** Por 1.500 € mis patrullas no pasan por tu calle. Y nada de registros en tu piso.
+> **SARGENTO MOLINA:** Por 1.500 € cada 10 días, mis patrullas no pasan por tu calle. Y nada de registros en tu piso.
 > **SARGENTO MOLINA:** ¿Aceptas el trato del sargento? → *Pagar 1.500 € / No*
-> *Si pagas:* «Bien. Mis agentes mirarán hacia otro lado.» *(Molina desaparece de la plaza.)*
-> *Si no:* «Tú sabrás. Mis agentes van a estar muy atentos.» *(+10 de calor; sigue en la plaza por si cambias de idea.)*
+> *Si pagas:* «Bien. Mis agentes mirarán hacia otro lado hasta el día D.»
+> *Si no:* «Tú sabrás. Mis agentes van a estar muy atentos.» *(+10 de calor)*
 > *Sin dinero:* «¿Con qué dinero? Vuelve cuando lo tengas.»
+> **SARGENTO MOLINA:** Si me necesitas, estoy en la comisaría del barrio alto. *(y se va de la plaza)*
+
+*En la comisaría:* «Estás cubierto hasta el día D. Te quedan N días.» (o «Se acaba HOY.») → «¿Pagar ya los diez días siguientes?» (cada pago suma 10 días); sin protección, «¿Aceptas el trato del sargento?» y, si dices que no, +10 de calor.
+
+*Cuando se acaba lo pagado:* **SMS · MOLINA:** «Se acabó lo pagado.» / «Si quieres que mis agentes sigan mirando hacia otro lado, ya sabes dónde está la comisaría.»
 
 *Redada (calor ≥ 90 al empezar un día):*
-- *Sin protección:* «REDADA. La policía entra en tu piso.» / «Se llevan todas las plantas y X g. Multa: Y €.» / «Toca empezar de nuevo. Y vender menos una temporada.»
+- *Sin protección:* «REDADA. La policía entra en tu piso.» / «Se llevan todas las plantas y X g. Multa: Y €.» / *con la caja fuerte,* «Encuentran la caja de detrás del diploma: se llevan X g y Y €.» (1 de cada 4 veces) o «La caja de detrás del diploma ni la ven.» / «Toca empezar de nuevo. Y vender menos una temporada.»
 - *Con protección:* **SMS · MOLINA:** «Esta noche había orden de entrada en tu piso. La he parado.» / «Baja el ritmo.»
 
 *Al pagar los 12.000 €:*
 > **DON BALTASAR:** Me sorprendes, {N}.
 > **DON BALTASAR:** Quedan 15.000. Te propongo algo.
-> **DON BALTASAR:** El sábado es la COPA DE RIBERA. Premio: 5.000 €.
+> **DON BALTASAR:** La COPA DE RIBERA se juega estos días en la plaza. Premio: 5.000 €.
 > **DON BALTASAR:** Mi sobrino Darko compite. No ha perdido nunca.
 > **DON BALTASAR:** Gana la Copa y, con el premio y lo que vendas, me pagas lo que queda. Si puedes.
 
@@ -208,6 +230,17 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 ## Capítulo 7 · Libertad
 
 *Objetivo: pagar los últimos 15.000 € en 7 días.*
+
+*El robo de Darko: la primera vez que duermes en este capítulo con más de 1.000 € o 100 g fuera de la caja fuerte:*
+> Te despierta un portazo. La cerradura está forzada y el piso, revuelto.
+> Se han llevado X € y Y g. *(la mitad de lo de fuera)* La caja de detrás del diploma sigue cerrada. *(si la tienes)*
+> **SMS · DARKO:** Te dije que esto no se acababa ahí.
+> *Sin caja:* Si la tía guardaba sus cosas en algún sitio, ahora te vendría bien saber dónde.
+
+**Darko** (astilleros, desde el capítulo 7):
+> **DARKO:** Mi tío dice que ya no le debes nada. A mí, sí. *(después del robo: «¿Has dormido bien últimamente?»)*
+> **DARKO:** Estas esquinas son mías. Si vendes aquí, mis chicos te lo van a recordar.
+
 > **DON BALTASAR:** 15.000 €. Contados.
 > **DON BALTASAR:** Deuda saldada. Lo de tu tía queda cerrado.
 > **DON BALTASAR:** Una cosa más, {N}: si algún día quieres trabajar para mí, ya sabes dónde estoy.
@@ -220,7 +253,20 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 
 ## Capítulo 8 · Tu imperio
 
-*Objetivo: «Tu imperio · [rango]. Facturado desde la deuda: Y € de X € para ser [rango siguiente]. Genoteca N/41.» Baltasar: «Ya no me debes nada. Que te vaya bien, {N}.»*
+*Objetivo: «Tu imperio · [rango]. Facturado desde la deuda: Y € de X € para ser [rango siguiente]. Genoteca N/41.» Con un encargo de Baltasar, el objetivo es el encargo.*
+
+**Encargos de Don Baltasar** (bar):
+> **DON BALTASAR:** Ya no me debes nada, {N}. Pero tengo trabajo, si lo quieres.
+> **DON BALTASAR:** X kg en el almacén de los astilleros, de noche. Toño los recoge. *(2 kg; 5 kg y 10 kg en los rangos altos)*
+> **DON BALTASAR:** Pago 6 € el gramo: X €. Tienes 2 días.
+> **DON BALTASAR:** ¿Aceptas el encargo? → *Aceptar / No* → «Toño estará allí cada noche hasta el día D. No le hagas esperar.» o «Tú sabrás. La oferta sigue en pie.»
+> *Con un encargo en marcha:* «Toño te espera en el almacén de los astilleros, de noche, con X kg. Hasta el día D.» · *Si fallaste:* «Me fallaste, {N}. Vuelve el día D.»
+
+**Toño** (almacén de los astilleros, mientras dura el encargo):
+> *De día:* «¿De día? ¿Tú estás loco? Vuelve de noche, a partir de las nueve.» · *Sin la carga:* «Don Baltasar dijo X kg. Llevas Y g. Vuelve con todo.»
+> ¿Entregas X kg? Toño se lleva primero los lotes más flojos. → *Entregar / Todavía no*
+> **TOÑO:** Contado. Don Baltasar estará contento. *(+X €, +2 de reputación y +3 de calor)*
+> *Si no llegas a tiempo:* **SMS · TOÑO:** «No apareciste. Don Baltasar no se olvida.» / «Reputación −10. Nada de encargos hasta el día D.»
 
 *Al subir de rango (Proveedor del barrio con 25.000 € facturados desde el último pago, Distribuidor de la ría con 100.000 € y Mayorista del norte con 250.000 €):*
 > TU IMPERIO · [rango]
@@ -231,6 +277,27 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 > Te tiemblan las manos: es GHOST TRAIN HAZE.
 > **SMS · KIKO:** ¿Ghost Train Haze? ¿De semilla propia? Llevo veinte años detrás de ella.
 > **SMS · KIKO:** Tu tía estaría orgullosa. Estabilízala y guárdala bien: eso vale más que el piso.
+
+## La caja fuerte
+
+*Ordenador → «Notas de la tía»:*
+> **NOTAS DE LA TÍA:** «Veinte años de cultivos, apuntados día a día.»
+> **NOTAS DE LA TÍA:** «Lo que no quiero llevar a la calle lo guardo detrás de mi premio. La combinación, el año en que lo gané.»
+
+*Diploma → «Mirar detrás»:*
+> Detrás del marco hay una caja fuerte empotrada en la pared. Tiene una rueda de cuatro cifras.
+> ¿Qué combinación pruebas? → *1976 / 1979 / 1987 / 1998 / Dejarlo* · mal: «Clac. No se abre.»
+> *Con 1998:* Clic. La caja se abre.
+> Dentro hay 300 € y una nota de la tía: «Para ti, {N}. Lo que guardes aquí no te lo quita nadie en la calle».
+> Caben 20.000 € y 2 kg. Lo que está dentro no lo llevas encima.
+
+*Abierta:* «La caja de la tía: X € y Y g (caben 20.000 € y 2 kg). Encima: X € y Y g.» → *Guardar todo / Guardar dinero / Guardar cogollos / Sacar dinero / Sacar cogollos / Sacar todo / Cerrar* · «Guardas X € y Y g.» (y, si no cabe todo, «No cabe todo: el resto se queda fuera.») · «Sacas X € y Y g.» · «¿Cuánto guardas?» / «¿Cuánto sacas?» · «No llevas dinero encima.» / «No cabe más dinero.» / «La caja no tiene dinero.» / «No llevas cogollos encima.» / «No caben más cogollos.» / «La caja no tiene cogollos.»
+
+*Ordenador → «Caja empotrada» (desde el capítulo 4, con la de la tía abierta):*
+> Caja empotrada: 50.000 € y 2,5 kg. Kiko la instala mañana detrás del diploma, con lo que ya tengas dentro. 380 €. → *Pedirla / Nada* · sin dinero, «No te llega el dinero.»
+> *Al día siguiente:* **SMS · KIKO:** «Ya está: la caja empotrada, detrás del diploma. Lo de la vieja lo tienes dentro.» / «Caben 50.000 € y 2,5 kg.»
+
+*Mochila:* «Caja fuerte · X € · Y g» y, arriba, «N g encima · M g en la caja».
 
 ## Combates
 
@@ -244,6 +311,7 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
   - *Victoria:* «El [nombre] sale corriendo.» / «Al huir se le cae la cartera: +X €.» / «Aguantas más. VIDA máxima: X.»
   - *Derrota:* «Pierdes el conocimiento.» / «Te roba X g y Y €.» / «Te despiertas en casa con la cabeza vendada. Un vecino te encontró en el portal.»
   - *Nombres:* ENCAPUCHADO, ATRACADOR, DESCONOCIDO, TIRONERO, CARTERISTA.
+  - *En los astilleros, 1 de cada 3 ventas:* «Uno de los chicos de Darko te ha visto vender.» / **CHICO DE DARKO:** «Te dijimos que lejos de nuestras esquinas.» y combate de ladrón.
 - *Policía:* «[AGENTE] te da el alto.» y luego una de estas: «Control rutinario. ¿Llevas algo encima?» / «Documentación. Y vacía los bolsillos.» / «Aquí huele a marihuana. ¿Es tuya?»
   - *SOBORNAR:* «¿Ofrecerle X € con disimulo?» → [AGENTE] se guarda el sobre. «Aquí no ha pasado nada.» o, con un agente honrado, [AGENTE]: «¿Me intentas sobornar a mí? Esto me lo quedo.» Si no llevas bastante: «No llevas tanto dinero encima.»
   - *HABLAR:* {N}: «Solo estaba dando un paseo, agente.» → [AGENTE]: «Bien. Circula.» o [AGENTE]: «No. Vacía los bolsillos.»
@@ -279,6 +347,10 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
   - «PARQUE DE LOS SAUCES · Horario: de 7:00 a 23:00.»
   - «PLAZA DE RIBERA VERDE · Fuente inaugurada en 1987.»
   - «MUELLE VIEJO → · Peligro: borde sin barandilla.»
+  - «↑ BARRIO ALTO · Plaza del Ensanche · Comisaría.»
+  - «ASTILLEROS DE RIBERA → · Zona industrial. Sin salida.»
+  - *Barrio alto:* «PLAZA DEL ENSANCHE · Urbanizada en 1964.» / «JARDINES DEL ENSANCHE · No pisar el césped.» / «COMISARÍA DE RIBERA · Atención al público: de 9:00 a 14:00.»
+  - *Astilleros:* «ALMACÉN 3 · Propiedad privada. Prohibido el paso.» / «ASTILLEROS DE RIBERA · Cerrados desde 1992.»
 - **Cultivo (1.10):**
   - *Cosecha:* «Cosechas X g de [variedad]. THC: Y%.»
   - *Fenotipo estrella:* «¡Fenotipo estrella! THC ×A y cosecha ×B sobre la media de la [variedad].» / «Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.» · *Flojo:* «Fenotipo flojo: THC ×A y cosecha ×B de la media.»
@@ -291,7 +363,7 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
   - *Nevera:* «La nevera: medio limón, leche y un táper de alubias que dejó la tía.»
   - *Monstera:* «Una monstera. La tía Maite le hablaba cada mañana.»
   - *Ventana:* «Por la ventana se ve la ría. Huele a salitre.»
-  - *Diploma:* Un diploma enmarcado: «COPA DE RIBERA 1998 · 2º PREMIO: MAITE».
+  - *Diploma:* Un diploma enmarcado: «COPA DE RIBERA 1998 · 2º PREMIO: MAITE». → *Mirar detrás / Dejarlo* (ver «La caja fuerte»).
   - *Mesa de genética, antes del capítulo 4:* «Una mesa con un microscopio viejo y frascos. Kiko sabrá qué hacer con esto.»
   - *Hueco sin carpa:* «Aquí cabe una carpa de cultivo. Kiko vende carpas de 100×100.»
 - **Objetos de la tienda y el bar:**

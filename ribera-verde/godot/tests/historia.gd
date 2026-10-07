@@ -1,10 +1,10 @@
 # Ribera Verde (Godot) — la historia 1 → 8 contra el HTML (godot/tests/historia.json, lo saca tools/test-historia.js con
-# RV_ORACULO): los mismos 52 pasos que el test del HTML, con el mismo piloto (A cada 12 ms en los diálogos, opciones de menú
+# RV_ORACULO): los mismos 66 pasos que el test del HTML, con el mismo piloto (A cada 12 ms en los diálogos, opciones de menú
 # por texto, «<B>» cierra el menú) y el mismo azar (Park-Miller). El reloj del juego y los paseos están parados: el bucle solo
 # corre los eventos pendientes, como el update del oráculo. Tras cada paso compara la transcripción, S, el estado del azar,
 # R, I, TO y dónde está cada cosa.
 #   godot --headless --path godot --script res://tests/historia.gd [-- --oraculo f.json] [--salida dir]
-#   → «historia: 52 pasos (52 OK) · semilla N · 0 diferencias con el HTML · T s»
+#   → «historia: 66 pasos (66 OK) · semilla N · 0 diferencias con el HTML · T s»
 extends SceneTree
 
 const Datos = preload("res://src/datos.gd")
@@ -296,10 +296,11 @@ func _pasos() -> void:
 		func(): return (J.S.ch == 2 and J.S.buds.has("ria") and J.S.buds.ria.g > 30 and J.S.seeds.get("ria", 0) >= 1 and J.S.clients.size() > 0) or {"ch": J.S.ch, "buds": J.S.buds, "clients": J.S.clients.size()})
 
 	# ---------- capítulo 2 ----------
-	step("Vender a un cliente (rebaja) → 300 € → capítulo 3", ["Skunk", "Rebaja"], func():
+	step("Vender a un cliente (rebaja) → 300 € → capítulo 3; el plazo de 3.000 € corre desde que aparece Toño", ["Skunk", "Rebaja"], func():
 		J.S.sales = int(D.META_VENTAS) - 1
 		await run(func(): await J.talk_client(J.S.clients[0])),
-		func(): return (J.S.ch == 3 and J.S.sales >= D.META_VENTAS and J.S.heat > 0) or {"ch": J.S.ch, "sales": J.S.sales})
+		func(): return (J.S.ch == 3 and J.S.sales >= D.META_VENTAS and J.S.heat > 0 and J.S.due == 3000 and J.S.deadline == J.S.day + 7 and J.S.flags.get("tono") == J.S.day
+			and not si(J.S.flags.get("metB"))) or {"ch": J.S.ch, "sales": J.S.sales, "due": J.S.due, "deadline": J.S.deadline})
 	step("Hablar con Josune (pintxo)", ["Pintxo"], func():
 		J.S.hp = 10
 		await run(J.talk_josune),
@@ -327,12 +328,12 @@ func _pasos() -> void:
 
 	# ---------- capítulo 3 ----------
 	step("Don Baltasar explica la deuda", [], func(): await run(J.talk_baltasar),
-		func(): return (si(J.S.flags.get("metB")) and J.S.due == 3000 and J.S.debt == 30000 and J.S.deadline == J.S.day + 7) or {"due": J.S.due, "deadline": J.S.deadline, "day": J.S.day})
-	step("Plazo vencido → Toño cobra intereses", [], func():
+		func(): return (si(J.S.flags.get("metB")) and J.S.due == 3000 and J.S.debt == 30000 and J.S.deadline == J.S.flags.tono + 7) or {"due": J.S.due, "deadline": J.S.deadline, "day": J.S.day})
+	step("Plazo vencido → Toño cobra intereses (1.er plazo vencido)", [], func():
 		J.S.deadline = J.S.day
 		J.advance_time(24 * 60)
 		await idle(),
-		func(): return (J.S.due == 3600 and J.S.debt == 30600 and J.S.deadline == J.S.day + 5) or {"due": J.S.due, "debt": J.S.debt})
+		func(): return (J.S.due == 3600 and J.S.debt == 30600 and J.S.deadline == J.S.day + 5 and J.S.vencidos == 1) or {"due": J.S.due, "debt": J.S.debt, "vencidos": J.S.vencidos})
 	step("Pagar 3.600 € → capítulo 4", ["^Pagar"], func():
 		J.S.money = 6000
 		await run(J.talk_baltasar),
@@ -428,12 +429,12 @@ func _pasos() -> void:
 		func(): return (si(J.S.carpas[1].get("vent")) and si(J.S.carpas[1].get("filtro")) and si(J.S.carpas[1].get("goteo")) and R.money == 1000 - 20 - 110 - 55
 			and absf(R.f.plaga - R.m.plaga * .7) < 1e-9 and absf(R.f.agua - R.F.agua * R.m.agua * .5) < 1e-9 and R.h1 == 30 - 12 + 2 and R.h2 == R.h1 - 12
 			and si(J.S.carpas[0].get("filtro")) and not J.S.items.get("x_filtro")) or {"carpas": J.S.carpas, "R": R, "items": J.S.items})
-	step("Cruce de receta: Afghani × Skunk #1 → Critical Mass", ["^Afghani", "^Skunk #1", "Cruzar"], func():
+	step("Cruce de receta: Afghani × Skunk #1 → Critical Mass (de receta, sacada en la mesa: falta cosecharla)", ["^Afghani", "^Skunk #1", "Cruzar"], func():
 		J.add_seeds("ria", 2)
 		J.add_seeds("txoko", 2)
 		await run(J.lab_action),
-		func(): return (J.S.seeds.get("kushrif") == 2 and si(J.S.disc.get("kushrif")) and J.S.gen.get("kushrif") == 1) or {"seeds": J.S.seeds, "gen": J.S.gen})
-	step("Cruce libre: Skunk #1 × Hindu Kush → híbrido propio (m % de la madre, el resto del padre) → capítulo 5", ["^Skunk #1", "^Hindu Kush", "Cruzar"], func():
+		func(): return (J.S.seeds.get("kushrif") == 2 and si(J.S.disc.get("kushrif")) and J.S.gen.get("kushrif") == 1 and J.S.rec.get("kushrif") == 1 and J.rec_count() == 0) or {"seeds": J.S.seeds, "gen": J.S.gen, "rec": J.S.rec})
+	step("Cruce libre: Skunk #1 × Hindu Kush → híbrido propio (m % de la madre, el resto del padre); 8 variedades ya no pasan de capítulo", ["^Skunk #1", "^Hindu Kush", "Cruzar"], func():
 		await run(J.lab_action)
 		var k = J.S.custom.keys()[0] if J.S.custom.size() else null
 		R = {"k": k, "c": J.S.custom.get(k) if k else null, "linea": J.strain_line(k).split("\n")[1] if k else null},
@@ -443,7 +444,7 @@ func _pasos() -> void:
 				return R
 			var m: int = int(c.m)
 			var STR: Dictionary = D.STRAINS
-			return (J.S.custom.size() == 1 and J.disc_count() >= 8 and J.S.ch == 5 and J.S.due == 12000 and c.ma == "ria" and c.pa == "hindu" and m >= 30 and m <= 70
+			return (J.S.custom.size() == 1 and J.disc_count() >= 8 and J.S.ch == 4 and J.S.due == 0 and not J.S.rec.has(R.k) and re("\\(0/2\\)", J.objective_text()) and c.ma == "ria" and c.pa == "hindu" and m >= 30 and m <= 70
 				and c.ind == Datos.jsround((m * 65 + (100 - m) * 100) / 100.0) and c.hj == Datos.mix(STR.hindu.hj, STR.ria.hj, m / 100.0) and c.c == Datos.mix(STR.hindu.c, STR.ria.c, m / 100.0)
 				and R.linea == "Índica %d %% · sativa %d %% · %d %% madre · %d %% padre" % [c.ind, 100 - c.ind, m, 100 - m]) or {"custom": J.S.custom, "disc": J.disc_count(), "ch": J.S.ch, "R": R})
 
@@ -486,7 +487,13 @@ func _pasos() -> void:
 				gs[r.g] = true
 				bien = bien and r.g == r.e and r.sd >= 2 and r.sd <= 5
 			return (si(J.S.disc.get("haze")) and J.S.gen.get("haze") == 1 and gs.size() > 2 and bien and re("F1: línea inestable", J.strain_line("haze"))
-				and Cultivo.tipo_gen(J.S, "haze") == "F1") or {"R": R, "gen": J.S.gen.get("haze")})
+				and Cultivo.tipo_gen(J.S, "haze") == "F1" and J.S.rec.get("haze") == 2 and J.rec_count() == 1 and J.S.ch == 4) or {"R": R, "gen": J.S.gen.get("haze"), "rec": J.S.rec, "ch": J.S.ch})
+	step("Cosechar una Critical Mass, la 2.ª de receta sacada en la mesa → capítulo 5", [], func():
+		J.S.pots[0] = {"sid": "kushrif", "prog": 1, "water": 80, "health": 100, "fert": false, "pest": false, "f": J.roll_feno("kushrif")}
+		await run(func(): await J.harvest(0)),
+		func():
+			var sv = J.load_save()
+			return (J.S.rec.get("kushrif") == 2 and J.rec_count() == 2 and J.S.ch == 5 and J.S.due == 12000 and sv and sv.due == 12000) or {"rec": J.S.rec, "ch": J.S.ch, "due": J.S.due})
 
 	# ---------- capítulo 5 ----------
 	step("Growshop: carpa 120 en el sitio C, junto a la cama (6 plazas más)", ["Carpa 120", "Salir"], func():
@@ -499,10 +506,10 @@ func _pasos() -> void:
 				hay = hay or (t.ci == 2 and t.x0 == 2 and t.x1 == 3)
 			return (J.S.carpas.size() > 2 and J.S.carpas[2] and J.S.carpas[2].t == "m120" and J.S.carpas[2].foco == "cfl" and J.huecos().size() == 13 and J.S.pots.size() == 13
 				and J.S.macetas.size() == 13 and J.S.money == 1000 - 150 and hay and J.tile_solid(J.MAPS.home, 2, 2) and J.tile_solid(J.MAPS.home, 3, 2)) or {"carpas": J.S.carpas, "money": J.S.money, "n": J.huecos().size(), "mapa": J.MAPS.home.carpas})
-	step("Sargento Molina: pagar protección (1.500 €)", ["^Pagar"], func():
+	step("Sargento Molina: pagar protección (1.500 € cada 10 días)", ["^Pagar"], func():
 		J.S.money = 1600
 		await run(J.talk_molina),
-		func(): return (J.S.protect == true and J.S.money == 100) or {"protect": J.S.protect, "money": J.S.money})
+		func(): return (J.S.protect == true and J.S.money == 100 and J.S.protHasta == J.S.day + 10 and si(J.S.flags.get("molina1"))) or {"protect": J.S.protect, "money": J.S.money, "hasta": J.S.protHasta})
 	step("Calor 95 con protección → Molina para la redada", ["Skunk"], func():
 		J.add_seeds("ria", 1)
 		await run(func(): await J.pot_action(0))
@@ -579,13 +586,14 @@ func _pasos() -> void:
 		await run(func(): await J.battle("thief"))
 		WANT = [],
 		func(): return J.S.hpMax == 42 or {"hpMax": J.S.hpMax})
-	step("Policía: soborno con protección", ["SOBORNAR", "^Sí"], func():
+	step("Policía: soborno con protección (40 + 4 × calor + 0,5 × gramos + 5 % del dinero encima)", ["SOBORNAR", "^Sí"], func():
 		J.S.protect = true
 		J.S.heat = 40
 		J.S.money = 1000
 		J.add_buds("ria", 10, 12)
+		R = {"p": J.precio_soborno(), "g": J.total_buds()}
 		await run(func(): await J.battle("police")),
-		func(): return (J.S.money < 1000 and J.S.heat == 30 and J.S.buds.has("ria")) or {"money": J.S.money, "heat": J.S.heat})
+		func(): return (R.p == Datos.jsround(40 + 160 + R.g * .5 + 50) and J.S.money == 1000 - R.p and J.S.heat == 30 and J.S.buds.has("ria")) or {"money": J.S.money, "heat": J.S.heat, "R": R})
 	step("Agente en la plaza: entregar la mercancía", ["ENTREGAR"], func():
 		J.S.protect = false
 		J.add_buds("ria", 5, 12)
@@ -722,20 +730,371 @@ func _pasos() -> void:
 		R.dias5 = J.S.deadline - J.S.day
 		J.S = S0,
 		func(): return (R.due == 15000 and R.dias == 7 and R.eco == 2 and R.eur == "999 €|3.000 €|1.500 €|-1.234 €|30.000 €" and R.due5 == 12000 and R.dias5 == 10) or R)
-	step("8.ª variedad desde un arbusto → capítulo 5 sin más acciones", [], func():
+	step("Capítulo 4: la 8.ª variedad (de un arbusto) no pasa de capítulo; la 2.ª de receta cosechada, sí", [], func():
 		J.S.ch = 4
 		J.S.flags.lab = true
 		J.S.due = 0
 		J.S.disc = {"ria": true, "limon": true, "txoko": true, "niebla": true, "mango": true, "purpura": true, "rif": true}
 		J.S.custom = {}
+		J.S.rec = {"kushrif": 2, "citrus": 1}
 		J.S.taken.erase("h_acap")
 		J.S.map = "town"
 		await run(func(): await J.object_action(2, 26))
 		J.S.map = "home"
-		await idle(),
+		await idle()
+		R = {"ch": J.S.ch, "disc": J.disc_count()}
+		J.S.pots[0] = {"sid": "citrus", "prog": 1, "water": 80, "health": 100, "fert": false, "pest": false, "f": J.roll_feno("citrus")}
+		await run(func(): await J.harvest(0)),
 		func():
 			var sv = J.load_save()
-			return (J.S.ch == 5 and J.S.due == 12000 and sv and sv.due == 12000) or {"ch": J.S.ch, "disc": J.disc_count(), "guardado": sv.due if sv else null})
+			return (R.ch == 4 and R.disc == 8 and J.S.ch == 5 and J.S.due == 12000 and sv and sv.due == 12000) or {"R": R, "ch": J.S.ch, "guardado": sv.due if sv else null})
+	# ---------- 1.10: la caja fuerte, el guion completo y el mapa ampliado ----------
+	var vacia := func():
+		var o := []
+		for p in J.S.pots:
+			o.append(null)
+		J.S.pots = o
+	var lin := func(l0: int, p: String) -> String:
+		for l in LOG.slice(l0):
+			if re(p, l):
+				return l
+		return ""
+	step("Caja de la tía: la pista en el PC («el año en que lo gané»); detrás del diploma, 1987 no abre y 1998 sí (300 € dentro)", ["Notas de la tía", "Mirar detrás", "^1987", "Mirar detrás", "^1998"], func():
+		for k in J.S.seeds.keys():   # el paso de la 8.ª variedad vació S.custom: fuera las semillas del híbrido
+			if J.strain(k) == null:
+				J.S.seeds.erase(k)
+		J.S.map = "home"
+		J.S.ch = 5
+		J.S.caja = null
+		J.S.money = 0
+		var l0 := LOG.size()
+		await run(J.pc_action)
+		await run(func(): await J.object_action(7, 1))
+		R = {"pista": lin.call(l0, "el año en que lo gané") != "", "tras1987": J.S.caja}
+		await run(func(): await J.object_action(7, 1)),
+		func(): return (R.pista and R.tras1987 == null and J.S.caja and J.S.caja.nivel == 1 and J.S.caja.money == 300 and J.caja_g() == 0 and J.S.money == 0) or {"R": R, "caja": J.S.caja})
+	# sin nada encima, ni policía ni ladrones: 20 pasos con el azar a 0 en la primera casilla de clientes del barrio
+	var enc := func() -> int:
+		var nb := []
+		J.gancho_combate = func(t): nb.append(t)
+		Cultivo.fijo = 0
+		J.S.map = "town"
+		var t0: Array = D.CLIENT_TILES.town[0]
+		for k in 20:
+			J.P.x = int(t0[0])
+			J.P.y = int(t0[1])
+			J.S.cool = 0
+			J.on_step_end()
+		Cultivo.fijo = -1
+		J.gancho_combate = Callable()
+		J.S.map = "home"
+		J.S.cool = 0
+		return nb.size()
+	step("Caja: guardar todo (5.000 € y 300 g); sin nada encima no hay ladrones ni policía en la calle; la mochila la enseña", ["Guardar todo", "Cerrar", "MOCHILA", "<B>", "SALIR"], func():
+		J.S.money = 5000
+		J.S.buds = {}
+		J.add_buds("ria", 200, 12)
+		J.add_buds("dragon", 100, 27)
+		J.S.protect = false
+		J.S.heat = 100
+		R = {"antes": enc.call()}
+		await run(func(): await J.object_action(7, 1))
+		R.despues = enc.call()
+		R.caja = norm(J.S.caja)
+		R.m = J.S.money
+		R.g = J.total_buds()
+		var l0 := LOG.size()
+		await run(J.start_menu)
+		R.mochila = lin.call(l0, "\\[menú\\] Dinero"),
+		func(): return (R.antes == 20 and R.despues == 0 and R.caja.money == 5300 and R.caja.buds.ria.g == 200 and R.caja.buds.dragon.g == 100 and R.m == 0 and R.g == 0
+			and re("Caja fuerte", R.mochila)) or R)
+	step("Caja: sacar 1.000 € y 100 g de Fire OG; el soborno cuenta lo de encima (+5 % del dinero)", ["Sacar dinero", "^1\\.000 €", "Sacar cogollos", "^Fire OG", "^100 g", "Cerrar"], func():
+		J.S.heat = 20
+		await run(func(): await J.object_action(7, 1))
+		R = {"p": J.precio_soborno()},
+		func(): return (J.S.money == 1000 and J.S.caja.money == 4300 and J.S.buds.has("dragon") and J.S.buds.dragon.g == 100 and not J.S.caja.buds.has("dragon") and J.S.caja.buds.ria.g == 200
+			and R.p == Datos.jsround(40 + 80 + 50 + 50)) or {"R": R, "money": J.S.money, "caja": J.S.caja, "buds": J.S.buds})
+	step("Redada con la caja: 3 de cada 4 veces no la ven; si la ven, sus gramos y la mitad de su dinero; la multa sale de la caja si fuera no llega", [], func():
+		var mira := func():
+			var np := 0
+			for p in J.S.pots:
+				if p:
+					np += 1
+			return {"m": J.S.money, "cm": J.S.caja.money, "cg": J.caja_g(), "g": J.total_buds(), "h": J.S.heat, "pots": np}
+		J.S.protect = false
+		vacia.call()
+		J.S.pots[1] = {"sid": "ria", "prog": .5, "water": 90, "health": 100, "fert": false, "pest": false}
+		J.S.caja.money = 4000
+		J.S.money = 200
+		J.S.heat = 95
+		Cultivo.fijo = .9
+		await run(J.raid_event)
+		Cultivo.fijo = -1
+		R = {"a": mira.call()}
+		J.add_buds("ria", 30, 12)
+		J.S.heat = 95
+		Cultivo.fijo = .1
+		await run(J.raid_event)
+		Cultivo.fijo = -1
+		R.b = mira.call(),
+		func(): return (R.a.m == 0 and R.a.cm == 4000 - (D.MULTA_REDADA - 200) and R.a.cg == 200 and R.a.g == 0 and R.a.h == 30 and R.a.pots == 0
+			and R.b.cg == 0 and R.b.g == 0 and R.b.cm == maxf(0, R.a.cm - floor(R.a.cm / 2) - D.MULTA_REDADA) and R.b.m == 0 and R.b.h == 30) or R)
+	step("Caja empotrada por el ordenador (380 €, de fuera y el resto de la caja): Kiko la instala al día siguiente", ["Caja empotrada", "Pedirla"], func():
+		J.S.caja.money = 1000
+		J.S.money = 100
+		await run(J.pc_action)
+		R = {"m": J.S.money, "cm": J.S.caja.money, "mejora": J.S.caja.get("mejora"), "nivel": J.S.caja.nivel}
+		var l0 := LOG.size()
+		J.new_day()
+		await idle()
+		R.sms = lin.call(l0, "caja empotrada") != "",
+		func(): return (R.m == 0 and R.cm == 1000 - 280 and R.mejora == 1 and R.nivel == 1 and J.S.caja.nivel == 2 and not J.S.caja.has("mejora") and J.S.caja.money == 720 and R.sms) or {"R": R, "caja": J.S.caja})
+	step("Capítulo 7: Darko roba el piso la primera noche con dinero o cogollos fuera de la caja (la mitad); la caja, intacta; la segunda noche, nada", ["Dormir", "Dormir"], func():
+		J.S.ch = 7
+		J.S.flags.robo = false
+		J.S.deadline = J.S.day + 20
+		J.S.money = 3001
+		J.S.buds = {}
+		J.add_buds("ria", 120, 12)
+		J.add_buds("kushrif", 81, 20)
+		J.S.caja.money = 720
+		J.S.caja.buds = {"dragon": {"g": 50, "thc": 27}}
+		vacia.call()
+		J.S.min = 23 * 60
+		await run(J.bed_action)
+		R = {"m": J.S.money, "ria": J.S.buds.ria.g, "kr": J.S.buds.kushrif.g, "cm": J.S.caja.money, "cg": J.caja_g(), "robo": J.S.flags.robo}
+		J.S.min = 23 * 60
+		await run(J.bed_action)
+		R.m2 = J.S.money
+		R.g2 = J.total_buds(),
+		func(): return (R.robo and R.m == 1501 and R.ria == 60 and R.kr == 41 and R.cm == 720 and R.cg == 50 and R.m2 == 1501 and R.g2 == 101) or R)
+	step("Tercer plazo vencido: Toño se lleva la carpa más grande (la de 120, no la de 100) y cada planta sigue en su plaza; después, la otra; sin carpas, la mitad del dinero", [], func():
+		J.S.ch = 5
+		var pl := func(sid: String): return {"sid": sid, "prog": .3, "water": 90, "health": 100, "fert": false, "pest": false}
+		vacia.call()
+		J.S.pots[0] = pl.call("ria")
+		J.S.pots[3] = pl.call("hindu")
+		J.S.pots[8] = pl.call("thai")
+		J.S.pots[12] = pl.call("haze")
+		var ts := func() -> String:
+			var o := []
+			for c in J.S.carpas:
+				o.append(c.t if c else "")
+			return ",".join(o)
+		R = {"t": ts.call(), "h0": J.huecos().size()}
+		J.S.vencidos = 2
+		J.S.due = 1000
+		J.S.money = 901
+		await run(J.penalty_event)
+		var viv := 0
+		for p in J.S.pots:
+			if p:
+				viv += 1
+		R.a = {"t": ts.call(), "n": J.huecos().size(), "v": J.S.vencidos, "p0": J.S.pots[0].sid if J.S.pots[0] else null, "p3": J.S.pots[3].sid if J.S.pots[3] else null,
+			"vivas": viv, "mapa": J.MAPS.home.carpas.size()}
+		for k in [1, 2]:
+			J.S.vencidos = 2
+			await run(J.penalty_event)
+			R["v%d" % k] = "%s|%s|%d" % [ts.call(), Datos.js_num(J.S.money), J.S.pots.size()],
+		func(): return (R.t == "p80,m100,m120" and R.h0 == 13 and R.a.t == "p80,m100," and R.a.n == 7 and R.a.v == 0 and R.a.p0 == "ria" and R.a.p3 == "hindu" and R.a.vivas == 2 and R.a.mapa == 2
+			and R.v1 == "p80,,|901|3" and R.v2 == "p80,,|451|3") or R)
+	var donde := func(id: String) -> String:
+		var o := []
+		for e in J.ents:
+			if e.id == id:
+				o.append("%d,%d" % [int(e.x), int(e.y)])
+		return ",".join(o)
+	step("Cuota de Molina: se acaba a los 10 días (SMS) y se renueva en la comisaría del barrio alto, de 10 en 10", ["^Pagar", "^Pagar"], func():
+		J.S.protect = true
+		J.S.protHasta = J.S.day
+		J.S.flags.molina1 = true
+		var l0 := LOG.size()
+		J.new_day()
+		await idle()
+		R = {"p": J.S.protect, "sms": lin.call(l0, "Se acabó lo pagado") != ""}
+		J.S.map = "comisaria"
+		J.build_ents()
+		R.ent = donde.call("molina")
+		J.S.money = 3000
+		await run(J.talk_molina)
+		R.h1 = J.S.protHasta - J.S.day
+		await run(J.talk_molina)
+		R.cub = lin.call(l0, "Estás cubierto hasta el día") != ""
+		J.S.map = "home",
+		func(): return (R.p == false and R.sms and R.ent == "4,2" and R.h1 == 10 and R.cub and J.S.protect and J.S.protHasta == J.S.day + 20 and J.S.money == 0) or {"R": R, "hasta": J.S.protHasta, "day": J.S.day, "money": J.S.money})
+	var hay_tono := func() -> bool: return J.ents.any(func(e): return e.id == "tono2")
+	step("Imperio: encargo de Don Baltasar (2 kg al almacén de los astilleros, de noche, a 6 €/g); Toño se lleva primero lo más flojo; si no llegas, reputación −10 y 5 días sin encargos", ["Aceptar", "Entregar", "Aceptar"], func():
+		J.S.ch = 8
+		J.S.due = 0
+		J.S.encargo = null
+		J.S.encVeto = 0
+		J.S.rep = 50
+		J.S.map = "bar"
+		await run(J.talk_baltasar)
+		R = {"e": J.S.encargo.duplicate() if J.S.encargo else null, "d": J.S.day}
+		J.S.map = "almacen"
+		J.build_ents()
+		R.tono = hay_tono.call()
+		J.S.buds = {}
+		J.add_buds("ria", 1500, 12)
+		J.add_buds("dragon", 800, 27)
+		J.S.min = 600
+		await run(J.talk_tono_almacen)
+		R.dia = J.total_buds() if J.S.encargo else J.S.encargo
+		J.S.min = 22 * 60
+		R.m = J.S.money
+		R.s = J.S.sales
+		R.rep = J.S.rep
+		R.heat = J.S.heat
+		await run(J.talk_tono_almacen)
+		R.d1 = {"m": J.S.money - R.m, "s": J.S.sales - R.s, "rep": J.S.rep - R.rep, "heat": J.S.heat - R.heat, "ria": J.S.buds.get("ria"), "dragon": J.S.buds.dragon.g,
+			"enc": J.S.encargo, "tono": hay_tono.call()}
+		J.S.map = "bar"
+		J.S.min = 600
+		await run(J.talk_baltasar)
+		R.e2 = J.S.encargo.hasta - J.S.day if J.S.encargo else J.S.encargo
+		R.rep2 = J.S.rep
+		for k in 3:
+			J.new_day()
+			await idle()
+		R.veto = J.S.encVeto - J.S.day
+		R.rep3 = J.S.rep
+		R.enc3 = J.S.encargo
+		var l0 := LOG.size()
+		await run(J.talk_baltasar)
+		R.fallo = lin.call(l0, "Me fallaste") != ""
+		J.S.map = "home",
+		func(): return (R.e and R.e.g == 2000 and R.e.hasta == R.d + 2 and R.tono and R.dia == 2300 and R.d1.m == 12000 and R.d1.s == 12000 and R.d1.rep == 2 and R.d1.heat == 3
+			and not R.d1.ria and R.d1.dragon == 300 and R.d1.enc == null and not R.d1.tono and R.e2 == 2 and R.rep3 == R.rep2 - 10 and R.enc3 == null and R.veto == 5 and R.fallo) or R)
+	step("Mapa ampliado: barrio alto y astilleros con sus puertas; policía y ladrones según la zona; clientes de cada zona", [], func():
+		J.S.ch = 5
+		J.S.protect = false
+		J.S.heat = 0
+		J.S.min = 600
+		J.S.money = 200
+		J.S.buds = {}
+		J.add_buds("ria", 10, 12)
+		R = {"enc": {}}
+		var nb := {"t": null}
+		J.gancho_combate = func(t): nb.t = t
+		for zr in [["town", [.0019, .0059, .0061]], ["alto", [.0029, .0049, .0051]], ["astilleros", [.0009, .0089, .0091]]]:
+			J.S.map = zr[0]
+			var t0: Array = D.CLIENT_TILES[zr[0]][0]
+			var o := []
+			for r in zr[1]:
+				nb.t = null
+				Cultivo.fijo = r
+				J.P.x = int(t0[0])
+				J.P.y = int(t0[1])
+				J.S.cool = 0
+				J.on_step_end()
+				Cultivo.fijo = -1
+				o.append(nb.t if nb.t else "")
+			R.enc[zr[0]] = ",".join(o)
+		J.gancho_combate = Callable()
+		J.S.cool = 0
+		var W := func(m: String, k: String) -> String:
+			var d = J.MAPS[m].doors.get(k)
+			return ("%s,%d,%d,%s" % [d.to, d.x, d.y, d.dir]) if d else ""
+		R.puertas = "|".join([W.call("town", "11,0"), W.call("town", "12,0"), W.call("alto", "12,29"), W.call("town", "39,21"), W.call("astilleros", "0,20"), W.call("alto", "26,18"),
+			W.call("astilleros", "18,13"), W.call("town", "34,8")])
+		var sal := []
+		for mm in ["comisaria", "almacen", "txaro"]:
+			var e: Dictionary = J.MAPS[mm].exits["4,7"]
+			sal.append("%s,%d,%d" % [e.to, e.x, e.y])
+		R.salidas = "|".join(sal)
+		J.S.map = "alto"
+		R.m0 = J.S.money
+		await run(func(): await J.object_action(2, 10))
+		R.sobre = J.S.money - R.m0
+		J.S.map = "astilleros"
+		R.sp = J.S.items.spray
+		var it = J.item_at(4, 5)
+		if it:
+			await run(func(): await J.pick_item(it))
+		R.sp = J.S.items.spray - R.sp
+		J.S.map = "town"
+		await run(func(): await J.warp(J.MAPS.town.doors["11,0"]))
+		R.warp = "%s,%d,%d" % [J.S.map, J.P.x, J.P.y]
+		var cz := func(z: String) -> int: return J.S.clients.filter(func(c): return c.get("map") == z).size()
+		J.S.ch = 2
+		J.spawn_clients()
+		R.c2 = "%d,%d,%d" % [cz.call("town"), cz.call("alto"), cz.call("astilleros")]
+		J.S.ch = 5
+		J.spawn_clients()
+		R.c5 = "%d,%d" % [cz.call("alto"), cz.call("astilleros")]
+		R.tipos = J.S.clients.all(func(c):
+			var ti: Array = ["pij", "tur"] if c.map == "alto" else (["est", "cur"] if c.map == "astilleros" else D.CTYPES.keys())
+			return ti.has(c.type) and D.CLIENT_TILES[c.map].any(func(t): return t[0] == c.x and t[1] == c.y))
+		var rc := RegEx.create_from_string("^c")
+		var rb := RegEx.create_from_string("^c\\d+_b")
+		R.ents = J.ents.filter(func(e): return rc.search(e.id) != null and rb.search(e.id) == null).size()
+		R.entsB = J.ents.filter(func(e): return rb.search(e.id) != null).size()
+		J.S.map = "home"
+		J.enter_map("home", 5, 5, "up"),
+		func(): return (R.enc.town == "police,thief," and R.enc.alto == "police,thief," and R.enc.astilleros == "police,thief,"
+			and R.puertas == "alto,11,28,up|alto,12,28,up|town,12,1,down|astilleros,1,21,right|town,38,20,left|comisaria,4,6,up|almacen,4,6,up|txaro,4,6,up"
+			and R.salidas == "alto,26,19|astilleros,18,14|town,34,9" and R.warp == "alto,11,28" and R.c2.ends_with(",0,2") and R.c5 == "3,3" and R.tipos and R.ents == 0 and R.entsB == 3
+			and R.sobre == 80 and R.sp == 2) or R)
+	step("Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas", ["^Hindu Kush"], func():
+		J.S.ch = 5
+		J.S.flags.txaro = true
+		J.S.flags.txaro2 = false
+		J.S.map = "txaro"
+		J.build_ents()
+		R = {"ent": donde.call("txaro")}
+		J.S.buds = {}
+		J.add_buds("ria", 20, 12)
+		J.add_buds("hindu", 15, 18)
+		J.add_buds("thai", 20, 16)
+		R.ch = J.S.seeds.get("chitral", 0)
+		R.boc = J.S.items.bocata
+		R.rep = J.S.rep
+		var l0 := LOG.size()
+		await run(J.talk_txaro)
+		R.menu = lin.call(l0, "\\[menú\\].*Ahora no")
+		J.S.map = "home",
+		func(): return (R.ent == "6,3" and si(J.S.flags.get("txaro2")) and J.S.seeds.get("chitral") == R.ch + 3 and J.S.items.bocata == R.boc + 3 and J.S.rep == R.rep + 5 and J.S.buds.hindu.g == 5
+			and J.S.buds.ria.g == 20 and re("Hindu Kush", R.menu) and not re("Skunk|Thai", R.menu)) or R)
+	step("Astilleros: el gramo, un 20 % más caro; 1 de cada 3 ventas, un chico de Darko te sale al paso", ["Justo", "Justo"], func():
+		J.S.ch = 5
+		J.S.map = "astilleros"
+		J.S.buds = {}
+		J.add_buds("ria", 20, 12)
+		R = {"b": []}
+		J.gancho_combate = func(t): R.b.append(t)
+		var cl := func(id: String, r: float) -> Callable:
+			var c := {"id": id, "map": "astilleros", "x": 5, "y": 20, "type": "cur", "want": 10, "minThc": 0}
+			J.S.clients.append(c)
+			return func():
+				Cultivo.fijo = r
+				await J.talk_client(c)
+				Cultivo.fijo = -1
+		R.m = J.S.money
+		await run(cl.call("cx1", .2))
+		R.m1 = J.S.money - R.m
+		R.b1 = R.b.size()
+		await run(cl.call("cx2", .5))
+		R.m2 = J.S.money - R.m - R.m1
+		J.gancho_combate = Callable()
+		J.S.map = "home",
+		func(): return (R.m1 == Datos.jsround(J.precio_calle(12) * D.CTYPES.cur.mult * 1.2 * 10) and R.m2 == R.m1 and R.b1 == 1 and ",".join(R.b) == "thief" and D.ZONAS.astilleros.precio == 1.2) or R)
+	step("Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor", [], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.ch = 3
+		J.S.due = 0
+		J.S.deadline = 0
+		J.S.protect = true
+		J.S.flags.metB = false
+		J.S.flags.erase("tono")
+		for k in ["caja", "rec", "vencidos", "protHasta", "encargo", "encVeto"]:
+			J.S.erase(k)
+		J.migrate()
+		R = {"due": J.S.due, "dias": J.S.deadline - J.S.day, "tono": J.S.flags.get("tono") == J.S.day, "hasta": J.S.protHasta - J.S.day,
+			"campos": jj([J.S.caja, J.S.rec, J.S.vencidos, J.S.encargo, J.S.encVeto])}
+		J.S = S0,
+		func(): return (R.due == 3000 and R.dias == 7 and R.tono and R.hasta == 10 and R.campos == "[null,{},0,null,0]") or R)
 	step("Guardar y cargar la partida", [], func(): J.save(),
 		func():
 			var sv = J.load_save()

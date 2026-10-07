@@ -26,7 +26,8 @@ async function battle(kind){
     const w=$('wipe');w.hidden=false;w.classList.remove('go');void w.offsetWidth;w.classList.add('go');await wait(480);
     const ch=S.ch;
     B=kind==='thief'?{kind,name:pick(THIEVES),look:randLook('th'+Math.random(),'thief'),t:0,flashE:0,shakeP:0}:{kind,name:pick(COPS),look:LOOKS.cop,t:0,flashE:0,shakeP:0};
-    if(kind==='thief'){B.hpMax=12+ch*2+ri(0,4);B.hp=B.hpMax;B.atk=[2+(ch>>2),4+(ch>>1)];}
+    // desde el capítulo 5 (1.10), ladrones más duros: +4 de vida y +1 a cada golpe
+    if(kind==='thief'){const d=ch>=5?1:0;B.hpMax=12+ch*2+ri(0,4)+4*d;B.hp=B.hpMax;B.atk=[2+(ch>>2)+d,4+(ch>>1)+d];}
     mode='battle';updateHUD();w.hidden=true;w.classList.remove('go');
     await wait(650);bhudBuild();
     if(kind==='thief'){await say(`Un ${B.name.toLowerCase()} te corta el paso.`);await say(pick(['«La mochila. Dámela y no pasa nada.»','«Eh, tú. Sé lo que llevas encima.»','«Quieto. El dinero y lo que lleves.»']),B.name);}
@@ -94,8 +95,10 @@ function confiscate(extraFine=true){
   const g=Math.floor(totalBuds()),fine=extraFine?Math.min(S.money,MULTA_CALLE):0;
   if(B)bAnim('E','multa');S.buds={};S.money-=fine;S.heat=Math.max(0,S.heat-15);return [g,fine];
 }
+// el soborno (1.10) sube también con el dinero que llevas encima: un 5 %
+const precioSoborno=()=>Math.round(40+S.heat*4+totalBuds()*.5+S.money*.05);
 async function copRound(){
-  const cost=Math.round(40+S.heat*4+totalBuds()*.5);
+  const cost=precioSoborno();
   prompt('¿Qué haces?');
   const c=await menu(['SOBORNAR','HABLAR','HUIR','ENTREGAR'],{cls:'battle',cancel:false});
   if(c===0){
