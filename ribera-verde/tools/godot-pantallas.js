@@ -60,7 +60,10 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
     P: { x: 4, y: 6, dir: 'up' } },
   { k: 'casa-txaro', sw: 240, mode: 'world', now: T + 60, S: { ch: 4, flags: { txaro: true } }, map: 'txaro', P: { x: 4, y: 6, dir: 'up' } },
   // la comarca (1.10): el pueblo del prólogo (caseríos, monte, parada y la vecina) y el puerto al atardecer con clientes
-  { k: 'mendialde', sw: 320, mode: 'world', now: T + 444, S: { ch: 1, min: 8 * 60, flags: { llegada: false } }, map: 'mendialde', P: { x: 11, y: 13, dir: 'up' } },
+  { k: 'mendialde', sw: 320, mode: 'world', now: T + 444, S: { ch: 1, min: 8 * 60, flags: { llegada: false } }, map: 'mendialde', P: { x: 21, y: 19, dir: 'up' } },
+  // orgánico (1.10): la pista y el puente de madera de Errotabarri, y el asfalto roto de Valdehierro (árboles corridos y en espejo)
+  { k: 'errotabarri', sw: 400, mode: 'world', now: T + 777, S: { ch: 4, min: 10 * 60, flags: {} }, map: 'errotabarri', P: { x: 7, y: 13, dir: 'right' } },
+  { k: 'valdehierro', sw: 240, mode: 'world', now: T + 999, S: { ch: 4, min: 12 * 60, flags: {} }, map: 'valdehierro', P: { x: 15, y: 11, dir: 'down' } },
   { k: 'puerto-tarde', sw: 400, mode: 'world', now: T + 3333, seed: 55, S: { ch: 4, min: 19 * 60, day: 8, flags: {} }, clientes: true, map: 'puerto',
     P: { x: 20, y: 10, dir: 'up' } },
   // la vista B: carpa de 150 con extras (goteo, filtro y ventilador), macetas de todo tipo, fases, plaga, seca y muerta; elegida

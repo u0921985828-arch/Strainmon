@@ -3,7 +3,9 @@
 #  · árbol alto (5 m, 80 px), para la calle, los parques y el monte;
 #  · fachadas por bioma: la comisaría del barrio alto (piedra), la nave del almacén de los astilleros, el caserío de los
 #    pueblos (Mendialde y Errotabarri), las casas marineras de Puerto Viejo, el bloque de ladrillo y la fábrica de Valdehierro;
-#  · la marquesina del autobús.
+#  · la marquesina del autobús;
+#  · (orgánico) firmes de hormigón, pista y asfalto roto en tiras de variantes, detalles de la hierba, el caserío pequeño, la
+#    borda, dos casas marineras de otro tamaño, el manzano y un segundo árbol alto.
 # Sale a art/crudo/<grupo>/<sprite>/unica/NN.png; después, node tools/sprites/procesar.js <grupos> --atlas.
 import math, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -603,12 +605,338 @@ def parada():
     return lz
 
 
+
+# ------------------------------------------------------------------------------------------------- firmes y detalles (orgánico)
+# Firmes en tiras de 4 variantes de 16 × 16 (64 × 16): el juego coge una por casilla con un hash (la 0, la más frecuente, es
+# la lisa), así el suelo no se repite cada metro. Detalles sueltos de la hierba en 8 × 8.
+# paletas de lo aprobado (tiles-exterior): asfalto, tierra, hierba
+AS, ASB, ASO, AMA, ASM = '#4a515c', '#7e8694', '#3c3c44', '#f0c838', '#5a5a66'
+TI, TIL, TIO, TIM, TIS = '#c48a52', '#c0ae8a', '#7a5a3a', '#a0744c', '#9e7650'
+HI, HIO, HIL = '#84cc6c', '#62aa56', '#b0e48c'
+# hormigón de pista rural: gris cálido claro, juntas, árido y manchas
+HO, HOJ, HOL, HOO, HOG = '#c4beb0', '#a49e90', '#d8d3c6', '#948e80', '#7c776c'
+
+
+def dentro(x, y, x0, y0, w, h):
+    dx, dy = (x + .5 - x0 - w / 2) / (w / 2), (y + .5 - y0 - h / 2) / (h / 2)
+    return dx * dx + dy * dy < 1
+
+
+def mancha(lz, x0, y0, w, h, c, r, dens=None):
+    """borrón de borde limpio: dos elipses solapadas, la segunda corrida al azar (nada de píxeles sueltos)"""
+    ox, oy, w2, h2 = int(r() * w / 2), int(r() * 2) - 1, max(2, w - 2), max(2, h - 1)
+    pts = []
+    for y in range(y0 - 2, y0 + h + 2):
+        for x in range(x0 - 1, x0 + w + 2):
+            if dentro(x, y, x0, y0, w * .75, h) or dentro(x, y, x0 + w * .25 + ox * .3, y0 + oy, w2 * .75, h2):
+                lz.p(x, y, c); pts.append((x, y))
+    return pts
+
+
+def grieta(lz, x, y, pasos, c, r, dx=1, dy=0, borde=None):
+    """grieta: avanza en su dirección y escalona de vez en cuando (1 px a un lado)"""
+    for _ in range(pasos):
+        lz.p(x, y, c)
+        if borde:
+            lz.p(x + dy, y + dx, borde)
+        if r() < .3:
+            if dx:
+                y += 1 if r() < .5 else -1
+            else:
+                x += 1 if r() < .5 else -1
+            lz.p(x, y, c)
+        x += dx; y += dy
+    return x, y
+
+
+def mata(lz, x, y, r):
+    """matojo de 3-5 px de alto que sale de una grieta o una junta"""
+    lz.p(x, y, HIO); lz.p(x, y - 1, HI)
+    if r() < .7:
+        lz.p(x - 1, y, HIO); lz.p(x - 1, y - 1, HIO if r() < .5 else HI)
+    if r() < .7:
+        lz.p(x + 1, y, HIO); lz.p(x + 1, y - 2, HI)
+    lz.p(x, y - 2, HIL)
+
+
+def hormigon():
+    """pista de hormigón de los pueblos. Variante 0 lisa (la que más sale), 1 junta con musgo, 2 mancha de aceite, 3 grieta"""
+    lz = Lienzo(64, 16)
+    for v in range(4):
+        r = azar(400 + v * 17); x0 = v * 16
+        lz.r(x0, 0, 16, 16, HO)
+        for _ in range(6):
+            lz.p(x0 + int(r() * 16), int(r() * 16), HOL)
+        for _ in range(4):
+            lz.p(x0 + int(r() * 16), int(r() * 16), HOO)
+        if v == 1:
+            lz.vl(x0 + 7, 0, 15, HOJ); lz.vl(x0 + 8, 0, 15, HOL); lz.p(x0 + 7, 11, HIO); lz.p(x0 + 7, 12, HIO); lz.p(x0 + 6, 12, HIO); lz.p(x0 + 7, 10, HI)
+        elif v == 2:
+            mancha(lz, x0 + 3, 6, 8, 4, HOO, r); mancha(lz, x0 + 5, 7, 3, 2, HOG, r)
+        elif v == 3:
+            grieta(lz, x0, 5, 16, HOG, r, borde=HOJ)
+    return lz
+
+
+def pista():
+    """pista de tierra (sin asfaltar): la tierra aprobada; 0 grava suelta (la que más sale), 1 charco, 2 hierba, 3 piedras"""
+    lz = Lienzo(64, 16)
+    for v in range(4):
+        r = azar(500 + v * 23); x0 = v * 16
+        lz.r(x0, 0, 16, 16, TI)
+        for _ in range(5):
+            x, y = x0 + int(r() * 15), int(r() * 15)
+            lz.p(x, y, TIL); lz.p(x + 1, y + 1, TIO)
+        for _ in range(4):
+            lz.p(x0 + int(r() * 16), int(r() * 16), TIS)
+        if v == 1:                                  # charco: lámina plana con el borde húmedo y el reflejo
+            mancha(lz, x0 + 2, 6, 12, 5, TIM, r)
+            mancha(lz, x0 + 3, 7, 10, 3, '#6a8ea0', r); lz.hl(x0 + 6, x0 + 8, 7, '#a8d0e4')
+        elif v == 2:
+            for x in (4, 9, 12):
+                mata(lz, x0 + x, 8 + int(r() * 4), r)
+        elif v == 3:
+            for x, y in ((3, 4), (10, 9)):
+                lz.r(x0 + x, y, 2, 2, TIL); lz.hl(x0 + x, x0 + x + 2, y + 2, TIO); lz.vl(x0 + x + 2, y, y + 1, TIO)
+    return lz
+
+
+def roto(fila):
+    """asfalto roto (T: bordillo y raya; B: cuneta). 0 gastado (el que más sale), 1 bache, 2 parche, 3 grieta con matojo;
+    la raya amarilla, a trozos y descolorida"""
+    PAR, PARO = '#40464f', '#363b44'
+    lz = Lienzo(64, 16)
+    for v in range(4):
+        r = azar(600 + v * 29 + (0 if fila == 'T' else 7)); x0 = v * 16
+        lz.r(x0, 0, 16, 16, AS)
+        for _ in range(5):
+            lz.p(x0 + int(r() * 16), int(r() * 16), ASM)
+        if fila == 'T':
+            lz.hl(x0, x0 + 15, 1, ASB); lz.r(x0, 2, 16, 3, ASO)
+            for x in range(16):
+                if r() < .25:
+                    lz.p(x0 + x, 1, ASO)
+            for x in (0, 5, 10):                    # la raya de siempre (3 px y hueco de 2), con tramos borrados o descoloridos
+                if r() < .7:
+                    lz.hl(x0 + x, x0 + x + (2 if r() < .75 else 1), 15, AMA if r() < .6 else '#b8a058')
+        else:
+            lz.hl(x0, x0 + 15, 15, ASO)
+        y0 = 6 if fila == 'T' else 2
+        if v == 1:                                  # bache: hueco oscuro con el canto de abajo claro
+            p = mancha(lz, x0 + 3, y0 + 1, 9, 5, ASO, r)
+            for x, y in p:
+                if (x, y + 1) not in p:
+                    lz.p(x, y + 1, ASB)
+            mancha(lz, x0 + 5, y0 + 2, 4, 2, '#2c2e36', r)
+        elif v == 2:                                # parche más oscuro, de bordes rectos pero torcido
+            lz.r(x0 + 2, y0, 10, 6, PAR); lz.r(x0 + 4, y0 + 6, 8, 1, PAR); lz.hl(x0 + 2, x0 + 11, y0 + 6, PARO)
+            lz.p(x0 + 2, y0, AS); lz.p(x0 + 11, y0 + 5, PARO)
+        elif v == 3:
+            x, y = grieta(lz, x0, y0 + 3, 16, ASO, r)
+            mata(lz, x0 + 6, y0 + 4, r)
+    return lz
+
+
+def detalles():
+    """sueltos sobre la hierba, 8 × 8 cada uno: matojo, piedras, trébol, margaritas, hojas secas"""
+    lz = Lienzo(40, 8)
+    r = azar(700)
+    mata(lz, 3, 6, r); mata(lz, 5, 7, r)
+    lz.r(9, 4, 2, 2, TIL); lz.p(11, 5, TIO); lz.p(10, 6, TIO); lz.p(13, 6, TIL); lz.p(14, 7, TIO)
+    for x, y in ((18, 3), (20, 5), (21, 2)):
+        lz.p(x, y, HIO); lz.p(x + 1, y, HIO); lz.p(x, y + 1, HIO); lz.p(x + 1, y + 1, '#3f8a46')
+    for x, y in ((26, 2), (29, 5)):
+        lz.p(x, y - 1, '#f4f4ee'); lz.p(x - 1, y, '#f4f4ee'); lz.p(x + 1, y, '#f4f4ee'); lz.p(x, y + 1, '#f4f4ee'); lz.p(x, y, AMA)
+    lz.p(34, 4, '#c8a050'); lz.p(35, 4, '#a07a3a'); lz.p(35, 5, '#c8a050'); lz.p(36, 5, '#a07a3a')
+    lz.p(37, 2, '#c8a050'); lz.p(38, 3, '#a07a3a')
+    return lz
+
+
+# ------------------------------------------------------------------------------------------ casas de otros tamaños y árboles
+# Para que los pueblos no sean todos iguales: el caserío pequeño, la borda, dos casas marineras más (estrecha y baja, ancha y
+# alta), el manzano de las huertas y un segundo árbol alto.
+def caserio_pequeno():
+    """caserío pequeño (6 × 5): el mismo pueblo pero de una planta y media, sin balconada: teja árabe, entramado arriba con
+    dos ventanucos, abajo cal, una ventana con contraventanas, la puerta de madera en arco rebajado y leña apilada"""
+    lz = Lienzo(96, 80)
+    MAD = ('#4a2c1c', '#6a421c', '#7e5630')
+    CAL, CALS = '#ece6d6', '#d4ccb6'
+    PIE = ('#b8ad98', '#8a7f6c')
+    VER, CR, FL = '#3c7a3c', '#34404c', '#e04848'
+    teja_arabe(lz, 0, 0, 96, 22)
+    lz.r(0, 22, 96, 3, MAD[0])
+    for x in range(3, 96, 9):
+        lz.r(x, 23, 3, 2, MAD[2])
+    lz.r(0, 25, 96, 55, CAL)
+    R = azar(83)
+    for _ in range(40):
+        lz.p(int(R() * 96), 26 + int(R() * 50), CALS)
+    lz.hl(0, 95, 25, CALS)
+    lz.r(0, 26, 96, 2, MAD[1]); lz.r(0, 44, 96, 2, MAD[1])          # entramado de la media planta
+    for x in (0, 30, 64, 93):
+        lz.r(x, 26, 3, 19, MAD[1]); lz.vl(x, 26, 44, MAD[2])
+    for k in range(17):                                                # una tornapunta a la derecha
+        lz.p(67 + round(24 * k / 16), 44 - k, MAD[1]); lz.p(68 + round(24 * k / 16), 44 - k, MAD[1])
+    for x in (12, 42):
+        ventana(lz, x, 30, 9, 10, MAD[0], CR, '#6f9fc4', CALS)
+    for y in range(46, 76, 6):                                         # esquinas de sillar
+        k = (y - 46) // 6 % 2
+        lz.caja(0, y, 6 + 3 * k, 6, PIE[0], PIE[1]); lz.caja(90 - 3 * k, y, 6 + 3 * k, 6, PIE[0], PIE[1])
+    ventana(lz, 16, 52, 10, 12, MAD[0], CR, '#6f9fc4', CALS, alfeizar=PIE[1])
+    lz.r(11, 52, 4, 12, VER); lz.r(27, 52, 4, 12, VER)
+    lz.r(15, 65, 12, 3, MAD[1]); lz.p(17, 64, FL); lz.p(21, 64, FL); lz.p(24, 64, FL)
+    for y in range(50, 80):                                            # puerta de madera, arco rebajado de piedra
+        for x in range(44, 66):
+            dx = x + .5 - 55
+            if y < 58 and dx * dx + (y - 58) ** 2 * 3 > 11 * 11:
+                continue
+            lz.p(x, y, PIE[0] if ((x // 4) + (y // 5)) % 2 else PIE[1])
+    for y in range(53, 80):
+        for x in range(47, 63):
+            dx = x + .5 - 55
+            if y < 58 and dx * dx + (y - 58) ** 2 * 3 > 8 * 8:
+                continue
+            lz.p(x, y, MAD[1] if (x - 47) % 4 else MAD[0])
+    lz.p(60, 67, '#c8b070')
+    for i, y in enumerate(range(62, 76, 4)):                           # leña apilada contra la pared
+        for x in range(72, 88, 4):
+            lz.r(x + (2 if i % 2 else 0), y, 4, 4, MAD[2]); lz.p(x + 1 + (2 if i % 2 else 0), y + 1, '#c89a5a'); lz.p(x + 3 + (2 if i % 2 else 0), y + 3, MAD[0])
+    lz.r(0, 76, 96, 4, PIE[1]); lz.hl(0, 95, 76, PIE[0])
+    return lz
+
+
+def borda():
+    """borda (4 × 4): la cuadra de piedra de las afueras, tejado a un agua, puerta de tablas y un ventanuco"""
+    lz = Lienzo(64, 64)
+    PI, PIL, PIO, JUN = '#a69c8a', '#c2b8a4', '#7a705e', '#8e8472'
+    MAD = ('#4a2c1c', '#6a421c', '#7e5630')
+    teja_arabe(lz, 0, 0, 64, 18)
+    lz.r(0, 18, 64, 3, MAD[0])
+    R = azar(91)
+    lz.r(0, 21, 64, 43, JUN)
+    y = 21
+    while y < 62:                                                      # mampostería: piedras de distinto tamaño
+        x = -int(R() * 6)
+        h = 4 + int(R() * 3)
+        while x < 64:
+            w = 6 + int(R() * 8)
+            lz.r(x + 1, y + 1, w - 1, h - 1, PI)
+            lz.hl(x + 1, x + w - 1, y + 1, PIL); lz.vl(x + w - 1, y + 2, y + h - 1, PIO)
+            x += w
+        y += h
+    for yy in range(36, 64):                                           # puerta de tablas
+        for xx in range(22, 42):
+            lz.p(xx, yy, MAD[1] if (xx - 22) % 5 else MAD[0])
+    lz.r(20, 33, 24, 3, MAD[0]); lz.vl(21, 36, 63, MAD[0]); lz.vl(42, 36, 63, MAD[0])
+    for yy in (40, 52):
+        lz.hl(23, 40, yy, MAD[2])
+    lz.caja(48, 28, 8, 6, '#26262e', MAD[0])                           # ventanuco
+    lz.r(0, 62, 64, 2, PIO)
+    return lz
+
+
+def marinera_var(k, ancho, pisos):
+    """casa marinera de otro tamaño: ancho en casillas (3-5) y pisos (1-3) sobre la planta baja; cada piso, una balconera
+    con su balcón; abajo, puerta (no se entra) y una ventana si cabe"""
+    W, H = ancho * 16, 80 if pisos == 1 else 112                   # 1 piso: 5 casillas de alto; 2 pisos: 7
+    lz = Lienzo(W, H)
+    C0, C1, C2 = MARINERAS[k]
+    BL, BLS, CR, CRL = '#f4f4ee', '#c8ccd0', '#2e3c4c', '#6f9fc4'
+    PIE = ('#9c9488', '#6c665e')
+    tejas(lz, 0, 0, W, 22, TEJA, alto=4, paso=6, sem=11 + ancho * 7 + pisos)
+    lz.r(0, 22, W, 2, TEJA[2]); lz.r(0, 24, W, 3, BL); lz.hl(0, W - 1, 26, BLS)
+    lz.r(0, 27, W, H - 27, C0)
+    R = azar(57 + ancho)
+    for _ in range(W * H // 140):
+        lz.p(int(R() * W), 28 + int(R() * (H - 34)), C1)
+    lz.hl(0, W - 1, 27, C1)
+    lz.r(W - 3, 27, 3, H - 27, PIE[0]); lz.vl(W - 3, 27, H - 1, PIE[1])
+    cx = W // 2
+    base = H - 32                                                     # la planta baja ocupa los 32 px de abajo
+    for p in range(pisos):                                            # pisos de arriba abajo
+        y = 30 + p * 26
+        bw = 18 if ancho == 3 else 22
+        vh = 18 if pisos > 1 else 13
+        lz.r(cx - bw // 2 - 2, y, bw + 4, vh + 5, BL)
+        ventana(lz, cx - bw // 2 + 1, y + 2, bw - 2, vh, C2, CR, CRL, C1, cruz=False)
+        lz.vl(cx, y + 3, y + vh, C2)
+        lz.r(cx - bw // 2 - 4, y + vh + 2, bw + 8, 2, C2); lz.hl(cx - bw // 2 - 4, cx + bw // 2 + 3, y + vh - 3, C2)
+        for x in range(cx - bw // 2 - 3, cx + bw // 2 + 4, 3):
+            lz.vl(x, y + vh - 2, y + vh + 1, C2)
+        if ancho >= 5:                                                # ventanas pequeñas a los lados
+            for x in (6, W - 16):
+                lz.r(x - 1, y + 3, 11, 14, BL); ventana(lz, x, y + 4, 9, 11, C2, CR, CRL, C1)
+        lz.p(cx - bw // 2 - 2, y + vh - 4, '#e04848'); lz.p(cx + bw // 2 + 1, y + vh - 4, '#e04848')
+    lz.r(cx - 9, base + 2, 18, 30, BL)                                # puerta
+    lz.r(cx - 6, base + 5, 12, 27, C2)
+    for y in (base + 8, base + 17):
+        lz.caja(cx - 4, y, 8, 7, C1, C2)
+    lz.p(cx + 4, base + 20, BL)
+    if ancho >= 4:
+        for x in ((5,) if ancho == 4 else (6, W - 18)):
+            lz.r(x - 2, base + 2, 14, 18, BL); ventana(lz, x, base + 4, 10, 13, C2, CR, CRL, C1)
+    lz.r(0, H - 4, W, 4, PIE[0]); lz.hl(0, W - 1, H - 4, PIE[1])
+    return lz
+
+
+def manzano(sem=13):
+    """manzano de las huertas (3,5 m, 56 px): tronco corto y torcido, copa ancha y baja con manzanas rojas"""
+    lz = Lienzo(48, 64)
+    tronco(lz, 23, 40, 63, 3, 6)
+    for (xa, ya, xb, yb) in ((23, 46, 13, 36), (24, 44, 34, 35)):
+        n = max(abs(xb - xa), abs(yb - ya))
+        for k in range(n + 1):
+            x = round(xa + (xb - xa) * k / n); y = round(ya + (yb - ya) * k / n)
+            lz.p(x, y, TRONCO[1]); lz.p(x + 1, y, TRONCO[2])
+    grumos = [(24, 14, 10), (13, 22, 9), (35, 21, 9), (24, 25, 12), (9, 33, 7), (39, 32, 7), (18, 37, 8), (31, 37, 8)]
+    copa(lz, grumos, sem)
+    R = azar(sem + 5)
+    n = 0
+    while n < 14:                                                     # manzanas: 2 px rojos con brillo, sobre la copa
+        x, y = 5 + int(R() * 38), 6 + int(R() * 34)
+        if lz.g(x, y)[3] and lz.g(x + 1, y + 1)[3]:
+            lz.p(x, y, '#d8403a'); lz.p(x + 1, y, '#b02a2a'); lz.p(x, y + 1, '#b02a2a'); lz.p(x + 1, y + 1, '#8a1e22'); lz.p(x, y, '#f07a62')
+            n += 1
+    lz.contorno(HOJA[0])
+    return lz
+
+
+def arbol2():
+    """segundo árbol alto (5 m, 80 px): copa más suelta y torcida hacia la derecha, tronco que se abre en dos"""
+    lz = Lienzo(64, 96)
+    tronco(lz, 30, 58, 95, 4, 7)
+    for (xa, ya, xb, yb) in ((30, 64, 20, 48), (31, 62, 44, 44), (30, 58, 33, 36)):
+        n = max(abs(xb - xa), abs(yb - ya))
+        for k in range(n + 1):
+            x = round(xa + (xb - xa) * k / n); y = round(ya + (yb - ya) * k / n)
+            lz.p(x, y, TRONCO[1]); lz.p(x + 1, y, TRONCO[2]); lz.p(x + 2, y, TRONCO[2])
+    grumos = [(36, 18, 11), (24, 26, 10), (47, 28, 10), (35, 32, 13), (17, 42, 9), (52, 42, 8), (28, 46, 11),
+              (42, 47, 10), (22, 55, 6), (46, 56, 6)]
+    copa(lz, grumos, 29)
+    for (x, y) in ((25, 58), (26, 57), (40, 57), (41, 57), (33, 55)):
+        if lz.g(x, y)[3]:
+            lz.p(x, y, HOJA[0])
+    lz.contorno(HOJA[0])
+    return lz
+
+
+MARINERAS['marinera5'] = ('#ece6d8', '#d4ccba', '#2c5490')    # blanca con carpintería azul: 5 de ancho, 2 pisos (7 de alto)
+MARINERAS['marinera6'] = ('#d8846a', '#b86a52', '#6a3a2a')    # rosa teja: 3 de ancho, 1 piso
+
 SPRITES['caserio'] = lambda: [guarda_edificio('edificio-caserio', *caserio(0)), guarda_edificio('edificio-caserio2', *caserio(1))]
-SPRITES['marinera'] = lambda: [guarda_edificio('edificio-' + k, marinera(k)) for k in MARINERAS]
+SPRITES['marinera'] = lambda: [guarda_edificio('edificio-' + k, marinera(k)) for k in ('marinera', 'marinera2', 'marinera3', 'marinera4')]
 SPRITES['ladrillo'] = lambda: guarda_edificio('edificio-ladrillo', ladrillo())
 SPRITES['fabrica'] = lambda: guarda_edificio('edificio-fabrica', fabrica())
 SPRITES['parada'] = lambda: sale(parada(), 'prop-parada', 'parada')
 
+
+SPRITES['firmes'] = lambda: [sale(f(), 'tiles-firmes', k) for k, f in (('hormigon', hormigon), ('pista', pista), ('rotoT', lambda: roto('T')), ('rotoB', lambda: roto('B')))]
+SPRITES['detalles'] = lambda: sale(detalles(), 'detalles-hierba', 'detalles')
+SPRITES['caserio3'] = lambda: guarda_edificio('edificio-caserio3', caserio_pequeno())
+SPRITES['borda'] = lambda: guarda_edificio('edificio-borda', borda())
+SPRITES['marinera-var'] = lambda: [guarda_edificio('edificio-marinera5', marinera_var('marinera5', 5, 2)), guarda_edificio('edificio-marinera6', marinera_var('marinera6', 3, 1))]
+SPRITES['manzano'] = lambda: sale(manzano(), 'prop-manzano', 'manzano')
+SPRITES['arbol2'] = lambda: sale(arbol2(), 'prop-arbol-alto2', 'tree2')
 
 if __name__ == '__main__':
     pedidos = sys.argv[1:] or list(SPRITES)

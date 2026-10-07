@@ -283,7 +283,7 @@ func _pasos() -> void:
 		await run(func(): await J.warp(J.MAPS["casa-ama"].exits["4,7"]))
 		R = {"mapa": J.S.map, "x": J.P.x, "y": J.P.y, "m": J.S.money, "t": J.S.min}
 		await run(J.parada_action),
-		func(): return (R.mapa == "mendialde" and R.x == 6 and R.y == 10 and J.S.map == "town" and J.P.x == 7 and J.P.y == 12 and si(J.S.flags.get("llegada"))
+		func(): return (R.mapa == "mendialde" and R.x == 6 and R.y == 12 and J.S.map == "town" and J.P.x == 7 and J.P.y == 12 and si(J.S.flags.get("llegada"))
 			and J.S.money == R.m and J.S.min - R.t >= 40 and J.S.min - R.t < 46) or {"R": R, "map": J.S.map, "x": J.P.x, "y": J.P.y, "m": J.S.money, "t": J.S.min})
 	step("Entrar en el piso de la tía", [], func(): await run(func(): await J.warp(J.MAPS.town.doors["5,8"])),
 		func(): return (J.S.map == "home" and J.objective_text() == "Lee la carta que hay en la mesa.") or {"map": J.S.map, "obj": J.objective_text()})

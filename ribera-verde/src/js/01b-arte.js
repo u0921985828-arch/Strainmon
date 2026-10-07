@@ -47,7 +47,7 @@ function frameDe(g,s,dir,t,o={}){
   if(o.i!=null)i=((o.i%n)+n)%n;
   else if(o.ph!=null)i=Math.floor(o.ph*n)%n;
   else{i=Math.floor(Math.max(0,t)*(a.fps||8)/1000);i=(o.bucle??a.bucle)?i%n:Math.min(n-1,i);}
-  return {c:m?espejo(ks[i]):ARTE.fr[ks[i]],i,n,cel:a.celda||ARTE.d.celdas[g]};
+  return {c:m!==!!o.esp?espejo(ks[i]):ARTE.fr[ks[i]],i,n,cel:a.celda||ARTE.d.celdas[g]};   // o.esp (orgánico): en espejo
 }
 // cambia colores exactos (rampa clave → rampa destino); se calcula una vez por fotograma y rampa
 function conRampa(c,map,id){
@@ -142,12 +142,31 @@ function arteTile(k,tx,ty,sx,sy,now){
     }
   }
   const f=frameDe(ARTE.cubre['tile:'+k],k,'unica',0,{i:0});if(!f)return false;
-  ctx.drawImage(f.c,sx,sy,16,16);return true;
+  if(f.c.width>16&&f.c.height===16){ctx.drawImage(f.c,variante(k,tx,ty)*16,0,16,16,sx,sy,16,16);return true;}   // tira de variantes (orgánico)
+  ctx.drawImage(f.c,sx,sy,16,16);
+  if(k==='grass')detalle(tx,ty,sx,sy);
+  return true;
 }
+// orgánico (1.10): un hash de la casilla (el mismo en pinta.gd) para que nada vaya a compás de la rejilla: qué variante de un firme
+// sale (la 0, la lisa, la que más: de 8 o de 6 tiradas, las que pasan de 3 son la 0), qué detalle lleva la hierba y dónde, y
+// cuánto se corre (y si va en espejo) cada árbol y cada monte
+const hashT=(x,y)=>{const a=(x*1103+y*2459+x*y*31)%9973;return (a*a+x*7+y*3)%9973;};
+const TIRADAS={hormigon:8,pista:8,rotoT:6,rotoB:6};
+function variante(k,tx,ty){const v=(hashT(tx,ty)>>2)%(TIRADAS[k]||4);return v<4?v:0;}
+// en 1 de cada 4 casillas de hierba, uno de los 5 detalles (8 × 8) en cualquier sitio de la casilla (sin salirse: la de al lado lo taparía)
+function detalle(tx,ty,sx,sy){
+  if(P.x===tx&&P.y===ty)return;const h=hashT(tx,ty);if(h%4)return;
+  const f=frameDe(ARTE.cubre['misc:detalles'],'detalles','unica',0,{i:0});if(!f)return;
+  ctx.drawImage(f.c,Math.floor(h/3)%5*8,0,8,8,sx+Math.floor(h/7)%9,sy+Math.floor(h/11)%9,8,8);
+}
+// cuánto se corre cada objeto alto de su casilla ([±x, ±y] px) y si va en espejo
+const DESF={tree:[6,3],tree2:[6,3],manzano:[5,3],monte:[4,2],monte2:[4,2]};
+function desfase(o,x,y){const r=DESF[o];if(!r)return {dx:0,dy:0,esp:0};const h=hashT(x,y),n=2*r[0]+1;
+  return {dx:h%n-r[0],dy:Math.floor(h/n)%(2*r[1]+1)-r[1],esp:Math.floor(h/97)%2};}
 // orillas (F4b): sobre el agua, la tierra o la plaza que toca hierba, la transición Wang de PixelLab.
 // Cada esquina es «hierba» si alguna de las 3 casillas que la comparten es hierba; máscara NW=1 NE=2 SW=4 SE=8.
 // La superposición deja ver el tile de debajo (el agua sigue animada); rodeada del todo (15) no se pinta.
-const TRANS={water:'agua',dirt:'tierra',plaza:'plaza'},HIERBA=/^(grass|flowers|tallgrass)$/;
+const TRANS={water:'agua',dirt:'tierra',plaza:'plaza',pista:'tierra'},HIERBA=/^(grass|flowers|tallgrass)$/;
 function mascaraOrilla(m,tx,ty){
   const H=(x,y)=>x>=0&&y>=0&&x<m.w&&y<m.h&&HIERBA.test(m.g[y][x]);
   const n=H(tx,ty-1),s=H(tx,ty+1),w=H(tx-1,ty),e=H(tx+1,ty);
@@ -166,11 +185,11 @@ const ALZA={iwin:-13,poster:-13,shelfW:-16,bottles:-13};
 function arteObj(o,tx,ty,cam,now,list){
   if(!ARTE.ok)return false;
   const g=ARTE.cubre['obj:'+o];if(!g)return false;
-  const an=ARTE.sobre['obj:'+o];
-  const f=an?frameDe(an[0][0],an[0][1],'unica',now,{bucle:true}):frameDe(g,o,'unica',0,{i:0});
+  const an=ARTE.sobre['obj:'+o],d=desfase(o,tx,ty);
+  const f=an?frameDe(an[0][0],an[0][1],'unica',now,{bucle:true}):frameDe(g,o,'unica',0,{i:0,esp:d.esp});
   if(!f)return false;
-  const xp=tx*16+8-cam.x,yp=ty*16+15+(ALZA[o]||0)-cam.y;
-  if(f.cel.h>16&&list)list.push([ty*16,()=>pinta(f,xp,yp)]);else pinta(f,xp,yp);
+  const xp=tx*16+8+d.dx-cam.x,yp=ty*16+15+d.dy+(ALZA[o]||0)-cam.y;
+  if(f.cel.h>16&&list)list.push([ty*16+Math.min(0,d.dy),()=>pinta(f,xp,yp)]);else pinta(f,xp,yp);   // corrido hacia abajo, no pasa delante de quien está en su fila
   return true;
 }
 // edificios grises con puerta (1.10): su fachada (b.fachada, con hueco para la puerta), la puerta de otra (b.puerta) y, con b.mascara,

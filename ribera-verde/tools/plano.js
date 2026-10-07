@@ -58,10 +58,11 @@ const REAL = {
       alto: [['PLAZA DEL ENSANCHE', 3, 4, 19, 17], ['JARDINES', 22, 3, 38, 11], ['CALLE', 1, 20, 38, 23]],
       astilleros: [['ASTILLEROS CERRADOS', 24, 4, 37, 10], ['MUELLE DE CARGA', 0, 19, 39, 22], ['DIQUES', 6, 23, 28, 27]],
       // la comarca (1.10)
-      mendialde: [['CARRETERA DE LA COMARCA', 1, 10, 30, 13], ['PLAZA', 12, 14, 19, 18], ['MAIZAL', 21, 15, 29, 21]],
+      mendialde: [['BARRIO VIEJO (HORMIGÓN)', 3, 3, 37, 13], ['CARRETERA DE LA COMARCA', 0, 17, 47, 18], ['PLAZA', 18, 19, 29, 26], ['AFUERAS (PISTA)', 3, 26, 42, 28],
+        ['MAIZAL', 39, 19, 46, 23], ['MANZANAL', 15, 29, 36, 32]],
       puerto: [['CASAS MARINERAS', 1, 2, 36, 7], ['PASEO', 1, 8, 38, 14], ['PANTALANES', 6, 16, 34, 21]],
-      valdehierro: [['CARRETERA', 1, 9, 38, 10], ['FUNDICIÓN', 29, 2, 36, 7], ['SOLAR', 20, 12, 38, 22], ['PARQUE', 2, 20, 17, 22]],
-      errotabarri: [['RÍO', 15, 0, 17, 19], ['CAMINO', 1, 9, 30, 10], ['HUERTA', 2, 13, 10, 17]] };
+      valdehierro: [['CARRETERA ROTA', 0, 9, 39, 10], ['NAVE', 10, 2, 15, 7], ['FUNDICIÓN', 29, 2, 36, 7], ['SOLAR', 20, 12, 38, 22], ['PARQUE', 1, 20, 17, 22]],
+      errotabarri: [['RÍO', 16, 0, 18, 23], ['PISTA', 0, 11, 35, 12], ['HUERTA', 3, 15, 10, 19], ['MOLINO', 22, 15, 25, 18]] };
     const FUERA = n => !!CLIENT_TILES[n];   // los mapas de fuera (barrio, barrio alto, astilleros y la comarca)
 
     mode = 'plano'; S = newState(); S.ch = 6; S.protect = false; S.flags = { letter: 1, kiko1: 1, harvest1: 1, metB: 1, lab: 1 }; S.min = 12 * 60; S.clients = [];

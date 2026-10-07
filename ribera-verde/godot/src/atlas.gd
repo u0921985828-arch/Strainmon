@@ -124,7 +124,8 @@ static func frame_de(g, s: String, dir: String, t: float, o := {}):
 	var cel = a.get("celda")
 	if cel == null:
 		cel = d.celdas[g]
-	return {"c": espejo(ks[i]) if r[1] else frame(ks[i]), "i": i, "n": n, "cel": cel}
+	var esp := true if o.get("esp") else false   # o.esp (orgánico): en espejo
+	return {"c": espejo(ks[i]) if r[1] != esp else frame(ks[i]), "i": i, "n": n, "cel": cel}
 
 # cambia colores exactos (rampa clave → rampa destino); una vez por fotograma y rampa
 static func con_rampa(c: Image, mapa: Dictionary, id: String) -> Image:

@@ -8,7 +8,23 @@ const ob=(m,x,y,k)=>{if(x>=0&&y>=0&&x<m.w&&y<m.h)m.o[y][x]=k;};
 const rect=(m,x0,y0,x1,y1,fn)=>{for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)fn(x,y);};
 // linde de los mapas (1.10): monte espeso de 3 m, dos copas alternas, por arriba y por los lados; seto de 1 m por abajo (el árbol
 // alto, de 5,8 m, en fila de 1 en 1 era un peine de troncos y tapaba 5 filas). monte(m, x, y) pone el que toca en esa casilla
-const monte=(m,x,y)=>ob(m,x,y,(x+y)&1?'monte2':'monte');
+const monte=(m,x,y)=>ob(m,x,y,(hashT(x,y)>>1)&1?'monte2':'monte');   // orgánico: cuál de los dos, por hash (antes, a cuadros)
+// orgánico (1.10): ruido suave de 0 a 1 a lo largo de una línea (cada p casillas un valor al azar, determinista por sem)
+const ruido=(i,sem,p)=>{const f=i/p,a=Math.floor(f),t=f-a,s=t*t*(3-2*t),h=n=>{const v=((n+97)*7919+sem*104729)%10007;return v*v%10007/10007;};return h(a)*(1-s)+h(a+1)*s;};
+// monte en una casilla de hierba libre (lo demás, carreteras, casas, agua, hierba alta y objetos, se queda como está)
+const enMonte=(m,x,y)=>{if(x>=0&&y>=0&&x<m.w&&y<m.h&&!m.o[y][x]&&/^(grass|flowers)$/.test(m.g[y][x]))monte(m,x,y);};   // no en la hierba alta (huertas y maizal)
+// linde que entra y sale (orgánico): por cada lado (n, s, o, e), [mín, máx] casillas de fondo; se pone al final, así las
+// carreteras salen del mapa entre los árboles
+function linde(m,o){
+  const L=(i,r,k)=>r[0]+Math.round(ruido(i,o.sem+k,o.p||5)*(r[1]-r[0]));
+  for(let x=0;x<m.w;x++){if(o.n)for(let y=0;y<L(x,o.n,1);y++)enMonte(m,x,y);if(o.s)for(let y=m.h-L(x,o.s,2);y<m.h;y++)enMonte(m,x,y);}
+  for(let y=0;y<m.h;y++){if(o.o)for(let x=0;x<L(y,o.o,3);x++)enMonte(m,x,y);if(o.e)for(let x=m.w-L(y,o.e,4);x<m.w;x++)enMonte(m,x,y);}
+}
+// bosquete: una mancha de monte de borde irregular alrededor de (cx, cy)
+function bosque(m,cx,cy,rx,ry,sem){
+  for(let y=Math.floor(cy-ry-1);y<=cy+ry+1;y++)for(let x=Math.floor(cx-rx-1);x<=cx+rx+1;x++){
+    const dx=(x-cx)/rx,dy=(y-cy)/ry,an=Math.round((Math.atan2(dy,dx)+Math.PI)*3),r=.75+ruido(an,sem,2)*.5;if(dx*dx+dy*dy<r*r)enMonte(m,x,y);}
+}
 // op (1.10, edificios grises con puerta): ancha, la puerta ocupa doorX y doorX + 1 (se pinta centrada entre las dos: dx 8);
 // fachada, el arte de la fachada si no es el de id ('gray-puerta': la gris con las ventanas de abajo separadas para la puerta);
 // puerta, la fachada de la que sale la animación de la puerta ('home'); mascara, sin el trozo de pared de esa fachada
@@ -28,7 +44,7 @@ const ZONAS={town:{n:'Ribera Verde',pol:1,lad:1,precio:1},alto:{n:'Barrio alto',
 // de Ribera Verde (min, €): todas las líneas pasan por ella, así que un viaje entre dos pueblos suma los dos tramos. De 7:00 a 21:00
 const PARADAS={town:{n:'Ribera Verde',x:8,y:12,a:[7,12,'down'],min:0,eur:0},
   puerto:{n:'Puerto Viejo',x:19,y:9,a:[20,9,'down'],min:25,eur:2},valdehierro:{n:'Valdehierro',x:14,y:11,a:[15,11,'down'],min:20,eur:2},
-  mendialde:{n:'Mendialde',x:10,y:13,a:[11,13,'down'],min:40,eur:3},errotabarri:{n:'Errotabarri',x:8,y:11,a:[9,11,'down'],min:30,eur:3}};
+  mendialde:{n:'Mendialde',x:20,y:19,a:[21,19,'down'],min:40,eur:3},errotabarri:{n:'Errotabarri',x:6,y:13,a:[7,13,'down'],min:30,eur:3}};
 const BUS_HORAS=[7*60,21*60];
 const viaje=(a,b)=>({min:PARADAS[a].min+PARADAS[b].min,eur:PARADAS[a].eur+PARADAS[b].eur});
 function buildMaps(){
@@ -111,65 +127,90 @@ function buildMaps(){
   [[9,19],[20,19],[31,19],[14,8]].forEach(([x,y])=>ob(t,x,y,'lamp'));[[10,3],[12,4],[2,10],[37,14]].forEach(([x,y])=>ob(t,x,y,'tree'));
 
   // ---------- MENDIALDE (1.10): el pueblo de caseríos del que viene el protagonista ----------
-  // la carretera de la comarca cruza el pueblo; al norte, el caserío de la familia (se entra: casa-ama) y el de los vecinos;
-  // al sur, la plaza con su fuente y la parada, otro caserío y la huerta de maíz
-  const v=newMap('mendialde',32,24,'grass');v.music='town';
-  for(let x=0;x<32;x++){monte(v,x,0);monte(v,x,1);ob(v,x,23,'seto');}
-  for(let y=0;y<24;y++){monte(v,0,y);monte(v,31,y);}
-  for(let x=1;x<31;x++){gr(v,x,10,'walk');gr(v,x,11,'roadT');gr(v,x,12,'roadB');gr(v,x,13,'walk');}
-  building(v,'caserio',3,4,8,6,6,{to:'casa-ama',x:4,y:6,dir:'up'},{ancha:1,dx:8});
-  building(v,'caserio2',19,3,8,6,null);rect(v,19,9,26,9,(x,y)=>gr(v,x,y,'dirt'));
-  rect(v,12,14,19,18,(x,y)=>gr(v,x,y,'plaza'));ob(v,15,16,'fountain');ob(v,13,17,'bench');ob(v,18,17,'bench');
-  [[12,14],[19,14]].forEach(([x,y])=>ob(v,x,y,'lamp'));ob(v,10,13,'parada');ob(v,2,13,'sign');
-  building(v,'caserio2',2,16,8,6,null);rect(v,2,22,9,22,(x,y)=>gr(v,x,y,'dirt'));
-  rect(v,21,15,29,15,(x,y)=>{if(x!==25)ob(v,x,y,'fence');});rect(v,21,21,29,21,(x,y)=>ob(v,x,y,'fence'));
-  rect(v,21,16,21,20,(x,y)=>ob(v,x,y,'fence'));rect(v,29,16,29,20,(x,y)=>ob(v,x,y,'fence'));rect(v,22,16,28,20,(x,y)=>gr(v,x,y,'tallgrass'));
-  [[13,8],[29,8],[11,21],[20,21]].forEach(([x,y])=>ob(v,x,y,'tree'));[[2,3],[17,9],[28,13]].forEach(([x,y])=>ob(v,x,y,'bush'));
-  [[12,3],[15,5],[4,14],[8,14],[24,14],[27,22],[14,20],[17,21]].forEach(([x,y])=>gr(v,x,y,'flowers'));
+  // orgánico: la carretera de la comarca (asfalto) cruza el pueblo y sale entre los árboles; arriba, el barrio viejo por una pista
+  // de hormigón: el caserío de la familia (se entra: casa-ama), el de los vecinos, uno pequeño y la borda; abajo, la plaza con la
+  // fuente y la parada, otro caserío grande y otro pequeño; y las afueras por la pista de tierra: el manzanal, el maizal y otra
+  // borda. El monte entra y sale por los bordes y hay dos bosquetes en las esquinas
+  const v=newMap('mendialde',48,34,'grass');v.music='town';
+  for(let x=0;x<48;x++){gr(v,x,17,'roadT');gr(v,x,18,'roadB');}
+  rect(v,4,12,37,13,(x,y)=>gr(v,x,y,'hormigon'));rect(v,13,14,14,16,(x,y)=>gr(v,x,y,'hormigon'));
+  rect(v,28,9,29,11,(x,y)=>gr(v,x,y,'hormigon'));rect(v,30,9,34,10,(x,y)=>gr(v,x,y,'hormigon'));
+  building(v,'caserio',3,6,8,6,6,{to:'casa-ama',x:4,y:6,dir:'up'},{ancha:1,dx:8});
+  building(v,'caserio2',16,5,8,6,null);building(v,'caserio3',30,3,6,5,null);building(v,'borda',38,9,4,4,null);
+  rect(v,2,14,9,15,(x,y)=>gr(v,x,y,'tallgrass'));rect(v,2,16,9,16,(x,y)=>ob(v,x,y,'fence'));   // la huerta de casa
+  [[12,10],[25,10],[36,7],[42,14],[1,10]].forEach(([x,y])=>ob(v,x,y,'manzano'));[[15,4],[26,3]].forEach(([x,y])=>ob(v,x,y,'tree2'));
+  // la plaza (sin esquinas), la fuente, los bancos, las farolas y la parada
+  rect(v,18,19,29,25,(x,y)=>{if(!((x===18||x===29)&&(y===25)))gr(v,x,y,'plaza');});rect(v,20,26,27,26,(x,y)=>gr(v,x,y,'plaza'));
+  ob(v,24,22,'fountain');ob(v,21,23,'bench');ob(v,27,23,'bench');ob(v,18,21,'lamp');ob(v,29,21,'lamp');ob(v,20,19,'parada');ob(v,2,19,'sign');
+  // abajo: caserío grande y pequeño y la pista de tierra a las afueras
+  building(v,'caserio2',3,20,8,6,null);building(v,'caserio3',32,19,6,5,null);
+  rect(v,12,19,13,27,(x,y)=>gr(v,x,y,'pista'));rect(v,3,26,10,26,(x,y)=>gr(v,x,y,'pista'));rect(v,11,26,11,27,(x,y)=>gr(v,x,y,'pista'));
+  rect(v,14,27,42,28,(x,y)=>gr(v,x,y,'pista'));rect(v,34,24,35,26,(x,y)=>gr(v,x,y,'pista'));
+  building(v,'borda',43,25,4,4,null);
+  rect(v,39,19,46,19,(x,y)=>{if(x!==42)ob(v,x,y,'fence');});rect(v,39,23,46,23,(x,y)=>ob(v,x,y,'fence'));
+  rect(v,39,20,39,22,(x,y)=>ob(v,x,y,'fence'));rect(v,46,20,46,22,(x,y)=>ob(v,x,y,'fence'));rect(v,40,20,45,22,(x,y)=>gr(v,x,y,'tallgrass'));   // el maizal
+  [[15,30],[18,31],[21,30],[24,31],[27,30],[30,31],[33,30],[17,32],[23,32],[29,32],[36,31]].forEach(([x,y])=>ob(v,x,y,'manzano'));   // el manzanal (abajo, sin monte)
+  [[1,27],[14,22],[31,15],[45,16],[38,31]].forEach(([x,y])=>ob(v,x,y,'tree'));[[16,20],[11,24],[37,16]].forEach(([x,y])=>ob(v,x,y,'tree2'));   // ninguno tapa un cartel ni una casa
+  [[9,3],[24,14],[31,26],[16,25],[42,11]].forEach(([x,y])=>ob(v,x,y,'bush'));
+  [[11,15],[20,15],[27,14],[33,15],[5,29],[9,31],[36,30],[41,15],[16,23],[30,24]].forEach(([x,y])=>gr(v,x,y,'flowers'));
+  bosque(v,44,3,5,4,11);bosque(v,2,31,4,4,12);linde(v,{n:[2,5],s:[1,1],o:[1,3],e:[1,3],sem:5});
   // ---------- CASA DE AMA (1.10): dentro del caserío de la familia ----------
   const ca=newMap('casa-ama',10,8,'floor');ca.music='home';
   rect(ca,0,0,9,0,(x,y)=>gr(ca,x,y,'iwT_home'));rect(ca,0,1,9,1,(x,y)=>gr(ca,x,y,'iwB_home'));
   ob(ca,2,1,'iwin');ob(ca,7,1,'iwin');ob(ca,0,2,'bedT');ob(ca,0,3,'bedB');ob(ca,9,6,'fridge');ob(ca,5,4,'table');
   ob(ca,9,2,'plantDeco');ob(ca,0,7,'plantDeco');
-  gr(ca,4,7,'mat');ca.exits['4,7']={to:'mendialde',x:6,y:10,dir:'down'};
+  gr(ca,4,7,'mat');ca.exits['4,7']={to:'mendialde',x:6,y:12,dir:'down'};
   // ---------- PUERTO VIEJO (1.10): el pueblo pesquero, ciudad pequeña ----------
   // casas marineras de colores en fila frente al paseo, el muelle con sus pantalanes y el mar abajo
   const pv=newMap('puerto',40,24,'plaza');pv.music='town';
-  for(let x=0;x<40;x++){monte(pv,x,0);monte(pv,x,1);}
-  for(let y=0;y<16;y++){monte(pv,0,y);monte(pv,39,y);}
-  ['marinera','marinera3','marinera2','marinera4','marinera','marinera2','marinera3','marinera4','marinera2'].forEach((k,i)=>building(pv,k,1+i*4,2,4,6,null));
-  rect(pv,37,2,38,7,(x,y)=>gr(pv,x,y,'grass'));ob(pv,37,6,'bush');
+  // orgánico: casas de tres anchos y tres alturas (la fila sigue la línea del paseo; por arriba, monte hasta donde llega cada una)
+  rect(pv,0,0,39,7,(x,y)=>gr(pv,x,y,'grass'));rect(pv,0,8,1,15,(x,y)=>gr(pv,x,y,'grass'));rect(pv,38,8,39,15,(x,y)=>gr(pv,x,y,'grass'));
+  let px=1;[['marinera',4,6],['marinera6',3,5],['marinera2',4,6],['marinera5',5,7],['marinera3',4,6],['marinera4',4,6],['marinera6',3,5],['marinera',4,6],['marinera5',5,7]]
+    .forEach(([k,w,h])=>{building(pv,k,px,8-h,w,h,null);for(let x=px;x<px+w;x++)for(let y=0;y<8-h;y++)enMonte(pv,x,y);px+=w;});
+  ob(pv,37,6,'bush');
   for(let x=1;x<39;x++)gr(pv,x,8,'walk');
   rect(pv,0,16,39,23,(x,y)=>{gr(pv,x,y,'water');ob(pv,x,y,null);});
   [[6,8],[22,24],[32,34]].forEach(([x0,x1],i)=>rect(pv,x0,16,x1,i===2?19:21,(x,y)=>gr(pv,x,y,'dock')));
   rect(pv,1,15,38,15,(x,y)=>{if(!(x>=6&&x<=8||x>=22&&x<=24||x>=32&&x<=34))ob(pv,x,y,'fence');});
   [5,15,27,35].forEach(x=>ob(pv,x,9,'lamp'));[[11,14],[18,14],[29,14]].forEach(([x,y])=>ob(pv,x,y,'bench'));
   [[8,20],[23,21],[24,20],[34,18]].forEach(([x,y])=>ob(pv,x,y,'crate'));ob(pv,19,9,'parada');ob(pv,2,9,'sign');
-  [[4,14],[37,14]].forEach(([x,y])=>ob(pv,x,y,'tree'));
+  [[4,14],[37,14]].forEach(([x,y])=>ob(pv,x,y,'tree'));ob(pv,38,4,'tree2');
+  linde(pv,{n:[1,3],o:[1,2],e:[1,2],sem:7});
   // ---------- VALDEHIERRO (1.10): la ciudad pequeña de la industria ----------
   // bloques de ladrillo y la fundición a los dos lados de la carretera; al sureste, un solar vallado con cajas
   const vh=newMap('valdehierro',40,24,'walk');vh.music='town';
-  for(let x=0;x<40;x++){monte(vh,x,0);monte(vh,x,1);ob(vh,x,23,'seto');}
-  for(let y=0;y<24;y++){monte(vh,0,y);monte(vh,39,y);}
-  building(vh,'ladrillo',2,2,7,6,null);building(vh,'ladrillo',10,2,7,6,null);building(vh,'ladrillo',19,2,7,6,null);building(vh,'fabrica',29,2,8,6,null);
-  for(let x=1;x<39;x++){gr(vh,x,9,'roadT');gr(vh,x,10,'roadB');}
+  // orgánico: la carretera, de asfalto roto (baches, parches y la raya borrada); una nave entre los bloques; el borde, de monte
+  // que entra y sale por donde no hay ciudad
+  rect(vh,0,0,39,1,(x,y)=>gr(vh,x,y,'grass'));rect(vh,0,2,0,23,(x,y)=>gr(vh,x,y,'grass'));rect(vh,39,2,39,23,(x,y)=>gr(vh,x,y,'grass'));rect(vh,0,23,39,23,(x,y)=>gr(vh,x,y,'grass'));
+  building(vh,'ladrillo',2,2,7,6,null);building(vh,'nave',10,2,6,6,null);rect(vh,16,2,18,7,(x,y)=>gr(vh,x,y,'dirt'));building(vh,'ladrillo',19,2,7,6,null);building(vh,'fabrica',29,2,8,6,null);
+  for(let x=0;x<40;x++){gr(vh,x,9,'rotoT');gr(vh,x,10,'rotoB');}
   building(vh,'ladrillo',2,13,7,6,null);building(vh,'ladrillo',10,13,7,6,null);
   rect(vh,21,13,37,21,(x,y)=>gr(vh,x,y,'dirt'));rect(vh,20,12,38,12,(x,y)=>{if(x!==28&&x!==29)ob(vh,x,y,'fence');});
   rect(vh,20,13,20,22,(x,y)=>ob(vh,x,y,'fence'));rect(vh,38,13,38,22,(x,y)=>ob(vh,x,y,'fence'));rect(vh,21,22,37,22,(x,y)=>ob(vh,x,y,'fence'));
   [[23,14],[24,14],[23,15],[33,15],[34,15],[34,16],[26,19],[31,20],[36,18]].forEach(([x,y])=>ob(vh,x,y,'crate'));rect(vh,30,17,33,19,(x,y)=>gr(vh,x,y,'tallgrass'));
   [[9,8],[18,8],[28,8],[6,11],[24,11]].forEach(([x,y])=>ob(vh,x,y,'lamp'));ob(vh,14,11,'parada');ob(vh,2,8,'sign');ob(vh,27,12,'sign');
-  rect(vh,2,20,17,22,(x,y)=>gr(vh,x,y,'grass'));[[5,22],[14,22]].forEach(([x,y])=>ob(vh,x,y,'tree'));ob(vh,9,21,'bench');
+  rect(vh,1,20,17,22,(x,y)=>gr(vh,x,y,'grass'));[[5,22],[14,22]].forEach(([x,y])=>ob(vh,x,y,'tree'));ob(vh,10,22,'tree2');ob(vh,8,20,'bench');ob(vh,28,21,'tree2');
+  [[17,5],[16,7]].forEach(([x,y])=>ob(vh,x,y,'crate'));
+  linde(vh,{n:[1,2],s:[1,1],o:[1,1],e:[1,1],sem:9});
+
   // ---------- ERROTABARRI (1.10): el pueblo del río, con su molino ----------
-  const e=newMap('errotabarri',32,20,'grass');e.music='town';
-  for(let x=0;x<32;x++){if(x<15||x>17){monte(e,x,0);monte(e,x,1);ob(e,x,19,'seto');}}
-  for(let y=0;y<20;y++){monte(e,0,y);monte(e,31,y);}
-  rect(e,15,0,17,19,(x,y)=>gr(e,x,y,'water'));rect(e,15,9,17,9,(x,y)=>gr(e,x,y,'bridgeT'));rect(e,15,10,17,10,(x,y)=>gr(e,x,y,'bridgeB'));
-  for(let x=1;x<31;x++)if(x<15||x>17){gr(e,x,9,'dirt');gr(e,x,10,'dirt');}
-  building(e,'caserio2',3,2,8,6,null);building(e,'caserio',20,2,8,6,null);rect(e,6,8,7,8,(x,y)=>gr(e,x,y,'dirt'));rect(e,23,8,24,8,(x,y)=>gr(e,x,y,'dirt'));
-  ob(e,19,8,'sign');ob(e,8,11,'parada');ob(e,2,11,'sign');
-  rect(e,2,13,10,13,(x,y)=>ob(e,x,y,'fence'));rect(e,2,17,10,17,(x,y)=>ob(e,x,y,'fence'));rect(e,3,14,9,16,(x,y)=>gr(e,x,y,'tallgrass'));
-  [[13,17],[28,16],[25,16]].forEach(([x,y])=>ob(e,x,y,'tree'));[[11,12],[19,13],[23,12],[29,10]].forEach(([x,y])=>ob(e,x,y,'bush'));
-  [[4,12],[11,14],[20,17],[25,17],[13,4],[29,6]].forEach(([x,y])=>gr(e,x,y,'flowers'));
+  // orgánico: el camino es una pista de tierra (sin asfaltar) que cruza el río, que serpentea, por un puente de madera; arriba, el
+  // caserío grande y uno pequeño; abajo, la huerta, el molino viejo junto al agua (de piedra, la borda) y otro caserío pequeño
+  const e=newMap('errotabarri',36,24,'grass');e.music='town';
+  const rio=y=>16+Math.round(ruido(y>=10&&y<=13?11:y,21,4)*2);
+  for(let y=0;y<24;y++)for(let x=rio(y);x<rio(y)+3;x++)gr(e,x,y,'water');
+  for(let x=0;x<36;x++){const r=x>=rio(11)&&x<rio(11)+3;gr(e,x,11,r?'bridgeT':'pista');gr(e,x,12,r?'bridgeB':'pista');}
+  building(e,'caserio',4,3,8,6,null);rect(e,7,9,8,10,(x,y)=>gr(e,x,y,'pista'));
+  building(e,'caserio3',23,4,6,5,null);rect(e,25,9,26,10,(x,y)=>gr(e,x,y,'pista'));
+  building(e,'borda',22,15,4,4,null);ob(e,26,18,'sign');   // el molino
+  building(e,'caserio3',27,13,6,5,null);rect(e,33,13,34,20,(x,y)=>gr(e,x,y,'pista'));rect(e,27,19,32,20,(x,y)=>gr(e,x,y,'pista'));
+  rect(e,3,15,10,15,(x,y)=>ob(e,x,y,'fence'));rect(e,3,19,10,19,(x,y)=>ob(e,x,y,'fence'));rect(e,3,16,3,18,(x,y)=>ob(e,x,y,'fence'));rect(e,10,16,10,18,(x,y)=>ob(e,x,y,'fence'));
+  rect(e,4,16,9,18,(x,y)=>gr(e,x,y,'tallgrass'));
+  ob(e,6,13,'parada');ob(e,2,10,'sign');
+  [[13,6],[14,9],[2,14],[12,18]].forEach(([x,y])=>ob(e,x,y,'manzano'));[[30,9],[13,21]].forEach(([x,y])=>ob(e,x,y,'tree'));[[21,8],[31,22]].forEach(([x,y])=>ob(e,x,y,'tree2'));
+  [[12,13],[20,13],[28,10],[12,8],[25,21]].forEach(([x,y])=>ob(e,x,y,'bush'));
+  [[4,14],[11,14],[20,17],[24,20],[13,3],[30,6],[6,21],[15,15]].forEach(([x,y])=>gr(e,x,y,'flowers'));
+  bosque(e,33,3,4,3,13);linde(e,{n:[2,4],s:[1,3],o:[1,3],e:[1,2],sem:11});
 
   // ---------- HOME ----------
   // 1 casilla = 1 m: 12 × 6 m de suelo (72 m²). Dormitorio a la izquierda, escritorio y mesa de genética al fondo,
@@ -231,8 +272,10 @@ const sitioLibre=(x,y)=>SITIOS.findIndex((s,ci)=>sitioVisible(ci)&&x>=s.x&&x<s.x
 // casillas donde puede salir un cliente, por zona (1.10): en el barrio, de la calle para abajo y fuera de la entrada de la plaza
 // (Darko y Molina); en el barrio alto, la plaza del Ensanche y la avenida; en los astilleros, el patio y el muelle de carga
 // copas (1.10): lo que tapa un objeto alto por encima de su casilla, [casillas a cada lado, filas hacia arriba]; ahí no sale un cliente
-const COPA={tree:[1,5],monte:[1,2],monte2:[1,2]};
-function tapadas(m){const t=new Set();for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++){const c=COPA[m.o[y][x]];if(c)for(let j=y-c[1];j<y;j++)for(let i=x-c[0];i<=x+c[0];i++)t.add(i+','+j);}return t;}
+const COPA={tree:[1,5],tree2:[1,5],manzano:[1,3],monte:[1,2],monte2:[1,2]};
+// orgánico: con la copa corrida (desfase de 01b-arte), también la columna de al lado hacia donde se corre y, si sube, la fila de encima
+function tapadas(m){const t=new Set();for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++){const o=m.o[y][x],c=COPA[o];if(!c)continue;const d=desfase(o,x,y);
+  for(let j=y-c[1]-(d.dy<0?1:0);j<y;j++)for(let i=x-c[0]-(d.dx<0?1:0);i<=x+c[0]+(d.dx>0?1:0);i++)t.add(i+','+j);}return t;}
 let CLIENT_TILES={};
 function computeClientTiles(){
   CLIENT_TILES={};
@@ -240,7 +283,7 @@ function computeClientTiles(){
     alto:(x,y,g)=>y<=23&&y!==21&&y!==22&&(g==='plaza'||g==='walk')&&!(y===19&&x>=23)&&!(x>=10&&x<=13&&y>=18),
     astilleros:(x,y,g)=>y>=12&&y<=21&&x>=2&&(g==='dirt'||g==='dock')&&!(x>=15&&x<=22&&y<=14),
     puerto:(x,y,g)=>y>=9&&(g==='plaza'||g==='dock'),valdehierro:(x,y,g)=>(y===8||y===11||y>=20)&&(g==='walk'||g==='grass'),
-    mendialde:(x,y,g)=>g==='plaza',errotabarri:(x,y,g)=>g==='dirt'&&y>=9};
+    mendialde:(x,y,g)=>g==='plaza',errotabarri:(x,y,g)=>g==='pista'};
   for(const k in zona){const m=MAPS[k],l=CLIENT_TILES[k]=[],tp=tapadas(m),va=aPie(m,entrada(k));
     for(let y=1;y<m.h-1;y++)for(let x=1;x<m.w-1;x++){const g=m.g[y][x];if(zona[k](x,y,g)&&va.has(x+','+y)&&!tp.has(x+','+y)&&!(PARADAS[k]&&PARADAS[k].a[0]===x&&PARADAS[k].a[1]===y))l.push([x,y]);}}   // ni en la casilla donde deja el autobús (1.10)
 }

@@ -17,7 +17,7 @@ const Vista = preload("res://src/vista.gd")
 
 const SH := 160
 const DIR4 := {"down": "south", "up": "north", "left": "west", "right": "east"}
-const TRANS := {"water": "agua", "dirt": "tierra", "plaza": "plaza"}
+const TRANS := {"water": "agua", "dirt": "tierra", "plaza": "plaza", "pista": "tierra"}
 const HIERBA := ["grass", "flowers", "tallgrass"]
 const FUMA := ["fum", "puro", "pipa", "vap"]
 
@@ -303,8 +303,46 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 	var f = Atlas.frame_de(Atlas.cubre("tile:" + k), k, "unica", 0, {"i": 0})
 	if f == null:
 		return false
+	if f.c.get_width() > 16 and f.c.get_height() == 16:   # tira de variantes (orgánico)
+		L.draw_texture_rect_region(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), Rect2(variante(k, tx, ty) * 16, 0, 16, 16))
+		return true
 	L.draw_texture_rect(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), false)
+	if k == "grass":
+		_detalle(tx, ty, sx, sy)
 	return true
+
+# orgánico (1.10, 01b-arte.js): el mismo hash de casilla que el HTML (hashT) para que nada vaya a compás de la rejilla: qué
+# variante de un firme sale (la 0, la lisa, la que más), qué detalle lleva la hierba y dónde, y cuánto se corre (y si va en
+# espejo) cada árbol y cada monte
+static func hash_t(x: int, y: int) -> int:
+	var a := (x * 1103 + y * 2459 + x * y * 31) % 9973
+	return (a * a + x * 7 + y * 3) % 9973
+
+const TIRADAS := {"hormigon": 8, "pista": 8, "rotoT": 6, "rotoB": 6}
+static func variante(k: String, tx: int, ty: int) -> int:
+	var v: int = (hash_t(tx, ty) >> 2) % int(TIRADAS.get(k, 4))
+	return v if v < 4 else 0
+
+# en 1 de cada 4 casillas de hierba, uno de los 5 detalles (8 × 8) en cualquier sitio de la casilla
+func _detalle(tx: int, ty: int, sx: int, sy: int) -> void:
+	if J.P.x == tx and J.P.y == ty:
+		return
+	var h := hash_t(tx, ty)
+	if h % 4:
+		return
+	var f = Atlas.frame_de(Atlas.cubre("misc:detalles"), "detalles", "unica", 0, {"i": 0})
+	if f == null:
+		return
+	L.draw_texture_rect_region(Atlas.tex(f.c), Rect2(sx + (h / 7) % 9, sy + (h / 11) % 9, 8, 8), Rect2((h / 3) % 5 * 8, 0, 8, 8))
+
+const DESF := {"tree": [6, 3], "tree2": [6, 3], "manzano": [5, 3], "monte": [4, 2], "monte2": [4, 2]}
+static func desfase(o: String, x: int, y: int) -> Dictionary:
+	var r = DESF.get(o)
+	if r == null:
+		return {"dx": 0, "dy": 0, "esp": 0}
+	var h := hash_t(x, y)
+	var n: int = 2 * r[0] + 1
+	return {"dx": h % n - r[0], "dy": (h / n) % (2 * r[1] + 1) - r[1], "esp": (h / 97) % 2}
 
 func _mascara(m: Dictionary, tx: int, ty: int) -> int:
 	var H := func(x: int, y: int) -> bool: return x >= 0 and y >= 0 and x < m.w and y < m.h and HIERBA.has(m.g[y][x])
@@ -332,13 +370,14 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array) -> void:
 	if not gr:
 		return
 	var an = Atlas.sobre.get("obj:" + o)
-	var f = Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, o, "unica", 0, {"i": 0})
+	var d := desfase(o, tx, ty)
+	var f = Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, o, "unica", 0, {"i": 0, "esp": d.esp})
 	if f == null:
 		return
-	var xp: int = tx * 16 + 8 - cam.x
-	var yp: int = ty * 16 + 15 + int(ALZA.get(o, 0)) - cam.y
+	var xp: int = tx * 16 + 8 + d.dx - cam.x
+	var yp: int = ty * 16 + 15 + d.dy + int(ALZA.get(o, 0)) - cam.y
 	if f.cel.h > 16:
-		list.append([ty * 16, _pinta.bind(f, xp, yp)])
+		list.append([ty * 16 + mini(0, d.dy), _pinta.bind(f, xp, yp)])   # corrido hacia abajo, no pasa delante de quien está en su fila
 	else:
 		_pinta(f, xp, yp)
 

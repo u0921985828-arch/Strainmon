@@ -753,43 +753,75 @@
   "mendialde": {
    "nombre": "mendialde",
    "titulo": "MENDIALDE · el pueblo del prólogo",
-   "w": 32,
-   "h": 24,
+   "w": 48,
+   "h": 34,
    "edificios": [
     {
      "id": "caserio",
      "x": 3,
-     "y": 4,
+     "y": 6,
      "w": 8,
      "h": 6,
      "puerta": 6
     },
     {
      "id": "caserio2",
-     "x": 19,
-     "y": 3,
+     "x": 16,
+     "y": 5,
      "w": 8,
      "h": 6,
      "puerta": null
     },
     {
+     "id": "caserio3",
+     "x": 30,
+     "y": 3,
+     "w": 6,
+     "h": 5,
+     "puerta": null
+    },
+    {
+     "id": "borda",
+     "x": 38,
+     "y": 9,
+     "w": 4,
+     "h": 4,
+     "puerta": null
+    },
+    {
      "id": "caserio2",
-     "x": 2,
-     "y": 16,
+     "x": 3,
+     "y": 20,
      "w": 8,
      "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "caserio3",
+     "x": 32,
+     "y": 19,
+     "w": 6,
+     "h": 5,
+     "puerta": null
+    },
+    {
+     "id": "borda",
+     "x": 43,
+     "y": 25,
+     "w": 4,
+     "h": 4,
      "puerta": null
     }
    ],
    "puertas": [
     {
      "x": 6,
-     "y": 9,
+     "y": 11,
      "a": "casa-ama"
     },
     {
      "x": 7,
-     "y": 9,
+     "y": 11,
      "a": "casa-ama"
     }
    ],
@@ -797,21 +829,21 @@
    "npcs": [
     {
      "id": "vecina",
-     "x": 17,
-     "y": 15,
+     "x": 22,
+     "y": 21,
      "deambula": 1
     }
    ],
    "objetos": [
     {
      "o": "parada",
-     "x": 10,
-     "y": 13
+     "x": 20,
+     "y": 19
     },
     {
      "o": "fountain",
-     "x": 15,
-     "y": 16
+     "x": 24,
+     "y": 22
     }
    ],
    "carpas": []
@@ -885,31 +917,31 @@
      "puerta": null
     },
     {
-     "id": "marinera3",
+     "id": "marinera6",
      "x": 5,
-     "y": 2,
-     "w": 4,
-     "h": 6,
+     "y": 3,
+     "w": 3,
+     "h": 5,
      "puerta": null
     },
     {
      "id": "marinera2",
-     "x": 9,
+     "x": 8,
      "y": 2,
      "w": 4,
      "h": 6,
      "puerta": null
     },
     {
-     "id": "marinera4",
-     "x": 13,
-     "y": 2,
-     "w": 4,
-     "h": 6,
+     "id": "marinera5",
+     "x": 12,
+     "y": 1,
+     "w": 5,
+     "h": 7,
      "puerta": null
     },
     {
-     "id": "marinera",
+     "id": "marinera3",
      "x": 17,
      "y": 2,
      "w": 4,
@@ -917,7 +949,7 @@
      "puerta": null
     },
     {
-     "id": "marinera2",
+     "id": "marinera4",
      "x": 21,
      "y": 2,
      "w": 4,
@@ -925,27 +957,27 @@
      "puerta": null
     },
     {
-     "id": "marinera3",
+     "id": "marinera6",
      "x": 25,
+     "y": 3,
+     "w": 3,
+     "h": 5,
+     "puerta": null
+    },
+    {
+     "id": "marinera",
+     "x": 28,
      "y": 2,
      "w": 4,
      "h": 6,
      "puerta": null
     },
     {
-     "id": "marinera4",
-     "x": 29,
-     "y": 2,
-     "w": 4,
-     "h": 6,
-     "puerta": null
-    },
-    {
-     "id": "marinera2",
-     "x": 33,
-     "y": 2,
-     "w": 4,
-     "h": 6,
+     "id": "marinera5",
+     "x": 32,
+     "y": 1,
+     "w": 5,
+     "h": 7,
      "puerta": null
     }
    ],
@@ -983,10 +1015,10 @@
      "puerta": null
     },
     {
-     "id": "ladrillo",
+     "id": "nave",
      "x": 10,
      "y": 2,
-     "w": 7,
+     "w": 6,
      "h": 6,
      "puerta": null
     },
@@ -1045,23 +1077,39 @@
   "errotabarri": {
    "nombre": "errotabarri",
    "titulo": "ERROTABARRI",
-   "w": 32,
-   "h": 20,
+   "w": 36,
+   "h": 24,
    "edificios": [
     {
-     "id": "caserio2",
-     "x": 3,
-     "y": 2,
+     "id": "caserio",
+     "x": 4,
+     "y": 3,
      "w": 8,
      "h": 6,
      "puerta": null
     },
     {
-     "id": "caserio",
-     "x": 20,
-     "y": 2,
-     "w": 8,
-     "h": 6,
+     "id": "caserio3",
+     "x": 23,
+     "y": 4,
+     "w": 6,
+     "h": 5,
+     "puerta": null
+    },
+    {
+     "id": "borda",
+     "x": 22,
+     "y": 15,
+     "w": 4,
+     "h": 4,
+     "puerta": null
+    },
+    {
+     "id": "caserio3",
+     "x": 27,
+     "y": 13,
+     "w": 6,
+     "h": 5,
      "puerta": null
     }
    ],
@@ -1070,16 +1118,16 @@
    "npcs": [
     {
      "id": "excursionista",
-     "x": 21,
-     "y": 10,
+     "x": 14,
+     "y": 14,
      "deambula": 2
     }
    ],
    "objetos": [
     {
      "o": "parada",
-     "x": 8,
-     "y": 11
+     "x": 6,
+     "y": 13
     }
    ],
    "carpas": []

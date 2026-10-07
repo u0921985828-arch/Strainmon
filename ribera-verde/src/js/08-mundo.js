@@ -54,8 +54,8 @@ const NPCDEF=[
   {id:'tono2',map:'almacen',x:5,y:2,look:'tono',cond:()=>!!S.encargo,talk:()=>talkTonoAlmacen()},   // los encargos de Baltasar (1.10)
   {id:'jurado',map:'town',x:18,y:15,look:'judge',cond:()=>S.ch===6,talk:()=>talkJurado()},
   // la comarca (1.10)
-  {id:'vecina',map:'mendialde',x:17,y:15,wander:1,look:'vecina',talk:()=>say(pick(['En Mendialde el autobús para en la plaza. El último sale a las nueve.','Tu ama dice que en la ciudad no comes. Llévate el táper.','Aquí el maíz se siembra en mayo y se recoge en octubre. Como toda la vida.']),'VECINA')},
-  {id:'excursionista',map:'errotabarri',x:21,y:10,wander:2,look:'excursionista',talk:()=>say(pick(['El molino tiene trescientos años. Todavía muele algún domingo.','Del puente para arriba, el río baja limpio. Para abajo, ya no tanto.','Vengo en el autobús de Ribera Verde: treinta minutos y tres euros.']),'EXCURSIONISTA')},
+  {id:'vecina',map:'mendialde',x:22,y:21,wander:1,look:'vecina',talk:()=>say(pick(['En Mendialde el autobús para en la plaza. El último sale a las nueve.','Tu ama dice que en la ciudad no comes. Llévate el táper.','Aquí el maíz se siembra en mayo y se recoge en octubre. Como toda la vida.']),'VECINA')},
+  {id:'excursionista',map:'errotabarri',x:14,y:14,wander:2,look:'excursionista',talk:()=>say(pick(['El molino tiene trescientos años. Todavía muele algún domingo.','Del puente para arriba, el río baja limpio. Para abajo, ya no tanto.','Vengo en el autobús de Ribera Verde: treinta minutos y tres euros.']),'EXCURSIONISTA')},
   {id:'turista',map:'puerto',x:14,y:11,wander:2,look:'turista',talk:()=>say(pick(['Las casas son de colores para que cada pescador viera la suya desde el mar.','Dicen que en este puerto se paga bien... y que la policía mira poco.','He venido a por anchoas y me han ofrecido de todo.']),'TURISTA')},
   {id:'obrero',map:'valdehierro',x:28,y:14,wander:1,look:'obrero',talk:()=>say(pick(['La fundición cerró hace años. Ahora el solar no es de nadie.','Aquí la gente cobra poco y paga poco. Y de noche, cuidado con la cartera.','De Valdehierro a Ribera Verde, veinte minutos de autobús.']),'OBRERO')},
 ];
@@ -152,9 +152,9 @@ const SIGNS={'town:9,8':'Calle Ribera, 3.\nPiso de la tía Maite.','town:13,8':'
   'town:10,4':'↑ BARRIO ALTO\nPlaza del Ensanche · Comisaría.','town:38,19':'ASTILLEROS DE RIBERA →\nZona industrial. Sin salida.',
   'alto:10,18':'PLAZA DEL ENSANCHE\nUrbanizada en 1964.','alto:22,7':'JARDINES DEL ENSANCHE\nNo pisar el césped.','alto:23,19':'COMISARÍA DE RIBERA\nAtención al público: de 9:00 a 14:00.',
   'astilleros:15,13':'ALMACÉN 3\nPropiedad privada. Prohibido el paso.','astilleros:2,18':'ASTILLEROS DE RIBERA\nCerrados desde 1992.',
-  'mendialde:2,13':'MENDIALDE\nCaseríos, huertas y la parada del autobús.','puerto:2,9':'PUERTO VIEJO\nCofradía de pescadores desde 1890.',
+  'mendialde:2,19':'MENDIALDE\nCaseríos, huertas y la parada del autobús.','puerto:2,9':'PUERTO VIEJO\nCofradía de pescadores desde 1890.',
   'valdehierro:2,8':'VALDEHIERRO\nCiudad del hierro desde 1911.','valdehierro:27,12':'SOLAR DE LA FUNDICIÓN\nPropiedad privada. Prohibido el paso.',
-  'errotabarri:2,11':'ERROTABARRI\nEl pueblo del molino.','errotabarri:19,8':'ERROTA ZAHARRA\nMolino harinero del siglo XVIII.'};
+  'errotabarri:2,10':'ERROTABARRI\nEl pueblo del molino.','errotabarri:26,18':'ERROTA ZAHARRA\nMolino harinero del siglo XVIII.'};
 async function objectAction(x,y){
   const m=MAPS[S.map],o=m.o[y]&&m.o[y][x];
   if(S.map==='home'){

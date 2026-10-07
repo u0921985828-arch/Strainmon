@@ -102,7 +102,10 @@ for (const a of M.assets) {
     if (fs.existsSync(d)) fs.readdirSync(d).filter(f => f.endsWith('.png')).sort().forEach((f, i) => wr(a.id, n, 'unica', i, PNG.sync.read(fs.readFileSync(path.join(d, f))))); }
   // ---------- tiles (16×16 exacto; los animados en bloques de 32×32) ----------
   if (a.tipo === 'tiles') {
-    for (const c of a.cubre || []) { const k = c.slice(5); const f = has(`tiles/${k}.png`) ? `tiles/${k}.png` : has(`tiles/${k}_f0.png`) ? `tiles/${k}_f0.png` : null; if (f) wr(a.id, k, 'unica', 0, rd(f)); }
+    // una tira de variantes (orgánico, 1.10: celda tile_tira de 64 × 16) lleva la loseta repetida 4 veces
+    const tw = (M.celdas[a.celda] || { w: 16 }).w;
+    for (const c of a.cubre || []) { const k = c.slice(5); const f = has(`tiles/${k}.png`) ? `tiles/${k}.png` : has(`tiles/${k}_f0.png`) ? `tiles/${k}_f0.png` : null;
+      if (f && tw > 16) { const o = blank(tw, 16); for (let x = 0; x < tw; x += 16) copy(rd(f), o, x, 0); wr(a.id, k, 'unica', 0, o); } else if (f) wr(a.id, k, 'unica', 0, rd(f)); }
     for (const an of a.animaciones || []) {
       const k = (an.sobre || '').slice(5); const fs0 = [0, 1].map(i => has(`tiles/${k}_f${i}.png`) ? rd(`tiles/${k}_f${i}.png`) : has(`tiles/${k}.png`) ? rd(`tiles/${k}.png`) : null);
       if (!fs0[0]) continue;
@@ -119,11 +122,11 @@ for (const a of M.assets) {
       wr(a.id, `${t}-${String(mk).padStart(2, '0')}`, 'unica', 0, o);
     }
   }
-  // ---------- edificios (una pieza de 7×6 o 6×6 casillas, montada como en building()) ----------
+  // ---------- edificios (una pieza del tamaño de su celda, de 3×5 a 8×6 casillas, montada como en building()) ----------
   if (a.tipo === 'edificio') {
     // gray-puerta (fachada retocada a mano para la puerta de home) se calca de las losetas de gray. La puerta: en la casilla
     // 3 (las aprobadas de 7 × 6) o en a.puerta = {x, ancha} (las de mundo.py, 1.10: ancha ocupa x y x + 1 y se recorta centrada)
-    const id = a.id.replace('edificio-', ''), ref = id.replace(/-puerta$/, ''), w = M.celdas[a.celda].w / 16, h = 6;
+    const id = a.id.replace('edificio-', ''), ref = id.replace(/-puerta$/, ''), w = M.celdas[a.celda].w / 16, h = M.celdas[a.celda].h / 16;   // alto de la celda (orgánico: 4, 5, 6 o 7)
     const doorX = a.puerta ? a.puerta.x : ref === 'gray' || !(a.animaciones || []).some(an => an.nombre === 'puerta') ? null : 3, an2 = a.puerta && a.puerta.ancha ? 1 : 0;
     const o = blank(w * 16, h * 16), t = k => rd(`tiles/${k}_${ref}.png`);
     for (let x = 0; x < w; x++) { copy(t('roofT'), o, x * 16, 0); copy(t('roofB'), o, x * 16, 16); for (let y = 2; y < h; y++) copy(t('wall'), o, x * 16, y * 16); if (x % 3 === 1 && x !== doorX) copy(t('win'), o, x * 16, 48); }

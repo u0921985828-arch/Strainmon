@@ -392,6 +392,76 @@
    ],
    "ajuste": "pies",
    "nota": "poste de la parada del autobús (1.10): 3 m"
+  },
+  "tile_tira": {
+   "w": 64,
+   "h": 16,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "firmes en tiras de 4 variantes de 16 × 16 (orgánico, mundo.py): el juego coge una por casilla con un hash; la 0, lisa, es la que más sale"
+  },
+  "tira_detalles": {
+   "w": 40,
+   "h": 8,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "detalles sueltos de la hierba en 8 × 8 (orgánico): matojo, piedras, trébol, margaritas, hojas secas"
+  },
+  "edificio_6x5": {
+   "w": 96,
+   "h": 80,
+   "ancla": [
+    48,
+    79
+   ],
+   "ajuste": "pies",
+   "nota": "fachadas de 6 × 5 casillas (orgánico, mundo.py): caserío pequeño"
+  },
+  "edificio_4x4": {
+   "w": 64,
+   "h": 64,
+   "ancla": [
+    32,
+    63
+   ],
+   "ajuste": "pies",
+   "nota": "fachadas de 4 × 4 casillas (orgánico, mundo.py): borda"
+  },
+  "edificio_5x7": {
+   "w": 80,
+   "h": 112,
+   "ancla": [
+    40,
+    111
+   ],
+   "ajuste": "pies",
+   "nota": "fachadas de 5 × 7 casillas (orgánico, mundo.py): casa marinera ancha de dos pisos"
+  },
+  "edificio_3x5": {
+   "w": 48,
+   "h": 80,
+   "ancla": [
+    24,
+    79
+   ],
+   "ajuste": "pies",
+   "nota": "fachadas de 3 × 5 casillas (orgánico, mundo.py): casa marinera estrecha de un piso"
+  },
+  "objeto_manzano": {
+   "w": 48,
+   "h": 64,
+   "ancla": [
+    24,
+    63
+   ],
+   "ajuste": "pies",
+   "nota": "manzano de las huertas (orgánico): 3,5 m, copa ancha y baja"
   }
  },
  "fases": [
@@ -6567,6 +6637,157 @@
    "notas": "1.10 P3. Porte i/h/s × ancho 38 (todas las carpas) y 32 (la fila de atrás de la de 120, donde las vecinas quedan a 34 px): floración y lista planta-c-<porte>-<ancho> y vegetativo planta-c-<porte>2-<ancho>, un fotograma cada 2 px de alto (00 el más alto) entre los altos que se ven en las carpas: índica 66-40 y 36-24, híbrida 72-44 y 42-28, sativa 92-54 (con 32 de ancho, 80-54: más alta se sale) y 46-32. El motor dibuja el fotograma de su alto (vcAltura) y le quita la fila que sobre (vcAplasta). Germinando (8 × 8) y plántula (16 × 28), las de carpa-c-plantas-h, para los tres portes. Paleta A: hoja y tallo #0d2620 #1b4630 #2f7038 #57a33e #94d255, tallo tierno #71984a #3b5a2e, tricoma #f2f4dc, pistilos #f08a3c #b45a28 y el cogollo en la rampa clave magenta; el motor pone el color de la variedad al cogollo (+50, tal cual, −60) y su tono de hoja (STRAINS[k].hj) a los verdes de la hoja y el tallo. Como mucho 13 colores por sprite.",
    "montaje": "tal cual (exporta.py), un PNG por alto, ya en la celda de 40 × 96 con el tallo en las columnas 19-20 (ajuste exacto); la luz la pone el motor",
    "aprobado": "2026-10-07: planta A con la genética (lámina gen4), «Me vale». El vegetativo es nuevo en esta entrega: pendiente de su visto bueno. 2026-10-07: «Parecen peras las bolas de bajo»: yemas de los nudos y cogollitos de la cola rehechos, anchos arriba y estrechos abajo (cola2.py, YEMA de planta_a.py); pendiente de su visto bueno"
+  },
+  {
+   "id": "tiles-firmes",
+   "tipo": "tiles",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:hormigon",
+    "tile:pista",
+    "tile:rotoT",
+    "tile:rotoB"
+   ],
+   "celda": "tile_tira",
+   "origen": "tools/sprites/a-mano/mundo.py: dibujado a mano a 16 px/m con la paleta y la luz de lo aprobado",
+   "descripcion": "firmes: pista de hormigón de los pueblos, pista de tierra sin asfaltar y asfalto roto (con bordillo y raya / con cuneta), 4 variantes cada uno",
+   "notas": "orgánico (1.10), pedido por el usuario: «que haya más heterogeneidad que homogeneidad»; árboles sin cuadrícula, casas de varios tamaños y firmes distintos."
+  },
+  {
+   "id": "detalles-hierba",
+   "tipo": "misc",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "misc:detalles"
+   ],
+   "celda": "tira_detalles",
+   "origen": "tools/sprites/a-mano/mundo.py: dibujado a mano a 16 px/m con la paleta y la luz de lo aprobado",
+   "descripcion": "detalles sueltos sobre la hierba (matojo, piedras, trébol, margaritas, hojas secas), en posiciones que no siguen la rejilla",
+   "notas": "orgánico (1.10), pedido por el usuario: «que haya más heterogeneidad que homogeneidad»; árboles sin cuadrícula, casas de varios tamaños y firmes distintos."
+  },
+  {
+   "id": "edificio-caserio3",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:roofT_caserio3",
+    "tile:roofB_caserio3",
+    "tile:wall_caserio3",
+    "tile:win_caserio3"
+   ],
+   "celda": "edificio_6x5",
+   "origen": "tools/sprites/a-mano/mundo.py: dibujado a mano a 16 px/m con la paleta y la luz de lo aprobado",
+   "descripcion": "caserío pequeño de una planta y media: entramado arriba, cal, puerta de madera en arco rebajado y leña apilada",
+   "notas": "orgánico (1.10), pedido por el usuario: «que haya más heterogeneidad que homogeneidad»; árboles sin cuadrícula, casas de varios tamaños y firmes distintos."
+  },
+  {
+   "id": "edificio-borda",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:roofT_borda",
+    "tile:roofB_borda",
+    "tile:wall_borda",
+    "tile:win_borda"
+   ],
+   "celda": "edificio_4x4",
+   "origen": "tools/sprites/a-mano/mundo.py: dibujado a mano a 16 px/m con la paleta y la luz de lo aprobado",
+   "descripcion": "borda de piedra de las afueras: mampostería de piedras de distinto tamaño, puerta de tablas y ventanuco",
+   "notas": "orgánico (1.10), pedido por el usuario: «que haya más heterogeneidad que homogeneidad»; árboles sin cuadrícula, casas de varios tamaños y firmes distintos."
+  },
+  {
+   "id": "edificio-marinera5",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:roofT_marinera5",
+    "tile:roofB_marinera5",
+    "tile:wall_marinera5",
+    "tile:win_marinera5"
+   ],
+   "celda": "edificio_5x7",
+   "origen": "tools/sprites/a-mano/mundo.py: dibujado a mano a 16 px/m con la paleta y la luz de lo aprobado",
+   "descripcion": "casa marinera ancha de dos pisos (blanca, carpintería azul)",
+   "notas": "orgánico (1.10), pedido por el usuario: «que haya más heterogeneidad que homogeneidad»; árboles sin cuadrícula, casas de varios tamaños y firmes distintos."
+  },
+  {
+   "id": "edificio-marinera6",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:roofT_marinera6",
+    "tile:roofB_marinera6",
+    "tile:wall_marinera6",
+    "tile:win_marinera6"
+   ],
+   "celda": "edificio_3x5",
+   "origen": "tools/sprites/a-mano/mundo.py: dibujado a mano a 16 px/m con la paleta y la luz de lo aprobado",
+   "descripcion": "casa marinera estrecha de un piso (rosa teja)",
+   "notas": "orgánico (1.10), pedido por el usuario: «que haya más heterogeneidad que homogeneidad»; árboles sin cuadrícula, casas de varios tamaños y firmes distintos."
+  },
+  {
+   "id": "prop-manzano",
+   "tipo": "objeto",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "obj:manzano"
+   ],
+   "celda": "objeto_manzano",
+   "origen": "tools/sprites/a-mano/mundo.py: dibujado a mano a 16 px/m con la paleta y la luz de lo aprobado",
+   "descripcion": "manzano de las huertas (3,5 m) con manzanas rojas",
+   "notas": "orgánico (1.10), pedido por el usuario: «que haya más heterogeneidad que homogeneidad»; árboles sin cuadrícula, casas de varios tamaños y firmes distintos."
+  },
+  {
+   "id": "prop-arbol-alto2",
+   "tipo": "objeto",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "obj:tree2"
+   ],
+   "celda": "objeto_arbol",
+   "origen": "tools/sprites/a-mano/mundo.py: dibujado a mano a 16 px/m con la paleta y la luz de lo aprobado",
+   "descripcion": "segundo árbol alto (5 m): copa más suelta y torcida, tronco que se abre en dos",
+   "notas": "orgánico (1.10), pedido por el usuario: «que haya más heterogeneidad que homogeneidad»; árboles sin cuadrícula, casas de varios tamaños y firmes distintos."
   }
  ],
  "familias": {

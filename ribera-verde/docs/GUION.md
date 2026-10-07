@@ -44,6 +44,8 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 
 *Empiezas en tu cuarto del caserío. Objetivo: coger el autobús en la plaza de Mendialde hasta Ribera Verde.*
 
+*Mendialde (1.10): sales del caserío al barrio viejo, de pistas de hormigón, con el caserío de los vecinos, uno pequeño y la borda; bajas a la carretera de la comarca y, al otro lado, a la plaza de la fuente, con la parada. Por la pista de tierra se va a las afueras: el maizal, el manzanal y otra borda.*
+
 - *Mesa:* Una nota de tu ama: «Te he dejado un táper de alubias en la nevera. Llama cuando llegues. Y no te metas en líos». (Otra vez: «La nota de ama: «...y no te metas en líos».»)
 - *Nevera:* Consigues el táper de alubias de ama (1 × BOCATA). (Otra vez: «La nevera de casa. El táper ya va en la mochila.»)
 - *Cama:* «Tu cama de siempre, con la colcha de cuadros.» · *Ventana:* «Por la ventana se ven el monte y la carretera de la comarca.» · *Geranios:* «Los geranios de ama. Les sobra agua.»

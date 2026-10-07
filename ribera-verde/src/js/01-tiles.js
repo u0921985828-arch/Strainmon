@@ -45,13 +45,19 @@ function buildTiles(){
   T('bridgeT',t=>{t.F(0,0,16,16,C.wood1);for(let x=0;x<16;x+=4)t.F(x,0,1,16,C.wood2);t.F(0,0,16,3,C.wood4);t.F(0,1,16,1,C.wood3);});
   T('bridgeB',t=>{t.F(0,0,16,16,C.wood1);for(let x=0;x<16;x+=4)t.F(x,0,1,16,C.wood2);t.F(0,13,16,3,C.wood4);t.F(0,14,16,1,C.wood3);});
   T('dock',t=>{t.F(0,0,16,16,C.wood3);for(let y=3;y<16;y+=4)t.F(0,y,16,1,C.wood2);t.P(2,1,C.wood4);t.P(13,5,C.wood4);t.P(6,9,C.wood4);t.P(10,13,C.wood4);t.noise(5,[C.wood1]);});
+  // firmes (orgánico): hormigón de los pueblos, pista de tierra y asfalto roto (sin arte, como estos; con arte, mundo.py y sus variantes)
+  T('hormigon',t=>{t.F(0,0,16,16,'#c4beb0');t.noise(10,['#d8d3c6','#948e80']);t.F(7,0,1,16,'#a49e90');});
+  T('pista',t=>{t.F(0,0,16,16,C.dirt1);t.noise(12,['#c0ae8a','#7a5a3a','#a0744c']);});
+  T('rotoT',t=>{t.F(0,0,16,16,C.road1);t.noise(18,[C.road2,C.road3]);t.F(0,0,16,2,'#4a515c');t.F(1,14,4,2,'#b8a058');t.F(4,6,6,3,'#3c3c44');});
+  T('rotoB',t=>{t.F(0,0,16,16,C.road1);t.noise(18,[C.road2,C.road3]);t.F(0,14,16,2,'#4a515c');t.F(8,3,5,3,'#40464f');});
   T('void',t=>t.F(0,0,16,16,'#000'));
   // buildings
   // 1.10: las fachadas por bioma de mundo.py (comisaría, nave del almacén, caseríos, casas marineras, bloque de ladrillo y fábrica)
   const B={home:['#d65a4a','#f0dcae','doorW'],shop:['#46a262','#d8ecc4','doorG'],bar:['#4a72c2','#d4dbe8','doorD'],gray:['#8a92a2','#e4cec4','doorW'],
     comisaria:['#4e5664','#cfc8b8','doorD'],nave:['#5f7e80','#8c98a2','doorD'],caserio:['#b04a32','#f2eee2','doorD'],caserio2:['#b04a32','#ece0c4','doorD'],
     marinera:['#b04a32','#3f8a5a','doorD'],marinera2:['#b04a32','#3c6eb4','doorD'],marinera3:['#b04a32','#b8403a','doorD'],marinera4:['#b04a32','#e0b84a','doorD'],
-    ladrillo:['#9a9690','#a04a34','doorD'],fabrica:['#4e5258','#a04a34','doorD']};
+    ladrillo:['#9a9690','#a04a34','doorD'],fabrica:['#4e5258','#a04a34','doorD'],
+    caserio3:['#b04a32','#ece6d6','none'],borda:['#b04a32','#a69c8a','none'],marinera5:['#b04a32','#ece6d8','none'],marinera6:['#b04a32','#d8846a','none']};   // orgánico: sin puerta
   for(const [id,[roof,wall,door]] of Object.entries(B)){
     const shingles=(t)=>{t.F(0,0,16,16,roof);for(let y=3;y<16;y+=4){t.F(0,y,16,1,shade(roof,-38));for(let x=((y>>2)%2)*4;x<16;x+=8)t.F(x,y-3,1,3,shade(roof,-22));}t.noise(4,[shade(roof,22)]);};
     T('roofT_'+id,t=>{shingles(t);t.F(0,0,16,2,shade(roof,30));t.F(0,2,16,1,shade(roof,-45));});
@@ -75,6 +81,8 @@ function buildTiles(){
   T('floorS',t=>{for(let y=0;y<2;y++)for(let x=0;x<2;x++)t.F(x*8,y*8,8,8,(x+y)%2?'#e8eadc':'#cfdcc4');});
   T('mat',t=>{t.F(0,0,16,16,'#d8a868');t.box(1,3,14,11,'#c44a4a','#7a2626');for(let x=3;x<13;x+=3)t.F(x,5,1,7,'#a83636');});
   // objects (transparent)
+  T('tree2',t=>{t.F(6,11,3,5,C.wood4);t.blob(8,6,7.2,6.2,'#3a8e42','#1f4f2a','#6cc262','#2c6e36');});   // orgánico: el segundo árbol y el manzano
+  T('manzano',t=>{t.F(7,10,2,6,C.wood4);t.blob(8,6.5,7,5.4,'#4a9a44','#1f4f2a','#7acc66','#2c6e36');t.P(5,6,'#d8403a');t.P(10,5,'#d8403a');t.P(8,9,'#d8403a');});
   T('tree',t=>{t.F(6,11,4,5,C.wood4);t.F(7,11,1,5,'#8c6438');t.blob(8,6.5,7.6,6.6,'#3e9446','#1f4f2a','#72c868','#2c6e36');t.noise(6,['#2c6e36'],3,2,10,8);});
   T('bush',t=>{t.blob(8,9.5,7,5.6,'#4ea04e','#22522c','#86d474','#357a3c');});
   // linde de los mapas (1.10): monte espeso y seto; con arte, los de prop-monte y prop-seto (mundo.py)

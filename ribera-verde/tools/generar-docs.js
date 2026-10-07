@@ -22,10 +22,10 @@ const ROOT = path.join(__dirname, '..');
     const macetas = Object.entries(MACETAS).map(([k, M]) => ({ k, ...M }));
     const recipes = Object.entries(RECIPES).map(([pair, out]) => ({ a: pair.split('+')[0], b: pair.split('+')[1], out }));
     const G = { grass: '.', flowers: '*', tallgrass: '"', dirt: ':', walk: '-', roadT: '=', roadB: '=', plaza: '+', water: '~', bridgeT: 'H', bridgeB: 'H', dock: '#',
-      floor: '.', floorB: '.', floorS: '.', mat: 'm', void: ' ' };
+      rotoT: '%', rotoB: '%', hormigon: '_', pista: ',', floor: '.', floorB: '.', floorS: '.', mat: 'm', void: ' ' };
     const O = { tree: 'T', bush: 'b', fence: 'f', sign: 'S', lamp: 'L', bench: 'n', fountain: 'O', crate: 'c', bedT: 'B', bedB: 'B', pc: 'P', lab: 'G', lab2: 'G',
       table: 't', fridge: 'F', shelfW: 's', counter: 'C', display: 'd', plantDeco: 'p', barcounter: 'C', bottles: 's', stool: 'x', btable: 't', jukebox: 'J', iwin: 'v', poster: 'v', carpa: 'K',
-      monte: 'M', monte2: 'M', seto: 'h', parada: 'A' };
+      monte: 'M', monte2: 'M', seto: 'h', parada: 'A', tree2: 'T', manzano: 'Y' };
     const maps = {};
     for (const [name, m] of Object.entries(MAPS)) {
       const rows = [];
@@ -247,8 +247,8 @@ Saldada la deuda, el juego sigue: cada rango se gana facturando desde el último
   fs.writeFileSync(path.join(ROOT, 'docs/ECONOMIA.md'), e);
 
   // ---------- MAPA.md ----------
-  const legend = `Leyenda: \`.\` suelo/hierba · \`*\` flores · \`"\` hierba alta (ladrones ×3, a cualquier hora) · \`:\` tierra · \`-\` acera · \`=\` carretera · \`+\` plaza · \`~\` agua · \`H\` puente · \`#\` muelle
-\`^\` tejado · \`█\` pared/ventana · \`D\` puerta · \`T\` árbol · \`b\` arbusto · \`$\` arbusto con objeto oculto · \`i\` objeto en el suelo · \`f\` valla · \`S\` cartel · \`L\` farola · \`n\` banco · \`O\` fuente · \`c\` cajas · \`@\` personaje · \`M\` monte (el bosque de los lindes) · \`h\` seto · \`A\` parada del autobús
+  const legend = `Leyenda: \`.\` suelo/hierba · \`*\` flores · \`"\` hierba alta (ladrones ×3, a cualquier hora) · \`:\` tierra · \`-\` acera · \`=\` carretera · \`%\` carretera rota (baches y parches) · \`_\` hormigón · \`,\` pista de tierra · \`+\` plaza · \`~\` agua · \`H\` puente · \`#\` muelle
+\`^\` tejado · \`█\` pared/ventana · \`D\` puerta · \`T\` árbol · \`Y\` manzano · \`b\` arbusto · \`$\` arbusto con objeto oculto · \`i\` objeto en el suelo · \`f\` valla · \`S\` cartel · \`L\` farola · \`n\` banco · \`O\` fuente · \`c\` cajas · \`@\` personaje · \`M\` monte (el bosque de los lindes) · \`h\` seto · \`A\` parada del autobús
 Interiores: \`B\` cama · \`P\` ordenador · \`G\` mesa de genética · \`t\` mesa · \`F\` nevera · \`K\` carpa (mueble: el armario de 60 u 80 en x 8, la carpa de 100 o 150 en x 10-11 y la de 120 en x 2-3; sus plazas se ven por dentro, en la vista de carpa) · \`C\` mostrador · \`s\` estantería · \`d\` expositor · \`x\` taburete · \`J\` gramola · \`v\` ventana/póster · \`m\` felpudo (salida)`;
   let m = `# Mapa de Ribera Verde
 
@@ -259,9 +259,9 @@ ${legend}
   const titles = { town: 'Barrio (exterior) — 40 × 30', home: 'Piso de la tía Maite — 12 × 8 (1 casilla = 1 m; con el armario de 60 y la carpa de 150)', shop: 'Growshop Kiko — 10 × 8', bar: 'Bar El Ancla — 10 × 8',
     alto: 'Barrio alto (exterior, al norte) — 40 × 30', astilleros: 'Astilleros (exterior, al este del muelle) — 40 × 30', txaro: 'Casa de la abuela Txaro — 10 × 8',
     comisaria: 'Comisaría del barrio alto — 10 × 8', almacen: 'Almacén de los astilleros — 10 × 8',
-    mendialde: 'Mendialde (pueblo de caseríos, de donde eres; el prólogo) — 32 × 24', 'casa-ama': 'Caserío de la familia, en Mendialde — 10 × 8',
+    mendialde: 'Mendialde (pueblo de caseríos, de donde eres; el prólogo) — 48 × 34', 'casa-ama': 'Caserío de la familia, en Mendialde — 10 × 8',
     puerto: 'Puerto Viejo (ciudad pequeña, pesquera) — 40 × 24', valdehierro: 'Valdehierro (ciudad pequeña, del hierro) — 40 × 24',
-    errotabarri: 'Errotabarri (pueblo del molino) — 32 × 20' };
+    errotabarri: 'Errotabarri (pueblo del molino) — 36 × 24' };
   for (const [k, mp] of Object.entries(D.maps)) {
     const pad = String(mp.w - 1).length;
     let header = '    ' + Array.from({ length: mp.w }, (_, x) => x % 10 === 0 ? String(x / 10 % 10) : ' ').join('') + '\n    ' + Array.from({ length: mp.w }, (_, x) => x % 10).join('');

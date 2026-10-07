@@ -87,7 +87,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     () => S.flags.notaAma === true && S.flags.taper === true && S.items.bocata === 2 || { flags: S.flags, items: S.items });
   await step('Prólogo: el autobús de Mendialde a Ribera Verde (billete de ama)', ['Ribera Verde'], async () => {
     await run(() => warp(MAPS['casa-ama'].exits['4,7'])); window.R = { mapa: S.map, x: P.x, y: P.y, m: S.money, t: S.min }; await run(paradaAction);
-  }, () => R.mapa === 'mendialde' && R.x === 6 && R.y === 10 && S.map === 'town' && P.x === 7 && P.y === 12 && S.flags.llegada === true && S.money === R.m && S.min - R.t >= 40 && S.min - R.t < 46 || { R, map: S.map, x: P.x, y: P.y, m: S.money, t: S.min });
+  }, () => R.mapa === 'mendialde' && R.x === 6 && R.y === 12 && S.map === 'town' && P.x === 7 && P.y === 12 && S.flags.llegada === true && S.money === R.m && S.min - R.t >= 40 && S.min - R.t < 46 || { R, map: S.map, x: P.x, y: P.y, m: S.money, t: S.min });
   await step('Entrar en el piso de la tía', [], async () => { await run(() => warp(MAPS.town.doors['5,8'])); },
     () => S.map === 'home' && objectiveText() === 'Lee la carta que hay en la mesa.' || { map: S.map, obj: objectiveText() });
   await step('Leer la carta de la tía', [], async () => { await run(() => objectAction(3, 5)); },

@@ -1,0 +1,19 @@
+{
+  "grupo": "edificio-borda",
+  "celda": [
+    64,
+    64
+  ],
+  "tope_colores": 15,
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 21.6,
+  "distancia_media": 0,
+  "colores_finales": 11,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}
