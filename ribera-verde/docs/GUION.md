@@ -4,7 +4,7 @@
 
 ## Premisa
 
-La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a orillas de la ría. En el piso hay un armario de cultivo y, además, una deuda: 30.000 € con Don Baltasar, el del bar El Ancla. Con la ayuda de Kiko, el del growshop, que cultivaba con tu tía, aprendes a cultivar, a cruzar genéticas y a vender en la calle mientras esquivas a la policía, a los ladrones del parque y de los astilleros y al sargento Molina. Lo que no quieras llevar a la calle, guárdalo en la caja fuerte de la tía, detrás de su diploma. Al final tienes que ganarle la Copa de Ribera a Darko, el sobrino de Baltasar, para pagar el último plazo. Saldada la deuda, empieza tu imperio.
+Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a orillas de la ría, a cuarenta minutos de autobús. En el piso hay un armario de cultivo y, además, una deuda: 30.000 € con Don Baltasar, el del bar El Ancla. Con la ayuda de Kiko, el del growshop, que cultivaba con tu tía, aprendes a cultivar, a cruzar genéticas y a vender en la calle mientras esquivas a la policía, a los ladrones del parque y de los astilleros y al sargento Molina. Lo que no quieras llevar a la calle, guárdalo en la caja fuerte de la tía, detrás de su diploma. Al final tienes que ganarle la Copa de Ribera a Darko, el sobrino de Baltasar, para pagar el último plazo. Saldada la deuda, empieza tu imperio. El autobús de la comarca lleva, además, a Puerto Viejo (un puerto pesquero), a Valdehierro (la ciudad del hierro) y a Errotabarri (el pueblo del molino): cada sitio con sus clientes, su policía y sus ladrones.
 
 ## Personajes
 
@@ -24,24 +24,36 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 | **Begoña** y **Unai** | Vecina y niño, dan consejos | Calle y plaza |
 | **Agente de patrulla** | Policía que hace controles | Plaza (desde el cap. 2) |
 | **Jurado** | Juez de la Copa, la de la asociación cannábica del barrio | Plaza (cap. 6) |
+| **Ama** | Tu madre. Solo aparece en su nota | Caserío de la familia, en Mendialde |
+| **Vecina**, **excursionista**, **turista** y **obrero** | Gente de la comarca, dan conversación | Mendialde, Errotabarri, Puerto Viejo y Valdehierro |
 
 ## Prólogo
 
-*Pantalla de título → NUEVA PARTIDA. Noche sobre la ría y Kiko en primer plano.*
+*Pantalla de título → NUEVA PARTIDA. Noche sobre la ría y Kiko, al teléfono, en primer plano. Te llama al caserío de la familia, en Mendialde.*
 
-> **???:** Ribera Verde. Un barrio obrero a orillas de la ría.
-> **???:** Me llamo Kiko. Llevo treinta años con el growshop de la esquina.
+> **???:** ¿Diga? ¿Eres familia de Maite, la de Ribera Verde? Un barrio obrero a orillas de la ría.
+> **???:** Me llamo Kiko. Llevo treinta años con el growshop de su calle.
 > **KIKO:** Conservo genéticas: variedades locales de Afganistán, México o la India, y los cruces que salen de ellas.
 > **KIKO:** Las apunto todas en un registro, una GENOTECA. Tu tía Maite me ayudaba a mantenerla.
 > **KIKO:** Perdona. ¿Cómo te llamabas?
 > *[Eliges nombre]*
 > **KIKO:** {N}. Hacía años que no te veía por el barrio.
 > **KIKO:** Maite murió hace tres semanas. Te ha dejado su piso, su armario de cultivo... y una deuda.
+> **KIKO:** Coge el autobús en la plaza del pueblo: te deja enfrente del piso. La llave está en el buzón.
 > **KIKO:** Lee la carta que te dejó. Después pásate por el growshop.
+
+*Empiezas en tu cuarto del caserío. Objetivo: coger el autobús en la plaza de Mendialde hasta Ribera Verde.*
+
+- *Mesa:* Una nota de tu ama: «Te he dejado un táper de alubias en la nevera. Llama cuando llegues. Y no te metas en líos». (Otra vez: «La nota de ama: «...y no te metas en líos».»)
+- *Nevera:* Consigues el táper de alubias de ama (1 × BOCATA). (Otra vez: «La nevera de casa. El táper ya va en la mochila.»)
+- *Cama:* «Tu cama de siempre, con la colcha de cuadros.» · *Ventana:* «Por la ventana se ven el monte y la carretera de la comarca.» · *Geranios:* «Los geranios de ama. Les sobra agua.»
+- *Parada de Mendialde (A en el poste):* «¿A dónde vas?» → *Ribera Verde (billete de ama) / Nada*. Cuarenta minutos después, en la parada de Ribera Verde, en la acera de enfrente del piso:
+
+> Ribera Verde. El piso de la tía es el del tejado rojo, al otro lado de la calle.
 
 ## Capítulo 1 · La herencia
 
-*Despiertas en el piso. Objetivo: leer la carta de la mesa.*
+*Objetivo: entrar en el piso de la tía Maite, enfrente de la parada, y leer la carta de la mesa.*
 
 > Hay una carta encima de la mesa. Es de la tía Maite.
 > **CARTA:** «{N}: si lees esto, el piso es tuyo. Cuídalo.»
@@ -351,6 +363,16 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
   - «ASTILLEROS DE RIBERA → · Zona industrial. Sin salida.»
   - *Barrio alto:* «PLAZA DEL ENSANCHE · Urbanizada en 1964.» / «JARDINES DEL ENSANCHE · No pisar el césped.» / «COMISARÍA DE RIBERA · Atención al público: de 9:00 a 14:00.»
   - *Astilleros:* «ALMACÉN 3 · Propiedad privada. Prohibido el paso.» / «ASTILLEROS DE RIBERA · Cerrados desde 1992.»
+  - *Mendialde:* «MENDIALDE · Caseríos, huertas y la parada del autobús.»
+  - *Puerto Viejo:* «PUERTO VIEJO · Cofradía de pescadores desde 1890.»
+  - *Valdehierro:* «VALDEHIERRO · Ciudad del hierro desde 1911.» / «SOLAR DE LA FUNDICIÓN · Propiedad privada. Prohibido el paso.»
+  - *Errotabarri:* «ERROTABARRI · El pueblo del molino.» / «ERROTA ZAHARRA · Molino harinero del siglo XVIII.»
+- **Autobús de la comarca (1.10):** en el poste de cada parada (de 7:00 a 21:00), «¿A dónde vas?» → las otras paradas con su precio y lo que tarda (Puerto Viejo, 2 € y 25 min desde Ribera Verde; Valdehierro, 2 € y 20 min; Mendialde, 3 € y 40 min; Errotabarri, 3 € y 30 min; entre dos de fuera, la suma) / *Nada*. Fuera de horas: «PARADA DE [SITIO] · El primer autobús pasa a las 7:00 y el último, a las 21:00.» Sin dinero: «El billete hasta [sitio] cuesta X €. No te llega.»
+- **Gente de la comarca (1.10):**
+  - *Vecina (Mendialde):* «En Mendialde el autobús para en la plaza. El último sale a las nueve.» / «Tu ama dice que en la ciudad no comes. Llévate el táper.» / «Aquí el maíz se siembra en mayo y se recoge en octubre. Como toda la vida.»
+  - *Excursionista (Errotabarri):* «El molino tiene trescientos años. Todavía muele algún domingo.» / «Del puente para arriba, el río baja limpio. Para abajo, ya no tanto.» / «Vengo en el autobús de Ribera Verde: treinta minutos y tres euros.»
+  - *Turista (Puerto Viejo):* «Las casas son de colores para que cada pescador viera la suya desde el mar.» / «Dicen que en este puerto se paga bien... y que la policía mira poco.» / «He venido a por anchoas y me han ofrecido de todo.»
+  - *Obrero (Valdehierro):* «La fundición cerró hace años. Ahora el solar no es de nadie.» / «Aquí la gente cobra poco y paga poco. Y de noche, cuidado con la cartera.» / «De Valdehierro a Ribera Verde, veinte minutos de autobús.»
 - **Cultivo (1.10):**
   - *Cosecha:* «Cosechas X g de [variedad]. THC: Y%.»
   - *Fenotipo estrella:* «¡Fenotipo estrella! THC ×A y cosecha ×B sobre la media de la [variedad].» / «Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.» · *Flojo:* «Fenotipo flojo: THC ×A y cosecha ×B de la media.»
@@ -372,5 +394,5 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
   - *Botellas:* «Txakoli, pacharán y orujo casero.»
   - *Gramola:* «La gramola suena: rock vasco de los 80.»
 - **Objetos del barrio:**
-  - *Cajas del muelle:* «Cajas de pescado vacías del puerto.»
+  - *Cajas del muelle:* «Cajas de pescado vacías del puerto.» · *en Valdehierro:* «Cajas de piezas de la fundición, oxidadas.»
   - *Fuente:* «La fuente de la plaza. Lleva años sin agua potable.»

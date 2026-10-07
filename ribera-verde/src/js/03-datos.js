@@ -125,6 +125,11 @@ const LOOKS={
   cop:{id:'cop',skin:'#eab890',hair:'#2a2a2a',style:'cap',hat:'#1e2a5a',hat2:'#0e1430',shirt:'#8ab0e0',shirt2:'#1e2a5a',pants:'#1e2a5a'},
   molina:{id:'molina',skin:'#dca07c',hair:'#4a4a4a',style:'cap',hat:'#1e2a5a',hat2:'#f0c040',shirt:'#6a8ac0',shirt2:'#f0c040',pants:'#1e2a5a',stache:'#3a3a3a'},
   darko:{id:'darko',skin:'#f2c4a0',hair:'#101014',style:'hood',hat:'#202024',shirt:'#202024',shirt2:'#c02828',pants:'#303038'},
+  // la comarca (1.10): un vecino en cada sitio, con el arte de una familia de clientes (id: look:clienteN del atlas)
+  vecina:{id:'cliente6',skin:'#f6c8a0',hair:'#d8c070',style:'bun',shirt:'#a060c0',pants:'#4a6aa8'},
+  excursionista:{id:'cliente1',skin:'#e8b088',hair:'#5a3a24',style:'short',shirt:'#4a8ad0',pants:'#5a5a64'},
+  turista:{id:'cliente3',skin:'#f0d0b8',hair:'#c48a3a',style:'cap',hat:'#e8d8a0',hat2:'#c8b880',shirt:'#40a0a0',pants:'#c8b080'},
+  obrero:{id:'cliente2',skin:'#d49a74',hair:'#1a1a1a',style:'short',shirt:'#f08a40',shirt2:'#6a6a70',pants:'#3a3a44'},
   judge:{id:'judge',skin:'#f0c4a0',hair:'#6a4a2a',style:'short',shirt:'#3a3a48',shirt2:'#c0a040',pants:'#2a2a34',glasses:1},
 };
 const SKINS=['#f6c8a0','#e8b088','#d49a74','#b07850','#8a5a3a','#f0d0b8'];

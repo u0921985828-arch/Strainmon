@@ -37,7 +37,10 @@ const signo = x => (Math.round(x) > 0 ? '+' : Math.round(x) < 0 ? '−' : '±') 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const unif = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
 // las zonas (1.10, 04-mapas): el control y el ladrón de cada paso se multiplican por pol y lad; el gramo, por precio
-const ZON = { town: { n: 'Ribera Verde (el barrio)', pol: 1, lad: 1, precio: 1 }, alto: { n: 'Barrio alto', pol: 1.5, lad: .5, precio: 1 }, astilleros: { n: 'Astilleros', pol: .5, lad: 2, precio: 1.2 } };
+const ZON = { town: { n: 'Ribera Verde (el barrio)', pol: 1, lad: 1, precio: 1 }, alto: { n: 'Barrio alto', pol: 1.5, lad: .5, precio: 1 }, astilleros: { n: 'Astilleros', pol: .5, lad: 2, precio: 1.2 },
+  // la comarca (1.10): las dos ciudades pequeñas y los dos pueblos, a un autobús
+  puerto: { n: 'Puerto Viejo', pol: .8, lad: .6, precio: 1.15 }, valdehierro: { n: 'Valdehierro', pol: .6, lad: 1.4, precio: .9 }, mendialde: { n: 'Mendialde', pol: .2, lad: .1, precio: 1 },
+  errotabarri: { n: 'Errotabarri', pol: .2, lad: .1, precio: 1 } };
 const Z = e => ZON[e.zona || 'town'];
 // un paso por la calle (08-mundo, onStepEnd), desde el capítulo 2: un solo Math.random; policía si r < pp, ladrón si pp ≤ r < pp + pt.
 // Solo cuenta lo que llevas encima: lo de la caja fuerte no
@@ -439,7 +442,7 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
     T.paso = ['| Situación | Control por paso | Ladrón por paso | Pasos de media hasta un encuentro | Juego (simulado) |', '|---|---|---|---|---|', ...filas].join('\n');
     // ---------- 1 b. por zona (1.10): las mismas reglas × pol y × lad de cada zona, andadas en cada mapa ----------
     for (const z in ZON) exige(`zona ${z}`, ['pol', 'lad', 'precio'].every(k => zc.ZONAS[z] && zc.ZONAS[z][k] === ZON[z][k]), zc.ZONAS[z]);
-    exige('zonas: las tres', Object.keys(zc.ZONAS).join() === Object.keys(ZON).join(), Object.keys(zc.ZONAS));
+    exige('zonas: las siete', Object.keys(zc.ZONAS).join() === Object.keys(ZON).join(), Object.keys(zc.ZONAS));
     const SZ = [{ n: 'Con gramos, calor 50, de día', ch: 5, heat: 50, g: 50, money: 2000 }, { n: 'Con gramos, calor 50, de noche', ch: 5, heat: 50, g: 50, money: 2000, night: true },
       { n: 'Con gramos, calor 50, con protección', ch: 5, heat: 50, g: 50, money: 2000, protect: true }, { n: 'Solo dinero (0 g, ≥ 150 €), de noche', ch: 5, heat: 50, g: 0, money: 2000, night: true }];
     const filasZ = [];
@@ -449,7 +452,7 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
       filasZ.push(`| ${e.n} | ${celdas.join(' | ')} |`);
     }
     T.zonas = ['| Situación (cap. 5) | ' + Object.values(ZON).map(z => `${z.n}: control / ladrón`).join(' | ') + ' |', '|---|' + Object.keys(ZON).map(() => '---|').join(''), ...filasZ,
-      '| Precio del gramo en la calle | ' + Object.values(ZON).map(z => '×' + coma(z.precio, 1)).join(' | ') + ' |'].join('\n');
+      '| Precio del gramo en la calle | ' + Object.values(ZON).map(z => '×' + String(z.precio).replace('.', ',')).join(' | ') + ' |'].join('\n');
 
     // ---------- 2. por trayecto (todas las celdas, andadas también en el juego) ----------
     const ESC = [

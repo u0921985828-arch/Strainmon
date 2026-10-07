@@ -135,7 +135,7 @@ function atlasCarpa() {
       ITEMS: ITEMS.map(it => ({ id: it.id, map: it.map, x: it.x, y: it.y, hidden: !!it.hidden })), SIGNS,
       SHOP: SHOP.map(it => { const o = {}; for (const k of ['lbl', 'p', 'ch', 'sid', 'item', 'n', 'desc', 'maceta', 'foco', 'extra', 'carpa', 'ci']) if (it[k] != null) o[k] = it[k]; return o; }),
       SOBRES, GRANEL, BANCO, SOBRE, DEUDA, PLAZOS, INTERES, PREMIO_COPA, SOBORNO, MULTA_REDADA, META_VENTAS, MULTA_CALLE,
-      ZONAS, CAJA, CAJA_P, CAJA_REDADA, CAJA_ANIO, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, ENCARGO_DIAS, ENCARGO_VETO, CUOTA_DIAS,
+      ZONAS, PARADAS, BUS_HORAS, CAJA, CAJA_P, CAJA_REDADA, CAJA_ANIO, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, ENCARGO_DIAS, ENCARGO_VETO, CUOTA_DIAS,
       IMPERIO, RECIPE_HINTS, DICHO_CARPA, THIEVES, COPS, SITIOS, OLOR, ESQUEJE_DIAS, MS_PER_MIN, KIKO_TIPS: kiko,
       TUNES, GLYPH, CORTES_COMBATE, FOCO_LUZ, VK, DANO, MACETA_CM, VB: { M: VB_M, F: VB_F, X: VB_X, PARED: VB_PARED }, BW, BH, BP, CUR,
       NEW_STATE: newState(), MASCARAS: mascaras() });

@@ -1,0 +1,19 @@
+{
+  "grupo": "prop-parada",
+  "celda": [
+    16,
+    48
+  ],
+  "tope_colores": 15,
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 31.7,
+  "distancia_media": 0,
+  "colores_finales": 7,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

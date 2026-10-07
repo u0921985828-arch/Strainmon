@@ -1,10 +1,10 @@
 # Ribera Verde (Godot) — la historia 1 → 8 contra el HTML (godot/tests/historia.json, lo saca tools/test-historia.js con
-# RV_ORACULO): los mismos 66 pasos que el test del HTML, con el mismo piloto (A cada 12 ms en los diálogos, opciones de menú
+# RV_ORACULO): los mismos 71 pasos que el test del HTML, con el mismo piloto (A cada 12 ms en los diálogos, opciones de menú
 # por texto, «<B>» cierra el menú) y el mismo azar (Park-Miller). El reloj del juego y los paseos están parados: el bucle solo
 # corre los eventos pendientes, como el update del oráculo. Tras cada paso compara la transcripción, S, el estado del azar,
 # R, I, TO y dónde está cada cosa.
 #   godot --headless --path godot --script res://tests/historia.gd [-- --oraculo f.json] [--salida dir]
-#   → «historia: 66 pasos (66 OK) · semilla N · 0 diferencias con el HTML · T s»
+#   → «historia: 71 pasos (71 OK) · semilla N · 0 diferencias con el HTML · T s»
 extends SceneTree
 
 const Datos = preload("res://src/datos.gd")
@@ -272,8 +272,21 @@ func _corre() -> void:
 func _pasos() -> void:
 	var S = func(): return J.S
 	# ---------- capítulo 1 ----------
-	step("Nueva partida e intro", [], func(): await run(J.new_game),
-		func(): return (J.S.ch == 1 and J.S.map == "home" and J.S.name == "EDDIE") or {"ch": J.S.ch, "map": J.S.map, "name": J.S.name})
+	step("Nueva partida e intro (prólogo en Mendialde)", [], func(): await run(J.new_game),
+		func(): return (J.S.ch == 1 and J.S.map == "casa-ama" and J.llegando() and J.S.name == "EDDIE" and "autobús" in J.objective_text()) or {"ch": J.S.ch, "map": J.S.map, "name": J.S.name, "flags": J.S.flags})
+	step("Prólogo: la nota de ama y el táper de la nevera", [], func():
+		await run(func(): await J.object_action(5, 4))
+		await run(func(): await J.object_action(9, 6))
+		await run(func(): await J.object_action(9, 6)),
+		func(): return (si(J.S.flags.get("notaAma")) and si(J.S.flags.get("taper")) and J.S.items.bocata == 2) or {"flags": J.S.flags, "items": J.S.items})
+	step("Prólogo: el autobús de Mendialde a Ribera Verde (billete de ama)", ["Ribera Verde"], func():
+		await run(func(): await J.warp(J.MAPS["casa-ama"].exits["4,7"]))
+		R = {"mapa": J.S.map, "x": J.P.x, "y": J.P.y, "m": J.S.money, "t": J.S.min}
+		await run(J.parada_action),
+		func(): return (R.mapa == "mendialde" and R.x == 6 and R.y == 10 and J.S.map == "town" and J.P.x == 7 and J.P.y == 12 and si(J.S.flags.get("llegada"))
+			and J.S.money == R.m and J.S.min - R.t >= 40 and J.S.min - R.t < 46) or {"R": R, "map": J.S.map, "x": J.P.x, "y": J.P.y, "m": J.S.money, "t": J.S.min})
+	step("Entrar en el piso de la tía", [], func(): await run(func(): await J.warp(J.MAPS.town.doors["5,8"])),
+		func(): return (J.S.map == "home" and J.objective_text() == "Lee la carta que hay en la mesa.") or {"map": J.S.map, "obj": J.objective_text()})
 	step("Leer la carta de la tía", [], func(): await run(func(): await J.object_action(3, 5)),
 		func(): return J.S.flags.get("letter") == true)
 	step("Kiko regala semillas y abono", [], func(): await run(J.talk_kiko),
@@ -325,6 +338,25 @@ func _pasos() -> void:
 		await run(func(): await J.object_action(2, 26))
 		J.S.map = "home",
 		func(): return J.S.seeds.get("acapulco") == 2 or {"seeds": J.S.seeds})
+	step("Autobús de pago: de Ribera Verde a Puerto Viejo (2 €, 25 min) y de allí a Valdehierro (4 €, 45 min)", ["Puerto Viejo", "Valdehierro"], func():
+		J.enter_map("town", 7, 12, "up")
+		J.S.min = 10 * 60
+		R = {"m": J.S.money}
+		await run(J.parada_action)
+		R.mapa = J.S.map
+		R.x = J.P.x
+		R.y = J.P.y
+		R.m1 = J.S.money
+		R.t1 = J.S.min
+		await run(J.parada_action),
+		func(): return (R.mapa == "puerto" and R.x == 20 and R.y == 9 and R.m1 == R.m - 2 and R.t1 >= 625 and R.t1 < 631 and J.S.map == "valdehierro" and J.P.x == 15
+			and J.P.y == 11 and J.S.money == R.m - 6 and J.S.min - R.t1 >= 45 and J.S.min - R.t1 < 51 and J.ents.any(func(e): return e.id == "obrero")) or {"R": R, "map": J.S.map, "m": J.S.money, "t": J.S.min})
+	step("Autobús de vuelta a Ribera Verde (2 €) y a casa", ["Ribera Verde"], func():
+		R.m2 = J.S.money
+		await run(J.parada_action)
+		R.mapa2 = J.S.map
+		J.enter_map("home", 2, 4, "down"),
+		func(): return (J.S.money == R.m2 - 2 and R.mapa2 == "town" and J.S.map == "home") or {"R": R, "m": J.S.money, "map": J.S.map})
 
 	# ---------- capítulo 3 ----------
 	step("Don Baltasar explica la deuda", [], func(): await run(J.talk_baltasar),

@@ -146,6 +146,11 @@
    ],
    "objetos": [
     {
+     "o": "parada",
+     "x": 8,
+     "y": 12
+    },
+    {
      "o": "fountain",
      "x": 20,
      "y": 19
@@ -439,7 +444,7 @@
    "h": 30,
    "edificios": [
     {
-     "id": "gray",
+     "id": "comisaria",
      "x": 24,
      "y": 13,
      "w": 6,
@@ -493,7 +498,7 @@
    "h": 30,
    "edificios": [
     {
-     "id": "gray",
+     "id": "nave",
      "x": 16,
      "y": 8,
      "w": 6,
@@ -741,6 +746,340 @@
      "o": "crate",
      "x": 8,
      "y": 6
+    }
+   ],
+   "carpas": []
+  },
+  "mendialde": {
+   "nombre": "mendialde",
+   "titulo": "MENDIALDE · el pueblo del prólogo",
+   "w": 32,
+   "h": 24,
+   "edificios": [
+    {
+     "id": "caserio",
+     "x": 3,
+     "y": 4,
+     "w": 8,
+     "h": 6,
+     "puerta": 6
+    },
+    {
+     "id": "caserio2",
+     "x": 19,
+     "y": 3,
+     "w": 8,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "caserio2",
+     "x": 2,
+     "y": 16,
+     "w": 8,
+     "h": 6,
+     "puerta": null
+    }
+   ],
+   "puertas": [
+    {
+     "x": 6,
+     "y": 9,
+     "a": "casa-ama"
+    },
+    {
+     "x": 7,
+     "y": 9,
+     "a": "casa-ama"
+    }
+   ],
+   "salidas": [],
+   "npcs": [
+    {
+     "id": "vecina",
+     "x": 17,
+     "y": 15,
+     "deambula": 1
+    }
+   ],
+   "objetos": [
+    {
+     "o": "parada",
+     "x": 10,
+     "y": 13
+    },
+    {
+     "o": "fountain",
+     "x": 15,
+     "y": 16
+    }
+   ],
+   "carpas": []
+  },
+  "casa-ama": {
+   "nombre": "casa-ama",
+   "titulo": "CASERÍO DE LA FAMILIA (MENDIALDE)",
+   "w": 10,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 4,
+     "y": 7,
+     "a": "mendialde"
+    }
+   ],
+   "npcs": [],
+   "objetos": [
+    {
+     "o": "iwin",
+     "x": 2,
+     "y": 1
+    },
+    {
+     "o": "iwin",
+     "x": 7,
+     "y": 1
+    },
+    {
+     "o": "bedT",
+     "x": 0,
+     "y": 2
+    },
+    {
+     "o": "plantDeco",
+     "x": 9,
+     "y": 2
+    },
+    {
+     "o": "table",
+     "x": 5,
+     "y": 4
+    },
+    {
+     "o": "fridge",
+     "x": 9,
+     "y": 6
+    },
+    {
+     "o": "plantDeco",
+     "x": 0,
+     "y": 7
+    }
+   ],
+   "carpas": []
+  },
+  "puerto": {
+   "nombre": "puerto",
+   "titulo": "PUERTO VIEJO",
+   "w": 40,
+   "h": 24,
+   "edificios": [
+    {
+     "id": "marinera",
+     "x": 1,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "marinera3",
+     "x": 5,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "marinera2",
+     "x": 9,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "marinera4",
+     "x": 13,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "marinera",
+     "x": 17,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "marinera2",
+     "x": 21,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "marinera3",
+     "x": 25,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "marinera4",
+     "x": 29,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "marinera2",
+     "x": 33,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    }
+   ],
+   "puertas": [],
+   "salidas": [],
+   "npcs": [
+    {
+     "id": "turista",
+     "x": 14,
+     "y": 11,
+     "deambula": 2
+    }
+   ],
+   "objetos": [
+    {
+     "o": "parada",
+     "x": 19,
+     "y": 9
+    }
+   ],
+   "carpas": []
+  },
+  "valdehierro": {
+   "nombre": "valdehierro",
+   "titulo": "VALDEHIERRO",
+   "w": 40,
+   "h": 24,
+   "edificios": [
+    {
+     "id": "ladrillo",
+     "x": 2,
+     "y": 2,
+     "w": 7,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "ladrillo",
+     "x": 10,
+     "y": 2,
+     "w": 7,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "ladrillo",
+     "x": 19,
+     "y": 2,
+     "w": 7,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "fabrica",
+     "x": 29,
+     "y": 2,
+     "w": 8,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "ladrillo",
+     "x": 2,
+     "y": 13,
+     "w": 7,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "ladrillo",
+     "x": 10,
+     "y": 13,
+     "w": 7,
+     "h": 6,
+     "puerta": null
+    }
+   ],
+   "puertas": [],
+   "salidas": [],
+   "npcs": [
+    {
+     "id": "obrero",
+     "x": 28,
+     "y": 14,
+     "deambula": 1
+    }
+   ],
+   "objetos": [
+    {
+     "o": "parada",
+     "x": 14,
+     "y": 11
+    }
+   ],
+   "carpas": []
+  },
+  "errotabarri": {
+   "nombre": "errotabarri",
+   "titulo": "ERROTABARRI",
+   "w": 32,
+   "h": 20,
+   "edificios": [
+    {
+     "id": "caserio2",
+     "x": 3,
+     "y": 2,
+     "w": 8,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "caserio",
+     "x": 20,
+     "y": 2,
+     "w": 8,
+     "h": 6,
+     "puerta": null
+    }
+   ],
+   "puertas": [],
+   "salidas": [],
+   "npcs": [
+    {
+     "id": "excursionista",
+     "x": 21,
+     "y": 10,
+     "deambula": 2
+    }
+   ],
+   "objetos": [
+    {
+     "o": "parada",
+     "x": 8,
+     "y": 11
     }
    ],
    "carpas": []
@@ -1486,10 +1825,10 @@
    "eje": "alto",
    "real": 6,
    "ppm": 16,
-   "w": 18,
-   "h": 24,
-   "m": 1.5,
-   "ratio": 0.25
+   "w": 54,
+   "h": 93,
+   "m": 5.81,
+   "ratio": 0.97
   },
   {
    "grupo": "EXTERIOR",
@@ -1550,6 +1889,18 @@
    "h": 12,
    "m": 0.75,
    "ratio": 0.75
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Parada del autobús",
+   "clave": "parada",
+   "eje": "alto",
+   "real": 2.8,
+   "ppm": 16,
+   "w": 14,
+   "h": 48,
+   "m": 3,
+   "ratio": 1.07
   },
   {
    "grupo": "EXTERIOR",

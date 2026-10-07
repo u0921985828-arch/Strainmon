@@ -81,8 +81,15 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   function LOGMARK(name) { return page.evaluate(n => LOG.push('\n=== ' + n + ' ==='), name); }
 
   // ---------- capítulo 1 ----------
-  await step('Nueva partida e intro', [], async () => { await run(newGame); },
-    () => S.ch === 1 && S.map === 'home' && S.name === 'EDDIE' || { ch: S.ch, map: S.map, name: S.name });
+  await step('Nueva partida e intro (prólogo en Mendialde)', [], async () => { await run(newGame); },
+    () => S.ch === 1 && S.map === 'casa-ama' && S.flags.llegada === false && S.name === 'EDDIE' && /autobús/.test(objectiveText()) || { ch: S.ch, map: S.map, name: S.name, flags: S.flags });
+  await step('Prólogo: la nota de ama y el táper de la nevera', [], async () => { await run(() => objectAction(5, 4)); await run(() => objectAction(9, 6)); await run(() => objectAction(9, 6)); },
+    () => S.flags.notaAma === true && S.flags.taper === true && S.items.bocata === 2 || { flags: S.flags, items: S.items });
+  await step('Prólogo: el autobús de Mendialde a Ribera Verde (billete de ama)', ['Ribera Verde'], async () => {
+    await run(() => warp(MAPS['casa-ama'].exits['4,7'])); window.R = { mapa: S.map, x: P.x, y: P.y, m: S.money, t: S.min }; await run(paradaAction);
+  }, () => R.mapa === 'mendialde' && R.x === 6 && R.y === 10 && S.map === 'town' && P.x === 7 && P.y === 12 && S.flags.llegada === true && S.money === R.m && S.min - R.t >= 40 && S.min - R.t < 46 || { R, map: S.map, x: P.x, y: P.y, m: S.money, t: S.min });
+  await step('Entrar en el piso de la tía', [], async () => { await run(() => warp(MAPS.town.doors['5,8'])); },
+    () => S.map === 'home' && objectiveText() === 'Lee la carta que hay en la mesa.' || { map: S.map, obj: objectiveText() });
   await step('Leer la carta de la tía', [], async () => { await run(() => objectAction(3, 5)); },
     () => S.flags.letter === true);
   await step('Kiko regala semillas y abono', [], async () => { await run(talkKiko); },
@@ -110,6 +117,11 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   }, () => R.m1 === R.m + 800 && R.g1 === R.g - 250 && S.mDay === S.day && S.money === R.m1 && Math.abs(precioMayor(12) - 3.2) < 1e-9 || R);
   await step('Arbusto escondido → Acapulco Gold', [], async () => { S.map = 'town'; await run(() => objectAction(2, 26)); S.map = 'home'; },
     () => S.seeds.acapulco === 2 || { seeds: S.seeds });
+  await step('Autobús de pago: de Ribera Verde a Puerto Viejo (2 €, 25 min) y de allí a Valdehierro (4 €, 45 min)', ['Puerto Viejo', 'Valdehierro'], async () => {
+    enterMap('town', 7, 12, 'up'); S.min = 10 * 60; window.R = { m: S.money }; await run(paradaAction); Object.assign(R, { mapa: S.map, x: P.x, y: P.y, m1: S.money, t1: S.min }); await run(paradaAction);
+  }, () => R.mapa === 'puerto' && R.x === 20 && R.y === 9 && R.m1 === R.m - 2 && R.t1 >= 625 && R.t1 < 631 && S.map === 'valdehierro' && P.x === 15 && P.y === 11 && S.money === R.m - 6 && S.min - R.t1 >= 45 && S.min - R.t1 < 51 && ents.some(e => e.id === 'obrero') || { R, map: S.map, m: S.money, t: S.min });
+  await step('Autobús de vuelta a Ribera Verde (2 €) y a casa', ['Ribera Verde'], async () => { R.m2 = S.money; await run(paradaAction); R.mapa2 = S.map; enterMap('home', 2, 4, 'down'); },
+    () => S.money === R.m2 - 2 && R.mapa2 === 'town' && S.map === 'home' || { R, m: S.money, map: S.map });
 
   // ---------- capítulo 3 ----------
   await step('Don Baltasar explica la deuda', [], async () => { await run(talkBaltasar); },

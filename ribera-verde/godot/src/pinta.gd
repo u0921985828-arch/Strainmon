@@ -190,8 +190,10 @@ func _mundo() -> void:
 	var tx0 := floori(cam.x / 16.0)
 	var ty0 := floori(cam.y / 16.0)
 	var list := []
-	for ty in range(ty0, ty0 + SH / 16 + 1):
-		for tx in range(tx0, tx0 + ceili(J.SW / 16.0) + 1):
+	# hasta 6 filas por debajo y 2 casillas a cada lado de la pantalla (1.10, 14-render.js): los objetos altos (el árbol, de 6
+	# filas; el monte, 3 de ancho) se ven aunque su pie esté fuera
+	for ty in range(ty0, ty0 + SH / 16 + 7):
+		for tx in range(tx0 - 2, tx0 + ceili(J.SW / 16.0) + 3):
 			if tx < 0 or ty < 0 or tx >= m.w or ty >= m.h:
 				continue
 			var sx: int = tx * 16 - cam.x

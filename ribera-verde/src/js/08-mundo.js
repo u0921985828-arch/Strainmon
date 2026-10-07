@@ -53,6 +53,11 @@ const NPCDEF=[
   {id:'molina',map:'comisaria',x:4,y:2,look:'molina',cond:()=>S.ch>=5&&!!S.flags.molina1,talk:()=>talkMolina()},   // la cuota, en la comisaría (1.10)
   {id:'tono2',map:'almacen',x:5,y:2,look:'tono',cond:()=>!!S.encargo,talk:()=>talkTonoAlmacen()},   // los encargos de Baltasar (1.10)
   {id:'jurado',map:'town',x:18,y:15,look:'judge',cond:()=>S.ch===6,talk:()=>talkJurado()},
+  // la comarca (1.10)
+  {id:'vecina',map:'mendialde',x:17,y:15,wander:1,look:'vecina',talk:()=>say(pick(['En Mendialde el autobús para en la plaza. El último sale a las nueve.','Tu ama dice que en la ciudad no comes. Llévate el táper.','Aquí el maíz se siembra en mayo y se recoge en octubre. Como toda la vida.']),'VECINA')},
+  {id:'excursionista',map:'errotabarri',x:21,y:10,wander:2,look:'excursionista',talk:()=>say(pick(['El molino tiene trescientos años. Todavía muele algún domingo.','Del puente para arriba, el río baja limpio. Para abajo, ya no tanto.','Vengo en el autobús de Ribera Verde: treinta minutos y tres euros.']),'EXCURSIONISTA')},
+  {id:'turista',map:'puerto',x:14,y:11,wander:2,look:'turista',talk:()=>say(pick(['Las casas son de colores para que cada pescador viera la suya desde el mar.','Dicen que en este puerto se paga bien... y que la policía mira poco.','He venido a por anchoas y me han ofrecido de todo.']),'TURISTA')},
+  {id:'obrero',map:'valdehierro',x:28,y:14,wander:1,look:'obrero',talk:()=>say(pick(['La fundición cerró hace años. Ahora el solar no es de nadie.','Aquí la gente cobra poco y paga poco. Y de noche, cuidado con la cartera.','De Valdehierro a Ribera Verde, veinte minutos de autobús.']),'OBRERO')},
 ];
 function mkEnt(d){return{id:d.id,x:d.x,y:d.y,px:d.x*16,py:d.y*16,hx:d.x,hy:d.y,dir:d.dir||'down',look:d.lookObj||LOOKS[d.look],def:d,wander:d.wander||0,wt:800+Math.random()*2400,moving:false,t:0,fx:d.x,fy:d.y};}
 function buildEnts(){
@@ -125,7 +130,7 @@ function updateEnts(dt){
     if(!free||!e.wander)continue;e.wt-=dt;if(e.wt>0)continue;e.wt=1200+Math.random()*2600;
     const d=pick(['up','down','left','right']);e.dir=d;const [dx,dy]=DV[d],nx=e.x+dx,ny=e.y+dy;
     if(Math.abs(nx-e.hx)>e.wander||Math.abs(ny-e.hy)>e.wander)continue;
-    if(tileSolid(m,nx,ny)||entAt(nx,ny)||(nx===P.x&&ny===P.y)||(P.moving&&nx===P.fx&&ny===P.fy)||m.doors[nx+','+ny]||m.exits[nx+','+ny])continue;
+    if(tileSolid(m,nx,ny)||entAt(nx,ny)||(nx===P.x&&ny===P.y)||(P.moving&&nx===P.fx&&ny===P.fy)||m.doors[nx+','+ny]||m.exits[nx+','+ny]||(PARADAS[S.map]&&PARADAS[S.map].a[0]===nx&&PARADAS[S.map].a[1]===ny))continue;   // ni en la llegada del autobús (1.10)
     e.fx=e.x;e.fy=e.y;e.x=nx;e.y=ny;e.t=0;e.moving=true;
   }
 }
@@ -146,7 +151,10 @@ const SIGNS={'town:9,8':'Calle Ribera, 3.\nPiso de la tía Maite.','town:13,8':'
   'town:4,13':'PARQUE DE LOS SAUCES\nHorario: de 7:00 a 23:00.','town:17,13':'PLAZA DE RIBERA VERDE\nFuente inaugurada en 1987.','town:29,18':'MUELLE VIEJO →\nPeligro: borde sin barandilla.',
   'town:10,4':'↑ BARRIO ALTO\nPlaza del Ensanche · Comisaría.','town:38,19':'ASTILLEROS DE RIBERA →\nZona industrial. Sin salida.',
   'alto:10,18':'PLAZA DEL ENSANCHE\nUrbanizada en 1964.','alto:22,7':'JARDINES DEL ENSANCHE\nNo pisar el césped.','alto:23,19':'COMISARÍA DE RIBERA\nAtención al público: de 9:00 a 14:00.',
-  'astilleros:15,13':'ALMACÉN 3\nPropiedad privada. Prohibido el paso.','astilleros:2,18':'ASTILLEROS DE RIBERA\nCerrados desde 1992.'};
+  'astilleros:15,13':'ALMACÉN 3\nPropiedad privada. Prohibido el paso.','astilleros:2,18':'ASTILLEROS DE RIBERA\nCerrados desde 1992.',
+  'mendialde:2,13':'MENDIALDE\nCaseríos, huertas y la parada del autobús.','puerto:2,9':'PUERTO VIEJO\nCofradía de pescadores desde 1890.',
+  'valdehierro:2,8':'VALDEHIERRO\nCiudad del hierro desde 1911.','valdehierro:27,12':'SOLAR DE LA FUNDICIÓN\nPropiedad privada. Prohibido el paso.',
+  'errotabarri:2,11':'ERROTABARRI\nEl pueblo del molino.','errotabarri:19,8':'ERROTA ZAHARRA\nMolino harinero del siglo XVIII.'};
 async function objectAction(x,y){
   const m=MAPS[S.map],o=m.o[y]&&m.o[y][x];
   if(S.map==='home'){
@@ -168,6 +176,13 @@ async function objectAction(x,y){
     if(o==='fridge')return say('Nevera de las de antes. No es tuya.');
     if(o==='iwin')return say('Por la ventana se ve el parque de los Sauces.');
   }
+  if(S.map==='casa-ama'){   // el caserío de la familia, en Mendialde (1.10)
+    if(o==='table'){const n=!S.flags.notaAma;S.flags.notaAma=true;return say(n?'Una nota de tu ama: «Te he dejado un táper de alubias en la nevera. Llama cuando llegues. Y no te metas en líos».':'La nota de ama: «...y no te metas en líos».');}
+    if(o==='fridge'){if(S.flags.taper)return say('La nevera de casa. El táper ya va en la mochila.');S.flags.taper=true;S.items.bocata+=1;return got('el táper de alubias de ama (1 × BOCATA)');}
+    if(o==='bedT'||o==='bedB')return say('Tu cama de siempre, con la colcha de cuadros.');
+    if(o==='iwin')return say('Por la ventana se ven el monte y la carretera de la comarca.');
+    if(o==='plantDeco')return say('Los geranios de ama. Les sobra agua.');
+  }
   if(S.map==='comisaria'){
     if(o==='iwin')return say('Por la ventana se ve la plaza del Ensanche.');
     if(o==='shelfW')return say('Archivadores con expedientes. Hay uno con tu calle.');
@@ -178,12 +193,26 @@ async function objectAction(x,y){
     if(o==='btable')return say('Una mesa con una báscula y rollos de film transparente.');
   }
   if(o==='sign')return say(SIGNS[S.map+':'+x+','+y]||'Está tan desgastado que no se lee.');
+  if(o==='parada')return paradaAction();
   if(o==='bush'){const h=ITEMS.find(it=>it.hidden&&it.map===S.map&&it.x===x&&it.y===y&&!S.taken[it.id]);if(h)return pickItem(h);return;}
   if(o==='fountain')return say('La fuente de la plaza. Lleva años sin agua potable.');
   if(o==='shelfW')return say('Botes de abono, sustrato de coco y medidores de pH.');
   if(o==='display')return say('Sobres de semillas de bancos de todo el mundo, ordenados por tipo.');
   if(o==='bottles')return say('Txakoli, pacharán y orujo casero.');
   if(o==='jukebox'){sfx('get');return say('La gramola suena: rock vasco de los 80.');}
-  if(o==='crate')return say(S.map==='astilleros'?'Cajas de madera de los astilleros, podridas por la humedad.':'Cajas de pescado vacías del puerto.');
+  if(o==='crate')return say(S.map==='astilleros'?'Cajas de madera de los astilleros, podridas por la humedad.':S.map==='valdehierro'?'Cajas de piezas de la fundición, oxidadas.':'Cajas de pescado vacías del puerto.');
+}
+// el autobús de la comarca (1.10): en el poste de la parada, a dónde, cuánto y cuánto tarda; el reloj corre lo que dura el viaje.
+// El primer viaje (del pueblo al piso: S.flags.llegada === false) lo paga ama y solo va a Ribera Verde
+async function paradaAction(){
+  const aqui=S.map,pa=PARADAS[aqui];
+  if(S.min<BUS_HORAS[0]||S.min>BUS_HORAS[1])return say(`PARADA DE ${pa.n.toUpperCase()}\nEl primer autobús pasa a las 7:00 y el último, a las 21:00.`);
+  const ama=S.flags.llegada===false,ds=ama?['town']:Object.keys(PARADAS).filter(k=>k!==aqui);
+  const i=await menu(ds.map(k=>{const v=viaje(aqui,k);return{label:PARADAS[k].n,right:ama?'billete de ama':`${eur(v.eur)} · ${v.min} min`};}).concat([{label:'Nada'}]),{cls:'right',title:'¿A dónde vas?'});
+  if(i<0||i>=ds.length)return;
+  const k=ds[i],v=viaje(aqui,k);
+  if(!ama){if(S.money<v.eur)return say(`El billete hasta ${PARADAS[k].n} cuesta ${eur(v.eur)}. No te llega.`);S.money-=v.eur;}
+  sfx('door');await fade(1);advanceTime(v.min);enterMap(k,...PARADAS[k].a);if(S.clientsDay!==S.day)spawnClients();updateHUD();await wait(80);await fade(0);
+  if(ama){S.flags.llegada=true;await say('Ribera Verde. El piso de la tía es el del tejado rojo, al otro lado de la calle.');showObjective();}
 }
 

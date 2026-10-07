@@ -161,6 +161,8 @@ function checkAnim(a, an) {
     if (!(w && h && w <= 256 && h <= 256)) E(id, 'animate_image: lienzo hasta 256×256');
     if (w * h * an.frames > 524288) E(id, 'animate_image: ancho × alto × fotogramas > 524288');
     if (!an.accion) E(id, 'falta accion');
+  } else if (an.herramienta === 'importado') {   // dibujada a mano (1.10, mundo.py)
+    if (a.herramienta !== 'importado') E(id, 'animación importada solo en un asset importado');
   } else E(id, `herramienta de animación «${an.herramienta}» no válida`);
   const cel = M.celdas[an.celda || a.celda];
   if (an.celda && !M.celdas[an.celda]) E(id, `celda «${an.celda}» no definida`);

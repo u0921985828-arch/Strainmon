@@ -1,0 +1,19 @@
+{
+  "grupo": "prop-monte",
+  "celda": [
+    48,
+    48
+  ],
+  "tope_colores": 15,
+  "secuencias": 2,
+  "fotogramas": 2,
+  "semitransparentes": 0,
+  "en_paleta_antes": 100,
+  "distancia_media": 0,
+  "colores_finales": 10,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

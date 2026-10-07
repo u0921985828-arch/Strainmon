@@ -59,6 +59,10 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
   { k: 'almacen', sw: 280, mode: 'world', now: T + 900, S: { ch: 8, min: 23 * 60, day: 40, flags: {}, encargo: { g: 2000, hasta: 41 } }, map: 'almacen',
     P: { x: 4, y: 6, dir: 'up' } },
   { k: 'casa-txaro', sw: 240, mode: 'world', now: T + 60, S: { ch: 4, flags: { txaro: true } }, map: 'txaro', P: { x: 4, y: 6, dir: 'up' } },
+  // la comarca (1.10): el pueblo del prólogo (caseríos, monte, parada y la vecina) y el puerto al atardecer con clientes
+  { k: 'mendialde', sw: 320, mode: 'world', now: T + 444, S: { ch: 1, min: 8 * 60, flags: { llegada: false } }, map: 'mendialde', P: { x: 11, y: 13, dir: 'up' } },
+  { k: 'puerto-tarde', sw: 400, mode: 'world', now: T + 3333, seed: 55, S: { ch: 4, min: 19 * 60, day: 8, flags: {} }, clientes: true, map: 'puerto',
+    P: { x: 20, y: 10, dir: 'up' } },
   // la vista B: carpa de 150 con extras (goteo, filtro y ventilador), macetas de todo tipo, fases, plaga, seca y muerta; elegida
   // una plaza de atrás (la fila de delante en transparencia)
   { k: 'carpa-b-g150', sw: 240, mode: 'carpa', now: T + 1234, S: { ch: 5, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },

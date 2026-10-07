@@ -539,7 +539,11 @@ func chapter(nn: int) -> void:
 func objective_text() -> String:
 	match int(S.ch):
 		1:
-			return "Lee la carta que hay en la mesa." if not S.flags.get("letter") else ("Visita el growshop de Kiko, al lado de casa." if not S.flags.get("kiko1") else "Planta y consigue tu primera cosecha.")
+			if llegando():
+				return "Coge el autobús en la plaza de Mendialde hasta Ribera Verde."
+			if not S.flags.get("letter"):
+				return "Lee la carta que hay en la mesa." if S.map == "home" else "Entra en el piso de la tía Maite, enfrente de la parada, y lee la carta que hay en la mesa."
+			return ("Visita el growshop de Kiko, al lado de casa." if not S.flags.get("kiko1") else "Planta y consigue tu primera cosecha.")
 		2:
 			var mv := int(D.META_VENTAS)
 			return "Gana %d € vendiendo (%d/%d)." % [mv, mini(mv, Datos.jsround(S.sales)), mv]

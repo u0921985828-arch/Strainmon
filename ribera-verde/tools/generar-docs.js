@@ -24,7 +24,8 @@ const ROOT = path.join(__dirname, '..');
     const G = { grass: '.', flowers: '*', tallgrass: '"', dirt: ':', walk: '-', roadT: '=', roadB: '=', plaza: '+', water: '~', bridgeT: 'H', bridgeB: 'H', dock: '#',
       floor: '.', floorB: '.', floorS: '.', mat: 'm', void: ' ' };
     const O = { tree: 'T', bush: 'b', fence: 'f', sign: 'S', lamp: 'L', bench: 'n', fountain: 'O', crate: 'c', bedT: 'B', bedB: 'B', pc: 'P', lab: 'G', lab2: 'G',
-      table: 't', fridge: 'F', shelfW: 's', counter: 'C', display: 'd', plantDeco: 'p', barcounter: 'C', bottles: 's', stool: 'x', btable: 't', jukebox: 'J', iwin: 'v', poster: 'v', carpa: 'K' };
+      table: 't', fridge: 'F', shelfW: 's', counter: 'C', display: 'd', plantDeco: 'p', barcounter: 'C', bottles: 's', stool: 'x', btable: 't', jukebox: 'J', iwin: 'v', poster: 'v', carpa: 'K',
+      monte: 'M', monte2: 'M', seto: 'h', parada: 'A' };
     const maps = {};
     for (const [name, m] of Object.entries(MAPS)) {
       const rows = [];
@@ -57,7 +58,7 @@ const ROOT = path.join(__dirname, '..');
     });
     S = S0;
     const signs = SIGNS;
-    return { strains, recipes, maps, npcs, items, shop, signs, banco: BANCO, sobre: SOBRE, gen, focos, macetas, carpas, zonas: ZONAS,
+    return { strains, recipes, maps, npcs, items, shop, signs, banco: BANCO, sobre: SOBRE, gen, focos, macetas, carpas, zonas: ZONAS, paradas: PARADAS, busHoras: BUS_HORAS,
       montajes, c: { CAJA, CAJA_P, CAJA_REDADA, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, ENCARGO_DIAS, SOBORNO, CUOTA_DIAS, KWH, H_LUZ, H_24, W_M2, Y_MEDIA, FENO_ESTRELLA, FENO_FLOJO, ESQUEJE_DIAS, SEMILLA_HERMA, DEUDA, PLAZOS, INTERES, PREMIO_COPA, mayor: [precioMayor(12), precioMayor(30)], calle: [precioCalle(12), precioCalle(30)], IMPERIO, SOBRES, GRANEL } };
   });
   await browser.close();
@@ -247,7 +248,7 @@ Saldada la deuda, el juego sigue: cada rango se gana facturando desde el último
 
   // ---------- MAPA.md ----------
   const legend = `Leyenda: \`.\` suelo/hierba · \`*\` flores · \`"\` hierba alta (ladrones ×3, a cualquier hora) · \`:\` tierra · \`-\` acera · \`=\` carretera · \`+\` plaza · \`~\` agua · \`H\` puente · \`#\` muelle
-\`^\` tejado · \`█\` pared/ventana · \`D\` puerta · \`T\` árbol · \`b\` arbusto · \`$\` arbusto con objeto oculto · \`i\` objeto en el suelo · \`f\` valla · \`S\` cartel · \`L\` farola · \`n\` banco · \`O\` fuente · \`c\` cajas · \`@\` personaje
+\`^\` tejado · \`█\` pared/ventana · \`D\` puerta · \`T\` árbol · \`b\` arbusto · \`$\` arbusto con objeto oculto · \`i\` objeto en el suelo · \`f\` valla · \`S\` cartel · \`L\` farola · \`n\` banco · \`O\` fuente · \`c\` cajas · \`@\` personaje · \`M\` monte (el bosque de los lindes) · \`h\` seto · \`A\` parada del autobús
 Interiores: \`B\` cama · \`P\` ordenador · \`G\` mesa de genética · \`t\` mesa · \`F\` nevera · \`K\` carpa (mueble: el armario de 60 u 80 en x 8, la carpa de 100 o 150 en x 10-11 y la de 120 en x 2-3; sus plazas se ven por dentro, en la vista de carpa) · \`C\` mostrador · \`s\` estantería · \`d\` expositor · \`x\` taburete · \`J\` gramola · \`v\` ventana/póster · \`m\` felpudo (salida)`;
   let m = `# Mapa de Ribera Verde
 
@@ -257,7 +258,10 @@ ${legend}
 `;
   const titles = { town: 'Barrio (exterior) — 40 × 30', home: 'Piso de la tía Maite — 12 × 8 (1 casilla = 1 m; con el armario de 60 y la carpa de 150)', shop: 'Growshop Kiko — 10 × 8', bar: 'Bar El Ancla — 10 × 8',
     alto: 'Barrio alto (exterior, al norte) — 40 × 30', astilleros: 'Astilleros (exterior, al este del muelle) — 40 × 30', txaro: 'Casa de la abuela Txaro — 10 × 8',
-    comisaria: 'Comisaría del barrio alto — 10 × 8', almacen: 'Almacén de los astilleros — 10 × 8' };
+    comisaria: 'Comisaría del barrio alto — 10 × 8', almacen: 'Almacén de los astilleros — 10 × 8',
+    mendialde: 'Mendialde (pueblo de caseríos, de donde eres; el prólogo) — 32 × 24', 'casa-ama': 'Caserío de la familia, en Mendialde — 10 × 8',
+    puerto: 'Puerto Viejo (ciudad pequeña, pesquera) — 40 × 24', valdehierro: 'Valdehierro (ciudad pequeña, del hierro) — 40 × 24',
+    errotabarri: 'Errotabarri (pueblo del molino) — 32 × 20' };
   for (const [k, mp] of Object.entries(D.maps)) {
     const pad = String(mp.w - 1).length;
     let header = '    ' + Array.from({ length: mp.w }, (_, x) => x % 10 === 0 ? String(x / 10 % 10) : ' ').join('') + '\n    ' + Array.from({ length: mp.w }, (_, x) => x % 10).join('');
@@ -268,7 +272,10 @@ ${legend}
   }
   m += `\n## Personajes\n\n| id | Mapa | Posición | Deambula | Aparece cuando |\n|---|---|---|---|---|\n`;
   for (const n of D.npcs) m += `| ${n.id} | ${n.map} | (${n.x},${n.y}) | ${n.wander ? 'radio ' + n.wander : 'no'} | ${n.cond ? '`' + n.cond + '`' : 'siempre'} |\n`;
-  m += `\nLos **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acera, plaza y tierra: en el barrio, 4 + reputación/15 (+1 desde el capítulo 4, máximo 10); en los astilleros, 2 (3 desde el capítulo 4), estudiantes y currelas, que pagan el gramo un 20 % más; y en el barrio alto, desde el capítulo 3, 2 (3 desde el 4), pijos y turistas.\n`;
+  m += `\nLos **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acera, plaza y tierra: en el barrio, 4 + reputación/15 (+1 desde el capítulo 4, máximo 10); en los astilleros, 2 (3 desde el capítulo 4), estudiantes y currelas, que pagan el gramo un 20 % más; en el barrio alto, desde el capítulo 3, 2 (3 desde el 4), pijos y turistas; en Puerto Viejo, 2 (3 desde el 4), turistas, currelas y estudiantes; en Valdehierro, 2 (3 desde el 4), estudiantes y currelas; y en los pueblos, 1: un currela en Mendialde y un currela o un turista en Errotabarri.\n`;
+  const P0 = D.paradas, hh = m => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
+  m += `\n## Autobús de la comarca\n\nEn el poste de cada parada (\`A\`), de ${hh(D.busHoras[0])} a ${hh(D.busHoras[1])}. Cada parada está a un tramo de Ribera Verde; entre dos de fuera se suman los dos tramos. El reloj corre lo que dura el viaje. El primero (Mendialde → Ribera Verde, en el prólogo) lo paga ama.\n\n| Parada | Posición | Llegas a | Desde Ribera Verde |\n|---|---|---|---|\n`;
+  for (const [k, p] of Object.entries(P0)) m += `| ${p.n} | ${k} (${p.x},${p.y}) | (${p.a[0]},${p.a[1]}) | ${k === 'town' ? '—' : `${p.min} min · ${p.eur} €`} |\n`;
   m += `\n**Zonas** (\`ZONAS\`): factor de policía, de ladrones y de precio en cada mapa de fuera. ${Object.entries(D.zonas).map(([k, z]) => `${z.n}: policía ×${String(z.pol).replace('.', ',')}, ladrones ×${String(z.lad).replace('.', ',')}, precio ×${String(z.precio).replace('.', ',')}`).join(' · ')}. Dentro de las casas no hay encuentros.\n`;
   m += `\n## Objetos\n\n| id | Posición | Tipo | Contenido |\n|---|---|---|---|\n`;
   for (const i of D.items) m += `| ${i.id} | ${i.map} (${i.x},${i.y}) | ${i.hidden ? 'oculto en arbusto (pulsa A delante)' : 'bolsa en el suelo'} | ${i.give || ''} |\n`;

@@ -57,7 +57,7 @@ Skunk #1 sana y abonada, fenotipo medio (cosecha de 2,5 días):
 
 - **Calle:** 6,4-10 €/g según el THC (× 0,85 estudiante, × 1 currela, × 1,15 turista, × 1,35 pijo; rebaja × 0,85, caro × 1,3). Cada cliente quiere 2-12 g.
 - **Al por mayor (Iñaki, en el muelle, desde el capítulo 3):** 3,2-5 €/g, lotes de 100 g para arriba, una carga al día de hasta 1 kg (más en el imperio). Cada carga sube el calor 2 + 1 por cada 100 g.
-- **Zonas:** en los astilleros, el gramo × 1,2 (las esquinas de Darko: 1 de cada 3 ventas acaba en pelea).
+- **Zonas:** en los astilleros, el gramo × 1,2; en Puerto Viejo, el gramo × 1,15; en Valdehierro, el gramo × 0,9 (las esquinas de Darko: 1 de cada 3 ventas acaba en pelea).
 - **Encargos de Don Baltasar (capítulo 8):** 6 €/g por 2, 5 o 10 kg según el rango del imperio, entregados de noche en el almacén de los astilleros en 2 días.
 - **Multas:** policía en la calle, 601 € (la mínima de la Ley de Seguridad Ciudadana); redada en el piso, hasta 3.000 € y se llevan las plantas y los cogollos de fuera de la caja fuerte.
 - **Protección del sargento Molina:** 1.500 € cada 10 días.

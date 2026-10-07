@@ -44,11 +44,13 @@ async function chooseName(){
     push(b=>{if(b==='A')done();});inp.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter'){e.preventDefault();done();}};});
 }
 async function newGame(){
-  S=newState();await fade(1);$('title').hidden=true;mode='intro';music('home');await fade(0);
-  await talk('???',['Ribera Verde. Un barrio obrero a orillas de la ría.','Me llamo Kiko. Llevo treinta años con el growshop de la esquina.']);
+  // prólogo (1.10): en el caserío de la familia, en Mendialde; el piso de la tía, en Ribera Verde, está a un autobús
+  S=newState();Object.assign(S,{map:'casa-ama',x:2,y:4,dir:'down'});S.flags.llegada=false;
+  await fade(1);$('title').hidden=true;mode='intro';music('home');await fade(0);
+  await talk('???',['¿Diga? ¿Eres familia de Maite, la de Ribera Verde? Un barrio obrero a orillas de la ría.','Me llamo Kiko. Llevo treinta años con el growshop de su calle.']);
   await talk('KIKO',['Conservo genéticas: variedades locales de Afganistán, México o la India, y los cruces que salen de ellas.','Las apunto todas en un registro, una GENOTECA. Tu tía Maite me ayudaba a mantenerla.','Perdona. ¿Cómo te llamabas?']);
   S.name=await chooseName();
-  await talk('KIKO',['{N}. Hacía años que no te veía por el barrio.','Maite murió hace tres semanas. Te ha dejado su piso, su armario de cultivo... y una deuda.','Lee la carta que te dejó. Después pásate por el growshop.']);
+  await talk('KIKO',['{N}. Hacía años que no te veía por el barrio.','Maite murió hace tres semanas. Te ha dejado su piso, su armario de cultivo... y una deuda.','Coge el autobús en la plaza del pueblo: te deja enfrente del piso. La llave está en el buzón.','Lee la carta que te dejó. Después pásate por el growshop.']);
   await fade(1);enterGame();await wait(300);await fade(0);
   await chapter(1);await wait(2600);showObjective();
 }

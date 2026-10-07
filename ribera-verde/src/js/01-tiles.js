@@ -47,7 +47,11 @@ function buildTiles(){
   T('dock',t=>{t.F(0,0,16,16,C.wood3);for(let y=3;y<16;y+=4)t.F(0,y,16,1,C.wood2);t.P(2,1,C.wood4);t.P(13,5,C.wood4);t.P(6,9,C.wood4);t.P(10,13,C.wood4);t.noise(5,[C.wood1]);});
   T('void',t=>t.F(0,0,16,16,'#000'));
   // buildings
-  const B={home:['#d65a4a','#f0dcae','doorW'],shop:['#46a262','#d8ecc4','doorG'],bar:['#4a72c2','#d4dbe8','doorD'],gray:['#8a92a2','#e4cec4','doorW']};
+  // 1.10: las fachadas por bioma de mundo.py (comisaría, nave del almacén, caseríos, casas marineras, bloque de ladrillo y fábrica)
+  const B={home:['#d65a4a','#f0dcae','doorW'],shop:['#46a262','#d8ecc4','doorG'],bar:['#4a72c2','#d4dbe8','doorD'],gray:['#8a92a2','#e4cec4','doorW'],
+    comisaria:['#4e5664','#cfc8b8','doorD'],nave:['#5f7e80','#8c98a2','doorD'],caserio:['#b04a32','#f2eee2','doorD'],caserio2:['#b04a32','#ece0c4','doorD'],
+    marinera:['#b04a32','#3f8a5a','doorD'],marinera2:['#b04a32','#3c6eb4','doorD'],marinera3:['#b04a32','#b8403a','doorD'],marinera4:['#b04a32','#e0b84a','doorD'],
+    ladrillo:['#9a9690','#a04a34','doorD'],fabrica:['#4e5258','#a04a34','doorD']};
   for(const [id,[roof,wall,door]] of Object.entries(B)){
     const shingles=(t)=>{t.F(0,0,16,16,roof);for(let y=3;y<16;y+=4){t.F(0,y,16,1,shade(roof,-38));for(let x=((y>>2)%2)*4;x<16;x+=8)t.F(x,y-3,1,3,shade(roof,-22));}t.noise(4,[shade(roof,22)]);};
     T('roofT_'+id,t=>{shingles(t);t.F(0,0,16,2,shade(roof,30));t.F(0,2,16,1,shade(roof,-45));});
@@ -73,6 +77,11 @@ function buildTiles(){
   // objects (transparent)
   T('tree',t=>{t.F(6,11,4,5,C.wood4);t.F(7,11,1,5,'#8c6438');t.blob(8,6.5,7.6,6.6,'#3e9446','#1f4f2a','#72c868','#2c6e36');t.noise(6,['#2c6e36'],3,2,10,8);});
   T('bush',t=>{t.blob(8,9.5,7,5.6,'#4ea04e','#22522c','#86d474','#357a3c');});
+  // linde de los mapas (1.10): monte espeso y seto; con arte, los de prop-monte y prop-seto (mundo.py)
+  T('monte',t=>{t.F(7,12,2,4,C.wood4);t.blob(8,7,7.8,6.4,'#2f7a3a','#183f24','#5ca850','#245c30');t.noise(6,['#245c30'],2,2,12,9);});
+  T('monte2',t=>{t.F(6,12,2,4,C.wood4);t.blob(8,7.5,7.8,6.2,'#327e3c','#183f24','#62ae54','#245c30');t.noise(5,['#245c30'],2,3,12,8);});
+  T('parada',t=>{t.F(7,5,2,11,'#7c848e');t.box(2,0,12,7,'#2c5aa0','#26262e');t.F(4,2,8,3,'#f4f4ee');t.F(3,5,10,1,'#f0d050');t.F(5,14,6,2,'#4c545e');});   // el poste del autobús (1.10)
+  T('seto',t=>{t.F(0,3,16,13,'#357a3c');t.F(0,2,16,1,'#22522c');t.F(0,4,16,2,'#4ea04e');t.F(0,15,16,1,'#22522c');t.noise(8,['#86d474','#22522c'],0,5,16,9);});
   T('fence',t=>{const p=(x)=>{t.F(x,3,3,12,'#5a3a20');t.F(x+1,4,1,10,'#e8c890');};t.F(0,6,16,3,'#5a3a20');t.F(0,7,16,1,'#e8c890');t.F(0,11,16,3,'#5a3a20');t.F(0,12,16,1,'#e8c890');p(1);p(12);});
   T('sign',t=>{t.F(7,9,2,7,C.wood4);t.box(1,2,14,9,C.wood3,C.wood4);t.F(3,4,10,1,C.wood2);t.F(3,6,8,1,C.wood2);t.F(3,8,6,1,C.wood2);});
   T('lamp',t=>{t.F(7,3,2,12,'#3c444e');t.F(5,14,6,2,'#2c333c');t.F(4,0,8,3,'#4c5560');t.F(5,2,6,2,'#fff2a0');t.P(8,4,'#6a7480');});

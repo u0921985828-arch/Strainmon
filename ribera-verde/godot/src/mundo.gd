@@ -179,6 +179,11 @@ func lot_item(l: Array) -> Dictionary:
 	var k: String = l[0]
 	return {"label": lot_nombre(k), "right": "%d g · %s%%" % [int(floor(l[1].g)), Datos.pct(l[1].thc)], "sw": strain(lot_sid(k)).c, "ic": ic_cog(lot_sid(k))}
 
+# el prólogo (1.10): S.flags.llegada === false hasta que el autobús de ama deja al jugador en Ribera Verde (las partidas viejas
+# no la llevan: ya han llegado)
+func llegando() -> bool:
+	return S.flags.has("llegada") and S.flags.llegada is bool and S.flags.llegada == false
+
 func got(t: String) -> void:
 	sfx("get")
 	await say("Consigues %s." % t)
@@ -271,6 +276,15 @@ func npc_talk(d: Dictionary) -> void:
 			await talk_molina()
 		"jurado":
 			await talk_jurado()
+		# la comarca (1.10)
+		"vecina":
+			await say(pick(["En Mendialde el autobús para en la plaza. El último sale a las nueve.", "Tu ama dice que en la ciudad no comes. Llévate el táper.", "Aquí el maíz se siembra en mayo y se recoge en octubre. Como toda la vida."]), "VECINA")
+		"excursionista":
+			await say(pick(["El molino tiene trescientos años. Todavía muele algún domingo.", "Del puente para arriba, el río baja limpio. Para abajo, ya no tanto.", "Vengo en el autobús de Ribera Verde: treinta minutos y tres euros."]), "EXCURSIONISTA")
+		"turista":
+			await say(pick(["Las casas son de colores para que cada pescador viera la suya desde el mar.", "Dicen que en este puerto se paga bien... y que la policía mira poco.", "He venido a por anchoas y me han ofrecido de todo."]), "TURISTA")
+		"obrero":
+			await say(pick(["La fundición cerró hace años. Ahora el solar no es de nadie.", "Aquí la gente cobra poco y paga poco. Y de noche, cuidado con la cartera.", "De Valdehierro a Ribera Verde, veinte minutos de autobús."]), "OBRERO")
 
 func mk_ent(d: Dictionary) -> Dictionary:
 	var look = d.get("lookObj")
@@ -336,6 +350,11 @@ func tile_solid(m: Dictionary, x: int, y: int) -> bool:
 	if SOLID_G.search(m.g[y][x]) or m.o[y][x]:
 		return true
 	return item_at(x, y) != null
+
+# la casilla donde deja el autobús en este mapa (1.10): ahí no se para nadie
+func llegada_bus(x: int, y: int) -> bool:
+	var pa = D.PARADAS.get(S.map)
+	return pa != null and int(pa.a[0]) == x and int(pa.a[1]) == y
 
 func ent_at(x: int, y: int):
 	for e in ents:
@@ -500,7 +519,7 @@ func update_ents(dt: float) -> void:
 		if absi(nx - e.hx) > e.wander or absi(ny - e.hy) > e.wander:
 			continue
 		var k := "%d,%d" % [nx, ny]
-		if tile_solid(m, nx, ny) or ent_at(nx, ny) or (nx == P.x and ny == P.y) or (P.moving and nx == P.fx and ny == P.fy) or m.doors.has(k) or m.exits.has(k):
+		if tile_solid(m, nx, ny) or ent_at(nx, ny) or (nx == P.x and ny == P.y) or (P.moving and nx == P.fx and ny == P.fy) or m.doors.has(k) or m.exits.has(k) or llegada_bus(nx, ny):   # ni en la llegada del autobús (1.10)
 			continue
 		e.fx = e.x
 		e.fy = e.y
@@ -580,6 +599,30 @@ func object_action(x: int, y: int) -> void:
 			"poster":
 				await diploma_action()
 				return
+	if S.map == "casa-ama":   # el caserío de la familia, en Mendialde (1.10)
+		match o:
+			"table":
+				var nueva: bool = not S.flags.get("notaAma")
+				S.flags.notaAma = true
+				await say("Una nota de tu ama: «Te he dejado un táper de alubias en la nevera. Llama cuando llegues. Y no te metas en líos»." if nueva else "La nota de ama: «...y no te metas en líos».")
+				return
+			"fridge":
+				if S.flags.get("taper"):
+					await say("La nevera de casa. El táper ya va en la mochila.")
+					return
+				S.flags.taper = true
+				S.items.bocata += 1
+				await got("el táper de alubias de ama (1 × BOCATA)")
+				return
+			"bedT", "bedB":
+				await say("Tu cama de siempre, con la colcha de cuadros.")
+				return
+			"iwin":
+				await say("Por la ventana se ven el monte y la carretera de la comarca.")
+				return
+			"plantDeco":
+				await say("Los geranios de ama. Les sobra agua.")
+				return
 	var txt := ""
 	if S.map == "txaro":
 		txt = {"bedT": "Una cama con colcha de ganchillo.", "bedB": "Una cama con colcha de ganchillo.", "table": "Un bote de aceite con una etiqueta a mano: «Para dormir. 2 gotas».",
@@ -594,6 +637,8 @@ func object_action(x: int, y: int) -> void:
 	match o:
 		"sign":
 			await say(D.SIGNS.get("%s:%d,%d" % [S.map, x, y], "Está tan desgastado que no se lee."))
+		"parada":
+			await parada_action()
 		"bush":
 			for it in D.ITEMS:
 				if it.hidden and it.map == S.map and it.x == x and it.y == y and not S.taken.get(it.id):
@@ -611,7 +656,7 @@ func object_action(x: int, y: int) -> void:
 			sfx("get")
 			await say("La gramola suena: rock vasco de los 80.")
 		"crate":
-			await say("Cajas de madera de los astilleros, podridas por la humedad." if S.map == "astilleros" else "Cajas de pescado vacías del puerto.")
+			await say("Cajas de madera de los astilleros, podridas por la humedad." if S.map == "astilleros" else ("Cajas de piezas de la fundición, oxidadas." if S.map == "valdehierro" else "Cajas de pescado vacías del puerto."))
 
 # ---------- acciones y efectos del atlas (01b-arte accion, lanzarVfx) ----------
 func accion(nn: String, vf = null) -> void:
@@ -651,6 +696,8 @@ func spawn_clients() -> void:
 		var zonas := [["town", nn, tipos], ["astilleros", 2 + (1 if S.ch >= 4 else 0), ["est", "cur"]]]
 		if S.ch >= 3:
 			zonas.append(["alto", 2 + (1 if S.ch >= 4 else 0), ["pij", "tur"]])
+		var mas := 1 if S.ch >= 4 else 0   # la comarca (1.10)
+		zonas.append_array([["puerto", 2 + mas, ["tur", "tur", "cur", "est"]], ["valdehierro", 2 + mas, ["est", "cur", "cur"]], ["mendialde", 1, ["cur"]], ["errotabarri", 1, ["cur", "tur"]]])
 		for zz in zonas:
 			var map_: String = zz[0]
 			var used := {}
@@ -669,7 +716,7 @@ func spawn_clients() -> void:
 				used["%d,%d" % [t[0], t[1]]] = true
 				var type: String = pick(zz[2])
 				var ct: Dictionary = D.CTYPES[type]
-				var id := "c%d_%s%d" % [S.day, {"town": "", "alto": "b", "astilleros": "s"}[map_], i]
+				var id := "c%d_%s%d" % [S.day, {"town": "", "alto": "b", "astilleros": "s", "puerto": "p", "valdehierro": "v", "mendialde": "m", "errotabarri": "e"}[map_], i]
 				var want := ri(int(ct.g[0]), int(ct.g[1]))
 				var mt := 0
 				if type == "pij":
@@ -790,6 +837,8 @@ func pc_action():
 func lab_action():
 	pass
 func letter_action():
+	pass
+func parada_action():
 	pass
 func title_press(_b):
 	pass

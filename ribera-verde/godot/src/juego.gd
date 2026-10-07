@@ -183,19 +183,25 @@ func choose_name() -> String:
 	return await Motor.espera(pr)
 
 func new_game() -> void:
+	# prólogo (1.10): en el caserío de la familia, en Mendialde; el piso de la tía, en Ribera Verde, está a un autobús
 	S = new_state()
+	S.map = "casa-ama"
+	S.x = 2
+	S.y = 4
+	S.dir = "down"
+	S.flags.llegada = false
 	await fade(1)
 	if not oraculo:
 		titulo.hide()
 	mode = "intro"
 	music("home")
 	await fade(0)
-	await talk("???", ["Ribera Verde. Un barrio obrero a orillas de la ría.", "Me llamo Kiko. Llevo treinta años con el growshop de la esquina."])
+	await talk("???", ["¿Diga? ¿Eres familia de Maite, la de Ribera Verde? Un barrio obrero a orillas de la ría.", "Me llamo Kiko. Llevo treinta años con el growshop de su calle."])
 	await talk("KIKO", ["Conservo genéticas: variedades locales de Afganistán, México o la India, y los cruces que salen de ellas.",
 		"Las apunto todas en un registro, una GENOTECA. Tu tía Maite me ayudaba a mantenerla.", "Perdona. ¿Cómo te llamabas?"])
 	S.name = await choose_name()
 	await talk("KIKO", ["{N}. Hacía años que no te veía por el barrio.", "Maite murió hace tres semanas. Te ha dejado su piso, su armario de cultivo... y una deuda.",
-		"Lee la carta que te dejó. Después pásate por el growshop."])
+		"Coge el autobús en la plaza del pueblo: te deja enfrente del piso. La llave está en el buzón.", "Lee la carta que te dejó. Después pásate por el growshop."])
 	await fade(1)
 	enter_game()
 	await wait(300)

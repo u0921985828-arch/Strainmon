@@ -1,5 +1,5 @@
 # Ribera Verde (Godot) — una partida nueva jugada con los mandos desde el título, como lo haría una persona: título → NUEVA
-# PARTIDA → la intro (con el nombre escrito a mano) → el piso. Allí el menú START (Genoteca, Mochila, Plantas, Objetivo,
+# PARTIDA → la intro (con el nombre escrito a mano) → el prólogo (del caserío de Mendialde a la parada y el autobús) → el piso. Allí el menú START (Genoteca, Mochila, Plantas, Objetivo,
 # Guardar, Sonido y Salir), un paseo por la calle (la salida del felpudo y la puerta del portal) y, con lo que vendería Kiko
 # (semillas, insecticida, la carpa de 100 y un foco de sodio: la tienda la recorre historia.gd), un ciclo de cultivo entero:
 # andar hasta la carpa, abrirla (vista B con el CFL), colgar el foco (vista C), plantar las 4 plazas, cuidarlas cada mañana,
@@ -292,6 +292,7 @@ func _corre() -> void:
 	root.add_child(J)
 	await espera(10)
 	await titulo_e_intro()
+	await prologo()
 	await menu_start()
 	await paseo()
 	await ciclo()
@@ -365,13 +366,50 @@ func titulo_e_intro() -> void:
 	textos.clear()
 	await libre()
 	check("Kiko te llama por tu nombre", textos.any(func(t): return t.begins_with("NAIA. Hacía años")))
-	check("la partida empieza en el piso, capítulo 1, en (2,4) y sin el título", J.mode == "world" and J.S.map == "home" and J.S.ch == 1 and Vector2i(J.P.x, J.P.y) == Vector2i(2, 4) \
+	check("la partida empieza en el caserío de Mendialde (el prólogo), capítulo 1, en (2,4) y sin el título", J.mode == "world" and J.S.map == "casa-ama" and J.S.ch == 1 and Vector2i(J.P.x, J.P.y) == Vector2i(2, 4) \
 		and not J.titulo.visible and J.pintor.modo == "world")
 	check("HUD: «%s»" % J.hud_txt.text.replace("\n", " · "), J.hud.visible and J.hud_txt.text.begins_with("DÍA 1 · 08:") and J.hud_txt.text.contains("150 €"))
 	check("guardada al empezar el capítulo", FileAccess.file_exists(Juego.GUARDADO))
 	await hasta(func(): return J.toast_box.visible and J.toast_txt.get_parsed_text().contains("OBJETIVO"), 400)
-	await foto("3-piso")
+	await foto("3-caserio")
 	await check_aviso("el objetivo")
+
+# ---------- el prólogo (1.10): del caserío a la parada de Mendialde, el autobús de ama hasta Ribera Verde y el portal del piso ----------
+func prologo() -> void:
+	check("el objetivo del prólogo: el autobús", J.objective_text().contains("autobús"))
+	var m: Dictionary = J.MAPS["casa-ama"]
+	var ex: Vector2i
+	for k in m.exits:
+		var p: PackedStringArray = k.split(",")
+		ex = Vector2i(int(p[0]), int(p[1]))
+	check("andando hasta la puerta del caserío (%d,%d)" % [ex.x, ex.y], await anda(ex))
+	await toque(0, "down", true)
+	await hasta(func(): return J.S.map == "mendialde", 120)
+	await toque(0, "down", false)
+	await libre()
+	check("▼ en la puerta sale a Mendialde con la música de la calle", J.S.map == "mendialde" and J.sonido.actual == "town")
+	var pa: Dictionary = J.D.PARADAS.mendialde
+	check("andando hasta la parada (%d,%d)" % [pa.a[0], pa.a[1]], await anda(Vector2i(int(pa.a[0]), int(pa.a[1]))))
+	await mira("left")
+	await foto("3c-mendialde")
+	await pulsa("A")
+	var t0: int = J.S.min
+	check("A en la parada: «¿A dónde vas?» solo con Ribera Verde (billete de ama)", await pasa(func(): return J.menu_box.visible) and etiquetas() == ["Ribera Verde", "Nada"]
+		and J.m_items[0].right == "billete de ama")
+	await elige("Ribera Verde")
+	textos.clear()
+	await libre()
+	check("el autobús deja en Ribera Verde (7,12), sin pagar y con el reloj 40 min más tarde", J.S.map == "town" and Vector2i(J.P.x, J.P.y) == Vector2i(7, 12) and J.S.money == 150
+		and J.S.min - t0 >= 40 and J.S.min - t0 < 46 and J.S.flags.get("llegada") == true and textos.any(func(t): return t.begins_with("Ribera Verde. El piso")))
+	var puerta := Vector2i(-1, -1)
+	for k in J.MAPS.town.doors:
+		if J.MAPS.town.doors[k].to == "home":
+			var p: PackedStringArray = k.split(",")
+			puerta = Vector2i(int(p[0]), int(p[1]))
+	await anda(puerta)
+	await libre()
+	check("por el portal, al piso: el objetivo es ya la carta", J.S.map == "home" and J.objective_text() == "Lee la carta que hay en la mesa.")
+	await foto("3-piso")
 
 # ---------- menú START ----------
 func menu_start() -> void:
@@ -695,10 +733,11 @@ func continuar() -> void:
 	await pulsa("START")
 	await elige("GUARDAR")
 	await pasa(func(): return J.menu_box.visible and not J.dlg.visible)
-	await elige("SALIR")
-	await libre()
+	# lo guardado, con el menú aún abierto (el reloj del juego no corre): al cerrarlo puede pasar un minuto antes de mirarlo
 	var S: Dictionary = J.S
 	var esperado := {"name": S.name, "day": float(S.day), "min": float(S.min), "ch": float(S.ch), "seeds": S.seeds.keys(), "buds": S.buds.keys(), "money": float(S.money), "x": int(J.P.x), "y": int(J.P.y)}
+	await elige("SALIR")
+	await libre()
 	J.queue_free()
 	await espera(3)
 	J = load("res://juego.tscn").instantiate()

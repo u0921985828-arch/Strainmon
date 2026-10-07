@@ -121,13 +121,15 @@ for (const a of M.assets) {
   }
   // ---------- edificios (una pieza de 7×6 o 6×6 casillas, montada como en building()) ----------
   if (a.tipo === 'edificio') {
-    // gray-puerta (fachada retocada a mano para la puerta de home) se calca de las losetas de gray
-    const id = a.id.replace('edificio-', ''), ref = id.replace(/-puerta$/, ''), w = a.celda === 'edificio_6x6' ? 6 : 7, h = 6, doorX = ref === 'gray' ? null : 3;
+    // gray-puerta (fachada retocada a mano para la puerta de home) se calca de las losetas de gray. La puerta: en la casilla
+    // 3 (las aprobadas de 7 × 6) o en a.puerta = {x, ancha} (las de mundo.py, 1.10: ancha ocupa x y x + 1 y se recorta centrada)
+    const id = a.id.replace('edificio-', ''), ref = id.replace(/-puerta$/, ''), w = M.celdas[a.celda].w / 16, h = 6;
+    const doorX = a.puerta ? a.puerta.x : ref === 'gray' || !(a.animaciones || []).some(an => an.nombre === 'puerta') ? null : 3, an2 = a.puerta && a.puerta.ancha ? 1 : 0;
     const o = blank(w * 16, h * 16), t = k => rd(`tiles/${k}_${ref}.png`);
     for (let x = 0; x < w; x++) { copy(t('roofT'), o, x * 16, 0); copy(t('roofB'), o, x * 16, 16); for (let y = 2; y < h; y++) copy(t('wall'), o, x * 16, y * 16); if (x % 3 === 1 && x !== doorX) copy(t('win'), o, x * 16, 48); }
-    if (doorX != null) copy(t('door'), o, doorX * 16, (h - 1) * 16);
+    if (doorX != null) for (let x = doorX; x <= doorX + an2; x++) copy(t('door'), o, x * 16, (h - 1) * 16);
     wr(a.id, 'base', 'unica', 0, o);
-    if (doorX != null) for (let i = 0; i < 4; i++) { const p = blank(32, 32); copy(o, p, 0, 0, doorX * 16 - 8, (h - 2) * 16, 32, 32);
+    if (doorX != null) for (let i = 0; i < 4; i++) { const p = blank(32, 32); copy(o, p, 0, 0, doorX * 16 - 8 + an2 * 8, (h - 2) * 16, 32, 32);
       for (let y = 0; y < 13; y++) for (let x = 0; x < Math.min(10, i * 4); x++) dot(p, 11 + x, 18 + y, '#26262e'); wr(a.id, 'puerta', 'unica', i, p); }
   }
   // ---------- carpas (1.6): la huella entera, por dentro o cerrada ----------

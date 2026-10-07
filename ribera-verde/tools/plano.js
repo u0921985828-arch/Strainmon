@@ -33,7 +33,7 @@ const REAL = {
   plantas: ['i', 's', 'h'].flatMap(po => [['Germinando', 0, .05], ['Plántula', 1, .15], ['Vegetativo', 2], ['Floración', 3], ['Lista', 4]]
     .map(([n, st, r]) => [`${n} (${{ i: 'índica', s: 'sativa', h: 'híbrida' }[po]})`, `p34:${po}${st}`, 'alto', r || { i: [0, 0, .35, .55, .65], s: [0, 0, .45, .75, .9], h: [0, 0, .4, .6, .7] }[po][st], 48])),
   exterior: [['Árbol', 'tree', 'alto', 6], ['Farola', 'lamp', 'alto', 4], ['Banco', 'bench', 'ancho', 1.8], ['Fuente', 'fountain', 'ancho', 3], ['Arbusto', 'bush', 'ancho', 1.2],
-    ['Valla', 'fence', 'alto', 1.0], ['Edificio (piso)', 'edificio:home', 'ancho', 14], ['Edificio (bar)', 'edificio:bar', 'ancho', 14]],
+    ['Valla', 'fence', 'alto', 1.0], ['Parada del autobús', 'parada', 'alto', 2.8], ['Edificio (piso)', 'edificio:home', 'ancho', 14], ['Edificio (bar)', 'edificio:bar', 'ancho', 14]],
 };
 
 (async () => {
@@ -50,13 +50,19 @@ const REAL = {
     let K = 2; const MG = 30, out = { mapas: {}, medidas: [] };
     const NOMBRE = { bedT: 'cama', bedB: '', pc: 'ordenador', lab: 'mesa genética', lab2: 'mesa genética', table: 'mesa', fridge: 'nevera', plantDeco: 'planta',
       iwin: 'ventana', poster: 'diploma', shelfW: 'estantería', counter: 'mostrador', display: 'expositor', bottles: 'botellero', barcounter: 'barra', stool: 'taburete',
-      btable: 'mesa', jukebox: 'gramola', crate: 'cajas', lamp: 'farola', fountain: 'fuente', sign: 'cartel', bench: 'banco', mesa: '' };
+      btable: 'mesa', jukebox: 'gramola', crate: 'cajas', lamp: 'farola', fountain: 'fuente', sign: 'cartel', bench: 'banco', mesa: '', parada: 'parada del autobús' };
     const NPCN = { kiko: 'Kiko', josune: 'Josune', baltasar: 'Baltasar', tono: 'Toño', begona: 'Begoña', unai: 'Unai', patxi: 'Patxi', txaro: 'Txaro', inaki: 'Iñaki',
-      cop: 'Agente', darko: 'Darko', darko2: 'Darko', molina: 'Sgto. Molina', tono2: 'Toño', jurado: 'Jurado' };
+      cop: 'Agente', darko: 'Darko', darko2: 'Darko', molina: 'Sgto. Molina', tono2: 'Toño', jurado: 'Jurado', vecina: 'Vecina', excursionista: 'Excursionista', turista: 'Turista',
+      obrero: 'Obrero' };
     const ZONAS = { town: [['PARQUE DE LOS SAUCES', 1, 13, 11, 27], ['PLAZA', 14, 13, 26, 24], ['RÍA', 31, 14, 38, 28], ['MUELLE', 34, 16, 38, 25], ['CALLE', 1, 9, 38, 12]],
       alto: [['PLAZA DEL ENSANCHE', 3, 4, 19, 17], ['JARDINES', 22, 3, 38, 11], ['CALLE', 1, 20, 38, 23]],
-      astilleros: [['ASTILLEROS CERRADOS', 24, 4, 37, 10], ['MUELLE DE CARGA', 0, 19, 39, 22], ['DIQUES', 6, 23, 28, 27]] };
-    const FUERA = n => !!CLIENT_TILES[n];   // los mapas de fuera (barrio, barrio alto y astilleros)
+      astilleros: [['ASTILLEROS CERRADOS', 24, 4, 37, 10], ['MUELLE DE CARGA', 0, 19, 39, 22], ['DIQUES', 6, 23, 28, 27]],
+      // la comarca (1.10)
+      mendialde: [['CARRETERA DE LA COMARCA', 1, 10, 30, 13], ['PLAZA', 12, 14, 19, 18], ['MAIZAL', 21, 15, 29, 21]],
+      puerto: [['CASAS MARINERAS', 1, 2, 36, 7], ['PASEO', 1, 8, 38, 14], ['PANTALANES', 6, 16, 34, 21]],
+      valdehierro: [['CARRETERA', 1, 9, 38, 10], ['FUNDICIÓN', 29, 2, 36, 7], ['SOLAR', 20, 12, 38, 22], ['PARQUE', 2, 20, 17, 22]],
+      errotabarri: [['RÍO', 15, 0, 17, 19], ['CAMINO', 1, 9, 30, 10], ['HUERTA', 2, 13, 10, 17]] };
+    const FUERA = n => !!CLIENT_TILES[n];   // los mapas de fuera (barrio, barrio alto, astilleros y la comarca)
 
     mode = 'plano'; S = newState(); S.ch = 6; S.protect = false; S.flags = { letter: 1, kiko1: 1, harvest1: 1, metB: 1, lab: 1 }; S.min = 12 * 60; S.clients = [];
     S.carpas = [{ t: 'p80', foco: 'sodio250' }, { t: 'g150', foco: 'led720' }, { t: 'm120', foco: 'led480' }]; S.macetas = Array(15).fill('tela11'); S.pots = Array(15).fill(null);
@@ -124,6 +130,8 @@ const REAL = {
     }
     anotar('town', 'RIBERA VERDE · barrio'); anotar('home', 'PISO DE LA TÍA MAITE (armario 80 + carpa 150 + carpa 120)'); anotar('shop', 'GROWSHOP KIKO'); anotar('bar', 'BAR EL ANCLA');
     anotar('alto', 'BARRIO ALTO'); anotar('astilleros', 'ASTILLEROS'); anotar('txaro', 'CASA DE TXARO'); anotar('comisaria', 'COMISARÍA DEL BARRIO ALTO'); anotar('almacen', 'ALMACÉN DE LOS ASTILLEROS');
+    anotar('mendialde', 'MENDIALDE · el pueblo del prólogo'); anotar('casa-ama', 'CASERÍO DE LA FAMILIA (MENDIALDE)'); anotar('puerto', 'PUERTO VIEJO');
+    anotar('valdehierro', 'VALDEHIERRO'); anotar('errotabarri', 'ERROTABARRI');
 
     // ---------- hoja de escala ----------
     function caja(c) { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;

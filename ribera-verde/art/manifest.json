@@ -342,6 +342,56 @@
     63
    ],
    "ajuste": "pies"
+  },
+  "objeto_arbol": {
+   "w": 64,
+   "h": 96,
+   "ancla": [
+    32,
+    95
+   ],
+   "ajuste": "pies",
+   "nota": "árbol alto (1.10): 4 casillas de ancho y 6 de alto, pies en el centro de la base"
+  },
+  "objeto_monte": {
+   "w": 48,
+   "h": 48,
+   "ancla": [
+    24,
+    47
+   ],
+   "ajuste": "pies",
+   "nota": "linde de monte (1.10): árboles de 3 m pegados de 16 en 16 px por el borde de los mapas"
+  },
+  "edificio_8x6": {
+   "w": 128,
+   "h": 96,
+   "ancla": [
+    64,
+    95
+   ],
+   "ajuste": "pies",
+   "nota": "fachadas de 8 × 6 casillas (1.10, mundo.py): caserío y fábrica"
+  },
+  "edificio_4x6": {
+   "w": 64,
+   "h": 96,
+   "ancla": [
+    32,
+    95
+   ],
+   "ajuste": "pies",
+   "nota": "fachadas de 4 × 6 casillas (1.10, mundo.py): casas marineras"
+  },
+  "objeto_parada": {
+   "w": 16,
+   "h": 48,
+   "ancla": [
+    8,
+    47
+   ],
+   "ajuste": "pies",
+   "nota": "poste de la parada del autobús (1.10): 3 m"
   }
  },
  "fases": [
@@ -1017,7 +1067,8 @@
    "fase": "F3",
    "cubre": [
     "look:tono",
-    "npc:tono"
+    "npc:tono",
+    "npc:tono2"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -1907,7 +1958,8 @@
    "fase": "F3",
    "cubre": [
     "look:darko",
-    "npc:darko"
+    "npc:darko",
+    "npc:darko2"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -2112,7 +2164,9 @@
    "tipo": "personaje",
    "fase": "F3",
    "cubre": [
-    "look:cliente1"
+    "look:cliente1",
+    "look:excursionista",
+    "npc:excursionista"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -2219,7 +2273,9 @@
    "tipo": "personaje",
    "fase": "F3",
    "cubre": [
-    "look:cliente2"
+    "look:cliente2",
+    "look:obrero",
+    "npc:obrero"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -2336,7 +2392,9 @@
    "tipo": "personaje",
    "fase": "F3",
    "cubre": [
-    "look:cliente3"
+    "look:cliente3",
+    "look:turista",
+    "npc:turista"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -2669,7 +2727,9 @@
    "tipo": "personaje",
    "fase": "F3",
    "cubre": [
-    "look:cliente6"
+    "look:cliente6",
+    "look:vecina",
+    "npc:vecina"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -4591,7 +4651,9 @@
    "tipo": "edificio",
    "fase": "F4",
    "herramienta": "importado",
-   "cubre": [],
+   "cubre": [
+    "tile:door_gray"
+   ],
    "origen": "tools/sprites/a-mano/fachada_puerta.py: la fachada aprobada de edificio-gray con las dos ventanas de abajo separadas 9 px hacia los lados (solo mueve sus píxeles: misma paleta)",
    "descripcion": "la casa gris con hueco para la puerta del piso (32 × 32, sin su pared) entre las dos ventanas de abajo",
    "celda": "edificio_6x6",
@@ -4599,6 +4661,269 @@
    "familia": "importado",
    "coste_real": 0,
    "notas": "1.10: la casa de Txaro, la comisaría y el almacén (building(..., {fachada: 'gray-puerta', puerta: 'home', mascara: 1})). Antes llevaban la fachada sin puerta con la del piso o la del bar pegada encima de las ventanas. Pedido por el usuario: «mover las ventanas de abajo para que entre la puerta»."
+  },
+  {
+   "id": "edificio-comisaria",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:roofT_comisaria",
+    "tile:roofB_comisaria",
+    "tile:wall_comisaria",
+    "tile:win_comisaria",
+    "tile:door_comisaria"
+   ],
+   "celda": "edificio_6x6",
+   "origen": "tools/sprites/a-mano/mundo.py (comisaria): dibujado a mano a 16 px/m con la luz y el estilo de las fachadas aprobadas",
+   "descripcion": "comisaría del barrio alto: sillería clara, cornisa, pizarra, rejas, placa azul con un escudo propio y doble puerta bajo arco de piedra",
+   "puerta": {
+    "x": 2,
+    "ancha": 1
+   },
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose (interior #26262e), de mundo.py",
+     "herramienta": "importado"
+    }
+   ],
+   "notas": "1.10, pedido por el usuario: casas según el bioma de cada sitio y sin mezclas de fachadas."
+  },
+  {
+   "id": "edificio-nave",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:roofT_nave",
+    "tile:roofB_nave",
+    "tile:wall_nave",
+    "tile:win_nave",
+    "tile:door_nave"
+   ],
+   "celda": "edificio_6x6",
+   "origen": "tools/sprites/a-mano/mundo.py (nave): dibujado a mano a 16 px/m con la luz y el estilo de las fachadas aprobadas",
+   "descripcion": "almacén de los astilleros: nave de chapa grecada con óxido, ventanal corrido, rótulo «3» y puerta corredera",
+   "puerta": {
+    "x": 2,
+    "ancha": 1
+   },
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose (interior #26262e), de mundo.py",
+     "herramienta": "importado"
+    }
+   ],
+   "notas": "1.10, pedido por el usuario: casas según el bioma de cada sitio y sin mezclas de fachadas."
+  },
+  {
+   "id": "edificio-caserio",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:roofT_caserio",
+    "tile:roofB_caserio",
+    "tile:wall_caserio",
+    "tile:win_caserio",
+    "tile:door_caserio"
+   ],
+   "celda": "edificio_8x6",
+   "origen": "tools/sprites/a-mano/mundo.py (caserio): dibujado a mano a 16 px/m con la luz y el estilo de las fachadas aprobadas",
+   "descripcion": "caserío de los pueblos: teja árabe, canecillos, entramado con balconada y geranios, sillar en las esquinas y portalón en arco",
+   "puerta": {
+    "x": 3,
+    "ancha": 1
+   },
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose (interior #26262e), de mundo.py",
+     "herramienta": "importado"
+    }
+   ],
+   "notas": "1.10, pedido por el usuario: casas según el bioma de cada sitio y sin mezclas de fachadas."
+  },
+  {
+   "id": "edificio-caserio2",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:roofT_caserio2",
+    "tile:roofB_caserio2",
+    "tile:wall_caserio2",
+    "tile:win_caserio2"
+   ],
+   "celda": "edificio_8x6",
+   "origen": "tools/sprites/a-mano/mundo.py (caserio): dibujado a mano a 16 px/m con la luz y el estilo de las fachadas aprobadas",
+   "descripcion": "el mismo caserío con contraventanas rojas y cal crema",
+   "puerta": {
+    "x": 3,
+    "ancha": 1
+   },
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose (interior #26262e), de mundo.py",
+     "herramienta": "importado"
+    }
+   ],
+   "notas": "1.10, pedido por el usuario: casas según el bioma de cada sitio y sin mezclas de fachadas."
+  },
+  {
+   "id": "edificio-marinera",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:roofT_marinera",
+    "tile:roofB_marinera",
+    "tile:wall_marinera",
+    "tile:win_marinera"
+   ],
+   "celda": "edificio_4x6",
+   "origen": "tools/sprites/a-mano/mundo.py (marinera): dibujado a mano a 16 px/m con la luz y el estilo de las fachadas aprobadas",
+   "descripcion": "casa marinera de Puerto Viejo, estrecha y pintada (verde), con recercados blancos y balcón de hierro",
+   "notas": "1.10, pedido por el usuario: casas según el bioma de cada sitio y sin mezclas de fachadas."
+  },
+  {
+   "id": "edificio-marinera2",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:roofT_marinera2",
+    "tile:roofB_marinera2",
+    "tile:wall_marinera2",
+    "tile:win_marinera2"
+   ],
+   "celda": "edificio_4x6",
+   "origen": "tools/sprites/a-mano/mundo.py (marinera): dibujado a mano a 16 px/m con la luz y el estilo de las fachadas aprobadas",
+   "descripcion": "casa marinera de Puerto Viejo, estrecha y pintada (azul), con recercados blancos y balcón de hierro",
+   "notas": "1.10, pedido por el usuario: casas según el bioma de cada sitio y sin mezclas de fachadas."
+  },
+  {
+   "id": "edificio-marinera3",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:roofT_marinera3",
+    "tile:roofB_marinera3",
+    "tile:wall_marinera3",
+    "tile:win_marinera3"
+   ],
+   "celda": "edificio_4x6",
+   "origen": "tools/sprites/a-mano/mundo.py (marinera): dibujado a mano a 16 px/m con la luz y el estilo de las fachadas aprobadas",
+   "descripcion": "casa marinera de Puerto Viejo, estrecha y pintada (roja), con recercados blancos y balcón de hierro",
+   "notas": "1.10, pedido por el usuario: casas según el bioma de cada sitio y sin mezclas de fachadas."
+  },
+  {
+   "id": "edificio-marinera4",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:roofT_marinera4",
+    "tile:roofB_marinera4",
+    "tile:wall_marinera4",
+    "tile:win_marinera4"
+   ],
+   "celda": "edificio_4x6",
+   "origen": "tools/sprites/a-mano/mundo.py (marinera): dibujado a mano a 16 px/m con la luz y el estilo de las fachadas aprobadas",
+   "descripcion": "casa marinera de Puerto Viejo, estrecha y pintada (amarilla), con recercados blancos y balcón de hierro",
+   "notas": "1.10, pedido por el usuario: casas según el bioma de cada sitio y sin mezclas de fachadas."
+  },
+  {
+   "id": "edificio-ladrillo",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:roofT_ladrillo",
+    "tile:roofB_ladrillo",
+    "tile:wall_ladrillo",
+    "tile:win_ladrillo"
+   ],
+   "celda": "edificio_7x6",
+   "origen": "tools/sprites/a-mano/mundo.py (ladrillo): dibujado a mano a 16 px/m con la luz y el estilo de las fachadas aprobadas",
+   "descripcion": "bloque de ladrillo de Valdehierro: azotea, pretil, aluminio, ropa tendida, persiana de tienda y portal",
+   "notas": "1.10, pedido por el usuario: casas según el bioma de cada sitio y sin mezclas de fachadas."
+  },
+  {
+   "id": "edificio-fabrica",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "tile:roofT_fabrica",
+    "tile:roofB_fabrica",
+    "tile:wall_fabrica",
+    "tile:win_fabrica"
+   ],
+   "celda": "edificio_8x6",
+   "origen": "tools/sprites/a-mano/mundo.py (fabrica): dibujado a mano a 16 px/m con la luz y el estilo de las fachadas aprobadas",
+   "descripcion": "fábrica vieja de Valdehierro: diente de sierra, chimenea de ladrillo, rótulo «FUNDICIÓN», ventanales de hierro y portón",
+   "notas": "1.10, pedido por el usuario: casas según el bioma de cada sitio y sin mezclas de fachadas."
   },
   {
    "id": "props-altura",
@@ -4916,9 +5241,7 @@
    "id": "prop-arbol",
    "tipo": "objeto",
    "fase": "F4",
-   "cubre": [
-    "obj:tree"
-   ],
+   "cubre": [],
    "descripcion": "round leafy town tree with a short brown trunk, dense green canopy with highlights on the top-left, casting a small shadow on the grass, clean 16-bit handheld RPG pixel art, same style and light as the surrounding map",
    "celda": "objeto_alto",
    "referencias": [
@@ -4938,7 +5261,7 @@
     "background_image": "art/referencias/mapa/tree.png",
     "inpainting.mask_image": "art/referencias/mapa/tree_mascara.png"
    },
-   "notas": " Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera. Recorte y máscara en base64 (los PNG de art/referencias/mapa caben; si no, se cuantizan en paleta).",
+   "notas": " Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera. Recorte y máscara en base64 (los PNG de art/referencias/mapa caben; si no, se cuantizan en paleta). 1.10: obj:tree pasa a prop-arbol-alto (5,8 m; este medía 1,5 m).",
    "depende_de": [
     "tiles-exterior"
    ],
@@ -4946,6 +5269,75 @@
     "map_object_id": "15df7a0c-ef08-436b-a971-4e9652703f71"
    },
    "coste_real": 1
+  },
+  {
+   "id": "prop-arbol-alto",
+   "tipo": "objeto",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "obj:tree"
+   ],
+   "celda": "objeto_arbol",
+   "origen": "tools/sprites/a-mano/mundo.py (arbol): dibujado a mano con la rampa de hoja y de tronco de prop-arbol (grumos sombreados con la luz de arriba a la izquierda, hojitas y contorno #1e3a2a)",
+   "descripcion": "árbol de copa redonda a su altura (5,8 m: 93 px), tronco de 2 m a la vista",
+   "notas": "1.10, pedido por el usuario («todos los muebles y decorativos a la altura correcta»): el árbol de prop-arbol medía 1,5 m (24 px)."
+  },
+  {
+   "id": "prop-monte",
+   "tipo": "objeto",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "obj:monte",
+    "obj:monte2"
+   ],
+   "celda": "objeto_monte",
+   "origen": "tools/sprites/a-mano/mundo.py (monte): dibujado a mano con la rampa de hoja y de tronco de prop-arbol, dos copas distintas que se alternan",
+   "descripcion": "linde de monte: árbol de copa baja y espesa (3 m) para el borde de los mapas, de 16 en 16 px",
+   "notas": "1.10: el borde de árboles altos de 1 casilla formaba un peine de troncos; la linde va con estos dos y con el seto abajo."
+  },
+  {
+   "id": "prop-seto",
+   "tipo": "objeto",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "obj:seto"
+   ],
+   "celda": "objeto_1x1",
+   "origen": "tools/sprites/a-mano/mundo.py (seto): dibujado a mano con la rampa de hoja de prop-arbol",
+   "descripcion": "seto de 1 m que se repite de 16 en 16 px por el borde de abajo de los mapas",
+   "notas": "1.10: borde de abajo (no tapa las filas que se pisan)."
+  },
+  {
+   "id": "prop-parada",
+   "tipo": "objeto",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "cubre": [
+    "obj:parada"
+   ],
+   "celda": "objeto_parada",
+   "origen": "tools/sprites/a-mano/mundo.py (parada): dibujado a mano",
+   "descripcion": "poste de la parada del autobús de 3 m: señal azul con un autobús propio, banda amarilla y horarios",
+   "notas": "1.10: una en cada sitio de la comarca (A delante: el menú del autobús)."
   },
   {
    "id": "prop-farola",

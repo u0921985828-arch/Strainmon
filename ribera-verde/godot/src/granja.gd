@@ -575,6 +575,56 @@ func letter_action():
 	S.flags.letter = true
 	show_objective()
 
+# ---------- el autobús de la comarca (1.10, paradaAction de 08-mundo) ----------
+# en el poste de la parada: a dónde, cuánto y cuánto tarda; el reloj corre lo que dura el viaje. El primer viaje (del pueblo al
+# piso: llegando()) lo paga ama y solo va a Ribera Verde
+func viaje(a: String, b: String) -> Dictionary:
+	return {"min": int(D.PARADAS[a].min + D.PARADAS[b].min), "eur": D.PARADAS[a].eur + D.PARADAS[b].eur}
+
+func parada_action():
+	var aqui: String = S.map
+	var pa: Dictionary = D.PARADAS[aqui]
+	if S.min < int(D.BUS_HORAS[0]) or S.min > int(D.BUS_HORAS[1]):
+		await say("PARADA DE %s\nEl primer autobús pasa a las 7:00 y el último, a las 21:00." % String(pa.n).to_upper())
+		return
+	var ama := llegando()
+	var ds := []
+	if ama:
+		ds = ["town"]
+	else:
+		for k in D.PARADAS:
+			if k != aqui:
+				ds.append(k)
+	var it := []
+	for k in ds:
+		var v := viaje(aqui, k)
+		it.append({"label": D.PARADAS[k].n, "right": "billete de ama" if ama else "%s · %d min" % [Datos.eur(v.eur), v.min]})
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿A dónde vas?"})
+	if i < 0 or i >= ds.size():
+		return
+	var k: String = ds[i]
+	var v := viaje(aqui, k)
+	if not ama:
+		if S.money < v.eur:
+			await say("El billete hasta %s cuesta %s. No te llega." % [D.PARADAS[k].n, Datos.eur(v.eur)])
+			return
+		S.money -= v.eur
+	sfx("door")
+	await fade(1)
+	advance_time(v.min)
+	var a: Array = D.PARADAS[k].a
+	enter_map(k, int(a[0]), int(a[1]), a[2])
+	if S.clientsDay != S.day:
+		spawn_clients()
+	update_hud()
+	await wait(80)
+	await fade(0)
+	if ama:
+		S.flags.llegada = true
+		await say("Ribera Verde. El piso de la tía es el del tejado rojo, al otro lado de la calle.")
+		show_objective()
+
 # ---------- mesa de genética ----------
 func _mk(l: Array) -> Array:
 	var o := []

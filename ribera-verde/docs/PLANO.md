@@ -6,10 +6,11 @@ personajes), medido contra su tamaño real. En la 1.7.0 sirvió para decidir la 
 (sección 6): carpa abierta en 3/4 a 48 px/m.
 
 - Imágenes: `docs/plano/town.png`, `home.png`, `shop.png`, `bar.png` y, desde la 1.10, `alto.png`, `astilleros.png`,
-  `txaro.png`, `comisaria.png` y `almacen.png` (rejilla, coordenadas y rótulos),
+  `txaro.png`, `comisaria.png`, `almacen.png`, `mendialde.png`, `casa-ama.png`, `puerto.png`, `valdehierro.png` y
+  `errotabarri.png` (rejilla, coordenadas y rótulos),
   `docs/plano/escala.png` (todos los sprites junto al jugador sobre la misma línea de suelo) y
   `docs/plano/vista-b.png` (las 5 carpas abiertas de la vista B).
-- Datos: `docs/plano/medidas.json` (posiciones de cada mapa y las 69 medidas de abajo).
+- Datos: `docs/plano/medidas.json` (posiciones de cada mapa y las 70 medidas de abajo).
 - Se regenera con `npm run plano` (`tools/plano.js`): pinta los mapas y la vista B con el motor del juego y mide la
   caja opaca de cada fotograma, así que el plano siempre coincide con lo que se ve. La tabla de la sección 3 sale de
   `medidas.json`.
@@ -30,15 +31,20 @@ personajes), medido contra su tamaño real. En la 1.7.0 sirvió para decidir la 
 
 | Mapa | Casillas | Qué hay (x, y) |
 |---|---|---|
-| Barrio (`town`) | 40 × 30 | Edificios de 7 × 6 en y 3–8: piso (2), growshop (14), bar (23); casa de Txaro, gris, 6 × 6 (32). Puertas: piso (5,8), growshop (17,8), bar (26,8) y casa de Txaro (34–35,8). Al barrio alto, por el camino del norte (11–12, 0); a los astilleros, por el muelle (39, 20–21). Calle: acera y 9, calzada y 10–11, acera y 12. Parque de los Sauces (1,13)–(11,27), con hierba alta en (7–10, 18–20) y (1–3, 21–23). Plaza (14,13)–(26,24), con la fuente en (20,19). Ría (31–38, 14–28), muelle (34–38, 16–25) y puente (31–33, 19–20). |
+| Barrio (`town`) | 40 × 30 | Edificios de 7 × 6 en y 3–8: piso (2), growshop (14), bar (23); casa de Txaro, gris, 6 × 6 (32). Puertas: piso (5,8), growshop (17,8), bar (26,8) y casa de Txaro (34–35,8). Al barrio alto, por el camino del norte (11–12, 0); a los astilleros, por el muelle (39, 20–21). Calle: acera y 9, calzada y 10–11, acera y 12. Parque de los Sauces (1,13)–(11,27), con hierba alta en (7–10, 18–20) y (1–3, 21–23). Plaza (14,13)–(26,24), con la fuente en (20,19). Ría (31–38, 14–28), muelle (34–38, 16–25) y puente (31–33, 19–20). Parada del autobús en (8,12), enfrente del piso. Lindes de monte (bosque de 2 filas) y seto abajo. |
 | Piso (`home`) | 12 × 8 (72 m²) | Paredes en y 0–1, con ventanas en (6,1) y (9,1) y el diploma en (7,1); suelo de 12 × 6 m. Cama (0,2–3), planta (1,2), ordenador (4,2), mesas de genética (5,2) y (6,2), mesa (3,5), nevera (0,6) y planta (11,7). Sitio A (8,2), 1 casilla: el armario 60 o el 80. Sitio B (10–11,2), 2 casillas: la carpa 100 (en x 10) o la 150 (x 10–11). Sitio C (2–3,2), 2 casillas: la carpa 120, cuando ya hay carpa en B. Salida en (5,7). |
 | Growshop (`shop`) | 10 × 8 | Estanterías (0,1) y (8,1), mostrador (2–7, 3), expositores (0,5) y (9,5), Kiko (4,2). Salida en (4,7). |
 | Bar El Ancla (`bar`) | 10 × 8 | Botellero (0–3, 1), barra (0–3, 3), taburetes (1,4) y (3,4), mesas (8,2) y (7,5), gramola (9,2). Josune (2,2), Toño (5,4) y Baltasar (7,4). Salida en (4,7). |
-| Barrio alto (`alto`, 1.10) | 40 × 30 | Plaza del Ensanche (3–19, 4–17) con la fuente en (11,11) y 4 bancos. Comisaría gris 6 × 6 (24, 13–18), puerta ancha en (26–27,18). Jardines (22–38, 3–11) y flores (31–37, 14–18). Calle: acera y 20, calzada y 21–22, acera y 23. Camino al barrio en (11–12, 24–29). Arbusto con 80 € en (2,10). |
-| Astilleros (`astilleros`, 1.10) | 40 × 30 | Tierra; astilleros cerrados (24–37, 4–10) con valla; almacén gris 6 × 6 (16, 8–13), puerta ancha en (18–19,13). Hierba alta en (2–6, 3–7) y (30–35, 13–15). Muelle de carga en y 19–22 y dos diques (6–8 y 26–28, 23–27); agua abajo. Darko (24,16) desde el capítulo 7. Bolsa con 2 sprays en (4,5). |
+| Barrio alto (`alto`, 1.10) | 40 × 30 | Plaza del Ensanche (3–19, 4–17) con la fuente en (11,11) y 4 bancos. Comisaría de sillar con su fachada 6 × 6 (24, 13–18), puerta doble en (26–27,18). Jardines (22–38, 3–11) y flores (31–37, 14–18). Calle: acera y 20, calzada y 21–22, acera y 23. Camino al barrio en (11–12, 24–29). Arbusto con 80 € en (2,10). |
+| Astilleros (`astilleros`, 1.10) | 40 × 30 | Tierra; astilleros cerrados (24–37, 4–10) con valla; almacén, nave de chapa 6 × 6 (16, 8–13), puerta corredera en (18–19,13). Hierba alta en (2–6, 3–7) y (30–35, 13–15). Muelle de carga en y 19–22 y dos diques (6–8 y 26–28, 23–27); agua abajo. Darko (24,16) desde el capítulo 7. Bolsa con 2 sprays en (4,5). |
 | Casa de Txaro (`txaro`, 1.10) | 10 × 8 | Cama (0,2–3), mesa (5,4), nevera (9,6) y plantas. Txaro (6,3) desde su primera misión. Salida en (4,7). |
 | Comisaría (`comisaria`, 1.10) | 10 × 8 | Estanterías, mostrador (2–7, 3) y bancos (0,5) y (9,5). Molina (4,2) desde el capítulo 5. Salida en (4,7). |
 | Almacén (`almacen`, 1.10) | 10 × 8 | Cajas en las esquinas, mesa (5,4) y taburete (4,4). Toño (5,2) mientras hay un encargo de Baltasar. Salida en (4,7). |
+| Mendialde (`mendialde`, 1.10) | 32 × 24 | El pueblo del prólogo. Carretera de la comarca: acera y 10, calzada y 11–12, acera y 13. Caserío de la familia 8 × 6 (3,4), puerta doble en (6–7,9); caseríos vecinos (19,3) y (2,16). Plaza (12–19, 14–18) con la fuente en (15,16); parada (10,13); maizal vallado (21–29, 15–21). Vecina (17,15). |
+| Caserío de la familia (`casa-ama`, 1.10) | 10 × 8 | Cama (0,2–3), mesa con la nota de ama (5,4), nevera con el táper (9,6) y geranios. Empiezas en (2,4). Salida en (4,7). |
+| Puerto Viejo (`puerto`, 1.10) | 40 × 24 | Nueve casas marineras de colores 4 × 6 en y 2–7; acera y 8; paseo hasta la barandilla (y 15); tres pantalanes (6–8, 22–24 y 32–34) sobre el mar (y 16–23). Parada (19,9). Turista (14,11). |
+| Valdehierro (`valdehierro`, 1.10) | 40 × 24 | Bloques de ladrillo 7 × 6 en (2,2), (10,2), (19,2), (2,13) y (10,13); fundición 8 × 6 (29,2); carretera y 9–10; solar vallado (20–38, 12–22) con cajas y hierba alta (30–33, 17–19); parque (2–17, 20–22). Parada (14,11). Obrero (28,14). |
+| Errotabarri (`errotabarri`, 1.10) | 32 × 20 | Río (15–17) con puente en y 9–10; camino de tierra y 9–10; caseríos (3,2) y (20,2) —el molino—; huerta vallada (2–10, 13–17). Parada (8,11). Excursionista (21,10). |
 
 **NPC del barrio:** Begoña (10,12), Txaro (3,18), Unai (17,18), Darko (20,14), Jurado (18,15), Molina (23,15), agente (22,17),
 Patxi (21,21) e Iñaki (37,21).
@@ -125,12 +131,13 @@ En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho de la carpa abi
 |  | Vegetativo (híbrida) | 18×19 | alto | 0,4 m | 0,4 m | ×0,99 |
 |  | Floración (híbrida) | 24×28 | alto | 0,58 m | 0,6 m | ×0,97 |
 |  | Lista (híbrida) | 28×33 | alto | 0,69 m | 0,7 m | ×0,98 |
-| Exterior | Árbol | 18×24 | alto | 1,5 m | 6 m | **×0,25** |
+| Exterior | Árbol | 54×93 | alto | 5,81 m | 6 m | ×0,97 |
 |  | Farola | 6×56 | alto | 3,5 m | 4 m | ×0,88 |
 |  | Banco | 16×12 | ancho | 1 m | 1,8 m | **×0,56** |
 |  | Fuente | 26×27 | ancho | 1,63 m | 3 m | **×0,54** |
 |  | Arbusto | 14×11 | ancho | 0,88 m | 1,2 m | **×0,73** |
 |  | Valla | 16×12 | alto | 0,75 m | 1 m | ×0,75 |
+|  | Parada del autobús | 14×48 | alto | 3 m | 2,8 m | ×1,07 |
 |  | Edificio (piso) | 112×96 | ancho | 7 m | 14 m | **×0,50** |
 |  | Edificio (bar) | 112×96 | ancho | 7 m | 14 m | **×0,50** |
 
@@ -143,8 +150,9 @@ En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho de la carpa abi
    plántula van a ×2, a propósito, para que se vean (5 y 15 cm reales darían 2 y 7 px).
 3. **El piso, a tamaño real.** 12 × 8 casillas (72 m² con paredes; 12 × 6 m de suelo), frente a 240 m² de la 1.7.0.
 4. **Siguen fuera de escala, sin tocar:** la nevera (×1,9) y las cajas (×1,5), que se rehacen en P5 (D5); la cama
-   (×1,3), los personajes que no cambian de altura (Unai ×1,3, Txaro ×1,13) y el exterior comprimido (árboles ×0,25,
-   edificios ×0,5), que es la convención del género. Los árboles piden arte nuevo (pendiente).
+   (×1,3), los personajes que no cambian de altura (Unai ×1,3, Txaro ×1,13) y los edificios comprimidos (×0,5), que es la
+   convención del género. Los árboles, a escala desde la 1.10: 5,8 m (×0,97), dibujados a mano en
+   `tools/sprites/a-mano/mundo.py`, con el monte de los lindes, el seto, la parada y las fachadas de cada sitio.
 5. **Alturas corregidas en la 1.10** (retoque a mano, `tools/sprites/a-mano/alturas.py`, sin créditos): la farola
    pasa de 1,69 a 3,5 m (×0,88), el mostrador y la barra del bar de 0,69 a 1 m (la barra, ya más alta que los
    taburetes) y la gramola de 1 a 1,5 m. Lo que cuelga de la pared ya no se pinta a ras de suelo (`ALZA` en

@@ -17,7 +17,9 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
   ctx.fillStyle='#000';ctx.fillRect(0,0,SW,SH);
   const wf=Math.floor(now/500)%2,tx0=Math.floor(cam.x/16),ty0=Math.floor(cam.y/16);
   const list=[];
-  for(let ty=ty0;ty<=ty0+SH/16;ty++)for(let tx=tx0;tx<=tx0+Math.ceil(SW/16);tx++){
+  // hasta 6 filas por debajo y 2 casillas a cada lado de la pantalla (1.10): los objetos altos (el árbol, de 6 filas; el monte, 3 de
+  // ancho) se ven aunque su pie esté fuera; antes la copa salía de golpe al entrar el pie
+  for(let ty=ty0;ty<=ty0+SH/16+6;ty++)for(let tx=tx0-2;tx<=tx0+Math.ceil(SW/16)+2;tx++){
     if(tx<0||ty<0||tx>=m.w||ty>=m.h)continue;
     const sx=tx*16-cam.x,sy=ty*16-cam.y,k=m.g[ty][tx],a=TILES[k];
     if(!arteTile(k,tx,ty,sx,sy,now))ctx.drawImage(a[a.length>1?wf:0],sx,sy);

@@ -3,7 +3,7 @@
 > Generado automáticamente con `node tools/generar-docs.js`. Coordenadas (x, y) en casillas de 16 px; (0,0) es la esquina superior izquierda.
 
 Leyenda: `.` suelo/hierba · `*` flores · `"` hierba alta (ladrones ×3, a cualquier hora) · `:` tierra · `-` acera · `=` carretera · `+` plaza · `~` agua · `H` puente · `#` muelle
-`^` tejado · `█` pared/ventana · `D` puerta · `T` árbol · `b` arbusto · `$` arbusto con objeto oculto · `i` objeto en el suelo · `f` valla · `S` cartel · `L` farola · `n` banco · `O` fuente · `c` cajas · `@` personaje
+`^` tejado · `█` pared/ventana · `D` puerta · `T` árbol · `b` arbusto · `$` arbusto con objeto oculto · `i` objeto en el suelo · `f` valla · `S` cartel · `L` farola · `n` banco · `O` fuente · `c` cajas · `@` personaje · `M` monte (el bosque de los lindes) · `h` seto · `A` parada del autobús
 Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F` nevera · `K` carpa (mueble: el armario de 60 u 80 en x 8, la carpa de 100 o 150 en x 10-11 y la de 120 en x 2-3; sus plazas se ven por dentro, en la vista de carpa) · `C` mostrador · `s` estantería · `d` expositor · `x` taburete · `J` gramola · `v` ventana/póster · `m` felpudo (salida)
 
 ## Barrio (exterior) — 40 × 30
@@ -11,36 +11,36 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 ```
     0         1         2         3         
     0123456789012345678901234567890123456789
- 0  TTTTTTTTTTT--TTTTTTTTTTTTTTTTTTTTTTTTTTT
- 1  TTTTTTTTTTT--TTTTTTTTTTTTTTTTTTTTTTTTTTT
- 2  T..*......*--.........*........*....*..T
- 3  T.^^^^^^^..--.^^^^^^^..^^^^^^^..^^^^^^.T
- 4  T.^^^^^^^.S--.^^^^^^^..^^^^^^^..^^^^^^.T
- 5  T.███████..--.███████..███████..██████.T
- 6  T.███████..--.███████..███████..██████.T
- 7  T.███████..--.███████..███████..██████.T
- 8  T.███D███S.--S███D███.S███D███..██DD██.T
- 9  T----------L---------L---------L-------T
-10  T======================================T
-11  T======================================T
-12  T---------@----------------------------T
-13  TfffS::fffff.....S+++++.......fffffffffT
-14  T.*..::..*....L+++++@+++++L....~~~~~~~~T
-15  TT...::....T..++++@++++@+++.T..~~~~~~~~T
-16  T....::..$....++n+++++++n++*...~~~#####T
-17  Tb.n.::.......++++++++@++++....~~~####cT
-18  T..@.::""""..*+++@+++++++++..S.~~~####cT
-19  T..*.::""""...++++++O++++++----HHH####ST
-20  TT...::""""...+++++++++++++----HHH######
-21  T""".::....T..+++++++@+++++....~~~###@##
-22  T""".::.*...*.++n+++++++n++....~~~#####T
-23  T""".::.......+i+++++++++++....~~~#####T
-24  T.T..::...$...L+++++++++++L..T.~~~##i##T
-25  T....::.i*.....................~~~c####T
-26  T.$.*::....T..T..T..T..T..T....~~~~~~~~T
-27  T....::.T.*..*....*.........T..~~~~~~~~T
-28  T........................*.....~~~~~~~~T
-29  TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+ 0  MMMMMMMMMMM--MMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 1  MMMMMMMMMMM--MMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 2  M..*......*--.........*........*....*..M
+ 3  M.^^^^^^^..--.^^^^^^^..^^^^^^^..^^^^^^.M
+ 4  M.^^^^^^^.S--.^^^^^^^..^^^^^^^..^^^^^^.M
+ 5  M.███████..--.███████..███████..██████.M
+ 6  M.███████..--.███████..███████..██████.M
+ 7  M.███████..--.███████..███████..██████.M
+ 8  M.███D███S.--S███D███.S███D███..██DD██.M
+ 9  M----------L---------L---------L-------M
+10  M======================================M
+11  M======================================M
+12  M-------A-@----------------------------M
+13  MfffS::fffff.....S+++++.......fffffffffM
+14  M.*..::..*....L+++++@+++++L....~~~~~~~~M
+15  MT...::.......++++@++++@+++.T..~~~~~~~~M
+16  M....::..$....++n+++++++n++*...~~~#####M
+17  M..n.::.......++++++++@++++....~~~####cM
+18  M..@.::""""..*+++@+++++++++..S.~~~####cM
+19  M..*.::""""...++++++O++++++----HHH####SM
+20  MT...::""""...+++++++++++++----HHH######
+21  M""".::....T..+++++++@+++++....~~~###@##
+22  M""".::.*...*.++n+++++++n++....~~~#####M
+23  M""".::.......+i+++++++++++....~~~#####M
+24  M.T..::...$...L+++++++++++L..T.~~~##i##M
+25  M....::.i*.....................~~~c####M
+26  M.$.*::........................~~~~~~~~M
+27  M....::...*..*....*.........T..~~~~~~~~M
+28  M...T.......T....T..T..T.*T....~~~~~~~~M
+29  MhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhM
 ```
 
 - puerta (5,8) → home (5,6)
@@ -58,36 +58,36 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 ```
     0         1         2         3         
     0123456789012345678901234567890123456789
- 0  TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
- 1  TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
- 2  T......................................T
- 3  T...T...T.....T...T.........T..........T
- 4  T..*****************....T........T.....T
- 5  T..L+++++++++++++++L..........*........T
- 6  T.b+++++++++++++++++.....*...........T.T
- 7  T..+++++++++++++++++b.S........T..*....T
- 8  T..++++n+++++++n++++......T...n........T
- 9  T..+++++++++++++++++............*..T...T
-10  T.$+++++++++++++++++...T...*.T.........T
-11  T..++++++++O++++++++...................T
-12  T..+++++++++++++++++b..........fffffff.T
-13  T..+++++++++++++++++....^^^^^^.........T
-14  T.b++++n+++++++n++++....^^^^^^.*****b*.T
-15  T..+++++++++++++++++....██████.*b*****.T
-16  T..+++++++++++++++++....██████.*******.T
-17  T..L+++++++++++++++L....██████.****b**.T
-18  T.........S--...........██DD██.*******.T
-19  T..........--..........S-------........T
-20  T-----L----------L--------------L------T
-21  T======================================T
-22  T======================================T
-23  T--------------------------------------T
-24  T..........--.b...b...b...b...b...b...bT
-25  T..T.......--...T..........T.........T.T
-26  T....*.....--......*..........*........T
-27  T......T...--........T...........T.....T
-28  T.T........--...........*..............T
-29  TTTTTTTTTTT--TTTTTTTTTTTTTTTTTTTTTTTTTTT
+ 0  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 1  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 2  M......................................M
+ 3  M...T...T.....T...T.........T..........M
+ 4  M..*****************....T........T.....M
+ 5  M..L+++++++++++++++L..........*........M
+ 6  M.b+++++++++++++++++.....*...........T.M
+ 7  M..+++++++++++++++++b.S........T..*....M
+ 8  M..++++n+++++++n++++......T...n........M
+ 9  M..+++++++++++++++++............*..T...M
+10  M.$+++++++++++++++++.......*.T.........M
+11  M..++++++++O++++++++...................M
+12  M..+++++++++++++++++b..........fffffff.M
+13  M..+++++++++++++++++....^^^^^^.........M
+14  M.b++++n+++++++n++++....^^^^^^.*****b*.M
+15  M..+++++++++++++++++....██████.*b*****.M
+16  M..+++++++++++++++++....██████.*******.M
+17  M..L+++++++++++++++L....██████.****b**.M
+18  M.........S--...........██DD██.*******.M
+19  M..........--..........S-------........M
+20  M-----L----------L--------------L------M
+21  M======================================M
+22  M======================================M
+23  M--------------------------------------M
+24  M..........--.b...b...b...b...b...b....M
+25  M..T.......--...T...........T.......T..M
+26  M....*.....--......*..........*........M
+27  M......T...--.......T...........T......M
+28  M.T........--...........*..............M
+29  Mhhhhhhhhhh--hhhhhhhhhhhhhhhhhhhhhhhhhhM
 ```
 
 - puerta (11,29) → town (11,1)
@@ -100,29 +100,29 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 ```
     0         1         2         3         
     0123456789012345678901234567890123456789
- 0  TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
- 1  TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
- 2  T::::::::::::::::::::::::::::::::::::::T
- 3  T:"""""::.T...:::::::::::::::::::::::::T
- 4  T:"""""::...T.::::::::::ffffffffffffff:T
- 5  T:""i"":::::::::::::::::fcc::::::::ccf:T
- 6  T:""""":::::::::::::::::fc::::::::::cf:T
- 7  T:""""":::::::::::::::::f::::::::::::f:T
- 8  T:::::::::::::L:^^^^^^::f:::c::::c:::f:T
- 9  T:::::::::::::::^^^^^^::f::::::::::::f:T
-10  T:T:::::::::::::██████::ffffff::ffffff:T
-11  T:::::::::::::::██████:::::::::::::::::T
-12  T:::::::::::::::██████:::::::::::::::::T
-13  T::::::::::::::S██DD██::::::::"""""":::T
-14  T:::::::::::::::::::::::::::::"""""":T:T
-15  T:::::::::c:::::::::::::::::::"""""":::T
-16  T:::::::::cc::::::::::::@::::::::::::::T
-17  T::cc:::::::::::::::::c::::::::::::::::T
-18  T:S::::::::::::::::::::::::::::::ccc:::T
-19  T########L##########L##########L#######T
-20  #######################################T
-21  #######################################T
-22  T######################################T
+ 0  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 1  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 2  M::::::::::::::::::::::::::::::::::::::M
+ 3  M:"""""::.T...:::::::::::::::::::::::::M
+ 4  M:"""""::...T.::::::::::ffffffffffffff:M
+ 5  M:""i"":::::::::::::::::fcc::::::::ccf:M
+ 6  M:""""":::::::::::::::::fc::::::::::cf:M
+ 7  M:""""":::::::::::::::::f::::::::::::f:M
+ 8  M:::::::::::::L:^^^^^^::f:::c::::c:::f:M
+ 9  M:::::::::::::::^^^^^^::f::::::::::::f:M
+10  M:T:::::::::::::██████::ffffff::ffffff:M
+11  M:::::::::::::::██████:::::::::::::::::M
+12  M:::::::::::::::██████:::::::::::::::::M
+13  M::::::::::::::S██DD██::::::::"""""":::M
+14  M:::::::::::::::::::::::::::::"""""":T:M
+15  M:::::::::c:::::::::::::::::::"""""":::M
+16  M:::::::::cc::::::::::::@::::::::::::::M
+17  M::cc:::::::::::::::::c::::::::::::::::M
+18  M:S::::::::::::::::::::::::::::::ccc:::M
+19  M########L##########L##########L#######M
+20  #######################################M
+21  #######################################M
+22  M######################################M
 23  ~~~~~~###~~~~~~~~~~~~~~~~~###~~~~~~~~~~~
 24  ~~~~~~###~~~~~~~~~~~~~~~~~###~~~~~~~~~~~
 25  ~~~~~~###~~~~~~~~~~~~~~~~~###~~~~~~~~~~~
@@ -136,6 +136,146 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 - puerta (0,21) → town (38,21)
 - puerta (18,13) → almacen (4,6)
 - puerta (19,13) → almacen (5,6)
+
+## Mendialde (pueblo de caseríos, de donde eres; el prólogo) — 32 × 24
+
+```
+    0         1         2         3 
+    01234567890123456789012345678901
+ 0  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 1  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 2  M..............................M
+ 3  M.b.........*......^^^^^^^^....M
+ 4  M..^^^^^^^^........^^^^^^^^....M
+ 5  M..^^^^^^^^....*...████████....M
+ 6  M..████████........████████....M
+ 7  M..████████........████████....M
+ 8  M..████████..T.....████████..T.M
+ 9  M..███DD███......b.::::::::....M
+10  M------------------------------M
+11  M==============================M
+12  M==============================M
+13  M-S-------A-----------------b--M
+14  M...*...*...L++++++L....*......M
+15  M...........+++++@++.ffff.ffff.M
+16  M.^^^^^^^^..+++O++++.f"""""""f.M
+17  M.^^^^^^^^..+n++++n+.f"""""""f.M
+18  M.████████..++++++++.f"""""""f.M
+19  M.████████...........f"""""""f.M
+20  M.████████....*......f"""""""f.M
+21  M.████████.T.....*..Tfffffffff.M
+22  M.::::::::.................*...M
+23  MhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhM
+```
+
+- puerta (6,9) → casa-ama (4,6)
+- puerta (7,9) → casa-ama (5,6)
+
+## Caserío de la familia, en Mendialde — 10 × 8
+
+```
+    0         
+    0123456789
+ 0  ██████████
+ 1  ██v████v██
+ 2  B........p
+ 3  B.........
+ 4  .....t....
+ 5  ..........
+ 6  .........F
+ 7  p...m.....
+```
+
+- salida (4,7) pulsando abajo → mendialde (6,10)
+
+## Puerto Viejo (ciudad pequeña, pesquera) — 40 × 24
+
+```
+    0         1         2         3         
+    0123456789012345678901234567890123456789
+ 0  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 1  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 2  M^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^..M
+ 3  M^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^..M
+ 4  M████████████████████████████████████..M
+ 5  M████████████████████████████████████..M
+ 6  M████████████████████████████████████b.M
+ 7  M████████████████████████████████████..M
+ 8  M--------------------------------------M
+ 9  M+S++L+++++++++L+++A+++++++L+++++++L+++M
+10  M++++++++++++++++++++++++++++++++++++++M
+11  M+++++++++++++@++++++++++++++++++++++++M
+12  M++++++++++++++++++++++++++++++++++++++M
+13  M++++++++++++++++++++++++++++++++++++++M
+14  M+++T++++++n++++++n++++++++++n+++++++T+M
+15  Mfffff+++fffffffffffff+++fffffff+++ffffM
+16  ~~~~~~###~~~~~~~~~~~~~###~~~~~~~###~~~~~
+17  ~~~~~~###~~~~~~~~~~~~~###~~~~~~~###~~~~~
+18  ~~~~~~###~~~~~~~~~~~~~###~~~~~~~##c~~~~~
+19  ~~~~~~###~~~~~~~~~~~~~###~~~~~~~###~~~~~
+20  ~~~~~~##c~~~~~~~~~~~~~##c~~~~~~~~~~~~~~~
+21  ~~~~~~###~~~~~~~~~~~~~#c#~~~~~~~~~~~~~~~
+22  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+23  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+
+## Valdehierro (ciudad pequeña, del hierro) — 40 × 24
+
+```
+    0         1         2         3         
+    0123456789012345678901234567890123456789
+ 0  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 1  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 2  M-^^^^^^^-^^^^^^^--^^^^^^^---^^^^^^^^--M
+ 3  M-^^^^^^^-^^^^^^^--^^^^^^^---^^^^^^^^--M
+ 4  M-███████-███████--███████---████████--M
+ 5  M-███████-███████--███████---████████--M
+ 6  M-███████-███████--███████---████████--M
+ 7  M-███████-███████--███████---████████--M
+ 8  M-S------L--------L---------L----------M
+ 9  M======================================M
+10  M======================================M
+11  M-----L-------A---------L--------------M
+12  M-------------------fffffffS--fffffffffM
+13  M-^^^^^^^-^^^^^^^---f:::::::::::::::::fM
+14  M-^^^^^^^-^^^^^^^---f::cc:::@:::::::::fM
+15  M-███████-███████---f::c:::::::::cc:::fM
+16  M-███████-███████---f:::::::::::::c:::fM
+17  M-███████-███████---f:::::::::""""::::fM
+18  M-███████-███████---f:::::::::""""::c:fM
+19  M-------------------f:::::c:::""""::::fM
+20  M-................--f::::::::::c::::::fM
+21  M-.......n........--f:::::::::::::::::fM
+22  M-...T........T...--fffffffffffffffffffM
+23  MhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhM
+```
+
+## Errotabarri (pueblo del molino) — 32 × 20
+
+```
+    0         1         2         3 
+    01234567890123456789012345678901
+ 0  MMMMMMMMMMMMMMM~~~MMMMMMMMMMMMMM
+ 1  MMMMMMMMMMMMMMM~~~MMMMMMMMMMMMMM
+ 2  M..^^^^^^^^....~~~..^^^^^^^^...M
+ 3  M..^^^^^^^^....~~~..^^^^^^^^...M
+ 4  M..████████..*.~~~..████████...M
+ 5  M..████████....~~~..████████...M
+ 6  M..████████....~~~..████████.*.M
+ 7  M..████████....~~~..████████...M
+ 8  M.....::.......~~~.S...::......M
+ 9  M::::::::::::::HHH:::::::::::::M
+10  M::::::::::::::HHH:::@:::::::b:M
+11  M.S.....A......~~~.............M
+12  M...*......b...~~~.....b.......M
+13  M.fffffffff....~~~.b...........M
+14  M..""""""".*...~~~.............M
+15  M..""""""".....~~~.............M
+16  M..""""""".....~~~.......T..T..M
+17  M.fffffffff..T.~~~..*....*.....M
+18  M..............~~~.............M
+19  Mhhhhhhhhhhhhhh~~~hhhhhhhhhhhhhM
+```
 
 ## Piso de la tía Maite — 12 × 8 (1 casilla = 1 m; con el armario de 60 y la carpa de 150)
 
@@ -254,16 +394,32 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 | txaro | txaro | (6,3) | no | `!!S.flags.txaro` |
 | inaki | town | (37,21) | no | `S.ch>=2` |
 | cop | town | (22,17) | radio 3 | `S.ch>=2` |
-| darko | town | (20,14) | no | `(S.ch>=2&&!S.flags.darko1)||S.ch===6` |
+| darko | town | (20,14) | no | `(S.ch>=2&&S.ch<7&&!S.flags.darko1)||S.ch===6` |
 | darko2 | astilleros | (24,16) | no | `S.ch>=7` |
 | molina | town | (23,15) | no | `S.ch>=5&&!S.flags.molina1` |
 | molina | comisaria | (4,2) | no | `S.ch>=5&&!!S.flags.molina1` |
 | tono2 | almacen | (5,2) | no | `!!S.encargo` |
 | jurado | town | (18,15) | no | `S.ch===6` |
+| vecina | mendialde | (17,15) | radio 1 | siempre |
+| excursionista | errotabarri | (21,10) | radio 2 | siempre |
+| turista | puerto | (14,11) | radio 2 | siempre |
+| obrero | valdehierro | (28,14) | radio 1 | siempre |
 
-Los **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acera, plaza y tierra: en el barrio, 4 + reputación/15 (+1 desde el capítulo 4, máximo 10); en los astilleros, 2 (3 desde el capítulo 4), estudiantes y currelas, que pagan el gramo un 20 % más; y en el barrio alto, desde el capítulo 3, 2 (3 desde el 4), pijos y turistas.
+Los **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acera, plaza y tierra: en el barrio, 4 + reputación/15 (+1 desde el capítulo 4, máximo 10); en los astilleros, 2 (3 desde el capítulo 4), estudiantes y currelas, que pagan el gramo un 20 % más; en el barrio alto, desde el capítulo 3, 2 (3 desde el 4), pijos y turistas; en Puerto Viejo, 2 (3 desde el 4), turistas, currelas y estudiantes; en Valdehierro, 2 (3 desde el 4), estudiantes y currelas; y en los pueblos, 1: un currela en Mendialde y un currela o un turista en Errotabarri.
 
-**Zonas** (`ZONAS`): factor de policía, de ladrones y de precio en cada mapa de fuera. Ribera Verde: policía ×1, ladrones ×1, precio ×1 · Barrio alto: policía ×1,5, ladrones ×0,5, precio ×1 · Astilleros: policía ×0,5, ladrones ×2, precio ×1,2. Dentro de las casas no hay encuentros.
+## Autobús de la comarca
+
+En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo de Ribera Verde; entre dos de fuera se suman los dos tramos. El reloj corre lo que dura el viaje. El primero (Mendialde → Ribera Verde, en el prólogo) lo paga ama.
+
+| Parada | Posición | Llegas a | Desde Ribera Verde |
+|---|---|---|---|
+| Ribera Verde | town (8,12) | (7,12) | — |
+| Puerto Viejo | puerto (19,9) | (20,9) | 25 min · 2 € |
+| Valdehierro | valdehierro (14,11) | (15,11) | 20 min · 2 € |
+| Mendialde | mendialde (10,13) | (11,13) | 40 min · 3 € |
+| Errotabarri | errotabarri (8,11) | (9,11) | 30 min · 3 € |
+
+**Zonas** (`ZONAS`): factor de policía, de ladrones y de precio en cada mapa de fuera. Ribera Verde: policía ×1, ladrones ×1, precio ×1 · Barrio alto: policía ×1,5, ladrones ×0,5, precio ×1 · Astilleros: policía ×0,5, ladrones ×2, precio ×1,2 · Puerto Viejo: policía ×0,8, ladrones ×0,6, precio ×1,15 · Valdehierro: policía ×0,6, ladrones ×1,4, precio ×0,9 · Mendialde: policía ×0,2, ladrones ×0,1, precio ×1 · Errotabarri: policía ×0,2, ladrones ×0,1, precio ×1. Dentro de las casas no hay encuentros.
 
 ## Objetos
 
@@ -293,6 +449,12 @@ Los **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acer
 - **alto:23,19** — COMISARÍA DE RIBERA · Atención al público: de 9:00 a 14:00.
 - **astilleros:15,13** — ALMACÉN 3 · Propiedad privada. Prohibido el paso.
 - **astilleros:2,18** — ASTILLEROS DE RIBERA · Cerrados desde 1992.
+- **mendialde:2,13** — MENDIALDE · Caseríos, huertas y la parada del autobús.
+- **puerto:2,9** — PUERTO VIEJO · Cofradía de pescadores desde 1890.
+- **valdehierro:2,8** — VALDEHIERRO · Ciudad del hierro desde 1911.
+- **valdehierro:27,12** — SOLAR DE LA FUNDICIÓN · Propiedad privada. Prohibido el paso.
+- **errotabarri:2,11** — ERROTABARRI · El pueblo del molino.
+- **errotabarri:19,8** — ERROTA ZAHARRA · Molino harinero del siglo XVIII.
 
 ## Tienda de Kiko
 
