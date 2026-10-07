@@ -17,7 +17,7 @@ const INV = JSON.parse(fs.readFileSync(path.join(ROOT, 'art', 'inventario.json')
 const want = [
   ...INV.personajes.map(k => 'look:' + k), ...INV.npcs.map(n => 'npc:' + n.id),
   ...INV.tiles_suelo.map(k => 'tile:' + k), ...INV.objetos.map(k => 'obj:' + k),
-  ...INV.plantas.fases.map(k => 'planta:' + k), ...INV.plantas.variantes.map(k => 'planta-variante:' + k),
+  ...(INV.plantas.fases || []).map(k => 'planta:' + k), ...(INV.plantas.variantes || []).map(k => 'planta-variante:' + k),   // la planta de la vista va en misc desde la 1.8
   ...INV.combate.map(k => 'combate:' + k), ...INV.misc.map(k => 'misc:' + k)];
 
 const lote = a => {

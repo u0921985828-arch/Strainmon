@@ -1,6 +1,6 @@
 {
  "generado": "tools/sprites/catalogo.js",
- "claves": 138,
+ "claves": 149,
  "catalogo": {
   "look:player": [
    {
@@ -579,15 +579,6 @@
    }
   ],
   "tile:mat": [
-   {
-    "asset": "tiles-interior-extra",
-    "familia": "mapa-terreno",
-    "herramienta": "create_tiles_pro",
-    "fase": "F4",
-    "depende_de": []
-   }
-  ],
-  "tile:tent": [
    {
     "asset": "tiles-interior-extra",
     "familia": "mapa-terreno",
@@ -1266,30 +1257,120 @@
     "depende_de": []
    }
   ],
+  "misc:carpa-p60-mapa": [
+   {
+    "asset": "carpas-mapa",
+    "familia": "imagen",
+    "herramienta": "create_image_pixflux",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:carpa-m100-mapa": [
+   {
+    "asset": "carpas-mapa",
+    "familia": "imagen",
+    "herramienta": "create_image_pixflux",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:carpa-g150-mapa": [
+   {
+    "asset": "carpas-mapa",
+    "familia": "imagen",
+    "herramienta": "create_image_pixflux",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:carpa-p60-vista": [
+   {
+    "asset": "carpas-vista",
+    "familia": "imagen",
+    "herramienta": "create_image_pixflux",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:carpa-m100-vista": [
+   {
+    "asset": "carpas-vista",
+    "familia": "imagen",
+    "herramienta": "create_image_pixflux",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:carpa-g150-vista": [
+   {
+    "asset": "carpas-vista",
+    "familia": "imagen",
+    "herramienta": "create_image_pixflux",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-vista-plastico7": [
+   {
+    "asset": "macetas-vista",
+    "familia": "imagen",
+    "herramienta": "create_image_pixflux",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-vista-tela11": [
+   {
+    "asset": "macetas-vista",
+    "familia": "imagen",
+    "herramienta": "create_image_pixflux",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-vista-plastico18": [
+   {
+    "asset": "macetas-vista",
+    "familia": "imagen",
+    "herramienta": "create_image_pixflux",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-vista-tela25": [
+   {
+    "asset": "macetas-vista",
+    "familia": "imagen",
+    "herramienta": "create_image_pixflux",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:cuarto-cultivo": [
+   {
+    "asset": "cuarto-cultivo",
+    "familia": "imagen",
+    "herramienta": "create_image_pixflux",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-vista": [
+   {
+    "asset": "plantas-vista",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
   "misc:bolsa": [
    {
     "asset": "iconos",
     "familia": "objeto-lote",
     "herramienta": "create_1_direction_object",
     "fase": "F7",
-    "depende_de": []
-   }
-  ],
-  "planta-variante:plaga": [
-   {
-    "asset": "vfx-16",
-    "familia": "objeto-lote",
-    "herramienta": "create_1_direction_object",
-    "fase": "F3",
-    "depende_de": []
-   }
-  ],
-  "planta-variante:seca-plaga": [
-   {
-    "asset": "vfx-16",
-    "familia": "objeto-lote",
-    "herramienta": "create_1_direction_object",
-    "fase": "F3",
     "depende_de": []
    }
   ],
@@ -1317,6 +1398,254 @@
     "familia": "procedural",
     "herramienta": "procedural",
     "fase": "F7",
+    "depende_de": []
+   }
+  ],
+  "misc:carpa-c-pared": [
+   {
+    "asset": "carpa-c-fondo",
+    "familia": "imagen",
+    "herramienta": "edit_image_pixen",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:carpa-c-luz": [
+   {
+    "asset": "carpa-c-fondo",
+    "familia": "imagen",
+    "herramienta": "edit_image_pixen",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:foco-c-40": [
+   {
+    "asset": "carpa-c-focos",
+    "familia": "imagen",
+    "herramienta": "edit_image_pixen",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:foco-c-44": [
+   {
+    "asset": "carpa-c-focos",
+    "familia": "imagen",
+    "herramienta": "edit_image_pixen",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:foco-c-46": [
+   {
+    "asset": "carpa-c-focos",
+    "familia": "imagen",
+    "herramienta": "edit_image_pixen",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-c-15": [
+   {
+    "asset": "carpa-c-macetas",
+    "familia": "imagen",
+    "herramienta": "edit_image_pixen",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-c-22": [
+   {
+    "asset": "carpa-c-macetas",
+    "familia": "imagen",
+    "herramienta": "edit_image_pixen",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-i-24": [
+   {
+    "asset": "carpa-c-plantas",
+    "familia": "imagen",
+    "herramienta": "edit_image_pixen",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-i-36": [
+   {
+    "asset": "carpa-c-plantas",
+    "familia": "imagen",
+    "herramienta": "edit_image_pixen",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:foco-c-cfl-36": [
+   {
+    "asset": "carpa-c-focos-cfl",
+    "familia": "imagen",
+    "herramienta": "edit_image_pixen",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-h-24": [
+   {
+    "asset": "carpa-c-plantas-h",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-h2-24": [
+   {
+    "asset": "carpa-c-plantas-h",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-h1-18": [
+   {
+    "asset": "carpa-c-plantas-h",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   },
+   {
+    "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-h0-8": [
+   {
+    "asset": "carpa-c-plantas-h",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   },
+   {
+    "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-i-38": [
+   {
+    "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-i2-38": [
+   {
+    "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-i-32": [
+   {
+    "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-i2-32": [
+   {
+    "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-h-38": [
+   {
+    "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-h2-38": [
+   {
+    "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-h-32": [
+   {
+    "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-h2-32": [
+   {
+    "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-s-38": [
+   {
+    "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-s2-38": [
+   {
+    "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-s-32": [
+   {
+    "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:planta-c-s2-32": [
+   {
+    "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
     "depende_de": []
    }
   ]

@@ -9,13 +9,14 @@ Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: 
 | Familia | Claves del juego | Assets | Herramientas | Generaciones aprox. |
 |---|---|---|---|---|
 | Personajes | 39 | 25 | create_character · animate_character · create_image_pro (paso previo) | 1111 |
-| Mapa · terreno | 23 | 6 | create_tiles_pro · create_building_kit · create_topdown_tileset · animate_image | 15 + sin documentar |
+| Mapa · terreno | 22 | 6 | create_tiles_pro · create_building_kit · create_topdown_tileset · animate_image | 15 + sin documentar |
 | Mapa · objetos con el estilo del mapa | 28 | 13 | create_map_object (background_image + máscara) · animate_image | 14 + sin documentar |
-| Objetos sueltos en lote | 43 | 10 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 180 + sin documentar |
-| Imágenes simples | 3 | 3 | create_image_pixflux (init_image + color_image) | 3 |
+| Objetos sueltos en lote | 41 | 10 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 180 + sin documentar |
+| Imágenes simples | 24 | 12 | create_image_pixflux (init_image + color_image) | 7 + sin documentar |
 | Se queda procedural | 2 | 1 | — | 0 |
+| Importado | 17 | 3 | importado | 0 + sin documentar |
 
-**Total documentado: ~1323 generaciones** (más create_tiles_pro, create_map_object, animate_object, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 138/138 claves.
+**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 149/149 claves.
 
 ## Orden de creación
 
@@ -75,7 +76,7 @@ Lo que se repite en casillas: tiles_pro numerados en una sola llamada, kit de ed
 | interior-home | floor, iwT_home, iwB_home | create_tiles_pro | 3 tiles numerados en 1 llamada | style_images: iwT_home.png, iwB_home.png, floor.png, floorS.png | F4 | — | 0+? |
 | interior-shop | floorS, iwT_shop, iwB_shop | create_tiles_pro | 3 tiles numerados en 1 llamada | style_images: iwT_home.png, iwB_home.png, floor.png, floorS.png | F4 | — | 0+? |
 | interior-bar | floorB, iwT_bar, iwB_bar | create_tiles_pro | 3 tiles numerados en 1 llamada | style_images: iwT_home.png, iwB_home.png, floor.png, floorS.png | F4 | — | 0+? |
-| tiles-interior-extra | mat, tent | create_tiles_pro | 2 tiles numerados en 1 llamada | style_images: mat.png, tent.png | F4 | — | 0+? |
+| tiles-interior-extra | mat | create_tiles_pro | 1 tiles numerados en 1 llamada | style_images: mat.png | F4 | — | 0+? |
 
 ## Mapa · objetos con el estilo del mapa
 
@@ -104,14 +105,14 @@ Muchos objetos pequeños del mismo estilo en una sola llamada (hasta 64 candidat
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
 | macetas | maceta-plastico7, maceta-tela11, maceta-plastico18, maceta-tela25 | create_1_direction_object | 48 objetos en 1 llamada (64 candidatos a 16 px) | style_images: estilo-maceta-16.png | F8 | — | 30 |
-| focos | foco-cfl, foco-sodio, foco-led | create_1_direction_object | 48 objetos en 1 llamada (64 candidatos a 32 px) | style_images: 00.png | F8 | — | 30 |
+| focos | foco-cfl, foco-sodio, foco-led | create_1_direction_object | 48 objetos en 1 llamada (64 candidatos a 32 px) | style_images: maceta-vacia-32.png | F8 | — | 30 |
 | mesa-cultivo | mesa | create_1_direction_object | 24 objetos en 1 llamada (64 candidatos a 16 px) | style_images: 00.png | F8 | — | 30 |
 | props-16 | fence, sign, bench, crate, bush, pc, lab, lab2, table, shelfW, counter, display, plantDeco, barcounter, bottles, stool, btable, jukebox, iwin, poster | create_1_direction_object | 64 objetos en 1 llamada (64 candidatos a 16 px) | style_images: bench.png, sign.png, crate.png, bush.png, counter.png, stool.png, jukebox.png, plantDeco.png | F4 | luces | 30+? |
 | props-32 | fridge, bedT, bedB | create_1_direction_object | 2 objetos · **comparte lote-32** (15 objetos de 4 assets en 1 llamada de 64 candidatos a 32 px) | solo texto | F4 | — | 30 |
 | planta-fases | germinando, plantula, vegetativo, floracion, lista, muerta, maceta-vacia, sana, seca | create_1_direction_object | 7 objetos · **comparte lote-32** (15 objetos de 4 assets en 1 llamada de 64 candidatos a 32 px) | solo texto | F5 | balanceo-vegetativo, balanceo-floracion, balanceo-lista | 0+? |
 | iconos | bolsa | create_1_direction_object | 12 objetos · **comparte lote-16** (24 objetos de 2 assets en 1 llamada de 64 candidatos a 16 px) | solo texto | F7 | — | 30 |
 | cogollos-genoteca | — | create_1_direction_object | 4 objetos · **comparte lote-32** (15 objetos de 4 assets en 1 llamada de 64 candidatos a 32 px) | solo texto | F7 | — | 0 |
-| vfx-16 | plaga, seca-plaga | create_1_direction_object | 12 objetos · **comparte lote-16** (24 objetos de 2 assets en 1 llamada de 64 candidatos a 16 px) | solo texto | F3 | vfx-humo-cigarro/efecto, vfx-humo-puro/efecto, vfx-humo-porro/efecto, vfx-humo-pipa/efecto, vfx-golpe/efecto, vfx-gotas/efecto, vfx-brillo/efecto, vfx-polen/efecto, vfx-acaros/efecto, vfx-monedas/efecto, gaviota/idle, paloma/idle | 0+? |
+| vfx-16 | vfx-humo-cigarro, vfx-humo-puro, vfx-humo-porro, vfx-humo-pipa, vfx-golpe, vfx-gotas, vfx-brillo, vfx-polen, vfx-acaros, vfx-monedas, gaviota, paloma | create_1_direction_object | 12 objetos · **comparte lote-16** (24 objetos de 2 assets en 1 llamada de 64 candidatos a 16 px) | solo texto | F3 | vfx-humo-cigarro/efecto, vfx-humo-puro/efecto, vfx-humo-porro/efecto, vfx-humo-pipa/efecto, vfx-golpe/efecto, vfx-gotas/efecto, vfx-brillo/efecto, vfx-polen/efecto, vfx-acaros/efecto, vfx-monedas/efecto, gaviota/idle, paloma/idle | 0+? |
 | vfx-32 | vfx-nube-vaper, vfx-spray | create_1_direction_object | 2 objetos · **comparte lote-32** (15 objetos de 4 assets en 1 llamada de 64 candidatos a 32 px) | solo texto | F3 | vfx-nube-vaper/efecto, vfx-spray/efecto | 0+? |
 
 ## Imágenes simples
@@ -122,7 +123,16 @@ Pantallas completas sin rig: img2img sobre la composición actual y paleta forza
 |---|---|---|---|---|---|---|---|
 | fondo-combate-ladron | fondo-ladron | create_image_pixflux | pantalla entera, img2img | init_image_base64: fondo-ladron.png | F6 | — | 1 |
 | fondo-combate-policia | fondo-policia | create_image_pixflux | pantalla entera, img2img | init_image_base64: fondo-policia.png | F6 | — | 1 |
+| carpas-mapa | carpa-p60-mapa, carpa-m100-mapa, carpa-g150-mapa | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-carpas-mapa.png | F9 | — | 1 |
+| carpas-vista | carpa-p60-vista, carpa-m100-vista, carpa-g150-vista | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-carpas-vista.png | F9 | — | 1 |
+| macetas-vista | maceta-vista-plastico7, maceta-vista-tela11, maceta-vista-plastico18, maceta-vista-tela25 | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-macetas-vista.png | F9 | — | 1 |
+| cuarto-cultivo | cuarto-cultivo | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-cuarto-cultivo.png | F9 | — | 1 |
 | titulo | hoja-titulo | create_image_pixflux | pantalla entera, img2img | init_image_base64: titulo.png | F7 | — | 1 |
+| carpa-c-fondo | carpa-c-pared, carpa-c-luz | edit_image_pixen | — | image_url: imagen-a.png | F9 | — | 0+? |
+| carpa-c-focos | foco-c-40, foco-c-44, foco-c-46 | edit_image_pixen | — | image_url: imagen-a-foco.png | F9 | — | 0+? |
+| carpa-c-macetas | maceta-c-15, maceta-c-22 | edit_image_pixen | — | image_url: imagen-a-maceta.png | F9 | — | 0+? |
+| carpa-c-plantas | planta-c-i-24, planta-c-i-36 | edit_image_pixen | — | image_url: imagen-a-planta.png | F9 | — | 0+? |
+| carpa-c-focos-cfl | foco-c-cfl-36 | edit_image_pixen | — | image_url: vista-c-foco-48.png | F9 | — | 0+? |
 
 ## Se queda procedural
 
@@ -131,6 +141,16 @@ Burbujas $ y ! de 7×8: más nítidas a mano que generadas.
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
 | burbujas | burbuja-$, burbuja-! | procedural | — | solo texto | F7 | — | 0 |
+
+## Importado
+
+Arte propio del repositorio que ya existe (Strainmon): se adapta en local (recorte y escala) sin gastar generaciones.
+
+| Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
+|---|---|---|---|---|---|---|---|
+| plantas-vista | planta-vista | importado | — | solo texto | F9 | — | 0+? |
+| carpa-c-plantas-h | planta-c-h-24, planta-c-h2-24, planta-c-h1-18, planta-c-h0-8 | importado | — | solo texto | F9 | — | 0+? |
+| carpa-c-plantas-a | planta-c-i-38, planta-c-i2-38, planta-c-i-32, planta-c-i2-32, planta-c-h-38, planta-c-h2-38, planta-c-h-32, planta-c-h2-32, planta-c-s-38, planta-c-s2-38, planta-c-s-32, planta-c-s2-32, planta-c-h1-18, planta-c-h0-8 | importado | — | solo texto | F9 | — | 0+? |
 
 ## Lotes compartidos
 
@@ -245,6 +265,26 @@ Una llamada a `create_1_direction_object` de ≤42 px devuelve 64 candidatos y c
 1. `wang-agua-hierba`: lower «calm blue river water» → upper «short green grass», transition_size 0.25 — guarda el id del tile de hierba (get_topdown_tileset).
 2. `wang-tierra-hierba`: lower «packed light brown dirt path» → upper «short green grass», transition_size 0.25, `upper_base_tile_id` = 4e6ae897-6f8a-4ead-b17c-3fe3cbcb51ba.
 3. `wang-plaza-hierba`: lower «warm beige square stone plaza pavement» → upper «short green grass», transition_size 0, `upper_base_tile_id` = 4e6ae897-6f8a-4ead-b17c-3fe3cbcb51ba.
+
+**carpa-c-fondo** (edit_image_pixen, obligatorio)
+1. `undefined`: lower «undefined» → upper «undefined», transition_size undefined.
+2. `undefined`: lower «undefined» → upper «undefined», transition_size undefined.
+3. `undefined`: lower «undefined» → upper «undefined», transition_size undefined.
+
+**carpa-c-focos** (edit_image_pixen, obligatorio)
+1. `undefined`: lower «undefined» → upper «undefined», transition_size undefined.
+2. `undefined`: lower «undefined» → upper «undefined», transition_size undefined.
+
+**carpa-c-macetas** (edit_image_pixen, obligatorio)
+1. `undefined`: lower «undefined» → upper «undefined», transition_size undefined.
+2. `undefined`: lower «undefined» → upper «undefined», transition_size undefined.
+
+**carpa-c-plantas** (edit_image_pixen, obligatorio)
+1. `undefined`: lower «undefined» → upper «undefined», transition_size undefined.
+2. `undefined`: lower «undefined» → upper «undefined», transition_size undefined.
+
+**carpa-c-focos-cfl** (edit_image_pixen, obligatorio)
+1. `undefined`: lower «undefined» → upper «undefined», transition_size undefined.
 
 **Objetos con el estilo del mapa** (`create_map_object`): `background_image` = recorte del mapa de `art/referencias/mapa/` y `inpainting` = `{"type": "mask", "mask_image": "<máscara en base64>"}` con la máscara `*_mascara.png` (blanco = lo que genera, negro = suelo que se conserva). Las fachadas y los props de exterior se generan después de aprobar `tiles-exterior`: regenera antes los recortes con los tiles nuevos (`npm run sprites:ref` con el atlas puesto) para que el contexto ya sea el arte final.
 
