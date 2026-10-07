@@ -1,9 +1,14 @@
 # Ribera Verde (Godot) — un ciclo de cultivo entero jugado con los botones, como lo haría una persona:
 # plantar las 4 plazas, dormir (START) y regar hasta que estén listas, y cosechar. Guarda capturas de la pantalla del juego.
-#   xvfb-run … godot --path godot --rendering-driver opengl3 --resolution 1560x720 --script res://tests/ciclo.gd -- --salida <dir>
+# Comprueba también las barras de cada planta, el aviso de plaga al despertar, los daños encima de la planta (y que tratada
+# vuelve a ser la de siempre) y que el aviso de arriba no pisa la ficha ni START.
+#   xvfb-run … godot --path godot --rendering-driver opengl3 --resolution 1560x720 --script res://tests/ciclo.gd -- --salida <dir> [--azar N]
 extends SceneTree
 
+const Datos = preload("res://src/datos.gd")
 const Cultivo = preload("res://src/cultivo.gd")
+const Vista = preload("res://src/vista.gd")
+const Arte = preload("res://src/arte.gd")
 var J
 var dir := ""
 var fallos := []
@@ -44,6 +49,43 @@ func foto(nombre: String) -> void:
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(dir.path_join("juego-%s.png" % nombre))
 
+func rect(c: Control) -> Rect2:
+	return Rect2(c.position, c.size)
+
+# el aviso de arriba, sin pisar la ficha ni START y dentro de la pantalla del juego
+func check_aviso(cuando: String) -> void:
+	await espera(3)
+	var r := rect(J.toast)
+	var ok: bool = not J.toast.visible or (not (J.ficha.visible and r.intersects(rect(J.ficha))) and not r.intersects(rect(J.botones.START)) and rect(J.pantalla).encloses(r))
+	check("el aviso no pisa la ficha ni START y cabe en la pantalla (%s)" % cuando, ok)
+
+func color(im: Image, x: int, y: int) -> String:
+	return im.get_pixel(x, y).to_html(false)
+
+# la planta de la plaza i: con plaga lleva los daños encima (solo cambia el color de unos píxeles suyos, no la silueta)
+func danos(i: int) -> Array:
+	var g = Vista.geo(J.S, 0)
+	var v: Dictionary
+	for q in g.pl:
+		if q.i == i:
+			v = q.v
+	var p: Dictionary = J.S.pots[i]
+	var sano := p.duplicate(true)
+	sano.pest = false
+	var a := Vista.img_planta(J.S, p, v)
+	var b := Vista.img_planta(J.S, sano, v)
+	var n := 0
+	var silueta := true
+	for y in a.get_height():
+		for x in a.get_width():
+			var c := a.get_pixel(x, y)
+			var d := b.get_pixel(x, y)
+			if c.a8 != d.a8:
+				silueta = false
+			elif c != d:
+				n += 1
+	return [n, silueta, Vista.clave_planta(J.S, sano, v), b]
+
 func check(que: String, ok: bool) -> void:
 	print(("OK     " if ok else "FALLO  ") + que)
 	if not ok:
@@ -60,7 +102,8 @@ func _corre() -> void:
 	root.add_child(J)
 	await espera(10)
 	await foto("0-inicio")
-	Cultivo.pm = 4242   # el azar del Park-Miller: la prueba sale siempre igual
+	await check_aviso("al empezar")
+	Cultivo.pm = int(a[a.find("--azar") + 1]) if a.find("--azar") >= 0 else 4242   # el azar del Park-Miller: la prueba sale siempre igual
 	var S: Dictionary = J.S
 	# plantar: A en cada plaza vacía → menú de semillas → la primera que quede → aviso
 	for k in 4:
@@ -77,6 +120,7 @@ func _corre() -> void:
 		if k == 0:
 			# tocar la caja de diálogo es A
 			var c: Vector2 = J.dlg.get_global_rect().get_center()
+			var antes: String = J.dlg_txt.text
 			for pulsado in [true, false]:
 				var e := InputEventMouseButton.new()
 				e.button_index = MOUSE_BUTTON_LEFT
@@ -85,7 +129,10 @@ func _corre() -> void:
 				e.global_position = c
 				root.push_input(e)
 				await espera(2)
-			check("tocar la caja de diálogo es A", J.modo == "" and not J.dlg.visible)
+			check("tocar la caja de diálogo es A", not J.dlg.visible or J.dlg_txt.text != antes)
+			check("con la primera planta, la pista de las barras", J.modo == "say" and J.dlg_txt.text.contains("barra"))
+			while J.modo == "say":
+				await pulsa("A")
 		else:
 			await pulsa("A")
 		if k == 0:
@@ -99,6 +146,26 @@ func _corre() -> void:
 		if p:
 			n += 1
 	check("4 plantas plantadas", n == 4)
+	# una barra encima de cada planta, sin pisarse y con sitio para el cursor; en la pantalla: el marco, el agua al 70 % en azul
+	# (10 de 14) y la cosecha vacía
+	await espera(3)
+	await RenderingServer.frame_post_draw
+	var bs: Array = Vista.barras(S, Vista.geo(S, 0), J.VC.sel)
+	var pisan := false
+	for e in bs:
+		for f in bs:
+			if e != f and e.caja.intersects(f.caja):
+				pisan = true
+	check("una barra encima de cada planta (%d), sin pisarse" % bs.size(), bs.size() == 4 and not pisan)
+	var im: Image = J.sv.get_texture().get_image()
+	var ox: int = (J.sw - 240) >> 1
+	var pinta := true
+	for b in bs:
+		var x: int = ox + b.r.position.x
+		var y: int = b.r.position.y
+		pinta = pinta and color(im, x + 1, y) == "26262e" and color(im, x + 1, y + 2) == "4a92e0" and color(im, x + 10, y + 2) == "4a92e0"
+		pinta = pinta and color(im, x + 11, y + 2) == "4a4a56" and color(im, x + 1, y + 5) == "4a4a56" and color(im, x + 14, y + 5) == "4a4a56"
+	check("en la pantalla, cada barra con el agua al 70 % y la cosecha vacía", pinta)
 	# Atrás con un menú abierto es B (y no cierra el juego)
 	await pulsa("A")
 	var abierto: bool = J.modo == "menu"
@@ -123,6 +190,9 @@ func _corre() -> void:
 	# cada mañana, plaza por plaza: la seca se retira, la lista se cosecha y las demás se tratan si tienen plaga y se riegan;
 	# luego START → dormir hasta las 7. Hasta que no quede ninguna (como mucho 8 noches)
 	var noches := 0
+	var avisos := 0
+	var plagas := 0
+	var tratadas := 0
 	var vistas := {}
 	var cosechadas := 0
 	var muertas := 0
@@ -148,11 +218,20 @@ func _corre() -> void:
 				cosechadas += 1
 			else:
 				if p.pest and S.items.insect > 0:
+					var d := danos(J.VC.sel)
+					check("con plaga, daños encima de la planta (%d px) sin cambiar su silueta" % d[0], d[0] > 0 and d[1])
+					if tratadas == 0:
+						await foto("4b-plaga")
 					await pulsa("A")
 					while J.m_opts[J.m_sel] != "Tratar plaga":
 						await pulsa("down")
 					await pulsa("A")
 					await pulsa("A")
+					await espera(3)
+					var k := Vista.clave_planta(S, p, Vista.geo(S, 0).pl.filter(func(q): return q.i == J.VC.sel)[0].v)
+					var igual: bool = k == d[2] and Arte.texs.has(k) and Arte.texs[k].get_image().get_data() == d[3].get_data()
+					check("tratada, la planta vuelve a ser la de siempre", not p.pest and igual)
+					tratadas += 1
 				await pulsa("A")    # Regar es la primera opción
 				if noches == 2 and paso == "":
 					await foto("4-preguntar")
@@ -166,10 +245,29 @@ func _corre() -> void:
 			check("▲ desde la fila de atrás elige el foco", J.VC.sel == -1)
 			await foto("6-foco")
 			await pulsa("down")
+		var con_plaga := []
+		for p in S.pots:
+			con_plaga.append(p != null and p.pest)
 		await pulsa("START")
 		await pulsa("A")
 		noches += 1
 		await espera(4)
+		# al despertar, el aviso de las que han cogido plaga esta noche, con su nombre
+		var nuevas := []
+		for i in S.pots.size():
+			var p = S.pots[i]
+			if p and p.pest and not p.get("dead") and not con_plaga[i]:
+				nuevas.append(Datos.strain(S, p.sid).n)
+		var aviso := ""
+		while J.modo == "say":
+			if J.dlg_txt.text.begins_with("¡Plaga!"):
+				aviso = J.dlg_txt.text
+			await pulsa("A")
+		plagas += nuevas.size()
+		if aviso != "":
+			avisos += 1
+		check("noche %d: %d con plaga nueva y %s" % [noches, nuevas.size(), "aviso" if aviso != "" else "sin aviso"], (aviso != "") == (nuevas.size() > 0) and nuevas.all(func(m): return aviso.contains(m)))
+		await check_aviso("al despertar")
 		for p in S.pots:
 			if p:
 				vistas[9 if p.get("dead") else Cultivo.plant_stage(p)] = true
@@ -177,6 +275,7 @@ func _corre() -> void:
 		if noches == 1 or noches == 2:
 			await foto("3-noche%d" % noches)
 	check("ha pasado por plántula, vegetativo, floración y lista", vistas.has(1) and vistas.has(2) and vistas.has(3) and vistas.has(4))
+	check("ha habido plaga (%d), aviso (%d) y tratamiento (%d)" % [plagas, avisos, tratadas], plagas > 0 and avisos > 0 and tratadas > 0)
 	check("%d cosechadas y %d secas retiradas" % [cosechadas, muertas], cosechadas >= 3 and cosechadas + muertas == 4)
 	var g0 := 0.0
 	for k in S.buds:

@@ -159,6 +159,76 @@ static func seca(c: Image) -> Image:
 			o.set_pixel(x, y, Color8(z[0], z[1], z[2], p.a8))
 	return o
 
+# daños de la plaga encima de la planta, sacados de su propio fotograma (c0, antes de los colores de la variedad): en las
+# hojas y el tallo (los verdes de VC_HOJA) y en los cogollos (la rampa clave), nunca en la base del tallo, cada píxel con el
+# tono de su sitio en la rampa, así que la luz y la sombra del sprite se quedan: en las hojas, manchas amarillas con el centro
+# pardo, el punteado claro de los bichos y, en el nivel 3, bordes quemados; en los cogollos, telilla blanca y podrido pardo.
+# La silueta no cambia. nivel 1-3; sem: la misma planta, las mismas manchas
+const DANO_AMARILLO := ["#4c4a1e", "#7c7428", "#b4a83a", "#e2d66a", "#a8984a", "#605a2a"]
+const DANO_PARDO := ["#3a2416", "#5c3a1e", "#7e5228", "#a87638", "#8a6434", "#4c3220"]
+const DANO_PUNTO := ["#8a8a60", "#b8b484", "#e8e6b0", "#f4f2cc", "#e0dca8", "#a8a47c"]
+const DANO_TELA := ["#f4f2ea", "#cfcbc0", "#8e8a80"]      # la rampa del cogollo: clara, media y oscura
+const DANO_PODRIDO := ["#9a8670", "#6e5c4a", "#463a30"]
+
+static func azar(x: int, y: int, s: int, k: int) -> float:
+	var h := (x * 73856093 + y * 19349663 + s * 83492791 + k * 40503) & 0x7fffffff
+	h = ((h ^ (h >> 13)) * 1274126177) & 0x7fffffff
+	h = ((h ^ (h >> 16)) * 668265263) & 0x7fffffff
+	return float(h ^ (h >> 15)) / 2147483648.0
+
+static func dano(im: Image, c0: Image, nivel: int, sem: int) -> Image:
+	var hj: Array = Datos.carga().VC_HOJA
+	var ix := {}
+	for j in hj.size():
+		ix[Datos.hexi(hj[j])] = j
+	for j in rampa.size():
+		ix[Datos.hexi(rampa[j])] = 10 + j
+	var o: Image = im.duplicate()
+	var W := o.get_width()
+	var H := o.get_height()
+	var mancha: float = [0, .18, .28, .38][nivel]   # celdas de 4 × 4 con mancha
+	var punto: float = [0, .10, .15, .20][nivel]
+	for y in range(H - alto(c0), H - 3):
+		for x in W:
+			var p0 := c0.get_pixel(x, y)
+			if p0.a8 == 0:
+				continue
+			var j = ix.get((p0.r8 << 16) | (p0.g8 << 8) | p0.b8)
+			if j == null:
+				continue
+			var t := ""
+			for cy in range(y / 4 - 1, y / 4 + 2):
+				for cx in range(x / 4 - 1, x / 4 + 2):
+					if azar(cx, cy, sem, 1) >= mancha:
+						continue
+					var mx := cx * 4 + azar(cx, cy, sem, 2) * 4
+					var my := cy * 4 + azar(cx, cy, sem, 3) * 4
+					var rr := 1.1 + azar(cx, cy, sem, 4) * (.5 + .4 * nivel)
+					var d := sqrt((x + .5 - mx) * (x + .5 - mx) + (y + .5 - my) * (y + .5 - my))
+					if d <= rr * .45 and nivel >= 2:
+						t = "p"
+					elif d <= rr and t == "":
+						t = "a"
+			var cogollo: bool = j >= 10
+			if cogollo and t == "a":
+				t = ""
+			if t == "" and nivel >= 3 and not cogollo and azar(x, y, sem, 5) < .4:
+				for e in [Vector2i(-1, 0), Vector2i(1, 0), Vector2i(0, -1), Vector2i(0, 1)]:
+					var a: int = x + e.x
+					var b: int = y + e.y
+					if a < 0 or b < 0 or a >= W or b >= H or c0.get_pixel(a, b).a8 == 0:
+						t = "p"
+			if t == "" and azar(x, y, sem, 6) < punto:
+				t = "."
+			if t != "":
+				var c: Color
+				if cogollo:
+					c = Color.html((DANO_PODRIDO if t == "p" else DANO_TELA)[j - 10])
+				else:
+					c = Color.html((DANO_PARDO if t == "p" else (DANO_AMARILLO if t == "a" else DANO_PUNTO))[j])
+				o.set_pixel(x, y, Color8(c.r8, c.g8, c.b8, im.get_pixel(x, y).a8))
+	return o
+
 # la campana con la boca apagada: los tonos cálidos y los casi blancos (el tubo del CFL) pasan a gris oscuro
 static func apagado(c: Image) -> Image:
 	var k := "off|%d" % c.get_instance_id()

@@ -91,6 +91,7 @@ func _ready() -> void:
 	toast_txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	toast.add_child(toast_txt)
 	add_child(toast)
+	toast.minimum_size_changed.connect(func(): _coloca_toast.call_deferred())
 	toast_t.one_shot = true
 	toast_t.timeout.connect(toast.hide)
 	add_child(toast_t)
@@ -206,7 +207,9 @@ func ajusta() -> void:
 	menu_box.set_meta("arriba", y + ut + 3 * us)
 	menu_box.add_theme_stylebox_override("panel", _caja(us, 5, 7))
 	toast.set_meta("centro", x + cw / 2)
-	toast.position.y = y + 24 * us
+	toast.set_meta("izq", x + 3 * us)
+	toast.set_meta("der", x + cw - 3 * us)
+	toast.set_meta("y", y + 24 * us)
 	toast.add_theme_stylebox_override("panel", _caja(us, 4, 10))
 	_letra(toast_txt, letra, 9 * us, INK, 12)
 	_coloca()
@@ -513,6 +516,7 @@ func _ficha() -> void:
 		ficha_txt.add_child(n)
 	ficha.size = Vector2(66 * u, 0)
 	ficha.show()
+	_coloca.call_deferred()
 
 # ---------- diálogos: say, ask y menú (07-interfaz) ----------
 func _coloca() -> void:
@@ -528,9 +532,32 @@ func _coloca() -> void:
 		if dlg.visible:
 			bajo = minf(bajo, dlg.position.y - 2 * us)
 		menu_box.position.y = maxf(menu_box.get_meta("arriba"), bajo - menu_box.size.y)
+	_coloca_toast()
+
+# el aviso, sin pisar la ficha ni START: de ancho, lo que quepa a la derecha de la ficha (el texto pasa a dos líneas). Se
+# vuelve a colocar cuando el autowrap cambia de líneas (minimum_size_changed)
+func _coloca_toast() -> void:
+	if not toast.has_meta("centro"):
+		return
+	var h := _hueco_toast()
+	var fs := toast_txt.get_theme_font_size("font_size")
+	var caja := toast.get_theme_stylebox("panel").get_minimum_size().x
+	var wl := minf(letra.get_string_size(toast_txt.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 2, minf(210 * us, h.y - h.x - caja))
+	toast_txt.custom_minimum_size.x = wl
+	toast.size = Vector2(wl + caja, 0)
 	toast.reset_size()
-	if toast.has_meta("centro"):
-		toast.position.x = toast.get_meta("centro") - toast.size.x / 2
+	toast.position.x = clampf(toast.get_meta("centro") - toast.size.x / 2, h.x, maxf(h.x, h.y - toast.size.x))
+	toast.position.y = toast.get_meta("y")
+	var st := Rect2(botones.START.position, botones.START.size)
+	if st.intersects(Rect2(toast.position, toast.size)):
+		toast.position.y = st.end.y + 2 * us
+
+# de dónde a dónde puede ir el aviso: el ancho de la escena menos la ficha, si se ve
+func _hueco_toast() -> Vector2:
+	var lo: float = toast.get_meta("izq", 0.0)
+	if ficha.visible:
+		lo = maxf(lo, ficha.position.x + ficha.size.x + 3 * us)
+	return Vector2(lo, toast.get_meta("der", get_viewport_rect().size.x))
 
 func say(t: String) -> void:
 	dlg_txt.text = t
@@ -604,8 +631,6 @@ func _pinta_menu() -> void:
 
 func _toast(t: String, seg: float) -> void:
 	toast_txt.text = t
-	var fs := toast_txt.get_theme_font_size("font_size")
-	toast_txt.custom_minimum_size.x = minf(letra.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 2, 210 * us)
 	toast.show()
 	_coloca.call_deferred()
 	toast_t.start(seg)
@@ -678,6 +703,9 @@ func plantar(i: int) -> void:
 		S.seeds.erase(sid)
 	S.pots[i] = Cultivo.nueva_planta(S, sid)
 	await say("Has plantado %s." % Datos.strain(S, sid).n)
+	if not S.get("pista_barras"):
+		S.pista_barras = true
+		await say("Encima de cada planta va su barra: arriba el agua (roja, toca regar) y abajo lo que le falta para cosechar (dorada, lista). Con plaga sale una «!» roja.")
 
 func marca_feno(f) -> String:
 	var v = S.fenos.get(str(int(f.id))) if f is Dictionary and f.get("id") else null
@@ -719,9 +747,33 @@ func dormir() -> void:
 	var c := await ask("Día %d · %02d:%02d · %s\nCosecha guardada: %d g" % [S.day, int(S.min) / 60, int(S.min) % 60, Datos.eur(S.money), tot], ["Dormir hasta las 7", "Siesta de 3 h", "Nada"])
 	if c > 1:
 		return
+	var antes := {}
+	for i in S.pots.size():
+		if S.pots[i] and S.pots[i].pest:
+			antes[i] = true
 	var luz := Cultivo.avanza(S, Cultivo.minutos_cama(S, c))
 	_guarda()
 	_toast("Has descansado%s · Partida guardada" % (" · Luz −" + Datos.eur(luz) if luz else ""), 1.8)
+	await aviso_plaga(antes)
+
+# al despertar: las plantas que han cogido plaga esta noche y las que siguen sin tratar
+func aviso_plaga(antes: Dictionary) -> void:
+	var nuevas := []
+	var siguen := []
+	var hu := Cultivo.huecos(S)
+	for i in S.pots.size():
+		var p = S.pots[i]
+		if p and p.pest and not p.get("dead"):
+			(siguen if antes.has(i) else nuevas).append("la %s (plaza %d)" % [Datos.strain(S, p.sid).n, hu[i].j + 1])
+	var n: int = S.items.insect
+	var queda := ("Te queda%s %d." % ["n" if n > 1 else "", n]) if n else "No te queda INSECTICIDA."
+	if nuevas.size():
+		await say("¡Plaga! Han salido bichos en %s y se comen las hojas. Trátala%s con INSECTICIDA. %s" % [_lista(nuevas), "s" if nuevas.size() > 1 else "", queda])
+	if siguen.size():
+		await say("Sigue la plaga en %s: sin tratar pierde salud cada hora." % _lista(siguen))
+
+static func _lista(L: Array) -> String:
+	return L[0] if L.size() == 1 else ", ".join(L.slice(0, -1)) + " y " + L[-1]
 
 # ---------- partida ----------
 func _carga() -> Dictionary:
