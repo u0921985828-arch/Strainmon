@@ -77,7 +77,13 @@ func _ready() -> void:
 		var a := us * 4
 		var y := (us * 2 if int(now / 300) % 2 else 0.0)
 		dlg_mas.draw_colored_polygon(PackedVector2Array([Vector2(0, y), Vector2(2 * a, y), Vector2(a, y + us * 5)]), ROJO))
+	dlg_mas.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dlg.add_child(dlg_mas)
+	# tocar la caja es A, como en 07-interfaz
+	dlg.mouse_filter = Control.MOUSE_FILTER_STOP
+	dlg.gui_input.connect(func(e):
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+			press("A"))
 	add_child(dlg)
 	menu_box.add_child(menu_list)
 	add_child(menu_box)
@@ -118,9 +124,14 @@ func _fuente(f: String) -> FontFile:
 func ajusta() -> void:
 	var V := get_viewport_rect().size
 	var dp := _dp()
+	var z := _zona_segura()
+	var zl: float = z[0]
+	var zr: float = z[1]
+	var zt: float = z[2]
+	var zb: float = z[3]
 	var rim := roundf(clampf(minf(V.x, V.y) * .008, 2 * dp, 5 * dp))
-	var w := V.x - 2 * rim
-	var h := V.y - 2 * rim
+	var w := V.x - zl - zr - 2 * rim
+	var h := V.y - zt - zb - 2 * rim
 	var s := h / 160
 	var k := floorf(s)
 	if k >= 2 and k >= s * .94:
@@ -132,8 +143,8 @@ func ajusta() -> void:
 	sv.size = Vector2i(sw, 160)
 	var cw := floorf(sw * s)
 	var ch := floorf(160 * s)
-	var x := roundf(rim + (w - cw) / 2)
-	var y := roundf(rim + (h - ch) / 2)
+	var x := roundf(zl + rim + (w - cw) / 2)
+	var y := roundf(zt + rim + (h - ch) / 2)
 	pantalla.position = Vector2(x, y)
 	pantalla.size = Vector2(cw, ch)
 	var H := V.y / dp
@@ -141,7 +152,7 @@ func ajusta() -> void:
 	var ab := roundf(d / dp * .44) * dp
 	var m := roundf(clampf(H * .035, 8, 22)) * dp
 	var pill := roundf(clampf(H * .07, 24, 34)) * dp
-	var col := m + maxf(d, ab * 2.25) + m * .5
+	var col := maxf(zl, zr) + m + maxf(d, ab * 2.25) + m * .5
 	us = clampf((V.x - 2 * col) / 240, minf(s, maxf(s * .5, 1.3 * dp)), s)
 	var uiw := minf(cw, roundf(240 * us))
 	# escena de 240 u en el centro: la ficha
@@ -151,16 +162,18 @@ func ajusta() -> void:
 	ficha.size = Vector2(66 * u, 0)
 	ficha.add_theme_stylebox_override("panel", _caja(u, 3, 4))
 	# mandos
-	_pon(botones.up, Vector2(m + d / 3, V.y - m - d), Vector2(d / 3, d / 3))
-	_pon(botones.left, Vector2(m, V.y - m - d * 2 / 3), Vector2(d / 3, d / 3))
-	_pon(botones.right, Vector2(m + d * 2 / 3, V.y - m - d * 2 / 3), Vector2(d / 3, d / 3))
-	_pon(botones.down, Vector2(m + d / 3, V.y - m - d / 3), Vector2(d / 3, d / 3))
-	_pon(botones.mid, Vector2(m + d / 3, V.y - m - d * 2 / 3), Vector2(d / 3, d / 3))
-	var abx := V.x - m - ab * 2.25
-	var aby := V.y - m - ab * 1.6
+	var dx := zl + m
+	var dy := V.y - zb - m
+	_pon(botones.up, Vector2(dx + d / 3, dy - d), Vector2(d / 3, d / 3))
+	_pon(botones.left, Vector2(dx, dy - d * 2 / 3), Vector2(d / 3, d / 3))
+	_pon(botones.right, Vector2(dx + d * 2 / 3, dy - d * 2 / 3), Vector2(d / 3, d / 3))
+	_pon(botones.down, Vector2(dx + d / 3, dy - d / 3), Vector2(d / 3, d / 3))
+	_pon(botones.mid, Vector2(dx + d / 3, dy - d * 2 / 3), Vector2(d / 3, d / 3))
+	var abx := V.x - zr - m - ab * 2.25
+	var aby := V.y - zb - m - ab * 1.6
 	_pon(botones.B, Vector2(abx, aby + ab * .6), Vector2(ab, ab))
 	_pon(botones.A, Vector2(abx + ab * 1.25, aby), Vector2(ab, ab))
-	_pon(botones.START, Vector2(V.x - m - pill * 2.6, m), Vector2(pill * 2.6, pill))
+	_pon(botones.START, Vector2(V.x - zr - m - pill * 2.6, zt + m), Vector2(pill * 2.6, pill))
 	for b in ["up", "down", "left", "right"]:
 		_estilo(botones[b], Color(24 / 255.0, 28 / 255.0, 34 / 255.0, .5), Color(70 / 255.0, 80 / 255.0, 96 / 255.0, .75), Color(1, 1, 1, .22), 8 * dp, d * .1, b)
 	var mid: Panel = botones.mid
@@ -195,6 +208,15 @@ func ajusta() -> void:
 	_letra(toast_txt, letra, 9 * us, INK, 12)
 	_coloca()
 	_ficha()
+
+# márgenes seguros (muesca y barras del sistema), como env(safe-area-inset-*) en el HTML: [izquierda, derecha, arriba, abajo].
+# Solo en el móvil: en el escritorio la «zona segura» es la de toda la pantalla, no la de la ventana
+func _zona_segura() -> Array:
+	if not OS.has_feature("mobile"):
+		return [0.0, 0.0, 0.0, 0.0]
+	var r := Rect2(DisplayServer.get_display_safe_area())
+	var v := Rect2(Vector2(DisplayServer.window_get_position()), get_viewport_rect().size)
+	return [maxf(0, r.position.x - v.position.x), maxf(0, v.end.x - r.end.x), maxf(0, r.position.y - v.position.y), maxf(0, v.end.y - r.end.y)]
 
 # px de pantalla por px CSS: por los ppp del móvil y, si el sistema no los da bien (escritorio, Xvfb), como un móvil en
 # horizontal, que mide 360-430 px CSS de alto
@@ -308,7 +330,12 @@ func _unhandled_input(e: InputEvent) -> void:
 
 func _notification(w: int) -> void:
 	if w == NOTIFICATION_WM_GO_BACK_REQUEST:
-		press("B")
+		# Atrás: B en un diálogo o menú; en la carpa, sin nada abierto, guarda y sale (no hay mapa al que volver)
+		if modo != "":
+			press("B")
+		elif not VC.ocupado:
+			_guarda()
+			get_tree().quit()
 	elif w == NOTIFICATION_APPLICATION_PAUSED or w == NOTIFICATION_WM_CLOSE_REQUEST:
 		if S:
 			_guarda()
@@ -316,7 +343,7 @@ func _notification(w: int) -> void:
 func press(b: String) -> void:
 	if modo == "menu":
 		if b == "up" or b == "down":
-			m_sel = clampi(m_sel + (1 if b == "down" else -1), 0, m_opts.size() - 1)
+			m_sel = posmod(m_sel + (1 if b == "down" else -1), m_opts.size())   # en bucle, como 07-interfaz
 			_pinta_menu()
 		elif b == "A":
 			hecho.emit(m_sel)
@@ -675,7 +702,12 @@ func _carga() -> Dictionary:
 				s.items[k] = int(s.items[k])
 	return s
 
+# a un archivo aparte y luego se cambia de nombre: si se corta a medias, la partida de antes sigue entera. Sin ordenar las claves
+# (las semillas salen en el menú en su orden) y con todos los decimales
 func _guarda() -> void:
-	var f := FileAccess.open(GUARDADO, FileAccess.WRITE)
+	var tmp := GUARDADO + ".tmp"
+	var f := FileAccess.open(tmp, FileAccess.WRITE)
 	if f:
-		f.store_string(JSON.stringify(S))
+		f.store_string(JSON.stringify(S, "", false, true))
+		f.close()
+		DirAccess.rename_absolute(tmp, GUARDADO)

@@ -49,8 +49,26 @@ func _corre() -> void:
 		await pulsa("A")
 		if k == 0:
 			await foto("1-semillas")
+			# el menú va en bucle, como el del HTML
+			await pulsa("up")
+			var vuelta: bool = J.m_sel == J.m_opts.size() - 1
+			await pulsa("down")
+			check("menú en bucle: ▲ en la primera pasa a la última y ▼ vuelve", vuelta and J.m_sel == 0)
 		await pulsa("A")
-		await pulsa("A")
+		if k == 0:
+			# tocar la caja de diálogo es A
+			var c: Vector2 = J.dlg.get_global_rect().get_center()
+			for pulsado in [true, false]:
+				var e := InputEventMouseButton.new()
+				e.button_index = MOUSE_BUTTON_LEFT
+				e.pressed = pulsado
+				e.position = c
+				e.global_position = c
+				root.push_input(e)
+				await espera(2)
+			check("tocar la caja de diálogo es A", J.modo == "" and not J.dlg.visible)
+		else:
+			await pulsa("A")
 		if k == 0:
 			await pulsa("right")
 		elif k == 1:
@@ -62,6 +80,12 @@ func _corre() -> void:
 		if p:
 			n += 1
 	check("4 plantas plantadas", n == 4)
+	# Atrás con un menú abierto es B (y no cierra el juego)
+	await pulsa("A")
+	var abierto: bool = J.modo == "menu"
+	J._notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	await espera(3)
+	check("Atrás con un menú abierto lo cierra", abierto and J.modo == "" and not J.VC.ocupado)
 	check("semillas gastadas: quedan 5", S.seeds.values().reduce(func(x, y): return x + y, 0) == 5)
 	await foto("2-plantadas")
 	# cada mañana, plaza por plaza: la seca se retira, la lista se cosecha y las demás se tratan si tienen plaga y se riegan;
@@ -127,7 +151,9 @@ func _corre() -> void:
 		g0 += S.buds[k].g
 	var vacias: bool = S.pots.all(func(p): return p == null)
 	check("carpa vacía y %d g en el bote" % g0, vacias and g0 > 0)
-	check("partida guardada", FileAccess.file_exists(J.GUARDADO))
+	check("partida guardada", FileAccess.file_exists(J.GUARDADO) and not FileAccess.file_exists(J.GUARDADO + ".tmp"))
+	var g = JSON.parse_string(FileAccess.get_file_as_string(J.GUARDADO))
+	check("guardada con las semillas en su orden (%s)" % ", ".join(S.seeds.keys()), g is Dictionary and g.seeds.keys() == S.seeds.keys())
 	await foto("7-cosecha")
 	print("ciclo: %d noches, %d fallos" % [noches, fallos.size()])
 	quit(1 if fallos.size() else 0)

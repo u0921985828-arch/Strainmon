@@ -5,7 +5,7 @@
   2. godot/arte/carpa.png + carpa.json: del atlas (assets/sprites), solo los sprites de la vista C (pared, luz, focos, macetas y
      plantas A con todos sus fotogramas).
   3. godot/tests/oraculo.json: lo que calcula el HTML en las escenas de prueba (geometría de la vista C, fotograma de cada planta),
-     el tono y el porte de cada variedad a varios % índica, los factores de cada carpa y foco y dos ciclos de cultivo hora a hora con
+     el tono y el porte de cada variedad a varios % índica, los factores de cada carpa y foco y tres ciclos de cultivo hora a hora con
      un generador fijo (Park-Miller) en lugar de Math.random.
   4. tools/salida/godot/html-<escena>.png: la escena de cada prueba pintada por el HTML (240 × 160) para compararla píxel a píxel
      con la de Godot (godot/tests/prueba.gd), y html-<escena>-sinluz.png, sin la capa de luz.
