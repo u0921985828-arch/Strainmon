@@ -4,7 +4,7 @@
    en la 1.6-1.7 (sin techo, sin frente y sin lateral derecho), pero a escala real: escena compuesta a 240 px, 48 px/m de
    ancho y de alto y 24 px/m de fondo; lo de atrás se corre 6 px/m a la derecha, así la pared izquierda se ve por dentro.
    La carpa tiene la espalda contra la pared del cuarto (y VB_PARED): la de 150 × 100 × 200 cm mide 72 × 120 px y una
-   sativa lista, 67 px más su maceta.
+   sativa lista, 43 px más su maceta.
    Las plazas van en filas de CARPAS[t].cols macetas: la fila 0 delante y la 1 detrás (pintada antes). Cada maceta va en el centro
    de su parte de la carpa, lo más separada posible, y la copa de su planta se dibuja como mucho del ancho que cabe sin tocar a las
    vecinas ni las paredes (distancia segura, q.cw) y como mucho del alto que deja la distancia al foco (FOCO_SEP, q.ch).
@@ -67,7 +67,7 @@ const vcAnchos=pre=>Object.keys(ARTE.cubre||{}).filter(k=>k.startsWith('misc:'+p
 // el sprite de la familia (prefijo + ancho en px) más cercano a «px», si se aparta como mucho un 25 %
 function vcSprite(pre,px){let m=null;for(const a of vcAnchos(pre))if(Math.abs(a-px)<=px*.25&&(!m||Math.abs(a-px)<Math.abs(m.a-px)))m={a,n:pre+a};return m&&{...m,f:fotoMisc(m.n)};}
 // la planta: el sprite de su porte y fase más ancho que deja 2 px de aire en su sitio (esp: px hasta la vecina de su fila más cercana o,
-// a cada lado, hasta la pared, a la altura de su maceta) o, si ninguno, el más estrecho. Floración y lista comparten sprite
+// a cada lado, hasta la pared, a la altura de su maceta, redondeado: con la pared queda 1 px) o, si ninguno, el más estrecho. Floración y lista comparten sprite
 // (planta-c-<porte>-<ancho>); vegetativo lleva la fase (planta-c-<porte>2-<ancho>); germinando y plántula, las mismas para los tres portes
 // (planta-c-h0-8, planta-c-h1-18)
 function vcPlantaSprite(po,st,esp){const pre='planta-c-'+(st<2?'h':po)+(st>=3?'':st)+'-',A=vcAnchos(pre).sort((a,b)=>a-b);if(!A.length)return null;
@@ -89,7 +89,7 @@ function vistaC(g){
     const y=yq(q),x=xy(q,y),r={x,y,m,tierra:VC_TIERRA[m.n]||Math.round(m.f.c.height*.7),hp:0};
     if(p){const st=p.dead?9:plantStage(p),po=portePlanta(p),D=PLANTA_CM[po];if(st>4)return null;
       // sitio en pantalla: hasta la vecina de su fila más cercana y, a cada lado, hasta la pared (×2)
-      r.esp=Math.min(wy(y)-2*Math.abs(x-120),...pl.filter(o=>o!==q&&yq(o)===y).map(o=>Math.abs(xy(o,y)-x)));
+      r.esp=Math.round(Math.min(wy(y)-2*Math.abs(x-120),...pl.filter(o=>o!==q&&yq(o)===y).map(o=>Math.abs(xy(o,y)-x))));
       const s=vcPlantaSprite(po,st,r.esp);if(!s||!s.f)return null;
       // tope: su alto real (ch) y, en pantalla, la distancia segura a la boca del foco (el sprite de la maceta es más alto que la real)
       r.p=s;r.hp=Math.min(vcAlto(s.f.c),Math.round(Math.min(D.h[st],q.ch)*Z),Math.floor(y-r.tierra-VCA.boca-FOCO_SEP[c.foco]*Z));}

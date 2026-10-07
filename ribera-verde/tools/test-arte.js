@@ -218,8 +218,9 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
         const dib = {};
         for (const q of g.pl) { const v = q.v, p = S.pots[q.i], st = p && plantStage(p);
           if (!p) continue; const po = portePlanta(p), nom = 'planta-c-' + (st < 2 ? 'h' : po) + (st >= 3 ? '' : st) + '-'; r.portes.add(po + st);
-          // el porte de la planta: el de su % índica (p.f.i), no el de su variedad
-          if (p.f && porteInd(p.f.i) !== po) r.fallos.push(`${n} plaza ${q.i}: porte ${po} con ${p.f.i} % índica`);
+          // el porte de la planta: el de su % índica (p.f.i; sin él, el de su variedad): índica desde 70, sativa por debajo de 30
+          const ip = p.f && p.f.i != null ? p.f.i : STRAINS[p.sid].ind, pe = ip >= 70 ? 'i' : ip < 30 ? 's' : 'h';
+          if (po !== pe) r.fallos.push(`${n} plaza ${q.i}: porte ${po} con ${ip} % índica (${pe})`);
           if (!v.p.n.startsWith(nom)) r.fallos.push(`${n} plaza ${q.i}: fase ${st} (${po}) con ${v.p.n}`);
           // el más ancho que deja 2 px de aire en su sitio (o el más estrecho si ninguno); su sitio, hasta la vecina de fila o la pared
           const A = vcAnchos(nom), a = +v.p.n.slice(nom.length); r.anchos.add(a);
@@ -234,8 +235,11 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
             if (al === v.hp) { r.exactas++; if (c0 !== c) r.fallos.push(`${n} plaza ${q.i}: hay fotograma de ${al} px y no se usa`); }
             else { const k = aplastaBien(c, c0, v.hp); r.aplastadas++; if (!k.ok || (st >= 2 && al - v.hp > 1)) r.fallos.push(`${n} plaza ${q.i}: aplastada ${al} → ${v.hp} ${JSON.stringify(k)}`); } }
           // el tono de la hoja: los verdes de la paleta A pasan a los de su variedad (ni uno se queda si su tono es otro)
-          const hj = hojaPlanta(p), T = vcTonos(hj), cs = colores(conRampa(c0, T, 'test|' + hj));
-          if (hj !== '#57a33e' && (cs.has('#57a33e') || !cs.has(T['#57a33e']))) r.fallos.push(`${n} plaza ${q.i}: hoja sin el tono ${hj}`); }
+          // (lo que pinta vcPlantaC, no conRampa por su cuenta)
+          const hj = hojaPlanta(p), T = vcTonos(hj), pinta = [], di = ctx.drawImage;
+          ctx.drawImage = function (im, ...a) { pinta.push(im); return di.call(this, im, ...a); }; try { vcPlantaC(q, 1000); } finally { ctx.drawImage = di; }
+          const pc = pinta.filter(im => im !== v.m.f.c).pop(), cs = pc ? colores(pc) : new Set();
+          if (!pc || (hj !== '#57a33e' && (cs.has('#57a33e') || !cs.has(T['#57a33e'])))) r.fallos.push(`${n} plaza ${q.i}: hoja sin el tono ${hj}`); }
         // en pantalla, ninguna planta toca a su vecina de fila (2 px de aire) ni se sale por las paredes de su fila
         for (const a of g.pl) { if (!dib[a.i]) continue; const wy = g.vc.w + 32 * (a.y - VCA.fondo) / 19;
           if (dib[a.i][0] < 120 - wy / 2 - .5 || dib[a.i][1] > 120 + wy / 2 + .5) r.fallos.push(`${t} plaza ${a.i}: ${dib[a.i]} se sale de la pared (${(120 - wy / 2).toFixed(1)}-${(120 + wy / 2).toFixed(1)})`);
@@ -263,6 +267,9 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       r.altos = {};
       for (const po of ['i', 'h', 's']) for (const w of [38, 32]) for (const fa of ['', '2']) { const nm = 'planta-c-' + po + fa + '-' + w, F = fotos(nm), a = F.map(vcAlto), k = F.map(cogollo);
         r.altos[nm] = [a[0], a[a.length - 1], a.length];
+        // los altos de cada sprite: los de las carpas (exporta.py)
+        const E = fa ? { i: [36, 24], h: [42, 28], s: [46, 32] }[po] : { i: [66, 40], h: [72, 44], s: [w === 38 ? 92 : 80, 54] }[po];
+        if (a[0] !== E[0] || a[a.length - 1] !== E[1]) r.fallos.push(nm + ': altos ' + a[0] + '-' + a[a.length - 1] + ', no ' + E.join('-'));
         if (a.some((h, i) => i && h !== a[i - 1] - 2) || F.some(c => ancho(c) > w) || F.some(c => repetidas(c) > 2) || (fa ? k.some(Boolean) : k.some((x, i) => k.some((y, j) => a[j] <= a[i] - 10 && y > x)) || !k[k.length - 1]))
           r.fallos.push(nm + ': ' + JSON.stringify({ a, k })); }
       r.repetidas = ['planta-c-h1-18', 'planta-c-h0-8'].map(n => fotos(n).reduce((s, c) => s + repetidas(c), 0)); if (r.repetidas.some(k => k)) r.fallos.push('filas repetidas (estirada): ' + r.repetidas);
@@ -284,7 +291,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
           VC = { ci: 0, sel: 0, ocupado: false }; renderCarpa(1000); VC = null; ctx.drawImage = di; return !n && !encendido; })() };
       r.anchos = [...r.anchos].sort().join(); r.portes = [...r.portes].sort().join();
       S.carpas = C0; S.macetas = M0; S.pots = P0; return r; });
-    check('Vista C (imagen A): en las 5 carpas, la planta A del porte de cada planta (su % índica) en todas sus fases, con el tono de hoja de su variedad; la más ancha que deja 2 px de aire con su vecina de fila y las paredes (la de 38 o la de 32); de su alto real, sin pasar de su distancia al foco, con el fotograma de su alto (uno cada 2 px, sin filas repetidas, más alta = más cogollo) o aplastado 1 fila, sin escalar, en todas las carpas y focos; la pared solo lleva tela, macetas y plantas sin luz pintada y la luz es su propio sprite, por delante en «overlay» (la del CFL, fría y al 60 %); el CFL apagado, gris; sin arte, la vista B', vc.escenas.length === 11 && vc.aplastadas >= 5 && vc.exactas >= 5 && vc.anchos === '18,32,38,8' && vc.portes === 'h0,h2,h3,h4,i0,i2,i3,i4,s1,s2,s3,s4' && vc.cubre >= 100 && !vc.fallos.length && Object.values(vc.b).every(Boolean), vc);
+    check('Vista C (imagen A): en las 5 carpas, la planta A del porte de cada planta (su % índica) en todas sus fases, con el tono de hoja de su variedad; la más ancha que deja 2 px de aire con su vecina de fila y no se sale de las paredes (la de 38 o la de 32); de su alto real, sin pasar de su distancia al foco, con el fotograma de su alto (uno cada 2 px, sin filas repetidas, más alta = más cogollo) o aplastado 1 fila, sin escalar, en todas las carpas y focos; la pared solo lleva tela, macetas y plantas sin luz pintada y la luz es su propio sprite, por delante en «overlay» (la del CFL, fría y al 60 %); el CFL apagado, gris; sin arte, la vista B', vc.escenas.length === 11 && vc.aplastadas >= 5 && vc.exactas >= 5 && vc.anchos === '18,32,38,8' && vc.portes === 'h0,h2,h3,h4,i0,i2,i3,i4,s1,s2,s3,s4' && vc.cubre >= 100 && !vc.fallos.length && Object.values(vc.b).every(Boolean), vc);
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
       for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }
       r.rio = mascaraOrilla(m, 31, 15); r.centro = mascaraOrilla(m, 35, 27); r.sinAtlas = (() => { const ok = ARTE.ok; ARTE.ok = false; const v = arteOrilla(m, 'water', 31, 15, 0, 0); ARTE.ok = ok; return v; })(); return r; });

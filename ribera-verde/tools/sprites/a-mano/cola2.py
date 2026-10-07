@@ -1,5 +1,6 @@
 # cola en racimos: cogollitos apilados (cada uno con su luz arriba a la izquierda y su sombra abajo a la derecha), el borde con
-# bultos, pelos naranjas y puntas de hoja de azúcar asomando entre racimos. P/Q/R = color de la cepa (claro/medio/oscuro)
+# bultos (cada cogollito, ancho arriba y estrecho abajo: las puntas de los cálices miran arriba y afuera; al revés, la cola
+# parecía un racimo de peras), pelos naranjas y puntas de hoja de azúcar asomando entre racimos. P/Q/R = color de la cepa (claro/medio/oscuro)
 def cola2(L, w=7, semilla=1, azucar=2, paso=3):
     r = [semilla * 7919 + 13]
     def azar(n):
@@ -10,13 +11,13 @@ def cola2(L, w=7, semilla=1, azucar=2, paso=3):
         nugs.append((y, (azar(3) - 1) if y > 2 else 0)); y += paso
     for k, (y0, ox) in reversed(list(enumerate(nugs))):
         prog = min(1, (y0 + 2) / 9)                 # los de arriba, más estrechos
-        hws = [w / 2 - 1.6, w / 2 - .6, w / 2, w / 2 - .9]
+        hws = [w / 2 - .4, w / 2, w / 2 - .5, w / 2 - 1.3]
         for i, hw in enumerate(hws):
             hw = max(.6, hw * (.45 + .55 * prog))
             for x in range(-4, w + 4):
                 u = (x - c - ox) / max(hw, .5)
                 if abs(x - c - ox) <= hw:
-                    s = u * .8 + (i - 1.5) * .5
+                    s = u * .8 + (i - .8) * .5
                     pts[(x, y0 + i)] = 'P' if s < -.3 else ('R' if s > .6 else 'Q')
         # pelos
         if azar(3) < 2:

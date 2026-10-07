@@ -147,7 +147,7 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
 - **Nombre:** primera palabra de la madre + última palabra del padre (si coincide con un padre, al revés; si ya existe, se añade «F2…F8»).
 - **THC:** media de los padres + aleatorio entre −1,5 y +2,0 (tope 33 %).
 - **Rendimiento:** media ± 4 g. **Días:** media ± 0,3 (redondeado a medios días). **Resistencia:** media ± 5 (entre 20 y 95).
-- **De la madre y del padre:** la madre (la primera que eliges) pasa un m % al azar entre 30 y 70 y el padre el resto (la ficha lo enseña: «60 % madre · 40 % padre»). Con ese reparto se mezclan el % índica, el tono de la hoja y el color del cogollo.
+- **De la madre y del padre:** en un cruce nuevo (sin receta), la madre (la primera que eliges) pasa un m % al azar entre 30 y 70 y el padre el resto. El híbrido se guarda la primera vez: si luego cruzas las mismas al revés, sale el mismo, con la madre y el reparto de entonces (la ficha lo enseña: «60 % madre · 40 % padre»). Con ese reparto se mezclan el % índica, el tono de la hoja y el color del cogollo.
 - Aparecen en la Genoteca con ★ y cuentan para el objetivo de «descubrir 8 variedades».
 
 ## Fórmulas de cultivo

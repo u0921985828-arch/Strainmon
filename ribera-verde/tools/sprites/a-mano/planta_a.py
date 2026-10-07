@@ -48,8 +48,9 @@ class Lienzo:
         g = [r[M:M + W] for r in g]
         while all(c == '.' for c in g[0]): g.pop(0)
         return [''.join(r) for r in g]
-# yema en flor: racimo de cálices (luz arriba a la izquierda), pelos (estigmas) naranjas y algún tricoma blanco
-YEMA = {1: ['.P.', 'PQ.', 'QRn', '.R.'], 2: ['..P.', '.PQ.', 'PFQR', 'QNnR', '.RR.'], 3: ['..P..', '.PQ..', 'PFQQ.', 'PQQRn', 'QNnRR', '.RRR.']}
+# yema en flor: racimo de cálices con la punta arriba (luz arriba a la izquierda), una hoja de azúcar asomando, pelos (estigmas)
+# naranjas y algún tricoma blanco. Ancha arriba y estrecha en el pie: con una sola punta arriba y la base redonda parecía una pera
+YEMA = {1: ['P.H', 'QPL', '.R.'], 2: ['.P.H', 'PQPL', 'QNQR', '.RR.'], 3: ['.P.P.', 'PQPQH', 'QFQNL', 'QQRR.', '.RR..']}
 def flor(H=62, W=38, ind=.5, estricto=True):
     """H filas sin el contorno de arriba (el dibujo mide H + 1)"""
     L_ = Lienzo(H, W, ind); put, pieza, hojap, sx = L_.put, L_.pieza, L_.hojap, L_.sx
