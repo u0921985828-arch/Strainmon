@@ -147,6 +147,8 @@ Solo en el barrio, desde el capítulo 2. Se comprueban en cada paso y, tras un e
 
 ## 9. Combate contra ladrones
 
+Probabilidades de cada encuentro, de cada estrategia y del soborno, por paso y por trayecto: [ANALISIS.md](ANALISIS.md).
+
 - **Ladrón:** vida `12 + 2 × capítulo + 0…4`; golpea entre `2 + capítulo/4` y `4 + capítulo/2` (divisiones redondeadas hacia abajo).
 
 | Opción | Efecto |

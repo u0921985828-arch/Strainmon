@@ -234,6 +234,9 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 
 ## Combates
 
+*Probabilidades de robos y controles, y problemas del guion: [ANALISIS.md](ANALISIS.md).*
+
+
 - *Ladrón:* «Un [nombre] te corta el paso.» (el nombre, en minúsculas) y luego una de estas: «La mochila. Dámela y no pasa nada.» / «Eh, tú. Sé lo que llevas encima.» / «Quieto. El dinero y lo que lleves.»
   - *Tus golpes:* «Le das un puñetazo.» / «Le das una patada.»; si fallas, «Fallas.», y con una patada de 11 o más, «Le has hecho daño de verdad.» · *Spray:* «Le echas SPRAY DE PIMIENTA a la cara.» / «No puede abrir los ojos.» · *Bocata:* «Te comes un BOCATA. Recuperas vida.»
   - *Ataques del ladrón:* «El [nombre] te golpea / te empuja contra un portal / te da una patada / te tira al suelo.»
