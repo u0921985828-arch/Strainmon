@@ -333,6 +333,15 @@
    ],
    "ajuste": "exacto",
    "nota": "planta A sin maceta de la vista C (38 px de ancho como mucho y 92 de alto); la base del tallo en (20, 95), el tallo en las columnas 19-20"
+  },
+  "objeto_muy_alto": {
+   "w": 32,
+   "h": 64,
+   "ancla": [
+    16,
+    63
+   ],
+   "ajuste": "pies"
   }
  },
  "fases": [
@@ -4578,6 +4587,73 @@
    "coste_real": 1
   },
   {
+   "id": "edificio-gray-puerta",
+   "tipo": "edificio",
+   "fase": "F4",
+   "herramienta": "importado",
+   "cubre": [],
+   "origen": "tools/sprites/a-mano/fachada_puerta.py: la fachada aprobada de edificio-gray con las dos ventanas de abajo separadas 9 px hacia los lados (solo mueve sus píxeles: misma paleta)",
+   "descripcion": "la casa gris con hueco para la puerta del piso (32 × 32, sin su pared) entre las dos ventanas de abajo",
+   "celda": "edificio_6x6",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "notas": "1.10: la casa de Txaro, la comisaría y el almacén (building(..., {fachada: 'gray-puerta', puerta: 'home', mascara: 1})). Antes llevaban la fachada sin puerta con la del piso o la del bar pegada encima de las ventanas. Pedido por el usuario: «mover las ventanas de abajo para que entre la puerta»."
+  },
+  {
+   "id": "props-altura",
+   "tipo": "objeto",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "cubre": [
+    "obj:counter",
+    "obj:barcounter"
+   ],
+   "celda": "objeto_1x1",
+   "ajuste_por_sprite": {
+    "counter": "exacto",
+    "barcounter": "exacto"
+   },
+   "origen": "tools/sprites/a-mano/alturas.py: el mostrador y la barra aprobados de props-16 con 5 filas más de frente (de 11 a 16 px: 1 m con la tapa)",
+   "descripcion": "mostrador de la tienda y de la comisaría y barra del bar, a su altura",
+   "notas": "1.10, pedido por el usuario («todos los muebles a la altura correcta»): a 16 px/m, como los personajes, el mostrador y la barra medían 0,69 m y la barra quedaba más baja que los taburetes."
+  },
+  {
+   "id": "prop-farola-alta",
+   "tipo": "objeto",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "cubre": [
+    "obj:lamp"
+   ],
+   "celda": "objeto_muy_alto",
+   "origen": "tools/sprites/a-mano/alturas.py: la farola aprobada de prop-farola con 29 filas más de poste (de 27 a 56 px: 3,5 m)",
+   "descripcion": "farola de calle a su altura (3,5 m), más alta que la gente y que las puertas",
+   "notas": "1.10, pedido por el usuario: la farola medía 1,69 m, lo mismo que el jugador. La luz de noche sigue siendo el charco del suelo (LAMPS)."
+  },
+  {
+   "id": "prop-gramola-alta",
+   "tipo": "objeto",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "cubre": [
+    "obj:jukebox"
+   ],
+   "celda": "objeto_alto",
+   "origen": "tools/sprites/a-mano/alturas.py: la gramola aprobada de props-16 con 8 filas más del panel de abajo (de 16 a 24 px: 1,5 m)",
+   "descripcion": "gramola del bar a su altura (1,5 m)",
+   "notas": "1.10, pedido por el usuario («todos los muebles a la altura correcta»): medía 1 m."
+  },
+  {
    "id": "props-16",
    "tipo": "objeto",
    "fase": "F4",
@@ -4593,14 +4669,11 @@
     "obj:lab2",
     "obj:table",
     "obj:shelfW",
-    "obj:counter",
     "obj:display",
     "obj:plantDeco",
-    "obj:barcounter",
     "obj:bottles",
     "obj:stool",
     "obj:btable",
-    "obj:jukebox",
     "obj:iwin",
     "obj:poster"
    ],
@@ -4878,9 +4951,7 @@
    "id": "prop-farola",
    "tipo": "objeto",
    "fase": "F4",
-   "cubre": [
-    "obj:lamp"
-   ],
+   "cubre": [],
    "descripcion": "tall black iron street lamp on the sidewalk, thin pole with a small square glass lantern on top, clean 16-bit handheld RPG pixel art, same style and light as the surrounding map",
    "celda": "objeto_alto",
    "referencias": [

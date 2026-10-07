@@ -328,9 +328,11 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.min = 600; await run(talkTonoAlmacen); R.dia = S.encargo && totalBuds(); S.min = 22 * 60; R.m = S.money; R.s = S.sales; R.rep = S.rep; R.heat = S.heat;
     await run(talkTonoAlmacen); R.d1 = { m: S.money - R.m, s: S.sales - R.s, rep: S.rep - R.rep, heat: S.heat - R.heat, ria: S.buds.ria, dragon: S.buds.dragon.g, enc: S.encargo, tono: ents.some(e => e.id === 'tono2') };
     S.map = 'bar'; S.min = 600; await run(talkBaltasar); R.e2 = S.encargo && S.encargo.hasta - S.day; R.rep2 = S.rep;
-    for (let k = 0; k < 3; k++) { newDay(); await idle(); } R.veto = S.encVeto - S.day; R.rep3 = S.rep; R.enc3 = S.encargo; const l0 = LOG.length; await run(talkBaltasar); R.fallo = LOG.slice(l0).some(l => /Me fallaste/.test(l)); S.map = 'home';
+    S.map = 'almacen'; buildEnts(); for (let k = 0; k < 3; k++) { newDay(); await idle(); } R.veto = S.encVeto - S.day; R.rep3 = S.rep; R.enc3 = S.encargo;
+    S.min = 22 * 60; let l0 = LOG.length; await run(talkTonoAlmacen); R.tarde = ents.some(e => e.id === 'tono2') && LOG.slice(l0).some(l => /El plazo se acabó/.test(l));   // vencido con Toño delante
+    S.map = 'bar'; S.min = 600; l0 = LOG.length; await run(talkBaltasar); R.fallo = LOG.slice(l0).some(l => /Me fallaste/.test(l)); S.map = 'home';
   }, () => R.e && R.e.g === 2000 && R.e.hasta === R.d + 2 && R.tono && R.dia === 2300 && R.d1.m === 12000 && R.d1.s === 12000 && R.d1.rep === 2 && R.d1.heat === 3 && !R.d1.ria && R.d1.dragon === 300 && R.d1.enc === null && !R.d1.tono
-    && R.e2 === 2 && R.rep3 === R.rep2 - 10 && R.enc3 === null && R.veto === 5 && R.fallo || R);
+    && R.e2 === 2 && R.rep3 === R.rep2 - 10 && R.enc3 === null && R.veto === 5 && R.tarde && R.fallo || R);
   await step('Mapa ampliado: barrio alto y astilleros con sus puertas; policía y ladrones según la zona; clientes de cada zona', [], async () => {
     S.ch = 5; S.protect = false; S.heat = 0; S.min = 600; S.money = 200; S.buds = {}; addBuds('ria', 10, 12);
     const r0 = Math.random, b0 = battle; window.R = { enc: {} }; let n; window.battle = async t => { n = t; };

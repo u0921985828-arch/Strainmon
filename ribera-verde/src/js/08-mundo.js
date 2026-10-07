@@ -47,7 +47,7 @@ const NPCDEF=[
   {id:'txaro',map:'txaro',x:6,y:3,look:'granny',cond:()=>!!S.flags.txaro,talk:()=>talkTxaro()},   // después del aceite, en su casa (1.10)
   {id:'inaki',map:'town',x:37,y:21,dir:'left',look:'sailor',cond:()=>S.ch>=2,talk:()=>talkInaki()},
   {id:'cop',map:'town',x:22,y:17,wander:3,look:'cop',cond:()=>S.ch>=2,talk:()=>talkCop()},
-  {id:'darko',map:'town',x:20,y:14,dir:'up',look:'darko',cond:()=>(S.ch>=2&&!S.flags.darko1)||S.ch===6,talk:()=>talkDarko()},
+  {id:'darko',map:'town',x:20,y:14,dir:'up',look:'darko',cond:()=>(S.ch>=2&&S.ch<7&&!S.flags.darko1)||S.ch===6,talk:()=>talkDarko()},
   {id:'darko2',map:'astilleros',x:24,y:16,look:'darko',cond:()=>S.ch>=7,talk:()=>talkDarko()},   // sus esquinas (1.10)
   {id:'molina',map:'town',x:23,y:15,look:'molina',cond:()=>S.ch>=5&&!S.flags.molina1,talk:()=>talkMolina()},
   {id:'molina',map:'comisaria',x:4,y:2,look:'molina',cond:()=>S.ch>=5&&!!S.flags.molina1,talk:()=>talkMolina()},   // la cuota, en la comisaría (1.10)
@@ -107,7 +107,7 @@ function onStepEnd(){
   if(door){run(()=>warp(door));return;}
   const Z=ZONAS[S.map];if(!Z)return;
   if(S.map==='town'&&P.y>=13&&P.y<=14&&P.x>=18&&P.x<=22){
-    if(S.ch>=2&&!S.flags.darko1){queue('darko',async()=>{const e=ents.find(e=>e.id==='darko');if(e)e.dir='up';await talkDarko();});return;}
+    if(S.ch>=2&&S.ch<7&&!S.flags.darko1){queue('darko',async()=>{const e=ents.find(e=>e.id==='darko');if(e)e.dir='up';await talkDarko();});return;}
     if(S.ch>=5&&!S.flags.molina1){queue('molina',talkMolina);return;}
   }
   if(S.ch>=2&&S.cool<=0){

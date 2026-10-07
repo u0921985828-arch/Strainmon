@@ -78,12 +78,12 @@ En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho de la carpa abi
 |  | Mesa | 14×13 | ancho | 0,88 m | 0,8 m | ×1,09 |
 |  | Planta deco | 14×16 | alto | 1 m | 0,9 m | ×1,11 |
 |  | Estantería | 16×9 | ancho | 1 m | 0,9 m | ×1,11 |
-|  | Mostrador | 16×11 | alto | 0,69 m | 1 m | **×0,69** |
+|  | Mostrador | 16×16 | alto | 1 m | 1 m | ×1,00 |
 |  | Expositor | 14×15 | ancho | 0,88 m | 0,8 m | ×1,09 |
 |  | Botellero | 16×11 | ancho | 1 m | 1 m | ×1,00 |
 |  | Taburete | 8×14 | alto | 0,88 m | 0,75 m | ×1,17 |
 |  | Mesa de bar | 14×14 | ancho | 0,88 m | 0,7 m | ×1,25 |
-|  | Gramola | 12×16 | ancho | 0,75 m | 0,7 m | ×1,07 |
+|  | Gramola | 12×24 | ancho | 0,75 m | 0,7 m | ×1,07 |
 |  | Cajas | 14×15 | ancho | 0,88 m | 0,6 m | **×1,46** |
 | Cultivo (piso, 16 px/m) | Armario 60×60 | 10×31 | ancho | 0,63 m | 0,6 m | ×1,04 |
 |  | Armario 80×80 | 13×35 | ancho | 0,81 m | 0,8 m | ×1,02 |
@@ -126,7 +126,7 @@ En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho de la carpa abi
 |  | Floración (híbrida) | 24×28 | alto | 0,58 m | 0,6 m | ×0,97 |
 |  | Lista (híbrida) | 28×33 | alto | 0,69 m | 0,7 m | ×0,98 |
 | Exterior | Árbol | 18×24 | alto | 1,5 m | 6 m | **×0,25** |
-|  | Farola | 6×27 | alto | 1,69 m | 4 m | **×0,42** |
+|  | Farola | 6×56 | alto | 3,5 m | 4 m | ×0,88 |
 |  | Banco | 16×12 | ancho | 1 m | 1,8 m | **×0,56** |
 |  | Fuente | 26×27 | ancho | 1,63 m | 3 m | **×0,54** |
 |  | Arbusto | 14×11 | ancho | 0,88 m | 1,2 m | **×0,73** |
@@ -144,7 +144,12 @@ En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho de la carpa abi
 3. **El piso, a tamaño real.** 12 × 8 casillas (72 m² con paredes; 12 × 6 m de suelo), frente a 240 m² de la 1.7.0.
 4. **Siguen fuera de escala, sin tocar:** la nevera (×1,9) y las cajas (×1,5), que se rehacen en P5 (D5); la cama
    (×1,3), los personajes que no cambian de altura (Unai ×1,3, Txaro ×1,13) y el exterior comprimido (árboles ×0,25,
-   farolas ×0,42, edificios ×0,5), que es la convención del género.
+   edificios ×0,5), que es la convención del género. Los árboles piden arte nuevo (pendiente).
+5. **Alturas corregidas en la 1.10** (retoque a mano, `tools/sprites/a-mano/alturas.py`, sin créditos): la farola
+   pasa de 1,69 a 3,5 m (×0,88), el mostrador y la barra del bar de 0,69 a 1 m (la barra, ya más alta que los
+   taburetes) y la gramola de 1 a 1,5 m. Lo que cuelga de la pared ya no se pinta a ras de suelo (`ALZA` en
+   `01b-arte.js` y `pinta.gd`): las ventanas y los carteles (el diploma) a 0,9 m, las baldas de las plantas a
+   1 m y el botellero a 1,05 m.
 
 ## 5. Decisión: opción A (1.8.0)
 

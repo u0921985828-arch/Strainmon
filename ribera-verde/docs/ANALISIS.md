@@ -67,7 +67,7 @@ Si un plazo vence (capítulos 3, 5 y 7), Toño se presenta al cambiar de día:
 | Josune | Bar | 3-4 € | Vida y rumores | Los rumores adelantan lo de Molina y Darko |
 | Sargento Molina | La primera vez, en la plaza (capítulo 5). Después, en la comisaría del barrio alto | 1.500 € cada 10 días | Protección (§ 2.1) | Se puede pagar por adelantado: cada pago suma 10 días. Al acabarse, un SMS |
 | Darko | Astilleros (24, 16), desde el capítulo 7 | — | — | Sus chicos vigilan las esquinas de los astilleros: 1 de cada 3 ventas allí acaba en pelea |
-| Don Baltasar | Bar, capítulo 8 | Llevar 2 kg (5 kg desde el 2.º rango del imperio y 10 kg desde el 3.º) al almacén de los astilleros, de noche, en 2 días | 6 €/g (12.000 € por 2 kg), +2 de reputación y +3 de calor | Toño espera en el almacén de 21:00 a 6:00 y se lleva primero los lotes más flojos. Si no llegas, reputación −10 y 5 días sin encargos |
+| Don Baltasar | Bar, capítulo 8 | Llevar 2 kg (5 kg desde Distribuidor de la ría y 10 kg desde Mayorista del norte) al almacén de los astilleros, de noche, en 2 días | 6 €/g (12.000 € por 2 kg), +2 de reputación y +3 de calor | Toño espera en el almacén de 21:00 a 6:00 y se lleva primero los lotes más flojos. Si no llegas, reputación −10 y 5 días sin encargos |
 | Ghost Train Haze | Mesa de genética | Cruzar Amnesia Haze × Fire OG | Un SMS de Kiko | Es la meta del final, junto con la genoteca |
 
 ### 1.3 Problemas del guion: cómo quedan
@@ -412,7 +412,7 @@ La caja no quita los encuentros del todo: hay que llevar la mercancía para vend
 ### 3.5 Dónde está en el código
 
 - **HTML:** `11b-caja.js` (la caja, el robo de Darko y los encargos de Baltasar); `08-mundo.js` (`S.caja`, `S.rec`, `S.vencidos`, `S.protHasta`, `S.encargo` y la migración); `09-cultivo.js` (el ordenador, la luz, la instalación de la empotrada y el robo al dormir); `11-historia.js` (`raidEvent`, el embargo, Molina y el capítulo 4); `12-menus.js` (la mochila); `04-mapas.js` (el barrio alto, los astilleros y los tres interiores).
-- **Godot:** lo mismo en `godot/src/trama.gd`, `juego.gd` y `pinta.gd`. `tests/historia.gd` juega los mismos 66 pasos que `npm test` y compara cada uno con el HTML, y `tests/pantallas.gd` compara las zonas nuevas y sus interiores píxel a píxel.
+- **Godot:** lo mismo en `godot/src/mundo.gd` (la caja, las zonas, los clientes y quién está en cada mapa), `granja.gd` (el día nuevo, la cama, el ordenador y la cosecha), `trama.gd` (la historia, la redada, el embargo, el robo y los encargos), `juego.gd` y `pinta.gd`. `tests/historia.gd` juega los mismos 66 pasos que `npm test` y compara cada uno con el HTML, y `tests/pantallas.gd` compara las zonas nuevas y sus interiores píxel a píxel.
 - **Tests:** los pasos de la caja, el robo, el embargo, la cuota, los encargos y las zonas en `tools/test-historia.js`; y en `analisis-riesgos.js`, los viajes de § 3.4 y la redada de § 2.6 jugados con la caja.
 
 ### 3.6 El robo de Darko (capítulo 7)

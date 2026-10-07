@@ -7,7 +7,9 @@ const gr=(m,x,y,k)=>{if(x>=0&&y>=0&&x<m.w&&y<m.h)m.g[y][x]=k;};
 const ob=(m,x,y,k)=>{if(x>=0&&y>=0&&x<m.w&&y<m.h)m.o[y][x]=k;};
 const rect=(m,x0,y0,x1,y1,fn)=>{for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)fn(x,y);};
 // op (1.10, edificios grises con puerta): ancha, la puerta ocupa doorX y doorX + 1 (se pinta centrada entre las dos: dx 8);
-// puerta, la fachada de la que sale la animación de la puerta ('home' o 'bar'); mascara, sin el trozo de pared de esa fachada
+// fachada, el arte de la fachada si no es el de id ('gray-puerta': la gris con las ventanas de abajo separadas para la puerta);
+// puerta, la fachada de la que sale la animación de la puerta ('home'); mascara, sin el trozo de pared de esa fachada
+const GRIS_PUERTA={ancha:1,fachada:'gray-puerta',puerta:'home',mascara:1,dx:8};   // la casa de Txaro, la comisaría y el almacén
 function building(m,id,x0,y0,w,h,doorX,warp,op){
   (m.blds=m.blds||[]).push(Object.assign({id,x0,y0,w,h,doorX},op));
   for(let x=x0;x<x0+w;x++){gr(m,x,y0,'roofT_'+id);gr(m,x,y0+1,'roofB_'+id);for(let y=y0+2;y<y0+h;y++)gr(m,x,y,'wall_'+id);
@@ -26,7 +28,7 @@ function buildMaps(){
   building(m,'home',2,3,7,6,5,{to:'home',x:5,y:6,dir:'up'});
   building(m,'shop',14,3,7,6,17,{to:'shop',x:4,y:6,dir:'up'});
   building(m,'bar',23,3,7,6,26,{to:'bar',x:4,y:6,dir:'up'});
-  building(m,'gray',32,3,6,6,34,{to:'txaro',x:4,y:6,dir:'up'},{ancha:1,puerta:'home',mascara:1,dx:8});   // casa de Txaro (1.10)
+  building(m,'gray',32,3,6,6,34,{to:'txaro',x:4,y:6,dir:'up'},GRIS_PUERTA);   // casa de Txaro (1.10)
   ob(m,9,8,'sign');ob(m,13,8,'sign');ob(m,22,8,'sign');
   [11,21,31].forEach(x=>ob(m,x,9,'lamp'));
   // park
@@ -68,7 +70,7 @@ function buildMaps(){
   ob(a,11,11,'fountain');[[7,8],[15,8],[7,14],[15,14]].forEach(([x,y])=>ob(a,x,y,'bench'));
   [[3,5],[19,5],[3,17],[19,17]].forEach(([x,y])=>ob(a,x,y,'lamp'));[[4,3],[8,3],[14,3],[18,3]].forEach(([x,y])=>ob(a,x,y,'tree'));
   [[2,6],[2,10],[2,14],[20,7],[20,12]].forEach(([x,y])=>ob(a,x,y,'bush'));ob(a,10,18,'sign');
-  building(a,'gray',24,13,6,6,26,{to:'comisaria',x:4,y:6,dir:'up'},{ancha:1,puerta:'bar',dx:8});
+  building(a,'gray',24,13,6,6,26,{to:'comisaria',x:4,y:6,dir:'up'},GRIS_PUERTA);
   rect(a,23,19,30,19,(x,y)=>gr(a,x,y,'walk'));ob(a,23,19,'sign');
   rect(a,31,14,37,18,(x,y)=>gr(a,x,y,'flowers'));rect(a,31,12,37,12,(x,y)=>ob(a,x,y,'fence'));[[32,15],[35,17],[36,14]].forEach(([x,y])=>ob(a,x,y,'bush'));
   [[24,4],[28,3],[33,4],[37,6],[26,8],[31,7],[35,9],[23,10],[29,10]].forEach(([x,y])=>ob(a,x,y,'tree'));
@@ -86,7 +88,7 @@ function buildMaps(){
   rect(t,0,23,39,29,(x,y)=>gr(t,x,y,'water'));rect(t,0,19,39,22,(x,y)=>gr(t,x,y,'dock'));
   rect(t,6,23,8,27,(x,y)=>gr(t,x,y,'dock'));rect(t,26,23,28,27,(x,y)=>gr(t,x,y,'dock'));
   [20,21].forEach(y=>t.doors['0,'+y]={to:'town',x:38,y,dir:'left'});
-  building(t,'gray',16,8,6,6,18,{to:'almacen',x:4,y:6,dir:'up'},{ancha:1,puerta:'home',mascara:1,dx:8});ob(t,15,13,'sign');ob(t,2,18,'sign');
+  building(t,'gray',16,8,6,6,18,{to:'almacen',x:4,y:6,dir:'up'},GRIS_PUERTA);ob(t,15,13,'sign');ob(t,2,18,'sign');
   rect(t,2,3,6,7,(x,y)=>gr(t,x,y,'tallgrass'));rect(t,30,13,35,15,(x,y)=>gr(t,x,y,'tallgrass'));rect(t,9,3,13,4,(x,y)=>gr(t,x,y,'grass'));
   rect(t,24,4,37,4,(x,y)=>ob(t,x,y,'fence'));rect(t,24,10,37,10,(x,y)=>{if(x!==30&&x!==31)ob(t,x,y,'fence');});rect(t,24,5,24,9,(x,y)=>ob(t,x,y,'fence'));rect(t,37,5,37,9,(x,y)=>ob(t,x,y,'fence'));
   [[25,5],[26,5],[25,6],[36,5],[36,6],[35,5],[28,8],[33,8],[3,17],[4,17],[10,16],[11,16],[10,15],[33,18],[34,18],[35,18],[7,27],[27,27],[22,17]].forEach(([x,y])=>ob(t,x,y,'crate'));

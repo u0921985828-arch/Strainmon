@@ -228,7 +228,7 @@ func npc_cond(d: Dictionary) -> bool:
 		"inaki", "cop":
 			return S.ch >= 2
 		"darko":
-			return (S.ch >= 2 and not S.flags.get("darko1")) or S.ch == 6
+			return (S.ch >= 2 and S.ch < 7 and not S.flags.get("darko1")) or S.ch == 6
 		"darko2":
 			return S.ch >= 7
 		"txaro":    # 1.10: después del aceite, en su casa
@@ -450,7 +450,7 @@ func on_step_end() -> void:
 		return
 	var Z: Dictionary = D.ZONAS[S.map]
 	if S.map == "town" and P.y >= 13 and P.y <= 14 and P.x >= 18 and P.x <= 22:
-		if S.ch >= 2 and not S.flags.get("darko1"):
+		if S.ch >= 2 and S.ch < 7 and not S.flags.get("darko1"):
 			queue("darko", func():
 				for e in ents:
 					if e.id == "darko":

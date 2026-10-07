@@ -121,8 +121,9 @@ for (const a of M.assets) {
   }
   // ---------- edificios (una pieza de 7×6 o 6×6 casillas, montada como en building()) ----------
   if (a.tipo === 'edificio') {
-    const id = a.id.replace('edificio-', ''), w = a.celda === 'edificio_6x6' ? 6 : 7, h = 6, doorX = id === 'gray' ? null : 3;
-    const o = blank(w * 16, h * 16), t = k => rd(`tiles/${k}_${id}.png`);
+    // gray-puerta (fachada retocada a mano para la puerta de home) se calca de las losetas de gray
+    const id = a.id.replace('edificio-', ''), ref = id.replace(/-puerta$/, ''), w = a.celda === 'edificio_6x6' ? 6 : 7, h = 6, doorX = ref === 'gray' ? null : 3;
+    const o = blank(w * 16, h * 16), t = k => rd(`tiles/${k}_${ref}.png`);
     for (let x = 0; x < w; x++) { copy(t('roofT'), o, x * 16, 0); copy(t('roofB'), o, x * 16, 16); for (let y = 2; y < h; y++) copy(t('wall'), o, x * 16, y * 16); if (x % 3 === 1 && x !== doorX) copy(t('win'), o, x * 16, 48); }
     if (doorX != null) copy(t('door'), o, doorX * 16, (h - 1) * 16);
     wr(a.id, 'base', 'unica', 0, o);

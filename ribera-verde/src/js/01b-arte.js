@@ -159,19 +159,22 @@ function arteOrilla(m,k,tx,ty,sx,sy){
   const f=frameDe('tileset-transiciones',t+'-'+String(mk).padStart(2,'0'),'unica',0,{i:0});if(!f)return false;
   ctx.drawImage(f.c,sx,sy,16,16);return true;
 }
-// objetos: los de 1 casilla en el suelo; los altos van a la lista ordenada por Y (tapan al jugador si está detrás)
+// objetos: los de 1 casilla en el suelo; los altos van a la lista ordenada por Y (tapan al jugador si está detrás). Los de la
+// pared (fila de abajo de la pared, 2 m a 16 px/m), subidos a su altura (1.10, ALZA px): ventanas y cuadros con el alféizar a
+// 0,9 m, las baldas de las plantas a 1 m y la de las botellas a 1,05 m (antes, todos a ras de suelo)
+const ALZA={iwin:-13,poster:-13,shelfW:-16,bottles:-13};
 function arteObj(o,tx,ty,cam,now,list){
   if(!ARTE.ok)return false;
   const g=ARTE.cubre['obj:'+o];if(!g)return false;
   const an=ARTE.sobre['obj:'+o];
   const f=an?frameDe(an[0][0],an[0][1],'unica',now,{bucle:true}):frameDe(g,o,'unica',0,{i:0});
   if(!f)return false;
-  const xp=tx*16+8-cam.x,yp=ty*16+15-cam.y;
+  const xp=tx*16+8-cam.x,yp=ty*16+15+(ALZA[o]||0)-cam.y;
   if(f.cel.h>16&&list)list.push([ty*16,()=>pinta(f,xp,yp)]);else pinta(f,xp,yp);
   return true;
 }
-// edificios grises con puerta (1.10): la puerta de otra fachada (b.puerta) y, con b.mascara, sin su trozo de pared (PARED: los
-// colores de la fachada del piso, quitados desde el borde del fotograma hacia dentro mientras sigan siendo pared)
+// edificios grises con puerta (1.10): su fachada (b.fachada, con hueco para la puerta), la puerta de otra (b.puerta) y, con b.mascara,
+// sin su trozo de pared (PARED: los colores de la fachada del piso, quitados desde el borde del fotograma hacia dentro mientras sigan siendo pared)
 const PARED=new Set(['248,248,240','246,232,200','224,206,170','220,214,198']),_sinPared=new Map();
 function puertaSinPared(c){
   let o=_sinPared.get(c);if(o)return o;
@@ -184,7 +187,7 @@ function puertaSinPared(c){
 function arteEdificios(m,cam){
   if(!ARTE.ok||!m.blds)return;
   for(const b of m.blds){
-    const g='edificio-'+b.id,f=frameDe(g,'base','unica',0,{i:0});if(!f)continue;
+    const g='edificio-'+(b.fachada||b.id),f=frameDe(g,'base','unica',0,{i:0});if(!f)continue;
     ctx.drawImage(f.c,b.x0*16-cam.x,b.y0*16-cam.y);
     const gp='edificio-'+(b.puerta||b.id);
     if(b.doorX!=null&&animDe(gp,'puerta')){

@@ -1316,6 +1316,9 @@ func encargo_baltasar(N: String):
 
 func talk_tono_almacen():
 	var N := "TOÑO"
+	if S.get("encargo") == null:   # vencido con él delante (sigue en pantalla hasta el próximo build_ents)
+		await say("El plazo se acabó. Don Baltasar ya te escribirá.", N)
+		return
 	var E: Dictionary = S.encargo
 	if not is_night():
 		await say("¿De día? ¿Tú estás loco? Vuelve de noche, a partir de las nueve.", N)

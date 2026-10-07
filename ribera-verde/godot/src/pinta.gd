@@ -322,6 +322,9 @@ func _arte_orilla(m: Dictionary, k: String, tx: int, ty: int, sx: int, sy: int) 
 	if f:
 		L.draw_texture_rect(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), false)
 
+# los de la pared, subidos a su altura (1.10, ALZA de 01b-arte.js: px)
+const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13}
+
 func _arte_obj(o: String, tx: int, ty: int, list: Array) -> void:
 	var gr = Atlas.cubre("obj:" + o)
 	if not gr:
@@ -331,7 +334,7 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array) -> void:
 	if f == null:
 		return
 	var xp: int = tx * 16 + 8 - cam.x
-	var yp: int = ty * 16 + 15 - cam.y
+	var yp: int = ty * 16 + 15 + int(ALZA.get(o, 0)) - cam.y
 	if f.cel.h > 16:
 		list.append([ty * 16, _pinta.bind(f, xp, yp)])
 	else:
@@ -341,7 +344,7 @@ func _arte_edificios(m: Dictionary) -> void:
 	if not Atlas.ok:
 		return
 	for b in m.get("blds", []):
-		var gr: String = "edificio-" + b.id
+		var gr: String = "edificio-" + b.get("fachada", b.id)
 		var f = Atlas.frame_de(gr, "base", "unica", 0, {"i": 0})
 		if f == null:
 			continue
@@ -354,8 +357,8 @@ func _arte_edificios(m: Dictionary) -> void:
 			if p:
 				_img(_sin_pared(p.c, "%s|%d" % [gp, p.i]) if b.get("mascara") else p.c, b.doorX * 16 - 8 + b.get("dx", 0) - cam.x, (dy + 1) * 16 - 32 - cam.y)
 
-# edificios grises con puerta (1.10): la puerta de otra fachada (b.puerta) y, con b.mascara, sin su trozo de pared (PARED: los
-# colores de la fachada del piso, quitados desde el borde del fotograma hacia dentro mientras sigan siendo pared; puertaSinPared)
+# edificios grises con puerta (1.10): su fachada (b.fachada, con hueco para la puerta), la puerta de otra (b.puerta) y, con b.mascara,
+# sin su trozo de pared (PARED: los colores de la fachada del piso, quitados desde el borde del fotograma hacia dentro mientras sigan siendo pared; puertaSinPared)
 const PARED := {"248,248,240": 1, "246,232,200": 1, "224,206,170": 1, "220,214,198": 1}
 var _sin_pared_c := {}
 func _sin_pared(c: Image, k: String) -> Image:

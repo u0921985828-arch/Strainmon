@@ -954,18 +954,26 @@ func _pasos() -> void:
 		await run(J.talk_baltasar)
 		R.e2 = J.S.encargo.hasta - J.S.day if J.S.encargo else J.S.encargo
 		R.rep2 = J.S.rep
+		J.S.map = "almacen"
+		J.build_ents()
 		for k in 3:
 			J.new_day()
 			await idle()
 		R.veto = J.S.encVeto - J.S.day
 		R.rep3 = J.S.rep
 		R.enc3 = J.S.encargo
+		J.S.min = 22 * 60
 		var l0 := LOG.size()
+		await run(J.talk_tono_almacen)
+		R.tarde = hay_tono.call() and lin.call(l0, "El plazo se acabó") != ""   # vencido con Toño delante
+		J.S.map = "bar"
+		J.S.min = 600
+		l0 = LOG.size()
 		await run(J.talk_baltasar)
 		R.fallo = lin.call(l0, "Me fallaste") != ""
 		J.S.map = "home",
 		func(): return (R.e and R.e.g == 2000 and R.e.hasta == R.d + 2 and R.tono and R.dia == 2300 and R.d1.m == 12000 and R.d1.s == 12000 and R.d1.rep == 2 and R.d1.heat == 3
-			and not R.d1.ria and R.d1.dragon == 300 and R.d1.enc == null and not R.d1.tono and R.e2 == 2 and R.rep3 == R.rep2 - 10 and R.enc3 == null and R.veto == 5 and R.fallo) or R)
+			and not R.d1.ria and R.d1.dragon == 300 and R.d1.enc == null and not R.d1.tono and R.e2 == 2 and R.rep3 == R.rep2 - 10 and R.enc3 == null and R.veto == 5 and R.tarde and R.fallo) or R)
 	step("Mapa ampliado: barrio alto y astilleros con sus puertas; policía y ladrones según la zona; clientes de cada zona", [], func():
 		J.S.ch = 5
 		J.S.protect = false

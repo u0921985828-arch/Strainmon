@@ -96,6 +96,7 @@ async function encargoBaltasar(N){
 }
 async function talkTonoAlmacen(){
   const N='TOÑO',E=S.encargo;
+  if(!E)return say('El plazo se acabó. Don Baltasar ya te escribirá.',N);   // vencido con él delante (sigue en pantalla hasta el próximo buildEnts)
   if(!isNight())return say('¿De día? ¿Tú estás loco? Vuelve de noche, a partir de las nueve.',N);
   if(totalBuds()<E.g)return say(`Don Baltasar dijo ${kgTxt(E.g)}. Llevas ${gTxt(totalBuds())}. Vuelve con todo.`,N);
   if(await ask(`¿Entregas ${kgTxt(E.g)}? Toño se lleva primero los lotes más flojos.`,['Entregar','Todavía no'],N)!==0)return;
