@@ -703,9 +703,15 @@ func plantar(i: int) -> void:
 		S.seeds.erase(sid)
 	S.pots[i] = Cultivo.nueva_planta(S, sid)
 	await say("Has plantado %s." % Datos.strain(S, sid).n)
-	if not S.get("pista_barras"):
-		S.pista_barras = true
-		await say("Encima de cada planta va su barra: arriba el agua (roja, toca regar) y abajo lo que le falta para cosechar (dorada, lista). Con plaga sale una «!» roja.")
+	await pista_barras()
+
+# con la primera planta, qué dice su barra (pistaBarras de 09-cultivo.js)
+func pista_barras() -> void:
+	if S.flags.get("barras"):
+		return
+	S.flags.barras = true
+	await say("Cada planta lleva su barra: arriba, el agua (roja: toca regar); abajo, la cosecha (dorada: lista).")
+	await say("Si le sale plaga, verás una «!» roja y manchas en las hojas. Trátala con INSECTICIDA.")
 
 func marca_feno(f) -> String:
 	var v = S.fenos.get(str(int(f.id))) if f is Dictionary and f.get("id") else null
@@ -763,11 +769,16 @@ func aviso_plaga(antes: Dictionary) -> void:
 	var siguen := []
 	var muertas := []
 	var hu := Cultivo.huecos(S)
+	var varias := 0
+	for c in S.carpas:
+		if c:
+			varias += 1
 	for i in S.pots.size():
 		var p = S.pots[i]
 		if p == null:
 			continue
-		var nom := "la %s (plaza %d)" % [Datos.strain(S, p.sid).n, hu[i].j + 1]
+		var donde: String = (Datos.carga().CARPAS[S.carpas[hu[i].c].t].n + ", ") if varias > 1 else ""
+		var nom := "la %s (%splaza %d)" % [Datos.strain(S, p.sid).n, donde, hu[i].j + 1]
 		var a: Array = antes.get(i, [false, false])
 		if p.get("dead"):
 			if not a[1]:
@@ -775,9 +786,9 @@ func aviso_plaga(antes: Dictionary) -> void:
 		elif p.pest:
 			(siguen if a[0] else nuevas).append(nom)
 	if nuevas.size():
-		var n: int = S.items.insect
-		var queda := (" (te queda%s %d)" % ["n" if n > 1 else "", n]) if n else ", pero no te queda"
-		await say("¡Plaga! Han salido bichos en %s: se comen las hojas. Trátala%s con INSECTICIDA%s." % [_lista(nuevas), "s" if nuevas.size() > 1 else "", queda])
+		var k: int = S.items.insect
+		var queda := ("te queda%s %d." % ["n" if k > 1 else "", k]) if k else "no te queda; cómpralo en el growshop."
+		await say("¡Plaga en %s! Trátala%s con INSECTICIDA: %s" % [_lista(nuevas), "s" if nuevas.size() > 1 else "", queda])
 	if siguen.size():
 		await say("Sigue la plaga en %s: sin tratar, pierde%s salud cada hora." % [_lista(siguen), "n" if siguen.size() > 1 else ""])
 	if muertas.size():
@@ -802,6 +813,9 @@ func _carga() -> Dictionary:
 				s.seeds[k] = int(s.seeds[k])
 			for k in s.items:
 				s.items[k] = int(s.items[k])
+			if not s.has("flags"):   # partidas de la 0.1.2: la pista iba en pista_barras
+				s.flags = {"barras": true} if s.get("pista_barras") else {}
+			s.erase("pista_barras")
 	return s
 
 # a un archivo aparte y luego se cambia de nombre: si se corta a medias, la partida de antes sigue entera. Sin ordenar las claves

@@ -291,7 +291,7 @@ func _corre() -> void:
 		var aviso := ""
 		var aviso_s := ""
 		while J.modo == "say":
-			if J.dlg_txt.text.begins_with("¡Plaga!"):
+			if J.dlg_txt.text.begins_with("¡Plaga en "):
 				aviso = J.dlg_txt.text
 			if J.dlg_txt.text.contains("secado del todo"):
 				aviso_s = J.dlg_txt.text

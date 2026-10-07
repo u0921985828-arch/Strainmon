@@ -8,9 +8,9 @@
 #   y por debajo de su distancia al foco
 # · dos plantas de la misma fila no se pisan ni balanceándose una hacia la otra
 # · se pinta de atrás adelante: la más honda (cy) antes y más arriba
-# · solo en el port (Vista.extras): las barras de agua y cosecha (con la «!» de plaga) y el cursor de la elegida no se pisan
+# · las barras de agua y cosecha (con la «!» de plaga) y el cursor de la elegida no se pisan
 #   y caben en la pantalla, con cualquier plaza elegida, también con plazas vacías o secas y plantas del todo altas; los daños de plaga de cada sprite (niveles 1-3) cambian
-#   píxeles de la planta y nunca su silueta ni la base del tallo; sin plaga, o con extras apagados (C2), la planta de siempre
+#   píxeles de la planta y nunca su silueta ni la base del tallo; tratada, la planta de siempre
 extends SceneTree
 
 const Datos = preload("res://src/datos.gd")
@@ -193,12 +193,9 @@ func _initialize() -> void:
 										elif c1 != c2:
 											cambia += 1
 								check(nombre + " con plaga (nivel %d): %d px dañados, %d fuera de sitio" % [Vista.nivel_dano(pl), cambia, silueta], cambia > 0 and silueta == 0)
-								Vista.extras = false
-								var e := Vista.img_planta(S, pl, v)
-								Vista.extras = true
-								check(nombre + ": con los extras apagados (C2), sin daños", e.get_data() == im.get_data())
 							pl.pest = false
 							pl.health = 100.0
+							check(nombre + ": tratada, sin daños", Vista.img_planta(S, pl, v).get_data() == im.get_data())
 							dib[i].append({"c": nombre, "f": fs, "sh": sh, "y": q.y})
 				S.pots[i] = null
 			# vecinas de la misma fila
@@ -265,7 +262,7 @@ func _initialize() -> void:
 					if o[a].cy > o[b].cy:
 						bien = bien and a < b and o[a].y < o[b].y
 			check("%s %s: de atrás adelante" % [t, fk], bien)
-	for k in ["borde de su celda", "trozos sueltos", "fuera de la pantalla", "pisa la campana", "cerca del foco", "aire mínimo", "de atrás adelante", "barras", "con plaga", "extras apagados"]:
+	for k in ["borde de su celda", "trozos sueltos", "fuera de la pantalla", "pisa la campana", "cerca del foco", "aire mínimo", "de atrás adelante", "barras", "con plaga", "tratada"]:
 		var m := fallos.filter(func(f): return f.contains(k)).size()
 		if m:
 			print("  %s: %d" % [k, m])

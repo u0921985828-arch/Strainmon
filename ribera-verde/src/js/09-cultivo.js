@@ -117,11 +117,17 @@ async function plantar(i){
   if(j>=own.length){
     const e=esq.splice(j-own.length,1)[0];
     S.pots[i]={sid:e.sid,prog:.12,water:70,health:100,fert:false,pest:false,f:e.f};sfx('sel');   // ya enraizado: empieza de plántula
-    await accion('plantar');return say(`Plantas el esqueje de ${getStrain(e.sid).n}${marcaFeno(e.f)}.`);
+    await accion('plantar');await say(`Plantas el esqueje de ${getStrain(e.sid).n}${marcaFeno(e.f)}.`);return pistaBarras();
   }
   const sid=own[j][0];S.seeds[sid]--;if(!S.seeds[sid])delete S.seeds[sid];
   S.pots[i]={sid,prog:0,water:70,health:100,fert:false,pest:false,f:rollFeno(sid)};sfx('sel');
-  await accion('plantar');return say(`Has plantado ${getStrain(sid).n}.`);
+  await accion('plantar');await say(`Has plantado ${getStrain(sid).n}.`);return pistaBarras();
+}
+// con la primera planta, qué dice su barra (09b-carpa)
+async function pistaBarras(){
+  if(S.flags.barras)return;S.flags.barras=true;
+  await say('Cada planta lleva su barra: arriba, el agua (roja: toca regar); abajo, la cosecha (dorada: lista).');
+  await say('Si le sale plaga, verás una «!» roja y manchas en las hojas. Trátala con INSECTICIDA.');
 }
 async function sacarEsqueje(i){
   const p=S.pots[i],s=getStrain(p.sid);
@@ -205,10 +211,24 @@ async function bedAction(){
   const c=await ask('Tu cama. Todavía huele a la colonia de la tía.',['Dormir hasta las 7','Siesta de 3 h','Nada']);
   if(c>1)return;
   await fade(1);
-  const mins=c===1?180:(((7*60-S.min)+1440)%1440||1440);
+  const mins=c===1?180:(((7*60-S.min)+1440)%1440||1440),antes=S.pots.map(p=>p&&[!!p.pest,!!p.dead]);
   advanceTime(mins);S.hp=S.hpMax;buildEnts();updateHUD();await wait(500);await fade(0);
   const hoy=S.luz&&S.luz.d===S.day&&S.luz;
   save();toast('Has descansado'+(hoy&&hoy.e?' · Luz −'+eur(hoy.e):'')+(hoy&&hoy.o?' · Olor: calor +'+hoy.o:'')+' · Partida guardada',1800);
+  await avisoPlaga(antes);
+}
+// al despertar (1.10): las plantas que han cogido plaga mientras dormías (y el insecticida que te queda), las que la siguen teniendo
+// sin tratar y las que se han secado del todo (antes: [plaga, muerta] de cada plaza al acostarte)
+async function avisoPlaga(antes){
+  const nuevas=[],siguen=[],muertas=[],H=huecos(),varias=S.carpas.filter(c=>c).length>1;
+  S.pots.forEach((p,i)=>{if(!p)return;const a=antes[i]||[false,false],
+    nom=`la ${getStrain(p.sid).n} (${varias?CARPAS[S.carpas[H[i].c].t].n+', ':''}plaza ${H[i].j+1})`;
+    if(p.dead){if(!a[1])muertas.push(nom);}else if(p.pest)(a[0]?siguen:nuevas).push(nom);});
+  const lista=L=>L.length===1?L[0]:L.slice(0,-1).join(', ')+' y '+L[L.length-1],s=L=>L.length>1?'s':'',n=L=>L.length>1?'n':'';
+  if(nuevas.length){const k=S.items.insect;sfx('bad');
+    await say(`¡Plaga en ${lista(nuevas)}! Trátala${s(nuevas)} con INSECTICIDA: ${k?`te queda${k>1?'n':''} ${k}.`:'no te queda; cómpralo en el growshop.'}`);}
+  if(siguen.length)await say(`Sigue la plaga en ${lista(siguen)}: sin tratar, pierde${n(siguen)} salud cada hora.`);
+  if(muertas.length)await say(`Se ha${n(muertas)} secado del todo ${lista(muertas)}. Retírala${s(muertas)} con A.`);
 }
 async function pcAction(){
   const o=['Genoteca'].concat(S.ch>=2?['Banco de semillas']:[],['Guardar partida','Apagar']);

@@ -2,8 +2,8 @@
 # geo(S, ci) es vcGeo + vistaC: dónde va cada maceta y qué planta, a qué alto. pinta(S, VC, now) dibuja como renderCarpaC:
 # fondo negro, pared, macetas y plantas (las de delante de la fila elegida en transparencia), la luz del foco en «overlay»
 # (shader sobre lo ya pintado), la campana y el cursor. Todo en px del juego: el nodo va en un SubViewport de 160 de alto.
-# Solo en el port (extras): encima de cada planta, su barra de agua y de cosecha con el aviso de plaga, y los daños de la
-# plaga pintados sobre sus hojas; C2 los apaga para comparar con el HTML.
+# Encima de cada planta, su barra de agua y de cosecha con el aviso de plaga, y los daños de la plaga pintados sobre sus
+# hojas (como el HTML desde la 1.10: barras, posCursor, vcBarra y vcDano de 09b-carpa.js).
 extends Node2D
 
 const Datos = preload("res://src/datos.gd")
@@ -18,8 +18,6 @@ const BH := 7
 const BP := 6
 const OSC := Color8(0x26, 0x26, 0x2e)
 const VACIO := Color8(0x4a, 0x4a, 0x56)
-
-static var extras := true
 
 const OVERLAY := """
 shader_type canvas_item;
@@ -172,16 +170,16 @@ static func clave_planta(S_: Dictionary, p: Dictionary, v: Dictionary) -> String
 	var n := nivel_dano(p)
 	return k + ("|d%d|%d" % [n, semilla(p)] if n else "")
 
-# daños de la plaga según la salud que le queda (solo en el port); tratada, ninguno
+# daños de la plaga según la salud que le queda; tratada, ninguno
 static func nivel_dano(p: Dictionary) -> int:
-	if not extras or not p.pest or p.get("dead"):
+	if not p.pest or p.get("dead"):
 		return 0
 	return 1 if p.health >= 75 else (2 if p.health >= 45 else 3)
 
 # cada planta, sus manchas: del id de su fenotipo (los esquejes, las de su madre)
 static func semilla(p: Dictionary) -> int:
 	var f = p.get("f")
-	return int(f.id) if f is Dictionary and f.get("id") else hash(p.sid)
+	return int(f.id) if f is Dictionary and f.get("id") else Datos.hash_str(p.sid)
 
 # la planta tal como se pinta: el fotograma de su alto (sin las filas de más), con los colores de su variedad y seca sin agua
 static func img_planta(S_: Dictionary, p: Dictionary, v: Dictionary) -> Image:
@@ -192,7 +190,7 @@ static func img_planta(S_: Dictionary, p: Dictionary, v: Dictionary) -> Image:
 	var im := Arte.recolor(c0, mapa)
 	var n := nivel_dano(p)
 	if n:
-		im = Arte.dano(im, c0, n, semilla(p) ^ hash(v.p.n))
+		im = Arte.dano(im, c0, n, semilla(p) ^ Datos.hash_str(v.p.n))
 	if p.water <= 0:
 		im = Arte.seca(im)
 	return im
@@ -207,7 +205,7 @@ static func con_barra(S_: Dictionary, q: Dictionary) -> bool:
 
 static func barras(S_: Dictionary, g_: Dictionary, sel := -1) -> Array:
 	var o := []
-	if not extras or g_.is_empty() or g_.vc == null:
+	if g_.is_empty() or g_.vc == null:
 		return o
 	var cajas := []
 	for q in g_.pl:

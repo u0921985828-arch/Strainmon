@@ -1307,11 +1307,17 @@ async function plantar(i){
   if(j>=own.length){
     const e=esq.splice(j-own.length,1)[0];
     S.pots[i]={sid:e.sid,prog:.12,water:70,health:100,fert:false,pest:false,f:e.f};sfx('sel');   // ya enraizado: empieza de plántula
-    await accion('plantar');return say(`Plantas el esqueje de ${getStrain(e.sid).n}${marcaFeno(e.f)}.`);
+    await accion('plantar');await say(`Plantas el esqueje de ${getStrain(e.sid).n}${marcaFeno(e.f)}.`);return pistaBarras();
   }
   const sid=own[j][0];S.seeds[sid]--;if(!S.seeds[sid])delete S.seeds[sid];
   S.pots[i]={sid,prog:0,water:70,health:100,fert:false,pest:false,f:rollFeno(sid)};sfx('sel');
-  await accion('plantar');return say(`Has plantado ${getStrain(sid).n}.`);
+  await accion('plantar');await say(`Has plantado ${getStrain(sid).n}.`);return pistaBarras();
+}
+// con la primera planta, qué dice su barra (09b-carpa)
+async function pistaBarras(){
+  if(S.flags.barras)return;S.flags.barras=true;
+  await say('Cada planta lleva su barra: arriba, el agua (roja: toca regar); abajo, la cosecha (dorada: lista).');
+  await say('Si le sale plaga, verás una «!» roja y manchas en las hojas. Trátala con INSECTICIDA.');
 }
 async function sacarEsqueje(i){
   const p=S.pots[i],s=getStrain(p.sid);
@@ -1395,10 +1401,24 @@ async function bedAction(){
   const c=await ask('Tu cama. Todavía huele a la colonia de la tía.',['Dormir hasta las 7','Siesta de 3 h','Nada']);
   if(c>1)return;
   await fade(1);
-  const mins=c===1?180:(((7*60-S.min)+1440)%1440||1440);
+  const mins=c===1?180:(((7*60-S.min)+1440)%1440||1440),antes=S.pots.map(p=>p&&[!!p.pest,!!p.dead]);
   advanceTime(mins);S.hp=S.hpMax;buildEnts();updateHUD();await wait(500);await fade(0);
   const hoy=S.luz&&S.luz.d===S.day&&S.luz;
   save();toast('Has descansado'+(hoy&&hoy.e?' · Luz −'+eur(hoy.e):'')+(hoy&&hoy.o?' · Olor: calor +'+hoy.o:'')+' · Partida guardada',1800);
+  await avisoPlaga(antes);
+}
+// al despertar (1.10): las plantas que han cogido plaga mientras dormías (y el insecticida que te queda), las que la siguen teniendo
+// sin tratar y las que se han secado del todo (antes: [plaga, muerta] de cada plaza al acostarte)
+async function avisoPlaga(antes){
+  const nuevas=[],siguen=[],muertas=[],H=huecos(),varias=S.carpas.filter(c=>c).length>1;
+  S.pots.forEach((p,i)=>{if(!p)return;const a=antes[i]||[false,false],
+    nom=`la ${getStrain(p.sid).n} (${varias?CARPAS[S.carpas[H[i].c].t].n+', ':''}plaza ${H[i].j+1})`;
+    if(p.dead){if(!a[1])muertas.push(nom);}else if(p.pest)(a[0]?siguen:nuevas).push(nom);});
+  const lista=L=>L.length===1?L[0]:L.slice(0,-1).join(', ')+' y '+L[L.length-1],s=L=>L.length>1?'s':'',n=L=>L.length>1?'n':'';
+  if(nuevas.length){const k=S.items.insect;sfx('bad');
+    await say(`¡Plaga en ${lista(nuevas)}! Trátala${s(nuevas)} con INSECTICIDA: ${k?`te queda${k>1?'n':''} ${k}.`:'no te queda; cómpralo en el growshop.'}`);}
+  if(siguen.length)await say(`Sigue la plaga en ${lista(siguen)}: sin tratar, pierde${n(siguen)} salud cada hora.`);
+  if(muertas.length)await say(`Se ha${n(muertas)} secado del todo ${lista(muertas)}. Retírala${s(muertas)} con A.`);
 }
 async function pcAction(){
   const o=['Genoteca'].concat(S.ch>=2?['Banco de semillas']:[],['Guardar partida','Apagar']);
@@ -1610,7 +1630,8 @@ function renderCarpaC(g,now){
   // la luz del foco es su propia capa y va delante de pared, macetas y plantas (ninguna lleva la luz pintada); la campana, encima
   if(on){ctx.globalCompositeOperation='overlay';ctx.globalAlpha=(LUZ_C[vc.tipo]||[0,1])[1];ctx.drawImage(vcLuz(c.t,vc),0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';}
   const fc=vc.foco.f.c;ctx.drawImage(on?fc:vcApagado(fc),120-24,VCA.boca-15);
-  vcCursor(g,now);
+  const bs=barras(g,VC.sel);for(const b of bs)vcBarra(b,b.fila<fsel?.35:1,now);
+  vcCursor(g,now,bs);
   if(ARTE.ok)pintarVfx(now,{x:0,y:0},'home');
   ctx.restore();
 }
@@ -1632,7 +1653,8 @@ function vcPlantaC(q,now){
   const v=q.v,p=S.pots[q.i];ctx.drawImage(v.m.f.c,q.x-16,q.y-31);
   if(!p)return;
   const s=getStrain(p.sid),rk=((ARTE.d.rampas||{})['carpa-c-plantas-a']||{}).cogollo,c0=vcDibujo(v),yb=q.y-v.tierra,hj=hojaPlanta(p);
-  const pc=rk&&s?conRampa(c0,{[rk.rampa[0]]:shade(s.c,50),[rk.rampa[1]]:s.c,[rk.rampa[2]]:shade(s.c,-60),...vcTonos(hj)},'g|'+s.c+'|'+hj):c0;
+  const pc0=rk&&s?conRampa(c0,{[rk.rampa[0]]:shade(s.c,50),[rk.rampa[1]]:s.c,[rk.rampa[2]]:shade(s.c,-60),...vcTonos(hj)},'g|'+s.c+'|'+hj):c0;
+  const nd=nivelDano(p),pc=nd&&rk?vcDano(pc0,c0,nd,semDano(p)^hashStr(v.p.n),rk.rampa):pc0;   // con plaga, los daños encima
   if(p.water<=0)ctx.filter='saturate(.4) sepia(.7)';   // seca: amarillenta
   const b=pc.height-1;balanceo(pc,q.x-(pc.width>>1),yb-b,b,p.water>0?1:0,now+q.x*37);
   ctx.filter='none';
@@ -1782,7 +1804,8 @@ function renderCarpa(now){
   const fc=foco34(c.foco),x0=g.fx-(fc.width>>1),y0=g.fy-fc.height+1,ty=y0+(F.tipo==='led'?4:0);   // cuelga de dos cuerdas
   ctx.fillStyle='#2a2b30';if(ty>g.barra){ctx.fillRect(x0+2,g.barra,1,ty-g.barra);ctx.fillRect(x0+fc.width-3,g.barra,1,ty-g.barra);}
   ctx.drawImage(fc,x0,y0);
-  vcCursor(g,now);
+  const bs=barras(g,VC.sel);for(const b of bs)vcBarra(b,b.fila<fsel?.35:1,now);
+  vcCursor(g,now,bs);
   if(ARTE.ok)pintarVfx(now,{x:0,y:0},'home');
   ctx.restore();
 }
@@ -1796,13 +1819,79 @@ function vcPlanta(q,now){
   balanceo(pc,q.x-24,yb-79,79,!p.dead&&p.water>0&&st>=2?1:0,now+q.x*37);
   if(p.pest&&!p.dead){ctx.fillStyle='#e02828';for(let n=0;n<6;n++)ctx.fillRect(q.x-6+((n*5+Math.floor(now/300))%12),yb-8-((n*7)%14),1,1);}
 }
-function vcCursor(g,now){
+function vcCursor(g,now,bs=[]){
   const b=Math.floor(now/300)%2;let x,y;
   if(VC.sel<0){const fw=g.fw||foco34(g.c.foco).width;x=g.fx-(fw>>1)-8;y=g.fy-5;ctx.fillStyle='#26262e';ctx.fillRect(x-1,y-4,6,9);ctx.fillStyle='#f8f8f0';for(let k=0;k<4;k++)ctx.fillRect(x+b+k,y-3+k,1,7-2*k);return;}
   const q=g.pl.find(q=>q.i===VC.sel);if(!q)return;
   ctx.fillStyle='rgba(255,255,240,.35)';ctx.fillRect(q.x-7,q.y,14,2);
-  x=q.x;y=q.y-(q.alto||12)-9+b;
+  [x,y]=posCursor(g,VC.sel,bs);y+=b;
   ctx.fillStyle='#26262e';ctx.fillRect(x-4,y-1,9,6);ctx.fillStyle='#f8f8f0';for(let k=0;k<4;k++)ctx.fillRect(x-3+k,y+k,7-2*k,1);
+}
+/* ---------- barras y daños de la plaga (1.10) ----------
+   Encima de cada planta, su barra: arriba el agua (por debajo de 30, roja y parpadeando: toca regar) y abajo lo que le falta para
+   cosechar (dorada y parpadeando, lista); con plaga, una «!» roja al lado. Se colocan de delante atrás y, si una pisa a otra, sube.
+   La de la plaza elegida deja sitio encima al cursor (CUR filas) y, si la elegida no tiene barra (vacía o seca), su cursor también
+   aparta las barras. Las de delante de la fila elegida van en transparencia, como sus plantas, en rectángulos que no se pisan. */
+const BW=16,BH=7,BP=6,CUR=7;
+const conBarra=q=>{const p=S.pots[q.i];return !!p&&!p.dead&&(!q.v||!!q.v.p);};
+// lo que ocupa el cursor con su bote (9 × 7) y si dos cajas se tocan (con 1 px de aire)
+const cajaCursor=([x,y])=>({x:x-4,y:y-1,w:9,h:7}),choca=(a,b)=>a.x-1<b.x+b.w&&a.x+a.w+1>b.x&&a.y-1<b.y+b.h&&a.y+a.h+1>b.y;
+function barras(g,sel){
+  const o=[],cajas=[];
+  for(const q of g.pl)if(q.i===sel&&!conBarra(q))cajas.push(cajaCursor(posCursor(g,sel,[])));
+  for(const q of [...g.pl].sort((a,b)=>b.y-a.y||a.x-b.x||a.i-b.i)){
+    if(!conBarra(q))continue;const p=S.pots[q.i],cur=q.i===sel?CUR:0,r={x:q.x-(BW>>1),y:q.y-q.alto+3-BH,w:BW+(p.pest?BP:0),h:BH};
+    for(let mueve=true;mueve;){mueve=false;for(const c of cajas)if(choca(c,{x:r.x,y:r.y-cur,w:r.w,h:r.h+cur})){r.y=c.y-BH-1;mueve=true;}}
+    const caja={x:r.x,y:r.y-cur,w:r.w,h:r.h+cur};cajas.push(caja);o.push({i:q.i,r,p,caja,fila:q.fila});}
+  return o;
+}
+// el cursor de la plaza elegida (arriba a la izquierda de la flecha, sin el bote): encima de su barra o de su planta (12 px si no hay)
+function posCursor(g,sel,bs){const q=g.pl.find(q=>q.i===sel);if(!q)return [-1,-1];const e=bs.find(e=>e.i===sel);
+  return e?[q.x,e.r.y-6]:[q.x,q.y-(q.alto||12)-9];}
+function vcBarra(b,al,now){
+  const {x,y}=b.r,p=b.p,tic=Math.floor(now/400)%2===1,n=BW-2,R=(rx,ry,w,h,c)=>{if(w>0&&h>0){ctx.fillStyle=c;ctx.fillRect(rx,ry,w,h);}};
+  ctx.globalAlpha=al;
+  for(const f of [y,y+3,y+6])R(x+1,f,n,1,'#26262e');R(x,y+1,1,BH-2,'#26262e');R(x+BW-1,y+1,1,BH-2,'#26262e');
+  const sed=p.water<30&&tic,na=Math.ceil(clamp(p.water,0,100)*n/100);
+  R(x+1,y+1,na,1,sed?'#f08078':'#76b4f2');R(x+1,y+2,na,1,sed?'#e04040':'#4a92e0');R(x+1+na,y+1,n-na,2,sed?'#7a2a30':'#4a4a56');
+  const lista=p.prog>=1,nc=lista?n:Math.floor(clamp(p.prog,0,1)*n);
+  R(x+1,y+4,nc,1,lista?(tic?'#fff4b0':'#f8d860'):'#b0e48c');R(x+1,y+5,nc,1,lista?(tic?'#f8d860':'#d8a030'):'#62aa56');R(x+1+nc,y+4,n-nc,2,'#4a4a56');
+  if(p.pest){const px=x+BW,rojo=tic?'#a02020':'#e04040';
+    R(px,y,BP,1,'#26262e');R(px,y+BH-1,BP,1,'#26262e');R(px,y+1,1,BH-2,'#26262e');R(px+BP-1,y+1,1,BH-2,'#26262e');
+    R(px+1,y+1,1,BH-2,rojo);R(px+BP-2,y+1,1,BH-2,rojo);R(px+2,y+4,2,1,rojo);R(px+2,y+1,2,3,'#f8f8f0');R(px+2,y+5,2,1,'#f8f8f0');}
+  ctx.globalAlpha=1;
+}
+// daños de la plaga según la salud que le queda (tratada, ninguno); cada planta, sus manchas: del id de su fenotipo (los esquejes, las de su madre)
+const nivelDano=p=>!p.pest||p.dead?0:p.health>=75?1:p.health>=45?2:3,semDano=p=>p.f&&p.f.id?p.f.id:hashStr(p.sid);
+// los daños encima de la planta (pc, ya con sus colores), sacados de su propio fotograma (c0): en las hojas y el tallo (los verdes de
+// VC_HOJA) y en los cogollos (la rampa clave, rk), nunca en la base del tallo, cada píxel con el tono de su sitio en la rampa, así que
+// la luz y la sombra del sprite se quedan: en las hojas, manchas amarillas con el centro pardo, el punteado claro de los bichos y, en
+// el nivel 3, bordes quemados; en los cogollos, telilla blanca y podrido pardo. La silueta no cambia. Nivel 1-3; sem: la misma
+// planta, las mismas manchas
+const DANO={a:['#4c4a1e','#7c7428','#b4a83a','#e2d66a','#a8984a','#605a2a'],p:['#3a2416','#5c3a1e','#7e5228','#a87638','#8a6434','#4c3220'],
+  '.':['#8a8a60','#b8b484','#e8e6b0','#f4f2cc','#e0dca8','#a8a47c'],ca:['#f4f2ea','#cfcbc0','#8e8a80'],'c.':['#f4f2ea','#cfcbc0','#8e8a80'],cp:['#9a8670','#6e5c4a','#463a30']};
+function azarDano(x,y,s,k){let h=(Math.imul(x,73856093)+Math.imul(y,19349663)+Math.imul(s,83492791)+Math.imul(k,40503))&0x7fffffff;
+  h=Math.imul(h^(h>>13),1274126177)&0x7fffffff;h=Math.imul(h^(h>>16),668265263)&0x7fffffff;return (h^(h>>15))/2147483648;}
+const vcDanos=new WeakMap();
+function vcDano(pc,c0,nivel,sem,rk){
+  let m=vcDanos.get(pc);if(!m)vcDanos.set(pc,m=new Map());const key=nivel+'|'+sem;if(m.has(key))return m.get(key);
+  const ix={};VC_HOJA.forEach((h,j)=>ix[parseInt(h.slice(1),16)]=j);rk.forEach((h,j)=>ix[parseInt(h.slice(1),16)]=10+j);
+  const W=pc.width,H=pc.height,[o,x]=mkCanvas(W,H);x.drawImage(pc,0,0);const im=x.getImageData(0,0,W,H),d=im.data,d0=c0.getContext('2d').getImageData(0,0,W,H).data;
+  const mancha=[0,.18,.28,.38][nivel],punto=[0,.10,.15,.20][nivel],cw=(W>>2)+3,celdas=[];
+  for(let cy=-1;cy<(H>>2)+2;cy++)for(let cx=-1;cx<(W>>2)+2;cx++)celdas.push(azarDano(cx,cy,sem,1)>=mancha?null:
+    [cx*4+azarDano(cx,cy,sem,2)*4,cy*4+azarDano(cx,cy,sem,3)*4,1.1+azarDano(cx,cy,sem,4)*(.5+.4*nivel)]);
+  for(let yy=H-vcAlto(c0);yy<H-3;yy++)for(let xx=0;xx<W;xx++){
+    const k=(yy*W+xx)*4;if(!d0[k+3])continue;const j=ix[(d0[k]<<16)|(d0[k+1]<<8)|d0[k+2]];if(j==null)continue;
+    let t='';
+    for(let cy=(yy>>2)-1;cy<(yy>>2)+2;cy++)for(let cx=(xx>>2)-1;cx<(xx>>2)+2;cx++){const c=celdas[(cy+1)*cw+cx+1];if(!c)continue;
+      const dd=Math.sqrt((xx+.5-c[0])*(xx+.5-c[0])+(yy+.5-c[1])*(yy+.5-c[1]));if(dd<=c[2]*.45&&nivel>=2)t='p';else if(dd<=c[2]&&t==='')t='a';}
+    const cog=j>=10;if(cog&&t==='a')t='';
+    if(t===''&&nivel>=3&&!cog&&azarDano(xx,yy,sem,5)<.4)for(const [ex,ey] of [[-1,0],[1,0],[0,-1],[0,1]]){const a=xx+ex,b=yy+ey;
+      if(a<0||b<0||a>=W||b>=H||!d0[(b*W+a)*4+3])t='p';}
+    if(t===''&&azarDano(xx,yy,sem,6)<punto)t='.';
+    if(t){const n=parseInt(DANO[cog?'c'+t:t][cog?j-10:j].slice(1),16);d[k]=n>>16;d[k+1]=(n>>8)&255;d[k+2]=n&255;}
+  }
+  x.putImageData(im,0,0);m.set(key,o);return o;
 }
 function vcInfo(){
   const el=$('vcInfo');if(!VC||VC.ocupado){el.hidden=true;return;}

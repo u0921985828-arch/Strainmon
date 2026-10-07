@@ -15,7 +15,7 @@ static func azar() -> float:
 static func nuevo_estado() -> Dictionary:
 	return {"day": 1, "min": 8 * 60, "money": 150, "carpas": [{"t": "m100", "foco": "sodio400"}], "macetas": ["plastico7", "plastico7", "plastico7", "plastico7"],
 		"pots": [null, null, null, null], "seeds": {"ria": 2, "limon": 1, "txoko": 1, "niebla": 1}, "items": {"fert": 2, "insect": 3},
-		"buds": {}, "custom": {}, "gen": {}, "fenos": {}, "fenoN": 0}
+		"buds": {}, "custom": {}, "gen": {}, "fenos": {}, "fenoN": 0, "flags": {}}
 
 # plazas de todas las carpas, en orden: S.pots[i] y S.macetas[i] son las de la plaza i
 static func huecos(S: Dictionary) -> Array:

@@ -272,7 +272,6 @@ func translucido(e: Dictionary) -> Array:
 	return o
 
 func _pinta(O: Dictionary, dir: String) -> void:
-	Vista.extras = false   # sin lo que solo tiene el port (barras y daños de plaga): la escena del HTML tal cual
 	var tot := 0
 	for e in O.escenas:
 		if e.html == null:

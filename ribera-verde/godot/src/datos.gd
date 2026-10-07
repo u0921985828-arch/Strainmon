@@ -22,6 +22,13 @@ static func u8(x: float) -> int:
 		f += 1.0
 	return int(f)
 
+# hashStr de 00-nucleo.js: FNV-1a de 32 bits
+static func hash_str(s: String) -> int:
+	var h := 2166136261
+	for i in s.length():
+		h = ((h ^ s.unicode_at(i)) * 16777619) & 0xffffffff
+	return h
+
 static func hexi(h: String) -> int:
 	return h.substr(1).hex_to_int()
 
