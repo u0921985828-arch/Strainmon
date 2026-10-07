@@ -229,13 +229,12 @@ La tía Maite ha muerto y te deja su piso en Ribera Verde, un barrio obrero a or
 
 *La primera vez que sale la Ghost Train Haze en la mesa de genética (desde el capítulo 4):*
 > Te tiemblan las manos: es GHOST TRAIN HAZE.
-> **SMS · KIKO:** ¿Ghost Train Haze? ¿Estable, de semilla propia? Llevo veinte años detrás de ella.
-> **SMS · KIKO:** Tu tía estaría orgullosa. Guárdala bien: eso vale más que el piso.
+> **SMS · KIKO:** ¿Ghost Train Haze? ¿De semilla propia? Llevo veinte años detrás de ella.
+> **SMS · KIKO:** Tu tía estaría orgullosa. Estabilízala y guárdala bien: eso vale más que el piso.
 
 ## Combates
 
 *Probabilidades de robos y controles, y problemas del guion: [ANALISIS.md](ANALISIS.md).*
-
 
 - *Ladrón:* «Un [nombre] te corta el paso.» (el nombre, en minúsculas) y luego una de estas: «La mochila. Dámela y no pasa nada.» / «Eh, tú. Sé lo que llevas encima.» / «Quieto. El dinero y lo que lleves.»
   - *Tus golpes:* «Le das un puñetazo.» / «Le das una patada.»; si fallas, «Fallas.», y con una patada de 11 o más, «Le has hecho daño de verdad.» · *Spray:* «Le echas SPRAY DE PIMIENTA a la cara.» / «No puede abrir los ojos.» · *Bocata:* «Te comes un BOCATA. Recuperas vida.»
