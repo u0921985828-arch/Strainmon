@@ -18,7 +18,9 @@ function queue(key,fn){if(queued.has(key))return;queued.add(key);pending.push(as
 const totalBuds=()=>Object.values(S.buds).reduce((a,b)=>a+b.g,0);
 const discCount=()=>Object.keys(S.disc).length;
 // ficha de una variedad: cifras, tipo genético (si es un cruce y qué fenotipos da) y origen
-function strainLine(k){const s=getStrain(k),G=GENETICA[tipoGen(k)];return `THC ${pct(s.thc)}% · ~${gm2(s)} g/m² · ${coma(s.d)} días · Resist. ${s.r}%\n${G.n}${PADRES[k]?' ('+PADRES[k]+')':''}: ${G.d}. Estrella: 1 de cada ~${miles(G.uno)}.\n${s.o}`;}
+// % índica de la variedad y, en un híbrido propio, lo que sacó de la madre (la 1.ª del cruce, la de la izquierda en «o») y del padre
+const lineaInd=k=>{const s=getStrain(k),i=indDe(k);return `Índica ${i} % · sativa ${100-i} %${s.m?` · ${s.m} % madre · ${100-s.m} % padre`:''}`;};
+function strainLine(k){const s=getStrain(k),G=GENETICA[tipoGen(k)];return `THC ${pct(s.thc)}% · ~${gm2(s)} g/m² · ${coma(s.d)} días · Resist. ${s.r}%\n${lineaInd(k)}\n${G.n}${PADRES[k]?' ('+PADRES[k]+')':''}: ${G.d}. Estrella: 1 de cada ~${miles(G.uno)}.\n${s.o}`;}
 function discover(sid){if(!S.disc[sid]){S.disc[sid]=true;toast(`<small>NUEVA EN LA GENOTECA</small>${esc(getStrain(sid).n)}`);queue('historia',checkStory);}}
 function addSeeds(sid,n){S.seeds[sid]=(S.seeds[sid]||0)+n;discover(sid);}
 // cogollos por lotes: clave = variedad, o variedad + '*' para lo de un fenotipo estrella (se vende y se presenta aparte)

@@ -4,49 +4,51 @@
 
 ## Las 41 variedades de la Genoteca
 
-| # | Variedad | THC | Rinde (g/m²) | Días | Resist. | Tipo | Color | Cómo se consigue |
-|---|---|---|---|---|---|---|---|---|
-| 01 | Skunk #1 | 12% | 500 | 2,5 | 75% | línea estable | `#9bd35a` | Growshop (cap. 1), 5 € la semilla |
-| 02 | Lemon Haze | 15% | 380 | 3,5 | 50% | polihíbrido (Lemon Skunk × Silver Haze) | `#d8e060` | Growshop (cap. 2), 9 € la semilla |
-| 03 | OG Kush | 16% | 430 | 3 | 65% | polihíbrido (Chemdawg × Hindu Kush) | `#6fb04a` | Growshop (cap. 2), 10 € la semilla |
-| 04 | Blueberry | 17% | 400 | 3,5 | 55% | línea estable | `#7a9ec8` | Growshop (cap. 3), 8 € la semilla |
-| 05 | Mango | 15% | 560 | 3 | 60% | cruce F1 (KC 33 × Afghani) | `#b8c850` | Growshop (cap. 3), 7 € la semilla |
-| 06 | Purple Afghani | 18% | 350 | 4 | 45% | línea estable | `#9070b8` | Growshop (cap. 4), 8 € la semilla |
-| 07 | Afghani | 16% | 480 | 3 | 85% | landrace | `#88a050` | Kiko, al montar la mesa de genética: de un amigo de Mazar-i-Sharif (cap. 4) |
-| 08 | Hindu Kush | 18% | 380 | 3 | 80% | landrace | `#4a8a3a` | Txaro, a cambio de 5 g para hacer aceite (parque): del viaje de su marido a Pakistán en 1976 |
-| 09 | Acapulco Gold | 19% | 330 | 4,5 | 60% | landrace | `#d0c048` | En un bote de carrete escondido en un arbusto del parque (2,26), «Guerrero, 1979» |
-| 10 | Malawi Gold | 20% | 300 | 5 | 55% | landrace | `#c8d068` | Iñaki, el marinero, tras venderle 10 g (muelle): de un marinero de Malaui en Mombasa |
-| 11 | Lemon Skunk | 18% | 500 | 3 | 70% | cruce (F1 en la mesa) | `#c0dc50` | Cruce: Skunk #1 × Lemon Haze |
-| 12 | Blueberry Kush | 20% | 450 | 3 | 65% | cruce (F1 en la mesa) | `#6a94b8` | Cruce: OG Kush × Blueberry |
-| 13 | Trainwreck | 21% | 380 | 4 | 55% | cruce (F1 en la mesa) | `#a8cc58` | Cruce: Acapulco Gold × Afghani |
-| 14 | Critical Mass | 21% | 500 | 3 | 85% | cruce (F1 en la mesa) | `#8cbc4c` | Cruce: Afghani × Skunk #1 |
-| 15 | Purple Kush | 22% | 400 | 3,5 | 70% | cruce (F1 en la mesa) | `#7a5aa8` | Cruce: Hindu Kush × Purple Afghani |
-| 16 | Mango Kush | 21% | 480 | 3,5 | 60% | cruce (F1 en la mesa) | `#a8c040` | Cruce: Mango × Hindu Kush |
-| 17 | Blue Dream | 22% | 430 | 4 | 55% | cruce (F1 en la mesa) | `#80a8c0` | Cruce: Blueberry × Lemon Haze |
-| 18 | Super Lemon Haze | 23% | 480 | 4 | 65% | cruce (F1 en la mesa) | `#d0e458` | Cruce: Lemon Skunk × Lemon Haze |
-| 19 | Critical Kush | 24% | 530 | 3,5 | 80% | cruce (F1 en la mesa) | `#78ac44` | Cruce: Critical Mass × OG Kush |
-| 20 | Purple Haze | 23% | 430 | 4 | 60% | cruce (F1 en la mesa) | `#8a64b0` | Cruce: Purple Kush × Lemon Haze |
-| 21 | Amnesia Haze | 26% | 450 | 4,5 | 65% | cruce (F1 en la mesa) | `#bcd468` | Cruce: Super Lemon Haze × Trainwreck |
-| 22 | Fire OG | 27% | 500 | 3,5 | 75% | cruce (F1 en la mesa) | `#90b448` | Cruce: Critical Kush × Blueberry Kush |
-| 23 | Ghost Train Haze | 29% | 530 | 4,5 | 75% | cruce (F1 en la mesa) | `#d8ecb0` | Cruce: Amnesia Haze × Fire OG · **legendaria** |
-| 24 | Michoacán | 15% | 380 | 4 | 55% | landrace | `#b8d860` | Banco de semillas del PC, sobre de 10 por 25 € (cap. 2; llega al día siguiente) |
-| 25 | Punto Rojo | 16% | 380 | 4,5 | 45% | landrace | `#b4a24c` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 2; llega al día siguiente) |
-| 26 | Thai | 17% | 330 | 5 | 40% | landrace | `#b0d468` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 2; llega al día siguiente) |
-| 27 | Luang Prabang | 15% | 380 | 4,5 | 50% | landrace | `#8a9a5c` | Banco de semillas del PC, sobre de 10 por 40 € (cap. 4; llega al día siguiente) |
-| 28 | Chitral Kush | 17% | 400 | 3 | 70% | landrace | `#7a9a48` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 3; llega al día siguiente) |
-| 29 | Nepalese | 16% | 350 | 3,5 | 65% | landrace | `#88906a` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
-| 30 | Congolese | 16% | 400 | 3,5 | 55% | landrace | `#b4d058` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
-| 31 | Lamb's Bread | 16% | 380 | 4 | 60% | landrace | `#a8d070` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
-| 32 | Kif | 13% | 350 | 3 | 80% | landrace | `#a8c060` | Banco de semillas del PC, sobre de 10 por 20 € (cap. 2; llega al día siguiente) |
-| 33 | Beldia | 12% | 300 | 3 | 75% | landrace | `#98b45c` | Banco de semillas del PC, sobre de 10 por 20 € (cap. 2; llega al día siguiente) |
-| 34 | Oaxaca | 15% | 400 | 4 | 65% | landrace | `#b0a84a` | Banco de semillas del PC, sobre de 10 por 25 € (cap. 3; llega al día siguiente) |
-| 35 | Panama Red | 17% | 350 | 4,5 | 50% | landrace | `#b8984c` | Banco de semillas del PC, sobre de 10 por 45 € (cap. 4; llega al día siguiente) |
-| 36 | Haze | 20% | 400 | 5 | 45% | cruce (F1 en la mesa) | `#c8dc68` | Cruce: Punto Rojo × Thai (o Michoacán × Thai) |
-| 37 | Northern Lights | 18% | 530 | 3 | 80% | cruce (F1 en la mesa) | `#7cae4c` | Cruce: Afghani × Thai |
-| 38 | Afghan Kush | 19% | 500 | 3 | 85% | cruce (F1 en la mesa) | `#6e9a44` | Cruce: Afghani × Hindu Kush |
-| 39 | Shiva Skunk | 19% | 550 | 3 | 85% | cruce (F1 en la mesa) | `#8cbc50` | Cruce: Northern Lights × Skunk #1 |
-| 40 | Silver Haze | 21% | 450 | 4,5 | 55% | cruce (F1 en la mesa) | `#c0d880` | Cruce: Haze × Northern Lights |
-| 41 | Super Silver Haze | 23% | 500 | 4 | 70% | cruce (F1 en la mesa) | `#c8e090` | Cruce: Silver Haze × Skunk #1 |
+| # | Variedad | THC | Rinde (g/m²) | Días | Resist. | Índica | Tipo | Cogollo | Hoja | Cómo se consigue |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 01 | Skunk #1 | 12% | 500 | 2,5 | 75% | 65 % | línea estable | `#9bd35a` | `#57a33e` | Growshop (cap. 1), 5 € la semilla |
+| 02 | Lemon Haze | 15% | 380 | 3,5 | 50% | 20 % | polihíbrido (Lemon Skunk × Silver Haze) | `#d8e060` | `#7aa63e` | Growshop (cap. 2), 9 € la semilla |
+| 03 | OG Kush | 16% | 430 | 3 | 65% | 75 % | polihíbrido (Chemdawg × Hindu Kush) | `#6fb04a` | `#50973b` | Growshop (cap. 2), 10 € la semilla |
+| 04 | Blueberry | 17% | 400 | 3,5 | 55% | 80 % | línea estable | `#7a9ec8` | `#4a8a4c` | Growshop (cap. 3), 8 € la semilla |
+| 05 | Mango | 15% | 560 | 3 | 60% | 70 % | cruce F1 (KC 33 × Afghani) | `#b8c850` | `#549d3d` | Growshop (cap. 3), 7 € la semilla |
+| 06 | Purple Afghani | 18% | 350 | 4 | 45% | 95 % | línea estable | `#9070b8` | `#4c6c44` | Growshop (cap. 4), 8 € la semilla |
+| 07 | Afghani | 16% | 480 | 3 | 85% | 100 % | landrace | `#88a050` | `#3f7a34` | Kiko, al montar la mesa de genética: de un amigo de Mazar-i-Sharif (cap. 4) |
+| 08 | Hindu Kush | 18% | 380 | 3 | 80% | 100 % | landrace | `#4a8a3a` | `#3f7a34` | Txaro, a cambio de 5 g para hacer aceite (parque): del viaje de su marido a Pakistán en 1976 |
+| 09 | Acapulco Gold | 19% | 330 | 4,5 | 60% | 0 % | landrace | `#d0c048` | `#8aa83e` | En un bote de carrete escondido en un arbusto del parque (2,26), «Guerrero, 1979» |
+| 10 | Malawi Gold | 20% | 300 | 5 | 55% | 0 % | landrace | `#c8d068` | `#8aa83e` | Iñaki, el marinero, tras venderle 10 g (muelle): de un marinero de Malaui en Mombasa |
+| 11 | Lemon Skunk | 18% | 500 | 3 | 70% | 40 % | cruce (F1 en la mesa) | `#c0dc50` | `#6ba53e` | Cruce: Skunk #1 × Lemon Haze |
+| 12 | Blueberry Kush | 20% | 450 | 3 | 65% | 80 % | cruce (F1 en la mesa) | `#6a94b8` | `#468650` | Cruce: OG Kush × Blueberry |
+| 13 | Trainwreck | 21% | 380 | 4 | 55% | 35 % | cruce (F1 en la mesa) | `#a8cc58` | `#6fa53e` | Cruce: Acapulco Gold × Afghani |
+| 14 | Critical Mass | 21% | 500 | 3 | 85% | 80 % | cruce (F1 en la mesa) | `#8cbc4c` | `#4d913a` | Cruce: Afghani × Skunk #1 |
+| 15 | Purple Kush | 22% | 400 | 3,5 | 70% | 100 % | cruce (F1 en la mesa) | `#7a5aa8` | `#486640` | Cruce: Hindu Kush × Purple Afghani |
+| 16 | Mango Kush | 21% | 480 | 3,5 | 60% | 65 % | cruce (F1 en la mesa) | `#a8c040` | `#57a33e` | Cruce: Mango × Hindu Kush |
+| 17 | Blue Dream | 22% | 430 | 4 | 55% | 40 % | cruce (F1 en la mesa) | `#80a8c0` | `#5c9a48` | Cruce: Blueberry × Lemon Haze |
+| 18 | Super Lemon Haze | 23% | 480 | 4 | 65% | 25 % | cruce (F1 en la mesa) | `#d0e458` | `#76a63e` | Cruce: Lemon Skunk × Lemon Haze |
+| 19 | Critical Kush | 24% | 530 | 3,5 | 80% | 80 % | cruce (F1 en la mesa) | `#78ac44` | `#4d913a` | Cruce: Critical Mass × OG Kush |
+| 20 | Purple Haze | 23% | 430 | 4 | 60% | 15 % | cruce (F1 en la mesa) | `#8a64b0` | `#6e8a4c` | Cruce: Purple Kush × Lemon Haze |
+| 21 | Amnesia Haze | 26% | 450 | 4,5 | 65% | 20 % | cruce (F1 en la mesa) | `#bcd468` | `#7aa63e` | Cruce: Super Lemon Haze × Trainwreck |
+| 22 | Fire OG | 27% | 500 | 3,5 | 75% | 70 % | cruce (F1 en la mesa) | `#90b448` | `#549d3d` | Cruce: Critical Kush × Blueberry Kush |
+| 23 | Ghost Train Haze | 29% | 530 | 4,5 | 75% | 20 % | cruce (F1 en la mesa) | `#d8ecb0` | `#7aa63e` | Cruce: Amnesia Haze × Fire OG · **legendaria** |
+| 24 | Michoacán | 15% | 380 | 4 | 55% | 0 % | landrace | `#b8d860` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 25 € (cap. 2; llega al día siguiente) |
+| 25 | Punto Rojo | 16% | 380 | 4,5 | 45% | 0 % | landrace | `#b4a24c` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 2; llega al día siguiente) |
+| 26 | Thai | 17% | 330 | 5 | 40% | 0 % | landrace | `#b0d468` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 2; llega al día siguiente) |
+| 27 | Luang Prabang | 15% | 380 | 4,5 | 50% | 0 % | landrace | `#8a9a5c` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 40 € (cap. 4; llega al día siguiente) |
+| 28 | Chitral Kush | 17% | 400 | 3 | 70% | 100 % | landrace | `#7a9a48` | `#4a6e3c` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 3; llega al día siguiente) |
+| 29 | Nepalese | 16% | 350 | 3,5 | 65% | 50 % | landrace | `#88906a` | `#63a43e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
+| 30 | Congolese | 16% | 400 | 3,5 | 55% | 0 % | landrace | `#b4d058` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
+| 31 | Lamb's Bread | 16% | 380 | 4 | 60% | 0 % | landrace | `#a8d070` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
+| 32 | Kif | 13% | 350 | 3 | 80% | 80 % | landrace | `#a8c060` | `#4d913a` | Banco de semillas del PC, sobre de 10 por 20 € (cap. 2; llega al día siguiente) |
+| 33 | Beldia | 12% | 300 | 3 | 75% | 80 % | landrace | `#98b45c` | `#4d913a` | Banco de semillas del PC, sobre de 10 por 20 € (cap. 2; llega al día siguiente) |
+| 34 | Oaxaca | 15% | 400 | 4 | 65% | 0 % | landrace | `#b0a84a` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 25 € (cap. 3; llega al día siguiente) |
+| 35 | Panama Red | 17% | 350 | 4,5 | 50% | 0 % | landrace | `#b8984c` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 45 € (cap. 4; llega al día siguiente) |
+| 36 | Haze | 20% | 400 | 5 | 45% | 10 % | cruce (F1 en la mesa) | `#c8dc68` | `#82a73e` | Cruce: Punto Rojo × Thai (o Michoacán × Thai) |
+| 37 | Northern Lights | 18% | 530 | 3 | 80% | 90 % | cruce (F1 en la mesa) | `#7cae4c` | `#468637` | Cruce: Afghani × Thai |
+| 38 | Afghan Kush | 19% | 500 | 3 | 85% | 100 % | cruce (F1 en la mesa) | `#6e9a44` | `#3f7a34` | Cruce: Afghani × Hindu Kush |
+| 39 | Shiva Skunk | 19% | 550 | 3 | 85% | 80 % | cruce (F1 en la mesa) | `#8cbc50` | `#4d913a` | Cruce: Northern Lights × Skunk #1 |
+| 40 | Silver Haze | 21% | 450 | 4,5 | 55% | 35 % | cruce (F1 en la mesa) | `#c0d880` | `#6fa53e` | Cruce: Haze × Northern Lights |
+| 41 | Super Silver Haze | 23% | 500 | 4 | 70% | 20 % | cruce (F1 en la mesa) | `#c8e090` | `#7aa63e` | Cruce: Silver Haze × Skunk #1 |
+
+**Índica** es el % índica (el resto, sativa), con datos reales de cada variedad; **hoja**, el tono de su hoja. Dan la forma de la planta en la carpa (`porteInd`): 70 % o más, índica (hoja ancha de 7 foliolos, colas gordas y cortas, internudo corto); menos de 30 %, sativa (9 foliolos finos y largos, colas finas y largas, internudo largo); en medio, híbrida. La sativa tiene la hoja clara y amarillenta; la índica, oscura.
 
 ## Historia de cada variedad
 
@@ -159,15 +161,17 @@ Lo que sale de un cruce nuevo (receta o híbrido propio) es una **F1**: una lín
 
 Cada semilla es una planta distinta. Al germinar, tira su fenotipo: THC × (1 + σ·z) y gramos × (1 + σ·z), cada uno por su lado (z normal; entre ×0,6 y ×1,5). σ depende de lo pura que sea la genética. Si THC × gramos ≥ 1,35, es un **fenotipo estrella**: va a un lote aparte (★) que se vende y se presenta a la Copa por separado. Si ≤ 0,75, es **floja**. El fenotipo se sabe al cosecharla.
 
-| Tipo | σ | Estrella | Qué es |
-|---|---|---|---|
-| Línea estable | 0,06 | 1 de cada ~16.000 | fijada a lo largo de generaciones: casi todas las plantas salen iguales |
-| Cruce F1 | 0,07 | 1 de cada ~2.000 | hijo directo de dos líneas estables: uniforme y con vigor híbrido |
-| F1 | 0,08 | 1 de cada ~500 | línea inestable, cosechas desiguales. Estabilízala en la mesa |
-| F2 | 0,12 | 1 de cada ~40 | línea inestable, la generación que más se separa. Estabilízala en la mesa |
-| F3 | 0,1 | 1 de cada ~100 | línea inestable, ya seleccionada. Estabilízala en la mesa |
-| Landrace | 0,1 | 1 de cada ~100 | población silvestre de su región: plantas variadas |
-| Polihíbrido | 0,11 | 1 de cada ~60 | cruce de cruces: cada planta sale distinta |
+| Tipo | σ | σ índica | Estrella | Qué es |
+|---|---|---|---|---|
+| Línea estable | 0,06 | 0 | 1 de cada ~16.000 | fijada a lo largo de generaciones: casi todas las plantas salen iguales |
+| Cruce F1 | 0,07 | 3 | 1 de cada ~2.000 | hijo directo de dos líneas estables: uniforme y con vigor híbrido |
+| F1 | 0,08 | 8 | 1 de cada ~500 | línea inestable, cosechas desiguales. Estabilízala en la mesa |
+| F2 | 0,12 | 15 | 1 de cada ~40 | línea inestable, la generación que más se separa. Estabilízala en la mesa |
+| F3 | 0,1 | 10 | 1 de cada ~100 | línea inestable, ya seleccionada. Estabilízala en la mesa |
+| Landrace | 0,1 | 10 | 1 de cada ~100 | población silvestre de su región: plantas variadas |
+| Polihíbrido | 0,11 | 12 | 1 de cada ~60 | cruce de cruces: cada planta sale distinta |
+
+Cada planta tira también su % índica alrededor del de su variedad (σ índica, en puntos): da su forma y el tono de su hoja, así que hasta que la línea se estabiliza (F4) cada planta sale distinta; una línea estable sale toda igual.
 
 Con 50 semillas de un polihíbrido sale de media casi 1 estrella (58 % de que salga al menos una); con 50 de una línea estable, casi nunca. `test-historia` tira 200.000 plantas de cada tipo y comprueba esas tasas.
 
@@ -181,7 +185,7 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
 - **Nombre:** primera palabra de la madre + última palabra del padre (si coincide con un padre, al revés; si ya existe, se añade «F2…F8»).
 - **THC:** media de los padres + aleatorio entre −1,5 y +2,0 (tope 33 %).
 - **Rendimiento:** media ± 4 g. **Días:** media ± 0,3 (redondeado a medios días). **Resistencia:** media ± 5 (entre 20 y 95).
-- **Color:** mezcla al 50 % de los colores de los padres.
+- **De la madre y del padre:** la madre (la primera que eliges) pasa un m % al azar entre 30 y 70 y el padre el resto (la ficha lo enseña: «60 % madre · 40 % padre»). Con ese reparto se mezclan el % índica, el tono de la hoja y el color del cogollo.
 - Aparecen en la Genoteca con ★ y cuentan para el objetivo de «descubrir 8 variedades».
 
 ## Fórmulas de cultivo

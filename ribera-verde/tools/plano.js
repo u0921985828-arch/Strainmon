@@ -31,7 +31,7 @@ const REAL = {
     ['Ventilador', 'x34:vent', 'ancho', .2, 48], ['Filtro y extractor', 'x34:filtro', 'ancho', .65, 48], ['Depósito de goteo', 'x34:goteo', 'alto', .5, 48]],
   // plantas de la vista B por porte; germinando y plántula, estilizadas a ×2 (plan de producción, §4)
   plantas: ['i', 's', 'h'].flatMap(po => [['Germinando', 0, .05], ['Plántula', 1, .15], ['Vegetativo', 2], ['Floración', 3], ['Lista', 4]]
-    .map(([n, st, r]) => [`${n} (${{ i: 'índica', s: 'sativa', h: 'híbrida' }[po]})`, `p34:${po}${st}`, 'alto', r || { i: [0, 0, .45, .75, .9], s: [0, 0, .7, 1.2, 1.4], h: [0, 0, .55, .95, 1.1] }[po][st], 48])),
+    .map(([n, st, r]) => [`${n} (${{ i: 'índica', s: 'sativa', h: 'híbrida' }[po]})`, `p34:${po}${st}`, 'alto', r || { i: [0, 0, .35, .55, .65], s: [0, 0, .45, .75, .9], h: [0, 0, .4, .6, .7] }[po][st], 48])),
   exterior: [['Árbol', 'tree', 'alto', 6], ['Farola', 'lamp', 'alto', 4], ['Banco', 'bench', 'ancho', 1.8], ['Fuente', 'fountain', 'ancho', 3], ['Arbusto', 'bush', 'ancho', 1.2],
     ['Valla', 'fence', 'alto', 1.0], ['Edificio (piso)', 'edificio:home', 'ancho', 14], ['Edificio (bar)', 'edificio:bar', 'ancho', 14]],
 };

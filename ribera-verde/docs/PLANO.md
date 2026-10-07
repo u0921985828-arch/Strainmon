@@ -106,19 +106,19 @@ En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho de la carpa abi
 |  | Depósito de goteo | 14×24 | alto | 0,5 m | 0,5 m | ×1,00 |
 |  | Germinando (índica) | 9×5 | alto | 0,1 m | 0,05 m | **×2,08** |
 |  | Plántula (índica) | 10×15 | alto | 0,31 m | 0,15 m | **×2,08** |
-|  | Vegetativo (índica) | 22×22 | alto | 0,46 m | 0,45 m | ×1,02 |
-|  | Floración (índica) | 32×35 | alto | 0,73 m | 0,75 m | ×0,97 |
-|  | Lista (índica) | 34×42 | alto | 0,88 m | 0,9 m | ×0,97 |
+|  | Vegetativo (índica) | 20×17 | alto | 0,35 m | 0,35 m | ×1,01 |
+|  | Floración (índica) | 28×25 | alto | 0,52 m | 0,55 m | ×0,95 |
+|  | Lista (índica) | 30×30 | alto | 0,63 m | 0,65 m | ×0,96 |
 |  | Germinando (sativa) | 9×5 | alto | 0,1 m | 0,05 m | **×2,08** |
 |  | Plántula (sativa) | 10×15 | alto | 0,31 m | 0,15 m | **×2,08** |
-|  | Vegetativo (sativa) | 18×34 | alto | 0,71 m | 0,7 m | ×1,01 |
-|  | Floración (sativa) | 28×57 | alto | 1,19 m | 1,2 m | ×0,99 |
-|  | Lista (sativa) | 30×66 | alto | 1,38 m | 1,4 m | ×0,98 |
+|  | Vegetativo (sativa) | 18×22 | alto | 0,46 m | 0,45 m | ×1,02 |
+|  | Floración (sativa) | 24×35 | alto | 0,73 m | 0,75 m | ×0,97 |
+|  | Lista (sativa) | 28×42 | alto | 0,88 m | 0,9 m | ×0,97 |
 |  | Germinando (híbrida) | 9×5 | alto | 0,1 m | 0,05 m | **×2,08** |
 |  | Plántula (híbrida) | 10×15 | alto | 0,31 m | 0,15 m | **×2,08** |
-|  | Vegetativo (híbrida) | 20×26 | alto | 0,54 m | 0,55 m | ×0,98 |
-|  | Floración (híbrida) | 28×45 | alto | 0,94 m | 0,95 m | ×0,99 |
-|  | Lista (híbrida) | 30×52 | alto | 1,08 m | 1,1 m | ×0,98 |
+|  | Vegetativo (híbrida) | 18×19 | alto | 0,4 m | 0,4 m | ×0,99 |
+|  | Floración (híbrida) | 24×28 | alto | 0,58 m | 0,6 m | ×0,97 |
+|  | Lista (híbrida) | 28×33 | alto | 0,69 m | 0,7 m | ×0,98 |
 | Exterior | Árbol | 18×24 | alto | 1,5 m | 6 m | **×0,25** |
 |  | Farola | 6×27 | alto | 1,69 m | 4 m | **×0,42** |
 |  | Banco | 16×12 | ancho | 1 m | 1,8 m | **×0,56** |
@@ -133,7 +133,7 @@ En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho de la carpa abi
 1. **Personajes adultos, muebles y carpas: coherentes.** Entre ×0,8 y ×1,3 en el piso (1 m = 16 px); las 5 carpas
    cerradas, a ×1,0.
 2. **Vista de carpa B: 29 de 35 piezas a escala** (×0,94–×1,06): carpas, macetas, focos, extras y las plantas
-   de vegetativo a lista en sus 3 portes (índica 0,9 m, sativa 1,4 m e híbrida 1,1 m listas). Solo germinando y
+   de vegetativo a lista en sus 3 portes (índica 0,65 m, sativa 0,9 m e híbrida 0,7 m listas, despuntadas desde la 1.10). Solo germinando y
    plántula van a ×2, a propósito, para que se vean (5 y 15 cm reales darían 2 y 7 px).
 3. **El piso, a tamaño real.** 12 × 8 casillas (72 m² con paredes; 12 × 6 m de suelo), frente a 240 m² de la 1.7.0.
 4. **Siguen fuera de escala, sin tocar:** la nevera (×1,9) y las cajas (×1,5), que se rehacen en P5 (D5); la cama
@@ -179,10 +179,10 @@ macetas, las plantas y el foco colgando) pero a escala real.
 | Carpa 150×100 | 6 | 25,25 · 75,25 · 125,25 · 25,75 · 75,75 · 125,75 | 50 cm | 25 cm | 46 cm | CFL 134 · Sodio 250 114 · Sodio 400 104 · Sodio 600 94 · LED 100 119 · LED 200 119 · LED 480 109 · LED 720 104 cm (18 L) |
 
 Distancia de seguridad de la cima al foco: CFL 10 cm · Sodio 250 30 cm · LED 100 25 cm · LED 200 25 cm · Sodio 400 40 cm · LED 480 35 cm · Sodio 600 50 cm · LED 720 40 cm.
-Las plantas más grandes, lista: índica 70 cm de ancho y 90 de alto, sativa 60 × 140 e híbrida 60 × 110.
+Las plantas más grandes, lista (despuntadas y en mainline, 1.10): índica 60 cm de ancho y 65 de alto, sativa 55 × 90 e híbrida 58 × 70.
 
 - **Piezas procedurales** (son también las huellas de las láminas de P3–P4, `npm run sprites:huellas`): `carpa34`,
-  `cuarto34`, `maceta34` (`MACETA_CM`), `planta34` por porte (`PORTE`, `PLANTA_CM`), `foco34` (`FOCO_CM`) y
+  `cuarto34`, `maceta34` (`MACETA_CM`), `planta34` por porte (`porteInd`: el % índica de cada planta; `PLANTA_CM`), `foco34` (`FOCO_CM`) y
   `extra34`. Un foco centrado a 28 cm del techo; su luz, recortada a la carpa y detrás de las plantas.
 - **Estado:** el arte de plantas y carpas de la vista B **no está aprobado**: se pide en P3–P4 con una referencia nueva.
   Mientras tanto, la vista B se dibuja con el arte procedural también con el atlas, así que no se publica versión.

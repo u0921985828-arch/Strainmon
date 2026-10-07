@@ -1,0 +1,32 @@
+{
+  "grupo": "carpa-c-plantas-a",
+  "celda": [
+    40,
+    96
+  ],
+  "tope_colores": 15,
+  "secuencias": 14,
+  "fotogramas": 140,
+  "semitransparentes": 0,
+  "en_paleta_antes": 18.7,
+  "distancia_media": 0,
+  "colores_finales": 13,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "planta-c-h-32/unica": 0,
+    "planta-c-h-38/unica": 0,
+    "planta-c-h2-32/unica": 0,
+    "planta-c-h2-38/unica": 0,
+    "planta-c-i-32/unica": 0,
+    "planta-c-i-38/unica": 0,
+    "planta-c-i2-32/unica": 0,
+    "planta-c-i2-38/unica": 0,
+    "planta-c-s-32/unica": 0,
+    "planta-c-s-38/unica": 0,
+    "planta-c-s2-32/unica": 0,
+    "planta-c-s2-38/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}

@@ -144,9 +144,12 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   await step('Cruce de receta: Afghani × Skunk #1 → Critical Mass', ['^Afghani', '^Skunk #1', 'Cruzar'], async () => {
     addSeeds('ria', 2); addSeeds('txoko', 2); await run(labAction);
   }, () => S.seeds.kushrif === 2 && S.disc.kushrif && S.gen.kushrif === 1 || { seeds: S.seeds, gen: S.gen });
-  await step('Cruce libre: Skunk #1 × Hindu Kush → híbrido propio → capítulo 5', ['^Skunk #1', '^Hindu Kush', 'Cruzar'], async () => {
-    await run(labAction);
-  }, () => Object.keys(S.custom).length === 1 && discCount() >= 8 && S.ch === 5 && S.due === 12000 || { custom: S.custom, disc: discCount(), ch: S.ch });
+  // de la madre (la Skunk #1, 65 % índica) saca el m % (30-70) y del padre (la Hindu Kush, 100 %) el resto: % índica, tono de hoja y cogollo
+  await step('Cruce libre: Skunk #1 × Hindu Kush → híbrido propio (m % de la madre, el resto del padre) → capítulo 5', ['^Skunk #1', '^Hindu Kush', 'Cruzar'], async () => {
+    await run(labAction); const k = Object.keys(S.custom)[0]; window.R = { k, c: S.custom[k], linea: k && strainLine(k).split('\n')[1] };
+  }, () => Object.keys(S.custom).length === 1 && discCount() >= 8 && S.ch === 5 && S.due === 12000 && R.c.ma === 'ria' && R.c.pa === 'hindu' && R.c.m >= 30 && R.c.m <= 70
+    && R.c.ind === Math.round((R.c.m * 65 + (100 - R.c.m) * 100) / 100) && R.c.hj === mix(STRAINS.hindu.hj, STRAINS.ria.hj, R.c.m / 100) && R.c.c === mix(STRAINS.hindu.c, STRAINS.ria.c, R.c.m / 100)
+    && R.linea === `Índica ${R.c.ind} % · sativa ${100 - R.c.ind} % · ${R.c.m} % madre · ${100 - R.c.m} % padre` || { custom: S.custom, disc: discCount(), ch: S.ch, R });
 
   await step('Estabilizar Critical Mass: F1 → F2 → F3 → estable', ['^Critical Mass', 'estabilizar', 'Estabilizar', '^Critical Mass', 'estabilizar', 'Estabilizar', '^Critical Mass', 'estabilizar', 'Estabilizar'], async () => {
     window.R = []; for (let k = 0; k < 3; k++) { if (k) addSeeds('kushrif', 1); await run(labAction); R.push(genDe('kushrif') + ':' + S.seeds.kushrif); }
@@ -214,10 +217,13 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
     async () => { await run(startMenu); }, () => handlers.length === 0);
   await step('Cama: siesta de 3 horas', ['Siesta'], async () => { S.min = 600; S.hp = 5; await run(bedAction); },
     () => (S.min === 780 || S.min === 781) && S.hp === S.hpMax || { min: S.min, hp: S.hp });   // 780 = 600 + 180; entre la siesta y la comprobación puede pasar un minuto de reloj real
-  await step('Fenotipos: 200.000 plantas por tipo → 1 estrella de cada N (GENETICA[t].uno); de menos a más variable', [], async () => {
+  // y el % índica de cada planta: igual al de su variedad en una línea estable; alrededor del suyo (σ de su tipo) en una landrace
+  await step('Fenotipos: 200.000 plantas por tipo → 1 estrella de cada N (GENETICA[t].uno); de menos a más variable; % índica de cada planta', [], async () => {
     window.R = {}; for (const t in GENETICA) { let n = 0, fl = 0; for (let k = 0; k < 200000; k++) { const f = tiraFeno(GENETICA[t].sigma); if (claseFeno(f) === 'estrella') n++; if (claseFeno(f) === 'floja') fl++; } R[t] = { n, fl, E: 200000 / GENETICA[t].uno }; }
-  }, () => Object.values(R).every(r => Math.abs(r.n - r.E) <= 4 * Math.sqrt(r.E) + 3 + .1 * r.E) && ['estable', 'f1', 'F1', 'landrace', 'poli', 'F2'].every((t, i, a) => !i || R[t].n > R[a[i - 1]].n)
-    && tipoGen('ria') === 'estable' && tipoGen('mango') === 'f1' && tipoGen('limon') === 'poli' && tipoGen('thai') === 'landrace' && /Cruce F1 \(KC 33 × Afghani\)/.test(strainLine('mango')) || R);
+    const n0 = S.fenoN, ria = new Set(), np = []; for (let k = 0; k < 5000; k++) { ria.add(rollFeno('ria').i); np.push(rollFeno('nepal').i); } S.fenoN = n0;
+    const m = np.reduce((a, b) => a + b, 0) / np.length; window.I = { ria: [...ria].join(), media: +m.toFixed(1), sd: +Math.sqrt(np.reduce((a, b) => a + (b - m) ** 2, 0) / np.length).toFixed(1) };
+  }, () => Object.values(R).every(r => Math.abs(r.n - r.E) <= 4 * Math.sqrt(r.E) + 3 + .1 * r.E) && I.ria === '65' && Math.abs(I.media - 50) < 1 && Math.abs(I.sd - GENETICA.landrace.si) < 1 && ['estable', 'f1', 'F1', 'landrace', 'poli', 'F2'].every((t, i, a) => !i || R[t].n > R[a[i - 1]].n)
+    && tipoGen('ria') === 'estable' && tipoGen('mango') === 'f1' && tipoGen('limon') === 'poli' && tipoGen('thai') === 'landrace' && /Cruce F1 \(KC 33 × Afghani\)/.test(strainLine('mango')) || { R, I });
   await step('Esquejes: el clon guarda el fenotipo estrella de la madre; su cosecha va a un lote aparte (★); sin plantar se seca', ['Sacar esqueje', 'Sacar esqueje', 'Cosechar', '^Esqueje'], async () => {
     S.esquejes = []; S.buds = {}; const f = { id: 9999, t: 1.25, y: 1.15 };
     S.pots[0] = { sid: 'limon', prog: .4, water: 100, health: 100, fert: false, pest: false, f }; await run(() => potAction(0)); await run(() => potAction(0));

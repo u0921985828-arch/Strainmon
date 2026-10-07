@@ -323,6 +323,16 @@
    ],
    "ajuste": "pies",
    "nota": "planta sin maceta de la vista C con el foco CFL (cabe más alta: 10 cm de distancia segura); la base del tallo en (24, 111)"
+  },
+  "planta_c_a": {
+   "w": 40,
+   "h": 96,
+   "ancla": [
+    20,
+    95
+   ],
+   "ajuste": "exacto",
+   "nota": "planta A sin maceta de la vista C (38 px de ancho como mucho y 92 de alto); la base del tallo en (20, 95), el tallo en las columnas 19-20"
   }
  },
  "fases": [
@@ -5874,7 +5884,7 @@
   {
    "fase": "F9",
    "herramienta": "edit_image_pixen",
-   "estado": "aprobado",
+   "estado": "retirado",
    "familia": "imagen",
    "paleta": "propia",
    "estilo_ref": "imagen A (estilo.carpa_p3.referencia)",
@@ -5927,7 +5937,8 @@
    },
    "notas": "Índica lista a su tope de la plaza (cw × ch por la escala): 24 × 84 en la carpa de 60 y 36 × 68 en las de 200 cm. Los cogollos van en la rampa clave y el motor les pone el color de la cepa.",
    "montaje": "Los verdes amarillentos de la luz del foco (tono 60-88°) pasan a verde (92°) con la misma saturación y valor (scratchpad f22/scripts/prep.py). La luz la pone el motor.",
-   "aprobado": "2026-10-06: corte de prueba de la vista C (p60, p80, m100, g150 y m100 vacía), aprobado por la persona tras la 2.ª versión (pared solo de tela y luz delante de todo)"
+   "aprobado": "2026-10-06: corte de prueba de la vista C (p60, p80, m100, g150 y m100 vacía), aprobado por la persona tras la 2.ª versión (pared solo de tela y luz delante de todo)",
+   "retirado": "1.10 P3: la persona cambió el diseño de la planta a la planta A (baja, despuntada y en mainline, como en sus fotos: corona de 6 ramas en V con lollipop, 6 colas en zigzag con aire, yemas en pares cruzados con sus hojas, pistilos y tricomas) y pidió que la forma salga de la genética (% índica). La sustituye carpa-c-plantas-a; su crudo, en art/crudo/_retirado."
   },
   {
    "fase": "F9",
@@ -5968,7 +5979,7 @@
   {
    "fase": "F9",
    "herramienta": "importado",
-   "estado": "aprobado",
+   "estado": "retirado",
    "familia": "importado",
    "paleta": "propia",
    "estilo_ref": "la planta 2.ª de la prueba de estilo elegida (70 px: abanicos por nudo, colas a los dos lados y cola arriba), paleta A (verde frío)",
@@ -6028,7 +6039,71 @@
     "4e487282-1b7e-4cd6-9882-62c43bec896a": "planta-c-h2-24 (24 × 56): pixen reescaló la entrada al lienzo (de 84 a 104 px de alto, y luego a 56 y 32) y dejó las mismas ramas y cogollos estirados o aplastados; una planta más alta debe tener más nudos, no los mismos más largos",
     "08cf8afa-0014-412f-a257-75242fefba47": "planta-c-h1-20 (20 × 32): pixen reescaló la entrada al lienzo (de 84 a 104 px de alto, y luego a 56 y 32) y dejó las mismas ramas y cogollos estirados o aplastados; una planta más alta debe tener más nudos, no los mismos más largos",
     "1a49c22e-8c9e-53b6-bd45-00d54951ba7f": "planta-c-h0-8 (pixen, 16 × 16 → 8 × 8): sustituida por la dibujada a mano (no se veía bien lo que es)"
-   }
+   },
+   "retirado": "1.10 P3: la persona cambió el diseño de la planta a la planta A (baja, despuntada y en mainline, como en sus fotos: corona de 6 ramas en V con lollipop, 6 colas en zigzag con aire, yemas en pares cruzados con sus hojas, pistilos y tricomas) y pidió que la forma salga de la genética (% índica). La sustituye carpa-c-plantas-a; su crudo, en art/crudo/_retirado."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "paleta": "propia",
+   "estilo_ref": "la planta A elegida (lámina gen4: Afghani, Haze, Skunk #1 y Blue Dream en la de 60), paleta A (verde frío) de carpa-c-plantas-h",
+   "tipo": "objeto",
+   "id": "carpa-c-plantas-a",
+   "coste_real": 0,
+   "cubre": [
+    "misc:planta-c-i-38",
+    "misc:planta-c-i2-38",
+    "misc:planta-c-i-32",
+    "misc:planta-c-i2-32",
+    "misc:planta-c-h-38",
+    "misc:planta-c-h2-38",
+    "misc:planta-c-h-32",
+    "misc:planta-c-h2-32",
+    "misc:planta-c-s-38",
+    "misc:planta-c-s2-38",
+    "misc:planta-c-s-32",
+    "misc:planta-c-s2-32",
+    "misc:planta-c-h1-18",
+    "misc:planta-c-h0-8"
+   ],
+   "celda": "planta_c_a",
+   "ajuste_por_sprite": {
+    "planta-c-i-38": "exacto",
+    "planta-c-i2-38": "exacto",
+    "planta-c-i-32": "exacto",
+    "planta-c-i2-32": "exacto",
+    "planta-c-h-38": "exacto",
+    "planta-c-h2-38": "exacto",
+    "planta-c-h-32": "exacto",
+    "planta-c-h2-32": "exacto",
+    "planta-c-s-38": "exacto",
+    "planta-c-s2-38": "exacto",
+    "planta-c-s-32": "exacto",
+    "planta-c-s2-32": "exacto",
+    "planta-c-h1-18": "exacto",
+    "planta-c-h0-8": "exacto"
+   },
+   "origen": "dibujada a mano, sin PixelLab: planta_a.py (corona, nudos y hojas), prim.py (hoja de abanico rasterizada), cola2.py (colas en racimos) y, para germinando y plántula, los sellos de planta.py; python3 -I tools/sprites/a-mano/exporta.py art/crudo/carpa-c-plantas-a",
+   "descripcion": "Planta A, despuntada y en mainline: el tallo se abre abajo en una corona de 6 ramas en V. En floración y lista, cada rama pelada abajo (lollipop), con nudos de yemas en pares cruzados (a los lados con su hoja de abanico hacia fuera; el siguiente, girado 90°, delante y detrás), más pequeñas cuanto más abajo, y la cola en la punta; las 6 colas en zigzag (3 detrás más altas, 3 delante), con aire entre las puntas. Cogollos: racimos de cálices con pelos naranjas y tricomas. En vegetativo, la misma corona sin cogollos: dos hojas de abanico grandes por rama (las de detrás en sombra) y un brote en cada punta. La genética da la forma: índica (ind ,9) hoja de 7 foliolos anchos, colas gordas y cortas, internudo corto; sativa (,1) 9 foliolos finos y largos, colas finas y largas (foxtail), internudo largo; híbrida (,5) en medio.",
+   "rampas_clave": {
+    "cogollo": {
+     "tono": [
+      295,
+      310
+     ],
+     "saturacion_min": 0.4,
+     "rampa": [
+      "#ff5cff",
+      "#d020c8",
+      "#80107a"
+     ]
+    }
+   },
+   "notas": "1.10 P3. Porte i/h/s × ancho 38 (todas las carpas) y 32 (la fila de atrás de la de 120, donde las vecinas quedan a 34 px): floración y lista planta-c-<porte>-<ancho> y vegetativo planta-c-<porte>2-<ancho>, un fotograma cada 2 px de alto (00 el más alto) entre los altos que se ven en las carpas: índica 66-40 y 36-24, híbrida 72-44 y 42-28, sativa 92-54 (con 32 de ancho, 80-54: más alta se sale) y 46-32. El motor dibuja el fotograma de su alto (vcAltura) y le quita la fila que sobre (vcAplasta). Germinando (8 × 8) y plántula (16 × 28), las de carpa-c-plantas-h, para los tres portes. Paleta A: hoja y tallo #0d2620 #1b4630 #2f7038 #57a33e #94d255, tallo tierno #71984a #3b5a2e, tricoma #f2f4dc, pistilos #f08a3c #b45a28 y el cogollo en la rampa clave magenta; el motor pone el color de la variedad al cogollo (+50, tal cual, −60) y su tono de hoja (STRAINS[k].hj) a los verdes de la hoja y el tallo. Como mucho 11 colores por sprite.",
+   "montaje": "tal cual (exporta.py), un PNG por alto, ya en la celda de 40 × 96 con el tallo en las columnas 19-20 (ajuste exacto); la luz la pone el motor",
+   "aprobado": "2026-10-07: planta A con la genética (lámina gen4), «Me vale». El vegetativo es nuevo en esta entrega: pendiente de su visto bueno"
   }
  ],
  "familias": {

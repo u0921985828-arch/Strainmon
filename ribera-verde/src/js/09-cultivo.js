@@ -100,7 +100,8 @@ function newDay(){
 const ESQUEJE_DIAS=1;   // días que aguanta un esqueje enraizando sin plantar (un día de juego ≈ 4 semanas)
 const gauss=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
 const tiraFeno=sg=>{const m=()=>Math.round(clamp(1+sg*gauss(),.6,1.5)*100)/100;return {t:m(),y:m()};};
-function rollFeno(sid){S.fenoN++;return Object.assign({id:S.fenoN},tiraFeno(GENETICA[tipoGen(sid)].sigma));}
+// i: el % índica de la planta (forma y tono de la hoja), alrededor del de su variedad con el σ de su tipo (si)
+function rollFeno(sid){S.fenoN++;const G=GENETICA[tipoGen(sid)];return Object.assign({id:S.fenoN},tiraFeno(G.sigma),{i:Math.round(clamp(indDe(sid)+G.si*gauss(),0,100))});}
 const claseFeno=f=>!f?'normal':f.t*f.y>=FENO_ESTRELLA?'estrella':f.t*f.y<=FENO_FLOJO?'floja':'normal';
 const fenoVisto=f=>f&&f.id&&S.fenos[f.id];   // undefined hasta que se cosecha esa planta o uno de sus esquejes
 const marcaFeno=f=>fenoVisto(f)==='estrella'?' ★':fenoVisto(f)==='floja'?' (floja)':'';

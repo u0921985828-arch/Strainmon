@@ -79,14 +79,16 @@ const ROOT = path.join(__dirname, '..');
 
 ## Las ${D.strains.length} variedades de la Genoteca
 
-| # | Variedad | THC | Rinde (g/m²) | Días | Resist. | Tipo | Color | Cómo se consigue |
-|---|---|---|---|---|---|---|---|---|
+| # | Variedad | THC | Rinde (g/m²) | Días | Resist. | Índica | Tipo | Cogollo | Hoja | Cómo se consigue |
+|---|---|---|---|---|---|---|---|---|---|---|
 `;
   for (const s of D.strains) {
     const how = ORIGIN[s.k] || 'Cruce: ' + s.o.replace(' · LEGENDARIA', '') + (s.o.includes('LEGENDARIA') ? ' · **legendaria**' : '');
-    g += `| ${String(s.idx).padStart(2, '0')} | ${s.n} | ${pct(s.thc)}% | ${s.gm2} | ${pct(s.d)} | ${s.r}% | ${TIPO[s.tipo]}${s.padres ? ' (' + s.padres + ')' : ''} | \`${s.c}\` | ${how} |\n`;
+    g += `| ${String(s.idx).padStart(2, '0')} | ${s.n} | ${pct(s.thc)}% | ${s.gm2} | ${pct(s.d)} | ${s.r}% | ${s.ind} % | ${TIPO[s.tipo]}${s.padres ? ' (' + s.padres + ')' : ''} | \`${s.c}\` | \`${s.hj}\` | ${how} |\n`;
   }
   g += `
+**Índica** es el % índica (el resto, sativa), con datos reales de cada variedad; **hoja**, el tono de su hoja. Dan la forma de la planta en la carpa (\`porteInd\`): 70 % o más, índica (hoja ancha de 7 foliolos, colas gordas y cortas, internudo corto); menos de 30 %, sativa (9 foliolos finos y largos, colas finas y largas, internudo largo); en medio, híbrida. La sativa tiene la hoja clara y amarillenta; la índica, oscura.
+
 ## Historia de cada variedad
 
 Las landraces y los híbridos clásicos de la 1.9 salen del catálogo de Strainmon (\`../src/species.js\`): mismas regiones y perfiles, con su nombre real. Se lee en la Genoteca.
@@ -125,11 +127,13 @@ Lo que sale de un cruce nuevo (receta o híbrido propio) es una **F1**: una lín
 
 Cada semilla es una planta distinta. Al germinar, tira su fenotipo: THC × (1 + σ·z) y gramos × (1 + σ·z), cada uno por su lado (z normal; entre ×0,6 y ×1,5). σ depende de lo pura que sea la genética. Si THC × gramos ≥ ${pct(D.c.FENO_ESTRELLA)}, es un **fenotipo estrella**: va a un lote aparte (★) que se vende y se presenta a la Copa por separado. Si ≤ ${pct(D.c.FENO_FLOJO)}, es **floja**. El fenotipo se sabe al cosecharla.
 
-| Tipo | σ | Estrella | Qué es |
-|---|---|---|---|
+| Tipo | σ | σ índica | Estrella | Qué es |
+|---|---|---|---|---|
 `;
-  for (const t of D.gen) g += `| ${t.n} | ${pct(t.sigma)} | 1 de cada ~${n0(t.uno)} | ${t.d} |\n`;
+  for (const t of D.gen) g += `| ${t.n} | ${pct(t.sigma)} | ${t.si} | 1 de cada ~${n0(t.uno)} | ${t.d} |\n`;
   g += `
+Cada planta tira también su % índica alrededor del de su variedad (σ índica, en puntos): da su forma y el tono de su hoja, así que hasta que la línea se estabiliza (F4) cada planta sale distinta; una línea estable sale toda igual.
+
 Con 50 semillas de un polihíbrido sale de media casi 1 estrella (58 % de que salga al menos una); con 50 de una línea estable, casi nunca. \`test-historia\` tira 200.000 plantas de cada tipo y comprueba esas tasas.
 
 **Esquejes:** a una planta en crecimiento (20-65 %) se le saca un esqueje (−5 de salud): es la misma planta, con su fenotipo. Enraíza en el propagador (hasta 12) y hay que plantarlo antes de que acabe el día siguiente (${D.c.ESQUEJE_DIAS} día de juego ≈ 4 semanas); entra ya de plántula (12 %). Cuando cosechas la madre o un clon y sale estrella, sus esquejes se marcan con ★: así se guarda un fenotipo.
@@ -143,7 +147,7 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
 - **Nombre:** primera palabra de la madre + última palabra del padre (si coincide con un padre, al revés; si ya existe, se añade «F2…F8»).
 - **THC:** media de los padres + aleatorio entre −1,5 y +2,0 (tope 33 %).
 - **Rendimiento:** media ± 4 g. **Días:** media ± 0,3 (redondeado a medios días). **Resistencia:** media ± 5 (entre 20 y 95).
-- **Color:** mezcla al 50 % de los colores de los padres.
+- **De la madre y del padre:** la madre (la primera que eliges) pasa un m % al azar entre 30 y 70 y el padre el resto (la ficha lo enseña: «60 % madre · 40 % padre»). Con ese reparto se mezclan el % índica, el tono de la hoja y el color del cogollo.
 - Aparecen en la Genoteca con ★ y cuentan para el objetivo de «descubrir 8 variedades».
 
 ## Fórmulas de cultivo

@@ -44,7 +44,7 @@ informe técnico directo + código refactorizado, sin relleno.
   (`export CHROMIUM_PATH=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome | head -1)`):
   `npm test` → 52/52, 0 errores JS · `npm run test:arte` → 24/24.
 - Plano de escala: `npm run plano` → `docs/plano/` (con `vista-b.png`) + `docs/PLANO.md` (opción A en la 1.8.0; vista de carpa B en P2).
-- Genética (1.9.0): landraces e híbridos clásicos de `src/species.js` (solo texto e información), estabilizar F1 → F4 y banco de semillas.
+- Genética (1.9.0): landraces e híbridos clásicos de `src/species.js` (solo texto e información), estabilizar F1 → F4 y banco de semillas. En la 1.10, cada variedad lleva su % índica real y su tono de hoja: de ahí salen el porte y la forma de la planta A (vista C, dibujada a mano); un cruce sale en un 30–70 % de la madre y cada planta varía su % índica hasta la F4.
 - Economía (1.10): cifras reales (precios, W, kWh, g/W, tope por maceta), fenotipos estrella según la pureza, esquejes, venta al por mayor, deuda de 30.000 € e imperio tras la deuda. Tablas en `docs/ECONOMIA.md` (`npm run docs`).
 - Android: `npm run apk` → `dist/ribera-verde.apk` (WebView + index.html, `sensorLandscape`; sin Android SDK, ver `ribera-verde/CLAUDE.md`).
 - Sprites: MCP `pixellab` en `.mcp.json` (raíz; habilitado en `.claude/settings.json`), token en la variable `PIXELLAB_TOKEN`,

@@ -132,9 +132,10 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       r.mapa = ['p60', 'm100', 'g150'].every(t => arteCarpaMapa(t, 50, 50)); r.anchos = [A.x1 - A.x0 + 1, B.x1 - B.x0 + 1].join();
       r.solidas = tileSolid(m, A.x0, A.y) && tileSolid(m, B.x0, B.y) && tileSolid(m, B.x1, B.y) && !tileSolid(m, A.x0, A.y + 1);
       r.piso = [m.w, m.h].join('×');
-      // todas las variedades tienen porte (los híbridos propios, por sus días de floración); de vegetativo a lista, alto y ancho
-      // reales (PLANTA_CM a 48 px/m) entre ×0,75 y ×1,33; la que crece no encoge
-      r.n = DEX.length; r.portes = DEX.every(k => k in PORTE) && ['i', 's', 'h'].includes(porteDe('xq9'));
+      // todas las variedades tienen su % índica y su tono de hoja (los híbridos propios, de sus padres; los de partidas viejas, por sus
+      // días de floración), que dan el porte; de vegetativo a lista, alto y ancho reales (PLANTA_CM a 48 px/m) entre ×0,75 y ×1,33; la que crece no encoge
+      r.n = DEX.length; r.portes = DEX.every(k => Number.isInteger(STRAINS[k].ind) && STRAINS[k].ind >= 0 && STRAINS[k].ind <= 100 && /^#[0-9a-f]{6}$/.test(STRAINS[k].hj))
+        && porteDe('xq9') === 'h' && [porteInd(70), porteInd(69), porteInd(30), porteInd(29)].join() === 'i,h,h,s' && porteDe('rif') === 'i' && porteDe('thai') === 's';
       const caja = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, x1 = -1, y0 = 1e9;
         for (let i = 0; i < d.length; i += 4) if (d[i + 3]) { const x = (i / 4) % c.width; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, Math.floor(i / 4 / c.width)); }
         return [x1 - x0 + 1, c.height - y0]; };
@@ -162,13 +163,14 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       press('B'); await hasta(() => mode === 'world' && isFree()); r.sale = !VC && document.getElementById('vcInfo').hidden;
       return r; });
     check('Carpas: muebles del piso (1-2 casillas, sólidos) con su arte, piso de 12×8', carpa.mapa && carpa.anchos === '1,2' && carpa.solidas && carpa.piso === '12×8', carpa);
-    check(`Plantas de la vista B: ${carpa.n} variedades con porte, alto y ancho reales (×0,75-1,33) de vegetativo a lista, seca y muerta sin verdes`, carpa.portes && carpa.crece && carpa.seca, carpa);
+    check(`Plantas de la vista B: ${carpa.n} variedades con % índica, tono de hoja y porte, alto y ancho reales (×0,75-1,33) de vegetativo a lista, seca y muerta sin verdes`, carpa.portes && carpa.crece && carpa.seca, carpa);
     check('Vista B, distancia segura: en las 5 carpas, con cada foco y maceta, ni las copas en floración ni las macetas se tocan ni tocan las paredes, y la cima queda a su distancia del foco', carpa.espacio.length === 5 && carpa.espacio.every(e => +e.split(' ')[1] >= 0), carpa.espacio);
     check('Vista de carpa B: A abre, ▶ plaza 2, ▲ el foco, B sale; cuarto, carpas, macetas, focos y extras', carpa.escena && carpa.sel.join() === '0,1,-1' && /CFL/.test(carpa.info) && carpa.sale, carpa);
-    // vista C (P3, imagen A): la pared solo lleva la tela y la luz va en su propio sprite, por delante; macetas y copas a la escala
-    // de la carpa sin pasar de su sitio (cw) ni de su distancia al foco (ch); sin arte para algo de la carpa, la vista B
+    // vista C (P3, imagen A): la pared solo lleva la tela y la luz va en su propio sprite, por delante; macetas y plantas a la escala
+    // de la carpa; la planta A del porte de cada planta (su % índica), del ancho que deja aire con sus vecinas de fila y las paredes, de
+    // su alto real sin pasar de su distancia al foco (ch) y con el tono de hoja de su variedad; sin arte para algo de la carpa, la vista B
     const vc = await page.evaluate(() => {
-      const r = { escenas: [], fallos: [] }, C0 = S.carpas, M0 = S.macetas, P0 = S.pots;
+      const r = { escenas: [], fallos: [], exactas: 0, aplastadas: 0, anchos: new Set(), portes: new Set() }, C0 = S.carpas, M0 = S.macetas, P0 = S.pots;
       const calidos = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 3] && d[i] > d[i + 2] + 40) n++; return n; };
       // la pared no sigue a la luz: correlación de luminancias pared ↔ luz donde hay luz (la pared de la 1.ª versión, con la forma del cono: 0,8)
       const sigue = (p, l) => { const P = p.getContext('2d').getImageData(0, 0, 240, 160).data, L = l.getContext('2d').getImageData(0, 0, 240, 160).data, a = [], b = [], Y = (d, i) => .299 * d[i] + .587 * d[i + 1] + .114 * d[i + 2];
@@ -176,93 +178,97 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
         const m = v => v.reduce((s, x) => s + x, 0) / v.length, ma = m(a), mb = m(b); let c = 0, va = 0, vb = 0;
         a.forEach((x, k) => { c += (x - ma) * (b[k] - mb); va += (x - ma) ** 2; vb += (b[k] - mb) ** 2; }); return +(c / Math.sqrt(va * vb)).toFixed(2); };
       // brillos cálidos (no la tierra, más oscura): la luz del foco pintada en el sprite
-      // los pistilos de la híbrida (#f08a3c, #b45a28) son naranjas de suyo: no cuentan como luz pintada
+      // los pistilos de la planta A (#f08a3c, #b45a28) son naranjas de suyo: no cuentan como luz pintada
       const PISTILOS = new Set(['240,138,60', '180,90,40']), conLuz = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0;
         for (let i = 0; i < d.length; i += 4) { if (!d[i + 3]) continue; const [r, g, b] = [d[i], d[i + 1], d[i + 2]], M = Math.max(r, g, b), m = Math.min(r, g, b); if (M < 46 || M - m < .25 * M || PISTILOS.has(r + ',' + g + ',' + b)) continue;
           const h = M === r ? 60 * (((g - b) / (M - m)) % 6) : M === g ? 60 * ((b - r) / (M - m) + 2) : 60 * ((r - g) / (M - m) + 4); if ((h + 360) % 360 < 88 || (h + 360) % 360 > 340) n++; } return n; };
-      const ancho = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, x1 = -1; for (let i = 0; i < d.length; i += 4) if (d[i + 3]) { const x = (i / 4) % c.width; x0 = Math.min(x0, x); x1 = Math.max(x1, x); } return x1 - x0 + 1; };
-      const pon = (t, foco, sids, prog = 1, extra = {}) => { S.carpas = [{ t, foco, ...extra }]; S.macetas = Array(CARPAS[t].plazas).fill('plastico7'); S.pots = sids.map((s, i) => s && { sid: s, prog: Array.isArray(prog) ? prog[i] : prog, water: 80, health: 100 }); return vcGeo(0); };
-      const seis = ['mango', 'purpura', 'txoko', 'niebla', 'rif', 'afkush'];
-      // p80 con el sodio de 400 es el caso justo (dos filas con la maceta de 22 px); m120 en floración (prog ,8) aplasta las plantas;
-      // p60 con el CFL y la Skunk #1 (híbrida) en sus 5 fases: germinando y plántula, vegetativo y floración, lista; p80 con el CFL y la
-      // híbrida en plántula, vegetativo y lista (dos filas). Lo esperado, escrito a mano: la híbrida, su sprite de cada fase; el resto, índicas en floración
-      // aplastada sin escalar: mide justo su alto, la base del tallo (2 filas) no cambia y sus filas son filas enteras del sprite, en orden.
-      // Con pisos (VC_PISOS): si cabe quitar alguno del medio, falta alguno entero (más baja = menos nudos) y del último queda algo (su borde
-      // de abajo es el único natural). Lo que no es un piso entero pierde lo mínimo (las filas con menos píxeles de debajo de la cola, el 40 %
-      // de arriba). Escalando se pierden filas sueltas al azar, con hojas y cogollos
-      const aplastaBien = (a, b, h, pisos) => { const W = a.width, H = a.height, A = a.getContext('2d').getImageData(0, 0, W, H).data, B = b.getContext('2d').getImageData(0, 0, W, H).data,
+      const caja = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, x1 = -1; for (let i = 0; i < d.length; i += 4) if (d[i + 3]) { const x = (i / 4) % c.width; x0 = Math.min(x0, x); x1 = Math.max(x1, x); } return [x0, x1]; },
+        ancho = c => { const [x0, x1] = caja(c); return x1 - x0 + 1; };
+      const colores = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, o = new Set(); for (let i = 0; i < d.length; i += 4) if (d[i + 3]) o.add('#' + [d[i], d[i + 1], d[i + 2]].map(v => v.toString(16).padStart(2, '0')).join('')); return o; };
+      // ss: sid o [sid, % índica de la planta]
+      const pon = (t, foco, ss, prog = 1, extra = {}) => { S.carpas = [{ t, foco, ...extra }]; S.macetas = Array(CARPAS[t].plazas).fill('plastico7');
+        S.pots = ss.map((s, i) => s && { sid: [].concat(s)[0], prog: Array.isArray(prog) ? prog[i] : prog, water: 80, health: 100, f: Array.isArray(s) ? { id: 1, t: 1, y: 1, i: s[1] } : undefined }); return vcGeo(0); };
+      // aplastada sin escalar: mide justo su alto, la base del tallo (2 filas) no cambia y sus filas son filas enteras del fotograma, en
+      // orden; pierde lo mínimo (las filas con menos píxeles de debajo de la cola, el 40 % de arriba). Escalando se pierden filas sueltas al azar
+      const aplastaBien = (a, b, h) => { const W = a.width, H = a.height, A = a.getContext('2d').getImageData(0, 0, W, H).data, B = b.getContext('2d').getImageData(0, 0, W, H).data,
           fila = (D, y) => D.slice(y * W * 4, (y + 1) * W * 4).join(), cuenta = (D, y) => { let k = 0; for (let x = 0; x < W; x++) if (D[(y * W + x) * 4 + 3]) k++; return k; }, alto = vcAlto(a), y0 = H - alto;
-        let perdidos = 0; const quedan = new Set(); for (let y = 0; y < H; y++) perdidos += cuenta(A, y) - cuenta(B, y);
-        // qué filas de a se quedan: de las formas de sacar b de a (filas enteras, en orden), la que deja fuera más filas de pisos del medio
-        // enteros (con filas iguales, la primera que case podría ser una de un piso que se fue) y, a igualdad, la que deja más del último. V: lo
-        // mejor desde la fila i de a con jb de b puestas; t = el piso de la fila i − 1 ya tiene alguna que se queda
-        const md = pisos ? pisos.slice(1, -1) : [], fa = [], fb = []; for (let y = y0; y < H; y++) fa.push(fila(A, y)); for (let y = H - h; y < H; y++) fb.push(fila(B, y));
-        const n = fa.length, m = fb.length, pz = fa.map((_, i) => md.findIndex(([p0, p1]) => i >= p0 && i <= p1)), V = [], U = [], ix = (i, jb, t) => (i * (m + 1) + jb) * 2 + t,
-          fin = i => pisos && i >= pisos[pisos.length - 1][0] && i <= pisos[pisos.length - 1][1] ? 1e-3 : 0, cierra = (i, t) => i && (i === n || pz[i] !== pz[i - 1]) ? [pz[i - 1] >= 0 && !t ? md[pz[i - 1]][1] - md[pz[i - 1]][0] + 1 : 0, 0] : [0, t];
-        for (let i = n; i >= 0; i--) for (let jb = 0; jb <= m; jb++) for (const t0 of [0, 1]) { const [g, t] = cierra(i, t0);
-          if (i === n) { V[ix(i, jb, t0)] = jb === m ? g : -1e9; continue; }
-          let v = V[ix(i + 1, jb, t)], u = 0; if (jb < m && fa[i] === fb[jb] && V[ix(i + 1, jb + 1, pz[i] >= 0 ? 1 : 0)] + fin(i) > v) { v = V[ix(i + 1, jb + 1, pz[i] >= 0 ? 1 : 0)] + fin(i); u = 1; }
-          V[ix(i, jb, t0)] = v + g; U[ix(i, jb, t0)] = u; }
-        const enteras = V[ix(0, 0, 0)] >= 0; if (enteras) for (let i = 0, jb = 0, t = 0; i < n; i++) { const u = U[ix(i, jb, t)]; t = cierra(i, t)[1];
-          if (u) { quedan.add(y0 + i); jb++; t = pz[i] >= 0 ? 1 : 0; } }
-        const base = fila(A, H - 1) === fila(B, H - 1) && fila(A, H - 2) === fila(B, H - 2), mide = vcAlto(b) === h;
-        const medio = md, idos = medio.filter(([p0, p1]) => { for (let y = p0; y <= p1; y++) if (quedan.has(y0 + y)) return false; return true; }),
-          enPiso = y => idos.some(([p0, p1]) => y - y0 >= p0 && y - y0 <= p1), cola = y0 + Math.round(alto * .4), abajo = [], arriba = [];
-        let nPiso = 0; for (let y = y0; y < H; y++) if (enPiso(y)) { perdidos -= cuenta(A, y); nPiso++; } else if (y < H - 2) (y < cola ? arriba : abajo).push(cuenta(A, y));
-        const minimo = [...abajo.sort((x, y) => x - y), ...arriba.sort((x, y) => x - y)].slice(0, alto - h - nPiso).reduce((x, y) => x + y, 0), k = { enteras, base, mide, perdidos, minimo };
-        if (!pisos) return { ...k, ok: enteras && base && mide && perdidos <= minimo };
-        const u = pisos[pisos.length - 1], caben = medio.some(([p0, p1]) => p1 - p0 + 1 <= alto - h), fondo = [...quedan].some(y => y - y0 >= u[0] && y - y0 <= u[1]);
-        return { ...k, caben, entero: idos.length > 0, fondo, ok: enteras && base && mide && perdidos <= minimo && fondo && (!caben || idos.length > 0) }; };
-      // la híbrida está dibujada a mano a cada alto (un fotograma por alto): más alta = más nudos, nunca la misma más larga. Lista y floración
-      // de 40 a 99 filas sin saltarse ninguna y el vegetativo desde 52, cada fotograma más bajo que el anterior; cuanto más alta, más cogollo
-      // (nunca menos que una 10 filas más baja; la de 99, al menos 1,8 veces la de 40). Estirar repite filas: ninguna fila con hojas o
-      // cogollos (más de 2 píxeles: el tallo solo sí se repite) es igual a la de encima
+        let perdidos = 0; for (let y = 0; y < H; y++) perdidos += cuenta(A, y) - cuenta(B, y);
+        let jb = H - h; for (let y = y0; y < H && jb < H; y++) if (fila(A, y) === fila(B, jb)) jb++;
+        const enteras = jb === H, base = fila(A, H - 1) === fila(B, H - 1) && fila(A, H - 2) === fila(B, H - 2), mide = vcAlto(b) === h, cola = y0 + Math.round(alto * .4), abajo = [], arriba = [];
+        for (let y = y0; y < H - 2; y++) (y < cola ? arriba : abajo).push(cuenta(A, y));
+        const minimo = [...abajo.sort((x, y) => x - y), ...arriba.sort((x, y) => x - y)].slice(0, alto - h).reduce((x, y) => x + y, 0);
+        return { enteras, base, mide, perdidos, minimo, ok: enteras && base && mide && perdidos <= minimo }; };
       const fotos = n => { const g = ARTE.cubre['misc:' + n], k = frameDe(g, n, 'unica', 0, { i: 0 }).n; return [...Array(k)].map((_, i) => frameDe(g, n, 'unica', 0, { i }).c); },
-        clave = new Set(((ARTE.d.rampas || {})['carpa-c-plantas'] || { cogollo: { rampa: [] } }).cogollo.rampa.map(h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)).join())),
+        clave = new Set(((ARTE.d.rampas || {})['carpa-c-plantas-a'] || { cogollo: { rampa: [] } }).cogollo.rampa.map(h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)).join())),
         cogollo = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 3] && clave.has(d[i] + ',' + d[i + 1] + ',' + d[i + 2])) n++; return n; };
       const repetidas = c => { const W = c.width, d = c.getContext('2d').getImageData(0, 0, W, c.height).data, f = y => d.slice(y * W * 4, (y + 1) * W * 4).join(); let n = 0;
-        for (let y = 1; y < c.height; y++) { let k = 0; for (let x = 0; x < W; x++) if (d[(y * W + x) * 4 + 3]) k++; if (k > 2 && f(y) === f(y - 1)) n++; } return n; };
-      const ESP_H = ['planta-c-h0-8', 'planta-c-h1-18', 'planta-c-h2-24', 'planta-c-h-24', 'planta-c-h-24'];
-      for (const [t, f, ss, prog] of [['p60', 'sodio250', ['mango', 'purpura'], 1], ['p80', 'sodio400', ['txoko', 'niebla', 'hindu'], 1], ['m100', 'sodio400', ['txoko', 'niebla', 'rif', 'hindu'], 1],
-        ['m120', 'sodio600', seis, .8], ['g150', 'sodio600', seis, 1], ['p60', 'cfl', ['ria', 'ria'], [.05, .2]], ['p60', 'cfl', ['ria', 'ria'], [.5, .8]], ['p60', 'cfl', ['ria', null], 1], ['p80', 'cfl', ['ria', 'ria', 'ria'], [.2, .5, 1]], ['p60', 'sodio250', ['ria', 'mango'], 1], ['m120', 'sodio600', Array(6).fill('ria'), [.05, .2, .5, .8, 1, 1]]]) {
+        for (let y = 1; y < c.height; y++) { let k = 0; for (let x = 0; x < W; x++) if (d[(y * W + x) * 4 + 3]) k++; if (k > 4 && f(y) === f(y - 1)) n++; } return n; };
+      // la Skunk #1 (ria, 65 %) es la paleta A tal cual; la Afghani (100 %), la Haze (10 %) y la Blue Dream (40 %), con su tono
+      const ESC = [['p60', 'cfl', ['rif', 'haze'], 1], ['p60', 'sodio250', ['ria', 'nieblamor'], [.7, .5]], ['p60', 'cfl', ['ria', 'thai'], [.05, .2]],
+        ['p80', 'sodio400', ['nl', 'tormenta', 'ria'], [1, 1, .5]], ['p80', 'cfl', ['purpurah', 'malawi', 'citrus'], [.5, .8, 1]],
+        ['m100', 'sodio400', ['purpurah', 'thai', 'txoko', 'malawi'], [1, .7, .4, .2]], ['m100', 'sodio600', ['haze', 'nieblamor', 'rif', 'ssh'], .8],
+        ['m120', 'sodio600', ['mango', 'purpura', 'txoko', 'niebla', 'rif', 'afkush'], .8], ['m120', 'sodio400', ['haze', 'ria', 'afkush', 'thai', 'nieblamor', 'kif'], [1, 1, 1, .5, .5, .5]],
+        ['g150', 'sodio600', ['afkush', 'ssh', 'kif', 'nieblamor', 'acapulco', 'rif'], [1, 1, 1, .7, .5, .05]], ['p60', 'sodio250', [['haze', 90], ['rif', 10]], 1]];
+      for (const [t, f, ss, prog] of ESC) {
         const g = pon(t, f, ss, prog), n = t + '/' + f; if (!g.vc) { r.fallos.push(n + ' sin vista C'); continue; }
         const { Z } = g.vc, boca = VCA.boca, e = { t, pared: calidos(vcFondo(t, g.vc, 'pared')), luz: calidos(vcFondo(t, g.vc, 'luz')), foco: ancho(g.vc.foco.f.c), focoReal: Math.round(FOCO_CM[f] * Z),
           sigue: sigue(vcFondo(t, g.vc, 'pared'), vcFondo(t, g.vc, 'luz')), objetos: g.pl.reduce((n, q) => n + conLuz(q.v.m.f.c) + (q.v.p ? conLuz(q.v.p.f.c) : 0), 0),
           luzTipo: f === 'cfl' ? calidos(vcLuz(t, g.vc)) : 0 };   // la luz del CFL, fría: ni un píxel cálido
-        // lo dibujado (ya aplastado), no lo calculado: ancho de la copa, alto de la planta y cima a la boca del foco en pantalla; el sprite de su porte y fase
+        // lo dibujado, no lo calculado: de cada planta, dónde caen sus píxeles en pantalla (x0, x1), su alto y su cima
+        const dib = {};
         for (const q of g.pl) { const v = q.v, p = S.pots[q.i], st = p && plantStage(p);
-          if (!p) continue; if (p.sid === 'ria' ? v.p.n !== ESP_H[st] : !/^planta-c-i-\d+$/.test(v.p.n)) r.fallos.push(`${n} plaza ${q.i}: fase ${st} con ${v.p.n}`);
-          const dib = vcDibujo(v), w = ancho(v.p.f.c), h = vcAlto(dib), cima = q.y - v.tierra - h;
-          if (w > q.cw * Z + 1) r.fallos.push(`${t} plaza ${q.i}: copa de ${w} px y caben ${(q.cw * Z).toFixed(1)}`);
-          const real = Math.min(PLANTA_CM[porteDe(p.sid)].w[st], q.cw) * Z;   // ancho real de la copa en su sitio: el dibujo, entre ×0,75 y ×1,33 (como la vista B)
-          if (w > real * 1.33 + 1 || w < real * .75 - 1) r.fallos.push(`${n} plaza ${q.i}: ${w} px de ancho en la fase ${st} (real ${real.toFixed(1)})`);
-          if (h > PLANTA_CM[porteDe(p.sid)].h[st] * 1.33 * Z + 1) r.fallos.push(`${n} plaza ${q.i}: ${h} px de alto en la fase ${st} (real ${(PLANTA_CM[porteDe(p.sid)].h[st] * Z).toFixed(1)})`);
-          if (h > q.ch * Z + .5) r.fallos.push(`${t} plaza ${q.i}: ${h} px de alto y el tope es ${(q.ch * Z).toFixed(1)}`);
+          if (!p) continue; const po = portePlanta(p), nom = 'planta-c-' + (st < 2 ? 'h' : po) + (st >= 3 ? '' : st) + '-'; r.portes.add(po + st);
+          // el porte de la planta: el de su % índica (p.f.i), no el de su variedad
+          if (p.f && porteInd(p.f.i) !== po) r.fallos.push(`${n} plaza ${q.i}: porte ${po} con ${p.f.i} % índica`);
+          if (!v.p.n.startsWith(nom)) r.fallos.push(`${n} plaza ${q.i}: fase ${st} (${po}) con ${v.p.n}`);
+          // el más ancho que deja 2 px de aire en su sitio (o el más estrecho si ninguno); su sitio, hasta la vecina de fila o la pared
+          const A = vcAnchos(nom), a = +v.p.n.slice(nom.length); r.anchos.add(a);
+          if (A.some(b => b > a && b <= v.esp - 2) || (a > v.esp - 2 && A.some(b => b < a))) r.fallos.push(`${n} plaza ${q.i}: ${v.p.n} con ${v.esp} px de sitio`);
+          const c0 = vcDibujo(v), h = vcAlto(c0), cima = q.y - v.tierra - h, D = PLANTA_CM[po], [x0, x1] = caja(c0), dx = q.x - (c0.width >> 1);
+          dib[q.i] = [dx + x0, dx + x1];
+          // de alto, el real de su porte y fase (ch como mucho) y su distancia al foco; el de su fotograma tal cual o aplastado 1 fila
+          const tope = Math.min(vcAlto(v.p.f.c), Math.round(Math.min(D.h[st], q.ch) * Z), Math.floor(q.y - v.tierra - boca - FOCO_SEP[f] * Z));
+          if (h !== v.hp || v.hp !== tope) r.fallos.push(`${n} plaza ${q.i}: ${h} px de alto (hp ${v.hp}, tope ${tope})`);
           if ((cima - boca) / Z < FOCO_SEP[f]) r.fallos.push(`${t} plaza ${q.i}: cima a ${((cima - boca) / Z).toFixed(1)} cm del foco (${FOCO_SEP[f]})`);
-          if (st === 3 && h >= vcAlto(v.p.f.c)) r.fallos.push(`${t} plaza ${q.i}: en floración no se aplasta (${h} px)`);
-          if (v.p.k) { const D = PLANTA_CM[porteDe(p.sid)], tope = Math.min(vcAlto(v.p.f.c), Math.round(Math.min(D.h[st] * v.p.k, q.ch) * Z), Math.floor(q.y - v.tierra - boca - FOCO_SEP[f] * Z));
-            r.conK = (r.conK || 0) + 1; if (v.hp !== tope) r.fallos.push(`${n} plaza ${q.i}: elegida ×${v.p.k.toFixed(2)} de ancho y ${v.hp} px de alto (${tope})`); }
-          // más baja que su sprite: la híbrida, el fotograma de su alto tal cual; si no lo hay justo (y las demás), aplastada
-          if (v.hp < vcAlto(v.p.f.c)) { const [a, c, i] = vcAltura(v.p.n, v.hp);
-            if (a === v.hp) { r.exactas = (r.exactas || 0) + 1; if (dib !== c) r.fallos.push(`${n} plaza ${q.i}: hay fotograma de ${a} px y no se usa`); }
-            else { const k = aplastaBien(c, dib, v.hp, i ? null : VC_PISOS[v.p.n]); r.aplastadas = (r.aplastadas || 0) + 1; if (!k.ok) r.fallos.push(`${n} plaza ${q.i}: aplastada ${JSON.stringify(k)}`); } } }
+          if (v.hp < vcAlto(v.p.f.c)) { const [al, c, i] = vcAltura(v.p.n, v.hp);
+            if (al === v.hp) { r.exactas++; if (c0 !== c) r.fallos.push(`${n} plaza ${q.i}: hay fotograma de ${al} px y no se usa`); }
+            else { const k = aplastaBien(c, c0, v.hp); r.aplastadas++; if (!k.ok || (st >= 2 && al - v.hp > 1)) r.fallos.push(`${n} plaza ${q.i}: aplastada ${al} → ${v.hp} ${JSON.stringify(k)}`); } }
+          // el tono de la hoja: los verdes de la paleta A pasan a los de su variedad (ni uno se queda si su tono es otro)
+          const hj = hojaPlanta(p), T = vcTonos(hj), cs = colores(conRampa(c0, T, 'test|' + hj));
+          if (hj !== '#57a33e' && (cs.has('#57a33e') || !cs.has(T['#57a33e']))) r.fallos.push(`${n} plaza ${q.i}: hoja sin el tono ${hj}`); }
+        // en pantalla, ninguna planta toca a su vecina de fila (2 px de aire) ni se sale por las paredes de su fila
+        for (const a of g.pl) { if (!dib[a.i]) continue; const wy = g.vc.w + 32 * (a.y - VCA.fondo) / 19;
+          if (dib[a.i][0] < 120 - wy / 2 - .5 || dib[a.i][1] > 120 + wy / 2 + .5) r.fallos.push(`${t} plaza ${a.i}: ${dib[a.i]} se sale de la pared (${(120 - wy / 2).toFixed(1)}-${(120 + wy / 2).toFixed(1)})`);
+          for (const b of g.pl) if (a.i < b.i && dib[b.i] && a.y === b.y) { const aire = a.x < b.x ? dib[b.i][0] - dib[a.i][1] - 1 : dib[a.i][0] - dib[b.i][1] - 1;
+            if (aire < 2) r.fallos.push(`${t}: plantas ${a.i} y ${b.i} a ${aire} px`); } }
         for (const a of g.pl) for (const b of g.pl) if (a.i < b.i && a.y === b.y && Math.abs(a.x - b.x) < ancho(a.v.m.f.c)) r.fallos.push(`${t}: macetas ${a.i} y ${b.i} se tocan`);
         if (e.pared || e.luz < 2000 || Math.abs(e.sigue) > .25 || e.objetos || e.luzTipo || Math.abs(e.foco - e.focoReal) > 3) r.fallos.push(JSON.stringify(e));
         // la luz se pinta después de todas las macetas y plantas, en 'overlay', y antes de la campana
         const orden = [], di = ctx.drawImage, luz = vcLuz(t, g.vc), suyas = new Set(g.pl.flatMap(q => [q.v.m.f.c, q.v.p && q.v.p.f.c]));
-        ctx.drawImage = function (im, ...a) { orden.push(im === luz ? 'luz:' + ctx.globalCompositeOperation + ':' + ctx.globalAlpha : im === g.vc.foco.f.c ? 'foco' : suyas.has(im) || im.width === 48 ? 'obj' : '-'); return di.call(this, im, ...a); };
+        ctx.drawImage = function (im, ...a) { orden.push(im === luz ? 'luz:' + ctx.globalCompositeOperation + ':' + ctx.globalAlpha : im === g.vc.foco.f.c ? 'foco' : suyas.has(im) || im.width === 40 ? 'obj' : '-'); return di.call(this, im, ...a); };
         VC = { ci: 0, sel: 0, ocupado: false }; renderCarpa(1000); VC = null; ctx.drawImage = di; r.escenas.push(n);
         const iL = orden.indexOf('luz:overlay:' + (f === 'cfl' ? .6 : 1));   // el CFL, más suave
         if (iL < 0 || orden.lastIndexOf('obj') > iL || orden.indexOf('foco') < iL) r.fallos.push(n + ': orden ' + orden.join(','));
       }
-      { const L = fotos('planta-c-h-24').map(c => [vcAlto(c), cogollo(c)]), V = fotos('planta-c-h2-24').map(vcAlto), a = L.map(x => x[0]),
-          menos = L.filter(([h, k]) => L.some(([h2, k2]) => h2 <= h - 10 && k2 > k)).map(x => x[0]), c40 = (L.find(x => x[0] === 40) || [0, 1e9])[1];
-        r.altos = { lista: [a[0], a[a.length - 1], a.length], cogollo: [c40, L[0][1]], menos, veg: [V[0], V[V.length - 1], V.length] };
-        if (a.length !== 60 || a.some((h, i) => h !== 99 - i) || V[0] !== 52 || V.some((h, i) => i && h >= V[i - 1]) || menos.length || !(L[0][1] >= 1.8 * c40)) r.fallos.push('altos: ' + JSON.stringify(r.altos)); }
-      r.repetidas = ['planta-c-h-24', 'planta-c-h2-24', 'planta-c-h1-18', 'planta-c-h0-8'].map(n => fotos(n).reduce((s, c) => s + repetidas(c), 0)); if (r.repetidas.some(k => k)) r.fallos.push('filas repetidas (estirada): ' + r.repetidas);
-      // la comprobación distingue: el vegetativo estirado a 99 filas (repitiendo filas, como la lista que se rechazó) sí repite
-      { const a = fotoMisc('planta-c-h2-24').c, al = vcAlto(a), H = a.height, [e, x] = mkCanvas(a.width, H);
-        for (let t = 0; t < 99; t++) x.drawImage(a, 0, H - al + Math.floor(t * al / 99), a.width, 1, 0, H - 99 + t, a.width, 1);
+      // en cada carpa con cada foco con campana, los tres portes en vegetativo, floración y lista: su alto cae dentro de los fotogramas
+      // de su sprite (sobra 1 fila como mucho: uno cada 2 px)
+      r.cubre = 0;
+      for (const t in CARPAS) for (const f in FOCOS) if (FOCOS[f].w <= CARPAS[t].wmax) for (const po of ['i', 'h', 's']) for (const pr of [.5, .8, 1]) {
+        const sid = { i: 'rif', h: 'nepal', s: 'thai' }[po], g = pon(t, f, Array(CARPAS[t].plazas).fill(sid), pr); if (!g.vc) continue;
+        for (const q of g.pl) { const v = q.v, L = vcAltura(v.p.n, v.hp); if (L[0] < v.hp || L[0] - v.hp > 1) r.fallos.push(`${t}/${f} ${po} ${pr} plaza ${q.i}: ${v.hp} px y el fotograma de ${L[0]}`); }
+        r.cubre++; }
+      // los fotogramas: uno cada 2 px de alto, del más alto al más bajo; sin filas repetidas (estirar repite filas: ninguna fila con hojas o
+      // cogollos, más de 4 píxeles, el tronco con su contorno, igual a la de encima; las ramas peladas de la sativa alta, 2 como mucho); como
+      // mucho del ancho de su nombre; en vegetativo sin cogollos y, en flor, más alta = más cogollo (nunca menos que una 10 filas más baja)
+      r.altos = {};
+      for (const po of ['i', 'h', 's']) for (const w of [38, 32]) for (const fa of ['', '2']) { const nm = 'planta-c-' + po + fa + '-' + w, F = fotos(nm), a = F.map(vcAlto), k = F.map(cogollo);
+        r.altos[nm] = [a[0], a[a.length - 1], a.length];
+        if (a.some((h, i) => i && h !== a[i - 1] - 2) || F.some(c => ancho(c) > w) || F.some(c => repetidas(c) > 2) || (fa ? k.some(Boolean) : k.some((x, i) => k.some((y, j) => a[j] <= a[i] - 10 && y > x)) || !k[k.length - 1]))
+          r.fallos.push(nm + ': ' + JSON.stringify({ a, k })); }
+      r.repetidas = ['planta-c-h1-18', 'planta-c-h0-8'].map(n => fotos(n).reduce((s, c) => s + repetidas(c), 0)); if (r.repetidas.some(k => k)) r.fallos.push('filas repetidas (estirada): ' + r.repetidas);
+      // la comprobación distingue: el vegetativo estirado a 90 filas (repitiendo filas, como la lista que se rechazó) sí repite
+      { const a = fotoMisc('planta-c-h2-38').c, al = vcAlto(a), H = a.height, [e, x] = mkCanvas(a.width, H);
+        for (let t = 0; t < 90; t++) x.drawImage(a, 0, H - al + Math.floor(t * al / 90), a.width, 1, 0, H - 90 + t, a.width, 1);
         r.estirada = repetidas(e); if (r.estirada < 20) r.fallos.push('repetidas no ve lo estirado: ' + r.estirada); }
       // el CFL apagado (carpa vacía): la campana dibujada es la apagada y el tubo (luminosidad > 170) se queda oscuro (< 100); sin luz
       { const g = pon('p60', 'cfl', [null, null]), fc = g.vc && g.vc.foco.f.c, off = fc && vcApagado(fc), Y = (d, i) => .299 * d[i] + .587 * d[i + 1] + .114 * d[i + 2],
@@ -271,14 +277,14 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
         let dib = 0, luzD = 0; const di = ctx.drawImage, luz = g.vc && vcLuz('p60', g.vc); ctx.drawImage = function (im, ...a) { if (im === off) dib++; if (im === luz) luzD++; return di.call(this, im, ...a); };
         if (g.vc) { VC = { ci: 0, sel: 0, ocupado: false }; renderCarpa(1000); VC = null; } ctx.drawImage = di;
         r.cflApagado = g.vc && { encendidos: vivos(fc), apagados: vivos(off), dib, luzD }; if (!g.vc || !r.cflApagado.encendidos || r.cflApagado.apagados || !dib || luzD) r.fallos.push('p60/cfl apagado: ' + JSON.stringify(r.cflApagado)); }
-      r.b = { led100: !pon('p60', 'led100', ['mango', null]).vc, extras: !pon('p60', 'sodio250', ['mango', null], 1, { vent: true }).vc, plantula: !pon('p60', 'sodio250', ['mango', null], .2).vc,
-        sativa: !pon('p60', 'sodio250', ['malawi', null]).vc, cfl200: !pon('m100', 'cfl', ['ria', null, null, null]).vc,
-        hibrida150: !pon('g150', 'sodio600', Array(6).fill('ria'), 1).vc, hibrida100: !pon('m100', 'sodio400', Array(4).fill('ria'), .8).vc, tela: (() => { pon('p60', 'sodio250', [null, null]); S.macetas[0] = 'tela11'; return !vcGeo(0).vc; })(), vacia: (() => { const g = pon('m100', 'sodio600', [null, null, null, null]); if (!g.vc) return false;   // vacía: vista C con el foco apagado, sin luz
+      r.b = { led100: !pon('p60', 'led100', ['mango', null]).vc, extras: !pon('p60', 'sodio250', ['mango', null], 1, { vent: true }).vc, cfl200: !pon('m100', 'cfl', ['ria', null, null, null]).vc,
+        tela: (() => { pon('p60', 'sodio250', [null, null]); S.macetas[0] = 'tela11'; return !vcGeo(0).vc; })(), vacia: (() => { const g = pon('m100', 'sodio600', [null, null, null, null]); if (!g.vc) return false;   // vacía: vista C con el foco apagado, sin luz
           const luz = vcFondo('m100', g.vc, 'luz'), di = ctx.drawImage; let n = 0, encendido = 0;
           ctx.drawImage = function (im, ...a) { if (im === luz) n++; if (im === g.vc.foco.f.c) encendido++; return di.call(this, im, ...a); };
           VC = { ci: 0, sel: 0, ocupado: false }; renderCarpa(1000); VC = null; ctx.drawImage = di; return !n && !encendido; })() };
+      r.anchos = [...r.anchos].sort().join(); r.portes = [...r.portes].sort().join();
       S.carpas = C0; S.macetas = M0; S.pots = P0; return r; });
-    check('Vista C (imagen A): en p60, p80, m100, m120 y g150, la p60 y la p80 con el CFL y la Skunk #1 de germinando a lista, y la m120 con la Skunk #1 en sus fases, la pared solo lleva tela (ni luz ni la forma del cono), macetas y plantas sin luz pintada y la luz es su propio sprite, por delante en «overlay» (la del CFL, fría y al 60 %); cada fase con su sprite (la híbrida, dibujada a mano a cada alto: más alta, más nudos y más cogollo, sin filas repetidas, y a su alto, el fotograma de ese alto) y, si no lo hay, pierde pisos enteros y filas, sin escalar; copas y macetas sin tocarse ni pasar de su distancia al foco; el CFL apagado, gris; sin arte, la vista B', vc.escenas.length === 11 && vc.aplastadas >= 8 && vc.exactas >= 5 && vc.conK >= 1 && !vc.fallos.length && Object.values(vc.b).every(Boolean), vc);
+    check('Vista C (imagen A): en las 5 carpas, la planta A del porte de cada planta (su % índica) en todas sus fases, con el tono de hoja de su variedad; la más ancha que deja 2 px de aire con su vecina de fila y las paredes (la de 38 o la de 32); de su alto real, sin pasar de su distancia al foco, con el fotograma de su alto (uno cada 2 px, sin filas repetidas, más alta = más cogollo) o aplastado 1 fila, sin escalar, en todas las carpas y focos; la pared solo lleva tela, macetas y plantas sin luz pintada y la luz es su propio sprite, por delante en «overlay» (la del CFL, fría y al 60 %); el CFL apagado, gris; sin arte, la vista B', vc.escenas.length === 11 && vc.aplastadas >= 5 && vc.exactas >= 5 && vc.anchos === '18,32,38,8' && vc.portes === 'h0,h2,h3,h4,i0,i2,i3,i4,s1,s2,s3,s4' && vc.cubre >= 100 && !vc.fallos.length && Object.values(vc.b).every(Boolean), vc);
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
       for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }
       r.rio = mascaraOrilla(m, 31, 15); r.centro = mascaraOrilla(m, 35, 27); r.sinAtlas = (() => { const ok = ARTE.ok; ARTE.ok = false; const v = arteOrilla(m, 'water', 31, 15, 0, 0); ARTE.ok = ok; return v; })(); return r; });

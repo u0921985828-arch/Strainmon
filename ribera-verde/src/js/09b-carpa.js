@@ -14,13 +14,12 @@
    Con el arte de la imagen A en el atlas, la carpa se ve por dentro a pantalla completa (vista C, abajo).
    ========================================================= */
 const VB_M=.48,VB_F=.24,VB_X=.06,VB_PARED=126;   // px por cm de ancho y alto · de fondo · corrimiento a la derecha por cm de fondo · y de la pared
-// porte de cada variedad para dibujar su planta (i: índica, s: sativa, h: híbrida); los híbridos propios, por sus días de floración
-const PORTE={ria:'h',limon:'s',txoko:'i',niebla:'i',mango:'i',purpura:'i',rif:'i',hindu:'i',acapulco:'s',malawi:'s',citrus:'h',bluetx:'i',sollimon:'h',
-  kushrif:'i',purpurah:'i',orotrop:'i',nieblamor:'h',brumaog:'s',reina:'i',amanecer:'s',tormenta:'s',dragon:'h',leyenda:'s',
-  mich:'s',punto:'s',thai:'s',lao:'s',chitral:'i',nepal:'h',congo:'s',lamb:'s',kif:'i',beldia:'i',oaxaca:'s',panama:'s',haze:'s',nl:'i',afkush:'i',shiva:'i',silver:'h',ssh:'s'};
-const porteDe=sid=>{if(PORTE[sid])return PORTE[sid];const d=(getStrain(sid)||{d:3.5}).d;return d<=3?'i':d>=4.5?'s':'h';};
-// alto y ancho reales (cm, sin maceta) por fase: germinando, plántula, vegetativo, floración y lista. Las dos primeras, a ×2 para que se vean
-const PLANTA_CM={i:{h:[10,30,45,75,90],w:[8,20,45,65,70]},s:{h:[10,30,70,120,140],w:[8,18,35,55,60]},h:{h:[10,30,55,95,110],w:[8,18,40,58,60]}};
+// porte para dibujar la planta (i: índica, s: sativa, h: híbrida), por su % índica (indDe, 03-datos): 70 o más, índica; menos de 30,
+// sativa. Cada planta, por el suyo (p.f.i, que varía alrededor del de su variedad hasta que la línea se estabiliza)
+const porteInd=i=>i>=70?'i':i<30?'s':'h',porteDe=sid=>porteInd(indDe(sid)),portePlanta=p=>porteInd(p.f&&p.f.i!=null?p.f.i:indDe(p.sid));
+// alto y ancho reales (cm, sin maceta) por fase: germinando, plántula, vegetativo, floración y lista. Las dos primeras, a ×2 para que se vean.
+// Plantas despuntadas y en mainline (la planta A, 1.10): bajas y anchas; en floración estiran ×1,6 (índica) a ×2 (sativa)
+const PLANTA_CM={i:{h:[10,30,35,55,65],w:[8,20,40,55,60]},s:{h:[10,30,45,75,90],w:[8,18,35,48,55]},h:{h:[10,30,40,60,70],w:[8,18,38,52,58]}};
 // macetas: diámetro y alto (cm), cuerpo, borde y si es de tela
 const MACETA_CM={plastico7:[22,20,'#2c2c30','#4a4a52',0],tela11:[25,22,'#45474e','#5e6068',1],plastico18:[30,28,'#2c2c30','#4a4a52',0],tela25:[35,26,'#7a6c50','#988a6c',1]};
 const FOCO_CM={cfl:35,sodio250:45,sodio400:50,sodio600:55,led100:25,led200:30,led480:60,led720:100};   // ancho real de cada foco
@@ -51,7 +50,7 @@ function posPlaza(i){
   const p=S.pots[i],h=p?altoPlanta(p,q):0;return [q.x,q.y-macetaPx(S.macetas[i]).hb-Math.round(h/2)];
 }
 // alto en px de la planta; en una plaza q, con el tope de alto de la plaza (q.ch)
-const altoPlanta=(p,q)=>{const D=PLANTA_CM[porteDe(p.sid)];return Math.min(Math.round(D.h[p.dead?2:plantStage(p)]*VB_M),q?Math.floor(q.ch*VB_M):1e9)-(p.dead?4:0);};
+const altoPlanta=(p,q)=>{const D=PLANTA_CM[portePlanta(p)];return Math.min(Math.round(D.h[p.dead?2:plantStage(p)]*VB_M),q?Math.floor(q.ch*VB_M):1e9)-(p.dead?4:0);};
 
 /* ---------- vista C (P3): la carpa por dentro a pantalla completa, como la imagen A ----------
    La pared (misc:carpa-c-pared) es la imagen A sin plantas, sin foco y sin su luz: solo la tela, con sus brillos y sombras. La luz
@@ -59,21 +58,20 @@ const altoPlanta=(p,q)=>{const D=PLANTA_CM[porteDe(p.sid)];return Math.min(Math.
    Cada carpa va a su escala (px/cm): Z = 134 / (alto − 28), así la boca del foco (y 16, donde está en la imagen A) queda a su altura
    real sobre el suelo (y 150, a medio fondo). La pared del fondo se recorta al ancho de la carpa (W·Z px) alrededor de x 120, entre
    los laterales de la imagen A (columnas 0-43 y 196-239); el suelo baja de y 140 a 159 y se abre 16 px por lado. Macetas y copas,
-   como en la vista B: en el centro de su parte y como mucho de cw × ch (distancia segura), a escala Z.
-   Solo se usa si hay arte para todo lo que hay en la carpa (por ahora, focos de sodio y CFL, macetas de 7 L sin extras, índicas en
-   floración y lista, e híbridas en sus fases); si no, la vista B. */
+   como en la vista B: en el centro de su parte y como mucho de ch de alto (distancia segura al foco), a escala Z; de ancho, la planta A
+   (38 px) o, si sus vecinas de fila o las paredes quedan más cerca, la estrecha (32).
+   Solo se usa si hay arte para todo lo que hay en la carpa (por ahora, focos de sodio y CFL y macetas de 7 L sin extras); si no, la vista B. */
 const VCA={lado:44,boca:16,base:150,fondo:140},VC_FILA=[[152],[156,146]];   // y de la base de las macetas: una fila · dos (delante, detrás)
 const VC_TIERRA={'maceta-c-22':23,'maceta-c-15':10};                         // px de la base de la maceta a la tierra, donde nace el tallo
 const vcAnchos=pre=>Object.keys(ARTE.cubre||{}).filter(k=>k.startsWith('misc:'+pre)).map(k=>+k.slice(5+pre.length)).filter(n=>n>0);
 // el sprite de la familia (prefijo + ancho en px) más cercano a «px», si se aparta como mucho un 25 %
 function vcSprite(pre,px){let m=null;for(const a of vcAnchos(pre))if(Math.abs(a-px)<=px*.25&&(!m||Math.abs(a-px)<Math.abs(m.a-px)))m={a,n:pre+a};return m&&{...m,f:fotoMisc(m.n)};}
-// la planta: el sprite de su porte y fase más ancho que no pasa de su copa (distancia segura) ni baja de ×0,75. Floración y lista
-// comparten sprite (planta-c-<porte>-NN); germinando, plántula y vegetativo llevan la fase (planta-c-<porte><fase>-NN). Si ninguno
-// cabe, el más estrecho de los más anchos hasta ×1,33 (la tolerancia de la vista B) que no pase del sitio (tope), y entonces se dibuja
-// así de grande también de alto (k = su ancho / el real: no se aplasta para meterla en el alto real); si no, la vista B
-function vcPlantaSprite(po,st,px,tope){const pre='planta-c-'+po+(st>=3?'':st)+'-';let m=null,e=null;
-  for(const a of vcAnchos(pre)){if(a<=px+1&&a>=px*.75&&(!m||a>m.a))m={a,n:pre+a};if(a>px+1&&a<=Math.min(px*1.33,tope)&&(!e||a<e.a))e={a,n:pre+a};}
-  m=m||e&&{...e,k:e.a/px};return m&&{...m,f:fotoMisc(m.n)};}
+// la planta: el sprite de su porte y fase más ancho que deja 2 px de aire en su sitio (esp: px hasta la vecina de su fila más cercana o,
+// a cada lado, hasta la pared, a la altura de su maceta) o, si ninguno, el más estrecho. Floración y lista comparten sprite
+// (planta-c-<porte>-<ancho>); vegetativo lleva la fase (planta-c-<porte>2-<ancho>); germinando y plántula, las mismas para los tres portes
+// (planta-c-h0-8, planta-c-h1-18)
+function vcPlantaSprite(po,st,esp){const pre='planta-c-'+(st<2?'h':po)+(st>=3?'':st)+'-',A=vcAnchos(pre).sort((a,b)=>a-b);if(!A.length)return null;
+  const a=A.filter(a=>a<=esp-2).pop()||A[0];return {a,n:pre+a,f:fotoMisc(pre+a)};}
 const vcAltos=new WeakMap();   // alto del dibujo (de la última fila a la primera con algo) de cada celda
 function vcAlto(c){if(vcAltos.has(c))return vcAltos.get(c);const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let y=0;
   for(let i=3;i<d.length;i+=4)if(d[i]){y=Math.floor((i>>2)/c.width);break;}vcAltos.set(c,c.height-y);return c.height-y;}
@@ -84,13 +82,17 @@ function vistaC(g){
   const Z=(VCA.base-VCA.boca)/(H-28),w=Math.round(W*Z),foco=vcSprite(tipo==='sodio'?'foco-c-':'foco-c-'+tipo+'-',(FOCO_CM[c.foco]||45)*Z);
   if(!fotoMisc('carpa-c-pared')||!fotoMisc('carpa-c-luz')||!foco||!foco.f)return null;
   const filas=VC_FILA[CARPAS[c.t].filas-1],v=[];
+  // el suelo se abre 16 px por lado de y 140 a 159: a la altura y, la carpa mide wy px de ancho
+  const wy=y=>w+32*(y-VCA.fondo)/19,xy=(q,y)=>Math.round(120+(q.cx/W-.5)*wy(y)),yq=q=>filas[Math.min(q.fila,filas.length-1)];
   for(const q of pl){
     const k=S.macetas[q.i],m=k==='plastico7'&&vcSprite('maceta-c-',MACETA_CM[k][0]*Z),p=S.pots[q.i];if(!m||!m.f)return null;
-    const y=filas[Math.min(q.fila,filas.length-1)],x=Math.round(120+(q.cx/W-.5)*(w+32*(y-VCA.fondo)/19)),r={x,y,m,tierra:VC_TIERRA[m.n]||Math.round(m.f.c.height*.7),hp:0};
-    if(p){const st=p.dead?9:plantStage(p),po=porteDe(p.sid),D=PLANTA_CM[po];if(st>4)return null;
-      const s=vcPlantaSprite(po,st,Math.min(D.w[st],q.cw)*Z,q.cw*Z+1);if(!s||!s.f)return null;
+    const y=yq(q),x=xy(q,y),r={x,y,m,tierra:VC_TIERRA[m.n]||Math.round(m.f.c.height*.7),hp:0};
+    if(p){const st=p.dead?9:plantStage(p),po=portePlanta(p),D=PLANTA_CM[po];if(st>4)return null;
+      // sitio en pantalla: hasta la vecina de su fila más cercana y, a cada lado, hasta la pared (×2)
+      r.esp=Math.min(wy(y)-2*Math.abs(x-120),...pl.filter(o=>o!==q&&yq(o)===y).map(o=>Math.abs(xy(o,y)-x)));
+      const s=vcPlantaSprite(po,st,r.esp);if(!s||!s.f)return null;
       // tope: su alto real (ch) y, en pantalla, la distancia segura a la boca del foco (el sprite de la maceta es más alto que la real)
-      r.p=s;r.hp=Math.min(vcAlto(s.f.c),Math.round(Math.min(D.h[st]*(s.k||1),q.ch)*Z),Math.floor(y-r.tierra-VCA.boca-FOCO_SEP[c.foco]*Z));}
+      r.p=s;r.hp=Math.min(vcAlto(s.f.c),Math.round(Math.min(D.h[st],q.ch)*Z),Math.floor(y-r.tierra-VCA.boca-FOCO_SEP[c.foco]*Z));}
     v.push(r);}
   pl.forEach((q,j)=>{q.v=v[j];q.x=v[j].x;q.y=v[j].y;q.alto=v[j].tierra+4+v[j].hp;});
   return {Z,w,xl:120-(w>>1),foco,tipo};
@@ -109,30 +111,24 @@ function vcLuz(t,vc){const L=vcFondo(t,vc,'luz'),k=LUZ_C[vc.tipo];if(!k)return L
   const [c,x]=mkCanvas(240,160),[r,g,b]=k[0],lk=.299*r+.587*g+.114*b;x.drawImage(L,0,0);const im=x.getImageData(0,0,240,160),d=im.data;
   for(let i=0;i<d.length;i+=4)if(d[i+3]){const l=(.299*d[i]+.587*d[i+1]+.114*d[i+2])/lk;d[i]=Math.min(255,r*l);d[i+1]=Math.min(255,g*l);d[i+2]=Math.min(255,b*l);}
   x.putImageData(im,0,0);return carpaCache[key]=c;}
-// la planta más baja que su sprite pierde filas enteras, nunca se escala (los píxeles no se aplastan). Primero pisos de ramas enteros
-// (VC_PISOS), del medio, el más bajo que quepa primero: más baja = menos nudos. Siempre quedan el 1.º y el último (su borde de abajo es el
-// único que se ve en la planta entera; el de los de en medio va tapado por el de debajo y, al aire, sería un estante). Lo que falte, las filas con
-// menos píxeles (tallo pelado y entrenudos) de debajo de la cola; la cola (el 40 % de arriba) solo si no basta. La base del tallo (las 2
-// últimas filas) se queda, en la última fila de la celda; las demás, en su orden
-// pisos de cada sprite (filas desde arriba del dibujo, ambas incluidas; la cola y el tallo pelado no son pisos)
-const VC_PISOS={'planta-c-i-24':[[18,29],[30,46],[47,57],[58,73]]};
+// la planta más baja que su fotograma pierde filas enteras, nunca se escala (los píxeles no se aplastan): las que tienen menos píxeles
+// (las ramas peladas de abajo) de debajo de la cola (el 40 % de arriba); la cola solo si no basta. La base del tallo (las 2 últimas filas)
+// se queda, en la última fila de la celda; las demás, en su orden. Con un fotograma cada 2 px de alto, sobra 1 fila como mucho
 const vcBajas=new WeakMap();
-// la híbrida va dibujada a mano a cada alto (un fotograma por alto; el 0, el más alto: más alta = más nudos). De los fotogramas del
-// sprite n, el más bajo que no baja de h: [alto, canvas, índice]. Las demás plantas tienen uno solo
+// la planta A va dibujada a cada alto (un fotograma cada 2 px; el 0, el más alto). De los fotogramas del sprite n, el más bajo que no
+// baja de h: [alto, canvas, índice]
 const vcAltas=new Map();
 function vcAltura(n,h){let L=vcAltas.get(n);
   if(!L){const g=ARTE.cubre['misc:'+n],k=frameDe(g,n,'unica',0,{i:0}).n;L=[];for(let i=0;i<k;i++){const c=frameDe(g,n,'unica',0,{i}).c;L.push([vcAlto(c),c,i]);}
     L.sort((a,b)=>a[0]-b[0]);vcAltas.set(n,L);}
   return L.find(([a])=>a>=h)||L[L.length-1];}
-// lo que se dibuja de la planta de una plaza (sin el color de la variedad): el fotograma de su alto o, si no lo hay justo, el siguiente
-// aplastado (con sus pisos solo el 0)
-function vcDibujo(v){const [,c,i]=vcAltura(v.p.n,v.hp);return vcAplasta(c,v.hp,i?null:VC_PISOS[v.p.n]);}
-function vcAplasta(c,h,pisos){
-  const a=vcAlto(c),key=(pisos?'p':'')+h;if(h>=a)return c;let m=vcBajas.get(c);if(!m)vcBajas.set(c,m=new Map());if(m.has(key))return m.get(key);
-  const W=c.width,H=c.height,y0=H-a,d=c.getContext('2d').getImageData(0,0,W,H).data,cola=y0+Math.round(a*.4),n=[],filas=[],fuera=new Set();let falta=a-h;
-  const P=pisos||[];for(let i=P.length-2;i>0&&falta>0;i--){const k=P[i][1]-P[i][0]+1;if(k<=falta){for(let y=P[i][0];y<=P[i][1];y++)fuera.add(y0+y);falta-=k;}}
-  for(let y=y0;y<H-2;y++){if(fuera.has(y))continue;let k=0;for(let x=0;x<W;x++)if(d[(y*W+x)*4+3])k++;n[y]=k;filas.push(y);}
-  filas.sort((p,q)=>(p<cola)-(q<cola)||n[p]-n[q]||q-p).slice(0,falta).forEach(y=>fuera.add(y));
+// lo que se dibuja de la planta de una plaza (sin el color de la variedad): el fotograma de su alto o, si no lo hay justo, el siguiente aplastado
+function vcDibujo(v){return vcAplasta(vcAltura(v.p.n,v.hp)[1],v.hp);}
+function vcAplasta(c,h){
+  const a=vcAlto(c),key=h;if(h>=a)return c;let m=vcBajas.get(c);if(!m)vcBajas.set(c,m=new Map());if(m.has(key))return m.get(key);
+  const W=c.width,H=c.height,y0=H-a,d=c.getContext('2d').getImageData(0,0,W,H).data,cola=y0+Math.round(a*.4),n=[],filas=[],fuera=new Set();
+  for(let y=y0;y<H-2;y++){let k=0;for(let x=0;x<W;x++)if(d[(y*W+x)*4+3])k++;n[y]=k;filas.push(y);}
+  filas.sort((p,q)=>(p<cola)-(q<cola)||n[p]-n[q]||q-p).slice(0,a-h).forEach(y=>fuera.add(y));
   const [o,x]=mkCanvas(W,H);let y=H;for(let s=H-1;s>=y0;s--)if(!fuera.has(s))x.drawImage(c,0,s,W,1,0,--y,W,1);
   m.set(key,o);return o;
 }
@@ -157,13 +153,27 @@ function renderCarpaC(g,now){
   if(ARTE.ok)pintarVfx(now,{x:0,y:0},'home');
   ctx.restore();
 }
+// tono de la hoja de la planta: el de su variedad (hojaDe), movido como el de su % índica respecto al de la variedad
+function hojaPlanta(p){const h=hojaDe(p.sid),i=p.f&&p.f.i,i0=indDe(p.sid);if(i==null||i===i0)return h;
+  const a=tonoHoja(i),b=tonoHoja(i0),c=k=>parseInt(k.slice(1),16),A=c(a),B=c(b),Hh=c(h),f=s=>clamp(((Hh>>s)&255)+((A>>s)&255)-((B>>s)&255),0,255);
+  return '#'+((1<<24)|(f(16)<<16)|(f(8)<<8)|f(0)).toString(16).slice(1);}
+// los verdes de la paleta A (hoja y tallo; el contorno no) movidos en tono, luz y saturación como su verde medio (#57a33e) hasta el tono
+// de la hoja hj: {color de la paleta: color nuevo}, para conRampa
+const VC_HOJA=['#1b4630','#2f7038','#57a33e','#94d255','#71984a','#3b5a2e'],vcTonosC=new Map();
+function rgbHls(h){const n=parseInt(h.slice(1),16),r=(n>>16)/255,g=((n>>8)&255)/255,b=(n&255)/255,M=Math.max(r,g,b),m=Math.min(r,g,b),l=(M+m)/2,d=M-m;
+  if(!d)return [0,l,0];const s=l>.5?d/(2-M-m):d/(M+m),H=M===r?(g-b)/d+(g<b?6:0):M===g?(b-r)/d+2:(r-g)/d+4;return [H/6,l,s];}
+function hlsRgb(H,l,s){const q=l<.5?l*(1+s):l+s-l*s,p=2*l-q,t=x=>{x=(x+1)%1;return x<1/6?p+(q-p)*6*x:x<.5?q:x<2/3?p+(q-p)*(2/3-x)*6:p;};
+  const f=v=>Math.round(clamp(v,0,1)*255);return '#'+((1<<24)|(f(t(H+1/3))<<16)|(f(t(H))<<8)|f(t(H-1/3))).toString(16).slice(1);}
+function vcTonos(hj){if(vcTonosC.has(hj))return vcTonosC.get(hj);const b=rgbHls(hj),r=rgbHls('#57a33e'),o={};
+  for(const k of VC_HOJA){const [h,l,s]=rgbHls(k);o[k]=hlsRgb((h+b[0]-r[0]+1)%1,clamp(l+b[1]-r[1],0,1),clamp(s*b[2]/Math.max(r[2],.01),0,1));}
+  vcTonosC.set(hj,o);return o;}
 function vcPlantaC(q,now){
   const v=q.v,p=S.pots[q.i];ctx.drawImage(v.m.f.c,q.x-16,q.y-31);
   if(!p)return;
-  const s=getStrain(p.sid),rk=((ARTE.d.rampas||{})['carpa-c-plantas']||{}).cogollo,c0=vcDibujo(v),yb=q.y-v.tierra;
-  const pc=rk&&s?conRampa(c0,{[rk.rampa[0]]:shade(s.c,50),[rk.rampa[1]]:s.c,[rk.rampa[2]]:shade(s.c,-60)},'g|'+s.c):c0;
+  const s=getStrain(p.sid),rk=((ARTE.d.rampas||{})['carpa-c-plantas-a']||{}).cogollo,c0=vcDibujo(v),yb=q.y-v.tierra,hj=hojaPlanta(p);
+  const pc=rk&&s?conRampa(c0,{[rk.rampa[0]]:shade(s.c,50),[rk.rampa[1]]:s.c,[rk.rampa[2]]:shade(s.c,-60),...vcTonos(hj)},'g|'+s.c+'|'+hj):c0;
   if(p.water<=0)ctx.filter='saturate(.4) sepia(.7)';   // seca: amarillenta
-  const b=pc.height-1;balanceo(pc,q.x-24,yb-b,b,p.water>0?1:0,now+q.x*37);
+  const b=pc.height-1;balanceo(pc,q.x-(pc.width>>1),yb-b,b,p.water>0?1:0,now+q.x*37);
   ctx.filter='none';
   if(p.pest){ctx.fillStyle='#e02828';for(let n=0;n<6;n++)ctx.fillRect(q.x-8+((n*5+Math.floor(now/300))%16),yb-12-((n*7)%20),1,1);}
 }
@@ -320,7 +330,7 @@ function vcPlanta(q,now){
   const p=S.pots[q.i],k=S.macetas[q.i],m=maceta34(k),{e,hb}=macetaPx(k);
   ctx.drawImage(m,q.x-(m.width>>1),q.y-Math.round(e/2+hb));q.alto=hb+Math.round(e/2);
   if(!p)return;
-  const s=getStrain(p.sid),st=p.dead?9:plantStage(p),pc=planta34(porteDe(p.sid),st,!p.dead&&p.water<=0,s?s.c:'#9bd35a',q.cw,q.ch),yb=q.y-hb+1;
+  const s=getStrain(p.sid),st=p.dead?9:plantStage(p),pc=planta34(portePlanta(p),st,!p.dead&&p.water<=0,s?s.c:'#9bd35a',q.cw,q.ch),yb=q.y-hb+1;
   q.alto+=altoPlanta(p,q);
   balanceo(pc,q.x-24,yb-79,79,!p.dead&&p.water>0&&st>=2?1:0,now+q.x*37);
   if(p.pest&&!p.dead){ctx.fillStyle='#e02828';for(let n=0;n<6;n++)ctx.fillRect(q.x-6+((n*5+Math.floor(now/300))%12),yb-8-((n*7)%14),1,1);}
