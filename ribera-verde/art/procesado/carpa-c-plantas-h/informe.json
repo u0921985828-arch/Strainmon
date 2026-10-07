@@ -6,14 +6,17 @@
   ],
   "tope_colores": 15,
   "secuencias": 4,
-  "fotogramas": 4,
+  "fotogramas": 93,
   "semitransparentes": 0,
-  "en_paleta_antes": 37.8,
+  "en_paleta_antes": 16.7,
   "distancia_media": 0,
-  "colores_finales": 15,
+  "colores_finales": 11,
   "fundidos": [],
   "huerfanos_quitados": 0,
-  "deriva_pies": {},
+  "deriva_pies": {
+    "planta-c-h-24/unica": 0,
+    "planta-c-h2-24/unica": 0
+  },
   "errores": [],
   "avisos": []
 }

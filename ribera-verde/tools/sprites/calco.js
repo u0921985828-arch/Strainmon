@@ -97,8 +97,9 @@ for (const a of M.assets) {
     if (c === 'misc:cuarto-cultivo' && has('misc/cuarto-cultivo.png')) wr(a.id, 'cuarto-cultivo', 'unica', 0, rd('misc/cuarto-cultivo.png'));
   }
   // ---------- vista C (P3): sale de la imagen A y no tiene referencia procedural; se calca la lámina ya procesada ----------
-  if (/^carpa-c-/.test(a.id)) for (const c of a.cubre || []) { const n = c.slice(5), f = path.join(ROOT, 'art', 'procesado', a.id, n, 'unica', '00.png');
-    if (fs.existsSync(f)) wr(a.id, n, 'unica', 0, PNG.sync.read(fs.readFileSync(f))); }
+  // (todos los fotogramas: la híbrida lleva uno por alto)
+  if (/^carpa-c-/.test(a.id)) for (const c of a.cubre || []) { const n = c.slice(5), d = path.join(ROOT, 'art', 'procesado', a.id, n, 'unica');
+    if (fs.existsSync(d)) fs.readdirSync(d).filter(f => f.endsWith('.png')).sort().forEach((f, i) => wr(a.id, n, 'unica', i, PNG.sync.read(fs.readFileSync(path.join(d, f))))); }
   // ---------- tiles (16×16 exacto; los animados en bloques de 32×32) ----------
   if (a.tipo === 'tiles') {
     for (const c of a.cubre || []) { const k = c.slice(5); const f = has(`tiles/${k}.png`) ? `tiles/${k}.png` : has(`tiles/${k}_f0.png`) ? `tiles/${k}_f0.png` : null; if (f) wr(a.id, k, 'unica', 0, rd(f)); }

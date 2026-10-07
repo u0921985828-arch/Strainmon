@@ -114,10 +114,19 @@ function vcLuz(t,vc){const L=vcFondo(t,vc,'luz'),k=LUZ_C[vc.tipo];if(!k)return L
 // único que se ve en la planta entera; el de los de en medio va tapado por el de debajo y, al aire, sería un estante). Lo que falte, las filas con
 // menos píxeles (tallo pelado y entrenudos) de debajo de la cola; la cola (el 40 % de arriba) solo si no basta. La base del tallo (las 2
 // últimas filas) se queda, en la última fila de la celda; las demás, en su orden
-// pisos de cada sprite (filas desde arriba del dibujo, ambas incluidas; la cola y el tallo pelado no son pisos). La híbrida está montada
-// con los de la índica (ver el manifiesto)
-const VC_PISOS={'planta-c-i-24':[[18,29],[30,46],[47,57],[58,73]],'planta-c-h-24':[[18,29],[30,46],[47,63],[64,74],[75,90]],'planta-c-h2-24':[[18,29],[30,36],[37,47]]};
+// pisos de cada sprite (filas desde arriba del dibujo, ambas incluidas; la cola y el tallo pelado no son pisos)
+const VC_PISOS={'planta-c-i-24':[[18,29],[30,46],[47,57],[58,73]]};
 const vcBajas=new WeakMap();
+// la híbrida va dibujada a mano a cada alto (un fotograma por alto; el 0, el más alto: más alta = más nudos). De los fotogramas del
+// sprite n, el más bajo que no baja de h: [alto, canvas, índice]. Las demás plantas tienen uno solo
+const vcAltas=new Map();
+function vcAltura(n,h){let L=vcAltas.get(n);
+  if(!L){const g=ARTE.cubre['misc:'+n],k=frameDe(g,n,'unica',0,{i:0}).n;L=[];for(let i=0;i<k;i++){const c=frameDe(g,n,'unica',0,{i}).c;L.push([vcAlto(c),c,i]);}
+    L.sort((a,b)=>a[0]-b[0]);vcAltas.set(n,L);}
+  return L.find(([a])=>a>=h)||L[L.length-1];}
+// lo que se dibuja de la planta de una plaza (sin el color de la variedad): el fotograma de su alto o, si no lo hay justo, el siguiente
+// aplastado (con sus pisos solo el 0)
+function vcDibujo(v){const [,c,i]=vcAltura(v.p.n,v.hp);return vcAplasta(c,v.hp,i?null:VC_PISOS[v.p.n]);}
 function vcAplasta(c,h,pisos){
   const a=vcAlto(c),key=(pisos?'p':'')+h;if(h>=a)return c;let m=vcBajas.get(c);if(!m)vcBajas.set(c,m=new Map());if(m.has(key))return m.get(key);
   const W=c.width,H=c.height,y0=H-a,d=c.getContext('2d').getImageData(0,0,W,H).data,cola=y0+Math.round(a*.4),n=[],filas=[],fuera=new Set();let falta=a-h;
@@ -151,10 +160,10 @@ function renderCarpaC(g,now){
 function vcPlantaC(q,now){
   const v=q.v,p=S.pots[q.i];ctx.drawImage(v.m.f.c,q.x-16,q.y-31);
   if(!p)return;
-  const s=getStrain(p.sid),rk=((ARTE.d.rampas||{})['carpa-c-plantas']||{}).cogollo,c0=v.p.f.c,yb=q.y-v.tierra;
-  const c1=rk&&s?conRampa(c0,{[rk.rampa[0]]:shade(s.c,50),[rk.rampa[1]]:s.c,[rk.rampa[2]]:shade(s.c,-60)},'g|'+s.c):c0;
+  const s=getStrain(p.sid),rk=((ARTE.d.rampas||{})['carpa-c-plantas']||{}).cogollo,c0=vcDibujo(v),yb=q.y-v.tierra;
+  const pc=rk&&s?conRampa(c0,{[rk.rampa[0]]:shade(s.c,50),[rk.rampa[1]]:s.c,[rk.rampa[2]]:shade(s.c,-60)},'g|'+s.c):c0;
   if(p.water<=0)ctx.filter='saturate(.4) sepia(.7)';   // seca: amarillenta
-  const pc=vcAplasta(c1,v.hp,VC_PISOS[v.p.n]),b=pc.height-1;balanceo(pc,q.x-24,yb-b,b,p.water>0?1:0,now+q.x*37);
+  const b=pc.height-1;balanceo(pc,q.x-24,yb-b,b,p.water>0?1:0,now+q.x*37);
   ctx.filter='none';
   if(p.pest){ctx.fillStyle='#e02828';for(let n=0;n<6;n++)ctx.fillRect(q.x-8+((n*5+Math.floor(now/300))%16),yb-12-((n*7)%20),1,1);}
 }
