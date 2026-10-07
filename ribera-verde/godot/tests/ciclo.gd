@@ -52,12 +52,25 @@ func foto(nombre: String) -> void:
 func rect(c: Control) -> Rect2:
 	return Rect2(c.position, c.size)
 
-# el aviso de arriba, sin pisar la ficha ni START y dentro de la pantalla del juego
+# el aviso de arriba, sin pisar la ficha ni START y dentro de la pantalla del juego, con la ventana de cada tamaño; si no
+# hay aviso, el más largo de los que salen al dormir
+const TAMANOS := [Vector2i(1560, 720), Vector2i(2400, 1080), Vector2i(1280, 960), Vector2i(1024, 768), Vector2i(2560, 1600), Vector2i(800, 600)]
 func check_aviso(cuando: String) -> void:
-	await espera(3)
-	var r := rect(J.toast)
-	var ok: bool = not J.toast.visible or (not (J.ficha.visible and r.intersects(rect(J.ficha))) and not r.intersects(rect(J.botones.START)) and rect(J.pantalla).encloses(r))
-	check("el aviso no pisa la ficha ni START y cabe en la pantalla (%s)" % cuando, ok)
+	var era: Vector2i = root.size
+	var txt: String = J.toast_txt.text if J.toast.visible else "Has descansado · Luz −25,00 € · Partida guardada"
+	var mal := []
+	for t in TAMANOS:
+		root.size = t
+		if not J.toast.visible:
+			J._toast(txt, 1.8)
+		await espera(4)
+		var r := rect(J.toast)
+		var ok: bool = root.get_visible_rect().size == Vector2(t) and J.toast.visible and not (J.ficha.visible and r.intersects(rect(J.ficha))) and not r.intersects(rect(J.botones.START)) and rect(J.pantalla).encloses(r)
+		if not ok:
+			mal.append("%dx%d" % [t.x, t.y])
+	root.size = era
+	await espera(4)
+	check("el aviso no pisa la ficha ni START y cabe en la pantalla (%s; mal en: %s)" % [cuando, ", ".join(mal)], mal.is_empty())
 
 func color(im: Image, x: int, y: int) -> String:
 	return im.get_pixel(x, y).to_html(false)
@@ -160,12 +173,19 @@ func _corre() -> void:
 	var im: Image = J.sv.get_texture().get_image()
 	var ox: int = (J.sw - 240) >> 1
 	var pinta := true
+	var fsel := Vista.fila_sel(Vista.geo(S, 0), J.VC.sel)
+	var claras := 0
 	for b in bs:
 		var x: int = ox + b.r.position.x
 		var y: int = b.r.position.y
+		if b.fila < fsel:
+			# delante de la fila elegida, en transparencia como su planta: ni el marco ni el agua con su color lleno
+			claras += 1
+			pinta = pinta and color(im, x + 1, y) != "26262e" and color(im, x + 1, y + 2) != "4a92e0"
+			continue
 		pinta = pinta and color(im, x + 1, y) == "26262e" and color(im, x + 1, y + 2) == "4a92e0" and color(im, x + 10, y + 2) == "4a92e0"
 		pinta = pinta and color(im, x + 11, y + 2) == "4a4a56" and color(im, x + 1, y + 5) == "4a4a56" and color(im, x + 14, y + 5) == "4a4a56"
-	check("en la pantalla, cada barra con el agua al 70 % y la cosecha vacía", pinta)
+	check("en la pantalla, cada barra con el agua al 70 %% y la cosecha vacía (%d en transparencia, delante de la elegida)" % claras, pinta and claras < bs.size())
 	# Atrás con un menú abierto es B (y no cierra el juego)
 	await pulsa("A")
 	var abierto: bool = J.modo == "menu"
@@ -220,6 +240,9 @@ func _corre() -> void:
 				if p.pest and S.items.insect > 0:
 					var d := danos(J.VC.sel)
 					check("con plaga, daños encima de la planta (%d px) sin cambiar su silueta" % d[0], d[0] > 0 and d[1])
+					# la que se pinta ahora es la dañada (su textura ya está hecha y no es la sana)
+					var kd := Vista.clave_planta(S, p, Vista.geo(S, 0).pl.filter(func(q): return q.i == J.VC.sel)[0].v)
+					check("con plaga, en pantalla la textura dañada", kd != d[2] and Arte.texs.has(kd) and Arte.texs[kd].get_image().get_data() != d[3].get_data())
 					if tratadas == 0:
 						await foto("4b-plaga")
 					await pulsa("A")
@@ -246,8 +269,10 @@ func _corre() -> void:
 			await foto("6-foco")
 			await pulsa("down")
 		var con_plaga := []
+		var secas := []
 		for p in S.pots:
 			con_plaga.append(p != null and p.pest)
+			secas.append(p != null and p.get("dead", false))
 		await pulsa("START")
 		await pulsa("A")
 		noches += 1
@@ -258,15 +283,24 @@ func _corre() -> void:
 			var p = S.pots[i]
 			if p and p.pest and not p.get("dead") and not con_plaga[i]:
 				nuevas.append(Datos.strain(S, p.sid).n)
+		var nuevas_secas := []
+		for i in S.pots.size():
+			var p = S.pots[i]
+			if p and p.get("dead") and not secas[i]:
+				nuevas_secas.append(Datos.strain(S, p.sid).n)
 		var aviso := ""
+		var aviso_s := ""
 		while J.modo == "say":
 			if J.dlg_txt.text.begins_with("¡Plaga!"):
 				aviso = J.dlg_txt.text
+			if J.dlg_txt.text.contains("secado del todo"):
+				aviso_s = J.dlg_txt.text
 			await pulsa("A")
 		plagas += nuevas.size()
 		if aviso != "":
 			avisos += 1
 		check("noche %d: %d con plaga nueva y %s" % [noches, nuevas.size(), "aviso" if aviso != "" else "sin aviso"], (aviso != "") == (nuevas.size() > 0) and nuevas.all(func(m): return aviso.contains(m)))
+		check("noche %d: %d secas nuevas y %s" % [noches, nuevas_secas.size(), "aviso" if aviso_s != "" else "sin aviso"], (aviso_s != "") == (nuevas_secas.size() > 0) and nuevas_secas.all(func(m): return aviso_s.contains(m)))
 		await check_aviso("al despertar")
 		for p in S.pots:
 			if p:
@@ -275,7 +309,13 @@ func _corre() -> void:
 		if noches == 1 or noches == 2:
 			await foto("3-noche%d" % noches)
 	check("ha pasado por plántula, vegetativo, floración y lista", vistas.has(1) and vistas.has(2) and vistas.has(3) and vistas.has(4))
-	check("ha habido plaga (%d), aviso (%d) y tratamiento (%d)" % [plagas, avisos, tratadas], plagas > 0 and avisos > 0 and tratadas > 0)
+	# con la semilla de siempre tiene que salir; con otra (--azar) puede no haber plaga, y entonces solo se dice
+	var hubo := plagas > 0 and avisos > 0 and tratadas > 0
+	var que := "ha habido plaga (%d), aviso (%d) y tratamiento (%d)" % [plagas, avisos, tratadas]
+	if a.find("--azar") >= 0 and not hubo:
+		print("INFO   " + que)
+	else:
+		check(que, hubo)
 	check("%d cosechadas y %d secas retiradas" % [cosechadas, muertas], cosechadas >= 3 and cosechadas + muertas == 4)
 	var g0 := 0.0
 	for k in S.buds:

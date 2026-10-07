@@ -7,9 +7,9 @@
 # · cada planta, con el balanceo (±1 px arriba), dentro de la pantalla y de las paredes de su fila, sin tocar la campana
 #   y por debajo de su distancia al foco
 # · dos plantas de la misma fila no se pisan ni balanceándose una hacia la otra
-# · se pinta de atrás adelante
-# · solo en el port (Vista.extras): las barras de agua y cosecha (con la «!» de plaga y el sitio del cursor de la elegida) no
-#   se pisan y caben en la pantalla, con cualquier plaza elegida; los daños de plaga de cada sprite (niveles 1-3) cambian
+# · se pinta de atrás adelante: la más honda (cy) antes y más arriba
+# · solo en el port (Vista.extras): las barras de agua y cosecha (con la «!» de plaga) y el cursor de la elegida no se pisan
+#   y caben en la pantalla, con cualquier plaza elegida, también con plazas vacías o secas y plantas del todo altas; los daños de plaga de cada sprite (niveles 1-3) cambian
 #   píxeles de la planta y nunca su silueta ni la base del tallo; sin plaga, o con extras apagados (C2), la planta de siempre
 extends SceneTree
 
@@ -224,20 +224,35 @@ func _initialize() -> void:
 									peor = gap
 									cual = "%s / %s" % [A.c, B.c]
 					check("%s %s · plazas %d y %d: aire mínimo %d px (%s)" % [t, fk, i, j, peor, cual], peor >= 0)
-			# barras: todas las plazas con planta (de cada fase y porte, por turnos), con cada plaza elegida
-			for vuelta in 15:
+			# barras: todas las plazas con planta (de cada fase y porte, por turnos) y luego con plazas vacías y secas, y con
+			# plantas del todo altas; con cada plaza elegida, ni las barras ni el cursor se pisan y caben en la pantalla
+			for vuelta in 36:
 				for i in np:
 					var po: String = portes.keys()[(vuelta + i) % 3]
-					S.pots[i] = {"sid": "ria", "prog": progs[(vuelta / 3 + i) % 5], "water": 40.0, "health": 100.0, "fert": false, "pest": (vuelta + i) % 2 == 0, "f": {"id": 1, "t": 1, "y": 1, "i": portes[po]}}
+					var pr: float = progs[(vuelta / 3 + i) % 5] if vuelta < 30 else 1.0
+					S.pots[i] = {"sid": "ria", "prog": pr, "water": 40.0, "health": 100.0, "fert": false, "pest": (vuelta + i) % 2 == 0, "f": {"id": 1, "t": 1, "y": 1, "i": portes[po]}}
+					var hueco := (vuelta * 7 + i * 3) % 5   # vacía (0) o seca (1), sin ir atada al porte
+					if vuelta >= 15 and hueco == 0:
+						S.pots[i] = null
+					elif vuelta >= 15 and hueco == 1:
+						S.pots[i].dead = true
 				var g = Vista.geo(S, 0)
+				var conb: int = g.pl.filter(func(q): return Vista.con_barra(S, q)).size()
 				for sel in range(-1, np):
 					var bs := Vista.barras(S, g, sel)
-					var mal := bs.size() != np
-					for a in bs:
-						mal = mal or a.caja.position.y < 0 or a.caja.position.x < 0 or a.caja.end.x > 240 or a.caja.end.y > 160
-						for b in bs:
-							mal = mal or (a != b and a.caja.intersects(b.caja))
-					check("%s %s · vuelta %d · elegida %d: barras sin pisarse y en la pantalla" % [t, fk, vuelta, sel], not mal)
+					var mal := bs.size() != conb
+					var cajas := bs.map(func(e): return e.r)
+					if sel >= 0:
+						cajas.append(Vista.caja_cursor(Vista.pos_cursor(g, sel, bs)))
+					for a in cajas.size():
+						var A: Rect2i = cajas[a]
+						mal = mal or A.position.y < 0 or A.position.x < 0 or A.end.x > 240 or A.end.y > 160
+						for b in cajas.size():
+							mal = mal or (a != b and A.intersects(cajas[b]))
+					for a in bs.size():
+						for b in bs.size():
+							mal = mal or (a != b and bs[a].caja.intersects(bs[b].caja))
+					check("%s %s · vuelta %d · elegida %d: barras y cursor sin pisarse y en la pantalla" % [t, fk, vuelta, sel], not mal)
 			for i in np:
 				S.pots[i] = null
 			# orden: de atrás adelante
@@ -245,6 +260,10 @@ func _initialize() -> void:
 			var bien := true
 			for k in range(1, o.size()):
 				bien = bien and o[k - 1].y <= o[k].y
+			for a in o.size():
+				for b in o.size():
+					if o[a].cy > o[b].cy:
+						bien = bien and a < b and o[a].y < o[b].y
 			check("%s %s: de atrás adelante" % [t, fk], bien)
 	for k in ["borde de su celda", "trozos sueltos", "fuera de la pantalla", "pisa la campana", "cerca del foco", "aire mínimo", "de atrás adelante", "barras", "con plaga", "extras apagados"]:
 		var m := fallos.filter(func(f): return f.contains(k)).size()

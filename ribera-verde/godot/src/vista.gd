@@ -198,29 +198,62 @@ static func img_planta(S_: Dictionary, p: Dictionary, v: Dictionary) -> Image:
 	return im
 
 # las barras, de delante atrás: cada una encima de su planta (2 filas de aire) y, si pisa otra, encima de esa. La de la
-# plaza elegida deja sitio encima para el cursor (CUR filas)
+# plaza elegida deja sitio encima para el cursor (CUR filas); si la elegida no tiene barra (vacía o muerta), su cursor
+# también aparta las barras
 const CUR := 7
+static func con_barra(S_: Dictionary, q: Dictionary) -> bool:
+	var p = S_.pots[q.i]
+	return p != null and not p.get("dead") and q.v.p != null
+
 static func barras(S_: Dictionary, g_: Dictionary, sel := -1) -> Array:
 	var o := []
 	if not extras or g_.is_empty() or g_.vc == null:
 		return o
+	var cajas := []
+	for q in g_.pl:
+		if q.i == sel and not con_barra(S_, q):
+			cajas.append(caja_cursor(pos_cursor(g_, sel, [])))
 	var pl: Array = g_.pl.duplicate()
 	pl.sort_custom(func(a, b): return a.y > b.y or (a.y == b.y and (a.x < b.x or (a.x == b.x and a.i < b.i))))
 	for q in pl:
-		var p = S_.pots[q.i]
-		if p == null or p.get("dead") or q.v.p == null:
+		if not con_barra(S_, q):
 			continue
+		var p: Dictionary = S_.pots[q.i]
 		var r := Rect2i(q.x - (BW >> 1), q.y - q.alto + 3 - BH, BW + (BP if p.pest else 0), BH)
 		var cur := CUR if q.i == sel else 0
 		var mueve := true
 		while mueve:
 			mueve = false
-			for b in o:
-				if b.caja.grow(1).intersects(r.grow_individual(0, cur, 0, 0)):
-					r.position.y = b.caja.position.y - BH - 1
+			for c in cajas:
+				if c.grow(1).intersects(r.grow_individual(0, cur, 0, 0)):
+					r.position.y = c.position.y - BH - 1
 					mueve = true
-		o.append({"i": q.i, "r": r, "p": p, "caja": r.grow_individual(0, cur, 0, 0)})
+		var caja := r.grow_individual(0, cur, 0, 0)
+		cajas.append(caja)
+		o.append({"i": q.i, "r": r, "p": p, "caja": caja, "fila": q.fila})
 	return o
+
+# el cursor de la plaza elegida (arriba a la izquierda de la flecha, sin el bote de 1 px): encima de su barra, en el sitio
+# que deja, o encima de su planta (12 px si no hay)
+static func pos_cursor(g_: Dictionary, sel: int, bs: Array) -> Vector2i:
+	for q in g_.pl:
+		if q.i == sel:
+			for e in bs:
+				if e.i == sel:
+					return Vector2i(q.x, e.r.position.y - 6)
+			return Vector2i(q.x, q.y - (q.alto if q.alto else 12) - 9)
+	return Vector2i(-1, -1)
+
+# lo que ocupa el cursor en pantalla con el bote: 9 × 7 px
+static func caja_cursor(c: Vector2i) -> Rect2i:
+	return Rect2i(c.x - 4, c.y - 1, 9, 7)
+
+# la fila de la plaza elegida: las de delante van en transparencia
+static func fila_sel(g_: Dictionary, sel: int) -> int:
+	for q in g_.pl:
+		if q.i == sel:
+			return q.fila
+	return 0
 
 func pinta(S_: Dictionary, VC_: Dictionary, now_: float, ancho := 240) -> void:
 	S = S_
@@ -245,10 +278,7 @@ func _pinta_base() -> void:
 	if g.is_empty() or g.vc == null:
 		return
 	base.draw_texture(Arte.tex("pared|" + g.c.t, Arte.fondo(g.c.t, g.vc, "pared")), Vector2.ZERO)
-	var fsel := 0
-	for q in g.pl:
-		if q.i == VC.sel:
-			fsel = q.fila
+	var fsel := fila_sel(g, VC.sel)
 	for q in orden(g):
 		_planta(q, A35 if q.fila < fsel else 1.0)
 
@@ -289,38 +319,50 @@ func _pinta_encima() -> void:
 	var im := fc if on else Arte.apagado(fc)
 	encima.draw_texture(Arte.tex("foco|%s|%s" % [g.vc.foco.n, on], im), Vector2(120 - 24, int(D.VCA.boca) - 15))
 	var bs := barras(S, g, VC.sel)
+	var fsel := fila_sel(g, VC.sel)
 	for b in bs:
-		_barra(b)
+		_barra(b, A35 if b.fila < fsel else 1.0)
 	_cursor(bs)
 
 # agua: azul, y por debajo de 30 (toca regar) parpadea en rojo; cosecha: verde hasta que está lista, y entonces dorada y
-# parpadeando; con plaga, la «!» roja al lado
-func _barra(b: Dictionary) -> void:
+# parpadeando; con plaga, la «!» roja al lado. Rectángulos que no se pisan: con transparencia (al) no se suman
+func _barra(b: Dictionary, al: float) -> void:
 	var r: Rect2i = b.r
 	var p: Dictionary = b.p
 	var x := r.position.x
 	var y := r.position.y
 	var tic := int(floor(now / 400)) % 2 == 1
-	encima.draw_rect(Rect2(x + 1, y, BW - 2, BH), OSC)
-	encima.draw_rect(Rect2(x, y + 1, BW, BH - 2), OSC)
-	var sed: bool = p.water < 30
-	var na := ceili(clampf(p.water, 0, 100) * (BW - 2) / 100.0)
-	encima.draw_rect(Rect2(x + 1, y + 1, BW - 2, 2), Color8(0x7a, 0x2a, 0x30) if sed and tic else VACIO)
-	if na:
-		encima.draw_rect(Rect2(x + 1, y + 1, na, 1), Color8(0xf0, 0x80, 0x78) if sed and tic else Color8(0x76, 0xb4, 0xf2))
-		encima.draw_rect(Rect2(x + 1, y + 2, na, 1), Color8(0xe0, 0x40, 0x40) if sed and tic else Color8(0x4a, 0x92, 0xe0))
+	var R := func(rx: int, ry: int, w: int, h: int, c: Color) -> void:
+		if w > 0 and h > 0:
+			encima.draw_rect(Rect2(rx, ry, w, h), Color(c, al))
+	var n := BW - 2
+	for f in [y, y + 3, y + 6]:
+		R.call(x + 1, f, n, 1, OSC)
+	R.call(x, y + 1, 1, BH - 2, OSC)
+	R.call(x + BW - 1, y + 1, 1, BH - 2, OSC)
+	var sed: bool = p.water < 30 and tic
+	var na := ceili(clampf(p.water, 0, 100) * n / 100.0)
+	R.call(x + 1, y + 1, na, 1, Color8(0xf0, 0x80, 0x78) if sed else Color8(0x76, 0xb4, 0xf2))
+	R.call(x + 1, y + 2, na, 1, Color8(0xe0, 0x40, 0x40) if sed else Color8(0x4a, 0x92, 0xe0))
+	R.call(x + 1 + na, y + 1, n - na, 2, Color8(0x7a, 0x2a, 0x30) if sed else VACIO)
 	var lista: bool = p.prog >= 1
-	var nc := (BW - 2) if lista else floori(clampf(p.prog, 0, 1) * (BW - 2))
-	encima.draw_rect(Rect2(x + 1, y + 4, BW - 2, 2), VACIO)
-	if nc:
-		encima.draw_rect(Rect2(x + 1, y + 4, nc, 1), (Color8(0xff, 0xf4, 0xb0) if tic else Color8(0xf8, 0xd8, 0x60)) if lista else Color8(0xb0, 0xe4, 0x8c))
-		encima.draw_rect(Rect2(x + 1, y + 5, nc, 1), (Color8(0xf8, 0xd8, 0x60) if tic else Color8(0xd8, 0xa0, 0x30)) if lista else Color8(0x62, 0xaa, 0x56))
+	var nc := n if lista else floori(clampf(p.prog, 0, 1) * n)
+	R.call(x + 1, y + 4, nc, 1, (Color8(0xff, 0xf4, 0xb0) if tic else Color8(0xf8, 0xd8, 0x60)) if lista else Color8(0xb0, 0xe4, 0x8c))
+	R.call(x + 1, y + 5, nc, 1, (Color8(0xf8, 0xd8, 0x60) if tic else Color8(0xd8, 0xa0, 0x30)) if lista else Color8(0x62, 0xaa, 0x56))
+	R.call(x + 1 + nc, y + 4, n - nc, 2, VACIO)
 	if p.pest:
 		var px := x + BW
-		encima.draw_rect(Rect2(px, y, BP, BH), OSC)
-		encima.draw_rect(Rect2(px + 1, y + 1, BP - 2, BH - 2), Color8(0xa0, 0x20, 0x20) if tic else Color8(0xe0, 0x40, 0x40))
-		encima.draw_rect(Rect2(px + 2, y + 1, 2, 3), Color8(0xf8, 0xf8, 0xf0))
-		encima.draw_rect(Rect2(px + 2, y + 5, 2, 1), Color8(0xf8, 0xf8, 0xf0))
+		var rojo := Color8(0xa0, 0x20, 0x20) if tic else Color8(0xe0, 0x40, 0x40)
+		var bla := Color8(0xf8, 0xf8, 0xf0)
+		R.call(px, y, BP, 1, OSC)
+		R.call(px, y + BH - 1, BP, 1, OSC)
+		R.call(px, y + 1, 1, BH - 2, OSC)
+		R.call(px + BP - 1, y + 1, 1, BH - 2, OSC)
+		R.call(px + 1, y + 1, 1, BH - 2, rojo)
+		R.call(px + BP - 2, y + 1, 1, BH - 2, rojo)
+		R.call(px + 2, y + 4, 2, 1, rojo)
+		R.call(px + 2, y + 1, 2, 3, bla)
+		R.call(px + 2, y + 5, 2, 1, bla)
 
 func _cursor(bs: Array) -> void:
 	var b := int(floor(now / 300)) % 2
@@ -336,11 +378,11 @@ func _cursor(bs: Array) -> void:
 	for q in g.pl:
 		if q.i == VC.sel:
 			encima.draw_rect(Rect2(q.x - 7, q.y, 14, 2), Color(1, 1, 240 / 255.0, A35))
-			var x: int = q.x
-			var y: int = q.y - (q.alto if q.alto else 12) - 9 + b
-			for e in bs:
-				if e.i == q.i:
-					y = e.r.position.y - 6 + b   # encima de su barra, en el sitio que deja (CUR)
-			encima.draw_rect(Rect2(x - 4, y - 1, 9, 6), osc)
-			for k in 4:
-				encima.draw_rect(Rect2(x - 3 + k, y + k, 7 - 2 * k, 1), cla)
+	var c := pos_cursor(g, VC.sel, bs)
+	if c == Vector2i(-1, -1):
+		return
+	var x := c.x
+	var y := c.y + b
+	encima.draw_rect(Rect2(x - 4, y - 1, 9, 6), osc)
+	for k in 4:
+		encima.draw_rect(Rect2(x - 3 + k, y + k, 7 - 2 * k, 1), cla)

@@ -183,11 +183,24 @@ static func dano(im: Image, c0: Image, nivel: int, sem: int) -> Image:
 		ix[Datos.hexi(hj[j])] = j
 	for j in rampa.size():
 		ix[Datos.hexi(rampa[j])] = 10 + j
+	var col := {}
+	for t in ["a", "p", "."]:
+		col[t] = (DANO_AMARILLO if t == "a" else (DANO_PARDO if t == "p" else DANO_PUNTO)).map(func(h): return Color.html(h))
+		col["c" + t] = (DANO_PODRIDO if t == "p" else DANO_TELA).map(func(h): return Color.html(h))
 	var o: Image = im.duplicate()
 	var W := o.get_width()
 	var H := o.get_height()
 	var mancha: float = [0, .18, .28, .38][nivel]   # celdas de 4 × 4 con mancha
 	var punto: float = [0, .10, .15, .20][nivel]
+	# las manchas, una vez por celda (centro y radio) antes de mirar los píxeles
+	var cw := W / 4 + 3
+	var celdas := []
+	for cy in range(-1, H / 4 + 2):
+		for cx in range(-1, W / 4 + 2):
+			if azar(cx, cy, sem, 1) >= mancha:
+				celdas.append(null)
+			else:
+				celdas.append(Vector3(cx * 4 + azar(cx, cy, sem, 2) * 4, cy * 4 + azar(cx, cy, sem, 3) * 4, 1.1 + azar(cx, cy, sem, 4) * (.5 + .4 * nivel)))
 	for y in range(H - alto(c0), H - 3):
 		for x in W:
 			var p0 := c0.get_pixel(x, y)
@@ -199,15 +212,13 @@ static func dano(im: Image, c0: Image, nivel: int, sem: int) -> Image:
 			var t := ""
 			for cy in range(y / 4 - 1, y / 4 + 2):
 				for cx in range(x / 4 - 1, x / 4 + 2):
-					if azar(cx, cy, sem, 1) >= mancha:
+					var m = celdas[(cy + 1) * cw + cx + 1]
+					if m == null:
 						continue
-					var mx := cx * 4 + azar(cx, cy, sem, 2) * 4
-					var my := cy * 4 + azar(cx, cy, sem, 3) * 4
-					var rr := 1.1 + azar(cx, cy, sem, 4) * (.5 + .4 * nivel)
-					var d := sqrt((x + .5 - mx) * (x + .5 - mx) + (y + .5 - my) * (y + .5 - my))
-					if d <= rr * .45 and nivel >= 2:
+					var d := sqrt((x + .5 - m.x) * (x + .5 - m.x) + (y + .5 - m.y) * (y + .5 - m.y))
+					if d <= m.z * .45 and nivel >= 2:
 						t = "p"
-					elif d <= rr and t == "":
+					elif d <= m.z and t == "":
 						t = "a"
 			var cogollo: bool = j >= 10
 			if cogollo and t == "a":
@@ -221,11 +232,7 @@ static func dano(im: Image, c0: Image, nivel: int, sem: int) -> Image:
 			if t == "" and azar(x, y, sem, 6) < punto:
 				t = "."
 			if t != "":
-				var c: Color
-				if cogollo:
-					c = Color.html((DANO_PODRIDO if t == "p" else DANO_TELA)[j - 10])
-				else:
-					c = Color.html((DANO_PARDO if t == "p" else (DANO_AMARILLO if t == "a" else DANO_PUNTO))[j])
+				var c: Color = col[("c" + t) if cogollo else t][(j - 10) if cogollo else j]
 				o.set_pixel(x, y, Color8(c.r8, c.g8, c.b8, im.get_pixel(x, y).a8))
 	return o
 

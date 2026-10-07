@@ -749,28 +749,40 @@ func dormir() -> void:
 		return
 	var antes := {}
 	for i in S.pots.size():
-		if S.pots[i] and S.pots[i].pest:
-			antes[i] = true
+		if S.pots[i]:
+			antes[i] = [bool(S.pots[i].pest), bool(S.pots[i].get("dead", false))]
 	var luz := Cultivo.avanza(S, Cultivo.minutos_cama(S, c))
 	_guarda()
 	_toast("Has descansado%s · Partida guardada" % (" · Luz −" + Datos.eur(luz) if luz else ""), 1.8)
 	await aviso_plaga(antes)
 
-# al despertar: las plantas que han cogido plaga esta noche y las que siguen sin tratar
+# al despertar: las plantas que han cogido plaga esta noche, las que siguen sin tratar y las que se han muerto (antes: plaza
+# → [plaga, muerta] al acostarse)
 func aviso_plaga(antes: Dictionary) -> void:
 	var nuevas := []
 	var siguen := []
+	var muertas := []
 	var hu := Cultivo.huecos(S)
 	for i in S.pots.size():
 		var p = S.pots[i]
-		if p and p.pest and not p.get("dead"):
-			(siguen if antes.has(i) else nuevas).append("la %s (plaza %d)" % [Datos.strain(S, p.sid).n, hu[i].j + 1])
-	var n: int = S.items.insect
-	var queda := ("Te queda%s %d." % ["n" if n > 1 else "", n]) if n else "No te queda INSECTICIDA."
+		if p == null:
+			continue
+		var nom := "la %s (plaza %d)" % [Datos.strain(S, p.sid).n, hu[i].j + 1]
+		var a: Array = antes.get(i, [false, false])
+		if p.get("dead"):
+			if not a[1]:
+				muertas.append(nom)
+		elif p.pest:
+			(siguen if a[0] else nuevas).append(nom)
 	if nuevas.size():
-		await say("¡Plaga! Han salido bichos en %s y se comen las hojas. Trátala%s con INSECTICIDA. %s" % [_lista(nuevas), "s" if nuevas.size() > 1 else "", queda])
+		var n: int = S.items.insect
+		var queda := (" (te queda%s %d)" % ["n" if n > 1 else "", n]) if n else ", pero no te queda"
+		await say("¡Plaga! Han salido bichos en %s: se comen las hojas. Trátala%s con INSECTICIDA%s." % [_lista(nuevas), "s" if nuevas.size() > 1 else "", queda])
 	if siguen.size():
-		await say("Sigue la plaga en %s: sin tratar pierde salud cada hora." % _lista(siguen))
+		await say("Sigue la plaga en %s: sin tratar, pierde%s salud cada hora." % [_lista(siguen), "n" if siguen.size() > 1 else ""])
+	if muertas.size():
+		var v := muertas.size() > 1
+		await say("Se ha%s secado del todo %s. Retírala%s con A." % ["n" if v else "", _lista(muertas), "s" if v else ""])
 
 static func _lista(L: Array) -> String:
 	return L[0] if L.size() == 1 else ", ".join(L.slice(0, -1)) + " y " + L[-1]
