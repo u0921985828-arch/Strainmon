@@ -1,4 +1,4 @@
-; Ribera Verde — corte de prueba en Godot 4.3: la vista C (la carpa por dentro) y un ciclo de cultivo.
+; Ribera Verde — el juego entero en Godot 4.3 (port del HTML: historia, mapas, granja, carpas en las vistas B y C, tienda, combates).
 ; La escena del juego se pinta en un SubViewport de 160 px de alto (240-400 de ancho, como el HTML) y se escala a píxeles
 ; enteros; la interfaz (ficha, diálogos y mandos) va encima a la resolución del móvil (src/juego.gd).
 config_version=5
@@ -6,7 +6,7 @@ config_version=5
 [application]
 
 config/name="Ribera Verde (Godot)"
-config/version="0.1.2"
+config/version="0.2.0"
 run/main_scene="res://juego.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icono.svg"

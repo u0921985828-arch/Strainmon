@@ -1,16 +1,21 @@
 #!/usr/bin/env node
 /*
-  Ribera Verde — corte de prueba en Godot 4 (godot/): saca del juego HTML lo que el port necesita y lo que tiene que dar igual
+  Ribera Verde — port a Godot 4 (godot/): saca del juego HTML lo que el port necesita y lo que tiene que dar igual
   1. godot/datos/datos.json: variedades, genética, carpas, focos, macetas y las constantes de la vista C, leídas del juego compilado.
   2. godot/arte/carpa.png + carpa.json: del atlas (assets/sprites), solo los sprites de la vista C (pared, luz, focos, macetas y
-     plantas A con todos sus fotogramas).
+     plantas A con todos sus fotogramas); godot/arte/atlas.png + atlas.json, el atlas entero, tal cual (mapa, personajes, combate,
+     título, iconos), y godot/fuentes/: las letras de la interfaz (OFL), las mismas que el HTML.
   3. godot/tests/oraculo.json: lo que calcula el HTML en las escenas de prueba (geometría de la vista C, fotograma de cada planta),
      el tono y el porte de cada variedad a varios % índica, los factores de cada carpa y foco, tres ciclos de cultivo hora a hora,
      jornadas de cama (bedAction: dormir y siesta, cambio de día y factura de la luz) y cosechas (harvest: lotes, estrella, semillas),
      todo con un generador fijo (Park-Miller) en lugar de Math.random y las funciones de verdad del juego (los diálogos, las
-     animaciones y lo que no está en el corte, como los clientes, no hacen nada).
+     animaciones y los clientes no hacen nada).
   4. tools/salida/godot/html-<escena>.png: la escena de cada prueba pintada por el HTML (240 × 160) para compararla píxel a píxel
      con la de Godot (godot/tests/prueba.gd), y html-<escena>-sinluz.png, sin la capa de luz.
+  5. en godot/datos/datos.json, además, el resto del juego tal cual es dato en el HTML (mapas, personajes, objetos, tienda, historia,
+     combate, música, estado inicial) y MASCARAS: lo que el canvas pinta con antialias en un sitio fijo (su alfa).
+  Las pantallas (godot/tests/pantallas.json) las saca tools/godot-pantallas.js y la historia (godot/tests/historia.json),
+  tools/test-historia.js con RV_ORACULO; npm run godot hace los cuatro pasos.
   Uso: node tools/build.js && node tools/godot.js [--escenas archivo.json] [--casos archivo.json] [--salida dir]
   (--escenas: otras escenas; --casos: otras {jornadas, cosechas}, p. ej. un caso reservado; con alguno de los dos solo escribe ese
   oráculo, y sus PNG, en --salida)
@@ -85,9 +90,12 @@ function atlasCarpa() {
   fs.mkdirSync(path.join(GD, 'arte'), { recursive: true });
   fs.writeFileSync(path.join(GD, 'arte/carpa.png'), PNG.sync.write(out));
   fs.writeFileSync(path.join(GD, 'arte/carpa.json'), JSON.stringify({ sprites, rampa: d.rampas['carpa-c-plantas-a'].cogollo.rampa }));
+  // el atlas entero para el resto del juego (mapa, personajes, combate, título, iconos), tal cual
+  for (const f of ['atlas.png', 'atlas.json']) fs.copyFileSync(path.join(ROOT, 'assets/sprites', f), path.join(GD, 'arte', f));
   // la letra de la interfaz (OFL), la misma que el HTML
   fs.mkdirSync(path.join(GD, 'fuentes'), { recursive: true });
-  for (const f of ['atkinson-hyperlegible-latin-400-normal.woff2', 'atkinson-hyperlegible-latin-700-normal.woff2', 'OFL-AtkinsonHyperlegible.txt'])
+  for (const f of ['atkinson-hyperlegible-latin-400-normal.woff2', 'atkinson-hyperlegible-latin-700-normal.woff2', 'OFL-AtkinsonHyperlegible.txt',
+    'press-start-2p-latin-400-normal.woff2', 'OFL-PressStart2P.txt'])
     fs.copyFileSync(path.join(ROOT, 'assets/fonts', f), path.join(GD, 'fuentes', f));
   return `${lista.length} fotogramas de ${nombres.length} sprites, ${W}×${y + hf}`;
 }
@@ -103,6 +111,32 @@ function atlasCarpa() {
   await page.goto('file://' + path.join(ROOT, 'index.html'));
   await page.waitForFunction(() => typeof mode !== 'undefined' && mode === 'title');
   await page.evaluate(() => arteListo());
+  // 5. el resto del juego para el port completo (mapas, personajes, objetos, tienda, historia, combate, música…): lo que es dato en
+  // el HTML, tal cual, antes de que nada lo toque (la casa sin carpas: montarCasa la monta al entrar)
+  const juego = parcial ? null : await page.evaluate(() => {
+    // lo que el canvas pinta con antialias en un sitio fijo, tal cual (su alfa, 0-255): la sombra de Kiko en la intro (elipse 34 × 7
+    // en (120, 104)), con el mismo desplazamiento entero
+    const mascaras = () => {
+      const m = {}, mk = (k, w, h, fn) => { const [c, x] = mkCanvas(w, h);x.fillStyle = x.strokeStyle = '#fff';fn(x);
+        const d = x.getImageData(0, 0, w, h).data, a = [];for (let i = 3; i < d.length; i += 4) a.push(d[i]);m[k] = { w, h, a }; };
+      mk('elipse', 72, 18, x => { x.beginPath();x.ellipse(36, 9, 34, 7, 0, 0, Math.PI * 2);x.fill(); });   // centro en (36, 9): (120, 104) − (84, 95)
+      return m;
+    };
+    const sinFn = o => JSON.parse(JSON.stringify(o));
+    const mapa = m => ({ name: m.name, w: m.w, h: m.h, g: m.g, o: m.o, exits: m.exits, doors: m.doors, music: m.music, blds: m.blds || [] });
+    const kiko = eval('(' + kikoTip.toString().match(/const t=(\[[\s\S]*\]);\s*return/)[1] + ')');
+    return sinFn({
+      MAPS: Object.fromEntries(Object.entries(MAPS).map(([k, m]) => [k, mapa(m)])), CLIENT_TILES, LAMPS,
+      STRAINS_O: Object.fromEntries(DEX.map(k => [k, { o: STRAINS[k].o, h: STRAINS[k].h || null }])), TIPO_COGOLLO, PADRES, RECIPES,
+      LOOKS, SKINS, HAIRS, CLOTH, CTYPES, CH_TITLES,
+      NPCDEF: NPCDEF.map(d => ({ id: d.id, map: d.map, x: d.x, y: d.y, look: d.look, wander: d.wander || 0, dir: d.dir || null })),
+      ITEMS: ITEMS.map(it => ({ id: it.id, map: it.map, x: it.x, y: it.y, hidden: !!it.hidden })), SIGNS,
+      SHOP: SHOP.map(it => { const o = {}; for (const k of ['lbl', 'p', 'ch', 'sid', 'item', 'n', 'desc', 'maceta', 'foco', 'extra', 'carpa', 'ci']) if (it[k] != null) o[k] = it[k]; return o; }),
+      SOBRES, GRANEL, BANCO, SOBRE, DEUDA, PLAZOS, INTERES, PREMIO_COPA, SOBORNO, MULTA_REDADA, META_VENTAS, MULTA_CALLE,
+      IMPERIO, RECIPE_HINTS, DICHO_CARPA, THIEVES, COPS, SITIOS, OLOR, ESQUEJE_DIAS, MS_PER_MIN, KIKO_TIPS: kiko,
+      TUNES, GLYPH, CORTES_COMBATE, FOCO_LUZ, VK, DANO, MACETA_CM, VB: { M: VB_M, F: VB_F, X: VB_X, PARED: VB_PARED }, BW, BH, BP, CUR,
+      NEW_STATE: newState(), MASCARAS: mascaras() });
+  });
   const r = await page.evaluate(async ({ ESCENAS, CICLOS, DEF, parcial }) => {
     try { localStorage.clear(); } catch (e) {}
     mode = 'pausa';   // que el bucle del juego no pinte encima
@@ -126,7 +160,7 @@ function atlasCarpa() {
       const vl = vcLuz;vcLuz = () => mkCanvas(240, 160)[0];renderCarpaC(g, e.now);vcLuz = vl;
       o.png[e.k + '-sinluz'] = cv.toDataURL('image/png');
     }
-    // lo que no está en el corte o es solo de pantalla no hace nada: diálogos, animaciones, sonido, avisos, historia, clientes y
+    // lo que no entra en este oráculo o es solo de pantalla no hace nada: diálogos, animaciones, sonido, avisos, historia, clientes y
     // pedidos del banco (que también tirarían del azar)
     for (const k of ['say', 'accion', 'checkStory', 'fade']) window[k] = async () => {};
     for (const k of ['sfx', 'discover', 'toast', 'buildEnts', 'updateHUD', 'save', 'spawnClients', 'recibirPedido']) window[k] = () => {};
@@ -225,7 +259,9 @@ function atlasCarpa() {
   }
   Object.assign(orac, { hojas: r.hojas, factores: r.factores, ciclos: r.ciclos });
   for (const d of ['datos', 'tests']) fs.mkdirSync(path.join(GD, d), { recursive: true });
-  fs.writeFileSync(path.join(GD, 'datos/datos.json'), JSON.stringify(r.datos));
+  for (const k in juego.STRAINS_O) Object.assign(r.datos.STRAINS[k], juego.STRAINS_O[k]);
+  delete juego.STRAINS_O;
+  fs.writeFileSync(path.join(GD, 'datos/datos.json'), JSON.stringify(Object.assign(r.datos, juego)));
   fs.writeFileSync(path.join(GD, 'tests/oraculo.json'), JSON.stringify(orac));
   const nulas = ESCENAS.filter(e => !r.escenas[e.k]).map(e => e.k);
   console.log(`datos: ${r.datos.DEX.length} variedades · oráculo: ${ESCENAS.length} escenas${nulas.length ? ' (sin vista C: ' + nulas.join(', ') + ')' : ''}, ${r.hojas.length} tonos, ${r.factores.length} factores, ${Object.keys(r.ciclos).length} ciclos, ${Object.keys(r.jornadas).length} jornadas, ${Object.keys(r.cosechas).length} cosechas · PNG en ${path.relative(ROOT, SAL)}`);

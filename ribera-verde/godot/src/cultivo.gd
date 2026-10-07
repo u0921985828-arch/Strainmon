@@ -6,7 +6,10 @@ const Datos = preload("res://src/datos.gd")
 
 # azar: el de Godot o, para las pruebas, el Park-Miller del oráculo (tools/godot.js), que sustituye a Math.random
 static var pm := -1
+static var fijo := -1.0      # ≥ 0: azar() da siempre ese número (la prueba de las semillas al cosechar fija Math.random)
 static func azar() -> float:
+	if fijo >= 0:
+		return fijo
 	if pm < 0:
 		return randf()
 	pm = pm * 48271 % 2147483647

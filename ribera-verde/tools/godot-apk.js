@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
-  Ribera Verde — APK del corte de prueba en Godot (godot/), sin Android SDK ni Gradle
+  Ribera Verde — APK del port a Godot (godot/, el juego entero), sin Android SDK ni Gradle
     1. Godot 4.3 (GODOT=… o /home/user/godot-bin/Godot_v4.3-stable_linux.x86_64) con sus plantillas de exportación
        (~/.local/share/godot/export_templates/4.3.stable) exporta la plantilla release sin firmar (godot/export_presets.cfg:
        arm64-v8a, com.riberaverde.godot). La comprobación del SDK solo mira que existan adb y apksigner: se le da una carpeta

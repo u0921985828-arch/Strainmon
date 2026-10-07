@@ -157,5 +157,160 @@ static func miles(n: float) -> String:
 static func eur(n: float) -> String:
 	return miles(n) + " €"
 
+
+# ---------- números como en JavaScript ----------
+# String(n): los enteros sin decimales; los demás, el decimal más corto que vuelve a dar el mismo double
+static func js_num(x) -> String:
+	if x is int:
+		return str(x)
+	var f: float = x
+	if is_nan(f):
+		return "NaN"
+	if f == floorf(f) and absf(f) < 1e21:
+		return str(int(f))
+	for d in range(1, 21):
+		var s := String.num(f, d)
+		if s.to_float() == f:
+			while s.ends_with("0"):
+				s = s.left(-1)
+			return s
+	return String.num(f, 20)
+
+# toFixed: el printf de Godot redondea las mitades exactas al par; JavaScript, hacia arriba (en valor absoluto)
+static func to_fixed(x: float, f: int) -> String:
+	var t := absf(x) * pow(2.0, f + 1)
+	if t == floorf(t) and t < 1e15 and int(t) % 2 == 1:
+		var n := (int(t) * int(pow(5.0, f)) + 1) / 2
+		var s := str(n)
+		if f > 0:
+			while s.length() <= f:
+				s = "0" + s
+			s = s.left(-f) + "." + s.right(f)
+		return ("-" if x < 0 else "") + s
+	return ("%." + str(f) + "f") % x
+
+static func coma(x) -> String:
+	return js_num(x).replace(".", ",")
+
 static func pct(n: float) -> String:
-	return ("%.1f" % n).replace(".", ",")
+	return to_fixed(n, 1).replace(".", ",")
+
+# Number.prototype.toString(36) de un entero sin signo
+static func b36(n: int) -> String:
+	var dig := "0123456789abcdefghijklmnopqrstuvwxyz"
+	if n == 0:
+		return "0"
+	var s := ""
+	while n > 0:
+		s = dig[n % 36] + s
+		n /= 36
+	return s
+
+# rngSeed de 00-nucleo (mulberry32): todo en 32 bits sin signo
+class Rng:
+	var t := 0
+	func _init(s: int) -> void:
+		t = s & 0xffffffff
+	func sig() -> float:
+		t = (t + 0x6D2B79F5) & 0xffffffff
+		var r := ((t ^ (t >> 15)) * (1 | t)) & 0xffffffff
+		r = (r ^ ((r + (((r ^ (r >> 7)) * (61 | r)) & 0xffffffff)) & 0xffffffff)) & 0xffffffff
+		return float((r ^ (r >> 14)) & 0xffffffff) / 4294967296.0
+
+static func rng_seed(s: int) -> Rng:
+	return Rng.new(s)
+
+static func clamp_js(v: float, a: float, b: float) -> float:
+	return maxf(a, minf(b, v))
+
+# randLook de 03-datos: el aspecto de un cliente o un ladrón, siempre el mismo para la misma semilla
+static func rand_look(seed: String, kind: String) -> Dictionary:
+	var D := carga()
+	var R := rng_seed(hash_str(seed))
+	var p := func(a: Array): return a[int(floor(R.sig() * a.size()))]
+	if kind == "thief":
+		var o := {"id": "t" + seed}
+		o.skin = p.call(D.SKINS)
+		o.hair = p.call(D.HAIRS)
+		o.style = "hood"
+		o.hat = p.call(["#2a2a30", "#3a2a4a", "#2a3a2a", "#4a2a2a"])
+		o.shirt = "#2a2a30"
+		o.shirt2 = p.call(["#c02828", "#e0e0e0", "#3a8a3a"])
+		o.pants = "#3a3a44"
+		return o
+	var o := {"id": "n" + seed}
+	o.skin = p.call(D.SKINS)
+	o.hair = p.call(D.HAIRS)
+	o.style = p.call(["short", "short", "long", "curly", "bun", "cap", "bald"])
+	o.hat = p.call(D.CLOTH)
+	o.shirt = p.call(D.CLOTH)
+	o.pants = p.call(["#36466e", "#3a3a44", "#5a4a3a", "#4a6aa8", "#2a2a30"])
+	o.beard = 1 if R.sig() < .15 else 0
+	o.glasses = 1 if R.sig() < .15 else 0
+	return o
+
+static func dex() -> Array:
+	return carga().DEX
+
+# crossResult de 03-datos (a: la madre, b: el padre): la receta o un híbrido propio en S.custom, con el m % de la madre
+static func cross_result(S: Dictionary, a: String, b: String) -> String:
+	var D := carga()
+	var ks := [a, b]
+	ks.sort()
+	var key := "+".join(ks)
+	if D.RECIPES.has(key):
+		return D.RECIPES[key]
+	var id := "x" + b36(hash_str(key))
+	if not S.custom.has(id):
+		var A = strain(S, a)
+		var B = strain(S, b)
+		var R := rng_seed(hash_str(key))
+		var w := func(s) -> Array: return Array(s.n.split(" ")).filter(func(p): return not p.begins_with("#"))
+		var wa: Array = w.call(A)
+		var wb: Array = w.call(B)
+		var usado := func(n: String) -> bool:
+			if n == A.n or n == B.n:
+				return true
+			for k in D.DEX:
+				if D.STRAINS[k].n == n:
+					return true
+			for k in S.custom:
+				if S.custom[k].n == n:
+					return true
+			return false
+		var name: String = wa[0] + " " + wb[-1]
+		if wa[0] == wb[-1] or usado.call(name):
+			name = wb[0] + " " + wa[-1]
+		if usado.call(name):
+			name = A.n + " × " + B.n
+		if usado.call(name):
+			name += " F" + str(2 + int(floor(R.sig() * 7)))
+		var C := {"n": name}
+		C.thc = minf(33, jsround(((A.thc + B.thc) / 2.0 + R.sig() * 3.5 - 1.5) * 10) / 10.0)
+		C.y = jsround((A.y + B.y) / 2.0 + R.sig() * 8 - 4)
+		C.d = jsround(((A.d + B.d) / 2.0 + R.sig() * .6 - .3) * 2) / 2.0
+		C.r = int(clamp_js(jsround((A.r + B.r) / 2.0 + R.sig() * 10 - 5), 20, 95))
+		C.o = A.n + " × " + B.n + " · híbrido propio"
+		S.custom[id] = C
+		var m := 30 + int(floor(R.sig() * 41))
+		C.m = m
+		C.ma = a
+		C.pa = b
+		C.ind = jsround((m * ind_de(S, a) + (100 - m) * ind_de(S, b)) / 100.0)
+		C.hj = mix(hoja_de(S, b), hoja_de(S, a), m / 100.0)
+		C.c = mix(B.c, A.c, m / 100.0)
+	return id
+
+# JSON → los enteros que JavaScript guarda como enteros vuelven a int (Godot los lee como float)
+static func enteros(v):
+	if v is Dictionary:
+		for k in v:
+			v[k] = enteros(v[k])
+		return v
+	if v is Array:
+		for i in v.size():
+			v[i] = enteros(v[i])
+		return v
+	if v is float and v == floorf(v) and absf(v) < 9e15:
+		return int(v)
+	return v

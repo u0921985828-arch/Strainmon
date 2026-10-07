@@ -1,0 +1,1022 @@
+# Ribera Verde (Godot) — 11-historia, 12-menus y 13-combate: la tienda de Kiko, los personajes, la deuda, los capítulos y el
+# imperio, el menú START (Genoteca, mochila, cultivo) y los combates con ladrones y policía. Mismo guion, mismo orden de azar.
+extends "res://src/granja.gd"
+
+var cap_hasta := 0.0       # el rótulo del capítulo dura 2,8 s: el objetivo que se pida mientras tanto sale al acabar
+var endcard_on := false
+
+# ---------- tienda ----------
+func shop_cond(it: Dictionary) -> bool:
+	if it.get("extra"):
+		var k: String = it.extra
+		var nc := 0
+		for c in S.carpas:
+			if c and not c.get(k):
+				nc += 1
+		return nc > S.items.get("x_" + k, 0)
+	match it.get("carpa", ""):
+		"p80":
+			return S.carpas[0].t == "p60"
+		"m100":
+			return S.carpas.size() < 2 or S.carpas[1] == null
+		"g150":
+			return S.carpas.size() > 1 and S.carpas[1] != null and S.carpas[1].t == "m100"
+		"m120":
+			return S.carpas.size() > 1 and S.carpas[1] != null and (S.carpas.size() < 3 or S.carpas[2] == null)
+	return true
+
+func precio_sobre(it: Dictionary, nf: Array) -> int:
+	return Datos.jsround(it.p * nf[0] * nf[1])
+
+func comprar_semillas(it: Dictionary) -> void:
+	var l: Array = D.SOBRES.duplicate()
+	if S.ch >= 3:
+		l.append(D.GRANEL)
+	var o := []
+	for nf in l:
+		var nn := int(nf[0])
+		o.append("%s · %s" % ["1 semilla" if nn == 1 else ("Bolsa de %d" % nn if nn >= 50 else "Sobre de %d" % nn), Datos.eur(precio_sobre(it, nf))])
+	o.append("Nada")
+	var j: int = await ask("Semillas feminizadas de %s. ¿Cuántas?" % D.STRAINS[it.sid].n, o, "KIKO")
+	if j < 0 or j >= l.size():
+		return
+	var e := precio_sobre(it, l[j])
+	if S.money < e:
+		sfx("bad")
+		await say("No te llega el dinero.", "KIKO")
+		return
+	S.money -= e
+	sfx("coin")
+	add_seeds(it.sid, int(l[j][0]))
+	toast("Comprado: %d × %s" % [int(l[j][0]), D.STRAINS[it.sid].n], 1200)
+
+# carpa comprada (en un sitio libre) o ampliada (mismo sitio): cada plaza conserva su planta y su maceta por (carpa, plaza)
+func comprar_carpa(t: String, ci: int) -> void:
+	var antes := []
+	for h in huecos():
+		antes.append("%d:%d" % [h.c, h.j])
+	var pots: Array = S.pots
+	var mac: Array = S.macetas
+	if ci < S.carpas.size() and S.carpas[ci]:
+		S.carpas[ci].t = t
+	else:
+		while S.carpas.size() <= ci:
+			S.carpas.append(null)
+		S.carpas[ci] = {"t": t, "foco": "cfl"}
+	var np := []
+	var nm_ := []
+	for h in huecos():
+		var j := antes.find("%d:%d" % [h.c, h.j])
+		np.append(pots[j] if j >= 0 and j < pots.size() and pots[j] else null)
+		nm_.append(mac[j] if j >= 0 and j < mac.size() and mac[j] else "plastico7")
+	S.pots = np
+	S.macetas = nm_
+
+const IC := {"fert": "abono", "insect": "insecticida", "spray": "spray", "bocata": "bocadillo"}
+
+func shop() -> void:
+	var i := 0
+	while true:
+		var list := []
+		for it in D.SHOP:
+			if S.ch >= it.ch and shop_cond(it):
+				list.append(it)
+		var items := []
+		for it in list:
+			var ic = null
+			if it.get("sid"):
+				ic = icono("semillas")
+			elif it.get("item"):
+				ic = icono(IC[it.item])
+			elif it.get("maceta"):
+				ic = icono("maceta")
+			elif it.get("foco"):
+				ic = icono("lampara")
+			items.append({"label": it.lbl, "right": Datos.eur(it.p) + ("/u" if it.get("sid") else ""), "sw": D.STRAINS[it.sid].c if it.get("sid") else null, "ic": ic,
+				"desc": strain_line(it.sid) if it.get("sid") else it.get("desc", "")})
+		items.append({"label": "Salir", "desc": "Volver al mostrador."})
+		i = await menu(items, {"cls": "full", "title": "GROWSHOP KIKO", "title2": "Tienes " + Datos.eur(S.money), "desc": true, "initial": i})
+		if i < 0 or i >= list.size():
+			break
+		var it: Dictionary = list[i]
+		if it.get("sid"):
+			await comprar_semillas(it)
+			await check_story()
+			continue
+		var p := int(it.p)
+		if S.money < p:
+			sfx("bad")
+			await say("No te llega el dinero.", "KIKO")
+			continue
+		S.money -= p
+		sfx("coin")
+		if it.get("item"):
+			S.items[it.item] += int(it.get("n", 1))
+		if it.get("maceta"):
+			S.items["m_" + it.maceta] += 1
+		if not it.get("foco") and not it.get("carpa") and not it.get("extra"):
+			toast("Comprado: " + it.lbl, 1200)
+		if it.get("carpa"):
+			comprar_carpa(it.carpa, int(it.ci))
+			await say(D.DICHO_CARPA[it.carpa], "KIKO")
+		if it.get("extra"):
+			S.items["x_" + it.extra] += 1
+			var ok := []
+			for ci in S.carpas.size():
+				if S.carpas[ci] and not S.carpas[ci].get(it.extra):
+					ok.append(ci)
+			if ok.is_empty():
+				await say("Ya tienes uno en cada carpa. Te lo guardo en la mochila.", "KIKO")
+			else:
+				var o := []
+				for ci in ok:
+					o.append(D.CARPAS[S.carpas[ci].t].n)
+				o.append("Luego")
+				var c: int = await ask("¿Te lo pongo ya?", o, "KIKO")
+				if c >= 0 and c < ok.size():
+					poner_extra(ok[c], it.extra)
+					toast("Puesto: " + it.lbl, 1200)
+		if it.get("foco"):
+			S.items["f_" + it.foco] += 1
+			var ok := []
+			for ci in S.carpas.size():
+				var cc = S.carpas[ci]
+				if cc and D.FOCOS[it.foco].w <= D.CARPAS[cc.t].wmax:
+					ok.append(ci)
+			if ok.is_empty():
+				await say("Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande.", "KIKO")
+			else:
+				var o := []
+				for ci in ok:
+					o.append("%s (%s)" % [D.CARPAS[S.carpas[ci].t].n, D.FOCOS[S.carpas[ci].foco].n])
+				o.append("Luego")
+				var c: int = await ask("¿Lo cuelgo ya? El que quites va a tu mochila.", o, "KIKO")
+				if c >= 0 and c < ok.size():
+					instalar_foco(ok[c], it.foco)
+					toast("Instalado: " + it.lbl, 1200)
+		await check_story()
+	await say("Ten cuidado ahí fuera.", "KIKO")
+
+func kiko_tip() -> String:
+	var t: Array = D.KIKO_TIPS
+	var l: Array = t[mini(3, maxi(0, S.ch - 1))].duplicate()
+	if S.ch > 3:
+		l.append_array(t[1])
+	return pick(l)
+
+# ---------- personajes ----------
+func talk_kiko():
+	var N := "KIKO"
+	if not S.flags.get("kiko1"):
+		await talk(N, ["{N}, pasa. Te pareces a tu tía.", "Maite y yo cultivamos juntos desde que cerraron los astilleros. Ella tenía mano; yo, paciencia.", "Para empezar, toma esto."])
+		add_seeds("ria", 3)
+		await got("3 semillas de SKUNK #1")
+		S.items.fert += 2
+		await got("2 dosis de ABONO")
+		await talk(N, ["La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.", "Planta en las macetas del armario de tu tía y riega cuando baje el agua.",
+			"El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.", "Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.",
+			"Las plantas siguen creciendo mientras duermes."])
+		S.flags.kiko1 = true
+		show_objective()
+		return
+	if S.ch == 4 and not S.flags.get("lab"):
+		await talk(N, ["Ya me han contado que has pagado a Baltasar. Bien hecho.", "Te he montado en el piso mi equipo de polinización: pinceles, bolsas de papel y una lupa."])
+		S.flags.lab = true
+		await got("la MESA DE GENÉTICA")
+		add_seeds("rif", 3)
+		await got("3 semillas de AFGHANI")
+		await talk(N, ["Me las trajo un amigo de Mazar-i-Sharif en los ochenta. Las he ido renovando desde entonces.", "En la mesa polinizas una variedad con otra: gastas una semilla de cada y obtienes 2 del cruce.",
+			"Algunos cruces dan variedades conocidas. Otros, híbridos que solo tendrás tú.", "Apúntalo todo en la GENOTECA. Las mejores genéticas salen de cruzar cruces."])
+		show_objective()
+		await check_story()
+		return
+	var alguna := false
+	for p in S.pots:
+		if p:
+			alguna = true
+	if S.seeds.is_empty() and not alguna and not total_buds() and S.money < 15:
+		await say("¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.", N)
+		add_seeds("ria", 2)
+		await got("2 semillas de SKUNK #1")
+	var c: int = await ask("¿Qué necesitas?", ["Comprar", "Un consejo", "Nada"], N)
+	if c == 0:
+		await shop()
+	elif c == 1:
+		await say(kiko_tip(), N)
+	else:
+		await say("Ten cuidado ahí fuera.", N)
+
+func talk_josune():
+	var N := "JOSUNE"
+	var c: int = await ask("¡Kaixo! ¿Qué te pongo?", ["Pintxo · 4 €", "Kalimotxo · 3 €", "¿Algún rumor?", "Nada"], N)
+	if c == 0 or c == 1:
+		var cost := 3 if c else 4
+		var hp := 6 if c else 12
+		if S.money < cost:
+			await say("Aquí no se fía.", N)
+			return
+		S.money -= cost
+		S.hp = mini(S.hpMax, S.hp + hp)
+		sfx("coin")
+		await say("Un kalimotxo. Recuperas algo de vida." if c else "Pintxo de tortilla, recién hecha. Recuperas vida.", N)
+		return
+	if c == 2:
+		await say(pick(["Dicen que alguien escondía cosas en los arbustos del parque.", "Iñaki, el del muelle, trae semillas de sus viajes.", "Txaro está con la quimio. Lo está pasando muy mal.",
+			"Darko es sobrino de Baltasar. Por eso nadie le dice nada.", "El sargento Molina cobra por mirar hacia otro lado. Lo sabe todo el barrio."]), N)
+
+func talk_patxi():
+	S.patxi = S.get("patxi", 0) + 1
+	var R: Array = D.RECIPE_HINTS
+	await say("Cuando tengas una mesa de genética, ven a verme. Algo sé de cruces." if S.ch < 4 else "Cuarenta años cultivando en el monte. Te digo una cosa: " + R[S.patxi % R.size()], "PATXI")
+
+func talk_txaro():
+	var N := "ABUELA TXARO"
+	if S.flags.get("txaro"):
+		await say(pick(["Ya duermo de un tirón. Gracias, de verdad.", "Tu tía me ayudaba igual. No se lo contábamos a nadie."]), N)
+		return
+	await talk(N, ["Tú vives en el piso de Maite. Tu tía me ayudaba con... ya sabes.", "Desde la quimio apenas duermo y no tengo hambre. Las pastillas no me hacen nada.",
+		"Me vendrían bien 5 gramos, para hacer aceite como me enseñó ella. ¿Me los das?"])
+	var lots := bud_lots(5)
+	if lots.is_empty():
+		await say("Cuando tengas 5 gramos, acuérdate de mí.", N)
+		return
+	var it := lots.map(lot_item)
+	it.append({"label": "Ahora no"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿Qué le das?"})
+	if i < 0 or i >= lots.size():
+		await say("No pasa nada. Aquí estaré.", N)
+		return
+	use_buds(lots[i][0], 5)
+	await say("Gracias. Toma: las trajo mi Paco de Pakistán en el setenta y seis. Nunca supe qué hacer con ellas.", N)
+	add_seeds("hindu", 2)
+	await got("2 semillas de HINDU KUSH")
+	S.items.bocata += 3
+	await say("Y llévate estos bocadillos, que comes poco.", N)
+	await got("3 × BOCATA")
+	S.flags.txaro = true
+
+# Iñaki: 10 g para el viaje, una vez al día; desde el capítulo 3 también compra al por mayor
+func talk_inaki():
+	var N := "IÑAKI"
+	if S.ch >= 3:
+		var c: int = await ask("Aupa. ¿Qué traes?", ["10 g para el viaje", "Venta al por mayor", "Nada"], N)
+		if c == 1:
+			await venta_mayor(N)
+			return
+		if c != 0:
+			return
+	if S.iDay == S.day:
+		await say("Ya me has vendido hoy. Mañana más, que el barco sale temprano.", N)
+		return
+	await say("Aupa. Me voy tres semanas a la mar. ¿Tienes 10 g para el viaje? Pago bien.", N)
+	var lots := bud_lots(10)
+	if lots.is_empty():
+		await say("Pues nada. Si consigues 10 g, aquí estaré.", N)
+		return
+	var it := lots.map(lot_item)
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿Qué le vendes?"})
+	if i < 0 or i >= lots.size():
+		return
+	var sid: String = lots[i][0]
+	var b: Dictionary = lots[i][1]
+	var amt := Datos.jsround(precio_calle(b.thc) * 1.2 * 10)
+	if await ask("Te doy %d € por 10 g de %s. ¿Hecho?" % [amt, lot_nombre(sid)], ["Hecho", "No"], N) != 0:
+		return
+	use_buds(sid, 10)
+	S.money += amt
+	S.sales += amt
+	S.heat = min(100, S.heat + 3)
+	S.iDay = S.day
+	S.rep += 2
+	sfx("coin")
+	if not S.flags.get("inaki"):
+		S.flags.inaki = true
+		await say("Toma. Me las dio un marinero de Malaui en Mombasa, en el último viaje.", N)
+		add_seeds("malawi", 2)
+		await got("2 semillas de MALAWI GOLD")
+	else:
+		await say("Eskerrik asko. Hasta la vuelta.", N)
+	await check_story()
+
+func mayor_dia() -> int:
+	return int(D.IMPERIO[imperio_nivel() if S.ch >= 8 else 0].mayor)
+
+static func _kg(g: int) -> String:
+	return (Datos.coma(g / 1000.0) + " kg") if g >= 1000 else "%d g" % g
+
+static func _dos(x: float) -> String:
+	return Datos.to_fixed(x, 2).replace(".", ",")
+
+func venta_mayor(N: String) -> void:
+	if S.mDay == S.day:
+		await say("Hoy ya he cargado. Mañana sale otro barco.", N)
+		return
+	var lots := bud_lots(100)
+	if lots.is_empty():
+		await say("Al por mayor, de 100 g para arriba. Pago entre %s y %s € el gramo, según lo bueno que sea. Hasta %s por carga." % [_dos(precio_mayor(12)), _dos(precio_mayor(30)), _kg(mayor_dia())], N)
+		return
+	var it := lots.map(lot_item)
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿Qué lote?"})
+	if i < 0 or i >= lots.size():
+		await say("Otro día.", N)
+		return
+	var k: String = lots[i][0]
+	var b: Dictionary = lots[i][1]
+	var pg := Datos.jsround(precio_mayor(b.thc) * 100) / 100.0
+	var tope := mini(int(floor(b.g)), mayor_dia())
+	var ops := []
+	for g in [100, 250, 500, 1000, 2000, 5000, 10000]:
+		if g < tope:
+			ops.append(g)
+	ops.append(tope)
+	var o := []
+	for g in ops:
+		o.append("%s · %s" % [_kg(g), Datos.eur(g * pg)])
+	o.append("Nada")
+	var j: int = await ask("%s a %s € el gramo. ¿Cuánto cargas?" % [lot_nombre(k), _dos(pg)], o, N)
+	if j < 0 or j >= ops.size():
+		return
+	var g: int = ops[j]
+	var e := Datos.jsround(g * pg)
+	use_buds(k, g)
+	S.money += e
+	S.sales += e
+	S.mDay = S.day
+	S.heat = min(100, S.heat + 2 + g / 250.0)
+	S.rep += 1
+	sfx("coin")
+	await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})
+	toast("+%s · %s al por mayor" % [Datos.eur(e), _kg(g)], 1600)
+	await say("Cargado. Esta noche sale en el barco.", N)
+	heat_warn()
+	await check_story()
+
+func talk_cop():
+	if total_buds() > 0 and not S.protect:
+		await say("¿Y ese olor? Quieto ahí.", "AGENTE")
+		await battle("police")
+		return
+	await say(pick(["Circule.", "Todo tranquilo por aquí. Que siga así.", "De noche hay robos en el parque. Tenga cuidado."]), "AGENTE")
+
+func talk_darko():
+	var N := "DARKO"
+	if S.ch == 6:
+		await talk(N, ["¿Vienes a la Copa? Mi AMNESIA HAZE dio un 26,8 % de THC en el laboratorio.", "Nadie en Ribera ha pasado del 26. No vas a ser tú el primero."])
+		return
+	S.flags.darko1 = true
+	await talk(N, ["Así que tú te has quedado el piso de Maite.", "Soy DARKO. La hierba de este barrio la muevo yo.", "Vende lo tuyo si quieres, pero lejos de mis esquinas.", "No me hagas repetirlo."])
+	await fade(1)
+	build_ents()
+	await fade(0)
+
+func talk_molina():
+	var N := "SARGENTO MOLINA"
+	var sob := int(D.SOBORNO)
+	if not S.flags.get("molina1"):
+		S.flags.molina1 = true
+		await talk(N, ["Así que eres tú quien vende en la plaza.", "Podría detenerte ahora mismo. O podemos entendernos.", "Por %s mis patrullas no pasan por tu calle. Y nada de registros en tu piso." % Datos.eur(sob)])
+	var c: int = await ask("¿Aceptas el trato del sargento?", ["Pagar " + Datos.eur(sob), "No"], N)
+	if c == 0:
+		if S.money < sob:
+			await say("¿Con qué dinero? Vuelve cuando lo tengas.", N)
+			return
+		S.money -= sob
+		S.protect = true
+		sfx("coin")
+		await say("Bien. Mis agentes mirarán hacia otro lado.", N)
+		await fade(1)
+		build_ents()
+		await fade(0)
+	else:
+		S.heat = min(100, S.heat + 10)
+		await say("Tú sabrás. Mis agentes van a estar muy atentos.", N)
+		heat_warn()
+
+func talk_jurado():
+	var N := "JURADO"
+	await talk(N, ["Esto es la COPA DE RIBERA, la de la asociación cannábica del barrio.", "Para competir, trae 20 g de una sola variedad. Se analizan en laboratorio.", "Marca a batir: DARKO, con AMNESIA HAZE, 26,8 % de THC."])
+	var lots := bud_lots(20)
+	if lots.is_empty():
+		await say("Vuelve cuando tengas 20 g de algo.", N)
+		return
+	var it := lots.map(lot_item)
+	it.append({"label": "Todavía no"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿Qué presentas?"})
+	if i < 0 or i >= lots.size():
+		return
+	var sid: String = lots[i][0]
+	var b: Dictionary = lots[i][1]
+	var thc := Datos.jsround(b.thc * 10) / 10.0
+	var name_ := lot_nombre(sid).replace(" ★", "")
+	use_buds(sid, 20)
+	await fade(1)
+	await wait(500)
+	await fade(0)
+	await say("Resultado del laboratorio. AMNESIA HAZE de Darko: 26,8 % de THC.", N)
+	await say("%s de {N}: %s %% de THC." % [name_, Datos.pct(thc)], N)
+	if thc > 26.8:
+		sfx("get")
+		await say("Nueva marca. {N} gana la COPA DE RIBERA.", N)
+		S.money += int(D.PREMIO_COPA)
+		S.rep += 20
+		await got(Datos.eur(D.PREMIO_COPA) + " y el trofeo de la Copa")
+		await talk("DARKO", ["Esto no se acaba aquí.", "Mi tío se va a enterar."])
+		S.flags.copa = true
+		S.due = S.debt
+		S.deadline = S.day + 7
+		await chapter(7)   # el plazo, antes: chapter() guarda
+		show_objective()
+	else:
+		sfx("bad")
+		await say("Gana DARKO. La Copa sigue abierta: vuelve con algo más potente.", N)
+
+func talk_baltasar():
+	var N := "DON BALTASAR"
+	if S.ch < 3:
+		await say("¿Y tú quién eres? No tengo nada que hablar contigo.", N)
+		return
+	if S.ch == 3 and not S.flags.get("metB"):
+		await talk(N, ["Siéntate, {N}. Vamos al grano.", "Tu tía Maite me debía %s. Las deudas no se mueren con la gente." % Datos.eur(D.DEUDA).replace(" €", " euros"),
+			"Me los vas a pagar a plazos. El primero, %s." % Datos.eur(D.PLAZOS["3"]), "Tienes siete días. Si no, Toño te hará una visita. Y Toño cobra intereses."])
+		S.flags.metB = true
+		S.due = int(D.PLAZOS["3"])
+		S.deadline = S.day + 7
+		show_objective()
+		return
+	if S.ch >= 8:
+		await say("Ya no me debes nada. Que te vaya bien, {N}.", N)
+		return
+	if S.ch == 4:
+		await say("Tranquilo. Ya te avisaré cuando toque el siguiente pago.", N)
+		return
+	if S.ch == 6:
+		await say("Primero, la Copa. Darko te espera en la plaza.", N)
+		return
+	var left: int = S.deadline - S.day
+	await say("Me debes %s para el día %s. %s" % [Datos.eur(S.due), n(S.deadline), ("Te quedan %d días." % left) if left > 0 else "Es HOY."], N)
+	if S.money < S.due:
+		await say("Vuelve cuando tengas el dinero.", N)
+		return
+	if await ask("¿Pagar ahora?", ["Pagar", "Todavía no"], N) != 0:
+		return
+	S.money -= S.due
+	S.debt -= S.due
+	var paid = S.due
+	S.due = 0
+	sfx("coin")
+	toast("Pagado: " + Datos.eur(paid), 1500)
+	if S.ch == 3:
+		await talk(N, ["Puntual. Así me gusta.", "Quedan %s. Ya te avisaré del siguiente plazo." % Datos.eur(S.debt).replace(" €", "")])
+		await chapter(4)
+		await talk("SMS · KIKO", ["Pásate por el growshop. Tengo algo para ti."])
+		show_objective()
+	elif S.ch == 5:
+		await talk(N, ["Me sorprendes, {N}.", "Quedan %s. Te propongo algo." % Datos.eur(S.debt).replace(" €", ""), "El sábado es la COPA DE RIBERA. Premio: %s." % Datos.eur(D.PREMIO_COPA),
+			"Mi sobrino Darko compite. No ha perdido nunca.", "Gana la Copa y, con el premio y lo que vendas, me pagas lo que queda. Si puedes."])
+		await chapter(6)
+		show_objective()
+	elif S.ch == 7:
+		await talk(N, ["%s. Contados." % Datos.eur(paid), "Deuda saldada. Lo de tu tía queda cerrado.", "Una cosa más, {N}: si algún día quieres trabajar para mí, ya sabes dónde estoy."])
+		S.debt = 0
+		S.imp0 = S.sales
+		S.impN = 0
+		await ending()
+
+# ---------- capítulos, objetivo e imperio ----------
+func chapter(nn: int) -> void:
+	S.ch = nn
+	sfx("get")
+	toast("<small>CAPÍTULO %d</small>%s" % [nn, D.CH_TITLES[str(nn)]], 2800)
+	cap_hasta = M.reloj + 2800
+	build_ents()
+	await wait(400)
+	save()
+
+func objective_text() -> String:
+	match int(S.ch):
+		1:
+			return "Lee la carta que hay en la mesa." if not S.flags.get("letter") else ("Visita el growshop de Kiko, al lado de casa." if not S.flags.get("kiko1") else "Planta y consigue tu primera cosecha.")
+		2:
+			var mv := int(D.META_VENTAS)
+			return "Gana %d € vendiendo en la calle (%d/%d)." % [mv, mini(mv, Datos.jsround(S.sales)), mv]
+		3:
+			return "Ve al bar El Ancla." if not S.flags.get("metB") else "Paga %s a Don Baltasar antes del día %s." % [Datos.eur(S.due), n(S.deadline)]
+		4:
+			return "Kiko quiere verte en el growshop." if not S.flags.get("lab") else "Descubre 8 variedades (%d/8)." % disc_count()
+		5:
+			return "Paga %s a Don Baltasar antes del día %s." % [Datos.eur(S.due), n(S.deadline)]
+		6:
+			return "Gana la Copa: 20 g con más de 26,8% de THC al jurado de la plaza."
+		7:
+			return "Paga los últimos %s a Don Baltasar antes del día %s." % [Datos.eur(S.due), n(S.deadline)]
+	var nv := imperio_nivel()
+	var I: Array = D.IMPERIO
+	var nd := 0
+	for k in D.DEX:
+		if S.disc.get(k):
+			nd += 1
+	var gen := "Genoteca %d/%d" % [nd, D.DEX.size()]
+	if nv + 1 < I.size():
+		var sig: Dictionary = I[nv + 1]
+		return "Tu imperio · %s. Facturado desde la deuda: %s de %s para ser %s. %s." % [I[nv].n, Datos.eur(minf(sig.meta, facturado())), Datos.eur(sig.meta), sig.n.to_lower(), gen]
+	return "Tu imperio · %s. Completa la %s." % [I[nv].n, gen]
+
+func show_objective():
+	var d := cap_hasta - M.reloj
+	if d > 0:
+		M.timeout(show_objective, d)
+		return
+	toast("<small>OBJETIVO</small>" + esc(objective_text()), 3200)
+
+func facturado() -> float:
+	return maxf(0, S.sales - S.get("imp0", 0))
+
+func imperio_nivel() -> int:
+	var nv := 0
+	for i in D.IMPERIO.size():
+		if facturado() >= D.IMPERIO[i].meta:
+			nv = i
+	return nv
+
+func check_story():
+	if S.ch == 1 and S.flags.get("harvest1"):
+		await chapter(2)
+		spawn_clients()
+		await talk("SMS · KIKO", ["Primera cosecha. Bien hecho.", "La gente que busca material lleva un $ encima. Puedes venderles en la calle.", "Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba."])
+		show_objective()
+	if S.ch == 2 and S.sales >= D.META_VENTAS:
+		await chapter(3)
+		await say("Un hombre enorme en chándal te corta el paso.")
+		await talk("TOÑO", ["Tú vives en el piso de Maite, ¿no?", "Don Baltasar quiere verte. En el bar El Ancla. Hoy.", "No me hagas venir a buscarte."])
+		show_objective()
+	if S.ch >= 8 and imperio_nivel() > S.get("impN", 0):
+		S.impN = imperio_nivel()
+		var r: Dictionary = D.IMPERIO[S.impN]
+		sfx("get")
+		toast("<small>TU IMPERIO</small>" + r.n, 2800)
+		await talk("SMS · IÑAKI", ["Se corre la voz: %s vendidos desde que pagaste a Baltasar." % Datos.eur(facturado()), "Desde hoy te cargo hasta %s al día en el barco." % _kg(int(r.mayor))])
+		show_objective()
+	if S.ch == 4 and S.flags.get("lab") and disc_count() >= 8:
+		S.due = int(D.PLAZOS["5"])
+		S.deadline = S.day + 10
+		await chapter(5)
+		await talk("SMS · TOÑO", ["Don Baltasar quiere %s en diez días." % Datos.eur(D.PLAZOS["5"]), "Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza."])
+		show_objective()
+
+func penalty_event():
+	await say("TOÑO te estaba esperando.")
+	var it := Datos.jsround(S.due * D.INTERES / 100) * 100
+	await talk("TOÑO", ["Don Baltasar dice que llegas tarde.", "Son %s más de intereses. Y esto, para que no se te olvide." % Datos.eur(it)])
+	sfx("hurt")
+	S.hp = maxi(1, S.hp - 15)
+	S.due += it
+	S.debt += it
+	S.deadline = S.day + 5
+	await say("La deuda del plazo sube a %s. Nuevo límite: día %s." % [Datos.eur(S.due), n(S.deadline)])
+
+func raid_event():
+	if S.protect:
+		S.heat = 50
+		await talk("SMS · MOLINA", ["Esta noche había orden de entrada en tu piso. La he parado.", "Baja el ritmo."])
+		return
+	sfx("bad")
+	await say("REDADA. La policía entra en tu piso.")
+	var g := int(floor(total_buds()))
+	var fine = min(S.money, int(D.MULTA_REDADA))
+	var np := []
+	for p in S.pots:
+		np.append(null)
+	S.pots = np
+	S.buds = {}
+	S.heat = 30
+	S.money -= fine
+	await say("Se llevan todas las plantas y %d g. Multa: %s." % [g, Datos.eur(fine)])
+	await say("Toca empezar de nuevo. Y vender menos una temporada.")
+
+func ending() -> void:
+	await fade(1)
+	endcard_on = true
+	endcard_pon(["DEUDA SALDADA", "Has saldado los %s de tu tía Maite en %s días." % [Datos.eur(D.DEUDA), n(S.day)], "Variedades: %d · Ventas totales: %s" % [disc_count(), Datos.eur(S.sales)],
+		"Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.\n¿Completarás la GENOTECA? ¿Conseguirás la GHOST TRAIN HAZE?", "Pulsa A"])
+	await fade(0)
+	sfx("get")
+	var pr := Motor.Prom.new()
+	push(func(b: String):
+		if b == "A" or b == "START":
+			pop()
+			pr.res())
+	await Motor.espera(pr)
+	await fade(1)
+	endcard_on = false
+	endcard_pon(null)
+	await fade(0)
+	await chapter(8)
+	show_objective()
+
+# ---------- menú START (12-menus) ----------
+func start_menu():
+	var i := 0
+	while true:
+		i = await menu(["GENOTECA", "MOCHILA", "PLANTAS", "OBJETIVO", "GUARDAR", "SONIDO: SÍ" if sonido_on() else "SONIDO: NO", "SALIR"], {"cls": "start", "initial": i, "startCloses": true})
+		if i < 0 or i == 6:
+			return
+		if i == 0:
+			await genoteca()
+		elif i == 1:
+			await mochila()
+		elif i == 2:
+			await plantas()
+		elif i == 3:
+			await say("CAPÍTULO %d: %s\n%s" % [S.ch, D.CH_TITLES.get(str(S.ch), ""), objective_text()])
+			await say("Deuda: %s · Ventas: %s\nReputación %s · Calor %d%%" % [Datos.eur(S.debt), Datos.eur(S.sales), n(S.rep), Datos.jsround(S.heat)])
+		elif i == 4:
+			await say("Partida guardada." if save() else "No se ha podido guardar en este navegador.")
+		elif i == 5:
+			set_sound(not sonido_on())
+
+func genoteca():
+	var items := []
+	var DEX: Array = D.DEX
+	for j in DEX.size():
+		var k: String = DEX[j]
+		var s: Dictionary = D.STRAINS[k]
+		var nn := "%02d" % (j + 1)
+		if S.disc.get(k):
+			items.append({"label": "%s %s" % [nn, s.n], "right": Datos.pct(s.thc) + "%", "sw": s.c, "ic": ic_cog(k), "desc": strain_line(k) + (("\n" + s.h) if s.get("h") else "")})
+		else:
+			items.append({"label": nn + " ??????", "desc": "Sin descubrir."})
+	var cust := []
+	for k in S.custom:
+		if S.disc.get(k):
+			cust.append(k)
+	for k in cust:
+		var s: Dictionary = S.custom[k]
+		items.append({"label": "★ " + s.n, "right": Datos.pct(s.thc) + "%", "sw": s.c, "ic": ic_cog(k), "desc": strain_line(k)})
+	var nd := 0
+	for k in DEX:
+		if S.disc.get(k):
+			nd += 1
+	var i := 0
+	while true:
+		i = await menu(items, {"cls": "full", "title": "GENOTECA", "title2": "%d/%d · %d propias" % [nd, DEX.size(), cust.size()], "desc": true, "initial": i})
+		if i < 0:
+			break
+
+func mochila() -> void:
+	var i := 0
+	while true:
+		var rows := [{"label": "Dinero", "right": Datos.eur(S.money), "ic": icono("billetes"), "desc": "Tu capital. Don Baltasar también lo cuenta."},
+			{"label": "Vida", "right": "%s/%s" % [n(S.hp), n(S.hpMax)], "desc": "Se recupera durmiendo, comiendo o con el tiempo."},
+			{"label": "Abono (dosis)", "right": "×" + n(S.items.fert), "ic": icono("abono"), "desc": "Una por planta: +25% de cosecha."},
+			{"label": "Insecticida (tratamientos)", "right": "×" + n(S.items.insect), "ic": icono("insecticida"), "desc": "Úsalo en una maceta con plaga."},
+			{"label": "Spray de pimienta", "right": "×" + n(S.items.spray), "ic": icono("spray"), "desc": "Solo en combate."},
+			{"label": "Bocata", "right": "×" + n(S.items.bocata), "ic": icono("bocadillo"), "desc": "Pulsa A para comerlo: +15 de vida.", "k": "bocata"}]
+		for k in D.MACETAS:
+			if S.items.get("m_" + k, 0) > 0:
+				rows.append({"label": "Maceta " + D.MACETAS[k].n, "right": "×" + n(S.items["m_" + k]), "ic": icono("maceta"), "desc": desc_maceta(k) + "\nSe cambia en una plaza vacía de la carpa."})
+		for k in D.FOCOS:
+			if S.items.get("f_" + k, 0) > 0:
+				rows.append({"label": "Foco " + D.FOCOS[k].n, "right": "×" + n(S.items["f_" + k]), "ic": icono("lampara"), "desc": desc_foco(k) + "\nSe cuelga desde la vista de carpa: ▲ hasta el foco y A."})
+		for k in D.EXTRAS:
+			if S.items.get("x_" + k, 0) > 0:
+				rows.append({"label": D.EXTRAS[k].n, "right": "×" + n(S.items["x_" + k]), "desc": D.EXTRAS[k].d + "\nSe pone desde la vista de carpa: ▲ hasta el foco y A."})
+		for k in S.seeds:
+			rows.append({"label": "Semilla " + strain(k).n, "right": "×" + n(S.seeds[k]), "sw": strain(k).c, "ic": icono("semillas"), "desc": strain_line(k)})
+		for e in S.esquejes:
+			rows.append({"label": "Esqueje " + strain(e.sid).n + marca_feno(e.f), "right": "día " + n(e.dia + D.ESQUEJE_DIAS), "sw": strain(e.sid).c, "ic": ic_cog(e.sid),
+				"desc": "Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día %s." % n(e.dia + D.ESQUEJE_DIAS)})
+		for k in S.buds:
+			var b: Dictionary = S.buds[k]
+			rows.append({"label": lot_nombre(k), "right": "%d g · %s%%" % [int(floor(b.g)), Datos.pct(b.thc)], "sw": strain(lot_sid(k)).c, "ic": ic_cog(lot_sid(k)),
+				"desc": ("Cogollos de un fenotipo estrella, en lote aparte.\n" if k.ends_with("*") else "Cogollos listos para vender.\n") + strain(lot_sid(k)).o})
+		i = await menu(rows, {"cls": "full", "title": "MOCHILA", "title2": "%d g encima" % int(floor(total_buds())), "desc": true, "initial": i})
+		if i < 0:
+			return
+		if rows[i].get("k") == "bocata":
+			if S.items.bocata > 0 and S.hp < S.hpMax:
+				S.items.bocata -= 1
+				S.hp = mini(S.hpMax, S.hp + 15)
+				sfx("get")
+				toast("Te comes el bocata. +15 de vida", 1200)
+			else:
+				sfx("bump")
+
+func plantas() -> void:
+	var rows := []
+	var H := huecos()
+	for ci in S.carpas.size():
+		var c = S.carpas[ci]
+		if not c:
+			continue
+		var C: Dictionary = D.CARPAS[c.t]
+		var F: Dictionary = D.FOCOS[c.foco]
+		var wm2 := Datos.jsround(F.w / (C.cm[0] * C.cm[2] / 1e4))
+		rows.append({"label": C.n, "right": F.n, "ic": icono("lampara"), "desc": "%s plantas · foco %s, %d W/m²%s\nLuz: %s al día con plantas · hasta %s W y macetas de %s L." % [n(C.plazas), F.n, wm2,
+			" (poca luz: crecen más despacio y con menos THC)" if wm2 < D.W_M2 else "", Datos.eur(luz_carpa(ci)), n(C.wmax), n(C.lmax)]})
+		for i in H.size():
+			var h: Dictionary = H[i]
+			if h.c != ci:
+				continue
+			var p = S.pots[i]
+			var Mc: Dictionary = D.MACETAS[S.macetas[i]]
+			if not p:
+				rows.append({"label": "  %d · vacía" % (h.j + 1), "right": n(Mc.l) + " L", "ic": icono("maceta"), "desc": "Maceta de %s. Planta algo desde la carpa de tu piso." % Mc.n})
+				continue
+			var s = strain(p.sid)
+			var desc := "Se ha secado. Retírala." if p.get("dead") else "%s · Agua %d%% · Salud %d%%\n%s%s · maceta de %s." % ["Lista para cosechar" if p.prog >= 1 else stage_name(p), Datos.jsround(p.water),
+				Datos.jsround(p.health), "PLAGA: trátala con insecticida. " if p.pest else "", "Abonada" if p.fert else "Sin abonar", Mc.n]
+			rows.append({"label": "  %d · %s%s" % [h.j + 1, s.n, marca_feno(p.get("f"))], "sw": s.c, "ic": ic_cog(p.sid),
+				"right": "muerta" if p.get("dead") else ("LISTA" if p.prog >= 1 else "%d%%" % int(floor(p.prog * 100))), "desc": desc})
+	var luz := factura_luz()
+	var i := 0
+	while true:
+		i = await menu(rows, {"cls": "full", "title": "CULTIVO", "title2": ("Luz " + Datos.eur(luz) + "/día") if luz else "Luz apagada", "desc": true, "initial": i})
+		if i < 0:
+			break
+
+# ---------- combate (13-combate) ----------
+static func hp_col(f: float) -> Color:
+	return Color("#58d080") if f > .5 else (Color("#f0c040") if f > .2 else Color("#f05050"))
+
+func bhud_datos() -> Dictionary:
+	var f: float = B.hp / float(B.hpMax) if B.kind == "thief" else S.heat / 100.0
+	var pf: float = S.hp / float(S.hpMax)
+	return {"e": [B.name, "VIDA" if B.kind == "thief" else "SOSP.", maxf(0, f), hp_col(f) if B.kind == "thief" else Color("#e05050")],
+		"p": [S.name, "%d g" % int(floor(total_buds())), maxf(0, pf), hp_col(pf), "%s/%s · %s" % [n(S.hp), n(S.hpMax), Datos.eur(S.money)]]}
+
+func bhud_build() -> void:
+	bhud_pon(bhud_datos())
+
+func bhud_act() -> void:
+	if B:
+		bhud_pon(bhud_datos())
+
+# el texto de la caja sin esperar a nadie (las preguntas del combate, con el menú al lado)
+func prompt(t: String) -> void:
+	if oraculo:
+		return
+	dlg.show()
+	dlg_nm.hide()
+	dlg_more.hide()
+	dlg_txt.text = nm(t)
+	_coloca.call_deferred()
+
+func grupo_combate(who: String):
+	if not Atlas.ok or B == null:
+		return null
+	if who == "P":
+		return Atlas.cubre("combate:espalda:player")
+	if B.kind == "thief":
+		var g = Atlas.grupo_look(B.look)
+		return g if g else Atlas.cubre("combate:frente:ladron")
+	return Atlas.cubre("combate:frente:policia")
+
+# lanza una animación de combate; devuelve su duración en ms
+func b_anim(who: String, nn: String) -> float:
+	var g = grupo_combate(who)
+	if not g or Atlas.anim_de(g, nn) == null:
+		return 0.0
+	B["a" + who] = {"n": nn, "t0": M.reloj}
+	return Atlas.duracion(g, nn)
+
+func vfx_combate(id: String, x: float, y: float) -> void:
+	if Atlas.ok:
+		lanzar_vfx(id, x, y, M.reloj, "*", false)
+
+func battle(kind):
+	lock += 1
+	var res = null
+	music("battle")
+	sfx("enc")
+	for k in 3:
+		fade_pon(.85, true, true)
+		await wait(70)
+		fade_pon(0, true, true)
+		await wait(70)
+	wipe_go()
+	await wait(480)
+	var ch: int = S.ch
+	if kind == "thief":
+		var nm_: String = pick(D.THIEVES)
+		B = {"kind": kind, "name": nm_, "look": Datos.rand_look("th" + Datos.js_num(Cultivo.azar()), "thief"), "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
+		B.hpMax = 12 + ch * 2 + ri(0, 4)
+		B.hp = B.hpMax
+		B.atk = [2 + (ch >> 2), 4 + (ch >> 1)]
+	else:
+		B = {"kind": kind, "name": pick(D.COPS), "look": D.LOOKS.cop, "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
+	mode = "battle"
+	update_hud()
+	wipe_fuera()
+	await wait(650)
+	bhud_build()
+	if kind == "thief":
+		await say("Un %s te corta el paso." % B.name.to_lower())
+		await say(pick(["«La mochila. Dámela y no pasa nada.»", "«Eh, tú. Sé lo que llevas encima.»", "«Quieto. El dinero y lo que lleves.»"]), B.name)
+	else:
+		b_anim("E", "alto")
+		await say("%s te da el alto." % B.name)
+		await say(pick(["«Control rutinario. ¿Llevas algo encima?»", "«Documentación. Y vacía los bolsillos.»", "«Aquí huele a marihuana. ¿Es tuya?»"]), B.name)
+	while not res:
+		if kind == "thief":
+			res = await thief_round()
+		else:
+			res = await cop_round()
+	bhud_pon(null)
+	if not oraculo:
+		dlg.hide()
+		dlg_nm.hide()
+		menu_box.hide()
+	await fade(1)
+	mode = "world"
+	B = null
+	if res == "ko":
+		advance_time(360)
+		S.hp = S.hpMax
+		enter_map("home", 2, 4, "down")
+	else:
+		music(map_music())
+	update_hud()
+	await fade(0)
+	if res == "ko":
+		await say("Te despiertas en casa con la cabeza vendada. Un vecino te encontró en el portal.")
+	S.cool = 25
+	heat_warn()
+	lock -= 1
+
+func enemy_hits():
+	var dmg := ri(int(B.atk[0]), int(B.atk[1]))
+	b_anim("E", "ataque")
+	await say("El %s %s." % [B.name.to_lower(), pick(["te golpea", "te empuja contra un portal", "te da una patada", "te tira al suelo"])])
+	b_anim("P", "herido")
+	vfx_combate("vfx-golpe", 64, 112)
+	B.shakeP = 450.0
+	sfx("hurt")
+	S.hp = maxi(0, S.hp - dmg)
+	bhud_act()
+	await wait(450)
+	if S.hp <= 0:
+		b_anim("P", "desmayo")
+		await say("Pierdes el conocimiento.")
+		var lost := 0
+		for b in S.buds.values():
+			var l := int(floor(b.g / 2))
+			lost += l
+			b.g -= l
+		for k in S.buds.keys():
+			if S.buds[k].g < .5:
+				S.buds.erase(k)
+		var lm := Datos.jsround(S.money * .3)
+		S.money -= lm
+		await say("Te roba %d g y %s." % [lost, Datos.eur(lm)])
+		return "ko"
+	return null
+
+func thief_round():
+	prompt("¿Qué haces?")
+	var c: int = await menu(["LUCHAR", "MOCHILA", "HABLAR", "HUIR"], {"cls": "battle", "cancel": false})
+	if c == 0:
+		prompt("Elige un golpe.")
+		var m: int = await menu(["PUÑETAZO", "PATADA"], {"cls": "battle"})
+		if m < 0:
+			return null
+		var mv := {"n": "PATADA", "acc": .65, "d": [8, 12]} if m else {"n": "PUÑETAZO", "acc": .92, "d": [4, 7]}
+		await wait(b_anim("P", "patada" if m else "golpe") * .6)
+		await say("Le das una patada." if mv.n == "PATADA" else "Le das un puñetazo.")
+		if Cultivo.azar() < mv.acc:
+			var d := ri(mv.d[0], mv.d[1])
+			b_anim("E", "herido")
+			vfx_combate("vfx-golpe", 178, 40)
+			B.flashE = 500.0
+			sfx("hit")
+			B.hp -= d
+			bhud_act()
+			await wait(500)
+			if m and d >= 11:
+				await say("Le has hecho daño de verdad.")
+		else:
+			await say("Fallas.")
+	elif c == 1:
+		prompt("¿Qué usas?")
+		var it: int = await menu([{"label": "SPRAY ×%s" % n(S.items.spray), "ic": icono("spray")}, {"label": "BOCATA ×%s" % n(S.items.bocata), "ic": icono("bocadillo")}], {"cls": "battle"})
+		if it < 0:
+			return null
+		if it == 0:
+			if not S.items.spray:
+				await say("No te queda SPRAY.")
+				return null
+			S.items.spray -= 1
+			b_anim("P", "spray")
+			vfx_combate("vfx-spray", 178, 48)
+			await say("Le echas SPRAY DE PIMIENTA a la cara.")
+			b_anim("E", "herido")
+			B.flashE = 700.0
+			sfx("hit")
+			B.hp -= ri(12, 16)
+			bhud_act()
+			await wait(500)
+			await say("No puede abrir los ojos.")
+		else:
+			if not S.items.bocata:
+				await say("No te quedan BOCATAS.")
+				return null
+			S.items.bocata -= 1
+			b_anim("P", "comer")
+			S.hp = mini(S.hpMax, S.hp + 15)
+			sfx("get")
+			bhud_act()
+			await say("Te comes un BOCATA. Recuperas vida.")
+	elif c == 2:
+		await say("%s: «Tranquilo. Somos del mismo barrio.»" % S.name)
+		if Cultivo.azar() < clampf(.25 + S.rep / 300.0, .25, .7):
+			await say("«Vale... Tú eres el de Maite. Olvídalo.»")
+			return "talk"
+		await say("«No me cuentes historias.»")
+	elif c == 3:
+		if Cultivo.azar() < .5:
+			sfx("door")
+			await say("Consigues escapar.")
+			return "flee"
+		await say("Te corta el paso. No puedes escapar.")
+	if B.hp <= 0:
+		B.gone = true
+		b_anim("E", "huir")
+		await say("El %s sale corriendo." % B.name.to_lower())
+		var loot: int = ri(20, 40) + S.ch * 10
+		S.money += loot
+		S.rep += 2
+		sfx("coin")
+		bhud_act()
+		await say("Al huir se le cae la cartera: +%s." % Datos.eur(loot))
+		if S.hpMax < 60:
+			S.hpMax += 2
+			S.hp += 2
+			bhud_act()
+			await say("Aguantas más. VIDA máxima: %d." % S.hpMax)
+		return "win"
+	return await enemy_hits()
+
+func confiscate(extra_fine := true) -> Array:
+	var g := int(floor(total_buds()))
+	var fine = min(S.money, int(D.MULTA_CALLE)) if extra_fine else 0
+	if B:
+		b_anim("E", "multa")
+	S.buds = {}
+	S.money -= fine
+	S.heat = max(0, S.heat - 15)
+	return [g, fine]
+
+func cop_round():
+	var cost := Datos.jsround(40 + S.heat * 4 + total_buds() * .5)
+	prompt("¿Qué haces?")
+	var c: int = await menu(["SOBORNAR", "HABLAR", "HUIR", "ENTREGAR"], {"cls": "battle", "cancel": false})
+	if c == 0:
+		if await ask("¿Ofrecerle %s con disimulo?" % Datos.eur(cost), ["Sí", "No"]) != 0:
+			return null
+		if S.money < cost:
+			await say("No llevas tanto dinero encima.")
+			return null
+		if not S.protect and S.ch >= 3 and Cultivo.azar() < .15:
+			await say("%s: «¿Me intentas sobornar a mí? Esto me lo quedo.»" % B.name)
+			var r := confiscate()
+			S.heat = min(100, S.heat + 20)
+			sfx("bad")
+			await say("Te requisan %d g y te multan con %s." % [r[0], Datos.eur(r[1])])
+			return "caught"
+		S.money -= cost
+		S.heat = max(0, S.heat - 10)
+		sfx("coin")
+		bhud_act()
+		b_anim("E", "soborno")
+		await say("%s se guarda el sobre. «Aquí no ha pasado nada.»" % B.name)
+		return "bribe"
+	if c == 1:
+		await say("%s: «Solo estaba dando un paseo, agente.»" % S.name)
+		if Cultivo.azar() < clampf(.3 + S.rep / 250.0 - S.heat / 300.0, .1, .85):
+			await say("%s: «Bien. Circula.»" % B.name)
+			return "talk"
+		await say("%s: «No. Vacía los bolsillos.»" % B.name)
+		var r := confiscate()
+		sfx("bad")
+		bhud_act()
+		await say("Te requisan %d g y te multan con %s." % [r[0], Datos.eur(r[1])])
+		return "caught"
+	if c == 2:
+		if Cultivo.azar() < .45 + (.15 if is_night() else 0.0):
+			sfx("door")
+			S.heat = min(100, S.heat + 8)
+			await say("Sales corriendo entre los coches y lo pierdes.")
+			return "flee"
+		b_anim("E", "perseguir")
+		await say("%s te alcanza y te reduce en el suelo." % B.name)
+		var r := confiscate()
+		S.hp = maxi(1, S.hp - 5)
+		sfx("hurt")
+		bhud_act()
+		await say("Te requisan %d g y te multan con %s." % [r[0], Datos.eur(r[1])])
+		return "caught"
+	var r := confiscate(false)
+	bhud_act()
+	await say("Le entregas %d g. «Buena decisión. Por esta vez, sin multa.»" % r[0])
+	return "caught"

@@ -7,6 +7,10 @@
   Requisitos (una vez):  npm install   y   npx playwright install chromium
   Uso:                   node tools/test-historia.js
   Resultado:             lista de pasos OK/FALLO + tools/salida/transcripcion.txt con todos los diálogos
+  Oráculo del port de Godot (RV_ORACULO=archivo.json, RV_SEMILLA=n, 4242 por defecto): Math.random pasa a ser un Park-Miller
+  con esa semilla, el reloj del juego y los paseos de los personajes se paran (solo corre la cola de eventos) y no se pinta
+  nada; tras cada paso se guardan su transcripción, S, el estado del azar, R y dónde está cada personaje
+  (godot/tests/historia.gd repite los mismos pasos y lo compara).
 */
 const { chromium } = require('playwright');
 const fs = require('fs');
@@ -14,6 +18,7 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.join(__dirname, 'salida');
+const ORAC = process.env.RV_ORACULO ? path.resolve(process.env.RV_ORACULO) : null, SEMILLA = +(process.env.RV_SEMILLA || 4242);
 
 (async () => {
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
@@ -23,6 +28,12 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
   await page.goto('file://' + (process.env.RV_HTML ? path.resolve(process.env.RV_HTML) : path.join(ROOT, 'index.html')));
   await page.waitForFunction(() => typeof mode !== 'undefined' && mode === 'title');
+  if (ORAC) await page.evaluate(sem => {
+    audioInit();   // el ruido del audio tira de Math.random: antes del Park-Miller
+    window.PM = { s: sem }; Math.random = () => (PM.s = PM.s * 48271 % 2147483647) / 2147483647;
+    window.update = () => { if (mode === 'world' && S && isFree() && pending.length && !P.moving) run(pending.shift()); };
+    window.render = () => {};
+  }, SEMILLA);
 
   // ---------- piloto automático dentro de la página ----------
   await page.evaluate(() => {
@@ -46,9 +57,10 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
     window.pr = l => SHOP.find(it => it.lbl.startsWith(l)).p;   // precio de tienda por el principio del rótulo
   });
 
-  const results = [];
+  const results = [], orac = [];
   async function step(name, wantList, fn, check) {
     await page.evaluate(w => want(w), wantList);
+    const l0 = await page.evaluate(() => LOG.length);
     await LOGMARK(name);
     let ok = false, detail = '';
     try {
@@ -58,6 +70,10 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
       ok = r === true; detail = r === true ? '' : JSON.stringify(r);
     } catch (e) { detail = e.message.split('\n')[0]; }
     results.push({ name, ok, detail });
+    if (ORAC) orac.push(Object.assign({ name, ok, detail }, await page.evaluate(l0 => JSON.parse(JSON.stringify({
+      log: LOG.slice(l0), S, pm: PM.s, R: window.R, I: window.I, TO: window.TO,
+      extra: { mode, map: S && S.map, x: P.x, y: P.y, dir: P.dir, ents: ents.map(e => [e.id, e.x, e.y, e.dir, e.wt]),
+        vc: VC && { ci: VC.ci, sel: VC.sel, ocupado: VC.ocupado }, h: handlers.length, lock, pend: pending.length } })), l0)));
     console.log(`${ok ? 'OK   ' : 'FALLO'}  ${name}${detail ? '  → ' + detail : ''}`);
   }
   function LOGMARK(name) { return page.evaluate(n => LOG.push('\n=== ' + n + ' ==='), name); }
@@ -259,6 +275,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   // ---------- resumen ----------
   fs.mkdirSync(OUT, { recursive: true });
   fs.writeFileSync(path.join(OUT, 'transcripcion.txt'), (await page.evaluate(() => LOG.join('\n'))) + '\n');
+  if (ORAC) { fs.mkdirSync(path.dirname(ORAC), { recursive: true }); fs.writeFileSync(ORAC, JSON.stringify({ semilla: SEMILLA, pasos: orac })); }
   const failed = results.filter(r => !r.ok).length;
   console.log(`\n${results.length - failed}/${results.length} pasos OK · errores de JavaScript: ${errors.length}`);
   errors.forEach(e => console.log('  ' + e));

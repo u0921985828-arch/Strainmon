@@ -9,6 +9,7 @@ extends Node2D
 const Datos = preload("res://src/datos.gd")
 const Cultivo = preload("res://src/cultivo.gd")
 const Arte = preload("res://src/arte.gd")
+const Procedural = preload("res://src/procedural.gd")
 
 # el canvas guarda el alfa global en 8 bits: .35 → 89/255
 const A35 := 89 / 255.0
@@ -73,14 +74,22 @@ static func vc_planta_sprite(po: String, st: int, esp: int):
 			a = x
 	return {"a": a, "n": pre + str(a)}
 
-# muertas: el HTML pasa a la vista B (procedural, fuera del corte); aquí la plaza se pinta sin planta (solo la maceta)
+# vcGeo: la vista B (P pasa cm a px: x desde la izquierda, y de fondo desde el frente, z de alto) y, si hay arte para todo, la C
+static func punto(g: Dictionary, x: float, y: float, z: float) -> Array:
+	var VB: Dictionary = Datos.carga().VB
+	return [Datos.jsround(g.x0 + x * VB.M + y * VB.X), Datos.jsround(g.yf - y * VB.F - z * VB.M)]
+
 static func geo(S: Dictionary, ci: int):
 	var D := Datos.carga()
+	var VB: Dictionary = D.VB
 	var c: Dictionary = S.carpas[ci]
 	var C: Dictionary = D.CARPAS[c.t]
 	var W: float = C.cm[0]
 	var H: float = C.cm[1]
 	var Dp: float = C.cm[2]
+	var w := Datos.jsround(W * VB.M)
+	var sx := Datos.jsround(Dp * VB.X)
+	var o := {"c": c, "C": C, "W": W, "H": H, "D": Dp, "w": w, "s": sx, "x0": 120 - ((w + sx) >> 1), "yf": int(VB.PARED) + Datos.jsround(Dp * VB.F)}
 	var cols := int(C.cols)
 	var pl := []
 	var hu := Cultivo.huecos(S)
@@ -99,12 +108,26 @@ static func geo(S: Dictionary, ci: int):
 				d = minf(d, sqrt((a.cx - b.cx) * (a.cx - b.cx) + (a.cy - b.cy) * (a.cy - b.cy)))
 		a.cw = d - D.HOLGURA
 		a.ch = H - 28 - D.FOCO_SEP.get(c.foco, 40) - D.MACETA_CM.get(S.macetas[a.i], D.MACETA_CM.plastico7)[1]
-	var o := {"c": c, "C": C, "W": W, "H": H, "D": Dp, "pl": pl}
+		var xy := punto(o, a.cx, a.cy, 0)
+		a.x = xy[0]
+		a.y = xy[1]
+	o.pl = pl
+	o.fx = punto(o, W / 2, Dp / 2, 0)[0]
+	o.fy = punto(o, 0, Dp / 2, H - 28)[1]
+	o.barra = punto(o, 0, Dp / 2, H - 4)[1]
 	o.vc = vista_c(S, o)
 	if o.vc:
 		o.fx = 120
 		o.fy = int(D.VCA.boca)
 		o.fw = o.vc.foco.a
+	else:   # vista B: lo que se ve de cada plaza por encima del suelo (maceta y planta) y el ancho del foco
+		o.fw = Procedural.foco34(c.foco).get_width()
+		for q in pl:
+			var mp := Procedural.maceta_px(S.macetas[q.i])
+			q.alto = mp.hb + Datos.jsround(mp.e / 2.0)
+			var p = S.pots[q.i]
+			if p:
+				q.alto += Procedural.alto_planta(Datos.porte_planta(S, p), 0 if p.get("dead") else Cultivo.plant_stage(p), true if p.get("dead") else false, q)
 	return o
 
 static func vista_c(S: Dictionary, g: Dictionary):
@@ -135,7 +158,9 @@ static func vista_c(S: Dictionary, g: Dictionary):
 		var x: int = xy.call(q, y)
 		var r := {"x": x, "y": y, "m": m, "tierra": D.VC_TIERRA.get(m.n, Datos.jsround(Arte.foto(m.n).get_height() * .7)), "hp": 0, "p": null}
 		var p = S.pots[q.i]
-		if p and not p.get("dead"):
+		if p and p.get("dead"):
+			return null
+		if p:
 			var st := Cultivo.plant_stage(p)
 			var po := Datos.porte_planta(S, p)
 			var Dh: Array = D.PLANTA_CM[po].h
@@ -201,11 +226,11 @@ static func img_planta(S_: Dictionary, p: Dictionary, v: Dictionary) -> Image:
 const CUR := 7
 static func con_barra(S_: Dictionary, q: Dictionary) -> bool:
 	var p = S_.pots[q.i]
-	return p != null and not p.get("dead") and q.v.p != null
+	return p != null and not p.get("dead") and (not q.has("v") or q.v.p != null)
 
 static func barras(S_: Dictionary, g_: Dictionary, sel := -1) -> Array:
 	var o := []
-	if g_.is_empty() or g_.vc == null:
+	if g_.is_empty():
 		return o
 	var cajas := []
 	for q in g_.pl:
@@ -324,7 +349,7 @@ func _pinta_encima() -> void:
 
 # agua: azul, y por debajo de 30 (toca regar) parpadea en rojo; cosecha: verde hasta que está lista, y entonces dorada y
 # parpadeando; con plaga, la «!» roja al lado. Rectángulos que no se pisan: con transparencia (al) no se suman
-func _barra(b: Dictionary, al: float) -> void:
+static func pinta_barra(L: CanvasItem, b: Dictionary, al: float, now: float) -> void:
 	var r: Rect2i = b.r
 	var p: Dictionary = b.p
 	var x := r.position.x
@@ -332,7 +357,7 @@ func _barra(b: Dictionary, al: float) -> void:
 	var tic := int(floor(now / 400)) % 2 == 1
 	var R := func(rx: int, ry: int, w: int, h: int, c: Color) -> void:
 		if w > 0 and h > 0:
-			encima.draw_rect(Rect2(rx, ry, w, h), Color(c, al))
+			L.draw_rect(Rect2(rx, ry, w, h), Color(c, al))
 	var n := BW - 2
 	for f in [y, y + 3, y + 6]:
 		R.call(x + 1, f, n, 1, OSC)
@@ -362,25 +387,31 @@ func _barra(b: Dictionary, al: float) -> void:
 		R.call(px + 2, y + 1, 2, 3, bla)
 		R.call(px + 2, y + 5, 2, 1, bla)
 
-func _cursor(bs: Array) -> void:
+static func pinta_cursor(L: CanvasItem, g: Dictionary, VC: Dictionary, bs: Array, now: float) -> void:
 	var b := int(floor(now / 300)) % 2
 	var osc := Color.html("#26262e")
 	var cla := Color.html("#f8f8f0")
 	if VC.sel < 0:
 		var x: int = g.fx - (int(g.fw) >> 1) - 8
 		var y: int = g.fy - 5
-		encima.draw_rect(Rect2(x - 1, y - 4, 6, 9), osc)
+		L.draw_rect(Rect2(x - 1, y - 4, 6, 9), osc)
 		for k in 4:
-			encima.draw_rect(Rect2(x + b + k, y - 3 + k, 1, 7 - 2 * k), cla)
+			L.draw_rect(Rect2(x + b + k, y - 3 + k, 1, 7 - 2 * k), cla)
 		return
 	for q in g.pl:
 		if q.i == VC.sel:
-			encima.draw_rect(Rect2(q.x - 7, q.y, 14, 2), Color(1, 1, 240 / 255.0, A35))
+			L.draw_rect(Rect2(q.x - 7, q.y, 14, 2), Color(1, 1, 240 / 255.0, A35))
 	var c := pos_cursor(g, VC.sel, bs)
 	if c == Vector2i(-1, -1):
 		return
 	var x := c.x
 	var y := c.y + b
-	encima.draw_rect(Rect2(x - 4, y - 1, 9, 6), osc)
+	L.draw_rect(Rect2(x - 4, y - 1, 9, 6), osc)
 	for k in 4:
-		encima.draw_rect(Rect2(x - 3 + k, y + k, 7 - 2 * k, 1), cla)
+		L.draw_rect(Rect2(x - 3 + k, y + k, 7 - 2 * k, 1), cla)
+
+func _barra(b: Dictionary, al: float) -> void:
+	pinta_barra(encima, b, al, now)
+
+func _cursor(bs: Array) -> void:
+	pinta_cursor(encima, g, VC, bs, now)

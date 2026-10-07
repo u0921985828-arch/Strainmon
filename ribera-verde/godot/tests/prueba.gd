@@ -1,4 +1,4 @@
-# Ribera Verde (Godot) — prueba del corte contra el HTML (tests/oraculo.json, lo saca tools/godot.js)
+# Ribera Verde (Godot) — prueba de la vista C y del cultivo contra el HTML (tests/oraculo.json, lo saca tools/godot.js)
 #   C1 (sin ventana):  godot --headless --path godot --script res://tests/prueba.gd [-- --oraculo f]
 #      datos, tono y porte de cada variedad, factores de cada carpa, geometría de la vista C, ciclos de cultivo hora a hora,
 #      jornadas de cama (cambio de día y factura de la luz) y cosechas (lotes, fenotipo y semillas) con el mismo azar
