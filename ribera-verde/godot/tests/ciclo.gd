@@ -277,14 +277,17 @@ func pico(w: AudioStreamWAV) -> int:
 		m = maxi(m, absi(d.decode_s16(k)))
 	return m
 
-func _corre() -> void:
+func arg(k: String, d := "") -> String:
 	var a := OS.get_cmdline_user_args()
-	if a.find("--salida") >= 0:
-		dir = a[a.find("--salida") + 1]
+	var i := a.find(k)
+	return a[i + 1] if i >= 0 and i + 1 < a.size() else d
+
+func _corre() -> void:
+	dir = arg("--salida", dir)
 	Juego = load("res://src/juego.gd")
 	Juego.GUARDADO = "user://prueba-ciclo.json"
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Juego.GUARDADO))
-	Cultivo.pm = int(a[a.find("--azar") + 1]) if a.find("--azar") >= 0 else 4242   # el azar del Park-Miller: la prueba sale siempre igual
+	Cultivo.pm = int(arg("--azar", "4242"))   # el azar del Park-Miller: la prueba sale siempre igual
 	J = load("res://juego.tscn").instantiate()
 	root.add_child(J)
 	await espera(10)

@@ -4,7 +4,7 @@
 # corre los eventos pendientes, como el update del oráculo. Tras cada paso compara la transcripción, S, el estado del azar,
 # R, I, TO y dónde está cada cosa.
 #   godot --headless --path godot --script res://tests/historia.gd [-- --oraculo f.json] [--salida dir]
-#   → «historia: 52 pasos, N comprobaciones, 0 diferencias»
+#   → «historia: 52 pasos (52 OK) · semilla N · 0 diferencias con el HTML · T s»
 extends SceneTree
 
 const Datos = preload("res://src/datos.gd")
@@ -227,7 +227,12 @@ func pr(l: String) -> int:
 	return -1
 
 func _corre() -> void:
-	O = JSON.parse_string(FileAccess.get_file_as_string(arg("--oraculo", "res://tests/historia.json")))
+	var o = JSON.parse_string(FileAccess.get_file_as_string(arg("--oraculo", "res://tests/historia.json")))
+	if not o is Dictionary:
+		print("uso: … --script res://tests/historia.gd [-- --oraculo f.json] (falta el oráculo o no se lee)")
+		quit(2)
+		return
+	O = o
 	var sem := int(O.semilla)
 	Juego.GUARDADO = "user://prueba-historia.json"
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Juego.GUARDADO))

@@ -10,7 +10,8 @@
   Oráculo del port de Godot (RV_ORACULO=archivo.json, RV_SEMILLA=n, 4242 por defecto): Math.random pasa a ser un Park-Miller
   con esa semilla, el reloj del juego y los paseos de los personajes se paran (solo corre la cola de eventos) y no se pinta
   nada; tras cada paso se guardan su transcripción, S, el estado del azar, R y dónde está cada personaje
-  (godot/tests/historia.gd repite los mismos pasos y lo compara).
+  (godot/tests/historia.gd repite los mismos pasos y lo compara). Solo se escribe si pasan todos; la transcripción va a
+  transcripcion-oraculo.txt.
 */
 const { chromium } = require('playwright');
 const fs = require('fs');
@@ -19,6 +20,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.join(__dirname, 'salida');
 const ORAC = process.env.RV_ORACULO ? path.resolve(process.env.RV_ORACULO) : null, SEMILLA = +(process.env.RV_SEMILLA || 4242);
+if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new Error('RV_SEMILLA: un entero de 1 a 2147483646');
 
 (async () => {
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
@@ -274,9 +276,11 @@ const ORAC = process.env.RV_ORACULO ? path.resolve(process.env.RV_ORACULO) : nul
 
   // ---------- resumen ----------
   fs.mkdirSync(OUT, { recursive: true });
-  fs.writeFileSync(path.join(OUT, 'transcripcion.txt'), (await page.evaluate(() => LOG.join('\n'))) + '\n');
-  if (ORAC) { fs.mkdirSync(path.dirname(ORAC), { recursive: true }); fs.writeFileSync(ORAC, JSON.stringify({ semilla: SEMILLA, pasos: orac })); }
+  // con el oráculo (reloj parado) la transcripción va aparte, para no pisar la de npm test
+  fs.writeFileSync(path.join(OUT, ORAC ? 'transcripcion-oraculo.txt' : 'transcripcion.txt'), (await page.evaluate(() => LOG.join('\n'))) + '\n');
   const failed = results.filter(r => !r.ok).length;
+  if (ORAC && !failed && !errors.length) { fs.mkdirSync(path.dirname(ORAC), { recursive: true }); fs.writeFileSync(ORAC, JSON.stringify({ semilla: SEMILLA, pasos: orac })); }
+  else if (ORAC) console.log('oráculo sin escribir: hay pasos que fallan o errores de JavaScript');
   console.log(`\n${results.length - failed}/${results.length} pasos OK · errores de JavaScript: ${errors.length}`);
   errors.forEach(e => console.log('  ' + e));
   await browser.close();

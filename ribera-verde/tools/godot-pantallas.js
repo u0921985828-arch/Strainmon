@@ -79,7 +79,7 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
   const errores = [];
   page.on('pageerror', e => errores.push(e.message));
   page.on('console', m => { if (m.type() === 'error') errores.push(m.text()); });
-  await page.goto('file://' + path.join(ROOT, process.env.RV_HTML || 'index.html'));
+  await page.goto('file://' + (process.env.RV_HTML ? path.resolve(process.env.RV_HTML) : path.join(ROOT, 'index.html')));
   await page.waitForFunction(() => typeof mode !== 'undefined' && mode === 'title');
   await page.evaluate(() => arteListo());
   const r = await page.evaluate((PANTALLAS) => {

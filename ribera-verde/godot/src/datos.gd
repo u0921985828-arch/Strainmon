@@ -225,7 +225,7 @@ static func clamp_js(v: float, a: float, b: float) -> float:
 
 # randLook de 03-datos: el aspecto de un cliente o un ladrón, siempre el mismo para la misma semilla
 static func rand_look(seed: String, kind: String) -> Dictionary:
-	var D := carga()
+	carga()
 	var R := rng_seed(hash_str(seed))
 	var p := func(a: Array): return a[int(floor(R.sig() * a.size()))]
 	if kind == "thief":
@@ -254,7 +254,7 @@ static func dex() -> Array:
 
 # crossResult de 03-datos (a: la madre, b: el padre): la receta o un híbrido propio en S.custom, con el m % de la madre
 static func cross_result(S: Dictionary, a: String, b: String) -> String:
-	var D := carga()
+	carga()
 	var ks := [a, b]
 	ks.sort()
 	var key := "+".join(ks)

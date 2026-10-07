@@ -1,6 +1,6 @@
 ; Ribera Verde — el juego entero en Godot 4.3 (port del HTML: historia, mapas, granja, carpas en las vistas B y C, tienda, combates).
 ; La escena del juego se pinta en un SubViewport de 160 px de alto (240-400 de ancho, como el HTML) y se escala a píxeles
-; enteros; la interfaz (ficha, diálogos y mandos) va encima a la resolución del móvil (src/juego.gd).
+; enteros; la interfaz (ficha, diálogos y mandos) va encima a la resolución del móvil (src/ui.gd).
 config_version=5
 
 [application]

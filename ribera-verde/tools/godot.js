@@ -108,7 +108,7 @@ function atlasCarpa() {
   const errores = [];
   page.on('pageerror', e => errores.push(e.message));
   page.on('console', m => { if (m.type() === 'error') errores.push(m.text()); });
-  await page.goto('file://' + path.join(ROOT, 'index.html'));
+  await page.goto('file://' + (process.env.RV_HTML ? path.resolve(process.env.RV_HTML) : path.join(ROOT, 'index.html')));
   await page.waitForFunction(() => typeof mode !== 'undefined' && mode === 'title');
   await page.evaluate(() => arteListo());
   // 5. el resto del juego para el port completo (mapas, personajes, objetos, tienda, historia, combate, música…): lo que es dato en
@@ -124,7 +124,9 @@ function atlasCarpa() {
     };
     const sinFn = o => JSON.parse(JSON.stringify(o));
     const mapa = m => ({ name: m.name, w: m.w, h: m.h, g: m.g, o: m.o, exits: m.exits, doors: m.doors, music: m.music, blds: m.blds || [] });
-    const kiko = eval('(' + kikoTip.toString().match(/const t=(\[[\s\S]*\]);\s*return/)[1] + ')');
+    const mk = kikoTip.toString().match(/const t=(\[[\s\S]*\]);\s*return/);
+    if (!mk) throw new Error('kikoTip ha cambiado: tools/godot.js ya no encuentra su lista de consejos (const t=[…]; return)');
+    const kiko = eval('(' + mk[1] + ')');
     return sinFn({
       MAPS: Object.fromEntries(Object.entries(MAPS).map(([k, m]) => [k, mapa(m)])), CLIENT_TILES, LAMPS,
       STRAINS_O: Object.fromEntries(DEX.map(k => [k, { o: STRAINS[k].o, h: STRAINS[k].h || null }])), TIPO_COGOLLO, PADRES, RECIPES,
