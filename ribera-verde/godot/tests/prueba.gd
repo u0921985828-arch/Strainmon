@@ -1,7 +1,8 @@
 # Ribera Verde (Godot) — prueba del corte contra el HTML (tests/oraculo.json, lo saca tools/godot.js)
-#   C1 (sin ventana):  godot --headless --path godot --script res://tests/prueba.gd
-#      datos, tono y porte de cada variedad, factores de cada carpa, geometría de la vista C y ciclos de cultivo hora a hora
-#      con el mismo azar (Park-Miller): 0 diferencias.
+#   C1 (sin ventana):  godot --headless --path godot --script res://tests/prueba.gd [-- --oraculo f]
+#      datos, tono y porte de cada variedad, factores de cada carpa, geometría de la vista C, ciclos de cultivo hora a hora,
+#      jornadas de cama (cambio de día y factura de la luz) y cosechas (lotes, fenotipo y semillas) con el mismo azar
+#      (Park-Miller): 0 diferencias.
 #   C2 (con pantalla, p. ej. xvfb-run … --rendering-driver opengl3):  … --script res://tests/prueba.gd -- --pintar <dir> [--oraculo f]
 #      pinta cada escena a 240 × 160 y la compara píxel a píxel con <dir>/html-<escena>.png (godot-<escena>.png y dif-<escena>.png)
 extends SceneTree
@@ -76,7 +77,7 @@ func _corre() -> void:
 		for k in f.f:
 			igual("factores %s %s %s %d %s" % [f.t, f.foco, f.m, f.x, k], r[k], f.f[k], 1e-12)
 	# geometría de la vista C
-	for e in O.escenas:
+	for e in O.get("escenas", []):
 		var S := estado(e)
 		var g = Vista.geo(S, 0)
 		var H = e.html
@@ -140,19 +141,104 @@ func _corre() -> void:
 					var o := {"prog": p.prog, "water": p.water, "health": p.health, "pest": p.pest, "dead": p.get("dead", false), "st": Cultivo.plant_stage(p), "etapa": Cultivo.stage_name(p)}
 					for x in o:
 						igual("%s h%d plaza %d %s" % [k, h, i, x], o[x], t[i][x], 1e-9)
+		S.seeds = {}
+		S.buds = {}
+		S.fenos = {}
+		cosecha_lista(k, S, c)
+		compara_fin(k, S, c)
+	# jornadas de cama: regar, dormir o siesta (cambio de día, factura de la luz, dinero) y cosechar lo que esté listo
+	for k in O.get("jornadas", {}):
+		var c: Dictionary = O.jornadas[k]
+		var S := base(c)
+		S.money = int(c.money)
+		S.min = int(c.min)
+		S.pots = []
+		for m in c.macetas:
+			S.pots.append(null)
+		for i in c.sids.size():
+			if c.sids[i]:
+				S.pots[i] = Cultivo.nueva_planta(S, c.sids[i])
 		for i in S.pots.size():
-			var p = S.pots[i]
-			var es = c.cosecha[i]
-			if p == null or p.get("dead") or p.prog < 1:
-				igual("%s cosecha %d" % [k, i], null, es)
-				continue
-			var f := Cultivo.factores(S, i)
-			igual("%s gramos %d" % [k, i], Cultivo.gramos_planta(S, p, f), es.g if es else null)
-			igual("%s thc %d" % [k, i], Cultivo.thc_cosecha(S, p, f), es.thc if es else null, 1e-12)
-		igual("%s fenoN" % k, S.fenoN, c.fenoN)
-		igual("%s azar siguiente" % k, Cultivo.azar(), c.sigue, 1e-15)
-		Cultivo.pm = -1
+			if S.pots[i]:
+				igual("%s feno %d" % [k, i], S.pots[i].f, c.fenos[i])
+		for j in c.pasos.size():
+			for p in S.pots:
+				if p and not p.get("dead") and c.rega and p.water < c.rega:
+					p.water = 100.0
+			var luz := Cultivo.avanza(S, Cultivo.minutos_cama(S, int(c.pasos[j])))
+			var h: Dictionary = c.tras[j]
+			for x in ["day", "min", "money"]:
+				igual("%s paso %d %s" % [k, j, x], S[x], h[x])
+			igual("%s paso %d luz" % [k, j], luz, h.luz)
+			for i in S.pots.size():
+				var o = foto_planta(S.pots[i])
+				if o == null or h.pots[i] == null:
+					igual("%s paso %d plaza %d" % [k, j, i], o, h.pots[i])
+					continue
+				for x in o:
+					igual("%s paso %d plaza %d %s" % [k, j, i, x], o[x], h.pots[i][x], 1e-9)
+		if c.cosechar:
+			cosecha_lista(k, S, c)
+		compara_fin(k, S, c)
+	# cosechas: plantas listas, en ese orden, sobre los lotes de antes
+	for k in O.get("cosechas", {}):
+		var c: Dictionary = O.cosechas[k]
+		var S := base(c)
+		S.pots = []
+		for p in c.pots:
+			S.pots.append(p.duplicate(true) if p else null)
+		for j in c.orden.size():
+			compara_cosecha("%s cosecha %d" % [k, j], Cultivo.cosecha(S, int(c.orden[j])), c.r[j])
+		compara_fin(k, S, c)
 	_fin("C1")
+
+func base(c: Dictionary) -> Dictionary:
+	Cultivo.pm = int(c.seed)
+	var S := Cultivo.nuevo_estado()
+	S.carpas = [{"t": c.t, "foco": c.foco}]
+	S.macetas = c.macetas.duplicate()
+	S.custom = c.get("custom", {})
+	S.gen = c.get("gen", {})
+	S.seeds = {}
+	S.buds = c.get("buds0", {}).duplicate(true)
+	S.fenos = {}
+	return S
+
+func foto_planta(p):
+	if p == null:
+		return null
+	return {"prog": p.prog, "water": p.water, "health": p.health, "pest": p.pest, "dead": p.get("dead", false), "st": Cultivo.plant_stage(p), "etapa": Cultivo.stage_name(p)}
+
+# cosecha (harvest) cada plaza lista, en orden
+func cosecha_lista(k: String, S: Dictionary, c: Dictionary) -> void:
+	for i in S.pots.size():
+		var p = S.pots[i]
+		var r = Cultivo.cosecha(S, i) if p and not p.get("dead") and p.prog >= 1 else null
+		compara_cosecha("%s cosecha %d" % [k, i], r, c.cosechas[i])
+
+func compara_cosecha(que: String, r, h) -> void:
+	if r == null or h == null:
+		igual(que, "cosecha" if r else null, "cosecha" if h else null)
+		return
+	for x in ["k", "cl", "g", "n"]:
+		igual("%s %s" % [que, x], r[x], h[x])
+	igual("%s thc" % que, r.thc, h.thc, 1e-12)
+
+# lo que queda: lotes (gramos y THC medio), semillas, clases de fenotipo, plazas ocupadas, fenoN y el azar que viene
+func compara_fin(k: String, S: Dictionary, c: Dictionary) -> void:
+	igual("%s lotes" % k, ",".join(S.buds.keys()), ",".join(c.buds.keys()))
+	for x in c.buds:
+		var b = S.buds.get(x)
+		igual("%s lote %s g" % [k, x], b.g if b else null, c.buds[x].g)
+		igual("%s lote %s thc" % [k, x], b.thc if b else null, c.buds[x].thc, 1e-12)
+	igual("%s semillas" % k, ",".join(S.seeds.keys()), ",".join(c.seeds.keys()))
+	for x in c.seeds:
+		igual("%s semillas %s" % [k, x], S.seeds.get(x), c.seeds[x])
+	igual("%s clases" % k, S.fenos, c.clases)
+	igual("%s plazas ocupadas" % k, S.pots.map(func(p): return p != null), c.quedan)
+	igual("%s fenoN" % k, S.fenoN, c.fenoN)
+	igual("%s azar siguiente" % k, Cultivo.azar(), c.sigue, 1e-15)
+	Cultivo.pm = -1
 
 func _fin(que: String) -> void:
 	var malos := fallos.filter(func(f): return f != "")

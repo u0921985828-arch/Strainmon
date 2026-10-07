@@ -19,6 +19,25 @@ func pulsa(b: String, n := 3) -> void:
 	J.press(b)
 	await espera(n)
 
+# un dedo (índice) en el centro de un mando, como lo manda Android (Godot imita el ratón con el primero)
+func toque(dedo: int, b: String, on: bool) -> void:
+	var e := InputEventScreenTouch.new()
+	e.index = dedo
+	e.position = J.botones[b].get_global_rect().get_center()
+	e.pressed = on
+	Input.parse_input_event(e)
+	await espera(3)
+
+func clic(b: String) -> void:
+	for on in [true, false]:
+		var e := InputEventMouseButton.new()
+		e.button_index = MOUSE_BUTTON_LEFT
+		e.position = J.botones[b].get_global_rect().get_center()
+		e.global_position = e.position
+		e.pressed = on
+		Input.parse_input_event(e)
+		await espera(3)
+
 func foto(nombre: String) -> void:
 	if dir == "":
 		return
@@ -86,6 +105,19 @@ func _corre() -> void:
 	J._notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
 	await espera(3)
 	check("Atrás con un menú abierto lo cierra", abierto and J.modo == "" and not J.VC.ocupado)
+	# varios dedos a la vez: con uno en la cruceta, otro en A abre el menú de la planta; al soltar, nada se queda apretado
+	await toque(0, "left", true)
+	await toque(1, "A", true)
+	var con_dos: bool = J.modo == "menu" and J.botones.left.button_pressed and J.botones.A.button_pressed
+	await toque(1, "A", false)
+	await toque(0, "left", false)
+	check("con un dedo en la cruceta, A responde", con_dos and not J.botones.left.button_pressed and not J.botones.A.button_pressed and J.rep_b == "")
+	await pulsa("B")
+	# el ratón de verdad (escritorio) también aprieta los mandos: A abre el menú y B lo cierra
+	await clic("A")
+	var con_raton: bool = J.modo == "menu"
+	await clic("B")
+	check("con el ratón, A abre el menú y B lo cierra", con_raton and J.modo == "")
 	check("semillas gastadas: quedan 5", S.seeds.values().reduce(func(x, y): return x + y, 0) == 5)
 	await foto("2-plantadas")
 	# cada mañana, plaza por plaza: la seca se retira, la lista se cosecha y las demás se tratan si tienen plaga y se riegan;

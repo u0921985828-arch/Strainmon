@@ -111,6 +111,46 @@ static func nueva_planta(S: Dictionary, sid: String) -> Dictionary:
 	return {"sid": sid, "prog": 0.0, "water": 70.0, "health": 100.0, "fert": false, "pest": false, "f": roll_feno(S, sid)}
 
 # ---------- cosecha ----------
+static func clase_feno(f) -> String:
+	if not f is Dictionary:
+		return "normal"
+	var D := Datos.carga()
+	return "estrella" if f.t * f.y >= D.FENO_ESTRELLA else ("floja" if f.t * f.y <= D.FENO_FLOJO else "normal")
+
+# ri de 00-nucleo: entero de a a b
+static func ri(a: int, b: int) -> int:
+	return a + int(floor(azar() * (b - a + 1)))
+
+# harvest sin los diálogos: gramos y THC con el fenotipo; la estrella va a su lote (sid + "*"), con el THC medio ponderado (addBuds).
+# Semillas: una línea sin fijar se poliniza entre ella (2-5); las regulares (no son de tienda), 1-3; las feminizadas (de tienda),
+# solo si sale una hermafrodita (SEMILLA_HERMA), 1-3. Tira del azar en el mismo orden que el HTML
+static func cosecha(S: Dictionary, i: int) -> Dictionary:
+	var D := Datos.carga()
+	var p: Dictionary = S.pots[i]
+	var f := factores(S, i)
+	var cl := clase_feno(p.get("f"))
+	var g := gramos_planta(S, p, f)
+	var thc := thc_cosecha(S, p, f)
+	var cria: bool = gen_de(S, p.sid) < D.GEN_ESTABLE
+	var fem: bool = p.sid in D.FEM
+	var n := 0
+	if cria:
+		n = ri(2, 5)
+	elif not fem or azar() < D.SEMILLA_HERMA:
+		n = ri(1, 3)
+	var k: String = p.sid + ("*" if cl == "estrella" else "")
+	if S.buds.has(k):
+		var b: Dictionary = S.buds[k]
+		b.thc = (b.thc * b.g + thc * g) / (b.g + g)
+		b.g += g
+	else:
+		S.buds[k] = {"g": g, "thc": thc}
+	if n:
+		S.seeds[p.sid] = int(S.seeds.get(p.sid, 0)) + n
+	if p.get("f") is Dictionary and p.f.get("id"):
+		S.fenos[str(int(p.f.id))] = cl
+	S.pots[i] = null
+	return {"k": k, "g": g, "thc": thc, "n": n, "cl": cl, "cria": cria, "fem": fem}
 static func gramos_planta(S: Dictionary, p: Dictionary, f: Dictionary) -> int:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"y": 1}
@@ -137,6 +177,13 @@ static func luz_carpa(S: Dictionary, ci: int) -> int:
 		if c.get(k):
 			x += D.EXTRAS[k].w
 	return Datos.jsround((D.FOCOS[c.foco].w * D.H_LUZ + x * D.H_24) / 1000 * D.KWH)
+
+# lo que se duerme en la cama (bedAction): 0, hasta las 7 (si ya son las 7, un día entero); 1, siesta de 3 h
+static func minutos_cama(S: Dictionary, c: int) -> int:
+	if c == 1:
+		return 180
+	var m := (7 * 60 - int(S.min) + 1440) % 1440
+	return m if m else 1440
 
 # el tiempo: de 60 en 60 min, como advanceTime; al pasar de las 24 h, un día nuevo con su factura de la luz
 static func avanza(S: Dictionary, minutos: int) -> int:

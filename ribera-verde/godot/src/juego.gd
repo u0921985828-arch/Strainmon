@@ -43,7 +43,7 @@ var menu_box := PanelContainer.new()
 var menu_list := VBoxContainer.new()
 var toast := PanelContainer.new()
 var toast_txt := Label.new()
-var toast_n := 0
+var toast_t := Timer.new()   # un temporizador propio (no uno del árbol que se quede esperando al salir)
 var botones := {}
 var rep := Timer.new()
 var rep_b := ""
@@ -91,6 +91,9 @@ func _ready() -> void:
 	toast_txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	toast.add_child(toast_txt)
 	add_child(toast)
+	toast_t.one_shot = true
+	toast_t.timeout.connect(toast.hide)
+	add_child(toast_t)
 	for n in [dlg, menu_box, toast]:
 		n.hide()
 	_mandos()
@@ -275,18 +278,11 @@ func _mandos() -> void:
 		n.add_theme_color_override("font_color", Color(1, 1, 1, .88))
 		n.add_theme_color_override("font_pressed_color", Color(1, 1, 1, .95))
 		n.add_theme_color_override("font_hover_color", Color(1, 1, 1, .88))
-		var k: String = b[0]
-		n.button_down.connect(func():
-			press(k)
-			if k in ["up", "down", "left", "right"]:
-				rep_b = k
-				rep.start(.32))
-		n.button_up.connect(func():
-			if rep_b == k:
-				rep_b = ""
-				rep.stop())
+		# los toques los lleva _input (varios dedos a la vez); el botón solo se pinta apretado o suelto
+		n.toggle_mode = true
+		n.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(n)
-		botones[k] = n
+		botones[b[0]] = n
 	var mid := Panel.new()
 	mid.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(mid)
@@ -328,6 +324,57 @@ func _unhandled_input(e: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		press(b)
 
+# los mandos con varios dedos a la vez, como los pointerdown del HTML: cada toque aprieta el mando que pisa hasta que se levanta.
+# El ratón de verdad cuenta como un dedo más; el que Godot imita con el primer toque se descarta encima de los mandos
+var dedos := {}   # dedo (índice del toque o "raton") → mando
+
+func _input(e: InputEvent) -> void:
+	var dedo = null
+	if e is InputEventScreenTouch:
+		dedo = e.index
+	elif e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
+		if e.device == InputEvent.DEVICE_ID_EMULATION:
+			if _mando_en(e.position) != "":
+				get_viewport().set_input_as_handled()
+			return
+		dedo = "raton"
+	else:
+		return
+	if e.pressed:
+		var k := _mando_en(e.position)
+		if k != "":
+			get_viewport().set_input_as_handled()
+			dedos[dedo] = k
+			_aprieta(k, true)
+	elif dedos.has(dedo):
+		get_viewport().set_input_as_handled()
+		var k: String = dedos[dedo]
+		dedos.erase(dedo)
+		_aprieta(k, false)
+
+func _mando_en(p: Vector2) -> String:
+	for k in ["up", "down", "left", "right", "A", "B", "START"]:
+		if botones[k].get_global_rect().has_point(p):
+			return k
+	return ""
+
+# apretar o soltar un mando; las flechas se repiten (320 ms y luego cada 110), como en 06-controles
+func _aprieta(k: String, on: bool) -> void:
+	botones[k].set_pressed_no_signal(on)
+	if on:
+		press(k)
+		if k in ["up", "down", "left", "right"]:
+			rep_b = k
+			rep.start(.32)
+	elif rep_b == k:
+		rep_b = ""
+		rep.stop()
+
+func _suelta_todo() -> void:
+	for d in dedos:
+		_aprieta(dedos[d], false)
+	dedos.clear()
+
 func _notification(w: int) -> void:
 	if w == NOTIFICATION_WM_GO_BACK_REQUEST:
 		# Atrás: B en un diálogo o menú; en la carpa, sin nada abierto, guarda y sale (no hay mapa al que volver)
@@ -337,8 +384,11 @@ func _notification(w: int) -> void:
 			_guarda()
 			get_tree().quit()
 	elif w == NOTIFICATION_APPLICATION_PAUSED or w == NOTIFICATION_WM_CLOSE_REQUEST:
+		_suelta_todo()
 		if S:
 			_guarda()
+	elif w == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		_suelta_todo()
 
 func press(b: String) -> void:
 	if modo == "menu":
@@ -557,12 +607,8 @@ func _toast(t: String, seg: float) -> void:
 	var fs := toast_txt.get_theme_font_size("font_size")
 	toast_txt.custom_minimum_size.x = minf(letra.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 2, 210 * us)
 	toast.show()
-	toast_n += 1
-	var n := toast_n
 	_coloca.call_deferred()
-	await get_tree().create_timer(seg).timeout
-	if n == toast_n:
-		toast.hide()
+	toast_t.start(seg)
 
 # ---------- cultivo (09-cultivo) ----------
 func pot_action(i: int) -> void:
@@ -577,7 +623,7 @@ func pot_action(i: int) -> void:
 		await say("Retiras la planta muerta.")
 		return
 	if p.prog >= 1:
-		var c := await ask("%s%s lista para cosechar.\nSalud %d%% · Agua %d%%" % [s.n, marca_feno(p.f), Datos.jsround(p.health), Datos.jsround(p.water)], ["Cosechar", "Esperar"])
+		var c := await ask("%s%s lista para cosechar.\nSalud %d%% · Agua %d%%" % [s.n, marca_feno(p.get("f")), Datos.jsround(p.health), Datos.jsround(p.water)], ["Cosechar", "Esperar"])
 		if c == 0:
 			await harvest(i)
 		return
@@ -587,7 +633,7 @@ func pot_action(i: int) -> void:
 	if p.pest:
 		opts.append("Tratar plaga")
 	opts.append_array(["Arrancar", "Salir"])
-	var c := await ask("%s%s · %s %d%%\nAgua %d%% · Salud %d%%%s" % [s.n, marca_feno(p.f), Cultivo.stage_name(p), int(floor(p.prog * 100)), Datos.jsround(p.water), Datos.jsround(p.health), " · PLAGA" if p.pest else ""], opts)
+	var c := await ask("%s%s · %s %d%%\nAgua %d%% · Salud %d%%%s" % [s.n, marca_feno(p.get("f")), Cultivo.stage_name(p), int(floor(p.prog * 100)), Datos.jsround(p.water), Datos.jsround(p.health), " · PLAGA" if p.pest else ""], opts)
 	var op: String = opts[c]
 	if op == "Regar":
 		p.water = 100.0
@@ -633,37 +679,30 @@ func plantar(i: int) -> void:
 	S.pots[i] = Cultivo.nueva_planta(S, sid)
 	await say("Has plantado %s." % Datos.strain(S, sid).n)
 
-func clase_feno(f) -> String:
-	if not f is Dictionary:
-		return "normal"
-	var D := Datos.carga()
-	return "estrella" if f.t * f.y >= D.FENO_ESTRELLA else ("floja" if f.t * f.y <= D.FENO_FLOJO else "normal")
-
 func marca_feno(f) -> String:
-	var v = S.fenos.get(str(f.id)) if f is Dictionary and f.get("id") else null
+	var v = S.fenos.get(str(int(f.id))) if f is Dictionary and f.get("id") else null
 	return " ★" if v == "estrella" else (" (floja)" if v == "floja" else "")
 
 func harvest(i: int) -> void:
 	var p: Dictionary = S.pots[i]
 	var s = Datos.strain(S, p.sid)
-	var f := Cultivo.factores(S, i)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"t": 1, "y": 1}
-	var cl := clase_feno(p.get("f"))
-	var g := Cultivo.gramos_planta(S, p, f)
-	var thc := Cultivo.thc_cosecha(S, p, f)
-	var k: String = p.sid + ("*" if cl == "estrella" else "")
-	var b: Dictionary = S.buds.get(k, {"g": 0, "thc": 0.0})
-	b.thc = (b.thc * b.g + thc * g) / (b.g + g)
-	b.g += g
-	S.buds[k] = b
-	if fe.get("id"):
-		S.fenos[str(fe.id)] = cl
-	S.pots[i] = null
-	await say("Cosechas %d g de %s. THC: %s%%." % [g, s.n, Datos.pct(thc)])
-	if cl == "estrella":
+	var r := Cultivo.cosecha(S, i)
+	await say("Cosechas %d g de %s. THC: %s%%." % [r.g, s.n, Datos.pct(r.thc)])
+	if r.cl == "estrella":
 		await say("¡Fenotipo estrella! THC ×%s y cosecha ×%s sobre la media de la %s." % [str(fe.t).replace(".", ","), str(fe.y).replace(".", ","), s.n])
-	elif cl == "floja":
+		await say("Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.")
+	elif r.cl == "floja":
 		await say("Fenotipo flojo: THC ×%s y cosecha ×%s de la media." % [str(fe.t).replace(".", ","), str(fe.y).replace(".", ",")])
+	var n: int = r.n
+	if n:
+		var ss := "s" if n > 1 else ""
+		if r.cria:
+			await say("Las plantas de la línea se han polinizado entre ellas: recoges %d semillas de %s." % [n, s.n])
+		elif not r.fem:
+			await say("Son semillas regulares: algún macho ha polinizado unas flores. Recoges %d semilla%s de %s." % [n, ss, s.n])
+		else:
+			await say("Una flor hermafrodita ha polinizado unas pocas: recoges %d semilla%s de %s." % [n, ss, s.n])
 
 func carpa_action() -> void:
 	var D := Datos.carga()
@@ -680,8 +719,7 @@ func dormir() -> void:
 	var c := await ask("Día %d · %02d:%02d · %s\nCosecha guardada: %d g" % [S.day, int(S.min) / 60, int(S.min) % 60, Datos.eur(S.money), tot], ["Dormir hasta las 7", "Siesta de 3 h", "Nada"])
 	if c > 1:
 		return
-	var mins: int = 180 if c == 1 else ((7 * 60 - int(S.min) + 1440) % 1440 if (7 * 60 - int(S.min) + 1440) % 1440 else 1440)
-	var luz := Cultivo.avanza(S, mins)
+	var luz := Cultivo.avanza(S, Cultivo.minutos_cama(S, c))
 	_guarda()
 	_toast("Has descansado%s · Partida guardada" % (" · Luz −" + Datos.eur(luz) if luz else ""), 1.8)
 
