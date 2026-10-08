@@ -386,6 +386,32 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     R.m1 = S.money - R.m1; R.r = totalRosin(); R.h = S.heat; S.map = 'home';
   }, () => R.m === 750 && R.p === 1 && R.ros.ria.g === 5 && R.ros.ria.thc === 36 && R.g === 15 && R.min === 30 && R.ext === 'town,town,astilleros,puerto,valdehierro'
     && R.m1 === Math.round(precioRosin(36) * 2 * .85) && R.r === 3 && GLYPH.gota && CTYPES.ext.label === 'CATADOR' || R);
+  await step('Rosin a salvo: la caja lo guarda y lo saca (en el hueco de los cogollos); Darko (con 21 g de rosin = 105 g de flor) se lleva la mitad del de fuera y la caja, intacta; la redada que la encuentra, también el suyo; el rosin atrae ladrones (1 g = 5 g de flor)',
+    ['Guardar rosin', '^Rosin · Skunk', '^1 g', 'Guardar todo', 'Sacar rosin', '^Rosin · Skunk', '^1 g', 'Cerrar', 'Dormir'], async () => {
+    const sv = { ch: S.ch, robo: S.flags.robo, money: S.money, caja: JSON.parse(JSON.stringify(S.caja)), due: S.due, heat: S.heat };
+    S.map = 'home'; S.ch = 7; S.flags.robo = false; S.due = 0; S.money = 0; S.heat = 0; S.buds = {}; S.rosin = {}; S.pots = S.pots.map(() => null);
+    addRosin('ria', 3, 36); addRosin('hindu', 2, 40); S.caja.money = 0; S.caja.buds = {}; delete S.caja.rosin;
+    const l0 = LOG.length; await run(() => objectAction(7, 1));
+    window.R = { caja: JSON.parse(JSON.stringify(S.caja.rosin)), fuera: JSON.parse(JSON.stringify(S.rosin)), cr: cajaR(), txt: LOG.slice(l0).filter(l => /Guardas/.test(l)).join('|') };
+    addRosin('hindu', 20, 40); R.flor = gramosFlor(); S.min = 23 * 60; const l1 = LOG.length; await run(bedAction);
+    R.robo = S.flags.robo; R.f2 = JSON.parse(JSON.stringify(S.rosin)); R.c2 = cajaR(); R.dk = LOG.slice(l1).filter(l => /Se han llevado/.test(l)).join('|');
+    const r0 = Math.random; S.protect = false; Math.random = () => .1; const l2 = LOG.length; await run(raidEvent); Math.random = r0;
+    R.c3 = 'rosin' in S.caja; R.f3 = totalRosin(); R.rd = LOG.slice(l2).filter(l => /Encuentran la caja/.test(l)).join('|');
+    const enc = () => { const b0 = battle, n = []; window.battle = async t => { n.push(t); }; Math.random = () => 0; S.map = 'town';
+      const [x, y] = CLIENT_TILES.town[0]; for (let k = 0; k < 20; k++) { P.x = x; P.y = y; S.cool = 0; onStepEnd(); } Math.random = r0; window.battle = b0; S.map = 'home'; S.cool = 0; return n.length; };
+    S.money = 0; S.buds = {}; S.rosin = {}; addRosin('ria', 1, 36); R.l1 = enc(); S.rosin = {}; addRosin('ria', .9, 36); R.l0 = enc(); S.rosin = {};
+    S.ch = sv.ch; S.flags.robo = sv.robo; S.money = sv.money; S.caja = sv.caja; S.due = sv.due; S.heat = sv.heat;
+  }, () => R.caja.ria.g === 2 && R.caja.hindu.g === 2 && R.fuera.ria.g === 1 && !R.fuera.hindu && R.cr === 4 && /Guardas 0 € y 4 g de rosin\./.test(R.txt)
+    && R.flor === 105 && R.robo && R.f2.ria.g === .5 && R.f2.hindu.g === 10 && R.c2 === 4 && /Se han llevado 0 € y 10,5 g de rosin\./.test(R.dk)
+    && !R.c3 && R.f3 === 0 && /se llevan 4 g de rosin y 0 €/.test(R.rd) && R.l1 === 20 && R.l0 === 0 || R);
+  await step('Autobús perdido: en Errotabarri a las 23:50, esperar → a las 7:00 del día siguiente sale el primero; en Mendialde, dormir en casa de ama (sin robo de Darko)',
+    ['Esperar', '^Ribera Verde', 'Dormir'], async () => {
+    const sv = { ch: S.ch, robo: S.flags.robo, money: S.money, due: S.due }, pa = PARADAS.errotabarri, v = viaje('errotabarri', 'town');
+    S.ch = 7; S.flags.robo = false; S.due = 0; S.money = 3000; S.pots = S.pots.map(() => null); enterMap('errotabarri', ...pa.a); S.min = 23 * 60 + 50;
+    window.R = { d: S.day }; await run(() => objectAction(pa.x, pa.y)); R.d1 = S.day - R.d; R.min = S.min; R.map = S.map; R.m = S.money; R.v = v;
+    enterMap('casa-ama', 1, 3, 'left'); S.min = 22 * 60; R.d2 = S.day; await run(() => objectAction(0, 3)); R.d3 = S.day - R.d2; R.min2 = S.min; R.robo = S.flags.robo; R.hp = S.hp === S.hpMax;
+    enterMap('home', 5, 6, 'up'); S.ch = sv.ch; S.flags.robo = sv.robo; S.money = sv.money; S.due = sv.due;
+  }, () => R.d1 === 1 && R.min === 7 * 60 + R.v.min && R.map === 'town' && R.m === 3000 - R.v.eur && R.d3 === 1 && R.min2 === 7 * 60 && !R.robo && R.hp || R);
   await step('Patrullas: andan solo por la calle; la sospecha sube si te ven con algo (50 g: 14/s de día, 35 de noche, 5,6 con Molina; nada a la espalda ni sin nada encima); llena → te persiguen → control', ['ENTREGAR'], async () => {
     S.ch = 5; S.protect = false; S.heat = 0; S.min = 600; S.buds = {}; S.rosin = {}; S.clients = []; enterMap('town', 16, 17, 'up');
     const pat = () => ents.filter(e => e.pat), vis = []; window.R = {};

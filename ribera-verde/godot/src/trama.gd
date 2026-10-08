@@ -197,7 +197,7 @@ func talk_kiko():
 	for p in S.pots:
 		if p:
 			alguna = true
-	if S.seeds.is_empty() and not alguna and not total_buds() and not total_rosin() and not caja_g() and S.money + caja_e() < 15:   # lo de la caja también cuenta (1.10)
+	if S.seeds.is_empty() and not alguna and not total_buds() and not total_rosin() and not caja_g() and not caja_r() and S.money + caja_e() < 15:   # lo de la caja también cuenta (1.10)
 		await say("¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.", N)
 		add_seeds("ria", 2)
 		await got("2 semillas de SKUNK #1")
@@ -673,7 +673,7 @@ func embargo() -> void:
 		sfx("bad")
 		await say("TOÑO te vacía los bolsillos: se lleva %s." % Datos.eur(e))
 
-# la redada (1.10, con la caja): lo de fuera, siempre; la caja, 1 de cada 4 veces (sus gramos y la mitad de su dinero). La
+# la redada (1.10, con la caja): lo de fuera, siempre; la caja, 1 de cada 4 veces (sus gramos, su rosin y la mitad de su dinero). La
 # multa sale de lo de fuera y, si no llega, de la caja
 func raid_event():
 	if S.protect:
@@ -693,16 +693,25 @@ func raid_event():
 	S.heat = 30
 	var hallada: bool = S.get("caja") != null and Cultivo.azar() < D.CAJA_REDADA
 	var cg := 0
+	var cr := 0.0
 	var ce := 0
 	if hallada:
 		cg = int(floor(caja_g()))
+		cr = caja_r()
 		ce = int(floor(S.caja.money / 2.0))
 		S.caja.buds = {}
+		S.caja.erase("rosin")
 		S.caja.money -= ce
 	var fine: float = D.MULTA_REDADA - pagar_casa(D.MULTA_REDADA)
-	await say("Se llevan todas las plantas y %d g%s. Multa: %s." % [g, (" y " + rosin_txt(ro)) if ro else "", Datos.eur(fine)])
+	await say("Se llevan todas las plantas%s. Multa: %s." % [("%s y %s" % [(", %d g" % g) if g else "", rosin_txt(ro)]) if ro else " y %d g" % g, Datos.eur(fine)])
 	if S.get("caja") != null:
-		await say(("Encuentran la caja de detrás del diploma: se llevan %d g y %s." % [cg, Datos.eur(ce)]) if hallada else "La caja de detrás del diploma ni la ven.")
+		var L := []   # sin «0 g» si solo había rosin
+		if cg or cr < .1:
+			L.append("%d g" % cg)
+		if cr >= .1:
+			L.append(rosin_txt(cr))
+		L.append(Datos.eur(ce))
+		await say(("Encuentran la caja de detrás del diploma: se llevan %s y %s." % [", ".join(L.slice(0, -1)), L[-1]]) if hallada else "La caja de detrás del diploma ni la ven.")
 	await say("Toca empezar de nuevo. Y vender menos una temporada.")
 
 func ending() -> void:
@@ -780,7 +789,7 @@ func mochila() -> void:
 		var rows := [{"label": "Dinero", "right": Datos.eur(S.money), "ic": icono("billetes"), "desc": "Lo que llevas encima. Don Baltasar también lo cuenta."}]
 		if S.get("caja"):
 			var CJ: Dictionary = D.CAJA[S.caja.nivel]
-			rows.append({"label": "Caja fuerte", "right": "%s · %d g" % [Datos.eur(caja_e()), int(floor(caja_g()))], "ic": icono("billetes"),
+			rows.append({"label": "Caja fuerte", "right": "%s · %d g%s" % [Datos.eur(caja_e()), int(floor(caja_g())), (" · " + Datos.coma(Datos.jsround(caja_r() * 10) / 10.0) + " g rosin") if caja_r() >= .1 else ""], "ic": icono("billetes"),
 				"desc": "%s, detrás del diploma. Caben %s y %s.\nLo que está dentro no lo llevas encima." % [CJ.n, Datos.eur(CJ.money), _kg(int(CJ.g))]})
 		rows.append_array([{"label": "Vida", "right": "%s/%s" % [n(S.hp), n(S.hpMax)], "desc": "Se recupera durmiendo, comiendo o con el tiempo."},
 			{"label": "Abono (dosis)", "right": "×" + n(S.items.fert), "ic": icono("abono"), "desc": "Una por planta: +25% de cosecha."},
@@ -1199,12 +1208,29 @@ func cuanto(txt: String, mx: float, pasos: Array, fmt: Callable):
 static func g_txt(g: float) -> String:
 	return "%d g" % int(floor(g))
 
+# «300 € y 50 g», «300 €, 50 g y 2 g de rosin» o, sin cogollos, «300 € y 2 g de rosin»
+func lo_que(e: float, g: float, r: float) -> String:
+	var L := [Datos.eur(e)]
+	if g >= 1 or r < .1:
+		L.append(g_txt(g))
+	if r >= .1:
+		L.append(rosin_txt(r))
+	return ", ".join(L.slice(0, -1)) + " y " + L[-1]
+
+# lo que cabe todavía en la caja (los cogollos y el rosin comparten el hueco); el del rosin, al décimo de gramo
+func _hueco(C: Dictionary) -> float:
+	return C.g - caja_g() - caja_r()
+
+func _hueco_r(C: Dictionary) -> float:
+	return floor(_hueco(C) * 10 + 1e-9) / 10.0
+
 func caja_action():
 	while true:
 		var C: Dictionary = D.CAJA[int(S.caja.nivel)]
-		var ops := ["Guardar todo", "Guardar dinero", "Guardar cogollos", "Sacar dinero", "Sacar cogollos", "Sacar todo", "Cerrar"]
-		var oi: int = await ask("%s: %s y %s (caben %s y %s).\nEncima: %s y %s." % [C.n, Datos.eur(S.caja.money), g_txt(caja_g()), Datos.eur(C.money), _kg(int(C.g)),
-			Datos.eur(S.money), g_txt(total_buds())], ops)
+		var ro: bool = (true if S.items.get("prensa") else false) or caja_r() > 0   # con la prensa (o rosin dentro), también el rosin
+		var ops := ["Guardar todo", "Guardar dinero", "Guardar cogollos"] + (["Guardar rosin"] if ro else []) + ["Sacar dinero", "Sacar cogollos"] + (["Sacar rosin"] if ro else []) + ["Sacar todo", "Cerrar"]
+		var oi: int = await ask("%s: %s (caben %s y %s).\nEncima: %s." % [C.n, lo_que(S.caja.money, caja_g(), caja_r()), Datos.eur(C.money), _kg(int(C.g)),
+			lo_que(S.money, total_buds(), total_rosin())], ops)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 		if op == "" or op == "Cerrar":
 			return
@@ -1213,23 +1239,65 @@ func caja_action():
 			S.money -= e
 			S.caja.money += e
 			var g := 0.0
+			var r := 0.0
 			for k in S.buds.keys():
-				var q: float = minf(S.buds[k].g, C.g - caja_g())
-				if q <= 0:
+				var q: float = minf(S.buds[k].g, _hueco(C))
+				if q < .5:   # menos de medio gramo no es un lote (mover_lote)
 					break
 				g += q
 				mover_lote(S.buds, S.caja.buds, k, q)
+			for k in S.rosin.keys():
+				var q: float = minf(S.rosin[k].g, _hueco_r(C))
+				if q < .1:
+					break
+				if not S.caja.get("rosin"):
+					S.caja.rosin = {}
+				r += q
+				mover_rosin(S.rosin, S.caja.rosin, k, q)
 			sfx("sel")
-			await say("Guardas %s y %s.%s" % [Datos.eur(e), g_txt(g), " No cabe todo: el resto se queda fuera." if S.money >= 1 or total_buds() >= 1 else ""])
+			await say("Guardas %s.%s" % [lo_que(e, g, r), " No cabe todo: el resto se queda fuera." if S.money >= 1 or total_buds() >= 1 or total_rosin() >= .1 else ""])
 		elif op == "Sacar todo":
 			var e: float = S.caja.money
 			var g := caja_g()
+			var r := caja_r()
 			S.money += e
 			S.caja.money = 0
 			for k in S.caja.buds.keys():
 				mover_lote(S.caja.buds, S.buds, k, S.caja.buds[k].g)
+			if S.caja.get("rosin"):
+				for k in S.caja.rosin.keys():
+					mover_rosin(S.caja.rosin, S.rosin, k, S.caja.rosin[k].g)
+				S.caja.erase("rosin")
 			sfx("sel")
-			await say("Sacas %s y %s." % [Datos.eur(e), g_txt(g)])
+			await say("Sacas %s." % lo_que(e, g, r))
+		elif op == "Guardar rosin" or op == "Sacar rosin":
+			var mete := op == "Guardar rosin"
+			var de: Dictionary = S.rosin if mete else S.caja.get("rosin", {})
+			var lots := []
+			for k in de:
+				lots.append([k, de[k]])
+			if lots.is_empty():
+				await say("No llevas rosin encima." if mete else "La caja no tiene rosin.")
+				continue
+			if mete and _hueco_r(C) < .1:
+				await say("No cabe más.")
+				continue
+			var it := lots.map(rosin_item)
+			it.append({"label": "Nada"})
+			var i: int = await menu(it, {"cls": "right", "title": "¿Qué guardas?" if mete else "¿Qué sacas?"})
+			if i < 0 or i >= lots.size():
+				continue
+			var k: String = lots[i][0]
+			var b: Dictionary = lots[i][1]
+			var g = await cuanto("Rosin · %s: ¿cuánto?" % lot_nombre(k), minf(b.g, _hueco_r(C)) if mete else float(b.g), [1, 5, 10, 50], func(v): return Datos.coma(v) + " g")
+			if not g:
+				continue
+			if mete and not S.caja.get("rosin"):
+				S.caja.rosin = {}
+			mover_rosin(de, S.caja.rosin if mete else S.rosin, k, g)
+			if not mete and S.caja.rosin.is_empty():
+				S.caja.erase("rosin")
+			sfx("sel")
 		elif op == "Guardar dinero" or op == "Sacar dinero":
 			var mete := op == "Guardar dinero"
 			var mx: float = minf(S.money, C.money - S.caja.money) if mete else float(S.caja.money)
@@ -1252,7 +1320,7 @@ func caja_action():
 			if lots.is_empty():
 				await say("No llevas cogollos encima." if mete else "La caja no tiene cogollos.")
 				continue
-			if mete and C.g - caja_g() < 1:
+			if mete and _hueco(C) < 1:
 				await say("No caben más cogollos.")
 				continue
 			var it := lots.map(lot_item)
@@ -1262,7 +1330,7 @@ func caja_action():
 				continue
 			var k: String = lots[i][0]
 			var b: Dictionary = lots[i][1]
-			var g = await cuanto("%s: ¿cuánto?" % lot_nombre(k), minf(b.g, C.g - caja_g()) if mete else float(b.g), [10, 50, 100, 500, 1000], func(v): return g_txt(v))
+			var g = await cuanto("%s: ¿cuánto?" % lot_nombre(k), minf(b.g, _hueco(C)) if mete else float(b.g), [10, 50, 100, 500, 1000], func(v): return g_txt(v))
 			if not g:
 				continue
 			mover_lote(de, a, k, g)
@@ -1294,11 +1362,13 @@ func instalar_caja():
 		sfx("get")
 		await talk("SMS · KIKO", ["Ya está: la caja empotrada, detrás del diploma. Lo de la vieja lo tienes dentro.", "Caben %s y %s." % [Datos.eur(D.CAJA[2].money), _kg(int(D.CAJA[2].g))]]))
 
-# el robo de Darko: la primera noche del capítulo 7 que duermes con más de 1.000 € o 100 g fuera de la caja, se llevan la mitad
+# el robo de Darko: la primera noche del capítulo 7 que duermes con más de 1.000 € o 100 g fuera de la caja (el rosin cuenta
+# como la flor de la que sale: gramos_flor), se llevan la mitad
 func robo_darko():
 	S.flags.robo = true
 	var e := int(floor(S.money / 2.0))
 	var g := 0
+	var r := 0.0
 	for k in S.buds:
 		var b: Dictionary = S.buds[k]
 		var l := int(floor(b.g / 2.0))
@@ -1307,10 +1377,14 @@ func robo_darko():
 	for k in S.buds.keys():
 		if S.buds[k].g < .5:
 			S.buds.erase(k)
+	for k in S.rosin.keys():   # y la mitad del rosin, como un ladrón
+		var q: float = Datos.jsround(S.rosin[k].g * 5) / 10.0
+		r += q
+		use_rosin(k, q)
 	S.money -= e
 	sfx("bad")
 	await say("Te despierta un portazo. La cerradura está forzada y el piso, revuelto.")
-	await say("Se han llevado %s y %d g.%s" % [Datos.eur(e), g, " La caja de detrás del diploma sigue cerrada." if S.get("caja") else ""])
+	await say("Se han llevado %s.%s" % [lo_que(e, g, r), " La caja de detrás del diploma sigue cerrada." if S.get("caja") else ""])
 	await talk("SMS · DARKO", ["Te dije que esto no se acababa ahí."])
 	if not S.get("caja"):
 		await say("Si la tía guardaba sus cosas en algún sitio, ahora te vendría bien saber dónde.")

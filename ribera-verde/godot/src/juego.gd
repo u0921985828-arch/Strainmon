@@ -241,7 +241,7 @@ func update(dt: float) -> void:
 			if pending.size() and not P.moving:
 				run(pending.pop_front())
 		hud_t -= dt
-		if hud_t <= 0:
+		if hud_t <= 0 or sosp_hud() != hud_visto:   # la barra de sospecha, en el fotograma en que cambia
 			hud_t = 250
 			update_hud()
 	elif mode == "battle" and B:
@@ -259,6 +259,7 @@ func update_hud() -> void:
 		return
 	var hh := "%02d" % int(floor(S.min / 60.0))
 	var mm := "%02d" % (int(floor(int(S.min) % 60 / 10.0)) * 10)
+	hud_visto = sosp_hud()
 	var r := total_rosin()
 	var ro := (" · " + Datos.coma(Datos.jsround(r * 10) / 10.0) + " g rosin") if r else ""
 	hud_pon("DÍA %s · %s:%s\n%s · %d g%s" % [n(S.day), hh, mm, Datos.eur(S.money), int(floor(total_buds())), ro], Datos.jsround(S.heat),

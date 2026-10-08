@@ -442,8 +442,10 @@ func estabilizar(k: String) -> void:
 		await say("Guardas 1 semilla F%d de %s: cultívala para tener más.\n%s para fijarla." % [g + 1, s.n, "Falta una generación" if GE - g - 1 == 1 else "Faltan %d generaciones" % (GE - g - 1)])
 
 # ---------- cama ----------
-func bed_action():
-	var c: int = await ask("Tu cama. Todavía huele a la colonia de la tía.", ["Dormir hasta las 7", "Siesta de 3 h", "Nada"])
+# la cama del piso y, desde la 1.10, la de casa de ama (txt): allí no hay robo de Darko ni aviso de plagas (las plantas están en el piso)
+func bed_action(txt := ""):
+	var piso: bool = S.map == "home"
+	var c: int = await ask(txt if txt else "Tu cama. Todavía huele a la colonia de la tía.", ["Dormir hasta las 7", "Siesta de 3 h", "Nada"])
 	if c > 1:
 		return
 	await fade(1)
@@ -460,7 +462,9 @@ func bed_action():
 	var hoy = S.luz if S.get("luz") and S.luz.d == S.day else null
 	save()
 	toast("Has descansado" + ((" · Luz −" + Datos.eur(hoy.e)) if hoy and hoy.e else "") + ((" · Olor: calor +" + n(hoy.o)) if hoy and hoy.o else "") + " · Partida guardada", 1800)
-	if S.ch == 7 and not S.flags.get("robo") and (S.money > 1000 or total_buds() > 100):
+	if not piso:
+		return
+	if S.ch == 7 and not S.flags.get("robo") and (S.money > 1000 or gramos_flor() > 100):
 		await robo_darko()   # la amenaza de Darko (1.10)
 	await aviso_plaga(antes)
 
@@ -584,9 +588,16 @@ func viaje(a: String, b: String) -> Dictionary:
 func parada_action():
 	var aqui: String = S.map
 	var pa: Dictionary = D.PARADAS[aqui]
-	if S.min < int(D.BUS_HORAS[0]) or S.min > int(D.BUS_HORAS[1]):
-		await say("PARADA DE %s\nEl primer autobús pasa a las 7:00 y el último, a las 21:00." % String(pa.n).to_upper())
-		return
+	if S.min < int(D.BUS_HORAS[0]) or S.min > int(D.BUS_HORAS[1]):   # fuera de horario: se puede esperar al primero (el reloj corre hasta las 7:00)
+		if await ask("PARADA DE %s\nEl primer autobús pasa a las 7:00 y el último, a las 21:00." % String(pa.n).to_upper(), ["Esperar al de las 7:00", "Nada"]) != 0:
+			return
+		await fade(1)
+		advance_time((int(D.BUS_HORAS[0]) - int(S.min) + 1440) % 1440)
+		build_ents()
+		update_hud()
+		await wait(300)
+		await fade(0)
+		await say("Las siete. Llega el primer autobús, medio vacío.")
 	var ama := llegando()
 	var ds := []
 	if ama:

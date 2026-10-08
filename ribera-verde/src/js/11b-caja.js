@@ -4,13 +4,19 @@
 // la caja: C, la de la tía Maite, detrás del diploma de la Copa de 1998 (la pista está en sus notas del ordenador): 20.000 € y
 // 2 kg; B, la empotrada, por el ordenador desde el capítulo 4 (CAJA_P, la instala Kiko al día siguiente): 50.000 € y 2,5 kg.
 // Lo que hay dentro no va encima: no cuenta para los encuentros ni te lo quitan un control, un ladrón o Darko. En una redada la
-// encuentran 1 de cada 4 veces (CAJA_REDADA). La luz y lo que se compra por el ordenador se pagan de fuera y, si no llega, de la caja
+// encuentran 1 de cada 4 veces (CAJA_REDADA). El rosin (con la prensa) va en S.caja.rosin, que no existe hasta que guardas el
+// primero, y ocupa el hueco de los cogollos. La luz y lo que se compra por el ordenador se pagan de fuera y, si no llega, de la caja
 const CAJA=[null,{n:'La caja de la tía',money:20000,g:2000},{n:'La caja empotrada',money:50000,g:2500}],CAJA_P=380,CAJA_REDADA=.25,CAJA_ANIO=1998,MAITE_CAJA=300;
 const cajaG=()=>S.caja?Object.values(S.caja.buds).reduce((a,b)=>a+b.g,0):0,cajaE=()=>S.caja?S.caja.money:0;
+const cajaR=()=>S.caja&&S.caja.rosin?Object.values(S.caja.rosin).reduce((a,b)=>a+b.g,0):0;
 // pagar desde el piso: primero lo de fuera y después la caja. Devuelve lo que falta
 function pagarCasa(e){const a=Math.min(S.money,e);S.money-=a;e-=a;if(e>0&&S.caja){const b=Math.min(S.caja.money,e);S.caja.money-=b;e-=b;}return e;}
 // g gramos del lote k de «de» a «a»: si el lote ya está, se juntan con el THC medio por gramos
 function moverLote(de,a,k,g){const b=de[k],t=a[k];if(t){t.thc=(t.thc*t.g+b.thc*g)/(t.g+g);t.g+=g;}else a[k]={g,thc:b.thc};b.g-=g;if(b.g<.5)delete de[k];}
+// lo mismo con el rosin, al décimo de gramo (como addRosin y useRosin)
+function moverRosin(de,a,k,g){const b=de[k],t=a[k];if(t){t.thc=(t.thc*t.g+b.thc*g)/(t.g+g);t.g=Math.round((t.g+g)*10)/10;}else a[k]={g,thc:b.thc};b.g=Math.round((b.g-g)*10)/10;if(b.g<.1)delete de[k];}
+// «300 € y 50 g», «300 €, 50 g y 2 g de rosin» o, sin cogollos, «300 € y 2 g de rosin»
+function loQue(e,g,r){const L=[eur(e)];if(g>=1||r<.1)L.push(gTxt(g));if(r>=.1)L.push(rosinTxt(r));return L.slice(0,-1).join(', ')+' y '+L[L.length-1];}
 async function diplomaAction(){
   if(S.caja)return cajaAction();
   if(await ask('Un diploma enmarcado: «COPA DE RIBERA 1998 · 2º PREMIO: MAITE».',['Mirar detrás','Dejarlo'])!==0)return;
@@ -31,17 +37,29 @@ async function cuanto(txt,max,pasos,fmt){
 const gTxt=g=>Math.floor(g)+' g';
 async function cajaAction(){
   for(;;){
-    const C=CAJA[S.caja.nivel],ops=['Guardar todo','Guardar dinero','Guardar cogollos','Sacar dinero','Sacar cogollos','Sacar todo','Cerrar'];
-    const op=ops[await ask(`${C.n}: ${eur(S.caja.money)} y ${gTxt(cajaG())} (caben ${eur(C.money)} y ${kgTxt(C.g)}).\nEncima: ${eur(S.money)} y ${gTxt(totalBuds())}.`,ops)];
+    const C=CAJA[S.caja.nivel],ro=!!S.items.prensa||cajaR()>0;   // con la prensa (o rosin dentro), también el rosin
+    const ops=['Guardar todo','Guardar dinero','Guardar cogollos'].concat(ro?['Guardar rosin']:[],['Sacar dinero','Sacar cogollos'],ro?['Sacar rosin']:[],['Sacar todo','Cerrar']);
+    const op=ops[await ask(`${C.n}: ${loQue(S.caja.money,cajaG(),cajaR())} (caben ${eur(C.money)} y ${kgTxt(C.g)}).\nEncima: ${loQue(S.money,totalBuds(),totalRosin())}.`,ops)];
     if(!op||op==='Cerrar')return;
-    const hueco=()=>C.g-cajaG();
+    const hueco=()=>C.g-cajaG()-cajaR(),huecoR=()=>Math.floor(hueco()*10+1e-9)/10;
     if(op==='Guardar todo'){
-      const e=Math.min(S.money,C.money-S.caja.money);S.money-=e;S.caja.money+=e;let g=0;
-      for(const [k,b] of Object.entries(S.buds)){const q=Math.min(b.g,hueco());if(q<=0)break;g+=q;moverLote(S.buds,S.caja.buds,k,q);}
-      sfx('sel');await say(`Guardas ${eur(e)} y ${gTxt(g)}.${S.money>=1||totalBuds()>=1?' No cabe todo: el resto se queda fuera.':''}`);
+      const e=Math.min(S.money,C.money-S.caja.money);S.money-=e;S.caja.money+=e;let g=0,r=0;
+      for(const [k,b] of Object.entries(S.buds)){const q=Math.min(b.g,hueco());if(q<.5)break;/* menos de medio gramo no es un lote (moverLote) */g+=q;moverLote(S.buds,S.caja.buds,k,q);}
+      for(const [k,b] of Object.entries(S.rosin)){const q=Math.min(b.g,huecoR());if(q<.1)break;S.caja.rosin=S.caja.rosin||{};r+=q;moverRosin(S.rosin,S.caja.rosin,k,q);}
+      sfx('sel');await say(`Guardas ${loQue(e,g,r)}.${S.money>=1||totalBuds()>=1||totalRosin()>=.1?' No cabe todo: el resto se queda fuera.':''}`);
     }else if(op==='Sacar todo'){
-      const e=S.caja.money,g=cajaG();S.money+=e;S.caja.money=0;for(const k of Object.keys(S.caja.buds))moverLote(S.caja.buds,S.buds,k,S.caja.buds[k].g);
-      sfx('sel');await say(`Sacas ${eur(e)} y ${gTxt(g)}.`);
+      const e=S.caja.money,g=cajaG(),r=cajaR();S.money+=e;S.caja.money=0;for(const k of Object.keys(S.caja.buds))moverLote(S.caja.buds,S.buds,k,S.caja.buds[k].g);
+      if(S.caja.rosin){for(const k of Object.keys(S.caja.rosin))moverRosin(S.caja.rosin,S.rosin,k,S.caja.rosin[k].g);delete S.caja.rosin;}
+      sfx('sel');await say(`Sacas ${loQue(e,g,r)}.`);
+    }else if(op==='Guardar rosin'||op==='Sacar rosin'){
+      const mete=op==='Guardar rosin',de=mete?S.rosin:S.caja.rosin||{},lots=Object.entries(de);
+      if(!lots.length){await say(mete?'No llevas rosin encima.':'La caja no tiene rosin.');continue;}
+      if(mete&&huecoR()<.1){await say('No cabe más.');continue;}
+      const i=await menu(lots.map(rosinItem).concat([{label:'Nada'}]),{cls:'right',title:mete?'¿Qué guardas?':'¿Qué sacas?'});
+      if(i<0||i>=lots.length)continue;
+      const [k,b]=lots[i],g=await cuanto(`Rosin · ${lotNombre(k)}: ¿cuánto?`,mete?Math.min(b.g,huecoR()):b.g,[1,5,10,50],r=>coma(r)+' g');if(!g)continue;
+      if(mete)S.caja.rosin=S.caja.rosin||{};
+      moverRosin(de,mete?S.caja.rosin:S.rosin,k,g);if(!mete&&!Object.keys(S.caja.rosin).length)delete S.caja.rosin;sfx('sel');
     }else if(op==='Guardar dinero'||op==='Sacar dinero'){
       const mete=op==='Guardar dinero',max=mete?Math.min(S.money,C.money-S.caja.money):S.caja.money;
       if(max<1){await say(mete?(S.money<1?'No llevas dinero encima.':'No cabe más dinero.'):'La caja no tiene dinero.');continue;}
@@ -70,14 +88,16 @@ function instalarCaja(){
   delete S.caja.mejora;S.caja.nivel=2;
   queue('caja',async()=>{sfx('get');await talk('SMS · KIKO',['Ya está: la caja empotrada, detrás del diploma. Lo de la vieja lo tienes dentro.',`Caben ${eur(CAJA[2].money)} y ${kgTxt(CAJA[2].g)}.`]);});
 }
-// el robo de Darko: la primera noche del capítulo 7 que duermes con más de 1.000 € o 100 g fuera de la caja, se llevan la mitad
+// el robo de Darko: la primera noche del capítulo 7 que duermes con más de 1.000 € o 100 g fuera de la caja (el rosin cuenta
+// como la flor de la que sale: gramosFlor), se llevan la mitad
 async function roboDarko(){
-  S.flags.robo=true;const e=Math.floor(S.money/2);let g=0;
+  S.flags.robo=true;const e=Math.floor(S.money/2);let g=0,r=0;
   for(const b of Object.values(S.buds)){const l=Math.floor(b.g/2);g+=l;b.g-=l;}
   for(const k of Object.keys(S.buds))if(S.buds[k].g<.5)delete S.buds[k];
+  for(const k of Object.keys(S.rosin)){const q=Math.round(S.rosin[k].g*5)/10;r+=q;useRosin(k,q);}   // y la mitad del rosin, como un ladrón
   S.money-=e;sfx('bad');
   await say('Te despierta un portazo. La cerradura está forzada y el piso, revuelto.');
-  await say(`Se han llevado ${eur(e)} y ${g} g.${S.caja?' La caja de detrás del diploma sigue cerrada.':''}`);
+  await say(`Se han llevado ${loQue(e,g,r)}.${S.caja?' La caja de detrás del diploma sigue cerrada.':''}`);
   await talk('SMS · DARKO',['Te dije que esto no se acababa ahí.']);
   if(!S.caja)await say('Si la tía guardaba sus cosas en algún sitio, ahora te vendría bien saber dónde.');
   save();

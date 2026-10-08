@@ -5693,6 +5693,40 @@
   {
    "tipo": "objeto",
    "fase": "F9",
+   "herramienta": "importado",
+   "estado": "pendiente de aprobación",
+   "familia": "importado",
+   "coste_real": 0,
+   "id": "carpas-medias-mapa",
+   "cubre": [
+    "misc:carpa-p80-mapa",
+    "misc:carpa-m120-mapa"
+   ],
+   "celda": "carpa_mapa",
+   "origen": "tools/sprites/a-mano/carpas.py: el armario de 60 y la carpa de 100 aprobados de carpas-mapa, alargados por dentro (solo se repiten columnas y filas suyas: misma paleta y contorno) hasta 13 × 35 y 19 × 40 (16 px/m, como carpaMapa)",
+   "descripcion": "armario de 80 y carpa de 120 cerrados en el piso",
+   "notas": "1.10: el armario de 80 (ampliación de A) y la carpa de 120 (C, junto a la cama) se pintaban procedurales con el atlas puesto. Hechos sin PixelLab; a la espera de que se aprueben."
+  },
+  {
+   "tipo": "objeto",
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "pendiente de aprobación",
+   "familia": "importado",
+   "coste_real": 0,
+   "id": "carpas-medias-vista",
+   "cubre": [
+    "misc:carpa-p80-vista",
+    "misc:carpa-m120-vista"
+   ],
+   "celda": "carpa_vista",
+   "origen": "tools/sprites/a-mano/carpas.py: el armario de 60 y la carpa de 100 aprobados de carpas-vista con un tramo del mylar repetido (13 columnas y 14 filas el de 80; 12 columnas la de 120), el que mejor casa consigo mismo",
+   "descripcion": "armario de 80 y carpa de 120 abiertos de frente (vista de carpa)",
+   "notas": "1.10: completan carpas-vista (la vista B sigue siendo procedural en el juego). Hechos sin PixelLab; a la espera de que se aprueben."
+  },
+  {
+   "tipo": "objeto",
+   "fase": "F9",
    "herramienta": "create_image_pixflux",
    "estado": "aprobado",
    "familia": "imagen",

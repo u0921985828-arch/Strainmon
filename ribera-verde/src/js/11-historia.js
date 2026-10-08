@@ -101,7 +101,7 @@ async function talkKiko(){
       'Empieza por las conocidas: saca dos de receta en la mesa y cosecha una planta de cada. Patxi, el de la plaza, se sabe unas cuantas.']);
     showObjective();await checkStory();return;
   }
-  if(!Object.keys(S.seeds).length&&!S.pots.some(Boolean)&&!totalBuds()&&!totalRosin()&&!cajaG()&&S.money+cajaE()<15){   // lo de la caja también cuenta (1.10)
+  if(!Object.keys(S.seeds).length&&!S.pots.some(Boolean)&&!totalBuds()&&!totalRosin()&&!cajaG()&&!cajaR()&&S.money+cajaE()<15){   // lo de la caja también cuenta (1.10)
     await say('¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.',N);addSeeds('ria',2);await got('2 semillas de SKUNK #1');
   }
   const c=await ask('¿Qué necesitas?',['Comprar','Un consejo','Nada'],N);
@@ -308,18 +308,19 @@ async function embargo(){
   if(ci>=0){const n=CARPAS[S.carpas[ci].t].n;quitarCarpa(ci);sfx('bad');await say(`TOÑO se lleva tu ${n}, con su foco y sus plantas.`);}
   else{const e=Math.floor(S.money/2);S.money-=e;sfx('bad');await say(`TOÑO te vacía los bolsillos: se lleva ${eur(e)}.`);}
 }
-// la redada (1.10, con la caja): lo de fuera, siempre; la caja, 1 de cada 4 veces (sus gramos y la mitad de su dinero). La
+// la redada (1.10, con la caja): lo de fuera, siempre; la caja, 1 de cada 4 veces (sus gramos, su rosin y la mitad de su dinero). La
 // multa sale de lo de fuera y, si no llega, de la caja
 async function raidEvent(){
   if(S.protect){S.heat=50;return talk('SMS · MOLINA',['Esta noche había orden de entrada en tu piso. La he parado.','Baja el ritmo.']);}
   sfx('bad');await say('REDADA. La policía entra en tu piso.');
   const g=Math.floor(totalBuds()),r=totalRosin();
   S.pots=S.pots.map(()=>null);S.buds={};S.rosin={};S.heat=30;
-  const hallada=!!S.caja&&Math.random()<CAJA_REDADA,cg=hallada?Math.floor(cajaG()):0,ce=hallada?Math.floor(S.caja.money/2):0;
-  if(hallada){S.caja.buds={};S.caja.money-=ce;}
+  const hallada=!!S.caja&&Math.random()<CAJA_REDADA,cg=hallada?Math.floor(cajaG()):0,cr=hallada?cajaR():0,ce=hallada?Math.floor(S.caja.money/2):0;
+  if(hallada){S.caja.buds={};delete S.caja.rosin;S.caja.money-=ce;}
   const fine=MULTA_REDADA-pagarCasa(MULTA_REDADA);
-  await say(`Se llevan todas las plantas y ${g} g${r?' y '+rosinTxt(r):''}. Multa: ${eur(fine)}.`);
-  if(S.caja)await say(hallada?`Encuentran la caja de detrás del diploma: se llevan ${cg} g y ${eur(ce)}.`:'La caja de detrás del diploma ni la ven.');
+  await say(`Se llevan todas las plantas${r?`${g?`, ${g} g`:''} y ${rosinTxt(r)}`:` y ${g} g`}. Multa: ${eur(fine)}.`);
+  const L=[...(cg||cr<.1?[cg+' g']:[]),...(cr>=.1?[rosinTxt(cr)]:[]),eur(ce)];   // sin «0 g» si solo había rosin
+  if(S.caja)await say(hallada?`Encuentran la caja de detrás del diploma: se llevan ${L.slice(0,-1).join(', ')} y ${L[L.length-1]}.`:'La caja de detrás del diploma ni la ven.');
   await say('Toca empezar de nuevo. Y vender menos una temporada.');
 }
 async function ending(){

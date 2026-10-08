@@ -127,7 +127,7 @@ function renderTitle(now){
 function updateHUD(){
   const h=$('hud');if(mode!=='world'||!S){h.hidden=true;return;}h.hidden=false;
   const hh=String(Math.floor(S.min/60)).padStart(2,'0'),mm=String(Math.floor(S.min%60/10)*10).padStart(2,'0'),heat=Math.round(S.heat);
-  const r=totalRosin(),sv=Math.round(SOSP.v);
+  const r=totalRosin(),sv=Math.round(SOSP.v);hudSosp=sospHUD();
   h.innerHTML=`DÍA ${S.day} · ${hh}:${mm}<br>${eur(S.money)} · ${Math.floor(totalBuds())} g${r?' · '+coma(Math.round(r*10)/10)+' g rosin':''}<div class="heat">CALOR<span class="bar"><i class="${heat>=70?'hot':''}" style="width:${heat}%"></i></span></div>`
     +(nPatrullas()?`<div class="heat sosp">${SOSP.alarma?'¡ALARMA!':'SOSPECHA'}<span class="bar"><i class="${SOSP.alarma?'hot':''}" style="width:${SOSP.alarma?100:sv}%"></i></span></div>`:'');
 }

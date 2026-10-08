@@ -36,6 +36,8 @@ const totalRosin=()=>Object.values(S.rosin).reduce((a,b)=>a+b.g,0);
 function addRosin(k,g,thc){const b=S.rosin[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g=Math.round((b.g+g)*10)/10;}else S.rosin[k]={g,thc};}
 function useRosin(k,g){const b=S.rosin[k];b.g=Math.round((b.g-g)*10)/10;if(b.g<.1)delete S.rosin[k];}
 const rosinTxt=r=>coma(Math.round(r*10)/10)+' g de rosin';
+// lo que llevas encima en gramos de flor: el rosin, como la flor de la que sale (1 g ↔ 1 / ROSIN.rend = 5 g). Ladrones y Darko
+const gramosFlor=()=>totalBuds()+totalRosin()/ROSIN.rend;
 function rosinLots(min){return Object.entries(S.rosin).filter(([k,b])=>b.g>=min);}
 const rosinItem=([k,b])=>({label:'Rosin · '+lotNombre(k),right:`${coma(b.g)} g · ${pct(b.thc)}%`,sw:'#d89a18',ic:iconoCogollo(lotSid(k))});
 const lotItem=([k,b])=>({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k))});
@@ -125,7 +127,7 @@ function onStepEnd(){
   }
   // ladrones al azar por paso; la policía ya no (1.10): patrulla por la calle (10b-patrulla). Con la alarma, nada
   if(S.ch>=2&&S.cool<=0&&!SOSP.alarma){
-    const g=totalBuds(),tall=m.g[P.y][P.x]==='tallgrass';
+    const g=gramosFlor(),tall=m.g[P.y][P.x]==='tallgrass';   // el rosin también atrae ladrones (1.10)
     const pt=(g>=5||S.money>=150)?.004*(isNight()?2.5:1)*(tall?3:1)*Z.lad:0;
     if(Math.random()<pt){S.cool=25;run(()=>battle('thief'));}
   }
@@ -187,7 +189,7 @@ async function objectAction(x,y){
   if(S.map==='casa-ama'){   // el caserío de la familia, en Mendialde (1.10)
     if(o==='table'){const n=!S.flags.notaAma;S.flags.notaAma=true;return say(n?'Una nota de tu ama: «Te he dejado un táper de alubias en la nevera. Llama cuando llegues. Y no te metas en líos».':'La nota de ama: «...y no te metas en líos».');}
     if(o==='fridge'){if(S.flags.taper)return say('La nevera de casa. El táper ya va en la mochila.');S.flags.taper=true;S.items.bocata+=1;return got('el táper de alubias de ama (1 × BOCATA)');}
-    if(o==='bedT'||o==='bedB')return say('Tu cama de siempre, con la colcha de cuadros.');
+    if(o==='bedT'||o==='bedB')return bedAction('Tu cama de siempre, con la colcha de cuadros.');   // si pierdes el último autobús
     if(o==='iwin')return say('Por la ventana se ven el monte y la carretera de la comarca.');
     if(o==='plantDeco')return say('Los geranios de ama. Les sobra agua.');
   }
@@ -211,10 +213,15 @@ async function objectAction(x,y){
   if(o==='crate')return say(S.map==='astilleros'?'Cajas de madera de los astilleros, podridas por la humedad.':S.map==='valdehierro'?'Cajas de piezas de la fundición, oxidadas.':'Cajas de pescado vacías del puerto.');
 }
 // el autobús de la comarca (1.10): en el poste de la parada, a dónde, cuánto y cuánto tarda; el reloj corre lo que dura el viaje.
-// El primer viaje (del pueblo al piso: S.flags.llegada === false) lo paga ama y solo va a Ribera Verde
+// El primer viaje (del pueblo al piso: S.flags.llegada === false) lo paga ama y solo va a Ribera Verde. Fuera de horario, esperar
+// al primero o, en Mendialde, dormir en casa de ama (bedAction)
 async function paradaAction(){
   const aqui=S.map,pa=PARADAS[aqui];
-  if(S.min<BUS_HORAS[0]||S.min>BUS_HORAS[1])return say(`PARADA DE ${pa.n.toUpperCase()}\nEl primer autobús pasa a las 7:00 y el último, a las 21:00.`);
+  if(S.min<BUS_HORAS[0]||S.min>BUS_HORAS[1]){   // fuera de horario: se puede esperar al primero (el reloj corre hasta las 7:00)
+    if(await ask(`PARADA DE ${pa.n.toUpperCase()}\nEl primer autobús pasa a las 7:00 y el último, a las 21:00.`,['Esperar al de las 7:00','Nada'])!==0)return;
+    await fade(1);advanceTime((BUS_HORAS[0]-S.min+1440)%1440);buildEnts();updateHUD();await wait(300);await fade(0);
+    await say('Las siete. Llega el primer autobús, medio vacío.');
+  }
   const ama=S.flags.llegada===false,ds=ama?['town']:Object.keys(PARADAS).filter(k=>k!==aqui);
   const i=await menu(ds.map(k=>{const v=viaje(aqui,k);return{label:PARADAS[k].n,right:ama?'billete de ama':`${eur(v.eur)} · ${v.min} min`};}).concat([{label:'Nada'}]),{cls:'right',title:'¿A dónde vas?'});
   if(i<0||i>=ds.length)return;

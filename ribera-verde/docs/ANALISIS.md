@@ -41,7 +41,7 @@ Generado con `npm run analisis`: 717 cifras comprobadas con el juego (20.000 com
 | 4 · Genética | Sacar en la mesa 2 variedades de receta y cosechar una planta de cada | `recCount() ≥ 2`: `S.rec[id]` vale 1 al sacarla en la mesa y 2 al cosecharla | — | Capítulo 5. Toño te escribe: 12.000 € en 10 días. Aparece Molina |
 | 5 · El sargento | Pagar 12.000 €. Molina te ofrece protección: 1.500 € cada 10 días. Si dices que no, +10 de calor | Pagar en el bar | 10 días | Capítulo 6. Baltasar: «La COPA DE RIBERA se juega estos días en la plaza» |
 | 6 · La Copa | Llevar 20 g de un lote con más del 26,8 % de THC | `talkJurado`: `round(thc·10)/10 > 26,8` | Ninguno (se puede repetir) | 5.000 € y +20 de reputación. Capítulo 7, con todo lo que queda (15.000 €) en 7 días |
-| 7 · Libertad | Pagar 15.000 €. La primera vez que duermas con más de 1.000 € o 100 g fuera de la caja, Darko te roba | Pagar en el bar | 7 días | Pantalla final y capítulo 8. Baltasar te ofrece trabajo |
+| 7 · Libertad | Pagar 15.000 €. La primera vez que duermas con más de 1.000 € o 100 g fuera de la caja (el rosin cuenta como la flor de la que sale: 1 g = 5 g), Darko te roba | Pagar en el bar | 7 días | Pantalla final y capítulo 8. Baltasar te ofrece trabajo |
 | 8 · Tu imperio | Facturar 25.000, 100.000 y 250.000 € desde el último pago. Los encargos de Baltasar | `imperioNivel()` | Cada encargo, 2 días | Iñaki te carga 2, 5 y 10 kg al día. La meta final es completar la genoteca de 41 y sacar la Ghost Train Haze |
 
 Si un plazo vence (capítulos 3, 5 y 7), Toño se presenta al cambiar de día:
@@ -130,7 +130,7 @@ Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo a Iñaki
 - **Encuentros.**
   - En las siete zonas, desde el capítulo 2. No hay encuentros dentro de las casas.
   - Después de un encuentro vienen 24 pasos tranquilos (`S.cool` se pone a 25 y baja antes de mirar). Los pasos dentro de casa, del growshop o del bar también descuentan.
-  - Cada paso tira un número al azar: si sale por debajo de *pt*, hay ladrón. *pt* = 0,004 × (2,5 de noche, de 21:00 a 6:00) × (3 en hierba alta) × ladrones de la zona. Solo si llevas encima 5 g o más, o 150 € o más. El calor no cuenta.
+  - Cada paso tira un número al azar: si sale por debajo de *pt*, hay ladrón. *pt* = 0,004 × (2,5 de noche, de 21:00 a 6:00) × (3 en hierba alta) × ladrones de la zona. Solo si llevas encima 5 g o más (el rosin cuenta como la flor de la que sale: 1 g = 5 g; las tablas son sin rosin), o 150 € o más. El calor no cuenta.
   - Desde la 1.10, la policía ya no sale al azar por paso: patrulla por la calle y se ve (abajo). Mientras un agente te persigue, no hay ladrones.
   - Lo que está en la caja fuerte no cuenta.
 - **Patrullas** (`10b-patrulla`; § 2.5). Los agentes salen al entrar en el mapa, a 6 casillas o más de ti, y andan solo por la calle (acera, calzada, plaza, pista, muelle, puentes), nunca por puertas, salidas ni la llegada del autobús.
@@ -390,14 +390,14 @@ No había nada que decidir sobre qué sacar de casa, y esa decisión es justo lo
 
 ### 3.2 Cómo es
 
-Una caja en el piso, detrás del diploma de la tía, con dinero y cogollos (`S.caja = { money, buds, nivel }`). Lo que está dentro no va encima: no cuenta para los encuentros, ni para el soborno, ni para lo que te quitan en la calle.
+Una caja en el piso, detrás del diploma de la tía, con dinero, cogollos y rosin (`S.caja = { money, buds, nivel }` y, desde que guardas el primero, `rosin`; el rosin va en el hueco de los cogollos). Lo que está dentro no va encima: no cuenta para los encuentros, ni para el soborno, ni para lo que te quitan en la calle.
 
-- Se abre pulsando A delante del diploma: «Guardar todo / Guardar dinero / Guardar cogollos / Sacar dinero / Sacar cogollos / Sacar todo / Cerrar». Dinero y gramos se eligen en pasos (100, 500, 1.000 € o 10, 50, 100 g…, y «todo lo que cabe»).
+- Se abre pulsando A delante del diploma: «Guardar todo / Guardar dinero / Guardar cogollos / Sacar dinero / Sacar cogollos / Sacar todo / Cerrar» y, con la prensa o rosin dentro, «Guardar rosin» y «Sacar rosin». Dinero y gramos se eligen en pasos (100, 500, 1.000 € o 10, 50, 100 g…, y «todo lo que cabe»).
 - La mochila enseña las dos cosas: lo de encima y lo de la caja.
 
 | Caja | Cómo se consigue | Capacidad | En una redada | Robo de Darko (cap. 7) |
 |---|---|---|---|---|
-| **C · La caja de la tía** | Detrás del diploma de la Copa de 1998 (7, 1). La pista está en las notas del ordenador: «La combinación, el año en que lo gané». Dentro hay 300 € | 20.000 € y 2 kg | La encuentran 1 de cada 4 veces: sus gramos y la mitad de su dinero | Resiste |
+| **C · La caja de la tía** | Detrás del diploma de la Copa de 1998 (7, 1). La pista está en las notas del ordenador: «La combinación, el año en que lo gané». Dentro hay 300 € | 20.000 € y 2 kg | La encuentran 1 de cada 4 veces: sus gramos, su rosin y la mitad de su dinero | Resiste |
 | **B · La caja empotrada** | Por el ordenador, desde el capítulo 4 y con la de la tía abierta, por 380 € (de fuera y, si no llega, de la caja). Kiko la instala al día siguiente, con lo que ya tuvieras dentro | 50.000 € y 2,5 kg | Igual: 1 de cada 4 veces | Resiste |
 
 La caja de sobremesa de la tienda (la A de la propuesta) se descartó: la de la tía da sentido al diploma y conecta con la Copa, y la empotrada es la mejora para el imperio.
@@ -465,8 +465,8 @@ La caja no quita los riesgos del todo: hay que llevar la mercancía para venderl
 
 ### 3.6 El robo de Darko (capítulo 7)
 
-1. La primera vez que duermes en el capítulo 7 (hasta las 7 o una siesta) con más de 1.000 € o más de 100 g fuera de la caja, entran en el piso: «Te despierta un portazo. La cerradura está forzada y el piso, revuelto».
-2. Se llevan la mitad del dinero y la mitad de cada lote que haya fuera de la caja. La caja, de la tía o empotrada, sigue cerrada.
+1. La primera vez que duermes en el capítulo 7 (hasta las 7 o una siesta) con más de 1.000 € o más de 100 g fuera de la caja (contando el rosin como 5 g de flor el gramo), entran en el piso: «Te despierta un portazo. La cerradura está forzada y el piso, revuelto».
+2. Se llevan la mitad del dinero y la mitad de cada lote, de cogollos o de rosin, que haya fuera de la caja. La caja, de la tía o empotrada, sigue cerrada.
 3. Llega un SMS de Darko: «Te dije que esto no se acababa ahí». Si aún no has abierto la caja de la tía, el juego te recuerda que la tía guardaba sus cosas en algún sitio.
 
 Pasa una sola vez (`flags.robo`). Así se cierra el hilo de la Copa y la caja tiene su momento en la historia.

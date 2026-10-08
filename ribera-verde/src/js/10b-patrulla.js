@@ -15,6 +15,8 @@ const PAT={paso:[420,360],corre:[210,180],alto:600,vista:[5,5],sube:[1,2.5],baja
 const CALLE=/^(walk|roadT|roadB|rotoT|rotoB|hormigon|pista|plaza|dirt|dock|bridgeT|bridgeB)$/,TAPA_VISTA=/^(tree|tree2|manzano|monte|monte2|seto|crate)$/;
 let SOSP={v:0,alarma:null,sinVer:0,aviso:0,tregua:0};
 const nPatrullas=()=>{const p=PATRULLAS[S.map];return p&&S.ch>=2?p[isNight()?1:0]:0;};
+// lo que enseña la barra del HUD (updateHUD guarda el último en hudSosp): si cambia, el HUD se rehace sin esperar a su cuarto de segundo
+const sospHUD=()=>nPatrullas()?(SOSP.alarma?'A':Math.round(SOSP.v)):'';let hudSosp='';
 const cargaSosp=()=>totalBuds()+totalRosin();
 const llegadaBus=(x,y)=>!!PARADAS[S.map]&&PARADAS[S.map].a[0]===x&&PARADAS[S.map].a[1]===y;
 // casillas de ronda de un mapa: de calle, a las que se llega a pie, sin la llegada del autobús

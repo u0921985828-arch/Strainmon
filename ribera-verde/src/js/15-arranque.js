@@ -64,7 +64,7 @@ function update(dt){
     updatePlayer(dt);updateEnts(dt);if(isFree())updatePatrullas(dt);
     if(isFree()){timeAcc+=dt;while(timeAcc>=MS_PER_MIN){timeAcc-=MS_PER_MIN;tickMinute();}
       if(pending.length&&!P.moving)run(pending.shift());}
-    hudT-=dt;if(hudT<=0){hudT=250;updateHUD();}
+    hudT-=dt;if(hudT<=0||sospHUD()!==hudSosp){hudT=250;updateHUD();}   // la barra de sospecha, en el fotograma en que cambia (1.10)
   }else if(mode==='battle'&&B){B.t+=dt;if(B.flashE>0)B.flashE-=dt;if(B.shakeP>0)B.shakeP-=dt;}
 }
 function render(now){if(mode==='world'&&S)renderWorld(now);else if(mode==='battle'&&B)renderBattle(now);else if(mode==='carpa'&&VC)renderCarpa(now);else if(mode==='title'||mode==='intro')renderTitle(now);}

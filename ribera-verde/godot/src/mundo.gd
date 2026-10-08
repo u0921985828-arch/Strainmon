@@ -15,6 +15,7 @@ var ents: Array = []
 var B = null
 var time_acc := 0.0
 var hud_t := 0.0
+var hud_visto = ""   # lo último que enseñó la barra de sospecha (sosp_hud)
 var pending: Array = []
 var queued := {}
 var MAPS := {}
@@ -94,6 +95,14 @@ func caja_g() -> float:
 			t += S.caja.buds[k].g
 	return t
 
+# el rosin de la caja (S.caja.rosin, que no existe hasta que guardas el primero): ocupa el hueco de los cogollos
+func caja_r() -> float:
+	var t := 0.0
+	if S.get("caja") and S.caja.get("rosin"):
+		for k in S.caja.rosin:
+			t += S.caja.rosin[k].g
+	return t
+
 func caja_e() -> float:
 	return S.caja.money if S.get("caja") else 0
 
@@ -119,6 +128,19 @@ func mover_lote(de: Dictionary, a: Dictionary, k: String, g: float) -> void:
 		a[k] = {"g": g, "thc": b.thc}
 	b.g -= g
 	if b.g < .5:
+		de.erase(k)
+
+# lo mismo con el rosin, al décimo de gramo (como add_rosin y use_rosin)
+func mover_rosin(de: Dictionary, a: Dictionary, k: String, g: float) -> void:
+	var b: Dictionary = de[k]
+	if a.has(k):
+		var t: Dictionary = a[k]
+		t.thc = (t.thc * t.g + b.thc * g) / (t.g + g)
+		t.g = Datos.jsround((t.g + g) * 10) / 10.0
+	else:
+		a[k] = {"g": g, "thc": b.thc}
+	b.g = Datos.jsround((b.g - g) * 10) / 10.0
+	if b.g < .1:
 		de.erase(k)
 
 func gm2(s) -> int:
@@ -202,6 +224,10 @@ func use_rosin(k: String, g: float) -> void:
 
 func rosin_txt(r: float) -> String:
 	return Datos.coma(Datos.jsround(r * 10) / 10.0) + " g de rosin"
+
+# lo que llevas encima en gramos de flor: el rosin, como la flor de la que sale (1 g ↔ 1 / ROSIN.rend = 5 g). Ladrones y Darko
+func gramos_flor() -> float:
+	return total_buds() + total_rosin() / D.ROSIN.rend
 
 func rosin_lots(mn: float) -> Array:
 	var o := []
@@ -524,7 +550,7 @@ func on_step_end() -> void:
 			return
 	# ladrones al azar por paso; la policía ya no (1.10): patrulla por la calle (más abajo). Con la alarma, nada
 	if S.ch >= 2 and S.cool <= 0 and SOSP.alarma == null:
-		var g := total_buds()
+		var g := gramos_flor()   # el rosin también atrae ladrones (1.10)
 		var tall: bool = m.g[P.y][P.x] == "tallgrass"
 		var pt: float = .004 * (2.5 if is_night() else 1.0) * (3.0 if tall else 1.0) * Z.lad if (g >= 5 or S.money >= 150) else 0.0
 		if Cultivo.azar() < pt:
@@ -655,8 +681,8 @@ func object_action(x: int, y: int) -> void:
 				S.items.bocata += 1
 				await got("el táper de alubias de ama (1 × BOCATA)")
 				return
-			"bedT", "bedB":
-				await say("Tu cama de siempre, con la colcha de cuadros.")
+			"bedT", "bedB":   # si pierdes el último autobús
+				await bed_action("Tu cama de siempre, con la colcha de cuadros.")
 				return
 			"iwin":
 				await say("Por la ventana se ven el monte y la carretera de la comarca.")
@@ -869,6 +895,10 @@ func re_calle() -> RegEx:
 func n_patrullas() -> int:
 	var p = D.PATRULLAS.get(S.map)
 	return int(p[1 if is_night() else 0]) if p != null and S.ch >= 2 else 0
+
+# lo que enseña la barra del HUD: si cambia, el HUD se rehace sin esperar a su cuarto de segundo
+func sosp_hud():
+	return ("A" if SOSP.alarma != null else str(Datos.jsround(SOSP.v))) if n_patrullas() else ""
 
 func carga_sosp() -> float:
 	return total_buds() + total_rosin()
@@ -1209,7 +1239,7 @@ func start_menu():
 	pass
 func abrir_carpa(_ci):
 	pass
-func bed_action():
+func bed_action(_txt := ""):
 	pass
 func pc_action():
 	pass

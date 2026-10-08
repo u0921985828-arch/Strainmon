@@ -210,15 +210,17 @@ async function estabilizar(k){
   if(g+1>=GEN_ESTABLE){delete S.gen[k];sfx('get');addSeeds(k,1);await say(`${s.n} ya es una línea estable: todas sus plantas salen iguales.\nGuardas 1 semilla.`);}
   else{S.gen[k]=g+1;addSeeds(k,1);await say(`Guardas 1 semilla F${g+1} de ${s.n}: cultívala para tener más.\n${GEN_ESTABLE-g-1===1?'Falta una generación':'Faltan '+(GEN_ESTABLE-g-1)+' generaciones'} para fijarla.`);}
 }
-async function bedAction(){
-  const c=await ask('Tu cama. Todavía huele a la colonia de la tía.',['Dormir hasta las 7','Siesta de 3 h','Nada']);
+// la cama del piso y, desde la 1.10, la de casa de ama (txt): allí no hay robo de Darko ni aviso de plagas (las plantas están en el piso)
+async function bedAction(txt){
+  const piso=S.map==='home',c=await ask(txt||'Tu cama. Todavía huele a la colonia de la tía.',['Dormir hasta las 7','Siesta de 3 h','Nada']);
   if(c>1)return;
   await fade(1);
   const mins=c===1?180:(((7*60-S.min)+1440)%1440||1440),antes=S.pots.map(p=>p&&[!!p.pest,!!p.dead]);
   advanceTime(mins);S.hp=S.hpMax;buildEnts();updateHUD();await wait(500);await fade(0);
   const hoy=S.luz&&S.luz.d===S.day&&S.luz;
   save();toast('Has descansado'+(hoy&&hoy.e?' · Luz −'+eur(hoy.e):'')+(hoy&&hoy.o?' · Olor: calor +'+hoy.o:'')+' · Partida guardada',1800);
-  if(S.ch===7&&!S.flags.robo&&(S.money>1000||totalBuds()>100))await roboDarko();   // la amenaza de Darko (1.10)
+  if(!piso)return;
+  if(S.ch===7&&!S.flags.robo&&(S.money>1000||gramosFlor()>100))await roboDarko();   // la amenaza de Darko (1.10)
   await avisoPlaga(antes);
 }
 // al despertar (1.10): las plantas que han cogido plaga mientras dormías (y el insecticida que te queda), las que la siguen teniendo
