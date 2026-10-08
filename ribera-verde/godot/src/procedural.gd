@@ -406,8 +406,14 @@ static func foco34(id: String) -> Image:
 	cache[key] = t.im
 	return t.im
 
-# extras de la carpa: ventilador de pinza, filtro de carbón con su extractor y depósito de goteo; base en la última fila, centrada
+# extras de la carpa: ventilador de pinza, filtro de carbón con su extractor, depósito de goteo (el de 650 L) y garrafa (la de una
+# maceta de 25 L); base en la última fila, centrada
 static func extra34(k: String) -> Image:
+	var DD := Datos.carga()
+	if k == "goteo":
+		return deposito34(DD.GOTEO_X * 100)
+	if k == "garrafas":
+		return garrafa34(Datos.jsround(DD.GARRAFA_X * 25))
 	var key := "x34|" + k
 	if cache.has(key):
 		return cache[key]
@@ -430,15 +436,75 @@ static func extra34(k: String) -> Image:
 		t.F(30, 1, 2, 10, "#2a2b30")
 		t.blob(4, 6, 3.5, 3.5, "#3a3c44", "#1c1d22", "#6a6e78")
 		t.F(6, 4, 2, 4, "#a8aebb")
-	else:
-		t = Pintor.new(16, 24, 7)
-		t.F(1, 6, 14, 18, "#2e4a66")
-		t.F(1, 6, 14, 1, "#5a7a98")
-		t.F(1, 12, 14, 1, "#4a6a88")
-		t.F(2, 13, 12, 10, "#3a5a7c")
-		t.blob(8, 4, 7, 3, "#26303a", "#1c1d22", "#3a4a5a")
-		t.F(6, 0, 1, 4, "#1c1d22")
-		t.F(9, 0, 1, 4, "#1c1d22")
+	cache[key] = t.im
+	return t.im
+
+# el depósito del goteo de l litros, a su tamaño real: cilindro de pie, de alto 1,3 × el diámetro (en m; VB.M px/cm), con aros cada 20 cm
+static func deposito_px(l: float) -> Dictionary:
+	var VB: Dictionary = Datos.carga().VB
+	var d := pow(4 * l / 1000 / (1.3 * PI), 1.0 / 3)
+	return {"w": Datos.jsround(d * 100 * VB.M), "h": Datos.jsround(130 * d * VB.M), "e": maxi(3, Datos.jsround(22 * d * VB.M))}
+
+static func deposito34(l: float) -> Image:
+	var key := "dep|" + Datos.js_num(l)
+	if cache.has(key):
+		return cache[key]
+	var dp := deposito_px(l)
+	var w: int = dp.w
+	var h: int = dp.h
+	var e: int = dp.e
+	var t := Pintor.new(w, h + e, 7)
+	var r := w / 2.0
+	var ry := e / 2.0
+	var dentro := func(px: int, py: int, cy: float, ryy: float) -> bool:
+		var dx := (px + .5 - r) / r
+		var dy := (py + .5 - cy) / ryy
+		return dx * dx + dy * dy <= 1
+	for py in h + e:
+		for px in w:
+			if (py >= ry and py <= ry + h) or dentro.call(px, py, ry + h, ry):   # cuerpo y fondo redondo: luz a la izquierda, sombra a la derecha
+				var c := "#2e4a66"
+				if py > ry + 4 and Datos.jsround(py - ry) % 12 == 0:
+					c = "#26405a"
+				elif px < w * .12:
+					c = "#4a6a88"
+				elif px < w * .22:
+					c = "#3a5a7c"
+				elif px > w * .85:
+					c = "#24384e"
+				t.P(px, py, c)
+	for py in e:   # la tapa, con su boca
+		for px in w:
+			if dentro.call(px, py, ry, ry):
+				t.P(px, py, "#5a7a98")
+	t.F(Datos.jsround(r) - 2, Datos.jsround(ry) - 1, 4, 2, "#1c1d22")
+	cache[key] = t.im
+	return t.im
+
+# una garrafa de l litros, a su tamaño real (ancho 0,7 × el alto; fondo 0,5): plástico blanco, asa y tapón con el gotero
+static func garrafa_px(l: float) -> Dictionary:
+	var VB: Dictionary = Datos.carga().VB
+	var a := pow(l / 1000 / (.7 * .5 * .85), 1.0 / 3)
+	return {"w": Datos.jsround(70 * a * VB.M), "h": Datos.jsround(100 * a * VB.M)}
+
+static func garrafa34(l: float) -> Image:
+	var key := "gar|" + Datos.js_num(l)
+	if cache.has(key):
+		return cache[key]
+	var gp := garrafa_px(l)
+	var w: int = gp.w
+	var h: int = gp.h
+	var o := "#7a8690"
+	var a := maxi(3, Datos.jsround(w * .45))
+	var t := Pintor.new(w, h, 8)
+	t.F(0, 3, w, h - 3, o)
+	t.F(1, 4, w - 2, h - 5, "#dfe6ea")
+	t.F(2, 5, 1, h - 8, "#f6f9fa")
+	t.F(1, 0, a, 1, o)
+	t.F(1, 1, 1, 3, o)
+	t.F(a, 1, 1, 3, o)
+	t.F(w - 4, 0, 3, 3, "#3a6aa8")
+	t.F(w - 4, 0, 3, 1, "#6a9ad8")
 	cache[key] = t.im
 	return t.im
 

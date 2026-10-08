@@ -52,7 +52,7 @@ const OUT = path.join(ROOT, 'art', 'crudo', '_ref');
     out['huella-carpas-mapa-5'] = dieciseis(lamina(32, 48, 5, Object.keys(CARPAS).map(carpaMapa)));
     out['huella-focos-34'] = dieciseis(lamina(64, 16, 4, Object.keys(FOCOS).map(foco34), true));
     out['huella-macetas-34'] = dieciseis(lamina(24, 24, 4, Object.keys(MACETAS).map(maceta34)));
-    out['huella-extras-34'] = dieciseis(lamina(32, 32, 3, ['vent', 'filtro', 'goteo'].map(extra34)));
+    out['huella-extras-34'] = dieciseis(lamina(60, 80, 4, ['vent', 'filtro', 'goteo', 'garrafas'].map(extra34)));
     for (const [po, n] of [['i', 'indica'], ['s', 'sativa'], ['h', 'hibrida']])
       out['huella-plantas-34-' + n] = dieciseis(lamina(48, 80, 5, [0, 1, 2, 3, 4].map(st => planta34(po, st, false, MAG))));
     return out;

@@ -2214,15 +2214,36 @@ function foco34(id){
   else{t.F(1,5,w,1,'#3a3c44');t.F(1,6,w,3,'#1c1d22');t.F(2,7,w-2,1,'#2a2b30');const d=['#ff70c0','#f4f0ff','#c070ff'];for(let i=0;i<Math.floor(w/3);i++)t.F(2+i*3,9,2,1,d[i%3]);t.F(cx-3,4,6,1,'#5a5e68');}
   return carpaCache[key]=c;
 }
-// extras de la carpa (1.10): ventilador de pinza, filtro de carbón con su extractor y depósito de goteo; base en la última fila, centrada
+// extras de la carpa (1.10): ventilador de pinza, filtro de carbón con su extractor, depósito de goteo (el de 650 L) y garrafa (la de
+// una maceta de 25 L); base en la última fila, centrada
 function extra34(k){
+  if(k==='goteo')return deposito34(GOTEO_X*100);if(k==='garrafas')return garrafa34(Math.round(GARRAFA_X*25));
   const key='x34|'+k;if(carpaCache[key])return carpaCache[key];let c,x,t;
   if(k==='vent'){[c,x]=mkCanvas(11,14);t=painter(x,rngSeed(5));t.blob(5.5,5,5,5,'#c8ccd6','#3a3c44','#e8eaf0');t.blob(5.5,5,1.6,1.6,'#5a5e68','#2a2b30');
     for(const [a,b] of [[2,2],[8,2],[2,8],[8,8]])t.P(a,b,'#8a8e98');t.F(5,10,1,2,'#3a3c44');t.F(3,12,5,2,'#2a2b30');}   // aspas, eje y pinza
   else if(k==='filtro'){[c,x]=mkCanvas(32,12);t=painter(x,rngSeed(6));t.F(8,1,24,10,'#4a4c54');for(let i=9;i<31;i+=2)t.F(i,2,1,8,'#5e6068');
     t.F(8,1,24,1,'#6a6e78');t.F(8,10,24,1,'#2a2b30');t.F(30,1,2,10,'#2a2b30');t.blob(4,6,3.5,3.5,'#3a3c44','#1c1d22','#6a6e78');t.F(6,4,2,4,'#a8aebb');}   // filtro, extractor y abrazadera
-  else{[c,x]=mkCanvas(16,24);t=painter(x,rngSeed(7));t.F(1,6,14,18,'#2e4a66');t.F(1,6,14,1,'#5a7a98');t.F(1,12,14,1,'#4a6a88');t.F(2,13,12,10,'#3a5a7c');   // depósito y nivel del agua
-    t.blob(8,4,7,3,'#26303a','#1c1d22','#3a4a5a');t.F(6,0,1,4,'#1c1d22');t.F(9,0,1,4,'#1c1d22');}   // tapa y tubos
+  return carpaCache[key]=c;
+}
+// el depósito del goteo de l litros, a su tamaño real: cilindro de pie, de alto 1,3 × el diámetro (en m; VB_M px/cm), con aros cada 20 cm; lienzo w × (h + e)
+const depositoPx=l=>{const d=Math.pow(4*l/1000/(1.3*Math.PI),1/3);return {w:Math.round(d*100*VB_M),h:Math.round(130*d*VB_M),e:Math.max(3,Math.round(22*d*VB_M))};};
+function deposito34(l){
+  const key='dep|'+l;if(carpaCache[key])return carpaCache[key];
+  const {w,h,e}=depositoPx(l),[c,x]=mkCanvas(w,h+e),t=painter(x,rngSeed(7)),r=w/2,ry=e/2;
+  const dentro=(px,py,cy,ryy)=>{const dx=(px+.5-r)/r,dy=(py+.5-cy)/ryy;return dx*dx+dy*dy<=1;};
+  for(let py=0;py<h+e;py++)for(let px=0;px<w;px++)if((py>=ry&&py<=ry+h)||dentro(px,py,ry+h,ry))   // cuerpo y fondo redondo: luz a la izquierda, sombra a la derecha
+    t.P(px,py,py>ry+4&&Math.round(py-ry)%12===0?'#26405a':px<w*.12?'#4a6a88':px<w*.22?'#3a5a7c':px>w*.85?'#24384e':'#2e4a66');
+  for(let py=0;py<e;py++)for(let px=0;px<w;px++)if(dentro(px,py,ry,ry))t.P(px,py,'#5a7a98');   // la tapa, con su boca
+  t.F(Math.round(r)-2,Math.round(ry)-1,4,2,'#1c1d22');
+  return carpaCache[key]=c;
+}
+// una garrafa de l litros, a su tamaño real (ancho 0,7 × el alto; fondo 0,5): plástico blanco, asa y tapón con el gotero; lienzo w × h
+const garrafaPx=l=>{const a=Math.pow(l/1000/(.7*.5*.85),1/3);return {w:Math.round(70*a*VB_M),h:Math.round(100*a*VB_M)};};
+function garrafa34(l){
+  const key='gar|'+l;if(carpaCache[key])return carpaCache[key];
+  const {w,h}=garrafaPx(l),[c,x]=mkCanvas(w,h),t=painter(x,rngSeed(8)),o='#7a8690',a=Math.max(3,Math.round(w*.45));
+  t.F(0,3,w,h-3,o);t.F(1,4,w-2,h-5,'#dfe6ea');t.F(2,5,1,h-8,'#f6f9fa');
+  t.F(1,0,a,1,o);t.F(1,1,1,3,o);t.F(a,1,1,3,o);t.F(w-4,0,3,3,'#3a6aa8');t.F(w-4,0,3,1,'#6a9ad8');
   return carpaCache[key]=c;
 }
 
@@ -2233,8 +2254,9 @@ function renderCarpa(now){
   fondoAncho(cuarto34());
   ctx.save();ctx.translate(OX(),0);
   // el depósito del goteo, fuera de la carpa: en 3/4, al pie de la pared y detrás; de frente, a su lado y con el tubo por la puerta
-  const goteo=()=>{const e=extra34('goteo'),gx=g.x0+g.w+g.s+12,gy=g.plata?g.yf:VB_PARED+8;ctx.drawImage(e,gx-(e.width>>1),gy-e.height+1);
-    const [tx,ty]=P(W-6,D*.7,4);ctx.fillStyle='#1c1d22';ctx.fillRect(tx,gy-e.height+1,gx-tx-1,1);ctx.fillRect(tx,gy-e.height+1,1,ty-(gy-e.height+1));};
+  // (de su tamaño real: su capacidad, goteoL; el tubo sale a 40 cm del suelo)
+  const goteo=()=>{const e=deposito34(goteoL(VC.ci)),gl=g.x0+g.w+g.s+4,gy=g.plata?g.yf:VB_PARED+8,y0=gy-Math.round(40*VB_M);ctx.drawImage(e,gl,gy-e.height+1);
+    const [tx,ty]=P(W-6,D*.7,4);ctx.fillStyle='#1c1d22';ctx.fillRect(tx,y0,gl-tx,1);ctx.fillRect(tx,Math.min(y0,ty),1,Math.abs(ty-y0));};
   if(c.goteo&&!g.plata)goteo();
   if(g.plata)pinta(g.plata,120,157);else{const cv=carpa34(c.t);ctx.drawImage(cv,g.x0-1,g.yf+2-cv.height);}
   if(c.goteo&&g.plata)goteo();
@@ -2260,8 +2282,12 @@ function renderCarpa(now){
 }
 // maceta y planta de una plaza (q.alto: lo que se ve por encima del suelo, para la flecha)
 function vcPlanta(q,now){
-  const p=S.pots[q.i],k=S.macetas[q.i],m=maceta34(k),{e,hb}=macetaPx(k);
-  ctx.drawImage(m,q.x-(m.width>>1),q.y-Math.round(e/2+hb));q.alto=hb+Math.round(e/2);
+  const p=S.pots[q.i],k=S.macetas[q.i],m=maceta34(k),{e,hb}=macetaPx(k),ca=S.carpas[huecos()[q.i].c];
+  // su garrafa (sin goteo), detrás a la derecha, con el agua que le queda; el tubo del gotero va del tapón a la tierra de la maceta
+  const gar=ca.garrafas&&!ca.goteo,gr=gar&&garrafa34(garrafaL(q.i)),gx=q.x+(m.width>>1)-4,gy=q.y-1-(gr?gr.height:0),rim=q.y-Math.round(e/2+hb);
+  if(gar){const n=Math.round((gr.height-5)*garrafa(q.i)/garrafaL(q.i));ctx.drawImage(gr,gx,gy);ctx.fillStyle='#9ab8cc';ctx.fillRect(gx+1,gy+gr.height-1-n,gr.width-2,n);}
+  ctx.drawImage(m,q.x-(m.width>>1),rim);q.alto=hb+Math.round(e/2);
+  if(gar){ctx.fillStyle='#1c1d22';ctx.fillRect(q.x+3,gy-1,gx+gr.width-q.x-5,1);if(rim+2>gy-1)ctx.fillRect(q.x+3,gy-1,1,rim+2-(gy-1));}
   if(!p)return;
   const s=getStrain(p.sid),st=p.dead?9:plantStage(p),pc=planta34(portePlanta(p),st,!p.dead&&p.water<=0,s?s.c:'#9bd35a',q.cw,q.ch),yb=q.y-hb+1;
   q.alto+=altoPlanta(p,q);

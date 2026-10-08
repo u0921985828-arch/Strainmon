@@ -805,16 +805,17 @@ func _carpa_fondo() -> void:
 		_img(e, p[0], p[1] - e.get_height() + 1)
 
 # el depósito del goteo, fuera de la carpa: en 3/4, al pie de la pared y detrás; de frente, a su lado y con el tubo por la puerta
+# (de su tamaño real: su capacidad, goteo_l; el tubo sale a 40 cm del suelo)
 func _goteo() -> void:
-	var e := Procedural.extra34("goteo")
-	var gx: int = g.x0 + g.w + g.s + 12
+	var e := Procedural.deposito34(Cultivo.goteo_l(J.S, J.VC.ci))
+	var gl: int = g.x0 + g.w + g.s + 4
 	var gy: int = g.yf if g.has("plata") else int(J.D.VB.PARED) + 8
-	_img(e, gx - (e.get_width() >> 1), gy - e.get_height() + 1)
+	var y0: int = gy - Datos.jsround(40 * J.D.VB.M)
+	_img(e, gl, gy - e.get_height() + 1)
 	var tp: Array = Vista.punto(g, g.W - 6, g.D * .7, 4)
 	var osc := css("#1c1d22")
-	var y0 := gy - e.get_height() + 1
-	_rect(tp[0], y0, gx - tp[0] - 1, 1, osc)
-	_rect(tp[0], y0, 1, tp[1] - y0, osc)
+	_rect(tp[0], y0, gl - tp[0], 1, osc)
+	_rect(tp[0], mini(y0, tp[1]), 1, absi(tp[1] - y0), osc)
 
 # el cono de luz del foco encendido (dentro de la carpa): trapecio con degradado vertical, sumado ('lighter')
 func _cono() -> void:
@@ -885,7 +886,14 @@ func _img_clip(im: Image, x: int, y: int, src: Rect2i, clip: Rect2i, mod: Color)
 	var s := Rect2i(src.position + dst.position - Vector2i(x, y), dst.size)
 	L.draw_texture_rect_region(Atlas.tex(im), Rect2(dst), Rect2(s), mod)
 
-# maceta y planta de una plaza
+# un rectángulo recortado al de la carpa
+func _rect_clip(x: int, y: int, w: int, h: int, col: Color, clip: Rect2i) -> void:
+	var r := Rect2i(x, y, w, h).intersection(clip)
+	if r.size.x > 0 and r.size.y > 0:
+		_rect(r.position.x, r.position.y, r.size.x, r.size.y, col)
+
+# maceta y planta de una plaza; con garrafas (sin goteo), su garrafa detrás a la derecha, con el agua que le queda, y el tubo del
+# gotero del tapón a la tierra de la maceta
 func _planta_b(q: Dictionary, al: float, clip: Rect2i) -> void:
 	var S: Dictionary = J.S
 	var p = S.pots[q.i]
@@ -893,7 +901,22 @@ func _planta_b(q: Dictionary, al: float, clip: Rect2i) -> void:
 	var m := Procedural.maceta34(k)
 	var mp := Procedural.maceta_px(k)
 	var mod := Color(1, 1, 1, al)
-	_img_clip(m, q.x - (m.get_width() >> 1), q.y - Datos.jsround(mp.e / 2.0 + mp.hb), Rect2i(Vector2i.ZERO, m.get_size()), clip, mod)
+	var ca: Dictionary = S.carpas[Cultivo.huecos(S)[q.i].c]
+	var gar: bool = ca.get("garrafas", false) and not ca.get("goteo", false)
+	var gr: Image = Procedural.garrafa34(Cultivo.garrafa_l(S, q.i)) if gar else null
+	var gx: int = q.x + (m.get_width() >> 1) - 4
+	var gy: int = q.y - 1 - (gr.get_height() if gar else 0)
+	var rim: int = q.y - Datos.jsround(mp.e / 2.0 + mp.hb)
+	if gar:
+		var nn := Datos.jsround((gr.get_height() - 5) * Cultivo.garrafa(S, q.i) / Cultivo.garrafa_l(S, q.i))
+		_img_clip(gr, gx, gy, Rect2i(Vector2i.ZERO, gr.get_size()), clip, mod)
+		_rect_clip(gx + 1, gy + gr.get_height() - 1 - nn, gr.get_width() - 2, nn, Color(css("#9ab8cc"), al), clip)
+	_img_clip(m, q.x - (m.get_width() >> 1), rim, Rect2i(Vector2i.ZERO, m.get_size()), clip, mod)
+	if gar:
+		var tu := Color(css("#1c1d22"), al)
+		_rect_clip(q.x + 3, gy - 1, gx + gr.get_width() - q.x - 5, 1, tu, clip)
+		if rim + 2 > gy - 1:
+			_rect_clip(q.x + 3, gy - 1, 1, rim + 2 - (gy - 1), tu, clip)
 	if p == null:
 		return
 	var s = Datos.strain(S, p.sid)

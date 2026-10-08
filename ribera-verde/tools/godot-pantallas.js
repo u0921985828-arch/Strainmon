@@ -87,6 +87,11 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
   { k: 'carpa-b-p80', sw: 360, mode: 'carpa', now: T + 99, S: { ch: 4, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },
     carpas: [{ t: 'p80', foco: 'led200' }], macetas: ['plastico18', 'plastico7', 'plastico7'],
     pots: { 0: pl('acapulco', .66), 1: null, 2: pl('rif', 1, { f: { id: 4, t: 1, y: 1, i: 20 } }) }, VC: { ci: 0, sel: -1 } },
+  // carpa 100 con LED (vista B) y garrafas: una por maceta, de su tamaño (5, 7, 12 y 16 L), llena, a medias, vacía y a un 62 %; el depósito
+  // del goteo de la de 150 (975 L) sale en carpa-b-g150
+  { k: 'carpa-b-garrafas', sw: 320, mode: 'carpa', now: T + 777, S: { ch: 4, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },
+    carpas: [{ t: 'm100', foco: 'led480', garrafas: true, gar: [null, 3, 0, 10] }], macetas: ['plastico7', 'tela11', 'plastico18', 'tela25'],
+    pots: { 0: pl('ria', .6), 1: pl('limon', .9), 3: pl('kif', .3) }, VC: { ci: 0, sel: 1 } },
   // la vista C dentro del lienzo de 320 con un efecto encima
   { k: 'carpa-c', sw: 320, mode: 'carpa', now: T + 2500, S: { ch: 4, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },
     carpas: [{ t: 'm100', foco: 'sodio400' }], pots: { 0: pl('txoko', 1), 1: pl('limon', .8, { pest: true }), 2: pl('ria', .4) },

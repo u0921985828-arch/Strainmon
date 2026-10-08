@@ -285,7 +285,7 @@ ${legend}
   m += `\n## Carteles\n\n`;
   for (const [k, v] of Object.entries(D.signs)) m += `- **${k}** — ${v.replace(/\n/g, ' · ')}\n`;
   m += `\n## Tienda de Kiko\n\n| Artículo | Precio | Desde cap. | Nota |\n|---|---|---|---|\n`;
-  for (const s of D.shop) m += `| ${s.lbl} | ${s.p} € | ${s.ch} | ${s.desc} |\n`;
+  for (const s of D.shop) m += `| ${s.lbl} | ${n0(s.p)} € | ${s.ch} | ${s.desc} |\n`;
   fs.writeFileSync(path.join(ROOT, 'docs/MAPA.md'), m);
   console.log('docs/GENETICA.md, docs/ECONOMIA.md y docs/MAPA.md regenerados');
 })();

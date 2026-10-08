@@ -191,7 +191,7 @@ Para la vista B, las huellas salen del arte procedural del motor (P2): `npm run 
 | 3 | `carpas-mapa` (rehecha) | las 5 carpas cerradas del piso, con la puerta de cremallera | 160 × 48 | `carpa_mapa` 32 × 48, (16, 47) | 1 | 2 |
 | 4 | `focos-34` | CFL, 3 de sodio y 4 LED (100, 200, 480 y 720), apagados | 192 × 32 (4 × 2) | `foco34` 48 × 16, (24, 0) | 1 | 2 |
 | 5 | `macetas-34` | las 4 macetas con tierra y su plato | 96 × 24 | `maceta34` 24 × 24, (12, 23) | 1 | 2 |
-| 6 | `extras-34` | ventilador de pinza, extractor con filtro y depósito de goteo | 96 × 32 | `extra34` 32 × 32, (16, 31) | 1 | 2 |
+| 6 | `extras-34` | ventilador de pinza, extractor con filtro y depósito de goteo (1.10: el depósito y las garrafas van a su tamaño real por litros, de 37 × 56 a 59 × 90 y de 11 × 15 a 16 × 23 px; siguen procedurales; la huella, con la garrafa de 16 L y el depósito de 650 L) | 240 × 80 | `extra34` 60 × 80, (30, 79) | 1 | 2 |
 | 7–9 | `plantas-34-indica` / `-sativa` / `-hibrida` | 5 fases en fila (germinando → lista), cogollos en magenta | 240 × 80 cada una | `planta34` 48 × 80, (24, 79) | 3 | 6 |
 | 10 | balanceo | 3 fases (vegetativo, floración y lista) × 3 portes, 4 fotogramas, con `animate_image` | — | `planta34` | 9 | 9 |
 | 11 | ventilador | aspas girando, 4 fotogramas, con `animate_image` | — | `extra34` | 1 | 1 |

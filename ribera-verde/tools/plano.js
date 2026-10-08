@@ -28,7 +28,7 @@ const REAL = {
     ['Maceta 25 L', 'm34:tela25', 'ancho', .35, 60], ['CFL 125', 'f34:cfl', 'ancho', .35, 60], ['Sodio 250', 'f34:sodio250', 'ancho', .45, 60],
     ['Sodio 400', 'f34:sodio400', 'ancho', .5, 60], ['Sodio 600', 'f34:sodio600', 'ancho', .55, 60], ['LED 100', 'f34:led100', 'ancho', .25, 60],
     ['LED 200', 'f34:led200', 'ancho', .3, 60], ['LED 480', 'f34:led480', 'ancho', .6, 60], ['LED 720', 'f34:led720', 'ancho', 1.0, 60],
-    ['Ventilador', 'x34:vent', 'ancho', .2, 60], ['Filtro y extractor', 'x34:filtro', 'ancho', .65, 60], ['Depósito de goteo', 'x34:goteo', 'alto', .5, 60]],
+    ['Ventilador', 'x34:vent', 'ancho', .2, 60], ['Filtro y extractor', 'x34:filtro', 'ancho', .65, 60], ['Depósito de goteo (650 L)', 'x34:goteo', 'alto', 1.12, 60], ['Garrafa (16 L)', 'x34:garrafas', 'alto', .38, 60]],
   // plantas de la vista B por porte; germinando y plántula, estilizadas a ×2 (plan de producción, §4)
   plantas: ['i', 's', 'h'].flatMap(po => [['Germinando', 0, .05], ['Plántula', 1, .15], ['Vegetativo', 2], ['Floración', 3], ['Lista', 4]]
     .map(([n, st, r]) => [`${n} (${{ i: 'índica', s: 'sativa', h: 'híbrida' }[po]})`, `p34:${po}${st}`, 'alto', r || { i: [0, 0, .35, .55, .65], s: [0, 0, .45, .75, .9], h: [0, 0, .4, .6, .7] }[po][st], 60])),

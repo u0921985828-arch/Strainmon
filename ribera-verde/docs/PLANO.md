@@ -115,7 +115,8 @@ En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho del suelo de de
 |  | LED 720 | 60×6 | ancho | 1 m | 1 m | ×1,00 |
 |  | Ventilador | 9×14 | ancho | 0,15 m | 0,2 m | ×0,75 |
 |  | Filtro y extractor | 31×10 | ancho | 0,52 m | 0,65 m | ×0,79 |
-|  | Depósito de goteo | 14×24 | alto | 0,4 m | 0,5 m | ×0,80 |
+|  | Depósito de goteo (650 L) | 52×78 | alto | 1,3 m | 1,12 m | ×1,16 |
+|  | Garrafa (16 L) | 16×23 | alto | 0,38 m | 0,38 m | ×1,01 |
 |  | Germinando (índica) | 9×6 | alto | 0,1 m | 0,05 m | **×2,00** |
 |  | Plántula (índica) | 10×19 | alto | 0,32 m | 0,15 m | **×2,11** |
 |  | Vegetativo (índica) | 24×21 | alto | 0,35 m | 0,35 m | ×1,00 |
