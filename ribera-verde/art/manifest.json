@@ -6351,7 +6351,7 @@
    "herramienta": "importado",
    "origen": "tools/sprites/a-mano/carpa_c.py: la pared dibujada en código (mylar plateado con vetas verticales, laterales más oscuros hacia delante, bandeja blanca con rejilla y el armazón negro) con la geometría de la imagen A; la luz, la de la imagen A sin los brillos de las cortinas y con el cono liso (resplandor bajo la boca y haz central, en sus tonos)",
    "descripcion": "la carpa por dentro (vista C): pared del fondo, laterales y suelo de tela plateada con el armazón negro, como las carpas del piso y de la vista B; la luz del foco en su capa",
-   "aprobado": "2026-10-08: «prueba B» (p60 con CFL, m100 con sodio 400 y g150 con sodio 600, antes y después), aprobada por la persona: «Me gustan más los plateados»",
+   "aprobado": "2026-10-08: «prueba B» (p60 con CFL, m100 con sodio 400 y g150 con sodio 600, antes y después), aprobada por la persona: «Me gustan más los plateados». 2026-10-08: la luz lisa (sin la textura de las cortinas; sodio, LED y CFL), aprobada: «Perfect»",
    "historial": {
     "herramienta": "edit_image_pixen",
     "parametros": {
