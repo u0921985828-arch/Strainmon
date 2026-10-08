@@ -1,7 +1,8 @@
 # python3 -I tools/sprites/a-mano/equipo_c.py  (Python 3 + Pillow; no va en los scripts de npm)
 # El equipo de la vista C que faltaba (1.10, P3), dibujado a mano con la paleta de la campana y la maceta aprobadas (imagen A):
 #  · carpa-c-focos-led: los LED a su ancho en cada carpa (FOCO_CM × Z: 1,02 en la de 60, 0,88 en la de 80 y 0,78 en las de 200 cm),
-#    vistos de frente y algo desde abajo (como la campana: se ve la cara que alumbra), colgados de sus cuerdas con trinquete; y el CFL
+#    todos de barras (1.10: como los de 720 W de 8 barras; 3, 4, 6 y 8 barras), vistos de frente y algo desde abajo (como la campana:
+#    se ve la cara que alumbra), colgados de sus cuerdas con trinquete; y el CFL
 #    de las carpas de 200 cm (foco-c-cfl-25), la campana aprobada (foco-c-cfl-36) con columnas y filas quitadas, sin colores nuevos.
 #    Celda foco_c (48 × 16) y, los de 480 y 720 (carpa-c-focos-led-ancho), foco_c_ancho (80 × 16): la boca en la última fila, centrada (ajuste exacto).
 #  · carpa-c-macetas-b: tela de 11 L (gris), plástico de 18 L (la de 7 L aprobada, más ancha y más alta) y tela de 25 L (beis),
@@ -17,7 +18,7 @@ from PIL import Image
 K = '#000000'                                                  # contorno (el de la campana y la maceta)
 M0, M1, M2, M3, MC = '#202e34', '#304046', '#3d4c4e', '#7a8584', '#655a48'   # metal de la campana: sombra, medio, luz, brillo y reflejo cálido
 C0, C1 = '#1c1d22', '#3a3c44'                                  # cuerda y trinquete
-LB, LR, LP = '#ffffff', '#f8d8ff', '#f8c0f8'                   # diodos encendidos: blanco, rosa claro y rosa (apagados, gris: vcApagado)
+LB, LR = '#ffffff', '#f8d8ff'                                 # diodos encendidos: blanco y rosa claro (apagados, gris: vcApagado)
 SAL = {}                                                       # grupo → {sprite: [Lienzo, …]}
 
 def sale(grupo, n, *fs):
@@ -29,68 +30,33 @@ def cuerdas(L, xs, y1, tr=True):   # cuerdas del techo (fila 0) a la fila y1, co
         if tr: L.r(x - 1, 3, 3, 2, C1); L.p(x - 1, 3, M3)
 
 # ---------- focos LED ----------
-def diodos(L, x0, x1, y0, n=2, paso=3):   # la cara que alumbra, vista desde abajo: n filas de diodos en rejilla
-    for y in range(y0, y0 + n):
-        for x in range(x0, x1 + 1):
-            k = (x - x0 + (y - y0) * (paso // 2 + 1)) % paso
-            L.p(x, y, LB if k == 0 else (LR if k == 1 else LP))
-
-def panel(w, alto, cw=48, driver=False):
-    """LED 100 y 200: panel cuadrado de alto filas de frente (con disipador de aletas arriba) y 2 filas de diodos debajo"""
-    L = Lienzo(cw, 16); x0 = (cw - w) // 2; x1 = x0 + w - 1; yt = 14 - alto
-    cuerdas(L, (x0 + 2, x1 - 2), yt - 1)
-    if driver:   # la fuente encima, con su cable
-        dw = max(6, w // 3); dx = (cw - dw) // 2
-        L.caja(dx, yt - 4, dw, 4, M1, K); L.hl(dx + 1, dx + dw - 2, yt - 3, M2); L.p(dx + dw - 2, yt - 2, '#e8644c')
-    for x in range(x0 + 1, x1):   # aletas del disipador
-        L.p(x, yt, K if (x - x0) % 2 else M2)
-    L.caja(x0, yt + 1, w, alto - 1, M1, K)
-    L.hl(x0 + 1, x1 - 1, yt + 2, M2); L.p(x0 + 1, yt + 2, M3)
-    for y in range(yt + 3, 14): L.p(x0 + 1, y, M2); L.p(x1 - 1, y, M0)
-    if alto >= 6: L.hl(x0 + 2, x1 - 2, 12, M0)
-    L.p(x0, 14, K); L.p(x1, 14, K); L.p(x0, 15, K); L.p(x1, 15, K)
-    diodos(L, x0 + 1, x1 - 1, 14)
-    return L
-
-def placa(w, cw=48):
-    """LED 480: placa grande (quantum board) en su marco de aluminio, con la fuente encima y 4 cuerdas (se ven 2)"""
-    L = Lienzo(cw, 16); x0 = (cw - w) // 2; x1 = x0 + w - 1
-    cuerdas(L, (x0 + 3, x1 - 3), 9)
-    dw = 12; dx = (cw - dw) // 2
-    L.caja(dx, 6, dw, 4, M1, K); L.hl(dx + 1, dx + dw - 2, 7, M2); L.p(dx + dw - 3, 8, '#e8644c'); L.p(dx + 2, 8, M3)
-    L.hl(x0, x1, 10, K)
-    for x in range(x0 + 1, x1):   # el marco: aletas arriba
-        L.p(x, 10, K if (x - x0) % 3 == 0 else M2)
-    L.hl(x0, x1, 11, K); L.hl(x0 + 1, x1 - 1, 12, M1); L.hl(x0 + 1, x1 - 1, 11, M3 if False else M2)
-    L.p(x0, 12, K); L.p(x1, 12, K)
-    L.hl(x0 + 1, x1 - 1, 13, '#2a6a3a')   # la placa verde de canto
-    L.p(x0, 13, K); L.p(x1, 13, K)
-    for y in (14, 15): L.p(x0, y, K); L.p(x1, y, K)
-    diodos(L, x0 + 1, x1 - 1, 14, 2, 2)
-    return L
-
-def barras(w, cw=80):
-    """LED 720: marco ancho con 6 barras de fondo a fondo; de frente se ve el travesaño, la fuente y la punta de cada barra con su cara de diodos"""
-    L = Lienzo(cw, 16); x0 = (cw - w) // 2; x1 = x0 + w - 1
-    cuerdas(L, (x0 + 2, x1 - 2), 7)
-    dw = 14; dx = (cw - dw) // 2
-    L.caja(dx, 4, dw, 4, M1, K); L.hl(dx + 1, dx + dw - 2, 5, M2); L.p(dx + dw - 3, 6, '#e8644c'); L.p(dx + 2, 6, M3)
-    L.caja(x0, 8, w, 3, M1, K); L.hl(x0 + 1, x1 - 1, 9, M2)    # travesaño de delante
-    bw = 6
-    for i in range(6):
-        bx = x0 + round(i * (w - bw) / 5)
-        L.caja(bx, 10, bw, 4, M1, K); L.hl(bx + 1, bx + bw - 2, 11, M2); L.p(bx + 1, 12, M3)
-        L.p(bx, 14, K); L.p(bx + bw - 1, 14, K); L.p(bx, 15, K); L.p(bx + bw - 1, 15, K)
-        diodos(L, bx + 1, bx + bw - 2, 14, 2, 2)
+def barras(w, n, cw=48, driver=True):
+    """LED de barras (como los de 720 W de 8 barras): n barras de fondo a fondo, delgadas y con aire entre ellas, unidas por el
+    travesaño de delante y colgadas de 4 cuerdas (se ven 2); la fuente, encima en el centro. De frente y algo desde abajo: el travesaño,
+    la punta de cada barra y su cara de diodos encendida (blanca y rosa), y entre barra y barra se ve el techo de la carpa"""
+    L = Lienzo(cw, 16); x0 = (cw - w) // 2; x1 = x0 + w - 1; bw = 5 if w >= 60 else 4
+    cuerdas(L, (x0 + 1, x1 - 1), 10)
+    if driver:
+        dw = max(6, round(w * .18)); dx = (cw - dw) // 2
+        L.caja(dx, 6, dw, 4, M1, K); L.hl(dx + 1, dx + dw - 2, 7, M2); L.p(dx + dw - 2, 8, '#e8644c'); L.p(dx + 1, 8, M3)
+    L.hl(x0, x1, 10, K); L.hl(x0 + 1, x1 - 1, 11, M2); L.p(x0, 11, K); L.p(x1, 11, K); L.p(x0 + 1, 11, M3)   # travesaño
+    L.hl(x0, x1, 12, K)
+    for i in range(n):
+        bx = x0 + round(i * (w - bw) / (n - 1)); bx1 = bx + bw - 1
+        L.hl(bx + 1, bx1 - 1, 12, M1)                                     # la punta de la barra, bajo el travesaño
+        for y in (12, 13, 14, 15): L.p(bx, y, K); L.p(bx1, y, K)
+        for y in (13, 14, 15):                                            # su cara: diodos blancos (espectro completo) con algún rosa
+            for x in range(bx + 1, bx1): L.p(x, y, LR if (x + 2 * y) % 3 == 0 else LB)
     return L
 
 # LED 100 (25 cm): 26 en la de 60, 22 en la de 80, 20 en las de 200 · LED 200 (30 cm): 31, 26 y 23 · 480 (60): 47 · 720 (100): 78
-sale('carpa-c-focos-led', 'foco-c-led100-26', panel(26, 5))
-sale('carpa-c-focos-led', 'foco-c-led100-20', panel(20, 4))
-sale('carpa-c-focos-led', 'foco-c-led200-30', panel(30, 6, driver=True))
-sale('carpa-c-focos-led', 'foco-c-led200-24', panel(24, 5, driver=True))
-sale('carpa-c-focos-led-ancho', 'foco-c-led480-47', placa(47, 80))   # 47 no cabe en la de 48 sin tocar el borde
-sale('carpa-c-focos-led-ancho', 'foco-c-led720-78', barras(78))
+# todos de barras: 3 el de 100, 4 el de 200, 6 el de 480 y 8 el de 720
+sale('carpa-c-focos-led', 'foco-c-led100-26', barras(26, 3, driver=False))
+sale('carpa-c-focos-led', 'foco-c-led100-20', barras(20, 3, driver=False))
+sale('carpa-c-focos-led', 'foco-c-led200-30', barras(30, 4))
+sale('carpa-c-focos-led', 'foco-c-led200-24', barras(24, 4))
+sale('carpa-c-focos-led-ancho', 'foco-c-led480-47', barras(47, 6, 80))   # 47 no cabe en la de 48 sin tocar el borde
+sale('carpa-c-focos-led-ancho', 'foco-c-led720-78', barras(78, 8, 80))
 
 # CFL de las carpas de 200 cm (35 cm × 0,78 = 27): la campana aprobada sin 9 columnas ni 3 filas (repartidas, ni el contorno ni el
 # tubo), 25 px (con 27, el armario 80, de 31, se quedaría esta y no la de 34); sin colores nuevos

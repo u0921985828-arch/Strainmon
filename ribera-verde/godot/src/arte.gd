@@ -257,7 +257,7 @@ static func luz_k(vc: Dictionary) -> float:
 	return maxf(1, vc.foco.a / 46.0)
 
 static func fondo(t: String, vc: Dictionary, capa: String) -> Image:
-	var kl := luz_k(vc) if capa == "luz" else 1.0
+	var kl := luz_k(vc) if capa.begins_with("luz") else 1.0
 	var k := "vc|%s|%s" % [t, capa] + ("|%d" % vc.foco.a if kl > 1 else "")
 	if cache.has(k):
 		return cache[k]
@@ -296,9 +296,54 @@ static func _pega(o: Image, s: Image, sx: int, w: int, dx: int) -> void:
 		for y in 160:
 			o.set_pixel(dx + x, y, s.get_pixel(sx + x, y))
 
-# la luz de cada tipo de foco: la del sodio, tal cual; las demás, la misma capa con su color (misma luminosidad)
+# tonos de la capa de luz (los de la imagen A; luz() les pone el color de cada foco): base, haz, resplandor y núcleo
+const VC_LZ := [[198, 130, 77], [231, 150, 86], [255, 172, 82], [255, 224, 149]]
+
+# la luz de un LED de barras (vcLuzLed): el suelo y los postes, de carpa-c-luz-led (ensanchada con el foco); en la pared del fondo, un
+# haz por barra (de la última fila del sprite del foco) que baja hasta el pie de la pared abriéndose lo justo para que los de fuera
+# lleguen a las paredes de la carpa. Bajo las barras, el núcleo; con un haz, el haz; con dos o más, el resplandor; entre haces, nada
+static func luz_led(t: String, vc: Dictionary) -> Image:
+	var k := "vc|%s|luz-led|%s" % [t, vc.foco.n]
+	if cache.has(k):
+		return cache[k]
+	var o: Image = fondo(t, vc, "luz-led").duplicate()
+	var fc := foto(vc.foco.n)
+	var fw := fc.get_width()
+	var ox := 120 - (fw >> 1)
+	var B := []
+	for i in fw:
+		if fc.get_pixel(i, fc.get_height() - 1).a8:
+			if B.size() and B[-1][1] == ox + i - 1:
+				B[-1][1] = ox + i
+			else:
+				B.append([ox + i, ox + i])
+	var V: Dictionary = Datos.carga().VCA
+	var X0: int = vc.xl
+	var X1: int = vc.xl + vc.w - 1
+	var y0 := int(V.boca) + 1
+	var y1 := int(V.fondo) - 2
+	var s := 0.0
+	if B.size():
+		s = float(maxi(maxi(B[0][0] - X0, X1 - B[-1][1]), 0)) / (y1 - y0)
+	for y in range(y0, y1 + 1):
+		var e := s * (y - y0)
+		for i in range(X0, X1 + 1):
+			var p := i + .5
+			var n := 0
+			for b in B:
+				if p >= b[0] - e and p <= b[1] + 1 + e:
+					n += 1
+			if not n:
+				o.set_pixel(i, y, Color(0, 0, 0, 0))
+				continue
+			var z: Array = VC_LZ[3 if y < y0 + 2 else (2 if n > 1 else 1)]
+			o.set_pixel(i, y, Color8(z[0], z[1], z[2], 255))
+	cache[k] = o
+	return o
+
+# la luz de cada tipo de foco: la del sodio, tal cual; las demás, con su color (misma luminosidad). Los LED, de barras, la suya (luz_led)
 static func luz(t: String, vc: Dictionary) -> Image:
-	var L := fondo(t, vc, "luz")
+	var L := luz_led(t, vc) if vc.tipo == "led" and hay("carpa-c-luz-led") else fondo(t, vc, "luz")
 	var lc: Dictionary = Datos.carga().LUZ_C
 	if not lc.has(vc.tipo):
 		return L

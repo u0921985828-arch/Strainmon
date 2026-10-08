@@ -14,9 +14,9 @@ Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: 
 | Objetos sueltos en lote | 36 | 10 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 180 + sin documentar |
 | Imágenes simples | 22 | 11 | create_image_pixflux (init_image + color_image) | 7 + sin documentar |
 | Se queda procedural | 2 | 1 | — | 0 |
-| Importado | 122 | 38 | importado | 0 + sin documentar |
+| Importado | 123 | 38 | importado | 0 + sin documentar |
 
-**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 257/257 claves.
+**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 258/258 claves.
 
 ## Orden de creación
 
@@ -168,7 +168,7 @@ Arte propio del repositorio que ya existe (Strainmon): se adapta en local (recor
 | carpas-medias-mapa | carpa-p80-mapa, carpa-m120-mapa | importado | — | solo texto | F9 | — | 0+? |
 | carpas-medias-vista | carpa-p80-vista, carpa-m120-vista | importado | — | solo texto | F9 | — | 0+? |
 | plantas-vista | planta-vista | importado | — | solo texto | F9 | — | 0+? |
-| carpa-c-fondo | carpa-c-pared, carpa-c-luz | importado | — | solo texto | F9 | — | 0+? |
+| carpa-c-fondo | carpa-c-pared, carpa-c-luz, carpa-c-luz-led | importado | — | solo texto | F9 | — | 0+? |
 | carpa-c-plantas-h | planta-c-h-24, planta-c-h2-24, planta-c-h1-18, planta-c-h0-8 | importado | — | solo texto | F9 | — | 0+? |
 | carpa-c-plantas-a | planta-c-i-38, planta-c-i2-38, planta-c-i-32, planta-c-i2-32, planta-c-h-38, planta-c-h2-38, planta-c-h-32, planta-c-h2-32, planta-c-s-38, planta-c-s2-38, planta-c-s-32, planta-c-s2-32, planta-c-h1-18, planta-c-h0-8 | importado | — | solo texto | F9 | — | 0+? |
 | carpa-c-focos-led | foco-c-led100-26, foco-c-led100-20, foco-c-led200-30, foco-c-led200-24, foco-c-cfl-25 | importado | — | solo texto | F9 | — | 0+? |

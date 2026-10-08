@@ -1,6 +1,6 @@
 # python3 -I tools/sprites/a-mano/equipo_p5.py  (Python 3 + Pillow; no va en los scripts de npm)
 # Láminas 12 y 13 del plan de producción (1.10, P5), dibujadas a mano:
-#  · iconos-equipo (celda icono, 16 × 16): armario, carpa, led, ventilador, filtro, garrafa y goteo, para la tienda, la mochila y
+#  · iconos-equipo (celda icono, 16 × 16): armario, carpa, led (de barras), ventilador, filtro, garrafa y goteo, para la tienda, la mochila y
 #    la lista de plantas (icono(nombre) los busca aquí si no están en «iconos»). Contorno oscuro, 3 tonos con la luz arriba a la
 #    izquierda, como los iconos aprobados.
 #  · props-escala (celda mueble_escala, 32 × 48, base en (16, 47)): la nevera (obj:fridge, 60 × 180 cm) y las cajas de 40 cm
@@ -34,15 +34,15 @@ def tienda(w, h):
     return L
 
 def led():
-    """panel LED con su fuente encima, colgado de dos cuerdas, la cara de diodos encendida"""
+    """LED de barras (1.10, como los de 720 W) visto desde abajo: 4 barras con la cara de diodos encendida (blanca, algún rosa) y aire
+    entre ellas, los travesaños de delante y de detrás, la fuente encima y dos cuerdas"""
     L = Lienzo(16, 16)
-    L.vl(3, 0, 5, T1); L.vl(12, 0, 5, T1)
-    L.r(6, 3, 4, 2, '#304046'); L.p(8, 3, '#e8644c')
-    L.r(2, 6, 12, 2, '#3d4c4e'); L.hl(2, 13, 6, '#7a8584')
-    L.r(2, 8, 12, 5, '#202e34')
-    for y in range(9, 12):
-        for x in range(3, 13):
-            L.p(x, y, ('#ffffff', '#f8d8ff', '#f8c0f8')[(x + y * 2) % 3])
+    L.vl(3, 0, 4, T1); L.vl(12, 0, 4, T1)
+    L.r(6, 2, 4, 2, '#304046'); L.p(8, 2, '#e8644c')
+    L.hl(1, 14, 4, '#3d4c4e'); L.hl(1, 14, 13, '#3d4c4e'); L.p(1, 4, '#7a8584')   # travesaños
+    for bx in (1, 5, 9, 13):                                    # barras de 2 px con 2 de aire
+        for y in range(5, 13):
+            for x in (bx, bx + 1): L.p(x, y, '#f8d8ff' if (x + 2 * y) % 3 == 0 else '#ffffff')
     L.contorno(K)
     return L
 

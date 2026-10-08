@@ -6343,14 +6343,15 @@
    "coste_real": 0,
    "cubre": [
     "misc:carpa-c-pared",
-    "misc:carpa-c-luz"
+    "misc:carpa-c-luz",
+    "misc:carpa-c-luz-led"
    ],
    "celda": "pantalla",
    "max_colores": 32,
-   "notas": "Vista C: la pared se recorta a lo ancho de cada carpa (columnas 0-43 y 196-239 fijas, la pared del fondo centrada) y la luz igual. La pared lleva solo la tela, sin la forma del cono (la 1.ª versión pasaba los tonos de la luz a grises y se quedaba su silueta). La luz se pinta delante de todo (pared, macetas y plantas) en «overlay», debajo de la campana; con el foco apagado no se pinta. Hasta 32 colores (max_colores): son fondos de pantalla entera.",
+   "notas": "Vista C: la pared se recorta a lo ancho de cada carpa (columnas 0-43 y 196-239 fijas, la pared del fondo centrada) y la luz igual. La pared lleva solo la tela, sin la forma del cono (la 1.ª versión pasaba los tonos de la luz a grises y se quedaba su silueta). La luz se pinta delante de todo (pared, macetas y plantas) en «overlay», debajo de la campana; con el foco apagado no se pinta. Los LED de barras llevan la suya (carpa-c-luz-led, 1.10): sin el cono (el motor pinta un haz por barra, vcLuzLed, abierto hasta las paredes de la carpa) y con un charco más ancho en el suelo. Hasta 32 colores (max_colores): son fondos de pantalla entera.",
    "herramienta": "importado",
-   "origen": "tools/sprites/a-mano/carpa_c.py: la pared dibujada en código (mylar plateado con vetas verticales, laterales más oscuros hacia delante, bandeja blanca con rejilla y el armazón negro) con la geometría de la imagen A; la luz, la de la imagen A sin los brillos de las cortinas y con el cono liso (resplandor bajo la boca y haz central, en sus tonos)",
-   "descripcion": "la carpa por dentro (vista C): pared del fondo, laterales y suelo de tela plateada con el armazón negro, como las carpas del piso y de la vista B; la luz del foco en su capa",
+   "origen": "tools/sprites/a-mano/carpa_c.py: la pared dibujada en código (mylar plateado con vetas verticales, laterales más oscuros hacia delante, bandeja blanca con rejilla y el armazón negro) con la geometría de la imagen A; la luz, la de la imagen A sin los brillos de las cortinas y con el cono liso (resplandor bajo la boca y haz central, en sus tonos); la de los LED de barras (carpa-c-luz-led), la misma sin el cono (los haces de cada barra los pinta el motor) y con un charco más ancho en el suelo",
+   "descripcion": "la carpa por dentro (vista C): pared del fondo, laterales y suelo de tela plateada con el armazón negro, como las carpas del piso y de la vista B; la luz del foco en su capa (y la de los LED de barras en la suya)",
    "aprobado": "2026-10-08: «prueba B» (p60 con CFL, m100 con sodio 400 y g150 con sodio 600, antes y después), aprobada por la persona: «Me gustan más los plateados». 2026-10-08: la luz lisa (sin la textura de las cortinas; sodio, LED y CFL), aprobada: «Perfect»",
    "historial": {
     "herramienta": "edit_image_pixen",
@@ -6737,8 +6738,8 @@
     "foco-c-cfl-25": "exacto"
    },
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_c.py",
-   "descripcion": "Focos de la vista C que faltaban: LED 100 (panel pequeño), LED 200 (panel con la fuente encima) y LED 480 (placa grande en su marco con la fuente), de frente y algo desde abajo, colgados de sus cuerdas con trinquete y con la cara de diodos encendida (blanca y rosa); y el CFL de las carpas de 200 cm.",
-   "notas": "1.10 P3. A su ancho real en cada carpa (FOCO_CM × Z): LED 100, 26 (armario 60) y 20 (80 y las de 200 cm, dentro del 25 %); LED 200, 30 y 24; LED 480, 47 (solo en las de 100 a 150, por vatios). Nombres con el modelo (foco-c-led100-NN): dos LED del mismo ancho no son el mismo foco. foco-c-cfl-25: la campana aprobada foco-c-cfl-36 sin 9 columnas ni 3 filas (repartidas, ni el contorno ni el tubo), sin colores nuevos; 25 px y no 27 para que el armario 80 (31) siga con la de 34. Paleta de la campana aprobada (metal #202e34 #304046 #3d4c4e #7a8584, contorno negro) y diodos #ffffff #f8d8ff #f8c0f8 (apagados, gris: vcApagado). Su luz, carpa-c-luz con el color del LED (LUZ_C).",
+   "descripcion": "Focos de la vista C que faltaban: los LED de barras (1.10, como los de 720 W de 8 barras: delgadas, con aire entre ellas y unidas por el travesaño): LED 100 (3 barras) y LED 200 (4, con la fuente encima), de frente y algo desde abajo, colgados de sus cuerdas con trinquete y con la cara de diodos encendida (blanca, de espectro completo, con algún rosa); y el CFL de las carpas de 200 cm.",
+   "notas": "1.10 P3. A su ancho real en cada carpa (FOCO_CM × Z): LED 100, 26 (armario 60) y 20 (80 y las de 200 cm, dentro del 25 %); LED 200, 30 y 24; LED 480, 47 (solo en las de 100 a 150, por vatios). Todos de barras (barras() en equipo_c.py): 3, 4, 6 y 8. Nombres con el modelo (foco-c-led100-NN): dos LED del mismo ancho no son el mismo foco. foco-c-cfl-25: la campana aprobada foco-c-cfl-36 sin 9 columnas ni 3 filas (repartidas, ni el contorno ni el tubo), sin colores nuevos; 25 px y no 27 para que el armario 80 (31) siga con la de 34. Paleta de la campana aprobada (metal #202e34 #304046 #3d4c4e #7a8584, contorno negro) y diodos #ffffff #f8d8ff (apagados, gris: vcApagado). Su luz (vcLuzLed): un haz por barra que se abre hasta las paredes de la carpa, con el suelo y los postes de carpa-c-luz-led, en el color del LED (LUZ_C).",
    "montaje": "tal cual (equipo_c.py), ya en la celda con la boca en la fila 15, centrada (ajuste exacto)",
    "aprobado": "2026-10-08: lámina B de la vista C (LED 720 con extras y goteo, LED 480, LED 200 con garrafas, CFL de 25 px, muertas y sombras), aprobada por la persona: «Mola»"
   },
@@ -6762,7 +6763,7 @@
     "foco-c-led720-78": "exacto"
    },
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_c.py",
-   "descripcion": "LED 480 (la placa de carpa-c-focos-led: 47 px no caben en la celda de 48 sin tocar su borde) y LED 720 de la vista C: marco ancho con 6 barras de fondo a fondo; de frente, el travesaño, la fuente encima y la punta de cada barra con su cara de diodos encendida.",
+   "descripcion": "LED 480 (6 barras: 47 px no caben en la celda de 48 sin tocar su borde) y LED 720 (8 barras) de la vista C, de barras como los de 720 W: barras delgadas de fondo a fondo con aire entre ellas; de frente, el travesaño, la fuente encima y la punta de cada barra con su cara de diodos encendida.",
    "notas": "1.10 P3. LED 480: 60 cm × 0,78 = 47 px. LED 720: 100 cm × 0,78 = 78 px (las de 120 y 150, las únicas con vatios para él). Misma paleta que carpa-c-focos-led.",
    "montaje": "tal cual (equipo_c.py), en la celda de 80 × 16 con la boca en la fila 15, centrada",
    "aprobado": "2026-10-08: lámina B de la vista C (LED 720 con extras y goteo, LED 480, LED 200 con garrafas, CFL de 25 px, muertas y sombras), aprobada por la persona: «Mola»"
@@ -6850,7 +6851,7 @@
    "cubre": [],
    "celda": "icono",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_p5.py",
-   "descripcion": "Lámina 12: iconos de 16 px del equipo nuevo: armario y carpa cerrados (tela negra, techo plateado y la puerta de cremallera), panel LED con su fuente y la cara de diodos, ventilador de pinza, filtro de carbón con su extractor, garrafa de riego con el agua y riego por goteo (depósito con mirilla, bomba y goteros).",
+   "descripcion": "Lámina 12: iconos de 16 px del equipo nuevo: armario y carpa cerrados (tela negra, techo plateado y la puerta de cremallera), LED de barras visto desde abajo (4 barras encendidas con aire entre ellas, los travesaños y la fuente), ventilador de pinza, filtro de carbón con su extractor, garrafa de riego con el agua y riego por goteo (depósito con mirilla, bomba y goteros).",
    "notas": "1.10 P5. icono(nombre) los busca en «iconos» y, si no, aquí. Tienda, mochila, lista de plantas y menús de foco: armario (armarios de 60 y 80), carpa (100, 120 y 150), led (los 4 LED), ventilador, filtro, garrafa y goteo. Contorno #2a2a34 como los aprobados.",
    "montaje": "tal cual (equipo_p5.py), 16 × 16 (ajuste exacto)",
    "aprobado": "2026-10-08: láminas 12 y 13 (iconos del equipo, nevera y cajas a escala, con el piso de día y de noche y el almacén), aprobadas por la persona: «Mola»"

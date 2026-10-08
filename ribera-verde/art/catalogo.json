@@ -1,6 +1,6 @@
 {
  "generado": "tools/sprites/catalogo.js",
- "claves": 257,
+ "claves": 258,
  "catalogo": {
   "look:player": [
    {
@@ -1947,6 +1947,15 @@
    }
   ],
   "misc:carpa-c-luz": [
+   {
+    "asset": "carpa-c-fondo",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:carpa-c-luz-led": [
    {
     "asset": "carpa-c-fondo",
     "familia": "importado",

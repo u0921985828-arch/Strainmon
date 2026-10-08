@@ -123,7 +123,7 @@ function vistaC(g){
 const vcLuzK=vc=>Math.max(1,vc.foco.a/46);
 // pared o luz de la carpa t: la de 240 × 160 con la pared del fondo recortada a su ancho (los laterales, con los postes del fondo, enteros)
 function vcFondo(t,vc,capa){
-  const k=capa==='luz'?vcLuzK(vc):1,key='vc|'+t+'|'+capa+(k>1?'|'+vc.foco.a:'');if(carpaCache[key])return carpaCache[key];
+  const k=capa.startsWith('luz')?vcLuzK(vc):1,key='vc|'+t+'|'+capa+(k>1?'|'+vc.foco.a:'');if(carpaCache[key])return carpaCache[key];
   let s=fotoMisc('carpa-c-'+capa).c;const [c,x]=mkCanvas(240,160),L=VCA.lado,xl=vc.xl,xr=xl+vc.w;
   if(k>1){const [o,ox]=mkCanvas(240,160);for(let i=0;i<240;i++)ox.drawImage(s,Math.floor(120+(i+.5-120)/k),0,1,160,i,0,1,160);s=o;}
   x.drawImage(s,0,0,L,160,xl-L,0,L,160);x.drawImage(s,xl,0,vc.w,160,xl,0,vc.w,160);x.drawImage(s,240-L,0,L,160,xr,0,L,160);
@@ -135,9 +135,28 @@ function vcFondo(t,vc,capa){
     x.putImageData(im,0,0);}
   return carpaCache[key]=c;
 }
-// la luz de cada tipo de foco: la del sodio es la de la imagen A tal cual; las demás, la misma capa con su color (misma luminosidad) y su fuerza
-const LUZ_C={cfl:[[220,240,255],.6],led:[[250,214,255],.7]};
-function vcLuz(t,vc){const L=vcFondo(t,vc,'luz'),k=LUZ_C[vc.tipo];if(!k)return L;
+// la luz de cada tipo de foco: la del sodio es la de la imagen A tal cual; las demás, con su color (misma luminosidad) y su fuerza. Los LED,
+// de barras, la suya (vcLuzLed) y blanca, de espectro completo, algo rosada
+const LUZ_C={cfl:[[220,240,255],.6],led:[[255,232,236],.7]};
+// tonos de la capa de luz (los de la imagen A; vcLuz les pone el color de cada foco): base, haz, resplandor y núcleo
+const VC_LZ=[[198,130,77],[231,150,86],[255,172,82],[255,224,149]];
+// la luz de un LED de barras: el suelo y los postes, de carpa-c-luz-led (ensanchada con el foco, como la de sodio); en la pared del
+// fondo, un haz por barra (las barras, de la última fila del sprite del foco: lo que no es transparente) que baja hasta el pie de la pared
+// abriéndose lo justo para que los de las barras de fuera lleguen a las paredes de la carpa: así cuenta el ancho de la carpa, el del foco
+// y cuántas barras lleva. Justo bajo las barras, el núcleo; con un haz, el haz; donde se juntan dos o más, el resplandor; entre haces, nada
+function vcLuzLed(t,vc){
+  const key='vc|'+t+'|luz-led|'+vc.foco.n;if(carpaCache[key])return carpaCache[key];
+  const [c,x]=mkCanvas(240,160);x.drawImage(vcFondo(t,vc,'luz-led'),0,0);const im=x.getImageData(0,0,240,160),d=im.data;
+  const fc=vc.foco.f.c,fw=fc.width,fh=fc.height,fd=fc.getContext('2d').getImageData(0,fh-1,fw,1).data,ox=120-(fw>>1),B=[];
+  for(let i=0;i<fw;i++)if(fd[i*4+3]){const b=B[B.length-1];if(b&&b[1]===ox+i-1)b[1]=ox+i;else B.push([ox+i,ox+i]);}
+  const X0=vc.xl,X1=vc.xl+vc.w-1,y0=VCA.boca+1,y1=VCA.fondo-2;
+  const s=B.length?Math.max(B[0][0]-X0,X1-B[B.length-1][1],0)/(y1-y0):0;
+  for(let y=y0;y<=y1;y++){const e=s*(y-y0);
+    for(let i=X0;i<=X1;i++){const p=i+.5;let n=0;for(const [a,b] of B)if(p>=a-e&&p<=b+1+e)n++;
+      const j=(y*240+i)*4;if(!n){d[j+3]=0;continue;}
+      const z=VC_LZ[y<y0+2?3:n>1?2:1];d[j]=z[0];d[j+1]=z[1];d[j+2]=z[2];d[j+3]=255;}}
+  x.putImageData(im,0,0);return carpaCache[key]=c;}
+function vcLuz(t,vc){const L=vc.tipo==='led'&&fotoMisc('carpa-c-luz-led')?vcLuzLed(t,vc):vcFondo(t,vc,'luz'),k=LUZ_C[vc.tipo];if(!k)return L;
   const key='vc|'+t+'|luz|'+vc.tipo+'|'+vc.foco.a;if(carpaCache[key])return carpaCache[key];
   const [c,x]=mkCanvas(240,160),[r,g,b]=k[0],lk=.299*r+.587*g+.114*b;x.drawImage(L,0,0);const im=x.getImageData(0,0,240,160),d=im.data;
   for(let i=0;i<d.length;i+=4)if(d[i+3]){const l=(.299*d[i]+.587*d[i+1]+.114*d[i+2])/lk;d[i]=Math.min(255,r*l);d[i+1]=Math.min(255,g*l);d[i+2]=Math.min(255,b*l);}

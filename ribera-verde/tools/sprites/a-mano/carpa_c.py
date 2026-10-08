@@ -10,7 +10,9 @@
 #    junto al suelo, lo que queda fuera del borde de la bandeja: x <= diag(y) y su espejo) y con el cono liso (1.10: la textura de
 #    la imagen A era la sombra de las cortinas): el resplandor bajo la boca y un haz central, en los tonos de la imagen A; el charco
 #    del suelo, igual. Se puede pasar más de una vez (borrar lo borrado y repintar el cono no cambia nada).
-# Sale a art/crudo/carpa-c-fondo/carpa-c-<pared|luz>/unica/00.png (después, node tools/sprites/procesar.js carpa-c-fondo --atlas)
+#  · carpa-c-luz-led: la de los LED de barras, de la misma, sin el cono (los haces de cada barra los pinta el motor, vcLuzLed) y
+#    con un charco más ancho en el suelo.
+# Sale a art/crudo/carpa-c-fondo/carpa-c-<pared|luz|luz-led>/unica/00.png (después, node tools/sprites/procesar.js carpa-c-fondo --atlas)
 import os
 from PIL import Image
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..')
@@ -104,3 +106,15 @@ for y in range(17, 137):
         c = LZ3 if d < .45 else LZ2 if d < .72 else LZ1 if d < 1 or u < .34 else LZ0
         q[x, y] = c + (255,)
 guarda(luz, 'luz')
+# la luz de los LED de barras (carpa-c-luz-led): sin el cono (en la pared, el motor pinta un haz por barra: vcLuzLed) y, en el suelo,
+# un charco más ancho (la fuente es ancha y está cerca); los postes y el techo, los de la de sodio
+led = luz.copy(); ql = led.load()
+for y in range(16, 139):
+    for x in range(XL + 3, XR - 2): ql[x, y] = (0, 0, 0, 0)
+for y in range(141, H):
+    for x in range(W):
+        if not ql[x, y][3]: continue
+        e = ((x + .5 - CX) / 70) ** 2 + ((y - 152) / 12) ** 2
+        if e < 1: ql[x, y] = LZ3 + (255,)
+        elif e < 1.15: ql[x, y] = (255, 172, 82, 255)
+guarda(led, 'luz-led')
