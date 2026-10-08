@@ -202,7 +202,7 @@ Para la vista B, las huellas salen del arte procedural del motor (P2): `npm run 
 
 ### 5.2 Vista C: la carpa por dentro, desde la imagen A (P3)
 
-La lámina 1 (`cuarto-cultivo-34`, pixflux sobre la huella) no se aprobó porque no se parecía a la imagen A. La vista elegida es la **C**: la carpa por dentro a toda la altura de la pantalla, como la imagen A. Todo su arte sale de la imagen A. A los lados de la carpa, el cuarto queda a oscuras (negro): en las carpas estrechas y en los móviles más anchos que 3:2 se ve esa banda.
+La lámina 1 (`cuarto-cultivo-34`, pixflux sobre la huella) no se aprobó porque no se parecía a la imagen A. La vista elegida es la **C**: la carpa por dentro a toda la altura de la pantalla, como la imagen A. Su arte sale de la imagen A, salvo la planta A y, desde la 1.10, la pared plateada, dibujadas a mano. A los lados de la carpa, el cuarto queda a oscuras (negro): en las carpas estrechas y en los móviles más anchos que 3:2 se ve esa banda.
 
 **Cómo se hace:**
 1. **Fondo.** La imagen A se vació con `edit_image_pixen` (sin plantas ni macetas; otra edición sin el foco). `capas.py` la separa en dos sprites de 240 × 160 (`carpa-c-fondo`, hasta 32 colores por ser fondos de pantalla entera):

@@ -6363,7 +6363,8 @@
     ],
     "montaje": "scratchpad f22/capas.py separa la imagen A vacía en pared y luz. f23/tela.py: la pared del fondo (x 46-193, y 3-138) sale de la llamada 3 (tela sin la forma del cono), con los tonos de la pared de la imagen A; laterales, cortinas y suelo, los de capas.py. f23/cono.py: la luz de la imagen A (solo sus tonos claros) recortada a un cono recto desde la boca del foco (y 16, x 97-143) hasta el pie de la pared, con la banda tenue #c6824d en los huecos; fuera del cono, transparente salvo el charco del suelo y los brillos de las cortinas.",
     "aprobado": "2026-10-06: corte de prueba de la vista C (p60, p80, m100, g150 y m100 vacía), aprobado por la persona tras la 2.ª versión (pared solo de tela y luz delante de todo)",
-    "nota": "1.ª versión (imagen A, cortinas verdeazuladas, hecha con edit_image_pixen): aprobada el 2026-10-06 y sustituida el 2026-10-08 porque no casaba con las carpas plateadas"
+    "nota": "1.ª versión (imagen A, cortinas verdeazuladas, hecha con edit_image_pixen): aprobada el 2026-10-06 y sustituida el 2026-10-08 porque no casaba con las carpas plateadas",
+    "coste_real": 3
    }
   },
   {

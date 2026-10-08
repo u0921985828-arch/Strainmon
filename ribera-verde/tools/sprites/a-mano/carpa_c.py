@@ -2,7 +2,8 @@
 # La vista C (la carpa por dentro) con la tela plateada (mylar) y el armazón negro de las carpas aprobadas del piso y de la vista B
 # (1.10, aprobada el 2026-10-08 como «prueba B»). Misma geometría que la imagen A, para que todo lo demás de la vista C siga igual:
 # pared del fondo x 44-195 e y 3-140 (vcFondo la recorta al ancho de cada carpa), laterales de 44 px (fijos, con los postes del
-# fondo en sus 2 últimas columnas, que si no se irían con el recorte) y suelo y 141-159.
+# fondo en sus 2 últimas columnas, que si no se irían con el recorte) y suelo y 141-159. El suelo dibujado se abre 24 px por lado
+# (el de la imagen A, unos 16, los que usa el motor para colocar las macetas): la diferencia no se ve con las macetas puestas.
 #  · carpa-c-pared: dibujada en código. Mylar con vetas verticales (como la vista B) y algún brillo; laterales más oscuros hacia
 #    delante; bandeja blanca con su rejilla; techo, postes y bordes en el negro del armazón; la cremallera de la puerta abierta.
 #  · carpa-c-luz: la de la imagen A (art/procesado) sin los brillos pintados en las cortinas (los laterales por encima del suelo);
@@ -20,7 +21,7 @@ im = Image.new('RGBA', (W, H), N1 + (255,)); p = im.load()
 def pon(x, y, c):
     if 0 <= x < W and 0 <= y < H: p[x, y] = c + (255,)
 XL, XR, YT, YB = 44, 195, 3, 140                                           # pared del fondo (con sus postes)
-def diag(y):                                                               # borde del suelo en el lateral izquierdo, de (44,140) a (18,159)
+def diag(y):                                                               # borde del suelo en el lateral izquierdo, de (42,140) a (18,159)
     return XL - 2 - (y - YB) * 24 / 19
 # laterales: tela plateada de lado, más oscura hacia delante; las arrugas son verticales (en un punto de fuga siguen verticales)
 for x in range(4, XL - 2):
@@ -53,14 +54,14 @@ for y in range(YB + 1, H):
         u = (x - 120) / (120 - xa)                                         # -1..1 a lo ancho
         if abs((u * 7) - round(u * 7)) < .07: c = P[3]
         pon(x, y, c)
-for y in (143, 147, 152, 158): 
+for y in (143, 147, 152, 158):
     xa = diag(y)
     for x in range(int(xa) + 1, W - int(xa) - 1): pon(x, y, P[3])
 # esquinas y armazón negro: techo, postes del fondo, borde del suelo, postes de delante
 for x in range(W):
     for y in range(0, YT): pon(x, y, N1)
     pon(x, YT, N2)
-# los postes del fondo van en la última columna de cada lateral (vcFondo recorta la pared del fondo al ancho de la carpa)
+# los postes del fondo van en las 2 últimas columnas de cada lateral (vcFondo recorta la pared del fondo al ancho de la carpa)
 for y in range(YT, YB + 1):
     for x in (XL - 2, XL - 1): pon(x, y, N1); pon(W - 1 - x, y, N1)
 for x in range(XL - 2, XR + 3): pon(x, YB, N1)
