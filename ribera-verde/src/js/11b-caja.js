@@ -47,17 +47,20 @@ async function cajaAction(){
       for(const [k,b] of Object.entries(S.buds)){const q=Math.min(b.g,hueco());if(q<.5)break;/* menos de medio gramo no es un lote (moverLote) */g+=q;moverLote(S.buds,S.caja.buds,k,q);}
       for(const [k,b] of Object.entries(S.rosin)){const q=Math.min(b.g,huecoR());if(q<.1)break;S.caja.rosin=S.caja.rosin||{};r+=q;moverRosin(S.rosin,S.caja.rosin,k,q);}
       sfx('sel');await say(`Guardas ${loQue(e,g,r)}.${S.money>=1||totalBuds()>=1||totalRosin()>=.1?' No cabe todo: el resto se queda fuera.':''}`);
-    }else if(op==='Sacar todo'){
-      const e=S.caja.money,g=cajaG(),r=cajaR();S.money+=e;S.caja.money=0;for(const k of Object.keys(S.caja.buds))moverLote(S.caja.buds,S.buds,k,S.caja.buds[k].g);
-      if(S.caja.rosin){for(const k of Object.keys(S.caja.rosin))moverRosin(S.caja.rosin,S.rosin,k,S.caja.rosin[k].g);delete S.caja.rosin;}
-      sfx('sel');await say(`Sacas ${loQue(e,g,r)}.`);
+    }else if(op==='Sacar todo'){   // los gramos, hasta el tope de la mochila (1.10)
+      const e=S.caja.money;S.money+=e;S.caja.money=0;let g=0,r=0;
+      for(const [k,b] of Object.entries(S.caja.buds)){const q=Math.min(b.g,Math.floor(libreMochila()));if(q<.5)break;g+=q;moverLote(S.caja.buds,S.buds,k,q);}
+      if(S.caja.rosin){for(const [k,b] of Object.entries(S.caja.rosin)){const q=Math.min(b.g,Math.floor(libreMochila()*10+1e-9)/10);if(q<.1)break;r+=q;moverRosin(S.caja.rosin,S.rosin,k,q);}
+        if(!Object.keys(S.caja.rosin).length)delete S.caja.rosin;}
+      sfx('sel');await say(`Sacas ${loQue(e,g,r)}.${cajaG()>=.5||cajaR()>=.1?' No te cabe todo encima: el resto se queda en la caja.':''}`);
     }else if(op==='Guardar rosin'||op==='Sacar rosin'){
       const mete=op==='Guardar rosin',de=mete?S.rosin:S.caja.rosin||{},lots=Object.entries(de);
       if(!lots.length){await say(mete?'No llevas rosin encima.':'La caja no tiene rosin.');continue;}
       if(mete&&huecoR()<.1){await say('No cabe más.');continue;}
+      if(!mete&&libreMochila()<.1){await say('No te cabe nada más encima.');continue;}
       const i=await menu(lots.map(rosinItem).concat([{label:'Nada'}]),{cls:'right',title:mete?'¿Qué guardas?':'¿Qué sacas?'});
       if(i<0||i>=lots.length)continue;
-      const [k,b]=lots[i],g=await cuanto(`Rosin · ${lotNombre(k)}: ¿cuánto?`,mete?Math.min(b.g,huecoR()):b.g,[1,5,10,50],r=>coma(r)+' g');if(!g)continue;
+      const [k,b]=lots[i],g=await cuanto(`Rosin · ${lotNombre(k)}: ¿cuánto?`,mete?Math.min(b.g,huecoR()):Math.min(b.g,Math.floor(libreMochila()*10+1e-9)/10),[1,5,10,50],r=>coma(r)+' g');if(!g)continue;
       if(mete)S.caja.rosin=S.caja.rosin||{};
       moverRosin(de,mete?S.caja.rosin:S.rosin,k,g);if(!mete&&!Object.keys(S.caja.rosin).length)delete S.caja.rosin;sfx('sel');
     }else if(op==='Guardar dinero'||op==='Sacar dinero'){
@@ -69,9 +72,10 @@ async function cajaAction(){
       const mete=op==='Guardar cogollos',de=mete?S.buds:S.caja.buds,a=mete?S.caja.buds:S.buds,lots=Object.entries(de);
       if(!lots.length){await say(mete?'No llevas cogollos encima.':'La caja no tiene cogollos.');continue;}
       if(mete&&hueco()<1){await say('No caben más cogollos.');continue;}
+      if(!mete&&libreMochila()<1){await say('No te cabe nada más encima.');continue;}
       const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:mete?'¿Qué guardas?':'¿Qué sacas?'});
       if(i<0||i>=lots.length)continue;
-      const [k,b]=lots[i],g=await cuanto(`${lotNombre(k)}: ¿cuánto?`,mete?Math.min(b.g,hueco()):b.g,[10,50,100,500,1000],gTxt);if(!g)continue;
+      const [k,b]=lots[i],g=await cuanto(`${lotNombre(k)}: ¿cuánto?`,mete?Math.min(b.g,hueco()):Math.min(b.g,Math.floor(libreMochila())),[10,50,100,500,1000],gTxt);if(!g)continue;
       moverLote(de,a,k,g);sfx('sel');
     }
   }
@@ -95,6 +99,9 @@ async function roboDarko(){
   for(const b of Object.values(S.buds)){const l=Math.floor(b.g/2);g+=l;b.g-=l;}
   for(const k of Object.keys(S.buds))if(S.buds[k].g<.5)delete S.buds[k];
   for(const k of Object.keys(S.rosin)){const q=Math.round(S.rosin[k].g*5)/10;r+=q;useRosin(k,q);}   // y la mitad del rosin, como un ladrón
+  const A=S.arcon;   // y la mitad de lo del arcón (1.10)
+  for(const k of Object.keys(A.buds)){const l=Math.floor(A.buds[k].g/2);g+=l;A.buds[k].g-=l;if(A.buds[k].g<.5)delete A.buds[k];}
+  for(const k of Object.keys(A.rosin)){const q=Math.round(A.rosin[k].g*5)/10;r+=q;A.rosin[k].g=Math.round((A.rosin[k].g-q)*10)/10;if(A.rosin[k].g<.1)delete A.rosin[k];}
   S.money-=e;sfx('bad');
   await say('Te despierta un portazo. La cerradura está forzada y el piso, revuelto.');
   await say(`Se han llevado ${loQue(e,g,r)}.${S.caja?' La caja de detrás del diploma sigue cerrada.':''}`);

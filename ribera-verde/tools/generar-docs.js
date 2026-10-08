@@ -153,9 +153,9 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
 
 ## Fórmulas de cultivo
 
-- **Crecimiento por hora:** \`1 / (días × 24) × crec\`, ×0,4 si el agua < 20 %, 0 si el agua llega a 0, ×1,1 con abono. \`crec\`, \`thc\` y \`riego\` salen del foco (a plena intensidad desde ${D.c.W_M2} W/m²) y de la maceta de cada plaza. Equipo, precios y luz: [ECONOMIA.md](ECONOMIA.md).
-- **Agua:** baja 3,5 × riego puntos por hora (con CFL y maceta de 7 L una planta regada aguanta ~28 h).
-- **Salud:** −4/h sin agua, −2,5/h con plaga, +1/h si agua > 30 % y sin plaga. A 0 la planta muere.
+- **Crecimiento por hora:** \`1 / (días × 24) × crec\`, ×0,4 si el agua < 20 %, 0 si el agua llega a 0, ×1,1 con abono. \`crec\`, \`thc\` y \`riego\` salen del foco (a plena intensidad desde ${D.c.W_M2} W/m²) y de la maceta de cada plaza; \`crec\`, también del clima de la sala (−6 % por grado fuera de 18-30 °C, hasta ×0,4; −1,5 % por punto fuera del 40-60 % de humedad, hasta ×0,7). Equipo, precios y luz: [ECONOMIA.md](ECONOMIA.md).
+- **Agua:** baja 3,5 × riego puntos por hora (con CFL y maceta de 7 L una planta regada aguanta ~28 h). El goteo riega del depósito (100 L) la que baja del 50 %.
+- **Salud:** −4/h sin agua, −2,5/h con plaga, +1/h si agua > 30 % y sin plaga; en floración, moho con la humedad por encima del 60 %: −0,1/h por punto de más. A 0 la planta muere.
 - **Plagas:** probabilidad por hora \`0,006 × (100 − resistencia) / 40\` mientras no está madura.
 - **Cosecha (g):** \`mín(tope de la maceta, W × g/W ÷ plazas de la carpa × rend de la maceta × rinde/${D.c.Y_MEDIA} × (0,4 + 0,6 × salud/100) × (abono ? 1,25 : 1) × fenotipo)\`. Una plaza vacía es luz perdida.
 - **THC final:** \`THC × fenotipo × (0,85 + 0,15 × salud/100) + thc del foco + (abono ? 0,3 : 0)\` (tope 35 %).

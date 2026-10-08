@@ -36,9 +36,9 @@ Plantar → cuidar (agua, abono, plagas) y sacar esquejes de las buenas → cose
 | Lista | 100 % |
 
 - Al plantar: agua 70 %, salud 100 %. Se gasta 1 semilla (o un esqueje, que empieza de plántula, 12 %).
-- **Agua:** −3,5 × `riego` puntos por hora (foco × maceta × goteo). Regar la pone al 100 %.
-- **Crecimiento por hora:** `1 / (días × 24) × crec`. Se multiplica ×0,4 con agua < 20 %, ×0 sin agua y ×1,1 con abono; `crec` sale del foco y de la maceta (ver «Equipo»).
-- **Salud:** −4/h sin agua y −2,5/h con plaga; +1/h con agua > 30 % y sin plaga. A 0 la planta muere.
+- **Agua:** −3,5 × `riego` puntos por hora (foco × maceta). Regar la pone al 100 %; con goteo, el depósito (100 L) riega solo la que baja del 50 %, gastando la mitad de los litros de la maceta por cada 100 %, y se rellena desde la vista de carpa.
+- **Crecimiento por hora:** `1 / (días × 24) × crec`. Se multiplica ×0,4 con agua < 20 %, ×0 sin agua y ×1,1 con abono; `crec` sale del foco, de la maceta (ver «Equipo») y del clima de la sala (−6 % por grado fuera de 18-30 °C, hasta ×0,4; −1,5 % por punto fuera del 40-60 % de humedad, hasta ×0,7).
+- **Salud:** −4/h sin agua y −2,5/h con plaga; +1/h con agua > 30 % y sin plaga; en floración, con la humedad por encima del 60 %, moho: −0,1/h por punto de más (lo avisa al despertar). A 0 la planta muere.
 - **Plaga** (araña roja, puntos rojos en las hojas): probabilidad por hora `0,006 × (100 − resistencia) / 40` (×0,8 en maceta de tela y ×0,7 con ventilador) mientras la planta no está lista. Se quita con insecticida.
 - **Abono:** una dosis por planta (la botella de 1 L trae 4). Da +25 % de cosecha, +10 % de velocidad y +0,3 de THC.
 - **Cosecha (g por planta):** `mín(tope de la maceta, W × g/W ÷ plazas × rend de la maceta × rinde/34 × (0,4 + 0,6 × salud/100) × abono 1,25 × fenotipo.y)`. 34 g es el rinde medio de las variedades: la ficha enseña el de cada una en g/m² (LED a 400 W/m², abonada). Una plaza vacía es luz perdida.
@@ -80,7 +80,7 @@ El cultivo va en carpas dentro del piso. Desde fuera se ven cerradas (techo, fre
 | Tela 25 L | 210 g | +5 % | — | ×1,1 | ×0,8 | 4 € (cap. 3) |
 
 - **Gramos por vatio:** el foco da `W × g/W` gramos por cosecha (sin abono), repartidos entre las plazas de la carpa; la maceta pone el tope (unos 8 g por litro de tierra). Cultivador medio y bien abonado: CFL unos 0,3 g/W, sodio 0,55-0,7, LED 0,8-1,05.
-- **Intensidad:** `dens = mín(1, W ÷ (m² de la carpa × 400 W/m²))`. `crec = foco.crece × (0,85 + 0,15 × dens) × maceta.crece`; `thc = foco.thc × dens`; `riego = foco.riego × maceta.riego × (0,5 con goteo)`; las plagas, `maceta.plagas × (0,7 con ventilador)`. La ficha de la carpa enseña sus W/m².
+- **Intensidad:** `dens = mín(1, W ÷ (m² de la carpa × 400 W/m²))`. `crec = foco.crece × (0,85 + 0,15 × dens) × maceta.crece`; `thc = foco.thc × dens`; `riego = foco.riego × maceta.riego` (el goteo riega del depósito); las plagas, `maceta.plagas × (0,7 con ventilador)`. La ficha de la carpa enseña sus W/m².
 - **Límites:** el foco no puede pasar de los vatios de la carpa (calor) y la maceta, de sus litros.
 - **Cambiar:** las macetas, en una plaza vacía (A → «Cambiar maceta»); los focos, desde el foco de la vista de carpa (A → «Cambiar foco») o al comprarlos («¿Lo cuelgo ya?»). Lo que se quita va a la mochila.
 - **Factura de la luz:** cada día, por cada carpa con alguna planta viva (las vacías van apagadas), `(W del foco × 392 h + W de los extras × 672 h) ÷ 1000 × 0,16 €/kWh`. CFL 8 €, sodio 400 W 25 €, LED 720 W 45 €.
@@ -90,7 +90,7 @@ El cultivo va en carpas dentro del piso. Desde fuera se ven cerradas (techo, fre
 |---|---|---|---|
 | Ventilador de pinza | plagas ×0,7 | 25 W día y noche | 20 € (cap. 1) |
 | Extractor con filtro de carbón | anula el olor (ver abajo) | 75 W día y noche | 110 € (cap. 2) |
-| Riego por goteo | riego ×0,5 (el agua baja a la mitad de rápido) | — | 55 € (cap. 3) |
+| Riego por goteo | depósito de 100 L: riega solo la que baja del 50 % mientras le quede; se rellena desde la carpa | — | 55 € (cap. 3) |
 
   La tienda solo ofrece un extra si alguna carpa lo necesita y no lo llevas ya en la mochila.
 

@@ -9,13 +9,17 @@ var endcard_on := false
 func shop_cond(it: Dictionary) -> bool:
 	if it.get("item") == "prensa":   # la prensa de rosin (1.10), una
 		return not S.items.get("prensa")
+	if it.get("aparato"):   # los aparatos de la sala (1.10), uno de cada; lo pedido por el móvil no se vuelve a vender
+		return not S.sala.get(it.aparato) and not S.envio.has(it.lbl)
+	if it.get("bolsa"):   # la bolsa de deporte y la maleta (1.10)
+		return bolsa_ya() < it.bolsa
 	if it.get("extra"):
 		var k: String = it.extra
 		var nc := 0
 		for c in S.carpas:
 			if c and not c.get(k):
 				nc += 1
-		return nc > S.items.get("x_" + k, 0)
+		return nc > S.items.get("x_" + k, 0) + S.envio.count(it.lbl)
 	match it.get("carpa", ""):
 		"p80":
 			return S.carpas[0].t == "p60"
@@ -116,6 +120,10 @@ func shop() -> void:
 			S.items[it.item] += int(it.get("n", 1))
 		if it.get("maceta"):
 			S.items["m_" + it.maceta] += 1
+		if it.get("bolsa"):
+			S.items.bolsa = int(it.bolsa)
+		if it.get("aparato"):
+			S.sala[it.aparato] = true
 		if not it.get("foco") and not it.get("carpa") and not it.get("extra"):
 			toast("Comprado: " + it.lbl, 1200)
 		if it.get("carpa"):
@@ -197,7 +205,7 @@ func talk_kiko():
 	for p in S.pots:
 		if p:
 			alguna = true
-	if S.seeds.is_empty() and not alguna and not total_buds() and not total_rosin() and not caja_g() and not caja_r() and S.money + caja_e() < 15:   # lo de la caja también cuenta (1.10)
+	if S.seeds.is_empty() and not alguna and not total_buds() and not total_rosin() and not caja_g() and not caja_r() and not arcon_g() and not arcon_r() and S.money + caja_e() < 15:   # lo de la caja y el arcón también cuenta (1.10)
 		await say("¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.", N)
 		add_seeds("ria", 2)
 		await got("2 semillas de SKUNK #1")
@@ -682,14 +690,15 @@ func raid_event():
 		return
 	sfx("bad")
 	await say("REDADA. La policía entra en tu piso.")
-	var g := int(floor(total_buds()))
-	var ro := total_rosin()
+	var g := int(floor(total_buds() + arcon_g()))   # lo de encima y el arcón (1.10)
+	var ro := total_rosin() + arcon_r()
 	var np := []
 	for p in S.pots:
 		np.append(null)
 	S.pots = np
 	S.buds = {}
 	S.rosin = {}
+	S.arcon = {"buds": {}, "rosin": {}}
 	S.heat = 30
 	var hallada: bool = S.get("caja") != null and Cultivo.azar() < D.CAJA_REDADA
 	var cg := 0
@@ -738,21 +747,23 @@ func ending() -> void:
 func start_menu():
 	var i := 0
 	while true:
-		i = await menu(["GENOTECA", "MOCHILA", "PLANTAS", "OBJETIVO", "GUARDAR", "SONIDO: SÍ" if sonido_on() else "SONIDO: NO", "SALIR"], {"cls": "start", "initial": i, "startCloses": true})
-		if i < 0 or i == 6:
+		i = await menu(["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "GUARDAR", "SONIDO: SÍ" if sonido_on() else "SONIDO: NO", "SALIR"], {"cls": "start", "initial": i, "startCloses": true})
+		if i < 0 or i == 7:
 			return
 		if i == 0:
 			await genoteca()
 		elif i == 1:
 			await mochila()
 		elif i == 2:
-			await plantas()
+			await movil_menu()
 		elif i == 3:
+			await plantas()
+		elif i == 4:
 			await say("CAPÍTULO %d: %s\n%s" % [S.ch, D.CH_TITLES.get(str(S.ch), ""), objective_text()])
 			await say("Deuda: %s · Ventas: %s\nReputación %s · Calor %d%%" % [Datos.eur(S.debt), Datos.eur(S.sales), n(S.rep), Datos.jsround(S.heat)])
-		elif i == 4:
-			await say("Partida guardada." if save() else "No se ha podido guardar en este navegador.")
 		elif i == 5:
+			await say("Partida guardada." if save() else "No se ha podido guardar en este navegador.")
+		elif i == 6:
 			set_sound(not sonido_on())
 
 func genoteca():
@@ -786,7 +797,11 @@ func genoteca():
 func mochila() -> void:
 	var i := 0
 	while true:
-		var rows := [{"label": "Dinero", "right": Datos.eur(S.money), "ic": icono("billetes"), "desc": "Lo que llevas encima. Don Baltasar también lo cuenta."}]
+		var M: Dictionary = D.MOCHILAS[int(S.items.get("bolsa", 0))]
+		var rows := [{"label": "Dinero", "right": Datos.eur(S.money), "ic": icono("billetes"), "desc": "Lo que llevas encima. Don Baltasar también lo cuenta."},
+			{"label": M.n, "right": "%d de %s" % [int(floor(peso_encima())), _kg(int(M.g))], "ic": icono("bolsa"), "desc": "Cogollos y rosin que llevas encima. Lo que no cabe al cosechar va al arcón de casa."}]
+		if arcon_g() >= 1 or arcon_r() >= .1:
+			rows.append({"label": "Arcón", "right": arcon_txt(), "ic": icono("cogollo"), "desc": "En casa, entre la cama y la nevera. Un control en la calle no lo ve; una redada se lo lleva."})
 		if S.get("caja"):
 			var CJ: Dictionary = D.CAJA[S.caja.nivel]
 			rows.append({"label": "Caja fuerte", "right": "%s · %d g%s" % [Datos.eur(caja_e()), int(floor(caja_g())), (" · " + Datos.coma(Datos.jsround(caja_r() * 10) / 10.0) + " g rosin") if caja_r() >= .1 else ""], "ic": icono("billetes"),
@@ -835,6 +850,8 @@ func mochila() -> void:
 func plantas() -> void:
 	var rows := []
 	var H := huecos()
+	var cl := Cultivo.clima_sala(S, is_night())
+	rows.append({"label": "Sala", "right": t_clima(cl) if S.sala.get("termo") else "¿?", "desc": sala_desc() if S.sala.get("termo") else "Sin termohigrómetro no sabes la temperatura ni la humedad de la sala. Kiko lo vende."})
 	for ci in S.carpas.size():
 		var c = S.carpas[ci]
 		if not c:
@@ -1256,20 +1273,29 @@ func caja_action():
 				mover_rosin(S.rosin, S.caja.rosin, k, q)
 			sfx("sel")
 			await say("Guardas %s.%s" % [lo_que(e, g, r), " No cabe todo: el resto se queda fuera." if S.money >= 1 or total_buds() >= 1 or total_rosin() >= .1 else ""])
-		elif op == "Sacar todo":
+		elif op == "Sacar todo":   # los gramos, hasta el tope de la mochila (1.10)
 			var e: float = S.caja.money
-			var g := caja_g()
-			var r := caja_r()
+			var g := 0.0
+			var r := 0.0
 			S.money += e
 			S.caja.money = 0
 			for k in S.caja.buds.keys():
-				mover_lote(S.caja.buds, S.buds, k, S.caja.buds[k].g)
-			if S.caja.get("rosin"):
+				var q: float = minf(S.caja.buds[k].g, floor(libre_mochila()))
+				if q < .5:
+					break
+				g += q
+				mover_lote(S.caja.buds, S.buds, k, q)
+			if S.caja.get("rosin") != null:
 				for k in S.caja.rosin.keys():
-					mover_rosin(S.caja.rosin, S.rosin, k, S.caja.rosin[k].g)
-				S.caja.erase("rosin")
+					var q: float = minf(S.caja.rosin[k].g, floor(libre_mochila() * 10 + 1e-9) / 10.0)
+					if q < .1:
+						break
+					r += q
+					mover_rosin(S.caja.rosin, S.rosin, k, q)
+				if S.caja.rosin.is_empty():
+					S.caja.erase("rosin")
 			sfx("sel")
-			await say("Sacas %s." % lo_que(e, g, r))
+			await say("Sacas %s.%s" % [lo_que(e, g, r), " No te cabe todo encima: el resto se queda en la caja." if caja_g() >= .5 or caja_r() >= .1 else ""])
 		elif op == "Guardar rosin" or op == "Sacar rosin":
 			var mete := op == "Guardar rosin"
 			var de: Dictionary = S.rosin if mete else S.caja.get("rosin", {})
@@ -1282,6 +1308,9 @@ func caja_action():
 			if mete and _hueco_r(C) < .1:
 				await say("No cabe más.")
 				continue
+			if not mete and libre_mochila() < .1:
+				await say("No te cabe nada más encima.")
+				continue
 			var it := lots.map(rosin_item)
 			it.append({"label": "Nada"})
 			var i: int = await menu(it, {"cls": "right", "title": "¿Qué guardas?" if mete else "¿Qué sacas?"})
@@ -1289,7 +1318,7 @@ func caja_action():
 				continue
 			var k: String = lots[i][0]
 			var b: Dictionary = lots[i][1]
-			var g = await cuanto("Rosin · %s: ¿cuánto?" % lot_nombre(k), minf(b.g, _hueco_r(C)) if mete else float(b.g), [1, 5, 10, 50], func(v): return Datos.coma(v) + " g")
+			var g = await cuanto("Rosin · %s: ¿cuánto?" % lot_nombre(k), minf(b.g, _hueco_r(C)) if mete else minf(b.g, floor(libre_mochila() * 10 + 1e-9) / 10.0), [1, 5, 10, 50], func(v): return Datos.coma(v) + " g")
 			if not g:
 				continue
 			if mete and not S.caja.get("rosin"):
@@ -1323,6 +1352,9 @@ func caja_action():
 			if mete and _hueco(C) < 1:
 				await say("No caben más cogollos.")
 				continue
+			if not mete and libre_mochila() < 1:
+				await say("No te cabe nada más encima.")
+				continue
 			var it := lots.map(lot_item)
 			it.append({"label": "Nada"})
 			var i: int = await menu(it, {"cls": "right", "title": "¿Qué guardas?" if mete else "¿Qué sacas?"})
@@ -1330,7 +1362,7 @@ func caja_action():
 				continue
 			var k: String = lots[i][0]
 			var b: Dictionary = lots[i][1]
-			var g = await cuanto("%s: ¿cuánto?" % lot_nombre(k), minf(b.g, _hueco(C)) if mete else float(b.g), [10, 50, 100, 500, 1000], func(v): return g_txt(v))
+			var g = await cuanto("%s: ¿cuánto?" % lot_nombre(k), minf(b.g, _hueco(C)) if mete else minf(b.g, floor(libre_mochila())), [10, 50, 100, 500, 1000], func(v): return g_txt(v))
 			if not g:
 				continue
 			mover_lote(de, a, k, g)
@@ -1381,6 +1413,19 @@ func robo_darko():
 		var q: float = Datos.jsround(S.rosin[k].g * 5) / 10.0
 		r += q
 		use_rosin(k, q)
+	var A: Dictionary = S.arcon   # y la mitad de lo del arcón (1.10)
+	for k in A.buds.keys():
+		var l := int(floor(A.buds[k].g / 2.0))
+		g += l
+		A.buds[k].g -= l
+		if A.buds[k].g < .5:
+			A.buds.erase(k)
+	for k in A.rosin.keys():
+		var q: float = Datos.jsround(A.rosin[k].g * 5) / 10.0
+		r += q
+		A.rosin[k].g = Datos.jsround((A.rosin[k].g - q) * 10) / 10.0
+		if A.rosin[k].g < .1:
+			A.rosin.erase(k)
 	S.money -= e
 	sfx("bad")
 	await say("Te despierta un portazo. La cerradura está forzada y el piso, revuelto.")
@@ -1458,3 +1503,250 @@ func vencer_encargo():
 	S.rep = max(0, S.rep - 10)
 	S.encVeto = S.day + int(D.ENCARGO_VETO)
 	queue("encargo", func(): await talk("SMS · TOÑO", ["No apareciste. Don Baltasar no se olvida.", "Reputación −10. Nada de encargos hasta el día %s." % n(S.encVeto)]))
+
+# ---------- la sala (1.10, 09c-sala): clima y arcón ----------
+func t_clima(cl: Dictionary) -> String:
+	return "%s °C · %s %%" % [Datos.coma(cl.t), n(cl.hr)]
+
+func _mal(cl: Dictionary) -> String:
+	var L := []
+	if cl.t < D.T_OK[0]:
+		L.append("frío")
+	if cl.t > D.T_OK[1]:
+		L.append("calor")
+	if cl.hr < D.HR_OK[0]:
+		L.append("seco")
+	if cl.hr > D.HR_OK[1]:
+		L.append("húmedo")
+	return (" (" + ", ".join(L) + ")") if L.size() else ""
+
+func sala_desc() -> String:
+	var d := Cultivo.clima_sala(S, false)
+	var nc := Cultivo.clima_sala(S, true)
+	var ap := []
+	for k in D.APARATOS:
+		if k != "termo" and S.sala.get(k):
+			ap.append(D.APARATOS[k].n)
+	var mes: String = D.MESES[Cultivo.mes_de(int(S.day))]
+	var fs := Cultivo.factura_sala(S)
+	return "%s · de día %s%s · de noche %s%s\nBien: %s-%s °C y %s-%s %%. Aparatos: %s%s." % [mes.substr(0, 1).to_upper() + mes.substr(1), t_clima(d), _mal(d), t_clima(nc), _mal(nc),
+		n(D.T_OK[0]), n(D.T_OK[1]), n(D.HR_OK[0]), n(D.HR_OK[1]), ", ".join(ap) if ap.size() else "ninguno", (" · " + Datos.eur(fs) + " al día") if fs else ""]
+
+func arcon_txt() -> String:
+	return ("%s y %s" % [g_txt(arcon_g()), rosin_txt(arcon_r())]) if arcon_r() >= .1 else g_txt(arcon_g())
+
+func arcon_action():
+	while true:
+		var ops := ["Guardar todo", "Guardar un lote", "Sacar un lote", "Cerrar"]
+		var oi: int = await ask("El arcón: %s.\nEncima: %s de %s." % [arcon_txt(), g_txt(peso_encima()), _kg(int(cap_mochila()))], ops)
+		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+		if op == "" or op == "Cerrar":
+			return
+		if op == "Guardar todo":
+			var g := total_buds()
+			var r := total_rosin()
+			if g < .5 and r < .1:
+				await say("No llevas nada que guardar.")
+				continue
+			for k in S.buds.keys():
+				mover_lote(S.buds, S.arcon.buds, k, S.buds[k].g)
+			for k in S.rosin.keys():
+				mover_rosin(S.rosin, S.arcon.rosin, k, S.rosin[k].g)
+			sfx("sel")
+			await say("Guardas %s en el arcón." % [("%s y %s" % [g_txt(g), rosin_txt(r)]) if r >= .1 else g_txt(g)])
+			continue
+		var mete := op == "Guardar un lote"
+		var B: Dictionary = S.buds if mete else S.arcon.buds
+		var Ro: Dictionary = S.rosin if mete else S.arcon.rosin
+		var lots := []
+		for k in B:
+			lots.append([[k, B[k]], 0])
+		for k in Ro:
+			lots.append([[k, Ro[k]], 1])
+		if lots.is_empty():
+			await say("No llevas nada encima." if mete else "El arcón está vacío.")
+			continue
+		if not mete and libre_mochila() < .1:
+			await say("No te cabe nada más encima.")
+			continue
+		var items := []
+		for l in lots:
+			items.append(rosin_item(l[0]) if l[1] else lot_item(l[0]))
+		items.append({"label": "Nada"})
+		var i: int = await menu(items, {"cls": "right", "title": "¿Qué guardas?" if mete else "¿Qué sacas?"})
+		if i < 0 or i >= lots.size():
+			continue
+		var k: String = lots[i][0][0]
+		var b: Dictionary = lots[i][0][1]
+		var ro: bool = lots[i][1] == 1
+		var tope: float = b.g if mete else minf(b.g, libre_mochila())
+		var mx: float = floor(tope * 10 + 1e-9) / 10.0 if ro else floor(tope)
+		if mx < (.1 if ro else 1.0):
+			await say("No te cabe encima.")
+			continue
+		var g = await cuanto("%s%s: ¿cuánto?" % ["Rosin · " if ro else "", lot_nombre(k)], mx, [1, 5, 10, 50] if ro else [10, 50, 100, 500, 1000],
+			(func(q): return Datos.coma(q) + " g") if ro else (func(q): return g_txt(q)))
+		if not g:
+			continue
+		if ro:
+			mover_rosin(Ro, S.arcon.rosin if mete else S.rosin, k, g)
+		else:
+			mover_lote(B, S.arcon.buds if mete else S.buds, k, g)
+		sfx("sel")
+
+# ---------- el móvil (1.10, 12b-movil) ----------
+func reloj_txt() -> String:
+	return "%02d:%02d" % [int(S.min) / 60, int(S.min) % 60]
+
+func movil_menu():
+	while true:
+		var ops := ["Llamar"]
+		if S.flags.get("kiko1"):
+			ops.append("Pedir a Kiko")
+		ops.append_array(["Mensajes", "Colgar"])
+		var ns: int = S.sms.size()
+		var oi: int = await ask("MÓVIL · día %s, %s%s" % [n(S.day), reloj_txt(), (" · %d mensaje%s" % [ns, "s" if ns > 1 else ""]) if ns else ""], ops)
+		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+		if op == "" or op == "Colgar":
+			return
+		if op == "Llamar":
+			if await llamar():
+				return
+		elif op == "Pedir a Kiko":
+			await pedir_kiko()
+		else:
+			await mensajes()
+
+# devuelve true si ha venido un cliente (el móvil se cierra)
+func llamar() -> bool:
+	var C := []
+	if S.flags.get("kiko1"):
+		C.append({"label": "Kiko", "right": "growshop", "desc": "Consejos de cultivo. Los pedidos, desde «Pedir a Kiko».", "k": "kiko"})
+	if S.flags.get("tono"):
+		C.append({"label": "Toño", "right": "Don Baltasar", "desc": "Lo que debes y hasta cuándo.", "k": "tono"})
+	if S.flags.get("inaki"):
+		C.append({"label": "Iñaki", "right": "muelle", "desc": "Compra al por mayor.", "k": "inaki"})
+	for f in S.fijos:
+		C.append({"label": f.n, "right": D.CTYPES[f.t].label.to_lower(), "desc": "Ya ha venido hoy." if f.dia == S.day else "Te compró en la calle. Si estás fuera, viene a buscarte.", "f": f})
+	if C.is_empty():
+		await say("La agenda está vacía.")
+		return false
+	var items := C.duplicate()
+	items.append({"label": "Nada"})
+	var i: int = await menu(items, {"cls": "right", "title": "LLAMAR"})
+	if i < 0 or i >= C.size():
+		return false
+	var c: Dictionary = C[i]
+	match c.get("k", ""):
+		"kiko":
+			await talk("KIKO", [kiko_tip()])
+			return false
+		"tono":
+			await talk("TOÑO", [("Te quedan %s hasta el día %s. Don Baltasar no espera." % [Datos.eur(S.due), n(S.deadline)]) if S.due > 0 else "Ahora mismo no debes nada. Que siga así."])
+			return false
+		"inaki":
+			await talk("IÑAKI", ["Ahora estoy en la mar. A la vuelta hablamos." if S.ch < 3 else ("Hoy ya he cargado. Mañana sale otro barco." if S.mDay == S.day else "Al por mayor, de 100 g para arriba y hasta %s por carga. Pásate por el muelle." % _kg(mayor_dia()))])
+			return false
+	return await llamar_fijo(c.f)
+
+func llamar_fijo(f: Dictionary) -> bool:
+	if f.dia == S.day:
+		await say("%s ya ha venido hoy." % f.n)
+		return false
+	if not D.ZONAS.has(S.map):
+		await say("%s: «¿Dónde estás? Quedamos en la calle»." % f.n)
+		return false
+	if SOSP.alarma:
+		await say("%s: «¿Con la policía detrás? Ni de broma»." % f.n)
+		return false
+	var ct: Dictionary = D.CTYPES[f.t]
+	f.dia = S.day
+	S.heat = minf(100, S.heat + 1)
+	await say("%s: «Vale, voy para allá»." % f.n)
+	advance_time(int(D.LLAMADA_MIN))
+	update_hud()
+	await talk_client({"id": "tel-" + f.id, "fijo": true, "n": f.n.to_upper(), "map": S.map, "x": P.x, "y": P.y, "type": f.t, "want": ri(int(ct.g[0]), int(ct.g[1])),
+		"minThc": mini(24, 15 + int(S.ch)) if f.t == "pij" else 0})
+	return true
+
+# lo que Kiko manda a casa: lo del growshop que no son semillas, carpas ni la prensa, más caro; lo que ya está pedido no se repite
+func precio_envio(it: Dictionary) -> int:
+	return Datos.jsround(it.p * D.ENVIO)
+
+func pedible(it: Dictionary) -> bool:
+	return not it.get("sid") and not it.get("carpa") and it.get("item") != "prensa" and S.ch >= it.ch and shop_cond(it)   # shop_cond ya cuenta lo pedido
+
+func pedir_kiko():
+	var i := 0
+	var ult := ""
+	while true:
+		var l := []
+		for it in D.SHOP:
+			if pedible(it):
+				if it.lbl == ult:   # el cursor, en lo último pedido si sigue en la lista
+					i = l.size()
+				l.append(it)
+		var items := []
+		for it in l:
+			var nn: int = S.envio.count(it.lbl)
+			items.append({"label": it.lbl + ((" · ×%d" % nn) if nn else ""), "right": Datos.eur(precio_envio(it)), "desc": it.get("desc", "")})
+		items.append({"label": "Salir", "desc": "Lo pedido llega mañana por la mañana a casa."})
+		i = await menu(items, {"cls": "full", "title": "PEDIR A KIKO", "title2": "Envío a casa +%d %% · tienes %s" % [Datos.jsround((D.ENVIO - 1) * 100), Datos.eur(S.money)], "desc": true, "initial": i})
+		if i < 0 or i >= l.size():
+			return
+		var it: Dictionary = l[i]
+		var e := precio_envio(it)
+		if S.money < e:
+			sfx("bad")
+			await say("No te llega el dinero.")
+			continue
+		S.money -= e
+		S.envio.append(it.lbl)
+		ult = it.lbl
+		sfx("coin")
+		toast("Pedido: " + it.lbl + " · llega mañana", 1400)
+
+func recibir_envio():
+	if S.envio.is_empty():
+		return
+	var c := {}
+	for lbl in S.envio:
+		var it = null
+		for x in D.SHOP:
+			if x.lbl == lbl:
+				it = x
+				break
+		if it == null:
+			continue
+		c[lbl] = c.get(lbl, 0) + 1
+		if it.get("item"):
+			S.items[it.item] += int(it.get("n", 1))
+		if it.get("maceta"):
+			S.items["m_" + it.maceta] += 1
+		if it.get("foco"):
+			S.items["f_" + it.foco] += 1
+		if it.get("extra"):
+			S.items["x_" + it.extra] += 1
+		if it.get("bolsa"):
+			S.items.bolsa = maxi(int(S.items.get("bolsa", 0)), int(it.bolsa))
+		if it.get("aparato"):
+			S.sala[it.aparato] = true
+	S.envio = []
+	var L := []
+	for lbl in c:
+		L.append(("%s ×%d" % [lbl, c[lbl]]) if c[lbl] > 1 else lbl)
+	var t := ", ".join(L)
+	queue("envio", func(): await talk("SMS · KIKO", ["Te he dejado el paquete en casa: %s." % t]))
+
+func mensajes():
+	if S.sms.is_empty():
+		await say("No tienes mensajes.")
+		return
+	var i := 0
+	while true:
+		var items := []
+		for m in S.sms:
+			items.append({"label": m.n, "right": "día " + n(m.d), "desc": m.t})
+		i = await menu(items, {"cls": "full", "title": "MENSAJES", "title2": "%d de %s" % [S.sms.size(), n(D.SMS_MAX)], "desc": true, "initial": i})
+		if i < 0:
+			return

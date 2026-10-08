@@ -103,6 +103,52 @@ func caja_r() -> float:
 			t += S.caja.rosin[k].g
 	return t
 
+# lo que llevas encima (cogollos y rosin) y su tope, la mochila (1.10, 09c-sala); el arcón de casa no tiene tope
+# la mejor bolsa que tienes o que ya has pedido a Kiko (no se vende otra igual o peor)
+func bolsa_ya() -> int:
+	var b := int(S.items.get("bolsa", 0))
+	for l in S.envio:
+		for x in D.SHOP:
+			if x.lbl == l:
+				b = maxi(b, int(x.get("bolsa", 0)))
+	return b
+
+func peso_encima() -> float:
+	return total_buds() + total_rosin()
+
+func cap_mochila() -> float:
+	return D.MOCHILAS[int(S.items.get("bolsa", 0))].g
+
+func libre_mochila() -> float:
+	return maxf(0, cap_mochila() - peso_encima())
+
+func arcon_g() -> float:
+	var t := 0.0
+	for k in S.arcon.buds:
+		t += S.arcon.buds[k].g
+	return t
+
+func arcon_r() -> float:
+	var t := 0.0
+	for k in S.arcon.rosin:
+		t += S.arcon.rosin[k].g
+	return t
+
+# la agenda del móvil (1.10, 12b-movil): el cliente que te compra te da su número
+func nombre_fijo(id: String) -> String:
+	var a := 0
+	for i in id.length():
+		a = (a * 31 + id.unicode_at(i)) % 9973
+	return D.NOMBRES_FIJO[a % D.NOMBRES_FIJO.size()]
+
+func apunta_fijo(c: Dictionary) -> void:
+	if c.get("fijo") or S.fijos.size() >= D.FIJOS_MAX:
+		return
+	for f in S.fijos:
+		if f.id == c.id:
+			return
+	S.fijos.append({"id": c.id, "n": nombre_fijo(c.id), "t": c.type, "dia": 0})
+
 func caja_e() -> float:
 	return S.caja.money if S.get("caja") else 0
 
@@ -657,6 +703,9 @@ func object_action(x: int, y: int) -> void:
 			"fridge":
 				await say("La nevera: medio limón, leche y un táper de alubias que dejó la tía.")
 				return
+			"crate":
+				await arcon_action()
+				return
 			"plantDeco":
 				await say("Una monstera. La tía Maite le hablaba cada mañana.")
 				return
@@ -813,7 +862,7 @@ func remove_client(id: String) -> void:
 # el catador (1.10) solo compra rosin: a precio_rosin, y el «caro» cuela según lo que pase del 50 % de THC
 func talk_client(c: Dictionary) -> void:
 	var ct: Dictionary = D.CTYPES[c.type]
-	var N: String = ct.label
+	var N: String = c.get("n", ct.label)   # n: el nombre de un cliente de la agenda (12b-movil)
 	var ext: bool = c.type == "ext"
 	await say(pick(ct.greet), N)
 	if ext:
@@ -852,6 +901,7 @@ func talk_client(c: Dictionary) -> void:
 		sfx("coin")
 		await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})
 		remove_client(c.id)
+		apunta_fijo(c)
 		await say(pick(["Trato hecho.", "Gracias. Nos vemos.", "Bien. Se lo diré a mis amigos."]), N)
 		toast("+%s · %s g %svendidos" % [Datos.eur(pr[j]), n(c.want), "de rosin " if ext else ""], 1600)
 		visto_vender()
@@ -1228,6 +1278,10 @@ func instalar_caja():
 func vencer_encargo():
 	pass
 func robo_darko():
+	pass
+func arcon_action():
+	pass
+func recibir_envio():
 	pass
 func notas_tia():
 	pass

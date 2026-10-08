@@ -133,10 +133,10 @@ function atlasCarpa() {
       LOOKS, SKINS, HAIRS, CLOTH, CTYPES, CH_TITLES,
       NPCDEF: NPCDEF.map(d => ({ id: d.id, map: d.map, x: d.x, y: d.y, look: d.look, wander: d.wander || 0, dir: d.dir || null })),
       ITEMS: ITEMS.map(it => ({ id: it.id, map: it.map, x: it.x, y: it.y, hidden: !!it.hidden })), SIGNS,
-      SHOP: SHOP.map(it => { const o = {}; for (const k of ['lbl', 'p', 'ch', 'sid', 'item', 'n', 'desc', 'maceta', 'foco', 'extra', 'carpa', 'ci']) if (it[k] != null) o[k] = it[k]; return o; }),
+      SHOP: SHOP.map(it => { const o = {}; for (const k of ['lbl', 'p', 'ch', 'sid', 'item', 'n', 'desc', 'maceta', 'foco', 'extra', 'carpa', 'ci', 'aparato', 'bolsa']) if (it[k] != null) o[k] = it[k]; return o; }),
       SOBRES, GRANEL, BANCO, SOBRE, DEUDA, PLAZOS, INTERES, PREMIO_COPA, SOBORNO, MULTA_REDADA, META_VENTAS, MULTA_CALLE,
       ZONAS, PARADAS, BUS_HORAS, CAJA, CAJA_P, CAJA_REDADA, CAJA_ANIO, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, ENCARGO_DIAS, ENCARGO_VETO, CUOTA_DIAS,
-      IMPERIO, RECIPE_HINTS, DICHO_CARPA, THIEVES, COPS, SITIOS, OLOR, ESQUEJE_DIAS, MS_PER_MIN, KIKO_TIPS: kiko,
+      IMPERIO, RECIPE_HINTS, DICHO_CARPA, MOCHILAS, ENVIO, SMS_MAX, FIJOS_MAX, LLAMADA_MIN, NOMBRES_FIJO, THIEVES, COPS, SITIOS, OLOR, ESQUEJE_DIAS, MS_PER_MIN, KIKO_TIPS: kiko,
       ROSIN, PATRULLAS, PAT, CALLE: CALLE.source, TAPA_VISTA: TAPA_VISTA.source, RONDA: Object.fromEntries(Object.keys(PATRULLAS).map(k => [k, casillasRonda(k)])),
       TUNES, GLYPH, CORTES_COMBATE, FOCO_LUZ, VK, DANO, MACETA_CM, LITROS_M2, VB: { M: VB_M, F: VB_F, X: VB_X, PARED: VB_PARED, PLATA: VB_PLATA }, BW, BH, BP, CUR,
       NEW_STATE: newState(), MASCARAS: mascaras() });
@@ -218,6 +218,7 @@ function atlasCarpa() {
       STRAINS: Object.fromEntries(ids.map(k => { const s = STRAINS[k]; return [k, { n: s.n, thc: s.thc, y: s.y, d: s.d, r: s.r, c: s.c, ind: indDe(k), hj: hojaDe(k), tipo: tipoGen(k) }]; })),
       DEX: ids, GENETICA, CARPAS, FOCOS, MACETAS, PLANTA_CM, MACETA_CM, FOCO_CM, FOCO_SEP, HOLGURA, VCA, VC_FILA, VC_TIERRA, LUZ_C, VC_HOJA,
       Y_MEDIA, W_M2, GEN_ESTABLE, TIPO_GEN, KWH, H_LUZ, H_24, EXTRAS, FENO_ESTRELLA, FENO_FLOJO, SEMILLA_HERMA,
+      MESES, MES0, T_MES, HR_MES, CALOR_W, HR_PLANTA, HR_NOCHE, HR_FILTRO, T_FILTRO, T_OK, HR_OK, H_DIA, MOHO, APARATOS, GOTEO_L,
       FEM: SHOP.filter(it => it.sid).map(it => it.sid) };   // FEM: las feminizadas (las de tienda)
     // tono y porte por % índica
     o.hojas = [];

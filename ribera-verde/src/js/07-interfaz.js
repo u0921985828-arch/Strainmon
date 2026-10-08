@@ -15,7 +15,8 @@ async function say(text,name,keep){
   await new Promise(res=>push(b=>{if(b==='A'||b==='B'){pop();res();}}));
   dlgMore.hidden=true;if(!keep)dlg.hidden=true;
 }
-async function talk(name,lines){for(const l of lines)await say(l,name);}
+// los SMS (1.10) se quedan en el móvil: S.sms, del último al primero, hasta SMS_MAX
+async function talk(name,lines){if(S&&S.sms&&/^SMS · /.test(name)){S.sms.unshift({d:S.day,n:name.slice(6),t:lines.map(nm).join('\n')});if(S.sms.length>SMS_MAX)S.sms.length=SMS_MAX;}for(const l of lines)await say(l,name);}
 async function ask(text,opts,name){await typeText(text,name);const i=await menu(opts,{cls:'right',cancel:true});dlg.hidden=true;return i<0?opts.length-1:i;}
 dlg.addEventListener('click',()=>press('A'));
 function menu(items,o={}){return new Promise(res=>{

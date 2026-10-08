@@ -40,8 +40,90 @@ static func factores(S: Dictionary, i: int) -> Dictionary:
 	var F: Dictionary = D.FOCOS[c.foco]
 	var M: Dictionary = D.MACETAS.get(S.macetas[i], D.MACETAS.plastico7)
 	var dens := minf(1, F.w / (C.cm[0] * C.cm[2] / 1e4 * D.W_M2))
-	return {"g": F.w * F.gpw / C.plazas * M.rend, "cap": M.cap, "crec": F.crec * (.85 + .15 * dens) * M.crec, "thc": F.thc * dens,
-		"agua": F.agua * M.agua * (.5 if c.get("goteo") else 1.0), "plaga": M.plaga * (.7 if c.get("vent") else 1.0), "dens": dens}
+	var cl := clima_sala(S, es_noche(S))   # (1.10) crec lleva el clima de la sala y hr, su humedad (el moho de plant_step)
+	return {"g": F.w * F.gpw / C.plazas * M.rend, "cap": M.cap, "crec": F.crec * (.85 + .15 * dens) * M.crec * f_clima(cl), "thc": F.thc * dens,
+		"agua": F.agua * M.agua, "plaga": M.plaga * (.7 if c.get("vent") else 1.0), "dens": dens, "hr": cl.hr}
+
+# ---------- la sala del piso (1.10, 09c-sala): clima, aparatos y goteo ----------
+static func es_noche(S: Dictionary) -> bool:
+	return S.min >= 21 * 60 or S.min < 6 * 60
+
+static func mes_de(d: int) -> int:
+	return (int(Datos.carga().MES0) + d - 1) % 12
+
+static func fuera(v: float, r: Array) -> float:
+	return r[0] - v if v < r[0] else (v - r[1] if v > r[1] else 0.0)
+
+# t (°C, al décimo), hr (%), uso (los aparatos que trabajan) y n (plantas vivas)
+static func clima_sala(S: Dictionary, noche: bool) -> Dictionary:
+	var D := Datos.carga()
+	var m := mes_de(int(S.day))
+	var sa: Dictionary = S.get("sala", {})
+	var nn := 0
+	var calor := 0.0
+	var filtros := 0
+	for p in S.pots:
+		if p and not p.get("dead"):
+			nn += 1
+	for ci in S.carpas.size():
+		var c = S.carpas[ci]
+		if not c or not plantas_vivas(S, ci):
+			continue
+		var F: Dictionary = D.FOCOS[c.foco]
+		if not noche:
+			calor += F.w * D.CALOR_W[F.tipo]
+		if c.get("filtro"):
+			filtros += 1
+	var t: float = D.T_MES[m][1 if noche else 0] + calor - D.T_FILTRO * filtros
+	var hr: float = D.HR_MES[m] + D.HR_PLANTA * nn + (D.HR_NOCHE if noche else 0.0) - D.HR_FILTRO * filtros - calor
+	var uso := {}
+	if nn:
+		for k in D.APARATOS:
+			var A: Dictionary = D.APARATOS[k]
+			if not sa.get(k) or not (A.get("t") or A.get("hr")):
+				continue
+			if A.get("t"):
+				if (t < A.obj) if A.t > 0 else (t > A.obj):
+					t = minf(A.obj, t + A.t) if A.t > 0 else maxf(A.obj, t + A.t)
+					uso[k] = 1
+			elif (hr < A.obj) if A.hr > 0 else (hr > A.obj):
+				hr = minf(A.obj, hr + A.hr) if A.hr > 0 else maxf(A.obj, hr + A.hr)
+				uso[k] = 1
+	return {"t": Datos.jsround(t * 10) / 10.0, "hr": Datos.jsround(hr), "uso": uso, "n": nn}
+
+static func f_clima(cl: Dictionary) -> float:
+	var D := Datos.carga()
+	return clampf(1 - .06 * fuera(cl.t, D.T_OK), .4, 1) * clampf(1 - .015 * fuera(cl.hr, D.HR_OK), .7, 1)
+
+# € al día de los aparatos que trabajan (de día H_DIA del tiempo, de noche el resto; un termostato, la mitad de ese tiempo)
+static func factura_sala(S: Dictionary) -> int:
+	var D := Datos.carga()
+	var d := clima_sala(S, false)
+	var nc := clima_sala(S, true)
+	if not d.n:
+		return 0
+	var kwh := 0.0
+	for k in D.APARATOS:
+		if d.uso.get(k) or nc.uso.get(k):
+			kwh += D.APARATOS[k].w * D.H_24 * (D.H_DIA * d.uso.get(k, 0) + (1 - D.H_DIA) * nc.uso.get(k, 0)) * .5 / 1000
+	return Datos.jsround(kwh * D.KWH)
+
+# el depósito del goteo (c.dep litros; sin el campo, lleno) riega la planta que baja del 50 % de agua
+static func regar_goteo(S: Dictionary, p: Dictionary, i: int) -> void:
+	var D := Datos.carga()
+	var c: Dictionary = S.carpas[huecos(S)[i].c]
+	if not c.get("goteo") or p.get("dead") or p.water >= 50:
+		return
+	var l: float = D.MACETAS.get(S.macetas[i], D.MACETAS.plastico7).l * .5 * (100 - p.water) / 100
+	var d: float = c.get("dep", D.GOTEO_L) if c.get("dep") != null else D.GOTEO_L
+	if d <= 0:
+		return
+	if d >= l:
+		p.water = 100
+		c.dep = Datos.jsround((d - l) * 100) / 100.0
+	else:
+		p.water += d / l * (100 - p.water)
+		c.dep = 0
 
 static func plant_stage(p: Dictionary) -> int:
 	return 4 if p.prog >= 1 else (0 if p.prog < .12 else (1 if p.prog < .35 else (2 if p.prog < .65 else 3)))
@@ -71,6 +153,9 @@ static func plant_step(S: Dictionary, p: Dictionary, h: float, f: Dictionary) ->
 		p.health -= 2.5 * h
 	if p.water > 30 and not p.pest:
 		p.health += h
+	var D := Datos.carga()
+	if f.get("hr", 0) > D.HR_OK[1] and p.prog >= .65 and p.prog < 1:   # moho: humedad alta en floración (1.10)
+		p.health -= h * (f.hr - D.HR_OK[1]) * D.MOHO
 	p.health = clampf(p.health, 0, 100)
 	if p.health <= 0:
 		p.dead = true
@@ -79,6 +164,7 @@ static func plants_advance(S: Dictionary, minutos: int) -> void:
 	for i in S.pots.size():
 		if S.pots[i] != null:
 			plant_step(S, S.pots[i], minutos / 60.0, factores(S, i))
+			regar_goteo(S, S.pots[i], i)
 
 # ---------- fenotipo: cada planta de semilla tira el suyo al plantar (THC, gramos y % índica) ----------
 static func gauss() -> float:
@@ -167,7 +253,7 @@ static func thc_cosecha(S: Dictionary, p: Dictionary, f: Dictionary) -> float:
 static func plantas_vivas(S: Dictionary, ci: int) -> bool:
 	var H := huecos(S)
 	for i in H.size():
-		if H[i].c == ci and S.pots[i] != null and not S.pots[i].get("dead"):
+		if H[i].c == ci and i < S.pots.size() and S.pots[i] != null and not S.pots[i].get("dead"):   # (como en JS, una plaza sin entrada en S.pots está vacía)
 			return true
 	return false
 
@@ -203,6 +289,7 @@ static func avanza(S: Dictionary, minutos: int) -> int:
 			for ci in S.carpas.size():
 				if S.carpas[ci] and plantas_vivas(S, ci):
 					e += luz_carpa(S, ci)
+			e += factura_sala(S)
 			S.money = maxi(0, S.money - e)
 			luz += e
 	return luz

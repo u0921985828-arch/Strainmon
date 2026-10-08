@@ -22,6 +22,7 @@ function migrate(){
   const d=newState();for(const k in d)if(!(k in S))S[k]=d[k];for(const k in d.items)if(!(k in S.items))S.items[k]=0;
   // 1.10: el plazo del capítulo 3 corre desde Toño (las partidas sin él, desde hoy) y la protección de Molina dura 10 días desde hoy
   if(S.ch===3&&!S.flags.metB&&!(S.due>0)){S.due=PLAZOS[3];S.deadline=S.day+7;S.flags.tono=S.day;}
+  if(S.flags.metB&&!('tono' in S.flags))S.flags.tono=S.day;   // ya conoces a Toño: sale en el móvil (12b-movil)
   if(S.protect&&!S.protHasta)S.protHasta=S.day+CUOTA_DIAS;
   const n=huecos().length;while(S.pots.length<n)S.pots.push(null);while(S.macetas.length<n)S.macetas.push('plastico7');
 }

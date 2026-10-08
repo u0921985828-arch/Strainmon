@@ -159,7 +159,7 @@ Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo a Iñaki
   - Entregar: te quitan los gramos, sin multa, y el calor baja 15.
   - Una requisa se lleva **todos** los gramos que llevas encima y baja el calor 15. La multa es de 601 € (o lo que lleves, si es menos).
 - **Calor y redada.** Al cambiar de día (00:00), duermas o no, el juego mira el calor *antes* de bajarlo:
-  - con 90 o más, hay redada: se llevan todas las plantas y todos los gramos de fuera de la caja, hay una multa de hasta 3.000 € y el calor queda en 30. La caja la encuentran 1 de cada 4 veces (§ 2.7);
+  - con 90 o más, hay redada: se llevan todas las plantas y todos los gramos de fuera de la caja (los de encima y los del arcón de casa), hay una multa de hasta 3.000 € y el calor queda en 30. La caja la encuentran 1 de cada 4 veces (§ 2.7);
   - con la protección de Molina, la redada se para y el calor queda en 50.
 
 ### 2.2 Por paso
@@ -328,7 +328,7 @@ Comprobado con el juego: redada con calor 90 y no con 89,9 (se lleva las plantas
 
 La redada se decide al cambiar de día, a las 00:00, duermas o no. A esa hora, el calor tiene que estar por debajo de 90. Durante el día, el calor solo baja de tres formas: con un soborno (−10), con una requisa o entregando (−15). Todo lo demás lo hace la bajada diaria (−12, o −20 con protección), y esa bajada llega *después* de mirar la redada. Con 3 carpas en flor sin filtro, el olor suma 6 al día y deja muy poco margen para vender en la calle.
 
-Con la caja, una redada cuesta menos: 3 de cada 4 veces no la ven, y la multa sale primero de lo de fuera. Si la encuentran, se llevan sus gramos y la mitad de su dinero. Las plantas se pierden igual.
+Con la caja, una redada cuesta menos: 3 de cada 4 veces no la ven, y la multa sale primero de lo de fuera. Si la encuentran, se llevan sus gramos y la mitad de su dinero. Las plantas se pierden igual. El arcón de casa (1.10) no protege de la redada, que se lo lleva entero: solo te libra de los controles y de los ladrones de la calle (y Darko se lleva la mitad).
 
 ### 2.8 La Copa
 

@@ -160,7 +160,7 @@ function copa(thc, sigma, luz, abono, salud = 100) {
   return p;
 }
 
-// la redada (11-historia, raidEvent): se lleva lo de fuera y una multa (MULTA_REDADA) que se paga de fuera y, si no llega, de la
+// la redada (11-historia, raidEvent): se lleva lo de fuera (lo de encima y el arcón; los escenarios lo tienen vacío) y una multa (MULTA_REDADA) que se paga de fuera y, si no llega, de la
 // caja; la caja la encuentran 1 de cada 4 veces (CAJA_REDADA): sus gramos y la mitad de su dinero. Pérdida media en euros
 const MULTA_R = 3000, P_CAJA = .25;
 function redada(e, eurG) {

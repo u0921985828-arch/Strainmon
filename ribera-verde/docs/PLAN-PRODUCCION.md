@@ -133,7 +133,7 @@ Van uno por carpa (`EXTRAS` y `S.carpas[ci][id]`). Se compran en el growshop («
 |---|---|---|---|---|
 | `vent` | Ventilador de pinza | Ø 15–20 cm | plagas ×0,7 en esa carpa; gasta 25 W día y noche | 20 € · cap. 1 |
 | `filtro` | Extractor con filtro de carbón | filtro Ø 20 × 50 cm y extractor Ø 15 cm | Sin filtro, cada carpa con alguna planta en floración suma +2 de calor policial al día por el olor. Con filtro, 0. Se suma después de la bajada diaria del calor (lo prueba el test). Gasta 75 W día y noche | 110 € · cap. 2 |
-| `goteo` | Riego por goteo | depósito de 20 L (30 × 25 × 35 cm) con goteros | el agua baja a la mitad de velocidad | 55 € · cap. 3 |
+| `goteo` | Riego por goteo | depósito de 100 L con goteros | riega solo la que baja del 50 % mientras quede agua; se rellena desde la carpa | 55 € · cap. 3 |
 
 **Ideas:** temporizador y fotoperiodo (18/6 en crecimiento y 12/12 en floración), termohigrómetro (temperatura y humedad en la ficha), malla SCROG (+cosecha, +días) y deshumidificador (moho).
 

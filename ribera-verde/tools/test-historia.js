@@ -166,12 +166,12 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   }, () => S.carpas[0].t === 'p80' && S.carpas[0].foco === 'led200' && S.money === 1000 - 90 && S.pots.length === 7 && R.filas === '0,0,1' && R.atras
     && [0, 1].every(i => JSON.stringify(S.pots[i]) === R.antes[i]) && R.antes[3] !== 'null' && R.movida === R.antes[3] && S.pots[3] === null && S.macetas[2] === 'plastico7' && S.macetas[3] === R.mac[2] && MAPS.home.carpas.length === 2
     || { carpas: S.carpas, money: S.money, R, pots: S.pots.map(p => JSON.stringify(p)), macetas: S.macetas });
-  await step('Extras: ventilador, filtro y goteo en la carpa de 100; sin filtro, el olor de la floración sube el calor', ['Ventilador', '^Carpa 100', 'Extractor', '^Carpa 100', 'Riego por goteo', '^Carpa 100', 'Salir', 'Poner filtro'], async () => {
+  await step('Extras: ventilador, filtro y goteo en la carpa de 100 (el goteo riega del depósito); sin filtro, el olor de la floración sube el calor', ['Ventilador', '^Carpa 100', 'Extractor', '^Carpa 100', 'Riego por goteo', '^Carpa 100', 'Salir', 'Poner filtro'], async () => {
     S.money = 1000; await run(shop); const flor = () => ({ sid: 'ria', prog: .8, water: 100, health: 100, fert: false, pest: false });
     window.R = { money: S.money, f: factores(4), m: MACETAS[S.macetas[4]], F: FOCOS[S.carpas[1].foco] };
     S.protect = false; S.pots[0] = flor(); S.pots[4] = flor(); S.heat = 30; advanceTime(24 * 60); await idle(); R.h1 = S.heat;
     S.items.x_filtro = 1; await run(() => carpaAction(0)); advanceTime(24 * 60); await idle(); R.h2 = S.heat; S.pots[0] = S.pots[4] = null;
-  }, () => S.carpas[1].vent && S.carpas[1].filtro && S.carpas[1].goteo && R.money === 1000 - 20 - 110 - 55 && Math.abs(R.f.plaga - R.m.plaga * .7) < 1e-9 && Math.abs(R.f.agua - R.F.agua * R.m.agua * .5) < 1e-9
+  }, () => S.carpas[1].vent && S.carpas[1].filtro && S.carpas[1].goteo && R.money === 1000 - 20 - 110 - 55 && Math.abs(R.f.plaga - R.m.plaga * .7) < 1e-9 && Math.abs(R.f.agua - R.F.agua * R.m.agua) < 1e-9 && S.carpas[1].dep < GOTEO_L
     && R.h1 === 30 - 12 + 2 && R.h2 === R.h1 - 12 && S.carpas[0].filtro && !S.items.x_filtro || { carpas: S.carpas, R, items: S.items });
   await step('Cruce de receta: Afghani × Skunk #1 → Critical Mass (de receta, sacada en la mesa: falta cosecharla)', ['^Afghani', '^Skunk #1', 'Cruzar'], async () => {
     addSeeds('ria', 2); addSeeds('txoko', 2); await run(labAction);
@@ -442,11 +442,65 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.min = 359; resetSosp(); enterMap('town', 16, 17, 'up'); R.n = ents.filter(e => e.pat).length; e = ents.find(e => e.id === 'pat1'); alarma(e);
     S.min = 360; UPAT(50); R.alba = [ents.filter(e => e.pat).length, SOSP.alarma, SOSP.v].join(); S.min = 600; enterMap('home', 5, 5, 'up');
   }, () => !CALLE.test(R.g) && R.t > 0 && R.t <= 3000 && R.sigue && R.n === 2 && R.alba === '1,,50' || R);
-  await step('Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor', [], async () => {
+  await step('Goteo (1.10): el depósito riega solo lo que baja del 50 %, gasta la mitad de los litros de la maceta por cada 100 % y, vacío, no riega; se rellena desde la carpa', ['Rellenar depósito'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { carpas: [{ t: 'm100', foco: 'sodio400', goteo: true, dep: 10 }], macetas: Array(4).fill('plastico7'), pots: Array(4).fill(null) });
+    const i = 1, p = { sid: 'ria', prog: .3, water: 40, health: 100, fert: false, pest: false }, l = MACETAS[S.macetas[i]].l * .5;
+    S.pots[i] = p; regarGoteo(p, i); window.R = { w1: p.water, d1: S.carpas[0].dep, e1: Math.round((10 - l * .6) * 100) / 100 };
+    S.carpas[0].dep = 1; p.water = 40; regarGoteo(p, i); R.w2 = p.water; R.e2 = 40 + 1 / (l * .6) * 60; R.d2 = S.carpas[0].dep;
+    p.water = 45; regarGoteo(p, i); R.w3 = p.water; p.water = 50.1; S.carpas[0].dep = 50; plantsAdvance(10); R.w4 = p.water; R.d4 = S.carpas[0].dep;
+    await run(() => carpaAction(0)); R.d5 = S.carpas[0].dep; S = S0;
+  }, () => R.w1 === 100 && R.d1 === R.e1 && Math.abs(R.w2 - R.e2) < 1e-9 && R.d2 === 0 && R.w3 === 45 && R.w4 === 100 && R.d4 < 50 && R.d5 === GOTEO_L || R);
+  await step('Clima de la sala (1.10): enero, de día con sodio 400 W (+4 °C) y de noche (frío: crecen −18 %); con LED casi no calienta; termohigrómetro, calefactor y deshumidificador del growshop, su factura de noche; moho en floración y su aviso al despertar (julio, de noche)', ['Termohigrómetro', 'Calefactor', 'Deshumidificador', 'Salir'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 5, money: 1000, sala: {}, day: 10, carpas: [{ t: 'm100', foco: 'sodio400' }], macetas: Array(4).fill('plastico7') });
+    S.pots = S.macetas.map(() => ({ sid: 'ria', prog: .8, water: 100, health: 90, fert: false, pest: false }));
+    window.R = { mes: MESES[mesDe(S.day)], dia: climaSala(false), noche: climaSala(true) }; R.f = fClima(R.noche); S.min = 23 * 60; R.c0 = factores(0).crec;
+    S.carpas[0].foco = 'led480'; R.led = climaSala(false).t; S.carpas[0].foco = 'sodio400';
+    await run(shop); R.m = S.money; R.sala = Object.keys(S.sala).join(); R.n2 = climaSala(true); R.d2 = climaSala(false); R.c1 = factores(0).crec; R.fs = facturaSala();
+    const p = S.pots[0], f = Object.assign({}, factores(0), { hr: 70, plaga: 0 }); plantStep(p, 1, f); R.moho = p.health;
+    S.day = 4; S.sala = {}; R.julio = climaSala(true).hr; const l0 = LOG.length; await run(() => avisoPlaga([])); R.aviso = LOG.slice(l0).filter(l => /^Moho/.test(l)).join('|'); S = S0;
+  }, () => R.mes === 'enero' && R.dia.t === 22 && R.dia.hr === 49 && R.noche.t === 15 && R.noche.hr === 58 && Math.abs(R.f - .82) < 1e-9 && R.led === 19.9
+    && R.m === 1000 - pr('Termohigrómetro') - pr('Calefactor') - pr('Deshumidificador') && R.sala === 'termo,calef,deshu' && R.n2.t === 20 && R.n2.hr === 55 && R.n2.uso.calef && R.n2.uso.deshu && !R.d2.uso.calef
+    && Math.abs(R.c1 / R.c0 - 1 / .82) < 1e-9 && R.fs === Math.round((1500 + 250) * H_24 * (1 - H_DIA) * .5 / 1000 * KWH) && R.moho === 90 && R.julio === 55 + 8 + 5
+    && /^Moho en .*\(plaza 1\), .* y .*\(plaza 4\): de noche la sala pasa del 60 % de humedad\./.test(R.aviso) || R);
+  await step('Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad',
+    ['Sacar un lote', '^Hindu', '^10 g', 'Guardar todo', 'Cerrar', 'Bolsa de deporte', 'Salir', 'Sacar todo', 'Cerrar'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 5, map: 'home', buds: {}, rosin: {}, arcon: { buds: {}, rosin: {} }, protect: false, caja: null });
+    S.items.bolsa = 0; addBuds('ria', 990, 12); S.pots[0] = { sid: 'hindu', prog: 1, water: 100, health: 100, fert: false, pest: false, f: { id: 9998, t: 1, y: 1 } };
+    const g = gramosPlanta(S.pots[0], factores(0)), l0 = LOG.length; await run(() => harvest(0));
+    window.R = { g, encima: pesoEncima(), arcon: arconG(), aviso: LOG.slice(l0).filter(l => /arcón/.test(l)).join('|') };
+    useBuds('ria', 500); await run(arconAction); R.a2 = arconG(); R.b2 = totalBuds(); S.money = 100; await run(shop); R.cap = capMochila(); R.bolsa = S.items.bolsa;
+    addBuds('ria', 20, 12); confiscate(false); R.control = arconG(); addBuds('ria', 5, 12);
+    const l1 = LOG.length; await run(raidEvent); R.redada = LOG.slice(l1).filter(l => /Se llevan/.test(l)).join('|'); R.a3 = arconG();
+    S.caja = { money: 0, buds: { ria: { g: 1500, thc: 12 } }, nivel: 1 }; S.buds = {}; addBuds('ria', 2000, 12); const l3 = LOG.length; await run(cajaAction);
+    R.sacar = [totalBuds(), cajaG(), LOG.slice(l3).some(l => /No te cabe todo encima/.test(l))].join();
+    S.arcon = { buds: { ria: { g: 101, thc: 12 } }, rosin: { ria: { g: 3, thc: 36 } } }; S.money = 0; S.buds = {}; S.rosin = {};
+    const l2 = LOG.length; await run(roboDarko); R.darko = LOG.slice(l2).filter(l => /Se han llevado/.test(l)).join('|'); R.a4 = JSON.stringify(S.arcon); S = S0;
+  }, () => R.g > 10 && R.encima === 1000 && R.arcon === R.g - 10 && new RegExp(`en la mochila: ${R.g - 10} g van al arcón`).test(R.aviso) && R.a2 === 490 + R.g && R.b2 === 0
+    && R.cap === 3000 && R.bolsa === 1 && R.control === R.a2 && new RegExp(`y ${Math.floor(5 + R.a2)} g\\.`).test(R.redada) && R.a3 === 0
+    && R.sacar === '3000,500,true' && /Se han llevado 0 €, 50 g y 1,5 g de rosin\./.test(R.darko) && R.a4 === '{"buds":{"ria":{"g":51,"thc":12}},"rosin":{"ria":{"g":1.5,"thc":36}}}' || R);
+  await step('Móvil (1.10): START → MÓVIL; pedir a Kiko (+15 %, llega mañana) y su SMS en Mensajes; llamar a Kiko; quien te compra te da su número y, llamado, viene a la calle (20 min, +1 de calor, una vez al día)',
+    ['MÓVIL', 'Pedir a Kiko', '^Abono', 'Salir', 'Colgar', 'SALIR', 'MÓVIL', 'Mensajes', '<B>', 'Llamar', '^Kiko', 'Colgar', 'SALIR', '^Skunk', 'Rebaja',
+      'MÓVIL', 'Llamar', '^(?!Kiko|Nada)', '^Skunk', 'Rebaja', 'SALIR', 'MÓVIL', 'Llamar', '^(?!Kiko|Nada)', 'Colgar', 'SALIR'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0));
+    Object.assign(S, { map: 'home', money: 100, sms: [], envio: [], fijos: [], protect: false, protHasta: 0, encargo: null, heat: 0, due: 0, buds: {}, rosin: {}, min: 600 });
+    S.flags.kiko1 = true; S.flags.tono = 0; S.flags.inaki = false; const f0 = S.items.fert;
+    await run(startMenu); window.R = { m: S.money, envio: S.envio.join() }; advanceTime(24 * 60); await idle();
+    R.fert = S.items.fert - f0; R.sms = S.sms.find(m => m.n === 'KIKO') || null; R.envio2 = S.envio.length;
+    const l0 = LOG.length; await run(startMenu); R.log = LOG.slice(l0);
+    enterMap('town', 16, 17, 'up'); S.min = 600; addBuds('ria', 50, 12); const c = { id: 'cz1', map: 'town', x: 5, y: 20, type: 'cur', want: 2, minThc: 0 }; S.clients.push(c);
+    await run(() => talkClient(c)); R.fijos = JSON.stringify(S.fijos); R.nom = nombreFijo('cz1');
+    R.h = S.heat; R.min = S.min; R.mon = S.money; const l1 = LOG.length; await run(startMenu); R.t = S.min - R.min; R.dh = S.heat - R.h; R.cobra = S.money - R.mon; R.dia = S.fijos[0].dia === S.day;
+    R.log2 = LOG.slice(l1); const l2 = LOG.length; await run(startMenu); R.otra = LOG.slice(l2).join('|'); S = S0; enterMap('home', 5, 5, 'up');
+  }, () => R.m === 100 - Math.round(pr('Abono') * ENVIO) && R.envio === 'Abono de floración 1 L' && R.fert === 4 && R.envio2 === 0 && R.sms && R.sms.t === 'Te he dejado el paquete en casa: Abono de floración 1 L.'
+    && R.log.some(l => /\[menú\] KIKO/.test(l)) && R.log.some(l => /^KIKO: /.test(l)) && R.fijos === JSON.stringify([{ id: 'cz1', n: R.nom, t: 'cur', dia: 0 }])
+    && R.t === LLAMADA_MIN && R.dh >= 1 + 3 && R.cobra > 0 && R.dia && R.log2.some(l => l === `  [menú] Kiko | ${R.nom} | Nada  → ${R.nom}`) && R.log2.some(l => l.startsWith(R.nom.toUpperCase() + ': Busco')) && new RegExp(`${R.nom} ya ha venido hoy`).test(R.otra) || R);
+  await step('Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también arcón, sala, agenda, mensajes, pedidos y bolsa); con Toño ya visto, sale en el móvil', [], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 3, due: 0, deadline: 0, protect: true }); S.flags.metB = false; delete S.flags.tono;
-    for (const k of ['caja', 'rec', 'vencidos', 'protHasta', 'encargo', 'encVeto']) delete S[k]; migrate();
-    window.R = { due: S.due, dias: S.deadline - S.day, tono: S.flags.tono === S.day, hasta: S.protHasta - S.day, campos: JSON.stringify([S.caja, S.rec, S.vencidos, S.encargo, S.encVeto]) }; S = S0;
-  }, () => R.due === 3000 && R.dias === 7 && R.tono && R.hasta === 10 && R.campos === '[null,{},0,null,0]' || R);
+    for (const k of ['caja', 'rec', 'vencidos', 'protHasta', 'encargo', 'encVeto', 'arcon', 'sala', 'fijos', 'sms', 'envio']) delete S[k]; delete S.items.bolsa; migrate();
+    window.R = { due: S.due, dias: S.deadline - S.day, tono: S.flags.tono === S.day, hasta: S.protHasta - S.day, campos: JSON.stringify([S.caja, S.rec, S.vencidos, S.encargo, S.encVeto]),
+      nuevos: JSON.stringify([S.arcon, S.sala, S.fijos, S.sms, S.envio, S.items.bolsa]) };
+    S = JSON.parse(JSON.stringify(S0)); S.flags.metB = true; delete S.flags.tono; migrate(); R.tono2 = S.flags.tono === S.day; S = S0;
+  }, () => R.due === 3000 && R.dias === 7 && R.tono && R.hasta === 10 && R.campos === '[null,{},0,null,0]' && R.nuevos === '[{"buds":{},"rosin":{}},{},[],[],[],0]' && R.tono2 || R);
   await step('Guardar y cargar la partida', [], async () => { save(); },
     () => { const sv = loadSave(); return sv && sv.ch === S.ch && sv.money === S.money && JSON.stringify(sv.disc) === JSON.stringify(S.disc) || 'no coincide'; });
 

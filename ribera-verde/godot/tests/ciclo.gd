@@ -1,5 +1,5 @@
 # Ribera Verde (Godot) — una partida nueva jugada con los mandos desde el título, como lo haría una persona: título → NUEVA
-# PARTIDA → la intro (con el nombre escrito a mano) → el prólogo (del caserío de Mendialde a la parada y el autobús) → el piso. Allí el menú START (Genoteca, Mochila, Plantas, Objetivo,
+# PARTIDA → la intro (con el nombre escrito a mano) → el prólogo (del caserío de Mendialde a la parada y el autobús) → el piso. Allí el menú START (Genoteca, Mochila, Móvil, Plantas, Objetivo,
 # Guardar, Sonido y Salir), un paseo por la calle (la salida del felpudo y la puerta del portal) y, con lo que vendería Kiko
 # (semillas, insecticida, la carpa de 100 y un foco de sodio: la tienda la recorre historia.gd), un ciclo de cultivo entero:
 # andar hasta la carpa, abrirla (vista B con el CFL), colgar el foco (vista C), plantar las 4 plazas, cuidarlas cada mañana,
@@ -450,15 +450,15 @@ func menu_start() -> void:
 	await pulsa("START")
 	await foto("3b-start")
 	var l := etiquetas()
-	check("START abre el menú (%s)" % ", ".join(l), l == ["GENOTECA", "MOCHILA", "PLANTAS", "OBJETIVO", "GUARDAR", "SONIDO: SÍ", "SALIR"])
+	check("START abre el menú (%s)" % ", ".join(l), l == ["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "GUARDAR", "SONIDO: SÍ", "SALIR"])
 	await elige("GENOTECA")
 	check("Genoteca: %d filas, todas sin descubrir" % J.m_items.size(), J.m_items.size() == J.D.DEX.size() and J.m_items.all(func(x): return x.label.ends_with("??????")))
 	await pulsa("B")
 	await elige("MOCHILA")
-	check("Mochila: dinero, vida y lo de siempre", J.m_items.size() == 6 and J.m_items[0].right == "150 €")
+	check("Mochila: dinero, la mochila (1 kg), vida y lo de siempre", J.m_items.size() == 7 and J.m_items[0].right == "150 €" and J.m_items[1].right == "0 de 1 kg")
 	await pulsa("B")
 	await elige("PLANTAS")
-	check("Plantas: el armario con su foco y sus 2 plazas vacías", J.m_items.size() == 3 and J.m_items[0].label == "Armario 60×60" and J.m_items[1].label.ends_with("vacía"))
+	check("Plantas: la sala (sin termohigrómetro), el armario con su foco y sus 2 plazas vacías", J.m_items.size() == 4 and J.m_items[0].label == "Sala" and J.m_items[0].right == "¿?" and J.m_items[1].label == "Armario 60×60" and J.m_items[2].label.ends_with("vacía"))
 	await pulsa("B")
 	textos.clear()
 	await elige("OBJETIVO")

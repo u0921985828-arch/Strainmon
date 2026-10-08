@@ -300,7 +300,7 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
  1  ██████vv█v██
  2  Bp..PGG.K.KK
  3  B...........
- 4  ............
+ 4  c...........
  5  ...t........
  6  F...........
  7  .....m.....p
@@ -490,7 +490,7 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Foco LED 100 W | 110 € | 1 | 100 W · ilumina 60×60 cm · 0,65 g/W (0,81 abonando) · crece +5% · THC +0,3 · riego ×1 · Luz: 39 kWh (6 €) al día con plantas. · Aguanta en carpas de 60, 80, 100, 120 y 150. |
 | Ventilador de pinza | 20 € | 1 | Mueve el aire de la carpa: plagas ×0,7. Gasta 25 W día y noche. · Uno por carpa. |
 | Extractor con filtro de carbón | 110 € | 2 | Sin filtro, cada carpa con plantas en floración suma +2 de calor policial al día por el olor. Con él, nada. Gasta 75 W día y noche. · Uno por carpa. |
-| Riego por goteo | 55 € | 3 | Depósito con goteros: el agua baja a la mitad de rápido. · Uno por carpa. |
+| Riego por goteo | 55 € | 3 | Depósito de 100 L con goteros: riega solo cada planta que baja del 50 % de agua mientras le quede. Se rellena desde la vista de carpa. · Uno por carpa. |
 | Foco sodio 250 W | 85 € | 2 | 250 W · ilumina 70×70 cm · 0,45 g/W (0,56 abonando) · crece +5% · THC +0,3 · riego ×1,3 · Luz: 98 kWh (16 €) al día con plantas. · Aguanta en carpas de 60, 80, 100, 120 y 150. |
 | Foco LED 200 W | 220 € | 2 | 200 W · ilumina 80×80 cm · 0,7 g/W (0,88 abonando) · crece +10% · THC +0,6 · riego ×1,05 · Luz: 78 kWh (12 €) al día con plantas. · Aguanta en carpas de 60, 80, 100, 120 y 150. |
 | Foco sodio 400 W | 100 € | 3 | 400 W · ilumina 100×100 cm · 0,5 g/W (0,63 abonando) · crece +5% · THC +0,5 · riego ×1,4 · Luz: 157 kWh (25 €) al día con plantas. · Aguanta en carpas de 80, 100, 120 y 150. |
@@ -501,4 +501,11 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Carpa 100×100 | 120 € | 2 | Segunda carpa para el piso: 4 plantas, focos de hasta 480 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. |
 | Carpa 150×100 | 140 € | 4 | Cambia tu carpa de 100 por una de 150: 6 plantas y focos de hasta 720 W. Tus plantas, foco y macetas se quedan. |
 | Carpa 120×120 | 150 € | 5 | Tercera carpa, junto a la cama: 6 plantas, focos de hasta 720 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. Antes necesitas la del fondo. |
+| Termohigrómetro | 12 € | 1 | Temperatura y humedad de la sala, de día y de noche: se ven en PLANTAS (START). · Uno para la sala: Kiko lo deja puesto. |
+| Calefactor | 35 € | 2 | Termostato: si la sala baja de 20 °C, la sube hasta 6 °C. Gasta 1.500 W mientras calienta. · Uno para la sala: Kiko lo deja puesto. |
+| Humidificador | 40 € | 2 | Si la humedad baja del 45 %, la sube hasta 15 puntos. Gasta 30 W. · Uno para la sala: Kiko lo deja puesto. |
+| Deshumidificador | 190 € | 3 | Si la humedad pasa del 55 %, la baja hasta 20 puntos: contra el moho en floración. Gasta 250 W. · Uno para la sala: Kiko lo deja puesto. |
+| Aire acondicionado portátil | 320 € | 3 | Termostato: si la sala pasa de 26 °C, la baja hasta 12 °C. Gasta 900 W mientras enfría. · Uno para la sala: Kiko lo deja puesto. |
+| Bolsa de deporte | 35 € | 3 | Llevas encima hasta 3 kg de cogollos y rosin (la mochila, 1 kg). |
+| Maleta con ruedas | 90 € | 5 | Llevas encima hasta 10 kg de cogollos y rosin. |
 | Prensa de rosin | 250 € | 3 | Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores. |

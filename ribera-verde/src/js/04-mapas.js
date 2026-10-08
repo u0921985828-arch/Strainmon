@@ -220,7 +220,7 @@ function buildMaps(){
   rect(h,0,0,11,0,(x,y)=>gr(h,x,y,'iwT_home'));rect(h,0,1,11,1,(x,y)=>gr(h,x,y,'iwB_home'));
   ob(h,6,1,'iwin');ob(h,9,1,'iwin');ob(h,7,1,'poster');
   ob(h,0,2,'bedT');ob(h,0,3,'bedB');ob(h,1,2,'plantDeco');ob(h,4,2,'pc');ob(h,5,2,'lab');ob(h,6,2,'lab2');
-  ob(h,0,6,'fridge');ob(h,3,5,'table');ob(h,11,7,'plantDeco');
+  ob(h,0,6,'fridge');ob(h,3,5,'table');ob(h,11,7,'plantDeco');ob(h,0,4,'crate');   // el arcón (1.10), entre la cama y la nevera (en 0,5 lo tapa la nevera)
   gr(h,5,7,'mat');h.exits['5,7']={to:'town',x:5,y:9,dir:'down'};
   // ---------- SHOP ----------
   const s=newMap('shop',10,8,'floorS');s.music='home';

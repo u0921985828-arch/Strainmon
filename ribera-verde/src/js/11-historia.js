@@ -20,6 +20,10 @@ const SHOP=[
   {lbl:'Carpa 100×100',p:120,ch:2,carpa:'m100',ci:1,desc:'Segunda carpa para el piso: 4 plantas, focos de hasta 480 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L.',cond:()=>!S.carpas[1]},
   {lbl:'Carpa 150×100',p:140,ch:4,carpa:'g150',ci:1,desc:'Cambia tu carpa de 100 por una de 150: 6 plantas y focos de hasta 720 W. Tus plantas, foco y macetas se quedan.',cond:()=>S.carpas[1]&&S.carpas[1].t==='m100'},
   {lbl:'Carpa 120×120',p:150,ch:5,carpa:'m120',ci:2,desc:'Tercera carpa, junto a la cama: 6 plantas, focos de hasta 720 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. Antes necesitas la del fondo.',cond:()=>!!S.carpas[1]&&!S.carpas[2]},
+  {lbl:'Termohigrómetro',p:12,ch:1,aparato:'termo'},{lbl:'Calefactor',p:35,ch:2,aparato:'calef'},{lbl:'Humidificador',p:40,ch:2,aparato:'humi'},
+  {lbl:'Deshumidificador',p:190,ch:3,aparato:'deshu'},{lbl:'Aire acondicionado portátil',p:320,ch:3,aparato:'aire'},
+  {lbl:'Bolsa de deporte',p:35,ch:3,bolsa:1,desc:'Llevas encima hasta 3 kg de cogollos y rosin (la mochila, 1 kg).',cond:()=>bolsaYa()<1},
+  {lbl:'Maleta con ruedas',p:90,ch:5,bolsa:2,desc:'Llevas encima hasta 10 kg de cogollos y rosin.',cond:()=>bolsaYa()<2},
   {lbl:'Prensa de rosin',p:250,ch:3,item:'prensa',desc:'Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores.',cond:()=>!S.items.prensa},
 ];
 const SOBRES=[[1,1],[3,.95],[5,.9],[10,.85]],GRANEL=[50,.6];   // [semillas, precio por semilla relativo]
@@ -36,7 +40,8 @@ async function comprarSemillas(it){
 // vence, Toño suma INTERES. META_VENTAS: lo que hay que vender en la calle en el capítulo 2
 const DEUDA=30000,PLAZOS={3:3000,5:12000,7:15000},INTERES=.2,PREMIO_COPA=5000,SOBORNO=1500,MULTA_REDADA=3000,META_VENTAS=300;
 const yLista=l=>l.length>1?l.slice(0,-1).join(', ')+' y '+l[l.length-1]:l[0];
-for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+yLista(Object.values(CARPAS).filter(C=>FOCOS[it.foco].w<=C.wmax).map(C=>C.cm[0]))+'.';if(it.extra){const k=it.extra;it.desc=EXTRAS[k].d+'\nUno por carpa.';it.cond=()=>S.carpas.filter(c=>c&&!c[k]).length>S.items['x_'+k];}}
+for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+yLista(Object.values(CARPAS).filter(C=>FOCOS[it.foco].w<=C.wmax).map(C=>C.cm[0]))+'.';if(it.extra){const k=it.extra;it.desc=EXTRAS[k].d+'\nUno por carpa.';it.cond=()=>S.carpas.filter(c=>c&&!c[k]).length>S.items['x_'+k]+S.envio.filter(l=>l===it.lbl).length;}
+  if(it.aparato){const k=it.aparato;it.desc=APARATOS[k].d+'\nUno para la sala: Kiko lo deja puesto.';it.cond=()=>!S.sala[k]&&!S.envio.includes(it.lbl);}}   // lo pedido por el móvil (12b-movil) no se vuelve a vender
 // carpa comprada (en un sitio libre) o ampliada (mismo sitio, se quedan foco, extras, plantas y macetas): cada plaza
 // conserva su planta y su maceta por (carpa, plaza); las nuevas, vacías y con maceta de 7 L. La casa se vuelve a montar al entrar
 function comprarCarpa(t,ci){
@@ -62,7 +67,7 @@ async function shop(){
     if(it.sid){await comprarSemillas(it);await checkStory();continue;}
     if(S.money<it.p){sfx('bad');await say('No te llega el dinero.','KIKO');continue;}
     S.money-=it.p;sfx('coin');
-    if(it.item)S.items[it.item]+=it.n||1;if(it.maceta)S.items['m_'+it.maceta]++;
+    if(it.item)S.items[it.item]+=it.n||1;if(it.maceta)S.items['m_'+it.maceta]++;if(it.bolsa)S.items.bolsa=it.bolsa;if(it.aparato)S.sala[it.aparato]=true;
     if(!it.foco&&!it.carpa&&!it.extra)toast('Comprado: '+it.lbl,1200);
     if(it.carpa){comprarCarpa(it.carpa,it.ci);await say(DICHO_CARPA[it.carpa],'KIKO');}
     if(it.extra){S.items['x_'+it.extra]++;const ok=S.carpas.map((c,ci)=>c&&!c[it.extra]?ci:-1).filter(ci=>ci>=0);
@@ -101,7 +106,7 @@ async function talkKiko(){
       'Empieza por las conocidas: saca dos de receta en la mesa y cosecha una planta de cada. Patxi, el de la plaza, se sabe unas cuantas.']);
     showObjective();await checkStory();return;
   }
-  if(!Object.keys(S.seeds).length&&!S.pots.some(Boolean)&&!totalBuds()&&!totalRosin()&&!cajaG()&&!cajaR()&&S.money+cajaE()<15){   // lo de la caja también cuenta (1.10)
+  if(!Object.keys(S.seeds).length&&!S.pots.some(Boolean)&&!totalBuds()&&!totalRosin()&&!cajaG()&&!cajaR()&&!arconG()&&!arconR()&&S.money+cajaE()<15){   // lo de la caja y el arcón también cuenta (1.10)
     await say('¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.',N);addSeeds('ria',2);await got('2 semillas de SKUNK #1');
   }
   const c=await ask('¿Qué necesitas?',['Comprar','Un consejo','Nada'],N);
@@ -313,8 +318,8 @@ async function embargo(){
 async function raidEvent(){
   if(S.protect){S.heat=50;return talk('SMS · MOLINA',['Esta noche había orden de entrada en tu piso. La he parado.','Baja el ritmo.']);}
   sfx('bad');await say('REDADA. La policía entra en tu piso.');
-  const g=Math.floor(totalBuds()),r=totalRosin();
-  S.pots=S.pots.map(()=>null);S.buds={};S.rosin={};S.heat=30;
+  const g=Math.floor(totalBuds()+arconG()),r=totalRosin()+arconR();   // lo de encima y el arcón (1.10)
+  S.pots=S.pots.map(()=>null);S.buds={};S.rosin={};S.arcon={buds:{},rosin:{}};S.heat=30;
   const hallada=!!S.caja&&Math.random()<CAJA_REDADA,cg=hallada?Math.floor(cajaG()):0,cr=hallada?cajaR():0,ce=hallada?Math.floor(S.caja.money/2):0;
   if(hallada){S.caja.buds={};delete S.caja.rosin;S.caja.money-=ce;}
   const fine=MULTA_REDADA-pagarCasa(MULTA_REDADA);

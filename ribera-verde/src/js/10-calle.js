@@ -31,7 +31,7 @@ function spawnClients(){
 function removeClient(id){S.clients=S.clients.filter(c=>c.id!==id);ents=ents.filter(e=>e.id!==id);}
 // el catador (1.10) solo compra rosin: a precioRosin, y el «caro» cuela según lo que pase del 50 % de THC
 async function talkClient(c){
-  const ct=CTYPES[c.type],N=ct.label,ext=c.type==='ext';
+  const ct=CTYPES[c.type],N=c.n||ct.label,ext=c.type==='ext';   // n: el nombre de un cliente de la agenda (12b-movil)
   await say(pick(ct.greet),N);
   await say(ext?`Busco ${c.want} g de rosin.`:`Busco ${c.want} g${c.minThc?` de algo potente, mínimo ${c.minThc}% de THC`:''}.`,N);
   const lots=ext?rosinLots(c.want):budLots(c.want,c.minThc);
@@ -47,7 +47,7 @@ async function talkClient(c){
     if(ext)useRosin(sid,c.want);else useBuds(sid,c.want);
     S.money+=pr[j];S.sales+=pr[j];S.heat=Math.min(100,S.heat+3+c.want*(ext?2.5:.5));S.rep+=[3,2,1][j];sfx('coin');
     await accion('vender',{id:'vfx-monedas',x:P.px+8,y:P.py+2});
-    removeClient(c.id);
+    removeClient(c.id);apuntaFijo(c);
     await say(pick(['Trato hecho.','Gracias. Nos vemos.','Bien. Se lo diré a mis amigos.']),N);
     toast(`+${eur(pr[j])} · ${c.want} g ${ext?'de rosin ':''}vendidos`,1600);
     vistoVender();heatWarn();await checkStory();

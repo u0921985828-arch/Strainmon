@@ -443,7 +443,7 @@ func _pasos() -> void:
 		func(): return chk(J.S.carpas[0].t == "p80" and J.S.carpas[0].foco == "led200" and J.S.money == 1000 - 90 and J.S.pots.size() == 7 and R.filas == "0,0,1" and R.atras
 			and jj(J.S.pots[0]) == R.antes[0] and jj(J.S.pots[1]) == R.antes[1] and R.antes[3] != "null" and R.movida == R.antes[3] and J.S.pots[3] == null and J.S.macetas[2] == "plastico7"
 			and J.S.macetas[3] == R.mac[2] and J.MAPS.home.carpas.size() == 2, {"carpas": J.S.carpas, "money": J.S.money, "R": R, "macetas": J.S.macetas}))
-	step("Extras: ventilador, filtro y goteo en la carpa de 100; sin filtro, el olor de la floración sube el calor", ["Ventilador", "^Carpa 100", "Extractor", "^Carpa 100", "Riego por goteo", "^Carpa 100", "Salir", "Poner filtro"], func():
+	step("Extras: ventilador, filtro y goteo en la carpa de 100 (el goteo riega del depósito); sin filtro, el olor de la floración sube el calor", ["Ventilador", "^Carpa 100", "Extractor", "^Carpa 100", "Riego por goteo", "^Carpa 100", "Salir", "Poner filtro"], func():
 		J.S.money = 1000
 		await run(J.shop)
 		var flor := func(): return {"sid": "ria", "prog": .8, "water": 100, "health": 100, "fert": false, "pest": false}
@@ -463,7 +463,7 @@ func _pasos() -> void:
 		J.S.pots[0] = null
 		J.S.pots[4] = null,
 		func(): return chk(si(J.S.carpas[1].get("vent")) and si(J.S.carpas[1].get("filtro")) and si(J.S.carpas[1].get("goteo")) and R.money == 1000 - 20 - 110 - 55
-			and absf(R.f.plaga - R.m.plaga * .7) < 1e-9 and absf(R.f.agua - R.F.agua * R.m.agua * .5) < 1e-9 and R.h1 == 30 - 12 + 2 and R.h2 == R.h1 - 12
+			and absf(R.f.plaga - R.m.plaga * .7) < 1e-9 and absf(R.f.agua - R.F.agua * R.m.agua) < 1e-9 and J.S.carpas[1].get("dep", D.GOTEO_L) < D.GOTEO_L and R.h1 == 30 - 12 + 2 and R.h2 == R.h1 - 12
 			and si(J.S.carpas[0].get("filtro")) and not J.S.items.get("x_filtro"), {"carpas": J.S.carpas, "R": R, "items": J.S.items}))
 	step("Cruce de receta: Afghani × Skunk #1 → Critical Mass (de receta, sacada en la mesa: falta cosecharla)", ["^Afghani", "^Skunk #1", "Cruzar"], func():
 		J.add_seeds("ria", 2)
@@ -1381,7 +1381,170 @@ func _pasos() -> void:
 		J.S.min = 600
 		J.enter_map("home", 5, 5, "up"),
 		func(): return chk(J.re_calle().search(R.g) == null and R.t > 0 and R.t <= 3000 and R.sigue and R.n == 2 and R.alba == "1,,50", R))
-	step("Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor", [], func():
+	step("Goteo (1.10): el depósito riega solo lo que baja del 50 %, gasta la mitad de los litros de la maceta por cada 100 % y, vacío, no riega; se rellena desde la carpa", ["Rellenar depósito"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.merge({"carpas": [{"t": "m100", "foco": "sodio400", "goteo": true, "dep": 10}], "macetas": ["plastico7", "plastico7", "plastico7", "plastico7"], "pots": [null, null, null, null]}, true)
+		var i := 1
+		var p := {"sid": "ria", "prog": .3, "water": 40, "health": 100, "fert": false, "pest": false}
+		var l: float = D.MACETAS[J.S.macetas[i]].l * .5
+		J.S.pots[i] = p
+		Cultivo.regar_goteo(J.S, p, i)
+		R = {"w1": p.water, "d1": J.S.carpas[0].dep, "e1": Datos.jsround((10 - l * .6) * 100) / 100.0}
+		J.S.carpas[0].dep = 1
+		p.water = 40
+		Cultivo.regar_goteo(J.S, p, i)
+		R.w2 = p.water
+		R.e2 = 40 + 1 / (l * .6) * 60
+		R.d2 = J.S.carpas[0].dep
+		p.water = 45
+		Cultivo.regar_goteo(J.S, p, i)
+		R.w3 = p.water
+		p.water = 50.1
+		J.S.carpas[0].dep = 50
+		J.plants_advance(10)
+		R.w4 = p.water
+		R.d4 = J.S.carpas[0].dep
+		await run(func(): await J.carpa_action(0))
+		R.d5 = J.S.carpas[0].dep
+		J.S = S0,
+		func(): return chk(R.w1 == 100 and R.d1 == R.e1 and absf(R.w2 - R.e2) < 1e-9 and R.d2 == 0 and R.w3 == 45 and R.w4 == 100 and R.d4 < 50 and R.d5 == D.GOTEO_L, R))
+	step("Clima de la sala (1.10): enero, de día con sodio 400 W (+4 °C) y de noche (frío: crecen −18 %); con LED casi no calienta; termohigrómetro, calefactor y deshumidificador del growshop, su factura de noche; moho en floración y su aviso al despertar (julio, de noche)", ["Termohigrómetro", "Calefactor", "Deshumidificador", "Salir"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.merge({"ch": 5, "money": 1000, "sala": {}, "day": 10, "carpas": [{"t": "m100", "foco": "sodio400"}], "macetas": ["plastico7", "plastico7", "plastico7", "plastico7"]}, true)
+		var pots := []
+		for m in J.S.macetas:
+			pots.append({"sid": "ria", "prog": .8, "water": 100, "health": 90, "fert": false, "pest": false})
+		J.S.pots = pots
+		R = {"mes": D.MESES[Cultivo.mes_de(int(J.S.day))], "dia": Cultivo.clima_sala(J.S, false), "noche": Cultivo.clima_sala(J.S, true)}
+		R.f = Cultivo.f_clima(R.noche)
+		J.S.min = 23 * 60
+		R.c0 = J.factores(0).crec
+		J.S.carpas[0].foco = "led480"
+		R.led = Cultivo.clima_sala(J.S, false).t
+		J.S.carpas[0].foco = "sodio400"
+		await run(J.shop)
+		R.m = J.S.money
+		R.sala = ",".join(J.S.sala.keys())
+		R.n2 = Cultivo.clima_sala(J.S, true)
+		R.d2 = Cultivo.clima_sala(J.S, false)
+		R.c1 = J.factores(0).crec
+		R.fs = Cultivo.factura_sala(J.S)
+		var p: Dictionary = J.S.pots[0]
+		var f: Dictionary = J.factores(0).duplicate()
+		f.merge({"hr": 70, "plaga": 0}, true)
+		Cultivo.plant_step(J.S, p, 1, f)
+		R.moho = p.health
+		J.S.day = 4
+		J.S.sala = {}
+		R.julio = Cultivo.clima_sala(J.S, true).hr
+		var l0 := LOG.size()
+		await run(func(): await J.aviso_plaga([]))
+		R.aviso = "|".join(LOG.slice(l0).filter(func(l): return l.begins_with("Moho")))
+		J.S = S0,
+		func(): return chk(R.mes == "enero" and R.dia.t == 22 and R.dia.hr == 49 and R.noche.t == 15 and R.noche.hr == 58 and absf(R.f - .82) < 1e-9 and R.led == 19.9
+			and R.m == 1000 - pr("Termohigrómetro") - pr("Calefactor") - pr("Deshumidificador") and R.sala == "termo,calef,deshu" and R.n2.t == 20 and R.n2.hr == 55 and si(R.n2.uso.get("calef")) and si(R.n2.uso.get("deshu")) and not si(R.d2.uso.get("calef"))
+			and absf(R.c1 / R.c0 - 1 / .82) < 1e-9 and R.fs == Datos.jsround((1500 + 250) * D.H_24 * (1 - D.H_DIA) * .5 / 1000 * D.KWH) and R.moho == 90 and R.julio == 55 + 8 + 5
+			and re("^Moho en .*\\(plaza 1\\), .* y .*\\(plaza 4\\): de noche la sala pasa del 60 % de humedad\\.", R.aviso), R))
+	step("Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad",
+		["Sacar un lote", "^Hindu", "^10 g", "Guardar todo", "Cerrar", "Bolsa de deporte", "Salir", "Sacar todo", "Cerrar"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.merge({"ch": 5, "map": "home", "buds": {}, "rosin": {}, "arcon": {"buds": {}, "rosin": {}}, "protect": false, "caja": null}, true)
+		J.S.items.bolsa = 0
+		J.add_buds("ria", 990, 12)
+		J.S.pots[0] = {"sid": "hindu", "prog": 1, "water": 100, "health": 100, "fert": false, "pest": false, "f": {"id": 9998, "t": 1, "y": 1}}
+		var g: int = J.gramos_planta(J.S.pots[0], J.factores(0))
+		var l0 := LOG.size()
+		await run(func(): await J.harvest(0))
+		R = {"g": g, "encima": J.peso_encima(), "arcon": J.arcon_g(), "aviso": "|".join(LOG.slice(l0).filter(func(l): return "arcón" in l))}
+		J.use_buds("ria", 500)
+		await run(J.arcon_action)
+		R.a2 = J.arcon_g()
+		R.b2 = J.total_buds()
+		J.S.money = 100
+		await run(J.shop)
+		R.cap = J.cap_mochila()
+		R.bolsa = J.S.items.bolsa
+		J.add_buds("ria", 20, 12)
+		J.confiscate(false)
+		R.control = J.arcon_g()
+		J.add_buds("ria", 5, 12)
+		var l1 := LOG.size()
+		await run(J.raid_event)
+		R.redada = "|".join(LOG.slice(l1).filter(func(l): return "Se llevan" in l))
+		R.a3 = J.arcon_g()
+		J.S.caja = {"money": 0, "buds": {"ria": {"g": 1500, "thc": 12}}, "nivel": 1}
+		J.S.buds = {}
+		J.add_buds("ria", 2000, 12)
+		var l3 := LOG.size()
+		await run(J.caja_action)
+		R.sacar = "%s,%s,%s" % [Datos.js_num(J.total_buds()), Datos.js_num(J.caja_g()), "true" if LOG.slice(l3).any(func(l): return "No te cabe todo encima" in l) else "false"]
+		J.S.arcon = {"buds": {"ria": {"g": 101, "thc": 12}}, "rosin": {"ria": {"g": 3, "thc": 36}}}
+		J.S.money = 0
+		J.S.buds = {}
+		J.S.rosin = {}
+		var l2 := LOG.size()
+		await run(J.robo_darko)
+		R.darko = "|".join(LOG.slice(l2).filter(func(l): return "Se han llevado" in l))
+		R.a4 = jj(J.S.arcon)
+		J.S = S0,
+		func(): return chk(R.g > 10 and R.encima == 1000 and R.arcon == R.g - 10 and re("en la mochila: %d g van al arcón" % (R.g - 10), R.aviso) and R.a2 == 490 + R.g and R.b2 == 0
+			and R.cap == 3000 and R.bolsa == 1 and R.control == R.a2 and re("y %d g\\." % int(floor(5 + R.a2)), R.redada) and R.a3 == 0
+			and R.sacar == "3000,500,true" and re("Se han llevado 0 €, 50 g y 1,5 g de rosin\\.", R.darko) and R.a4 == "{\"buds\":{\"ria\":{\"g\":51,\"thc\":12}},\"rosin\":{\"ria\":{\"g\":1.5,\"thc\":36}}}", R))
+	step("Móvil (1.10): START → MÓVIL; pedir a Kiko (+15 %, llega mañana) y su SMS en Mensajes; llamar a Kiko; quien te compra te da su número y, llamado, viene a la calle (20 min, +1 de calor, una vez al día)",
+		["MÓVIL", "Pedir a Kiko", "^Abono", "Salir", "Colgar", "SALIR", "MÓVIL", "Mensajes", "<B>", "Llamar", "^Kiko", "Colgar", "SALIR", "^Skunk", "Rebaja",
+			"MÓVIL", "Llamar", "^(?!Kiko|Nada)", "^Skunk", "Rebaja", "SALIR", "MÓVIL", "Llamar", "^(?!Kiko|Nada)", "Colgar", "SALIR"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.merge({"map": "home", "money": 100, "sms": [], "envio": [], "fijos": [], "protect": false, "protHasta": 0, "encargo": null, "heat": 0, "due": 0, "buds": {}, "rosin": {}, "min": 600}, true)
+		J.S.flags.kiko1 = true
+		J.S.flags.tono = 0
+		J.S.flags.inaki = false
+		var f0: int = J.S.items.fert
+		await run(J.start_menu)
+		R = {"m": J.S.money, "envio": ",".join(J.S.envio)}
+		J.advance_time(24 * 60)
+		await idle()
+		R.fert = J.S.items.fert - f0
+		R.sms = null
+		for m in J.S.sms:
+			if m.n == "KIKO":
+				R.sms = m
+				break
+		R.envio2 = J.S.envio.size()
+		var l0 := LOG.size()
+		await run(J.start_menu)
+		R.log = LOG.slice(l0)
+		J.enter_map("town", 16, 17, "up")
+		J.S.min = 600
+		J.add_buds("ria", 50, 12)
+		var c := {"id": "cz1", "map": "town", "x": 5, "y": 20, "type": "cur", "want": 2, "minThc": 0}
+		J.S.clients.append(c)
+		await run(func(): await J.talk_client(c))
+		R.fijos = jj(J.S.fijos)
+		R.nom = J.nombre_fijo("cz1")
+		R.h = J.S.heat
+		R.min = J.S.min
+		R.mon = J.S.money
+		var l1 := LOG.size()
+		await run(J.start_menu)
+		R.t = J.S.min - R.min
+		R.dh = J.S.heat - R.h
+		R.cobra = J.S.money - R.mon
+		R.dia = J.S.fijos[0].dia == J.S.day
+		R.log2 = LOG.slice(l1)
+		var l2 := LOG.size()
+		await run(J.start_menu)
+		R.otra = "|".join(LOG.slice(l2))
+		J.S = S0
+		J.enter_map("home", 5, 5, "up"),
+		func(): return chk(R.m == 100 - Datos.jsround(pr("Abono") * D.ENVIO) and R.envio == "Abono de floración 1 L" and R.fert == 4 and R.envio2 == 0 and R.sms != null and R.sms.t == "Te he dejado el paquete en casa: Abono de floración 1 L."
+			and R.log.any(func(l): return re("\\[menú\\] KIKO", l)) and R.log.any(func(l): return l.begins_with("KIKO: ")) and R.fijos == jj([{"id": "cz1", "n": R.nom, "t": "cur", "dia": 0}])
+			and R.t == D.LLAMADA_MIN and R.dh >= 1 + 3 and R.cobra > 0 and R.dia and R.log2.any(func(l): return l == "  [menú] Kiko | %s | Nada  → %s" % [R.nom, R.nom])
+			and R.log2.any(func(l): return l.begins_with(R.nom.to_upper() + ": Busco")) and re("%s ya ha venido hoy" % R.nom, R.otra), R))
+	step("Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también arcón, sala, agenda, mensajes, pedidos y bolsa); con Toño ya visto, sale en el móvil", [], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))
 		J.S.ch = 3
@@ -1390,13 +1553,20 @@ func _pasos() -> void:
 		J.S.protect = true
 		J.S.flags.metB = false
 		J.S.flags.erase("tono")
-		for k in ["caja", "rec", "vencidos", "protHasta", "encargo", "encVeto"]:
+		for k in ["caja", "rec", "vencidos", "protHasta", "encargo", "encVeto", "arcon", "sala", "fijos", "sms", "envio"]:
 			J.S.erase(k)
+		J.S.items.erase("bolsa")
 		J.migrate()
 		R = {"due": J.S.due, "dias": J.S.deadline - J.S.day, "tono": J.S.flags.get("tono") == J.S.day, "hasta": J.S.protHasta - J.S.day,
-			"campos": jj([J.S.caja, J.S.rec, J.S.vencidos, J.S.encargo, J.S.encVeto])}
+			"campos": jj([J.S.caja, J.S.rec, J.S.vencidos, J.S.encargo, J.S.encVeto]), "nuevos": jj([J.S.arcon, J.S.sala, J.S.fijos, J.S.sms, J.S.envio, J.S.items.bolsa])}
+		J.S = Datos.enteros(norm(S0))
+		J.S.flags.metB = true
+		J.S.flags.erase("tono")
+		J.migrate()
+		R.tono2 = J.S.flags.get("tono") == J.S.day
 		J.S = S0,
-		func(): return chk(R.due == 3000 and R.dias == 7 and R.tono and R.hasta == 10 and R.campos == "[null,{},0,null,0]", R))
+		func(): return chk(R.due == 3000 and R.dias == 7 and R.tono and R.hasta == 10 and R.campos == "[null,{},0,null,0]"
+			and R.nuevos == "[{\"buds\":{},\"rosin\":{}},{},[],[],[],0]" and R.tono2, R))
 	step("Guardar y cargar la partida", [], func(): J.save(),
 		func():
 			var sv = J.load_save()

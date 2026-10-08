@@ -45,7 +45,7 @@ func factura_luz() -> int:
 	for ci in S.carpas.size():
 		if S.carpas[ci] and plantas_vivas(ci):
 			e += luz_carpa(ci)
-	return e
+	return e + Cultivo.factura_sala(S)
 
 func kwh_foco(k: String) -> int:
 	return Datos.jsround(D.FOCOS[k].w * D.H_LUZ / 1000)
@@ -121,6 +121,7 @@ func new_day() -> void:
 		toast("<br>".join(av), 1600)
 	spawn_clients()
 	recibir_pedido()
+	recibir_envio()
 	instalar_caja()
 	vencer_encargo()
 	if S.due > 0 and S.day > S.deadline:   # 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
@@ -360,6 +361,8 @@ func extras_libres(ci: int) -> Array:
 func poner_extra(ci: int, k: String) -> void:
 	S.items["x_" + k] -= 1
 	S.carpas[ci][k] = true
+	if k == "goteo":
+		S.carpas[ci].dep = D.GOTEO_L
 	sfx("sel")
 
 func carpa_action(ci: int) -> void:
@@ -368,13 +371,22 @@ func carpa_action(ci: int) -> void:
 	var F: Dictionary = D.FOCOS[c.foco]
 	var f := focos_libres(ci).size()
 	var ex := extras_libres(ci)
+	var dep: float = c.get("dep", D.GOTEO_L) if c.get("goteo") else D.GOTEO_L
 	var opts := ["Cambiar foco"] if f else []
 	for k in ex:
 		opts.append("Poner " + D.EXTRAS[k].c.to_lower())
+	if dep < D.GOTEO_L:
+		opts.append("Rellenar depósito")
 	opts.append("Salir")
-	var k: int = await ask("%s · %s plantas · %s\n%d W/m² · luz %s al día con plantas" % [C.n, n(C.plazas), F.n, Datos.jsround(F.w / (C.cm[0] * C.cm[2] / 1e4)), Datos.eur(luz_carpa(ci))], opts)
+	var gt: String = (" · goteo %d de %s L" % [int(floor(dep)), n(D.GOTEO_L)]) if c.get("goteo") else ""
+	var k: int = await ask("%s · %s plantas · %s\n%d W/m² · luz %s al día con plantas%s" % [C.n, n(C.plazas), F.n, Datos.jsround(F.w / (C.cm[0] * C.cm[2] / 1e4)), Datos.eur(luz_carpa(ci)), gt], opts)
 	if opts[k] == "Cambiar foco":
 		await cambiar_foco(ci)
+		return
+	if opts[k] == "Rellenar depósito":
+		c.dep = D.GOTEO_L
+		sfx("sel")
+		await say("Llenas el depósito del goteo: %s L." % n(D.GOTEO_L))
 		return
 	var ix := k - (1 if f else 0)
 	if k < 0 or ix < 0 or ix >= ex.size():
@@ -405,9 +417,13 @@ func harvest(i: int) -> void:
 		nn = ri(2, 5)
 	elif not fem or Cultivo.azar() < D.SEMILLA_HERMA:
 		nn = ri(1, 3)
-	add_buds(p.sid + "*" if cl == "estrella" else p.sid, g, thc)
+	var lk: String = p.sid + "*" if cl == "estrella" else p.sid
+	add_buds(lk, g, thc)
 	if nn:
 		add_seeds(p.sid, nn)
+	var sobra := mini(g, int(floor(peso_encima() - cap_mochila())))   # lo que no cabe encima, al arcón (1.10)
+	if sobra >= 1:
+		mover_lote(S.buds, S.arcon.buds, lk, sobra)
 	if p.get("f") and p.f.get("id"):
 		S.fenos[str(int(p.f.id))] = cl
 	S.pots[i] = null
@@ -415,6 +431,8 @@ func harvest(i: int) -> void:
 	if S.rec.get(p.sid) == 1:   # una variedad de receta sacada en la mesa, cosechada (capítulo 4)
 		S.rec[p.sid] = 2
 	await say("Cosechas %d g de %s. THC: %s%%." % [g, s.n, Datos.pct(thc)])
+	if sobra >= 1:
+		await say("No te cabe todo en la %s: %d g van al arcón." % [D.MOCHILAS[int(S.items.get("bolsa", 0))].n.to_lower(), sobra])
 	if cl == "estrella":
 		sfx("enc")
 		await say("¡Fenotipo estrella! THC ×%s y cosecha ×%s sobre la media de la %s." % [Datos.coma(fe.t), Datos.coma(fe.y), s.n])
@@ -480,19 +498,22 @@ func bed_action(txt := ""):
 	toast("Has descansado" + ((" · Luz −" + Datos.eur(hoy.e)) if hoy and hoy.e else "") + ((" · Olor: calor +" + n(hoy.o)) if hoy and hoy.o else "") + " · Partida guardada", 1800)
 	if not piso:
 		return
-	if S.ch == 7 and not S.flags.get("robo") and (S.money > 1000 or gramos_flor() > 100):
-		await robo_darko()   # la amenaza de Darko (1.10)
+	if S.ch == 7 and not S.flags.get("robo") and (S.money > 1000 or gramos_flor() + arcon_g() + arcon_r() / D.ROSIN.rend > 100):
+		await robo_darko()   # la amenaza de Darko (1.10; con lo del arcón)
 	await aviso_plaga(antes)
 
 static func _lista(L: Array) -> String:
 	return L[0] if L.size() == 1 else ", ".join(L.slice(0, -1)) + " y " + L[-1]
 
 # al despertar: las que han cogido plaga mientras dormías (y el insecticida que te queda), las que la siguen teniendo sin
-# tratar y las que se han secado del todo (antes: [plaga, muerta] de cada plaza al acostarte)
+# tratar, las que se han secado del todo (antes: [plaga, muerta] de cada plaza al acostarte) y las que florecen con moho porque
+# la sala pasa de HR_OK de noche (09c-sala)
 func aviso_plaga(antes: Array) -> void:
 	var nuevas := []
 	var siguen := []
 	var muertas := []
+	var moho := []
+	var humeda: bool = Cultivo.clima_sala(S, true).hr > D.HR_OK[1]
 	var H := huecos()
 	var nc := 0
 	for c in S.carpas:
@@ -508,8 +529,11 @@ func aviso_plaga(antes: Array) -> void:
 		if p.get("dead"):
 			if not a[1]:
 				muertas.append(nom)
-		elif p.pest:
-			(siguen if a[0] else nuevas).append(nom)
+		else:
+			if p.pest:
+				(siguen if a[0] else nuevas).append(nom)
+			if humeda and p.prog >= .65 and p.prog < 1:
+				moho.append(nom)
 	if nuevas.size():
 		var k: int = S.items.insect
 		sfx("bad")
@@ -518,6 +542,8 @@ func aviso_plaga(antes: Array) -> void:
 		await say("Sigue la plaga en %s: sin tratar, pierde%s salud cada hora." % [_lista(siguen), "n" if siguen.size() > 1 else ""])
 	if muertas.size():
 		await say("Se ha%s secado del todo %s. Retírala%s con A." % ["n" if muertas.size() > 1 else "", _lista(muertas), "s" if muertas.size() > 1 else ""])
+	if moho.size():
+		await say("Moho en %s: de noche la sala pasa del %s %% de humedad. Un deshumidificador o extractores con filtro la bajan." % [_lista(moho), n(D.HR_OK[1])])
 
 # ---------- PC ----------
 func pc_action():

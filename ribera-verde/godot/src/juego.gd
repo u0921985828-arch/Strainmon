@@ -118,6 +118,8 @@ func migrate() -> void:
 		S.due = int(D.PLAZOS["3"])
 		S.deadline = S.day + 7
 		S.flags.tono = S.day
+	if S.flags.get("metB") and not S.flags.has("tono"):   # ya conoces a Toño: sale en el móvil (trama, llamar)
+		S.flags.tono = S.day
 	if S.get("protect") and not S.get("protHasta"):
 		S.protHasta = S.day + int(D.CUOTA_DIAS)
 	var nh := huecos().size()

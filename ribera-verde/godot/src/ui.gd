@@ -717,7 +717,15 @@ func say(text: String, name_ := "", keep := false) -> void:
 			dlg.hide()
 			dlg_nm.hide()
 
+# los SMS (1.10) se quedan en el móvil: S.sms, del último al primero, hasta SMS_MAX
 func talk(name_: String, lines: Array) -> void:
+	if S and S.get("sms") is Array and name_.begins_with("SMS · "):
+		var t := []
+		for l in lines:
+			t.append(nm(l))
+		S.sms.push_front({"d": S.day, "n": name_.substr(6), "t": "\n".join(t)})
+		if S.sms.size() > D.SMS_MAX:
+			S.sms.resize(int(D.SMS_MAX))
 	for l in lines:
 		await say(l, name_)
 

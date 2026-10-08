@@ -6,8 +6,8 @@
 # (el de la imagen A, unos 16, los que usa el motor para colocar las macetas): la diferencia no se ve con las macetas puestas.
 #  · carpa-c-pared: dibujada en código. Mylar con vetas verticales (como la vista B) y algún brillo; laterales más oscuros hacia
 #    delante; bandeja blanca con su rejilla; techo, postes y bordes en el negro del armazón; la cremallera de la puerta abierta.
-#  · carpa-c-luz: la de la imagen A (art/procesado) sin los brillos pintados en las cortinas (los laterales por encima del suelo);
-#    el cono y el charco del suelo, igual. Se puede pasar más de una vez (borrar lo borrado no cambia nada).
+#  · carpa-c-luz: la de la imagen A (art/procesado) sin los brillos pintados en las cortinas (los laterales por encima del suelo y,
+#    junto al suelo, lo que queda fuera del borde de la bandeja: x <= diag(y) y su espejo); el cono y el charco del suelo, igual. Se puede pasar más de una vez (borrar lo borrado no cambia nada).
 # Sale a art/crudo/carpa-c-fondo/carpa-c-<pared|luz>/unica/00.png (después, node tools/sprites/procesar.js carpa-c-fondo --atlas)
 import os
 from PIL import Image
@@ -85,4 +85,7 @@ guarda(im, 'pared')
 luz = Image.open(P_('art', 'procesado', 'carpa-c-fondo', 'carpa-c-luz', 'unica', '00.png')).convert('RGBA'); q = luz.load()
 for y in range(141):
     for x in list(range(0, 44)) + list(range(196, 240)): q[x, y] = (0, 0, 0, 0)
+for y in range(141, H):                                                    # y los restos de las cortinas junto al suelo, fuera de la bandeja
+    xa = round(diag(y))
+    for x in range(0, xa + 1): q[x, y] = (0, 0, 0, 0); q[W - 1 - x, y] = (0, 0, 0, 0)
 guarda(luz, 'luz')

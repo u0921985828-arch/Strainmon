@@ -4,12 +4,12 @@
 async function startMenu(){
   let i=0;
   for(;;){
-    i=await menu(['GENOTECA','MOCHILA','PLANTAS','OBJETIVO','GUARDAR',soundOn?'SONIDO: SÍ':'SONIDO: NO','SALIR'],{cls:'start',initial:i,startCloses:true});
-    if(i<0||i===6)return;
-    if(i===0)await genoteca();else if(i===1)await mochila();else if(i===2)await plantas();
-    else if(i===3){await say(`CAPÍTULO ${S.ch}: ${CH_TITLES[S.ch]||''}\n${objectiveText()}`);await say(`Deuda: ${eur(S.debt)} · Ventas: ${eur(S.sales)}\nReputación ${S.rep} · Calor ${Math.round(S.heat)}%`);}
-    else if(i===4)await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');
-    else if(i===5)setSound(!soundOn);
+    i=await menu(['GENOTECA','MOCHILA','MÓVIL','PLANTAS','OBJETIVO','GUARDAR',soundOn?'SONIDO: SÍ':'SONIDO: NO','SALIR'],{cls:'start',initial:i,startCloses:true});
+    if(i<0||i===7)return;
+    if(i===0)await genoteca();else if(i===1)await mochila();else if(i===2)await movilMenu();else if(i===3)await plantas();
+    else if(i===4){await say(`CAPÍTULO ${S.ch}: ${CH_TITLES[S.ch]||''}\n${objectiveText()}`);await say(`Deuda: ${eur(S.debt)} · Ventas: ${eur(S.sales)}\nReputación ${S.rep} · Calor ${Math.round(S.heat)}%`);}
+    else if(i===5)await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');
+    else if(i===6)setSound(!soundOn);
   }
 }
 async function genoteca(){
@@ -22,7 +22,10 @@ async function genoteca(){
 async function mochila(){
   let i=0;
   for(;;){
-    const rows=[{label:'Dinero',right:eur(S.money),ic:icono('billetes'),desc:'Lo que llevas encima. Don Baltasar también lo cuenta.'}].concat(S.caja?[{label:'Caja fuerte',right:`${eur(cajaE())} · ${Math.floor(cajaG())} g${cajaR()>=.1?' · '+coma(Math.round(cajaR()*10)/10)+' g rosin':''}`,ic:icono('billetes'),
+    const M=MOCHILAS[S.items.bolsa||0];
+    const rows=[{label:'Dinero',right:eur(S.money),ic:icono('billetes'),desc:'Lo que llevas encima. Don Baltasar también lo cuenta.'},
+      {label:M.n,right:`${Math.floor(pesoEncima())} de ${kgTxt(M.g)}`,ic:icono('bolsa'),desc:'Cogollos y rosin que llevas encima. Lo que no cabe al cosechar va al arcón de casa.'}].concat(arconG()>=1||arconR()>=.1?[{label:'Arcón',right:arconTxt(),ic:icono('cogollo'),
+      desc:'En casa, entre la cama y la nevera. Un control en la calle no lo ve; una redada se lo lleva.'}]:[],S.caja?[{label:'Caja fuerte',right:`${eur(cajaE())} · ${Math.floor(cajaG())} g${cajaR()>=.1?' · '+coma(Math.round(cajaR()*10)/10)+' g rosin':''}`,ic:icono('billetes'),
       desc:`${CAJA[S.caja.nivel].n}, detrás del diploma. Caben ${eur(CAJA[S.caja.nivel].money)} y ${kgTxt(CAJA[S.caja.nivel].g)}.\nLo que está dentro no lo llevas encima.`}]:[],[{label:'Vida',right:`${S.hp}/${S.hpMax}`,desc:'Se recupera durmiendo, comiendo o con el tiempo.'},
       {label:'Abono (dosis)',right:'×'+S.items.fert,ic:icono('abono'),desc:'Una por planta: +25% de cosecha.'},{label:'Insecticida (tratamientos)',right:'×'+S.items.insect,ic:icono('insecticida'),desc:'Úsalo en una maceta con plaga.'},
       {label:'Spray de pimienta',right:'×'+S.items.spray,ic:icono('spray'),desc:'Solo en combate.'},{label:'Bocata',right:'×'+S.items.bocata,ic:icono('bocadillo'),desc:'Pulsa A para comerlo: +15 de vida.',k:'bocata'}]);
@@ -40,7 +43,8 @@ async function mochila(){
   }
 }
 async function plantas(){
-  const rows=[],H=huecos();
+  const rows=[],H=huecos(),cl=climaSala();
+  rows.push({label:'Sala',right:S.sala.termo?tClima(cl):'¿?',desc:S.sala.termo?salaDesc():'Sin termohigrómetro no sabes la temperatura ni la humedad de la sala. Kiko lo vende.'});
   S.carpas.forEach((c,ci)=>{
     if(!c)return;const C=CARPAS[c.t],F=FOCOS[c.foco],wm2=Math.round(F.w/(C.cm[0]*C.cm[2]/1e4));
     rows.push({label:C.n,right:F.n,ic:icono('lampara'),desc:`${C.plazas} plantas · foco ${F.n}, ${wm2} W/m²${wm2<W_M2?' (poca luz: crecen más despacio y con menos THC)':''}\nLuz: ${eur(luzCarpa(ci))} al día con plantas · hasta ${C.wmax} W, macetas de ${C.lmax} L y ${litrosMax(ci)} L de tierra (${litrosCarpa(ci)} puestos).`});
