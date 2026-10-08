@@ -6349,7 +6349,7 @@
    "max_colores": 32,
    "notas": "Vista C: la pared se recorta a lo ancho de cada carpa (columnas 0-43 y 196-239 fijas, la pared del fondo centrada) y la luz igual. La pared lleva solo la tela, sin la forma del cono (la 1.ª versión pasaba los tonos de la luz a grises y se quedaba su silueta). La luz se pinta delante de todo (pared, macetas y plantas) en «overlay», debajo de la campana; con el foco apagado no se pinta. Hasta 32 colores (max_colores): son fondos de pantalla entera.",
    "herramienta": "importado",
-   "origen": "tools/sprites/a-mano/carpa_c.py: la pared dibujada en código (mylar plateado con vetas verticales, laterales más oscuros hacia delante, bandeja blanca con rejilla y el armazón negro) con la geometría de la imagen A; la luz, la de la imagen A sin los brillos de las cortinas",
+   "origen": "tools/sprites/a-mano/carpa_c.py: la pared dibujada en código (mylar plateado con vetas verticales, laterales más oscuros hacia delante, bandeja blanca con rejilla y el armazón negro) con la geometría de la imagen A; la luz, la de la imagen A sin los brillos de las cortinas y con el cono liso (resplandor bajo la boca y haz central, en sus tonos)",
    "descripcion": "la carpa por dentro (vista C): pared del fondo, laterales y suelo de tela plateada con el armazón negro, como las carpas del piso y de la vista B; la luz del foco en su capa",
    "aprobado": "2026-10-08: «prueba B» (p60 con CFL, m100 con sodio 400 y g150 con sodio 600, antes y después), aprobada por la persona: «Me gustan más los plateados»",
    "historial": {

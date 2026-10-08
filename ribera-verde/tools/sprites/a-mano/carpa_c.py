@@ -7,7 +7,9 @@
 #  · carpa-c-pared: dibujada en código. Mylar con vetas verticales (como la vista B) y algún brillo; laterales más oscuros hacia
 #    delante; bandeja blanca con su rejilla; techo, postes y bordes en el negro del armazón; la cremallera de la puerta abierta.
 #  · carpa-c-luz: la de la imagen A (art/procesado) sin los brillos pintados en las cortinas (los laterales por encima del suelo y,
-#    junto al suelo, lo que queda fuera del borde de la bandeja: x <= diag(y) y su espejo); el cono y el charco del suelo, igual. Se puede pasar más de una vez (borrar lo borrado no cambia nada).
+#    junto al suelo, lo que queda fuera del borde de la bandeja: x <= diag(y) y su espejo) y con el cono liso (1.10: la textura de
+#    la imagen A era la sombra de las cortinas): el resplandor bajo la boca y un haz central, en los tonos de la imagen A; el charco
+#    del suelo, igual. Se puede pasar más de una vez (borrar lo borrado y repintar el cono no cambia nada).
 # Sale a art/crudo/carpa-c-fondo/carpa-c-<pared|luz>/unica/00.png (después, node tools/sprites/procesar.js carpa-c-fondo --atlas)
 import os
 from PIL import Image
@@ -88,4 +90,17 @@ for y in range(141):
 for y in range(141, H):                                                    # y los restos de las cortinas junto al suelo, fuera de la bandeja
     xa = round(diag(y))
     for x in range(0, xa + 1): q[x, y] = (0, 0, 0, 0); q[W - 1 - x, y] = (0, 0, 0, 0)
+# el cono liso: sin la textura de la imagen A (la sombra de las cortinas); un resplandor bajo la boca y un haz central
+LZ0, LZ1, LZ2, LZ3 = (198, 130, 77), (231, 150, 86), (255, 172, 82), (255, 224, 149)   # base, haz, resplandor y núcleo (los de la imagen A)
+CX, CY = 120, 16                                                           # centro de la boca del foco
+for y in range(17, 137):
+    xs = [x for x in range(XL + 3, XR - 1) if q[x, y][3]]
+    if not xs: continue
+    x0, x1 = xs[0], xs[-1]; hw = (x1 - x0) / 2
+    for x in range(x0, x1 + 1):
+        if not q[x, y][3]: continue
+        d = (((x - CX) / 26) ** 2 + ((y - CY) / 21) ** 2) ** .5            # el resplandor, media elipse bajo la boca
+        u = abs(x + .5 - CX) / hw                                          # el haz, un tercio del ancho del cono
+        c = LZ3 if d < .45 else LZ2 if d < .72 else LZ1 if d < 1 or u < .34 else LZ0
+        q[x, y] = c + (255,)
 guarda(luz, 'luz')
