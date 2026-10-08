@@ -39,13 +39,13 @@ informe técnico directo + código refactorizado, sin relleno.
 
 ## Subproyecto `ribera-verde/`
 
-- RPG de cultivo independiente (v1.9.0 publicada; 1.10 en desarrollo): 160 px de alto y de 240 a 400 de ancho, solo en horizontal, con mandos flotantes; piso a 1 casilla = 1 m, vista de carpa B en 3/4 a 48 px/m y vista C (la carpa por dentro, desde la imagen A; pared solo con la tela y la luz del foco en una capa aparte, delante de todo). Notas propias en `ribera-verde/CLAUDE.md`.
+- RPG de cultivo independiente (v1.9.0 publicada; 1.10 en desarrollo): 160 px de alto y de 240 a 400 de ancho, solo en horizontal, con mandos flotantes; piso a 1 casilla = 1 m, vista de carpa B a 60 px/m con las carpas plateadas de frente (3/4 sin atlas) y vista C (la carpa por dentro, desde la imagen A; pared solo con la tela y la luz del foco en una capa aparte, delante de todo). Notas propias en `ribera-verde/CLAUDE.md`.
 - Tests: `cd ribera-verde && npm install` y, con el Chromium preinstalado
   (`export CHROMIUM_PATH=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome | head -1)`):
-  `npm test` → 77/77, 0 errores JS · `npm run test:arte` → 24/24.
+  `npm test` → 77/77, 0 errores JS · `npm run test:arte` → 25/25.
 - Plano de escala: `npm run plano` → `docs/plano/` (con `vista-b.png`) + `docs/PLANO.md` (opción A en la 1.8.0; vista de carpa B en P2).
 - Genética (1.9.0): landraces e híbridos clásicos de `src/species.js` (solo texto e información), estabilizar F1 → F4 y banco de semillas. En la 1.10, cada variedad lleva su % índica real y su tono de hoja: de ahí salen el porte y la forma de la planta A (vista C, dibujada a mano); un cruce nuevo (sin receta) sale en un 30–70 % de la madre y cada planta varía su % índica hasta la F4.
-- Economía (1.10): cifras reales (precios, W, kWh, g/W, tope por maceta), fenotipos estrella según la pureza, esquejes, venta al por mayor, deuda de 30.000 € e imperio tras la deuda con los encargos de Baltasar.
+- Economía (1.10): cifras reales (precios, W, kWh, g/W, tope por maceta y de tierra por carpa), fenotipos estrella según la pureza, esquejes, venta al por mayor, deuda de 30.000 € e imperio tras la deuda con los encargos de Baltasar.
 - Guion y mapa (1.10): caja fuerte de la tía (detrás del diploma, combinación en el PC) y empotrada (PC, 380 €); capítulo 4 por 2 variedades de receta cosechadas; plazo desde Toño; robo de Darko (cap. 7); embargo al 3.er plazo vencido; cuota de Molina cada 10 días; barrio alto y astilleros (40 × 30, con `ZONAS`) y 3 interiores (casa de Txaro, comisaría, almacén); la comarca por biomas (Puerto Viejo y Valdehierro, ciudades pequeñas; Mendialde y Errotabarri, pueblos) en autobús (`PARADAS`), y el prólogo en el caserío de Mendialde. Tablas en `docs/ECONOMIA.md` (`npm run docs`).
 - Calle (1.10): patrullas de policía visibles (`10b-patrulla.js`: 0-2 agentes por zona, cono de día, sigilo de noche, barra de sospecha, alarma y huida por un portal o por distancia; la policía ya no sale por paso) y rosin (prensa de Kiko, catadores, 10 + 0,6 × THC el gramo).
 - Análisis (1.10): guion y misiones, probabilidades de ladrones, controles, soborno, calor, redada y Copa en las tres zonas, y la caja fuerte (jugada) en `docs/ANALISIS.md` (`npm run analisis`: modelo exacto, comprobado con las funciones del juego salvo la tabla de la caja; sale con 1 si no cuadra).

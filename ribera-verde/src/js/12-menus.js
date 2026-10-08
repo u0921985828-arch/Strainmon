@@ -43,7 +43,7 @@ async function plantas(){
   const rows=[],H=huecos();
   S.carpas.forEach((c,ci)=>{
     if(!c)return;const C=CARPAS[c.t],F=FOCOS[c.foco],wm2=Math.round(F.w/(C.cm[0]*C.cm[2]/1e4));
-    rows.push({label:C.n,right:F.n,ic:icono('lampara'),desc:`${C.plazas} plantas · foco ${F.n}, ${wm2} W/m²${wm2<W_M2?' (poca luz: crecen más despacio y con menos THC)':''}\nLuz: ${eur(luzCarpa(ci))} al día con plantas · hasta ${C.wmax} W y macetas de ${C.lmax} L.`});
+    rows.push({label:C.n,right:F.n,ic:icono('lampara'),desc:`${C.plazas} plantas · foco ${F.n}, ${wm2} W/m²${wm2<W_M2?' (poca luz: crecen más despacio y con menos THC)':''}\nLuz: ${eur(luzCarpa(ci))} al día con plantas · hasta ${C.wmax} W, macetas de ${C.lmax} L y ${litrosMax(ci)} L de tierra (${litrosCarpa(ci)} puestos).`});
     H.forEach((h,i)=>{if(h.c!==ci)return;const p=S.pots[i],M=MACETAS[S.macetas[i]];
       if(!p){rows.push({label:`  ${h.j+1} · vacía`,right:M.l+' L',ic:icono('maceta'),desc:`Maceta de ${M.n}. Planta algo desde la carpa de tu piso.`});return;}
       const s=getStrain(p.sid);

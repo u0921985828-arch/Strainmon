@@ -33,6 +33,9 @@ const MACETAS={
   tela11:{n:'Tela 11 L',l:11,rend:1.05,cap:92,crec:1.05,agua:1.25,plaga:.8},
   plastico18:{n:'Plástico 18 L',l:18,rend:1,cap:144,crec:.95,agua:.8,plaga:1},
   tela25:{n:'Tela 25 L',l:25,rend:1.05,cap:210,crec:1,agua:1.1,plaga:.8}};
+// tierra (1.10): cada carpa admite como mucho LITROS_M2 litros por m² de suelo, sumando todas sus macetas (4 de 25 L en 1 m²)
+const LITROS_M2=100,litrosMax=ci=>{const [W,,D]=CARPAS[S.carpas[ci].t].cm;return Math.round(W*D/1e4*LITROS_M2);};
+const litrosCarpa=ci=>huecos().reduce((a,q,i)=>a+(q.c===ci?(MACETAS[S.macetas[i]]||MACETAS.plastico7).l:0),0);
 // extras (1.10): uno de cada por carpa (S.carpas[ci][k] = true); se compran en el growshop (S.items['x_'+k]) y se ponen desde la vista de carpa
 const EXTRAS={
   vent:{n:'Ventilador de pinza',c:'Ventilador',w:25,d:'Mueve el aire de la carpa: plagas ×0,7. Gasta 25 W día y noche.'},
@@ -142,7 +145,7 @@ function stageName(p){return p.prog<.12?'Germinando':p.prog<.35?'Plántula':p.pr
 async function potAction(i){
   const p=S.pots[i];
   if(!p){
-    if(macetasLibres(i).length){const c=await ask(`Plaza vacía con una maceta de ${MACETAS[S.macetas[i]].n}.`,['Plantar','Cambiar maceta','Salir']);if(c===1)return cambiarMaceta(i);if(c!==0)return;}
+    if(macetasLibres(i,false).length){const c=await ask(`Plaza vacía con una maceta de ${MACETAS[S.macetas[i]].n}.`,['Plantar','Cambiar maceta','Salir']);if(c===1)return cambiarMaceta(i);if(c!==0)return;}
     return plantar(i);
   }
   const s=getStrain(p.sid);
@@ -157,11 +160,14 @@ async function potAction(i){
   else if(op==='Sacar esqueje')await sacarEsqueje(i);
   else if(op==='Arrancar'){if(await ask('¿Seguro que quieres arrancarla?',['Sí','No'])===0){S.pots[i]=null;await say('Arrancas la planta.');}}
 }
-// macetas de repuesto que caben en la carpa de la plaza i (y no son la que ya tiene)
-function macetasLibres(i){const h=huecos()[i],C=CARPAS[S.carpas[h.c].t];return Object.keys(MACETAS).filter(k=>S.items['m_'+k]>0&&MACETAS[k].l<=C.lmax&&k!==S.macetas[i]);}
+// macetas de repuesto que caben en la plaza i (y no son la que ya tiene): las de la mochila hasta CARPAS[t].lmax; con tierra, solo
+// las que no pasan de litrosMax en la carpa (tierra = false: las que caben en la plaza aunque no quepa su tierra)
+function macetasLibres(i,tierra=true){const h=huecos()[i],C=CARPAS[S.carpas[h.c].t],sobra=litrosMax(h.c)-litrosCarpa(h.c)+MACETAS[S.macetas[i]].l;
+  return Object.keys(MACETAS).filter(k=>S.items['m_'+k]>0&&MACETAS[k].l<=C.lmax&&k!==S.macetas[i]&&(!tierra||MACETAS[k].l<=sobra));}
 async function cambiarMaceta(i){
-  const l=macetasLibres(i);if(!l.length)return say('No tienes otra maceta que quepa aquí.');
-  const j=await menu(l.map(k=>({label:'Maceta '+MACETAS[k].n,right:'×'+S.items['m_'+k],ic:icono('maceta'),desc:descMaceta(k)})),{cls:'full',title:'CAMBIAR MACETA',title2:'Ahora: '+MACETAS[S.macetas[i]].n,desc:true});
+  const l=macetasLibres(i),c=huecos()[i].c,tl=`tierra ${litrosCarpa(c)} de ${litrosMax(c)} L`;
+  if(!l.length)return say(macetasLibres(i,false).length?`No cabe más tierra en la carpa (${tl}).`:'No tienes otra maceta que quepa aquí.');
+  const j=await menu(l.map(k=>({label:'Maceta '+MACETAS[k].n,right:'×'+S.items['m_'+k],ic:icono('maceta'),desc:descMaceta(k)})),{cls:'full',title:'CAMBIAR MACETA',title2:'Ahora: '+MACETAS[S.macetas[i]].n+' · '+tl,desc:true});
   if(j<0)return;const k=l[j];S.items['m_'+k]--;S.items['m_'+S.macetas[i]]=(S.items['m_'+S.macetas[i]]||0)+1;S.macetas[i]=k;sfx('sel');
   return say(`Pones la maceta de ${MACETAS[k].n}. La vieja va a la mochila.`);
 }

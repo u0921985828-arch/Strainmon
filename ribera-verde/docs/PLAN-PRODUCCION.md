@@ -145,6 +145,8 @@ Van uno por carpa (`EXTRAS` y `S.carpas[ci][id]`). Se compran en el growshop («
 | Vista de carpa, opción A | 64 px/m, de frente | La carpa abierta de frente sobre el fondo de un cuarto | hecho (1.8) · sustituida por la B en P2 |
 | **Vista de carpa, opción B ★** | **48 px/m de ancho y de alto, y 24 px/m de fondo (3/4, como el piso)** | La carpa recortada como en la 1.6–1.7: sin techo, sin frente y sin lateral derecho. Se ven el fondo y la pared izquierda de mylar, el suelo, las macetas, las plantas y los focos colgando medio transparentes | **hecho con arte procedural (P2)**; medidas en [PLANO.md §6](PLANO.md#6-vista-de-carpa-b-p2-del-plan-de-producción) y `plano/vista-b.png` |
 
+> **1.10:** con el atlas, la vista B ya no es 3/4: pinta de frente las carpas plateadas aprobadas a 60 px/m (el 3/4 queda sin atlas). Las cifras de abajo son las de P2, a 48 px/m; las de ahora, en [PLANO.md](PLANO.md) §3 y §6.
+
 **Por qué la B.** Recupera el aspecto de las carpas de la 1.6–1.7 (paredes de mylar acolchado, bastidor negro, suelo claro, vistas desde arriba como las paredes de la casa). Las proporciones, en cambio, son reales: una carpa de 150 × 100 × 200 cm mide 72 × 120 px y cabe en los 160 px de alto con margen.
 
 Medidas en la vista B (ancho × alto en px, contando el suelo y la pared):

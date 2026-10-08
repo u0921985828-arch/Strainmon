@@ -21,13 +21,15 @@ Un día de juego cuenta 392 h de foco (4 semanas a 18 h en crecimiento y 12 h en
 
 ## Carpas y macetas
 
-| Carpa | Precio | Plazas | Foco máx. | Maceta máx. |
-|---|---|---|---|---|
-| Armario 60×60×160 | la de la tía | 2 | 250 W | 11 L |
-| Armario 80×80×180 | 90 € (cap. 3) | 3 | 400 W | 18 L |
-| Carpa 100×100×200 | 120 € (cap. 2) | 4 | 480 W | 25 L |
-| Carpa 120×120×200 | 150 € (cap. 5) | 6 | 720 W | 25 L |
-| Carpa 150×100×200 | 140 € (cap. 4) | 6 | 720 W | 25 L |
+| Carpa | Precio | Plazas | Foco máx. | Maceta máx. | Tierra máx. (todas las macetas) |
+|---|---|---|---|---|---|
+| Armario 60×60×160 | la de la tía | 2 | 250 W | 11 L | 36 L |
+| Armario 80×80×180 | 90 € (cap. 3) | 3 | 400 W | 18 L | 64 L |
+| Carpa 100×100×200 | 120 € (cap. 2) | 4 | 480 W | 25 L | 100 L |
+| Carpa 120×120×200 | 150 € (cap. 5) | 6 | 720 W | 25 L | 144 L |
+| Carpa 150×100×200 | 140 € (cap. 4) | 6 | 720 W | 25 L | 150 L |
+
+La tierra de todas las macetas de una carpa no pasa de 100 L por m² de suelo (`LITROS_M2`: 4 macetas de 25 L en 1 m²); «Cambiar maceta» no ofrece las que la pasarían.
 
 | Maceta | Precio | Tope por planta | Extra |
 |---|---|---|---|

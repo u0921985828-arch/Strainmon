@@ -65,7 +65,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
     const mascara = (w, h, [rx, ry, rw, rh]) => { const [c, x] = mkCanvas(w, h); x.fillStyle = '#000000'; x.fillRect(0, 0, w, h); x.fillStyle = '#ffffff'; x.fillRect(rx, ry, rw, rh); return c; };
     for (const b of MAPS.town.blds) { const c = region('town', b.x0 - 1, b.y0 - 1, b.w + 2, b.h + 2);
       files[`mapa/edificio-${b.id}.png`] = png(c); files[`mapa/edificio-${b.id}_mascara.png`] = png(mascara(c.width, c.height, [16, 16, b.w * 16, b.h * 16])); }
-    // carpas: el mueble del piso (16 px/m) y, de la vista B (48 px/m, P2), cada carpa en 3/4, el cuarto, las macetas, las
+    // carpas: el mueble del piso (16 px/m) y, de la vista B (60 px/m desde la 1.10, P2), cada carpa en 3/4, el cuarto, las macetas, las
     // plantas por porte y fase (cogollos en el verde de referencia), los focos y los extras (las láminas, en huellas.js)
     for (const t of Object.keys(CARPAS)) { files[`misc/carpa-${t}-mapa.png`] = png(carpaMapa(t)); files[`misc/carpa-${t}-34.png`] = png(carpa34(t)); }
     files['misc/cuarto-34.png'] = png(cuarto34());

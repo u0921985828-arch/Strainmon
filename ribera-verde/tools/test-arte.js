@@ -122,7 +122,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     const acc = await page.evaluate(async () => { VFXLOG.length = 0; enterMap('home', 5, 6, 'up'); const t = performance.now(); await accion('regar', { id: 'vfx-gotas', x: 80, y: 80 }); return { ms: Math.round(performance.now() - t), libre: P.act === null, vfx: VFXLOG.slice() }; });
     check('Regar: animación de 1 s y gotas', acc.ms >= 950 && acc.ms < 1600 && acc.libre && acc.vfx.includes('vfx-gotas'), acc);
 
-    // carpas: muebles del piso a 16 px/m y, con A delante, la vista B en 3/4 a 48 px/m (procedural hasta las láminas de P3-P4)
+    // carpas: muebles del piso a 16 px/m y, con A delante, la vista B a 60 px/m (con atlas, la carpa plateada de frente; lo demás, procedural hasta las láminas de P3-P4)
     const carpa = await page.evaluate(async () => {
       const espera = ms => new Promise(r => setTimeout(r, ms)), hasta = f => new Promise(r => { const i = setInterval(() => { if (f()) { clearInterval(i); r(); } }, 20); });
       S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'led720' }]; S.macetas = ['plastico7', 'tela11', 'plastico18', 'tela25', 'tela11', 'tela11', 'tela11', 'tela11'];
@@ -133,7 +133,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       r.solidas = tileSolid(m, A.x0, A.y) && tileSolid(m, B.x0, B.y) && tileSolid(m, B.x1, B.y) && !tileSolid(m, A.x0, A.y + 1);
       r.piso = [m.w, m.h].join('×');
       // todas las variedades tienen su % índica y su tono de hoja (los híbridos propios, de sus padres; los de partidas viejas, por sus
-      // días de floración), que dan el porte; de vegetativo a lista, alto y ancho reales (PLANTA_CM a 48 px/m) entre ×0,75 y ×1,33; la que crece no encoge
+      // días de floración), que dan el porte; de vegetativo a lista, alto y ancho reales (PLANTA_CM a VB_M) entre ×0,75 y ×1,33; la que crece no encoge
       r.n = DEX.length; r.portes = DEX.every(k => Number.isInteger(STRAINS[k].ind) && STRAINS[k].ind >= 0 && STRAINS[k].ind <= 100 && /^#[0-9a-f]{6}$/.test(STRAINS[k].hj))
         && porteDe('xq9') === 'h' && [porteInd(70), porteInd(69), porteInd(30), porteInd(29)].join() === 'i,h,h,s' && porteDe('rif') === 'i' && porteDe('thai') === 's';
       const caja = c => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, x1 = -1, y0 = 1e9;
@@ -154,7 +154,18 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
           pl.forEach((a, i) => { const ra = Math.max(an(a), md) / 2; peor = Math.min(peor, a.cx - ra, W - a.cx - ra, a.cy - ra, D - a.cy - ra, H - 28 - FOCO_SEP[f] - MACETA_CM[k][1] - al(a));
             pl.forEach((b, j) => { if (j > i) peor = Math.min(peor, Math.hypot(a.cx - b.cx, a.cy - b.cy) - Math.max((an(a) + an(b)) / 2, md)); }); }); }
         r.espacio.push(t + ' ' + Math.round(peor)); }
-      S.carpas = C0; S.macetas = M0;
+      // tierra (1.10): de frente, cada maceta que admite la carpa queda entre las columnas del suelo de la plateada, a su fondo; y el tope de litros de la carpa: en la de 120 con 5 de 25 L y una de 7, solo cabe la de 18 L
+      r.dentro = [];
+      for (const t in CARPAS) { const C = CARPAS[t], k = VB_PLATA[t]; let peor = 1e9;
+        for (const m in MACETAS) if (MACETAS[m].l <= C.lmax) { S.carpas = [{ t, foco: 'led200' }]; S.macetas = Array(C.plazas).fill(m); const g = vcGeo(0), w = macetaPx(m).w;
+          if (!g.plata) { peor = -1e9; continue; }
+          for (const q of g.pl) { const f = (155 - q.y) / 17, xl = 120 + k.xf[0] + (k.xb[0] - k.xf[0]) * f, xr = 120 + k.xf[1] + (k.xb[1] - k.xf[1]) * f;
+            peor = Math.min(peor, q.x - (w >> 1) - xl, xr - (q.x - (w >> 1) + w - 1)); } }
+        r.dentro.push(t + ' ' + Math.floor(peor)); }
+      S.carpas = [{ t: 'm120', foco: 'led480' }]; S.macetas = ['tela25', 'tela25', 'tela25', 'tela25', 'tela25', 'plastico7']; const I0 = S.items;
+      S.items = Object.assign({}, I0, { m_tela25: 1, m_plastico18: 1, m_tela11: 0, m_plastico7: 0 });
+      r.tierra = [litrosMax(0), litrosCarpa(0), macetasLibres(5).join(), macetasLibres(5, false).join(), Object.keys(CARPAS).every(t => { S.carpas = [{ t, foco: 'cfl' }]; return CARPAS[t].plazas * 7 <= litrosMax(0); })];
+      S.items = I0; S.carpas = C0; S.macetas = M0;
       // la escena: A delante del armario, ▶ plaza 2, ▲ el foco, B sale
       enterMap('home', A.x0, A.y + 1, 'up'); press('A'); await hasta(() => mode === 'carpa' && handlers.length === 1); await espera(150);
       const hay = c => c && c.width > 0 && colores(c).size > 2;
@@ -165,6 +176,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     check('Carpas: muebles del piso (1-2 casillas, sólidos) con su arte, piso de 12×8', carpa.mapa && carpa.anchos === '1,2' && carpa.solidas && carpa.piso === '12×8', carpa);
     check(`Plantas de la vista B: ${carpa.n} variedades con % índica, tono de hoja y porte, alto y ancho reales (×0,75-1,33) de vegetativo a lista, seca y muerta sin verdes`, carpa.portes && carpa.crece && carpa.seca, carpa);
     check('Vista B, distancia segura: en las 5 carpas, con cada foco y maceta, ni las copas en floración ni las macetas se tocan ni tocan las paredes, y la cima queda a su distancia del foco', carpa.espacio.length === 5 && carpa.espacio.every(e => +e.split(' ')[1] >= 0), carpa.espacio);
+    check('Vista B de frente: las macetas, dentro del suelo de la carpa plateada en las 5 carpas; tope de tierra por carpa (120: 144 L, con 5 de 25 L y una de 7 solo entra la de 18 L)', carpa.dentro.length === 5 && carpa.dentro.every(e => +e.split(' ')[1] >= 0) && carpa.tierra.join('|') === '144|132|plastico18|plastico18,tela25|true', { dentro: carpa.dentro, tierra: carpa.tierra });
     check('Vista de carpa B: A abre, ▶ plaza 2, ▲ el foco, B sale; cuarto, carpas, macetas, focos y extras', carpa.escena && carpa.sel.join() === '0,1,-1' && /CFL/.test(carpa.info) && carpa.sale, carpa);
     // vista C (P3, imagen A): la pared solo lleva la tela y la luz va en su propio sprite, por delante; macetas y plantas a la escala
     // de la carpa; la planta A del porte de cada planta (su % índica), del ancho que deja aire con sus vecinas de fila y las paredes, de

@@ -1,5 +1,5 @@
 {
- "escala": "mapa: 1 casilla = 16 px = 1 m · vista de carpa B: 48 px = 1 m de ancho y alto, 24 px/m de fondo",
+ "escala": "mapa: 1 casilla = 16 px = 1 m · vista de carpa B: 60 px = 1 m de ancho y alto (las carpas plateadas, de frente)",
  "mapas": {
   "town": {
    "nombre": "town",
@@ -1452,11 +1452,11 @@
    "clave": "c34:p60",
    "eje": "frente",
    "real": 0.6,
-   "ppm": 48,
-   "w": 33,
-   "h": 93,
-   "m": 0.58,
-   "ratio": 0.97
+   "ppm": 60,
+   "w": 42,
+   "h": 105,
+   "m": 0.6,
+   "ratio": 1
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1464,11 +1464,11 @@
    "clave": "c34:p80",
    "eje": "frente",
    "real": 0.8,
-   "ppm": 48,
-   "w": 44,
-   "h": 108,
-   "m": 0.79,
-   "ratio": 0.99
+   "ppm": 60,
+   "w": 55,
+   "h": 119,
+   "m": 0.82,
+   "ratio": 1.02
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1476,11 +1476,11 @@
    "clave": "c34:m100",
    "eje": "frente",
    "real": 1,
-   "ppm": 48,
-   "w": 55,
-   "h": 122,
-   "m": 1,
-   "ratio": 1
+   "ppm": 60,
+   "w": 68,
+   "h": 133,
+   "m": 1.03,
+   "ratio": 1.03
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1488,11 +1488,11 @@
    "clave": "c34:m120",
    "eje": "frente",
    "real": 1.2,
-   "ppm": 48,
-   "w": 66,
-   "h": 127,
-   "m": 1.21,
-   "ratio": 1.01
+   "ppm": 60,
+   "w": 80,
+   "h": 133,
+   "m": 1.23,
+   "ratio": 1.03
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1500,11 +1500,11 @@
    "clave": "c34:g150",
    "eje": "frente",
    "real": 1.5,
-   "ppm": 48,
-   "w": 79,
-   "h": 122,
-   "m": 1.5,
-   "ratio": 1
+   "ppm": 60,
+   "w": 100,
+   "h": 133,
+   "m": 1.57,
+   "ratio": 1.04
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1512,11 +1512,11 @@
    "clave": "m34:plastico7",
    "eje": "ancho",
    "real": 0.22,
-   "ppm": 48,
-   "w": 11,
-   "h": 15,
-   "m": 0.23,
-   "ratio": 1.04
+   "ppm": 60,
+   "w": 13,
+   "h": 17,
+   "m": 0.22,
+   "ratio": 0.98
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1524,9 +1524,9 @@
    "clave": "m34:tela11",
    "eje": "ancho",
    "real": 0.25,
-   "ppm": 48,
-   "w": 12,
-   "h": 17,
+   "ppm": 60,
+   "w": 15,
+   "h": 19,
    "m": 0.25,
    "ratio": 1
   },
@@ -1536,11 +1536,11 @@
    "clave": "m34:plastico18",
    "eje": "ancho",
    "real": 0.3,
-   "ppm": 48,
-   "w": 14,
-   "h": 20,
-   "m": 0.29,
-   "ratio": 0.97
+   "ppm": 60,
+   "w": 18,
+   "h": 24,
+   "m": 0.3,
+   "ratio": 1
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1548,11 +1548,11 @@
    "clave": "m34:tela25",
    "eje": "ancho",
    "real": 0.35,
-   "ppm": 48,
-   "w": 17,
-   "h": 20,
+   "ppm": 60,
+   "w": 21,
+   "h": 24,
    "m": 0.35,
-   "ratio": 1.01
+   "ratio": 1
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1560,11 +1560,11 @@
    "clave": "f34:cfl",
    "eje": "ancho",
    "real": 0.35,
-   "ppm": 48,
-   "w": 17,
+   "ppm": 60,
+   "w": 21,
    "h": 10,
    "m": 0.35,
-   "ratio": 1.01
+   "ratio": 1
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1572,11 +1572,11 @@
    "clave": "f34:sodio250",
    "eje": "ancho",
    "real": 0.45,
-   "ppm": 48,
-   "w": 22,
+   "ppm": 60,
+   "w": 27,
    "h": 9,
-   "m": 0.46,
-   "ratio": 1.02
+   "m": 0.45,
+   "ratio": 1
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1584,8 +1584,8 @@
    "clave": "f34:sodio400",
    "eje": "ancho",
    "real": 0.5,
-   "ppm": 48,
-   "w": 24,
+   "ppm": 60,
+   "w": 30,
    "h": 9,
    "m": 0.5,
    "ratio": 1
@@ -1596,11 +1596,11 @@
    "clave": "f34:sodio600",
    "eje": "ancho",
    "real": 0.55,
-   "ppm": 48,
-   "w": 26,
+   "ppm": 60,
+   "w": 33,
    "h": 9,
-   "m": 0.54,
-   "ratio": 0.98
+   "m": 0.55,
+   "ratio": 1
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1608,8 +1608,8 @@
    "clave": "f34:led100",
    "eje": "ancho",
    "real": 0.25,
-   "ppm": 48,
-   "w": 12,
+   "ppm": 60,
+   "w": 15,
    "h": 6,
    "m": 0.25,
    "ratio": 1
@@ -1620,11 +1620,11 @@
    "clave": "f34:led200",
    "eje": "ancho",
    "real": 0.3,
-   "ppm": 48,
-   "w": 14,
+   "ppm": 60,
+   "w": 18,
    "h": 6,
-   "m": 0.29,
-   "ratio": 0.97
+   "m": 0.3,
+   "ratio": 1
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1632,11 +1632,11 @@
    "clave": "f34:led480",
    "eje": "ancho",
    "real": 0.6,
-   "ppm": 48,
-   "w": 29,
+   "ppm": 60,
+   "w": 36,
    "h": 6,
    "m": 0.6,
-   "ratio": 1.01
+   "ratio": 1
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1644,8 +1644,8 @@
    "clave": "f34:led720",
    "eje": "ancho",
    "real": 1,
-   "ppm": 48,
-   "w": 48,
+   "ppm": 60,
+   "w": 60,
    "h": 6,
    "m": 1,
    "ratio": 1
@@ -1656,11 +1656,11 @@
    "clave": "x34:vent",
    "eje": "ancho",
    "real": 0.2,
-   "ppm": 48,
+   "ppm": 60,
    "w": 9,
    "h": 14,
-   "m": 0.19,
-   "ratio": 0.94
+   "m": 0.15,
+   "ratio": 0.75
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1668,11 +1668,11 @@
    "clave": "x34:filtro",
    "eje": "ancho",
    "real": 0.65,
-   "ppm": 48,
+   "ppm": 60,
    "w": 31,
    "h": 10,
-   "m": 0.65,
-   "ratio": 0.99
+   "m": 0.52,
+   "ratio": 0.79
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1680,11 +1680,11 @@
    "clave": "x34:goteo",
    "eje": "alto",
    "real": 0.5,
-   "ppm": 48,
+   "ppm": 60,
    "w": 14,
    "h": 24,
-   "m": 0.5,
-   "ratio": 1
+   "m": 0.4,
+   "ratio": 0.8
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1692,11 +1692,11 @@
    "clave": "p34:i0",
    "eje": "alto",
    "real": 0.05,
-   "ppm": 48,
+   "ppm": 60,
    "w": 9,
-   "h": 5,
+   "h": 6,
    "m": 0.1,
-   "ratio": 2.08
+   "ratio": 2
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1704,11 +1704,11 @@
    "clave": "p34:i1",
    "eje": "alto",
    "real": 0.15,
-   "ppm": 48,
+   "ppm": 60,
    "w": 10,
-   "h": 15,
-   "m": 0.31,
-   "ratio": 2.08
+   "h": 19,
+   "m": 0.32,
+   "ratio": 2.11
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1716,11 +1716,11 @@
    "clave": "p34:i2",
    "eje": "alto",
    "real": 0.35,
-   "ppm": 48,
-   "w": 20,
-   "h": 17,
+   "ppm": 60,
+   "w": 24,
+   "h": 21,
    "m": 0.35,
-   "ratio": 1.01
+   "ratio": 1
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1728,11 +1728,11 @@
    "clave": "p34:i3",
    "eje": "alto",
    "real": 0.55,
-   "ppm": 48,
-   "w": 28,
-   "h": 25,
-   "m": 0.52,
-   "ratio": 0.95
+   "ppm": 60,
+   "w": 34,
+   "h": 32,
+   "m": 0.53,
+   "ratio": 0.97
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1740,11 +1740,11 @@
    "clave": "p34:i4",
    "eje": "alto",
    "real": 0.65,
-   "ppm": 48,
-   "w": 30,
-   "h": 30,
+   "ppm": 60,
+   "w": 36,
+   "h": 38,
    "m": 0.63,
-   "ratio": 0.96
+   "ratio": 0.97
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1752,11 +1752,11 @@
    "clave": "p34:s0",
    "eje": "alto",
    "real": 0.05,
-   "ppm": 48,
+   "ppm": 60,
    "w": 9,
-   "h": 5,
+   "h": 6,
    "m": 0.1,
-   "ratio": 2.08
+   "ratio": 2
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1764,11 +1764,11 @@
    "clave": "p34:s1",
    "eje": "alto",
    "real": 0.15,
-   "ppm": 48,
+   "ppm": 60,
    "w": 10,
-   "h": 15,
-   "m": 0.31,
-   "ratio": 2.08
+   "h": 19,
+   "m": 0.32,
+   "ratio": 2.11
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1776,11 +1776,11 @@
    "clave": "p34:s2",
    "eje": "alto",
    "real": 0.45,
-   "ppm": 48,
-   "w": 18,
-   "h": 22,
-   "m": 0.46,
-   "ratio": 1.02
+   "ppm": 60,
+   "w": 22,
+   "h": 27,
+   "m": 0.45,
+   "ratio": 1
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1788,11 +1788,11 @@
    "clave": "p34:s3",
    "eje": "alto",
    "real": 0.75,
-   "ppm": 48,
-   "w": 24,
-   "h": 35,
+   "ppm": 60,
+   "w": 30,
+   "h": 44,
    "m": 0.73,
-   "ratio": 0.97
+   "ratio": 0.98
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1800,11 +1800,11 @@
    "clave": "p34:s4",
    "eje": "alto",
    "real": 0.9,
-   "ppm": 48,
-   "w": 28,
-   "h": 42,
+   "ppm": 60,
+   "w": 34,
+   "h": 53,
    "m": 0.88,
-   "ratio": 0.97
+   "ratio": 0.98
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1812,11 +1812,11 @@
    "clave": "p34:h0",
    "eje": "alto",
    "real": 0.05,
-   "ppm": 48,
+   "ppm": 60,
    "w": 9,
-   "h": 5,
+   "h": 6,
    "m": 0.1,
-   "ratio": 2.08
+   "ratio": 2
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1824,11 +1824,11 @@
    "clave": "p34:h1",
    "eje": "alto",
    "real": 0.15,
-   "ppm": 48,
+   "ppm": 60,
    "w": 10,
-   "h": 15,
-   "m": 0.31,
-   "ratio": 2.08
+   "h": 19,
+   "m": 0.32,
+   "ratio": 2.11
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1836,11 +1836,11 @@
    "clave": "p34:h2",
    "eje": "alto",
    "real": 0.4,
-   "ppm": 48,
-   "w": 18,
-   "h": 19,
+   "ppm": 60,
+   "w": 22,
+   "h": 24,
    "m": 0.4,
-   "ratio": 0.99
+   "ratio": 1
   },
   {
    "grupo": "VISTA DE CARPA B",
@@ -1848,9 +1848,9 @@
    "clave": "p34:h3",
    "eje": "alto",
    "real": 0.6,
-   "ppm": 48,
-   "w": 24,
-   "h": 28,
+   "ppm": 60,
+   "w": 32,
+   "h": 35,
    "m": 0.58,
    "ratio": 0.97
   },
@@ -1860,10 +1860,10 @@
    "clave": "p34:h4",
    "eje": "alto",
    "real": 0.7,
-   "ppm": 48,
-   "w": 28,
-   "h": 33,
-   "m": 0.69,
+   "ppm": 60,
+   "w": 36,
+   "h": 41,
+   "m": 0.68,
    "ratio": 0.98
   },
   {

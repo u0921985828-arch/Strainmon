@@ -10,6 +10,7 @@ const Datos = preload("res://src/datos.gd")
 const Cultivo = preload("res://src/cultivo.gd")
 const Arte = preload("res://src/arte.gd")
 const Procedural = preload("res://src/procedural.gd")
+const Atlas = preload("res://src/atlas.gd")
 
 # el canvas guarda el alfa global en 8 bits: .35 → 89/255
 const A35 := 89 / 255.0
@@ -77,6 +78,12 @@ static func vc_planta_sprite(po: String, st: int, esp: int):
 # vcGeo: la vista B (P pasa cm a px: x desde la izquierda, y de fondo desde el frente, z de alto) y, si hay arte para todo, la C
 static func punto(g: Dictionary, x: float, y: float, z: float) -> Array:
 	var VB: Dictionary = Datos.carga().VB
+	if g.has("pk"):   # la carpa plateada de frente: cada fondo y, entre las columnas del suelo de delante y las de la pared
+		var k: Dictionary = g.pk
+		var t: float = y / g.D
+		var xl: float = g.x0 + (k.xb[0] - k.xf[0]) * t
+		var xr: float = g.x0 + g.w + (k.xb[1] - k.xf[1]) * t
+		return [Datos.jsround(xl + (xr - xl) * x / g.W), Datos.jsround(g.yf - 17 * t - z * VB.M)]
 	return [Datos.jsround(g.x0 + x * VB.M + y * VB.X), Datos.jsround(g.yf - y * VB.F - z * VB.M)]
 
 static func geo(S: Dictionary, ci: int):
@@ -90,6 +97,15 @@ static func geo(S: Dictionary, ci: int):
 	var w := Datos.jsround(W * VB.M)
 	var sx := Datos.jsround(Dp * VB.X)
 	var o := {"c": c, "C": C, "W": W, "H": H, "D": Dp, "w": w, "s": sx, "x0": 120 - ((w + sx) >> 1), "yf": int(VB.PARED) + Datos.jsround(Dp * VB.F)}
+	var f = Atlas.foto_misc("carpa-" + c.t + "-vista") if VB.PLATA.has(c.t) else null
+	if f:   # con el atlas, la carpa plateada de frente (VB_PLATA)
+		var k: Dictionary = VB.PLATA[c.t]
+		o.pk = k
+		o.plata = f
+		o.x0 = 120 + int(k.xf[0])
+		o.w = int(k.xf[1]) - int(k.xf[0]) + 1
+		o.s = 0
+		o.yf = 155
 	var cols := int(C.cols)
 	var pl := []
 	var hu := Cultivo.huecos(S)
@@ -115,6 +131,10 @@ static func geo(S: Dictionary, ci: int):
 	o.fx = punto(o, W / 2, Dp / 2, 0)[0]
 	o.fy = punto(o, 0, Dp / 2, H - 28)[1]
 	o.barra = punto(o, 0, Dp / 2, H - 4)[1]
+	if f:   # de frente, lo que cuelga no sube del techo de dentro (8 filas sobre yt): cuerdas, campana y filtro
+		o.techo = 157 + int(o.pk.yt) - 8
+		o.barra = maxi(o.barra, o.techo)
+		o.fy = maxi(o.fy, o.techo + Procedural.foco34(c.foco).get_height() - 1)
 	o.vc = vista_c(S, o)
 	if o.vc:
 		o.fx = 120

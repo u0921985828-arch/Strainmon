@@ -785,26 +785,36 @@ func _carpa_fondo() -> void:
 	var c: Dictionary = g.c
 	_fondo_ancho(Procedural.cuarto34())
 	L.draw_set_transform(Vector2(OX(), 0))
-	if c.get("goteo"):
-		var e := Procedural.extra34("goteo")
-		var gx: int = g.x0 + g.w + g.s + 12
-		var gy: int = int(D.VB.PARED) + 8
-		_img(e, gx - (e.get_width() >> 1), gy - e.get_height() + 1)
-		var tp: Array = Vista.punto(g, g.W - 6, g.D * .7, 4)
-		var osc := css("#1c1d22")
-		var y0 := gy - e.get_height() + 1
-		_rect(tp[0], y0, gx - tp[0] - 1, 1, osc)
-		_rect(tp[0], y0, 1, tp[1] - y0, osc)
-	var cv := Procedural.carpa34(c.t)
-	_img(cv, g.x0 - 1, g.yf + 2 - cv.get_height())
+	if c.get("goteo") and not g.has("plata"):
+		_goteo()
+	if g.has("plata"):
+		_pinta(g.plata, 120, 157)
+	else:
+		var cv := Procedural.carpa34(c.t)
+		_img(cv, g.x0 - 1, g.yf + 2 - cv.get_height())
+	if c.get("goteo") and g.has("plata"):
+		_goteo()
 	if c.get("filtro"):
 		var e := Procedural.extra34("filtro")
 		var p: Array = Vista.punto(g, g.W * .55, g.D * .85, g.H - 24)
-		_img(e, p[0] - (e.get_width() >> 1), p[1] - e.get_height() + 1)
+		var fy: int = maxi(p[1], g.techo + e.get_height() - 1) if g.has("plata") else p[1]
+		_img(e, p[0] - (e.get_width() >> 1), fy - e.get_height() + 1)
 	if c.get("vent"):
 		var e := Procedural.extra34("vent")
 		var p: Array = Vista.punto(g, 2, g.D * .8, 110)
 		_img(e, p[0], p[1] - e.get_height() + 1)
+
+# el depósito del goteo, fuera de la carpa: en 3/4, al pie de la pared y detrás; de frente, a su lado y con el tubo por la puerta
+func _goteo() -> void:
+	var e := Procedural.extra34("goteo")
+	var gx: int = g.x0 + g.w + g.s + 12
+	var gy: int = g.yf if g.has("plata") else int(J.D.VB.PARED) + 8
+	_img(e, gx - (e.get_width() >> 1), gy - e.get_height() + 1)
+	var tp: Array = Vista.punto(g, g.W - 6, g.D * .7, 4)
+	var osc := css("#1c1d22")
+	var y0 := gy - e.get_height() + 1
+	_rect(tp[0], y0, gx - tp[0] - 1, 1, osc)
+	_rect(tp[0], y0, 1, tp[1] - y0, osc)
 
 # el cono de luz del foco encendido (dentro de la carpa): trapecio con degradado vertical, sumado ('lighter')
 func _cono() -> void:
@@ -813,7 +823,7 @@ func _cono() -> void:
 	var D: Dictionary = J.D
 	var c: Dictionary = g.c
 	var F: Dictionary = D.FOCOS[c.foco]
-	var key := "cono|%s|%s" % [c.t, c.foco]
+	var key := "cono|%s|%s|%s" % [c.t, c.foco, g.has("plata")]
 	if not cache.has(key):
 		var a: float = .05 + .09 * minf(1, F.w / 600.0)
 		var lw := Datos.jsround(D.FOCO_CM.get(c.foco, 40) * D.VB.M / 2)
@@ -822,8 +832,8 @@ func _cono() -> void:
 		var fy: float = g.fy
 		var yf: float = g.yf
 		var pol := PackedVector2Array([Vector2(fx - lw, fy), Vector2(fx + lw, fy), Vector2(fx + hw, yf), Vector2(fx - hw, yf)])
-		var cx0: int = g.x0 + 1
-		var cx1: int = cx0 + g.w + g.s - 1
+		var cx0: int = g.x0 if g.has("plata") else g.x0 + 1
+		var cx1: int = g.x0 + g.w if g.has("plata") else cx0 + g.w + g.s - 1
 		var cob := Procedural.cobertura(pol)
 		var luz := css(D.FOCO_LUZ[F.tipo] + "1)")
 		var o := {}
@@ -845,7 +855,7 @@ func _carpa_encima() -> void:
 	var c: Dictionary = g.c
 	var F: Dictionary = D.FOCOS[c.foco]
 	L.draw_set_transform(Vector2(OX(), 0))
-	var clip := Rect2i(g.x0 + 1, 0, g.w + g.s - 1, SH)
+	var clip := Rect2i(g.x0, 0, g.w, SH) if g.has("plata") else Rect2i(g.x0 + 1, 0, g.w + g.s - 1, SH)
 	var fsel := Vista.fila_sel(g, J.VC.sel)
 	var pl: Array = g.pl.duplicate()
 	pl.sort_custom(func(a, b): return a.y < b.y or (a.y == b.y and (a.x < b.x or (a.x == b.x and a.i < b.i))))

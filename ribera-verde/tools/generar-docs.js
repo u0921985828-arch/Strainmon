@@ -47,7 +47,7 @@ const ROOT = path.join(__dirname, '..');
     const npcs = NPCDEF.map(d => ({ id: d.id, map: d.map, x: d.x, y: d.y, wander: d.wander || 0, cond: d.cond ? d.cond.toString().replace(/^\(\)=>/, '') : '' }));
     const items = ITEMS.map(i => ({ id: i.id, map: i.map, x: i.x, y: i.y, hidden: !!i.hidden, give: i.give.toString().match(/got\('([^']+)'/)?.[1] || i.give.toString().match(/money\+=(\d+)/)?.[0] }));
     const shop = SHOP.map(s => ({ lbl: s.lbl, p: s.p, ch: s.ch, sid: s.sid, foco: s.foco, maceta: s.maceta, carpa: s.carpa, desc: (s.desc || '').replace(/\n/g, ' · ') }));
-    const carpas = Object.entries(CARPAS).map(([k, C]) => ({ k, ...C }));
+    const carpas = Object.entries(CARPAS).map(([k, C]) => ({ k, ...C, tierra: Math.round(C.cm[0] * C.cm[2] / 1e4 * LITROS_M2) }));
     // montajes de ejemplo: Skunk #1 sana y abonada, fenotipo medio, ciclo de 2,5 días
     const S0 = S, sk = { sid: 'ria', prog: 1, water: 100, health: 100, fert: true, pest: false, f: { t: 1, y: 1 } };
     const montajes = [['Armario 60 + CFL 125 W, 2 × 7 L', 'p60', 'cfl', 'plastico7'], ['Armario 60 + LED 200 W, 2 × 7 L', 'p60', 'led200', 'plastico7'],
@@ -58,7 +58,7 @@ const ROOT = path.join(__dirname, '..');
     });
     S = S0;
     const signs = SIGNS;
-    return { strains, recipes, maps, npcs, items, shop, signs, banco: BANCO, sobre: SOBRE, gen, focos, macetas, carpas, zonas: ZONAS, patrullas: PATRULLAS, paradas: PARADAS, busHoras: BUS_HORAS,
+    return { litrosM2: LITROS_M2, strains, recipes, maps, npcs, items, shop, signs, banco: BANCO, sobre: SOBRE, gen, focos, macetas, carpas, zonas: ZONAS, patrullas: PATRULLAS, paradas: PARADAS, busHoras: BUS_HORAS,
       montajes, c: { CAJA, CAJA_P, CAJA_REDADA, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, ENCARGO_DIAS, SOBORNO, CUOTA_DIAS, KWH, H_LUZ, H_24, W_M2, Y_MEDIA, FENO_ESTRELLA, FENO_FLOJO, ESQUEJE_DIAS, SEMILLA_HERMA, DEUDA, PLAZOS, INTERES, PREMIO_COPA, mayor: [precioMayor(12), precioMayor(30)], calle: [precioCalle(12), precioCalle(30)], ROSIN, rosin: [36, 54, 75].map(t => [t, precioRosin(t)]), prensa: SHOP.find(i => i.item === 'prensa').p, IMPERIO, SOBRES, GRANEL } };
   });
   await browser.close();
@@ -183,11 +183,13 @@ Un día de juego cuenta ${c.H_LUZ} h de foco (4 semanas a 18 h en crecimiento y 
   e += `
 ## Carpas y macetas
 
-| Carpa | Precio | Plazas | Foco máx. | Maceta máx. |
-|---|---|---|---|---|
+| Carpa | Precio | Plazas | Foco máx. | Maceta máx. | Tierra máx. (todas las macetas) |
+|---|---|---|---|---|---|
 `;
-  for (const C of D.carpas) { const it = D.shop.find(s => s.carpa === C.k); e += `| ${C.n}×${C.cm[1]} | ${it ? eu(it.p) + ' (cap. ' + it.ch + ')' : 'la de la tía'} | ${C.plazas} | ${C.wmax} W | ${C.lmax} L |\n`; }
+  for (const C of D.carpas) { const it = D.shop.find(s => s.carpa === C.k); e += `| ${C.n}×${C.cm[1]} | ${it ? eu(it.p) + ' (cap. ' + it.ch + ')' : 'la de la tía'} | ${C.plazas} | ${C.wmax} W | ${C.lmax} L | ${C.tierra} L |\n`; }
   e += `
+La tierra de todas las macetas de una carpa no pasa de ${D.litrosM2} L por m² de suelo (\`LITROS_M2\`: 4 macetas de 25 L en 1 m²); «Cambiar maceta» no ofrece las que la pasarían.
+
 | Maceta | Precio | Tope por planta | Extra |
 |---|---|---|---|
 `;

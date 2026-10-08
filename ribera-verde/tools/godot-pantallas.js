@@ -85,7 +85,7 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
     VC: { ci: 0, sel: 4 }, vfx: [['vfx-gotas', 120, 100, 200, 'home', false]] },
   // armario 80 con LED (sin campana: vista B) y el foco elegido; ancho de 360
   { k: 'carpa-b-p80', sw: 360, mode: 'carpa', now: T + 99, S: { ch: 4, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },
-    carpas: [{ t: 'p80', foco: 'led200' }], macetas: ['tela25', 'plastico7', 'plastico7'],
+    carpas: [{ t: 'p80', foco: 'led200' }], macetas: ['plastico18', 'plastico7', 'plastico7'],
     pots: { 0: pl('acapulco', .66), 1: null, 2: pl('rif', 1, { f: { id: 4, t: 1, y: 1, i: 20 } }) }, VC: { ci: 0, sel: -1 } },
   // la vista C dentro del lienzo de 320 con un efecto encima
   { k: 'carpa-c', sw: 320, mode: 'carpa', now: T + 2500, S: { ch: 4, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },

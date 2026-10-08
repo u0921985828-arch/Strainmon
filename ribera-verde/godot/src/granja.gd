@@ -218,7 +218,7 @@ func stage_name(p: Dictionary) -> String:
 func pot_action(i: int) -> void:
 	var p = S.pots[i]
 	if p == null:
-		if macetas_libres(i).size():
+		if macetas_libres(i, false).size():
 			var c: int = await ask("Plaza vacía con una maceta de %s." % D.MACETAS[S.macetas[i]].n, ["Plantar", "Cambiar maceta", "Salir"])
 			if c == 1:
 				await cambiar_maceta(i)
@@ -278,25 +278,41 @@ func pot_action(i: int) -> void:
 			S.pots[i] = null
 			await say("Arrancas la planta.")
 
-# macetas de repuesto que caben en la carpa de la plaza i (y no son la que ya tiene)
-func macetas_libres(i: int) -> Array:
+# tierra (1.10): como mucho LITROS_M2 litros por m² de suelo en cada carpa, sumando todas sus macetas
+func litros_max(ci: int) -> int:
+	var cm: Array = D.CARPAS[S.carpas[ci].t].cm
+	return Datos.jsround(cm[0] * cm[2] / 1e4 * D.LITROS_M2)
+
+func litros_carpa(ci: int) -> int:
+	var a := 0
+	var hu := huecos()
+	for i in hu.size():
+		if hu[i].c == ci:
+			a += int(D.MACETAS.get(S.macetas[i], D.MACETAS.plastico7).l)
+	return a
+
+# macetas de repuesto que caben en la plaza i (y no son la que ya tiene): hasta CARPAS[t].lmax y, con tierra, sin pasar de litros_max
+func macetas_libres(i: int, tierra := true) -> Array:
 	var h: Dictionary = huecos()[i]
 	var C: Dictionary = D.CARPAS[S.carpas[h.c].t]
+	var sobra: int = litros_max(h.c) - litros_carpa(h.c) + int(D.MACETAS[S.macetas[i]].l)
 	var o := []
 	for k in D.MACETAS:
-		if S.items.get("m_" + k, 0) > 0 and D.MACETAS[k].l <= C.lmax and k != S.macetas[i]:
+		if S.items.get("m_" + k, 0) > 0 and D.MACETAS[k].l <= C.lmax and k != S.macetas[i] and (not tierra or D.MACETAS[k].l <= sobra):
 			o.append(k)
 	return o
 
 func cambiar_maceta(i: int) -> void:
 	var l := macetas_libres(i)
+	var ci: int = huecos()[i].c
+	var tl := "tierra %d de %d L" % [litros_carpa(ci), litros_max(ci)]
 	if l.is_empty():
-		await say("No tienes otra maceta que quepa aquí.")
+		await say(("No cabe más tierra en la carpa (%s)." % tl) if macetas_libres(i, false).size() else "No tienes otra maceta que quepa aquí.")
 		return
 	var it := []
 	for k in l:
 		it.append({"label": "Maceta " + D.MACETAS[k].n, "right": "×" + n(S.items["m_" + k]), "ic": icono("maceta"), "desc": desc_maceta(k)})
-	var j: int = await menu(it, {"cls": "full", "title": "CAMBIAR MACETA", "title2": "Ahora: " + D.MACETAS[S.macetas[i]].n, "desc": true})
+	var j: int = await menu(it, {"cls": "full", "title": "CAMBIAR MACETA", "title2": "Ahora: " + D.MACETAS[S.macetas[i]].n + " · " + tl, "desc": true})
 	if j < 0:
 		return
 	var k: String = l[j]

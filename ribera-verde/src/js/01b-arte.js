@@ -217,7 +217,7 @@ function arteEdificios(m,cam){
   }
 }
 // carpas: en el piso, un mueble ('carpa-<t>-mapa', celda carpa_mapa, pies en el centro de su base); por dentro, la
-// vista B (09b-carpa.js), procedural hasta las láminas de P3-P4
+// vista B (09b-carpa.js), de frente con 'carpa-<t>-vista' (VB_PLATA)
 const fotoMisc=n=>ARTE.ok&&frameDe(ARTE.cubre['misc:'+n],n,'unica',0,{i:0});
 function arteCarpaMapa(t,xc,yb){const f=fotoMisc('carpa-'+t+'-mapa');if(!f)return false;pinta(f,xc,yb);return true;}
 // pinta c en (x, y) por franjas de 2 filas desplazadas con un seno: la base (fila b) quieta y la copa hasta ±a px

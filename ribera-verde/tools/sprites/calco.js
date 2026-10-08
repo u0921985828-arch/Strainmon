@@ -97,8 +97,8 @@ for (const a of M.assets) {
     if (c === 'misc:cuarto-cultivo' && has('misc/cuarto-cultivo.png')) wr(a.id, 'cuarto-cultivo', 'unica', 0, rd('misc/cuarto-cultivo.png'));
   }
   // ---------- vista C (P3): sale de la imagen A y no tiene referencia procedural; se calca la lámina ya procesada ----------
-  // (todos los fotogramas: la híbrida lleva uno por alto)
-  if (/^carpa-c-/.test(a.id)) for (const c of a.cubre || []) { const n = c.slice(5), d = path.join(ROOT, 'art', 'procesado', a.id, n, 'unica');
+  // (todos los fotogramas: la híbrida lleva uno por alto). Igual las carpas plateadas de 80 y 120 (carpas.py, sin referencia)
+  if (/^carpa-c-|^carpas-medias-vista$/.test(a.id)) for (const c of a.cubre || []) { const n = c.slice(5), d = path.join(ROOT, 'art', 'procesado', a.id, n, 'unica');
     if (fs.existsSync(d)) fs.readdirSync(d).filter(f => f.endsWith('.png')).sort().forEach((f, i) => wr(a.id, n, 'unica', i, PNG.sync.read(fs.readFileSync(path.join(d, f))))); }
   // ---------- tiles (16×16 exacto; los animados en bloques de 32×32) ----------
   if (a.tipo === 'tiles') {

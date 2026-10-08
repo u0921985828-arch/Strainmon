@@ -842,8 +842,8 @@ func plantas() -> void:
 		var C: Dictionary = D.CARPAS[c.t]
 		var F: Dictionary = D.FOCOS[c.foco]
 		var wm2 := Datos.jsround(F.w / (C.cm[0] * C.cm[2] / 1e4))
-		rows.append({"label": C.n, "right": F.n, "ic": icono("lampara"), "desc": "%s plantas · foco %s, %d W/m²%s\nLuz: %s al día con plantas · hasta %s W y macetas de %s L." % [n(C.plazas), F.n, wm2,
-			" (poca luz: crecen más despacio y con menos THC)" if wm2 < D.W_M2 else "", Datos.eur(luz_carpa(ci)), n(C.wmax), n(C.lmax)]})
+		rows.append({"label": C.n, "right": F.n, "ic": icono("lampara"), "desc": "%s plantas · foco %s, %d W/m²%s\nLuz: %s al día con plantas · hasta %s W, macetas de %s L y %d L de tierra (%d puestos)." % [n(C.plazas), F.n, wm2,
+			" (poca luz: crecen más despacio y con menos THC)" if wm2 < D.W_M2 else "", Datos.eur(luz_carpa(ci)), n(C.wmax), n(C.lmax), litros_max(ci), litros_carpa(ci)]})
 		for i in H.size():
 			var h: Dictionary = H[i]
 			if h.c != ci:

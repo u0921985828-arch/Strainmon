@@ -1,19 +1,26 @@
 /* =========================================================
    VISTA DE CARPA · B (plan de producción, D1 y P2)
-   En el piso (1 casilla = 1 m) cada carpa es un mueble de 1-2 casillas. A delante de ella la abre recortada en 3/4, como
-   en la 1.6-1.7 (sin techo, sin frente y sin lateral derecho), pero a escala real: escena compuesta a 240 px, 48 px/m de
-   ancho y de alto y 24 px/m de fondo; lo de atrás se corre 6 px/m a la derecha, así la pared izquierda se ve por dentro.
-   La carpa tiene la espalda contra la pared del cuarto (y VB_PARED): la de 150 × 100 × 200 cm mide 72 × 120 px y una
-   sativa lista, 43 px más su maceta.
+   En el piso (1 casilla = 1 m) cada carpa es un mueble de 1-2 casillas. A delante de ella la abre a escala real, en una escena
+   compuesta a 240 px a 60 px/m de ancho y de alto: con el atlas, de frente, la carpa plateada aprobada (VB_PLATA; la de
+   150 × 100 × 200 cm, 94 px de suelo delante y 133 de alto con el marco); sin él, recortada en 3/4 como en la 1.6-1.7 (sin
+   techo, sin frente y sin lateral derecho; 24 px/m de fondo, lo de atrás corrido 6 px/m a la derecha y la espalda contra la
+   pared del cuarto, y VB_PARED: la de 150 mide 90 × 120 px). Una sativa lista, 54 px más su maceta.
    Las plazas van en filas de CARPAS[t].cols macetas: la fila 0 delante y la 1 detrás (pintada antes). Cada maceta va en el centro
    de su parte de la carpa, lo más separada posible, y la copa de su planta se dibuja como mucho del ancho que cabe sin tocar a las
    vecinas ni las paredes (distancia segura, q.cw) y como mucho del alto que deja la distancia al foco (FOCO_SEP, q.ch).
    ◀ ▶ cambian de plaza y ▲ ▼ de fila; desde la fila de atrás, ▲ elige el foco. A cuida la planta (potAction) o abre el
    foco y los extras (carpaAction); B sale. El tiempo no corre mientras se mira.
-   Todo es procedural (y es la huella de las láminas de P3-P4, tools/sprites/huellas.js) hasta que lleguen esas láminas.
+   Con el atlas, la carpa es la plateada de frente (misc:carpa-<t>-vista, VB_PLATA) a 60 px/m; lo demás (y la carpa sin atlas, en 3/4)
+   es procedural (y es la huella de las láminas de P3-P4, tools/sprites/huellas.js).
    Con el arte de la imagen A en el atlas, la carpa se ve por dentro a pantalla completa (vista C, abajo).
    ========================================================= */
-const VB_M=.48,VB_F=.24,VB_X=.06,VB_PARED=126;   // px por cm de ancho y alto · de fondo · corrimiento a la derecha por cm de fondo · y de la pared
+const VB_M=.6,VB_F=.24,VB_X=.06,VB_PARED=126;   // px por cm de ancho y alto · de fondo · corrimiento a la derecha por cm de fondo · y de la pared
+// con el atlas, la carpa de frente (misc:carpa-<t>-vista, plateada, aprobada), pintada por su ancla en (120, 157): xf, columnas del
+// suelo de delante (fila −2) y xb, las de la pared del fondo (fila −19), desde el ancla; yt, la fila donde empieza la pared.
+// Va a unos VB_M px/cm de ancho y alto (el suelo de delante, de ×1 a ×1,04); el fondo se cierra en 17 filas de suelo y el techo de
+// dentro queda 8 filas sobre yt.
+const VB_PLATA={p60:{xf:[-18,17],xb:[-16,15],yt:-88},p80:{xf:[-24,24],xb:[-22,22],yt:-102},m100:{xf:[-31,30],xb:[-26,27],yt:-112},
+  m120:{xf:[-37,36],xb:[-32,33],yt:-112},g150:{xf:[-47,46],xb:[-41,39],yt:-112}};
 // porte para dibujar la planta (i: índica, s: sativa, h: híbrida), por su % índica (indDe, 03-datos): 70 o más, índica; menos de 30,
 // sativa. Cada planta, por el suyo (p.f.i, que varía alrededor del de su variedad hasta que la línea se estabiliza)
 const porteInd=i=>i>=70?'i':i<30?'s':'h',porteDe=sid=>porteInd(indDe(sid)),portePlanta=p=>porteInd(p.f&&p.f.i!=null?p.f.i:indDe(p.sid));
@@ -29,8 +36,10 @@ const macetaPx=k=>{const [d,h]=MACETA_CM[k]||MACETA_CM.plastico7;return {w:Math.
 let VC=null;                              // carpa abierta: {ci, sel: plaza (índice de huecos()) o −1 = el foco, ocupado}
 // geometría de la carpa ci en la escena de 240: P(x, y, z) pasa cm (x desde la izquierda, y de fondo desde el frente, z de alto) a px
 function vcGeo(ci){
-  const c=S.carpas[ci],C=CARPAS[c.t],[W,H,D]=C.cm,w=Math.round(W*VB_M),s=Math.round(D*VB_X),x0=120-((w+s)>>1),yf=VB_PARED+Math.round(D*VB_F);
-  const P=(x,y,z)=>[Math.round(x0+x*VB_M+y*VB_X),Math.round(yf-y*VB_F-z*VB_M)];
+  const c=S.carpas[ci],C=CARPAS[c.t],[W,H,D]=C.cm,f=VB_PLATA[c.t]&&fotoMisc('carpa-'+c.t+'-vista'),k=f&&VB_PLATA[c.t];
+  let w=Math.round(W*VB_M),s=Math.round(D*VB_X),x0=120-((w+s)>>1),yf=VB_PARED+Math.round(D*VB_F),P=(x,y,z)=>[Math.round(x0+x*VB_M+y*VB_X),Math.round(yf-y*VB_F-z*VB_M)];
+  if(f){x0=120+k.xf[0];w=k.xf[1]-k.xf[0]+1;s=0;yf=155;   // de frente: cada fondo y, entre las columnas del suelo de delante y las de la pared
+    P=(x,y,z)=>{const t=y/D,xl=x0+(k.xb[0]-k.xf[0])*t,xr=x0+w+(k.xb[1]-k.xf[1])*t;return [Math.round(xl+(xr-xl)*x/W),Math.round(yf-17*t-z*VB_M)];};}
   // cada maceta en el centro de su parte (cx, cy en cm; una fila incompleta se reparte todo el ancho). La copa (cw) cabe en el
   // círculo que no toca a ninguna vecina ni las paredes, menos la HOLGURA; la planta (ch), bajo el foco a su FOCO_SEP sobre la maceta
   const pl=[];huecos().forEach((q,i)=>{if(q.c!==ci)return;
@@ -40,6 +49,8 @@ function vcGeo(ci){
     a.cw=d-HOLGURA;a.ch=H-28-(FOCO_SEP[c.foco]||40)-(MACETA_CM[S.macetas[a.i]]||MACETA_CM.plastico7)[1];[a.x,a.y]=P(a.cx,a.cy,0);}
   // el foco, en el centro a medio fondo: fx su centro y fy su parte de abajo (a 28 cm del techo); barra: la barra de la que cuelga
   const g={c,C,W,H,D,w,s,x0,yf,P,pl,fx:P(W/2,D/2,0)[0],fy:P(0,D/2,H-28)[1],barra:P(0,D/2,H-4)[1]};
+  // de frente, lo que cuelga no sube del techo de dentro (8 filas sobre yt; la z no encoge con el fondo): cuerdas, campana y filtro
+  if(f){g.plata=f;g.techo=157+k.yt-8;g.barra=Math.max(g.barra,g.techo);g.fy=Math.max(g.fy,g.techo+foco34(c.foco).height-1);}
   g.vc=vistaC(g);if(g.vc){g.fx=120;g.fy=VCA.boca;g.fw=g.vc.foco.a;}
   return g;
 }
@@ -224,7 +235,7 @@ function carpa34(tk){
   const [px,py]=P(W-12,D,H-14);t.blob(px,py,3.5,3.5,'#26272c',VK.som);                          // boca del extractor
   return carpaCache[key]=c;
 }
-// el cuarto: pared del piso y suelo de tarima en 3/4, a 48 px/m (240 × 160: la pared llega a VB_PARED)
+// el cuarto: pared del piso y suelo de tarima en 3/4 (240 × 160: la pared llega a VB_PARED)
 let cuartoC=null;
 function cuarto34(){
   if(cuartoC)return cuartoC;const [c,x]=mkCanvas(240,160),t=painter(x,rngSeed(11)),col='#ead8b4',y0=VB_PARED;
@@ -305,12 +316,15 @@ function renderCarpa(now){
   if(g.vc)return renderCarpaC(g,now);
   fondoAncho(cuarto34());
   ctx.save();ctx.translate(OX(),0);
-  if(c.goteo){const e=extra34('goteo'),gx=g.x0+g.w+g.s+12,gy=VB_PARED+8;ctx.drawImage(e,gx-(e.width>>1),gy-e.height+1);   // el depósito, fuera de la carpa
-    const [tx,ty]=P(W-6,D*.7,4);ctx.fillStyle='#1c1d22';ctx.fillRect(tx,gy-e.height+1,gx-tx-1,1);ctx.fillRect(tx,gy-e.height+1,1,ty-(gy-e.height+1));}
-  const cv=carpa34(c.t);ctx.drawImage(cv,g.x0-1,g.yf+2-cv.height);
-  if(c.filtro){const e=extra34('filtro'),[fx,fy]=P(W*.55,D*.85,H-24);ctx.drawImage(e,fx-(e.width>>1),fy-e.height+1);}
+  // el depósito del goteo, fuera de la carpa: en 3/4, al pie de la pared y detrás; de frente, a su lado y con el tubo por la puerta
+  const goteo=()=>{const e=extra34('goteo'),gx=g.x0+g.w+g.s+12,gy=g.plata?g.yf:VB_PARED+8;ctx.drawImage(e,gx-(e.width>>1),gy-e.height+1);
+    const [tx,ty]=P(W-6,D*.7,4);ctx.fillStyle='#1c1d22';ctx.fillRect(tx,gy-e.height+1,gx-tx-1,1);ctx.fillRect(tx,gy-e.height+1,1,ty-(gy-e.height+1));};
+  if(c.goteo&&!g.plata)goteo();
+  if(g.plata)pinta(g.plata,120,157);else{const cv=carpa34(c.t);ctx.drawImage(cv,g.x0-1,g.yf+2-cv.height);}
+  if(c.goteo&&g.plata)goteo();
+  if(c.filtro){const e=extra34('filtro'),[fx,fy0]=P(W*.55,D*.85,H-24),fy=g.plata?Math.max(fy0,g.techo+e.height-1):fy0;ctx.drawImage(e,fx-(e.width>>1),fy-e.height+1);}
   if(c.vent){const e=extra34('vent'),[vx,vy]=P(2,D*.8,110);ctx.drawImage(e,vx,vy-e.height+1);}
-  ctx.save();ctx.beginPath();ctx.rect(g.x0+1,0,g.w+g.s-1,SH);ctx.clip();   // la luz y las copas no salen de la carpa por los lados
+  ctx.save();ctx.beginPath();if(g.plata)ctx.rect(g.x0,0,g.w,SH);else ctx.rect(g.x0+1,0,g.w+g.s-1,SH);ctx.clip();   // la luz y las copas no salen de la carpa por los lados
   if(on){ctx.globalCompositeOperation='lighter';const a=.05+.09*Math.min(1,F.w/600),lw=Math.round((FOCO_CM[c.foco]||40)*VB_M/2),hw=g.w/2+g.s;
     const gr=ctx.createLinearGradient(0,g.fy,0,g.yf);gr.addColorStop(0,FOCO_LUZ[F.tipo]+a+')');gr.addColorStop(1,FOCO_LUZ[F.tipo]+'0)');
     ctx.fillStyle=gr;ctx.beginPath();ctx.moveTo(g.fx-lw,g.fy);ctx.lineTo(g.fx+lw,g.fy);ctx.lineTo(g.fx+hw,g.yf);ctx.lineTo(g.fx-hw,g.yf);ctx.fill();

@@ -48,9 +48,9 @@ const OUT = path.join(ROOT, 'art', 'crudo', '_ref');
     };
     const MAG = '#ff00ff', out = {};
     out['huella-cuarto-cultivo-34'] = dieciseis(lamina(240, 160, 1, [cuarto34()]));
-    out['huella-carpas-vista-34'] = dieciseis(lamina(80, 128, 5, Object.keys(CARPAS).map(carpa34)));
+    out['huella-carpas-vista-34'] = dieciseis(lamina(104, 152, 5, Object.keys(CARPAS).map(carpa34)));
     out['huella-carpas-mapa-5'] = dieciseis(lamina(32, 48, 5, Object.keys(CARPAS).map(carpaMapa)));
-    out['huella-focos-34'] = dieciseis(lamina(48, 16, 4, Object.keys(FOCOS).map(foco34), true));
+    out['huella-focos-34'] = dieciseis(lamina(64, 16, 4, Object.keys(FOCOS).map(foco34), true));
     out['huella-macetas-34'] = dieciseis(lamina(24, 24, 4, Object.keys(MACETAS).map(maceta34)));
     out['huella-extras-34'] = dieciseis(lamina(32, 32, 3, ['vent', 'filtro', 'goteo'].map(extra34)));
     for (const [po, n] of [['i', 'indica'], ['s', 'sativa'], ['h', 'hibrida']])

@@ -3,7 +3,7 @@
 Inventario de todo lo que ocupa sitio en el juego (mapas, edificios, muebles, carpas, macetas, plantas, focos, extras y
 personajes), medido contra su tamaño real. En la 1.7.0 sirvió para decidir la escala; en la 1.8.0 se aplicó la
 **opción A** (sección 5). En P2 del [plan de producción](PLAN-PRODUCCION.md) la vista de carpa pasó a la **B**
-(sección 6): carpa abierta en 3/4 a 48 px/m.
+(sección 6): carpa abierta a 60 px/m, con el atlas la plateada de frente (en 3/4 sin él).
 
 - Imágenes: `docs/plano/town.png`, `home.png`, `shop.png`, `bar.png` y, desde la 1.10, `alto.png`, `astilleros.png`,
   `txaro.png`, `comisaria.png`, `almacen.png`, `mendialde.png`, `casa-ama.png`, `puerto.png`, `valdehierro.png` y
@@ -21,10 +21,10 @@ personajes), medido contra su tamaño real. En la 1.7.0 sirvió para decidir la 
 |---|---|
 | Casilla | 16 × 16 px |
 | Escala de los mapas | **1 casilla = 16 px = 1 m** (el jugador mide 27 px = 1,69 m frente a 1,75 m reales: ×0,96) |
-| Escala de la vista de carpa B | **48 px = 1 m de ancho y de alto, 24 px/m de fondo** (3/4, como el piso; lo de atrás se corre 6 px/m a la derecha). La carpa de 150 × 100 × 200 cm mide 72 × 120 px |
+| Escala de la vista de carpa B | **60 px = 1 m de ancho y de alto**. Con el atlas, la carpa plateada de frente (`carpa-<t>-vista`): 17 filas de suelo hasta la pared del fondo; sin él, en 3/4 con 24 px/m de fondo y lo de atrás corrido 6 px/m a la derecha. La carpa de 150 × 100 × 200 cm: suelo de delante de 94 px y 133 de alto con el marco |
 | Pantalla | 240–400 × 160 px = 15–25 × 10 m de mundo a la vista (el ancho depende del móvil) |
 | Personajes | celda 32 × 32, pies en (16, 30); adultos de 27–28 px |
-| Vista | mapas: cenital oblicua (3/4), el ancho se mide de frente; vista de carpa B: 3/4, recortada |
+| Vista | mapas: cenital oblicua (3/4), el ancho se mide de frente; vista de carpa B: de frente, abierta (3/4 recortada sin atlas) |
 | Tolerancia | ×0,75–×1,33 coherente · ×0,5–×2,5 estilizado · fuera de eso, incoherente |
 
 ## 2. Mapas
@@ -66,7 +66,7 @@ Patxi (21,21) e Iñaki (37,21).
 
 ## 3. Medidas (sprite en juego frente a tamaño real)
 
-En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho de la carpa abierta de un poste a otro.
+En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho del suelo de delante de la carpa abierta (en el piso, de un poste a otro). Los extras de la vista B (ventilador, filtro y goteo) son piezas procedurales de tamaño fijo, de cuando la vista iba a 48 px/m: hasta sus láminas se quedan en ×0,75–×0,80.
 
 | Grupo | Sprite | px | Eje | En juego | Real | Ratio |
 |---|---|---|---|---|---|---|
@@ -96,41 +96,41 @@ En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho de la carpa abi
 |  | Carpa 100×100 | 16×39 | ancho | 1 m | 1 m | ×1,00 |
 |  | Carpa 120×120 | 19×42 | ancho | 1,19 m | 1,2 m | ×0,99 |
 |  | Carpa 150×100 | 24×39 | ancho | 1,5 m | 1,5 m | ×1,00 |
-| Vista de carpa B (48 px/m) | Armario 60 | 33×93 | frente | 0,58 m | 0,6 m | ×0,97 |
-|  | Armario 80 | 44×108 | frente | 0,79 m | 0,8 m | ×0,99 |
-|  | Carpa 100 | 55×122 | frente | 1 m | 1 m | ×1,00 |
-|  | Carpa 120 | 66×127 | frente | 1,21 m | 1,2 m | ×1,01 |
-|  | Carpa 150 | 79×122 | frente | 1,5 m | 1,5 m | ×1,00 |
-|  | Maceta 7 L | 11×15 | ancho | 0,23 m | 0,22 m | ×1,04 |
-|  | Maceta 11 L | 12×17 | ancho | 0,25 m | 0,25 m | ×1,00 |
-|  | Maceta 18 L | 14×20 | ancho | 0,29 m | 0,3 m | ×0,97 |
-|  | Maceta 25 L | 17×20 | ancho | 0,35 m | 0,35 m | ×1,01 |
-|  | CFL 125 | 17×10 | ancho | 0,35 m | 0,35 m | ×1,01 |
-|  | Sodio 250 | 22×9 | ancho | 0,46 m | 0,45 m | ×1,02 |
-|  | Sodio 400 | 24×9 | ancho | 0,5 m | 0,5 m | ×1,00 |
-|  | Sodio 600 | 26×9 | ancho | 0,54 m | 0,55 m | ×0,98 |
-|  | LED 100 | 12×6 | ancho | 0,25 m | 0,25 m | ×1,00 |
-|  | LED 200 | 14×6 | ancho | 0,29 m | 0,3 m | ×0,97 |
-|  | LED 480 | 29×6 | ancho | 0,6 m | 0,6 m | ×1,01 |
-|  | LED 720 | 48×6 | ancho | 1 m | 1 m | ×1,00 |
-|  | Ventilador | 9×14 | ancho | 0,19 m | 0,2 m | ×0,94 |
-|  | Filtro y extractor | 31×10 | ancho | 0,65 m | 0,65 m | ×0,99 |
-|  | Depósito de goteo | 14×24 | alto | 0,5 m | 0,5 m | ×1,00 |
-|  | Germinando (índica) | 9×5 | alto | 0,1 m | 0,05 m | **×2,08** |
-|  | Plántula (índica) | 10×15 | alto | 0,31 m | 0,15 m | **×2,08** |
-|  | Vegetativo (índica) | 20×17 | alto | 0,35 m | 0,35 m | ×1,01 |
-|  | Floración (índica) | 28×25 | alto | 0,52 m | 0,55 m | ×0,95 |
-|  | Lista (índica) | 30×30 | alto | 0,63 m | 0,65 m | ×0,96 |
-|  | Germinando (sativa) | 9×5 | alto | 0,1 m | 0,05 m | **×2,08** |
-|  | Plántula (sativa) | 10×15 | alto | 0,31 m | 0,15 m | **×2,08** |
-|  | Vegetativo (sativa) | 18×22 | alto | 0,46 m | 0,45 m | ×1,02 |
-|  | Floración (sativa) | 24×35 | alto | 0,73 m | 0,75 m | ×0,97 |
-|  | Lista (sativa) | 28×42 | alto | 0,88 m | 0,9 m | ×0,97 |
-|  | Germinando (híbrida) | 9×5 | alto | 0,1 m | 0,05 m | **×2,08** |
-|  | Plántula (híbrida) | 10×15 | alto | 0,31 m | 0,15 m | **×2,08** |
-|  | Vegetativo (híbrida) | 18×19 | alto | 0,4 m | 0,4 m | ×0,99 |
-|  | Floración (híbrida) | 24×28 | alto | 0,58 m | 0,6 m | ×0,97 |
-|  | Lista (híbrida) | 28×33 | alto | 0,69 m | 0,7 m | ×0,98 |
+| Vista de carpa B (60 px/m) | Armario 60 | 42×105 | frente | 0,6 m | 0,6 m | ×1,00 |
+|  | Armario 80 | 55×119 | frente | 0,82 m | 0,8 m | ×1,02 |
+|  | Carpa 100 | 68×133 | frente | 1,03 m | 1 m | ×1,03 |
+|  | Carpa 120 | 80×133 | frente | 1,23 m | 1,2 m | ×1,03 |
+|  | Carpa 150 | 100×133 | frente | 1,57 m | 1,5 m | ×1,04 |
+|  | Maceta 7 L | 13×17 | ancho | 0,22 m | 0,22 m | ×0,98 |
+|  | Maceta 11 L | 15×19 | ancho | 0,25 m | 0,25 m | ×1,00 |
+|  | Maceta 18 L | 18×24 | ancho | 0,3 m | 0,3 m | ×1,00 |
+|  | Maceta 25 L | 21×24 | ancho | 0,35 m | 0,35 m | ×1,00 |
+|  | CFL 125 | 21×10 | ancho | 0,35 m | 0,35 m | ×1,00 |
+|  | Sodio 250 | 27×9 | ancho | 0,45 m | 0,45 m | ×1,00 |
+|  | Sodio 400 | 30×9 | ancho | 0,5 m | 0,5 m | ×1,00 |
+|  | Sodio 600 | 33×9 | ancho | 0,55 m | 0,55 m | ×1,00 |
+|  | LED 100 | 15×6 | ancho | 0,25 m | 0,25 m | ×1,00 |
+|  | LED 200 | 18×6 | ancho | 0,3 m | 0,3 m | ×1,00 |
+|  | LED 480 | 36×6 | ancho | 0,6 m | 0,6 m | ×1,00 |
+|  | LED 720 | 60×6 | ancho | 1 m | 1 m | ×1,00 |
+|  | Ventilador | 9×14 | ancho | 0,15 m | 0,2 m | ×0,75 |
+|  | Filtro y extractor | 31×10 | ancho | 0,52 m | 0,65 m | ×0,79 |
+|  | Depósito de goteo | 14×24 | alto | 0,4 m | 0,5 m | ×0,80 |
+|  | Germinando (índica) | 9×6 | alto | 0,1 m | 0,05 m | **×2,00** |
+|  | Plántula (índica) | 10×19 | alto | 0,32 m | 0,15 m | **×2,11** |
+|  | Vegetativo (índica) | 24×21 | alto | 0,35 m | 0,35 m | ×1,00 |
+|  | Floración (índica) | 34×32 | alto | 0,53 m | 0,55 m | ×0,97 |
+|  | Lista (índica) | 36×38 | alto | 0,63 m | 0,65 m | ×0,97 |
+|  | Germinando (sativa) | 9×6 | alto | 0,1 m | 0,05 m | **×2,00** |
+|  | Plántula (sativa) | 10×19 | alto | 0,32 m | 0,15 m | **×2,11** |
+|  | Vegetativo (sativa) | 22×27 | alto | 0,45 m | 0,45 m | ×1,00 |
+|  | Floración (sativa) | 30×44 | alto | 0,73 m | 0,75 m | ×0,98 |
+|  | Lista (sativa) | 34×53 | alto | 0,88 m | 0,9 m | ×0,98 |
+|  | Germinando (híbrida) | 9×6 | alto | 0,1 m | 0,05 m | **×2,00** |
+|  | Plántula (híbrida) | 10×19 | alto | 0,32 m | 0,15 m | **×2,11** |
+|  | Vegetativo (híbrida) | 22×24 | alto | 0,4 m | 0,4 m | ×1,00 |
+|  | Floración (híbrida) | 32×35 | alto | 0,58 m | 0,6 m | ×0,97 |
+|  | Lista (híbrida) | 36×41 | alto | 0,68 m | 0,7 m | ×0,98 |
 | Exterior | Árbol | 54×93 | alto | 5,81 m | 6 m | ×0,97 |
 |  | Farola | 6×56 | alto | 3,5 m | 4 m | ×0,88 |
 |  | Banco | 16×12 | ancho | 1 m | 1,8 m | **×0,56** |
@@ -174,12 +174,18 @@ generaciones · C: ajuste dentro del estilo, 60–80 generaciones) se eligió y 
 
 ## 6. Vista de carpa B (P2 del plan de producción)
 
-Decisión D1 del [plan de producción](PLAN-PRODUCCION.md#0-decisiones-aprobadas): la carpa se ve como en la 1.6–1.7
-(recortada: sin techo, sin frente y sin lateral derecho; se ven el fondo y la pared izquierda de mylar, el suelo, las
-macetas, las plantas y el foco colgando) pero a escala real.
+Decisión D1 del [plan de producción](PLAN-PRODUCCION.md#0-decisiones-aprobadas): la carpa se ve por dentro (el fondo de
+mylar, el suelo, las macetas, las plantas y el foco colgando) a escala real. Desde la 1.10, con el atlas, es la carpa
+plateada aprobada, de frente y con la puerta abierta; sin atlas, como en la 1.6–1.7 (recortada en 3/4: sin techo, sin
+frente y sin lateral derecho).
 
-- **Escala:** 48 px/m de ancho y de alto y 24 px/m de fondo, en una escena de 240 px centrada con `OX()`. La carpa
-  apoya la espalda en la pared del cuarto (y 126). Las medidas reales de cada carpa están en `CARPAS[t].cm`.
+- **Escala:** 60 px/m de ancho y de alto, en una escena de 240 px centrada con `OX()`, la de las carpas plateadas
+  (`carpa-<t>-vista`, aprobadas): con el atlas, la carpa se pinta de frente por su ancla en (120, 157) y cada cosa se
+  coloca sobre su suelo, que se cierra hacia el fondo en 17 filas (`VB_PLATA`: columnas del suelo de delante y de la
+  pared, medidas en cada sprite); el foco, a 28 cm del techo, cuelga justo bajo el techo de dentro del
+  dibujo (8 filas sobre la pared), y nada de lo que cuelga (cuerdas, campana, filtro) sube de ahí. Sin atlas, la carpa en 3/4
+  (24 px/m de fondo, lo de atrás corrido 6 px/m) con la espalda en la pared del cuarto (y 126). Las medidas reales de
+  cada carpa están en `CARPAS[t].cm`.
 - **Plazas:** filas de `CARPAS[t].cols` macetas, la 0 delante y la 1 detrás. ◀ ▶ cambian de plaza, ▲ ▼ de fila y,
   desde la de atrás, ▲ elige el foco. Con una plaza de atrás elegida, la fila de delante se ve en transparencia.
 - **Distancia segura (1.10):** cada maceta va en el centro de su parte de la carpa (una fila incompleta se reparte todo el
@@ -203,5 +209,5 @@ Las plantas más grandes, lista (despuntadas y en mainline, 1.10): índica 60 cm
 - **Piezas procedurales** (son también las huellas de las láminas de P3–P4, `npm run sprites:huellas`): `carpa34`,
   `cuarto34`, `maceta34` (`MACETA_CM`), `planta34` por porte (`porteInd`: el % índica de cada planta; `PLANTA_CM`), `foco34` (`FOCO_CM`) y
   `extra34`. Un foco centrado a 28 cm del techo; su luz, recortada a la carpa y detrás de las plantas.
-- **Estado:** el arte de plantas y carpas de la vista B **no está aprobado**: se pide en P3–P4 con una referencia nueva.
-  Mientras tanto, la vista B se dibuja con el arte procedural también con el atlas, así que no se publica versión.
+- **Estado:** las carpas de la vista B son las plateadas aprobadas (las de 80 y 120, alargadas de las de 60 y 100 con
+  `carpas.py`); macetas, plantas, focos y extras siguen procedurales hasta sus láminas, así que no se publica versión.
