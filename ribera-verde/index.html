@@ -2233,14 +2233,16 @@ function extra34(k){
     t.F(8,1,24,1,'#6a6e78');t.F(8,10,24,1,'#2a2b30');t.F(30,1,2,10,'#2a2b30');t.blob(4,6,3.5,3.5,'#3a3c44','#1c1d22','#6a6e78');t.F(6,4,2,4,'#a8aebb');}   // filtro, extractor y abrazadera
   return carpaCache[key]=c;
 }
-// el depósito del goteo de l litros, a su tamaño real: cilindro de pie, de alto 1,3 × el diámetro (en m; VB_M px/cm), con aros cada 20 cm; lienzo w × (h + e)
+// el depósito del goteo de l litros, a su tamaño real: cilindro de pie, de alto 1,3 × el diámetro (en m; VB_M px/cm), con aros cada 20 cm
+// que siguen la curva del frente (la del fondo); lienzo w × (h + e)
 const depositoPx=l=>{const d=Math.pow(4*l/1000/(1.3*Math.PI),1/3);return {w:Math.round(d*100*VB_M),h:Math.round(130*d*VB_M),e:Math.max(3,Math.round(22*d*VB_M))};};
 function deposito34(l){
   const key='dep|'+l;if(carpaCache[key])return carpaCache[key];
   const {w,h,e}=depositoPx(l),[c,x]=mkCanvas(w,h+e),t=painter(x,rngSeed(7)),r=w/2,ry=e/2;
   const dentro=(px,py,cy,ryy)=>{const dx=(px+.5-r)/r,dy=(py+.5-cy)/ryy;return dx*dx+dy*dy<=1;};
   for(let py=0;py<h+e;py++)for(let px=0;px<w;px++)if((py>=ry&&py<=ry+h)||dentro(px,py,ry+h,ry))   // cuerpo y fondo redondo: luz a la izquierda, sombra a la derecha
-    t.P(px,py,py>ry+4&&Math.round(py-ry)%12===0?'#26405a':px<w*.12?'#4a6a88':px<w*.22?'#3a5a7c':px>w*.85?'#24384e':'#2e4a66');
+  {const dx=(px+.5-r)/r,k=Math.round(py-ry)-Math.round(ry*Math.sqrt(Math.max(0,1-dx*dx)));
+    t.P(px,py,k>0&&k%12===0?'#26405a':px<w*.12?'#4a6a88':px<w*.22?'#3a5a7c':px>w*.85?'#24384e':'#2e4a66');}
   for(let py=0;py<e;py++)for(let px=0;px<w;px++)if(dentro(px,py,ry,ry))t.P(px,py,'#5a7a98');   // la tapa, con su boca
   t.F(Math.round(r)-2,Math.round(ry)-1,4,2,'#1c1d22');
   return carpaCache[key]=c;
@@ -2262,9 +2264,16 @@ function renderCarpa(now){
   fondoAncho(cuarto34());
   ctx.save();ctx.translate(OX(),0);
   // el depósito del goteo, fuera de la carpa: en 3/4, al pie de la pared y detrás; de frente, a su lado y con el tubo por la puerta
-  // (de su tamaño real: su capacidad, goteoL; el tubo sale a 40 cm del suelo)
-  const goteo=()=>{const e=deposito34(goteoL(VC.ci)),gl=g.x0+g.w+g.s+4,gy=g.plata?g.yf:VB_PARED+8,y0=gy-Math.round(40*VB_M);ctx.drawImage(e,gl,gy-e.height+1);
-    const [tx,ty]=P(W-6,D*.7,4);ctx.fillStyle='#1c1d22';ctx.fillRect(tx,y0,gl-tx,1);ctx.fillRect(tx,Math.min(y0,ty),1,Math.abs(ty-y0));};
+  // (de su tamaño real: su capacidad, goteoL), con el nivel del agua que le queda en un tubo transparente de delante; la manguera
+  // sale a 40 cm del suelo y entra por la pared derecha, donde baja al suelo (lineasGoteo: los ramales y los microtubos)
+  const LG=c.goteo?lineasGoteo(g):null,y0g=(g.plata?g.yf:VB_PARED+8)-Math.round(40*VB_M);
+  const goteo=()=>{const l=goteoL(VC.ci),e=deposito34(l),dp=depositoPx(l),gl=g.x0+g.w+g.s+4,ty=(g.plata?g.yf:VB_PARED+8)-e.height+1;ctx.drawImage(e,gl,ty);
+    const nx=gl+Math.round(e.width*.3),n0=ty+Math.round(dp.e/2)+3,L=dp.h-5,n=Math.round(L*(c.dep??l)/l);
+    ctx.fillStyle='#4e6e8c';ctx.fillRect(nx,n0,2,L);ctx.fillStyle='#8ec8f0';ctx.fillRect(nx,n0+L-n,2,n);
+    ctx.fillStyle='#1c1d22';ctx.fillRect(LG[0].xw,y0g,gl-LG[0].xw,1);};
+  // un tramo de manguera de 1 px, píxel a píxel; el ramal de una fila sale de la bajante (la primera, de la manguera que entra)
+  const raya=(x0,y0,x1,y1)=>{const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0));for(let i=0;i<=n;i++)ctx.fillRect(x0+(n&&Math.round((x1-x0)*i/n)),y0+(n&&Math.round((y1-y0)*i/n)),1,1);};
+  const ramal=f=>{const i=LG.indexOf(f),a=i?LG[i-1]:{xw:f.xw,y:y0g};ctx.fillStyle='#1c1d22';raya(a.xw,a.y,f.xw,f.y);ctx.fillRect(Math.min(f.x,f.xw),f.y,Math.abs(f.xw-f.x)+1,1);};
   if(c.goteo&&!g.plata)goteo();
   if(g.plata)pinta(g.plata,120,157);else{const cv=carpa34(c.t);ctx.drawImage(cv,g.x0-1,g.yf+2-cv.height);}
   if(c.goteo&&g.plata)goteo();
@@ -2277,7 +2286,8 @@ function renderCarpa(now){
     ctx.globalCompositeOperation='source-over';}
   // con una plaza de atrás elegida, la fila de delante se pinta en transparencia para que se vea la planta que tapa
   const fsel=(g.pl.find(q=>q.i===VC.sel)||{fila:0}).fila;
-  for(const q of [...g.pl].sort((a,b)=>a.y-b.y||a.x-b.x)){ctx.globalAlpha=q.fila<fsel?.35:1;vcPlanta(q,now);}
+  let fa=null;
+  for(const q of [...g.pl].sort((a,b)=>a.y-b.y||a.x-b.x)){ctx.globalAlpha=q.fila<fsel?.35:1;if(LG&&q.fila!==fa){fa=q.fila;ramal(LG.find(f=>f.fila===fa));}vcPlanta(q,now);}
   ctx.globalAlpha=1;
   ctx.restore();
   const fc=foco34(c.foco),x0=g.fx-(fc.width>>1),y0=g.fy-fc.height+1,ty=y0+(F.tipo==='led'?4:0);   // cuelga de dos cuerdas
@@ -2288,13 +2298,30 @@ function renderCarpa(now){
   if(ARTE.ok)pintarVfx(now,{x:0,y:0},'home');
   ctx.restore();
 }
+// el goteo por dentro (1.10): por cada fila, un ramal por el suelo detrás de sus macetas (a 3 cm de la más honda) que sale de la
+// bajante de la pared derecha (a 4 cm); cada maceta, su llave en el ramal y su microtubo, que sube por su derecha hasta el borde
+// (q.bx, q.yl: vcPlanta); la bajante, a la derecha del último microtubo (en las pequeñas, la maceta llega casi a la pared). Las
+// filas, de atrás adelante: {fila, d (cm de fondo), x y b (el primer y el último microtubo), xw (la bajante), y}
+function lineasGoteo(g){
+  const F={};
+  for(const q of g.pl){const k=S.macetas[q.i],f=F[q.fila]||(F[q.fila]={fila:q.fila,d:0,x:1e9,b:-1e9});
+    q.bx=q.x+(maceta34(k).width>>1)+1;f.d=Math.max(f.d,q.cy+(MACETA_CM[k]||MACETA_CM.plastico7)[0]/2+3);f.x=Math.min(f.x,q.bx);f.b=Math.max(f.b,q.bx);}
+  const L=Object.values(F).sort((a,b)=>b.fila-a.fila);
+  for(const f of L){f.d=Math.min(f.d,g.D-3);[f.xw,f.y]=g.P(g.W-4,f.d,0);f.xw=Math.max(f.xw,f.b+1);}
+  for(const q of g.pl)q.yl=F[q.fila].y;
+  return L;
+}
 // maceta y planta de una plaza (q.alto: lo que se ve por encima del suelo, para la flecha)
 function vcPlanta(q,now){
   const p=S.pots[q.i],k=S.macetas[q.i],m=maceta34(k),{e,hb}=macetaPx(k),ca=S.carpas[huecos()[q.i].c];
   // su garrafa (sin goteo), detrás a la derecha, con el agua que le queda; el tubo del gotero va del tapón a la tierra de la maceta
   const gar=ca.garrafas&&!ca.goteo,gr=gar&&garrafa34(garrafaL(q.i)),gx=q.x+(m.width>>1)-4,gy=q.y-1-(gr?gr.height:0),rim=q.y-Math.round(e/2+hb);
   if(gar){const n=Math.round((gr.height-5)*garrafa(q.i)/garrafaL(q.i));ctx.drawImage(gr,gx,gy);ctx.fillStyle='#9ab8cc';ctx.fillRect(gx+1,gy+gr.height-1-n,gr.width-2,n);}
+  // con goteo, su microtubo sube del ramal (detrás) por la derecha, con su llave, y entra por el borde hasta la tierra
+  const got=ca.goteo&&q.yl!=null;
+  if(got){ctx.fillStyle='#1c1d22';ctx.fillRect(q.bx,rim-1,1,q.yl-rim);ctx.fillStyle='#b8322a';ctx.fillRect(q.bx,q.yl-1,2,2);ctx.fillStyle='#e8644c';ctx.fillRect(q.bx,q.yl-1,1,1);}
   ctx.drawImage(m,q.x-(m.width>>1),rim);q.alto=hb+Math.round(e/2);
+  if(got){ctx.fillStyle='#1c1d22';ctx.fillRect(q.x+2,rim-1,q.bx-q.x-2,1);ctx.fillRect(q.x+2,rim,1,2);}
   if(gar){ctx.fillStyle='#1c1d22';ctx.fillRect(q.x+3,gy-1,gx+gr.width-q.x-5,1);if(rim+2>gy-1)ctx.fillRect(q.x+3,gy-1,1,rim+2-(gy-1));}
   if(!p)return;
   const s=getStrain(p.sid),st=p.dead?9:plantStage(p),pc=planta34(portePlanta(p),st,!p.dead&&p.water<=0,s?s.c:'#9bd35a',q.cw,q.ch),yb=q.y-hb+1;

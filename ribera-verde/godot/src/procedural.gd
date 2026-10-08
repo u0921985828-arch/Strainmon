@@ -440,6 +440,7 @@ static func extra34(k: String) -> Image:
 	return t.im
 
 # el depósito del goteo de l litros, a su tamaño real: cilindro de pie, de alto 1,3 × el diámetro (en m; VB.M px/cm), con aros cada 20 cm
+# que siguen la curva del frente (la del fondo)
 static func deposito_px(l: float) -> Dictionary:
 	var VB: Dictionary = Datos.carga().VB
 	var d := pow(4 * l / 1000 / (1.3 * PI), 1.0 / 3)
@@ -464,7 +465,9 @@ static func deposito34(l: float) -> Image:
 		for px in w:
 			if (py >= ry and py <= ry + h) or dentro.call(px, py, ry + h, ry):   # cuerpo y fondo redondo: luz a la izquierda, sombra a la derecha
 				var c := "#2e4a66"
-				if py > ry + 4 and Datos.jsround(py - ry) % 12 == 0:
+				var dx := (px + .5 - r) / r
+				var k := Datos.jsround(py - ry) - Datos.jsround(ry * sqrt(maxf(0, 1 - dx * dx)))
+				if k > 0 and k % 12 == 0:
 					c = "#26405a"
 				elif px < w * .12:
 					c = "#4a6a88"

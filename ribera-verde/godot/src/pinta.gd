@@ -64,6 +64,8 @@ func redibuja(t: float) -> void:
 	vc.visible = false
 	if modo == "carpa":
 		g = Vista.geo(J.S, J.VC.ci)
+		if not g.vc and g.c.get("goteo"):
+			g.lg = _lineas_goteo()
 		if g.vc:
 			modo = "carpaC"
 			vc.visible = true
@@ -805,17 +807,77 @@ func _carpa_fondo() -> void:
 		_img(e, p[0], p[1] - e.get_height() + 1)
 
 # el depósito del goteo, fuera de la carpa: en 3/4, al pie de la pared y detrás; de frente, a su lado y con el tubo por la puerta
-# (de su tamaño real: su capacidad, goteo_l; el tubo sale a 40 cm del suelo)
+# (de su tamaño real: su capacidad, goteo_l), con el nivel del agua que le queda en un tubo transparente de delante; la manguera
+# sale a 40 cm del suelo y entra por la pared derecha, donde baja al suelo (_lineas_goteo: los ramales y los microtubos)
 func _goteo() -> void:
-	var e := Procedural.deposito34(Cultivo.goteo_l(J.S, J.VC.ci))
+	var l: int = Cultivo.goteo_l(J.S, J.VC.ci)
+	var e := Procedural.deposito34(l)
+	var dp := Procedural.deposito_px(l)
 	var gl: int = g.x0 + g.w + g.s + 4
-	var gy: int = g.yf if g.has("plata") else int(J.D.VB.PARED) + 8
-	var y0: int = gy - Datos.jsround(40 * J.D.VB.M)
-	_img(e, gl, gy - e.get_height() + 1)
-	var tp: Array = Vista.punto(g, g.W - 6, g.D * .7, 4)
-	var osc := css("#1c1d22")
-	_rect(tp[0], y0, gl - tp[0], 1, osc)
-	_rect(tp[0], mini(y0, tp[1]), 1, absi(tp[1] - y0), osc)
+	var ty: int = _suelo_goteo() - e.get_height() + 1
+	_img(e, gl, ty)
+	var nx: int = gl + Datos.jsround(e.get_width() * .3)
+	var n0: int = ty + Datos.jsround(dp.e / 2.0) + 3
+	var ln: int = dp.h - 5
+	var dep: float = g.c.dep if g.c.get("dep") != null else float(l)
+	var n := Datos.jsround(ln * dep / l)
+	_rect(nx, n0, 2, ln, css("#4e6e8c"))
+	_rect(nx, n0 + ln - n, 2, n, css("#8ec8f0"))
+	var xe: int = g.lg[0].xw
+	_rect(xe, _y_goteo(), gl - xe, 1, css("#1c1d22"))
+
+# el suelo donde está el depósito y la altura de la manguera (40 cm)
+func _suelo_goteo() -> int:
+	return g.yf if g.has("plata") else int(J.D.VB.PARED) + 8
+
+func _y_goteo() -> int:
+	return _suelo_goteo() - Datos.jsround(40 * J.D.VB.M)
+
+# el goteo por dentro (1.10): por cada fila, un ramal por el suelo detrás de sus macetas (a 3 cm de la más honda) que sale de la
+# bajante de la pared derecha (a 4 cm); cada maceta, su llave en el ramal y su microtubo, que sube por su derecha hasta el borde
+# (q.bx, q.yl: _planta_b); la bajante, a la derecha del último microtubo (en las pequeñas, la maceta llega casi a la pared). Las
+# filas, de atrás adelante: {fila, d (cm de fondo), x y b (el primer y el último microtubo), xw (la bajante), y}
+func _lineas_goteo() -> Array:
+	var S: Dictionary = J.S
+	var D: Dictionary = J.D
+	var F := {}
+	for q in g.pl:
+		var k: String = S.macetas[q.i]
+		if not F.has(q.fila):
+			F[q.fila] = {"fila": q.fila, "d": 0.0, "x": 1000000000, "b": -1000000000}
+		var f: Dictionary = F[q.fila]
+		q.bx = q.x + (Procedural.maceta34(k).get_width() >> 1) + 1
+		f.d = maxf(f.d, q.cy + D.MACETA_CM.get(k, D.MACETA_CM.plastico7)[0] / 2.0 + 3)
+		f.x = mini(f.x, q.bx)
+		f.b = maxi(f.b, q.bx)
+	var fl: Array = F.values()
+	fl.sort_custom(func(a, b): return a.fila > b.fila)
+	for f in fl:
+		f.d = minf(f.d, g.D - 3)
+		var p: Array = Vista.punto(g, g.W - 4, f.d, 0)
+		f.xw = maxi(p[0], f.b + 1)
+		f.y = p[1]
+	for q in g.pl:
+		q.yl = F[q.fila].y
+	return fl
+
+# un tramo de manguera de 1 px, píxel a píxel (como raya en renderCarpa)
+func _manguera(x0: int, y0: int, x1: int, y1: int, col: Color, clip: Rect2i) -> void:
+	var n := maxi(absi(x1 - x0), absi(y1 - y0))
+	for i in n + 1:
+		_rect_clip(x0 + (Datos.jsround(float(x1 - x0) * i / n) if n else 0), y0 + (Datos.jsround(float(y1 - y0) * i / n) if n else 0), 1, 1, col, clip)
+
+# el ramal de una fila, que sale de la bajante (el primero, de la manguera que entra)
+func _ramal(lg: Array, fila, al: float, clip: Rect2i) -> void:
+	var i := 0
+	while lg[i].fila != fila:
+		i += 1
+	var f: Dictionary = lg[i]
+	var ax: int = lg[i - 1].xw if i else f.xw
+	var ay: int = lg[i - 1].y if i else _y_goteo()
+	var tu := Color(css("#1c1d22"), al)
+	_manguera(ax, ay, f.xw, f.y, tu, clip)
+	_rect_clip(mini(f.x, f.xw), f.y, absi(f.xw - f.x) + 1, 1, tu, clip)
 
 # el cono de luz del foco encendido (dentro de la carpa): trapecio con degradado vertical, sumado ('lighter')
 func _cono() -> void:
@@ -860,8 +922,14 @@ func _carpa_encima() -> void:
 	var fsel := Vista.fila_sel(g, J.VC.sel)
 	var pl: Array = g.pl.duplicate()
 	pl.sort_custom(func(a, b): return a.y < b.y or (a.y == b.y and (a.x < b.x or (a.x == b.x and a.i < b.i))))
+	var lg: Array = g.get("lg", [])
+	var fa = null
 	for q in pl:
-		_planta_b(q, Vista.A35 if q.fila < fsel else 1.0, clip)
+		var al := Vista.A35 if q.fila < fsel else 1.0
+		if lg.size() and q.fila != fa:
+			fa = q.fila
+			_ramal(lg, fa, al, clip)
+		_planta_b(q, al, clip)
 	var fc := Procedural.foco34(c.foco)
 	var x0: int = g.fx - (fc.get_width() >> 1)
 	var y0: int = g.fy - fc.get_height() + 1
@@ -911,7 +979,17 @@ func _planta_b(q: Dictionary, al: float, clip: Rect2i) -> void:
 		var nn := Datos.jsround((gr.get_height() - 5) * Cultivo.garrafa(S, q.i) / Cultivo.garrafa_l(S, q.i))
 		_img_clip(gr, gx, gy, Rect2i(Vector2i.ZERO, gr.get_size()), clip, mod)
 		_rect_clip(gx + 1, gy + gr.get_height() - 1 - nn, gr.get_width() - 2, nn, Color(css("#9ab8cc"), al), clip)
+	# con goteo, su microtubo sube del ramal (detrás) por la derecha, con su llave, y entra por el borde hasta la tierra
+	var got: bool = ca.get("goteo", false) and q.has("yl")
+	var mt := Color(css("#1c1d22"), al)
+	if got:
+		_rect_clip(q.bx, rim - 1, 1, q.yl - rim, mt, clip)
+		_rect_clip(q.bx, q.yl - 1, 2, 2, Color(css("#b8322a"), al), clip)
+		_rect_clip(q.bx, q.yl - 1, 1, 1, Color(css("#e8644c"), al), clip)
 	_img_clip(m, q.x - (m.get_width() >> 1), rim, Rect2i(Vector2i.ZERO, m.get_size()), clip, mod)
+	if got:
+		_rect_clip(q.x + 2, rim - 1, q.bx - q.x - 2, 1, mt, clip)
+		_rect_clip(q.x + 2, rim, 1, 2, mt, clip)
 	if gar:
 		var tu := Color(css("#1c1d22"), al)
 		_rect_clip(q.x + 3, gy - 1, gx + gr.get_width() - q.x - 5, 1, tu, clip)

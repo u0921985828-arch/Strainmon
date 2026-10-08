@@ -76,10 +76,10 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
     P: { x: 19, y: 21, dir: 'left', moving: true, fx: 20, fy: 21, t: 60, dur: 240, parity: 1, px: (20 - 60 / 240) * 16, py: 21 * 16 },
     ents: { pat0: { x: 22, y: 21, fx: 23, fy: 21, px: (23 - 105 / 210) * 16, py: 21 * 16, dir: 'left', moving: true, t: 105, caza: true, dur: 210 } },
     SOSP: { v: 100, alarma: 'pat0' } },
-  // la vista B: carpa de 150 con extras (goteo, filtro y ventilador), macetas de todo tipo, fases, plaga, seca y muerta; elegida
-  // una plaza de atrás (la fila de delante en transparencia)
+  // la vista B: carpa de 150 con extras (goteo con el depósito a 400 de 975 L, sus ramales, llaves y microtubos; filtro y
+  // ventilador), macetas de todo tipo, fases, plaga, seca y muerta; elegida una plaza de atrás (la fila de delante en transparencia)
   { k: 'carpa-b-g150', sw: 240, mode: 'carpa', now: T + 1234, S: { ch: 5, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },
-    carpas: [{ t: 'g150', foco: 'sodio600', goteo: true, filtro: true, vent: true }],
+    carpas: [{ t: 'g150', foco: 'sodio600', goteo: true, dep: 400, filtro: true, vent: true }],
     macetas: ['plastico7', 'tela11', 'plastico18', 'tela25', 'plastico7', 'tela25'],
     pots: { 0: pl('malawi', 1), 1: pl('thai', .7, { pest: true, health: 50 }), 2: pl('kif', .05), 3: pl('ria', .5, { water: 0 }), 4: pl('nepal', .9, { dead: true }), 5: pl('lamb', .3) },
     VC: { ci: 0, sel: 4 }, vfx: [['vfx-gotas', 120, 100, 200, 'home', false]] },
