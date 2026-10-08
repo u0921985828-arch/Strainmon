@@ -41,10 +41,10 @@ Todo está **hecho**. Lo que añadió P1 va marcado con **(P1)**.
 
 | Cap. | Título | Objetivo | Qué pasa | Growshop | Banco de semillas (PC) | Plazas |
 |---|---|---|---|---|---|---|
-| 1 | La herencia | Leer la carta, ir a ver a Kiko y sacar la primera cosecha | Heredas el piso de la tía Maite con su armario de 60 | Skunk #1 5 €/semilla, abono 1 L 14 €, insecticida 12 €, bocata 5 €, maceta de tela 11 L 3 € · (P1) ventilador 20 €, LED 100 W 110 € | — | 2 |
+| 1 | La herencia | Leer la carta, ir a ver a Kiko y sacar la primera cosecha | Heredas el piso de la tía Maite con su armario de 60 | Skunk #1 5 €/semilla, abono 1 L 14 €, insecticida 12 €, bocata 5 €, maceta de tela 11 L 3 € · (P1) ventilador 20 €, LED 100 W 110 € · (1.10) garrafas de riego 15 € | — | 2 |
 | 2 | La calle | Ganar 300 € vendiendo en la calle | Clientes con `$`, primeros ladrones | Lemon Haze 9 €, OG Kush 10 €, spray de pimienta 15 €, maceta de plástico 18 L 2 €, sodio 250 W 85 €, LED 200 W 220 €, carpa 100 × 100 120 € (sitio B) · (P1) extractor con filtro 110 € | Michoacán, Punto Rojo, Thai, Kif y Beldia | 6 |
-| 3 | La deuda | Pagar 3.000 € a Don Baltasar en 7 días | Toño te lleva al bar El Ancla: la tía debía 30.000 €. (1.10) Iñaki compra al por mayor | Blueberry 8 €, Mango 7 €, maceta de tela 25 L 4 €, sodio 400 W 100 €, LED 480 W 500 €, bolsas de 50 semillas · (P1) armario 80 90 € (sitio A), riego por goteo 55 € | + Chitral Kush, Nepalese, Congolese, Lamb's Bread y Oaxaca | 6 · (P1) 7 con el armario 80 |
-| 4 | Genética | Recoger la mesa de genética y descubrir 8 variedades | Kiko te enseña a cruzar; las líneas nuevas se estabilizan de F1 a F4 | Purple Afghani 8 €, sodio 600 W 120 €, carpa 150 × 100 140 € (sitio B) | + Luang Prabang y Panama Red | 8 · (P1) 9 con el armario 80 |
+| 3 | La deuda | Pagar 3.000 € a Don Baltasar en 7 días | Toño te lleva al bar El Ancla: la tía debía 30.000 €. (1.10) Iñaki compra al por mayor | Blueberry 8 €, Mango 7 €, maceta de tela 25 L 4 €, sodio 400 W 100 €, LED 480 W 500 €, bolsas de 50 semillas · (P1) armario 80 90 € (sitio A) | + Chitral Kush, Nepalese, Congolese, Lamb's Bread y Oaxaca | 6 · (P1) 7 con el armario 80 |
+| 4 | Genética | Recoger la mesa de genética y descubrir 8 variedades | Kiko te enseña a cruzar; las líneas nuevas se estabilizan de F1 a F4 | Purple Afghani 8 €, sodio 600 W 120 €, carpa 150 × 100 140 € (sitio B) · (1.10) riego por goteo 1.200 € | + Luang Prabang y Panama Red | 8 · (P1) 9 con el armario 80 |
 | 5 | El sargento | Pagar 12.000 € en 10 días | El sargento Molina ofrece su «protección» por 1.500 € | LED 720 W 950 € · (P1) carpa 120 150 € (sitio C) | — | 8 · (P1) 15 con la carpa 120 |
 | 6 | La Copa de Ribera | Llevar al jurado 20 g con más de 26,8 % de THC | Darko compite con su Amnesia Haze (26,8 %) | — | — | igual |
 | 7 | Libertad | Pagar los últimos 15.000 € en 7 días (la Copa da 5.000 €) | Saldas la deuda de la tía; Baltasar te ofrece trabajo | — | — | igual |
@@ -133,7 +133,8 @@ Van uno por carpa (`EXTRAS` y `S.carpas[ci][id]`). Se compran en el growshop («
 |---|---|---|---|---|
 | `vent` | Ventilador de pinza | Ø 15–20 cm | plagas ×0,7 en esa carpa; gasta 25 W día y noche | 20 € · cap. 1 |
 | `filtro` | Extractor con filtro de carbón | filtro Ø 20 × 50 cm y extractor Ø 15 cm | Sin filtro, cada carpa con alguna planta en floración suma +2 de calor policial al día por el olor. Con filtro, 0. Se suma después de la bajada diaria del calor (lo prueba el test). Gasta 75 W día y noche | 110 € · cap. 2 |
-| `goteo` | Riego por goteo | depósito de 100 L con goteros | riega solo la que baja del 50 % mientras quede agua; se rellena desde la carpa | 55 € · cap. 3 |
+| `garrafas` | Garrafas de riego | una garrafa con gotero por maceta, de 0,65 L por litro de tierra | media cosecha: riegan solas la que baja del 50 %; se rellenan desde la carpa | 15 € · cap. 1 |
+| `goteo` | Riego por goteo | depósito con bomba y goteros, de 6,5 L por litro de tierra que admite la carpa | unas cinco cosechas con la carpa llena; se rellena desde la carpa; las garrafas vuelven a la mochila | 1.200 € · cap. 4 |
 
 **Ideas:** temporizador y fotoperiodo (18/6 en crecimiento y 12/12 en floración), termohigrómetro (temperatura y humedad en la ficha), malla SCROG (+cosecha, +días) y deshumidificador (moho).
 

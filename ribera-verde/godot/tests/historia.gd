@@ -443,7 +443,7 @@ func _pasos() -> void:
 		func(): return chk(J.S.carpas[0].t == "p80" and J.S.carpas[0].foco == "led200" and J.S.money == 1000 - 90 and J.S.pots.size() == 7 and R.filas == "0,0,1" and R.atras
 			and jj(J.S.pots[0]) == R.antes[0] and jj(J.S.pots[1]) == R.antes[1] and R.antes[3] != "null" and R.movida == R.antes[3] and J.S.pots[3] == null and J.S.macetas[2] == "plastico7"
 			and J.S.macetas[3] == R.mac[2] and J.MAPS.home.carpas.size() == 2, {"carpas": J.S.carpas, "money": J.S.money, "R": R, "macetas": J.S.macetas}))
-	step("Extras: ventilador, filtro y goteo en la carpa de 100 (el goteo riega del depósito); sin filtro, el olor de la floración sube el calor", ["Ventilador", "^Carpa 100", "Extractor", "^Carpa 100", "Riego por goteo", "^Carpa 100", "Salir", "Poner filtro"], func():
+	step("Extras: ventilador, filtro y garrafas en la carpa de 100 (las garrafas riegan); sin filtro, el olor de la floración sube el calor", ["Ventilador", "^Carpa 100", "Extractor", "^Carpa 100", "Garrafas", "^Carpa 100", "Salir", "Poner filtro"], func():
 		J.S.money = 1000
 		await run(J.shop)
 		var flor := func(): return {"sid": "ria", "prog": .8, "water": 100, "health": 100, "fert": false, "pest": false}
@@ -462,8 +462,8 @@ func _pasos() -> void:
 		R.h2 = J.S.heat
 		J.S.pots[0] = null
 		J.S.pots[4] = null,
-		func(): return chk(si(J.S.carpas[1].get("vent")) and si(J.S.carpas[1].get("filtro")) and si(J.S.carpas[1].get("goteo")) and R.money == 1000 - 20 - 110 - 55
-			and absf(R.f.plaga - R.m.plaga * .7) < 1e-9 and absf(R.f.agua - R.F.agua * R.m.agua) < 1e-9 and J.S.carpas[1].get("dep", D.GOTEO_L) < D.GOTEO_L and R.h1 == 30 - 12 + 2 and R.h2 == R.h1 - 12
+		func(): return chk(si(J.S.carpas[1].get("vent")) and si(J.S.carpas[1].get("filtro")) and si(J.S.carpas[1].get("garrafas")) and R.money == 1000 - 20 - 110 - 15
+			and absf(R.f.plaga - R.m.plaga * .7) < 1e-9 and absf(R.f.agua - R.F.agua * R.m.agua) < 1e-9 and Cultivo.garrafas_carpa(J.S, 1)[0] < Cultivo.garrafas_carpa(J.S, 1)[1] and R.h1 == 30 - 12 + 2 and R.h2 == R.h1 - 12
 			and si(J.S.carpas[0].get("filtro")) and not J.S.items.get("x_filtro"), {"carpas": J.S.carpas, "R": R, "items": J.S.items}))
 	step("Cruce de receta: Afghani × Skunk #1 → Critical Mass (de receta, sacada en la mesa: falta cosecharla)", ["^Afghani", "^Skunk #1", "Cruzar"], func():
 		J.add_seeds("ria", 2)
@@ -1407,8 +1407,74 @@ func _pasos() -> void:
 		R.d4 = J.S.carpas[0].dep
 		await run(func(): await J.carpa_action(0))
 		R.d5 = J.S.carpas[0].dep
+		R.gl = Cultivo.goteo_l(J.S, 0)
 		J.S = S0,
-		func(): return chk(R.w1 == 100 and R.d1 == R.e1 and absf(R.w2 - R.e2) < 1e-9 and R.d2 == 0 and R.w3 == 45 and R.w4 == 100 and R.d4 < 50 and R.d5 == D.GOTEO_L, R))
+		func(): return chk(R.w1 == 100 and R.d1 == R.e1 and absf(R.w2 - R.e2) < 1e-9 and R.d2 == 0 and R.w3 == 45 and R.w4 == 100 and R.d4 < 50 and R.d5 == R.gl and R.gl == 650, R))
+	# con el azar fijo (sin plagas): una cosecha de Hindu Kush en la carpa de 100 con LED 480 W y 4 macetas de 25 L
+	step("Riego en dos niveles (1.10): las garrafas (15 €) se vacían hacia media cosecha y se rellenan; el goteo (1.200 €, capítulo 4) devuelve las garrafas a la mochila y dura unas cinco cosechas con la carpa llena", ["Rellenar garrafas", "Poner goteo"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		Cultivo.fijo = .99
+		J.S.merge({"day": 1, "min": 600, "sala": {}, "carpas": [{"t": "m100", "foco": "led480", "garrafas": true, "gar": []}], "macetas": ["tela25", "tela25", "tela25", "tela25"]}, true)
+		var nueva := func():
+			J.S.pots = []
+			for m in J.S.macetas:
+				J.S.pots.append({"sid": "hindu", "prog": 0, "water": 100, "health": 100, "fert": false, "pest": false})
+		var crece := func():
+			for p in J.S.pots:
+				if not p.get("dead") and p.prog < 1:
+					return true
+			return false
+		# la primera garrafa que se vacía marca hv; desde ahí se rellenan cada hora para medir la cosecha entera (h)
+		nueva.call()
+		var ga: Array = Cultivo.garrafas_carpa(J.S, 0)
+		R = {"cap": "%s,%s" % [Datos.js_num(ga[0]), Datos.js_num(ga[1])], "g1": 1e9}
+		var h := 0
+		var hv := 0
+		var gv = null
+		while crece.call() and h < 2000:
+			J.plants_advance(60)
+			h += 1
+			if hv == 0:
+				for i in J.S.pots.size():
+					if Cultivo.garrafa(J.S, i) <= 0:
+						hv = h
+						R.g1 = Cultivo.garrafas_carpa(J.S, 0)[0]
+						gv = J.S.carpas[0].gar.duplicate()
+						break
+			if hv:
+				J.S.carpas[0].gar = []
+		R.gar = float(hv) / h
+		R.muertas = 0
+		for p in J.S.pots:
+			if p.get("dead"):
+				R.muertas += 1
+		J.S.carpas[0].gar = gv if gv != null else []
+		await run(func(): await J.carpa_action(0))
+		ga = Cultivo.garrafas_carpa(J.S, 0)
+		R.g2 = "%s,%s" % [Datos.js_num(ga[0]), Datos.js_num(ga[1])]
+		J.S.items.x_goteo = 1
+		J.S.items.x_garrafas = 0
+		await run(func(): await J.carpa_action(0))
+		R.vu = "%s,%s,%s,%s" % [Datos.js_num(J.S.items.x_garrafas), "true" if J.S.carpas[0].get("garrafas") else "false", "true" if J.S.carpas[0].has("gar") else "false", Datos.js_num(J.S.carpas[0].dep)]
+		R.cos = 0
+		while R.cos < 20:
+			nueva.call()
+			var k := 0
+			while crece.call() and k < 2000:
+				J.plants_advance(60)
+				k += 1
+			if J.S.carpas[0].dep <= 0:
+				break
+			R.cos += 1
+		var gt := 0
+		for it in D.SHOP:
+			if it.get("extra") == "goteo":
+				gt = it.ch
+		R.precios = "%d,%d,%d" % [pr("Garrafas"), pr("Riego por goteo"), gt]
+		Cultivo.fijo = -1
+		J.S = S0,
+		func(): return chk(R.cap == "64,64" and R.gar >= .4 and R.gar <= .6 and R.g1 < 64 and R.muertas == 0 and R.g2 == "64,64" and R.vu == "1,false,false,650" and R.cos >= 4 and R.cos <= 6 and R.precios == "15,1200,4", R))
 	step("Clima de la sala (1.10): enero, de día con sodio 400 W (+4 °C) y de noche (frío: crecen −18 %); con LED casi no calienta; termohigrómetro, calefactor y deshumidificador del growshop, su factura de noche; moho en floración y su aviso al despertar (julio, de noche)", ["Termohigrómetro", "Calefactor", "Deshumidificador", "Salir"], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))

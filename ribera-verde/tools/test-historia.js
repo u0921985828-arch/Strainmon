@@ -166,12 +166,12 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   }, () => S.carpas[0].t === 'p80' && S.carpas[0].foco === 'led200' && S.money === 1000 - 90 && S.pots.length === 7 && R.filas === '0,0,1' && R.atras
     && [0, 1].every(i => JSON.stringify(S.pots[i]) === R.antes[i]) && R.antes[3] !== 'null' && R.movida === R.antes[3] && S.pots[3] === null && S.macetas[2] === 'plastico7' && S.macetas[3] === R.mac[2] && MAPS.home.carpas.length === 2
     || { carpas: S.carpas, money: S.money, R, pots: S.pots.map(p => JSON.stringify(p)), macetas: S.macetas });
-  await step('Extras: ventilador, filtro y goteo en la carpa de 100 (el goteo riega del depósito); sin filtro, el olor de la floración sube el calor', ['Ventilador', '^Carpa 100', 'Extractor', '^Carpa 100', 'Riego por goteo', '^Carpa 100', 'Salir', 'Poner filtro'], async () => {
+  await step('Extras: ventilador, filtro y garrafas en la carpa de 100 (las garrafas riegan); sin filtro, el olor de la floración sube el calor', ['Ventilador', '^Carpa 100', 'Extractor', '^Carpa 100', 'Garrafas', '^Carpa 100', 'Salir', 'Poner filtro'], async () => {
     S.money = 1000; await run(shop); const flor = () => ({ sid: 'ria', prog: .8, water: 100, health: 100, fert: false, pest: false });
     window.R = { money: S.money, f: factores(4), m: MACETAS[S.macetas[4]], F: FOCOS[S.carpas[1].foco] };
     S.protect = false; S.pots[0] = flor(); S.pots[4] = flor(); S.heat = 30; advanceTime(24 * 60); await idle(); R.h1 = S.heat;
     S.items.x_filtro = 1; await run(() => carpaAction(0)); advanceTime(24 * 60); await idle(); R.h2 = S.heat; S.pots[0] = S.pots[4] = null;
-  }, () => S.carpas[1].vent && S.carpas[1].filtro && S.carpas[1].goteo && R.money === 1000 - 20 - 110 - 55 && Math.abs(R.f.plaga - R.m.plaga * .7) < 1e-9 && Math.abs(R.f.agua - R.F.agua * R.m.agua) < 1e-9 && S.carpas[1].dep < GOTEO_L
+  }, () => S.carpas[1].vent && S.carpas[1].filtro && S.carpas[1].garrafas && R.money === 1000 - 20 - 110 - 15 && Math.abs(R.f.plaga - R.m.plaga * .7) < 1e-9 && Math.abs(R.f.agua - R.F.agua * R.m.agua) < 1e-9 && garrafasCarpa(1)[0] < garrafasCarpa(1)[1]
     && R.h1 === 30 - 12 + 2 && R.h2 === R.h1 - 12 && S.carpas[0].filtro && !S.items.x_filtro || { carpas: S.carpas, R, items: S.items });
   await step('Cruce de receta: Afghani × Skunk #1 → Critical Mass (de receta, sacada en la mesa: falta cosecharla)', ['^Afghani', '^Skunk #1', 'Cruzar'], async () => {
     addSeeds('ria', 2); addSeeds('txoko', 2); await run(labAction);
@@ -448,8 +448,22 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.pots[i] = p; regarGoteo(p, i); window.R = { w1: p.water, d1: S.carpas[0].dep, e1: Math.round((10 - l * .6) * 100) / 100 };
     S.carpas[0].dep = 1; p.water = 40; regarGoteo(p, i); R.w2 = p.water; R.e2 = 40 + 1 / (l * .6) * 60; R.d2 = S.carpas[0].dep;
     p.water = 45; regarGoteo(p, i); R.w3 = p.water; p.water = 50.1; S.carpas[0].dep = 50; plantsAdvance(10); R.w4 = p.water; R.d4 = S.carpas[0].dep;
-    await run(() => carpaAction(0)); R.d5 = S.carpas[0].dep; S = S0;
-  }, () => R.w1 === 100 && R.d1 === R.e1 && Math.abs(R.w2 - R.e2) < 1e-9 && R.d2 === 0 && R.w3 === 45 && R.w4 === 100 && R.d4 < 50 && R.d5 === GOTEO_L || R);
+    await run(() => carpaAction(0)); R.d5 = S.carpas[0].dep; R.gl = goteoL(0); S = S0;
+  }, () => R.w1 === 100 && R.d1 === R.e1 && Math.abs(R.w2 - R.e2) < 1e-9 && R.d2 === 0 && R.w3 === 45 && R.w4 === 100 && R.d4 < 50 && R.d5 === R.gl && R.gl === 650 || R);
+  // con Math.random fijo (sin plagas): una cosecha de Hindu Kush en la carpa de 100 con LED 480 W y 4 macetas de 25 L
+  await step('Riego en dos niveles (1.10): las garrafas (15 €) se vacían hacia media cosecha y se rellenan; el goteo (1.200 €, capítulo 4) devuelve las garrafas a la mochila y dura unas cinco cosechas con la carpa llena',
+    ['Rellenar garrafas', 'Poner goteo'], async () => {
+    const S0 = S, mr = Math.random; S = JSON.parse(JSON.stringify(S0)); Math.random = () => .99;
+    Object.assign(S, { day: 1, min: 600, sala: {}, carpas: [{ t: 'm100', foco: 'led480', garrafas: true, gar: [] }], macetas: Array(4).fill('tela25') });
+    const nueva = () => { S.pots = S.macetas.map(() => ({ sid: 'hindu', prog: 0, water: 100, health: 100, fert: false, pest: false })); }, crece = () => S.pots.some(p => !p.dead && p.prog < 1);
+    // la primera garrafa que se vacía marca hv; desde ahí se rellenan cada hora para medir la cosecha entera (h)
+    nueva(); window.R = { cap: garrafasCarpa(0).join() }; let h = 0, hv = 0, gv = null;
+    while (crece() && h < 2000) { plantsAdvance(60); h++; if (!hv && S.pots.some((p, i) => garrafa(i) <= 0)) { hv = h; R.g1 = garrafasCarpa(0)[0]; gv = S.carpas[0].gar.slice(); } if (hv) S.carpas[0].gar = []; }
+    R.gar = hv / h; R.muertas = S.pots.filter(p => p.dead).length; S.carpas[0].gar = gv || []; await run(() => carpaAction(0)); R.g2 = garrafasCarpa(0).join();
+    S.items.x_goteo = 1; S.items.x_garrafas = 0; await run(() => carpaAction(0)); R.vu = [S.items.x_garrafas, !!S.carpas[0].garrafas, 'gar' in S.carpas[0], S.carpas[0].dep].join();
+    R.cos = 0; while (R.cos < 20) { nueva(); for (let k = 0; crece() && k < 2000; k++)plantsAdvance(60); if (S.carpas[0].dep <= 0) break; R.cos++; }
+    R.precios = [pr('Garrafas'), pr('Riego por goteo'), SHOP.find(it => it.extra === 'goteo').ch].join(); Math.random = mr; S = S0;
+  }, () => R.cap === '64,64' && R.gar >= .4 && R.gar <= .6 && R.g1 < 64 && R.muertas === 0 && R.g2 === '64,64' && R.vu === '1,false,false,650' && R.cos >= 4 && R.cos <= 6 && R.precios === '15,1200,4' || R);
   await step('Clima de la sala (1.10): enero, de día con sodio 400 W (+4 °C) y de noche (frío: crecen −18 %); con LED casi no calienta; termohigrómetro, calefactor y deshumidificador del growshop, su factura de noche; moho en floración y su aviso al despertar (julio, de noche)', ['Termohigrómetro', 'Calefactor', 'Deshumidificador', 'Salir'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 5, money: 1000, sala: {}, day: 10, carpas: [{ t: 'm100', foco: 'sodio400' }], macetas: Array(4).fill('plastico7') });
     S.pots = S.macetas.map(() => ({ sid: 'ria', prog: .8, water: 100, health: 90, fert: false, pest: false }));

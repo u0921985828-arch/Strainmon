@@ -1624,7 +1624,10 @@ const litrosCarpa=ci=>huecos().reduce((a,q,i)=>a+(q.c===ci?(MACETAS[S.macetas[i]
 const EXTRAS={
   vent:{n:'Ventilador de pinza',c:'Ventilador',w:25,d:'Mueve el aire de la carpa: plagas ×0,7. Gasta 25 W día y noche.'},
   filtro:{n:'Extractor con filtro de carbón',c:'Filtro de carbón',w:75,d:'Sin filtro, cada carpa con plantas en floración suma +2 de calor policial al día por el olor. Con él, nada. Gasta 75 W día y noche.'},
-  goteo:{n:'Riego por goteo',c:'Goteo',w:0,d:'Depósito de 100 L con goteros: riega solo cada planta que baja del 50 % de agua mientras le quede. Se rellena desde la vista de carpa.'}};
+  garrafas:{n:'Garrafas de riego',c:'Garrafas',pl:true,w:0,d:'Una garrafa con gotero junto a cada maceta: riega sola la planta que baja del 50 % de agua y le dura media cosecha. Se rellenan desde la vista de carpa.'},
+  goteo:{n:'Riego por goteo',c:'Goteo',w:0,d:'Depósito grande con bomba y goteros para toda la carpa: riega solo cada planta que baja del 50 % de agua y, con la carpa llena de tierra, dura unas cinco cosechas. Se rellena desde la vista de carpa. Con él, las garrafas sobran.'}};
+// pl: femenino plural (las garrafas) · lo que le falta a la carpa (con goteo, las garrafas no)
+const faltaExtra=(c,k)=>c&&!c[k]&&!(k==='garrafas'&&c.goteo);
 const OLOR=2;   // calor al día por carpa sin filtro con alguna planta en floración (o lista)
 const KWH=.16,H_LUZ=392,H_24=672,W_M2=400,Y_MEDIA=34;   // €/kWh (tarifa doméstica) · horas por día de juego · W/m² a plena intensidad · g/planta medio de STRAINS
 const signo=v=>(v>=0?'+':'−')+String(Math.abs(Math.round(v))),pc=(t,f)=>Math.abs(f-1)<.001?'':` · ${t} ${signo((f-1)*100)}%`,coma=n=>String(n).replace('.',',');
@@ -1755,6 +1758,7 @@ async function cambiarMaceta(i){
   if(!l.length)return say(macetasLibres(i,false).length?`No cabe más tierra en la carpa (${tl}).`:'No tienes otra maceta que quepa aquí.');
   const j=await menu(l.map(k=>({label:'Maceta '+MACETAS[k].n,right:'×'+S.items['m_'+k],ic:icono('maceta'),desc:descMaceta(k)})),{cls:'full',title:'CAMBIAR MACETA',title2:'Ahora: '+MACETAS[S.macetas[i]].n+' · '+tl,desc:true});
   if(j<0)return;const k=l[j];S.items['m_'+k]--;S.items['m_'+S.macetas[i]]=(S.items['m_'+S.macetas[i]]||0)+1;S.macetas[i]=k;sfx('sel');
+  const h=huecos()[i],gc=S.carpas[h.c];if(gc.gar)delete gc.gar[h.j];   // su garrafa, llena para la maceta nueva
   return say(`Pones la maceta de ${MACETAS[k].n}. La vieja va a la mochila.`);
 }
 const focosLibres=ci=>Object.keys(FOCOS).filter(k=>S.items['f_'+k]>0&&FOCOS[k].w<=CARPAS[S.carpas[ci].t].wmax&&k!==S.carpas[ci].foco);
@@ -1764,17 +1768,22 @@ async function cambiarFoco(ci){
   const j=await menu(l.map(k=>({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],ic:icono('lampara'),desc:descFoco(k)})),{cls:'full',title:'CAMBIAR FOCO',title2:'Ahora: '+FOCOS[S.carpas[ci].foco].n,desc:true});
   if(j<0)return;instalarFoco(ci,l[j]);return say(`Cuelgas el foco ${FOCOS[l[j]].n}. El viejo va a la mochila.`);
 }
-const extrasLibres=ci=>Object.keys(EXTRAS).filter(k=>!S.carpas[ci][k]&&S.items['x_'+k]>0);
-function ponerExtra(ci,k){S.items['x_'+k]--;S.carpas[ci][k]=true;if(k==='goteo')S.carpas[ci].dep=GOTEO_L;sfx('sel');}
+const extrasLibres=ci=>Object.keys(EXTRAS).filter(k=>faltaExtra(S.carpas[ci],k)&&S.items['x_'+k]>0);
+// el goteo llega lleno y las garrafas que hubiera vuelven a la mochila; las garrafas llegan llenas
+function ponerExtra(ci,k){const c=S.carpas[ci];S.items['x_'+k]--;c[k]=true;
+  if(k==='goteo'){c.dep=goteoL(ci);if(c.garrafas){c.garrafas=false;delete c.gar;S.items.x_garrafas++;}}
+  if(k==='garrafas')c.gar=[];
+  sfx('sel');}
 async function carpaAction(ci){
   const c=S.carpas[ci],C=CARPAS[c.t],F=FOCOS[c.foco],f=focosLibres(ci).length,ex=extrasLibres(ci);
-  const dep=c.goteo?c.dep??GOTEO_L:GOTEO_L,ll=dep<GOTEO_L;
-  const opts=(f?['Cambiar foco']:[]).concat(ex.map(k=>'Poner '+EXTRAS[k].c.toLowerCase()),ll?['Rellenar depósito']:[],['Salir']);
-  const k=await ask(`${C.n} · ${C.plazas} plantas · ${F.n}\n${Math.round(F.w/(C.cm[0]*C.cm[2]/1e4))} W/m² · luz ${eur(luzCarpa(ci))} al día con plantas${c.goteo?` · goteo ${Math.floor(dep)} de ${GOTEO_L} L`:''}`,opts);
+  const gl=goteoL(ci),dep=c.goteo?c.dep??gl:0,gar=c.garrafas&&!c.goteo,[gq,gt]=garrafasCarpa(ci),ll=c.goteo?dep<gl:gar&&gq<gt;
+  const opts=(f?['Cambiar foco']:[]).concat(ex.map(k=>'Poner '+EXTRAS[k].c.toLowerCase()),ll?[c.goteo?'Rellenar depósito':'Rellenar garrafas']:[],['Salir']);
+  const k=await ask(`${C.n} · ${C.plazas} plantas · ${F.n}\n${Math.round(F.w/(C.cm[0]*C.cm[2]/1e4))} W/m² · luz ${eur(luzCarpa(ci))} al día con plantas${c.goteo?` · goteo ${miles(Math.floor(dep))} de ${miles(gl)} L`:gar?` · garrafas ${Math.floor(gq)} de ${gt} L`:''}`,opts);
   if(opts[k]==='Cambiar foco')return cambiarFoco(ci);
-  if(opts[k]==='Rellenar depósito'){c.dep=GOTEO_L;sfx('sel');return say(`Llenas el depósito del goteo: ${GOTEO_L} L.`);}
-  const x=ex[k-(f?1:0)];if(k<0||!x)return;
-  ponerExtra(ci,x);return say(`Pones el ${EXTRAS[x].n.toLowerCase()} en ${/^Armario/.test(C.n)?'el':'la'} ${C.n.toLowerCase()}.\n${EXTRAS[x].d}`);
+  if(opts[k]==='Rellenar depósito'){c.dep=gl;sfx('sel');return say(`Llenas el depósito del goteo: ${miles(gl)} L.`);}
+  if(opts[k]==='Rellenar garrafas'){c.gar=[];sfx('sel');return say(`Llenas las garrafas: ${gt} L.`);}
+  const x=ex[k-(f?1:0)];if(k<0||!x)return;const vu=x==='goteo'&&c.garrafas;
+  ponerExtra(ci,x);return say(`Pones ${EXTRAS[x].pl?'las':'el'} ${EXTRAS[x].n.toLowerCase()} en ${/^Armario/.test(C.n)?'el':'la'} ${C.n.toLowerCase()}.\n${EXTRAS[x].d}${vu?'\nLas garrafas vuelven a la mochila.':''}`);
 }
 // cosecha: gramos y THC con el fenotipo de la planta; un fenotipo estrella va a un lote aparte (clave sid + '*', ver lotSid).
 // Semillas: las de tienda (SHOP) son feminizadas y salen sin semilla salvo alguna flor hermafrodita (SEMILLA_HERMA); las
@@ -2003,7 +2012,7 @@ function vcAlto(c){if(vcAltos.has(c))return vcAltos.get(c);const d=c.getContext(
   for(let i=3;i<d.length;i+=4)if(d[i]){y=Math.floor((i>>2)/c.width);break;}vcAltos.set(c,c.height-y);return c.height-y;}
 // la geometría de la vista C sobre la de la vista B (g), o null si falta arte para algo de la carpa
 function vistaC(g){
-  const {c,W,H,pl}=g,tipo=FOCOS[c.foco].tipo;if(!ARTE.ok||Object.keys(EXTRAS).some(k=>c[k]))return null;
+  const {c,W,H,pl}=g,tipo=FOCOS[c.foco].tipo;if(!ARTE.ok||Object.keys(EXTRAS).some(k=>k!=='garrafas'&&c[k]))return null;   // las garrafas no se dibujan: no la quitan
   // las campanas de sodio son foco-c-NN; las demás llevan su tipo (foco-c-cfl-NN)
   const Z=(VCA.base-VCA.boca)/(H-28),w=Math.round(W*Z),foco=vcSprite(tipo==='sodio'?'foco-c-':'foco-c-'+tipo+'-',(FOCO_CM[c.foco]||45)*Z);
   if(!fotoMisc('carpa-c-pared')||!fotoMisc('carpa-c-luz')||!foco||!foco.f)return null;
@@ -2373,7 +2382,7 @@ async function abrirCarpa(ci){
   VC.ocupado=true;vcInfo();await fade(1);mode='world';VC=null;updateHUD();await fade(0);
 }
 /* =========================================================
-   LA SALA DEL PISO (1.10): CLIMA, APARATOS, GOTEO Y ARCÓN
+   LA SALA DEL PISO (1.10): CLIMA, APARATOS, RIEGO AUTOMÁTICO Y ARCÓN
    ========================================================= */
 /* ---------- clima ----------
    Una sala para todas las carpas: temperatura y humedad según el mes (un día de juego ≈ 4 semanas, así que 12 días son un año
@@ -2421,14 +2430,23 @@ function salaDesc(){
   const mal=cl=>{const L=[];if(cl.t<T_OK[0])L.push('frío');if(cl.t>T_OK[1])L.push('calor');if(cl.hr<HR_OK[0])L.push('seco');if(cl.hr>HR_OK[1])L.push('húmedo');return L.length?' ('+L.join(', ')+')':'';};
   return `${MESES[mesDe(S.day)][0].toUpperCase()+MESES[mesDe(S.day)].slice(1)} · de día ${tClima(d)}${mal(d)} · de noche ${tClima(n)}${mal(n)}\nBien: ${T_OK[0]}-${T_OK[1]} °C y ${HR_OK[0]}-${HR_OK[1]} %. Aparatos: ${ap.length?ap.join(', '):'ninguno'}${facturaSala()?' · '+eur(facturaSala())+' al día':''}.`;
 }
-/* ---------- goteo ----------
-   El depósito (S.carpas[ci].dep litros; sin el campo, lleno) riega solo: la planta que baja del 50 % de agua vuelve al 100 %
-   gastando la mitad de los litros de su maceta por cada 100 % que sube. Si no llega, sube lo que dé y el depósito se vacía */
-const GOTEO_L=100;
+/* ---------- riego automático: garrafas y goteo ----------
+   Dos niveles. Las garrafas (barato): una por maceta, de GARRAFA_X litros por litro de su tierra (media cosecha), en
+   S.carpas[ci].gar[j] por plaza (sin el valor, llena). El goteo (una inversión): un depósito por carpa de GOTEO_X litros por
+   litro de tierra que admite (litrosMax: unas cinco cosechas con la carpa llena), en S.carpas[ci].dep (sin el campo, lleno);
+   si la carpa lo tiene, las garrafas no se usan. Los dos riegan igual: la planta que baja del 50 % de agua vuelve al 100 %
+   gastando la mitad de los litros de su maceta por cada 100 % que sube. Si no llega, sube lo que dé y se vacía */
+const GARRAFA_X=.65,GOTEO_X=6.5;   // una cosecha gasta ~1,3 L de agua por litro de tierra (1-1,7 según foco, maceta y variedad)
+const goteoL=ci=>Math.round(GOTEO_X*litrosMax(ci));
+const garrafaL=i=>Math.round(GARRAFA_X*(MACETAS[S.macetas[i]]||MACETAS.plastico7).l);
+const garrafa=i=>{const h=huecos()[i],c=S.carpas[h.c],cap=garrafaL(i);return Math.min(cap,(c.gar||[])[h.j]??cap);};
+// litros que quedan y que caben en las garrafas de la carpa (una por plaza)
+const garrafasCarpa=ci=>huecos().reduce((a,h,i)=>h.c===ci?[a[0]+garrafa(i),a[1]+garrafaL(i)]:a,[0,0]);
 function regarGoteo(p,i){
-  const c=S.carpas[huecos()[i].c];if(!c.goteo||p.dead||p.water>=50)return;
-  const l=(MACETAS[S.macetas[i]]||MACETAS.plastico7).l*.5*(100-p.water)/100,d=c.dep??GOTEO_L;if(d<=0)return;
-  if(d>=l){p.water=100;c.dep=Math.round((d-l)*100)/100;}else{p.water+=d/l*(100-p.water);c.dep=0;}
+  const h=huecos()[i],c=S.carpas[h.c];if(!(c.goteo||c.garrafas)||p.dead||p.water>=50)return;
+  const l=(MACETAS[S.macetas[i]]||MACETAS.plastico7).l*.5*(100-p.water)/100,d=c.goteo?c.dep??goteoL(h.c):garrafa(i);if(d<=0)return;
+  let q=0;if(d>=l){p.water=100;q=Math.round((d-l)*100)/100;}else p.water+=d/l*(100-p.water);
+  if(c.goteo)c.dep=q;else(c.gar||(c.gar=[]))[h.j]=q;
 }
 /* ---------- arcón y mochila ----------
    Lo que llevas encima (cogollos y rosin, en gramos) tiene el tope de la mochila (S.items.bolsa: la de serie, la bolsa de
@@ -2661,8 +2679,8 @@ const SHOP=[
   {lbl:'Bocata',p:5,ch:1,item:'bocata',desc:'Recupera 15 de vida. En combate o desde la mochila.'},
   {lbl:'Spray de pimienta',p:15,ch:2,item:'spray',desc:'En combate: 12-16 de daño seguro a un ladrón.'},
   {lbl:'Maceta de tela 11 L',p:3,ch:1,maceta:'tela11'},{lbl:'Maceta de plástico 18 L',p:2,ch:2,maceta:'plastico18'},{lbl:'Maceta de tela 25 L',p:4,ch:3,maceta:'tela25'},
-  {lbl:'Foco LED 100 W',p:110,ch:1,foco:'led100'},{lbl:'Ventilador de pinza',p:20,ch:1,extra:'vent'},
-  {lbl:'Extractor con filtro de carbón',p:110,ch:2,extra:'filtro'},{lbl:'Riego por goteo',p:55,ch:3,extra:'goteo'},
+  {lbl:'Foco LED 100 W',p:110,ch:1,foco:'led100'},{lbl:'Ventilador de pinza',p:20,ch:1,extra:'vent'},{lbl:'Garrafas de riego',p:15,ch:1,extra:'garrafas'},
+  {lbl:'Extractor con filtro de carbón',p:110,ch:2,extra:'filtro'},{lbl:'Riego por goteo',p:1200,ch:4,extra:'goteo'},
   {lbl:'Foco sodio 250 W',p:85,ch:2,foco:'sodio250'},{lbl:'Foco LED 200 W',p:220,ch:2,foco:'led200'},
   {lbl:'Foco sodio 400 W',p:100,ch:3,foco:'sodio400'},{lbl:'Foco LED 480 W',p:500,ch:3,foco:'led480'},
   {lbl:'Foco sodio 600 W',p:120,ch:4,foco:'sodio600'},{lbl:'Foco LED 720 W',p:950,ch:5,foco:'led720'},
@@ -2690,7 +2708,7 @@ async function comprarSemillas(it){
 // vence, Toño suma INTERES. META_VENTAS: lo que hay que vender en la calle en el capítulo 2
 const DEUDA=30000,PLAZOS={3:3000,5:12000,7:15000},INTERES=.2,PREMIO_COPA=5000,SOBORNO=1500,MULTA_REDADA=3000,META_VENTAS=300;
 const yLista=l=>l.length>1?l.slice(0,-1).join(', ')+' y '+l[l.length-1]:l[0];
-for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+yLista(Object.values(CARPAS).filter(C=>FOCOS[it.foco].w<=C.wmax).map(C=>C.cm[0]))+'.';if(it.extra){const k=it.extra;it.desc=EXTRAS[k].d+'\nUno por carpa.';it.cond=()=>S.carpas.filter(c=>c&&!c[k]).length>S.items['x_'+k]+S.envio.filter(l=>l===it.lbl).length;}
+for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+yLista(Object.values(CARPAS).filter(C=>FOCOS[it.foco].w<=C.wmax).map(C=>C.cm[0]))+'.';if(it.extra){const k=it.extra;it.desc=EXTRAS[k].d+(EXTRAS[k].pl?'\nUna tanda por carpa.':'\nUno por carpa.');it.cond=()=>S.carpas.filter(c=>faltaExtra(c,k)).length>S.items['x_'+k]+S.envio.filter(l=>l===it.lbl).length;}
   if(it.aparato){const k=it.aparato;it.desc=APARATOS[k].d+'\nUno para la sala: Kiko lo deja puesto.';it.cond=()=>!S.sala[k]&&!S.envio.includes(it.lbl);}}   // lo pedido por el móvil (12b-movil) no se vuelve a vender
 // carpa comprada (en un sitio libre) o ampliada (mismo sitio, se quedan foco, extras, plantas y macetas): cada plaza
 // conserva su planta y su maceta por (carpa, plaza); las nuevas, vacías y con maceta de 7 L. La casa se vuelve a montar al entrar
@@ -2720,10 +2738,12 @@ async function shop(){
     if(it.item)S.items[it.item]+=it.n||1;if(it.maceta)S.items['m_'+it.maceta]++;if(it.bolsa)S.items.bolsa=it.bolsa;if(it.aparato)S.sala[it.aparato]=true;
     if(!it.foco&&!it.carpa&&!it.extra)toast('Comprado: '+it.lbl,1200);
     if(it.carpa){comprarCarpa(it.carpa,it.ci);await say(DICHO_CARPA[it.carpa],'KIKO');}
-    if(it.extra){S.items['x_'+it.extra]++;const ok=S.carpas.map((c,ci)=>c&&!c[it.extra]?ci:-1).filter(ci=>ci>=0);
-      if(!ok.length)await say('Ya tienes uno en cada carpa. Te lo guardo en la mochila.','KIKO');
-      else{const c=await ask('¿Te lo pongo ya?',ok.map(ci=>CARPAS[S.carpas[ci].t].n).concat(['Luego']),'KIKO');
-        if(c>=0&&c<ok.length){ponerExtra(ok[c],it.extra);toast('Puesto: '+it.lbl,1200);}}}
+    if(it.extra){S.items['x_'+it.extra]++;const ok=S.carpas.map((c,ci)=>faltaExtra(c,it.extra)?ci:-1).filter(ci=>ci>=0);
+      const pl=EXTRAS[it.extra].pl;
+      if(!ok.length)await say(pl?'Ya tienes unas en cada carpa. Te las guardo en la mochila.':'Ya tienes uno en cada carpa. Te lo guardo en la mochila.','KIKO');
+      else{const c=await ask(pl?'¿Te las pongo ya?':'¿Te lo pongo ya?',ok.map(ci=>CARPAS[S.carpas[ci].t].n).concat(['Luego']),'KIKO');
+        if(c>=0&&c<ok.length){const vu=it.extra==='goteo'&&S.carpas[ok[c]].garrafas;ponerExtra(ok[c],it.extra);toast((pl?'Puestas: ':'Puesto: ')+it.lbl,1200);
+          if(vu)await say('Las garrafas de esa carpa vuelven a la mochila.','KIKO');}}}
     if(it.foco){S.items['f_'+it.foco]++;const ok=S.carpas.map((c,ci)=>c&&FOCOS[it.foco].w<=CARPAS[c.t].wmax?ci:-1).filter(ci=>ci>=0);
       if(!ok.length)await say('Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande.','KIKO');
       else{const c=await ask('¿Lo cuelgo ya? El que quites va a tu mochila.',ok.map(ci=>`${CARPAS[S.carpas[ci].t].n} (${FOCOS[S.carpas[ci].foco].n})`).concat(['Luego']),'KIKO');
@@ -3159,7 +3179,7 @@ async function mochila(){
       {label:'Spray de pimienta',right:'×'+S.items.spray,ic:icono('spray'),desc:'Solo en combate.'},{label:'Bocata',right:'×'+S.items.bocata,ic:icono('bocadillo'),desc:'Pulsa A para comerlo: +15 de vida.',k:'bocata'}]);
     for(const k in MACETAS)if(S.items['m_'+k]>0)rows.push({label:'Maceta '+MACETAS[k].n,right:'×'+S.items['m_'+k],ic:icono('maceta'),desc:descMaceta(k)+'\nSe cambia en una plaza vacía de la carpa.'});
     for(const k in FOCOS)if(S.items['f_'+k]>0)rows.push({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],ic:icono('lampara'),desc:descFoco(k)+'\nSe cuelga desde la vista de carpa: ▲ hasta el foco y A.'});
-    for(const k in EXTRAS)if(S.items['x_'+k]>0)rows.push({label:EXTRAS[k].n,right:'×'+S.items['x_'+k],desc:EXTRAS[k].d+'\nSe pone desde la vista de carpa: ▲ hasta el foco y A.'});
+    for(const k in EXTRAS)if(S.items['x_'+k]>0)rows.push({label:EXTRAS[k].n,right:'×'+S.items['x_'+k],desc:EXTRAS[k].d+`\nSe pone${EXTRAS[k].pl?'n':''} desde la vista de carpa: ▲ hasta el foco y A.`});
     for(const [k,v] of Object.entries(S.seeds))rows.push({label:'Semilla '+getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:icono('semillas'),desc:strainLine(k)});
     for(const e of S.esquejes)rows.push({label:'Esqueje '+getStrain(e.sid).n+marcaFeno(e.f),right:'día '+(e.dia+ESQUEJE_DIAS),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),desc:`Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+ESQUEJE_DIAS}.`});
     for(const [k,b] of Object.entries(S.buds))rows.push({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k)),desc:(k.endsWith('*')?'Cogollos de un fenotipo estrella, en lote aparte.\n':'Cogollos listos para vender.\n')+getStrain(lotSid(k)).o});

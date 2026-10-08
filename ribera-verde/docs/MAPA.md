@@ -489,8 +489,9 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Maceta de tela 25 L | 4 € | 3 | 25 L · hasta 210 g por planta · cosecha +5% · riego ×1,1 · menos plagas · Se cambia en una plaza vacía de la carpa. |
 | Foco LED 100 W | 110 € | 1 | 100 W · ilumina 60×60 cm · 0,65 g/W (0,81 abonando) · crece +5% · THC +0,3 · riego ×1 · Luz: 39 kWh (6 €) al día con plantas. · Aguanta en carpas de 60, 80, 100, 120 y 150. |
 | Ventilador de pinza | 20 € | 1 | Mueve el aire de la carpa: plagas ×0,7. Gasta 25 W día y noche. · Uno por carpa. |
+| Garrafas de riego | 15 € | 1 | Una garrafa con gotero junto a cada maceta: riega sola la planta que baja del 50 % de agua y le dura media cosecha. Se rellenan desde la vista de carpa. · Una tanda por carpa. |
 | Extractor con filtro de carbón | 110 € | 2 | Sin filtro, cada carpa con plantas en floración suma +2 de calor policial al día por el olor. Con él, nada. Gasta 75 W día y noche. · Uno por carpa. |
-| Riego por goteo | 55 € | 3 | Depósito de 100 L con goteros: riega solo cada planta que baja del 50 % de agua mientras le quede. Se rellena desde la vista de carpa. · Uno por carpa. |
+| Riego por goteo | 1200 € | 4 | Depósito grande con bomba y goteros para toda la carpa: riega solo cada planta que baja del 50 % de agua y, con la carpa llena de tierra, dura unas cinco cosechas. Se rellena desde la vista de carpa. Con él, las garrafas sobran. · Uno por carpa. |
 | Foco sodio 250 W | 85 € | 2 | 250 W · ilumina 70×70 cm · 0,45 g/W (0,56 abonando) · crece +5% · THC +0,3 · riego ×1,3 · Luz: 98 kWh (16 €) al día con plantas. · Aguanta en carpas de 60, 80, 100, 120 y 150. |
 | Foco LED 200 W | 220 € | 2 | 200 W · ilumina 80×80 cm · 0,7 g/W (0,88 abonando) · crece +10% · THC +0,6 · riego ×1,05 · Luz: 78 kWh (12 €) al día con plantas. · Aguanta en carpas de 60, 80, 100, 120 y 150. |
 | Foco sodio 400 W | 100 € | 3 | 400 W · ilumina 100×100 cm · 0,5 g/W (0,63 abonando) · crece +5% · THC +0,5 · riego ×1,4 · Luz: 157 kWh (25 €) al día con plantas. · Aguanta en carpas de 80, 100, 120 y 150. |

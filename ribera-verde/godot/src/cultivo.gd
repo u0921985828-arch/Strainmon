@@ -108,22 +108,57 @@ static func factura_sala(S: Dictionary) -> int:
 			kwh += D.APARATOS[k].w * D.H_24 * (D.H_DIA * d.uso.get(k, 0) + (1 - D.H_DIA) * nc.uso.get(k, 0)) * .5 / 1000
 	return Datos.jsround(kwh * D.KWH)
 
-# el depósito del goteo (c.dep litros; sin el campo, lleno) riega la planta que baja del 50 % de agua
+# riego automático en dos niveles: las garrafas (c.gar[j] litros por plaza, media cosecha; sin el valor, llena) y el goteo
+# (c.dep litros, unas cinco cosechas con la carpa llena; sin el campo, lleno; con él, las garrafas no se usan)
+static func goteo_l(S: Dictionary, ci: int) -> int:
+	var D := Datos.carga()
+	var cm: Array = D.CARPAS[S.carpas[ci].t].cm
+	return Datos.jsround(D.GOTEO_X * Datos.jsround(cm[0] * cm[2] / 1e4 * D.LITROS_M2))
+
+static func garrafa_l(S: Dictionary, i: int) -> int:
+	var D := Datos.carga()
+	return Datos.jsround(D.GARRAFA_X * D.MACETAS.get(S.macetas[i], D.MACETAS.plastico7).l)
+
+static func garrafa(S: Dictionary, i: int) -> float:
+	var h: Dictionary = huecos(S)[i]
+	var g: Array = S.carpas[h.c].get("gar", [])
+	var cap := garrafa_l(S, i)
+	return minf(cap, g[h.j] if h.j < g.size() and g[h.j] != null else cap)
+
+# litros que quedan y que caben en las garrafas de la carpa
+static func garrafas_carpa(S: Dictionary, ci: int) -> Array:
+	var a := [0.0, 0]
+	var hu := huecos(S)
+	for i in hu.size():
+		if hu[i].c == ci:
+			a = [a[0] + garrafa(S, i), a[1] + garrafa_l(S, i)]
+	return a
+
+# la planta que baja del 50 % de agua vuelve al 100 % gastando la mitad de los litros de su maceta por cada 100 %
 static func regar_goteo(S: Dictionary, p: Dictionary, i: int) -> void:
 	var D := Datos.carga()
-	var c: Dictionary = S.carpas[huecos(S)[i].c]
-	if not c.get("goteo") or p.get("dead") or p.water >= 50:
+	var h: Dictionary = huecos(S)[i]
+	var c: Dictionary = S.carpas[h.c]
+	if not (c.get("goteo") or c.get("garrafas")) or p.get("dead") or p.water >= 50:
 		return
 	var l: float = D.MACETAS.get(S.macetas[i], D.MACETAS.plastico7).l * .5 * (100 - p.water) / 100
-	var d: float = c.get("dep", D.GOTEO_L) if c.get("dep") != null else D.GOTEO_L
+	var d: float = (c.dep if c.get("dep") != null else float(goteo_l(S, h.c))) if c.get("goteo") else garrafa(S, i)
 	if d <= 0:
 		return
+	var q := 0.0
 	if d >= l:
 		p.water = 100
-		c.dep = Datos.jsround((d - l) * 100) / 100.0
+		q = Datos.jsround((d - l) * 100) / 100.0
 	else:
 		p.water += d / l * (100 - p.water)
-		c.dep = 0
+	if c.get("goteo"):
+		c.dep = q
+	else:
+		if c.get("gar") == null:
+			c.gar = []
+		if c.gar.size() <= h.j:
+			c.gar.resize(h.j + 1)
+		c.gar[h.j] = q
 
 static func plant_stage(p: Dictionary) -> int:
 	return 4 if p.prog >= 1 else (0 if p.prog < .12 else (1 if p.prog < .35 else (2 if p.prog < .65 else 3)))

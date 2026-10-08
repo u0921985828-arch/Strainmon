@@ -40,7 +40,7 @@ La tierra de todas las macetas de una carpa no pasa de 100 L por m² de suelo (`
 
 Tope: unos 8 g por litro de tierra (la de tela, +5 %). Por mucho foco que pongas, una planta en 7 L no pasa de 56 g.
 
-Extras: ventilador 20 € (25 W día y noche), extractor con filtro de carbón 110 € (75 W día y noche; 672 h por día de juego), goteo 55 €.
+Extras: ventilador 20 € (25 W día y noche), extractor con filtro de carbón 110 € (75 W día y noche; 672 h por día de juego), garrafas de riego 15 € y riego por goteo 1.200 €.
 
 ## Cuánto da una cosecha
 

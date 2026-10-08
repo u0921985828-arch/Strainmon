@@ -1,5 +1,5 @@
 /* =========================================================
-   LA SALA DEL PISO (1.10): CLIMA, APARATOS, GOTEO Y ARCÓN
+   LA SALA DEL PISO (1.10): CLIMA, APARATOS, RIEGO AUTOMÁTICO Y ARCÓN
    ========================================================= */
 /* ---------- clima ----------
    Una sala para todas las carpas: temperatura y humedad según el mes (un día de juego ≈ 4 semanas, así que 12 días son un año
@@ -47,14 +47,23 @@ function salaDesc(){
   const mal=cl=>{const L=[];if(cl.t<T_OK[0])L.push('frío');if(cl.t>T_OK[1])L.push('calor');if(cl.hr<HR_OK[0])L.push('seco');if(cl.hr>HR_OK[1])L.push('húmedo');return L.length?' ('+L.join(', ')+')':'';};
   return `${MESES[mesDe(S.day)][0].toUpperCase()+MESES[mesDe(S.day)].slice(1)} · de día ${tClima(d)}${mal(d)} · de noche ${tClima(n)}${mal(n)}\nBien: ${T_OK[0]}-${T_OK[1]} °C y ${HR_OK[0]}-${HR_OK[1]} %. Aparatos: ${ap.length?ap.join(', '):'ninguno'}${facturaSala()?' · '+eur(facturaSala())+' al día':''}.`;
 }
-/* ---------- goteo ----------
-   El depósito (S.carpas[ci].dep litros; sin el campo, lleno) riega solo: la planta que baja del 50 % de agua vuelve al 100 %
-   gastando la mitad de los litros de su maceta por cada 100 % que sube. Si no llega, sube lo que dé y el depósito se vacía */
-const GOTEO_L=100;
+/* ---------- riego automático: garrafas y goteo ----------
+   Dos niveles. Las garrafas (barato): una por maceta, de GARRAFA_X litros por litro de su tierra (media cosecha), en
+   S.carpas[ci].gar[j] por plaza (sin el valor, llena). El goteo (una inversión): un depósito por carpa de GOTEO_X litros por
+   litro de tierra que admite (litrosMax: unas cinco cosechas con la carpa llena), en S.carpas[ci].dep (sin el campo, lleno);
+   si la carpa lo tiene, las garrafas no se usan. Los dos riegan igual: la planta que baja del 50 % de agua vuelve al 100 %
+   gastando la mitad de los litros de su maceta por cada 100 % que sube. Si no llega, sube lo que dé y se vacía */
+const GARRAFA_X=.65,GOTEO_X=6.5;   // una cosecha gasta ~1,3 L de agua por litro de tierra (1-1,7 según foco, maceta y variedad)
+const goteoL=ci=>Math.round(GOTEO_X*litrosMax(ci));
+const garrafaL=i=>Math.round(GARRAFA_X*(MACETAS[S.macetas[i]]||MACETAS.plastico7).l);
+const garrafa=i=>{const h=huecos()[i],c=S.carpas[h.c],cap=garrafaL(i);return Math.min(cap,(c.gar||[])[h.j]??cap);};
+// litros que quedan y que caben en las garrafas de la carpa (una por plaza)
+const garrafasCarpa=ci=>huecos().reduce((a,h,i)=>h.c===ci?[a[0]+garrafa(i),a[1]+garrafaL(i)]:a,[0,0]);
 function regarGoteo(p,i){
-  const c=S.carpas[huecos()[i].c];if(!c.goteo||p.dead||p.water>=50)return;
-  const l=(MACETAS[S.macetas[i]]||MACETAS.plastico7).l*.5*(100-p.water)/100,d=c.dep??GOTEO_L;if(d<=0)return;
-  if(d>=l){p.water=100;c.dep=Math.round((d-l)*100)/100;}else{p.water+=d/l*(100-p.water);c.dep=0;}
+  const h=huecos()[i],c=S.carpas[h.c];if(!(c.goteo||c.garrafas)||p.dead||p.water>=50)return;
+  const l=(MACETAS[S.macetas[i]]||MACETAS.plastico7).l*.5*(100-p.water)/100,d=c.goteo?c.dep??goteoL(h.c):garrafa(i);if(d<=0)return;
+  let q=0;if(d>=l){p.water=100;q=Math.round((d-l)*100)/100;}else p.water+=d/l*(100-p.water);
+  if(c.goteo)c.dep=q;else(c.gar||(c.gar=[]))[h.j]=q;
 }
 /* ---------- arcón y mochila ----------
    Lo que llevas encima (cogollos y rosin, en gramos) tiene el tope de la mochila (S.items.bolsa: la de serie, la bolsa de

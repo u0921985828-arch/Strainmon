@@ -59,7 +59,7 @@ const ROOT = path.join(__dirname, '..');
     S = S0;
     const signs = SIGNS;
     return { litrosM2: LITROS_M2, strains, recipes, maps, npcs, items, shop, signs, banco: BANCO, sobre: SOBRE, gen, focos, macetas, carpas, zonas: ZONAS, patrullas: PATRULLAS, paradas: PARADAS, busHoras: BUS_HORAS,
-      montajes, c: { CAJA, CAJA_P, CAJA_REDADA, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, ENCARGO_DIAS, SOBORNO, CUOTA_DIAS, KWH, H_LUZ, H_24, W_M2, Y_MEDIA, FENO_ESTRELLA, FENO_FLOJO, ESQUEJE_DIAS, SEMILLA_HERMA, DEUDA, PLAZOS, INTERES, PREMIO_COPA, mayor: [precioMayor(12), precioMayor(30)], calle: [precioCalle(12), precioCalle(30)], ROSIN, rosin: [36, 54, 75].map(t => [t, precioRosin(t)]), prensa: SHOP.find(i => i.item === 'prensa').p, IMPERIO, SOBRES, GRANEL } };
+      montajes, c: { CAJA, CAJA_P, CAJA_REDADA, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, ENCARGO_DIAS, SOBORNO, CUOTA_DIAS, KWH, H_LUZ, H_24, W_M2, Y_MEDIA, FENO_ESTRELLA, FENO_FLOJO, ESQUEJE_DIAS, SEMILLA_HERMA, GARRAFA_X, GOTEO_X, DEUDA, PLAZOS, INTERES, PREMIO_COPA, mayor: [precioMayor(12), precioMayor(30)], calle: [precioCalle(12), precioCalle(30)], ROSIN, rosin: [36, 54, 75].map(t => [t, precioRosin(t)]), prensa: SHOP.find(i => i.item === 'prensa').p, IMPERIO, SOBRES, GRANEL } };
   });
   await browser.close();
 
@@ -154,7 +154,7 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
 ## Fórmulas de cultivo
 
 - **Crecimiento por hora:** \`1 / (días × 24) × crec\`, ×0,4 si el agua < 20 %, 0 si el agua llega a 0, ×1,1 con abono. \`crec\`, \`thc\` y \`riego\` salen del foco (a plena intensidad desde ${D.c.W_M2} W/m²) y de la maceta de cada plaza; \`crec\`, también del clima de la sala (−6 % por grado fuera de 18-30 °C, hasta ×0,4; −1,5 % por punto fuera del 40-60 % de humedad, hasta ×0,7). Equipo, precios y luz: [ECONOMIA.md](ECONOMIA.md).
-- **Agua:** baja 3,5 × riego puntos por hora (con CFL y maceta de 7 L una planta regada aguanta ~28 h). El goteo riega del depósito (100 L) la que baja del 50 %.
+- **Agua:** baja 3,5 × riego puntos por hora (con CFL y maceta de 7 L una planta regada aguanta ~28 h). El riego automático riega solo la que baja del 50 %: las garrafas (${String(D.c.GARRAFA_X).replace('.', ',')} L por litro de tierra de la maceta, media cosecha) o el depósito del goteo (${String(D.c.GOTEO_X).replace('.', ',')} L por litro de tierra que admite la carpa, unas cinco cosechas con la carpa llena).
 - **Salud:** −4/h sin agua, −2,5/h con plaga, +1/h si agua > 30 % y sin plaga; en floración, moho con la humedad por encima del 60 %: −0,1/h por punto de más. A 0 la planta muere.
 - **Plagas:** probabilidad por hora \`0,006 × (100 − resistencia) / 40\` mientras no está madura.
 - **Cosecha (g):** \`mín(tope de la maceta, W × g/W ÷ plazas de la carpa × rend de la maceta × rinde/${D.c.Y_MEDIA} × (0,4 + 0,6 × salud/100) × (abono ? 1,25 : 1) × fenotipo)\`. Una plaza vacía es luz perdida.
@@ -197,7 +197,7 @@ La tierra de todas las macetas de una carpa no pasa de ${D.litrosM2} L por m² d
   e += `
 Tope: unos 8 g por litro de tierra (la de tela, +5 %). Por mucho foco que pongas, una planta en 7 L no pasa de ${D.macetas[0].cap} g.
 
-Extras: ventilador ${eu(precio(s => s.lbl.startsWith('Ventilador')))} (25 W día y noche), extractor con filtro de carbón ${eu(precio(s => s.lbl.startsWith('Extractor')))} (75 W día y noche; ${c.H_24} h por día de juego), goteo ${eu(precio(s => s.lbl.startsWith('Riego')))}.
+Extras: ventilador ${eu(precio(s => s.lbl.startsWith('Ventilador')))} (25 W día y noche), extractor con filtro de carbón ${eu(precio(s => s.lbl.startsWith('Extractor')))} (75 W día y noche; ${c.H_24} h por día de juego), garrafas de riego ${eu(precio(s => s.lbl.startsWith('Garrafas')))} y riego por goteo ${eu(precio(s => s.lbl.startsWith('Riego')))}.
 
 ## Cuánto da una cosecha
 

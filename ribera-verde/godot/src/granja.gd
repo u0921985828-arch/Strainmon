@@ -321,6 +321,10 @@ func cambiar_maceta(i: int) -> void:
 	S.items["m_" + S.macetas[i]] = S.items.get("m_" + S.macetas[i], 0) + 1
 	S.macetas[i] = k
 	sfx("sel")
+	var h: Dictionary = huecos()[i]   # su garrafa, llena para la maceta nueva
+	var gc: Dictionary = S.carpas[h.c]
+	if gc.get("gar") != null and h.j < gc.gar.size():
+		gc.gar[h.j] = null
 	await say("Pones la maceta de %s. La vieja va a la mochila." % D.MACETAS[k].n)
 
 func focos_libres(ci: int) -> Array:
@@ -351,18 +355,30 @@ func cambiar_foco(ci: int) -> void:
 	instalar_foco(ci, l[j])
 	await say("Cuelgas el foco %s. El viejo va a la mochila." % D.FOCOS[l[j]].n)
 
+# pl: femenino plural (las garrafas) · lo que le falta a la carpa (con goteo, las garrafas no)
+static func falta_extra(c, k: String) -> bool:
+	return c != null and not c.get(k) and not (k == "garrafas" and c.get("goteo"))
+
 func extras_libres(ci: int) -> Array:
 	var o := []
 	for k in D.EXTRAS:
-		if not S.carpas[ci].get(k) and S.items.get("x_" + k, 0) > 0:
+		if falta_extra(S.carpas[ci], k) and S.items.get("x_" + k, 0) > 0:
 			o.append(k)
 	return o
 
+# el goteo llega lleno y las garrafas que hubiera vuelven a la mochila; las garrafas llegan llenas
 func poner_extra(ci: int, k: String) -> void:
+	var c: Dictionary = S.carpas[ci]
 	S.items["x_" + k] -= 1
-	S.carpas[ci][k] = true
+	c[k] = true
 	if k == "goteo":
-		S.carpas[ci].dep = D.GOTEO_L
+		c.dep = Cultivo.goteo_l(S, ci)
+		if c.get("garrafas"):
+			c.garrafas = false
+			c.erase("gar")
+			S.items.x_garrafas = S.items.get("x_garrafas", 0) + 1
+	if k == "garrafas":
+		c.gar = []
 	sfx("sel")
 
 func carpa_action(ci: int) -> void:
@@ -371,29 +387,40 @@ func carpa_action(ci: int) -> void:
 	var F: Dictionary = D.FOCOS[c.foco]
 	var f := focos_libres(ci).size()
 	var ex := extras_libres(ci)
-	var dep: float = c.get("dep", D.GOTEO_L) if c.get("goteo") else D.GOTEO_L
+	var gl := Cultivo.goteo_l(S, ci)
+	var dep: float = (c.dep if c.get("dep") != null else float(gl)) if c.get("goteo") else 0.0
+	var gar: bool = c.get("garrafas", false) and not c.get("goteo")
+	var ga := Cultivo.garrafas_carpa(S, ci)
+	var ll: bool = dep < gl if c.get("goteo") else (gar and ga[0] < ga[1])
 	var opts := ["Cambiar foco"] if f else []
 	for k in ex:
 		opts.append("Poner " + D.EXTRAS[k].c.to_lower())
-	if dep < D.GOTEO_L:
-		opts.append("Rellenar depósito")
+	if ll:
+		opts.append("Rellenar depósito" if c.get("goteo") else "Rellenar garrafas")
 	opts.append("Salir")
-	var gt: String = (" · goteo %d de %s L" % [int(floor(dep)), n(D.GOTEO_L)]) if c.get("goteo") else ""
+	var gt: String = (" · goteo %s de %s L" % [Datos.miles(floor(dep)), Datos.miles(gl)]) if c.get("goteo") else ((" · garrafas %d de %d L" % [int(floor(ga[0])), ga[1]]) if gar else "")
 	var k: int = await ask("%s · %s plantas · %s\n%d W/m² · luz %s al día con plantas%s" % [C.n, n(C.plazas), F.n, Datos.jsround(F.w / (C.cm[0] * C.cm[2] / 1e4)), Datos.eur(luz_carpa(ci)), gt], opts)
 	if opts[k] == "Cambiar foco":
 		await cambiar_foco(ci)
 		return
 	if opts[k] == "Rellenar depósito":
-		c.dep = D.GOTEO_L
+		c.dep = gl
 		sfx("sel")
-		await say("Llenas el depósito del goteo: %s L." % n(D.GOTEO_L))
+		await say("Llenas el depósito del goteo: %s L." % Datos.miles(gl))
+		return
+	if opts[k] == "Rellenar garrafas":
+		c.gar = []
+		sfx("sel")
+		await say("Llenas las garrafas: %d L." % ga[1])
 		return
 	var ix := k - (1 if f else 0)
 	if k < 0 or ix < 0 or ix >= ex.size():
 		return
 	var x: String = ex[ix]
+	var vu: bool = x == "goteo" and c.get("garrafas", false)
 	poner_extra(ci, x)
-	await say("Pones el %s en %s %s.\n%s" % [D.EXTRAS[x].n.to_lower(), "el" if C.n.begins_with("Armario") else "la", C.n.to_lower(), D.EXTRAS[x].d])
+	await say("Pones %s %s en %s %s.\n%s%s" % ["las" if D.EXTRAS[x].get("pl") else "el", D.EXTRAS[x].n.to_lower(), "el" if C.n.begins_with("Armario") else "la", C.n.to_lower(), D.EXTRAS[x].d,
+		"\nLas garrafas vuelven a la mochila." if vu else ""])
 
 # ---------- cosecha ----------
 func harvest(i: int) -> void:

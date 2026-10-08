@@ -17,7 +17,7 @@ func shop_cond(it: Dictionary) -> bool:
 		var k: String = it.extra
 		var nc := 0
 		for c in S.carpas:
-			if c and not c.get(k):
+			if falta_extra(c, k):
 				nc += 1
 		return nc > S.items.get("x_" + k, 0) + S.envio.count(it.lbl)
 	match it.get("carpa", ""):
@@ -133,19 +133,23 @@ func shop() -> void:
 			S.items["x_" + it.extra] += 1
 			var ok := []
 			for ci in S.carpas.size():
-				if S.carpas[ci] and not S.carpas[ci].get(it.extra):
+				if falta_extra(S.carpas[ci], it.extra):
 					ok.append(ci)
+			var pl: bool = D.EXTRAS[it.extra].get("pl", false)
 			if ok.is_empty():
-				await say("Ya tienes uno en cada carpa. Te lo guardo en la mochila.", "KIKO")
+				await say("Ya tienes unas en cada carpa. Te las guardo en la mochila." if pl else "Ya tienes uno en cada carpa. Te lo guardo en la mochila.", "KIKO")
 			else:
 				var o := []
 				for ci in ok:
 					o.append(D.CARPAS[S.carpas[ci].t].n)
 				o.append("Luego")
-				var c: int = await ask("¿Te lo pongo ya?", o, "KIKO")
+				var c: int = await ask("¿Te las pongo ya?" if pl else "¿Te lo pongo ya?", o, "KIKO")
 				if c >= 0 and c < ok.size():
+					var vu: bool = it.extra == "goteo" and S.carpas[ok[c]].get("garrafas", false)
 					poner_extra(ok[c], it.extra)
-					toast("Puesto: " + it.lbl, 1200)
+					toast(("Puestas: " if pl else "Puesto: ") + it.lbl, 1200)
+					if vu:
+						await say("Las garrafas de esa carpa vuelven a la mochila.", "KIKO")
 		if it.get("foco"):
 			S.items["f_" + it.foco] += 1
 			var ok := []
@@ -819,7 +823,7 @@ func mochila() -> void:
 				rows.append({"label": "Foco " + D.FOCOS[k].n, "right": "×" + n(S.items["f_" + k]), "ic": icono("lampara"), "desc": desc_foco(k) + "\nSe cuelga desde la vista de carpa: ▲ hasta el foco y A."})
 		for k in D.EXTRAS:
 			if S.items.get("x_" + k, 0) > 0:
-				rows.append({"label": D.EXTRAS[k].n, "right": "×" + n(S.items["x_" + k]), "desc": D.EXTRAS[k].d + "\nSe pone desde la vista de carpa: ▲ hasta el foco y A."})
+				rows.append({"label": D.EXTRAS[k].n, "right": "×" + n(S.items["x_" + k]), "desc": D.EXTRAS[k].d + "\nSe pone%s desde la vista de carpa: ▲ hasta el foco y A." % ("n" if D.EXTRAS[k].get("pl") else "")})
 		for k in S.seeds:
 			rows.append({"label": "Semilla " + strain(k).n, "right": "×" + n(S.seeds[k]), "sw": strain(k).c, "ic": icono("semillas"), "desc": strain_line(k)})
 		for e in S.esquejes:

@@ -89,7 +89,7 @@ function vcAlto(c){if(vcAltos.has(c))return vcAltos.get(c);const d=c.getContext(
   for(let i=3;i<d.length;i+=4)if(d[i]){y=Math.floor((i>>2)/c.width);break;}vcAltos.set(c,c.height-y);return c.height-y;}
 // la geometría de la vista C sobre la de la vista B (g), o null si falta arte para algo de la carpa
 function vistaC(g){
-  const {c,W,H,pl}=g,tipo=FOCOS[c.foco].tipo;if(!ARTE.ok||Object.keys(EXTRAS).some(k=>c[k]))return null;
+  const {c,W,H,pl}=g,tipo=FOCOS[c.foco].tipo;if(!ARTE.ok||Object.keys(EXTRAS).some(k=>k!=='garrafas'&&c[k]))return null;   // las garrafas no se dibujan: no la quitan
   // las campanas de sodio son foco-c-NN; las demás llevan su tipo (foco-c-cfl-NN)
   const Z=(VCA.base-VCA.boca)/(H-28),w=Math.round(W*Z),foco=vcSprite(tipo==='sodio'?'foco-c-':'foco-c-'+tipo+'-',(FOCO_CM[c.foco]||45)*Z);
   if(!fotoMisc('carpa-c-pared')||!fotoMisc('carpa-c-luz')||!foco||!foco.f)return null;

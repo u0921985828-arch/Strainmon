@@ -11,8 +11,8 @@ const SHOP=[
   {lbl:'Bocata',p:5,ch:1,item:'bocata',desc:'Recupera 15 de vida. En combate o desde la mochila.'},
   {lbl:'Spray de pimienta',p:15,ch:2,item:'spray',desc:'En combate: 12-16 de daño seguro a un ladrón.'},
   {lbl:'Maceta de tela 11 L',p:3,ch:1,maceta:'tela11'},{lbl:'Maceta de plástico 18 L',p:2,ch:2,maceta:'plastico18'},{lbl:'Maceta de tela 25 L',p:4,ch:3,maceta:'tela25'},
-  {lbl:'Foco LED 100 W',p:110,ch:1,foco:'led100'},{lbl:'Ventilador de pinza',p:20,ch:1,extra:'vent'},
-  {lbl:'Extractor con filtro de carbón',p:110,ch:2,extra:'filtro'},{lbl:'Riego por goteo',p:55,ch:3,extra:'goteo'},
+  {lbl:'Foco LED 100 W',p:110,ch:1,foco:'led100'},{lbl:'Ventilador de pinza',p:20,ch:1,extra:'vent'},{lbl:'Garrafas de riego',p:15,ch:1,extra:'garrafas'},
+  {lbl:'Extractor con filtro de carbón',p:110,ch:2,extra:'filtro'},{lbl:'Riego por goteo',p:1200,ch:4,extra:'goteo'},
   {lbl:'Foco sodio 250 W',p:85,ch:2,foco:'sodio250'},{lbl:'Foco LED 200 W',p:220,ch:2,foco:'led200'},
   {lbl:'Foco sodio 400 W',p:100,ch:3,foco:'sodio400'},{lbl:'Foco LED 480 W',p:500,ch:3,foco:'led480'},
   {lbl:'Foco sodio 600 W',p:120,ch:4,foco:'sodio600'},{lbl:'Foco LED 720 W',p:950,ch:5,foco:'led720'},
@@ -40,7 +40,7 @@ async function comprarSemillas(it){
 // vence, Toño suma INTERES. META_VENTAS: lo que hay que vender en la calle en el capítulo 2
 const DEUDA=30000,PLAZOS={3:3000,5:12000,7:15000},INTERES=.2,PREMIO_COPA=5000,SOBORNO=1500,MULTA_REDADA=3000,META_VENTAS=300;
 const yLista=l=>l.length>1?l.slice(0,-1).join(', ')+' y '+l[l.length-1]:l[0];
-for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+yLista(Object.values(CARPAS).filter(C=>FOCOS[it.foco].w<=C.wmax).map(C=>C.cm[0]))+'.';if(it.extra){const k=it.extra;it.desc=EXTRAS[k].d+'\nUno por carpa.';it.cond=()=>S.carpas.filter(c=>c&&!c[k]).length>S.items['x_'+k]+S.envio.filter(l=>l===it.lbl).length;}
+for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+yLista(Object.values(CARPAS).filter(C=>FOCOS[it.foco].w<=C.wmax).map(C=>C.cm[0]))+'.';if(it.extra){const k=it.extra;it.desc=EXTRAS[k].d+(EXTRAS[k].pl?'\nUna tanda por carpa.':'\nUno por carpa.');it.cond=()=>S.carpas.filter(c=>faltaExtra(c,k)).length>S.items['x_'+k]+S.envio.filter(l=>l===it.lbl).length;}
   if(it.aparato){const k=it.aparato;it.desc=APARATOS[k].d+'\nUno para la sala: Kiko lo deja puesto.';it.cond=()=>!S.sala[k]&&!S.envio.includes(it.lbl);}}   // lo pedido por el móvil (12b-movil) no se vuelve a vender
 // carpa comprada (en un sitio libre) o ampliada (mismo sitio, se quedan foco, extras, plantas y macetas): cada plaza
 // conserva su planta y su maceta por (carpa, plaza); las nuevas, vacías y con maceta de 7 L. La casa se vuelve a montar al entrar
@@ -70,10 +70,12 @@ async function shop(){
     if(it.item)S.items[it.item]+=it.n||1;if(it.maceta)S.items['m_'+it.maceta]++;if(it.bolsa)S.items.bolsa=it.bolsa;if(it.aparato)S.sala[it.aparato]=true;
     if(!it.foco&&!it.carpa&&!it.extra)toast('Comprado: '+it.lbl,1200);
     if(it.carpa){comprarCarpa(it.carpa,it.ci);await say(DICHO_CARPA[it.carpa],'KIKO');}
-    if(it.extra){S.items['x_'+it.extra]++;const ok=S.carpas.map((c,ci)=>c&&!c[it.extra]?ci:-1).filter(ci=>ci>=0);
-      if(!ok.length)await say('Ya tienes uno en cada carpa. Te lo guardo en la mochila.','KIKO');
-      else{const c=await ask('¿Te lo pongo ya?',ok.map(ci=>CARPAS[S.carpas[ci].t].n).concat(['Luego']),'KIKO');
-        if(c>=0&&c<ok.length){ponerExtra(ok[c],it.extra);toast('Puesto: '+it.lbl,1200);}}}
+    if(it.extra){S.items['x_'+it.extra]++;const ok=S.carpas.map((c,ci)=>faltaExtra(c,it.extra)?ci:-1).filter(ci=>ci>=0);
+      const pl=EXTRAS[it.extra].pl;
+      if(!ok.length)await say(pl?'Ya tienes unas en cada carpa. Te las guardo en la mochila.':'Ya tienes uno en cada carpa. Te lo guardo en la mochila.','KIKO');
+      else{const c=await ask(pl?'¿Te las pongo ya?':'¿Te lo pongo ya?',ok.map(ci=>CARPAS[S.carpas[ci].t].n).concat(['Luego']),'KIKO');
+        if(c>=0&&c<ok.length){const vu=it.extra==='goteo'&&S.carpas[ok[c]].garrafas;ponerExtra(ok[c],it.extra);toast((pl?'Puestas: ':'Puesto: ')+it.lbl,1200);
+          if(vu)await say('Las garrafas de esa carpa vuelven a la mochila.','KIKO');}}}
     if(it.foco){S.items['f_'+it.foco]++;const ok=S.carpas.map((c,ci)=>c&&FOCOS[it.foco].w<=CARPAS[c.t].wmax?ci:-1).filter(ci=>ci>=0);
       if(!ok.length)await say('Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande.','KIKO');
       else{const c=await ask('¿Lo cuelgo ya? El que quites va a tu mochila.',ok.map(ci=>`${CARPAS[S.carpas[ci].t].n} (${FOCOS[S.carpas[ci].foco].n})`).concat(['Luego']),'KIKO');

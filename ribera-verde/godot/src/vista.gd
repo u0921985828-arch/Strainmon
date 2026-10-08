@@ -156,7 +156,7 @@ static func vista_c(S: Dictionary, g: Dictionary):
 	var W: float = g.W
 	var tipo: String = D.FOCOS[c.foco].tipo
 	for k in D.EXTRAS:
-		if c.get(k):
+		if k != "garrafas" and c.get(k):   # las garrafas no se dibujan: no la quitan
 			return null
 	var VCA: Dictionary = D.VCA
 	var Z: float = (VCA.base - VCA.boca) / (g.H - 28)
