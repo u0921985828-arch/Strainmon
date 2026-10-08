@@ -2,7 +2,7 @@
 # PARTIDA → la intro (con el nombre escrito a mano) → el prólogo (del caserío de Mendialde a la parada y el autobús) → el piso. Allí el menú START (Genoteca, Mochila, Móvil, Plantas, Objetivo,
 # Guardar, Sonido y Salir), un paseo por la calle (la salida del felpudo y la puerta del portal) y, con lo que vendería Kiko
 # (semillas, insecticida, la carpa de 100 y un foco de sodio: la tienda la recorre historia.gd), un ciclo de cultivo entero:
-# andar hasta la carpa, abrirla (vista B con el CFL), colgar el foco (vista C), plantar las 4 plazas, cuidarlas cada mañana,
+# andar hasta la carpa, abrirla (vista C con el CFL; desde la 1.10 todo el equipo tiene arte), colgar el foco de sodio, plantar las 4 plazas, cuidarlas cada mañana,
 # volver a la cama a dormir y cosechar. Con la cosecha encima, a la calle: un agente de patrulla la ve, la sospecha llena la
 # barra, salta la alarma y el jugador escapa corriendo por el portal. Al final, CONTINUAR desde el título carga la partida tal cual.
 # Comprueba también los mandos (teclado, dedos en los mandos, varios a la vez, el ratón y Atrás), los menús en bucle, tocar el
@@ -534,9 +534,9 @@ func ciclo() -> void:
 	var frente := Vector2i(int(sitio.x), int(sitio.y) + 1)
 	check("andando (corriendo) hasta delante de la carpa de 100", await anda(frente, true))
 	await mira("up")
-	check("A delante de la carpa la abre: vista B con el CFL, la ficha y el HUD fuera", await abre_carpa() and J.VC.ci == 1 and J.pintor.modo == "carpa" and J.vc_info.visible and not J.hud.visible)
+	check("A delante de la carpa la abre: vista C con el CFL, la ficha y el HUD fuera", await abre_carpa() and J.VC.ci == 1 and J.pintor.modo == "carpaC" and J.vc_info.visible and not J.hud.visible)
 	await check_aviso("al abrir la carpa")
-	await foto("5-vista-b")
+	await foto("5-vista-c-cfl")
 	# el foco: ▲ hasta arriba, A → Cambiar foco → Sodio 400 W
 	await ir_a(geo().pl.filter(func(q): return q.fila == 1)[0].i)
 	await pulsa("up")
@@ -546,7 +546,7 @@ func ciclo() -> void:
 	await elige("Foco " + J.D.FOCOS.sodio400.n)
 	await vista_libre()
 	await espera(2)
-	check("con el foco de sodio colgado, la vista C", S.carpas[1].foco == "sodio400" and S.items.f_cfl == 1 and J.pintor.modo == "carpaC")
+	check("con el foco de sodio colgado, sigue la vista C", S.carpas[1].foco == "sodio400" and S.items.f_cfl == 1 and J.pintor.modo == "carpaC")
 	# plantar: A en cada plaza vacía → menú de semillas → la primera que quede
 	var orden := []
 	for q in geo().pl:
@@ -639,7 +639,7 @@ func ciclo() -> void:
 	var tratadas := 0
 	var danadas := 0
 	var vistas := {}
-	var modos := {"carpa": true, "carpaC": true}
+	var modos := {"carpaC": "al colgar el foco de sodio"}
 	var cosechadas := 0
 	var muertas := 0
 	var en_carpa := func():
@@ -690,7 +690,7 @@ func ciclo() -> void:
 		var ok_vuelta := await anda(frente)
 		await mira("up")
 		check("noche %d: de vuelta a la carpa andando" % noches, ok_vuelta and await abre_carpa())
-		modos[J.pintor.modo] = true
+		modos[J.pintor.modo] = "al abrir tras la noche %d" % noches
 		if noches == 1 or noches == 2:
 			await foto("8-noche%d" % noches)
 		for q in orden:
@@ -738,11 +738,12 @@ func ciclo() -> void:
 				await elige("Regar")
 				await vista_libre()
 				check("regada al 100 %", p.water == 100)
-		modos[J.pintor.modo] = true
+		modos[J.pintor.modo] = "al salir tras la noche %d" % noches
 		await pulsa("B")
 		await libre()
 	check("ha pasado por plántula, vegetativo, floración y lista", vistas.has(1) and vistas.has(2) and vistas.has(3) and vistas.has(4))
-	check("vista B y vista C (%s)" % ", ".join(modos.keys()), modos.has("carpa") and modos.has("carpaC"))
+	# con el atlas, la vista C siempre (también con plaga, secas y muertas); la B queda para cuando falta el arte
+	check("siempre la vista C (%s)" % ", ".join(modos.keys().map(func(k): return "%s %s" % [k, modos[k]])), modos.has("carpaC") and not modos.has("carpa"))
 	# con la semilla de siempre tiene que salir; con otra (--azar) puede no haber plaga, y entonces solo se dice
 	var a := OS.get_cmdline_user_args()
 	var hubo := plagas > 0 and avisos > 0 and tratadas > 0

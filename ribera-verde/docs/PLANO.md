@@ -9,8 +9,9 @@ personajes), medido contra su tamaño real. En la 1.7.0 sirvió para decidir la 
   `txaro.png`, `comisaria.png`, `almacen.png`, `mendialde.png`, `casa-ama.png`, `puerto.png`, `valdehierro.png` y
   `errotabarri.png` (rejilla, coordenadas y rótulos),
   `docs/plano/escala.png` (todos los sprites junto al jugador sobre la misma línea de suelo) y
-  `docs/plano/vista-b.png` (las 5 carpas abiertas de la vista B).
-- Datos: `docs/plano/medidas.json` (posiciones de cada mapa y las 70 medidas de abajo).
+  `docs/plano/vista-b.png` (las 5 carpas abiertas de la vista B) y, desde la 1.10, `docs/plano/vista-c.png` (las mismas por
+  dentro: la vista C, la que se ve con el atlas).
+- Datos: `docs/plano/medidas.json` (posiciones de cada mapa y las 71 medidas de abajo).
 - Se regenera con `npm run plano` (`tools/plano.js`): pinta los mapas y la vista B con el motor del juego y mide la
   caja opaca de cada fotograma, así que el plano siempre coincide con lo que se ve. La tabla de la sección 3 sale de
   `medidas.json`.
@@ -77,7 +78,7 @@ En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho del suelo de de
 |  | Unai (niño) | 14×28 | alto | 1,75 m | 1,35 m | ×1,30 |
 |  | Agente | 16×28 | alto | 1,75 m | 1,8 m | ×0,97 |
 | Mobiliario | Cama | 19×32 | ancho | 1,19 m | 0,9 m | ×1,32 |
-|  | Nevera | 18×31 | ancho | 1,13 m | 0,6 m | **×1,88** |
+|  | Nevera | 12×36 | ancho | 0,75 m | 0,6 m | ×1,25 |
 |  | Ordenador | 16×15 | ancho | 1 m | 1,2 m | ×0,83 |
 |  | Mesa genética | 16×15 | ancho | 1 m | 1,2 m | ×0,83 |
 |  | Mesa genética 2 | 16×14 | ancho | 1 m | 1,2 m | ×0,83 |
@@ -90,7 +91,7 @@ En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho del suelo de de
 |  | Taburete | 8×14 | alto | 0,88 m | 0,75 m | ×1,17 |
 |  | Mesa de bar | 14×14 | ancho | 0,88 m | 0,7 m | ×1,25 |
 |  | Gramola | 12×24 | ancho | 0,75 m | 0,7 m | ×1,07 |
-|  | Cajas | 14×15 | ancho | 0,88 m | 0,6 m | **×1,46** |
+|  | Cajas (2 de 40 cm) | 16×19 | ancho | 1 m | 0,8 m | ×1,25 |
 | Cultivo (piso, 16 px/m) | Armario 60×60 | 10×31 | ancho | 0,63 m | 0,6 m | ×1,04 |
 |  | Armario 80×80 | 13×35 | ancho | 0,81 m | 0,8 m | ×1,02 |
 |  | Carpa 100×100 | 16×39 | ancho | 1 m | 1 m | ×1,00 |
@@ -150,10 +151,12 @@ En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho del suelo de de
    de vegetativo a lista en sus 3 portes (índica 0,65 m, sativa 0,9 m e híbrida 0,7 m listas, despuntadas desde la 1.10). Solo germinando y
    plántula van a ×2, a propósito, para que se vean (5 y 15 cm reales darían 2 y 7 px).
 3. **El piso, a tamaño real.** 12 × 8 casillas (72 m² con paredes; 12 × 6 m de suelo), frente a 240 m² de la 1.7.0.
-4. **Siguen fuera de escala, sin tocar:** la nevera (×1,9) y las cajas (×1,5), que se rehacen en P5 (D5); la cama
+4. **Siguen fuera de escala, sin tocar:** la cama
    (×1,3), los personajes que no cambian de altura (Unai ×1,3, Txaro ×1,13) y los edificios comprimidos (×0,5), que es la
    convención del género. Los árboles, a escala desde la 1.10: 5,8 m (×0,97), dibujados a mano en
-   `tools/sprites/a-mano/mundo.py`, con el monte de los lindes, el seto, la parada y las fachadas de cada sitio.
+   `tools/sprites/a-mano/mundo.py`, con el monte de los lindes, el seto, la parada y las fachadas de cada sitio. La nevera
+   (antes ×1,88) y las cajas (antes ×1,46), a escala desde la 1.10 (P5, lámina 13, a mano en
+   `tools/sprites/a-mano/equipo_p5.py`): ×1,25 las dos con el contorno; la nevera mide 180 cm de alto.
 5. **Alturas corregidas en la 1.10** (retoque a mano, `tools/sprites/a-mano/alturas.py`, sin créditos): la farola
    pasa de 1,69 a 3,5 m (×0,88), el mostrador y la barra del bar de 0,69 a 1 m (la barra, ya más alta que los
    taburetes) y la gramola de 1 a 1,5 m. Lo que cuelga de la pared ya no se pinta a ras de suelo (`ALZA` en

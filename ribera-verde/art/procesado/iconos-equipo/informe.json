@@ -1,0 +1,19 @@
+{
+  "grupo": "iconos-equipo",
+  "celda": [
+    16,
+    16
+  ],
+  "tope_colores": 15,
+  "secuencias": 7,
+  "fotogramas": 7,
+  "semitransparentes": 0,
+  "en_paleta_antes": 59.2,
+  "distancia_media": 0,
+  "colores_finales": 10,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

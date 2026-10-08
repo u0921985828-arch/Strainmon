@@ -173,8 +173,18 @@ static func icono(n: String):
 		return null
 	if not ico.has(n):
 		var f = frame_de("iconos", n, "unica", 0, {"i": 0})
+		if f == null:
+			f = frame_de("iconos-equipo", n, "unica", 0, {"i": 0})
 		ico[n] = tex(f.c) if f else null
 	return ico[n]
+
+# el icono del equipo (lámina 12): los LED, su panel; los demás focos, la lámpara; armarios (60 y 80) y carpas; cada extra, el suyo
+const ICX := {"vent": "ventilador", "filtro": "filtro", "garrafas": "garrafa", "goteo": "goteo"}
+static func ico_foco(k: String) -> String:
+	return "led" if Datos.carga().FOCOS.has(k) and Datos.carga().FOCOS[k].tipo == "led" else "lampara"
+
+static func ico_carpa(t: String) -> String:
+	return "armario" if t == "p60" or t == "p80" else "carpa"
 
 static func icono_cogollo(S, sid: String):
 	if not ok:

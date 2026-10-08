@@ -59,7 +59,7 @@ async function shop(){
   for(;;){
     const list=SHOP.filter(it=>S.ch>=it.ch&&(!it.cond||it.cond()));
     const IC={fert:'abono',insect:'insecticida',spray:'spray',bocata:'bocadillo'};
-    const items=list.map(it=>({label:it.lbl,right:eur(it.p)+(it.sid?'/u':''),sw:it.sid?STRAINS[it.sid].c:null,ic:it.sid?icono('semillas'):it.item?icono(IC[it.item]):it.maceta?icono('maceta'):it.foco?icono('lampara'):null,desc:it.sid?strainLine(it.sid):it.desc}));
+    const items=list.map(it=>({label:it.lbl,right:eur(it.p)+(it.sid?'/u':''),sw:it.sid?STRAINS[it.sid].c:null,ic:it.sid?icono('semillas'):it.item?icono(IC[it.item]):it.maceta?icono('maceta'):it.foco?icono(icoFoco(it.foco)):it.extra?icono(ICX[it.extra]):it.carpa?icono(icoCarpa(it.carpa)):null,desc:it.sid?strainLine(it.sid):it.desc}));
     items.push({label:'Salir',desc:'Volver al mostrador.'});
     i=await menu(items,{cls:'full',title:'GROWSHOP KIKO',title2:'Tienes '+eur(S.money),desc:true,initial:i});
     if(i<0||i>=list.length)break;

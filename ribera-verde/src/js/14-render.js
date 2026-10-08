@@ -16,7 +16,7 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
   const m=MAPS[S.map],cam=camFija||camera();
   ctx.fillStyle='#000';ctx.fillRect(0,0,SW,SH);
   const wf=Math.floor(now/500)%2,tx0=Math.floor(cam.x/16),ty0=Math.floor(cam.y/16);
-  const list=[];
+  const list=[],sombras=[];
   // hasta 6 filas por debajo y 2 casillas a cada lado de la pantalla (1.10): los objetos altos (el árbol, de 6 filas; el monte, 3 de
   // ancho) se ven aunque su pie esté fuera; antes la copa salía de golpe al entrar el pie
   for(let ty=ty0;ty<=ty0+SH/16+6;ty++)for(let tx=tx0-2;tx<=tx0+Math.ceil(SW/16)+2;tx++){
@@ -25,8 +25,9 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
     if(!arteTile(k,tx,ty,sx,sy,now))ctx.drawImage(a[a.length>1?wf:0],sx,sy);
     else arteOrilla(m,k,tx,ty,sx,sy);
     const o=m.o[ty][tx];
-    if(o&&o!=='carpa'&&!arteObj(o,tx,ty,cam,now,list))ctx.drawImage(TILES[o][0],sx,sy);
+    if(o&&o!=='carpa'&&!arteObj(o,tx,ty,cam,now,list,sombras))ctx.drawImage(TILES[o][0],sx,sy);
   }
+  ctx.fillStyle='rgba(0,0,0,.22)';for(const r of sombras)ctx.fillRect(...r);
   arteEdificios(m,cam);
   if(S.map==='home'){
     // carpas: muebles de 1-2 casillas, pintados enteros desde su base (tapan al jugador si pasa por detrás); con plantas,
@@ -48,8 +49,14 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
   const bob=Math.floor(now/400)%2;
   for(const e of ents){const bx=Math.round(e.px-cam.x)+4,by=Math.round(e.py-cam.y)-16+bob;
     if(e.def.client)bubble(bx,by,...e.def.client.type==='ext'?['gota','#d08a10']:['$','#2a9a4a']);else if(storyMark(e.id)||e.caza)bubble(bx,by,'!','#e03030');}
+  // el piso de noche (1.10 P5): se oscurece como la calle y cada carpa encendida deja delante una mancha de la luz de su foco
+  if(S.map==='home'){const a=nocheA();
+    if(a>0){ctx.fillStyle=`rgba(14,20,72,${a})`;ctx.fillRect(0,0,SW,SH);ctx.globalCompositeOperation='lighter';
+      for(const t of m.carpas){if(!plantasVivas(t.ci))continue;const xc=(t.x0+t.x1+1)*8-cam.x,yb=t.y*16+15-cam.y,k=FOCO_LUZ[FOCOS[S.carpas[t.ci].foco].tipo];
+        const g=ctx.createRadialGradient(xc,yb+5,1,xc,yb+5,18);g.addColorStop(0,k+(a*1.2)+')');g.addColorStop(1,k+'0)');ctx.fillStyle=g;ctx.fillRect(xc-20,yb-4,40,24);}
+      ctx.globalCompositeOperation='source-over';}}
   if(ZONAS[S.map]){
-    const h=S.min/60;let a=h>=21||h<5?.5:h>=19?(h-19)/2*.5:h<7?(7-h)/2*.5:0;
+    const h=S.min/60;let a=nocheA();
     if(h>=17.5&&h<20.5){ctx.fillStyle=`rgba(255,130,50,${.13*Math.sin((h-17.5)/3*Math.PI)})`;ctx.fillRect(0,0,SW,SH);}
     if(a>0){ctx.fillStyle=`rgba(14,20,72,${a})`;ctx.fillRect(0,0,SW,SH);
       if(a>.2){ctx.globalCompositeOperation='lighter';for(const [lx,ly] of LAMPS[S.map]){const x=lx*16+8-cam.x,y=ly*16+2-cam.y;if(x<-30||y<-30||x>SW+30||y>SH+30)continue;
@@ -57,6 +64,8 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
         ctx.globalCompositeOperation='source-over';}}
   }
 }
+// lo oscura que está la noche (0 de día, .5 de 21 a 5, en rampa de 19 a 21 y de 5 a 7)
+function nocheA(){const h=S.min/60;return h>=21||h<5?.5:h>=19?(h-19)/2*.5:h<7?(7-h)/2*.5:0;}
 /* ---------- luz de los focos y caché de la carpa (09b-carpa.js) ---------- */
 const FOCO_LUZ={cfl:'rgba(220,240,255,',sodio:'rgba(255,170,70,',led:'rgba(240,170,255,'};
 const carpaCache={};

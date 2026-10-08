@@ -14,6 +14,7 @@ const Atlas = preload("res://src/atlas.gd")
 const Cultivo = preload("res://src/cultivo.gd")
 const Procedural = preload("res://src/procedural.gd")
 const Vista = preload("res://src/vista.gd")
+const Arte = preload("res://src/arte.gd")
 
 const SH := 160
 const DIR4 := {"down": "south", "up": "north", "left": "west", "right": "east"}
@@ -192,6 +193,7 @@ func _mundo() -> void:
 	var tx0 := floori(cam.x / 16.0)
 	var ty0 := floori(cam.y / 16.0)
 	var list := []
+	var sombras := []
 	# hasta 6 filas por debajo y 2 casillas a cada lado de la pantalla (1.10, 14-render.js): los objetos altos (el árbol, de 6
 	# filas; el monte, 3 de ancho) se ven aunque su pie esté fuera
 	for ty in range(ty0, ty0 + SH / 16 + 7):
@@ -205,7 +207,9 @@ func _mundo() -> void:
 				_arte_orilla(m, k, tx, ty, sx, sy)
 			var o = m.o[ty][tx]
 			if o and o != "carpa":
-				_arte_obj(o, tx, ty, list)
+				_arte_obj(o, tx, ty, list, sombras)
+	for r in sombras:
+		_rect(r[0], r[1], r[2], r[3], Color8(0, 0, 0, 56))
 	_arte_edificios(m)
 	if S.map == "home":
 		for t in m.get("carpas", []):
@@ -250,6 +254,9 @@ func _mundo() -> void:
 				_bocadillo(bx, by, "$", css("#2a9a4a"))
 		elif story_mark(e.id) or e.get("caza"):
 			_bocadillo(bx, by, "!", css("#e03030"))
+	# el piso de noche (1.10 P5): se oscurece como la calle; la mancha de luz de cada carpa encendida, en _farolas
+	if S.map == "home" and noche() > 0:
+		_rect(0, 0, J.SW, SH, Color8(14, 20, 72, Datos.jsround(noche() * 255)))
 	if J.D.ZONAS.has(S.map):
 		var h: float = S.min / 60.0
 		if h >= 17.5 and h < 20.5:
@@ -264,6 +271,8 @@ func noche() -> float:
 
 # las farolas con la noche cerrada: un degradado radial (r 1 → 28) sumado a lo que hay ('lighter')
 func _farolas() -> void:
+	if J.S.map == "home":
+		_manchas()
 	if not J.D.ZONAS.has(J.S.map):   # farolas de cada zona de fuera (1.10)
 		return
 	var a := noche()
@@ -276,6 +285,35 @@ func _farolas() -> void:
 		if x < -30 or y < -30 or x > J.SW + 30 or y > SH + 30:
 			continue
 		_img(im, x - 30, y - 22)
+
+# delante de cada carpa encendida, de noche, la luz de su foco en el suelo: degradado radial (r 1 → 18) desde (xc, yb + 5), en la
+# mitad de abajo (40 × 24 desde (xc − 20, yb − 4)), sumado a lo que hay
+func _manchas() -> void:
+	var a := noche()
+	if a <= 0:
+		return
+	var m: Dictionary = J.MAPS[J.S.map]
+	for t in m.get("carpas", []):
+		if not J.plantas_vivas(t.ci):
+			continue
+		var xc: int = (t.x0 + t.x1 + 1) * 8 - cam.x
+		var yb: int = t.y * 16 + 15 - cam.y
+		_img(_mancha(a, J.D.FOCOS[J.S.carpas[t.ci].foco].tipo), xc - 20, yb - 4)
+
+func _mancha(a: float, tipo: String) -> Image:
+	var key := "mancha|%f|%s" % [a, tipo]
+	if cache.has(key):
+		return cache[key]
+	var c := css(J.D.FOCO_LUZ[tipo] + "1)")
+	var im := Image.create(40, 24, false, Image.FORMAT_RGBA8)
+	for y in 24:
+		for x in 40:
+			var d := Vector2(x + .5 - 20, y + .5 - 9).length()
+			var t := clampf((d - 1) / 17.0, 0, 1)
+			var al := minf(1, a * 1.2) * (1 - t)
+			im.set_pixel(x, y, Color8(Datos.jsround(c.r8 * al), Datos.jsround(c.g8 * al), Datos.jsround(c.b8 * al), 255))
+	cache[key] = im
+	return im
 
 func _farola(a: float) -> Image:
 	var key := "far|%f" % a
@@ -372,7 +410,10 @@ func _arte_orilla(m: Dictionary, k: String, tx: int, ty: int, sx: int, sy: int) 
 # los de la pared, subidos a su altura (1.10, ALZA de 01b-arte.js: px)
 const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13}
 
-func _arte_obj(o: String, tx: int, ty: int, list: Array) -> void:
+# los muebles que dejan sombra en el suelo (1.10 P5, SOMBRA_OBJ de 01b-arte.js): 1 px a cada lado del dibujo en sus 2 últimas filas
+# y la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo; se pintan con todo el suelo ya puesto
+const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "plantDeco", "lab", "lab2", "pc", "display", "counter", "barcounter", "jukebox", "bench", "bedB"]
+func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var gr = Atlas.cubre("obj:" + o)
 	if not gr:
 		return
@@ -383,6 +424,19 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array) -> void:
 		return
 	var xp: int = tx * 16 + 8 + d.dx - cam.x
 	var yp: int = ty * 16 + 15 + d.dy + int(ALZA.get(o, 0)) - cam.y
+	if o in SOMBRA_OBJ:
+		var m: Dictionary = J.MAPS[J.S.map]
+		var ob := func(x: int, y: int) -> bool: return y >= 0 and y < m.o.size() and x >= 0 and x < m.o[y].size() and m.o[y][x] != null and m.o[y][x] != ""
+		var bb: Array = Arte.caja(f.c)
+		var x0: int = Datos.jsround(xp - f.cel.ancla[0]) + int(bb[0])
+		var x1: int = x0 + int(bb[1]) - int(bb[0])
+		var sx: int = tx * 16 - cam.x
+		if x0 - 1 >= sx or not ob.call(tx - 1, ty):
+			sombras.append([x0 - 1, yp - 1, 1, 2])
+		if x1 + 1 <= sx + 15 or not ob.call(tx + 1, ty):
+			sombras.append([x1 + 1, yp - 1, 1, 2])
+		if not ob.call(tx, ty + 1):
+			sombras.append([x0, yp + 1, x1 - x0 + 1, 1])
 	if f.cel.h > 16:
 		list.append([ty * 16 + mini(0, d.dy), _pinta.bind(f, xp, yp)])   # corrido hacia abajo, no pasa delante de quien está en su fila
 	else:

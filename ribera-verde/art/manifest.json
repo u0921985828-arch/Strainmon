@@ -462,6 +462,36 @@
    ],
    "ajuste": "pies",
    "nota": "manzano de las huertas (orgánico): 3,5 m, copa ancha y baja"
+  },
+  "foco_c_ancho": {
+   "w": 80,
+   "h": 16,
+   "ancla": [
+    40,
+    15
+   ],
+   "ajuste": "exacto",
+   "nota": "foco ancho de la vista C (LED 480 y 720): centro de la boca en (40, 15); el motor lo centra en x 120 con la boca en y 16"
+  },
+  "extra_c": {
+   "w": 48,
+   "h": 48,
+   "ancla": [
+    24,
+    47
+   ],
+   "ajuste": "exacto",
+   "nota": "extras de la vista C (ventilador, filtro, garrafa, llave y depósito pequeño): la base centrada en (24, 47)"
+  },
+  "mueble_escala": {
+   "w": 32,
+   "h": 48,
+   "ancla": [
+    16,
+    47
+   ],
+   "ajuste": "exacto",
+   "nota": "muebles del piso a escala real (16 px/m, 1.10 P5): el frente a su ancho y alto y la tapa a medio fondo, como las carpas del piso; base centrada en (16, 47)"
   }
  },
  "fases": [
@@ -5057,7 +5087,6 @@
     "obj:fence",
     "obj:sign",
     "obj:bench",
-    "obj:crate",
     "obj:bush",
     "obj:pc",
     "obj:lab",
@@ -5158,7 +5187,7 @@
    },
    "descripcion": "set of small 16-bit town and interior props, same style as the reference sheet",
    "celda": "objeto_1x1",
-   "notas": "Sin size: las imágenes de estilo (16×16) fijan el tamaño, así que salen 64 candidatos en revisión. Elige con select_object_frames y descarta el resto con dismiss_review. Lo que cuelga de la pared (botellas, ventana interior, póster) se encaja con «exacto» (ajuste_por_sprite): conserva su altura en la casilla en vez de apoyarse en el suelo.",
+   "notas": "Sin size: las imágenes de estilo (16×16) fijan el tamaño, así que salen 64 candidatos en revisión. Elige con select_object_frames y descarta el resto con dismiss_review. Lo que cuelga de la pared (botellas, ventana interior, póster) se encaja con «exacto» (ajuste_por_sprite): conserva su altura en la casilla en vez de apoyarse en el suelo. 1.10 (P5): las cajas pasan a props-escala, a su tamaño real.",
    "estado": "aprobado",
    "animaciones": [
     {
@@ -5273,7 +5302,6 @@
    "fase": "F4",
    "herramienta": "create_1_direction_object",
    "cubre": [
-    "obj:fridge",
     "obj:bedT",
     "obj:bedB"
    ],
@@ -5290,7 +5318,7 @@
    ],
    "descripcion": "larger 16-bit indoor props that overhang their tile",
    "celda": "objeto_alto",
-   "notas": "La cama ocupa bedT+bedB (16×32). Los props altos de exterior (árbol, farola, fuente) van aparte con create_map_object para casar con el suelo.",
+   "notas": "La cama ocupa bedT+bedB (16×32). Los props altos de exterior (árbol, farola, fuente) van aparte con create_map_object para casar con el suelo. 1.10 (P5): la nevera pasa a props-escala, a su tamaño real.",
    "estado": "aprobado",
    "familia": "objeto-lote",
    "lote": "lote-32",
@@ -6682,6 +6710,175 @@
    "notas": "1.10 P3. Porte i/h/s × ancho 38 (todas las carpas) y 32 (la fila de atrás de la de 120, donde las vecinas quedan a 34 px): floración y lista planta-c-<porte>-<ancho> y vegetativo planta-c-<porte>2-<ancho>, un fotograma cada 2 px de alto (00 el más alto) entre los altos que se ven en las carpas: índica 66-40 y 36-24, híbrida 72-44 y 42-28, sativa 92-54 (con 32 de ancho, 80-54: más alta se sale) y 46-32. El motor dibuja el fotograma de su alto (vcAltura) y le quita la fila que sobre (vcAplasta). Germinando (8 × 8) y plántula (16 × 28), las de carpa-c-plantas-h, para los tres portes. Paleta A: hoja y tallo #0d2620 #1b4630 #2f7038 #57a33e #94d255, tallo tierno #71984a #3b5a2e, tricoma #f2f4dc, pistilos #f08a3c #b45a28 y el cogollo en la rampa clave magenta; el motor pone el color de la variedad al cogollo (+50, tal cual, −60) y su tono de hoja (STRAINS[k].hj) a los verdes de la hoja y el tallo. Como mucho 13 colores por sprite.",
    "montaje": "tal cual (exporta.py), un PNG por alto, ya en la celda de 40 × 96 con el tallo en las columnas 19-20 (ajuste exacto); la luz la pone el motor",
    "aprobado": "2026-10-07: planta A con la genética (lámina gen4), «Me vale». El vegetativo es nuevo en esta entrega: pendiente de su visto bueno. 2026-10-07: «Parecen peras las bolas de bajo»: yemas de los nudos y cogollitos de la cola rehechos, anchos arriba y estrechos abajo (cola2.py, YEMA de planta_a.py); pendiente de su visto bueno"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "paleta": "propia",
+   "estilo_ref": "la campana y la maceta aprobadas de la imagen A (carpa-c-focos, carpa-c-macetas) y la vista C plateada",
+   "tipo": "objeto",
+   "id": "carpa-c-focos-led",
+   "coste_real": 0,
+   "cubre": [
+    "misc:foco-c-led100-26",
+    "misc:foco-c-led100-20",
+    "misc:foco-c-led200-30",
+    "misc:foco-c-led200-24",
+    "misc:foco-c-cfl-25"
+   ],
+   "celda": "foco_c",
+   "ajuste_por_sprite": {
+    "foco-c-led100-26": "exacto",
+    "foco-c-led100-20": "exacto",
+    "foco-c-led200-30": "exacto",
+    "foco-c-led200-24": "exacto",
+    "foco-c-cfl-25": "exacto"
+   },
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_c.py",
+   "descripcion": "Focos de la vista C que faltaban: LED 100 (panel pequeño), LED 200 (panel con la fuente encima) y LED 480 (placa grande en su marco con la fuente), de frente y algo desde abajo, colgados de sus cuerdas con trinquete y con la cara de diodos encendida (blanca y rosa); y el CFL de las carpas de 200 cm.",
+   "notas": "1.10 P3. A su ancho real en cada carpa (FOCO_CM × Z): LED 100, 26 (armario 60) y 20 (80 y las de 200 cm, dentro del 25 %); LED 200, 30 y 24; LED 480, 47 (solo en las de 100 a 150, por vatios). Nombres con el modelo (foco-c-led100-NN): dos LED del mismo ancho no son el mismo foco. foco-c-cfl-25: la campana aprobada foco-c-cfl-36 sin 9 columnas ni 3 filas (repartidas, ni el contorno ni el tubo), sin colores nuevos; 25 px y no 27 para que el armario 80 (31) siga con la de 34. Paleta de la campana aprobada (metal #202e34 #304046 #3d4c4e #7a8584, contorno negro) y diodos #ffffff #f8d8ff #f8c0f8 (apagados, gris: vcApagado). Su luz, carpa-c-luz con el color del LED (LUZ_C).",
+   "montaje": "tal cual (equipo_c.py), ya en la celda con la boca en la fila 15, centrada (ajuste exacto)",
+   "aprobado": "2026-10-08: lámina B de la vista C (LED 720 con extras y goteo, LED 480, LED 200 con garrafas, CFL de 25 px, muertas y sombras), aprobada por la persona: «Mola»"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "paleta": "propia",
+   "estilo_ref": "la campana y la maceta aprobadas de la imagen A (carpa-c-focos, carpa-c-macetas) y la vista C plateada",
+   "tipo": "objeto",
+   "id": "carpa-c-focos-led-ancho",
+   "coste_real": 0,
+   "cubre": [
+    "misc:foco-c-led480-47",
+    "misc:foco-c-led720-78"
+   ],
+   "celda": "foco_c_ancho",
+   "ajuste_por_sprite": {
+    "foco-c-led480-47": "exacto",
+    "foco-c-led720-78": "exacto"
+   },
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_c.py",
+   "descripcion": "LED 480 (la placa de carpa-c-focos-led: 47 px no caben en la celda de 48 sin tocar su borde) y LED 720 de la vista C: marco ancho con 6 barras de fondo a fondo; de frente, el travesaño, la fuente encima y la punta de cada barra con su cara de diodos encendida.",
+   "notas": "1.10 P3. LED 480: 60 cm × 0,78 = 47 px. LED 720: 100 cm × 0,78 = 78 px (las de 120 y 150, las únicas con vatios para él). Misma paleta que carpa-c-focos-led.",
+   "montaje": "tal cual (equipo_c.py), en la celda de 80 × 16 con la boca en la fila 15, centrada",
+   "aprobado": "2026-10-08: lámina B de la vista C (LED 720 con extras y goteo, LED 480, LED 200 con garrafas, CFL de 25 px, muertas y sombras), aprobada por la persona: «Mola»"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "paleta": "propia",
+   "estilo_ref": "la campana y la maceta aprobadas de la imagen A (carpa-c-focos, carpa-c-macetas) y la vista C plateada",
+   "tipo": "objeto",
+   "id": "carpa-c-macetas-b",
+   "coste_real": 0,
+   "cubre": [
+    "misc:maceta-c-tela11-26",
+    "misc:maceta-c-tela11-20",
+    "misc:maceta-c-tela25-27",
+    "misc:maceta-c-plastico18-26",
+    "misc:maceta-c-plastico18-23"
+   ],
+   "celda": "maceta_c",
+   "ajuste_por_sprite": {
+    "maceta-c-tela11-26": "exacto",
+    "maceta-c-tela11-20": "exacto",
+    "maceta-c-tela25-27": "exacto",
+    "maceta-c-plastico18-26": "exacto",
+    "maceta-c-plastico18-23": "exacto"
+   },
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_c.py",
+   "descripcion": "Macetas de la vista C que faltaban: tela de 11 L (gris) y de 25 L (beis), cilindros de lados rectos con el borde vuelto y cosido, asas a los lados, la trama de la tela y la tierra dentro; plástico de 18 L, la de 7 L aprobada más ancha y más alta.",
+   "notas": "1.10 P3. A la escala de la de 7 L aprobada (22 × 27 px para 22 × 20 cm a Z 1,02): ancho = diámetro × Z y alto = alto × Z × 1,3. Tela 11 (Ø 25): 26 (armario 60) y 20 (80 y las de 200 cm); plástico 18 (Ø 30): 26 (80) y 23 (200 cm); tela 25 (Ø 35): 27 (200 cm). Cada carpa admite las de su tope por maceta (CARPAS[t].lmax). El motor elige por ancho (maceta-c-<tipo>-NN; la de 7 L sigue siendo maceta-c-NN).",
+   "montaje": "tela: dibujada en código (equipo_c.py); plástico 18: maceta-c-22 aprobada con columnas y filas del cuerpo repetidas, sin colores nuevos. Base centrada en (16, 31) (ajuste exacto)",
+   "aprobado": "2026-10-08: lámina B de la vista C (LED 720 con extras y goteo, LED 480, LED 200 con garrafas, CFL de 25 px, muertas y sombras), aprobada por la persona: «Mola»"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "paleta": "propia",
+   "estilo_ref": "la campana y la maceta aprobadas de la imagen A (carpa-c-focos, carpa-c-macetas) y la vista C plateada",
+   "tipo": "objeto",
+   "id": "carpa-c-extras",
+   "coste_real": 0,
+   "cubre": [
+    "misc:extra-c-vent",
+    "misc:extra-c-filtro-28",
+    "misc:extra-c-filtro-39",
+    "misc:extra-c-garrafa-20",
+    "misc:extra-c-garrafa-23",
+    "misc:extra-c-garrafa-26",
+    "misc:extra-c-garrafa-29",
+    "misc:extra-c-llave",
+    "misc:extra-c-deposito"
+   ],
+   "celda": "extra_c",
+   "ajuste_por_sprite": {
+    "extra-c-vent": "exacto",
+    "extra-c-filtro-28": "exacto",
+    "extra-c-filtro-39": "exacto",
+    "extra-c-garrafa-20": "exacto",
+    "extra-c-garrafa-23": "exacto",
+    "extra-c-garrafa-26": "exacto",
+    "extra-c-garrafa-29": "exacto",
+    "extra-c-llave": "exacto",
+    "extra-c-deposito": "exacto"
+   },
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_c.py",
+   "descripcion": "Extras de la vista C: ventilador de pinza (cabeza de frente con rejilla y 3 aspas, 4 fotogramas girando), filtro de carbón de chapa perforada colgado de 2 cintas con el extractor en línea y el tubo flexible al techo (2 largos), garrafa de riego translúcida con asa y tapón con gotero (4 altos), llave del microtubo del goteo y el depósito del goteo en pequeño con su mirilla.",
+   "notas": "1.10 P3. Ventilador (Ø 15 cm): en el poste del fondo derecho, a 60 cm del suelo, girando más deprisa que la planta se mueve; filtro de 100 mm (Ø 17 × 30 cm: 28 px, armario 60 y 80) y de 150 (Ø 20 × 50: 39 px, las de 200 cm), colgado arriba a la izquierda, el extractor tiembla 1 px; garrafas de 5, 7, 12 y 16 L a su alto real × Z (de 20 a 29 px), detrás a la derecha de su maceta, con el agua (#9ab8cc) hasta su nivel pintada por el motor en los píxeles «dentro» (#e6eef2); goteo: la manguera entra por la pared derecha y corre por el suelo detrás de cada fila, cada maceta con su microtubo y su llave; el depósito, fuera de la carpa, en pequeño arriba a la derecha con el nivel en la mirilla (#16263a vacía, #8ec8f0 el agua).",
+   "montaje": "tal cual (equipo_c.py), base centrada en (24, 47) (ajuste exacto)",
+   "aprobado": "2026-10-08: lámina B de la vista C (LED 720 con extras y goteo, LED 480, LED 200 con garrafas, CFL de 25 px, muertas y sombras), aprobada por la persona: «Mola»"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "paleta": "propia",
+   "estilo_ref": "los iconos aprobados (iconos) y el equipo de la vista C",
+   "tipo": "icono",
+   "id": "iconos-equipo",
+   "coste_real": 0,
+   "cubre": [],
+   "celda": "icono",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_p5.py",
+   "descripcion": "Lámina 12: iconos de 16 px del equipo nuevo: armario y carpa cerrados (tela negra, techo plateado y la puerta de cremallera), panel LED con su fuente y la cara de diodos, ventilador de pinza, filtro de carbón con su extractor, garrafa de riego con el agua y riego por goteo (depósito con mirilla, bomba y goteros).",
+   "notas": "1.10 P5. icono(nombre) los busca en «iconos» y, si no, aquí. Tienda, mochila, lista de plantas y menús de foco: armario (armarios de 60 y 80), carpa (100, 120 y 150), led (los 4 LED), ventilador, filtro, garrafa y goteo. Contorno #2a2a34 como los aprobados.",
+   "montaje": "tal cual (equipo_p5.py), 16 × 16 (ajuste exacto)",
+   "aprobado": "2026-10-08: láminas 12 y 13 (iconos del equipo, nevera y cajas a escala, con el piso de día y de noche y el almacén), aprobadas por la persona: «Mola»"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "paleta": "propia",
+   "estilo_ref": "los props aprobados del piso (props-16, props-32) a escala real",
+   "tipo": "objeto",
+   "id": "props-escala",
+   "coste_real": 0,
+   "cubre": [
+    "obj:fridge",
+    "obj:crate"
+   ],
+   "celda": "mueble_escala",
+   "ajuste_por_sprite": {
+    "fridge": "exacto",
+    "crate": "exacto"
+   },
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_p5.py",
+   "descripcion": "Lámina 13: la nevera de 60 × 180 cm (frente de 10 × 29 px, tapa de 5, congelador abajo) y las cajas de madera de 40 cm (dos abajo y una encima, 7 × 7 de frente y 3 de tapa) a 16 px/m.",
+   "notas": "1.10 P5. Sustituyen a fridge (props-32) y crate (props-16), que eran de una casilla entera: la nevera medía 16 × 30 y la caja 14 × 13. Como las carpas del piso: frente a su tamaño real y tapa a medio fondo. Dentro de la lista de profundidad (más altas que 16): tapan al jugador si pasa por detrás.",
+   "montaje": "tal cual (equipo_p5.py), base en (16, 47) (ajuste exacto)",
+   "aprobado": "2026-10-08: láminas 12 y 13 (iconos del equipo, nevera y cajas a escala, con el piso de día y de noche y el almacén), aprobadas por la persona: «Mola»"
   },
   {
    "id": "tiles-firmes",

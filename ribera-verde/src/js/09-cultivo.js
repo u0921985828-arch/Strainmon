@@ -181,7 +181,7 @@ const focosLibres=ci=>Object.keys(FOCOS).filter(k=>S.items['f_'+k]>0&&FOCOS[k].w
 function instalarFoco(ci,k){const c=S.carpas[ci];S.items['f_'+k]--;S.items['f_'+c.foco]=(S.items['f_'+c.foco]||0)+1;c.foco=k;sfx('sel');}
 async function cambiarFoco(ci){
   const l=focosLibres(ci);if(!l.length)return say('No tienes otro foco que aguante esta carpa.');
-  const j=await menu(l.map(k=>({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],ic:icono('lampara'),desc:descFoco(k)})),{cls:'full',title:'CAMBIAR FOCO',title2:'Ahora: '+FOCOS[S.carpas[ci].foco].n,desc:true});
+  const j=await menu(l.map(k=>({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],ic:icono(icoFoco(k)),desc:descFoco(k)})),{cls:'full',title:'CAMBIAR FOCO',title2:'Ahora: '+FOCOS[S.carpas[ci].foco].n,desc:true});
   if(j<0)return;instalarFoco(ci,l[j]);return say(`Cuelgas el foco ${FOCOS[l[j]].n}. El viejo va a la mochila.`);
 }
 const extrasLibres=ci=>Object.keys(EXTRAS).filter(k=>faltaExtra(S.carpas[ci],k)&&S.items['x_'+k]>0);

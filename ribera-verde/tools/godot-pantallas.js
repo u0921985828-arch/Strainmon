@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
   Ribera Verde — pantallas de prueba para el port de Godot (godot/tests/pantallas.gd): el HTML monta cada escena (mapa, hora,
-  jugador, personajes con sus acciones, clientes, objetos, efectos, combate, título o carpa en la vista B), la pinta con su
+  jugador, personajes con sus acciones, clientes, objetos, efectos, combate, título o carpa en la vista C), la pinta con su
   render de siempre (renderWorld, renderBattle, renderTitle, renderCarpa) a su ancho (SW de 240 a 400) y guarda:
   - tools/salida/godot/html-p-<escena>.png: lo que pinta el HTML;
   - godot/tests/pantallas.json: el estado de cada escena tal cual (S, P, personajes, combate, carpa abierta, efectos y el instante),
@@ -32,6 +32,11 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
   { k: 'casa-b', sw: 320, mode: 'world', now: T + 777, S: { ch: 4, flags: { letter: true, kiko1: true } }, carpas: [{ t: 'p80', foco: 'led200' }],
     pots: { 1: pl('txoko', .7) }, map: 'home', P: { x: 8, y: 4, dir: 'left', act: { n: 'cruzar', t0: T + 777 - 300 } },
     vfx: [['vfx-polen', 8 * 16 + 8, 4 * 16 - 4, 300, 'home', false]] },
+  // el piso de noche (1.10 P5): oscuro, con la mancha de luz de cada carpa encendida (sodio y LED) delante de su puerta, y las
+  // sombras de los muebles (nevera y cajas a escala); la tercera carpa, sin plantas, sin mancha
+  { k: 'casa-noche', sw: 400, mode: 'world', now: T + 321, S: { ch: 5, min: 23 * 60 + 30, flags: { letter: true, kiko1: true } },
+    carpas: [{ t: 'p80', foco: 'sodio250' }, { t: 'm100', foco: 'led480' }, { t: 'm120', foco: 'cfl' }],
+    pots: { 0: pl('ria', .5), 3: pl('limon', .8) }, map: 'home', P: { x: 4, y: 6, dir: 'left' } },
   // la plaza de día: el jugador andando, policía con la radio, Molina fumando (con su humo), clientes (uno andando), Patxi y su
   // paloma, bocadillos, la fuente animada y monedas
   { k: 'calle-plaza', sw: 320, mode: 'world', now: T, seed: 4242, S: { ch: 6, min: 12 * 60, day: 3, rep: 30, flags: { darko1: true } }, clientes: true,
@@ -76,20 +81,21 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
     P: { x: 19, y: 21, dir: 'left', moving: true, fx: 20, fy: 21, t: 60, dur: 240, parity: 1, px: (20 - 60 / 240) * 16, py: 21 * 16 },
     ents: { pat0: { x: 22, y: 21, fx: 23, fy: 21, px: (23 - 105 / 210) * 16, py: 21 * 16, dir: 'left', moving: true, t: 105, caza: true, dur: 210 } },
     SOSP: { v: 100, alarma: 'pat0' } },
-  // la vista B: carpa de 150 con extras (goteo con el depósito a 400 de 975 L, sus ramales, llaves y microtubos; filtro y
-  // ventilador), macetas de todo tipo, fases, plaga, seca y muerta; elegida una plaza de atrás (la fila de delante en transparencia)
-  { k: 'carpa-b-g150', sw: 240, mode: 'carpa', now: T + 1234, S: { ch: 5, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },
+  // la vista C con todo (1.10, antes en la vista B): carpa de 150 con extras (goteo con el depósito a 400 de 975 L en la mirilla,
+  // sus ramales, llaves y microtubos; filtro y ventilador), macetas de todo tipo, fases, plaga, seca y muerta; elegida una plaza de
+  // atrás (la fila de delante en transparencia)
+  { k: 'carpa-c-g150', sw: 240, mode: 'carpa', now: T + 1234, S: { ch: 5, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },
     carpas: [{ t: 'g150', foco: 'sodio600', goteo: true, dep: 400, filtro: true, vent: true }],
     macetas: ['plastico7', 'tela11', 'plastico18', 'tela25', 'plastico7', 'tela25'],
     pots: { 0: pl('malawi', 1), 1: pl('thai', .7, { pest: true, health: 50 }), 2: pl('kif', .05), 3: pl('ria', .5, { water: 0 }), 4: pl('nepal', .9, { dead: true }), 5: pl('lamb', .3) },
     VC: { ci: 0, sel: 4 }, vfx: [['vfx-gotas', 120, 100, 200, 'home', false]] },
-  // armario 80 con LED (sin campana: vista B) y el foco elegido; ancho de 360
-  { k: 'carpa-b-p80', sw: 360, mode: 'carpa', now: T + 99, S: { ch: 4, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },
+  // armario 80 con LED de 200 (su panel en la vista C) y macetas de 18 y 7 L, elegido el foco; ancho de 360
+  { k: 'carpa-c-p80', sw: 360, mode: 'carpa', now: T + 99, S: { ch: 4, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },
     carpas: [{ t: 'p80', foco: 'led200' }], macetas: ['plastico18', 'plastico7', 'plastico7'],
     pots: { 0: pl('acapulco', .66), 1: null, 2: pl('rif', 1, { f: { id: 4, t: 1, y: 1, i: 20 } }) }, VC: { ci: 0, sel: -1 } },
-  // carpa 100 con LED (vista B) y garrafas: una por maceta, de su tamaño (5, 7, 12 y 16 L), llena, a medias, vacía y a un 62 %; el depósito
-  // del goteo de la de 150 (975 L) sale en carpa-b-g150
-  { k: 'carpa-b-garrafas', sw: 320, mode: 'carpa', now: T + 777, S: { ch: 4, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },
+  // carpa 100 con LED de 480 y garrafas: una por maceta, de su tamaño (5, 7, 12 y 16 L), llena, a medias, vacía y a un 62 %; el
+  // depósito del goteo de la de 150 (975 L) sale en carpa-c-g150
+  { k: 'carpa-c-garrafas', sw: 320, mode: 'carpa', now: T + 777, S: { ch: 4, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },
     carpas: [{ t: 'm100', foco: 'led480', garrafas: true, gar: [null, 3, 0, 10] }], macetas: ['plastico7', 'tela11', 'plastico18', 'tela25'],
     pots: { 0: pl('ria', .6), 1: pl('limon', .9), 3: pl('kif', .3) }, VC: { ci: 0, sel: 1 } },
   // la vista C dentro del lienzo de 320 con un efecto encima

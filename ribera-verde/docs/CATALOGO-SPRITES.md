@@ -11,12 +11,12 @@ Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: 
 | Personajes | 49 | 25 | create_character · animate_character · create_image_pro (paso previo) | 1111 |
 | Mapa · terreno | 22 | 6 | create_tiles_pro · create_building_kit · create_topdown_tileset · animate_image | 15 + sin documentar |
 | Mapa · objetos con el estilo del mapa | 26 | 13 | create_map_object (background_image + máscara) · animate_image | 14 + sin documentar |
-| Objetos sueltos en lote | 38 | 10 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 180 + sin documentar |
+| Objetos sueltos en lote | 36 | 10 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 180 + sin documentar |
 | Imágenes simples | 22 | 11 | create_image_pixflux (init_image + color_image) | 7 + sin documentar |
 | Se queda procedural | 2 | 1 | — | 0 |
-| Importado | 99 | 32 | importado | 0 + sin documentar |
+| Importado | 122 | 38 | importado | 0 + sin documentar |
 
-**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 236/236 claves.
+**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 257/257 claves.
 
 ## Orden de creación
 
@@ -107,8 +107,8 @@ Muchos objetos pequeños del mismo estilo en una sola llamada (hasta 64 candidat
 | macetas | maceta-plastico7, maceta-tela11, maceta-plastico18, maceta-tela25 | create_1_direction_object | 48 objetos en 1 llamada (64 candidatos a 16 px) | style_images: estilo-maceta-16.png | F8 | — | 30 |
 | focos | foco-cfl, foco-sodio, foco-led | create_1_direction_object | 48 objetos en 1 llamada (64 candidatos a 32 px) | style_images: maceta-vacia-32.png | F8 | — | 30 |
 | mesa-cultivo | mesa | create_1_direction_object | 24 objetos en 1 llamada (64 candidatos a 16 px) | style_images: 00.png | F8 | — | 30 |
-| props-16 | fence, sign, bench, crate, bush, pc, lab, lab2, table, shelfW, display, plantDeco, bottles, stool, btable, iwin, poster | create_1_direction_object | 64 objetos en 1 llamada (64 candidatos a 16 px) | style_images: bench.png, sign.png, crate.png, bush.png, counter.png, stool.png, jukebox.png, plantDeco.png | F4 | luces | 30+? |
-| props-32 | fridge, bedT, bedB | create_1_direction_object | 2 objetos · **comparte lote-32** (15 objetos de 4 assets en 1 llamada de 64 candidatos a 32 px) | solo texto | F4 | — | 30 |
+| props-16 | fence, sign, bench, bush, pc, lab, lab2, table, shelfW, display, plantDeco, bottles, stool, btable, iwin, poster | create_1_direction_object | 64 objetos en 1 llamada (64 candidatos a 16 px) | style_images: bench.png, sign.png, crate.png, bush.png, counter.png, stool.png, jukebox.png, plantDeco.png | F4 | luces | 30+? |
+| props-32 | bedT, bedB | create_1_direction_object | 2 objetos · **comparte lote-32** (15 objetos de 4 assets en 1 llamada de 64 candidatos a 32 px) | solo texto | F4 | — | 30 |
 | planta-fases | germinando, plantula, vegetativo, floracion, lista, muerta, maceta-vacia, sana, seca | create_1_direction_object | 7 objetos · **comparte lote-32** (15 objetos de 4 assets en 1 llamada de 64 candidatos a 32 px) | solo texto | F5 | balanceo-vegetativo, balanceo-floracion, balanceo-lista | 0+? |
 | iconos | bolsa | create_1_direction_object | 12 objetos · **comparte lote-16** (24 objetos de 2 assets en 1 llamada de 64 candidatos a 16 px) | solo texto | F7 | — | 30 |
 | cogollos-genoteca | — | create_1_direction_object | 4 objetos · **comparte lote-32** (15 objetos de 4 assets en 1 llamada de 64 candidatos a 32 px) | solo texto | F7 | — | 0 |
@@ -171,6 +171,12 @@ Arte propio del repositorio que ya existe (Strainmon): se adapta en local (recor
 | carpa-c-fondo | carpa-c-pared, carpa-c-luz | importado | — | solo texto | F9 | — | 0+? |
 | carpa-c-plantas-h | planta-c-h-24, planta-c-h2-24, planta-c-h1-18, planta-c-h0-8 | importado | — | solo texto | F9 | — | 0+? |
 | carpa-c-plantas-a | planta-c-i-38, planta-c-i2-38, planta-c-i-32, planta-c-i2-32, planta-c-h-38, planta-c-h2-38, planta-c-h-32, planta-c-h2-32, planta-c-s-38, planta-c-s2-38, planta-c-s-32, planta-c-s2-32, planta-c-h1-18, planta-c-h0-8 | importado | — | solo texto | F9 | — | 0+? |
+| carpa-c-focos-led | foco-c-led100-26, foco-c-led100-20, foco-c-led200-30, foco-c-led200-24, foco-c-cfl-25 | importado | — | solo texto | F9 | — | 0+? |
+| carpa-c-focos-led-ancho | foco-c-led480-47, foco-c-led720-78 | importado | — | solo texto | F9 | — | 0+? |
+| carpa-c-macetas-b | maceta-c-tela11-26, maceta-c-tela11-20, maceta-c-tela25-27, maceta-c-plastico18-26, maceta-c-plastico18-23 | importado | — | solo texto | F9 | — | 0+? |
+| carpa-c-extras | extra-c-vent, extra-c-filtro-28, extra-c-filtro-39, extra-c-garrafa-20, extra-c-garrafa-23, extra-c-garrafa-26, extra-c-garrafa-29, extra-c-llave, extra-c-deposito | importado | — | solo texto | F9 | — | 0+? |
+| iconos-equipo | — | importado | — | solo texto | F9 | — | 0+? |
+| props-escala | fridge, crate | importado | — | solo texto | F9 | — | 0+? |
 | tiles-firmes | hormigon, pista, rotoT, rotoB | importado | — | solo texto | F4 | — | 0+? |
 | detalles-hierba | detalles | importado | — | solo texto | F4 | — | 0+? |
 | edificio-caserio3 | roofT_caserio3, roofB_caserio3, wall_caserio3, win_caserio3 | importado | — | solo texto | F4 | — | 0+? |

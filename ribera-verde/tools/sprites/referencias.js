@@ -89,6 +89,9 @@ const OUT = path.join(ROOT, 'art', 'referencias');
       plantas: { vista: 'misc:planta-vista (cepa × fase, de ../assets/plants)', colores_cogollo: Object.fromEntries(Object.entries(STRAINS).map(([k, s]) => [k, s.c])) },
       combate: ['fondo-ladron', 'fondo-policia', 'frente:ladron', 'frente:policia', 'espalda:player'],
       misc: ['bolsa', 'hoja-titulo', 'burbuja-$', 'burbuja-!', ...Object.keys(CARPAS).flatMap(t => ['carpa-' + t + '-mapa', 'carpa-' + t + '-vista']), 'cuarto-cultivo', 'carpa-c-pared', 'carpa-c-luz', 'foco-c-40', 'foco-c-44', 'foco-c-46', 'maceta-c-15', 'maceta-c-22', 'foco-c-cfl-36', ...['i', 'h', 's'].flatMap(p => [38, 32].flatMap(w => ['planta-c-' + p + '-' + w, 'planta-c-' + p + '2-' + w])), 'planta-c-h1-18', 'planta-c-h0-8',
+        'foco-c-led100-26', 'foco-c-led100-20', 'foco-c-led200-30', 'foco-c-led200-24', 'foco-c-led480-47', 'foco-c-cfl-25', 'foco-c-led720-78',
+        'maceta-c-tela11-26', 'maceta-c-tela11-20', 'maceta-c-tela25-27', 'maceta-c-plastico18-26', 'maceta-c-plastico18-23',
+        'extra-c-vent', 'extra-c-filtro-28', 'extra-c-filtro-39', 'extra-c-garrafa-20', 'extra-c-garrafa-23', 'extra-c-garrafa-26', 'extra-c-garrafa-29', 'extra-c-llave', 'extra-c-deposito',
         ...Object.keys(MACETAS).map(k => 'maceta-vista-' + k), 'planta-vista', 'foco-cfl', 'foco-sodio', 'foco-led', 'detalles'],   // detalles: los de la hierba (orgánico, 1.10)
       tamanos: { tile: [16, 16], personaje: [16, 20], planta: [16, 26], combate_escala: 3, pantalla: [240, 160] },
     };

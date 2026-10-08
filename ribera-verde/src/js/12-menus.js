@@ -30,8 +30,8 @@ async function mochila(){
       {label:'Abono (dosis)',right:'×'+S.items.fert,ic:icono('abono'),desc:'Una por planta: +25% de cosecha.'},{label:'Insecticida (tratamientos)',right:'×'+S.items.insect,ic:icono('insecticida'),desc:'Úsalo en una maceta con plaga.'},
       {label:'Spray de pimienta',right:'×'+S.items.spray,ic:icono('spray'),desc:'Solo en combate.'},{label:'Bocata',right:'×'+S.items.bocata,ic:icono('bocadillo'),desc:'Pulsa A para comerlo: +15 de vida.',k:'bocata'}]);
     for(const k in MACETAS)if(S.items['m_'+k]>0)rows.push({label:'Maceta '+MACETAS[k].n,right:'×'+S.items['m_'+k],ic:icono('maceta'),desc:descMaceta(k)+'\nSe cambia en una plaza vacía de la carpa.'});
-    for(const k in FOCOS)if(S.items['f_'+k]>0)rows.push({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],ic:icono('lampara'),desc:descFoco(k)+'\nSe cuelga desde la vista de carpa: ▲ hasta el foco y A.'});
-    for(const k in EXTRAS)if(S.items['x_'+k]>0)rows.push({label:EXTRAS[k].n,right:'×'+S.items['x_'+k],desc:EXTRAS[k].d+`\nSe pone${EXTRAS[k].pl?'n':''} desde la vista de carpa: ▲ hasta el foco y A.`});
+    for(const k in FOCOS)if(S.items['f_'+k]>0)rows.push({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],ic:icono(icoFoco(k)),desc:descFoco(k)+'\nSe cuelga desde la vista de carpa: ▲ hasta el foco y A.'});
+    for(const k in EXTRAS)if(S.items['x_'+k]>0)rows.push({label:EXTRAS[k].n,right:'×'+S.items['x_'+k],ic:icono(ICX[k]),desc:EXTRAS[k].d+`\nSe pone${EXTRAS[k].pl?'n':''} desde la vista de carpa: ▲ hasta el foco y A.`});
     for(const [k,v] of Object.entries(S.seeds))rows.push({label:'Semilla '+getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:icono('semillas'),desc:strainLine(k)});
     for(const e of S.esquejes)rows.push({label:'Esqueje '+getStrain(e.sid).n+marcaFeno(e.f),right:'día '+(e.dia+ESQUEJE_DIAS),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),desc:`Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+ESQUEJE_DIAS}.`});
     for(const [k,b] of Object.entries(S.buds))rows.push({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k)),desc:(k.endsWith('*')?'Cogollos de un fenotipo estrella, en lote aparte.\n':'Cogollos listos para vender.\n')+getStrain(lotSid(k)).o});
@@ -47,7 +47,7 @@ async function plantas(){
   rows.push({label:'Sala',right:S.sala.termo?tClima(cl):'¿?',desc:S.sala.termo?salaDesc():'Sin termohigrómetro no sabes la temperatura ni la humedad de la sala. Kiko lo vende.'});
   S.carpas.forEach((c,ci)=>{
     if(!c)return;const C=CARPAS[c.t],F=FOCOS[c.foco],wm2=Math.round(F.w/(C.cm[0]*C.cm[2]/1e4));
-    rows.push({label:C.n,right:F.n,ic:icono('lampara'),desc:`${C.plazas} plantas · foco ${F.n}, ${wm2} W/m²${wm2<W_M2?' (poca luz: crecen más despacio y con menos THC)':''}\nLuz: ${eur(luzCarpa(ci))} al día con plantas · hasta ${C.wmax} W, macetas de ${C.lmax} L y ${litrosMax(ci)} L de tierra (${litrosCarpa(ci)} puestos).`});
+    rows.push({label:C.n,right:F.n,ic:icono(icoCarpa(c.t)),desc:`${C.plazas} plantas · foco ${F.n}, ${wm2} W/m²${wm2<W_M2?' (poca luz: crecen más despacio y con menos THC)':''}\nLuz: ${eur(luzCarpa(ci))} al día con plantas · hasta ${C.wmax} W, macetas de ${C.lmax} L y ${litrosMax(ci)} L de tierra (${litrosCarpa(ci)} puestos).`});
     H.forEach((h,i)=>{if(h.c!==ci)return;const p=S.pots[i],M=MACETAS[S.macetas[i]];
       if(!p){rows.push({label:`  ${h.j+1} · vacía`,right:M.l+' L',ic:icono('maceta'),desc:`Maceta de ${M.n}. Planta algo desde la carpa de tu piso.`});return;}
       const s=getStrain(p.sid);

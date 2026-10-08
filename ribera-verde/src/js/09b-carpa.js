@@ -35,7 +35,8 @@ const FOCO_SEP={cfl:10,led100:25,led200:25,led480:35,led720:40,sodio250:30,sodio
 const macetaPx=k=>{const [d,h]=MACETA_CM[k]||MACETA_CM.plastico7;return {w:Math.round(d*VB_M),e:Math.max(3,Math.round(d*VB_F)),hb:Math.round(h*VB_M)};};
 let VC=null;                              // carpa abierta: {ci, sel: plaza (índice de huecos()) o −1 = el foco, ocupado}
 // geometría de la carpa ci en la escena de 240: P(x, y, z) pasa cm (x desde la izquierda, y de fondo desde el frente, z de alto) a px
-function vcGeo(ci){
+// soloB: la vista B aunque haya arte para la C (el plano y sus medidas, P2)
+function vcGeo(ci,soloB){
   const c=S.carpas[ci],C=CARPAS[c.t],[W,H,D]=C.cm,f=VB_PLATA[c.t]&&fotoMisc('carpa-'+c.t+'-vista'),k=f&&VB_PLATA[c.t];
   let w=Math.round(W*VB_M),s=Math.round(D*VB_X),x0=120-((w+s)>>1),yf=VB_PARED+Math.round(D*VB_F),P=(x,y,z)=>[Math.round(x0+x*VB_M+y*VB_X),Math.round(yf-y*VB_F-z*VB_M)];
   if(f){x0=120+k.xf[0];w=k.xf[1]-k.xf[0]+1;s=0;yf=155;   // de frente: cada fondo y, entre las columnas del suelo de delante y las de la pared
@@ -51,7 +52,7 @@ function vcGeo(ci){
   const g={c,C,W,H,D,w,s,x0,yf,P,pl,fx:P(W/2,D/2,0)[0],fy:P(0,D/2,H-28)[1],barra:P(0,D/2,H-4)[1]};
   // de frente, lo que cuelga no sube del techo de dentro (8 filas sobre yt; la z no encoge con el fondo): cuerdas, campana y filtro
   if(f){g.plata=f;g.techo=157+k.yt-8;g.barra=Math.max(g.barra,g.techo);g.fy=Math.max(g.fy,g.techo+foco34(c.foco).height-1);}
-  g.vc=vistaC(g);if(g.vc){g.fx=120;g.fy=VCA.boca;g.fw=g.vc.foco.a;}
+  g.vc=soloB?null:vistaC(g);if(g.vc){g.fx=120;g.fy=VCA.boca;g.fw=g.vc.foco.a;}
   return g;
 }
 // dónde lanzar un efecto sobre la plaza i (riego, cosecha): en la vista, sobre la planta; si no, sobre el jugador
@@ -74,10 +75,12 @@ const altoPlanta=(p,q)=>{const D=PLANTA_CM[portePlanta(p)];return Math.min(Math.
    (38 px) o, si sus vecinas de fila o las paredes quedan más cerca, la estrecha (32).
    Solo se usa si hay arte para todo lo que hay en la carpa (por ahora, focos de sodio y CFL y macetas de 7 L sin extras); si no, la vista B. */
 const VCA={lado:44,boca:16,base:150,fondo:140},VC_FILA=[[152],[156,146]];   // y de la base de las macetas: una fila · dos (delante, detrás)
-const VC_TIERRA={'maceta-c-22':23,'maceta-c-15':10};                         // px de la base de la maceta a la tierra, donde nace el tallo
+const VC_TIERRA={'maceta-c-22':23,'maceta-c-15':10,'maceta-c-tela11-26':23,'maceta-c-tela11-20':17,'maceta-c-tela25-27':20,'maceta-c-plastico18-26':27,
+  'maceta-c-plastico18-23':25};   // px de la base de la maceta a la tierra, donde nace el tallo
 const vcAnchos=pre=>Object.keys(ARTE.cubre||{}).filter(k=>k.startsWith('misc:'+pre)).map(k=>+k.slice(5+pre.length)).filter(n=>n>0);
 // el sprite de la familia (prefijo + ancho en px) más cercano a «px», si se aparta como mucho un 25 %
-function vcSprite(pre,px){let m=null;for(const a of vcAnchos(pre))if(Math.abs(a-px)<=px*.25&&(!m||Math.abs(a-px)<Math.abs(m.a-px)))m={a,n:pre+a};return m&&{...m,f:fotoMisc(m.n)};}
+// (cerca: si ninguno entra en el 25 %, el más cercano: con el atlas, la carpa nunca vuelve a la vista B por un ancho)
+function vcSprite(pre,px,cerca){let m=null;for(const a of vcAnchos(pre))if((cerca||Math.abs(a-px)<=px*.25)&&(!m||Math.abs(a-px)<Math.abs(m.a-px)))m={a,n:pre+a};return m&&{...m,f:fotoMisc(m.n)};}
 // la planta: el sprite de su porte y fase más ancho que deja 2 px de aire en su sitio (esp: px hasta la vecina de su fila más cercana o,
 // a cada lado, hasta la pared, a la altura de su maceta, redondeado: con la pared queda 1 px) o, si ninguno, el más estrecho. Floración y lista comparten sprite
 // (planta-c-<porte>-<ancho>); vegetativo lleva la fase (planta-c-<porte>2-<ancho>); germinando y plántula, las mismas para los tres portes
@@ -87,39 +90,55 @@ function vcPlantaSprite(po,st,esp){const pre='planta-c-'+(st<2?'h':po)+(st>=3?''
 const vcAltos=new WeakMap();   // alto del dibujo (de la última fila a la primera con algo) de cada celda
 function vcAlto(c){if(vcAltos.has(c))return vcAltos.get(c);const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let y=0;
   for(let i=3;i<d.length;i+=4)if(d[i]){y=Math.floor((i>>2)/c.width);break;}vcAltos.set(c,c.height-y);return c.height-y;}
-// la geometría de la vista C sobre la de la vista B (g), o null si falta arte para algo de la carpa
+// la geometría de la vista C sobre la de la vista B (g), o null si falta arte para algo de la carpa (sin el atlas)
 function vistaC(g){
-  const {c,W,H,pl}=g,tipo=FOCOS[c.foco].tipo;if(!ARTE.ok||Object.keys(EXTRAS).some(k=>k!=='garrafas'&&c[k]))return null;   // las garrafas no se dibujan: no la quitan
-  // las campanas de sodio son foco-c-NN; las demás llevan su tipo (foco-c-cfl-NN)
-  const Z=(VCA.base-VCA.boca)/(H-28),w=Math.round(W*Z),foco=vcSprite(tipo==='sodio'?'foco-c-':'foco-c-'+tipo+'-',(FOCO_CM[c.foco]||45)*Z);
+  const {c,W,H,pl}=g,tipo=FOCOS[c.foco].tipo;if(!ARTE.ok)return null;
+  // las campanas de sodio son foco-c-NN; el CFL, foco-c-cfl-NN, y los LED, con su modelo (foco-c-led200-NN)
+  const Z=(VCA.base-VCA.boca)/(H-28),w=Math.round(W*Z),foco=vcSprite(tipo==='sodio'?'foco-c-':tipo==='led'?'foco-c-'+c.foco+'-':'foco-c-'+tipo+'-',(FOCO_CM[c.foco]||45)*Z,1);
   if(!fotoMisc('carpa-c-pared')||!fotoMisc('carpa-c-luz')||!foco||!foco.f)return null;
   const filas=VC_FILA[CARPAS[c.t].filas-1],v=[];
   // el suelo se abre 16 px por lado de y 140 a 159: a la altura y, la carpa mide wy px de ancho
   const wy=y=>w+32*(y-VCA.fondo)/19,xy=(q,y)=>Math.round(120+(q.cx/W-.5)*wy(y)),yq=q=>filas[Math.min(q.fila,filas.length-1)];
   for(const q of pl){
-    const k=S.macetas[q.i],m=k==='plastico7'&&vcSprite('maceta-c-',MACETA_CM[k][0]*Z),p=S.pots[q.i];if(!m||!m.f)return null;
-    const y=yq(q),x=xy(q,y),r={x,y,m,tierra:VC_TIERRA[m.n]||Math.round(m.f.c.height*.7),hp:0};
-    if(p){const st=p.dead?9:plantStage(p),po=portePlanta(p),D=PLANTA_CM[po];if(st>4)return null;
+    // la de 7 L es maceta-c-NN; las demás llevan su tipo (maceta-c-tela11-NN)
+    const k=S.macetas[q.i]in MACETA_CM?S.macetas[q.i]:'plastico7',m=vcSprite(k==='plastico7'?'maceta-c-':'maceta-c-'+k+'-',MACETA_CM[k][0]*Z,1),p=S.pots[q.i];if(!m||!m.f)return null;
+    const y=yq(q),x=xy(q,y),r={x,y,m,Z,tierra:VC_TIERRA[m.n]||Math.round(m.f.c.height*.7),hp:0};
+    // la muerta: la de su porte en vegetativo, seca (marrón) y 4 cm más baja
+    if(p){const st=p.dead?2:plantStage(p),po=portePlanta(p),D=PLANTA_CM[po];r.muerta=!!p.dead;
       // sitio en pantalla: hasta la vecina de su fila más cercana y, a cada lado, hasta la pared (×2)
       r.esp=Math.round(Math.min(wy(y)-2*Math.abs(x-120),...pl.filter(o=>o!==q&&yq(o)===y).map(o=>Math.abs(xy(o,y)-x))));
       const s=vcPlantaSprite(po,st,r.esp);if(!s||!s.f)return null;
       // tope: su alto real (ch) y, en pantalla, la distancia segura a la boca del foco (el sprite de la maceta es más alto que la real)
-      r.p=s;r.hp=Math.min(vcAlto(s.f.c),Math.round(Math.min(D.h[st],q.ch)*Z),Math.floor(y-r.tierra-VCA.boca-FOCO_SEP[c.foco]*Z));}
+      r.p=s;r.hp=Math.min(vcAlto(s.f.c),Math.round(Math.min(D.h[st]-(p.dead?4:0),q.ch)*Z),Math.floor(y-r.tierra-VCA.boca-FOCO_SEP[c.foco]*Z));}
     v.push(r);}
   pl.forEach((q,j)=>{q.v=v[j];q.x=v[j].x;q.y=v[j].y;q.alto=v[j].tierra+4+v[j].hp;});
-  return {Z,w,xl:120-(w>>1),foco,tipo};
+  // el goteo: una manguera por fila, en el suelo detrás de sus macetas, de la primera llave a la pared derecha (por donde entra la de
+  // la de atrás; la de delante baja por la pared); cada maceta, su llave y su microtubo justo a su derecha (bx)
+  let lg=null;
+  if(c.goteo){const F={};for(const q of pl){const [,x1]=vcCaja(q.v.m.f.c),f=F[q.fila]||(F[q.fila]={fila:q.fila,y:q.y-3,x:1e9});q.bx=q.x-16+x1+2;q.yl=f.y;f.x=Math.min(f.x,q.bx);}
+    lg=Object.values(F).sort((a,b)=>a.y-b.y);for(const f of lg)f.xw=Math.round(120+wy(f.y)/2)-1;}
+  return {Z,w,xl:120-(w>>1),foco,tipo,lg};
 }
+// la boca del foco mide fa px y la luz (carpa-c-luz) sale de una de 46: con un foco más ancho, la luz se ensancha por igual desde el centro
+const vcLuzK=vc=>Math.max(1,vc.foco.a/46);
 // pared o luz de la carpa t: la de 240 × 160 con la pared del fondo recortada a su ancho (los laterales, con los postes del fondo, enteros)
 function vcFondo(t,vc,capa){
-  const key='vc|'+t+'|'+capa;if(carpaCache[key])return carpaCache[key];
-  const s=fotoMisc('carpa-c-'+capa).c,[c,x]=mkCanvas(240,160),L=VCA.lado,xl=vc.xl,xr=xl+vc.w;
+  const k=capa==='luz'?vcLuzK(vc):1,key='vc|'+t+'|'+capa+(k>1?'|'+vc.foco.a:'');if(carpaCache[key])return carpaCache[key];
+  let s=fotoMisc('carpa-c-'+capa).c;const [c,x]=mkCanvas(240,160),L=VCA.lado,xl=vc.xl,xr=xl+vc.w;
+  if(k>1){const [o,ox]=mkCanvas(240,160);for(let i=0;i<240;i++)ox.drawImage(s,Math.floor(120+(i+.5-120)/k),0,1,160,i,0,1,160);s=o;}
   x.drawImage(s,0,0,L,160,xl-L,0,L,160);x.drawImage(s,xl,0,vc.w,160,xl,0,vc.w,160);x.drawImage(s,240-L,0,L,160,xr,0,L,160);
+  // el suelo, más oscuro lejos del foco (1.10 P5): hasta un 25 % en las esquinas de delante, por la distancia al centro (x 120, y 150)
+  if(capa==='pared'){const im=x.getImageData(0,0,240,160),d=im.data;
+    for(let y=VCA.fondo;y<160;y++){const h=(vc.w+32*(y-VCA.fondo)/19)/2,dy=(y+.5-VCA.base)/19;
+      for(let i=Math.max(0,Math.ceil(120-h));i<Math.min(240,120+h);i++){const dx=(i+.5-120)/h,k=Math.round(64*Math.min(1,dx*dx+dy*dy)),j=(y*240+i)*4;
+        if(d[j+3])for(let n=0;n<3;n++)d[j+n]=(d[j+n]*(256-k))>>8;}}
+    x.putImageData(im,0,0);}
   return carpaCache[key]=c;
 }
 // la luz de cada tipo de foco: la del sodio es la de la imagen A tal cual; las demás, la misma capa con su color (misma luminosidad) y su fuerza
-const LUZ_C={cfl:[[220,240,255],.6]};
+const LUZ_C={cfl:[[220,240,255],.6],led:[[250,214,255],.7]};
 function vcLuz(t,vc){const L=vcFondo(t,vc,'luz'),k=LUZ_C[vc.tipo];if(!k)return L;
-  const key='vc|'+t+'|luz|'+vc.tipo;if(carpaCache[key])return carpaCache[key];
+  const key='vc|'+t+'|luz|'+vc.tipo+'|'+vc.foco.a;if(carpaCache[key])return carpaCache[key];
   const [c,x]=mkCanvas(240,160),[r,g,b]=k[0],lk=.299*r+.587*g+.114*b;x.drawImage(L,0,0);const im=x.getImageData(0,0,240,160),d=im.data;
   for(let i=0;i<d.length;i+=4)if(d[i+3]){const l=(.299*d[i]+.587*d[i+1]+.114*d[i+2])/lk;d[i]=Math.min(255,r*l);d[i+1]=Math.min(255,g*l);d[i+2]=Math.min(255,b*l);}
   x.putImageData(im,0,0);return carpaCache[key]=c;}
@@ -150,17 +169,40 @@ function vcApagado(c){let m=vcBajas.get(c);if(!m)vcBajas.set(c,m=new Map());if(m
   const [o,x]=mkCanvas(c.width,c.height);x.drawImage(c,0,0);const im=x.getImageData(0,0,c.width,c.height),d=im.data;
   for(let i=0;i<d.length;i+=4)if(d[i+3]&&(d[i]>d[i+2]+40||Math.min(d[i],d[i+1],d[i+2])>190)){const l=Math.round((d[i]*.3+d[i+1]*.59+d[i+2]*.11)*.3);d[i]=l;d[i+1]=l+2;d[i+2]=l+4;}
   x.putImageData(im,0,0);m.set('off',o);return o;}
+// columnas (primera y última) con algo de cada celda
+const vcCajas=new WeakMap();
+function vcCaja(c){if(vcCajas.has(c))return vcCajas.get(c);const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let a=c.width,b=-1;
+  for(let i=3;i<d.length;i+=4)if(d[i]){const x=(i>>2)%c.width;a=Math.min(a,x);b=Math.max(b,x);}const r=[a,b];vcCajas.set(c,r);return r;}
+// el agua de la garrafa y del depósito pequeño: los píxeles «dentro» (clave) de las fr filas de abajo (fracción de las filas que la
+// tienen) pasan al color del agua
+const VC_AGUA={garrafa:['#e6eef2','#9ab8cc'],deposito:['#16263a','#8ec8f0']};
+function vcNivel(c,[k,a],fr){
+  // las filas del agua (y0, y1) y los píxeles, una vez por imagen: se pide cada fotograma
+  let m=vcBajas.get(c);if(!m)vcBajas.set(c,m=new Map());
+  if(!m.has('f'+k)){const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data,K=parseInt(k.slice(1),16),es=i=>((d[i]<<16)|(d[i+1]<<8)|d[i+2])===K&&d[i+3];
+    let y0=c.height,y1=-1;for(let i=0;i<d.length;i+=4)if(es(i)){const y=Math.floor((i>>2)/c.width);y0=Math.min(y0,y);y1=Math.max(y1,y);}m.set('f'+k,{d,es,y0,y1});}
+  const {es,y0,y1}=m.get('f'+k),A=parseInt(a.slice(1),16),n=y1<0?0:Math.round((y1-y0+1)*clamp(fr,0,1));if(m.has('n'+n))return m.get('n'+n);
+  const [o,x]=mkCanvas(c.width,c.height);x.drawImage(c,0,0);const im=x.getImageData(0,0,c.width,c.height),p=im.data;
+  for(let i=0;i<p.length;i+=4)if(es(i)&&Math.floor((i>>2)/c.width)>y1-n){p[i]=A>>16;p[i+1]=(A>>8)&255;p[i+2]=A&255;}
+  x.putImageData(im,0,0);m.set('n'+n,o);return o;}
+const vcExtra=n=>fotoMisc('extra-c-'+n).c;
 function renderCarpaC(g,now){
-  const {c,vc}=g,on=plantasVivas(VC.ci);
+  const {c,vc}=g,on=plantasVivas(VC.ci),xr=vc.xl+vc.w;
   ctx.fillStyle='#000';ctx.fillRect(0,0,SW,SH);
   ctx.save();ctx.translate(OX(),0);
   ctx.drawImage(vcFondo(c.t,vc,'pared'),0,0);
-  const fsel=(g.pl.find(q=>q.i===VC.sel)||{fila:0}).fila;
-  for(const q of [...g.pl].sort((a,b)=>a.y-b.y||a.x-b.x)){ctx.globalAlpha=q.fila<fsel?.35:1;vcPlantaC(q,now);}
+  // el filtro de carbón, colgado del techo arriba a la izquierda (el extractor tiembla 1 px), y el ventilador de pinza en el poste del
+  // fondo derecho, a 55 cm del suelo, siempre girando
+  if(c.filtro){const f=vcSprite('extra-c-filtro-',(c.t==='p60'||c.t==='p80'?30:50)*vc.Z,1).f.c;ctx.drawImage(f,vc.xl+10-47+Math.floor(now/90)%2,3-(f.height-vcAlto(f)));}
+  if(c.vent)ctx.drawImage(frameDe(ARTE.cubre['misc:extra-c-vent'],'extra-c-vent','unica',0,{i:Math.floor(now/70)}).c,xr+1-24,VCA.fondo-Math.round(55*vc.Z)-47);
+  const fsel=(g.pl.find(q=>q.i===VC.sel)||{fila:0}).fila,lg=vc.lg;let fa=null;
+  for(const q of [...g.pl].sort((a,b)=>a.y-b.y||a.x-b.x)){ctx.globalAlpha=q.fila<fsel?.35:1;if(lg&&q.fila!==fa){fa=q.fila;vcRamal(lg,fa);}vcPlantaC(q,now);}
   ctx.globalAlpha=1;
   // la luz del foco es su propia capa y va delante de pared, macetas y plantas (ninguna lleva la luz pintada); la campana, encima
   if(on){ctx.globalCompositeOperation='overlay';ctx.globalAlpha=(LUZ_C[vc.tipo]||[0,1])[1];ctx.drawImage(vcLuz(c.t,vc),0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';}
-  const fc=vc.foco.f.c;ctx.drawImage(on?fc:vcApagado(fc),120-24,VCA.boca-15);
+  const fc=vc.foco.f.c;ctx.drawImage(on?fc:vcApagado(fc),120-(fc.width>>1),VCA.boca-15);
+  // el depósito del goteo está fuera: arriba a la derecha, en pequeño, con el agua que le queda en la mirilla
+  if(lg){const l=goteoL(VC.ci);ctx.drawImage(vcNivel(vcExtra('deposito'),VC_AGUA.deposito,(c.dep??l)/l),xr+22-24,8-28);}
   const bs=barras(g,VC.sel);for(const b of bs)vcBarra(b,b.fila<fsel?.35:1,now);
   vcCursor(g,now,bs);
   if(ARTE.ok)pintarVfx(now,{x:0,y:0},'home');
@@ -180,14 +222,37 @@ function hlsRgb(H,l,s){const q=l<.5?l*(1+s):l+s-l*s,p=2*l-q,t=x=>{x=(x+1)%1;retu
 function vcTonos(hj){if(vcTonosC.has(hj))return vcTonosC.get(hj);const b=rgbHls(hj),r=rgbHls('#57a33e'),o={};
   for(const k of VC_HOJA){const [h,l,s]=rgbHls(k);o[k]=hlsRgb((h+b[0]-r[0]+1)%1,clamp(l+b[1]-r[1],0,1),clamp(s*b[2]/Math.max(r[2],.01),0,1));}
   vcTonosC.set(hj,o);return o;}
+// la manguera del goteo de la fila fa (2 px: tubo y brillo), de su primera llave a la pared derecha; la de la primera fila entra por
+// la pared (pasamuros) y las demás bajan por la pared desde la de detrás
+function vcRamal(lg,fa){
+  const i=lg.findIndex(f=>f.fila===fa),f=lg[i];if(i<0)return;
+  ctx.fillStyle='#4a4c54';ctx.fillRect(f.x,f.y-1,f.xw-f.x+1,1);ctx.fillStyle='#1c1d22';ctx.fillRect(f.x,f.y,f.xw-f.x+1,1);
+  if(i){const a=lg[i-1],n=Math.max(Math.abs(f.xw-a.xw),f.y-a.y);for(let k=0;k<=n;k++)ctx.fillRect(a.xw+Math.round((f.xw-a.xw)*k/n),a.y+Math.round((f.y-a.y)*k/n),1,1);}
+  else{ctx.fillStyle='#3a3c44';ctx.fillRect(f.xw-1,f.y-2,3,4);ctx.fillStyle='#1c1d22';ctx.fillRect(f.xw,f.y-1,1,2);}}
+// la carpa seca: los verdes de hoja y tallo de la paleta A a marrones
+const VC_SECA={'#0d2620':'#24180e','#1b4630':'#3a2a18','#2f7038':'#5a4026','#57a33e':'#7a5a32','#94d255':'#a8884e','#71984a':'#8a7040','#3b5a2e':'#4a3a24'};
 function vcPlantaC(q,now){
-  const v=q.v,p=S.pots[q.i];ctx.drawImage(v.m.f.c,q.x-16,q.y-31);
+  const v=q.v,p=S.pots[q.i],ca=S.carpas[huecos()[q.i].c],[,mx1]=vcCaja(v.m.f.c),rim=q.y-31+(v.m.f.c.height-vcAlto(v.m.f.c));
+  // su garrafa (sin goteo), detrás de la maceta a la derecha, con el agua que le queda; el tubo del gotero va del tapón a la tierra
+  const gar=ca.garrafas&&!ca.goteo&&garrafaL(q.i),gs=gar&&vcSprite('extra-c-garrafa-',100*Math.pow(gar/1000/(.7*.5*.85),1/3)*v.Z,1),gc=q.x-16+mx1-1,gb=q.y-3;
+  // su sombra en el suelo (1.10 P5): del ancho de la maceta, debajo de su base
+  const [mx0]=vcCaja(v.m.f.c);ctx.fillStyle='rgba(0,0,0,.22)';ctx.fillRect(q.x-16+mx0-1,q.y-1,mx1-mx0+3,2);ctx.fillRect(q.x-16+mx0+1,q.y+1,mx1-mx0-1,1);
+  if(gs)ctx.drawImage(vcNivel(gs.f.c,VC_AGUA.garrafa,garrafa(q.i)/gar),gc-24,gb-47);
+  // con goteo, su microtubo sube de la manguera por la derecha de la maceta, con su llave, y entra por el borde hasta la tierra
+  const got=ca.goteo&&q.yl!=null;
+  if(got){ctx.fillStyle='#1c1d22';ctx.fillRect(q.bx,rim-1,1,q.yl-rim+1);ctx.drawImage(vcExtra('llave'),q.bx-24,q.yl+1-47);}
+  ctx.drawImage(v.m.f.c,q.x-16,q.y-31);
+  if(got){ctx.fillStyle='#1c1d22';ctx.fillRect(q.x+3,rim-1,q.bx-q.x-3,1);ctx.fillRect(q.x+3,rim,1,2);}
+  if(gs){const [gx0]=vcCaja(gs.f.c),cx=gc-24+gx0+2,cy=gb-vcAlto(gs.f.c)-1,ty=Math.min(cy,rim)-2;ctx.fillStyle='#1c1d22';
+    ctx.fillRect(q.x+3,ty,cx-q.x-2,1);ctx.fillRect(cx,ty,1,cy-ty);ctx.fillRect(q.x+3,ty,1,rim+2-ty);}
   if(!p)return;
   const s=getStrain(p.sid),rk=((ARTE.d.rampas||{})['carpa-c-plantas-a']||{}).cogollo,c0=vcDibujo(v),yb=q.y-v.tierra,hj=hojaPlanta(p);
+  if(v.muerta){const pc=conRampa(c0,VC_SECA,'seca');ctx.drawImage(pc,q.x-(pc.width>>1),yb-pc.height+1);return;}
   const pc0=rk&&s?conRampa(c0,{[rk.rampa[0]]:shade(s.c,50),[rk.rampa[1]]:s.c,[rk.rampa[2]]:shade(s.c,-60),...vcTonos(hj)},'g|'+s.c+'|'+hj):c0;
   const nd=nivelDano(p),pc=nd&&rk?vcDano(pc0,c0,nd,semDano(p)^hashStr(v.p.n),rk.rampa):pc0;   // con plaga, los daños encima
   if(p.water<=0)ctx.filter='saturate(.4) sepia(.7)';   // seca: amarillenta
-  const b=pc.height-1;balanceo(pc,q.x-(pc.width>>1),yb-b,b,p.water>0?1:0,now+q.x*37);
+  // se mece; con el ventilador encendido, el doble de deprisa
+  const b=pc.height-1;balanceo(pc,q.x-(pc.width>>1),yb-b,b,p.water>0?1:0,now*(ca.vent?2:1)+q.x*37);
   ctx.filter='none';
   if(p.pest){ctx.fillStyle='#e02828';for(let n=0;n<6;n++)ctx.fillRect(q.x-8+((n*5+Math.floor(now/300))%16),yb-12-((n*7)%20),1,1);}
 }
@@ -335,8 +400,8 @@ function garrafa34(l){
 }
 
 /* ---------- la escena ---------- */
-function renderCarpa(now){
-  const g=vcGeo(VC.ci),{c,P,W,H,D}=g,F=FOCOS[c.foco],on=plantasVivas(VC.ci);
+function renderCarpa(now,soloB){
+  const g=vcGeo(VC.ci,soloB),{c,P,W,H,D}=g,F=FOCOS[c.foco],on=plantasVivas(VC.ci);
   if(g.vc)return renderCarpaC(g,now);
   fondoAncho(cuarto34());
   ctx.save();ctx.translate(OX(),0);

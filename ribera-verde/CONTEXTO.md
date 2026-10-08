@@ -43,14 +43,14 @@
 - **El motor de sprites va antes que los sprites (v1.3).** Se probó con un atlas «de calco» del arte actual: si las capturas salen iguales, las anclas cuadran y los créditos se gastan solo en arte.
 - **Ajustes tras la prueba automática (v1.1).** Los ladrones de los capítulos altos ganaban casi siempre, así que se suavizaron y ahora la VIDA máxima sube 2 puntos por cada ladrón vencido. Además se corrigieron tres fallos; están en [CHANGELOG.md](CHANGELOG.md).
 
-## Estado (v1.9.0 publicada; 1.10 en desarrollo)
+## Estado (v1.10.0)
 
 - Se juega de principio a fin: capítulos 1 a 7, final («DEUDA SALDADA») y el imperio (capítulo 8).
-- `npm test` recorre la historia entera y los sistemas sueltos en 52 pasos: **52/52, 0 errores de JavaScript**, sin atlas y con el atlas de calco.
-- **Cifras reales (1.10, sin versión todavía):** precios de growshop, vatios, kWh, gramos por vatio y tope de la maceta, semillas feminizadas por unidad y en sobres, fenotipos y esquejes, venta al por mayor, multas reales y deuda de 30.000 € (sus plazos se pagan en las mismas cosechas que antes, según la simulación). Tablas en [docs/ECONOMIA.md](docs/ECONOMIA.md), que se genera con `npm run docs`.
+- `npm test` recorre la historia entera y los sistemas sueltos en 82 pasos: **82/82, 0 errores de JavaScript**; `npm run test:arte`, 25/25 con el atlas de calco.
+- **Cifras reales (1.10):** precios de growshop, vatios, kWh, gramos por vatio y tope de la maceta, semillas feminizadas por unidad y en sobres, fenotipos y esquejes, venta al por mayor, multas reales y deuda de 30.000 € (sus plazos se pagan en las mismas cosechas que antes, según la simulación). Tablas en [docs/ECONOMIA.md](docs/ECONOMIA.md), que se genera con `npm run docs`.
 - **Escala (1.8.0):** decidida y aplicada la opción A de [docs/PLANO.md](docs/PLANO.md): piso de 12 × 8 a 1 casilla = 1 m, carpas como muebles y vista de carpa a 64 px/m con las plantas de cepas de Strainmon (`../assets/plants`).
 - **Genética (1.9.0):** las landraces y los híbridos clásicos de Strainmon (`../src/species.js`, sus textos, no sus sprites), con su historia; estabilizar F1 → F4 en la mesa y banco de semillas en el PC desde el capítulo 2.
-- **Plan de producción (en desarrollo, sin versión todavía):** D1–D6 aprobadas. P1 hecho: el armario 80, la carpa 120 en el sitio C, el LED 100 W y los extras (ventilador, filtro de carbón y goteo), con la regla del olor. P2 hecho: la vista de carpa B (3/4 a 48 px/m; desde la 1.10, a 60 px/m con las carpas plateadas de frente) con arte procedural, medida en [docs/PLANO.md](docs/PLANO.md). P3 en marcha: vista C (la carpa por dentro a toda la altura, desde la imagen A del tablero de estilos; la pared solo con la tela y la luz del foco en una capa aparte, delante de todo). Corte de prueba con sodio, macetas de 7 L e índicas en floración, aprobado. Lámina A (el CFL y la híbrida Skunk #1 de germinando a lista en el armario 60) hecha y aprobada (8 de octubre de 2026), y las carpas medias del mapa (p80 y m120) también; 26 de 53 generaciones. Sin arte para algo de la carpa, vista B.
+- **Plan de producción (cerrado en la 1.10.0):** D1–D6 aprobadas. P1 hecho: el armario 80, la carpa 120 en el sitio C, el LED 100 W y los extras (ventilador, filtro de carbón y goteo), con la regla del olor. P2 hecho: la vista de carpa B (3/4 a 48 px/m; desde la 1.10, a 60 px/m con las carpas plateadas de frente) con arte procedural, medida en [docs/PLANO.md](docs/PLANO.md). P3 en marcha: vista C (la carpa por dentro a toda la altura, desde la imagen A del tablero de estilos; la pared solo con la tela y la luz del foco en una capa aparte, delante de todo). Corte de prueba con sodio, macetas de 7 L e índicas en floración, aprobado. Lámina A (el CFL y la híbrida Skunk #1 de germinando a lista en el armario 60) hecha y aprobada (8 de octubre de 2026), y las carpas medias del mapa (p80 y m120) también; 26 de 53 generaciones. P3–P6 cerrados a mano, sin más generaciones: lámina B de la vista C (focos LED, CFL de las carpas de 200 cm, macetas de tela y de 18 L, la muerta y los extras con el goteo y las garrafas), láminas 12 (iconos del equipo) y 13 (nevera y cajas a escala), sombras de los muebles y la noche en el piso. Con el atlas la carpa se ve siempre por dentro (vista C).
 - **Sprites:**
   - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
   - el motor ya usa el atlas (F2) y `npm run test:arte` da 24/24;
@@ -60,10 +60,10 @@
   - F4b (1.5): orillas del río, del camino de tierra y de la plaza con tres Wang encadenados y autotiling por esquinas;
   - F8 (1.6): carpas de 3 tamaños por dentro y cerradas (pixflux img2img sobre su huella), 4 macetas, 3 focos y la mesa de cultivo (lotes de `create_1_direction_object`). 
   - 1.8: carpas del piso y de la vista, macetas y cuarto de cultivo (4 generaciones pixflux) y las plantas de la vista importadas de Strainmon; retirados los sprites de cultivo de la 1.6–1.7. Atlas: 1169 fotogramas.
-- **Godot (0.2.0, aparte del juego):** el juego entero portado a Godot 4.3 (`godot/`) y comparado con el HTML: la historia 1 → 8 con el mismo piloto y el mismo azar (52 pasos, 0 diferencias), 16 pantallas píxel a píxel, la vista C y el cultivo como en el corte, y una partida jugada con los mandos desde el título. APK aparte: `dist/ribera-verde-godot.apk` (`com.riberaverde.godot`, 0.2.0, código 4; `npm run godot:apk`), firmado y verificado, sin probar en un móvil real.
+- **Godot (0.3.0, aparte del juego):** el juego entero portado a Godot 4.3 (`godot/`) y comparado con el HTML: la historia 1 → 8 con el mismo piloto y el mismo azar (82 pasos, 0 diferencias), 29 pantallas píxel a píxel, la vista C (9 escenas, con LED, extras, garrafas y muertas) y el cultivo, y una partida jugada con los mandos desde el título. APK aparte: `dist/ribera-verde-godot.apk` (`com.riberaverde.godot`, 0.3.0, código 5; `npm run godot:apk`), firmado y verificado, sin probar en un móvil real.
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
-- **Android:** `dist/ribera-verde.apk` (1.9.0, código 10900, siempre en horizontal), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
-- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está en la 1.9.0, con el atlas completo (1169 fotogramas). Es privado: se comparte desde su menú Compartir. No se republica mientras la vista B se vea con arte procedural.
+- **Android:** `dist/ribera-verde.apk` (1.10.0, código 11000, siempre en horizontal), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
+- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está en la 1.10.0, con el atlas completo (1401 fotogramas). Es privado: se comparte desde su menú Compartir.
 
 ## Limitaciones conocidas
 
@@ -78,7 +78,7 @@
 
 ## Siguientes pasos sugeridos
 
-0. Seguir [docs/PLAN-PRODUCCION.md](docs/PLAN-PRODUCCION.md): corte de la vista C aprobado (§5.2); lámina A (CFL e híbrida) aprobada; seguir con el resto de su arte desde ese corte (LED, macetas de tela y 18 L, extras, fases de la índica y la sativa), P4–P6.
+0. Siguiente tanda de la 1.10 (ver el CLAUDE.md de la raíz): ropa y pelo, muebles y casa; después, el local clandestino de setas.
 1. Probar los dos APK en un móvil real (el de WebView y el de Godot, la vista de carpa incluida).
 2. Revisar el arte nuevo jugando y repetir lo que no convenza (cada asset del manifiesto guarda sus ids, semillas y descartes). Guía: [docs/PIXELLAB.md](docs/PIXELLAB.md); comando `/sprites`.
 3. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.

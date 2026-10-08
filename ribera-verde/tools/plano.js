@@ -3,7 +3,7 @@
   Ribera Verde — plano del juego (1.8.0; vista de carpa B desde P2)
   Pinta cada mapa entero a 1 casilla = 32 px (×2) con la rejilla, las coordenadas y lo que hay en él (edificios, puertas,
   salidas, NPC, objetos y carpas), y una hoja de escala con todos los sprites junto al jugador, medidos contra su
-  tamaño real (en el mapa, 16 px = 1 m; en la vista de carpa B, 60 px = 1 m de ancho y de alto). Salida: docs/plano/<mapa>.png, docs/plano/escala.png, docs/plano/vista-b.png (las 5 carpas abiertas) y docs/plano/medidas.json (lo usa docs/PLANO.md).
+  tamaño real (en el mapa, 16 px = 1 m; en la vista de carpa B, 60 px = 1 m de ancho y de alto). Salida: docs/plano/<mapa>.png, docs/plano/escala.png, docs/plano/vista-b.png (las 5 carpas abiertas), docs/plano/vista-c.png (las mismas, por dentro: la vista con el atlas) y docs/plano/medidas.json (lo usa docs/PLANO.md).
   Uso:  node tools/build.js && node tools/plano.js
 */
 const { chromium } = require('playwright');
@@ -18,7 +18,7 @@ const REAL = {
   muebles: [['Cama', 'bed', 'ancho', .9], ['Nevera', 'fridge', 'ancho', .6], ['Ordenador', 'pc', 'ancho', 1.2], ['Mesa genética', 'lab', 'ancho', 1.2],
     ['Mesa genética 2', 'lab2', 'ancho', 1.2], ['Mesa', 'table', 'ancho', .8], ['Planta deco', 'plantDeco', 'alto', .9], ['Estantería', 'shelfW', 'ancho', .9],
     ['Mostrador', 'counter', 'alto', 1.0], ['Expositor', 'display', 'ancho', .8], ['Botellero', 'bottles', 'ancho', 1.0], ['Taburete', 'stool', 'alto', .75],
-    ['Mesa de bar', 'btable', 'ancho', .7], ['Gramola', 'jukebox', 'ancho', .7], ['Cajas', 'crate', 'ancho', .6]],
+    ['Mesa de bar', 'btable', 'ancho', .7], ['Gramola', 'jukebox', 'ancho', .7], ['Cajas', 'crate', 'ancho', .8]],   // (1.10) cajas: dos de 40 cm, una al lado de la otra
   cultivo: [['Armario 60×60', 'carpa:p60', 'ancho', .6], ['Armario 80×80', 'carpa:p80', 'ancho', .8], ['Carpa 100×100', 'carpa:m100', 'ancho', 1.0],
     ['Carpa 120×120', 'carpa:m120', 'ancho', 1.2], ['Carpa 150×100', 'carpa:g150', 'ancho', 1.5]],
   // vista de carpa B (60 px/m de ancho y alto): de las carpas (las plateadas de frente; sin atlas, en 3/4) se mide el suelo de delante
@@ -202,14 +202,16 @@ const REAL = {
       m100: ['led480', { vent: 1, filtro: 1 }, [['haze', 1], ['nepal', 1], ['afkush', 1], ['thai', .7]], ['tela25', 'plastico18', 'tela25', 'tela25']],
       m120: ['led720', { filtro: 1, goteo: 1 }, [['limon', 1], ['citrus', 1], ['mango', 1], ['malawi', .5], ['ria', .25], ['txoko', .05]], ['tela25', 'tela25', 'tela25', 'plastico18', 'tela11', 'plastico7']],
       g150: ['sodio600', { vent: 1, filtro: 1, goteo: 1 }, [['oaxaca', 1], ['dragon', .8], ['kif', 1], ['lamb', .5], ['nl', .2], null], ['tela25', 'tela25', 'tela25', 'plastico18', 'tela11', 'plastico7']] };
-    const VE = 2, [vc, vx] = mkCanvas(5 * (240 * VE + 16) + 16, 160 * VE + 56); vx.imageSmoothingEnabled = false; vx.fillStyle = '#1a1d24'; vx.fillRect(0, 0, vc.width, vc.height);
+    // (1.10) y la vista C, la que se ve con el atlas: las mismas carpas por dentro (vista-c.png)
+    const VE = 2, [vc, vx] = mkCanvas(5 * (240 * VE + 16) + 16, 160 * VE + 56), [vcc, vcx] = mkCanvas(vc.width, vc.height);
+    for (const x of [vx, vcx]) { x.imageSmoothingEnabled = false; x.fillStyle = '#1a1d24'; x.fillRect(0, 0, vc.width, vc.height); }
     Object.entries(MUESTRA).forEach(([t, [foco, ex, pots, mac]], i) => {
       S.carpas = [Object.assign({ t, foco }, ex)]; S.macetas = mac; S.pots = pots.map(p => p && { sid: p[0], prog: p[1], water: 80, health: 100 });
-      VC = { ci: 0, sel: 99, ocupado: true }; renderCarpa(1000); VC = null;   // sel 99: sin cursor
-      const px = 16 + i * (240 * VE + 16); vx.drawImage(cv, OX(), 0, 240, 160, px, 16, 240 * VE, 160 * VE);
-      texto(vx, `${CARPAS[t].n} · ${FOCOS[foco].n}`, px, 160 * VE + 36, '#e8ecf4', 12);
+      const px = 16 + i * (240 * VE + 16);
+      for (const [cc, xx, b] of [[vc, vx, true], [vcc, vcx, false]]) { VC = { ci: 0, sel: 99, ocupado: true }; renderCarpa(1000, b); VC = null;   // sel 99: sin cursor
+        xx.drawImage(cv, OX(), 0, 240, 160, px, 16, 240 * VE, 160 * VE); texto(xx, `${CARPAS[t].n} · ${FOCOS[foco].n}`, px, 160 * VE + 36, '#e8ecf4', 12); }
     });
-    out.vistaB = vc.toDataURL('image/png');
+    out.vistaB = vc.toDataURL('image/png'); out.vistaC = vcc.toDataURL('image/png');
     // distancia segura de cada carpa: centros de las macetas (cm), separación mínima entre ellas y a la pared, copa máxima de
     // la planta y alto máximo sobre la maceta más alta que admite, con cada foco (FOCO_SEP)
     out.holgura = HOLGURA; out.espacio = Object.keys(CARPAS).map(t => {
@@ -227,6 +229,7 @@ const REAL = {
   for (const [n, m] of Object.entries(res.mapas)) { png(n + '.png', m.png); console.log('  docs/plano/' + n + '.png'); }
   png('escala.png', res.escala); console.log('  docs/plano/escala.png');
   png('vista-b.png', res.vistaB); console.log('  docs/plano/vista-b.png');
+  png('vista-c.png', res.vistaC); console.log('  docs/plano/vista-c.png');
   const inv = Object.fromEntries(Object.entries(res.mapas).map(([n, m]) => [n, m.inv]));
   fs.writeFileSync(path.join(OUT, 'medidas.json'), JSON.stringify({ escala: 'mapa: 1 casilla = 16 px = 1 m · vista de carpa B: 60 px = 1 m de ancho y alto (las carpas plateadas, de frente)', mapas: inv, sprites: res.medidas, espacio: { holgura: res.holgura, carpas: res.espacio } }, null, 1) + '\n');
   console.log('  docs/plano/medidas.json · ' + res.medidas.length + ' sprites medidos');

@@ -252,11 +252,21 @@ static func apagado(c: Image) -> Image:
 	return o
 
 # pared o luz de la carpa: la de 240 × 160 con la pared del fondo recortada a su ancho (los laterales, con los postes del fondo, enteros)
+# la boca del foco mide a px y la luz sale de una de 46: con un foco más ancho, la luz se ensancha por igual desde el centro
+static func luz_k(vc: Dictionary) -> float:
+	return maxf(1, vc.foco.a / 46.0)
+
 static func fondo(t: String, vc: Dictionary, capa: String) -> Image:
-	var k := "vc|%s|%s" % [t, capa]
+	var kl := luz_k(vc) if capa == "luz" else 1.0
+	var k := "vc|%s|%s" % [t, capa] + ("|%d" % vc.foco.a if kl > 1 else "")
 	if cache.has(k):
 		return cache[k]
 	var s := foto("carpa-c-" + capa)
+	if kl > 1:
+		var e := Image.create(240, 160, false, Image.FORMAT_RGBA8)
+		for i in 240:
+			e.blit_rect(s, Rect2i(int(floor(120 + (i + .5 - 120) / kl)), 0, 1, 160), Vector2i(i, 0))
+		s = e
 	var L: int = Datos.carga().VCA.lado
 	var xl: int = vc.xl
 	var xr: int = xl + vc.w
@@ -264,6 +274,18 @@ static func fondo(t: String, vc: Dictionary, capa: String) -> Image:
 	_pega(o, s, 0, L, xl - L)
 	_pega(o, s, xl, vc.w, xl)
 	_pega(o, s, 240 - L, L, xr)
+	# el suelo, más oscuro lejos del foco (1.10 P5): hasta un 25 % en las esquinas de delante, por la distancia al centro (x 120, y 150)
+	if capa == "pared":
+		var V: Dictionary = Datos.carga().VCA
+		for y in range(int(V.fondo), 160):
+			var h: float = (vc.w + 32 * (y - V.fondo) / 19.0) / 2
+			var dy: float = (y + .5 - V.base) / 19
+			for i in range(maxi(0, ceili(120 - h)), mini(240, ceili(120 + h))):
+				var dx: float = (i + .5 - 120) / h
+				var kk := Datos.jsround(64 * minf(1, dx * dx + dy * dy))
+				var p := o.get_pixel(i, y)
+				if p.a8:
+					o.set_pixel(i, y, Color8((p.r8 * (256 - kk)) >> 8, (p.g8 * (256 - kk)) >> 8, (p.b8 * (256 - kk)) >> 8, p.a8))
 	cache[k] = o
 	return o
 
@@ -280,7 +302,7 @@ static func luz(t: String, vc: Dictionary) -> Image:
 	var lc: Dictionary = Datos.carga().LUZ_C
 	if not lc.has(vc.tipo):
 		return L
-	var k := "vc|%s|luz|%s" % [t, vc.tipo]
+	var k := "vc|%s|luz|%s|%d" % [t, vc.tipo, vc.foco.a]
 	if cache.has(k):
 		return cache[k]
 	var c: Array = lc[vc.tipo][0]
@@ -292,6 +314,53 @@ static func luz(t: String, vc: Dictionary) -> Image:
 			if p.a8:
 				var l := (.299 * p.r8 + .587 * p.g8 + .114 * p.b8) / lk
 				o.set_pixel(x, y, Color8(Datos.u8(minf(255, c[0] * l)), Datos.u8(minf(255, c[1] * l)), Datos.u8(minf(255, c[2] * l)), p.a8))
+	cache[k] = o
+	return o
+
+# columnas (primera y última) con algo de cada imagen
+static func caja(im: Image) -> Array:
+	var k := "caja|%d" % im.get_instance_id()
+	if cache.has(k):
+		return cache[k]
+	var a := im.get_width()
+	var b := -1
+	for y in im.get_height():
+		for x in im.get_width():
+			if im.get_pixel(x, y).a8 > 0:
+				a = mini(a, x)
+				b = maxi(b, x)
+	cache[k] = [a, b]
+	return cache[k]
+
+# el agua de la garrafa y del depósito pequeño: los píxeles «dentro» (par[0]) de las fr filas de abajo (fracción de las filas que
+# la tienen) pasan al color del agua (par[1])
+static func nivel(im: Image, par: Array, fr: float) -> Image:
+	var K := Datos.hexi(par[0])
+	# las filas del agua (y0, y1), una vez por imagen: se pide cada fotograma
+	var kf := "nivf|%d|%s" % [im.get_instance_id(), par[0]]
+	if not cache.has(kf):
+		var a := im.get_height()
+		var b := -1
+		for y in im.get_height():
+			for x in im.get_width():
+				var p := im.get_pixel(x, y)
+				if p.a8 and ((p.r8 << 16) | (p.g8 << 8) | p.b8) == K:
+					a = mini(a, y)
+					b = maxi(b, y)
+		cache[kf] = [a, b]
+	var y0: int = cache[kf][0]
+	var y1: int = cache[kf][1]
+	var n := 0 if y1 < 0 else Datos.jsround((y1 - y0 + 1) * clampf(fr, 0, 1))
+	var k := "niv|%d|%d" % [im.get_instance_id(), n]
+	if cache.has(k):
+		return cache[k]
+	var A := Color.html(par[1])
+	var o: Image = im.duplicate()
+	for y in range(maxi(0, y1 - n + 1), y1 + 1):
+		for x in o.get_width():
+			var p := o.get_pixel(x, y)
+			if p.a8 and ((p.r8 << 16) | (p.g8 << 8) | p.b8) == K:
+				o.set_pixel(x, y, Color8(A.r8, A.g8, A.b8, p.a8))
 	cache[k] = o
 	return o
 

@@ -42,6 +42,7 @@ func igual(que: String, a, b, tol := 0.0) -> void:
 func estado(e: Dictionary) -> Dictionary:
 	var S := Cultivo.nuevo_estado()
 	S.carpas = [{"t": e.t, "foco": e.foco}]
+	S.carpas[0].merge(e.get("x", {}).duplicate(true))
 	S.macetas = e.macetas.duplicate()
 	S.pots = []
 	for p in e.pots:
@@ -251,12 +252,14 @@ func _fin(que: String) -> void:
 
 # C2: cada escena en un SubViewport de 240 × 160, comparada con la del HTML. Sin la luz, idéntica salvo en lo que se pinta
 # translúcido (la fila de delante de la elegida al 35 % y la marca del cursor), donde el canvas mezcla en 8 bits y la GPU en coma
-# flotante: ahí, ±TOL_ALFA. Con la luz (el «overlay», que dobla esas diferencias), cada canal como mucho a TOL del HTML
-const TOL := 4
+# flotante: ahí, ±TOL_ALFA. Con la luz (el «overlay», que dobla esas diferencias, más 1 de su redondeo), cada canal como mucho a
+# TOL del HTML: la sombra de la maceta de la fila de delante (1.10 P5) es una capa translúcida sobre otra, junto al suelo
+const TOL := 5
 const TOL_ALFA := 2
 
-# rectángulos de lo translúcido: maceta y planta (con su balanceo de ±1 px y la plaga) de las filas de delante de la elegida y la
-# marca del cursor
+# rectángulos de lo translúcido: maceta y planta (con su balanceo de ±1 px y la plaga) de las filas de delante de la elegida, con
+# su garrafa (detrás a la derecha: hasta 12 px más), la
+# marca del cursor y la sombra de cada maceta en el suelo (de q.y − 1 a q.y + 1)
 func translucido(e: Dictionary) -> Array:
 	var g = Vista.geo(estado(e), 0)
 	var fsel := 0
@@ -266,7 +269,8 @@ func translucido(e: Dictionary) -> Array:
 	var o := []
 	for q in g.pl:
 		if q.fila < fsel:
-			o.append(Rect2i(q.x - 21, 0, 42, q.y + 1))
+			o.append(Rect2i(q.x - 21, 0, 54, q.y + 1))
+		o.append(Rect2i(q.x - 21, q.y - 1, 42, 3))
 		if q.i == int(e.sel):
 			o.append(Rect2i(q.x - 7, q.y, 14, 2))
 	return o

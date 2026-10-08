@@ -114,7 +114,7 @@ func _initialize() -> void:
 			for y in fc.get_height():
 				for x in fc.get_width():
 					if opaco(fc, x, y):
-						campana[Vector2i(96 + x, boca - 15 + y)] = true
+						campana[Vector2i(120 - (fc.get_width() >> 1) + x, boca - 15 + y)] = true
 			# cada plaza con cada planta: sus filas en pantalla y cuánto se mueve cada una
 			var dib := {}   # i → [{c, f: {y: [a, b]}, sh: {y: 0|1}}]
 			for i in np:

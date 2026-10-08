@@ -182,13 +182,21 @@ function arteOrilla(m,k,tx,ty,sx,sy){
 // pared (fila de abajo de la pared, 2 m a 16 px/m), subidos a su altura (1.10, ALZA px): ventanas y cuadros con el alféizar a
 // 0,9 m, las baldas de las plantas a 1 m y la de las botellas a 1,05 m (antes, todos a ras de suelo)
 const ALZA={iwin:-13,poster:-13,shelfW:-16,bottles:-13};
-function arteObj(o,tx,ty,cam,now,list){
+// los muebles que dejan sombra en el suelo (1.10 P5): como la de los personajes, 1 px a cada lado del dibujo en sus 2 últimas filas y
+// la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo. Van a «sombras» y se pintan con todo el suelo ya puesto
+const SOMBRA_OBJ=new Set(['fridge','crate','table','btable','stool','plantDeco','lab','lab2','pc','display','counter','barcounter','jukebox','bench','bedB']);
+function arteObj(o,tx,ty,cam,now,list,sombras){
   if(!ARTE.ok)return false;
   const g=ARTE.cubre['obj:'+o];if(!g)return false;
   const an=ARTE.sobre['obj:'+o],d=desfase(o,tx,ty);
   const f=an?frameDe(an[0][0],an[0][1],'unica',now,{bucle:true}):frameDe(g,o,'unica',0,{i:0,esp:d.esp});
   if(!f)return false;
   const xp=tx*16+8+d.dx-cam.x,yp=ty*16+15+d.dy+(ALZA[o]||0)-cam.y;
+  if(sombras&&SOMBRA_OBJ.has(o)){
+    const m=MAPS[S.map],ob=(x,y)=>{const r=m.o[y];return !!(r&&r[x]);},[a,b]=vcCaja(f.c),x0=Math.round(xp-f.cel.ancla[0])+a,x1=x0+b-a,sx=tx*16-cam.x;
+    if(x0-1>=sx||!ob(tx-1,ty))sombras.push([x0-1,yp-1,1,2]);
+    if(x1+1<=sx+15||!ob(tx+1,ty))sombras.push([x1+1,yp-1,1,2]);
+    if(!ob(tx,ty+1))sombras.push([x0,yp+1,x1-x0+1,1]);}
   if(f.cel.h>16&&list)list.push([ty*16+Math.min(0,d.dy),()=>pinta(f,xp,yp)]);else pinta(f,xp,yp);   // corrido hacia abajo, no pasa delante de quien está en su fila
   return true;
 }
@@ -263,8 +271,11 @@ function arteRetrato(look,cx,fy,now,k=2){
 const ICO={};
 function icono(n){
   if(!ARTE.ok)return null;if(n in ICO)return ICO[n];
-  const f=frameDe('iconos',n,'unica',0,{i:0});return ICO[n]=f?f.c.toDataURL():null;
+  const f=frameDe('iconos',n,'unica',0,{i:0})||frameDe('iconos-equipo',n,'unica',0,{i:0});return ICO[n]=f?f.c.toDataURL():null;
 }
+// el icono del equipo (lámina 12): los LED, su panel; los demás focos, la lámpara; armarios (60 y 80) y carpas; cada extra, el suyo
+const icoFoco=k=>FOCOS[k]&&FOCOS[k].tipo==='led'?'led':'lampara',icoCarpa=t=>t==='p60'||t==='p80'?'armario':'carpa',
+  ICX={vent:'ventilador',filtro:'filtro',garrafas:'garrafa',goteo:'goteo'};
 function iconoCogollo(sid){
   if(!ARTE.ok)return null;const s=getStrain(sid),key='c|'+sid+'|'+(s&&s.c);if(key in ICO)return ICO[key];
   const t=TIPO_COGOLLO[sid]||'hibrido',f=frameDe('cogollos-genoteca',t,'unica',0,{i:0});if(!f||!s)return ICO[key]=null;

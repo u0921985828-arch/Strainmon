@@ -5,7 +5,8 @@
 # Lo opaco (casillas, sprites, carpas, macetas, plantas, barras, bocadillos) tiene que salir igual. Lo que el canvas mezcla
 # (sombras, la fila de delante en transparencia, la tarde y la noche, el antialias de los trazos, del agua del título, de la elipse
 # y del cono, y la suma de las farolas y del cono) lo mezcla la GPU en coma flotante y el canvas en 8 bits: cada canal, como mucho
-# a TOL. Deja godot-p-*.png y dif-p-*.png (rojo: más de 1; amarillo: 1).
+# a TOL (4; en la carpa, TOL_C, 5: la luz de la vista C, un «overlay», dobla la diferencia de 2 de la sombra de la maceta de
+# delante, translúcida sobre la maceta translúcida, más 1 de su redondeo). Deja godot-p-*.png y dif-p-*.png (rojo: más de 1; amarillo: 1).
 #   xvfb-run … $GODOT --path godot --rendering-driver opengl3 --audio-driver Dummy --script res://tests/pantallas.gd --
 #     --sin-arranque --pintar <dir con html-p-*.png> [--pantallas f.json]
 #   → «C2 pantallas: N escenas, 0 diferencias»
@@ -15,6 +16,7 @@ const Datos = preload("res://src/datos.gd")
 const Juego = preload("res://src/juego.gd")
 
 const TOL := 4
+const TOL_C := 5
 
 var J
 var fallos: Array = []
@@ -76,8 +78,9 @@ func _corre() -> void:
 					dif.set_pixel(x, y, Color(b.r, b.g, b.b).darkened(.7))
 		dif.save_png(dir.path_join("dif-p-%s.png" % k))
 		print("%-18s SW %d · píxeles distintos %5d (más de 1: %5d) · diferencia máxima %d" % [k, im.get_width(), n, n2, mx])
-		if mx > TOL:
-			fallos.append("%s: diferencia máxima %d (> %d)" % [k, mx, TOL])
+		var tol := TOL_C if k.begins_with("carpa-c") else TOL
+		if mx > tol:
+			fallos.append("%s: diferencia máxima %d (> %d)" % [k, mx, tol])
 		tot += 1
 	for x in fallos:
 		print("  FALLO ", x)

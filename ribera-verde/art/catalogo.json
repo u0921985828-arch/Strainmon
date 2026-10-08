@@ -1,6 +1,6 @@
 {
  "generado": "tools/sprites/catalogo.js",
- "claves": 236,
+ "claves": 257,
  "catalogo": {
   "look:player": [
    {
@@ -1485,15 +1485,6 @@
     "depende_de": []
    }
   ],
-  "obj:crate": [
-   {
-    "asset": "props-16",
-    "familia": "objeto-lote",
-    "herramienta": "create_1_direction_object",
-    "fase": "F4",
-    "depende_de": []
-   }
-  ],
   "obj:bush": [
    {
     "asset": "props-16",
@@ -1605,15 +1596,6 @@
   "obj:poster": [
    {
     "asset": "props-16",
-    "familia": "objeto-lote",
-    "herramienta": "create_1_direction_object",
-    "fase": "F4",
-    "depende_de": []
-   }
-  ],
-  "obj:fridge": [
-   {
-    "asset": "props-32",
     "familia": "objeto-lote",
     "herramienta": "create_1_direction_object",
     "fase": "F4",
@@ -2197,6 +2179,213 @@
   "misc:planta-c-s2-32": [
    {
     "asset": "carpa-c-plantas-a",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:foco-c-led100-26": [
+   {
+    "asset": "carpa-c-focos-led",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:foco-c-led100-20": [
+   {
+    "asset": "carpa-c-focos-led",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:foco-c-led200-30": [
+   {
+    "asset": "carpa-c-focos-led",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:foco-c-led200-24": [
+   {
+    "asset": "carpa-c-focos-led",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:foco-c-cfl-25": [
+   {
+    "asset": "carpa-c-focos-led",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:foco-c-led480-47": [
+   {
+    "asset": "carpa-c-focos-led-ancho",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:foco-c-led720-78": [
+   {
+    "asset": "carpa-c-focos-led-ancho",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-c-tela11-26": [
+   {
+    "asset": "carpa-c-macetas-b",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-c-tela11-20": [
+   {
+    "asset": "carpa-c-macetas-b",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-c-tela25-27": [
+   {
+    "asset": "carpa-c-macetas-b",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-c-plastico18-26": [
+   {
+    "asset": "carpa-c-macetas-b",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:maceta-c-plastico18-23": [
+   {
+    "asset": "carpa-c-macetas-b",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:extra-c-vent": [
+   {
+    "asset": "carpa-c-extras",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:extra-c-filtro-28": [
+   {
+    "asset": "carpa-c-extras",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:extra-c-filtro-39": [
+   {
+    "asset": "carpa-c-extras",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:extra-c-garrafa-20": [
+   {
+    "asset": "carpa-c-extras",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:extra-c-garrafa-23": [
+   {
+    "asset": "carpa-c-extras",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:extra-c-garrafa-26": [
+   {
+    "asset": "carpa-c-extras",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:extra-c-garrafa-29": [
+   {
+    "asset": "carpa-c-extras",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:extra-c-llave": [
+   {
+    "asset": "carpa-c-extras",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:extra-c-deposito": [
+   {
+    "asset": "carpa-c-extras",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "obj:fridge": [
+   {
+    "asset": "props-escala",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "obj:crate": [
+   {
+    "asset": "props-escala",
     "familia": "importado",
     "herramienta": "importado",
     "fase": "F9",

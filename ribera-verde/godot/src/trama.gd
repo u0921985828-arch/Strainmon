@@ -97,7 +97,11 @@ func shop() -> void:
 			elif it.get("maceta"):
 				ic = icono("maceta")
 			elif it.get("foco"):
-				ic = icono("lampara")
+				ic = icono(Atlas.ico_foco(it.foco))
+			elif it.get("extra"):
+				ic = icono(Atlas.ICX[it.extra])
+			elif it.get("carpa"):
+				ic = icono(Atlas.ico_carpa(it.carpa))
 			items.append({"label": it.lbl, "right": Datos.eur(it.p) + ("/u" if it.get("sid") else ""), "sw": D.STRAINS[it.sid].c if it.get("sid") else null, "ic": ic,
 				"desc": strain_line(it.sid) if it.get("sid") else it.get("desc", "")})
 		items.append({"label": "Salir", "desc": "Volver al mostrador."})
@@ -820,10 +824,10 @@ func mochila() -> void:
 				rows.append({"label": "Maceta " + D.MACETAS[k].n, "right": "×" + n(S.items["m_" + k]), "ic": icono("maceta"), "desc": desc_maceta(k) + "\nSe cambia en una plaza vacía de la carpa."})
 		for k in D.FOCOS:
 			if S.items.get("f_" + k, 0) > 0:
-				rows.append({"label": "Foco " + D.FOCOS[k].n, "right": "×" + n(S.items["f_" + k]), "ic": icono("lampara"), "desc": desc_foco(k) + "\nSe cuelga desde la vista de carpa: ▲ hasta el foco y A."})
+				rows.append({"label": "Foco " + D.FOCOS[k].n, "right": "×" + n(S.items["f_" + k]), "ic": icono(Atlas.ico_foco(k)), "desc": desc_foco(k) + "\nSe cuelga desde la vista de carpa: ▲ hasta el foco y A."})
 		for k in D.EXTRAS:
 			if S.items.get("x_" + k, 0) > 0:
-				rows.append({"label": D.EXTRAS[k].n, "right": "×" + n(S.items["x_" + k]), "desc": D.EXTRAS[k].d + "\nSe pone%s desde la vista de carpa: ▲ hasta el foco y A." % ("n" if D.EXTRAS[k].get("pl") else "")})
+				rows.append({"label": D.EXTRAS[k].n, "right": "×" + n(S.items["x_" + k]), "ic": icono(Atlas.ICX[k]), "desc": D.EXTRAS[k].d + "\nSe pone%s desde la vista de carpa: ▲ hasta el foco y A." % ("n" if D.EXTRAS[k].get("pl") else "")})
 		for k in S.seeds:
 			rows.append({"label": "Semilla " + strain(k).n, "right": "×" + n(S.seeds[k]), "sw": strain(k).c, "ic": icono("semillas"), "desc": strain_line(k)})
 		for e in S.esquejes:
@@ -863,7 +867,7 @@ func plantas() -> void:
 		var C: Dictionary = D.CARPAS[c.t]
 		var F: Dictionary = D.FOCOS[c.foco]
 		var wm2 := Datos.jsround(F.w / (C.cm[0] * C.cm[2] / 1e4))
-		rows.append({"label": C.n, "right": F.n, "ic": icono("lampara"), "desc": "%s plantas · foco %s, %d W/m²%s\nLuz: %s al día con plantas · hasta %s W, macetas de %s L y %d L de tierra (%d puestos)." % [n(C.plazas), F.n, wm2,
+		rows.append({"label": C.n, "right": F.n, "ic": icono(Atlas.ico_carpa(c.t)), "desc": "%s plantas · foco %s, %d W/m²%s\nLuz: %s al día con plantas · hasta %s W, macetas de %s L y %d L de tierra (%d puestos)." % [n(C.plazas), F.n, wm2,
 			" (poca luz: crecen más despacio y con menos THC)" if wm2 < D.W_M2 else "", Datos.eur(luz_carpa(ci)), n(C.wmax), n(C.lmax), litros_max(ci), litros_carpa(ci)]})
 		for i in H.size():
 			var h: Dictionary = H[i]

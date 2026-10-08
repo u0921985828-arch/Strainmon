@@ -157,7 +157,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       // tierra (1.10): de frente, cada maceta que admite la carpa queda entre las columnas del suelo de la plateada, a su fondo; y el tope de litros de la carpa: en la de 120 con 5 de 25 L y una de 7, solo cabe la de 18 L
       r.dentro = [];
       for (const t in CARPAS) { const C = CARPAS[t], k = VB_PLATA[t]; let peor = 1e9;
-        for (const m in MACETAS) if (MACETAS[m].l <= C.lmax) { S.carpas = [{ t, foco: 'led200' }]; S.macetas = Array(C.plazas).fill(m); const g = vcGeo(0), w = macetaPx(m).w;
+        for (const m in MACETAS) if (MACETAS[m].l <= C.lmax) { S.carpas = [{ t, foco: 'led200' }]; S.macetas = Array(C.plazas).fill(m); const g = vcGeo(0, true), w = macetaPx(m).w;
           if (!g.plata) { peor = -1e9; continue; }
           for (const q of g.pl) { const f = (155 - q.y) / 17, xl = 120 + k.xf[0] + (k.xb[0] - k.xf[0]) * f, xr = 120 + k.xf[1] + (k.xb[1] - k.xf[1]) * f;
             peor = Math.min(peor, q.x - (w >> 1) - xl, xr - (q.x - (w >> 1) + w - 1)); } }
@@ -296,14 +296,31 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
         let dib = 0, luzD = 0; const di = ctx.drawImage, luz = g.vc && vcLuz('p60', g.vc); ctx.drawImage = function (im, ...a) { if (im === off) dib++; if (im === luz) luzD++; return di.call(this, im, ...a); };
         if (g.vc) { VC = { ci: 0, sel: 0, ocupado: false }; renderCarpa(1000); VC = null; } ctx.drawImage = di;
         r.cflApagado = g.vc && { encendidos: vivos(fc), apagados: vivos(off), dib, luzD }; if (!g.vc || !r.cflApagado.encendidos || r.cflApagado.apagados || !dib || luzD) r.fallos.push('p60/cfl apagado: ' + JSON.stringify(r.cflApagado)); }
-      r.b = { led100: !pon('p60', 'led100', ['mango', null]).vc, extras: !pon('p60', 'sodio250', ['mango', null], 1, { vent: true }).vc, cfl200: !pon('m100', 'cfl', ['ria', null, null, null]).vc,
-        tela: (() => { pon('p60', 'sodio250', [null, null]); S.macetas[0] = 'tela11'; return !vcGeo(0).vc; })(), vacia: (() => { const g = pon('m100', 'sodio600', [null, null, null, null]); if (!g.vc) return false;   // vacía: vista C con el foco apagado, sin luz
+      // con el atlas, siempre la vista C (1.10): en cada carpa, con cada foco y cada maceta que admite, con los 4 extras y una planta muerta,
+      // el foco y la maceta a su ancho real (×0,75-1,25) y los extras dibujados (filtro, ventilador, llaves, depósito pequeño; sin goteo, las
+      // garrafas); sin el atlas, la vista B
+      r.siempre = 0; r.b = {};
+      for (const t in CARPAS) for (const f in FOCOS) if (FOCOS[f].w <= CARPAS[t].wmax) for (const k in MACETAS) if (MACETAS[k].l <= CARPAS[t].lmax) for (const got of [true, false]) {
+        const n = CARPAS[t].plazas, g = pon(t, f, ['rif', ...Array(n - 1).fill('thai')], .8, { vent: true, filtro: true, garrafas: true, goteo: got, dep: 100 });
+        S.macetas = Array(n).fill(k); S.pots[n - 1].dead = true; const G = vcGeo(0), vc = G.vc;
+        if (!vc) { r.fallos.push(`${t}/${f}/${k}: sin vista C`); continue; }
+        const fr = FOCO_CM[f] * vc.Z, mr = MACETA_CM[k][0] * vc.Z;
+        if (Math.abs(ancho(vc.foco.f.c) - fr) > fr * .25 + 1) r.fallos.push(`${t}/${f}: foco de ${ancho(vc.foco.f.c)} px (${fr.toFixed(1)})`);
+        for (const q of G.pl) if (Math.abs(ancho(q.v.m.f.c) - mr) > mr * .25 + 1) r.fallos.push(`${t}/${k}: maceta de ${ancho(q.v.m.f.c)} px (${mr.toFixed(1)})`);
+        const usados = new Set(), di = ctx.drawImage, nom = new Map(Object.keys(ARTE.cubre).filter(c => c.startsWith('misc:extra-c-')).flatMap(c => { const s = c.slice(5), A = ARTE.cubre[c];
+          return [...Array(frameDe(A, s, 'unica', 0, { i: 0 }).n)].map((_, i) => [frameDe(A, s, 'unica', 0, { i }).c, s.replace(/-\d+$/, '')]); }));
+        ctx.drawImage = function (im, ...a) { usados.add(nom.get(im) || (im.width === 48 && im.height === 48 ? 'nivel' : '')); return di.call(this, im, ...a); };
+        VC = { ci: 0, sel: 0, ocupado: false }; renderCarpa(1000); VC = null; ctx.drawImage = di;
+        const falta = ['extra-c-filtro', 'extra-c-vent', ...(got ? ['extra-c-llave', 'nivel'] : ['nivel'])].filter(x => !usados.has(x));
+        if (falta.length) r.fallos.push(`${t}/${f}/${k}${got ? ' goteo' : ''}: sin ${falta}`); r.siempre++; }
+      { const ok = ARTE.ok; ARTE.ok = false; r.b.sinAtlas = !pon('p60', 'led100', ['mango', null]).vc; ARTE.ok = ok; }
+      r.b.vacia = (() => { const g = pon('m100', 'sodio600', [null, null, null, null]); if (!g.vc) return false;   // vacía: vista C con el foco apagado, sin luz
           const luz = vcFondo('m100', g.vc, 'luz'), di = ctx.drawImage; let n = 0, encendido = 0;
           ctx.drawImage = function (im, ...a) { if (im === luz) n++; if (im === g.vc.foco.f.c) encendido++; return di.call(this, im, ...a); };
-          VC = { ci: 0, sel: 0, ocupado: false }; renderCarpa(1000); VC = null; ctx.drawImage = di; return !n && !encendido; })() };
+          VC = { ci: 0, sel: 0, ocupado: false }; renderCarpa(1000); VC = null; ctx.drawImage = di; return !n && !encendido; })();
       r.anchos = [...r.anchos].sort().join(); r.portes = [...r.portes].sort().join();
       S.carpas = C0; S.macetas = M0; S.pots = P0; return r; });
-    check('Vista C (imagen A): en las 5 carpas, la planta A del porte de cada planta (su % índica) en todas sus fases, con el tono de hoja de su variedad; la más ancha que deja 2 px de aire con su vecina de fila y no se sale de las paredes (la de 38 o la de 32); de su alto real, sin pasar de su distancia al foco, con el fotograma de su alto (uno cada 2 px, sin filas repetidas, más alta = más cogollo) o aplastado 1 fila, sin escalar, en todas las carpas y focos; la pared solo lleva tela, macetas y plantas sin luz pintada y la luz es su propio sprite, por delante en «overlay» (la del CFL, fría y al 60 %); el CFL apagado, gris; sin arte, la vista B', vc.escenas.length === 11 && vc.aplastadas >= 5 && vc.exactas >= 5 && vc.anchos === '18,32,38,8' && vc.portes === 'h0,h2,h3,h4,i0,i2,i3,i4,s1,s2,s3,s4' && vc.cubre >= 100 && !vc.fallos.length && Object.values(vc.b).every(Boolean), vc);
+    check('Vista C (imagen A): en las 5 carpas, la planta A del porte de cada planta (su % índica) en todas sus fases, con el tono de hoja de su variedad; la más ancha que deja 2 px de aire con su vecina de fila y no se sale de las paredes (la de 38 o la de 32); de su alto real, sin pasar de su distancia al foco, con el fotograma de su alto (uno cada 2 px, sin filas repetidas, más alta = más cogollo) o aplastado 1 fila, sin escalar, en todas las carpas y focos; la pared solo lleva tela, macetas y plantas sin luz pintada y la luz es su propio sprite, por delante en «overlay» (la del CFL, fría y al 60 %); el CFL apagado, gris; con el atlas, siempre la vista C (cada foco, maceta y extra, a su ancho, y la muerta); sin atlas, la vista B', vc.escenas.length === 11 && vc.aplastadas >= 5 && vc.exactas >= 5 && vc.anchos === '18,32,38,8' && vc.portes === 'h0,h2,h3,h4,i0,i2,i3,i4,s1,s2,s3,s4' && vc.cubre >= 100 && vc.siempre >= 100 && !vc.fallos.length && Object.values(vc.b).every(Boolean), vc);
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
       for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }
       r.rio = mascaraOrilla(m, 31, 15); r.centro = mascaraOrilla(m, 35, 27); r.sinAtlas = (() => { const ok = ARTE.ok; ARTE.ok = false; const v = arteOrilla(m, 'water', 31, 15, 0, 0); ARTE.ok = ok; return v; })(); return r; });

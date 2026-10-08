@@ -348,7 +348,7 @@ func cambiar_foco(ci: int) -> void:
 		return
 	var it := []
 	for k in l:
-		it.append({"label": "Foco " + D.FOCOS[k].n, "right": "×" + n(S.items["f_" + k]), "ic": icono("lampara"), "desc": desc_foco(k)})
+		it.append({"label": "Foco " + D.FOCOS[k].n, "right": "×" + n(S.items["f_" + k]), "ic": icono(Atlas.ico_foco(k)), "desc": desc_foco(k)})
 	var j: int = await menu(it, {"cls": "full", "title": "CAMBIAR FOCO", "title2": "Ahora: " + D.FOCOS[S.carpas[ci].foco].n, "desc": true})
 	if j < 0:
 		return

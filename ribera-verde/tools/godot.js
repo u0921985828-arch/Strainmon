@@ -43,7 +43,18 @@ const ESCENAS = ESC ? JSON.parse(fs.readFileSync(ESC, 'utf8')) : CASOS ? [] : [
   { k: 'p80-mixta', t: 'p80', foco: 'sodio400', macetas: Array(3).fill('plastico7'), sel: 1, now: 3100,
     pots: [pl('acapulco', .66), pl('rif', .34, { f: { id: 4, t: 1, y: 1, i: 20 } }), pl('ria', 1, { fert: true })] },
   { k: 'g150-sodio600', t: 'g150', foco: 'sodio600', macetas: Array(6).fill('plastico7'), sel: 4, now: 4321,
-    pots: [pl('malawi', 1), pl('hindu', .7), pl('thai', .95, { f: { id: 5, t: 1, y: 1, i: 45 } }), pl('kif', .3), pl('oaxaca', .6, { water: 10 }), pl('nepal', 1, { pest: true })] }];
+    pots: [pl('malawi', 1), pl('hindu', .7), pl('thai', .95, { f: { id: 5, t: 1, y: 1, i: 45 } }), pl('kif', .3), pl('oaxaca', .6, { water: 10 }), pl('nepal', 1, { pest: true })] },
+  // los extras de la vista C (x: los campos de la carpa): LED de 720 (80 px) con filtro, ventilador (el doble de balanceo) y goteo
+  // (dos ramales, llaves y microtubos, el depósito a 300 L) con macetas de tela, de 18 y de 7 L y una planta muerta
+  { k: 'm120-led-extras', t: 'm120', foco: 'led720', macetas: ['tela25', 'tela11', 'plastico18', 'plastico7', 'tela11', 'tela25'], sel: 4, now: 2610,
+    x: { filtro: true, vent: true, goteo: true, dep: 300 },
+    pots: [pl('malawi', .8), pl('thai', .5, { dead: true, water: 0, health: 0 }), pl('kif', 1), null, pl('mango', .3, { pest: true }), pl('nepal', .95)] },
+  // garrafas (llena, a medias y vacía) con LED de 200 y el armario de 80
+  { k: 'p80-garrafas', t: 'p80', foco: 'led200', macetas: ['tela11', 'plastico7', 'plastico18'], sel: -1, now: 990,
+    x: { garrafas: true, gar: [null, 2.5, 0] }, pots: [pl('limon', .6), pl('rif', .9), pl('ria', .15)] },
+  // el CFL de 25 px del armario de 60, apagado (todas muertas)
+  { k: 'p60-cfl-muertas', t: 'p60', foco: 'cfl', macetas: ['tela11', 'plastico7'], sel: 1, now: 400,
+    pots: [pl('hindu', .7, { dead: true, water: 0, health: 0 }), pl('oaxaca', .4, { dead: true, water: 0, health: 0 })] }];
 
 // ciclos de cultivo: plantar (rollFeno), y cada hora plantsAdvance(60); cada 24 h riega las que bajan de rega % (rega 0: nunca),
 // abona la 0 a las 30 h y trata la plaga de la 1 cada día. Al final, se cosechan (harvest) las que estén listas
@@ -73,7 +84,7 @@ function leePng(f) { return PNG.sync.read(fs.readFileSync(f)); }
 // 2. atlas de la vista C
 function atlasCarpa() {
   const d = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/sprites/atlas.json'), 'utf8')), src = leePng(path.join(ROOT, 'assets/sprites/atlas.png'));
-  const nombres = Object.keys(d.cubre).filter(k => /^misc:(carpa-c-|planta-c-|maceta-c-|foco-c-)/.test(k)).map(k => k.slice(5));   // en el orden del atlas: vcSprite se queda con el primero si dos anchos empatan
+  const nombres = Object.keys(d.cubre).filter(k => /^misc:(carpa-c-|planta-c-|maceta-c-|foco-c-|extra-c-)/.test(k)).map(k => k.slice(5));   // en el orden del atlas: vcSprite se queda con el primero si dos anchos empatan
   const lista = [];   // [nombre, índice, rect del atlas]
   for (const n of nombres) d.anims[d.cubre['misc:' + n]][n].dirs.unica.forEach((k, i) => lista.push([n, i, d.frames[k]]));
   // estantes de 1024 de ancho, de los más altos a los más bajos
@@ -147,7 +158,7 @@ function atlasCarpa() {
     const pm = seed => { let x = seed; return () => (x = x * 48271 % 2147483647) / 2147483647; };
     const rnd0 = Math.random;
     function monta(e) {
-      S = newState(); S.carpas = [{ t: e.t, foco: e.foco }]; S.macetas = e.macetas.slice(); S.custom = e.custom || {}; S.gen = e.gen || {};
+      S = newState(); S.carpas = [{ t: e.t, foco: e.foco, ...JSON.parse(JSON.stringify(e.x || {})) }]; S.macetas = e.macetas.slice(); S.custom = e.custom || {}; S.gen = e.gen || {};
       S.pots = e.pots.map(p => p && JSON.parse(JSON.stringify(p)));
     }
     const o = { escenas: {}, png: {} };
@@ -216,7 +227,7 @@ function atlasCarpa() {
     const ids = DEX.slice();
     o.datos = {
       STRAINS: Object.fromEntries(ids.map(k => { const s = STRAINS[k]; return [k, { n: s.n, thc: s.thc, y: s.y, d: s.d, r: s.r, c: s.c, ind: indDe(k), hj: hojaDe(k), tipo: tipoGen(k) }]; })),
-      DEX: ids, GENETICA, CARPAS, FOCOS, MACETAS, PLANTA_CM, MACETA_CM, FOCO_CM, FOCO_SEP, HOLGURA, VCA, VC_FILA, VC_TIERRA, LUZ_C, VC_HOJA,
+      DEX: ids, GENETICA, CARPAS, FOCOS, MACETAS, PLANTA_CM, MACETA_CM, FOCO_CM, FOCO_SEP, HOLGURA, VCA, VC_FILA, VC_TIERRA, LUZ_C, VC_HOJA, VC_SECA, VC_AGUA,
       Y_MEDIA, W_M2, GEN_ESTABLE, TIPO_GEN, KWH, H_LUZ, H_24, EXTRAS, FENO_ESTRELLA, FENO_FLOJO, SEMILLA_HERMA,
       MESES, MES0, T_MES, HR_MES, CALOR_W, HR_PLANTA, HR_NOCHE, HR_FILTRO, T_FILTRO, T_OK, HR_OK, H_DIA, MOHO, APARATOS, GARRAFA_X, GOTEO_X, LITROS_M2,
       FEM: SHOP.filter(it => it.sid).map(it => it.sid) };   // FEM: las feminizadas (las de tienda)

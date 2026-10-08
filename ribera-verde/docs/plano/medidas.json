@@ -1230,10 +1230,10 @@
    "eje": "ancho",
    "real": 0.6,
    "ppm": 16,
-   "w": 18,
-   "h": 31,
-   "m": 1.13,
-   "ratio": 1.88
+   "w": 12,
+   "h": 36,
+   "m": 0.75,
+   "ratio": 1.25
   },
   {
    "grupo": "MOBILIARIO",
@@ -1384,12 +1384,12 @@
    "n": "Cajas",
    "clave": "crate",
    "eje": "ancho",
-   "real": 0.6,
+   "real": 0.8,
    "ppm": 16,
-   "w": 14,
-   "h": 15,
-   "m": 0.88,
-   "ratio": 1.46
+   "w": 16,
+   "h": 19,
+   "m": 1,
+   "ratio": 1.25
   },
   {
    "grupo": "CULTIVO",

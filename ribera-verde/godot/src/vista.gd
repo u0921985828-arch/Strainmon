@@ -56,10 +56,11 @@ func _init() -> void:
 	encima.draw.connect(_pinta_encima)
 
 # ---------- geometría ----------
-static func vc_sprite(pre: String, px: float):
+# (cerca: si ninguno entra en el 25 %, el más cercano: con el atlas, la carpa nunca vuelve a la vista B por un ancho)
+static func vc_sprite(pre: String, px: float, cerca := false):
 	var m = null
 	for a in Arte.anchos(pre):
-		if absf(a - px) <= px * .25 and (m == null or absf(a - px) < absf(m.a - px)):
+		if (cerca or absf(a - px) <= px * .25) and (m == null or absf(a - px) < absf(m.a - px)):
 			m = {"a": a, "n": pre + str(a)}
 	return m
 
@@ -155,13 +156,12 @@ static func vista_c(S: Dictionary, g: Dictionary):
 	var c: Dictionary = g.c
 	var W: float = g.W
 	var tipo: String = D.FOCOS[c.foco].tipo
-	for k in D.EXTRAS:
-		if k != "garrafas" and c.get(k):   # las garrafas no se dibujan: no la quitan
-			return null
 	var VCA: Dictionary = D.VCA
 	var Z: float = (VCA.base - VCA.boca) / (g.H - 28)
 	var w := Datos.jsround(W * Z)
-	var foco = vc_sprite("foco-c-" if tipo == "sodio" else "foco-c-" + tipo + "-", D.FOCO_CM.get(c.foco, 45) * Z)
+	# las campanas de sodio son foco-c-NN; el CFL, foco-c-cfl-NN, y los LED, con su modelo (foco-c-led200-NN)
+	var pf: String = "foco-c-" if tipo == "sodio" else ("foco-c-" + c.foco + "-" if tipo == "led" else "foco-c-" + tipo + "-")
+	var foco = vc_sprite(pf, D.FOCO_CM.get(c.foco, 45) * Z, true)
 	if not Arte.hay("carpa-c-pared") or not Arte.hay("carpa-c-luz") or foco == null:
 		return null
 	var filas: Array = D.VC_FILA[int(g.C.filas) - 1]
@@ -170,18 +170,19 @@ static func vista_c(S: Dictionary, g: Dictionary):
 	var xy := func(q: Dictionary, y: float) -> int: return Datos.jsround(120 + (q.cx / W - .5) * wy.call(y))
 	var v := []
 	for q in g.pl:
-		var k: String = S.macetas[q.i]
-		var m = vc_sprite("maceta-c-", D.MACETA_CM[k][0] * Z) if k == "plastico7" else null
+		# la de 7 L es maceta-c-NN; las demás llevan su tipo (maceta-c-tela11-NN)
+		var k: String = S.macetas[q.i] if D.MACETA_CM.has(S.macetas[q.i]) else "plastico7"
+		var m = vc_sprite("maceta-c-" if k == "plastico7" else "maceta-c-" + k + "-", D.MACETA_CM[k][0] * Z, true)
 		if m == null:
 			return null
 		var y: int = yq.call(q)
 		var x: int = xy.call(q, y)
-		var r := {"x": x, "y": y, "m": m, "tierra": D.VC_TIERRA.get(m.n, Datos.jsround(Arte.foto(m.n).get_height() * .7)), "hp": 0, "p": null}
+		var r := {"x": x, "y": y, "m": m, "Z": Z, "tierra": D.VC_TIERRA.get(m.n, Datos.jsround(Arte.foto(m.n).get_height() * .7)), "hp": 0, "p": null, "muerta": false}
 		var p = S.pots[q.i]
-		if p and p.get("dead"):
-			return null
-		if p:
-			var st := Cultivo.plant_stage(p)
+		if p:   # la muerta: la de su porte en vegetativo, seca (marrón) y 4 cm más baja
+			var muerta := true if p.get("dead") else false
+			r.muerta = muerta
+			var st := 2 if muerta else Cultivo.plant_stage(p)
 			var po := Datos.porte_planta(S, p)
 			var Dh: Array = D.PLANTA_CM[po].h
 			var e: float = wy.call(y) - 2 * absf(x - 120)
@@ -193,7 +194,7 @@ static func vista_c(S: Dictionary, g: Dictionary):
 			if s == null:
 				return null
 			r.p = s
-			r.hp = mini(Arte.alto(Arte.foto(s.n)), mini(Datos.jsround(minf(Dh[st], q.ch) * Z), int(floor(y - r.tierra - VCA.boca - D.FOCO_SEP[c.foco] * Z))))
+			r.hp = mini(Arte.alto(Arte.foto(s.n)), mini(Datos.jsround(minf(Dh[st] - (4 if muerta else 0), q.ch) * Z), int(floor(y - r.tierra - VCA.boca - D.FOCO_SEP[c.foco] * Z))))
 		v.append(r)
 	for j in g.pl.size():
 		var q: Dictionary = g.pl[j]
@@ -201,7 +202,30 @@ static func vista_c(S: Dictionary, g: Dictionary):
 		q.x = v[j].x
 		q.y = v[j].y
 		q.alto = v[j].tierra + 4 + v[j].hp
-	return {"Z": Z, "w": w, "xl": 120 - (w >> 1), "foco": foco, "tipo": tipo}
+	# el goteo: una manguera por fila, en el suelo detrás de sus macetas, de la primera llave a la pared derecha; cada maceta, su
+	# llave y su microtubo justo a su derecha (bx)
+	var lg = null
+	if c.get("goteo"):
+		var F := {}
+		var orden_f := []
+		for q in g.pl:
+			var x1: int = Arte.caja(Arte.foto(q.v.m.n))[1]
+			if not F.has(q.fila):
+				F[q.fila] = {"fila": q.fila, "y": q.y - 3, "x": 1e9}
+				orden_f.append(q.fila)
+			var f: Dictionary = F[q.fila]
+			q.bx = q.x - 16 + x1 + 2
+			q.yl = f.y
+			f.x = minf(f.x, q.bx)
+		orden_f.sort()
+		lg = []
+		for k in orden_f:
+			lg.append(F[k])
+		lg.sort_custom(func(a, b): return a.y < b.y)
+		for f in lg:
+			f.x = int(f.x)
+			f.xw = Datos.jsround(120 + wy.call(f.y) / 2) - 1
+	return {"Z": Z, "w": w, "xl": 120 - (w >> 1), "foco": foco, "tipo": tipo, "lg": lg}
 
 # ---------- dibujo ----------
 # de atrás adelante: fila (y), luego x y plaza
@@ -310,7 +334,7 @@ func pinta(S_: Dictionary, VC_: Dictionary, now_: float, ancho := 240) -> void:
 	var on := Cultivo.plantas_vivas(S, VC.ci)
 	luz.visible = on and g.vc != null
 	if luz.visible:
-		luz.texture = Arte.tex("luz|%s|%s" % [g.c.t, g.vc.tipo], Arte.luz(g.c.t, g.vc))
+		luz.texture = Arte.tex("luz|%s|%s|%d" % [g.c.t, g.vc.tipo, g.vc.foco.a], Arte.luz(g.c.t, g.vc))
 		luz.material.set_shader_parameter("fuerza", Datos.carga().LUZ_C.get(g.vc.tipo, [0, 1])[1])
 	base.queue_redraw()
 	encima.queue_redraw()
@@ -321,16 +345,109 @@ func _pinta_base() -> void:
 	if g.is_empty() or g.vc == null:
 		return
 	base.draw_texture(Arte.tex("pared|" + g.c.t, Arte.fondo(g.c.t, g.vc, "pared")), Vector2.ZERO)
+	var c: Dictionary = g.c
+	var D := Datos.carga()
+	var xr: int = g.vc.xl + g.vc.w
+	# el filtro de carbón, colgado del techo arriba a la izquierda (el extractor tiembla 1 px), y el ventilador de pinza en el poste
+	# del fondo derecho, a 55 cm del suelo, siempre girando
+	if c.get("filtro"):
+		var fs = vc_sprite("extra-c-filtro-", (30 if c.t == "p60" or c.t == "p80" else 50) * g.vc.Z, true)
+		var fi := Arte.foto(fs.n)
+		base.draw_texture(Arte.tex("x|" + fs.n, fi), Vector2(g.vc.xl + 10 - 47 + int(floor(now / 90)) % 2, 3 - (fi.get_height() - Arte.alto(fi))))
+	if c.get("vent"):
+		var nv := posmod(int(floor(now / 70)), Arte.n_fotos("extra-c-vent"))
+		base.draw_texture(Arte.tex("x|vent|%d" % nv, Arte.foto("extra-c-vent", nv)), Vector2(xr + 1 - 24, int(D.VCA.fondo) - Datos.jsround(55 * g.vc.Z) - 47))
 	var fsel := fila_sel(g, VC.sel)
+	var fa = null
 	for q in orden(g):
-		_planta(q, A35 if q.fila < fsel else 1.0)
+		var al := A35 if q.fila < fsel else 1.0
+		if g.vc.lg != null and q.fila != fa:
+			fa = q.fila
+			_ramal(g.vc.lg, fa, al)
+		_planta(q, al)
+
+# la manguera del goteo de la fila fa (2 px: tubo y brillo), de su primera llave a la pared derecha; la de la primera fila entra
+# por la pared (pasamuros) y las demás bajan por la pared desde la de detrás
+func _ramal(lg: Array, fa: int, al: float) -> void:
+	var i := -1
+	for j in lg.size():
+		if lg[j].fila == fa:
+			i = j
+			break
+	if i < 0:
+		return
+	var f: Dictionary = lg[i]
+	var osc := Color(Color.html("#1c1d22"), al)
+	_rect(f.x, f.y - 1, f.xw - f.x + 1, 1, Color(Color.html("#4a4c54"), al))
+	_rect(f.x, f.y, f.xw - f.x + 1, 1, osc)
+	if i:
+		var a: Dictionary = lg[i - 1]
+		var n := maxi(absi(f.xw - a.xw), f.y - a.y)
+		for k in (n + 1 if n > 0 else 0):
+			_rect(a.xw + Datos.jsround(float(f.xw - a.xw) * k / n), a.y + Datos.jsround(float(f.y - a.y) * k / n), 1, 1, osc)
+	else:
+		_rect(f.xw - 1, f.y - 2, 3, 4, Color(Color.html("#3a3c44"), al))
+		_rect(f.xw, f.y - 1, 1, 2, osc)
+
+# como fillRect del canvas: un ancho o un alto negativo pinta hacia la izquierda o hacia arriba
+func _rect(x: float, y: float, w: float, h: float, c: Color) -> void:
+	if w < 0:
+		x += w
+		w = -w
+	if h < 0:
+		y += h
+		h = -h
+	if w > 0 and h > 0:
+		base.draw_rect(Rect2(x, y, w, h), c)
 
 func _planta(q: Dictionary, al: float) -> void:
 	var v: Dictionary = q.v
 	var mod := Color(1, 1, 1, al)
-	base.draw_texture(Arte.tex("m|" + v.m.n, Arte.foto(v.m.n)), Vector2(q.x - 16, q.y - 31), mod)
+	var osc := Color(Color.html("#1c1d22"), al)
 	var p = S.pots[q.i]
+	var D := Datos.carga()
+	var ca: Dictionary = S.carpas[Cultivo.huecos(S)[q.i].c]
+	var mi := Arte.foto(v.m.n)
+	var mx1: int = Arte.caja(mi)[1]
+	var rim: int = q.y - 31 + (mi.get_height() - Arte.alto(mi))
+	# su garrafa (sin goteo), detrás de la maceta a la derecha, con el agua que le queda; el tubo del gotero va del tapón a la tierra
+	var gar := Cultivo.garrafa_l(S, q.i) if ca.get("garrafas") and not ca.get("goteo") else 0
+	var gs = vc_sprite("extra-c-garrafa-", 100 * pow(gar / 1000.0 / (.7 * .5 * .85), 1 / 3.0) * v.Z, true) if gar else null
+	var gc: int = q.x - 16 + mx1 - 1
+	var gb: int = q.y - 3
+	# su sombra en el suelo (1.10 P5): del ancho de la maceta, debajo de su base
+	var mx0: int = Arte.caja(mi)[0]
+	var som := Color(0, 0, 0, 56 / 255.0 * al)
+	_rect(q.x - 16 + mx0 - 1, q.y - 1, mx1 - mx0 + 3, 2, som)
+	_rect(q.x - 16 + mx0 + 1, q.y + 1, mx1 - mx0 - 1, 1, som)
+	if gs:
+		var gi := Arte.nivel(Arte.foto(gs.n), D.VC_AGUA.garrafa, Cultivo.garrafa(S, q.i) / gar)
+		base.draw_texture(Arte.tex("img|%d" % gi.get_instance_id(), gi), Vector2(gc - 24, gb - 47), mod)
+	# con goteo, su microtubo sube de la manguera por la derecha de la maceta, con su llave, y entra por el borde hasta la tierra
+	var got: bool = ca.get("goteo", false) and q.has("yl")
+	if got:
+		_rect(q.bx, rim - 1, 1, q.yl - rim + 1, osc)
+		base.draw_texture(Arte.tex("x|llave", Arte.foto("extra-c-llave")), Vector2(q.bx - 24, q.yl + 1 - 47), mod)
+	base.draw_texture(Arte.tex("m|" + v.m.n, mi), Vector2(q.x - 16, q.y - 31), mod)
+	if got:
+		_rect(q.x + 3, rim - 1, q.bx - q.x - 3, 1, osc)
+		_rect(q.x + 3, rim, 1, 2, osc)
+	if gs:
+		var gf := Arte.foto(gs.n)
+		var cx: int = gc - 24 + int(Arte.caja(gf)[0]) + 2
+		var cy: int = gb - Arte.alto(gf) - 1
+		var ty: int = mini(cy, rim) - 2
+		_rect(q.x + 3, ty, cx - q.x - 2, 1, osc)
+		_rect(cx, ty, 1, cy - ty, osc)
+		_rect(q.x + 3, ty, 1, rim + 2 - ty, osc)
 	if p == null or v.p == null:
+		return
+	if v.muerta:   # seca: los verdes de hoja y tallo a marrones, quieta
+		var ks := "seca|%s|%d" % [v.p.n, v.hp]
+		var ts: ImageTexture = Arte.texs.get(ks)
+		if ts == null:
+			ts = Arte.tex(ks, Arte.recolor(Arte.aplasta(Arte.altura(v.p.n, v.hp)[1], v.hp), D.VC_SECA))
+		base.draw_texture(ts, Vector2(q.x - (ts.get_width() >> 1), q.y - v.tierra - ts.get_height() + 1), mod)
 		return
 	var k := clave_planta(S, p, v)
 	var t: ImageTexture = Arte.texs.get(k)
@@ -338,7 +455,8 @@ func _planta(q: Dictionary, al: float) -> void:
 		t = Arte.tex(k, img_planta(S, p, v))
 	var yb: int = q.y - v.tierra
 	var b := t.get_height() - 1
-	_balanceo(t, q.x - (t.get_width() >> 1), yb - b, b, 1 if p.water > 0 else 0, now + q.x * 37, mod)
+	# se mece; con el ventilador encendido, el doble de deprisa
+	_balanceo(t, q.x - (t.get_width() >> 1), yb - b, b, 1 if p.water > 0 else 0, now * (2 if ca.get("vent") else 1) + q.x * 37, mod)
 	if p.pest:
 		for n in 6:
 			base.draw_rect(Rect2(q.x - 8 + ((n * 5 + int(floor(now / 300))) % 16), yb - 12 - ((n * 7) % 20), 1, 1), Color(Color.html("#e02828"), al))
@@ -360,7 +478,13 @@ func _pinta_encima() -> void:
 	var on := Cultivo.plantas_vivas(S, VC.ci)
 	var fc := Arte.foto(g.vc.foco.n)
 	var im := fc if on else Arte.apagado(fc)
-	encima.draw_texture(Arte.tex("foco|%s|%s" % [g.vc.foco.n, on], im), Vector2(120 - 24, int(D.VCA.boca) - 15))
+	encima.draw_texture(Arte.tex("foco|%s|%s" % [g.vc.foco.n, on], im), Vector2(120 - (fc.get_width() >> 1), int(D.VCA.boca) - 15))
+	# el depósito del goteo está fuera: arriba a la derecha, en pequeño, con el agua que le queda en la mirilla
+	if g.vc.lg != null:
+		var l := Cultivo.goteo_l(S, VC.ci)
+		var dep = g.c.get("dep")
+		var di := Arte.nivel(Arte.foto("extra-c-deposito"), D.VC_AGUA.deposito, (float(dep) if dep != null else float(l)) / l)
+		encima.draw_texture(Arte.tex("img|%d" % di.get_instance_id(), di), Vector2(g.vc.xl + g.vc.w + 22 - 24, 8 - 28))
 	var bs := barras(S, g, VC.sel)
 	var fsel := fila_sel(g, VC.sel)
 	for b in bs:

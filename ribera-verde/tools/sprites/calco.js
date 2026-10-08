@@ -100,6 +100,11 @@ for (const a of M.assets) {
   // (todos los fotogramas: la híbrida lleva uno por alto). Igual las carpas plateadas de 80 y 120 (carpas.py, sin referencia)
   if (/^carpa-c-|^carpas-medias-vista$/.test(a.id)) for (const c of a.cubre || []) { const n = c.slice(5), d = path.join(ROOT, 'art', 'procesado', a.id, n, 'unica');
     if (fs.existsSync(d)) fs.readdirSync(d).filter(f => f.endsWith('.png')).sort().forEach((f, i) => wr(a.id, n, 'unica', i, PNG.sync.read(fs.readFileSync(path.join(d, f))))); }
+  // las láminas 12 y 13 (1.10 P5, a mano: iconos del equipo y muebles a escala) tampoco tienen referencia: la lámina ya procesada
+  const A_MANO = ['iconos-equipo', 'props-escala'];
+  if (A_MANO.includes(a.id)) { const g = path.join(ROOT, 'art', 'procesado', a.id);
+    if (fs.existsSync(g)) for (const n of fs.readdirSync(g).filter(n => fs.existsSync(path.join(g, n, 'unica')))) { const d = path.join(g, n, 'unica');
+      fs.readdirSync(d).filter(f => f.endsWith('.png')).sort().forEach((f, i) => wr(a.id, n, 'unica', i, PNG.sync.read(fs.readFileSync(path.join(d, f))))); } }
   // ---------- tiles (16×16 exacto; los animados en bloques de 32×32) ----------
   if (a.tipo === 'tiles') {
     // una tira de variantes (orgánico, 1.10: celda tile_tira de 64 × 16) lleva la loseta repetida 4 veces
@@ -138,7 +143,7 @@ for (const a of M.assets) {
   // ---------- carpas (1.6): la huella entera, por dentro o cerrada ----------
   if (a.tipo === 'carpa') for (const c of a.cubre || []) { const k = c.slice(5); if (has(`misc/${k}.png`)) wr(a.id, 'base', 'unica', 0, rd(`misc/${k}.png`)); }
   // ---------- objetos (y macetas y focos, que van como misc:) ----------
-  if (a.tipo === 'objeto') {
+  if (a.tipo === 'objeto' && !A_MANO.includes(a.id)) {
     for (const c of a.cubre || []) { if (c.startsWith('misc:')) { const k = c.slice(5); if (has(`misc/${k}.png`)) wr(a.id, k, 'unica', 0, rd(`misc/${k}.png`)); continue; }
       const k = c.slice(4); if (has(`objetos/${k}.png`)) wr(a.id, k, 'unica', 0, rd(`objetos/${k}.png`)); }
     for (const an of a.animaciones || []) { const k = (an.sobre || '').slice(4); if (!has(`objetos/${k}.png`)) continue;
