@@ -1,6 +1,6 @@
 {
  "generado": "tools/sprites/catalogo.js",
- "claves": 149,
+ "claves": 236,
  "catalogo": {
   "look:player": [
    {
@@ -75,6 +75,15 @@
    }
   ],
   "npc:tono": [
+   {
+    "asset": "tono",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:tono2": [
    {
     "asset": "tono",
     "familia": "personaje",
@@ -227,6 +236,15 @@
     "depende_de": []
    }
   ],
+  "npc:darko2": [
+   {
+    "asset": "darko",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
   "look:judge": [
    {
     "asset": "jurado",
@@ -254,6 +272,24 @@
     "depende_de": []
    }
   ],
+  "look:excursionista": [
+   {
+    "asset": "cliente1",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:excursionista": [
+   {
+    "asset": "cliente1",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
   "look:cliente2": [
    {
     "asset": "cliente2",
@@ -263,7 +299,43 @@
     "depende_de": []
    }
   ],
+  "look:obrero": [
+   {
+    "asset": "cliente2",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:obrero": [
+   {
+    "asset": "cliente2",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
   "look:cliente3": [
+   {
+    "asset": "cliente3",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:turista": [
+   {
+    "asset": "cliente3",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:turista": [
    {
     "asset": "cliente3",
     "familia": "personaje",
@@ -291,6 +363,24 @@
    }
   ],
   "look:cliente6": [
+   {
+    "asset": "cliente6",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:vecina": [
+   {
+    "asset": "cliente6",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:vecina": [
    {
     "asset": "cliente6",
     "familia": "personaje",
@@ -936,6 +1026,438 @@
     ]
    }
   ],
+  "tile:door_gray": [
+   {
+    "asset": "edificio-gray-puerta",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_comisaria": [
+   {
+    "asset": "edificio-comisaria",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_comisaria": [
+   {
+    "asset": "edificio-comisaria",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_comisaria": [
+   {
+    "asset": "edificio-comisaria",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_comisaria": [
+   {
+    "asset": "edificio-comisaria",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:door_comisaria": [
+   {
+    "asset": "edificio-comisaria",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_nave": [
+   {
+    "asset": "edificio-nave",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_nave": [
+   {
+    "asset": "edificio-nave",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_nave": [
+   {
+    "asset": "edificio-nave",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_nave": [
+   {
+    "asset": "edificio-nave",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:door_nave": [
+   {
+    "asset": "edificio-nave",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_caserio": [
+   {
+    "asset": "edificio-caserio",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_caserio": [
+   {
+    "asset": "edificio-caserio",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_caserio": [
+   {
+    "asset": "edificio-caserio",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_caserio": [
+   {
+    "asset": "edificio-caserio",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:door_caserio": [
+   {
+    "asset": "edificio-caserio",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_caserio2": [
+   {
+    "asset": "edificio-caserio2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_caserio2": [
+   {
+    "asset": "edificio-caserio2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_caserio2": [
+   {
+    "asset": "edificio-caserio2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_caserio2": [
+   {
+    "asset": "edificio-caserio2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_marinera": [
+   {
+    "asset": "edificio-marinera",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_marinera": [
+   {
+    "asset": "edificio-marinera",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_marinera": [
+   {
+    "asset": "edificio-marinera",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_marinera": [
+   {
+    "asset": "edificio-marinera",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_marinera2": [
+   {
+    "asset": "edificio-marinera2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_marinera2": [
+   {
+    "asset": "edificio-marinera2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_marinera2": [
+   {
+    "asset": "edificio-marinera2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_marinera2": [
+   {
+    "asset": "edificio-marinera2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_marinera3": [
+   {
+    "asset": "edificio-marinera3",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_marinera3": [
+   {
+    "asset": "edificio-marinera3",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_marinera3": [
+   {
+    "asset": "edificio-marinera3",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_marinera3": [
+   {
+    "asset": "edificio-marinera3",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_marinera4": [
+   {
+    "asset": "edificio-marinera4",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_marinera4": [
+   {
+    "asset": "edificio-marinera4",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_marinera4": [
+   {
+    "asset": "edificio-marinera4",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_marinera4": [
+   {
+    "asset": "edificio-marinera4",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_ladrillo": [
+   {
+    "asset": "edificio-ladrillo",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_ladrillo": [
+   {
+    "asset": "edificio-ladrillo",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_ladrillo": [
+   {
+    "asset": "edificio-ladrillo",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_ladrillo": [
+   {
+    "asset": "edificio-ladrillo",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_fabrica": [
+   {
+    "asset": "edificio-fabrica",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_fabrica": [
+   {
+    "asset": "edificio-fabrica",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_fabrica": [
+   {
+    "asset": "edificio-fabrica",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_fabrica": [
+   {
+    "asset": "edificio-fabrica",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:counter": [
+   {
+    "asset": "props-altura",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:barcounter": [
+   {
+    "asset": "props-altura",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:lamp": [
+   {
+    "asset": "prop-farola-alta",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:jukebox": [
+   {
+    "asset": "prop-gramola-alta",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
   "obj:fence": [
    {
     "asset": "props-16",
@@ -1026,15 +1548,6 @@
     "depende_de": []
    }
   ],
-  "obj:counter": [
-   {
-    "asset": "props-16",
-    "familia": "objeto-lote",
-    "herramienta": "create_1_direction_object",
-    "fase": "F4",
-    "depende_de": []
-   }
-  ],
   "obj:display": [
    {
     "asset": "props-16",
@@ -1045,15 +1558,6 @@
    }
   ],
   "obj:plantDeco": [
-   {
-    "asset": "props-16",
-    "familia": "objeto-lote",
-    "herramienta": "create_1_direction_object",
-    "fase": "F4",
-    "depende_de": []
-   }
-  ],
-  "obj:barcounter": [
    {
     "asset": "props-16",
     "familia": "objeto-lote",
@@ -1081,15 +1585,6 @@
    }
   ],
   "obj:btable": [
-   {
-    "asset": "props-16",
-    "familia": "objeto-lote",
-    "herramienta": "create_1_direction_object",
-    "fase": "F4",
-    "depende_de": []
-   }
-  ],
-  "obj:jukebox": [
    {
     "asset": "props-16",
     "familia": "objeto-lote",
@@ -1145,24 +1640,47 @@
   ],
   "obj:tree": [
    {
-    "asset": "prop-arbol",
-    "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "asset": "prop-arbol-alto",
+    "familia": "importado",
+    "herramienta": "importado",
     "fase": "F4",
-    "depende_de": [
-     "tiles-exterior"
-    ]
+    "depende_de": []
    }
   ],
-  "obj:lamp": [
+  "obj:monte": [
    {
-    "asset": "prop-farola",
-    "familia": "mapa-objeto",
-    "herramienta": "create_map_object",
+    "asset": "prop-monte",
+    "familia": "importado",
+    "herramienta": "importado",
     "fase": "F4",
-    "depende_de": [
-     "tiles-exterior"
-    ]
+    "depende_de": []
+   }
+  ],
+  "obj:monte2": [
+   {
+    "asset": "prop-monte",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:seto": [
+   {
+    "asset": "prop-seto",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:parada": [
+   {
+    "asset": "prop-parada",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
    }
   ],
   "obj:fountain": [
@@ -1311,6 +1829,42 @@
     "depende_de": []
    }
   ],
+  "misc:carpa-p80-mapa": [
+   {
+    "asset": "carpas-medias-mapa",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:carpa-m120-mapa": [
+   {
+    "asset": "carpas-medias-mapa",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:carpa-p80-vista": [
+   {
+    "asset": "carpas-medias-vista",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "misc:carpa-m120-vista": [
+   {
+    "asset": "carpas-medias-vista",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
   "misc:maceta-vista-plastico7": [
    {
     "asset": "macetas-vista",
@@ -1404,8 +1958,8 @@
   "misc:carpa-c-pared": [
    {
     "asset": "carpa-c-fondo",
-    "familia": "imagen",
-    "herramienta": "edit_image_pixen",
+    "familia": "importado",
+    "herramienta": "importado",
     "fase": "F9",
     "depende_de": []
    }
@@ -1413,8 +1967,8 @@
   "misc:carpa-c-luz": [
    {
     "asset": "carpa-c-fondo",
-    "familia": "imagen",
-    "herramienta": "edit_image_pixen",
+    "familia": "importado",
+    "herramienta": "importado",
     "fase": "F9",
     "depende_de": []
    }
@@ -1646,6 +2200,213 @@
     "familia": "importado",
     "herramienta": "importado",
     "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:hormigon": [
+   {
+    "asset": "tiles-firmes",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:pista": [
+   {
+    "asset": "tiles-firmes",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:rotoT": [
+   {
+    "asset": "tiles-firmes",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:rotoB": [
+   {
+    "asset": "tiles-firmes",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "misc:detalles": [
+   {
+    "asset": "detalles-hierba",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_caserio3": [
+   {
+    "asset": "edificio-caserio3",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_caserio3": [
+   {
+    "asset": "edificio-caserio3",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_caserio3": [
+   {
+    "asset": "edificio-caserio3",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_caserio3": [
+   {
+    "asset": "edificio-caserio3",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_borda": [
+   {
+    "asset": "edificio-borda",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_borda": [
+   {
+    "asset": "edificio-borda",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_borda": [
+   {
+    "asset": "edificio-borda",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_borda": [
+   {
+    "asset": "edificio-borda",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_marinera5": [
+   {
+    "asset": "edificio-marinera5",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_marinera5": [
+   {
+    "asset": "edificio-marinera5",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_marinera5": [
+   {
+    "asset": "edificio-marinera5",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_marinera5": [
+   {
+    "asset": "edificio-marinera5",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_marinera6": [
+   {
+    "asset": "edificio-marinera6",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_marinera6": [
+   {
+    "asset": "edificio-marinera6",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_marinera6": [
+   {
+    "asset": "edificio-marinera6",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_marinera6": [
+   {
+    "asset": "edificio-marinera6",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:manzano": [
+   {
+    "asset": "prop-manzano",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "obj:tree2": [
+   {
+    "asset": "prop-arbol-alto2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
     "depende_de": []
    }
   ]

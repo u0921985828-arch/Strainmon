@@ -251,7 +251,7 @@ static func apagado(c: Image) -> Image:
 	cache[k] = o
 	return o
 
-# pared o luz de la carpa: la de la imagen A con la pared del fondo recortada a su ancho (240 × 160)
+# pared o luz de la carpa: la de 240 × 160 con la pared del fondo recortada a su ancho (los laterales, con los postes del fondo, enteros)
 static func fondo(t: String, vc: Dictionary, capa: String) -> Image:
 	var k := "vc|%s|%s" % [t, capa]
 	if cache.has(k):

@@ -64,7 +64,8 @@ function posPlaza(i){
 const altoPlanta=(p,q)=>{const D=PLANTA_CM[portePlanta(p)];return Math.min(Math.round(D.h[p.dead?2:plantStage(p)]*VB_M),q?Math.floor(q.ch*VB_M):1e9)-(p.dead?4:0);};
 
 /* ---------- vista C (P3): la carpa por dentro a pantalla completa, como la imagen A ----------
-   La pared (misc:carpa-c-pared) es la imagen A sin plantas, sin foco y sin su luz: solo la tela, con sus brillos y sombras. La luz
+   La pared (misc:carpa-c-pared) tiene la geometría de la imagen A, con la tela plateada y el armazón negro de las carpas del piso y de
+   la vista B (a mano, tools/sprites/a-mano/carpa_c.py): solo la tela, sin plantas, sin foco y sin su luz. La luz
    del foco (misc:carpa-c-luz) es otro sprite, por delante de la pared y detrás de las macetas; con el foco apagado no se pinta.
    Cada carpa va a su escala (px/cm): Z = 134 / (alto − 28), así la boca del foco (y 16, donde está en la imagen A) queda a su altura
    real sobre el suelo (y 150, a medio fondo). La pared del fondo se recorta al ancho de la carpa (W·Z px) alrededor de x 120, entre
@@ -108,7 +109,7 @@ function vistaC(g){
   pl.forEach((q,j)=>{q.v=v[j];q.x=v[j].x;q.y=v[j].y;q.alto=v[j].tierra+4+v[j].hp;});
   return {Z,w,xl:120-(w>>1),foco,tipo};
 }
-// pared o luz de la carpa t: la de la imagen A con la pared del fondo recortada a su ancho (240 × 160)
+// pared o luz de la carpa t: la de 240 × 160 con la pared del fondo recortada a su ancho (los laterales, con los postes del fondo, enteros)
 function vcFondo(t,vc,capa){
   const key='vc|'+t+'|'+capa;if(carpaCache[key])return carpaCache[key];
   const s=fotoMisc('carpa-c-'+capa).c,[c,x]=mkCanvas(240,160),L=VCA.lado,xl=vc.xl,xr=xl+vc.w;

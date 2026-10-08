@@ -8,15 +8,15 @@ Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: 
 
 | Familia | Claves del juego | Assets | Herramientas | Generaciones aprox. |
 |---|---|---|---|---|
-| Personajes | 39 | 25 | create_character · animate_character · create_image_pro (paso previo) | 1111 |
+| Personajes | 49 | 25 | create_character · animate_character · create_image_pro (paso previo) | 1111 |
 | Mapa · terreno | 22 | 6 | create_tiles_pro · create_building_kit · create_topdown_tileset · animate_image | 15 + sin documentar |
-| Mapa · objetos con el estilo del mapa | 28 | 13 | create_map_object (background_image + máscara) · animate_image | 14 + sin documentar |
-| Objetos sueltos en lote | 41 | 10 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 180 + sin documentar |
-| Imágenes simples | 24 | 12 | create_image_pixflux (init_image + color_image) | 7 + sin documentar |
+| Mapa · objetos con el estilo del mapa | 26 | 13 | create_map_object (background_image + máscara) · animate_image | 14 + sin documentar |
+| Objetos sueltos en lote | 38 | 10 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 180 + sin documentar |
+| Imágenes simples | 22 | 11 | create_image_pixflux (init_image + color_image) | 7 + sin documentar |
 | Se queda procedural | 2 | 1 | — | 0 |
-| Importado | 17 | 3 | importado | 0 + sin documentar |
+| Importado | 99 | 32 | importado | 0 + sin documentar |
 
-**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 149/149 claves.
+**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 236/236 claves.
 
 ## Orden de creación
 
@@ -24,7 +24,7 @@ Las dependencias mandan: nada que use el estilo de otra cosa se genera antes de 
 
 - **F1 · Ancla de estilo:** player.
 - **F3 · Personajes:** kiko, josune, baltasar, tono, begona, unai, patxi, txaro, inaki, cop, molina, darko, jurado, cliente1, cliente2, cliente3, cliente4, cliente5, cliente6, vfx-16, vfx-32.
-- **F4 · Entorno:** tiles-exterior, interior-home, interior-shop, interior-bar, tiles-interior-extra, edificio-home (tras tiles-exterior), edificio-shop (tras tiles-exterior), edificio-bar (tras tiles-exterior), edificio-gray (tras tiles-exterior), props-16, props-32, prop-arbol (tras tiles-exterior), prop-farola (tras tiles-exterior), prop-fuente (tras tiles-exterior).
+- **F4 · Entorno:** tiles-exterior, interior-home, interior-shop, interior-bar, tiles-interior-extra, edificio-home (tras tiles-exterior), edificio-shop (tras tiles-exterior), edificio-bar (tras tiles-exterior), edificio-gray (tras tiles-exterior), edificio-gray-puerta, edificio-comisaria, edificio-nave, edificio-caserio, edificio-caserio2, edificio-marinera, edificio-marinera2, edificio-marinera3, edificio-marinera4, edificio-ladrillo, edificio-fabrica, props-altura, prop-farola-alta, prop-gramola-alta, props-16, props-32, prop-arbol (tras tiles-exterior), prop-arbol-alto, prop-monte, prop-seto, prop-parada, prop-farola (tras tiles-exterior), prop-fuente (tras tiles-exterior), tiles-firmes, detalles-hierba, edificio-caserio3, edificio-borda, edificio-marinera5, edificio-marinera6, prop-manzano, prop-arbol-alto2.
 - **F4b · Transiciones (opcional):** tileset-transiciones — opcional.
 - **F5 · Plantas:** planta-fases.
 - **F6 · Combate:** player-combate (tras player), ladron1-combate, ladron2-combate, ladron3-combate, policia-combate (tras cop), fondo-combate-ladron, fondo-combate-policia.
@@ -41,7 +41,7 @@ Rig humanoide: rotaciones coherentes y plantillas de animación a 1 generación 
 | kiko | kiko | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: kiko.png | F3 | idle*, fumar*, semillas* | 44 |
 | josune | josune | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: josune.png | F3 | idle*, secar_vaso*, servir* | 44 |
 | baltasar | baltasar | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: baltasar.png | F3 | idle*, puro*, contar* | 44 |
-| tono | tono | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: tono.png | F3 | idle*, nudillos*, fumar* | 44 |
+| tono | tono, tono2 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: tono.png | F3 | idle*, nudillos*, fumar* | 44 |
 | begona | begona | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: begona.png | F3 | idle*, walk*, cotillear* | 44 |
 | unai | kid, unai | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: unai.png | F3 | idle*, walk*, pelota* | 44 |
 | patxi | oldman, patxi | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: patxi.png | F3 | idle*, palomas* | 42 |
@@ -49,14 +49,14 @@ Rig humanoide: rotaciones coherentes y plantillas de animación a 1 generación 
 | inaki | sailor, inaki | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: inaki.png | F3 | idle*, pipa*, cabo* | 43 |
 | cop | cop | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cop.png | F3 | idle*, walk*, radio* | 44 |
 | molina | molina | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: molina.png | F3 | idle*, fumar* | 41 |
-| darko | darko | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: darko.png | F3 | idle*, vapear* | 42 |
+| darko | darko, darko2 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: darko.png | F3 | idle*, vapear* | 42 |
 | jurado | judge, jurado | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: jurado.png | F3 | idle*, notas* | 41 |
-| cliente1 | cliente1 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente1.png | F3 | idle*, walk*, movil* | 44 |
-| cliente2 | cliente2 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente2.png | F3 | idle*, walk*, fumar* | 44 |
-| cliente3 | cliente3 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente3.png | F3 | idle*, walk*, movil* | 44 |
+| cliente1 | cliente1, excursionista | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente1.png | F3 | idle*, walk*, movil* | 44 |
+| cliente2 | cliente2, obrero | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente2.png | F3 | idle*, walk*, fumar* | 44 |
+| cliente3 | cliente3, turista | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente3.png | F3 | idle*, walk*, movil* | 44 |
 | cliente4 | cliente4 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente4.png | F3 | idle*, walk*, movil* | 44 |
 | cliente5 | cliente5 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente5.png | F3 | idle*, walk*, fumar* | 44 |
-| cliente6 | cliente6 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente6.png | F3 | idle*, walk*, movil* | 44 |
+| cliente6 | cliente6, vecina | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente6.png | F3 | idle*, walk*, movil* | 44 |
 | player-combate | espalda:player | create_character (v3) | v3: 8 direcciones, 64 px | previo create_image_pro (solo texto) · reference_image_base64: player-combate.png | F6 · tras player | idle*, golpe*, patada*, spray*, comer*, herido*, desmayo* | 46 |
 | ladron1-combate | ladron1, frente:ladron | create_character (v3) | v3: 8 direcciones, 64 px | previo create_image_pro (solo texto) · reference_image_base64: ladron1-combate.png | F6 | idle*, ataque*, herido*, huir* | 43 |
 | ladron2-combate | ladron2, frente:ladron | create_character (v3) | v3: 8 direcciones, 64 px | previo create_image_pro (solo texto) · reference_image_base64: ladron2-combate.png | F6 | idle*, ataque*, herido*, huir* | 43 |
@@ -94,8 +94,8 @@ Lo grande que se apoya en el suelo (fachadas, carpa, árbol, farola, fuente): in
 | edificio-shop | roofT_shop, roofB_shop, wall_shop, win_shop, door_shop | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-edificio-shop.png | F4 · tras tiles-exterior | puerta | 2 |
 | edificio-bar | roofT_bar, roofB_bar, wall_bar, win_bar, door_bar | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-edificio-bar.png | F4 · tras tiles-exterior | puerta | 2 |
 | edificio-gray | roofT_gray, roofB_gray, wall_gray, win_gray | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-edificio-gray.png | F4 · tras tiles-exterior | — | 1 |
-| prop-arbol | tree | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: tree.png · inpainting.mask_image: tree_mascara.png | F4 · tras tiles-exterior | — | 0+? |
-| prop-farola | lamp | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: lamp.png · inpainting.mask_image: lamp_mascara.png | F4 · tras tiles-exterior | — | 0+? |
+| prop-arbol | — | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: tree.png · inpainting.mask_image: tree_mascara.png | F4 · tras tiles-exterior | — | 0+? |
+| prop-farola | — | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: lamp.png · inpainting.mask_image: lamp_mascara.png | F4 · tras tiles-exterior | — | 0+? |
 | prop-fuente | fountain | create_map_object | 1 por llamada, sobre el recorte del mapa | background_image: fountain.png · inpainting.mask_image: fountain_mascara.png | F4 · tras tiles-exterior | agua | 1+? |
 
 ## Objetos sueltos en lote
@@ -107,7 +107,7 @@ Muchos objetos pequeños del mismo estilo en una sola llamada (hasta 64 candidat
 | macetas | maceta-plastico7, maceta-tela11, maceta-plastico18, maceta-tela25 | create_1_direction_object | 48 objetos en 1 llamada (64 candidatos a 16 px) | style_images: estilo-maceta-16.png | F8 | — | 30 |
 | focos | foco-cfl, foco-sodio, foco-led | create_1_direction_object | 48 objetos en 1 llamada (64 candidatos a 32 px) | style_images: maceta-vacia-32.png | F8 | — | 30 |
 | mesa-cultivo | mesa | create_1_direction_object | 24 objetos en 1 llamada (64 candidatos a 16 px) | style_images: 00.png | F8 | — | 30 |
-| props-16 | fence, sign, bench, crate, bush, pc, lab, lab2, table, shelfW, counter, display, plantDeco, barcounter, bottles, stool, btable, jukebox, iwin, poster | create_1_direction_object | 64 objetos en 1 llamada (64 candidatos a 16 px) | style_images: bench.png, sign.png, crate.png, bush.png, counter.png, stool.png, jukebox.png, plantDeco.png | F4 | luces | 30+? |
+| props-16 | fence, sign, bench, crate, bush, pc, lab, lab2, table, shelfW, display, plantDeco, bottles, stool, btable, iwin, poster | create_1_direction_object | 64 objetos en 1 llamada (64 candidatos a 16 px) | style_images: bench.png, sign.png, crate.png, bush.png, counter.png, stool.png, jukebox.png, plantDeco.png | F4 | luces | 30+? |
 | props-32 | fridge, bedT, bedB | create_1_direction_object | 2 objetos · **comparte lote-32** (15 objetos de 4 assets en 1 llamada de 64 candidatos a 32 px) | solo texto | F4 | — | 30 |
 | planta-fases | germinando, plantula, vegetativo, floracion, lista, muerta, maceta-vacia, sana, seca | create_1_direction_object | 7 objetos · **comparte lote-32** (15 objetos de 4 assets en 1 llamada de 64 candidatos a 32 px) | solo texto | F5 | balanceo-vegetativo, balanceo-floracion, balanceo-lista | 0+? |
 | iconos | bolsa | create_1_direction_object | 12 objetos · **comparte lote-16** (24 objetos de 2 assets en 1 llamada de 64 candidatos a 16 px) | solo texto | F7 | — | 30 |
@@ -128,7 +128,6 @@ Pantallas completas sin rig: img2img sobre la composición actual y paleta forza
 | macetas-vista | maceta-vista-plastico7, maceta-vista-tela11, maceta-vista-plastico18, maceta-vista-tela25 | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-macetas-vista.png | F9 | — | 1 |
 | cuarto-cultivo | cuarto-cultivo | create_image_pixflux | pantalla entera, img2img | init_image_base64: huella-cuarto-cultivo.png | F9 | — | 1 |
 | titulo | hoja-titulo | create_image_pixflux | pantalla entera, img2img | init_image_base64: titulo.png | F7 | — | 1 |
-| carpa-c-fondo | carpa-c-pared, carpa-c-luz | edit_image_pixen | — | image_url: imagen-a.png | F9 | — | 0+? |
 | carpa-c-focos | foco-c-40, foco-c-44, foco-c-46 | edit_image_pixen | — | image_url: imagen-a-foco.png | F9 | — | 0+? |
 | carpa-c-macetas | maceta-c-15, maceta-c-22 | edit_image_pixen | — | image_url: imagen-a-maceta.png | F9 | — | 0+? |
 | carpa-c-plantas | planta-c-i-24, planta-c-i-36 | edit_image_pixen | — | image_url: imagen-a-planta.png | F9 | — | 0+? |
@@ -148,9 +147,38 @@ Arte propio del repositorio que ya existe (Strainmon): se adapta en local (recor
 
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
+| edificio-gray-puerta | door_gray | importado | — | solo texto | F4 | — | 0+? |
+| edificio-comisaria | roofT_comisaria, roofB_comisaria, wall_comisaria, win_comisaria, door_comisaria | importado | — | solo texto | F4 | puerta | 0+? |
+| edificio-nave | roofT_nave, roofB_nave, wall_nave, win_nave, door_nave | importado | — | solo texto | F4 | puerta | 0+? |
+| edificio-caserio | roofT_caserio, roofB_caserio, wall_caserio, win_caserio, door_caserio | importado | — | solo texto | F4 | puerta | 0+? |
+| edificio-caserio2 | roofT_caserio2, roofB_caserio2, wall_caserio2, win_caserio2 | importado | — | solo texto | F4 | puerta | 0+? |
+| edificio-marinera | roofT_marinera, roofB_marinera, wall_marinera, win_marinera | importado | — | solo texto | F4 | — | 0+? |
+| edificio-marinera2 | roofT_marinera2, roofB_marinera2, wall_marinera2, win_marinera2 | importado | — | solo texto | F4 | — | 0+? |
+| edificio-marinera3 | roofT_marinera3, roofB_marinera3, wall_marinera3, win_marinera3 | importado | — | solo texto | F4 | — | 0+? |
+| edificio-marinera4 | roofT_marinera4, roofB_marinera4, wall_marinera4, win_marinera4 | importado | — | solo texto | F4 | — | 0+? |
+| edificio-ladrillo | roofT_ladrillo, roofB_ladrillo, wall_ladrillo, win_ladrillo | importado | — | solo texto | F4 | — | 0+? |
+| edificio-fabrica | roofT_fabrica, roofB_fabrica, wall_fabrica, win_fabrica | importado | — | solo texto | F4 | — | 0+? |
+| props-altura | counter, barcounter | importado | — | solo texto | F4 | — | 0+? |
+| prop-farola-alta | lamp | importado | — | solo texto | F4 | — | 0+? |
+| prop-gramola-alta | jukebox | importado | — | solo texto | F4 | — | 0+? |
+| prop-arbol-alto | tree | importado | — | solo texto | F4 | — | 0+? |
+| prop-monte | monte, monte2 | importado | — | solo texto | F4 | — | 0+? |
+| prop-seto | seto | importado | — | solo texto | F4 | — | 0+? |
+| prop-parada | parada | importado | — | solo texto | F4 | — | 0+? |
+| carpas-medias-mapa | carpa-p80-mapa, carpa-m120-mapa | importado | — | solo texto | F9 | — | 0+? |
+| carpas-medias-vista | carpa-p80-vista, carpa-m120-vista | importado | — | solo texto | F9 | — | 0+? |
 | plantas-vista | planta-vista | importado | — | solo texto | F9 | — | 0+? |
+| carpa-c-fondo | carpa-c-pared, carpa-c-luz | importado | — | solo texto | F9 | — | 0+? |
 | carpa-c-plantas-h | planta-c-h-24, planta-c-h2-24, planta-c-h1-18, planta-c-h0-8 | importado | — | solo texto | F9 | — | 0+? |
 | carpa-c-plantas-a | planta-c-i-38, planta-c-i2-38, planta-c-i-32, planta-c-i2-32, planta-c-h-38, planta-c-h2-38, planta-c-h-32, planta-c-h2-32, planta-c-s-38, planta-c-s2-38, planta-c-s-32, planta-c-s2-32, planta-c-h1-18, planta-c-h0-8 | importado | — | solo texto | F9 | — | 0+? |
+| tiles-firmes | hormigon, pista, rotoT, rotoB | importado | — | solo texto | F4 | — | 0+? |
+| detalles-hierba | detalles | importado | — | solo texto | F4 | — | 0+? |
+| edificio-caserio3 | roofT_caserio3, roofB_caserio3, wall_caserio3, win_caserio3 | importado | — | solo texto | F4 | — | 0+? |
+| edificio-borda | roofT_borda, roofB_borda, wall_borda, win_borda | importado | — | solo texto | F4 | — | 0+? |
+| edificio-marinera5 | roofT_marinera5, roofB_marinera5, wall_marinera5, win_marinera5 | importado | — | solo texto | F4 | — | 0+? |
+| edificio-marinera6 | roofT_marinera6, roofB_marinera6, wall_marinera6, win_marinera6 | importado | — | solo texto | F4 | — | 0+? |
+| prop-manzano | manzano | importado | — | solo texto | F4 | — | 0+? |
+| prop-arbol-alto2 | tree2 | importado | — | solo texto | F4 | — | 0+? |
 
 ## Lotes compartidos
 
@@ -265,11 +293,6 @@ Una llamada a `create_1_direction_object` de ≤42 px devuelve 64 candidatos y c
 1. `wang-agua-hierba`: lower «calm blue river water» → upper «short green grass», transition_size 0.25 — guarda el id del tile de hierba (get_topdown_tileset).
 2. `wang-tierra-hierba`: lower «packed light brown dirt path» → upper «short green grass», transition_size 0.25, `upper_base_tile_id` = 4e6ae897-6f8a-4ead-b17c-3fe3cbcb51ba.
 3. `wang-plaza-hierba`: lower «warm beige square stone plaza pavement» → upper «short green grass», transition_size 0, `upper_base_tile_id` = 4e6ae897-6f8a-4ead-b17c-3fe3cbcb51ba.
-
-**carpa-c-fondo** (edit_image_pixen, obligatorio)
-1. `undefined`: lower «undefined» → upper «undefined», transition_size undefined.
-2. `undefined`: lower «undefined» → upper «undefined», transition_size undefined.
-3. `undefined`: lower «undefined» → upper «undefined», transition_size undefined.
 
 **carpa-c-focos** (edit_image_pixen, obligatorio)
 1. `undefined`: lower «undefined» → upper «undefined», transition_size undefined.

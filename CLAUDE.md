@@ -39,7 +39,7 @@ informe técnico directo + código refactorizado, sin relleno.
 
 ## Subproyecto `ribera-verde/`
 
-- RPG de cultivo independiente (v1.9.0 publicada; 1.10 en desarrollo): 160 px de alto y de 240 a 400 de ancho, solo en horizontal, con mandos flotantes; piso a 1 casilla = 1 m, vista de carpa B a 60 px/m con las carpas plateadas de frente (3/4 sin atlas) y vista C (la carpa por dentro, desde la imagen A; pared solo con la tela y la luz del foco en una capa aparte, delante de todo). Notas propias en `ribera-verde/CLAUDE.md`.
+- RPG de cultivo independiente (v1.9.0 publicada; 1.10 en desarrollo): 160 px de alto y de 240 a 400 de ancho, solo en horizontal, con mandos flotantes; piso a 1 casilla = 1 m, vista de carpa B a 60 px/m con las carpas plateadas de frente (3/4 sin atlas) y vista C (la carpa por dentro, desde la imagen A, plateada con el armazón negro como las carpas; pared solo con la tela y la luz del foco en una capa aparte, delante de todo). Notas propias en `ribera-verde/CLAUDE.md`.
 - Tests: `cd ribera-verde && npm install` y, con el Chromium preinstalado
   (`export CHROMIUM_PATH=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome | head -1)`):
   `npm test` → 77/77, 0 errores JS · `npm run test:arte` → 25/25.

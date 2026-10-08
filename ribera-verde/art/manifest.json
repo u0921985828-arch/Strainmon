@@ -5711,7 +5711,7 @@
    "tipo": "objeto",
    "fase": "F9",
    "herramienta": "importado",
-   "estado": "pendiente de aprobación",
+   "estado": "aprobado",
    "familia": "importado",
    "coste_real": 0,
    "id": "carpas-medias-vista",
@@ -5722,7 +5722,8 @@
    "celda": "carpa_vista",
    "origen": "tools/sprites/a-mano/carpas.py: el armario de 60 y la carpa de 100 aprobados de carpas-vista con un tramo del mylar repetido (13 columnas y 14 filas el de 80; 12 columnas la de 120), el que mejor casa consigo mismo",
    "descripcion": "armario de 80 y carpa de 120 abiertos de frente (vista de carpa)",
-   "notas": "1.10: completan carpas-vista (la vista B sigue siendo procedural en el juego). Hechos sin PixelLab; a la espera de que se aprueben."
+   "notas": "1.10: completan carpas-vista; la vista B las pinta de frente (VB_PLATA). Hechos sin PixelLab; aprobados.",
+   "aprobado": "1.10: el armario de 80 y la carpa de 120, plateados con el armazón negro, aprobados por la persona (captura de la vista B de las 5 carpas)"
   },
   {
    "tipo": "objeto",
@@ -6304,59 +6305,66 @@
   },
   {
    "fase": "F9",
-   "herramienta": "edit_image_pixen",
    "estado": "aprobado",
-   "familia": "imagen",
+   "familia": "importado",
    "paleta": "propia",
    "estilo_ref": "imagen A (estilo.carpa_p3.referencia)",
    "tipo": "fondo",
    "id": "carpa-c-fondo",
-   "coste_real": 3,
+   "coste_real": 0,
    "cubre": [
     "misc:carpa-c-pared",
     "misc:carpa-c-luz"
    ],
    "celda": "pantalla",
    "max_colores": 32,
-   "parametros": {
-    "seed": 1101,
-    "width": 240,
-    "height": 160
-   },
-   "descripcion": "Remove the two cannabis plants, their black pots and the hanging lamp. Keep the empty grow tent exactly as it is: wrinkled silver mylar back and side walls, empty light floor, dark rolled-up curtains at both sides, same outline and colors. Replace the orange lamp glow on the walls with even neutral light.",
-   "entrada": {
-    "image_url": "art/crudo/_ref/imagen-a.png"
-   },
-   "entrada_origen": "la imagen A tal cual (https://api.pixellab.ai/mcp/images/ce445b95-382f-4fab-9be1-6406775eb1a8/download)",
-   "llamadas": [
-    {
-     "que": "imagen A sin plantas ni macetas; el foco y su luz se quedan",
-     "image_job": "3f9e18db-ea51-4084-b580-8d74d91a7c41",
-     "asset_id": "598af2b7-4fec-52b7-8b40-db49b866835c",
+   "notas": "Vista C: la pared se recorta a lo ancho de cada carpa (columnas 0-43 y 196-239 fijas, la pared del fondo centrada) y la luz igual. La pared lleva solo la tela, sin la forma del cono (la 1.ª versión pasaba los tonos de la luz a grises y se quedaba su silueta). La luz se pinta delante de todo (pared, macetas y plantas) en «overlay», debajo de la campana; con el foco apagado no se pinta. Hasta 32 colores (max_colores): son fondos de pantalla entera.",
+   "herramienta": "importado",
+   "origen": "tools/sprites/a-mano/carpa_c.py: la pared dibujada en código (mylar plateado con vetas verticales, laterales más oscuros hacia delante, bandeja blanca con rejilla y el armazón negro) con la geometría de la imagen A; la luz, la de la imagen A sin los brillos de las cortinas",
+   "descripcion": "la carpa por dentro (vista C): pared del fondo, laterales y suelo de tela plateada con el armazón negro, como las carpas del piso y de la vista B; la luz del foco en su capa",
+   "aprobado": "2026-10-08: «prueba B» (p60 con CFL, m100 con sodio 400 y g150 con sodio 600, antes y después), aprobada por la persona: «Me gustan más los plateados»",
+   "historial": {
+    "herramienta": "edit_image_pixen",
+    "parametros": {
+     "seed": 1101,
      "width": 240,
      "height": 160
     },
-    {
-     "que": "sin el foco (de aquí sale la tela que queda detrás de la campana)",
-     "image_job": "8b381c7c-70b6-43f7-b467-bd48f1d31c39",
-     "width": 240,
-     "height": 160,
-     "descripcion": "Remove the hanging lamp and all the orange light and glow. The mylar walls and the floor become plain neutral silver-grey, evenly lit, keeping the same wrinkles, the dark rolled-up curtains, the black outline and the pixel style. Nothing else changes."
+    "descripcion": "Remove the two cannabis plants, their black pots and the hanging lamp. Keep the empty grow tent exactly as it is: wrinkled silver mylar back and side walls, empty light floor, dark rolled-up curtains at both sides, same outline and colors. Replace the orange lamp glow on the walls with even neutral light.",
+    "entrada": {
+     "image_url": "art/crudo/_ref/imagen-a.png"
     },
-    {
-     "que": "la pared solo con la tela: la zona del cono, aplanada al tono de la tela (recorte de la pared del fondo, 152 × 140), y pixen le pone arrugas como las de las esquinas",
-     "image_job": "9ee52ba5-bd8c-4f1f-9593-c5da28e777fe",
-     "asset_id": "649c914c-0947-5069-90ca-e0ef24136aa4",
-     "entrada": "art/crudo/_ref/imagen-a-muro-plano.png",
-     "width": 152,
-     "height": 140,
-     "seed": 1101,
-     "descripcion": "This is the back wall of a grow tent: blue-grey canvas fabric seen straight on. Fill the whole plain flat area with soft fabric wrinkles, subtle vertical folds and slight sag, in the same blue-grey tones and pixel style as the wrinkles in the top corners. Even neutral lighting, no light beam, no cone, no curved bands, no glow, no warm colours. Keep the top corner wrinkles, the black outline and the image edge to edge."
-    }
-   ],
-   "montaje": "scratchpad f22/capas.py separa la imagen A vacía en pared y luz. f23/tela.py: la pared del fondo (x 46-193, y 3-138) sale de la llamada 3 (tela sin la forma del cono), con los tonos de la pared de la imagen A; laterales, cortinas y suelo, los de capas.py. f23/cono.py: la luz de la imagen A (solo sus tonos claros) recortada a un cono recto desde la boca del foco (y 16, x 97-143) hasta el pie de la pared, con la banda tenue #c6824d en los huecos; fuera del cono, transparente salvo el charco del suelo y los brillos de las cortinas.",
-   "notas": "Vista C: la pared se recorta a lo ancho de cada carpa (columnas 0-43 y 196-239 fijas, la pared del fondo centrada) y la luz igual. La pared lleva solo la tela, sin la forma del cono (la 1.ª versión pasaba los tonos de la luz a grises y se quedaba su silueta). La luz se pinta delante de todo (pared, macetas y plantas) en «overlay», debajo de la campana; con el foco apagado no se pinta. Hasta 32 colores (max_colores): son fondos de pantalla entera.",
-   "aprobado": "2026-10-06: corte de prueba de la vista C (p60, p80, m100, g150 y m100 vacía), aprobado por la persona tras la 2.ª versión (pared solo de tela y luz delante de todo)"
+    "entrada_origen": "la imagen A tal cual (https://api.pixellab.ai/mcp/images/ce445b95-382f-4fab-9be1-6406775eb1a8/download)",
+    "llamadas": [
+     {
+      "que": "imagen A sin plantas ni macetas; el foco y su luz se quedan",
+      "image_job": "3f9e18db-ea51-4084-b580-8d74d91a7c41",
+      "asset_id": "598af2b7-4fec-52b7-8b40-db49b866835c",
+      "width": 240,
+      "height": 160
+     },
+     {
+      "que": "sin el foco (de aquí sale la tela que queda detrás de la campana)",
+      "image_job": "8b381c7c-70b6-43f7-b467-bd48f1d31c39",
+      "width": 240,
+      "height": 160,
+      "descripcion": "Remove the hanging lamp and all the orange light and glow. The mylar walls and the floor become plain neutral silver-grey, evenly lit, keeping the same wrinkles, the dark rolled-up curtains, the black outline and the pixel style. Nothing else changes."
+     },
+     {
+      "que": "la pared solo con la tela: la zona del cono, aplanada al tono de la tela (recorte de la pared del fondo, 152 × 140), y pixen le pone arrugas como las de las esquinas",
+      "image_job": "9ee52ba5-bd8c-4f1f-9593-c5da28e777fe",
+      "asset_id": "649c914c-0947-5069-90ca-e0ef24136aa4",
+      "entrada": "art/crudo/_ref/imagen-a-muro-plano.png",
+      "width": 152,
+      "height": 140,
+      "seed": 1101,
+      "descripcion": "This is the back wall of a grow tent: blue-grey canvas fabric seen straight on. Fill the whole plain flat area with soft fabric wrinkles, subtle vertical folds and slight sag, in the same blue-grey tones and pixel style as the wrinkles in the top corners. Even neutral lighting, no light beam, no cone, no curved bands, no glow, no warm colours. Keep the top corner wrinkles, the black outline and the image edge to edge."
+     }
+    ],
+    "montaje": "scratchpad f22/capas.py separa la imagen A vacía en pared y luz. f23/tela.py: la pared del fondo (x 46-193, y 3-138) sale de la llamada 3 (tela sin la forma del cono), con los tonos de la pared de la imagen A; laterales, cortinas y suelo, los de capas.py. f23/cono.py: la luz de la imagen A (solo sus tonos claros) recortada a un cono recto desde la boca del foco (y 16, x 97-143) hasta el pie de la pared, con la banda tenue #c6824d en los huecos; fuera del cono, transparente salvo el charco del suelo y los brillos de las cortinas.",
+    "aprobado": "2026-10-06: corte de prueba de la vista C (p60, p80, m100, g150 y m100 vacía), aprobado por la persona tras la 2.ª versión (pared solo de tela y luz delante de todo)",
+    "nota": "1.ª versión (imagen A, cortinas verdeazuladas, hecha con edit_image_pixen): aprobada el 2026-10-06 y sustituida el 2026-10-08 porque no casaba con las carpas plateadas"
+   }
   },
   {
    "fase": "F9",
