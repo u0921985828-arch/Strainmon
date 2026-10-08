@@ -61,7 +61,7 @@ function enterGame(){
 }
 function update(dt){
   if(mode==='world'&&S){
-    updatePlayer(dt);updateEnts(dt);
+    updatePlayer(dt);updateEnts(dt);if(isFree())updatePatrullas(dt);
     if(isFree()){timeAcc+=dt;while(timeAcc>=MS_PER_MIN){timeAcc-=MS_PER_MIN;tickMinute();}
       if(pending.length&&!P.moving)run(pending.shift());}
     hudT-=dt;if(hudT<=0){hudT=250;updateHUD();}

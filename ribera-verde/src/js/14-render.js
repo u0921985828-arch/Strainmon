@@ -3,7 +3,7 @@
    ========================================================= */
 const camera=()=>{const m=MAPS[S.map];let cx=P.px+8-SW/2,cy=P.py+8-SH/2;const mw=m.w*16,mh=m.h*16;
   cx=mw<=SW?(mw-SW)/2:clamp(cx,0,mw-SW);cy=mh<=SH?(mh-SH)/2:clamp(cy,0,mh-SH);return{x:Math.round(cx),y:Math.round(cy)};};
-const GLYPH={'$':['..#..','.####','#.#..','.###.','..#.#','####.','..#..'],'!':['..#..','..#..','..#..','..#..','..#..','.....','..#..']};
+const GLYPH={'$':['..#..','.####','#.#..','.###.','..#.#','####.','..#..'],'!':['..#..','..#..','..#..','..#..','..#..','.....','..#..'],'gota':['..#..','..#..','.###.','.###.','#####','#####','.###.']};   // gota: el catador de rosin (1.10)
 function bubble(x,y,ch,col){ctx.fillStyle='#26262e';ctx.fillRect(x-1,y-1,9,10);ctx.fillStyle='#ffffff';ctx.fillRect(x,y,7,8);ctx.fillRect(x+2,y+8,3,1);
   ctx.fillStyle=col;GLYPH[ch].forEach((r,j)=>{for(let i=0;i<5;i++)if(r[i]==='#')ctx.fillRect(x+1+i,y+(j>3?j-0:j)+0,1,1);});}
 function storyMark(id){
@@ -37,7 +37,8 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
   }
   const fr=(e,dur)=>e.moving&&e.t/dur<.5?1+((e.x+e.y)&1):0;
   if(ARTE.ok)for(const e of ents)ambiente(e,now,cam);
-  for(const e of ents)list.push([e.py,()=>{if(!dibujarPJ(e,e.look,now,cam,false,320))ctx.drawImage(spriteFor(e.look,e.dir,fr(e,320)),Math.round(e.px-cam.x),Math.round(e.py-cam.y-4));}]);
+  if(ZONAS[S.map])pintarVistas(cam);   // por dónde miran las patrullas, de día (10b-patrulla)
+  for(const e of ents)list.push([e.py,()=>{if(!dibujarPJ(e,e.look,now,cam,false,e.dur||320))ctx.drawImage(spriteFor(e.look,e.dir,fr(e,e.dur||320)),Math.round(e.px-cam.x),Math.round(e.py-cam.y-4));}]);
   if(!camFija)list.push([P.py,()=>{if(!dibujarPJ(P,LOOKS.player,now,cam,true,P.dur))ctx.drawImage(spriteFor(LOOKS.player,P.dir,P.moving&&P.t/P.dur<.5?1+P.parity:0),Math.round(P.px-cam.x),Math.round(P.py-cam.y-4));}]);
   const bolsa=ARTE.ok&&frameDe(ARTE.cubre['misc:bolsa'],'bolsa','unica',0,{i:0});
   for(const it of ITEMS)if(!it.hidden&&it.map===S.map&&!S.taken[it.id])list.push([it.y*16,()=>{const x=it.x*16-cam.x,y=it.y*16-cam.y;if(bolsa)pinta(bolsa,x+8,y+8);else ctx.drawImage(bagSprite,x,y);}]);
@@ -46,7 +47,7 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
   if(ARTE.ok)pintarVfx(now,cam,S.map);
   const bob=Math.floor(now/400)%2;
   for(const e of ents){const bx=Math.round(e.px-cam.x)+4,by=Math.round(e.py-cam.y)-16+bob;
-    if(e.def.client)bubble(bx,by,'$','#2a9a4a');else if(storyMark(e.id))bubble(bx,by,'!','#e03030');}
+    if(e.def.client)bubble(bx,by,...e.def.client.type==='ext'?['gota','#d08a10']:['$','#2a9a4a']);else if(storyMark(e.id)||e.caza)bubble(bx,by,'!','#e03030');}
   if(ZONAS[S.map]){
     const h=S.min/60;let a=h>=21||h<5?.5:h>=19?(h-19)/2*.5:h<7?(7-h)/2*.5:0;
     if(h>=17.5&&h<20.5){ctx.fillStyle=`rgba(255,130,50,${.13*Math.sin((h-17.5)/3*Math.PI)})`;ctx.fillRect(0,0,SW,SH);}
@@ -126,6 +127,8 @@ function renderTitle(now){
 function updateHUD(){
   const h=$('hud');if(mode!=='world'||!S){h.hidden=true;return;}h.hidden=false;
   const hh=String(Math.floor(S.min/60)).padStart(2,'0'),mm=String(Math.floor(S.min%60/10)*10).padStart(2,'0'),heat=Math.round(S.heat);
-  h.innerHTML=`DÍA ${S.day} · ${hh}:${mm}<br>${eur(S.money)} · ${Math.floor(totalBuds())} g<div class="heat">CALOR<span class="bar"><i class="${heat>=70?'hot':''}" style="width:${heat}%"></i></span></div>`;
+  const r=totalRosin(),sv=Math.round(SOSP.v);
+  h.innerHTML=`DÍA ${S.day} · ${hh}:${mm}<br>${eur(S.money)} · ${Math.floor(totalBuds())} g${r?' · '+coma(Math.round(r*10)/10)+' g rosin':''}<div class="heat">CALOR<span class="bar"><i class="${heat>=70?'hot':''}" style="width:${heat}%"></i></span></div>`
+    +(nPatrullas()?`<div class="heat sosp">${SOSP.alarma?'¡ALARMA!':'SOSPECHA'}<span class="bar"><i class="${SOSP.alarma?'hot':''}" style="width:${SOSP.alarma?100:sv}%"></i></span></div>`:'');
 }
 

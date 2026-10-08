@@ -7,6 +7,8 @@ var endcard_on := false
 
 # ---------- tienda ----------
 func shop_cond(it: Dictionary) -> bool:
+	if it.get("item") == "prensa":   # la prensa de rosin (1.10), una
+		return not S.items.get("prensa")
 	if it.get("extra"):
 		var k: String = it.extra
 		var nc := 0
@@ -87,7 +89,7 @@ func shop() -> void:
 			if it.get("sid"):
 				ic = icono("semillas")
 			elif it.get("item"):
-				ic = icono(IC[it.item])
+				ic = icono(IC[it.item]) if IC.has(it.item) else null
 			elif it.get("maceta"):
 				ic = icono("maceta")
 			elif it.get("foco"):
@@ -195,7 +197,7 @@ func talk_kiko():
 	for p in S.pots:
 		if p:
 			alguna = true
-	if S.seeds.is_empty() and not alguna and not total_buds() and not caja_g() and S.money + caja_e() < 15:   # lo de la caja también cuenta (1.10)
+	if S.seeds.is_empty() and not alguna and not total_buds() and not total_rosin() and not caja_g() and S.money + caja_e() < 15:   # lo de la caja también cuenta (1.10)
 		await say("¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.", N)
 		add_seeds("ria", 2)
 		await got("2 semillas de SKUNK #1")
@@ -383,7 +385,7 @@ func venta_mayor(N: String) -> void:
 	await check_story()
 
 func talk_cop():
-	if total_buds() > 0 and not S.protect:
+	if carga_sosp() > 0 and not S.protect:
 		await say("¿Y ese olor? Quieto ahí.", "AGENTE")
 		await battle("police")
 		return
@@ -681,11 +683,13 @@ func raid_event():
 	sfx("bad")
 	await say("REDADA. La policía entra en tu piso.")
 	var g := int(floor(total_buds()))
+	var ro := total_rosin()
 	var np := []
 	for p in S.pots:
 		np.append(null)
 	S.pots = np
 	S.buds = {}
+	S.rosin = {}
 	S.heat = 30
 	var hallada: bool = S.get("caja") != null and Cultivo.azar() < D.CAJA_REDADA
 	var cg := 0
@@ -696,7 +700,7 @@ func raid_event():
 		S.caja.buds = {}
 		S.caja.money -= ce
 	var fine: float = D.MULTA_REDADA - pagar_casa(D.MULTA_REDADA)
-	await say("Se llevan todas las plantas y %d g. Multa: %s." % [g, Datos.eur(fine)])
+	await say("Se llevan todas las plantas y %d g%s. Multa: %s." % [g, (" y " + rosin_txt(ro)) if ro else "", Datos.eur(fine)])
 	if S.get("caja") != null:
 		await say(("Encuentran la caja de detrás del diploma: se llevan %d g y %s." % [cg, Datos.eur(ce)]) if hallada else "La caja de detrás del diploma ni la ven.")
 	await say("Toca empezar de nuevo. Y vender menos una temporada.")
@@ -801,6 +805,12 @@ func mochila() -> void:
 			var b: Dictionary = S.buds[k]
 			rows.append({"label": lot_nombre(k), "right": "%d g · %s%%" % [int(floor(b.g)), Datos.pct(b.thc)], "sw": strain(lot_sid(k)).c, "ic": ic_cog(lot_sid(k)),
 				"desc": ("Cogollos de un fenotipo estrella, en lote aparte.\n" if k.ends_with("*") else "Cogollos listos para vender.\n") + strain(lot_sid(k)).o})
+		for k in S.rosin:
+			var b: Dictionary = S.rosin[k]
+			rows.append({"label": "Rosin · " + lot_nombre(k), "right": "%s g · %s%%" % [Datos.coma(b.g), Datos.pct(b.thc)], "sw": "#d89a18", "ic": ic_cog(lot_sid(k)),
+				"desc": "Rosin: extracción prensada sin disolventes. Lo compran los catadores.\n" + strain(lot_sid(k)).o})
+		if S.items.get("prensa"):
+			rows.append({"label": "Prensa de rosin", "right": "en la mesa", "desc": "De 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso."})
 		i = await menu(rows, {"cls": "full", "title": "MOCHILA", "title2": "%d g encima" % int(floor(total_buds())) + ((" · %d g en la caja" % int(floor(caja_g()))) if S.get("caja") else ""), "desc": true, "initial": i})
 		if i < 0:
 			return
@@ -982,9 +992,14 @@ func enemy_hits():
 		for k in S.buds.keys():
 			if S.buds[k].g < .5:
 				S.buds.erase(k)
+		var lr := 0.0
+		for k in S.rosin.keys():   # y la mitad del rosin (1.10)
+			var qr: float = Datos.jsround(S.rosin[k].g * 5) / 10.0
+			lr += qr
+			use_rosin(k, qr)
 		var lm := Datos.jsround(S.money * .3)
 		S.money -= lm
-		await say("Te roba %d g y %s." % [lost, Datos.eur(lm)])
+		await say("Te roba %d g%s y %s." % [lost, (", " + rosin_txt(lr)) if lr > 0 else "", Datos.eur(lm)])
 		return "ko"
 	return null
 
@@ -1072,19 +1087,22 @@ func thief_round():
 		return "win"
 	return await enemy_hits()
 
+# devuelve lo requisado en texto (cogollos y, si hay, rosin) y la multa
 func confiscate(extra_fine := true) -> Array:
 	var g := int(floor(total_buds()))
+	var ro := total_rosin()
 	var fine = min(S.money, int(D.MULTA_CALLE)) if extra_fine else 0
 	if B:
 		b_anim("E", "multa")
 	S.buds = {}
+	S.rosin = {}
 	S.money -= fine
 	S.heat = max(0, S.heat - 15)
-	return [g, fine]
+	return ["%d g%s" % [g, (" y " + rosin_txt(ro)) if ro else ""], fine]
 
 # el soborno (1.10) sube también con el dinero que llevas encima: un 5 %
 func precio_soborno() -> int:
-	return Datos.jsround(40 + S.heat * 4 + total_buds() * .5 + S.money * .05)
+	return Datos.jsround(40 + S.heat * 4 + carga_sosp() * .5 + S.money * .05)
 
 func cop_round():
 	var cost := precio_soborno()
@@ -1101,7 +1119,7 @@ func cop_round():
 			var r := confiscate()
 			S.heat = min(100, S.heat + 20)
 			sfx("bad")
-			await say("Te requisan %d g y te multan con %s." % [r[0], Datos.eur(r[1])])
+			await say("Te requisan %s y te multan con %s." % [r[0], Datos.eur(r[1])])
 			return "caught"
 		S.money -= cost
 		S.heat = max(0, S.heat - 10)
@@ -1119,7 +1137,7 @@ func cop_round():
 		var r := confiscate()
 		sfx("bad")
 		bhud_act()
-		await say("Te requisan %d g y te multan con %s." % [r[0], Datos.eur(r[1])])
+		await say("Te requisan %s y te multan con %s." % [r[0], Datos.eur(r[1])])
 		return "caught"
 	if c == 2:
 		if Cultivo.azar() < .45 + (.15 if is_night() else 0.0):
@@ -1133,11 +1151,11 @@ func cop_round():
 		S.hp = maxi(1, S.hp - 5)
 		sfx("hurt")
 		bhud_act()
-		await say("Te requisan %d g y te multan con %s." % [r[0], Datos.eur(r[1])])
+		await say("Te requisan %s y te multan con %s." % [r[0], Datos.eur(r[1])])
 		return "caught"
 	var r := confiscate(false)
 	bhud_act()
-	await say("Le entregas %d g. «Buena decisión. Por esta vez, sin multa.»" % r[0])
+	await say("Le entregas %s. «Buena decisión. Por esta vez, sin multa.»" % r[0])
 	return "caught"
 
 # ---------- la caja fuerte, el robo de Darko y los encargos de Baltasar (1.10, 11b-caja) ----------

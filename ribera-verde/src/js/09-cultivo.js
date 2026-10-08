@@ -269,7 +269,23 @@ async function letterAction(){
   await talk('CARTA',['«{N}: si lees esto, el piso es tuyo. Cuídalo.»','«Al fondo del salón está mi armario de cultivo. Lo he tenido treinta años y nunca me ha fallado.»','«Pásate por el growshop de Kiko, aquí al lado. Él te enseñará lo que yo no pude.»','«Le debo dinero a Baltasar, el del bar El Ancla. No es buena gente. Lo siento.»']);
   S.flags.letter=true;showObjective();
 }
+// la prensa de rosin (1.10, de Kiko desde el capítulo 3): calor y presión sobre los cogollos; sale el ROSIN.rend del peso (al
+// décimo de gramo) con ROSIN.thc veces su THC, hasta ROSIN.tope. Media hora en la mesa
+const rosinDe=g=>Math.round(g*ROSIN.rend*10)/10;
+async function prensar(){
+  const lots=budLots(5);
+  if(!lots.length)return say('PRENSA DE ROSIN: necesitas 5 g de cogollos como mínimo.');
+  const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué prensas?'});
+  if(i<0||i>=lots.length)return;
+  const [k,b]=lots[i],ops=[5,25,100].filter(g=>g<Math.floor(b.g)).concat([Math.floor(b.g)]);
+  const j=await ask(`${lotNombre(k)}: ${Math.floor(b.g)} g. ¿Cuánto prensas?`,ops.map(g=>`${g} g → ${coma(rosinDe(g))} g de rosin`).concat(['Nada']));
+  if(j<0||j>=ops.length)return;
+  const g=ops[j],r=rosinDe(g),thc=Math.min(ROSIN.tope,b.thc*ROSIN.thc);
+  useBuds(k,g);addRosin(k,r,thc);advanceTime(30);sfx('get');
+  await say(`Prensas ${g} g de ${lotNombre(k)}: ${coma(r)} g de rosin con un ${pct(thc)} % de THC.`);
+}
 async function labAction(){
+  if(S.items.prensa){const j=await ask('La mesa de la tía. ¿Qué haces?',['Prensar rosin','Cruzar semillas','Nada']);if(j===0)return prensar();if(j!==1)return;}
   if(!S.flags.lab)return say('Una mesa con un microscopio viejo y frascos. Kiko sabrá qué hacer con esto.');
   const own=()=>Object.entries(S.seeds).filter(([,v])=>v>0);
   if(own().length<2&&!own().some(([k,v])=>v>=2&&genDe(k)<GEN_ESTABLE))return say('MESA DE GENÉTICA: necesitas semillas de dos variedades distintas para cruzar, o 2 de una línea sin estabilizar.');

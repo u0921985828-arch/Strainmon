@@ -32,6 +32,8 @@ async function mochila(){
     for(const [k,v] of Object.entries(S.seeds))rows.push({label:'Semilla '+getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:icono('semillas'),desc:strainLine(k)});
     for(const e of S.esquejes)rows.push({label:'Esqueje '+getStrain(e.sid).n+marcaFeno(e.f),right:'día '+(e.dia+ESQUEJE_DIAS),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),desc:`Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+ESQUEJE_DIAS}.`});
     for(const [k,b] of Object.entries(S.buds))rows.push({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k)),desc:(k.endsWith('*')?'Cogollos de un fenotipo estrella, en lote aparte.\n':'Cogollos listos para vender.\n')+getStrain(lotSid(k)).o});
+    for(const [k,b] of Object.entries(S.rosin))rows.push({label:'Rosin · '+lotNombre(k),right:`${coma(b.g)} g · ${pct(b.thc)}%`,sw:'#d89a18',ic:iconoCogollo(lotSid(k)),desc:'Rosin: extracción prensada sin disolventes. Lo compran los catadores.\n'+getStrain(lotSid(k)).o});
+    if(S.items.prensa)rows.push({label:'Prensa de rosin',right:'en la mesa',desc:'De 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso.'});
     i=await menu(rows,{cls:'full',title:'MOCHILA',title2:`${Math.floor(totalBuds())} g encima`+(S.caja?` · ${Math.floor(cajaG())} g en la caja`:''),desc:true,initial:i});
     if(i<0)return;
     if(rows[i].k==='bocata'){if(S.items.bocata>0&&S.hp<S.hpMax){S.items.bocata--;S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');toast('Te comes el bocata. +15 de vida',1200);}else sfx('bump');}

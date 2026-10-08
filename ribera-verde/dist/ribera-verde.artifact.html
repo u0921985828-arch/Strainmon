@@ -4,8 +4,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Press+Start+2P&display=swap">
 <style>
 /* Layout: app de móvil en horizontal. La pantalla del juego ocupa todo el móvil, con un reborde fino, y los mandos
-   flotan encima, fijos: cruceta abajo a la izquierda, A/B abajo a la derecha, SONIDO y START arriba a la derecha.
-   06b-pantalla.js mide el hueco real y fija el tamaño de cada parte en variables CSS; aquí solo se colocan. */
+   flotan encima, fijos y medidos en mm donde descansan los pulgares: cruceta abajo a la izquierda, A/B abajo a la derecha con START
+   encima y SONIDO arriba a la derecha. 06b-pantalla.js mide el hueco real y coloca cada parte (geoMandos); aquí solo se pintan. */
 :root{
   --rim:#121519; --ink:#e6f2ea;
   --btn:#6d2c4b; --btnHi:#9a4a72;
@@ -18,34 +18,33 @@ html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
 [hidden]{display:none!important}
 body{position:fixed;inset:0;background:var(--rim);color:var(--ink);font-family:var(--texto);-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 /* --u: píxel del juego en CSS px · --sw/--sh/--sx/--sy: tamaño y sitio de la pantalla · --uiw/--us: escenario de diálogos y menús
-   --d cruceta · --ab botón A/B · --m margen de los mandos · --pill SONIDO/START. Los valores por defecto ya caben en un móvil. */
-.marco{--u:2.25px;--us:2.25px;--uiw:540px;--sw:810px;--sh:360px;--sx:0px;--sy:0px;--d:124px;--ab:54px;--m:12px;--pill:26px;--ut:0px;
+   --k: px por mm de los mandos (con lo que encogen en un móvil estrecho). Los valores por defecto ya caben en un móvil. */
+.marco{--u:2.25px;--us:2.25px;--uiw:540px;--sw:810px;--sh:360px;--sx:0px;--sy:0px;--k:6.3px;--ut:0px;--bpr:13.5px;
   position:absolute;inset:0;overflow:hidden;background:var(--rim);box-sizing:border-box;
   padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
 .screen{position:absolute;left:var(--sx);top:var(--sy);width:var(--sw);height:var(--sh);background:#000;overflow:hidden;border-radius:calc(var(--u)*2);user-select:none;-webkit-user-select:none}
 /* escena: los 240×160 del centro (título y marcadores del combate) · ui: diálogos, menús y avisos, fuera de los mandos
-   (--ut: empieza debajo de SONIDO/START si los tendría encima). Con un menú a toda altura, el HUD se aparta. */
+   (--ut: empieza debajo de SONIDO si lo tendría encima). Con un menú a toda altura, el HUD se aparta. */
 .escena{position:absolute;top:0;bottom:0;left:calc(50% - var(--u) * 120);width:calc(var(--u) * 240);pointer-events:none;z-index:14}
 .ui{position:absolute;top:var(--ut);bottom:0;left:calc(50% - var(--uiw) / 2);width:var(--uiw);--u:var(--us);z-index:20;pointer-events:none}
 .ui>*{pointer-events:auto}
 .screen:has(>.ui>.menu.full:not([hidden]))>.hud{visibility:hidden}
-/* mandos flotando sobre la pantalla */
+/* mandos flotando sobre la pantalla: #dpad y #ab son las zonas de toque (la cruz y los botones, dentro) */
 .mando{position:absolute;inset:0;pointer-events:none;z-index:50}
 .mando>*{position:absolute;pointer-events:auto}
-.dpad{left:calc(var(--m) + env(safe-area-inset-left,0px));bottom:calc(var(--m) + env(safe-area-inset-bottom,0px));width:var(--d);height:var(--d);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);touch-action:none}
-.dpad button,.ab button,.pills button{font:inherit;font-weight:700;border:0;cursor:pointer;touch-action:none;padding:0;color:rgba(255,255,255,.88);text-shadow:0 1px 0 rgba(0,0,0,.5)}
-.dpad button,.dpad .m{background:rgba(24,28,34,.5);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22)}
-.dpad button{font-size:calc(var(--d) * .1)}
-.dpad .u{grid-area:1/2;border-radius:8px 8px 0 0}.dpad .d{grid-area:3/2;border-radius:0 0 8px 8px}
-.dpad .l{grid-area:2/1;border-radius:8px 0 0 8px}.dpad .r{grid-area:2/3;border-radius:0 8px 8px 0}
-.dpad .m{grid-area:2/2;box-shadow:none}
-.ab{right:calc(var(--m) + env(safe-area-inset-right,0px));bottom:calc(var(--m) + env(safe-area-inset-bottom,0px));width:calc(var(--ab) * 2.25);height:calc(var(--ab) * 1.6)}
-.ab button{position:absolute;width:var(--ab);height:var(--ab);border-radius:50%;background:rgba(109,44,75,.55);box-shadow:inset 0 0 0 1.5px rgba(255,210,230,.4);font-size:calc(var(--ab) * .36)}
-.ab button:nth-child(1){left:0;bottom:0}.ab button:nth-child(2){right:0;top:0}
-.pills{right:calc(var(--m) + env(safe-area-inset-right,0px));top:calc(var(--m) + env(safe-area-inset-top,0px));display:flex;gap:calc(var(--m) * .6)}
-.pills button{height:var(--pill);min-width:calc(var(--pill) * 2.6);border-radius:calc(var(--pill) / 2);padding:0 calc(var(--pill) * .45);background:rgba(24,28,34,.55);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22);font-size:calc(var(--pill) * .42);letter-spacing:.06em}
+.dpad,.ab{touch-action:none}
+.cruz{position:absolute;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);pointer-events:none}
+.cruz span{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:calc(var(--k) * 2.4);color:rgba(255,255,255,.88);text-shadow:0 1px 0 rgba(0,0,0,.5);
+  background:rgba(24,28,34,.5);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22)}
+.cruz .u{grid-area:1/2;border-radius:calc(var(--k) * 1.6) calc(var(--k) * 1.6) 0 0}.cruz .d{grid-area:3/2;border-radius:0 0 calc(var(--k) * 1.6) calc(var(--k) * 1.6)}
+.cruz .l{grid-area:2/1;border-radius:calc(var(--k) * 1.6) 0 0 calc(var(--k) * 1.6)}.cruz .r{grid-area:2/3;border-radius:0 calc(var(--k) * 1.6) calc(var(--k) * 1.6) 0}
+.cruz .m{grid-area:2/2;box-shadow:none}
+.cruz span.on{background:rgba(70,80,96,.75)}
+.ab button,.start,.sonido{font:inherit;font-weight:700;border:0;cursor:pointer;touch-action:none;padding:0;color:rgba(255,255,255,.88);text-shadow:0 1px 0 rgba(0,0,0,.5)}
+.ab button{position:absolute;border-radius:50%;background:rgba(109,44,75,.55);box-shadow:inset 0 0 0 1.5px rgba(255,210,230,.4);font-size:calc(var(--k) * 3.8)}
+.start,.sonido{border-radius:calc(var(--k) * 3.5);background:rgba(24,28,34,.55);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22);font-size:calc(var(--k) * 2.6);letter-spacing:.06em}
 button:active,button.on{filter:brightness(1.6)}
-.dpad button:active,.dpad button.on,.pills button:active,.pills button.on{background:rgba(70,80,96,.75)}
+.start:active,.start.on,.sonido:active,.sonido.on{background:rgba(70,80,96,.75)}
 .ab button:active,.ab button.on{background:rgba(154,74,114,.85)}
 button:focus-visible{outline:2px solid #f8e070;outline-offset:2px}
 /* vertical: la app solo va en horizontal */
@@ -82,6 +81,8 @@ canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixela
 .hud .bar{width:calc(var(--u)*34);height:calc(var(--u)*3);background:#2e3a34;border-radius:calc(var(--u)*1)}
 .hud .bar i{display:block;height:100%;background:#f0a030;border-radius:calc(var(--u)*1)}
 .hud .bar i.hot{background:#f04040}
+.hud .sosp .bar i{background:#e8d040}
+.hud .sosp .bar i.hot{background:#f04040}
 .toast{position:absolute;left:50%;top:calc(var(--u)*24);transform:translateX(-50%);padding:calc(var(--u)*4) calc(var(--u)*10);font-size:calc(var(--u)*9);line-height:calc(var(--u)*12);text-align:center;z-index:25;width:max-content;max-width:calc(var(--u)*210);pointer-events:none}
 .toast small{display:block;font-weight:700;font-size:calc(var(--u)*7);color:var(--boxLine);letter-spacing:.08em;text-shadow:none}
 .bhp{position:absolute;padding:calc(var(--u)*3) calc(var(--u)*6);font-size:calc(var(--u)*8.5);line-height:calc(var(--u)*11);width:calc(var(--u)*104);z-index:15}
@@ -91,7 +92,7 @@ canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixela
 .bhp .hp span i{display:block;height:100%;width:100%;background:#58d080;border-radius:calc(var(--u)*2);transition:width .5s steps(12)}
 .bhp .num{text-align:right;font-variant-numeric:tabular-nums}
 #bE{left:calc(var(--u)*6);top:calc(var(--u)*8)}
-#bP{right:calc(var(--u)*6);bottom:calc(var(--u)*49)}
+#bP{right:var(--bpr);bottom:calc(var(--u)*49)}   /* --bpr: 6u o, si A, B o START le caen encima, a su izquierda */
 /* vista de carpa: ficha de la plaza o del foco elegido */
 .vcinfo{position:absolute;left:calc(var(--u)*3);top:calc(var(--u)*3);width:calc(var(--u)*66);padding:calc(var(--u)*3) calc(var(--u)*4);font-size:calc(var(--u)*6.5);line-height:calc(var(--u)*8.5);z-index:15}
 .vcinfo div,.vcinfo b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -142,14 +143,11 @@ canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixela
   </div>
   <div class="mando" id="mando">
     <div class="dpad" id="dpad" aria-label="Cruceta">
-      <button class="u" data-b="up" aria-label="Arriba">▲</button>
-      <button class="l" data-b="left" aria-label="Izquierda">◀</button>
-      <div class="m"></div>
-      <button class="r" data-b="right" aria-label="Derecha">▶</button>
-      <button class="d" data-b="down" aria-label="Abajo">▼</button>
+      <div class="cruz"><span class="u" aria-label="Arriba">▲</span><span class="l" aria-label="Izquierda">◀</span><span class="m"></span><span class="r" aria-label="Derecha">▶</span><span class="d" aria-label="Abajo">▼</span></div>
     </div>
-    <div class="ab"><button data-b="B" aria-label="Botón B">B</button><button data-b="A" aria-label="Botón A">A</button></div>
-    <div class="pills"><button id="bSound" aria-label="Activar o quitar sonido">SONIDO</button><button data-b="START" aria-label="Start, menú">START</button></div>
+    <div class="ab" id="ab"><button data-k="B" aria-label="Botón B">B</button><button data-k="A" aria-label="Botón A">A</button></div>
+    <button class="start" id="bStart" data-b="START" aria-label="Start, menú">START</button>
+    <button class="sonido" id="bSound" aria-label="Activar o quitar sonido">SONIDO</button>
   </div>
   <div class="girar" id="girar" hidden><div><b>Gira el móvil</b>Ribera Verde se juega en horizontal.</div></div>
 </main>
@@ -808,6 +806,7 @@ const CTYPES={
   cur:{label:'CURRELA',mult:1,g:[3,8],greet:['Buenas. Salgo de doble turno.','Qué tal. Lo de siempre, sin líos.']},
   tur:{label:'TURISTA',mult:1.15,g:[4,9],greet:['Hello. ¿Tú vendes... marihuana? Pago bien.','Bonjour. Me han dicho que aquí se cultiva bien.']},
   pij:{label:'PIJO',mult:1.35,g:[5,12],greet:['Busco algo de calidad para una cena en Neguri.','Solo quiero lo mejor. El precio me da igual.']},
+  ext:{label:'CATADOR',mult:1,g:[1,3],greet:['¿Tienes rosin? Me han dicho que prensas tú mismo.','Busco extracción sin disolventes. Rosin, nada de BHO.']},   // solo rosin (1.10)
 };
 
 /* =========================================================
@@ -847,11 +846,11 @@ function building(m,id,x0,y0,w,h,doorX,warp,op){
     if((x-x0)%3===1&&x!==doorX){gr(m,x,y0+3,'win_'+id);}}
   if(doorX!=null)for(let x=doorX;x<=doorX+(op&&op.ancha?1:0);x++){gr(m,x,y0+h-1,'door_'+id);m.doors[x+','+(y0+h-1)]=Object.assign({},warp,{x:warp.x+x-doorX});}
 }
-// las tres zonas de fuera (1.10): policía y ladrones por paso (× pol y × lad), precio de la calle (× precio) y música de calle
-// y la comarca (1.10): dos ciudades pequeñas y dos pueblos, a los que se va en autobús (PARADAS)
-const ZONAS={town:{n:'Ribera Verde',pol:1,lad:1,precio:1},alto:{n:'Barrio alto',pol:1.5,lad:.5,precio:1},astilleros:{n:'Astilleros',pol:.5,lad:2,precio:1.2},
-  puerto:{n:'Puerto Viejo',pol:.8,lad:.6,precio:1.15},valdehierro:{n:'Valdehierro',pol:.6,lad:1.4,precio:.9},
-  mendialde:{n:'Mendialde',pol:.2,lad:.1,precio:1},errotabarri:{n:'Errotabarri',pol:.2,lad:.1,precio:1}};
+// las tres zonas de fuera (1.10): ladrones por paso (× lad), precio de la calle (× precio) y música de calle (la policía, por
+// patrullas: PATRULLAS, 10b-patrulla) y la comarca (1.10): dos ciudades pequeñas y dos pueblos, a los que se va en autobús (PARADAS)
+const ZONAS={town:{n:'Ribera Verde',lad:1,precio:1},alto:{n:'Barrio alto',lad:.5,precio:1},astilleros:{n:'Astilleros',lad:2,precio:1.2},
+  puerto:{n:'Puerto Viejo',lad:.6,precio:1.15},valdehierro:{n:'Valdehierro',lad:1.4,precio:.9},
+  mendialde:{n:'Mendialde',lad:.1,precio:1},errotabarri:{n:'Errotabarri',lad:.1,precio:1}};
 // paradas del autobús (1.10): el poste (x, y), dónde te deja el autobús (a: x, y, hacia dónde miras) y lo que hay hasta la estación
 // de Ribera Verde (min, €): todas las líneas pasan por ella, así que un viaje entre dos pueblos suma los dos tramos. De 7:00 a 21:00
 const PARADAS={town:{n:'Ribera Verde',x:8,y:12,a:[7,12,'down'],min:0,eur:0},
@@ -1172,15 +1171,49 @@ document.addEventListener('keydown',e=>{
   const b=KEYMAP[e.key];if(!b)return;e.preventDefault();
   setHeld(b,true);if(e.repeat&&!['up','down','left','right'].includes(b))return;press(b);});
 document.addEventListener('keyup',e=>{const b=KEYMAP[e.key];if(b)setHeld(b,false);});
-window.addEventListener('blur',()=>{for(const k in held)held[k]=false;dirOrder.length=0;});
-document.querySelectorAll('[data-b]').forEach(el=>{
-  const b=el.dataset.b;let rep=null,rep2=null;
-  const stop=()=>{setHeld(b,false);clearTimeout(rep);clearInterval(rep2);el.classList.remove('on');};
-  el.addEventListener('pointerdown',e=>{e.preventDefault();try{el.setPointerCapture(e.pointerId);}catch(_){}el.classList.add('on');setHeld(b,true);press(b);
-    if(['up','down','left','right'].includes(b)){rep=setTimeout(()=>{rep2=setInterval(()=>{if(handlers.length)press(b);},110);},320);}});
-  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,stop));
+document.querySelectorAll('[data-b]').forEach(el=>{   // START
+  const b=el.dataset.b;
+  el.addEventListener('pointerdown',e=>{e.preventDefault();try{el.setPointerCapture(e.pointerId);}catch(_){}dedoEn(b,true,el);});
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,()=>dedoEn(b,false,el)));
   el.addEventListener('contextmenu',e=>e.preventDefault());
 });
+// un mando apretado con el dedo: las flechas se repiten (320 ms y luego cada 110) mientras haya algo abierto
+function dedoEn(b,on,el){
+  if(el)el.classList.toggle('on',on);setHeld(b,on);clearTimeout(dedoEn.rep[b]);clearInterval(dedoEn.rep2[b]);if(!on)return;press(b);
+  if(['up','down','left','right'].includes(b))dedoEn.rep[b]=setTimeout(()=>{dedoEn.rep2[b]=setInterval(()=>{if(handlers.length)press(b);},110);},320);
+}
+dedoEn.rep={};dedoEn.rep2={};
+// al perder el foco (otra app, otra pestaña, la pantalla apagada) puede no llegar el pointerup: se suelta todo, paran las
+// repeticiones y la cruceta y A/B olvidan sus dedos (soltarMandos.f)
+function soltarMandos(){
+  for(const k in held)held[k]=false;dirOrder.length=0;
+  for(const b in dedoEn.rep)clearTimeout(dedoEn.rep[b]);for(const b in dedoEn.rep2)clearInterval(dedoEn.rep2[b]);
+  soltarMandos.f.forEach(f=>f());document.querySelectorAll('#mando .on').forEach(e=>e.classList.remove('on'));
+}
+soltarMandos.f=[];
+addEventListener('blur',soltarMandos);addEventListener('pagehide',soltarMandos);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)soltarMandos();});
+// cruceta: un dedo para las cuatro flechas. Manda la del ángulo desde el centro de la cruz (fuera de una zona muerta de 0,42 brazos)
+// y, al deslizar sin levantar el dedo, pasa a la otra; la zona de toque (#dpad) es más grande que la cruz
+(()=>{const el=$('dpad');if(!el)return;const cruz=el.querySelector('.cruz'),brazo={up:'.u',down:'.d',left:'.l',right:'.r'};let id=null,dir=null;
+  const dirDe=e=>{const r=cruz.getBoundingClientRect(),x=e.clientX-(r.left+r.width/2),y=e.clientY-(r.top+r.height/2);
+    if(Math.hypot(x,y)<r.width/3*.42)return dir;return Math.abs(x)>Math.abs(y)?(x<0?'left':'right'):(y<0?'up':'down');};
+  const pon=d=>{if(d===dir)return;if(dir)dedoEn(dir,false,cruz.querySelector(brazo[dir]));dir=d;if(d)dedoEn(d,true,cruz.querySelector(brazo[d]));};
+  soltarMandos.f.push(()=>{id=null;dir=null;});
+  el.addEventListener('pointerdown',e=>{e.preventDefault();if(id!==null)return;id=e.pointerId;try{el.setPointerCapture(id);}catch(_){}pon(dirDe(e));});
+  el.addEventListener('pointermove',e=>{if(e.pointerId===id)pon(dirDe(e));});
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,e=>{if(e.pointerId===id){id=null;pon(null);}}));
+  el.addEventListener('contextmenu',e=>e.preventDefault());
+})();
+// A y B: la zona de toque (#ab) es más grande que los botones; cada dedo aprieta el más cercano hasta que se levanta
+(()=>{const el=$('ab');if(!el)return;const bs=[...el.querySelectorAll('[data-k]')],dedos=new Map();
+  const cerca=e=>{let m=null,dm=1e9;for(const b of bs){const r=b.getBoundingClientRect(),d=Math.hypot(e.clientX-r.left-r.width/2,e.clientY-r.top-r.height/2);if(d<dm){dm=d;m=b;}}return m;};
+  soltarMandos.f.push(()=>dedos.clear());
+  el.addEventListener('pointerdown',e=>{e.preventDefault();const b=cerca(e);dedos.set(e.pointerId,b);try{el.setPointerCapture(e.pointerId);}catch(_){}dedoEn(b.dataset.k,true,b);});
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,e=>{const b=dedos.get(e.pointerId);if(!b)return;dedos.delete(e.pointerId);
+    if(![...dedos.values()].includes(b))dedoEn(b.dataset.k,false,b);}));
+  el.addEventListener('contextmenu',e=>e.preventDefault());
+})();
 $('bSound').addEventListener('click',()=>{audioInit();setSound(!soundOn);});
 
 /* =========================================================
@@ -1189,13 +1222,35 @@ $('bSound').addEventListener('click',()=>{audioInit();setSound(!soundOn);});
    · la resolución del juego: 160 px de alto y el ancho que pida el móvil (SW, de 240 a 400, par), así la imagen llena
      la pantalla sin deformarse; en tablets más cuadradas que 3:2 se queda en 240 y sobran bandas arriba y abajo;
    · --u (CSS px por píxel del juego), con píxeles enteros si se pierde menos de un 6 % de alto;
-   · los mandos a tamaño de pulgar (--d cruceta, --ab A/B, --pill SONIDO/START, --m margen);
+   · los mandos en milímetros, donde descansa el pulgar (geoMandos);
    · el escenario de diálogos y menús (--uiw, --us): 240 px del juego centrados; si los mandos lo pisarían, se encoge
      hasta caber entre la cruceta y A/B (hasta la mitad, sin bajar de 1,3 px por píxel: letra de 13 px como mínimo) y,
-     si SONIDO/START le caen encima, empieza debajo de ellos (--ut).
+     si SONIDO le cae encima, empieza debajo (--ut); la caja de vida del combate (#bP) se aparta de A, B y START (--bpr).
    En vertical sale el aviso de girar el móvil (la app de Android ya va fija en horizontal).
    ========================================================= */
 let menuRedraw=null;   // menú abierto (07-interfaz): al cambiar el tamaño se vuelve a medir cuántas filas caben
+// mandos en mm para el pulgar en reposo (1 px CSS = 1 dp = 1/160 de pulgada): cruceta de 24 mm (brazos de 8) con el centro a 16 mm
+// del lado y 18 de abajo; A y B de 10,5 mm con 3,5 de hueco, inclinados 28° (B abajo a la izquierda), A a 12 mm del lado y 19 de
+// abajo; START (15 × 7) encima de A y SONIDO arriba a la derecha. Zonas de toque: 3 mm alrededor de la cruz y 2,5 alrededor de A/B
+// (1 mm por el lado del escenario). Si el escenario (med px a cada lado del centro de la pantalla, que con márgenes seguros distintos
+// no es el de la ventana) no cabe entre ellos, o no caben en alto, encogen: los tamaños y los márgenes de abajo y de arriba por f, y
+// los de los lados por f³, que se van antes. Devuelve f, la mitad del ancho que les deja al escenario (med) y los rectángulos
+// [x, y, ancho, alto] en px de la ventana.
+const MM=160/25.4;
+function geoMandos(W,H,il,ir,it,ib,med){
+  const c=(W+il-ir)/2,ocupa=f=>{const s=f*MM,m=f*f*f*MM;return [il+4*m+25*s+2,ir+6.75*m+23.86*s+2,ib+35.25*s+it+10*s+MM];};   // +2 px: redondeos
+  const cabe=([l,r,h])=>l+med<=c&&r+med<=W-c&&h<=H;
+  let f=1;while(f>.3&&!cabe(ocupa(f)))f-=.005;
+  const [l,r]=ocupa(f);
+  const s=f*MM,m=f*f*f*MM,R=(x,y,w,h)=>[x,y,w,h].map(Math.round);
+  const cx=il+4*m+12*s,cy=H-ib-18*s,dx=Math.max(il,cx-15*s),dy=cy-15*s;
+  const ax=W-ir-6.75*m-5.25*s,ay=H-ib-19*s,bx=ax-12.361*s,by=ay+6.573*s,
+    abx=bx-6.25*s,aby=ay-7.75*s,abr=Math.min(W-ir,ax+7.75*s),abb=Math.min(H-ib,by+7.75*s),stx=Math.min(ax,W-ir-8*s);
+  return {f,k:s,med:Math.min(c-l,W-r-c),
+    dpad:R(dx,dy,cx+13*s-dx,Math.min(H-ib,cy+15*s)-dy),cruz:R(cx-12*s,cy-12*s,24*s,24*s),
+    ab:R(abx,aby,abr-abx,abb-aby),A:R(ax-5.25*s,ay-5.25*s,10.5*s,10.5*s),B:R(bx-5.25*s,by-5.25*s,10.5*s,10.5*s),
+    start:R(stx-7.5*s,ay-16.25*s,15*s,7*s),sonido:R(W-ir-4.5*m-15*s,it+3*s,15*s,7*s)};
+}
 function ajustarPantalla(){
   const el=$('consola');if(!el)return;
   const vv=window.visualViewport,W=vv?vv.width:innerWidth,H=vv?vv.height:innerHeight;
@@ -1207,14 +1262,19 @@ function ajustarPantalla(){
   let sw=clamp(Math.floor(w/s/2)*2,240,400);if(sw*s>w)s=w/sw;
   const cw=Math.floor(sw*s),ch=Math.floor(160*s),x=Math.round(pl+rim+(w-cw)/2),y=Math.round(pt+rim+(h-ch)/2);
   if(SW!==sw){SW=sw;cv.width=sw;ctx.imageSmoothingEnabled=false;}
-  const d=Math.round(clamp(H*.34,104,150)),ab=Math.round(d*.44),m=Math.round(clamp(H*.035,8,22)),pill=Math.round(clamp(H*.07,24,34));
-  const col=Math.max(pl,pr)+m+Math.max(d,ab*2.25)+m*.5,us=clamp((W-2*col)/240,Math.min(s,Math.max(s*.5,1.3)),s);
+  const usMin=Math.min(s,Math.max(s*.5,1.3)),G=geoMandos(W,H,pl,pr,pt,pb,120*usMin),us=clamp(G.med/120,usMin,s);
   const set=(n,v)=>el.style.setProperty(n,v+'px');
   set('--u',s);set('--us',us);set('--uiw',Math.min(cw,Math.round(240*us)));
-  set('--sw',cw);set('--sh',ch);set('--sx',x);set('--sy',y);set('--d',d);set('--ab',ab);set('--m',m);set('--pill',pill);
-  const P=el.querySelector('.pills');let ut=0;
-  if(P){const p=P.getBoundingClientRect(),der=x+cw/2+Math.min(cw,Math.round(240*us))/2;if(p.left<der&&p.bottom>y)ut=Math.round(p.bottom-y+m*.4);}
-  set('--ut',ut);
+  set('--sw',cw);set('--sh',ch);set('--sx',x);set('--sy',y);set('--k',G.k);
+  const pon=(q,r,o)=>{const e=el.querySelector(q);if(e)[e.style.left,e.style.top,e.style.width,e.style.height]=r.map((v,i)=>v-(o&&i<2?o[i]:0)+'px');};
+  pon('#dpad',G.dpad);pon('#dpad .cruz',G.cruz,G.dpad);pon('#ab',G.ab);pon('#ab [data-k=A]',G.A,G.ab);pon('#ab [data-k=B]',G.B,G.ab);
+  pon('#bStart',G.start);pon('#bSound',G.sonido);
+  const so=G.sonido,der=x+cw/2+Math.min(cw,Math.round(240*us))/2;
+  set('--ut',so[0]<der&&so[1]+so[3]>y?Math.round(so[1]+so[3]-y+G.k*1.5):0);
+  // caja de vida del jugador en el combate (#bP, abajo a la derecha de la escena, ~46u de alto): a la izquierda de A, B y START si le caen encima
+  const er=x+cw/2+120*s,bb=y+ch-49*s;let bpr=6*s;
+  for(const r of [G.A,G.B,G.start])if(r[1]<bb+G.k&&r[1]+r[3]>bb-46*s-G.k)bpr=Math.max(bpr,er-r[0]+G.k);
+  set('--bpr',Math.round(Math.min(bpr,130*s)));
   if(menuRedraw)menuRedraw();
 }
 ajustarPantalla();
@@ -1289,7 +1349,7 @@ const P={x:0,y:0,px:0,py:0,dir:'down',moving:false,fx:0,fy:0,t:0,dur:240,parity:
 const DV={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]},OPP={up:'down',down:'up',left:'right',right:'left'};
 const CH_TITLES={1:'La herencia',2:'La calle',3:'La deuda',4:'Genética',5:'El sargento',6:'La Copa de Ribera',7:'Libertad',8:'Tu imperio'};
 function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,min:8*60,money:150,hp:30,hpMax:30,heat:0,rep:0,ch:0,flags:{},sales:0,
-  seeds:{},buds:{},items:Object.assign({fert:0,insect:0,spray:0,bocata:1},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
+  seeds:{},buds:{},rosin:{},items:Object.assign({fert:0,insect:0,spray:0,bocata:1,prensa:0},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},gen:{},pedido:[],esquejes:[],fenos:{},fenoN:0,eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
   caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0};}
@@ -1312,6 +1372,13 @@ const lotSid=k=>k.replace(/\*$/,''),lotNombre=k=>getStrain(lotSid(k)).n+(k.endsW
 function addBuds(k,g,thc){const b=S.buds[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;}else S.buds[k]={g,thc};discover(lotSid(k));}
 function useBuds(k,g){const b=S.buds[k];b.g-=g;if(b.g<.5)delete S.buds[k];}
 function budLots(min,minThc=0){return Object.entries(S.buds).filter(([k,b])=>b.g>=min&&b.thc>=minThc);}
+// rosin (1.10): lo que sale de prensar cogollos en la mesa (prensar, 09-cultivo), por lotes como ellos y al décimo de gramo
+const totalRosin=()=>Object.values(S.rosin).reduce((a,b)=>a+b.g,0);
+function addRosin(k,g,thc){const b=S.rosin[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g=Math.round((b.g+g)*10)/10;}else S.rosin[k]={g,thc};}
+function useRosin(k,g){const b=S.rosin[k];b.g=Math.round((b.g-g)*10)/10;if(b.g<.1)delete S.rosin[k];}
+const rosinTxt=r=>coma(Math.round(r*10)/10)+' g de rosin';
+function rosinLots(min){return Object.entries(S.rosin).filter(([k,b])=>b.g>=min);}
+const rosinItem=([k,b])=>({label:'Rosin · '+lotNombre(k),right:`${coma(b.g)} g · ${pct(b.thc)}%`,sw:'#d89a18',ic:iconoCogollo(lotSid(k))});
 const lotItem=([k,b])=>({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k))});
 async function got(t){sfx('get');await say(`Consigues ${t}.`);}
 
@@ -1345,6 +1412,7 @@ function buildEnts(){
   const old={};ents.forEach(e=>old[e.id]=e);ents=[];
   for(const d of NPCDEF){if(d.map!==S.map||(d.cond&&!d.cond()))continue;ents.push(old[d.id]&&old[d.id].def===d?old[d.id]:mkEnt(d));}
   for(const c of S.clients)if((c.map||'town')===S.map){const o=old[c.id];ents.push(o||mkEnt({id:c.id,x:c.x,y:c.y,wander:2,lookObj:c.look,client:c}));}
+  for(const e of Object.values(old))if(e.pat&&e.mapa===S.map)ents.push(e);ponPatrullas();   // las patrullas (10b-patrulla)
 }
 const ITEMS=[
   {id:'i_spray',map:'town',x:8,y:25,give:async()=>{S.items.spray+=2;await got('2 × SPRAY DE PIMIENTA');}},
@@ -1364,7 +1432,7 @@ function tileSolid(m,x,y){
   return !!itemAt(x,y);
 }
 const entAt=(x,y)=>ents.find(e=>(e.x===x&&e.y===y)||(e.moving&&e.fx===x&&e.fy===y));
-function enterMap(name,x,y,dir){S.map=name;if(name==='home')montarCasa();Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];buildEnts();music(mapMusic());}
+function enterMap(name,x,y,dir){S.map=name;if(name==='home')montarCasa();Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];resetSosp();buildEnts();music(mapMusic());}
 const mapMusic=()=>ZONAS[S.map]?(isNight()?'night':'town'):'home';
 async function warp(w){sfx('door');await fade(1);enterMap(w.to,w.x,w.y,w.dir);updateHUD();await wait(80);await fade(0);}
 
@@ -1396,17 +1464,17 @@ function onStepEnd(){
     if(S.ch>=2&&S.ch<7&&!S.flags.darko1){queue('darko',async()=>{const e=ents.find(e=>e.id==='darko');if(e)e.dir='up';await talkDarko();});return;}
     if(S.ch>=5&&!S.flags.molina1){queue('molina',talkMolina);return;}
   }
-  if(S.ch>=2&&S.cool<=0){
+  // ladrones al azar por paso; la policía ya no (1.10): patrulla por la calle (10b-patrulla). Con la alarma, nada
+  if(S.ch>=2&&S.cool<=0&&!SOSP.alarma){
     const g=totalBuds(),tall=m.g[P.y][P.x]==='tallgrass';
-    const pp=g>0?(.002+S.heat*.00025)*(S.protect?.4:1)*Z.pol:0;
     const pt=(g>=5||S.money>=150)?.004*(isNight()?2.5:1)*(tall?3:1)*Z.lad:0;
-    const r=Math.random();
-    if(r<pp){S.cool=25;run(()=>battle('police'));}else if(r<pp+pt){S.cool=25;run(()=>battle('thief'));}
+    if(Math.random()<pt){S.cool=25;run(()=>battle('thief'));}
   }
 }
 function updateEnts(dt){
   const free=isFree(),m=MAPS[S.map];
   for(const e of ents){
+    if(e.pat)continue;   // las patrullas andan en updatePatrullas
     if(e.moving){e.t+=dt;const k=Math.min(1,e.t/320);e.px=(e.fx+(e.x-e.fx)*k)*16;e.py=(e.fy+(e.y-e.fy)*k)*16;if(k>=1){e.moving=false;e.fx=e.x;e.fy=e.y;}continue;}
     if(!free||!e.wander)continue;e.wt-=dt;if(e.wt>0)continue;e.wt=1200+Math.random()*2600;
     const d=pick(['up','down','left','right']);e.dir=d;const [dx,dy]=DV[d],nx=e.x+dx,ny=e.y+dy;
@@ -1768,7 +1836,23 @@ async function letterAction(){
   await talk('CARTA',['«{N}: si lees esto, el piso es tuyo. Cuídalo.»','«Al fondo del salón está mi armario de cultivo. Lo he tenido treinta años y nunca me ha fallado.»','«Pásate por el growshop de Kiko, aquí al lado. Él te enseñará lo que yo no pude.»','«Le debo dinero a Baltasar, el del bar El Ancla. No es buena gente. Lo siento.»']);
   S.flags.letter=true;showObjective();
 }
+// la prensa de rosin (1.10, de Kiko desde el capítulo 3): calor y presión sobre los cogollos; sale el ROSIN.rend del peso (al
+// décimo de gramo) con ROSIN.thc veces su THC, hasta ROSIN.tope. Media hora en la mesa
+const rosinDe=g=>Math.round(g*ROSIN.rend*10)/10;
+async function prensar(){
+  const lots=budLots(5);
+  if(!lots.length)return say('PRENSA DE ROSIN: necesitas 5 g de cogollos como mínimo.');
+  const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué prensas?'});
+  if(i<0||i>=lots.length)return;
+  const [k,b]=lots[i],ops=[5,25,100].filter(g=>g<Math.floor(b.g)).concat([Math.floor(b.g)]);
+  const j=await ask(`${lotNombre(k)}: ${Math.floor(b.g)} g. ¿Cuánto prensas?`,ops.map(g=>`${g} g → ${coma(rosinDe(g))} g de rosin`).concat(['Nada']));
+  if(j<0||j>=ops.length)return;
+  const g=ops[j],r=rosinDe(g),thc=Math.min(ROSIN.tope,b.thc*ROSIN.thc);
+  useBuds(k,g);addRosin(k,r,thc);advanceTime(30);sfx('get');
+  await say(`Prensas ${g} g de ${lotNombre(k)}: ${coma(r)} g de rosin con un ${pct(thc)} % de THC.`);
+}
 async function labAction(){
+  if(S.items.prensa){const j=await ask('La mesa de la tía. ¿Qué haces?',['Prensar rosin','Cruzar semillas','Nada']);if(j===0)return prensar();if(j!==1)return;}
   if(!S.flags.lab)return say('Una mesa con un microscopio viejo y frascos. Kiko sabrá qué hacer con esto.');
   const own=()=>Object.entries(S.seeds).filter(([,v])=>v>0);
   if(own().length<2&&!own().some(([k,v])=>v>=2&&genDe(k)<GEN_ESTABLE))return say('MESA DE GENÉTICA: necesitas semillas de dos variedades distintas para cruzar, o 2 de una línea sin estabilizar.');
@@ -2243,8 +2327,13 @@ async function abrirCarpa(ci){
    Precios reales (1.10): en la calle, el gramo a 6-10 € según el THC (× el tipo de cliente y lo que pidas); al por mayor,
    3,20-5 € (ventaMayor, 11-historia). */
 const precioCalle=thc=>4+thc*.2,precioMayor=thc=>2+thc*.1;
+// rosin (1.10): de la flor sale un 20 % del peso (real: 15-25 %) con el triple de THC, hasta el 75 % (real: 60-75 %); el gramo, a
+// 10 + 0,6 × THC € (≈ 42 € al 54 %; real: 30-60 €). Prensar compensa desde el 12,5 % de THC de la flor: 1 g de rosin vale más
+// que los 5 g de los que sale (10 + 1,8·t > 5·(4 + 0,2·t))
+const ROSIN={rend:.2,thc:3,tope:75},precioRosin=thc=>10+thc*.6;
 // clientes del día por zona (1.10): en el barrio, como siempre; en el barrio alto, pijos y turistas desde el capítulo 3; en los
-// astilleros (las esquinas de Darko), estudiantes y currelas
+// astilleros (las esquinas de Darko), estudiantes y currelas. Con la prensa (1.10), catadores de rosin en la ciudad, los
+// astilleros, Puerto Viejo y Valdehierro
 function spawnClients(){
   S.clientsDay=S.day;S.clients=[];
   if(S.ch>=2){
@@ -2252,42 +2341,170 @@ function spawnClients(){
     const tipos=()=>{const t=['est','est','cur','cur'];if(S.ch>=3)t.push('tur');if(S.ch>=4)t.push('pij','pij');return t;};
     const zonas=[['town',n,tipos()],['astilleros',2+(S.ch>=4?1:0),['est','cur']]];if(S.ch>=3)zonas.push(['alto',2+(S.ch>=4?1:0),['pij','tur']]);
     zonas.push(['puerto',2+(S.ch>=4?1:0),['tur','tur','cur','est']],['valdehierro',2+(S.ch>=4?1:0),['est','cur','cur']],['mendialde',1,['cur']],['errotabarri',1,['cur','tur']]);   // la comarca (1.10)
-    for(const [map,nz,types] of zonas){
-      const used=new Set(NPCDEF.filter(d=>d.map===map).map(d=>d.x+','+d.y).concat(ITEMS.filter(it=>it.map===map).map(it=>it.x+','+it.y)));
+    const usado={};
+    const pon=(map,nz,types,pre)=>{
+      const used=usado[map]=usado[map]||new Set(NPCDEF.filter(d=>d.map===map).map(d=>d.x+','+d.y).concat(ITEMS.filter(it=>it.map===map).map(it=>it.x+','+it.y)));
       for(let i=0;i<nz;i++){let t;for(let k=0;k<30;k++){t=pick(CLIENT_TILES[map]);if(!used.has(t+''))break;}used.add(t+'');
-        const type=pick(types),ct=CTYPES[type],id='c'+S.day+'_'+{town:'',alto:'b',astilleros:'s',puerto:'p',valdehierro:'v',mendialde:'m',errotabarri:'e'}[map]+i;
+        const type=pick(types),ct=CTYPES[type],id='c'+S.day+'_'+pre+{town:'',alto:'b',astilleros:'s',puerto:'p',valdehierro:'v',mendialde:'m',errotabarri:'e'}[map]+i;
         S.clients.push({id,map,x:t[0],y:t[1],type,want:ri(ct.g[0],ct.g[1]),minThc:type==='pij'?Math.min(24,15+S.ch):(type==='tur'&&Math.random()<.4?15:0),look:randLook(id,'client')});}
-    }
+    };
+    for(const [map,nz,types] of zonas)pon(map,nz,types,'');
+    if(S.ch>=3&&S.items.prensa)for(const [map,nz] of [['town',2],['astilleros',1],['puerto',1],['valdehierro',1]])pon(map,nz,['ext'],'x');
   }
   if(ZONAS[S.map])buildEnts();
 }
 function removeClient(id){S.clients=S.clients.filter(c=>c.id!==id);ents=ents.filter(e=>e.id!==id);}
+// el catador (1.10) solo compra rosin: a precioRosin, y el «caro» cuela según lo que pase del 50 % de THC
 async function talkClient(c){
-  const ct=CTYPES[c.type],N=ct.label;
+  const ct=CTYPES[c.type],N=ct.label,ext=c.type==='ext';
   await say(pick(ct.greet),N);
-  await say(`Busco ${c.want} g${c.minThc?` de algo potente, mínimo ${c.minThc}% de THC`:''}.`,N);
-  const lots=budLots(c.want,c.minThc);
-  if(!lots.length)return say(totalBuds()>0?'Eso no me vale. Vuelve cuando tengas lo que busco.':'¿No llevas nada? Vale.',N);
-  const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué le vendes?'});
+  await say(ext?`Busco ${c.want} g de rosin.`:`Busco ${c.want} g${c.minThc?` de algo potente, mínimo ${c.minThc}% de THC`:''}.`,N);
+  const lots=ext?rosinLots(c.want):budLots(c.want,c.minThc);
+  if(!lots.length)return say((ext?totalRosin():totalBuds())>0?'Eso no me vale. Vuelve cuando tengas lo que busco.':'¿No llevas nada? Vale.',N);
+  const i=await menu(lots.map(ext?rosinItem:lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué le vendes?'});
   if(i<0||i>=lots.length)return say('Vale, otro día.',N);
-  const [sid,b]=lots[i],base=precioCalle(b.thc)*ct.mult*ZONAS[c.map||'town'].precio*c.want;
+  const [sid,b]=lots[i],base=(ext?precioRosin:precioCalle)(b.thc)*ct.mult*ZONAS[c.map||'town'].precio*c.want;
   const pr=[Math.round(base*.85),Math.round(base),Math.round(base*1.3)];
-  const j=await ask(`${c.want} g de ${lotNombre(sid)}. ¿Cuánto le pides?`,[`Rebaja · ${pr[0]} €`,`Justo · ${pr[1]} €`,`Caro · ${pr[2]} €`,'Cancelar']);
+  const j=await ask(`${c.want} g de ${ext?'rosin de ':''}${lotNombre(sid)}. ¿Cuánto le pides?`,[`Rebaja · ${pr[0]} €`,`Justo · ${pr[1]} €`,`Caro · ${pr[2]} €`,'Cancelar']);
   if(j===3)return say('Entonces me voy.',N);
-  const acc=[1,.92,clamp(.3+(b.thc-(c.minThc||14))*.05+(c.type==='pij'?.25:0)+(c.type==='tur'?.15:0),.1,.9)][j];
+  const acc=[1,.92,clamp(.3+(b.thc-(ext?50:c.minThc||14))*.05+(c.type==='pij'?.25:0)+(c.type==='tur'?.15:0),.1,.9)][j];
   if(Math.random()<acc){
-    useBuds(sid,c.want);S.money+=pr[j];S.sales+=pr[j];S.heat=Math.min(100,S.heat+3+c.want*.5);S.rep+=[3,2,1][j];sfx('coin');
+    if(ext)useRosin(sid,c.want);else useBuds(sid,c.want);
+    S.money+=pr[j];S.sales+=pr[j];S.heat=Math.min(100,S.heat+3+c.want*(ext?2.5:.5));S.rep+=[3,2,1][j];sfx('coin');
     await accion('vender',{id:'vfx-monedas',x:P.px+8,y:P.py+2});
     removeClient(c.id);
     await say(pick(['Trato hecho.','Gracias. Nos vemos.','Bien. Se lo diré a mis amigos.']),N);
-    toast(`+${eur(pr[j])} · ${c.want} g vendidos`,1600);
-    heatWarn();await checkStory();
+    toast(`+${eur(pr[j])} · ${c.want} g ${ext?'de rosin ':''}vendidos`,1600);
+    vistoVender();heatWarn();await checkStory();
     // en las esquinas de Darko (1.10), 1 de cada 3 ventas acaba con uno de sus chicos encima
     if(c.map==='astilleros'&&Math.random()<1/3){await say('Uno de los chicos de Darko te ha visto vender.');await say('«Te dijimos que lejos de nuestras esquinas.»','CHICO DE DARKO');await battle('thief');}
   }else{S.rep=Math.max(0,S.rep-1);sfx('bad');removeClient(c.id);await say(pick(['¿Tanto? No.','A ese precio, paso.','Eso es demasiado. Adiós.']),N);}
 }
 function heatWarn(){if(S.heat>=70&&!S.flags.heatW){S.flags.heatW=true;toast('<small>CUIDADO</small>Mucha presión policial. Si llega a 90 habrá registro.',3200);}if(S.heat<60)S.flags.heatW=false;}
 
+/* =========================================================
+   PATRULLAS (1.10): los policías se ven por la calle
+   ========================================================= */
+// cuántos agentes andan por cada mapa de fuera, [de día, de noche], desde el capítulo 2: el barrio 1–2 y el barrio alto 2, las
+// ciudades pequeñas y los astilleros 1, los pueblos ninguno. No se guardan: salen al entrar en el mapa
+const PATRULLAS={town:[1,2],alto:[2,2],astilleros:[1,1],puerto:[1,1],valdehierro:[1,1],mendialde:[0,0],errotabarri:[0,0]};
+// la ronda: un paso cada paso[día, noche] ms; sigue recto 3 de cada 4 veces y cada 5–10 pasos se para 0,9–1,8 s a mirar (y a falta
+// de 0,6 s gira; fuera de la calle, vuelve a ella). Ve vista casillas hacia delante (cono: de lado, como mucho lo que tiene delante) y la de al lado, si nada alto
+// tapa (edificios, árboles, monte, setos, cajas). De noche no se ve por dónde mira (sigilo), pero la sospecha sube sube[1] veces
+// más deprisa. Sospecha (0–100, no se guarda): por segundo, mientras un agente te ve y llevas algo, (8 + 0,12 × gramos, hasta
+// 100 g) × sube × (1 + calor/100) × protección de Molina (0,4); sin verte baja baja por segundo. Llena: alarma («¡alto!»: alto ms
+// quieto, para que dé tiempo a reaccionar) y el agente corre (corre ms por paso) a por ti; te pierde si pasan olvida ms sin verte (ve vista[0] × 2 casillas a la redonda) y estás a más de
+// pierde casillas, o si cruzas una puerta o una salida. Vender a vista[0] casillas o menos de uno (aunque no mire): +vende. Tras un control, tregua ms sin sospecha
+const PAT={paso:[420,360],corre:[210,180],alto:600,vista:[5,5],sube:[1,2.5],baja:10,vende:60,pierde:10,olvida:4000,tregua:30000};
+const CALLE=/^(walk|roadT|roadB|rotoT|rotoB|hormigon|pista|plaza|dirt|dock|bridgeT|bridgeB)$/,TAPA_VISTA=/^(tree|tree2|manzano|monte|monte2|seto|crate)$/;
+let SOSP={v:0,alarma:null,sinVer:0,aviso:0,tregua:0};
+const nPatrullas=()=>{const p=PATRULLAS[S.map];return p&&S.ch>=2?p[isNight()?1:0]:0;};
+const cargaSosp=()=>totalBuds()+totalRosin();
+const llegadaBus=(x,y)=>!!PARADAS[S.map]&&PARADAS[S.map].a[0]===x&&PARADAS[S.map].a[1]===y;
+// casillas de ronda de un mapa: de calle, a las que se llega a pie, sin la llegada del autobús
+const RONDA={};
+function casillasRonda(k){
+  if(RONDA[k])return RONDA[k];const m=MAPS[k],va=aPie(m,entrada(k)),pa=PARADAS[k],l=[];
+  for(const s of va){const [x,y]=s.split(',').map(Number);if(CALLE.test(m.g[y][x])&&!m.doors[s]&&!m.exits[s]&&!(pa&&pa.a[0]===x&&pa.a[1]===y))l.push([x,y]);}
+  l.sort((a,b)=>a[1]-b[1]||a[0]-b[0]);return RONDA[k]=l;
+}
+// dónde sale el agente i: por hash del día, el mapa y su número, a 6 casillas o más del jugador y sin nadie encima
+function sitioPatrulla(i){
+  const l=casillasRonda(S.map),h0=hashT(S.day*7+i*131,S.map.length*17+i);
+  for(let k=0;k<l.length;k++){const [x,y]=l[(h0+k*61)%l.length];if(Math.abs(x-P.x)+Math.abs(y-P.y)>=6&&!entAt(x,y))return [x,y];}
+  return l[h0%l.length];
+}
+function mkPatrulla(i){const [x,y]=sitioPatrulla(i),d={id:'pat'+i,map:S.map,x,y,look:'cop',talk:()=>say(pick(['«Circule.»','«Buenas. Nada que ver aquí.»','«¿Todo bien? Siga.»']),'AGENTE')};
+  return {id:d.id,x,y,px:x*16,py:y*16,hx:x,hy:y,dir:['down','left','up','right'][hashT(x,y)%4],look:LOOKS.cop,def:d,wander:0,wt:0,moving:false,t:0,fx:x,fy:y,
+    pat:true,mapa:S.map,pasos:6+hashT(y,x)%6,espera:0,giro:0,caza:false,dur:PAT.paso[0]};}
+// los que tocan en este mapa a esta hora (buildEnts y, al pasar de día a noche, updatePatrullas)
+function ponPatrullas(){
+  const n=nPatrullas(),hay=ents.filter(e=>e.pat).length;
+  for(let i=hay;i<n;i++)ents.push(mkPatrulla(i));
+  if(hay>n)ents=ents.filter(e=>!e.pat||+e.id.slice(3)<n);
+}
+// ¿ve el agente e la casilla (x, y)? En su cono (o, con lejos, a lejos casillas a la redonda) o pegada a él, con la línea limpia
+function veCasilla(e,x,y,lejos){
+  const dx=x-e.x,dy=y-e.y,ad=Math.abs(dx)+Math.abs(dy);if(ad===0)return true;
+  const m=MAPS[S.map];
+  if(ad>1){if(lejos){if(ad>lejos)return false;}
+    else{const [fx,fy]=DV[e.dir],fr=dx*fx+dy*fy,la=Math.abs(dx*fy)+Math.abs(dy*fx);if(fr<=0||la>fr||fr>PAT.vista[isNight()?1:0])return false;}}
+  const n=Math.max(Math.abs(dx),Math.abs(dy));
+  for(let s=1;s<n;s++){const cx=e.x+Math.round(dx*s/n),cy=e.y+Math.round(dy*s/n),g=m.g[cy][cx],o=m.o[cy][cx];
+    if(/^(roof|wall|win|door)/.test(g)||(o&&TAPA_VISTA.test(o)))return false;}
+  return true;
+}
+const tePilla=e=>veCasilla(e,P.x,P.y,e.caza?PAT.vista[0]*2:0);
+// un paso de ronda: recto si puede (3 de cada 4), si no, a un lado; media vuelta solo en un callejón
+function pasoRonda(e,m){
+  if(!CALLE.test(m.g[e.y][e.x])){pasoVuelta(e,m);return;}
+  const libre=d=>{const [dx,dy]=DV[d],nx=e.x+dx,ny=e.y+dy,k=nx+','+ny;return CALLE.test((m.g[ny]||[])[nx]||'')&&!tileSolid(m,nx,ny)&&!entAt(nx,ny)&&!(nx===P.x&&ny===P.y)&&
+    !(P.moving&&nx===P.fx&&ny===P.fy)&&!m.doors[k]&&!m.exits[k]&&!llegadaBus(nx,ny);};
+  const ops=['up','down','left','right'].filter(d=>d!==OPP[e.dir]&&libre(d)),otras=ops.filter(d=>d!==e.dir);
+  const d=ops.includes(e.dir)&&Math.random()<.75?e.dir:otras.length?pick(otras):ops.length?ops[0]:libre(OPP[e.dir])?OPP[e.dir]:null;
+  if(!d)return;e.dir=d;const [dx,dy]=DV[d];e.fx=e.x;e.fy=e.y;e.x+=dx;e.y+=dy;e.t=0;e.moving=true;e.dur=PAT.paso[isNight()?1:0];
+}
+// fuera de la calle (tras una caza, por la hierba o el parque): un paso por el camino más corto a la calle más cercana
+function pasoVuelta(e,m){
+  const k0=e.x+','+e.y,prev=new Map([[k0,null]]),q=[[e.x,e.y]];let fin=null;
+  for(let qi=0;qi<q.length&&!fin;qi++){const [x,y]=q[qi];for(const d of ['up','down','left','right']){const [dx,dy]=DV[d],nx=x+dx,ny=y+dy,k=nx+','+ny;
+    if(prev.has(k)||tileSolid(m,nx,ny)||m.doors[k]||m.exits[k]||(nx===P.x&&ny===P.y)||(P.moving&&nx===P.fx&&ny===P.fy)||ents.some(o=>o!==e&&o.x===nx&&o.y===ny))continue;
+    prev.set(k,[x,y,d]);if(CALLE.test(m.g[ny][nx])){fin=k;break;}q.push([nx,ny]);}}
+  if(!fin)return;let k=fin,p=prev.get(k);while(p[0]+','+p[1]!==k0){k=p[0]+','+p[1];p=prev.get(k);}
+  const [nx,ny]=k.split(',').map(Number);e.dir=p[2];e.fx=e.x;e.fy=e.y;e.x=nx;e.y=ny;e.t=0;e.moving=true;e.dur=PAT.paso[isNight()?1:0];
+}
+// un paso de caza: el primero del camino más corto hasta el jugador (por lo que no es sólido, sin puertas ni salidas ni gente)
+function pasoCaza(e,m){
+  const k0=e.x+','+e.y,prev=new Map([[k0,null]]),q=[[e.x,e.y]];let fin=null;
+  for(let qi=0;qi<q.length&&!fin;qi++){const [x,y]=q[qi];for(const d of ['up','down','left','right']){const [dx,dy]=DV[d],nx=x+dx,ny=y+dy,k=nx+','+ny;
+    if(prev.has(k))continue;if(nx===P.x&&ny===P.y){prev.set(k,[x,y,d]);fin=k;break;}
+    if(tileSolid(m,nx,ny)||m.doors[k]||m.exits[k]||ents.some(o=>o!==e&&o.x===nx&&o.y===ny))continue;prev.set(k,[x,y,d]);q.push([nx,ny]);}}
+  if(!fin)return;let k=fin,p=prev.get(k);while(p[0]+','+p[1]!==k0){k=p[0]+','+p[1];p=prev.get(k);}
+  e.dir=p[2];const [nx,ny]=k.split(',').map(Number);if(nx===P.x&&ny===P.y)return;
+  e.fx=e.x;e.fy=e.y;e.x=nx;e.y=ny;e.t=0;e.moving=true;e.dur=PAT.corre[isNight()?1:0];
+}
+// en el mundo y libre (update): mueve a los agentes, sube o baja la sospecha y lleva la alarma
+function updatePatrullas(dt){
+  if(!ZONAS[S.map])return;
+  if(ents.filter(e=>e.pat).length!==nPatrullas())ponPatrullas();
+  const pats=ents.filter(e=>e.pat),m=MAPS[S.map];if(!pats.length){SOSP.v=0;return;}
+  for(const e of pats){
+    if(e.moving){e.t+=dt;const k=Math.min(1,e.t/e.dur);e.px=(e.fx+(e.x-e.fx)*k)*16;e.py=(e.fy+(e.y-e.fy)*k)*16;if(k>=1){e.moving=false;e.fx=e.x;e.fy=e.y;}continue;}
+    if(e.caza){if(e.espera>0){e.espera-=dt;continue;}if(Math.abs(e.x-P.x)+Math.abs(e.y-P.y)===1&&!P.moving){pillado(e);return;}pasoCaza(e,m);continue;}
+    if(e.espera>0){e.espera-=dt;if(e.espera<=600&&!e.giro){e.giro=1;e.dir=pick(['up','down','left','right']);}continue;}
+    if(--e.pasos<=0){e.pasos=6+Math.floor(Math.random()*6);e.espera=900+Math.random()*900;e.giro=0;continue;}
+    pasoRonda(e,m);
+  }
+  const ve=pats.find(tePilla),seg=dt/1000;
+  if(SOSP.alarma){const e=pats.find(p=>p.id===SOSP.alarma);
+    if(!e){SOSP.alarma=null;SOSP.v=50;toast('Lo has despistado.',1600);return;}   // al cambiar el turno se va el que te seguía
+    if(ve)SOSP.sinVer=0;else SOSP.sinVer+=dt;
+    if(SOSP.sinVer>=PAT.olvida&&Math.abs(e.x-P.x)+Math.abs(e.y-P.y)>PAT.pierde){e.caza=false;e.espera=1200;SOSP.alarma=null;SOSP.v=50;toast('Lo has despistado.',1600);}
+    return;
+  }
+  if(SOSP.tregua>0)SOSP.tregua-=dt;
+  const g=SOSP.tregua>0?0:cargaSosp();
+  if(ve&&g>0){SOSP.v=Math.min(100,SOSP.v+(8+Math.min(g,100)*.12)*PAT.sube[isNight()?1:0]*(1+S.heat/100)*(S.protect?.4:1)*seg);
+    if(!SOSP.aviso&&(!isNight()||SOSP.v>=40)){SOSP.aviso=1;toast(isNight()?'Oyes pasos detrás de ti.':'Un agente te está mirando.',1800);}}
+  else SOSP.v=Math.max(0,SOSP.v-PAT.baja*seg);
+  if(SOSP.v>=100)alarma(ve||pats[0]);
+}
+function alarma(e){SOSP.alarma=e.id;SOSP.sinVer=0;e.caza=true;e.espera=PAT.alto;sfx('enc');toast('<small>¡ALTO, POLICÍA!</small>Corre (B): métete en un portal o aléjate.',2200);}
+// vender cerca de un agente (talkClient), aunque no mire: la sospecha sube de golpe
+function vistoVender(){if(!SOSP.alarma&&ents.some(e=>e.pat&&veCasilla(e,P.x,P.y,PAT.vista[0]))){SOSP.v=Math.min(100,SOSP.v+PAT.vende);SOSP.aviso=1;toast('Un agente te ha visto vender.',1600);}}
+// te alcanza: el control de siempre (battle, 13-combate); después, una tregua
+function pillado(e){e.caza=false;e.espera=1500;e.dir=OPP[P.dir];SOSP={v:0,alarma:null,sinVer:0,aviso:1,tregua:PAT.tregua};run(()=>battle('police'));}
+// al cambiar de mapa (enterMap): la sospecha y la alarma se quedan en la calle
+function resetSosp(){SOSP={v:0,alarma:null,sinVer:0,aviso:0,tregua:0};}
+// de día, por dónde mira cada agente (de noche, no: sigilo); con la alarma, ninguno
+function pintarVistas(cam){
+  if(isNight()||SOSP.alarma)return;
+  ctx.fillStyle='rgba(255,230,60,.34)';
+  const m=MAPS[S.map];
+  for(const e of ents){if(!e.pat)continue;const R=PAT.vista[0];   // desde la casilla a la que va
+    for(let y=e.y-R;y<=e.y+R;y++)for(let x=e.x-R;x<=e.x+R;x++){if((x===e.x&&y===e.y)||tileSolid(m,x,y)||!veCasilla(e,x,y,0))continue;
+      ctx.fillRect(x*16-cam.x,y*16-cam.y,16,16);}}
+}
 /* =========================================================
    PERSONAJES Y GUION
    ========================================================= */
@@ -2310,6 +2527,7 @@ const SHOP=[
   {lbl:'Carpa 100×100',p:120,ch:2,carpa:'m100',ci:1,desc:'Segunda carpa para el piso: 4 plantas, focos de hasta 480 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L.',cond:()=>!S.carpas[1]},
   {lbl:'Carpa 150×100',p:140,ch:4,carpa:'g150',ci:1,desc:'Cambia tu carpa de 100 por una de 150: 6 plantas y focos de hasta 720 W. Tus plantas, foco y macetas se quedan.',cond:()=>S.carpas[1]&&S.carpas[1].t==='m100'},
   {lbl:'Carpa 120×120',p:150,ch:5,carpa:'m120',ci:2,desc:'Tercera carpa, junto a la cama: 6 plantas, focos de hasta 720 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. Antes necesitas la del fondo.',cond:()=>!!S.carpas[1]&&!S.carpas[2]},
+  {lbl:'Prensa de rosin',p:250,ch:3,item:'prensa',desc:'Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores.',cond:()=>!S.items.prensa},
 ];
 const SOBRES=[[1,1],[3,.95],[5,.9],[10,.85]],GRANEL=[50,.6];   // [semillas, precio por semilla relativo]
 const precioSobre=(it,[n,f])=>Math.round(it.p*n*f);
@@ -2390,7 +2608,7 @@ async function talkKiko(){
       'Empieza por las conocidas: saca dos de receta en la mesa y cosecha una planta de cada. Patxi, el de la plaza, se sabe unas cuantas.']);
     showObjective();await checkStory();return;
   }
-  if(!Object.keys(S.seeds).length&&!S.pots.some(Boolean)&&!totalBuds()&&!cajaG()&&S.money+cajaE()<15){   // lo de la caja también cuenta (1.10)
+  if(!Object.keys(S.seeds).length&&!S.pots.some(Boolean)&&!totalBuds()&&!totalRosin()&&!cajaG()&&S.money+cajaE()<15){   // lo de la caja también cuenta (1.10)
     await say('¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.',N);addSeeds('ria',2);await got('2 semillas de SKUNK #1');
   }
   const c=await ask('¿Qué necesitas?',['Comprar','Un consejo','Nada'],N);
@@ -2464,7 +2682,7 @@ async function ventaMayor(N){
   await say('Cargado. Esta noche sale en el barco.',N);heatWarn();await checkStory();
 }
 async function talkCop(){
-  if(totalBuds()>0&&!S.protect){await say('¿Y ese olor? Quieto ahí.','AGENTE');await battle('police');return;}
+  if(cargaSosp()>0&&!S.protect){await say('¿Y ese olor? Quieto ahí.','AGENTE');await battle('police');return;}
   await say(pick(['Circule.','Todo tranquilo por aquí. Que siga así.','De noche hay robos en el parque. Tenga cuidado.']),'AGENTE');
 }
 async function talkDarko(){
@@ -2602,12 +2820,12 @@ async function embargo(){
 async function raidEvent(){
   if(S.protect){S.heat=50;return talk('SMS · MOLINA',['Esta noche había orden de entrada en tu piso. La he parado.','Baja el ritmo.']);}
   sfx('bad');await say('REDADA. La policía entra en tu piso.');
-  const g=Math.floor(totalBuds());
-  S.pots=S.pots.map(()=>null);S.buds={};S.heat=30;
+  const g=Math.floor(totalBuds()),r=totalRosin();
+  S.pots=S.pots.map(()=>null);S.buds={};S.rosin={};S.heat=30;
   const hallada=!!S.caja&&Math.random()<CAJA_REDADA,cg=hallada?Math.floor(cajaG()):0,ce=hallada?Math.floor(S.caja.money/2):0;
   if(hallada){S.caja.buds={};S.caja.money-=ce;}
   const fine=MULTA_REDADA-pagarCasa(MULTA_REDADA);
-  await say(`Se llevan todas las plantas y ${g} g. Multa: ${eur(fine)}.`);
+  await say(`Se llevan todas las plantas y ${g} g${r?' y '+rosinTxt(r):''}. Multa: ${eur(fine)}.`);
   if(S.caja)await say(hallada?`Encuentran la caja de detrás del diploma: se llevan ${cg} g y ${eur(ce)}.`:'La caja de detrás del diploma ni la ven.');
   await say('Toca empezar de nuevo. Y vender menos una temporada.');
 }
@@ -2766,6 +2984,8 @@ async function mochila(){
     for(const [k,v] of Object.entries(S.seeds))rows.push({label:'Semilla '+getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:icono('semillas'),desc:strainLine(k)});
     for(const e of S.esquejes)rows.push({label:'Esqueje '+getStrain(e.sid).n+marcaFeno(e.f),right:'día '+(e.dia+ESQUEJE_DIAS),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),desc:`Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+ESQUEJE_DIAS}.`});
     for(const [k,b] of Object.entries(S.buds))rows.push({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k)),desc:(k.endsWith('*')?'Cogollos de un fenotipo estrella, en lote aparte.\n':'Cogollos listos para vender.\n')+getStrain(lotSid(k)).o});
+    for(const [k,b] of Object.entries(S.rosin))rows.push({label:'Rosin · '+lotNombre(k),right:`${coma(b.g)} g · ${pct(b.thc)}%`,sw:'#d89a18',ic:iconoCogollo(lotSid(k)),desc:'Rosin: extracción prensada sin disolventes. Lo compran los catadores.\n'+getStrain(lotSid(k)).o});
+    if(S.items.prensa)rows.push({label:'Prensa de rosin',right:'en la mesa',desc:'De 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso.'});
     i=await menu(rows,{cls:'full',title:'MOCHILA',title2:`${Math.floor(totalBuds())} g encima`+(S.caja?` · ${Math.floor(cajaG())} g en la caja`:''),desc:true,initial:i});
     if(i<0)return;
     if(rows[i].k==='bocata'){if(S.items.bocata>0&&S.hp<S.hpMax){S.items.bocata--;S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');toast('Te comes el bocata. +15 de vida',1200);}else sfx('bump');}
@@ -2838,8 +3058,9 @@ async function enemyHits(){
     bAnim('P','desmayo');await say('Pierdes el conocimiento.');
     let lost=0;for(const b of Object.values(S.buds)){const l=Math.floor(b.g/2);lost+=l;b.g-=l;}
     for(const k of Object.keys(S.buds))if(S.buds[k].g<.5)delete S.buds[k];
+    let lr=0;for(const k of Object.keys(S.rosin)){const q=Math.round(S.rosin[k].g*5)/10;lr+=q;useRosin(k,q);}   // y la mitad del rosin (1.10)
     const lm=Math.round(S.money*.3);S.money-=lm;
-    await say(`Te roba ${lost} g y ${eur(lm)}.`);
+    await say(`Te roba ${lost} g${lr>0?', '+rosinTxt(lr):''} y ${eur(lm)}.`);
     return 'ko';
   }
   return null;
@@ -2876,13 +3097,14 @@ async function thiefRound(){
   }
   return enemyHits();
 }
-const MULTA_CALLE=601;   // tenencia en la vía pública: la mínima de la Ley de Seguridad Ciudadana (601-30.000 €)
+const MULTA_CALLE=601;   // tenencia en la vía pública: la mínima de la Ley de Seguridad Ciudadana (601-30.000 €). Devuelve lo requisado en texto
+// (cogollos y, si hay, rosin) y la multa
 function confiscate(extraFine=true){
-  const g=Math.floor(totalBuds()),fine=extraFine?Math.min(S.money,MULTA_CALLE):0;
-  if(B)bAnim('E','multa');S.buds={};S.money-=fine;S.heat=Math.max(0,S.heat-15);return [g,fine];
+  const g=Math.floor(totalBuds()),r=totalRosin(),fine=extraFine?Math.min(S.money,MULTA_CALLE):0;
+  if(B)bAnim('E','multa');S.buds={};S.rosin={};S.money-=fine;S.heat=Math.max(0,S.heat-15);return [g+' g'+(r?' y '+rosinTxt(r):''),fine];
 }
 // el soborno (1.10) sube también con el dinero que llevas encima: un 5 %
-const precioSoborno=()=>Math.round(40+S.heat*4+totalBuds()*.5+S.money*.05);
+const precioSoborno=()=>Math.round(40+S.heat*4+cargaSosp()*.5+S.money*.05);
 async function copRound(){
   const cost=precioSoborno();
   prompt('¿Qué haces?');
@@ -2892,7 +3114,7 @@ async function copRound(){
     if(S.money<cost){await say('No llevas tanto dinero encima.');return null;}
     if(!S.protect&&S.ch>=3&&Math.random()<.15){
       await say(`${B.name}: «¿Me intentas sobornar a mí? Esto me lo quedo.»`);
-      const [g,f]=confiscate();S.heat=Math.min(100,S.heat+20);sfx('bad');await say(`Te requisan ${g} g y te multan con ${eur(f)}.`);return 'caught';}
+      const [g,f]=confiscate();S.heat=Math.min(100,S.heat+20);sfx('bad');await say(`Te requisan ${g} y te multan con ${eur(f)}.`);return 'caught';}
     S.money-=cost;S.heat=Math.max(0,S.heat-10);sfx('coin');bhud();bAnim('E','soborno');
     await say(`${B.name} se guarda el sobre. «Aquí no ha pasado nada.»`);return 'bribe';
   }
@@ -2900,14 +3122,14 @@ async function copRound(){
     await say(`${S.name}: «Solo estaba dando un paseo, agente.»`);
     if(Math.random()<clamp(.3+S.rep/250-S.heat/300,.1,.85)){await say(`${B.name}: «Bien. Circula.»`);return 'talk';}
     await say(`${B.name}: «No. Vacía los bolsillos.»`);
-    const [g,f]=confiscate();sfx('bad');bhud();await say(`Te requisan ${g} g y te multan con ${eur(f)}.`);return 'caught';
+    const [g,f]=confiscate();sfx('bad');bhud();await say(`Te requisan ${g} y te multan con ${eur(f)}.`);return 'caught';
   }
   if(c===2){
     if(Math.random()<.45+(isNight()?.15:0)){sfx('door');S.heat=Math.min(100,S.heat+8);await say('Sales corriendo entre los coches y lo pierdes.');return 'flee';}
     bAnim('E','perseguir');await say(`${B.name} te alcanza y te reduce en el suelo.`);
-    const [g,f]=confiscate();S.hp=Math.max(1,S.hp-5);sfx('hurt');bhud();await say(`Te requisan ${g} g y te multan con ${eur(f)}.`);return 'caught';
+    const [g,f]=confiscate();S.hp=Math.max(1,S.hp-5);sfx('hurt');bhud();await say(`Te requisan ${g} y te multan con ${eur(f)}.`);return 'caught';
   }
-  const [g]=confiscate(false);bhud();await say(`Le entregas ${g} g. «Buena decisión. Por esta vez, sin multa.»`);return 'caught';
+  const [g]=confiscate(false);bhud();await say(`Le entregas ${g}. «Buena decisión. Por esta vez, sin multa.»`);return 'caught';
 }
 
 /* =========================================================
@@ -2915,7 +3137,7 @@ async function copRound(){
    ========================================================= */
 const camera=()=>{const m=MAPS[S.map];let cx=P.px+8-SW/2,cy=P.py+8-SH/2;const mw=m.w*16,mh=m.h*16;
   cx=mw<=SW?(mw-SW)/2:clamp(cx,0,mw-SW);cy=mh<=SH?(mh-SH)/2:clamp(cy,0,mh-SH);return{x:Math.round(cx),y:Math.round(cy)};};
-const GLYPH={'$':['..#..','.####','#.#..','.###.','..#.#','####.','..#..'],'!':['..#..','..#..','..#..','..#..','..#..','.....','..#..']};
+const GLYPH={'$':['..#..','.####','#.#..','.###.','..#.#','####.','..#..'],'!':['..#..','..#..','..#..','..#..','..#..','.....','..#..'],'gota':['..#..','..#..','.###.','.###.','#####','#####','.###.']};   // gota: el catador de rosin (1.10)
 function bubble(x,y,ch,col){ctx.fillStyle='#26262e';ctx.fillRect(x-1,y-1,9,10);ctx.fillStyle='#ffffff';ctx.fillRect(x,y,7,8);ctx.fillRect(x+2,y+8,3,1);
   ctx.fillStyle=col;GLYPH[ch].forEach((r,j)=>{for(let i=0;i<5;i++)if(r[i]==='#')ctx.fillRect(x+1+i,y+(j>3?j-0:j)+0,1,1);});}
 function storyMark(id){
@@ -2949,7 +3171,8 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
   }
   const fr=(e,dur)=>e.moving&&e.t/dur<.5?1+((e.x+e.y)&1):0;
   if(ARTE.ok)for(const e of ents)ambiente(e,now,cam);
-  for(const e of ents)list.push([e.py,()=>{if(!dibujarPJ(e,e.look,now,cam,false,320))ctx.drawImage(spriteFor(e.look,e.dir,fr(e,320)),Math.round(e.px-cam.x),Math.round(e.py-cam.y-4));}]);
+  if(ZONAS[S.map])pintarVistas(cam);   // por dónde miran las patrullas, de día (10b-patrulla)
+  for(const e of ents)list.push([e.py,()=>{if(!dibujarPJ(e,e.look,now,cam,false,e.dur||320))ctx.drawImage(spriteFor(e.look,e.dir,fr(e,e.dur||320)),Math.round(e.px-cam.x),Math.round(e.py-cam.y-4));}]);
   if(!camFija)list.push([P.py,()=>{if(!dibujarPJ(P,LOOKS.player,now,cam,true,P.dur))ctx.drawImage(spriteFor(LOOKS.player,P.dir,P.moving&&P.t/P.dur<.5?1+P.parity:0),Math.round(P.px-cam.x),Math.round(P.py-cam.y-4));}]);
   const bolsa=ARTE.ok&&frameDe(ARTE.cubre['misc:bolsa'],'bolsa','unica',0,{i:0});
   for(const it of ITEMS)if(!it.hidden&&it.map===S.map&&!S.taken[it.id])list.push([it.y*16,()=>{const x=it.x*16-cam.x,y=it.y*16-cam.y;if(bolsa)pinta(bolsa,x+8,y+8);else ctx.drawImage(bagSprite,x,y);}]);
@@ -2958,7 +3181,7 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
   if(ARTE.ok)pintarVfx(now,cam,S.map);
   const bob=Math.floor(now/400)%2;
   for(const e of ents){const bx=Math.round(e.px-cam.x)+4,by=Math.round(e.py-cam.y)-16+bob;
-    if(e.def.client)bubble(bx,by,'$','#2a9a4a');else if(storyMark(e.id))bubble(bx,by,'!','#e03030');}
+    if(e.def.client)bubble(bx,by,...e.def.client.type==='ext'?['gota','#d08a10']:['$','#2a9a4a']);else if(storyMark(e.id)||e.caza)bubble(bx,by,'!','#e03030');}
   if(ZONAS[S.map]){
     const h=S.min/60;let a=h>=21||h<5?.5:h>=19?(h-19)/2*.5:h<7?(7-h)/2*.5:0;
     if(h>=17.5&&h<20.5){ctx.fillStyle=`rgba(255,130,50,${.13*Math.sin((h-17.5)/3*Math.PI)})`;ctx.fillRect(0,0,SW,SH);}
@@ -3038,7 +3261,9 @@ function renderTitle(now){
 function updateHUD(){
   const h=$('hud');if(mode!=='world'||!S){h.hidden=true;return;}h.hidden=false;
   const hh=String(Math.floor(S.min/60)).padStart(2,'0'),mm=String(Math.floor(S.min%60/10)*10).padStart(2,'0'),heat=Math.round(S.heat);
-  h.innerHTML=`DÍA ${S.day} · ${hh}:${mm}<br>${eur(S.money)} · ${Math.floor(totalBuds())} g<div class="heat">CALOR<span class="bar"><i class="${heat>=70?'hot':''}" style="width:${heat}%"></i></span></div>`;
+  const r=totalRosin(),sv=Math.round(SOSP.v);
+  h.innerHTML=`DÍA ${S.day} · ${hh}:${mm}<br>${eur(S.money)} · ${Math.floor(totalBuds())} g${r?' · '+coma(Math.round(r*10)/10)+' g rosin':''}<div class="heat">CALOR<span class="bar"><i class="${heat>=70?'hot':''}" style="width:${heat}%"></i></span></div>`
+    +(nPatrullas()?`<div class="heat sosp">${SOSP.alarma?'¡ALARMA!':'SOSPECHA'}<span class="bar"><i class="${SOSP.alarma?'hot':''}" style="width:${SOSP.alarma?100:sv}%"></i></span></div>`:'');
 }
 
 /* =========================================================
@@ -3104,7 +3329,7 @@ function enterGame(){
 }
 function update(dt){
   if(mode==='world'&&S){
-    updatePlayer(dt);updateEnts(dt);
+    updatePlayer(dt);updateEnts(dt);if(isFree())updatePatrullas(dt);
     if(isFree()){timeAcc+=dt;while(timeAcc>=MS_PER_MIN){timeAcc-=MS_PER_MIN;tickMinute();}
       if(pending.length&&!P.moving)run(pending.shift());}
     hudT-=dt;if(hudT<=0){hudT=250;updateHUD();}

@@ -1,6 +1,6 @@
 /* Layout: app de móvil en horizontal. La pantalla del juego ocupa todo el móvil, con un reborde fino, y los mandos
-   flotan encima, fijos: cruceta abajo a la izquierda, A/B abajo a la derecha, SONIDO y START arriba a la derecha.
-   06b-pantalla.js mide el hueco real y fija el tamaño de cada parte en variables CSS; aquí solo se colocan. */
+   flotan encima, fijos y medidos en mm donde descansan los pulgares: cruceta abajo a la izquierda, A/B abajo a la derecha con START
+   encima y SONIDO arriba a la derecha. 06b-pantalla.js mide el hueco real y coloca cada parte (geoMandos); aquí solo se pintan. */
 :root{
   --rim:#121519; --ink:#e6f2ea;
   --btn:#6d2c4b; --btnHi:#9a4a72;
@@ -13,34 +13,33 @@ html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
 [hidden]{display:none!important}
 body{position:fixed;inset:0;background:var(--rim);color:var(--ink);font-family:var(--texto);-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 /* --u: píxel del juego en CSS px · --sw/--sh/--sx/--sy: tamaño y sitio de la pantalla · --uiw/--us: escenario de diálogos y menús
-   --d cruceta · --ab botón A/B · --m margen de los mandos · --pill SONIDO/START. Los valores por defecto ya caben en un móvil. */
-.marco{--u:2.25px;--us:2.25px;--uiw:540px;--sw:810px;--sh:360px;--sx:0px;--sy:0px;--d:124px;--ab:54px;--m:12px;--pill:26px;--ut:0px;
+   --k: px por mm de los mandos (con lo que encogen en un móvil estrecho). Los valores por defecto ya caben en un móvil. */
+.marco{--u:2.25px;--us:2.25px;--uiw:540px;--sw:810px;--sh:360px;--sx:0px;--sy:0px;--k:6.3px;--ut:0px;--bpr:13.5px;
   position:absolute;inset:0;overflow:hidden;background:var(--rim);box-sizing:border-box;
   padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
 .screen{position:absolute;left:var(--sx);top:var(--sy);width:var(--sw);height:var(--sh);background:#000;overflow:hidden;border-radius:calc(var(--u)*2);user-select:none;-webkit-user-select:none}
 /* escena: los 240×160 del centro (título y marcadores del combate) · ui: diálogos, menús y avisos, fuera de los mandos
-   (--ut: empieza debajo de SONIDO/START si los tendría encima). Con un menú a toda altura, el HUD se aparta. */
+   (--ut: empieza debajo de SONIDO si lo tendría encima). Con un menú a toda altura, el HUD se aparta. */
 .escena{position:absolute;top:0;bottom:0;left:calc(50% - var(--u) * 120);width:calc(var(--u) * 240);pointer-events:none;z-index:14}
 .ui{position:absolute;top:var(--ut);bottom:0;left:calc(50% - var(--uiw) / 2);width:var(--uiw);--u:var(--us);z-index:20;pointer-events:none}
 .ui>*{pointer-events:auto}
 .screen:has(>.ui>.menu.full:not([hidden]))>.hud{visibility:hidden}
-/* mandos flotando sobre la pantalla */
+/* mandos flotando sobre la pantalla: #dpad y #ab son las zonas de toque (la cruz y los botones, dentro) */
 .mando{position:absolute;inset:0;pointer-events:none;z-index:50}
 .mando>*{position:absolute;pointer-events:auto}
-.dpad{left:calc(var(--m) + env(safe-area-inset-left,0px));bottom:calc(var(--m) + env(safe-area-inset-bottom,0px));width:var(--d);height:var(--d);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);touch-action:none}
-.dpad button,.ab button,.pills button{font:inherit;font-weight:700;border:0;cursor:pointer;touch-action:none;padding:0;color:rgba(255,255,255,.88);text-shadow:0 1px 0 rgba(0,0,0,.5)}
-.dpad button,.dpad .m{background:rgba(24,28,34,.5);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22)}
-.dpad button{font-size:calc(var(--d) * .1)}
-.dpad .u{grid-area:1/2;border-radius:8px 8px 0 0}.dpad .d{grid-area:3/2;border-radius:0 0 8px 8px}
-.dpad .l{grid-area:2/1;border-radius:8px 0 0 8px}.dpad .r{grid-area:2/3;border-radius:0 8px 8px 0}
-.dpad .m{grid-area:2/2;box-shadow:none}
-.ab{right:calc(var(--m) + env(safe-area-inset-right,0px));bottom:calc(var(--m) + env(safe-area-inset-bottom,0px));width:calc(var(--ab) * 2.25);height:calc(var(--ab) * 1.6)}
-.ab button{position:absolute;width:var(--ab);height:var(--ab);border-radius:50%;background:rgba(109,44,75,.55);box-shadow:inset 0 0 0 1.5px rgba(255,210,230,.4);font-size:calc(var(--ab) * .36)}
-.ab button:nth-child(1){left:0;bottom:0}.ab button:nth-child(2){right:0;top:0}
-.pills{right:calc(var(--m) + env(safe-area-inset-right,0px));top:calc(var(--m) + env(safe-area-inset-top,0px));display:flex;gap:calc(var(--m) * .6)}
-.pills button{height:var(--pill);min-width:calc(var(--pill) * 2.6);border-radius:calc(var(--pill) / 2);padding:0 calc(var(--pill) * .45);background:rgba(24,28,34,.55);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22);font-size:calc(var(--pill) * .42);letter-spacing:.06em}
+.dpad,.ab{touch-action:none}
+.cruz{position:absolute;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);pointer-events:none}
+.cruz span{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:calc(var(--k) * 2.4);color:rgba(255,255,255,.88);text-shadow:0 1px 0 rgba(0,0,0,.5);
+  background:rgba(24,28,34,.5);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22)}
+.cruz .u{grid-area:1/2;border-radius:calc(var(--k) * 1.6) calc(var(--k) * 1.6) 0 0}.cruz .d{grid-area:3/2;border-radius:0 0 calc(var(--k) * 1.6) calc(var(--k) * 1.6)}
+.cruz .l{grid-area:2/1;border-radius:calc(var(--k) * 1.6) 0 0 calc(var(--k) * 1.6)}.cruz .r{grid-area:2/3;border-radius:0 calc(var(--k) * 1.6) calc(var(--k) * 1.6) 0}
+.cruz .m{grid-area:2/2;box-shadow:none}
+.cruz span.on{background:rgba(70,80,96,.75)}
+.ab button,.start,.sonido{font:inherit;font-weight:700;border:0;cursor:pointer;touch-action:none;padding:0;color:rgba(255,255,255,.88);text-shadow:0 1px 0 rgba(0,0,0,.5)}
+.ab button{position:absolute;border-radius:50%;background:rgba(109,44,75,.55);box-shadow:inset 0 0 0 1.5px rgba(255,210,230,.4);font-size:calc(var(--k) * 3.8)}
+.start,.sonido{border-radius:calc(var(--k) * 3.5);background:rgba(24,28,34,.55);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22);font-size:calc(var(--k) * 2.6);letter-spacing:.06em}
 button:active,button.on{filter:brightness(1.6)}
-.dpad button:active,.dpad button.on,.pills button:active,.pills button.on{background:rgba(70,80,96,.75)}
+.start:active,.start.on,.sonido:active,.sonido.on{background:rgba(70,80,96,.75)}
 .ab button:active,.ab button.on{background:rgba(154,74,114,.85)}
 button:focus-visible{outline:2px solid #f8e070;outline-offset:2px}
 /* vertical: la app solo va en horizontal */
@@ -77,6 +76,8 @@ canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixela
 .hud .bar{width:calc(var(--u)*34);height:calc(var(--u)*3);background:#2e3a34;border-radius:calc(var(--u)*1)}
 .hud .bar i{display:block;height:100%;background:#f0a030;border-radius:calc(var(--u)*1)}
 .hud .bar i.hot{background:#f04040}
+.hud .sosp .bar i{background:#e8d040}
+.hud .sosp .bar i.hot{background:#f04040}
 .toast{position:absolute;left:50%;top:calc(var(--u)*24);transform:translateX(-50%);padding:calc(var(--u)*4) calc(var(--u)*10);font-size:calc(var(--u)*9);line-height:calc(var(--u)*12);text-align:center;z-index:25;width:max-content;max-width:calc(var(--u)*210);pointer-events:none}
 .toast small{display:block;font-weight:700;font-size:calc(var(--u)*7);color:var(--boxLine);letter-spacing:.08em;text-shadow:none}
 .bhp{position:absolute;padding:calc(var(--u)*3) calc(var(--u)*6);font-size:calc(var(--u)*8.5);line-height:calc(var(--u)*11);width:calc(var(--u)*104);z-index:15}
@@ -86,7 +87,7 @@ canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixela
 .bhp .hp span i{display:block;height:100%;width:100%;background:#58d080;border-radius:calc(var(--u)*2);transition:width .5s steps(12)}
 .bhp .num{text-align:right;font-variant-numeric:tabular-nums}
 #bE{left:calc(var(--u)*6);top:calc(var(--u)*8)}
-#bP{right:calc(var(--u)*6);bottom:calc(var(--u)*49)}
+#bP{right:var(--bpr);bottom:calc(var(--u)*49)}   /* --bpr: 6u o, si A, B o START le caen encima, a su izquierda */
 /* vista de carpa: ficha de la plaza o del foco elegido */
 .vcinfo{position:absolute;left:calc(var(--u)*3);top:calc(var(--u)*3);width:calc(var(--u)*66);padding:calc(var(--u)*3) calc(var(--u)*4);font-size:calc(var(--u)*6.5);line-height:calc(var(--u)*8.5);z-index:15}
 .vcinfo div,.vcinfo b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

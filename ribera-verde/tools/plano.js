@@ -72,7 +72,7 @@ const REAL = {
     function mapaEntero(name) {
       S.map = name; if (name === 'home') montarCasa();
       Object.assign(P, { x: -50, y: -50, px: -800, py: -800, fx: -50, fy: -50, moving: false });
-      ents = []; buildEnts(); ents.forEach(e => e.wander = 0);
+      ents = []; buildEnts(); ents = ents.filter(e => !e.pat); ents.forEach(e => e.wander = 0);   // sin las patrullas (1.10): no se guardan ni son del mapa
       const m = MAPS[name], W = m.w * 16, H = m.h * 16, [c, x] = mkCanvas(W, H);
       for (let cy = 0; cy < H; cy += SH) for (let cx = 0; cx < W; cx += SW) { renderWorld(1000, { x: cx, y: cy }); x.drawImage(cv, cx, cy); }
       return c;

@@ -8,7 +8,7 @@ const P={x:0,y:0,px:0,py:0,dir:'down',moving:false,fx:0,fy:0,t:0,dur:240,parity:
 const DV={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]},OPP={up:'down',down:'up',left:'right',right:'left'};
 const CH_TITLES={1:'La herencia',2:'La calle',3:'La deuda',4:'Genética',5:'El sargento',6:'La Copa de Ribera',7:'Libertad',8:'Tu imperio'};
 function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,min:8*60,money:150,hp:30,hpMax:30,heat:0,rep:0,ch:0,flags:{},sales:0,
-  seeds:{},buds:{},items:Object.assign({fert:0,insect:0,spray:0,bocata:1},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
+  seeds:{},buds:{},rosin:{},items:Object.assign({fert:0,insect:0,spray:0,bocata:1,prensa:0},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},gen:{},pedido:[],esquejes:[],fenos:{},fenoN:0,eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
   caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0};}
@@ -31,6 +31,13 @@ const lotSid=k=>k.replace(/\*$/,''),lotNombre=k=>getStrain(lotSid(k)).n+(k.endsW
 function addBuds(k,g,thc){const b=S.buds[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;}else S.buds[k]={g,thc};discover(lotSid(k));}
 function useBuds(k,g){const b=S.buds[k];b.g-=g;if(b.g<.5)delete S.buds[k];}
 function budLots(min,minThc=0){return Object.entries(S.buds).filter(([k,b])=>b.g>=min&&b.thc>=minThc);}
+// rosin (1.10): lo que sale de prensar cogollos en la mesa (prensar, 09-cultivo), por lotes como ellos y al décimo de gramo
+const totalRosin=()=>Object.values(S.rosin).reduce((a,b)=>a+b.g,0);
+function addRosin(k,g,thc){const b=S.rosin[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g=Math.round((b.g+g)*10)/10;}else S.rosin[k]={g,thc};}
+function useRosin(k,g){const b=S.rosin[k];b.g=Math.round((b.g-g)*10)/10;if(b.g<.1)delete S.rosin[k];}
+const rosinTxt=r=>coma(Math.round(r*10)/10)+' g de rosin';
+function rosinLots(min){return Object.entries(S.rosin).filter(([k,b])=>b.g>=min);}
+const rosinItem=([k,b])=>({label:'Rosin · '+lotNombre(k),right:`${coma(b.g)} g · ${pct(b.thc)}%`,sw:'#d89a18',ic:iconoCogollo(lotSid(k))});
 const lotItem=([k,b])=>({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k))});
 async function got(t){sfx('get');await say(`Consigues ${t}.`);}
 
@@ -64,6 +71,7 @@ function buildEnts(){
   const old={};ents.forEach(e=>old[e.id]=e);ents=[];
   for(const d of NPCDEF){if(d.map!==S.map||(d.cond&&!d.cond()))continue;ents.push(old[d.id]&&old[d.id].def===d?old[d.id]:mkEnt(d));}
   for(const c of S.clients)if((c.map||'town')===S.map){const o=old[c.id];ents.push(o||mkEnt({id:c.id,x:c.x,y:c.y,wander:2,lookObj:c.look,client:c}));}
+  for(const e of Object.values(old))if(e.pat&&e.mapa===S.map)ents.push(e);ponPatrullas();   // las patrullas (10b-patrulla)
 }
 const ITEMS=[
   {id:'i_spray',map:'town',x:8,y:25,give:async()=>{S.items.spray+=2;await got('2 × SPRAY DE PIMIENTA');}},
@@ -83,7 +91,7 @@ function tileSolid(m,x,y){
   return !!itemAt(x,y);
 }
 const entAt=(x,y)=>ents.find(e=>(e.x===x&&e.y===y)||(e.moving&&e.fx===x&&e.fy===y));
-function enterMap(name,x,y,dir){S.map=name;if(name==='home')montarCasa();Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];buildEnts();music(mapMusic());}
+function enterMap(name,x,y,dir){S.map=name;if(name==='home')montarCasa();Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];resetSosp();buildEnts();music(mapMusic());}
 const mapMusic=()=>ZONAS[S.map]?(isNight()?'night':'town'):'home';
 async function warp(w){sfx('door');await fade(1);enterMap(w.to,w.x,w.y,w.dir);updateHUD();await wait(80);await fade(0);}
 
@@ -115,17 +123,17 @@ function onStepEnd(){
     if(S.ch>=2&&S.ch<7&&!S.flags.darko1){queue('darko',async()=>{const e=ents.find(e=>e.id==='darko');if(e)e.dir='up';await talkDarko();});return;}
     if(S.ch>=5&&!S.flags.molina1){queue('molina',talkMolina);return;}
   }
-  if(S.ch>=2&&S.cool<=0){
+  // ladrones al azar por paso; la policía ya no (1.10): patrulla por la calle (10b-patrulla). Con la alarma, nada
+  if(S.ch>=2&&S.cool<=0&&!SOSP.alarma){
     const g=totalBuds(),tall=m.g[P.y][P.x]==='tallgrass';
-    const pp=g>0?(.002+S.heat*.00025)*(S.protect?.4:1)*Z.pol:0;
     const pt=(g>=5||S.money>=150)?.004*(isNight()?2.5:1)*(tall?3:1)*Z.lad:0;
-    const r=Math.random();
-    if(r<pp){S.cool=25;run(()=>battle('police'));}else if(r<pp+pt){S.cool=25;run(()=>battle('thief'));}
+    if(Math.random()<pt){S.cool=25;run(()=>battle('thief'));}
   }
 }
 function updateEnts(dt){
   const free=isFree(),m=MAPS[S.map];
   for(const e of ents){
+    if(e.pat)continue;   // las patrullas andan en updatePatrullas
     if(e.moving){e.t+=dt;const k=Math.min(1,e.t/320);e.px=(e.fx+(e.x-e.fx)*k)*16;e.py=(e.fy+(e.y-e.fy)*k)*16;if(k>=1){e.moving=false;e.fx=e.x;e.fy=e.y;}continue;}
     if(!free||!e.wander)continue;e.wt-=dt;if(e.wt>0)continue;e.wt=1200+Math.random()*2600;
     const d=pick(['up','down','left','right']);e.dir=d;const [dx,dy]=DV[d],nx=e.x+dx,ny=e.y+dy;

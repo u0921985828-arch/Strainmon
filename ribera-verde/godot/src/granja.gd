@@ -633,7 +633,47 @@ func _mk(l: Array) -> Array:
 		o.append({"label": s.n, "right": "×" + n(e[1]), "sw": s.c, "ic": ic_cog(e[0]), "desc": strain_line(e[0])})
 	return o
 
+# la prensa de rosin (1.10): de un lote de 5 g o más, una parte (5, 25, 100 g o todo) a rosin con el triple de THC
+func rosin_de(g: float) -> float:
+	return Datos.jsround(g * D.ROSIN.rend * 10) / 10.0
+
+func prensar():
+	var lots := bud_lots(5)
+	if lots.is_empty():
+		await say("PRENSA DE ROSIN: necesitas 5 g de cogollos como mínimo.")
+		return
+	var it := lots.map(lot_item)
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿Qué prensas?"})
+	if i < 0 or i >= lots.size():
+		return
+	var k: String = lots[i][0]
+	var b: Dictionary = lots[i][1]
+	var tot := int(floor(b.g))
+	var ops := [5, 25, 100].filter(func(g): return g < tot)
+	ops.append(tot)
+	var tx := ops.map(func(g): return "%d g → %s g de rosin" % [g, Datos.coma(rosin_de(g))])
+	tx.append("Nada")
+	var j: int = await ask("%s: %d g. ¿Cuánto prensas?" % [lot_nombre(k), tot], tx)
+	if j < 0 or j >= ops.size():
+		return
+	var g: int = ops[j]
+	var r := rosin_de(g)
+	var thc: float = minf(D.ROSIN.tope, b.thc * D.ROSIN.thc)
+	use_buds(k, g)
+	add_rosin(k, r, thc)
+	advance_time(30)
+	sfx("get")
+	await say("Prensas %d g de %s: %s g de rosin con un %s %% de THC." % [g, lot_nombre(k), Datos.coma(r), Datos.pct(thc)])
+
 func lab_action():
+	if S.items.get("prensa"):
+		var c: int = await ask("La mesa de la tía. ¿Qué haces?", ["Prensar rosin", "Cruzar semillas", "Nada"])
+		if c == 0:
+			await prensar()
+			return
+		if c != 1:
+			return
 	if not S.flags.get("lab"):
 		await say("Una mesa con un microscopio viejo y frascos. Kiko sabrá qué hacer con esto.")
 		return

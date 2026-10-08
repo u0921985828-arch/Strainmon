@@ -23,6 +23,7 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 | **Patxi** | Anciano que lleva cuarenta años cultivando en el monte. Sabe de cruces | Plaza, junto a la fuente |
 | **Begoña** y **Unai** | Vecina y niño, dan consejos | Calle y plaza |
 | **Agente de patrulla** | Policía que hace controles | Plaza (desde el cap. 2) |
+| **Patrullas** (1.10) | Agentes que andan por la calle: si te ven con algo encima, sospechan; con la alarma, te persiguen | Las zonas de fuera, desde el cap. 2: 1 de día y 2 de noche en el barrio, 2 en el barrio alto, 1 en los astilleros, Puerto Viejo y Valdehierro, ninguno en los pueblos |
 | **Jurado** | Juez de la Copa, la de la asociación cannábica del barrio | Plaza (cap. 6) |
 | **Ama** | Tu madre. Solo aparece en su nota | Caserío de la familia, en Mendialde |
 | **Vecina**, **excursionista**, **turista** y **obrero** | Gente de la comarca, dan conversación | Mendialde, Errotabarri, Puerto Viejo y Valdehierro |
@@ -97,6 +98,7 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 - *Currela:* «Buenas. Salgo de doble turno.» / «Qué tal. Lo de siempre, sin líos.»
 - *Turista:* «Hello. ¿Tú vendes... marihuana? Pago bien.» / «Bonjour. Me han dicho que aquí se cultiva bien.»
 - *Pijo:* «Busco algo de calidad para una cena en Neguri.» / «Solo quiero lo mejor. El precio me da igual.»
+- *Catador (1.10; desde el capítulo 3, si tienes la prensa; solo compra rosin: «Busco X g de rosin.»):* «¿Tienes rosin? Me han dicho que prensas tú mismo.» / «Busco extracción sin disolventes. Rosin, nada de BHO.»
 - *Si acepta:* «Trato hecho.» / «Gracias. Nos vemos.» / «Bien. Se lo diré a mis amigos.»
 - *Si rechaza:* «¿Tanto? No.» / «A ese precio, paso.» / «Eso es demasiado. Adiós.»
 - *Si no tienes lo que pide:* «Eso no me vale. Vuelve cuando tengas lo que busco.» / «¿No llevas nada? Vale.»
@@ -334,6 +336,7 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
   - *Requisa (soborno rechazado, HABLAR o HUIR fallidos):* «Te requisan X g y te multan con Y €.»
   - *Agentes:* AGENTE LÓPEZ, AGENTE ETXEBERRIA, AGENTE RUIZ, AGENTE GARAI.
 - *Agente de patrulla (al hablarle):* con mercancía y sin la protección de Molina, «¿Y ese olor? Quieto ahí.» y control. Si no, una de estas: «Circule.» / «Todo tranquilo por aquí. Que siga así.» / «De noche hay robos en el parque. Tenga cuidado.»
+- *Patrullas (1.10, avisos):* «Un agente te está mirando.» (de día, en cuanto sube la sospecha) / «Oyes pasos detrás de ti.» (de noche, desde 40) / «Un agente te ha visto vender.» / con la alarma, «¡ALTO, POLICÍA! Corre (B): métete en un portal o aléjate.» / «Lo has despistado.» Si te pilla, el control de siempre («[AGENTE] te da el alto.»). Al hablarle: «Circule.» / «Buenas. Nada que ver aquí.» / «¿Todo bien? Siga.»
 
 ## Ambiente
 
@@ -389,6 +392,7 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
   - *Ventana:* «Por la ventana se ve la ría. Huele a salitre.»
   - *Diploma:* Un diploma enmarcado: «COPA DE RIBERA 1998 · 2º PREMIO: MAITE». → *Mirar detrás / Dejarlo* (ver «La caja fuerte»).
   - *Mesa de genética, antes del capítulo 4:* «Una mesa con un microscopio viejo y frascos. Kiko sabrá qué hacer con esto.»
+  - *Prensa de rosin (1.10; Kiko la vende desde el capítulo 3):* en la mesa, «La mesa de la tía. ¿Qué haces?» → *Prensar rosin / Cruzar semillas / Nada* · «¿Qué prensas?» → «[variedad]: X g. ¿Cuánto prensas?» → «Prensas X g de [variedad]: Y g de rosin con un Z % de THC.» (media hora) · sin 5 g: «PRENSA DE ROSIN: necesitas 5 g de cogollos como mínimo.»
   - *Hueco sin carpa:* «Aquí cabe una carpa de cultivo. Kiko vende carpas de 100×100.»
 - **Objetos de la tienda y el bar:**
   - *Estantería:* «Botes de abono, sustrato de coco y medidores de pH.»

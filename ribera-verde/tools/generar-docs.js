@@ -58,8 +58,8 @@ const ROOT = path.join(__dirname, '..');
     });
     S = S0;
     const signs = SIGNS;
-    return { strains, recipes, maps, npcs, items, shop, signs, banco: BANCO, sobre: SOBRE, gen, focos, macetas, carpas, zonas: ZONAS, paradas: PARADAS, busHoras: BUS_HORAS,
-      montajes, c: { CAJA, CAJA_P, CAJA_REDADA, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, ENCARGO_DIAS, SOBORNO, CUOTA_DIAS, KWH, H_LUZ, H_24, W_M2, Y_MEDIA, FENO_ESTRELLA, FENO_FLOJO, ESQUEJE_DIAS, SEMILLA_HERMA, DEUDA, PLAZOS, INTERES, PREMIO_COPA, mayor: [precioMayor(12), precioMayor(30)], calle: [precioCalle(12), precioCalle(30)], IMPERIO, SOBRES, GRANEL } };
+    return { strains, recipes, maps, npcs, items, shop, signs, banco: BANCO, sobre: SOBRE, gen, focos, macetas, carpas, zonas: ZONAS, patrullas: PATRULLAS, paradas: PARADAS, busHoras: BUS_HORAS,
+      montajes, c: { CAJA, CAJA_P, CAJA_REDADA, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, ENCARGO_DIAS, SOBORNO, CUOTA_DIAS, KWH, H_LUZ, H_24, W_M2, Y_MEDIA, FENO_ESTRELLA, FENO_FLOJO, ESQUEJE_DIAS, SEMILLA_HERMA, DEUDA, PLAZOS, INTERES, PREMIO_COPA, mayor: [precioMayor(12), precioMayor(30)], calle: [precioCalle(12), precioCalle(30)], ROSIN, rosin: [36, 54, 75].map(t => [t, precioRosin(t)]), prensa: SHOP.find(i => i.item === 'prensa').p, IMPERIO, SOBRES, GRANEL } };
   });
   await browser.close();
 
@@ -212,6 +212,7 @@ Skunk #1 sana y abonada, fenotipo medio (cosecha de 2,5 días):
 
 - **Calle:** ${dec(c.calle[0])}-${dec(c.calle[1])} €/g según el THC (× 0,85 estudiante, × 1 currela, × 1,15 turista, × 1,35 pijo; rebaja × 0,85, caro × 1,3). Cada cliente quiere 2-12 g.
 - **Al por mayor (Iñaki, en el muelle, desde el capítulo 3):** ${dec(c.mayor[0])}-${dec(c.mayor[1])} €/g, lotes de 100 g para arriba, una carga al día de hasta ${dec(c.IMPERIO[0].mayor / 1000)} kg (más en el imperio). Cada carga sube el calor 2 + 1 por cada 100 g.
+- **Rosin (desde el capítulo 3, con la prensa de Kiko, ${c.prensa} €):** en la mesa del piso, ${dec(c.ROSIN.rend * 100)} % del peso de la flor con ${c.ROSIN.thc} veces su THC (hasta el ${c.ROSIN.tope} %), en media hora. Lo compran los catadores (bocadillo con una gota ámbar; 1-3 g; 2 al día en el barrio y 1 en los astilleros, en Puerto Viejo y en Valdehierro) a ${c.rosin.map(([t, p]) => `${dec(p)} €/g al ${t} %`).join(', ')}: prensar compensa desde el 12,5 % de THC de la flor. Cada gramo vendido sube el calor 2,5 (la flor, 0,5).
 - **Zonas:** ${Object.values(D.zonas).filter(z => z.precio !== 1).map(z => `en ${z.n === 'Astilleros' ? 'los astilleros' : z.n}, el gramo × ${dec(z.precio)}`).join('; ')} (las esquinas de Darko: 1 de cada 3 ventas acaba en pelea).
 - **Encargos de Don Baltasar (capítulo 8):** ${c.PAGO_ENCARGO} €/g por ${[...new Set(c.ENCARGO)].map(g => dec(g / 1000)).join(', ').replace(/, ([^,]*)$/, ' o $1')} kg según el rango del imperio, entregados de noche en el almacén de los astilleros en ${c.ENCARGO_DIAS} días.
 - **Multas:** policía en la calle, 601 € (la mínima de la Ley de Seguridad Ciudadana); redada en el piso, hasta 3.000 € y se llevan las plantas y los cogollos de fuera de la caja fuerte.
@@ -276,7 +277,7 @@ ${legend}
   const P0 = D.paradas, hh = m => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
   m += `\n## Autobús de la comarca\n\nEn el poste de cada parada (\`A\`), de ${hh(D.busHoras[0])} a ${hh(D.busHoras[1])}. Cada parada está a un tramo de Ribera Verde; entre dos de fuera se suman los dos tramos. El reloj corre lo que dura el viaje. El primero (Mendialde → Ribera Verde, en el prólogo) lo paga ama.\n\n| Parada | Posición | Llegas a | Desde Ribera Verde |\n|---|---|---|---|\n`;
   for (const [k, p] of Object.entries(P0)) m += `| ${p.n} | ${k} (${p.x},${p.y}) | (${p.a[0]},${p.a[1]}) | ${k === 'town' ? '—' : `${p.min} min · ${p.eur} €`} |\n`;
-  m += `\n**Zonas** (\`ZONAS\`): factor de policía, de ladrones y de precio en cada mapa de fuera. ${Object.entries(D.zonas).map(([k, z]) => `${z.n}: policía ×${String(z.pol).replace('.', ',')}, ladrones ×${String(z.lad).replace('.', ',')}, precio ×${String(z.precio).replace('.', ',')}`).join(' · ')}. Dentro de las casas no hay encuentros.\n`;
+  m += `\n**Zonas** (\`ZONAS\` y \`PATRULLAS\`): factor de ladrones y de precio en cada mapa de fuera, y los agentes que patrullan de día y de noche (desde el capítulo 2). ${Object.entries(D.zonas).map(([k, z]) => `${z.n}: ladrones ×${String(z.lad).replace('.', ',')}, precio ×${String(z.precio).replace('.', ',')}, ${D.patrullas[k].join('/')} agentes`).join(' · ')}. Dentro de las casas no hay encuentros.\n`;
   m += `\n## Objetos\n\n| id | Posición | Tipo | Contenido |\n|---|---|---|---|\n`;
   for (const i of D.items) m += `| ${i.id} | ${i.map} (${i.x},${i.y}) | ${i.hidden ? 'oculto en arbusto (pulsa A delante)' : 'bolsa en el suelo'} | ${i.give || ''} |\n`;
   m += `\n## Carteles\n\n`;

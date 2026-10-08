@@ -57,6 +57,7 @@ Skunk #1 sana y abonada, fenotipo medio (cosecha de 2,5 días):
 
 - **Calle:** 6,4-10 €/g según el THC (× 0,85 estudiante, × 1 currela, × 1,15 turista, × 1,35 pijo; rebaja × 0,85, caro × 1,3). Cada cliente quiere 2-12 g.
 - **Al por mayor (Iñaki, en el muelle, desde el capítulo 3):** 3,2-5 €/g, lotes de 100 g para arriba, una carga al día de hasta 1 kg (más en el imperio). Cada carga sube el calor 2 + 1 por cada 100 g.
+- **Rosin (desde el capítulo 3, con la prensa de Kiko, 250 €):** en la mesa del piso, 20 % del peso de la flor con 3 veces su THC (hasta el 75 %), en media hora. Lo compran los catadores (bocadillo con una gota ámbar; 1-3 g; 2 al día en el barrio y 1 en los astilleros, en Puerto Viejo y en Valdehierro) a 31,6 €/g al 36 %, 42,4 €/g al 54 %, 55 €/g al 75 %: prensar compensa desde el 12,5 % de THC de la flor. Cada gramo vendido sube el calor 2,5 (la flor, 0,5).
 - **Zonas:** en los astilleros, el gramo × 1,2; en Puerto Viejo, el gramo × 1,15; en Valdehierro, el gramo × 0,9 (las esquinas de Darko: 1 de cada 3 ventas acaba en pelea).
 - **Encargos de Don Baltasar (capítulo 8):** 6 €/g por 2, 5 o 10 kg según el rango del imperio, entregados de noche en el almacén de los astilleros en 2 días.
 - **Multas:** policía en la calle, 601 € (la mínima de la Ley de Seguridad Ciudadana); redada en el piso, hasta 3.000 € y se llevan las plantas y los cogollos de fuera de la caja fuerte.

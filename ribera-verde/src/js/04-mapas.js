@@ -35,11 +35,11 @@ function building(m,id,x0,y0,w,h,doorX,warp,op){
     if((x-x0)%3===1&&x!==doorX){gr(m,x,y0+3,'win_'+id);}}
   if(doorX!=null)for(let x=doorX;x<=doorX+(op&&op.ancha?1:0);x++){gr(m,x,y0+h-1,'door_'+id);m.doors[x+','+(y0+h-1)]=Object.assign({},warp,{x:warp.x+x-doorX});}
 }
-// las tres zonas de fuera (1.10): policía y ladrones por paso (× pol y × lad), precio de la calle (× precio) y música de calle
-// y la comarca (1.10): dos ciudades pequeñas y dos pueblos, a los que se va en autobús (PARADAS)
-const ZONAS={town:{n:'Ribera Verde',pol:1,lad:1,precio:1},alto:{n:'Barrio alto',pol:1.5,lad:.5,precio:1},astilleros:{n:'Astilleros',pol:.5,lad:2,precio:1.2},
-  puerto:{n:'Puerto Viejo',pol:.8,lad:.6,precio:1.15},valdehierro:{n:'Valdehierro',pol:.6,lad:1.4,precio:.9},
-  mendialde:{n:'Mendialde',pol:.2,lad:.1,precio:1},errotabarri:{n:'Errotabarri',pol:.2,lad:.1,precio:1}};
+// las tres zonas de fuera (1.10): ladrones por paso (× lad), precio de la calle (× precio) y música de calle (la policía, por
+// patrullas: PATRULLAS, 10b-patrulla) y la comarca (1.10): dos ciudades pequeñas y dos pueblos, a los que se va en autobús (PARADAS)
+const ZONAS={town:{n:'Ribera Verde',lad:1,precio:1},alto:{n:'Barrio alto',lad:.5,precio:1},astilleros:{n:'Astilleros',lad:2,precio:1.2},
+  puerto:{n:'Puerto Viejo',lad:.6,precio:1.15},valdehierro:{n:'Valdehierro',lad:1.4,precio:.9},
+  mendialde:{n:'Mendialde',lad:.1,precio:1},errotabarri:{n:'Errotabarri',lad:.1,precio:1}};
 // paradas del autobús (1.10): el poste (x, y), dónde te deja el autobús (a: x, y, hacia dónde miras) y lo que hay hasta la estación
 // de Ribera Verde (min, €): todas las líneas pasan por ella, así que un viaje entre dos pueblos suma los dos tramos. De 7:00 a 21:00
 const PARADAS={town:{n:'Ribera Verde',x:8,y:12,a:[7,12,'down'],min:0,eur:0},

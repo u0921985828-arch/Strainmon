@@ -20,6 +20,7 @@ const SHOP=[
   {lbl:'Carpa 100×100',p:120,ch:2,carpa:'m100',ci:1,desc:'Segunda carpa para el piso: 4 plantas, focos de hasta 480 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L.',cond:()=>!S.carpas[1]},
   {lbl:'Carpa 150×100',p:140,ch:4,carpa:'g150',ci:1,desc:'Cambia tu carpa de 100 por una de 150: 6 plantas y focos de hasta 720 W. Tus plantas, foco y macetas se quedan.',cond:()=>S.carpas[1]&&S.carpas[1].t==='m100'},
   {lbl:'Carpa 120×120',p:150,ch:5,carpa:'m120',ci:2,desc:'Tercera carpa, junto a la cama: 6 plantas, focos de hasta 720 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. Antes necesitas la del fondo.',cond:()=>!!S.carpas[1]&&!S.carpas[2]},
+  {lbl:'Prensa de rosin',p:250,ch:3,item:'prensa',desc:'Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores.',cond:()=>!S.items.prensa},
 ];
 const SOBRES=[[1,1],[3,.95],[5,.9],[10,.85]],GRANEL=[50,.6];   // [semillas, precio por semilla relativo]
 const precioSobre=(it,[n,f])=>Math.round(it.p*n*f);
@@ -100,7 +101,7 @@ async function talkKiko(){
       'Empieza por las conocidas: saca dos de receta en la mesa y cosecha una planta de cada. Patxi, el de la plaza, se sabe unas cuantas.']);
     showObjective();await checkStory();return;
   }
-  if(!Object.keys(S.seeds).length&&!S.pots.some(Boolean)&&!totalBuds()&&!cajaG()&&S.money+cajaE()<15){   // lo de la caja también cuenta (1.10)
+  if(!Object.keys(S.seeds).length&&!S.pots.some(Boolean)&&!totalBuds()&&!totalRosin()&&!cajaG()&&S.money+cajaE()<15){   // lo de la caja también cuenta (1.10)
     await say('¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.',N);addSeeds('ria',2);await got('2 semillas de SKUNK #1');
   }
   const c=await ask('¿Qué necesitas?',['Comprar','Un consejo','Nada'],N);
@@ -174,7 +175,7 @@ async function ventaMayor(N){
   await say('Cargado. Esta noche sale en el barco.',N);heatWarn();await checkStory();
 }
 async function talkCop(){
-  if(totalBuds()>0&&!S.protect){await say('¿Y ese olor? Quieto ahí.','AGENTE');await battle('police');return;}
+  if(cargaSosp()>0&&!S.protect){await say('¿Y ese olor? Quieto ahí.','AGENTE');await battle('police');return;}
   await say(pick(['Circule.','Todo tranquilo por aquí. Que siga así.','De noche hay robos en el parque. Tenga cuidado.']),'AGENTE');
 }
 async function talkDarko(){
@@ -312,12 +313,12 @@ async function embargo(){
 async function raidEvent(){
   if(S.protect){S.heat=50;return talk('SMS · MOLINA',['Esta noche había orden de entrada en tu piso. La he parado.','Baja el ritmo.']);}
   sfx('bad');await say('REDADA. La policía entra en tu piso.');
-  const g=Math.floor(totalBuds());
-  S.pots=S.pots.map(()=>null);S.buds={};S.heat=30;
+  const g=Math.floor(totalBuds()),r=totalRosin();
+  S.pots=S.pots.map(()=>null);S.buds={};S.rosin={};S.heat=30;
   const hallada=!!S.caja&&Math.random()<CAJA_REDADA,cg=hallada?Math.floor(cajaG()):0,ce=hallada?Math.floor(S.caja.money/2):0;
   if(hallada){S.caja.buds={};S.caja.money-=ce;}
   const fine=MULTA_REDADA-pagarCasa(MULTA_REDADA);
-  await say(`Se llevan todas las plantas y ${g} g. Multa: ${eur(fine)}.`);
+  await say(`Se llevan todas las plantas y ${g} g${r?' y '+rosinTxt(r):''}. Multa: ${eur(fine)}.`);
   if(S.caja)await say(hallada?`Encuentran la caja de detrás del diploma: se llevan ${cg} g y ${eur(ce)}.`:'La caja de detrás del diploma ni la ven.');
   await say('Toca empezar de nuevo. Y vender menos una temporada.');
 }

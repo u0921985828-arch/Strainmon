@@ -145,5 +145,6 @@ const CTYPES={
   cur:{label:'CURRELA',mult:1,g:[3,8],greet:['Buenas. Salgo de doble turno.','Qué tal. Lo de siempre, sin líos.']},
   tur:{label:'TURISTA',mult:1.15,g:[4,9],greet:['Hello. ¿Tú vendes... marihuana? Pago bien.','Bonjour. Me han dicho que aquí se cultiva bien.']},
   pij:{label:'PIJO',mult:1.35,g:[5,12],greet:['Busco algo de calidad para una cena en Neguri.','Solo quiero lo mejor. El precio me da igual.']},
+  ext:{label:'CATADOR',mult:1,g:[1,3],greet:['¿Tienes rosin? Me han dicho que prensas tú mismo.','Busco extracción sin disolventes. Rosin, nada de BHO.']},   // solo rosin (1.10)
 };
 

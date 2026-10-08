@@ -232,6 +232,8 @@ func update(dt: float) -> void:
 		update_player(dt)
 		update_ents(dt)
 		if is_free():
+			update_patrullas(dt)
+		if is_free():
 			time_acc += dt
 			while time_acc >= D.MS_PER_MIN:
 				time_acc -= D.MS_PER_MIN
@@ -257,4 +259,7 @@ func update_hud() -> void:
 		return
 	var hh := "%02d" % int(floor(S.min / 60.0))
 	var mm := "%02d" % (int(floor(int(S.min) % 60 / 10.0)) * 10)
-	hud_pon("DÍA %s · %s:%s\n%s · %d g" % [n(S.day), hh, mm, Datos.eur(S.money), int(floor(total_buds()))], Datos.jsround(S.heat))
+	var r := total_rosin()
+	var ro := (" · " + Datos.coma(Datos.jsround(r * 10) / 10.0) + " g rosin") if r else ""
+	hud_pon("DÍA %s · %s:%s\n%s · %d g%s" % [n(S.day), hh, mm, Datos.eur(S.money), int(floor(total_buds())), ro], Datos.jsround(S.heat),
+		Datos.jsround(SOSP.v) if n_patrullas() else -1, SOSP.alarma != null)

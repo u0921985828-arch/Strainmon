@@ -179,6 +179,41 @@ func lot_item(l: Array) -> Dictionary:
 	var k: String = l[0]
 	return {"label": lot_nombre(k), "right": "%d g · %s%%" % [int(floor(l[1].g)), Datos.pct(l[1].thc)], "sw": strain(lot_sid(k)).c, "ic": ic_cog(lot_sid(k))}
 
+# rosin (1.10): lo que sale de prensar cogollos en la mesa (prensar, granja), por lotes como ellos y al décimo de gramo
+func total_rosin() -> float:
+	var t := 0.0
+	for k in S.rosin:
+		t += S.rosin[k].g
+	return t
+
+func add_rosin(k: String, g: float, thc: float) -> void:
+	if S.rosin.has(k):
+		var b: Dictionary = S.rosin[k]
+		b.thc = (b.thc * b.g + thc * g) / (b.g + g)
+		b.g = Datos.jsround((b.g + g) * 10) / 10.0
+	else:
+		S.rosin[k] = {"g": g, "thc": thc}
+
+func use_rosin(k: String, g: float) -> void:
+	var b: Dictionary = S.rosin[k]
+	b.g = Datos.jsround((b.g - g) * 10) / 10.0
+	if b.g < .1:
+		S.rosin.erase(k)
+
+func rosin_txt(r: float) -> String:
+	return Datos.coma(Datos.jsround(r * 10) / 10.0) + " g de rosin"
+
+func rosin_lots(mn: float) -> Array:
+	var o := []
+	for k in S.rosin:
+		if S.rosin[k].g >= mn:
+			o.append([k, S.rosin[k]])
+	return o
+
+func rosin_item(l: Array) -> Dictionary:
+	var k: String = l[0]
+	return {"label": "Rosin · " + lot_nombre(k), "right": "%s g · %s%%" % [Datos.coma(l[1].g), Datos.pct(l[1].thc)], "sw": "#d89a18", "ic": ic_cog(lot_sid(k))}
+
 # el prólogo (1.10): S.flags.llegada === false hasta que el autobús de ama deja al jugador en Ribera Verde (las partidas viejas
 # no la llevan: ya han llegado)
 func llegando() -> bool:
@@ -247,6 +282,9 @@ func npc_cond(d: Dictionary) -> bool:
 	return true
 
 func npc_talk(d: Dictionary) -> void:
+	if d.get("look") == "cop" and d.id.begins_with("pat"):   # las patrullas (1.10)
+		await say(pick(["«Circule.»", "«Buenas. Nada que ver aquí.»", "«¿Todo bien? Siga.»"]), "AGENTE")
+		return
 	match d.id:
 		"kiko":
 			await talk_kiko()
@@ -305,6 +343,10 @@ func build_ents() -> void:
 	for c in S.clients:
 		if c.get("map", "town") == S.map:
 			ents.append(old[c.id] if old.has(c.id) else mk_ent({"id": c.id, "x": c.x, "y": c.y, "wander": 2, "lookObj": c.look, "client": c}))
+	for e in old.values():   # las patrullas (más abajo)
+		if e.get("pat") and e.mapa == S.map:
+			ents.append(e)
+	pon_patrullas()
 
 func item_give(id: String) -> void:
 	match id:
@@ -381,6 +423,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	S.y = y
 	S.dir = P.dir
 	ents = []
+	reset_sosp()
 	build_ents()
 	music(map_music())
 
@@ -479,16 +522,12 @@ func on_step_end() -> void:
 		if S.ch >= 5 and not S.flags.get("molina1"):
 			queue("molina", talk_molina)
 			return
-	if S.ch >= 2 and S.cool <= 0:
+	# ladrones al azar por paso; la policía ya no (1.10): patrulla por la calle (más abajo). Con la alarma, nada
+	if S.ch >= 2 and S.cool <= 0 and SOSP.alarma == null:
 		var g := total_buds()
 		var tall: bool = m.g[P.y][P.x] == "tallgrass"
-		var pp: float = (.002 + S.heat * .00025) * (.4 if S.protect else 1.0) * Z.pol if g > 0 else 0.0
 		var pt: float = .004 * (2.5 if is_night() else 1.0) * (3.0 if tall else 1.0) * Z.lad if (g >= 5 or S.money >= 150) else 0.0
-		var r := Cultivo.azar()
-		if r < pp:
-			S.cool = 25
-			run(func(): await battle("police"))
-		elif r < pp + pt:
+		if Cultivo.azar() < pt:
 			S.cool = 25
 			run(func(): await battle("thief"))
 
@@ -496,6 +535,8 @@ func update_ents(dt: float) -> void:
 	var free := is_free()
 	var m: Dictionary = MAPS[S.map]
 	for e in ents:
+		if e.get("pat"):   # las patrullas andan en update_patrullas
+			continue
 		if e.moving:
 			e.t += dt
 			var k := minf(1, e.t / 320)
@@ -681,8 +722,13 @@ func precio_calle(thc: float) -> float:
 func precio_mayor(thc: float) -> float:
 	return 2 + thc * .1
 
+# rosin (1.10, 10-calle): el gramo, a 10 + 0,6 × THC €
+func precio_rosin(thc: float) -> float:
+	return 10 + thc * .6
+
 # clientes del día por zona (1.10): en el barrio, como siempre; en el barrio alto, pijos y turistas desde el capítulo 3; en los
-# astilleros (las esquinas de Darko), estudiantes y currelas
+# astilleros (las esquinas de Darko), estudiantes y currelas. Con la prensa (1.10), catadores de rosin en la ciudad, los
+# astilleros, Puerto Viejo y Valdehierro
 func spawn_clients() -> void:
 	S.clientsDay = S.day
 	S.clients = []
@@ -698,15 +744,22 @@ func spawn_clients() -> void:
 			zonas.append(["alto", 2 + (1 if S.ch >= 4 else 0), ["pij", "tur"]])
 		var mas := 1 if S.ch >= 4 else 0   # la comarca (1.10)
 		zonas.append_array([["puerto", 2 + mas, ["tur", "tur", "cur", "est"]], ["valdehierro", 2 + mas, ["est", "cur", "cur"]], ["mendialde", 1, ["cur"]], ["errotabarri", 1, ["cur", "tur"]]])
+		var usado := {}
+		if S.ch >= 3 and S.items.get("prensa"):
+			for zx in [["town", 2], ["astilleros", 1], ["puerto", 1], ["valdehierro", 1]]:
+				zonas.append([zx[0], zx[1], ["ext"], "x"])
 		for zz in zonas:
 			var map_: String = zz[0]
-			var used := {}
-			for d in D.NPCDEF:
-				if d.map == map_:
-					used["%d,%d" % [d.x, d.y]] = true
-			for it in D.ITEMS:
-				if it.map == map_:
-					used["%d,%d" % [it.x, it.y]] = true
+			if not usado.has(map_):
+				usado[map_] = {}
+				for d in D.NPCDEF:
+					if d.map == map_:
+						usado[map_]["%d,%d" % [d.x, d.y]] = true
+				for it in D.ITEMS:
+					if it.map == map_:
+						usado[map_]["%d,%d" % [it.x, it.y]] = true
+			var used: Dictionary = usado[map_]
+			var pre: String = zz[3] if zz.size() > 3 else ""
 			for i in int(zz[1]):
 				var t: Array = []
 				for k in 30:
@@ -716,7 +769,7 @@ func spawn_clients() -> void:
 				used["%d,%d" % [t[0], t[1]]] = true
 				var type: String = pick(zz[2])
 				var ct: Dictionary = D.CTYPES[type]
-				var id := "c%d_%s%d" % [S.day, {"town": "", "alto": "b", "astilleros": "s", "puerto": "p", "valdehierro": "v", "mendialde": "m", "errotabarri": "e"}[map_], i]
+				var id := "c%d_%s%s%d" % [S.day, pre, {"town": "", "alto": "b", "astilleros": "s", "puerto": "p", "valdehierro": "v", "mendialde": "m", "errotabarri": "e"}[map_], i]
 				var want := ri(int(ct.g[0]), int(ct.g[1]))
 				var mt := 0
 				if type == "pij":
@@ -731,16 +784,21 @@ func remove_client(id: String) -> void:
 	S.clients = S.clients.filter(func(c): return c.id != id)
 	ents = ents.filter(func(e): return e.id != id)
 
+# el catador (1.10) solo compra rosin: a precio_rosin, y el «caro» cuela según lo que pase del 50 % de THC
 func talk_client(c: Dictionary) -> void:
 	var ct: Dictionary = D.CTYPES[c.type]
 	var N: String = ct.label
+	var ext: bool = c.type == "ext"
 	await say(pick(ct.greet), N)
-	await say("Busco %s g%s." % [n(c.want), (" de algo potente, mínimo %s%% de THC" % n(c.minThc)) if c.minThc else ""], N)
-	var lots := bud_lots(c.want, c.minThc)
+	if ext:
+		await say("Busco %s g de rosin." % n(c.want), N)
+	else:
+		await say("Busco %s g%s." % [n(c.want), (" de algo potente, mínimo %s%% de THC" % n(c.minThc)) if c.minThc else ""], N)
+	var lots := rosin_lots(c.want) if ext else bud_lots(c.want, c.minThc)
 	if lots.is_empty():
-		await say("Eso no me vale. Vuelve cuando tengas lo que busco." if total_buds() > 0 else "¿No llevas nada? Vale.", N)
+		await say("Eso no me vale. Vuelve cuando tengas lo que busco." if (total_rosin() if ext else total_buds()) > 0 else "¿No llevas nada? Vale.", N)
 		return
-	var it := lots.map(lot_item)
+	var it := lots.map(rosin_item if ext else lot_item)
 	it.append({"label": "Nada"})
 	var i: int = await menu(it, {"cls": "right", "title": "¿Qué le vendes?"})
 	if i < 0 or i >= lots.size():
@@ -748,25 +806,29 @@ func talk_client(c: Dictionary) -> void:
 		return
 	var sid: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
-	var base: float = precio_calle(b.thc) * ct.mult * D.ZONAS[c.get("map", "town")].precio * c.want
+	var base: float = (precio_rosin(b.thc) if ext else precio_calle(b.thc)) * ct.mult * D.ZONAS[c.get("map", "town")].precio * c.want
 	var pr := [Datos.jsround(base * .85), Datos.jsround(base), Datos.jsround(base * 1.3)]
-	var j: int = await ask("%s g de %s. ¿Cuánto le pides?" % [n(c.want), lot_nombre(sid)], ["Rebaja · %d €" % pr[0], "Justo · %d €" % pr[1], "Caro · %d €" % pr[2], "Cancelar"])
+	var j: int = await ask("%s g de %s%s. ¿Cuánto le pides?" % [n(c.want), "rosin de " if ext else "", lot_nombre(sid)], ["Rebaja · %d €" % pr[0], "Justo · %d €" % pr[1], "Caro · %d €" % pr[2], "Cancelar"])
 	if j == 3:
 		await say("Entonces me voy.", N)
 		return
-	var mt: float = c.minThc if c.minThc else 14
+	var mt: float = 50.0 if ext else (c.minThc if c.minThc else 14)
 	var acc: float = [1.0, .92, clampf(.3 + (b.thc - mt) * .05 + (.25 if c.type == "pij" else 0.0) + (.15 if c.type == "tur" else 0.0), .1, .9)][j]
 	if Cultivo.azar() < acc:
-		use_buds(sid, c.want)
+		if ext:
+			use_rosin(sid, c.want)
+		else:
+			use_buds(sid, c.want)
 		S.money += pr[j]
 		S.sales += pr[j]
-		S.heat = minf(100, S.heat + 3 + c.want * .5)
+		S.heat = minf(100, S.heat + 3 + c.want * (2.5 if ext else .5))
 		S.rep += [3, 2, 1][j]
 		sfx("coin")
 		await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})
 		remove_client(c.id)
 		await say(pick(["Trato hecho.", "Gracias. Nos vemos.", "Bien. Se lo diré a mis amigos."]), N)
-		toast("+%s · %s g vendidos" % [Datos.eur(pr[j]), n(c.want)], 1600)
+		toast("+%s · %s g %svendidos" % [Datos.eur(pr[j]), n(c.want), "de rosin " if ext else ""], 1600)
+		visto_vender()
 		heat_warn()
 		await check_story()
 		# en las esquinas de Darko (1.10), 1 de cada 3 ventas acaba con uno de sus chicos encima
@@ -786,6 +848,323 @@ func heat_warn() -> void:
 		toast("<small>CUIDADO</small>Mucha presión policial. Si llega a 90 habrá registro.", 3200)
 	if S.heat < 60:
 		S.flags.heatW = false
+
+# ---------- patrullas (1.10, 10b-patrulla.js): los policías se ven por la calle ----------
+# PATRULLAS, PAT, CALLE, TAPA_VISTA y las casillas de ronda de cada mapa (RONDA) vienen del HTML (tools/godot.js)
+var SOSP := {"v": 0.0, "alarma": null, "sinVer": 0.0, "aviso": 0, "tregua": 0.0}
+var _re_calle: RegEx = null
+var _re_tapa: RegEx = null
+var _re_edif := RegEx.create_from_string("^(roof|wall|win|door)")
+
+static func _hash_t(x: int, y: int) -> int:
+	var a := (x * 1103 + y * 2459 + x * y * 31) % 9973
+	return (a * a + x * 7 + y * 3) % 9973
+
+func re_calle() -> RegEx:
+	if _re_calle == null:
+		_re_calle = RegEx.create_from_string(D.CALLE)
+		_re_tapa = RegEx.create_from_string(D.TAPA_VISTA)
+	return _re_calle
+
+func n_patrullas() -> int:
+	var p = D.PATRULLAS.get(S.map)
+	return int(p[1 if is_night() else 0]) if p != null and S.ch >= 2 else 0
+
+func carga_sosp() -> float:
+	return total_buds() + total_rosin()
+
+func sitio_patrulla(i: int) -> Array:
+	var l: Array = D.RONDA[S.map]
+	var h0 := _hash_t(S.day * 7 + i * 131, S.map.length() * 17 + i)
+	for k in l.size():
+		var t: Array = l[(h0 + k * 61) % l.size()]
+		if absi(t[0] - P.x) + absi(t[1] - P.y) >= 6 and ent_at(t[0], t[1]) == null:
+			return [int(t[0]), int(t[1])]
+	var t0: Array = l[h0 % l.size()]
+	return [int(t0[0]), int(t0[1])]
+
+func mk_patrulla(i: int) -> Dictionary:
+	var xy := sitio_patrulla(i)
+	var x: int = xy[0]
+	var y: int = xy[1]
+	var d := {"id": "pat%d" % i, "map": S.map, "x": x, "y": y, "look": "cop"}
+	return {"id": d.id, "x": x, "y": y, "px": x * 16.0, "py": y * 16.0, "hx": x, "hy": y, "dir": ["down", "left", "up", "right"][_hash_t(x, y) % 4], "look": D.LOOKS.cop,
+		"def": d, "wander": 0, "wt": 0, "moving": false, "t": 0.0, "fx": x, "fy": y, "act": null,
+		"pat": true, "mapa": S.map, "pasos": 6 + _hash_t(y, x) % 6, "espera": 0.0, "giro": 0, "caza": false, "dur": float(D.PAT.paso[0])}
+
+func pon_patrullas() -> void:
+	var nn := n_patrullas()
+	var hay := ents.filter(func(e): return e.get("pat")).size()
+	for i in range(hay, nn):
+		ents.append(mk_patrulla(i))
+	if hay > nn:
+		ents = ents.filter(func(e): return not e.get("pat") or int(e.id.substr(3)) < nn)
+
+# ¿ve el agente e la casilla (x, y)? En su cono (o, con lejos, a lejos casillas a la redonda) o pegada a él, con la línea limpia
+func ve_casilla(e: Dictionary, x: int, y: int, lejos: int) -> bool:
+	re_calle()
+	var dx: int = x - e.x
+	var dy: int = y - e.y
+	var ad := absi(dx) + absi(dy)
+	if ad == 0:
+		return true
+	var m: Dictionary = MAPS[S.map]
+	if ad > 1:
+		if lejos:
+			if ad > lejos:
+				return false
+		else:
+			var f: Array = DV[e.dir]
+			var fr: int = dx * f[0] + dy * f[1]
+			var la: int = absi(dx * f[1]) + absi(dy * f[0])
+			if fr <= 0 or la > fr or fr > int(D.PAT.vista[1 if is_night() else 0]):
+				return false
+	var nn := maxi(absi(dx), absi(dy))
+	for s in range(1, nn):
+		var cx: int = e.x + Datos.jsround(float(dx) * s / nn)
+		var cy: int = e.y + Datos.jsround(float(dy) * s / nn)
+		var o = m.o[cy][cx]
+		if _re_edif.search(m.g[cy][cx]) != null or (o and _re_tapa.search(o) != null):
+			return false
+	return true
+
+func te_pilla(e: Dictionary) -> bool:
+	return ve_casilla(e, P.x, P.y, int(D.PAT.vista[0]) * 2 if e.caza else 0)
+
+func _libre_ronda(e: Dictionary, m: Dictionary, d: String) -> bool:
+	var nx: int = e.x + DV[d][0]
+	var ny: int = e.y + DV[d][1]
+	var k := "%d,%d" % [nx, ny]
+	if nx < 0 or ny < 0 or nx >= m.w or ny >= m.h or re_calle().search(m.g[ny][nx]) == null:
+		return false
+	return not tile_solid(m, nx, ny) and ent_at(nx, ny) == null and not (nx == P.x and ny == P.y) and not (P.moving and nx == P.fx and ny == P.fy) \
+		and not m.doors.has(k) and not m.exits.has(k) and not llegada_bus(nx, ny)
+
+# un paso de ronda: recto si puede (3 de cada 4), si no, a un lado; media vuelta solo en un callejón
+func paso_ronda(e: Dictionary, m: Dictionary) -> void:
+	if re_calle().search(m.g[e.y][e.x]) == null:
+		paso_vuelta(e, m)
+		return
+	var ops := ["up", "down", "left", "right"].filter(func(d): return d != OPP[e.dir] and _libre_ronda(e, m, d))
+	var otras := ops.filter(func(d): return d != e.dir)
+	var d = null
+	if ops.has(e.dir) and Cultivo.azar() < .75:
+		d = e.dir
+	elif otras.size():
+		d = pick(otras)
+	elif ops.size():
+		d = ops[0]
+	elif _libre_ronda(e, m, OPP[e.dir]):
+		d = OPP[e.dir]
+	if d == null:
+		return
+	e.dir = d
+	e.fx = e.x
+	e.fy = e.y
+	e.x += DV[d][0]
+	e.y += DV[d][1]
+	e.t = 0.0
+	e.moving = true
+	e.dur = float(D.PAT.paso[1 if is_night() else 0])
+
+# fuera de la calle (tras una caza, por la hierba o el parque): un paso por el camino más corto a la calle más cercana
+func paso_vuelta(e: Dictionary, m: Dictionary) -> void:
+	var k0 := "%d,%d" % [e.x, e.y]
+	var prev := {k0: null}
+	var q := [[e.x, e.y]]
+	var fin = null
+	var qi := 0
+	while qi < q.size() and fin == null:
+		var c: Array = q[qi]
+		qi += 1
+		for d in ["up", "down", "left", "right"]:
+			var nx: int = c[0] + DV[d][0]
+			var ny: int = c[1] + DV[d][1]
+			var k := "%d,%d" % [nx, ny]
+			if prev.has(k) or tile_solid(m, nx, ny) or m.doors.has(k) or m.exits.has(k) or (nx == P.x and ny == P.y) or (P.moving and nx == P.fx and ny == P.fy) \
+					or ents.any(func(o): return not is_same(o, e) and o.x == nx and o.y == ny):
+				continue
+			prev[k] = [c[0], c[1], d]
+			if re_calle().search(m.g[ny][nx]) != null:
+				fin = k
+				break
+			q.append([nx, ny])
+	if fin == null:
+		return
+	var k: String = fin
+	var p: Array = prev[k]
+	while "%d,%d" % [p[0], p[1]] != k0:
+		k = "%d,%d" % [p[0], p[1]]
+		p = prev[k]
+	var xy := k.split(",")
+	e.dir = p[2]
+	e.fx = e.x
+	e.fy = e.y
+	e.x = int(xy[0])
+	e.y = int(xy[1])
+	e.t = 0.0
+	e.moving = true
+	e.dur = float(D.PAT.paso[1 if is_night() else 0])
+
+# un paso de caza: el primero del camino más corto hasta el jugador (por lo que no es sólido, sin puertas ni salidas ni gente)
+func paso_caza(e: Dictionary, m: Dictionary) -> void:
+	var k0 := "%d,%d" % [e.x, e.y]
+	var prev := {k0: null}
+	var q := [[e.x, e.y]]
+	var fin = null
+	var qi := 0
+	while qi < q.size() and fin == null:
+		var c: Array = q[qi]
+		qi += 1
+		for d in ["up", "down", "left", "right"]:
+			var nx: int = c[0] + DV[d][0]
+			var ny: int = c[1] + DV[d][1]
+			var k := "%d,%d" % [nx, ny]
+			if prev.has(k):
+				continue
+			if nx == P.x and ny == P.y:
+				prev[k] = [c[0], c[1], d]
+				fin = k
+				break
+			if tile_solid(m, nx, ny) or m.doors.has(k) or m.exits.has(k) or ents.any(func(o): return not is_same(o, e) and o.x == nx and o.y == ny):
+				continue
+			prev[k] = [c[0], c[1], d]
+			q.append([nx, ny])
+	if fin == null:
+		return
+	var k: String = fin
+	var p: Array = prev[k]
+	while "%d,%d" % [p[0], p[1]] != k0:
+		k = "%d,%d" % [p[0], p[1]]
+		p = prev[k]
+	e.dir = p[2]
+	var xy := k.split(",")
+	var nx := int(xy[0])
+	var ny := int(xy[1])
+	if nx == P.x and ny == P.y:
+		return
+	e.fx = e.x
+	e.fy = e.y
+	e.x = nx
+	e.y = ny
+	e.t = 0.0
+	e.moving = true
+	e.dur = float(D.PAT.corre[1 if is_night() else 0])
+
+# en el mundo y libre (update): mueve a los agentes, sube o baja la sospecha y lleva la alarma
+func update_patrullas(dt: float) -> void:
+	if not D.ZONAS.has(S.map):
+		return
+	if ents.filter(func(e): return e.get("pat")).size() != n_patrullas():
+		pon_patrullas()
+	var pats := ents.filter(func(e): return e.get("pat"))
+	var m: Dictionary = MAPS[S.map]
+	if pats.is_empty():
+		SOSP.v = 0.0
+		return
+	for e in pats:
+		if e.moving:
+			e.t += dt
+			var k := minf(1, e.t / e.dur)
+			e.px = (e.fx + (e.x - e.fx) * k) * 16
+			e.py = (e.fy + (e.y - e.fy) * k) * 16
+			if k >= 1:
+				e.moving = false
+				e.fx = e.x
+				e.fy = e.y
+			continue
+		if e.caza:
+			if e.espera > 0:   # el «¡alto!» (PAT.alto ms quieto)
+				e.espera -= dt
+				continue
+			if absi(e.x - P.x) + absi(e.y - P.y) == 1 and not P.moving:
+				pillado(e)
+				return
+			paso_caza(e, m)
+			continue
+		if e.espera > 0:
+			e.espera -= dt
+			if e.espera <= 600 and not e.giro:
+				e.giro = 1
+				e.dir = pick(["up", "down", "left", "right"])
+			continue
+		e.pasos -= 1
+		if e.pasos <= 0:
+			e.pasos = 6 + int(floor(Cultivo.azar() * 6))
+			e.espera = 900 + Cultivo.azar() * 900
+			e.giro = 0
+			continue
+		paso_ronda(e, m)
+	var ve = null
+	for e in pats:
+		if te_pilla(e):
+			ve = e
+			break
+	var seg := dt / 1000.0
+	if SOSP.alarma != null:
+		var e = null
+		for p in pats:
+			if p.id == SOSP.alarma:
+				e = p
+		if e == null:   # al cambiar el turno se va el que te seguía
+			SOSP.alarma = null
+			SOSP.v = 50.0
+			toast("Lo has despistado.", 1600)
+			return
+		if ve:
+			SOSP.sinVer = 0.0
+		else:
+			SOSP.sinVer += dt
+		if SOSP.sinVer >= D.PAT.olvida and absi(e.x - P.x) + absi(e.y - P.y) > D.PAT.pierde:
+			e.caza = false
+			e.espera = 1200.0
+			SOSP.alarma = null
+			SOSP.v = 50.0
+			toast("Lo has despistado.", 1600)
+		return
+	if SOSP.tregua > 0:
+		SOSP.tregua -= dt
+	var g := 0.0 if SOSP.tregua > 0 else carga_sosp()
+	if ve and g > 0:
+		SOSP.v = minf(100, SOSP.v + (8 + minf(g, 100) * .12) * float(D.PAT.sube[1 if is_night() else 0]) * (1 + S.heat / 100.0) * (.4 if S.protect else 1.0) * seg)
+		if not SOSP.aviso and (not is_night() or SOSP.v >= 40):
+			SOSP.aviso = 1
+			toast("Oyes pasos detrás de ti." if is_night() else "Un agente te está mirando.", 1800)
+	else:
+		SOSP.v = maxf(0, SOSP.v - D.PAT.baja * seg)
+	if SOSP.v >= 100:
+		alarma(ve if ve else pats[0])
+
+func alarma(e: Dictionary) -> void:
+	SOSP.alarma = e.id
+	SOSP.sinVer = 0.0
+	e.caza = true
+	e.espera = float(D.PAT.alto)
+	sfx("enc")
+	toast("<small>¡ALTO, POLICÍA!</small>Corre (B): métete en un portal o aléjate.", 2200)
+
+# vender cerca de un agente (talk_client), aunque no mire: la sospecha sube de golpe
+func visto_vender() -> void:
+	if SOSP.alarma != null:
+		return
+	for e in ents:
+		if e.get("pat") and ve_casilla(e, P.x, P.y, int(D.PAT.vista[0])):
+			SOSP.v = minf(100, SOSP.v + D.PAT.vende)
+			SOSP.aviso = 1
+			toast("Un agente te ha visto vender.", 1600)
+			return
+
+# te alcanza: el control de siempre (battle); después, una tregua
+func pillado(e: Dictionary) -> void:
+	e.caza = false
+	e.espera = 1500.0
+	e.dir = OPP[P.dir]
+	SOSP = {"v": 0.0, "alarma": null, "sinVer": 0.0, "aviso": 1, "tregua": float(D.PAT.tregua)}
+	run(func(): await battle("police"))
+
+# al cambiar de mapa (enter_map): la sospecha y la alarma se quedan en la calle
+func reset_sosp() -> void:
+	SOSP = {"v": 0.0, "alarma": null, "sinVer": 0.0, "aviso": 0, "tregua": 0.0}
 
 # ---------- virtuales: las definen granja, trama y juego ----------
 func check_story():

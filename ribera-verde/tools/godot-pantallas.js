@@ -22,7 +22,8 @@ const PAN = arg('--pantallas'), SAL = arg('--salida', path.join(__dirname, 'sali
 const pl = (sid, prog, o = {}) => Object.assign({ sid, prog, water: 70, health: 100, fert: false, pest: false, f: { id: 1, t: 1, y: 1, i: null } }, o);
 const T = 123456;   // el instante de las escenas (ms)
 // cada escena: k, sw, mode, now, seed (azar de los clientes), S (encima de newState()), carpas/macetas/pots, map + P (enterMap y
-// luego lo demás de P), clientes (spawnClients), ents ({id: campos}), vfx ([id, x, y, hace ms, capa, sube]), B, VC
+// luego lo demás de P), clientes (spawnClients), ents ({id: campos}), SOSP (encima de la de enterMap), vfx ([id, x, y, hace ms, capa,
+// sube]), B, VC
 const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
   // el piso: carpa 100 del atlas con plantas (luz bajo la puerta), carpa 120 procedural vacía, sitio libre de 2 casillas y la carta
   { k: 'casa-a', sw: 240, mode: 'world', now: T, S: { ch: 2, flags: {} }, carpas: [{ t: 'm100', foco: 'sodio400' }, { t: 'm120', foco: 'cfl' }],
@@ -66,6 +67,15 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
   { k: 'valdehierro', sw: 240, mode: 'world', now: T + 999, S: { ch: 4, min: 12 * 60, flags: {} }, map: 'valdehierro', P: { x: 15, y: 11, dir: 'down' } },
   { k: 'puerto-tarde', sw: 400, mode: 'world', now: T + 3333, seed: 55, S: { ch: 4, min: 19 * 60, day: 8, flags: {} }, clientes: true, map: 'puerto',
     P: { x: 20, y: 10, dir: 'up' } },
+  // las patrullas (1.10): de día, el cono amarillo del agente que mira a la izquierda y el catador de rosin con su gota; de noche,
+  // sin cono (sigilo) y con la alarma: el agente corre a por el jugador con su «!»
+  { k: 'patrulla-dia', sw: 320, mode: 'world', now: T, seed: 4242, S: { ch: 6, min: 12 * 60, day: 3, rep: 30, flags: { darko1: true },
+    items: { fert: 0, insect: 0, spray: 0, bocata: 1, prensa: 1 } }, clientes: true, map: 'town', P: { x: 21, y: 19, dir: 'right' },
+    ents: { pat0: { x: 24, y: 21, fx: 24, fy: 21, px: 24 * 16, py: 21 * 16, dir: 'left' } } },
+  { k: 'patrulla-noche', sw: 240, mode: 'world', now: T + 544, seed: 4242, S: { ch: 6, min: 23 * 60, day: 3, rep: 30, flags: { darko1: true } }, map: 'town',
+    P: { x: 19, y: 21, dir: 'left', moving: true, fx: 20, fy: 21, t: 60, dur: 240, parity: 1, px: (20 - 60 / 240) * 16, py: 21 * 16 },
+    ents: { pat0: { x: 22, y: 21, fx: 23, fy: 21, px: (23 - 105 / 210) * 16, py: 21 * 16, dir: 'left', moving: true, t: 105, caza: true, dur: 210 } },
+    SOSP: { v: 100, alarma: 'pat0' } },
   // la vista B: carpa de 150 con extras (goteo, filtro y ventilador), macetas de todo tipo, fases, plaga, seca y muerta; elegida
   // una plaza de atrás (la fila de delante en transparencia)
   { k: 'carpa-b-g150', sw: 240, mode: 'carpa', now: T + 1234, S: { ch: 5, flags: {} }, map: 'home', P: { x: 5, y: 4, dir: 'up' },
@@ -134,12 +144,14 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
           Object.assign(x, c);
         }
       }
+      if (e.SOSP) Object.assign(SOSP, e.SOSP);   // la sospecha y la alarma de las patrullas (10b-patrulla)
       for (const [id, x, y, hace, capa, sube] of e.vfx || []) lanzarVfx(id, x, y, e.now - hace, capa, sube);
       if (e.B) { B = copia(e.B);B.look = /^th/.test(e.B.look) ? randLook(e.B.look, 'thief') : LOOKS[e.B.look]; }
       if (e.VC) VC = Object.assign({ ocupado: false }, e.VC);
       mode = e.mode;
       const st = copia({ k: e.k, sw: SW, mode, now: e.now, S, P, B, VC, vfx: ARTE.vfx,
-        ents: ents.map(x => ({ id: x.id, x: x.x, y: x.y, px: x.px, py: x.py, dir: x.dir, moving: x.moving, t: x.t, fx: x.fx, fy: x.fy, act: x.act || null })) });
+        ents: ents.map(x => Object.assign({ id: x.id, x: x.x, y: x.y, px: x.px, py: x.py, dir: x.dir, moving: x.moving, t: x.t, fx: x.fx, fy: x.fy, act: x.act || null },
+          x.pat ? { caza: x.caza, dur: x.dur } : {})), SOSP });
       render(e.now);
       o.png[e.k] = cv.toDataURL('image/png');
       o.escenas.push(st);

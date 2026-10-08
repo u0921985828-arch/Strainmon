@@ -3,15 +3,15 @@
 Este documento revisa:
 
 - la historia y sus misiones;
-- lo que puede pasarte por la calle (ladrones, controles de policía, sobornos, calor y redadas) en las siete zonas: el barrio, el barrio alto y los astilleros de Ribera Verde, las ciudades pequeñas de Puerto Viejo y Valdehierro y los pueblos de Mendialde y Errotabarri;
+- lo que puede pasarte por la calle (ladrones, patrullas de policía con su sospecha y su persecución, controles, sobornos, calor y redadas) en las siete zonas: el barrio, el barrio alto y los astilleros de Ribera Verde, las ciudades pequeñas de Puerto Viejo y Valdehierro y los pueblos de Mendialde y Errotabarri;
 - la **caja fuerte** del piso.
 
 La primera versión de este análisis encontró 10 problemas (el resumen de abajo). La 1.10 los resuelve todos, y el documento ya describe el juego tal como queda.
 
-Las cifras salen del código de la 1.10. `node tools/analisis-riesgos.js` escribe las tablas generadas con un modelo exacto, que aplica las mismas reglas que el código. Después, el mismo script juega cada caso con las funciones de verdad del juego (`onStepEnd`, `battle` y `thiefRound`, `copRound`, `newDay` y `raidEvent`, `talkClient`, `talkInaki`, `ventaMayor`, `harvest`, `addBuds` y `talkJurado`), también con la caja llena (`S.caja`). Si alguna cifra no cuadra, para con un error y no escribe nada.
+Las cifras salen del código de la 1.10. `node tools/analisis-riesgos.js` escribe las tablas generadas con un modelo exacto, que aplica las mismas reglas que el código. Después, el mismo script juega cada caso con las funciones de verdad del juego (`onStepEnd`, `updatePatrullas` y `updatePlayer`, `battle` y `thiefRound`, `copRound`, `newDay` y `raidEvent`, `talkClient`, `talkInaki`, `ventaMayor`, `harvest`, `addBuds` y `talkJurado`), también con la caja llena (`S.caja`). Si alguna cifra no cuadra, para con un error y no escribe nada.
 
 <!-- auto:meta -->
-Generado con `npm run analisis`: 721 cifras comprobadas con el juego (20.000 combates, controles, ventas o trayectos simulados por celda, 100.000 pasos por situación y 5.000 carpas por fila de la Copa). Gramos a 7,60 €/g (precio de calle de una variedad del 18 %), salvo donde se dice.
+Generado con `npm run analisis`: 717 cifras comprobadas con el juego (20.000 combates, controles, ventas o trayectos simulados por celda, 100.000 pasos por situación, 5.000 carpas por fila de la Copa y las patrullas fotograma a fotograma). Gramos a 7,60 €/g (precio de calle de una variedad del 18 %), salvo donde se dice.
 <!-- /auto:meta -->
 
 ## Resumen
@@ -90,7 +90,7 @@ Si un plazo vence (capítulos 3, 5 y 7), Toño se presenta al cambiar de día:
 El calor baja 12 al día (20 con la protección de Molina), y cada carpa con plantas en flor y sin filtro suma 2. Cuánto puedes vender cada día sin que el calor suba depende del calor que da cada venta:
 
 <!-- auto:eficiencia -->
-| Venta (THC 18 %, salvo el pijo) | Cobras | €/g | Calor | € por punto de calor |
+| Venta (THC 18 %, salvo el pijo y el rosin) | Cobras | €/g | Calor | € por punto de calor |
 |---|---|---|---|---|
 | Calle · currela, 8 g a precio justo (acepta el 92 %) | 61 € | 7,63 | +7 | 9 € |
 | Calle · pijo del cap. 6 (pide 21 % de THC), 12 g de THC 24 a precio caro (acepta el 70 %) | 185 € | 15,42 | +9 | 21 € |
@@ -99,12 +99,14 @@ El calor baja 12 al día (20 con la protección de Molina), y cada carpa con pla
 | Al por mayor · 1 kg (una carga al día, hasta 1 kg antes del imperio) | 3.800 € | 3,80 | +12 | 317 € |
 | Al por mayor · 10 kg (Mayorista del norte; el calor no pasa de 100) | 38.000 € | 3,80 | +100 | 380 € |
 | Encargo de Don Baltasar · 2 kg (cap. 8, Proveedor del barrio) | 12.000 € | 6,00 | +3 | 4.000 € |
+| Catador · 2 g de rosin al 54 % a precio justo (cap. 3, con la prensa) (acepta el 92 %) | 85 € | 42,50 | +8 | 11 € |
 <!-- /auto:eficiencia -->
 
 Por gramo, la calle paga el doble que el por mayor. Pero cada venta en la calle suma 3 de calor más medio punto por gramo, mientras que una carga al por mayor suma 2 más 1 por cada 100 g. Una carga de 1 kg da tanto dinero como unas 60 ventas en la calle y sube el calor lo que menos de dos.
 
 - **Astilleros:** el gramo se paga un 20 % más, pero 1 de cada 3 ventas acaba en pelea con un chico de Darko.
-- **Barrio alto:** clientes con más dinero (pijos y turistas) desde el capítulo 3, pero con un 50 % más de policía.
+- **Barrio alto:** clientes con más dinero (pijos y turistas) desde el capítulo 3, pero con 2 agentes de patrulla también de día (en el barrio, 1 de día y 2 de noche).
+- **Rosin (capítulo 3, con la prensa de Kiko):** el gramo vale 10 + 0,6 × THC (42,40 € al 54 %) y sube el calor 2,5 (la flor, 0,5): por punto de calor rinde como la calle. Prensar compensa desde el 12,5 % de THC de la flor (1 g de rosin sale de 5 g y vale más que ellos). Lo compran los catadores (bocadillo con una gota ámbar): 2 al día en el barrio y 1 en los astilleros, en Puerto Viejo y en Valdehierro.
 - **Encargos de Baltasar:** lo que más rinde por punto de calor, pero solo uno a la vez, de noche y con 2 a 10 kg encima por los astilleros.
 
 Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo a Iñaki. La calle compensa por la reputación: cada venta da de +1 a +3. La reputación ayuda a salir hablando de un control y trae más clientes.
@@ -113,25 +115,31 @@ Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo a Iñaki
 
 ### 2.1 Las reglas (08-mundo, 13-combate, 09-cultivo)
 
-- **Zonas.** Hay siete, cada una con su factor de policía, de ladrones y de precio (`ZONAS`). A las cuatro de la comarca se va en autobús (`PARADAS`, de 7:00 a 21:00; entre dos paradas de fuera se suman los dos tramos):
+- **Zonas.** Hay siete, cada una con su factor de ladrones y de precio (`ZONAS`) y sus agentes de patrulla (`PATRULLAS`, desde el capítulo 2). A las cuatro de la comarca se va en autobús (`PARADAS`, de 7:00 a 21:00; entre dos paradas de fuera se suman los dos tramos):
 
-  | Zona | Cómo se llega | Policía | Ladrones | Precio del gramo |
+  | Zona | Cómo se llega | Agentes (de día / de noche) | Ladrones | Precio del gramo |
   |---|---|---|---|---|
-  | Ribera Verde (el barrio) | — | ×1 | ×1 | ×1 |
-  | Barrio alto | Por el camino del norte de la calle (11-12, 0) | ×1,5 | ×0,5 | ×1 |
-  | Astilleros | Por el muelle, al este (39, 20-21) | ×0,5 | ×2 | ×1,2 |
-  | Puerto Viejo | Autobús desde la parada de la acera, enfrente del piso (8, 12): 25 min, 2 € | ×0,8 | ×0,6 | ×1,15 |
-  | Valdehierro | Autobús: 20 min, 2 € | ×0,6 | ×1,4 | ×0,9 |
-  | Mendialde (el pueblo del prólogo) | Autobús: 40 min, 3 € | ×0,2 | ×0,1 | ×1 |
-  | Errotabarri | Autobús: 30 min, 3 € | ×0,2 | ×0,1 | ×1 |
+  | Ribera Verde (el barrio) | — | 1 / 2 | ×1 | ×1 |
+  | Barrio alto | Por el camino del norte de la calle (11-12, 0) | 2 / 2 | ×0,5 | ×1 |
+  | Astilleros | Por el muelle, al este (39, 20-21) | 1 / 1 | ×2 | ×1,2 |
+  | Puerto Viejo | Autobús desde la parada de la acera, enfrente del piso (8, 12): 25 min, 2 € | 1 / 1 | ×0,6 | ×1,15 |
+  | Valdehierro | Autobús: 20 min, 2 € | 1 / 1 | ×1,4 | ×0,9 |
+  | Mendialde (el pueblo del prólogo) | Autobús: 40 min, 3 € | 0 / 0 | ×0,1 | ×1 |
+  | Errotabarri | Autobús: 30 min, 3 € | 0 / 0 | ×0,1 | ×1 |
 
 - **Encuentros.**
   - En las siete zonas, desde el capítulo 2. No hay encuentros dentro de las casas.
   - Después de un encuentro vienen 24 pasos tranquilos (`S.cool` se pone a 25 y baja antes de mirar). Los pasos dentro de casa, del growshop o del bar también descuentan.
-  - Cada paso tira un único número al azar: si sale por debajo de *pp*, hay control; si cae entre *pp* y *pp* + *pt*, hay ladrón.
-  - Control: *pp* = (0,002 + 0,00025 × calor) × (0,4 con protección) × policía de la zona. Si no llevas ni un gramo encima, es 0.
-  - Ladrón: *pt* = 0,004 × (2,5 de noche, de 21:00 a 6:00) × (3 en hierba alta) × ladrones de la zona. Solo si llevas encima 5 g o más, o 150 € o más.
+  - Cada paso tira un número al azar: si sale por debajo de *pt*, hay ladrón. *pt* = 0,004 × (2,5 de noche, de 21:00 a 6:00) × (3 en hierba alta) × ladrones de la zona. Solo si llevas encima 5 g o más, o 150 € o más. El calor no cuenta.
+  - Desde la 1.10, la policía ya no sale al azar por paso: patrulla por la calle y se ve (abajo). Mientras un agente te persigue, no hay ladrones.
   - Lo que está en la caja fuerte no cuenta.
+- **Patrullas** (`10b-patrulla`; § 2.5). Los agentes salen al entrar en el mapa, a 6 casillas o más de ti, y andan solo por la calle (acera, calzada, plaza, pista, muelle, puentes), nunca por puertas, salidas ni la llegada del autobús.
+  - Ronda: un paso cada 420 ms de día y 360 de noche; siguen recto 3 de cada 4 veces y cada 5-10 pasos se paran a mirar 0,9-1,8 s (a falta de 0,6 s, giran). Si una caza los deja fuera de la calle (hierba, parque), vuelven a ella por el camino más corto.
+  - Ven 5 casillas hacia delante en cono (de lado, como mucho lo que tienen delante) y la casilla de al lado, si nada alto tapa: edificios, árboles, monte, setos y cajas. De día se ve por dónde miran (el cono amarillo); de noche, no.
+  - Sospecha (0-100, la barra del HUD): mientras un agente te ve con algo encima (gramos de flor o de rosin, fuera de la caja), sube por segundo (8 + 0,12 × gramos, hasta 100 g) × (2,5 de noche) × (1 + calor/100) × (0,4 con la protección de Molina). Sin verte, baja 10 por segundo. Vender a 5 casillas o menos de un agente (aunque no mire, de día o de noche): +60 de golpe. Aviso: de día, «Un agente te está mirando» en cuanto sube; de noche, «Oyes pasos detrás de ti» solo desde 40.
+  - Llena: alarma («¡ALTO, POLICÍA!»). El agente se queda 0,6 s quieto (el «¡alto!», para que dé tiempo a reaccionar) y luego corre hacia ti por el camino más corto, 210 ms por casilla de día y 180 de noche (más un fotograma entre paso y paso). Si se pone a tu lado cuando estás parado, te pilla: control (abajo). Corriendo (B) le sacas distancia; andando, no.
+  - Te pierde si cruzas una puerta, una salida del mapa o subes al autobús (la sospecha vuelve a 0), o si pasas 4 s sin que te vea (con la alarma ve 10 casillas a la redonda) y estás a más de 10 casillas (la sospecha se queda en 50).
+  - Después de un control, 30 s sin sospecha.
 - **Ladrón.** Tiene 12 + 2 × capítulo + (de 0 a 4) de vida. Pega entre 2 + cap/4 y 4 + cap/2 (divisiones enteras). Desde el capítulo 5, 4 de vida más y 1 más de golpe.
   - Puñetazo: acierta un 92 % y quita 4-7.
   - Patada: acierta un 65 % y quita 8-12.
@@ -142,7 +150,7 @@ Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo a Iñaki
   - Tu vida máxima empieza en 30 y sube 2 con cada ladrón que vences, hasta 60.
   - Si ganas: 20-40 € + 10 × capítulo y +2 de reputación.
   - Si caes KO: se lleva la mitad de cada lote y el 30 % del dinero que llevas encima, y despiertas en casa 6 horas después.
-- **Control.**
+- **Control** (cuando te pilla una patrulla o le hablas con algo encima al agente de la plaza).
   - Sobornar cuesta 40 + 4 × calor + 0,5 × gramos + 5 % del dinero que llevas encima. Si no te llega lo que llevas, el agente no lo acepta y vuelves a elegir.
     - Sale bien: −10 de calor.
     - Agente honrado (15 %, desde el capítulo 3 y sin protección): requisa, multa y +20 de calor. Con el −15 de la requisa, son +5 en total.
@@ -151,55 +159,53 @@ Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo a Iñaki
   - Entregar: te quitan los gramos, sin multa, y el calor baja 15.
   - Una requisa se lleva **todos** los gramos que llevas encima y baja el calor 15. La multa es de 601 € (o lo que lleves, si es menos).
 - **Calor y redada.** Al cambiar de día (00:00), duermas o no, el juego mira el calor *antes* de bajarlo:
-  - con 90 o más, hay redada: se llevan todas las plantas y todos los gramos de fuera de la caja, hay una multa de hasta 3.000 € y el calor queda en 30. La caja la encuentran 1 de cada 4 veces (§ 2.6);
+  - con 90 o más, hay redada: se llevan todas las plantas y todos los gramos de fuera de la caja, hay una multa de hasta 3.000 € y el calor queda en 30. La caja la encuentran 1 de cada 4 veces (§ 2.7);
   - con la protección de Molina, la redada se para y el calor queda en 50.
 
 ### 2.2 Por paso
 
 <!-- auto:paso -->
-| Situación | Control por paso | Ladrón por paso | Pasos de media hasta un encuentro | Juego (simulado) |
-|---|---|---|---|---|
-| Sin nada (0 g, < 150 €) | 0,00 % | 0,00 % | — | 0,00 % · 0,00 % |
-| Solo dinero (0 g, ≥ 150 €), de día | 0,00 % | 0,40 % | 250 | 0,00 % · 0,40 % |
-| Con gramos, calor 0, de día | 0,20 % | 0,40 % | 167 | 0,20 % · 0,42 % |
-| Con gramos, calor 50, de día | 1,45 % | 0,40 % | 54 | 1,45 % · 0,41 % |
-| Con gramos, calor 89, de día | 2,43 % | 0,40 % | 35 | 2,44 % · 0,39 % |
-| Con gramos, calor 89, con protección | 0,97 % | 0,40 % | 73 | 0,98 % · 0,37 % |
-| Con gramos, calor 50, de noche | 1,45 % | 1,00 % | 41 | 1,45 % · 1,02 % |
-| Con gramos, calor 50, de noche en hierba alta | 1,45 % | 3,00 % | 22 | 1,45 % · 3,00 % |
+| Situación | Ladrón por paso | Pasos de media hasta un ladrón | Juego (simulado) |
+|---|---|---|---|
+| Sin nada (0 g, < 150 €) | 0,00 % | — | 0,00 % |
+| Solo dinero (0 g, ≥ 150 €), de día | 0,40 % | 250 | 0,40 % |
+| Con gramos, de día | 0,40 % | 250 | 0,40 % |
+| Con gramos, calor 89 y la protección de Molina, de día (el calor ya no cuenta) | 0,40 % | 250 | 0,40 % |
+| Con gramos, de noche | 1,00 % | 100 | 1,00 % |
+| Con gramos, de noche en hierba alta | 3,00 % | 33 | 2,99 % |
 <!-- /auto:paso -->
 
 Las mismas situaciones en las siete zonas:
 
 <!-- auto:zonas -->
-| Situación (cap. 5) | Ribera Verde (el barrio): control / ladrón | Barrio alto: control / ladrón | Astilleros: control / ladrón | Puerto Viejo: control / ladrón | Valdehierro: control / ladrón | Mendialde: control / ladrón | Errotabarri: control / ladrón |
+| Cap. 5 | Ribera Verde (el barrio) | Barrio alto | Astilleros | Puerto Viejo | Valdehierro | Mendialde | Errotabarri |
 |---|---|---|---|---|---|---|---|
-| Con gramos, calor 50, de día | 1,45 % / 0,40 % | 2,18 % / 0,20 % | 0,73 % / 0,80 % | 1,16 % / 0,24 % | 0,87 % / 0,56 % | 0,29 % / < 0,1 % | 0,29 % / < 0,1 % |
-| Con gramos, calor 50, de noche | 1,45 % / 1,00 % | 2,18 % / 0,50 % | 0,73 % / 2,00 % | 1,16 % / 0,60 % | 0,87 % / 1,40 % | 0,29 % / 0,10 % | 0,29 % / 0,10 % |
-| Con gramos, calor 50, con protección | 0,58 % / 0,40 % | 0,87 % / 0,20 % | 0,29 % / 0,80 % | 0,46 % / 0,24 % | 0,35 % / 0,56 % | 0,12 % / < 0,1 % | 0,12 % / < 0,1 % |
-| Solo dinero (0 g, ≥ 150 €), de noche | 0,00 % / 1,00 % | 0,00 % / 0,50 % | 0,00 % / 2,00 % | 0,00 % / 0,60 % | 0,00 % / 1,40 % | 0,00 % / 0,10 % | 0,00 % / 0,10 % |
+| Ladrón por paso: con gramos, de día | 0,40 % | 0,20 % | 0,80 % | 0,24 % | 0,56 % | < 0,1 % | < 0,1 % |
+| Ladrón por paso: con gramos, de noche | 1,00 % | 0,50 % | 2,00 % | 0,60 % | 1,40 % | 0,10 % | 0,10 % |
+| Ladrón por paso: solo dinero (0 g, ≥ 150 €), de noche | 1,00 % | 0,50 % | 2,00 % | 0,60 % | 1,40 % | 0,10 % | 0,10 % |
+| Agentes de patrulla (de día / de noche) | 1 / 2 | 2 / 2 | 1 / 1 | 1 / 1 | 1 / 1 | 0 / 0 | 0 / 0 |
 | Precio del gramo en la calle | ×1 | ×1 | ×1,2 | ×1,15 | ×0,9 | ×1 | ×1 |
 <!-- /auto:zonas -->
 
-El barrio alto es la zona para ir con dinero (la mitad de ladrones) y los astilleros, para ir sin gramos encima (la mitad de controles, pero el doble de ladrones). En la comarca, Puerto Viejo paga el gramo un 15 % más con menos controles y menos ladrones que el barrio; Valdehierro lo paga un 10 % menos y tiene más ladrones; en los pueblos casi no pasa nada (×0,2 controles, ×0,1 ladrones), pero hay un solo cliente al día (2 en Puerto Viejo y en Valdehierro, 3 desde el capítulo 4).
+El barrio alto es la zona para ir con dinero (la mitad de ladrones), pero con 2 agentes también de día; los astilleros tienen el doble de ladrones y un solo agente, también de noche. En la comarca, Puerto Viejo paga el gramo un 15 % más con menos ladrones que el barrio y un agente; Valdehierro lo paga un 10 % menos y tiene más ladrones; en los pueblos casi no pasa nada (sin agentes, ×0,1 ladrones), pero hay un solo cliente al día (2 en Puerto Viejo y en Valdehierro, 3 desde el capítulo 4).
 
 ### 2.3 Por trayecto desde casa
 
-Los trayectos siguen el camino más corto desde la salida del piso, que está en (5, 9), justo debajo de la puerta (5, 8). Se usan las paredes de verdad del mapa (`tileSolid`). Cada cifra da la probabilidad de que el primer encuentro de la ida sea un control o un ladrón, llevando 50 g y 2.000 € encima. No cuentan los personajes que se cruzan.
+Los trayectos siguen el camino más corto desde la salida del piso, que está en (5, 9), justo debajo de la puerta (5, 8). Se usan las paredes de verdad del mapa (`tileSolid`). Cada cifra da la probabilidad de cruzarte con un ladrón en la ida, llevando 50 g y 2.000 € encima (las patrullas no son al azar: dependen de por dónde vayas, § 2.5). No cuentan los personajes que se cruzan.
 
 <!-- auto:rutas -->
-| Ida desde casa | Pasos | En hierba alta | Control / ladrón (cap. 3, calor 30, de día) | Control / ladrón (cap. 5, calor 80, de noche) | Control / ladrón (cap. 5, calor 80, con protección) |
+| Ida desde casa | Pasos | En hierba alta | Ladrón (de día) | Ladrón (de noche) | Ladrón (de noche, sin gramos y con menos de 150 €) |
 |---|---|---|---|---|---|
-| Growshop de Kiko | 14 | 0 | 12,2 % / 5,1 % | 25,1 % / 11,4 % | 11,3 % / 5,2 % |
-| Bar El Ancla (Baltasar) | 23 | 0 | 18,9 % / 8,0 % | 36,2 % / 16,5 % | 17,6 % / 8,0 % |
-| Plaza (Patxi, clientes) | 27 | 0 | 21,6 % / 9,1 % | 40,2 % / 18,3 % | 20,2 % / 9,2 % |
-| Muelle (Iñaki) | 43 | 0 | 31,1 % / 13,1 % | 51,8 % / 23,5 % | 29,2 % / 13,3 % |
-| Parque (Txaro) | 10 | 0 | 8,9 % / 3,8 % | 19,1 % / 8,7 % | 8,3 % / 3,8 % |
-| Hierba alta del parque (8, 19) | 13 | 2 | 11,4 % / 6,2 % | 23,7 % / 13,5 % | 10,6 % / 6,2 % |
-| Arbusto de la Acapulco Gold (delante, en 2, 25) | 19 | 0 | 16,0 % / 6,7 % | 31,7 % / 14,4 % | 14,9 % / 6,8 % |
+| Growshop de Kiko | 14 | 0 | 5,5 % | 13,1 % | 0,0 % |
+| Bar El Ancla (Baltasar) | 23 | 0 | 8,8 % | 20,6 % | 0,0 % |
+| Plaza (Patxi, clientes) | 27 | 0 | 10,3 % | 23,8 % | 0,0 % |
+| Muelle (Iñaki) | 43 | 0 | 15,8 % | 35,1 % | 0,0 % |
+| Parque (Txaro) | 10 | 0 | 3,9 % | 9,6 % | 0,0 % |
+| Hierba alta del parque (8, 19) | 13 | 2 | 6,6 % | 15,8 % | 0,0 % |
+| Arbusto de la Acapulco Gold (delante, en 2, 25) | 19 | 0 | 7,3 % | 17,4 % | 0,0 % |
 <!-- /auto:rutas -->
 
-El muelle es lo más lejano del barrio: 43 pasos. Con 80 de calor y de noche, una de cada dos idas a ver a Iñaki acaba en control. Ninguna ruta normal pisa la hierba alta; solo la que va hasta ella (2 casillas).
+El muelle es lo más lejano del barrio: 43 pasos. De noche, más de una de cada tres idas a ver a Iñaki con algo encima acaba en ladrón. Ninguna ruta normal pisa la hierba alta; solo la que va hasta ella (2 casillas).
 
 ### 2.4 Ladrones
 
@@ -228,7 +234,47 @@ Primera acción de «la mejor» (la que menos veces acaba en KO):
 - **Huir** no da dinero ni vida máxima. Ganar sí: así se sube la vida para los capítulos altos.
 - Lo que hace daño de verdad es el **KO**: la mitad de los gramos y el 30 % del dinero que llevas encima. Con la caja, solo lo del viaje.
 
-### 2.5 Policía: control y soborno
+### 2.5 Patrullas
+
+Cuánto tarda en saltar la alarma si un agente te ve todo el rato, desde 0 (el juego, `updatePatrullas` de verdad cada 50 ms con un agente a 3 casillas mirándote; con un tick de 50 ms, la alarma llega en el primer múltiplo de 0,05 s):
+
+<!-- auto:patrullas -->
+| Te ve un agente con… | Sospecha por segundo | Hasta la alarma (de 0 a 100) | Juego (updatePatrullas cada 50 ms) |
+|---|---|---|---|
+| 10 g, calor 0, de día | 9,2 | 10,9 s | 10,90 s |
+| 50 g, calor 0, de día | 14,0 | 7,1 s | 7,15 s |
+| 100 g o más, calor 0, de día | 20,0 | 5,0 s | 5,00 s |
+| 50 g, calor 50, de día | 21,0 | 4,8 s | 4,80 s |
+| 50 g, calor 50, con la protección de Molina | 8,4 | 11,9 s | 11,95 s |
+| 50 g, calor 0, de noche | 35,0 | 2,9 s | 2,90 s |
+| 100 g o más, calor 80, de noche | 90,0 | 1,1 s | 1,15 s |
+| 2 g de rosin (salen de 10 g de flor), calor 0, de día | 8,2 | 12,1 s | 12,15 s |
+| Justo después de venderle 8 g a un cliente con un agente cerca (50 g, calor 0, de día) | 14,0 | 2,9 s | 2,90 s |
+| Sin nada encima | 0 | nunca | nunca |
+<!-- /auto:patrullas -->
+
+- **De día, la patrulla avisa:** se ve su cono y la sospecha sube despacio (11 s hasta la alarma con 10 g, 5 s con 100 g o más). Basta con salir del cono o meterse detrás de algo: sin verte, baja 10 por segundo.
+- **De noche, sigilo e intensidad:** no se ve hacia dónde mira, el aviso solo llega a 40 y la sospecha sube 2,5 veces más deprisa (con 100 g y calor 80, la alarma salta en poco más de 1 s). En el barrio hay 2 agentes.
+- **El calor y la carga aceleran;** la protección de Molina divide por 2,5. Sin nada encima (o con todo en la caja) la patrulla no sospecha nunca.
+- **El rosin abulta poco:** cuenta por gramos, así que 2 g de rosin (salen de 10 g de flor) dan casi la misma sospecha que 10 g de flor.
+- **Vender con un agente cerca** (a 5 casillas o menos, aunque no mire) suma 60 de golpe: desde 0 y con 50 g, alarma en 3 s si no te vas.
+
+Con la alarma, la huida (el juego, `updatePlayer` y `updatePatrullas` de verdad a 60 fotogramas por segundo, en una recta sin nada; el modelo cuenta los fotogramas de cada paso):
+
+<!-- auto:huida -->
+| Con la alarma, desde 3 casillas, en campo abierto | Él (casillas/s) | Tú (casillas/s) | Modelo | Juego (updatePlayer y updatePatrullas, 60 fotogramas/s) |
+|---|---|---|---|---|
+| De día · corriendo (B) | 4,29 | 7,50 | te pierde a los 5,62 s | 5,62 s |
+| De noche · corriendo (B) | 5,00 | 7,50 | te pierde a los 5,88 s | 5,88 s |
+| De día · andando | 4,29 | 4,00 | se te pega a los 12,75 s y no te suelta; si te paras, te pilla | 12,75 s · pillado al pararte |
+| De noche · andando | 5,00 | 4,00 | se te pega a los 4,22 s y no te suelta; si te paras, te pilla | 4,22 s · pillado al pararte |
+<!-- /auto:huida -->
+
+- **Corriendo (B) siempre escapas** en campo abierto: le sacas 3,2 casillas por segundo de día y 2,5 de noche, más lo que corres durante su «¡alto!», y te pierde a los 5,6-5,9 s. Por una puerta o una salida, al momento.
+- **Andando no:** de día va un poco más rápido que tú (4,3 casillas por segundo frente a 4) y de noche, bastante más (5); se te pega en 4 s de noche y en casi 13 de día. Mientras sigas andando no puede pararte (te pilla cuando estás quieto a su lado), pero en cuanto te paras (una esquina, un cliente, un menú), control.
+- **Lo que pierdes** si te pilla es lo del control (§ 2.6), con todo lo que llevas encima.
+
+### 2.6 Policía: control y soborno
 
 En la tabla, «requisa» es la probabilidad de perder los gramos, y «−€» es lo que pierdes de media en euros (dinero y gramos, estos a precio de calle). El calor es el cambio medio. La columna «Mejor (en euros)» no tiene en cuenta el calor.
 
@@ -265,7 +311,7 @@ A partir de cuántos gramos encima sale más a cuenta sobornar que entregar, en 
 - **Huir** tiene sentido de noche (60 %) y con mucha carga, si te da igual el calor (+8).
 - El agente que patrulla la plaza (`talkCop`) te hace un control siempre que le hablas con algún gramo encima y sin protección.
 
-### 2.6 Calor y redada
+### 2.7 Calor y redada
 
 <!-- auto:calorOk -->
 Comprobado con el juego: redada con calor 90 y no con 89,9 (se lleva las plantas, los gramos y hasta 3.000 € de multa, y deja el calor en 30); −12 al día; con protección, −20 y la redada se para (calor 50, sin quitar nada); +2 por carpa en flor sin filtro.
@@ -284,7 +330,7 @@ La redada se decide al cambiar de día, a las 00:00, duermas o no. A esa hora, e
 
 Con la caja, una redada cuesta menos: 3 de cada 4 veces no la ven, y la multa sale primero de lo de fuera. Si la encuentran, se llevan sus gramos y la mitad de su dinero. Las plantas se pierden igual.
 
-### 2.7 La Copa
+### 2.8 La Copa
 
 Para ganar hay que llevar al jurado 20 g de un lote con más del 26,8 % de THC. Los cogollos de una misma variedad se juntan en un solo lote, con el THC medio ponderado por gramos (`addBuds`). Lo que sale de un fenotipo estrella va a un lote aparte (★).
 
@@ -360,7 +406,7 @@ La caja de sobremesa de la tienda (la A de la propuesta) se descartó: la de la 
 
 | Dónde | Antes | Con la caja |
 |---|---|---|
-| `onStepEnd` (encuentros) | Contaban `totalBuds()` y `S.money`, es decir, todo | Solo lo de fuera de la caja. La fórmula no cambia: lo guardado sale de `S.buds` y de `S.money` |
+| `onStepEnd` (ladrones) y `updatePatrullas` (sospecha) | Contaban `totalBuds()` y `S.money`, es decir, todo | Solo lo de fuera de la caja. La fórmula no cambia: lo guardado sale de `S.buds` y de `S.money`. Sin gramos encima, la patrulla no sospecha |
 | `copRound` (soborno) | Pagabas con todo tu dinero | Solo con el que llevas encima: «No llevas tanto dinero encima». Y el precio suma el 5 % de ese dinero |
 | `confiscate` y el KO del ladrón | Se llevaban de todo | Solo de lo que llevas fuera |
 | `raidEvent` | Todas las plantas, todos los gramos y una multa de hasta 3.000 € | Lo de fuera, siempre. La caja, 1 de cada 4 veces (`CAJA_REDADA`). La multa sale primero de lo de fuera y después de la caja (`pagarCasa`) |
@@ -378,16 +424,16 @@ La tabla compara viajes de ida y vuelta en tres casos:
 - **Con caja:** llevas solo lo que hace falta para el viaje.
 - **Con caja y el soborno encima:** además, llevas el precio del soborno, para poder pagarlo si te paran (el 5 % de ese dinero también entra en el precio).
 
-Cada celda da tres cifras: la probabilidad de cruzarte con un control, la de cruzarte con un ladrón y lo que pierdes de media. Se cuenta el primer encuentro de cada tramo (después vienen 24 pasos tranquilos). En el control se elige la mejor opción en euros y, con el ladrón, la mejor forma de pelear. Los supuestos de cada fila están en la lista de debajo. Los encuentros de cada tramo se juegan en el juego, andando con lo demás dentro de la caja; lo que se pierde en cada encuentro sale del modelo.
+Cada celda da tres cifras: la probabilidad de cruzarte con un ladrón en la ida o en la vuelta, lo que te quita de media peleando de la mejor forma (solo cuenta el KO, que con la mejor forma es raro) y lo que pierdes si una patrulla te pilla a la ida, eligiendo la mejor opción del control en euros («nada que ver» si no llevas gramos: no sospecha). Pillarte depende de cómo andes (§ 2.5), así que esa cifra es lo que está en juego, no una media. Los supuestos de cada fila están en la lista de debajo. Los ladrones de cada tramo se juegan en el juego, andando con lo demás dentro de la caja; lo que se pierde en cada encuentro sale del modelo.
 
 <!-- auto:caja -->
-| Ida y vuelta | Sin caja: control / ladrón · pérdida media | Con caja | Con caja y el soborno encima |
+| Ida y vuelta | Sin caja: ladrón · pérdida media · si te pilla una patrulla a la ida | Con caja | Con caja y el soborno encima |
 |---|---|---|---|
-| Cap. 3 · ir a comprar a Kiko (200 €) | 22,9 % / 10,0 % · −189 € | 0,0 % / 5,5 % · 0 € | igual |
-| Cap. 4 · vender 10 g a Iñaki | 67,8 % / 22,4 % · −975 € | 43,3 % / 11,9 % · −18 € | 43,3 % / 25,9 % · −33 € |
-| Cap. 4 · vender 40 g en la plaza, de noche | 55,0 % / 35,0 % · −751 € | 32,9 % / 38,5 % · −40 € | 32,9 % / 38,5 % · −84 € |
-| Cap. 5 · pagar 12.000 € a Baltasar | 57,7 % / 13,8 % · −1.118 € | 0,0 % / 8,8 % · 0 € | igual |
-| Cap. 8 · cargar 2 kg a Iñaki | 67,8 % / 22,4 % · −3.208 € | 43,3 % / 25,9 % · −877 € | 43,3 % / 25,9 % · −946 € |
+| Cap. 3 · ir a comprar a Kiko (200 €) | 10,6 % · 0 € · −781 € | 5,5 % · 0 € · nada que ver | igual |
+| Cap. 4 · vender 10 g a Iñaki | 29,2 % · 0 € · −1.133 € | 15,8 % · 0 € · −42 € | 29,2 % · 0 € · −76 € |
+| Cap. 4 · vender 40 g en la plaza, de noche | 41,9 % · 0 € · −1.167 € | 41,9 % · 0 € · −122 € | 41,9 % · 0 € · −254 € |
+| Cap. 5 · pagar 12.000 € a Baltasar | 16,8 % · 0 € · −1.854 € | 8,8 % · 0 € · nada que ver | igual |
+| Cap. 8 · cargar 2 kg a Iñaki | 29,2 % · 0 € · −4.720 € | 29,2 % · 0 € · −2.027 € | 29,2 % · 0 € · −2.187 € |
 <!-- /auto:caja -->
 
 <!-- auto:cajaSup -->
@@ -400,14 +446,12 @@ Cada celda da tres cifras: la probabilidad de cruzarte con un control, la de cru
 
 Cómo leer la tabla:
 
-- **Los controles bajan con la caja:** la vuelta se hace sin gramos, y sin gramos no hay control.
-- **El ladrón a veces sube**, por dos motivos:
-  - al haber menos controles, el ladrón es más a menudo el primer encuentro del tramo;
-  - llevar 150 € o más para el soborno lo atrae.
-- **La pérdida media se desploma**, porque un control o un KO ya solo te quitan lo que llevas.
-- **Sin dinero para el soborno**, en un control solo puedes hablar, huir o entregar.
+- **Lo que te juegas con una patrulla se desploma con la caja:** el control ya solo te quita lo que llevas. Y la vuelta se hace sin gramos: sin gramos no hay sospecha.
+- **El ladrón baja con la caja** si el viaje es con poco (menos de 5 g y de 150 €) y **sube** si llevas el dinero del soborno: 150 € o más lo atraen.
+- **Con la mejor forma de pelear, el ladrón casi nunca te quita nada:** el KO es raro. Lo caro es la patrulla.
+- **Llevar el soborno solo compensa con mucha carga:** con 10 g, pagarlo cuesta más que perderlos, y el dinero encima sube la multa de hablar o huir. Sin dinero para el soborno, en un control solo puedes hablar, huir o entregar.
 
-La caja no quita los encuentros del todo: hay que llevar la mercancía para venderla y el dinero para pagar. Lo que cambia es que un control cuesta lo que llevas, y no todo lo que tienes. Y aparecen decisiones:
+La caja no quita los riesgos del todo: hay que llevar la mercancía para venderla y el dinero para pagar. Lo que cambia es que un control cuesta lo que llevas, y no todo lo que tienes. Y aparecen decisiones:
 
 - cuánto sacar de casa;
 - si llevar el dinero del soborno;
@@ -416,8 +460,8 @@ La caja no quita los encuentros del todo: hay que llevar la mercancía para vend
 ### 3.5 Dónde está en el código
 
 - **HTML:** `11b-caja.js` (la caja, el robo de Darko y los encargos de Baltasar); `08-mundo.js` (`S.caja`, `S.rec`, `S.vencidos`, `S.protHasta`, `S.encargo` y la migración); `09-cultivo.js` (el ordenador, la luz, la instalación de la empotrada y el robo al dormir); `11-historia.js` (`raidEvent`, el embargo, Molina y el capítulo 4); `12-menus.js` (la mochila); `04-mapas.js` (el barrio alto, los astilleros y los tres interiores).
-- **Godot:** lo mismo en `godot/src/mundo.gd` (la caja, las zonas, los clientes y quién está en cada mapa), `granja.gd` (el día nuevo, la cama, el ordenador y la cosecha), `trama.gd` (la historia, la redada, el embargo, el robo y los encargos), `juego.gd` y `pinta.gd`. `tests/historia.gd` juega los mismos 71 pasos que `npm test` y compara cada uno con el HTML, y `tests/pantallas.gd` compara las zonas nuevas y sus interiores píxel a píxel.
-- **Tests:** los pasos de la caja, el robo, el embargo, la cuota, los encargos y las zonas en `tools/test-historia.js`; y en `analisis-riesgos.js`, los viajes de § 3.4 y la redada de § 2.6 jugados con la caja.
+- **Godot:** lo mismo en `godot/src/mundo.gd` (la caja, las zonas, los clientes y quién está en cada mapa), `granja.gd` (el día nuevo, la cama, el ordenador y la cosecha), `trama.gd` (la historia, la redada, el embargo, el robo y los encargos), `juego.gd` y `pinta.gd`. `tests/historia.gd` juega los mismos 74 pasos que `npm test` y compara cada uno con el HTML, y `tests/pantallas.gd` compara las zonas nuevas y sus interiores píxel a píxel.
+- **Tests:** los pasos de la caja, el robo, el embargo, la cuota, los encargos, las zonas, el rosin y las patrullas en `tools/test-historia.js`; y en `analisis-riesgos.js`, los viajes de § 3.4 y la redada de § 2.7 jugados con la caja, y la sospecha y la huida de § 2.5 jugadas con `updatePatrullas`.
 
 ### 3.6 El robo de Darko (capítulo 7)
 

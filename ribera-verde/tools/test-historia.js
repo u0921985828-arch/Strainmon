@@ -57,6 +57,8 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     window.idle = () => new Promise(r => { const t = setInterval(() => { if (isFree() && !pending.length) { clearInterval(t); r(); } }, 25); });
     window.want = w => { WANT = w.map(s => s === '<B>' ? s : new RegExp(s)); };
     window.pr = l => SHOP.find(it => it.lbl.startsWith(l)).p;   // precio de tienda por el principio del rótulo
+    // las patrullas (1.10) no andan solas (ni con el reloj en marcha): los pasos que las prueban llaman a UPAT con un dt fijo
+    window.UPAT = updatePatrullas; window.updatePatrullas = () => {};
   });
 
   const results = [], orac = [];
@@ -235,14 +237,15 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   await step('Combate ladrón: ganar con spray', Array(12).fill(['MOCHILA', 'SPRAY']).flat(), async () => {
     S.hpMax = 60; S.hp = 60; S.items.spray = 12; S.money = 100; await run(() => battle('thief')); WANT = [];
   }, () => S.money > 100 && S.hpMax === 60 && mode === 'world' || { money: S.money, hpMax: S.hpMax, mode });
-  await step('Combate ladrón: desmayo → despiertas en casa', [], async () => {
-    S.hpMax = 30; S.hp = 1; S.money = 1000; S.buds = {}; addBuds('ria', 20, 12); S.map = 'town'; await run(() => battle('thief'));
-  }, () => S.map === 'home' && S.hp === S.hpMax && S.money === 700 && S.buds.ria.g === 10 || { map: S.map, hp: S.hp, money: S.money, buds: S.buds });
+  await step('Combate ladrón: desmayo → despiertas en casa (se lleva la mitad de la flor y del rosin y el 30 % del dinero, y lo dice)', [], async () => {
+    S.hpMax = 30; S.hp = 1; S.money = 1000; S.buds = {}; addBuds('ria', 20, 12); S.rosin = { ria: { g: 3, thc: 36 } }; S.map = 'town'; await run(() => battle('thief'));
+  }, () => S.map === 'home' && S.hp === S.hpMax && S.money === 700 && S.buds.ria.g === 10 && S.rosin.ria.g === 1.5 && LOG.some(l => l.includes('Te roba 10 g, 1,5 g de rosin y 300 €'))
+    || { map: S.map, hp: S.hp, money: S.money, buds: S.buds, rosin: S.rosin });
   await step('Ladrón vencido sube la VIDA máxima', ['LUCHAR', 'PATADA'].concat(Array(20).fill(['MOCHILA', 'SPRAY']).flat()), async () => {
     S.hpMax = 40; S.hp = 40; S.items.spray = 20; await run(() => battle('thief')); WANT = [];
   }, () => S.hpMax === 42 || { hpMax: S.hpMax });
   await step('Policía: soborno con protección (40 + 4 × calor + 0,5 × gramos + 5 % del dinero encima)', ['SOBORNAR', '^Sí'], async () => {
-    S.protect = true; S.heat = 40; S.money = 1000; addBuds('ria', 10, 12); window.R = { p: precioSoborno(), g: totalBuds() }; await run(() => battle('police'));
+    S.protect = true; S.rosin = {}; S.heat = 40; S.money = 1000; addBuds('ria', 10, 12); window.R = { p: precioSoborno(), g: totalBuds() }; await run(() => battle('police'));
   }, () => R.p === Math.round(40 + 160 + R.g * .5 + 50) && S.money === 1000 - R.p && S.heat === 30 && !!S.buds.ria || { money: S.money, heat: S.heat, R });
   await step('Agente en la plaza: entregar la mercancía', ['ENTREGAR'], async () => {
     S.protect = false; addBuds('ria', 5, 12); await run(talkCop);
@@ -345,10 +348,11 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.map = 'bar'; S.min = 600; l0 = LOG.length; await run(talkBaltasar); R.fallo = LOG.slice(l0).some(l => /Me fallaste/.test(l)); S.map = 'home';
   }, () => R.e && R.e.g === 2000 && R.e.hasta === R.d + 2 && R.tono && R.dia === 2300 && R.d1.m === 12000 && R.d1.s === 12000 && R.d1.rep === 2 && R.d1.heat === 3 && !R.d1.ria && R.d1.dragon === 300 && R.d1.enc === null && !R.d1.tono
     && R.e2 === 2 && R.rep3 === R.rep2 - 10 && R.enc3 === null && R.veto === 5 && R.tarde && R.fallo || R);
-  await step('Mapa ampliado: barrio alto y astilleros con sus puertas; policía y ladrones según la zona; clientes de cada zona', [], async () => {
+  await step('Mapa ampliado: barrio alto y astilleros con sus puertas; ladrones al azar y patrullas según la zona; clientes de cada zona', [], async () => {
     S.ch = 5; S.protect = false; S.heat = 0; S.min = 600; S.money = 200; S.buds = {}; addBuds('ria', 10, 12);
     const r0 = Math.random, b0 = battle; window.R = { enc: {} }; let n; window.battle = async t => { n = t; };
-    for (const [z, rs] of [['town', [.0019, .0059, .0061]], ['alto', [.0029, .0049, .0051]], ['astilleros', [.0009, .0089, .0091]]]) {
+    R.pat = ['town', 'alto', 'astilleros', 'puerto', 'valdehierro', 'mendialde', 'errotabarri'].map(z => { S.map = z; return [600, 1380].map(mn => { S.min = mn; return nPatrullas(); }).join('/'); }).join(); S.min = 600;
+    for (const [z, rs] of [['town', [.0039, .0041]], ['alto', [.0019, .0021]], ['astilleros', [.0079, .0081]]]) {
       S.map = z; const [x, y] = CLIENT_TILES[z][0]; R.enc[z] = rs.map(r => { n = null; Math.random = () => r; P.x = x; P.y = y; S.cool = 0; onStepEnd(); Math.random = r0; return n; }).join(); }
     window.battle = b0; S.cool = 0;
     const W = (m, k) => { const d = MAPS[m].doors[k]; return d && [d.to, d.x, d.y, d.dir].join(); };
@@ -360,7 +364,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.ch = 5; spawnClients(); R.c5 = ['alto', 'astilleros'].map(z => S.clients.filter(c => c.map === z).length).join();
     R.tipos = S.clients.every(c => (c.map === 'alto' ? ['pij', 'tur'] : c.map === 'astilleros' ? ['est', 'cur'] : Object.keys(CTYPES)).includes(c.type) && CLIENT_TILES[c.map].some(t => t[0] === c.x && t[1] === c.y));
     R.ents = ents.filter(e => /^c/.test(e.id) && !/^c\d+_b/.test(e.id)).length; R.entsB = ents.filter(e => /^c\d+_b/.test(e.id)).length; S.map = 'home'; enterMap('home', 5, 5, 'up');
-  }, () => R.enc.town === 'police,thief,' && R.enc.alto === 'police,thief,' && R.enc.astilleros === 'police,thief,'
+  }, () => R.enc.town === 'thief,' && R.enc.alto === 'thief,' && R.enc.astilleros === 'thief,' && R.pat === '1/2,2/2,1/1,1/1,1/1,0/0,0/0'
     && R.puertas === 'alto,11,28,up|alto,12,28,up|town,12,1,down|astilleros,1,21,right|town,38,20,left|comisaria,4,6,up|almacen,4,6,up|txaro,4,6,up'
     && R.salidas === 'alto,26,19|astilleros,18,14|town,34,9' && R.warp === 'alto,11,28' && R.c2.endsWith(',0,2') && R.c5 === '3,3' && R.tipos && R.ents === 0 && R.entsB === 3 && R.sobre === 80 && R.sp === 2 || R);
   await step('Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas', ['^Hindu Kush'], async () => {
@@ -374,6 +378,44 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     const cl = (id, r) => { const c = { id, map: 'astilleros', x: 5, y: 20, type: 'cur', want: 10, minThc: 0 }; S.clients.push(c); return async () => { Math.random = () => r; await talkClient(c); Math.random = r0; }; };
     R.m = S.money; await run(cl('cx1', .2)); R.m1 = S.money - R.m; R.b1 = R.b.length; await run(cl('cx2', .5)); R.m2 = S.money - R.m - R.m1; window.battle = b0; S.map = 'home';
   }, () => R.m1 === Math.round(precioCalle(12) * CTYPES.cur.mult * 1.2 * 10) && R.m2 === R.m1 && R.b1 === 1 && R.b.join() === 'thief' && ZONAS.astilleros.precio === 1.2 || R);
+  await step('Rosin: la prensa de Kiko (250 €, capítulo 3); en la mesa, 25 g de Skunk #1 al 12 % → 5 g de rosin al 36 % en media hora; catadores en 4 zonas; uno paga 10 + 0,6 × THC el gramo', ['Prensa de rosin', 'Salir', 'Prensar rosin', '^Skunk', '^25 g', 'Rebaja'], async () => {
+    S.ch = 5; S.money = 1000; S.buds = {}; S.rosin = {}; S.items.prensa = 0; addBuds('ria', 40, 12); await run(shop); window.R = { m: S.money, p: S.items.prensa, min: S.min };
+    S.map = 'home'; await run(labAction); R.min = S.min - R.min; R.ros = JSON.parse(JSON.stringify(S.rosin)); R.g = totalBuds();
+    S.clientsDay = 0; spawnClients(); R.ext = S.clients.filter(c => c.type === 'ext').map(c => c.map).join();
+    S.map = 'town'; const c = { id: 'cx9', map: 'town', x: 5, y: 20, type: 'ext', want: 2, minThc: 0 }; S.clients.push(c); R.m1 = S.money; await run(() => talkClient(c));
+    R.m1 = S.money - R.m1; R.r = totalRosin(); R.h = S.heat; S.map = 'home';
+  }, () => R.m === 750 && R.p === 1 && R.ros.ria.g === 5 && R.ros.ria.thc === 36 && R.g === 15 && R.min === 30 && R.ext === 'town,town,astilleros,puerto,valdehierro'
+    && R.m1 === Math.round(precioRosin(36) * 2 * .85) && R.r === 3 && GLYPH.gota && CTYPES.ext.label === 'CATADOR' || R);
+  await step('Patrullas: andan solo por la calle; la sospecha sube si te ven con algo (50 g: 14/s de día, 35 de noche, 5,6 con Molina; nada a la espalda ni sin nada encima); llena → te persiguen → control', ['ENTREGAR'], async () => {
+    S.ch = 5; S.protect = false; S.heat = 0; S.min = 600; S.buds = {}; S.rosin = {}; S.clients = []; enterMap('town', 16, 17, 'up');
+    const pat = () => ents.filter(e => e.pat), vis = []; window.R = {};
+    for (let t = 0; t < 1200; t++) { UPAT(50); if (t % 20 === 0) for (const e of pat()) vis.push(e.x + ',' + e.y); }
+    R.calle = vis.every(k => { const [x, y] = k.split(',').map(Number); return CALLE.test(MAPS.town.g[y][x]); }); R.traza = vis.join(' '); R.v0 = SOSP.v; R.sitios = new Set(vis).size;
+    const mira = (noche, prot, dir) => { S.min = noche ? 1380 : 600; S.protect = prot; resetSosp(); ponPatrullas(); const e = pat()[0];
+      Object.assign(e, { x: 16, y: 14, fx: 16, fy: 14, px: 256, py: 224, dir: dir || 'down', moving: false, espera: 1e9, caza: false });
+      pat().slice(1).forEach(o => Object.assign(o, { x: 1, y: 1, fx: 1, fy: 1, moving: false, espera: 1e9 })); Object.assign(P, { x: 16, y: 17, fx: 16, fy: 17, moving: false }); UPAT(1000); return Math.round(SOSP.v * 100) / 100; };
+    R.sinNada = mira(false, false); addBuds('ria', 50, 12); R.dia = mira(false, false); R.noche = mira(true, false); R.molina = mira(false, true); R.espalda = mira(false, false, 'up');
+    S.buds = {}; S.rosin = { ria: { g: 2, thc: 36 } }; R.rosin = mira(false, false); S.rosin = {}; addBuds('ria', 50, 12);
+    mira(false, false); let t = 1000; for (; t < 20000 && isFree(); t += 50) UPAT(50); R.t = t; R.al = SOSP.alarma;
+  }, () => R.calle && R.sitios >= 20 && R.v0 === 0 && R.sinNada === 0 && R.dia === 14 && R.noche === 35 && R.molina === 5.6 && R.espalda === 0 && R.rosin === 8.24
+    && R.t > 7000 + PAT.alto && R.t < 9000 + PAT.alto && !Object.keys(S.buds).length && SOSP.tregua === PAT.tregua && !R.al && R.traza.split(' ').length === 60 || R);
+  await step('Patrullas: con la alarma te pierde a más de 10 casillas y 4 s sin verte (la sospecha se queda en 50); por una puerta, al momento; vender a 5 casillas o menos de un agente, aunque no mire: +60', [], async () => {
+    S.ch = 5; S.min = 600; S.buds = {}; addBuds('ria', 50, 12); enterMap('town', 16, 17, 'up'); let e = ents.find(e => e.pat);
+    Object.assign(e, { x: 16, y: 14, fx: 16, fy: 14, dir: 'down', moving: false }); alarma(e); Object.assign(P, { x: 37, y: 26, fx: 37, fy: 26 }); window.R = { a: SOSP.alarma };
+    let t = 0; for (; t < 30000 && SOSP.alarma; t += 50) UPAT(50); R.t = t; R.v = SOSP.v; R.d = Math.abs(e.x - P.x) + Math.abs(e.y - P.y);
+    enterMap('town', 16, 17, 'up'); e = ents.find(e => e.pat); alarma(e); const k = Object.keys(MAPS.town.doors).find(k => MAPS.town.doors[k].to === 'home');
+    await run(() => warp(MAPS.town.doors[k])); R.puerta = [S.map, SOSP.alarma, SOSP.v].join();
+    enterMap('town', 16, 17, 'up'); e = ents.find(e => e.pat); Object.assign(e, { x: 16, y: 14, fx: 16, fy: 14, dir: 'up', moving: false }); vistoVender(); R.vende = SOSP.v;
+    S.map = 'mendialde'; R.pueblo = nPatrullas(); enterMap('home', 5, 5, 'up');
+  }, () => R.a === 'pat0' && R.t === 4000 && R.v === 50 && R.d > 10 && R.puerta === 'home,,0' && R.vende === 60 && R.pueblo === 0 || R);
+  await step('Patrullas: fuera de la calle (tras una caza por el parque) vuelve a ella y sigue la ronda; si al amanecer se va el agente que te seguía, lo has despistado (sospecha 50)', [], async () => {
+    S.ch = 5; S.min = 600; S.buds = {}; S.rosin = {}; enterMap('town', 16, 17, 'up'); let e = ents.find(e => e.pat); window.R = { g: MAPS.town.g[16][2] };
+    Object.assign(e, { x: 2, y: 16, fx: 2, fy: 16, px: 32, py: 256, moving: false, espera: 0, caza: false, pasos: 1e9 });
+    let t = 0; for (; t < 20000 && !CALLE.test(MAPS.town.g[e.y][e.x]); t += 50) UPAT(50); R.t = t; R.en = e.x + ',' + e.y; const en = R.en;
+    for (let i = 0; i < 100; i++) UPAT(50); R.sigue = e.x + ',' + e.y !== en && CALLE.test(MAPS.town.g[e.y][e.x]);
+    S.min = 359; resetSosp(); enterMap('town', 16, 17, 'up'); R.n = ents.filter(e => e.pat).length; e = ents.find(e => e.id === 'pat1'); alarma(e);
+    S.min = 360; UPAT(50); R.alba = [ents.filter(e => e.pat).length, SOSP.alarma, SOSP.v].join(); S.min = 600; enterMap('home', 5, 5, 'up');
+  }, () => !CALLE.test(R.g) && R.t > 0 && R.t <= 3000 && R.sigue && R.n === 2 && R.alba === '1,,50' || R);
   await step('Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor', [], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 3, due: 0, deadline: 0, protect: true }); S.flags.metB = false; delete S.flags.tono;
     for (const k of ['caja', 'rec', 'vencidos', 'protHasta', 'encargo', 'encVeto']) delete S[k]; migrate();

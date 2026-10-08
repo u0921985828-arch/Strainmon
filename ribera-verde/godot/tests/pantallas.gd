@@ -101,6 +101,7 @@ func monta(e: Dictionary) -> void:
 				if o.id == x.id:
 					for c in x:
 						o[c] = x[c]
+		J.SOSP = e.SOSP
 	for c in e.P:
 		J.P[c] = e.P[c]
 	J.mode = e.mode

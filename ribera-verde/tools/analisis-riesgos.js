@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 /*
-  Ribera Verde — análisis de riesgos de la calle (docs/ANALISIS.md): encuentros por paso y por trayecto, combate contra
-  ladrones, control de policía (soborno, hablar, huir, entregar), calor y redada, ventas, la Copa y la caja fuerte propuesta.
+  Ribera Verde — análisis de riesgos de la calle (docs/ANALISIS.md): ladrones por paso y por trayecto, combate contra
+  ladrones, patrullas (sospecha, alarma y huida), control de policía (soborno, hablar, huir, entregar), calor y redada, ventas,
+  la Copa y la caja fuerte.
   Las tablas salen de un modelo exacto con las mismas reglas que el código (08-mundo, 10-calle, 13-combate, 09-cultivo,
   11-historia). Cada cifra de las tablas de paso, trayecto, ladrón, policía, ventas y Copa se comprueba jugando el caso con
-  las funciones de verdad del juego (onStepEnd, battle + thiefRound + enemyHits, copRound, newDay + raidEvent, talkClient,
-  talkInaki, ventaMayor, harvest + addBuds + talkJurado), con la interfaz y las esperas anuladas y un Park-Miller fijo: si
+  las funciones de verdad del juego (onStepEnd, battle + thiefRound + enemyHits, updatePatrullas + updatePlayer, copRound,
+  newDay + raidEvent, talkClient, talkInaki, ventaMayor, harvest + addBuds + talkJurado), con la interfaz y las esperas anuladas y
+  un Park-Miller fijo: si
   alguna se aparta más de 4 σ, el código ha cambiado y el modelo también tiene que cambiar. Entonces no escribe nada y sale
   con 1. Desde la 1.10 también las zonas (barrio alto y astilleros: onStepEnd y talkClient en cada mapa) y la caja fuerte
   (los trayectos con lo demás dentro de S.caja y la redada con caja, raidEvent).
@@ -36,25 +38,51 @@ const signo = x => (Math.round(x) > 0 ? '+' : Math.round(x) < 0 ? '−' : '±') 
 // ---------- modelo exacto ----------
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const unif = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
-// las zonas (1.10, 04-mapas): el control y el ladrón de cada paso se multiplican por pol y lad; el gramo, por precio
-const ZON = { town: { n: 'Ribera Verde (el barrio)', pol: 1, lad: 1, precio: 1 }, alto: { n: 'Barrio alto', pol: 1.5, lad: .5, precio: 1 }, astilleros: { n: 'Astilleros', pol: .5, lad: 2, precio: 1.2 },
+// las zonas (1.10, 04-mapas y 10b-patrulla): el ladrón de cada paso se multiplica por lad; el gramo, por precio; pat: agentes
+// de patrulla [de día, de noche], desde el capítulo 2
+const ZON = { town: { n: 'Ribera Verde (el barrio)', lad: 1, precio: 1, pat: [1, 2] }, alto: { n: 'Barrio alto', lad: .5, precio: 1, pat: [2, 2] },
+  astilleros: { n: 'Astilleros', lad: 2, precio: 1.2, pat: [1, 1] },
   // la comarca (1.10): las dos ciudades pequeñas y los dos pueblos, a un autobús
-  puerto: { n: 'Puerto Viejo', pol: .8, lad: .6, precio: 1.15 }, valdehierro: { n: 'Valdehierro', pol: .6, lad: 1.4, precio: .9 }, mendialde: { n: 'Mendialde', pol: .2, lad: .1, precio: 1 },
-  errotabarri: { n: 'Errotabarri', pol: .2, lad: .1, precio: 1 } };
+  puerto: { n: 'Puerto Viejo', lad: .6, precio: 1.15, pat: [1, 1] }, valdehierro: { n: 'Valdehierro', lad: 1.4, precio: .9, pat: [1, 1] },
+  mendialde: { n: 'Mendialde', lad: .1, precio: 1, pat: [0, 0] }, errotabarri: { n: 'Errotabarri', lad: .1, precio: 1, pat: [0, 0] } };
 const Z = e => ZON[e.zona || 'town'];
-// un paso por la calle (08-mundo, onStepEnd), desde el capítulo 2: un solo Math.random; policía si r < pp, ladrón si pp ≤ r < pp + pt.
-// Solo cuenta lo que llevas encima: lo de la caja fuerte no
-const pPolicia = e => e.ch >= 2 && e.g > 0 ? (.002 + e.heat * .00025) * (e.protect ? .4 : 1) * Z(e).pol : 0;
+// un paso por la calle (08-mundo, onStepEnd), desde el capítulo 2: ladrón si Math.random() < pt (con la alarma, nada). La policía
+// ya no sale por paso (1.10): patrulla por la calle. Solo cuenta lo que llevas encima: lo de la caja fuerte no
 const pLadron = e => e.ch >= 2 && (e.g >= 5 || e.money >= 150) ? .004 * (e.night ? 2.5 : 1) * (e.tall ? 3 : 1) * Z(e).lad : 0;
 // el ladrón (13-combate): desde el capítulo 5, 4 de vida más y 1 más de golpe (1.10)
 const fuerte = ch => ch >= 5 ? 1 : 0, vidaL = ch => [12 + 2 * ch + 4 * fuerte(ch), 16 + 2 * ch + 4 * fuerte(ch)], golpeL = ch => [2 + (ch >> 2) + fuerte(ch), 4 + (ch >> 1) + fuerte(ch)];
 // el soborno (precioSoborno): 40 + 4·calor + 0,5·gramos + 5 % del dinero que llevas encima (1.10)
 const soborno = e => Math.round(40 + 4 * e.heat + .5 * e.g + .05 * e.money);
-// un trayecto: la probabilidad de que el primer encuentro sea un control o un ladrón (después hay 24 pasos de calma)
+// un trayecto: la probabilidad de cruzarte con un ladrón (después hay 24 pasos de calma: el primero basta)
 function trayecto(tiles, e) {
-  let sigue = 1, pol = 0, lad = 0;
-  for (const t of tiles) { const a = pPolicia(e), b = pLadron({ ...e, tall: t.tall }); pol += sigue * a; lad += sigue * b; sigue *= 1 - a - b; }
-  return { pol, lad, alguno: 1 - sigue };
+  let sigue = 1, lad = 0;
+  for (const t of tiles) { const b = pLadron({ ...e, tall: t.tall }); lad += sigue * b; sigue *= 1 - b; }
+  return { lad };
+}
+// las patrullas (10b-patrulla). Sospecha (0-100) por segundo mientras un agente te ve con algo encima (gramos de flor y de rosin):
+// (8 + 0,12 × gramos, hasta 100 g) × 2,5 de noche × (1 + calor/100) × 0,4 con la protección de Molina; sin verte, −10 por
+// segundo; vender a vista[0] casillas o menos de él (aunque no mire), +60. Llena: alarma, alto ms quieto («¡alto!») y corre a por ti (corre ms por casilla, más un fotograma: el paso empieza en
+// el fotograma siguiente al que acaba). Te pierde si pasan olvida ms sin verte (ve vista[0] × 2 casillas a la redonda) y estás a
+// más de pierde casillas, o si cruzas una puerta, una salida o subes al autobús. Te pilla si te paras con él al lado
+const PAT = { corre: [210, 180], alto: 600, vista: [5, 5], sube: [1, 2.5], baja: 10, vende: 60, pierde: 10, olvida: 4000, tregua: 30000 };
+const ritmo = e => e.g > 0 ? (8 + Math.min(e.g, 100) * .12) * PAT.sube[e.night ? 1 : 0] * (1 + e.heat / 100) * (e.protect ? .4 : 1) : 0;
+const alarmaEn = (e, v0 = 0) => ritmo(e) ? (100 - v0) / ritmo(e) : Infinity;   // segundos
+// la huida en campo abierto, fotograma a fotograma (60 por segundo): tu paso dura ceil(240 / 16,7) = 15 fotogramas andando y
+// ceil(130 / 16,7) = 8 corriendo (el siguiente empieza en el mismo fotograma en que acaba); el suyo, ceil(corre / 16,7) + 1 (el
+// siguiente empieza en el fotograma de después), y empieza después de q fotogramas quieto: los que tarda alto en bajar a 0 restando
+// un fotograma cada vez, como en updatePatrullas. Los dos pisan la casilla nueva al empezar el paso. Te pierde cuando lleva olvida
+// ms sin verte (a más de vista[0] × 2 casillas) y estás a más de pierde; andando, se te pega (a 1 casilla) y te pilla al pararte
+const FR = 1000 / 60, fot = ms => Math.ceil(ms / FR - 1e-9);
+function huida(noche, d0, corre) {
+  const pt = fot(corre ? 130 : 240), pa = fot(PAT.corre[noche ? 1 : 0]) + 1, r = { va: 60 / pa, vt: 60 / pt, escapa: null, alcanza: null };
+  let sin = 0, q = 0;for (let es = PAT.alto; es > 0; es -= FR) q++;
+  for (let f = 1; f <= 3600; f++) {
+    const d = d0 + Math.floor((f - 1) / pt) + 1 - (f > q ? Math.floor((f - 1 - q) / pa) + 1 : 0);
+    if (d <= 1 && r.alcanza == null) { r.alcanza = f * FR / 1000;if (!corre) break; }
+    if (d <= PAT.vista[0] * 2) sin = 0;else sin += FR;
+    if (sin >= PAT.olvida && d > PAT.pierde) { r.escapa = f * FR / 1000;break; }
+  }
+  return r;
 }
 // combate contra un ladrón (13-combate): vida del ladrón 12 + 2·cap + 0…4, golpea entre 2 + cap>>2 y 4 + cap>>1 (enteros; desde
 // el capítulo 5, +4 de vida y +1 de golpe);
@@ -181,7 +209,8 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
     sigma: Object.fromEntries(Object.entries(GENETICA).map(([k, G]) => [k, G.sigma])),
     mult: Object.fromEntries(Object.entries(CTYPES).map(([k, c]) => [k, c.mult])),
     thc: { tormenta: STRAINS.tormenta.thc, dragon: STRAINS.dragon.thc }, nombres: { tormenta: STRAINS.tormenta.n, dragon: STRAINS.dragon.n } }));
-  const precioC = t => 4 + t * .2, precioM = t => 2 + t * .1;
+  // el gramo de flor en la calle y al por mayor (10-calle) y el de rosin (1.10): 10 + 0,6 × THC
+  const precioC = t => 4 + t * .2, precioM = t => 2 + t * .1, precioR = t => 10 + t * .6;
   for (const [t, a, b] of datos.pc) exige(`precios con THC ${t}`, Math.abs(precioC(t) - a) < 1e-9 && Math.abs(precioM(t) - b) < 1e-9, [a, b]);
   const luzDe = (t, f) => { const C = datos.carpas[t], F = datos.focos[f];return F.thc * Math.min(1, F.w / (C.cm[0] * C.cm[2] / 1e4 * datos.W_M2)); };
 
@@ -200,7 +229,7 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
   const paso = async (que, e, n) => {
     const mc = await pasoMC(e, n);
     exige(`${que}: la casilla ${e.tall ? 'no es' : 'es'} de hierba alta`, mc.alta === !!e.tall);
-    compara(`${que} policía`, pPolicia(e), mc.pol, n);compara(`${que} ladrón`, pLadron(e), mc.lad, n);
+    exige(`${que}: ningún control por paso`, mc.pol === 0, mc.pol);compara(`${que} ladrón`, pLadron(e), mc.lad, n);
     return mc;
   };
 
@@ -236,7 +265,7 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
     { k: 'arbusto', n: 'Arbusto de la Acapulco Gold (delante, en 2, 25)', de: [5, 9], a: [2, 25] }]);
   // un trayecto andado con onStepEnd de verdad, casilla a casilla, hasta el primer encuentro (Darko y Molina ya vistos)
   const trayectoMC = (tiles, e, n) => juego(({ tiles, e, n }) => {
-    semilla(31337);let pol = 0, lad = 0, k = null;
+    semilla(31337);let pol = 0, lad = 0, k = null;   // pol: controles por paso (tiene que ser 0)
     window.battle = async x => { k = x; };
     for (let i = 0; i < n; i++) {
       S = newState();Object.assign(S, { ch: e.ch, heat: e.heat, protect: !!e.protect, money: e.money, map: 'town', min: e.night ? 23 * 60 : 12 * 60 });
@@ -248,6 +277,49 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
     window.battle = ORIG.battle;
     return { pol: pol / n, lad: lad / n };
   }, { tiles, e, n });
+
+  // ---- 2 b. patrullas (10b-patrulla): un agente quieto en la plaza, a 3 casillas y mirando al jugador (o de espaldas);
+  // updatePatrullas de verdad cada 50 ms hasta la alarma (o hasta que la sospecha baja a 0) ----
+  const sospechaJuego = casos => juego(casos => casos.map(e => {
+    S = newState();Object.assign(S, { ch: 5, heat: e.heat, protect: !!e.protect, map: 'town', min: e.night ? 23 * 60 : 12 * 60 });
+    S.buds = e.g ? { ria: { g: e.g, thc: 12 } } : {};S.rosin = e.rosin ? { ria: { g: e.rosin, thc: 36 } } : {};
+    Object.assign(P, { x: 16, y: 17, fx: 16, fy: 17, moving: false });ents = [];resetSosp();ponPatrullas();
+    const p = ents.filter(x => x.pat);
+    Object.assign(p[0], { x: 16, y: 14, fx: 16, fy: 14, dir: e.espalda ? 'up' : 'down', moving: false, espera: 1e9, caza: false });
+    p.slice(1).forEach(o => Object.assign(o, { x: 1, y: 1, fx: 1, fy: 1, moving: false, espera: 1e9 }));
+    if (e.vende) vistoVender();
+    if (e.v0) SOSP.v = e.v0;
+    const v1 = SOSP.v;let t = 0;
+    if (e.baja) while (SOSP.v > 0 && t < 6e5) { updatePatrullas(50);t += 50; }
+    else while (!SOSP.alarma && t < 6e5) { updatePatrullas(50);t += 50; }
+    const r = { t: t / 1000, v1, n: p.length };ents = [];resetSosp();return r;
+  }), casos);
+  // la huida, en una pista recta de 80 × 3 casillas de acera: el agente detrás, a d0 casillas, con la alarma; el jugador hacia la
+  // derecha con la cruceta (y B si corre). updatePlayer y updatePatrullas de verdad, 60 fotogramas por segundo, hasta que te
+  // pierde (o max s; andando, antes de llegar al final de la pista, a los 17 s). Con «para», a los max s suelta la cruceta: ¿te pilla?
+  const huidaJuego = casos => juego(async casos => { const out = [];for (const e of casos) {
+    const W = 80, fila = v => Array(W).fill(v);
+    MAPS.__pista = { w: W, h: 3, g: [fila('walk'), fila('walk'), fila('walk')], o: [fila(null), fila(null), fila(null)], doors: {}, exits: {} };
+    ZONAS.__pista = { n: 'pista', lad: 0, precio: 1 };PATRULLAS.__pista = [1, 1];RONDA.__pista = [[0, 1]];
+    S = newState();Object.assign(S, { ch: 5, map: '__pista', min: e.night ? 23 * 60 : 12 * 60, money: 0, heat: 0 });S.buds = { ria: { g: 1, thc: 12 } };
+    const b0 = battle;let pill = false;window.battle = async () => { pill = true; };
+    mode = 'world';ents = [];resetSosp();
+    Object.assign(P, { x: 10, y: 1, fx: 10, fy: 1, px: 160, py: 16, dir: 'right', moving: false, chain: false, hold: 0 });
+    ponPatrullas();const a = ents.find(x => x.pat);Object.assign(a, { x: 10 - e.d0, y: 1, fx: 10 - e.d0, fy: 1, px: (10 - e.d0) * 16, py: 16, dir: 'right', moving: false });
+    alarma(a);held.B = !!e.corre;dirOrder.length = 0;dirOrder.push('right');
+    const dt = 1000 / 60;let t = 0, pegado = null;
+    while (t < e.max * 1000 && SOSP.alarma && !pill) {
+      updatePlayer(dt);if (isFree()) updatePatrullas(dt);t += dt;
+      if (pegado === null && Math.abs(a.x - P.x) + Math.abs(a.y - P.y) <= 1) pegado = t / 1000;
+    }
+    const sigue = !!SOSP.alarma;
+    if (e.para && SOSP.alarma) { dirOrder.length = 0;for (let k = 0; k < 120 && !pill; k++) { updatePlayer(dt);if (isFree()) updatePatrullas(dt); } }
+    const r = { t: t / 1000, sigue, pegado, pill, d: Math.abs(a.x - P.x) };
+    held.B = false;dirOrder.length = 0;mode = 'pausa';ents = [];resetSosp();S.map = 'town';
+    for (let k = 0; k < 10; k++) await null;   // que acabe el run() del control (pillado) y suelte el lock
+    window.battle = b0;delete MAPS.__pista;delete ZONAS.__pista;delete PATRULLAS.__pista;delete RONDA.__pista;
+    out.push(r);
+  } return out; }, casos);
 
   // ---- 3. combate contra un ladrón: battle('thief') de verdad (crea al ladrón, thiefRound, enemyHits y el KO) con una
   // política fija o la tabla de la óptima. Comprueba también la vida y el golpe del ladrón y lo que te quita un KO ----
@@ -333,6 +405,7 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
     return (async () => {
       for (let i = 0; i < n; i++) {
         const z = c.zona || 'town';S = newState();Object.assign(S, { ch: c.ch, heat: 10, map: z });S.buds = { ria: { g: 50, thc: c.thc } };
+        if (c.type === 'ext') { S.buds = {};S.rosin = { ria: { g: 50, thc: c.thc } }; }   // el catador solo compra rosin
         const cl = { id: 'c', map: z, type: c.type, want: c.want, minThc: c.minThc };S.clients = [cl];
         await talkClient(cl);
         if (S.money > 150) { ok++;dh += S.heat - 10;cobro[S.money - 150] = 1; }
@@ -370,7 +443,8 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
     })();
   }, { e, n });
   // las zonas y la caja de verdad: ZONAS, CAJA y las constantes de la caja (11b-caja)
-  const zc = await juego(() => ({ ZONAS, CAJA, CAJA_P, CAJA_REDADA, CAJA_ANIO, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, CUOTA_DIAS }));
+  const zc = await juego(() => ({ ZONAS, PATRULLAS, PAT, ROSIN, CAJA, CAJA_P, CAJA_REDADA, CAJA_ANIO, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, CUOTA_DIAS,
+    rosin: [36, 54, 75].map(t => [t, precioRosin(t)]) }));
 
   // ---- 6. la Copa: harvest de verdad (fenotipo con rollFeno) de la carpa llena; los lotes se juntan con addBuds, como en el
   // juego (una variedad = un lote, con el THC medio por gramos; lo de un fenotipo estrella, aparte), y cada lote de 20 g o
@@ -412,7 +486,7 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
     for (const e of [...(res.paso || []), ...(res.ladron || []), ...(res.policia || []), ...(res.ruta ? [res.ruta] : [])])
       if (!(e.ch >= 1)) throw new Error('caso reservado sin «ch»: ' + JSON.stringify(e));
     // ---------- caso reservado: solo comprobar ----------
-    for (const e of res.paso || []) { const mc = await paso('reservado paso', e, N * 5);console.log(`paso: modelo ${pc(pPolicia(e), 2)} / ${pc(pLadron(e), 2)} · juego ${pc(mc.pol, 2)} / ${pc(mc.lad, 2)}`); }
+    for (const e of res.paso || []) { const mc = await paso('reservado paso', e, N * 5);console.log(`paso: ladrón modelo ${pc(pLadron(e), 2)} · juego ${pc(mc.lad, 2)} (controles por paso: ${mc.pol})`); }
     for (const e of res.ladron || []) { const { x, mc } = await pelea(`reservado ladrón ${e.pol}`, e, N);
       console.log(`ladrón ${e.pol}: modelo KO ${pc(x.ko)} gana ${pc(x.win)} · juego KO ${pc(mc.ko)} gana ${pc(mc.win)}`); }
     for (const e of res.policia || []) for (const op of ['sobornar', 'hablar', 'huir', 'entregar']) {
@@ -420,55 +494,88 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
       console.log(`policía ${op}: modelo requisa ${pc(x.pReq)}, −${coma(x.m, 1)} €, calor ${coma(x.dh, 2)} · juego ${pc(mc.pReq)}, −${coma(mc.m, 1)} €, ${coma(mc.h, 2)}`); }
     if (res.ruta) {
       const [ru] = await rutasDe([{ k: 'reservada', de: res.ruta.de, a: res.ruta.a }]), er = res.ruta, xr = trayecto(ru.tiles, er), mr = await trayectoMC(ru.tiles, er, N);
-      compara('reservado ruta policía', xr.pol, mr.pol, N);compara('reservado ruta ladrón', xr.lad, mr.lad, N);
-      console.log(`ruta reservada (${ru.tiles.length} pasos, ${ru.tiles.filter(t => t.tall).length} en hierba alta): modelo control ${pc(xr.pol)} ladrón ${pc(xr.lad)} · juego ${pc(mr.pol)} ${pc(mr.lad)}`);
+      exige('reservado ruta: ningún control por paso', mr.pol === 0, mr.pol);compara('reservado ruta ladrón', xr.lad, mr.lad, N);
+      console.log(`ruta reservada (${ru.tiles.length} pasos, ${ru.tiles.filter(t => t.tall).length} en hierba alta): ladrón modelo ${pc(xr.lad)} · juego ${pc(mr.lad)}`);
     }
   } else {
     // ---------- 1. por paso ----------
     const PASOS = [
       { n: 'Sin nada (0 g, < 150 €)', ch: 3, heat: 0, g: 0, money: 100 },
       { n: 'Solo dinero (0 g, ≥ 150 €), de día', ch: 3, heat: 0, g: 0, money: 2000 },
-      { n: 'Con gramos, calor 0, de día', ch: 3, heat: 0, g: 50, money: 2000 },
-      { n: 'Con gramos, calor 50, de día', ch: 3, heat: 50, g: 50, money: 2000 },
-      { n: 'Con gramos, calor 89, de día', ch: 3, heat: 89, g: 50, money: 2000 },
-      { n: 'Con gramos, calor 89, con protección', ch: 5, heat: 89, protect: true, g: 50, money: 2000 },
-      { n: 'Con gramos, calor 50, de noche', ch: 3, heat: 50, g: 50, money: 2000, night: true },
-      { n: 'Con gramos, calor 50, de noche en hierba alta', ch: 3, heat: 50, g: 50, money: 2000, night: true, tall: true }];
+      { n: 'Con gramos, de día', ch: 3, heat: 0, g: 50, money: 2000 },
+      { n: 'Con gramos, calor 89 y la protección de Molina, de día (el calor ya no cuenta)', ch: 5, heat: 89, protect: true, g: 50, money: 2000 },
+      { n: 'Con gramos, de noche', ch: 3, heat: 50, g: 50, money: 2000, night: true },
+      { n: 'Con gramos, de noche en hierba alta', ch: 3, heat: 50, g: 50, money: 2000, night: true, tall: true }];
     const filas = [];
     for (const e of PASOS) {
-      const a = pPolicia(e), b = pLadron(e), mc = await paso(`paso «${e.n}»`, e, N * 5);
-      filas.push(`| ${e.n} | ${pc(a, 2)} | ${pc(b, 2)} | ${a + b ? miles(1 / (a + b)) : '—'} | ${pc(mc.pol, 2)} · ${pc(mc.lad, 2)} |`);
+      const b = pLadron(e), mc = await paso(`paso «${e.n}»`, e, N * 5);
+      filas.push(`| ${e.n} | ${pc(b, 2)} | ${b ? miles(1 / b) : '—'} | ${pc(mc.lad, 2)} |`);
     }
-    T.paso = ['| Situación | Control por paso | Ladrón por paso | Pasos de media hasta un encuentro | Juego (simulado) |', '|---|---|---|---|---|', ...filas].join('\n');
-    // ---------- 1 b. por zona (1.10): las mismas reglas × pol y × lad de cada zona, andadas en cada mapa ----------
-    for (const z in ZON) exige(`zona ${z}`, ['pol', 'lad', 'precio'].every(k => zc.ZONAS[z] && zc.ZONAS[z][k] === ZON[z][k]), zc.ZONAS[z]);
+    T.paso = ['| Situación | Ladrón por paso | Pasos de media hasta un ladrón | Juego (simulado) |', '|---|---|---|---|', ...filas].join('\n');
+    // ---------- 1 b. por zona (1.10): las mismas reglas × lad de cada zona, andadas en cada mapa; y sus patrullas ----------
+    for (const z in ZON) exige(`zona ${z}`, ['lad', 'precio'].every(k => zc.ZONAS[z] && zc.ZONAS[z][k] === ZON[z][k]) && zc.PATRULLAS[z].join() === ZON[z].pat.join(),
+      [zc.ZONAS[z], zc.PATRULLAS[z]]);
     exige('zonas: las siete', Object.keys(zc.ZONAS).join() === Object.keys(ZON).join(), Object.keys(zc.ZONAS));
-    const SZ = [{ n: 'Con gramos, calor 50, de día', ch: 5, heat: 50, g: 50, money: 2000 }, { n: 'Con gramos, calor 50, de noche', ch: 5, heat: 50, g: 50, money: 2000, night: true },
-      { n: 'Con gramos, calor 50, con protección', ch: 5, heat: 50, g: 50, money: 2000, protect: true }, { n: 'Solo dinero (0 g, ≥ 150 €), de noche', ch: 5, heat: 50, g: 0, money: 2000, night: true }];
+    const SZ = [{ n: 'Con gramos, de día', ch: 5, heat: 50, g: 50, money: 2000 }, { n: 'Con gramos, de noche', ch: 5, heat: 50, g: 50, money: 2000, night: true },
+      { n: 'Solo dinero (0 g, ≥ 150 €), de noche', ch: 5, heat: 50, g: 0, money: 2000, night: true }];
     const filasZ = [];
     for (const e of SZ) {
       const celdas = [];
-      for (const z in ZON) { const ez = { ...e, zona: z };await paso(`paso «${e.n}» en ${z}`, ez, N * 5);celdas.push(`${pc(pPolicia(ez), 2)} / ${pc(pLadron(ez), 2)}`); }
-      filasZ.push(`| ${e.n} | ${celdas.join(' | ')} |`);
+      for (const z in ZON) { const ez = { ...e, zona: z };await paso(`paso «${e.n}» en ${z}`, ez, N * 5);celdas.push(pc(pLadron(ez), 2)); }
+      filasZ.push(`| Ladrón por paso: ${e.n.charAt(0).toLowerCase() + e.n.slice(1)} | ${celdas.join(' | ')} |`);
     }
-    T.zonas = ['| Situación (cap. 5) | ' + Object.values(ZON).map(z => `${z.n}: control / ladrón`).join(' | ') + ' |', '|---|' + Object.keys(ZON).map(() => '---|').join(''), ...filasZ,
+    T.zonas = ['| Cap. 5 | ' + Object.values(ZON).map(z => z.n).join(' | ') + ' |', '|---|' + Object.keys(ZON).map(() => '---|').join(''), ...filasZ,
+      '| Agentes de patrulla (de día / de noche) | ' + Object.values(ZON).map(z => z.pat.join(' / ')).join(' | ') + ' |',
       '| Precio del gramo en la calle | ' + Object.values(ZON).map(z => '×' + String(z.precio).replace('.', ',')).join(' | ') + ' |'].join('\n');
 
     // ---------- 2. por trayecto (todas las celdas, andadas también en el juego) ----------
     const ESC = [
-      { n: 'cap. 3, calor 30, de día', ch: 3, heat: 30, g: 50, money: 2000 },
-      { n: 'cap. 5, calor 80, de noche', ch: 5, heat: 80, g: 50, money: 2000, night: true },
-      { n: 'cap. 5, calor 80, con protección', ch: 5, heat: 80, g: 50, money: 2000, protect: true }];
+      { n: 'de día', ch: 3, heat: 30, g: 50, money: 2000 },
+      { n: 'de noche', ch: 5, heat: 80, g: 50, money: 2000, night: true },
+      { n: 'de noche, sin gramos y con menos de 150 €', ch: 5, heat: 80, g: 0, money: 100, night: true }];
     const filasR = [];
     for (const r of rutas) {
       const celdas = [];
       for (const e of ESC) { const x = trayecto(r.tiles, e), mc = await trayectoMC(r.tiles, e, N);
-        compara(`trayecto ${r.k} (${e.n}) control`, x.pol, mc.pol, N);compara(`trayecto ${r.k} (${e.n}) ladrón`, x.lad, mc.lad, N);
-        celdas.push(`${pc(x.pol)} / ${pc(x.lad)}`); }
+        exige(`trayecto ${r.k} (${e.n}): ningún control por paso`, mc.pol === 0, mc.pol);compara(`trayecto ${r.k} (${e.n}) ladrón`, x.lad, mc.lad, N);
+        celdas.push(pc(x.lad)); }
       filasR.push(`| ${r.n} | ${r.tiles.length} | ${r.tiles.filter(t => t.tall).length} | ${celdas.join(' | ')} |`);
     }
-    T.rutas = ['| Ida desde casa | Pasos | En hierba alta | ' + ESC.map(e => `Control / ladrón (${e.n})`).join(' | ') + ' |',
+    T.rutas = ['| Ida desde casa | Pasos | En hierba alta | ' + ESC.map(e => `Ladrón (${e.n})`).join(' | ') + ' |',
       '|---|---|---|' + ESC.map(() => '---|').join(''), ...filasR].join('\n');
+
+    // ---------- 2 b. patrullas: sospecha hasta la alarma y la huida ----------
+    exige('patrullas: las constantes de 10b-patrulla', ['corre', 'vista', 'sube'].every(k => zc.PAT[k].join() === PAT[k].join()) && ['alto', 'baja', 'vende', 'pierde', 'olvida', 'tregua'].every(k => zc.PAT[k] === PAT[k]), zc.PAT);
+    const SOS = [
+      { n: '10 g, calor 0, de día', g: 10, heat: 0 }, { n: '50 g, calor 0, de día', g: 50, heat: 0 }, { n: '100 g o más, calor 0, de día', g: 100, heat: 0 },
+      { n: '50 g, calor 50, de día', g: 50, heat: 50 }, { n: '50 g, calor 50, con la protección de Molina', g: 50, heat: 50, protect: true },
+      { n: '50 g, calor 0, de noche', g: 50, heat: 0, night: true }, { n: '100 g o más, calor 80, de noche', g: 100, heat: 80, night: true },
+      { n: '2 g de rosin (salen de 10 g de flor), calor 0, de día', g: 2, rosin: 2, heat: 0 },
+      { n: 'Justo después de venderle 8 g a un cliente con un agente cerca (50 g, calor 0, de día)', g: 50, heat: 0, vende: true },
+      { n: 'Sin nada encima', g: 0, heat: 50 }];
+    const sj = await sospechaJuego(SOS.filter(e => e.g > 0).map(e => ({ ...e, g: e.rosin ? 0 : e.g })).concat([{ g: 50, heat: 0, espalda: true, v0: 99, baja: true }]));
+    const filasS = [];let k = 0;
+    for (const e of SOS) {
+      if (!e.g) { filasS.push(`| ${e.n} | 0 | nunca | nunca |`);continue; }
+      const v0 = e.vende ? PAT.vende : 0, x = alarmaEn(e, v0), mc = sj[k++];
+      exige(`sospecha «${e.n}»: alarma en ${coma(x, 2)} s (juego ${coma(mc.t, 2)} s)`, Math.abs(mc.t - x) <= .05 + 1e-9 && Math.abs(mc.v1 - v0) < 1e-9, mc);
+      filasS.push(`| ${e.n} | ${coma(ritmo(e), 1)} | ${coma(x, 1)} s | ${coma(mc.t, 2)} s |`);
+    }
+    const bj = sj[k];exige(`sospecha: de 99 a 0 sin verte en ${coma(99 / PAT.baja, 1)} s`, Math.abs(bj.t - 99 / PAT.baja) <= .05 + 1e-9, bj);
+    T.patrullas = ['| Te ve un agente con… | Sospecha por segundo | Hasta la alarma (de 0 a 100) | Juego (updatePatrullas cada 50 ms) |', '|---|---|---|---|', ...filasS].join('\n');
+    const HU = [{ noche: false, corre: true }, { noche: true, corre: true }, { noche: false, corre: false }, { noche: true, corre: false }];
+    const hj = await huidaJuego(HU.map(h => ({ night: h.noche, corre: h.corre, d0: 3, max: h.corre ? 12 : 15, para: !h.corre })));
+    const filasH = HU.map((h, i) => {
+      const x = huida(h.noche, 3, h.corre), mc = hj[i], q = `huida ${h.noche ? 'de noche' : 'de día'} ${h.corre ? 'corriendo' : 'andando'}`;
+      const fila = (fin, juego) => `| ${h.noche ? 'De noche' : 'De día'} · ${h.corre ? 'corriendo (B)' : 'andando'} | ${coma(x.va, 2)} | ${coma(x.vt, 2)} | ${fin} | ${juego} |`;
+      if (h.corre) {
+        exige(`${q}: te pierde a los ${x.escapa} s (juego ${mc.t} s)`, x.escapa != null && !mc.sigue && !mc.pill && Math.abs(mc.t - x.escapa) < 1e-6, mc);
+        return fila(`te pierde a los ${coma(x.escapa, 2)} s`, `${coma(mc.t, 2)} s`);
+      }
+      exige(`${q}: se te pega a los ${x.alcanza} s (juego ${mc.pegado} s), no te pierde y, si te paras, te pilla`, mc.sigue && mc.pill && mc.pegado != null && Math.abs(mc.pegado - x.alcanza) < 1e-6, mc);
+      return fila(`se te pega a los ${coma(x.alcanza, 2)} s y no te suelta; si te paras, te pilla`, `${coma(mc.pegado, 2)} s · pillado al pararte`);
+    });
+    T.huida = ['| Con la alarma, desde 3 casillas, en campo abierto | Él (casillas/s) | Tú (casillas/s) | Modelo | Juego (updatePlayer y updatePatrullas, 60 fotogramas/s) |', '|---|---|---|---|---|', ...filasH].join('\n');
 
     // ---------- 3. ladrón: probabilidad de KO por estrategia (todas las celdas, peleadas también en el juego) ----------
     const FILAS = [[2, 30], [5, 30], [5, 40], [8, 30], [8, 40], [8, 60]];
@@ -532,14 +639,15 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
       { n: 'Calle · currela, 8 g a precio justo', c: { ch: 4, type: 'cur', want: 8, minThc: 0, thc: 18 }, j: 1, acc: .92 },
       { n: 'Calle · pijo del cap. 6 (pide 21 % de THC), 12 g de THC 24 a precio caro', c: { ch: 6, type: 'pij', want: 12, minThc: 21, thc: 24 }, j: 2, acc: clamp(.3 + (24 - 21) * .05 + .25, .1, .9) },
       { n: 'Astilleros · currela, 8 g a precio justo (1 de cada 3 ventas, un chico de Darko)', c: { ch: 4, type: 'cur', want: 8, minThc: 0, thc: 18, zona: 'astilleros' }, j: 1, acc: .92, lad: 1 / 3 }];
-    const vender = [];
-    for (const v of VENTAS) {
-      const precio = Math.round(precioC(v.c.thc) * datos.mult[v.c.type] * ZON[v.c.zona || 'town'].precio * v.c.want * [.85, 1, 1.3][v.j]), mc = await ventaMC(v.c, v.j, N);
+    const vender = [], venta = async v => {   // el rosin (catador): a precioR y +2,5 de calor por gramo (la flor, +0,5)
+      const ext = v.c.type === 'ext', h = 3 + v.c.want * (ext ? 2.5 : .5);
+      const precio = Math.round((ext ? precioR : precioC)(v.c.thc) * datos.mult[v.c.type] * ZON[v.c.zona || 'town'].precio * v.c.want * [.85, 1, 1.3][v.j]), mc = await ventaMC(v.c, v.j, N);
       compara(`${v.n}: acepta`, v.acc, mc.acepta, N);compara(`${v.n}: chico de Darko`, v.lad || 0, mc.lad, mc.ok);
       exige(`${v.n}: cobras ${precio} €`, mc.cobro.length === 1 && mc.cobro[0] === precio, mc.cobro);
-      exige(`${v.n}: calor +${3 + v.c.want * .5}`, Math.abs(mc.calor - (3 + v.c.want * .5)) < 1e-9, mc.calor);
-      vender.push([v.n + ` (acepta el ${coma(v.acc * 100, 0)} %)`, precio, 3 + v.c.want * .5]);
-    }
+      exige(`${v.n}: calor +${h}`, Math.abs(mc.calor - h) < 1e-9, mc.calor);
+      return [v.n + ` (acepta el ${coma(v.acc * 100, 0)} %)`, precio, h];
+    };
+    for (const v of VENTAS) vender.push(await venta(v));
     vender.push(['Iñaki · 10 g para el viaje (una vez al día)', Math.round(precioC(18) * 1.2 * 10), 3],
       ['Al por mayor · 1 kg (una carga al día, hasta 1 kg antes del imperio)', Math.round(1000 * precioM(18)), 2 + 1000 / 100],
       ['Al por mayor · 10 kg (Mayorista del norte; el calor no pasa de 100)', Math.round(10000 * precioM(18)), Math.min(100, 2 + 10000 / 100)],
@@ -547,8 +655,12 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
     exige('Iñaki 10 g', iñaki.inaki.e === vender[3][1] && iñaki.inaki.h === 3 && iñaki.inaki.g === 10, iñaki.inaki);
     exige('al por mayor 1 kg', iñaki.mayor.e === vender[4][1] && iñaki.mayor.h === 12 && iñaki.mayor.g === 1000, iñaki.mayor);
     exige('encargo de Baltasar', iñaki.encargo.e === vender[6][1] && iñaki.encargo.h === 3 && iñaki.encargo.g === zc.ENCARGO[1] && iñaki.encargo.fin, iñaki.encargo);
-    T.eficiencia = ['| Venta (THC 18 %, salvo el pijo) | Cobras | €/g | Calor | € por punto de calor |', '|---|---|---|---|---|',
-      ...vender.map(([n, e, h], i) => { const g = [8, 12, 8, 10, 1000, 10000, zc.ENCARGO[1]][i];return `| ${n} | ${eur(e)} | ${coma(e / g, 2)} | +${coma(h, 0)} | ${miles(e / h)} € |`; })].join('\n');
+    // el rosin, al final (las de arriba se miran por su índice)
+    for (const [t, p] of zc.rosin) exige(`rosin al ${t} %: ${precioR(t)} €/g`, Math.abs(precioR(t) - p) < 1e-9, p);
+    exige('rosin: 20 % del peso, ×3 de THC, hasta el 75 %', zc.ROSIN.rend === .2 && zc.ROSIN.thc === 3 && zc.ROSIN.tope === 75, zc.ROSIN);
+    vender.push(await venta({ n: 'Catador · 2 g de rosin al 54 % a precio justo (cap. 3, con la prensa)', c: { ch: 4, type: 'ext', want: 2, minThc: 0, thc: 54 }, j: 1, acc: .92 }));
+    T.eficiencia = ['| Venta (THC 18 %, salvo el pijo y el rosin) | Cobras | €/g | Calor | € por punto de calor |', '|---|---|---|---|---|',
+      ...vender.map(([n, e, h], i) => { const g = [8, 12, 8, 10, 1000, 10000, zc.ENCARGO[1], 2][i];return `| ${n} | ${eur(e)} | ${coma(e / g, 2)} | +${coma(h, 0)} | ${miles(e / h)} € |`; })].join('\n');
     T.calorOk = `Comprobado con el juego: redada con calor 90 y no con 89,9 (se lleva las plantas, los gramos y hasta ${eur(datos.redada)} de multa, y deja el calor en 30); −12 al día; con protección, −20 y la redada se para (calor 50, sin quitar nada); +${datos.olor} por carpa en flor sin filtro.`;
 
     // ---------- 6. Copa ----------
@@ -572,10 +684,12 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
     exige('caja: C de 20.000 € y 2 kg, B de 50.000 € y 2,5 kg (380 €), 1 de cada 4 redadas, 1998, 300 € dentro', zc.CAJA[1].money === 20000 && zc.CAJA[1].g === 2000 && zc.CAJA[2].money === 50000 && zc.CAJA[2].g === 2500
       && zc.CAJA_P === 380 && zc.CAJA_REDADA === P_CAJA && zc.CAJA_ANIO === 1998 && zc.MAITE_CAJA === 300 && datos.redada === MULTA_R, zc);
     const R = Object.fromEntries(rutas.map(r => [r.k, r.tiles]));
-    const perdidaTramo = (tiles, e, eurG) => {   // primer encuentro del tramo: control (la mejor opción) o ladrón (la mejor estrategia)
+    // por tramo: el ladrón (la mejor estrategia; el primero del tramo) y, aparte, lo que pierdes si una patrulla te pilla (el
+    // control, con la mejor opción); sin gramos encima, la patrulla no sospecha y no hay control
+    const perdidaTramo = (tiles, e, eurG) => {
       const t = trayecto(tiles, e), lad = ladron({ ch: e.ch, hp: e.hp, rep: e.rep, spray: e.spray, bocata: e.bocata, pol: 'optima' });
-      const lp = e.g > 0 ? mejorPolicia(e, eurG).eur : 0, lk = lad.ko * (Math.floor(e.g / 2) * eurG + Math.round(e.money * .3));
-      return { pol: t.pol, lad: t.lad, eur: t.pol * lp + t.lad * lk };
+      const lk = lad.ko * (Math.floor(e.g / 2) * eurG + Math.round(e.money * .3));
+      return { lad: t.lad, eur: t.lad * lk, pilla: e.g > 0 ? mejorPolicia(e, eurG).eur : null };
     };
     // lo que hay que llevar para poder sobornar: X tal que X ≥ el soborno con X encima (el 5 % del dinero también cuenta)
     const extraSoborno = (heat, g, m) => { if (!g) return 0;let x = 0;while (x < soborno({ heat, g, money: m + x })) x++;return x; };
@@ -599,9 +713,9 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
       const viaje = async (legs, col) => {
         const L = dentro(legs), x = L.map(l => perdidaTramo(t, { ...c.base, ...l }, c.eurG));
         for (const [k, l] of L.entries()) { const e = { ...c.base, ...l }, mc = await trayectoMC(t, e, N);
-          compara(`caja «${c.n}» (${col}, tramo ${k + 1}) control`, x[k].pol, mc.pol, N);compara(`caja «${c.n}» (${col}, tramo ${k + 1}) ladrón`, x[k].lad, mc.lad, N); }
-        return { pol: 1 - (1 - x[0].pol) * (1 - x[1].pol), lad: 1 - (1 - x[0].lad) * (1 - x[1].lad), eur: x[0].eur + x[1].eur }; };
-      const celda = v => `${pc(v.pol)} / ${pc(v.lad)} · ${Math.round(v.eur) > 0 ? "−" : ""}${eur(v.eur)}`;
+          exige(`caja «${c.n}» (${col}, tramo ${k + 1}): ningún control por paso`, mc.pol === 0, mc.pol);compara(`caja «${c.n}» (${col}, tramo ${k + 1}) ladrón`, x[k].lad, mc.lad, N); }
+        return { lad: 1 - (1 - x[0].lad) * (1 - x[1].lad), eur: x[0].eur + x[1].eur, pilla: x[0].pilla }; };
+      const celda = v => `${pc(v.lad)} · ${Math.round(v.eur) > 0 ? "−" : ""}${eur(v.eur)} · ${v.pilla == null ? 'nada que ver' : '−' + eur(v.pilla)}`;
       filasK.push(`| ${c.n} | ${celda(await viaje(c.hoy, 'hoy'))} | ${celda(await viaje(c.caja, 'con caja'))} | ${extra ? celda(await viaje(soborno, 'con soborno')) : 'igual'} |`);
       const b = c.base, l = (x, y) => `${x.g ? miles(x.g) + ' g y ' : ''}${eur(x.money)} a la ida, ${y.g ? miles(y.g) + ' g y ' : ''}${eur(y.money)} a la vuelta`;
       sup.push(`- **${c.n}:** calor ${b.heat}, reputación ${b.rep}, vida ${b.hp}, ${b.spray ? b.spray + ' spray' + (b.spray > 1 ? 's' : '') : 'sin spray'} y ${b.bocata} bocata${b.night ? ', de noche' : ''}; gramos a ${coma(c.eurG, 2)} €/g. Sin caja: ${l(...c.hoy)}. Con caja: ${l(...c.caja)}${extra ? `; con el soborno, ${eur(extra)} más en cada tramo` : ''}.`);
@@ -616,9 +730,9 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
       filasRe.push(`| ${e.n} | ${e.caja ? pc(x.hallada, 0) : '—'} | −${eur(x.eur)} | −${eur(mc.eur)} |`);
     }
     T.redada = ['| En el piso (gramos a ' + coma(datos.eurG, 2) + ' €/g; las plantas se pierden igual) | Encuentran la caja | Pérdida media (modelo) | Juego |', '|---|---|---|---|', ...filasRe].join('\n');
-    T.caja = ['| Ida y vuelta | Sin caja: control / ladrón · pérdida media | Con caja | Con caja y el soborno encima |', '|---|---|---|---|', ...filasK].join('\n');
+    T.caja = ['| Ida y vuelta | Sin caja: ladrón · pérdida media · si te pilla una patrulla a la ida | Con caja | Con caja y el soborno encima |', '|---|---|---|---|', ...filasK].join('\n');
     T.cajaSup = sup.join('\n');
-    T.meta = `Generado con \`npm run analisis\`: ${miles(comprobadas)} cifras comprobadas con el juego (${miles(N)} combates, controles, ventas o trayectos simulados por celda, ${miles(N * 5)} pasos por situación y ${miles(NC)} carpas por fila de la Copa). Gramos a ${coma(datos.eurG, 2)} €/g (precio de calle de una variedad del 18 %), salvo donde se dice.`;
+    T.meta = `Generado con \`npm run analisis\`: ${miles(comprobadas)} cifras comprobadas con el juego (${miles(N)} combates, controles, ventas o trayectos simulados por celda, ${miles(N * 5)} pasos por situación, ${miles(NC)} carpas por fila de la Copa y las patrullas fotograma a fotograma). Gramos a ${coma(datos.eurG, 2)} €/g (precio de calle de una variedad del 18 %), salvo donde se dice.`;
   }
 
   await browser.close();

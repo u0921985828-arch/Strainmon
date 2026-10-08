@@ -324,17 +324,44 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     for (const [w, h] of [[568, 320], [640, 360], [740, 360], [844, 390], [915, 412], [1024, 768], [1366, 768], [360, 740], [412, 915]]) {
       await page.setViewportSize({ width: w, height: h }); await page.waitForTimeout(80);
       marco.push(await page.evaluate(([w, h]) => { ajustarPantalla(); const R = q => document.querySelector(q).getBoundingClientRect();
-        const s = R('#screen'), u = R('#ui'), d = R('#dpad'), a = R('.ab'), pi = R('.pills'), st = R('[data-b=START]'), so = R('#bSound'), gi = document.getElementById('girar');
+        const s = R('#screen'), u = R('#ui'), d = R('#dpad'), a = R('#ab'), st = R('#bStart'), so = R('#bSound'), gi = document.getElementById('girar'), cz = R('#dpad .cruz'), A = R('#ab [data-k=A]');
         const dentro = b => b.left >= 0 && b.top >= 0 && b.right <= w + .5 && b.bottom <= h + .5, cruza = (p, q) => p.left < q.right && q.left < p.right && p.top < q.bottom && q.top < p.bottom;
         const sinScroll = document.documentElement.scrollHeight <= h && document.documentElement.scrollWidth <= w;
         if (h > w) return { w, h, ok: !gi.hidden && R('#girar').width >= w - 1 && sinScroll, girar: !gi.hidden };
         const frac = s.width * s.height / (w * h), ancho = w / h >= 1.6, cuadrado = Math.abs(cv.width / 160 - s.width / s.height) < .02;
-        const libre = ![d, a, pi].some(b => cruza(b, u));
-        return { w, h, ok: gi.hidden && [s, d, a, st, so].every(dentro) && sinScroll && cuadrado && libre && !cruza(d, a) && frac >= (ancho ? .9 : .8) && d.width >= 96,
-          SW, us: +(u.width / 240).toFixed(2), pantalla: Math.round(s.width) + '×' + Math.round(s.height), frac: +frac.toFixed(2), cuadrado, libre, cruceta: Math.round(d.width) }; }, [w, h]));
+        const libre = ![d, a, st, so].some(b => cruza(b, u)), mm = 160 / 25.4;
+        // mandos en mm (1.10): cruz de 24 mm y A/B de 10,5 si caben (móvil de 740 × 360 o más), y nunca menos que la 1.9 (17,3 y 7,6)
+        const talla = w >= 740 && h >= 360 ? cz.width >= 24 * mm - 1 && A.width >= 10.5 * mm - 1 : cz.width >= 17.3 * mm - 1 && A.width >= 7.6 * mm - 1;
+        // la caja de vida del combate (#bP) no queda debajo de A, B ni START (1.10)
+        const bp = document.getElementById('bP'), oc = bp.hidden; bp.innerHTML = '<div class="row"><span>ANDER</span><span>12 g</span></div><div class="hp">VIDA<span><i></i></span></div><div class="num">20/20 · 1300 €</div>';
+        bp.hidden = false; const P = R('#bP'), caja = ![A, R('#ab [data-k=B]'), st].some(b => cruza(b, P)) && P.left >= s.left && P.right <= s.right; bp.hidden = oc;
+        return { w, h, ok: gi.hidden && [s, d, a, st, so].every(dentro) && sinScroll && cuadrado && libre && !cruza(d, a) && frac >= (ancho ? .9 : .8) && talla && u.width / 240 >= 1.29 && caja,
+          SW, us: +(u.width / 240).toFixed(2), pantalla: Math.round(s.width) + '×' + Math.round(s.height), frac: +frac.toFixed(2), cuadrado, libre, caja, cruz: +(cz.width / mm).toFixed(1), A: +(A.width / mm).toFixed(1) }; }, [w, h]));
+    }
+    // la cruceta con un dedo (1.10): de ◀ a ▲ sin levantarlo cambia de flecha; un toque fuera de la cruz, en su zona, también vale
+    await page.setViewportSize({ width: 844, height: 390 }); await page.waitForTimeout(80);
+    const desliza = await page.evaluate(() => { ajustarPantalla(); const el = document.getElementById('dpad'), C = q => { const r = el.querySelector(q).getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
+      const ev = (t, [x, y]) => el.dispatchEvent(new PointerEvent(t, { pointerId: 7, clientX: x, clientY: y, bubbles: true, cancelable: true })), H = () => Object.keys(held).filter(k => held[k]).join();
+      const [l, u] = [C('.l'), C('.u')], r = {}; ev('pointerdown', l); r.baja = H(); for (let i = 1; i <= 6; i++) ev('pointermove', [l[0] + (u[0] - l[0]) * i / 6, l[1] + (u[1] - l[1]) * i / 6]);
+      r.tras = H(); ev('pointerup', u); r.suelta = H(); const z = el.getBoundingClientRect(); ev('pointerdown', [z.left + 3, l[1]]); r.borde = H(); ev('pointerup', [z.left + 3, l[1]]); r.fin = H(); return r; });
+    marco.push({ w: 'desliza', ok: desliza.baja === 'left' && desliza.tras === 'up' && desliza.suelta === '' && desliza.borde === 'left' && desliza.fin === '', ...desliza });
+    // al perder el foco sin pointerup (otra app), la cruceta y A sueltan y la cruceta vuelve a responder a un dedo nuevo
+    const foco = await page.evaluate(() => { const el = document.getElementById('dpad'), ab = document.getElementById('ab'), C = (e, q) => { const r = e.querySelector(q).getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
+      const ev = (e, t, id, [x, y]) => e.dispatchEvent(new PointerEvent(t, { pointerId: id, clientX: x, clientY: y, bubbles: true, cancelable: true })), H = () => Object.keys(held).filter(k => held[k]).join();
+      const r = {}; ev(el, 'pointerdown', 8, C(el, '.l')); ev(ab, 'pointerdown', 9, C(ab, '[data-k=A]')); r.antes = H(); dispatchEvent(new Event('blur')); r.blur = H();
+      r.on = document.querySelectorAll('#mando .on').length; ev(el, 'pointerdown', 10, C(el, '.r')); r.nuevo = H(); ev(el, 'pointerup', 10, C(el, '.r')); r.fin = H();
+      ev(ab, 'pointerdown', 11, C(ab, '[data-k=A]')); r.a = H(); ev(ab, 'pointerup', 11, C(ab, '[data-k=A]')); r.afin = H(); return r; });   // A/B olvidan el dedo de antes
+    marco.push({ w: 'foco', ok: foco.antes === 'left,A' && foco.blur === '' && foco.on === 0 && foco.nuevo === 'right' && foco.fin === '' && foco.a === 'A' && foco.afin === '', ...foco });
+    // márgenes seguros distintos a cada lado (muesca a un lado): la pantalla va corrida y el escenario sigue sin pisar los mandos (con 12 px, la
+    // columna simétrica de antes lo pisaba 3 px)
+    for (const lado of ['Left', 'Right']) {
+      marco.push(await page.evaluate(lado => { const el = document.getElementById('consola'); el.style['padding' + lado] = '12px'; ajustarPantalla();
+        const R = q => document.querySelector(q).getBoundingClientRect(), u = R('#ui'), cruza = (p, q) => p.left < q.right && q.left < p.right && p.top < q.bottom && q.top < p.bottom;
+        const libre = !['#dpad', '#ab', '#bStart', '#bSound'].some(q => cruza(R(q), u)); el.style['padding' + lado] = ''; ajustarPantalla();
+        return { w: 'muesca ' + lado, ok: libre && u.width / 240 >= 1.29, us: +(u.width / 240).toFixed(2) }; }, lado));
     }
     await page.setViewportSize({ width: 1000, height: 700 });
-    check('Pantalla completa en horizontal: reborde, píxeles cuadrados y mandos flotando en 7 tamaños; en vertical, «Gira el móvil»', marco.every(m => m.ok), marco.filter(m => !m.ok).concat(marco.length ? [] : ['sin datos']));
+    check('Pantalla completa en horizontal: reborde, píxeles cuadrados y mandos en mm flotando sin pisar el escenario ni la caja de vida del combate en 7 tamaños (y con la muesca a un lado); la cruceta se desliza y todo se suelta al perder el foco; en vertical, «Gira el móvil»', marco.every(m => m.ok), marco.filter(m => !m.ok).concat(marco.length ? [] : ['sin datos']));
     await page.waitForTimeout(300);
     check('Con atlas: 0 errores de JavaScript', errors.length === 0, errors.slice(0, 5));
     await page.close();

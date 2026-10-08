@@ -77,8 +77,11 @@ var u := 1.0
 var us := 1.0
 var uiw := 240.0
 var ut := 0.0
+var bp_r := 0.0   # de la caja de vida del jugador al borde derecho de la escena (--bpr)
 var scr := Rect2(0, 0, 240, 160)
-var mpx := 8.0
+var zona_cruz := Rect2()   # zonas de toque de la cruceta y de A/B, y la cruz que se ve
+var zona_ab := Rect2()
+var cruz := Rect2()
 
 func _ready() -> void:
 	D = Datos.carga()
@@ -249,44 +252,53 @@ func ajusta() -> void:
 	scr = Rect2(x, y, cw, ch)
 	pantalla.position = Vector2(x, y)
 	pantalla.size = Vector2(cw, ch)
-	var H := V.y / dp
-	var d := roundf(clampf(H * .34, 104, 150)) * dp
-	var ab := roundf(d / dp * .44) * dp
-	var m := roundf(clampf(H * .035, 8, 22)) * dp
-	mpx = m
-	var pill := roundf(clampf(H * .07, 24, 34)) * dp
-	var col := maxf(zl, zr) + m + maxf(d, ab * 2.25) + m * .5
-	us = clampf((V.x - 2 * col) / 240, minf(s, maxf(s * .5, 1.3 * dp)), s)
+	# mandos en mm (geo_mandos): se calculan en px CSS, como el HTML, y se pasan a px de pantalla
+	var us_min := minf(s, maxf(s * .5, 1.3 * dp))
+	var G := geo_mandos(V.x / dp, V.y / dp, zl / dp, zr / dp, zt / dp, zb / dp, 120 * us_min / dp)
+	for n in ["dpad", "cruz", "ab", "A", "B", "start", "sonido"]:
+		G[n] = Rect2(G[n].position * dp, G[n].size * dp)
+	var kp: float = G.k * dp
+	us = clampf(G.med * dp / 120, us_min, s)
 	uiw = minf(cw, roundf(240 * us))
-	var dx := zl + m
-	var dy := V.y - zb - m
-	_pon(botones.up, Vector2(dx + d / 3, dy - d), Vector2(d / 3, d / 3))
-	_pon(botones.left, Vector2(dx, dy - d * 2 / 3), Vector2(d / 3, d / 3))
-	_pon(botones.right, Vector2(dx + d * 2 / 3, dy - d * 2 / 3), Vector2(d / 3, d / 3))
-	_pon(botones.down, Vector2(dx + d / 3, dy - d / 3), Vector2(d / 3, d / 3))
-	_pon(botones.mid, Vector2(dx + d / 3, dy - d * 2 / 3), Vector2(d / 3, d / 3))
-	var abx := V.x - zr - m - ab * 2.25
-	var aby := V.y - zb - m - ab * 1.6
-	_pon(botones.B, Vector2(abx, aby + ab * .6), Vector2(ab, ab))
-	_pon(botones.A, Vector2(abx + ab * 1.25, aby), Vector2(ab, ab))
-	var pw := pill * 2.6
-	_pon(botones.START, Vector2(V.x - zr - m - pw, zt + m), Vector2(pw, pill))
-	_pon(botones.SONIDO, Vector2(V.x - zr - m - pw * 2 - m * .6, zt + m), Vector2(pw, pill))
+	zona_cruz = G.dpad
+	zona_ab = G.ab
+	cruz = G.cruz
+	var a: float = cruz.size.x / 3
 	for b in ["up", "down", "left", "right"]:
-		_estilo(botones[b], Color(24 / 255.0, 28 / 255.0, 34 / 255.0, .5), Color(70 / 255.0, 80 / 255.0, 96 / 255.0, .75), Color(1, 1, 1, .22), 8 * dp, d * .1, b)
+		_estilo(botones[b], Color(24 / 255.0, 28 / 255.0, 34 / 255.0, .5), Color(70 / 255.0, 80 / 255.0, 96 / 255.0, .75), Color(1, 1, 1, .22), kp * 1.6, kp * 2.4, b)
 	var st := StyleBoxFlat.new()
 	st.bg_color = Color(24 / 255.0, 28 / 255.0, 34 / 255.0, .5)
 	botones.mid.add_theme_stylebox_override("panel", st)
 	for b in ["A", "B"]:
-		_estilo(botones[b], Color(109 / 255.0, 44 / 255.0, 75 / 255.0, .55), Color(154 / 255.0, 74 / 255.0, 114 / 255.0, .85), Color(1, 210 / 255.0, 230 / 255.0, .4), ab / 2, ab * .36, "")
+		_estilo(botones[b], Color(109 / 255.0, 44 / 255.0, 75 / 255.0, .55), Color(154 / 255.0, 74 / 255.0, 114 / 255.0, .85), Color(1, 210 / 255.0, 230 / 255.0, .4), G.A.size.x / 2, kp * 3.8, "")
 	for b in ["START", "SONIDO"]:
-		_estilo(botones[b], Color(24 / 255.0, 28 / 255.0, 34 / 255.0, .55), Color(70 / 255.0, 80 / 255.0, 96 / 255.0, .75), Color(1, 1, 1, .22), pill / 2, pill * .42, "")
-	# escenario de diálogos: 240 us centrado, debajo de SONIDO/START si le caen encima
+		_estilo(botones[b], Color(24 / 255.0, 28 / 255.0, 34 / 255.0, .55), Color(70 / 255.0, 80 / 255.0, 96 / 255.0, .75), Color(1, 1, 1, .22), kp * 3.5, kp * 2.6, "")
+	# después de la letra: un botón no encoge por debajo de lo que pide la letra que tenía (de una ventana más grande)
+	_pon(botones.up, cruz.position + Vector2(a, 0), Vector2(a, a))
+	_pon(botones.left, cruz.position + Vector2(0, a), Vector2(a, a))
+	_pon(botones.right, cruz.position + Vector2(a * 2, a), Vector2(a, a))
+	_pon(botones.down, cruz.position + Vector2(a, a * 2), Vector2(a, a))
+	_pon(botones.mid, cruz.position + Vector2(a, a), Vector2(a, a))
+	_pon(botones.A, G.A.position, G.A.size)
+	_pon(botones.B, G.B.position, G.B.size)
+	_pon(botones.START, G.start.position, G.start.size)
+	_pon(botones.SONIDO, G.sonido.position, G.sonido.size)
+	# escenario de diálogos: 240 us centrado, debajo de SONIDO si le cae encima
 	var ux := x + cw / 2 - uiw / 2
 	ut = 0.0
-	var pr := Rect2(botones.SONIDO.position, Vector2(botones.START.position.x + botones.START.size.x - botones.SONIDO.position.x, pill))
-	if pr.position.x < ux + uiw and pr.end.y > y:
-		ut = roundf(pr.end.y - y + m * .4)
+	var so: Rect2 = G.sonido
+	if so.position.x < ux + uiw and so.end.y > y:
+		ut = roundf(so.end.y - y + kp * 1.5)
+	# caja de vida del jugador en el combate (bP, abajo a la derecha de la escena, ~46 u de alto): a la izquierda de A, B y START
+	# si le caen encima (--bpr en el HTML)
+	var er := x + cw / 2 + 120 * s
+	var bb := y + ch - 49 * s
+	bp_r = 6 * s
+	for n in ["A", "B", "start"]:
+		var r: Rect2 = G[n]
+		if r.position.y < bb + kp and r.end.y > bb - 46 * s - kp:
+			bp_r = maxf(bp_r, er - r.position.x + kp)
+	bp_r = roundf(minf(bp_r, 130 * s))
 	for n in [fade_el, wipe, endcard]:
 		_pon(n, scr.position, scr.size)
 	_pon(escena, Vector2(x + cw / 2 - 120 * u, y), Vector2(240 * u, ch))
@@ -295,6 +307,40 @@ func ajusta() -> void:
 	if menu_redraw.is_valid():
 		menu_redraw.call()
 	_coloca()
+
+# mandos en mm para el pulgar en reposo (geoMandos en 06b-pantalla, mismos números): en px CSS, con los rectángulos redondeados igual
+const MM := 160 / 25.4
+func geo_mandos(W: float, H: float, il: float, ir: float, it: float, ib: float, med: float) -> Dictionary:
+	var c := (W + il - ir) / 2
+	var ocupa := func(f: float) -> Array:
+		var s := f * MM
+		var m := f * f * f * MM
+		return [il + 4 * m + 25 * s + 2, ir + 6.75 * m + 23.86 * s + 2, ib + 35.25 * s + it + 10 * s + MM]
+	var cabe := func(o: Array) -> bool: return o[0] + med <= c and o[1] + med <= W - c and o[2] <= H
+	var f := 1.0
+	while f > .3 and not cabe.call(ocupa.call(f)):
+		f -= .005
+	var o: Array = ocupa.call(f)
+	var s := f * MM
+	var m := f * f * f * MM
+	var R := func(x: float, y: float, w: float, h: float) -> Rect2: return Rect2(Datos.jsround(x), Datos.jsround(y), Datos.jsround(w), Datos.jsround(h))
+	var cx := il + 4 * m + 12 * s
+	var cy := H - ib - 18 * s
+	var dx := maxf(il, cx - 15 * s)
+	var dy := cy - 15 * s
+	var ax := W - ir - 6.75 * m - 5.25 * s
+	var ay := H - ib - 19 * s
+	var bx := ax - 12.361 * s
+	var by := ay + 6.573 * s
+	var abx := bx - 6.25 * s
+	var aby := ay - 7.75 * s
+	var abr := minf(W - ir, ax + 7.75 * s)
+	var abb := minf(H - ib, by + 7.75 * s)
+	var stx := minf(ax, W - ir - 8 * s)
+	return {"f": f, "k": s, "med": minf(c - o[0], W - o[1] - c),
+		"dpad": R.call(dx, dy, cx + 13 * s - dx, minf(H - ib, cy + 15 * s) - dy), "cruz": R.call(cx - 12 * s, cy - 12 * s, 24 * s, 24 * s),
+		"ab": R.call(abx, aby, abr - abx, abb - aby), "A": R.call(ax - 5.25 * s, ay - 5.25 * s, 10.5 * s, 10.5 * s), "B": R.call(bx - 5.25 * s, by - 5.25 * s, 10.5 * s, 10.5 * s),
+		"start": R.call(stx - 7.5 * s, ay - 16.25 * s, 15 * s, 7 * s), "sonido": R.call(W - ir - 4.5 * m - 15 * s, it + 3 * s, 15 * s, 7 * s)}
 
 # rectángulo del escenario .ui (en px de pantalla)
 func ui_rect() -> Rect2:
@@ -460,36 +506,79 @@ func _unhandled_input(e: InputEvent) -> void:
 		set_held(b, false)
 
 # los mandos con varios dedos a la vez, como los pointerdown del HTML: cada toque aprieta el mando que pisa hasta que se levanta.
-# El ratón de verdad cuenta como un dedo más; el que Godot imita con el primer toque se descarta encima de los mandos
+# La cruceta, con un dedo: manda la flecha del ángulo desde el centro de la cruz (fuera de una zona muerta de 0,42 brazos) y, al
+# deslizar sin levantarlo, pasa a la otra; A y B: el más cercano dentro de su zona. El ratón de verdad cuenta como un dedo más;
+# el que Godot imita con el primer toque se descarta encima de los mandos
 var dedos := {}
+var dedos_cruz := {}   # dedo en la cruceta → flecha que aprieta ("" en la zona muerta)
 var rep := {}     # mando → [id del retardo, id del intervalo]
 
 func _input(e: InputEvent) -> void:
 	var dedo = null
 	if e is InputEventScreenTouch:
 		dedo = e.index
+	elif e is InputEventScreenDrag or (e is InputEventMouseMotion and e.device != InputEvent.DEVICE_ID_EMULATION):
+		var d = e.index if e is InputEventScreenDrag else "raton"
+		if dedos_cruz.has(d):
+			get_viewport().set_input_as_handled()
+			_cruz_a(d, e.position)
+		return
 	elif e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
 		if e.device == InputEvent.DEVICE_ID_EMULATION:
-			if mando_en(e.position) != "":
+			if zona_cruz.has_point(e.position) or mando_en(e.position) != "":
 				get_viewport().set_input_as_handled()
 			return
 		dedo = "raton"
 	else:
 		return
 	if e.pressed:
+		if zona_cruz.has_point(e.position):
+			get_viewport().set_input_as_handled()
+			if dedos_cruz.is_empty():
+				dedos_cruz[dedo] = ""
+				_cruz_a(dedo, e.position)
+			return
 		var k := mando_en(e.position)
 		if k != "":
 			get_viewport().set_input_as_handled()
 			dedos[dedo] = k
 			aprieta(k, true)
+	elif dedos_cruz.has(dedo):
+		get_viewport().set_input_as_handled()
+		var k: String = dedos_cruz[dedo]
+		dedos_cruz.erase(dedo)
+		if k != "":
+			aprieta(k, false)
 	elif dedos.has(dedo):
 		get_viewport().set_input_as_handled()
 		var k: String = dedos[dedo]
 		dedos.erase(dedo)
+		if not dedos.values().has(k):
+			aprieta(k, false)
+
+func dir_cruz(p: Vector2, actual: String) -> String:
+	var v := p - cruz.get_center()
+	if v.length() < cruz.size.x / 3 * .42:
+		return actual
+	if absf(v.x) > absf(v.y):
+		return "left" if v.x < 0 else "right"
+	return "up" if v.y < 0 else "down"
+
+func _cruz_a(dedo, p: Vector2) -> void:
+	var k: String = dedos_cruz[dedo]
+	var n := dir_cruz(p, k)
+	if n == k:
+		return
+	if k != "":
 		aprieta(k, false)
+	dedos_cruz[dedo] = n
+	if n != "":
+		aprieta(n, true)
 
 func mando_en(p: Vector2) -> String:
-	for k in ["up", "down", "left", "right", "A", "B", "START", "SONIDO"]:
+	if zona_ab.has_point(p):
+		return "A" if p.distance_to(botones.A.get_global_rect().get_center()) < p.distance_to(botones.B.get_global_rect().get_center()) else "B"
+	for k in ["START", "SONIDO"]:
 		if botones[k].get_global_rect().has_point(p):
 			return k
 	return ""
@@ -521,6 +610,10 @@ func suelta_todo() -> void:
 	for d in dedos:
 		aprieta(dedos[d], false)
 	dedos.clear()
+	for d in dedos_cruz:
+		if dedos_cruz[d] != "":
+			aprieta(dedos_cruz[d], false)
+	dedos_cruz.clear()
 	for b in held:
 		held[b] = false
 	dir_order.clear()
@@ -919,9 +1012,9 @@ func _coloca() -> void:
 		bE.reset_size()
 		bE.position = Vector2(6 * u, 8 * u)
 		bP.reset_size()
-		bP.position = Vector2(escena.size.x - 6 * u - bP.size.x, escena.size.y - 49 * u - bP.size.y)
+		bP.position = Vector2(escena.size.x - bp_r - bP.size.x, escena.size.y - 49 * u - bP.size.y)
 
-# el aviso, sin pisar la ficha ni START: de ancho, lo que quepa a la derecha de la ficha (el texto pasa a dos líneas)
+# el aviso, sin pisar la ficha ni SONIDO: de ancho, lo que quepa a la derecha de la ficha (el texto pasa a dos líneas)
 func coloca_toast() -> void:
 	if not toast_box.visible:
 		return
@@ -942,9 +1035,9 @@ func coloca_toast() -> void:
 	toast_box.reset_size()
 	toast_box.position.x = clampf(R.get_center().x - toast_box.size.x / 2, lo, maxf(lo, hi - toast_box.size.x))
 	toast_box.position.y = R.position.y + 24 * us
-	var stt := Rect2(botones.SONIDO.position, botones.START.position + botones.START.size - botones.SONIDO.position)
-	if stt.intersects(Rect2(toast_box.position, toast_box.size)):
-		toast_box.position.y = stt.end.y + 2 * us
+	var so := Rect2(botones.SONIDO.position, botones.SONIDO.size)
+	if so.intersects(Rect2(toast_box.position, toast_box.size)):
+		toast_box.position.y = so.end.y + 2 * us
 
 # <small>…</small> (rótulo de arriba, en una línea aparte), <br>, <em> y las entidades de esc()
 func html_bb(h: String) -> String:
@@ -1012,11 +1105,15 @@ func _pinta_wipe() -> void:
 
 # ---------- HUD (14-render updateHUD) ----------
 var hud_heat := 0
-func hud_pon(t: String, heat: int) -> void:
+var hud_sosp := -1   # la barra de sospecha (1.10): -1 sin patrullas en el mapa
+var hud_alarma := false
+func hud_pon(t: String, heat: int, sosp := -1, alarma := false) -> void:
 	if oraculo:
 		return
 	hud_txt.text = t
 	hud_heat = heat
+	hud_sosp = sosp
+	hud_alarma = alarma
 	hud.show()
 	hud_bar.queue_redraw()
 	_coloca.call_deferred()
@@ -1029,7 +1126,15 @@ func _pinta_hud_bar() -> void:
 	var y := (9 * u - 3 * u) / 2
 	hud_bar.draw_rect(Rect2(x, y, 34 * u, 3 * u), Color("#2e3a34"))
 	hud_bar.draw_rect(Rect2(x, y, 34 * u * hud_heat / 100.0, 3 * u), Color("#f04040") if hud_heat >= 70 else Color("#f0a030"))
-	hud_bar.custom_minimum_size = Vector2(x + 34 * u, 9 * u)
+	var w := x + 34 * u
+	if hud_sosp >= 0:
+		var et := "¡ALARMA!" if hud_alarma else "SOSPECHA"
+		hud_bar.draw_string(f, Vector2(0, 9 * u + f.get_ascent(fs) + (9 * u - f.get_height(fs)) / 2), et, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#eef8f0"))
+		var x2 := f.get_string_size(et, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 3 * u
+		hud_bar.draw_rect(Rect2(x2, 9 * u + y, 34 * u, 3 * u), Color("#2e3a34"))
+		hud_bar.draw_rect(Rect2(x2, 9 * u + y, 34 * u * (100 if hud_alarma else hud_sosp) / 100.0, 3 * u), Color("#f04040") if hud_alarma else Color("#e8d040"))
+		w = maxf(w, x2 + 34 * u)
+	hud_bar.custom_minimum_size = Vector2(w, 18 * u if hud_sosp >= 0 else 9 * u)
 
 # ---------- ficha de la carpa (vcInfo): [título, [líneas]] · una línea que empieza por «!» va en rojo ----------
 var vc_lineas := []

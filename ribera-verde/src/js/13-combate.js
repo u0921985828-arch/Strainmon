@@ -52,8 +52,9 @@ async function enemyHits(){
     bAnim('P','desmayo');await say('Pierdes el conocimiento.');
     let lost=0;for(const b of Object.values(S.buds)){const l=Math.floor(b.g/2);lost+=l;b.g-=l;}
     for(const k of Object.keys(S.buds))if(S.buds[k].g<.5)delete S.buds[k];
+    let lr=0;for(const k of Object.keys(S.rosin)){const q=Math.round(S.rosin[k].g*5)/10;lr+=q;useRosin(k,q);}   // y la mitad del rosin (1.10)
     const lm=Math.round(S.money*.3);S.money-=lm;
-    await say(`Te roba ${lost} g y ${eur(lm)}.`);
+    await say(`Te roba ${lost} g${lr>0?', '+rosinTxt(lr):''} y ${eur(lm)}.`);
     return 'ko';
   }
   return null;
@@ -90,13 +91,14 @@ async function thiefRound(){
   }
   return enemyHits();
 }
-const MULTA_CALLE=601;   // tenencia en la vía pública: la mínima de la Ley de Seguridad Ciudadana (601-30.000 €)
+const MULTA_CALLE=601;   // tenencia en la vía pública: la mínima de la Ley de Seguridad Ciudadana (601-30.000 €). Devuelve lo requisado en texto
+// (cogollos y, si hay, rosin) y la multa
 function confiscate(extraFine=true){
-  const g=Math.floor(totalBuds()),fine=extraFine?Math.min(S.money,MULTA_CALLE):0;
-  if(B)bAnim('E','multa');S.buds={};S.money-=fine;S.heat=Math.max(0,S.heat-15);return [g,fine];
+  const g=Math.floor(totalBuds()),r=totalRosin(),fine=extraFine?Math.min(S.money,MULTA_CALLE):0;
+  if(B)bAnim('E','multa');S.buds={};S.rosin={};S.money-=fine;S.heat=Math.max(0,S.heat-15);return [g+' g'+(r?' y '+rosinTxt(r):''),fine];
 }
 // el soborno (1.10) sube también con el dinero que llevas encima: un 5 %
-const precioSoborno=()=>Math.round(40+S.heat*4+totalBuds()*.5+S.money*.05);
+const precioSoborno=()=>Math.round(40+S.heat*4+cargaSosp()*.5+S.money*.05);
 async function copRound(){
   const cost=precioSoborno();
   prompt('¿Qué haces?');
@@ -106,7 +108,7 @@ async function copRound(){
     if(S.money<cost){await say('No llevas tanto dinero encima.');return null;}
     if(!S.protect&&S.ch>=3&&Math.random()<.15){
       await say(`${B.name}: «¿Me intentas sobornar a mí? Esto me lo quedo.»`);
-      const [g,f]=confiscate();S.heat=Math.min(100,S.heat+20);sfx('bad');await say(`Te requisan ${g} g y te multan con ${eur(f)}.`);return 'caught';}
+      const [g,f]=confiscate();S.heat=Math.min(100,S.heat+20);sfx('bad');await say(`Te requisan ${g} y te multan con ${eur(f)}.`);return 'caught';}
     S.money-=cost;S.heat=Math.max(0,S.heat-10);sfx('coin');bhud();bAnim('E','soborno');
     await say(`${B.name} se guarda el sobre. «Aquí no ha pasado nada.»`);return 'bribe';
   }
@@ -114,13 +116,13 @@ async function copRound(){
     await say(`${S.name}: «Solo estaba dando un paseo, agente.»`);
     if(Math.random()<clamp(.3+S.rep/250-S.heat/300,.1,.85)){await say(`${B.name}: «Bien. Circula.»`);return 'talk';}
     await say(`${B.name}: «No. Vacía los bolsillos.»`);
-    const [g,f]=confiscate();sfx('bad');bhud();await say(`Te requisan ${g} g y te multan con ${eur(f)}.`);return 'caught';
+    const [g,f]=confiscate();sfx('bad');bhud();await say(`Te requisan ${g} y te multan con ${eur(f)}.`);return 'caught';
   }
   if(c===2){
     if(Math.random()<.45+(isNight()?.15:0)){sfx('door');S.heat=Math.min(100,S.heat+8);await say('Sales corriendo entre los coches y lo pierdes.');return 'flee';}
     bAnim('E','perseguir');await say(`${B.name} te alcanza y te reduce en el suelo.`);
-    const [g,f]=confiscate();S.hp=Math.max(1,S.hp-5);sfx('hurt');bhud();await say(`Te requisan ${g} g y te multan con ${eur(f)}.`);return 'caught';
+    const [g,f]=confiscate();S.hp=Math.max(1,S.hp-5);sfx('hurt');bhud();await say(`Te requisan ${g} y te multan con ${eur(f)}.`);return 'caught';
   }
-  const [g]=confiscate(false);bhud();await say(`Le entregas ${g} g. «Buena decisión. Por esta vez, sin multa.»`);return 'caught';
+  const [g]=confiscate(false);bhud();await say(`Le entregas ${g}. «Buena decisión. Por esta vez, sin multa.»`);return 'caught';
 }
 

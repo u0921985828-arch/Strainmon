@@ -3,7 +3,8 @@
 # Guardar, Sonido y Salir), un paseo por la calle (la salida del felpudo y la puerta del portal) y, con lo que vendería Kiko
 # (semillas, insecticida, la carpa de 100 y un foco de sodio: la tienda la recorre historia.gd), un ciclo de cultivo entero:
 # andar hasta la carpa, abrirla (vista B con el CFL), colgar el foco (vista C), plantar las 4 plazas, cuidarlas cada mañana,
-# volver a la cama a dormir y cosechar. Al final, CONTINUAR desde el título carga la partida tal cual.
+# volver a la cama a dormir y cosechar. Con la cosecha encima, a la calle: un agente de patrulla la ve, la sospecha llena la
+# barra, salta la alarma y el jugador escapa corriendo por el portal. Al final, CONTINUAR desde el título carga la partida tal cual.
 # Comprueba también los mandos (teclado, dedos en los mandos, varios a la vez, el ratón y Atrás), los menús en bucle, tocar el
 # diálogo, el sonido (síntesis, música de cada sitio y SONIDO), el HUD, la ficha, las barras de cada planta (en transparencia
 # las de delante de la elegida), el aviso de plaga y el de las secas de cada noche, los daños y que tratada vuelve a ser la de
@@ -63,6 +64,18 @@ func toque(dedo: int, b: String, on: bool) -> void:
 	e.pressed = on
 	Input.parse_input_event(e)
 	await espera(3)
+
+# el dedo, sin levantarlo, del centro del mando a al del b en 6 pasos
+func arrastra(dedo: int, a: String, b: String) -> void:
+	var p0: Vector2 = J.botones[a].get_global_rect().get_center()
+	var p1: Vector2 = J.botones[b].get_global_rect().get_center()
+	for i in range(1, 7):
+		var e := InputEventScreenDrag.new()
+		e.index = dedo
+		e.position = p0.lerp(p1, i / 6.0)
+		Input.parse_input_event(e)
+		await espera(1)
+	await espera(2)
 
 func clic(b: String) -> void:
 	for on in [true, false]:
@@ -246,13 +259,14 @@ func danos(i: int) -> Array:
 				n += 1
 	return [n, silueta, Vista.clave_planta(J.S, sano, v), b]
 
-# el aviso de arriba, sin pisar la ficha ni START y dentro de la pantalla del juego, con la ventana de cada tamaño;
+# el aviso de arriba, sin pisar la ficha, SONIDO ni START y dentro de la pantalla del juego, con la ventana de cada tamaño;
 # si no hay aviso, el más largo de los que salen al dormir
 const TAMANOS := [Vector2i(1560, 720), Vector2i(2400, 1080), Vector2i(1280, 960), Vector2i(1024, 768), Vector2i(2560, 1600), Vector2i(800, 600)]
 func check_aviso(cuando: String) -> void:
 	var era: Vector2i = root.size
 	var txt: String = J.toast_txt.get_parsed_text() if J.toast_box.visible else "Has descansado · Luz −25,00 € · Partida guardada"
 	var mal := []
+	var mal_m := []
 	for t in TAMANOS:
 		root.size = t
 		if not J.toast_box.visible:
@@ -261,13 +275,32 @@ func check_aviso(cuando: String) -> void:
 		var r := rect(J.toast_box)
 		var fi := Rect2(J.escena.position + J.vc_info.position, J.vc_info.size)
 		var ok: bool = root.get_visible_rect().size == Vector2(t) and J.toast_box.visible and not (J.vc_info.visible and r.intersects(fi)) \
-			and not r.intersects(rect(J.botones.START)) and rect(J.pantalla).encloses(r)
+			and not r.intersects(rect(J.botones.START)) and not r.intersects(rect(J.botones.SONIDO)) and rect(J.pantalla).encloses(r)
 		if not ok:
 			mal.append("%dx%d" % [t.x, t.y])
-			print("  aviso %s · ficha %s · START %s · pantalla %s" % [r, fi if J.vc_info.visible else "-", rect(J.botones.START), rect(J.pantalla)])
+			print("  aviso %s · ficha %s · START %s · SONIDO %s · pantalla %s" % [r, fi if J.vc_info.visible else "-", rect(J.botones.START), rect(J.botones.SONIDO), rect(J.pantalla)])
+		# los mandos (1.10, en mm): dentro de la ventana y sin pisar el escenario de diálogos
+		var v := Rect2(Vector2.ZERO, Vector2(t))
+		var zonas := [J.zona_cruz, J.zona_ab, rect(J.botones.START), rect(J.botones.SONIDO)]
+		if not zonas.all(func(z): return v.encloses(z) and not z.intersects(J.ui_rect())):
+			mal_m.append("%dx%d" % [t.x, t.y])
+			print("  mandos %s · escenario %s" % [zonas, J.ui_rect()])
+		# la caja de vida del combate (bP) no queda debajo de A, B ni START (bp_r, como --bpr en el HTML)
+		var bp_era: bool = J.bP.visible
+		if not bp_era:
+			J.bhud_pon({"e": ["TIRONERO", "VIDA", 1.0, Color("#58d080")], "p": ["ANDER", "12 g", 1.0, Color("#58d080"), "20/20 · 1300 €"]})
+			await espera(2)
+		var bp: Rect2 = J.bP.get_global_rect()
+		if [J.botones.A, J.botones.B, J.botones.START].any(func(b): return b.get_global_rect().intersects(bp)) or not J.escena.get_global_rect().encloses(bp):
+			mal_m.append("%dx%d (caja de vida)" % [t.x, t.y])
+			print("  caja de vida %s · A %s · START %s" % [bp, J.botones.A.get_global_rect(), J.botones.START.get_global_rect()])
+		if not bp_era:
+			J.bhud_pon(null)
+			J.bh = {}
 	root.size = era
 	await espera(4)
-	check("el aviso no pisa la ficha ni START y cabe en la pantalla (%s; mal en: %s)" % [cuando, ", ".join(mal)], mal.is_empty())
+	check("el aviso no pisa la ficha, SONIDO ni START y cabe en la pantalla (%s; mal en: %s)" % [cuando, ", ".join(mal)], mal.is_empty())
+	check("los mandos caben y no pisan el escenario de diálogos ni la caja de vida del combate (%s; mal en: %s)" % [cuando, ", ".join(mal_m)], mal_m.is_empty())
 
 # lo más alto de una onda (16 bits con signo)
 func pico(w: AudioStreamWAV) -> int:
@@ -296,6 +329,7 @@ func _corre() -> void:
 	await menu_start()
 	await paseo()
 	await ciclo()
+	await patrulla()
 	await continuar()
 	print("ciclo: %d fallos" % fallos.size())
 	quit(1 if fallos.size() else 0)
@@ -726,6 +760,87 @@ func ciclo() -> void:
 	check("partida guardada", FileAccess.file_exists(Juego.GUARDADO) and not FileAccess.file_exists(Juego.GUARDADO + ".tmp"))
 	await foto("10-cosecha")
 	print("ciclo: %d noches" % noches)
+
+# ---------- patrulla (1.10): con la cosecha encima, el jugador a 6 casillas del portal y un agente 3 más allá; la sospecha sube,
+# salta la alarma y, corriendo con B por delante del agente, el portal la deja en la calle ----------
+func patrulla() -> void:
+	# deslizar en la cruceta (1.10): sin levantar el dedo, de ◀ a ▲ cambia de flecha; al soltar, nada se queda apretado
+	await libre()
+	await toque(0, "left", true)
+	var ini: bool = J.held.left and J.botones.left.button_pressed
+	await arrastra(0, "left", "up")
+	var tras: bool = J.held.up and not J.held.left and J.botones.up.button_pressed and not J.botones.left.button_pressed
+	await toque(0, "up", false)
+	await hasta(func(): return not J.P.moving, 120)
+	check("deslizando el dedo por la cruceta de ◀ a ▲ cambia de flecha sin levantarlo", ini and tras and not J.held.up and not J.held.left and J.rep.is_empty())
+	var m: Dictionary = J.MAPS.home
+	var ex: Vector2i
+	for k in m.exits:
+		var p: PackedStringArray = k.split(",")
+		ex = Vector2i(int(p[0]), int(p[1]))
+	await anda(ex)
+	await toque(0, "down", true)
+	await hasta(func(): return J.S.map == "town", 120)
+	await toque(0, "down", false)
+	await libre()
+	var puerta := Vector2i(-1, -1)
+	for k in J.MAPS.town.doors:
+		if J.MAPS.town.doors[k].to == "home":
+			var p: PackedStringArray = k.split(",")
+			puerta = Vector2i(int(p[0]), int(p[1]))
+	var pats: Array = J.ents.filter(func(e): return e.get("pat"))
+	check("capítulo %d en el barrio: %d agente(s) de patrulla" % [J.S.ch, pats.size()], J.S.ch >= 2 and pats.size() == J.n_patrullas() and pats.size() >= 1)
+	if pats.is_empty():
+		return
+	# una recta de calle de 9 casillas desde el portal: el jugador a 6, el agente a 9 mirándolo, quieto hasta la alarma
+	var mt: Dictionary = J.MAPS.town
+	var t := Vector2i(J.P.x, J.P.y)
+	var lado := Vector2i(-1, -1)
+	var sitio := Vector2i(-1, -1)
+	var mira_a := ""
+	for d in ["left", "right", "down", "up"]:
+		var ok := sitio.x < 0
+		for i in range(1, 10):
+			var v: Vector2i = t + DV[d] * i
+			ok = ok and v.x >= 0 and v.y >= 0 and v.x < mt.w and v.y < mt.h and J.re_calle().search(mt.g[v.y][v.x]) != null and not J.tile_solid(mt, v.x, v.y) \
+				and not mt.doors.has("%d,%d" % [v.x, v.y]) and not mt.exits.has("%d,%d" % [v.x, v.y])
+		if ok:
+			lado = t + DV[d] * 6
+			sitio = t + DV[d] * 9
+			mira_a = {"down": "up", "up": "down", "left": "right", "right": "left"}[d]
+	check("recta de calle junto al portal para la persecución: el jugador a (%d,%d), el agente a (%d,%d)" % [lado.x, lado.y, sitio.x, sitio.y], sitio.x >= 0)
+	if sitio.x < 0:
+		return
+	var e: Dictionary = pats[0]
+	for o in pats:   # quietos lejos mientras el jugador se aparta del portal
+		o.merge({"espera": 1e9}, true)
+	await anda(lado)
+	for o in pats.slice(1):
+		o.merge({"x": 1, "y": 1, "fx": 1, "fy": 1, "px": 16.0, "py": 16.0, "moving": false, "espera": 1e9, "caza": false}, true)
+	e.merge({"x": sitio.x, "y": sitio.y, "fx": sitio.x, "fy": sitio.y, "px": sitio.x * 16.0, "py": sitio.y * 16.0, "dir": mira_a, "moving": false, "espera": 1e9, "caza": false}, true)
+	J.reset_sosp()
+	var f0 := Engine.get_process_frames()
+	check("con %d g encima y el agente mirando, la sospecha sube" % int(J.total_buds()), await pasa(func(): return J.SOSP.v >= 40, 900))
+	J.update_hud()
+	await foto("12-sospecha")
+	check("HUD: la barra de SOSPECHA (%d %%)" % J.hud_sosp, J.hud.visible and J.hud_sosp >= 40 and not J.hud_alarma)
+	check("se llena: ¡ALTO, POLICÍA! y el agente corre a por el jugador", await pasa(func(): return J.SOSP.alarma != null, 1500) and e.caza)
+	print("patrulla: alarma en %d fotogramas" % (Engine.get_process_frames() - f0))
+	var a0 := Vector2i(e.x, e.y)
+	J.update_hud()
+	await foto("13-alarma")
+	check("HUD: ¡ALARMA!", J.hud_alarma)
+	# el «¡alto!» (PAT.alto): quieto hasta que se le acaba la espera, para que dé tiempo a reaccionar; luego corre
+	f0 = Engine.get_process_frames()
+	check("«¡alto!»: el agente se queda quieto antes de correr", await hasta(func(): return e.espera <= 0, 120) and Vector2i(e.x, e.y) == a0)
+	print("patrulla: «¡alto!» de %d fotogramas desde la foto" % (Engine.get_process_frames() - f0))
+	f0 = Engine.get_process_frames()
+	check("corriendo (B) 6 casillas hasta el portal con el agente detrás", await anda(puerta, true))
+	await libre()
+	var corre := absi(e.x - a0.x) + absi(e.y - a0.y)
+	print("patrulla: huida en %d fotogramas; el agente corre %d casillas" % [Engine.get_process_frames() - f0, corre])
+	check("el agente persigue (%d casillas) y no alcanza al que corre" % corre, corre >= 3 and J.mode == "world")
+	check("dentro del portal, la alarma y la sospecha se quedan en la calle", J.S.map == "home" and J.SOSP.alarma == null and J.SOSP.v == 0 and J.mode == "world")
 
 # ---------- CONTINUAR: el juego de nuevo desde el título carga la partida guardada ----------
 func continuar() -> void:

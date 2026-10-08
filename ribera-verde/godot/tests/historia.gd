@@ -602,15 +602,17 @@ func _pasos() -> void:
 		await run(func(): await J.battle("thief"))
 		WANT = [],
 		func(): return (J.S.money > 100 and J.S.hpMax == 60 and J.mode == "world") or {"money": J.S.money, "hpMax": J.S.hpMax, "mode": J.mode})
-	step("Combate ladrón: desmayo → despiertas en casa", [], func():
+	step("Combate ladrón: desmayo → despiertas en casa (se lleva la mitad de la flor y del rosin y el 30 % del dinero, y lo dice)", [], func():
 		J.S.hpMax = 30
 		J.S.hp = 1
 		J.S.money = 1000
 		J.S.buds = {}
 		J.add_buds("ria", 20, 12)
+		J.S.rosin = {"ria": {"g": 3, "thc": 36}}
 		J.S.map = "town"
 		await run(func(): await J.battle("thief")),
-		func(): return (J.S.map == "home" and J.S.hp == J.S.hpMax and J.S.money == 700 and J.S.buds.ria.g == 10) or {"map": J.S.map, "hp": J.S.hp, "money": J.S.money, "buds": J.S.buds})
+		func(): return (J.S.map == "home" and J.S.hp == J.S.hpMax and J.S.money == 700 and J.S.buds.ria.g == 10 and J.S.rosin.ria.g == 1.5
+			and LOG.any(func(l): return "Te roba 10 g, 1,5 g de rosin y 300 €" in l)) or {"map": J.S.map, "hp": J.S.hp, "money": J.S.money, "buds": J.S.buds, "rosin": J.S.rosin})
 	step("Ladrón vencido sube la VIDA máxima", ["LUCHAR", "PATADA"] + spray, func():
 		J.S.hpMax = 40
 		J.S.hp = 40
@@ -620,6 +622,7 @@ func _pasos() -> void:
 		func(): return J.S.hpMax == 42 or {"hpMax": J.S.hpMax})
 	step("Policía: soborno con protección (40 + 4 × calor + 0,5 × gramos + 5 % del dinero encima)", ["SOBORNAR", "^Sí"], func():
 		J.S.protect = true
+		J.S.rosin = {}
 		J.S.heat = 40
 		J.S.money = 1000
 		J.add_buds("ria", 10, 12)
@@ -1006,7 +1009,7 @@ func _pasos() -> void:
 		J.S.map = "home",
 		func(): return (R.e and R.e.g == 2000 and R.e.hasta == R.d + 2 and R.tono and R.dia == 2300 and R.d1.m == 12000 and R.d1.s == 12000 and R.d1.rep == 2 and R.d1.heat == 3
 			and not R.d1.ria and R.d1.dragon == 300 and R.d1.enc == null and not R.d1.tono and R.e2 == 2 and R.rep3 == R.rep2 - 10 and R.enc3 == null and R.veto == 5 and R.tarde and R.fallo) or R)
-	step("Mapa ampliado: barrio alto y astilleros con sus puertas; policía y ladrones según la zona; clientes de cada zona", [], func():
+	step("Mapa ampliado: barrio alto y astilleros con sus puertas; ladrones al azar y patrullas según la zona; clientes de cada zona", [], func():
 		J.S.ch = 5
 		J.S.protect = false
 		J.S.heat = 0
@@ -1017,7 +1020,17 @@ func _pasos() -> void:
 		R = {"enc": {}}
 		var nb := {"t": null}
 		J.gancho_combate = func(t): nb.t = t
-		for zr in [["town", [.0019, .0059, .0061]], ["alto", [.0029, .0049, .0051]], ["astilleros", [.0009, .0089, .0091]]]:
+		var pt := []
+		for z in ["town", "alto", "astilleros", "puerto", "valdehierro", "mendialde", "errotabarri"]:
+			J.S.map = z
+			var o := []
+			for mn in [600, 1380]:
+				J.S.min = mn
+				o.append(str(J.n_patrullas()))
+			pt.append("/".join(o))
+		R.pat = ",".join(pt)
+		J.S.min = 600
+		for zr in [["town", [.0039, .0041]], ["alto", [.0019, .0021]], ["astilleros", [.0079, .0081]]]:
 			J.S.map = zr[0]
 			var t0: Array = D.CLIENT_TILES[zr[0]][0]
 			var o := []
@@ -1072,7 +1085,7 @@ func _pasos() -> void:
 		R.entsB = J.ents.filter(func(e): return rb.search(e.id) != null).size()
 		J.S.map = "home"
 		J.enter_map("home", 5, 5, "up"),
-		func(): return (R.enc.town == "police,thief," and R.enc.alto == "police,thief," and R.enc.astilleros == "police,thief,"
+		func(): return (R.enc.town == "thief," and R.enc.alto == "thief," and R.enc.astilleros == "thief," and R.pat == "1/2,2/2,1/1,1/1,1/1,0/0,0/0"
 			and R.puertas == "alto,11,28,up|alto,12,28,up|town,12,1,down|astilleros,1,21,right|town,38,20,left|comisaria,4,6,up|almacen,4,6,up|txaro,4,6,up"
 			and R.salidas == "alto,26,19|astilleros,18,14|town,34,9" and R.warp == "alto,11,28" and R.c2.ends_with(",0,2") and R.c5 == "3,3" and R.tipos and R.ents == 0 and R.entsB == 3
 			and R.sobre == 80 and R.sp == 2) or R)
@@ -1119,6 +1132,163 @@ func _pasos() -> void:
 		J.gancho_combate = Callable()
 		J.S.map = "home",
 		func(): return (R.m1 == Datos.jsround(J.precio_calle(12) * D.CTYPES.cur.mult * 1.2 * 10) and R.m2 == R.m1 and R.b1 == 1 and ",".join(R.b) == "thief" and D.ZONAS.astilleros.precio == 1.2) or R)
+	step("Rosin: la prensa de Kiko (250 €, capítulo 3); en la mesa, 25 g de Skunk #1 al 12 % → 5 g de rosin al 36 % en media hora; catadores en 4 zonas; uno paga 10 + 0,6 × THC el gramo", ["Prensa de rosin", "Salir", "Prensar rosin", "^Skunk", "^25 g", "Rebaja"], func():
+		J.S.ch = 5
+		J.S.money = 1000
+		J.S.buds = {}
+		J.S.rosin = {}
+		J.S.items.prensa = 0
+		J.add_buds("ria", 40, 12)
+		await run(J.shop)
+		R = {"m": J.S.money, "p": J.S.items.prensa, "min": J.S.min}
+		J.S.map = "home"
+		await run(J.lab_action)
+		R.min = J.S.min - R.min
+		R.ros = J.S.rosin.duplicate(true)
+		R.g = J.total_buds()
+		J.S.clientsDay = 0
+		J.spawn_clients()
+		R.ext = ",".join(J.S.clients.filter(func(c): return c.type == "ext").map(func(c): return c.map))
+		J.S.map = "town"
+		var c := {"id": "cx9", "map": "town", "x": 5, "y": 20, "type": "ext", "want": 2, "minThc": 0}
+		J.S.clients.append(c)
+		R.m1 = J.S.money
+		await run(func(): await J.talk_client(c))
+		R.m1 = J.S.money - R.m1
+		R.r = J.total_rosin()
+		R.h = J.S.heat
+		J.S.map = "home",
+		func(): return (R.m == 750 and R.p == 1 and R.ros.ria.g == 5 and R.ros.ria.thc == 36 and R.g == 15 and R.min == 30 and R.ext == "town,town,astilleros,puerto,valdehierro"
+			and R.m1 == Datos.jsround(J.precio_rosin(36) * 2 * .85) and R.r == 3 and D.GLYPH.has("gota") and D.CTYPES.ext.label == "CATADOR") or R)
+	step("Patrullas: andan solo por la calle; la sospecha sube si te ven con algo (50 g: 14/s de día, 35 de noche, 5,6 con Molina; nada a la espalda ni sin nada encima); llena → te persiguen → control", ["ENTREGAR"], func():
+		J.S.ch = 5
+		J.S.protect = false
+		J.S.heat = 0
+		J.S.min = 600
+		J.S.buds = {}
+		J.S.rosin = {}
+		J.S.clients = []
+		J.enter_map("town", 16, 17, "up")
+		var pat := func() -> Array: return J.ents.filter(func(e): return e.get("pat"))
+		var vis := []
+		R = {}
+		for t in 1200:
+			J.update_patrullas(50)
+			if t % 20 == 0:
+				for e in pat.call():
+					vis.append("%d,%d" % [e.x, e.y])
+		R.calle = vis.all(func(k):
+			var xy: PackedStringArray = k.split(",")
+			return J.re_calle().search(J.MAPS.town.g[int(xy[1])][int(xy[0])]) != null)
+		R.traza = " ".join(vis)
+		R.v0 = J.SOSP.v
+		var sitios := {}
+		for k in vis:
+			sitios[k] = 1
+		R.sitios = sitios.size()
+		var mira := func(noche: bool, prot: bool, dir: String) -> float:
+			J.S.min = 1380 if noche else 600
+			J.S.protect = prot
+			J.reset_sosp()
+			J.pon_patrullas()
+			var ps: Array = pat.call()
+			var e: Dictionary = ps[0]
+			e.merge({"x": 16, "y": 14, "fx": 16, "fy": 14, "px": 256.0, "py": 224.0, "dir": dir, "moving": false, "espera": 1e9, "caza": false}, true)
+			for o in ps.slice(1):
+				o.merge({"x": 1, "y": 1, "fx": 1, "fy": 1, "moving": false, "espera": 1e9}, true)
+			J.P.merge({"x": 16, "y": 17, "fx": 16, "fy": 17, "moving": false}, true)
+			J.update_patrullas(1000)
+			return Datos.jsround(J.SOSP.v * 100) / 100.0
+		R.sinNada = mira.call(false, false, "down")
+		J.add_buds("ria", 50, 12)
+		R.dia = mira.call(false, false, "down")
+		R.noche = mira.call(true, false, "down")
+		R.molina = mira.call(false, true, "down")
+		R.espalda = mira.call(false, false, "up")
+		J.S.buds = {}
+		J.S.rosin = {"ria": {"g": 2, "thc": 36}}
+		R.rosin = mira.call(false, false, "down")
+		J.S.rosin = {}
+		J.add_buds("ria", 50, 12)
+		mira.call(false, false, "down")
+		var t := 1000
+		while t < 20000 and J.is_free():
+			J.update_patrullas(50)
+			t += 50
+		R.t = t
+		R.al = J.SOSP.alarma,
+		func(): return (R.calle and R.sitios >= 20 and R.v0 == 0 and R.sinNada == 0 and R.dia == 14 and R.noche == 35 and R.molina == 5.6 and R.espalda == 0 and R.rosin == 8.24
+			and R.t > 7000 + D.PAT.alto and R.t < 9000 + D.PAT.alto and J.S.buds.is_empty() and J.SOSP.tregua == D.PAT.tregua and R.al == null and R.traza.split(" ").size() == 60) or R)
+	step("Patrullas: con la alarma te pierde a más de 10 casillas y 4 s sin verte (la sospecha se queda en 50); por una puerta, al momento; vender a 5 casillas o menos de un agente, aunque no mire: +60", [], func():
+		J.S.ch = 5
+		J.S.min = 600
+		J.S.buds = {}
+		J.add_buds("ria", 50, 12)
+		J.enter_map("town", 16, 17, "up")
+		var una := func() -> Dictionary: return J.ents.filter(func(e): return e.get("pat"))[0]
+		var e: Dictionary = una.call()
+		e.merge({"x": 16, "y": 14, "fx": 16, "fy": 14, "dir": "down", "moving": false}, true)
+		J.alarma(e)
+		J.P.merge({"x": 37, "y": 26, "fx": 37, "fy": 26}, true)
+		R = {"a": J.SOSP.alarma}
+		var t := 0
+		while t < 30000 and J.SOSP.alarma != null:
+			J.update_patrullas(50)
+			t += 50
+		R.t = t
+		R.v = J.SOSP.v
+		R.d = absi(e.x - J.P.x) + absi(e.y - J.P.y)
+		J.enter_map("town", 16, 17, "up")
+		e = una.call()
+		J.alarma(e)
+		var k := ""
+		for kk in J.MAPS.town.doors:
+			if J.MAPS.town.doors[kk].to == "home" and k == "":
+				k = kk
+		await run(func(): await J.warp(J.MAPS.town.doors[k]))
+		R.puerta = "%s,%s,%s" % [J.S.map, J.SOSP.alarma if J.SOSP.alarma != null else "", Datos.js_num(J.SOSP.v)]
+		J.enter_map("town", 16, 17, "up")
+		e = una.call()
+		e.merge({"x": 16, "y": 14, "fx": 16, "fy": 14, "dir": "up", "moving": false}, true)
+		J.visto_vender()
+		R.vende = J.SOSP.v
+		J.S.map = "mendialde"
+		R.pueblo = J.n_patrullas()
+		J.enter_map("home", 5, 5, "up"),
+		func(): return (R.a == "pat0" and R.t == 4000 and R.v == 50 and R.d > 10 and R.puerta == "home,,0" and R.vende == 60 and R.pueblo == 0) or R)
+	step("Patrullas: fuera de la calle (tras una caza por el parque) vuelve a ella y sigue la ronda; si al amanecer se va el agente que te seguía, lo has despistado (sospecha 50)", [], func():
+		J.S.ch = 5
+		J.S.min = 600
+		J.S.buds = {}
+		J.S.rosin = {}
+		J.enter_map("town", 16, 17, "up")
+		var pats := func() -> Array: return J.ents.filter(func(e): return e.get("pat"))
+		var e: Dictionary = pats.call()[0]
+		R = {"g": J.MAPS.town.g[16][2]}
+		e.merge({"x": 2, "y": 16, "fx": 2, "fy": 16, "px": 32.0, "py": 256.0, "moving": false, "espera": 0.0, "caza": false, "pasos": 1000000000}, true)
+		var calle := func(x: int, y: int) -> bool: return J.re_calle().search(J.MAPS.town.g[y][x]) != null
+		var t := 0
+		while t < 20000 and not calle.call(e.x, e.y):
+			J.update_patrullas(50)
+			t += 50
+		R.t = t
+		R.en = "%d,%d" % [e.x, e.y]
+		for i in 100:
+			J.update_patrullas(50)
+		R.sigue = "%d,%d" % [e.x, e.y] != R.en and calle.call(e.x, e.y)
+		J.S.min = 359
+		J.reset_sosp()
+		J.enter_map("town", 16, 17, "up")
+		R.n = pats.call().size()
+		for o in pats.call():
+			if o.id == "pat1":
+				J.alarma(o)
+		J.S.min = 360
+		J.update_patrullas(50)
+		R.alba = "%d,%s,%s" % [pats.call().size(), J.SOSP.alarma if J.SOSP.alarma != null else "", Datos.js_num(J.SOSP.v)]
+		J.S.min = 600
+		J.enter_map("home", 5, 5, "up"),
+		func(): return (J.re_calle().search(R.g) == null and R.t > 0 and R.t <= 3000 and R.sigue and R.n == 2 and R.alba == "1,,50") or R)
 	step("Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor", [], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))

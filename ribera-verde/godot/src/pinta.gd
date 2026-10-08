@@ -219,8 +219,10 @@ func _mundo() -> void:
 	if Atlas.ok and ambiente_on:
 		for e in J.ents:
 			_ambiente(e)
+	if J.D.ZONAS.has(S.map):
+		_vistas()
 	for e in J.ents:
-		list.append([e.py, _pj.bind(e, e.look, false, 320.0)])
+		list.append([e.py, _pj.bind(e, e.look, false, float(e.get("dur", 320.0)))])
 	list.append([P.py, _pj.bind(P, J.D.LOOKS.player, true, P.dur)])
 	var bolsa = Atlas.foto_misc("bolsa")
 	if bolsa:
@@ -240,8 +242,11 @@ func _mundo() -> void:
 		var bx: int = Datos.jsround(e.px - cam.x) + 4
 		var by: int = Datos.jsround(e.py - cam.y) - 16 + bob
 		if e.def.get("client"):
-			_bocadillo(bx, by, "$", css("#2a9a4a"))
-		elif story_mark(e.id):
+			if e.def.client.type == "ext":
+				_bocadillo(bx, by, "gota", css("#d08a10"))
+			else:
+				_bocadillo(bx, by, "$", css("#2a9a4a"))
+		elif story_mark(e.id) or e.get("caza"):
 			_bocadillo(bx, by, "!", css("#e03030"))
 	if J.D.ZONAS.has(S.map):
 		var h: float = S.min / 60.0
@@ -632,6 +637,22 @@ func _vfx(c, capa: String) -> void:
 		var dy := floori(fi / 3.0) if v.sube else 0
 		var dx := floori(fi / 6.0) if v.sube and capa == "town" else 0
 		_dibujar(v.id, "efecto", "unica", t, v.x - c.x + dx, v.y - c.y - dy)
+
+# de día, por dónde mira cada agente (de noche, no: sigilo); con la alarma, ninguno (pintarVistas, 10b-patrulla)
+func _vistas() -> void:
+	if J.is_night() or J.SOSP.alarma != null:
+		return
+	var m: Dictionary = J.MAPS[J.S.map]
+	var R := int(J.D.PAT.vista[0])
+	var col := Color8(255, 230, 60, 87)
+	for e in J.ents:
+		if not e.get("pat"):
+			continue
+		for y in range(e.y - R, e.y + R + 1):
+			for x in range(e.x - R, e.x + R + 1):
+				if (x == e.x and y == e.y) or J.tile_solid(m, x, y) or not J.ve_casilla(e, x, y, 0):
+					continue
+				_rect(x * 16 - cam.x, y * 16 - cam.y, 16, 16, col)
 
 func _bocadillo(x: int, y: int, ch: String, col: Color) -> void:
 	_rect(x - 1, y - 1, 9, 10, css("#26262e"))

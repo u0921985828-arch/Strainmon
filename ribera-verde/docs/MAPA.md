@@ -433,7 +433,7 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Mendialde | mendialde (20,19) | (21,19) | 40 min · 3 € |
 | Errotabarri | errotabarri (6,13) | (7,13) | 30 min · 3 € |
 
-**Zonas** (`ZONAS`): factor de policía, de ladrones y de precio en cada mapa de fuera. Ribera Verde: policía ×1, ladrones ×1, precio ×1 · Barrio alto: policía ×1,5, ladrones ×0,5, precio ×1 · Astilleros: policía ×0,5, ladrones ×2, precio ×1,2 · Puerto Viejo: policía ×0,8, ladrones ×0,6, precio ×1,15 · Valdehierro: policía ×0,6, ladrones ×1,4, precio ×0,9 · Mendialde: policía ×0,2, ladrones ×0,1, precio ×1 · Errotabarri: policía ×0,2, ladrones ×0,1, precio ×1. Dentro de las casas no hay encuentros.
+**Zonas** (`ZONAS` y `PATRULLAS`): factor de ladrones y de precio en cada mapa de fuera, y los agentes que patrullan de día y de noche (desde el capítulo 2). Ribera Verde: ladrones ×1, precio ×1, 1/2 agentes · Barrio alto: ladrones ×0,5, precio ×1, 2/2 agentes · Astilleros: ladrones ×2, precio ×1,2, 1/1 agentes · Puerto Viejo: ladrones ×0,6, precio ×1,15, 1/1 agentes · Valdehierro: ladrones ×1,4, precio ×0,9, 1/1 agentes · Mendialde: ladrones ×0,1, precio ×1, 0/0 agentes · Errotabarri: ladrones ×0,1, precio ×1, 0/0 agentes. Dentro de las casas no hay encuentros.
 
 ## Objetos
 
@@ -501,3 +501,4 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Carpa 100×100 | 120 € | 2 | Segunda carpa para el piso: 4 plantas, focos de hasta 480 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. |
 | Carpa 150×100 | 140 € | 4 | Cambia tu carpa de 100 por una de 150: 6 plantas y focos de hasta 720 W. Tus plantas, foco y macetas se quedan. |
 | Carpa 120×120 | 150 € | 5 | Tercera carpa, junto a la cama: 6 plantas, focos de hasta 720 W y macetas de hasta 25 L. Trae un CFL y macetas de 7 L. Antes necesitas la del fondo. |
+| Prensa de rosin | 250 € | 3 | Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores. |
