@@ -2,6 +2,9 @@
    Precios reales (1.10): en la calle, el gramo a 6-10 € según el THC (× el tipo de cliente y lo que pidas); al por mayor,
    3,20-5 € (ventaMayor, 11-historia). */
 const precioCalle=thc=>4+thc*.2,precioMayor=thc=>2+thc*.1;
+// calor de una venta en la calle (1.11: antes 3 + 0,5 por gramo; ahora el primer plazo se paga sin redada, docs/ANALISIS.md) y
+// el aviso de antes de la investigación (heatWarn)
+const CALOR_CALLE={base:2,g:.3,rosin:2.5},CALOR_AVISO=50;
 // rosin (1.10): de la flor sale un 20 % del peso (real: 15-25 %) con el triple de THC, hasta el 75 % (real: 60-75 %); el gramo, a
 // 10 + 0,6 × THC € (≈ 42 € al 54 %; real: 30-60 €). Prensar compensa desde el 12,5 % de THC de la flor: 1 g de rosin vale más
 // que los 5 g de los que sale (10 + 1,8·t > 5·(4 + 0,2·t))
@@ -45,7 +48,7 @@ async function talkClient(c){
   const acc=[1,.92,clamp(.3+(b.thc-(ext?50:c.minThc||14))*.05+(c.type==='pij'?.25:0)+(c.type==='tur'?.15:0),.1,.9)][j];
   if(Math.random()<acc){
     if(ext)useRosin(sid,c.want);else useBuds(sid,c.want);
-    S.money+=pr[j];S.sales+=pr[j];S.heat=Math.min(100,S.heat+3+c.want*(ext?2.5:.5));S.rep+=[3,2,1][j];sfx('coin');
+    S.money+=pr[j];S.sales+=pr[j];S.heat=Math.min(100,Math.round((S.heat+CALOR_CALLE.base+c.want*(ext?CALOR_CALLE.rosin:CALOR_CALLE.g))*10)/10);S.rep+=[3,2,1][j];sfx('coin');
     await accion('vender',{id:'vfx-monedas',x:P.px+8,y:P.py+2});
     removeClient(c.id);apuntaFijo(c);
     await say(pick(['Trato hecho.','Gracias. Nos vemos.','Bien. Se lo diré a mis amigos.']),N);
@@ -55,5 +58,8 @@ async function talkClient(c){
     if(c.map==='astilleros'&&Math.random()<1/3){await say('Uno de los chicos de Darko te ha visto vender.');await say('«Te dijimos que lejos de nuestras esquinas.»','CHICO DE DARKO');await battle('thief');}
   }else{S.rep=Math.max(0,S.rep-1);sfx('bad');removeClient(c.id);await say(pick(['¿Tanto? No.','A ese precio, paso.','Eso es demasiado. Adiós.']),N);}
 }
-function heatWarn(){if(S.heat>=70&&!S.flags.heatW){S.flags.heatW=true;toast(`<small>CUIDADO</small>La policía investiga. Si el calor llega a ${NIVEL_POLI[3][0]} al cambiar el día, habrá orden de registro.`,3200);}if(S.heat<60)S.flags.heatW=false;}
+// 1.11: un aviso antes, con 50 (con 60 investigan), que dice por dónde se vende sin tanto calor
+function heatWarn(){if(S.heat>=70&&!S.flags.heatW){S.flags.heatW=true;S.flags.heatA=true;toast(`<small>CUIDADO</small>La policía investiga. Si el calor llega a ${NIVEL_POLI[3][0]} al cambiar el día, habrá orden de registro.`,3200);}
+  else if(S.heat>=CALOR_AVISO&&S.heat<70&&!S.flags.heatA){S.flags.heatA=true;toast(`<small>CALOR</small>Con ${NIVEL_POLI[2][0]}, la policía investiga. Vende menos en la calle: ${S.ch>=3?'Iñaki compra al por mayor':'Iñaki compra 10 g al día'} con menos calor.`,3200);}
+  if(S.heat<60)S.flags.heatW=false;if(S.heat<CALOR_AVISO-10)S.flags.heatA=false;}
 

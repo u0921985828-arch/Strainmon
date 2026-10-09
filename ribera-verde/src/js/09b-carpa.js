@@ -640,5 +640,5 @@ async function abrirCarpa(ci){
     if(b==='A'){VC.ocupado=true;vcInfo();(VC.sel===SEL_TEMP?temporizador(VC.ci):VC.sel<0?carpaAction(VC.ci):potAction(VC.sel)).then(()=>{VC.ocupado=false;vcInfo();});return;}
     if(DV[b]){const s=VC.sel;vcMover(b);if(s!==VC.sel){sfx('tick');vcInfo();}}
   }));
-  VC.ocupado=true;vcInfo();await fade(1);mode='world';VC=null;updateHUD();await fade(0);
+  VC.ocupado=true;vcInfo();await fade(1);mode='world';VC=null;updateHUD();revisaMisiones();await fade(0);   // 1.11: lo montado en la carpa cuenta ya
 }

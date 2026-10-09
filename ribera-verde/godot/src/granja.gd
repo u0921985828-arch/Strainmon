@@ -134,6 +134,8 @@ func new_day() -> void:
 	vencer_encargo()
 	if S.due > 0 and S.day > S.deadline:   # 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
 		queue("penalty", penalty_event)
+	elif S.due > 0 and (S.deadline - S.day == 3 or S.deadline == S.day):   # 1.11: a 3 días y el último
+		queue("plazo", recuerdo_plazo)
 
 # ---------- fenotipo ----------
 func tira_feno(sg: float) -> Dictionary:
@@ -1173,6 +1175,7 @@ func abrir_carpa(ci):
 	mode = "world"
 	VC = null
 	update_hud()
+	revisa_misiones()   # 1.11: lo montado en la carpa cuenta ya
 	await fade(0)
 
 # ---------- virtuales: las definen trama y juego ----------
@@ -1185,6 +1188,8 @@ func show_objective():
 func raid_event():
 	pass
 func aviso_orden():
+	pass
+func recuerdo_plazo():
 	pass
 func penalty_event():
 	pass

@@ -145,7 +145,7 @@ function atlasCarpa() {
       NPCDEF: NPCDEF.map(d => ({ id: d.id, map: d.map, x: d.x, y: d.y, look: d.look, wander: d.wander || 0, dir: d.dir || null })),
       ITEMS: ITEMS.map(it => ({ id: it.id, map: it.map, x: it.x, y: it.y, hidden: !!it.hidden })), SIGNS,
       SHOP: SHOP.map(it => { const o = {}; for (const k of ['lbl', 'p', 'ch', 'sid', 'item', 'n', 'desc', 'maceta', 'foco', 'extra', 'carpa', 'ci', 'aparato', 'bolsa']) if (it[k] != null) o[k] = it[k]; return o; }),
-      SOBRES, GRANEL, BANCO, SOBRE, DEUDA, PLAZOS, INTERES, PREMIO_COPA, SOBORNO, MULTA_REDADA, MULTA_PLANTA, MULTA_G, MULTA_TOPE, CALOR_REDADA, NIVEL_POLI, META_VENTAS, MULTA_CALLE,
+      SOBRES, GRANEL, BANCO, SOBRE, DEUDA, PLAZOS, INTERES, PREMIO_COPA, SOBORNO, MULTA_REDADA, MULTA_PLANTA, MULTA_G, MULTA_TOPE, CALOR_REDADA, NIVEL_POLI, META_VENTAS, MULTA_CALLE, CALOR_CALLE, CALOR_AVISO, MISIONES, PREMIO_N,
       ZONAS, PARADAS, BUS_HORAS, CAJA, CAJA_P, CAJA_ANIO, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, ENCARGO_DIAS, ENCARGO_VETO, CUOTA_DIAS,
       IMPERIO, RECIPE_HINTS, DICHO_CARPA, MOCHILAS, ENVIO, SMS_MAX, FIJOS_MAX, LLAMADA_MIN, NOMBRES_FIJO, THIEVES, COPS, SITIOS, MUEBLES, FORO, DOCU, JUEGOS, OLOR, ESQUEJE_DIAS, MS_PER_MIN, KIKO_TIPS: kiko,
       ROSIN, PATRULLAS, PAT, CALLE: CALLE.source, TAPA_VISTA: TAPA_VISTA.source, RONDA: Object.fromEntries(Object.keys(PATRULLAS).map(k => [k, casillasRonda(k)])),

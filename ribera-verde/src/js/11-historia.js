@@ -120,7 +120,7 @@ async function talkKiko(){
   if(!S.flags.kiko1){
     await talk(N,['{N}, pasa. Te pareces a tu tía.','Maite y yo cultivamos juntos desde que cerraron los astilleros. Ella tenía mano; yo, paciencia.','Para empezar, toma esto.']);
     addSeeds('ria',3);await got('3 semillas de SKUNK #1');S.items.fert+=2;await got('2 dosis de ABONO');
-    await talk(N,['La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.','Planta en las macetas del armario de tu tía y riega cuando baje el agua.','El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.','Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.','Las plantas siguen creciendo mientras duermes.']);
+    await talk(N,['La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.','Planta en las macetas del armario de tu tía y riega cuando baje el agua.','El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.','Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.','Las plantas siguen creciendo mientras duermes.','Te iré mandando al móvil lo que te hace falta para salir adelante. Lo tienes en START, en OBJETIVO.']);
     S.flags.kiko1=true;showObjective();return;
   }
   if(S.ch===4&&!S.flags.lab){
@@ -280,16 +280,18 @@ function objectiveText(){
   switch(S.ch){
     case 1:return S.flags.llegada===false?'Coge el autobús en la plaza de Mendialde hasta Ribera Verde.':!S.flags.letter?(S.map==='home'?'Lee la carta que hay en la mesa.':'Entra en el piso de la tía Maite, enfrente de la parada, y lee la carta que hay en la mesa.'):!S.flags.kiko1?'Visita el growshop de Kiko, al lado de casa.':'Planta y consigue tu primera cosecha.';
     case 2:return `Gana ${META_VENTAS} € vendiendo (${Math.min(META_VENTAS,Math.round(S.sales))}/${META_VENTAS}).`;
-    case 3:return !S.flags.metB?`Ve al bar El Ancla antes del día ${S.deadline}: Don Baltasar quiere ${eur(S.due)}.`:`Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
+    case 3:return (!S.flags.metB?`Ve al bar El Ancla antes del día ${S.deadline}: Don Baltasar quiere ${eur(S.due)}.`:`Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`)+llevas();
     case 4:return !S.flags.lab?'Kiko quiere verte en el growshop.':`Saca en la mesa 2 variedades de receta y cosecha una planta de cada (${recCount()}/2).`;
-    case 5:return `Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
+    case 5:return `Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`+llevas();
     case 6:return 'Gana la Copa: 20 g con más de 26,8% de THC al jurado de la plaza.';
-    case 7:return `Paga los últimos ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
+    case 7:return `Paga los últimos ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`+llevas();
     default:{if(S.encargo)return `Encargo de Don Baltasar: lleva ${kgTxt(S.encargo.g)} al almacén de los astilleros, de noche, antes de que acabe el día ${S.encargo.hasta}.`;
       const n=imperioNivel(),sig=IMPERIO[n+1],gen=`Genoteca ${DEX.filter(k=>S.disc[k]).length}/${DEX.length}`;
       return sig?`Tu imperio · ${IMPERIO[n].n}. Facturado desde la deuda: ${eur(Math.min(sig.meta,facturado()))} de ${eur(sig.meta)} para ser ${sig.n.toLowerCase()}. ${gen}.`:`Tu imperio · ${IMPERIO[n].n}. Completa la ${gen}.`;}
   }
 }
+// 1.11: en los plazos, lo que llevas entre el bolsillo y la caja
+const llevas=()=>` Llevas ${eur(S.money+cajaE())}.`;
 function showObjective(){const d=capHasta-Date.now();if(d>0){setTimeout(showObjective,d);return;}toast(`<small>OBJETIVO</small>${esc(objectiveText())}`,3200);}
 // el imperio (1.10): saldada la deuda, empieza. Cada rango se gana facturando desde el último pago (S.imp0) y sube lo que
 // Iñaki carga al día

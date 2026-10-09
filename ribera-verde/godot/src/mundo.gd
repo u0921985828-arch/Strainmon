@@ -61,6 +61,8 @@ func run(fn: Callable) -> void:
 	lock += 1
 	await fn.call()
 	lock -= 1
+	if lock == 0 and S and S.has("misiones"):   # 1.11: las misiones guiadas, al acabar cada guion (trama.gd)
+		revisa_misiones()
 
 func queue(key: String, fn: Callable) -> void:
 	if queued.has(key):
@@ -934,7 +936,7 @@ func talk_client(c: Dictionary) -> void:
 			use_buds(sid, c.want)
 		S.money += pr[j]
 		S.sales += pr[j]
-		S.heat = minf(100, S.heat + 3 + c.want * (2.5 if ext else .5))
+		S.heat = minf(100, Datos.jsround((S.heat + D.CALOR_CALLE.base + c.want * (D.CALOR_CALLE.rosin if ext else D.CALOR_CALLE.g)) * 10) / 10.0)
 		S.rep += [3, 2, 1][j]
 		sfx("coin")
 		await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})
@@ -972,12 +974,19 @@ func baja_calor() -> float:
 func multa_redada(plantas: int, g: int) -> int:
 	return mini(int(D.MULTA_TOPE), int(D.MULTA_REDADA) + int(D.MULTA_PLANTA) * plantas + int(D.MULTA_G) * g)
 
+# 1.11: un aviso antes, con 50 (con 60 investigan), que dice por dónde se vende sin tanto calor
 func heat_warn() -> void:
 	if S.heat >= 70 and not S.flags.get("heatW"):
 		S.flags.heatW = true
+		S.flags.heatA = true
 		toast("<small>CUIDADO</small>La policía investiga. Si el calor llega a %d al cambiar el día, habrá orden de registro." % int(D.NIVEL_POLI[3][0]), 3200)
+	elif S.heat >= D.CALOR_AVISO and S.heat < 70 and not S.flags.get("heatA"):
+		S.flags.heatA = true
+		toast("<small>CALOR</small>Con %d, la policía investiga. Vende menos en la calle: %s con menos calor." % [int(D.NIVEL_POLI[2][0]), "Iñaki compra al por mayor" if S.ch >= 3 else "Iñaki compra 10 g al día"], 3200)
 	if S.heat < 60:
 		S.flags.heatW = false
+	if S.heat < D.CALOR_AVISO - 10:
+		S.flags.heatA = false
 
 # ---------- patrullas (1.10, 10b-patrulla.js): los policías se ven por la calle ----------
 # PATRULLAS, PAT, CALLE, TAPA_VISTA y las casillas de ronda de cada mapa (RONDA) vienen del HTML (tools/godot.js)
@@ -1303,6 +1312,8 @@ func reset_sosp() -> void:
 
 # ---------- virtuales: las definen granja, trama y juego ----------
 func check_story():
+	pass
+func revisa_misiones() -> void:
 	pass
 func talk_kiko():
 	pass

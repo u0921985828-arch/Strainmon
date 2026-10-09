@@ -126,7 +126,7 @@ Desde el capítulo 2 aparecen cada día **min(10, 4 + reputación/15 + 1 desde e
 - **Justo** (×1): 92 % de aceptación, +2 de reputación.
 - **Caro** (×1,3): aceptación `0,30 + (THC − mínimo) × 0,05`, donde «mínimo» es el THC que pide el cliente (14 si no pide nada); +0,25 si es pijo y +0,15 si es turista, entre 10 % y 90 %. +1 de reputación.
 - Si rechaza: −1 de reputación y el cliente se va.
-- **Cada venta:** calor +3 + 0,5 × gramos.
+- **Cada venta:** calor +2 + 0,3 × gramos (1.11; el rosin, +2 + 2,5 × gramos), con un aviso a 50 de calor.
 - **Zonas (1.10):** en los astilleros, el gramo × 1,2, pero son las esquinas de Darko: 1 de cada 3 ventas acaba en un combate con uno de sus chicos.
 - **Iñaki** (muelle, desde el capítulo 2): compra 10 g al día a ×1,2. Suma +3 de calor y +2 de reputación. La primera vez regala Malawi Gold.
 - **Al por mayor (1.10, Iñaki desde el capítulo 3):** `(2 + THC × 0,1)` €/g, de 3,2 a 5 €/g, en cargas de 100 g, 250 g, 500 g, 1 kg… hasta lo que admite al día (1 kg; más en el imperio). Una carga al día: calor +2 + gramos/100 (1.10; antes, /250) y +1 de reputación. Es lo que hace falta para mover las cosechas de las carpas grandes.

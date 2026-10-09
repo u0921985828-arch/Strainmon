@@ -197,7 +197,7 @@ func talk_kiko():
 		await got("2 dosis de ABONO")
 		await talk(N, ["La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.", "Planta en las macetas del armario de tu tía y riega cuando baje el agua.",
 			"El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.", "Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.",
-			"Las plantas siguen creciendo mientras duermes."])
+			"Las plantas siguen creciendo mientras duermes.", "Te iré mandando al móvil lo que te hace falta para salir adelante. Lo tienes en START, en OBJETIVO."])
 		S.flags.kiko1 = true
 		show_objective()
 		return
@@ -570,15 +570,15 @@ func objective_text() -> String:
 			var mv := int(D.META_VENTAS)
 			return "Gana %d € vendiendo (%d/%d)." % [mv, mini(mv, Datos.jsround(S.sales)), mv]
 		3:
-			return ("Ve al bar El Ancla antes del día %s: Don Baltasar quiere %s." % [n(S.deadline), Datos.eur(S.due)]) if not S.flags.get("metB") else "Paga %s a Don Baltasar antes del día %s." % [Datos.eur(S.due), n(S.deadline)]
+			return (("Ve al bar El Ancla antes del día %s: Don Baltasar quiere %s." % [n(S.deadline), Datos.eur(S.due)]) if not S.flags.get("metB") else "Paga %s a Don Baltasar antes del día %s." % [Datos.eur(S.due), n(S.deadline)]) + llevas()
 		4:
 			return "Kiko quiere verte en el growshop." if not S.flags.get("lab") else "Saca en la mesa 2 variedades de receta y cosecha una planta de cada (%d/2)." % rec_count()
 		5:
-			return "Paga %s a Don Baltasar antes del día %s." % [Datos.eur(S.due), n(S.deadline)]
+			return "Paga %s a Don Baltasar antes del día %s." % [Datos.eur(S.due), n(S.deadline)] + llevas()
 		6:
 			return "Gana la Copa: 20 g con más de 26,8% de THC al jurado de la plaza."
 		7:
-			return "Paga los últimos %s a Don Baltasar antes del día %s." % [Datos.eur(S.due), n(S.deadline)]
+			return "Paga los últimos %s a Don Baltasar antes del día %s." % [Datos.eur(S.due), n(S.deadline)] + llevas()
 	if S.get("encargo"):
 		return "Encargo de Don Baltasar: lleva %s al almacén de los astilleros, de noche, antes de que acabe el día %s." % [_kg(int(S.encargo.g)), n(S.encargo.hasta)]
 	var nv := imperio_nivel()
@@ -593,12 +593,122 @@ func objective_text() -> String:
 		return "Tu imperio · %s. Facturado desde la deuda: %s de %s para ser %s. %s." % [I[nv].n, Datos.eur(minf(sig.meta, facturado())), Datos.eur(sig.meta), sig.n.to_lower(), gen]
 	return "Tu imperio · %s. Completa la %s." % [I[nv].n, gen]
 
+# 1.11: en los plazos, lo que llevas entre el bolsillo y la caja
+func llevas() -> String:
+	return " Llevas %s." % Datos.eur(S.money + caja_e())
+
 func show_objective():
 	var d := cap_hasta - M.reloj
 	if d > 0:
 		M.timeout(show_objective, d)
 		return
 	toast("<small>OBJETIVO</small>" + esc(objective_text()), 3200)
+
+# ---------- misiones guiadas (1.11, 11c-misiones.js): textos y regalos del HTML (D.MISIONES); aquí, lo que mira cada una ----------
+var mision_aviso: Array = []
+
+func _con_foco() -> Array:
+	return S.carpas.filter(func(c): return c is Dictionary and D.FOCOS.has(str(c.get("foco"))))
+
+func mision_ok(id: String) -> bool:
+	match id:
+		"caja":
+			return true if S.get("caja") else false
+		"luz":
+			return _con_foco().any(func(c): return c.foco != "cfl")
+		"carpa":
+			return S.carpas.filter(func(c): return c is Dictionary).size() >= 2
+		"olor":
+			return S.carpas.any(func(c): return Cultivo.kit_de(c) != "")
+		"inaki":
+			return true if S.flags.get("inaki") else false
+		"mayor":
+			return float(S.get("mDay", 0)) > 0
+		"potencia":
+			return _con_foco().any(func(c): return float(D.FOCOS[c.foco].w) >= 400)
+		"led":
+			return _con_foco().any(func(c): return D.FOCOS[c.foco].tipo == "led" and float(D.FOCOS[c.foco].w) >= 480)
+		"seis":
+			return S.carpas.any(func(c): return c is Dictionary and int(D.CARPAS[c.t].plazas) >= 6)
+	return false
+
+func misiones_ver() -> Array:
+	if not S.flags.get("kiko1"):
+		return []
+	return D.MISIONES.filter(func(m): return m.ch <= S.ch)
+
+func mision_sig():
+	for m in misiones_ver():
+		if not S.misiones.has(m.id):
+			return m
+	return null
+
+func premio_txt(m: Dictionary) -> Array:
+	var r := []
+	var p = m.get("p")
+	if p:
+		for k in p:
+			r.append("%d %s" % [int(p[k]), D.PREMIO_N[k]])
+	var s = m.get("s")
+	if s:
+		for k in s:
+			r.append("%d semillas de %s" % [int(s[k]), strain(k).n.to_upper()])
+	return r
+
+# run() la llama al acabar cada guion: marca las cumplidas, da el regalo y encola el SMS
+func revisa_misiones() -> void:
+	for m in misiones_ver():
+		if not S.misiones.has(m.id) and mision_ok(m.id):
+			S.misiones[m.id] = S.day
+			mision_aviso.append(m.id)
+			var p = m.get("p")
+			if p:
+				for k in p:
+					S.items[k] += int(p[k])
+			var s = m.get("s")
+			if s:
+				for k in s:
+					add_seeds(k, int(s[k]))
+	if mision_aviso.size():
+		queue("mision", aviso_mision)
+
+func aviso_mision():
+	while mision_aviso.size():
+		var id: String = mision_aviso.pop_front()
+		var m: Dictionary = {}
+		for x in D.MISIONES:
+			if x.id == id:
+				m = x
+		sfx("get")
+		toast("<small>MISIÓN CUMPLIDA</small>" + m.t, 2400)
+		await talk("SMS · KIKO", m.sms)
+		for t in premio_txt(m):
+			await got(t)
+	var sg = mision_sig()
+	if sg:
+		toast("<small>MISIÓN</small>" + sg.t, 3200)
+
+# el plazo (1.11): Toño avisa cuando quedan 3 días y el último, con lo que llevas
+func recuerdo_plazo():
+	var nd := int(S.deadline - S.day)   # los días, como los cuenta Baltasar (talk_baltasar)
+	var ll: float = S.money + caja_e()
+	await talk("SMS · TOÑO", [("Don Baltasar quiere %s antes de que acabe el día %s. Te quedan %d días." % [Datos.eur(S.due), n(S.deadline), nd]) if nd > 0 else "Hoy es el último día para los %s de Don Baltasar." % Datos.eur(S.due)])
+	await say(("Llevas %s entre el bolsillo y la caja: te faltan %s." % [Datos.eur(ll), Datos.eur(S.due - ll)]) if ll < S.due else "Llevas %s entre el bolsillo y la caja: ya lo tienes.%s Ve al bar El Ancla." % [Datos.eur(ll), " Saca lo que falte de la caja y" if S.money < S.due else ""])
+
+# START → OBJETIVO: el del capítulo, las misiones (con lo que hay que hacer abajo) y la deuda
+func objetivo_menu():
+	var it := [{"label": "CAPÍTULO %d" % S.ch, "desc": "%s\n%s" % [D.CH_TITLES.get(str(S.ch), ""), objective_text()]}]
+	var ini := 0
+	var mv := misiones_ver()
+	for i in mv.size():
+		var hecha: bool = S.misiones.has(mv[i].id)
+		it.append({"label": mv[i].t, "right": "HECHA" if hecha else null, "desc": mv[i].d})
+		if not hecha and ini == 0:
+			ini = i + 1
+	var plazo := ("Plazo: %s antes de que acabe el día %s. Llevas %s.\n" % [Datos.eur(S.due), n(S.deadline), Datos.eur(S.money + caja_e())]) if S.due > 0 else ""
+	it.append({"label": "DEUDA", "right": Datos.eur(S.debt), "desc": plazo + "Ventas %s · Reputación %s · Calor %d %%" % [Datos.eur(S.sales), n(S.rep), Datos.jsround(S.heat)]})
+	it.append({"label": "Volver", "desc": ""})
+	await menu(it, {"cls": "full", "title": "OBJETIVO", "title2": "cap. %d" % S.ch, "desc": true, "initial": ini})
 
 func facturado() -> float:
 	return maxf(0, S.sales - S.get("imp0", 0))
@@ -802,8 +912,7 @@ func start_menu():
 		elif i == 3:
 			await plantas()
 		elif i == 4:
-			await say("CAPÍTULO %d: %s\n%s" % [S.ch, D.CH_TITLES.get(str(S.ch), ""), objective_text()])
-			await say("Deuda: %s · Ventas: %s\nReputación %s · Calor %d%%" % [Datos.eur(S.debt), Datos.eur(S.sales), n(S.rep), Datos.jsround(S.heat)])
+			await objetivo_menu()
 		elif i == 5:
 			await say("Partida guardada." if save() else "No se ha podido guardar la partida.")
 		elif i == 6:

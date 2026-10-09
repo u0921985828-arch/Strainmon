@@ -11,7 +11,7 @@ async function startMenu(){
       {cls:'start',initial:i,startCloses:true,title:`DÍA ${S.day} · ${relojTxt()}`,title2:eur(S.money)});
     if(i<0||i===7)return;
     if(i===0)await genoteca();else if(i===1)await mochila();else if(i===2)await movilMenu();else if(i===3)await plantas();
-    else if(i===4){await say(`CAPÍTULO ${S.ch}: ${CH_TITLES[S.ch]||''}\n${objectiveText()}`);await say(`Deuda: ${eur(S.debt)} · Ventas: ${eur(S.sales)}\nReputación ${S.rep} · Calor ${Math.round(S.heat)}%`);}
+    else if(i===4)await objetivoMenu();
     else if(i===5)await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');
     else if(i===6)await opciones();
   }

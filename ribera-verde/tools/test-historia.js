@@ -128,8 +128,13 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   // ---------- capítulo 3 ----------
   await step('Don Baltasar explica la deuda', [], async () => { await run(talkBaltasar); },
     () => S.flags.metB && S.due === 3000 && S.debt === 30000 && S.deadline === S.flags.tono + 7 || { due: S.due, deadline: S.deadline, day: S.day });
-  await step('Plazo vencido → Toño cobra intereses (1.er plazo vencido)', [], async () => { S.deadline = S.day; advanceTime(24 * 60); await idle(); },
-    () => S.due === 3600 && S.debt === 30600 && S.deadline === S.day + 5 && S.vencidos === 1 || { due: S.due, debt: S.debt, vencidos: S.vencidos });
+  // 1.11: a 3 días del plazo, Toño avisa con lo que llevas (recuerdoPlazo)
+  await step('Plazo: a 3 días, el SMS de Toño con lo que llevas; vencido → Toño cobra intereses (1.er plazo vencido)', [], async () => {
+    // (el aviso, sin cambiar de día: newDay lo encola con S.deadline − S.day = 3 o 0)
+    const l0 = LOG.length; S.deadline = S.day + 3; await run(recuerdoPlazo); S.deadline = S.day; await run(recuerdoPlazo); window.R = { av: LOG.slice(l0), ll: S.money + cajaE(), d: S.day };
+    advanceTime(24 * 60); await idle(); },
+    () => S.due === 3600 && S.debt === 30600 && S.deadline === S.day + 5 && S.vencidos === 1 && R.av.includes(`SMS · TOÑO: Don Baltasar quiere ${eur(3000)} antes de que acabe el día ${R.d + 3}. Te quedan 3 días.`)
+      && R.av.includes(`SMS · TOÑO: Hoy es el último día para los ${eur(3000)} de Don Baltasar.`) && R.av.filter(l => l.startsWith(`Llevas ${eur(R.ll)} entre el bolsillo y la caja`)).length === 2 || { due: S.due, debt: S.debt, vencidos: S.vencidos, R });
   await step('Pagar 3.600 € → capítulo 4', ['^Pagar'], async () => { S.money = 6000; await run(talkBaltasar); },
     () => S.ch === 4 && S.debt === 27000 && S.due === 0 || { ch: S.ch, debt: S.debt });
 
@@ -137,8 +142,8 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   await step('Kiko instala la mesa de genética', [], async () => { await run(talkKiko); },
     () => S.flags.lab && S.seeds.rif === 3 || { lab: S.flags.lab, seeds: S.seeds });
   await step('Comprar en el growshop: un bote de abono (4 dosis) y un sobre de 10 Skunk #1', ['Abono', 'Semillas Skunk', 'Sobre de 10', 'Salir'], async () => {
-    window.R = { m: S.money, s: S.seeds.ria || 0 }; await run(shop);
-  }, () => S.items.fert === 5 && S.seeds.ria === R.s + 10 && S.money === R.m - 14 - 43 || { items: S.items, R, money: S.money, seeds: S.seeds.ria });
+    window.R = { m: S.money, s: S.seeds.ria || 0, f: S.items.fert }; await run(shop);
+  }, () => S.items.fert === R.f + 4 && S.seeds.ria === R.s + 10 && S.money === R.m - 14 - 43 || { items: S.items, R, money: S.money, seeds: S.seeds.ria });
   await step('Growshop: carpa de 100, foco LED 200 W colgado en el armario y una maceta de tela', ['Carpa 100', 'Foco LED 200', '^Armario', 'Maceta de tela 11', 'Salir'], async () => {
     S.money = 2000; await run(shop);
   }, () => S.carpas[1]?.t === 'm100' && S.carpas[0].foco === 'led200' && S.items.f_cfl === 1 && S.items.m_tela11 === 1 && S.pots.length === 6 && S.macetas.length === 6 && S.money === 2000 - 120 - 220 - 3 && pr('Carpa 100') === 120
@@ -256,8 +261,8 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   await step('Agente en la plaza: entregar la mercancía', ['ENTREGAR'], async () => {
     S.protect = false; addBuds('ria', 5, 12); await run(talkCop);
   }, () => Object.keys(S.buds).length === 0 || { buds: S.buds });
-  await step('Menú START: Genoteca, Mochila, Plantas, Objetivo', ['GENOTECA', '<B>', 'MOCHILA', '<B>', 'PLANTAS', '<B>', 'OBJETIVO', 'SALIR'],
-    async () => { await run(startMenu); }, () => handlers.length === 0);
+  await step('Menú START: Genoteca, Mochila, Plantas, Objetivo', ['GENOTECA', '<B>', 'MOCHILA', '<B>', 'PLANTAS', '<B>', 'OBJETIVO', '<B>', 'SALIR'],
+    async () => { await run(startMenu); }, () => handlers.length === 0 && LOG.some(l => l.startsWith(`  [menú] CAPÍTULO ${S.ch} | ${MISIONES.map(m => m.t).join(' | ')} | DEUDA | Volver`)) || LOG.slice(-4));
   await step('Cama: siesta de 3 horas', ['Siesta'], async () => { S.min = 600; S.hp = 5; await run(bedAction); },
     () => (S.min === 780 || S.min === 781) && S.hp === S.hpMax || { min: S.min, hp: S.hp });   // 780 = 600 + 180; entre la siesta y la comprobación puede pasar un minuto de reloj real
   // y el % índica de cada planta: igual al de su variedad en una línea estable; alrededor del suyo (σ de su tipo) en una landrace
@@ -570,14 +575,14 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     R.log2 = LOG.slice(l1); const l2 = LOG.length; await run(startMenu); R.otra = LOG.slice(l2).join('|'); S = S0; enterMap('home', 5, 5, 'up');
   }, () => R.m === 100 - Math.round(pr('Abono') * ENVIO) && R.envio === 'Abono de floración 1 L' && R.fert === 4 && R.envio2 === 0 && R.sms && R.sms.t === 'Te he dejado el paquete en casa: Abono de floración 1 L.'
     && R.log.some(l => /\[menú\] KIKO/.test(l)) && R.log.some(l => /^KIKO: /.test(l)) && R.fijos === JSON.stringify([{ id: 'cz1', n: R.nom, t: 'cur', dia: 0 }])
-    && R.t === LLAMADA_MIN && R.dh >= 1 + 3 && R.cobra > 0 && R.dia && R.log2.some(l => l === `  [menú] Kiko | ${R.nom} | Nada  → ${R.nom}`) && R.log2.some(l => l.startsWith(R.nom.toUpperCase() + ': Busco')) && new RegExp(`${R.nom} ya ha venido hoy`).test(R.otra) || R);
+    && R.t === LLAMADA_MIN && R.dh >= 1 + CALOR_CALLE.base && R.cobra > 0 && R.dia && R.log2.some(l => l === `  [menú] Kiko | ${R.nom} | Nada  → ${R.nom}`) && R.log2.some(l => l.startsWith(R.nom.toUpperCase() + ': Busco')) && new RegExp(`${R.nom} ya ha venido hoy`).test(R.otra) || R);
   await step('Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también arcón, sala, agenda, mensajes, pedidos y bolsa); con Toño ya visto, sale en el móvil', [], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 3, due: 0, deadline: 0, protect: true }); S.flags.metB = false; delete S.flags.tono;
-    for (const k of ['caja', 'rec', 'vencidos', 'protHasta', 'encargo', 'encVeto', 'arcon', 'sala', 'fijos', 'sms', 'envio']) delete S[k]; delete S.items.bolsa; migrate();
+    for (const k of ['caja', 'rec', 'vencidos', 'protHasta', 'encargo', 'encVeto', 'arcon', 'sala', 'fijos', 'sms', 'envio', 'misiones']) delete S[k]; delete S.items.bolsa; migrate();
     window.R = { due: S.due, dias: S.deadline - S.day, tono: S.flags.tono === S.day, hasta: S.protHasta - S.day, campos: JSON.stringify([S.caja, S.rec, S.vencidos, S.encargo, S.encVeto]),
-      nuevos: JSON.stringify([S.arcon, S.sala, S.fijos, S.sms, S.envio, S.items.bolsa]) };
+      nuevos: JSON.stringify([S.arcon, S.sala, S.fijos, S.sms, S.envio, S.items.bolsa]), mis: Object.keys(S.misiones).join() + '/' + Object.values(S.misiones).join() };
     S = JSON.parse(JSON.stringify(S0)); S.flags.metB = true; delete S.flags.tono; migrate(); R.tono2 = S.flags.tono === S.day; S = S0;
-  }, () => R.due === 3000 && R.dias === 7 && R.tono && R.hasta === 10 && R.campos === '[null,{},0,null,0]' && R.nuevos === '[{"buds":{},"rosin":{}},{},[],[],[],0]' && R.tono2 || R);
+  }, () => R.due === 3000 && R.dias === 7 && R.tono && R.hasta === 10 && R.campos === '[null,{},0,null,0]' && R.nuevos === '[{"buds":{},"rosin":{}},{},[],[],[],0]' && R.tono2 && R.mis === 'caja,luz,carpa,olor,inaki/0,0,0,0,0' || R);
   await step('Guardar y cargar la partida', [], async () => { save(); },
     () => { const sv = loadSave(); return sv && sv.ch === S.ch && sv.money === S.money && JSON.stringify(sv.disc) === JSON.stringify(S.disc) || 'no coincide'; });
 

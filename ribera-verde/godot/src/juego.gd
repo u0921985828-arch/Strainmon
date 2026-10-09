@@ -109,6 +109,7 @@ func migrate() -> void:
 	if (S.ch == 5 or S.ch == 7) and not (S.get("due", 0) > 0) and S.get("debt", 0) > 0:
 		S.due = mini(int(D.PLAZOS["5"]), S.debt) if S.ch == 5 else S.debt
 		S.deadline = maxi(S.get("deadline", 0) if S.get("deadline") else 0, S.day + (10 if S.ch == 5 else 7))
+	var sin_mis: bool = not S.has("misiones")
 	var d := new_state()
 	for k in d:
 		if not S.has(k):
@@ -116,6 +117,10 @@ func migrate() -> void:
 	for k in d.items:
 		if not S.items.has(k):
 			S.items[k] = 0
+	if sin_mis:   # 1.11: las de capítulos pasados, hechas y sin regalo
+		for m in D.MISIONES:
+			if m.ch < S.ch:
+				S.misiones[m.id] = 0
 	# 1.10: el plazo del capítulo 3 corre desde Toño (las partidas sin él, desde hoy) y la protección de Molina dura 10 días desde hoy
 	if S.ch == 3 and not S.flags.get("metB") and not (S.get("due", 0) > 0):
 		S.due = int(D.PLAZOS["3"])

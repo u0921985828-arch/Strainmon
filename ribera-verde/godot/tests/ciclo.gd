@@ -553,10 +553,12 @@ func menu_start() -> void:
 	await elige("PLANTAS")
 	check("Plantas: la sala (sin termohigrómetro), el armario con su foco y sus 2 plazas vacías", J.m_items.size() == 4 and J.m_items[0].label == "Sala" and J.m_items[0].right == "¿?" and J.m_items[1].label == "Armario 60×60" and J.m_items[2].label.ends_with("vacía"))
 	await pulsa("B")
-	textos.clear()
+	# OBJETIVO (1.11): una lista con el capítulo, las misiones (ninguna antes de conocer a Kiko) y la deuda
 	await elige("OBJETIVO")
-	await pasa(func(): return J.menu_box.visible and not J.dlg.visible)
-	check("Objetivo: el capítulo y la carta", textos.size() == 2 and textos[0].begins_with("CAPÍTULO 1") and textos[0].contains("carta"))
+	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OBJETIVO", 60)
+	check("Objetivo: el capítulo y la carta, sin misiones hasta conocer a Kiko, y la deuda", etiquetas() == ["CAPÍTULO 1", "DEUDA", "Volver"] and str(J.m_items[0].desc).contains("carta") and str(J.m_items[1].right) == Datos.eur(30000))
+	await pulsa("B")
+	await hasta(func(): return J.menu_box.visible and etiquetas().has("GUARDAR"), 60)
 	# OPCIONES · SONIDO apaga la música y los efectos (y lo dice el mando de arriba); otra vez, los enciende
 	await pasa(func(): return J.menu_box.visible)
 	var ini: bool = J.m_items.size() == 8 and J.m_items.all(func(x): return x.get("ic") != null)

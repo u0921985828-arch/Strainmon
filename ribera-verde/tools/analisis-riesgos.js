@@ -202,7 +202,7 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
   });
   const juego = (fn, a) => page.evaluate(fn, a);
   const datos = await juego(() => ({ eurG: precioCalle(18), eurMayor: precioMayor(18), pc: [12, 18, 24, 30].map(t => [t, precioCalle(t), precioMayor(t)]),
-    multa: MULTA_CALLE, redada: [MULTA_REDADA, MULTA_PLANTA, MULTA_G, MULTA_TOPE], calorR: CALOR_REDADA, niveles: NIVEL_POLI, olor: OLOR, premio: PREMIO_COPA,
+    multa: MULTA_CALLE, calle: CALOR_CALLE, redada: [MULTA_REDADA, MULTA_PLANTA, MULTA_G, MULTA_TOPE], calorR: CALOR_REDADA, niveles: NIVEL_POLI, olor: OLOR, premio: PREMIO_COPA,
     focos: Object.fromEntries(Object.entries(FOCOS).map(([k, F]) => [k, { thc: F.thc, w: F.w }])), W_M2,
     carpas: Object.fromEntries(Object.entries(CARPAS).map(([k, C]) => [k, { cm: C.cm, n: C.plazas }])),
     sigma: Object.fromEntries(Object.entries(GENETICA).map(([k, G]) => [k, G.sigma])),
@@ -646,8 +646,10 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
       { n: 'Calle · currela, 8 g a precio justo', c: { ch: 4, type: 'cur', want: 8, minThc: 0, thc: 18 }, j: 1, acc: .92 },
       { n: 'Calle · pijo del cap. 6 (pide 21 % de THC), 12 g de THC 24 a precio caro', c: { ch: 6, type: 'pij', want: 12, minThc: 21, thc: 24 }, j: 2, acc: clamp(.3 + (24 - 21) * .05 + .25, .1, .9) },
       { n: 'Astilleros · currela, 8 g a precio justo (1 de cada 3 ventas, un chico de Darko)', c: { ch: 4, type: 'cur', want: 8, minThc: 0, thc: 18, zona: 'astilleros' }, j: 1, acc: .92, lad: 1 / 3 }];
-    const vender = [], venta = async v => {   // el rosin (catador): a precioR y +2,5 de calor por gramo (la flor, +0,5)
-      const ext = v.c.type === 'ext', h = 3 + v.c.want * (ext ? 2.5 : .5);
+    // 1.11: cada venta en la calle, +2 de calor y +0,3 por gramo de flor (antes, 3 + 0,5) o +2,5 por gramo de rosin (catador)
+    exige('calor de la calle: 2 + 0,3 por gramo de flor y 2,5 de rosin', JSON.stringify(datos.calle) === JSON.stringify({ base: 2, g: .3, rosin: 2.5 }), datos.calle);
+    const vender = [], venta = async v => {   // el rosin (catador): a precioR
+      const ext = v.c.type === 'ext', h = 2 + v.c.want * (ext ? 2.5 : .3);
       const precio = Math.round((ext ? precioR : precioC)(v.c.thc) * datos.mult[v.c.type] * ZON[v.c.zona || 'town'].precio * v.c.want * [.85, 1, 1.3][v.j]), mc = await ventaMC(v.c, v.j, N);
       compara(`${v.n}: acepta`, v.acc, mc.acepta, N);compara(`${v.n}: chico de Darko`, v.lad || 0, mc.lad, mc.ok);
       exige(`${v.n}: cobras ${precio} €`, mc.cobro.length === 1 && mc.cobro[0] === precio, mc.cobro);
@@ -667,7 +669,7 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
     exige('rosin: 20 % del peso, ×3 de THC, hasta el 75 %', zc.ROSIN.rend === .2 && zc.ROSIN.thc === 3 && zc.ROSIN.tope === 75, zc.ROSIN);
     vender.push(await venta({ n: 'Catador · 2 g de rosin al 54 % a precio justo (cap. 3, con la prensa)', c: { ch: 4, type: 'ext', want: 2, minThc: 0, thc: 54 }, j: 1, acc: .92 }));
     T.eficiencia = ['| Venta (THC 18 %, salvo el pijo y el rosin) | Cobras | €/g | Calor | € por punto de calor |', '|---|---|---|---|---|',
-      ...vender.map(([n, e, h], i) => { const g = [8, 12, 8, 10, 1000, 10000, zc.ENCARGO[1], 2][i];return `| ${n} | ${eur(e)} | ${coma(e / g, 2)} | +${coma(h, 0)} | ${miles(e / h)} € |`; })].join('\n');
+      ...vender.map(([n, e, h], i) => { const g = [8, 12, 8, 10, 1000, 10000, zc.ENCARGO[1], 2][i];return `| ${n} | ${eur(e)} | ${coma(e / g, 2)} | +${coma(h, h % 1 ? 1 : 0)} | ${miles(e / h)} € |`; })].join('\n');
     T.calorOk = `Comprobado con el juego: con calor 90 al cambiar el día (y no con 89,9) llega la orden de registro con el aviso de Kiko y, al día siguiente, la redada (las plantas, el equipo de sus carpas y lo de fuera; la caja, no; multa de ${eur(MULTA_R[0])} + ${eur(MULTA_R[1])} por planta + ${MULTA_R[2]} € por gramo, hasta ${eur(MULTA_R[3])}; el calor queda en ${CALOR_R}); baja 12 al día en tranquilo y vigilancia, 8 en investigación y nada con la orden (con Molina, × 1,5, y la redada se para: calor 50, sin quitar nada); +${datos.olor} por carpa en flor sin extractor (con uno corto de caudal, +1).`;
 
     // ---------- 6. Copa ----------

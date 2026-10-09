@@ -365,11 +365,21 @@ func _pasos() -> void:
 	# ---------- capítulo 3 ----------
 	step("Don Baltasar explica la deuda", [], func(): await run(J.talk_baltasar),
 		func(): return chk(si(J.S.flags.get("metB")) and J.S.due == 3000 and J.S.debt == 30000 and J.S.deadline == J.S.flags.tono + 7, {"due": J.S.due, "deadline": J.S.deadline, "day": J.S.day}))
-	step("Plazo vencido → Toño cobra intereses (1.er plazo vencido)", [], func():
+	# 1.11: a 3 días del plazo, Toño avisa con lo que llevas (recuerdo_plazo)
+	step("Plazo: a 3 días, el SMS de Toño con lo que llevas; vencido → Toño cobra intereses (1.er plazo vencido)", [], func():
+		# (el aviso, sin cambiar de día: new_day lo encola con S.deadline − S.day = 3 o 0)
+		var l0 := LOG.size()
+		J.S.deadline = J.S.day + 3
+		await run(J.recuerdo_plazo)
 		J.S.deadline = J.S.day
+		await run(J.recuerdo_plazo)
+		R = {"av": LOG.slice(l0), "ll": J.S.money + J.caja_e(), "d": J.S.day}
 		J.advance_time(24 * 60)
 		await idle(),
-		func(): return chk(J.S.due == 3600 and J.S.debt == 30600 and J.S.deadline == J.S.day + 5 and J.S.vencidos == 1, {"due": J.S.due, "debt": J.S.debt, "vencidos": J.S.vencidos}))
+		func(): return chk(J.S.due == 3600 and J.S.debt == 30600 and J.S.deadline == J.S.day + 5 and J.S.vencidos == 1
+			and R.av.has("SMS · TOÑO: Don Baltasar quiere %s antes de que acabe el día %d. Te quedan 3 días." % [Datos.eur(3000), R.d + 3])
+			and R.av.has("SMS · TOÑO: Hoy es el último día para los %s de Don Baltasar." % Datos.eur(3000))
+			and R.av.filter(func(l): return l.begins_with("Llevas %s entre el bolsillo y la caja" % Datos.eur(R.ll))).size() == 2, {"due": J.S.due, "debt": J.S.debt, "vencidos": J.S.vencidos, "R": R}))
 	step("Pagar 3.600 € → capítulo 4", ["^Pagar"], func():
 		J.S.money = 6000
 		await run(J.talk_baltasar),
@@ -379,9 +389,9 @@ func _pasos() -> void:
 	step("Kiko instala la mesa de genética", [], func(): await run(J.talk_kiko),
 		func(): return chk(si(J.S.flags.get("lab")) and J.S.seeds.get("rif") == 3, {"lab": J.S.flags.get("lab"), "seeds": J.S.seeds}))
 	step("Comprar en el growshop: un bote de abono (4 dosis) y un sobre de 10 Skunk #1", ["Abono", "Semillas Skunk", "Sobre de 10", "Salir"], func():
-		R = {"m": J.S.money, "s": J.S.seeds.get("ria", 0)}
+		R = {"m": J.S.money, "s": J.S.seeds.get("ria", 0), "f": J.S.items.fert}
 		await run(J.shop),
-		func(): return chk(J.S.items.fert == 5 and J.S.seeds.ria == R.s + 10 and J.S.money == R.m - 14 - 43, {"items": J.S.items, "R": R, "money": J.S.money, "seeds": J.S.seeds.get("ria")}))
+		func(): return chk(J.S.items.fert == R.f + 4 and J.S.seeds.ria == R.s + 10 and J.S.money == R.m - 14 - 43, {"items": J.S.items, "R": R, "money": J.S.money, "seeds": J.S.seeds.get("ria")}))
 	step("Growshop: carpa de 100, foco LED 200 W colgado en el armario y una maceta de tela", ["Carpa 100", "Foco LED 200", "^Armario", "Maceta de tela 11", "Salir"], func():
 		J.S.money = 2000
 		await run(J.shop),
@@ -664,8 +674,8 @@ func _pasos() -> void:
 		J.add_buds("ria", 5, 12)
 		await run(J.talk_cop),
 		func(): return chk(J.S.buds.is_empty(), {"buds": J.S.buds}))
-	step("Menú START: Genoteca, Mochila, Plantas, Objetivo", ["GENOTECA", "<B>", "MOCHILA", "<B>", "PLANTAS", "<B>", "OBJETIVO", "SALIR"], func(): await run(J.start_menu),
-		func(): return J.handlers.is_empty())
+	step("Menú START: Genoteca, Mochila, Plantas, Objetivo", ["GENOTECA", "<B>", "MOCHILA", "<B>", "PLANTAS", "<B>", "OBJETIVO", "<B>", "SALIR"], func(): await run(J.start_menu),
+		func(): return chk(J.handlers.is_empty() and LOG.any(func(l): return l.begins_with("  [menú] CAPÍTULO %d | %s | DEUDA | Volver" % [J.S.ch, " | ".join(PackedStringArray(J.D.MISIONES.map(func(m): return m.t)))])), LOG.slice(-4)))
 	step("Cama: siesta de 3 horas", ["Siesta"], func():
 		J.S.min = 600
 		J.S.hp = 5
@@ -1794,7 +1804,7 @@ func _pasos() -> void:
 		J.enter_map("home", 5, 5, "up"),
 		func(): return chk(R.m == 100 - Datos.jsround(pr("Abono") * D.ENVIO) and R.envio == "Abono de floración 1 L" and R.fert == 4 and R.envio2 == 0 and R.sms != null and R.sms.t == "Te he dejado el paquete en casa: Abono de floración 1 L."
 			and R.log.any(func(l): return re("\\[menú\\] KIKO", l)) and R.log.any(func(l): return l.begins_with("KIKO: ")) and R.fijos == jj([{"id": "cz1", "n": R.nom, "t": "cur", "dia": 0}])
-			and R.t == D.LLAMADA_MIN and R.dh >= 1 + 3 and R.cobra > 0 and R.dia and R.log2.any(func(l): return l == "  [menú] Kiko | %s | Nada  → %s" % [R.nom, R.nom])
+			and R.t == D.LLAMADA_MIN and R.dh >= 1 + D.CALOR_CALLE.base and R.cobra > 0 and R.dia and R.log2.any(func(l): return l == "  [menú] Kiko | %s | Nada  → %s" % [R.nom, R.nom])
 			and R.log2.any(func(l): return l.begins_with(R.nom.to_upper() + ": Busco")) and re("%s ya ha venido hoy" % R.nom, R.otra), R))
 	step("Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también arcón, sala, agenda, mensajes, pedidos y bolsa); con Toño ya visto, sale en el móvil", [], func():
 		var S0 = J.S
@@ -1805,12 +1815,13 @@ func _pasos() -> void:
 		J.S.protect = true
 		J.S.flags.metB = false
 		J.S.flags.erase("tono")
-		for k in ["caja", "rec", "vencidos", "protHasta", "encargo", "encVeto", "arcon", "sala", "fijos", "sms", "envio"]:
+		for k in ["caja", "rec", "vencidos", "protHasta", "encargo", "encVeto", "arcon", "sala", "fijos", "sms", "envio", "misiones"]:
 			J.S.erase(k)
 		J.S.items.erase("bolsa")
 		J.migrate()
 		R = {"due": J.S.due, "dias": J.S.deadline - J.S.day, "tono": J.S.flags.get("tono") == J.S.day, "hasta": J.S.protHasta - J.S.day,
-			"campos": jj([J.S.caja, J.S.rec, J.S.vencidos, J.S.encargo, J.S.encVeto]), "nuevos": jj([J.S.arcon, J.S.sala, J.S.fijos, J.S.sms, J.S.envio, J.S.items.bolsa])}
+			"campos": jj([J.S.caja, J.S.rec, J.S.vencidos, J.S.encargo, J.S.encVeto]), "nuevos": jj([J.S.arcon, J.S.sala, J.S.fijos, J.S.sms, J.S.envio, J.S.items.bolsa]),
+			"mis": ",".join(PackedStringArray(J.S.misiones.keys())) + "/" + ",".join(PackedStringArray(J.S.misiones.values().map(func(v): return str(int(v)))))}
 		J.S = Datos.enteros(norm(S0))
 		J.S.flags.metB = true
 		J.S.flags.erase("tono")
@@ -1818,7 +1829,7 @@ func _pasos() -> void:
 		R.tono2 = J.S.flags.get("tono") == J.S.day
 		J.S = S0,
 		func(): return chk(R.due == 3000 and R.dias == 7 and R.tono and R.hasta == 10 and R.campos == "[null,{},0,null,0]"
-			and R.nuevos == "[{\"buds\":{},\"rosin\":{}},{},[],[],[],0]" and R.tono2, R))
+			and R.nuevos == "[{\"buds\":{},\"rosin\":{}},{},[],[],[],0]" and R.tono2 and R.mis == "caja,luz,carpa,olor,inaki/0,0,0,0,0", R))
 	step("Guardar y cargar la partida", [], func(): J.save(),
 		func():
 			var sv = J.load_save()

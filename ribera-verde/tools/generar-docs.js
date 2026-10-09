@@ -249,6 +249,8 @@ ${eu(c.DEUDA)} en tres plazos: ${eu(c.PLAZOS[3])} en 7 días (capítulo 3), ${eu
 
 Por qué ${eu(c.DEUDA)}: con equipo, precios y venta al por mayor reales, un jugador que reinvierte cada cosecha en lo que más rinde por euro (focos LED, macetas grandes, carpas) paga el primer plazo en unas 4 cosechas (6 días), el segundo en unas 8 y el último en unas 9: lo mismo que la deuda de 5.000 € con los números de la 1.9 (3, 5 y 11 cosechas). Con los plazos viejos, la historia se acabaría en 7 cosechas.
 
+Las misiones guiadas (1.11, START → OBJETIVO) son esa ruta: la caja de la tía, un LED de 100 W y macetas de tela (capítulo 1); la carpa de 100 con un sodio de 250 W, un extractor y las ventas a Iñaki (2); el por mayor y un sodio de 400 W (3); un LED de 480 W y una carpa de seis plazas (4). Siguiéndolas, el primer plazo se paga hacia el día 10 (vence el 12), el segundo hacia el 18 (vence el 22) y el último hacia el 20 (vence el 24). Kiko regala abono, pH−, insecticida o semillas al cumplir cada una, nunca dinero. Sin ellas, un jugador que vende en la calle a todo el que pide se comía una redada antes del primer pago casi siempre: desde la 1.11 cada venta en la calle sube el calor 2 + 0,3 por gramo (antes, 3 + 0,5), con un aviso a 50.
+
 ## Tu imperio
 
 Saldada la deuda, el juego sigue: cada rango se gana facturando desde el último pago y sube lo que Iñaki carga al día.

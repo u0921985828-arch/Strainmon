@@ -1525,10 +1525,10 @@ function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,
   seeds:{},buds:{},rosin:{},items:Object.assign({fert:0,fertv:0,phm:0,medidor:0,insect:0,spray:0,bocata:1,prensa:0,bolsa:0},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},gen:{},pedido:[],esquejes:[],fenos:{},fenoN:0,eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
-  caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0,arcon:{buds:{},rosin:{}},sala:{},fijos:[],sms:[],envio:[],orden:0};}
+  caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0,arcon:{buds:{},rosin:{}},sala:{},fijos:[],sms:[],envio:[],orden:0,misiones:{}};}
 const isFree=()=>mode==='world'&&lock===0&&handlers.length===0;
 const isNight=()=>S.min>=21*60||S.min<6*60;
-async function run(fn){lock++;try{await fn();}catch(e){console.error(e);}finally{lock--;}}
+async function run(fn){lock++;try{await fn();}catch(e){console.error(e);}finally{lock--;}if(!lock&&S&&S.misiones)revisaMisiones();}
 function queue(key,fn){if(queued.has(key))return;queued.add(key);pending.push(async()=>{try{await fn();}finally{queued.delete(key);}});}
 const totalBuds=()=>Object.values(S.buds).reduce((a,b)=>a+b.g,0);
 const discCount=()=>Object.keys(S.disc).length;
@@ -1903,7 +1903,9 @@ function newDay(){
   const sec=S.esquejes.filter(e=>S.day-e.dia>ESQUEJE_DIAS).length;if(sec){S.esquejes=S.esquejes.filter(e=>S.day-e.dia<=ESQUEJE_DIAS);av.push(`Se ${sec>1?'han secado '+sec+' esquejes':'ha secado un esqueje'} sin plantar`);}
   if(av.length&&mode==='world')toast(av.join('<br>'),1600);
   spawnClients();recibirPedido();recibirEnvio();instalarCaja();llegaMueble();vencerEncargo();
-  if(S.due>0&&S.day>S.deadline)queue('penalty',penaltyEvent);   // 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
+  // 1.10: el plazo vencido, también sin haber visto a Baltasar (el plazo corre desde Toño); 1.11: el aviso, a 3 días y el último
+  if(S.due>0&&S.day>S.deadline)queue('penalty',penaltyEvent);
+  else if(S.due>0&&(S.deadline-S.day===3||S.deadline===S.day))queue('plazo',recuerdoPlazo);
 }
 /* ---------- fenotipo (1.10) ----------
    Cada planta de semilla tira el suyo al germinar (t: THC, y: gramos; σ según tipoGen, 03-datos). Un esqueje es la misma
@@ -2792,7 +2794,7 @@ async function abrirCarpa(ci){
     if(b==='A'){VC.ocupado=true;vcInfo();(VC.sel===SEL_TEMP?temporizador(VC.ci):VC.sel<0?carpaAction(VC.ci):potAction(VC.sel)).then(()=>{VC.ocupado=false;vcInfo();});return;}
     if(DV[b]){const s=VC.sel;vcMover(b);if(s!==VC.sel){sfx('tick');vcInfo();}}
   }));
-  VC.ocupado=true;vcInfo();await fade(1);mode='world';VC=null;updateHUD();await fade(0);
+  VC.ocupado=true;vcInfo();await fade(1);mode='world';VC=null;updateHUD();revisaMisiones();await fade(0);   // 1.11: lo montado en la carpa cuenta ya
 }
 /* =========================================================
    LA SALA DEL PISO (1.10): CLIMA, APARATOS, RIEGO AUTOMÁTICO Y ARCÓN
@@ -2899,6 +2901,9 @@ async function arconAction(){
    Precios reales (1.10): en la calle, el gramo a 6-10 € según el THC (× el tipo de cliente y lo que pidas); al por mayor,
    3,20-5 € (ventaMayor, 11-historia). */
 const precioCalle=thc=>4+thc*.2,precioMayor=thc=>2+thc*.1;
+// calor de una venta en la calle (1.11: antes 3 + 0,5 por gramo; ahora el primer plazo se paga sin redada, docs/ANALISIS.md) y
+// el aviso de antes de la investigación (heatWarn)
+const CALOR_CALLE={base:2,g:.3,rosin:2.5},CALOR_AVISO=50;
 // rosin (1.10): de la flor sale un 20 % del peso (real: 15-25 %) con el triple de THC, hasta el 75 % (real: 60-75 %); el gramo, a
 // 10 + 0,6 × THC € (≈ 42 € al 54 %; real: 30-60 €). Prensar compensa desde el 12,5 % de THC de la flor: 1 g de rosin vale más
 // que los 5 g de los que sale (10 + 1,8·t > 5·(4 + 0,2·t))
@@ -2942,7 +2947,7 @@ async function talkClient(c){
   const acc=[1,.92,clamp(.3+(b.thc-(ext?50:c.minThc||14))*.05+(c.type==='pij'?.25:0)+(c.type==='tur'?.15:0),.1,.9)][j];
   if(Math.random()<acc){
     if(ext)useRosin(sid,c.want);else useBuds(sid,c.want);
-    S.money+=pr[j];S.sales+=pr[j];S.heat=Math.min(100,S.heat+3+c.want*(ext?2.5:.5));S.rep+=[3,2,1][j];sfx('coin');
+    S.money+=pr[j];S.sales+=pr[j];S.heat=Math.min(100,Math.round((S.heat+CALOR_CALLE.base+c.want*(ext?CALOR_CALLE.rosin:CALOR_CALLE.g))*10)/10);S.rep+=[3,2,1][j];sfx('coin');
     await accion('vender',{id:'vfx-monedas',x:P.px+8,y:P.py+2});
     removeClient(c.id);apuntaFijo(c);
     await say(pick(['Trato hecho.','Gracias. Nos vemos.','Bien. Se lo diré a mis amigos.']),N);
@@ -2952,7 +2957,10 @@ async function talkClient(c){
     if(c.map==='astilleros'&&Math.random()<1/3){await say('Uno de los chicos de Darko te ha visto vender.');await say('«Te dijimos que lejos de nuestras esquinas.»','CHICO DE DARKO');await battle('thief');}
   }else{S.rep=Math.max(0,S.rep-1);sfx('bad');removeClient(c.id);await say(pick(['¿Tanto? No.','A ese precio, paso.','Eso es demasiado. Adiós.']),N);}
 }
-function heatWarn(){if(S.heat>=70&&!S.flags.heatW){S.flags.heatW=true;toast(`<small>CUIDADO</small>La policía investiga. Si el calor llega a ${NIVEL_POLI[3][0]} al cambiar el día, habrá orden de registro.`,3200);}if(S.heat<60)S.flags.heatW=false;}
+// 1.11: un aviso antes, con 50 (con 60 investigan), que dice por dónde se vende sin tanto calor
+function heatWarn(){if(S.heat>=70&&!S.flags.heatW){S.flags.heatW=true;S.flags.heatA=true;toast(`<small>CUIDADO</small>La policía investiga. Si el calor llega a ${NIVEL_POLI[3][0]} al cambiar el día, habrá orden de registro.`,3200);}
+  else if(S.heat>=CALOR_AVISO&&S.heat<70&&!S.flags.heatA){S.flags.heatA=true;toast(`<small>CALOR</small>Con ${NIVEL_POLI[2][0]}, la policía investiga. Vende menos en la calle: ${S.ch>=3?'Iñaki compra al por mayor':'Iñaki compra 10 g al día'} con menos calor.`,3200);}
+  if(S.heat<60)S.flags.heatW=false;if(S.heat<CALOR_AVISO-10)S.flags.heatA=false;}
 
 /* =========================================================
    PATRULLAS (1.10): los policías se ven por la calle
@@ -3201,7 +3209,7 @@ async function talkKiko(){
   if(!S.flags.kiko1){
     await talk(N,['{N}, pasa. Te pareces a tu tía.','Maite y yo cultivamos juntos desde que cerraron los astilleros. Ella tenía mano; yo, paciencia.','Para empezar, toma esto.']);
     addSeeds('ria',3);await got('3 semillas de SKUNK #1');S.items.fert+=2;await got('2 dosis de ABONO');
-    await talk(N,['La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.','Planta en las macetas del armario de tu tía y riega cuando baje el agua.','El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.','Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.','Las plantas siguen creciendo mientras duermes.']);
+    await talk(N,['La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.','Planta en las macetas del armario de tu tía y riega cuando baje el agua.','El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.','Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.','Las plantas siguen creciendo mientras duermes.','Te iré mandando al móvil lo que te hace falta para salir adelante. Lo tienes en START, en OBJETIVO.']);
     S.flags.kiko1=true;showObjective();return;
   }
   if(S.ch===4&&!S.flags.lab){
@@ -3361,16 +3369,18 @@ function objectiveText(){
   switch(S.ch){
     case 1:return S.flags.llegada===false?'Coge el autobús en la plaza de Mendialde hasta Ribera Verde.':!S.flags.letter?(S.map==='home'?'Lee la carta que hay en la mesa.':'Entra en el piso de la tía Maite, enfrente de la parada, y lee la carta que hay en la mesa.'):!S.flags.kiko1?'Visita el growshop de Kiko, al lado de casa.':'Planta y consigue tu primera cosecha.';
     case 2:return `Gana ${META_VENTAS} € vendiendo (${Math.min(META_VENTAS,Math.round(S.sales))}/${META_VENTAS}).`;
-    case 3:return !S.flags.metB?`Ve al bar El Ancla antes del día ${S.deadline}: Don Baltasar quiere ${eur(S.due)}.`:`Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
+    case 3:return (!S.flags.metB?`Ve al bar El Ancla antes del día ${S.deadline}: Don Baltasar quiere ${eur(S.due)}.`:`Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`)+llevas();
     case 4:return !S.flags.lab?'Kiko quiere verte en el growshop.':`Saca en la mesa 2 variedades de receta y cosecha una planta de cada (${recCount()}/2).`;
-    case 5:return `Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
+    case 5:return `Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`+llevas();
     case 6:return 'Gana la Copa: 20 g con más de 26,8% de THC al jurado de la plaza.';
-    case 7:return `Paga los últimos ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`;
+    case 7:return `Paga los últimos ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`+llevas();
     default:{if(S.encargo)return `Encargo de Don Baltasar: lleva ${kgTxt(S.encargo.g)} al almacén de los astilleros, de noche, antes de que acabe el día ${S.encargo.hasta}.`;
       const n=imperioNivel(),sig=IMPERIO[n+1],gen=`Genoteca ${DEX.filter(k=>S.disc[k]).length}/${DEX.length}`;
       return sig?`Tu imperio · ${IMPERIO[n].n}. Facturado desde la deuda: ${eur(Math.min(sig.meta,facturado()))} de ${eur(sig.meta)} para ser ${sig.n.toLowerCase()}. ${gen}.`:`Tu imperio · ${IMPERIO[n].n}. Completa la ${gen}.`;}
   }
 }
+// 1.11: en los plazos, lo que llevas entre el bolsillo y la caja
+const llevas=()=>` Llevas ${eur(S.money+cajaE())}.`;
 function showObjective(){const d=capHasta-Date.now();if(d>0){setTimeout(showObjective,d);return;}toast(`<small>OBJETIVO</small>${esc(objectiveText())}`,3200);}
 // el imperio (1.10): saldada la deuda, empieza. Cada rango se gana facturando desde el último pago (S.imp0) y sube lo que
 // Iñaki carga al día
@@ -3587,6 +3597,67 @@ function vencerEncargo(){
   queue('encargo',()=>talk('SMS · TOÑO',['No apareciste. Don Baltasar no se olvida.',`Reputación −10. Nada de encargos hasta el día ${S.encVeto}.`]));
 }
 /* =========================================================
+   MISIONES GUIADAS (1.11)
+   ========================================================= */
+// lo que hay que montar para llegar a los plazos de la deuda: la ruta guiada de docs/ANALISIS.md. Salen desde que conoces a Kiko,
+// las de tu capítulo y las de antes, en START → OBJETIVO. ok() mira lo que tienes, no lo que pasó: lo que ya tengas se cumple al
+// llegar a su capítulo. Al cumplir una, Kiko manda un SMS y deja un regalo (p: objetos, s: semillas; nunca dinero).
+// S.misiones[id] = día en que se cumplió (0: partida vieja, de un capítulo anterior, sin regalo)
+const precioDe=f=>SHOP.find(f).p;
+const conFoco=()=>S.carpas.filter(c=>c&&FOCOS[c.foco]);
+const MISIONES=[
+  {id:'caja',ch:1,t:'La caja de la tía',d:'Tu tía guardaba dinero en casa. Mira sus notas en el ordenador: la combinación de la caja fuerte, detrás del diploma.',
+    ok:()=>!!S.caja,sms:['Lo de la caja de tu tía ya lo sabía yo. Gástalo bien.']},
+  {id:'luz',ch:1,t:'Luz de verdad',d:`El CFL da poco. En el growshop: un LED de 100 W (${eur(precioDe(it=>it.foco==='led100'))}) y macetas de tela de 11 L (${eur(precioDe(it=>it.maceta==='tela11'))} cada una).`,
+    ok:()=>conFoco().some(c=>c.foco!=='cfl'),p:{fertv:2},sms:['Ese LED da casi el triple que el CFL por vatio.']},
+  {id:'carpa',ch:2,t:'Una carpa',d:`Con el armario no llegas al primer plazo. Una carpa de 100 (${eur(precioDe(it=>it.carpa==='m100'))}) y un sodio de 250 W (${eur(precioDe(it=>it.foco==='sodio250'))}): cuatro plantas más.`,
+    ok:()=>S.carpas.filter(Boolean).length>=2,s:{txoko:3},sms:['Con la carpa ya produces de verdad. Ponle buena luz.','Y un extractor con filtro: el olor sube el calor.']},
+  {id:'olor',ch:2,t:'Sin olor',d:`Las plantas en flor huelen y el olor sube el calor cada día. Un extractor de 100 mm con filtro (${eur(precioDe(it=>it.extra==='filtro100'))}) en la carpa.`,
+    ok:()=>S.carpas.some(c=>kitDe(c)),p:{insect:1},sms:['Sin olor, los vecinos no hablan.']},
+  {id:'inaki',ch:2,t:'Iñaki',d:`Iñaki, en el muelle, compra 10 g al día: paga más que la calle y sube menos el calor. Si el calor llega a ${NIVEL_POLI[2][0]}, la policía investiga.`,
+    ok:()=>!!S.flags.inaki,p:{fert:2},sms:['Iñaki es de fiar. Cuando empiece lo de la deuda, te comprará también al por mayor.']},
+  {id:'mayor',ch:3,t:'El barco',d:'Iñaki ya compra al por mayor: de 100 g para arriba, una carga al día. Es lo que paga la deuda: en la calle, el calor sube demasiado.',
+    ok:()=>S.mDay>0,p:{fert:4},sms:['Así se paga una deuda: por kilos y sin ruido.']},
+  {id:'potencia',ch:3,t:'Más luz',d:`Un sodio de 400 W (${eur(precioDe(it=>it.foco==='sodio400'))}) en la carpa de 100 y el de 250 W al armario: más vatios, más gramos.`,
+    ok:()=>conFoco().some(c=>FOCOS[c.foco].w>=400),p:{phm:10},sms:['Más vatios, más gramos. Vigila el riego: el sodio seca las macetas.']},
+  {id:'led',ch:4,t:'Escalar',d:`Un LED de 480 W (${eur(precioDe(it=>it.foco==='led480'))}): más gramos por vatio y menos calor en la carpa. El segundo plazo es de ${eur(PLAZOS[5])}.`,
+    ok:()=>conFoco().some(c=>FOCOS[c.foco].tipo==='led'&&FOCOS[c.foco].w>=480),p:{fert:4},sms:['Con LED grandes, la luz se paga sola.']},
+  {id:'seis',ch:4,t:'Seis plazas',d:`La carpa de 150 en lugar de la de 100 (${eur(precioDe(it=>it.carpa==='g150'))}) y, en el capítulo 5, la de 120 junto a la cama: seis plantas cada una.`,
+    ok:()=>S.carpas.some(c=>c&&CARPAS[c.t].plazas>=6),s:{txoko:5},sms:['Seis plantas por carpa. Esto ya es un negocio.']}];
+const PREMIO_N={fert:'dosis de ABONO DE FLORACIÓN',fertv:'dosis de ABONO DE CRECIMIENTO',phm:'dosis de pH−',insect:'tratamiento de INSECTICIDA'};
+const premioTxt=m=>Object.entries(m.p||{}).map(([k,n])=>`${n} ${PREMIO_N[k]}`).concat(Object.entries(m.s||{}).map(([k,n])=>`${n} semillas de ${STRAINS[k].n.toUpperCase()}`));
+const misionesVer=()=>S.flags.kiko1?MISIONES.filter(m=>m.ch<=S.ch):[];
+const misionSig=()=>misionesVer().find(m=>!(m.id in S.misiones));
+let misionAviso=[];
+// run() la llama al acabar cada guion: marca las cumplidas, da el regalo y encola el SMS
+function revisaMisiones(){
+  for(const m of misionesVer())if(!(m.id in S.misiones)&&m.ok()){
+    S.misiones[m.id]=S.day;misionAviso.push(m.id);
+    for(const k in m.p||{})S.items[k]+=m.p[k];for(const k in m.s||{})addSeeds(k,m.s[k]);
+  }
+  if(misionAviso.length)queue('mision',avisoMision);
+}
+async function avisoMision(){
+  while(misionAviso.length){
+    const id=misionAviso.shift(),m=MISIONES.find(x=>x.id===id);sfx('get');toast(`<small>MISIÓN CUMPLIDA</small>${m.t}`,2400);
+    await talk('SMS · KIKO',m.sms);for(const t of premioTxt(m))await got(t);
+  }
+  const s=misionSig();if(s)toast(`<small>MISIÓN</small>${s.t}`,3200);
+}
+// el plazo (1.11): Toño avisa cuando quedan 3 días y el último, con lo que llevas
+async function recuerdoPlazo(){
+  const n=S.deadline-S.day,ll=S.money+cajaE();   // los días, como los cuenta Baltasar (talkBaltasar)
+  await talk('SMS · TOÑO',[n>0?`Don Baltasar quiere ${eur(S.due)} antes de que acabe el día ${S.deadline}. Te quedan ${n} días.`:`Hoy es el último día para los ${eur(S.due)} de Don Baltasar.`]);
+  await say(ll<S.due?`Llevas ${eur(ll)} entre el bolsillo y la caja: te faltan ${eur(S.due-ll)}.`:`Llevas ${eur(ll)} entre el bolsillo y la caja: ya lo tienes.${S.money<S.due?' Saca lo que falte de la caja y':''} Ve al bar El Ancla.`);
+}
+// START → OBJETIVO: el del capítulo, las misiones (con lo que hay que hacer abajo) y la deuda
+async function objetivoMenu(){
+  const it=[{label:`CAPÍTULO ${S.ch}`,desc:`${CH_TITLES[S.ch]||''}\n${objectiveText()}`}]
+    .concat(misionesVer().map(m=>({label:m.t,right:m.id in S.misiones?'HECHA':null,desc:m.d})))
+    .concat([{label:'DEUDA',right:eur(S.debt),desc:(S.due>0?`Plazo: ${eur(S.due)} antes de que acabe el día ${S.deadline}. Llevas ${eur(S.money+cajaE())}.\n`:'')+`Ventas ${eur(S.sales)} · Reputación ${S.rep} · Calor ${Math.round(S.heat)} %`},{label:'Volver',desc:''}]);
+  await menu(it,{cls:'full',title:'OBJETIVO',title2:'cap. '+S.ch,desc:true,initial:Math.max(0,misionesVer().findIndex(m=>!(m.id in S.misiones))+1)});
+}
+/* =========================================================
    MENÚ START
    ========================================================= */
 async function startMenu(){
@@ -3599,7 +3670,7 @@ async function startMenu(){
       {cls:'start',initial:i,startCloses:true,title:`DÍA ${S.day} · ${relojTxt()}`,title2:eur(S.money)});
     if(i<0||i===7)return;
     if(i===0)await genoteca();else if(i===1)await mochila();else if(i===2)await movilMenu();else if(i===3)await plantas();
-    else if(i===4){await say(`CAPÍTULO ${S.ch}: ${CH_TITLES[S.ch]||''}\n${objectiveText()}`);await say(`Deuda: ${eur(S.debt)} · Ventas: ${eur(S.sales)}\nReputación ${S.rep} · Calor ${Math.round(S.heat)}%`);}
+    else if(i===4)await objetivoMenu();
     else if(i===5)await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');
     else if(i===6)await opciones();
   }
@@ -4107,7 +4178,8 @@ function migrate(){
   }
   // partidas guardadas por chapter() antes de poner el plazo (hasta la 1.10): capítulo 5 o 7 sin nada que pagar
   if((S.ch===5||S.ch===7)&&!(S.due>0)&&S.debt>0){S.due=S.ch===5?Math.min(PLAZOS[5],S.debt):S.debt;S.deadline=Math.max(S.deadline||0,S.day+(S.ch===5?10:7));}
-  const d=newState();for(const k in d)if(!(k in S))S[k]=d[k];for(const k in d.items)if(!(k in S.items))S.items[k]=0;
+  const sinMis=!S.misiones,d=newState();for(const k in d)if(!(k in S))S[k]=d[k];for(const k in d.items)if(!(k in S.items))S.items[k]=0;
+  if(sinMis)MISIONES.forEach(m=>{if(m.ch<S.ch)S.misiones[m.id]=0;});   // 1.11: las de capítulos pasados, hechas y sin regalo
   // 1.10: el plazo del capítulo 3 corre desde Toño (las partidas sin él, desde hoy) y la protección de Molina dura 10 días desde hoy
   if(S.ch===3&&!S.flags.metB&&!(S.due>0)){S.due=PLAZOS[3];S.deadline=S.day+7;S.flags.tono=S.day;}
   if(S.flags.metB&&!('tono' in S.flags))S.flags.tono=S.day;   // ya conoces a Toño: sale en el móvil (12b-movil)

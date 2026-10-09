@@ -11,7 +11,7 @@ La primera versión de este análisis encontró 10 problemas (el resumen de abaj
 Las cifras salen del código de la 1.10. `node tools/analisis-riesgos.js` escribe las tablas generadas con un modelo exacto, que aplica las mismas reglas que el código. Después, el mismo script juega cada caso con las funciones de verdad del juego (`onStepEnd`, `updatePatrullas` y `updatePlayer`, `battle` y `thiefRound`, `copRound`, `newDay` y `raidEvent`, `talkClient`, `talkInaki`, `ventaMayor`, `harvest`, `addBuds` y `talkJurado`), también con la caja llena (`S.caja`). Si alguna cifra no cuadra, para con un error y no escribe nada.
 
 <!-- auto:meta -->
-Generado con `npm run analisis`: 720 cifras comprobadas con el juego (20.000 combates, controles, ventas o trayectos simulados por celda, 100.000 pasos por situación, 5.000 carpas por fila de la Copa y las patrullas fotograma a fotograma). Gramos a 7,60 €/g (precio de calle de una variedad del 18 %), salvo donde se dice.
+Generado con `npm run analisis`: 721 cifras comprobadas con el juego (20.000 combates, controles, ventas o trayectos simulados por celda, 100.000 pasos por situación, 5.000 carpas por fila de la Copa y las patrullas fotograma a fotograma). Gramos a 7,60 €/g (precio de calle de una variedad del 18 %), salvo donde se dice.
 <!-- /auto:meta -->
 
 ## Resumen
@@ -28,6 +28,7 @@ Generado con `npm run analisis`: 720 cifras comprobadas con el juego (20.000 com
 | 8 | **Con spray, los ladrones casi nunca ganaban.** | Baja | Desde el capítulo 5, los ladrones tienen 4 de vida más y pegan 1 más. Con spray siguen perdiendo casi siempre; sin spray, ya no |
 | 9 | **La Copa se prepara en cuanto tienes la mesa,** con 4 cruces. | Baja | Sin cambios: aceptable. Baltasar ya no dice «El sábado» (el juego no tiene días de la semana) |
 | 10 | El objetivo del capítulo 2 decía «vendiendo en la calle», pero también cuentan las ventas a Iñaki. | Muy baja | «Gana 300 € vendiendo» |
+| 11 | **El primer plazo casi nunca se pagaba a tiempo (1.11).** Nada decía qué comprar, y quien vendía en la calle a todo el que pedía (3 + 0,5 de calor por gramo) se comía una redada antes del pago: con 200 partidas simuladas, solo un 2 % pagaba los 3.000 €; con la CFL del armario, nadie. | Alta | **Misiones guiadas** (START → OBJETIVO, con la pista de cada una; Kiko manda un SMS y un regalo, nunca dinero): la caja, un LED de 100 W y tela (cap. 1); la carpa de 100 con sodio, un extractor e Iñaki (2); el por mayor y un sodio de 400 W (3); un LED de 480 W y seis plazas (4). Siguiéndolas, los plazos se pagan hacia los días 10, 18 y 20 (vencen el 12, el 22 y el 24). La calle sube 2 + 0,3 por gramo, con un aviso a 50 de calor, y Toño avisa a 3 días del plazo y el último, con lo que llevas |
 
 ## 1. Guion y misiones
 
@@ -92,21 +93,21 @@ El calor baja 12 al día en tranquilo y vigilancia y 8 en investigación (× 1,5
 <!-- auto:eficiencia -->
 | Venta (THC 18 %, salvo el pijo y el rosin) | Cobras | €/g | Calor | € por punto de calor |
 |---|---|---|---|---|
-| Calle · currela, 8 g a precio justo (acepta el 92 %) | 61 € | 7,63 | +7 | 9 € |
-| Calle · pijo del cap. 6 (pide 21 % de THC), 12 g de THC 24 a precio caro (acepta el 70 %) | 185 € | 15,42 | +9 | 21 € |
-| Astilleros · currela, 8 g a precio justo (1 de cada 3 ventas, un chico de Darko) (acepta el 92 %) | 73 € | 9,13 | +7 | 10 € |
+| Calle · currela, 8 g a precio justo (acepta el 92 %) | 61 € | 7,63 | +4,4 | 14 € |
+| Calle · pijo del cap. 6 (pide 21 % de THC), 12 g de THC 24 a precio caro (acepta el 70 %) | 185 € | 15,42 | +5,6 | 33 € |
+| Astilleros · currela, 8 g a precio justo (1 de cada 3 ventas, un chico de Darko) (acepta el 92 %) | 73 € | 9,13 | +4,4 | 17 € |
 | Iñaki · 10 g para el viaje (una vez al día) | 91 € | 9,10 | +3 | 30 € |
 | Al por mayor · 1 kg (una carga al día, hasta 1 kg antes del imperio) | 3.800 € | 3,80 | +12 | 317 € |
 | Al por mayor · 10 kg (Mayorista del norte; el calor no pasa de 100) | 38.000 € | 3,80 | +100 | 380 € |
 | Encargo de Don Baltasar · 2 kg (cap. 8, Proveedor del barrio) | 12.000 € | 6,00 | +3 | 4.000 € |
-| Catador · 2 g de rosin al 54 % a precio justo (cap. 3, con la prensa) (acepta el 92 %) | 85 € | 42,50 | +8 | 11 € |
+| Catador · 2 g de rosin al 54 % a precio justo (cap. 3, con la prensa) (acepta el 92 %) | 85 € | 42,50 | +7 | 12 € |
 <!-- /auto:eficiencia -->
 
-Por gramo, la calle paga el doble que el por mayor. Pero cada venta en la calle suma 3 de calor más medio punto por gramo, mientras que una carga al por mayor suma 2 más 1 por cada 100 g. Una carga de 1 kg da tanto dinero como unas 60 ventas en la calle y sube el calor lo que menos de dos.
+Por gramo, la calle paga el doble que el por mayor. Pero cada venta en la calle suma 2 de calor más 0,3 por gramo (1.11; antes, 3 más medio punto), mientras que una carga al por mayor suma 2 más 1 por cada 100 g. Una carga de 1 kg da tanto dinero como unas 60 ventas en la calle y sube el calor lo que menos de tres.
 
 - **Astilleros:** el gramo se paga un 20 % más, pero 1 de cada 3 ventas acaba en pelea con un chico de Darko.
 - **Barrio alto:** clientes con más dinero (pijos y turistas) desde el capítulo 3, pero con 2 agentes de patrulla también de día (en el barrio, 1 de día y 2 de noche).
-- **Rosin (capítulo 3, con la prensa de Kiko):** el gramo vale 10 + 0,6 × THC (42,40 € al 54 %) y sube el calor 2,5 (la flor, 0,5): por punto de calor rinde como la calle. Prensar compensa desde el 12,5 % de THC de la flor (1 g de rosin sale de 5 g y vale más que ellos). Lo compran los catadores (bocadillo con una gota ámbar): 2 al día en el barrio y 1 en los astilleros, en Puerto Viejo y en Valdehierro.
+- **Rosin (capítulo 3, con la prensa de Kiko):** el gramo vale 10 + 0,6 × THC (42,40 € al 54 %) y sube el calor 2,5 por gramo (la flor, 0,3): por punto de calor rinde casi como la calle. Prensar compensa desde el 12,5 % de THC de la flor (1 g de rosin sale de 5 g y vale más que ellos). Lo compran los catadores (bocadillo con una gota ámbar): 2 al día en el barrio y 1 en los astilleros, en Puerto Viejo y en Valdehierro.
 - **Encargos de Baltasar:** lo que más rinde por punto de calor, pero solo uno a la vez, de noche y con 2 a 10 kg encima por los astilleros.
 
 Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo a Iñaki. La calle compensa por la reputación: cada venta da de +1 a +3. La reputación ayuda a salir hablando de un control y trae más clientes.
