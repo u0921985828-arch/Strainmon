@@ -1,0 +1,39 @@
+{
+  "grupo": "edificio-shop",
+  "celda": [
+    112,
+    96
+  ],
+  "secuencias": 2,
+  "fotogramas": 5,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 24.62,
+  "colores_finales": 15,
+  "fundidos": [
+    "base: #74d064→#62aa56",
+    "base: #8ab0e0→#a9d2ec",
+    "base: #46a262→#5aa860",
+    "base: #d4dbe8→#d8f0ff",
+    "base: #5aa860→#62aa56",
+    "base: #4a4a5a→#3c3c44",
+    "base: #2a6a40→#2c6e36",
+    "base: #357a3c→#2c6e36",
+    "base: #26262e→#2c2c30",
+    "base: #1f4f2a→#22662a",
+    "base: #7e8694→#6a8ac0",
+    "base: #5a6070→#3c3c44",
+    "base: #a9d2ec→#a8dcf0",
+    "base: #40a0a0→#6a8ac0",
+    "puerta: #93aa80→#5aa860",
+    "puerta: #2c6e36→#2a6a40",
+    "puerta: #2a6a40→#357a3c",
+    "puerta: #5aa860→#62aa56"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "puerta/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}

@@ -1,0 +1,26 @@
+{
+  "grupo": "unai",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 9,
+  "fotogramas": 28,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 23.22,
+  "colores_finales": 14,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "idle/south": 0,
+    "pelota/south": 2,
+    "walk/east": 0,
+    "walk/north": 1,
+    "walk/south": 0
+  },
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #2a2a2a≈#2a2a30, #26262e≈#2a2a30"
+  ]
+}

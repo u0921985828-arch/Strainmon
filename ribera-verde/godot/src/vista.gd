@@ -1,0 +1,620 @@
+# Ribera Verde (Godot) — la vista C de 09b-carpa.js: la carpa por dentro a pantalla completa (imagen A).
+# geo(S, ci) es vcGeo + vistaC: dónde va cada maceta y qué planta, a qué alto. pinta(S, VC, now) dibuja como renderCarpaC:
+# fondo negro, pared, macetas y plantas (las de delante de la fila elegida en transparencia), la luz del foco en «overlay»
+# (shader sobre lo ya pintado), la campana y el cursor. Todo en px del juego: el nodo va en un SubViewport de 160 de alto.
+# Encima de cada planta, su barra de agua y de cosecha con el aviso de plaga, y los daños de la plaga pintados sobre sus
+# hojas (como el HTML desde la 1.10: barras, posCursor, vcBarra y vcDano de 09b-carpa.js).
+extends Node2D
+
+const Datos = preload("res://src/datos.gd")
+const Cultivo = preload("res://src/cultivo.gd")
+const Arte = preload("res://src/arte.gd")
+const Procedural = preload("res://src/procedural.gd")
+const Atlas = preload("res://src/atlas.gd")
+
+# el canvas guarda el alfa global en 8 bits: .35 → 89/255
+const A35 := 89 / 255.0
+# barra de cada planta: marco, agua (2 filas), raya, cosecha (2 filas), marco; con plaga, la «!» al lado
+const BW := 16
+const BH := 7
+const BP := 6
+const OSC := Color8(0x26, 0x26, 0x2e)
+const SEL_TEMP := -2   # VC.sel del temporizador (1.10)
+const RUEDA := [[3, 0], [4, 0], [5, 1], [6, 2], [6, 3], [6, 4], [5, 5], [4, 6], [3, 6], [2, 6], [1, 5], [0, 4], [0, 3], [0, 2], [1, 1], [2, 0]]
+const VACIO := Color8(0x4a, 0x4a, 0x56)
+
+const OVERLAY := """
+shader_type canvas_item;
+uniform sampler2D pantalla : hint_screen_texture, filter_nearest;
+uniform float fuerza = 1.0;
+void fragment() {
+	vec4 s = texture(TEXTURE, UV);
+	vec3 b = texture(pantalla, SCREEN_UV).rgb;
+	vec3 m = 2.0 * b * s.rgb;
+	vec3 n = 1.0 - 2.0 * (1.0 - b) * (1.0 - s.rgb);
+	vec3 o = mix(m, n, step(vec3(0.5000001), b));
+	COLOR = vec4(mix(b, o, s.a * fuerza), 1.0);
+}
+"""
+
+var base := Node2D.new()
+var luz := Sprite2D.new()
+var encima := Node2D.new()
+var S: Dictionary
+var VC: Dictionary
+var g: Dictionary
+var now := 0.0
+var sw := 240
+
+func _init() -> void:
+	for n in [base, luz, encima]:
+		add_child(n)
+	luz.centered = false
+	var sh := Shader.new()
+	sh.code = OVERLAY
+	luz.material = ShaderMaterial.new()
+	luz.material.shader = sh
+	base.draw.connect(_pinta_base)
+	encima.draw.connect(_pinta_encima)
+
+# ---------- geometría ----------
+# (cerca: si ninguno entra en el 25 %, el más cercano: con el atlas, la carpa nunca vuelve a la vista B por un ancho)
+static func vc_sprite(pre: String, px: float, cerca := false):
+	var m = null
+	for a in Arte.anchos(pre):
+		if (cerca or absf(a - px) <= px * .25) and (m == null or absf(a - px) < absf(m.a - px)):
+			m = {"a": a, "n": pre + str(a)}
+	return m
+
+static func vc_planta_sprite(po: String, st: int, esp: int):
+	var pre := "planta-c-" + ("h" if st < 2 else po) + ("" if st >= 3 else str(st)) + "-"
+	var A := Arte.anchos(pre)
+	if A.is_empty():
+		return null
+	A.sort()
+	var a: int = A[0]
+	for x in A:
+		if x <= esp - 2:
+			a = x
+	return {"a": a, "n": pre + str(a)}
+
+# vcGeo: la vista B (P pasa cm a px: x desde la izquierda, y de fondo desde el frente, z de alto) y, si hay arte para todo, la C
+static func punto(g: Dictionary, x: float, y: float, z: float) -> Array:
+	var VB: Dictionary = Datos.carga().VB
+	if g.has("pk"):   # la carpa plateada de frente: cada fondo y, entre las columnas del suelo de delante y las de la pared
+		var k: Dictionary = g.pk
+		var t: float = y / g.D
+		var xl: float = g.x0 + (k.xb[0] - k.xf[0]) * t
+		var xr: float = g.x0 + g.w + (k.xb[1] - k.xf[1]) * t
+		return [Datos.jsround(xl + (xr - xl) * x / g.W), Datos.jsround(g.yf - 17 * t - z * VB.M)]
+	return [Datos.jsround(g.x0 + x * VB.M + y * VB.X), Datos.jsround(g.yf - y * VB.F - z * VB.M)]
+
+static func geo(S: Dictionary, ci: int):
+	var D := Datos.carga()
+	var VB: Dictionary = D.VB
+	var c: Dictionary = S.carpas[ci]
+	var C: Dictionary = D.CARPAS[c.t]
+	var W: float = C.cm[0]
+	var H: float = C.cm[1]
+	var Dp: float = C.cm[2]
+	var w := Datos.jsround(W * VB.M)
+	var sx := Datos.jsround(Dp * VB.X)
+	var o := {"c": c, "C": C, "W": W, "H": H, "D": Dp, "w": w, "s": sx, "x0": 120 - ((w + sx) >> 1), "yf": int(VB.PARED) + Datos.jsround(Dp * VB.F)}
+	var f = Atlas.foto_misc("carpa-" + c.t + "-vista") if VB.PLATA.has(c.t) else null
+	if f:   # con el atlas, la carpa plateada de frente (VB_PLATA)
+		var k: Dictionary = VB.PLATA[c.t]
+		o.pk = k
+		o.plata = f
+		o.x0 = 120 + int(k.xf[0])
+		o.w = int(k.xf[1]) - int(k.xf[0]) + 1
+		o.s = 0
+		o.yf = 155
+	var cols := int(C.cols)
+	var pl := []
+	var hu := Cultivo.huecos(S)
+	for i in hu.size():
+		var q: Dictionary = hu[i]
+		if q.c != ci:
+			continue
+		var col: int = q.j % cols
+		var fila: int = q.j / cols
+		var n := mini(cols, int(C.plazas) - fila * cols)
+		pl.append({"i": i, "col": col, "fila": fila, "cx": (col + .5) * W / n, "cy": (fila + .5) * Dp / C.filas})
+	for a in pl:
+		var d := 2 * minf(minf(a.cx, W - a.cx), minf(a.cy, Dp - a.cy))
+		for b in pl:
+			if b != a:
+				d = minf(d, sqrt((a.cx - b.cx) * (a.cx - b.cx) + (a.cy - b.cy) * (a.cy - b.cy)))
+		a.cw = d - D.HOLGURA
+		a.ch = H - 28 - D.FOCO_SEP.get(c.foco, 40) - D.MACETA_CM.get(S.macetas[a.i], D.MACETA_CM.plastico7)[1]
+		var xy := punto(o, a.cx, a.cy, 0)
+		a.x = xy[0]
+		a.y = xy[1]
+	o.pl = pl
+	o.fx = punto(o, W / 2, Dp / 2, 0)[0]
+	o.fy = punto(o, 0, Dp / 2, H - 28)[1]
+	o.barra = punto(o, 0, Dp / 2, H - 4)[1]
+	if f:   # de frente, lo que cuelga no sube del techo de dentro (8 filas sobre yt): cuerdas, campana y filtro
+		o.techo = 157 + int(o.pk.yt) - 8
+		o.barra = maxi(o.barra, o.techo)
+		o.fy = maxi(o.fy, o.techo + Procedural.foco34(c.foco).get_height() - 1)
+	o.vc = vista_c(S, o)
+	if o.vc:
+		o.fx = 120
+		o.fy = o.vc.fy
+		o.fw = o.vc.foco.a
+	else:   # vista B: lo que se ve de cada plaza por encima del suelo (maceta y planta) y el ancho del foco
+		o.fw = Procedural.foco34(c.foco).get_width()
+		for q in pl:
+			var mp := Procedural.maceta_px(S.macetas[q.i])
+			q.alto = mp.hb + Datos.jsround(mp.e / 2.0)
+			var p = S.pots[q.i]
+			if p:
+				q.alto += Procedural.alto_planta(Datos.porte_planta(S, p), 0 if p.get("dead") else Cultivo.plant_stage(p), true if p.get("dead") else false, q)
+	o.tx = (int(o.vc.xl) - 24) if o.vc else (int(o.x0) - 16)   # el temporizador (1.10), a la izquierda de la carpa
+	o.ty = 84
+	return o
+
+# el temporizador de enchufe (1.10, 09b-carpa: vcTemp), como rectángulos [x, y, w, h, color]: caja blanca de 11 × 13 con su rueda
+# de 16 pinzas (las bajadas, CICLOS[k].on, del color de su modo) y, debajo, el enchufe y el piloto; cuelga de su cable desde arriba
+static func temporizador(x: int, y: int, k: String, on: bool) -> Array:
+	var C: Dictionary = Datos.carga().CICLOS[k]
+	var o := [[x + 5, 0, 1, y, Arte.VC_CUERDA], [x + 1, y, 9, 1, OSC], [x, y + 1, 11, 11, OSC], [x + 1, y + 12, 9, 1, OSC], [x + 1, y + 1, 9, 11, Color.html("#e8e8e0")],
+		[x + 9, y + 2, 1, 10, Color.html("#bcb4a2")], [x + 2, y + 11, 7, 1, Color.html("#bcb4a2")], [x + 3, y + 2, 5, 5, Color.html("#f8f8f0")]]
+	for n in RUEDA.size():
+		o.append([x + 2 + RUEDA[n][0], y + 1 + RUEDA[n][1], 1, 1, Color.html(C.col) if n < int(C.on) else Color.html("#6a6e78")])
+	o.append_array([[x + 5, y + 3, 1, 2, OSC], [x + 4, y + 9, 1, 1, OSC], [x + 6, y + 9, 1, 1, OSC], [x + 8, y + 9, 1, 1, Color.html("#e04040") if on else Color.html("#7a2a30")]])
+	return o
+
+# el del piso, en la pared a la izquierda de la carpa (5 × 7) y su cable hasta ella (xl: su borde)
+static func temporizador_mapa(xl: int, yb: int, k: String) -> Array:
+	var x := xl - 7
+	var y := yb - 29
+	return [[x, y, 5, 7, OSC], [x + 1, y + 1, 3, 5, Color.html("#e8e8e0")], [x + 1, y + 1, 3, 3, Color.html(Datos.carga().CICLOS[k].col)], [x + 2, y + 2, 1, 1, Color.html("#f8f8f0")],
+		[x + 2, y + 5, 1, 1, OSC], [x + 5, y + 4, 2, 1, Arte.VC_CUERDA]]
+
+static func vista_c(S: Dictionary, g: Dictionary):
+	var D := Datos.carga()
+	var c: Dictionary = g.c
+	var W: float = g.W
+	var tipo: String = D.FOCOS[c.foco].tipo
+	var VCA: Dictionary = D.VCA
+	var Z: float = (VCA.base - VCA.boca) / (g.H - 28)
+	var w := Datos.jsround(W * Z)
+	# las campanas de sodio son foco-c-NN; el CFL, foco-c-cfl-NN, y los LED, con su modelo (foco-c-led200-NN)
+	var pf: String = "foco-c-" if tipo == "sodio" else ("foco-c-" + c.foco + "-" if tipo == "led" else "foco-c-" + tipo + "-")
+	var foco = vc_sprite(pf, D.FOCO_CM.get(c.foco, 45) * Z, true)
+	if not Arte.hay("carpa-c-pared") or not Arte.hay("carpa-c-luz") or foco == null:
+		return null
+	var filas: Array = D.VC_FILA[int(g.C.filas) - 1]
+	var wy := func(y: float) -> float: return w + 32 * (y - VCA.fondo) / 19
+	var yq := func(q: Dictionary) -> int: return int(filas[mini(q.fila, filas.size() - 1)])
+	var xy := func(q: Dictionary, y: float) -> int: return Datos.jsround(120 + (q.cx / W - .5) * wy.call(y))
+	var v := []
+	var fy := 1000000000
+	var viva := false
+	for q in g.pl:
+		# la de 7 L es maceta-c-NN; las demás llevan su tipo (maceta-c-tela11-NN)
+		var k: String = S.macetas[q.i] if D.MACETA_CM.has(S.macetas[q.i]) else "plastico7"
+		var m = vc_sprite("maceta-c-" if k == "plastico7" else "maceta-c-" + k + "-", D.MACETA_CM[k][0] * Z, true)
+		if m == null:
+			return null
+		var y: int = yq.call(q)
+		var x: int = xy.call(q, y)
+		var r := {"x": x, "y": y, "m": m, "Z": Z, "tierra": D.VC_TIERRA.get(m.n, Datos.jsround(Arte.foto(m.n).get_height() * .7)), "hp": 0, "p": null, "muerta": false}
+		var p = S.pots[q.i]
+		if p:   # la muerta: la de su porte en vegetativo, seca (marrón) y 4 cm más baja
+			var muerta := true if p.get("dead") else false
+			r.muerta = muerta
+			var st := 2 if muerta else Cultivo.plant_stage(p)
+			var po := Datos.porte_planta(S, p)
+			var Dh: Array = D.PLANTA_CM[po].h
+			var e: float = wy.call(y) - 2 * absf(x - 120)
+			for o in g.pl:
+				if o != q and yq.call(o) == y:
+					e = minf(e, absf(xy.call(o, y) - x))
+			r.esp = Datos.jsround(e)
+			var s = vc_planta_sprite(po, st, r.esp)
+			if s == null:
+				return null
+			r.p = s
+			r.hp = mini(Arte.alto(Arte.foto(s.n)), mini(Datos.jsround(minf(Dh[st] - (4 if muerta else 0), q.ch) * Z), int(floor(y - r.tierra - VCA.boca - D.FOCO_SEP[c.foco] * Z))))
+			# el foco, a la distancia de su fase de la cima de cada planta (la que lo tiene más cerca manda); de la muerta, a la de seguridad
+			if not muerta:
+				viva = true
+			fy = mini(fy, int(y - r.tierra - r.hp) - Datos.jsround(D.FOCO_SEP[c.foco] * (1 if muerta else D.FOCO_FASE[st]) * Z))
+		v.append(r)
+	for j in g.pl.size():
+		var q: Dictionary = g.pl[j]
+		q.v = v[j]
+		q.x = v[j].x
+		q.y = v[j].y
+		q.alto = v[j].tierra + 4 + v[j].hp
+	# el goteo: una manguera por fila, en el suelo detrás de sus macetas, de la primera llave a la pared derecha; cada maceta, su
+	# llave y su microtubo justo a su derecha (bx)
+	var lg = null
+	if c.get("goteo"):
+		var F := {}
+		var orden_f := []
+		for q in g.pl:
+			var x1: int = Arte.caja(Arte.foto(q.v.m.n))[1]
+			if not F.has(q.fila):
+				F[q.fila] = {"fila": q.fila, "y": q.y - 3, "x": 1e9}
+				orden_f.append(q.fila)
+			var f: Dictionary = F[q.fila]
+			q.bx = q.x - 16 + x1 + 2
+			q.yl = f.y
+			f.x = minf(f.x, q.bx)
+		orden_f.sort()
+		lg = []
+		for k in orden_f:
+			lg.append(F[k])
+		lg.sort_custom(func(a, b): return a.y < b.y)
+		for f in lg:
+			f.x = int(f.x)
+			f.xw = Datos.jsround(120 + wy.call(f.y) / 2) - 1
+	# la boca del foco (fy): baja hasta su distancia de las plantas, nunca por encima del techo (VCA.boca); sin vivas (apagado), arriba
+	fy = maxi(int(VCA.boca), fy) if viva else int(VCA.boca)
+	return {"Z": Z, "w": w, "xl": 120 - (w >> 1), "foco": foco, "tipo": tipo, "lg": lg, "fy": fy}
+
+# ---------- dibujo ----------
+# las poleas del foco bajado (vcPoleas), como rectángulos [x, y, w, h, color]: una por lado, colgada del techo (fila VCA.boca − 15) por
+# fuera de cada extremo de la fila de arriba de la campana; la cuerda que sostiene baja por su borde de dentro hasta la campana y la que
+# se tira, por el de fuera, 8 filas, con su tirador
+static func poleas(fc: Image, fy: int) -> Array:
+	var cu := Arte.cuelga(fc)
+	var fx := 120 - (fc.get_width() >> 1)
+	var y0 := int(Datos.carga().VCA.boca) - 15
+	var K: Color = Arte.VC_CUERDA
+	var M: Color = Arte.VC_POLEA[0]
+	var H: Color = Arte.VC_POLEA[1]
+	var o := []
+	for ls in [[fx + cu[0], -1], [fx + cu[1], 1]]:
+		var X: int = ls[0]
+		var cx: int = X + 2 * ls[1]
+		var T: int = X + 4 * ls[1]
+		# cuerdas, tirador (contorno y cuerpo), rueda (contorno de 5 × 5 sin esquinas, cuerpo, eje y brillo) y el gancho del techo
+		o.append_array([[X, y0 + 3, 1, fy - 15 + cu[2] - (y0 + 3), K], [T, y0 + 3, 1, 8, K], [T - 1, y0 + 11, 3, 3, K], [T, y0 + 12, 1, 1, M],
+			[cx - 1, y0 + 1, 3, 5, K], [cx - 2, y0 + 2, 5, 3, K], [cx - 1, y0 + 2, 3, 3, M], [cx, y0 + 3, 1, 1, K], [cx - 1, y0 + 2, 1, 1, H], [cx, y0, 1, 1, K]])
+	return o.filter(func(e): return e[3] > 0)
+
+# de atrás adelante: fila (y), luego x y plaza
+static func orden(g_: Dictionary) -> Array:
+	var o: Array = g_.pl.duplicate()
+	o.sort_custom(func(a, b): return a.y < b.y or (a.y == b.y and (a.x < b.x or (a.x == b.x and a.i < b.i))))
+	return o
+
+static func clave_planta(S_: Dictionary, p: Dictionary, v: Dictionary) -> String:
+	var k := "pl|%s|%d|%s|%s|%s" % [v.p.n, v.hp, Datos.strain(S_, p.sid).c, Datos.hoja_planta(S_, p), p.water <= 0]
+	var n := nivel_dano(p)
+	return k + ("|d%d|%d" % [n, semilla(p)] if n else "")
+
+# daños de la plaga según la salud que le queda; tratada, ninguno
+static func nivel_dano(p: Dictionary) -> int:
+	if not p.pest or p.get("dead"):
+		return 0
+	return 1 if p.health >= 75 else (2 if p.health >= 45 else 3)
+
+# cada planta, sus manchas: del id de su fenotipo (los esquejes, las de su madre)
+static func semilla(p: Dictionary) -> int:
+	var f = p.get("f")
+	return int(f.id) if f is Dictionary and f.get("id") else Datos.hash_str(p.sid)
+
+# la planta tal como se pinta: el fotograma de su alto (sin las filas de más), con los colores de su variedad y seca sin agua
+static func img_planta(S_: Dictionary, p: Dictionary, v: Dictionary) -> Image:
+	var s = Datos.strain(S_, p.sid)
+	var c0 := Arte.aplasta(Arte.altura(v.p.n, v.hp)[1], v.hp)
+	var mapa := {Arte.rampa[0]: Datos.shade(s.c, 50), Arte.rampa[1]: s.c, Arte.rampa[2]: Datos.shade(s.c, -60)}
+	mapa.merge(Datos.vc_tonos(Datos.hoja_planta(S_, p)), true)
+	var im := Arte.recolor(c0, mapa)
+	var n := nivel_dano(p)
+	if n:
+		im = Arte.dano(im, c0, n, semilla(p) ^ Datos.hash_str(v.p.n))
+	if p.water <= 0:
+		im = Arte.seca(im)
+	return im
+
+# las barras, de delante atrás: cada una encima de su planta (2 filas de aire) y, si pisa otra, encima de esa. La de la
+# plaza elegida deja sitio encima para el cursor (CUR filas); si la elegida no tiene barra (vacía o muerta), su cursor
+# también aparta las barras
+const CUR := 7
+static func con_barra(S_: Dictionary, q: Dictionary) -> bool:
+	var p = S_.pots[q.i]
+	return p != null and not p.get("dead") and (not q.has("v") or q.v.p != null)
+
+static func barras(S_: Dictionary, g_: Dictionary, sel := -1) -> Array:
+	var o := []
+	if g_.is_empty():
+		return o
+	var cajas := []
+	for q in g_.pl:
+		if q.i == sel and not con_barra(S_, q):
+			cajas.append(caja_cursor(pos_cursor(g_, sel, [])))
+	var pl: Array = g_.pl.duplicate()
+	pl.sort_custom(func(a, b): return a.y > b.y or (a.y == b.y and (a.x < b.x or (a.x == b.x and a.i < b.i))))
+	for q in pl:
+		if not con_barra(S_, q):
+			continue
+		var p: Dictionary = S_.pots[q.i]
+		var r := Rect2i(q.x - (BW >> 1), q.y - q.alto + 3 - BH, BW + (BP if p.pest else 0), BH)
+		var cur := CUR if q.i == sel else 0
+		var mueve := true
+		while mueve:
+			mueve = false
+			for c in cajas:
+				if c.grow(1).intersects(r.grow_individual(0, cur, 0, 0)):
+					r.position.y = c.position.y - BH - 1
+					mueve = true
+		var caja := r.grow_individual(0, cur, 0, 0)
+		cajas.append(caja)
+		o.append({"i": q.i, "r": r, "p": p, "caja": caja, "fila": q.fila})
+	return o
+
+# el cursor de la plaza elegida (arriba a la izquierda de la flecha, sin el bote de 1 px): encima de su barra, en el sitio
+# que deja, o encima de su planta (12 px si no hay)
+static func pos_cursor(g_: Dictionary, sel: int, bs: Array) -> Vector2i:
+	for q in g_.pl:
+		if q.i == sel:
+			for e in bs:
+				if e.i == sel:
+					return Vector2i(q.x, e.r.position.y - 6)
+			return Vector2i(q.x, q.y - (q.alto if q.alto else 12) - 9)
+	return Vector2i(-1, -1)
+
+# lo que ocupa el cursor en pantalla con el bote: 9 × 7 px
+static func caja_cursor(c: Vector2i) -> Rect2i:
+	return Rect2i(c.x - 4, c.y - 1, 9, 7)
+
+# la fila de la plaza elegida: las de delante van en transparencia
+static func fila_sel(g_: Dictionary, sel: int) -> int:
+	for q in g_.pl:
+		if q.i == sel:
+			return q.fila
+	return 0
+
+func pinta(S_: Dictionary, VC_: Dictionary, now_: float, ancho := 240) -> void:
+	S = S_
+	VC = VC_
+	now = now_
+	sw = ancho
+	g = geo(S, VC.ci)
+	var ox := (sw - 240) >> 1
+	for n in [base, luz, encima]:
+		n.position = Vector2(ox, 0)
+	var on := Cultivo.plantas_vivas(S, VC.ci)
+	luz.visible = on and g.vc != null
+	if luz.visible:
+		luz.texture = Arte.tex("luz|%s|%s|%d|%d" % [g.c.t, g.vc.tipo, g.vc.foco.a, g.vc.fy], Arte.luz(g.c.t, g.vc))
+		luz.material.set_shader_parameter("fuerza", Datos.carga().LUZ_C.get(g.vc.tipo, [0, 1])[1])
+	base.queue_redraw()
+	encima.queue_redraw()
+
+func _pinta_base() -> void:
+	var ox := (sw - 240) >> 1
+	base.draw_rect(Rect2(-ox, 0, sw, 160), Color.BLACK)
+	if g.is_empty() or g.vc == null:
+		return
+	base.draw_texture(Arte.tex("pared|" + g.c.t, Arte.fondo(g.c.t, g.vc, "pared")), Vector2.ZERO)
+	var c: Dictionary = g.c
+	for e in temporizador(g.tx, g.ty, Cultivo.ciclo_de(c), Cultivo.plantas_vivas(S, VC.ci)):
+		base.draw_rect(Rect2(e[0], e[1], e[2], e[3]), e[4])
+	var D := Datos.carga()
+	var xr: int = g.vc.xl + g.vc.w
+	# el filtro de carbón, colgado del techo arriba a la izquierda (el extractor tiembla 1 px), y el ventilador de pinza en el poste
+	# del fondo derecho, a 55 cm del suelo, siempre girando
+	var kk := Cultivo.kit_de(c)   # (1.11) el kit de 100 mm, a 30 cm; el de 150, a 50; el de 125, según la carpa
+	if kk != "":
+		var fs = vc_sprite("extra-c-filtro-", (30 if kk == "filtro100" or kk == "filtro" and (c.t == "p60" or c.t == "p80") else 50) * g.vc.Z, true)
+		var fi := Arte.foto(fs.n)
+		base.draw_texture(Arte.tex("x|" + fs.n, fi), Vector2(g.vc.xl + 10 - 47 + int(floor(now / 90)) % 2, 3 - (fi.get_height() - Arte.alto(fi))))
+	if c.get("vent"):
+		var nv := posmod(int(floor(now / 70)), Arte.n_fotos("extra-c-vent"))
+		base.draw_texture(Arte.tex("x|vent|%d" % nv, Arte.foto("extra-c-vent", nv)), Vector2(xr + 1 - 24, int(D.VCA.fondo) - Datos.jsround(55 * g.vc.Z) - 47))
+	var fsel := fila_sel(g, VC.sel)
+	var fa = null
+	for q in orden(g):
+		var al := A35 if q.fila < fsel else 1.0
+		if g.vc.lg != null and q.fila != fa:
+			fa = q.fila
+			_ramal(g.vc.lg, fa, al)
+		_planta(q, al)
+
+# la manguera del goteo de la fila fa (2 px: tubo y brillo), de su primera llave a la pared derecha; la de la primera fila entra
+# por la pared (pasamuros) y las demás bajan por la pared desde la de detrás
+func _ramal(lg: Array, fa: int, al: float) -> void:
+	var i := -1
+	for j in lg.size():
+		if lg[j].fila == fa:
+			i = j
+			break
+	if i < 0:
+		return
+	var f: Dictionary = lg[i]
+	var osc := Color(Color.html("#1c1d22"), al)
+	_rect(f.x, f.y - 1, f.xw - f.x + 1, 1, Color(Color.html("#4a4c54"), al))
+	_rect(f.x, f.y, f.xw - f.x + 1, 1, osc)
+	if i:
+		var a: Dictionary = lg[i - 1]
+		var n := maxi(absi(f.xw - a.xw), f.y - a.y)
+		for k in (n + 1 if n > 0 else 0):
+			_rect(a.xw + Datos.jsround(float(f.xw - a.xw) * k / n), a.y + Datos.jsround(float(f.y - a.y) * k / n), 1, 1, osc)
+	else:
+		_rect(f.xw - 1, f.y - 2, 3, 4, Color(Color.html("#3a3c44"), al))
+		_rect(f.xw, f.y - 1, 1, 2, osc)
+
+# como fillRect del canvas: un ancho o un alto negativo pinta hacia la izquierda o hacia arriba
+func _rect(x: float, y: float, w: float, h: float, c: Color) -> void:
+	if w < 0:
+		x += w
+		w = -w
+	if h < 0:
+		y += h
+		h = -h
+	if w > 0 and h > 0:
+		base.draw_rect(Rect2(x, y, w, h), c)
+
+func _planta(q: Dictionary, al: float) -> void:
+	var v: Dictionary = q.v
+	var mod := Color(1, 1, 1, al)
+	var osc := Color(Color.html("#1c1d22"), al)
+	var p = S.pots[q.i]
+	var D := Datos.carga()
+	var ca: Dictionary = S.carpas[Cultivo.huecos(S)[q.i].c]
+	var mi := Arte.foto(v.m.n)
+	var mx1: int = Arte.caja(mi)[1]
+	var rim: int = q.y - 31 + (mi.get_height() - Arte.alto(mi))
+	# su garrafa (sin goteo), detrás de la maceta a la derecha, con el agua que le queda; el tubo del gotero va del tapón a la tierra
+	var gar := Cultivo.garrafa_l(S, q.i) if ca.get("garrafas") and not ca.get("goteo") else 0
+	var gs = vc_sprite("extra-c-garrafa-", 100 * pow(gar / 1000.0 / (.7 * .5 * .85), 1 / 3.0) * v.Z, true) if gar else null
+	var gc: int = q.x - 16 + mx1 - 1
+	var gb: int = q.y - 3
+	# su sombra en el suelo (1.10 P5): del ancho de la maceta, debajo de su base
+	var mx0: int = Arte.caja(mi)[0]
+	var som := Color(0, 0, 0, 56 / 255.0 * al)
+	_rect(q.x - 16 + mx0 - 1, q.y - 1, mx1 - mx0 + 3, 2, som)
+	_rect(q.x - 16 + mx0 + 1, q.y + 1, mx1 - mx0 - 1, 1, som)
+	if gs:
+		var gi := Arte.nivel(Arte.foto(gs.n), D.VC_AGUA.garrafa, Cultivo.garrafa(S, q.i) / gar)
+		base.draw_texture(Arte.tex("img|%d" % gi.get_instance_id(), gi), Vector2(gc - 24, gb - 47), mod)
+	# con goteo, su microtubo sube de la manguera por la derecha de la maceta, con su llave, y entra por el borde hasta la tierra
+	var got: bool = ca.get("goteo", false) and q.has("yl")
+	if got:
+		_rect(q.bx, rim - 1, 1, q.yl - rim + 1, osc)
+		base.draw_texture(Arte.tex("x|llave", Arte.foto("extra-c-llave")), Vector2(q.bx - 24, q.yl + 1 - 47), mod)
+	base.draw_texture(Arte.tex("m|" + v.m.n, mi), Vector2(q.x - 16, q.y - 31), mod)
+	if got:
+		_rect(q.x + 3, rim - 1, q.bx - q.x - 3, 1, osc)
+		_rect(q.x + 3, rim, 1, 2, osc)
+	if gs:
+		var gf := Arte.foto(gs.n)
+		var cx: int = gc - 24 + int(Arte.caja(gf)[0]) + 2
+		var cy: int = gb - Arte.alto(gf) - 1
+		var ty: int = mini(cy, rim) - 2
+		_rect(q.x + 3, ty, cx - q.x - 2, 1, osc)
+		_rect(cx, ty, 1, cy - ty, osc)
+		_rect(q.x + 3, ty, 1, rim + 2 - ty, osc)
+	if p == null or v.p == null:
+		return
+	if v.muerta:   # seca: los verdes de hoja y tallo a marrones, quieta
+		var ks := "seca|%s|%d" % [v.p.n, v.hp]
+		var ts: ImageTexture = Arte.texs.get(ks)
+		if ts == null:
+			ts = Arte.tex(ks, Arte.recolor(Arte.aplasta(Arte.altura(v.p.n, v.hp)[1], v.hp), D.VC_SECA))
+		base.draw_texture(ts, Vector2(q.x - (ts.get_width() >> 1), q.y - v.tierra - ts.get_height() + 1), mod)
+		return
+	var k := clave_planta(S, p, v)
+	var t: ImageTexture = Arte.texs.get(k)
+	if t == null:
+		t = Arte.tex(k, img_planta(S, p, v))
+	var yb: int = q.y - v.tierra
+	var b := t.get_height() - 1
+	# se mece; con el ventilador encendido, el doble de deprisa
+	_balanceo(t, q.x - (t.get_width() >> 1), yb - b, b, 1 if p.water > 0 else 0, now * (2 if ca.get("vent") else 1) + q.x * 37, mod)
+	if p.pest:
+		for n in 6:
+			base.draw_rect(Rect2(q.x - 8 + ((n * 5 + int(floor(now / 300))) % 16), yb - 12 - ((n * 7) % 20), 1, 1), Color(Color.html("#e02828"), al))
+
+# pinta la textura por franjas de 2 filas desplazadas con un seno: la base (fila b) quieta y la copa hasta ±a px
+func _balanceo(t: Texture2D, x: int, y: int, b: int, a: int, tt: float, mod: Color) -> void:
+	if not a:
+		base.draw_texture(t, Vector2(x, y), mod)
+		return
+	var s := sin(tt / 950) * .7 + sin(tt / 410) * .3
+	for r in range(0, t.get_height(), 2):
+		var dx := Datos.jsround(a * s * pow(maxf(0, float(b - r) / b), 1.5))
+		base.draw_texture_rect_region(t, Rect2(x + dx, y + r, t.get_width(), 2), Rect2(0, r, t.get_width(), 2), mod)
+
+func _pinta_encima() -> void:
+	if g.is_empty() or g.vc == null:
+		return
+	var D := Datos.carga()
+	var on := Cultivo.plantas_vivas(S, VC.ci)
+	var fc := Arte.foto(g.vc.foco.n)
+	var im := fc if on else Arte.apagado(fc)
+	# la campana, con la boca en fy; bajada, cuelga de dos poleas del techo (poleas) y luego se pinta ella
+	var fx := 120 - (fc.get_width() >> 1)
+	var fy: int = g.vc.fy
+	if fy > int(D.VCA.boca):
+		for e in poleas(fc, fy):
+			encima.draw_rect(Rect2(e[0], e[1], e[2], e[3]), e[4])
+	encima.draw_texture(Arte.tex("foco|%s|%s" % [g.vc.foco.n, on], im), Vector2(fx, fy - 15))
+	# el depósito del goteo está fuera: arriba a la derecha, en pequeño, con el agua que le queda en la mirilla
+	if g.vc.lg != null:
+		var l := Cultivo.goteo_l(S, VC.ci)
+		var dep = g.c.get("dep")
+		var di := Arte.nivel(Arte.foto("extra-c-deposito"), D.VC_AGUA.deposito, (float(dep) if dep != null else float(l)) / l)
+		encima.draw_texture(Arte.tex("img|%d" % di.get_instance_id(), di), Vector2(g.vc.xl + g.vc.w + 22 - 24, 8 - 28))
+	var bs := barras(S, g, VC.sel)
+	var fsel := fila_sel(g, VC.sel)
+	for b in bs:
+		_barra(b, A35 if b.fila < fsel else 1.0)
+	_cursor(bs)
+
+# agua: azul, y por debajo de 30 (toca regar) parpadea en rojo; cosecha: verde hasta que está lista, y entonces dorada y
+# parpadeando; con plaga, la «!» roja al lado. Rectángulos que no se pisan: con transparencia (al) no se suman
+static func pinta_barra(L: CanvasItem, b: Dictionary, al: float, now: float) -> void:
+	var r: Rect2i = b.r
+	var p: Dictionary = b.p
+	var x := r.position.x
+	var y := r.position.y
+	var tic := int(floor(now / 400)) % 2 == 1
+	var R := func(rx: int, ry: int, w: int, h: int, c: Color) -> void:
+		if w > 0 and h > 0:
+			L.draw_rect(Rect2(rx, ry, w, h), Color(c, al))
+	var n := BW - 2
+	for f in [y, y + 3, y + 6]:
+		R.call(x + 1, f, n, 1, OSC)
+	R.call(x, y + 1, 1, BH - 2, OSC)
+	R.call(x + BW - 1, y + 1, 1, BH - 2, OSC)
+	var sed: bool = p.water < 30 and tic
+	var na := ceili(clampf(p.water, 0, 100) * n / 100.0)
+	R.call(x + 1, y + 1, na, 1, Color8(0xf0, 0x80, 0x78) if sed else Color8(0x76, 0xb4, 0xf2))
+	R.call(x + 1, y + 2, na, 1, Color8(0xe0, 0x40, 0x40) if sed else Color8(0x4a, 0x92, 0xe0))
+	R.call(x + 1 + na, y + 1, n - na, 2, Color8(0x7a, 0x2a, 0x30) if sed else VACIO)
+	var lista: bool = p.prog >= 1
+	var nc := n if lista else floori(clampf(p.prog, 0, 1) * n)
+	R.call(x + 1, y + 4, nc, 1, (Color8(0xff, 0xf4, 0xb0) if tic else Color8(0xf8, 0xd8, 0x60)) if lista else Color8(0xb0, 0xe4, 0x8c))
+	R.call(x + 1, y + 5, nc, 1, (Color8(0xf8, 0xd8, 0x60) if tic else Color8(0xd8, 0xa0, 0x30)) if lista else Color8(0x62, 0xaa, 0x56))
+	R.call(x + 1 + nc, y + 4, n - nc, 2, VACIO)
+	if p.pest:
+		var px := x + BW
+		var rojo := Color8(0xa0, 0x20, 0x20) if tic else Color8(0xe0, 0x40, 0x40)
+		var bla := Color8(0xf8, 0xf8, 0xf0)
+		R.call(px, y, BP, 1, OSC)
+		R.call(px, y + BH - 1, BP, 1, OSC)
+		R.call(px, y + 1, 1, BH - 2, OSC)
+		R.call(px + BP - 1, y + 1, 1, BH - 2, OSC)
+		R.call(px + 1, y + 1, 1, BH - 2, rojo)
+		R.call(px + BP - 2, y + 1, 1, BH - 2, rojo)
+		R.call(px + 2, y + 4, 2, 1, rojo)
+		R.call(px + 2, y + 1, 2, 3, bla)
+		R.call(px + 2, y + 5, 2, 1, bla)
+
+static func pinta_cursor(L: CanvasItem, g: Dictionary, VC: Dictionary, bs: Array, now: float) -> void:
+	var b := int(floor(now / 300)) % 2
+	var osc := Color.html("#26262e")
+	var cla := Color.html("#f8f8f0")
+	if VC.sel < 0:
+		var x: int = g.tx - 8 if VC.sel == SEL_TEMP else g.fx - (int(g.fw) >> 1) - 8
+		var y: int = g.ty + 6 if VC.sel == SEL_TEMP else g.fy - 5
+		L.draw_rect(Rect2(x - 1, y - 4, 6, 9), osc)
+		for k in 4:
+			L.draw_rect(Rect2(x + b + k, y - 3 + k, 1, 7 - 2 * k), cla)
+		return
+	for q in g.pl:
+		if q.i == VC.sel:
+			L.draw_rect(Rect2(q.x - 7, q.y, 14, 2), Color(1, 1, 240 / 255.0, A35))
+	var c := pos_cursor(g, VC.sel, bs)
+	if c == Vector2i(-1, -1):
+		return
+	var x := c.x
+	var y := c.y + b
+	L.draw_rect(Rect2(x - 4, y - 1, 9, 6), osc)
+	for k in 4:
+		L.draw_rect(Rect2(x - 3 + k, y + k, 7 - 2 * k, 1), cla)
+
+func _barra(b: Dictionary, al: float) -> void:
+	pinta_barra(encima, b, al, now)
+
+func _cursor(bs: Array) -> void:
+	pinta_cursor(encima, g, VC, bs, now)

@@ -1,0 +1,19 @@
+{
+  "grupo": "salon",
+  "celda": [
+    48,
+    48
+  ],
+  "tope_colores": 15,
+  "secuencias": 3,
+  "fotogramas": 3,
+  "semitransparentes": 0,
+  "en_paleta_antes": 4.7,
+  "distancia_media": 0,
+  "colores_finales": 15,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

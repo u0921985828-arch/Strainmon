@@ -1,0 +1,115 @@
+/* Layout: app de móvil en horizontal. La pantalla del juego ocupa todo el móvil, con un reborde fino, y los mandos
+   flotan encima, fijos y medidos en mm donde descansan los pulgares: cruceta abajo a la izquierda, A/B abajo a la derecha con START
+   encima y SONIDO arriba a la derecha. 06b-pantalla.js mide el hueco real y coloca cada parte (geoMandos); aquí solo se pintan. */
+:root{
+  --rim:#121519; --ink:#e6f2ea;
+  --btn:#6d2c4b; --btnHi:#9a4a72;
+  --box:#f8f8f0; --boxInk:#2c2c36; --boxShadow:#e2dbd0; --boxLine:#46749a; --boxLine2:#a9d2ec;
+  --display:"Press Start 2P", ui-monospace, monospace;
+  --texto:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+[hidden]{display:none!important}
+body{position:fixed;inset:0;background:var(--rim);color:var(--ink);font-family:var(--texto);-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+/* --u: píxel del juego en CSS px · --sw/--sh/--sx/--sy: tamaño y sitio de la pantalla · --uiw/--us: escenario de diálogos y menús
+   --k: px por mm de los mandos (con lo que encogen en un móvil estrecho). Los valores por defecto ya caben en un móvil. */
+.marco{--u:2.25px;--us:2.25px;--uiw:540px;--sw:810px;--sh:360px;--sx:0px;--sy:0px;--k:6.3px;--ut:0px;--bpr:13.5px;
+  position:absolute;inset:0;overflow:hidden;background:var(--rim);box-sizing:border-box;
+  padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.screen{position:absolute;left:var(--sx);top:var(--sy);width:var(--sw);height:var(--sh);background:#000;overflow:hidden;border-radius:calc(var(--u)*2);user-select:none;-webkit-user-select:none}
+/* escena: los 240×160 del centro (título y marcadores del combate) · ui: diálogos, menús y avisos, fuera de los mandos
+   (--ut: empieza debajo de SONIDO si lo tendría encima). Con un menú a toda altura, el HUD se aparta. */
+.escena{position:absolute;top:0;bottom:0;left:calc(50% - var(--u) * 120);width:calc(var(--u) * 240);pointer-events:none;z-index:14}
+.ui{position:absolute;top:var(--ut);bottom:0;left:calc(50% - var(--uiw) / 2);width:var(--uiw);--u:var(--us);z-index:20;pointer-events:none}
+.ui>*{pointer-events:auto}
+.screen:has(>.ui>.menu.full:not([hidden]))>.hud{visibility:hidden}
+/* mandos flotando sobre la pantalla: #dpad y #ab son las zonas de toque (la cruz y los botones, dentro) */
+.mando{position:absolute;inset:0;pointer-events:none;z-index:50}
+.mando>*{position:absolute;pointer-events:auto}
+.dpad,.ab{touch-action:none}
+.cruz{position:absolute;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);pointer-events:none}
+.cruz span{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:calc(var(--k) * 2.4);color:rgba(255,255,255,.88);text-shadow:0 1px 0 rgba(0,0,0,.5);
+  background:rgba(24,28,34,.5);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22)}
+.cruz .u{grid-area:1/2;border-radius:calc(var(--k) * 1.6) calc(var(--k) * 1.6) 0 0}.cruz .d{grid-area:3/2;border-radius:0 0 calc(var(--k) * 1.6) calc(var(--k) * 1.6)}
+.cruz .l{grid-area:2/1;border-radius:calc(var(--k) * 1.6) 0 0 calc(var(--k) * 1.6)}.cruz .r{grid-area:2/3;border-radius:0 calc(var(--k) * 1.6) calc(var(--k) * 1.6) 0}
+.cruz .m{grid-area:2/2;box-shadow:none}
+.cruz span.on{background:rgba(70,80,96,.75)}
+.ab button,.start,.sonido{font:inherit;font-weight:700;border:0;cursor:pointer;touch-action:none;padding:0;color:rgba(255,255,255,.88);text-shadow:0 1px 0 rgba(0,0,0,.5)}
+.ab button{position:absolute;border-radius:50%;background:rgba(109,44,75,.55);box-shadow:inset 0 0 0 1.5px rgba(255,210,230,.4);font-size:calc(var(--k) * 3.8)}
+.start,.sonido{border-radius:calc(var(--k) * 3.5);background:rgba(24,28,34,.55);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22);font-size:calc(var(--k) * 2.6);letter-spacing:.06em}
+button:active,button.on{filter:brightness(1.6)}
+.start:active,.start.on,.sonido:active,.sonido.on{background:rgba(70,80,96,.75)}
+.ab button:active,.ab button.on{background:rgba(154,74,114,.85)}
+button:focus-visible{outline:2px solid #f8e070;outline-offset:2px}
+/* vertical: la app solo va en horizontal */
+.girar{position:absolute;inset:0;z-index:100;background:#0b120e;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;box-sizing:border-box}
+.girar div{font-size:17px;line-height:1.45;color:#cfe6d6;max-width:260px}
+.girar b{display:block;font-size:22px;color:#ffe680;margin-bottom:6px}
+.girar div::before{content:"";display:block;width:44px;height:74px;margin:0 auto 18px;border:3px solid #9cf0a8;border-radius:9px;animation:girar 2.2s ease-in-out infinite}
+@keyframes girar{0%,25%{transform:rotate(0)}55%,100%{transform:rotate(-90deg)}}
+/* ---- interfaz dentro de la pantalla, medida en píxeles del juego (--u) ---- */
+canvas#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+.box{background:var(--box);border:calc(var(--u)*2) solid var(--boxLine);border-radius:calc(var(--u)*4);box-shadow:inset 0 0 0 calc(var(--u)*1.5) var(--boxLine2);color:var(--boxInk);text-shadow:calc(var(--u)*.8) calc(var(--u)*.8) 0 var(--boxShadow);box-sizing:border-box}
+.dlg{position:absolute;left:calc(var(--u)*3);right:calc(var(--u)*3);bottom:calc(var(--u)*3);min-height:calc(var(--u)*44);padding:calc(var(--u)*6) calc(var(--u)*10);font-size:calc(var(--u)*10);line-height:calc(var(--u)*13.5);white-space:pre-wrap;z-index:20}
+.dlg .nm{position:absolute;top:calc(var(--u)*-12);left:calc(var(--u)*6);background:var(--boxLine);color:#fff;text-shadow:none;font-weight:700;font-size:calc(var(--u)*8);letter-spacing:.04em;line-height:1;padding:calc(var(--u)*2.5) calc(var(--u)*5);border-radius:calc(var(--u)*3) calc(var(--u)*3) 0 0}
+.dlg .more{position:absolute;right:calc(var(--u)*8);bottom:calc(var(--u)*4);width:0;height:0;border-left:calc(var(--u)*4) solid transparent;border-right:calc(var(--u)*4) solid transparent;border-top:calc(var(--u)*5) solid #e04040;animation:bob .6s steps(2) infinite}
+@keyframes bob{50%{transform:translateY(calc(var(--u)*2))}}
+.menu{position:absolute;padding:calc(var(--u)*5) calc(var(--u)*7);font-size:calc(var(--u)*10);line-height:calc(var(--u)*14.5);z-index:30;min-width:calc(var(--u)*60)}
+.menu.right{right:calc(var(--u)*3);bottom:calc(var(--u)*49);max-width:calc(var(--u)*170)}
+.menu.start{right:calc(var(--u)*3);top:calc(var(--u)*3)}
+.menu.full{left:calc(var(--u)*3);right:calc(var(--u)*3);top:calc(var(--u)*3);bottom:calc(var(--u)*3);display:flex;flex-direction:column}
+.menu.battle{right:calc(var(--u)*3);bottom:calc(var(--u)*3);height:calc(var(--u)*44);width:calc(var(--u)*118);display:grid;grid-template-columns:1fr 1fr;align-content:center;padding:calc(var(--u)*4) calc(var(--u)*6);font-size:calc(var(--u)*9.5)}
+.menu .ttl{color:var(--boxLine);font-weight:700;font-size:calc(var(--u)*8.5);display:flex;justify-content:space-between;gap:calc(var(--u)*8);border-bottom:calc(var(--u)*1) solid var(--boxLine2);margin-bottom:calc(var(--u)*3);padding-bottom:calc(var(--u)*1)}
+.menu .list{flex:1;min-height:0}
+.menu .it{position:relative;padding-left:calc(var(--u)*10);white-space:nowrap;display:flex;justify-content:space-between;gap:calc(var(--u)*10);cursor:pointer;overflow:hidden;text-overflow:ellipsis}
+.menu .it .r{color:#6a6a78;font-variant-numeric:tabular-nums}
+.menu .it.sel::before{content:"";position:absolute;left:0;top:calc(var(--u)*3.5);border-top:calc(var(--u)*4) solid transparent;border-bottom:calc(var(--u)*4) solid transparent;border-left:calc(var(--u)*5) solid #404048}
+.menu .it.dis{color:#a6a6ae}
+.menu .it>span:first-child{display:flex;align-items:center;min-width:0}
+.menu .ic{flex:none;display:block;margin-right:calc(var(--u)*2);background:center/100% 100% no-repeat;image-rendering:pixelated;image-rendering:crisp-edges}
+.menu .sw{flex:none;display:inline-block;width:calc(var(--u)*6);height:calc(var(--u)*6);border-radius:calc(var(--u)*1.5);margin-right:calc(var(--u)*4);vertical-align:middle;box-shadow:0 0 0 calc(var(--u)*.8) #404048}
+.menu .desc{border-top:calc(var(--u)*1) solid var(--boxLine2);margin-top:calc(var(--u)*3);padding-top:calc(var(--u)*3);font-size:calc(var(--u)*8.5);line-height:calc(var(--u)*11.5);min-height:calc(var(--u)*24);white-space:pre-wrap}
+.menu .arr{text-align:center;color:#e04040;font-size:calc(var(--u)*6);line-height:calc(var(--u)*5);height:calc(var(--u)*5)}
+.menu .it>span:first-child{overflow:hidden;text-overflow:ellipsis}
+.hud{position:absolute;left:calc(var(--u)*3);top:calc(var(--u)*3);background:rgba(16,28,22,.78);color:#eef8f0;font-size:calc(var(--u)*7.5);line-height:calc(var(--u)*9);padding:calc(var(--u)*2) calc(var(--u)*4);border-radius:calc(var(--u)*3);z-index:10;font-weight:700;font-variant-numeric:tabular-nums;pointer-events:none}
+.hud .heat{display:flex;align-items:center;gap:calc(var(--u)*3)}
+.hud .bar{width:calc(var(--u)*34);height:calc(var(--u)*3);background:#2e3a34;border-radius:calc(var(--u)*1)}
+.hud .bar i{display:block;height:100%;background:#f0a030;border-radius:calc(var(--u)*1)}
+.hud .bar i.hot{background:#f04040}
+.hud .sosp .bar i{background:#e8d040}
+.hud .sosp .bar i.hot{background:#f04040}
+.toast{position:absolute;left:50%;top:calc(var(--u)*24);transform:translateX(-50%);padding:calc(var(--u)*4) calc(var(--u)*10);font-size:calc(var(--u)*9);line-height:calc(var(--u)*12);text-align:center;z-index:25;width:max-content;max-width:calc(var(--u)*210);pointer-events:none}
+.toast.sobre{z-index:35}
+.ui:has(>.menu.battle:not([hidden]))>.dlg{padding-right:calc(var(--u)*126)}
+.toast small{display:block;font-weight:700;font-size:calc(var(--u)*7);color:var(--boxLine);letter-spacing:.08em;text-shadow:none}
+.bhp{position:absolute;padding:calc(var(--u)*3) calc(var(--u)*6);font-size:calc(var(--u)*8.5);line-height:calc(var(--u)*11);width:calc(var(--u)*104);z-index:15}
+.bhp .row{display:flex;justify-content:space-between}
+.bhp .hp{display:flex;align-items:center;gap:calc(var(--u)*3);font-size:calc(var(--u)*7.5);font-weight:700;color:#d08a20;text-shadow:none}
+.bhp .hp span{flex:1;height:calc(var(--u)*3.5);background:#3a3a44;border-radius:calc(var(--u)*2);padding:calc(var(--u)*.6)}
+.bhp .hp span i{display:block;height:100%;width:100%;background:#58d080;border-radius:calc(var(--u)*2);transition:width .5s steps(12)}
+.bhp .num{text-align:right;font-variant-numeric:tabular-nums}
+#bE{left:calc(var(--u)*6);top:calc(var(--u)*8)}
+#bP{right:var(--bpr);bottom:calc(var(--u)*49)}   /* --bpr: 6u o, si A, B o START le caen encima, a su izquierda */
+/* vista de carpa: ficha de la plaza o del foco elegido */
+.vcinfo{position:absolute;left:calc(var(--u)*3);top:calc(var(--u)*3);width:calc(var(--u)*66);padding:calc(var(--u)*3) calc(var(--u)*4);font-size:calc(var(--u)*6.5);line-height:calc(var(--u)*8.5);z-index:15}
+.vcinfo div,.vcinfo b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vcinfo b{display:block;color:var(--boxLine);font-size:calc(var(--u)*7);border-bottom:calc(var(--u)*1) solid var(--boxLine2);margin-bottom:calc(var(--u)*1.5)}
+.vcinfo em{font-style:normal;font-weight:700;color:#e04040}
+.title{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:var(--tt,calc(var(--u)*20));z-index:12;pointer-events:none;text-align:center}
+.title h1{margin:0;font-family:var(--display);font-weight:400;font-size:calc(var(--u)*17);line-height:1.15;color:#ffe680;text-shadow:calc(var(--u)*1.5) calc(var(--u)*1.5) 0 #2a7a40,calc(var(--u)*3) calc(var(--u)*3) 0 #10301c;letter-spacing:.04em}
+.title h1 span{display:block;color:#9cf0a8;font-size:calc(var(--u)*10);margin-top:calc(var(--u)*5)}
+.title p{margin:calc(var(--u)*6) 0 0;font-size:calc(var(--u)*8);color:#d8f0e0;text-shadow:calc(var(--u)*1) calc(var(--u)*1) 0 #10301c}
+.title .press{position:absolute;bottom:calc(var(--u)*14);font-weight:700;font-size:calc(var(--u)*9.5);letter-spacing:.12em;color:#fff;animation:blink 1s steps(2) infinite;text-shadow:calc(var(--u)*1) calc(var(--u)*1) 0 #000}
+@keyframes blink{50%{opacity:0}}
+.fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:40;transition:opacity .22s linear}
+.fade.white{background:#fff}
+.wipe{position:absolute;inset:0;background:#000;z-index:41;pointer-events:none;clip-path:inset(50% 0 50% 0)}
+.wipe.go{animation:wipe .45s steps(8) forwards}
+@keyframes wipe{to{clip-path:inset(0 0 0 0)}}
+.namebox{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:calc(var(--u)*8) calc(var(--u)*10);z-index:35;display:flex;flex-direction:column;gap:calc(var(--u)*5);font-size:calc(var(--u)*9)}
+.namebox input{-webkit-user-select:text;user-select:text;font-family:var(--texto);font-size:calc(var(--u)*12);width:calc(var(--u)*110);border:calc(var(--u)*1) solid var(--boxLine);background:#fff;color:var(--boxInk);padding:calc(var(--u)*2) calc(var(--u)*4);text-transform:uppercase}
+.namebox small{font-size:calc(var(--u)*7);color:#6a6a78}
+.endcard{position:absolute;inset:0;z-index:38;background:#0b1a12;color:#e8f8ec;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*6);text-align:center;padding:calc(var(--u)*12);font-size:calc(var(--u)*9);line-height:calc(var(--u)*13)}
+.endcard h2{font-family:var(--display);font-weight:400;font-size:calc(var(--u)*14);color:#ffe680;margin:0}
+@media (prefers-reduced-motion:reduce){.dlg .more,.title .press{animation:none}.fade{transition:none}}

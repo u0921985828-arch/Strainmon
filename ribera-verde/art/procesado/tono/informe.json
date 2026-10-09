@@ -1,0 +1,26 @@
+{
+  "grupo": "tono",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 9,
+  "fotogramas": 30,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 14.22,
+  "colores_finales": 14,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "fumar/south": 0,
+    "idle/east": 0,
+    "idle/north": 0,
+    "idle/south": 0,
+    "nudillos/south": 0
+  },
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #26262e≈#2a2a30"
+  ]
+}

@@ -1,0 +1,217 @@
+# Plano de Ribera Verde (1.10, en desarrollo)
+
+Inventario de todo lo que ocupa sitio en el juego (mapas, edificios, muebles, carpas, macetas, plantas, focos, extras y
+personajes), medido contra su tamaño real. En la 1.7.0 sirvió para decidir la escala; en la 1.8.0 se aplicó la
+**opción A** (sección 5). En P2 del [plan de producción](PLAN-PRODUCCION.md) la vista de carpa pasó a la **B**
+(sección 6): carpa abierta a 60 px/m, con el atlas la plateada de frente (en 3/4 sin él).
+
+- Imágenes: `docs/plano/town.png`, `home.png`, `shop.png`, `bar.png` y, desde la 1.10, `alto.png`, `astilleros.png`,
+  `txaro.png`, `comisaria.png`, `almacen.png`, `mendialde.png`, `casa-ama.png`, `puerto.png`, `valdehierro.png` y
+  `errotabarri.png` (rejilla, coordenadas y rótulos),
+  `docs/plano/escala.png` (todos los sprites junto al jugador sobre la misma línea de suelo) y
+  `docs/plano/vista-b.png` (las 5 carpas abiertas de la vista B) y, desde la 1.10, `docs/plano/vista-c.png` (las mismas por
+  dentro: la vista C, la que se ve con el atlas).
+- Datos: `docs/plano/medidas.json` (posiciones de cada mapa y las 71 medidas de abajo).
+- Se regenera con `npm run plano` (`tools/plano.js`): pinta los mapas y la vista B con el motor del juego y mide la
+  caja opaca de cada fotograma, así que el plano siempre coincide con lo que se ve. La tabla de la sección 3 sale de
+  `medidas.json`.
+
+## 1. Patrón de escala
+
+| Magnitud | Valor |
+|---|---|
+| Casilla | 16 × 16 px |
+| Escala de los mapas | **1 casilla = 16 px = 1 m** (el jugador mide 27 px = 1,69 m frente a 1,75 m reales: ×0,96) |
+| Escala de la vista de carpa B | **60 px = 1 m de ancho y de alto**. Con el atlas, la carpa plateada de frente (`carpa-<t>-vista`): 17 filas de suelo hasta la pared del fondo; sin él, en 3/4 con 24 px/m de fondo y lo de atrás corrido 6 px/m a la derecha. La carpa de 150 × 100 × 200 cm: suelo de delante de 94 px y 133 de alto con el marco |
+| Pantalla | 240–400 × 160 px = 15–25 × 10 m de mundo a la vista (el ancho depende del móvil) |
+| Personajes | celda 32 × 32, pies en (16, 30); adultos de 27–28 px |
+| Vista | mapas: cenital oblicua (3/4), el ancho se mide de frente; vista de carpa B: de frente, abierta (3/4 recortada sin atlas) |
+| Tolerancia | ×0,75–×1,33 coherente · ×0,5–×2,5 estilizado · fuera de eso, incoherente |
+
+## 2. Mapas
+
+| Mapa | Casillas | Qué hay (x, y) |
+|---|---|---|
+| Barrio (`town`) | 40 × 30 | Edificios de 7 × 6 en y 3–8: piso (2), growshop (14), bar (23); casa de Txaro, gris, 6 × 6 (32). Puertas: piso (5,8), growshop (17,8), bar (26,8) y casa de Txaro (34–35,8). Al barrio alto, por el camino del norte (11–12, 0); a los astilleros, por el muelle (39, 20–21). Calle: acera y 9, calzada y 10–11, acera y 12. Parque de los Sauces (1,13)–(11,27), con hierba alta en (7–10, 18–20) y (1–3, 21–23). Plaza (14,13)–(26,24), con la fuente en (20,19). Ría (31–38, 14–28), muelle (34–38, 16–25) y puente (31–33, 19–20). Parada del autobús en (8,12), enfrente del piso. Lindes de monte (bosque de 2 filas) y seto abajo. |
+| Piso (`home`) | 18 × 8 (108 m²) | Paredes en y 0–1, con ventanas en (6,1), (9,1) y (15,1) y el diploma en (7,1); suelo de 18 × 6 m. Cama (0,2–3), planta (1,2), ordenador (4,2), mesas de genética (5,2) y (6,2), arcón (0,4), mesa (3,5), nevera (0,6) y planta (17,7). Salón (1.10, x 12–17), vacío hasta que compras los muebles, de 2 casillas cada uno: tele (13–14,2), PC gaming (16–17,2) y sofá (13–14,5), mirando a la tele. Sitio A (8,2), 1 casilla: el armario 60 o el 80. Sitio B (10–11,2), 2 casillas: la carpa 100 (en x 10) o la 150 (x 10–11). Sitio C (2–3,2), 2 casillas: la carpa 120, cuando ya hay carpa en B. Salida en (5,7). |
+| Growshop (`shop`) | 10 × 8 | Estanterías (0,1) y (8,1), mostrador (2–7, 3), expositores (0,5) y (9,5), Kiko (4,2). Salida en (4,7). |
+| Bar El Ancla (`bar`) | 10 × 8 | Botellero (0–3, 1), barra (0–3, 3), taburetes (1,4) y (3,4), mesas (8,2) y (7,5), gramola (9,2). Josune (2,2), Toño (5,4) y Baltasar (7,4). Salida en (4,7). |
+| Barrio alto (`alto`, 1.10) | 40 × 30 | Plaza del Ensanche (3–19, 4–17) con la fuente en (11,11) y 4 bancos. Comisaría de sillar con su fachada 6 × 6 (24, 13–18), puerta doble en (26–27,18). Jardines (22–38, 3–11) y flores (31–37, 14–18). Calle: acera y 20, calzada y 21–22, acera y 23. Camino al barrio en (11–12, 24–29). Arbusto con 80 € en (2,10). |
+| Astilleros (`astilleros`, 1.10) | 40 × 30 | Tierra; astilleros cerrados (24–37, 4–10) con valla; almacén, nave de chapa 6 × 6 (16, 8–13), puerta corredera en (18–19,13). Hierba alta en (2–6, 3–7) y (30–35, 13–15). Muelle de carga en y 19–22 y dos diques (6–8 y 26–28, 23–27); agua abajo. Darko (24,16) desde el capítulo 7. Bolsa con 2 sprays en (4,5). |
+| Casa de Txaro (`txaro`, 1.10) | 10 × 8 | Cama (0,2–3), mesa (5,4), nevera (9,6) y plantas. Txaro (6,3) desde su primera misión. Salida en (4,7). |
+| Comisaría (`comisaria`, 1.10) | 10 × 8 | Estanterías, mostrador (2–7, 3) y bancos (0,5) y (9,5). Molina (4,2) desde el capítulo 5. Salida en (4,7). |
+| Almacén (`almacen`, 1.10) | 10 × 8 | Cajas en las esquinas, mesa (5,4) y taburete (4,4). Toño (5,2) mientras hay un encargo de Baltasar. Salida en (4,7). |
+| Mendialde (`mendialde`, 1.10) | 48 × 34 | El pueblo del prólogo, con el borde irregular (el monte entra y sale; bosquetes arriba a la derecha y abajo a la izquierda). Carretera de la comarca, de asfalto, en y 17–18 de lado a lado. Arriba, el barrio viejo por pistas de hormigón (4–37, 12–13; 13–14, 14–16; 28–34, 9–11): caserío de la familia 8 × 6 (3,6), puerta doble en (6–7,11); caserío vecino 8 × 6 (16,5), caserío pequeño 6 × 5 (30,3) y borda 4 × 4 (38,9); huerta con valla (2–9, 14–16). Abajo, la plaza (18–29, 19–26) con la fuente en (24,22) y la parada (20,19); caserío 8 × 6 (3,20) y pequeño 6 × 5 (32,19). Las afueras, por la pista de tierra (12–13, 19–27; 3–11, 26–27; 14–42, 27–28): maizal vallado (39–46, 19–23), otra borda (43,25) y el manzanal (15–36, 30–32). Vecina (22,21). |
+| Caserío de la familia (`casa-ama`, 1.10) | 10 × 8 | Cama (0,2–3), mesa con la nota de ama (5,4), nevera con el táper (9,6) y geranios. Empiezas en (2,4). Salida en (4,7). |
+| Puerto Viejo (`puerto`, 1.10) | 40 × 24 | Nueve casas marineras de colores de tres tamaños parecidos (3 × 5, 4 × 6 y 5 × 7, de dos pisos) con la base en y 7 y el monte por encima hasta donde llega cada una; acera y 8; paseo hasta la barandilla (y 15); tres pantalanes (6–8, 22–24 y 32–34) sobre el mar (y 16–23). Parada (19,9). Turista (14,11). |
+| Valdehierro (`valdehierro`, 1.10) | 40 × 24 | Bloques de ladrillo 7 × 6 en (2,2), (19,2), (2,13) y (10,13); nave de chapa 6 × 6 (10,2) y un patio de tierra con cajas (16–18, 2–7); fundición 8 × 6 (29,2); carretera de asfalto roto (baches, parches y la raya borrada) en y 9–10 de lado a lado; solar vallado (20–38, 12–22) con cajas y hierba alta (30–33, 17–19); parque (1–17, 20–22); monte por el borde. Parada (14,11). Obrero (28,14). |
+| Errotabarri (`errotabarri`, 1.10) | 36 × 24 | El camino es una pista de tierra (sin asfaltar) en y 11–12 de lado a lado, con un puente de madera sobre el río, que serpentea (3 de ancho, entre x 16 y 20); caserío 8 × 6 (4,3), caseríos pequeños 6 × 5 (23,4) y (27,13), cada caserío con su camino de pista, y el molino de piedra 4 × 4 (22,15) junto al río; huerta vallada (3–10, 15–19); bosquete arriba a la derecha y monte que entra y sale. Parada (6,13). Excursionista (14,14). |
+
+**NPC del barrio:** Begoña (10,12), Txaro (3,18), Unai (17,18), Darko (20,14), Jurado (18,15), Molina (23,15), agente (22,17),
+Patxi (21,21) e Iñaki (37,21).
+
+**Objetos del barrio:**
+- A la vista: spray (8,25), abono (36,24) y bocata (15,23).
+- Escondidos en arbustos: Acapulco Gold (2,26), 50 € (9,16) e insecticida (10,24).
+
+**Carpas del piso:** muebles sólidos que se usan con A desde la casilla de delante; dentro, la vista de carpa B.
+`home.png` sale con las tres montadas (armario 80, carpa 150 y carpa 120) y el salón amueblado.
+
+| Carpa | Real | En el piso | En la vista B | Plazas | Focos |
+|---|---|---|---|---|---|
+| Armario 60 × 60 | 0,6 × 0,6 × 1,6 m | 1 casilla (A) | 2 en 1 fila | 2 | hasta 250 W |
+| Armario 80 × 80 | 0,8 × 0,8 × 1,8 m | 1 casilla (A) | 2 delante y 1 detrás, centrada | 3 | hasta 400 W |
+| Carpa 100 × 100 | 1 × 1 × 2 m | 1 casilla (B) | 2 × 2 (en rejilla, a 50 cm) | 4 | hasta 480 W |
+| Carpa 150 × 100 | 1,5 × 1 × 2 m | 2 casillas (B) | 3 × 2 | 6 | hasta 720 W |
+| Carpa 120 × 120 | 1,2 × 1,2 × 2 m | 2 casillas (C) | 3 × 2 | 6 | hasta 720 W |
+
+## 3. Medidas (sprite en juego frente a tamaño real)
+
+En negrita, lo que se sale de ×0,75–×1,33. «Frente»: ancho del suelo de delante de la carpa abierta (en el piso, de un poste a otro). Los extras de la vista B (ventilador, filtro y goteo) son piezas procedurales de tamaño fijo, de cuando la vista iba a 48 px/m: hasta sus láminas se quedan en ×0,75–×0,80.
+
+| Grupo | Sprite | px | Eje | En juego | Real | Ratio |
+|---|---|---|---|---|---|---|
+| Personajes | Jugador | 16×27 | alto | 1,69 m | 1,75 m | ×0,96 |
+|  | Kiko | 18×28 | alto | 1,75 m | 1,78 m | ×0,98 |
+|  | Baltasar | 16×27 | alto | 1,69 m | 1,8 m | ×0,94 |
+|  | Txaro | 16×28 | alto | 1,75 m | 1,55 m | ×1,13 |
+|  | Unai (niño) | 14×28 | alto | 1,75 m | 1,35 m | ×1,30 |
+|  | Agente | 16×28 | alto | 1,75 m | 1,8 m | ×0,97 |
+| Mobiliario | Cama | 19×32 | ancho | 1,19 m | 0,9 m | ×1,32 |
+|  | Nevera | 12×36 | ancho | 0,75 m | 0,6 m | ×1,25 |
+|  | Ordenador | 16×15 | ancho | 1 m | 1,2 m | ×0,83 |
+|  | Mesa genética | 16×15 | ancho | 1 m | 1,2 m | ×0,83 |
+|  | Mesa genética 2 | 16×14 | ancho | 1 m | 1,2 m | ×0,83 |
+|  | Mesa | 14×13 | ancho | 0,88 m | 0,8 m | ×1,09 |
+|  | Planta deco | 14×16 | alto | 1 m | 0,9 m | ×1,11 |
+|  | Estantería | 16×9 | ancho | 1 m | 0,9 m | ×1,11 |
+|  | Mostrador | 16×16 | alto | 1 m | 1 m | ×1,00 |
+|  | Expositor | 14×15 | ancho | 0,88 m | 0,8 m | ×1,09 |
+|  | Botellero | 16×11 | ancho | 1 m | 1 m | ×1,00 |
+|  | Taburete | 8×14 | alto | 0,88 m | 0,75 m | ×1,17 |
+|  | Mesa de bar | 14×14 | ancho | 0,88 m | 0,7 m | ×1,25 |
+|  | Gramola | 12×24 | ancho | 0,75 m | 0,7 m | ×1,07 |
+|  | Cajas (2 de 40 cm) | 16×19 | ancho | 1 m | 0,8 m | ×1,25 |
+| Cultivo (piso, 16 px/m) | Armario 60×60 | 10×31 | ancho | 0,63 m | 0,6 m | ×1,04 |
+|  | Armario 80×80 | 13×35 | ancho | 0,81 m | 0,8 m | ×1,02 |
+|  | Carpa 100×100 | 16×39 | ancho | 1 m | 1 m | ×1,00 |
+|  | Carpa 120×120 | 19×42 | ancho | 1,19 m | 1,2 m | ×0,99 |
+|  | Carpa 150×100 | 24×39 | ancho | 1,5 m | 1,5 m | ×1,00 |
+| Vista de carpa B (60 px/m) | Armario 60 | 42×105 | frente | 0,6 m | 0,6 m | ×1,00 |
+|  | Armario 80 | 55×119 | frente | 0,82 m | 0,8 m | ×1,02 |
+|  | Carpa 100 | 68×133 | frente | 1,03 m | 1 m | ×1,03 |
+|  | Carpa 120 | 80×133 | frente | 1,23 m | 1,2 m | ×1,03 |
+|  | Carpa 150 | 100×133 | frente | 1,57 m | 1,5 m | ×1,04 |
+|  | Maceta 7 L | 13×17 | ancho | 0,22 m | 0,22 m | ×0,98 |
+|  | Maceta 11 L | 15×19 | ancho | 0,25 m | 0,25 m | ×1,00 |
+|  | Maceta 18 L | 18×24 | ancho | 0,3 m | 0,3 m | ×1,00 |
+|  | Maceta 25 L | 21×24 | ancho | 0,35 m | 0,35 m | ×1,00 |
+|  | CFL 125 | 21×10 | ancho | 0,35 m | 0,35 m | ×1,00 |
+|  | Sodio 250 | 27×9 | ancho | 0,45 m | 0,45 m | ×1,00 |
+|  | Sodio 400 | 30×9 | ancho | 0,5 m | 0,5 m | ×1,00 |
+|  | Sodio 600 | 33×9 | ancho | 0,55 m | 0,55 m | ×1,00 |
+|  | LED 100 | 15×6 | ancho | 0,25 m | 0,25 m | ×1,00 |
+|  | LED 200 | 18×6 | ancho | 0,3 m | 0,3 m | ×1,00 |
+|  | LED 480 | 36×6 | ancho | 0,6 m | 0,6 m | ×1,00 |
+|  | LED 720 | 60×6 | ancho | 1 m | 1 m | ×1,00 |
+|  | Ventilador | 9×14 | ancho | 0,15 m | 0,2 m | ×0,75 |
+|  | Filtro y extractor | 31×10 | ancho | 0,52 m | 0,65 m | ×0,79 |
+|  | Depósito de goteo (650 L) | 52×78 | alto | 1,3 m | 1,12 m | ×1,16 |
+|  | Garrafa (16 L) | 16×23 | alto | 0,38 m | 0,38 m | ×1,01 |
+|  | Germinando (índica) | 9×6 | alto | 0,1 m | 0,05 m | **×2,00** |
+|  | Plántula (índica) | 10×19 | alto | 0,32 m | 0,15 m | **×2,11** |
+|  | Vegetativo (índica) | 24×21 | alto | 0,35 m | 0,35 m | ×1,00 |
+|  | Floración (índica) | 34×32 | alto | 0,53 m | 0,55 m | ×0,97 |
+|  | Lista (índica) | 36×38 | alto | 0,63 m | 0,65 m | ×0,97 |
+|  | Germinando (sativa) | 9×6 | alto | 0,1 m | 0,05 m | **×2,00** |
+|  | Plántula (sativa) | 10×19 | alto | 0,32 m | 0,15 m | **×2,11** |
+|  | Vegetativo (sativa) | 22×27 | alto | 0,45 m | 0,45 m | ×1,00 |
+|  | Floración (sativa) | 30×44 | alto | 0,73 m | 0,75 m | ×0,98 |
+|  | Lista (sativa) | 34×53 | alto | 0,88 m | 0,9 m | ×0,98 |
+|  | Germinando (híbrida) | 9×6 | alto | 0,1 m | 0,05 m | **×2,00** |
+|  | Plántula (híbrida) | 10×19 | alto | 0,32 m | 0,15 m | **×2,11** |
+|  | Vegetativo (híbrida) | 22×24 | alto | 0,4 m | 0,4 m | ×1,00 |
+|  | Floración (híbrida) | 32×35 | alto | 0,58 m | 0,6 m | ×0,97 |
+|  | Lista (híbrida) | 36×41 | alto | 0,68 m | 0,7 m | ×0,98 |
+| Exterior | Árbol | 54×93 | alto | 5,81 m | 6 m | ×0,97 |
+|  | Farola | 6×56 | alto | 3,5 m | 4 m | ×0,88 |
+|  | Banco | 16×12 | ancho | 1 m | 1,8 m | **×0,56** |
+|  | Fuente | 26×27 | ancho | 1,63 m | 3 m | **×0,54** |
+|  | Arbusto | 14×11 | ancho | 0,88 m | 1,2 m | **×0,73** |
+|  | Valla | 16×12 | alto | 0,75 m | 1 m | ×0,75 |
+|  | Parada del autobús | 14×48 | alto | 3 m | 2,8 m | ×1,07 |
+|  | Edificio (piso) | 112×96 | ancho | 7 m | 14 m | **×0,50** |
+|  | Edificio (bar) | 112×96 | ancho | 7 m | 14 m | **×0,50** |
+
+## 4. Qué sale del plano
+
+1. **Personajes adultos, muebles y carpas: coherentes.** Entre ×0,8 y ×1,3 en el piso (1 m = 16 px); las 5 carpas
+   cerradas, a ×1,0.
+2. **Vista de carpa B: 29 de 35 piezas a escala** (×0,94–×1,06): carpas, macetas, focos, extras y las plantas
+   de vegetativo a lista en sus 3 portes (índica 0,65 m, sativa 0,9 m e híbrida 0,7 m listas, despuntadas desde la 1.10). Solo germinando y
+   plántula van a ×2, a propósito, para que se vean (5 y 15 cm reales darían 2 y 7 px).
+3. **El piso, a tamaño real.** 12 × 8 casillas (72 m² con paredes; 12 × 6 m de suelo), frente a 240 m² de la 1.7.0.
+4. **Siguen fuera de escala, sin tocar:** la cama
+   (×1,3), los personajes que no cambian de altura (Unai ×1,3, Txaro ×1,13) y los edificios comprimidos (×0,5), que es la
+   convención del género. Los árboles, a escala desde la 1.10: 5,8 m (×0,97), dibujados a mano en
+   `tools/sprites/a-mano/mundo.py`, con el monte de los lindes, el seto, la parada y las fachadas de cada sitio. La nevera
+   (antes ×1,88) y las cajas (antes ×1,46), a escala desde la 1.10 (P5, lámina 13, a mano en
+   `tools/sprites/a-mano/equipo_p5.py`): ×1,25 las dos con el contorno; la nevera mide 180 cm de alto.
+5. **Alturas corregidas en la 1.10** (retoque a mano, `tools/sprites/a-mano/alturas.py`, sin créditos): la farola
+   pasa de 1,69 a 3,5 m (×0,88), el mostrador y la barra del bar de 0,69 a 1 m (la barra, ya más alta que los
+   taburetes) y la gramola de 1 a 1,5 m. Lo que cuelga de la pared ya no se pinta a ras de suelo (`ALZA` en
+   `01b-arte.js` y `pinta.gd`): las ventanas y los carteles (el diploma) a 0,9 m, las baldas de las plantas a
+   1 m y el botellero a 1,05 m.
+
+## 5. Decisión: opción A (1.8.0)
+
+De las tres opciones de la 1.7.0 (A: vista de carpa a escala de detalle · B: interiores a ×2, más de 600
+generaciones · C: ajuste dentro del estilo, 60–80 generaciones) se eligió y aplicó la **A**:
+
+- **Piso a 1 casilla = 1 m** (12 × 8). Las carpas son muebles (`carpa`): armarios 60 y 80 y carpa 100 de 1 casilla,
+  carpas 120 y 150 de 2, en los sitios A (8,2), B (10,2) y C (2,2). Sprites `carpa-<t>-mapa` (celda `carpa_mapa` 32 × 48).
+- **Vista de carpa** (`src/js/09b-carpa.js`): A delante de una carpa la abre. La cruceta elige plaza o foco, A cuida
+  (`potAction`) o cambia el foco y los extras (`carpaAction`) y B sale. El tiempo no corre mientras se mira.
+- **Arte (1.8):** 4 generaciones de PixelLab (pixflux img2img, strength 130, sobre huellas procedurales) para carpas del
+  mapa, carpas de la vista de frente, macetas y fondo; las plantas, importadas de Strainmon. Previsión inicial: 120–180.
+- **Retirado:** carpas de la 1.6/1.7 (`carpa-<t>`, `-fuera`), `mesa-cultivo`, `macetas` y `planta-fases`.
+
+## 6. Vista de carpa B (P2 del plan de producción)
+
+Decisión D1 del [plan de producción](PLAN-PRODUCCION.md#0-decisiones-aprobadas): la carpa se ve por dentro (el fondo de
+mylar, el suelo, las macetas, las plantas y el foco colgando) a escala real. Desde la 1.10, con el atlas, es la carpa
+plateada aprobada, de frente y con la puerta abierta; sin atlas, como en la 1.6–1.7 (recortada en 3/4: sin techo, sin
+frente y sin lateral derecho).
+
+- **Escala:** 60 px/m de ancho y de alto, en una escena de 240 px centrada con `OX()`, la de las carpas plateadas
+  (`carpa-<t>-vista`, aprobadas): con el atlas, la carpa se pinta de frente por su ancla en (120, 157) y cada cosa se
+  coloca sobre su suelo, que se cierra hacia el fondo en 17 filas (`VB_PLATA`: columnas del suelo de delante y de la
+  pared, medidas en cada sprite); el foco, a 28 cm del techo, cuelga justo bajo el techo de dentro del
+  dibujo (8 filas sobre la pared), y nada de lo que cuelga (cuerdas, campana, filtro) sube de ahí. Sin atlas, la carpa en 3/4
+  (24 px/m de fondo, lo de atrás corrido 6 px/m) con la espalda en la pared del cuarto (y 126). Las medidas reales de
+  cada carpa están en `CARPAS[t].cm`.
+- **Plazas:** filas de `CARPAS[t].cols` macetas, la 0 delante y la 1 detrás. ◀ ▶ cambian de plaza, ▲ ▼ de fila y,
+  desde la de atrás, ▲ elige el foco. Con una plaza de atrás elegida, la fila de delante se ve en transparencia.
+- **Distancia segura (1.10):** cada maceta va en el centro de su parte de la carpa (una fila incompleta se reparte todo el
+  ancho), lo más separada posible de las demás. Cada planta se dibuja de su tamaño real (`PLANTA_CM`), pero su copa,
+  como mucho del círculo que no toca a ninguna vecina ni las paredes, menos 4 cm de aire (`q.cw`), y su alto, como
+  mucho lo que deja el foco: alto de la carpa − 28 cm (el foco) − la distancia de seguridad del foco (`FOCO_SEP`) − el alto
+  de la maceta (`q.ch`). Así una planta grande en una carpa llena se ve podada y doblada, como lo haría un cultivador.
+  `npm run test:arte` comprueba en las 5 carpas, con cada foco y maceta, que nada se toca.
+
+| Carpa | Plazas | Centros de las macetas (cm) | Entre centros | Del centro a la pared | Copa máx. | Alto máx. de la planta con cada foco (en la maceta más alta que admite) |
+|---|---|---|---|---|---|---|
+| Armario 60×60 | 2 | 15,30 · 45,30 | 30 cm | 15 cm | 26 cm | CFL 100 · Sodio 250 80 · LED 100 85 · LED 200 85 cm (tela 11 L) |
+| Armario 80×80 | 3 | 20,20 · 60,20 · 40,60 | 40 cm | 20 cm | 36 cm | CFL 114 · Sodio 250 94 · Sodio 400 84 · LED 100 99 · LED 200 99 cm (18 L) |
+| Carpa 100×100 | 4 | 25,25 · 75,25 · 25,75 · 75,75 | 50 cm | 25 cm | 46 cm | CFL 134 · Sodio 250 114 · Sodio 400 104 · LED 100 119 · LED 200 119 · LED 480 109 cm (18 L) |
+| Carpa 120×120 | 6 | 20,30 · 60,30 · 100,30 · 20,90 · 60,90 · 100,90 | 40 cm | 20 cm | 36 cm | CFL 134 · Sodio 250 114 · Sodio 400 104 · Sodio 600 94 · LED 100 119 · LED 200 119 · LED 480 109 · LED 720 104 cm (18 L) |
+| Carpa 150×100 | 6 | 25,25 · 75,25 · 125,25 · 25,75 · 75,75 · 125,75 | 50 cm | 25 cm | 46 cm | CFL 134 · Sodio 250 114 · Sodio 400 104 · Sodio 600 94 · LED 100 119 · LED 200 119 · LED 480 109 · LED 720 104 cm (18 L) |
+
+Distancia de seguridad de la cima al foco: CFL 10 cm · Sodio 250 30 cm · LED 100 25 cm · LED 200 25 cm · Sodio 400 40 cm · LED 480 35 cm · Sodio 600 50 cm · LED 720 40 cm.
+Las plantas más grandes, lista (despuntadas y en mainline, 1.10): índica 60 cm de ancho y 65 de alto, sativa 55 × 90 e híbrida 58 × 70.
+
+- **Piezas procedurales** (son también las huellas de las láminas de P3–P4, `npm run sprites:huellas`): `carpa34`,
+  `cuarto34`, `maceta34` (`MACETA_CM`), `planta34` por porte (`porteInd`: el % índica de cada planta; `PLANTA_CM`), `foco34` (`FOCO_CM`) y
+  `extra34`. Un foco centrado a 28 cm del techo; su luz, recortada a la carpa y detrás de las plantas.
+- **Estado:** las carpas de la vista B son las plateadas aprobadas (las de 80 y 120, alargadas de las de 60 y 100 con
+  `carpas.py`); macetas, plantas, focos y extras siguen procedurales hasta sus láminas, así que no se publica versión.

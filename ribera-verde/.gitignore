@@ -1,0 +1,5 @@
+node_modules/
+tools/salida/
+art/crudo/
+__pycache__/
+dist/ribera-verde-godot.apk

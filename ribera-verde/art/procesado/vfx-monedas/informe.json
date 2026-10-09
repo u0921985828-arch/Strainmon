@@ -1,0 +1,27 @@
+{
+  "grupo": "vfx-monedas",
+  "celda": [
+    16,
+    16
+  ],
+  "secuencias": 1,
+  "fotogramas": 6,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 31.63,
+  "colores_finales": 15,
+  "fundidos": [
+    "#d0b040→#d2aa1a",
+    "#4a4a52→#4a4a4a",
+    "#6c441e→#6a421c",
+    "#684828→#6a421c",
+    "#6a421c→#74502e",
+    "#3a3a3a→#3c3c44"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "efecto/unica": 2
+  },
+  "errores": [],
+  "avisos": []
+}

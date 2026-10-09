@@ -1,0 +1,39 @@
+{
+  "grupo": "cogollos-genoteca",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 4,
+  "fotogramas": 4,
+  "semitransparentes": 0,
+  "en_paleta_antes": 13.1,
+  "distancia_media": 3.93,
+  "colores_finales": 15,
+  "fundidos": [
+    "hibrido: #4c5560→#5a5a66",
+    "hibrido: #6c4632→#74502e",
+    "hibrido: #8f6741→#74502e",
+    "hibrido: #4a4a4a→#5a5a66",
+    "legendario: #d4dbe8→#e8e8e8",
+    "legendario: #b2b8c4→#c8b486",
+    "legendario: #2c2c30→#4a2a2a",
+    "legendario: #c48a52→#f06060",
+    "legendario: #ffffff→#f2f4f8",
+    "legendario: #0e1a12→#000000",
+    "legendario: #7e8694→#5a5a66",
+    "legendario: #4a2a2a→#a03030",
+    "legendario: #c8b486→#f0dcae",
+    "legendario: #22662a→#2c6e36",
+    "sativa: #2c6e36→#357a3c",
+    "sativa: #180e1e→#18181c",
+    "sativa: #8c6438→#986240",
+    "sativa: #a03030→#986240",
+    "sativa: #986240→#9a7040",
+    "sativa: #18181c→#0e1a12"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

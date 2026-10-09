@@ -1,0 +1,30 @@
+{
+  "grupo": "vfx-humo-puro",
+  "celda": [
+    16,
+    16
+  ],
+  "secuencias": 1,
+  "fotogramas": 6,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 10.26,
+  "colores_finales": 15,
+  "fundidos": [
+    "#e0e0e8→#d8d8d8",
+    "#3c3c44→#3a3a3a",
+    "#3a3a3a→#3c3434",
+    "#3c3434→#303038",
+    "#4a4a52→#5a6070",
+    "#9a9aa4→#8a90a0",
+    "#6a6a74→#5a6070",
+    "#b2b8c4→#acb3c0",
+    "#a2a9b6→#acb3c0"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "efecto/unica": 2
+  },
+  "errores": [],
+  "avisos": []
+}

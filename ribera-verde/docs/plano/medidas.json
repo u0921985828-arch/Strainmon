@@ -1,0 +1,2339 @@
+{
+ "escala": "mapa: 1 casilla = 16 px = 1 m · vista de carpa B: 60 px = 1 m de ancho y alto (las carpas plateadas, de frente)",
+ "mapas": {
+  "town": {
+   "nombre": "town",
+   "titulo": "RIBERA VERDE · barrio",
+   "w": 40,
+   "h": 30,
+   "edificios": [
+    {
+     "id": "home",
+     "x": 2,
+     "y": 3,
+     "w": 7,
+     "h": 6,
+     "puerta": 5
+    },
+    {
+     "id": "shop",
+     "x": 14,
+     "y": 3,
+     "w": 7,
+     "h": 6,
+     "puerta": 17
+    },
+    {
+     "id": "bar",
+     "x": 23,
+     "y": 3,
+     "w": 7,
+     "h": 6,
+     "puerta": 26
+    },
+    {
+     "id": "gray",
+     "x": 32,
+     "y": 3,
+     "w": 6,
+     "h": 6,
+     "puerta": 34
+    }
+   ],
+   "puertas": [
+    {
+     "x": 5,
+     "y": 8,
+     "a": "home"
+    },
+    {
+     "x": 17,
+     "y": 8,
+     "a": "shop"
+    },
+    {
+     "x": 26,
+     "y": 8,
+     "a": "bar"
+    },
+    {
+     "x": 34,
+     "y": 8,
+     "a": "txaro"
+    },
+    {
+     "x": 35,
+     "y": 8,
+     "a": "txaro"
+    },
+    {
+     "x": 11,
+     "y": 0,
+     "a": "alto"
+    },
+    {
+     "x": 12,
+     "y": 0,
+     "a": "alto"
+    },
+    {
+     "x": 39,
+     "y": 20,
+     "a": "astilleros"
+    },
+    {
+     "x": 39,
+     "y": 21,
+     "a": "astilleros"
+    }
+   ],
+   "salidas": [],
+   "npcs": [
+    {
+     "id": "begona",
+     "x": 10,
+     "y": 12,
+     "deambula": 2
+    },
+    {
+     "id": "unai",
+     "x": 17,
+     "y": 18,
+     "deambula": 3
+    },
+    {
+     "id": "patxi",
+     "x": 21,
+     "y": 21,
+     "deambula": 0
+    },
+    {
+     "id": "txaro",
+     "x": 3,
+     "y": 18,
+     "deambula": 0
+    },
+    {
+     "id": "inaki",
+     "x": 37,
+     "y": 21,
+     "deambula": 0
+    },
+    {
+     "id": "cop",
+     "x": 22,
+     "y": 17,
+     "deambula": 3
+    },
+    {
+     "id": "darko",
+     "x": 20,
+     "y": 14,
+     "deambula": 0
+    },
+    {
+     "id": "molina",
+     "x": 23,
+     "y": 15,
+     "deambula": 0
+    },
+    {
+     "id": "jurado",
+     "x": 18,
+     "y": 15,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "parada",
+     "x": 8,
+     "y": 12
+    },
+    {
+     "o": "fountain",
+     "x": 20,
+     "y": 19
+    },
+    {
+     "o": "i_spray",
+     "x": 8,
+     "y": 25,
+     "item": 1
+    },
+    {
+     "o": "i_fert",
+     "x": 36,
+     "y": 24,
+     "item": 1
+    },
+    {
+     "o": "i_boc",
+     "x": 15,
+     "y": 23,
+     "item": 1
+    },
+    {
+     "o": "h_acap",
+     "x": 2,
+     "y": 26,
+     "item": 1
+    },
+    {
+     "o": "h_50",
+     "x": 9,
+     "y": 16,
+     "item": 1
+    },
+    {
+     "o": "h_ins",
+     "x": 10,
+     "y": 24,
+     "item": 1
+    }
+   ],
+   "carpas": []
+  },
+  "home": {
+   "nombre": "home",
+   "titulo": "PISO DE LA TÍA MAITE (armario 80 + carpa 150 + carpa 120 + salón)",
+   "w": 18,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 5,
+     "y": 7,
+     "a": "town"
+    }
+   ],
+   "npcs": [],
+   "objetos": [
+    {
+     "o": "iwin",
+     "x": 6,
+     "y": 1
+    },
+    {
+     "o": "poster",
+     "x": 7,
+     "y": 1
+    },
+    {
+     "o": "iwin",
+     "x": 9,
+     "y": 1
+    },
+    {
+     "o": "iwin",
+     "x": 15,
+     "y": 1
+    },
+    {
+     "o": "bedT",
+     "x": 0,
+     "y": 2
+    },
+    {
+     "o": "plantDeco",
+     "x": 1,
+     "y": 2
+    },
+    {
+     "o": "pc",
+     "x": 4,
+     "y": 2
+    },
+    {
+     "o": "lab",
+     "x": 5,
+     "y": 2
+    },
+    {
+     "o": "lab2",
+     "x": 6,
+     "y": 2
+    },
+    {
+     "o": "crate",
+     "x": 0,
+     "y": 4
+    },
+    {
+     "o": "table",
+     "x": 3,
+     "y": 5
+    },
+    {
+     "o": "fridge",
+     "x": 0,
+     "y": 6
+    },
+    {
+     "o": "plantDeco",
+     "x": 17,
+     "y": 7
+    }
+   ],
+   "carpas": [
+    {
+     "t": "p80",
+     "x": 8,
+     "y": 2,
+     "w": 1,
+     "h": 1,
+     "plazas": 3
+    },
+    {
+     "t": "g150",
+     "x": 10,
+     "y": 2,
+     "w": 2,
+     "h": 1,
+     "plazas": 6
+    },
+    {
+     "t": "m120",
+     "x": 2,
+     "y": 2,
+     "w": 2,
+     "h": 1,
+     "plazas": 6
+    }
+   ]
+  },
+  "shop": {
+   "nombre": "shop",
+   "titulo": "GROWSHOP KIKO",
+   "w": 10,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 4,
+     "y": 7,
+     "a": "town"
+    }
+   ],
+   "npcs": [
+    {
+     "id": "kiko",
+     "x": 4,
+     "y": 2,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "shelfW",
+     "x": 0,
+     "y": 1
+    },
+    {
+     "o": "poster",
+     "x": 4,
+     "y": 1
+    },
+    {
+     "o": "shelfW",
+     "x": 8,
+     "y": 1
+    },
+    {
+     "o": "counter",
+     "x": 2,
+     "y": 3
+    },
+    {
+     "o": "display",
+     "x": 0,
+     "y": 5
+    },
+    {
+     "o": "display",
+     "x": 9,
+     "y": 5
+    },
+    {
+     "o": "plantDeco",
+     "x": 0,
+     "y": 7
+    },
+    {
+     "o": "plantDeco",
+     "x": 9,
+     "y": 7
+    }
+   ],
+   "carpas": []
+  },
+  "bar": {
+   "nombre": "bar",
+   "titulo": "BAR EL ANCLA",
+   "w": 10,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 4,
+     "y": 7,
+     "a": "town"
+    }
+   ],
+   "npcs": [
+    {
+     "id": "josune",
+     "x": 2,
+     "y": 2,
+     "deambula": 0
+    },
+    {
+     "id": "baltasar",
+     "x": 7,
+     "y": 4,
+     "deambula": 0
+    },
+    {
+     "id": "tono",
+     "x": 5,
+     "y": 4,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "bottles",
+     "x": 0,
+     "y": 1
+    },
+    {
+     "o": "iwin",
+     "x": 6,
+     "y": 1
+    },
+    {
+     "o": "btable",
+     "x": 8,
+     "y": 2
+    },
+    {
+     "o": "jukebox",
+     "x": 9,
+     "y": 2
+    },
+    {
+     "o": "barcounter",
+     "x": 0,
+     "y": 3
+    },
+    {
+     "o": "stool",
+     "x": 1,
+     "y": 4
+    },
+    {
+     "o": "stool",
+     "x": 3,
+     "y": 4
+    },
+    {
+     "o": "btable",
+     "x": 7,
+     "y": 5
+    }
+   ],
+   "carpas": []
+  },
+  "alto": {
+   "nombre": "alto",
+   "titulo": "BARRIO ALTO",
+   "w": 40,
+   "h": 30,
+   "edificios": [
+    {
+     "id": "comisaria",
+     "x": 24,
+     "y": 13,
+     "w": 6,
+     "h": 6,
+     "puerta": 26
+    }
+   ],
+   "puertas": [
+    {
+     "x": 11,
+     "y": 29,
+     "a": "town"
+    },
+    {
+     "x": 12,
+     "y": 29,
+     "a": "town"
+    },
+    {
+     "x": 26,
+     "y": 18,
+     "a": "comisaria"
+    },
+    {
+     "x": 27,
+     "y": 18,
+     "a": "comisaria"
+    }
+   ],
+   "salidas": [],
+   "npcs": [],
+   "objetos": [
+    {
+     "o": "fountain",
+     "x": 11,
+     "y": 11
+    },
+    {
+     "o": "h_alto",
+     "x": 2,
+     "y": 10,
+     "item": 1
+    }
+   ],
+   "carpas": []
+  },
+  "astilleros": {
+   "nombre": "astilleros",
+   "titulo": "ASTILLEROS",
+   "w": 40,
+   "h": 30,
+   "edificios": [
+    {
+     "id": "nave",
+     "x": 16,
+     "y": 8,
+     "w": 6,
+     "h": 6,
+     "puerta": 18
+    }
+   ],
+   "puertas": [
+    {
+     "x": 0,
+     "y": 20,
+     "a": "town"
+    },
+    {
+     "x": 0,
+     "y": 21,
+     "a": "town"
+    },
+    {
+     "x": 18,
+     "y": 13,
+     "a": "almacen"
+    },
+    {
+     "x": 19,
+     "y": 13,
+     "a": "almacen"
+    }
+   ],
+   "salidas": [],
+   "npcs": [
+    {
+     "id": "darko2",
+     "x": 24,
+     "y": 16,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "i_ast",
+     "x": 4,
+     "y": 5,
+     "item": 1
+    }
+   ],
+   "carpas": []
+  },
+  "txaro": {
+   "nombre": "txaro",
+   "titulo": "CASA DE TXARO",
+   "w": 10,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 4,
+     "y": 7,
+     "a": "town"
+    }
+   ],
+   "npcs": [
+    {
+     "id": "txaro",
+     "x": 6,
+     "y": 3,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "iwin",
+     "x": 2,
+     "y": 1
+    },
+    {
+     "o": "iwin",
+     "x": 7,
+     "y": 1
+    },
+    {
+     "o": "bedT",
+     "x": 0,
+     "y": 2
+    },
+    {
+     "o": "plantDeco",
+     "x": 1,
+     "y": 2
+    },
+    {
+     "o": "plantDeco",
+     "x": 9,
+     "y": 2
+    },
+    {
+     "o": "table",
+     "x": 5,
+     "y": 4
+    },
+    {
+     "o": "fridge",
+     "x": 9,
+     "y": 6
+    },
+    {
+     "o": "plantDeco",
+     "x": 0,
+     "y": 7
+    }
+   ],
+   "carpas": []
+  },
+  "comisaria": {
+   "nombre": "comisaria",
+   "titulo": "COMISARÍA DEL BARRIO ALTO",
+   "w": 10,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 4,
+     "y": 7,
+     "a": "alto"
+    }
+   ],
+   "npcs": [
+    {
+     "id": "molina",
+     "x": 4,
+     "y": 2,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "shelfW",
+     "x": 0,
+     "y": 1
+    },
+    {
+     "o": "iwin",
+     "x": 4,
+     "y": 1
+    },
+    {
+     "o": "shelfW",
+     "x": 8,
+     "y": 1
+    },
+    {
+     "o": "counter",
+     "x": 2,
+     "y": 3
+    },
+    {
+     "o": "bench",
+     "x": 0,
+     "y": 5
+    },
+    {
+     "o": "bench",
+     "x": 9,
+     "y": 5
+    },
+    {
+     "o": "plantDeco",
+     "x": 0,
+     "y": 7
+    },
+    {
+     "o": "plantDeco",
+     "x": 9,
+     "y": 7
+    }
+   ],
+   "carpas": []
+  },
+  "almacen": {
+   "nombre": "almacen",
+   "titulo": "ALMACÉN DE LOS ASTILLEROS",
+   "w": 10,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 4,
+     "y": 7,
+     "a": "astilleros"
+    }
+   ],
+   "npcs": [
+    {
+     "id": "tono2",
+     "x": 5,
+     "y": 2,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "iwin",
+     "x": 6,
+     "y": 1
+    },
+    {
+     "o": "crate",
+     "x": 0,
+     "y": 2
+    },
+    {
+     "o": "crate",
+     "x": 8,
+     "y": 2
+    },
+    {
+     "o": "crate",
+     "x": 0,
+     "y": 3
+    },
+    {
+     "o": "crate",
+     "x": 9,
+     "y": 3
+    },
+    {
+     "o": "stool",
+     "x": 4,
+     "y": 4
+    },
+    {
+     "o": "btable",
+     "x": 5,
+     "y": 4
+    },
+    {
+     "o": "crate",
+     "x": 0,
+     "y": 6
+    },
+    {
+     "o": "crate",
+     "x": 8,
+     "y": 6
+    }
+   ],
+   "carpas": []
+  },
+  "mendialde": {
+   "nombre": "mendialde",
+   "titulo": "MENDIALDE · el pueblo del prólogo",
+   "w": 48,
+   "h": 34,
+   "edificios": [
+    {
+     "id": "caserio",
+     "x": 3,
+     "y": 6,
+     "w": 8,
+     "h": 6,
+     "puerta": 6
+    },
+    {
+     "id": "caserio2",
+     "x": 16,
+     "y": 5,
+     "w": 8,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "caserio3",
+     "x": 30,
+     "y": 3,
+     "w": 6,
+     "h": 5,
+     "puerta": null
+    },
+    {
+     "id": "borda",
+     "x": 38,
+     "y": 9,
+     "w": 4,
+     "h": 4,
+     "puerta": null
+    },
+    {
+     "id": "caserio2",
+     "x": 3,
+     "y": 20,
+     "w": 8,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "caserio3",
+     "x": 32,
+     "y": 19,
+     "w": 6,
+     "h": 5,
+     "puerta": null
+    },
+    {
+     "id": "borda",
+     "x": 43,
+     "y": 25,
+     "w": 4,
+     "h": 4,
+     "puerta": null
+    }
+   ],
+   "puertas": [
+    {
+     "x": 6,
+     "y": 11,
+     "a": "casa-ama"
+    },
+    {
+     "x": 7,
+     "y": 11,
+     "a": "casa-ama"
+    }
+   ],
+   "salidas": [],
+   "npcs": [
+    {
+     "id": "vecina",
+     "x": 22,
+     "y": 21,
+     "deambula": 1
+    }
+   ],
+   "objetos": [
+    {
+     "o": "parada",
+     "x": 20,
+     "y": 19
+    },
+    {
+     "o": "fountain",
+     "x": 24,
+     "y": 22
+    }
+   ],
+   "carpas": []
+  },
+  "casa-ama": {
+   "nombre": "casa-ama",
+   "titulo": "CASERÍO DE LA FAMILIA (MENDIALDE)",
+   "w": 10,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 4,
+     "y": 7,
+     "a": "mendialde"
+    }
+   ],
+   "npcs": [],
+   "objetos": [
+    {
+     "o": "iwin",
+     "x": 2,
+     "y": 1
+    },
+    {
+     "o": "iwin",
+     "x": 7,
+     "y": 1
+    },
+    {
+     "o": "bedT",
+     "x": 0,
+     "y": 2
+    },
+    {
+     "o": "plantDeco",
+     "x": 9,
+     "y": 2
+    },
+    {
+     "o": "table",
+     "x": 5,
+     "y": 4
+    },
+    {
+     "o": "fridge",
+     "x": 9,
+     "y": 6
+    },
+    {
+     "o": "plantDeco",
+     "x": 0,
+     "y": 7
+    }
+   ],
+   "carpas": []
+  },
+  "puerto": {
+   "nombre": "puerto",
+   "titulo": "PUERTO VIEJO",
+   "w": 40,
+   "h": 24,
+   "edificios": [
+    {
+     "id": "marinera",
+     "x": 1,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "marinera6",
+     "x": 5,
+     "y": 3,
+     "w": 3,
+     "h": 5,
+     "puerta": null
+    },
+    {
+     "id": "marinera2",
+     "x": 8,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "marinera5",
+     "x": 12,
+     "y": 1,
+     "w": 5,
+     "h": 7,
+     "puerta": null
+    },
+    {
+     "id": "marinera3",
+     "x": 17,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "marinera4",
+     "x": 21,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "marinera6",
+     "x": 25,
+     "y": 3,
+     "w": 3,
+     "h": 5,
+     "puerta": null
+    },
+    {
+     "id": "marinera",
+     "x": 28,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "marinera5",
+     "x": 32,
+     "y": 1,
+     "w": 5,
+     "h": 7,
+     "puerta": null
+    }
+   ],
+   "puertas": [],
+   "salidas": [],
+   "npcs": [
+    {
+     "id": "turista",
+     "x": 14,
+     "y": 11,
+     "deambula": 2
+    }
+   ],
+   "objetos": [
+    {
+     "o": "parada",
+     "x": 19,
+     "y": 9
+    }
+   ],
+   "carpas": []
+  },
+  "valdehierro": {
+   "nombre": "valdehierro",
+   "titulo": "VALDEHIERRO",
+   "w": 40,
+   "h": 24,
+   "edificios": [
+    {
+     "id": "ladrillo",
+     "x": 2,
+     "y": 2,
+     "w": 7,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "nave",
+     "x": 10,
+     "y": 2,
+     "w": 6,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "ladrillo",
+     "x": 19,
+     "y": 2,
+     "w": 7,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "fabrica",
+     "x": 29,
+     "y": 2,
+     "w": 8,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "ladrillo",
+     "x": 2,
+     "y": 13,
+     "w": 7,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "ladrillo",
+     "x": 10,
+     "y": 13,
+     "w": 7,
+     "h": 6,
+     "puerta": null
+    }
+   ],
+   "puertas": [],
+   "salidas": [],
+   "npcs": [
+    {
+     "id": "obrero",
+     "x": 28,
+     "y": 14,
+     "deambula": 1
+    }
+   ],
+   "objetos": [
+    {
+     "o": "parada",
+     "x": 14,
+     "y": 11
+    }
+   ],
+   "carpas": []
+  },
+  "errotabarri": {
+   "nombre": "errotabarri",
+   "titulo": "ERROTABARRI",
+   "w": 36,
+   "h": 24,
+   "edificios": [
+    {
+     "id": "caserio",
+     "x": 4,
+     "y": 3,
+     "w": 8,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "caserio3",
+     "x": 23,
+     "y": 4,
+     "w": 6,
+     "h": 5,
+     "puerta": null
+    },
+    {
+     "id": "borda",
+     "x": 22,
+     "y": 15,
+     "w": 4,
+     "h": 4,
+     "puerta": null
+    },
+    {
+     "id": "caserio3",
+     "x": 27,
+     "y": 13,
+     "w": 6,
+     "h": 5,
+     "puerta": null
+    }
+   ],
+   "puertas": [],
+   "salidas": [],
+   "npcs": [
+    {
+     "id": "excursionista",
+     "x": 14,
+     "y": 14,
+     "deambula": 2
+    }
+   ],
+   "objetos": [
+    {
+     "o": "parada",
+     "x": 6,
+     "y": 13
+    }
+   ],
+   "carpas": []
+  }
+ },
+ "sprites": [
+  {
+   "grupo": "PERSONAJES",
+   "n": "Jugador",
+   "clave": "look:player",
+   "eje": "alto",
+   "real": 1.75,
+   "ppm": 16,
+   "w": 16,
+   "h": 27,
+   "m": 1.69,
+   "ratio": 0.96
+  },
+  {
+   "grupo": "PERSONAJES",
+   "n": "Kiko",
+   "clave": "look:kiko",
+   "eje": "alto",
+   "real": 1.78,
+   "ppm": 16,
+   "w": 18,
+   "h": 28,
+   "m": 1.75,
+   "ratio": 0.98
+  },
+  {
+   "grupo": "PERSONAJES",
+   "n": "Baltasar",
+   "clave": "look:baltasar",
+   "eje": "alto",
+   "real": 1.8,
+   "ppm": 16,
+   "w": 16,
+   "h": 27,
+   "m": 1.69,
+   "ratio": 0.94
+  },
+  {
+   "grupo": "PERSONAJES",
+   "n": "Txaro",
+   "clave": "look:granny",
+   "eje": "alto",
+   "real": 1.55,
+   "ppm": 16,
+   "w": 16,
+   "h": 28,
+   "m": 1.75,
+   "ratio": 1.13
+  },
+  {
+   "grupo": "PERSONAJES",
+   "n": "Unai (niño)",
+   "clave": "look:kid",
+   "eje": "alto",
+   "real": 1.35,
+   "ppm": 16,
+   "w": 14,
+   "h": 28,
+   "m": 1.75,
+   "ratio": 1.3
+  },
+  {
+   "grupo": "PERSONAJES",
+   "n": "Agente",
+   "clave": "look:cop",
+   "eje": "alto",
+   "real": 1.8,
+   "ppm": 16,
+   "w": 16,
+   "h": 28,
+   "m": 1.75,
+   "ratio": 0.97
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Cama",
+   "clave": "bed",
+   "eje": "ancho",
+   "real": 0.9,
+   "ppm": 16,
+   "w": 19,
+   "h": 32,
+   "m": 1.19,
+   "ratio": 1.32
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Nevera",
+   "clave": "fridge",
+   "eje": "ancho",
+   "real": 0.6,
+   "ppm": 16,
+   "w": 12,
+   "h": 36,
+   "m": 0.75,
+   "ratio": 1.25
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Ordenador",
+   "clave": "pc",
+   "eje": "ancho",
+   "real": 1.2,
+   "ppm": 16,
+   "w": 16,
+   "h": 15,
+   "m": 1,
+   "ratio": 0.83
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Mesa genética",
+   "clave": "lab",
+   "eje": "ancho",
+   "real": 1.2,
+   "ppm": 16,
+   "w": 16,
+   "h": 15,
+   "m": 1,
+   "ratio": 0.83
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Mesa genética 2",
+   "clave": "lab2",
+   "eje": "ancho",
+   "real": 1.2,
+   "ppm": 16,
+   "w": 16,
+   "h": 14,
+   "m": 1,
+   "ratio": 0.83
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Mesa",
+   "clave": "table",
+   "eje": "ancho",
+   "real": 0.8,
+   "ppm": 16,
+   "w": 14,
+   "h": 13,
+   "m": 0.88,
+   "ratio": 1.09
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Planta deco",
+   "clave": "plantDeco",
+   "eje": "alto",
+   "real": 0.9,
+   "ppm": 16,
+   "w": 14,
+   "h": 16,
+   "m": 1,
+   "ratio": 1.11
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Estantería",
+   "clave": "shelfW",
+   "eje": "ancho",
+   "real": 0.9,
+   "ppm": 16,
+   "w": 16,
+   "h": 9,
+   "m": 1,
+   "ratio": 1.11
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Mostrador",
+   "clave": "counter",
+   "eje": "alto",
+   "real": 1,
+   "ppm": 16,
+   "w": 16,
+   "h": 16,
+   "m": 1,
+   "ratio": 1
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Expositor",
+   "clave": "display",
+   "eje": "ancho",
+   "real": 0.8,
+   "ppm": 16,
+   "w": 14,
+   "h": 15,
+   "m": 0.88,
+   "ratio": 1.09
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Botellero",
+   "clave": "bottles",
+   "eje": "ancho",
+   "real": 1,
+   "ppm": 16,
+   "w": 16,
+   "h": 11,
+   "m": 1,
+   "ratio": 1
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Taburete",
+   "clave": "stool",
+   "eje": "alto",
+   "real": 0.75,
+   "ppm": 16,
+   "w": 8,
+   "h": 14,
+   "m": 0.88,
+   "ratio": 1.17
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Mesa de bar",
+   "clave": "btable",
+   "eje": "ancho",
+   "real": 0.7,
+   "ppm": 16,
+   "w": 14,
+   "h": 14,
+   "m": 0.88,
+   "ratio": 1.25
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Gramola",
+   "clave": "jukebox",
+   "eje": "ancho",
+   "real": 0.7,
+   "ppm": 16,
+   "w": 12,
+   "h": 24,
+   "m": 0.75,
+   "ratio": 1.07
+  },
+  {
+   "grupo": "MOBILIARIO",
+   "n": "Cajas",
+   "clave": "crate",
+   "eje": "ancho",
+   "real": 0.8,
+   "ppm": 16,
+   "w": 16,
+   "h": 19,
+   "m": 1,
+   "ratio": 1.25
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Armario 60×60",
+   "clave": "carpa:p60",
+   "eje": "ancho",
+   "real": 0.6,
+   "ppm": 16,
+   "w": 10,
+   "h": 31,
+   "m": 0.63,
+   "ratio": 1.04
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Armario 80×80",
+   "clave": "carpa:p80",
+   "eje": "ancho",
+   "real": 0.8,
+   "ppm": 16,
+   "w": 13,
+   "h": 35,
+   "m": 0.81,
+   "ratio": 1.02
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Carpa 100×100",
+   "clave": "carpa:m100",
+   "eje": "ancho",
+   "real": 1,
+   "ppm": 16,
+   "w": 16,
+   "h": 40,
+   "m": 1,
+   "ratio": 1
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Carpa 120×120",
+   "clave": "carpa:m120",
+   "eje": "ancho",
+   "real": 1.2,
+   "ppm": 16,
+   "w": 19,
+   "h": 42,
+   "m": 1.19,
+   "ratio": 0.99
+  },
+  {
+   "grupo": "CULTIVO",
+   "n": "Carpa 150×100",
+   "clave": "carpa:g150",
+   "eje": "ancho",
+   "real": 1.5,
+   "ppm": 16,
+   "w": 24,
+   "h": 40,
+   "m": 1.5,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Armario 60",
+   "clave": "c34:p60",
+   "eje": "frente",
+   "real": 0.6,
+   "ppm": 60,
+   "w": 42,
+   "h": 105,
+   "m": 0.6,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Armario 80",
+   "clave": "c34:p80",
+   "eje": "frente",
+   "real": 0.8,
+   "ppm": 60,
+   "w": 55,
+   "h": 119,
+   "m": 0.82,
+   "ratio": 1.02
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Carpa 100",
+   "clave": "c34:m100",
+   "eje": "frente",
+   "real": 1,
+   "ppm": 60,
+   "w": 68,
+   "h": 133,
+   "m": 1.03,
+   "ratio": 1.03
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Carpa 120",
+   "clave": "c34:m120",
+   "eje": "frente",
+   "real": 1.2,
+   "ppm": 60,
+   "w": 80,
+   "h": 133,
+   "m": 1.23,
+   "ratio": 1.03
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Carpa 150",
+   "clave": "c34:g150",
+   "eje": "frente",
+   "real": 1.5,
+   "ppm": 60,
+   "w": 100,
+   "h": 133,
+   "m": 1.57,
+   "ratio": 1.04
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Maceta 7 L",
+   "clave": "m34:plastico7",
+   "eje": "ancho",
+   "real": 0.22,
+   "ppm": 60,
+   "w": 13,
+   "h": 17,
+   "m": 0.22,
+   "ratio": 0.98
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Maceta 11 L",
+   "clave": "m34:tela11",
+   "eje": "ancho",
+   "real": 0.25,
+   "ppm": 60,
+   "w": 15,
+   "h": 19,
+   "m": 0.25,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Maceta 18 L",
+   "clave": "m34:plastico18",
+   "eje": "ancho",
+   "real": 0.3,
+   "ppm": 60,
+   "w": 18,
+   "h": 24,
+   "m": 0.3,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Maceta 25 L",
+   "clave": "m34:tela25",
+   "eje": "ancho",
+   "real": 0.35,
+   "ppm": 60,
+   "w": 21,
+   "h": 24,
+   "m": 0.35,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "CFL 125",
+   "clave": "f34:cfl",
+   "eje": "ancho",
+   "real": 0.35,
+   "ppm": 60,
+   "w": 21,
+   "h": 10,
+   "m": 0.35,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Sodio 250",
+   "clave": "f34:sodio250",
+   "eje": "ancho",
+   "real": 0.45,
+   "ppm": 60,
+   "w": 27,
+   "h": 9,
+   "m": 0.45,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Sodio 400",
+   "clave": "f34:sodio400",
+   "eje": "ancho",
+   "real": 0.5,
+   "ppm": 60,
+   "w": 30,
+   "h": 9,
+   "m": 0.5,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Sodio 600",
+   "clave": "f34:sodio600",
+   "eje": "ancho",
+   "real": 0.55,
+   "ppm": 60,
+   "w": 33,
+   "h": 9,
+   "m": 0.55,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "LED 100",
+   "clave": "f34:led100",
+   "eje": "ancho",
+   "real": 0.25,
+   "ppm": 60,
+   "w": 15,
+   "h": 6,
+   "m": 0.25,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "LED 200",
+   "clave": "f34:led200",
+   "eje": "ancho",
+   "real": 0.3,
+   "ppm": 60,
+   "w": 18,
+   "h": 6,
+   "m": 0.3,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "LED 480",
+   "clave": "f34:led480",
+   "eje": "ancho",
+   "real": 0.6,
+   "ppm": 60,
+   "w": 36,
+   "h": 6,
+   "m": 0.6,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "LED 720",
+   "clave": "f34:led720",
+   "eje": "ancho",
+   "real": 1,
+   "ppm": 60,
+   "w": 60,
+   "h": 6,
+   "m": 1,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Ventilador",
+   "clave": "x34:vent",
+   "eje": "ancho",
+   "real": 0.2,
+   "ppm": 60,
+   "w": 9,
+   "h": 14,
+   "m": 0.15,
+   "ratio": 0.75
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Filtro y extractor",
+   "clave": "x34:filtro",
+   "eje": "ancho",
+   "real": 0.65,
+   "ppm": 60,
+   "w": 31,
+   "h": 10,
+   "m": 0.52,
+   "ratio": 0.79
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Depósito de goteo (650 L)",
+   "clave": "x34:goteo",
+   "eje": "alto",
+   "real": 1.12,
+   "ppm": 60,
+   "w": 52,
+   "h": 78,
+   "m": 1.3,
+   "ratio": 1.16
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Garrafa (16 L)",
+   "clave": "x34:garrafas",
+   "eje": "alto",
+   "real": 0.38,
+   "ppm": 60,
+   "w": 16,
+   "h": 23,
+   "m": 0.38,
+   "ratio": 1.01
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Germinando (índica)",
+   "clave": "p34:i0",
+   "eje": "alto",
+   "real": 0.05,
+   "ppm": 60,
+   "w": 9,
+   "h": 6,
+   "m": 0.1,
+   "ratio": 2
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Plántula (índica)",
+   "clave": "p34:i1",
+   "eje": "alto",
+   "real": 0.15,
+   "ppm": 60,
+   "w": 10,
+   "h": 19,
+   "m": 0.32,
+   "ratio": 2.11
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Vegetativo (índica)",
+   "clave": "p34:i2",
+   "eje": "alto",
+   "real": 0.35,
+   "ppm": 60,
+   "w": 24,
+   "h": 21,
+   "m": 0.35,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Floración (índica)",
+   "clave": "p34:i3",
+   "eje": "alto",
+   "real": 0.55,
+   "ppm": 60,
+   "w": 34,
+   "h": 32,
+   "m": 0.53,
+   "ratio": 0.97
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Lista (índica)",
+   "clave": "p34:i4",
+   "eje": "alto",
+   "real": 0.65,
+   "ppm": 60,
+   "w": 36,
+   "h": 38,
+   "m": 0.63,
+   "ratio": 0.97
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Germinando (sativa)",
+   "clave": "p34:s0",
+   "eje": "alto",
+   "real": 0.05,
+   "ppm": 60,
+   "w": 9,
+   "h": 6,
+   "m": 0.1,
+   "ratio": 2
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Plántula (sativa)",
+   "clave": "p34:s1",
+   "eje": "alto",
+   "real": 0.15,
+   "ppm": 60,
+   "w": 10,
+   "h": 19,
+   "m": 0.32,
+   "ratio": 2.11
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Vegetativo (sativa)",
+   "clave": "p34:s2",
+   "eje": "alto",
+   "real": 0.45,
+   "ppm": 60,
+   "w": 22,
+   "h": 27,
+   "m": 0.45,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Floración (sativa)",
+   "clave": "p34:s3",
+   "eje": "alto",
+   "real": 0.75,
+   "ppm": 60,
+   "w": 30,
+   "h": 44,
+   "m": 0.73,
+   "ratio": 0.98
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Lista (sativa)",
+   "clave": "p34:s4",
+   "eje": "alto",
+   "real": 0.9,
+   "ppm": 60,
+   "w": 34,
+   "h": 53,
+   "m": 0.88,
+   "ratio": 0.98
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Germinando (híbrida)",
+   "clave": "p34:h0",
+   "eje": "alto",
+   "real": 0.05,
+   "ppm": 60,
+   "w": 9,
+   "h": 6,
+   "m": 0.1,
+   "ratio": 2
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Plántula (híbrida)",
+   "clave": "p34:h1",
+   "eje": "alto",
+   "real": 0.15,
+   "ppm": 60,
+   "w": 10,
+   "h": 19,
+   "m": 0.32,
+   "ratio": 2.11
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Vegetativo (híbrida)",
+   "clave": "p34:h2",
+   "eje": "alto",
+   "real": 0.4,
+   "ppm": 60,
+   "w": 22,
+   "h": 24,
+   "m": 0.4,
+   "ratio": 1
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Floración (híbrida)",
+   "clave": "p34:h3",
+   "eje": "alto",
+   "real": 0.6,
+   "ppm": 60,
+   "w": 32,
+   "h": 35,
+   "m": 0.58,
+   "ratio": 0.97
+  },
+  {
+   "grupo": "VISTA DE CARPA B",
+   "n": "Lista (híbrida)",
+   "clave": "p34:h4",
+   "eje": "alto",
+   "real": 0.7,
+   "ppm": 60,
+   "w": 36,
+   "h": 41,
+   "m": 0.68,
+   "ratio": 0.98
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Árbol",
+   "clave": "tree",
+   "eje": "alto",
+   "real": 6,
+   "ppm": 16,
+   "w": 54,
+   "h": 93,
+   "m": 5.81,
+   "ratio": 0.97
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Farola",
+   "clave": "lamp",
+   "eje": "alto",
+   "real": 4,
+   "ppm": 16,
+   "w": 6,
+   "h": 56,
+   "m": 3.5,
+   "ratio": 0.88
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Banco",
+   "clave": "bench",
+   "eje": "ancho",
+   "real": 1.8,
+   "ppm": 16,
+   "w": 16,
+   "h": 12,
+   "m": 1,
+   "ratio": 0.56
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Fuente",
+   "clave": "fountain",
+   "eje": "ancho",
+   "real": 3,
+   "ppm": 16,
+   "w": 26,
+   "h": 27,
+   "m": 1.63,
+   "ratio": 0.54
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Arbusto",
+   "clave": "bush",
+   "eje": "ancho",
+   "real": 1.2,
+   "ppm": 16,
+   "w": 14,
+   "h": 11,
+   "m": 0.88,
+   "ratio": 0.73
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Valla",
+   "clave": "fence",
+   "eje": "alto",
+   "real": 1,
+   "ppm": 16,
+   "w": 16,
+   "h": 12,
+   "m": 0.75,
+   "ratio": 0.75
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Parada del autobús",
+   "clave": "parada",
+   "eje": "alto",
+   "real": 2.8,
+   "ppm": 16,
+   "w": 14,
+   "h": 48,
+   "m": 3,
+   "ratio": 1.07
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Edificio (piso)",
+   "clave": "edificio:home",
+   "eje": "ancho",
+   "real": 14,
+   "ppm": 16,
+   "w": 112,
+   "h": 96,
+   "m": 7,
+   "ratio": 0.5
+  },
+  {
+   "grupo": "EXTERIOR",
+   "n": "Edificio (bar)",
+   "clave": "edificio:bar",
+   "eje": "ancho",
+   "real": 14,
+   "ppm": 16,
+   "w": 112,
+   "h": 96,
+   "m": 7,
+   "ratio": 0.5
+  }
+ ],
+ "espacio": {
+  "holgura": 4,
+  "carpas": [
+   {
+    "t": "p60",
+    "n": "Armario 60×60",
+    "cm": [
+     60,
+     160,
+     60
+    ],
+    "plazas": 2,
+    "centros": [
+     [
+      15,
+      30
+     ],
+     [
+      45,
+      30
+     ]
+    ],
+    "sep": 30,
+    "pared": 15,
+    "copa": 26,
+    "maceta": "tela11",
+    "altoMaceta": 22,
+    "altos": [
+     {
+      "foco": "cfl",
+      "sep": 10,
+      "alto": 100
+     },
+     {
+      "foco": "sodio250",
+      "sep": 30,
+      "alto": 80
+     },
+     {
+      "foco": "led100",
+      "sep": 25,
+      "alto": 85
+     },
+     {
+      "foco": "led200",
+      "sep": 25,
+      "alto": 85
+     }
+    ]
+   },
+   {
+    "t": "p80",
+    "n": "Armario 80×80",
+    "cm": [
+     80,
+     180,
+     80
+    ],
+    "plazas": 3,
+    "centros": [
+     [
+      20,
+      20
+     ],
+     [
+      60,
+      20
+     ],
+     [
+      40,
+      60
+     ]
+    ],
+    "sep": 40,
+    "pared": 20,
+    "copa": 36,
+    "maceta": "plastico18",
+    "altoMaceta": 28,
+    "altos": [
+     {
+      "foco": "cfl",
+      "sep": 10,
+      "alto": 114
+     },
+     {
+      "foco": "sodio250",
+      "sep": 30,
+      "alto": 94
+     },
+     {
+      "foco": "sodio400",
+      "sep": 40,
+      "alto": 84
+     },
+     {
+      "foco": "led100",
+      "sep": 25,
+      "alto": 99
+     },
+     {
+      "foco": "led200",
+      "sep": 25,
+      "alto": 99
+     }
+    ]
+   },
+   {
+    "t": "m100",
+    "n": "Carpa 100×100",
+    "cm": [
+     100,
+     200,
+     100
+    ],
+    "plazas": 4,
+    "centros": [
+     [
+      25,
+      25
+     ],
+     [
+      75,
+      25
+     ],
+     [
+      25,
+      75
+     ],
+     [
+      75,
+      75
+     ]
+    ],
+    "sep": 50,
+    "pared": 25,
+    "copa": 46,
+    "maceta": "plastico18",
+    "altoMaceta": 28,
+    "altos": [
+     {
+      "foco": "cfl",
+      "sep": 10,
+      "alto": 134
+     },
+     {
+      "foco": "sodio250",
+      "sep": 30,
+      "alto": 114
+     },
+     {
+      "foco": "sodio400",
+      "sep": 40,
+      "alto": 104
+     },
+     {
+      "foco": "led100",
+      "sep": 25,
+      "alto": 119
+     },
+     {
+      "foco": "led200",
+      "sep": 25,
+      "alto": 119
+     },
+     {
+      "foco": "led480",
+      "sep": 35,
+      "alto": 109
+     }
+    ]
+   },
+   {
+    "t": "m120",
+    "n": "Carpa 120×120",
+    "cm": [
+     120,
+     200,
+     120
+    ],
+    "plazas": 6,
+    "centros": [
+     [
+      20,
+      30
+     ],
+     [
+      60,
+      30
+     ],
+     [
+      100,
+      30
+     ],
+     [
+      20,
+      90
+     ],
+     [
+      60,
+      90
+     ],
+     [
+      100,
+      90
+     ]
+    ],
+    "sep": 40,
+    "pared": 20,
+    "copa": 36,
+    "maceta": "plastico18",
+    "altoMaceta": 28,
+    "altos": [
+     {
+      "foco": "cfl",
+      "sep": 10,
+      "alto": 134
+     },
+     {
+      "foco": "sodio250",
+      "sep": 30,
+      "alto": 114
+     },
+     {
+      "foco": "sodio400",
+      "sep": 40,
+      "alto": 104
+     },
+     {
+      "foco": "sodio600",
+      "sep": 50,
+      "alto": 94
+     },
+     {
+      "foco": "led100",
+      "sep": 25,
+      "alto": 119
+     },
+     {
+      "foco": "led200",
+      "sep": 25,
+      "alto": 119
+     },
+     {
+      "foco": "led480",
+      "sep": 35,
+      "alto": 109
+     },
+     {
+      "foco": "led720",
+      "sep": 40,
+      "alto": 104
+     }
+    ]
+   },
+   {
+    "t": "g150",
+    "n": "Carpa 150×100",
+    "cm": [
+     150,
+     200,
+     100
+    ],
+    "plazas": 6,
+    "centros": [
+     [
+      25,
+      25
+     ],
+     [
+      75,
+      25
+     ],
+     [
+      125,
+      25
+     ],
+     [
+      25,
+      75
+     ],
+     [
+      75,
+      75
+     ],
+     [
+      125,
+      75
+     ]
+    ],
+    "sep": 50,
+    "pared": 25,
+    "copa": 46,
+    "maceta": "plastico18",
+    "altoMaceta": 28,
+    "altos": [
+     {
+      "foco": "cfl",
+      "sep": 10,
+      "alto": 134
+     },
+     {
+      "foco": "sodio250",
+      "sep": 30,
+      "alto": 114
+     },
+     {
+      "foco": "sodio400",
+      "sep": 40,
+      "alto": 104
+     },
+     {
+      "foco": "sodio600",
+      "sep": 50,
+      "alto": 94
+     },
+     {
+      "foco": "led100",
+      "sep": 25,
+      "alto": 119
+     },
+     {
+      "foco": "led200",
+      "sep": 25,
+      "alto": 119
+     },
+     {
+      "foco": "led480",
+      "sep": 35,
+      "alto": 109
+     },
+     {
+      "foco": "led720",
+      "sep": 40,
+      "alto": 104
+     }
+    ]
+   }
+  ]
+ }
+}
