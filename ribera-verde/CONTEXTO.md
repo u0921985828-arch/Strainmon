@@ -46,7 +46,7 @@
 ## Estado (v1.10.0)
 
 - Se juega de principio a fin: capítulos 1 a 7, final («DEUDA SALDADA») y el imperio (capítulo 8).
-- `npm test` recorre la historia entera y los sistemas sueltos en 82 pasos: **82/82, 0 errores de JavaScript**; `npm run test:arte`, 25/25 con el atlas de calco.
+- `npm test` recorre la historia entera y los sistemas sueltos en 83 pasos: **83/83, 0 errores de JavaScript**; `npm run test:arte`, 26/26 con el atlas de calco.
 - **Cifras reales (1.10):** precios de growshop, vatios, kWh, gramos por vatio y tope de la maceta, semillas feminizadas por unidad y en sobres, fenotipos y esquejes, venta al por mayor, multas reales y deuda de 30.000 € (sus plazos se pagan en las mismas cosechas que antes, según la simulación). Tablas en [docs/ECONOMIA.md](docs/ECONOMIA.md), que se genera con `npm run docs`.
 - **Escala (1.8.0):** decidida y aplicada la opción A de [docs/PLANO.md](docs/PLANO.md): piso de 12 × 8 a 1 casilla = 1 m, carpas como muebles y vista de carpa a 64 px/m con las plantas de cepas de Strainmon (`../assets/plants`).
 - **Genética (1.9.0):** las landraces y los híbridos clásicos de Strainmon (`../src/species.js`, sus textos, no sus sprites), con su historia; estabilizar F1 → F4 en la mesa y banco de semillas en el PC desde el capítulo 2.
@@ -60,7 +60,7 @@
   - F4b (1.5): orillas del río, del camino de tierra y de la plaza con tres Wang encadenados y autotiling por esquinas;
   - F8 (1.6): carpas de 3 tamaños por dentro y cerradas (pixflux img2img sobre su huella), 4 macetas, 3 focos y la mesa de cultivo (lotes de `create_1_direction_object`). 
   - 1.8: carpas del piso y de la vista, macetas y cuarto de cultivo (4 generaciones pixflux) y las plantas de la vista importadas de Strainmon; retirados los sprites de cultivo de la 1.6–1.7. Atlas: 1169 fotogramas.
-- **Godot (0.3.0, aparte del juego):** el juego entero portado a Godot 4.3 (`godot/`) y comparado con el HTML: la historia 1 → 8 con el mismo piloto y el mismo azar (82 pasos, 0 diferencias), 29 pantallas píxel a píxel, la vista C (9 escenas, con LED, extras, garrafas y muertas) y el cultivo, y una partida jugada con los mandos desde el título. APK aparte: `dist/ribera-verde-godot.apk` (`com.riberaverde.godot`, 0.3.0, código 5; `npm run godot:apk`), firmado y verificado, sin probar en un móvil real.
+- **Godot (0.3.0, aparte del juego):** el juego entero portado a Godot 4.3 (`godot/`) y comparado con el HTML: la historia 1 → 8 con el mismo piloto y el mismo azar (83 pasos, 0 diferencias), 29 pantallas píxel a píxel, la vista C (9 escenas, con LED, extras, garrafas y muertas) y el cultivo, y una partida jugada con los mandos desde el título. APK aparte: `dist/ribera-verde-godot.apk` (`com.riberaverde.godot`, 0.3.0, código 5; `npm run godot:apk`), firmado y verificado, sin probar en un móvil real.
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
 - **Android:** `dist/ribera-verde.apk` (1.10.0, código 11000, siempre en horizontal), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
 - **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está en la 1.10.0, con el atlas completo (1401 fotogramas). Es privado: se comparte desde su menú Compartir.

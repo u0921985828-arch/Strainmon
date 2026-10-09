@@ -363,6 +363,45 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       r.anchos = [...r.anchos].sort().join(); r.portes = [...r.portes].sort().join();
       S.carpas = C0; S.macetas = M0; S.pots = P0; return r; });
     check('Vista C (imagen A): en las 5 carpas, la planta A del porte de cada planta (su % índica) en todas sus fases, con el tono de hoja de su variedad; la más ancha que deja 2 px de aire con su vecina de fila y no se sale de las paredes (la de 38 o la de 32); de su alto real, sin pasar de su distancia al foco, con el fotograma de su alto (uno cada 2 px, sin filas repetidas, más alta = más cogollo) o aplastado 1 fila, sin escalar, en todas las carpas y focos; la pared solo lleva tela, macetas y plantas sin luz pintada y la luz es su propio sprite, por delante en «overlay» (la del CFL, fría y al 60 %); los LED, de barras, con un haz por barra que llega al pie de la pared en todo su ancho y sin un píxel cálido; el foco, a la distancia de la fase de cada planta (la más cercana manda; la muerta no cuenta), sube a medida que crecen, colgado de dos poleas, y su luz baja con él; el CFL apagado, gris; con el atlas, siempre la vista C (cada foco, maceta y extra, a su ancho, y la muerta); sin atlas, la vista B', vc.escenas.length === 11 && vc.aplastadas >= 5 && vc.exactas >= 5 && vc.anchos === '18,32,38,8' && vc.portes === 'h0,h2,h3,h4,i0,i2,i3,i4,s1,s2,s3,s4' && vc.cubre >= 100 && vc.siempre >= 100 && vc.led.length >= 8 && vc.sube >= 93 && (vc.mezcladas || []).length === 3 && !vc.fallos.length && Object.values(vc.b).every(Boolean), vc);
+    // el temporizador de cada carpa (1.10): CICLOS en su orden, sin él (partida vieja) automático; luz 18/6 > automático > 12/12; con
+    // 18/6 la planta se queda en vegetativo (madre: VEG_TOPE) y en automático florece; con 12/12 el vegetativo dura la mitad y la cosecha
+    // baja CORTA_REND; ◀ desde el foco o desde la planta de la izquierda lo elige, ▶ vuelve y ▼ baja a las plantas; A lo cambia (y automático borra c.ciclo); se pinta en la
+    // vista C y en la B (rueda con CICLOS[k].on pinzas de su color, cursor a su izquierda) y en la pared del piso, a la izquierda de la carpa
+    const temp = await page.evaluate(async () => {
+      const C0 = S.carpas, M0 = S.macetas, P0 = S.pots, r = { fallos: [] }, F = r.fallos;
+      S.carpas = [{ t: 'm100', foco: 'led480' }]; S.macetas = Array(4).fill('tela25'); S.pots = [null, null, null, null];
+      r.orden = Object.keys(CICLOS).join(); r.vieja = cicloDe(S.carpas[0]) + ',' + cicloDe({ ciclo: 'x' });
+      r.luz = ['veg', 'auto', 'flor'].map(k => { S.carpas[0].ciclo = k; return luzCarpa(0); });
+      const crece = (k, prog, hasta) => { S.carpas[0].ciclo = k; const p = { sid: 'rif', prog, water: 100, health: 100, fert: false, pest: false }; S.pots[0] = p;
+        const f = Object.assign(factores(0), { plaga: 0, hr: 50 }); let h = 0; while (h < 20000 && p.prog < hasta) { p.water = 100; plantStep(p, 1, f); h++; } return { p, h }; };
+      const madre = crece('veg', .2, 1), auto = crece('auto', .2, 1); r.madre = +madre.p.prog.toFixed(3); r.auto = auto.p.prog;
+      const va = crece('auto', .35, .65), vf = crece('flor', .35, .65); r.veg = [va.h, vf.h, +(vf.p.corta || 0).toFixed(2)];
+      const f = factores(0), gr = c => gramosPlanta({ sid: 'rif', prog: 1, health: 100, fert: false, corta: c }, f); r.gramos = [gr(0), gr(1)];
+      // A: ask y say de mentira
+      const a0 = ask, s0 = say; let dicho = '';
+      try { ask = async () => 1; say = async t => { dicho = t; }; S.carpas[0].ciclo = undefined; await temporizador(0); r.a = [S.carpas[0].ciclo];
+        ask = async () => 0; await temporizador(0); r.a.push('ciclo' in S.carpas[0] ? 'queda' : 'borrado'); r.dicho = dicho; } finally { ask = a0; say = s0; }
+      S.pots = [{ sid: 'rif', prog: .5, water: 80, health: 100 }, null, null, null];
+      VC = { ci: 0, sel: -1, ocupado: false }; const nav = []; for (const b of ['left', 'right', 'left', 'down', 'left', 'left']) { vcMover(b); nav.push(VC.sel); } r.nav = nav;
+      // dibujo: vista C y B, con cada modo
+      r.dibujo = [];
+      for (const soloB of [false, true]) for (const k of Object.keys(CICLOS)) {
+        if (k === 'auto') delete S.carpas[0].ciclo; else S.carpas[0].ciclo = k;
+        const g = vcGeo(0, soloB), R = [], fr = ctx.fillRect; ctx.fillRect = function (...a) { R.push([...a, ctx.fillStyle]); return fr.apply(this, a); };
+        VC = { ci: 0, sel: SEL_TEMP, ocupado: false }; try { renderCarpa(1000, soloB); } finally { ctx.fillRect = fr; }
+        const tiene = (x, y, w, h, c) => R.some(e => e[0] === x && e[1] === y && e[2] === w && e[3] === h && e[4] === c), pinzas = R.filter(e => e[2] === 1 && e[3] === 1 && e[4] === CICLOS[k].col).length;
+        const ok = !!g.vc === !soloB && tiene(g.tx, g.ty + 1, 11, 11, '#26262e') && pinzas === CICLOS[k].on && tiene(g.tx - 9, g.ty + 2, 6, 9, '#26262e') && g.tx > 0;
+        r.dibujo.push((soloB ? 'B/' : 'C/') + k + ':' + pinzas); if (!ok) F.push(`dibujo ${soloB ? 'B' : 'C'} ${k}: ${JSON.stringify(R.slice(0, 30))}`); }
+      VC = null;
+      // en el piso: la carpa de 100 en (10, 2) mide 16 px; el reloj, de 5 × 7, en la pared a 7 px de su borde izquierdo, a la altura 18
+      { S.carpas[0].ciclo = 'flor'; const R = [], fr = ctx.fillRect; ctx.fillRect = function (...a) { R.push([...a, ctx.fillStyle]); return fr.apply(this, a); };
+        try { pintarCarpaMapa({ t: 'm100', x0: 10, x1: 10, y: 2, ci: 0 }, { x: 0, y: 0 }); } finally { ctx.fillRect = fr; }
+        r.mapa = R.some(e => e.join() === '153,18,5,7,#26262e') && R.some(e => e.join() === '154,19,3,3,' + CICLOS.flor.col); }
+      S.carpas = C0; S.macetas = M0; S.pots = P0; return r; });
+    check('Temporizador de cada carpa: automático, 18/6 (madres: no florecen) y 12/12 (florecen ya: vegetativo a la mitad, cosecha −40 %); su luz; ◀ desde el foco, A lo cambia; en la vista C y B y en la pared del piso',
+      temp.orden === 'auto,veg,flor' && temp.vieja === 'auto,auto' && temp.luz[0] > temp.luz[1] && temp.luz[1] > temp.luz[2] && temp.madre <= .649 && temp.madre > .6 && temp.auto === 1 &&
+      temp.veg[1] * 2 <= temp.veg[0] + 2 && temp.veg[2] > .9 && Math.abs(temp.gramos[1] / temp.gramos[0] - .6) < .03 && temp.a.join() === 'veg,borrado' && /^Automático/.test(temp.dicho) && temp.nav.join(',').startsWith('-2,-1,-2,') && temp.nav[3] >= 0 && temp.nav[5] === -2 &&
+      temp.dibujo.length === 6 && temp.mapa && !temp.fallos.length, temp);
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
       for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }
       r.rio = mascaraOrilla(m, 31, 15); r.centro = mascaraOrilla(m, 35, 27); r.sinAtlas = (() => { const ok = ARTE.ok; ARTE.ok = false; const v = arteOrilla(m, 'water', 31, 15, 0, 0); ARTE.ok = ok; return v; })(); return r; });

@@ -476,6 +476,17 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && R.m === 1000 - pr('Termohigrómetro') - pr('Calefactor') - pr('Deshumidificador') && R.sala === 'termo,calef,deshu' && R.n2.t === 20 && R.n2.hr === 55 && R.n2.uso.calef && R.n2.uso.deshu && !R.d2.uso.calef
     && Math.abs(R.c1 / R.c0 - 1 / .82) < 1e-9 && R.fs === Math.round((1500 + 250) * H_24 * (1 - H_DIA) * .5 / 1000 * KWH) && R.moho === 90 && R.julio === 55 + 8 + 5
     && /^Moho en .*\(plaza 1\), .* y .*\(plaza 4\): de noche la sala pasa del 60 % de humedad\./.test(R.aviso) || R);
+  await step('Temporizador (1.10): 18/6 deja la planta en vegetativo (madre) y gasta más luz; 12/12 acorta el vegetativo y la cosecha; automático quita c.ciclo', ['18/6', '12/12', 'Automático'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { carpas: [{ t: 'm100', foco: 'led480' }], macetas: Array(4).fill('tela25'), pots: [null, null, null, null] });
+    window.R = { l0: luzCarpa(0) };
+    const crece = () => { const p = { sid: 'rif', prog: .3, water: 100, health: 100, fert: false, pest: false }; S.pots[0] = p;
+      const f = Object.assign({}, factores(0), { plaga: 0, hr: 50 }); for (let h = 0; h < 30; h++) { p.water = 100; plantStep(p, 1, f); } return p; };
+    R.a = crece().prog;
+    await run(() => temporizador(0)); R.c1 = S.carpas[0].ciclo; R.l1 = luzCarpa(0); R.m = crece().prog;
+    await run(() => temporizador(0)); R.c2 = S.carpas[0].ciclo; R.l2 = luzCarpa(0); const p = crece(); R.fl = [p.prog, p.corta];
+    R.g = [gramosPlanta(p, factores(0)), gramosPlanta(Object.assign({}, p, { corta: 0 }), factores(0))];
+    await run(() => temporizador(0)); R.c3 = 'ciclo' in S.carpas[0]; S = S0;
+  }, () => R.l1 > R.l0 && R.l0 > R.l2 && R.c1 === 'veg' && Math.abs(R.m - VEG_TOPE) < 1e-9 && R.a > .65 && R.c2 === 'flor' && R.fl[0] > R.a && R.fl[1] > .9 && R.g[0] < R.g[1] * .65 && R.c3 === false || R);
   await step('Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad',
     ['Sacar un lote', '^Hindu', '^10 g', 'Guardar todo', 'Cerrar', 'Bolsa de deporte', 'Salir', 'Sacar todo', 'Cerrar'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 5, map: 'home', buds: {}, rosin: {}, arcon: { buds: {}, rosin: {} }, protect: false, caja: null });

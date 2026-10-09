@@ -56,6 +56,7 @@ function vcGeo(ci,soloB){
   // de frente, lo que cuelga no sube del techo de dentro (8 filas sobre yt; la z no encoge con el fondo): cuerdas, campana y filtro
   if(f){g.plata=f;g.techo=157+k.yt-8;g.barra=Math.max(g.barra,g.techo);g.fy=Math.max(g.fy,g.techo+foco34(c.foco).height-1);}
   g.vc=soloB?null:vistaC(g);if(g.vc){g.fx=120;g.fy=g.vc.fy;g.fw=g.vc.foco.a;}
+  g.tx=g.vc?g.vc.xl-24:g.x0-16;g.ty=84;   // el temporizador (1.10), a la izquierda de la carpa
   return g;
 }
 // dónde lanzar un efecto sobre la plaza i (riego, cosecha): en la vista, sobre la planta; si no, sobre el jugador
@@ -231,11 +232,25 @@ function vcPoleas(fc,fy){const [a,b,r]=vcCuelga(fc),fx=120-(fc.width>>1),y0=VCA.
     o.push([X,y0+3,1,fy-15+r-(y0+3),K],[T,y0+3,1,8,K],[T-1,y0+11,3,3,K],[T,y0+12,1,1,M],
       [cx-1,y0+1,3,5,K],[cx-2,y0+2,5,3,K],[cx-1,y0+2,3,3,M],[cx,y0+3,1,1,K],[cx-1,y0+2,1,1,H],[cx,y0,1,1,K]);}
   return o.filter(e=>e[3]>0);}
+// el temporizador de enchufe (1.10), como rectángulos [x, y, w, h, color] (Godot, Vista.temporizador, los mismos): caja blanca de
+// 11 × 13 con su rueda de 16 pinzas (hora y media cada una; las bajadas, CICLOS[k].on, del color de su modo) y, debajo, el enchufe
+// y el piloto (rojo con el foco encendido); cuelga de su cable desde arriba de la pantalla
+const SEL_TEMP=-2,VC_RUEDA=[[3,0],[4,0],[5,1],[6,2],[6,3],[6,4],[5,5],[4,6],[3,6],[2,6],[1,5],[0,4],[0,3],[0,2],[1,1],[2,0]];
+function vcTemp(x,y,k,on){const K='#26262e',o=[[x+5,0,1,y,VC_CUERDA],[x+1,y,9,1,K],[x,y+1,11,11,K],[x+1,y+12,9,1,K],[x+1,y+1,9,11,'#e8e8e0'],
+    [x+9,y+2,1,10,'#bcb4a2'],[x+2,y+11,7,1,'#bcb4a2'],[x+3,y+2,5,5,'#f8f8f0']];
+  VC_RUEDA.forEach(([a,b],n)=>o.push([x+2+a,y+1+b,1,1,n<CICLOS[k].on?CICLOS[k].col:'#6a6e78']));
+  o.push([x+5,y+3,1,2,K],[x+4,y+9,1,1,K],[x+6,y+9,1,1,K],[x+8,y+9,1,1,on?'#e04040':'#7a2a30']);
+  return o;}
+// el del piso, en la pared a la izquierda de la carpa (5 × 7, la rueda del color de su modo) y su cable hasta ella (xl: su borde)
+const mapaTemp=(xl,yb,k)=>{const x=xl-7,y=yb-29;return [[x,y,5,7,'#26262e'],[x+1,y+1,3,5,'#e8e8e0'],[x+1,y+1,3,3,CICLOS[k].col],[x+2,y+2,1,1,'#f8f8f0'],
+  [x+2,y+5,1,1,'#26262e'],[x+5,y+4,2,1,VC_CUERDA]];};
+const pintaRects=o=>{for(const [x,y,w,h,k] of o){ctx.fillStyle=k;ctx.fillRect(x,y,w,h);}};
 function renderCarpaC(g,now){
   const {c,vc}=g,on=plantasVivas(VC.ci),xr=vc.xl+vc.w;
   ctx.fillStyle='#000';ctx.fillRect(0,0,SW,SH);
   ctx.save();ctx.translate(OX(),0);
   ctx.drawImage(vcFondo(c.t,vc,'pared'),0,0);
+  pintaRects(vcTemp(g.tx,g.ty,cicloDe(c),on));
   // el filtro de carbón, colgado del techo arriba a la izquierda (el extractor tiembla 1 px), y el ventilador de pinza en el poste del
   // fondo derecho, a 55 cm del suelo, siempre girando
   if(c.filtro){const f=vcSprite('extra-c-filtro-',(c.t==='p60'||c.t==='p80'?30:50)*vc.Z,1).f.c;ctx.drawImage(f,vc.xl+10-47+Math.floor(now/90)%2,3-(f.height-vcAlto(f)));}
@@ -321,6 +336,7 @@ function carpaMapa(tk){
 }
 function pintarCarpaMapa(t,cam){
   const xc=(t.x0+t.x1+1)*8-cam.x,yb=t.y*16+15-cam.y;
+  pintaRects(mapaTemp(xc-(Math.round(CARPAS[t.t].cm[0]*.16)>>1),yb,cicloDe(S.carpas[t.ci])));
   if(!arteCarpaMapa(t.t,xc,yb)){const c=carpaMapa(t.t);ctx.drawImage(c,xc-(c.width>>1),yb-c.height+1);}
   if(plantasVivas(t.ci)){ctx.fillStyle=FOCO_LUZ[FOCOS[S.carpas[t.ci].foco].tipo]+'.6)';ctx.fillRect(xc-3,yb+1,6,1);}   // la luz se escapa bajo la puerta
 }
@@ -466,6 +482,7 @@ function renderCarpa(now,soloB){
   if(c.goteo&&!g.plata)goteo();
   if(g.plata)pinta(g.plata,120,157);else{const cv=carpa34(c.t);ctx.drawImage(cv,g.x0-1,g.yf+2-cv.height);}
   if(c.goteo&&g.plata)goteo();
+  pintaRects(vcTemp(g.tx,g.ty,cicloDe(c),on));
   if(c.filtro){const e=extra34('filtro'),[fx,fy0]=P(W*.55,D*.85,H-24),fy=g.plata?Math.max(fy0,g.techo+e.height-1):fy0;ctx.drawImage(e,fx-(e.width>>1),fy-e.height+1);}
   if(c.vent){const e=extra34('vent'),[vx,vy]=P(2,D*.8,110);ctx.drawImage(e,vx,vy-e.height+1);}
   ctx.save();ctx.beginPath();if(g.plata)ctx.rect(g.x0,0,g.w,SH);else ctx.rect(g.x0+1,0,g.w+g.s-1,SH);ctx.clip();   // la luz y las copas no salen de la carpa por los lados
@@ -520,7 +537,7 @@ function vcPlanta(q,now){
 }
 function vcCursor(g,now,bs=[]){
   const b=Math.floor(now/300)%2;let x,y;
-  if(VC.sel<0){const fw=g.fw||foco34(g.c.foco).width;x=g.fx-(fw>>1)-8;y=g.fy-5;ctx.fillStyle='#26262e';ctx.fillRect(x-1,y-4,6,9);ctx.fillStyle='#f8f8f0';for(let k=0;k<4;k++)ctx.fillRect(x+b+k,y-3+k,1,7-2*k);return;}
+  if(VC.sel<0){const fw=g.fw||foco34(g.c.foco).width;[x,y]=VC.sel===SEL_TEMP?[g.tx-8,g.ty+6]:[g.fx-(fw>>1)-8,g.fy-5];ctx.fillStyle='#26262e';ctx.fillRect(x-1,y-4,6,9);ctx.fillStyle='#f8f8f0';for(let k=0;k<4;k++)ctx.fillRect(x+b+k,y-3+k,1,7-2*k);return;}
   const q=g.pl.find(q=>q.i===VC.sel);if(!q)return;
   ctx.fillStyle='rgba(255,255,240,.35)';ctx.fillRect(q.x-7,q.y,14,2);
   [x,y]=posCursor(g,VC.sel,bs);y+=b;
@@ -595,7 +612,8 @@ function vcDano(pc,c0,nivel,sem,rk){
 function vcInfo(){
   const el=$('vcInfo');if(!VC||VC.ocupado){el.hidden=true;return;}
   const c=S.carpas[VC.ci],L=[];
-  if(VC.sel<0){L.push(esc(FOCOS[c.foco].n),plantasVivas(VC.ci)?'Luz '+eur(luzCarpa(VC.ci))+' al día':'Apagado');for(const k in EXTRAS)if(c[k])L.push(EXTRAS[k].c);}
+  if(VC.sel===SEL_TEMP){const k=cicloDe(c);L.push('Temporizador',CICLOS[k].n+' · '+CICLOS[k].c,plantasVivas(VC.ci)?'Luz '+eur(luzCarpa(VC.ci))+' al día':'Apagado');}
+  else if(VC.sel<0){L.push(esc(FOCOS[c.foco].n),plantasVivas(VC.ci)?'Luz '+eur(luzCarpa(VC.ci))+' al día':'Apagado');for(const k in EXTRAS)if(c[k])L.push(EXTRAS[k].c);}
   else{const i=VC.sel,p=S.pots[i];L.push(`Plaza ${huecos()[i].j+1} · ${MACETAS[S.macetas[i]].l} L`);
     if(!p)L.push('Vacía');
     else{L.push(esc(getStrain(p.sid).n));
@@ -605,8 +623,8 @@ function vcInfo(){
 }
 function vcMover(b){
   const pl=vcGeo(VC.ci).pl,cur=pl.find(q=>q.i===VC.sel),cerca=(l,x)=>l.reduce((m,q)=>Math.abs(q.x-x)<Math.abs(m.x-x)?q:m);
-  if(!cur){if(b==='down'){const fm=Math.max(...pl.map(q=>q.fila));VC.sel=cerca(pl.filter(q=>q.fila===fm),120).i;}return;}
-  if(b==='left'||b==='right'){const f=pl.filter(q=>q.fila===cur.fila).sort((a,c)=>a.x-c.x),k=f.indexOf(cur)+(b==='left'?-1:1);if(k>=0&&k<f.length)VC.sel=f[k].i;}
+  if(!cur){if(b==='left'&&VC.sel===-1)VC.sel=SEL_TEMP;else if(b==='right'&&VC.sel===SEL_TEMP)VC.sel=-1;else if(b==='down'){const fm=Math.max(...pl.map(q=>q.fila));VC.sel=cerca(pl.filter(q=>q.fila===fm),120).i;}return;}
+  if(b==='left'||b==='right'){const f=pl.filter(q=>q.fila===cur.fila).sort((a,c)=>a.x-c.x),k=f.indexOf(cur)+(b==='left'?-1:1);if(k>=0&&k<f.length)VC.sel=f[k].i;else if(k<0)VC.sel=SEL_TEMP;}
   else if(b==='up'){const f=pl.filter(q=>q.fila===cur.fila+1);VC.sel=f.length?cerca(f,cur.x).i:-1;}
   else if(b==='down'){const f=pl.filter(q=>q.fila===cur.fila-1);if(f.length)VC.sel=cerca(f,cur.x).i;}
 }
@@ -614,11 +632,11 @@ async function abrirCarpa(ci){
   sfx('door');await fade(1);
   const pl=vcGeo(ci).pl;VC={ci,sel:pl.length?pl[0].i:-1,ocupado:false};mode='carpa';updateHUD();vcInfo();
   await fade(0);
-  if(!S.flags.vista){S.flags.vista=true;toast('◀ ▶ ▲ ▼ eliges planta o foco · A la cuidas · B sales',2800);}
+  if(!S.flags.vista){S.flags.vista=true;toast('◀ ▶ ▲ ▼ eliges planta, foco o reloj · A la cuidas · B sales',2800);}
   await new Promise(res=>push(b=>{
     if(VC.ocupado)return;
     if(b==='B'){pop();res();return;}
-    if(b==='A'){VC.ocupado=true;vcInfo();(VC.sel<0?carpaAction(VC.ci):potAction(VC.sel)).then(()=>{VC.ocupado=false;vcInfo();});return;}
+    if(b==='A'){VC.ocupado=true;vcInfo();(VC.sel===SEL_TEMP?temporizador(VC.ci):VC.sel<0?carpaAction(VC.ci):potAction(VC.sel)).then(()=>{VC.ocupado=false;vcInfo();});return;}
     if(DV[b]){const s=VC.sel;vcMover(b);if(s!==VC.sel){sfx('tick');vcInfo();}}
   }));
   VC.ocupado=true;vcInfo();await fade(1);mode='world';VC=null;updateHUD();await fade(0);

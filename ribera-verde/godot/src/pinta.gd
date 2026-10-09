@@ -500,6 +500,8 @@ func _sin_pared(c: Image, k: String) -> Image:
 func _carpa_mapa(t: Dictionary) -> void:
 	var xc: int = (t.x0 + t.x1 + 1) * 8 - cam.x
 	var yb: int = t.y * 16 + 15 - cam.y
+	for e in Vista.temporizador_mapa(xc - (Datos.jsround(J.D.CARPAS[t.t].cm[0] * .16) >> 1), yb, Cultivo.ciclo_de(J.S.carpas[t.ci])):
+		_rect(e[0], e[1], e[2], e[3], e[4])
 	var f = Atlas.foto_misc("carpa-" + t.t + "-mapa")
 	if f:
 		_pinta(f, xc, yb)
@@ -850,6 +852,8 @@ func _carpa_fondo() -> void:
 		_img(cv, g.x0 - 1, g.yf + 2 - cv.get_height())
 	if c.get("goteo") and g.has("plata"):
 		_goteo()
+	for e in Vista.temporizador(g.tx, g.ty, Cultivo.ciclo_de(c), J.plantas_vivas(J.VC.ci)):
+		_rect(e[0], e[1], e[2], e[3], e[4])
 	if c.get("filtro"):
 		var e := Procedural.extra34("filtro")
 		var p: Array = Vista.punto(g, g.W * .55, g.D * .85, g.H - 24)

@@ -19,6 +19,8 @@ const BW := 16
 const BH := 7
 const BP := 6
 const OSC := Color8(0x26, 0x26, 0x2e)
+const SEL_TEMP := -2   # VC.sel del temporizador (1.10)
+const RUEDA := [[3, 0], [4, 0], [5, 1], [6, 2], [6, 3], [6, 4], [5, 5], [4, 6], [3, 6], [2, 6], [1, 5], [0, 4], [0, 3], [0, 2], [1, 1], [2, 0]]
 const VACIO := Color8(0x4a, 0x4a, 0x56)
 
 const OVERLAY := """
@@ -149,7 +151,27 @@ static func geo(S: Dictionary, ci: int):
 			var p = S.pots[q.i]
 			if p:
 				q.alto += Procedural.alto_planta(Datos.porte_planta(S, p), 0 if p.get("dead") else Cultivo.plant_stage(p), true if p.get("dead") else false, q)
+	o.tx = (int(o.vc.xl) - 24) if o.vc else (int(o.x0) - 16)   # el temporizador (1.10), a la izquierda de la carpa
+	o.ty = 84
 	return o
+
+# el temporizador de enchufe (1.10, 09b-carpa: vcTemp), como rectángulos [x, y, w, h, color]: caja blanca de 11 × 13 con su rueda
+# de 16 pinzas (las bajadas, CICLOS[k].on, del color de su modo) y, debajo, el enchufe y el piloto; cuelga de su cable desde arriba
+static func temporizador(x: int, y: int, k: String, on: bool) -> Array:
+	var C: Dictionary = Datos.carga().CICLOS[k]
+	var o := [[x + 5, 0, 1, y, Arte.VC_CUERDA], [x + 1, y, 9, 1, OSC], [x, y + 1, 11, 11, OSC], [x + 1, y + 12, 9, 1, OSC], [x + 1, y + 1, 9, 11, Color.html("#e8e8e0")],
+		[x + 9, y + 2, 1, 10, Color.html("#bcb4a2")], [x + 2, y + 11, 7, 1, Color.html("#bcb4a2")], [x + 3, y + 2, 5, 5, Color.html("#f8f8f0")]]
+	for n in RUEDA.size():
+		o.append([x + 2 + RUEDA[n][0], y + 1 + RUEDA[n][1], 1, 1, Color.html(C.col) if n < int(C.on) else Color.html("#6a6e78")])
+	o.append_array([[x + 5, y + 3, 1, 2, OSC], [x + 4, y + 9, 1, 1, OSC], [x + 6, y + 9, 1, 1, OSC], [x + 8, y + 9, 1, 1, Color.html("#e04040") if on else Color.html("#7a2a30")]])
+	return o
+
+# el del piso, en la pared a la izquierda de la carpa (5 × 7) y su cable hasta ella (xl: su borde)
+static func temporizador_mapa(xl: int, yb: int, k: String) -> Array:
+	var x := xl - 7
+	var y := yb - 29
+	return [[x, y, 5, 7, OSC], [x + 1, y + 1, 3, 5, Color.html("#e8e8e0")], [x + 1, y + 1, 3, 3, Color.html(Datos.carga().CICLOS[k].col)], [x + 2, y + 2, 1, 1, Color.html("#f8f8f0")],
+		[x + 2, y + 5, 1, 1, OSC], [x + 5, y + 4, 2, 1, Arte.VC_CUERDA]]
 
 static func vista_c(S: Dictionary, g: Dictionary):
 	var D := Datos.carga()
@@ -374,6 +396,8 @@ func _pinta_base() -> void:
 		return
 	base.draw_texture(Arte.tex("pared|" + g.c.t, Arte.fondo(g.c.t, g.vc, "pared")), Vector2.ZERO)
 	var c: Dictionary = g.c
+	for e in temporizador(g.tx, g.ty, Cultivo.ciclo_de(c), Cultivo.plantas_vivas(S, VC.ci)):
+		base.draw_rect(Rect2(e[0], e[1], e[2], e[3]), e[4])
 	var D := Datos.carga()
 	var xr: int = g.vc.xl + g.vc.w
 	# el filtro de carbón, colgado del techo arriba a la izquierda (el extractor tiembla 1 px), y el ventilador de pinza en el poste
@@ -570,8 +594,8 @@ static func pinta_cursor(L: CanvasItem, g: Dictionary, VC: Dictionary, bs: Array
 	var osc := Color.html("#26262e")
 	var cla := Color.html("#f8f8f0")
 	if VC.sel < 0:
-		var x: int = g.fx - (int(g.fw) >> 1) - 8
-		var y: int = g.fy - 5
+		var x: int = g.tx - 8 if VC.sel == SEL_TEMP else g.fx - (int(g.fw) >> 1) - 8
+		var y: int = g.ty + 6 if VC.sel == SEL_TEMP else g.fy - 5
 		L.draw_rect(Rect2(x - 1, y - 4, 6, 9), osc)
 		for k in 4:
 			L.draw_rect(Rect2(x + b + k, y - 3 + k, 1, 7 - 2 * k), cla)

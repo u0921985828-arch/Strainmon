@@ -9,7 +9,7 @@
    plaza vacía es luz perdida), con el tope de la maceta (≈ 8 g por litro de tierra; la de tela, +5 %) y × el vigor de la
    variedad (s.y / Y_MEDIA), la salud, el abono y el fenotipo. Cultivador medio y bien abonado: CFL ≈ 0,3 g/W, sodio
    0,55-0,7, LED 0,8-1,05. Un día de juego son unas 4 semanas de cultivo: el foco gasta H_LUZ horas (18 h en crecimiento y
-   12 en floración) y el extractor y el ventilador, H_24. */
+   12 en floración; con el temporizador en 18/6 o 12/12, las de CICLOS) y el extractor y el ventilador, H_24. */
 const CARPAS={
   p60:{n:'Armario 60×60',w:1,cm:[60,160,60],cols:2,filas:1,plazas:2,wmax:250,lmax:11},
   p80:{n:'Armario 80×80',w:1,cm:[80,180,80],cols:2,filas:2,plazas:3,wmax:400,lmax:18},
@@ -46,6 +46,17 @@ const EXTRAS={
 const faltaExtra=(c,k)=>c&&!c[k]&&!(k==='garrafas'&&c.goteo);
 const OLOR=2;   // calor al día por carpa sin filtro con alguna planta en floración (o lista)
 const KWH=.16,H_LUZ=392,H_24=672,W_M2=400,Y_MEDIA=34;   // €/kWh (tarifa doméstica) · horas por día de juego · W/m² a plena intensidad · g/planta medio de STRAINS
+// el temporizador de cada carpa (1.10, en la pared, a su izquierda): c.ciclo; sin él, automático. h: horas de foco por día de juego.
+// Con 18/6 no florecen (madres para esquejes: se quedan en VEG_TOPE; si ya florecían, siguen) y con 12/12 florecen ya: en vegetativo crecen al doble y lo
+// que se salta acorta la planta (p.corta, de 0 a 1: la cosecha baja hasta CORTA_REND)
+const CICLOS={
+  auto:{n:'Automático',m:'Automático',c:'18/6 y 12/12 en flor',h:H_LUZ,col:'#58d080',on:12,
+    d:'Automático: 18 h de luz mientras crecen y 12 h en cuanto toca florecer. Lo normal.'},
+  veg:{n:'18/6',m:'18/6 · madres',c:'Crecen y no florecen',h:504,col:'#4a92e0',on:12,
+    d:'18 h de luz y 6 de noche: no florecen nunca. Así se tienen madres para sacar esquejes.'},
+  flor:{n:'12/12',m:'12/12 · floración',c:'Florecen ya',h:336,col:'#f0a030',on:8,
+    d:'12 h de luz y 12 de noche: florecen ya. Si aún son pequeñas, crecen menos y cosechas menos.'}};
+const VEG_TOPE=.649,CORTA_REND=.4,cicloDe=c=>c&&Object.hasOwn(CICLOS,c.ciclo)?c.ciclo:'auto';
 const signo=v=>(v>=0?'+':'−')+String(Math.abs(Math.round(v))),pc=(t,f)=>Math.abs(f-1)<.001?'':` · ${t} ${signo((f-1)*100)}%`,coma=n=>String(n).replace('.',',');
 const gm2=s=>Math.round(W_M2*.85*1.25*s.y/Y_MEDIA/10)*10;   // g/m² de la ficha: LED a 400 W/m², abonada, variedad sana
 const kwhFoco=k=>Math.round(FOCOS[k].w*H_LUZ/1000);
@@ -63,21 +74,24 @@ function huecos(){
 function factores(i){
   const h=huecos()[i],c=S.carpas[h.c],C=CARPAS[c.t],F=FOCOS[c.foco],M=MACETAS[S.macetas[i]]||MACETAS.plastico7;
   const dens=Math.min(1,F.w/(C.cm[0]*C.cm[2]/1e4*W_M2)),cl=climaSala();
-  return {g:F.w*F.gpw/C.plazas*M.rend,cap:M.cap,crec:F.crec*(.85+.15*dens)*M.crec*fClima(cl),thc:F.thc*dens,agua:F.agua*M.agua,plaga:M.plaga*(c.vent?.7:1),dens,hr:cl.hr};
+  return {g:F.w*F.gpw/C.plazas*M.rend,cap:M.cap,crec:F.crec*(.85+.15*dens)*M.crec*fClima(cl),thc:F.thc*dens,agua:F.agua*M.agua,plaga:M.plaga*(c.vent?.7:1),dens,hr:cl.hr,ciclo:cicloDe(c)};
 }
 // gramos de una planta al cosecharla (f: factores de su plaza)
-const gramosPlanta=(p,f)=>{const s=getStrain(p.sid),fe=p.f||{y:1};return Math.max(1,Math.round(Math.min(f.cap,f.g*s.y/Y_MEDIA*(.4+.6*p.health/100)*(p.fert?1.25:1)*fe.y)));};
+const gramosPlanta=(p,f)=>{const s=getStrain(p.sid),fe=p.f||{y:1};return Math.max(1,Math.round(Math.min(f.cap,f.g*s.y/Y_MEDIA*(.4+.6*p.health/100)*(p.fert?1.25:1)*fe.y)*(1-CORTA_REND*(p.corta||0))));};
 const plantasVivas=ci=>huecos().some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead);
 const enFlor=ci=>huecos().some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead&&S.pots[i].prog>=.65);
 const olorDia=()=>S.carpas.reduce((a,c,ci)=>a+(c&&!c.filtro&&enFlor(ci)?OLOR:0),0);
-const luzCarpa=ci=>{const c=S.carpas[ci];return Math.round((FOCOS[c.foco].w*H_LUZ+Object.keys(EXTRAS).reduce((a,k)=>a+(c[k]?EXTRAS[k].w:0),0)*H_24)/1000*KWH);};
+const luzCarpa=ci=>{const c=S.carpas[ci];return Math.round((FOCOS[c.foco].w*CICLOS[cicloDe(c)].h+Object.keys(EXTRAS).reduce((a,k)=>a+(c[k]?EXTRAS[k].w:0),0)*H_24)/1000*KWH);};
 function facturaLuz(){let e=0;S.carpas.forEach((c,ci)=>{if(c&&plantasVivas(ci))e+=luzCarpa(ci);});return e+facturaSala();}   // y los aparatos de la sala (09c)
 function plantStep(p,h,f){
   if(p.dead)return;const s=getStrain(p.sid);
   p.water=Math.max(0,p.water-3.5*h*f.agua);
   if(!p.pest&&p.prog<1&&Math.random()<.006*h*(100-s.r)/40*f.plaga)p.pest=true;
   let g=h/(s.d*24)*f.crec;if(p.water<20)g*=.4;if(p.water<=0)g=0;if(p.fert)g*=1.1;
-  if(p.prog<1)p.prog=Math.min(1,p.prog+g);
+  if(p.prog<1){
+    if(f.ciclo==='veg'&&p.prog<.65)g=Math.max(0,Math.min(g,VEG_TOPE-p.prog));   // madre: no pasa de vegetativo (si ya florece, sigue)
+    else if(f.ciclo==='flor'&&p.prog>=.35&&p.prog<.65){const e=Math.min(g,(.65-p.prog)/2);p.corta=Math.min(1,(p.corta||0)+e/.15);g+=e;}
+    p.prog=Math.min(1,p.prog+g);}
   if(p.water<=0)p.health-=4*h;if(p.pest)p.health-=2.5*h;if(p.water>30&&!p.pest)p.health+=h;
   if(f.hr>HR_OK[1]&&p.prog>=.65&&p.prog<1)p.health-=h*(f.hr-HR_OK[1])*MOHO;   // moho: humedad alta en floración (1.10)
   p.health=clamp(p.health,0,100);if(p.health<=0)p.dead=true;
@@ -200,6 +214,14 @@ async function carpaAction(ci){
   if(opts[k]==='Rellenar garrafas'){c.gar=[];sfx('sel');return say(`Llenas las garrafas: ${gt} L.`);}
   const x=ex[k-(f?1:0)];if(k<0||!x)return;const vu=x==='goteo'&&c.garrafas;
   ponerExtra(ci,x);return say(`Pones ${EXTRAS[x].pl?'las':'el'} ${EXTRAS[x].n.toLowerCase()} en ${/^Armario/.test(C.n)?'el':'la'} ${C.n.toLowerCase()}.\n${EXTRAS[x].d}${vu?'\nLas garrafas vuelven a la mochila.':''}`);
+}
+// el temporizador de la carpa ci (vista de carpa, a la izquierda del foco): automático, 18/6 (madres) o 12/12 (floración)
+async function temporizador(ci){
+  const c=S.carpas[ci],k=cicloDe(c),K=Object.keys(CICLOS);
+  const j=await ask(`Temporizador · ${CICLOS[k].n}: ${CICLOS[k].c.toLowerCase()}\nLuz ${eur(luzCarpa(ci))} al día con plantas`,K.map(x=>CICLOS[x].m).concat('Salir'));
+  if(j<0||j>=K.length||K[j]===k)return;
+  if(K[j]==='auto')delete c.ciclo;else c.ciclo=K[j];sfx('sel');
+  return say(CICLOS[K[j]].d);
 }
 // cosecha: gramos y THC con el fenotipo de la planta; un fenotipo estrella va a un lote aparte (clave sid + '*', ver lotSid).
 // Semillas: las de tienda (SHOP) son feminizadas y salen sin semilla salvo alguna flor hermafrodita (SEMILLA_HERMA); las

@@ -152,7 +152,7 @@ function atlasCarpa() {
       TUNES, GLYPH, CORTES_COMBATE, FOCO_LUZ, VK, DANO, MACETA_CM, LITROS_M2, VB: { M: VB_M, F: VB_F, X: VB_X, PARED: VB_PARED, PLATA: VB_PLATA }, BW, BH, BP, CUR,
       NEW_STATE: newState(), MASCARAS: mascaras() });
   });
-  const r = await page.evaluate(async ({ ESCENAS, CICLOS, DEF, parcial }) => {
+  const r = await page.evaluate(async ({ ESCENAS, CICLOS: CICLOS_C, DEF, parcial }) => {
     try { localStorage.clear(); } catch (e) {}
     mode = 'pausa';   // que el bucle del juego no pinte encima
     const pm = seed => { let x = seed; return () => (x = x * 48271 % 2147483647) / 2147483647; };
@@ -227,7 +227,7 @@ function atlasCarpa() {
     const ids = DEX.slice();
     o.datos = {
       STRAINS: Object.fromEntries(ids.map(k => { const s = STRAINS[k]; return [k, { n: s.n, thc: s.thc, y: s.y, d: s.d, r: s.r, c: s.c, ind: indDe(k), hj: hojaDe(k), tipo: tipoGen(k) }]; })),
-      DEX: ids, GENETICA, CARPAS, FOCOS, MACETAS, PLANTA_CM, MACETA_CM, FOCO_CM, FOCO_SEP, FOCO_FASE, HOLGURA, VCA, VC_FILA, VC_TIERRA, LUZ_C, VC_HOJA, VC_SECA, VC_AGUA,
+      DEX: ids, GENETICA, CARPAS, FOCOS, MACETAS, PLANTA_CM, MACETA_CM, FOCO_CM, FOCO_SEP, FOCO_FASE, CICLOS, VEG_TOPE, CORTA_REND, HOLGURA, VCA, VC_FILA, VC_TIERRA, LUZ_C, VC_HOJA, VC_SECA, VC_AGUA,
       Y_MEDIA, W_M2, GEN_ESTABLE, TIPO_GEN, KWH, H_LUZ, H_24, EXTRAS, FENO_ESTRELLA, FENO_FLOJO, SEMILLA_HERMA,
       MESES, MES0, T_MES, HR_MES, CALOR_W, HR_PLANTA, HR_NOCHE, HR_FILTRO, T_FILTRO, T_OK, HR_OK, H_DIA, MOHO, APARATOS, GARRAFA_X, GOTEO_X, LITROS_M2,
       FEM: SHOP.filter(it => it.sid).map(it => it.sid) };   // FEM: las feminizadas (las de tienda)
@@ -245,7 +245,7 @@ function atlasCarpa() {
     }
     // ciclos de cultivo con el generador fijo
     o.ciclos = {};
-    for (const c of CICLOS) {
+    for (const c of CICLOS_C) {
       Math.random = pm(c.seed);
       S = newState(); S.carpas = [{ t: c.t, foco: c.foco }]; S.macetas = c.macetas.slice(); S.pots = c.macetas.map(() => null);
       c.sids.forEach((sid, i) => { S.pots[i] = { sid, prog: 0, water: 70, health: 100, fert: false, pest: false, f: rollFeno(sid) }; });

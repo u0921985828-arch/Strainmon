@@ -1513,6 +1513,37 @@ func _pasos() -> void:
 			and R.m == 1000 - pr("Termohigrómetro") - pr("Calefactor") - pr("Deshumidificador") and R.sala == "termo,calef,deshu" and R.n2.t == 20 and R.n2.hr == 55 and si(R.n2.uso.get("calef")) and si(R.n2.uso.get("deshu")) and not si(R.d2.uso.get("calef"))
 			and absf(R.c1 / R.c0 - 1 / .82) < 1e-9 and R.fs == Datos.jsround((1500 + 250) * D.H_24 * (1 - D.H_DIA) * .5 / 1000 * D.KWH) and R.moho == 90 and R.julio == 55 + 8 + 5
 			and re("^Moho en .*\\(plaza 1\\), .* y .*\\(plaza 4\\): de noche la sala pasa del 60 % de humedad\\.", R.aviso), R))
+	step("Temporizador (1.10): 18/6 deja la planta en vegetativo (madre) y gasta más luz; 12/12 acorta el vegetativo y la cosecha; automático quita c.ciclo", ["18/6", "12/12", "Automático"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.merge({"carpas": [{"t": "m100", "foco": "led480"}], "macetas": ["tela25", "tela25", "tela25", "tela25"], "pots": [null, null, null, null]}, true)
+		R = {"l0": J.luz_carpa(0)}
+		var crece := func() -> Dictionary:
+			var q := {"sid": "rif", "prog": .3, "water": 100, "health": 100, "fert": false, "pest": false}
+			J.S.pots[0] = q
+			var f: Dictionary = J.factores(0).duplicate()
+			f.merge({"plaga": 0, "hr": 50}, true)
+			for h in 30:
+				q.water = 100
+				Cultivo.plant_step(J.S, q, 1, f)
+			return q
+		R.a = crece.call().prog
+		await run(func(): await J.temporizador(0))
+		R.c1 = J.S.carpas[0].get("ciclo")
+		R.l1 = J.luz_carpa(0)
+		R.m = crece.call().prog
+		await run(func(): await J.temporizador(0))
+		R.c2 = J.S.carpas[0].get("ciclo")
+		R.l2 = J.luz_carpa(0)
+		var p: Dictionary = crece.call()
+		R.fl = [p.prog, float(p.get("corta", 0))]
+		var p0 := p.duplicate()
+		p0.corta = 0
+		R.g = [J.gramos_planta(p, J.factores(0)), J.gramos_planta(p0, J.factores(0))]
+		await run(func(): await J.temporizador(0))
+		R.c3 = J.S.carpas[0].has("ciclo")
+		J.S = S0,
+		func(): return chk(R.l1 > R.l0 and R.l0 > R.l2 and R.c1 == "veg" and absf(R.m - D.VEG_TOPE) < 1e-9 and R.a > .65 and R.c2 == "flor" and R.fl[0] > R.a and R.fl[1] > .9 and R.g[0] < R.g[1] * .65 and R.c3 == false, R))
 	step("Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad",
 		["Sacar un lote", "^Hindu", "^10 g", "Guardar todo", "Cerrar", "Bolsa de deporte", "Salir", "Sacar todo", "Cerrar"], func():
 		var S0 = J.S

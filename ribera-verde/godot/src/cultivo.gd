@@ -42,7 +42,12 @@ static func factores(S: Dictionary, i: int) -> Dictionary:
 	var dens := minf(1, F.w / (C.cm[0] * C.cm[2] / 1e4 * D.W_M2))
 	var cl := clima_sala(S, es_noche(S))   # (1.10) crec lleva el clima de la sala y hr, su humedad (el moho de plant_step)
 	return {"g": F.w * F.gpw / C.plazas * M.rend, "cap": M.cap, "crec": F.crec * (.85 + .15 * dens) * M.crec * f_clima(cl), "thc": F.thc * dens,
-		"agua": F.agua * M.agua, "plaga": M.plaga * (.7 if c.get("vent") else 1.0), "dens": dens, "hr": cl.hr}
+		"agua": F.agua * M.agua, "plaga": M.plaga * (.7 if c.get("vent") else 1.0), "dens": dens, "hr": cl.hr, "ciclo": ciclo_de(c)}
+
+# el temporizador de la carpa (1.10, 09-cultivo: CICLOS): c.ciclo; sin él, automático
+static func ciclo_de(c) -> String:
+	var k = c.get("ciclo") if c is Dictionary else null
+	return k if k is String and Datos.carga().CICLOS.has(k) else "auto"
 
 # ---------- la sala del piso (1.10, 09c-sala): clima, aparatos y goteo ----------
 static func es_noche(S: Dictionary) -> bool:
@@ -181,6 +186,12 @@ static func plant_step(S: Dictionary, p: Dictionary, h: float, f: Dictionary) ->
 	if p.fert:
 		g *= 1.1
 	if p.prog < 1:
+		if f.get("ciclo") == "veg" and p.prog < .65:   # madre: no pasa de vegetativo (si ya florece, sigue)
+			g = maxf(0, minf(g, Datos.carga().VEG_TOPE - p.prog))
+		elif f.get("ciclo") == "flor" and p.prog >= .35 and p.prog < .65:   # 12/12 en vegetativo: crece al doble y lo que se salta la acorta
+			var e := minf(g, (.65 - p.prog) / 2)
+			p.corta = minf(1, float(p.get("corta", 0)) + e / .15)
+			g += e
 		p.prog = minf(1, p.prog + g)
 	if p.water <= 0:
 		p.health -= 4 * h
@@ -278,7 +289,7 @@ static func cosecha(S: Dictionary, i: int) -> Dictionary:
 static func gramos_planta(S: Dictionary, p: Dictionary, f: Dictionary) -> int:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"y": 1}
-	return maxi(1, Datos.jsround(minf(f.cap, f.g * s.y / Datos.carga().Y_MEDIA * (.4 + .6 * p.health / 100) * (1.25 if p.fert else 1.0) * fe.y)))
+	return maxi(1, Datos.jsround(minf(f.cap, f.g * s.y / Datos.carga().Y_MEDIA * (.4 + .6 * p.health / 100) * (1.25 if p.fert else 1.0) * fe.y) * (1 - Datos.carga().CORTA_REND * float(p.get("corta", 0)))))
 
 static func thc_cosecha(S: Dictionary, p: Dictionary, f: Dictionary) -> float:
 	var s = Datos.strain(S, p.sid)
@@ -300,7 +311,7 @@ static func luz_carpa(S: Dictionary, ci: int) -> int:
 	for k in D.EXTRAS:
 		if c.get(k):
 			x += D.EXTRAS[k].w
-	return Datos.jsround((D.FOCOS[c.foco].w * D.H_LUZ + x * D.H_24) / 1000 * D.KWH)
+	return Datos.jsround((D.FOCOS[c.foco].w * D.CICLOS[ciclo_de(c)].h + x * D.H_24) / 1000 * D.KWH)
 
 # lo que se duerme en la cama (bedAction): 0, hasta las 7 (si ya son las 7, un día entero); 1, siesta de 3 h
 static func minutos_cama(S: Dictionary, c: int) -> int:

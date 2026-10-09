@@ -381,6 +381,25 @@ func poner_extra(ci: int, k: String) -> void:
 		c.gar = []
 	sfx("sel")
 
+# el temporizador de la carpa ci (vista de carpa, a la izquierda del foco): automático, 18/6 (madres) o 12/12 (floración)
+func temporizador(ci: int) -> void:
+	var c: Dictionary = S.carpas[ci]
+	var k := Cultivo.ciclo_de(c)
+	var K: Array = D.CICLOS.keys()
+	var opts := []
+	for x in K:
+		opts.append(D.CICLOS[x].m)
+	opts.append("Salir")
+	var j: int = await ask("Temporizador · %s: %s\nLuz %s al día con plantas" % [D.CICLOS[k].n, D.CICLOS[k].c.to_lower(), Datos.eur(luz_carpa(ci))], opts)
+	if j < 0 or j >= K.size() or K[j] == k:
+		return
+	if K[j] == "auto":
+		c.erase("ciclo")
+	else:
+		c.ciclo = K[j]
+	sfx("sel")
+	await say(D.CICLOS[K[j]].d)
+
 func carpa_action(ci: int) -> void:
 	var c: Dictionary = S.carpas[ci]
 	var C: Dictionary = D.CARPAS[c.t]
@@ -858,7 +877,12 @@ func vc_ficha() -> void:
 		return
 	var c: Dictionary = S.carpas[VC.ci]
 	var L := []
-	if VC.sel < 0:
+	if VC.sel == Vista.SEL_TEMP:
+		var k := Cultivo.ciclo_de(c)
+		L.append("Temporizador")
+		L.append(D.CICLOS[k].n + " · " + D.CICLOS[k].c)
+		L.append(("Luz " + Datos.eur(luz_carpa(VC.ci)) + " al día") if plantas_vivas(VC.ci) else "Apagado")
+	elif VC.sel < 0:
 		L.append(D.FOCOS[c.foco].n)
 		L.append(("Luz " + Datos.eur(luz_carpa(VC.ci)) + " al día") if plantas_vivas(VC.ci) else "Apagado")
 		for k in D.EXTRAS:
@@ -899,7 +923,11 @@ func vc_mover(b: String) -> void:
 				m = q
 		return m
 	if cur == null:
-		if b == "down":
+		if b == "left" and VC.sel == -1:
+			VC.sel = Vista.SEL_TEMP
+		elif b == "right" and VC.sel == Vista.SEL_TEMP:
+			VC.sel = -1
+		elif b == "down":
 			var fm := -1
 			for q in pl:
 				fm = maxi(fm, q.fila)
@@ -915,6 +943,8 @@ func vc_mover(b: String) -> void:
 		k += -1 if b == "left" else 1
 		if k >= 0 and k < f.size():
 			VC.sel = f[k].i
+		elif k < 0:
+			VC.sel = Vista.SEL_TEMP
 	elif b == "up":
 		var f := pl.filter(func(q): return q.fila == cur.fila + 1)
 		VC.sel = cerca.call(f, cur.x).i if f.size() else -1
@@ -924,7 +954,9 @@ func vc_mover(b: String) -> void:
 			VC.sel = cerca.call(f, cur.x).i
 
 func _vc_accion() -> void:
-	if VC.sel < 0:
+	if VC.sel == Vista.SEL_TEMP:
+		await temporizador(VC.ci)
+	elif VC.sel < 0:
 		await carpa_action(VC.ci)
 	else:
 		await pot_action(VC.sel)
@@ -943,7 +975,7 @@ func abrir_carpa(ci):
 	await fade(0)
 	if not S.flags.get("vista"):
 		S.flags.vista = true
-		toast("◀ ▶ ▲ ▼ eliges planta o foco · A la cuidas · B sales", 2800)
+		toast("◀ ▶ ▲ ▼ eliges planta, foco o reloj · A la cuidas · B sales", 2800)
 	var pr := Motor.Prom.new()
 	push(func(b: String):
 		if VC.ocupado:
