@@ -5,7 +5,8 @@
 #   apoya: la planta y la maceta abajo y la campana abajo (la boca) y arriba (cuelga del techo)
 # · vcAplasta: quitar filas no deja trozos sueltos (no sube el número de manchas de 8 vecinos)
 # · cada planta, con el balanceo (±1 px arriba), dentro de la pantalla y de las paredes de su fila, sin tocar la campana
-#   y por debajo de su distancia al foco
+#   y por debajo de su distancia al foco; el foco (vc.fy), a la distancia de su fase (FOCO_FASE) de cada planta
+#   (o en el techo, si la carpa no da para más)
 # · dos plantas de la misma fila no se pisan ni balanceándose una hacia la otra
 # · se pinta de atrás adelante: la más honda (cy) antes y más arriba
 # · las barras de agua y cosecha (con la «!» de plaga) y el cursor de la elegida no se pisan
@@ -108,13 +109,13 @@ func _initialize() -> void:
 			var Z: float = g0.vc.Z
 			var boca: int = int(D.VCA.boca)
 			var sep: float = D.FOCO_SEP[fk] * Z
-			# la campana: sus píxeles en pantalla
+			# la campana: sus píxeles, con la boca en la fila 0 (en pantalla, + vc.fy, que baja con las plantas pequeñas)
 			var fc := Arte.foto(g0.vc.foco.n)
 			var campana := {}
 			for y in fc.get_height():
 				for x in fc.get_width():
 					if opaco(fc, x, y):
-						campana[Vector2i(120 - (fc.get_width() >> 1) + x, boca - 15 + y)] = true
+						campana[Vector2i(120 - (fc.get_width() >> 1) + x, y - 15)] = true
 			# cada plaza con cada planta: sus filas en pantalla y cuánto se mueve cada una
 			var dib := {}   # i → [{c, f: {y: [a, b]}, sh: {y: 0|1}}]
 			for i in np:
@@ -154,6 +155,7 @@ func _initialize() -> void:
 							var pisa := 0
 							var fuera := 0
 							var wy: float = g.vc.w + 32 * (q.y - D.VCA.fondo) / 19.0
+							var fy: int = g.vc.fy
 							var L := 120 - wy / 2
 							var R := 120 + wy / 2
 							for r in F:
@@ -171,11 +173,13 @@ func _initialize() -> void:
 								if xa - s < L or xb + s + 1 > R:
 									fuera += 1
 								for x in range(xa - s, xb + s + 1):
-									if campana.has(Vector2i(x, ya)):
+									if campana.has(Vector2i(x, ya - fy)):
 										pisa += 1
 							check(nombre + ": %d filas fuera de la pantalla o de sus paredes" % fuera, fuera == 0)
 							check(nombre + ": pisa la campana en %d px" % pisa, pisa == 0)
 							check(nombre + ": arriba en %d, más cerca del foco que %d" % [top, int(ceil(boca + sep))], top >= floor(boca + sep))
+							var dfa := Datos.jsround(D.FOCO_SEP[fk] * D.FOCO_FASE[Cultivo.plant_stage(S.pots[i])] * Z)
+							check(nombre + ": arriba en %d, más cerca del foco (boca en %d) que %d" % [top, fy, dfa], (top - fy >= dfa or fy == boca) and fy >= boca)
 							# daños de plaga encima: la misma silueta, la base del tallo igual y algún píxel cambiado
 							var pl: Dictionary = S.pots[i]
 							for salud in [100.0, 60.0, 20.0]:

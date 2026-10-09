@@ -303,7 +303,7 @@ const VC_LZ := [[198, 130, 77], [231, 150, 86], [255, 172, 82], [255, 224, 149]]
 # haz por barra (de la última fila del sprite del foco) que baja hasta el pie de la pared abriéndose lo justo para que los de fuera
 # lleguen a las paredes de la carpa. Bajo las barras, el núcleo; con un haz, el haz; con dos o más, el resplandor; entre haces, nada
 static func luz_led(t: String, vc: Dictionary) -> Image:
-	var k := "vc|%s|luz-led|%s" % [t, vc.foco.n]
+	var k := "vc|%s|luz-led|%s|%d" % [t, vc.foco.n, vc.fy]
 	if cache.has(k):
 		return cache[k]
 	var o: Image = fondo(t, vc, "luz-led").duplicate()
@@ -320,7 +320,7 @@ static func luz_led(t: String, vc: Dictionary) -> Image:
 	var V: Dictionary = Datos.carga().VCA
 	var X0: int = vc.xl
 	var X1: int = vc.xl + vc.w - 1
-	var y0 := int(V.boca) + 1
+	var y0: int = vc.fy + 1
 	var y1 := int(V.fondo) - 2
 	var s := 0.0
 	if B.size():
@@ -341,13 +341,54 @@ static func luz_led(t: String, vc: Dictionary) -> Image:
 	cache[k] = o
 	return o
 
+# la de sodio (y la del CFL) con el foco bajado (vcLuzBaja): en la pared del fondo, de la boca al pie (138), baja con él; arriba, nada
+static func luz_baja(t: String, vc: Dictionary) -> Image:
+	var L := fondo(t, vc, "luz")
+	var V: Dictionary = Datos.carga().VCA
+	var y0 := int(V.boca)
+	var y1 := int(V.fondo) - 2
+	var dy: int = vc.fy - y0
+	if dy <= 0:
+		return L
+	var k := "vc|%s|luz-baja|%d|%d" % [t, vc.foco.a, vc.fy]
+	if cache.has(k):
+		return cache[k]
+	var o: Image = L.duplicate()
+	o.fill_rect(Rect2i(vc.xl, y0, vc.w, y1 + 1 - y0), Color(0, 0, 0, 0))
+	if y1 + 1 - y0 - dy > 0:
+		o.blit_rect(L, Rect2i(vc.xl, y0, vc.w, y1 + 1 - y0 - dy), Vector2i(vc.xl, y0 + dy))
+	cache[k] = o
+	return o
+
+# de dónde cuelga la campana (vcCuelga): la primera y la última columna con algo de su fila de arriba (las cuerdas de los LED) y esa fila
+const VC_CUERDA := Color8(28, 29, 34)
+const VC_POLEA := [Color8(58, 60, 68), Color8(122, 133, 132)]   # cuerpo y brillo de la rueda
+static func cuelga(c: Image) -> Array:
+	var k := "cuelga|%d" % c.get_instance_id()
+	if cache.has(k):
+		return cache[k]
+	var o := [0, 0, 0]
+	for r in c.get_height():
+		var a := -1
+		var b := -1
+		for i in c.get_width():
+			if c.get_pixel(i, r).a8:
+				if a < 0:
+					a = i
+				b = i
+		if a >= 0:
+			o = [a, b, r]
+			break
+	cache[k] = o
+	return o
+
 # la luz de cada tipo de foco: la del sodio, tal cual; las demás, con su color (misma luminosidad). Los LED, de barras, la suya (luz_led)
 static func luz(t: String, vc: Dictionary) -> Image:
-	var L := luz_led(t, vc) if vc.tipo == "led" and hay("carpa-c-luz-led") else fondo(t, vc, "luz")
+	var L := luz_led(t, vc) if vc.tipo == "led" and hay("carpa-c-luz-led") else luz_baja(t, vc)
 	var lc: Dictionary = Datos.carga().LUZ_C
 	if not lc.has(vc.tipo):
 		return L
-	var k := "vc|%s|luz|%s|%d" % [t, vc.tipo, vc.foco.a]
+	var k := "vc|%s|luz|%s|%d|%d" % [t, vc.tipo, vc.foco.a, vc.fy]
 	if cache.has(k):
 		return cache[k]
 	var c: Array = lc[vc.tipo][0]

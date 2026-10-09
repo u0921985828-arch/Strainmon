@@ -88,7 +88,7 @@ func _corre() -> void:
 		if g.vc == null:
 			igual("vista C %s" % e.k, null, "vista C")
 			continue
-		for k in ["Z", "w", "xl", "tipo"]:
+		for k in ["Z", "w", "xl", "tipo", "fy"]:
 			igual("%s %s" % [e.k, k], g.vc[k], H[k], 1e-12)
 		igual("%s foco" % e.k, g.vc.foco.n, H.foco)
 		igual("%s on" % e.k, Cultivo.plantas_vivas(S, 0), H.on)

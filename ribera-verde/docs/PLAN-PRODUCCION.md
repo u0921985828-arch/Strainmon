@@ -214,7 +214,7 @@ La lámina 1 (`cuarto-cultivo-34`, pixflux sobre la huella) no se aprobó porque
 2. **Escala de cada carpa.** Es `Z = 134 / (alto − 28)` px/cm: 1,02 en la de 60, 0,88 en la de 80 y 0,78 en las de 200 cm. Así la boca del foco (y = 16, como en la imagen A) queda a su altura real sobre el suelo (y = 150).
    - La pared del fondo se recorta al ancho de la carpa, centrada entre los laterales de la imagen A. Mide 61, 71, 78, 93 y 117 px.
    - Las macetas van en el centro de su parte: una fila en y = 152, o dos filas, en 146 (detrás) y 156 (delante).
-   - La copa y el alto de cada planta respetan la distancia segura de §4 (`q.cw` × `q.ch`) a esa escala. Como el sprite de la maceta es algo más alto que la real, el alto también se acota en pantalla: la cima queda al menos a `FOCO_SEP` × Z de la boca del foco.
+   - La copa y el alto de cada planta respetan la distancia segura de §4 (`q.cw` × `q.ch`) a esa escala. Como el sprite de la maceta es algo más alto que la real, el alto también se acota en pantalla: la cima queda al menos a `FOCO_SEP` × Z de la boca del foco. El foco, además, baja hasta la distancia de la fase de las plantas (`FOCO_FASE`: × 1,5 germinando y plántula, × 1,4 en vegetativo, × 1 en floración) y sube a medida que crecen, colgado de dos poleas (las pinta el motor, `vcPoleas`); su luz baja con él.
 3. **Sprites.** Se hacen con `edit_image_pixen` (1 generación) sobre los recortes de la imagen A. Se piden al tamaño real, con «spans the full canvas» (con «smaller», PixelLab encoge el dibujo y deja margen).
 
 | Sprite | De dónde sale | Tamaño | Gen. |

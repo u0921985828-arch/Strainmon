@@ -307,6 +307,37 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
         const e = { t, f, barras, haces: fila(VCA.boca + 1)[1], pie: fila(VCA.fondo - 2)[0], w: g.vc.w, calidos: calidos(L) };
         if (barras !== { led100: 3, led200: 4, led480: 6, led720: 8 }[f] || e.haces !== barras || e.pie !== e.w || e.calidos) r.fallos.push('LED ' + JSON.stringify(e));
         r.led.push(t + '/' + f); }
+      // el foco sube a medida que crecen (1.10): en cada carpa con cada foco, los tres portes de germinando a lista, la boca (vc.fy) nunca
+      // baja al crecer ni pasa del techo (VCA.boca), y queda a la distancia de su fase (FOCO_FASE × FOCO_SEP) de cada planta viva, justa
+      // con la que lo tiene más cerca (si no está en el techo); de germinando a lista, sube
+      r.sube = 0; const dFase = (f, p, Z) => Math.round(FOCO_SEP[f] * (p.dead ? 1 : FOCO_FASE[plantStage(p)]) * Z);
+      const aDist = (g, f, n) => { const vivas = g.pl.filter(q => q.v.p && !S.pots[q.i].dead), d = g.pl.filter(q => q.v.p).map(q => q.y - q.v.tierra - q.v.hp - g.vc.fy - dFase(f, S.pots[q.i], g.vc.Z));
+        if (g.vc.fy < VCA.boca || d.some(x => x < 0) || (g.vc.fy > VCA.boca && Math.min(...d) !== 0) || (!vivas.length && g.vc.fy !== VCA.boca) || g.fy !== g.vc.fy) r.fallos.push(`${n}: foco en ${g.vc.fy}, a ${d} de su distancia`); };
+      for (const t in CARPAS) for (const f in FOCOS) if (FOCOS[f].w <= CARPAS[t].wmax) for (const sid of ['rif', 'nepal', 'thai']) {
+        const fys = [.05, .2, .5, .8, 1].map(pr => { const g = pon(t, f, Array(CARPAS[t].plazas).fill(sid), pr); if (!g.vc) return null; aDist(g, f, `${t}/${f}/${sid} ${pr}`); return g.vc.fy; });
+        if (fys.includes(null) || fys.some((y, i) => i && y > fys[i - 1]) || fys[0] <= fys[4]) r.fallos.push(`${t}/${f}/${sid}: el foco no sube al crecer (${fys})`); r.sube++; }
+      // mezcladas (una en flor, una plántula, una germinando y una muerta, a la distancia de seguridad, que aquí no lo mueve): manda la que
+      // lo tiene más cerca; la campana se dibuja con la boca en fy, después de sus dos poleas, con la cuerda del techo a su fila de arriba; la luz baja con ella (la de sodio, la de la boca
+      // en la fila fy y nada encima en la pared; la de los LED, un haz por barra justo bajo la boca)
+      for (const [t, f] of [['m100', 'sodio400'], ['g150', 'led720'], ['p60', 'cfl']]) {
+        const n = CARPAS[t].plazas, g0 = pon(t, f, ['thai', 'rif', 'nepal', 'thai', null, null].slice(0, n), [.2, .05, .8, .8].slice(0, n).concat([1, 1]));
+        if (n > 2) S.pots[3].dead = true; const g = vcGeo(0), vc = g.vc; aDist(g, f, t + '/' + f + ' mezcladas'); if (!vc) continue;
+        const sinM = (() => { const d = S.pots[3]; if (n > 2) S.pots[3] = null; const y = vcGeo(0).vc.fy; if (n > 2) S.pots[3] = d; return y; })();
+        if (n > 2 && sinM !== vc.fy) r.fallos.push(`${t}/${f}: la muerta mueve el foco (${sinM} → ${vc.fy})`);
+        const fc = vc.foco.f.c, fx = 120 - (fc.width >> 1), [ca, cb, cr] = vcCuelga(fc), pinta = [], di = ctx.drawImage, fr = ctx.fillRect;
+        ctx.drawImage = function (im, ...a) { if (im === fc) pinta.push(['foco', a[0], a[1]]); return di.call(this, im, ...a); };
+        ctx.fillRect = function (...a) { if (ctx.fillStyle === VC_CUERDA && a[2] === 1) pinta.push(['cuerda', a[0], a[1], a[3]]); if (ctx.fillStyle === VC_POLEA[1]) pinta.push(['brillo', a[0], a[1]]); return fr.apply(this, a); };
+        VC = { ci: 0, sel: -2, ocupado: false }; try { renderCarpa(1000); } finally { VC = null; ctx.drawImage = di; ctx.fillRect = fr; }
+        const cu = pinta.filter(p => p[0] === 'cuerda' && p[2] === VCA.boca - 12 && p[3] === vc.fy - 15 + cr - (VCA.boca - 12)).map(p => p[1]).sort((a, b) => a - b).join(),
+          poleas = pinta.filter(p => p[0] === 'brillo').length, antes = pinta.findIndex(p => p[0] === 'foco') > pinta.findLastIndex(p => p[0] !== 'foco' && p[2] < 30);
+        const L = vcLuz(t, vc), d = L.getContext('2d').getImageData(0, 0, 240, 160).data, op = (x, y) => d[(y * 240 + x) * 4 + 3] > 0, X = [...Array(vc.w)].map((_, i) => vc.xl + i);
+        let luz;
+        if (vc.tipo === 'led') { let k = 0; for (const x of X) if (op(x, vc.fy + 1) && !op(x - 1, vc.fy + 1)) k++; luz = k === { led720: 8 }[f]; }
+        else { const L0 = vcFondo(t, vc, 'luz').getContext('2d').getImageData(0, 0, 240, 160).data;
+          luz = X.every(x => [...Array(vc.fy - VCA.boca)].every((_, j) => !op(x, VCA.boca + j)) && d[((vc.fy) * 240 + x) * 4 + 3] === L0[(VCA.boca * 240 + x) * 4 + 3]) && X.some(x => op(x, vc.fy)); }
+        r.mezcladas = (r.mezcladas || []).concat(`${t}/${f}:${vc.fy}`);
+        if (vc.fy <= VCA.boca || !pinta.some(p => p[0] === 'foco' && p[1] === fx && p[2] === vc.fy - 15) || cu !== [fx + ca, fx + cb].join() || poleas !== 2 || !antes || !luz)
+          r.fallos.push(`${t}/${f} mezcladas: foco en ${vc.fy}, ${JSON.stringify(pinta)}, cuerdas ${cu}, poleas ${poleas}, luz ${luz}`); }
       // con el atlas, siempre la vista C (1.10): en cada carpa, con cada foco y cada maceta que admite, con los 4 extras y una planta muerta,
       // el foco y la maceta a su ancho real (×0,75-1,25) y los extras dibujados (filtro, ventilador, llaves, depósito pequeño; sin goteo, las
       // garrafas); sin el atlas, la vista B
@@ -331,7 +362,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
           VC = { ci: 0, sel: 0, ocupado: false }; renderCarpa(1000); VC = null; ctx.drawImage = di; return !n && !encendido; })();
       r.anchos = [...r.anchos].sort().join(); r.portes = [...r.portes].sort().join();
       S.carpas = C0; S.macetas = M0; S.pots = P0; return r; });
-    check('Vista C (imagen A): en las 5 carpas, la planta A del porte de cada planta (su % índica) en todas sus fases, con el tono de hoja de su variedad; la más ancha que deja 2 px de aire con su vecina de fila y no se sale de las paredes (la de 38 o la de 32); de su alto real, sin pasar de su distancia al foco, con el fotograma de su alto (uno cada 2 px, sin filas repetidas, más alta = más cogollo) o aplastado 1 fila, sin escalar, en todas las carpas y focos; la pared solo lleva tela, macetas y plantas sin luz pintada y la luz es su propio sprite, por delante en «overlay» (la del CFL, fría y al 60 %); los LED, de barras, con un haz por barra que llega al pie de la pared en todo su ancho y sin un píxel cálido; el CFL apagado, gris; con el atlas, siempre la vista C (cada foco, maceta y extra, a su ancho, y la muerta); sin atlas, la vista B', vc.escenas.length === 11 && vc.aplastadas >= 5 && vc.exactas >= 5 && vc.anchos === '18,32,38,8' && vc.portes === 'h0,h2,h3,h4,i0,i2,i3,i4,s1,s2,s3,s4' && vc.cubre >= 100 && vc.siempre >= 100 && vc.led.length >= 8 && !vc.fallos.length && Object.values(vc.b).every(Boolean), vc);
+    check('Vista C (imagen A): en las 5 carpas, la planta A del porte de cada planta (su % índica) en todas sus fases, con el tono de hoja de su variedad; la más ancha que deja 2 px de aire con su vecina de fila y no se sale de las paredes (la de 38 o la de 32); de su alto real, sin pasar de su distancia al foco, con el fotograma de su alto (uno cada 2 px, sin filas repetidas, más alta = más cogollo) o aplastado 1 fila, sin escalar, en todas las carpas y focos; la pared solo lleva tela, macetas y plantas sin luz pintada y la luz es su propio sprite, por delante en «overlay» (la del CFL, fría y al 60 %); los LED, de barras, con un haz por barra que llega al pie de la pared en todo su ancho y sin un píxel cálido; el foco, a la distancia de la fase de cada planta (la más cercana manda; la muerta no cuenta), sube a medida que crecen, colgado de dos poleas, y su luz baja con él; el CFL apagado, gris; con el atlas, siempre la vista C (cada foco, maceta y extra, a su ancho, y la muerta); sin atlas, la vista B', vc.escenas.length === 11 && vc.aplastadas >= 5 && vc.exactas >= 5 && vc.anchos === '18,32,38,8' && vc.portes === 'h0,h2,h3,h4,i0,i2,i3,i4,s1,s2,s3,s4' && vc.cubre >= 100 && vc.siempre >= 100 && vc.led.length >= 8 && vc.sube >= 93 && (vc.mezcladas || []).length === 3 && !vc.fallos.length && Object.values(vc.b).every(Boolean), vc);
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
       for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }
       r.rio = mascaraOrilla(m, 31, 15); r.centro = mascaraOrilla(m, 35, 27); r.sinAtlas = (() => { const ok = ARTE.ok; ARTE.ok = false; const v = arteOrilla(m, 'water', 31, 15, 0, 0); ARTE.ok = ok; return v; })(); return r; });

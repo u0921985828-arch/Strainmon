@@ -165,7 +165,7 @@ function atlasCarpa() {
     for (const e of ESCENAS) {
       monta(e); VC = { ci: 0, sel: e.sel, ocupado: false };
       const g = vcGeo(0);if (!g.vc) { o.escenas[e.k] = null; continue; }
-      o.escenas[e.k] = { Z: g.vc.Z, w: g.vc.w, xl: g.vc.xl, foco: g.vc.foco.n, tipo: g.vc.tipo, on: plantasVivas(0),
+      o.escenas[e.k] = { Z: g.vc.Z, w: g.vc.w, xl: g.vc.xl, foco: g.vc.foco.n, tipo: g.vc.tipo, fy: g.vc.fy, on: plantasVivas(0),
         pl: g.pl.map(q => ({ i: q.i, col: q.col, fila: q.fila, cx: q.cx, cy: q.cy, cw: q.cw, ch: q.ch, x: q.x, y: q.y, alto: q.alto,
           maceta: q.v.m.n, tierra: q.v.tierra, hp: q.v.hp, esp: q.v.esp ?? null, planta: q.v.p ? q.v.p.n : null,
           foto: q.v.p ? vcAltura(q.v.p.n, q.v.hp)[2] : null, hoja: S.pots[q.i] ? hojaPlanta(S.pots[q.i]) : null, porte: S.pots[q.i] ? portePlanta(S.pots[q.i]) : null })) };
@@ -227,7 +227,7 @@ function atlasCarpa() {
     const ids = DEX.slice();
     o.datos = {
       STRAINS: Object.fromEntries(ids.map(k => { const s = STRAINS[k]; return [k, { n: s.n, thc: s.thc, y: s.y, d: s.d, r: s.r, c: s.c, ind: indDe(k), hj: hojaDe(k), tipo: tipoGen(k) }]; })),
-      DEX: ids, GENETICA, CARPAS, FOCOS, MACETAS, PLANTA_CM, MACETA_CM, FOCO_CM, FOCO_SEP, HOLGURA, VCA, VC_FILA, VC_TIERRA, LUZ_C, VC_HOJA, VC_SECA, VC_AGUA,
+      DEX: ids, GENETICA, CARPAS, FOCOS, MACETAS, PLANTA_CM, MACETA_CM, FOCO_CM, FOCO_SEP, FOCO_FASE, HOLGURA, VCA, VC_FILA, VC_TIERRA, LUZ_C, VC_HOJA, VC_SECA, VC_AGUA,
       Y_MEDIA, W_M2, GEN_ESTABLE, TIPO_GEN, KWH, H_LUZ, H_24, EXTRAS, FENO_ESTRELLA, FENO_FLOJO, SEMILLA_HERMA,
       MESES, MES0, T_MES, HR_MES, CALOR_W, HR_PLANTA, HR_NOCHE, HR_FILTRO, T_FILTRO, T_OK, HR_OK, H_DIA, MOHO, APARATOS, GARRAFA_X, GOTEO_X, LITROS_M2,
       FEM: SHOP.filter(it => it.sid).map(it => it.sid) };   // FEM: las feminizadas (las de tienda)
