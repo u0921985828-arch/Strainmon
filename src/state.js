@@ -118,7 +118,7 @@
     if (!entry) {
       isNewSignature = true;
       entry = {
-        sig, speciesId: specimen.speciesId, name: specimen.name,
+        sig, speciesId: specimen.speciesId, canonId: specimen.canonId || null, name: specimen.name,
         tier: specimen.tier, rarity: specimen.rarity,
         count: 0, firstAt: PH.state.timeLabel(state.data.env),
         pheno: specimen.pheno, genotype: specimen.genotype,
