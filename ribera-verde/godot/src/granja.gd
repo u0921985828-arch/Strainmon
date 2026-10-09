@@ -100,7 +100,7 @@ func new_day() -> void:
 	# la policía (1.11, NIVEL_POLI): con la orden de ayer, la redada; con 90 o más, la orden (y el aviso), o Molina la para
 	if S.get("orden") and S.day > S.orden:
 		queue("raid", raid_event)
-	elif not S.get("orden") and S.heat >= 90:
+	elif not S.get("orden") and S.heat >= D.NIVEL_POLI[3][0]:
 		if S.protect:
 			queue("raid", raid_event)
 		else:
@@ -278,7 +278,7 @@ func pot_action(i: int) -> void:
 				p.fert = true
 				p.fq = q
 			sfx("sel")
-			await say(("Echas una dosis de ABONO DE CRECIMIENTO. Crecerá más deprisa." if veg else "Echas una dosis de ABONO. Dará más cosecha.") + ("\nCon el medidor, el pH al 6,2: lo aprovecha entero." if q == 1 else ("\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo." if q > .5 else "\nSin pH−, el agua del grifo (pH 7,5) bloquea la mitad del abono.")))
+			await say(("Echas una dosis de ABONO DE CRECIMIENTO. Crecerá más deprisa." if veg else "Echas una dosis de ABONO. Dará más cosecha.") + (("\nCon el medidor, el pH al %s: lo aprovecha entero." % Datos.coma(D.ABONO.ph[2])) if q == D.ABONO.q[2] else ("\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo." if q > D.ABONO.q[0] else "\nSin pH−, el agua del grifo (pH %s) bloquea %d %% del abono." % [Datos.coma(D.ABONO.ph[0]), Datos.jsround((1 - D.ABONO.q[0]) * 100)])))
 		else:
 			await say("No te queda ABONO.")
 	elif op == "Tratar plaga":
@@ -385,7 +385,7 @@ func extras_libres(ci: int) -> Array:
 
 # abono, pH y EC (1.11, 09-cultivo): lo que aprovecha la dosis (con pH− y medidor, 1; a ojo, .75; sin pH−, .5) y su texto
 func abono_q() -> float:
-	return (1.0 if S.items.get("medidor", 0) else .75) if S.items.get("phm", 0) > 0 else .5
+	return float(D.ABONO.q[(2 if S.items.get("medidor", 0) else 1) if S.items.get("phm", 0) > 0 else 0])
 
 func _fv(p: Dictionary) -> float:
 	return float(p.fv) if p.get("fv") != null else 0.0
@@ -400,7 +400,7 @@ func abono_txt(p: Dictionary) -> String:
 	if S.items.get("medidor", 0) and L.size():
 		var ec := Datos.jsround((.4 + (.7 if _fv(p) > 0 else 0.0) + (.9 if p.fert else 0.0)) * 10) / 10.0
 		var q := minf(_fv(p) if _fv(p) > 0 else 1.0, Cultivo.fq(p) if p.fert else 1.0)
-		t += " · EC %s · pH %s" % [Datos.coma(ec), Datos.coma(6.2 if q >= 1 else (6.6 if q >= .75 else 7.5))]
+		t += " · EC %s · pH %s" % [Datos.coma(ec), Datos.coma(D.ABONO.ph[2] if q >= D.ABONO.q[2] else (D.ABONO.ph[1] if q >= D.ABONO.q[1] else D.ABONO.ph[0]))]
 	return t
 
 # el goteo llega lleno y las garrafas que hubiera vuelven a la mochila; las garrafas llegan llenas; un kit de extracción

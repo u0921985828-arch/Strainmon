@@ -15,6 +15,7 @@ Genética por generaciones, policía por niveles con aviso y accesorios de carpa
   - **Clima por carpa:** de día, el foco calienta la carpa (el sodio más que el CFL, el LED lo que menos) y cada planta suma humedad; el extractor se lleva casi todo. PLANTAS enseña el caudal y, con termohigrómetro, el clima de dentro. Fuera de rango, crecen menos; con humedad de noche en flor, moho (el aviso de la mañana lo dice por carpa).
   - **Ventilador:** crecen un 3 % más, la mitad de moho y plagas × 0,7.
   - **Abono por fases y pH/EC:** abono de crecimiento (12 €, crecen hasta un 15 % más en vegetativo) además del de floración; **pH−** (6 €, 10 dosis): sin él, el abono rinde la mitad, y con él, tres cuartos; con el **medidor de pH/EC** (35 €), entero, y PLANTAS enseña la EC y el pH de cada maceta.
+- Las cifras de los textos salen de las constantes del juego (`NIVEL_POLI`, `INTRA`, `VENT`, `ABONO`, `RENUEVA`, `FILTRO_X`), también en Godot: si cambia una, cambia el texto.
 - Tests: `npm test` 86/86 (pasos nuevos de la genética, la orden de registro, la redada con la caja y los accesorios); `npm run analisis` con los niveles, la orden y la redada nueva jugados (`docs/ANALISIS.md` § 2.7).
 
 ## App de Android 0.4.0 (Godot) · 9 de octubre de 2026

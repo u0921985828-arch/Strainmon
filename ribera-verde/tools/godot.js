@@ -229,7 +229,7 @@ function atlasCarpa() {
       STRAINS: Object.fromEntries(ids.map(k => { const s = STRAINS[k]; return [k, { n: s.n, thc: s.thc, y: s.y, d: s.d, r: s.r, c: s.c, ind: indDe(k), hj: hojaDe(k), tipo: tipoGen(k) }]; })),
       DEX: ids, GENETICA, CARPAS, FOCOS, MACETAS, PLANTA_CM, MACETA_CM, FOCO_CM, FOCO_SEP, FOCO_FASE, CICLOS, VEG_TOPE, CORTA_REND, HOLGURA, VCA, VC_FILA, VC_TIERRA, LUZ_C, VC_HOJA, VC_SECA, VC_AGUA,
       Y_MEDIA, W_M2, GEN_ESTABLE, TIPO_GEN, KWH, H_LUZ, H_24, EXTRAS, FENO_ESTRELLA, FENO_FLOJO, SEMILLA_HERMA,
-      MESES, MES0, T_MES, HR_MES, CALOR_W, HR_PLANTA, HR_NOCHE, HR_FILTRO, T_FILTRO, KT, EXT_W, HR_CARPA, INTRA, OLOR_MAL, KITS, T_OK, HR_OK, H_DIA, MOHO, APARATOS, GARRAFA_X, GOTEO_X, LITROS_M2,
+      MESES, MES0, T_MES, HR_MES, CALOR_W, HR_PLANTA, HR_NOCHE, HR_FILTRO, T_FILTRO, KT, EXT_W, HR_CARPA, INTRA, OLOR_MAL, KITS, RENUEVA, FILTRO_X, VENT, ABONO, T_OK, HR_OK, H_DIA, MOHO, APARATOS, GARRAFA_X, GOTEO_X, LITROS_M2,
       FEM: SHOP.filter(it => it.sid).map(it => it.sid) };   // FEM: las feminizadas (las de tienda)
     // tono y porte por % índica
     o.hojas = [];

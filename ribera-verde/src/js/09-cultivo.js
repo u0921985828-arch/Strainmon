@@ -40,11 +40,11 @@ const litrosCarpa=ci=>huecos().reduce((a,q,i)=>a+(q.c===ci?(MACETAS[S.macetas[i]
 // (1.11) Tres kits de extracción (extractor + filtro de carbón, KITS: m3 = m³/h): uno por carpa, el que pongas devuelve el otro a la
 // mochila (filtro es el de 125 mm de antes). El intractor mete aire de fuera: sin él, el extractor rinde ×INTRA
 const EXTRAS={
-  vent:{n:'Ventilador de pinza',c:'Ventilador',w:25,d:'Mueve el aire de la carpa: plagas ×0,7, moho ×0,5 y crecen un 3 % más. Gasta 25 W día y noche.'},
+  vent:{n:'Ventilador de pinza',c:'Ventilador',w:25,d:''},
   filtro:{n:'Extractor de 125 mm con filtro de carbón',c:'Extractor 125 mm',w:75,m3:400},
   garrafas:{n:'Garrafas de riego',c:'Garrafas',pl:true,w:0,d:'Una garrafa con gotero junto a cada maceta: riega sola la planta que baja del 50 % de agua y le dura media cosecha. Se rellenan desde la vista de carpa.'},
   goteo:{n:'Riego por goteo',c:'Goteo',w:0,d:'Depósito grande con bomba y goteros para toda la carpa: riega solo cada planta que baja del 50 % de agua y, con la carpa llena de tierra, dura unas cinco cosechas. Se rellena desde la vista de carpa. Con él, las garrafas sobran.'},
-  intra:{n:'Intractor de 100 mm',c:'Intractor',w:25,d:'Mete aire fresco de fuera por abajo: el extractor rinde entero (sin él, un 15 % menos). Gasta 25 W día y noche.'},
+  intra:{n:'Intractor de 100 mm',c:'Intractor',w:25,d:''},
   filtro100:{n:'Extractor de 100 mm con filtro de carbón',c:'Extractor 100 mm',w:35,m3:250},
   filtro150:{n:'Extractor de 150 mm con filtro de carbón',c:'Extractor 150 mm',w:110,m3:750}};
 const KITS=['filtro150','filtro','filtro100'],kitDe=c=>c&&KITS.find(k=>c[k])||null;
@@ -52,8 +52,9 @@ const KITS=['filtro150','filtro','filtro100'],kitDe=c=>c&&KITS.find(k=>c[k])||nu
 // sudan HR_CARPA puntos cada una; el extractor saca la parte e (extCarpa, de 0 a 1) del calor (×0,75) y de la humedad (×0,8). La
 // carpa pide su volumen × 60 renovaciones por hora × 1,3 (lo que frena el filtro) + EXT_W m³/h por vatio del foco (el sodio, más)
 const KT={cfl:.012,sodio:.015,led:.005},EXT_W={cfl:.3,sodio:.5,led:.2},HR_CARPA=1.5,INTRA=.85,OLOR_MAL=.7;
-for(const k of KITS)EXTRAS[k].d=`Saca el aire de la carpa por un filtro de carbón: sin olor, menos calor y menos humedad. Mueve ${EXTRAS[k].m3} m³/h; cada carpa pide su volumen × 60 por hora (× 1,3 por el filtro) y más con focos que calientan. Corto de caudal, huele algo. Gasta ${EXTRAS[k].w} W día y noche.`;
-const caudalPide=ci=>{const c=S.carpas[ci],[W,H,D]=CARPAS[c.t].cm,F=FOCOS[c.foco];return Math.round(W*H*D/1e6*60*1.3+F.w*EXT_W[F.tipo]);};
+// (1.11) el caudal que pide una carpa: su volumen RENUEVA veces por hora, × FILTRO_X por lo que frena el filtro de carbón; el ventilador
+const RENUEVA=60,FILTRO_X=1.3,VENT={crec:1.03,plaga:.7,moho:.5},pct0=x=>Math.round(x*100);
+const caudalPide=ci=>{const c=S.carpas[ci],[W,H,D]=CARPAS[c.t].cm,F=FOCOS[c.foco];return Math.round(W*H*D/1e6*RENUEVA*FILTRO_X+F.w*EXT_W[F.tipo]);};
 const extCarpa=ci=>{const c=S.carpas[ci],k=kitDe(c);return k?Math.min(1,EXTRAS[k].m3/caudalPide(ci))*(c.intra?1:INTRA):0;};
 const extTxt=ci=>{const c=S.carpas[ci],k=kitDe(c);return `${k?EXTRAS[k].c+': '+EXTRAS[k].m3:'Sin extractor: 0'} de ${caudalPide(ci)} m³/h${k&&!c.intra?' · sin intractor':''}`;};
 function climaCarpa(ci,noche=isNight()){
@@ -77,6 +78,10 @@ const CICLOS={
     d:'12 h de luz y 12 de noche: florecen ya. Si aún son pequeñas, crecen menos y cosechas menos.'}};
 const VEG_TOPE=.649,CORTA_REND=.4,cicloDe=c=>c&&Object.hasOwn(CICLOS,c.ciclo)?c.ciclo:'auto';
 const signo=v=>(v>=0?'+':'−')+String(Math.abs(Math.round(v))),pc=(t,f)=>Math.abs(f-1)<.001?'':` · ${t} ${signo((f-1)*100)}%`,coma=n=>String(n).replace('.',',');
+// los textos del equipo de extracción y del ventilador (1.11), con sus cifras
+EXTRAS.vent.d=`Mueve el aire de la carpa: plagas ×${coma(VENT.plaga)}, moho ×${coma(VENT.moho)} y crecen un ${pct0(VENT.crec-1)} % más. Gasta ${EXTRAS.vent.w} W día y noche.`;
+EXTRAS.intra.d=`Mete aire fresco de fuera por abajo: el extractor rinde entero (sin él, un ${pct0(1-INTRA)} % menos). Gasta ${EXTRAS.intra.w} W día y noche.`;
+for(const k of KITS)EXTRAS[k].d=`Saca el aire de la carpa por un filtro de carbón: sin olor, menos calor y menos humedad. Mueve ${EXTRAS[k].m3} m³/h; cada carpa pide su volumen × ${RENUEVA} por hora (× ${coma(FILTRO_X)} por el filtro) y más con focos que calientan. Corto de caudal, huele algo. Gasta ${EXTRAS[k].w} W día y noche.`;
 const gm2=s=>Math.round(W_M2*.85*1.25*s.y/Y_MEDIA/10)*10;   // g/m² de la ficha: LED a 400 W/m², abonada, variedad sana
 const kwhFoco=k=>Math.round(FOCOS[k].w*H_LUZ/1000);
 const descFoco=k=>{const F=FOCOS[k];return `${F.w} W · ilumina ${F.lado}×${F.lado} cm · ${coma(F.gpw)} g/W (${coma(Math.round(F.gpw*1.25*100)/100)} abonando)${pc('crece',F.crec)}${F.thc?' · THC +'+pct(F.thc):''} · riego ×${coma(F.agua)}\nLuz: ${kwhFoco(k)} kWh (${eur(kwhFoco(k)*KWH)}) al día con plantas.`;};
@@ -93,18 +98,20 @@ function huecos(){
 function factores(i){
   const h=huecos()[i],c=S.carpas[h.c],C=CARPAS[c.t],F=FOCOS[c.foco],M=MACETAS[S.macetas[i]]||MACETAS.plastico7;
   const dens=Math.min(1,F.w/(C.cm[0]*C.cm[2]/1e4*W_M2)),cl=climaCarpa(h.c);
-  return {g:F.w*F.gpw/C.plazas*M.rend,cap:M.cap,crec:F.crec*(.85+.15*dens)*M.crec*fClima(cl)*(c.vent?1.03:1),thc:F.thc*dens,agua:F.agua*M.agua,plaga:M.plaga*(c.vent?.7:1),dens,hr:cl.hr,moho:c.vent?.5:1,ciclo:cicloDe(c)};
+  return {g:F.w*F.gpw/C.plazas*M.rend,cap:M.cap,crec:F.crec*(.85+.15*dens)*M.crec*fClima(cl)*(c.vent?VENT.crec:1),thc:F.thc*dens,agua:F.agua*M.agua,plaga:M.plaga*(c.vent?VENT.plaga:1),dens,hr:cl.hr,moho:c.vent?VENT.moho:1,ciclo:cicloDe(c)};
 }
 /* ---------- abono, pH y EC (1.11) ----------
    Dos abonos: el de floración (p.fert: cosecha × 1,25, THC + 0,3 y crece × 1,1) y el de crecimiento (p.fv: crece × 1,15 hasta
    florecer). Al echar una dosis se corrige el pH si tienes pH− (gasta 1): con el medidor, al 6,2 y lo aprovecha entero (1); a
    ojo, 0,75; sin pH−, el agua del grifo (pH 7,5) bloquea la mitad (0,5). p.fq y p.fv guardan lo que aprovecha cada uno (sin p.fq,
    partida vieja: entero). Con el medidor, PLANTAS enseña la EC y el pH de cada maceta */
-const abonoQ=()=>S.items.phm>0?S.items.medidor?1:.75:.5,fq=p=>p.fert?p.fq??1:0;
-const ecDe=p=>Math.round((.4+(p.fv?.7:0)+(p.fert?.9:0))*10)/10,phDe=p=>{const q=Math.min(p.fv||1,p.fert?fq(p):1);return q>=1?6.2:q>=.75?6.6:7.5;};
+// ABONO: rend (cosecha +), thc (+), crec (crece ×1+), veg (el de crecimiento), q y ph: [sin pH−, a ojo, con medidor]
+const ABONO={rend:.25,thc:.3,crec:.1,veg:.15,q:[.5,.75,1],ph:[7.5,6.6,6.2]};
+const abonoQ=()=>ABONO.q[S.items.phm>0?S.items.medidor?2:1:0],fq=p=>p.fert?p.fq??1:0;
+const ecDe=p=>Math.round((.4+(p.fv?.7:0)+(p.fert?.9:0))*10)/10,phDe=p=>{const q=Math.min(p.fv||1,p.fert?fq(p):1);return q>=ABONO.q[2]?ABONO.ph[2]:q>=ABONO.q[1]?ABONO.ph[1]:ABONO.ph[0];};
 const abonoTxt=p=>{const L=(p.fv?['crecimiento']:[]).concat(p.fert?['floración']:[]);return (L.length?'Abonada ('+L.join(' y ')+')':'Sin abonar')+(S.items.medidor&&L.length?` · EC ${coma(ecDe(p))} · pH ${coma(phDe(p))}`:'');};
 // gramos de una planta al cosecharla (f: factores de su plaza)
-const gramosPlanta=(p,f)=>{const s=getStrain(p.sid),fe=p.f||{y:1};return Math.max(1,Math.round(Math.min(f.cap,f.g*s.y/Y_MEDIA*(.4+.6*p.health/100)*(1+.25*fq(p))*fe.y)*(1-CORTA_REND*(p.corta||0))));};
+const gramosPlanta=(p,f)=>{const s=getStrain(p.sid),fe=p.f||{y:1};return Math.max(1,Math.round(Math.min(f.cap,f.g*s.y/Y_MEDIA*(.4+.6*p.health/100)*(1+ABONO.rend*fq(p))*fe.y)*(1-CORTA_REND*(p.corta||0))));};
 const plantasVivas=ci=>huecos().some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead);
 const enFlor=ci=>huecos().some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead&&S.pots[i].prog>=.65);
 const olorDia=()=>S.carpas.reduce((a,c,ci)=>a+(c&&enFlor(ci)?!kitDe(c)?OLOR:extCarpa(ci)<OLOR_MAL?1:0:0),0);
@@ -114,7 +121,7 @@ function plantStep(p,h,f){
   if(p.dead)return;const s=getStrain(p.sid);
   p.water=Math.max(0,p.water-3.5*h*f.agua);
   if(!p.pest&&p.prog<1&&Math.random()<.006*h*(100-s.r)/40*f.plaga)p.pest=true;
-  let g=h/(s.d*24)*f.crec;if(p.water<20)g*=.4;if(p.water<=0)g=0;g*=1+.1*fq(p);if(p.fv&&p.prog<.65)g*=1+.15*p.fv;
+  let g=h/(s.d*24)*f.crec;if(p.water<20)g*=.4;if(p.water<=0)g=0;g*=1+ABONO.crec*fq(p);if(p.fv&&p.prog<.65)g*=1+ABONO.veg*p.fv;
   if(p.prog<1){
     if(f.ciclo==='veg'&&p.prog<.65)g=Math.max(0,Math.min(g,VEG_TOPE-p.prog));   // madre: no pasa de vegetativo (si ya florece, sigue)
     else if(f.ciclo==='flor'&&p.prog>=.35&&p.prog<.65){const e=Math.min(g,(.65-p.prog)/2);p.corta=Math.min(1,(p.corta||0)+e/.15);g+=e;}
@@ -137,7 +144,7 @@ function newDay(){
   if(S.protect&&S.protHasta&&S.day>S.protHasta){S.protect=false;queue('cuota',()=>talk('SMS · MOLINA',['Se acabó lo pagado.','Si quieres que mis agentes sigan mirando hacia otro lado, ya sabes dónde está la comisaría.']));}
   // la policía (1.11, NIVEL_POLI): con la orden de ayer, la redada; con 90 o más, la orden (y el aviso), o Molina la para
   if(S.orden&&S.day>S.orden)queue('raid',raidEvent);
-  else if(!S.orden&&S.heat>=90){if(S.protect)queue('raid',raidEvent);else{S.orden=S.day;queue('orden',avisoOrden);}}
+  else if(!S.orden&&S.heat>=NIVEL_POLI[3][0]){if(S.protect)queue('raid',raidEvent);else{S.orden=S.day;queue('orden',avisoOrden);}}
   S.heat=Math.max(0,S.heat-bajaCalor());
   const luz=facturaLuz(),olor=olorDia(),av=[];S.luz={d:S.day,e:luz,o:olor};if(luz>0){pagarCasa(luz);av.push('Factura de la luz: −'+eur(luz));}   // de lo de fuera y, si no llega, de la caja (1.10)
   if(olor){S.heat=Math.min(100,S.heat+olor);av.push('Olor a cogollo: calor +'+olor);}   // después de bajar el calor: cuenta para la redada de mañana
@@ -204,7 +211,7 @@ async function potAction(i){
   const op=opts[c];
   if(op==='Regar'){const [vx,vy]=posPlaza(i);await accion('regar',{id:'vfx-gotas',x:vx,y:vy-6});p.water=100;sfx('sel');await say('Riegas la planta. Agua al 100%.');}
   else if(op==='Abonar'){if(veg||S.items.fert>0){const q=abonoQ();if(S.items.phm>0)S.items.phm--;if(veg){S.items.fertv--;p.fv=q;}else{S.items.fert--;p.fert=true;p.fq=q;}sfx('sel');
-    await say((veg?'Echas una dosis de ABONO DE CRECIMIENTO. Crecerá más deprisa.':'Echas una dosis de ABONO. Dará más cosecha.')+(q===1?'\nCon el medidor, el pH al 6,2: lo aprovecha entero.':q>.5?'\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo.':'\nSin pH−, el agua del grifo (pH 7,5) bloquea la mitad del abono.'));}else await say('No te queda ABONO.');}
+    await say((veg?'Echas una dosis de ABONO DE CRECIMIENTO. Crecerá más deprisa.':'Echas una dosis de ABONO. Dará más cosecha.')+(q===ABONO.q[2]?`\nCon el medidor, el pH al ${coma(ABONO.ph[2])}: lo aprovecha entero.`:q>ABONO.q[0]?'\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo.':`\nSin pH−, el agua del grifo (pH ${coma(ABONO.ph[0])}) bloquea ${pct0(1-ABONO.q[0])} % del abono.`));}else await say('No te queda ABONO.');}
   else if(op==='Tratar plaga'){if(S.items.insect>0){S.items.insect--;p.pest=false;sfx('sel');await say('Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.');}else await say('No tienes INSECTICIDA. Kiko lo vende.');}
   else if(op==='Sacar esqueje')await sacarEsqueje(i);
   else if(op==='Arrancar'){if(await ask('¿Seguro que quieres arrancarla?',['Sí','No'])===0){S.pots[i]=null;await say('Arrancas la planta.');}}
@@ -263,7 +270,7 @@ const SEMILLA_HERMA=.12;
 async function harvest(i){
   const p=S.pots[i],s=getStrain(p.sid),f=factores(i),fe=p.f||{t:1,y:1},cl=claseFeno(p.f);
   const g=gramosPlanta(p,f);
-  const thc=Math.min(35,Math.round((s.thc*fe.t*(.85+.15*p.health/100)+f.thc+.3*fq(p))*10)/10);
+  const thc=Math.min(35,Math.round((s.thc*fe.t*(.85+.15*p.health/100)+f.thc+ABONO.thc*fq(p))*10)/10);
   const [vx,vy]=posPlaza(i);await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:vx,y:vy-12});
   const cria=genDe(p.sid)<GEN_ESTABLE,fem=SHOP.some(it=>it.sid===p.sid),n=cria?ri(2,5):!fem||Math.random()<SEMILLA_HERMA?ri(1,3):0;
   const lk=cl==='estrella'?p.sid+'*':p.sid;addBuds(lk,g,thc);if(n)addSeeds(p.sid,n);

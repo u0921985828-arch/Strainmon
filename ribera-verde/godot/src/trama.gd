@@ -850,11 +850,11 @@ func mochila() -> void:
 			rows.append({"label": "Caja fuerte", "right": "%s · %d g%s" % [Datos.eur(caja_e()), int(floor(caja_g())), (" · " + Datos.coma(Datos.jsround(caja_r() * 10) / 10.0) + " g rosin") if caja_r() >= .1 else ""], "ic": icono("billetes"),
 				"desc": "%s, detrás del diploma. Caben %s y %s.\nLo que está dentro no lo llevas encima." % [CJ.n, Datos.eur(CJ.money), _kg(int(CJ.g))]})
 		rows.append_array([{"label": "Vida", "right": "%s/%s" % [n(S.hp), n(S.hpMax)], "desc": "Se recupera durmiendo, comiendo o con el tiempo."},
-			{"label": "Abono (dosis)", "right": "×" + n(S.items.fert), "ic": icono("abono"), "desc": "De floración. Una por planta: +25% de cosecha, con el pH corregido."}])
+			{"label": "Abono (dosis)", "right": "×" + n(S.items.fert), "ic": icono("abono"), "desc": "De floración. Una por planta: +%d %% de cosecha, con el pH corregido." % Datos.jsround(D.ABONO.rend * 100)}])
 		if S.items.get("fertv", 0) > 0:
-			rows.append({"label": "Abono de crecimiento", "right": "×" + n(S.items.fertv), "ic": icono("abono"), "desc": "Una por planta en crecimiento: crece un 15 % más deprisa hasta florecer."})
+			rows.append({"label": "Abono de crecimiento", "right": "×" + n(S.items.fertv), "ic": icono("abono"), "desc": "Una por planta en crecimiento: crece un %d %% más deprisa hasta florecer." % Datos.jsround(D.ABONO.veg * 100)})
 		if S.items.get("phm", 0) > 0:
-			rows.append({"label": "pH− (dosis)", "right": "×" + n(S.items.phm), "ic": icono("abono"), "desc": "Se gasta una con cada dosis de abono: baja el pH del agua al 6,2."})
+			rows.append({"label": "pH− (dosis)", "right": "×" + n(S.items.phm), "ic": icono("abono"), "desc": "Se gasta una con cada dosis de abono: baja el pH del agua al %s." % Datos.coma(D.ABONO.ph[2])})
 		if S.items.get("medidor", 0):
 			rows.append({"label": "Medidor de pH y EC", "right": "×1", "desc": "Con él corriges el pH justo y ves la EC y el pH de cada maceta en PLANTAS."})
 		rows.append_array([{"label": "Insecticida (tratamientos)", "right": "×" + n(S.items.insect), "ic": icono("insecticida"), "desc": "Úsalo en una maceta con plaga."},

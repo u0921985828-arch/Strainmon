@@ -485,9 +485,9 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Semillas Kali Mist | 10 € | 4 |  |
 | Semillas California Orange | 8 € | 4 |  |
 | Semillas Chemdawg | 12 € | 5 |  |
-| Abono de floración 1 L | 14 € | 1 | 4 dosis. Una por planta: +25% de cosecha, con el pH corregido (sin pH−, la mitad). |
-| Abono de crecimiento 1 L | 12 € | 1 | 4 dosis. Una por planta en crecimiento: crece un 15 % más deprisa hasta florecer (sin pH−, la mitad). |
-| pH− 250 ml | 6 € | 1 | 10 dosis. Se gasta una con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. Sin él, el abono rinde la mitad; sin medidor, a ojo (×0,75). |
+| Abono de floración 1 L | 14 € | 1 | 4 dosis. Una por planta: +25 % de cosecha, con el pH corregido (sin pH−, ×0,5). |
+| Abono de crecimiento 1 L | 12 € | 1 | 4 dosis. Una por planta en crecimiento: crece un 15 % más deprisa hasta florecer (sin pH−, ×0,5). |
+| pH− 250 ml | 6 € | 1 | 10 dosis. Se gasta una con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. Sin él, el abono rinde ×0,5; sin medidor, a ojo (×0,75). |
 | Medidor de pH y EC | 35 € | 2 | Mide el pH y la EC del riego: con pH−, el abono rinde entero, y en PLANTAS ves la EC y el pH de cada maceta. |
 | Insecticida de neem 500 ml | 12 € | 1 | 3 tratamientos. Cada uno elimina una plaga de araña roja. |
 | Bocata | 5 € | 1 | Recupera 15 de vida. En combate o desde la mochila. |

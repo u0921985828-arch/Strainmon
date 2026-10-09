@@ -971,7 +971,7 @@ func multa_redada(plantas: int, g: int) -> int:
 func heat_warn() -> void:
 	if S.heat >= 70 and not S.flags.get("heatW"):
 		S.flags.heatW = true
-		toast("<small>CUIDADO</small>La policía investiga. Si el calor llega a 90 al cambiar el día, habrá orden de registro.", 3200)
+		toast("<small>CUIDADO</small>La policía investiga. Si el calor llega a %d al cambiar el día, habrá orden de registro." % int(D.NIVEL_POLI[3][0]), 3200)
 	if S.heat < 60:
 		S.flags.heatW = false
 
