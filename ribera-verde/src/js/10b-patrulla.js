@@ -14,7 +14,7 @@ const PATRULLAS={town:[1,2],alto:[2,2],astilleros:[1,1],puerto:[1,1],valdehierro
 const PAT={paso:[420,360],corre:[210,180],alto:600,vista:[5,5],sube:[1,2.5],baja:10,vende:60,pierde:10,olvida:4000,tregua:30000};
 const CALLE=/^(walk|roadT|roadB|rotoT|rotoB|hormigon|pista|plaza|dirt|dock|bridgeT|bridgeB)$/,TAPA_VISTA=/^(tree|tree2|manzano|monte|monte2|seto|crate)$/;
 let SOSP={v:0,alarma:null,sinVer:0,aviso:0,tregua:0};
-const nPatrullas=()=>{const p=PATRULLAS[S.map];return p&&S.ch>=2?p[isNight()?1:0]:0;};
+const nPatrullas=()=>{const p=PATRULLAS[S.map],n=p&&S.ch>=2?p[isNight()?1:0]:0;return n&&nivelPoli()>=2?n+1:n;};   // investigación (1.11): una más
 // lo que enseña la barra del HUD (updateHUD guarda el último en hudSosp): si cambia, el HUD se rehace sin esperar a su cuarto de segundo
 const sospHUD=()=>nPatrullas()?(SOSP.alarma?'A':Math.round(SOSP.v)):'';let hudSosp='';
 const cargaSosp=()=>totalBuds()+totalRosin();

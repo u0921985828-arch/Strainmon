@@ -854,7 +854,7 @@ func _carpa_fondo() -> void:
 		_goteo()
 	for e in Vista.temporizador(g.tx, g.ty, Cultivo.ciclo_de(c), J.plantas_vivas(J.VC.ci)):
 		_rect(e[0], e[1], e[2], e[3], e[4])
-	if c.get("filtro"):
+	if Cultivo.kit_de(c) != "":
 		var e := Procedural.extra34("filtro")
 		var p: Array = Vista.punto(g, g.W * .55, g.D * .85, g.H - 24)
 		var fy: int = maxi(p[1], g.techo + e.get_height() - 1) if g.has("plata") else p[1]

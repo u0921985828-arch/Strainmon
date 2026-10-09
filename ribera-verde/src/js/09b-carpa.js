@@ -253,7 +253,8 @@ function renderCarpaC(g,now){
   pintaRects(vcTemp(g.tx,g.ty,cicloDe(c),on));
   // el filtro de carbón, colgado del techo arriba a la izquierda (el extractor tiembla 1 px), y el ventilador de pinza en el poste del
   // fondo derecho, a 55 cm del suelo, siempre girando
-  if(c.filtro){const f=vcSprite('extra-c-filtro-',(c.t==='p60'||c.t==='p80'?30:50)*vc.Z,1).f.c;ctx.drawImage(f,vc.xl+10-47+Math.floor(now/90)%2,3-(f.height-vcAlto(f)));}
+  const kk=kitDe(c);   // (1.11) el kit de 100 mm, a 30 cm; el de 150, a 50; el de 125, según la carpa
+  if(kk){const f=vcSprite('extra-c-filtro-',(kk==='filtro100'||kk==='filtro'&&(c.t==='p60'||c.t==='p80')?30:50)*vc.Z,1).f.c;ctx.drawImage(f,vc.xl+10-47+Math.floor(now/90)%2,3-(f.height-vcAlto(f)));}
   if(c.vent)ctx.drawImage(frameDe(ARTE.cubre['misc:extra-c-vent'],'extra-c-vent','unica',0,{i:Math.floor(now/70)}).c,xr+1-24,VCA.fondo-Math.round(55*vc.Z)-47);
   const fsel=(g.pl.find(q=>q.i===VC.sel)||{fila:0}).fila,lg=vc.lg;let fa=null;
   for(const q of [...g.pl].sort((a,b)=>a.y-b.y||a.x-b.x)){ctx.globalAlpha=q.fila<fsel?.35:1;if(lg&&q.fila!==fa){fa=q.fila;vcRamal(lg,fa);}vcPlantaC(q,now);}
@@ -483,7 +484,7 @@ function renderCarpa(now,soloB){
   if(g.plata)pinta(g.plata,120,157);else{const cv=carpa34(c.t);ctx.drawImage(cv,g.x0-1,g.yf+2-cv.height);}
   if(c.goteo&&g.plata)goteo();
   pintaRects(vcTemp(g.tx,g.ty,cicloDe(c),on));
-  if(c.filtro){const e=extra34('filtro'),[fx,fy0]=P(W*.55,D*.85,H-24),fy=g.plata?Math.max(fy0,g.techo+e.height-1):fy0;ctx.drawImage(e,fx-(e.width>>1),fy-e.height+1);}
+  if(kitDe(c)){const e=extra34('filtro'),[fx,fy0]=P(W*.55,D*.85,H-24),fy=g.plata?Math.max(fy0,g.techo+e.height-1):fy0;ctx.drawImage(e,fx-(e.width>>1),fy-e.height+1);}
   if(c.vent){const e=extra34('vent'),[vx,vy]=P(2,D*.8,110);ctx.drawImage(e,vx,vy-e.height+1);}
   ctx.save();ctx.beginPath();if(g.plata)ctx.rect(g.x0,0,g.w,SH);else ctx.rect(g.x0+1,0,g.w+g.s-1,SH);ctx.clip();   // la luz y las copas no salen de la carpa por los lados
   if(on){ctx.globalCompositeOperation='lighter';const a=.05+.09*Math.min(1,F.w/600),lw=Math.round((FOCO_CM[c.foco]||40)*VB_M/2),hw=g.w/2+g.s;

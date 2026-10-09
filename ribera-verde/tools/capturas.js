@@ -83,7 +83,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
   await page.waitForTimeout(200); for (let i = 0; i < 10; i++) { await page.keyboard.press('ArrowDown'); await page.waitForTimeout(40); }
   await shot('09-genoteca.png'); await reset();
 
-  await page.evaluate(() => { say('Nueva variedad: Critical Kush.'); discover('reina'); });
+  await page.evaluate(() => { say('Nueva variedad: Critical Kali Mist.'); discover('reina'); });
   await page.waitForTimeout(1200); await shot('10-cruce.png'); await reset();
 
   await page.evaluate(() => { enterMap('shop', 4, 4, 'up'); shop(); });

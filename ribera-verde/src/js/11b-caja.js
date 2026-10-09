@@ -3,10 +3,10 @@
    ========================================================= */
 // la caja: C, la de la tía Maite, detrás del diploma de la Copa de 1998 (la pista está en sus notas del ordenador): 20.000 € y
 // 2 kg; B, la empotrada, por el ordenador desde el capítulo 4 (CAJA_P, la instala Kiko al día siguiente): 50.000 € y 2,5 kg.
-// Lo que hay dentro no va encima: no cuenta para los encuentros ni te lo quitan un control, un ladrón o Darko. En una redada la
-// encuentran 1 de cada 4 veces (CAJA_REDADA). El rosin (con la prensa) va en S.caja.rosin, que no existe hasta que guardas el
+// Lo que hay dentro no va encima: no cuenta para los encuentros ni te lo quitan un control, un ladrón o Darko. En una redada no la
+// tocan (1.11: raidEvent; solo pagan de ella la multa que no llegue de fuera). El rosin (con la prensa) va en S.caja.rosin, que no existe hasta que guardas el
 // primero, y ocupa el hueco de los cogollos. La luz y lo que se compra por el ordenador se pagan de fuera y, si no llega, de la caja
-const CAJA=[null,{n:'La caja de la tía',money:20000,g:2000},{n:'La caja empotrada',money:50000,g:2500}],CAJA_P=380,CAJA_REDADA=.25,CAJA_ANIO=1998,MAITE_CAJA=300;
+const CAJA=[null,{n:'La caja de la tía',money:20000,g:2000},{n:'La caja empotrada',money:50000,g:2500}],CAJA_P=380,CAJA_ANIO=1998,MAITE_CAJA=300;
 const cajaG=()=>S.caja?Object.values(S.caja.buds).reduce((a,b)=>a+b.g,0):0,cajaE=()=>S.caja?S.caja.money:0;
 const cajaR=()=>S.caja&&S.caja.rosin?Object.values(S.caja.rosin).reduce((a,b)=>a+b.g,0):0;
 // pagar desde el piso: primero lo de fuera y después la caja. Devuelve lo que falta

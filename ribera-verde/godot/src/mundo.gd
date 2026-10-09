@@ -202,7 +202,7 @@ func strain_line(k: String) -> String:
 	var G: Dictionary = D.GENETICA[Cultivo.tipo_gen(S, k)]
 	var pa = D.PADRES.get(k)
 	return "THC %s%% · ~%d g/m² · %s días · Resist. %s%%\n%s\n%s%s: %s. Estrella: 1 de cada ~%s.\n%s" % [Datos.pct(s.thc), gm2(s), Datos.coma(s.d), n(s.r),
-		linea_ind(k), G.n, (" (" + pa + ")") if pa else "", G.d, Datos.miles(G.uno), s.o]
+		linea_ind(k), G.n, (" (" + pa + ")") if pa else "", G.d, Datos.miles(G.uno), (str(int(s.gen)) + ".ª generación · " if s.get("gen") else "") + s.o]
 
 func discover(sid: String) -> void:
 	if not S.disc.get(sid):
@@ -952,10 +952,26 @@ func talk_client(c: Dictionary) -> void:
 		remove_client(c.id)
 		await say(pick(["¿Tanto? No.", "A ese precio, paso.", "Eso es demasiado. Adiós."]), N)
 
+# policía por niveles (1.11, 11-historia): el nivel por el calor (con la orden, 3), lo que baja cada día y la multa de la redada
+func nivel_poli() -> int:
+	if S.get("orden"):
+		return 3
+	var n := 0
+	for i in D.NIVEL_POLI.size():
+		if S.heat >= D.NIVEL_POLI[i][0]:
+			n = i
+	return n
+
+func baja_calor() -> float:
+	return D.NIVEL_POLI[nivel_poli()][2] * (1.5 if S.protect else 1.0)
+
+func multa_redada(plantas: int, g: int) -> int:
+	return mini(int(D.MULTA_TOPE), int(D.MULTA_REDADA) + int(D.MULTA_PLANTA) * plantas + int(D.MULTA_G) * g)
+
 func heat_warn() -> void:
 	if S.heat >= 70 and not S.flags.get("heatW"):
 		S.flags.heatW = true
-		toast("<small>CUIDADO</small>Mucha presión policial. Si llega a 90 habrá registro.", 3200)
+		toast("<small>CUIDADO</small>La policía investiga. Si el calor llega a 90 al cambiar el día, habrá orden de registro.", 3200)
 	if S.heat < 60:
 		S.flags.heatW = false
 
@@ -978,7 +994,8 @@ func re_calle() -> RegEx:
 
 func n_patrullas() -> int:
 	var p = D.PATRULLAS.get(S.map)
-	return int(p[1 if is_night() else 0]) if p != null and S.ch >= 2 else 0
+	var k := int(p[1 if is_night() else 0]) if p != null and S.ch >= 2 else 0
+	return k + 1 if k and nivel_poli() >= 2 else k   # investigación (1.11): una más
 
 # lo que enseña la barra del HUD: si cambia, el HUD se rehace sin esperar a su cuarto de segundo
 func sosp_hud():

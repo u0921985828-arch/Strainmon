@@ -33,8 +33,8 @@ func olor_dia() -> int:
 	var a := 0
 	for ci in S.carpas.size():
 		var c = S.carpas[ci]
-		if c and not c.get("filtro") and en_flor(ci):
-			a += int(D.OLOR)
+		if c and en_flor(ci):   # (1.11) sin extractor, OLOR; con uno corto de caudal, 1
+			a += int(D.OLOR) if Cultivo.kit_de(c) == "" else (1 if Cultivo.ext_carpa(S, ci) < D.OLOR_MAL else 0)
 	return a
 
 func luz_carpa(ci: int) -> int:
@@ -97,9 +97,16 @@ func new_day() -> void:
 	if S.protect and S.get("protHasta") and S.day > S.protHasta:
 		S.protect = false
 		queue("cuota", func(): await talk("SMS · MOLINA", ["Se acabó lo pagado.", "Si quieres que mis agentes sigan mirando hacia otro lado, ya sabes dónde está la comisaría."]))
-	if S.heat >= 90:
-		queue("raid", raid_event)   # antes de que el calor baje con el nuevo día
-	S.heat = max(0, S.heat - (20 if S.protect else 12))
+	# la policía (1.11, NIVEL_POLI): con la orden de ayer, la redada; con 90 o más, la orden (y el aviso), o Molina la para
+	if S.get("orden") and S.day > S.orden:
+		queue("raid", raid_event)
+	elif not S.get("orden") and S.heat >= 90:
+		if S.protect:
+			queue("raid", raid_event)
+		else:
+			S.orden = S.day
+			queue("orden", aviso_orden)
+	S.heat = max(0, S.heat - baja_calor())
 	var luz := factura_luz()
 	var olor := olor_dia()
 	var av := []
@@ -240,8 +247,9 @@ func pot_action(i: int) -> void:
 		if c == 0:
 			await harvest(i)
 		return
+	var veg: bool = p.prog < .65 and not (float(p.get("fv", 0) if p.get("fv") != null else 0) > 0) and S.items.get("fertv", 0) > 0
 	var opts := ["Regar"]
-	if not p.fert:
+	if not p.fert or veg:
 		opts.append("Abonar")
 	if p.pest:
 		opts.append("Tratar plaga")
@@ -258,11 +266,19 @@ func pot_action(i: int) -> void:
 		sfx("sel")
 		await say("Riegas la planta. Agua al 100%.")
 	elif op == "Abonar":
-		if S.items.fert > 0:
-			S.items.fert -= 1
-			p.fert = true
+		if veg or S.items.fert > 0:
+			var q := abono_q()
+			if S.items.get("phm", 0) > 0:
+				S.items.phm -= 1
+			if veg:
+				S.items.fertv -= 1
+				p.fv = q
+			else:
+				S.items.fert -= 1
+				p.fert = true
+				p.fq = q
 			sfx("sel")
-			await say("Echas una dosis de ABONO. Dará más cosecha.")
+			await say(("Echas una dosis de ABONO DE CRECIMIENTO. Crecerá más deprisa." if veg else "Echas una dosis de ABONO. Dará más cosecha.") + ("\nCon el medidor, el pH al 6,2: lo aprovecha entero." if q == 1 else ("\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo." if q > .5 else "\nSin pH−, el agua del grifo (pH 7,5) bloquea la mitad del abono.")))
 		else:
 			await say("No te queda ABONO.")
 	elif op == "Tratar plaga":
@@ -367,10 +383,35 @@ func extras_libres(ci: int) -> Array:
 			o.append(k)
 	return o
 
-# el goteo llega lleno y las garrafas que hubiera vuelven a la mochila; las garrafas llegan llenas
-func poner_extra(ci: int, k: String) -> void:
+# abono, pH y EC (1.11, 09-cultivo): lo que aprovecha la dosis (con pH− y medidor, 1; a ojo, .75; sin pH−, .5) y su texto
+func abono_q() -> float:
+	return (1.0 if S.items.get("medidor", 0) else .75) if S.items.get("phm", 0) > 0 else .5
+
+func _fv(p: Dictionary) -> float:
+	return float(p.fv) if p.get("fv") != null else 0.0
+
+func abono_txt(p: Dictionary) -> String:
+	var L := []
+	if _fv(p) > 0:
+		L.append("crecimiento")
+	if p.fert:
+		L.append("floración")
+	var t := ("Abonada (" + " y ".join(L) + ")") if L.size() else "Sin abonar"
+	if S.items.get("medidor", 0) and L.size():
+		var ec := Datos.jsround((.4 + (.7 if _fv(p) > 0 else 0.0) + (.9 if p.fert else 0.0)) * 10) / 10.0
+		var q := minf(_fv(p) if _fv(p) > 0 else 1.0, Cultivo.fq(p) if p.fert else 1.0)
+		t += " · EC %s · pH %s" % [Datos.coma(ec), Datos.coma(6.2 if q >= 1 else (6.6 if q >= .75 else 7.5))]
+	return t
+
+# el goteo llega lleno y las garrafas que hubiera vuelven a la mochila; las garrafas llegan llenas; un kit de extracción
+# devuelve el que hubiera (1.11: lo devuelve poner_extra, para el mensaje)
+func poner_extra(ci: int, k: String) -> String:
 	var c: Dictionary = S.carpas[ci]
+	var vk := Cultivo.kit_de(c) if D.KITS.has(k) else ""
 	S.items["x_" + k] -= 1
+	if vk != "":
+		c[vk] = false
+		S.items["x_" + vk] = S.items.get("x_" + vk, 0) + 1
 	c[k] = true
 	if k == "goteo":
 		c.dep = Cultivo.goteo_l(S, ci)
@@ -381,6 +422,7 @@ func poner_extra(ci: int, k: String) -> void:
 	if k == "garrafas":
 		c.gar = []
 	sfx("sel")
+	return vk
 
 # el temporizador de la carpa ci (vista de carpa, a la izquierda del foco): automático, 18/6 (madres) o 12/12 (floración)
 func temporizador(ci: int) -> void:
@@ -438,9 +480,9 @@ func carpa_action(ci: int) -> void:
 		return
 	var x: String = ex[ix]
 	var vu: bool = x == "goteo" and c.get("garrafas", false)
-	poner_extra(ci, x)
-	await say("Pones %s %s en %s %s.\n%s%s" % ["las" if D.EXTRAS[x].get("pl") else "el", D.EXTRAS[x].n.to_lower(), "el" if C.n.begins_with("Armario") else "la", C.n.to_lower(), D.EXTRAS[x].d,
-		"\nLas garrafas vuelven a la mochila." if vu else ""])
+	var vk := poner_extra(ci, x)
+	await say("Pones %s %s en %s %s.\n%s%s%s" % ["las" if D.EXTRAS[x].get("pl") else "el", D.EXTRAS[x].n.to_lower(), "el" if C.n.begins_with("Armario") else "la", C.n.to_lower(), D.EXTRAS[x].d,
+		"\nLas garrafas vuelven a la mochila." if vu else "", ("\nEl %s vuelve a la mochila." % D.EXTRAS[vk].c.to_lower()) if vk != "" else ""])
 
 # ---------- cosecha ----------
 func harvest(i: int) -> void:
@@ -554,14 +596,16 @@ static func _lista(L: Array) -> String:
 
 # al despertar: las que han cogido plaga mientras dormías (y el insecticida que te queda), las que la siguen teniendo sin
 # tratar, las que se han secado del todo (antes: [plaga, muerta] de cada plaza al acostarte) y las que florecen con moho porque
-# la sala pasa de HR_OK de noche (09c-sala)
+# su carpa pasa de HR_OK de noche (09c-sala; 1.11: clima_carpa)
 func aviso_plaga(antes: Array) -> void:
 	var nuevas := []
 	var siguen := []
 	var muertas := []
 	var moho := []
-	var humeda: bool = Cultivo.clima_sala(S, true).hr > D.HR_OK[1]
 	var H := huecos()
+	var hum := []
+	for ci in S.carpas.size():
+		hum.append(S.carpas[ci] != null and Cultivo.clima_carpa(S, ci, true).hr > D.HR_OK[1])
 	var nc := 0
 	for c in S.carpas:
 		if c:
@@ -579,7 +623,7 @@ func aviso_plaga(antes: Array) -> void:
 		else:
 			if p.pest:
 				(siguen if a[0] else nuevas).append(nom)
-			if humeda and p.prog >= .65 and p.prog < 1:
+			if hum[H[i].c] and p.prog >= .65 and p.prog < 1:
 				moho.append(nom)
 	if nuevas.size():
 		var k: int = S.items.insect
@@ -590,7 +634,7 @@ func aviso_plaga(antes: Array) -> void:
 	if muertas.size():
 		await say("Se ha%s secado del todo %s. Retírala%s con A." % ["n" if muertas.size() > 1 else "", _lista(muertas), "s" if muertas.size() > 1 else ""])
 	if moho.size():
-		await say("Moho en %s: de noche la sala pasa del %s %% de humedad. Un deshumidificador o extractores con filtro la bajan." % [_lista(moho), n(D.HR_OK[1])])
+		await say("Moho en %s: de noche la carpa pasa del %s %% de humedad. Un extractor a su medida con intractor, un ventilador o un deshumidificador la bajan." % [_lista(moho), n(D.HR_OK[1])])
 
 # ---------- PC ----------
 func pc_action():
@@ -944,11 +988,9 @@ func lab_action():
 	var r := Datos.cross_result(S, A, Bk)
 	var is_new: bool = not S.disc.get(r)
 	var s = strain(r)
-	if is_new:
+	if is_new and not D.SHOP.any(func(it): return it.get("sid") == r):   # la de tienda sigue estable
 		S.gen[r] = 1
-	var kr := [A, Bk]
-	kr.sort()
-	if D.RECIPES.has("+".join(kr)) and not S.rec.get(r):   # de receta, sacada en la mesa: falta cosecharla (capítulo 4)
+	if Datos.receta_de(S, A, Bk) and not S.rec.get(r):   # de receta, sacada en la mesa: falta cosecharla (capítulo 4)
 		S.rec[r] = 1
 	await accion("cruzar", {"id": "vfx-polen", "x": P.px + 8, "y": P.py - 4})
 	sfx("enc")
@@ -961,8 +1003,8 @@ func lab_action():
 		await say("Nueva variedad: %s." % s.n)
 		await say("THC %s%% · ~%d g/m² · %s días.\nObtienes 2 semillas F1: la línea aún no es estable." % [Datos.pct(s.thc), gm2(s), Datos.coma(s.d)])
 		if r == "leyenda":
-			await say("Te tiemblan las manos: es GHOST TRAIN HAZE.")
-			await talk("SMS · KIKO", ["¿Ghost Train Haze? ¿De semilla propia? Llevo veinte años detrás de ella.", "Tu tía estaría orgullosa. Estabilízala y guárdala bien: eso vale más que el piso."])
+			await say("Te tiemblan las manos: es JACK HERER.")
+			await talk("SMS · KIKO", ["¿Jack Herer? ¿De semilla propia? Llevo veinte años detrás de ella.", "Tu tía estaría orgullosa. Estabilízala y guárdala bien: eso vale más que el piso."])
 	else:
 		await say("Obtienes 2 semillas de %s." % s.n)
 	await check_story()
@@ -1141,6 +1183,8 @@ func genoteca():
 func show_objective():
 	pass
 func raid_event():
+	pass
+func aviso_orden():
 	pass
 func penalty_event():
 	pass

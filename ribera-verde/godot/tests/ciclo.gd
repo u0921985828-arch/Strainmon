@@ -363,7 +363,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.lector.visible, 60)
 	await espera(3)
 	await foto("0b-creditos")
-	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.4.0") \
+	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.5.0") \
 		and J.lector_txt.text.contains("Open Font License") and J.lector_txt.text.contains("FICCIÓN") and J.lector.get_global_rect().encloses(J.lector_sc.get_global_rect()))
 	await pulsa("B")
 	await elige("LICENCIAS")

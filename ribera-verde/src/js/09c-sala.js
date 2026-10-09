@@ -25,7 +25,7 @@ const fuera=(v,[a,b])=>v<a?a-v:v>b?v-b:0;
 function climaSala(noche=isNight()){
   const m=mesDe(S.day),sa=S.sala||{};let n=0,calor=0,filtros=0;
   S.pots.forEach(p=>{if(p&&!p.dead)n++;});
-  S.carpas.forEach((c,ci)=>{if(!c||!plantasVivas(ci))return;const F=FOCOS[c.foco];if(!noche)calor+=F.w*CALOR_W[F.tipo];if(c.filtro)filtros++;});
+  S.carpas.forEach((c,ci)=>{if(!c||!plantasVivas(ci))return;const F=FOCOS[c.foco];if(!noche)calor+=F.w*CALOR_W[F.tipo];if(kitDe(c))filtros++;});
   let t=T_MES[m][noche?1:0]+calor-T_FILTRO*filtros,hr=HR_MES[m]+HR_PLANTA*n+(noche?HR_NOCHE:0)-HR_FILTRO*filtros-calor;
   const uso={};
   if(n)for(const k in APARATOS){const A=APARATOS[k];if(!sa[k]||!(A.t||A.hr))continue;

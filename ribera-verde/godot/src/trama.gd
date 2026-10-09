@@ -9,6 +9,8 @@ var endcard_on := false
 func shop_cond(it: Dictionary) -> bool:
 	if it.get("item") == "prensa":   # la prensa de rosin (1.10), una
 		return not S.items.get("prensa")
+	if it.get("item") == "medidor":   # el medidor de pH y EC (1.11), uno
+		return not S.items.get("medidor") and not S.envio.has(it.lbl)
 	if it.get("aparato"):   # los aparatos de la sala (1.10), uno de cada; lo pedido por el móvil no se vuelve a vender
 		return not S.sala.get(it.aparato) and not S.envio.has(it.lbl)
 	if it.get("bolsa"):   # la bolsa de deporte y la maleta (1.10)
@@ -78,7 +80,7 @@ func comprar_carpa(t: String, ci: int) -> void:
 	S.pots = np
 	S.macetas = nm_
 
-const IC := {"fert": "abono", "insect": "insecticida", "spray": "spray", "bocata": "bocadillo"}
+const IC := {"fert": "abono", "fertv": "abono", "phm": "abono", "insect": "insecticida", "spray": "spray", "bocata": "bocadillo"}
 
 func shop() -> void:
 	var i := 0
@@ -150,10 +152,12 @@ func shop() -> void:
 				var c: int = await ask("¿Te las pongo ya?" if pl else "¿Te lo pongo ya?", o, "KIKO")
 				if c >= 0 and c < ok.size():
 					var vu: bool = it.extra == "goteo" and S.carpas[ok[c]].get("garrafas", false)
-					poner_extra(ok[c], it.extra)
+					var vk := poner_extra(ok[c], it.extra)
 					toast(("Puestas: " if pl else "Puesto: ") + it.lbl, 1200)
 					if vu:
 						await say("Las garrafas de esa carpa vuelven a la mochila.", "KIKO")
+					if vk != "":
+						await say("El %s que tenías vuelve a tu mochila." % D.EXTRAS[vk].c.to_lower(), "KIKO")
 		if it.get("foco"):
 			S.items["f_" + it.foco] += 1
 			var ok := []
@@ -689,17 +693,49 @@ func embargo() -> void:
 		sfx("bad")
 		await say("TOÑO te vacía los bolsillos: se lleva %s." % Datos.eur(e))
 
-# la redada (1.10, con la caja): lo de fuera, siempre; la caja, 1 de cada 4 veces (sus gramos, su rosin y la mitad de su dinero). La
-# multa sale de lo de fuera y, si no llega, de la caja
+# el aviso de la orden de registro (1.11): un día antes de la redada
+func aviso_orden():
+	sfx("bad")
+	await talk("SMS · KIKO", ["Me dice uno de la comisaría que mañana entran en tu piso con orden de registro.", "Esta noche, el dinero y los cogollos a la caja o fuera de casa. Las plantas no se pueden esconder.", "O paga a Molina, que aún estás a tiempo."])
+
+# la redada (1.11): lo de fuera y las plantas, siempre; la caja fuerte, nunca. La multa (multa_redada) sale de lo de fuera y, si no
+# llega, de la caja
 func raid_event():
+	S.orden = 0
 	if S.protect:
 		S.heat = 50
 		await talk("SMS · MOLINA", ["Esta noche había orden de entrada en tu piso. La he parado.", "Baja el ritmo."])
 		return
 	sfx("bad")
-	await say("REDADA. La policía entra en tu piso.")
+	await say("REDADA. La policía entra en tu piso con una orden de registro.")
 	var g := int(floor(total_buds() + arcon_g()))   # lo de encima y el arcón (1.10)
 	var ro := total_rosin() + arcon_r()
+	var hs := huecos()
+	var npl := 0
+	for p in S.pots:
+		if p and not p.get("dead"):
+			npl += 1
+	var eq := []
+	for ci in S.carpas.size():
+		var c = S.carpas[ci]
+		if c == null:
+			continue
+		var con := false
+		for i in hs.size():
+			if hs[i].c == ci and S.pots[i] and not (true if S.pots[i].get("dead") else false):
+				con = true
+		if not con:
+			continue
+		for k in D.EXTRAS:
+			if c.get(k):
+				var nm: String = D.EXTRAS[k].n.to_lower()
+				if not eq.has(nm):
+					eq.append(nm)
+				c.erase(k)
+				if k == "goteo":
+					c.erase("dep")
+				if k == "garrafas":
+					c.erase("gar")
 	var np := []
 	for p in S.pots:
 		np.append(null)
@@ -707,35 +743,21 @@ func raid_event():
 	S.buds = {}
 	S.rosin = {}
 	S.arcon = {"buds": {}, "rosin": {}}
-	S.heat = 30
-	var hallada: bool = S.get("caja") != null and Cultivo.azar() < D.CAJA_REDADA
-	var cg := 0
-	var cr := 0.0
-	var ce := 0
-	if hallada:
-		cg = int(floor(caja_g()))
-		cr = caja_r()
-		ce = int(floor(S.caja.money / 2.0))
-		S.caja.buds = {}
-		S.caja.erase("rosin")
-		S.caja.money -= ce
-	var fine: float = D.MULTA_REDADA - pagar_casa(D.MULTA_REDADA)
+	S.esquejes = []
+	S.heat = D.CALOR_REDADA
+	var multa := multa_redada(npl, g + Datos.jsround(ro / D.ROSIN.rend))   # el rosin, como la flor de la que sale
+	var fine: float = multa - pagar_casa(multa)
 	await say("Se llevan todas las plantas%s. Multa: %s." % [("%s y %s" % [(", %d g" % g) if g else "", rosin_txt(ro)]) if ro else " y %d g" % g, Datos.eur(fine)])
-	if S.get("caja") != null:
-		var L := []   # sin «0 g» si solo había rosin
-		if cg or cr < .1:
-			L.append("%d g" % cg)
-		if cr >= .1:
-			L.append(rosin_txt(cr))
-		L.append(Datos.eur(ce))
-		await say(("Encuentran la caja de detrás del diploma: se llevan %s y %s." % [", ".join(L.slice(0, -1)), L[-1]]) if hallada else "La caja de detrás del diploma ni la ven.")
+	if eq.size():
+		await say("Y el equipo de las carpas con plantas: " + ", ".join(eq) + ".")
+	await say("La caja de detrás del diploma ni la ven. Las semillas no son delito: se quedan." if S.get("caja") != null else "Las semillas no son delito: se quedan.")
 	await say("Toca empezar de nuevo. Y vender menos una temporada.")
 
 func ending() -> void:
 	await fade(1)
 	endcard_on = true
 	endcard_pon(["DEUDA SALDADA", "Has saldado los %s de tu tía Maite en %s días." % [Datos.eur(D.DEUDA), n(S.day)], "Variedades: %d · Ventas totales: %s" % [disc_count(), Datos.eur(S.sales)],
-		"Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.\n¿Completarás la GENOTECA? ¿Conseguirás la GHOST TRAIN HAZE?", "Pulsa A"])
+		"Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.\n¿Completarás la GENOTECA? ¿Conseguirás la JACK HERER?", "Pulsa A"])
 	await fade(0)
 	sfx("get")
 	var pr := Motor.Prom.new()
@@ -828,8 +850,14 @@ func mochila() -> void:
 			rows.append({"label": "Caja fuerte", "right": "%s · %d g%s" % [Datos.eur(caja_e()), int(floor(caja_g())), (" · " + Datos.coma(Datos.jsround(caja_r() * 10) / 10.0) + " g rosin") if caja_r() >= .1 else ""], "ic": icono("billetes"),
 				"desc": "%s, detrás del diploma. Caben %s y %s.\nLo que está dentro no lo llevas encima." % [CJ.n, Datos.eur(CJ.money), _kg(int(CJ.g))]})
 		rows.append_array([{"label": "Vida", "right": "%s/%s" % [n(S.hp), n(S.hpMax)], "desc": "Se recupera durmiendo, comiendo o con el tiempo."},
-			{"label": "Abono (dosis)", "right": "×" + n(S.items.fert), "ic": icono("abono"), "desc": "Una por planta: +25% de cosecha."},
-			{"label": "Insecticida (tratamientos)", "right": "×" + n(S.items.insect), "ic": icono("insecticida"), "desc": "Úsalo en una maceta con plaga."},
+			{"label": "Abono (dosis)", "right": "×" + n(S.items.fert), "ic": icono("abono"), "desc": "De floración. Una por planta: +25% de cosecha, con el pH corregido."}])
+		if S.items.get("fertv", 0) > 0:
+			rows.append({"label": "Abono de crecimiento", "right": "×" + n(S.items.fertv), "ic": icono("abono"), "desc": "Una por planta en crecimiento: crece un 15 % más deprisa hasta florecer."})
+		if S.items.get("phm", 0) > 0:
+			rows.append({"label": "pH− (dosis)", "right": "×" + n(S.items.phm), "ic": icono("abono"), "desc": "Se gasta una con cada dosis de abono: baja el pH del agua al 6,2."})
+		if S.items.get("medidor", 0):
+			rows.append({"label": "Medidor de pH y EC", "right": "×1", "desc": "Con él corriges el pH justo y ves la EC y el pH de cada maceta en PLANTAS."})
+		rows.append_array([{"label": "Insecticida (tratamientos)", "right": "×" + n(S.items.insect), "ic": icono("insecticida"), "desc": "Úsalo en una maceta con plaga."},
 			{"label": "Spray de pimienta", "right": "×" + n(S.items.spray), "ic": icono("spray"), "desc": "Solo en combate."},
 			{"label": "Bocata", "right": "×" + n(S.items.bocata), "ic": icono("bocadillo"), "desc": "Pulsa A para comerlo: +15 de vida.", "k": "bocata"}])
 		for k in D.MACETAS:
@@ -880,8 +908,9 @@ func plantas() -> void:
 		var C: Dictionary = D.CARPAS[c.t]
 		var F: Dictionary = D.FOCOS[c.foco]
 		var wm2 := Datos.jsround(F.w / (C.cm[0] * C.cm[2] / 1e4))
-		rows.append({"label": C.n, "right": F.n, "ic": icono(Atlas.ico_carpa(c.t)), "desc": "%s plantas · foco %s, %d W/m²%s\nLuz: %s al día con plantas · hasta %s W, macetas de %s L y %d L de tierra (%d puestos)." % [n(C.plazas), F.n, wm2,
-			" (poca luz: crecen más despacio y con menos THC)" if wm2 < D.W_M2 else "", Datos.eur(luz_carpa(ci)), n(C.wmax), n(C.lmax), litros_max(ci), litros_carpa(ci)]})
+		rows.append({"label": C.n, "right": F.n, "ic": icono(Atlas.ico_carpa(c.t)), "desc": "%s plantas · foco %s, %d W/m²%s\nLuz: %s al día con plantas · hasta %s W, macetas de %s L y %d L de tierra (%d puestos).\n%s%s" % [n(C.plazas), F.n, wm2,
+			" (poca luz: crecen más despacio y con menos THC)" if wm2 < D.W_M2 else "", Datos.eur(luz_carpa(ci)), n(C.wmax), n(C.lmax), litros_max(ci), litros_carpa(ci),
+			Cultivo.ext_txt(S, ci), (" · dentro, de día " + t_clima(Cultivo.clima_carpa(S, ci, false))) if S.sala.get("termo") and plantas_vivas(ci) else ""]})
 		for i in H.size():
 			var h: Dictionary = H[i]
 			if h.c != ci:
@@ -893,7 +922,7 @@ func plantas() -> void:
 				continue
 			var s = strain(p.sid)
 			var desc := "Se ha secado. Retírala." if p.get("dead") else "%s · Agua %d%% · Salud %d%%\n%s%s · maceta de %s." % ["Lista para cosechar" if p.prog >= 1 else stage_name(p), Datos.jsround(p.water),
-				Datos.jsround(p.health), "PLAGA: trátala con insecticida. " if p.pest else "", "Abonada" if p.fert else "Sin abonar", Mc.n]
+				Datos.jsround(p.health), "PLAGA: trátala con insecticida. " if p.pest else "", abono_txt(p), Mc.n]
 			rows.append({"label": "  %d · %s%s" % [h.j + 1, s.n, marca_feno(p.get("f"))], "sw": s.c, "ic": ic_cog(p.sid),
 				"right": "muerta" if p.get("dead") else ("LISTA" if p.prog >= 1 else "%d%%" % int(floor(p.prog * 100))), "desc": desc})
 	var luz := factura_luz()
@@ -1208,8 +1237,8 @@ func cop_round():
 # ---------- la caja fuerte, el robo de Darko y los encargos de Baltasar (1.10, 11b-caja) ----------
 # la caja: C, la de la tía Maite, detrás del diploma de la Copa de 1998 (la pista está en sus notas del ordenador): 20.000 € y
 # 2 kg; B, la empotrada, por el ordenador desde el capítulo 4 (CAJA_P, la instala Kiko al día siguiente): 50.000 € y 2,5 kg.
-# Lo que hay dentro no va encima: no cuenta para los encuentros ni te lo quitan un control, un ladrón o Darko. En una redada la
-# encuentran 1 de cada 4 veces (CAJA_REDADA). La luz y lo que se compra por el ordenador se pagan de fuera y, si no llega, de la caja
+# Lo que hay dentro no va encima: no cuenta para los encuentros ni te lo quitan un control, un ladrón o Darko. En una redada no la
+# tocan (1.11: raid_event; solo pagan de ella la multa que no llegue de fuera). La luz y lo que se compra por el ordenador se pagan de fuera y, si no llega, de la caja
 func diploma_action():
 	if S.get("caja"):
 		await caja_action()

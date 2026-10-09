@@ -11,7 +11,7 @@ La primera versión de este análisis encontró 10 problemas (el resumen de abaj
 Las cifras salen del código de la 1.10. `node tools/analisis-riesgos.js` escribe las tablas generadas con un modelo exacto, que aplica las mismas reglas que el código. Después, el mismo script juega cada caso con las funciones de verdad del juego (`onStepEnd`, `updatePatrullas` y `updatePlayer`, `battle` y `thiefRound`, `copRound`, `newDay` y `raidEvent`, `talkClient`, `talkInaki`, `ventaMayor`, `harvest`, `addBuds` y `talkJurado`), también con la caja llena (`S.caja`). Si alguna cifra no cuadra, para con un error y no escribe nada.
 
 <!-- auto:meta -->
-Generado con `npm run analisis`: 717 cifras comprobadas con el juego (20.000 combates, controles, ventas o trayectos simulados por celda, 100.000 pasos por situación, 5.000 carpas por fila de la Copa y las patrullas fotograma a fotograma). Gramos a 7,60 €/g (precio de calle de una variedad del 18 %), salvo donde se dice.
+Generado con `npm run analisis`: 720 cifras comprobadas con el juego (20.000 combates, controles, ventas o trayectos simulados por celda, 100.000 pasos por situación, 5.000 carpas por fila de la Copa y las patrullas fotograma a fotograma). Gramos a 7,60 €/g (precio de calle de una variedad del 18 %), salvo donde se dice.
 <!-- /auto:meta -->
 
 ## Resumen
@@ -42,7 +42,7 @@ Generado con `npm run analisis`: 717 cifras comprobadas con el juego (20.000 com
 | 5 · El sargento | Pagar 12.000 €. Molina te ofrece protección: 1.500 € cada 10 días. Si dices que no, +10 de calor | Pagar en el bar | 10 días | Capítulo 6. Baltasar: «La COPA DE RIBERA se juega estos días en la plaza» |
 | 6 · La Copa | Llevar 20 g de un lote con más del 26,8 % de THC | `talkJurado`: `round(thc·10)/10 > 26,8` | Ninguno (se puede repetir) | 5.000 € y +20 de reputación. Capítulo 7, con todo lo que queda (15.000 €) en 7 días |
 | 7 · Libertad | Pagar 15.000 €. La primera vez que duermas con más de 1.000 € o 100 g fuera de la caja (el rosin cuenta como la flor de la que sale: 1 g = 5 g), Darko te roba | Pagar en el bar | 7 días | Pantalla final y capítulo 8. Baltasar te ofrece trabajo |
-| 8 · Tu imperio | Facturar 25.000, 100.000 y 250.000 € desde el último pago. Los encargos de Baltasar | `imperioNivel()` | Cada encargo, 2 días | Iñaki te carga 2, 5 y 10 kg al día. La meta final es completar la genoteca de 41 y sacar la Ghost Train Haze |
+| 8 · Tu imperio | Facturar 25.000, 100.000 y 250.000 € desde el último pago. Los encargos de Baltasar | `imperioNivel()` | Cada encargo, 2 días | Iñaki te carga 2, 5 y 10 kg al día. La meta final es completar la genoteca de 59 y sacar la Jack Herer |
 
 Si un plazo vence (capítulos 3, 5 y 7), Toño se presenta al cambiar de día:
 
@@ -68,7 +68,7 @@ Si un plazo vence (capítulos 3, 5 y 7), Toño se presenta al cambiar de día:
 | Sargento Molina | La primera vez, en la plaza (capítulo 5). Después, en la comisaría del barrio alto | 1.500 € cada 10 días | Protección (§ 2.1) | Se puede pagar por adelantado: cada pago suma 10 días. Al acabarse, un SMS |
 | Darko | Astilleros (24, 16), desde el capítulo 7 | — | — | Sus chicos vigilan las esquinas de los astilleros: 1 de cada 3 ventas allí acaba en pelea |
 | Don Baltasar | Bar, capítulo 8 | Llevar 2 kg (5 kg desde Distribuidor de la ría y 10 kg desde Mayorista del norte) al almacén de los astilleros, de noche, en 2 días | 6 €/g (12.000 € por 2 kg), +2 de reputación y +3 de calor | Toño espera en el almacén de 21:00 a 6:00 y se lleva primero los lotes más flojos. Si no llegas, reputación −10 y 5 días sin encargos |
-| Ghost Train Haze | Mesa de genética | Cruzar Amnesia Haze × Fire OG | Un SMS de Kiko | Es la meta del final, junto con la genoteca |
+| Jack Herer | Mesa de genética | Cruzar Northern Lights × Shiva Skunk y lo que sale × Haze | Un SMS de Kiko | Es la meta del final, junto con la genoteca |
 
 ### 1.3 Problemas del guion: cómo quedan
 
@@ -82,12 +82,12 @@ Si un plazo vence (capítulos 3, 5 y 7), Toño se presenta al cambiar de día:
 4. **La oferta de Baltasar tiene continuación:** los encargos del imperio (§ 1.2). Pagan más por gramo que Iñaki, pero hay que cruzar los astilleros de noche con la carga encima.
 5. **Ya hay derrota parcial.** Al tercer plazo vencido, Toño se lleva la carpa más grande (§ 1.1). Sigue sin haber «fin de partida»: el juego es tranquilo, pero el plazo ya no es solo texto.
 6. **La Copa «del sábado».** Baltasar dice ahora que la Copa «se juega estos días en la plaza»: el jurado está todo el capítulo 6.
-7. **Molina cobra cada 10 días.** La protección dura 10 días por pago (`S.protHasta`, el último día cubierto) y se renueva en la comisaría del barrio alto. Cuando se acaba, Molina te manda un SMS y vuelven las redadas, los agentes honrados y la bajada de calor de 12. Las partidas guardadas con protección reciben 10 días al cargarlas.
+7. **Molina cobra cada 10 días.** La protección dura 10 días por pago (`S.protHasta`, el último día cubierto) y se renueva en la comisaría del barrio alto. Cuando se acaba, Molina te manda un SMS y vuelven las órdenes de registro, los agentes honrados y la bajada de calor de siempre (sin el × 1,5). Las partidas guardadas con protección reciben 10 días al cargarlas.
 8. **Texto del capítulo 2:** «Gana 300 € vendiendo».
 
 ### 1.4 Vender: euros por punto de calor
 
-El calor baja 12 al día (20 con la protección de Molina), y cada carpa con plantas en flor y sin filtro suma 2. Cuánto puedes vender cada día sin que el calor suba depende del calor que da cada venta:
+El calor baja 12 al día en tranquilo y vigilancia y 8 en investigación (× 1,5 con la protección de Molina), y cada carpa con plantas en flor suma 2 sin extractor y 1 con uno que no llega al caudal que pide (§ 2.7). Cuánto puedes vender cada día sin que el calor suba depende del calor que da cada venta:
 
 <!-- auto:eficiencia -->
 | Venta (THC 18 %, salvo el pijo y el rosin) | Cobras | €/g | Calor | € por punto de calor |
@@ -158,9 +158,10 @@ Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo a Iñaki
   - Huir sale bien un 45 % (un 60 % de noche) y suma 8 de calor. Si falla: requisa, multa y −5 de vida.
   - Entregar: te quitan los gramos, sin multa, y el calor baja 15.
   - Una requisa se lleva **todos** los gramos que llevas encima y baja el calor 15. La multa es de 601 € (o lo que lleves, si es menos).
-- **Calor y redada.** Al cambiar de día (00:00), duermas o no, el juego mira el calor *antes* de bajarlo:
-  - con 90 o más, hay redada: se llevan todas las plantas y todos los gramos de fuera de la caja (los de encima y los del arcón de casa), hay una multa de hasta 3.000 € y el calor queda en 30. La caja la encuentran 1 de cada 4 veces (§ 2.7);
-  - con la protección de Molina, la redada se para y el calor queda en 50.
+- **Calor, niveles y redada (1.11).** El calor marca el nivel de la policía: tranquilo (0-29), vigilancia (30-59), investigación (60-89) y orden de registro (90). Al cambiar de día (00:00), duermas o no, el juego mira el calor *antes* de bajarlo:
+  - con 90 o más, el juez firma la orden de registro y Kiko te avisa: tienes un día para vaciar el piso. Con la orden, el calor no baja;
+  - al día siguiente, la redada: se llevan las plantas, el equipo montado en sus carpas y lo que está a la vista (lo de encima y el arcón). La caja fuerte no la tocan. La multa sale de lo que encuentran: 601 € + 300 € por planta + 3 € por gramo, hasta 30.000 €, y el calor queda en 40 (§ 2.7);
+  - con la protección de Molina, no hay orden: Molina para la redada y el calor queda en 50.
 
 ### 2.2 Por paso
 
@@ -314,40 +315,36 @@ A partir de cuántos gramos encima sale más a cuenta sobornar que entregar, en 
 ### 2.7 Calor y redada
 
 <!-- auto:calorOk -->
-Comprobado con el juego: redada con calor 90 y no con 89,9 (se lleva las plantas, los gramos y hasta 3.000 € de multa, y deja el calor en 30); −12 al día; con protección, −20 y la redada se para (calor 50, sin quitar nada); +2 por carpa en flor sin filtro.
+Comprobado con el juego: con calor 90 al cambiar el día (y no con 89,9) llega la orden de registro con el aviso de Kiko y, al día siguiente, la redada (las plantas, el equipo de sus carpas y lo de fuera; la caja, no; multa de 601 € + 300 € por planta + 3 € por gramo, hasta 30.000 €; el calor queda en 40); baja 12 al día en tranquilo y vigilancia, 8 en investigación y nada con la orden (con Molina, × 1,5, y la redada se para: calor 50, sin quitar nada); +2 por carpa en flor sin extractor (con uno corto de caudal, +1).
 <!-- /auto:calorOk -->
 
 <!-- auto:redada -->
-| En el piso (gramos a 7,60 €/g; las plantas se pierden igual) | Encuentran la caja | Pérdida media (modelo) | Juego |
+| En el piso (gramos a 7,60 €/g; las plantas se pierden igual) | Multa | Pérdida (modelo) | Juego |
 |---|---|---|---|
-| Sin caja: 10.000 € y 500 g en el piso | — | −6.800 € | −6.800 € |
-| Con caja: todo dentro | 25 % | −5.200 € | −5.274 € |
-| Con caja: 1.000 € y 100 g fuera, el resto dentro | 25 % | −5.645 € | −5.708 € |
-| Con caja: 3.000 € fuera (pagan la multa), el resto dentro | 25 % | −4.825 € | −4.886 € |
+| Sin caja: 10.000 € y 500 g en el piso, 4 plantas | 3.301 € | −7.101 € | −7.101 € |
+| Con caja: todo dentro, 4 plantas | 1.801 € | −1.801 € | −1.801 € |
+| Con caja: 1.000 € y 100 g fuera, 4 plantas | 2.101 € | −2.861 € | −2.861 € |
+| Con caja: todo dentro, entre cosechas (sin plantas) | 601 € | −601 € | −601 € |
 <!-- /auto:redada -->
 
-La redada se decide al cambiar de día, a las 00:00, duermas o no. A esa hora, el calor tiene que estar por debajo de 90. Durante el día, el calor solo baja de tres formas: con un soborno (−10), con una requisa o entregando (−15). Todo lo demás lo hace la bajada diaria (−12, o −20 con protección), y esa bajada llega *después* de mirar la redada. Con 3 carpas en flor sin filtro, el olor suma 6 al día y deja muy poco margen para vender en la calle.
+La orden se decide al cambiar de día, a las 00:00, duermas o no. A esa hora, el calor tiene que estar por debajo de 90. Durante el día, el calor solo baja de tres formas: con un soborno (−10), con una requisa o entregando (−15). Todo lo demás lo hace la bajada diaria, que depende del nivel (−12 en tranquilo y vigilancia, −8 en investigación, nada con la orden; × 1,5 con protección) y llega *después* de mirar la orden. Bajar de nivel cuesta días: de 89 a 59, cuatro días sin vender (de 8 en 8). Con 3 carpas en flor sin extractor, el olor suma 6 al día y deja muy poco margen para vender en la calle; con un extractor a su medida, nada.
 
-Con la caja, una redada cuesta menos: 3 de cada 4 veces no la ven, y la multa sale primero de lo de fuera. Si la encuentran, se llevan sus gramos y la mitad de su dinero. Las plantas se pierden igual. El arcón de casa (1.10) no protege de la redada, que se lo lleva entero: solo te libra de los controles y de los ladrones de la calle (y Darko se lleva la mitad).
+La caja fuerte es lo que guardas de verdad: en la redada no la tocan, y solo sale de ella la multa que no llegue con el dinero de fuera (`pagarCasa`). Con el aviso, el día de margen sirve para meter el dinero y los cogollos en la caja: la multa baja (solo cuenta lo que encuentran) y lo de dentro se queda. Las plantas y el equipo montado se pierden igual. El arcón de casa (1.10) no protege de la redada, que se lo lleva entero: solo te libra de los controles y de los ladrones de la calle (y Darko se lleva la mitad).
 
 ### 2.8 La Copa
 
 Para ganar hay que llevar al jurado 20 g de un lote con más del 26,8 % de THC. Los cogollos de una misma variedad se juntan en un solo lote, con el THC medio ponderado por gramos (`addBuds`). Lo que sale de un fenotipo estrella va a un lote aparte (★).
 
-- **Amnesia Haze** (THC 26), en 4 cruces:
-  1. Skunk #1 × Lemon Haze → Lemon Skunk;
-  2. Lemon Skunk × Lemon Haze → Super Lemon Haze;
-  3. Acapulco Gold × Afghani → Trainwreck;
-  4. Super Lemon Haze × Trainwreck → Amnesia Haze.
-- **Fire OG** (THC 27), también en 4 cruces:
-  1. Afghani × Skunk #1 → Critical Mass;
-  2. Critical Mass × OG Kush → Critical Kush;
-  3. OG Kush × Blueberry → Blueberry Kush;
-  4. Critical Kush × Blueberry Kush → Fire OG.
+- **Amnesia Haze** (THC 26), 2.ª generación, en 4 cruces con landraces del banco de semillas:
+  1. Punto Rojo (o Michoacán) × Thai → Haze;
+  2. Haze × Lamb's Bread → un híbrido propio;
+  3. ese híbrido × Hawaiian (o Afghani) → otro;
+  4. ese × Luang Prabang → Amnesia Haze (el orden de los tres últimos da igual: cuenta el conjunto de variedades).
+- **Sour Diesel** (THC 27), 3.ª generación, en un solo cruce: Chemdawg × Super Skunk, las dos en la tienda de Kiko (Chemdawg desde el capítulo 5).
 
-Cada cruce gasta una semilla de cada padre y da 2. Con 4 cruces solo tienes 2 semillas de Amnesia Haze o de Fire OG. Para llenar una carpa de 6 hay dos caminos:
+Cada cruce gasta una semilla de cada padre y da 2. Para llenar una carpa de 6 hay dos caminos:
 
-- **Repetir cruces:** unos 8 en total. En la Amnesia Haze hay un tope: solo hay 2 semillas de Acapulco Gold y no se venden, así que salen como mucho 2 cruces de Trainwreck (4 semillas) y, como mucho, 8 semillas de Amnesia Haze.
+- **Repetir cruces:** con la Sour Diesel, 3 cruces con semillas de la tienda. Con la Amnesia Haze, cada vuelta pide semillas de 5 landraces: el banco de semillas las vende en sobres de 10.
 - **Esquejes:** sacarlos de las plantas en crecimiento (entre el 20 % y el 65 % del cultivo) y plantarlos.
 
 La carpa de 120 y el LED de 720 W están en la tienda desde el capítulo 5.
@@ -360,19 +357,19 @@ La carpa de 120 y el LED de 720 W están en la tienda desde el capítulo 5.
 | Amnesia Haze F1 · carpa 150 + sodio 600 W · abono | 6 | 27,0 % | 52,5 % | 52,4 % | 76 g | 54,6 % | 58,0 % |
 | Amnesia Haze F1 · carpa 120 + LED 720 W · abono | 6 | 27,7 % | 66,9 % | 67,1 % | 142 g | 72,0 % | 84,2 % |
 | Amnesia Haze estable · carpa 120 + LED 720 W · abono | 6 | 27,7 % | 72,0 % | 72,2 % | 142 g | 78,1 % | 90,8 % |
-| Fire OG F1 · armario 60 + CFL | 2 | 27,0 % | 52,5 % | 52,4 % | 18 g | 54,3 % | 54,3 % |
-| Fire OG F1 · carpa 120 + LED 720 W · abono | 6 | 28,7 % | 79,2 % | 79,5 % | 157 g | 89,4 % | 98,0 % |
+| Sour Diesel F1 · armario 60 + CFL | 2 | 27,0 % | 52,5 % | 52,4 % | 17 g | 54,4 % | 54,4 % |
+| Sour Diesel F1 · carpa 120 + LED 720 W · abono | 6 | 28,7 % | 79,2 % | 79,5 % | 142 g | 89,4 % | 98,1 % |
 <!-- /auto:copa -->
 
 En el armario de la tía, con un CFL, una planta da 17-18 g, menos de los 20 g que pide el jurado. Hay que juntar las dos en un lote, y entonces manda la media:
 
 - Amnesia Haze: gana algo más de 1 de cada 4 veces.
-- Fire OG: gana algo más de la mitad de las veces.
+- Sour Diesel: gana algo más de la mitad de las veces.
 
 Con la carpa de 120 y el LED de 720 W, abonando:
 
 - Carpa llena de Amnesia Haze: gana unas 84 de cada 100 veces.
-- Carpa llena de Fire OG: gana casi siempre.
+- Carpa llena de Sour Diesel: gana casi siempre.
 
 Estabilizar la Amnesia Haze sube algo sus opciones (de 84 a 91 de cada 100), pero cuesta 3 generaciones más. Lo que más cuenta es la luz.
 
@@ -395,10 +392,10 @@ Una caja en el piso, detrás del diploma de la tía, con dinero, cogollos y rosi
 - Se abre pulsando A delante del diploma: «Guardar todo / Guardar dinero / Guardar cogollos / Sacar dinero / Sacar cogollos / Sacar todo / Cerrar» y, con la prensa o rosin dentro, «Guardar rosin» y «Sacar rosin». Dinero y gramos se eligen en pasos (100, 500, 1.000 € o 10, 50, 100 g…, y «todo lo que cabe»).
 - La mochila enseña las dos cosas: lo de encima y lo de la caja.
 
-| Caja | Cómo se consigue | Capacidad | En una redada | Robo de Darko (cap. 7) |
+| Caja | Cómo se consigue | Capacidad | En una redada (1.11) | Robo de Darko (cap. 7) |
 |---|---|---|---|---|
-| **C · La caja de la tía** | Detrás del diploma de la Copa de 1998 (7, 1). La pista está en las notas del ordenador: «La combinación, el año en que lo gané». Dentro hay 300 € | 20.000 € y 2 kg | La encuentran 1 de cada 4 veces: sus gramos, su rosin y la mitad de su dinero | Resiste |
-| **B · La caja empotrada** | Por el ordenador, desde el capítulo 4 y con la de la tía abierta, por 380 € (de fuera y, si no llega, de la caja). Kiko la instala al día siguiente, con lo que ya tuvieras dentro | 50.000 € y 2,5 kg | Igual: 1 de cada 4 veces | Resiste |
+| **C · La caja de la tía** | Detrás del diploma de la Copa de 1998 (7, 1). La pista está en las notas del ordenador: «La combinación, el año en que lo gané». Dentro hay 300 € | 20.000 € y 2 kg | No la tocan: solo sale de ella la multa que no llegue con lo de fuera | Resiste |
+| **B · La caja empotrada** | Por el ordenador, desde el capítulo 4 y con la de la tía abierta, por 380 € (de fuera y, si no llega, de la caja). Kiko la instala al día siguiente, con lo que ya tuvieras dentro | 50.000 € y 2,5 kg | Igual: no la tocan | Resiste |
 
 La caja de sobremesa de la tienda (la A de la propuesta) se descartó: la de la tía da sentido al diploma y conecta con la Copa, y la empotrada es la mejora para el imperio.
 
@@ -409,7 +406,7 @@ La caja de sobremesa de la tienda (la A de la propuesta) se descartó: la de la 
 | `onStepEnd` (ladrones) y `updatePatrullas` (sospecha) | Contaban `totalBuds()` y `S.money`, es decir, todo | Solo lo de fuera de la caja. La fórmula no cambia: lo guardado sale de `S.buds` y de `S.money`. Sin gramos encima, la patrulla no sospecha |
 | `copRound` (soborno) | Pagabas con todo tu dinero | Solo con el que llevas encima: «No llevas tanto dinero encima». Y el precio suma el 5 % de ese dinero |
 | `confiscate` y el KO del ladrón | Se llevaban de todo | Solo de lo que llevas fuera |
-| `raidEvent` | Todas las plantas, todos los gramos y una multa de hasta 3.000 € | Lo de fuera, siempre. La caja, 1 de cada 4 veces (`CAJA_REDADA`). La multa sale primero de lo de fuera y después de la caja (`pagarCasa`) |
+| `raidEvent` | Todas las plantas, todos los gramos y una multa de hasta 3.000 € | Desde la 1.11, con un día de aviso (`avisoOrden`): las plantas, el equipo montado y lo de fuera. La caja, nunca. La multa (`multaRedada`: lo que encuentran) sale primero de lo de fuera y después de la caja (`pagarCasa`) |
 | `newDay` (luz) | La factura de la luz salía de `S.money` | De lo de fuera y, si no llega, de la caja |
 | Kiko (regalo) | Con menos de 15 €, sin semillas, sin plantas y sin gramos | Cuenta también lo de la caja |
 | Ordenador | Pagabas con lo que llevabas | Paga de lo de fuera y, si no llega, de la caja: el ordenador está en el piso |

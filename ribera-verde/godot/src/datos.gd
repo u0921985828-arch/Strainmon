@@ -253,13 +253,36 @@ static func dex() -> Array:
 	return carga().DEX
 
 # crossResult de 03-datos (a: la madre, b: el padre): la receta o un híbrido propio en S.custom, con el m % de la madre
+# recetas por hojas (1.11, recetaDe): las variedades con nombre de las que sale un híbrido propio (S.custom[id].hojas)
+static func hojas_de(S: Dictionary, id: String) -> Array:
+	if S and S.has("custom") and S.custom.has(id) and S.custom[id].get("hojas") is Array:
+		return S.custom[id].hojas
+	return [id]
+
+static func hojas_cruce(S: Dictionary, a: String, b: String) -> Array:
+	var h := []
+	for x in hojas_de(S, a) + hojas_de(S, b):
+		if not h.has(x):
+			h.append(x)
+	h.sort()
+	return h
+
+static func receta_de(S: Dictionary, a: String, b: String):
+	carga()
+	if D.RECETA_ORD.has(a + ">" + b):
+		return D.RECETA_ORD[a + ">" + b]
+	if a == b:
+		return null
+	return D.RECIPES.get("+".join(hojas_cruce(S, a, b)))
+
 static func cross_result(S: Dictionary, a: String, b: String) -> String:
 	carga()
+	var rc = receta_de(S, a, b)
+	if rc:
+		return rc
 	var ks := [a, b]
 	ks.sort()
 	var key := "+".join(ks)
-	if D.RECIPES.has(key):
-		return D.RECIPES[key]
 	var id := "x" + b36(hash_str(key))
 	if not S.custom.has(id):
 		var A = strain(S, a)
@@ -296,6 +319,7 @@ static func cross_result(S: Dictionary, a: String, b: String) -> String:
 		C.m = m
 		C.ma = a
 		C.pa = b
+		C.hojas = hojas_cruce(S, a, b)
 		C.ind = jsround((m * ind_de(S, a) + (100 - m) * ind_de(S, b)) / 100.0)
 		C.hj = mix(hoja_de(S, b), hoja_de(S, a), m / 100.0)
 		C.c = mix(B.c, A.c, m / 100.0)

@@ -166,7 +166,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   }, () => S.carpas[0].t === 'p80' && S.carpas[0].foco === 'led200' && S.money === 1000 - 90 && S.pots.length === 7 && R.filas === '0,0,1' && R.atras
     && [0, 1].every(i => JSON.stringify(S.pots[i]) === R.antes[i]) && R.antes[3] !== 'null' && R.movida === R.antes[3] && S.pots[3] === null && S.macetas[2] === 'plastico7' && S.macetas[3] === R.mac[2] && MAPS.home.carpas.length === 2
     || { carpas: S.carpas, money: S.money, R, pots: S.pots.map(p => JSON.stringify(p)), macetas: S.macetas });
-  await step('Extras: ventilador, filtro y garrafas en la carpa de 100 (las garrafas riegan); sin filtro, el olor de la floración sube el calor', ['Ventilador', '^Carpa 100', 'Extractor', '^Carpa 100', 'Garrafas', '^Carpa 100', 'Salir', 'Poner filtro'], async () => {
+  await step('Extras: ventilador, filtro y garrafas en la carpa de 100 (las garrafas riegan); sin filtro, el olor de la floración sube el calor', ['Ventilador', '^Carpa 100', 'Extractor 125', '^Carpa 100', 'Garrafas', '^Carpa 100', 'Salir', 'Poner extractor 125'], async () => {
     S.money = 1000; await run(shop); const flor = () => ({ sid: 'ria', prog: .8, water: 100, health: 100, fert: false, pest: false });
     window.R = { money: S.money, f: factores(4), m: MACETAS[S.macetas[4]], F: FOCOS[S.carpas[1].foco] };
     S.protect = false; S.pots[0] = flor(); S.pots[4] = flor(); S.heat = 30; advanceTime(24 * 60); await idle(); R.h1 = S.heat;
@@ -211,9 +211,15 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   await step('Calor 95 con protección → Molina para la redada', ['Skunk'], async () => {
     addSeeds('ria', 1); await run(() => potAction(0)); S.heat = 95; advanceTime(24 * 60); await idle();
   }, () => S.heat === 50 && S.pots[0] !== null || { heat: S.heat, pot: S.pots[0] });
-  await step('Calor 95 sin protección → redada', [], async () => {
-    S.protect = false; S.heat = 95; addBuds('ria', 10, 12); advanceTime(24 * 60); await idle();
-  }, () => S.pots.every(p => p === null) && Object.keys(S.buds).length === 0 && S.heat === 30 || { pots: S.pots, buds: S.buds, heat: S.heat });
+  // policía por niveles (1.11): 90 al cambiar el día → la orden y el aviso de Kiko (el calor no baja); al día siguiente, la redada
+  await step('Calor 95 sin protección → orden de registro: Kiko avisa, el calor no baja y la redada es al día siguiente (las plantas y el equipo de su carpa, la multa por lo hallado; las semillas se quedan)', [], async () => {
+    S.protect = false; S.heat = 95; addBuds('ria', 10, 12); S.carpas[0].vent = true; const l0 = LOG.length; advanceTime(24 * 60); await idle();
+    S.pots.forEach(p => { if (p) { delete p.dead; p.health = 100; p.water = 100; } });   // vivas: la redada se lleva el equipo de las carpas con plantas vivas
+    window.R = { orden: S.orden === S.day, heat: S.heat, nivel: nivelPoli(), aviso: LOG.slice(l0).some(l => /mañana entran en tu piso con orden de registro/.test(l)), pots: S.pots.filter(p => p).length }; updateHUD(); R.hud = /ORDEN/.test($('hud').textContent);
+    R.np = S.pots.filter(p => p && !p.dead).length; R.sd = JSON.stringify(S.seeds); S.money = 5000; R.multa = multaRedada(R.np, Math.floor(totalBuds() + arconG()) + Math.round((totalRosin() + arconR()) / ROSIN.rend)); const l1 = LOG.length; advanceTime(24 * 60); await idle();
+    R.log = LOG.slice(l1).join('|'); R.m = S.money;
+  }, () => R.orden && R.heat === 95 && R.nivel === 3 && R.aviso && R.pots > 0 && R.hud && S.pots.every(p => p === null) && Object.keys(S.buds).length === 0 && S.heat === CALOR_REDADA && !S.orden
+    && !S.carpas[0].vent && R.multa > 601 && R.m === 5000 - R.multa - S.luz.e && /equipo de las carpas con plantas: ventilador/.test(R.log) && JSON.stringify(S.seeds) === R.sd || { R, pots: S.pots, buds: S.buds, heat: S.heat });
   await step('Pagar 12.000 € → capítulo 6', ['^Pagar'], async () => { S.protect = true; S.money = 12500; await run(talkBaltasar); },
     () => S.ch === 6 && S.debt === 15000 && S.money === 500 || { ch: S.ch, debt: S.debt });
 
@@ -221,7 +227,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   await step('Darko presume', [], async () => { await run(talkDarko); }, () => S.ch === 6);
   await step('Copa: presentar Skunk #1 (12%) → pierde', ['Skunk'], async () => { addBuds('ria', 25, 12); await run(talkJurado); },
     () => S.ch === 6 && Math.round(S.buds.ria.g) === 5 || { ch: S.ch, buds: S.buds });
-  await step('Copa: presentar Fire OG (27,2%) → gana → capítulo 7', ['Fire OG'], async () => {
+  await step('Copa: presentar Sour Diesel (27,2%) → gana → capítulo 7', ['Sour Diesel'], async () => {
     S.money = 0; addBuds('dragon', 25, 27.2); await run(talkJurado);
   }, () => S.ch === 7 && S.money === 5000 && S.due === 15000 && S.flags.copa && loadSave().due === 15000 || { ch: S.ch, money: S.money, due: S.due, guardado: loadSave().due });
 
@@ -260,7 +266,24 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     const n0 = S.fenoN, ria = new Set(), np = []; for (let k = 0; k < 5000; k++) { ria.add(rollFeno('ria').i); np.push(rollFeno('nepal').i); } S.fenoN = n0;
     const m = np.reduce((a, b) => a + b, 0) / np.length; window.I = { ria: [...ria].join(), media: +m.toFixed(1), sd: +Math.sqrt(np.reduce((a, b) => a + (b - m) ** 2, 0) / np.length).toFixed(1) };
   }, () => Object.values(R).every(r => Math.abs(r.n - r.E) <= 4 * Math.sqrt(r.E) + 3 + .1 * r.E) && I.ria === '65' && Math.abs(I.media - 50) < 1 && Math.abs(I.sd - GENETICA.landrace.si) < 1 && ['estable', 'f1', 'F1', 'landrace', 'poli', 'F2'].every((t, i, a) => !i || R[t].n > R[a[i - 1]].n)
-    && tipoGen('ria') === 'estable' && tipoGen('mango') === 'f1' && tipoGen('limon') === 'poli' && tipoGen('thai') === 'landrace' && /Cruce F1 \(KC 33 × Afghani\)/.test(strainLine('mango')) || { R, I });
+    && tipoGen('ria') === 'estable' && tipoGen('txoko') === 'f1' && tipoGen('limon') === 'poli' && tipoGen('thai') === 'landrace' && /Cruce F1: [^\n]*\n2\.ª generación · Skunk #1 × Afghani$/.test(strainLine('txoko')) && /\n≈|origen incierto/.test(strainLine('mango')) || { R, I });
+  // el árbol de la tabla (1.11): generación y ✔/≈ de cada una; todas salen en la mesa, con crossResult de verdad, desde las landraces y las de
+  // tienda que no son de receta (los cruces de 3 o 4 padres, por híbridos propios con sus hojas); sin bancos, criadores ni personas
+  await step('Árbol por generaciones (1.11): las 35 de la tabla con su generación y ✔/≈; todas salen en la mesa desde landraces y tienda; sin criadores', [], async () => {
+    const T = { 1: 'Skunk #1 ✔|Haze ≈|Northern Lights ≈|Purple Thai ✔|Trainwreck ≈|AK-47 ✔|Laughing Buddha ✔|Cannalope Haze ✔|Master Kush ≈|Purple Kush ≈|Congo × Panama ✔|Malawi × Panama ✔|Malawi × PCK ✔|Kali Mist ≈',
+      2: 'Blueberry ✔|Super Skunk ✔|Shiva Skunk ✔|Critical Mass ✔|Cheese ✔|NL5 × Haze ✔|Neville\'s Haze ✔|Silver Haze ≈|Chocolope ✔|Pineapple Express ≈|Tangie ✔|Amnesia Haze ≈',
+      3: 'Jack Herer ✔|Super Silver Haze ✔|Blue Dream ✔|Blue Cheese ✔|Lemon Haze ≈|Sour Diesel ≈|Kali 47 ✔|Critical Kali Mist ✔|Big Bud ≈' };
+    window.R = { tabla: [1, 2, 3].every(g => DEX.filter(k => STRAINS[k].gen === g).map(k => STRAINS[k].n + (/origen incierto/.test(STRAINS[k].o) ? ' ≈' : ' ✔')).sort().join('|') === T[g].split('|').sort().join('|')) };
+    const sale = new Set([...Object.values(RECIPES), ...Object.values(RECETA_ORD)]), RS = Object.keys(RECIPES).map(k => k.split('+'));
+    const S0 = S; S = JSON.parse(JSON.stringify(S0)); S.custom = {}; const ids = new Set(DEX.filter(k => !sale.has(k))), via = {}, vistas = new Set(ids);
+    for (let cambia = true; cambia;) { cambia = false; const L = [...ids];
+      for (const a of L) for (const b of L) { if (a === b) continue; const h = hojasCruce(a, b);
+        if (!recetaDe(a, b) && !RS.some(r => r.length > h.length && h.every(x => r.includes(x)))) continue;
+        const r = crossResult(a, b), hk = hojasDe(r).join('+'); if (!ids.has(r) && !vistas.has(hk)) { ids.add(r); vistas.add(hk); via[r] = a + '×' + b; cambia = true; } } }
+    R.faltan = DEX.filter(k => !ids.has(k)); R.cm = crossResult('rif', 'ria'); R.ss = crossResult('ria', 'rif'); R.ria = via.ria; S = S0;
+    R.marcas = (JSON.stringify(STRAINS) + JSON.stringify(RECIPE_HINTS) + JSON.stringify(SHOP.map(i => i.lbl))).match(/Sensi|Serious|DNA|Barney|Green ?House|Mr\.? ?Nice|Sacred|DJ Short|Skunkman|Brothers|\bAce\b|Ghost|Fire OG|OG Kush/g);
+    R.linea = strainLine('ria').split('\n').pop();
+  }, () => R.tabla && !R.faltan.length && R.cm === 'kushrif' && R.ss === 'txoko' && /(^|×)x/.test(R.ria) && !R.marcas && R.linea === '1.ª generación · Afghani × Colombian Gold × Acapulco Gold' || R);
   await step('Esquejes: el clon guarda el fenotipo estrella de la madre; su cosecha va a un lote aparte (★); sin plantar se seca', ['Sacar esqueje', 'Sacar esqueje', 'Cosechar', '^Esqueje'], async () => {
     S.esquejes = []; S.buds = {}; const f = { id: 9999, t: 1.25, y: 1.15 };
     S.pots[0] = { sid: 'limon', prog: .4, water: 100, health: 100, fert: false, pest: false, f }; await run(() => potAction(0)); await run(() => potAction(0));
@@ -288,8 +311,8 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   }, () => R.due === 15000 && R.dias === 7 && R.eco === 2 && R.eur === '999 €|3.000 €|1.500 €|-1.234 €|30.000 €' && R.due5 === 12000 && R.dias5 === 10 || R);
   await step('Capítulo 4: la 8.ª variedad (de un arbusto) no pasa de capítulo; la 2.ª de receta cosechada, sí', [], async () => {
     S.ch = 4; S.flags.lab = true; S.due = 0; S.disc = { ria: true, limon: true, txoko: true, niebla: true, mango: true, purpura: true, rif: true };
-    S.custom = {}; S.rec = { kushrif: 2, citrus: 1 }; delete S.taken.h_acap; S.map = 'town'; await run(() => objectAction(2, 26)); S.map = 'home'; await idle();
-    window.R = { ch: S.ch, disc: discCount() }; S.pots[0] = { sid: 'citrus', prog: 1, water: 80, health: 100, fert: false, pest: false, f: rollFeno('citrus') }; await run(() => harvest(0));
+    S.custom = {}; S.rec = { kushrif: 2, shiva: 1 }; delete S.taken.h_acap; S.map = 'town'; await run(() => objectAction(2, 26)); S.map = 'home'; await idle();
+    window.R = { ch: S.ch, disc: discCount() }; S.pots[0] = { sid: 'shiva', prog: 1, water: 80, health: 100, fert: false, pest: false, f: rollFeno('shiva') }; await run(() => harvest(0));
   }, () => R.ch === 4 && R.disc === 8 && S.ch === 5 && S.due === 12000 && loadSave().due === 12000 || { R, ch: S.ch, guardado: loadSave().due });
   // ---------- 1.10: la caja fuerte, el guion completo y el mapa ampliado ----------
   await step('Caja de la tía: la pista en el PC («el año en que lo gané»); detrás del diploma, 1987 no abre y 1998 sí (300 € dentro)', ['Notas de la tía', 'Mirar detrás', '^1987', 'Mirar detrás', '^1998'], async () => {
@@ -304,16 +327,16 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     window.R = { antes: enc() }; await run(() => objectAction(7, 1)); R.despues = enc(); R.caja = JSON.parse(JSON.stringify(S.caja)); R.m = S.money; R.g = totalBuds();
     const l0 = LOG.length; await run(startMenu); R.mochila = LOG.slice(l0).find(l => /\[menú\] Dinero/.test(l)) || '';
   }, () => R.antes === 20 && R.despues === 0 && R.caja.money === 5300 && R.caja.buds.ria.g === 200 && R.caja.buds.dragon.g === 100 && R.m === 0 && R.g === 0 && /Caja fuerte/.test(R.mochila) || R);
-  await step('Caja: sacar 1.000 € y 100 g de Fire OG; el soborno cuenta lo de encima (+5 % del dinero)', ['Sacar dinero', '^1\\.000 €', 'Sacar cogollos', '^Fire OG', '^100 g', 'Cerrar'], async () => {
+  await step('Caja: sacar 1.000 € y 100 g de Sour Diesel; el soborno cuenta lo de encima (+5 % del dinero)', ['Sacar dinero', '^1\\.000 €', 'Sacar cogollos', '^Sour Diesel', '^100 g', 'Cerrar'], async () => {
     S.heat = 20; await run(() => objectAction(7, 1)); window.R = { p: precioSoborno() };
   }, () => S.money === 1000 && S.caja.money === 4300 && S.buds.dragon.g === 100 && !S.caja.buds.dragon && S.caja.buds.ria.g === 200 && R.p === Math.round(40 + 80 + 50 + 50) || { R, money: S.money, caja: S.caja, buds: S.buds });
-  await step('Redada con la caja: 3 de cada 4 veces no la ven; si la ven, sus gramos y la mitad de su dinero; la multa sale de la caja si fuera no llega', [], async () => {
-    const r0 = Math.random, mira = () => ({ m: S.money, cm: S.caja.money, cg: cajaG(), g: totalBuds(), h: S.heat, pots: S.pots.filter(p => p).length });
-    S.protect = false; S.pots = S.pots.map(() => null); S.pots[1] = { sid: 'ria', prog: .5, water: 90, health: 100, fert: false, pest: false };
-    S.caja.money = 4000; S.money = 200; S.heat = 95; Math.random = () => .9; await run(raidEvent); Math.random = r0; window.R = { a: mira() };
-    addBuds('ria', 30, 12); S.heat = 95; Math.random = () => .1; await run(raidEvent); Math.random = r0; R.b = mira();
-  }, () => R.a.m === 0 && R.a.cm === 4000 - (MULTA_REDADA - 200) && R.a.cg === 200 && R.a.g === 0 && R.a.h === 30 && R.a.pots === 0
-    && R.b.cg === 0 && R.b.g === 0 && R.b.cm === Math.max(0, R.a.cm - Math.floor(R.a.cm / 2) - MULTA_REDADA) && R.b.m === 0 && R.b.h === 30 || R);
+  await step('Redada con la caja (1.11): la caja nunca se toca; la multa (601 € + 300 por planta + 3 por gramo) sale de lo de fuera y, si no llega, de la caja', [], async () => {
+    const mira = () => ({ m: S.money, cm: S.caja.money, cg: cajaG(), g: totalBuds(), h: S.heat, pots: S.pots.filter(p => p).length });
+    S.protect = false; S.buds = {}; S.pots = S.pots.map(() => null); S.pots[1] = { sid: 'ria', prog: .5, water: 90, health: 100, fert: false, pest: false };
+    S.caja.money = 4000; S.money = 200; S.heat = 95; await run(raidEvent); window.R = { a: mira() };
+    addBuds('ria', 30, 12); S.heat = 95; await run(raidEvent); R.b = mira();
+  }, () => R.a.m === 0 && R.a.cm === 4000 - (901 - 200) && R.a.cg === 200 && R.a.g === 0 && R.a.h === CALOR_REDADA && R.a.pots === 0
+    && R.b.cg === 200 && R.b.g === 0 && R.b.cm === R.a.cm - 691 && R.b.m === 0 && R.b.h === CALOR_REDADA || R);
   await step('Caja empotrada por el ordenador (380 €, de fuera y el resto de la caja): Kiko la instala al día siguiente', ['Caja empotrada', 'Pedirla'], async () => {
     S.caja.money = 1000; S.money = 100; await run(pcAction); window.R = { m: S.money, cm: S.caja.money, mejora: S.caja.mejora, nivel: S.caja.nivel };
     const l0 = LOG.length; newDay(); await idle(); R.sms = LOG.slice(l0).some(l => /caja empotrada/.test(l));
@@ -386,7 +409,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     R.m1 = S.money - R.m1; R.r = totalRosin(); R.h = S.heat; S.map = 'home';
   }, () => R.m === 750 && R.p === 1 && R.ros.ria.g === 5 && R.ros.ria.thc === 36 && R.g === 15 && R.min === 30 && R.ext === 'town,town,astilleros,puerto,valdehierro'
     && R.m1 === Math.round(precioRosin(36) * 2 * .85) && R.r === 3 && GLYPH.gota && CTYPES.ext.label === 'CATADOR' || R);
-  await step('Rosin a salvo: la caja lo guarda y lo saca (en el hueco de los cogollos); Darko (con 21 g de rosin = 105 g de flor) se lleva la mitad del de fuera y la caja, intacta; la redada que la encuentra, también el suyo; el rosin atrae ladrones (1 g = 5 g de flor)',
+  await step('Rosin a salvo: la caja lo guarda y lo saca (en el hueco de los cogollos); Darko (con 21 g de rosin = 105 g de flor) se lleva la mitad del de fuera y la caja, intacta; la redada, el de fuera (la caja nunca); el rosin atrae ladrones (1 g = 5 g de flor)',
     ['Guardar rosin', '^Rosin · Skunk', '^1 g', 'Guardar todo', 'Sacar rosin', '^Rosin · Skunk', '^1 g', 'Cerrar', 'Dormir'], async () => {
     const sv = { ch: S.ch, robo: S.flags.robo, money: S.money, caja: JSON.parse(JSON.stringify(S.caja)), due: S.due, heat: S.heat };
     S.map = 'home'; S.ch = 7; S.flags.robo = false; S.due = 0; S.money = 0; S.heat = 0; S.buds = {}; S.rosin = {}; S.pots = S.pots.map(() => null);
@@ -396,14 +419,14 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     addRosin('hindu', 20, 40); R.flor = gramosFlor(); S.min = 23 * 60; const l1 = LOG.length; await run(bedAction);
     R.robo = S.flags.robo; R.f2 = JSON.parse(JSON.stringify(S.rosin)); R.c2 = cajaR(); R.dk = LOG.slice(l1).filter(l => /Se han llevado/.test(l)).join('|');
     const r0 = Math.random; S.protect = false; Math.random = () => .1; const l2 = LOG.length; await run(raidEvent); Math.random = r0;
-    R.c3 = 'rosin' in S.caja; R.f3 = totalRosin(); R.rd = LOG.slice(l2).filter(l => /Encuentran la caja/.test(l)).join('|');
+    R.c3 = 'rosin' in S.caja; R.f3 = totalRosin(); R.rd = LOG.slice(l2).filter(l => /ni la ven/.test(l)).join('|');
     const enc = () => { const b0 = battle, n = []; window.battle = async t => { n.push(t); }; Math.random = () => 0; S.map = 'town';
       const [x, y] = CLIENT_TILES.town[0]; for (let k = 0; k < 20; k++) { P.x = x; P.y = y; S.cool = 0; onStepEnd(); } Math.random = r0; window.battle = b0; S.map = 'home'; S.cool = 0; return n.length; };
     S.money = 0; S.buds = {}; S.rosin = {}; addRosin('ria', 1, 36); R.l1 = enc(); S.rosin = {}; addRosin('ria', .9, 36); R.l0 = enc(); S.rosin = {};
     S.ch = sv.ch; S.flags.robo = sv.robo; S.money = sv.money; S.caja = sv.caja; S.due = sv.due; S.heat = sv.heat;
   }, () => R.caja.ria.g === 2 && R.caja.hindu.g === 2 && R.fuera.ria.g === 1 && !R.fuera.hindu && R.cr === 4 && /Guardas 0 € y 4 g de rosin\./.test(R.txt)
     && R.flor === 105 && R.robo && R.f2.ria.g === .5 && R.f2.hindu.g === 10 && R.c2 === 4 && /Se han llevado 0 € y 10,5 g de rosin\./.test(R.dk)
-    && !R.c3 && R.f3 === 0 && /se llevan 4 g de rosin y 0 €/.test(R.rd) && R.l1 === 20 && R.l0 === 0 || R);
+    && R.c3 && R.f3 === 0 && !!R.rd && R.l1 === 20 && R.l0 === 0 || R);
   await step('Autobús perdido: en Errotabarri a las 23:50, esperar → a las 7:00 del día siguiente sale el primero; en Mendialde, dormir en casa de ama (sin robo de Darko)',
     ['Esperar', '^Ribera Verde', 'Dormir'], async () => {
     const sv = { ch: S.ch, robo: S.flags.robo, money: S.money, due: S.due }, pa = PARADAS.errotabarri, v = viaje('errotabarri', 'town');
@@ -467,15 +490,34 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   await step('Clima de la sala (1.10): enero, de día con sodio 400 W (+4 °C) y de noche (frío: crecen −18 %); con LED casi no calienta; termohigrómetro, calefactor y deshumidificador del growshop, su factura de noche; moho en floración y su aviso al despertar (julio, de noche)', ['Termohigrómetro', 'Calefactor', 'Deshumidificador', 'Salir'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 5, money: 1000, sala: {}, day: 10, carpas: [{ t: 'm100', foco: 'sodio400' }], macetas: Array(4).fill('plastico7') });
     S.pots = S.macetas.map(() => ({ sid: 'ria', prog: .8, water: 100, health: 90, fert: false, pest: false }));
-    window.R = { mes: MESES[mesDe(S.day)], dia: climaSala(false), noche: climaSala(true) }; R.f = fClima(R.noche); S.min = 23 * 60; R.c0 = factores(0).crec;
+    window.R = { mes: MESES[mesDe(S.day)], dia: climaSala(false), noche: climaSala(true) }; R.f = fClima(R.noche); S.min = 23 * 60; R.c0 = factores(0).crec; R.cc0 = climaCarpa(0, true);
     S.carpas[0].foco = 'led480'; R.led = climaSala(false).t; S.carpas[0].foco = 'sodio400';
-    await run(shop); R.m = S.money; R.sala = Object.keys(S.sala).join(); R.n2 = climaSala(true); R.d2 = climaSala(false); R.c1 = factores(0).crec; R.fs = facturaSala();
+    await run(shop); R.m = S.money; R.sala = Object.keys(S.sala).join(); R.n2 = climaSala(true); R.d2 = climaSala(false); R.c1 = factores(0).crec; R.cc1 = climaCarpa(0, true); R.fs = facturaSala();
     const p = S.pots[0], f = Object.assign({}, factores(0), { hr: 70, plaga: 0 }); plantStep(p, 1, f); R.moho = p.health;
     S.day = 4; S.sala = {}; R.julio = climaSala(true).hr; const l0 = LOG.length; await run(() => avisoPlaga([])); R.aviso = LOG.slice(l0).filter(l => /^Moho/.test(l)).join('|'); S = S0;
   }, () => R.mes === 'enero' && R.dia.t === 22 && R.dia.hr === 49 && R.noche.t === 15 && R.noche.hr === 58 && Math.abs(R.f - .82) < 1e-9 && R.led === 19.9
     && R.m === 1000 - pr('Termohigrómetro') - pr('Calefactor') - pr('Deshumidificador') && R.sala === 'termo,calef,deshu' && R.n2.t === 20 && R.n2.hr === 55 && R.n2.uso.calef && R.n2.uso.deshu && !R.d2.uso.calef
-    && Math.abs(R.c1 / R.c0 - 1 / .82) < 1e-9 && R.fs === Math.round((1500 + 250) * H_24 * (1 - H_DIA) * .5 / 1000 * KWH) && R.moho === 90 && R.julio === 55 + 8 + 5
-    && /^Moho en .*\(plaza 1\), .* y .*\(plaza 4\): de noche la sala pasa del 60 % de humedad\./.test(R.aviso) || R);
+    && R.cc0.hr === R.noche.hr + 4 * HR_CARPA && R.cc0.t === R.noche.t && Math.abs(R.c1 / R.c0 - fClima(R.cc1) / fClima(R.cc0)) < 1e-9 && R.c1 > R.c0 && R.fs === Math.round((1500 + 250) * H_24 * (1 - H_DIA) * .5 / 1000 * KWH) && R.moho === 90 && R.julio === 55 + 8 + 5
+    && /^Moho en .*\(plaza 1\), .* y .*\(plaza 4\): de noche la carpa pasa del 60 % de humedad\./.test(R.aviso) || R);
+  await step('Accesorios (1.11): la carpa de 120 con sodio 600 pide 525 m³/h; sin extractor huele (+2) y se cuece; el de 125 se queda corto (huele +1), el de 150 lo devuelve a la mochila y con intractor rinde entero; el ventilador; abono de crecimiento sin pH− (la mitad), de floración a ojo (×0,75) y, con medidor, la EC y el pH',
+    ['Abonar', 'Abonar', 'Abonar'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { day: 4, min: 12 * 60, sala: {}, carpas: [{ t: 'm120', foco: 'sodio600' }], macetas: Array(6).fill('tela25') });
+    S.pots = S.macetas.map(() => ({ sid: 'ria', prog: .8, water: 100, health: 100, fert: false, pest: false }));
+    Object.assign(S.items, { x_filtro: 1, x_filtro150: 1, x_intra: 1, x_vent: 1, fert: 1, fertv: 1, phm: 0, medidor: 0 });
+    const cc = () => climaCarpa(0, false), sala = climaSala(false);
+    window.R = { pide: caudalPide(0), e0: extCarpa(0), c0: cc(), o0: olorDia(), dt: cc().t - sala.t, dh: cc().hr - sala.hr };
+    R.k1 = ponerExtra(0, 'filtro') || ''; R.e1 = extCarpa(0); R.o1 = olorDia();
+    R.k2 = ponerExtra(0, 'filtro150'); R.e2 = extCarpa(0); R.o2 = olorDia(); R.x = [S.items.x_filtro, S.items.x_filtro150, !!S.carpas[0].filtro];
+    ponerExtra(0, 'intra'); R.e3 = extCarpa(0); R.c3 = cc(); R.f0 = factores(0); ponerExtra(0, 'vent'); R.f1 = factores(0);
+    S.pots[0].prog = S.pots[1].prog = .3; await run(() => potAction(0)); R.p0 = S.pots[0].fv;
+    S.items.phm = 2; await run(() => potAction(1)); R.p1 = [S.pots[1].fert, S.pots[1].fq, S.items.phm, S.items.fert];
+    S.items.medidor = 1; S.items.fert = 1; await run(() => potAction(2)); R.p2 = [S.pots[2].fq, abonoTxt(S.pots[2]), abonoTxt(S.pots[1]), abonoTxt(S.pots[0])];
+    R.g = [gramosPlanta(S.pots[1], R.f1), gramosPlanta(S.pots[2], R.f1)]; R.txt = extTxt(0); S = S0;
+  }, () => R.pide === 525 && R.e0 === 0 && R.o0 === 2 && Math.abs(R.dt - 9) < 1e-9 && R.dh === 9 && R.k1 === '' && Math.abs(R.e1 - 400 / 525 * INTRA) < 1e-9 && R.o1 === 1
+    && R.k2 === 'filtro' && Math.abs(R.e2 - INTRA) < 1e-9 && R.o2 === 0 && R.x.join() === '1,0,false' && R.e3 === 1 && R.c3.t < R.c0.t && R.c3.hr < R.c0.hr
+    && Math.abs(R.f1.crec / R.f0.crec - 1.03) < 1e-9 && R.f1.moho === .5 && R.f0.moho === 1 && R.p0 === .5 && R.p1.join() === 'true,0.75,1,0'
+    && R.p2[0] === 1 && R.p2[1] === 'Abonada (floración) · EC 1,3 · pH 6,2' && R.p2[2] === 'Abonada (floración) · EC 1,3 · pH 6,6' && R.p2[3] === 'Abonada (crecimiento) · EC 1,1 · pH 7,5'
+    && R.g[0] < R.g[1] && R.txt === 'Extractor 150 mm: 750 de 525 m³/h' || R);
   await step('Temporizador (1.10): 18/6 deja la planta en vegetativo (madre) y gasta más luz; 12/12 acorta el vegetativo y la cosecha; automático quita c.ciclo', ['18/6', '12/12', 'Automático'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { carpas: [{ t: 'm100', foco: 'led480' }], macetas: Array(4).fill('tela25'), pots: [null, null, null, null] });
     window.R = { l0: luzCarpa(0) };

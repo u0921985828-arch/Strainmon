@@ -1,5 +1,22 @@
 # Cambios
 
+## 1.11.0 · 9 de octubre de 2026
+
+Genética por generaciones, policía por niveles con aviso y accesorios de carpa que cuentan. Godot, 0.5.0.
+
+- **Cambiado: el árbol de la genética** (`docs/GENETICA.md`). 59 variedades: los landraces y, por generaciones, los híbridos clásicos (1.ª: Skunk #1, Haze, Northern Lights, Purple Thai, AK-47, Master Kush…; 2.ª: Blueberry, Super Skunk, Shiva Skunk, Critical Mass, Cheese, Amnesia Haze…; 3.ª: Jack Herer, Super Silver Haze, Blue Dream, Blue Cheese, Sour Diesel, Kali 47…). Los de linaje dudoso llevan «≈ origen incierto». Nuevas: Kali Mist, Cheese, California Orange, Chemdawg, Colombian Gold, Chocolate Thai, Highland Thai, Hawaiian, AK-47, Laughing Buddha, Cannalope Haze, Congo × Panama, Malawi × Panama, Malawi × PCK, NL5 × Haze, Neville's Haze, Chocolope y Kali 47; renombradas a su nombre real las que no lo eran. Sin criadores, bancos ni personas en el juego.
+  - **Recetas por conjunto de variedades:** un híbrido propio recuerda de qué variedades sale, así que las de 3 o 4 padres (Skunk #1, Amnesia Haze, Jack Herer…) se sacan cruzando en cualquier orden; las que dependen de quién es la madre (Super Skunk, Critical Mass, NL5 × Haze, Silver Haze) siguen dependiendo.
+  - La meta del final es la **Jack Herer** (Haze × (Northern Lights × Shiva Skunk)); la Copa se gana con Amnesia Haze o Sour Diesel.
+- **Cambiado: la policía, por niveles y con aviso.** El calor marca el nivel: tranquilo (0-29) y vigilancia (30-59) bajan 12 al día; investigación (60-89), 8 y una patrulla más por zona; con 90 al cambiar de día, **orden de registro**: el calor no baja, Kiko te avisa por SMS y la redada llega al día siguiente. El HUD dice ORDEN mientras dura. Con la protección de Molina, la bajada es × 1,5 y no hay orden.
+  - **La redada es justa:** se lleva las plantas, el equipo montado en sus carpas y lo que está a la vista (lo de encima y el arcón). **La caja fuerte no la tocan**: solo sale de ella la multa que no llegue con lo de fuera. La multa es por lo que encuentran: 601 € + 300 € por planta + 3 € por gramo, hasta 30.000 €; el calor queda en 40. Con el día de aviso, guardar en la caja es la jugada.
+- **Nuevo: accesorios de la carpa que cuentan.**
+  - **Extractores con filtro de carbón** de 100, 125 y 150 mm (250, 400 y 750 m³/h; 75, 110 y 190 €). Cada carpa pide un caudal (su volumen renovado cada minuto, × 1,3 por el filtro, más lo que calienta su foco). Sin extractor, la floración suma 2 de calor al día; con uno corto de caudal, 1; a su medida, nada. Montar uno nuevo devuelve el anterior a la mochila.
+  - **Intractor** de 100 mm (45 €): sin él, el extractor rinde un 85 %.
+  - **Clima por carpa:** de día, el foco calienta la carpa (el sodio más que el CFL, el LED lo que menos) y cada planta suma humedad; el extractor se lleva casi todo. PLANTAS enseña el caudal y, con termohigrómetro, el clima de dentro. Fuera de rango, crecen menos; con humedad de noche en flor, moho (el aviso de la mañana lo dice por carpa).
+  - **Ventilador:** crecen un 3 % más, la mitad de moho y plagas × 0,7.
+  - **Abono por fases y pH/EC:** abono de crecimiento (12 €, crecen hasta un 15 % más en vegetativo) además del de floración; **pH−** (6 €, 10 dosis): sin él, el abono rinde la mitad, y con él, tres cuartos; con el **medidor de pH/EC** (35 €), entero, y PLANTAS enseña la EC y el pH de cada maceta.
+- Tests: `npm test` 86/86 (pasos nuevos de la genética, la orden de registro, la redada con la caja y los accesorios); `npm run analisis` con los niveles, la orden y la redada nueva jugados (`docs/ANALISIS.md` § 2.7).
+
 ## App de Android 0.4.0 (Godot) · 9 de octubre de 2026
 
 La app de Godot es la de Android y pasa las normas básicas de un juego para móvil (`docs/NORMAS-MOVIL.md`); la ficha de Google Play, en `docs/PLAY.md`.

@@ -4,15 +4,20 @@
 // precios de growshop reales (1.10). Semillas: lo que cuesta una feminizada; se venden en sobres (SOBRES), más baratas cuanto
 // más grande el sobre, y desde el capítulo 3 en bolsas de 50 a granel. n: dosis que trae el bote
 const SHOP=[
-  {lbl:'Semillas Skunk #1',p:5,ch:1,sid:'ria'},{lbl:'Semillas Lemon Haze',p:9,ch:2,sid:'limon'},{lbl:'Semillas OG Kush',p:10,ch:2,sid:'txoko'},
-  {lbl:'Semillas Blueberry',p:8,ch:3,sid:'niebla'},{lbl:'Semillas Mango',p:7,ch:3,sid:'mango'},{lbl:'Semillas Purple Afghani',p:8,ch:4,sid:'purpura'},
-  {lbl:'Abono de floración 1 L',p:14,ch:1,item:'fert',n:4,desc:'4 dosis. Una por planta: +25% de cosecha.'},
+  {lbl:'Semillas Skunk #1',p:5,ch:1,sid:'ria'},{lbl:'Semillas Lemon Haze',p:9,ch:2,sid:'limon'},{lbl:'Semillas Super Skunk',p:10,ch:2,sid:'txoko'},
+  {lbl:'Semillas Blueberry',p:8,ch:3,sid:'niebla'},{lbl:'Semillas Big Bud',p:7,ch:3,sid:'mango'},{lbl:'Semillas Lemon Skunk',p:8,ch:3,sid:'citrus'},{lbl:'Semillas Cheese',p:9,ch:3,sid:'cheese'},
+  {lbl:'Semillas Purple Afghani',p:8,ch:4,sid:'purpura'},{lbl:'Semillas Kali Mist',p:10,ch:4,sid:'kali'},{lbl:'Semillas California Orange',p:8,ch:4,sid:'calorange'},{lbl:'Semillas Chemdawg',p:12,ch:5,sid:'chemdawg'},
+  {lbl:'Abono de floración 1 L',p:14,ch:1,item:'fert',n:4,desc:'4 dosis. Una por planta: +25% de cosecha, con el pH corregido (sin pH−, la mitad).'},
+  {lbl:'Abono de crecimiento 1 L',p:12,ch:1,item:'fertv',n:4,desc:'4 dosis. Una por planta en crecimiento: crece un 15 % más deprisa hasta florecer (sin pH−, la mitad).'},
+  {lbl:'pH− 250 ml',p:6,ch:1,item:'phm',n:10,desc:'10 dosis. Se gasta una con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. Sin él, el abono rinde la mitad; sin medidor, a ojo (×0,75).'},
+  {lbl:'Medidor de pH y EC',p:35,ch:2,item:'medidor',desc:'Mide el pH y la EC del riego: con pH−, el abono rinde entero, y en PLANTAS ves la EC y el pH de cada maceta.',cond:()=>!S.items.medidor&&!S.envio.includes('Medidor de pH y EC')},
   {lbl:'Insecticida de neem 500 ml',p:12,ch:1,item:'insect',n:3,desc:'3 tratamientos. Cada uno elimina una plaga de araña roja.'},
   {lbl:'Bocata',p:5,ch:1,item:'bocata',desc:'Recupera 15 de vida. En combate o desde la mochila.'},
   {lbl:'Spray de pimienta',p:15,ch:2,item:'spray',desc:'En combate: 12-16 de daño seguro a un ladrón.'},
   {lbl:'Maceta de tela 11 L',p:3,ch:1,maceta:'tela11'},{lbl:'Maceta de plástico 18 L',p:2,ch:2,maceta:'plastico18'},{lbl:'Maceta de tela 25 L',p:4,ch:3,maceta:'tela25'},
   {lbl:'Foco LED 100 W',p:110,ch:1,foco:'led100'},{lbl:'Ventilador de pinza',p:20,ch:1,extra:'vent'},{lbl:'Garrafas de riego',p:15,ch:1,extra:'garrafas'},
-  {lbl:'Extractor con filtro de carbón',p:110,ch:2,extra:'filtro'},{lbl:'Riego por goteo',p:1200,ch:4,extra:'goteo'},
+  {lbl:'Extractor 100 mm con filtro',p:75,ch:1,extra:'filtro100'},{lbl:'Extractor 125 mm con filtro',p:110,ch:2,extra:'filtro'},{lbl:'Extractor 150 mm con filtro',p:190,ch:3,extra:'filtro150'},
+  {lbl:'Intractor 100 mm',p:45,ch:2,extra:'intra'},{lbl:'Riego por goteo',p:1200,ch:4,extra:'goteo'},
   {lbl:'Foco sodio 250 W',p:85,ch:2,foco:'sodio250'},{lbl:'Foco LED 200 W',p:220,ch:2,foco:'led200'},
   {lbl:'Foco sodio 400 W',p:100,ch:3,foco:'sodio400'},{lbl:'Foco LED 480 W',p:500,ch:3,foco:'led480'},
   {lbl:'Foco sodio 600 W',p:120,ch:4,foco:'sodio600'},{lbl:'Foco LED 720 W',p:950,ch:5,foco:'led720'},
@@ -38,7 +43,16 @@ async function comprarSemillas(it){
 // la deuda de la tía (1.10, a escala real): 30.000 € en tres plazos (capítulos 3, 5 y 7). Con equipo y precios reales, un
 // jugador que reinvierte paga cada plazo en las mismas cosechas que antes (simulación en docs/ECONOMIA.md). Si un plazo
 // vence, Toño suma INTERES. META_VENTAS: lo que hay que vender en la calle en el capítulo 2
-const DEUDA=30000,PLAZOS={3:3000,5:12000,7:15000},INTERES=.2,PREMIO_COPA=5000,SOBORNO=1500,MULTA_REDADA=3000,META_VENTAS=300;
+const DEUDA=30000,PLAZOS={3:3000,5:12000,7:15000},INTERES=.2,PREMIO_COPA=5000,SOBORNO=1500,META_VENTAS=300;
+// policía por niveles (1.11): el calor (0-100) marca el nivel; con 60 o más, una patrulla más por zona. Al cambiar de día con 90 o
+// más llega la orden de registro: Kiko te avisa y la redada es al cambiar el día siguiente (con Molina pagado, la para). Cada día el
+// calor baja lo del nivel (con Molina, × 1,5); con la orden, nada. La redada se lleva las plantas, el equipo de las carpas que las
+// tienen y lo que está a la vista (cogollos, rosin, arcón y esquejes); la caja fuerte y las semillas, nunca. Multa según lo hallado
+const NIVEL_POLI=[[0,'TRANQUILO',12],[30,'VIGILANCIA',12],[60,'INVESTIGACIÓN',8],[90,'ORDEN DE REGISTRO',0]];
+const nivelPoli=()=>S.orden?3:NIVEL_POLI.reduce((n,[c],i)=>S.heat>=c?i:n,0);
+const bajaCalor=()=>NIVEL_POLI[nivelPoli()][2]*(S.protect?1.5:1);
+const MULTA_REDADA=601,MULTA_PLANTA=300,MULTA_G=3,MULTA_TOPE=30000,CALOR_REDADA=40;
+const multaRedada=(plantas,g)=>Math.min(MULTA_TOPE,MULTA_REDADA+MULTA_PLANTA*plantas+MULTA_G*g);
 const yLista=l=>l.length>1?l.slice(0,-1).join(', ')+' y '+l[l.length-1]:l[0];
 for(const it of SHOP){if(it.maceta)it.desc=descMaceta(it.maceta)+'\nSe cambia en una plaza vacía de la carpa.';if(it.foco)it.desc=descFoco(it.foco)+'\nAguanta en carpas de '+yLista(Object.values(CARPAS).filter(C=>FOCOS[it.foco].w<=C.wmax).map(C=>C.cm[0]))+'.';if(it.extra){const k=it.extra;it.desc=EXTRAS[k].d+(EXTRAS[k].pl?'\nUna tanda por carpa.':'\nUno por carpa.');it.cond=()=>S.carpas.filter(c=>faltaExtra(c,k)).length>S.items['x_'+k]+S.envio.filter(l=>l===it.lbl).length;}
   if(it.aparato){const k=it.aparato;it.desc=APARATOS[k].d+'\nUno para la sala: Kiko lo deja puesto.';it.cond=()=>!S.sala[k]&&!S.envio.includes(it.lbl);}}   // lo pedido por el móvil (12b-movil) no se vuelve a vender
@@ -58,7 +72,7 @@ async function shop(){
   let i=0;
   for(;;){
     const list=SHOP.filter(it=>S.ch>=it.ch&&(!it.cond||it.cond()));
-    const IC={fert:'abono',insect:'insecticida',spray:'spray',bocata:'bocadillo'};
+    const IC={fert:'abono',fertv:'abono',phm:'abono',insect:'insecticida',spray:'spray',bocata:'bocadillo'};
     const items=list.map(it=>({label:it.lbl,right:eur(it.p)+(it.sid?'/u':''),sw:it.sid?STRAINS[it.sid].c:null,ic:it.sid?icono('semillas'):it.item?icono(IC[it.item]):it.maceta?icono('maceta'):it.foco?icono(icoFoco(it.foco)):it.extra?icono(ICX[it.extra]):it.carpa?icono(icoCarpa(it.carpa)):null,desc:it.sid?strainLine(it.sid):it.desc}));
     items.push({label:'Salir',desc:'Volver al mostrador.'});
     i=await menu(items,{cls:'full',title:'GROWSHOP KIKO',title2:'Tienes '+eur(S.money),desc:true,initial:i});
@@ -74,8 +88,8 @@ async function shop(){
       const pl=EXTRAS[it.extra].pl;
       if(!ok.length)await say(pl?'Ya tienes unas en cada carpa. Te las guardo en la mochila.':'Ya tienes uno en cada carpa. Te lo guardo en la mochila.','KIKO');
       else{const c=await ask(pl?'¿Te las pongo ya?':'¿Te lo pongo ya?',ok.map(ci=>CARPAS[S.carpas[ci].t].n).concat(['Luego']),'KIKO');
-        if(c>=0&&c<ok.length){const vu=it.extra==='goteo'&&S.carpas[ok[c]].garrafas;ponerExtra(ok[c],it.extra);toast((pl?'Puestas: ':'Puesto: ')+it.lbl,1200);
-          if(vu)await say('Las garrafas de esa carpa vuelven a la mochila.','KIKO');}}}
+        if(c>=0&&c<ok.length){const vu=it.extra==='goteo'&&S.carpas[ok[c]].garrafas,vk=ponerExtra(ok[c],it.extra);toast((pl?'Puestas: ':'Puesto: ')+it.lbl,1200);
+          if(vu)await say('Las garrafas de esa carpa vuelven a la mochila.','KIKO');if(vk)await say(`El ${EXTRAS[vk].c.toLowerCase()} que tenías vuelve a tu mochila.`,'KIKO');}}}
     if(it.foco){S.items['f_'+it.foco]++;const ok=S.carpas.map((c,ci)=>c&&FOCOS[it.foco].w<=CARPAS[c.t].wmax?ci:-1).filter(ci=>ci>=0);
       if(!ok.length)await say('Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande.','KIKO');
       else{const c=await ask('¿Lo cuelgo ya? El que quites va a tu mochila.',ok.map(ci=>`${CARPAS[S.carpas[ci].t].n} (${FOCOS[S.carpas[ci].foco].n})`).concat(['Luego']),'KIKO');
@@ -84,10 +98,19 @@ async function shop(){
   }
   await say('Ten cuidado ahí fuera.','KIKO');
 }
-const RECIPE_HINTS=['Skunk #1 polinizada con Lemon Haze: así salió la Lemon Skunk.','OG Kush con Blueberry da Blueberry Kush. Índica, de color azulado.','Afghani con Skunk #1 es la Critical Mass. Produce como ninguna.','Hindu Kush con Purple Afghani: la Purple Kush.','Mango con Hindu Kush: Mango Kush.','Blueberry con una Haze da Blue Dream. Con la Lemon Haze te vale.','Acapulco Gold con Afghani: así se hizo la Trainwreck.','Las de segunda generación se cruzan entre ellas: Critical Kush, Super Lemon Haze, Purple Haze...','La Amnesia Haze de Darko viene de una Super Lemon Haze y una Trainwreck.','La Fire OG sale de Critical Kush con Blueberry Kush. Hace falta paciencia.','Una Amnesia Haze con una Fire OG... de ahí sale la Ghost Train Haze. Yo nunca lo he conseguido.'];
+// (1.11) el árbol por generaciones (RECIPES): una pista por receta, sin criadores ni bancos
+const RECIPE_HINTS=['Afghani, Colombian Gold y Acapulco Gold: de esas tres salió la Skunk #1. Cruza dos y luego la tercera.','Punto Rojo o Michoacán con Thai: la Haze. Afghani con Thai: la Northern Lights.',
+  'Afghani × Skunk #1 es la Critical Mass. Al revés, Skunk #1 × Afghani, la Super Skunk: la madre manda.','Northern Lights × Haze da la NL5 × Haze; Haze × Northern Lights, la Silver Haze.',
+  'Skunk #1 con Northern Lights: la Shiva Skunk.','Chocolate Thai con Highland Oaxacan Gold: la Purple Thai. Con Highland Thai y Afghani, la Blueberry.',
+  'Michoacán, Afghani y Thai: la Trainwreck. Con una Colombian Gold antes de la Thai sale la AK-47.','Thai con Lamb\'s Bread: la Laughing Buddha. Haze con Michoacán: la Cannalope Haze.',
+  'Hindu Kush con Chitral Kush: la Master Kush. Con Purple Afghani, la Purple Kush.','Malawi o Congolese con Panama Red; Malawi con Chitral Kush: las sativas africanas.',
+  'Una Haze con la NL5 × Haze da la Neville\'s Haze, casi pura Haze.','Trainwreck con Hawaiian: la Pineapple Express. California Orange con Skunk #1: la Tangie.',
+  'Haze, Lamb\'s Bread, Luang Prabang y una Afghani o una Hawaiian: así se hizo la Amnesia Haze de Darko.','Blueberry con Haze, Blue Dream; con Cheese, Blue Cheese.',
+  'Skunk #1, Northern Lights y Haze: la Super Silver Haze. La Lemon Haze sale de Lemon Skunk con Silver Haze.','Kali Mist con Critical Mass: la Critical Kali Mist. Con AK-47, la Kali 47.',
+  'La Sour Diesel sale de Chemdawg con Super Skunk. Hace falta paciencia.','Haze × (Northern Lights × Shiva Skunk)... de ahí sale la Jack Herer. Yo nunca lo he conseguido.'];
 function kikoTip(){
   const t=[['Riega cuando el agua baje del 30 %. Una planta seca enferma.','El abono se echa una vez por planta. Merece la pena.','Las plantas crecen mientras duermes. No hace falta mirarlas cada hora.','Un CFL da poco: unos 0,3 gramos por vatio. Un LED, el triple.'],
-    ['Los clientes cambian cada día. No los hagas esperar.','Pedir caro funciona con turistas, con gente de dinero y con cogollo potente.','Si la presión policial (CALOR) sube mucho, deja de vender unos días.','Una carpa más grande es la mejor inversión que puedes hacer.','Tu tía pedía landraces a un banco de semillas por internet. Mira en su ordenador.','Lo que sale de un cruce es una F1: cada planta sale distinta. Crúzala consigo misma hasta fijarla.','Las macetas de tela airean las raíces: más cosecha y menos plagas, pero hay que regar más.','Cada semilla es una planta distinta. Si compras muchas, alguna sale estrella: más potente y más productiva.','Si una planta promete, sácale esquejes en crecimiento. Un esqueje es la misma planta: así se guarda un fenotipo estrella.','Una maceta pequeña no da más de unos 8 gramos por litro de tierra, por mucho foco que le pongas.'],
+    ['Los clientes cambian cada día. No los hagas esperar.','Pedir caro funciona con turistas, con gente de dinero y con cogollo potente.','El CALOR tiene niveles: con 30, vigilancia; con 60, investigación y más patrullas; con 90 al cambiar el día, orden de registro. Lo de la caja fuerte no lo tocan.','Una carpa más grande es la mejor inversión que puedes hacer.','Tu tía pedía landraces a un banco de semillas por internet. Mira en su ordenador.','Lo que sale de un cruce es una F1: cada planta sale distinta. Crúzala consigo misma hasta fijarla.','Las macetas de tela airean las raíces: más cosecha y menos plagas, pero hay que regar más.','Cada semilla es una planta distinta. Si compras muchas, alguna sale estrella: más potente y más productiva.','Si una planta promete, sácale esquejes en crecimiento. Un esqueje es la misma planta: así se guarda un fenotipo estrella.','Una maceta pequeña no da más de unos 8 gramos por litro de tierra, por mucho foco que le pongas.'],
     ['El LED cuesta más, pero rinde más y apenas da calor. El sodio es barato y seca las macetas.','Un foco pequeño en una carpa grande no llega a todas las plantas.','La luz se paga: cada carpa con plantas suma su factura cada día. Un LED de 720 W gasta unos 280 kWh al día: 45 €.','Una plaza vacía es luz que pagas y no aprovechas.','Iñaki, el del muelle, compra cantidad. Paga menos por gramo que la calle, pero se lo lleva todo.','De noche, en el parque, roban. Lleva el spray de pimienta.'],
     RECIPE_HINTS.concat(['Las landraces no las vendo. Pregunta por el barrio: Txaro, Iñaki el del muelle... y mira bien en el parque.'])];
   return pick(t[Math.min(3,Math.max(0,S.ch-1))].concat(S.ch>3?t[1]:[]));
@@ -315,24 +338,28 @@ async function embargo(){
   if(ci>=0){const n=CARPAS[S.carpas[ci].t].n;quitarCarpa(ci);sfx('bad');await say(`TOÑO se lleva tu ${n}, con su foco y sus plantas.`);}
   else{const e=Math.floor(S.money/2);S.money-=e;sfx('bad');await say(`TOÑO te vacía los bolsillos: se lleva ${eur(e)}.`);}
 }
-// la redada (1.10, con la caja): lo de fuera, siempre; la caja, 1 de cada 4 veces (sus gramos, su rosin y la mitad de su dinero). La
-// multa sale de lo de fuera y, si no llega, de la caja
+// el aviso de la orden de registro (1.11): un día antes de la redada
+async function avisoOrden(){
+  sfx('bad');await talk('SMS · KIKO',['Me dice uno de la comisaría que mañana entran en tu piso con orden de registro.','Esta noche, el dinero y los cogollos a la caja o fuera de casa. Las plantas no se pueden esconder.','O paga a Molina, que aún estás a tiempo.']);
+}
+// la redada (1.11): lo de fuera y las plantas, siempre; la caja fuerte, nunca. La multa (multaRedada) sale de lo de fuera y, si no
+// llega, de la caja
 async function raidEvent(){
+  S.orden=0;
   if(S.protect){S.heat=50;return talk('SMS · MOLINA',['Esta noche había orden de entrada en tu piso. La he parado.','Baja el ritmo.']);}
-  sfx('bad');await say('REDADA. La policía entra en tu piso.');
-  const g=Math.floor(totalBuds()+arconG()),r=totalRosin()+arconR();   // lo de encima y el arcón (1.10)
-  S.pots=S.pots.map(()=>null);S.buds={};S.rosin={};S.arcon={buds:{},rosin:{}};S.heat=30;
-  const hallada=!!S.caja&&Math.random()<CAJA_REDADA,cg=hallada?Math.floor(cajaG()):0,cr=hallada?cajaR():0,ce=hallada?Math.floor(S.caja.money/2):0;
-  if(hallada){S.caja.buds={};delete S.caja.rosin;S.caja.money-=ce;}
-  const fine=MULTA_REDADA-pagarCasa(MULTA_REDADA);
+  sfx('bad');await say('REDADA. La policía entra en tu piso con una orden de registro.');
+  const g=Math.floor(totalBuds()+arconG()),r=totalRosin()+arconR(),hs=huecos(),np=S.pots.filter(p=>p&&!p.dead).length,eq=new Set();   // lo de encima y el arcón (1.10)
+  S.carpas.forEach((c,ci)=>{if(c&&hs.some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead))for(const k in EXTRAS)if(c[k]){eq.add(EXTRAS[k].n.toLowerCase());delete c[k];if(k==='goteo')delete c.dep;if(k==='garrafas')delete c.gar;}});
+  S.pots=S.pots.map(()=>null);S.buds={};S.rosin={};S.arcon={buds:{},rosin:{}};S.esquejes=[];S.heat=CALOR_REDADA;
+  const multa=multaRedada(np,g+Math.round(r/ROSIN.rend)),fine=multa-pagarCasa(multa);   // el rosin, como la flor de la que sale
   await say(`Se llevan todas las plantas${r?`${g?`, ${g} g`:''} y ${rosinTxt(r)}`:` y ${g} g`}. Multa: ${eur(fine)}.`);
-  const L=[...(cg||cr<.1?[cg+' g']:[]),...(cr>=.1?[rosinTxt(cr)]:[]),eur(ce)];   // sin «0 g» si solo había rosin
-  if(S.caja)await say(hallada?`Encuentran la caja de detrás del diploma: se llevan ${L.slice(0,-1).join(', ')} y ${L[L.length-1]}.`:'La caja de detrás del diploma ni la ven.');
+  if(eq.size)await say('Y el equipo de las carpas con plantas: '+[...eq].join(', ')+'.');
+  await say(S.caja?'La caja de detrás del diploma ni la ven. Las semillas no son delito: se quedan.':'Las semillas no son delito: se quedan.');
   await say('Toca empezar de nuevo. Y vender menos una temporada.');
 }
 async function ending(){
   await fade(1);const e=$('endcard');
-  e.innerHTML=`<h2>DEUDA SALDADA</h2><div>Has saldado los ${eur(DEUDA)} de tu tía Maite en ${S.day} días.</div><div>Variedades: ${discCount()} · Ventas totales: ${eur(S.sales)}</div><div>Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.<br>¿Completarás la GENOTECA? ¿Conseguirás la GHOST TRAIN HAZE?</div><div style="opacity:.7">Pulsa A</div>`;
+  e.innerHTML=`<h2>DEUDA SALDADA</h2><div>Has saldado los ${eur(DEUDA)} de tu tía Maite en ${S.day} días.</div><div>Variedades: ${discCount()} · Ventas totales: ${eur(S.sales)}</div><div>Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.<br>¿Completarás la GENOTECA? ¿Conseguirás la JACK HERER?</div><div style="opacity:.7">Pulsa A</div>`;
   e.hidden=false;await fade(0);sfx('get');
   await new Promise(r=>push(b=>{if(b==='A'||b==='START'){pop();r();}}));
   await fade(1);e.hidden=true;await fade(0);await chapter(8);showObjective();

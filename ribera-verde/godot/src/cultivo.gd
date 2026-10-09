@@ -40,9 +40,60 @@ static func factores(S: Dictionary, i: int) -> Dictionary:
 	var F: Dictionary = D.FOCOS[c.foco]
 	var M: Dictionary = D.MACETAS.get(S.macetas[i], D.MACETAS.plastico7)
 	var dens := minf(1, F.w / (C.cm[0] * C.cm[2] / 1e4 * D.W_M2))
-	var cl := clima_sala(S, es_noche(S))   # (1.10) crec lleva el clima de la sala y hr, su humedad (el moho de plant_step)
-	return {"g": F.w * F.gpw / C.plazas * M.rend, "cap": M.cap, "crec": F.crec * (.85 + .15 * dens) * M.crec * f_clima(cl), "thc": F.thc * dens,
-		"agua": F.agua * M.agua, "plaga": M.plaga * (.7 if c.get("vent") else 1.0), "dens": dens, "hr": cl.hr, "ciclo": ciclo_de(c)}
+	var cl := clima_carpa(S, h.c, es_noche(S))   # (1.10) crec lleva el clima (1.11: el de la carpa) y hr, su humedad (el moho de plant_step; con ventilador, ×0,5)
+	return {"g": F.w * F.gpw / C.plazas * M.rend, "cap": M.cap, "crec": F.crec * (.85 + .15 * dens) * M.crec * f_clima(cl) * (1.03 if c.get("vent") else 1.0), "thc": F.thc * dens,
+		"agua": F.agua * M.agua, "plaga": M.plaga * (.7 if c.get("vent") else 1.0), "dens": dens, "hr": cl.hr, "moho": .5 if c.get("vent") else 1.0, "ciclo": ciclo_de(c)}
+
+# ---------- extracción y clima de cada carpa (1.11, 09-cultivo: KITS, climaCarpa) ----------
+static func kit_de(c) -> String:
+	if not (c is Dictionary):
+		return ""
+	for k in Datos.carga().KITS:
+		if c.get(k):
+			return k
+	return ""
+
+static func caudal_pide(S: Dictionary, ci: int) -> int:
+	var D := Datos.carga()
+	var c: Dictionary = S.carpas[ci]
+	var cm: Array = D.CARPAS[c.t].cm
+	var F: Dictionary = D.FOCOS[c.foco]
+	return Datos.jsround(cm[0] * cm[1] * cm[2] / 1e6 * 60 * 1.3 + F.w * D.EXT_W[F.tipo])
+
+static func ext_carpa(S: Dictionary, ci: int) -> float:
+	var c: Dictionary = S.carpas[ci]
+	var k := kit_de(c)
+	if k == "":
+		return 0.0
+	return minf(1, Datos.carga().EXTRAS[k].m3 / float(caudal_pide(S, ci))) * (1.0 if c.get("intra") else Datos.carga().INTRA)
+
+static func ext_txt(S: Dictionary, ci: int) -> String:
+	var c: Dictionary = S.carpas[ci]
+	var k := kit_de(c)
+	var E: Dictionary = Datos.carga().EXTRAS
+	return "%s de %d m³/h%s" % [E[k].c + ": " + str(int(E[k].m3)) if k != "" else "Sin extractor: 0", caudal_pide(S, ci), " · sin intractor" if k != "" and not c.get("intra") else ""]
+
+static func clima_carpa(S: Dictionary, ci: int, noche: bool) -> Dictionary:
+	var D := Datos.carga()
+	var cl := clima_sala(S, noche)
+	var c: Dictionary = S.carpas[ci]
+	var H := huecos(S)
+	var n := 0
+	for i in H.size():
+		if H[i].c == ci and i < S.pots.size() and S.pots[i] != null and not S.pots[i].get("dead"):
+			n += 1
+	if not n:
+		return cl
+	var e := ext_carpa(S, ci)
+	var F: Dictionary = D.FOCOS[c.foco]
+	return {"t": Datos.jsround((cl.t + (0.0 if noche else F.w * D.KT[F.tipo] * (1 - .75 * e))) * 10) / 10.0, "hr": Datos.jsround(cl.hr + D.HR_CARPA * n * (1 - .8 * e)), "uso": cl.uso, "n": cl.n, "e": e}
+
+# abono (1.11, 09-cultivo): lo que aprovecha la dosis de floración (sin p.fq, partida vieja: entera)
+static func fq(p: Dictionary) -> float:
+	if not p.get("fert"):
+		return 0.0
+	var q = p.get("fq")
+	return 1.0 if q == null else float(q)
 
 # el temporizador de la carpa (1.10, 09-cultivo: CICLOS): c.ciclo; sin él, automático
 static func ciclo_de(c) -> String:
@@ -77,7 +128,7 @@ static func clima_sala(S: Dictionary, noche: bool) -> Dictionary:
 		var F: Dictionary = D.FOCOS[c.foco]
 		if not noche:
 			calor += F.w * D.CALOR_W[F.tipo]
-		if c.get("filtro"):
+		if kit_de(c) != "":
 			filtros += 1
 	var t: float = D.T_MES[m][1 if noche else 0] + calor - D.T_FILTRO * filtros
 	var hr: float = D.HR_MES[m] + D.HR_PLANTA * nn + (D.HR_NOCHE if noche else 0.0) - D.HR_FILTRO * filtros - calor
@@ -183,8 +234,9 @@ static func plant_step(S: Dictionary, p: Dictionary, h: float, f: Dictionary) ->
 		g *= .4
 	if p.water <= 0:
 		g = 0
-	if p.fert:
-		g *= 1.1
+	g *= 1 + .1 * fq(p)
+	if float(p.get("fv", 0) if p.get("fv") != null else 0) > 0 and p.prog < .65:
+		g *= 1 + .15 * float(p.fv)
 	if p.prog < 1:
 		if f.get("ciclo") == "veg" and p.prog < .65:   # madre: no pasa de vegetativo (si ya florece, sigue)
 			g = maxf(0, minf(g, Datos.carga().VEG_TOPE - p.prog))
@@ -201,7 +253,7 @@ static func plant_step(S: Dictionary, p: Dictionary, h: float, f: Dictionary) ->
 		p.health += h
 	var D := Datos.carga()
 	if f.get("hr", 0) > D.HR_OK[1] and p.prog >= .65 and p.prog < 1:   # moho: humedad alta en floración (1.10)
-		p.health -= h * (f.hr - D.HR_OK[1]) * D.MOHO
+		p.health -= h * (f.hr - D.HR_OK[1]) * D.MOHO * float(f.get("moho", 1.0))
 	p.health = clampf(p.health, 0, 100)
 	if p.health <= 0:
 		p.dead = true
@@ -289,12 +341,12 @@ static func cosecha(S: Dictionary, i: int) -> Dictionary:
 static func gramos_planta(S: Dictionary, p: Dictionary, f: Dictionary) -> int:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"y": 1}
-	return maxi(1, Datos.jsround(minf(f.cap, f.g * s.y / Datos.carga().Y_MEDIA * (.4 + .6 * p.health / 100) * (1.25 if p.fert else 1.0) * fe.y) * (1 - Datos.carga().CORTA_REND * float(p.get("corta", 0)))))
+	return maxi(1, Datos.jsround(minf(f.cap, f.g * s.y / Datos.carga().Y_MEDIA * (.4 + .6 * p.health / 100) * (1 + .25 * fq(p)) * fe.y) * (1 - Datos.carga().CORTA_REND * float(p.get("corta", 0)))))
 
 static func thc_cosecha(S: Dictionary, p: Dictionary, f: Dictionary) -> float:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"t": 1}
-	return minf(35, Datos.jsround((s.thc * fe.t * (.85 + .15 * p.health / 100) + f.thc + (.3 if p.fert else 0.0)) * 10) / 10.0)
+	return minf(35, Datos.jsround((s.thc * fe.t * (.85 + .15 * p.health / 100) + f.thc + .3 * fq(p)) * 10) / 10.0)
 
 static func plantas_vivas(S: Dictionary, ci: int) -> bool:
 	var H := huecos(S)

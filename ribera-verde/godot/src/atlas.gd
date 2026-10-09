@@ -200,7 +200,7 @@ static func ic_px(n: int, us: float) -> float:
 	return n * k
 
 # el icono del equipo (lámina 12): los LED, su panel; los demás focos, la lámpara; armarios (60 y 80) y carpas; cada extra, el suyo
-const ICX := {"vent": "ventilador", "filtro": "filtro", "garrafas": "garrafa", "goteo": "goteo"}
+const ICX := {"vent": "ventilador", "filtro": "filtro", "garrafas": "garrafa", "goteo": "goteo", "intra": "ventilador", "filtro100": "filtro", "filtro150": "filtro"}
 static func ico_foco(k: String) -> String:
 	return "led" if Datos.carga().FOCOS.has(k) and Datos.carga().FOCOS[k].tipo == "led" else "lampara"
 

@@ -1280,11 +1280,13 @@ func _pinta_wipe() -> void:
 var hud_heat := 0
 var hud_sosp := -1   # la barra de sospecha (1.10): -1 sin patrullas en el mapa
 var hud_alarma := false
-func hud_pon(t: String, heat: int, sosp := -1, alarma := false) -> void:
+var hud_orden := false   # (1.11) con la orden de registro, la barra dice ORDEN
+func hud_pon(t: String, heat: int, sosp := -1, alarma := false, orden := false) -> void:
 	if oraculo:
 		return
 	hud_txt.text = t
 	hud_heat = heat
+	hud_orden = orden
 	hud_sosp = sosp
 	hud_alarma = alarma
 	hud.show()
@@ -1294,8 +1296,9 @@ func hud_pon(t: String, heat: int, sosp := -1, alarma := false) -> void:
 func _pinta_hud_bar() -> void:
 	var f := negrita
 	var fs := roundi(7.5 * u)
-	hud_bar.draw_string(f, Vector2(0, f.get_ascent(fs) + (9 * u - f.get_height(fs)) / 2), "CALOR", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#eef8f0"))
-	var x := f.get_string_size("CALOR", HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 3 * u
+	var eti := "ORDEN" if hud_orden else "CALOR"
+	hud_bar.draw_string(f, Vector2(0, f.get_ascent(fs) + (9 * u - f.get_height(fs)) / 2), eti, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#eef8f0"))
+	var x := f.get_string_size(eti, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 3 * u
 	var y := (9 * u - 3 * u) / 2
 	hud_bar.draw_rect(Rect2(x, y, 34 * u, 3 * u), Color("#2e3a34"))
 	hud_bar.draw_rect(Rect2(x, y, 34 * u * hud_heat / 100.0, 3 * u), Color("#f04040") if hud_heat >= 70 else Color("#f0a030"))

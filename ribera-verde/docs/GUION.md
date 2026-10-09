@@ -173,17 +173,24 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 *(Si hablas con Baltasar en este capítulo: «Tranquilo. Ya te avisaré cuando toque el siguiente pago.»)*
 
 *Objetivo: «Saca en la mesa 2 variedades de receta y cosecha una planta de cada (N/2).» Patxi, en la fuente, da una pista de receta cada vez que le hablas («Cuarenta años cultivando en el monte. Te digo una cosa: …»). Van por turnos, de esta lista (`RECIPE_HINTS`, la misma que usa Kiko en sus consejos desde el capítulo 4):*
-1. Skunk #1 polinizada con Lemon Haze: así salió la Lemon Skunk.
-2. OG Kush con Blueberry da Blueberry Kush. Índica, de color azulado.
-3. Afghani con Skunk #1 es la Critical Mass. Produce como ninguna.
-4. Hindu Kush con Purple Afghani: la Purple Kush.
-5. Mango con Hindu Kush: Mango Kush.
-6. Blueberry con una Haze da Blue Dream. Con la Lemon Haze te vale.
-7. Acapulco Gold con Afghani: así se hizo la Trainwreck.
-8. Las de segunda generación se cruzan entre ellas: Critical Kush, Super Lemon Haze, Purple Haze...
-9. La Amnesia Haze de Darko viene de una Super Lemon Haze y una Trainwreck.
-10. La Fire OG sale de Critical Kush con Blueberry Kush. Hace falta paciencia.
-11. Una Amnesia Haze con una Fire OG... de ahí sale la Ghost Train Haze. Yo nunca lo he conseguido.
+1. Afghani, Colombian Gold y Acapulco Gold: de esas tres salió la Skunk #1. Cruza dos y luego la tercera.
+2. Punto Rojo o Michoacán con Thai: la Haze. Afghani con Thai: la Northern Lights.
+3. Afghani × Skunk #1 es la Critical Mass. Al revés, Skunk #1 × Afghani, la Super Skunk: la madre manda.
+4. Northern Lights × Haze da la NL5 × Haze; Haze × Northern Lights, la Silver Haze.
+5. Skunk #1 con Northern Lights: la Shiva Skunk.
+6. Chocolate Thai con Highland Oaxacan Gold: la Purple Thai. Con Highland Thai y Afghani, la Blueberry.
+7. Michoacán, Afghani y Thai: la Trainwreck. Con una Colombian Gold antes de la Thai sale la AK-47.
+8. Thai con Lamb's Bread: la Laughing Buddha. Haze con Michoacán: la Cannalope Haze.
+9. Hindu Kush con Chitral Kush: la Master Kush. Con Purple Afghani, la Purple Kush.
+10. Malawi o Congolese con Panama Red; Malawi con Chitral Kush: las sativas africanas.
+11. Una Haze con la NL5 × Haze da la Neville's Haze, casi pura Haze.
+12. Trainwreck con Hawaiian: la Pineapple Express. California Orange con Skunk #1: la Tangie.
+13. Haze, Lamb's Bread, Luang Prabang y una Afghani o una Hawaiian: así se hizo la Amnesia Haze de Darko.
+14. Blueberry con Haze, Blue Dream; con Cheese, Blue Cheese.
+15. Skunk #1, Northern Lights y Haze: la Super Silver Haze. La Lemon Haze sale de Lemon Skunk con Silver Haze.
+16. Kali Mist con Critical Mass: la Critical Kali Mist. Con AK-47, la Kali 47.
+17. La Sour Diesel sale de Chemdawg con Super Skunk. Hace falta paciencia.
+18. Haze × (Northern Lights × Shiva Skunk)... de ahí sale la Jack Herer. Yo nunca lo he conseguido.
 
 *(Antes del capítulo 4 Patxi solo dice: «Cuando tengas una mesa de genética, ven a verme. Algo sé de cruces.»)*
 
@@ -265,7 +272,7 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 > DEUDA SALDADA
 > Has saldado los 30.000 € de tu tía Maite en N días.
 > Variedades: X · Ventas totales: Y €
-> Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco. ¿Completarás la GENOTECA? ¿Conseguirás la GHOST TRAIN HAZE?
+> Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco. ¿Completarás la GENOTECA? ¿Conseguirás la JACK HERER?
 
 ## Capítulo 8 · Tu imperio
 
@@ -289,9 +296,9 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 > **SMS · IÑAKI:** Se corre la voz: X € vendidos desde que pagaste a Baltasar.
 > **SMS · IÑAKI:** Desde hoy te cargo hasta 2 kg al día en el barco. *(5 kg y 10 kg en los rangos siguientes)*
 
-*La primera vez que sale la Ghost Train Haze en la mesa de genética (desde el capítulo 4):*
-> Te tiemblan las manos: es GHOST TRAIN HAZE.
-> **SMS · KIKO:** ¿Ghost Train Haze? ¿De semilla propia? Llevo veinte años detrás de ella.
+*La primera vez que sale la Jack Herer en la mesa de genética (desde el capítulo 4):*
+> Te tiemblan las manos: es JACK HERER.
+> **SMS · KIKO:** ¿Jack Herer? ¿De semilla propia? Llevo veinte años detrás de ella.
 > **SMS · KIKO:** Tu tía estaría orgullosa. Estabilízala y guárdala bien: eso vale más que el piso.
 
 ## La caja fuerte

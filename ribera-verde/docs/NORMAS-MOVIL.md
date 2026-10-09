@@ -1,6 +1,6 @@
 # Ribera Verde para móvil: normas básicas de un juego de Android
 
-Repaso de la app de Godot (`com.riberaverde.godot`, 0.4.0) contra lo que se espera de un juego para móvil: las guías de calidad
+Repaso de la app de Godot (`com.riberaverde.godot`, 0.5.0) contra lo que se espera de un juego para móvil: las guías de calidad
 de Android (Core app quality, Material: zonas táctiles, botón Atrás, ciclo de vida) y lo que pide Google Play. Lo de la tienda
 (ficha, clasificación, privacidad, AAB y clave) está en [PLAY.md](PLAY.md). Cada punto dice dónde está y qué lo comprueba
 (`godot/tests/ciclo.gd` es la partida jugada con los mandos: `ciclo: 0 fallos`).
@@ -13,7 +13,7 @@ de Android (Core app quality, Material: zonas táctiles, botón Atrás, ciclo de
 |---|---|---|
 | Icono propio, clásico y adaptativo (Android 8+), sin recortes con ninguna máscara | ✅ | `tools/sprites/a-mano/icono.py` → `art/icono`; la hoja va entera dentro del círculo seguro de 66 dp (a 18,6 de 22 px de radio); `art/icono/vista.png` lo enseña con máscara redonda, de ardilla y cuadrada |
 | Pantalla de arranque propia, sin el logo del motor | ✅ | `godot/arranque.png` sobre el fondo del juego (`boot_splash` en `project.godot`) |
-| Nombre y versión visibles y coherentes | ✅ | «Ribera Verde», 0.4.0 (código 6) en `project.godot`, `export_presets.cfg` y los créditos |
+| Nombre y versión visibles y coherentes | ✅ | «Ribera Verde», 0.5.0 (código 7) en `project.godot`, `export_presets.cfg` y los créditos |
 | Sin permisos que no use | ✅ | ninguno (`permissions/*` vacíos; lo comprueba el APK desempaquetado) |
 | 64 bits | ✅ | arm64-v8a |
 | Horizontal con el sensor, pantalla completa inmersiva, muescas | ✅ | `sensorLandscape`, `immersive_mode`; los mandos y la pantalla dejan los márgenes seguros (`_zona_segura`) |

@@ -379,4 +379,4 @@ func update_hud() -> void:
 	var r := total_rosin()
 	var ro := (" · " + Datos.coma(Datos.jsround(r * 10) / 10.0) + " g rosin") if r else ""
 	hud_pon("DÍA %s · %s:%s\n%s · %d g%s" % [n(S.day), hh, mm, Datos.eur(S.money), int(floor(total_buds())), ro], Datos.jsround(S.heat),
-		Datos.jsround(SOSP.v) if n_patrullas() else -1, SOSP.alarma != null)
+		Datos.jsround(SOSP.v) if n_patrullas() else -1, SOSP.alarma != null, float(S.get("orden", 0)) > 0)

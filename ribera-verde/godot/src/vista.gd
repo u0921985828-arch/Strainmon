@@ -402,8 +402,9 @@ func _pinta_base() -> void:
 	var xr: int = g.vc.xl + g.vc.w
 	# el filtro de carbón, colgado del techo arriba a la izquierda (el extractor tiembla 1 px), y el ventilador de pinza en el poste
 	# del fondo derecho, a 55 cm del suelo, siempre girando
-	if c.get("filtro"):
-		var fs = vc_sprite("extra-c-filtro-", (30 if c.t == "p60" or c.t == "p80" else 50) * g.vc.Z, true)
+	var kk := Cultivo.kit_de(c)   # (1.11) el kit de 100 mm, a 30 cm; el de 150, a 50; el de 125, según la carpa
+	if kk != "":
+		var fs = vc_sprite("extra-c-filtro-", (30 if kk == "filtro100" or kk == "filtro" and (c.t == "p60" or c.t == "p80") else 50) * g.vc.Z, true)
 		var fi := Arte.foto(fs.n)
 		base.draw_texture(Arte.tex("x|" + fs.n, fi), Vector2(g.vc.xl + 10 - 47 + int(floor(now / 90)) % 2, 3 - (fi.get_height() - Arte.alto(fi))))
 	if c.get("vent"):

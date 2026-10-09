@@ -169,7 +169,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       // la escena: A delante del armario, ▶ plaza 2, ▲ el foco, B sale
       enterMap('home', A.x0, A.y + 1, 'up'); press('A'); await hasta(() => mode === 'carpa' && handlers.length === 1); await espera(150);
       const hay = c => c && c.width > 0 && colores(c).size > 2;
-      r.escena = hay(cuarto34()) && Object.keys(CARPAS).every(t => hay(carpa34(t))) && Object.keys(MACETAS).every(k => hay(maceta34(k))) && Object.keys(FOCOS).every(k => hay(foco34(k))) && Object.keys(EXTRAS).every(k => hay(extra34(k)));
+      r.escena = hay(cuarto34()) && Object.keys(CARPAS).every(t => hay(carpa34(t))) && Object.keys(MACETAS).every(k => hay(maceta34(k))) && Object.keys(FOCOS).every(k => hay(foco34(k))) && Object.keys(EXTRAS).filter(k => k !== 'intra' && !(KITS.includes(k) && k !== 'filtro')).every(k => hay(extra34(k)));   // 1.11: los tres kits se pintan con el filtro y el intractor no se ve
       r.sel = [VC.sel]; press('right'); r.sel.push(VC.sel); press('up'); r.sel.push(VC.sel); r.info = document.getElementById('vcInfo').textContent;
       press('B'); await hasta(() => mode === 'world' && isFree()); r.sale = !VC && document.getElementById('vcInfo').hidden;
       return r; });

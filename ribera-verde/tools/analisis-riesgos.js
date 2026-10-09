@@ -160,15 +160,14 @@ function copa(thc, sigma, luz, abono, salud = 100) {
   return p;
 }
 
-// la redada (11-historia, raidEvent): se lleva lo de fuera (lo de encima y el arcón; los escenarios lo tienen vacío) y una multa (MULTA_REDADA) que se paga de fuera y, si no llega, de la
-// caja; la caja la encuentran 1 de cada 4 veces (CAJA_REDADA): sus gramos y la mitad de su dinero. Pérdida media en euros
-const MULTA_R = 3000, P_CAJA = .25;
+// la redada (1.11, 11-historia, raidEvent): se lleva las plantas y lo de fuera (lo de encima y el arcón; los escenarios lo
+// tienen vacío) y una multa según lo que encuentra (multaRedada: 601 € + 300 por planta + 3 por gramo, hasta 30.000) que se paga
+// de fuera y, si no llega, de la caja. La caja no la tocan. Pérdida en euros (las plantas, aparte)
+const MULTA_R = [601, 300, 3, 30000], CALOR_R = 40;
+const multaR = (plantas, g) => Math.min(MULTA_R[3], MULTA_R[0] + MULTA_R[1] * plantas + MULTA_R[2] * g);
 function redada(e, eurG) {
-  const k = e.caja || { money: 0, g: 0 }, multa = m => Math.min(MULTA_R, m);
-  const no = e.g * eurG + multa(e.money + k.money);
-  if (!e.caja) return { eur: no, hallada: 0 };
-  const ce = Math.floor(k.money / 2), si = e.g * eurG + k.g * eurG + ce + multa(e.money + k.money - ce);
-  return { eur: (1 - P_CAJA) * no + P_CAJA * si, hallada: k.g ? P_CAJA : 0 };
+  const k = e.caja || { money: 0, g: 0 }, m = multaR(e.plantas || 0, e.g);
+  return { eur: e.g * eurG + Math.min(m, e.money + k.money), multa: m };
 }
 
 // ---------- comprobación con el juego ----------
@@ -203,7 +202,7 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
   });
   const juego = (fn, a) => page.evaluate(fn, a);
   const datos = await juego(() => ({ eurG: precioCalle(18), eurMayor: precioMayor(18), pc: [12, 18, 24, 30].map(t => [t, precioCalle(t), precioMayor(t)]),
-    multa: MULTA_CALLE, redada: MULTA_REDADA, olor: OLOR, premio: PREMIO_COPA,
+    multa: MULTA_CALLE, redada: [MULTA_REDADA, MULTA_PLANTA, MULTA_G, MULTA_TOPE], calorR: CALOR_REDADA, niveles: NIVEL_POLI, olor: OLOR, premio: PREMIO_COPA,
     focos: Object.fromEntries(Object.entries(FOCOS).map(([k, F]) => [k, { thc: F.thc, w: F.w }])), W_M2,
     carpas: Object.fromEntries(Object.entries(CARPAS).map(([k, C]) => [k, { cm: C.cm, n: C.plazas }])),
     sigma: Object.fromEntries(Object.entries(GENETICA).map(([k, G]) => [k, G.sigma])),
@@ -383,17 +382,21 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
   };
 
   // ---- 5. calor: newDay de verdad (bajada diaria, olor) y, si la encola, la redada (raidEvent) ----
+  // (1.11) con 90 o más, la orden de registro (y el aviso de Kiko); la redada, al cambiar el día siguiente
   const dia = await juego(() => (async () => {
     const r = [];
-    for (const [heat, protect, flor] of [[90, false, 0], [89.9, false, 0], [100, true, 0], [40, false, 2]]) {
+    for (const [heat, protect, flor] of [[90, false, 0], [89.9, false, 0], [100, true, 0], [40, false, 2], [40, false, 3]]) {
       S = newState();Object.assign(S, { ch: 5, heat, protect, map: 'home', money: 5000 });S.buds = { ria: { g: 100, thc: 12 } };
       if (flor) { S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'm100', foco: 'cfl' }];S.macetas = Array(6).fill('plastico7');S.pots = Array(6).fill(null);
+        if (flor === 3) { S.carpas[0].filtro100 = true;S.carpas[1].filtro = true; }
         S.pots[0] = { sid: 'ria', prog: .8, water: 70, health: 100 };S.pots[2] = { sid: 'ria', prog: .8, water: 70, health: 100 }; }
       else S.pots = [{ sid: 'ria', prog: .3, water: 70, health: 100 }, null];
       const q = [];window.queue = (k, fn) => q.push([k, fn]);
-      newDay();const antes = { heat: S.heat, money: S.money }, raid = q.find(x => x[0] === 'raid');
-      if (raid) await raid[1]();
-      r.push({ heat, protect, flor, redada: !!raid, despues: antes.heat, final: S.heat, plantas: S.pots.filter(Boolean).length, g: totalBuds(), multa: antes.money - S.money, dinero: antes.money });
+      newDay();const despues = S.heat, orden = q.some(x => x[0] === 'orden'), raid1 = q.some(x => x[0] === 'raid');
+      const np = S.pots.filter(p => p && !p.dead).length;
+      if (orden) { q.length = 0;newDay(); }
+      const m0 = S.money, raid = q.find(x => x[0] === 'raid');if (raid) await raid[1]();
+      r.push({ heat, protect, flor, orden, raid1, redada: !!raid, despues, final: S.heat, np, plantas: S.pots.filter(Boolean).length, g: totalBuds(), multa: m0 - S.money, dinero: m0 });
     }
     window.queue = ORIG.queue;
     return r;
@@ -431,19 +434,20 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
   // la redada con la caja fuerte (1.10): raidEvent de verdad, n veces; lo que se pierde (dinero y gramos a eurG €/g, sin las
   // plantas, que se pierden igual) y cuántas veces encuentran la caja
   const redadaMC = (e, n) => juego(({ e, n }) => {
-    semilla(555);let hall = 0, p = 0, p2 = 0;
+    semilla(555);let p = 0, p2 = 0, cg = 0, pl = 0;
     return (async () => {
       for (let i = 0; i < n; i++) {
-        S = newState();Object.assign(S, { ch: 5, heat: 95, protect: false, map: 'home', money: e.money });S.buds = e.g ? { ria: { g: e.g, thc: 12 } } : {};
+        S = newState();Object.assign(S, { ch: 5, heat: 95, protect: false, map: 'home', money: e.money, orden: S.day });S.buds = e.g ? { ria: { g: e.g, thc: 12 } } : {};
+        S.carpas = [{ t: 'm100', foco: 'cfl' }];S.macetas = Array(4).fill('plastico7');S.pots = S.macetas.map((_, j) => j < (e.plantas || 0) ? { sid: 'ria', prog: .5, water: 70, health: 100 } : null);
         S.caja = e.caja ? { money: e.caja.money, buds: e.caja.g ? { ria: { g: e.caja.g, thc: 12 } } : {}, nivel: 2 } : null;
-        const m0 = S.money + cajaE(), g0 = totalBuds() + cajaG();await raidEvent();
-        const x = m0 - S.money - cajaE() + (g0 - totalBuds() - cajaG()) * e.eurG;p += x;p2 += x * x;if (e.caja && e.caja.g && !cajaG()) hall++;
+        const m0 = S.money + cajaE(), g0 = totalBuds() + cajaG(), k0 = cajaG();await raidEvent();
+        const x = m0 - S.money - cajaE() + (g0 - totalBuds() - cajaG()) * e.eurG;p += x;p2 += x * x;cg += k0 - cajaG();pl += S.pots.filter(Boolean).length;
       }
-      return { eur: p / n, sd: Math.sqrt(Math.max(0, p2 / n - (p / n) ** 2)), hallada: hall / n };
+      return { eur: p / n, sd: Math.sqrt(Math.max(0, p2 / n - (p / n) ** 2)), cajaG: cg / n, plantas: pl / n, calor: S.heat, orden: S.orden };
     })();
   }, { e, n });
   // las zonas y la caja de verdad: ZONAS, CAJA y las constantes de la caja (11b-caja)
-  const zc = await juego(() => ({ ZONAS, PATRULLAS, PAT, ROSIN, CAJA, CAJA_P, CAJA_REDADA, CAJA_ANIO, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, CUOTA_DIAS,
+  const zc = await juego(() => ({ ZONAS, PATRULLAS, PAT, ROSIN, CAJA, CAJA_P, CAJA_ANIO, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, CUOTA_DIAS,
     rosin: [36, 54, 75].map(t => [t, precioRosin(t)]) }));
 
   // ---- 6. la Copa: harvest de verdad (fenotipo con rollFeno) de la carpa llena; los lotes se juntan con addBuds, como en el
@@ -630,11 +634,14 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
 
     // ---------- 5. calor y ventas ----------
     const d = dia;
-    exige('newDay: la redada salta con calor 90 y no con 89,9', d[0].redada && !d[1].redada, d.map(x => x.redada));
-    exige('newDay: −12 al día', Math.abs(d[0].despues - 78) < 1e-9 && Math.abs(d[1].despues - 77.9) < 1e-9, [d[0].despues, d[1].despues]);
-    exige('redada sin protección: plantas, gramos, multa y calor 30', d[0].plantas === 0 && d[0].g === 0 && d[0].multa === Math.min(d[0].dinero, datos.redada) && d[0].final === 30, d[0]);
-    exige('con protección: −20 al día y la redada se para con calor 50, sin quitar nada', d[2].redada && Math.abs(d[2].despues - 80) < 1e-9 && d[2].final === 50 && d[2].plantas === 1 && d[2].g === 100 && d[2].multa === 0, d[2]);
-    exige('dos carpas en flor sin filtro', Math.abs(d[3].despues - (40 - 12 + 2 * datos.olor)) < 1e-9, d[3]);
+    exige('multa y calor de la redada: los del juego', datos.redada.join() === MULTA_R.join() && datos.calorR === CALOR_R, [datos.redada, datos.calorR]);
+    exige('niveles: tranquilo, vigilancia, investigación y orden (0, 30, 60, 90; bajan 12, 12, 8 y 0 al día)', datos.niveles.map(([c, , b]) => c + '/' + b).join() === '0/12,30/12,60/8,90/0', datos.niveles);
+    exige('newDay: con calor 90, orden de registro y aviso, y la redada al día siguiente; con 89,9, nada', d[0].orden && !d[0].raid1 && d[0].redada && !d[1].orden && !d[1].redada, d.map(x => [x.orden, x.raid1, x.redada]));
+    exige('newDay: con la orden no baja; en investigación, −8', d[0].despues === 90 && Math.abs(d[1].despues - 81.9) < 1e-9, [d[0].despues, d[1].despues]);
+    exige('redada sin protección: plantas, gramos, la multa según lo hallado y calor 40', d[0].plantas === 0 && d[0].g === 0 && d[0].multa === Math.min(d[0].dinero, multaR(d[0].np, 100)) && d[0].final === CALOR_R, d[0]);
+    exige('con protección: la orden ni llega y la redada se para con calor 50, sin quitar nada', !d[2].orden && d[2].redada && d[2].despues === 100 && d[2].final === 50 && d[2].plantas === 1 && d[2].g === 100 && d[2].multa === 0, d[2]);
+    exige('dos carpas en flor sin extractor: +2 cada una', Math.abs(d[3].despues - (40 - 12 + 2 * datos.olor)) < 1e-9, d[3]);
+    exige('con extractor a su medida, sin olor', Math.abs(d[4].despues - (40 - 12)) < 1e-9, d[4]);
     const VENTAS = [
       { n: 'Calle · currela, 8 g a precio justo', c: { ch: 4, type: 'cur', want: 8, minThc: 0, thc: 18 }, j: 1, acc: .92 },
       { n: 'Calle · pijo del cap. 6 (pide 21 % de THC), 12 g de THC 24 a precio caro', c: { ch: 6, type: 'pij', want: 12, minThc: 21, thc: 24 }, j: 2, acc: clamp(.3 + (24 - 21) * .05 + .25, .1, .9) },
@@ -661,7 +668,7 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
     vender.push(await venta({ n: 'Catador · 2 g de rosin al 54 % a precio justo (cap. 3, con la prensa)', c: { ch: 4, type: 'ext', want: 2, minThc: 0, thc: 54 }, j: 1, acc: .92 }));
     T.eficiencia = ['| Venta (THC 18 %, salvo el pijo y el rosin) | Cobras | €/g | Calor | € por punto de calor |', '|---|---|---|---|---|',
       ...vender.map(([n, e, h], i) => { const g = [8, 12, 8, 10, 1000, 10000, zc.ENCARGO[1], 2][i];return `| ${n} | ${eur(e)} | ${coma(e / g, 2)} | +${coma(h, 0)} | ${miles(e / h)} € |`; })].join('\n');
-    T.calorOk = `Comprobado con el juego: redada con calor 90 y no con 89,9 (se lleva las plantas, los gramos y hasta ${eur(datos.redada)} de multa, y deja el calor en 30); −12 al día; con protección, −20 y la redada se para (calor 50, sin quitar nada); +${datos.olor} por carpa en flor sin filtro.`;
+    T.calorOk = `Comprobado con el juego: con calor 90 al cambiar el día (y no con 89,9) llega la orden de registro con el aviso de Kiko y, al día siguiente, la redada (las plantas, el equipo de sus carpas y lo de fuera; la caja, no; multa de ${eur(MULTA_R[0])} + ${eur(MULTA_R[1])} por planta + ${MULTA_R[2]} € por gramo, hasta ${eur(MULTA_R[3])}; el calor queda en ${CALOR_R}); baja 12 al día en tranquilo y vigilancia, 8 en investigación y nada con la orden (con Molina, × 1,5, y la redada se para: calor 50, sin quitar nada); +${datos.olor} por carpa en flor sin extractor (con uno corto de caudal, +1).`;
 
     // ---------- 6. Copa ----------
     const nom = datos.nombres, CP = { p60: 'armario 60', m100: 'carpa 100', m120: 'carpa 120', g150: 'carpa 150' }, FC = { cfl: 'CFL', led480: 'LED 480 W', sodio600: 'sodio 600 W', led720: 'LED 720 W' };
@@ -681,8 +688,8 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
 
     // ---------- 7. caja fuerte (1.10): hoy (todo encima), con caja (solo lo del viaje) y con caja y el soborno encima. Los
     // trayectos se andan en el juego con lo demás dentro de S.caja (cada tramo de cada columna); las pérdidas, del modelo ----
-    exige('caja: C de 20.000 € y 2 kg, B de 50.000 € y 2,5 kg (380 €), 1 de cada 4 redadas, 1998, 300 € dentro', zc.CAJA[1].money === 20000 && zc.CAJA[1].g === 2000 && zc.CAJA[2].money === 50000 && zc.CAJA[2].g === 2500
-      && zc.CAJA_P === 380 && zc.CAJA_REDADA === P_CAJA && zc.CAJA_ANIO === 1998 && zc.MAITE_CAJA === 300 && datos.redada === MULTA_R, zc);
+    exige('caja: C de 20.000 € y 2 kg, B de 50.000 € y 2,5 kg (380 €), 1998, 300 € dentro', zc.CAJA[1].money === 20000 && zc.CAJA[1].g === 2000 && zc.CAJA[2].money === 50000 && zc.CAJA[2].g === 2500
+      && zc.CAJA_P === 380 && zc.CAJA_ANIO === 1998 && zc.MAITE_CAJA === 300, zc);
     const R = Object.fromEntries(rutas.map(r => [r.k, r.tiles]));
     // por tramo: el ladrón (la mejor estrategia; el primero del tramo) y, aparte, lo que pierdes si una patrulla te pilla (el
     // control, con la mejor opción); sin gramos encima, la patrulla no sospecha y no hay control
@@ -721,15 +728,16 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
       sup.push(`- **${c.n}:** calor ${b.heat}, reputación ${b.rep}, vida ${b.hp}, ${b.spray ? b.spray + ' spray' + (b.spray > 1 ? 's' : '') : 'sin spray'} y ${b.bocata} bocata${b.night ? ', de noche' : ''}; gramos a ${coma(c.eurG, 2)} €/g. Sin caja: ${l(...c.hoy)}. Con caja: ${l(...c.caja)}${extra ? `; con el soborno, ${eur(extra)} más en cada tramo` : ''}.`);
     }
     // la redada con la caja, jugada
-    const RED = [{ n: 'Sin caja: 10.000 € y 500 g en el piso', money: 10000, g: 500 }, { n: 'Con caja: todo dentro', money: 0, g: 0, caja: { money: 10000, g: 500 } },
-      { n: 'Con caja: 1.000 € y 100 g fuera, el resto dentro', money: 1000, g: 100, caja: { money: 9000, g: 400 } }, { n: 'Con caja: 3.000 € fuera (pagan la multa), el resto dentro', money: 3000, g: 0, caja: { money: 7000, g: 500 } }];
+    const RED = [{ n: 'Sin caja: 10.000 € y 500 g en el piso, 4 plantas', money: 10000, g: 500, plantas: 4 }, { n: 'Con caja: todo dentro, 4 plantas', money: 0, g: 0, plantas: 4, caja: { money: 10000, g: 500 } },
+      { n: 'Con caja: 1.000 € y 100 g fuera, 4 plantas', money: 1000, g: 100, plantas: 4, caja: { money: 9000, g: 400 } }, { n: 'Con caja: todo dentro, entre cosechas (sin plantas)', money: 0, g: 0, plantas: 0, caja: { money: 10000, g: 500 } }];
     const filasRe = [];
     for (const e of RED) {
       const x = redada(e, datos.eurG), mc = await redadaMC({ ...e, eurG: datos.eurG }, N);
-      compara(`redada «${e.n}»: pérdida`, x.eur, mc.eur, N, mc.sd);compara(`redada «${e.n}»: caja hallada`, x.hallada, mc.hallada, N);
-      filasRe.push(`| ${e.n} | ${e.caja ? pc(x.hallada, 0) : '—'} | −${eur(x.eur)} | −${eur(mc.eur)} |`);
+      compara(`redada «${e.n}»: pérdida`, x.eur, mc.eur, N, mc.sd);
+      exige(`redada «${e.n}»: la caja intacta, sin plantas, calor ${CALOR_R} y sin orden`, mc.cajaG === 0 && mc.plantas === 0 && mc.calor === CALOR_R && !mc.orden, mc);
+      filasRe.push(`| ${e.n} | ${eur(x.multa)} | −${eur(x.eur)} | −${eur(mc.eur)} |`);
     }
-    T.redada = ['| En el piso (gramos a ' + coma(datos.eurG, 2) + ' €/g; las plantas se pierden igual) | Encuentran la caja | Pérdida media (modelo) | Juego |', '|---|---|---|---|', ...filasRe].join('\n');
+    T.redada = ['| En el piso (gramos a ' + coma(datos.eurG, 2) + ' €/g; las plantas se pierden igual) | Multa | Pérdida (modelo) | Juego |', '|---|---|---|---|', ...filasRe].join('\n');
     T.caja = ['| Ida y vuelta | Sin caja: ladrón · pérdida media · si te pilla una patrulla a la ida | Con caja | Con caja y el soborno encima |', '|---|---|---|---|', ...filasK].join('\n');
     T.cajaSup = sup.join('\n');
     T.meta = `Generado con \`npm run analisis\`: ${miles(comprobadas)} cifras comprobadas con el juego (${miles(N)} combates, controles, ventas o trayectos simulados por celda, ${miles(N * 5)} pasos por situación, ${miles(NC)} carpas por fila de la Copa y las patrullas fotograma a fotograma). Gramos a ${coma(datos.eurG, 2)} €/g (precio de calle de una variedad del 18 %), salvo donde se dice.`;

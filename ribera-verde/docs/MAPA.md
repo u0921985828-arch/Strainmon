@@ -476,11 +476,19 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 |---|---|---|---|
 | Semillas Skunk #1 | 5 € | 1 |  |
 | Semillas Lemon Haze | 9 € | 2 |  |
-| Semillas OG Kush | 10 € | 2 |  |
+| Semillas Super Skunk | 10 € | 2 |  |
 | Semillas Blueberry | 8 € | 3 |  |
-| Semillas Mango | 7 € | 3 |  |
+| Semillas Big Bud | 7 € | 3 |  |
+| Semillas Lemon Skunk | 8 € | 3 |  |
+| Semillas Cheese | 9 € | 3 |  |
 | Semillas Purple Afghani | 8 € | 4 |  |
-| Abono de floración 1 L | 14 € | 1 | 4 dosis. Una por planta: +25% de cosecha. |
+| Semillas Kali Mist | 10 € | 4 |  |
+| Semillas California Orange | 8 € | 4 |  |
+| Semillas Chemdawg | 12 € | 5 |  |
+| Abono de floración 1 L | 14 € | 1 | 4 dosis. Una por planta: +25% de cosecha, con el pH corregido (sin pH−, la mitad). |
+| Abono de crecimiento 1 L | 12 € | 1 | 4 dosis. Una por planta en crecimiento: crece un 15 % más deprisa hasta florecer (sin pH−, la mitad). |
+| pH− 250 ml | 6 € | 1 | 10 dosis. Se gasta una con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. Sin él, el abono rinde la mitad; sin medidor, a ojo (×0,75). |
+| Medidor de pH y EC | 35 € | 2 | Mide el pH y la EC del riego: con pH−, el abono rinde entero, y en PLANTAS ves la EC y el pH de cada maceta. |
 | Insecticida de neem 500 ml | 12 € | 1 | 3 tratamientos. Cada uno elimina una plaga de araña roja. |
 | Bocata | 5 € | 1 | Recupera 15 de vida. En combate o desde la mochila. |
 | Spray de pimienta | 15 € | 2 | En combate: 12-16 de daño seguro a un ladrón. |
@@ -488,9 +496,12 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Maceta de plástico 18 L | 2 € | 2 | 18 L · hasta 144 g por planta · crece −5% · riego ×0,8 · Se cambia en una plaza vacía de la carpa. |
 | Maceta de tela 25 L | 4 € | 3 | 25 L · hasta 210 g por planta · cosecha +5% · riego ×1,1 · menos plagas · Se cambia en una plaza vacía de la carpa. |
 | Foco LED 100 W | 110 € | 1 | 100 W · ilumina 60×60 cm · 0,65 g/W (0,81 abonando) · crece +5% · THC +0,3 · riego ×1 · Luz: 39 kWh (6 €) al día con plantas. · Aguanta en carpas de 60, 80, 100, 120 y 150. |
-| Ventilador de pinza | 20 € | 1 | Mueve el aire de la carpa: plagas ×0,7. Gasta 25 W día y noche. · Uno por carpa. |
+| Ventilador de pinza | 20 € | 1 | Mueve el aire de la carpa: plagas ×0,7, moho ×0,5 y crecen un 3 % más. Gasta 25 W día y noche. · Uno por carpa. |
 | Garrafas de riego | 15 € | 1 | Una garrafa con gotero junto a cada maceta: riega sola la planta que baja del 50 % de agua y le dura media cosecha. Se rellenan desde la vista de carpa. · Una tanda por carpa. |
-| Extractor con filtro de carbón | 110 € | 2 | Sin filtro, cada carpa con plantas en floración suma +2 de calor policial al día por el olor. Con él, nada. Gasta 75 W día y noche. · Uno por carpa. |
+| Extractor 100 mm con filtro | 75 € | 1 | Saca el aire de la carpa por un filtro de carbón: sin olor, menos calor y menos humedad. Mueve 250 m³/h; cada carpa pide su volumen × 60 por hora (× 1,3 por el filtro) y más con focos que calientan. Corto de caudal, huele algo. Gasta 35 W día y noche. · Uno por carpa. |
+| Extractor 125 mm con filtro | 110 € | 2 | Saca el aire de la carpa por un filtro de carbón: sin olor, menos calor y menos humedad. Mueve 400 m³/h; cada carpa pide su volumen × 60 por hora (× 1,3 por el filtro) y más con focos que calientan. Corto de caudal, huele algo. Gasta 75 W día y noche. · Uno por carpa. |
+| Extractor 150 mm con filtro | 190 € | 3 | Saca el aire de la carpa por un filtro de carbón: sin olor, menos calor y menos humedad. Mueve 750 m³/h; cada carpa pide su volumen × 60 por hora (× 1,3 por el filtro) y más con focos que calientan. Corto de caudal, huele algo. Gasta 110 W día y noche. · Uno por carpa. |
+| Intractor 100 mm | 45 € | 2 | Mete aire fresco de fuera por abajo: el extractor rinde entero (sin él, un 15 % menos). Gasta 25 W día y noche. · Uno por carpa. |
 | Riego por goteo | 1.200 € | 4 | Depósito grande con bomba y goteros para toda la carpa: riega solo cada planta que baja del 50 % de agua y, con la carpa llena de tierra, dura unas cinco cosechas. Se rellena desde la vista de carpa. Con él, las garrafas sobran. · Uno por carpa. |
 | Foco sodio 250 W | 85 € | 2 | 250 W · ilumina 70×70 cm · 0,45 g/W (0,56 abonando) · crece +5% · THC +0,3 · riego ×1,3 · Luz: 98 kWh (16 €) al día con plantas. · Aguanta en carpas de 60, 80, 100, 120 y 150. |
 | Foco LED 200 W | 220 € | 2 | 200 W · ilumina 80×80 cm · 0,7 g/W (0,88 abonando) · crece +10% · THC +0,6 · riego ×1,05 · Luz: 78 kWh (12 €) al día con plantas. · Aguanta en carpas de 60, 80, 100, 120 y 150. |

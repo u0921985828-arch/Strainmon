@@ -36,15 +36,34 @@ const MACETAS={
 // tierra (1.10): cada carpa admite como mucho LITROS_M2 litros por m² de suelo, sumando todas sus macetas (4 de 25 L en 1 m²)
 const LITROS_M2=100,litrosMax=ci=>{const [W,,D]=CARPAS[S.carpas[ci].t].cm;return Math.round(W*D/1e4*LITROS_M2);};
 const litrosCarpa=ci=>huecos().reduce((a,q,i)=>a+(q.c===ci?(MACETAS[S.macetas[i]]||MACETAS.plastico7).l:0),0);
-// extras (1.10): uno de cada por carpa (S.carpas[ci][k] = true); se compran en el growshop (S.items['x_'+k]) y se ponen desde la vista de carpa
+// extras (1.10): uno de cada por carpa (S.carpas[ci][k] = true); se compran en el growshop (S.items['x_'+k]) y se ponen desde la vista de carpa.
+// (1.11) Tres kits de extracción (extractor + filtro de carbón, KITS: m3 = m³/h): uno por carpa, el que pongas devuelve el otro a la
+// mochila (filtro es el de 125 mm de antes). El intractor mete aire de fuera: sin él, el extractor rinde ×INTRA
 const EXTRAS={
-  vent:{n:'Ventilador de pinza',c:'Ventilador',w:25,d:'Mueve el aire de la carpa: plagas ×0,7. Gasta 25 W día y noche.'},
-  filtro:{n:'Extractor con filtro de carbón',c:'Filtro de carbón',w:75,d:'Sin filtro, cada carpa con plantas en floración suma +2 de calor policial al día por el olor. Con él, nada. Gasta 75 W día y noche.'},
+  vent:{n:'Ventilador de pinza',c:'Ventilador',w:25,d:'Mueve el aire de la carpa: plagas ×0,7, moho ×0,5 y crecen un 3 % más. Gasta 25 W día y noche.'},
+  filtro:{n:'Extractor de 125 mm con filtro de carbón',c:'Extractor 125 mm',w:75,m3:400},
   garrafas:{n:'Garrafas de riego',c:'Garrafas',pl:true,w:0,d:'Una garrafa con gotero junto a cada maceta: riega sola la planta que baja del 50 % de agua y le dura media cosecha. Se rellenan desde la vista de carpa.'},
-  goteo:{n:'Riego por goteo',c:'Goteo',w:0,d:'Depósito grande con bomba y goteros para toda la carpa: riega solo cada planta que baja del 50 % de agua y, con la carpa llena de tierra, dura unas cinco cosechas. Se rellena desde la vista de carpa. Con él, las garrafas sobran.'}};
+  goteo:{n:'Riego por goteo',c:'Goteo',w:0,d:'Depósito grande con bomba y goteros para toda la carpa: riega solo cada planta que baja del 50 % de agua y, con la carpa llena de tierra, dura unas cinco cosechas. Se rellena desde la vista de carpa. Con él, las garrafas sobran.'},
+  intra:{n:'Intractor de 100 mm',c:'Intractor',w:25,d:'Mete aire fresco de fuera por abajo: el extractor rinde entero (sin él, un 15 % menos). Gasta 25 W día y noche.'},
+  filtro100:{n:'Extractor de 100 mm con filtro de carbón',c:'Extractor 100 mm',w:35,m3:250},
+  filtro150:{n:'Extractor de 150 mm con filtro de carbón',c:'Extractor 150 mm',w:110,m3:750}};
+const KITS=['filtro150','filtro','filtro100'],kitDe=c=>c&&KITS.find(k=>c[k])||null;
+// clima de cada carpa (1.11): dentro hace más calor y humedad que en la sala. El foco calienta KT °C por vatio de día y las plantas
+// sudan HR_CARPA puntos cada una; el extractor saca la parte e (extCarpa, de 0 a 1) del calor (×0,75) y de la humedad (×0,8). La
+// carpa pide su volumen × 60 renovaciones por hora × 1,3 (lo que frena el filtro) + EXT_W m³/h por vatio del foco (el sodio, más)
+const KT={cfl:.012,sodio:.015,led:.005},EXT_W={cfl:.3,sodio:.5,led:.2},HR_CARPA=1.5,INTRA=.85,OLOR_MAL=.7;
+for(const k of KITS)EXTRAS[k].d=`Saca el aire de la carpa por un filtro de carbón: sin olor, menos calor y menos humedad. Mueve ${EXTRAS[k].m3} m³/h; cada carpa pide su volumen × 60 por hora (× 1,3 por el filtro) y más con focos que calientan. Corto de caudal, huele algo. Gasta ${EXTRAS[k].w} W día y noche.`;
+const caudalPide=ci=>{const c=S.carpas[ci],[W,H,D]=CARPAS[c.t].cm,F=FOCOS[c.foco];return Math.round(W*H*D/1e6*60*1.3+F.w*EXT_W[F.tipo]);};
+const extCarpa=ci=>{const c=S.carpas[ci],k=kitDe(c);return k?Math.min(1,EXTRAS[k].m3/caudalPide(ci))*(c.intra?1:INTRA):0;};
+const extTxt=ci=>{const c=S.carpas[ci],k=kitDe(c);return `${k?EXTRAS[k].c+': '+EXTRAS[k].m3:'Sin extractor: 0'} de ${caudalPide(ci)} m³/h${k&&!c.intra?' · sin intractor':''}`;};
+function climaCarpa(ci,noche=isNight()){
+  const cl=climaSala(noche),c=S.carpas[ci],n=huecos().reduce((a,h,i)=>a+(h.c===ci&&S.pots[i]&&!S.pots[i].dead?1:0),0);if(!n)return cl;
+  const e=extCarpa(ci),F=FOCOS[c.foco];
+  return {t:Math.round((cl.t+(noche?0:F.w*KT[F.tipo]*(1-.75*e)))*10)/10,hr:Math.round(cl.hr+HR_CARPA*n*(1-.8*e)),uso:cl.uso,n:cl.n,e};
+}
 // pl: femenino plural (las garrafas) · lo que le falta a la carpa (con goteo, las garrafas no)
 const faltaExtra=(c,k)=>c&&!c[k]&&!(k==='garrafas'&&c.goteo);
-const OLOR=2;   // calor al día por carpa sin filtro con alguna planta en floración (o lista)
+const OLOR=2;   // calor al día por carpa sin extractor con alguna planta en floración (o lista); con uno corto de caudal (extCarpa < OLOR_MAL), 1
 const KWH=.16,H_LUZ=392,H_24=672,W_M2=400,Y_MEDIA=34;   // €/kWh (tarifa doméstica) · horas por día de juego · W/m² a plena intensidad · g/planta medio de STRAINS
 // el temporizador de cada carpa (1.10, en la pared, a su izquierda): c.ciclo; sin él, automático. h: horas de foco por día de juego.
 // Con 18/6 no florecen (madres para esquejes: se quedan en VEG_TOPE; si ya florecían, siguen) y con 12/12 florecen ya: en vegetativo crecen al doble y lo
@@ -70,30 +89,38 @@ function huecos(){
   return _hu;
 }
 // g: gramos por planta de la variedad media, sana y sin abono, antes del tope de la maceta · dens: intensidad (W/m² ÷ W_M2, hasta 1)
-// (1.10) crec lleva el clima de la sala (fClima) y hr, su humedad (el moho de plantStep)
+// (1.10) crec lleva el clima (fClima; 1.11: el de la carpa) y hr, su humedad (el moho de plantStep; con ventilador, ×0,5)
 function factores(i){
   const h=huecos()[i],c=S.carpas[h.c],C=CARPAS[c.t],F=FOCOS[c.foco],M=MACETAS[S.macetas[i]]||MACETAS.plastico7;
-  const dens=Math.min(1,F.w/(C.cm[0]*C.cm[2]/1e4*W_M2)),cl=climaSala();
-  return {g:F.w*F.gpw/C.plazas*M.rend,cap:M.cap,crec:F.crec*(.85+.15*dens)*M.crec*fClima(cl),thc:F.thc*dens,agua:F.agua*M.agua,plaga:M.plaga*(c.vent?.7:1),dens,hr:cl.hr,ciclo:cicloDe(c)};
+  const dens=Math.min(1,F.w/(C.cm[0]*C.cm[2]/1e4*W_M2)),cl=climaCarpa(h.c);
+  return {g:F.w*F.gpw/C.plazas*M.rend,cap:M.cap,crec:F.crec*(.85+.15*dens)*M.crec*fClima(cl)*(c.vent?1.03:1),thc:F.thc*dens,agua:F.agua*M.agua,plaga:M.plaga*(c.vent?.7:1),dens,hr:cl.hr,moho:c.vent?.5:1,ciclo:cicloDe(c)};
 }
+/* ---------- abono, pH y EC (1.11) ----------
+   Dos abonos: el de floración (p.fert: cosecha × 1,25, THC + 0,3 y crece × 1,1) y el de crecimiento (p.fv: crece × 1,15 hasta
+   florecer). Al echar una dosis se corrige el pH si tienes pH− (gasta 1): con el medidor, al 6,2 y lo aprovecha entero (1); a
+   ojo, 0,75; sin pH−, el agua del grifo (pH 7,5) bloquea la mitad (0,5). p.fq y p.fv guardan lo que aprovecha cada uno (sin p.fq,
+   partida vieja: entero). Con el medidor, PLANTAS enseña la EC y el pH de cada maceta */
+const abonoQ=()=>S.items.phm>0?S.items.medidor?1:.75:.5,fq=p=>p.fert?p.fq??1:0;
+const ecDe=p=>Math.round((.4+(p.fv?.7:0)+(p.fert?.9:0))*10)/10,phDe=p=>{const q=Math.min(p.fv||1,p.fert?fq(p):1);return q>=1?6.2:q>=.75?6.6:7.5;};
+const abonoTxt=p=>{const L=(p.fv?['crecimiento']:[]).concat(p.fert?['floración']:[]);return (L.length?'Abonada ('+L.join(' y ')+')':'Sin abonar')+(S.items.medidor&&L.length?` · EC ${coma(ecDe(p))} · pH ${coma(phDe(p))}`:'');};
 // gramos de una planta al cosecharla (f: factores de su plaza)
-const gramosPlanta=(p,f)=>{const s=getStrain(p.sid),fe=p.f||{y:1};return Math.max(1,Math.round(Math.min(f.cap,f.g*s.y/Y_MEDIA*(.4+.6*p.health/100)*(p.fert?1.25:1)*fe.y)*(1-CORTA_REND*(p.corta||0))));};
+const gramosPlanta=(p,f)=>{const s=getStrain(p.sid),fe=p.f||{y:1};return Math.max(1,Math.round(Math.min(f.cap,f.g*s.y/Y_MEDIA*(.4+.6*p.health/100)*(1+.25*fq(p))*fe.y)*(1-CORTA_REND*(p.corta||0))));};
 const plantasVivas=ci=>huecos().some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead);
 const enFlor=ci=>huecos().some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead&&S.pots[i].prog>=.65);
-const olorDia=()=>S.carpas.reduce((a,c,ci)=>a+(c&&!c.filtro&&enFlor(ci)?OLOR:0),0);
+const olorDia=()=>S.carpas.reduce((a,c,ci)=>a+(c&&enFlor(ci)?!kitDe(c)?OLOR:extCarpa(ci)<OLOR_MAL?1:0:0),0);
 const luzCarpa=ci=>{const c=S.carpas[ci];return Math.round((FOCOS[c.foco].w*CICLOS[cicloDe(c)].h+Object.keys(EXTRAS).reduce((a,k)=>a+(c[k]?EXTRAS[k].w:0),0)*H_24)/1000*KWH);};
 function facturaLuz(){let e=0;S.carpas.forEach((c,ci)=>{if(c&&plantasVivas(ci))e+=luzCarpa(ci);});return e+facturaSala();}   // y los aparatos de la sala (09c)
 function plantStep(p,h,f){
   if(p.dead)return;const s=getStrain(p.sid);
   p.water=Math.max(0,p.water-3.5*h*f.agua);
   if(!p.pest&&p.prog<1&&Math.random()<.006*h*(100-s.r)/40*f.plaga)p.pest=true;
-  let g=h/(s.d*24)*f.crec;if(p.water<20)g*=.4;if(p.water<=0)g=0;if(p.fert)g*=1.1;
+  let g=h/(s.d*24)*f.crec;if(p.water<20)g*=.4;if(p.water<=0)g=0;g*=1+.1*fq(p);if(p.fv&&p.prog<.65)g*=1+.15*p.fv;
   if(p.prog<1){
     if(f.ciclo==='veg'&&p.prog<.65)g=Math.max(0,Math.min(g,VEG_TOPE-p.prog));   // madre: no pasa de vegetativo (si ya florece, sigue)
     else if(f.ciclo==='flor'&&p.prog>=.35&&p.prog<.65){const e=Math.min(g,(.65-p.prog)/2);p.corta=Math.min(1,(p.corta||0)+e/.15);g+=e;}
     p.prog=Math.min(1,p.prog+g);}
   if(p.water<=0)p.health-=4*h;if(p.pest)p.health-=2.5*h;if(p.water>30&&!p.pest)p.health+=h;
-  if(f.hr>HR_OK[1]&&p.prog>=.65&&p.prog<1)p.health-=h*(f.hr-HR_OK[1])*MOHO;   // moho: humedad alta en floración (1.10)
+  if(f.hr>HR_OK[1]&&p.prog>=.65&&p.prog<1)p.health-=h*(f.hr-HR_OK[1])*MOHO*f.moho;   // moho: humedad alta en floración (1.10)
   p.health=clamp(p.health,0,100);if(p.health<=0)p.dead=true;
 }
 function plantsAdvance(min){S.pots.forEach((p,i)=>{if(p){plantStep(p,min/60,factores(i));regarGoteo(p,i);}});}
@@ -108,8 +135,10 @@ function newDay(){
   S.day++;
   // la cuota de Molina (1.10): pasado el último día pagado, se acaba la protección (antes de la redada de esta noche)
   if(S.protect&&S.protHasta&&S.day>S.protHasta){S.protect=false;queue('cuota',()=>talk('SMS · MOLINA',['Se acabó lo pagado.','Si quieres que mis agentes sigan mirando hacia otro lado, ya sabes dónde está la comisaría.']));}
-  if(S.heat>=90)queue('raid',raidEvent); // se comprueba antes de que el calor baje con el nuevo día
-  S.heat=Math.max(0,S.heat-(S.protect?20:12));
+  // la policía (1.11, NIVEL_POLI): con la orden de ayer, la redada; con 90 o más, la orden (y el aviso), o Molina la para
+  if(S.orden&&S.day>S.orden)queue('raid',raidEvent);
+  else if(!S.orden&&S.heat>=90){if(S.protect)queue('raid',raidEvent);else{S.orden=S.day;queue('orden',avisoOrden);}}
+  S.heat=Math.max(0,S.heat-bajaCalor());
   const luz=facturaLuz(),olor=olorDia(),av=[];S.luz={d:S.day,e:luz,o:olor};if(luz>0){pagarCasa(luz);av.push('Factura de la luz: −'+eur(luz));}   // de lo de fuera y, si no llega, de la caja (1.10)
   if(olor){S.heat=Math.min(100,S.heat+olor);av.push('Olor a cogollo: calor +'+olor);}   // después de bajar el calor: cuenta para la redada de mañana
   const sec=S.esquejes.filter(e=>S.day-e.dia>ESQUEJE_DIAS).length;if(sec){S.esquejes=S.esquejes.filter(e=>S.day-e.dia<=ESQUEJE_DIAS);av.push(`Se ${sec>1?'han secado '+sec+' esquejes':'ha secado un esqueje'} sin plantar`);}
@@ -170,11 +199,12 @@ async function potAction(i){
   const s=getStrain(p.sid);
   if(p.dead){await say(`La ${s.n} se ha secado del todo.`);S.pots[i]=null;return say('Retiras la planta muerta.');}
   if(p.prog>=1){const c=await ask(`${s.n}${marcaFeno(p.f)} lista para cosechar.\nSalud ${Math.round(p.health)}% · Agua ${Math.round(p.water)}%`,['Cosechar','Esperar']);if(c===0)await harvest(i);return;}
-  const opts=['Regar'];if(!p.fert)opts.push('Abonar');if(p.pest)opts.push('Tratar plaga');if(p.prog>=.2&&p.prog<.65)opts.push('Sacar esqueje');opts.push('Arrancar','Salir');
+  const veg=p.prog<.65&&!p.fv&&S.items.fertv>0,opts=['Regar'];if(!p.fert||veg)opts.push('Abonar');if(p.pest)opts.push('Tratar plaga');if(p.prog>=.2&&p.prog<.65)opts.push('Sacar esqueje');opts.push('Arrancar','Salir');
   const c=await ask(`${s.n}${marcaFeno(p.f)} · ${stageName(p)} ${Math.floor(p.prog*100)}%\nAgua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%${p.pest?' · PLAGA':''}`,opts);
   const op=opts[c];
   if(op==='Regar'){const [vx,vy]=posPlaza(i);await accion('regar',{id:'vfx-gotas',x:vx,y:vy-6});p.water=100;sfx('sel');await say('Riegas la planta. Agua al 100%.');}
-  else if(op==='Abonar'){if(S.items.fert>0){S.items.fert--;p.fert=true;sfx('sel');await say('Echas una dosis de ABONO. Dará más cosecha.');}else await say('No te queda ABONO.');}
+  else if(op==='Abonar'){if(veg||S.items.fert>0){const q=abonoQ();if(S.items.phm>0)S.items.phm--;if(veg){S.items.fertv--;p.fv=q;}else{S.items.fert--;p.fert=true;p.fq=q;}sfx('sel');
+    await say((veg?'Echas una dosis de ABONO DE CRECIMIENTO. Crecerá más deprisa.':'Echas una dosis de ABONO. Dará más cosecha.')+(q===1?'\nCon el medidor, el pH al 6,2: lo aprovecha entero.':q>.5?'\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo.':'\nSin pH−, el agua del grifo (pH 7,5) bloquea la mitad del abono.'));}else await say('No te queda ABONO.');}
   else if(op==='Tratar plaga'){if(S.items.insect>0){S.items.insect--;p.pest=false;sfx('sel');await say('Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.');}else await say('No tienes INSECTICIDA. Kiko lo vende.');}
   else if(op==='Sacar esqueje')await sacarEsqueje(i);
   else if(op==='Arrancar'){if(await ask('¿Seguro que quieres arrancarla?',['Sí','No'])===0){S.pots[i]=null;await say('Arrancas la planta.');}}
@@ -199,11 +229,13 @@ async function cambiarFoco(ci){
   if(j<0)return;instalarFoco(ci,l[j]);return say(`Cuelgas el foco ${FOCOS[l[j]].n}. El viejo va a la mochila.`);
 }
 const extrasLibres=ci=>Object.keys(EXTRAS).filter(k=>faltaExtra(S.carpas[ci],k)&&S.items['x_'+k]>0);
-// el goteo llega lleno y las garrafas que hubiera vuelven a la mochila; las garrafas llegan llenas
-function ponerExtra(ci,k){const c=S.carpas[ci];S.items['x_'+k]--;c[k]=true;
+// el goteo llega lleno y las garrafas que hubiera vuelven a la mochila; las garrafas llegan llenas; un kit de extracción
+// devuelve el que hubiera (1.11: lo devuelve ponerExtra, para el mensaje)
+function ponerExtra(ci,k){const c=S.carpas[ci],vk=KITS.includes(k)&&kitDe(c);S.items['x_'+k]--;
+  if(vk){c[vk]=false;S.items['x_'+vk]++;}c[k]=true;
   if(k==='goteo'){c.dep=goteoL(ci);if(c.garrafas){c.garrafas=false;delete c.gar;S.items.x_garrafas++;}}
   if(k==='garrafas')c.gar=[];
-  sfx('sel');}
+  sfx('sel');return vk;}
 async function carpaAction(ci){
   const c=S.carpas[ci],C=CARPAS[c.t],F=FOCOS[c.foco],f=focosLibres(ci).length,ex=extrasLibres(ci);
   const gl=goteoL(ci),dep=c.goteo?c.dep??gl:0,gar=c.garrafas&&!c.goteo,[gq,gt]=garrafasCarpa(ci),ll=c.goteo?dep<gl:gar&&gq<gt;
@@ -213,7 +245,7 @@ async function carpaAction(ci){
   if(opts[k]==='Rellenar depósito'){c.dep=gl;sfx('sel');return say(`Llenas el depósito del goteo: ${miles(gl)} L.`);}
   if(opts[k]==='Rellenar garrafas'){c.gar=[];sfx('sel');return say(`Llenas las garrafas: ${gt} L.`);}
   const x=ex[k-(f?1:0)];if(k<0||!x)return;const vu=x==='goteo'&&c.garrafas;
-  ponerExtra(ci,x);return say(`Pones ${EXTRAS[x].pl?'las':'el'} ${EXTRAS[x].n.toLowerCase()} en ${/^Armario/.test(C.n)?'el':'la'} ${C.n.toLowerCase()}.\n${EXTRAS[x].d}${vu?'\nLas garrafas vuelven a la mochila.':''}`);
+  const vk=ponerExtra(ci,x);return say(`Pones ${EXTRAS[x].pl?'las':'el'} ${EXTRAS[x].n.toLowerCase()} en ${/^Armario/.test(C.n)?'el':'la'} ${C.n.toLowerCase()}.\n${EXTRAS[x].d}${vu?'\nLas garrafas vuelven a la mochila.':''}${vk?`\nEl ${EXTRAS[vk].c.toLowerCase()} vuelve a la mochila.`:''}`);
 }
 // el temporizador de la carpa ci (vista de carpa, a la izquierda del foco): automático, 18/6 (madres) o 12/12 (floración)
 async function temporizador(ci){
@@ -231,7 +263,7 @@ const SEMILLA_HERMA=.12;
 async function harvest(i){
   const p=S.pots[i],s=getStrain(p.sid),f=factores(i),fe=p.f||{t:1,y:1},cl=claseFeno(p.f);
   const g=gramosPlanta(p,f);
-  const thc=Math.min(35,Math.round((s.thc*fe.t*(.85+.15*p.health/100)+f.thc+(p.fert?.3:0))*10)/10);
+  const thc=Math.min(35,Math.round((s.thc*fe.t*(.85+.15*p.health/100)+f.thc+.3*fq(p))*10)/10);
   const [vx,vy]=posPlaza(i);await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:vx,y:vy-12});
   const cria=genDe(p.sid)<GEN_ESTABLE,fem=SHOP.some(it=>it.sid===p.sid),n=cria?ri(2,5):!fem||Math.random()<SEMILLA_HERMA?ri(1,3):0;
   const lk=cl==='estrella'?p.sid+'*':p.sid;addBuds(lk,g,thc);if(n)addSeeds(p.sid,n);
@@ -269,18 +301,18 @@ async function bedAction(txt){
 }
 // al despertar (1.10): las plantas que han cogido plaga mientras dormías (y el insecticida que te queda), las que la siguen teniendo
 // sin tratar, las que se han secado del todo (antes: [plaga, muerta] de cada plaza al acostarte) y las que florecen con moho
-// porque la sala pasa de HR_OK de noche (09c-sala)
+// porque su carpa pasa de HR_OK de noche (09c-sala; 1.11: climaCarpa)
 async function avisoPlaga(antes){
-  const nuevas=[],siguen=[],muertas=[],moho=[],H=huecos(),varias=S.carpas.filter(c=>c).length>1,humeda=climaSala(true).hr>HR_OK[1];
+  const nuevas=[],siguen=[],muertas=[],moho=[],H=huecos(),varias=S.carpas.filter(c=>c).length>1,hum=S.carpas.map((c,ci)=>c&&climaCarpa(ci,true).hr>HR_OK[1]);
   S.pots.forEach((p,i)=>{if(!p)return;const a=antes[i]||[false,false],
     nom=`la ${getStrain(p.sid).n} (${varias?CARPAS[S.carpas[H[i].c].t].n+', ':''}plaza ${H[i].j+1})`;
-    if(p.dead){if(!a[1])muertas.push(nom);}else{if(p.pest)(a[0]?siguen:nuevas).push(nom);if(humeda&&p.prog>=.65&&p.prog<1)moho.push(nom);}});
+    if(p.dead){if(!a[1])muertas.push(nom);}else{if(p.pest)(a[0]?siguen:nuevas).push(nom);if(hum[H[i].c]&&p.prog>=.65&&p.prog<1)moho.push(nom);}});
   const lista=L=>L.length===1?L[0]:L.slice(0,-1).join(', ')+' y '+L[L.length-1],s=L=>L.length>1?'s':'',n=L=>L.length>1?'n':'';
   if(nuevas.length){const k=S.items.insect;sfx('bad');
     await say(`¡Plaga en ${lista(nuevas)}! Trátala${s(nuevas)} con INSECTICIDA: ${k?`te queda${k>1?'n':''} ${k}.`:'no te queda; cómpralo en el growshop.'}`);}
   if(siguen.length)await say(`Sigue la plaga en ${lista(siguen)}: sin tratar, pierde${n(siguen)} salud cada hora.`);
   if(muertas.length)await say(`Se ha${n(muertas)} secado del todo ${lista(muertas)}. Retírala${s(muertas)} con A.`);
-  if(moho.length)await say(`Moho en ${lista(moho)}: de noche la sala pasa del ${HR_OK[1]} % de humedad. Un deshumidificador o extractores con filtro la bajan.`);
+  if(moho.length)await say(`Moho en ${lista(moho)}: de noche la carpa pasa del ${HR_OK[1]} % de humedad. Un extractor a su medida con intractor, un ventilador o un deshumidificador la bajan.`);
 }
 async function pcAction(){
   const o=['Genoteca'].concat(S.ch>=2?['Banco de semillas']:[],['Notas de la tía','Tienda online'],S.ch>=4&&S.caja&&S.caja.nivel===1&&!S.caja.mejora?['Caja empotrada']:[],['Guardar partida','Apagar']);
@@ -291,7 +323,7 @@ async function pcAction(){
 }
 // banco de semillas (1.9): las landraces de Strainmon en sobres de SOBRE semillas, a precio de bancos de conservación
 // (1.10: 2-4,50 € la semilla); el pedido llega por mensajero al día siguiente (newDay)
-const SOBRE=10,BANCO=[['mich',25,2],['punto',30,2],['thai',30,2],['kif',20,2],['beldia',20,2],['chitral',35,3],['nepal',30,3],['congo',30,3],['lamb',30,3],['oaxaca',25,3],['lao',40,4],['panama',45,4]];
+const SOBRE=10,BANCO=[['mich',25,2],['punto',30,2],['colgold',30,2],['thai',30,2],['kif',20,2],['beldia',20,2],['chitral',35,3],['nepal',30,3],['congo',30,3],['lamb',30,3],['oaxaca',25,3],['choco',35,3],['hthai',30,3],['hawai',30,3],['lao',40,4],['panama',45,4]];
 async function bancoSemillas(){
   let i=0;
   for(;;){
@@ -348,13 +380,13 @@ async function labAction(){
   const Bk=l2[b-(it2.length-l2.length)][0];
   if(await ask(`¿Cruzar ${getStrain(A).n} × ${getStrain(Bk).n}? Gastas 1 semilla de cada.`,['Cruzar','Cancelar'])!==0)return;
   S.seeds[A]--;S.seeds[Bk]--;for(const k of [A,Bk])if(!S.seeds[k])delete S.seeds[k];
-  const r=crossResult(A,Bk),isNew=!S.disc[r],s=getStrain(r);if(isNew)S.gen[r]=1;
-  if(RECIPES[[A,Bk].sort().join('+')]&&!S.rec[r])S.rec[r]=1;   // de receta, sacada en la mesa: falta cosecharla (capítulo 4)
+  const r=crossResult(A,Bk),isNew=!S.disc[r],s=getStrain(r);if(isNew&&!SHOP.some(it=>it.sid===r))S.gen[r]=1;   // la de tienda sigue estable
+  if(recetaDe(A,Bk)&&!S.rec[r])S.rec[r]=1;   // de receta, sacada en la mesa: falta cosecharla (capítulo 4)
   await accion('cruzar',{id:'vfx-polen',x:P.px+8,y:P.py-4});
   sfx('enc');await fade(1,true);await wait(450);await fade(0,true);
   addSeeds(r,2);
   if(isNew){sfx('get');await say(`Nueva variedad: ${s.n}.`);await say(`THC ${pct(s.thc)}% · ~${gm2(s)} g/m² · ${coma(s.d)} días.\nObtienes 2 semillas F1: la línea aún no es estable.`);
-    if(r==='leyenda'){await say('Te tiemblan las manos: es GHOST TRAIN HAZE.');await talk('SMS · KIKO',['¿Ghost Train Haze? ¿De semilla propia? Llevo veinte años detrás de ella.','Tu tía estaría orgullosa. Estabilízala y guárdala bien: eso vale más que el piso.']);}}
+    if(r==='leyenda'){await say('Te tiemblan las manos: es JACK HERER.');await talk('SMS · KIKO',['¿Jack Herer? ¿De semilla propia? Llevo veinte años detrás de ella.','Tu tía estaría orgullosa. Estabilízala y guárdala bien: eso vale más que el piso.']);}}
   else await say(`Obtienes 2 semillas de ${s.n}.`);
   await checkStory();
 }

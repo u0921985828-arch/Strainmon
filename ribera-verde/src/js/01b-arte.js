@@ -286,7 +286,7 @@ function icono(n){
 }
 // el icono del equipo (lámina 12): los LED, su panel; los demás focos, la lámpara; armarios (60 y 80) y carpas; cada extra, el suyo
 const icoFoco=k=>FOCOS[k]&&FOCOS[k].tipo==='led'?'led':'lampara',icoCarpa=t=>t==='p60'||t==='p80'?'armario':'carpa',
-  ICX={vent:'ventilador',filtro:'filtro',garrafas:'garrafa',goteo:'goteo'};
+  ICX={vent:'ventilador',filtro:'filtro',garrafas:'garrafa',goteo:'goteo',intra:'ventilador',filtro100:'filtro',filtro150:'filtro'};
 function iconoCogollo(sid){
   if(!ARTE.ok)return null;const s=getStrain(sid),key='c|'+sid+'|'+(s&&s.c);if(key in ICO)return ICO[key];
   const t=TIPO_COGOLLO[sid]||'hibrido',f=frameDe('cogollos-genoteca',t,'unica',0,{i:0});if(!f||!s)return ICO[key]=null;

@@ -16,11 +16,11 @@ const ROOT = path.join(__dirname, '..');
   await page.waitForFunction(() => typeof mode !== 'undefined' && mode === 'title');
   const D = await page.evaluate(() => {
     S = newState(); S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'cfl' }]; S.muebles = { sofa: 1, tv: 1, gpc: 1 }; montarCasa();   // el piso con el armario, la carpa grande y el salón
-    const strains = DEX.map((k, i) => ({ k, idx: i + 1, ...STRAINS[k], tipo: TIPO_GEN[k] || (/^Landrace/.test(STRAINS[k].o) ? 'landrace' : 'cruce'), padres: PADRES[k], gm2: gm2(STRAINS[k]) }));
+    const strains = DEX.map((k, i) => ({ k, idx: i + 1, ...STRAINS[k], tipo: TIPO_GEN[k] || (/^Landrace/.test(STRAINS[k].o) ? 'landrace' : 'cruce'), padres: PADRES[k], gm2: gm2(STRAINS[k]), hj: hojaDe(k) }));
     const gen = Object.entries(GENETICA).map(([k, G]) => ({ k, ...G }));
     const focos = Object.entries(FOCOS).map(([k, F]) => ({ k, ...F, kwh: kwhFoco(k), eur: Math.round(kwhFoco(k) * KWH) }));
     const macetas = Object.entries(MACETAS).map(([k, M]) => ({ k, ...M }));
-    const recipes = Object.entries(RECIPES).map(([pair, out]) => ({ a: pair.split('+')[0], b: pair.split('+')[1], out }));
+    const recipes = Object.entries(RECETA_ORD).map(([k, out]) => ({ hojas: k.split('>'), out, ord: true })).concat(Object.entries(RECIPES).map(([k, out]) => ({ hojas: k.split('+'), out })));
     const G = { grass: '.', flowers: '*', tallgrass: '"', dirt: ':', walk: '-', roadT: '=', roadB: '=', plaza: '+', water: '~', bridgeT: 'H', bridgeB: 'H', dock: '#',
       rotoT: '%', rotoB: '%', hormigon: '_', pista: ',', floor: '.', floorB: '.', floorS: '.', mat: 'm', void: ' ' };
     const O = { tree: 'T', bush: 'b', fence: 'f', sign: 'S', lamp: 'L', bench: 'n', fountain: 'O', crate: 'c', bedT: 'B', bedB: 'B', pc: 'P', lab: 'G', lab2: 'G',
@@ -59,7 +59,7 @@ const ROOT = path.join(__dirname, '..');
     S = S0;
     const signs = SIGNS;
     return { litrosM2: LITROS_M2, strains, recipes, maps, npcs, items, shop, signs, banco: BANCO, sobre: SOBRE, gen, focos, macetas, carpas, zonas: ZONAS, patrullas: PATRULLAS, paradas: PARADAS, busHoras: BUS_HORAS,
-      montajes, c: { CAJA, CAJA_P, CAJA_REDADA, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, ENCARGO_DIAS, SOBORNO, CUOTA_DIAS, KWH, H_LUZ, H_24, W_M2, Y_MEDIA, FENO_ESTRELLA, FENO_FLOJO, ESQUEJE_DIAS, SEMILLA_HERMA, GARRAFA_X, GOTEO_X, DEUDA, PLAZOS, INTERES, PREMIO_COPA, mayor: [precioMayor(12), precioMayor(30)], calle: [precioCalle(12), precioCalle(30)], ROSIN, rosin: [36, 54, 75].map(t => [t, precioRosin(t)]), prensa: SHOP.find(i => i.item === 'prensa').p, IMPERIO, SOBRES, GRANEL } };
+      montajes, c: { CAJA, CAJA_P, MAITE_CAJA, ENCARGO, PAGO_ENCARGO, ENCARGO_DIAS, SOBORNO, CUOTA_DIAS, KWH, H_LUZ, H_24, W_M2, Y_MEDIA, FENO_ESTRELLA, FENO_FLOJO, ESQUEJE_DIAS, SEMILLA_HERMA, GARRAFA_X, GOTEO_X, DEUDA, PLAZOS, INTERES, PREMIO_COPA, MULTA_REDADA, MULTA_PLANTA, MULTA_G, MULTA_TOPE, CALOR_REDADA, mayor: [precioMayor(12), precioMayor(30)], calle: [precioCalle(12), precioCalle(30)], ROSIN, rosin: [36, 54, 75].map(t => [t, precioRosin(t)]), prensa: SHOP.find(i => i.item === 'prensa').p, IMPERIO, SOBRES, GRANEL } };
   });
   await browser.close();
 
@@ -99,21 +99,31 @@ Las landraces y los híbridos clásicos de la 1.9 salen del catálogo de Strainm
 `;
   for (const s of D.strains.filter(s => s.h)) g += `| ${s.n} | ${s.o} | ${s.h} |\n`;
   g += `
+## El árbol por generaciones (1.11)
+
+Los híbridos clásicos, de las landraces a la 3.ª generación. ✔ padres documentados; ≈ origen incierto (se marca en la Genoteca).
+
+| Gen. | Variedad | Padres | | THC | Índica |
+|---|---|---|---|---|---|
+`;
+  for (const n of [1, 2, 3]) for (const s of D.strains.filter(s => s.gen === n)) g += `| ${n}.ª | ${s.n} | ${s.o.replace(' · ≈ origen incierto', '').replace(/ \(padres sin publicar\)/, '').replace(' · LEGENDARIA', '')} | ${/origen incierto/.test(s.o) ? '≈' : '✔'} | ${pct(s.thc)}% | ${s.ind} % |\n`;
+  g += `
 ## Recetas de cruce (${D.recipes.length})
 
-El orden de los padres da igual. Cada cruce gasta 1 semilla de cada padre y da 2 semillas del resultado.
+Cada receta es un conjunto de variedades de partida («hojas»). Un cruce de dos da la variedad si sus hojas juntas son las de la receta; si no, un híbrido propio que guarda las hojas de sus padres. Así las de 3 o 4 padres se hacen en varios cruces: (Afghani × Colombian Gold) × Acapulco Gold = Skunk #1, en cualquier orden que no pase antes por otra receta. En las marcadas **madre × padre** el orden cuenta. Cada cruce gasta 1 semilla de cada padre y da 2 semillas del resultado.
 
-| Madre | Padre | Resultado | THC |
+| Variedades de partida | Resultado | Gen. | THC |
 |---|---|---|---|
 `;
-  for (const r of D.recipes) g += `| ${name(r.a)} | ${name(r.b)} | **${name(r.out)}** | ${pct(D.strains.find(s => s.k === r.out).thc)}% |\n`;
+  for (const r of D.recipes) { const s = D.strains.find(s => s.k === r.out); g += `| ${r.hojas.map(name).join(r.ord ? ' (madre) × ' : ' + ')}${r.ord ? ' (padre)' : ''} | **${s.n}** | ${s.gen ? s.gen + '.ª' : ''} | ${pct(s.thc)}% |\n`; }
   g += `
-## Árbol hasta la Ghost Train Haze
+## Árbol hasta la Jack Herer
 
 \`\`\`mermaid
 flowchart LR
 `;
-  for (const r of D.recipes) g += `  ${r.a}["${name(r.a)}"] --> ${r.out}["${name(r.out)}"]\n  ${r.b}["${name(r.b)}"] --> ${r.out}\n`;
+  const ar = new Set();
+  for (const r of D.recipes) for (const h of r.hojas) { const l = `  ${h}["${name(h)}"] --> ${r.out}["${name(r.out)}"]\n`; if (!ar.has(h + r.out)) { ar.add(h + r.out); g += l; } }
   g += `  style leyenda fill:#40e0a0,color:#062\n\`\`\`
 
 ## Estabilizar (F1 → estable)
@@ -197,7 +207,7 @@ La tierra de todas las macetas de una carpa no pasa de ${D.litrosM2} L por m² d
   e += `
 Tope: unos 8 g por litro de tierra (la de tela, +5 %). Por mucho foco que pongas, una planta en 7 L no pasa de ${D.macetas[0].cap} g.
 
-Extras: ventilador ${eu(precio(s => s.lbl.startsWith('Ventilador')))} (25 W día y noche), extractor con filtro de carbón ${eu(precio(s => s.lbl.startsWith('Extractor')))} (75 W día y noche; ${c.H_24} h por día de juego), garrafas de riego ${eu(precio(s => s.lbl.startsWith('Garrafas')))} y riego por goteo ${eu(precio(s => s.lbl.startsWith('Riego')))}.
+Extras: ventilador ${eu(precio(s => s.lbl.startsWith('Ventilador')))} (25 W día y noche), extractores con filtro de carbón de 100, 125 y 150 mm ${eu(precio(s => s.lbl.startsWith('Extractor 100')))}, ${eu(precio(s => s.lbl.startsWith('Extractor 125')))} y ${eu(precio(s => s.lbl.startsWith('Extractor 150')))} (250, 400 y 750 m³/h; 35, 75 y 110 W día y noche, ${c.H_24} h por día de juego), intractor ${eu(precio(s => s.lbl.startsWith('Intractor')))} (25 W), garrafas de riego ${eu(precio(s => s.lbl.startsWith('Garrafas')))} y riego por goteo ${eu(precio(s => s.lbl.startsWith('Riego')))}.
 
 ## Cuánto da una cosecha
 
@@ -217,12 +227,12 @@ Skunk #1 sana y abonada, fenotipo medio (cosecha de 2,5 días):
 - **Rosin (desde el capítulo 3, con la prensa de Kiko, ${c.prensa} €):** en la mesa del piso, ${dec(c.ROSIN.rend * 100)} % del peso de la flor con ${c.ROSIN.thc} veces su THC (hasta el ${c.ROSIN.tope} %), en media hora. Lo compran los catadores (bocadillo con una gota ámbar; 1-3 g; 2 al día en el barrio y 1 en los astilleros, en Puerto Viejo y en Valdehierro) a ${c.rosin.map(([t, p]) => `${dec(p)} €/g al ${t} %`).join(', ')}: prensar compensa desde el 12,5 % de THC de la flor. Cada gramo vendido sube el calor 2,5 (la flor, 0,5).
 - **Zonas:** ${Object.values(D.zonas).filter(z => z.precio !== 1).map(z => `en ${z.n === 'Astilleros' ? 'los astilleros' : z.n}, el gramo × ${dec(z.precio)}`).join('; ')} (las esquinas de Darko: 1 de cada 3 ventas acaba en pelea).
 - **Encargos de Don Baltasar (capítulo 8):** ${c.PAGO_ENCARGO} €/g por ${[...new Set(c.ENCARGO)].map(g => dec(g / 1000)).join(', ').replace(/, ([^,]*)$/, ' o $1')} kg según el rango del imperio, entregados de noche en el almacén de los astilleros en ${c.ENCARGO_DIAS} días.
-- **Multas:** policía en la calle, 601 € (la mínima de la Ley de Seguridad Ciudadana); redada en el piso, hasta 3.000 € y se llevan las plantas y los cogollos de fuera de la caja fuerte.
+- **Multas:** policía en la calle, 601 € (la mínima de la Ley de Seguridad Ciudadana); redada en el piso (con un día de aviso, al llegar el calor a 90), ${eu(c.MULTA_REDADA)} + ${eu(c.MULTA_PLANTA)} por planta + ${c.MULTA_G} € por gramo que encuentran, hasta ${eu(c.MULTA_TOPE)}; se llevan las plantas, el equipo montado en sus carpas y lo de fuera de la caja fuerte, que no tocan, y el calor queda en ${c.CALOR_REDADA}.
 - **Protección del sargento Molina:** ${eu(c.SOBORNO)} cada ${c.CUOTA_DIAS} días.
 
 ## La caja fuerte
 
-Lo que hay dentro no va encima: no cuenta para los encuentros ni se lo llevan un control, un ladrón o Darko. En una redada la encuentran ${Math.round(c.CAJA_REDADA * 100)} de cada 100 veces (sus gramos y la mitad de su dinero).
+Lo que hay dentro no va encima: no cuenta para los encuentros ni se lo llevan un control, un ladrón o Darko. En una redada no la tocan: solo sale de ella la multa que no llegue con el dinero de fuera.
 
 | Caja | Cómo se consigue | Capacidad |
 |---|---|---|

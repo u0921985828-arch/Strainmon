@@ -40,7 +40,7 @@ La tierra de todas las macetas de una carpa no pasa de 100 L por m² de suelo (`
 
 Tope: unos 8 g por litro de tierra (la de tela, +5 %). Por mucho foco que pongas, una planta en 7 L no pasa de 56 g.
 
-Extras: ventilador 20 € (25 W día y noche), extractor con filtro de carbón 110 € (75 W día y noche; 672 h por día de juego), garrafas de riego 15 € y riego por goteo 1.200 €.
+Extras: ventilador 20 € (25 W día y noche), extractores con filtro de carbón de 100, 125 y 150 mm 75 €, 110 € y 190 € (250, 400 y 750 m³/h; 35, 75 y 110 W día y noche, 672 h por día de juego), intractor 45 € (25 W), garrafas de riego 15 € y riego por goteo 1.200 €.
 
 ## Cuánto da una cosecha
 
@@ -62,12 +62,12 @@ Skunk #1 sana y abonada, fenotipo medio (cosecha de 2,5 días):
 - **Rosin (desde el capítulo 3, con la prensa de Kiko, 250 €):** en la mesa del piso, 20 % del peso de la flor con 3 veces su THC (hasta el 75 %), en media hora. Lo compran los catadores (bocadillo con una gota ámbar; 1-3 g; 2 al día en el barrio y 1 en los astilleros, en Puerto Viejo y en Valdehierro) a 31,6 €/g al 36 %, 42,4 €/g al 54 %, 55 €/g al 75 %: prensar compensa desde el 12,5 % de THC de la flor. Cada gramo vendido sube el calor 2,5 (la flor, 0,5).
 - **Zonas:** en los astilleros, el gramo × 1,2; en Puerto Viejo, el gramo × 1,15; en Valdehierro, el gramo × 0,9 (las esquinas de Darko: 1 de cada 3 ventas acaba en pelea).
 - **Encargos de Don Baltasar (capítulo 8):** 6 €/g por 2, 5 o 10 kg según el rango del imperio, entregados de noche en el almacén de los astilleros en 2 días.
-- **Multas:** policía en la calle, 601 € (la mínima de la Ley de Seguridad Ciudadana); redada en el piso, hasta 3.000 € y se llevan las plantas y los cogollos de fuera de la caja fuerte.
+- **Multas:** policía en la calle, 601 € (la mínima de la Ley de Seguridad Ciudadana); redada en el piso (con un día de aviso, al llegar el calor a 90), 601 € + 300 € por planta + 3 € por gramo que encuentran, hasta 30.000 €; se llevan las plantas, el equipo montado en sus carpas y lo de fuera de la caja fuerte, que no tocan, y el calor queda en 40.
 - **Protección del sargento Molina:** 1.500 € cada 10 días.
 
 ## La caja fuerte
 
-Lo que hay dentro no va encima: no cuenta para los encuentros ni se lo llevan un control, un ladrón o Darko. En una redada la encuentran 25 de cada 100 veces (sus gramos y la mitad de su dinero).
+Lo que hay dentro no va encima: no cuenta para los encuentros ni se lo llevan un control, un ladrón o Darko. En una redada no la tocan: solo sale de ella la multa que no llegue con el dinero de fuera.
 
 | Caja | Cómo se consigue | Capacidad |
 |---|---|---|
@@ -76,7 +76,7 @@ Lo que hay dentro no va encima: no cuenta para los encuentros ni se lo llevan un
 
 ## Semillas
 
-Feminizadas de tienda, Skunk #1 5 €, Lemon Haze 9 €, OG Kush 10 €, Blueberry 8 €, Mango 7 €, Purple Afghani 8 € la semilla. Sobres: 1, 3 (−5 %), 5 (−10 %), 10 (−15 %); desde el capítulo 3, bolsa de 50 a granel (−40 %). Landraces del banco del PC: sobres de 10 por 20-45 €.
+Feminizadas de tienda, Skunk #1 5 €, Lemon Haze 9 €, Super Skunk 10 €, Blueberry 8 €, Big Bud 7 €, Lemon Skunk 8 €, Cheese 9 €, Purple Afghani 8 €, Kali Mist 10 €, California Orange 8 €, Chemdawg 12 € la semilla. Sobres: 1, 3 (−5 %), 5 (−10 %), 10 (−15 %); desde el capítulo 3, bolsa de 50 a granel (−40 %). Landraces del banco del PC: sobres de 10 por 20-45 €.
 
 ## La deuda
 

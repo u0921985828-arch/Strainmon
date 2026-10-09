@@ -55,5 +55,5 @@ async function talkClient(c){
     if(c.map==='astilleros'&&Math.random()<1/3){await say('Uno de los chicos de Darko te ha visto vender.');await say('«Te dijimos que lejos de nuestras esquinas.»','CHICO DE DARKO');await battle('thief');}
   }else{S.rep=Math.max(0,S.rep-1);sfx('bad');removeClient(c.id);await say(pick(['¿Tanto? No.','A ese precio, paso.','Eso es demasiado. Adiós.']),N);}
 }
-function heatWarn(){if(S.heat>=70&&!S.flags.heatW){S.flags.heatW=true;toast('<small>CUIDADO</small>Mucha presión policial. Si llega a 90 habrá registro.',3200);}if(S.heat<60)S.flags.heatW=false;}
+function heatWarn(){if(S.heat>=70&&!S.flags.heatW){S.flags.heatW=true;toast('<small>CUIDADO</small>La policía investiga. Si el calor llega a 90 al cambiar el día, habrá orden de registro.',3200);}if(S.heat<60)S.flags.heatW=false;}
 
