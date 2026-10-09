@@ -1,13 +1,7 @@
 # Árbol genealógico canónico de Strainmon
 
-> Generado por `node scripts/arbol.mjs` a partir de `src/lineages.js`. No se edita a mano.
-
 16 landraces (SM-001…SM-016) y 2 reliquias (SM-000 Cepa Primigenia, SM-017 Semilla del Edén)
 dan **100 híbridas canónicas** (SH-001…SH-100). Nombres de parodia originales.
-
-En el juego, cruzar en el laboratorio dos líneas que forman receta (landrace o híbrida canónica,
-en cualquier orden) da la híbrida con su nombre y su código SH. Cruzar una híbrida canónica
-consigo misma la estabiliza y conserva el nombre. Cualquier otro cruce sigue siendo procedural.
 
 | Generación | Híbridas |
 |---|---|
