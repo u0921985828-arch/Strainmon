@@ -8,7 +8,7 @@ const push=fn=>handlers.push(fn),pop=()=>handlers.pop();
 function press(b){audioInit();if(handlers.length){handlers[handlers.length-1](b);return;}worldPress(b);}
 function setHeld(b,v){if(b in held){held[b]=v;if(['up','down','left','right'].includes(b)){const i=dirOrder.indexOf(b);if(i>=0)dirOrder.splice(i,1);if(v)dirOrder.push(b);}}}
 const KEYMAP={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right',
-  z:'A',Z:'A',' ':'A',Enter:'A',j:'A',x:'B',X:'B',Escape:'B',Backspace:'B',k:'B',Shift:'B',m:'START',M:'START',Tab:'START'};
+  z:'A',Z:'A',' ':'A',Enter:'A',j:'A',x:'B',X:'B',Escape:'B',Backspace:'B',k:'B',Shift:'B',m:'START',M:'START',Tab:'START',p:'MOVIL',P:'MOVIL'};
 document.addEventListener('keydown',e=>{
   if(document.activeElement===$('nameInput'))return;
   const b=KEYMAP[e.key];if(!b)return;e.preventDefault();

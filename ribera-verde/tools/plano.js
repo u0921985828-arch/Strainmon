@@ -66,7 +66,7 @@ const REAL = {
     const FUERA = n => !!CLIENT_TILES[n];   // los mapas de fuera (barrio, barrio alto, astilleros y la comarca)
 
     mode = 'plano'; S = newState(); S.ch = 6; S.protect = false; S.flags = { letter: 1, kiko1: 1, harvest1: 1, metB: 1, lab: 1 }; S.min = 12 * 60; S.clients = [];
-    S.carpas = [{ t: 'p80', foco: 'sodio250' }, { t: 'g150', foco: 'led720' }, { t: 'm120', foco: 'led480' }]; S.macetas = Array(15).fill('tela11'); S.pots = Array(15).fill(null);
+    S.carpas = [{ t: 'p80', foco: 'sodio250' }, { t: 'g150', foco: 'led720' }, { t: 'm120', foco: 'led480' }]; S.macetas = Array(15).fill('tela11'); S.pots = Array(15).fill(null); S.muebles = { sofa: 1, tv: 1, gpc: 1 };
     const espera = ms => new Promise(r => setTimeout(r, ms));
 
     function mapaEntero(name) {
@@ -129,7 +129,7 @@ const REAL = {
       lx = MG; ley.forEach(([col, n]) => { x.fillStyle = col; x.fillRect(lx, ly + 10, 12, 12); texto(x, n, lx + 16, ly + 21, '#d8dce6', 11, 'normal'); lx += 30 + n.length * 6.4; });
       out.mapas[name] = { png: c.toDataURL('image/png'), inv };
     }
-    anotar('town', 'RIBERA VERDE · barrio'); anotar('home', 'PISO DE LA TÍA MAITE (armario 80 + carpa 150 + carpa 120)'); anotar('shop', 'GROWSHOP KIKO'); anotar('bar', 'BAR EL ANCLA');
+    anotar('town', 'RIBERA VERDE · barrio'); anotar('home', 'PISO DE LA TÍA MAITE (armario 80 + carpa 150 + carpa 120 + salón)'); anotar('shop', 'GROWSHOP KIKO'); anotar('bar', 'BAR EL ANCLA');
     anotar('alto', 'BARRIO ALTO'); anotar('astilleros', 'ASTILLEROS'); anotar('txaro', 'CASA DE TXARO'); anotar('comisaria', 'COMISARÍA DEL BARRIO ALTO'); anotar('almacen', 'ALMACÉN DE LOS ASTILLEROS');
     anotar('mendialde', 'MENDIALDE · el pueblo del prólogo'); anotar('casa-ama', 'CASERÍO DE LA FAMILIA (MENDIALDE)'); anotar('puerto', 'PUERTO VIEJO');
     anotar('valdehierro', 'VALDEHIERRO'); anotar('errotabarri', 'ERROTABARRI');

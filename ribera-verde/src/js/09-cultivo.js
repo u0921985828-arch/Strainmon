@@ -114,7 +114,7 @@ function newDay(){
   if(olor){S.heat=Math.min(100,S.heat+olor);av.push('Olor a cogollo: calor +'+olor);}   // después de bajar el calor: cuenta para la redada de mañana
   const sec=S.esquejes.filter(e=>S.day-e.dia>ESQUEJE_DIAS).length;if(sec){S.esquejes=S.esquejes.filter(e=>S.day-e.dia<=ESQUEJE_DIAS);av.push(`Se ${sec>1?'han secado '+sec+' esquejes':'ha secado un esqueje'} sin plantar`);}
   if(av.length&&mode==='world')toast(av.join('<br>'),1600);
-  spawnClients();recibirPedido();recibirEnvio();instalarCaja();vencerEncargo();
+  spawnClients();recibirPedido();recibirEnvio();instalarCaja();llegaMueble();vencerEncargo();
   if(S.due>0&&S.day>S.deadline)queue('penalty',penaltyEvent);   // 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
 }
 /* ---------- fenotipo (1.10) ----------
@@ -283,10 +283,10 @@ async function avisoPlaga(antes){
   if(moho.length)await say(`Moho en ${lista(moho)}: de noche la sala pasa del ${HR_OK[1]} % de humedad. Un deshumidificador o extractores con filtro la bajan.`);
 }
 async function pcAction(){
-  const o=['Genoteca'].concat(S.ch>=2?['Banco de semillas']:[],['Notas de la tía'],S.ch>=4&&S.caja&&S.caja.nivel===1&&!S.caja.mejora?['Caja empotrada']:[],['Guardar partida','Apagar']);
+  const o=['Genoteca'].concat(S.ch>=2?['Banco de semillas']:[],['Notas de la tía','Tienda online'],S.ch>=4&&S.caja&&S.caja.nivel===1&&!S.caja.mejora?['Caja empotrada']:[],['Guardar partida','Apagar']);
   const c=o[await ask('El ordenador de la tía. Tiene su registro de cultivos de veinte años.',o)];
   if(c==='Genoteca')await genoteca();else if(c==='Banco de semillas')await bancoSemillas();
-  else if(c==='Notas de la tía')await notasTia();else if(c==='Caja empotrada')await pedirCaja();
+  else if(c==='Notas de la tía')await notasTia();else if(c==='Tienda online')await tiendaOnline();else if(c==='Caja empotrada')await pedirCaja();
   else if(c==='Guardar partida')await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');
 }
 // banco de semillas (1.9): las landraces de Strainmon en sobres de SOBRE semillas, a precio de bancos de conservación

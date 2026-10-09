@@ -172,11 +172,32 @@ static func icono(n: String):
 	if not ok:
 		return null
 	if not ico.has(n):
-		var f = frame_de("iconos", n, "unica", 0, {"i": 0})
+		# los de la lámina de iconos-menu, dibujados a mano, primero: el cogollo fresco sustituye al de PixelLab
+		var f = frame_de("iconos-menu", n, "unica", 0, {"i": 0})
+		if f == null:
+			f = frame_de("iconos", n, "unica", 0, {"i": 0})
 		if f == null:
 			f = frame_de("iconos-equipo", n, "unica", 0, {"i": 0})
-		ico[n] = tex(f.c) if f else null
+		ico[n] = tex(ico_centrado(f.c)) if f else null
 	return ico[n]
+
+# el icono, centrado en su celda por lo que pinta (icoCentrado en el HTML): así queda a la altura del texto
+static func ico_centrado(c: Image) -> Image:
+	var r := c.get_used_rect()
+	if r.size.x <= 0:
+		return c
+	var o := Image.create(c.get_width(), c.get_height(), false, Image.FORMAT_RGBA8)
+	var src := c if c.get_format() == Image.FORMAT_RGBA8 else c.duplicate()
+	if src.get_format() != Image.FORMAT_RGBA8:
+		src.convert(Image.FORMAT_RGBA8)
+	o.blit_rect(src, r, Vector2i((c.get_width() - r.size.x) / 2, (c.get_height() - r.size.y) / 2))
+	return o
+
+# lado del icono en el menú: unas 12 us, a un múltiplo entero de sus píxeles (o a la mitad, un tercio…; icPx en el HTML)
+static func ic_px(n: int, us: float) -> float:
+	var t := 12.0 * us / n
+	var k := float(roundi(t)) if t >= 1 else 1.0 / roundi(1.0 / t)
+	return n * k
 
 # el icono del equipo (lámina 12): los LED, su panel; los demás focos, la lámpara; armarios (60 y 80) y carpas; cada extra, el suyo
 const ICX := {"vent": "ventilador", "filtro": "filtro", "garrafas": "garrafa", "goteo": "goteo"}
@@ -206,5 +227,5 @@ static func icono_cogollo(S, sid: String):
 		m[rk.rampa[1]] = s.c
 		m[rk.rampa[2]] = Datos.shade(s.c, -60)
 		c = con_rampa(f.c, m, "g|" + s.c)
-	ico[key] = tex(c)
+	ico[key] = tex(ico_centrado(c))
 	return ico[key]

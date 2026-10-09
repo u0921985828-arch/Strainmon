@@ -14,9 +14,9 @@ Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: 
 | Objetos sueltos en lote | 36 | 10 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 180 + sin documentar |
 | Imágenes simples | 22 | 11 | create_image_pixflux (init_image + color_image) | 7 + sin documentar |
 | Se queda procedural | 2 | 1 | — | 0 |
-| Importado | 123 | 38 | importado | 0 + sin documentar |
+| Importado | 126 | 40 | importado | 0 + sin documentar |
 
-**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 258/258 claves.
+**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 261/261 claves.
 
 ## Orden de creación
 
@@ -177,6 +177,8 @@ Arte propio del repositorio que ya existe (Strainmon): se adapta en local (recor
 | carpa-c-extras | extra-c-vent, extra-c-filtro-28, extra-c-filtro-39, extra-c-garrafa-20, extra-c-garrafa-23, extra-c-garrafa-26, extra-c-garrafa-29, extra-c-llave, extra-c-deposito | importado | — | solo texto | F9 | — | 0+? |
 | iconos-equipo | — | importado | — | solo texto | F9 | — | 0+? |
 | props-escala | fridge, crate | importado | — | solo texto | F9 | — | 0+? |
+| salon | sofa, tv, gpc | importado | — | solo texto | F9 | — | 0+? |
+| iconos-menu | — | importado | — | solo texto | F9 | — | 0+? |
 | tiles-firmes | hormigon, pista, rotoT, rotoB | importado | — | solo texto | F4 | — | 0+? |
 | detalles-hierba | detalles | importado | — | solo texto | F4 | — | 0+? |
 | edificio-caserio3 | roofT_caserio3, roofB_caserio3, wall_caserio3, win_caserio3 | importado | — | solo texto | F4 | — | 0+? |

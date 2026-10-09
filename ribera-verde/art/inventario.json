@@ -1,5 +1,5 @@
 {
-  "generado": "2026-10-07",
+  "generado": "2026-10-09",
   "tiles_suelo": [
     "bridgeB",
     "bridgeT",
@@ -121,6 +121,7 @@
     "fence",
     "fountain",
     "fridge",
+    "gpc",
     "iwin",
     "jukebox",
     "lab",
@@ -136,10 +137,12 @@
     "seto",
     "shelfW",
     "sign",
+    "sofa",
     "stool",
     "table",
     "tree",
-    "tree2"
+    "tree2",
+    "tv"
   ],
   "tiles_animados": [
     {

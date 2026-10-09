@@ -754,8 +754,21 @@ func ending() -> void:
 # ---------- menú START (12-menus) ----------
 func start_menu():
 	var i := 0
-	while true:
-		i = await menu(["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "GUARDAR", "SONIDO: SÍ" if sonido_on() else "SONIDO: NO", "SALIR"], {"cls": "start", "initial": i, "startCloses": true})
+	while true:   # 1.10: con su icono y lo que hay en cada uno, y arriba el día, la hora y el dinero
+		var ns: int = S.sms.size()
+		var vivas := 0
+		for p in S.pots:
+			if p and not p.get("dead"):
+				vivas += 1
+		var desc := 0
+		for k in D.DEX:
+			if S.disc.get(k):
+				desc += 1
+		i = await menu([{"label": "GENOTECA", "right": "%d/%d" % [desc, D.DEX.size()], "ic": icono("cogollo")}, {"label": "MOCHILA", "right": _kg(int(floor(peso_encima()))), "ic": icono("bolsa")},
+			{"label": "MÓVIL", "right": ("%d SMS" % ns) if ns else null, "ic": icono("movil")}, {"label": "PLANTAS", "right": str(vivas), "ic": icono("maceta")},
+			{"label": "OBJETIVO", "right": "cap. %d" % S.ch, "ic": icono("trofeo")}, {"label": "GUARDAR", "ic": icono("guardar")},
+			{"label": "SONIDO", "right": "SÍ" if sonido_on() else "NO", "ic": icono("altavoz")}, {"label": "SALIR", "ic": icono("salir")}],
+			{"cls": "start", "initial": i, "startCloses": true, "title": "DÍA %d · %s" % [S.day, reloj_txt()], "title2": Datos.eur(S.money)})
 		if i < 0 or i == 7:
 			return
 		if i == 0:
@@ -1611,7 +1624,7 @@ func movil_menu():
 		var ops := ["Llamar"]
 		if S.flags.get("kiko1"):
 			ops.append("Pedir a Kiko")
-		ops.append_array(["Mensajes", "Colgar"])
+		ops.append_array(["Mensajes", "Tienda online", "Colgar"])
 		var ns: int = S.sms.size()
 		var oi: int = await ask("MÓVIL · día %s, %s%s" % [n(S.day), reloj_txt(), (" · %d mensaje%s" % [ns, "s" if ns > 1 else ""]) if ns else ""], ops)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
@@ -1622,6 +1635,8 @@ func movil_menu():
 				return
 		elif op == "Pedir a Kiko":
 			await pedir_kiko()
+		elif op == "Tienda online":
+			await tienda_online()
 		else:
 			await mensajes()
 

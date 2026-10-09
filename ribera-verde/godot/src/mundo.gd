@@ -303,13 +303,18 @@ func montar_casa() -> void:
 	var ks := []
 	for c in S.carpas:
 		ks.append(c.t if c else "-")
-	var key := ",".join(ks)
+	var ya := muebles_ya()
+	var key := ",".join(ks) + "|" + ",".join(ya)
 	if h.get("carpasK") == key:
 		return
 	h.carpasK = key
 	for s in D.SITIOS:
 		for x in range(s.x, s.x + s.w):
 			h.o[s.y][x] = null
+	for k in D.MUEBLES:   # los muebles del salón que ya han llegado (12c-salon): k y k + "2"
+		var mu: Dictionary = D.MUEBLES[k]
+		h.o[mu.y][mu.x] = k if k in ya else null
+		h.o[mu.y][mu.x + 1] = (k + "2") if k in ya else null
 	h.carpas = []
 	for ci in S.carpas.size():
 		var c = S.carpas[ci]
@@ -321,6 +326,24 @@ func montar_casa() -> void:
 		for x in range(x0, x1 + 1):
 			h.o[s.y][x] = "carpa"
 		h.carpas.append({"ci": ci, "t": c.t, "x0": x0, "x1": x1, "y": int(s.y)})
+
+# el salón (1.10, 12c-salon): los muebles comprados que ya han llegado, y de qué mueble es un objeto (k o su mitad k + "2")
+func muebles_ya() -> Array:
+	var l := []
+	var mu: Dictionary = S.get("muebles", {}) if S.get("muebles") is Dictionary else {}
+	for k in D.MUEBLES:
+		if mu.get(k) and mu[k] <= S.day:
+			l.append(k)
+	return l
+
+func mueble_de(o) -> String:
+	if not (o is String):
+		return ""
+	if D.MUEBLES.has(o):
+		return o
+	if o.ends_with("2") and D.MUEBLES.has(o.left(-1)):
+		return o.left(-1)
+	return ""
 
 func sitio_visible(ci: int) -> bool:
 	return not (ci < S.carpas.size() and S.carpas[ci]) and (ci < 2 or (S.carpas.size() > 1 and S.carpas[1] != null))
@@ -651,6 +674,8 @@ func world_press(b: String) -> void:
 		interact()
 	elif b == "START":
 		run(start_menu)
+	elif b == "MOVIL":
+		run(movil_menu)
 
 func interact() -> void:
 	var dv: Array = DV[P.dir]
@@ -687,6 +712,15 @@ func object_action(x: int, y: int) -> void:
 		if sl >= 0:
 			await say(("Hueco junto a la cama: aquí cabe una carpa de 120×120." + (" Kiko las tendrá más adelante." if S.ch < 5 else " Kiko las vende.")) if sl == 2 else "Aquí cabe una carpa de cultivo. Kiko vende carpas de 100×100.")
 			return
+		if mueble_de(o) != "":
+			await mueble_action(mueble_de(o))
+			return
+		for k in D.MUEBLES:   # el sitio vacío de un mueble del salón
+			var mu: Dictionary = D.MUEBLES[k]
+			if (x == mu.x or x == mu.x + 1) and y == mu.y:
+				var pd = S.get("muebles", {}).get(k) if S.get("muebles") is Dictionary else null
+				await say(("Aquí va %s: llega mañana." % mu.art) if pd else ("Aquí iría bien %s. Se compra por internet: en el ordenador de la tía o con el móvil." % mu.art))
+				return
 		match o:
 			"bedT", "bedB":
 				await bed_action()
@@ -1290,6 +1324,10 @@ func pedir_caja():
 func battle(_kind):
 	pass
 func start_menu():
+	pass
+func movil_menu():
+	pass
+func mueble_action(_k):
 	pass
 func abrir_carpa(_ci):
 	pass

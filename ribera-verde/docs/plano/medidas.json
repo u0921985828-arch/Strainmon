@@ -196,8 +196,8 @@
   },
   "home": {
    "nombre": "home",
-   "titulo": "PISO DE LA TÍA MAITE (armario 80 + carpa 150 + carpa 120)",
-   "w": 12,
+   "titulo": "PISO DE LA TÍA MAITE (armario 80 + carpa 150 + carpa 120 + salón)",
+   "w": 18,
    "h": 8,
    "edificios": [],
    "puertas": [],
@@ -223,6 +223,11 @@
     {
      "o": "iwin",
      "x": 9,
+     "y": 1
+    },
+    {
+     "o": "iwin",
+     "x": 15,
      "y": 1
     },
     {
@@ -267,7 +272,7 @@
     },
     {
      "o": "plantDeco",
-     "x": 11,
+     "x": 17,
      "y": 7
     }
    ],
@@ -1423,7 +1428,7 @@
    "real": 1,
    "ppm": 16,
    "w": 16,
-   "h": 39,
+   "h": 40,
    "m": 1,
    "ratio": 1
   },
@@ -1435,7 +1440,7 @@
    "real": 1.2,
    "ppm": 16,
    "w": 19,
-   "h": 40,
+   "h": 42,
    "m": 1.19,
    "ratio": 0.99
   },
@@ -1447,7 +1452,7 @@
    "real": 1.5,
    "ppm": 16,
    "w": 24,
-   "h": 39,
+   "h": 40,
    "m": 1.5,
    "ratio": 1
   },

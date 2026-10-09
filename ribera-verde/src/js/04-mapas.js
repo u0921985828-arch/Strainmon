@@ -213,14 +213,15 @@ function buildMaps(){
   bosque(e,33,3,4,3,13);linde(e,{n:[2,4],s:[1,3],o:[1,3],e:[1,2],sem:11});
 
   // ---------- HOME ----------
-  // 1 casilla = 1 m: 12 × 6 m de suelo (72 m²). Dormitorio a la izquierda, escritorio y mesa de genética al fondo,
+  // 1 casilla = 1 m: 18 × 6 m de suelo (108 m²). Dormitorio a la izquierda, escritorio y mesa de genética al fondo,
   // las carpas (montarCasa) al fondo (A en x 8, B en x 10-11 y C en x 2-3, junto a la cama), cocina abajo a la izquierda y la puerta en (5,7).
-  // En la pared, solo encima de casillas que no puede tapar una carpa: ventanas en x 6 y x 9, diploma en x 7
-  const h=newMap('home',12,8,'floor');h.music='home';
-  rect(h,0,0,11,0,(x,y)=>gr(h,x,y,'iwT_home'));rect(h,0,1,11,1,(x,y)=>gr(h,x,y,'iwB_home'));
-  ob(h,6,1,'iwin');ob(h,9,1,'iwin');ob(h,7,1,'poster');
+  // El salón (1.10), a la derecha (x 12-17): vacío hasta que compras los muebles por internet (MUEBLES, 12c-salon; los monta montarCasa).
+  // En la pared, solo encima de casillas que no puede tapar una carpa ni un mueble: ventanas en x 6, x 9 y x 15, diploma en x 7
+  const h=newMap('home',18,8,'floor');h.music='home';
+  rect(h,0,0,17,0,(x,y)=>gr(h,x,y,'iwT_home'));rect(h,0,1,17,1,(x,y)=>gr(h,x,y,'iwB_home'));
+  ob(h,6,1,'iwin');ob(h,9,1,'iwin');ob(h,7,1,'poster');ob(h,15,1,'iwin');
   ob(h,0,2,'bedT');ob(h,0,3,'bedB');ob(h,1,2,'plantDeco');ob(h,4,2,'pc');ob(h,5,2,'lab');ob(h,6,2,'lab2');
-  ob(h,0,6,'fridge');ob(h,3,5,'table');ob(h,11,7,'plantDeco');ob(h,0,4,'crate');   // el arcón (1.10), entre la cama y la nevera (en 0,5 lo tapa la nevera)
+  ob(h,0,6,'fridge');ob(h,3,5,'table');ob(h,17,7,'plantDeco');ob(h,0,4,'crate');   // el arcón (1.10), entre la cama y la nevera (en 0,5 lo tapa la nevera)
   gr(h,5,7,'mat');h.exits['5,7']={to:'town',x:5,y:9,dir:'down'};
   // ---------- SHOP ----------
   const s=newMap('shop',10,8,'floorS');s.music='home';
@@ -254,12 +255,14 @@ function buildMaps(){
   [[0,2],[1,2],[0,3],[8,2],[9,2],[9,3],[8,6],[9,6],[0,6]].forEach(([x,y])=>ob(w,x,y,'crate'));ob(w,5,4,'btable');ob(w,4,4,'stool');
   gr(w,4,7,'mat');w.exits['4,7']={to:'astilleros',x:18,y:14,dir:'down'};
 }
-// carpas del piso según S.carpas: un mueble sólido ('carpa') en las casillas de su sitio; se pinta entero desde su base
+// carpas del piso según S.carpas: un mueble sólido ('carpa') en las casillas de su sitio; se pinta entero desde su base.
+// Y los muebles del salón que ya han llegado (mueblesYa, 12c-salon): k y k + '2'
 // (14-render) y por dentro se ve en la vista de carpa (09b-carpa)
 function montarCasa(){
   const h=MAPS.home;if(!h||!S)return;
-  const key=S.carpas.map(c=>c?c.t:'-').join();if(h.carpasK===key)return;h.carpasK=key;
+  const ya=mueblesYa(),key=S.carpas.map(c=>c?c.t:'-').join()+'|'+ya.join();if(h.carpasK===key)return;h.carpasK=key;
   SITIOS.forEach(s=>{for(let x=s.x;x<s.x+s.w;x++)ob(h,x,s.y,null);});
+  for(const k in MUEBLES){const m=MUEBLES[k],en=ya.includes(k);ob(h,m.x,m.y,en?k:null);ob(h,m.x+1,m.y,en?k+'2':null);}
   h.carpas=[];
   S.carpas.forEach((c,ci)=>{
     if(!c)return;const s=SITIOS[ci],x0=s.x,x1=x0+CARPAS[c.t].w-1;

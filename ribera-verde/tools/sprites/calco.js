@@ -101,7 +101,7 @@ for (const a of M.assets) {
   if (/^carpa-c-|^carpas-medias-vista$/.test(a.id)) for (const c of a.cubre || []) { const n = c.slice(5), d = path.join(ROOT, 'art', 'procesado', a.id, n, 'unica');
     if (fs.existsSync(d)) fs.readdirSync(d).filter(f => f.endsWith('.png')).sort().forEach((f, i) => wr(a.id, n, 'unica', i, PNG.sync.read(fs.readFileSync(path.join(d, f))))); }
   // las láminas 12 y 13 (1.10 P5, a mano: iconos del equipo y muebles a escala) tampoco tienen referencia: la lámina ya procesada
-  const A_MANO = ['iconos-equipo', 'props-escala'];
+  const A_MANO = ['iconos-equipo', 'props-escala', 'salon', 'iconos-menu'];   // y la 14 (1.10: salón e iconos del menú)
   if (A_MANO.includes(a.id)) { const g = path.join(ROOT, 'art', 'procesado', a.id);
     if (fs.existsSync(g)) for (const n of fs.readdirSync(g).filter(n => fs.existsSync(path.join(g, n, 'unica')))) { const d = path.join(g, n, 'unica');
       fs.readdirSync(d).filter(f => f.endsWith('.png')).sort().forEach((f, i) => wr(a.id, n, 'unica', i, PNG.sync.read(fs.readFileSync(path.join(d, f))))); } }

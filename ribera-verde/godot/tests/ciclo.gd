@@ -275,14 +275,14 @@ func check_aviso(cuando: String) -> void:
 		var r := rect(J.toast_box)
 		var fi := Rect2(J.escena.position + J.vc_info.position, J.vc_info.size)
 		var ok: bool = root.get_visible_rect().size == Vector2(t) and J.toast_box.visible and not (J.vc_info.visible and r.intersects(fi)) \
-			and not r.intersects(rect(J.botones.START)) and not r.intersects(rect(J.botones.SONIDO)) and rect(J.pantalla).encloses(r)
+			and not r.intersects(rect(J.botones.START)) and not r.intersects(rect(J.botones.MOVIL)) and not r.intersects(rect(J.botones.SONIDO)) and rect(J.pantalla).encloses(r)
 		if not ok:
 			mal.append("%dx%d" % [t.x, t.y])
 			print("  aviso %s · ficha %s · START %s · SONIDO %s · pantalla %s" % [r, fi if J.vc_info.visible else "-", rect(J.botones.START), rect(J.botones.SONIDO), rect(J.pantalla)])
 		# los mandos (1.10, en mm): dentro de la ventana y sin pisar el escenario de diálogos
 		var v := Rect2(Vector2.ZERO, Vector2(t))
-		var zonas := [J.zona_cruz, J.zona_ab, rect(J.botones.START), rect(J.botones.SONIDO)]
-		if not zonas.all(func(z): return v.encloses(z) and not z.intersects(J.ui_rect())):
+		var zonas := [J.zona_cruz, J.zona_ab, rect(J.botones.START), rect(J.botones.MOVIL), rect(J.botones.SONIDO)]
+		if not zonas.all(func(z): return v.encloses(z) and not z.intersects(J.ui_rect())) or rect(J.botones.MOVIL).intersects(J.zona_cruz):
 			mal_m.append("%dx%d" % [t.x, t.y])
 			print("  mandos %s · escenario %s" % [zonas, J.ui_rect()])
 		# la caja de vida del combate (bP) no queda debajo de A, B ni START (bp_r, como --bpr en el HTML)
@@ -450,7 +450,7 @@ func menu_start() -> void:
 	await pulsa("START")
 	await foto("3b-start")
 	var l := etiquetas()
-	check("START abre el menú (%s)" % ", ".join(l), l == ["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "GUARDAR", "SONIDO: SÍ", "SALIR"])
+	check("START abre el menú (%s)" % ", ".join(l), l == ["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "GUARDAR", "SONIDO", "SALIR"] and J.m_items[6].right == "SÍ")
 	await elige("GENOTECA")
 	check("Genoteca: %d filas, todas sin descubrir" % J.m_items.size(), J.m_items.size() == J.D.DEX.size() and J.m_items.all(func(x): return x.label.ends_with("??????")))
 	await pulsa("B")
@@ -465,11 +465,13 @@ func menu_start() -> void:
 	await pasa(func(): return J.menu_box.visible and not J.dlg.visible)
 	check("Objetivo: el capítulo y la carta", textos.size() == 2 and textos[0].begins_with("CAPÍTULO 1") and textos[0].contains("carta"))
 	# SONIDO apaga la música y los efectos (y lo dice el mando de arriba); otra vez, los enciende
-	await elige("SONIDO: SÍ")
+	await pasa(func(): return J.menu_box.visible)
+	var ini: bool = J.m_items.size() == 8 and J.m_items.all(func(x): return x.get("ic") != null) and J.m_items[6].right == "SÍ"
+	await elige("SONIDO")
 	var so = J.sonido
-	var calla: bool = not so.on and so.musica.volume_db == -80.0 and J.botones.SONIDO.text == "SILENCIO" and etiquetas().has("SONIDO: NO")
-	await elige("SONIDO: NO")
-	check("SONIDO en el menú: apaga y enciende", calla and so.on and so.musica.volume_db == 0.0 and J.botones.SONIDO.text == "SONIDO")
+	var calla: bool = not so.on and so.musica.volume_db == -80.0 and J.botones.SONIDO.text == "SILENCIO" and J.m_items[6].right == "NO"
+	await elige("SONIDO")
+	check("SONIDO en el menú (con su icono, como todas las filas): apaga y enciende", ini and calla and so.on and so.musica.volume_db == 0.0 and J.botones.SONIDO.text == "SONIDO")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Juego.GUARDADO))
 	textos.clear()
 	await elige("GUARDAR")

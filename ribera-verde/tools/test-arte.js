@@ -173,7 +173,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       r.sel = [VC.sel]; press('right'); r.sel.push(VC.sel); press('up'); r.sel.push(VC.sel); r.info = document.getElementById('vcInfo').textContent;
       press('B'); await hasta(() => mode === 'world' && isFree()); r.sale = !VC && document.getElementById('vcInfo').hidden;
       return r; });
-    check('Carpas: muebles del piso (1-2 casillas, sólidos) con su arte, piso de 12×8', carpa.mapa && carpa.anchos === '1,2' && carpa.solidas && carpa.piso === '12×8', carpa);
+    check('Carpas: muebles del piso (1-2 casillas, sólidos) con su arte, piso de 18×8 (con el salón)', carpa.mapa && carpa.anchos === '1,2' && carpa.solidas && carpa.piso === '18×8', carpa);
     check(`Plantas de la vista B: ${carpa.n} variedades con % índica, tono de hoja y porte, alto y ancho reales (×0,75-1,33) de vegetativo a lista, seca y muerta sin verdes`, carpa.portes && carpa.crece && carpa.seca, carpa);
     check('Vista B, distancia segura: en las 5 carpas, con cada foco y maceta, ni las copas en floración ni las macetas se tocan ni tocan las paredes, y la cima queda a su distancia del foco', carpa.espacio.length === 5 && carpa.espacio.every(e => +e.split(' ')[1] >= 0), carpa.espacio);
     check('Vista B de frente: las macetas, dentro del suelo de la carpa plateada en las 5 carpas; tope de tierra por carpa (120: 144 L, con 5 de 25 L y una de 7 solo entra la de 18 L)', carpa.dentro.length === 5 && carpa.dentro.every(e => +e.split(' ')[1] >= 0) && carpa.tierra.join('|') === '144|132|plastico18|plastico18,tela25|true', { dentro: carpa.dentro, tierra: carpa.tierra });
@@ -402,6 +402,44 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       temp.orden === 'auto,veg,flor' && temp.vieja === 'auto,auto' && temp.luz[0] > temp.luz[1] && temp.luz[1] > temp.luz[2] && temp.madre <= .649 && temp.madre > .6 && temp.auto === 1 &&
       temp.veg[1] * 2 <= temp.veg[0] + 2 && temp.veg[2] > .9 && Math.abs(temp.gramos[1] / temp.gramos[0] - .6) < .03 && temp.a.join() === 'veg,borrado' && /^Automático/.test(temp.dicho) && temp.nav.join(',').startsWith('-2,-1,-2,') && temp.nav[3] >= 0 && temp.nav[5] === -2 &&
       temp.dibujo.length === 6 && temp.mapa && !temp.fallos.length, temp);
+    // el salón (1.10): vacío al llegar; la tienda online (en el ordenador de la tía, en el PC gaming y en el móvil) cobra (de lo de
+    // fuera y después de la caja) y el mueble llega al día siguiente (llegaMueble, montado por montarCasa): 2 casillas sólidas, k con su
+    // arte del atlas y k2 sin pintar (la de la izquierda lo pinta entero); el sofá (+5 de vida, 1 h), la tele (noticias según el calor,
+    // 1 h) y el PC (foro de cultivo, 30 min); el menú START con un icono en cada fila y el día, la hora y el dinero arriba; MÓVIL, encima
+    // de la cruceta sin pisarla, abre el móvil (y la tecla P)
+    const salon = await page.evaluate(async () => {
+      const S0 = S, r = {}, a0 = ask, s0 = say, me0 = menu, f0 = fade; let opc = {}, pide = [], dicho = [];
+      S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { money: 1500, caja: { nivel: 1, money: 500, buds: {}, rosin: {} }, heat: 70, hp: 10, hpMax: 30, min: 600, map: 'home' }); delete S.muebles; montarCasa();
+      const m = MAPS.home; r.vacio = Object.keys(MUEBLES).every(k => !m.o[MUEBLES[k].y][MUEBLES[k].x] && !m.o[MUEBLES[k].y][MUEBLES[k].x + 1]);
+      try {
+        say = async t => { dicho.push(t); }; fade = async () => {};
+        ask = async (t, o) => { opc[t.slice(0, 12)] = o; return o.length - 1; };
+        menu = async (items, o) => { if (o.title === 'TIENDA ONLINE') { r.tienda = r.tienda || items.map(i => i.label + (i.disabled ? '×' : '')).join('|'); const k = pide.shift(); return k == null ? -1 : k; } if (o.cls === 'start') { r.start = { items, o }; } return -1; };
+        pide = [0, 2]; await tiendaOnline(); r.pago = [S.money, S.caja.money]; r.ped = JSON.stringify(S.muebles); const ti = r.tienda; r.tienda = null; pide = []; await tiendaOnline(); r.tienda2 = r.tienda; r.tienda = ti;
+        r.hoy = mueblesYa().join(); S.day++; llegaMueble(); while (pending.length) await pending.shift()(); r.ya = mueblesYa().join(); r.llega = dicho.pop();
+        r.solido = ['sofa', 'gpc'].every(k => tileSolid(m, MUEBLES[k].x, MUEBLES[k].y) && tileSolid(m, MUEBLES[k].x + 1, MUEBLES[k].y) && m.o[MUEBLES[k].y][MUEBLES[k].x + 1] === k + '2') && !m.o[MUEBLES.tv.y][MUEBLES.tv.x];
+        const L = []; r.arte = arteObj('sofa', 13, 5, { x: 0, y: 0 }, 0, L, []) && L.length === 1 && arteObj('sofa2', 14, 5, { x: 0, y: 0 }, 0, L, []) && L.length === 1 && ARTE.cubre['obj:tv'] && ARTE.cubre['obj:gpc'];
+        ask = async (t, o) => { opc[t.slice(0, 12)] = o; return 0; };
+        const t0 = S.min; await objectAction(14, 5); r.sofa = [S.hp, S.min - t0];
+        await objectAction(13, 2); r.vacioTv = dicho.pop();
+        S.muebles.tv = S.day; montarCasa(); const t1 = S.min; await objectAction(14, 2); r.tv = [dicho.pop(), S.min - t1];
+        ask = async (t, o) => { opc[t.slice(0, 12)] = o; return 1; }; const t2 = S.min; await objectAction(17, 2); r.foro = [dicho.pop(), S.min - t2];
+        ask = async (t, o) => { opc[t.slice(0, 12)] = o; return o.length - 1; }; opc = {}; await pcAction(); await movilMenu();
+        r.opc = Object.values(opc).map(o => o.includes('Tienda online')).join();
+        await startMenu();
+      } finally { ask = a0; say = s0; menu = me0; fade = f0; }
+      const st = r.start; r.start = st && [st.items.length, st.items.every(i => i.ic), /^DÍA \d+ · \d\d:\d\d$/.test(st.o.title), st.o.title2].join();
+      const R = q => document.querySelector(q).getBoundingClientRect(), bm = R('#bMovil'), dp = R('#dpad'), hud = R('#hud');
+      r.boton = [bm.width > 20, bm.bottom <= dp.top, Math.abs((bm.left + bm.right) / 2 - (R('#dpad .cruz').left + R('#dpad .cruz').right) / 2) < 2].join();
+      S = S0; montarCasa(); return r; });
+    const salonM = await page.evaluate(async () => { const m0 = movilMenu; let n = 0; movilMenu = async () => { n++; };
+      try { mode = 'world'; while (handlers.length) handlers.pop(); press('MOVIL'); await new Promise(r => setTimeout(r, 50));
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'p' })); await new Promise(r => setTimeout(r, 50)); } finally { movilMenu = m0; } return n; });
+    check('Salón: muebles por internet (llegan mañana), 2 casillas con su arte, sofá, tele y PC; menú START con iconos y el día; botón MÓVIL encima de la cruceta',
+      salon.vacio && salon.tienda === 'Sofá de 2 plazas|Tele de 43" con mueble|PC gaming con mesa|Salir' && salon.pago.join() === '0,111' && salon.ped === '{"sofa":2,"gpc":2}' &&
+      salon.tienda2 === 'Sofá de 2 plazas · pedido×|Tele de 43" con mueble|PC gaming con mesa · pedido×|Salir' && salon.hoy === '' && salon.ya === 'sofa,gpc' && /el sofá y el PC gaming/.test(salon.llega) &&
+      salon.solido && salon.arte && salon.sofa[0] === 15 && salon.sofa[1] >= 60 && salon.sofa[1] < 64 && /^Aquí iría bien la tele/.test(salon.vacioTv) && /^Noticias: la policía busca/.test(salon.tv[0]) && salon.tv[1] >= 60 && salon.tv[1] < 64 &&
+      /^Foro de cultivo · /.test(salon.foro[0]) && salon.foro[1] >= 30 && salon.foro[1] < 34 && salon.opc === 'true,true' && salon.start === '8,true,true,0 €' && salon.boton === 'true,true,true' && salonM === 2, { ...salon, salonM });
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
       for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }
       r.rio = mascaraOrilla(m, 31, 15); r.centro = mascaraOrilla(m, 35, 27); r.sinAtlas = (() => { const ok = ARTE.ok; ARTE.ok = false; const v = arteOrilla(m, 'water', 31, 15, 0, 0); ARTE.ok = ok; return v; })(); return r; });

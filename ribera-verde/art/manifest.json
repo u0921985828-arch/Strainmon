@@ -492,6 +492,16 @@
    ],
    "ajuste": "exacto",
    "nota": "muebles del piso a escala real (16 px/m, 1.10 P5): el frente a su ancho y alto y la tapa a medio fondo, como las carpas del piso; base centrada en (16, 47)"
+  },
+  "mueble_ancho": {
+   "w": 48,
+   "h": 48,
+   "ancla": [
+    16,
+    47
+   ],
+   "ajuste": "exacto",
+   "nota": "muebles del piso de 2 casillas de ancho a escala real (16 px/m, 1.10 salón): la base en el centro de la casilla de la izquierda (16, 47) y el mueble centrado en x 24; la casilla de la derecha (k + '2') no se pinta"
   }
  },
  "fases": [
@@ -6880,6 +6890,49 @@
    "notas": "1.10 P5. Sustituyen a fridge (props-32) y crate (props-16), que eran de una casilla entera: la nevera medía 16 × 30 y la caja 14 × 13. Como las carpas del piso: frente a su tamaño real y tapa a medio fondo. Dentro de la lista de profundidad (más altas que 16): tapan al jugador si pasa por detrás.",
    "montaje": "tal cual (equipo_p5.py), base en (16, 47) (ajuste exacto)",
    "aprobado": "2026-10-08: láminas 12 y 13 (iconos del equipo, nevera y cajas a escala, con el piso de día y de noche y el almacén), aprobadas por la persona: «Mola»"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "estilo_ref": "los muebles a escala del piso (props-escala)",
+   "tipo": "objeto",
+   "id": "salon",
+   "cubre": [
+    "obj:sofa",
+    "obj:tv",
+    "obj:gpc"
+   ],
+   "celda": "mueble_ancho",
+   "ajuste_por_sprite": {
+    "sofa": "exacto",
+    "tv": "exacto",
+    "gpc": "exacto"
+   },
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/salon.py",
+   "descripcion": "Lámina 14: los muebles del salón, que se compran por internet, a 16 px/m: sofá de 2 plazas (180 cm) visto por detrás, tele de 43\" sobre un mueble bajo de 140 cm con la consola y mesa gaming de 140 cm con monitor de 27\", teclado, torre con ventiladores y tira de LED.",
+   "notas": "1.10 salón. Cada mueble ocupa 2 casillas (k en x y k + '2' en x + 1, que no se pinta). Como la nevera: frente a su tamaño real y tapa a medio fondo; dentro de la lista de profundidad.",
+   "montaje": "tal cual (salon.py), base en (16, 47) (ajuste exacto)"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "estilo_ref": "los iconos aprobados (iconos, iconos-equipo)",
+   "tipo": "icono",
+   "id": "iconos-menu",
+   "cubre": [],
+   "celda": "icono",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/salon.py",
+   "descripcion": "Iconos de 16 px del menú START que faltaban: el móvil con la pantalla encendida, la libreta (guardar) el altavoz (sonido) y la puerta con la flecha (salir).",
+   "notas": "1.10. icono(nombre) los busca en «iconos», «iconos-equipo» y aquí. Contorno #2a2a34 como los aprobados.",
+   "montaje": "tal cual (salon.py), 16 × 16 (ajuste exacto)"
   },
   {
    "id": "tiles-firmes",

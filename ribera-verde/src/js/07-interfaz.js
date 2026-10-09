@@ -28,7 +28,7 @@ function menu(items,o={}){return new Promise(res=>{
     if(i<top)top=i;if(i>=top+vis)top=i-vis+1;
     let h='';if(o.title)h+=`<div class="ttl"><span>${o.title}</span>${o.title2?`<span>${o.title2}</span>`:''}</div>`;
     if(o.cls==='full')h+=`<div class="arr">${top>0?'▲':''}</div><div class="list">`;
-    items.slice(top,top+vis).forEach((it,k)=>{const idx=top+k;h+=`<div class="it ${idx===i?'sel':''} ${it.disabled?'dis':''}" data-i="${idx}"><span>${it.ic?`<i class="ic" style="background-image:url(${it.ic})"></i>`:it.sw?`<i class="sw" style="background:${it.sw}"></i>`:''}${esc(it.label)}</span>${it.right!=null?`<span class="r">${esc(it.right)}</span>`:''}</div>`;});
+    items.slice(top,top+vis).forEach((it,k)=>{const idx=top+k;h+=`<div class="it ${idx===i?'sel':''} ${it.disabled?'dis':''}" data-i="${idx}"><span>${it.ic?`<i class="ic" style="background-image:url(${it.ic});width:${icPx(ICO_N[it.ic]||16)}px;height:${icPx(ICO_N[it.ic]||16)}px"></i>`:it.sw?`<i class="sw" style="background:${it.sw}"></i>`:''}${esc(it.label)}</span>${it.right!=null?`<span class="r">${esc(it.right)}</span>`:''}</div>`;});
     if(o.cls==='full')h+=`</div><div class="arr">${top+vis<items.length?'▼':''}</div>`;
     if(o.desc)h+=`<div class="desc">${esc(items[i].desc||'')}</div>`;
     menuEl.innerHTML=h;
@@ -47,7 +47,32 @@ function menu(items,o={}){return new Promise(res=>{
   push(handler);
 });}
 let toastT=null;
-function toast(html,ms=2400){const t=$('toast');t.innerHTML=html;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,ms);}
+function toast(html,ms=2400){const t=$('toast');t.innerHTML=html;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,ms);colocaToast(true);}
+// el aviso, sin pisar la ficha de la carpa, el HUD ni SONIDO (como coloca_toast en Godot): de ancho, lo que quepa a la derecha de la ficha;
+// si choca con el HUD, a su derecha si cabe y, si no, debajo; con un menú a pantalla completa, encima de él y abajo (sobre la descripción)
+// el botón MÓVIL solo sirve andando por el mapa: en el título, la carpa o el combate no se ve (ni tapa la ficha de la carpa)
+function verMovil(){const b=$('bMovil'),v=mode==='world'?'':'hidden';if(b&&b.style.visibility!==v)b.style.visibility=v;}
+var toastFirma='';   // var: ajustarPantalla (06b) ya llama a colocaToast al cargar
+function colocaToast(forzar){
+  const t=$('toast');if(t.hidden){toastFirma='';return;}
+  const mm=$('menu'),hh=$('hud'),f=[t.innerHTML,mm.hidden,mm.className,$('vcInfo').hidden,hh.hidden,hh.innerHTML,innerWidth,innerHeight].join('|');
+  if(!forzar&&f===toastFirma)return;toastFirma=f;
+  const ui=$('ui'),U=ui.getBoundingClientRect(),us=parseFloat($('consola').style.getPropertyValue('--us'))||1;
+  const ve=e=>e&&!e.hidden&&getComputedStyle(e).visibility!=='hidden',B=e=>e.getBoundingClientRect(),choca=(R,x,y,w,h)=>x<R.right&&x+w>R.left&&y<R.bottom&&y+h>R.top;
+  const vc=$('vcInfo'),m=$('menu'),full=ve(m)&&m.classList.contains('full'),hi=U.right;let lo=U.left;
+  if(ve(vc))lo=Math.max(lo,B(vc).right+3*us);
+  t.style.transform='none';t.style.maxWidth=Math.max(0,Math.min(210*us,hi-lo))+'px';   // .box es border-box: la caja entera, como en Godot
+t.classList.toggle('sobre',full);
+  const w=t.offsetWidth,h=t.offsetHeight;
+  let x=clamp(U.left+U.width/2-w/2,lo,Math.max(lo,hi-w)),y=U.top+24*us;
+  if(full)y=B(m).bottom-6*us-h;
+  else{
+    const hu=$('hud');
+    if(ve(hu)){const H=B(hu);if(choca(H,x,y,w,h)){if(H.right+3*us+w<=hi)x=Math.max(x,H.right+3*us);else y=H.bottom+2*us;}}
+    const so=B($('bSound'));if(choca(so,x,y,w,h))y=Math.max(y,so.bottom+2*us);
+  }
+  t.style.left=x-U.left+'px';t.style.top=y-U.top+'px';
+}
 const fadeEl=$('fade');
 async function fade(to,white){fadeEl.classList.toggle('white',!!white);fadeEl.style.opacity=to;await wait(240);}
 

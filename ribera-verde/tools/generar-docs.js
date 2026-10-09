@@ -15,7 +15,7 @@ const ROOT = path.join(__dirname, '..');
   await page.goto('file://' + path.join(ROOT, 'index.html'));
   await page.waitForFunction(() => typeof mode !== 'undefined' && mode === 'title');
   const D = await page.evaluate(() => {
-    S = newState(); S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'cfl' }]; montarCasa();   // el piso con el armario y la carpa grande
+    S = newState(); S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'cfl' }]; S.muebles = { sofa: 1, tv: 1, gpc: 1 }; montarCasa();   // el piso con el armario, la carpa grande y el salón
     const strains = DEX.map((k, i) => ({ k, idx: i + 1, ...STRAINS[k], tipo: TIPO_GEN[k] || (/^Landrace/.test(STRAINS[k].o) ? 'landrace' : 'cruce'), padres: PADRES[k], gm2: gm2(STRAINS[k]) }));
     const gen = Object.entries(GENETICA).map(([k, G]) => ({ k, ...G }));
     const focos = Object.entries(FOCOS).map(([k, F]) => ({ k, ...F, kwh: kwhFoco(k), eur: Math.round(kwhFoco(k) * KWH) }));
@@ -259,7 +259,7 @@ Interiores: \`B\` cama · \`P\` ordenador · \`G\` mesa de genética · \`t\` me
 
 ${legend}
 `;
-  const titles = { town: 'Barrio (exterior) — 40 × 30', home: 'Piso de la tía Maite — 12 × 8 (1 casilla = 1 m; con el armario de 60 y la carpa de 150)', shop: 'Growshop Kiko — 10 × 8', bar: 'Bar El Ancla — 10 × 8',
+  const titles = { town: 'Barrio (exterior) — 40 × 30', home: 'Piso de la tía Maite — 18 × 8 (1 casilla = 1 m; con el armario de 60, la carpa de 150 y el salón amueblado)', shop: 'Growshop Kiko — 10 × 8', bar: 'Bar El Ancla — 10 × 8',
     alto: 'Barrio alto (exterior, al norte) — 40 × 30', astilleros: 'Astilleros (exterior, al este del muelle) — 40 × 30', txaro: 'Casa de la abuela Txaro — 10 × 8',
     comisaria: 'Comisaría del barrio alto — 10 × 8', almacen: 'Almacén de los astilleros — 10 × 8',
     mendialde: 'Mendialde (pueblo de caseríos, de donde eres; el prólogo) — 48 × 34', 'casa-ama': 'Caserío de la familia, en Mendialde — 10 × 8',

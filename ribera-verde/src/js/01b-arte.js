@@ -187,6 +187,7 @@ const ALZA={iwin:-13,poster:-13,shelfW:-16,bottles:-13};
 const SOMBRA_OBJ=new Set(['fridge','crate','table','btable','stool','plantDeco','lab','lab2','pc','display','counter','barcounter','jukebox','bench','bedB']);
 function arteObj(o,tx,ty,cam,now,list,sombras){
   if(!ARTE.ok)return false;
+  if(SEGUNDA.has(o))return !!ARTE.cubre['obj:'+o.slice(0,-1)];   // la mitad de la derecha de un mueble del salón: la pinta la de la izquierda
   const g=ARTE.cubre['obj:'+o];if(!g)return false;
   const an=ARTE.sobre['obj:'+o],d=desfase(o,tx,ty);
   const f=an?frameDe(an[0][0],an[0][1],'unica',now,{bucle:true}):frameDe(g,o,'unica',0,{i:0,esp:d.esp});
@@ -268,10 +269,20 @@ function arteRetrato(look,cx,fy,now,k=2){
   ctx.drawImage(f.c,Math.round(cx-f.cel.ancla[0]*k),Math.round(fy-f.cel.ancla[1]*k),f.c.width*k,f.c.height*k);return true;
 }
 // iconos de PixelLab para los menús (DOM): data URL de un fotograma; el cogollo de la Genoteca con el color de la variedad
-const ICO={};
+// (los de la lámina de iconos-menu, dibujados a mano, primero: el cogollo fresco sustituye al de PixelLab)
+const ICO={},ICO_N={};
+// el icono, centrado en su celda por lo que pinta (sin el aire de arriba o de abajo que traiga): así queda a la altura del texto
+function icoCentrado(c){
+  const w=c.width,h=c.height,d=c.getContext('2d').getImageData(0,0,w,h).data;let x0=w,y0=h,x1=-1,y1=-1;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}
+  if(x1<0)return c;const bw=x1-x0+1,bh=y1-y0+1,[o,ox]=mkCanvas(w,h);ox.drawImage(c,x0,y0,bw,bh,(w-bw)>>1,(h-bh)>>1,bw,bh);return o;
+}
+const icoURL=c=>{const u=icoCentrado(c).toDataURL();ICO_N[u]=c.width;return u;};
+// lado del icono en el menú (px CSS): unas 12 u, a un múltiplo entero de sus píxeles en la pantalla (o a la mitad, un tercio…): cada píxel, igual
+function icPx(n){const us=parseFloat($('consola').style.getPropertyValue('--us'))||1,d=window.devicePixelRatio||1,t=12*us*d/n,k=t>=1?Math.round(t):1/Math.round(1/t);return n*k/d;}
 function icono(n){
   if(!ARTE.ok)return null;if(n in ICO)return ICO[n];
-  const f=frameDe('iconos',n,'unica',0,{i:0})||frameDe('iconos-equipo',n,'unica',0,{i:0});return ICO[n]=f?f.c.toDataURL():null;
+  const f=frameDe('iconos-menu',n,'unica',0,{i:0})||frameDe('iconos',n,'unica',0,{i:0})||frameDe('iconos-equipo',n,'unica',0,{i:0});return ICO[n]=f?icoURL(f.c):null;
 }
 // el icono del equipo (lámina 12): los LED, su panel; los demás focos, la lámpara; armarios (60 y 80) y carpas; cada extra, el suyo
 const icoFoco=k=>FOCOS[k]&&FOCOS[k].tipo==='led'?'led':'lampara',icoCarpa=t=>t==='p60'||t==='p80'?'armario':'carpa',
@@ -281,7 +292,7 @@ function iconoCogollo(sid){
   const t=TIPO_COGOLLO[sid]||'hibrido',f=frameDe('cogollos-genoteca',t,'unica',0,{i:0});if(!f||!s)return ICO[key]=null;
   const rk=ARTE.d.rampas&&ARTE.d.rampas['cogollos-genoteca']&&ARTE.d.rampas['cogollos-genoteca'].cogollo;
   const c=rk?conRampa(f.c,{[rk.rampa[0]]:shade(s.c,50),[rk.rampa[1]]:s.c,[rk.rampa[2]]:shade(s.c,-60)},'g|'+s.c):f.c;
-  return ICO[key]=c.toDataURL();
+  return ICO[key]=icoURL(c);
 }
 function arteTitulo(){
   const g=ARTE.ok&&ARTE.cubre['misc:hoja-titulo'];if(!g)return false;

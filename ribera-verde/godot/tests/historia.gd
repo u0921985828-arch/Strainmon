@@ -1544,6 +1544,31 @@ func _pasos() -> void:
 		R.c3 = J.S.carpas[0].has("ciclo")
 		J.S = S0,
 		func(): return chk(R.l1 > R.l0 and R.l0 > R.l2 and R.c1 == "veg" and absf(R.m - D.VEG_TOPE) < 1e-9 and R.a > .65 and R.c2 == "flor" and R.fl[0] > R.a and R.fl[1] > .9 and R.g[0] < R.g[1] * .65 and R.c3 == false, R))
+	step("Salón (1.10): en el ordenador de la tía, la tienda online → el sofá y la tele llegan mañana (lo que no llega de fuera, de la caja); el sofá, una cabezada (+5 de vida); la tele, las noticias según el calor",
+		["Tienda online", "^Sofá", "^Tele", "Salir", "Echar", "Noticias"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.erase("muebles")
+		J.S.merge({"money": 500, "caja": {"nivel": 1, "money": 1000, "buds": {}, "rosin": {}}, "heat": 40, "hp": 10, "map": "home"}, true)
+		J.montar_casa()
+		var h: Dictionary = J.MAPS.home
+		R = {"libre": not J.tile_solid(h, 13, 5), "d": J.S.day}
+		await run(func(): await J.pc_action())
+		R.m = [J.S.money, J.S.caja.money]
+		R.ped = [J.S.muebles.get("sofa"), J.S.muebles.get("tv"), J.S.muebles.has("gpc")]
+		J.S.day += 1
+		J.llega_mueble()
+		await idle()
+		R.ya = ",".join(J.muebles_ya())
+		R.solido = J.tile_solid(h, 13, 5) and h.o[5][14] == "sofa2" and h.o[2][14] == "tv2"
+		await run(func(): await J.object_action(14, 5))
+		R.hp = J.S.hp
+		await run(func(): await J.object_action(13, 2))
+		J.S = S0
+		J.montar_casa()
+		R.vacio = not h.o[5][13],
+		func(): return chk(R.libre and R.m[0] == 0 and R.m[1] == 652 and R.ped[0] == R.d + 1 and R.ped[1] == R.d + 1 and R.ped[2] == false and R.ya == "sofa,tv" and R.solido and R.hp == 15 and R.vacio
+			and LOG.any(func(l): return l.contains("Llega el mensajero con el sofá y la tele")) and LOG.any(func(l): return l.contains("Noticias: detenido en el puerto")), R))
 	step("Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad",
 		["Sacar un lote", "^Hindu", "^10 g", "Guardar todo", "Cerrar", "Bolsa de deporte", "Salir", "Sacar todo", "Cerrar"], func():
 		var S0 = J.S

@@ -123,6 +123,7 @@ func new_day() -> void:
 	recibir_pedido()
 	recibir_envio()
 	instalar_caja()
+	llega_mueble()
 	vencer_encargo()
 	if S.due > 0 and S.day > S.deadline:   # 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
 		queue("penalty", penalty_event)
@@ -596,7 +597,7 @@ func pc_action():
 	var o := ["Genoteca"]
 	if S.ch >= 2:
 		o.append("Banco de semillas")
-	o.append("Notas de la tía")
+	o.append_array(["Notas de la tía", "Tienda online"])
 	if S.ch >= 4 and S.get("caja") and S.caja.nivel == 1 and not S.caja.get("mejora"):
 		o.append("Caja empotrada")
 	o.append_array(["Guardar partida", "Apagar"])
@@ -607,10 +608,138 @@ func pc_action():
 		await banco_semillas()
 	elif c == "Notas de la tía":
 		await notas_tia()
+	elif c == "Tienda online":
+		await tienda_online()
 	elif c == "Caja empotrada":
 		await pedir_caja()
 	elif c == "Guardar partida":
 		await say("Partida guardada." if save() else "No se ha podido guardar en este navegador.")
+
+# ---------- salón (12c-salon, 1.10): los muebles se compran por internet y llegan al día siguiente ----------
+func por_hora(l: Array) -> String:
+	return l[(int(S.day) * 24 + int(S.min) / 60) % l.size()]
+
+func noticia() -> String:
+	if S.heat >= 60:
+		return "Noticias: la policía busca un cultivo de interior en Ribera Verde. Los vecinos denuncian olor a marihuana en varios portales."
+	if S.heat >= 30:
+		return "Noticias: detenido en el puerto un hombre con dos kilos de marihuana escondidos en una furgoneta de reparto."
+	return "Noticias: el tiempo. Nubes y claros en la costa y la ría en calma. Nada que contar en Ribera Verde."
+
+func mueble_action(k):
+	if k == "sofa":
+		var o := ["Echar una cabezada (1 h)"]
+		if "tv" in muebles_ya():
+			o.append("Ver la tele")
+		o.append("Nada")
+		var oi: int = await ask("Tu sofá. Todavía huele a nuevo.", o)
+		var c: String = o[oi] if oi >= 0 and oi < o.size() else ""
+		if c == "Ver la tele":
+			await mueble_action("tv")
+			return
+		if c != "Echar una cabezada (1 h)":
+			return
+		await fade(1)
+		advance_time(60)
+		S.hp = min(S.hpMax, S.hp + 5)
+		build_ents()
+		update_hud()
+		await wait(300)
+		await fade(0)
+		await say("Una cabezada en el sofá: +5 de vida.")
+		return
+	if k == "tv":
+		var o := ["Noticias", "Documental", "Nada"]
+		var oi: int = await ask("La tele.", o)
+		var c: String = o[oi] if oi >= 0 and oi < o.size() else ""
+		if c == "Nada" or c == "":
+			return
+		var t := noticia() if c == "Noticias" else por_hora(D.DOCU)
+		advance_time(60)
+		update_hud()
+		await say(t)
+		return
+	var o := ["Jugar (2 h)", "Foro de cultivo", "Tienda online", "Apagar"]
+	var oi: int = await ask("El PC gaming. Los ventiladores brillan de colores.", o)
+	var c: String = o[oi] if oi >= 0 and oi < o.size() else ""
+	if c == "Jugar (2 h)":
+		var t := por_hora(D.JUEGOS)
+		await fade(1)
+		advance_time(120)
+		build_ents()
+		update_hud()
+		await wait(300)
+		await fade(0)
+		await say(t)
+	elif c == "Foro de cultivo":
+		var t := por_hora(D.FORO)
+		advance_time(30)
+		update_hud()
+		await say("Foro de cultivo · " + t)
+	elif c == "Tienda online":
+		await tienda_online()
+
+func tienda_online() -> void:
+	var i := 0
+	while true:
+		var ks: Array = D.MUEBLES.keys()
+		var ya := muebles_ya()
+		var items := []
+		for k in ks:
+			var m: Dictionary = D.MUEBLES[k]
+			var en: bool = k in ya
+			var pd: bool = not en and S.get("muebles") is Dictionary and float(S.muebles.get(k, 0)) > 0
+			items.append({"label": m.n + (" · en casa" if en else " · pedido" if pd else ""), "right": Datos.eur(m.p), "disabled": en or pd,
+				"desc": m.d + ("" if en else "\nLlega mañana: te lo suben al salón." if pd else "\nLlega mañana y te lo suben al salón.")})
+		items.append({"label": "Salir", "desc": "Pagas con lo que llevas y, si no llega, con la caja fuerte."})
+		i = await menu(items, {"cls": "full", "title": "TIENDA ONLINE", "title2": "Muebles · tienes " + Datos.eur(S.money + caja_e()), "desc": true, "initial": i})
+		if i < 0 or i >= ks.size():
+			return
+		var k: String = ks[i]
+		var m: Dictionary = D.MUEBLES[k]
+		if S.money + caja_e() < m.p:
+			sfx("bad")
+			await say("No te llega el dinero.")
+			continue
+		pagar_casa(m.p)
+		if not (S.get("muebles") is Dictionary):
+			S.muebles = {}
+		S.muebles[k] = S.day + 1
+		sfx("coin")
+		toast("Pedido: " + m.n + " · llega mañana", 1400)
+
+func llega_mueble() -> void:
+	var l := []
+	if S.get("muebles") is Dictionary:
+		for k in D.MUEBLES:
+			if S.muebles.get(k) == S.day:
+				l.append(D.MUEBLES[k].art)
+	if l.is_empty():
+		return
+	montar_casa()
+	# si estás donde lo montan, te apartas a la casilla libre más cercana (llegaMueble en el HTML)
+	if S.map == "home" and tile_solid(MAPS.home, P.x, P.y):
+		var ok := false
+		for r in range(1, 4):
+			for dy in range(-r, r + 1):
+				for dx in range(-r, r + 1):
+					if ok or maxi(absi(dx), absi(dy)) != r or tile_solid(MAPS.home, P.x + dx, P.y + dy):
+						continue
+					var x: int = P.x + dx
+					var y: int = P.y + dy
+					P.x = x
+					P.y = y
+					P.px = x * 16.0
+					P.py = y * 16.0
+					P.fx = x
+					P.fy = y
+					P.moving = false
+					S.x = x
+					S.y = y
+					ok = true
+	queue("mueble", func():
+		sfx("get")
+		await say("Llega el mensajero con %s: te lo dejan montado en el salón." % _lista(l)))
 
 # banco de semillas: las landraces en sobres de SOBRE semillas; el pedido llega al día siguiente (new_day)
 func banco_semillas() -> void:

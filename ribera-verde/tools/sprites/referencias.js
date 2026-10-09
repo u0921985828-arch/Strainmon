@@ -27,7 +27,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
 
   await page.evaluate(() => arteListo());   // si el build lleva atlas, los recortes de mapa/ salen con los tiles ya aprobados
   const data = await page.evaluate(() => {
-    S = newState(); S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'cfl' }]; montarCasa();   // el piso con las dos carpas
+    S = newState(); S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'cfl' }]; S.muebles = { sofa: 1, tv: 1, gpc: 1 }; montarCasa();   // el piso con las dos carpas y el salón
     const png = c => c.toDataURL('image/png');
     const up = (c, k) => { const [o, x] = mkCanvas(c.width * k, c.height * k); x.drawImage(c, 0, 0, c.width * k, c.height * k); return o; };
     // qué claves de TILES se usan como suelo y cuáles como objeto
@@ -35,6 +35,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
     for (const m of Object.values(MAPS)) for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) { ground.add(m.g[y][x]); if (m.o[y][x]) objects.add(m.o[y][x]); }
     const files = {};
     for (const [k, frames] of Object.entries(TILES)) {
+      if (SEGUNDA.has(k)) continue;   // la mitad derecha de un mueble del salón (sofa2…) no se pinta: el sprite del mueble ocupa las dos casillas
       const dir = objects.has(k) ? 'objetos' : 'tiles';
       frames.forEach((c, i) => { files[`${dir}/${k}${frames.length > 1 ? '_f' + i : ''}.png`] = png(c); });
     }
@@ -81,7 +82,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
     const inventario = {
       generado: new Date().toISOString().slice(0, 10),
       tiles_suelo: [...ground].sort(),
-      objetos: [...objects].filter(k => k !== 'carpa').sort(),   // la carpa del piso es misc:carpa-<t>-mapa
+      objetos: [...objects].filter(k => k !== 'carpa' && !SEGUNDA.has(k)).sort(),   // la carpa del piso es misc:carpa-<t>-mapa
       tiles_animados: Object.entries(TILES).filter(([, f]) => f.length > 1).map(([k, f]) => ({ clave: k, fotogramas: f.length })),
       personajes: Object.keys(looks),
       personajes_fijos: Object.keys(LOOKS),

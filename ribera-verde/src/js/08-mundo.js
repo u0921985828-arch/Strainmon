@@ -147,7 +147,7 @@ function updateEnts(dt){
 function worldPress(b){
   if(mode==='title'){titlePress(b);return;}
   if(!isFree()||P.moving)return;
-  if(b==='A')interact();else if(b==='START')run(startMenu);
+  if(b==='A')interact();else if(b==='START')run(startMenu);else if(b==='MOVIL')run(movilMenu);
 }
 function interact(){
   const [dx,dy]=DV[P.dir],m=MAPS[S.map];let tx=P.x+dx,ty=P.y+dy;
@@ -177,6 +177,9 @@ async function objectAction(x,y){
     if(o==='table')return letterAction();
     if(o==='fridge')return say('La nevera: medio limón, leche y un táper de alubias que dejó la tía.');
     if(o==='crate')return arconAction();
+    if(muebleDe(o))return muebleAction(muebleDe(o));
+    {const k=Object.keys(MUEBLES).find(k=>(x===MUEBLES[k].x||x===MUEBLES[k].x+1)&&y===MUEBLES[k].y);   // el sitio vacío de un mueble del salón
+      if(k)return say(S.muebles&&S.muebles[k]?`Aquí va ${MUEBLES[k].art}: llega mañana.`:`Aquí iría bien ${MUEBLES[k].art}. Se compra por internet: en el ordenador de la tía o con el móvil.`);}
     if(o==='plantDeco')return say('Una monstera. La tía Maite le hablaba cada mañana.');
     if(o==='iwin')return say('Por la ventana se ve la ría. Huele a salitre.');
     if(o==='poster')return diplomaAction();

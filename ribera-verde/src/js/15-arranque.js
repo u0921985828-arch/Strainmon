@@ -70,7 +70,7 @@ function update(dt){
 }
 function render(now){if(mode==='world'&&S)renderWorld(now);else if(mode==='battle'&&B)renderBattle(now);else if(mode==='carpa'&&VC)renderCarpa(now);else if(mode==='title'||mode==='intro')renderTitle(now);}
 let last=performance.now();
-function loop(now){const dt=Math.min(50,now-last);last=now;try{update(dt);render(now);}catch(e){console.error(e);}requestAnimationFrame(loop);}
+function loop(now){const dt=Math.min(50,now-last);last=now;try{update(dt);render(now);colocaToast();verMovil();}catch(e){console.error(e);}requestAnimationFrame(loop);}
 function boot(data){
   buildTiles();makeMisc();buildMaps();computeClientTiles();makeArt();arteListo();
   try{if(localStorage.getItem('rv_sound')==='0')setSound(false);}catch(e){}

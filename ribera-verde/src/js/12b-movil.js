@@ -12,11 +12,12 @@ function apuntaFijo(c){if(c.fijo||S.fijos.length>=FIJOS_MAX||S.fijos.some(f=>f.i
 const relojTxt=()=>String(Math.floor(S.min/60)).padStart(2,'0')+':'+String(S.min%60).padStart(2,'0');
 async function movilMenu(){
   for(;;){
-    const ops=['Llamar'].concat(S.flags.kiko1?['Pedir a Kiko']:[],['Mensajes','Colgar']);
+    const ops=['Llamar'].concat(S.flags.kiko1?['Pedir a Kiko']:[],['Mensajes','Tienda online','Colgar']);
     const op=ops[await ask(`MÓVIL · día ${S.day}, ${relojTxt()}${S.sms.length?` · ${S.sms.length} mensaje${S.sms.length>1?'s':''}`:''}`,ops)];
     if(!op||op==='Colgar')return;
     if(op==='Llamar'){if(await llamar())return;}
     else if(op==='Pedir a Kiko')await pedirKiko();
+    else if(op==='Tienda online')await tiendaOnline();
     else await mensajes();
   }
 }

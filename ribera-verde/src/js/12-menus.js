@@ -3,8 +3,12 @@
    ========================================================= */
 async function startMenu(){
   let i=0;
-  for(;;){
-    i=await menu(['GENOTECA','MOCHILA','MÓVIL','PLANTAS','OBJETIVO','GUARDAR',soundOn?'SONIDO: SÍ':'SONIDO: NO','SALIR'],{cls:'start',initial:i,startCloses:true});
+  for(;;){   // 1.10: con su icono y lo que hay en cada uno, y arriba el día, la hora y el dinero
+    const sms=S.sms.length,vivas=S.pots.filter(p=>p&&!p.dead).length;
+    i=await menu([{label:'GENOTECA',right:`${DEX.filter(k=>S.disc[k]).length}/${DEX.length}`,ic:icono('cogollo')},{label:'MOCHILA',right:kgTxt(Math.floor(pesoEncima())),ic:icono('bolsa')},
+      {label:'MÓVIL',right:sms?sms+' SMS':null,ic:icono('movil')},{label:'PLANTAS',right:String(vivas),ic:icono('maceta')},{label:'OBJETIVO',right:'cap. '+S.ch,ic:icono('trofeo')},
+      {label:'GUARDAR',ic:icono('guardar')},{label:'SONIDO',right:soundOn?'SÍ':'NO',ic:icono('altavoz')},{label:'SALIR',ic:icono('salir')}],
+      {cls:'start',initial:i,startCloses:true,title:`DÍA ${S.day} · ${relojTxt()}`,title2:eur(S.money)});
     if(i<0||i===7)return;
     if(i===0)await genoteca();else if(i===1)await mochila();else if(i===2)await movilMenu();else if(i===3)await plantas();
     else if(i===4){await say(`CAPÍTULO ${S.ch}: ${CH_TITLES[S.ch]||''}\n${objectiveText()}`);await say(`Deuda: ${eur(S.debt)} · Ventas: ${eur(S.sales)}\nReputación ${S.rep} · Calor ${Math.round(S.heat)}%`);}

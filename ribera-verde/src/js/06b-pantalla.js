@@ -13,7 +13,7 @@
 let menuRedraw=null;   // menú abierto (07-interfaz): al cambiar el tamaño se vuelve a medir cuántas filas caben
 // mandos en mm para el pulgar en reposo (1 px CSS = 1 dp = 1/160 de pulgada): cruceta de 24 mm (brazos de 8) con el centro a 16 mm
 // del lado y 18 de abajo; A y B de 10,5 mm con 3,5 de hueco, inclinados 28° (B abajo a la izquierda), A a 12 mm del lado y 19 de
-// abajo; START (15 × 7) encima de A y SONIDO arriba a la derecha. Zonas de toque: 3 mm alrededor de la cruz y 2,5 alrededor de A/B
+// abajo; START (15 × 7) encima de A, MÓVIL (igual) encima de la cruceta y SONIDO arriba a la derecha. Zonas de toque: 3 mm alrededor de la cruz y 2,5 alrededor de A/B
 // (1 mm por el lado del escenario). Si el escenario (med px a cada lado del centro de la pantalla, que con márgenes seguros distintos
 // no es el de la ventana) no cabe entre ellos, o no caben en alto, encogen: los tamaños y los márgenes de abajo y de arriba por f, y
 // los de los lados por f³, que se van antes. Devuelve f, la mitad del ancho que les deja al escenario (med) y los rectángulos
@@ -31,7 +31,7 @@ function geoMandos(W,H,il,ir,it,ib,med){
   return {f,k:s,med:Math.min(c-l,W-r-c),
     dpad:R(dx,dy,cx+13*s-dx,Math.min(H-ib,cy+15*s)-dy),cruz:R(cx-12*s,cy-12*s,24*s,24*s),
     ab:R(abx,aby,abr-abx,abb-aby),A:R(ax-5.25*s,ay-5.25*s,10.5*s,10.5*s),B:R(bx-5.25*s,by-5.25*s,10.5*s,10.5*s),
-    start:R(stx-7.5*s,ay-16.25*s,15*s,7*s),sonido:R(W-ir-4.5*m-15*s,it+3*s,15*s,7*s)};
+    start:R(stx-7.5*s,ay-16.25*s,15*s,7*s),movil:R(cx-7.5*s,cy-23*s,15*s,7*s),sonido:R(W-ir-4.5*m-15*s,it+3*s,15*s,7*s)};
 }
 function ajustarPantalla(){
   const el=$('consola');if(!el)return;
@@ -50,14 +50,17 @@ function ajustarPantalla(){
   set('--sw',cw);set('--sh',ch);set('--sx',x);set('--sy',y);set('--k',G.k);
   const pon=(q,r,o)=>{const e=el.querySelector(q);if(e)[e.style.left,e.style.top,e.style.width,e.style.height]=r.map((v,i)=>v-(o&&i<2?o[i]:0)+'px');};
   pon('#dpad',G.dpad);pon('#dpad .cruz',G.cruz,G.dpad);pon('#ab',G.ab);pon('#ab [data-k=A]',G.A,G.ab);pon('#ab [data-k=B]',G.B,G.ab);
-  pon('#bStart',G.start);pon('#bSound',G.sonido);
+  pon('#bStart',G.start);pon('#bMovil',G.movil);pon('#bSound',G.sonido);
   const so=G.sonido,der=x+cw/2+Math.min(cw,Math.round(240*us))/2;
   set('--ut',so[0]<der&&so[1]+so[3]>y?Math.round(so[1]+so[3]-y+G.k*1.5):0);
+  // el rótulo del título (RIBERA VERDE: 212 u de ancho y 3 de sombra) baja si SONIDO le pisa la esquina (--tt, arriba del texto)
+  set('--tt',so[0]<x+cw/2+109*s&&so[1]+so[3]>y+20*s?Math.max(20*s,Math.round(so[1]+so[3]-y+G.k*1.5)):20*s);
   // caja de vida del jugador en el combate (#bP, abajo a la derecha de la escena, ~46u de alto): a la izquierda de A, B y START si le caen encima
   const er=x+cw/2+120*s,bb=y+ch-49*s;let bpr=6*s;
   for(const r of [G.A,G.B,G.start])if(r[1]<bb+G.k&&r[1]+r[3]>bb-46*s-G.k)bpr=Math.max(bpr,er-r[0]+G.k);
   set('--bpr',Math.round(Math.min(bpr,130*s)));
   if(menuRedraw)menuRedraw();
+  colocaToast(true);
 }
 ajustarPantalla();
 addEventListener('resize',ajustarPantalla);addEventListener('orientationchange',()=>setTimeout(ajustarPantalla,120));

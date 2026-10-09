@@ -33,7 +33,7 @@ personajes), medido contra su tamaño real. En la 1.7.0 sirvió para decidir la 
 | Mapa | Casillas | Qué hay (x, y) |
 |---|---|---|
 | Barrio (`town`) | 40 × 30 | Edificios de 7 × 6 en y 3–8: piso (2), growshop (14), bar (23); casa de Txaro, gris, 6 × 6 (32). Puertas: piso (5,8), growshop (17,8), bar (26,8) y casa de Txaro (34–35,8). Al barrio alto, por el camino del norte (11–12, 0); a los astilleros, por el muelle (39, 20–21). Calle: acera y 9, calzada y 10–11, acera y 12. Parque de los Sauces (1,13)–(11,27), con hierba alta en (7–10, 18–20) y (1–3, 21–23). Plaza (14,13)–(26,24), con la fuente en (20,19). Ría (31–38, 14–28), muelle (34–38, 16–25) y puente (31–33, 19–20). Parada del autobús en (8,12), enfrente del piso. Lindes de monte (bosque de 2 filas) y seto abajo. |
-| Piso (`home`) | 12 × 8 (72 m²) | Paredes en y 0–1, con ventanas en (6,1) y (9,1) y el diploma en (7,1); suelo de 12 × 6 m. Cama (0,2–3), planta (1,2), ordenador (4,2), mesas de genética (5,2) y (6,2), mesa (3,5), nevera (0,6) y planta (11,7). Sitio A (8,2), 1 casilla: el armario 60 o el 80. Sitio B (10–11,2), 2 casillas: la carpa 100 (en x 10) o la 150 (x 10–11). Sitio C (2–3,2), 2 casillas: la carpa 120, cuando ya hay carpa en B. Salida en (5,7). |
+| Piso (`home`) | 18 × 8 (108 m²) | Paredes en y 0–1, con ventanas en (6,1), (9,1) y (15,1) y el diploma en (7,1); suelo de 18 × 6 m. Cama (0,2–3), planta (1,2), ordenador (4,2), mesas de genética (5,2) y (6,2), arcón (0,4), mesa (3,5), nevera (0,6) y planta (17,7). Salón (1.10, x 12–17), vacío hasta que compras los muebles, de 2 casillas cada uno: tele (13–14,2), PC gaming (16–17,2) y sofá (13–14,5), mirando a la tele. Sitio A (8,2), 1 casilla: el armario 60 o el 80. Sitio B (10–11,2), 2 casillas: la carpa 100 (en x 10) o la 150 (x 10–11). Sitio C (2–3,2), 2 casillas: la carpa 120, cuando ya hay carpa en B. Salida en (5,7). |
 | Growshop (`shop`) | 10 × 8 | Estanterías (0,1) y (8,1), mostrador (2–7, 3), expositores (0,5) y (9,5), Kiko (4,2). Salida en (4,7). |
 | Bar El Ancla (`bar`) | 10 × 8 | Botellero (0–3, 1), barra (0–3, 3), taburetes (1,4) y (3,4), mesas (8,2) y (7,5), gramola (9,2). Josune (2,2), Toño (5,4) y Baltasar (7,4). Salida en (4,7). |
 | Barrio alto (`alto`, 1.10) | 40 × 30 | Plaza del Ensanche (3–19, 4–17) con la fuente en (11,11) y 4 bancos. Comisaría de sillar con su fachada 6 × 6 (24, 13–18), puerta doble en (26–27,18). Jardines (22–38, 3–11) y flores (31–37, 14–18). Calle: acera y 20, calzada y 21–22, acera y 23. Camino al barrio en (11–12, 24–29). Arbusto con 80 € en (2,10). |
@@ -55,7 +55,7 @@ Patxi (21,21) e Iñaki (37,21).
 - Escondidos en arbustos: Acapulco Gold (2,26), 50 € (9,16) e insecticida (10,24).
 
 **Carpas del piso:** muebles sólidos que se usan con A desde la casilla de delante; dentro, la vista de carpa B.
-`home.png` sale con las tres montadas (armario 80, carpa 150 y carpa 120).
+`home.png` sale con las tres montadas (armario 80, carpa 150 y carpa 120) y el salón amueblado.
 
 | Carpa | Real | En el piso | En la vista B | Plazas | Focos |
 |---|---|---|---|---|---|

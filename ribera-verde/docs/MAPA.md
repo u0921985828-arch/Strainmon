@@ -291,19 +291,19 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 23  MMMMMMMMMMMMMMMMMM~~~MMMMMMMMMMMMMMM
 ```
 
-## Piso de la tía Maite — 12 × 8 (1 casilla = 1 m; con el armario de 60 y la carpa de 150)
+## Piso de la tía Maite — 18 × 8 (1 casilla = 1 m; con el armario de 60, la carpa de 150 y el salón amueblado)
 
 ```
-    0         1 
-    012345678901
- 0  ████████████
- 1  ██████vv█v██
- 2  Bp..PGG.K.KK
- 3  B...........
- 4  c...........
- 5  ...t........
- 6  F...........
- 7  .....m.....p
+    0         1       
+    012345678901234567
+ 0  ██████████████████
+ 1  ██████vv█v█████v██
+ 2  Bp..PGG.K.KK.??.??
+ 3  B.................
+ 4  c.................
+ 5  ...t.........??...
+ 6  F.................
+ 7  .....m...........p
 ```
 
 - salida (5,7) pulsando abajo → town (5,9)

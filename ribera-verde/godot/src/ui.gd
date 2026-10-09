@@ -77,6 +77,7 @@ var u := 1.0
 var us := 1.0
 var uiw := 240.0
 var ut := 0.0
+var tt := 0.0
 var bp_r := 0.0   # de la caja de vida del jugador al borde derecho de la escena (--bpr)
 var scr := Rect2(0, 0, 240, 160)
 var zona_cruz := Rect2()   # zonas de toque de la cruceta y de A/B, y la cruz que se ve
@@ -146,7 +147,6 @@ func _ready() -> void:
 	toast_txt.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toast_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toast_box.add_child(toast_txt)
-	add_child(toast_box)
 	# con autowrap, el alto del texto se sabe un fotograma después: entonces se vuelve a colocar
 	toast_txt.minimum_size_changed.connect(func(): coloca_toast.call_deferred())
 	dlg_txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -165,6 +165,7 @@ func _ready() -> void:
 		var y := (2 * us if int(M.reloj / 300) % 2 else 0.0)
 		dlg_more.draw_colored_polygon(PackedVector2Array([Vector2(0, y), Vector2(8 * us, y), Vector2(4 * us, y + 5 * us)]), ROJO))
 	add_child(dlg_more)
+	add_child(toast_box)   # después del diálogo y antes del menú, como los z-index del HTML (diálogo 20, aviso 25, menú 30)
 	menu_box.add_child(menu_col)
 	menu_col.add_theme_constant_override("separation", 0)
 	menu_box.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -255,7 +256,7 @@ func ajusta() -> void:
 	# mandos en mm (geo_mandos): se calculan en px CSS, como el HTML, y se pasan a px de pantalla
 	var us_min := minf(s, maxf(s * .5, 1.3 * dp))
 	var G := geo_mandos(V.x / dp, V.y / dp, zl / dp, zr / dp, zt / dp, zb / dp, 120 * us_min / dp)
-	for n in ["dpad", "cruz", "ab", "A", "B", "start", "sonido"]:
+	for n in ["dpad", "cruz", "ab", "A", "B", "start", "movil", "sonido"]:
 		G[n] = Rect2(G[n].position * dp, G[n].size * dp)
 	var kp: float = G.k * dp
 	us = clampf(G.med * dp / 120, us_min, s)
@@ -271,7 +272,7 @@ func ajusta() -> void:
 	botones.mid.add_theme_stylebox_override("panel", st)
 	for b in ["A", "B"]:
 		_estilo(botones[b], Color(109 / 255.0, 44 / 255.0, 75 / 255.0, .55), Color(154 / 255.0, 74 / 255.0, 114 / 255.0, .85), Color(1, 210 / 255.0, 230 / 255.0, .4), G.A.size.x / 2, kp * 3.8, "")
-	for b in ["START", "SONIDO"]:
+	for b in ["START", "MOVIL", "SONIDO"]:
 		_estilo(botones[b], Color(24 / 255.0, 28 / 255.0, 34 / 255.0, .55), Color(70 / 255.0, 80 / 255.0, 96 / 255.0, .75), Color(1, 1, 1, .22), kp * 3.5, kp * 2.6, "")
 	# después de la letra: un botón no encoge por debajo de lo que pide la letra que tenía (de una ventana más grande)
 	_pon(botones.up, cruz.position + Vector2(a, 0), Vector2(a, a))
@@ -282,6 +283,7 @@ func ajusta() -> void:
 	_pon(botones.A, G.A.position, G.A.size)
 	_pon(botones.B, G.B.position, G.B.size)
 	_pon(botones.START, G.start.position, G.start.size)
+	_pon(botones.MOVIL, G.movil.position, G.movil.size)
 	_pon(botones.SONIDO, G.sonido.position, G.sonido.size)
 	# escenario de diálogos: 240 us centrado, debajo de SONIDO si le cae encima
 	var ux := x + cw / 2 - uiw / 2
@@ -289,6 +291,8 @@ func ajusta() -> void:
 	var so: Rect2 = G.sonido
 	if so.position.x < ux + uiw and so.end.y > y:
 		ut = roundf(so.end.y - y + kp * 1.5)
+	# el rótulo del título (RIBERA VERDE: 212 u de ancho y 3 de sombra) baja si SONIDO le pisa la esquina (--tt en el HTML)
+	tt = maxf(20 * s, roundf(so.end.y - y + kp * 1.5)) if so.position.x < x + cw / 2 + 109 * s and so.end.y > y + 20 * s else 20 * s
 	# caja de vida del jugador en el combate (bP, abajo a la derecha de la escena, ~46 u de alto): a la izquierda de A, B y START
 	# si le caen encima (--bpr en el HTML)
 	var er := x + cw / 2 + 120 * s
@@ -340,7 +344,7 @@ func geo_mandos(W: float, H: float, il: float, ir: float, it: float, ib: float, 
 	return {"f": f, "k": s, "med": minf(c - o[0], W - o[1] - c),
 		"dpad": R.call(dx, dy, cx + 13 * s - dx, minf(H - ib, cy + 15 * s) - dy), "cruz": R.call(cx - 12 * s, cy - 12 * s, 24 * s, 24 * s),
 		"ab": R.call(abx, aby, abr - abx, abb - aby), "A": R.call(ax - 5.25 * s, ay - 5.25 * s, 10.5 * s, 10.5 * s), "B": R.call(bx - 5.25 * s, by - 5.25 * s, 10.5 * s, 10.5 * s),
-		"start": R.call(stx - 7.5 * s, ay - 16.25 * s, 15 * s, 7 * s), "sonido": R.call(W - ir - 4.5 * m - 15 * s, it + 3 * s, 15 * s, 7 * s)}
+		"start": R.call(stx - 7.5 * s, ay - 16.25 * s, 15 * s, 7 * s), "movil": R.call(cx - 7.5 * s, cy - 23 * s, 15 * s, 7 * s), "sonido": R.call(W - ir - 4.5 * m - 15 * s, it + 3 * s, 15 * s, 7 * s)}
 
 # rectángulo del escenario .ui (en px de pantalla)
 func ui_rect() -> Rect2:
@@ -426,7 +430,7 @@ func _estilos() -> void:
 		bhud()
 
 func _mandos() -> void:
-	for b in [["up", ""], ["down", ""], ["left", ""], ["right", ""], ["A", "A"], ["B", "B"], ["START", "START"], ["SONIDO", "SONIDO"]]:
+	for b in [["up", ""], ["down", ""], ["left", ""], ["right", ""], ["A", "A"], ["B", "B"], ["START", "START"], ["MOVIL", "MÓVIL"], ["SONIDO", "SONIDO"]]:
 		var n := Button.new()
 		n.text = b[1]
 		if b[1] == "":
@@ -479,7 +483,7 @@ func _estilo(n: Button, bg: Color, on: Color, borde: Color, r: float, px: float,
 # ---------- entrada (06-controles) ----------
 const TECLAS := {KEY_UP: "up", KEY_DOWN: "down", KEY_LEFT: "left", KEY_RIGHT: "right", KEY_W: "up", KEY_S: "down", KEY_A: "left", KEY_D: "right",
 	KEY_Z: "A", KEY_SPACE: "A", KEY_ENTER: "A", KEY_KP_ENTER: "A", KEY_J: "A", KEY_X: "B", KEY_ESCAPE: "B", KEY_BACKSPACE: "B", KEY_K: "B", KEY_SHIFT: "B",
-	KEY_M: "START", KEY_TAB: "START"}
+	KEY_M: "START", KEY_TAB: "START", KEY_P: "MOVIL"}
 const DIRS := ["up", "down", "left", "right"]
 
 func set_held(b: String, v: bool) -> void:
@@ -578,8 +582,8 @@ func _cruz_a(dedo, p: Vector2) -> void:
 func mando_en(p: Vector2) -> String:
 	if zona_ab.has_point(p):
 		return "A" if p.distance_to(botones.A.get_global_rect().get_center()) < p.distance_to(botones.B.get_global_rect().get_center()) else "B"
-	for k in ["START", "SONIDO"]:
-		if botones[k].get_global_rect().has_point(p):
+	for k in ["START", "MOVIL", "SONIDO"]:
+		if botones[k].visible and botones[k].get_global_rect().has_point(p):
 			return k
 	return ""
 
@@ -772,6 +776,7 @@ func menu(items_: Array, o := {}) -> int:
 		if not oraculo:
 			menu_box.hide()
 			update_hud()
+			coloca_toast.call_deferred()
 		p.res(v)
 	var handler := func(b: String):
 		var g: bool = o.get("cls") == "battle"
@@ -895,7 +900,8 @@ func _pinta_menu(rows: int) -> void:
 			tr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 			tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			tr.custom_minimum_size = Vector2(12 * us, 12 * us)
+			var lado := Atlas.ic_px(ic.get_width(), us)
+			tr.custom_minimum_size = Vector2(lado, lado)
 			tr.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			f.add_child(tr)
 			var e := Control.new()
@@ -980,6 +986,9 @@ func _coloca() -> void:
 	if dlg.visible:
 		dlg.custom_minimum_size = Vector2(R.size.x - 6 * us, 44 * us)
 		dlg.size = Vector2(R.size.x - 6 * us, 0)
+		# en el combate, el texto no pasa por debajo del menú de la derecha (118 de ancho): .dlg con padding-right 126 en el CSS
+		var bt: bool = menu_box.visible and menu_box.get_meta("cls", "right") == "battle"
+		dlg.get_theme_stylebox("panel").content_margin_right = ((126 if bt else 10) + 2) * us
 		dlg.reset_size()
 		dlg.size.x = R.size.x - 6 * us
 		dlg.position = Vector2(R.position.x + 3 * us, R.end.y - 3 * us - dlg.size.y)
@@ -1007,7 +1016,6 @@ func _coloca() -> void:
 	if name_box.visible:
 		name_box.reset_size()
 		name_box.position = R.get_center() - name_box.size / 2
-	coloca_toast()
 	if hud.visible:
 		hud.reset_size()
 		hud.position = scr.position + Vector2(3 * u, 3 * u)
@@ -1021,8 +1029,10 @@ func _coloca() -> void:
 		bE.position = Vector2(6 * u, 8 * u)
 		bP.reset_size()
 		bP.position = Vector2(escena.size.x - bp_r - bP.size.x, escena.size.y - 49 * u - bP.size.y)
+	coloca_toast()
 
-# el aviso, sin pisar la ficha ni SONIDO: de ancho, lo que quepa a la derecha de la ficha (el texto pasa a dos líneas)
+# el aviso, sin pisar la ficha, el HUD ni SONIDO: de ancho, lo que quepa a la derecha de la ficha (el texto pasa a dos líneas);
+# si choca con el HUD, a su derecha si cabe y, si no, debajo; con un menú a pantalla completa, encima de él y abajo (sobre la descripción)
 func coloca_toast() -> void:
 	if not toast_box.visible:
 		return
@@ -1043,9 +1053,22 @@ func coloca_toast() -> void:
 	toast_box.reset_size()
 	toast_box.position.x = clampf(R.get_center().x - toast_box.size.x / 2, lo, maxf(lo, hi - toast_box.size.x))
 	toast_box.position.y = R.position.y + 24 * us
+	var full: bool = menu_box.visible and menu_box.get_meta("cls", "right") == "full"
+	if full != (toast_box.get_index() > menu_box.get_index()):
+		move_child(toast_box, menu_box.get_index())
+	if full:
+		toast_box.position.y = menu_box.position.y + menu_box.size.y - 6 * us - toast_box.size.y
+		return
+	if hud.visible:
+		var H := Rect2(hud.position, hud.size)
+		if H.intersects(Rect2(toast_box.position, toast_box.size)):
+			if H.end.x + 3 * us + toast_box.size.x <= hi:
+				toast_box.position.x = maxf(toast_box.position.x, H.end.x + 3 * us)
+			else:
+				toast_box.position.y = H.end.y + 2 * us
 	var so := Rect2(botones.SONIDO.position, botones.SONIDO.size)
 	if so.intersects(Rect2(toast_box.position, toast_box.size)):
-		toast_box.position.y = so.end.y + 2 * us
+		toast_box.position.y = maxf(toast_box.position.y, so.end.y + 2 * us)
 
 # <small>…</small> (rótulo de arriba, en una línea aparte), <br>, <em> y las entidades de esc()
 func html_bb(h: String) -> String:
@@ -1255,7 +1278,7 @@ func _pinta_titulo() -> void:
 	var f := display
 	var s1 := roundi(17 * u)
 	var t1 := "RIBERA VERDE"
-	var y := 20 * u + f.get_ascent(s1)
+	var y := tt + f.get_ascent(s1)
 	var x := (w - f.get_string_size(t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1).x) / 2
 	c.draw_string(f, Vector2(x + 3 * u, y + 3 * u), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#10301c"))
 	c.draw_string(f, Vector2(x + 1.5 * u, y + 1.5 * u), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#2a7a40"))
@@ -1315,6 +1338,8 @@ func _pinta_endcard() -> void:
 func _process_ui() -> void:
 	if oraculo:
 		return
+	# el botón MÓVIL solo sirve andando por el mapa (verMovil en el HTML)
+	botones.MOVIL.visible = mode == "world"
 	if dlg_more.visible:
 		dlg_more.queue_redraw()
 	if titulo.visible:

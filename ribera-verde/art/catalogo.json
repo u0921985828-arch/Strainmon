@@ -1,6 +1,6 @@
 {
  "generado": "tools/sprites/catalogo.js",
- "claves": 258,
+ "claves": 261,
  "catalogo": {
   "look:player": [
    {
@@ -2395,6 +2395,33 @@
   "obj:crate": [
    {
     "asset": "props-escala",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "obj:sofa": [
+   {
+    "asset": "salon",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "obj:tv": [
+   {
+    "asset": "salon",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "obj:gpc": [
+   {
+    "asset": "salon",
     "familia": "importado",
     "herramienta": "importado",
     "fase": "F9",
