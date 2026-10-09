@@ -767,7 +767,7 @@ func start_menu():
 		i = await menu([{"label": "GENOTECA", "right": "%d/%d" % [desc, D.DEX.size()], "ic": icono("cogollo")}, {"label": "MOCHILA", "right": _kg(int(floor(peso_encima()))), "ic": icono("bolsa")},
 			{"label": "MÓVIL", "right": ("%d SMS" % ns) if ns else null, "ic": icono("movil")}, {"label": "PLANTAS", "right": str(vivas), "ic": icono("maceta")},
 			{"label": "OBJETIVO", "right": "cap. %d" % S.ch, "ic": icono("trofeo")}, {"label": "GUARDAR", "ic": icono("guardar")},
-			{"label": "SONIDO", "right": "SÍ" if sonido_on() else "NO", "ic": icono("altavoz")}, {"label": "SALIR", "ic": icono("salir")}],
+			{"label": "OPCIONES", "ic": icono("altavoz")}, {"label": "SALIR", "ic": icono("salir")}],
 			{"cls": "start", "initial": i, "startCloses": true, "title": "DÍA %d · %s" % [S.day, reloj_txt()], "title2": Datos.eur(S.money)})
 		if i < 0 or i == 7:
 			return
@@ -783,9 +783,9 @@ func start_menu():
 			await say("CAPÍTULO %d: %s\n%s" % [S.ch, D.CH_TITLES.get(str(S.ch), ""), objective_text()])
 			await say("Deuda: %s · Ventas: %s\nReputación %s · Calor %d%%" % [Datos.eur(S.debt), Datos.eur(S.sales), n(S.rep), Datos.jsround(S.heat)])
 		elif i == 5:
-			await say("Partida guardada." if save() else "No se ha podido guardar en este navegador.")
+			await say("Partida guardada." if save() else "No se ha podido guardar la partida.")
 		elif i == 6:
-			set_sound(not sonido_on())
+			await opciones()
 
 func genoteca():
 	var items := []

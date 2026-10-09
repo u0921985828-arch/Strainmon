@@ -19,6 +19,7 @@ const Datos = preload("res://src/datos.gd")
 const Cultivo = preload("res://src/cultivo.gd")
 const Vista = preload("res://src/vista.gd")
 const Arte = preload("res://src/arte.gd")
+const UI = preload("res://src/ui.gd")
 const DV := {"up": Vector2i(0, -1), "down": Vector2i(0, 1), "left": Vector2i(-1, 0), "right": Vector2i(1, 0)}
 const TECLA := {"up": KEY_UP, "down": KEY_DOWN, "left": KEY_LEFT, "right": KEY_RIGHT, "A": KEY_Z, "B": KEY_X, "START": KEY_M}
 var Juego
@@ -93,8 +94,8 @@ func foto(nombre: String) -> void:
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(dir.path_join("juego-%s.png" % nombre))
 
-func check(que: String, ok: bool) -> void:
-	print(("OK     " if ok else "FALLO  ") + que)
+func check(que: String, ok: bool, si_falla := "") -> void:
+	print(("OK     " if ok else "FALLO  ") + que + ("" if ok or si_falla == "" else "  → " + si_falla))
 	if not ok:
 		fallos.append(que)
 
@@ -320,6 +321,8 @@ func _corre() -> void:
 	Juego = load("res://src/juego.gd")
 	Juego.GUARDADO = "user://prueba-ciclo.json"
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Juego.GUARDADO))
+	UI.AJUSTES = "user://prueba-ajustes.json"   # el primer arranque: sin el aviso de edad aceptado
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(UI.AJUSTES))
 	Cultivo.pm = int(arg("--azar", "4242"))   # el azar del Park-Miller: la prueba sale siempre igual
 	J = load("res://juego.tscn").instantiate()
 	root.add_child(J)
@@ -337,9 +340,84 @@ func _corre() -> void:
 # ---------- título, intro y nombre ----------
 func titulo_e_intro() -> void:
 	check("arranca en el título", J.mode == "title" and J.titulo.visible and J.pintor.modo == "title" and not J.hud.visible)
+	# el primer arranque: el aviso de edad (+18) con su pregunta; aceptado, se guarda en los ajustes y no vuelve a salir
+	textos.clear()
+	var hay_aviso: bool = await hasta(func(): return J.dlg.visible, 60)
+	await foto("0a-aviso")
+	await pasa(func(): return false, 400)
+	check("primer arranque: el aviso de edad (%s) y la pregunta (%s)" % [" / ".join(textos), ", ".join(etiquetas())], hay_aviso and textos.size() >= 1 and textos[0].contains("18 años") \
+		and etiquetas() == ["TENGO 18 O MÁS", "SALIR"])
+	await pulsa("A")
+	await hasta(func(): return J.lock == 0 and J.handlers.is_empty(), 120)
+	var aj = JSON.parse_string(FileAccess.get_file_as_string(UI.AJUSTES)) if FileAccess.file_exists(UI.AJUSTES) else {}
+	check("aceptado, se guarda en los ajustes", J.aj.aviso and aj is Dictionary and aj.get("aviso") == true and J.mode == "title")
 	await foto("0-titulo")
 	await pulsa("A")
-	check("sin partida guardada, A en el título empieza una nueva", J.mode == "intro" or await hasta(func(): return J.mode == "intro", 120))
+	await hasta(func(): return J.menu_box.visible, 120)
+	check("sin partida guardada, el título: NUEVA PARTIDA, OPCIONES y CRÉDITOS (%s)" % ", ".join(etiquetas()), etiquetas() == ["NUEVA PARTIDA", "OPCIONES", "CRÉDITOS"])
+	# CRÉDITOS: los créditos, las licencias enteras (Godot y las fuentes) y la privacidad, en un texto con scroll
+	await elige("CRÉDITOS")
+	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "CRÉDITOS", 60)
+	check("CRÉDITOS: %s" % ", ".join(etiquetas()), etiquetas() == ["CRÉDITOS", "LICENCIAS", "PRIVACIDAD", "VOLVER"])
+	await elige("CRÉDITOS")
+	await hasta(func(): return J.lector.visible, 60)
+	await espera(3)
+	await foto("0b-creditos")
+	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.4.0") \
+		and J.lector_txt.text.contains("Open Font License") and J.lector_txt.text.contains("FICCIÓN") and J.lector.get_global_rect().encloses(J.lector_sc.get_global_rect()))
+	await pulsa("B")
+	await elige("LICENCIAS")
+	await hasta(func(): return J.lector.visible, 60)
+	await espera(3)
+	var y0: int = J.lector_sc.scroll_vertical
+	await pulsa("down")
+	var baja: bool = J.lector_sc.scroll_vertical > y0
+	var n: int = J.lector_pags.size()
+	var todo := "\n\n".join(J.lector_pags)
+	await pulsa("right")
+	var pasa: bool = J.lector_i == 1 and J.lector_sc.scroll_vertical == 0 and J.lector_ttl.text.ends_with("2/%d" % n)
+	await pulsa("left")
+	pasa = pasa and J.lector_i == 0
+	await foto("0c-licencias")
+	var mayor := 0
+	for pg in J.lector_pags:
+		mayor = maxi(mayor, pg.length())
+	check("LICENCIAS: la MIT de Godot, las OFL y las de terceros enteras, en %d páginas de %d letras como mucho; ▼ baja y ▶ ◀ pasan de página" % [n, mayor], todo.contains("Permission is hereby granted") \
+		and todo.contains("SIL OPEN FONT LICENSE") and todo.contains("FreeType") and n > 1 and mayor <= 3500 and baja and pasa)
+	J._notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	await espera(3)
+	check("Atrás cierra las licencias", not J.lector.visible and J.menu_box.visible)
+	await elige("VOLVER")
+	# OPCIONES: la música de 25 en 25 % (y vuelta a 0 y a 100), el texto y SONIDO; se guardan al momento
+	await hasta(func(): return J.menu_box.visible and etiquetas().has("OPCIONES"), 60)
+	await elige("OPCIONES")
+	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OPCIONES", 60)
+	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "VOLVER"] and J.m_items[0].right == "100 %")
+	await elige("MÚSICA")
+	await hasta(func(): return J.menu_box.visible, 60)
+	var so0 = J.sonido
+	var m0: bool = J.aj.musica == 0 and J.m_items[0].right == "0 %"
+	await pulsa("A")
+	await espera(3)
+	var m1: bool = J.aj.musica == 1 and is_equal_approx(so0.vm, .25)
+	for k in 3:
+		await pulsa("A")
+		await espera(3)
+	aj = JSON.parse_string(FileAccess.get_file_as_string(UI.AJUSTES))
+	check("MÚSICA: 100 → 0 → 25 … → 100 %, y se guarda", m0 and m1 and J.aj.musica == 4 and J.m_items[0].right == "100 %" and aj.get("musica") == 4.0)
+	await elige("TEXTO")
+	await hasta(func(): return J.menu_box.visible, 60)
+	var rapido: bool = J.m_items[2].right == "RÁPIDO" and J.aj.texto == 1
+	await pulsa("A")
+	await espera(3)
+	var momento: bool = J.m_items[2].right == "AL MOMENTO"
+	await pulsa("A")
+	await espera(3)
+	check("TEXTO: normal → rápido → al momento → normal", rapido and momento and J.aj.texto == 0)
+	await elige("VOLVER")
+	await hasta(func(): return J.menu_box.visible and etiquetas().has("NUEVA PARTIDA"), 60)
+	await elige("NUEVA PARTIDA")
+	check("NUEVA PARTIDA empieza una", J.mode == "intro" or await hasta(func(): return J.mode == "intro", 120))
 	# el sonido se pone en marcha con la primera tecla (como el AudioContext del navegador): los efectos y las canciones
 	# sintetizados, no en silencio, y la música de la intro
 	var so = J.sonido
@@ -450,7 +528,7 @@ func menu_start() -> void:
 	await pulsa("START")
 	await foto("3b-start")
 	var l := etiquetas()
-	check("START abre el menú (%s)" % ", ".join(l), l == ["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "GUARDAR", "SONIDO", "SALIR"] and J.m_items[6].right == "SÍ")
+	check("START abre el menú (%s)" % ", ".join(l), l == ["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "GUARDAR", "OPCIONES", "SALIR"])
 	await elige("GENOTECA")
 	check("Genoteca: %d filas, todas sin descubrir" % J.m_items.size(), J.m_items.size() == J.D.DEX.size() and J.m_items.all(func(x): return x.label.ends_with("??????")))
 	await pulsa("B")
@@ -464,14 +542,21 @@ func menu_start() -> void:
 	await elige("OBJETIVO")
 	await pasa(func(): return J.menu_box.visible and not J.dlg.visible)
 	check("Objetivo: el capítulo y la carta", textos.size() == 2 and textos[0].begins_with("CAPÍTULO 1") and textos[0].contains("carta"))
-	# SONIDO apaga la música y los efectos (y lo dice el mando de arriba); otra vez, los enciende
+	# OPCIONES · SONIDO apaga la música y los efectos (y lo dice el mando de arriba); otra vez, los enciende
 	await pasa(func(): return J.menu_box.visible)
-	var ini: bool = J.m_items.size() == 8 and J.m_items.all(func(x): return x.get("ic") != null) and J.m_items[6].right == "SÍ"
+	var ini: bool = J.m_items.size() == 8 and J.m_items.all(func(x): return x.get("ic") != null)
+	await elige("OPCIONES")
+	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OPCIONES", 60)
+	var sin_borrar: bool = not etiquetas().has("BORRAR PARTIDA")
 	await elige("SONIDO")
 	var so = J.sonido
-	var calla: bool = not so.on and so.musica.volume_db == -80.0 and J.botones.SONIDO.text == "SILENCIO" and J.m_items[6].right == "NO"
+	await hasta(func(): return J.menu_box.visible, 60)
+	var calla: bool = not so.on and so.musica.volume_db == -80.0 and J.botones.SONIDO.text == "SILENCIO" and J.m_items[3].right == "NO"
 	await elige("SONIDO")
-	check("SONIDO en el menú (con su icono, como todas las filas): apaga y enciende", ini and calla and so.on and so.musica.volume_db == 0.0 and J.botones.SONIDO.text == "SONIDO")
+	await hasta(func(): return J.menu_box.visible, 60)
+	check("OPCIONES en el menú START (con su icono, como todas las filas; sin BORRAR PARTIDA): SONIDO apaga y enciende", ini and sin_borrar and calla and so.on and so.musica.volume_db == 0.0 and J.botones.SONIDO.text == "SONIDO")
+	await elige("VOLVER")
+	await hasta(func(): return J.menu_box.visible and etiquetas().has("GUARDAR"), 60)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Juego.GUARDADO))
 	textos.clear()
 	await elige("GUARDAR")
@@ -491,6 +576,24 @@ func menu_start() -> void:
 	await toque(0, "SONIDO", true)
 	await toque(0, "SONIDO", false)
 	check("el mando SONIDO apaga y enciende", off and so.on and J.botones.SONIDO.text == "SONIDO")
+	# START se toca en 48 × 48 dp aunque se vea más bajo (el mínimo de Android): un dedo justo encima de su borde lo aprieta
+	var r: Rect2 = J.botones.START.get_global_rect()
+	var dp: float = J._dp()
+	var g: float = (48 * dp - r.size.y) / 2   # lo que crece por arriba
+	var fuera := Vector2(r.get_center().x, r.position.y - minf(2 * dp, g / 2))
+	check("START se toca en 48 dp de alto (%.0f px de %.0f; un dedo en y %.0f, encima del borde %.0f)" % [r.size.y, 48 * dp, fuera.y, r.position.y], g < 1 or (J.mando_en(fuera) == "START" and fuera.y < r.position.y))
+	# Atrás andando por el mapa es la pausa (el menú START), no sale del juego; Atrás otra vez la cierra
+	J._notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	await hasta(func(): return J.menu_box.visible, 30)
+	var pausa: bool = J.menu_box.visible and etiquetas().has("GUARDAR")
+	J._notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	check("Atrás andando abre la pausa (el menú START) y Atrás otra vez la cierra", pausa and await libre() and not J.menu_box.visible)
+	# volver a la app andando por el mapa: en pausa
+	J._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+	await hasta(func(): return J.menu_box.visible, 30)
+	var pausa2: bool = J.menu_box.visible and etiquetas().has("GUARDAR")
+	await pulsa("B")
+	check("al volver a la app, en pausa (el menú START)", pausa2 and await libre())
 
 # ---------- un paseo: el felpudo, la calle y el portal ----------
 func paseo() -> void:
@@ -663,7 +766,8 @@ func ciclo() -> void:
 		var dia: int = S.day
 		await libre()
 		noches += 1
-		check("noche %d: a la cama andando y a dormir hasta las 7 del día %d" % [noches, S.day], ok_cama and duerme and S.min == 7 * 60 and S.day == dia + 1)
+		check("noche %d: a la cama andando y a dormir hasta las 7 del día %d" % [noches, S.day], ok_cama and duerme and S.min >= 7 * 60 and S.min <= 7 * 60 + 2 and S.day == dia + 1,
+			"cama %s · dormir %s · %d:%02d · día %d → %d · %s" % [ok_cama, duerme, S.min / 60, S.min % 60, dia, S.day, " | ".join(textos)])
 		# al despertar, el aviso de las que han cogido plaga esta noche y el de las que se han secado, con su nombre
 		var nuevas := []
 		var nuevas_secas := []
@@ -865,7 +969,7 @@ func continuar() -> void:
 	await espera(10)
 	await pulsa("A")
 	await hasta(func(): return J.menu_box.visible, 120)
-	check("con partida guardada, el título pregunta (%s)" % ", ".join(etiquetas()), etiquetas() == ["CONTINUAR", "NUEVA PARTIDA"])
+	check("con partida guardada, el título pregunta, sin el aviso de edad otra vez (%s)" % ", ".join(etiquetas()), etiquetas() == ["CONTINUAR", "NUEVA PARTIDA", "OPCIONES", "CRÉDITOS"] and not J.dlg.visible)
 	await pulsa("A")
 	await libre()
 	var T: Dictionary = J.S

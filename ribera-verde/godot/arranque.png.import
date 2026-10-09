@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://kjj4tkxbumse"
-path="res://.godot/imported/icono.svg-17ec74f3ae303d31f1de03433f47fea9.ctex"
+uid="uid://bvmf035mci83l"
+path="res://.godot/imported/arranque.png-92acbaf99a4b360925b4631c638603ce.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://icono.svg"
-dest_files=["res://.godot/imported/icono.svg-17ec74f3ae303d31f1de03433f47fea9.ctex"]
+source_file="res://arranque.png"
+dest_files=["res://.godot/imported/arranque.png-92acbaf99a4b360925b4631c638603ce.ctex"]
 
 [params]
 
@@ -32,6 +32,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

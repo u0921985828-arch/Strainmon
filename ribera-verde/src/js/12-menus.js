@@ -7,13 +7,25 @@ async function startMenu(){
     const sms=S.sms.length,vivas=S.pots.filter(p=>p&&!p.dead).length;
     i=await menu([{label:'GENOTECA',right:`${DEX.filter(k=>S.disc[k]).length}/${DEX.length}`,ic:icono('cogollo')},{label:'MOCHILA',right:kgTxt(Math.floor(pesoEncima())),ic:icono('bolsa')},
       {label:'MÓVIL',right:sms?sms+' SMS':null,ic:icono('movil')},{label:'PLANTAS',right:String(vivas),ic:icono('maceta')},{label:'OBJETIVO',right:'cap. '+S.ch,ic:icono('trofeo')},
-      {label:'GUARDAR',ic:icono('guardar')},{label:'SONIDO',right:soundOn?'SÍ':'NO',ic:icono('altavoz')},{label:'SALIR',ic:icono('salir')}],
+      {label:'GUARDAR',ic:icono('guardar')},{label:'OPCIONES',ic:icono('altavoz')},{label:'SALIR',ic:icono('salir')}],
       {cls:'start',initial:i,startCloses:true,title:`DÍA ${S.day} · ${relojTxt()}`,title2:eur(S.money)});
     if(i<0||i===7)return;
     if(i===0)await genoteca();else if(i===1)await mochila();else if(i===2)await movilMenu();else if(i===3)await plantas();
     else if(i===4){await say(`CAPÍTULO ${S.ch}: ${CH_TITLES[S.ch]||''}\n${objectiveText()}`);await say(`Deuda: ${eur(S.debt)} · Ventas: ${eur(S.sales)}\nReputación ${S.rep} · Calor ${Math.round(S.heat)}%`);}
     else if(i===5)await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');
-    else if(i===6)setSound(!soundOn);
+    else if(i===6)await opciones();
+  }
+}
+// OPCIONES: A cambia cada fila (la música y los efectos de 25 en 25 %, el texto y SONIDO); se guardan al momento
+const TEXTO_VEL=['NORMAL','RÁPIDO','AL MOMENTO'];
+async function opciones(){
+  let i=0;
+  for(;;){
+    i=await menu([{label:'MÚSICA',right:AJ.musica*25+' %'},{label:'EFECTOS',right:AJ.efectos*25+' %'},{label:'TEXTO',right:TEXTO_VEL[AJ.texto]},{label:'SONIDO',right:soundOn?'SÍ':'NO'},{label:'VOLVER'}],
+      {cls:'start',initial:i,title:'OPCIONES'});
+    if(i<0||i===4)return;
+    if(i===0)AJ.musica=(AJ.musica+1)%5;else if(i===1)AJ.efectos=(AJ.efectos+1)%5;else if(i===2)AJ.texto=(AJ.texto+1)%3;else setSound(!soundOn);
+    guardaAjustes();if(i===1)sfx('coin');
   }
 }
 async function genoteca(){

@@ -5,9 +5,9 @@ const dlg=$('dlg'),dlgText=$('dlgText'),dlgName=$('dlgName'),dlgMore=$('dlgMore'
 function nm(t){return S?t.replace(/\{N\}/g,S.name):t;}
 function typeText(text,name){return new Promise(res=>{
   dlg.hidden=false;dlgName.hidden=!name;dlgName.textContent=name||'';dlgMore.hidden=true;
-  const full=nm(text);let i=0,done=false;dlgText.textContent='';
+  const full=nm(text),paso=[1,3,1e5][AJ.texto];let i=0,n=0,done=false;dlgText.textContent='';   // OPCIONES · TEXTO: normal, rápido o al momento
   const fin=()=>{clearInterval(iv);dlgText.textContent=full;done=true;pop();res();};
-  const iv=setInterval(()=>{i+=1;dlgText.textContent=full.slice(0,i);if(i%3===0)sfx('blip');if(i>=full.length)fin();},20);
+  const iv=setInterval(()=>{i=Math.min(i+paso,full.length);dlgText.textContent=full.slice(0,i);if(++n%3===0)sfx('blip');if(i>=full.length)fin();},20);
   push(b=>{if((b==='A'||b==='B')&&!done)fin();});
 });}
 async function say(text,name,keep){

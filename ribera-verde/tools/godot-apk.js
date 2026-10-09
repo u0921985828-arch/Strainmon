@@ -5,6 +5,8 @@
        (~/.local/share/godot/export_templates/4.3.stable) exporta la plantilla release sin firmar (godot/export_presets.cfg:
        arm64-v8a, com.riberaverde.godot). La comprobación del SDK solo mira que existan adb y apksigner: se le da una carpeta
        con dos scripts vacíos (tools/salida/godot-sdk), porque la firma la hace el paso 2.
+    1b. Godot reescala los iconos a cada densidad con un filtro suave (pixel art borroso en xxhdpi, ×4,5): se vuelven a escribir
+       en el APK por vecino más próximo desde art/icono, al tamaño que dejó Godot.
     2. uber-apk-signer (el de tools/build-apk.js, en tools/salida/apk-cache con su huella): zipalign + firma v1/v2/v3 con su
        clave de depuración fija y verificación.
   Sale: dist/ribera-verde-godot.apk.   Uso: node tools/godot.js && node tools/godot-apk.js
@@ -26,37 +28,22 @@ const TPL = path.join(process.env.HOME, '.local/share/godot/export_templates/4.3
 if (!fs.existsSync(TPL)) throw new Error('faltan las plantillas de exportación de Godot 4.3: ' + TPL);
 if (!fs.existsSync(path.join(GD, 'datos', 'datos.json'))) throw new Error('falta godot/datos: node tools/godot.js');
 
-// 0 · iconos del lanzador, de godot/icono.svg (rectángulos de 16 × 16): el normal a 192 px y, para el adaptativo (Android 8+),
-//     la planta sola centrada en 432 px, dentro del círculo que no recorta ninguna máscara (264 px), sobre fondo #121519
+// 0 · iconos del lanzador, de art/icono (tools/sprites/a-mano/icono.py), por vecino más próximo: el normal (48 px de arte) a ×4
+//     = 192 y, para el adaptativo (Android 8+), sus dos capas (72 px de arte = 108 dp) a ×6 = 432
 const ICO = path.join(GD, 'icono');
 {
-  const rects = [...fs.readFileSync(path.join(GD, 'icono.svg'), 'utf8').matchAll(/<rect([^>]*)\/>/g)].map(m => {
-    const at = k => { const v = m[1].match(new RegExp('\\b' + k + '="([^"]*)"')); return v ? v[1] : null; };
-    return { x: +(at('x') || 0), y: +(at('y') || 0), w: +at('width'), h: +at('height'), rx: +(at('rx') || 0), c: at('fill') };
-  });
-  const png = (f, n, pinta) => {
-    const im = new PNG({ width: n, height: n });
-    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
-      const c = pinta(x, y), o = (y * n + x) * 4;
-      if (c) { for (let k = 0; k < 3; k++) im.data[o + k] = parseInt(c.slice(1 + 2 * k, 3 + 2 * k), 16); im.data[o + 3] = 255; }
-    }
-    fs.writeFileSync(path.join(ICO, f), PNG.sync.write(im));
-  };
-  const dentro = (r, u, v) => {
-    if (u < r.x || v < r.y || u >= r.x + r.w || v >= r.y + r.h) return false;
-    if (!r.rx) return true;
-    const cx = Math.min(Math.max(u, r.x + r.rx), r.x + r.w - r.rx), cy = Math.min(Math.max(v, r.y + r.rx), r.y + r.h - r.rx);
-    return (u - cx) ** 2 + (v - cy) ** 2 <= r.rx ** 2;
-  };
-  const color = (l, u, v) => { let c = null; for (const r of l) if (dentro(r, u, v)) c = r.c; return c; };
-  const planta = rects.filter(r => !r.rx);
-  const x0 = Math.min(...planta.map(r => r.x)), x1 = Math.max(...planta.map(r => r.x + r.w));
-  const y0 = Math.min(...planta.map(r => r.y)), y1 = Math.max(...planta.map(r => r.y + r.h));
-  const k = 15, ox = (432 - (x1 - x0) * k) / 2, oy = (432 - (y1 - y0) * k) / 2;
   fs.mkdirSync(ICO, { recursive: true });
-  png('icono-192.png', 192, (x, y) => color(rects, (x + .5) / 12, (y + .5) / 12));
-  png('icono-delante-432.png', 432, (x, y) => x < ox || y < oy ? null : color(planta, x0 + Math.floor((x - ox) / k), y0 + Math.floor((y - oy) / k)));
-  png('icono-fondo-432.png', 432, () => rects.find(r => r.rx).c);
+  fs.writeFileSync(path.join(ICO, 'icono-192.png'), PNG.sync.write(vecino('icono-48.png', 192)));
+  fs.writeFileSync(path.join(ICO, 'icono-delante-432.png'), PNG.sync.write(vecino('icono-delante-72.png', 432)));
+  fs.writeFileSync(path.join(ICO, 'icono-fondo-432.png'), PNG.sync.write(vecino('icono-fondo-72.png', 432)));
+}
+// un PNG de art/icono a lado × lado, por vecino más próximo (a ×1,5 o ×4,5 los píxeles salen desiguales, pero nítidos)
+function vecino(f, lado) {
+  const t = PNG.sync.read(fs.readFileSync(path.join(ROOT, 'art', 'icono', f))), o = new PNG({ width: lado, height: lado });
+  for (let y = 0; y < lado; y++) for (let x = 0; x < lado; x++) {
+    const i = (Math.floor(y * t.height / lado) * t.width + Math.floor(x * t.width / lado)) * 4; t.data.copy(o.data, (y * lado + x) * 4, i, i + 4);
+  }
+  return o;
 }
 
 // 1 · SDK de mentira y exportación sin firmar
@@ -72,6 +59,19 @@ let log = '';
 try { log = run(GODOT, ['--headless', '--path', GD, '--export-release', 'Android', sinFirmar], { env }); }
 catch (e) { log = (e.stdout || '') + (e.stderr || ''); }
 if (!fs.existsSync(sinFirmar)) { console.error(log); throw new Error('Godot no ha exportado el APK'); }
+
+// 1b · los iconos de cada densidad, nítidos (zip -0 los cambia en su sitio; la firma del paso 2 rehace el APK)
+{
+  const DE = { 'icon.png': 'icono-48.png', 'icon_foreground.png': 'icono-delante-72.png', 'icon_background.png': 'icono-fondo-72.png' };
+  const ents = run('unzip', ['-Z1', sinFirmar]).split('\n').filter(e => /^res\/mipmap[^/]*\/icon(_foreground|_background)?\.png$/.test(e));
+  if (ents.length < 15) throw new Error('el APK de Godot no trae los iconos esperados: ' + ents.join(', '));
+  for (const e of ents) {
+    const lado = PNG.sync.read(execFileSync('unzip', ['-p', sinFirmar, e], { maxBuffer: 1 << 26 })).width;
+    fs.mkdirSync(path.join(TMP, path.dirname(e)), { recursive: true });
+    fs.writeFileSync(path.join(TMP, e), PNG.sync.write(vecino(DE[path.basename(e)], lado)));
+  }
+  execFileSync('zip', ['-q', '-0', sinFirmar, ...ents], { cwd: TMP });
+}
 
 // 2 · zipalign + firma + verificación
 if (!fs.existsSync(SIGNER.f)) { fs.mkdirSync(path.dirname(SIGNER.f), { recursive: true });run('curl', ['-sSLf', '--max-time', '300', '-o', SIGNER.f, SIGNER.url]); }

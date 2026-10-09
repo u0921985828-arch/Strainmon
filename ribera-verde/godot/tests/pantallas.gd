@@ -38,6 +38,8 @@ func _corre() -> void:
 		quit(2)
 		return
 	Juego.GUARDADO = "user://prueba-pantallas.json"
+	Juego.AJUSTES = "user://prueba-pantallas-ajustes.json"   # los ajustes de serie, no los del que juega
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(Juego.AJUSTES))
 	J = Juego.new()
 	root.add_child(J)
 	await process_frame

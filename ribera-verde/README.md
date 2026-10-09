@@ -9,7 +9,8 @@ RPG de cultivo en pixel art, con 160 px de alto (y de 240 a 400 de ancho, según
 - Abre **`index.html`** con doble clic (Chrome, Edge o Firefox). Funciona sin conexión porque las fuentes van dentro del archivo.
 - La partida se guarda en el navegador al dormir, al cambiar de capítulo y desde START → GUARDAR o desde el ordenador del piso. No se comparte entre navegadores ni entre equipos.
 - Está pensado para el **móvil en horizontal**: la pantalla del juego ocupa todo el móvil (solo queda un reborde fino) y los mandos flotan encima, fijos: cruceta abajo a la izquierda, A y B abajo a la derecha, SONIDO y START arriba a la derecha. En móviles anchos el mundo se ve más ancho (hasta 400 px de juego) y los diálogos quedan en el centro, entre los mandos. En vertical aparece «Gira el móvil». Al primer toque pide pantalla completa y bloquea el giro en horizontal (el APK va siempre en horizontal).
-- **Android:** instala `dist/ribera-verde.apk` (activa «Instalar apps desconocidas» para el navegador o el gestor de archivos). Es el mismo juego en pantalla completa, sin conexión y sin permisos; el botón Atrás hace de B. La partida se guarda dentro de la app.
+- **Android (la app):** instala `dist/ribera-verde-godot.apk` (`npm run godot:apk`; «Ribera Verde», el juego hecho en Godot, sin conexión, sin permisos y sin anuncios). Pide confirmar la edad la primera vez; tiene OPCIONES (música, efectos, texto), CRÉDITOS con las licencias y la privacidad, y Atrás pone el juego en pausa. Lo que cumple de las normas de un juego para móvil, en `docs/NORMAS-MOVIL.md`; la ficha de Google Play, en `docs/PLAY.md`.
+- **Android (versión web):** instala `dist/ribera-verde.apk` (activa «Instalar apps desconocidas» para el navegador o el gestor de archivos). Es el mismo juego en pantalla completa, sin conexión y sin permisos; el botón Atrás hace de B. La partida se guarda dentro de la app.
 
 | Acción | Botón |
 |---|---|

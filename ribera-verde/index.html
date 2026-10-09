@@ -1156,15 +1156,16 @@ function aPie(m,[x0,y0]){
 /* =========================================================
    AUDIO — chiptune propio
    ========================================================= */
-let AC=null,master=null,soundOn=true,tune=null,seqT=0,seqStep=0,seqIv=null,noiseBuf=null;
+let AC=null,master=null,musG=null,sfxG=null,soundOn=true,tune=null,seqT=0,seqStep=0,seqIv=null,noiseBuf=null;
 function audioInit(){
   if(AC)return;try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=soundOn?.16:0;master.connect(AC.destination);
+  musG=AC.createGain();sfxG=AC.createGain();musG.connect(master);sfxG.connect(master);ajustesSonido();
   noiseBuf=AC.createBuffer(1,AC.sampleRate*.3,AC.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}catch(e){AC=null;}
   if(AC&&!seqIv)seqIv=setInterval(schedule,60);
 }
-function tone(f,t,dur,type='square',vol=.25,f2){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);
-  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(master);o.start(t);o.stop(t+dur+.02);}
-function noise(t,dur,vol=.3){if(!AC)return;const s=AC.createBufferSource(),g=AC.createGain();s.buffer=noiseBuf;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(g);g.connect(master);s.start(t);s.stop(t+dur);}
+function tone(f,t,dur,type='square',vol=.25,f2,out=sfxG){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(out);o.start(t);o.stop(t+dur+.02);}
+function noise(t,dur,vol=.3){if(!AC)return;const s=AC.createBufferSource(),g=AC.createGain();s.buffer=noiseBuf;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(g);g.connect(sfxG);s.start(t);s.stop(t+dur);}
 const mf=n=>440*Math.pow(2,(n-69)/12);
 function sfx(k){if(!AC||!soundOn)return;const t=AC.currentTime+.005;
   switch(k){
@@ -1195,8 +1196,13 @@ const TUNES={
 };
 function music(name){if(tune===TUNES[name])return;tune=TUNES[name]||null;seqStep=0;if(AC)seqT=AC.currentTime+.05;}
 function schedule(){if(!AC||!tune)return;if(seqT<AC.currentTime)seqT=AC.currentTime+.02;const st=60/tune.bpm/2;
-  while(seqT<AC.currentTime+.25){const i=seqStep%tune.mel.length;if(soundOn){const n=tune.mel[i],b=tune.bas[i];if(n)tone(mf(n),seqT,st*.9,'square',.07);if(b)tone(mf(b),seqT,st*.95,'triangle',.16);}
+  while(seqT<AC.currentTime+.25){const i=seqStep%tune.mel.length;if(soundOn){const n=tune.mel[i],b=tune.bas[i];if(n)tone(mf(n),seqT,st*.9,'square',.07,0,musG);if(b)tone(mf(b),seqT,st*.95,'triangle',.16,0,musG);}
     seqT+=st;seqStep++;}}
+// OPCIONES (12-menus): el volumen de la música y de los efectos (de 0 a 4, de 25 en 25 %) y la velocidad del texto, en rv_ajustes
+const AJ={musica:4,efectos:4,texto:0};
+try{const j=JSON.parse(localStorage.getItem('rv_ajustes')||'{}');for(const k in AJ)if(typeof j[k]==='number')AJ[k]=clamp(Math.round(j[k]),0,k==='texto'?2:4);}catch(e){}
+function ajustesSonido(){if(musG){musG.gain.value=AJ.musica/4;sfxG.gain.value=AJ.efectos/4;}}
+function guardaAjustes(){ajustesSonido();try{localStorage.setItem('rv_ajustes',JSON.stringify(AJ));}catch(e){}}
 function setSound(on){soundOn=on;if(master)master.gain.value=on?.16:0;$('bSound').classList.toggle('on',!on);$('bSound').textContent=on?'SONIDO':'SILENCIO';try{localStorage.setItem('rv_sound',on?'1':'0');}catch(e){}}
 
 /* =========================================================
@@ -1341,9 +1347,9 @@ const dlg=$('dlg'),dlgText=$('dlgText'),dlgName=$('dlgName'),dlgMore=$('dlgMore'
 function nm(t){return S?t.replace(/\{N\}/g,S.name):t;}
 function typeText(text,name){return new Promise(res=>{
   dlg.hidden=false;dlgName.hidden=!name;dlgName.textContent=name||'';dlgMore.hidden=true;
-  const full=nm(text);let i=0,done=false;dlgText.textContent='';
+  const full=nm(text),paso=[1,3,1e5][AJ.texto];let i=0,n=0,done=false;dlgText.textContent='';   // OPCIONES · TEXTO: normal, rápido o al momento
   const fin=()=>{clearInterval(iv);dlgText.textContent=full;done=true;pop();res();};
-  const iv=setInterval(()=>{i+=1;dlgText.textContent=full.slice(0,i);if(i%3===0)sfx('blip');if(i>=full.length)fin();},20);
+  const iv=setInterval(()=>{i=Math.min(i+paso,full.length);dlgText.textContent=full.slice(0,i);if(++n%3===0)sfx('blip');if(i>=full.length)fin();},20);
   push(b=>{if((b==='A'||b==='B')&&!done)fin();});
 });}
 async function say(text,name,keep){
@@ -3427,13 +3433,25 @@ async function startMenu(){
     const sms=S.sms.length,vivas=S.pots.filter(p=>p&&!p.dead).length;
     i=await menu([{label:'GENOTECA',right:`${DEX.filter(k=>S.disc[k]).length}/${DEX.length}`,ic:icono('cogollo')},{label:'MOCHILA',right:kgTxt(Math.floor(pesoEncima())),ic:icono('bolsa')},
       {label:'MÓVIL',right:sms?sms+' SMS':null,ic:icono('movil')},{label:'PLANTAS',right:String(vivas),ic:icono('maceta')},{label:'OBJETIVO',right:'cap. '+S.ch,ic:icono('trofeo')},
-      {label:'GUARDAR',ic:icono('guardar')},{label:'SONIDO',right:soundOn?'SÍ':'NO',ic:icono('altavoz')},{label:'SALIR',ic:icono('salir')}],
+      {label:'GUARDAR',ic:icono('guardar')},{label:'OPCIONES',ic:icono('altavoz')},{label:'SALIR',ic:icono('salir')}],
       {cls:'start',initial:i,startCloses:true,title:`DÍA ${S.day} · ${relojTxt()}`,title2:eur(S.money)});
     if(i<0||i===7)return;
     if(i===0)await genoteca();else if(i===1)await mochila();else if(i===2)await movilMenu();else if(i===3)await plantas();
     else if(i===4){await say(`CAPÍTULO ${S.ch}: ${CH_TITLES[S.ch]||''}\n${objectiveText()}`);await say(`Deuda: ${eur(S.debt)} · Ventas: ${eur(S.sales)}\nReputación ${S.rep} · Calor ${Math.round(S.heat)}%`);}
     else if(i===5)await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');
-    else if(i===6)setSound(!soundOn);
+    else if(i===6)await opciones();
+  }
+}
+// OPCIONES: A cambia cada fila (la música y los efectos de 25 en 25 %, el texto y SONIDO); se guardan al momento
+const TEXTO_VEL=['NORMAL','RÁPIDO','AL MOMENTO'];
+async function opciones(){
+  let i=0;
+  for(;;){
+    i=await menu([{label:'MÚSICA',right:AJ.musica*25+' %'},{label:'EFECTOS',right:AJ.efectos*25+' %'},{label:'TEXTO',right:TEXTO_VEL[AJ.texto]},{label:'SONIDO',right:soundOn?'SÍ':'NO'},{label:'VOLVER'}],
+      {cls:'start',initial:i,title:'OPCIONES'});
+    if(i<0||i===4)return;
+    if(i===0)AJ.musica=(AJ.musica+1)%5;else if(i===1)AJ.efectos=(AJ.efectos+1)%5;else if(i===2)AJ.texto=(AJ.texto+1)%3;else setSound(!soundOn);
+    guardaAjustes();if(i===1)sfx('coin');
   }
 }
 async function genoteca(){

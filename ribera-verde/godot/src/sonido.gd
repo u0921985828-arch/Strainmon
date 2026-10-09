@@ -10,6 +10,8 @@ const HZ := 22050
 const MASTER := .16
 
 var on := true
+var vm := 1.0   # volumen de la música y de los efectos (OPCIONES, de 0 a 1)
+var ve := 1.0
 var listo := false
 var efectos := {}
 var temas := {}
@@ -187,12 +189,17 @@ func music(n: String) -> void:
 		musica.play()
 
 func _vol() -> void:
-	var db := 0.0 if on else -80.0
-	musica.volume_db = db
+	musica.volume_db = linear_to_db(vm) if on and vm > 0 else -80.0
 	for v in voces:
-		v.volume_db = db
+		v.volume_db = linear_to_db(ve) if on and ve > 0 else -80.0
 
 func set_on(v: bool) -> void:
 	on = v
+	if listo:
+		_vol()
+
+func niveles(m: float, e: float) -> void:
+	vm = m
+	ve = e
 	if listo:
 		_vol()

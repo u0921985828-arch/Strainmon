@@ -36,19 +36,22 @@ func _notification(w: int) -> void:
 	if oraculo:
 		return
 	if w == NOTIFICATION_WM_GO_BACK_REQUEST:
-		# Atrás: B con un diálogo o un menú abierto; si no, guarda y sale
+		# Atrás: B con un diálogo, un menú o la carpa abiertos; andando por el mapa, la pausa (el menú START, con el reloj
+		# parado); en el título, sale
 		if handlers.size():
 			press("B")
-		elif mode == "carpa" or mode == "world":
-			if is_free() or mode == "carpa":
-				save()
-			get_tree().quit()
-		else:
+		elif mode == "world":
+			press("START")
+		elif mode == "title" and lock == 0:
 			get_tree().quit()
 	elif w == NOTIFICATION_APPLICATION_PAUSED or w == NOTIFICATION_WM_CLOSE_REQUEST:
 		suelta_todo()
 		if S and (mode == "world" or mode == "carpa" or mode == "battle"):
 			save()
+	elif w == NOTIFICATION_APPLICATION_RESUMED:
+		# al volver a la app, andando por el mapa, en pausa: el menú START
+		if mode == "world" and is_free() and not P.moving:
+			press("START")
 	elif w == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		suelta_todo()
 
@@ -135,6 +138,18 @@ func show_title() -> void:
 		titulo.show()
 	update_hud()
 	music("title")
+	if not oraculo and not aj.aviso:
+		run(aviso_edad)
+
+# el aviso de contenido, una vez (se guarda en los ajustes): mayores de 18 o salir
+func aviso_edad() -> void:
+	await say("Ribera Verde es un juego de ficción para mayores de 18 años.", "AVISO")
+	var c: int = await ask("Trata del cultivo y la venta de cannabis, delito en muchos países. No anima a consumir ni a vender.", ["TENGO 18 O MÁS", "SALIR"], "AVISO")
+	if c != 0:
+		get_tree().quit()
+		return
+	aj.aviso = true
+	ajustes_guarda()
 
 func title_press(b):
 	if (b != "A" and b != "START") or lock:
@@ -145,25 +160,124 @@ func title_press(b):
 
 func _title_press() -> void:
 	sfx("sel")
-	var sv = load_save()
-	var c := 1
-	if sv:
-		c = await menu(["CONTINUAR", "NUEVA PARTIDA"], {"cls": "start"})
-		if c < 0:
+	var i := 0
+	var ult := ""
+	while true:
+		var sv = load_save()
+		var ops := (["CONTINUAR"] if sv else []) + ["NUEVA PARTIDA", "OPCIONES", "CRÉDITOS"]
+		i = await menu(ops, {"cls": "start", "initial": maxi(0, ops.find(ult))})
+		if i < 0:
 			return
-	if c == 0:
-		S = sv
-		migrate()
-		await fade(1)
-		if not oraculo:
-			titulo.hide()
-		enter_game()
-		await fade(0)
-		show_objective()
-		return
-	if sv and await ask("Hay una partida guardada. ¿Empezar de cero y sobrescribirla?", ["Sí", "No"]) != 0:
-		return
-	await new_game()
+		ult = ops[i]
+		if ops[i] == "OPCIONES":
+			await opciones(true)
+		elif ops[i] == "CRÉDITOS":
+			await creditos()
+		elif ops[i] == "CONTINUAR":
+			S = sv
+			migrate()
+			await fade(1)
+			if not oraculo:
+				titulo.hide()
+			enter_game()
+			await fade(0)
+			show_objective()
+			return
+		elif not sv or await ask("Hay una partida guardada. ¿Empezar de cero y sobrescribirla?", ["Sí", "No"]) == 0:
+			await new_game()
+			return
+
+# OPCIONES (en el título y en el menú START): A cambia cada fila; se guardan al momento
+func opciones(desde_titulo := false) -> void:
+	var i := 0
+	while true:
+		var it := [{"label": "MÚSICA", "right": "%d %%" % (aj.musica * 25)}, {"label": "EFECTOS", "right": "%d %%" % (aj.efectos * 25)},
+			{"label": "TEXTO", "right": TEXTO_VEL[aj.texto]}, {"label": "SONIDO", "right": "SÍ" if aj.sonido else "NO"}]
+		if desde_titulo and FileAccess.file_exists(GUARDADO):
+			it.append({"label": "BORRAR PARTIDA"})
+		it.append({"label": "VOLVER"})
+		i = await menu(it, {"cls": "start", "initial": i, "title": "OPCIONES"})
+		if i < 0 or it[i].label == "VOLVER":
+			return
+		match it[i].label:
+			"MÚSICA":
+				aj.musica = (aj.musica + 1) % 5
+			"EFECTOS":
+				aj.efectos = (aj.efectos + 1) % 5
+			"TEXTO":
+				aj.texto = (aj.texto + 1) % 3
+			"SONIDO":
+				aj.sonido = not aj.sonido
+			"BORRAR PARTIDA":
+				if await ask("¿Borrar la partida guardada? No se puede deshacer.", ["Sí, borrarla", "No"]) == 0:
+					DirAccess.remove_absolute(ProjectSettings.globalize_path(GUARDADO))
+					await say("Partida borrada.")
+					i = 0
+		ajustes_aplica()
+		ajustes_guarda()
+		if it[i].label == "EFECTOS":
+			sfx("coin")   # para oír el volumen nuevo
+
+var VERSION: String = ProjectSettings.get_setting("application/config/version", "")
+const CREDITOS := """RIBERA VERDE · genética de barrio
+Versión %s para Android
+
+Un juego de Eddie.
+Hecho con Godot Engine y con la ayuda de Claude Code (Anthropic).
+
+ARTE
+Personajes, escenarios y objetos: PixelLab (pixellab.ai), revisados y retocados a mano. Carpas por dentro, plantas, equipo, muebles, iconos y el icono de la app: dibujados a mano, píxel a píxel.
+
+MÚSICA Y SONIDO
+Chiptune original, sintetizado en el propio juego.
+
+FUENTES
+Press Start 2P · Copyright 2012 The Press Start 2P Project Authors. SIL Open Font License 1.1.
+Atkinson Hyperlegible · Copyright 2020 Braille Institute of America, Inc. SIL Open Font License 1.1.
+
+FICCIÓN
+Ribera Verde, Mendialde, Puerto Viejo, Valdehierro, Errotabarri y sus personajes son inventados: cualquier parecido con personas o lugares reales es casualidad. Las variedades llevan el nombre de genéticas conocidas y su historia es solo información.
+El cultivo y la venta de cannabis son delito en muchos países. Este juego no anima a consumir ni a vender.
+
+Gracias por jugar."""
+const PRIVACIDAD := """Ribera Verde no recoge, no envía y no comparte ningún dato.
+
+· No tiene cuentas, anuncios ni compras.
+· No usa internet ni pide permisos.
+· La partida y los ajustes se guardan solo en este móvil, en la carpeta privada de la app. Se borran al desinstalarla (o desde OPCIONES · BORRAR PARTIDA).
+· Tampoco se copian en la copia de seguridad de Google.
+
+Si tienes dudas, escribe a la dirección de contacto de la ficha de la tienda."""
+
+# CRÉDITOS (en el título): los créditos, las licencias (Godot y las fuentes, enteras, como piden) y la privacidad
+func creditos() -> void:
+	var i := 0
+	while true:
+		i = await menu(["CRÉDITOS", "LICENCIAS", "PRIVACIDAD", "VOLVER"], {"cls": "start", "initial": i, "title": "CRÉDITOS"})
+		if i < 0 or i == 3:
+			return
+		if i == 0:
+			await leer("CRÉDITOS", CREDITOS % VERSION)
+		elif i == 1:
+			await leer("LICENCIAS", licencias())
+		else:
+			await leer("PRIVACIDAD", PRIVACIDAD)
+
+func licencias() -> String:
+	var t := "Este juego usa Godot Engine, con licencia MIT:\n\n" + Engine.get_license_text()
+	for f in ["OFL-PressStart2P.txt", "OFL-AtkinsonHyperlegible.txt"]:
+		t += "\n\n— %s —\n\n%s" % [f.trim_prefix("OFL-").trim_suffix(".txt"), FileAccess.get_file_as_string("res://fuentes/" + f).strip_edges()]
+	t += "\n\nGODOT ENGINE: PARTES DE TERCEROS"
+	for c in Engine.get_copyright_info():
+		t += "\n\n" + str(c.name)
+		for p in c.parts:
+			for cp in p.copyright:
+				t += "\n© " + str(cp)
+			t += "\nLicencia: " + str(p.license)
+	var li := Engine.get_license_info()
+	for k in li:
+		t += "\n\n— %s —\n\n%s" % [k, str(li[k]).strip_edges()]
+	return t
 
 func choose_name() -> String:
 	var opts := ["EDDIE", "ÁLEX", "LUR", "ANDER", "Otro..."]

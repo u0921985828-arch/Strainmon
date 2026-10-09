@@ -1,15 +1,16 @@
 /* =========================================================
    AUDIO — chiptune propio
    ========================================================= */
-let AC=null,master=null,soundOn=true,tune=null,seqT=0,seqStep=0,seqIv=null,noiseBuf=null;
+let AC=null,master=null,musG=null,sfxG=null,soundOn=true,tune=null,seqT=0,seqStep=0,seqIv=null,noiseBuf=null;
 function audioInit(){
   if(AC)return;try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=soundOn?.16:0;master.connect(AC.destination);
+  musG=AC.createGain();sfxG=AC.createGain();musG.connect(master);sfxG.connect(master);ajustesSonido();
   noiseBuf=AC.createBuffer(1,AC.sampleRate*.3,AC.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}catch(e){AC=null;}
   if(AC&&!seqIv)seqIv=setInterval(schedule,60);
 }
-function tone(f,t,dur,type='square',vol=.25,f2){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);
-  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(master);o.start(t);o.stop(t+dur+.02);}
-function noise(t,dur,vol=.3){if(!AC)return;const s=AC.createBufferSource(),g=AC.createGain();s.buffer=noiseBuf;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(g);g.connect(master);s.start(t);s.stop(t+dur);}
+function tone(f,t,dur,type='square',vol=.25,f2,out=sfxG){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(out);o.start(t);o.stop(t+dur+.02);}
+function noise(t,dur,vol=.3){if(!AC)return;const s=AC.createBufferSource(),g=AC.createGain();s.buffer=noiseBuf;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(g);g.connect(sfxG);s.start(t);s.stop(t+dur);}
 const mf=n=>440*Math.pow(2,(n-69)/12);
 function sfx(k){if(!AC||!soundOn)return;const t=AC.currentTime+.005;
   switch(k){
@@ -40,7 +41,12 @@ const TUNES={
 };
 function music(name){if(tune===TUNES[name])return;tune=TUNES[name]||null;seqStep=0;if(AC)seqT=AC.currentTime+.05;}
 function schedule(){if(!AC||!tune)return;if(seqT<AC.currentTime)seqT=AC.currentTime+.02;const st=60/tune.bpm/2;
-  while(seqT<AC.currentTime+.25){const i=seqStep%tune.mel.length;if(soundOn){const n=tune.mel[i],b=tune.bas[i];if(n)tone(mf(n),seqT,st*.9,'square',.07);if(b)tone(mf(b),seqT,st*.95,'triangle',.16);}
+  while(seqT<AC.currentTime+.25){const i=seqStep%tune.mel.length;if(soundOn){const n=tune.mel[i],b=tune.bas[i];if(n)tone(mf(n),seqT,st*.9,'square',.07,0,musG);if(b)tone(mf(b),seqT,st*.95,'triangle',.16,0,musG);}
     seqT+=st;seqStep++;}}
+// OPCIONES (12-menus): el volumen de la música y de los efectos (de 0 a 4, de 25 en 25 %) y la velocidad del texto, en rv_ajustes
+const AJ={musica:4,efectos:4,texto:0};
+try{const j=JSON.parse(localStorage.getItem('rv_ajustes')||'{}');for(const k in AJ)if(typeof j[k]==='number')AJ[k]=clamp(Math.round(j[k]),0,k==='texto'?2:4);}catch(e){}
+function ajustesSonido(){if(musG){musG.gain.value=AJ.musica/4;sfxG.gain.value=AJ.efectos/4;}}
+function guardaAjustes(){ajustesSonido();try{localStorage.setItem('rv_ajustes',JSON.stringify(AJ));}catch(e){}}
 function setSound(on){soundOn=on;if(master)master.gain.value=on?.16:0;$('bSound').classList.toggle('on',!on);$('bSound').textContent=on?'SONIDO':'SILENCIO';try{localStorage.setItem('rv_sound',on?'1':'0');}catch(e){}}
 

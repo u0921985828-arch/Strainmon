@@ -5,11 +5,15 @@ config_version=5
 
 [application]
 
-config/name="Ribera Verde (Godot)"
-config/version="0.3.0"
+config/name="Ribera Verde"
+config/version="0.4.0"
 run/main_scene="res://juego.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
-config/icon="res://icono.svg"
+config/icon="res://arranque.png"
+boot_splash/bg_color=Color(0.0706, 0.0824, 0.098, 1)
+boot_splash/image="res://arranque.png"
+boot_splash/fullsize=false
+boot_splash/use_filter=false
 config/quit_on_go_back=false
 
 [display]

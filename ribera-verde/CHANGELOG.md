@@ -1,5 +1,18 @@
 # Cambios
 
+## App de Android 0.4.0 (Godot) · 9 de octubre de 2026
+
+La app de Godot es la de Android y pasa las normas básicas de un juego para móvil (`docs/NORMAS-MOVIL.md`); la ficha de Google Play, en `docs/PLAY.md`.
+
+- **Nuevo: icono de la app**, dibujado a mano (`tools/sprites/a-mano/icono.py`): una hoja de 7 foliolos verde fresco con el halo del foco detrás, sobre la ribera de noche (la orilla y el río). Clásico y adaptativo (Android 8+, entero dentro de cualquier máscara), nítido en cada densidad, en las dos APK; el de la ficha de Play, a 512. Antes, la app de WebView recortaba la hoja del título y la de Godot llevaba un dibujo de prueba.
+- **Nuevo: pantalla de arranque** con el icono sobre el fondo del juego (sin el logo del motor), y la app se llama «Ribera Verde».
+- **Nuevo: aviso de edad** la primera vez: juego de ficción para mayores de 18 años; «SALIR» cierra la app.
+- **Nuevo: el título** con CONTINUAR, NUEVA PARTIDA, **OPCIONES** y **CRÉDITOS** (créditos, licencias enteras de Godot y de las fuentes, y privacidad, en un texto con scroll; las licencias, unas 80.000 letras, por páginas para que abran al momento).
+- **Nuevo: OPCIONES** (en el título y en el menú START, en lugar de SONIDO): volumen de la música y de los efectos por separado (de 25 en 25 %), velocidad del texto (normal, rápido o al momento), sonido y, en el título, borrar la partida. Se guardan aparte de la partida y se recuerdan. En el HTML, las mismas OPCIONES en START (sin borrar partida).
+- **Cambiado: el botón Atrás** andando por el mapa abre la pausa (el menú START) en vez de cerrar la app; en el título sale. Al volver a la app, el juego espera en pausa.
+- **Cambiado: START, MÓVIL y SONIDO se tocan en 48 × 48 dp** como poco (el mínimo de Android), aunque se vean igual.
+- `docs/PRIVACIDAD.md` (no recoge ningún dato) y `docs/play/` (icono 512, gráfico destacado y capturas).
+
 ## 1.10.0 · 8 de octubre de 2026
 
 Sale con el arte del plan de producción (`docs/PLAN-PRODUCCION.md`, P3–P6 cerrados). Godot, 0.3.0.

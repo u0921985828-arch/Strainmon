@@ -7,7 +7,7 @@
     1. herramientas en tools/salida/apk-cache (se descargan la primera vez y se comprueba su huella):
        apktool 2.9.3 (trae aapt2 y el framework), dalvik-dx 9.0.0_r3 (Maven Central) y uber-apk-signer 1.3.0;
     2. javac de tools/apk/java contra los stubs de tools/apk/stubs (solo las firmas de la API que se usan) y dx → classes.dex;
-    3. proyecto de apktool en tools/salida/apk/proyecto: manifiesto, apktool.yml, icono (la hoja del título del atlas),
+    3. proyecto de apktool en tools/salida/apk/proyecto: manifiesto, apktool.yml, icono (art/icono: clásico y adaptativo),
        nombre y assets/index.html → apktool b;
     4. uber-apk-signer: zipalign + firma v1/v2/v3 con su clave de depuración (la misma en cada build, así que una versión
        nueva se instala encima sin perder la partida) y verificación.
@@ -50,18 +50,19 @@ function herramienta(n) {
   return f;
 }
 
-// icono: la hoja del título (atlas procesado), 48×48 escalado por vecino más próximo a cada densidad
+// icono (art/icono, de tools/sprites/a-mano/icono.py), escalado por vecino más próximo: el clásico de 48 a cada densidad
+// (×1…×4) y, para Android 8+, el adaptativo (mipmap-anydpi-v26) con sus dos capas de 72 a ×6 (432 px = 108 dp en xxxhdpi)
 function iconos(dir) {
-  const t = PNG.sync.read(fs.readFileSync(path.join(ROOT, 'art', 'procesado', 'titulo', 'base', 'unica', '00.png')));
-  const X0 = 96, Y0 = 64, N = 48;
-  for (const [d, k] of [['mdpi', 1], ['xhdpi', 2], ['xxhdpi', 3], ['xxxhdpi', 4]]) {
-    const o = new PNG({ width: N * k, height: N * k });
-    for (let y = 0; y < N * k; y++) for (let x = 0; x < N * k; x++) {
-      const i = ((Y0 + Math.floor(y / k)) * t.width + X0 + Math.floor(x / k)) * 4, j = (y * N * k + x) * 4;
-      o.data[j] = t.data[i]; o.data[j + 1] = t.data[i + 1]; o.data[j + 2] = t.data[i + 2]; o.data[j + 3] = 255;
-    }
-    const f = path.join(dir, 'res', 'mipmap-' + d, 'ic_launcher.png'); fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, PNG.sync.write(o));
-  }
+  const escala = (f, k) => {
+    const t = PNG.sync.read(fs.readFileSync(path.join(ROOT, 'art', 'icono', f))), o = new PNG({ width: t.width * k, height: t.height * k });
+    for (let y = 0; y < o.height; y++) for (let x = 0; x < o.width; x++) t.data.copy(o.data, (y * o.width + x) * 4, (Math.floor(y / k) * t.width + Math.floor(x / k)) * 4, (Math.floor(y / k) * t.width + Math.floor(x / k)) * 4 + 4);
+    return PNG.sync.write(o);
+  };
+  const pon = (d, n, buf) => { const f = path.join(dir, 'res', d, n); fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, buf); };
+  for (const [d, k] of [['mdpi', 1], ['xhdpi', 2], ['xxhdpi', 3], ['xxxhdpi', 4]]) pon('mipmap-' + d, 'ic_launcher.png', escala('icono-48.png', k));
+  pon('mipmap-xxxhdpi', 'ic_launcher_fondo.png', escala('icono-fondo-72.png', 6));
+  pon('mipmap-xxxhdpi', 'ic_launcher_delante.png', escala('icono-delante-72.png', 6));
+  pon('mipmap-anydpi-v26', 'ic_launcher.xml', '<?xml version="1.0" encoding="utf-8"?>\n<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n    <background android:drawable="@mipmap/ic_launcher_fondo" />\n    <foreground android:drawable="@mipmap/ic_launcher_delante" />\n</adaptive-icon>\n');
 }
 
 const html = path.join(ROOT, 'index.html');
@@ -106,7 +107,7 @@ versionInfo:
   versionName: ${PKG.version}
 `);
 fs.mkdirSync(path.join(PROY, 'res', 'values'), { recursive: true });
-fs.writeFileSync(path.join(PROY, 'res', 'values', 'strings.xml'), '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <string name="app_name">Ribera Verde</string>\n</resources>\n');
+fs.writeFileSync(path.join(PROY, 'res', 'values', 'strings.xml'), '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <string name="app_name">Ribera Verde web</string>\n</resources>\n');
 iconos(PROY);
 fs.mkdirSync(path.join(PROY, 'assets'), { recursive: true });
 fs.copyFileSync(html, path.join(PROY, 'assets', 'index.html'));

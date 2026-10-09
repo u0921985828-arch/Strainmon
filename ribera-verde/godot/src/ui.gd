@@ -65,6 +65,13 @@ var menu_box := PanelContainer.new()
 var menu_col := VBoxContainer.new()
 var name_box := PanelContainer.new()
 var name_in := LineEdit.new()
+var lector := PanelContainer.new()   # textos largos con scroll (créditos, licencias, privacidad): leer()
+var lector_ttl := Label.new()
+var lector_pie := Label.new()
+var lector_sc := ScrollContainer.new()
+var lector_txt := Label.new()
+var lector_pags: Array[String] = []   # el texto entero, en páginas de ~3.500 letras (◀ ▶)
+var lector_i := 0
 var endcard := ColorRect.new()
 var endcard_col := VBoxContainer.new()
 var fade_el := ColorRect.new()
@@ -181,6 +188,22 @@ func _ready() -> void:
 	ns.text = "Pulsa A para aceptar"
 	nc.add_child(ns)
 	add_child(name_box)
+	var lc := VBoxContainer.new()
+	var lt := HBoxContainer.new()
+	lector.add_child(lc)
+	lc.add_child(lt)
+	lt.add_child(lector_ttl)
+	lector_ttl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lt.add_child(lector_pie)
+	lector_pie.text = "▲▼ · B VOLVER"
+	lc.add_child(lector_sc)
+	lector_sc.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	lector_sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	lector_sc.add_child(lector_txt)
+	lector_txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lector_txt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lector.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(lector)
 	endcard.color = Color("#0b1a12")
 	endcard.add_child(endcard_col)
 	endcard_col.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -192,11 +215,12 @@ func _ready() -> void:
 	wipe.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	wipe.draw.connect(_pinta_wipe)
 	add_child(wipe)
-	for n in [hud, titulo, bE, bP, vc_info, toast_box, dlg, dlg_nm, dlg_more, menu_box, name_box, endcard, wipe]:
+	for n in [hud, titulo, bE, bP, vc_info, toast_box, dlg, dlg_nm, dlg_more, menu_box, name_box, lector, endcard, wipe]:
 		n.hide()
 	_mandos()
 	sonido = Sonido.new()
 	add_child(sonido)
+	ajustes_carga()
 	get_viewport().size_changed.connect(ajusta)
 	ajusta()
 
@@ -422,6 +446,11 @@ func _estilos() -> void:
 	pon_letra(name_in, letra, 12 * us, INK, 0, false)
 	name_in.custom_minimum_size = Vector2(110 * us, 0)
 	pon_letra(nc.get_child(2), letra, 7 * us, GRIS, 0, false)
+	lector.add_theme_stylebox_override("panel", caja(us, 5, 7))
+	lector.get_child(0).add_theme_constant_override("separation", roundi(4 * us))
+	pon_letra(lector_ttl, negrita, 9 * us, LINEA, 0, false)
+	pon_letra(lector_pie, letra, 7 * us, GRIS, 0, false)
+	pon_letra(lector_txt, letra, 9 * us, INK, 12.5 * us, false)
 	if endcard.visible:
 		_pinta_endcard()
 	if vc_info.visible:
@@ -582,10 +611,22 @@ func _cruz_a(dedo, p: Vector2) -> void:
 func mando_en(p: Vector2) -> String:
 	if zona_ab.has_point(p):
 		return "A" if p.distance_to(botones.A.get_global_rect().get_center()) < p.distance_to(botones.B.get_global_rect().get_center()) else "B"
+	# START, MÓVIL y SONIDO se tocan en 48 × 48 dp como poco (el mínimo de Android), aunque se vean más pequeños
+	var m := 48 * _dp()
 	for k in ["START", "MOVIL", "SONIDO"]:
-		if botones[k].visible and botones[k].get_global_rect().has_point(p):
+		var r: Rect2 = botones[k].get_global_rect()
+		var gx := maxf(0, (m - r.size.x) / 2)
+		var gy := maxf(0, (m - r.size.y) / 2)
+		if botones[k].visible and (r.has_point(p) or r.grow_individual(gx, gy, gx, gy).has_point(p) and not tapa(p)):
 			return k
 	return ""
+
+# lo que hay abierto en el escenario (menú, diálogo o lector) manda sobre el margen de 48 dp de los mandos
+func tapa(p: Vector2) -> bool:
+	for c in [menu_box, dlg, lector]:
+		if c.visible and c.get_global_rect().has_point(p):
+			return true
+	return false
 
 # apretar o soltar un mando; las flechas se repiten (320 ms y luego cada 110, con algo abierto), como en 06-controles
 func aprieta(k: String, on: bool) -> void:
@@ -651,11 +692,106 @@ func music(n: String) -> void:
 func sonido_on() -> bool:
 	return sonido.on if sonido else true
 
-func set_sound(on: bool) -> void:
+func set_sound(on: bool, guarda := true) -> void:
 	if sonido:
 		sonido.set_on(on)
 		botones.SONIDO.text = "SONIDO" if on else "SILENCIO"
 		botones.SONIDO.set_pressed_no_signal(not on)
+	aj.sonido = on
+	if guarda:
+		ajustes_guarda()
+
+# ---------- ajustes de la app (solo Godot): el aviso de edad aceptado, el volumen de la música y de los efectos (de 0 a 4,
+# de 25 en 25 %), la velocidad del texto y SONIDO; en un archivo aparte de la partida, que no los borra ----------
+static var AJUSTES := "user://ajustes.json"   # las pruebas usan otro
+const TEXTO_VEL := ["NORMAL", "RÁPIDO", "AL MOMENTO"]
+var aj := {"aviso": false, "musica": 4, "efectos": 4, "texto": 0, "sonido": true}
+
+func ajustes_carga() -> void:
+	if oraculo:
+		return
+	var j = JSON.parse_string(FileAccess.get_file_as_string(AJUSTES)) if FileAccess.file_exists(AJUSTES) else null
+	if j is Dictionary:
+		for k in aj:
+			if j.has(k) and (typeof(j[k]) == TYPE_BOOL) == (aj[k] is bool):
+				aj[k] = j[k] if aj[k] is bool else clampi(int(j[k]), 0, 2 if k == "texto" else 4)
+	ajustes_aplica()
+
+func ajustes_aplica() -> void:
+	if sonido:
+		sonido.niveles(aj.musica / 4.0, aj.efectos / 4.0)
+	set_sound(aj.sonido, false)
+
+func ajustes_guarda() -> void:
+	if oraculo:
+		return
+	var f := FileAccess.open(AJUSTES + ".tmp", FileAccess.WRITE)
+	if f == null:
+		return
+	f.store_string(JSON.stringify(aj))
+	f.close()
+	DirAccess.rename_absolute(AJUSTES + ".tmp", AJUSTES)
+
+# OPCIONES (título y menú START): la define juego.gd
+func opciones(_desde_titulo := false) -> void:
+	pass
+
+# un texto largo a toda altura, con scroll (▲ ▼ de línea en línea, el dedo) y en páginas (◀ ▶) hasta A, B o START
+func leer(t: String, texto: String) -> void:
+	if oraculo:
+		return
+	lector_pags = paginas(texto)
+	var ver := func(i: int):
+		lector_i = clampi(i, 0, lector_pags.size() - 1)
+		lector_ttl.text = t if lector_pags.size() == 1 else "%s · %d/%d" % [t, lector_i + 1, lector_pags.size()]
+		lector_pie.text = "▲▼ · B VOLVER" if lector_pags.size() == 1 else "▲▼ ◀▶ · B VOLVER"
+		lector_txt.text = lector_pags[lector_i]
+		lector_sc.scroll_vertical = 0
+	ver.call(0)
+	lector.show()
+	hud.hide()
+	_coloca()
+	var p := Motor.Prom.new()
+	push(func(b: String):
+		if b == "up" or b == "down":
+			lector_sc.scroll_vertical += roundi(25 * us) * (-1 if b == "up" else 1)
+		elif b == "left" or b == "right":
+			var i := lector_i + (-1 if b == "left" else 1)
+			if i >= 0 and i < lector_pags.size():
+				sfx("sel")
+				ver.call(i)
+		elif b == "A" or b == "B" or b == "START":
+			sfx("back")
+			pop()
+			lector.hide()
+			lector_txt.text = ""
+			lector_pags = []
+			update_hud()
+			p.res())
+	await Motor.espera(p)
+
+# parte un texto en páginas por los párrafos (y por las líneas si un párrafo no cabe)
+static func paginas(texto: String, tope := 3500) -> Array[String]:
+	var out: Array[String] = []
+	var pag := ""
+	for par in texto.split("\n\n"):
+		var trozos: Array[String] = [par]
+		if par.length() > tope:
+			trozos = []
+			var t := ""
+			for l in par.split("\n"):
+				if t != "" and t.length() + l.length() > tope:
+					trozos.append(t)
+					t = ""
+				t += ("\n" if t != "" else "") + l
+			trozos.append(t)
+		for tr in trozos:
+			if pag != "" and pag.length() + tr.length() > tope:
+				out.append(pag)
+				pag = ""
+			pag += ("\n\n" if pag != "" else "") + tr
+	out.append(pag)
+	return out
 
 # ---------- virtuales (las definen mundo, granja, trama y juego) ----------
 func world_press(_b: String) -> void:
@@ -676,7 +812,8 @@ func type_text(text: String, name_ := "") -> void:
 		gancho_texto.call(text, name_)
 	var p := Motor.Prom.new()
 	var full := nm(text)
-	var st := {"i": 0, "done": false, "iv": 0}
+	var st := {"i": 0, "n": 0, "done": false, "iv": 0}
+	var paso: int = [1, 3, 100000][aj.texto]   # OPCIONES · TEXTO: normal, rápido (3 letras cada vez) o al momento
 	if not oraculo:
 		dlg.show()
 		dlg_nm.visible = name_ != ""
@@ -692,10 +829,11 @@ func type_text(text: String, name_ := "") -> void:
 		pop()
 		p.res()
 	st.iv = M.intervalo(func():
-		st.i += 1
+		st.i = mini(st.i + paso, full.length())
 		if not oraculo:
 			dlg_txt.text = full.substr(0, st.i)
-		if st.i % 3 == 0:
+		st.n += 1
+		if st.n % 3 == 0:
 			sfx("blip")
 		if st.i >= full.length():
 			fin.call(), 20)
@@ -1013,6 +1151,10 @@ func _coloca() -> void:
 				menu_box.position = Vector2(R.end.x - 3 * us - menu_box.size.x, R.position.y + 3 * us)
 			else:
 				menu_box.position = Vector2(R.end.x - 3 * us - menu_box.size.x, maxf(R.position.y + 3 * us, R.end.y - 49 * us - menu_box.size.y))
+	if lector.visible:   # como un menú a toda altura
+		lector.custom_minimum_size = R.size - Vector2(6 * us, 6 * us)
+		lector.size = lector.custom_minimum_size
+		lector.position = R.position + Vector2(3 * us, 3 * us)
 	if name_box.visible:
 		name_box.reset_size()
 		name_box.position = R.get_center() - name_box.size / 2
