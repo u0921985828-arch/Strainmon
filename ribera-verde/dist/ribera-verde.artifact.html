@@ -970,7 +970,7 @@ function buildMaps(){
   // ---------- BARRIO ALTO (1.10) ----------
   // al norte del barrio, cuesta arriba: la plaza del Ensanche, los jardines y la comisaría del sargento Molina.
   // Más policía y menos ladrones; clientes con dinero (pijos y turistas) desde el capítulo 3
-  const a=newMap('alto',40,30,'grass');a.music='town';
+  const a=newMap('alto',40,30,'grass');a.music='alto';
   for(let x=0;x<40;x++){monte(a,x,0);monte(a,x,1);if(x!==11&&x!==12)ob(a,x,29,'seto');}
   for(let y=0;y<30;y++){monte(a,0,y);monte(a,39,y);}
   for(let x=1;x<39;x++){gr(a,x,20,'walk');gr(a,x,21,'roadT');gr(a,x,22,'roadB');gr(a,x,23,'walk');}
@@ -991,7 +991,7 @@ function buildMaps(){
   // ---------- ASTILLEROS (1.10) ----------
   // al este del muelle: los astilleros cerrados, el muelle de carga y el almacén donde Toño recoge los encargos de Baltasar.
   // Pocos controles y muchos ladrones; las esquinas de Darko: los clientes pagan más, pero sus chicos vigilan
-  const t=newMap('astilleros',40,30,'dirt');t.music='town';
+  const t=newMap('astilleros',40,30,'dirt');t.music='astilleros';
   for(let x=0;x<40;x++){monte(t,x,0);monte(t,x,1);}
   for(let y=0;y<23;y++){if(y!==20&&y!==21)monte(t,0,y);monte(t,39,y);}
   rect(t,0,23,39,29,(x,y)=>gr(t,x,y,'water'));rect(t,0,19,39,22,(x,y)=>gr(t,x,y,'dock'));
@@ -1008,7 +1008,7 @@ function buildMaps(){
   // de hormigón: el caserío de la familia (se entra: casa-ama), el de los vecinos, uno pequeño y la borda; abajo, la plaza con la
   // fuente y la parada, otro caserío grande y otro pequeño; y las afueras por la pista de tierra: el manzanal, el maizal y otra
   // borda. El monte entra y sale por los bordes y hay dos bosquetes en las esquinas
-  const v=newMap('mendialde',48,34,'grass');v.music='town';
+  const v=newMap('mendialde',48,34,'grass');v.music='mendialde';
   for(let x=0;x<48;x++){gr(v,x,17,'roadT');gr(v,x,18,'roadB');}
   rect(v,4,12,37,13,(x,y)=>gr(v,x,y,'hormigon'));rect(v,13,14,14,16,(x,y)=>gr(v,x,y,'hormigon'));
   rect(v,28,9,29,11,(x,y)=>gr(v,x,y,'hormigon'));rect(v,30,9,34,10,(x,y)=>gr(v,x,y,'hormigon'));
@@ -1032,14 +1032,14 @@ function buildMaps(){
   [[11,15],[20,15],[27,14],[33,15],[5,29],[9,31],[36,30],[41,15],[16,23],[30,24]].forEach(([x,y])=>gr(v,x,y,'flowers'));
   bosque(v,44,3,5,4,11);bosque(v,2,31,4,4,12);linde(v,{n:[2,5],s:[1,1],o:[1,3],e:[1,3],sem:5});
   // ---------- CASA DE AMA (1.10): dentro del caserío de la familia ----------
-  const ca=newMap('casa-ama',10,8,'floor');ca.music='home';
+  const ca=newMap('casa-ama',10,8,'floor');ca.music='mendialde_n';
   rect(ca,0,0,9,0,(x,y)=>gr(ca,x,y,'iwT_home'));rect(ca,0,1,9,1,(x,y)=>gr(ca,x,y,'iwB_home'));
   ob(ca,2,1,'iwin');ob(ca,7,1,'iwin');ob(ca,0,2,'bedT');ob(ca,0,3,'bedB');ob(ca,9,6,'fridge');ob(ca,5,4,'table');
   ob(ca,9,2,'plantDeco');ob(ca,0,7,'plantDeco');
   gr(ca,4,7,'mat');ca.exits['4,7']={to:'mendialde',x:6,y:12,dir:'down'};
   // ---------- PUERTO VIEJO (1.10): el pueblo pesquero, ciudad pequeña ----------
   // casas marineras de colores en fila frente al paseo, el muelle con sus pantalanes y el mar abajo
-  const pv=newMap('puerto',40,24,'plaza');pv.music='town';
+  const pv=newMap('puerto',40,24,'plaza');pv.music='puerto';
   // orgánico: casas de tres anchos y tres alturas (la fila sigue la línea del paseo; por arriba, monte hasta donde llega cada una)
   rect(pv,0,0,39,7,(x,y)=>gr(pv,x,y,'grass'));rect(pv,0,8,1,15,(x,y)=>gr(pv,x,y,'grass'));rect(pv,38,8,39,15,(x,y)=>gr(pv,x,y,'grass'));
   let px=1;[['marinera',4,6],['marinera6',3,5],['marinera2',4,6],['marinera5',5,7],['marinera3',4,6],['marinera4',4,6],['marinera6',3,5],['marinera',4,6],['marinera5',5,7]]
@@ -1055,7 +1055,7 @@ function buildMaps(){
   linde(pv,{n:[1,3],o:[1,2],e:[1,2],sem:7});
   // ---------- VALDEHIERRO (1.10): la ciudad pequeña de la industria ----------
   // bloques de ladrillo y la fundición a los dos lados de la carretera; al sureste, un solar vallado con cajas
-  const vh=newMap('valdehierro',40,24,'walk');vh.music='town';
+  const vh=newMap('valdehierro',40,24,'walk');vh.music='valdehierro';
   // orgánico: la carretera, de asfalto roto (baches, parches y la raya borrada); una nave entre los bloques; el borde, de monte
   // que entra y sale por donde no hay ciudad
   rect(vh,0,0,39,1,(x,y)=>gr(vh,x,y,'grass'));rect(vh,0,2,0,23,(x,y)=>gr(vh,x,y,'grass'));rect(vh,39,2,39,23,(x,y)=>gr(vh,x,y,'grass'));rect(vh,0,23,39,23,(x,y)=>gr(vh,x,y,'grass'));
@@ -1073,7 +1073,7 @@ function buildMaps(){
   // ---------- ERROTABARRI (1.10): el pueblo del río, con su molino ----------
   // orgánico: el camino es una pista de tierra (sin asfaltar) que cruza el río, que serpentea, por un puente de madera; arriba, el
   // caserío grande y uno pequeño; abajo, la huerta, el molino viejo junto al agua (de piedra, la borda) y otro caserío pequeño
-  const e=newMap('errotabarri',36,24,'grass');e.music='town';
+  const e=newMap('errotabarri',36,24,'grass');e.music='errotabarri';
   const rio=y=>16+Math.round(ruido(y>=10&&y<=13?11:y,21,4)*2);
   for(let y=0;y<24;y++)for(let x=rio(y);x<rio(y)+3;x++)gr(e,x,y,'water');
   for(let x=0;x<36;x++){const r=x>=rio(11)&&x<rio(11)+3;gr(e,x,11,r?'bridgeT':'pista');gr(e,x,12,r?'bridgeB':'pista');}
@@ -1101,14 +1101,14 @@ function buildMaps(){
   ob(h,0,6,'fridge');ob(h,3,5,'table');ob(h,17,7,'plantDeco');ob(h,0,4,'crate');   // el arcón (1.10), entre la cama y la nevera (en 0,5 lo tapa la nevera)
   gr(h,5,7,'mat');h.exits['5,7']={to:'town',x:5,y:9,dir:'down'};
   // ---------- SHOP ----------
-  const s=newMap('shop',10,8,'floorS');s.music='home';
+  const s=newMap('shop',10,8,'floorS');s.music='shop';
   rect(s,0,0,9,0,(x,y)=>gr(s,x,y,'iwT_shop'));rect(s,0,1,9,1,(x,y)=>gr(s,x,y,'iwB_shop'));
   [0,1,8,9].forEach(x=>ob(s,x,1,'shelfW'));ob(s,4,1,'poster');
   rect(s,2,3,7,3,(x,y)=>ob(s,x,y,'counter'));
   ob(s,0,5,'display');ob(s,9,5,'display');ob(s,0,7,'plantDeco');ob(s,9,7,'plantDeco');
   gr(s,4,7,'mat');s.exits['4,7']={to:'town',x:17,y:9,dir:'down'};
   // ---------- BAR ----------
-  const b=newMap('bar',10,8,'floorB');b.music='home';
+  const b=newMap('bar',10,8,'floorB');b.music='bar';
   rect(b,0,0,9,0,(x,y)=>gr(b,x,y,'iwT_bar'));rect(b,0,1,9,1,(x,y)=>gr(b,x,y,'iwB_bar'));
   rect(b,0,1,3,1,(x,y)=>ob(b,x,y,'bottles'));ob(b,6,1,'iwin');
   rect(b,0,3,3,3,(x,y)=>ob(b,x,y,'barcounter'));ob(b,1,4,'stool');ob(b,3,4,'stool');
@@ -1121,13 +1121,13 @@ function buildMaps(){
   ob(tx,5,4,'table');ob(tx,1,2,'plantDeco');ob(tx,9,2,'plantDeco');ob(tx,0,7,'plantDeco');
   gr(tx,4,7,'mat');tx.exits['4,7']={to:'town',x:34,y:9,dir:'down'};
   // ---------- COMISARÍA (1.10) ----------
-  const c=newMap('comisaria',10,8,'floorS');c.music='home';
+  const c=newMap('comisaria',10,8,'floorS');c.music='comisaria';
   rect(c,0,0,9,0,(x,y)=>gr(c,x,y,'iwT_shop'));rect(c,0,1,9,1,(x,y)=>gr(c,x,y,'iwB_shop'));
   [0,1,8,9].forEach(x=>ob(c,x,1,'shelfW'));ob(c,4,1,'iwin');rect(c,2,3,7,3,(x,y)=>ob(c,x,y,'counter'));
   ob(c,0,5,'bench');ob(c,9,5,'bench');ob(c,0,7,'plantDeco');ob(c,9,7,'plantDeco');
   gr(c,4,7,'mat');c.exits['4,7']={to:'alto',x:26,y:19,dir:'down'};
   // ---------- ALMACÉN DE LOS ASTILLEROS (1.10) ----------
-  const w=newMap('almacen',10,8,'floorB');w.music='home';
+  const w=newMap('almacen',10,8,'floorB');w.music='astilleros_n';
   rect(w,0,0,9,0,(x,y)=>gr(w,x,y,'iwT_bar'));rect(w,0,1,9,1,(x,y)=>gr(w,x,y,'iwB_bar'));ob(w,6,1,'iwin');
   [[0,2],[1,2],[0,3],[8,2],[9,2],[9,3],[8,6],[9,6],[0,6]].forEach(([x,y])=>ob(w,x,y,'crate'));ob(w,5,4,'btable');ob(w,4,4,'stool');
   gr(w,4,7,'mat');w.exits['4,7']={to:'astilleros',x:18,y:14,dir:'down'};
@@ -1181,7 +1181,7 @@ function aPie(m,[x0,y0]){
 /* =========================================================
    AUDIO — chiptune propio
    ========================================================= */
-let AC=null,master=null,musG=null,sfxG=null,soundOn=true,tune=null,seqT=0,seqStep=0,seqIv=null,noiseBuf=null;
+let AC=null,master=null,musG=null,musF=null,sfxG=null,soundOn=true,tune=null,seqT=0,seqStep=0,seqIv=null,noiseBuf=null;
 function audioInit(){
   if(AC)return;try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=soundOn?.16:0;master.connect(AC.destination);
   musG=AC.createGain();sfxG=AC.createGain();musG.connect(master);sfxG.connect(master);ajustesSonido();
@@ -1190,7 +1190,7 @@ function audioInit(){
 }
 function tone(f,t,dur,type='square',vol=.25,f2,out=sfxG){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);
   g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(out);o.start(t);o.stop(t+dur+.02);}
-function noise(t,dur,vol=.3){if(!AC)return;const s=AC.createBufferSource(),g=AC.createGain();s.buffer=noiseBuf;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(g);g.connect(sfxG);s.start(t);s.stop(t+dur);}
+function noise(t,dur,vol=.3,out=sfxG){if(!AC)return;const s=AC.createBufferSource(),g=AC.createGain();s.buffer=noiseBuf;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(g);g.connect(out);s.start(t);s.stop(t+dur);}
 const mf=n=>440*Math.pow(2,(n-69)/12);
 function sfx(k){if(!AC||!soundOn)return;const t=AC.currentTime+.005;
   switch(k){
@@ -1207,21 +1207,90 @@ function sfx(k){if(!AC||!soundOn)return;const t=AC.currentTime+.005;
     case 'enc':for(let i=0;i<8;i++)tone(mf(60+i*3),t+i*.045,.05,'square',.12);break;
     case 'bad':tone(220,t,.18,'square',.15);tone(160,t+.18,.35,'square',.15);break;
   }}
-const TUNES={
-  town:{bpm:132,mel:[72,0,76,79,77,76,74,0,72,74,76,72,69,0,67,0,72,0,76,79,81,79,77,76,74,76,77,74,72,0,0,0],
-        bas:[48,0,55,0,53,0,55,0,48,0,55,0,45,0,43,0,48,0,55,0,53,0,52,0,50,0,55,0,48,0,43,0]},
+// Las canciones se escriben en notas («c5», «f#4», «bb5»; «.» silencio, «-» alarga la anterior un paso), acordes por compás
+// (cs pasos cada uno: bajo con el patrón bp —R raíz, 5 quinta, 8 octava, 3 tercera— y arpegio ap con los índices del acorde) y
+// batería (k bombo, s caja, h charles). tema() las convierte en pasos: mel/md (nota y largo en pasos), arm, bas y bat (1 k, 2 s,
+// 3 h), con la onda y el volumen de cada voz (mo/ao/bo). Godot recibe TUNES ya convertido (tools/godot.js).
+const VOLW={square:.07,pulse25:.07,pulse12:.06,triangle:.12,sawtooth:.05},PC={c:0,d:2,e:4,f:5,g:7,a:9,b:11},
+  ACORDE={'':[0,4,7],m:[0,3,7],'7':[0,4,7,10],maj7:[0,4,7,11],m7:[0,3,7,10]},BATERIA={k:1,s:2,h:3},
+  toks=s=>s.split(/\s+/).filter(x=>x&&x!=='|'),alt=x=>x==='#'?1:x==='b'?-1:0;
+function midi(s){const m=/^([a-g])([#b]?)(\d)$/.exec(s);if(!m)throw Error('nota '+s);return 12*(+m[3]+1)+PC[m[1]]+alt(m[2]);}
+function tema(d){const T={bpm:d.bpm,mo:d.mo||'square',ao:d.ao||'square',bo:d.bo||'triangle'};T.mv=VOLW[T.mo];T.av=VOLW[T.ao]*.6*(d.af||1);T.bv=T.bo==='triangle'?.16:.07;
+  let mel=[],md=[],u=-1;
+  if(Array.isArray(d.mel)){mel=d.mel.slice();md=mel.map(n=>n?1:0);}
+  else for(const t of toks(d.mel)){if(t==='-'){mel.push(0);md.push(0);if(u>=0)md[u]++;continue;}const n=t==='.'?0:midi(t);u=n?mel.length:-1;mel.push(n);md.push(n?1:0);}
+  const L=mel.length,arm=Array(L).fill(0),bas=d.bas?d.bas.slice():Array(L).fill(0);
+  if(d.ch){const cs=d.cs||4,ch=toks(d.ch),bp=toks(d.bp||'R . 5 .'),ap=d.ap?toks(d.ap):null;
+    if(ch.length*cs!==L)throw Error(`acordes ${ch.length}×${cs} ≠ ${L} pasos`);
+    ch.forEach((c,j)=>{const m=/^([A-G])([#b]?)(maj7|m7|m|7)?$/.exec(c);if(!m)throw Error('acorde '+c);
+      const pc=(PC[m[1].toLowerCase()]+alt(m[2])+12)%12,iv=ACORDE[m[3]||''],r=pc<=7?48+pc:36+pc;
+      for(let k=0;k<cs;k++){const i=j*cs+k,b=bp[k%bp.length],a=ap?ap[k%ap.length]:'.';
+        if(b!=='.'){if(!(b in {R:1,5:1,8:1,3:1}))throw Error('bajo '+b);bas[i]=r+({R:0,5:7,8:12,3:iv[1]})[b];}
+        if(a!=='.'){const x=+a;if(!(x>=0))throw Error('arpegio '+a);arm[i]=60+pc+iv[x%iv.length]+12*Math.floor(x/iv.length);}}});}
+  const bt=d.bat?toks(d.bat):null;if(bt&&bt.some(x=>x!=='.'&&!BATERIA[x]))throw Error('batería '+d.bat);
+  if(bas.length!==L)throw Error('bajo ≠ melodía');
+  return Object.assign(T,{mel,md,arm,bas,bat:mel.map((_,i)=>bt&&BATERIA[bt[i%bt.length]]||0)});}
+// de noche, la misma canción más lenta, con flauta (triangular), el arpegio más suave y sin bombo ni caja
+const nocturno=d=>({...d,bpm:Math.round(d.bpm*.8),mo:'triangle',ao:'pulse12',af:.7,bat:d.bat&&toks(d.bat).map(x=>x==='h'?'h':'.').join(' ')});
+const TOWN_A='c5 . e5 g5 f5 e5 d5 . | c5 d5 e5 c5 a4 . g4 . | c5 . e5 g5 a5 g5 f5 e5 | d5 e5 f5 d5 c5 - . .',
+  TOWN_B='f5 . a5 c6 - . b5 a5 | g5 . e5 . a5 - . . | f5 e5 d5 . f5 . g5 a5 | g5 - e5 . d5 . . .';
+const CANCIONES={
+  // Ribera (centro): la de siempre con una segunda parte, A B A
+  town:{bpm:132,mel:[TOWN_A,TOWN_B,TOWN_A].join(' '),ch:'C C C Am C F G C  F G Em Am Dm G C G  C C C Am C F G C',bat:'k . h . s . h . k . h k s . h h'},
   night:{bpm:100,mel:[69,0,72,0,76,0,74,72,71,0,67,0,69,0,0,0,69,0,72,0,77,0,76,74,72,0,71,0,69,0,0,0],
         bas:[45,0,0,0,52,0,0,0,43,0,0,0,50,0,0,0,41,0,0,0,48,0,0,0,40,0,0,0,45,0,0,0]},
   home:{bpm:96,mel:[76,0,79,0,81,0,79,76,74,0,72,0,74,76,0,0,76,0,79,0,84,0,83,81,79,0,76,0,74,0,0,0],
         bas:[48,0,0,0,52,0,0,0,53,0,0,0,55,0,0,0,48,0,0,0,52,0,0,0,50,0,0,0,55,0,0,0]},
   battle:{bpm:168,mel:[69,72,76,72,69,72,76,79,77,76,74,72,71,72,74,71,69,72,76,72,69,72,76,81,79,77,76,74,76,0,75,0],
-        bas:[45,45,57,45,45,57,45,45,41,41,53,41,43,43,55,43,45,45,57,45,45,57,45,45,41,41,53,41,40,40,52,40]},
+        bas:[45,45,57,45,45,57,45,45,41,41,53,41,43,43,55,43,45,45,57,45,45,57,45,45,41,41,53,41,40,40,52,40],bat:'k h s h k k s h'},
   title:{bpm:120,mel:[76,0,79,0,84,0,83,0,81,0,79,0,76,0,72,0,74,0,77,0,81,0,79,77,76,0,0,0,79,0,0,0],
         bas:[48,0,55,0,48,0,55,0,45,0,52,0,45,0,52,0,50,0,57,0,50,0,57,0,43,0,50,0,43,0,47,0]},
+  // barrio alto: lounge en fa, acordes de séptima
+  alto:{bpm:108,mo:'pulse25',ao:'pulse12',ap:'0 1 2 3',
+    ch:'F F Gm7 C7 Am7 Dm7 Gm7 C7 F F Bbmaj7 Bbmaj7 Am7 D7 Gm7 C7',
+    mel:'c6 - a5 - e5 - f5 . | bb5 - a5 g5 e5 - c5 . | a5 - g5 - f5 - d5 . | g5 - - a5 bb5 - g5 . | a5 - c6 - f6 - e6 . | d6 - - c6 a5 - bb5 . | c6 - a5 - f#5 - a5 . | g5 - f5 - e5 - c5 .',bat:'k . h . s . h h'},
+  // astilleros: industrial en mi menor, bajo de sierra
+  astilleros:{bpm:124,bo:'sawtooth',bp:'R . 8 R',ch:'Em Em Em Em C C D D Em Em Em Em C D B B',
+    mel:'e5 . e5 g5 . e5 d5 . | e5 . b4 . d5 - e5 . | c5 . c5 e5 . c5 b4 . | d5 . a4 . d5 - f#5 . | g5 . g5 f#5 e5 . d5 . | e5 - b4 . e5 . g5 . | a5 - g5 . f#5 - d5 . | d#5 - f#5 - b5 - . .',bat:'k . h k s . h . k k h . s . h s'},
+  // Puerto Viejo: vals marinero en re
+  puerto:{bpm:150,cs:6,mo:'pulse25',ao:'pulse12',bp:'R . . . 5 .',ap:'. . 1 . 2 .',ch:'D D G D A A D D D D G G D A D D',
+    mel:'f#5 - - e5 d5 . | a5 - - - f#5 . | g5 - b5 - g5 . | f#5 - - d5 - . | e5 - - c#5 - e5 | a5 - g5 - e5 . | d5 - f#5 - a5 . | d6 - - - - . | a5 - - f#5 - a5 | d6 - - a5 - . | b5 - - g5 - b5 | d6 - b5 - g5 . | a5 - - f#5 - d5 | e5 - - a4 - c#5 | d5 - - - - . | . . . a4 - -',bat:'k . h . h .'},
+  // Valdehierro: la menor dórico, ciudad de mina
+  valdehierro:{bpm:116,bp:'R . 8 5',ch:'Am Am D D Am Am D D C C G G Am Am E E',
+    mel:'. a4 c5 d5 e5 . c5 . | f#5 - e5 d5 . a4 . . | . a4 c5 d5 e5 . g5 - | f#5 - d5 . e5 - . . | g5 . g5 e5 c5 . e5 . | d5 . b4 . d5 . g5 - | e5 - c5 . a4 . c5 . | b4 - g#4 . b4 . e5 .',bat:'k . h . s . h k . k h . s . h h'},
+  // Mendialde: 6/8 de caserío, flauta y arpegio
+  mendialde:{bpm:168,cs:6,mo:'triangle',ao:'pulse12',bp:'R . . 5 . .',ap:'. 1 2 . 1 2',ch:'G G C G D D G G Em Em C G D D G G',
+    mel:'d6 - b5 g5 - b5 | d6 - - g6 - . | e6 - c6 e6 - g6 | d6 - b5 g5 - . | a5 - f#5 a5 - d6 | c6 - a5 f#5 - a5 | b5 - g5 d6 - b5 | g5 - - - - . | e6 - b5 e6 - g6 | f#6 - e6 b5 - . | c6 - e6 g6 - e6 | d6 - b5 g5 - b5 | a5 - b5 c6 - a5 | f#5 - a5 d6 - c6 | b5 - a5 g5 - f#5 | g5 - - - . .',bat:'k . h s . h'},
+  // Errotabarri: pastoral lenta en fa
+  errotabarri:{bpm:92,mo:'pulse25',ao:'triangle',ap:'0 1 2 1',bp:'R . 5 .',ch:'F F C C Dm Dm Bb C F F Am Am Bb C F F',
+    mel:'c5 - f5 - a5 - - g5 | g5 - e5 - c5 - . . | d5 - f5 - a5 - g5 f5 | f5 - d5 - e5 - - . | a5 - c6 - a5 - f5 - | e5 - a5 - c6 - b5 a5 | d6 - bb5 - g5 - e5 . | f5 - - - . . . .',bat:'. . h . . . h .'},
+  // interiores: la tienda (reggae), el bar (tango) y la comisaría (tensa)
+  shop:{bpm:150,ap:'. . 1 .',ao:'pulse12',ch:'G G C C G G D D G G C C Em Em D D',
+    mel:'. . b4 d5 . . g5 . | e5 - - . c5 . e5 . | d5 . b4 . g4 - - . | . . a4 c5 d5 - . . | . . b5 . a5 . g5 . | e5 - g5 - e5 . c5 . | b4 - - e5 g5 - . . | f#5 - - d5 - . . .',bat:'. h . h s h . h'},
+  bar:{bpm:120,bp:'R . . 5',ap:'0 . 1 .',ch:'Dm Dm A A Dm Dm Gm A Dm Dm Gm Gm Dm A A A',
+    mel:'d5 . . d5 f5 . a5 . | e5 - - c#5 a4 . . . | d5 . . f5 a5 . d6 . | bb5 - a5 . g5 . e5 . | f5 . . a5 d6 - c6 . | bb5 . . g5 d5 - . . | f5 - e5 d5 c#5 - e5 . | a4 - - - . . . .',bat:'k . . h s . h .'},
+  comisaria:{bpm:96,bp:'R . R .',ch:'Em Em Em Em C C B B Em Em Em Em C C B B',
+    mel:'b4 - - - . . . . | c5 - b4 - . . g4 . | e5 - - - . . . . | d#5 - - - f#5 - . . | b5 - - - a5 - g5 - | f#5 - - - e5 - . . | e5 - g5 - c6 - - . | b5 - - - . . . .',bat:'h . . . h . . .'},
 };
-function music(name){if(tune===TUNES[name])return;tune=TUNES[name]||null;seqStep=0;if(AC)seqT=AC.currentTime+.05;}
-function schedule(){if(!AC||!tune)return;if(seqT<AC.currentTime)seqT=AC.currentTime+.02;const st=60/tune.bpm/2;
-  while(seqT<AC.currentTime+.25){const i=seqStep%tune.mel.length;if(soundOn){const n=tune.mel[i],b=tune.bas[i];if(n)tone(mf(n),seqT,st*.9,'square',.07,0,musG);if(b)tone(mf(b),seqT,st*.95,'triangle',.16,0,musG);}
+// las zonas de la calle llevan su canción de día y otra de noche (k_n); Ribera, la de siempre (night)
+const ZONA_MUSICA=Object.keys(ZONAS).filter(k=>k!=='town');
+for(const k of ZONA_MUSICA)CANCIONES[k+'_n']=nocturno(CANCIONES[k]);
+const TUNES=Object.fromEntries(Object.entries(CANCIONES).map(([k,d])=>[k,tema(d)]));
+// las ondas de pulso (25 y 12,5 %) son formas propias de WebAudio (serie de Fourier del pulso)
+const ONDAS={};
+function onda(w){if(!ONDAS[w]){const d=w==='pulse25'?.25:.125,N=32,re=new Float32Array(N),im=new Float32Array(N);
+  for(let n=1;n<N;n++){re[n]=Math.sin(2*Math.PI*n*d)/(n*Math.PI);im[n]=(1-Math.cos(2*Math.PI*n*d))/(n*Math.PI);}ONDAS[w]=AC.createPeriodicWave(re,im);}return ONDAS[w];}
+// una nota de la música: de vol a la mitad en dur (lineal) y suelta en 30 ms, a musF (el fundido de la canción)
+function voz(f,t,dur,w,vol){const o=AC.createOscillator(),g=AC.createGain();if(w==='pulse25'||w==='pulse12')o.setPeriodicWave(onda(w));else o.type=w;o.frequency.setValueAtTime(f,t);
+  g.gain.setValueAtTime(vol,t);g.gain.linearRampToValueAtTime(vol*.5,t+dur);g.gain.linearRampToValueAtTime(0,t+dur+.03);o.connect(g);g.connect(musF);o.start(t);o.stop(t+dur+.05);}
+// al cambiar de canción, la que suena se apaga en ~0,3 s y la nueva entra a los 0,4 s
+function music(name){const nt=TUNES[name]||null;if(tune===nt)return;const habia=!!tune;tune=nt;seqStep=0;if(!AC)return;const t=AC.currentTime;
+  if(musF){const o=musF;o.gain.cancelScheduledValues(t);o.gain.setTargetAtTime(0,t,.08);setTimeout(()=>o.disconnect(),4000);}
+  musF=AC.createGain();musF.connect(musG);seqT=t+(habia?.4:.05);musF.gain.setValueAtTime(0,t);musF.gain.setTargetAtTime(1,seqT,.03);}
+function schedule(){if(!AC||!tune)return;if(!musF){musF=AC.createGain();musF.connect(musG);}if(seqT<AC.currentTime)seqT=AC.currentTime+.02;const T=tune,st=60/T.bpm/2;
+  while(seqT<AC.currentTime+.25){const i=seqStep%T.mel.length;if(soundOn){const n=T.mel[i],a=T.arm[i],b=T.bas[i],d=T.bat[i];
+    if(n)voz(mf(n),seqT,T.md[i]*st-st*.1,T.mo,T.mv);if(a)voz(mf(a),seqT,st*.9,T.ao,T.av);if(b)voz(mf(b),seqT,st*.95,T.bo,T.bv);
+    if(d===1)tone(150,seqT,.12,'triangle',.3,45,musF);else if(d===2)noise(seqT,.12,.12,musF);else if(d===3)noise(seqT,.03,.05,musF);}
     seqT+=st;seqStep++;}}
 // OPCIONES (12-menus): el volumen de la música y de los efectos (de 0 a 4, de 25 en 25 %) y la velocidad del texto, en rv_ajustes
 const AJ={musica:4,efectos:4,texto:0};
@@ -1539,7 +1608,8 @@ function tileSolid(m,x,y){
 }
 const entAt=(x,y)=>ents.find(e=>(e.x===x&&e.y===y)||(e.moving&&e.fx===x&&e.fy===y));
 function enterMap(name,x,y,dir){S.map=name;if(name==='home')montarCasa();Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];resetSosp();buildEnts();music(mapMusic());}
-const mapMusic=()=>ZONAS[S.map]?(isNight()?'night':'town'):'home';
+// cada mapa lleva su canción (04-mapas); en la calle, de noche, su versión nocturna (Ribera: night)
+const mapMusic=()=>{const m=MAPS[S.map].music;return ZONAS[S.map]&&isNight()?(m==='town'?'night':m+'_n'):m;};
 async function warp(w){sfx('door');await fade(1);enterMap(w.to,w.x,w.y,w.dir);updateHUD();await wait(80);await fade(0);}
 
 /* ---------- movement ---------- */

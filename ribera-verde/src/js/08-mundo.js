@@ -94,7 +94,8 @@ function tileSolid(m,x,y){
 }
 const entAt=(x,y)=>ents.find(e=>(e.x===x&&e.y===y)||(e.moving&&e.fx===x&&e.fy===y));
 function enterMap(name,x,y,dir){S.map=name;if(name==='home')montarCasa();Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];resetSosp();buildEnts();music(mapMusic());}
-const mapMusic=()=>ZONAS[S.map]?(isNight()?'night':'town'):'home';
+// cada mapa lleva su canción (04-mapas); en la calle, de noche, su versión nocturna (Ribera: night)
+const mapMusic=()=>{const m=MAPS[S.map].music;return ZONAS[S.map]&&isNight()?(m==='town'?'night':m+'_n'):m;};
 async function warp(w){sfx('door');await fade(1);enterMap(w.to,w.x,w.y,w.dir);updateHUD();await wait(80);await fade(0);}
 
 /* ---------- movement ---------- */

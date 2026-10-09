@@ -522,8 +522,12 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	build_ents()
 	music(map_music())
 
+# cada mapa lleva su canción (04-mapas); en la calle, de noche, su versión nocturna (Ribera: night)
 func map_music() -> String:
-	return ("night" if is_night() else "town") if D.ZONAS.has(S.map) else "home"
+	var m: String = MAPS[S.map].music
+	if D.ZONAS.has(S.map) and is_night():
+		return "night" if m == "town" else m + "_n"
+	return m
 
 func warp(w: Dictionary) -> void:
 	sfx("door")

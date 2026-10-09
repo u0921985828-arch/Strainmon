@@ -421,6 +421,9 @@ func titulo_e_intro() -> void:
 	# el sonido se pone en marcha con la primera tecla (como el AudioContext del navegador): los efectos y las canciones
 	# sintetizados, no en silencio, y la música de la intro
 	var so = J.sonido
+	await hasta(func(): return so.temas.has("home"), 1800)
+	check("la canción de la intro (home) ya está sintetizada", so.temas.has("home"))
+	await hasta(func(): return so.temas.size() == J.D.TUNES.size(), 6000)
 	var oye := true
 	var mudos := []
 	for k in so.efectos:
@@ -433,8 +436,9 @@ func titulo_e_intro() -> void:
 	if not oye:
 		print("  en silencio: ", mudos, " · ", mudos.map(func(k): return pico(so.efectos[k] if so.efectos.has(k) else so.temas[k])))
 	check("sonido: %d efectos y %d canciones sintetizados, ninguno en silencio" % [so.efectos.size(), so.temas.size()], so.listo and so.efectos.size() == 12 and so.temas.size() == J.D.TUNES.size() and oye)
-	await hasta(func(): return so.actual == "home", 60)
-	check("en la intro suena la música de casa", so.actual == "home" and so.musica.playing and so.musica.stream == so.temas.home)
+	# (la del título se apaga en 0,3 s y la nueva entra a los 0,4 s)
+	await hasta(func(): return so.actual == "home" and so.musica.playing and so.musica.stream == so.temas.home, 120)
+	check("en la intro suena la música de casa, tras el fundido", so.actual == "home" and so.musica.playing and so.musica.stream == so.temas.home)
 	# tocar la caja de diálogo es A: acaba el texto que se está escribiendo
 	await hasta(func(): return J.dlg.visible and J.dlg_txt.text.length() > 3, 300)
 	var antes: String = J.dlg_txt.text
@@ -499,7 +503,18 @@ func prologo() -> void:
 	await hasta(func(): return J.S.map == "mendialde", 120)
 	await toque(0, "down", false)
 	await libre()
-	check("▼ en la puerta sale a Mendialde con la música de la calle", J.S.map == "mendialde" and J.sonido.actual == "town")
+	check("▼ en la puerta sale a Mendialde con su música", J.S.map == "mendialde" and J.sonido.actual == ("mendialde_n" if J.is_night() else "mendialde"))
+	# cada mapa lleva una canción que existe; cada zona de la calle, una de día y otra de noche, distintas entre zonas
+	var temas_ok := true
+	var dia := {}
+	for k in J.MAPS:
+		var mu: String = J.MAPS[k].music
+		temas_ok = temas_ok and J.sonido.temas.has(mu)
+		if J.D.ZONAS.has(k):
+			var n: String = "night" if mu == "town" else mu + "_n"
+			temas_ok = temas_ok and J.sonido.temas.has(n) and n != mu
+			dia[mu] = n
+	check("música: %d mapas con su canción; %d zonas con la suya de día y de noche, distintas" % [J.MAPS.size(), dia.size()], temas_ok and dia.size() == J.D.ZONAS.size())
 	var pa: Dictionary = J.D.PARADAS.mendialde
 	check("andando hasta la parada (%d,%d)" % [pa.a[0], pa.a[1]], await anda(Vector2i(int(pa.a[0]), int(pa.a[1]))))
 	await mira("left")

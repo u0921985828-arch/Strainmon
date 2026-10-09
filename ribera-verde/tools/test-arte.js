@@ -510,6 +510,19 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     }
     await page.setViewportSize({ width: 1000, height: 700 });
     check('Pantalla completa en horizontal: reborde, píxeles cuadrados y mandos en mm flotando sin pisar el escenario ni la caja de vida del combate en 7 tamaños (y con la muesca a un lado); la cruceta se desliza y todo se suelta al perder el foco; en vertical, «Gira el móvil»', marco.every(m => m.ok), marco.filter(m => !m.ok).concat(marco.length ? [] : ['sin datos']));
+    // música por zona (05-audio): cada mapa con una canción que existe; cada zona, la suya de día y otra de noche; las voces de
+    // cada canción del mismo largo y con notas; y todas se programan en WebAudio sin error (ondas de pulso, ligaduras, batería)
+    const mus = await page.evaluate(() => {
+      const r = { mal: [], dia: [], err: null, n: 0 };
+      for (const k in MAPS) if (!TUNES[MAPS[k].music]) r.mal.push(k + ':' + MAPS[k].music);
+      for (const z in ZONAS) { const m = MAPS[z].music, n = m === 'town' ? 'night' : m + '_n'; r.dia.push(m); if (!TUNES[n] || n === m) r.mal.push(z + ' de noche'); }
+      for (const [k, t] of Object.entries(TUNES)) { const L = t.mel.length; if (!L || ['md', 'arm', 'bas', 'bat'].some(x => t[x].length !== L) || !t.mel.some(Boolean) || !t.bas.some(Boolean)) r.mal.push('canción ' + k); }
+      const S0 = { map: S.map, min: S.min };
+      S.map = 'puerto'; S.min = 12 * 60; const d = mapMusic(); S.min = 23 * 60; const n = mapMusic(); S.map = 'town'; const t = mapMusic(); S.map = 'bar'; const b = mapMusic();
+      Object.assign(S, S0); r.mapa = [d, n, t, b].join();
+      try { audioInit(); for (const k in TUNES) { music(k); seqT = AC.currentTime; schedule(); r.n++; } music(mapMusic()); } catch (e) { r.err = String(e); }
+      r.distintas = new Set(r.dia).size === Object.keys(ZONAS).length; return r; });
+    check(`Música por zona: ${Object.keys(mus.dia).length} zonas con su canción de día y de noche, distintas; cada mapa con la suya (el bar, su tango); ${mus.n} canciones programadas sin error`, !mus.mal.length && mus.distintas && mus.mapa === 'puerto,puerto_n,night,bar' && !mus.err && mus.n >= 20, mus);
     await page.waitForTimeout(300);
     check('Con atlas: 0 errores de JavaScript', errors.length === 0, errors.slice(0, 5));
     await page.close();

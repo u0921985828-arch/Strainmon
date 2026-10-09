@@ -93,7 +93,7 @@ function buildMaps(){
   // ---------- BARRIO ALTO (1.10) ----------
   // al norte del barrio, cuesta arriba: la plaza del Ensanche, los jardines y la comisaría del sargento Molina.
   // Más policía y menos ladrones; clientes con dinero (pijos y turistas) desde el capítulo 3
-  const a=newMap('alto',40,30,'grass');a.music='town';
+  const a=newMap('alto',40,30,'grass');a.music='alto';
   for(let x=0;x<40;x++){monte(a,x,0);monte(a,x,1);if(x!==11&&x!==12)ob(a,x,29,'seto');}
   for(let y=0;y<30;y++){monte(a,0,y);monte(a,39,y);}
   for(let x=1;x<39;x++){gr(a,x,20,'walk');gr(a,x,21,'roadT');gr(a,x,22,'roadB');gr(a,x,23,'walk');}
@@ -114,7 +114,7 @@ function buildMaps(){
   // ---------- ASTILLEROS (1.10) ----------
   // al este del muelle: los astilleros cerrados, el muelle de carga y el almacén donde Toño recoge los encargos de Baltasar.
   // Pocos controles y muchos ladrones; las esquinas de Darko: los clientes pagan más, pero sus chicos vigilan
-  const t=newMap('astilleros',40,30,'dirt');t.music='town';
+  const t=newMap('astilleros',40,30,'dirt');t.music='astilleros';
   for(let x=0;x<40;x++){monte(t,x,0);monte(t,x,1);}
   for(let y=0;y<23;y++){if(y!==20&&y!==21)monte(t,0,y);monte(t,39,y);}
   rect(t,0,23,39,29,(x,y)=>gr(t,x,y,'water'));rect(t,0,19,39,22,(x,y)=>gr(t,x,y,'dock'));
@@ -131,7 +131,7 @@ function buildMaps(){
   // de hormigón: el caserío de la familia (se entra: casa-ama), el de los vecinos, uno pequeño y la borda; abajo, la plaza con la
   // fuente y la parada, otro caserío grande y otro pequeño; y las afueras por la pista de tierra: el manzanal, el maizal y otra
   // borda. El monte entra y sale por los bordes y hay dos bosquetes en las esquinas
-  const v=newMap('mendialde',48,34,'grass');v.music='town';
+  const v=newMap('mendialde',48,34,'grass');v.music='mendialde';
   for(let x=0;x<48;x++){gr(v,x,17,'roadT');gr(v,x,18,'roadB');}
   rect(v,4,12,37,13,(x,y)=>gr(v,x,y,'hormigon'));rect(v,13,14,14,16,(x,y)=>gr(v,x,y,'hormigon'));
   rect(v,28,9,29,11,(x,y)=>gr(v,x,y,'hormigon'));rect(v,30,9,34,10,(x,y)=>gr(v,x,y,'hormigon'));
@@ -155,14 +155,14 @@ function buildMaps(){
   [[11,15],[20,15],[27,14],[33,15],[5,29],[9,31],[36,30],[41,15],[16,23],[30,24]].forEach(([x,y])=>gr(v,x,y,'flowers'));
   bosque(v,44,3,5,4,11);bosque(v,2,31,4,4,12);linde(v,{n:[2,5],s:[1,1],o:[1,3],e:[1,3],sem:5});
   // ---------- CASA DE AMA (1.10): dentro del caserío de la familia ----------
-  const ca=newMap('casa-ama',10,8,'floor');ca.music='home';
+  const ca=newMap('casa-ama',10,8,'floor');ca.music='mendialde_n';
   rect(ca,0,0,9,0,(x,y)=>gr(ca,x,y,'iwT_home'));rect(ca,0,1,9,1,(x,y)=>gr(ca,x,y,'iwB_home'));
   ob(ca,2,1,'iwin');ob(ca,7,1,'iwin');ob(ca,0,2,'bedT');ob(ca,0,3,'bedB');ob(ca,9,6,'fridge');ob(ca,5,4,'table');
   ob(ca,9,2,'plantDeco');ob(ca,0,7,'plantDeco');
   gr(ca,4,7,'mat');ca.exits['4,7']={to:'mendialde',x:6,y:12,dir:'down'};
   // ---------- PUERTO VIEJO (1.10): el pueblo pesquero, ciudad pequeña ----------
   // casas marineras de colores en fila frente al paseo, el muelle con sus pantalanes y el mar abajo
-  const pv=newMap('puerto',40,24,'plaza');pv.music='town';
+  const pv=newMap('puerto',40,24,'plaza');pv.music='puerto';
   // orgánico: casas de tres anchos y tres alturas (la fila sigue la línea del paseo; por arriba, monte hasta donde llega cada una)
   rect(pv,0,0,39,7,(x,y)=>gr(pv,x,y,'grass'));rect(pv,0,8,1,15,(x,y)=>gr(pv,x,y,'grass'));rect(pv,38,8,39,15,(x,y)=>gr(pv,x,y,'grass'));
   let px=1;[['marinera',4,6],['marinera6',3,5],['marinera2',4,6],['marinera5',5,7],['marinera3',4,6],['marinera4',4,6],['marinera6',3,5],['marinera',4,6],['marinera5',5,7]]
@@ -178,7 +178,7 @@ function buildMaps(){
   linde(pv,{n:[1,3],o:[1,2],e:[1,2],sem:7});
   // ---------- VALDEHIERRO (1.10): la ciudad pequeña de la industria ----------
   // bloques de ladrillo y la fundición a los dos lados de la carretera; al sureste, un solar vallado con cajas
-  const vh=newMap('valdehierro',40,24,'walk');vh.music='town';
+  const vh=newMap('valdehierro',40,24,'walk');vh.music='valdehierro';
   // orgánico: la carretera, de asfalto roto (baches, parches y la raya borrada); una nave entre los bloques; el borde, de monte
   // que entra y sale por donde no hay ciudad
   rect(vh,0,0,39,1,(x,y)=>gr(vh,x,y,'grass'));rect(vh,0,2,0,23,(x,y)=>gr(vh,x,y,'grass'));rect(vh,39,2,39,23,(x,y)=>gr(vh,x,y,'grass'));rect(vh,0,23,39,23,(x,y)=>gr(vh,x,y,'grass'));
@@ -196,7 +196,7 @@ function buildMaps(){
   // ---------- ERROTABARRI (1.10): el pueblo del río, con su molino ----------
   // orgánico: el camino es una pista de tierra (sin asfaltar) que cruza el río, que serpentea, por un puente de madera; arriba, el
   // caserío grande y uno pequeño; abajo, la huerta, el molino viejo junto al agua (de piedra, la borda) y otro caserío pequeño
-  const e=newMap('errotabarri',36,24,'grass');e.music='town';
+  const e=newMap('errotabarri',36,24,'grass');e.music='errotabarri';
   const rio=y=>16+Math.round(ruido(y>=10&&y<=13?11:y,21,4)*2);
   for(let y=0;y<24;y++)for(let x=rio(y);x<rio(y)+3;x++)gr(e,x,y,'water');
   for(let x=0;x<36;x++){const r=x>=rio(11)&&x<rio(11)+3;gr(e,x,11,r?'bridgeT':'pista');gr(e,x,12,r?'bridgeB':'pista');}
@@ -224,14 +224,14 @@ function buildMaps(){
   ob(h,0,6,'fridge');ob(h,3,5,'table');ob(h,17,7,'plantDeco');ob(h,0,4,'crate');   // el arcón (1.10), entre la cama y la nevera (en 0,5 lo tapa la nevera)
   gr(h,5,7,'mat');h.exits['5,7']={to:'town',x:5,y:9,dir:'down'};
   // ---------- SHOP ----------
-  const s=newMap('shop',10,8,'floorS');s.music='home';
+  const s=newMap('shop',10,8,'floorS');s.music='shop';
   rect(s,0,0,9,0,(x,y)=>gr(s,x,y,'iwT_shop'));rect(s,0,1,9,1,(x,y)=>gr(s,x,y,'iwB_shop'));
   [0,1,8,9].forEach(x=>ob(s,x,1,'shelfW'));ob(s,4,1,'poster');
   rect(s,2,3,7,3,(x,y)=>ob(s,x,y,'counter'));
   ob(s,0,5,'display');ob(s,9,5,'display');ob(s,0,7,'plantDeco');ob(s,9,7,'plantDeco');
   gr(s,4,7,'mat');s.exits['4,7']={to:'town',x:17,y:9,dir:'down'};
   // ---------- BAR ----------
-  const b=newMap('bar',10,8,'floorB');b.music='home';
+  const b=newMap('bar',10,8,'floorB');b.music='bar';
   rect(b,0,0,9,0,(x,y)=>gr(b,x,y,'iwT_bar'));rect(b,0,1,9,1,(x,y)=>gr(b,x,y,'iwB_bar'));
   rect(b,0,1,3,1,(x,y)=>ob(b,x,y,'bottles'));ob(b,6,1,'iwin');
   rect(b,0,3,3,3,(x,y)=>ob(b,x,y,'barcounter'));ob(b,1,4,'stool');ob(b,3,4,'stool');
@@ -244,13 +244,13 @@ function buildMaps(){
   ob(tx,5,4,'table');ob(tx,1,2,'plantDeco');ob(tx,9,2,'plantDeco');ob(tx,0,7,'plantDeco');
   gr(tx,4,7,'mat');tx.exits['4,7']={to:'town',x:34,y:9,dir:'down'};
   // ---------- COMISARÍA (1.10) ----------
-  const c=newMap('comisaria',10,8,'floorS');c.music='home';
+  const c=newMap('comisaria',10,8,'floorS');c.music='comisaria';
   rect(c,0,0,9,0,(x,y)=>gr(c,x,y,'iwT_shop'));rect(c,0,1,9,1,(x,y)=>gr(c,x,y,'iwB_shop'));
   [0,1,8,9].forEach(x=>ob(c,x,1,'shelfW'));ob(c,4,1,'iwin');rect(c,2,3,7,3,(x,y)=>ob(c,x,y,'counter'));
   ob(c,0,5,'bench');ob(c,9,5,'bench');ob(c,0,7,'plantDeco');ob(c,9,7,'plantDeco');
   gr(c,4,7,'mat');c.exits['4,7']={to:'alto',x:26,y:19,dir:'down'};
   // ---------- ALMACÉN DE LOS ASTILLEROS (1.10) ----------
-  const w=newMap('almacen',10,8,'floorB');w.music='home';
+  const w=newMap('almacen',10,8,'floorB');w.music='astilleros_n';
   rect(w,0,0,9,0,(x,y)=>gr(w,x,y,'iwT_bar'));rect(w,0,1,9,1,(x,y)=>gr(w,x,y,'iwB_bar'));ob(w,6,1,'iwin');
   [[0,2],[1,2],[0,3],[8,2],[9,2],[9,3],[8,6],[9,6],[0,6]].forEach(([x,y])=>ob(w,x,y,'crate'));ob(w,5,4,'btable');ob(w,4,4,'stool');
   gr(w,4,7,'mat');w.exits['4,7']={to:'astilleros',x:18,y:14,dir:'down'};
