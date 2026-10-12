@@ -30,7 +30,7 @@ const SHOP=[
   {lbl:'Bolsa de deporte',p:35,ch:3,bolsa:1,desc:'Llevas encima hasta 3 kg de cogollos y rosin (la mochila, 1 kg).',cond:()=>bolsaYa()<1},
   {lbl:'Maleta con ruedas',p:90,ch:5,bolsa:2,desc:'Llevas encima hasta 10 kg de cogollos y rosin.',cond:()=>bolsaYa()<2},
   {lbl:'Carro de esquejes',p:CARRO.p,ch:2,mueble:'carro',desc:`Dos bandejas de ${CARRO.plazas} esquejes, tapadas y bajo tubos T5, y una mesita con la tabla de corte: pinchados ahí aguantan ${CARRO.dias} días (sueltos, ${ESQUEJE_DIAS}). Kiko te lo sube al piso mañana.`,cond:()=>!(S.muebles&&S.muebles.carro)},
-  {lbl:'Analizador de THC',p:180,ch:3,item:'analizador',desc:'Medidor de bolsillo (1.15): analiza un lote desde la mochila. Lo analizado se vende mejor en la calle y un 5 % más en los clubs, y la cata dice el THC exacto.',cond:()=>!S.items.analizador&&!S.envio.includes('Analizador de THC')},
+  {lbl:'Analizador de cannabinoides y terpenos',p:180,ch:3,item:'analizador',desc:'Medidor de bolsillo (1.15): THC, CBD y el terpeno principal de un lote, desde la mochila. Lo analizado se vende mejor en la calle y un 5 % más en los clubs, y la cata dice el THC exacto y el terpeno de cada aroma.',cond:()=>!S.items.analizador&&!S.envio.includes('Analizador de cannabinoides y terpenos')},
   {lbl:'Prensa de rosin',p:250,ch:3,item:'prensa',desc:'Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores.',cond:()=>!S.items.prensa},
 ];
 const SOBRES=[[1,1],[3,.95],[5,.9],[10,.85]],GRANEL=[50,.6];   // [semillas, precio por semilla relativo]

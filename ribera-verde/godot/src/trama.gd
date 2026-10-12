@@ -9,6 +9,8 @@ var endcard_on := false
 func shop_cond(it: Dictionary) -> bool:
 	if it.get("item") == "prensa":   # la prensa de rosin (1.10), una
 		return not S.items.get("prensa")
+	if it.get("item") == "analizador":   # el analizador de cannabinoides y terpenos (1.15), uno
+		return not S.items.get("analizador") and not S.envio.has(it.lbl)
 	if it.get("item") == "medidor":   # el medidor de pH y EC (1.11), uno
 		return not S.items.get("medidor") and not S.envio.has(it.lbl)
 	if it.get("aparato"):   # los aparatos de la sala (1.10), uno de cada; lo pedido por el móvil no se vuelve a vender
@@ -38,7 +40,7 @@ func shop_cond(it: Dictionary) -> bool:
 func precio_sobre(it: Dictionary, nf: Array) -> int:
 	return Datos.jsround(it.p * nf[0] * nf[1])
 
-func comprar_semillas(it: Dictionary) -> void:
+func comprar_semillas(it: Dictionary) -> bool:
 	var l: Array = D.SOBRES.duplicate()
 	if S.ch >= 3:
 		l.append(D.GRANEL)
@@ -49,16 +51,17 @@ func comprar_semillas(it: Dictionary) -> void:
 	o.append("Nada")
 	var j: int = await ask("Semillas feminizadas de %s. ¿Cuántas?" % D.STRAINS[it.sid].n, o, "KIKO")
 	if j < 0 or j >= l.size():
-		return
+		return false
 	var e := precio_sobre(it, l[j])
 	if S.money < e:
 		sfx("bad")
 		await say("No te llega el dinero.", "KIKO")
-		return
+		return false
 	S.money -= e
 	sfx("coin")
 	add_seeds(it.sid, int(l[j][0]))
 	toast("Comprado: %d × %s" % [int(l[j][0]), D.STRAINS[it.sid].n], 1200)
+	return true
 
 # carpa comprada (en un sitio libre) o ampliada (mismo sitio): cada plaza conserva su planta y su maceta por (carpa, plaza)
 func comprar_carpa(t: String, ci: int) -> void:
@@ -90,7 +93,7 @@ func tienda_ok(T: Dictionary, it: Dictionary) -> bool:
 	return T.N != "ANE" or not (it.get("sid") or it.get("mueble") or it.get("aparato"))
 
 func precio_t(T: Dictionary, it: Dictionary) -> int:
-	return Datos.jsround(it.p * T.f)
+	return Datos.jsround(it.p * T.f * (.95 if T.N == "KIKO" and rel("kiko") >= D.REL.amigo else 1.0))   # 1.15: con confianza, Kiko hace un 5 %
 
 func shop(T: Dictionary = {}) -> void:
 	if T.is_empty():
@@ -124,7 +127,8 @@ func shop(T: Dictionary = {}) -> void:
 			break
 		var it: Dictionary = list[i]
 		if it.get("sid"):
-			await comprar_semillas(it)
+			if await comprar_semillas(it) and T.N == "KIKO":
+				confia("kiko", 1)
 			await check_story()
 			continue
 		var p := precio_t(T, it)
@@ -134,6 +138,8 @@ func shop(T: Dictionary = {}) -> void:
 			continue
 		S.money -= p
 		sfx("coin")
+		if T.N == "KIKO":
+			confia("kiko", 1)
 		await entregar(it, T.N)
 		await check_story()
 	await say("Ten cuidado ahí fuera.", T.N)
@@ -294,6 +300,7 @@ func talk_txaro():
 			return
 		use_buds(li[i2][0], 10)
 		S.rep += 5
+		confia("txaro", 10)
 		await say("Toma, las últimas de mi Paco. Las trajo de Chitral, en las montañas de Pakistán.", N)
 		add_seeds("chitral", 3)
 		await got("3 semillas de CHITRAL KUSH")
@@ -314,6 +321,7 @@ func talk_txaro():
 		await say("No pasa nada. Aquí estaré.", N)
 		return
 	use_buds(lots[i][0], 5)
+	confia("txaro", 10)
 	await say("Gracias. Toma: las trajo mi Paco de Pakistán en el setenta y seis. Nunca supe qué hacer con ellas.", N)
 	add_seeds("hindu", 2)
 	await got("2 semillas de HINDU KUSH")
@@ -361,6 +369,7 @@ func talk_inaki():
 	S.heat = min(100, S.heat + 3)
 	S.iDay = S.day
 	S.rep += 2
+	confia("inaki", 1)
 	sfx("coin")
 	if not S.flags.get("inaki"):
 		S.flags.inaki = true
@@ -396,7 +405,7 @@ func venta_mayor(N: String) -> void:
 		return
 	var k: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
-	var pg := Datos.jsround(precio_mayor(b.thc) * 100) / 100.0
+	var pg := Datos.jsround(precio_mayor(b.thc) * (1.05 if rel("inaki") >= D.REL.amigo else 1.0) * 100) / 100.0   # 1.15: con confianza, un 5 % más
 	var tope := mini(int(floor(b.g)), mayor_dia())
 	var ops := []
 	for g in [100, 250, 500, 1000, 2000, 5000, 10000]:
@@ -418,6 +427,7 @@ func venta_mayor(N: String) -> void:
 	S.mDay = S.day
 	S.heat = min(100, S.heat + 2 + g / 100.0)   # 1.10: antes, por cada 250 g
 	S.rep += 1
+	confia("inaki", 1)
 	sfx("coin")
 	await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})
 	toast("+%s · %s al por mayor" % [Datos.eur(e), _kg(g)], 1600)
@@ -1233,7 +1243,7 @@ func menu_genoteca(i0: int) -> int:
 		var s: Dictionary = D.STRAINS[k]
 		var nn := "%02d" % (j + 1)
 		if S.disc.get(k):
-			items.append({"label": "%s %s" % [nn, s.n], "right": Datos.pct(s.thc) + "%", "sw": s.c, "ic": ic_cog(k), "desc": strain_line(k) + (("\n" + s.h) if s.get("h") else "")})
+			items.append({"label": "%s %s" % [nn, s.n], "right": Datos.pct(s.thc) + "%", "sw": s.c, "ic": ic_cog(k), "desc": strain_line(k) + (("\n" + s.h) if s.get("h") else "") + (("\nCata: " + S.catas[k]) if S.catas.has(k) else "")})
 		else:
 			items.append({"label": nn + " ??????", "desc": "Sin descubrir."})
 	var cust := []
@@ -1294,7 +1304,7 @@ func mochila() -> void:
 		for k in S.buds:
 			var b: Dictionary = S.buds[k]
 			rows.append({"label": lot_nombre(k), "right": "%d g · %s%%" % [int(floor(b.g)), Datos.pct(b.thc)], "sw": strain(lot_sid(k)).c, "ic": ic_cog(lot_sid(k)),
-				"desc": ("Cogollos de un fenotipo estrella, en lote aparte.\n" if k.ends_with("*") else "Cogollos listos para vender.\n") + strain(lot_sid(k)).o})
+				"desc": ("Cogollos de un fenotipo estrella, en lote aparte.\n" if k.ends_with("*") else "Cogollos listos para vender.\n") + ((S.catas[lot_sid(k)] + "\n") if S.catas.has(lot_sid(k)) else "") + strain(lot_sid(k)).o + "\nPulsa A para catarlo" + (" o analizarlo." if S.items.get("analizador") else "."), "k": "b", "key": k})
 		for k in S.rosin:
 			var b: Dictionary = S.rosin[k]
 			rows.append({"label": "Rosin · " + lot_nombre(k), "right": "%s g · %s%%" % [Datos.coma(b.g), Datos.pct(b.thc)], "sw": "#d89a18", "ic": ic_cog(lot_sid(k)),
@@ -1314,6 +1324,8 @@ func mochila() -> void:
 				sfx("bump")
 		elif rows[i].get("k") == "e":
 			await esqueje_accion(rows[i].e, S.esquejes)
+		elif rows[i].get("k") == "b":   # la cata y el análisis (1.15)
+			await lote_accion(rows[i].key)
 		elif rows[i].get("k") == "s":   # tirar semillas (1.11)
 			var sid: String = rows[i].sid
 			var ns: int = int(S.seeds[sid])
@@ -2090,7 +2102,7 @@ func movil_menu():
 		var ops := ["Llamar"]
 		if S.flags.get("kiko1"):
 			ops.append("Pedir a Kiko")
-		ops.append_array(["Mensajes", "Tienda online", "Colgar"])
+		ops.append_array(["Mensajes", "Gente", "Tienda online", "Colgar"])
 		var ns: int = S.sms.size()
 		var oi: int = await ask("MÓVIL · día %s, %s%s" % [n(S.day), reloj_txt(), (" · %d mensaje%s" % [ns, "s" if ns > 1 else ""]) if ns else ""], ops)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
@@ -2103,6 +2115,8 @@ func movil_menu():
 			await pedir_kiko()
 		elif op == "Tienda online":
 			await tienda_online()
+		elif op == "Gente":   # 1.15
+			await gente()
 		else:
 			await mensajes()
 
@@ -2136,7 +2150,7 @@ func llamar() -> bool:
 		"inaki":
 			await talk("IÑAKI", ["Ahora estoy en la mar. A la vuelta hablamos." if S.ch < 3 else ("Hoy ya he cargado. Mañana sale otro barco." if S.mDay == S.day else "Al por mayor, de 100 g para arriba y hasta %s por carga. Pásate por el muelle." % _kg(mayor_dia()))])
 			return false
-	return await llamar_fijo(c.f)
+	return await fijo_menu(c.f)   # 1.15: que venga, un regalo o que venda para ti
 
 func llamar_fijo(f: Dictionary) -> bool:
 	if f.dia == S.day:
@@ -2154,7 +2168,7 @@ func llamar_fijo(f: Dictionary) -> bool:
 	await say("%s: «Vale, voy para allá»." % f.n)
 	advance_time(int(D.LLAMADA_MIN))
 	update_hud()
-	await talk_client({"id": "tel-" + f.id, "fijo": true, "n": f.n.to_upper(), "map": S.map, "x": P.x, "y": P.y, "type": f.t, "want": ri(int(ct.g[0]), int(ct.g[1])),
+	await talk_client({"id": "tel-" + f.id, "fijo": true, "fid": f.id, "n": f.n.to_upper(), "map": S.map, "x": P.x, "y": P.y, "type": f.t, "want": ri(int(ct.g[0]), int(ct.g[1])),
 		"minThc": mini(24, 15 + int(S.ch)) if f.t == "pij" else 0})
 	return true
 
@@ -2604,10 +2618,16 @@ func vencer_encargo_club() -> void:
 # la cata (desde la mochila) y el analizador de THC
 func nota_cata(sid: String, thc: float) -> String:
 	var ind := Datos.ind_de(S, sid)
-	var a: String = D.AROMAS[Datos.hash_str(sid) % D.AROMAS.size()]
+	var a: String = aroma_de(sid)
 	var e := "relaja y pesa" if ind >= 65 else ("sube y despeja" if ind <= 35 else "equilibrado")
 	var p: String = (Datos.pct(thc) + " % de THC") if S.items.get("analizador") else ("floja" if thc < 12 else ("media" if thc < 18 else ("fuerte" if thc < 24 else "muy fuerte")))
-	return "Aroma %s · %s · %s" % [a, e, p]
+	return "Aroma %s%s · %s · %s" % [a, (" (" + D.TERPENOS[a] + ")") if S.items.get("analizador") else "", e, p]
+
+func aroma_de(sid: String) -> String:
+	return D.AROMAS[Datos.hash_str(sid) % D.AROMAS.size()]
+
+func cbd_de(sid: String) -> float:   # CBD del 0,2 al 1 % según el % índica
+	return Datos.jsround(20 + Datos.ind_de(S, sid) * 8) / 100.0
 
 func catar(k: String) -> void:
 	var b = S.buds.get(k)
@@ -2629,7 +2649,8 @@ func analizar(k: String) -> void:
 		return
 	b.ana = true
 	sfx("get")
-	await say("Analizado: %s, %s %% de THC. Lo que va con análisis se vende mejor." % [lot_nombre(k), Datos.pct(b.thc)])
+	var sid := lot_sid(k)
+	await say("Analizado: %s · THC %s %% · CBD %s %% · terpeno principal, %s. Lo que va con análisis se vende mejor." % [lot_nombre(k), Datos.pct(b.thc), Datos.pct(cbd_de(sid)), D.TERPENOS[aroma_de(sid)]])
 
 func lote_accion(k: String) -> void:
 	var b: Dictionary = S.buds[k]

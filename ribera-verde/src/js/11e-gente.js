@@ -94,7 +94,7 @@ async function talkBegona(){
 // la Genoteca) y encargos de semillas (10 de una variedad, en 7 días; las de receta pagan más). Un encargo a la vez
 const CLUBS={puerto:{n:'CLUB ITSASO',map:'puerto',x:10,y:8,ch:3,cuota:30,sid:['limon','cheese']},valde:{n:'CLUB LA FUNDICIÓN',map:'valdehierro',x:12,y:8,ch:3,cuota:30,sid:['txoko','mango']},
   ibar:{n:'CLUB KALEA',map:'ibarbide',x:6,y:18,ch:4,cuota:50,sid:['kali','chemdawg']},ens:{n:'CLUB ENSANCHE',map:'ensanche',x:12,y:9,ch:4,cuota:50,sid:['niebla','calorange']}};
-const CLUB={g:[50,100,200],compra:10,compraF:1.2,calor:1,enc:{n:10,dias:7,f:3,receta:80}};
+const CLUB={g:[50,100,200],compra:10,compraF:1.2,calor:1,enc:{n:10,dias:7,f:1.2,receta:80}};
 const precioClub=thc=>3+thc*.15;
 // el encargado de cada club, en la puerta, desde su capítulo
 Object.keys(CLUBS).forEach((k,i)=>{const C=CLUBS[k];NPCDEF.push({id:'club_'+k,map:C.map,x:C.x,y:C.y,dir:'down',look:i%2?'portera':'portero',cond:()=>S.ch>=C.ch,talk:()=>talkClub(k)});});
@@ -148,14 +148,17 @@ function vencerEncargoClub(){
 // potencia, exacta con el analizador de THC) en la Genoteca, y el lote catado se vende algo mejor; el analizado (el aparato del
 // growshop, uno), mejor aún y un 5 % más en los clubs
 const CATA={g:.5,min:30},AROMAS=['cítrico','a pino','terroso','dulce','a especias','a gasóleo','afrutado','a incienso'];
-function notaCata(sid,thc){const ind=indDe(sid),a=AROMAS[hashStr(sid)%AROMAS.length],e=ind>=65?'relaja y pesa':ind<=35?'sube y despeja':'equilibrado';
-  return `Aroma ${a} · ${e} · ${S.items.analizador?pct(thc)+' % de THC':thc<12?'floja':thc<18?'media':thc<24?'fuerte':'muy fuerte'}`;}
+// el analizador de cannabinoides y terpenos: THC, CBD (del 0,2 al 1 % según el % índica) y el terpeno principal, por el aroma
+const TERPENOS={'cítrico':'limoneno','a pino':'pineno','terroso':'mirceno','dulce':'linalool','a especias':'cariofileno','a gasóleo':'mirceno y cariofileno','afrutado':'mirceno','a incienso':'humuleno'};
+const aromaDe=sid=>AROMAS[hashStr(sid)%AROMAS.length],cbdDe=sid=>Math.round(20+indDe(sid)*8)/100;
+function notaCata(sid,thc){const ind=indDe(sid),a=aromaDe(sid),e=ind>=65?'relaja y pesa':ind<=35?'sube y despeja':'equilibrado';
+  return `Aroma ${a}${S.items.analizador?' ('+TERPENOS[a]+')':''} · ${e} · ${S.items.analizador?pct(thc)+' % de THC':thc<12?'floja':thc<18?'media':thc<24?'fuerte':'muy fuerte'}`;}
 async function catar(k){
   const b=S.buds[k];if(!b||b.g<CATA.g)return;
   const sid=lotSid(k),thc=b.thc;useBuds(k,CATA.g);if(S.buds[k])S.buds[k].cata=true;S.catas[sid]=notaCata(sid,thc);advanceTime(CATA.min);updateHUD();
   await say(`Catas ${lotNombre(k)}: ${S.catas[sid]}.`);
 }
-async function analizar(k){const b=S.buds[k];if(!b||!S.items.analizador)return;b.ana=true;sfx('get');await say(`Analizado: ${lotNombre(k)}, ${pct(b.thc)} % de THC. Lo que va con análisis se vende mejor.`);}
+async function analizar(k){const b=S.buds[k];if(!b||!S.items.analizador)return;const sid=lotSid(k);b.ana=true;sfx('get');await say(`Analizado: ${lotNombre(k)} · THC ${pct(b.thc)} % · CBD ${pct(cbdDe(sid))} % · terpeno principal, ${TERPENOS[aromaDe(sid)]}. Lo que va con análisis se vende mejor.`);}
 async function loteAccion(k){
   const b=S.buds[k],ops=[`Catar ${coma(CATA.g)} g`].concat(S.items.analizador&&!b.ana?['Analizar']:[],['Nada']);
   const op=ops[await ask(`${lotNombre(k)}: ${Math.floor(b.g)} g · ${pct(b.thc)} %${b.cata?' · catado':''}${b.ana?' · analizado':''}`,ops)];

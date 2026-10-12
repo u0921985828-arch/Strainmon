@@ -146,6 +146,8 @@ func new_day() -> void:
 	instalar_caja()
 	llega_mueble()
 	vencer_encargo()
+	curro_dia()   # la gente (1.15)
+	vencer_encargo_club()
 	if S.due > 0 and S.day > S.deadline:   # 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
 		queue("penalty", penalty_event)
 	elif S.due > 0 and (S.deadline - S.day == 3 or S.deadline == S.day):   # 1.11: a 3 días y el último

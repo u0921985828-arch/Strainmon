@@ -242,6 +242,8 @@ func add_buds(k: String, g: float, thc: float) -> void:
 		var b: Dictionary = S.buds[k]
 		b.thc = (b.thc * b.g + thc * g) / (b.g + g)
 		b.g += g
+		b.erase("cata")   # 1.15: lo que entra nuevo no está catado ni analizado
+		b.erase("ana")
 	else:
 		S.buds[k] = {"g": g, "thc": thc}
 	discover(lot_sid(k))
@@ -748,7 +750,7 @@ func interact() -> void:
 			else:
 				await npc_talk(e.def)
 				if not e.get("pat"):
-					saludo(e.id))
+					saludo(e.id.substr(5) if e.id.begins_with("club_") else e.id))
 		return
 	var it = item_at(tx, ty)
 	if it:

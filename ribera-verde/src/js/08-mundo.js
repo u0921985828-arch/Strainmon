@@ -29,7 +29,7 @@ function discover(sid){if(!S.disc[sid]){S.disc[sid]=true;toast(`<small>NUEVA EN 
 function addSeeds(sid,n){S.seeds[sid]=(S.seeds[sid]||0)+n;discover(sid);}
 // cogollos por lotes: clave = variedad, o variedad + '*' para lo de un fenotipo estrella (se vende y se presenta aparte)
 const lotSid=k=>k.replace(/\*$/,''),lotNombre=k=>getStrain(lotSid(k)).n+(k.endsWith('*')?' ★':'');
-function addBuds(k,g,thc){const b=S.buds[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;}else S.buds[k]={g,thc};discover(lotSid(k));}
+function addBuds(k,g,thc){const b=S.buds[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;delete b.cata;delete b.ana;}else S.buds[k]={g,thc};discover(lotSid(k));}
 function useBuds(k,g){const b=S.buds[k];b.g-=g;if(b.g<.5)delete S.buds[k];}
 function budLots(min,minThc=0){return Object.entries(S.buds).filter(([k,b])=>b.g>=min&&b.thc>=minThc);}
 // rosin (1.10): lo que sale de prensar cogollos en la mesa (prensar, 09-cultivo), por lotes como ellos y al décimo de gramo
@@ -161,7 +161,7 @@ function interact(){
   const [dx,dy]=DV[P.dir],m=MAPS[S.map];let tx=P.x+dx,ty=P.y+dy;
   let e=entAt(tx,ty);
   if(!e&&m.o[ty]&&COUNTERS.has(m.o[ty][tx]))e=entAt(tx+dx,ty+dy);
-  if(e){run(async()=>{if(!e.moving)e.dir=OPP[P.dir];if(e.def.client)await talkClient(e.def.client);else{await e.def.talk(e);if(!e.pat)saludo(e.id);}});return;}
+  if(e){run(async()=>{if(!e.moving)e.dir=OPP[P.dir];if(e.def.client)await talkClient(e.def.client);else{await e.def.talk(e);if(!e.pat)saludo(e.id.startsWith('club_')?e.id.slice(5):e.id);}});return;}
   const it=itemAt(tx,ty);if(it){run(()=>pickItem(it));return;}
   run(()=>objectAction(tx,ty));
 }
