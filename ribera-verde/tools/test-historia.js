@@ -458,8 +458,8 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.rel.begona = REL.amigo; await run(talkBegona); R.jard = !!S.curro.jard;
     S.buds = {}; addBuds('ria', 200, 12); S.fijos = [{ id: 'cF', n: 'Asier', t: 'cur', dia: 0 }]; S.rel.cF = REL.socio; want(['^Que venda', '^Skunk', '^50 g']); await run(() => fijoMenu(S.fijos[0]));
     R.vend = S.curro.vend.length ? [S.curro.vend[0].id, S.curro.vend[0].g].join() : ''; R.g = S.buds.ria.g;
-    S.pots.forEach(p => { if (p) p.water = 20; }); R.m = S.money; R.sms = S.sms.length; newDay(); await idle(); R.agua = S.pots.filter(Boolean).every(p => p.water === 100);
-    const v = S.curro.vend[0]; R.gone = !v; R.v = v ? v.g : 0; R.e = v ? Math.round(precioCalle(12) * ZONAS.town.precio * (50 - v.g) * (1 - CURRO.vend.com)) : 0; R.dinero = S.money - (R.m - CURRO.jard.sueldo + R.e); R.sms = S.sms.length - R.sms; enterMap('home', 5, 5, 'up');
+    S.pots.forEach(p => { if (p) p.water = 20; }); R.m = S.money; R.luz = facturaLuz(); R.sms = S.sms.length; newDay(); await idle(); R.agua = S.pots.filter(Boolean).every(p => p.water === 100);
+    const v = S.curro.vend[0]; R.gone = !v; R.v = v ? v.g : 0; R.e = v ? Math.round(precioCalle(12) * ZONAS.town.precio * (50 - v.g) * (1 - CURRO.vend.com)) : 0; R.dinero = S.money - (R.m - CURRO.jard.sueldo + R.e - R.luz); R.sms = S.sms.length - R.sms; enterMap('home', 5, 5, 'up');
   }, () => R.patxi === 1 && R.patxi2 === 1 && R.jard && R.vend === 'cF,50' && R.g === 150 && R.agua && (R.gone || R.v < 50) && R.dinero === 0 && R.sms >= 1 || R);
   await step('Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas', ['^Hindu Kush'], async () => {
     S.ch = 5; S.flags.txaro = true; S.flags.txaro2 = false; S.map = 'txaro'; buildEnts(); window.R = { ent: ents.filter(e => e.id === 'txaro').map(e => e.x + ',' + e.y).join() };

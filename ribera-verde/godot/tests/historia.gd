@@ -1427,6 +1427,7 @@ func _pasos() -> void:
 			if p:
 				p.water = 20
 		R.m = J.S.money
+		R.luz = J.factura_luz()
 		R.sms = J.S.sms.size()
 		J.new_day()
 		await idle()
@@ -1435,7 +1436,7 @@ func _pasos() -> void:
 		R.gone = v == null
 		R.v = v.g if v else 0
 		R.e = Datos.jsround(J.precio_calle(12) * D.ZONAS.town.precio * (50 - v.g) * (1 - D.CURRO.vend.com)) if v else 0
-		R.dinero = J.S.money - (R.m - int(D.CURRO.jard.sueldo) + R.e)
+		R.dinero = J.S.money - (R.m - int(D.CURRO.jard.sueldo) + R.e - R.luz)
 		R.sms = J.S.sms.size() - R.sms
 		J.enter_map("home", 5, 5, "up"),
 		func(): return chk(R.patxi == 1 and R.patxi2 == 1 and R.jard and R.vend == "cF,50" and R.g == 150 and R.agua and (R.gone or R.v < 50) and R.dinero == 0 and R.sms >= 1, R))
