@@ -1310,6 +1310,23 @@ func _pasos() -> void:
 		func(): return chk(R.lonja == Datos.jsround(250 * Datos.jsround(J.precio_mayor(12) * 1.15 * 100) / 100.0) and R.g == 50 and R.otra == 0 and R.dia.size() == 3
 			and R.dia[0] != R.dia[1] and R.dia[1] != R.dia[2] and R.dia[0] != R.dia[2]
 			and R.chat == R.p and R.v == R.lbl and R.chat2 == 0 and R.s == 3 and R.g2 == 30 and si(R.d) and J.S.lonja == J.S.day and J.S.trueque == J.S.day, R))
+	step("Kale Zaharra (1.14): por el callejón de detrás de GROW IBARBIDE, una plazuela sin patrullas (más ladrones, el gramo ×1,3) con algo en el arbusto; se vuelve por el mismo callejón", [], func():
+		J.S.ch = 5
+		R = {}
+		J.enter_map("ibarbide", 19, 1, "up")
+		await run(func(): await J.warp(J.MAPS.ibarbide.doors["19,0"]))
+		R.en = "%s,%d,%d" % [J.S.map, J.P.x, J.P.y]
+		R.m = J.S.money
+		await run(func(): await J.object_action(21, 10))
+		R.m = J.S.money - R.m
+		var d: Dictionary = J.MAPS.callejon.doors["11,17"]
+		R.vuelta = "%s,%d,%d" % [d.to, d.x, d.y]
+		R.z = "%d/%d,%s,%s,%s" % [D.PATRULLAS.callejon[0], D.PATRULLAS.callejon[1], str(D.ZONAS.callejon.lad), str(D.ZONAS.callejon.precio), "true" if D.CLIENT_TILES.callejon.size() >= 20 else "false"]
+		J.S.clientsDay = 0
+		J.spawn_clients()
+		R.c = J.S.clients.filter(func(c): return c.map == "callejon").size()
+		J.enter_map("home", 5, 5, "up"),
+		func(): return chk(R.en == "callejon,10,16" and R.m == 120 and R.vuelta == "ibarbide,20,1" and R.z == "0/0,1.6,1.3,true" and R.c == 2, R))
 	step("Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas", ["^Hindu Kush"], func():
 		J.S.ch = 5
 		J.S.flags.txaro = true

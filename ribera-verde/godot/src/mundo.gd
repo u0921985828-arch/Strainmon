@@ -481,6 +481,9 @@ func item_give(id: String) -> void:
 		"h_alto":
 			S.money += 80
 			await got("80 € en un sobre arrugado")
+		"h_kale":   # la Kale Zaharra (1.14)
+			S.money += 120
+			await got("120 € en una riñonera abandonada")
 
 func item_at(x: int, y: int):
 	for it in D.ITEMS:
@@ -839,7 +842,7 @@ func object_action(x: int, y: int) -> void:
 			sfx("get")
 			await say("La gramola suena: rock vasco de los 80.")
 		"crate":
-			await say("Cajas de madera de los astilleros, podridas por la humedad." if S.map == "astilleros" else ("Cajas de piezas de la fundición, oxidadas." if S.map == "valdehierro" else "Cajas de pescado vacías del puerto."))
+			await say("Cajas de madera de los astilleros, podridas por la humedad." if S.map == "astilleros" else ("Cajas de piezas de la fundición, oxidadas." if S.map == "valdehierro" else ("Cajas de fruta vacías. La frutería de la esquina cerró en verano." if S.map == "callejon" else "Cajas de pescado vacías del puerto.")))
 
 # ---------- acciones y efectos del atlas (01b-arte accion, lanzarVfx) ----------
 func accion(nn: String, vf = null) -> void:
@@ -888,7 +891,7 @@ func spawn_clients() -> void:
 		zonas.append_array([["puerto", 2 + mas, ["tur", "tur", "cur", "est"]], ["valdehierro", 2 + mas, ["est", "cur", "cur"]], ["mendialde", 1, ["cur"]], ["errotabarri", 1, ["cur", "tur"]]])
 		if S.ch >= 4:   # la ciudad grande (1.14), con su línea
 			var m5 := 1 if S.ch >= 5 else 0
-			zonas.append_array([["ibarbide", 3 + m5, ["tur", "tur", "pij", "est"]], ["ensanche", 3 + m5, ["pij", "pij", "cur", "est"]]])
+			zonas.append_array([["ibarbide", 3 + m5, ["tur", "tur", "pij", "est"]], ["ensanche", 3 + m5, ["pij", "pij", "cur", "est"]], ["callejon", 2, ["est", "cur", "pij"]]])
 		var usado := {}
 		if S.ch >= 3 and S.items.get("prensa"):
 			for zx in [["town", 2], ["astilleros", 1], ["puerto", 1], ["valdehierro", 1]] + ([["ibarbide", 1], ["ensanche", 1]] if S.ch >= 4 else []):
@@ -914,7 +917,7 @@ func spawn_clients() -> void:
 				used["%d,%d" % [t[0], t[1]]] = true
 				var type: String = pick(zz[2])
 				var ct: Dictionary = D.CTYPES[type]
-				var id := "c%d_%s%s%d" % [S.day, pre, {"town": "", "alto": "b", "astilleros": "s", "puerto": "p", "valdehierro": "v", "mendialde": "m", "errotabarri": "e", "ibarbide": "i", "ensanche": "n"}[map_], i]
+				var id := "c%d_%s%s%d" % [S.day, pre, {"town": "", "alto": "b", "astilleros": "s", "puerto": "p", "valdehierro": "v", "mendialde": "m", "errotabarri": "e", "ibarbide": "i", "ensanche": "n", "callejon": "k"}[map_], i]
 				var want := ri(int(ct.g[0]), int(ct.g[1]))
 				var mt := 0
 				if type == "pij":

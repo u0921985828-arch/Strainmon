@@ -65,7 +65,8 @@ const REAL = {
       errotabarri: [['RÍO', 16, 0, 18, 23], ['PISTA', 0, 11, 35, 12], ['HUERTA', 3, 15, 10, 19], ['MOLINO', 22, 15, 25, 18]],
       // la ciudad grande (1.14)
       ibarbide: [['CASCO VIEJO', 1, 2, 42, 9], ['PLAZA NUEVA', 14, 10, 29, 19], ['AVENIDA DE LA ESTACIÓN', 0, 20, 43, 23], ['PARQUE', 1, 24, 42, 28]],
-      ensanche: [['BLOQUES', 1, 2, 44, 8], ['AVENIDA', 0, 9, 45, 12], ['PARQUE LINEAL', 1, 13, 44, 20]] };
+      ensanche: [['BLOQUES', 1, 2, 44, 8], ['AVENIDA', 0, 9, 45, 12], ['PARQUE LINEAL', 1, 13, 44, 20]],
+      callejon: [['PLAZUELA', 1, 8, 20, 11], ['CALLEJÓN', 10, 12, 11, 17]] };
     const FUERA = n => !!CLIENT_TILES[n];   // los mapas de fuera (barrio, barrio alto, astilleros y la comarca)
 
     mode = 'plano'; S = newState(); S.ch = 6; S.protect = false; S.flags = { letter: 1, kiko1: 1, harvest1: 1, metB: 1, lab: 1 }; S.min = 12 * 60; S.clients = [];
@@ -136,7 +137,7 @@ const REAL = {
     anotar('alto', 'BARRIO ALTO'); anotar('astilleros', 'ASTILLEROS'); anotar('txaro', 'CASA DE TXARO'); anotar('comisaria', 'COMISARÍA DEL BARRIO ALTO'); anotar('almacen', 'ALMACÉN DE LOS ASTILLEROS');
     anotar('mendialde', 'MENDIALDE · el pueblo del prólogo'); anotar('casa-ama', 'CASERÍO DE LA FAMILIA (MENDIALDE)'); anotar('puerto', 'PUERTO VIEJO');
     anotar('valdehierro', 'VALDEHIERRO'); anotar('errotabarri', 'ERROTABARRI');
-    anotar('ibarbide', 'IBARBIDE · Casco Viejo (la ciudad grande)'); anotar('ensanche', 'IBARBIDE · Ensanche'); anotar('growcity', 'GROW IBARBIDE');
+    anotar('ibarbide', 'IBARBIDE · Casco Viejo (la ciudad grande)'); anotar('ensanche', 'IBARBIDE · Ensanche'); anotar('growcity', 'GROW IBARBIDE'); anotar('callejon', 'IBARBIDE · Kale Zaharra (detrás del growshop, sin patrullas)');
 
     // ---------- hoja de escala ----------
     function caja(c) { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;

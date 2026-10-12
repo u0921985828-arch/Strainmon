@@ -277,7 +277,8 @@ ${legend}
     mendialde: 'Mendialde (pueblo de caseríos, de donde eres; el prólogo) — 48 × 34', 'casa-ama': 'Caserío de la familia, en Mendialde — 10 × 8',
     puerto: 'Puerto Viejo (ciudad pequeña, pesquera) — 40 × 24', valdehierro: 'Valdehierro (ciudad pequeña, del hierro) — 40 × 24',
     errotabarri: 'Errotabarri (pueblo del molino) — 36 × 24', ibarbide: 'Ibarbide · Casco Viejo (la ciudad grande, desde el capítulo 4) — 44 × 30',
-    ensanche: 'Ibarbide · Ensanche (al este del Casco Viejo, por la avenida) — 46 × 22', growcity: 'GROW IBARBIDE (tienda de Ane, en el Casco Viejo) — 10 × 8' };
+    ensanche: 'Ibarbide · Ensanche (al este del Casco Viejo, por la avenida) — 46 × 22', growcity: 'GROW IBARBIDE (tienda de Ane, en el Casco Viejo) — 10 × 8',
+    callejon: 'Ibarbide · Kale Zaharra (la plazuela de detrás del growshop, por el callejón; sin patrullas) — 23 × 18' };
   for (const [k, mp] of Object.entries(D.maps)) {
     const pad = String(mp.w - 1).length;
     let header = '    ' + Array.from({ length: mp.w }, (_, x) => x % 10 === 0 ? String(x / 10 % 10) : ' ').join('') + '\n    ' + Array.from({ length: mp.w }, (_, x) => x % 10).join('');

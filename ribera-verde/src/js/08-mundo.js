@@ -88,6 +88,7 @@ const ITEMS=[
   {id:'h_ins',map:'town',x:10,y:24,hidden:1,give:async()=>{S.items.insect+=1;await got('1 tratamiento de INSECTICIDA');}},
   {id:'i_ast',map:'astilleros',x:4,y:5,give:async()=>{S.items.spray+=2;await got('2 × SPRAY DE PIMIENTA');}},
   {id:'h_alto',map:'alto',x:2,y:10,hidden:1,give:async()=>{S.money+=80;await got('80 € en un sobre arrugado');}},
+  {id:'h_kale',map:'callejon',x:21,y:10,hidden:1,give:async()=>{S.money+=120;await got('120 € en una riñonera abandonada');}},   // la Kale Zaharra (1.14)
 ];
 const itemAt=(x,y)=>ITEMS.find(it=>!it.hidden&&it.map===S.map&&it.x===x&&it.y===y&&!S.taken[it.id]);
 async function pickItem(it){S.taken[it.id]=true;await it.give();}
@@ -173,6 +174,7 @@ const SIGNS={'town:9,8':'Calle Ribera, 3.\nPiso de la tía Maite.','town:13,8':'
   'errotabarri:2,10':'ERROTABARRI\nEl pueblo del molino.','errotabarri:26,18':'ERROTA ZAHARRA\nMolino harinero del siglo XVIII. Semillas viejas: pregunta por Andoni.',
   'puerto:25,15':'LONJA DE PUERTO VIEJO\nSubasta de madrugada. Cargas para los barcos de fuera.',
   'ibarbide:13,9':'GROW IBARBIDE\nTodo para el cultivo, a precio de ciudad.','ibarbide:12,19':'PLAZA NUEVA\nCasco Viejo de Ibarbide.','ibarbide:41,20':'ENSANCHE →\nAvenida de la Estación.',
+  'ibarbide:21,8':'↑ KALE ZAHARRA\nPor el callejón.','callejon:8,10':'KALE ZAHARRA\nLa calle vieja. Aquí no entra la patrulla.',
   'ensanche:2,12':'IBARBIDE · ENSANCHE\n← Casco Viejo y estación de autobuses.'};
 async function objectAction(x,y){
   const m=MAPS[S.map],o=m.o[y]&&m.o[y][x];
@@ -223,7 +225,7 @@ async function objectAction(x,y){
   if(o==='display')return say('Sobres de semillas de bancos de todo el mundo, ordenados por tipo.');
   if(o==='bottles')return say('Txakoli, pacharán y orujo casero.');
   if(o==='jukebox'){sfx('get');return say('La gramola suena: rock vasco de los 80.');}
-  if(o==='crate')return say(S.map==='astilleros'?'Cajas de madera de los astilleros, podridas por la humedad.':S.map==='valdehierro'?'Cajas de piezas de la fundición, oxidadas.':'Cajas de pescado vacías del puerto.');
+  if(o==='crate')return say(S.map==='astilleros'?'Cajas de madera de los astilleros, podridas por la humedad.':S.map==='valdehierro'?'Cajas de piezas de la fundición, oxidadas.':S.map==='callejon'?'Cajas de fruta vacías. La frutería de la esquina cerró en verano.':'Cajas de pescado vacías del puerto.');
 }
 // el autobús de la comarca (1.10): en el poste de la parada, a dónde, cuánto y cuánto tarda; el reloj corre lo que dura el viaje.
 // El primer viaje (del pueblo al piso: S.flags.llegada === false) lo paga ama y solo va a Ribera Verde. Fuera de horario, esperar

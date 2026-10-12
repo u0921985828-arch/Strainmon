@@ -89,6 +89,9 @@ const CANCIONES={
     mel:'g5 . bb5 . c6 - bb5 . | a5 . g5 . f5 - d5 . | g5 . bb5 . d6 - c6 . | a5 - - . f#5 - d5 . | eb5 . g5 . bb5 - g5 . | f5 . a5 . c6 - a5 . | bb5 - a5 g5 . d5 g5 . | f#5 - - - d5 . . .',bat:'k . h k s . h h'},
   ensanche:{bpm:128,mo:'pulse12',ao:'pulse25',ap:'0 1 2 1',bp:'R R 8 R',ch:'C C Am Am F F G G C C Am Am F G C C',
     mel:'e5 . g5 . c6 . g5 . | e5 - d5 . c5 - . . | a4 . c5 . e5 . a5 . | g5 - e5 . c5 - . . | f5 . a5 . c6 . a5 . | g5 . b5 . d6 - b5 . | c6 . b5 . a5 . g5 . | e5 - d5 - c5 - . .',bat:'k h s h k h s h'},
+  // la Kale Zaharra (1.14): bajo y pasos, en la menor, sin batería fuerte
+  callejon:{bpm:84,mo:'triangle',ao:'pulse12',ap:'0 . . 1',bp:'R . . R',ch:'Am Am Am Am F F E E Am Am Dm Dm F E Am Am',
+    mel:'e5 - - . c5 . . . | d5 - - . b4 . . . | e5 - . a5 - . g5 . | f5 - - . e5 - . . | . . c5 . e5 . a5 - | g#5 - - . e5 - . . | a5 - g5 . f5 . e5 . | d5 - c5 . b4 - - .',bat:'. . h . . . h h'},
   // interiores: la tienda (reggae), el bar (tango) y la comisaría (tensa)
   shop:{bpm:150,ap:'. . 1 .',ao:'pulse12',ch:'G G C C G G D D G G C C Em Em D D',
     mel:'. . b4 d5 . . g5 . | e5 - - . c5 . e5 . | d5 . b4 . g4 - - . | . . a4 c5 d5 - . . | . . b5 . a5 . g5 . | e5 - g5 - e5 . c5 . | b4 - - e5 g5 - . . | f#5 - - d5 - . . .',bat:'. h . h s h . h'},

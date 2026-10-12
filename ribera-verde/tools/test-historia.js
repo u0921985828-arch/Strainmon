@@ -431,6 +431,12 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     R.d = S.disc[R.k]; R.n = ['nerea', 'bixente', 'andoni'].join(); enterMap('home', 5, 5, 'up');
   }, () => R.lonja === Math.round(250 * Math.round(precioMayor(12) * 1.15 * 100) / 100) && R.g === 50 && R.otra === 0 && R.dia.length === 3 && new Set(R.dia).size === 3
     && R.chat === R.p && R.v === R.lbl && R.chat2 === 0 && R.s === 3 && R.g2 === 30 && R.d && S.lonja === S.day && S.trueque === S.day || R);
+  await step('Kale Zaharra (1.14): por el callejón de detrás de GROW IBARBIDE, una plazuela sin patrullas (más ladrones, el gramo ×1,3) con algo en el arbusto; se vuelve por el mismo callejón', [], async () => {
+    S.ch = 5; window.R = {}; enterMap('ibarbide', 19, 1, 'up'); await run(() => warp(MAPS.ibarbide.doors['19,0'])); R.en = [S.map, P.x, P.y].join();
+    R.m = S.money; await run(() => objectAction(21, 10)); R.m = S.money - R.m; const d = MAPS.callejon.doors['11,17']; R.vuelta = [d.to, d.x, d.y].join();
+    R.z = [PATRULLAS.callejon.join('/'), ZONAS.callejon.lad, ZONAS.callejon.precio, CLIENT_TILES.callejon.length >= 20].join(); S.clientsDay = 0; spawnClients();
+    R.c = S.clients.filter(c => c.map === 'callejon').length; enterMap('home', 5, 5, 'up');
+  }, () => R.en === 'callejon,10,16' && R.m === 120 && R.vuelta === 'ibarbide,20,1' && R.z === '0/0,1.6,1.3,true' && R.c === 2 || R);
   await step('Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas', ['^Hindu Kush'], async () => {
     S.ch = 5; S.flags.txaro = true; S.flags.txaro2 = false; S.map = 'txaro'; buildEnts(); window.R = { ent: ents.filter(e => e.id === 'txaro').map(e => e.x + ',' + e.y).join() };
     S.buds = {}; addBuds('ria', 20, 12); addBuds('hindu', 15, 18); addBuds('thai', 20, 16); R.ch = S.seeds.chitral || 0; R.boc = S.items.bocata; R.rep = S.rep;

@@ -3,7 +3,7 @@
    ========================================================= */
 // cuántos agentes andan por cada mapa de fuera, [de día, de noche], desde el capítulo 2: el barrio 1–2 y el barrio alto 2, las
 // ciudades pequeñas y los astilleros 1, los pueblos ninguno. No se guardan: salen al entrar en el mapa
-const PATRULLAS={town:[1,2],alto:[2,2],astilleros:[1,1],puerto:[1,1],valdehierro:[1,1],mendialde:[0,0],errotabarri:[0,0],ibarbide:[2,2],ensanche:[2,3]};   // la ciudad grande (1.14): la que más
+const PATRULLAS={town:[1,2],alto:[2,2],astilleros:[1,1],puerto:[1,1],valdehierro:[1,1],mendialde:[0,0],errotabarri:[0,0],ibarbide:[2,2],ensanche:[2,3],callejon:[0,0]};   // la ciudad grande (1.14): la que más
 // la ronda: un paso cada paso[día, noche] ms; sigue recto 3 de cada 4 veces y cada 5–10 pasos se para 0,9–1,8 s a mirar (y a falta
 // de 0,6 s gira; fuera de la calle, vuelve a ella). Ve vista casillas hacia delante (cono: de lado, como mucho lo que tiene delante) y la de al lado, si nada alto
 // tapa (edificios, árboles, monte, setos, cajas). De noche no se ve por dónde mira (sigilo), pero la sospecha sube sube[1] veces
