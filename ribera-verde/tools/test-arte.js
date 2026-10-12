@@ -530,7 +530,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
   // ---------- ?arte=procedural ----------
   {
     const { page, errors } = await abrir(html, '?arte=procedural');
-    const ok = await page.evaluate(() => ARTE.ok === false && typeof ATLAS === 'object' && ATLAS !== null);
+    const ok = await page.evaluate(() => ARTE.ok === false && typeof ATLAS === 'object' && ATLAS !== null && Object.keys(MUEBLES).every(k => TILES[k] && TILES[k + '2']));   // los muebles de 2 casillas, también sin atlas
     await page.waitForTimeout(300);
     check('?arte=procedural ignora el atlas', ok && errors.length === 0, errors);
     await page.close();

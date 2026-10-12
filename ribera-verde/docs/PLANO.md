@@ -55,7 +55,7 @@ Patxi (21,21) e Iñaki (37,21).
 - Escondidos en arbustos: Acapulco Gold (2,26), 50 € (9,16) e insecticida (10,24).
 
 **Carpas del piso:** muebles sólidos que se usan con A desde la casilla de delante; dentro, la vista de carpa B.
-`home.png` sale con las tres montadas (armario 80, carpa 150 y carpa 120) y el salón amueblado.
+`home.png` sale con las tres montadas (armario 80, carpa 150 y carpa 120), el salón amueblado y el carro de esquejes (1.11) delante de las carpas.
 
 | Carpa | Real | En el piso | En la vista B | Plazas | Focos |
 |---|---|---|---|---|---|

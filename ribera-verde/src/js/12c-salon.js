@@ -2,14 +2,19 @@
    SALÓN (1.10): a la derecha del piso (x 12-17), vacío al llegar; los muebles se compran por internet (el ordenador de
    la tía, el PC gaming o el móvil) y llegan al día siguiente (newDay → llegaMueble), montados por montarCasa.
    Cada uno ocupa 2 casillas: k en (x, y) y k+'2' en (x+1, y), que no se pinta (arteObj) y hace lo mismo al tocarlo.
+   El carro de esquejes (1.11, grow: 1) va en medio del piso, delante de las carpas: lo vende Kiko en el growshop (no la tienda
+   online) y lo sube él al día siguiente. En su mesita, la tabla de corte: los esquejes del propagador se pinchan en las bandejas
+   (S.bandejas, CARRO en 09-cultivo) y se plantan desde ahí (plantar).
    ========================================================= */
 const MUEBLES={
   sofa:{n:'Sofá de 2 plazas',art:'el sofá',p:399,x:13,y:5,d:'Sofá de 180 cm, de tela azul, mirando a la tele. Para echar una cabezada sin meterte en la cama.'},
   tv:{n:'Tele de 43" con mueble',art:'la tele',p:449,x:13,y:2,d:'Smart TV de 43 pulgadas y un mueble bajo de 140 cm con hueco para la consola. Noticias y documentales.'},
-  gpc:{n:'PC gaming con mesa',art:'el PC gaming',p:1490,x:16,y:2,d:'Torre con gráfica, monitor de 27", teclado mecánico y mesa de 140 cm con LED. Para jugar, leer el foro de cultivo y comprar.'}};
+  gpc:{n:'PC gaming con mesa',art:'el PC gaming',p:1490,x:16,y:2,d:'Torre con gráfica, monitor de 27", teclado mecánico y mesa de 140 cm con LED. Para jugar, leer el foro de cultivo y comprar.'},
+  carro:{n:'Carro de esquejes',art:'el carro de esquejes',p:CARRO.p,x:8,y:5,grow:1,d:`Carro con ruedas, dos bandejas de ${CARRO.plazas} tacos tapadas bajo tubos T5 y una mesita con la tabla de corte.`}};
 const SEGUNDA=new Set(Object.keys(MUEBLES).map(k=>k+'2'));
 const muebleDe=o=>o&&(MUEBLES[o]?o:SEGUNDA.has(o)?o.slice(0,-1):null);
 const mueblesYa=()=>Object.keys(MUEBLES).filter(k=>S.muebles&&S.muebles[k]&&S.muebles[k]<=S.day);
+const carroYa=()=>mueblesYa().includes('carro');
 // el foro (consejos de cultivo de verdad), los documentales de la tele y las partidas: uno por hora del día, sin azar
 const FORO=['pH del agua de riego: entre 6 y 6,5 en tierra (en coco o hidro, 5,5-6). Fuera de ahí la planta no coge bien el abono.',
   'En floración, la humedad por debajo del 50 % y el aire moviéndose: el moho empieza por dentro del cogollo y no se ve hasta tarde.',
@@ -32,6 +37,7 @@ function noticia(){
   return 'Noticias: el tiempo. Nubes y claros en la costa y la ría en calma. Nada que contar en Ribera Verde.';
 }
 async function muebleAction(k){
+  if(k==='carro')return carroAction();
   if(k==='sofa'){
     const o=['Echar una cabezada (1 h)'].concat(mueblesYa().includes('tv')?['Ver la tele']:[],['Nada']);const c=o[await ask('Tu sofá. Todavía huele a nuevo.',o)];
     if(c==='Ver la tele')return muebleAction('tv');
@@ -52,7 +58,7 @@ async function muebleAction(k){
 async function tiendaOnline(){
   let i=0;
   for(;;){
-    const ks=Object.keys(MUEBLES),ya=mueblesYa();
+    const ks=Object.keys(MUEBLES).filter(k=>!MUEBLES[k].grow),ya=mueblesYa();
     const items=ks.map(k=>{const m=MUEBLES[k],en=ya.includes(k),pd=!en&&S.muebles&&S.muebles[k];
       return {label:m.n+(en?' · en casa':pd?' · pedido':''),right:eur(m.p),disabled:!!(en||pd),desc:m.d+(en?'':pd?'\nLlega mañana: te lo suben al salón.':'\nLlega mañana y te lo suben al salón.')};});
     items.push({label:'Salir',desc:'Pagas con lo que llevas y, si no llega, con la caja fuerte.'});
@@ -70,5 +76,22 @@ function llegaMueble(){
   if(S.map==='home'&&tileSolid(MAPS.home,P.x,P.y))for(let r=1,ok=false;r<4&&!ok;r++)for(let dy=-r;dy<=r&&!ok;dy++)for(let dx=-r;dx<=r&&!ok;dx++){
     const x=P.x+dx,y=P.y+dy;if(Math.max(Math.abs(dx),Math.abs(dy))!==r||tileSolid(MAPS.home,x,y))continue;
     Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false});S.x=x;S.y=y;ok=true;}
-  queue('mueble',async()=>{sfx('get');await say(`Llega el mensajero con ${yLista(l.map(k=>MUEBLES[k].art))}: te lo dejan montado en el salón.`);});
+  const on=l.filter(k=>!MUEBLES[k].grow),gr=l.filter(k=>MUEBLES[k].grow);
+  queue('mueble',async()=>{sfx('get');if(on.length)await say(`Llega el mensajero con ${yLista(on.map(k=>MUEBLES[k].art))}: te lo dejan montado en el salón.`);
+    if(gr.length)await say(`Kiko te sube ${yLista(gr.map(k=>MUEBLES[k].art))} y te lo deja montado delante de las carpas.`);});
+}
+// el carro de esquejes (1.11): en la tabla de corte, los esquejes del propagador (S.esquejes, ESQUEJE_DIAS) se pinchan en las
+// bandejas, donde aguantan CARRO.dias desde ese día hasta que haya hueco en una carpa; se plantan desde la plaza vacía (plantar)
+async function carroAction(){
+  const n=S.bandejas.length,cap=CARRO.bandejas*CARRO.plazas,o=[];
+  if(S.esquejes.length&&n<cap)o.push('Pinchar esquejes');if(n)o.push('Ver las bandejas');o.push('Nada');
+  const c=o[await ask(`El carro de esquejes: ${n} de ${cap} tacos ocupados.${S.esquejes.length?` En el propagador llevas ${S.esquejes.length}.`:''}`,o)];
+  if(c==='Pinchar esquejes'){
+    const m=Math.min(cap-n,S.esquejes.length);for(const e of S.esquejes.splice(0,m))S.bandejas.push({sid:e.sid,f:e.f,dia:S.day});sfx('sel');
+    await say(`En la tabla de corte, corte en bisel y hormona: ${m>1?'pinchas '+m+' esquejes':'pinchas 1 esqueje'}.`);
+    await say(`En las bandejas aguantan hasta el día ${S.day+CARRO.dias}: plántalos cuando haya hueco.`);
+    const q=S.esquejes.length;if(q)return say(q>1?`No caben ${q}: se quedan en el propagador.`:'No cabe 1: se queda en el propagador.');
+  }
+  if(c==='Ver las bandejas')await menu(S.bandejas.map(e=>({label:'Esqueje '+getStrain(e.sid).n+marcaFeno(e.f),right:'día '+(e.dia+CARRO.dias),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),
+    desc:`Pinchado el día ${e.dia}. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+CARRO.dias}.`})).concat([{label:'Volver',desc:''}]),{cls:'full',title:'BANDEJAS',title2:`${n} de ${cap}`,desc:true});
 }

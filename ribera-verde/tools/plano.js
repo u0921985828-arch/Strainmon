@@ -50,7 +50,7 @@ const REAL = {
     let K = 2; const MG = 30, out = { mapas: {}, medidas: [] };
     const NOMBRE = { bedT: 'cama', bedB: '', pc: 'ordenador', lab: 'mesa genética', lab2: 'mesa genética', table: 'mesa', fridge: 'nevera', plantDeco: 'planta',
       iwin: 'ventana', poster: 'diploma', shelfW: 'estantería', counter: 'mostrador', display: 'expositor', bottles: 'botellero', barcounter: 'barra', stool: 'taburete',
-      btable: 'mesa', jukebox: 'gramola', crate: 'cajas', lamp: 'farola', fountain: 'fuente', sign: 'cartel', bench: 'banco', mesa: '', parada: 'parada del autobús' };
+      btable: 'mesa', jukebox: 'gramola', crate: 'cajas', lamp: 'farola', fountain: 'fuente', sign: 'cartel', bench: 'banco', mesa: '', parada: 'parada del autobús', carro: 'carro de esquejes', carro2: '' };
     const NPCN = { kiko: 'Kiko', josune: 'Josune', baltasar: 'Baltasar', tono: 'Toño', begona: 'Begoña', unai: 'Unai', patxi: 'Patxi', txaro: 'Txaro', inaki: 'Iñaki',
       cop: 'Agente', darko: 'Darko', darko2: 'Darko', molina: 'Sgto. Molina', tono2: 'Toño', jurado: 'Jurado', vecina: 'Vecina', excursionista: 'Excursionista', turista: 'Turista',
       obrero: 'Obrero' };
@@ -66,7 +66,7 @@ const REAL = {
     const FUERA = n => !!CLIENT_TILES[n];   // los mapas de fuera (barrio, barrio alto, astilleros y la comarca)
 
     mode = 'plano'; S = newState(); S.ch = 6; S.protect = false; S.flags = { letter: 1, kiko1: 1, harvest1: 1, metB: 1, lab: 1 }; S.min = 12 * 60; S.clients = [];
-    S.carpas = [{ t: 'p80', foco: 'sodio250' }, { t: 'g150', foco: 'led720' }, { t: 'm120', foco: 'led480' }]; S.macetas = Array(15).fill('tela11'); S.pots = Array(15).fill(null); S.muebles = { sofa: 1, tv: 1, gpc: 1 };
+    S.carpas = [{ t: 'p80', foco: 'sodio250' }, { t: 'g150', foco: 'led720' }, { t: 'm120', foco: 'led480' }]; S.macetas = Array(15).fill('tela11'); S.pots = Array(15).fill(null); S.muebles = { sofa: 1, tv: 1, gpc: 1, carro: 1 };
     const espera = ms => new Promise(r => setTimeout(r, ms));
 
     function mapaEntero(name) {

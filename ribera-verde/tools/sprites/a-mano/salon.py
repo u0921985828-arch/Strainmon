@@ -5,6 +5,9 @@
 #  · sofa: sofá de 2 plazas (180 × 85 × 90 cm) visto por detrás (mira a la tele): el respaldo, su rulo y los brazos asomando.
 #  · tv: tele de 43" (97 × 56 cm) sobre un mueble bajo (140 × 45 × 40 cm) con la consola en el hueco del medio.
 #  · gpc: mesa gaming (140 × 75 × 70 cm) con el monitor de 27", el teclado y la torre con los ventiladores encendidos.
+#  · carro (1.11): la estación de esquejes, que vende Kiko: un carro de 100 × 50 × 120 cm con ruedas y dos bandejas de propagación
+#    con su tapa (los esquejes dentro) bajo dos tubos T5, y al lado una mesita de 80 × 75 cm con la tabla de corte, el bisturí y
+#    el bote de hormona de enraizamiento.
 # Y los iconos del menú START que faltaban (celda icono, 16 × 16, como los aprobados: contorno #2a2a34, luz arriba a la izquierda):
 #  · movil (el móvil, con la pantalla encendida), guardar (la libreta de la tía), altavoz y salir (la puerta entornada y la flecha).
 #  · cogollo (la Genoteca): un cogollo fresco, verde, con los cálices apilados, pistilos naranjas y la escarcha de los tricomas
@@ -84,6 +87,38 @@ def gpc():
     suelo(L, x0, x1, '#0a0a0e')
     return L
 
+def carro():
+    L = Lienzo(48, 48); O = '#1a1c22'
+    M1, M2, M3 = '#6c7480', '#a8b0bc', '#dfe5ec'                          # el cromado del carro
+    B0, D1, D2 = '#2e3038', '#8ec0d2', '#d4eef6'                          # la bandeja negra y la tapa transparente
+    G1, G2, T = '#3f8a46', '#84cc6c', '#fff6d0'                           # los esquejes y el tubo encendido
+    W1, W2, W3 = '#a46e40', '#c48a52', '#dcac6c'                          # la mesita y la tabla de corte
+    x0, x1 = 8, 23                                                        # el carro: 100 cm = 16 px
+    for y in (27, 36, 44): L.r(x0, y, 16, 2, M2); L.hl(x0, x1, y, M3)     # tres baldas (la de arriba, 120 cm)
+    for x in (x0, x1): L.vl(x, 27, 45, M1)                                # los postes
+    L.vl(x0, 27, 44, M2)
+    def bandeja(yb, yt):                                                  # la bandeja apoyada en yb y su tubo colgado en yt
+        L.hl(x0 + 2, x1 - 2, yt, T); L.hl(x0 + 3, x1 - 3, yt + 1, M3)
+        L.r(x0 + 2, yb - 2, 12, 2, B0)                                    # la bandeja con los tacos
+        L.r(x0 + 3, yb - 6, 10, 4, D1); L.hl(x0 + 3, x1 - 3, yb - 6, D2); L.p(x0 + 3, yb - 5, D2)   # la tapa
+        for i, x in enumerate(range(x0 + 4, x1 - 2, 2)):                 # los esquejes dentro, uno por taco
+            L.p(x, yb - 3, G1); L.p(x, yb - 4 - (i % 2), G2)
+        L.p(x1 - 4, yb - 7, M1)                                           # la rejilla de la tapa
+    bandeja(36, 29); bandeja(44, 38)
+    L.r(x0 + 1, 24, 3, 3, '#4a92e0'); L.hl(x0 + 1, x0 + 3, 24, D2); L.p(x0 + 2, 23, M1)   # el pulverizador, encima
+    for x in (x0, x0 + 1, x1 - 1, x1): L.p(x, 46, O)                     # las ruedas
+    # la mesita de 80 cm (13 px) y 75 de alto (12 px), con la tapa a medio fondo
+    m0, m1 = 26, 38
+    L.r(m0, 34, 13, 3, W2); L.hl(m0, m1, 34, W3); L.r(m0, 37, 13, 1, W1)
+    L.r(m0, 38, 2, 9, W1); L.r(m1 - 1, 38, 2, 9, W1); L.vl(m0, 38, 46, W2)
+    L.r(m0 + 2, 32, 7, 2, W3); L.hl(m0 + 2, m0 + 8, 33, W2)               # la tabla de corte
+    L.hl(m0 + 3, m0 + 5, 32, M3); L.hl(m0 + 6, m0 + 7, 32, B0)            # el bisturí
+    L.p(m0 + 7, 33, G2); L.p(m0 + 8, 32, G1)                              # una punta recién cortada
+    L.r(m0 + 10, 31, 2, 3, D2); L.hl(m0 + 10, m0 + 11, 30, '#4a92e0')     # el bote de hormona
+    L.contorno(O)
+    suelo(L, x0, m1, O)
+    return L
+
 K = '#2a2a34'
 def movil():
     L = Lienzo(16, 16)
@@ -150,6 +185,7 @@ sale('cogollo', cogollo(), 'iconos-menu')
 sale('sofa', sofa())
 sale('tv', tv())
 sale('gpc', gpc())
+sale('carro', carro())
 
 def escribe(raiz=None):
     for g, S in SAL.items():

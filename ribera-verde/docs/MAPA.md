@@ -520,4 +520,5 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Aire acondicionado portátil | 320 € | 3 | Termostato: si la sala pasa de 26 °C, la baja hasta 12 °C. Gasta 900 W mientras enfría. · Uno para la sala: Kiko lo deja puesto. |
 | Bolsa de deporte | 35 € | 3 | Llevas encima hasta 3 kg de cogollos y rosin (la mochila, 1 kg). |
 | Maleta con ruedas | 90 € | 5 | Llevas encima hasta 10 kg de cogollos y rosin. |
+| Carro de esquejes | 165 € | 2 | Dos bandejas de 12 esquejes, tapadas y bajo tubos T5, y una mesita con la tabla de corte: pinchados ahí aguantan 3 días (sueltos, 1). Kiko te lo sube al piso mañana. |
 | Prensa de rosin | 250 € | 3 | Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores. |

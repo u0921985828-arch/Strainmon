@@ -45,7 +45,14 @@ func factura_luz() -> int:
 	for ci in S.carpas.size():
 		if S.carpas[ci] and plantas_vivas(ci):
 			e += luz_carpa(ci)
-	return e + Cultivo.factura_sala(S)
+	return e + Cultivo.factura_sala(S) + factura_carro()   # y el carro de esquejes (1.11)
+
+# el carro de esquejes (1.11, CARRO): con algún esqueje en las bandejas, los tubos T5 gastan luz a 18/6
+func factura_carro() -> int:
+	return Datos.jsround(D.CARRO.w * D.H_24 * 18 / 24.0 / 1000 * D.KWH) if S.bandejas.size() else 0
+
+func carro_ya() -> bool:
+	return "carro" in muebles_ya()
 
 func kwh_foco(k: String) -> int:
 	return Datos.jsround(D.FOCOS[k].w * D.H_LUZ / 1000)
@@ -124,6 +131,13 @@ func new_day() -> void:
 	if sec:
 		S.esquejes = S.esquejes.filter(func(e): return S.day - e.dia <= D.ESQUEJE_DIAS)
 		av.append("Se %s sin plantar" % [("han secado %d esquejes" % sec) if sec > 1 else "ha secado un esqueje"])
+	var seb := 0
+	for e in S.bandejas:
+		if S.day - e.dia > D.CARRO.dias:
+			seb += 1
+	if seb:
+		S.bandejas = S.bandejas.filter(func(e): return S.day - e.dia <= D.CARRO.dias)
+		av.append("Se %s en las bandejas" % [("han secado %d esquejes" % seb) if seb > 1 else "ha secado un esqueje"])
 	if av.size() and mode == "world":
 		toast("<br>".join(av), 1600)
 	spawn_clients()
@@ -165,7 +179,11 @@ func _own() -> Array:
 
 func plantar(i: int) -> void:
 	var own := _own()
-	var esq: Array = S.esquejes
+	var esq := []   # [esqueje, 1 si es de las bandejas del carro]
+	for e in S.esquejes:
+		esq.append([e, 0])
+	for e in S.bandejas:
+		esq.append([e, 1])
 	if own.is_empty() and esq.is_empty():
 		await say("Maceta vacía. No tienes semillas: cómpralas en el growshop de Kiko.")
 		return
@@ -173,19 +191,21 @@ func plantar(i: int) -> void:
 	for o in own:
 		var s = strain(o[0])
 		items.append({"label": s.n, "right": "×" + n(o[1]), "sw": s.c, "ic": ic_cog(o[0]), "desc": strain_line(o[0])})
-	for e in esq:
+	for eb in esq:
+		var e: Dictionary = eb[0]
 		var s = strain(e.sid)
 		var v = feno_visto(e.f)
 		var dv := ("Fenotipo estrella: THC ×%s y cosecha ×%s." % [Datos.coma(e.f.t), Datos.coma(e.f.y)]) if v == "estrella" else ("Fenotipo flojo: rinde menos que la media." if v == "floja" else "Su fenotipo se sabrá cuando coseches a la madre o a un clon suyo.")
-		items.append({"label": "Esqueje " + s.n + marca_feno(e.f), "right": "esqueje", "sw": s.c, "ic": ic_cog(e.sid),
-			"desc": "Clon enraizado: la misma planta que su madre, con su fenotipo.\n%s\nSe seca si no lo plantas antes del día %s." % [dv, n(e.dia + D.ESQUEJE_DIAS + 1)]})
+		items.append({"label": "Esqueje " + s.n + marca_feno(e.f), "right": "bandeja" if eb[1] else "esqueje", "sw": s.c, "ic": ic_cog(e.sid),
+			"desc": "Clon enraizado: la misma planta que su madre, con su fenotipo.\n%s\nSe seca si no lo plantas antes del día %s." % [dv, n(e.dia + (D.CARRO.dias if eb[1] else D.ESQUEJE_DIAS) + 1)]})
 	items.append({"label": "Cancelar", "desc": ""})
 	var j: int = await menu(items, {"cls": "full", "title": "¿QUÉ PLANTAS?", "desc": true})
 	if j < 0 or j >= own.size() + esq.size():
 		return
 	if j >= own.size():
-		var e: Dictionary = esq[j - own.size()]
-		esq.remove_at(j - own.size())
+		var e: Dictionary = esq[j - own.size()][0]
+		var l: Array = S.bandejas if esq[j - own.size()][1] else S.esquejes
+		l.remove_at(l.find(e))
 		S.pots[i] = {"sid": e.sid, "prog": .12, "water": 70, "health": 100, "fert": false, "pest": false, "f": e.f}   # ya enraizado: empieza de plántula
 		sfx("sel")
 		await accion("plantar")
@@ -222,6 +242,8 @@ func sacar_esqueje(i: int) -> void:
 	p.health = max(1, p.health - 5)
 	sfx("sel")
 	await say("Cortas una punta de la %s y la pones a enraizar.\nPlántala antes del día %s: es la misma planta." % [s.n, n(S.day + D.ESQUEJE_DIAS + 1)])
+	if carro_ya():
+		await say("O pínchala en el carro: allí aguanta %d días." % D.CARRO.dias)
 
 func stage_name(p: Dictionary) -> String:
 	return Cultivo.stage_name(p)
@@ -673,6 +695,9 @@ func noticia() -> String:
 	return "Noticias: el tiempo. Nubes y claros en la costa y la ría en calma. Nada que contar en Ribera Verde."
 
 func mueble_action(k):
+	if k == "carro":
+		await carro_action()
+		return
 	if k == "sofa":
 		var o := ["Echar una cabezada (1 h)"]
 		if "tv" in muebles_ya():
@@ -728,7 +753,7 @@ func mueble_action(k):
 func tienda_online() -> void:
 	var i := 0
 	while true:
-		var ks: Array = D.MUEBLES.keys()
+		var ks: Array = D.MUEBLES.keys().filter(func(k): return not D.MUEBLES[k].get("grow"))
 		var ya := muebles_ya()
 		var items := []
 		for k in ks:
@@ -756,10 +781,13 @@ func tienda_online() -> void:
 
 func llega_mueble() -> void:
 	var l := []
+	var on := []
+	var gr := []
 	if S.get("muebles") is Dictionary:
 		for k in D.MUEBLES:
 			if S.muebles.get(k) == S.day:
 				l.append(D.MUEBLES[k].art)
+				(gr if D.MUEBLES[k].get("grow") else on).append(D.MUEBLES[k].art)
 	if l.is_empty():
 		return
 	montar_casa()
@@ -785,7 +813,44 @@ func llega_mueble() -> void:
 					ok = true
 	queue("mueble", func():
 		sfx("get")
-		await say("Llega el mensajero con %s: te lo dejan montado en el salón." % _lista(l)))
+		if on.size():
+			await say("Llega el mensajero con %s: te lo dejan montado en el salón." % _lista(on))
+		if gr.size():
+			await say("Kiko te sube %s y te lo deja montado delante de las carpas." % _lista(gr)))
+
+# el carro de esquejes (1.11, carroAction): en la tabla de corte, los del propagador se pinchan en las bandejas, donde aguantan
+# CARRO.dias desde ese día; se plantan desde la plaza vacía (plantar)
+func carro_action() -> void:
+	var nb: int = S.bandejas.size()
+	var cap: int = D.CARRO.bandejas * D.CARRO.plazas
+	var o := []
+	if S.esquejes.size() and nb < cap:
+		o.append("Pinchar esquejes")
+	if nb:
+		o.append("Ver las bandejas")
+	o.append("Nada")
+	var j: int = await ask("El carro de esquejes: %d de %d tacos ocupados.%s" % [nb, cap, (" En el propagador llevas %d." % S.esquejes.size()) if S.esquejes.size() else ""], o)
+	var c: String = o[j] if j >= 0 and j < o.size() else ""
+	if c == "Pinchar esquejes":
+		var m: int = mini(cap - nb, S.esquejes.size())
+		for e in S.esquejes.slice(0, m):
+			S.bandejas.append({"sid": e.sid, "f": e.f, "dia": S.day})
+		S.esquejes = S.esquejes.slice(m)
+		sfx("sel")
+		await say("En la tabla de corte, corte en bisel y hormona: %s." % (("pinchas %d esquejes" % m) if m > 1 else "pinchas 1 esqueje"))
+		await say("En las bandejas aguantan hasta el día %s: plántalos cuando haya hueco." % n(S.day + D.CARRO.dias))
+		var q: int = S.esquejes.size()
+		if q:
+			await say(("No caben %d: se quedan en el propagador." % q) if q > 1 else "No cabe 1: se queda en el propagador.")
+		return
+	if c == "Ver las bandejas":
+		var items := []
+		for e in S.bandejas:
+			var s = strain(e.sid)
+			items.append({"label": "Esqueje " + s.n + marca_feno(e.f), "right": "día " + n(e.dia + D.CARRO.dias), "sw": s.c, "ic": ic_cog(e.sid),
+				"desc": "Pinchado el día %s. Plántalo en una plaza vacía antes de que acabe el día %s." % [n(e.dia), n(e.dia + D.CARRO.dias)]})
+		items.append({"label": "Volver", "desc": ""})
+		await menu(items, {"cls": "full", "title": "BANDEJAS", "title2": "%d de %d" % [nb, cap], "desc": true})
 
 # banco de semillas: las landraces en sobres de SOBRE semillas; el pedido llega al día siguiente (new_day)
 func banco_semillas() -> void:

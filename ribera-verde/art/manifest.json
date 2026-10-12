@@ -6904,16 +6904,18 @@
    "cubre": [
     "obj:sofa",
     "obj:tv",
-    "obj:gpc"
+    "obj:gpc",
+    "obj:carro"
    ],
    "celda": "mueble_ancho",
    "ajuste_por_sprite": {
     "sofa": "exacto",
     "tv": "exacto",
-    "gpc": "exacto"
+    "gpc": "exacto",
+    "carro": "exacto"
    },
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/salon.py",
-   "descripcion": "Lámina 14: los muebles del salón, que se compran por internet, a 16 px/m: sofá de 2 plazas (180 cm) visto por detrás, tele de 43\" sobre un mueble bajo de 140 cm con la consola y mesa gaming de 140 cm con monitor de 27\", teclado, torre con ventiladores y tira de LED.",
+   "descripcion": "Lámina 14: los muebles del salón, que se compran por internet, a 16 px/m: sofá de 2 plazas (180 cm) visto por detrás, tele de 43\" sobre un mueble bajo de 140 cm con la consola y mesa gaming de 140 cm con monitor de 27\", teclado, torre con ventiladores y tira de LED; y (1.11) el carro de esquejes de 100 cm con dos bandejas de propagación tapadas bajo tubos T5 y la mesita de 80 cm con la tabla de corte, el bisturí y la hormona.",
    "notas": "1.10 salón. Cada mueble ocupa 2 casillas (k en x y k + '2' en x + 1, que no se pinta). Como la nevera: frente a su tamaño real y tapa a medio fondo; dentro de la lista de profundidad.",
    "montaje": "tal cual (salon.py), base en (16, 47) (ajuste exacto)"
   },

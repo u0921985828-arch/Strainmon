@@ -725,6 +725,8 @@ func object_action(x: int, y: int) -> void:
 			var mu: Dictionary = D.MUEBLES[k]
 			if (x == mu.x or x == mu.x + 1) and y == mu.y:
 				var pd = S.get("muebles", {}).get(k) if S.get("muebles") is Dictionary else null
+				if mu.get("grow") and not pd:   # el carro de esquejes (1.11): sin pedir, nada
+					break
 				await say(("Aquí va %s: llega mañana." % mu.art) if pd else ("Aquí iría bien %s. Se compra por internet: en el ordenador de la tía o con el móvil." % mu.art))
 				return
 		match o:

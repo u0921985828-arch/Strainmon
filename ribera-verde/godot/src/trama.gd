@@ -13,6 +13,8 @@ func shop_cond(it: Dictionary) -> bool:
 		return not S.items.get("medidor") and not S.envio.has(it.lbl)
 	if it.get("aparato"):   # los aparatos de la sala (1.10), uno de cada; lo pedido por el móvil no se vuelve a vender
 		return not S.sala.get(it.aparato) and not S.envio.has(it.lbl)
+	if it.get("mueble"):   # el carro de esquejes (1.11), uno
+		return not (S.get("muebles") is Dictionary and S.muebles.has(it.mueble))
 	if it.get("bolsa"):   # la bolsa de deporte y la maleta (1.10)
 		return bolsa_ya() < it.bolsa
 	if it.get("extra"):
@@ -130,8 +132,13 @@ func shop() -> void:
 			S.items.bolsa = int(it.bolsa)
 		if it.get("aparato"):
 			S.sala[it.aparato] = true
-		if not it.get("foco") and not it.get("carpa") and not it.get("extra"):
+		if not it.get("foco") and not it.get("carpa") and not it.get("extra") and not it.get("mueble"):
 			toast("Comprado: " + it.lbl, 1200)
+		if it.get("mueble"):
+			if not (S.get("muebles") is Dictionary):
+				S.muebles = {}
+			S.muebles[it.mueble] = S.day + 1
+			await say("Mañana te lo subo al piso y te lo monto junto a las carpas.", "KIKO")
 		if it.get("carpa"):
 			comprar_carpa(it.carpa, int(it.ci))
 			await say(D.DICHO_CARPA[it.carpa], "KIKO")
@@ -854,6 +861,7 @@ func raid_event():
 	S.rosin = {}
 	S.arcon = {"buds": {}, "rosin": {}}
 	S.esquejes = []
+	S.bandejas = []
 	S.heat = D.CALOR_REDADA
 	var multa := multa_redada(npl, g + Datos.jsround(ro / D.ROSIN.rend))   # el rosin, como la flor de la que sale
 	var fine: float = multa - pagar_casa(multa)
@@ -1835,7 +1843,7 @@ func precio_envio(it: Dictionary) -> int:
 	return Datos.jsround(it.p * D.ENVIO)
 
 func pedible(it: Dictionary) -> bool:
-	return not it.get("sid") and not it.get("carpa") and it.get("item") != "prensa" and S.ch >= it.ch and shop_cond(it)   # shop_cond ya cuenta lo pedido
+	return not it.get("sid") and not it.get("carpa") and not it.get("mueble") and it.get("item") != "prensa" and S.ch >= it.ch and shop_cond(it)   # shop_cond ya cuenta lo pedido
 
 func pedir_kiko():
 	var i := 0

@@ -116,7 +116,7 @@ const plantasVivas=ci=>huecos().some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead
 const enFlor=ci=>huecos().some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead&&S.pots[i].prog>=.65);
 const olorDia=()=>S.carpas.reduce((a,c,ci)=>a+(c&&enFlor(ci)?!kitDe(c)?OLOR:extCarpa(ci)<OLOR_MAL?1:0:0),0);
 const luzCarpa=ci=>{const c=S.carpas[ci];return Math.round((FOCOS[c.foco].w*CICLOS[cicloDe(c)].h+Object.keys(EXTRAS).reduce((a,k)=>a+(c[k]?EXTRAS[k].w:0),0)*H_24)/1000*KWH);};
-function facturaLuz(){let e=0;S.carpas.forEach((c,ci)=>{if(c&&plantasVivas(ci))e+=luzCarpa(ci);});return e+facturaSala();}   // y los aparatos de la sala (09c)
+function facturaLuz(){let e=0;S.carpas.forEach((c,ci)=>{if(c&&plantasVivas(ci))e+=luzCarpa(ci);});return e+facturaSala()+facturaCarro();}   // y los aparatos de la sala (09c) y el carro
 function plantStep(p,h,f){
   if(p.dead)return;const s=getStrain(p.sid);
   p.water=Math.max(0,p.water-3.5*h*f.agua);
@@ -149,6 +149,7 @@ function newDay(){
   const luz=facturaLuz(),olor=olorDia(),av=[];S.luz={d:S.day,e:luz,o:olor};if(luz>0){pagarCasa(luz);av.push('Factura de la luz: −'+eur(luz));}   // de lo de fuera y, si no llega, de la caja (1.10)
   if(olor){S.heat=Math.min(100,S.heat+olor);av.push('Olor a cogollo: calor +'+olor);}   // después de bajar el calor: cuenta para la redada de mañana
   const sec=S.esquejes.filter(e=>S.day-e.dia>ESQUEJE_DIAS).length;if(sec){S.esquejes=S.esquejes.filter(e=>S.day-e.dia<=ESQUEJE_DIAS);av.push(`Se ${sec>1?'han secado '+sec+' esquejes':'ha secado un esqueje'} sin plantar`);}
+  const seb=S.bandejas.filter(e=>S.day-e.dia>CARRO.dias).length;if(seb){S.bandejas=S.bandejas.filter(e=>S.day-e.dia<=CARRO.dias);av.push(`Se ${seb>1?'han secado '+seb+' esquejes':'ha secado un esqueje'} en las bandejas`);}
   if(av.length&&mode==='world')toast(av.join('<br>'),1600);
   spawnClients();recibirPedido();recibirEnvio();instalarCaja();llegaMueble();vencerEncargo();
   // 1.10: el plazo vencido, también sin haber visto a Baltasar (el plazo corre desde Toño); 1.11: el aviso, a 3 días y el último
@@ -160,6 +161,10 @@ function newDay(){
    planta: copia el fenotipo de su madre, id incluido. Se sabe al cosechar (S.fenos[id] = 'estrella' | 'floja' | 'normal'),
    así que de una planta que sale estrella solo te quedas con ella si antes le sacaste esquejes. */
 const ESQUEJE_DIAS=1;   // días que aguanta un esqueje enraizando sin plantar (un día de juego ≈ 4 semanas)
+// el carro de esquejes (1.11, 12c-salon; lo vende Kiko): dos bandejas de propagación tapadas bajo tubos T5 y la tabla de corte. Los
+// esquejes pinchados en S.bandejas ({sid, f, dia}: dia, el de pincharlos) aguantan CARRO.dias y, con alguno, los tubos gastan luz a 18/6
+const CARRO={p:165,bandejas:2,plazas:12,dias:3,w:48};
+const facturaCarro=()=>S.bandejas.length?Math.round(CARRO.w*H_24*18/24/1000*KWH):0;
 const gauss=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
 const tiraFeno=sg=>{const m=()=>Math.round(clamp(1+sg*gauss(),.6,1.5)*100)/100;return {t:m(),y:m()};};
 // i: el % índica de la planta (forma y tono de la hoja), alrededor del de su variedad con el σ de su tipo (si)
@@ -168,16 +173,16 @@ const claseFeno=f=>!f?'normal':f.t*f.y>=FENO_ESTRELLA?'estrella':f.t*f.y<=FENO_F
 const fenoVisto=f=>f&&f.id&&S.fenos[f.id];   // undefined hasta que se cosecha esa planta o uno de sus esquejes
 const marcaFeno=f=>fenoVisto(f)==='estrella'?' ★':fenoVisto(f)==='floja'?' (floja)':'';
 async function plantar(i){
-  const own=Object.entries(S.seeds).filter(([,v])=>v>0),esq=S.esquejes;
+  const own=Object.entries(S.seeds).filter(([,v])=>v>0),esq=S.esquejes.map(e=>[e,0]).concat(S.bandejas.map(e=>[e,1]));   // 1: de las bandejas del carro
   if(!own.length&&!esq.length)return say('Maceta vacía. No tienes semillas: cómpralas en el growshop de Kiko.');
   const items=own.map(([k,v])=>({label:getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:iconoCogollo(k),desc:strainLine(k)}))
-    .concat(esq.map(e=>{const s=getStrain(e.sid),v=fenoVisto(e.f);return {label:'Esqueje '+s.n+marcaFeno(e.f),right:'esqueje',sw:s.c,ic:iconoCogollo(e.sid),
-      desc:`Clon enraizado: la misma planta que su madre, con su fenotipo.\n${v==='estrella'?`Fenotipo estrella: THC ×${coma(e.f.t)} y cosecha ×${coma(e.f.y)}.`:v==='floja'?'Fenotipo flojo: rinde menos que la media.':'Su fenotipo se sabrá cuando coseches a la madre o a un clon suyo.'}\nSe seca si no lo plantas antes del día ${e.dia+ESQUEJE_DIAS+1}.`};}))
+    .concat(esq.map(([e,b])=>{const s=getStrain(e.sid),v=fenoVisto(e.f);return {label:'Esqueje '+s.n+marcaFeno(e.f),right:b?'bandeja':'esqueje',sw:s.c,ic:iconoCogollo(e.sid),
+      desc:`Clon enraizado: la misma planta que su madre, con su fenotipo.\n${v==='estrella'?`Fenotipo estrella: THC ×${coma(e.f.t)} y cosecha ×${coma(e.f.y)}.`:v==='floja'?'Fenotipo flojo: rinde menos que la media.':'Su fenotipo se sabrá cuando coseches a la madre o a un clon suyo.'}\nSe seca si no lo plantas antes del día ${e.dia+(b?CARRO.dias:ESQUEJE_DIAS)+1}.`};}))
     .concat([{label:'Cancelar',desc:''}]);
   const j=await menu(items,{cls:'full',title:'¿QUÉ PLANTAS?',desc:true});
   if(j<0||j>=own.length+esq.length)return;
   if(j>=own.length){
-    const e=esq.splice(j-own.length,1)[0];
+    const [e,b]=esq[j-own.length],l=b?S.bandejas:S.esquejes;l.splice(l.indexOf(e),1);
     S.pots[i]={sid:e.sid,prog:.12,water:70,health:100,fert:false,pest:false,f:e.f};sfx('sel');   // ya enraizado: empieza de plántula
     await accion('plantar');await say(`Plantas el esqueje de ${getStrain(e.sid).n}${marcaFeno(e.f)}.`);return pistaBarras();
   }
@@ -196,7 +201,8 @@ async function sacarEsqueje(i){
   if(S.esquejes.length>=12)return say('El propagador está lleno: 12 esquejes. Planta alguno antes.');
   S.esquejes.push({sid:p.sid,f:p.f||rollFeno(p.sid),dia:S.day});if(!p.f)p.f=S.esquejes[S.esquejes.length-1].f;
   p.health=Math.max(1,p.health-5);sfx('sel');
-  return say(`Cortas una punta de la ${s.n} y la pones a enraizar.\nPlántala antes del día ${S.day+ESQUEJE_DIAS+1}: es la misma planta.`);
+  await say(`Cortas una punta de la ${s.n} y la pones a enraizar.\nPlántala antes del día ${S.day+ESQUEJE_DIAS+1}: es la misma planta.`);
+  if(carroYa())return say(`O pínchala en el carro: allí aguanta ${CARRO.dias} días.`);
 }
 function stageName(p){return p.prog<.12?'Germinando':p.prog<.35?'Plántula':p.prog<.65?'Vegetativo':'Floración';}
 async function potAction(i){

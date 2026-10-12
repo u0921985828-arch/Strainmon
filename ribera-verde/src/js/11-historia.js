@@ -29,6 +29,7 @@ const SHOP=[
   {lbl:'Deshumidificador',p:190,ch:3,aparato:'deshu'},{lbl:'Aire acondicionado portátil',p:320,ch:3,aparato:'aire'},
   {lbl:'Bolsa de deporte',p:35,ch:3,bolsa:1,desc:'Llevas encima hasta 3 kg de cogollos y rosin (la mochila, 1 kg).',cond:()=>bolsaYa()<1},
   {lbl:'Maleta con ruedas',p:90,ch:5,bolsa:2,desc:'Llevas encima hasta 10 kg de cogollos y rosin.',cond:()=>bolsaYa()<2},
+  {lbl:'Carro de esquejes',p:CARRO.p,ch:2,mueble:'carro',desc:`Dos bandejas de ${CARRO.plazas} esquejes, tapadas y bajo tubos T5, y una mesita con la tabla de corte: pinchados ahí aguantan ${CARRO.dias} días (sueltos, ${ESQUEJE_DIAS}). Kiko te lo sube al piso mañana.`,cond:()=>!(S.muebles&&S.muebles.carro)},
   {lbl:'Prensa de rosin',p:250,ch:3,item:'prensa',desc:'Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores.',cond:()=>!S.items.prensa},
 ];
 const SOBRES=[[1,1],[3,.95],[5,.9],[10,.85]],GRANEL=[50,.6];   // [semillas, precio por semilla relativo]
@@ -82,7 +83,8 @@ async function shop(){
     if(S.money<it.p){sfx('bad');await say('No te llega el dinero.','KIKO');continue;}
     S.money-=it.p;sfx('coin');
     if(it.item)S.items[it.item]+=it.n||1;if(it.maceta)S.items['m_'+it.maceta]++;if(it.bolsa)S.items.bolsa=it.bolsa;if(it.aparato)S.sala[it.aparato]=true;
-    if(!it.foco&&!it.carpa&&!it.extra)toast('Comprado: '+it.lbl,1200);
+    if(!it.foco&&!it.carpa&&!it.extra&&!it.mueble)toast('Comprado: '+it.lbl,1200);
+    if(it.mueble){(S.muebles||(S.muebles={}))[it.mueble]=S.day+1;await say('Mañana te lo subo al piso y te lo monto junto a las carpas.','KIKO');}
     if(it.carpa){comprarCarpa(it.carpa,it.ci);await say(DICHO_CARPA[it.carpa],'KIKO');}
     if(it.extra){S.items['x_'+it.extra]++;const ok=S.carpas.map((c,ci)=>faltaExtra(c,it.extra)?ci:-1).filter(ci=>ci>=0);
       const pl=EXTRAS[it.extra].pl;
@@ -352,7 +354,7 @@ async function raidEvent(){
   sfx('bad');await say('REDADA. La policía entra en tu piso con una orden de registro.');
   const g=Math.floor(totalBuds()+arconG()),r=totalRosin()+arconR(),hs=huecos(),np=S.pots.filter(p=>p&&!p.dead).length,eq=new Set();   // lo de encima y el arcón (1.10)
   S.carpas.forEach((c,ci)=>{if(c&&hs.some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead))for(const k in EXTRAS)if(c[k]){eq.add(EXTRAS[k].n.toLowerCase());delete c[k];if(k==='goteo')delete c.dep;if(k==='garrafas')delete c.gar;}});
-  S.pots=S.pots.map(()=>null);S.buds={};S.rosin={};S.arcon={buds:{},rosin:{}};S.esquejes=[];S.heat=CALOR_REDADA;
+  S.pots=S.pots.map(()=>null);S.buds={};S.rosin={};S.arcon={buds:{},rosin:{}};S.esquejes=[];S.bandejas=[];S.heat=CALOR_REDADA;
   const multa=multaRedada(np,g+Math.round(r/ROSIN.rend)),fine=multa-pagarCasa(multa);   // el rosin, como la flor de la que sale
   await say(`Se llevan todas las plantas${r?`${g?`, ${g} g`:''} y ${rosinTxt(r)}`:` y ${g} g`}. Multa: ${eur(fine)}.`);
   if(eq.size)await say('Y el equipo de las carpas con plantas: '+[...eq].join(', ')+'.');

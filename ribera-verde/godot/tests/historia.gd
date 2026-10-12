@@ -1709,6 +1709,54 @@ func _pasos() -> void:
 		R.vacio = not h.o[5][13],
 		func(): return chk(R.libre and R.m[0] == 0 and R.m[1] == 652 and R.ped[0] == R.d + 1 and R.ped[1] == R.d + 1 and R.ped[2] == false and R.ya == "sofa,tv" and R.solido and R.hp == 15 and R.vacio
 			and LOG.any(func(l): return l.contains("Llega el mensajero con el sofá y la tele")) and LOG.any(func(l): return l.contains("Noticias: detenido en el puerto")), R))
+	step("Carro de esquejes (1.11): Kiko lo vende (no la tienda online) y lo sube mañana delante de las carpas; en la tabla de corte se pinchan los del propagador; en las bandejas aguantan CARRO.dias y gastan luz; se plantan desde ahí; la redada se los lleva",
+		["Carro de esquejes", "Salir", "Pinchar esquejes", "^Esqueje"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.erase("muebles")
+		J.S.merge({"money": 500, "map": "home", "esquejes": [], "bandejas": [], "heat": 0, "due": 0, "protect": false}, true)
+		for k in J.S.items:
+			if k.begins_with("m_"):
+				J.S.items[k] = 0
+		J.montar_casa()
+		var h: Dictionary = J.MAPS.home
+		R = {"libre": not J.tile_solid(h, 8, 5), "d": J.S.day, "online": ",".join(D.MUEBLES.keys().filter(func(k): return not D.MUEBLES[k].get("grow")))}
+		await run(func(): await J.shop())
+		R.m = J.S.money
+		R.ped = J.S.muebles.get("carro")
+		J.S.day += 1
+		J.llega_mueble()
+		await idle()
+		R.ya = J.carro_ya()
+		R.solido = J.tile_solid(h, 8, 5) and h.o[5][9] == "carro2"
+		var f := {"id": 9997, "t": 1, "y": 1, "i": 50}
+		J.S.esquejes = []
+		for q in 3:
+			J.S.esquejes.append({"sid": "limon", "f": f.duplicate(), "dia": J.S.day - 1})
+		R.l0 = J.factura_luz()
+		await run(func(): await J.object_action(9, 5))
+		R.n = "%d,%d,%s" % [J.S.esquejes.size(), J.S.bandejas.size(), str(J.S.bandejas.all(func(e): return e.dia == J.S.day)).to_lower()]
+		R.l1 = J.factura_luz() - R.l0
+		J.S.day += D.CARRO.dias - 1
+		J.new_day()
+		await idle()
+		R.dura = J.S.bandejas.size()
+		J.S.pots[0] = null
+		await run(func(): await J.pot_action(0))
+		R.pot = J.S.pots[0] != null and Datos.js_num(J.S.pots[0].f.id) == "9997" and J.S.pots[0].prog == .12
+		R.queda = J.S.bandejas.size()
+		J.S.bandejas.append({"sid": "limon", "f": f.duplicate(), "dia": J.S.day - 1})
+		J.new_day()
+		await idle()
+		R.seca = ",".join(J.S.bandejas.map(func(e): return Datos.js_num(e.dia)))
+		await run(J.raid_event)
+		R.redada = J.S.bandejas.size()
+		J.S = S0
+		J.montar_casa()
+		R.vacio = not h.o[5][8],
+		func(): return chk(R.libre and R.online == "sofa,tv,gpc" and R.m == 500 - D.CARRO.p and R.ped == R.d + 1 and R.ya and R.solido and R.n == "0,3,true" and R.l1 == 4
+			and R.dura == 3 and R.pot and R.queda == 2 and R.seca == Datos.js_num(R.d + D.CARRO.dias) and R.redada == 0 and R.vacio
+			and LOG.any(func(l): return l.contains("Kiko te sube el carro de esquejes")), R))
 	step("Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad",
 		["Sacar un lote", "^Hindu", "^10 g", "Guardar todo", "Cerrar", "Bolsa de deporte", "Salir", "Sacar todo", "Cerrar"], func():
 		var S0 = J.S

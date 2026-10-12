@@ -44,7 +44,7 @@ Plantar → cuidar (agua, abono, plagas) y sacar esquejes de las buenas → cose
 - **Cosecha (g por planta):** `mín(tope de la maceta, W × g/W ÷ plazas × rend de la maceta × rinde/34 × (0,4 + 0,6 × salud/100) × abono 1,25 × fenotipo.y)`. 34 g es el rinde medio de las variedades: la ficha enseña el de cada una en g/m² (LED a 400 W/m², abonada). Una plaza vacía es luz perdida.
 - **THC final:** `THC × fenotipo.t × (0,85 + 0,15 × salud/100) + thc del foco + 0,3 (abono)`, con un tope de 35 %.
 - **Semillas al cosechar:** las de tienda son feminizadas: un 12 % de las plantas sale hermafrodita y da 1-3 semillas; las demás, ninguna. Las landraces (como el Afghani que te da Kiko) y tus líneas ya fijadas son regulares: algún macho poliniza unas flores y cada planta da 1-3. Una línea sin fijar (F1-F3) se poliniza entre ella y da 2-5.
-- **Esquejes:** en crecimiento (del 20 %, ya plántula hecha, al 65 %, antes de florecer) se le saca un esqueje a una planta (−5 de salud). Es la misma planta, con su fenotipo. Enraíza en el propagador (hasta 12) y se seca si no se planta antes de que acabe el día siguiente.
+- **Esquejes:** en crecimiento (del 20 %, ya plántula hecha, al 65 %, antes de florecer) se le saca un esqueje a una planta (−5 de salud). Es la misma planta, con su fenotipo. Enraíza en el propagador (hasta 12) y se seca si no se planta antes de que acabe el día siguiente. Con el **carro de esquejes** (1.11, 165 € en el growshop; Kiko lo monta en el piso al día siguiente), en su tabla de corte se pinchan en dos bandejas de 12 bajo tubos T5: ahí aguantan 3 días hasta que haya hueco en una carpa (luz: 4 € al día con alguno pinchado; la redada se los lleva).
 
 ### Equipo: carpas, focos y macetas (1.6; cifras reales en la 1.10)
 

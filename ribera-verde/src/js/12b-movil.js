@@ -49,7 +49,7 @@ async function llamarFijo(f){
 }
 // lo que Kiko manda a casa: lo del growshop que no son semillas, carpas ni la prensa, más caro; lo que ya está pedido no se repite
 const precioEnvio=it=>Math.round(it.p*ENVIO);
-const pedible=it=>!it.sid&&!it.carpa&&it.item!=='prensa'&&S.ch>=it.ch&&(!it.cond||it.cond());   // cond ya cuenta lo pedido (aparatos, bolsas, extras)
+const pedible=it=>!it.sid&&!it.carpa&&!it.mueble&&it.item!=='prensa'&&S.ch>=it.ch&&(!it.cond||it.cond());   // cond ya cuenta lo pedido (aparatos, bolsas, extras)
 async function pedirKiko(){
   let i=0,ult=null;
   for(;;){

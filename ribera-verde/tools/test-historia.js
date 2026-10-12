@@ -544,6 +544,22 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S = S0; montarCasa(); R.vacio = !MAPS.home.o[5][13];
   }, () => R.libre && R.m.join() === '0,652' && R.ped.join() === [R.d + 1, R.d + 1, false].join() && R.ya === 'sofa,tv' && R.solido && R.hp === 15 && R.vacio
     && LOG.some(l => l.includes('Llega el mensajero con el sofá y la tele')) && LOG.some(l => l.includes('Noticias: detenido en el puerto')) || R);
+  await step('Carro de esquejes (1.11): Kiko lo vende (no la tienda online) y lo sube mañana delante de las carpas; en la tabla de corte se pinchan los del propagador; en las bandejas aguantan CARRO.dias y gastan luz; se plantan desde ahí; la redada se los lleva',
+    ['Carro de esquejes', 'Salir', 'Pinchar esquejes', '^Esqueje'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0)); delete S.muebles; Object.assign(S, { money: 500, map: 'home', esquejes: [], bandejas: [], heat: 0, due: 0, protect: false });
+    for (const k in S.items) if (/^m_/.test(k)) S.items[k] = 0; montarCasa();
+    window.R = { libre: !tileSolid(MAPS.home, 8, 5), d: S.day, online: Object.keys(MUEBLES).filter(k => !MUEBLES[k].grow).join() };
+    await run(shop); R.m = S.money; R.ped = S.muebles.carro;
+    S.day++; llegaMueble(); await idle(); R.ya = carroYa(); R.solido = tileSolid(MAPS.home, 8, 5) && MAPS.home.o[5][9] === 'carro2';
+    const f = { id: 9997, t: 1, y: 1, i: 50 }; S.esquejes = [0, 1, 2].map(() => ({ sid: 'limon', f, dia: S.day - 1 })); R.l0 = facturaLuz();
+    await run(() => objectAction(9, 5)); R.n = [S.esquejes.length, S.bandejas.length, S.bandejas.every(e => e.dia === S.day)].join(); R.l1 = facturaLuz() - R.l0;
+    S.day += CARRO.dias - 1; newDay(); await idle(); R.dura = S.bandejas.length; S.pots[0] = null;
+    await run(() => potAction(0)); R.pot = S.pots[0] && S.pots[0].f.id === 9997 && S.pots[0].prog === .12; R.queda = S.bandejas.length;
+    S.bandejas.push({ sid: 'limon', f, dia: S.day - 1 }); newDay(); await idle(); R.seca = S.bandejas.map(e => e.dia).join();
+    await run(raidEvent); R.redada = S.bandejas.length; S = S0; montarCasa(); R.vacio = !MAPS.home.o[5][8];
+  }, () => R.libre && R.online === 'sofa,tv,gpc' && R.m === 500 - CARRO.p && R.ped === R.d + 1 && R.ya && R.solido && R.n === '0,3,true' && R.l1 === 4
+    && R.dura === 3 && R.pot && R.queda === 2 && R.seca === String(R.d + CARRO.dias) && R.redada === 0 && R.vacio
+    && LOG.some(l => l.includes('Kiko te sube el carro de esquejes')) || R);
   await step('Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad',
     ['Sacar un lote', '^Hindu', '^10 g', 'Guardar todo', 'Cerrar', 'Bolsa de deporte', 'Salir', 'Sacar todo', 'Cerrar'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 5, map: 'home', buds: {}, rosin: {}, arcon: { buds: {}, rosin: {} }, protect: false, caja: null });
