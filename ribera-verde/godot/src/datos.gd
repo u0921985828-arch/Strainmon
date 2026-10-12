@@ -275,6 +275,55 @@ static func receta_de(S: Dictionary, a: String, b: String):
 		return null
 	return D.RECIPES.get("+".join(hojas_cruce(S, a, b)))
 
+# nombre corto de un cruce (1.11, nombreCruce de 03-datos): dos palabras de los padres, hasta NOM_MAX letras, sin repetir; si no, « #2»…
+const NOM_MAX := 20
+
+static func palabras(n: String) -> Array:
+	var re := RegEx.create_from_string("^F\\d+$")
+	return Array(n.split(" ")).filter(func(p): return p != "" and p != "×" and not p.begins_with("#") and re.search(p) == null)
+
+static func nombre_cruce(wa: Array, wb: Array, usado: Callable) -> String:
+	var c := []
+	var r := []
+	if wa.size() and wb.size():
+		for n in [wa[0] + " " + wb[-1], wb[0] + " " + wa[-1]]:
+			if not c.has(n):
+				c.append(n)
+	for x in wa:
+		for y in wb:
+			if x != y:
+				r.append(x + " " + y)
+				r.append(y + " " + x)
+	var ri := []
+	for i in r.size():
+		ri.append([r[i], i])
+	ri.sort_custom(func(p, q): return p[0].length() < q[0].length() or (p[0].length() == q[0].length() and p[1] < q[1]))
+	for e in ri:
+		if not c.has(e[0]):
+			c.append(e[0])
+	var ok := []
+	for n in c:
+		var w: PackedStringArray = n.split(" ")
+		if w[0] != w[1] and n.length() <= NOM_MAX:
+			ok.append(n)
+	for n in ok:
+		if not usado.call(n):
+			return n
+	var base := ""
+	for n in ok:
+		if n.length() <= NOM_MAX - 4:
+			base = n
+			break
+	if base == "":
+		base = (wa[0] if wa.size() else (wb[0] if wb.size() else "Cruce")).substr(0, NOM_MAX - 4)
+	var k := 2
+	while true:
+		var nm := base.substr(0, NOM_MAX - 2 - str(k).length()).rstrip(" ") + " #" + str(k)
+		if not usado.call(nm):
+			return nm
+		k += 1
+	return ""
+
 static func cross_result(S: Dictionary, a: String, b: String) -> String:
 	carga()
 	var rc = receta_de(S, a, b)
@@ -288,27 +337,18 @@ static func cross_result(S: Dictionary, a: String, b: String) -> String:
 		var A = strain(S, a)
 		var B = strain(S, b)
 		var R := rng_seed(hash_str(key))
-		var w := func(s) -> Array: return Array(s.n.split(" ")).filter(func(p): return not p.begins_with("#"))
-		var wa: Array = w.call(A)
-		var wb: Array = w.call(B)
 		var usado := func(n: String) -> bool:
-			if n == A.n or n == B.n:
+			var l := n.to_lower()
+			if l == A.n.to_lower() or l == B.n.to_lower():
 				return true
 			for k in D.DEX:
-				if D.STRAINS[k].n == n:
+				if D.STRAINS[k].n.to_lower() == l:
 					return true
 			for k in S.custom:
-				if S.custom[k].n == n:
+				if S.custom[k].n.to_lower() == l:
 					return true
 			return false
-		var name: String = wa[0] + " " + wb[-1]
-		if wa[0] == wb[-1] or usado.call(name):
-			name = wb[0] + " " + wa[-1]
-		if usado.call(name):
-			name = A.n + " × " + B.n
-		if usado.call(name):
-			name += " F" + str(2 + int(floor(R.sig() * 7)))
-		var C := {"n": name}
+		var C := {"n": nombre_cruce(palabras(A.n), palabras(B.n), usado)}
 		C.thc = minf(33, jsround(((A.thc + B.thc) / 2.0 + R.sig() * 3.5 - 1.5) * 10) / 10.0)
 		C.y = jsround((A.y + B.y) / 2.0 + R.sig() * 8 - 4)
 		C.d = jsround(((A.d + B.d) / 2.0 + R.sig() * .6 - .3) * 2) / 2.0

@@ -18,6 +18,15 @@ async function say(text,name,keep){
 // los SMS (1.10) se quedan en el móvil: S.sms, del último al primero, hasta SMS_MAX
 async function talk(name,lines){if(S&&S.sms&&/^SMS · /.test(name)){S.sms.unshift({d:S.day,n:name.slice(6),t:lines.map(nm).join('\n')});if(S.sms.length>SMS_MAX)S.sms.length=SMS_MAX;}for(const l of lines)await say(l,name);}
 async function ask(text,opts,name){await typeText(text,name);const i=await menu(opts,{cls:'right',cancel:true});dlg.hidden=true;return i<0?opts.length-1:i;}
+// texto a mano (1.11): el nombre del jugador, de una planta o de una variedad propia. A (o Intro) acepta; B (o Esc) cancela y da null.
+// Solo letras, números, espacio y # ' . - (sin «×», que es de los cruces, ni lo que rompe el HTML de los avisos o lo que no tiene la fuente)
+const limpiaTexto=(s,max)=>s.replace(/[^\p{L}\p{N} #'.\-]/gu,'').trim().slice(0,max);
+function pedirTexto(txt,ini='',max=12,mayus=false,cancela=true){return new Promise(res=>{
+  const box=$('nameBox'),inp=$('nameInput');$('nameLbl').textContent=txt;$('nameSmall').textContent='Pulsa A para aceptar'+(cancela?' y B para cancelar':'');
+  box.classList.toggle('mayus',mayus);inp.maxLength=max;inp.value=ini;box.hidden=false;setTimeout(()=>inp.focus(),30);
+  const done=v=>{box.hidden=true;inp.onkeydown=null;inp.blur();pop();res(v);},vale=()=>limpiaTexto(inp.value,max);
+  push(b=>{if(b==='A')done(vale());else if(b==='B'&&cancela)done(null);});
+  inp.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter'){e.preventDefault();done(vale());}else if(e.key==='Escape'&&cancela){e.preventDefault();done(null);}};});}
 dlg.addEventListener('click',()=>press('A'));
 function menu(items,o={}){return new Promise(res=>{
   items=items.map(it=>typeof it==='string'?{label:it}:it);

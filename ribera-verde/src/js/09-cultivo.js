@@ -172,11 +172,25 @@ function rollFeno(sid){S.fenoN++;const G=GENETICA[tipoGen(sid)];return Object.as
 const claseFeno=f=>!f?'normal':f.t*f.y>=FENO_ESTRELLA?'estrella':f.t*f.y<=FENO_FLOJO?'floja':'normal';
 const fenoVisto=f=>f&&f.id&&S.fenos[f.id];   // undefined hasta que se cosecha esa planta o uno de sus esquejes
 const marcaFeno=f=>fenoVisto(f)==='estrella'?' ★':fenoVisto(f)==='floja'?' (floja)':'';
+// número y nombre de cada planta (1.11): la nº de su fenotipo (f.id) o el nombre que le pone el jugador (S.fnom), que heredan sus esquejes
+const nomPlanta=f=>!f||!f.id?'':S.fnom[f.id]?` «${S.fnom[f.id]}»`:' nº '+f.id;
+const etiq=f=>nomPlanta(f)+marcaFeno(f);
+async function nombrarPlanta(f){
+  const v=await pedirTexto('Nombre de la planta (y sus esquejes)',S.fnom[f.id]||'',12);if(v===null||!v&&!S.fnom[f.id])return;
+  if(v)S.fnom[f.id]=v;else delete S.fnom[f.id];sfx('sel');
+  return say(v?`Ahora se llama «${v}». Sus esquejes, también.`:`Sin nombre: vuelve a ser la nº ${f.id}.`);
+}
+// un esqueje del propagador o de las bandejas del carro (l): ponerle nombre o tirarlo
+async function esquejeAccion(e,l){
+  const c=await ask(`Esqueje de ${getStrain(e.sid).n}${etiq(e.f)}.`,['Nombrar','Tirar','Nada']);
+  if(c===0)return nombrarPlanta(e.f);
+  if(c===1){l.splice(l.indexOf(e),1);sfx('sel');return say('Tiras el esqueje.');}
+}
 async function plantar(i){
   const own=Object.entries(S.seeds).filter(([,v])=>v>0),esq=S.esquejes.map(e=>[e,0]).concat(S.bandejas.map(e=>[e,1]));   // 1: de las bandejas del carro
   if(!own.length&&!esq.length)return say('Maceta vacía. No tienes semillas: cómpralas en el growshop de Kiko.');
   const items=own.map(([k,v])=>({label:getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:iconoCogollo(k),desc:strainLine(k)}))
-    .concat(esq.map(([e,b])=>{const s=getStrain(e.sid),v=fenoVisto(e.f);return {label:'Esqueje '+s.n+marcaFeno(e.f),right:b?'bandeja':'esqueje',sw:s.c,ic:iconoCogollo(e.sid),
+    .concat(esq.map(([e,b])=>{const s=getStrain(e.sid),v=fenoVisto(e.f);return {label:'Esqueje '+s.n+etiq(e.f),right:b?'bandeja':'esqueje',sw:s.c,ic:iconoCogollo(e.sid),
       desc:`Clon enraizado: la misma planta que su madre, con su fenotipo.\n${v==='estrella'?`Fenotipo estrella: THC ×${coma(e.f.t)} y cosecha ×${coma(e.f.y)}.`:v==='floja'?'Fenotipo flojo: rinde menos que la media.':'Su fenotipo se sabrá cuando coseches a la madre o a un clon suyo.'}\nSe seca si no lo plantas antes del día ${e.dia+(b?CARRO.dias:ESQUEJE_DIAS)+1}.`};}))
     .concat([{label:'Cancelar',desc:''}]);
   const j=await menu(items,{cls:'full',title:'¿QUÉ PLANTAS?',desc:true});
@@ -184,11 +198,11 @@ async function plantar(i){
   if(j>=own.length){
     const [e,b]=esq[j-own.length],l=b?S.bandejas:S.esquejes;l.splice(l.indexOf(e),1);
     S.pots[i]={sid:e.sid,prog:.12,water:70,health:100,fert:false,pest:false,f:e.f};sfx('sel');   // ya enraizado: empieza de plántula
-    await accion('plantar');await say(`Plantas el esqueje de ${getStrain(e.sid).n}${marcaFeno(e.f)}.`);return pistaBarras();
+    await accion('plantar');await say(`Plantas el esqueje de ${getStrain(e.sid).n}${etiq(e.f)}.`);return pistaBarras();
   }
   const sid=own[j][0];S.seeds[sid]--;if(!S.seeds[sid])delete S.seeds[sid];
   S.pots[i]={sid,prog:0,water:70,health:100,fert:false,pest:false,f:rollFeno(sid)};sfx('sel');
-  await accion('plantar');await say(`Has plantado ${getStrain(sid).n}.`);return pistaBarras();
+  await accion('plantar');await say(`Has plantado ${getStrain(sid).n}${nomPlanta(S.pots[i].f)}.`);return pistaBarras();
 }
 // con la primera planta, qué dice su barra (09b-carpa)
 async function pistaBarras(){
@@ -201,7 +215,7 @@ async function sacarEsqueje(i){
   if(S.esquejes.length>=12)return say('El propagador está lleno: 12 esquejes. Planta alguno antes.');
   S.esquejes.push({sid:p.sid,f:p.f||rollFeno(p.sid),dia:S.day});if(!p.f)p.f=S.esquejes[S.esquejes.length-1].f;
   p.health=Math.max(1,p.health-5);sfx('sel');
-  await say(`Cortas una punta de la ${s.n} y la pones a enraizar.\nPlántala antes del día ${S.day+ESQUEJE_DIAS+1}: es la misma planta.`);
+  await say(`Cortas una punta de la ${s.n}${nomPlanta(p.f)} y la pones a enraizar.\nPlántala antes del día ${S.day+ESQUEJE_DIAS+1}: es la misma planta.`);
   if(carroYa())return say(`O pínchala en el carro: allí aguanta ${CARRO.dias} días.`);
 }
 function stageName(p){return p.prog<.12?'Germinando':p.prog<.35?'Plántula':p.prog<.65?'Vegetativo':'Floración';}
@@ -213,15 +227,17 @@ async function potAction(i){
   }
   const s=getStrain(p.sid);
   if(p.dead){await say(`La ${s.n} se ha secado del todo.`);S.pots[i]=null;return say('Retiras la planta muerta.');}
-  if(p.prog>=1){const c=await ask(`${s.n}${marcaFeno(p.f)} lista para cosechar.\nSalud ${Math.round(p.health)}% · Agua ${Math.round(p.water)}%`,['Cosechar','Esperar']);if(c===0)await harvest(i);return;}
-  const veg=p.prog<.65&&!p.fv&&S.items.fertv>0,opts=['Regar'];if(!p.fert||veg)opts.push('Abonar');if(p.pest)opts.push('Tratar plaga');if(p.prog>=.2&&p.prog<.65)opts.push('Sacar esqueje');opts.push('Arrancar','Salir');
-  const c=await ask(`${s.n}${marcaFeno(p.f)} · ${stageName(p)} ${Math.floor(p.prog*100)}%\nAgua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%${p.pest?' · PLAGA':''}`,opts);
+  if(p.prog>=1){const c=await ask(`${s.n}${etiq(p.f)} lista para cosechar.\nSalud ${Math.round(p.health)}% · Agua ${Math.round(p.water)}%`,['Cosechar','Nombrar','Esperar']);
+    if(c===0)await harvest(i);else if(c===1){if(!p.f)p.f=rollFeno(p.sid);await nombrarPlanta(p.f);}return;}
+  const veg=p.prog<.65&&!p.fv&&S.items.fertv>0,opts=['Regar'];if(!p.fert||veg)opts.push('Abonar');if(p.pest)opts.push('Tratar plaga');if(p.prog>=.2&&p.prog<.65)opts.push('Sacar esqueje');opts.push('Nombrar','Arrancar','Salir');
+  const c=await ask(`${s.n}${etiq(p.f)} · ${stageName(p)} ${Math.floor(p.prog*100)}%\nAgua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%${p.pest?' · PLAGA':''}`,opts);
   const op=opts[c];
   if(op==='Regar'){const [vx,vy]=posPlaza(i);await accion('regar',{id:'vfx-gotas',x:vx,y:vy-6});p.water=100;sfx('sel');await say('Riegas la planta. Agua al 100%.');}
   else if(op==='Abonar'){if(veg||S.items.fert>0){const q=abonoQ();if(S.items.phm>0)S.items.phm--;if(veg){S.items.fertv--;p.fv=q;}else{S.items.fert--;p.fert=true;p.fq=q;}sfx('sel');
     await say((veg?'Echas una dosis de ABONO DE CRECIMIENTO. Crecerá más deprisa.':'Echas una dosis de ABONO. Dará más cosecha.')+(q===ABONO.q[2]?`\nCon el medidor, el pH al ${coma(ABONO.ph[2])}: lo aprovecha entero.`:q>ABONO.q[0]?'\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo.':`\nSin pH−, el agua del grifo (pH ${coma(ABONO.ph[0])}) bloquea ${pct0(1-ABONO.q[0])} % del abono.`));}else await say('No te queda ABONO.');}
   else if(op==='Tratar plaga'){if(S.items.insect>0){S.items.insect--;p.pest=false;sfx('sel');await say('Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.');}else await say('No tienes INSECTICIDA. Kiko lo vende.');}
   else if(op==='Sacar esqueje')await sacarEsqueje(i);
+  else if(op==='Nombrar'){if(!p.f)p.f=rollFeno(p.sid);await nombrarPlanta(p.f);}
   else if(op==='Arrancar'){if(await ask('¿Seguro que quieres arrancarla?',['Sí','No'])===0){S.pots[i]=null;await say('Arrancas la planta.');}}
 }
 // macetas de repuesto que caben en la plaza i (y no son la que ya tiene): las de la mochila hasta CARPAS[t].lmax; con tierra, solo

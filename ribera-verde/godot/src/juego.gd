@@ -130,6 +130,23 @@ func migrate() -> void:
 		S.flags.tono = S.day
 	if S.get("protect") and not S.get("protHasta"):
 		S.protHasta = S.day + int(D.CUOTA_DIAS)
+	for k in S.custom:   # 1.11: los cruces con nombre largo («A × B», de antes) pasan a uno corto, con la misma clave
+		var C: Dictionary = S.custom[k]
+		if not C.n.contains(" × ") and C.n.length() <= Datos.NOM_MAX:
+			continue
+		var cp: PackedStringArray = C.n.split(" × ")
+		var cw := Datos.palabras(C.n)
+		var ch := ceili(cw.size() / 2.0)
+		var wa: Array = Datos.palabras(cp[0]) if cp.size() > 1 else cw.slice(0, ch)
+		var wb: Array = Datos.palabras(cp[-1]) if cp.size() > 1 else cw.slice(ch)
+		C.n = Datos.nombre_cruce(wa, wb, func(nm: String) -> bool:
+			for dx in D.DEX:
+				if D.STRAINS[dx].n.to_lower() == nm.to_lower():
+					return true
+			for q in S.custom:
+				if not is_same(S.custom[q], C) and S.custom[q].n.to_lower() == nm.to_lower():
+					return true
+			return false)
 	var nh := huecos().size()
 	while S.pots.size() < nh:
 		S.pots.append(null)
@@ -198,12 +215,17 @@ func opciones(desde_titulo := false) -> void:
 	while true:
 		var it := [{"label": "MÚSICA", "right": "%d %%" % (aj.musica * 25)}, {"label": "EFECTOS", "right": "%d %%" % (aj.efectos * 25)},
 			{"label": "TEXTO", "right": TEXTO_VEL[aj.texto]}, {"label": "SONIDO", "right": "SÍ" if aj.sonido else "NO"}]
+		if not desde_titulo:
+			it.append({"label": "EXPORTAR PARTIDA"})
 		if desde_titulo and FileAccess.file_exists(GUARDADO):
 			it.append({"label": "BORRAR PARTIDA"})
 		it.append({"label": "VOLVER"})
 		i = await menu(it, {"cls": "start", "initial": i, "title": "OPCIONES"})
 		if i < 0 or it[i].label == "VOLVER":
 			return
+		if it[i].label == "EXPORTAR PARTIDA":
+			await exportar()
+			continue
 		match it[i].label:
 			"MÚSICA":
 				aj.musica = (aj.musica + 1) % 5
@@ -289,19 +311,8 @@ func choose_name() -> String:
 	var i: int = await menu(opts, {"cls": "start", "cancel": false, "title": "NOMBRE"})
 	if i < 4:
 		return opts[i]
-	var pr := Motor.Prom.new()
-	name_in.text = ""
-	name_box.show()
-	_coloca()
-	name_in.grab_focus.call_deferred()
-	push(func(b: String):
-		if b == "A":
-			var v := name_in.text.strip_edges().to_upper().substr(0, 8)
-			name_box.hide()
-			name_in.release_focus()
-			pop()
-			pr.res(v if v != "" else "EDDIE"))
-	return await Motor.espera(pr)
+	var v: String = str(await pedir_texto("¿Cómo te llamas?", "", 8, true, false)).to_upper().substr(0, 8)
+	return v if v != "" else "EDDIE"
 
 func new_game() -> void:
 	# prólogo (1.10): en el caserío de la familia, en Mendialde; el piso de la tía, en Ribera Verde, está a un autobús

@@ -89,7 +89,7 @@ func _gancho_menu(items: Array, o: Dictionary) -> Dictionary:
 			HOLD = false, 5)
 		LOG.append("  [menú] " + " | ".join(labels) + "  → (B)")
 	else:
-		if WANT.size():
+		if WANT.size() and WANT[0] is RegEx:
 			for k in labels.size():
 				if WANT[0].search(labels[k]) != null:
 					WANT.pop_front()
@@ -98,6 +98,17 @@ func _gancho_menu(items: Array, o: Dictionary) -> Dictionary:
 					break
 		LOG.append("  [menú] " + " | ".join(labels) + "  → " + labels[int(o.get("initial", 0)) if o.get("initial") else 0])
 	return o
+
+# la caja de texto (1.11, window.pedirTexto del piloto): '=texto' lo escribe y acepta; '<B>' cancela; sin nada, acepta lo que había
+func _gancho_pedir(t: String, ini: String, mx: int, cancela: bool):
+	var v = ini
+	if WANT.size() and WANT[0] is Dictionary:
+		v = WANT.pop_front().txt.strip_edges().substr(0, mx)
+	elif WANT.size() and WANT[0] is String and WANT[0] == "<B>" and cancela:
+		WANT.pop_front()
+		v = null
+	LOG.append("  [texto] " + t + " → " + ("(B)" if v == null else v))
+	return v
 
 func _gancho_texto(t: String, n: String) -> void:
 	LOG.append((n + ": " if n != "" else "") + J.nm(t))
@@ -139,7 +150,7 @@ func run(f: Callable) -> void:
 func step(nombre: String, w: Array, fn: Callable, check: Callable) -> void:
 	WANT = []
 	for s in w:
-		WANT.append(s if s == "<B>" else RegEx.create_from_string(s))
+		WANT.append(s if s == "<B>" else ({"txt": s.substr(1)} if s.begins_with("=") else RegEx.create_from_string(s)))
 	var l0 := LOG.size()
 	LOG.append("\n=== " + nombre + " ===")
 	var st := {"fin": false}
@@ -250,6 +261,7 @@ func _corre() -> void:
 	J.gancho_menu = _gancho_menu
 	J.gancho_texto = _gancho_texto
 	J.gancho_toast = _gancho_toast
+	J.gancho_pedir = _gancho_pedir
 	M.intervalo(func():
 		if not HOLD and J.handlers.size() and not (J.mode == "carpa" and J.VC and not J.VC.ocupado):
 			J.press("A"), 12)
@@ -1784,6 +1796,93 @@ func _pasos() -> void:
 		J.S = S0,
 		func(): return chk(R.siesta == "Has descansado · Partida guardada" and R.s == 0 and R.s0 == 0 and R.d == 1 and R.min == 420 and R.gasto >= R.luz and R.gasto > 0
 			and R.t.begins_with("Has descansado · Luz −" + Datos.eur(R.gasto)), R))
+	step("Plantas con nombre (1.11): la nº de su fenotipo; «Nombrar» le pone nombre y lo heredan sus esquejes; B cancela y vacío lo quita; en la mochila se tiran esquejes y semillas (una o todas)",
+		["Nombrar", "=Madre Lima", "Sacar esqueje", "Nombrar", "<B>", "MOCHILA", "^Esqueje", "Tirar", "^Semilla Skunk", "Tirar 1", "^Semilla Lemon", "^Tirar$", "<B>", "PLANTAS", "<B>", "SALIR", "Nombrar", "="], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.merge({"ch": 5, "map": "home", "heat": 0, "due": 0, "protect": false, "esquejes": [], "bandejas": [], "fnom": {}, "seeds": {"ria": 3, "limon": 1},
+			"carpas": [{"t": "m100", "foco": "sodio400"}], "macetas": ["plastico7", "plastico7", "plastico7", "plastico7"], "pots": [null, null, null, null]}, true)
+		J.S.pots[0] = {"sid": "ria", "prog": .3, "water": 100, "health": 100, "fert": true, "pest": false, "f": {"id": 9995, "t": 1, "y": 1, "i": 50}}
+		await run(func(): await J.pot_action(0))
+		R = {"n1": J.S.fnom.get("9995")}
+		await run(func(): await J.pot_action(0))
+		R.esq = ",".join(PackedStringArray(J.S.esquejes.map(func(e): return str(int(e.f.id)))))
+		await run(func(): await J.pot_action(0))
+		R.n2 = J.S.fnom.get("9995")
+		var l0 := LOG.size()
+		await run(J.start_menu)
+		R.esq2 = J.S.esquejes.size()
+		R.seeds = JSON.stringify(J.S.seeds)
+		R.lab = LOG.slice(l0).any(func(l): return re("\\[menú\\] .*  1 · Skunk #1 «Madre Lima»", l))
+		await run(func(): await J.pot_action(0))
+		R.n3 = J.S.fnom.has("9995")
+		J.S = S0,
+		func(): return chk(R.n1 == "Madre Lima" and R.esq == "9995" and R.n2 == "Madre Lima" and R.esq2 == 0 and R.seeds == '{"ria":2}' and R.lab and R.n3 == false
+			and LOG.any(func(l): return l == "  [texto] Nombre de la planta (y sus esquejes) → Madre Lima") and LOG.any(func(l): return l == "  [texto] Nombre de la planta (y sus esquejes) → (B)")
+			and LOG.any(func(l): return l.begins_with("Cortas una punta de la Skunk #1 «Madre Lima»")) and LOG.any(func(l): return l == "Sin nombre: vuelve a ser la nº 9995."), R))
+	step("Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave; se cambia el nombre de una propia (sin repetir otro); el recetario, con las 32 y de dónde sale cada semilla",
+		["GENOTECA", "RECETARIO", "Skunk #1$", "Volver", "<B>", "^★ Skunk Haze", "=Haze Corta", "^★ Haze Corta", "=skunk #1", "<B>", "SALIR"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.custom = {}
+		J.S.map = "home"
+		var Rn := Datos.rng_seed(7)
+		var pool: Array = J.D.DEX.duplicate()
+		for g in 120:
+			var a: String = pool[int(floor(Rn.sig() * pool.size()))]
+			var c: String = pool[int(floor(Rn.sig() * pool.size()))]
+			if a == c:
+				continue
+			var id := Datos.cross_result(J.S, a, c)
+			if not pool.has(id):
+				pool.append(id)
+		var ns := []
+		for k in J.S.custom:
+			ns.append(J.S.custom[k].n)
+		var mx := 0
+		var nx := 0
+		var nd := 0
+		var un := {}
+		for nm in ns:
+			mx = maxi(mx, nm.length())
+			if nm.contains("×"):
+				nx += 1
+			un[nm] = true
+			for k in J.D.DEX:
+				if J.D.STRAINS[k].n == nm:
+					nd += 1
+		R = {"n": ns.size(), "x": nx, "max": mx, "rep": ns.size() - un.size(), "dex": nd}
+		var base := {"thc": 15, "y": 400, "d": 9, "r": 50, "o": "x", "c": "#5a8a3a"}
+		J.S.custom = {"xv1": base.merged({"n": "Skunk #1 × Lemon Haze F5"}), "xv2": base.merged({"n": "Northern Lights Haze Skunk Lemon Thai"}), "xv3": base.merged({"n": "Thai Haze"})}
+		J.S.disc.merge({"xv1": true, "xv2": true, "xv3": true}, true)
+		J.migrate()
+		var mg := []
+		for k in J.S.custom:
+			mg.append(k + ":" + J.S.custom[k].n)
+		R.mig = "|".join(PackedStringArray(mg))
+		await run(J.start_menu)
+		R.ren = J.S.custom.xv1.n
+		var Rc: Dictionary = J.recetas()
+		var hojas := []
+		for t in Rc:
+			for o in Rc[t]:
+				for k in o.k:
+					if not hojas.has(k):
+						hojas.append(k)
+		R.rec = Rc.size()
+		R.sin = ",".join(PackedStringArray(hojas.filter(func(k): return J.donde_semilla(k) == "Semillas: .")))
+		R.parque = J.donde_semilla("acapulco")
+		R.ss = "|".join(PackedStringArray(Rc.txoko.map(func(o): return J.receta_txt(o))))
+		J.S = S0,
+		func(): return chk(R.n > 50 and R.x == 0 and R.max <= 20 and R.rep == 0 and R.dex == 0 and R.mig == "xv1:Skunk Haze|xv2:Northern Thai|xv3:Thai Haze" and R.ren == "Haze Corta"
+			and R.rec == 32 and R.sin == "" and R.parque == "Semillas: escondidas en el parque del barrio." and R.ss == "Skunk #1 × Afghani, en ese orden"
+			and LOG.any(func(l): return l == "  [texto] Nuevo nombre de la variedad → Haze Corta") and LOG.any(func(l): return l == "Ya hay una variedad con ese nombre.") and LOG.any(func(l): return re("\\[menú\\] .*Afghani.*Volver  → Volver", l)), R))
+	step("Exportar partida (1.11): OPCIONES → EXPORTAR PARTIDA copia el JSON de la partida", ["OPCIONES", "EXPORTAR", "VOLVER", "SALIR"], func():
+		J.exportado = ""
+		await run(J.start_menu)
+		var s = JSON.parse_string(J.exportado) if J.exportado != "" else null
+		R = {"clip": s is Dictionary and int(s.day) == int(J.S.day) and float(s.money) == float(J.S.money) and JSON.stringify(norm(s.custom)) == JSON.stringify(norm(J.S.custom))},
+		func(): return chk(R.clip and LOG.any(func(l): return l == "Partida copiada al portapapeles. Pégala en una nota o en un correo para guardarla."), R))
 	step("Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad",
 		["Sacar un lote", "^Hindu", "^10 g", "Guardar todo", "Cerrar", "Bolsa de deporte", "Salir", "Sacar todo", "Cerrar"], func():
 		var S0 = J.S

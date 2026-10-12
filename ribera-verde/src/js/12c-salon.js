@@ -92,6 +92,7 @@ async function carroAction(){
     await say(`En las bandejas aguantan hasta el día ${S.day+CARRO.dias}: plántalos cuando haya hueco.`);
     const q=S.esquejes.length;if(q)return say(q>1?`No caben ${q}: se quedan en el propagador.`:'No cabe 1: se queda en el propagador.');
   }
-  if(c==='Ver las bandejas')await menu(S.bandejas.map(e=>({label:'Esqueje '+getStrain(e.sid).n+marcaFeno(e.f),right:'día '+(e.dia+CARRO.dias),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),
-    desc:`Pinchado el día ${e.dia}. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+CARRO.dias}.`})).concat([{label:'Volver',desc:''}]),{cls:'full',title:'BANDEJAS',title2:`${n} de ${cap}`,desc:true});
+  if(c==='Ver las bandejas'){const j=await menu(S.bandejas.map(e=>({label:'Esqueje '+getStrain(e.sid).n+etiq(e.f),right:'día '+(e.dia+CARRO.dias),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),
+    desc:`Pinchado el día ${e.dia}. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+CARRO.dias}.\nPulsa A para ponerle nombre o tirarlo.`})).concat([{label:'Volver',desc:''}]),{cls:'full',title:'BANDEJAS',title2:`${n} de ${cap}`,desc:true});
+    if(j>=0&&j<n)await esquejeAccion(S.bandejas[j],S.bandejas);}
 }

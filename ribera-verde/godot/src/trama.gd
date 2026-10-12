@@ -926,8 +926,115 @@ func start_menu():
 		elif i == 6:
 			await opciones()
 
+# exportar la partida (1.11, exportar de 12-menus): el JSON de S al portapapeles
+var exportado := ""   # lo último copiado (las pruebas lo leen: sin pantalla no hay portapapeles)
+
+func exportar() -> void:
+	exportado = JSON.stringify(S, "", false, true)
+	DisplayServer.clipboard_set(exportado)
+	await say("Partida copiada al portapapeles. Pégala en una nota o en un correo para guardarla.")
+
+# recetario (1.11): cada variedad de receta con sus maneras de sacarla (RECIPES, en cualquier orden; RECETA_ORD, madre × padre)
+func recetas() -> Dictionary:
+	var R := {}
+	for h in D.RECIPES:
+		var t: String = D.RECIPES[h]
+		if not R.has(t):
+			R[t] = []
+		R[t].append({"k": Array(h.split("+")), "ord": false})
+	for h in D.RECETA_ORD:
+		var t: String = D.RECETA_ORD[h]
+		if not R.has(t):
+			R[t] = []
+		R[t].append({"k": Array(h.split(">")), "ord": true})
+	return R
+
+func receta_txt(o: Dictionary) -> String:
+	return (" × " if o.ord else " + ").join(PackedStringArray(o.k.map(func(k): return D.STRAINS[k].n))) + (", en ese orden" if o.ord else "")
+
+const REGALO := {"ria": "te las da Kiko al conocerlo", "rif": "te las da Kiko con la mesa de genética", "hindu": "Txaro, la vecina, por 5 g de cogollo",
+	"chitral": "Txaro, por 10 g de una índica", "malawi": "Iñaki, el del muelle, al venderle 10 g", "acapulco": "escondidas en el parque del barrio"}
+
+func donde_semilla(k: String) -> String:
+	var l := []
+	if REGALO.has(k):
+		l.append(REGALO[k])
+	for it in D.SHOP:
+		if it.get("sid") == k:
+			l.append("en el growshop de Kiko desde el cap. %s" % n(it.ch))
+			break
+	for b in D.BANCO:
+		if b[0] == k:
+			l.append("en el banco de semillas del PC desde el cap. %s" % n(b[2]))
+			break
+	if D.MISIONES.any(func(m): return m.get("s") is Dictionary and m.s.has(k)):
+		l.append("de premio en una misión")
+	if recetas().has(k):
+		l.append("de su receta")
+	return "Semillas: " + "; ".join(PackedStringArray(l)) + "."
+
+func recetario() -> void:
+	var R := recetas()
+	var ts: Array = R.keys()
+	var i := 0
+	while true:
+		var items := []
+		var nd := 0
+		for t in ts:
+			if S.disc.get(t):
+				nd += 1
+			items.append({"label": ("✓ " if S.disc.get(t) else "  ") + D.STRAINS[t].n, "right": ("%d recetas" % R[t].size()) if R[t].size() > 1 else "", "sw": D.STRAINS[t].c, "ic": ic_cog(t),
+				"desc": "\no ".join(PackedStringArray(R[t].map(func(o): return receta_txt(o))))})
+		items.append({"label": "Volver", "desc": ""})
+		i = await menu(items, {"cls": "full", "title": "RECETARIO", "title2": "%d/%d" % [nd, ts.size()], "desc": true, "initial": i})
+		if i < 0 or i >= ts.size():
+			return
+		var t: String = ts[i]
+		var ks := []
+		for o in R[t]:
+			for k in o.k:
+				if not ks.has(k):
+					ks.append(k)
+		var it2 := []
+		for k in ks:
+			it2.append({"label": ("✓ " if S.disc.get(k) else "  ") + D.STRAINS[k].n, "right": ("×" + n(S.seeds[k])) if S.seeds.get(k) else "", "sw": D.STRAINS[k].c, "ic": ic_cog(k), "desc": donde_semilla(k)})
+		it2.append({"label": "Volver", "desc": ""})
+		await menu(it2, {"cls": "full", "title": D.STRAINS[t].n.to_upper(), "title2": "lo que entra", "desc": true})
+
+# cambiar el nombre a una variedad propia (1.11): sin repetir el de otra
+func renombrar_variedad(k: String) -> void:
+	var C: Dictionary = S.custom[k]
+	var v = await pedir_texto("Nuevo nombre de la variedad", C.n, Datos.NOM_MAX)
+	if v == null or v == "" or v == C.n:
+		return
+	var l: String = v.to_lower()
+	for d in D.DEX:
+		if D.STRAINS[d].n.to_lower() == l:
+			await say("Ya hay una variedad con ese nombre.")
+			return
+	for q in S.custom:
+		if not is_same(S.custom[q], C) and S.custom[q].n.to_lower() == l:
+			await say("Ya hay una variedad con ese nombre.")
+			return
+	var a: String = C.n
+	C.n = v
+	sfx("sel")
+	await say("La %s pasa a llamarse %s." % [a, v])
+
 func genoteca():
-	var items := []
+	var i := 0
+	while true:
+		i = await menu_genoteca(i)
+		if i < 0:
+			break
+
+func menu_genoteca(i0: int) -> int:
+	var R := recetas()
+	var nr := 0
+	for t in R:
+		if S.disc.get(t):
+			nr += 1
+	var items := [{"label": "RECETARIO", "right": "%d/%d" % [nr, R.size()], "ic": icono("semillas"), "desc": "Las recetas de las variedades clásicas y dónde conseguir lo que entra en cada una."}]
 	var DEX: Array = D.DEX
 	for j in DEX.size():
 		var k: String = DEX[j]
@@ -943,16 +1050,17 @@ func genoteca():
 			cust.append(k)
 	for k in cust:
 		var s: Dictionary = S.custom[k]
-		items.append({"label": "★ " + s.n, "right": Datos.pct(s.thc) + "%", "sw": s.c, "ic": ic_cog(k), "desc": strain_line(k)})
+		items.append({"label": "★ " + s.n, "right": Datos.pct(s.thc) + "%", "sw": s.c, "ic": ic_cog(k), "desc": strain_line(k) + "\nPulsa A para cambiarle el nombre.", "c": k})
 	var nd := 0
 	for k in DEX:
 		if S.disc.get(k):
 			nd += 1
-	var i := 0
-	while true:
-		i = await menu(items, {"cls": "full", "title": "GENOTECA", "title2": "%d/%d · %d propias" % [nd, DEX.size(), cust.size()], "desc": true, "initial": i})
-		if i < 0:
-			break
+	var i: int = await menu(items, {"cls": "full", "title": "GENOTECA", "title2": "%d/%d · %d propias" % [nd, DEX.size(), cust.size()], "desc": true, "initial": i0})
+	if i == 0:
+		await recetario()
+	elif i > 0 and items[i].get("c"):
+		await renombrar_variedad(items[i].c)
+	return i
 
 func mochila() -> void:
 	var i := 0
@@ -987,10 +1095,10 @@ func mochila() -> void:
 			if S.items.get("x_" + k, 0) > 0:
 				rows.append({"label": D.EXTRAS[k].n, "right": "×" + n(S.items["x_" + k]), "ic": icono(Atlas.ICX[k]), "desc": D.EXTRAS[k].d + "\nSe pone%s desde la vista de carpa: ▲ hasta el foco y A." % ("n" if D.EXTRAS[k].get("pl") else "")})
 		for k in S.seeds:
-			rows.append({"label": "Semilla " + strain(k).n, "right": "×" + n(S.seeds[k]), "sw": strain(k).c, "ic": icono("semillas"), "desc": strain_line(k)})
+			rows.append({"label": "Semilla " + strain(k).n, "right": "×" + n(S.seeds[k]), "sw": strain(k).c, "ic": icono("semillas"), "desc": strain_line(k) + "\nPulsa A para tirarlas.", "k": "s", "sid": k})
 		for e in S.esquejes:
-			rows.append({"label": "Esqueje " + strain(e.sid).n + marca_feno(e.f), "right": "día " + n(e.dia + D.ESQUEJE_DIAS), "sw": strain(e.sid).c, "ic": ic_cog(e.sid),
-				"desc": "Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día %s." % n(e.dia + D.ESQUEJE_DIAS)})
+			rows.append({"label": "Esqueje " + strain(e.sid).n + etiq(e.f), "right": "día " + n(e.dia + D.ESQUEJE_DIAS), "sw": strain(e.sid).c, "ic": ic_cog(e.sid),
+				"desc": "Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día %s.\nPulsa A para ponerle nombre o tirarlo." % n(e.dia + D.ESQUEJE_DIAS), "k": "e", "e": e})
 		for k in S.buds:
 			var b: Dictionary = S.buds[k]
 			rows.append({"label": lot_nombre(k), "right": "%d g · %s%%" % [int(floor(b.g)), Datos.pct(b.thc)], "sw": strain(lot_sid(k)).c, "ic": ic_cog(lot_sid(k)),
@@ -1012,6 +1120,20 @@ func mochila() -> void:
 				toast("Te comes el bocata. +15 de vida", 1200)
 			else:
 				sfx("bump")
+		elif rows[i].get("k") == "e":
+			await esqueje_accion(rows[i].e, S.esquejes)
+		elif rows[i].get("k") == "s":   # tirar semillas (1.11)
+			var sid: String = rows[i].sid
+			var ns: int = int(S.seeds[sid])
+			var o := ["Tirar 1", "Tirar todas", "Nada"] if ns > 1 else ["Tirar", "Nada"]
+			var c: int = await ask("%s de %s." % [("%d semillas" % ns) if ns > 1 else "1 semilla", strain(sid).n], o)
+			if c >= 0 and c < o.size() and o[c] != "Nada":
+				var q: int = ns if o[c] == "Tirar todas" else 1
+				S.seeds[sid] -= q
+				if not S.seeds[sid]:
+					S.seeds.erase(sid)
+				sfx("sel")
+				await say(("Tiras las %d semillas." % q) if q > 1 else "Tiras 1 semilla.")
 
 func plantas() -> void:
 	var rows := []
@@ -1040,7 +1162,7 @@ func plantas() -> void:
 			var s = strain(p.sid)
 			var desc := "Se ha secado. Retírala." if p.get("dead") else "%s · Agua %d%% · Salud %d%%\n%s%s · maceta de %s." % ["Lista para cosechar" if p.prog >= 1 else stage_name(p), Datos.jsround(p.water),
 				Datos.jsround(p.health), "PLAGA: trátala con insecticida. " if p.pest else "", abono_txt(p), Mc.n]
-			rows.append({"label": "  %d · %s%s" % [h.j + 1, s.n, marca_feno(p.get("f"))], "sw": s.c, "ic": ic_cog(p.sid),
+			rows.append({"label": "  %d · %s%s" % [h.j + 1, s.n, etiq(p.get("f"))], "sw": s.c, "ic": ic_cog(p.sid),
 				"right": "muerta" if p.get("dead") else ("LISTA" if p.prog >= 1 else "%d%%" % int(floor(p.prog * 100))), "desc": desc})
 	var luz := factura_luz()
 	var i := 0

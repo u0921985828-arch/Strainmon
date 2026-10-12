@@ -31,6 +31,7 @@ var oraculo := false            # pruebas sin pantalla: no se pinta ni suena nad
 var gancho_menu := Callable()    # (items, o) → o · el piloto de las pruebas elige la opción
 var gancho_texto := Callable()   # (texto, nombre) · transcripción
 var gancho_toast := Callable()   # (html, ms)
+var gancho_pedir := Callable()    # (texto, inicial, máx, cancela) → texto o null · las pruebas escriben en la caja de texto
 var gancho_combate := Callable() # (tipo) · las pruebas cambian el combate por una función (window.battle en el HTML)
 
 var handlers: Array = []
@@ -65,6 +66,9 @@ var menu_box := PanelContainer.new()
 var menu_col := VBoxContainer.new()
 var name_box := PanelContainer.new()
 var name_in := LineEdit.new()
+var name_lbl := Label.new()
+var name_small := Label.new()
+var name_mayus := false
 var lector := PanelContainer.new()   # textos largos con scroll (créditos, licencias, privacidad): leer()
 var lector_ttl := Label.new()
 var lector_pie := Label.new()
@@ -179,14 +183,20 @@ func _ready() -> void:
 	add_child(menu_box)
 	var nc := VBoxContainer.new()
 	name_box.add_child(nc)
-	var nl := Label.new()
-	nl.text = "¿Cómo te llamas?"
-	nc.add_child(nl)
+	name_lbl.text = "¿Cómo te llamas?"
+	nc.add_child(name_lbl)
 	name_in.max_length = 8
 	nc.add_child(name_in)
-	var ns := Label.new()
-	ns.text = "Pulsa A para aceptar"
-	nc.add_child(ns)
+	name_in.text_changed.connect(func(t: String):   # en mayúsculas (el nombre del jugador), como text-transform en el HTML
+		if name_mayus and t != t.to_upper():
+			var cc := name_in.caret_column
+			name_in.text = t.to_upper()
+			name_in.caret_column = cc)
+	name_small.text = "Pulsa A para aceptar"
+	nc.add_child(name_small)
+	name_in.focus_exited.connect(func():   # con la caja abierta, el foco se queda en ella (las teclas no vuelven al juego)
+		if name_box.visible:
+			name_in.grab_focus.call_deferred())
 	add_child(name_box)
 	var lc := VBoxContainer.new()
 	var lt := HBoxContainer.new()
@@ -547,6 +557,10 @@ var dedos_cruz := {}   # dedo en la cruceta → flecha que aprieta ("" en la zon
 var rep := {}     # mando → [id del retardo, id del intervalo]
 
 func _input(e: InputEvent) -> void:
+	if name_box.visible and e is InputEventKey and e.pressed and not e.echo and e.keycode == KEY_ESCAPE:   # Esc = B en la caja de texto
+		get_viewport().set_input_as_handled()
+		press("B")
+		return
 	var dedo = null
 	if e is InputEventScreenTouch:
 		dedo = e.index
@@ -662,6 +676,32 @@ func suelta_todo() -> void:
 	for b in held:
 		held[b] = false
 	dir_order.clear()
+
+# texto a mano (1.11, pedirTexto de 07-interfaz): el nombre del jugador, de una planta o de una variedad propia. A (o Intro) acepta;
+# B (o Esc) cancela y da null. Solo letras, números, espacio y # ' . - (limpiaTexto)
+static func limpia_texto(s: String, mx: int) -> String:
+	return RegEx.create_from_string("[^\\p{L}\\p{N} #'.\\-]").sub(s, "", true).strip_edges().substr(0, mx)
+
+func pedir_texto(txt: String, ini := "", mx := 12, mayus := false, cancela := true):
+	if gancho_pedir.is_valid():
+		return gancho_pedir.call(txt, ini, mx, cancela)
+	var pr := Motor.Prom.new()
+	name_lbl.text = txt
+	name_small.text = "Pulsa A para aceptar" + (" y B para cancelar" if cancela else "")
+	name_mayus = mayus
+	name_in.max_length = mx
+	name_in.text = ini
+	name_box.show()
+	_coloca()
+	name_in.grab_focus.call_deferred()
+	push(func(b: String):
+		if b == "A" or (b == "B" and cancela):
+			var v = limpia_texto(name_in.text, mx) if b == "A" else null
+			name_box.hide()
+			name_in.release_focus()
+			pop()
+			pr.res(v))
+	return await Motor.espera(pr)
 
 func push(fn: Callable) -> void:
 	handlers.append(fn)

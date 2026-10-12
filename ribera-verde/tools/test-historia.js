@@ -46,7 +46,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
       const labels = items.map(it => typeof it === 'string' ? it : it.label);
       if (WANT[0] === '<B>') { WANT.shift(); HOLD = true; setTimeout(() => { press('B'); HOLD = false; }, 5); LOG.push('  [menú] ' + labels.join(' | ') + '  → (B)'); }
       else {
-        if (WANT.length) { const k = labels.findIndex(l => WANT[0].test(l)); if (k >= 0) { WANT.shift(); o = Object.assign({}, o, { initial: k }); } }
+        if (WANT[0] instanceof RegExp) { const k = labels.findIndex(l => WANT[0].test(l)); if (k >= 0) { WANT.shift(); o = Object.assign({}, o, { initial: k }); } }
         LOG.push('  [menú] ' + labels.join(' | ') + '  → ' + labels[o.initial || 0]);
       }
       return _menu(items, o);
@@ -55,7 +55,13 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     window.typeText = function (t, n) { LOG.push((n ? n + ': ' : '') + nm(t)); return _tt(t, n); };
     setInterval(() => { if (!HOLD && handlers.length && !(mode === 'carpa' && VC && !VC.ocupado)) press('A'); }, 12);   // en la vista de carpa, las teclas las pulsa el paso
     window.idle = () => new Promise(r => { const t = setInterval(() => { if (isFree() && !pending.length) { clearInterval(t); r(); } }, 25); });
-    window.want = w => { WANT = w.map(s => s === '<B>' ? s : new RegExp(s)); };
+    window.want = w => { WANT = w.map(s => s === '<B>' ? s : s[0] === '=' ? { txt: s.slice(1) } : new RegExp(s)); };   // '=texto': lo que se escribe en la caja de texto
+    window.pedirTexto = async (t, ini = '', max = 12, mayus = false, cancela = true) => {   // la caja de texto (1.11): '=texto' lo escribe y acepta; '<B>' cancela; sin nada, acepta lo que había
+      let v = ini;
+      if (WANT[0] && WANT[0].txt !== undefined) v = WANT.shift().txt.trim().slice(0, max);
+      else if (WANT[0] === '<B>' && cancela) { WANT.shift(); v = null; }
+      LOG.push('  [texto] ' + t + ' → ' + (v === null ? '(B)' : v)); return v;
+    };
     window.pr = l => SHOP.find(it => it.lbl.startsWith(l)).p;   // precio de tienda por el principio del rótulo
     // las patrullas (1.10) no andan solas (ni con el reloj en marcha): los pasos que las prueban llaman a UPAT con un dt fijo
     window.UPAT = updatePatrullas; window.updatePatrullas = () => {};
@@ -570,6 +576,40 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     Object.assign(R, { d: S.day - d, gasto: m - S.money, t: T[T.length - 1], luz: luzCarpa(0), min: S.min }); window.toast = _t; S = S0;
   }, () => R.siesta === 'Has descansado · Partida guardada' && R.s === 0 && R.s0 === 0 && R.d === 1 && R.min === 420 && R.gasto >= R.luz && R.gasto > 0
     && R.t.startsWith(`Has descansado · Luz −${eur(R.gasto)}`) || R);
+  await step('Plantas con nombre (1.11): la nº de su fenotipo; «Nombrar» le pone nombre y lo heredan sus esquejes; B cancela y vacío lo quita; en la mochila se tiran esquejes y semillas (una o todas)',
+    ['Nombrar', '=Madre Lima', 'Sacar esqueje', 'Nombrar', '<B>', 'MOCHILA', '^Esqueje', 'Tirar', '^Semilla Skunk', 'Tirar 1', '^Semilla Lemon', '^Tirar$', '<B>', 'PLANTAS', '<B>', 'SALIR', 'Nombrar', '='], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0));
+    Object.assign(S, { ch: 5, map: 'home', heat: 0, due: 0, protect: false, esquejes: [], bandejas: [], fnom: {}, seeds: { ria: 3, limon: 1 }, carpas: [{ t: 'm100', foco: 'sodio400' }], macetas: Array(4).fill('plastico7'), pots: [null, null, null, null] });
+    S.pots[0] = { sid: 'ria', prog: .3, water: 100, health: 100, fert: true, pest: false, f: { id: 9995, t: 1, y: 1, i: 50 } };
+    await run(() => potAction(0)); window.R = { n1: S.fnom[9995] };
+    await run(() => potAction(0)); R.esq = S.esquejes.map(e => e.f.id).join();
+    await run(() => potAction(0)); R.n2 = S.fnom[9995];
+    const l0 = LOG.length; await run(startMenu); R.esq2 = S.esquejes.length; R.seeds = JSON.stringify(S.seeds);
+    R.lab = LOG.slice(l0).some(l => /\[menú\] .*  1 · Skunk #1 «Madre Lima»/.test(l));
+    await run(() => potAction(0)); R.n3 = 9995 in S.fnom; S = S0;
+  }, () => R.n1 === 'Madre Lima' && R.esq === '9995' && R.n2 === 'Madre Lima' && R.esq2 === 0 && R.seeds === '{"ria":2}' && R.lab && R.n3 === false
+    && LOG.some(l => l === '  [texto] Nombre de la planta (y sus esquejes) → Madre Lima') && LOG.some(l => l === '  [texto] Nombre de la planta (y sus esquejes) → (B)')
+    && LOG.some(l => l.startsWith('Cortas una punta de la Skunk #1 «Madre Lima»')) && LOG.some(l => l === 'Sin nombre: vuelve a ser la nº 9995.') || R);
+  await step('Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave; se cambia el nombre de una propia (sin repetir otro); el recetario, con las 32 y de dónde sale cada semilla',
+    ['GENOTECA', 'RECETARIO', 'Skunk #1$', 'Volver', '<B>', '^★ Skunk Haze', '=Haze Corta', '^★ Haze Corta', '=skunk #1', '<B>', 'SALIR'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0)); S.custom = {}; S.map = 'home';
+    const Rn = rngSeed(7), pool = DEX.slice();
+    for (let g = 0; g < 120; g++) { const a = pool[Math.floor(Rn() * pool.length)], c = pool[Math.floor(Rn() * pool.length)]; if (a === c) continue; const id = crossResult(a, c); if (!pool.includes(id)) pool.push(id); }
+    const ns = Object.values(S.custom).map(c => c.n);
+    window.R = { n: ns.length, x: ns.filter(n => n.includes('×')).length, max: Math.max(...ns.map(n => n.length)), rep: ns.length - new Set(ns).size, dex: ns.filter(n => DEX.some(k => STRAINS[k].n === n)).length };
+    const base = { thc: 15, y: 400, d: 9, r: 50, o: 'x', c: '#5a8a3a' };
+    S.custom = { xv1: Object.assign({ n: 'Skunk #1 × Lemon Haze F5' }, base), xv2: Object.assign({ n: 'Northern Lights Haze Skunk Lemon Thai' }, base), xv3: Object.assign({ n: 'Thai Haze' }, base) };
+    S.disc = Object.assign({}, S.disc, { xv1: true, xv2: true, xv3: true }); migrate(); R.mig = Object.keys(S.custom).map(k => k + ':' + S.custom[k].n).join('|');
+    await run(startMenu); R.ren = S.custom.xv1.n;
+    const Rc = recetas(), hojas = [...new Set(Object.values(Rc).flat().flatMap(o => o.k))];
+    R.rec = Object.keys(Rc).length; R.sin = hojas.filter(k => dondeSemilla(k) === 'Semillas: .').join(); R.parque = dondeSemilla('acapulco'); R.ss = Rc.txoko.map(recetaTxt).join('|'); S = S0;
+  }, () => R.n > 50 && R.x === 0 && R.max <= 20 && R.rep === 0 && R.dex === 0 && R.mig === 'xv1:Skunk Haze|xv2:Northern Thai|xv3:Thai Haze' && R.ren === 'Haze Corta'
+    && R.rec === 32 && R.sin === '' && R.parque === 'Semillas: escondidas en el parque del barrio.' && R.ss === 'Skunk #1 × Afghani, en ese orden'
+    && LOG.some(l => l === '  [texto] Nuevo nombre de la variedad → Haze Corta') && LOG.some(l => l === 'Ya hay una variedad con ese nombre.') && LOG.some(l => /\[menú\] .*Afghani.*Volver  → Volver/.test(l)) || R);
+  await step('Exportar partida (1.11): OPCIONES → EXPORTAR PARTIDA copia el JSON de la partida', ['OPCIONES', 'EXPORTAR', 'VOLVER', 'SALIR'], async () => {
+    window.CLIP = ''; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async t => { window.CLIP = t; } }, configurable: true });
+    await run(startMenu); const s = JSON.parse(CLIP || 'null'); window.R = { clip: !!s && s.day === S.day && s.money === S.money && JSON.stringify(s.custom) === JSON.stringify(S.custom) };
+  }, () => R.clip && LOG.some(l => l === 'Partida copiada al portapapeles. Pégala en una nota o en un correo para guardarla.') || R);
   await step('Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad',
     ['Sacar un lote', '^Hindu', '^10 g', 'Guardar todo', 'Cerrar', 'Bolsa de deporte', 'Salir', 'Sacar todo', 'Cerrar'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 5, map: 'home', buds: {}, rosin: {}, arcon: { buds: {}, rosin: {} }, protect: false, caja: null });

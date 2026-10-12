@@ -124,17 +124,28 @@ const tonoHoja=i=>i<=65?mix('#8aa83e','#57a33e',i/65):mix('#57a33e','#3f7a34',(i
 const indDe=sid=>{const s=getStrain(sid)||{d:3.5};return s.ind!=null?s.ind:s.d<=3?75:s.d>=4.5?20:50;};
 const hojaDe=sid=>{const s=getStrain(sid);return s&&s.hj||tonoHoja(indDe(sid));};
 // a: la madre, b: el padre
+// nombre corto de un cruce (1.11): dos palabras de los padres (la 1.ª de uno y la última del otro antes que las demás), de hasta
+// NOM_MAX letras y sin repetir otra variedad (ni cambiando mayúsculas); si no queda ninguna, la más corta con « #2», « #3»… Nunca «A × B»: al cruzar cruces
+// se hacía larguísimo. El orden de las parejas, por largo y luego por cómo salen (igual en Godot, que no ordena estable)
+const NOM_MAX=20;
+const palabras=n=>n.split(' ').filter(p=>p&&p!=='×'&&!p.startsWith('#')&&!/^F\d+$/.test(p));
+function nombreCruce(wa,wb,usado){
+  const c=[],add=n=>{if(!c.includes(n))c.push(n);},r=[];
+  if(wa.length&&wb.length){add(wa[0]+' '+wb[wb.length-1]);add(wb[0]+' '+wa[wa.length-1]);}
+  for(const x of wa)for(const y of wb)if(x!==y)r.push(x+' '+y,y+' '+x);
+  r.map((n,i)=>[n,i]).sort((p,q)=>p[0].length-q[0].length||p[1]-q[1]).forEach(([n])=>add(n));
+  const ok=c.filter(n=>{const [x,y]=n.split(' ');return x!==y&&n.length<=NOM_MAX;});
+  for(const n of ok)if(!usado(n))return n;
+  const base=ok.find(n=>n.length<=NOM_MAX-4)||(wa[0]||wb[0]||'Cruce').slice(0,NOM_MAX-4);
+  for(let k=2;;k++){const n=base.slice(0,NOM_MAX-2-String(k).length).trimEnd()+' #'+k;if(!usado(n))return n;}
+}
 function crossResult(a,b){
   const rc=recetaDe(a,b);if(rc)return rc;
   const key=[a,b].sort().join('+');
   const id='x'+hashStr(key).toString(36);
   if(!S.custom[id]){
     const A=getStrain(a),B=getStrain(b),R=rngSeed(hashStr(key));
-    const w=s=>s.n.split(' ').filter(p=>!p.startsWith('#'));const wa=w(A),wb=w(B);
-    const usado=n=>n===A.n||n===B.n||DEX.some(k=>STRAINS[k].n===n)||Object.values(S.custom).some(c=>c.n===n);
-    let name=wa[0]+' '+wb[wb.length-1];if(wa[0]===wb[wb.length-1]||usado(name))name=wb[0]+' '+wa[wa.length-1];
-    if(usado(name))name=A.n+' × '+B.n;
-    if(usado(name))name+=' F'+(2+Math.floor(R()*7));
+    const l=n=>n.toLowerCase(),name=nombreCruce(palabras(A.n),palabras(B.n),n=>l(n)===l(A.n)||l(n)===l(B.n)||DEX.some(k=>l(STRAINS[k].n)===l(n))||Object.values(S.custom).some(c=>l(c.n)===l(n)));
     S.custom[id]={n:name,thc:Math.min(33,Math.round(((A.thc+B.thc)/2+R()*3.5-1.5)*10)/10),y:Math.round((A.y+B.y)/2+R()*8-4),
       d:Math.round(((A.d+B.d)/2+R()*.6-.3)*2)/2,r:clamp(Math.round((A.r+B.r)/2+R()*10-5),20,95),o:A.n+' × '+B.n+' · híbrido propio'};
     // de la madre (a) hereda el m % (30-70) y del padre el resto: el % índica, el tono de la hoja y el color del cogollo

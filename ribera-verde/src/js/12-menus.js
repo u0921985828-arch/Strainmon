@@ -21,19 +21,64 @@ const TEXTO_VEL=['NORMAL','RÁPIDO','AL MOMENTO'];
 async function opciones(){
   let i=0;
   for(;;){
-    i=await menu([{label:'MÚSICA',right:AJ.musica*25+' %'},{label:'EFECTOS',right:AJ.efectos*25+' %'},{label:'TEXTO',right:TEXTO_VEL[AJ.texto]},{label:'SONIDO',right:soundOn?'SÍ':'NO'},{label:'VOLVER'}],
+    i=await menu([{label:'MÚSICA',right:AJ.musica*25+' %'},{label:'EFECTOS',right:AJ.efectos*25+' %'},{label:'TEXTO',right:TEXTO_VEL[AJ.texto]},{label:'SONIDO',right:soundOn?'SÍ':'NO'},{label:'EXPORTAR PARTIDA'},{label:'VOLVER'}],
       {cls:'start',initial:i,title:'OPCIONES'});
-    if(i<0||i===4)return;
+    if(i<0||i===5)return;
+    if(i===4){await exportar();continue;}
     if(i===0)AJ.musica=(AJ.musica+1)%5;else if(i===1)AJ.efectos=(AJ.efectos+1)%5;else if(i===2)AJ.texto=(AJ.texto+1)%3;else setSound(!soundOn);
     guardaAjustes();if(i===1)sfx('coin');
   }
 }
+// exportar la partida (1.11): el JSON de S al portapapeles, para guardarlo en una nota (no hay importar)
+async function exportar(){
+  const t=JSON.stringify(S);let ok=false;
+  try{await navigator.clipboard.writeText(t);ok=true;}catch(e){}
+  if(!ok){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{ok=document.execCommand('copy');}catch(e){}a.remove();}
+  return say(ok?'Partida copiada al portapapeles. Pégala en una nota o en un correo para guardarla.':'No se ha podido copiar en este navegador.');
+}
+// recetario (1.11): cada variedad de receta con sus maneras de sacarla (RECIPES, en cualquier orden; RECETA_ORD, madre × padre)
+// y, de cada una que entra, dónde se consiguen las semillas
+function recetas(){const R={},add=(t,o)=>(R[t]=R[t]||[]).push(o);
+  for(const [h,t] of Object.entries(RECIPES))add(t,{k:h.split('+'),ord:false});
+  for(const [h,t] of Object.entries(RECETA_ORD))add(t,{k:h.split('>'),ord:true});
+  return R;}
+const recetaTxt=o=>o.k.map(k=>STRAINS[k].n).join(o.ord?' × ':' + ')+(o.ord?', en ese orden':'');
+const REGALO={ria:'te las da Kiko al conocerlo',rif:'te las da Kiko con la mesa de genética',hindu:'Txaro, la vecina, por 5 g de cogollo',
+  chitral:'Txaro, por 10 g de una índica',malawi:'Iñaki, el del muelle, al venderle 10 g',acapulco:'escondidas en el parque del barrio'};
+function dondeSemilla(k){
+  const b=BANCO.find(x=>x[0]===k),t=SHOP.find(it=>it.sid===k),l=[];
+  if(REGALO[k])l.push(REGALO[k]);if(t)l.push(`en el growshop de Kiko desde el cap. ${t.ch}`);if(b)l.push(`en el banco de semillas del PC desde el cap. ${b[2]}`);
+  if(MISIONES.some(m=>m.s&&m.s[k]))l.push('de premio en una misión');if(recetas()[k])l.push('de su receta');
+  return 'Semillas: '+l.join('; ')+'.';
+}
+async function recetario(){
+  const R=recetas(),ts=Object.keys(R);let i=0;
+  for(;;){
+    i=await menu(ts.map(t=>({label:(S.disc[t]?'✓ ':'  ')+STRAINS[t].n,right:R[t].length>1?R[t].length+' recetas':'',sw:STRAINS[t].c,ic:iconoCogollo(t),
+      desc:R[t].map(recetaTxt).join('\no '),k:t})).concat([{label:'Volver',desc:''}]),{cls:'full',title:'RECETARIO',title2:`${ts.filter(t=>S.disc[t]).length}/${ts.length}`,desc:true,initial:i});
+    if(i<0||i>=ts.length)return;
+    const t=ts[i],ks=[...new Set(R[t].flatMap(o=>o.k))];
+    await menu(ks.map(k=>({label:(S.disc[k]?'✓ ':'  ')+STRAINS[k].n,right:S.seeds[k]?'×'+S.seeds[k]:'',sw:STRAINS[k].c,ic:iconoCogollo(k),desc:dondeSemilla(k)}))
+      .concat([{label:'Volver',desc:''}]),{cls:'full',title:STRAINS[t].n.toUpperCase(),title2:'lo que entra',desc:true});
+  }
+}
+// cambiar el nombre a una variedad propia (1.11): sin repetir el de otra
+async function renombrarVariedad(k){
+  const C=S.custom[k],v=await pedirTexto('Nuevo nombre de la variedad',C.n,NOM_MAX);if(!v||v===C.n)return;
+  const l=v.toLowerCase();if(DEX.some(d=>STRAINS[d].n.toLowerCase()===l)||Object.values(S.custom).some(c=>c!==C&&c.n.toLowerCase()===l))return say('Ya hay una variedad con ese nombre.');
+  const a=C.n;C.n=v;sfx('sel');return say(`La ${a} pasa a llamarse ${v}.`);
+}
 async function genoteca(){
-  const items=DEX.map((k,n)=>{const s=STRAINS[k],nn=String(n+1).padStart(2,'0');return S.disc[k]?{label:`${nn} ${s.n}`,right:pct(s.thc)+'%',sw:s.c,ic:iconoCogollo(k),desc:strainLine(k)+(s.h?'\n'+s.h:'')}:{label:`${nn} ??????`,desc:'Sin descubrir.'};});
-  const cust=Object.keys(S.custom).filter(k=>S.disc[k]);
-  cust.forEach(k=>{const s=S.custom[k];items.push({label:'★ '+s.n,right:pct(s.thc)+'%',sw:s.c,ic:iconoCogollo(k),desc:strainLine(k)});});
   let i=0;
-  do{i=await menu(items,{cls:'full',title:'GENOTECA',title2:`${DEX.filter(k=>S.disc[k]).length}/${DEX.length} · ${cust.length} propias`,desc:true,initial:i});}while(i>=0);
+  for(;;){
+    const items=[{label:'RECETARIO',right:`${Object.keys(recetas()).filter(t=>S.disc[t]).length}/${Object.keys(recetas()).length}`,ic:icono('semillas'),desc:'Las recetas de las variedades clásicas y dónde conseguir lo que entra en cada una.'}]
+      .concat(DEX.map((k,n)=>{const s=STRAINS[k],nn=String(n+1).padStart(2,'0');return S.disc[k]?{label:`${nn} ${s.n}`,right:pct(s.thc)+'%',sw:s.c,ic:iconoCogollo(k),desc:strainLine(k)+(s.h?'\n'+s.h:'')}:{label:`${nn} ??????`,desc:'Sin descubrir.'};}));
+    const cust=Object.keys(S.custom).filter(k=>S.disc[k]);
+    cust.forEach(k=>{const s=S.custom[k];items.push({label:'★ '+s.n,right:pct(s.thc)+'%',sw:s.c,ic:iconoCogollo(k),desc:strainLine(k)+'\nPulsa A para cambiarle el nombre.',c:k});});
+    i=await menu(items,{cls:'full',title:'GENOTECA',title2:`${DEX.filter(k=>S.disc[k]).length}/${DEX.length} · ${cust.length} propias`,desc:true,initial:i});
+    if(i<0)return;
+    if(i===0)await recetario();else if(items[i].c)await renombrarVariedad(items[i].c);
+  }
 }
 async function mochila(){
   let i=0;
@@ -49,14 +94,19 @@ async function mochila(){
     for(const k in MACETAS)if(S.items['m_'+k]>0)rows.push({label:'Maceta '+MACETAS[k].n,right:'×'+S.items['m_'+k],ic:icono('maceta'),desc:descMaceta(k)+'\nSe cambia en una plaza vacía de la carpa.'});
     for(const k in FOCOS)if(S.items['f_'+k]>0)rows.push({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],ic:icono(icoFoco(k)),desc:descFoco(k)+'\nSe cuelga desde la vista de carpa: ▲ hasta el foco y A.'});
     for(const k in EXTRAS)if(S.items['x_'+k]>0)rows.push({label:EXTRAS[k].n,right:'×'+S.items['x_'+k],ic:icono(ICX[k]),desc:EXTRAS[k].d+`\nSe pone${EXTRAS[k].pl?'n':''} desde la vista de carpa: ▲ hasta el foco y A.`});
-    for(const [k,v] of Object.entries(S.seeds))rows.push({label:'Semilla '+getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:icono('semillas'),desc:strainLine(k)});
-    for(const e of S.esquejes)rows.push({label:'Esqueje '+getStrain(e.sid).n+marcaFeno(e.f),right:'día '+(e.dia+ESQUEJE_DIAS),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),desc:`Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+ESQUEJE_DIAS}.`});
+    for(const [k,v] of Object.entries(S.seeds))rows.push({label:'Semilla '+getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:icono('semillas'),desc:strainLine(k)+'\nPulsa A para tirarlas.',k:'s',sid:k});
+    for(const e of S.esquejes)rows.push({label:'Esqueje '+getStrain(e.sid).n+etiq(e.f),right:'día '+(e.dia+ESQUEJE_DIAS),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),desc:`Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+ESQUEJE_DIAS}.\nPulsa A para ponerle nombre o tirarlo.`,k:'e',e});
     for(const [k,b] of Object.entries(S.buds))rows.push({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k)),desc:(k.endsWith('*')?'Cogollos de un fenotipo estrella, en lote aparte.\n':'Cogollos listos para vender.\n')+getStrain(lotSid(k)).o});
     for(const [k,b] of Object.entries(S.rosin))rows.push({label:'Rosin · '+lotNombre(k),right:`${coma(b.g)} g · ${pct(b.thc)}%`,sw:'#d89a18',ic:iconoCogollo(lotSid(k)),desc:'Rosin: extracción prensada sin disolventes. Lo compran los catadores.\n'+getStrain(lotSid(k)).o});
     if(S.items.prensa)rows.push({label:'Prensa de rosin',right:'en la mesa',desc:'De 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso.'});
     i=await menu(rows,{cls:'full',title:'MOCHILA',title2:`${Math.floor(totalBuds())} g encima`+(S.caja?` · ${Math.floor(cajaG())} g en la caja`:''),desc:true,initial:i});
     if(i<0)return;
     if(rows[i].k==='bocata'){if(S.items.bocata>0&&S.hp<S.hpMax){S.items.bocata--;S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');toast('Te comes el bocata. +15 de vida',1200);}else sfx('bump');}
+    else if(rows[i].k==='e')await esquejeAccion(rows[i].e,S.esquejes);
+    else if(rows[i].k==='s'){   // tirar semillas (1.11)
+      const sid=rows[i].sid,n=S.seeds[sid],o=n>1?['Tirar 1','Tirar todas','Nada']:['Tirar','Nada'],c=await ask(`${n>1?n+' semillas':'1 semilla'} de ${getStrain(sid).n}.`,o);
+      if(o[c]&&o[c]!=='Nada'){const q=o[c]==='Tirar todas'?n:1;S.seeds[sid]-=q;if(!S.seeds[sid])delete S.seeds[sid];sfx('sel');await say(q>1?`Tiras las ${q} semillas.`:'Tiras 1 semilla.');}
+    }
   }
 }
 async function plantas(){
@@ -68,7 +118,7 @@ async function plantas(){
     H.forEach((h,i)=>{if(h.c!==ci)return;const p=S.pots[i],M=MACETAS[S.macetas[i]];
       if(!p){rows.push({label:`  ${h.j+1} · vacía`,right:M.l+' L',ic:icono('maceta'),desc:`Maceta de ${M.n}. Planta algo desde la carpa de tu piso.`});return;}
       const s=getStrain(p.sid);
-      rows.push({label:`  ${h.j+1} · ${s.n}${marcaFeno(p.f)}`,sw:s.c,ic:iconoCogollo(p.sid),right:p.dead?'muerta':p.prog>=1?'LISTA':`${Math.floor(p.prog*100)}%`,desc:p.dead?'Se ha secado. Retírala.':`${p.prog>=1?'Lista para cosechar':stageName(p)} · Agua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%\n${p.pest?'PLAGA: trátala con insecticida. ':''}${abonoTxt(p)} · maceta de ${M.n}.`});});
+      rows.push({label:`  ${h.j+1} · ${s.n}${etiq(p.f)}`,sw:s.c,ic:iconoCogollo(p.sid),right:p.dead?'muerta':p.prog>=1?'LISTA':`${Math.floor(p.prog*100)}%`,desc:p.dead?'Se ha secado. Retírala.':`${p.prog>=1?'Lista para cosechar':stageName(p)} · Agua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%\n${p.pest?'PLAGA: trátala con insecticida. ':''}${abonoTxt(p)} · maceta de ${M.n}.`});});
   });
   const luz=facturaLuz();
   let i=0;do{i=await menu(rows,{cls:'full',title:'CULTIVO',title2:luz?'Luz '+eur(luz)+'/día':'Luz apagada',desc:true,initial:i});}while(i>=0);

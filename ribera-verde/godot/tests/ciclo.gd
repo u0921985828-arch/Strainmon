@@ -545,7 +545,8 @@ func menu_start() -> void:
 	var l := etiquetas()
 	check("START abre el menú (%s)" % ", ".join(l), l == ["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "GUARDAR", "OPCIONES", "SALIR"])
 	await elige("GENOTECA")
-	check("Genoteca: %d filas, todas sin descubrir" % J.m_items.size(), J.m_items.size() == J.D.DEX.size() and J.m_items.all(func(x): return x.label.ends_with("??????")))
+	check("Genoteca: el recetario y %d filas, todas sin descubrir" % (J.m_items.size() - 1), J.m_items.size() == J.D.DEX.size() + 1 and J.m_items[0].label == "RECETARIO"
+		and J.m_items.slice(1).all(func(x): return x.label.ends_with("??????")))
 	await pulsa("B")
 	await elige("MOCHILA")
 	check("Mochila: dinero, la mochila (1 kg), vida y lo de siempre", J.m_items.size() == 7 and J.m_items[0].right == "150 €" and J.m_items[1].right == "0 de 1 kg")

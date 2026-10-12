@@ -169,6 +169,41 @@ func marca_feno(f) -> String:
 	var v = feno_visto(f)
 	return " ★" if v == "estrella" else (" (floja)" if v == "floja" else "")
 
+# número y nombre de cada planta (1.11, nomPlanta de 09-cultivo): la nº de su fenotipo o el nombre de S.fnom, que heredan sus esquejes
+func nom_planta(f) -> String:
+	if not (f is Dictionary and f.get("id")):
+		return ""
+	var k := str(int(f.id))
+	var fn: Dictionary = S.get("fnom", {})
+	return (" «%s»" % fn[k]) if fn.has(k) else " nº " + k
+
+func etiq(f) -> String:
+	return nom_planta(f) + marca_feno(f)
+
+func nombrar_planta(f: Dictionary) -> void:
+	if not S.has("fnom"):
+		S.fnom = {}
+	var k := str(int(f.id))
+	var v = await pedir_texto("Nombre de la planta (y sus esquejes)", S.fnom.get(k, ""), 12)
+	if v == null or (v == "" and not S.fnom.has(k)):
+		return
+	if v != "":
+		S.fnom[k] = v
+	else:
+		S.fnom.erase(k)
+	sfx("sel")
+	await say(("Ahora se llama «%s». Sus esquejes, también." % v) if v != "" else ("Sin nombre: vuelve a ser la nº %s." % k))
+
+# un esqueje del propagador o de las bandejas del carro (l): ponerle nombre o tirarlo
+func esqueje_accion(e: Dictionary, l: Array) -> void:
+	var c: int = await ask("Esqueje de %s%s." % [strain(e.sid).n, etiq(e.f)], ["Nombrar", "Tirar", "Nada"])
+	if c == 0:
+		await nombrar_planta(e.f)
+	elif c == 1:
+		l.remove_at(l.find(e))
+		sfx("sel")
+		await say("Tiras el esqueje.")
+
 # ---------- plantar y cuidar ----------
 func _own() -> Array:
 	var o := []
@@ -196,7 +231,7 @@ func plantar(i: int) -> void:
 		var s = strain(e.sid)
 		var v = feno_visto(e.f)
 		var dv := ("Fenotipo estrella: THC ×%s y cosecha ×%s." % [Datos.coma(e.f.t), Datos.coma(e.f.y)]) if v == "estrella" else ("Fenotipo flojo: rinde menos que la media." if v == "floja" else "Su fenotipo se sabrá cuando coseches a la madre o a un clon suyo.")
-		items.append({"label": "Esqueje " + s.n + marca_feno(e.f), "right": "bandeja" if eb[1] else "esqueje", "sw": s.c, "ic": ic_cog(e.sid),
+		items.append({"label": "Esqueje " + s.n + etiq(e.f), "right": "bandeja" if eb[1] else "esqueje", "sw": s.c, "ic": ic_cog(e.sid),
 			"desc": "Clon enraizado: la misma planta que su madre, con su fenotipo.\n%s\nSe seca si no lo plantas antes del día %s." % [dv, n(e.dia + (D.CARRO.dias if eb[1] else D.ESQUEJE_DIAS) + 1)]})
 	items.append({"label": "Cancelar", "desc": ""})
 	var j: int = await menu(items, {"cls": "full", "title": "¿QUÉ PLANTAS?", "desc": true})
@@ -209,7 +244,7 @@ func plantar(i: int) -> void:
 		S.pots[i] = {"sid": e.sid, "prog": .12, "water": 70, "health": 100, "fert": false, "pest": false, "f": e.f}   # ya enraizado: empieza de plántula
 		sfx("sel")
 		await accion("plantar")
-		await say("Plantas el esqueje de %s%s." % [strain(e.sid).n, marca_feno(e.f)])
+		await say("Plantas el esqueje de %s%s." % [strain(e.sid).n, etiq(e.f)])
 		await pista_barras()
 		return
 	var sid: String = own[j][0]
@@ -219,7 +254,7 @@ func plantar(i: int) -> void:
 	S.pots[i] = {"sid": sid, "prog": 0, "water": 70, "health": 100, "fert": false, "pest": false, "f": roll_feno(sid)}
 	sfx("sel")
 	await accion("plantar")
-	await say("Has plantado %s." % strain(sid).n)
+	await say("Has plantado %s%s." % [strain(sid).n, nom_planta(S.pots[i].f)])
 	await pista_barras()
 
 # con la primera planta, qué dice su barra
@@ -241,7 +276,7 @@ func sacar_esqueje(i: int) -> void:
 		p.f = S.esquejes[-1].f
 	p.health = max(1, p.health - 5)
 	sfx("sel")
-	await say("Cortas una punta de la %s y la pones a enraizar.\nPlántala antes del día %s: es la misma planta." % [s.n, n(S.day + D.ESQUEJE_DIAS + 1)])
+	await say("Cortas una punta de la %s%s y la pones a enraizar.\nPlántala antes del día %s: es la misma planta." % [s.n, nom_planta(p.f), n(S.day + D.ESQUEJE_DIAS + 1)])
 	if carro_ya():
 		await say("O pínchala en el carro: allí aguanta %d días." % D.CARRO.dias)
 
@@ -267,9 +302,13 @@ func pot_action(i: int) -> void:
 		await say("Retiras la planta muerta.")
 		return
 	if p.prog >= 1:
-		var c: int = await ask("%s%s lista para cosechar.\nSalud %d%% · Agua %d%%" % [s.n, marca_feno(p.get("f")), Datos.jsround(p.health), Datos.jsround(p.water)], ["Cosechar", "Esperar"])
+		var c: int = await ask("%s%s lista para cosechar.\nSalud %d%% · Agua %d%%" % [s.n, etiq(p.get("f")), Datos.jsround(p.health), Datos.jsround(p.water)], ["Cosechar", "Nombrar", "Esperar"])
 		if c == 0:
 			await harvest(i)
+		elif c == 1:
+			if not p.get("f"):
+				p.f = roll_feno(p.sid)
+			await nombrar_planta(p.f)
 		return
 	var veg: bool = p.prog < .65 and not (float(p.get("fv", 0) if p.get("fv") != null else 0) > 0) and S.items.get("fertv", 0) > 0
 	var opts := ["Regar"]
@@ -279,8 +318,8 @@ func pot_action(i: int) -> void:
 		opts.append("Tratar plaga")
 	if p.prog >= .2 and p.prog < .65:
 		opts.append("Sacar esqueje")
-	opts.append_array(["Arrancar", "Salir"])
-	var c: int = await ask("%s%s · %s %d%%\nAgua %d%% · Salud %d%%%s" % [s.n, marca_feno(p.get("f")), stage_name(p), int(floor(p.prog * 100)), Datos.jsround(p.water),
+	opts.append_array(["Nombrar", "Arrancar", "Salir"])
+	var c: int = await ask("%s%s · %s %d%%\nAgua %d%% · Salud %d%%%s" % [s.n, etiq(p.get("f")), stage_name(p), int(floor(p.prog * 100)), Datos.jsround(p.water),
 		Datos.jsround(p.health), " · PLAGA" if p.pest else ""], opts)
 	var op: String = opts[c]
 	if op == "Regar":
@@ -315,6 +354,10 @@ func pot_action(i: int) -> void:
 			await say("No tienes INSECTICIDA. Kiko lo vende.")
 	elif op == "Sacar esqueje":
 		await sacar_esqueje(i)
+	elif op == "Nombrar":
+		if not p.get("f"):
+			p.f = roll_feno(p.sid)
+		await nombrar_planta(p.f)
 	elif op == "Arrancar":
 		if await ask("¿Seguro que quieres arrancarla?", ["Sí", "No"]) == 0:
 			S.pots[i] = null
@@ -849,10 +892,12 @@ func carro_action() -> void:
 		var items := []
 		for e in S.bandejas:
 			var s = strain(e.sid)
-			items.append({"label": "Esqueje " + s.n + marca_feno(e.f), "right": "día " + n(e.dia + D.CARRO.dias), "sw": s.c, "ic": ic_cog(e.sid),
-				"desc": "Pinchado el día %s. Plántalo en una plaza vacía antes de que acabe el día %s." % [n(e.dia), n(e.dia + D.CARRO.dias)]})
+			items.append({"label": "Esqueje " + s.n + etiq(e.f), "right": "día " + n(e.dia + D.CARRO.dias), "sw": s.c, "ic": ic_cog(e.sid),
+				"desc": "Pinchado el día %s. Plántalo en una plaza vacía antes de que acabe el día %s.\nPulsa A para ponerle nombre o tirarlo." % [n(e.dia), n(e.dia + D.CARRO.dias)]})
 		items.append({"label": "Volver", "desc": ""})
-		await menu(items, {"cls": "full", "title": "BANDEJAS", "title2": "%d de %d" % [nb, cap], "desc": true})
+		var k: int = await menu(items, {"cls": "full", "title": "BANDEJAS", "title2": "%d de %d" % [nb, cap], "desc": true})
+		if k >= 0 and k < nb:
+			await esqueje_accion(S.bandejas[k], S.bandejas)
 
 # banco de semillas: las landraces en sobres de SOBRE semillas; el pedido llega al día siguiente (new_day)
 func banco_semillas() -> void:
