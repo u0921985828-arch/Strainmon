@@ -285,7 +285,7 @@ async function talkBaltasar(){
 // el rótulo del capítulo dura 2,8 s: el objetivo que se pida mientras tanto sale cuando acaba (sin parar el juego)
 let capHasta=0;
 // líneas de autobús nuevas (1.14): las paradas se abren por capítulos (PARADAS.cap, 04-mapas); al abrirse, un SMS de la compañía
-async function lineasNuevas(){const l=Object.keys(PARADAS).filter(k=>PARADAS[k].cap===S.ch);if(l.length)await talk('SMS · AUTOBUSES DE LA COMARCA',[`Nueva línea desde Ribera Verde: ${yLista(l.map(k=>PARADAS[k].n))}.`,'Salidas de 7:00 a 21:00, en la parada de la calle Ribera.']);}
+async function lineasNuevas(){const l=Object.keys(PARADAS).filter(k=>PARADAS[k].cap===S.ch);if(l.length)await talk('SMS · AUTOBUSES DE LA COMARCA',[`Nueva línea desde Ribera Verde: ${yLista(l.map(k=>PARADAS[k].n))}.`,`Salidas de ${BUS_HORAS.map(m=>Math.floor(m/60)+':'+String(m%60).padStart(2,'0')).join(' a ')}, en la parada de la calle Ribera.`]);}
 async function chapter(n){S.ch=n;sfx('get');toast(`<small>CAPÍTULO ${n}</small>${CH_TITLES[n]}`,2800);capHasta=Date.now()+2800;buildEnts();await wait(400);save();}
 function objectiveText(){
   switch(S.ch){

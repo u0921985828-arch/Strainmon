@@ -84,9 +84,8 @@ func comprar_carpa(t: String, ci: int) -> void:
 
 const IC := {"fert": "abono", "fertv": "abono", "phm": "abono", "insect": "insecticida", "spray": "spray", "bocata": "bocadillo"}
 
-# las tiendas (1.14): GROWSHOP KIKO y GROW IBARBIDE (ANE: un 10 % más barato y un capítulo antes, sin semillas, muebles ni aparatos)
-const TIENDAS := {"kiko": {"t": "GROWSHOP KIKO", "N": "KIKO", "f": 1.0, "ch": 0}, "ane": {"t": "GROW IBARBIDE", "N": "ANE", "f": .9, "ch": 1}}
-
+# las tiendas (1.14, D.TIENDAS): GROWSHOP KIKO y GROW IBARBIDE (ANE: un 10 % más barato y un capítulo antes, sin semillas, muebles ni
+# aparatos: su ok() del JS, aquí a mano)
 func tienda_ok(T: Dictionary, it: Dictionary) -> bool:
 	return T.N != "ANE" or not (it.get("sid") or it.get("mueble") or it.get("aparato"))
 
@@ -95,7 +94,7 @@ func precio_t(T: Dictionary, it: Dictionary) -> int:
 
 func shop(T: Dictionary = {}) -> void:
 	if T.is_empty():
-		T = TIENDAS.kiko
+		T = D.TIENDAS.kiko
 	var i := 0
 	while true:
 		var list := []
@@ -434,7 +433,7 @@ func talk_ane():
 	var N := "ANE"
 	await say("¿Qué te hace falta hoy?" if S.flags.get("ane") else "Kaixo. Esto es GROW IBARBIDE: el equipo, un 10 % más barato que en el barrio, y lo nuevo antes que nadie.", N)
 	S.flags.ane = true
-	await shop(TIENDAS.ane)
+	await shop(D.TIENDAS.ane)
 
 # las 3 piezas del día: las mismas para todos (_hash_t del día), sin repetir
 func chatarra_dia() -> Array:
@@ -461,7 +460,7 @@ func talk_bixente():
 				continue
 			for it in D.SHOP:
 				if it.lbl == lbl:
-					if shop_cond(it):
+					if S.ch >= int(it.ch) and shop_cond(it):   # solo lo de su capítulo
 						l.append(it)
 					break
 		if l.is_empty():
@@ -730,7 +729,7 @@ func lineas_nuevas() -> void:
 		if int(D.PARADAS[k].cap) == S.ch:
 			L.append(D.PARADAS[k].n)
 	if L.size():
-		await talk("SMS · AUTOBUSES DE LA COMARCA", ["Nueva línea desde Ribera Verde: %s." % _lista(L), "Salidas de 7:00 a 21:00, en la parada de la calle Ribera."])
+		await talk("SMS · AUTOBUSES DE LA COMARCA", ["Nueva línea desde Ribera Verde: %s." % _lista(L), "Salidas de %d:%02d a %d:%02d, en la parada de la calle Ribera." % [int(D.BUS_HORAS[0]) / 60, int(D.BUS_HORAS[0]) % 60, int(D.BUS_HORAS[1]) / 60, int(D.BUS_HORAS[1]) % 60]])
 
 func chapter(nn: int) -> void:
 	S.ch = nn

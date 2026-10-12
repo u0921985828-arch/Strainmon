@@ -337,7 +337,7 @@ function computeClientTiles(){
     astilleros:(x,y,g)=>y>=12&&y<=21&&x>=2&&(g==='dirt'||g==='dock')&&!(x>=15&&x<=22&&y<=14),
     puerto:(x,y,g)=>y>=9&&(g==='plaza'||g==='dock'),valdehierro:(x,y,g)=>(y===8||y===11||y>=20)&&(g==='walk'||g==='grass'),
     mendialde:(x,y,g)=>g==='plaza',errotabarri:(x,y,g)=>g==='pista',
-    ibarbide:(x,y,g)=>y>=8&&y<=23&&y!==21&&y!==22&&(g==='plaza'||g==='walk'||g==='hormigon')&&!(y===20&&x>=7&&x<=12),ensanche:(x,y,g)=>(y===9||y===12||y>=13)&&(g==='walk'||g==='plaza'||g==='dirt')};   // la ciudad (1.14)
+    ibarbide:(x,y,g)=>y>=8&&y<=23&&y!==21&&y!==22&&!(y===8&&x>=14&&x<=17)&&(g==='plaza'||g==='walk'||g==='hormigon')&&!(y===20&&x>=7&&x<=12),ensanche:(x,y,g)=>(y===9||y===12||y>=13)&&(g==='walk'||g==='plaza'||g==='dirt')};   // la ciudad (1.14)
   for(const k in zona){const m=MAPS[k],l=CLIENT_TILES[k]=[],tp=tapadas(m),va=aPie(m,entrada(k));
     for(let y=1;y<m.h-1;y++)for(let x=1;x<m.w-1;x++){const g=m.g[y][x];if(zona[k](x,y,g)&&va.has(x+','+y)&&!tp.has(x+','+y)&&!(PARADAS[k]&&PARADAS[k].a[0]===x&&PARADAS[k].a[1]===y))l.push([x,y]);}}   // ni en la casilla donde deja el autobús (1.10)
 }

@@ -1247,7 +1247,7 @@ function computeClientTiles(){
     astilleros:(x,y,g)=>y>=12&&y<=21&&x>=2&&(g==='dirt'||g==='dock')&&!(x>=15&&x<=22&&y<=14),
     puerto:(x,y,g)=>y>=9&&(g==='plaza'||g==='dock'),valdehierro:(x,y,g)=>(y===8||y===11||y>=20)&&(g==='walk'||g==='grass'),
     mendialde:(x,y,g)=>g==='plaza',errotabarri:(x,y,g)=>g==='pista',
-    ibarbide:(x,y,g)=>y>=8&&y<=23&&y!==21&&y!==22&&(g==='plaza'||g==='walk'||g==='hormigon')&&!(y===20&&x>=7&&x<=12),ensanche:(x,y,g)=>(y===9||y===12||y>=13)&&(g==='walk'||g==='plaza'||g==='dirt')};   // la ciudad (1.14)
+    ibarbide:(x,y,g)=>y>=8&&y<=23&&y!==21&&y!==22&&!(y===8&&x>=14&&x<=17)&&(g==='plaza'||g==='walk'||g==='hormigon')&&!(y===20&&x>=7&&x<=12),ensanche:(x,y,g)=>(y===9||y===12||y>=13)&&(g==='walk'||g==='plaza'||g==='dirt')};   // la ciudad (1.14)
   for(const k in zona){const m=MAPS[k],l=CLIENT_TILES[k]=[],tp=tapadas(m),va=aPie(m,entrada(k));
     for(let y=1;y<m.h-1;y++)for(let x=1;x<m.w-1;x++){const g=m.g[y][x];if(zona[k](x,y,g)&&va.has(x+','+y)&&!tp.has(x+','+y)&&!(PARADAS[k]&&PARADAS[k].a[0]===x&&PARADAS[k].a[1]===y))l.push([x,y]);}}   // ni en la casilla donde deja el autobús (1.10)
 }
@@ -1625,7 +1625,7 @@ function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,
   seeds:{},buds:{},rosin:{},items:Object.assign({fert:0,fertv:0,phm:0,medidor:0,insect:0,spray:0,bocata:1,prensa:0,bolsa:0},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},gen:{},pedido:[],esquejes:[],bandejas:[],fenos:{},fenoN:0,fnom:{},eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
-  caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0,arcon:{buds:{},rosin:{}},sala:{},fijos:[],sms:[],envio:[],orden:0,misiones:{}};}
+  caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0,arcon:{buds:{},rosin:{}},sala:{},fijos:[],sms:[],envio:[],orden:0,misiones:{},lonja:0,trueque:0,chatarra:null};}
 const isFree=()=>mode==='world'&&lock===0&&handlers.length===0;
 const isNight=()=>S.min>=21*60||S.min<6*60;
 async function run(fn){lock++;try{await fn();}catch(e){console.error(e);}finally{lock--;}if(!lock&&S&&S.misiones)revisaMisiones();}
@@ -3506,7 +3506,7 @@ async function talkBaltasar(){
 // el rótulo del capítulo dura 2,8 s: el objetivo que se pida mientras tanto sale cuando acaba (sin parar el juego)
 let capHasta=0;
 // líneas de autobús nuevas (1.14): las paradas se abren por capítulos (PARADAS.cap, 04-mapas); al abrirse, un SMS de la compañía
-async function lineasNuevas(){const l=Object.keys(PARADAS).filter(k=>PARADAS[k].cap===S.ch);if(l.length)await talk('SMS · AUTOBUSES DE LA COMARCA',[`Nueva línea desde Ribera Verde: ${yLista(l.map(k=>PARADAS[k].n))}.`,'Salidas de 7:00 a 21:00, en la parada de la calle Ribera.']);}
+async function lineasNuevas(){const l=Object.keys(PARADAS).filter(k=>PARADAS[k].cap===S.ch);if(l.length)await talk('SMS · AUTOBUSES DE LA COMARCA',[`Nueva línea desde Ribera Verde: ${yLista(l.map(k=>PARADAS[k].n))}.`,`Salidas de ${BUS_HORAS.map(m=>Math.floor(m/60)+':'+String(m%60).padStart(2,'0')).join(' a ')}, en la parada de la calle Ribera.`]);}
 async function chapter(n){S.ch=n;sfx('get');toast(`<small>CAPÍTULO ${n}</small>${CH_TITLES[n]}`,2800);capHasta=Date.now()+2800;buildEnts();await wait(400);save();}
 function objectiveText(){
   switch(S.ch){
@@ -3824,7 +3824,7 @@ async function talkBixente(){
   if(S.ch<CHATARRA.ch)return say('Compro chatarra y vendo lo que se puede aprovechar. Vuelve cuando cultives en serio.',N);
   let i=0;
   for(;;){
-    const ya=S.chatarra&&S.chatarra.d===S.day?S.chatarra.v:[],l=chatarraDia().filter(lbl=>!ya.includes(lbl)).map(lbl=>SHOP.find(it=>it.lbl===lbl)).filter(it=>it&&(!it.cond||it.cond()));
+    const ya=S.chatarra&&S.chatarra.d===S.day?S.chatarra.v:[],l=chatarraDia().filter(lbl=>!ya.includes(lbl)).map(lbl=>SHOP.find(it=>it.lbl===lbl)).filter(it=>it&&S.ch>=it.ch&&(!it.cond||it.cond()));   // solo lo de su capítulo
     if(!l.length)return say('Hoy no me queda nada que te sirva. Mañana entra más.',N);
     const items=l.map(it=>({label:it.lbl,right:eur(precioT({f:CHATARRA.f},it)),desc:(it.desc||'')+'\nDe segunda mano: funciona, pero sin garantía.'}));
     items.push({label:'Nada',desc:'Cada día entran tres piezas.'});

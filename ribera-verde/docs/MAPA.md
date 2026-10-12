@@ -218,9 +218,9 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 12  M.++++++++++++++++++++++++++++++++++++MM
 13  MM++++++++++++++++++++++++++++++++++++MM
 14  MM++T++++++n++++++n++++++++++n+++++++T.M
-15  Mfffff+++fffffffffffff+++fffffff+++ffffM
+15  Mfffff+++fffffffffffff+++Sffffff+++ffffM
 16  ~~~~~~###~~~~~~~~~~~~~###~~~~~~~###~~~~~
-17  ~~~~~~###~~~~~~~~~~~~~###~~~~~~~###~~~~~
+17  ~~~~~~###~~~~~~~~~~~~~#@#~~~~~~~###~~~~~
 18  ~~~~~~###~~~~~~~~~~~~~###~~~~~~~##c~~~~~
 19  ~~~~~~###~~~~~~~~~~~~~###~~~~~~~###~~~~~
 20  ~~~~~~##c~~~~~~~~~~~~~##c~~~~~~~~~~~~~~~
@@ -249,7 +249,7 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 12  M-------------------fffffffS--fffffffffM
 13  M-^^^^^^^-^^^^^^^---f:::::::::::::::::fM
 14  M-^^^^^^^-^^^^^^^---f::cc:::@:::::::::fM
-15  M-███████-███████---f::c:::::::::cc:::fM
+15  M-███████-███████---f::c::::::@::cc:::fM
 16  M-███████-███████---f:::::::::::::c:::fM
 17  M-███████-███████---f:::::::::""""::::fM
 18  M-███████-███████---f:::::::::""""::c:fM
@@ -284,12 +284,86 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 16  MM.f""""""f......~~~..^^^^.██████,,M
 17  MM.f""""""f......~~~*.████.██████,,M
 18  MM.f""""""f.Y....~~~..████S......,,M
-19  MM.ffffffff......~~~.......,,,,,,,,M
+19  MM.ffffffff......~~~....@..,,,,,,,,M
 20  MM...............~~~....*..,,,,,,,,M
 21  MM....*......T...~~~.....b........MM
 22  MMMMMMM..........~~~MMMMMMMMMMMTMMMM
 23  MMMMMMMMMMMMMMMMMM~~~MMMMMMMMMMMMMMM
 ```
+
+## Ibarbide · Casco Viejo (la ciudad grande, desde el capítulo 4) — 44 × 30
+
+```
+    0         1         2         3         4   
+    01234567890123456789012345678901234567890123
+ 0  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 1  MMMMMMMM^^^^^MMMMMMMMMMMMM^^^^^MMMMMMM^^^^^M
+ 2  M^^^^MMM^^^^^^^^^^^MMM^^^^^^^^^^^^^MMM^^^^^M
+ 3  M^^^^^^^█████^^^^^^^^^^^^^█████^^^^^^^█████M
+ 4  M████^^^███████████^^^█████████████^^^█████M
+ 5  M██████████████████████████████████████████M
+ 6  M██████████████████████████████████████████M
+ 7  M██████████████DD██████████████████████████M
+ 8  M------------------------------------------M
+ 9  M++++++++++++S+++++++++++++++++++++++++++++M
+10  M+++++++++++++L++++++++++++++L+++++++++++++M
+11  M^^^^^++++++++++++++++++++++++++++++++^^^^^M
+12  M^^^^^^^^^+++++++n+++++++n++++++++^^^^^^^^^M
+13  M█████^^^^^^^++++++++++++++++++^^^^^^^█████M
+14  M█████████^^^++++++++O+++++++++^^^█████████M
+15  M████████████++++++++++++++++++████████████M
+16  M████████████++++++++++++++++++████████████M
+17  M████████████++++n+++++++n+++++████████████M
+18  M++++++++++++++++++++++++++++++++++++++++++M
+19  M+++++++++++S+L++++++++++++++L+++++++++++++M
+20  M---L----A----------L---------------L----S-M
+21  M==========================================+
+22  M==========================================+
+23  M-----------L---------------L--------------M
+24  M...*.::......b............b........::.....M
+25  M.b...::..n.......*............n..*.::...b.M
+26  M.....::::::::::::::::::::::::::::::::.....M
+27  M.....::.*............n...*.........::.*...M
+28  M..T..::...T....T...T...T.....T...T.::..T..M
+29  MhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhM
+```
+
+- puerta (15,7) → growcity (4,6)
+- puerta (16,7) → growcity (5,6)
+- puerta (43,21) → ensanche (1,10)
+- puerta (43,22) → ensanche (1,11)
+
+## Ibarbide · Ensanche (al este del Casco Viejo, por la avenida) — 46 × 22
+
+```
+    0         1         2         3         4     
+    0123456789012345678901234567890123456789012345
+ 0  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 1  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+ 2  M^^^^^^^^M^^^^^^^^M^^^^^^^^M^^^^^^^^M^^^^^^^^M
+ 3  M^^^^^^^^.^^^^^^^^.^^^^^^^^.^^^^^^^^.^^^^^^^^M
+ 4  M████████-████████-████████-████████-████████M
+ 5  M████████-████████-████████-████████-████████M
+ 6  M████████-████████-████████-████████-████████M
+ 7  M████████-████████-████████-████████-████████M
+ 8  M████████b████████b████████b████████b████████M
+ 9  M----L--------L--------L--------L--------L---M
+10  =============================================M
+11  =============================================M
+12  M-S------L-----------------L-----------------M
+13  M............................................M
+14  Mb...*n....n.....b.+L+@++L+...*...n.....n...bM
+15  M..................++++++++..................M
+16  M::::::::::::::::::+++O++++::::::::::::::::::M
+17  M..............*...++++++++.b..............*.M
+18  M.........*........++n++n++...........*......M
+19  M.......T.......T..+L++++L+....T..........T..M
+20  M..T.........T...............T......T........M
+21  MhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhM
+```
+
+- puerta (0,10) → ibarbide (42,21)
+- puerta (0,11) → ibarbide (42,22)
 
 ## Piso de la tía Maite — 18 × 8 (1 casilla = 1 m; con el armario de 60, la carpa de 150 y el salón amueblado)
 
@@ -324,6 +398,24 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 ```
 
 - salida (4,7) pulsando abajo → town (17,9)
+
+## GROW IBARBIDE (tienda de Ane, en el Casco Viejo) — 10 × 8
+
+```
+    0         
+    0123456789
+ 0  ██████████
+ 1  sss█v██sss
+ 2  ....@.....
+ 3  ..CCCCCC..
+ 4  d........d
+ 5  d........d
+ 6  ..........
+ 7  p...mm...p
+```
+
+- salida (4,7) pulsando abajo → ibarbide (15,8)
+- salida (5,7) pulsando abajo → ibarbide (16,8)
 
 ## Bar El Ancla — 10 × 8
 
@@ -418,22 +510,28 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 | excursionista | errotabarri | (14,14) | radio 2 | siempre |
 | turista | puerto | (14,11) | radio 2 | siempre |
 | obrero | valdehierro | (28,14) | radio 1 | siempre |
+| ane | growcity | (4,2) | no | siempre |
+| nerea | puerto | (23,17) | no | siempre |
+| bixente | valdehierro | (30,15) | no | siempre |
+| andoni | errotabarri | (24,19) | no | siempre |
+| ibarbitarra | ensanche | (22,14) | radio 2 | siempre |
 
-Los **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acera, plaza y tierra: en el barrio, 4 + reputación/15 (+1 desde el capítulo 4, máximo 10); en los astilleros, 2 (3 desde el capítulo 4), estudiantes y currelas, que pagan el gramo un 20 % más; en el barrio alto, desde el capítulo 3, 2 (3 desde el 4), pijos y turistas; en Puerto Viejo, 2 (3 desde el 4), turistas, currelas y estudiantes; en Valdehierro, 2 (3 desde el 4), estudiantes y currelas; y en los pueblos, 1: un currela en Mendialde y un currela o un turista en Errotabarri.
+Los **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acera, plaza y tierra: en el barrio, 4 + reputación/15 (+1 desde el capítulo 4, máximo 10); en los astilleros, 2 (3 desde el capítulo 4), estudiantes y currelas, que pagan el gramo un 20 % más; en el barrio alto, desde el capítulo 3, 2 (3 desde el 4), pijos y turistas; en Puerto Viejo, 2 (3 desde el 4), turistas, currelas y estudiantes; en Valdehierro, 2 (3 desde el 4), estudiantes y currelas; y en los pueblos, 1: un currela en Mendialde y un currela o un turista en Errotabarri; en Ibarbide, desde el capítulo 4, 3 en el Casco Viejo (turistas, pijos y estudiantes) y 3 en el Ensanche (pijos, currelas y estudiantes), 4 desde el 5.
 
 ## Autobús de la comarca
 
-En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo de Ribera Verde; entre dos de fuera se suman los dos tramos. El reloj corre lo que dura el viaje. El primero (Mendialde → Ribera Verde, en el prólogo) lo paga ama.
+En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo de Ribera Verde; entre dos de fuera se suman los dos tramos. El reloj corre lo que dura el viaje. El primero (Mendialde → Ribera Verde, en el prólogo) lo paga ama. Las líneas se abren por capítulos (`PARADAS.cap`), con un SMS de la compañía.
 
-| Parada | Posición | Llegas a | Desde Ribera Verde |
-|---|---|---|---|
-| Ribera Verde | town (8,12) | (7,12) | — |
-| Puerto Viejo | puerto (19,9) | (20,9) | 25 min · 2 € |
-| Valdehierro | valdehierro (14,11) | (15,11) | 20 min · 2 € |
-| Mendialde | mendialde (20,19) | (21,19) | 40 min · 3 € |
-| Errotabarri | errotabarri (6,13) | (7,13) | 30 min · 3 € |
+| Parada | Posición | Llegas a | Desde Ribera Verde | Desde cap. |
+|---|---|---|---|---|
+| Ribera Verde | town (8,12) | (7,12) | — | — |
+| Puerto Viejo | puerto (19,9) | (20,9) | 25 min · 2 € | 2 |
+| Valdehierro | valdehierro (14,11) | (15,11) | 20 min · 2 € | 2 |
+| Mendialde | mendialde (20,19) | (21,19) | 40 min · 3 € | 0 |
+| Errotabarri | errotabarri (6,13) | (7,13) | 30 min · 3 € | 3 |
+| Ibarbide | ibarbide (9,20) | (10,20) | 35 min · 4 € | 4 |
 
-**Zonas** (`ZONAS` y `PATRULLAS`): factor de ladrones y de precio en cada mapa de fuera, y los agentes que patrullan de día y de noche (desde el capítulo 2). Ribera Verde: ladrones ×1, precio ×1, 1/2 agentes · Barrio alto: ladrones ×0,5, precio ×1, 2/2 agentes · Astilleros: ladrones ×2, precio ×1,2, 1/1 agentes · Puerto Viejo: ladrones ×0,6, precio ×1,15, 1/1 agentes · Valdehierro: ladrones ×1,4, precio ×0,9, 1/1 agentes · Mendialde: ladrones ×0,1, precio ×1, 0/0 agentes · Errotabarri: ladrones ×0,1, precio ×1, 0/0 agentes. Dentro de las casas no hay encuentros.
+**Zonas** (`ZONAS` y `PATRULLAS`): factor de ladrones y de precio en cada mapa de fuera, y los agentes que patrullan de día y de noche (desde el capítulo 2). Ribera Verde: ladrones ×1, precio ×1, 1/2 agentes · Barrio alto: ladrones ×0,5, precio ×1, 2/2 agentes · Astilleros: ladrones ×2, precio ×1,2, 1/1 agentes · Puerto Viejo: ladrones ×0,6, precio ×1,15, 1/1 agentes · Valdehierro: ladrones ×1,4, precio ×0,9, 1/1 agentes · Mendialde: ladrones ×0,1, precio ×1, 0/0 agentes · Errotabarri: ladrones ×0,1, precio ×1, 0/0 agentes · Ibarbide · Casco Viejo: ladrones ×0,8, precio ×1,3, 2/2 agentes · Ibarbide · Ensanche: ladrones ×1,2, precio ×1,25, 2/3 agentes. Dentro de las casas no hay encuentros.
 
 ## Objetos
 
@@ -466,9 +564,14 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 - **mendialde:2,19** — MENDIALDE · Caseríos, huertas y la parada del autobús.
 - **puerto:2,9** — PUERTO VIEJO · Cofradía de pescadores desde 1890.
 - **valdehierro:2,8** — VALDEHIERRO · Ciudad del hierro desde 1911.
-- **valdehierro:27,12** — SOLAR DE LA FUNDICIÓN · Propiedad privada. Prohibido el paso.
+- **valdehierro:27,12** — CHATARRERÍA DEL SOLAR · Compro y vendo. Material de segunda mano.
 - **errotabarri:2,10** — ERROTABARRI · El pueblo del molino.
-- **errotabarri:26,18** — ERROTA ZAHARRA · Molino harinero del siglo XVIII.
+- **errotabarri:26,18** — ERROTA ZAHARRA · Molino harinero del siglo XVIII. Semillas viejas: pregunta por Andoni.
+- **puerto:25,15** — LONJA DE PUERTO VIEJO · Subasta de madrugada. Cargas para los barcos de fuera.
+- **ibarbide:13,9** — GROW IBARBIDE · Todo para el cultivo, a precio de ciudad.
+- **ibarbide:12,19** — PLAZA NUEVA · Casco Viejo de Ibarbide.
+- **ibarbide:41,20** — ENSANCHE → · Avenida de la Estación.
+- **ensanche:2,12** — IBARBIDE · ENSANCHE · ← Casco Viejo y estación de autobuses.
 
 ## Tienda de Kiko
 

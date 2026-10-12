@@ -20,7 +20,7 @@ async function talkBixente(){
   if(S.ch<CHATARRA.ch)return say('Compro chatarra y vendo lo que se puede aprovechar. Vuelve cuando cultives en serio.',N);
   let i=0;
   for(;;){
-    const ya=S.chatarra&&S.chatarra.d===S.day?S.chatarra.v:[],l=chatarraDia().filter(lbl=>!ya.includes(lbl)).map(lbl=>SHOP.find(it=>it.lbl===lbl)).filter(it=>it&&(!it.cond||it.cond()));
+    const ya=S.chatarra&&S.chatarra.d===S.day?S.chatarra.v:[],l=chatarraDia().filter(lbl=>!ya.includes(lbl)).map(lbl=>SHOP.find(it=>it.lbl===lbl)).filter(it=>it&&S.ch>=it.ch&&(!it.cond||it.cond()));   // solo lo de su capítulo
     if(!l.length)return say('Hoy no me queda nada que te sirva. Mañana entra más.',N);
     const items=l.map(it=>({label:it.lbl,right:eur(precioT({f:CHATARRA.f},it)),desc:(it.desc||'')+'\nDe segunda mano: funciona, pero sin garantía.'}));
     items.push({label:'Nada',desc:'Cada día entran tres piezas.'});

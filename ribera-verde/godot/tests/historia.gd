@@ -1256,7 +1256,7 @@ func _pasos() -> void:
 		J.S.items.bolsa = sv.b
 		J.enter_map("home", 5, 5, "up"),
 		func(): return chk(R.ane and R.m == Datos.jsround(pr("Maleta") * .9) and R.b == 2 and re("Foco LED 720 W", R.menu) and not re("Semillas|Carro|Termohigr|Calefactor", R.menu), R))
-	step("La comarca con función (1.14): la lonja (Puerto Viejo) carga a ×1,15 cada 3 días; la chatarrería (Valdehierro), 3 piezas al día a mitad de precio; el molino (Errotabarri), 20 g por 3 semillas de una landrace que no tienes", ["^Skunk", "^250 g", "^Skunk"], func():
+	step("La comarca con función (1.14): la lonja (Puerto Viejo) carga a ×1,15 cada 3 días; la chatarrería (Valdehierro), 3 piezas al día a mitad de precio; el molino (Errotabarri), 20 g por 3 semillas de una landrace que no tienes", ["^Skunk", "^250 g"], func():
 		J.S.ch = 5
 		J.S.money = 1000
 		J.S.buds = {}
@@ -1275,7 +1275,13 @@ func _pasos() -> void:
 		R.otra = J.S.money - R.m
 		J.enter_map("valdehierro", 15, 11, "down")
 		R.dia = J.chatarra_dia()
-		var it: Dictionary = D.SHOP.filter(func(x): return x.lbl == R.dia[0])[0]
+		var it: Dictionary = {}
+		for l in R.dia:
+			var x: Dictionary = D.SHOP.filter(func(s): return s.lbl == l)[0]
+			if J.S.ch >= int(x.ch) and J.shop_cond(x):
+				it = x
+				break
+		R.lbl = it.lbl
 		var pide := false
 		if it.get("foco"):
 			pide = J.S.carpas.any(func(c): return c and D.FOCOS[it.foco].w <= D.CARPAS[c.t].wmax)
@@ -1303,7 +1309,7 @@ func _pasos() -> void:
 		J.enter_map("home", 5, 5, "up"),
 		func(): return chk(R.lonja == Datos.jsround(250 * Datos.jsround(J.precio_mayor(12) * 1.15 * 100) / 100.0) and R.g == 50 and R.otra == 0 and R.dia.size() == 3
 			and R.dia[0] != R.dia[1] and R.dia[1] != R.dia[2] and R.dia[0] != R.dia[2]
-			and R.chat == R.p and R.v == R.dia[0] and R.chat2 == 0 and R.s == 3 and R.g2 == 30 and si(R.d) and J.S.lonja == J.S.day and J.S.trueque == J.S.day, R))
+			and R.chat == R.p and R.v == R.lbl and R.chat2 == 0 and R.s == 3 and R.g2 == 30 and si(R.d) and J.S.lonja == J.S.day and J.S.trueque == J.S.day, R))
 	step("Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas", ["^Hindu Kush"], func():
 		J.S.ch = 5
 		J.S.flags.txaro = true

@@ -420,17 +420,17 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     const l0 = LOG.length; await run(talkAne); R.menu = LOG.slice(l0).find(l => /\[menú\]/.test(l)) || ''; R.m = R.m - S.money; R.b = S.items.bolsa;
     S.ch = sv.ch; S.items.bolsa = sv.b; enterMap('home', 5, 5, 'up');
   }, () => R.ane && R.m === Math.round(pr('Maleta') * .9) && R.b === 2 && /Foco LED 720 W/.test(R.menu) && !/Semillas|Carro|Termohigr|Calefactor/.test(R.menu) || R);
-  await step('La comarca con función (1.14): la lonja (Puerto Viejo) carga a ×1,15 cada 3 días; la chatarrería (Valdehierro), 3 piezas al día a mitad de precio; el molino (Errotabarri), 20 g por 3 semillas de una landrace que no tienes', ['^Skunk', '^250 g', '^Skunk'], async () => {
+  await step('La comarca con función (1.14): la lonja (Puerto Viejo) carga a ×1,15 cada 3 días; la chatarrería (Valdehierro), 3 piezas al día a mitad de precio; el molino (Errotabarri), 20 g por 3 semillas de una landrace que no tienes', ['^Skunk', '^250 g'], async () => {
     S.ch = 5; S.money = 1000; S.buds = {}; addBuds('ria', 300, 12); S.lonja = 0; S.trueque = 0; S.chatarra = null; window.R = {};
     enterMap('puerto', 20, 9, 'down'); R.m = S.money; await run(talkNerea); R.lonja = S.money - R.m; R.g = S.buds.ria.g; R.m = S.money; await run(talkNerea); R.otra = S.money - R.m;
-    enterMap('valdehierro', 15, 11, 'down'); R.dia = chatarraDia(); const it = SHOP.find(x => x.lbl === R.dia[0]);
+    enterMap('valdehierro', 15, 11, 'down'); R.dia = chatarraDia(); const it = R.dia.map(l => SHOP.find(x => x.lbl === l)).find(x => S.ch >= x.ch && (!x.cond || x.cond())); R.lbl = it.lbl;
     const pide = it.foco ? S.carpas.some(c => c && FOCOS[it.foco].w <= CARPAS[c.t].wmax) : it.extra ? S.carpas.some(c => faltaExtra(c, it.extra)) : false;
     want(['^' + it.lbl].concat(pide ? ['^Luego'] : [], ['<B>'])); R.m = S.money; await run(talkBixente); R.chat = R.m - S.money; R.v = S.chatarra && S.chatarra.v.join('|'); R.p = Math.round(it.p * .5);
     want(['<B>']); R.m = S.money; await run(talkBixente); R.chat2 = R.m - S.money;
     enterMap('errotabarri', 7, 13, 'down'); R.k = landraceTrueque(); R.s = S.seeds[R.k] || 0; want(['^Skunk']); await run(talkAndoni); R.s = (S.seeds[R.k] || 0) - R.s; R.g2 = S.buds.ria.g;
     R.d = S.disc[R.k]; R.n = ['nerea', 'bixente', 'andoni'].join(); enterMap('home', 5, 5, 'up');
   }, () => R.lonja === Math.round(250 * Math.round(precioMayor(12) * 1.15 * 100) / 100) && R.g === 50 && R.otra === 0 && R.dia.length === 3 && new Set(R.dia).size === 3
-    && R.chat === R.p && R.v === R.dia[0] && R.chat2 === 0 && R.s === 3 && R.g2 === 30 && R.d && S.lonja === S.day && S.trueque === S.day || R);
+    && R.chat === R.p && R.v === R.lbl && R.chat2 === 0 && R.s === 3 && R.g2 === 30 && R.d && S.lonja === S.day && S.trueque === S.day || R);
   await step('Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas', ['^Hindu Kush'], async () => {
     S.ch = 5; S.flags.txaro = true; S.flags.txaro2 = false; S.map = 'txaro'; buildEnts(); window.R = { ent: ents.filter(e => e.id === 'txaro').map(e => e.x + ',' + e.y).join() };
     S.buds = {}; addBuds('ria', 20, 12); addBuds('hindu', 15, 18); addBuds('thai', 20, 16); R.ch = S.seeds.chitral || 0; R.boc = S.items.bocata; R.rep = S.rep;
