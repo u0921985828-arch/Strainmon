@@ -12,12 +12,13 @@ function apuntaFijo(c){if(c.fijo||S.fijos.length>=FIJOS_MAX||S.fijos.some(f=>f.i
 const relojTxt=()=>String(Math.floor(S.min/60)).padStart(2,'0')+':'+String(S.min%60).padStart(2,'0');
 async function movilMenu(){
   for(;;){
-    const ops=['Llamar'].concat(S.flags.kiko1?['Pedir a Kiko']:[],['Mensajes','Tienda online','Colgar']);
+    const ops=['Llamar'].concat(S.flags.kiko1?['Pedir a Kiko']:[],['Mensajes','Gente','Tienda online','Colgar']);
     const op=ops[await ask(`MÓVIL · día ${S.day}, ${relojTxt()}${S.sms.length?` · ${S.sms.length} mensaje${S.sms.length>1?'s':''}`:''}`,ops)];
     if(!op||op==='Colgar')return;
     if(op==='Llamar'){if(await llamar())return;}
     else if(op==='Pedir a Kiko')await pedirKiko();
     else if(op==='Tienda online')await tiendaOnline();
+    else if(op==='Gente')await gente();   // 1.15 (11e-gente)
     else await mensajes();
   }
 }
@@ -35,7 +36,7 @@ async function llamar(){
   if(c.k==='kiko'){await talk('KIKO',[kikoTip()]);return false;}
   if(c.k==='tono'){await talk('TOÑO',[S.due>0?`Te quedan ${eur(S.due)} hasta el día ${S.deadline}. Don Baltasar no espera.`:'Ahora mismo no debes nada. Que siga así.']);return false;}
   if(c.k==='inaki'){await talk('IÑAKI',[S.ch<3?'Ahora estoy en la mar. A la vuelta hablamos.':S.mDay===S.day?'Hoy ya he cargado. Mañana sale otro barco.':`Al por mayor, de 100 g para arriba y hasta ${kgTxt(mayorDia())} por carga. Pásate por el muelle.`]);return false;}
-  return llamarFijo(c.f);
+  return fijoMenu(c.f);   // 1.15: que venga, un regalo o que venda para ti (11e-gente)
 }
 async function llamarFijo(f){
   if(f.dia===S.day){await say(`${f.n} ya ha venido hoy.`);return false;}
@@ -44,7 +45,7 @@ async function llamarFijo(f){
   const ct=CTYPES[f.t];f.dia=S.day;S.heat=Math.min(100,S.heat+1);
   await say(`${f.n}: «Vale, voy para allá».`);
   advanceTime(LLAMADA_MIN);updateHUD();
-  await talkClient({id:'tel-'+f.id,fijo:true,n:f.n.toUpperCase(),map:S.map,x:P.x,y:P.y,type:f.t,want:ri(ct.g[0],ct.g[1]),minThc:f.t==='pij'?Math.min(24,15+S.ch):0});
+  await talkClient({id:'tel-'+f.id,fijo:true,fid:f.id,n:f.n.toUpperCase(),map:S.map,x:P.x,y:P.y,type:f.t,want:ri(ct.g[0],ct.g[1]),minThc:f.t==='pij'?Math.min(24,15+S.ch):0});
   return true;
 }
 // lo que Kiko manda a casa: lo del growshop que no son semillas, carpas ni la prensa, más caro; lo que ya está pedido no se repite

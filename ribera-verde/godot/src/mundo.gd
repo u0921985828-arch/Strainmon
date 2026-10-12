@@ -136,6 +136,22 @@ func arcon_r() -> float:
 	return t
 
 # la agenda del móvil (1.10, 12b-movil): el cliente que te compra te da su número
+# la confianza (1.15, 11e-gente): 0-100 con cada persona con nombre; +1 al hablar el primer día
+func rel(id: String) -> int:
+	return int(S.rel.get(id, 0))
+
+func confia(id: String, d: int) -> void:
+	S.rel[id] = clampi(rel(id) + d, 0, int(D.REL.max))
+
+func rel_nivel(id: String) -> String:
+	return "socio" if rel(id) >= D.REL.socio else ("amigo" if rel(id) >= D.REL.amigo else "conocido")
+
+func saludo(id: String) -> void:
+	if S.relDia.get(id) == S.day:
+		return
+	S.relDia[id] = S.day
+	confia(id, int(D.REL.charla))
+
 func nombre_fijo(id: String) -> String:
 	var a := 0
 	for i in id.length():
@@ -375,6 +391,8 @@ func npc_cond(d: Dictionary) -> bool:
 			return S.get("encargo") != null
 		"jurado":
 			return S.ch == 6
+	if d.id.begins_with("club_"):   # los clubs (1.15), desde su capítulo
+		return S.ch >= int(D.CLUBS[d.id.substr(5)].ch)
 	return true
 
 func npc_talk(d: Dictionary) -> void:
@@ -400,8 +418,10 @@ func npc_talk(d: Dictionary) -> void:
 			await talk_baltasar()
 		"tono":
 			await say(pick(["Don Baltasar está ocupado. Habla con él si traes el dinero.", "Aquí dentro no se hacen preguntas."]), "TOÑO")
-		"begona":
-			await say(pick(["Bajo una lámpara las plantas beben mucho. Riégalas a diario, majo.", "Si se te ponen amarillas las hojas de abajo, les falta agua o abono.", "Tu tía siempre tenía el piso oliendo a limón. Ahora sé por qué."]), "BEGOÑA")
+		"begona":   # 1.15: consejos, regalos y la jardinera
+			await talk_begona()
+		"club_puerto", "club_valde", "club_ibar", "club_ens":   # los clubs (1.15)
+			await talk_club(d.id.substr(5))
 		"unai":
 			await say(pick(["Si mantienes pulsado B, corres.", "Mi hermano dice que de noche, en la hierba alta del parque, roban a la gente.", "Con START abres tu GENOTECA y la mochila.", "En los arbustos del parque la gente esconde cosas. Mira delante de ellos con A."]), "UNAI")
 		"patxi":
@@ -726,7 +746,9 @@ func interact() -> void:
 			if e.def.get("client"):
 				await talk_client(e.def.client)
 			else:
-				await npc_talk(e.def))
+				await npc_talk(e.def)
+				if not e.get("pat"):
+					saludo(e.id))
 		return
 	var it = item_at(tx, ty)
 	if it:
@@ -962,7 +984,11 @@ func talk_client(c: Dictionary) -> void:
 		return
 	var mt: float = 50.0 if ext else (c.minThc if c.minThc else 14)
 	var acc: float = [1.0, .92, clampf(.3 + (b.thc - mt) * .05 + (.25 if c.type == "pij" else 0.0) + (.15 if c.type == "tur" else 0.0), .1, .9)][j]
+	if j > 0:   # 1.15: la confianza de los de la agenda, la cata y el análisis
+		acc = minf(.97, acc + (rel(c.fid) / 250.0 if c.get("fid") else 0.0) + (.05 if b.get("cata") else 0.0) + (.1 if b.get("ana") else 0.0))
 	if Cultivo.azar() < acc:
+		if c.get("fid"):
+			confia(c.fid, [3, 2, 1][j])
 		if ext:
 			use_rosin(sid, c.want)
 		else:
@@ -987,6 +1013,8 @@ func talk_client(c: Dictionary) -> void:
 			await battle("thief")
 	else:
 		S.rep = maxi(0, S.rep - 1)
+		if c.get("fid"):
+			confia(c.fid, -2)
 		sfx("bad")
 		remove_client(c.id)
 		await say(pick(["¿Tanto? No.", "A ese precio, paso.", "Eso es demasiado. Adiós."]), N)
@@ -1389,6 +1417,14 @@ func robo_darko():
 func arcon_action():
 	pass
 func recibir_envio():
+	pass
+func talk_begona():
+	pass
+func talk_club(_k):
+	pass
+func curro_dia():
+	pass
+func vencer_encargo_club():
 	pass
 func notas_tia():
 	pass

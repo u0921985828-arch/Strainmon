@@ -72,7 +72,7 @@ async function genoteca(){
   let i=0;
   for(;;){
     const items=[{label:'RECETARIO',right:`${Object.keys(recetas()).filter(t=>S.disc[t]).length}/${Object.keys(recetas()).length}`,ic:icono('semillas'),desc:'Las recetas de las variedades clásicas y dónde conseguir lo que entra en cada una.'}]
-      .concat(DEX.map((k,n)=>{const s=STRAINS[k],nn=String(n+1).padStart(2,'0');return S.disc[k]?{label:`${nn} ${s.n}`,right:pct(s.thc)+'%',sw:s.c,ic:iconoCogollo(k),desc:strainLine(k)+(s.h?'\n'+s.h:'')}:{label:`${nn} ??????`,desc:'Sin descubrir.'};}));
+      .concat(DEX.map((k,n)=>{const s=STRAINS[k],nn=String(n+1).padStart(2,'0');return S.disc[k]?{label:`${nn} ${s.n}`,right:pct(s.thc)+'%',sw:s.c,ic:iconoCogollo(k),desc:strainLine(k)+(s.h?'\n'+s.h:'')+(S.catas[k]?'\nCata: '+S.catas[k]:'')}:{label:`${nn} ??????`,desc:'Sin descubrir.'};}));
     const cust=Object.keys(S.custom).filter(k=>S.disc[k]);
     cust.forEach(k=>{const s=S.custom[k];items.push({label:'★ '+s.n,right:pct(s.thc)+'%',sw:s.c,ic:iconoCogollo(k),desc:strainLine(k)+'\nPulsa A para cambiarle el nombre.',c:k});});
     i=await menu(items,{cls:'full',title:'GENOTECA',title2:`${DEX.filter(k=>S.disc[k]).length}/${DEX.length} · ${cust.length} propias`,desc:true,initial:i});
@@ -96,13 +96,14 @@ async function mochila(){
     for(const k in EXTRAS)if(S.items['x_'+k]>0)rows.push({label:EXTRAS[k].n,right:'×'+S.items['x_'+k],ic:icono(ICX[k]),desc:EXTRAS[k].d+`\nSe pone${EXTRAS[k].pl?'n':''} desde la vista de carpa: ▲ hasta el foco y A.`});
     for(const [k,v] of Object.entries(S.seeds))rows.push({label:'Semilla '+getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:icono('semillas'),desc:strainLine(k)+'\nPulsa A para tirarlas.',k:'s',sid:k});
     for(const e of S.esquejes)rows.push({label:'Esqueje '+getStrain(e.sid).n+etiq(e.f),right:'día '+(e.dia+ESQUEJE_DIAS),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),desc:`Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+ESQUEJE_DIAS}.\nPulsa A para ponerle nombre o tirarlo.`,k:'e',e});
-    for(const [k,b] of Object.entries(S.buds))rows.push({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k)),desc:(k.endsWith('*')?'Cogollos de un fenotipo estrella, en lote aparte.\n':'Cogollos listos para vender.\n')+getStrain(lotSid(k)).o});
+    for(const [k,b] of Object.entries(S.buds))rows.push({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k)),desc:(k.endsWith('*')?'Cogollos de un fenotipo estrella, en lote aparte.\n':'Cogollos listos para vender.\n')+(S.catas[lotSid(k)]?S.catas[lotSid(k)]+'\n':'')+getStrain(lotSid(k)).o+'\nPulsa A para catarlo'+(S.items.analizador?' o analizarlo.':'.'),k:'b',key:k});
     for(const [k,b] of Object.entries(S.rosin))rows.push({label:'Rosin · '+lotNombre(k),right:`${coma(b.g)} g · ${pct(b.thc)}%`,sw:'#d89a18',ic:iconoCogollo(lotSid(k)),desc:'Rosin: extracción prensada sin disolventes. Lo compran los catadores.\n'+getStrain(lotSid(k)).o});
     if(S.items.prensa)rows.push({label:'Prensa de rosin',right:'en la mesa',desc:'De 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso.'});
     i=await menu(rows,{cls:'full',title:'MOCHILA',title2:`${Math.floor(totalBuds())} g encima`+(S.caja?` · ${Math.floor(cajaG())} g en la caja`:''),desc:true,initial:i});
     if(i<0)return;
     if(rows[i].k==='bocata'){if(S.items.bocata>0&&S.hp<S.hpMax){S.items.bocata--;S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');toast('Te comes el bocata. +15 de vida',1200);}else sfx('bump');}
     else if(rows[i].k==='e')await esquejeAccion(rows[i].e,S.esquejes);
+    else if(rows[i].k==='b')await loteAccion(rows[i].key);   // la cata y el análisis (1.15)
     else if(rows[i].k==='s'){   // tirar semillas (1.11)
       const sid=rows[i].sid,n=S.seeds[sid],o=n>1?['Tirar 1','Tirar todas','Nada']:['Tirar','Nada'],c=await ask(`${n>1?n+' semillas':'1 semilla'} de ${getStrain(sid).n}.`,o);
       if(o[c]&&o[c]!=='Nada'){const q=o[c]==='Tirar todas'?n:1;S.seeds[sid]-=q;if(!S.seeds[sid])delete S.seeds[sid];sfx('sel');await say(q>1?`Tiras las ${q} semillas.`:'Tiras 1 semilla.');}

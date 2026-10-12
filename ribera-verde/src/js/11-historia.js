@@ -30,6 +30,7 @@ const SHOP=[
   {lbl:'Bolsa de deporte',p:35,ch:3,bolsa:1,desc:'Llevas encima hasta 3 kg de cogollos y rosin (la mochila, 1 kg).',cond:()=>bolsaYa()<1},
   {lbl:'Maleta con ruedas',p:90,ch:5,bolsa:2,desc:'Llevas encima hasta 10 kg de cogollos y rosin.',cond:()=>bolsaYa()<2},
   {lbl:'Carro de esquejes',p:CARRO.p,ch:2,mueble:'carro',desc:`Dos bandejas de ${CARRO.plazas} esquejes, tapadas y bajo tubos T5, y una mesita con la tabla de corte: pinchados ahí aguantan ${CARRO.dias} días (sueltos, ${ESQUEJE_DIAS}). Kiko te lo sube al piso mañana.`,cond:()=>!(S.muebles&&S.muebles.carro)},
+  {lbl:'Analizador de THC',p:180,ch:3,item:'analizador',desc:'Medidor de bolsillo (1.15): analiza un lote desde la mochila. Lo analizado se vende mejor en la calle y un 5 % más en los clubs, y la cata dice el THC exacto.',cond:()=>!S.items.analizador&&!S.envio.includes('Analizador de THC')},
   {lbl:'Prensa de rosin',p:250,ch:3,item:'prensa',desc:'Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores.',cond:()=>!S.items.prensa},
 ];
 const SOBRES=[[1,1],[3,.95],[5,.9],[10,.85]],GRANEL=[50,.6];   // [semillas, precio por semilla relativo]
@@ -39,7 +40,7 @@ async function comprarSemillas(it){
   const j=await ask(`Semillas feminizadas de ${STRAINS[it.sid].n}. ¿Cuántas?`,l.map(([n,f])=>`${n===1?'1 semilla':n>=50?'Bolsa de '+n:'Sobre de '+n} · ${eur(precioSobre(it,[n,f]))}`).concat(['Nada']),'KIKO');
   if(j<0||j>=l.length)return;
   const e=precioSobre(it,l[j]);if(S.money<e){sfx('bad');return say('No te llega el dinero.','KIKO');}
-  S.money-=e;sfx('coin');addSeeds(it.sid,l[j][0]);toast(`Comprado: ${l[j][0]} × ${STRAINS[it.sid].n}`,1200);
+  S.money-=e;sfx('coin');addSeeds(it.sid,l[j][0]);toast(`Comprado: ${l[j][0]} × ${STRAINS[it.sid].n}`,1200);return true;
 }
 // la deuda de la tía (1.10, a escala real): 30.000 € en tres plazos (capítulos 3, 5 y 7). Con equipo y precios reales, un
 // jugador que reinvierte paga cada plazo en las mismas cosechas que antes (simulación en docs/ECONOMIA.md). Si un plazo
@@ -72,7 +73,7 @@ const DICHO_CARPA={m100:'Te la monto esta tarde en el piso, al fondo, al lado de
 // las tiendas de equipo (1.14): la de Kiko y GROW IBARBIDE, la grande de la ciudad, con el equipo a −10 % y hasta un capítulo
 // antes, pero sin semillas (las de Kiko), sin el carro (lo sube Kiko) ni los aparatos de la sala (los deja puestos Kiko)
 const TIENDAS={kiko:{t:'GROWSHOP KIKO',N:'KIKO',f:1,ch:0,ok:()=>true},ane:{t:'GROW IBARBIDE',N:'ANE',f:.9,ch:1,ok:it=>!it.sid&&!it.mueble&&!it.aparato}};
-const precioT=(T,it)=>Math.round(it.p*T.f);
+const precioT=(T,it)=>Math.round(it.p*T.f*(T.N==='KIKO'&&rel('kiko')>=REL.amigo?.95:1));   // 1.15: con confianza, Kiko hace un 5 %
 async function shop(T=TIENDAS.kiko){
   let i=0;
   for(;;){
@@ -83,9 +84,9 @@ async function shop(T=TIENDAS.kiko){
     i=await menu(items,{cls:'full',title:T.t,title2:'Tienes '+eur(S.money),desc:true,initial:i});
     if(i<0||i>=list.length)break;
     const it=list[i];
-    if(it.sid){await comprarSemillas(it);await checkStory();continue;}
+    if(it.sid){if(await comprarSemillas(it)&&T.N==='KIKO')confia('kiko',1);await checkStory();continue;}
     const p=precioT(T,it);if(S.money<p){sfx('bad');await say('No te llega el dinero.',T.N);continue;}
-    S.money-=p;sfx('coin');await entregar(it,T.N);
+    S.money-=p;sfx('coin');if(T.N==='KIKO')confia('kiko',1);await entregar(it,T.N);
     await checkStory();
   }
   await say('Ten cuidado ahí fuera.',T.N);
@@ -163,7 +164,7 @@ async function talkTxaro(){
     const lots=budLots(10).filter(([k])=>indDe(lotSid(k))>=70);if(!lots.length)return say('Cuando tengas 10 gramos de una índica, ven a verme. Aquí estaré.',N);
     const i=await menu(lots.map(lotItem).concat([{label:'Ahora no'}]),{cls:'right',title:'¿Qué le das?'});
     if(i<0||i>=lots.length)return say('No pasa nada. Aquí estaré.',N);
-    useBuds(lots[i][0],10);S.rep+=5;
+    useBuds(lots[i][0],10);S.rep+=5;confia('txaro',10);
     await say('Toma, las últimas de mi Paco. Las trajo de Chitral, en las montañas de Pakistán.',N);
     addSeeds('chitral',3);await got('3 semillas de CHITRAL KUSH');S.items.bocata+=3;await got('3 × BOCATA');S.flags.txaro2=true;return;
   }
@@ -171,7 +172,7 @@ async function talkTxaro(){
   const lots=budLots(5);if(!lots.length)return say('Cuando tengas 5 gramos, acuérdate de mí.',N);
   const i=await menu(lots.map(lotItem).concat([{label:'Ahora no'}]),{cls:'right',title:'¿Qué le das?'});
   if(i<0||i>=lots.length)return say('No pasa nada. Aquí estaré.',N);
-  useBuds(lots[i][0],5);
+  useBuds(lots[i][0],5);confia('txaro',10);
   await say('Gracias. Toma: las trajo mi Paco de Pakistán en el setenta y seis. Nunca supe qué hacer con ellas.',N);
   addSeeds('hindu',2);await got('2 semillas de HINDU KUSH');S.items.bocata+=3;await say('Y llévate estos bocadillos, que comes poco.',N);await got('3 × BOCATA');S.flags.txaro=true;
   await say('Me voy a casa a preparar el aceite. Vivo en la casa gris, al lado del bar. Pásate cuando quieras.',N);
@@ -188,7 +189,7 @@ async function talkInaki(){
   if(i<0||i>=lots.length)return;
   const [sid,b]=lots[i],amt=Math.round(precioCalle(b.thc)*1.2*10);
   if(await ask(`Te doy ${amt} € por 10 g de ${lotNombre(sid)}. ¿Hecho?`,['Hecho','No'],N)!==0)return;
-  useBuds(sid,10);S.money+=amt;S.sales+=amt;S.heat=Math.min(100,S.heat+3);S.iDay=S.day;S.rep+=2;sfx('coin');
+  useBuds(sid,10);S.money+=amt;S.sales+=amt;S.heat=Math.min(100,S.heat+3);S.iDay=S.day;S.rep+=2;confia('inaki',1);sfx('coin');
   if(!S.flags.inaki){S.flags.inaki=true;await say('Toma. Me las dio un marinero de Malaui en Mombasa, en el último viaje.',N);addSeeds('malawi',2);await got('2 semillas de MALAWI GOLD');}
   else await say('Eskerrik asko. Hasta la vuelta.',N);
   await checkStory();
@@ -203,12 +204,12 @@ async function ventaMayor(N){
   if(!lots.length)return say(`Al por mayor, de 100 g para arriba. Pago entre ${coma(precioMayor(12).toFixed(2))} y ${coma(precioMayor(30).toFixed(2))} € el gramo, según lo bueno que sea. Hasta ${mayorDia()>=1000?coma(mayorDia()/1000)+' kg':mayorDia()+' g'} por carga.`,N);
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote?'});
   if(i<0||i>=lots.length)return say('Otro día.',N);
-  const [k,b]=lots[i],pg=Math.round(precioMayor(b.thc)*100)/100,tope=Math.min(Math.floor(b.g),mayorDia());
+  const [k,b]=lots[i],pg=Math.round(precioMayor(b.thc)*(rel('inaki')>=REL.amigo?1.05:1)*100)/100,tope=Math.min(Math.floor(b.g),mayorDia());   // 1.15: con confianza, un 5 % más
   const ops=[100,250,500,1000,2000,5000,10000].filter(g=>g<tope).concat([tope]),kg=kgTxt;
   const j=await ask(`${lotNombre(k)} a ${coma(pg.toFixed(2))} € el gramo. ¿Cuánto cargas?`,ops.map(g=>`${kg(g)} · ${eur(g*pg)}`).concat(['Nada']),N);
   if(j<0||j>=ops.length)return;
   const g=ops[j],e=Math.round(g*pg);
-  useBuds(k,g);S.money+=e;S.sales+=e;S.mDay=S.day;S.heat=Math.min(100,S.heat+2+g/100);S.rep+=1;sfx('coin');
+  useBuds(k,g);S.money+=e;S.sales+=e;S.mDay=S.day;S.heat=Math.min(100,S.heat+2+g/100);S.rep+=1;confia('inaki',1);sfx('coin');
   await accion('vender',{id:'vfx-monedas',x:P.px+8,y:P.py+2});
   toast(`+${eur(e)} · ${kg(g)} al por mayor`,1600);
   await say('Cargado. Esta noche sale en el barco.',N);heatWarn();await checkStory();

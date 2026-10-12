@@ -2239,3 +2239,407 @@ func mensajes():
 		i = await menu(items, {"cls": "full", "title": "MENSAJES", "title2": "%d de %s" % [S.sms.size(), n(D.SMS_MAX)], "desc": true, "initial": i})
 		if i < 0:
 			return
+
+# =========================================================
+# LA GENTE (1.15, 11e-gente): trabajadores, clubs y la cata (la confianza, en mundo.gd)
+# =========================================================
+func curro_dia() -> void:
+	var C: Dictionary = S.curro
+	var J: Dictionary = D.CURRO.jard
+	var V: Dictionary = D.CURRO.vend
+	if C.get("jard"):
+		if S.money < J.sueldo:
+			C.jard = null
+			confia("begona", -10)
+			queue("jard", func(): await talk("SMS · BEGOÑA", ["Sin cobrar no vuelvo, majo. Cuando tengas el dinero, hablamos."]))
+		else:
+			S.money -= int(J.sueldo)
+			for p in S.pots:
+				if p == null or p.get("dead"):
+					continue
+				p.water = 100
+				if p.get("pest") and S.items.insect > 0:
+					S.items.insect -= 1
+					p.pest = false
+			for ci in S.carpas.size():
+				var c = S.carpas[ci]
+				if c == null:
+					continue
+				if c.get("garrafas"):
+					c.erase("gar")
+				if c.get("goteo"):
+					c.dep = Cultivo.goteo_l(S, ci)
+			S.heat = min(100, S.heat + J.calor)
+	var fin := []
+	for v in C.vend:
+		var r := Cultivo.azar()
+		var N: String = "SMS · " + v.n.to_upper()
+		if r < V.pilla:
+			fin.append(v)
+			S.heat = min(100, S.heat + V.calorPilla)
+			confia(v.id, -5)
+			queue("vend" + v.id, func(): await talk(N, ["Me ha parado la policía. Se han quedado con %s de %s. Lo siento." % [g_txt(v.g), lot_nombre(v.k)]]))
+			continue
+		if r < V.pilla + V.estafa * (D.REL.max - rel(v.id)) / D.REL.max:
+			fin.append(v)
+			S.fijos = S.fijos.filter(func(f): return f.id != v.id)
+			S.rel[v.id] = 0
+			queue("vend" + v.id, func(): await say("%s no contesta al móvil. Se ha largado con %s de %s." % [v.n, g_txt(v.g), lot_nombre(v.k)]))
+			continue
+		var g: int = mini(int(floor(v.g)), ri(int(V.g[0]), int(V.g[1])))
+		var e := Datos.jsround(precio_calle(v.thc) * D.ZONAS.town.precio * g * (1 - V.com))
+		v.g -= g
+		S.money += e
+		S.sales += e
+		S.heat = min(100, S.heat + V.calor)
+		confia(v.id, 1)
+		if v.g < 1:
+			fin.append(v)
+			queue("vend" + v.id, func(): await talk(N, ["Vendidos los últimos %d g: %s en tu buzón. Si quieres que siga, déjame más." % [g, Datos.eur(e)]]))
+		else:
+			queue("vend" + v.id, func(): await talk(N, ["Vendidos %d g: %s en tu buzón. Me quedan %s." % [g, Datos.eur(e), g_txt(v.g)]]))
+	if fin.size():
+		C.vend = C.vend.filter(func(v): return not fin.has(v))
+
+func _vend_de(id: String):
+	for v in S.curro.vend:
+		if v.id == id:
+			return v
+	return null
+
+# un cliente de la agenda, desde el móvil: que venga, un regalo (una vez al día), cómo va su venta o que venda para ti
+func fijo_menu(f: Dictionary) -> bool:
+	var v = _vend_de(f.id)
+	var puede: bool = rel(f.id) >= D.REL.socio and S.curro.vend.size() < D.CURRO.vend.max
+	var ops := ["Que venga"]
+	if total_buds() >= D.REL.regaloG:
+		ops.append("Regalarle %d g" % int(D.REL.regaloG))
+	if v:
+		ops.append("Cómo va la venta")
+	elif puede:
+		ops.append("Que venda para mí")
+	ops.append("Nada")
+	var oi: int = await ask("%s · %s · confianza %d (%s)" % [f.n, D.CTYPES[f.t].label.to_lower(), rel(f.id), rel_nivel(f.id)], ops)
+	var op: String = ops[oi]
+	if op == "Que venga":
+		return await llamar_fijo(f)
+	if op.begins_with("Regalarle"):
+		if f.get("regalo") == S.day:
+			await say("%s: «¿Otra vez? Gracias, pero hoy ya me has invitado»." % f.n)
+			return false
+		var lots := bud_lots(D.REL.regaloG)
+		var it := lots.map(lot_item)
+		it.append({"label": "Nada"})
+		var i: int = await menu(it, {"cls": "right", "title": "¿Qué le regalas?"})
+		if i < 0 or i >= lots.size():
+			return false
+		use_buds(lots[i][0], D.REL.regaloG)
+		f.regalo = S.day
+		confia(f.id, int(D.REL.regalo))
+		sfx("get")
+		await say("%s: «¡Gracias! Se lo cuento a todo el mundo»." % f.n)
+		return false
+	if op == "Cómo va la venta":
+		await say("%s: «Me quedan %s de %s. Cada día vendo lo que puedo y te dejo el %d %% en el buzón»." % [f.n, g_txt(v.g), lot_nombre(v.k), Datos.jsround((1 - D.CURRO.vend.com) * 100)])
+		return false
+	if op == "Que venda para mí":
+		return await contratar_vendedor(f)
+	return false
+
+func contratar_vendedor(f: Dictionary) -> bool:
+	var V: Dictionary = D.CURRO.vend
+	var lots := bud_lots(V.lotes[0])
+	if lots.is_empty():
+		await say("%s: «Cuando tengas %d g o más, hablamos»." % [f.n, int(V.lotes[0])])
+		return false
+	var it := lots.map(lot_item)
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿Qué lote le dejas?"})
+	if i < 0 or i >= lots.size():
+		return false
+	var k: String = lots[i][0]
+	var b: Dictionary = lots[i][1]
+	var ops := []
+	for g in V.lotes:
+		if g <= floor(b.g):
+			ops.append(int(g))
+	var o := []
+	for g in ops:
+		o.append("%d g" % g)
+	o.append("Nada")
+	var j: int = await ask("%s vende a precio de calle y se queda el %d %%. ¿Cuánto le dejas?" % [f.n, Datos.jsround(V.com * 100)], o)
+	if j < 0 or j >= ops.size():
+		return false
+	use_buds(k, ops[j])
+	S.curro.vend.append({"id": f.id, "n": f.n, "k": k, "thc": b.thc, "g": ops[j], "dia": S.day})
+	sfx("sel")
+	await say("%s: «Hecho. Cada día te dejo lo vendido en el buzón»." % f.n)
+	return false
+
+# MÓVIL → GENTE: a quién conoces y cuánto se fía de ti
+func gente() -> void:
+	var rows := []
+	for id in D.GENTE:
+		if S.rel.has(id):
+			rows.append({"label": D.GENTE[id], "right": "%d · %s" % [rel(id), "jardinera" if id == "begona" and S.curro.get("jard") else rel_nivel(id)], "desc": D.QUE_DA.get(id, "Hablar cada día suma confianza.")})
+	for k in D.CLUBS:
+		if S.rel.has(k):
+			rows.append({"label": D.CLUBS[k].n, "right": "%d · %s" % [rel(k), rel_nivel(k)], "desc": "Eres socio. Vender y cumplir los encargos suma." if S.clubs.get(k) else "Hazte socio para vender y comprar."})
+	for f in S.fijos:
+		var v = _vend_de(f.id)
+		rows.append({"label": f.n, "right": "%d · %s" % [rel(f.id), "vende para ti" if v else rel_nivel(f.id)],
+			"desc": ("Le dejaste %s: le quedan %s." % [lot_nombre(v.k), g_txt(v.g)]) if v else "Cliente de la agenda. Buen precio y regalos suman; con %d vende para ti." % int(D.REL.socio)})
+	if rows.is_empty():
+		await say("Todavía no conoces a nadie.")
+		return
+	var i := 0
+	while true:
+		i = await menu(rows, {"cls": "full", "title": "GENTE", "title2": "%d persona%s" % [rows.size(), "s" if rows.size() > 1 else ""], "desc": true, "initial": i})
+		if i < 0:
+			return
+
+# Begoña (la vecina): consejos, un regalo al día y, con confianza y desde el capítulo 3, la jardinera
+const BEGONA_TIPS := ["Bajo una lámpara las plantas beben mucho. Riégalas a diario, majo.", "Si se te ponen amarillas las hojas de abajo, les falta agua o abono.", "Tu tía siempre tenía el piso oliendo a limón. Ahora sé por qué."]
+func talk_begona():
+	var N := "BEGOÑA"
+	var J: Dictionary = D.CURRO.jard
+	if S.curro.get("jard"):
+		var c: int = await ask("¿Qué tal las plantas, majo? Paso cada mañana: %s al día." % Datos.eur(J.sueldo), ["Charlar", "Que lo deje", "Nada"], N)
+		if c == 0:
+			await say(pick(BEGONA_TIPS), N)
+		elif c == 1:
+			S.curro.jard = null
+			await say("Como quieras. Si me necesitas, aquí estoy.", N)
+		return
+	var ops := ["Charlar"]
+	if total_buds() >= D.REL.regaloG:
+		ops.append("Regalarle %d g" % int(D.REL.regaloG))
+	if S.ch >= J.ch and rel("begona") >= D.REL.amigo:
+		ops.append("Contratarla")
+	ops.append("Nada")
+	var oi: int = await ask("Tu tía me dejaba cuidarle las plantas cuando se iba. Con confianza, se habla de todo." if S.ch >= J.ch and rel("begona") < D.REL.amigo else "Hola, majo. ¿Cómo van esas plantas?", ops, N)
+	var op: String = ops[oi]
+	if op == "Charlar":
+		await say(pick(BEGONA_TIPS), N)
+	elif op.begins_with("Regalarle"):
+		if S.flags.get("regBeg") == S.day:
+			await say("Hoy ya me has dado, majo. Mañana más.", N)
+			return
+		var lots := bud_lots(D.REL.regaloG)
+		var it := lots.map(lot_item)
+		it.append({"label": "Nada"})
+		var i: int = await menu(it, {"cls": "right", "title": "¿Qué le das?"})
+		if i < 0 or i >= lots.size():
+			return
+		use_buds(lots[i][0], D.REL.regaloG)
+		S.flags.regBeg = S.day
+		confia("begona", int(D.REL.regalo))
+		sfx("get")
+		await say("Ay, gracias. Para dormir, como hacía tu tía.", N)
+	elif op == "Contratarla":
+		if await ask("Te riego, relleno las garrafas y el depósito y, si tienes insecticida, trato las plagas. %s al día, cada mañana. ¿Hecho?" % Datos.eur(J.sueldo), ["Hecho", "Ahora no"], N) != 0:
+			return
+		S.curro.jard = {"dia": S.day}
+		await say("Mañana empiezo. Ya sé dónde dejaba la llave tu tía.", N)
+
+# los clubs cannábicos (CLUBS): el carné, vender un lote al día, comprar 10 g y encargos de semillas
+func precio_club(thc: float) -> float:
+	return 3 + thc * .15
+
+func talk_club(k: String):
+	var C: Dictionary = D.CLUBS[k]
+	var N: String = C.n
+	if not S.clubs.get(k):
+		if await ask("%s, asociación de consumidores. Dentro no se vende nada: lo tuyo entra por la puerta de atrás. La cuota son %s. ¿Te haces socio?" % [C.n, Datos.eur(C.cuota)], ["Hacerme socio", "No"], N) != 0:
+			return
+		if S.money < C.cuota:
+			sfx("bad")
+			await say("Sin la cuota no hay carné.", N)
+			return
+		S.money -= int(C.cuota)
+		S.clubs[k] = true
+		S.rep += 1
+		confia(k, 2)
+		sfx("coin")
+		await got("el carné de " + C.n)
+	var E = S.get("clubEnc")
+	var c: int = await ask("¿Qué te trae?", ["Vender al club", "Comprar %d g" % int(D.CLUB.compra), "Entregar las semillas" if E and E.k == k else "Encargo de semillas", "Nada"], N)
+	if c == 0:
+		await vender_club(k)
+	elif c == 1:
+		await comprar_club(k)
+	elif c == 2:
+		await encargo_club(k)
+
+func vender_club(k: String) -> void:
+	var C: Dictionary = D.CLUBS[k]
+	var N: String = C.n
+	if S.clubDia.get(k) == S.day:
+		await say("Hoy ya hemos cerrado caja. Mañana.", N)
+		return
+	var lots := bud_lots(D.CLUB.g[0])
+	if lots.is_empty():
+		await say("De %d g para arriba, entre %s y %s € el gramo según el THC. Una entrega al día." % [int(D.CLUB.g[0]), _dos(precio_club(12)), _dos(precio_club(30))], N)
+		return
+	var it := lots.map(lot_item)
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿Qué lote?"})
+	if i < 0 or i >= lots.size():
+		return
+	var kk: String = lots[i][0]
+	var b: Dictionary = lots[i][1]
+	var pg := Datos.jsround(precio_club(b.thc) * (1.05 if b.get("ana") else 1.0) * 100) / 100.0
+	var ops := []
+	for g in D.CLUB.g:
+		if g <= floor(b.g):
+			ops.append(int(g))
+	var o := []
+	for g in ops:
+		o.append("%d g · %s" % [g, Datos.eur(g * pg)])
+	o.append("Nada")
+	var j: int = await ask("%s a %s € el gramo%s. ¿Cuánto?" % [lot_nombre(kk), _dos(pg), " (analizado)" if b.get("ana") else ""], o, N)
+	if j < 0 or j >= ops.size():
+		return
+	var g: int = ops[j]
+	var e := Datos.jsround(g * pg)
+	use_buds(kk, g)
+	S.money += e
+	S.sales += e
+	S.heat = min(100, S.heat + D.CLUB.calor)
+	S.rep += 1
+	S.clubDia[k] = S.day
+	confia(k, 2)
+	sfx("coin")
+	await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})
+	toast("+%s · %d g al club" % [Datos.eur(e), g], 1600)
+	await say("Por la puerta de atrás, como siempre. Gracias.", N)
+	await check_story()
+
+func comprar_club(k: String) -> void:
+	var C: Dictionary = D.CLUBS[k]
+	var N: String = C.n
+	if S.clubCompra.get(k) == S.day:
+		await say("Lo de hoy ya está repartido. Mañana hay más.", N)
+		return
+	var sid: String = C.sid[int(S.day) % C.sid.size()]
+	var s: Dictionary = D.STRAINS[sid]
+	var p := Datos.jsround(precio_calle(s.thc) * D.CLUB.compraF * D.CLUB.compra)
+	if await ask("Hoy tenemos %s (%s %%): %d g por %s. ¿Te los llevas?" % [s.n, Datos.pct(s.thc), int(D.CLUB.compra), Datos.eur(p)], ["Comprar", "No"], N) != 0:
+		return
+	if S.money < p:
+		sfx("bad")
+		await say("Sin dinero no hay reparto.", N)
+		return
+	if libre_mochila() < D.CLUB.compra:
+		await say("No te caben en la bolsa.", N)
+		return
+	S.money -= p
+	S.clubCompra[k] = S.day
+	add_buds(sid, D.CLUB.compra, s.thc)
+	discover(sid)
+	sfx("coin")
+	toast("Comprado: %d g de %s" % [int(D.CLUB.compra), s.n], 1200)
+
+func encargo_club(k: String) -> void:
+	var N: String = D.CLUBS[k].n
+	var E = S.get("clubEnc")
+	var EN: Dictionary = D.CLUB.enc
+	if E:
+		if E.k != k:
+			await say("Ya tienes un encargo pendiente en %s. Cumple ese primero." % D.CLUBS[E.k].n, N)
+			return
+		var s = strain(E.sid)
+		var t: int = int(S.seeds.get(E.sid, 0))
+		if t < E.n:
+			await say("Nos faltan %d semillas de %s. Hasta el día %s." % [int(E.n) - t, s.n, n(E.hasta)], N)
+			return
+		S.seeds[E.sid] = t - int(E.n)
+		if not S.seeds[E.sid]:
+			S.seeds.erase(E.sid)
+		S.money += int(E.pago)
+		S.sales += int(E.pago)
+		S.rep += 3
+		confia(k, 5)
+		S.clubEnc = null
+		S.clubEncDia = S.day
+		sfx("coin")
+		toast("+%s · %d semillas de %s" % [Datos.eur(E.pago), int(E.n), s.n], 1600)
+		await say("Las sembramos para los socios. Buen trabajo.", N)
+		await check_story()
+		return
+	if S.clubEncDia == S.day:
+		await say("Hoy ya no hay más encargos. Mañana.", N)
+		return
+	var cand := []
+	for it in D.SHOP:
+		if it.get("sid") and S.ch >= it.ch:
+			cand.append([it.sid, int(it.p) * int(EN.n) * int(EN.f)])
+	if S.ch >= 4:
+		var vistos := []
+		for h in D.RECIPES:
+			var sr: String = D.RECIPES[h]
+			if not vistos.has(sr):
+				vistos.append(sr)
+				if S.disc.get(sr):
+					cand.append([sr, int(EN.receta) * int(EN.n)])
+	var el: Array = pick(cand)
+	var sid: String = el[0]
+	var pago: int = el[1]
+	var s: Dictionary = D.STRAINS[sid]
+	if await ask("Los socios quieren %d semillas de %s. Pagamos %s, en %d días. ¿Te encargas?" % [int(EN.n), s.n, Datos.eur(pago), int(EN.dias)], ["Aceptar", "No"], N) != 0:
+		await say("Si cambias de idea, aquí estamos.", N)
+		return
+	S.clubEnc = {"k": k, "sid": sid, "n": int(EN.n), "hasta": S.day + int(EN.dias), "pago": pago}
+	await say("Hasta el día %s. Las semillas, aquí." % n(S.clubEnc.hasta), N)
+
+func vencer_encargo_club() -> void:
+	var E = S.get("clubEnc")
+	if E == null or S.day <= E.hasta:
+		return
+	S.clubEnc = null
+	S.rep = maxi(0, S.rep - 3)
+	confia(E.k, -10)
+	queue("clubEnc", func(): await talk("SMS · " + D.CLUBS[E.k].n, ["Se acabó el plazo de las semillas. Los socios no se olvidan."]))
+
+# la cata (desde la mochila) y el analizador de THC
+func nota_cata(sid: String, thc: float) -> String:
+	var ind := Datos.ind_de(S, sid)
+	var a: String = D.AROMAS[Datos.hash_str(sid) % D.AROMAS.size()]
+	var e := "relaja y pesa" if ind >= 65 else ("sube y despeja" if ind <= 35 else "equilibrado")
+	var p: String = (Datos.pct(thc) + " % de THC") if S.items.get("analizador") else ("floja" if thc < 12 else ("media" if thc < 18 else ("fuerte" if thc < 24 else "muy fuerte")))
+	return "Aroma %s · %s · %s" % [a, e, p]
+
+func catar(k: String) -> void:
+	var b = S.buds.get(k)
+	if b == null or b.g < D.CATA.g:
+		return
+	var sid := lot_sid(k)
+	var thc: float = b.thc
+	use_buds(k, D.CATA.g)
+	if S.buds.has(k):
+		S.buds[k].cata = true
+	S.catas[sid] = nota_cata(sid, thc)
+	advance_time(int(D.CATA.min))
+	update_hud()
+	await say("Catas %s: %s." % [lot_nombre(k), S.catas[sid]])
+
+func analizar(k: String) -> void:
+	var b = S.buds.get(k)
+	if b == null or not S.items.get("analizador"):
+		return
+	b.ana = true
+	sfx("get")
+	await say("Analizado: %s, %s %% de THC. Lo que va con análisis se vende mejor." % [lot_nombre(k), Datos.pct(b.thc)])
+
+func lote_accion(k: String) -> void:
+	var b: Dictionary = S.buds[k]
+	var ops := ["Catar %s g" % Datos.coma(D.CATA.g)]
+	if S.items.get("analizador") and not b.get("ana"):
+		ops.append("Analizar")
+	ops.append("Nada")
+	var oi: int = await ask("%s: %d g · %s %%%s%s" % [lot_nombre(k), int(floor(b.g)), Datos.pct(b.thc), " · catado" if b.get("cata") else "", " · analizado" if b.get("ana") else ""], ops)
+	var op: String = ops[oi]
+	if op.begins_with("Catar"):
+		await catar(k)
+	elif op == "Analizar":
+		await analizar(k)

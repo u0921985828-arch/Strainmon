@@ -151,7 +151,7 @@ function newDay(){
   const sec=S.esquejes.filter(e=>S.day-e.dia>ESQUEJE_DIAS).length;if(sec){S.esquejes=S.esquejes.filter(e=>S.day-e.dia<=ESQUEJE_DIAS);av.push(`Se ${sec>1?'han secado '+sec+' esquejes':'ha secado un esqueje'} sin plantar`);}
   const seb=S.bandejas.filter(e=>S.day-e.dia>CARRO.dias).length;if(seb){S.bandejas=S.bandejas.filter(e=>S.day-e.dia<=CARRO.dias);av.push(`Se ${seb>1?'han secado '+seb+' esquejes':'ha secado un esqueje'} en las bandejas`);}
   if(av.length&&mode==='world')toast(av.join('<br>'),1600);
-  spawnClients();recibirPedido();recibirEnvio();instalarCaja();llegaMueble();vencerEncargo();
+  spawnClients();recibirPedido();recibirEnvio();instalarCaja();llegaMueble();vencerEncargo();curroDia();vencerEncargoClub();   // la gente (1.15)
   // 1.10: el plazo vencido, también sin haber visto a Baltasar (el plazo corre desde Toño); 1.11: el aviso, a 3 días y el último
   if(S.due>0&&S.day>S.deadline)queue('penalty',penaltyEvent);
   else if(S.due>0&&(S.deadline-S.day===3||S.deadline===S.day))queue('plazo',recuerdoPlazo);

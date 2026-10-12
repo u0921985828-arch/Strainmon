@@ -1327,6 +1327,118 @@ func _pasos() -> void:
 		R.c = J.S.clients.filter(func(c): return c.map == "callejon").size()
 		J.enter_map("home", 5, 5, "up"),
 		func(): return chk(R.en == "callejon,10,16" and R.m == 120 and R.vuelta == "ibarbide,20,1" and R.z == "0/0,1.6,1.3,true" and R.c == 2, R))
+	step("Clubs cannábicos (1.15): el carné (la cuota), un lote al día entre lo de Iñaki y la calle, 10 g de la variedad del día (entra en la Genoteca) y un encargo de semillas que se paga al entregarlo", ["^Hacerme socio", "^Vender al club", "^Skunk", "^100 g"], func():
+		J.S.ch = 5
+		J.S.money = 1000
+		J.S.buds = {}
+		J.add_buds("ria", 300, 12)
+		J.S.clubs = {}
+		J.S.clubDia = {}
+		J.S.clubCompra = {}
+		J.S.clubEnc = null
+		J.S.clubEncDia = 0
+		J.S.rel = {}
+		R = {}
+		J.enter_map("puerto", 10, 9, "up")
+		var l := []
+		for e in J.ents:
+			if e.id == "club_puerto":
+				l.append("%d,%d" % [e.x, e.y])
+		R.ent = ",".join(l)
+		R.m = J.S.money
+		await run(func(): await J.talk_club("puerto"))
+		R.venta = J.S.money - R.m + int(D.CLUBS.puerto.cuota)
+		R.g = J.S.buds.ria.g
+		R.pg = Datos.jsround(J.precio_club(12) * 100) / 100.0
+		want(["^Vender al club"])
+		R.m = J.S.money
+		await run(func(): await J.talk_club("puerto"))
+		R.otra = J.S.money - R.m
+		var sid: String = D.CLUBS.puerto.sid[int(J.S.day) % 2]
+		want(["^Comprar", "^Comprar"])
+		R.m = J.S.money
+		await run(func(): await J.talk_club("puerto"))
+		R.compra = R.m - J.S.money
+		R.cb = J.S.buds[sid].g if J.S.buds.has(sid) else null
+		R.disc = J.S.disc.get(sid, false) == true
+		R.pc = Datos.jsround(J.precio_calle(D.STRAINS[sid].thc) * 1.2 * 10)
+		want(["^Encargo", "^Aceptar"])
+		await run(func(): await J.talk_club("puerto"))
+		R.enc = ("%s,%d,%d" % [J.S.clubEnc.k, int(J.S.clubEnc.n), int(J.S.clubEnc.hasta) - int(J.S.day)]) if J.S.get("clubEnc") else null
+		J.S.seeds[J.S.clubEnc.sid] = int(J.S.seeds.get(J.S.clubEnc.sid, 0)) + 10
+		want(["^Entregar"])
+		R.m = J.S.money
+		R.rep = J.S.rep
+		await run(func(): await J.talk_club("puerto"))
+		R.pago = J.S.money - R.m
+		R.rep = J.S.rep - R.rep
+		R.fin = J.S.get("clubEnc") == null and J.S.clubEncDia == J.S.day
+		R.rel = J.S.rel.get("puerto")
+		J.enter_map("home", 5, 5, "up"),
+		func(): return chk(R.ent == "10,8" and R.venta == Datos.jsround(100 * R.pg) and R.g == 200 and J.S.clubs.get("puerto") == true and R.otra == 0 and R.compra == R.pc and R.cb == 10 and R.disc and R.enc == "puerto,10,7" and R.pago > 0 and R.rep == 3 and R.fin and R.rel == 9, R))
+	step("La cata y el analizador (1.15): catar medio gramo (30 min) deja la nota (aroma, efecto y potencia) en la Genoteca y marca el lote; con el analizador, el THC exacto y el lote analizado", [], func():
+		J.S.ch = 5
+		J.S.min = 10 * 60
+		J.S.buds = {}
+		J.add_buds("ria", 20, 12.3)
+		J.add_buds("thai", 10, 17)
+		J.S.catas = {}
+		J.S.items.analizador = 0
+		R = {"min": J.S.min}
+		await run(func(): await J.catar("ria"))
+		R.n1 = J.S.catas.ria
+		R.g = J.S.buds.ria.g
+		R.c = J.S.buds.ria.get("cata", false) == true
+		R.t = J.S.min - R.min
+		J.S.items.analizador = 1
+		await run(func(): await J.catar("thai"))
+		R.n2 = J.S.catas.thai
+		await run(func(): await J.analizar("ria"))
+		R.a = J.S.buds.ria.get("ana", false) == true
+		R.a0 = J.S.buds.thai.get("ana", false) == true
+		R.nota = J.nota_cata("ria", 12.3),
+		func(): return chk(RegEx.create_from_string("^Aroma .+ · relaja y pesa · media$").search(R.n1) != null and R.g == 19.5 and R.c and R.t == 30 and RegEx.create_from_string("^Aroma .+ · sube y despeja · 17,0 % de THC$").search(R.n2) != null and R.a and not R.a0 and R.nota.ends_with("12,3 % de THC"), R))
+	step("Confianza y trabajadores (1.15): hablar suma 1 al día; Begoña, con 20 y desde el cap. 3, se contrata de jardinera (riega y cobra 20 € al amanecer); un cliente de la agenda con 50 vende para ti a comisión y te deja lo vendido en el buzón", ["^Contratarla", "^Hecho"], func():
+		J.S.ch = 5
+		J.S.money = 500
+		J.S.rel = {}
+		J.S.relDia = {}
+		J.S.curro = {"jard": null, "vend": []}
+		R = {}
+		J.enter_map("town", 21, 22, "up")
+		J.interact()
+		await idle()
+		R.patxi = J.S.rel.get("patxi")
+		J.interact()
+		await idle()
+		R.patxi2 = J.S.rel.get("patxi")
+		J.S.rel.begona = int(D.REL.amigo)
+		await run(func(): await J.talk_begona())
+		R.jard = J.S.curro.get("jard") != null
+		J.S.buds = {}
+		J.add_buds("ria", 200, 12)
+		J.S.fijos = [{"id": "cF", "n": "Asier", "t": "cur", "dia": 0}]
+		J.S.rel.cF = int(D.REL.socio)
+		want(["^Que venda", "^Skunk", "^50 g"])
+		await run(func(): await J.fijo_menu(J.S.fijos[0]))
+		R.vend = ("%s,%d" % [J.S.curro.vend[0].id, int(J.S.curro.vend[0].g)]) if J.S.curro.vend.size() else ""
+		R.g = J.S.buds.ria.g
+		for p in J.S.pots:
+			if p:
+				p.water = 20
+		R.m = J.S.money
+		R.sms = J.S.sms.size()
+		J.new_day()
+		await idle()
+		R.agua = J.S.pots.filter(func(p): return p != null).all(func(p): return p.water == 100)
+		var v = J.S.curro.vend[0] if J.S.curro.vend.size() else null
+		R.gone = v == null
+		R.v = v.g if v else 0
+		R.e = Datos.jsround(J.precio_calle(12) * D.ZONAS.town.precio * (50 - v.g) * (1 - D.CURRO.vend.com)) if v else 0
+		R.dinero = J.S.money - (R.m - int(D.CURRO.jard.sueldo) + R.e)
+		R.sms = J.S.sms.size() - R.sms
+		J.enter_map("home", 5, 5, "up"),
+		func(): return chk(R.patxi == 1 and R.patxi2 == 1 and R.jard and R.vend == "cF,50" and R.g == 150 and R.agua and (R.gone or R.v < 50) and R.dinero == 0 and R.sms >= 1, R))
 	step("Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas", ["^Hindu Kush"], func():
 		J.S.ch = 5
 		J.S.flags.txaro = true

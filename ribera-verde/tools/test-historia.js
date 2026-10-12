@@ -437,6 +437,30 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     R.z = [PATRULLAS.callejon.join('/'), ZONAS.callejon.lad, ZONAS.callejon.precio, CLIENT_TILES.callejon.length >= 20].join(); S.clientsDay = 0; spawnClients();
     R.c = S.clients.filter(c => c.map === 'callejon').length; enterMap('home', 5, 5, 'up');
   }, () => R.en === 'callejon,10,16' && R.m === 120 && R.vuelta === 'ibarbide,20,1' && R.z === '0/0,1.6,1.3,true' && R.c === 2 || R);
+  await step('Clubs cannábicos (1.15): el carné (la cuota), un lote al día entre lo de Iñaki y la calle, 10 g de la variedad del día (entra en la Genoteca) y un encargo de semillas que se paga al entregarlo', ['^Hacerme socio', '^Vender al club', '^Skunk', '^100 g'], async () => {
+    S.ch = 5; S.money = 1000; S.buds = {}; addBuds('ria', 300, 12); S.clubs = {}; S.clubDia = {}; S.clubCompra = {}; S.clubEnc = null; S.clubEncDia = 0; S.rel = {}; window.R = {};
+    enterMap('puerto', 10, 9, 'up'); R.ent = ents.filter(e => e.id === 'club_puerto').map(e => e.x + ',' + e.y).join();
+    R.m = S.money; await run(() => talkClub('puerto')); R.venta = S.money - R.m + CLUBS.puerto.cuota; R.g = S.buds.ria.g; R.pg = Math.round(precioClub(12) * 100) / 100;
+    want(['^Vender al club']); R.m = S.money; await run(() => talkClub('puerto')); R.otra = S.money - R.m;
+    const sid = CLUBS.puerto.sid[S.day % 2]; want(['^Comprar', '^Comprar']); R.m = S.money; await run(() => talkClub('puerto')); R.compra = R.m - S.money; R.cb = S.buds[sid] && S.buds[sid].g; R.disc = !!S.disc[sid]; R.pc = Math.round(precioCalle(STRAINS[sid].thc) * 1.2 * 10);
+    want(['^Encargo', '^Aceptar']); await run(() => talkClub('puerto')); R.enc = S.clubEnc && [S.clubEnc.k, S.clubEnc.n, S.clubEnc.hasta - S.day].join();
+    S.seeds[S.clubEnc.sid] = (S.seeds[S.clubEnc.sid] || 0) + 10; want(['^Entregar']); R.m = S.money; R.rep = S.rep; await run(() => talkClub('puerto')); R.pago = S.money - R.m; R.rep = S.rep - R.rep; R.fin = S.clubEnc === null && S.clubEncDia === S.day;
+    R.rel = S.rel.puerto; enterMap('home', 5, 5, 'up');
+  }, () => R.ent === '10,8' && R.venta === Math.round(100 * R.pg) && R.g === 200 && S.clubs.puerto === true && R.otra === 0 && R.compra === R.pc && R.cb === 10 && R.disc && R.enc === 'puerto,10,7' && R.pago > 0 && R.rep === 3 && R.fin && R.rel === 9 || R);
+  await step('La cata y el analizador (1.15): catar medio gramo (30 min) deja la nota (aroma, efecto y potencia) en la Genoteca y marca el lote; con el analizador, el THC exacto y el lote analizado', [], async () => {
+    S.ch = 5; S.min = 10 * 60; S.buds = {}; addBuds('ria', 20, 12.3); addBuds('thai', 10, 17); S.catas = {}; S.items.analizador = 0; window.R = { min: S.min };
+    await run(() => catar('ria')); R.n1 = S.catas.ria; R.g = S.buds.ria.g; R.c = !!S.buds.ria.cata; R.t = S.min - R.min;
+    S.items.analizador = 1; await run(() => catar('thai')); R.n2 = S.catas.thai; await run(() => analizar('ria')); R.a = !!S.buds.ria.ana; R.a0 = !!S.buds.thai.ana; R.nota = notaCata('ria', 12.3);
+  }, () => /^Aroma .+ · relaja y pesa · media$/.test(R.n1) && R.g === 19.5 && R.c && R.t === 30 && /^Aroma .+ · sube y despeja · 17,0 % de THC$/.test(R.n2) && R.a && !R.a0 && /12,3 % de THC$/.test(R.nota) || R);
+  await step('Confianza y trabajadores (1.15): hablar suma 1 al día; Begoña, con 20 y desde el cap. 3, se contrata de jardinera (riega y cobra 20 € al amanecer); un cliente de la agenda con 50 vende para ti a comisión y te deja lo vendido en el buzón', ['^Contratarla', '^Hecho'], async () => {
+    S.ch = 5; S.money = 500; S.rel = {}; S.relDia = {}; S.curro = { jard: null, vend: [] }; window.R = {};
+    enterMap('town', 21, 22, 'up'); interact(); await idle(); R.patxi = S.rel.patxi; interact(); await idle(); R.patxi2 = S.rel.patxi;
+    S.rel.begona = REL.amigo; await run(talkBegona); R.jard = !!S.curro.jard;
+    S.buds = {}; addBuds('ria', 200, 12); S.fijos = [{ id: 'cF', n: 'Asier', t: 'cur', dia: 0 }]; S.rel.cF = REL.socio; want(['^Que venda', '^Skunk', '^50 g']); await run(() => fijoMenu(S.fijos[0]));
+    R.vend = S.curro.vend.length ? [S.curro.vend[0].id, S.curro.vend[0].g].join() : ''; R.g = S.buds.ria.g;
+    S.pots.forEach(p => { if (p) p.water = 20; }); R.m = S.money; R.sms = S.sms.length; newDay(); await idle(); R.agua = S.pots.filter(Boolean).every(p => p.water === 100);
+    const v = S.curro.vend[0]; R.gone = !v; R.v = v ? v.g : 0; R.e = v ? Math.round(precioCalle(12) * ZONAS.town.precio * (50 - v.g) * (1 - CURRO.vend.com)) : 0; R.dinero = S.money - (R.m - CURRO.jard.sueldo + R.e); R.sms = S.sms.length - R.sms; enterMap('home', 5, 5, 'up');
+  }, () => R.patxi === 1 && R.patxi2 === 1 && R.jard && R.vend === 'cF,50' && R.g === 150 && R.agua && (R.gone || R.v < 50) && R.dinero === 0 && R.sms >= 1 || R);
   await step('Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas', ['^Hindu Kush'], async () => {
     S.ch = 5; S.flags.txaro = true; S.flags.txaro2 = false; S.map = 'txaro'; buildEnts(); window.R = { ent: ents.filter(e => e.id === 'txaro').map(e => e.x + ',' + e.y).join() };
     S.buds = {}; addBuds('ria', 20, 12); addBuds('hindu', 15, 18); addBuds('thai', 20, 16); R.ch = S.seeds.chitral || 0; R.boc = S.items.bocata; R.rep = S.rep;

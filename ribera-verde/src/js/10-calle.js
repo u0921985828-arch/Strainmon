@@ -46,8 +46,10 @@ async function talkClient(c){
   const pr=[Math.round(base*.85),Math.round(base),Math.round(base*1.3)];
   const j=await ask(`${c.want} g de ${ext?'rosin de ':''}${lotNombre(sid)}. ¿Cuánto le pides?`,[`Rebaja · ${pr[0]} €`,`Justo · ${pr[1]} €`,`Caro · ${pr[2]} €`,'Cancelar']);
   if(j===3)return say('Entonces me voy.',N);
-  const acc=[1,.92,clamp(.3+(b.thc-(ext?50:c.minThc||14))*.05+(c.type==='pij'?.25:0)+(c.type==='tur'?.15:0),.1,.9)][j];
+  let acc=[1,.92,clamp(.3+(b.thc-(ext?50:c.minThc||14))*.05+(c.type==='pij'?.25:0)+(c.type==='tur'?.15:0),.1,.9)][j];
+  if(j>0)acc=Math.min(.97,acc+(c.fid?rel(c.fid)/250:0)+(b.cata?.05:0)+(b.ana?.1:0));   // 1.15: la confianza de los de la agenda, la cata y el análisis
   if(Math.random()<acc){
+    if(c.fid)confia(c.fid,[3,2,1][j]);
     if(ext)useRosin(sid,c.want);else useBuds(sid,c.want);
     S.money+=pr[j];S.sales+=pr[j];S.heat=Math.min(100,Math.round((S.heat+CALOR_CALLE.base+c.want*(ext?CALOR_CALLE.rosin:CALOR_CALLE.g))*10)/10);S.rep+=[3,2,1][j];sfx('coin');
     await accion('vender',{id:'vfx-monedas',x:P.px+8,y:P.py+2});
@@ -57,7 +59,7 @@ async function talkClient(c){
     vistoVender();heatWarn();await checkStory();
     // en las esquinas de Darko (1.10), 1 de cada 3 ventas acaba con uno de sus chicos encima
     if(c.map==='astilleros'&&Math.random()<1/3){await say('Uno de los chicos de Darko te ha visto vender.');await say('«Te dijimos que lejos de nuestras esquinas.»','CHICO DE DARKO');await battle('thief');}
-  }else{S.rep=Math.max(0,S.rep-1);sfx('bad');removeClient(c.id);await say(pick(['¿Tanto? No.','A ese precio, paso.','Eso es demasiado. Adiós.']),N);}
+  }else{S.rep=Math.max(0,S.rep-1);if(c.fid)confia(c.fid,-2);sfx('bad');removeClient(c.id);await say(pick(['¿Tanto? No.','A ese precio, paso.','Eso es demasiado. Adiós.']),N);}
 }
 // 1.11: un aviso antes, con 50 (con 60 investigan), que dice por dónde se vende sin tanto calor
 function heatWarn(){if(S.heat>=70&&!S.flags.heatW){S.flags.heatW=true;S.flags.heatA=true;toast(`<small>CUIDADO</small>La policía investiga. Si el calor llega a ${NIVEL_POLI[3][0]} al cambiar el día, habrá orden de registro.`,3200);}

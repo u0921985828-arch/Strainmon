@@ -2,14 +2,9 @@
 
 Lo que se ha pedido para mejorar el juego y aún no está hecho, por tandas. Lo hecho pasa al `CHANGELOG.md`.
 
-## Tanda 5
+## Tanda 5 (hecha en la 1.15)
 
-- **Clubs cannábicos**: 0-1 por pueblo o ciudad pequeña y varios en Ibarbide. Se vende, se compra y hay encargos de semillas.
-- **Catar y fumar lo tuyo** para afinar lo que sabes del fenotipo.
-- **Analizador de THC** (aparato).
-- **Vendedores a comisión**, con su riesgo.
-- **Relaciones con las personas**: clientes, amigos, socios y demás, cada uno con su confianza o afinidad, que sube y baja con lo que haces (lealtad, favores, traiciones).
-- **Trabajadores**: contratar gente (del barrio y de fuera), con sueldo, confianza y riesgo.
+Clubs cannábicos, cata y analizador de THC, vendedores a comisión, confianza con la gente y trabajadores: en el `CHANGELOG.md`.
 
 ## Después
 
