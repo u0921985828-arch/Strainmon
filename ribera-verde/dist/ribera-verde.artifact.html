@@ -1687,7 +1687,7 @@ function discover(sid){if(!S.disc[sid]){S.disc[sid]=true;toast(`<small>NUEVA EN 
 function addSeeds(sid,n){S.seeds[sid]=(S.seeds[sid]||0)+n;discover(sid);}
 // cogollos por lotes: clave = variedad, o variedad + '*' para lo de un fenotipo estrella (se vende y se presenta aparte)
 const lotSid=k=>k.replace(/\*$/,''),lotNombre=k=>getStrain(lotSid(k)).n+(k.endsWith('*')?' ★':'');
-function addBuds(k,g,thc){const b=S.buds[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;}else S.buds[k]={g,thc};discover(lotSid(k));}
+function addBuds(k,g,thc){const b=S.buds[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;delete b.cata;delete b.ana;}else S.buds[k]={g,thc};discover(lotSid(k));}
 function useBuds(k,g){const b=S.buds[k];b.g-=g;if(b.g<.5)delete S.buds[k];}
 function budLots(min,minThc=0){return Object.entries(S.buds).filter(([k,b])=>b.g>=min&&b.thc>=minThc);}
 // rosin (1.10): lo que sale de prensar cogollos en la mesa (prensar, 09-cultivo), por lotes como ellos y al décimo de gramo
@@ -1819,7 +1819,7 @@ function interact(){
   const [dx,dy]=DV[P.dir],m=MAPS[S.map];let tx=P.x+dx,ty=P.y+dy;
   let e=entAt(tx,ty);
   if(!e&&m.o[ty]&&COUNTERS.has(m.o[ty][tx]))e=entAt(tx+dx,ty+dy);
-  if(e){run(async()=>{if(!e.moving)e.dir=OPP[P.dir];if(e.def.client)await talkClient(e.def.client);else{await e.def.talk(e);if(!e.pat)saludo(e.id);}});return;}
+  if(e){run(async()=>{if(!e.moving)e.dir=OPP[P.dir];if(e.def.client)await talkClient(e.def.client);else{await e.def.talk(e);if(!e.pat)saludo(e.id.startsWith('club_')?e.id.slice(5):e.id);}});return;}
   const it=itemAt(tx,ty);if(it){run(()=>pickItem(it));return;}
   run(()=>objectAction(tx,ty));
 }
@@ -3300,7 +3300,7 @@ const SHOP=[
   {lbl:'Bolsa de deporte',p:35,ch:3,bolsa:1,desc:'Llevas encima hasta 3 kg de cogollos y rosin (la mochila, 1 kg).',cond:()=>bolsaYa()<1},
   {lbl:'Maleta con ruedas',p:90,ch:5,bolsa:2,desc:'Llevas encima hasta 10 kg de cogollos y rosin.',cond:()=>bolsaYa()<2},
   {lbl:'Carro de esquejes',p:CARRO.p,ch:2,mueble:'carro',desc:`Dos bandejas de ${CARRO.plazas} esquejes, tapadas y bajo tubos T5, y una mesita con la tabla de corte: pinchados ahí aguantan ${CARRO.dias} días (sueltos, ${ESQUEJE_DIAS}). Kiko te lo sube al piso mañana.`,cond:()=>!(S.muebles&&S.muebles.carro)},
-  {lbl:'Analizador de THC',p:180,ch:3,item:'analizador',desc:'Medidor de bolsillo (1.15): analiza un lote desde la mochila. Lo analizado se vende mejor en la calle y un 5 % más en los clubs, y la cata dice el THC exacto.',cond:()=>!S.items.analizador&&!S.envio.includes('Analizador de THC')},
+  {lbl:'Analizador de cannabinoides y terpenos',p:180,ch:3,item:'analizador',desc:'Medidor de bolsillo (1.15): THC, CBD y el terpeno principal de un lote, desde la mochila. Lo analizado se vende mejor en la calle y un 5 % más en los clubs, y la cata dice el THC exacto y el terpeno de cada aroma.',cond:()=>!S.items.analizador&&!S.envio.includes('Analizador de cannabinoides y terpenos')},
   {lbl:'Prensa de rosin',p:250,ch:3,item:'prensa',desc:'Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores.',cond:()=>!S.items.prensa},
 ];
 const SOBRES=[[1,1],[3,.95],[5,.9],[10,.85]],GRANEL=[50,.6];   // [semillas, precio por semilla relativo]
@@ -4014,7 +4014,7 @@ async function talkBegona(){
 // la Genoteca) y encargos de semillas (10 de una variedad, en 7 días; las de receta pagan más). Un encargo a la vez
 const CLUBS={puerto:{n:'CLUB ITSASO',map:'puerto',x:10,y:8,ch:3,cuota:30,sid:['limon','cheese']},valde:{n:'CLUB LA FUNDICIÓN',map:'valdehierro',x:12,y:8,ch:3,cuota:30,sid:['txoko','mango']},
   ibar:{n:'CLUB KALEA',map:'ibarbide',x:6,y:18,ch:4,cuota:50,sid:['kali','chemdawg']},ens:{n:'CLUB ENSANCHE',map:'ensanche',x:12,y:9,ch:4,cuota:50,sid:['niebla','calorange']}};
-const CLUB={g:[50,100,200],compra:10,compraF:1.2,calor:1,enc:{n:10,dias:7,f:3,receta:80}};
+const CLUB={g:[50,100,200],compra:10,compraF:1.2,calor:1,enc:{n:10,dias:7,f:1.2,receta:80}};
 const precioClub=thc=>3+thc*.15;
 // el encargado de cada club, en la puerta, desde su capítulo
 Object.keys(CLUBS).forEach((k,i)=>{const C=CLUBS[k];NPCDEF.push({id:'club_'+k,map:C.map,x:C.x,y:C.y,dir:'down',look:i%2?'portera':'portero',cond:()=>S.ch>=C.ch,talk:()=>talkClub(k)});});
@@ -4068,14 +4068,17 @@ function vencerEncargoClub(){
 // potencia, exacta con el analizador de THC) en la Genoteca, y el lote catado se vende algo mejor; el analizado (el aparato del
 // growshop, uno), mejor aún y un 5 % más en los clubs
 const CATA={g:.5,min:30},AROMAS=['cítrico','a pino','terroso','dulce','a especias','a gasóleo','afrutado','a incienso'];
-function notaCata(sid,thc){const ind=indDe(sid),a=AROMAS[hashStr(sid)%AROMAS.length],e=ind>=65?'relaja y pesa':ind<=35?'sube y despeja':'equilibrado';
-  return `Aroma ${a} · ${e} · ${S.items.analizador?pct(thc)+' % de THC':thc<12?'floja':thc<18?'media':thc<24?'fuerte':'muy fuerte'}`;}
+// el analizador de cannabinoides y terpenos: THC, CBD (del 0,2 al 1 % según el % índica) y el terpeno principal, por el aroma
+const TERPENOS={'cítrico':'limoneno','a pino':'pineno','terroso':'mirceno','dulce':'linalool','a especias':'cariofileno','a gasóleo':'mirceno y cariofileno','afrutado':'mirceno','a incienso':'humuleno'};
+const aromaDe=sid=>AROMAS[hashStr(sid)%AROMAS.length],cbdDe=sid=>Math.round(20+indDe(sid)*8)/100;
+function notaCata(sid,thc){const ind=indDe(sid),a=aromaDe(sid),e=ind>=65?'relaja y pesa':ind<=35?'sube y despeja':'equilibrado';
+  return `Aroma ${a}${S.items.analizador?' ('+TERPENOS[a]+')':''} · ${e} · ${S.items.analizador?pct(thc)+' % de THC':thc<12?'floja':thc<18?'media':thc<24?'fuerte':'muy fuerte'}`;}
 async function catar(k){
   const b=S.buds[k];if(!b||b.g<CATA.g)return;
   const sid=lotSid(k),thc=b.thc;useBuds(k,CATA.g);if(S.buds[k])S.buds[k].cata=true;S.catas[sid]=notaCata(sid,thc);advanceTime(CATA.min);updateHUD();
   await say(`Catas ${lotNombre(k)}: ${S.catas[sid]}.`);
 }
-async function analizar(k){const b=S.buds[k];if(!b||!S.items.analizador)return;b.ana=true;sfx('get');await say(`Analizado: ${lotNombre(k)}, ${pct(b.thc)} % de THC. Lo que va con análisis se vende mejor.`);}
+async function analizar(k){const b=S.buds[k];if(!b||!S.items.analizador)return;const sid=lotSid(k);b.ana=true;sfx('get');await say(`Analizado: ${lotNombre(k)} · THC ${pct(b.thc)} % · CBD ${pct(cbdDe(sid))} % · terpeno principal, ${TERPENOS[aromaDe(sid)]}. Lo que va con análisis se vende mejor.`);}
 async function loteAccion(k){
   const b=S.buds[k],ops=[`Catar ${coma(CATA.g)} g`].concat(S.items.analizador&&!b.ana?['Analizar']:[],['Nada']);
   const op=ops[await ask(`${lotNombre(k)}: ${Math.floor(b.g)} g · ${pct(b.thc)} %${b.cata?' · catado':''}${b.ana?' · analizado':''}`,ops)];
