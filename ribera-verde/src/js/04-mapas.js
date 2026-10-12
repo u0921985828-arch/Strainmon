@@ -39,12 +39,16 @@ function building(m,id,x0,y0,w,h,doorX,warp,op){
 // patrullas: PATRULLAS, 10b-patrulla) y la comarca (1.10): dos ciudades pequeñas y dos pueblos, a los que se va en autobús (PARADAS)
 const ZONAS={town:{n:'Ribera Verde',lad:1,precio:1},alto:{n:'Barrio alto',lad:.5,precio:1},astilleros:{n:'Astilleros',lad:2,precio:1.2},
   puerto:{n:'Puerto Viejo',lad:.6,precio:1.15},valdehierro:{n:'Valdehierro',lad:1.4,precio:.9},
-  mendialde:{n:'Mendialde',lad:.1,precio:1},errotabarri:{n:'Errotabarri',lad:.1,precio:1}};
+  mendialde:{n:'Mendialde',lad:.1,precio:1},errotabarri:{n:'Errotabarri',lad:.1,precio:1},
+  ibarbide:{n:'Ibarbide · Casco Viejo',lad:.8,precio:1.3},ensanche:{n:'Ibarbide · Ensanche',lad:1.2,precio:1.25}};   // la ciudad grande (1.14)
 // paradas del autobús (1.10): el poste (x, y), dónde te deja el autobús (a: x, y, hacia dónde miras) y lo que hay hasta la estación
-// de Ribera Verde (min, €): todas las líneas pasan por ella, así que un viaje entre dos pueblos suma los dos tramos. De 7:00 a 21:00
-const PARADAS={town:{n:'Ribera Verde',x:8,y:12,a:[7,12,'down'],min:0,eur:0},
-  puerto:{n:'Puerto Viejo',x:19,y:9,a:[20,9,'down'],min:25,eur:2},valdehierro:{n:'Valdehierro',x:14,y:11,a:[15,11,'down'],min:20,eur:2},
-  mendialde:{n:'Mendialde',x:20,y:19,a:[21,19,'down'],min:40,eur:3},errotabarri:{n:'Errotabarri',x:6,y:13,a:[7,13,'down'],min:30,eur:3}};
+// de Ribera Verde (min, €): todas las líneas pasan por ella, así que un viaje entre dos pueblos suma los dos tramos. De 7:00 a 21:00.
+// cap (1.14): el capítulo desde el que hay línea (las ciudades pequeñas, en la calle; Errotabarri, con la deuda; Ibarbide, la
+// ciudad grande, con la genética); al abrirse, un SMS (lineasNuevas, 11-historia)
+const PARADAS={town:{n:'Ribera Verde',x:8,y:12,a:[7,12,'down'],min:0,eur:0,cap:0},
+  puerto:{n:'Puerto Viejo',x:19,y:9,a:[20,9,'down'],min:25,eur:2,cap:2},valdehierro:{n:'Valdehierro',x:14,y:11,a:[15,11,'down'],min:20,eur:2,cap:2},
+  mendialde:{n:'Mendialde',x:20,y:19,a:[21,19,'down'],min:40,eur:3,cap:0},errotabarri:{n:'Errotabarri',x:6,y:13,a:[7,13,'down'],min:30,eur:3,cap:3},
+  ibarbide:{n:'Ibarbide',x:9,y:20,a:[10,20,'down'],min:35,eur:4,cap:4}};
 const BUS_HORAS=[7*60,21*60];
 const viaje=(a,b)=>({min:PARADAS[a].min+PARADAS[b].min,eur:PARADAS[a].eur+PARADAS[b].eur});
 function buildMaps(){
@@ -173,7 +177,7 @@ function buildMaps(){
   [[6,8],[22,24],[32,34]].forEach(([x0,x1],i)=>rect(pv,x0,16,x1,i===2?19:21,(x,y)=>gr(pv,x,y,'dock')));
   rect(pv,1,15,38,15,(x,y)=>{if(!(x>=6&&x<=8||x>=22&&x<=24||x>=32&&x<=34))ob(pv,x,y,'fence');});
   [5,15,27,35].forEach(x=>ob(pv,x,9,'lamp'));[[11,14],[18,14],[29,14]].forEach(([x,y])=>ob(pv,x,y,'bench'));
-  [[8,20],[23,21],[24,20],[34,18]].forEach(([x,y])=>ob(pv,x,y,'crate'));ob(pv,19,9,'parada');ob(pv,2,9,'sign');
+  [[8,20],[23,21],[24,20],[34,18]].forEach(([x,y])=>ob(pv,x,y,'crate'));ob(pv,19,9,'parada');ob(pv,2,9,'sign');ob(pv,25,15,'sign');   // la lonja (1.14)
   [[4,14],[37,14]].forEach(([x,y])=>ob(pv,x,y,'tree'));ob(pv,38,4,'tree2');
   linde(pv,{n:[1,3],o:[1,2],e:[1,2],sem:7});
   // ---------- VALDEHIERRO (1.10): la ciudad pequeña de la industria ----------
@@ -212,6 +216,46 @@ function buildMaps(){
   [[4,14],[11,14],[20,17],[24,20],[13,3],[30,6],[6,21],[15,15]].forEach(([x,y])=>gr(e,x,y,'flowers'));
   bosque(e,33,3,4,3,13);linde(e,{n:[2,4],s:[1,3],o:[1,3],e:[1,2],sem:11});
 
+  // ---------- IBARBIDE (1.14): la ciudad grande de la comarca, en dos barrios ----------
+  // el Casco Viejo: casas estrechas de tres alturas y colores (casco, casco2, casco3) en manzanas apretadas, la plaza Nueva con su
+  // fuente, el growshop grande (se entra: growcity) y, abajo, la avenida con la estación de autobuses y el parque. Por la avenida,
+  // al este, el Ensanche. Más policía que en ningún sitio, pero los clientes pagan más
+  const ib=newMap('ibarbide',44,30,'plaza');ib.music='ibarbide';
+  rect(ib,0,0,43,1,(x,y)=>gr(ib,x,y,'grass'));
+  let ix=1;[['casco',4,6],['casco2',3,5],['casco3',5,7],['growcity',6,6],['casco2',3,5],['casco',4,6],['casco3',5,7],['casco',4,6],['casco2',3,5],['casco3',5,7]]
+    .forEach(([k,w,h])=>{building(ib,k,ix,8-h,w,h,k==='growcity'?ix+2:null,k==='growcity'?{to:'growcity',x:4,y:6,dir:'up'}:null,k==='growcity'?{ancha:1,dx:8}:null);
+      for(let x=ix;x<ix+w;x++){for(let y=0;y<8-h;y++)gr(ib,x,y,'grass');for(let y=0;y<8-h;y++)monte(ib,x,y);}ix+=w;});
+  for(let x=1;x<43;x++)gr(ib,x,8,'walk');
+  [[1,11,'casco3',5,7],[6,12,'casco',4,6],[10,13,'casco2',3,5],[31,13,'casco2',3,5],[34,12,'casco',4,6],[38,11,'casco3',5,7]].forEach(([x,y,k,w,h])=>building(ib,k,x,y,w,h,null));
+  // la plaza Nueva: soportales en los lados (bancos y farolas), la fuente en medio
+  ob(ib,21,14,'fountain');[[17,12],[25,12],[17,17],[25,17]].forEach(([x,y])=>ob(ib,x,y,'bench'));[[14,10],[29,10],[14,19],[29,19]].forEach(([x,y])=>ob(ib,x,y,'lamp'));
+  for(let x=1;x<43;x++){gr(ib,x,20,'walk');gr(ib,x,21,'roadT');gr(ib,x,22,'roadB');gr(ib,x,23,'walk');}
+  ob(ib,9,20,'parada');ob(ib,13,9,'sign');ob(ib,12,19,'sign');ob(ib,41,20,'sign');[4,20,36].forEach(x=>ob(ib,x,20,'lamp'));[12,28].forEach(x=>ob(ib,x,23,'lamp'));
+  // el parque de la estación
+  rect(ib,1,24,42,28,(x,y)=>gr(ib,x,y,'grass'));rect(ib,1,29,42,29,(x,y)=>{gr(ib,x,y,'grass');ob(ib,x,y,'seto');});
+  rect(ib,6,24,7,28,(x,y)=>gr(ib,x,y,'dirt'));rect(ib,8,26,35,26,(x,y)=>gr(ib,x,y,'dirt'));rect(ib,36,24,37,28,(x,y)=>gr(ib,x,y,'dirt'));
+  [[3,28],[11,28],[16,28],[24,28],[30,28],[40,28]].forEach(([x,y])=>ob(ib,x,y,'tree'));[[20,28],[34,28]].forEach(([x,y])=>ob(ib,x,y,'tree2'));
+  [[10,25],[22,27],[31,25]].forEach(([x,y])=>ob(ib,x,y,'bench'));[[2,25],[14,24],[27,24],[41,25]].forEach(([x,y])=>ob(ib,x,y,'bush'));
+  [[4,24],[9,27],[18,25],[26,27],[34,25],[39,27]].forEach(([x,y])=>gr(ib,x,y,'flowers'));
+  for(let y=0;y<30;y++){if(y>=20&&y<=23)continue;[0,43].forEach(x=>{gr(ib,x,y,'grass');monte(ib,x,y);});}
+  [20,23].forEach(y=>{gr(ib,0,y,'grass');monte(ib,0,y);gr(ib,43,y,'grass');monte(ib,43,y);});[21,22].forEach(y=>{gr(ib,0,y,'grass');monte(ib,0,y);});
+  [21,22].forEach(y=>ib.doors['43,'+y]={to:'ensanche',x:1,y:y-11,dir:'right'});
+  // el Ensanche: bloques de pisos de seis alturas (bloque, bloque2) en fila frente a la avenida, el parque lineal con su plaza y su
+  // fuente. Ladrones y patrullas; clientes con dinero
+  const en=newMap('ensanche',46,22,'walk');en.music='ensanche';
+  rect(en,0,0,45,1,(x,y)=>{gr(en,x,y,'grass');monte(en,x,y);});
+  [1,10,19,28,37].forEach((x,i)=>{building(en,i%2?'bloque2':'bloque',x,2,8,7,null);if(i<4){gr(en,x+8,2,'grass');gr(en,x+8,3,'grass');monte(en,x+8,2);ob(en,x+8,8,'bush');}});
+  for(let x=0;x<46;x++){gr(en,x,10,'roadT');gr(en,x,11,'roadB');}
+  [5,14,23,32,41].forEach(x=>ob(en,x,9,'lamp'));[9,27].forEach(x=>ob(en,x,12,'lamp'));ob(en,2,12,'sign');
+  rect(en,0,13,45,21,(x,y)=>gr(en,x,y,'grass'));rect(en,1,21,44,21,(x,y)=>ob(en,x,y,'seto'));
+  rect(en,19,14,26,19,(x,y)=>gr(en,x,y,'plaza'));rect(en,1,16,44,16,(x,y)=>{if(x<19||x>26)gr(en,x,y,'dirt');});
+  ob(en,22,16,'fountain');[[20,14],[25,14],[20,19],[25,19]].forEach(([x,y])=>ob(en,x,y,'lamp'));[[21,18],[24,18]].forEach(([x,y])=>ob(en,x,y,'bench'));
+  [[3,20],[8,19],[13,20],[31,19],[36,20],[42,19]].forEach(([x,y])=>ob(en,x,y,'tree'));[[16,19],[29,20]].forEach(([x,y])=>ob(en,x,y,'tree2'));   // abajo: la copa no tapa la avenida
+  [[6,14],[11,14],[34,14],[40,14]].forEach(([x,y])=>ob(en,x,y,'bench'));[[1,14],[17,14],[28,17],[44,14]].forEach(([x,y])=>ob(en,x,y,'bush'));
+  [[5,14],[10,18],[15,17],[30,14],[38,18],[43,17]].forEach(([x,y])=>gr(en,x,y,'flowers'));
+  for(let y=2;y<22;y++){if(y===10||y===11)continue;[0,45].forEach(x=>{if(en.g[y][x]!=='roadT'){gr(en,x,y,'grass');monte(en,x,y);}});}
+  [10,11].forEach(y=>{en.doors['0,'+y]={to:'ibarbide',x:42,y:y+11,dir:'left'};gr(en,45,y,'grass');monte(en,45,y);});
+
   // ---------- HOME ----------
   // 1 casilla = 1 m: 18 × 6 m de suelo (108 m²). Dormitorio a la izquierda, escritorio y mesa de genética al fondo,
   // las carpas (montarCasa) al fondo (A en x 8, B en x 10-11 y C en x 2-3, junto a la cama), cocina abajo a la izquierda y la puerta en (5,7).
@@ -230,6 +274,12 @@ function buildMaps(){
   rect(s,2,3,7,3,(x,y)=>ob(s,x,y,'counter'));
   ob(s,0,5,'display');ob(s,9,5,'display');ob(s,0,7,'plantDeco');ob(s,9,7,'plantDeco');
   gr(s,4,7,'mat');s.exits['4,7']={to:'town',x:17,y:9,dir:'down'};
+  // ---------- GROW IBARBIDE (1.14): el growshop grande del Casco Viejo ----------
+  const gc=newMap('growcity',10,8,'floorS');gc.music='shop';
+  rect(gc,0,0,9,0,(x,y)=>gr(gc,x,y,'iwT_shop'));rect(gc,0,1,9,1,(x,y)=>gr(gc,x,y,'iwB_shop'));
+  [0,1,2,7,8,9].forEach(x=>ob(gc,x,1,'shelfW'));ob(gc,4,1,'poster');rect(gc,2,3,7,3,(x,y)=>ob(gc,x,y,'counter'));
+  [[0,4],[0,5],[9,4],[9,5]].forEach(([x,y])=>ob(gc,x,y,'display'));ob(gc,0,7,'plantDeco');ob(gc,9,7,'plantDeco');
+  gr(gc,4,7,'mat');gr(gc,5,7,'mat');gc.exits['4,7']={to:'ibarbide',x:15,y:8,dir:'down'};gc.exits['5,7']={to:'ibarbide',x:16,y:8,dir:'down'};
   // ---------- BAR ----------
   const b=newMap('bar',10,8,'floorB');b.music='bar';
   rect(b,0,0,9,0,(x,y)=>gr(b,x,y,'iwT_bar'));rect(b,0,1,9,1,(x,y)=>gr(b,x,y,'iwB_bar'));
@@ -286,7 +336,8 @@ function computeClientTiles(){
     alto:(x,y,g)=>y<=23&&y!==21&&y!==22&&(g==='plaza'||g==='walk')&&!(y===19&&x>=23)&&!(x>=10&&x<=13&&y>=18),
     astilleros:(x,y,g)=>y>=12&&y<=21&&x>=2&&(g==='dirt'||g==='dock')&&!(x>=15&&x<=22&&y<=14),
     puerto:(x,y,g)=>y>=9&&(g==='plaza'||g==='dock'),valdehierro:(x,y,g)=>(y===8||y===11||y>=20)&&(g==='walk'||g==='grass'),
-    mendialde:(x,y,g)=>g==='plaza',errotabarri:(x,y,g)=>g==='pista'};
+    mendialde:(x,y,g)=>g==='plaza',errotabarri:(x,y,g)=>g==='pista',
+    ibarbide:(x,y,g)=>y>=8&&y<=23&&y!==21&&y!==22&&(g==='plaza'||g==='walk'||g==='hormigon')&&!(y===20&&x>=7&&x<=12),ensanche:(x,y,g)=>(y===9||y===12||y>=13)&&(g==='walk'||g==='plaza'||g==='dirt')};   // la ciudad (1.14)
   for(const k in zona){const m=MAPS[k],l=CLIENT_TILES[k]=[],tp=tapadas(m),va=aPie(m,entrada(k));
     for(let y=1;y<m.h-1;y++)for(let x=1;x<m.w-1;x++){const g=m.g[y][x];if(zona[k](x,y,g)&&va.has(x+','+y)&&!tp.has(x+','+y)&&!(PARADAS[k]&&PARADAS[k].a[0]===x&&PARADAS[k].a[1]===y))l.push([x,y]);}}   // ni en la casilla donde deja el autobús (1.10)
 }

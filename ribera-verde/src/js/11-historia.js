@@ -69,36 +69,43 @@ const DICHO_CARPA={m100:'Te la monto esta tarde en el piso, al fondo, al lado de
   g150:'Me llevo la de 100 y te monto la de 150 en su sitio. Las plantas ni se enteran.',
   p80:'Te guardo el armario de tu tía en el trastero y te monto uno de 80 en su sitio. Las plantas ni se enteran.',
   m120:'Te la monto junto a la cama. Viene con un CFL y macetas de 7 L.'};
-async function shop(){
+// las tiendas de equipo (1.14): la de Kiko y GROW IBARBIDE, la grande de la ciudad, con el equipo a −10 % y hasta un capítulo
+// antes, pero sin semillas (las de Kiko), sin el carro (lo sube Kiko) ni los aparatos de la sala (los deja puestos Kiko)
+const TIENDAS={kiko:{t:'GROWSHOP KIKO',N:'KIKO',f:1,ch:0,ok:()=>true},ane:{t:'GROW IBARBIDE',N:'ANE',f:.9,ch:1,ok:it=>!it.sid&&!it.mueble&&!it.aparato}};
+const precioT=(T,it)=>Math.round(it.p*T.f);
+async function shop(T=TIENDAS.kiko){
   let i=0;
   for(;;){
-    const list=SHOP.filter(it=>S.ch>=it.ch&&(!it.cond||it.cond()));
+    const list=SHOP.filter(it=>S.ch+T.ch>=it.ch&&T.ok(it)&&(!it.cond||it.cond()));
     const IC={fert:'abono',fertv:'abono',phm:'abono',insect:'insecticida',spray:'spray',bocata:'bocadillo'};
-    const items=list.map(it=>({label:it.lbl,right:eur(it.p)+(it.sid?'/u':''),sw:it.sid?STRAINS[it.sid].c:null,ic:it.sid?icono('semillas'):it.item?icono(IC[it.item]):it.maceta?icono('maceta'):it.foco?icono(icoFoco(it.foco)):it.extra?icono(ICX[it.extra]):it.carpa?icono(icoCarpa(it.carpa)):null,desc:it.sid?strainLine(it.sid):it.desc}));
+    const items=list.map(it=>({label:it.lbl,right:eur(precioT(T,it))+(it.sid?'/u':''),sw:it.sid?STRAINS[it.sid].c:null,ic:it.sid?icono('semillas'):it.item?icono(IC[it.item]):it.maceta?icono('maceta'):it.foco?icono(icoFoco(it.foco)):it.extra?icono(ICX[it.extra]):it.carpa?icono(icoCarpa(it.carpa)):null,desc:it.sid?strainLine(it.sid):it.desc}));
     items.push({label:'Salir',desc:'Volver al mostrador.'});
-    i=await menu(items,{cls:'full',title:'GROWSHOP KIKO',title2:'Tienes '+eur(S.money),desc:true,initial:i});
+    i=await menu(items,{cls:'full',title:T.t,title2:'Tienes '+eur(S.money),desc:true,initial:i});
     if(i<0||i>=list.length)break;
     const it=list[i];
     if(it.sid){await comprarSemillas(it);await checkStory();continue;}
-    if(S.money<it.p){sfx('bad');await say('No te llega el dinero.','KIKO');continue;}
-    S.money-=it.p;sfx('coin');
-    if(it.item)S.items[it.item]+=it.n||1;if(it.maceta)S.items['m_'+it.maceta]++;if(it.bolsa)S.items.bolsa=it.bolsa;if(it.aparato)S.sala[it.aparato]=true;
-    if(!it.foco&&!it.carpa&&!it.extra&&!it.mueble)toast('Comprado: '+it.lbl,1200);
-    if(it.mueble){(S.muebles||(S.muebles={}))[it.mueble]=S.day+1;await say('Mañana te lo subo al piso y te lo monto junto a las carpas.','KIKO');}
-    if(it.carpa){comprarCarpa(it.carpa,it.ci);await say(DICHO_CARPA[it.carpa],'KIKO');}
-    if(it.extra){S.items['x_'+it.extra]++;const ok=S.carpas.map((c,ci)=>faltaExtra(c,it.extra)?ci:-1).filter(ci=>ci>=0);
-      const pl=EXTRAS[it.extra].pl;
-      if(!ok.length)await say(pl?'Ya tienes unas en cada carpa. Te las guardo en la mochila.':'Ya tienes uno en cada carpa. Te lo guardo en la mochila.','KIKO');
-      else{const c=await ask(pl?'¿Te las pongo ya?':'¿Te lo pongo ya?',ok.map(ci=>CARPAS[S.carpas[ci].t].n).concat(['Luego']),'KIKO');
-        if(c>=0&&c<ok.length){const vu=it.extra==='goteo'&&S.carpas[ok[c]].garrafas,vk=ponerExtra(ok[c],it.extra);toast((pl?'Puestas: ':'Puesto: ')+it.lbl,1200);
-          if(vu)await say('Las garrafas de esa carpa vuelven a la mochila.','KIKO');if(vk)await say(`El ${EXTRAS[vk].c.toLowerCase()} que tenías vuelve a tu mochila.`,'KIKO');}}}
-    if(it.foco){S.items['f_'+it.foco]++;const ok=S.carpas.map((c,ci)=>c&&FOCOS[it.foco].w<=CARPAS[c.t].wmax?ci:-1).filter(ci=>ci>=0);
-      if(!ok.length)await say('Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande.','KIKO');
-      else{const c=await ask('¿Lo cuelgo ya? El que quites va a tu mochila.',ok.map(ci=>`${CARPAS[S.carpas[ci].t].n} (${FOCOS[S.carpas[ci].foco].n})`).concat(['Luego']),'KIKO');
-        if(c>=0&&c<ok.length){instalarFoco(ok[c],it.foco);toast('Instalado: '+it.lbl,1200);}}}
+    const p=precioT(T,it);if(S.money<p){sfx('bad');await say('No te llega el dinero.',T.N);continue;}
+    S.money-=p;sfx('coin');await entregar(it,T.N);
     await checkStory();
   }
-  await say('Ten cuidado ahí fuera.','KIKO');
+  await say('Ten cuidado ahí fuera.',T.N);
+}
+// lo comprado (en una tienda o en la chatarrería): a la mochila, a la sala o puesto en una carpa, si quieres
+async function entregar(it,N){
+  if(it.item)S.items[it.item]+=it.n||1;if(it.maceta)S.items['m_'+it.maceta]++;if(it.bolsa)S.items.bolsa=it.bolsa;if(it.aparato)S.sala[it.aparato]=true;
+  if(!it.foco&&!it.carpa&&!it.extra&&!it.mueble)toast('Comprado: '+it.lbl,1200);
+  if(it.mueble){(S.muebles||(S.muebles={}))[it.mueble]=S.day+1;await say('Mañana te lo subo al piso y te lo monto junto a las carpas.',N);}
+  if(it.carpa){comprarCarpa(it.carpa,it.ci);await say(DICHO_CARPA[it.carpa],N);}
+  if(it.extra){S.items['x_'+it.extra]++;const ok=S.carpas.map((c,ci)=>faltaExtra(c,it.extra)?ci:-1).filter(ci=>ci>=0);
+    const pl=EXTRAS[it.extra].pl;
+    if(!ok.length)await say(pl?'Ya tienes unas en cada carpa. Te las guardo en la mochila.':'Ya tienes uno en cada carpa. Te lo guardo en la mochila.',N);
+    else{const c=await ask(pl?'¿Te las pongo ya?':'¿Te lo pongo ya?',ok.map(ci=>CARPAS[S.carpas[ci].t].n).concat(['Luego']),N);
+      if(c>=0&&c<ok.length){const vu=it.extra==='goteo'&&S.carpas[ok[c]].garrafas,vk=ponerExtra(ok[c],it.extra);toast((pl?'Puestas: ':'Puesto: ')+it.lbl,1200);
+        if(vu)await say('Las garrafas de esa carpa vuelven a la mochila.',N);if(vk)await say(`El ${EXTRAS[vk].c.toLowerCase()} que tenías vuelve a tu mochila.`,N);}}}
+  if(it.foco){S.items['f_'+it.foco]++;const ok=S.carpas.map((c,ci)=>c&&FOCOS[it.foco].w<=CARPAS[c.t].wmax?ci:-1).filter(ci=>ci>=0);
+    if(!ok.length)await say('Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande.',N);
+    else{const c=await ask('¿Lo cuelgo ya? El que quites va a tu mochila.',ok.map(ci=>`${CARPAS[S.carpas[ci].t].n} (${FOCOS[S.carpas[ci].foco].n})`).concat(['Luego']),N);
+      if(c>=0&&c<ok.length){instalarFoco(ok[c],it.foco);toast('Instalado: '+it.lbl,1200);}}}
 }
 // (1.11) el árbol por generaciones (RECIPES): una pista por receta, sin criadores ni bancos
 const RECIPE_HINTS=['Afghani, Colombian Gold y Acapulco Gold: de esas tres salió la Skunk #1. Cruza dos y luego la tercera.','Punto Rojo o Michoacán con Thai: la Haze. Afghani con Thai: la Northern Lights.',
@@ -266,7 +273,7 @@ async function talkBaltasar(){
   S.money-=S.due;S.debt-=S.due;const paid=S.due;S.due=0;sfx('coin');toast(`Pagado: ${eur(paid)}`,1500);
   if(S.ch===3){
     await talk(N,['Puntual. Así me gusta.',`Quedan ${eur(S.debt).replace(' €','')}. Ya te avisaré del siguiente plazo.`]);
-    await chapter(4);await talk('SMS · KIKO',['Pásate por el growshop. Tengo algo para ti.']);showObjective();
+    await chapter(4);await talk('SMS · KIKO',['Pásate por el growshop. Tengo algo para ti.']);await lineasNuevas();showObjective();
   }else if(S.ch===5){
     await talk(N,['Me sorprendes, {N}.',`Quedan ${eur(S.debt).replace(' €','')}. Te propongo algo.`,`La COPA DE RIBERA se juega estos días en la plaza. Premio: ${eur(PREMIO_COPA)}.`,'Mi sobrino Darko compite. No ha perdido nunca.','Gana la Copa y, con el premio y lo que vendas, me pagas lo que queda. Si puedes.']);
     await chapter(6);showObjective();
@@ -277,6 +284,8 @@ async function talkBaltasar(){
 }
 // el rótulo del capítulo dura 2,8 s: el objetivo que se pida mientras tanto sale cuando acaba (sin parar el juego)
 let capHasta=0;
+// líneas de autobús nuevas (1.14): las paradas se abren por capítulos (PARADAS.cap, 04-mapas); al abrirse, un SMS de la compañía
+async function lineasNuevas(){const l=Object.keys(PARADAS).filter(k=>PARADAS[k].cap===S.ch);if(l.length)await talk('SMS · AUTOBUSES DE LA COMARCA',[`Nueva línea desde Ribera Verde: ${yLista(l.map(k=>PARADAS[k].n))}.`,'Salidas de 7:00 a 21:00, en la parada de la calle Ribera.']);}
 async function chapter(n){S.ch=n;sfx('get');toast(`<small>CAPÍTULO ${n}</small>${CH_TITLES[n]}`,2800);capHasta=Date.now()+2800;buildEnts();await wait(400);save();}
 function objectiveText(){
   switch(S.ch){
@@ -303,12 +312,12 @@ const imperioNivel=()=>{let n=0;IMPERIO.forEach((r,i)=>{if(facturado()>=r.meta)n
 async function checkStory(){
   if(S.ch===1&&S.flags.harvest1){
     await chapter(2);spawnClients();
-    await talk('SMS · KIKO',['Primera cosecha. Bien hecho.','La gente que busca material lleva un $ encima. Puedes venderles en la calle.','Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba.']);showObjective();
+    await talk('SMS · KIKO',['Primera cosecha. Bien hecho.','La gente que busca material lleva un $ encima. Puedes venderles en la calle.','Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba.']);await lineasNuevas();showObjective();
   }
   if(S.ch===2&&S.sales>=META_VENTAS){
     S.due=PLAZOS[3];S.deadline=S.day+7;S.flags.tono=S.day;await chapter(3);   // el plazo, desde ya (1.10)
     await say('Un hombre enorme en chándal te corta el paso.');
-    await talk('TOÑO',['Tú vives en el piso de Maite, ¿no?','Don Baltasar quiere verte. En el bar El Ancla. Hoy.','Y ve contando: tienes siete días para el primer pago.','No me hagas venir a buscarte.']);showObjective();
+    await talk('TOÑO',['Tú vives en el piso de Maite, ¿no?','Don Baltasar quiere verte. En el bar El Ancla. Hoy.','Y ve contando: tienes siete días para el primer pago.','No me hagas venir a buscarte.']);await lineasNuevas();showObjective();
   }
   if(S.ch>=8&&imperioNivel()>(S.impN||0)){
     S.impN=imperioNivel();const r=IMPERIO[S.impN];sfx('get');toast(`<small>TU IMPERIO</small>${r.n}`,2800);

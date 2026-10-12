@@ -53,7 +53,7 @@ const REAL = {
       btable: 'mesa', jukebox: 'gramola', crate: 'cajas', lamp: 'farola', fountain: 'fuente', sign: 'cartel', bench: 'banco', mesa: '', parada: 'parada del autobús', carro: 'carro de esquejes', carro2: '' };
     const NPCN = { kiko: 'Kiko', josune: 'Josune', baltasar: 'Baltasar', tono: 'Toño', begona: 'Begoña', unai: 'Unai', patxi: 'Patxi', txaro: 'Txaro', inaki: 'Iñaki',
       cop: 'Agente', darko: 'Darko', darko2: 'Darko', molina: 'Sgto. Molina', tono2: 'Toño', jurado: 'Jurado', vecina: 'Vecina', excursionista: 'Excursionista', turista: 'Turista',
-      obrero: 'Obrero' };
+      obrero: 'Obrero', ane: 'Ane', nerea: 'Nerea (lonja)', bixente: 'Bixente (chatarra)', andoni: 'Andoni (molino)', ibarbitarra: 'Vecino' };
     const ZONAS = { town: [['PARQUE DE LOS SAUCES', 1, 13, 11, 27], ['PLAZA', 14, 13, 26, 24], ['RÍA', 31, 14, 38, 28], ['MUELLE', 34, 16, 38, 25], ['CALLE', 1, 9, 38, 12]],
       alto: [['PLAZA DEL ENSANCHE', 3, 4, 19, 17], ['JARDINES', 22, 3, 38, 11], ['CALLE', 1, 20, 38, 23]],
       astilleros: [['ASTILLEROS CERRADOS', 24, 4, 37, 10], ['MUELLE DE CARGA', 0, 19, 39, 22], ['DIQUES', 6, 23, 28, 27]],
@@ -62,7 +62,10 @@ const REAL = {
         ['MAIZAL', 39, 19, 46, 23], ['MANZANAL', 15, 29, 36, 32]],
       puerto: [['CASAS MARINERAS', 1, 2, 36, 7], ['PASEO', 1, 8, 38, 14], ['PANTALANES', 6, 16, 34, 21]],
       valdehierro: [['CARRETERA ROTA', 0, 9, 39, 10], ['NAVE', 10, 2, 15, 7], ['FUNDICIÓN', 29, 2, 36, 7], ['SOLAR', 20, 12, 38, 22], ['PARQUE', 1, 20, 17, 22]],
-      errotabarri: [['RÍO', 16, 0, 18, 23], ['PISTA', 0, 11, 35, 12], ['HUERTA', 3, 15, 10, 19], ['MOLINO', 22, 15, 25, 18]] };
+      errotabarri: [['RÍO', 16, 0, 18, 23], ['PISTA', 0, 11, 35, 12], ['HUERTA', 3, 15, 10, 19], ['MOLINO', 22, 15, 25, 18]],
+      // la ciudad grande (1.14)
+      ibarbide: [['CASCO VIEJO', 1, 2, 42, 9], ['PLAZA NUEVA', 14, 10, 29, 19], ['AVENIDA DE LA ESTACIÓN', 0, 20, 43, 23], ['PARQUE', 1, 24, 42, 28]],
+      ensanche: [['BLOQUES', 1, 2, 44, 8], ['AVENIDA', 0, 9, 45, 12], ['PARQUE LINEAL', 1, 13, 44, 20]] };
     const FUERA = n => !!CLIENT_TILES[n];   // los mapas de fuera (barrio, barrio alto, astilleros y la comarca)
 
     mode = 'plano'; S = newState(); S.ch = 6; S.protect = false; S.flags = { letter: 1, kiko1: 1, harvest1: 1, metB: 1, lab: 1 }; S.min = 12 * 60; S.clients = [];
@@ -133,6 +136,7 @@ const REAL = {
     anotar('alto', 'BARRIO ALTO'); anotar('astilleros', 'ASTILLEROS'); anotar('txaro', 'CASA DE TXARO'); anotar('comisaria', 'COMISARÍA DEL BARRIO ALTO'); anotar('almacen', 'ALMACÉN DE LOS ASTILLEROS');
     anotar('mendialde', 'MENDIALDE · el pueblo del prólogo'); anotar('casa-ama', 'CASERÍO DE LA FAMILIA (MENDIALDE)'); anotar('puerto', 'PUERTO VIEJO');
     anotar('valdehierro', 'VALDEHIERRO'); anotar('errotabarri', 'ERROTABARRI');
+    anotar('ibarbide', 'IBARBIDE · Casco Viejo (la ciudad grande)'); anotar('ensanche', 'IBARBIDE · Ensanche'); anotar('growcity', 'GROW IBARBIDE');
 
     // ---------- hoja de escala ----------
     function caja(c) { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;

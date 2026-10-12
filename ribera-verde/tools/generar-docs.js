@@ -276,7 +276,8 @@ ${legend}
     comisaria: 'Comisaría del barrio alto — 10 × 8', almacen: 'Almacén de los astilleros — 10 × 8',
     mendialde: 'Mendialde (pueblo de caseríos, de donde eres; el prólogo) — 48 × 34', 'casa-ama': 'Caserío de la familia, en Mendialde — 10 × 8',
     puerto: 'Puerto Viejo (ciudad pequeña, pesquera) — 40 × 24', valdehierro: 'Valdehierro (ciudad pequeña, del hierro) — 40 × 24',
-    errotabarri: 'Errotabarri (pueblo del molino) — 36 × 24' };
+    errotabarri: 'Errotabarri (pueblo del molino) — 36 × 24', ibarbide: 'Ibarbide · Casco Viejo (la ciudad grande, desde el capítulo 4) — 44 × 30',
+    ensanche: 'Ibarbide · Ensanche (al este del Casco Viejo, por la avenida) — 46 × 22', growcity: 'GROW IBARBIDE (tienda de Ane, en el Casco Viejo) — 10 × 8' };
   for (const [k, mp] of Object.entries(D.maps)) {
     const pad = String(mp.w - 1).length;
     let header = '    ' + Array.from({ length: mp.w }, (_, x) => x % 10 === 0 ? String(x / 10 % 10) : ' ').join('') + '\n    ' + Array.from({ length: mp.w }, (_, x) => x % 10).join('');
@@ -287,10 +288,10 @@ ${legend}
   }
   m += `\n## Personajes\n\n| id | Mapa | Posición | Deambula | Aparece cuando |\n|---|---|---|---|---|\n`;
   for (const n of D.npcs) m += `| ${n.id} | ${n.map} | (${n.x},${n.y}) | ${n.wander ? 'radio ' + n.wander : 'no'} | ${n.cond ? '`' + n.cond + '`' : 'siempre'} |\n`;
-  m += `\nLos **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acera, plaza y tierra: en el barrio, 4 + reputación/15 (+1 desde el capítulo 4, máximo 10); en los astilleros, 2 (3 desde el capítulo 4), estudiantes y currelas, que pagan el gramo un 20 % más; en el barrio alto, desde el capítulo 3, 2 (3 desde el 4), pijos y turistas; en Puerto Viejo, 2 (3 desde el 4), turistas, currelas y estudiantes; en Valdehierro, 2 (3 desde el 4), estudiantes y currelas; y en los pueblos, 1: un currela en Mendialde y un currela o un turista en Errotabarri.\n`;
+  m += `\nLos **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acera, plaza y tierra: en el barrio, 4 + reputación/15 (+1 desde el capítulo 4, máximo 10); en los astilleros, 2 (3 desde el capítulo 4), estudiantes y currelas, que pagan el gramo un 20 % más; en el barrio alto, desde el capítulo 3, 2 (3 desde el 4), pijos y turistas; en Puerto Viejo, 2 (3 desde el 4), turistas, currelas y estudiantes; en Valdehierro, 2 (3 desde el 4), estudiantes y currelas; y en los pueblos, 1: un currela en Mendialde y un currela o un turista en Errotabarri; en Ibarbide, desde el capítulo 4, 3 en el Casco Viejo (turistas, pijos y estudiantes) y 3 en el Ensanche (pijos, currelas y estudiantes), 4 desde el 5.\n`;
   const P0 = D.paradas, hh = m => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
-  m += `\n## Autobús de la comarca\n\nEn el poste de cada parada (\`A\`), de ${hh(D.busHoras[0])} a ${hh(D.busHoras[1])}. Cada parada está a un tramo de Ribera Verde; entre dos de fuera se suman los dos tramos. El reloj corre lo que dura el viaje. El primero (Mendialde → Ribera Verde, en el prólogo) lo paga ama.\n\n| Parada | Posición | Llegas a | Desde Ribera Verde |\n|---|---|---|---|\n`;
-  for (const [k, p] of Object.entries(P0)) m += `| ${p.n} | ${k} (${p.x},${p.y}) | (${p.a[0]},${p.a[1]}) | ${k === 'town' ? '—' : `${p.min} min · ${p.eur} €`} |\n`;
+  m += `\n## Autobús de la comarca\n\nEn el poste de cada parada (\`A\`), de ${hh(D.busHoras[0])} a ${hh(D.busHoras[1])}. Cada parada está a un tramo de Ribera Verde; entre dos de fuera se suman los dos tramos. El reloj corre lo que dura el viaje. El primero (Mendialde → Ribera Verde, en el prólogo) lo paga ama. Las líneas se abren por capítulos (\`PARADAS.cap\`), con un SMS de la compañía.\n\n| Parada | Posición | Llegas a | Desde Ribera Verde | Desde cap. |\n|---|---|---|---|---|\n`;
+  for (const [k, p] of Object.entries(P0)) m += `| ${p.n} | ${k} (${p.x},${p.y}) | (${p.a[0]},${p.a[1]}) | ${k === 'town' ? '—' : `${p.min} min · ${p.eur} €`} | ${k === 'town' ? '—' : p.cap} |\n`;
   m += `\n**Zonas** (\`ZONAS\` y \`PATRULLAS\`): factor de ladrones y de precio en cada mapa de fuera, y los agentes que patrullan de día y de noche (desde el capítulo 2). ${Object.entries(D.zonas).map(([k, z]) => `${z.n}: ladrones ×${String(z.lad).replace('.', ',')}, precio ×${String(z.precio).replace('.', ',')}, ${D.patrullas[k].join('/')} agentes`).join(' · ')}. Dentro de las casas no hay encuentros.\n`;
   m += `\n## Objetos\n\n| id | Posición | Tipo | Contenido |\n|---|---|---|---|\n`;
   for (const i of D.items) m += `| ${i.id} | ${i.map} (${i.x},${i.y}) | ${i.hidden ? 'oculto en arbusto (pulsa A delante)' : 'bolsa en el suelo'} | ${i.give || ''} |\n`;

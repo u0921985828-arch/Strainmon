@@ -1,5 +1,16 @@
 # Cambios
 
+## 1.14.0 · 12 de octubre de 2026
+
+La comarca crece con la historia: una ciudad grande, líneas de autobús que se abren por capítulos y un sitio con algo que hacer en cada pueblo. Godot, 0.8.0.
+
+- **Nuevo: Ibarbide, la ciudad grande** (desde el capítulo 4; 4 € y 35 min en autobús). Dos barrios: el **Casco Viejo** (44 × 30: casas estrechas de piedra y madera con miradores, la Plaza Nueva con su fuente, la avenida y un parque) y, por la avenida, el **Ensanche** (46 × 22: bloques de pisos, la carretera y un parque con plaza y fuente). Cada uno con su música de día y de noche, 2 agentes de día (2 y 3 de noche), más ladrones en el Ensanche y el gramo un 30 y un 25 % más caro; clientes desde el capítulo 4 (3 en cada barrio, 4 desde el 5) y catadores de rosin. Fachadas dibujadas a mano (`tools/sprites/a-mano/mundo.py`: `casco`, `growcity`, `bloque`).
+- **Nuevo: las líneas de autobús se abren por capítulos** (`PARADAS.cap`): Mendialde desde el principio, Puerto Viejo y Valdehierro en el 2, Errotabarri en el 3 e Ibarbide en el 4. Al abrirse, un SMS de la compañía.
+- **Nuevo: GROW IBARBIDE** (Ane, en el Casco Viejo): el equipo de Kiko un 10 % más barato y un capítulo antes; sin semillas, carro ni aparatos de la sala.
+- **Nuevo: la lonja de Puerto Viejo** (Nerea, desde el capítulo 3): carga para los barcos de fuera, de 100 a 500 g, un 15 % por encima de lo que paga Iñaki, cada 3 días.
+- **Nuevo: la chatarrería del solar de Valdehierro** (Bixente, desde el capítulo 2): 3 piezas de equipo al día (focos, extractores, intractor, ventilador, calefactor, humidificador), de segunda mano, a mitad de precio.
+- **Nuevo: el molino de Errotabarri** (Andoni, desde el capítulo 3): 3 semillas de una landrace del banco que aún no tengas por 20 g de lo tuyo, una vez por semana.
+
 ## 1.13.0 · 12 de octubre de 2026
 
 Patinete y bici, y un repaso de errores. Godot, 0.7.0.

@@ -19,15 +19,16 @@ function spawnClients(){
     const tipos=()=>{const t=['est','est','cur','cur'];if(S.ch>=3)t.push('tur');if(S.ch>=4)t.push('pij','pij');return t;};
     const zonas=[['town',n,tipos()],['astilleros',2+(S.ch>=4?1:0),['est','cur']]];if(S.ch>=3)zonas.push(['alto',2+(S.ch>=4?1:0),['pij','tur']]);
     zonas.push(['puerto',2+(S.ch>=4?1:0),['tur','tur','cur','est']],['valdehierro',2+(S.ch>=4?1:0),['est','cur','cur']],['mendialde',1,['cur']],['errotabarri',1,['cur','tur']]);   // la comarca (1.10)
+    if(S.ch>=4)zonas.push(['ibarbide',3+(S.ch>=5?1:0),['tur','tur','pij','est']],['ensanche',3+(S.ch>=5?1:0),['pij','pij','cur','est']]);   // la ciudad grande (1.14), con su línea
     const usado={};
     const pon=(map,nz,types,pre)=>{
       const used=usado[map]=usado[map]||new Set(NPCDEF.filter(d=>d.map===map).map(d=>d.x+','+d.y).concat(ITEMS.filter(it=>it.map===map).map(it=>it.x+','+it.y)));
       for(let i=0;i<nz;i++){let t;for(let k=0;k<30;k++){t=pick(CLIENT_TILES[map]);if(!used.has(t+''))break;}used.add(t+'');
-        const type=pick(types),ct=CTYPES[type],id='c'+S.day+'_'+pre+{town:'',alto:'b',astilleros:'s',puerto:'p',valdehierro:'v',mendialde:'m',errotabarri:'e'}[map]+i;
+        const type=pick(types),ct=CTYPES[type],id='c'+S.day+'_'+pre+{town:'',alto:'b',astilleros:'s',puerto:'p',valdehierro:'v',mendialde:'m',errotabarri:'e',ibarbide:'i',ensanche:'n'}[map]+i;
         S.clients.push({id,map,x:t[0],y:t[1],type,want:ri(ct.g[0],ct.g[1]),minThc:type==='pij'?Math.min(24,15+S.ch):(type==='tur'&&Math.random()<.4?15:0),look:randLook(id,'client')});}
     };
     for(const [map,nz,types] of zonas)pon(map,nz,types,'');
-    if(S.ch>=3&&S.items.prensa)for(const [map,nz] of [['town',2],['astilleros',1],['puerto',1],['valdehierro',1]])pon(map,nz,['ext'],'x');
+    if(S.ch>=3&&S.items.prensa)for(const [map,nz] of [['town',2],['astilleros',1],['puerto',1],['valdehierro',1]].concat(S.ch>=4?[['ibarbide',1],['ensanche',1]]:[]))pon(map,nz,['ext'],'x');
   }
   if(ZONAS[S.map])buildEnts();
 }

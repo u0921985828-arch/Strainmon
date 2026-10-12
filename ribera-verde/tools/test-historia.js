@@ -403,6 +403,34 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   }, () => R.enc.town === 'thief,' && R.enc.alto === 'thief,' && R.enc.astilleros === 'thief,' && R.pat === '1/2,2/2,1/1,1/1,1/1,0/0,0/0'
     && R.puertas === 'alto,11,28,up|alto,12,28,up|town,12,1,down|astilleros,1,21,right|town,38,20,left|comisaria,4,6,up|almacen,4,6,up|txaro,4,6,up'
     && R.salidas === 'alto,26,19|astilleros,18,14|town,34,9' && R.warp === 'alto,11,28' && R.c2.endsWith(',0,2') && R.c5 === '3,3' && R.tipos && R.ents === 0 && R.entsB === 3 && R.sobre === 80 && R.sp === 2 || R);
+  // la comarca por capítulos (1.14)
+  await step('Líneas por capítulo (1.14): Puerto Viejo y Valdehierro desde el 2, Errotabarri desde el 3, Ibarbide desde el 4 (SMS al abrirse); Ibarbide (4 €), el Casco Viejo y por la avenida el Ensanche', ['Ibarbide'], async () => {
+    const sv = S.ch; window.R = {}; enterMap('town', 7, 12, 'up'); S.min = 10 * 60;
+    R.l = [1, 2, 3, 4].map(c => { S.ch = c; return Object.keys(PARADAS).filter(k => k !== 'town' && S.ch >= PARADAS[k].cap).join('+'); }).join('|');
+    S.ch = 4; const l0 = LOG.length; await run(lineasNuevas); R.sms = LOG.slice(l0).filter(l => l.startsWith('SMS')).join(' / ');
+    R.m = S.money; await run(paradaAction); R.mapa = [S.map, P.x, P.y].join(); R.m = R.m - S.money; R.pat = PATRULLAS.ibarbide.join('/') + ',' + PATRULLAS.ensanche.join('/');
+    await run(() => warp(MAPS.ibarbide.doors['43,21'])); R.en = [S.map, P.x, P.y].join(); R.vecino = ents.some(e => e.id === 'ibarbitarra');
+    const d = MAPS.ensanche.doors['0,11']; R.vuelta = [d.to, d.x, d.y].join(); R.cli = ['ibarbide', 'ensanche'].map(z => CLIENT_TILES[z].length >= 60).join();
+    S.ch = sv; enterMap('home', 5, 5, 'up');
+  }, () => R.l === 'mendialde|puerto+valdehierro+mendialde|puerto+valdehierro+mendialde+errotabarri|puerto+valdehierro+mendialde+errotabarri+ibarbide'
+    && R.sms === 'SMS · AUTOBUSES DE LA COMARCA: Nueva línea desde Ribera Verde: Ibarbide. / SMS · AUTOBUSES DE LA COMARCA: Salidas de 7:00 a 21:00, en la parada de la calle Ribera.'
+    && R.mapa === 'ibarbide,10,20' && R.m === 4 && R.en === 'ensanche,1,10' && R.vuelta === 'ibarbide,42,22' && R.vecino && R.cli === 'true,true' && R.pat === '2/2,2/3' || R);
+  await step('GROW IBARBIDE (1.14): el equipo de Kiko a −10 % y hasta un capítulo antes (la maleta del 5, en el 4); sin semillas, carro ni aparatos', ['Maleta con ruedas', 'Salir'], async () => {
+    const sv = { ch: S.ch, b: S.items.bolsa }; S.ch = 4; S.items.bolsa = 0; S.money = 2000; enterMap('growcity', 4, 6, 'up'); window.R = { m: S.money, ane: ents.some(e => e.id === 'ane') };
+    const l0 = LOG.length; await run(talkAne); R.menu = LOG.slice(l0).find(l => /\[menú\]/.test(l)) || ''; R.m = R.m - S.money; R.b = S.items.bolsa;
+    S.ch = sv.ch; S.items.bolsa = sv.b; enterMap('home', 5, 5, 'up');
+  }, () => R.ane && R.m === Math.round(pr('Maleta') * .9) && R.b === 2 && /Foco LED 720 W/.test(R.menu) && !/Semillas|Carro|Termohigr|Calefactor/.test(R.menu) || R);
+  await step('La comarca con función (1.14): la lonja (Puerto Viejo) carga a ×1,15 cada 3 días; la chatarrería (Valdehierro), 3 piezas al día a mitad de precio; el molino (Errotabarri), 20 g por 3 semillas de una landrace que no tienes', ['^Skunk', '^250 g', '^Skunk'], async () => {
+    S.ch = 5; S.money = 1000; S.buds = {}; addBuds('ria', 300, 12); S.lonja = 0; S.trueque = 0; S.chatarra = null; window.R = {};
+    enterMap('puerto', 20, 9, 'down'); R.m = S.money; await run(talkNerea); R.lonja = S.money - R.m; R.g = S.buds.ria.g; R.m = S.money; await run(talkNerea); R.otra = S.money - R.m;
+    enterMap('valdehierro', 15, 11, 'down'); R.dia = chatarraDia(); const it = SHOP.find(x => x.lbl === R.dia[0]);
+    const pide = it.foco ? S.carpas.some(c => c && FOCOS[it.foco].w <= CARPAS[c.t].wmax) : it.extra ? S.carpas.some(c => faltaExtra(c, it.extra)) : false;
+    want(['^' + it.lbl].concat(pide ? ['^Luego'] : [], ['<B>'])); R.m = S.money; await run(talkBixente); R.chat = R.m - S.money; R.v = S.chatarra && S.chatarra.v.join('|'); R.p = Math.round(it.p * .5);
+    want(['<B>']); R.m = S.money; await run(talkBixente); R.chat2 = R.m - S.money;
+    enterMap('errotabarri', 7, 13, 'down'); R.k = landraceTrueque(); R.s = S.seeds[R.k] || 0; want(['^Skunk']); await run(talkAndoni); R.s = (S.seeds[R.k] || 0) - R.s; R.g2 = S.buds.ria.g;
+    R.d = S.disc[R.k]; R.n = ['nerea', 'bixente', 'andoni'].join(); enterMap('home', 5, 5, 'up');
+  }, () => R.lonja === Math.round(250 * Math.round(precioMayor(12) * 1.15 * 100) / 100) && R.g === 50 && R.otra === 0 && R.dia.length === 3 && new Set(R.dia).size === 3
+    && R.chat === R.p && R.v === R.dia[0] && R.chat2 === 0 && R.s === 3 && R.g2 === 30 && R.d && S.lonja === S.day && S.trueque === S.day || R);
   await step('Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas', ['^Hindu Kush'], async () => {
     S.ch = 5; S.flags.txaro = true; S.flags.txaro2 = false; S.map = 'txaro'; buildEnts(); window.R = { ent: ents.filter(e => e.id === 'txaro').map(e => e.x + ',' + e.y).join() };
     S.buds = {}; addBuds('ria', 20, 12); addBuds('hindu', 15, 18); addBuds('thai', 20, 16); R.ch = S.seeds.chitral || 0; R.boc = S.items.bocata; R.rep = S.rep;
@@ -420,7 +448,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.clientsDay = 0; spawnClients(); R.ext = S.clients.filter(c => c.type === 'ext').map(c => c.map).join();
     S.map = 'town'; const c = { id: 'cx9', map: 'town', x: 5, y: 20, type: 'ext', want: 2, minThc: 0 }; S.clients.push(c); R.m1 = S.money; await run(() => talkClient(c));
     R.m1 = S.money - R.m1; R.r = totalRosin(); R.h = S.heat; S.map = 'home';
-  }, () => R.m === 750 && R.p === 1 && R.ros.ria.g === 5 && R.ros.ria.thc === 36 && R.g === 15 && R.min === 30 && R.ext === 'town,town,astilleros,puerto,valdehierro'
+  }, () => R.m === 750 && R.p === 1 && R.ros.ria.g === 5 && R.ros.ria.thc === 36 && R.g === 15 && R.min === 30 && R.ext === 'town,town,astilleros,puerto,valdehierro,ibarbide,ensanche'
     && R.m1 === Math.round(precioRosin(36) * 2 * .85) && R.r === 3 && GLYPH.gota && CTYPES.ext.label === 'CATADOR' || R);
   await step('Rosin a salvo: la caja lo guarda y lo saca (en el hueco de los cogollos); Darko (con 21 g de rosin = 105 g de flor) se lleva la mitad del de fuera y la caja, intacta; la redada, el de fuera (la caja nunca); el rosin atrae ladrones (1 g = 5 g de flor)',
     ['Guardar rosin', '^Rosin · Skunk', '^1 g', 'Guardar todo', 'Sacar rosin', '^Rosin · Skunk', '^1 g', 'Cerrar', 'Dormir'], async () => {

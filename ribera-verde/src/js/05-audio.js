@@ -84,6 +84,11 @@ const CANCIONES={
   // Errotabarri: pastoral lenta en fa
   errotabarri:{bpm:92,mo:'pulse25',ao:'triangle',ap:'0 1 2 1',bp:'R . 5 .',ch:'F F C C Dm Dm Bb C F F Am Am Bb C F F',
     mel:'c5 - f5 - a5 - - g5 | g5 - e5 - c5 - . . | d5 - f5 - a5 - g5 f5 | f5 - d5 - e5 - - . | a5 - c6 - a5 - f5 - | e5 - a5 - c6 - b5 a5 | d6 - bb5 - g5 - e5 . | f5 - - - . . . .',bat:'. . h . . . h .'},
+  // Ibarbide (1.14): el Casco Viejo, funk en sol menor; el Ensanche, pop electrónico en do, a cuatro por compás
+  ibarbide:{bpm:112,mo:'pulse25',ao:'pulse12',ap:'0 . 1 2',bp:'R . R 5',ch:'Gm Gm C C Gm Gm D D Eb Eb F F Gm Gm D D',
+    mel:'g5 . bb5 . c6 - bb5 . | a5 . g5 . f5 - d5 . | g5 . bb5 . d6 - c6 . | a5 - - . f#5 - d5 . | eb5 . g5 . bb5 - g5 . | f5 . a5 . c6 - a5 . | bb5 - a5 g5 . d5 g5 . | f#5 - - - d5 . . .',bat:'k . h k s . h h'},
+  ensanche:{bpm:128,mo:'pulse12',ao:'pulse25',ap:'0 1 2 1',bp:'R R 8 R',ch:'C C Am Am F F G G C C Am Am F G C C',
+    mel:'e5 . g5 . c6 . g5 . | e5 - d5 . c5 - . . | a4 . c5 . e5 . a5 . | g5 - e5 . c5 - . . | f5 . a5 . c6 . a5 . | g5 . b5 . d6 - b5 . | c6 . b5 . a5 . g5 . | e5 - d5 - c5 - . .',bat:'k h s h k h s h'},
   // interiores: la tienda (reggae), el bar (tango) y la comisaría (tensa)
   shop:{bpm:150,ap:'. . 1 .',ao:'pulse12',ch:'G G C C G G D D G G C C Em Em D D',
     mel:'. . b4 d5 . . g5 . | e5 - - . c5 . e5 . | d5 . b4 . g4 - - . | . . a4 c5 d5 - . . | . . b5 . a5 . g5 . | e5 - g5 - e5 . c5 . | b4 - - e5 g5 - . . | f#5 - - d5 - . . .',bat:'. h . h s h . h'},

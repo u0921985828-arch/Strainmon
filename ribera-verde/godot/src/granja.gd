@@ -997,7 +997,7 @@ func parada_action():
 		ds = ["town"]
 	else:
 		for k in D.PARADAS:
-			if k != aqui:
+			if k != aqui and S.ch >= int(D.PARADAS[k].cap):   # las líneas, por capítulos (1.14)
 				ds.append(k)
 	var it := []
 	for k in ds:

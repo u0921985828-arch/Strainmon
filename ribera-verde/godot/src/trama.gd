@@ -84,12 +84,23 @@ func comprar_carpa(t: String, ci: int) -> void:
 
 const IC := {"fert": "abono", "fertv": "abono", "phm": "abono", "insect": "insecticida", "spray": "spray", "bocata": "bocadillo"}
 
-func shop() -> void:
+# las tiendas (1.14): GROWSHOP KIKO y GROW IBARBIDE (ANE: un 10 % más barato y un capítulo antes, sin semillas, muebles ni aparatos)
+const TIENDAS := {"kiko": {"t": "GROWSHOP KIKO", "N": "KIKO", "f": 1.0, "ch": 0}, "ane": {"t": "GROW IBARBIDE", "N": "ANE", "f": .9, "ch": 1}}
+
+func tienda_ok(T: Dictionary, it: Dictionary) -> bool:
+	return T.N != "ANE" or not (it.get("sid") or it.get("mueble") or it.get("aparato"))
+
+func precio_t(T: Dictionary, it: Dictionary) -> int:
+	return Datos.jsround(it.p * T.f)
+
+func shop(T: Dictionary = {}) -> void:
+	if T.is_empty():
+		T = TIENDAS.kiko
 	var i := 0
 	while true:
 		var list := []
 		for it in D.SHOP:
-			if S.ch >= it.ch and shop_cond(it):
+			if S.ch + T.ch >= it.ch and tienda_ok(T, it) and shop_cond(it):
 				list.append(it)
 		var items := []
 		for it in list:
@@ -106,10 +117,10 @@ func shop() -> void:
 				ic = icono(Atlas.ICX[it.extra])
 			elif it.get("carpa"):
 				ic = icono(Atlas.ico_carpa(it.carpa))
-			items.append({"label": it.lbl, "right": Datos.eur(it.p) + ("/u" if it.get("sid") else ""), "sw": D.STRAINS[it.sid].c if it.get("sid") else null, "ic": ic,
+			items.append({"label": it.lbl, "right": Datos.eur(precio_t(T, it)) + ("/u" if it.get("sid") else ""), "sw": D.STRAINS[it.sid].c if it.get("sid") else null, "ic": ic,
 				"desc": strain_line(it.sid) if it.get("sid") else it.get("desc", "")})
 		items.append({"label": "Salir", "desc": "Volver al mostrador."})
-		i = await menu(items, {"cls": "full", "title": "GROWSHOP KIKO", "title2": "Tienes " + Datos.eur(S.money), "desc": true, "initial": i})
+		i = await menu(items, {"cls": "full", "title": T.t, "title2": "Tienes " + Datos.eur(S.money), "desc": true, "initial": i})
 		if i < 0 or i >= list.size():
 			break
 		var it: Dictionary = list[i]
@@ -117,74 +128,78 @@ func shop() -> void:
 			await comprar_semillas(it)
 			await check_story()
 			continue
-		var p := int(it.p)
+		var p := precio_t(T, it)
 		if S.money < p:
 			sfx("bad")
-			await say("No te llega el dinero.", "KIKO")
+			await say("No te llega el dinero.", T.N)
 			continue
 		S.money -= p
 		sfx("coin")
-		if it.get("item"):
-			S.items[it.item] += int(it.get("n", 1))
-		if it.get("maceta"):
-			S.items["m_" + it.maceta] += 1
-		if it.get("bolsa"):
-			S.items.bolsa = int(it.bolsa)
-		if it.get("aparato"):
-			S.sala[it.aparato] = true
-		if not it.get("foco") and not it.get("carpa") and not it.get("extra") and not it.get("mueble"):
-			toast("Comprado: " + it.lbl, 1200)
-		if it.get("mueble"):
-			if not (S.get("muebles") is Dictionary):
-				S.muebles = {}
-			S.muebles[it.mueble] = S.day + 1
-			await say("Mañana te lo subo al piso y te lo monto junto a las carpas.", "KIKO")
-		if it.get("carpa"):
-			comprar_carpa(it.carpa, int(it.ci))
-			await say(D.DICHO_CARPA[it.carpa], "KIKO")
-		if it.get("extra"):
-			S.items["x_" + it.extra] += 1
-			var ok := []
-			for ci in S.carpas.size():
-				if falta_extra(S.carpas[ci], it.extra):
-					ok.append(ci)
-			var pl: bool = D.EXTRAS[it.extra].get("pl", false)
-			if ok.is_empty():
-				await say("Ya tienes unas en cada carpa. Te las guardo en la mochila." if pl else "Ya tienes uno en cada carpa. Te lo guardo en la mochila.", "KIKO")
-			else:
-				var o := []
-				for ci in ok:
-					o.append(D.CARPAS[S.carpas[ci].t].n)
-				o.append("Luego")
-				var c: int = await ask("¿Te las pongo ya?" if pl else "¿Te lo pongo ya?", o, "KIKO")
-				if c >= 0 and c < ok.size():
-					var vu: bool = it.extra == "goteo" and S.carpas[ok[c]].get("garrafas", false)
-					var vk := poner_extra(ok[c], it.extra)
-					toast(("Puestas: " if pl else "Puesto: ") + it.lbl, 1200)
-					if vu:
-						await say("Las garrafas de esa carpa vuelven a la mochila.", "KIKO")
-					if vk != "":
-						await say("El %s que tenías vuelve a tu mochila." % D.EXTRAS[vk].c.to_lower(), "KIKO")
-		if it.get("foco"):
-			S.items["f_" + it.foco] += 1
-			var ok := []
-			for ci in S.carpas.size():
-				var cc = S.carpas[ci]
-				if cc and D.FOCOS[it.foco].w <= D.CARPAS[cc.t].wmax:
-					ok.append(ci)
-			if ok.is_empty():
-				await say("Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande.", "KIKO")
-			else:
-				var o := []
-				for ci in ok:
-					o.append("%s (%s)" % [D.CARPAS[S.carpas[ci].t].n, D.FOCOS[S.carpas[ci].foco].n])
-				o.append("Luego")
-				var c: int = await ask("¿Lo cuelgo ya? El que quites va a tu mochila.", o, "KIKO")
-				if c >= 0 and c < ok.size():
-					instalar_foco(ok[c], it.foco)
-					toast("Instalado: " + it.lbl, 1200)
+		await entregar(it, T.N)
 		await check_story()
-	await say("Ten cuidado ahí fuera.", "KIKO")
+	await say("Ten cuidado ahí fuera.", T.N)
+
+# lo comprado (en una tienda o en la chatarrería): a la mochila, a la sala o puesto en una carpa, si quieres
+func entregar(it: Dictionary, N: String) -> void:
+	if it.get("item"):
+		S.items[it.item] += int(it.get("n", 1))
+	if it.get("maceta"):
+		S.items["m_" + it.maceta] += 1
+	if it.get("bolsa"):
+		S.items.bolsa = int(it.bolsa)
+	if it.get("aparato"):
+		S.sala[it.aparato] = true
+	if not it.get("foco") and not it.get("carpa") and not it.get("extra") and not it.get("mueble"):
+		toast("Comprado: " + it.lbl, 1200)
+	if it.get("mueble"):
+		if not (S.get("muebles") is Dictionary):
+			S.muebles = {}
+		S.muebles[it.mueble] = S.day + 1
+		await say("Mañana te lo subo al piso y te lo monto junto a las carpas.", N)
+	if it.get("carpa"):
+		comprar_carpa(it.carpa, int(it.ci))
+		await say(D.DICHO_CARPA[it.carpa], N)
+	if it.get("extra"):
+		S.items["x_" + it.extra] += 1
+		var ok := []
+		for ci in S.carpas.size():
+			if falta_extra(S.carpas[ci], it.extra):
+				ok.append(ci)
+		var pl: bool = D.EXTRAS[it.extra].get("pl", false)
+		if ok.is_empty():
+			await say("Ya tienes unas en cada carpa. Te las guardo en la mochila." if pl else "Ya tienes uno en cada carpa. Te lo guardo en la mochila.", N)
+		else:
+			var o := []
+			for ci in ok:
+				o.append(D.CARPAS[S.carpas[ci].t].n)
+			o.append("Luego")
+			var c: int = await ask("¿Te las pongo ya?" if pl else "¿Te lo pongo ya?", o, N)
+			if c >= 0 and c < ok.size():
+				var vu: bool = it.extra == "goteo" and S.carpas[ok[c]].get("garrafas", false)
+				var vk := poner_extra(ok[c], it.extra)
+				toast(("Puestas: " if pl else "Puesto: ") + it.lbl, 1200)
+				if vu:
+					await say("Las garrafas de esa carpa vuelven a la mochila.", N)
+				if vk != "":
+					await say("El %s que tenías vuelve a tu mochila." % D.EXTRAS[vk].c.to_lower(), N)
+	if it.get("foco"):
+		S.items["f_" + it.foco] += 1
+		var ok := []
+		for ci in S.carpas.size():
+			var cc = S.carpas[ci]
+			if cc and D.FOCOS[it.foco].w <= D.CARPAS[cc.t].wmax:
+				ok.append(ci)
+		if ok.is_empty():
+			await say("Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande.", N)
+		else:
+			var o := []
+			for ci in ok:
+				o.append("%s (%s)" % [D.CARPAS[S.carpas[ci].t].n, D.FOCOS[S.carpas[ci].foco].n])
+			o.append("Luego")
+			var c: int = await ask("¿Lo cuelgo ya? El que quites va a tu mochila.", o, N)
+			if c >= 0 and c < ok.size():
+				instalar_foco(ok[c], it.foco)
+				toast("Instalado: " + it.lbl, 1200)
 
 func kiko_tip() -> String:
 	var t: Array = D.KIKO_TIPS
@@ -411,6 +426,157 @@ func venta_mayor(N: String) -> void:
 	heat_warn()
 	await check_story()
 
+# ---------- la comarca con función (1.14, 11d-comarca) ----------
+# Ibarbide: GROW IBARBIDE (TIENDAS.ane). Puerto Viejo: la lonja (NEREA), al por mayor a un 15 % más que Iñaki, hasta 500 g y cada
+# 3 días. Valdehierro: la chatarrería del solar (BIXENTE), 3 piezas de segunda mano al día a mitad de precio. Errotabarri: el
+# molino (ANDONI), 20 g de cogollo por 3 semillas de una landrace del banco que aún no tengas, una vez por semana
+func talk_ane():
+	var N := "ANE"
+	await say("¿Qué te hace falta hoy?" if S.flags.get("ane") else "Kaixo. Esto es GROW IBARBIDE: el equipo, un 10 % más barato que en el barrio, y lo nuevo antes que nadie.", N)
+	S.flags.ane = true
+	await shop(TIENDAS.ane)
+
+# las 3 piezas del día: las mismas para todos (_hash_t del día), sin repetir
+func chatarra_dia() -> Array:
+	var l: Array = D.CHATARRA.piezas.duplicate()
+	var r := []
+	for i in int(D.CHATARRA.n):
+		var j := _hash_t(S.day, i + 7) % l.size()
+		r.append(l[j])
+		l.remove_at(j)
+	return r
+
+func talk_bixente():
+	var N := "BIXENTE"
+	if S.ch < int(D.CHATARRA.ch):
+		await say("Compro chatarra y vendo lo que se puede aprovechar. Vuelve cuando cultives en serio.", N)
+		return
+	var i := 0
+	while true:
+		var ch = S.get("chatarra")
+		var ya: Array = ch.v if ch is Dictionary and int(ch.d) == S.day else []
+		var l := []
+		for lbl in chatarra_dia():
+			if ya.has(lbl):
+				continue
+			for it in D.SHOP:
+				if it.lbl == lbl:
+					if shop_cond(it):
+						l.append(it)
+					break
+		if l.is_empty():
+			await say("Hoy no me queda nada que te sirva. Mañana entra más.", N)
+			return
+		var items := []
+		for it in l:
+			items.append({"label": it.lbl, "right": Datos.eur(Datos.jsround(it.p * D.CHATARRA.f)), "desc": it.get("desc", "") + "\nDe segunda mano: funciona, pero sin garantía."})
+		items.append({"label": "Nada", "desc": "Cada día entran tres piezas."})
+		i = await menu(items, {"cls": "full", "title": "CHATARRERÍA DEL SOLAR", "title2": "Tienes " + Datos.eur(S.money), "desc": true, "initial": i})
+		if i < 0 or i >= l.size():
+			await say("Lo que entra, sale. Si lo quieres, no tardes.", N)
+			return
+		var it: Dictionary = l[i]
+		var p := Datos.jsround(it.p * D.CHATARRA.f)
+		if S.money < p:
+			sfx("bad")
+			await say("Sin dinero no hay trato.", N)
+			continue
+		S.money -= p
+		sfx("coin")
+		if not (ch is Dictionary and int(ch.d) == S.day):
+			S.chatarra = {"d": S.day, "v": []}
+		S.chatarra.v.append(it.lbl)
+		await entregar(it, N)
+		await check_story()
+
+func talk_nerea():
+	var N := "NEREA"
+	var L: Dictionary = D.LONJA
+	if S.ch < int(L.ch):
+		await say("De madrugada se subasta el pescado. Lo otro, cuando te conozca más gente.", N)
+		return
+	if S.get("lonja") and S.day < int(S.lonja) + int(L.dias):
+		await say("Los barcos de fuera vuelven el día %d. Tráelo entonces." % (int(S.lonja) + int(L.dias)), N)
+		return
+	var lots := bud_lots(100)
+	if lots.is_empty():
+		await say("Cargo para los barcos de fuera: de 100 a %d g, un %d %% por encima de lo que paga Iñaki. Cada %d días." % [int(L.g), Datos.jsround((L.f - 1) * 100), int(L.dias)], N)
+		return
+	var it := lots.map(lot_item)
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿Qué lote?"})
+	if i < 0 or i >= lots.size():
+		await say("Otro día.", N)
+		return
+	var k: String = lots[i][0]
+	var b: Dictionary = lots[i][1]
+	var pg := Datos.jsround(precio_mayor(b.thc) * L.f * 100) / 100.0
+	var tope := mini(int(floor(b.g)), int(L.g))
+	var ops := []
+	for g in [100, 250]:
+		if g < tope:
+			ops.append(g)
+	ops.append(tope)
+	var o := []
+	for g in ops:
+		o.append("%s · %s" % [_kg(g), Datos.eur(g * pg)])
+	o.append("Nada")
+	var j: int = await ask("%s a %s € el gramo. ¿Cuánto cargas?" % [lot_nombre(k), _dos(pg)], o, N)
+	if j < 0 or j >= ops.size():
+		return
+	var g: int = ops[j]
+	var e := Datos.jsround(g * pg)
+	use_buds(k, g)
+	S.money += e
+	S.sales += e
+	S.lonja = S.day
+	S.heat = min(100, S.heat + 2 + g / 100.0)
+	S.rep += 1
+	sfx("coin")
+	await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})
+	toast("+%s · %s en la lonja" % [Datos.eur(e), _kg(g)], 1600)
+	await say("Hecho. Sale con el pesquero de las cinco.", N)
+	heat_warn()
+	await check_story()
+
+# la landrace del trueque: la primera del banco (las de su capítulo) que no tienes en la Genoteca; si las tienes todas, una según el día
+func landrace_trueque() -> String:
+	var l := []
+	for b in D.BANCO:
+		if S.ch >= int(b[2]):
+			l.append(b[0])
+	for k in l:
+		if not S.disc.get(k):
+			return k
+	return l[S.day % l.size()]
+
+func talk_andoni():
+	var N := "ANDONI"
+	var T: Dictionary = D.TRUEQUE
+	if S.ch < int(T.ch):
+		await say("El molino muele los domingos. Si te interesan las semillas viejas, vuelve más adelante.", N)
+		return
+	if S.get("trueque") and S.day < int(S.trueque) + int(T.dias):
+		await say("Hasta el día %d no tengo más semillas para cambiar." % (int(S.trueque) + int(T.dias)), N)
+		return
+	var k := landrace_trueque()
+	await say("Mi abuelo guardaba semillas en botes de cristal, junto a la harina. Tengo de %s." % D.STRAINS[k].n, N)
+	var lots := bud_lots(int(T.g))
+	if lots.is_empty():
+		await say("Te doy %d por %d g de lo tuyo. Cuando los tengas, aquí estoy." % [int(T.n), int(T.g)], N)
+		return
+	var it := lots.map(lot_item)
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "%d semillas por %d g" % [int(T.n), int(T.g)]})
+	if i < 0 or i >= lots.size():
+		await say("Tú verás. El bote no se mueve de aquí.", N)
+		return
+	use_buds(lots[i][0], int(T.g))
+	add_seeds(k, int(T.n))
+	S.trueque = S.day
+	await got("%d semillas de %s" % [int(T.n), String(D.STRAINS[k].n).to_upper()])
+	await say("Cuídalas. Ya no quedan muchas así.", N)
+
 func talk_cop():
 	if carga_sosp() > 0 and not S.protect:
 		await say("¿Y ese olor? Quieto ahí.", "AGENTE")
@@ -542,6 +708,7 @@ func talk_baltasar():
 		await talk(N, ["Puntual. Así me gusta.", "Quedan %s. Ya te avisaré del siguiente plazo." % Datos.eur(S.debt).replace(" €", "")])
 		await chapter(4)
 		await talk("SMS · KIKO", ["Pásate por el growshop. Tengo algo para ti."])
+		await lineas_nuevas()
 		show_objective()
 	elif S.ch == 5:
 		await talk(N, ["Me sorprendes, {N}.", "Quedan %s. Te propongo algo." % Datos.eur(S.debt).replace(" €", ""), "La COPA DE RIBERA se juega estos días en la plaza. Premio: %s." % Datos.eur(D.PREMIO_COPA),
@@ -556,6 +723,15 @@ func talk_baltasar():
 		await ending()
 
 # ---------- capítulos, objetivo e imperio ----------
+# líneas de autobús nuevas (1.14): las paradas se abren por capítulos (PARADAS.cap); al abrirse, un SMS de la compañía
+func lineas_nuevas() -> void:
+	var L := []
+	for k in D.PARADAS:
+		if int(D.PARADAS[k].cap) == S.ch:
+			L.append(D.PARADAS[k].n)
+	if L.size():
+		await talk("SMS · AUTOBUSES DE LA COMARCA", ["Nueva línea desde Ribera Verde: %s." % _lista(L), "Salidas de 7:00 a 21:00, en la parada de la calle Ribera."])
+
 func chapter(nn: int) -> void:
 	S.ch = nn
 	sfx("get")
@@ -732,6 +908,7 @@ func check_story():
 		await chapter(2)
 		spawn_clients()
 		await talk("SMS · KIKO", ["Primera cosecha. Bien hecho.", "La gente que busca material lleva un $ encima. Puedes venderles en la calle.", "Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba."])
+		await lineas_nuevas()
 		show_objective()
 	if S.ch == 2 and S.sales >= D.META_VENTAS:
 		S.due = int(D.PLAZOS["3"])   # el plazo, desde ya (1.10)
@@ -740,6 +917,7 @@ func check_story():
 		await chapter(3)
 		await say("Un hombre enorme en chándal te corta el paso.")
 		await talk("TOÑO", ["Tú vives en el piso de Maite, ¿no?", "Don Baltasar quiere verte. En el bar El Ancla. Hoy.", "Y ve contando: tienes siete días para el primer pago.", "No me hagas venir a buscarte."])
+		await lineas_nuevas()
 		show_objective()
 	if S.ch >= 8 and imperio_nivel() > S.get("impN", 0):
 		S.impN = imperio_nivel()

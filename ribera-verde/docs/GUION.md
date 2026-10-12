@@ -26,7 +26,11 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 | **Patrullas** (1.10) | Agentes que andan por la calle: si te ven con algo encima, sospechan; con la alarma, te persiguen | Las zonas de fuera, desde el cap. 2: 1 de día y 2 de noche en el barrio, 2 en el barrio alto, 1 en los astilleros, Puerto Viejo y Valdehierro, ninguno en los pueblos |
 | **Jurado** | Juez de la Copa, la de la asociación cannábica del barrio | Plaza (cap. 6) |
 | **Ama** | Tu madre. Solo aparece en su nota | Caserío de la familia, en Mendialde |
-| **Vecina**, **excursionista**, **turista** y **obrero** | Gente de la comarca, dan conversación | Mendialde, Errotabarri, Puerto Viejo y Valdehierro |
+| **Vecina**, **excursionista**, **turista**, **obrero** y **vecino** | Gente de la comarca, dan conversación | Mendialde, Errotabarri, Puerto Viejo, Valdehierro y el Ensanche de Ibarbide |
+| **Ane** (1.14) | La de GROW IBARBIDE: el equipo de Kiko un 10 % más barato y un capítulo antes, sin semillas, carro ni aparatos | Casco Viejo de Ibarbide (desde el cap. 4) |
+| **Nerea** (1.14) | La lonja: carga para los barcos de fuera, de 100 a 500 g, un 15 % por encima de Iñaki, cada 3 días (desde el cap. 3) | Puerto Viejo |
+| **Bixente** (1.14) | La chatarrería del solar: 3 piezas de equipo al día, de segunda mano, a mitad de precio (desde el cap. 2) | Valdehierro |
+| **Andoni** (1.14) | El molino: 3 semillas de una landrace del banco que aún no tengas por 20 g de lo tuyo, una vez por semana (desde el cap. 3) | Errotabarri |
 
 ## Prólogo
 
@@ -83,6 +87,8 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 > **SMS · KIKO:** Primera cosecha. Bien hecho.
 > **SMS · KIKO:** La gente que busca material lleva un $ encima. Puedes venderles en la calle.
 > **SMS · KIKO:** Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba.
+> **SMS · AUTOBUSES DE LA COMARCA:** Nueva línea desde Ribera Verde: Puerto Viejo y Valdehierro.
+> **SMS · AUTOBUSES DE LA COMARCA:** Salidas de 7:00 a 21:00, en la parada de la calle Ribera.
 
 ## Capítulo 2 · La calle
 
@@ -129,6 +135,8 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 > **TOÑO:** Don Baltasar quiere verte. En el bar El Ancla. Hoy.
 > **TOÑO:** Y ve contando: tienes siete días para el primer pago.
 > **TOÑO:** No me hagas venir a buscarte.
+> **SMS · AUTOBUSES DE LA COMARCA:** Nueva línea desde Ribera Verde: Errotabarri.
+> **SMS · AUTOBUSES DE LA COMARCA:** Salidas de 7:00 a 21:00, en la parada de la calle Ribera.
 
 *El plazo de 3.000 € (7 días) empieza aquí. Objetivo: «Ve al bar El Ancla antes de que acabe el día D: Don Baltasar quiere 3.000 €.»*
 
@@ -158,6 +166,8 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 > **DON BALTASAR:** Puntual. Así me gusta.
 > **DON BALTASAR:** Quedan 27.000. Ya te avisaré del siguiente plazo.
 > **SMS · KIKO:** Pásate por el growshop. Tengo algo para ti.
+> **SMS · AUTOBUSES DE LA COMARCA:** Nueva línea desde Ribera Verde: Ibarbide.
+> **SMS · AUTOBUSES DE LA COMARCA:** Salidas de 7:00 a 21:00, en la parada de la calle Ribera.
 
 ## Capítulo 4 · Genética
 
@@ -377,14 +387,22 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
   - *Astilleros:* «ALMACÉN 3 · Propiedad privada. Prohibido el paso.» / «ASTILLEROS DE RIBERA · Cerrados desde 1992.»
   - *Mendialde:* «MENDIALDE · Caseríos, huertas y la parada del autobús.»
   - *Puerto Viejo:* «PUERTO VIEJO · Cofradía de pescadores desde 1890.»
-  - *Valdehierro:* «VALDEHIERRO · Ciudad del hierro desde 1911.» / «SOLAR DE LA FUNDICIÓN · Propiedad privada. Prohibido el paso.»
-  - *Errotabarri:* «ERROTABARRI · El pueblo del molino.» / «ERROTA ZAHARRA · Molino harinero del siglo XVIII.»
-- **Autobús de la comarca (1.10):** en el poste de cada parada (de 7:00 a 21:00), «¿A dónde vas?» → las otras paradas con su precio y lo que tarda (Puerto Viejo, 2 € y 25 min desde Ribera Verde; Valdehierro, 2 € y 20 min; Mendialde, 3 € y 40 min; Errotabarri, 3 € y 30 min; entre dos de fuera, la suma) / *Nada*. Fuera de horas: «PARADA DE [SITIO] · El primer autobús pasa a las 7:00 y el último, a las 21:00.» Sin dinero: «El billete hasta [sitio] cuesta X €. No te llega.»
+  - *Valdehierro:* «VALDEHIERRO · Ciudad del hierro desde 1911.» / «CHATARRERÍA DEL SOLAR · Compro y vendo. Material de segunda mano.»
+  - *Errotabarri:* «ERROTABARRI · El pueblo del molino.» / «ERROTA ZAHARRA · Molino harinero del siglo XVIII. Semillas viejas: pregunta por Andoni.»
+  - *Puerto Viejo (1.14):* «LONJA DE PUERTO VIEJO · Subasta de madrugada. Cargas para los barcos de fuera.»
+  - *Ibarbide (1.14):* «GROW IBARBIDE · Todo para el cultivo, a precio de ciudad.» / «PLAZA NUEVA · Casco Viejo de Ibarbide.» / «ENSANCHE → · Avenida de la Estación.» / «IBARBIDE · ENSANCHE · ← Casco Viejo y estación de autobuses.»
+- **Autobús de la comarca (1.10):** en el poste de cada parada (de 7:00 a 21:00), «¿A dónde vas?» → las otras paradas con su precio y lo que tarda (Puerto Viejo, 2 € y 25 min desde Ribera Verde; Valdehierro, 2 € y 20 min; Mendialde, 3 € y 40 min; Errotabarri, 3 € y 30 min; Ibarbide, 4 € y 35 min; entre dos de fuera, la suma) / *Nada*. Las líneas se abren por capítulos (1.14): Mendialde desde el principio, Puerto Viejo y Valdehierro en el 2, Errotabarri en el 3 e Ibarbide en el 4, cada una con su SMS. Fuera de horas: «PARADA DE [SITIO] · El primer autobús pasa a las 7:00 y el último, a las 21:00.» Sin dinero: «El billete hasta [sitio] cuesta X €. No te llega.»
 - **Gente de la comarca (1.10):**
   - *Vecina (Mendialde):* «En Mendialde el autobús para en la plaza. El último sale a las nueve.» / «Tu ama dice que en la ciudad no comes. Llévate el táper.» / «Aquí el maíz se siembra en mayo y se recoge en octubre. Como toda la vida.»
   - *Excursionista (Errotabarri):* «El molino tiene trescientos años. Todavía muele algún domingo.» / «Del puente para arriba, el río baja limpio. Para abajo, ya no tanto.» / «Vengo en el autobús de Ribera Verde: treinta minutos y tres euros.»
   - *Turista (Puerto Viejo):* «Las casas son de colores para que cada pescador viera la suya desde el mar.» / «Dicen que en este puerto se paga bien... y que la policía mira poco.» / «He venido a por anchoas y me han ofrecido de todo.»
-  - *Obrero (Valdehierro):* «La fundición cerró hace años. Ahora el solar no es de nadie.» / «Aquí la gente cobra poco y paga poco. Y de noche, cuidado con la cartera.» / «De Valdehierro a Ribera Verde, veinte minutos de autobús.»
+  - *Obrero (Valdehierro):* «La fundición cerró hace años. Ahora el solar es del chatarrero.» / «Aquí la gente cobra poco y paga poco. Y de noche, cuidado con la cartera.» / «De Valdehierro a Ribera Verde, veinte minutos de autobús.»
+  - *Vecino (Ensanche, 1.14):* «Esto es el Ensanche: pisos, oficinas y el parque. El Casco Viejo, por la avenida.» / «En Ibarbide hay policía en cada esquina. Y aun así...» / «Los de los pueblos venís en autobús, ¿no? La estación está en el Casco.»
+- **Los sitios con función (1.14):**
+  - *Ane (GROW IBARBIDE):* la primera vez, «Kaixo. Esto es GROW IBARBIDE: el equipo, un 10 % más barato que en el barrio, y lo nuevo antes que nadie.»; luego, «¿Qué te hace falta hoy?» → la tienda (GROW IBARBIDE) → «Ten cuidado ahí fuera.»
+  - *Nerea (la lonja):* antes del cap. 3, «De madrugada se subasta el pescado. Lo otro, cuando te conozca más gente.» · sin 100 g, «Cargo para los barcos de fuera: de 100 a 500 g, un 15 % por encima de lo que paga Iñaki. Cada 3 días.» · «¿Qué lote?» → «[lote] a X € el gramo. ¿Cuánto cargas?» → «Hecho. Sale con el pesquero de las cinco.» · antes de 3 días, «Los barcos de fuera vuelven el día D. Tráelo entonces.»
+  - *Bixente (la chatarrería):* antes del cap. 2, «Compro chatarra y vendo lo que se puede aprovechar. Vuelve cuando cultives en serio.» · CHATARRERÍA DEL SOLAR, las 3 piezas del día («De segunda mano: funciona, pero sin garantía.») / *Nada* → «Lo que entra, sale. Si lo quieres, no tardes.» · sin dinero, «Sin dinero no hay trato.» · vendido todo, «Hoy no me queda nada que te sirva. Mañana entra más.»
+  - *Andoni (el molino):* antes del cap. 3, «El molino muele los domingos. Si te interesan las semillas viejas, vuelve más adelante.» · «Mi abuelo guardaba semillas en botes de cristal, junto a la harina. Tengo de [landrace].» → «3 semillas por 20 g» → «Cuídalas. Ya no quedan muchas así.» · sin 20 g, «Te doy 3 por 20 g de lo tuyo. Cuando los tengas, aquí estoy.» · antes de 7 días, «Hasta el día D no tengo más semillas para cambiar.»
 - **Cultivo (1.10):**
   - *Cosecha:* «Cosechas X g de [variedad]. THC: Y%.»
   - *Fenotipo estrella:* «¡Fenotipo estrella! THC ×A y cosecha ×B sobre la media de la [variedad].» / «Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.» · *Flojo:* «Fenotipo flojo: THC ×A y cosecha ×B de la media.»

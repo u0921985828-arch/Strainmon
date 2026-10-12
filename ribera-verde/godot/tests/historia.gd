@@ -147,10 +147,14 @@ func hasta(f: Callable) -> void:
 func run(f: Callable) -> void:
 	await J.run(f)
 
-func step(nombre: String, w: Array, fn: Callable, check: Callable) -> void:
+# window.want del piloto: lo que se elige en los menús que vienen ('<B>' sale; '=texto', en la caja de texto)
+func want(w: Array) -> void:
 	WANT = []
 	for s in w:
 		WANT.append(s if s == "<B>" else ({"txt": s.substr(1)} if s.begins_with("=") else RegEx.create_from_string(s)))
+
+func step(nombre: String, w: Array, fn: Callable, check: Callable) -> void:
+	want(w)
 	var l0 := LOG.size()
 	LOG.append("\n=== " + nombre + " ===")
 	var st := {"fin": false}
@@ -1204,6 +1208,102 @@ func _pasos() -> void:
 			and R.puertas == "alto,11,28,up|alto,12,28,up|town,12,1,down|astilleros,1,21,right|town,38,20,left|comisaria,4,6,up|almacen,4,6,up|txaro,4,6,up"
 			and R.salidas == "alto,26,19|astilleros,18,14|town,34,9" and R.warp == "alto,11,28" and R.c2.ends_with(",0,2") and R.c5 == "3,3" and R.tipos and R.ents == 0 and R.entsB == 3
 			and R.sobre == 80 and R.sp == 2, R))
+	# la comarca por capítulos (1.14)
+	step("Líneas por capítulo (1.14): Puerto Viejo y Valdehierro desde el 2, Errotabarri desde el 3, Ibarbide desde el 4 (SMS al abrirse); Ibarbide (4 €), el Casco Viejo y por la avenida el Ensanche", ["Ibarbide"], func():
+		var sv: int = J.S.ch
+		R = {}
+		J.enter_map("town", 7, 12, "up")
+		J.S.min = 10 * 60
+		var ll := []
+		for c in [1, 2, 3, 4]:
+			J.S.ch = c
+			ll.append("+".join(D.PARADAS.keys().filter(func(k): return k != "town" and J.S.ch >= int(D.PARADAS[k].cap))))
+		R.l = "|".join(ll)
+		J.S.ch = 4
+		var l0 := LOG.size()
+		await run(func(): await J.lineas_nuevas())
+		R.sms = " / ".join(LOG.slice(l0).filter(func(l): return l.begins_with("SMS")))
+		R.m = J.S.money
+		await run(func(): await J.parada_action())
+		R.mapa = "%s,%d,%d" % [J.S.map, J.P.x, J.P.y]
+		R.m = R.m - J.S.money
+		R.pat = "%d/%d,%d/%d" % [D.PATRULLAS.ibarbide[0], D.PATRULLAS.ibarbide[1], D.PATRULLAS.ensanche[0], D.PATRULLAS.ensanche[1]]
+		await run(func(): await J.warp(J.MAPS.ibarbide.doors["43,21"]))
+		R.en = "%s,%d,%d" % [J.S.map, J.P.x, J.P.y]
+		R.vecino = J.ents.any(func(e): return e.id == "ibarbitarra")
+		var d: Dictionary = J.MAPS.ensanche.doors["0,11"]
+		R.vuelta = "%s,%d,%d" % [d.to, d.x, d.y]
+		R.cli = ",".join(["ibarbide", "ensanche"].map(func(z): return "true" if D.CLIENT_TILES[z].size() >= 60 else "false"))
+		J.S.ch = sv
+		J.enter_map("home", 5, 5, "up"),
+		func(): return chk(R.l == "mendialde|puerto+valdehierro+mendialde|puerto+valdehierro+mendialde+errotabarri|puerto+valdehierro+mendialde+errotabarri+ibarbide"
+			and R.sms == "SMS · AUTOBUSES DE LA COMARCA: Nueva línea desde Ribera Verde: Ibarbide. / SMS · AUTOBUSES DE LA COMARCA: Salidas de 7:00 a 21:00, en la parada de la calle Ribera."
+			and R.mapa == "ibarbide,10,20" and R.m == 4 and R.en == "ensanche,1,10" and R.vuelta == "ibarbide,42,22" and R.vecino and R.cli == "true,true" and R.pat == "2/2,2/3", R))
+	step("GROW IBARBIDE (1.14): el equipo de Kiko a −10 % y hasta un capítulo antes (la maleta del 5, en el 4); sin semillas, carro ni aparatos", ["Maleta con ruedas", "Salir"], func():
+		var sv := {"ch": J.S.ch, "b": J.S.items.bolsa}
+		J.S.ch = 4
+		J.S.items.bolsa = 0
+		J.S.money = 2000
+		J.enter_map("growcity", 4, 6, "up")
+		R = {"m": J.S.money, "ane": J.ents.any(func(e): return e.id == "ane")}
+		var l0 := LOG.size()
+		await run(func(): await J.talk_ane())
+		var mm: Array = LOG.slice(l0).filter(func(l): return re("\\[menú\\]", l))
+		R.menu = mm[0] if mm.size() else ""
+		R.m = R.m - J.S.money
+		R.b = J.S.items.bolsa
+		J.S.ch = sv.ch
+		J.S.items.bolsa = sv.b
+		J.enter_map("home", 5, 5, "up"),
+		func(): return chk(R.ane and R.m == Datos.jsround(pr("Maleta") * .9) and R.b == 2 and re("Foco LED 720 W", R.menu) and not re("Semillas|Carro|Termohigr|Calefactor", R.menu), R))
+	step("La comarca con función (1.14): la lonja (Puerto Viejo) carga a ×1,15 cada 3 días; la chatarrería (Valdehierro), 3 piezas al día a mitad de precio; el molino (Errotabarri), 20 g por 3 semillas de una landrace que no tienes", ["^Skunk", "^250 g", "^Skunk"], func():
+		J.S.ch = 5
+		J.S.money = 1000
+		J.S.buds = {}
+		J.add_buds("ria", 300, 12)
+		J.S.lonja = 0
+		J.S.trueque = 0
+		J.S.chatarra = null
+		R = {}
+		J.enter_map("puerto", 20, 9, "down")
+		R.m = J.S.money
+		await run(func(): await J.talk_nerea())
+		R.lonja = J.S.money - R.m
+		R.g = J.S.buds.ria.g
+		R.m = J.S.money
+		await run(func(): await J.talk_nerea())
+		R.otra = J.S.money - R.m
+		J.enter_map("valdehierro", 15, 11, "down")
+		R.dia = J.chatarra_dia()
+		var it: Dictionary = D.SHOP.filter(func(x): return x.lbl == R.dia[0])[0]
+		var pide := false
+		if it.get("foco"):
+			pide = J.S.carpas.any(func(c): return c and D.FOCOS[it.foco].w <= D.CARPAS[c.t].wmax)
+		elif it.get("extra"):
+			pide = J.S.carpas.any(func(c): return J.falta_extra(c, it.extra))
+		want(["^" + it.lbl] + (["^Luego"] if pide else []) + ["<B>"])
+		R.m = J.S.money
+		await run(func(): await J.talk_bixente())
+		R.chat = R.m - J.S.money
+		R.v = "|".join(J.S.chatarra.v) if J.S.chatarra else null
+		R.p = Datos.jsround(it.p * .5)
+		want(["<B>"])
+		R.m = J.S.money
+		await run(func(): await J.talk_bixente())
+		R.chat2 = R.m - J.S.money
+		J.enter_map("errotabarri", 7, 13, "down")
+		R.k = J.landrace_trueque()
+		R.s = J.S.seeds.get(R.k, 0)
+		want(["^Skunk"])
+		await run(func(): await J.talk_andoni())
+		R.s = J.S.seeds.get(R.k, 0) - R.s
+		R.g2 = J.S.buds.ria.g
+		R.d = J.S.disc.get(R.k)
+		R.n = "nerea,bixente,andoni"
+		J.enter_map("home", 5, 5, "up"),
+		func(): return chk(R.lonja == Datos.jsround(250 * Datos.jsround(J.precio_mayor(12) * 1.15 * 100) / 100.0) and R.g == 50 and R.otra == 0 and R.dia.size() == 3
+			and R.dia[0] != R.dia[1] and R.dia[1] != R.dia[2] and R.dia[0] != R.dia[2]
+			and R.chat == R.p and R.v == R.dia[0] and R.chat2 == 0 and R.s == 3 and R.g2 == 30 and si(R.d) and J.S.lonja == J.S.day and J.S.trueque == J.S.day, R))
 	step("Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas", ["^Hindu Kush"], func():
 		J.S.ch = 5
 		J.S.flags.txaro = true
@@ -1273,7 +1373,7 @@ func _pasos() -> void:
 		R.r = J.total_rosin()
 		R.h = J.S.heat
 		J.S.map = "home",
-		func(): return chk(R.m == 750 and R.p == 1 and R.ros.ria.g == 5 and R.ros.ria.thc == 36 and R.g == 15 and R.min == 30 and R.ext == "town,town,astilleros,puerto,valdehierro"
+		func(): return chk(R.m == 750 and R.p == 1 and R.ros.ria.g == 5 and R.ros.ria.thc == 36 and R.g == 15 and R.min == 30 and R.ext == "town,town,astilleros,puerto,valdehierro,ibarbide,ensanche"
 			and R.m1 == Datos.jsround(J.precio_rosin(36) * 2 * .85) and R.r == 3 and D.GLYPH.has("gota") and D.CTYPES.ext.label == "CATADOR", R))
 	step("Rosin a salvo: la caja lo guarda y lo saca (en el hueco de los cogollos); Darko (con 21 g de rosin = 105 g de flor) se lleva la mitad del de fuera y la caja, intacta; la redada, el de fuera (la caja nunca); el rosin atrae ladrones (1 g = 5 g de flor)",
 		["Guardar rosin", "^Rosin · Skunk", "^1 g", "Guardar todo", "Sacar rosin", "^Rosin · Skunk", "^1 g", "Cerrar", "Dormir"], func():

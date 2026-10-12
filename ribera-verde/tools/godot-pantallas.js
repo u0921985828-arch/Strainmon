@@ -89,6 +89,12 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
     map: 'town', P: { x: 21, y: 21, dir: 'right', moving: true, fx: 20, fy: 21, t: 60, dur: 110, parity: 1, px: (20 + 60 / 110) * 16, py: 21 * 16 } },
   { k: 'calle-patinete', sw: 280, mode: 'world', now: T + 640, S: { ch: 4, min: 8 * 60, day: 2, veh: { patinete: 1 }, flags: {} }, map: 'mendialde',
     P: { x: 21, y: 20, dir: 'down', moving: true, fx: 21, fy: 19, t: 100, dur: 150, parity: 0, px: 21 * 16, py: (19 + 100 / 150) * 16 } },
+  // la ciudad grande (1.14): la Plaza Nueva del Casco Viejo con clientes, el parque del Ensanche al atardecer y GROW IBARBIDE por dentro
+  { k: 'ibarbide', sw: 400, mode: 'world', now: T + 321, seed: 77, S: { ch: 5, min: 11 * 60, day: 6, rep: 30, flags: {} }, clientes: true, map: 'ibarbide',
+    P: { x: 18, y: 16, dir: 'right' } },
+  { k: 'ensanche', sw: 320, mode: 'world', now: T + 888, seed: 77, S: { ch: 5, min: 19 * 60, day: 6, rep: 30, flags: {} }, clientes: true, map: 'ensanche',
+    P: { x: 20, y: 12, dir: 'down' } },
+  { k: 'growcity', sw: 240, mode: 'world', now: T + 150, S: { ch: 4, flags: { ane: true } }, map: 'growcity', P: { x: 4, y: 5, dir: 'up' } },
   // la vista C con todo (1.10, antes en la vista B): carpa de 150 con extras (goteo con el depósito a 400 de 975 L en la mirilla,
   // sus ramales, llaves y microtubos; filtro y ventilador), macetas de todo tipo, fases, plaga, seca y muerta; elegida una plaza de
   // atrás (la fila de delante en transparencia)

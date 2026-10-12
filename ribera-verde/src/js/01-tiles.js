@@ -57,7 +57,9 @@ function buildTiles(){
     comisaria:['#4e5664','#cfc8b8','doorD'],nave:['#5f7e80','#8c98a2','doorD'],caserio:['#b04a32','#f2eee2','doorD'],caserio2:['#b04a32','#ece0c4','doorD'],
     marinera:['#b04a32','#3f8a5a','doorD'],marinera2:['#b04a32','#3c6eb4','doorD'],marinera3:['#b04a32','#b8403a','doorD'],marinera4:['#b04a32','#e0b84a','doorD'],
     ladrillo:['#9a9690','#a04a34','doorD'],fabrica:['#4e5258','#a04a34','doorD'],
-    caserio3:['#b04a32','#ece6d6','none'],borda:['#b04a32','#a69c8a','none'],marinera5:['#b04a32','#ece6d8','none'],marinera6:['#b04a32','#d8846a','none']};   // orgánico: sin puerta
+    caserio3:['#b04a32','#ece6d6','none'],borda:['#b04a32','#a69c8a','none'],marinera5:['#b04a32','#ece6d8','none'],marinera6:['#b04a32','#d8846a','none'],   // orgánico: sin puerta
+    casco:['#b04a32','#c89a52','none'],casco2:['#b04a32','#7a96a4','none'],casco3:['#b04a32','#c07a5e','none'],growcity:['#b04a32','#e8dcc0','doorG'],
+    bloque:['#9a9690','#e6dcc8','none'],bloque2:['#9a9690','#b8bcc0','none']};   // Ibarbide (1.14)
   for(const [id,[roof,wall,door]] of Object.entries(B)){
     const shingles=(t)=>{t.F(0,0,16,16,roof);for(let y=3;y<16;y+=4){t.F(0,y,16,1,shade(roof,-38));for(let x=((y>>2)%2)*4;x<16;x+=8)t.F(x,y-3,1,3,shade(roof,-22));}t.noise(4,[shade(roof,22)]);};
     T('roofT_'+id,t=>{shingles(t);t.F(0,0,16,2,shade(roof,30));t.F(0,2,16,1,shade(roof,-45));});

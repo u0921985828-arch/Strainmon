@@ -174,6 +174,12 @@ const LOOKS={
   excursionista:{id:'cliente1',skin:'#e8b088',hair:'#5a3a24',style:'short',shirt:'#4a8ad0',pants:'#5a5a64'},
   turista:{id:'cliente3',skin:'#f0d0b8',hair:'#c48a3a',style:'cap',hat:'#e8d8a0',hat2:'#c8b880',shirt:'#40a0a0',pants:'#c8b080'},
   obrero:{id:'cliente2',skin:'#d49a74',hair:'#1a1a1a',style:'short',shirt:'#f08a40',shirt2:'#6a6a70',pants:'#3a3a44'},
+  // los sitios con función (1.14): también con el arte de una familia de clientes (o el de Patxi, el molinero)
+  ane:{id:'cliente4',skin:'#f0c0a0',hair:'#2a1a14',style:'long',shirt:'#5ab868',pants:'#3a3a44'},
+  nerea:{id:'cliente5',skin:'#e8b088',hair:'#8a2a1a',style:'bun',shirt:'#e0b84a',pants:'#24346a'},
+  bixente:{id:'cliente6',skin:'#d49a74',hair:'#5a3a24',style:'short',beard:1,shirt:'#7a5a3a',pants:'#3a3a44'},
+  andoni:{id:'oldman',skin:'#e8b894',hair:'#d8d8d8',style:'bald',beard:'#d8d8d8',shirt:'#b8a070',pants:'#5a5048'},
+  ibarbitarra:{id:'cliente1',skin:'#f0d0b8',hair:'#1a1a1a',style:'short',shirt:'#3a3a48',pants:'#2a2a30',glasses:1},
   judge:{id:'judge',skin:'#f0c4a0',hair:'#6a4a2a',style:'short',shirt:'#3a3a48',shirt2:'#c0a040',pants:'#2a2a34',glasses:1},
 };
 const SKINS=['#f6c8a0','#e8b088','#d49a74','#b07850','#8a5a3a','#f0d0b8'];

@@ -66,7 +66,7 @@ const NPCDEF=[
   {id:'vecina',map:'mendialde',x:22,y:21,wander:1,look:'vecina',talk:()=>say(pick(['En Mendialde el autobús para en la plaza. El último sale a las nueve.','Tu ama dice que en la ciudad no comes. Llévate el táper.','Aquí el maíz se siembra en mayo y se recoge en octubre. Como toda la vida.']),'VECINA')},
   {id:'excursionista',map:'errotabarri',x:14,y:14,wander:2,look:'excursionista',talk:()=>say(pick(['El molino tiene trescientos años. Todavía muele algún domingo.','Del puente para arriba, el río baja limpio. Para abajo, ya no tanto.','Vengo en el autobús de Ribera Verde: treinta minutos y tres euros.']),'EXCURSIONISTA')},
   {id:'turista',map:'puerto',x:14,y:11,wander:2,look:'turista',talk:()=>say(pick(['Las casas son de colores para que cada pescador viera la suya desde el mar.','Dicen que en este puerto se paga bien... y que la policía mira poco.','He venido a por anchoas y me han ofrecido de todo.']),'TURISTA')},
-  {id:'obrero',map:'valdehierro',x:28,y:14,wander:1,look:'obrero',talk:()=>say(pick(['La fundición cerró hace años. Ahora el solar no es de nadie.','Aquí la gente cobra poco y paga poco. Y de noche, cuidado con la cartera.','De Valdehierro a Ribera Verde, veinte minutos de autobús.']),'OBRERO')},
+  {id:'obrero',map:'valdehierro',x:28,y:14,wander:1,look:'obrero',talk:()=>say(pick(['La fundición cerró hace años. Ahora el solar es del chatarrero.','Aquí la gente cobra poco y paga poco. Y de noche, cuidado con la cartera.','De Valdehierro a Ribera Verde, veinte minutos de autobús.']),'OBRERO')},
 ];
 function mkEnt(d){return{id:d.id,x:d.x,y:d.y,px:d.x*16,py:d.y*16,hx:d.x,hy:d.y,dir:d.dir||'down',look:d.lookObj||LOOKS[d.look],def:d,wander:d.wander||0,wt:800+Math.random()*2400,moving:false,t:0,fx:d.x,fy:d.y};}
 function buildEnts(){
@@ -75,6 +75,10 @@ function buildEnts(){
   for(const c of S.clients)if((c.map||'town')===S.map){const o=old[c.id];ents.push(o||mkEnt({id:c.id,x:c.x,y:c.y,wander:2,lookObj:c.look,client:c}));}
   for(const e of Object.values(old))if(e.pat&&e.mapa===S.map)ents.push(e);ponPatrullas();   // las patrullas (10b-patrulla)
 }
+// los sitios con función (1.14, 11d-comarca): la tienda de la ciudad, la lonja, la chatarrería y el molino
+NPCDEF.push({id:'ane',map:'growcity',x:4,y:2,look:'ane',talk:()=>talkAne()},{id:'nerea',map:'puerto',x:23,y:17,dir:'down',look:'nerea',talk:()=>talkNerea()},
+  {id:'bixente',map:'valdehierro',x:30,y:15,dir:'down',look:'bixente',talk:()=>talkBixente()},{id:'andoni',map:'errotabarri',x:24,y:19,dir:'down',look:'andoni',talk:()=>talkAndoni()},
+  {id:'ibarbitarra',map:'ensanche',x:22,y:14,wander:2,look:'ibarbitarra',talk:()=>say(pick(['Esto es el Ensanche: pisos, oficinas y el parque. El Casco Viejo, por la avenida.','En Ibarbide hay policía en cada esquina. Y aun así...','Los de los pueblos venís en autobús, ¿no? La estación está en el Casco.']),'VECINO')});
 const ITEMS=[
   {id:'i_spray',map:'town',x:8,y:25,give:async()=>{S.items.spray+=2;await got('2 × SPRAY DE PIMIENTA');}},
   {id:'i_fert',map:'town',x:36,y:24,give:async()=>{S.items.fert+=3;await got('3 dosis de ABONO');}},
@@ -165,8 +169,11 @@ const SIGNS={'town:9,8':'Calle Ribera, 3.\nPiso de la tía Maite.','town:13,8':'
   'alto:10,18':'PLAZA DEL ENSANCHE\nUrbanizada en 1964.','alto:22,7':'JARDINES DEL ENSANCHE\nNo pisar el césped.','alto:23,19':'COMISARÍA DE RIBERA\nAtención al público: de 9:00 a 14:00.',
   'astilleros:15,13':'ALMACÉN 3\nPropiedad privada. Prohibido el paso.','astilleros:2,18':'ASTILLEROS DE RIBERA\nCerrados desde 1992.',
   'mendialde:2,19':'MENDIALDE\nCaseríos, huertas y la parada del autobús.','puerto:2,9':'PUERTO VIEJO\nCofradía de pescadores desde 1890.',
-  'valdehierro:2,8':'VALDEHIERRO\nCiudad del hierro desde 1911.','valdehierro:27,12':'SOLAR DE LA FUNDICIÓN\nPropiedad privada. Prohibido el paso.',
-  'errotabarri:2,10':'ERROTABARRI\nEl pueblo del molino.','errotabarri:26,18':'ERROTA ZAHARRA\nMolino harinero del siglo XVIII.'};
+  'valdehierro:2,8':'VALDEHIERRO\nCiudad del hierro desde 1911.','valdehierro:27,12':'CHATARRERÍA DEL SOLAR\nCompro y vendo. Material de segunda mano.',
+  'errotabarri:2,10':'ERROTABARRI\nEl pueblo del molino.','errotabarri:26,18':'ERROTA ZAHARRA\nMolino harinero del siglo XVIII. Semillas viejas: pregunta por Andoni.',
+  'puerto:25,15':'LONJA DE PUERTO VIEJO\nSubasta de madrugada. Cargas para los barcos de fuera.',
+  'ibarbide:13,9':'GROW IBARBIDE\nTodo para el cultivo, a precio de ciudad.','ibarbide:12,19':'PLAZA NUEVA\nCasco Viejo de Ibarbide.','ibarbide:41,20':'ENSANCHE →\nAvenida de la Estación.',
+  'ensanche:2,12':'IBARBIDE · ENSANCHE\n← Casco Viejo y estación de autobuses.'};
 async function objectAction(x,y){
   const m=MAPS[S.map],o=m.o[y]&&m.o[y][x];
   if(S.map==='home'){
@@ -228,7 +235,7 @@ async function paradaAction(){
     await fade(1);advanceTime((BUS_HORAS[0]-S.min+1440)%1440);buildEnts();updateHUD();await wait(300);await fade(0);
     await say('Las siete. Llega el primer autobús, medio vacío.');
   }
-  const ama=S.flags.llegada===false,ds=ama?['town']:Object.keys(PARADAS).filter(k=>k!==aqui);
+  const ama=S.flags.llegada===false,ds=ama?['town']:Object.keys(PARADAS).filter(k=>k!==aqui&&S.ch>=PARADAS[k].cap);   // las líneas, por capítulos (1.14)
   const i=await menu(ds.map(k=>{const v=viaje(aqui,k);return{label:PARADAS[k].n,right:ama?'billete de ama':`${eur(v.eur)} · ${v.min} min`};}).concat([{label:'Nada'}]),{cls:'right',title:'¿A dónde vas?'});
   if(i<0||i>=ds.length)return;
   const k=ds[i],v=viaje(aqui,k);

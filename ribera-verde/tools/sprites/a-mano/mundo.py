@@ -938,6 +938,191 @@ SPRITES['marinera-var'] = lambda: [guarda_edificio('edificio-marinera5', mariner
 SPRITES['manzano'] = lambda: sale(manzano(), 'prop-manzano', 'manzano')
 SPRITES['arbol2'] = lambda: sale(arbol2(), 'prop-arbol-alto2', 'tree2')
 
+# ---------------------------------------------------------------------------------------------------- Ibarbide (1.14)
+# La ciudad grande: en el Casco Viejo, casas estrechas de tres tamaños con la planta baja de piedra (lonja con arco o portal),
+# el revoque de un color apagado y miradores de madera blancos; el growshop grande, con escaparates y su rótulo; en el
+# Ensanche, bloques de pisos de seis alturas con azotea, terrazas y locales con toldo
+CASCOS = {'casco': ('#c89a52', '#a87c3e', '#6a4a24'), 'casco2': ('#7a96a4', '#5e7a88', '#3a4e5a'), 'casco3': ('#c07a5e', '#a05e46', '#5e3424')}
+PIEDRA = ('#b8b0a0', '#7c7468', '#d8d2c4')
+MADERA = ('#5a3a24', '#7a5232')
+LETRAS_MAS = {'G': '111100101101111', 'R': '110101110101101', 'W': '1000110001101011010101010', 'B': '110101110101110', 'E': '111100110100111'}
+
+
+def mirador(lz, x, y, w, h, c):
+    """mirador de madera pintado de blanco: caja acristalada en voladizo, peana y tejadillo"""
+    BL, BLS, CR, CRL = '#f4f4ee', '#c8ccd0', '#2e3c4c', '#6f9fc4'
+    lz.r(x - 1, y - 2, w + 2, 2, c[2])                          # tejadillo
+    lz.caja(x, y, w, h, CR, BL)
+    for xx in range(x + 1, x + w - 1, 6):
+        lz.vl(xx + 5, y + 1, y + h - 2, BL)
+    lz.hl(x + 1, x + w - 2, y + h // 2, BL)
+    lz.p(x + 2, y + 2, CRL); lz.p(x + 3, y + 2, CRL); lz.p(x + 2, y + 3, CRL)
+    lz.r(x - 1, y + h, w + 2, 2, BLS); lz.hl(x, x + w - 1, y + h + 2, c[2])   # peana y su sombra
+
+
+def casco(k, ancho, alto, sem):
+    """casa del Casco Viejo (ancho × alto casillas): tejado de teja, alero de madera con canecillos, revoque del color k, un
+    piso (o dos, si es alta) con balcón de hierro o mirador, y la planta baja de piedra con la lonja en arco (no se entra)"""
+    W, H = ancho * 16, alto * 16
+    lz = Lienzo(W, H)
+    C0, C1, C2 = CASCOS[k]
+    BL, BLS, CR, CRL = '#f4f4ee', '#c8ccd0', '#2e3c4c', '#6f9fc4'
+    tejas(lz, 0, 0, W, 22, TEJA, alto=4, paso=6, sem=sem)
+    lz.r(0, 22, W, 3, MADERA[0])
+    for x in range(2, W, 5):
+        lz.p(x, 25, MADERA[1])                                       # canecillos
+    lz.r(0, 25, W, H - 57, C0)
+    R = azar(sem + 3)
+    for _ in range(W * H // 120):
+        lz.p(int(R() * W), 26 + int(R() * (H - 60)), C1)
+    lz.hl(0, W - 1, 25, C2)
+    lz.r(0, 25, 2, H - 25, PIEDRA[1])                                # medianera
+    pisos = 2 if alto >= 7 else 1
+    cx = W // 2
+    for p in range(pisos):
+        y = 30 + p * 27
+        if ancho >= 5 and p == 0:                                    # el mirador, en el primero de la alta
+            mirador(lz, cx - 13, y + 1, 26, 19, (BL, BLS, C2))
+            for x in (5, W - 14):
+                lz.r(x - 1, y + 3, 11, 16, PIEDRA[2]); ventana(lz, x, y + 4, 9, 13, C2, CR, CRL, C1)
+            continue
+        vs = (cx - 6,) if ancho == 3 else (8, W - 20) if ancho == 4 else (8, cx - 6, W - 20)
+        for x in vs:
+            lz.r(x - 2, y, 16, 22, PIEDRA[2])                         # recercado de piedra
+            ventana(lz, x, y + 2, 12, 18, C2, CR, CRL, C1, cruz=False)
+            lz.vl(x + 6, y + 3, y + 18, C2)
+        x0, x1 = vs[0] - 4, vs[-1] + 15                              # balcón corrido de hierro
+        lz.r(x0, y + 20, x1 - x0 + 1, 2, MADERA[0]); lz.hl(x0, x1, y + 14, '#26262e')
+        for x in range(x0, x1 + 1, 3):
+            lz.vl(x, y + 15, y + 19, '#26262e')
+        lz.p(x0 + 2, y + 13, '#e04848'); lz.p(x1 - 2, y + 13, '#e04848'); lz.p(x0 + 3, y + 12, '#5ab868')
+    # planta baja de piedra: la lonja en arco de medio punto (escaparate) y, si cabe, el portal
+    sillar(lz, 0, H - 32, W, 32, PIEDRA, bw=10, bh=5, sem=sem + 9)
+    lz.hl(0, W - 1, H - 32, PIEDRA[1])
+    ax = 4 if ancho >= 4 else cx - 10
+    for y in range(H - 28, H):
+        for x in range(ax, ax + 20):
+            dx = x + .5 - (ax + 10)
+            if y < H - 20 and dx * dx + (y - (H - 20)) ** 2 > 10 * 10:
+                continue
+            lz.p(x, y, PIEDRA[2] if abs(dx) > 8 or y < H - 26 else CR)
+    lz.r(ax + 3, H - 18, 14, 1, C2); lz.p(ax + 5, H - 21, CRL); lz.p(ax + 6, H - 21, CRL)
+    lz.r(ax + 4, H - 12, 12, 2, '#5ab868' if k != 'casco2' else '#e0b84a')   # género en el escaparate
+    if ancho >= 4:                                                   # portal de madera
+        px = W - 16
+        lz.r(px - 2, H - 27, 14, 27, PIEDRA[2])
+        lz.r(px, H - 25, 10, 25, MADERA[0]); lz.vl(px + 5, H - 24, H - 1, MADERA[1]); lz.p(px + 7, H - 12, '#e0b040')
+    lz.r(0, H - 3, W, 3, PIEDRA[1])
+    return lz
+
+
+def growcity():
+    """GROW IBARBIDE (6 × 6): un piso del Casco Viejo con dos balcones y, abajo, el local: rótulo verde con letras propias,
+    escaparates con plantas bajo la luz y puerta doble de cristal en las casillas 2-3 (recorte en x 32, y 64)"""
+    lz = Lienzo(96, 96)
+    C0, C1, C2 = '#e8dcc0', '#d0c2a2', '#6a5a3a'
+    BL, CR, CRL = '#f4f4ee', '#2e3c4c', '#6f9fc4'
+    VER, VERL, VERS = '#2f8a4a', '#5ab868', '#1f5a30'
+    tejas(lz, 0, 0, 96, 22, TEJA, alto=4, paso=6, sem=41)
+    lz.r(0, 22, 96, 3, MADERA[0])
+    for x in range(2, 96, 5):
+        lz.p(x, 25, MADERA[1])
+    lz.r(0, 25, 96, 31, C0)
+    R = azar(43)
+    for _ in range(60):
+        lz.p(int(R() * 96), 26 + int(R() * 28), C1)
+    lz.hl(0, 95, 25, C2)
+    for x in (10, 38, 66):
+        lz.r(x - 2, 29, 24, 24, PIEDRA[2])
+        ventana(lz, x, 31, 20, 18, C2, CR, CRL, C1, cruz=False); lz.vl(x + 10, 32, 47, C2)
+        lz.r(x - 4, 49, 28, 2, MADERA[0]); lz.hl(x - 4, x + 23, 43, '#26262e')
+        for xx in range(x - 4, x + 24, 3):
+            lz.vl(xx, 44, 48, '#26262e')
+        lz.p(x - 1, 42, VERL); lz.p(x, 41, VERL); lz.p(x + 20, 42, VERL)
+    lz.r(0, 56, 96, 40, '#3a3a40')                                   # el local
+    lz.caja(2, 57, 92, 9, VER, VERS); lz.hl(3, 92, 58, VERL)         # rótulo
+    x = 25
+    for ch in 'GROW IBARBIDE':
+        if ch == ' ':
+            x += 3
+            continue
+        m = LETRAS_MAS.get(ch)
+        if m is None:
+            F = {'I': '111010010010111', 'A': '111101111101101', 'D': '110101101101110', 'O': '111101101101111'}
+            m = F[ch]
+        an = len(m) // 5
+        for j in range(5):
+            for i in range(an):
+                if m[j * an + i] == '1':
+                    lz.p(x + i, 59 + j, BL)
+        x += an + 1
+    for x0 in (4, 62):                                               # escaparates con plantas
+        lz.caja(x0, 68, 30, 24, '#1e2a24', '#c8ccd0')
+        lz.r(x0 + 1, 69, 28, 3, '#f0e8a0')                            # la luz de arriba
+        for i, px in enumerate(range(x0 + 4, x0 + 28, 8)):
+            lz.r(px, 86, 5, 5, '#6a4a2a')                             # maceta
+            for j in range(9):
+                lz.p(px + 2 + (j % 3) - 1, 85 - j, VERL if j % 2 else VER)
+            lz.p(px, 80, VER); lz.p(px + 4, 79, VER); lz.p(px - 1, 82, VERL); lz.p(px + 5, 82, VERL)
+        lz.p(x0 + 2, 70, BL); lz.p(x0 + 3, 70, BL)
+    lz.caja(36, 68, 24, 28, '#8cc8e4', '#c8ccd0')                    # puerta doble de cristal
+    lz.r(37, 69, 22, 27, '#5a8aa4'); lz.vl(48, 69, 95, '#c8ccd0'); lz.p(39, 71, BL); lz.p(40, 71, BL); lz.p(39, 72, BL)
+    lz.vl(46, 80, 84, '#26262e'); lz.vl(50, 80, 84, '#26262e')
+    lz.r(0, 93, 96, 3, PIEDRA[1])
+    return lz, puertas(lz, 32, 64, (5, 5, 22, 27), 'doble')
+
+
+BLOQUES = {'bloque': ('#e6dcc8', '#cfc3ac', '#9c907a', '#c04848'), 'bloque2': ('#b8bcc0', '#9a9ea4', '#6a6e74', '#3c6eb4')}
+
+
+def bloque(k):
+    """bloque de pisos del Ensanche (8 × 7): azotea (grava, casetón, antenas y el aparato del aire), pretil, tres plantas de
+    ventanas con terraza y barandilla de cristal, y los locales con su toldo de rayas"""
+    lz = Lienzo(128, 112)
+    C0, C1, C2, TOL = BLOQUES[k]
+    HOR, HORL, MAR = '#9a9690', '#bab6ae', '#2a2624'
+    ALU, CR, CRL = '#c8ccd0', '#34404c', '#6f9fc4'
+    R = azar(83 + len(k))
+    lz.r(0, 0, 128, 26, HOR)
+    for _ in range(360):
+        lz.p(int(R() * 128), int(R() * 26), HORL if R() < .5 else C2)
+    lz.caja(84, 3, 26, 16, HOR, MAR); lz.r(85, 4, 24, 3, HORL)
+    lz.caja(12, 6, 14, 10, ALU, MAR); lz.hl(14, 23, 9, C2)             # aparato del aire
+    for x in (44, 58):
+        lz.vl(x, 2, 14, MAR); lz.hl(x - 3, x + 3, 5, MAR); lz.hl(x - 2, x + 2, 9, MAR)
+    lz.r(0, 22, 128, 4, HORL); lz.hl(0, 127, 25, MAR)
+    lz.r(0, 26, 128, 2, C2)
+    lz.r(0, 28, 128, 54, C0)
+    for y in (46, 64):
+        lz.hl(0, 127, y, C1)                                          # forjados
+    for p in range(3):
+        y = 30 + p * 18
+        for i, x in enumerate((6, 38, 70, 102)):
+            ventana(lz, x, y, 20, 12, ALU, CR, CRL, C2, cruz=False)
+            lz.vl(x + 10, y + 1, y + 10, ALU)
+            if (i + p) % 2 == 0:                                      # terraza con barandilla de cristal
+                lz.r(x - 3, y + 12, 26, 2, C2); lz.caja(x - 3, y + 8, 26, 5, CRL, ALU)
+            elif p == 1 and i == 1:                                    # ropa tendida
+                lz.hl(x - 2, x + 21, y + 13, MAR)
+                for xx, c in ((x, '#e04848'), (x + 6, '#f0d070'), (x + 12, '#4a92e0')):
+                    lz.r(xx, y + 14, 4, 3, c)
+    lz.r(0, 82, 128, 30, '#3a3a40')                                   # locales
+    for x0 in (2, 66):
+        for xx in range(x0, x0 + 60):
+            lz.vl(xx, 82, 87, TOL if (xx // 5) % 2 == 0 else '#f4f4ee')  # toldo de rayas
+        lz.hl(x0, x0 + 59, 88, C2)
+        lz.caja(x0 + 4, 92, 30, 18, CR, ALU); lz.p(x0 + 6, 94, CRL); lz.p(x0 + 7, 94, CRL)
+        lz.caja(x0 + 40, 92, 14, 20, '#5a8aa4', ALU); lz.vl(x0 + 47, 93, 111, ALU)
+    lz.r(62, 82, 4, 30, C1)
+    lz.r(0, 109, 128, 3, C2)
+    return lz
+
+
+SPRITES['casco'] = lambda: [guarda_edificio('edificio-casco', casco('casco', 4, 6, 91)), guarda_edificio('edificio-casco2', casco('casco2', 3, 5, 93)),
+                            guarda_edificio('edificio-casco3', casco('casco3', 5, 7, 95))]
+SPRITES['growcity'] = lambda: guarda_edificio('edificio-growcity', *growcity())
+SPRITES['bloque'] = lambda: [guarda_edificio('edificio-' + k, bloque(k)) for k in BLOQUES]
+
 if __name__ == '__main__':
     pedidos = sys.argv[1:] or list(SPRITES)
     for k in pedidos:

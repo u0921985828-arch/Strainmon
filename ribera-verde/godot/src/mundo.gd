@@ -384,6 +384,16 @@ func npc_talk(d: Dictionary) -> void:
 	match d.id:
 		"kiko":
 			await talk_kiko()
+		"ane":
+			await talk_ane()
+		"nerea":
+			await talk_nerea()
+		"bixente":
+			await talk_bixente()
+		"andoni":
+			await talk_andoni()
+		"ibarbitarra":
+			await say(pick(["Esto es el Ensanche: pisos, oficinas y el parque. El Casco Viejo, por la avenida.", "En Ibarbide hay policía en cada esquina. Y aun así...", "Los de los pueblos venís en autobús, ¿no? La estación está en el Casco."]), "VECINO")
 		"josune":
 			await talk_josune()
 		"baltasar":
@@ -418,7 +428,7 @@ func npc_talk(d: Dictionary) -> void:
 		"turista":
 			await say(pick(["Las casas son de colores para que cada pescador viera la suya desde el mar.", "Dicen que en este puerto se paga bien... y que la policía mira poco.", "He venido a por anchoas y me han ofrecido de todo."]), "TURISTA")
 		"obrero":
-			await say(pick(["La fundición cerró hace años. Ahora el solar no es de nadie.", "Aquí la gente cobra poco y paga poco. Y de noche, cuidado con la cartera.", "De Valdehierro a Ribera Verde, veinte minutos de autobús."]), "OBRERO")
+			await say(pick(["La fundición cerró hace años. Ahora el solar es del chatarrero.", "Aquí la gente cobra poco y paga poco. Y de noche, cuidado con la cartera.", "De Valdehierro a Ribera Verde, veinte minutos de autobús."]), "OBRERO")
 
 func mk_ent(d: Dictionary) -> Dictionary:
 	var look = d.get("lookObj")
@@ -876,9 +886,12 @@ func spawn_clients() -> void:
 			zonas.append(["alto", 2 + (1 if S.ch >= 4 else 0), ["pij", "tur"]])
 		var mas := 1 if S.ch >= 4 else 0   # la comarca (1.10)
 		zonas.append_array([["puerto", 2 + mas, ["tur", "tur", "cur", "est"]], ["valdehierro", 2 + mas, ["est", "cur", "cur"]], ["mendialde", 1, ["cur"]], ["errotabarri", 1, ["cur", "tur"]]])
+		if S.ch >= 4:   # la ciudad grande (1.14), con su línea
+			var m5 := 1 if S.ch >= 5 else 0
+			zonas.append_array([["ibarbide", 3 + m5, ["tur", "tur", "pij", "est"]], ["ensanche", 3 + m5, ["pij", "pij", "cur", "est"]]])
 		var usado := {}
 		if S.ch >= 3 and S.items.get("prensa"):
-			for zx in [["town", 2], ["astilleros", 1], ["puerto", 1], ["valdehierro", 1]]:
+			for zx in [["town", 2], ["astilleros", 1], ["puerto", 1], ["valdehierro", 1]] + ([["ibarbide", 1], ["ensanche", 1]] if S.ch >= 4 else []):
 				zonas.append([zx[0], zx[1], ["ext"], "x"])
 		for zz in zonas:
 			var map_: String = zz[0]
@@ -901,7 +914,7 @@ func spawn_clients() -> void:
 				used["%d,%d" % [t[0], t[1]]] = true
 				var type: String = pick(zz[2])
 				var ct: Dictionary = D.CTYPES[type]
-				var id := "c%d_%s%s%d" % [S.day, pre, {"town": "", "alto": "b", "astilleros": "s", "puerto": "p", "valdehierro": "v", "mendialde": "m", "errotabarri": "e"}[map_], i]
+				var id := "c%d_%s%s%d" % [S.day, pre, {"town": "", "alto": "b", "astilleros": "s", "puerto": "p", "valdehierro": "v", "mendialde": "m", "errotabarri": "e", "ibarbide": "i", "ensanche": "n"}[map_], i]
 				var want := ri(int(ct.g[0]), int(ct.g[1]))
 				var mt := 0
 				if type == "pij":
@@ -1333,6 +1346,14 @@ func check_story():
 func revisa_misiones() -> void:
 	pass
 func talk_kiko():
+	pass
+func talk_ane():
+	pass
+func talk_nerea():
+	pass
+func talk_bixente():
+	pass
+func talk_andoni():
 	pass
 func talk_josune():
 	pass
