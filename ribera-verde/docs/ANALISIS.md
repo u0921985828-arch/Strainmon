@@ -11,7 +11,7 @@ La primera versión de este análisis encontró 10 problemas (el resumen de abaj
 Las cifras salen del código de la 1.10. `node tools/analisis-riesgos.js` escribe las tablas generadas con un modelo exacto, que aplica las mismas reglas que el código. Después, el mismo script juega cada caso con las funciones de verdad del juego (`onStepEnd`, `updatePatrullas` y `updatePlayer`, `battle` y `thiefRound`, `copRound`, `newDay` y `raidEvent`, `talkClient`, `talkInaki`, `ventaMayor`, `harvest`, `addBuds` y `talkJurado`), también con la caja llena (`S.caja`). Si alguna cifra no cuadra, para con un error y no escribe nada.
 
 <!-- auto:meta -->
-Generado con `npm run analisis`: 721 cifras comprobadas con el juego (20.000 combates, controles, ventas o trayectos simulados por celda, 100.000 pasos por situación, 5.000 carpas por fila de la Copa y las patrullas fotograma a fotograma). Gramos a 7,60 €/g (precio de calle de una variedad del 18 %), salvo donde se dice.
+Generado con `npm run analisis`: 751 cifras comprobadas con el juego (20.000 combates, controles, ventas o trayectos simulados por celda, 100.000 pasos por situación, 5.000 carpas por fila de la Copa y las patrullas fotograma a fotograma). Gramos a 7,60 €/g (precio de calle de una variedad del 18 %), salvo donde se dice.
 <!-- /auto:meta -->
 
 ## Resumen
@@ -180,13 +180,13 @@ Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo a Iñaki
 Las mismas situaciones en las diez zonas:
 
 <!-- auto:zonas -->
-| Cap. 5 | Ribera Verde (el barrio) | Barrio alto | Astilleros | Puerto Viejo | Valdehierro | Mendialde | Errotabarri |
-|---|---|---|---|---|---|---|---|
-| Ladrón por paso: con gramos, de día | 0,40 % | 0,20 % | 0,80 % | 0,24 % | 0,56 % | < 0,1 % | < 0,1 % |
-| Ladrón por paso: con gramos, de noche | 1,00 % | 0,50 % | 2,00 % | 0,60 % | 1,40 % | 0,10 % | 0,10 % |
-| Ladrón por paso: solo dinero (0 g, ≥ 150 €), de noche | 1,00 % | 0,50 % | 2,00 % | 0,60 % | 1,40 % | 0,10 % | 0,10 % |
-| Agentes de patrulla (de día / de noche) | 1 / 2 | 2 / 2 | 1 / 1 | 1 / 1 | 1 / 1 | 0 / 0 | 0 / 0 |
-| Precio del gramo en la calle | ×1 | ×1 | ×1,2 | ×1,15 | ×0,9 | ×1 | ×1 |
+| Cap. 5 | Ribera Verde (el barrio) | Barrio alto | Astilleros | Puerto Viejo | Valdehierro | Mendialde | Errotabarri | Ibarbide · Casco Viejo | Ibarbide · Ensanche | Ibarbide · Kale Zaharra |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Ladrón por paso: con gramos, de día | 0,40 % | 0,20 % | 0,80 % | 0,24 % | 0,56 % | < 0,1 % | < 0,1 % | 0,32 % | 0,48 % | 0,64 % |
+| Ladrón por paso: con gramos, de noche | 1,00 % | 0,50 % | 2,00 % | 0,60 % | 1,40 % | 0,10 % | 0,10 % | 0,80 % | 1,20 % | 1,60 % |
+| Ladrón por paso: solo dinero (0 g, ≥ 150 €), de noche | 1,00 % | 0,50 % | 2,00 % | 0,60 % | 1,40 % | 0,10 % | 0,10 % | 0,80 % | 1,20 % | 1,60 % |
+| Agentes de patrulla (de día / de noche) | 1 / 2 | 2 / 2 | 1 / 1 | 1 / 1 | 1 / 1 | 0 / 0 | 0 / 0 | 2 / 2 | 2 / 3 | 0 / 0 |
+| Precio del gramo en la calle | ×1 | ×1 | ×1,2 | ×1,15 | ×0,9 | ×1 | ×1 | ×1,3 | ×1,25 | ×1,3 |
 <!-- /auto:zonas -->
 
 El barrio alto es la zona para ir con dinero (la mitad de ladrones), pero con 2 agentes también de día; los astilleros tienen el doble de ladrones y un solo agente, también de noche. En la comarca, Puerto Viejo paga el gramo un 15 % más con menos ladrones que el barrio y un agente; Valdehierro lo paga un 10 % menos y tiene más ladrones; en los pueblos casi no pasa nada (sin agentes, ×0,1 ladrones), pero hay un solo cliente al día (2 en Puerto Viejo y en Valdehierro, 3 desde el capítulo 4).
