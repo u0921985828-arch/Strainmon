@@ -22,7 +22,7 @@ Plantar → cuidar (agua, abono, plagas) y sacar esquejes de las buenas → cose
 - **Escala del cultivo:** una cosecha dura de 2,5 a 5 días de juego, así que **un día de juego son unas 4 semanas de cultivo**. Lo que se cobra por día (la luz) cuenta esas 4 semanas: 392 h de foco (18 h en crecimiento y 12 en floración) y 672 h para lo que va día y noche (ventilador y extractor).
 - **Noche: de 21:00 a 06:00.** Los ladrones aparecen ×2,5, huir de la policía pasa del 45 % al 60 % y suena otra música. El cielo se oscurece entre las 19:00 y las 21:00 y aclara entre las 05:00 y las 07:00, con un tono naranja de 17:30 a 20:30.
 - La vida sube 1 punto cada 30 minutos de juego.
-- **Cama:** «dormir hasta las 7» o «siesta de 3 h». Rellena la vida, guarda la partida y hace pasar el tiempo para las plantas.
+- **Cama:** «dormir hasta las 7» o «siesta de 3 h». Rellena la vida, guarda la partida y hace pasar el tiempo para las plantas. La luz se paga un día entero a medianoche: el aviso de la cama dice solo lo pagado durmiendo.
 - **Inicio:** día 1 a las 08:00, con 150 €, 30 de vida, el armario de 60 con un CFL y 2 macetas de 7 L, y 1 bocata.
 
 ## 4. Cultivo

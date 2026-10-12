@@ -27,7 +27,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
 
   await page.evaluate(() => arteListo());   // si el build lleva atlas, los recortes de mapa/ salen con los tiles ya aprobados
   const data = await page.evaluate(() => {
-    S = newState(); S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'cfl' }]; S.muebles = { sofa: 1, tv: 1, gpc: 1 }; montarCasa();   // el piso con las dos carpas y el salón
+    S = newState(); S.carpas = [{ t: 'p60', foco: 'cfl' }, { t: 'g150', foco: 'cfl' }]; S.muebles = { sofa: 1, tv: 1, gpc: 1, carro: 1 }; montarCasa();   // el piso con las dos carpas, el salón y el carro de esquejes
     const png = c => c.toDataURL('image/png');
     const up = (c, k) => { const [o, x] = mkCanvas(c.width * k, c.height * k); x.drawImage(c, 0, 0, c.width * k, c.height * k); return o; };
     // qué claves de TILES se usan como suelo y cuáles como objeto
@@ -74,7 +74,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
     for (const po of ['i', 's', 'h']) { FASES.forEach((f, st) => { files[`misc/planta-34-${po}-${f}.png`] = png(planta34(po, st, false, '#9bd35a')); });
       files[`misc/planta-34-${po}-muerta.png`] = png(planta34(po, 9, false, '#9bd35a')); }
     for (const k of Object.keys(FOCOS)) files[`misc/foco-34-${k}.png`] = png(foco34(k));
-    for (const k of Object.keys(EXTRAS)) files[`misc/extra-34-${k}.png`] = png(extra34(k));
+    for (const k of Object.keys(EXTRAS)) { const c = extra34(k); if (c) files[`misc/extra-34-${k}.png`] = png(c); }   // el intractor y los filtros de 100/150 (1.11) no tienen dibujo de la vista B
     for (const [k, X, Y] of [['tree', 28, 15], ['lamp', 14, 14], ['fountain', 20, 19]]) {
       const c = region('town', X - 1, Y - 2, 3, 4, (x, y) => x === X && y === Y);
       files[`mapa/${k}.png`] = png(c); files[`mapa/${k}_mascara.png`] = png(mascara(c.width, c.height, [8, 16, 32, 32]));

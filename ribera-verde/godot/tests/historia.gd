@@ -1757,6 +1757,33 @@ func _pasos() -> void:
 		func(): return chk(R.libre and R.online == "sofa,tv,gpc" and R.m == 500 - D.CARRO.p and R.ped == R.d + 1 and R.ya and R.solido and R.n == "0,3,true" and R.l1 == 4
 			and R.dura == 3 and R.pot and R.queda == 2 and R.seca == Datos.js_num(R.d + D.CARRO.dias) and R.redada == 0 and R.vacio
 			and LOG.any(func(l): return l.contains("Kiko te sube el carro de esquejes")), R))
+	step("Cama (1.11): la siesta que no pasa de las 12 no cobra la luz; dormir hasta las 7 pasando la medianoche cobra el día y lo dice", ["Siesta", "Dormir hasta las 7"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.merge({"ch": 5, "map": "home", "money": 5000, "heat": 0, "due": 0, "protect": false, "esquejes": [], "bandejas": [], "muebles": {},
+			"carpas": [{"t": "m100", "foco": "sodio400", "filtro": true, "goteo": true, "dep": 60}], "macetas": ["plastico7", "plastico7", "plastico7", "plastico7"]}, true)
+		J.S.pots = []
+		for q in 4:
+			J.S.pots.append({"sid": "ria", "prog": .2, "water": 100, "health": 100, "fert": false, "pest": false, "f": {"id": 9996, "t": 1, "y": 1, "i": 50}})
+		var to0 = TO
+		TO = []
+		capta = true
+		J.S.min = 600
+		var m: int = J.S.money
+		var d: int = J.S.day
+		await run(J.bed_action)
+		R = {"siesta": TO.back(), "s": m - J.S.money, "s0": J.S.day - d}
+		J.S.min = 23 * 60
+		m = J.S.money
+		d = J.S.day
+		TO = []
+		await run(J.bed_action)
+		R.merge({"d": J.S.day - d, "gasto": m - J.S.money, "t": TO.back(), "luz": J.luz_carpa(0), "min": J.S.min})
+		capta = false
+		TO = to0
+		J.S = S0,
+		func(): return chk(R.siesta == "Has descansado · Partida guardada" and R.s == 0 and R.s0 == 0 and R.d == 1 and R.min == 420 and R.gasto >= R.luz and R.gasto > 0
+			and R.t.begins_with("Has descansado · Luz −" + Datos.eur(R.gasto)), R))
 	step("Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad",
 		["Sacar un lote", "^Hindu", "^10 g", "Guardar todo", "Cerrar", "Bolsa de deporte", "Salir", "Sacar todo", "Cerrar"], func():
 		var S0 = J.S

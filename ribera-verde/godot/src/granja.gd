@@ -589,7 +589,8 @@ func estabilizar(k: String) -> void:
 		await say("Guardas 1 semilla F%d de %s: cultívala para tener más.\n%s para fijarla." % [g + 1, s.n, "Falta una generación" if GE - g - 1 == 1 else "Faltan %d generaciones" % (GE - g - 1)])
 
 # ---------- cama ----------
-# la cama del piso y, desde la 1.10, la de casa de ama (txt): allí no hay robo de Darko ni aviso de plagas (las plantas están en el piso)
+# la cama del piso y, desde la 1.10, la de casa de ama (txt): allí no hay robo de Darko ni aviso de plagas (las plantas están en el piso).
+# El aviso dice solo la luz pagada durmiendo (1.11): la factura es de un día entero, a medianoche (new_day); una siesta que no pasa de las 12, nada
 func bed_action(txt := ""):
 	var piso: bool = S.map == "home"
 	var c: int = await ask(txt if txt else "Tu cama. Todavía huele a la colonia de la tía.", ["Dormir hasta las 7", "Siesta de 3 h", "Nada"])
@@ -598,6 +599,7 @@ func bed_action(txt := ""):
 	await fade(1)
 	var mins := 180 if c == 1 else Cultivo.minutos_cama(S, 0)
 	var antes := []
+	var d0: int = S.day
 	for p in S.pots:
 		antes.append([true if p.pest else false, true if p.get("dead") else false] if p else null)
 	advance_time(mins)
@@ -606,7 +608,7 @@ func bed_action(txt := ""):
 	update_hud()
 	await wait(500)
 	await fade(0)
-	var hoy = S.luz if S.get("luz") and S.luz.d == S.day else null
+	var hoy = S.luz if S.get("luz") and S.day > d0 else null
 	save()
 	toast("Has descansado" + ((" · Luz −" + Datos.eur(hoy.e)) if hoy and hoy.e else "") + ((" · Olor: calor +" + n(hoy.o)) if hoy and hoy.o else "") + " · Partida guardada", 1800)
 	if not piso:

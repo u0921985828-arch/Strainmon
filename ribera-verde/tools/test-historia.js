@@ -560,6 +560,16 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   }, () => R.libre && R.online === 'sofa,tv,gpc' && R.m === 500 - CARRO.p && R.ped === R.d + 1 && R.ya && R.solido && R.n === '0,3,true' && R.l1 === 4
     && R.dura === 3 && R.pot && R.queda === 2 && R.seca === String(R.d + CARRO.dias) && R.redada === 0 && R.vacio
     && LOG.some(l => l.includes('Kiko te sube el carro de esquejes')) || R);
+  await step('Cama (1.11): la siesta que no pasa de las 12 no cobra la luz; dormir hasta las 7 pasando la medianoche cobra el día y lo dice', ['Siesta', 'Dormir hasta las 7'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0));
+    Object.assign(S, { ch: 5, map: 'home', money: 5000, heat: 0, due: 0, protect: false, esquejes: [], bandejas: [], muebles: {}, carpas: [{ t: 'm100', foco: 'sodio400', filtro: true, goteo: true, dep: 60 }], macetas: Array(4).fill('plastico7') });
+    S.pots = [0, 1, 2, 3].map(() => ({ sid: 'ria', prog: .2, water: 100, health: 100, fert: false, pest: false, f: { id: 9996, t: 1, y: 1, i: 50 } }));
+    const T = [], _t = toast; window.toast = (h, ms) => { T.push(h); _t(h, ms); };
+    S.min = 600; let m = S.money, d = S.day; await run(bedAction); window.R = { siesta: T[T.length - 1], s: m - S.money, s0: S.day - d };
+    S.min = 23 * 60; m = S.money; d = S.day; T.length = 0; await run(bedAction);
+    Object.assign(R, { d: S.day - d, gasto: m - S.money, t: T[T.length - 1], luz: luzCarpa(0), min: S.min }); window.toast = _t; S = S0;
+  }, () => R.siesta === 'Has descansado · Partida guardada' && R.s === 0 && R.s0 === 0 && R.d === 1 && R.min === 420 && R.gasto >= R.luz && R.gasto > 0
+    && R.t.startsWith(`Has descansado · Luz −${eur(R.gasto)}`) || R);
   await step('Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad',
     ['Sacar un lote', '^Hindu', '^10 g', 'Guardar todo', 'Cerrar', 'Bolsa de deporte', 'Salir', 'Sacar todo', 'Cerrar'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 5, map: 'home', buds: {}, rosin: {}, arcon: { buds: {}, rosin: {} }, protect: false, caja: null });
