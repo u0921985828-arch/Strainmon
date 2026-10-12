@@ -8,6 +8,9 @@
 # marrón del cuello en la camiseta pasa a rojo oscuro (con el cuello parecía barba). De espaldas no hay cara: se queda como está.
 # En las acciones solo se pega donde la cabeza está derecha y sin nada delante: de frente, los fotogramas de DE_FRENTE (la mano en
 # la nariz, la regadera por encima de la cabeza o la cabeza hacia el móvil se quedan como están); de lado, donde la cabeza de antes casa con la nueva.
+# Los ojos (1.11): de lado, PixelLab los dibujó con el blanco al lado de la pupila (2 × 2, saltones); como la cara A de frente, se
+# quedan en la pupila de 1 × 2 y el blanco pasa a piel (`ojos`: el blanco que toca piel, dentro de lo ancho de la gorra y encima
+# de la camiseta; si la pupila sube hasta la gorra, su píxel de arriba también), también en las acciones de lado donde la cabeza no se cambia y en las de frente de `OJOS_SUR`.
 # El idle era cada fotograma una postura (de lado, el cuerpo encogía 2 px; de espaldas, los pies bajaban): ahora es la de base
 # (base/<dir>/00, de pie, a la altura de andar) respirando, con la cabeza 1 px más abajo en la segunda mitad, también de espaldas.
 # Lee y escribe art/procesado/player (repetirlo da lo mismo); después, node tools/sprites/procesar.js --atlas. Si se vuelve a
@@ -21,7 +24,9 @@ ACCIONES = ('cosechar', 'oler', 'plantar', 'regar', 'telefono', 'vender')
 DIRS = ('south', 'east', 'west')
 PARECIDO = .8   # en las acciones de lado, lo que tiene que casar la cabeza de antes con la nueva (de 0 a 1) para cambiarla
 DE_FRENTE = {'oler': (0, 1, 7), 'regar': (0, 1, 2, 6, 7), 'telefono': (0, 5)}   # las que no salen, todos
+OJOS_SUR = {'telefono': (3,)}   # de frente sin la cabeza nueva (va hacia el móvil), con los ojos blancos
 CAMISETA = {(200, 56, 56), (160, 48, 48)}
+GORRA = {(42, 138, 90), (90, 168, 96)}
 COL = {'A': (24, 14, 30), 'G': (74, 42, 42), 'I': (122, 90, 58), 'F': (232, 184, 148), 'J': (244, 244, 244), 'K': (160, 48, 48)}
 # la cara de frente, de la fila de debajo de la visera a la barbilla (14 de ancho, desde el contorno izquierdo; '.' = transparente)
 CARA = ['AGFFFFFFFFFFGA',
@@ -81,6 +86,20 @@ def pega(f, d, accion=None):
     im.save(f)
     return dx
 
+def ojos(f):   # el blanco de los ojos a piel: el que toca piel, dentro de lo ancho de la gorra y encima de la camiseta
+    im = abre(f); s = camiseta(im); F = COL['F'] + (255,)
+    px = lambda x, y: im.getpixel((x, y)) if 0 <= x < im.width and 0 <= y < im.height and im.getpixel((x, y))[3] else None
+    gx = [x for y in range(s) for x in range(im.width) if (px(x, y) or (0,))[:3] in GORRA]
+    blancos = [(x, y) for y in range(s) for x in range(min(gx), max(gx) + 1) if px(x, y) == COL['J'] + (255,)
+               and F in (px(x + 1, y), px(x - 1, y), px(x, y + 1), px(x, y - 1))]
+    for p in blancos: im.putpixel(p, F)
+    A = COL['A'] + (255,)   # la pupila que sube hasta la gorra (3 de alto): la de encima, también a piel
+    for x, y in {(x + k, y) for x, y in blancos for k in (1, -1) if px(x + k, y) == A}:
+        while px(x, y - 1) == A: y -= 1
+        if px(x - 1, y) != A and px(x + 1, y) != A and px(x, y - 1) and px(x, y - 1) != A and y < min(b[1] for b in blancos): im.putpixel((x, y), F)
+    if blancos: im.save(f)
+    return len(blancos)
+
 def respira(d):   # idle: la postura de base (ya con la cabeza nueva) en todos; en la segunda mitad, la cabeza 1 px más abajo (sobre el cuello de la camiseta)
     fs = sorted(glob.glob(os.path.join(RAIZ, 'idle', d, '*.png')))
     im = abre(os.path.join(RAIZ, 'base', d, '00.png')); s = camiseta(im); baja = im.copy()
@@ -95,4 +114,6 @@ for a in ANIMS + ACCIONES:
     for d in DIRS:
         fs = sorted(glob.glob(os.path.join(RAIZ, a, d, '*.png')))
         if fs: print(a, d, [pega(f, d, (a, i) if a in ACCIONES else None) for i, f in enumerate(fs)])
+        if d != 'south': print(' ojos', [ojos(f) for f in fs])
+for a, ii in OJOS_SUR.items(): print(a, 'south ojos', [ojos(os.path.join(RAIZ, a, 'south', '%02d.png' % i)) for i in ii])
 for d in ('north',) + DIRS: respira(d)
