@@ -1008,7 +1008,7 @@ function buildMaps(){
   rect(m,13,19,13,21,(x,y)=>gr(m,x,y,'plaza'));rect(m,27,19,27,20,(x,y)=>gr(m,x,y,'plaza'));rect(m,19,25,21,25,(x,y)=>gr(m,x,y,'plaza'));
   ob(m,20,19,'fountain');[[16,16],[24,16],[16,22],[24,22]].forEach(([x,y])=>ob(m,x,y,'bench'));
   [[14,14],[26,14],[14,24],[26,24]].forEach(([x,y])=>ob(m,x,y,'lamp'));ob(m,17,13,'sign');
-  [17,20,23,26].forEach(x=>ob(m,x,28,'tree'));[[13,18],[12,22],[27,16],[18,27],[25,28],[13,27]].forEach(([x,y])=>gr(m,x,y,'flowers'));
+  [17,20,23,26].forEach(x=>ob(m,x,28,'tree'));[[13,18],[11,20],[27,16],[18,27],[25,28],[13,27]].forEach(([x,y])=>gr(m,x,y,'flowers'));
   // river + docks
   rect(m,30,13,38,13,(x,y)=>ob(m,x,y,'fence'));
   rect(m,31,14,38,28,(x,y)=>gr(m,x,y,'water'));
@@ -1200,12 +1200,12 @@ function buildMaps(){
   // la Kale Zaharra (1.14): detrás del growshop, por el callejón, una plazuela de casas viejas. Sin patrullas (no entran), pero con
   // más ladrones: para vender en la ciudad sin policía. Se sale por el mismo callejón, entre dos casas, abajo
   const cj=newMap('callejon',23,18,'plaza');cj.music='callejon';
-  rect(cj,0,0,22,1,(x,y)=>{gr(cj,x,y,'grass');monte(cj,x,y);});
+  rect(cj,0,0,22,0,(x,y)=>{gr(cj,x,y,'grass');monte(cj,x,y);});
   let cx=1;[['casco3',5,7],['casco',4,6],['casco2',3,5],['casco',4,6],['casco3',5,7]].forEach(([k,w,h])=>{building(cj,k,cx,8-h,w,h,null);
     for(let x=cx;x<cx+w;x++)for(let y=0;y<8-h;y++){gr(cj,x,y,'grass');monte(cj,x,y);}cx+=w;});
   [[1,11,'casco3',5,7],[6,12,'casco',4,6],[12,12,'casco',4,6],[16,11,'casco3',5,7]].forEach(([x,y,k,w,h])=>building(cj,k,x,y,w,h,null));
   rect(cj,6,11,9,11,(x,y)=>gr(cj,x,y,'plaza'));rect(cj,12,11,15,11,(x,y)=>gr(cj,x,y,'plaza'));
-  for(let y=2;y<18;y++)[0,22].forEach(x=>{gr(cj,x,y,'grass');monte(cj,x,y);});for(let y=11;y<18;y++){gr(cj,21,y,'grass');monte(cj,21,y);}
+  for(let y=1;y<18;y++)[0,22].forEach(x=>{gr(cj,x,y,'grass');monte(cj,x,y);});for(let y=11;y<18;y++){gr(cj,21,y,'grass');monte(cj,21,y);}
   // la plazuela: un árbol viejo en su alcorque, bancos, cajas de la frutería, una farola y un arbusto (con algo dentro)
   rect(cj,4,8,6,10,(x,y)=>gr(cj,x,y,'grass'));ob(cj,5,9,'tree2');gr(cj,4,8,'flowers');gr(cj,6,10,'flowers');
   [[9,8],[14,8]].forEach(([x,y])=>ob(cj,x,y,'bench'));[[18,9],[19,9],[19,10]].forEach(([x,y])=>ob(cj,x,y,'crate'));ob(cj,12,10,'lamp');
@@ -1293,8 +1293,8 @@ function computeClientTiles(){
     astilleros:(x,y,g)=>y>=12&&y<=21&&x>=2&&(g==='dirt'||g==='dock')&&!(x>=15&&x<=22&&y<=14),
     puerto:(x,y,g)=>y>=9&&(g==='plaza'||g==='dock'),valdehierro:(x,y,g)=>(y===8||y===11||y>=20)&&(g==='walk'||g==='grass'),
     mendialde:(x,y,g)=>g==='plaza',errotabarri:(x,y,g)=>g==='pista',
-    ibarbide:(x,y,g)=>y>=8&&y<=23&&y!==21&&y!==22&&!(y===8&&x>=14&&x<=17)&&(g==='plaza'||g==='walk'||g==='hormigon')&&!(y===20&&x>=7&&x<=12),ensanche:(x,y,g)=>(y===9||y===12||y>=13)&&(g==='walk'||g==='plaza'||g==='dirt'),
-    callejon:(x,y,g)=>y>=8&&y<=11&&g==='plaza'};   // la ciudad (1.14)
+    ibarbide:(x,y,g)=>y>=8&&y<=23&&y!==21&&y!==22&&!(y===8&&x>=14&&x<=17)&&!(y===8&&x>=19&&x<=20)&&(g==='plaza'||g==='walk'||g==='hormigon')&&!(y===20&&x>=7&&x<=12),ensanche:(x,y,g)=>(y===9||y===12||y>=13)&&(g==='walk'||g==='plaza'||g==='dirt'),
+    callejon:(x,y,g)=>y>=8&&y<=11&&g==='plaza'&&!(y===11&&x>=10&&x<=11)};   // la ciudad (1.14)
   for(const k in zona){const m=MAPS[k],l=CLIENT_TILES[k]=[],tp=tapadas(m),va=aPie(m,entrada(k));
     for(let y=1;y<m.h-1;y++)for(let x=1;x<m.w-1;x++){const g=m.g[y][x];if(zona[k](x,y,g)&&va.has(x+','+y)&&!tp.has(x+','+y)&&!(PARADAS[k]&&PARADAS[k].a[0]===x&&PARADAS[k].a[1]===y))l.push([x,y]);}}   // ni en la casilla donde deja el autobús (1.10)
 }
