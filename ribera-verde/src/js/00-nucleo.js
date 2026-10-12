@@ -1,9 +1,9 @@
 'use strict';
 /* =========================================================
-   RIBERA VERDE — motor gráfico estilo 16-bit portátil (160 px de alto; 240-400 de ancho)
+   LANDRACE HUNTERS (antes Ribera Verde, el barrio) — motor gráfico estilo 16-bit portátil (180 px de alto; 240-450 de ancho)
    Todo el arte es procedural y original.
    ========================================================= */
-const TS=16, SH=160;
+const TS=16, SH=180, SW_MAX=450;   // 180 px de alto (1.12); el ancho, de 240 a SW_MAX
 let SW=240;   // ancho del juego: 06b-pantalla.js lo ajusta al móvil (240-400)
 const $=id=>document.getElementById(id);
 const cv=$('c'), ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;

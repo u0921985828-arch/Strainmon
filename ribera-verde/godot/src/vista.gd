@@ -1,7 +1,7 @@
 # Ribera Verde (Godot) — la vista C de 09b-carpa.js: la carpa por dentro a pantalla completa (imagen A).
 # geo(S, ci) es vcGeo + vistaC: dónde va cada maceta y qué planta, a qué alto. pinta(S, VC, now) dibuja como renderCarpaC:
 # fondo negro, pared, macetas y plantas (las de delante de la fila elegida en transparencia), la luz del foco en «overlay»
-# (shader sobre lo ya pintado), la campana y el cursor. Todo en px del juego: el nodo va en un SubViewport de 160 de alto.
+# (shader sobre lo ya pintado), la campana y el cursor. Todo en px del juego: el nodo va en el SubViewport de SH de alto, con la escena abajo (pinta: alto).
 # Encima de cada planta, su barra de agua y de cosecha con el aviso de plaga, y los daños de la plaga pintados sobre sus
 # hojas (como el HTML desde la 1.10: barras, posCursor, vcBarra y vcDano de 09b-carpa.js).
 extends Node2D
@@ -45,6 +45,7 @@ var VC: Dictionary
 var g: Dictionary
 var now := 0.0
 var sw := 240
+var sh := 160   # el alto del lienzo (180 en el juego): la escena va abajo
 
 func _init() -> void:
 	for n in [base, luz, encima]:
@@ -372,15 +373,16 @@ static func fila_sel(g_: Dictionary, sel: int) -> int:
 			return q.fila
 	return 0
 
-func pinta(S_: Dictionary, VC_: Dictionary, now_: float, ancho := 240) -> void:
+func pinta(S_: Dictionary, VC_: Dictionary, now_: float, ancho := 240, alto := 160) -> void:
 	S = S_
 	VC = VC_
 	now = now_
 	sw = ancho
+	sh = alto
 	g = geo(S, VC.ci)
 	var ox := (sw - 240) >> 1
 	for n in [base, luz, encima]:
-		n.position = Vector2(ox, 0)
+		n.position = Vector2(ox, sh - 160)
 	var on := Cultivo.plantas_vivas(S, VC.ci)
 	luz.visible = on and g.vc != null
 	if luz.visible:
@@ -391,7 +393,7 @@ func pinta(S_: Dictionary, VC_: Dictionary, now_: float, ancho := 240) -> void:
 
 func _pinta_base() -> void:
 	var ox := (sw - 240) >> 1
-	base.draw_rect(Rect2(-ox, 0, sw, 160), Color.BLACK)
+	base.draw_rect(Rect2(-ox, 160 - sh, sw, sh), Color.BLACK)
 	if g.is_empty() or g.vc == null:
 		return
 	base.draw_texture(Arte.tex("pared|" + g.c.t, Arte.fondo(g.c.t, g.vc, "pared")), Vector2.ZERO)

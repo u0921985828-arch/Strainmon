@@ -262,7 +262,7 @@ func danos(i: int) -> Array:
 
 # el aviso de arriba, sin pisar la ficha, SONIDO ni START y dentro de la pantalla del juego, con la ventana de cada tamaño;
 # si no hay aviso, el más largo de los que salen al dormir
-const TAMANOS := [Vector2i(1560, 720), Vector2i(2400, 1080), Vector2i(1280, 960), Vector2i(1024, 768), Vector2i(2560, 1600), Vector2i(800, 600)]
+const TAMANOS := [Vector2i(1560, 720), Vector2i(2400, 1080), Vector2i(2520, 1080), Vector2i(1280, 960), Vector2i(1024, 768), Vector2i(2560, 1600), Vector2i(800, 600)]
 func check_aviso(cuando: String) -> void:
 	var era: Vector2i = root.size
 	var txt: String = J.toast_txt.get_parsed_text() if J.toast_box.visible else "Has descansado · Luz −25,00 € · Partida guardada"
@@ -363,7 +363,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.lector.visible, 60)
 	await espera(3)
 	await foto("0b-creditos")
-	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.5.0") \
+	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.6.0") \
 		and J.lector_txt.text.contains("Open Font License") and J.lector_txt.text.contains("FICCIÓN") and J.lector.get_global_rect().encloses(J.lector_sc.get_global_rect()))
 	await pulsa("B")
 	await elige("LICENCIAS")
@@ -711,12 +711,13 @@ func ciclo() -> void:
 	check("una barra encima de cada planta (%d), sin pisarse" % bs.size(), bs.size() == 4 and not pisan)
 	var im: Image = J.sv.get_texture().get_image()
 	var ox: int = (J.SW - 240) >> 1
+	var oy: int = J.SH - 160   # la escena, abajo
 	var pinta := true
 	var fsel := Vista.fila_sel(geo(), J.VC.sel)
 	var claras := 0
 	for b in bs:
 		var x: int = ox + b.r.position.x
-		var y: int = b.r.position.y
+		var y: int = oy + b.r.position.y
 		if b.fila < fsel:
 			claras += 1
 			pinta = pinta and color(im, x + 1, y) != "26262e" and color(im, x + 1, y + 2) != "4a92e0"

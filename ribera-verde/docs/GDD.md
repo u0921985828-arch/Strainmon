@@ -6,7 +6,7 @@ Todas las cifras están sacadas del código de `src/js`. Si cambias un número a
 
 - **Género:** RPG de gestión y cultivo con combates por turnos.
 - **Plataforma:** móvil primero (APK de Android y navegador), en un único archivo HTML; también se juega en tablet y PC. Solo en horizontal: la pantalla del juego llena el móvil con un reborde fino y los mandos flotan encima, fijos (cruceta abajo a la izquierda, A/B abajo a la derecha, SONIDO y START arriba a la derecha). En vertical sale el aviso «Gira el móvil».
-- **Pantalla:** 160 px de alto y de 240 a 400 px de ancho (siempre par), según la proporción del móvil; en tablets más cuadradas que 3:2 se queda en 240 y sobran bandas arriba y abajo. Se escala sin suavizado, con píxeles cuadrados; casillas de 16 px.
+- **Pantalla:** 180 px de alto y de 240 a 450 px de ancho (siempre par), según la proporción del móvil (las escenas de 240 × 160 —título, combate, carpa— van abajo, con el reflejo del fondo arriba); en tablets más cuadradas que 4:3 se queda en 240 y sobran bandas arriba y abajo. Se escala sin suavizado, con píxeles cuadrados; casillas de 16 px.
 - **Letra:** Atkinson Hyperlegible en los textos y Press Start 2P en los títulos.
 - **Público:** adulto (trata de cannabis, venta ilegal y sobornos, con un guion en tono serio).
 - **Objetivo:** pagar los 30.000 € que debía la tía Maite a Don Baltasar en tres plazos y ganar la Copa de Ribera; después, levantar tu imperio (rangos por facturación) y completar la Genoteca.

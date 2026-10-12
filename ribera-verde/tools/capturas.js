@@ -12,7 +12,7 @@ const OUT = process.env.RV_SALIDA ? path.resolve(process.env.RV_SALIDA) : path.j
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
-  const page = await browser.newPage({ viewport: { width: 730, height: 496 }, deviceScaleFactor: 1 });   // pantalla de 240×160 a ×3 exacto (720×480)
+  const page = await browser.newPage({ viewport: { width: 730, height: 556 }, deviceScaleFactor: 1 });   // pantalla de 240×180 a ×3 exacto (720×540)
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.goto('file://' + (process.env.RV_HTML ? path.resolve(process.env.RV_HTML) : path.join(ROOT, 'index.html')));

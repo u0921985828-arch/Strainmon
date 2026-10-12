@@ -1,8 +1,8 @@
 /* =========================================================
    PANTALLA: el juego a pantalla completa, en horizontal, con los mandos flotando encima
    Mide el hueco real (visualViewport, menos los márgenes seguros del notch) y fija:
-   · la resolución del juego: 160 px de alto y el ancho que pida el móvil (SW, de 240 a 400, par), así la imagen llena
-     la pantalla sin deformarse; en tablets más cuadradas que 3:2 se queda en 240 y sobran bandas arriba y abajo;
+   · la resolución del juego: SH (180) px de alto y el ancho que pida el móvil (SW, de 240 a SW_MAX, par), así la imagen
+     llena la pantalla sin deformarse; en tablets más cuadradas que 4:3 se queda en 240 y sobran bandas arriba y abajo;
    · --u (CSS px por píxel del juego), con píxeles enteros si se pierde menos de un 6 % de alto;
    · los mandos en milímetros, donde descansa el pulgar (geoMandos);
    · el escenario de diálogos y menús (--uiw, --us): 240 px del juego centrados; si los mandos lo pisarían, se encoge
@@ -40,9 +40,9 @@ function ajustarPantalla(){
   const rim=Math.round(clamp(Math.min(W,H)*.008,2,5)),w=W-pl-pr-2*rim,h=H-pt-pb-2*rim;
   const girar=$('girar');if(girar)girar.hidden=!(h>w);
   const dpr=window.devicePixelRatio||1;
-  let s=h/160;const k=Math.floor(s*dpr);if(k>=2&&k/dpr>=s*.94)s=k/dpr;
-  let sw=clamp(Math.floor(w/s/2)*2,240,400);if(sw*s>w)s=w/sw;
-  const cw=Math.floor(sw*s),ch=Math.floor(160*s),x=Math.round(pl+rim+(w-cw)/2),y=Math.round(pt+rim+(h-ch)/2);
+  let s=h/SH;const k=Math.floor(s*dpr);if(k>=2&&k/dpr>=s*.94)s=k/dpr;
+  let sw=clamp(Math.floor(w/s/2)*2,240,SW_MAX);if(sw*s>w)s=w/sw;
+  const cw=Math.floor(sw*s),ch=Math.floor(SH*s),x=Math.round(pl+rim+(w-cw)/2),y=Math.round(pt+rim+(h-ch)/2);
   if(SW!==sw){SW=sw;cv.width=sw;ctx.imageSmoothingEnabled=false;}
   const usMin=Math.min(s,Math.max(s*.5,1.3)),G=geoMandos(W,H,pl,pr,pt,pb,120*usMin),us=clamp(G.med/120,usMin,s);
   const set=(n,v)=>el.style.setProperty(n,v+'px');
@@ -53,8 +53,10 @@ function ajustarPantalla(){
   pon('#bStart',G.start);pon('#bMovil',G.movil);pon('#bSound',G.sonido);
   const so=G.sonido,der=x+cw/2+Math.min(cw,Math.round(240*us))/2;
   set('--ut',so[0]<der&&so[1]+so[3]>y?Math.round(so[1]+so[3]-y+G.k*1.5):0);
-  // el rótulo del título (RIBERA VERDE: 212 u de ancho y 3 de sombra) baja si SONIDO le pisa la esquina (--tt, arriba del texto)
-  set('--tt',so[0]<x+cw/2+109*s&&so[1]+so[3]>y+20*s?Math.max(20*s,Math.round(so[1]+so[3]-y+G.k*1.5)):20*s);
+  // el rótulo del título (LANDRACE / HUNTERS en dos líneas: 144 u de ancho con la sombra) baja si SONIDO le pisa la esquina (--tt, arriba del texto, desde ye: la
+  // escena de 240 × 160, abajo)
+  const ye=y+ch-160*s;
+  set('--tt',so[0]<x+cw/2+73*s&&so[1]+so[3]>ye+4*s?Math.max(4*s,Math.round(so[1]+so[3]-ye+G.k*1.5)):4*s);   // arriba del todo: la hoja del fondo, libre
   // caja de vida del jugador en el combate (#bP, abajo a la derecha de la escena, ~46u de alto): a la izquierda de A, B y START si le caen encima
   const er=x+cw/2+120*s,bb=y+ch-49*s;let bpr=6*s;
   for(const r of [G.A,G.B,G.start])if(r[1]<bb+G.k&&r[1]+r[3]>bb-46*s-G.k)bpr=Math.max(bpr,er-r[0]+G.k);

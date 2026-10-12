@@ -169,11 +169,13 @@ function atlasCarpa() {
         pl: g.pl.map(q => ({ i: q.i, col: q.col, fila: q.fila, cx: q.cx, cy: q.cy, cw: q.cw, ch: q.ch, x: q.x, y: q.y, alto: q.alto,
           maceta: q.v.m.n, tierra: q.v.tierra, hp: q.v.hp, esp: q.v.esp ?? null, planta: q.v.p ? q.v.p.n : null,
           foto: q.v.p ? vcAltura(q.v.p.n, q.v.hp)[2] : null, hoja: S.pots[q.i] ? hojaPlanta(S.pots[q.i]) : null, porte: S.pots[q.i] ? portePlanta(S.pots[q.i]) : null })) };
+      // la escena de 240 × 160 (abajo en la pantalla de 180: OY)
+      const recorte = () => { const [c, x] = mkCanvas(240, 160);x.drawImage(cv, OX(), OY(), 240, 160, 0, 0, 240, 160);return c.toDataURL('image/png'); };
       renderCarpaC(g, e.now);
-      o.png[e.k] = cv.toDataURL('image/png');
+      o.png[e.k] = recorte();
       // la misma sin la capa de luz: así se ve si una diferencia viene del «overlay» o de antes
       const vl = vcLuz;vcLuz = () => mkCanvas(240, 160)[0];renderCarpaC(g, e.now);vcLuz = vl;
-      o.png[e.k + '-sinluz'] = cv.toDataURL('image/png');
+      o.png[e.k + '-sinluz'] = recorte();
     }
     // lo que no entra en este oráculo o es solo de pantalla no hace nada: diálogos, animaciones, sonido, avisos, historia, clientes y
     // pedidos del banco (que también tirarían del azar)

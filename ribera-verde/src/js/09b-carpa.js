@@ -248,7 +248,7 @@ const pintaRects=o=>{for(const [x,y,w,h,k] of o){ctx.fillStyle=k;ctx.fillRect(x,
 function renderCarpaC(g,now){
   const {c,vc}=g,on=plantasVivas(VC.ci),xr=vc.xl+vc.w;
   ctx.fillStyle='#000';ctx.fillRect(0,0,SW,SH);
-  ctx.save();ctx.translate(OX(),0);
+  ctx.save();ctx.translate(OX(),OY());
   ctx.drawImage(vcFondo(c.t,vc,'pared'),0,0);
   pintaRects(vcTemp(g.tx,g.ty,cicloDe(c),on));
   // el filtro de carbón, colgado del techo arriba a la izquierda (el extractor tiembla 1 px), y el ventilador de pinza en el poste del
@@ -468,7 +468,7 @@ function renderCarpa(now,soloB){
   const g=vcGeo(VC.ci,soloB),{c,P,W,H,D}=g,F=FOCOS[c.foco],on=plantasVivas(VC.ci);
   if(g.vc)return renderCarpaC(g,now);
   fondoAncho(cuarto34());
-  ctx.save();ctx.translate(OX(),0);
+  ctx.save();ctx.translate(OX(),OY());
   // el depósito del goteo, fuera de la carpa: en 3/4, al pie de la pared y detrás; de frente, a su lado y con el tubo por la puerta
   // (de su tamaño real: su capacidad, goteoL), con el nivel del agua que le queda en un tubo transparente de delante; la manguera
   // sale a 40 cm del suelo y entra por la pared derecha, donde baja al suelo (lineasGoteo: los ramales y los microtubos)

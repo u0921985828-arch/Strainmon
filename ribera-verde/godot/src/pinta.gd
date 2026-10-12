@@ -1,4 +1,4 @@
-# Ribera Verde (Godot) — 14-render y lo que dibuja 01b-arte: el lienzo de SW × 160 según el modo, como render(now) del HTML.
+# Ribera Verde (Godot) — 14-render y lo que dibuja 01b-arte: el lienzo de SW × SH (180) según el modo, como render(now) del HTML.
 # Mundo (renderWorld: casillas, orillas, objetos, edificios, carpas del piso, personajes con su sombra, objetos del suelo, palomas y
 # gaviotas, efectos, bocadillos, la tarde, la noche y las farolas), combate (renderBattle), título e intro (renderTitle) y la
 # carpa: la vista B (renderCarpa: el cuarto, la carpa en 3/4, extras, el cono de luz, macetas y plantas, el foco, barras y
@@ -16,7 +16,7 @@ const Procedural = preload("res://src/procedural.gd")
 const Vista = preload("res://src/vista.gd")
 const Arte = preload("res://src/arte.gd")
 
-const SH := 160
+const SH := 180   # 1.12 (ui.gd); las escenas de 240 × 160 van abajo: OY
 const DIR4 := {"down": "south", "up": "north", "left": "west", "right": "east"}
 const TRANS := {"water": "agua", "dirt": "tierra", "plaza": "plaza", "pista": "tierra"}
 const HIERBA := ["grass", "flowers", "tallgrass"]
@@ -70,7 +70,7 @@ func redibuja(t: float) -> void:
 		if g.vc:
 			modo = "carpaC"
 			vc.visible = true
-			vc.pinta(J.S, J.VC, now, J.SW)
+			vc.pinta(J.S, J.VC, now, J.SW, SH)
 	elif modo == "world":
 		cam = camara()
 	c0.queue_redraw()
@@ -90,13 +90,16 @@ func _capa(ci: CanvasItem, n: int) -> void:
 	elif modo == "carpa":
 		[_carpa_fondo, _cono, _carpa_encima][n].call()
 	elif modo == "carpaC" and n == 2:
-		L.draw_set_transform(Vector2(OX(), 0))
+		L.draw_set_transform(Vector2(OX(), OY()))
 		_vfx({"x": 0, "y": 0}, "home")
 	L.draw_set_transform(Vector2.ZERO)
 
 # ---------- utilidades de dibujo ----------
 func OX() -> int:
 	return (J.SW - 240) >> 1
+
+func OY() -> int:
+	return SH - 160
 
 static func css(s: String) -> Color:
 	if s.begins_with("#"):
@@ -133,30 +136,34 @@ static func _cubre(cajas: Array, x: int, y: int) -> float:
 					break
 	return n / 16.0
 
-# fondoAncho: la escena de 240 centrada; las bandas de los lados, con el reflejo de los bordes (o la copia, con cortes)
+# fondoAncho: la escena de 240 centrada y abajo; las bandas de los lados, con el reflejo de los bordes (o la copia, con cortes), y
+# la de arriba, con el reflejo de las primeras filas
 func _fondo_ancho(img: Image, cortes = null) -> void:
 	var ox := OX()
-	if not ox:
-		_img(img, 0, 0)
-		return
+	var oy := OY()
 	var key := "fa|%d|%d|%s" % [img.get_instance_id(), J.SW, str(cortes)]
 	if not cache.has(key):
 		var o := Image.create(J.SW, SH, false, Image.FORMAT_RGBA8)
-		o.blit_rect(img, Rect2i(Vector2i.ZERO, img.get_size()), Vector2i(ox, 0))
+		o.blit_rect(img, Rect2i(Vector2i.ZERO, img.get_size()), Vector2i(ox, oy))
 		var esp := img.duplicate()
 		esp.flip_x()
-		for c in (cortes if cortes else [[0, 160, ""]]):
+		for c in ((cortes if cortes else [[0, 160, ""]]) if ox else []):
 			var y0: int = c[0]
 			var h: int = int(c[1]) - y0
 			var lado: String = c[2]
+			var y := y0 + oy
 			if lado != "dch":   # izquierda: las ox columnas de la izquierda, al revés
-				o.blit_rect(esp, Rect2i(240 - ox, y0, ox, h), Vector2i(0, y0))
+				o.blit_rect(esp, Rect2i(240 - ox, y0, ox, h), Vector2i(0, y))
 			if lado != "izq":   # derecha: las de la derecha, al revés
-				o.blit_rect(esp, Rect2i(0, y0, ox, h), Vector2i(J.SW - ox, y0))
+				o.blit_rect(esp, Rect2i(0, y0, ox, h), Vector2i(J.SW - ox, y))
 			if lado == "dch":
-				o.blit_rect(img, Rect2i(240 - ox, y0, ox, h), Vector2i(0, y0))
+				o.blit_rect(img, Rect2i(240 - ox, y0, ox, h), Vector2i(0, y))
 			if lado == "izq":
-				o.blit_rect(img, Rect2i(0, y0, ox, h), Vector2i(240 + ox, y0))
+				o.blit_rect(img, Rect2i(0, y0, ox, h), Vector2i(240 + ox, y))
+		if oy:   # arriba, las primeras oy filas del todo, al revés
+			var b := o.get_region(Rect2i(0, oy, J.SW, oy))
+			b.flip_y()
+			o.blit_rect(b, Rect2i(0, 0, J.SW, oy), Vector2i.ZERO)
 		cache[key] = o
 	_img(cache[key], 0, 0)
 
@@ -196,7 +203,7 @@ func _mundo() -> void:
 	var sombras := []
 	# hasta 6 filas por debajo y 2 casillas a cada lado de la pantalla (1.10, 14-render.js): los objetos altos (el árbol, de 6
 	# filas; el monte, 3 de ancho) se ven aunque su pie esté fuera
-	for ty in range(ty0, ty0 + SH / 16 + 7):
+	for ty in range(ty0, ty0 + ceili(SH / 16.0) + 7):
 		for tx in range(tx0 - 2, tx0 + ceili(J.SW / 16.0) + 3):
 			if tx < 0 or ty < 0 or tx >= m.w or ty >= m.h:
 				continue
@@ -729,7 +736,7 @@ func _combate() -> void:
 	var ff = Atlas.frame_de(fo, "base", "unica", 0, {"i": 0}) if fo else null
 	if ff:
 		_fondo_ancho(ff.c, J.D.CORTES_COMBATE)
-	L.draw_set_transform(Vector2(OX(), 0))
+	L.draw_set_transform(Vector2(OX(), OY()))
 	var k := minf(1, float(B.t) / 700)
 	var e := 1 - pow(1 - k, 3)
 	var ex := Datos.jsround(154 - (1 - e) * 180)
@@ -767,6 +774,7 @@ func _comb_frame(who: String):
 func _titulo() -> void:
 	var t := now / 1000.0
 	var ox := OX()
+	var oy := OY()
 	var gr = Atlas.cubre("misc:hoja-titulo") if Atlas.ok else null
 	var f = Atlas.frame_de(gr, "base", "unica", 0, {"i": 0}) if gr else null
 	if f:
@@ -776,24 +784,24 @@ func _titulo() -> void:
 	for b in [-240, 0, 240]:
 		for y in range(112, 160, 4):
 			var o := sin(t * 1.5 + y) * 6
-			_raya(ox + b + 20 + o + (y * 7) % 60, y, 30, c)
-			_raya(ox + b + 140 - o + (y * 5) % 50, y, 24, c)
+			_raya(ox + b + 20 + o + (y * 7) % 60, y + oy, 30, c)
+			_raya(ox + b + 140 - o + (y * 5) % 50, y + oy, 24, c)
 	if J.mode != "title":
 		_rect(0, 0, J.SW, SH, Color(0, 0, 0, Datos.jsround(.35 * 255) / 255.0))
 		var mk = J.D.get("MASCARAS", {}).get("elipse")
 		var el: Dictionary
-		var o0 := Vector2i(ox + 120, 104)
+		var o0 := Vector2i(ox + 120, 104 + oy)
 		if mk:
 			if not cache.has("el|canvas"):
 				cache["el|canvas"] = _mascara_a(mk)
 			el = cache["el|canvas"]
-			o0 = Vector2i(ox + 84, 95)
+			o0 = Vector2i(ox + 84, 95 + oy)
 		else:
 			el = _elipse(34, 7)
 		var col := css("#2a6a48")
 		for p in el:
 			_rect(o0.x + p.x, o0.y + p.y, 1, 1, Color(col, el[p]))
-		_retrato(J.D.LOOKS.kiko, ox + 120, 104, 2)
+		_retrato(J.D.LOOKS.kiko, ox + 120, 104 + oy, 2)
 
 func _raya(x0: float, y: int, w: float, c: Color) -> void:
 	var x1 := x0 + w
@@ -842,7 +850,7 @@ func _carpa_fondo() -> void:
 	var D: Dictionary = J.D
 	var c: Dictionary = g.c
 	_fondo_ancho(Procedural.cuarto34())
-	L.draw_set_transform(Vector2(OX(), 0))
+	L.draw_set_transform(Vector2(OX(), OY()))
 	if c.get("goteo") and not g.has("plata"):
 		_goteo()
 	if g.has("plata"):
@@ -965,7 +973,7 @@ func _cono() -> void:
 			var al: float = a * (1 - t) * cob[p]
 			o[p] = Color8(Datos.jsround(luz.r8 * al), Datos.jsround(luz.g8 * al), Datos.jsround(luz.b8 * al), 255)
 		cache[key] = o
-	L.draw_set_transform(Vector2(OX(), 0))
+	L.draw_set_transform(Vector2(OX(), OY()))
 	var o: Dictionary = cache[key]
 	for p in o:
 		_rect(p.x, p.y, 1, 1, o[p])
@@ -975,7 +983,7 @@ func _carpa_encima() -> void:
 	var D: Dictionary = J.D
 	var c: Dictionary = g.c
 	var F: Dictionary = D.FOCOS[c.foco]
-	L.draw_set_transform(Vector2(OX(), 0))
+	L.draw_set_transform(Vector2(OX(), OY()))
 	var clip := Rect2i(g.x0, 0, g.w, SH) if g.has("plata") else Rect2i(g.x0 + 1, 0, g.w + g.s - 1, SH)
 	var fsel := Vista.fila_sel(g, J.VC.sel)
 	var pl: Array = g.pl.duplicate()

@@ -1,4 +1,4 @@
-# Ribera Verde en Google Play: ficha y lista de publicación
+# Landrace Hunters en Google Play: ficha y lista de publicación
 
 La app que se publica es la de Godot (`dist/ribera-verde-godot.apk`, `npm run godot:apk`). Lo que pide el juego por dentro está
 en [NORMAS-MOVIL.md](NORMAS-MOVIL.md); aquí va lo que pide la tienda. Los gráficos están en [`play/`](play/).
@@ -7,7 +7,7 @@ en [NORMAS-MOVIL.md](NORMAS-MOVIL.md); aquí va lo que pide la tienda. Los gráf
 
 | Campo | Valor |
 |---|---|
-| Nombre (máx. 30) | Ribera Verde |
+| Nombre (máx. 30) | Landrace Hunters |
 | Paquete | `com.riberaverde.godot` (no se puede cambiar después de la primera subida: si se prefiere otro, cámbialo antes en `godot/export_presets.cfg`) |
 | Descripción corta (máx. 80) | Cultiva, cruza y vende genéticas en un barrio obrero. Pixel art para mayores. |
 | Categoría | Juegos · Simulación |
@@ -36,7 +36,7 @@ en [NORMAS-MOVIL.md](NORMAS-MOVIL.md); aquí va lo que pide la tienda. Los gráf
 > · Pixel art original, hecho a mano · Chiptune propio · Mandos táctiles pensados para jugar en horizontal con los pulgares
 > · Sin conexión, sin anuncios y sin compras · Guardado automático
 >
-> Ribera Verde es una obra de ficción para mayores de 18 años. El cultivo y la venta de cannabis son delito en muchos países: el
+> Landrace Hunters es una obra de ficción para mayores de 18 años. El cultivo y la venta de cannabis son delito en muchos países: el
 > juego no anima a consumir ni a vender.
 
 ## 2. Clasificación de contenido (cuestionario IARC)

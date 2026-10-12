@@ -2,7 +2,7 @@
 /*
   Ribera Verde — pantallas de prueba para el port de Godot (godot/tests/pantallas.gd): el HTML monta cada escena (mapa, hora,
   jugador, personajes con sus acciones, clientes, objetos, efectos, combate, título o carpa en la vista C), la pinta con su
-  render de siempre (renderWorld, renderBattle, renderTitle, renderCarpa) a su ancho (SW de 240 a 400) y guarda:
+  render de siempre (renderWorld, renderBattle, renderTitle, renderCarpa) a su ancho (SW de 240 a 450, 180 de alto) y guarda:
   - tools/salida/godot/html-p-<escena>.png: lo que pinta el HTML;
   - godot/tests/pantallas.json: el estado de cada escena tal cual (S, P, personajes, combate, carpa abierta, efectos y el instante),
     tomado justo antes de pintar, para que Godot pinte lo mismo.
@@ -108,11 +108,12 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
   { k: 'combate-ladron', sw: 240, mode: 'battle', now: T, S: { ch: 3 },
     B: { kind: 'thief', name: 'CHORIZO', look: 'th0.25', t: 400, flashE: 100, shakeP: 200, aP: { n: 'spray', t0: T - 100 } },
     vfx: [['vfx-golpe', 178, 40, 80, '*', false]] },
-  { k: 'combate-policia', sw: 400, mode: 'battle', now: T + 5000, S: { ch: 5 }, B: { kind: 'police', name: 'AGENTE', look: 'cop', t: 900, flashE: 0, shakeP: 0 } },
+  { k: 'combate-policia', sw: 450, mode: 'battle', now: T + 5000, S: { ch: 5 }, B: { kind: 'police', name: 'AGENTE', look: 'cop', t: 900, flashE: 0, shakeP: 0 } },
   { k: 'combate-huida', sw: 320, mode: 'battle', now: T + 60, S: { ch: 4 },
     B: { kind: 'thief', name: 'CHORIZO', look: 'th0.75', t: 5000, flashE: 0, shakeP: 0, gone: true, aE: { n: 'huir', t0: T + 60 - 200 } } },
   { k: 'titulo-240', sw: 240, mode: 'title', now: T },
   { k: 'titulo-400', sw: 400, mode: 'title', now: T + 1717 },
+  { k: 'titulo-450', sw: 450, mode: 'title', now: T + 2900 },
   { k: 'intro-320', sw: 320, mode: 'intro', now: T + 800 }];
 
 (async () => {

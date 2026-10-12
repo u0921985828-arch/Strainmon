@@ -4,7 +4,6 @@
 extends "res://src/ui.gd"
 
 const TS := 16
-const SH := 160
 const DV := {"up": [0, -1], "down": [0, 1], "left": [-1, 0], "right": [1, 0]}
 const OPP := {"up": "down", "down": "up", "left": "right", "right": "left"}
 const COUNTERS := ["counter", "barcounter", "btable"]

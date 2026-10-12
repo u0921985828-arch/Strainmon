@@ -1,5 +1,5 @@
 # Ribera Verde (Godot) — la pantalla, los mandos y la interfaz del HTML (06-controles, 06b-pantalla, 07-interfaz, styles.css):
-# el juego se pinta en un SubViewport de SW × 160 (SW de 240 a 400, como ajustarPantalla) y encima, a la resolución del móvil,
+# el juego se pinta en un SubViewport de SW × SH (SH = 180; SW de 240 a SW_MAX, como ajustarPantalla) y encima, a la resolución del móvil,
 # van el HUD, la escena de 240 (título, cajas del combate y ficha de la carpa), los diálogos, los menús y los avisos (el
 # escenario .ui, que encoge para caber entre los mandos), la carta final, el fundido, la cortinilla y los mandos flotantes.
 # Los guiones son corrutinas: say/ask/menu esperan a una promesa (Motor.Prom) que resuelve el manejador de la pila (push/pop),
@@ -10,6 +10,8 @@ extends Control
 const Datos = preload("res://src/datos.gd")
 const Cultivo = preload("res://src/cultivo.gd")
 const Motor = preload("res://src/motor.gd")
+const SH := 180   # 1.12: alto del juego; el ancho, de 240 a SW_MAX
+const SW_MAX := 450
 const Atlas = preload("res://src/atlas.gd")
 const Sonido = preload("res://src/sonido.gd")
 
@@ -90,7 +92,7 @@ var uiw := 240.0
 var ut := 0.0
 var tt := 0.0
 var bp_r := 0.0   # de la caja de vida del jugador al borde derecho de la escena (--bpr)
-var scr := Rect2(0, 0, 240, 160)
+var scr := Rect2(0, 0, 240, SH)
 var zona_cruz := Rect2()   # zonas de toque de la cruceta y de A/B, y la cruz que se ve
 var zona_ab := Rect2()
 var cruz := Rect2()
@@ -113,7 +115,7 @@ func _ready() -> void:
 	sv.transparent_bg = false
 	sv.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	sv.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
-	sv.size = Vector2i(SW, 160)
+	sv.size = Vector2i(SW, SH)
 	sv.add_child(lienzo)
 	add_child(sv)
 	pantalla.texture = sv.get_texture()
@@ -269,19 +271,19 @@ func ajusta() -> void:
 	var rim := roundf(clampf(minf(V.x, V.y) * .008, 2 * dp, 5 * dp))
 	var w := V.x - zl - zr - 2 * rim
 	var h := V.y - zt - zb - 2 * rim
-	var s := h / 160
+	var s := h / SH
 	var k := floorf(s)
 	if k >= 2 and k >= s * .94:
 		s = k
-	var nsw := clampi(int(floor(w / s / 2)) * 2, 240, 400)
+	var nsw := clampi(int(floor(w / s / 2)) * 2, 240, SW_MAX)
 	if nsw * s > w:
 		s = w / nsw
 	u = s
 	if nsw != SW:
 		SW = nsw
-		sv.size = Vector2i(SW, 160)
+		sv.size = Vector2i(SW, SH)
 	var cw := floorf(SW * s)
-	var ch := floorf(160 * s)
+	var ch := floorf(SH * s)
 	var x := roundf(zl + rim + (w - cw) / 2)
 	var y := roundf(zt + rim + (h - ch) / 2)
 	scr = Rect2(x, y, cw, ch)
@@ -325,8 +327,10 @@ func ajusta() -> void:
 	var so: Rect2 = G.sonido
 	if so.position.x < ux + uiw and so.end.y > y:
 		ut = roundf(so.end.y - y + kp * 1.5)
-	# el rótulo del título (RIBERA VERDE: 212 u de ancho y 3 de sombra) baja si SONIDO le pisa la esquina (--tt en el HTML)
-	tt = maxf(20 * s, roundf(so.end.y - y + kp * 1.5)) if so.position.x < x + cw / 2 + 109 * s and so.end.y > y + 20 * s else 20 * s
+	# el rótulo del título (LANDRACE / HUNTERS en dos líneas: 144 u de ancho con la sombra) baja si SONIDO le pisa la esquina (--tt en el HTML), desde ye: la escena
+	# de 240 × 160, abajo
+	var ye := y + ch - 160 * s
+	tt = maxf(4 * s, roundf(so.end.y - ye + kp * 1.5)) if so.position.x < x + cw / 2 + 73 * s and so.end.y > ye + 4 * s else 4 * s
 	# caja de vida del jugador en el combate (bP, abajo a la derecha de la escena, ~46 u de alto): a la izquierda de A, B y START
 	# si le caen encima (--bpr en el HTML)
 	var er := x + cw / 2 + 120 * s
@@ -339,7 +343,7 @@ func ajusta() -> void:
 	bp_r = roundf(minf(bp_r, 130 * s))
 	for n in [fade_el, wipe, endcard]:
 		_pon(n, scr.position, scr.size)
-	_pon(escena, Vector2(x + cw / 2 - 120 * u, y), Vector2(240 * u, ch))
+	_pon(escena, Vector2(x + cw / 2 - 120 * u, ye), Vector2(240 * u, 160 * u))
 	_pon(titulo, Vector2.ZERO, escena.size)
 	_estilos()
 	if menu_redraw.is_valid():
@@ -1462,15 +1466,17 @@ func _pinta_titulo() -> void:
 	var w := c.size.x
 	var f := display
 	var s1 := roundi(17 * u)
-	var t1 := "RIBERA VERDE"
-	var y := tt + f.get_ascent(s1)
-	var x := (w - f.get_string_size(t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1).x) / 2
-	c.draw_string(f, Vector2(x + 3 * u, y + 3 * u), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#10301c"))
-	c.draw_string(f, Vector2(x + 1.5 * u, y + 1.5 * u), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#2a7a40"))
-	c.draw_string(f, Vector2(x, y), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#ffe680"))
+	var y := tt + f.get_ascent(s1) - 17 * u * 1.05
+	var x := 0.0
+	for t1 in ["LANDRACE", "HUNTERS"]:   # dos líneas (<br> en el HTML)
+		y += 17 * u * 1.05
+		x = (w - f.get_string_size(t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1).x) / 2
+		c.draw_string(f, Vector2(x + 3 * u, y + 3 * u), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#10301c"))
+		c.draw_string(f, Vector2(x + 1.5 * u, y + 1.5 * u), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#2a7a40"))
+		c.draw_string(f, Vector2(x, y), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#ffe680"))
 	var s2 := roundi(10 * u)
 	var t2 := "genética de barrio"
-	y += 17 * u * .15 + 5 * u + f.get_ascent(s2) + 2 * u
+	y += 17 * u * .05 + 5 * u + f.get_ascent(s2) + 2 * u
 	x = (w - f.get_string_size(t2, HORIZONTAL_ALIGNMENT_LEFT, -1, s2).x) / 2
 	c.draw_string(f, Vector2(x + 3 * u, y + 3 * u), t2, HORIZONTAL_ALIGNMENT_LEFT, -1, s2, Color("#10301c"))
 	c.draw_string(f, Vector2(x + 1.5 * u, y + 1.5 * u), t2, HORIZONTAL_ALIGNMENT_LEFT, -1, s2, Color("#2a7a40"))

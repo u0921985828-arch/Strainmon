@@ -165,7 +165,7 @@ func show_title() -> void:
 
 # el aviso de contenido, una vez (se guarda en los ajustes): mayores de 18 o salir
 func aviso_edad() -> void:
-	await say("Ribera Verde es un juego de ficción para mayores de 18 años.", "AVISO")
+	await say("Landrace Hunters es un juego de ficción para mayores de 18 años.", "AVISO")
 	var c: int = await ask("Trata del cultivo y la venta de cannabis, delito en muchos países. No anima a consumir ni a vender.", ["TENGO 18 O MÁS", "SALIR"], "AVISO")
 	if c != 0:
 		get_tree().quit()
@@ -246,7 +246,7 @@ func opciones(desde_titulo := false) -> void:
 			sfx("coin")   # para oír el volumen nuevo
 
 var VERSION: String = ProjectSettings.get_setting("application/config/version", "")
-const CREDITOS := """RIBERA VERDE · genética de barrio
+const CREDITOS := """LANDRACE HUNTERS · genética de barrio
 Versión %s para Android
 
 Un juego de Eddie.
@@ -267,7 +267,7 @@ Ribera Verde, Mendialde, Puerto Viejo, Valdehierro, Errotabarri y sus personajes
 El cultivo y la venta de cannabis son delito en muchos países. Este juego no anima a consumir ni a vender.
 
 Gracias por jugar."""
-const PRIVACIDAD := """Ribera Verde no recoge, no envía y no comparte ningún dato.
+const PRIVACIDAD := """Landrace Hunters no recoge, no envía y no comparte ningún dato.
 
 · No tiene cuentas, anuncios ni compras.
 · No usa internet ni pide permisos.

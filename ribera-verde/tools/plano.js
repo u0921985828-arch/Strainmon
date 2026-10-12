@@ -209,7 +209,7 @@ const REAL = {
       S.carpas = [Object.assign({ t, foco }, ex)]; S.macetas = mac; S.pots = pots.map(p => p && { sid: p[0], prog: p[1], water: 80, health: 100 });
       const px = 16 + i * (240 * VE + 16);
       for (const [cc, xx, b] of [[vc, vx, true], [vcc, vcx, false]]) { VC = { ci: 0, sel: 99, ocupado: true }; renderCarpa(1000, b); VC = null;   // sel 99: sin cursor
-        xx.drawImage(cv, OX(), 0, 240, 160, px, 16, 240 * VE, 160 * VE); texto(xx, `${CARPAS[t].n} · ${FOCOS[foco].n}`, px, 160 * VE + 36, '#e8ecf4', 12); }
+        xx.drawImage(cv, OX(), OY(), 240, 160, px, 16, 240 * VE, 160 * VE); texto(xx, `${CARPAS[t].n} · ${FOCOS[foco].n}`, px, 160 * VE + 36, '#e8ecf4', 12); }
     });
     out.vistaB = vc.toDataURL('image/png'); out.vistaC = vcc.toDataURL('image/png');
     // distancia segura de cada carpa: centros de las macetas (cm), separación mínima entre ellas y a la pared, copa máxima de

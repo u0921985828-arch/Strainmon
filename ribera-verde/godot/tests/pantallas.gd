@@ -1,6 +1,6 @@
 # Ribera Verde (Godot) — C2 de las pantallas: cada escena de godot/tests/pantallas.json (la saca tools/godot-pantallas.js del HTML:
 # el piso, la calle de día, de tarde y la hierba pisada, la tienda, el bar, la vista B de la carpa, la vista C en el lienzo ancho,
-# los combates, el título y la intro) pintada por el juego de verdad (juego.gd → pinta.gd en su SubViewport de SW × 160) y
+# los combates, el título y la intro) pintada por el juego de verdad (juego.gd → pinta.gd en su SubViewport de SW × SH) y
 # comparada píxel a píxel con html-p-<escena>.png.
 # Lo opaco (casillas, sprites, carpas, macetas, plantas, barras, bocadillos) tiene que salir igual. Lo que el canvas mezcla
 # (sombras, la fila de delante en transparencia, la tarde y la noche, el antialias de los trazos, del agua del título, de la elipse
@@ -61,11 +61,11 @@ func _corre() -> void:
 		if ref.get_size() != im.get_size():
 			fallos.append("%s: tamaño %s, HTML %s" % [k, im.get_size(), ref.get_size()])
 			continue
-		var dif := Image.create(im.get_width(), 160, false, Image.FORMAT_RGBA8)
+		var dif := Image.create(im.get_width(), im.get_height(), false, Image.FORMAT_RGBA8)
 		var n := 0
 		var n2 := 0
 		var mx := 0
-		for y in 160:
+		for y in im.get_height():
 			for x in im.get_width():
 				var a := im.get_pixel(x, y)
 				var b := ref.get_pixel(x, y)
@@ -93,7 +93,7 @@ func _corre() -> void:
 # el estado de la escena tal como lo tenía el HTML justo antes de pintar
 func monta(e: Dictionary) -> void:
 	J.SW = int(e.sw)
-	J.sv.size = Vector2i(J.SW, 160)
+	J.sv.size = Vector2i(J.SW, J.SH)
 	J.S = e.S
 	J.B = e.B
 	J.VC = e.VC

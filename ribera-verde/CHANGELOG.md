@@ -1,5 +1,13 @@
 # Cambios
 
+## 1.12.0 · 12 de octubre de 2026
+
+Pantalla más alta, nombre nuevo y personajes sin caras que cambian. Godot, 0.6.0.
+
+- **Cambiado: el juego se llama Landrace Hunters** (título, pestaña, aviso de edad, créditos, privacidad y las dos apps). Ribera Verde sigue siendo el barrio; los paquetes de Android (`com.riberaverde.*`) no cambian, así que la app se actualiza encima y las partidas guardadas se cargan igual. En el título, LANDRACE / HUNTERS en dos líneas, arriba, sin tapar la hoja.
+- **Cambiado: la pantalla, de 160 a 180 px de alto** (`SH`), píxel a píxel, y de 240 a 450 de ancho (`SW_MAX`, hasta 21:9). En la calle y el piso se ven más casillas; el título, la intro, el combate y la carpa (escenas de 240 × 160) van abajo y la franja de arriba es el reflejo de su fondo (en la vista C, negra).
+- **Cambiado: los personajes, por partes** (`tools/sprites/a-mano/npc_cara.py`): la cabeza de cada uno sale de una sola pieza por dirección (la de su postura de base) en el idle y al andar, así la cara ya no cambia en cada fotograma; el idle es la postura de base respirando, sin el «ictus».
+
 ## 1.11.0 · 9 de octubre de 2026
 
 Genética por generaciones, policía por niveles con aviso, accesorios de carpa que cuentan y misiones guiadas para pagar la deuda. Godot, 0.5.0.

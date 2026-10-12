@@ -61,7 +61,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     const { page, errors } = await abrir(html);
     const r0 = await page.evaluate(() => ({ ok: ARTE.ok, n: Object.keys(ARTE.fr).length, esperado: Object.keys(ATLAS.def.frames).length }));
     check('Atlas cargado y recortado', r0.ok && r0.n === r0.esperado && r0.n === N_CALCO, { ...r0, calco: N_CALCO });
-    const titulo = await page.evaluate(() => { const g = ARTE.cubre['misc:hoja-titulo'], m0 = mode; mode = 'title'; renderTitle(performance.now()); const d = ctx.getImageData(0, 0, 1, 1).data, f = frameDe(g, 'base', 'unica', 0, { i: 0 }), e = f.c.getContext('2d').getImageData(0, 0, 1, 1).data; mode = m0; return { g, igual: [0, 1, 2].every(i => d[i] === e[i]) }; });
+    const titulo = await page.evaluate(() => { const g = ARTE.cubre['misc:hoja-titulo'], m0 = mode; mode = 'title'; renderTitle(performance.now()); const d = ctx.getImageData(OX(), OY(), 1, 1).data, f = frameDe(g, 'base', 'unica', 0, { i: 0 }), e = f.c.getContext('2d').getImageData(0, 0, 1, 1).data; mode = m0; return { g, igual: [0, 1, 2].every(i => d[i] === e[i]) }; });
     check('Título: el fondo sale del atlas', titulo.g === 'titulo' && titulo.igual, titulo);
 
     const walk = await page.evaluate(() => {
@@ -469,14 +469,14 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     // pantalla completa en horizontal (1.7): solo el reborde, píxeles cuadrados, mandos flotando dentro del viewport sin tapar el
     // escenario de diálogos y menús en ningún tamaño horizontal, sin scroll; en vertical, el aviso de «Gira el móvil»
     const marco = [];
-    for (const [w, h] of [[568, 320], [640, 360], [740, 360], [844, 390], [915, 412], [1024, 768], [1366, 768], [360, 740], [412, 915]]) {
+    for (const [w, h] of [[568, 320], [640, 360], [740, 360], [844, 390], [915, 412], [960, 412], [1024, 768], [1366, 768], [360, 740], [412, 915]]) {
       await page.setViewportSize({ width: w, height: h }); await page.waitForTimeout(80);
       marco.push(await page.evaluate(([w, h]) => { ajustarPantalla(); const R = q => document.querySelector(q).getBoundingClientRect();
         const s = R('#screen'), u = R('#ui'), d = R('#dpad'), a = R('#ab'), st = R('#bStart'), so = R('#bSound'), gi = document.getElementById('girar'), cz = R('#dpad .cruz'), A = R('#ab [data-k=A]');
         const dentro = b => b.left >= 0 && b.top >= 0 && b.right <= w + .5 && b.bottom <= h + .5, cruza = (p, q) => p.left < q.right && q.left < p.right && p.top < q.bottom && q.top < p.bottom;
         const sinScroll = document.documentElement.scrollHeight <= h && document.documentElement.scrollWidth <= w;
         if (h > w) return { w, h, ok: !gi.hidden && R('#girar').width >= w - 1 && sinScroll, girar: !gi.hidden };
-        const frac = s.width * s.height / (w * h), ancho = w / h >= 1.6, cuadrado = Math.abs(cv.width / 160 - s.width / s.height) < .02;
+        const frac = s.width * s.height / (w * h), ancho = w / h >= 1.6, cuadrado = Math.abs(cv.width / SH - s.width / s.height) < .02;
         const libre = ![d, a, st, so].some(b => cruza(b, u)), mm = 160 / 25.4;
         // mandos en mm (1.10): cruz de 24 mm y A/B de 10,5 si caben (móvil de 740 × 360 o más), y nunca menos que la 1.9 (17,3 y 7,6)
         const talla = w >= 740 && h >= 360 ? cz.width >= 24 * mm - 1 && A.width >= 10.5 * mm - 1 : cz.width >= 17.3 * mm - 1 && A.width >= 7.6 * mm - 1;
@@ -509,7 +509,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
         return { w: 'muesca ' + lado, ok: libre && u.width / 240 >= 1.29, us: +(u.width / 240).toFixed(2) }; }, lado));
     }
     await page.setViewportSize({ width: 1000, height: 700 });
-    check('Pantalla completa en horizontal: reborde, píxeles cuadrados y mandos en mm flotando sin pisar el escenario ni la caja de vida del combate en 7 tamaños (y con la muesca a un lado); la cruceta se desliza y todo se suelta al perder el foco; en vertical, «Gira el móvil»', marco.every(m => m.ok), marco.filter(m => !m.ok).concat(marco.length ? [] : ['sin datos']));
+    check('Pantalla completa en horizontal: reborde, píxeles cuadrados y mandos en mm flotando sin pisar el escenario ni la caja de vida del combate en 8 tamaños (con el 21:9) (y con la muesca a un lado); la cruceta se desliza y todo se suelta al perder el foco; en vertical, «Gira el móvil»', marco.every(m => m.ok), marco.filter(m => !m.ok).concat(marco.length ? [] : ['sin datos']));
     // música por zona (05-audio): cada mapa con una canción que existe; cada zona, la suya de día y otra de noche; las voces de
     // cada canción del mismo largo y con notas; y todas se programan en WebAudio sin error (ondas de pulso, ligaduras, batería)
     const mus = await page.evaluate(() => {

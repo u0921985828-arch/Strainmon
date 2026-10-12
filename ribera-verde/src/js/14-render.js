@@ -19,7 +19,7 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
   const list=[],sombras=[];
   // hasta 6 filas por debajo y 2 casillas a cada lado de la pantalla (1.10): los objetos altos (el árbol, de 6 filas; el monte, 3 de
   // ancho) se ven aunque su pie esté fuera; antes la copa salía de golpe al entrar el pie
-  for(let ty=ty0;ty<=ty0+SH/16+6;ty++)for(let tx=tx0-2;tx<=tx0+Math.ceil(SW/16)+2;tx++){
+  for(let ty=ty0;ty<=ty0+Math.ceil(SH/16)+6;ty++)for(let tx=tx0-2;tx<=tx0+Math.ceil(SW/16)+2;tx++){
     if(tx<0||ty<0||tx>=m.w||ty>=m.h)continue;
     const sx=tx*16-cam.x,sy=ty*16-cam.y,k=m.g[ty][tx],a=TILES[k];
     if(!arteTile(k,tx,ty,sx,sy,now))ctx.drawImage(a[a.length>1?wf:0],sx,sy);
@@ -87,25 +87,27 @@ function makeArt(){
   }
   LAMPS={};for(const k in ZONAS){const m=MAPS[k],l=LAMPS[k]=[];for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++)if(m.o[y][x]==='lamp')l.push([x,y]);}
 }
-// escenas compuestas a 240 px (título, intro y combate): van centradas y el fondo se alarga a los lados con su reflejo.
+// escenas compuestas a 240 × 160 (título, intro, combate y carpa): van centradas y abajo (OY: los 20 px de más de arriba) y el
+// fondo se alarga a los lados con su reflejo, y arriba con el reflejo de sus primeras filas.
 // cortes: franjas [y0,y1,lado] que toman las dos bandas del mismo borde ('izq'/'dch': reflejo en su lado, copia en el otro),
 // para no repetir trozos de las tarimas del combate; sin cortes, cada banda refleja su borde.
-const OX=()=>(SW-240)>>1;
+const OX=()=>(SW-240)>>1,OY=()=>SH-160;
 const CORTES_COMBATE=[[0,92,'izq'],[92,160,'dch']];   // cielo y edificios del borde izquierdo; suelo del derecho (fondos de 240×160)
 function fondoAncho(img,cortes){
-  const ox=OX();ctx.drawImage(img,ox,0);if(!ox)return;
-  for(const [y0,y1,lado] of cortes||[[0,160,'']]){const h=y1-y0;
+  const ox=OX(),oy=OY();ctx.drawImage(img,ox,oy);
+  if(ox)for(const [y0,y1,lado] of cortes||[[0,160,'']]){const h=y1-y0,y=y0+oy;
     ctx.save();ctx.scale(-1,1);
-    if(lado!=='dch')ctx.drawImage(img,0,y0,ox,h,-ox,y0,ox,h);
-    if(lado!=='izq')ctx.drawImage(img,240-ox,y0,ox,h,-SW,y0,ox,h);
+    if(lado!=='dch')ctx.drawImage(img,0,y0,ox,h,-ox,y,ox,h);
+    if(lado!=='izq')ctx.drawImage(img,240-ox,y0,ox,h,-SW,y,ox,h);
     ctx.restore();
-    if(lado==='dch')ctx.drawImage(img,240-ox,y0,ox,h,0,y0,ox,h);
-    if(lado==='izq')ctx.drawImage(img,0,y0,ox,h,240+ox,y0,ox,h);
+    if(lado==='dch')ctx.drawImage(img,240-ox,y0,ox,h,0,y,ox,h);
+    if(lado==='izq')ctx.drawImage(img,0,y0,ox,h,240+ox,y,ox,h);
   }
+  if(oy){ctx.save();ctx.scale(1,-1);ctx.drawImage(cv,0,oy,SW,oy,0,-oy,SW,oy);ctx.restore();}   // arriba, las primeras oy filas del todo, al revés
 }
 function renderBattle(now){
   if(!arteFondoCombate())fondoAncho(battleBg[B.kind],CORTES_COMBATE);
-  ctx.save();ctx.translate(OX(),0);
+  ctx.save();ctx.translate(OX(),OY());
   const k=Math.min(1,B.t/700),e=1-Math.pow(1-k,3);
   const ex=Math.round(154-(1-e)*180),px=Math.round(40+(1-e)*190);
   const fE=combFrame('E',now),fP=combFrame('P',now);
@@ -118,11 +120,11 @@ function renderBattle(now){
   ctx.restore();
 }
 function renderTitle(now){
-  const t=now/1000,ox=OX(),art=arteTitulo();   // con atlas: el fondo de PixelLab (cielo, barrio, río y hoja); sin él, el procedural
-  ctx.save();ctx.translate(ox,0);
+  const t=now/1000,ox=OX(),oy=OY(),art=arteTitulo();   // con atlas: el fondo de PixelLab (cielo, barrio, río y hoja); sin él, el procedural
+  ctx.save();ctx.translate(ox,oy);
   if(!art){
     const sky=['#0e1638','#162250','#20306a','#2c3e7c','#3a4a86'];
-    for(let y=0;y<110;y++){ctx.fillStyle=sky[Math.min(4,Math.floor(y/22))];ctx.fillRect(-ox,y,SW,1);}
+    for(let y=-oy;y<110;y++){ctx.fillStyle=sky[clamp(Math.floor(y/22),0,4)];ctx.fillRect(-ox,y,SW,1);}
     for(let i=0;i<60;i++){const sx=(i*53)%SW-ox,sy=(i*29)%90;if(((i*7+Math.floor(t*2))%9)>1){ctx.fillStyle=i%5?'#c8d0ff':'#ffffff';ctx.fillRect(sx,sy,1,1);}}
     ctx.fillStyle='#0a0f1e';for(let i=0;i*18-6<SW;i++){const w=14+(i*37)%20,h=18+(i*53)%34;ctx.fillRect(i*18-6-ox,110-h,w,h);}
     ctx.fillStyle='#f0d070';for(let i=0;i<60;i++){const wx=(i*61)%SW-ox,wy=82+(i*13)%24;if((i+Math.floor(t))%7)ctx.fillRect(wx,wy,1,2);}
@@ -130,7 +132,7 @@ function renderTitle(now){
   }
   for(const b of [-240,0,240])for(let y=112;y<160;y+=4){const o=Math.sin(t*1.5+y)*6;ctx.fillStyle='#1e3a64';ctx.fillRect(b+20+o+(y*7)%60,y,30,1);ctx.fillRect(b+140-o+(y*5)%50,y,24,1);}
   if(mode==='title'){if(!art){const by=Math.round(Math.sin(t*1.6)*2);ctx.globalAlpha=.55;ctx.drawImage(titleArt,88,62+by,64,64);ctx.globalAlpha=1;}}
-  else{ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(-ox,0,SW,SH);ctx.fillStyle='#2a6a48';ctx.beginPath();ctx.ellipse(120,104,34,7,0,0,Math.PI*2);ctx.fill();if(!arteRetrato(LOOKS.kiko,120,104,now))ctx.drawImage(spriteFor(LOOKS.kiko,'down',0),96,44,48,60);}
+  else{ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(-ox,-oy,SW,SH);ctx.fillStyle='#2a6a48';ctx.beginPath();ctx.ellipse(120,104,34,7,0,0,Math.PI*2);ctx.fill();if(!arteRetrato(LOOKS.kiko,120,104,now))ctx.drawImage(spriteFor(LOOKS.kiko,'down',0),96,44,48,60);}
   ctx.restore();
 }
 function updateHUD(){

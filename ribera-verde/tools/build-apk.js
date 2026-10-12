@@ -107,7 +107,7 @@ versionInfo:
   versionName: ${PKG.version}
 `);
 fs.mkdirSync(path.join(PROY, 'res', 'values'), { recursive: true });
-fs.writeFileSync(path.join(PROY, 'res', 'values', 'strings.xml'), '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <string name="app_name">Ribera Verde web</string>\n</resources>\n');
+fs.writeFileSync(path.join(PROY, 'res', 'values', 'strings.xml'), '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <string name="app_name">Landrace Hunters web</string>\n</resources>\n');
 iconos(PROY);
 fs.mkdirSync(path.join(PROY, 'assets'), { recursive: true });
 fs.copyFileSync(html, path.join(PROY, 'assets', 'index.html'));
