@@ -130,7 +130,7 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 > **TOÑO:** Y ve contando: tienes siete días para el primer pago.
 > **TOÑO:** No me hagas venir a buscarte.
 
-*El plazo de 3.000 € (7 días) empieza aquí. Objetivo: «Ve al bar El Ancla antes del día D: Don Baltasar quiere 3.000 €.»*
+*El plazo de 3.000 € (7 días) empieza aquí. Objetivo: «Ve al bar El Ancla antes de que acabe el día D: Don Baltasar quiere 3.000 €.»*
 
 ## Capítulo 3 · La deuda
 
@@ -221,7 +221,7 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 *Cuando se acaba lo pagado:* **SMS · MOLINA:** «Se acabó lo pagado.» / «Si quieres que mis agentes sigan mirando hacia otro lado, ya sabes dónde está la comisaría.»
 
 *Redada (calor ≥ 90 al empezar un día):*
-- *Sin protección:* «REDADA. La policía entra en tu piso.» / «Se llevan todas las plantas y X g. Multa: Y €.» / *con la caja fuerte,* «Encuentran la caja de detrás del diploma: se llevan X g y Y €.» (1 de cada 4 veces) o «La caja de detrás del diploma ni la ven.» / «Toca empezar de nuevo. Y vender menos una temporada.»
+- *Sin protección:* «REDADA. La policía entra en tu piso.» / «Se llevan todas las plantas y X g. Multa: Y €.» (lo que encuentran: las plantas, los gramos y el rosin del arcón y, si estás en casa, los de encima; si no encuentran nada, «No encuentran nada que llevarse»; si no te llega, «(pagas Z €: no tienes más)») / *con la caja fuerte,* «La caja de detrás del diploma ni la ven.» / «Toca empezar de nuevo. Y vender menos una temporada.»
 - *Con protección:* **SMS · MOLINA:** «Esta noche había orden de entrada en tu piso. La he parado.» / «Baja el ritmo.»
 
 *Al pagar los 12.000 €:*

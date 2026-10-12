@@ -11,6 +11,13 @@ const MUEBLES={
   tv:{n:'Tele de 43" con mueble',art:'la tele',p:449,x:13,y:2,d:'Smart TV de 43 pulgadas y un mueble bajo de 140 cm con hueco para la consola. Noticias y documentales.'},
   gpc:{n:'PC gaming con mesa',art:'el PC gaming',p:1490,x:16,y:2,d:'Torre con gráfica, monitor de 27", teclado mecánico y mesa de 140 cm con LED. Para jugar, leer el foro de cultivo y comprar.'},
   carro:{n:'Carro de esquejes',art:'el carro de esquejes',p:CARRO.p,x:8,y:5,grow:1,d:`Carro con ruedas, dos bandejas de ${CARRO.plazas} tacos tapadas bajo tubos T5 y una mesita con la tabla de corte.`}};
+// el patinete y la bici (1.13): por la tienda online, llegan al día siguiente (S.veh[k] = ese día) y, en la calle (las ZONAS), vas
+// montado en el mejor que tengas (vehiculo()). paso: ms por casilla [sin B, con B] (a pie, 240 y 130; la policía corre a 210 y 180);
+// sube: los px que sube el protagonista (en la tabla o en el sillín; dibujarPJ, arte de tools/sprites/a-mano/vehiculos.py).
+const VEHICULOS={
+  patinete:{n:'Patinete',art:'el patinete',p:119,paso:[150,110],sube:3,d:'Patinete de aluminio con ruedas de 200 mm. Más rápido que correr, y se pliega para el autobús.'},
+  bici:{n:'Bici de segunda mano',art:'la bici',p:239,paso:[110,80],sube:5,d:'Bici urbana de segunda mano, cuadro mostaza. La más rápida: la policía no te sigue.'}};
+const vehiculo=()=>{const v=S&&S.veh;if(!v||!ZONAS[S.map])return null;return ['bici','patinete'].find(k=>v[k]&&v[k]<=S.day)||null;};
 const SEGUNDA=new Set(Object.keys(MUEBLES).map(k=>k+'2'));
 const muebleDe=o=>o&&(MUEBLES[o]?o:SEGUNDA.has(o)?o.slice(0,-1):null);
 const mueblesYa=()=>Object.keys(MUEBLES).filter(k=>S.muebles&&S.muebles[k]&&S.muebles[k]<=S.day);
@@ -58,18 +65,22 @@ async function muebleAction(k){
 async function tiendaOnline(){
   let i=0;
   for(;;){
-    const ks=Object.keys(MUEBLES).filter(k=>!MUEBLES[k].grow),ya=mueblesYa();
+    const ks=Object.keys(MUEBLES).filter(k=>!MUEBLES[k].grow),vs=Object.keys(VEHICULOS),ya=mueblesYa();
     const items=ks.map(k=>{const m=MUEBLES[k],en=ya.includes(k),pd=!en&&S.muebles&&S.muebles[k];
       return {label:m.n+(en?' · en casa':pd?' · pedido':''),right:eur(m.p),disabled:!!(en||pd),desc:m.d+(en?'':pd?'\nLlega mañana: te lo suben al salón.':'\nLlega mañana y te lo suben al salón.')};});
+    for(const k of vs){const v=VEHICULOS[k],d=S.veh&&S.veh[k],en=d&&d<=S.day;
+      items.push({label:v.n+(en?' · tuyo':d?' · pedido':''),right:eur(v.p),disabled:!!d,desc:v.d+(en?'':'\nLlega mañana: te lo dejan en el portal.')});}
     items.push({label:'Salir',desc:'Pagas con lo que llevas y, si no llega, con la caja fuerte.'});
-    i=await menu(items,{cls:'full',title:'TIENDA ONLINE',title2:'Muebles · tienes '+eur(S.money+cajaE()),desc:true,initial:i});
-    if(i<0||i>=ks.length)return;
-    const k=ks[i],m=MUEBLES[k];
+    i=await menu(items,{cls:'full',title:'TIENDA ONLINE',title2:'Muebles y transporte · tienes '+eur(S.money+cajaE()),desc:true,initial:i});
+    if(i<0||i>=ks.length+vs.length)return;
+    const k=i<ks.length?ks[i]:vs[i-ks.length],m=i<ks.length?MUEBLES[k]:VEHICULOS[k];
     if(S.money+cajaE()<m.p){sfx('bad');await say('No te llega el dinero.');continue;}
-    pagarCasa(m.p);(S.muebles||(S.muebles={}))[k]=S.day+1;sfx('coin');toast('Pedido: '+m.n+' · llega mañana',1400);
+    pagarCasa(m.p);(i<ks.length?S.muebles||(S.muebles={}):S.veh||(S.veh={}))[k]=S.day+1;sfx('coin');toast('Pedido: '+m.n+' · llega mañana',1400);
   }
 }
 function llegaMueble(){
+  const vs=Object.keys(VEHICULOS).filter(k=>S.veh&&S.veh[k]===S.day);
+  if(vs.length)queue('vehiculo',async()=>{sfx('get');await say(`Llega el mensajero con ${yLista(vs.map(k=>VEHICULOS[k].art))}. En la calle vas montado; con B, aún más rápido.`);});
   const l=Object.keys(MUEBLES).filter(k=>S.muebles&&S.muebles[k]===S.day);if(!l.length)return;
   montarCasa();
   // si estás donde lo montan, te apartas a la casilla libre más cercana (de dentro afuera; arriba, abajo, izquierda, derecha)

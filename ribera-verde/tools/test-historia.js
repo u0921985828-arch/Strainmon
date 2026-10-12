@@ -372,7 +372,9 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     R.cub = LOG.slice(l0).some(l => /Estás cubierto hasta el día/.test(l)); S.map = 'home';
   }, () => R.p === false && R.sms && R.ent === '4,2' && R.h1 === 10 && R.cub && S.protect && S.protHasta === S.day + 20 && S.money === 0 || { R, hasta: S.protHasta, day: S.day, money: S.money });
   await step('Imperio: encargo de Don Baltasar (2 kg al almacén de los astilleros, de noche, a 6 €/g); Toño se lleva primero lo más flojo; si no llegas, reputación −10 y 5 días sin encargos', ['Aceptar', 'Entregar', 'Aceptar'], async () => {
-    S.ch = 8; S.due = 0; S.encargo = null; S.encVeto = 0; S.rep = 50; S.map = 'bar'; await run(talkBaltasar); window.R = { e: S.encargo && Object.assign({}, S.encargo), d: S.day };
+    S.ch = 8; S.due = 0; S.encargo = null; S.encVeto = 0; S.rep = 50; S.map = 'bar'; S.items.bolsa = 0; const l9 = LOG.length; await run(talkBaltasar);   // 1.13: 2 kg no caben en la mochila
+    const sin = !S.encargo && LOG.slice(l9).some(l => /No te caben en la mochila\. Hazte con una bolsa de deporte/.test(l)); S.items.bolsa = 1;
+    await run(talkBaltasar); window.R = { e: S.encargo && Object.assign({}, S.encargo), d: S.day, sin };
     S.map = 'almacen'; buildEnts(); R.tono = ents.some(e => e.id === 'tono2'); S.buds = {}; addBuds('ria', 1500, 12); addBuds('dragon', 800, 27);
     S.min = 600; await run(talkTonoAlmacen); R.dia = S.encargo && totalBuds(); S.min = 22 * 60; R.m = S.money; R.s = S.sales; R.rep = S.rep; R.heat = S.heat;
     await run(talkTonoAlmacen); R.d1 = { m: S.money - R.m, s: S.sales - R.s, rep: S.rep - R.rep, heat: S.heat - R.heat, ria: S.buds.ria, dragon: S.buds.dragon.g, enc: S.encargo, tono: ents.some(e => e.id === 'tono2') };
@@ -380,7 +382,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.map = 'almacen'; buildEnts(); for (let k = 0; k < 3; k++) { newDay(); await idle(); } R.veto = S.encVeto - S.day; R.rep3 = S.rep; R.enc3 = S.encargo;
     S.min = 22 * 60; let l0 = LOG.length; await run(talkTonoAlmacen); R.tarde = ents.some(e => e.id === 'tono2') && LOG.slice(l0).some(l => /El plazo se acabó/.test(l));   // vencido con Toño delante
     S.map = 'bar'; S.min = 600; l0 = LOG.length; await run(talkBaltasar); R.fallo = LOG.slice(l0).some(l => /Me fallaste/.test(l)); S.map = 'home';
-  }, () => R.e && R.e.g === 2000 && R.e.hasta === R.d + 2 && R.tono && R.dia === 2300 && R.d1.m === 12000 && R.d1.s === 12000 && R.d1.rep === 2 && R.d1.heat === 3 && !R.d1.ria && R.d1.dragon === 300 && R.d1.enc === null && !R.d1.tono
+  }, () => R.e && R.sin && R.e.g === 2000 && R.e.hasta === R.d + 2 && R.tono && R.dia === 2300 && R.d1.m === 12000 && R.d1.s === 12000 && R.d1.rep === 2 && R.d1.heat === 3 && !R.d1.ria && R.d1.dragon === 300 && R.d1.enc === null && !R.d1.tono
     && R.e2 === 2 && R.rep3 === R.rep2 - 10 && R.enc3 === null && R.veto === 5 && R.tarde && R.fallo || R);
   await step('Mapa ampliado: barrio alto y astilleros con sus puertas; ladrones al azar y patrullas según la zona; clientes de cada zona', [], async () => {
     S.ch = 5; S.protect = false; S.heat = 0; S.min = 600; S.money = 200; S.buds = {}; addBuds('ria', 10, 12);
@@ -550,6 +552,16 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S = S0; montarCasa(); R.vacio = !MAPS.home.o[5][13];
   }, () => R.libre && R.m.join() === '0,652' && R.ped.join() === [R.d + 1, R.d + 1, false].join() && R.ya === 'sofa,tv' && R.solido && R.hp === 15 && R.vacio
     && LOG.some(l => l.includes('Llega el mensajero con el sofá y la tele')) && LOG.some(l => l.includes('Noticias: detenido en el puerto')) || R);
+  await step('Patinete y bici (1.13): por la tienda online, llegan mañana; en la calle vas montado en el mejor (la bici), más rápido que corriendo y con B más aún; en casa, a pie',
+    ['Tienda online', '^Patinete', '^Bici', 'Salir'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0)); delete S.veh; Object.assign(S, { money: 500, map: 'home' });
+    window.R = { d: S.day };
+    await run(pcAction); R.m = S.money; R.ped = [S.veh.patinete, S.veh.bici]; S.map = 'town'; R.antes = vehiculo();
+    S.day++; llegaMueble(); await idle(); R.v = vehiculo(); held.B = false; R.p = pasoMs(); held.B = true; R.pb = pasoMs(); held.B = false;
+    S.map = 'home'; R.casa = [vehiculo(), pasoMs()]; S = S0;
+  }, () => R.m === 500 - VEHICULOS.patinete.p - VEHICULOS.bici.p && R.ped.join() === [R.d + 1, R.d + 1].join() && R.antes === null && R.v === 'bici'
+    && R.p === VEHICULOS.bici.paso[0] && R.pb === VEHICULOS.bici.paso[1] && R.p < 130 && R.casa.join() === ',240'
+    && LOG.some(l => l.includes('Llega el mensajero con el patinete y la bici')) || R);
   await step('Carro de esquejes (1.11): Kiko lo vende (no la tienda online) y lo sube mañana delante de las carpas; en la tabla de corte se pinchan los del propagador; en las bandejas aguantan CARRO.dias y gastan luz; se plantan desde ahí; la redada se los lleva',
     ['Carro de esquejes', 'Salir', 'Pinchar esquejes', '^Esqueje'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); delete S.muebles; Object.assign(S, { money: 500, map: 'home', esquejes: [], bandejas: [], heat: 0, due: 0, protect: false });

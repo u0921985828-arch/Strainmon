@@ -593,8 +593,24 @@ func try_move(d: String) -> void:
 	P.t = 0.0
 	P.moving = true
 	P.pisT = M.reloj
-	P.dur = 130.0 if held.B else 240.0
+	P.dur = paso_ms()
 	P.parity ^= 1
+
+# el patinete o la bici (1.13, vehiculo() de 12c-salon): en la calle (ZONAS), el mejor que tengas
+func vehiculo():
+	var v = S.get("veh")
+	if not (v is Dictionary) or not D.ZONAS.has(S.map):
+		return null
+	for k in ["bici", "patinete"]:
+		if v.get(k) and float(v[k]) <= S.day:
+			return k
+	return null
+
+func paso_ms() -> float:   # ms por casilla: a pie, corriendo o montado (pasoMs)
+	var v = vehiculo()
+	if v:
+		return float(D.VEHICULOS[v].paso[1 if held.B else 0])
+	return 130.0 if held.B else 240.0
 
 func on_step_end() -> void:
 	S.x = P.x

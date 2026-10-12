@@ -450,7 +450,7 @@ func talk_molina():
 			await say("¿Con qué dinero? Vuelve cuando lo tengas.", N)
 		else:
 			S.money -= sob
-			S.protHasta = int(max(S.day, S.protHasta if S.protect else 0)) + cd
+			S.protHasta = int(S.protHasta if S.protect else S.day - 1) + cd
 			S.protect = true
 			sfx("coin")
 			await say("Bien. Mis agentes mirarán hacia otro lado hasta el día %s." % n(S.protHasta), N)
@@ -577,15 +577,15 @@ func objective_text() -> String:
 			var mv := int(D.META_VENTAS)
 			return "Gana %d € vendiendo (%d/%d)." % [mv, mini(mv, Datos.jsround(S.sales)), mv]
 		3:
-			return (("Ve al bar El Ancla antes del día %s: Don Baltasar quiere %s." % [n(S.deadline), Datos.eur(S.due)]) if not S.flags.get("metB") else "Paga %s a Don Baltasar antes del día %s." % [Datos.eur(S.due), n(S.deadline)]) + llevas()
+			return (("Ve al bar El Ancla antes de que acabe el día %s: Don Baltasar quiere %s." % [n(S.deadline), Datos.eur(S.due)]) if not S.flags.get("metB") else "Paga %s a Don Baltasar antes de que acabe el día %s." % [Datos.eur(S.due), n(S.deadline)]) + llevas()
 		4:
 			return "Kiko quiere verte en el growshop." if not S.flags.get("lab") else "Saca en la mesa 2 variedades de receta y cosecha una planta de cada (%d/2)." % rec_count()
 		5:
-			return "Paga %s a Don Baltasar antes del día %s." % [Datos.eur(S.due), n(S.deadline)] + llevas()
+			return "Paga %s a Don Baltasar antes de que acabe el día %s." % [Datos.eur(S.due), n(S.deadline)] + llevas()
 		6:
 			return "Gana la Copa: 20 g con más de 26,8% de THC al jurado de la plaza."
 		7:
-			return "Paga los últimos %s a Don Baltasar antes del día %s." % [Datos.eur(S.due), n(S.deadline)] + llevas()
+			return "Paga los últimos %s a Don Baltasar antes de que acabe el día %s." % [Datos.eur(S.due), n(S.deadline)] + llevas()
 	if S.get("encargo"):
 		return "Encargo de Don Baltasar: lleva %s al almacén de los astilleros, de noche, antes de que acabe el día %s." % [_kg(int(S.encargo.g)), n(S.encargo.hasta)]
 	var nv := imperio_nivel()
@@ -813,10 +813,13 @@ func embargo() -> void:
 # el aviso de la orden de registro (1.11): un día antes de la redada
 func aviso_orden():
 	sfx("bad")
-	await talk("SMS · KIKO", ["Me dice uno de la comisaría que mañana entran en tu piso con orden de registro.", "Esta noche, el dinero y los cogollos a la caja o fuera de casa. Las plantas no se pueden esconder.", "O paga a Molina, que aún estás a tiempo."])
+	var L := ["Me dice uno de la comisaría que mañana entran en tu piso con orden de registro.", "Esta noche, el dinero y los cogollos a la caja o fuera de casa. Las plantas no se pueden esconder."]
+	if S.ch >= 5:
+		L.append("O paga a Molina, que aún estás a tiempo.")
+	await talk("SMS · KIKO", L)
 
 # la redada (1.11): lo de fuera y las plantas, siempre; la caja fuerte, nunca. La multa (multa_redada) sale de lo de fuera y, si no
-# llega, de la caja
+# llega, de la caja. Lo de encima, solo si estás en casa (1.13)
 func raid_event():
 	S.orden = 0
 	if S.protect:
@@ -825,8 +828,9 @@ func raid_event():
 		return
 	sfx("bad")
 	await say("REDADA. La policía entra en tu piso con una orden de registro.")
-	var g := int(floor(total_buds() + arcon_g()))   # lo de encima y el arcón (1.10)
-	var ro := total_rosin() + arcon_r()
+	var casa: bool = S.map == "home"
+	var g := int(floor((total_buds() if casa else 0.0) + arcon_g()))   # lo de encima y el arcón (1.10)
+	var ro: float = (total_rosin() if casa else 0.0) + arcon_r()
 	var hs := huecos()
 	var npl := 0
 	for p in S.pots:
@@ -857,15 +861,23 @@ func raid_event():
 	for p in S.pots:
 		np.append(null)
 	S.pots = np
-	S.buds = {}
-	S.rosin = {}
+	if casa:
+		S.buds = {}
+		S.rosin = {}
 	S.arcon = {"buds": {}, "rosin": {}}
 	S.esquejes = []
 	S.bandejas = []
 	S.heat = D.CALOR_REDADA
 	var multa := multa_redada(npl, g + Datos.jsround(ro / D.ROSIN.rend))   # el rosin, como la flor de la que sale
 	var fine: float = multa - pagar_casa(multa)
-	await say("Se llevan todas las plantas%s. Multa: %s." % [("%s y %s" % [(", %d g" % g) if g else "", rosin_txt(ro)]) if ro else " y %d g" % g, Datos.eur(fine)])
+	var lo := []
+	if npl:
+		lo.append("todas las plantas")
+	if g:
+		lo.append("%d g" % g)
+	if ro:
+		lo.append(rosin_txt(ro))
+	await say("%s. Multa: %s%s." % [("Se llevan " + _lista(lo)) if lo.size() else "No encuentran nada que llevarse", Datos.eur(multa), (" (pagas %s: no tienes más)" % Datos.eur(fine)) if fine < multa else ""])
 	if eq.size():
 		await say("Y el equipo de las carpas con plantas: " + ", ".join(eq) + ".")
 	await say("La caja de detrás del diploma ni la ven. Las semillas no son delito: se quedan." if S.get("caja") != null else "Las semillas no son delito: se quedan.")
@@ -1737,6 +1749,12 @@ func encargo_baltasar(N: String):
 	var pe := int(D.PAGO_ENCARGO)
 	await talk(N, ["Ya no me debes nada, {N}. Pero tengo trabajo, si lo quieres.", "%s en el almacén de los astilleros, de noche. Toño los recoge." % _kg(g),
 		"Pago %d € el gramo: %s. Tienes %d días." % [pe, Datos.eur(g * pe), int(D.ENCARGO_DIAS)]])
+	if cap_mochila() < g:   # 1.13
+		var mi := 0
+		while D.MOCHILAS[mi].g < g:
+			mi += 1
+		await say("No te caben en la %s. Hazte con una %s y vuelve." % [D.MOCHILAS[int(S.items.get("bolsa", 0))].n.to_lower(), D.MOCHILAS[mi].n.to_lower()], N)
+		return
 	if await ask("¿Aceptas el encargo?", ["Aceptar", "No"], N) != 0:
 		await say("Tú sabrás. La oferta sigue en pie.", N)
 		return

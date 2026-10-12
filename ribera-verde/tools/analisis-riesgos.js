@@ -160,7 +160,7 @@ function copa(thc, sigma, luz, abono, salud = 100) {
   return p;
 }
 
-// la redada (1.11, 11-historia, raidEvent): se lleva las plantas y lo de fuera (lo de encima y el arcón; los escenarios lo
+// la redada (1.11, 11-historia, raidEvent): se lleva las plantas y lo de fuera (el arcón y lo de encima si estás en casa; los escenarios lo
 // tienen vacío) y una multa según lo que encuentra (multaRedada: 601 € + 300 por planta + 3 por gramo, hasta 30.000) que se paga
 // de fuera y, si no llega, de la caja. La caja no la tocan. Pérdida en euros (las plantas, aparte)
 const MULTA_R = [601, 300, 3, 30000], CALOR_R = 40;

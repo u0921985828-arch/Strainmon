@@ -617,7 +617,7 @@ function vcInfo(){
   else if(VC.sel<0){L.push(esc(FOCOS[c.foco].n),plantasVivas(VC.ci)?'Luz '+eur(luzCarpa(VC.ci))+' al día':'Apagado');for(const k in EXTRAS)if(c[k])L.push(EXTRAS[k].c);}
   else{const i=VC.sel,p=S.pots[i];L.push(`Plaza ${huecos()[i].j+1} · ${MACETAS[S.macetas[i]].l} L`);
     if(!p)L.push('Vacía');
-    else{L.push(esc(getStrain(p.sid).n));
+    else{L.push(esc(getStrain(p.sid).n+etiq(p.f)));
       if(p.dead)L.push('Seca');else L.push(p.prog>=1?'Cosecha lista':stageName(p)+' '+Math.floor(p.prog*100)+' %','Agua '+Math.round(p.water)+' %','Salud '+Math.round(p.health)+' %');
       if(p.pest&&!p.dead)L.push('<em>PLAGA</em>');}}
   el.innerHTML=`<b>${esc(CARPAS[c.t].n)}</b>`+L.map(l=>`<div>${l}</div>`).join('');el.hidden=false;

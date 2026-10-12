@@ -117,6 +117,7 @@ async function encargoBaltasar(N){
   if(S.encVeto>S.day)return say(`Me fallaste, {N}. Vuelve el día ${S.encVeto}.`,N);
   const g=ENCARGO[imperioNivel()];
   await talk(N,['Ya no me debes nada, {N}. Pero tengo trabajo, si lo quieres.',`${kgTxt(g)} en el almacén de los astilleros, de noche. Toño los recoge.`,`Pago ${PAGO_ENCARGO} € el gramo: ${eur(g*PAGO_ENCARGO)}. Tienes ${ENCARGO_DIAS} días.`]);
+  if(capMochila()<g){const m=MOCHILAS.find(m=>m.g>=g);return say(`No te caben en la ${MOCHILAS[S.items.bolsa||0].n.toLowerCase()}. Hazte con una ${m.n.toLowerCase()} y vuelve.`,N);}   // 1.13
   if(await ask('¿Aceptas el encargo?',['Aceptar','No'],N)!==0)return say('Tú sabrás. La oferta sigue en pie.',N);
   S.encargo={g,hasta:S.day+ENCARGO_DIAS};
   await say(`Toño estará allí cada noche hasta el día ${S.encargo.hasta}. No le hagas esperar.`,N);showObjective();

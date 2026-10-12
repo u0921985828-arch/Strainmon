@@ -115,8 +115,9 @@ function tryMove(d){
   if(d==='down'&&ex){P.chain=false;run(()=>warp(ex));return;}
   const nx=P.x+dx,ny=P.y+dy;
   if(tileSolid(m,nx,ny)||entAt(nx,ny)){const n=performance.now();if(n-P.bumpT>350){sfx('bump');P.bumpT=n;}P.chain=false;return;}
-  P.fx=P.x;P.fy=P.y;P.x=nx;P.y=ny;P.t=0;P.moving=true;P.pisT=performance.now();P.dur=held.B?130:240;P.parity^=1;
+  P.fx=P.x;P.fy=P.y;P.x=nx;P.y=ny;P.t=0;P.moving=true;P.pisT=performance.now();P.dur=pasoMs();P.parity^=1;
 }
+const pasoMs=()=>{const v=vehiculo();return v?VEHICULOS[v].paso[held.B?1:0]:held.B?130:240;};   // ms por casilla: a pie, corriendo o montado (1.13)
 function onStepEnd(){
   S.x=P.x;S.y=P.y;S.dir=P.dir;S.steps++;if(S.cool>0)S.cool--;
   const m=MAPS[S.map],door=m.doors[P.x+','+P.y];

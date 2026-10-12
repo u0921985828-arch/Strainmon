@@ -352,6 +352,11 @@ func enter_game() -> void:
 			enter_map(S.map, 5, 9, "down")
 	if S.clientsDay != S.day:
 		spawn_clients()
+	# 1.13: lo que se quedó en la cola al guardar (la cama guarda antes de que salgan los avisos de la noche)
+	if S.get("orden") and S.day > S.orden:
+		queue("raid", raid_event)
+	if S.due > 0 and S.day > S.deadline:
+		queue("penalty", penalty_event)
 	update_hud()
 
 # ---------- bucle ----------

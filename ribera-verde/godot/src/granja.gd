@@ -117,10 +117,10 @@ func new_day() -> void:
 	var luz := factura_luz()
 	var olor := olor_dia()
 	var av := []
-	S.luz = {"d": S.day, "e": luz, "o": olor}
+	var nf: float = pagar_casa(luz) if luz > 0 else 0.0    # de lo de fuera y, si no llega, de la caja (1.10)
+	S.luz = {"d": S.day, "e": luz - nf, "o": olor}
 	if luz > 0:
-		pagar_casa(luz)    # de lo de fuera y, si no llega, de la caja (1.10)
-		av.append("Factura de la luz: −" + Datos.eur(luz))
+		av.append("Factura de la luz: −" + Datos.eur(luz - nf) + ((" (te faltan %s)" % Datos.eur(nf)) if nf else ""))
 	if olor:
 		S.heat = min(100, S.heat + olor)
 		av.append("Olor a cogollo: calor +%d" % olor)
@@ -656,7 +656,7 @@ func bed_action(txt := ""):
 	toast("Has descansado" + ((" · Luz −" + Datos.eur(hoy.e)) if hoy and hoy.e else "") + ((" · Olor: calor +" + n(hoy.o)) if hoy and hoy.o else "") + " · Partida guardada", 1800)
 	if not piso:
 		return
-	if S.ch == 7 and not S.flags.get("robo") and (S.money > 1000 or gramos_flor() + arcon_g() + arcon_r() / D.ROSIN.rend > 100):
+	if S.day > d0 and S.ch == 7 and not S.flags.get("robo") and (S.money > 1000 or gramos_flor() + arcon_g() + arcon_r() / D.ROSIN.rend > 100):
 		await robo_darko()   # la amenaza de Darko (1.10; con lo del arcón)
 	await aviso_plaga(antes)
 
@@ -799,6 +799,7 @@ func tienda_online() -> void:
 	var i := 0
 	while true:
 		var ks: Array = D.MUEBLES.keys().filter(func(k): return not D.MUEBLES[k].get("grow"))
+		var vs: Array = D.VEHICULOS.keys()
 		var ya := muebles_ya()
 		var items := []
 		for k in ks:
@@ -807,24 +808,41 @@ func tienda_online() -> void:
 			var pd: bool = not en and S.get("muebles") is Dictionary and float(S.muebles.get(k, 0)) > 0
 			items.append({"label": m.n + (" · en casa" if en else " · pedido" if pd else ""), "right": Datos.eur(m.p), "disabled": en or pd,
 				"desc": m.d + ("" if en else "\nLlega mañana: te lo suben al salón." if pd else "\nLlega mañana y te lo suben al salón.")})
+		for k in vs:   # el patinete y la bici (1.13)
+			var v: Dictionary = D.VEHICULOS[k]
+			var d = S.veh.get(k) if S.get("veh") is Dictionary else null
+			var en: bool = d != null and float(d) <= S.day
+			items.append({"label": v.n + (" · tuyo" if en else " · pedido" if d else ""), "right": Datos.eur(v.p), "disabled": d != null and float(d) > 0,
+				"desc": v.d + ("" if en else "\nLlega mañana: te lo dejan en el portal.")})
 		items.append({"label": "Salir", "desc": "Pagas con lo que llevas y, si no llega, con la caja fuerte."})
-		i = await menu(items, {"cls": "full", "title": "TIENDA ONLINE", "title2": "Muebles · tienes " + Datos.eur(S.money + caja_e()), "desc": true, "initial": i})
-		if i < 0 or i >= ks.size():
+		i = await menu(items, {"cls": "full", "title": "TIENDA ONLINE", "title2": "Muebles y transporte · tienes " + Datos.eur(S.money + caja_e()), "desc": true, "initial": i})
+		if i < 0 or i >= ks.size() + vs.size():
 			return
-		var k: String = ks[i]
-		var m: Dictionary = D.MUEBLES[k]
+		var es_m: bool = i < ks.size()
+		var k: String = ks[i] if es_m else vs[i - ks.size()]
+		var m: Dictionary = D.MUEBLES[k] if es_m else D.VEHICULOS[k]
 		if S.money + caja_e() < m.p:
 			sfx("bad")
 			await say("No te llega el dinero.")
 			continue
 		pagar_casa(m.p)
-		if not (S.get("muebles") is Dictionary):
-			S.muebles = {}
-		S.muebles[k] = S.day + 1
+		var cl: String = "muebles" if es_m else "veh"
+		if not (S.get(cl) is Dictionary):
+			S[cl] = {}
+		S[cl][k] = S.day + 1
 		sfx("coin")
 		toast("Pedido: " + m.n + " · llega mañana", 1400)
 
 func llega_mueble() -> void:
+	var vs := []   # el patinete y la bici (1.13)
+	if S.get("veh") is Dictionary:
+		for k in D.VEHICULOS:
+			if S.veh.get(k) == S.day:
+				vs.append(D.VEHICULOS[k].art)
+	if vs.size():
+		queue("vehiculo", func():
+			sfx("get")
+			await say("Llega el mensajero con %s. En la calle vas montado; con B, aún más rápido." % _lista(vs)))
 	var l := []
 	var on := []
 	var gr := []
@@ -1180,7 +1198,7 @@ func vc_ficha() -> void:
 		if p == null:
 			L.append("Vacía")
 		else:
-			L.append(strain(p.sid).n)
+			L.append(strain(p.sid).n + etiq(p.get("f")))
 			if p.get("dead"):
 				L.append("Seca")
 			else:

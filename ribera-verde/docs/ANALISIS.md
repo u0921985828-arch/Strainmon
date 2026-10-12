@@ -161,7 +161,7 @@ Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo a Iñaki
   - Una requisa se lleva **todos** los gramos que llevas encima y baja el calor 15. La multa es de 601 € (o lo que lleves, si es menos).
 - **Calor, niveles y redada (1.11).** El calor marca el nivel de la policía: tranquilo (0-29), vigilancia (30-59), investigación (60-89) y orden de registro (90). Al cambiar de día (00:00), duermas o no, el juego mira el calor *antes* de bajarlo:
   - con 90 o más, el juez firma la orden de registro y Kiko te avisa: tienes un día para vaciar el piso. Con la orden, el calor no baja;
-  - al día siguiente, la redada: se llevan las plantas, el equipo montado en sus carpas y lo que está a la vista (lo de encima y el arcón). La caja fuerte no la tocan. La multa sale de lo que encuentran: 601 € + 300 € por planta + 3 € por gramo, hasta 30.000 €, y el calor queda en 40 (§ 2.7);
+  - al día siguiente, la redada: se llevan las plantas, el equipo montado en sus carpas y lo que está a la vista (el arcón y, si estás en casa, lo de encima; 1.13). La caja fuerte no la tocan. La multa sale de lo que encuentran: 601 € + 300 € por planta + 3 € por gramo, hasta 30.000 €, y el calor queda en 40 (§ 2.7);
   - con la protección de Molina, no hay orden: Molina para la redada y el calor queda en 50.
 
 ### 2.2 Por paso

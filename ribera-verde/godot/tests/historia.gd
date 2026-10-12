@@ -1075,8 +1075,13 @@ func _pasos() -> void:
 		J.S.encVeto = 0
 		J.S.rep = 50
 		J.S.map = "bar"
+		J.S.items.bolsa = 0   # 1.13: 2 kg no caben en la mochila
+		var l9 := LOG.size()
 		await run(J.talk_baltasar)
-		R = {"e": J.S.encargo.duplicate() if J.S.encargo else null, "d": J.S.day}
+		var sin: bool = J.S.encargo == null and LOG.slice(l9).any(func(l): return re("No te caben en la mochila\\. Hazte con una bolsa de deporte", l))
+		J.S.items.bolsa = 1
+		await run(J.talk_baltasar)
+		R = {"e": J.S.encargo.duplicate() if J.S.encargo else null, "d": J.S.day, "sin": sin}
 		J.S.map = "almacen"
 		J.build_ents()
 		R.tono = hay_tono.call()
@@ -1117,7 +1122,7 @@ func _pasos() -> void:
 		await run(J.talk_baltasar)
 		R.fallo = lin.call(l0, "Me fallaste") != ""
 		J.S.map = "home",
-		func(): return chk(R.e and R.e.g == 2000 and R.e.hasta == R.d + 2 and R.tono and R.dia == 2300 and R.d1.m == 12000 and R.d1.s == 12000 and R.d1.rep == 2 and R.d1.heat == 3
+		func(): return chk(R.e and R.sin and R.e.g == 2000 and R.e.hasta == R.d + 2 and R.tono and R.dia == 2300 and R.d1.m == 12000 and R.d1.s == 12000 and R.d1.rep == 2 and R.d1.heat == 3
 			and not R.d1.ria and R.d1.dragon == 300 and R.d1.enc == null and not R.d1.tono and R.e2 == 2 and R.rep3 == R.rep2 - 10 and R.enc3 == null and R.veto == 5 and R.tarde and R.fallo, R))
 	step("Mapa ampliado: barrio alto y astilleros con sus puertas; ladrones al azar y patrullas según la zona; clientes de cada zona", [], func():
 		J.S.ch = 5
@@ -1721,6 +1726,33 @@ func _pasos() -> void:
 		R.vacio = not h.o[5][13],
 		func(): return chk(R.libre and R.m[0] == 0 and R.m[1] == 652 and R.ped[0] == R.d + 1 and R.ped[1] == R.d + 1 and R.ped[2] == false and R.ya == "sofa,tv" and R.solido and R.hp == 15 and R.vacio
 			and LOG.any(func(l): return l.contains("Llega el mensajero con el sofá y la tele")) and LOG.any(func(l): return l.contains("Noticias: detenido en el puerto")), R))
+	step("Patinete y bici (1.13): por la tienda online, llegan mañana; en la calle vas montado en el mejor (la bici), más rápido que corriendo y con B más aún; en casa, a pie",
+		["Tienda online", "^Patinete", "^Bici", "Salir"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.erase("veh")
+		J.S.merge({"money": 500, "map": "home"}, true)
+		R = {"d": J.S.day}
+		await run(func(): await J.pc_action())
+		R.m = J.S.money
+		R.ped = [J.S.veh.get("patinete"), J.S.veh.get("bici")]
+		J.S.map = "town"
+		R.antes = J.vehiculo()
+		J.S.day += 1
+		J.llega_mueble()
+		await idle()
+		R.v = J.vehiculo()
+		J.held.B = false
+		R.p = J.paso_ms()
+		J.held.B = true
+		R.pb = J.paso_ms()
+		J.held.B = false
+		J.S.map = "home"
+		R.casa = [J.vehiculo(), J.paso_ms()]
+		J.S = S0,
+		func(): return chk(R.m == 500 - J.D.VEHICULOS.patinete.p - J.D.VEHICULOS.bici.p and R.ped[0] == R.d + 1 and R.ped[1] == R.d + 1 and R.antes == null and R.v == "bici"
+			and R.p == J.D.VEHICULOS.bici.paso[0] and R.pb == J.D.VEHICULOS.bici.paso[1] and R.p < 130 and R.casa[0] == null and R.casa[1] == 240
+			and LOG.any(func(l): return l.contains("Llega el mensajero con el patinete y la bici")), R))
 	step("Carro de esquejes (1.11): Kiko lo vende (no la tienda online) y lo sube mañana delante de las carpas; en la tabla de corte se pinchan los del propagador; en las bandejas aguantan CARRO.dias y gastan luz; se plantan desde ahí; la redada se los lleva",
 		["Carro de esquejes", "Salir", "Pinchar esquejes", "^Esqueje"], func():
 		var S0 = J.S

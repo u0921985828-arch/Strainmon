@@ -6926,6 +6926,63 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
+   "estilo_ref": "el protagonista (player): su contorno y su escala",
+   "tipo": "personaje",
+   "id": "vehiculos",
+   "cubre": [],
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "patinete-atras",
+     "fps": 8,
+     "bucle": true,
+     "frames": 2,
+     "herramienta": "importado",
+     "notas": "0-1: las ruedas giran (y el pedal en la bici); oeste = espejo del este"
+    },
+    {
+     "nombre": "patinete-delante",
+     "fps": 8,
+     "bucle": true,
+     "frames": 2,
+     "herramienta": "importado",
+     "notas": "0-1: las ruedas giran (y el pedal en la bici); oeste = espejo del este"
+    },
+    {
+     "nombre": "bici-atras",
+     "fps": 8,
+     "bucle": true,
+     "frames": 2,
+     "herramienta": "importado",
+     "notas": "0-1: las ruedas giran (y el pedal en la bici); oeste = espejo del este"
+    },
+    {
+     "nombre": "bici-delante",
+     "fps": 8,
+     "bucle": true,
+     "frames": 2,
+     "herramienta": "importado",
+     "notas": "0-1: las ruedas giran (y el pedal en la bici); oeste = espejo del este"
+    }
+   ],
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/vehiculos.py",
+   "descripcion": "Tanda 3 (1.13): el patinete (tabla de aluminio con lija, ruedas de 200 mm, barra y manillar) y la bici urbana de segunda mano (cuadro mostaza, ruedas de radios, sillín, manillar y pedal), a la escala del protagonista, en dos capas: lo que queda detrás de él y lo que le tapa.",
+   "notas": "1.13. dibujarPJ pinta <v>-atras, el protagonista subido VEHICULOS[v].sube px y <v>-delante, en la celda del personaje (pies en (16, 30)). Sur, este y norte; oeste en espejo.",
+   "montaje": "tal cual (vehiculos.py), 32 × 32 (ajuste exacto)",
+   "ajuste_por_sprite": {
+    "patinete-atras": "exacto",
+    "patinete-delante": "exacto",
+    "bici-atras": "exacto",
+    "bici-delante": "exacto"
+   }
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
    "estilo_ref": "los iconos aprobados (iconos, iconos-equipo)",
    "tipo": "icono",
    "id": "iconos-menu",

@@ -82,11 +82,20 @@ function pjFrame(e,g,now,isP,dur){
   if(tieneDir(g,'idle',DIR4[e.dir]))return frameDe(g,'idle',DIR4[e.dir],now+hashStr(String(e.id||'p'))%5000,{bucle:true}); // fase propia por NPC; sin idle en esa dirección, base
   return frameDe(g,'base',DIR4[e.dir],0,{i:0});
 }
+// montado (1.13): la acción si la hay; si no, en la bici pedalea (walk) y en el patinete va de pie (base)
+function frameMonta(e,g,v,now,dur){
+  const a=e.act,t=a?now-a.t0:0,f=a&&frameDe(g,a.n,DIR4[e.dir],t);if(f&&t<duracion(g,a.n))return f;e.act=null;
+  return v==='bici'&&e.moving?frameDe(g,'walk',DIR4[e.dir],0,{ph:(e.parity+Math.min(1,e.t/dur))/2}):frameDe(g,'base',DIR4[e.dir],0,{i:0});
+}
 function dibujarPJ(e,look,now,cam,isP,dur){
   const g=grupoLook(look);if(!g)return false;
-  const f=pjFrame(e,g,now,isP,dur);if(!f)return false;
+  const v=isP&&animDe('vehiculos',(vehiculo()||'-')+'-atras')?vehiculo():null;   // en la calle, con el patinete o la bici: detrás, él (subido) y delante
+  const f=v?frameMonta(e,g,v,now,dur):pjFrame(e,g,now,isP,dur);if(!f)return false;
   const xp=Math.round(e.px-cam.x)+8,yp=Math.round(e.py-cam.y)+15;   // pies en la última fila de la casilla
-  sombra(xp,yp);pinta(f,xp,yp);
+  sombra(xp,yp);
+  if(v){const o={i:e.moving?Math.min(1,Math.floor(e.t/dur*2)):0},d=DIR4[e.dir],a=frameDe('vehiculos',v+'-atras',d,0,o),b=frameDe('vehiculos',v+'-delante',d,0,o);
+    if(a)pinta(a,xp,yp);pinta(f,xp,yp-VEHICULOS[v].sube);if(b)pinta(b,xp,yp);}
+  else pinta(f,xp,yp);
   const a=e.act;
   if(a&&a.humo&&!a.humoHecho&&f.i>=a.humo.frame){a.humoHecho=1;lanzarVfx(a.humo.vfx,e.px+8+a.humo.off[0],e.py+15+a.humo.off[1],now,S.map,true);}
   return true;

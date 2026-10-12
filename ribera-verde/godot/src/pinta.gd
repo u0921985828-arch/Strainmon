@@ -589,7 +589,10 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 	var gr = Atlas.grupo_look(look)
 	if not gr:
 		return
-	var f = _pj_frame(e, gr, isP, dur)
+	var v = J.vehiculo() if isP else null   # en la calle, con el patinete o la bici: detrás, él (subido) y delante (dibujarPJ)
+	if v and not Atlas.anim_de("vehiculos", v + "-atras"):
+		v = null
+	var f = _monta_frame(e, gr, v, dur) if v else _pj_frame(e, gr, isP, dur)
 	if f == null:
 		return
 	var xp: int = Datos.jsround(e.px - cam.x) + 8
@@ -597,11 +600,35 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 	var sm := Color8(0, 0, 0, 56)
 	_rect(xp - 4, yp - 1, 8, 3, sm)
 	_rect(xp - 5, yp, 10, 1, sm)
-	_pinta(f, xp, yp)
+	if v:
+		var o := {"i": mini(1, floori(e.t / dur * 2)) if e.moving else 0}
+		var d: String = DIR4[e.dir]
+		var va = Atlas.frame_de("vehiculos", v + "-atras", d, 0, o)
+		var vd = Atlas.frame_de("vehiculos", v + "-delante", d, 0, o)
+		if va:
+			_pinta(va, xp, yp)
+		_pinta(f, xp, yp - int(J.D.VEHICULOS[v].sube))
+		if vd:
+			_pinta(vd, xp, yp)
+	else:
+		_pinta(f, xp, yp)
 	var a = e.get("act")
 	if a and a.get("humo") and not a.get("humoHecho") and f.i >= a.humo.frame:
 		a.humoHecho = 1
 		J.lanzar_vfx(a.humo.vfx, e.px + 8 + a.humo.off[0], e.py + 15 + a.humo.off[1], now, J.S.map, true)
+
+# montado (1.13, frameMonta): la acción si la hay; si no, en la bici pedalea (walk) y en el patinete va de pie (base)
+func _monta_frame(e: Dictionary, gr, v: String, dur: float):
+	var dir: String = DIR4[e.dir]
+	if e.get("act"):
+		var t: float = now - e.act.t0
+		var f = Atlas.frame_de(gr, e.act.n, dir, t)
+		if f and t < Atlas.duracion(gr, e.act.n):
+			return f
+		e.act = null
+	if v == "bici" and e.moving:
+		return Atlas.frame_de(gr, "walk", dir, 0, {"ph": (e.parity + minf(1, e.t / dur)) / 2})
+	return Atlas.frame_de(gr, "base", dir, 0, {"i": 0})
 
 func _pj_frame(e: Dictionary, gr, isP: bool, dur: float):
 	var dir: String = DIR4[e.dir]

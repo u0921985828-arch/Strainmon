@@ -3,7 +3,7 @@
  "imagen": "atlas.png",
  "tamano": [
   1024,
-  2872
+  2896
  ],
  "frames": {
   "carpa-c-fondo/carpa-c-luz-led/unica/00": {
@@ -7212,1263 +7212,1407 @@
    "w": 32,
    "h": 32
   },
-  "vfx-nube-vaper/efecto/unica/00": {
+  "vehiculos/bici-atras/east/00": {
    "x": 96,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/bici-atras/east/01": {
+   "x": 128,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/bici-atras/north/00": {
+   "x": 160,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/bici-atras/north/01": {
+   "x": 192,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/bici-atras/south/00": {
+   "x": 224,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/bici-atras/south/01": {
+   "x": 256,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/bici-delante/east/00": {
+   "x": 288,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/bici-delante/east/01": {
+   "x": 320,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/bici-delante/north/00": {
+   "x": 352,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/bici-delante/north/01": {
+   "x": 384,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/bici-delante/south/00": {
+   "x": 416,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/bici-delante/south/01": {
+   "x": 448,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/patinete-atras/east/00": {
+   "x": 480,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/patinete-atras/east/01": {
+   "x": 512,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/patinete-atras/north/00": {
+   "x": 544,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/patinete-atras/north/01": {
+   "x": 576,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/patinete-atras/south/00": {
+   "x": 608,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/patinete-atras/south/01": {
+   "x": 640,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/patinete-delante/east/00": {
+   "x": 672,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/patinete-delante/east/01": {
+   "x": 704,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/patinete-delante/north/00": {
+   "x": 736,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/patinete-delante/north/01": {
+   "x": 768,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/patinete-delante/south/00": {
+   "x": 800,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vehiculos/patinete-delante/south/01": {
+   "x": 832,
+   "y": 2776,
+   "w": 32,
+   "h": 32
+  },
+  "vfx-nube-vaper/efecto/unica/00": {
+   "x": 864,
    "y": 2776,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/01": {
-   "x": 128,
+   "x": 896,
    "y": 2776,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/02": {
-   "x": 160,
+   "x": 928,
    "y": 2776,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/03": {
-   "x": 192,
+   "x": 960,
    "y": 2776,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/04": {
-   "x": 224,
+   "x": 992,
    "y": 2776,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/05": {
-   "x": 256,
-   "y": 2776,
+   "x": 0,
+   "y": 2808,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/06": {
-   "x": 288,
-   "y": 2776,
+   "x": 32,
+   "y": 2808,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/07": {
-   "x": 320,
-   "y": 2776,
+   "x": 64,
+   "y": 2808,
    "w": 32,
    "h": 32
   },
   "vfx-spray/efecto/unica/00": {
-   "x": 352,
-   "y": 2776,
+   "x": 96,
+   "y": 2808,
    "w": 32,
    "h": 32
   },
   "vfx-spray/efecto/unica/01": {
-   "x": 384,
-   "y": 2776,
+   "x": 128,
+   "y": 2808,
    "w": 32,
    "h": 32
   },
   "vfx-spray/efecto/unica/02": {
-   "x": 416,
-   "y": 2776,
+   "x": 160,
+   "y": 2808,
    "w": 32,
    "h": 32
   },
   "vfx-spray/efecto/unica/03": {
-   "x": 448,
-   "y": 2776,
+   "x": 192,
+   "y": 2808,
    "w": 32,
    "h": 32
   },
   "vfx-spray/efecto/unica/04": {
-   "x": 480,
-   "y": 2776,
+   "x": 224,
+   "y": 2808,
    "w": 32,
    "h": 32
   },
   "vfx-spray/efecto/unica/05": {
-   "x": 512,
-   "y": 2776,
+   "x": 256,
+   "y": 2808,
    "w": 32,
    "h": 32
   },
   "macetas-vista/maceta-vista-plastico18/unica/00": {
-   "x": 544,
-   "y": 2776,
+   "x": 288,
+   "y": 2808,
    "w": 32,
    "h": 24
   },
   "macetas-vista/maceta-vista-plastico7/unica/00": {
-   "x": 576,
-   "y": 2776,
+   "x": 320,
+   "y": 2808,
    "w": 32,
    "h": 24
   },
   "macetas-vista/maceta-vista-tela11/unica/00": {
-   "x": 608,
-   "y": 2776,
+   "x": 352,
+   "y": 2808,
    "w": 32,
    "h": 24
   },
   "macetas-vista/maceta-vista-tela25/unica/00": {
-   "x": 640,
-   "y": 2776,
+   "x": 384,
+   "y": 2808,
    "w": 32,
    "h": 24
   },
   "carpa-c-focos-cfl/foco-c-cfl-36/unica/00": {
-   "x": 672,
-   "y": 2776,
+   "x": 416,
+   "y": 2808,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos-led-ancho/foco-c-led480-47/unica/00": {
-   "x": 720,
-   "y": 2776,
+   "x": 464,
+   "y": 2808,
    "w": 80,
    "h": 16
   },
   "carpa-c-focos-led-ancho/foco-c-led720-78/unica/00": {
-   "x": 800,
-   "y": 2776,
+   "x": 544,
+   "y": 2808,
    "w": 80,
    "h": 16
   },
   "carpa-c-focos-led/foco-c-cfl-25/unica/00": {
-   "x": 880,
-   "y": 2776,
+   "x": 624,
+   "y": 2808,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos-led/foco-c-led100-20/unica/00": {
-   "x": 928,
-   "y": 2776,
+   "x": 672,
+   "y": 2808,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos-led/foco-c-led100-26/unica/00": {
-   "x": 976,
-   "y": 2776,
+   "x": 720,
+   "y": 2808,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos-led/foco-c-led200-24/unica/00": {
-   "x": 0,
+   "x": 768,
    "y": 2808,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos-led/foco-c-led200-30/unica/00": {
-   "x": 48,
+   "x": 816,
    "y": 2808,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos/foco-c-40/unica/00": {
-   "x": 96,
+   "x": 864,
    "y": 2808,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos/foco-c-44/unica/00": {
-   "x": 144,
+   "x": 912,
    "y": 2808,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos/foco-c-46/unica/00": {
-   "x": 192,
+   "x": 960,
    "y": 2808,
    "w": 48,
    "h": 16
   },
   "gaviota/idle/unica/00": {
-   "x": 240,
+   "x": 1008,
    "y": 2808,
    "w": 16,
    "h": 16
   },
   "gaviota/idle/unica/01": {
-   "x": 256,
-   "y": 2808,
+   "x": 0,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "gaviota/idle/unica/02": {
-   "x": 272,
-   "y": 2808,
+   "x": 16,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "gaviota/idle/unica/03": {
-   "x": 288,
-   "y": 2808,
+   "x": 32,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos-equipo/armario/unica/00": {
-   "x": 304,
-   "y": 2808,
+   "x": 48,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos-equipo/carpa/unica/00": {
-   "x": 320,
-   "y": 2808,
+   "x": 64,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos-equipo/filtro/unica/00": {
-   "x": 336,
-   "y": 2808,
+   "x": 80,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos-equipo/garrafa/unica/00": {
-   "x": 352,
-   "y": 2808,
+   "x": 96,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos-equipo/goteo/unica/00": {
-   "x": 368,
-   "y": 2808,
+   "x": 112,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos-equipo/led/unica/00": {
-   "x": 384,
-   "y": 2808,
+   "x": 128,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos-equipo/ventilador/unica/00": {
-   "x": 400,
-   "y": 2808,
+   "x": 144,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos-menu/altavoz/unica/00": {
-   "x": 416,
-   "y": 2808,
+   "x": 160,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos-menu/cogollo/unica/00": {
-   "x": 432,
-   "y": 2808,
+   "x": 176,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos-menu/guardar/unica/00": {
-   "x": 448,
-   "y": 2808,
+   "x": 192,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos-menu/movil/unica/00": {
-   "x": 464,
-   "y": 2808,
+   "x": 208,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos-menu/salir/unica/00": {
-   "x": 480,
-   "y": 2808,
+   "x": 224,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos/abono/unica/00": {
-   "x": 496,
-   "y": 2808,
+   "x": 240,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos/billetes/unica/00": {
-   "x": 512,
-   "y": 2808,
+   "x": 256,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos/bocadillo/unica/00": {
-   "x": 528,
-   "y": 2808,
+   "x": 272,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos/bolsa/unica/00": {
-   "x": 544,
-   "y": 2808,
+   "x": 288,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos/cogollo/unica/00": {
-   "x": 560,
-   "y": 2808,
+   "x": 304,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos/insecticida/unica/00": {
-   "x": 576,
-   "y": 2808,
+   "x": 320,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos/lampara/unica/00": {
-   "x": 592,
-   "y": 2808,
+   "x": 336,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos/maceta/unica/00": {
-   "x": 608,
-   "y": 2808,
+   "x": 352,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos/monedas/unica/00": {
-   "x": 624,
-   "y": 2808,
+   "x": 368,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos/polinizador/unica/00": {
-   "x": 640,
-   "y": 2808,
+   "x": 384,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos/semillas/unica/00": {
-   "x": 656,
-   "y": 2808,
+   "x": 400,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos/spray/unica/00": {
-   "x": 672,
-   "y": 2808,
+   "x": 416,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "iconos/trofeo/unica/00": {
-   "x": 688,
-   "y": 2808,
+   "x": 432,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "interior-bar/floorB/unica/00": {
-   "x": 704,
-   "y": 2808,
+   "x": 448,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "interior-bar/iwB_bar/unica/00": {
-   "x": 720,
-   "y": 2808,
+   "x": 464,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "interior-bar/iwT_bar/unica/00": {
-   "x": 736,
-   "y": 2808,
+   "x": 480,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "interior-home/floor/unica/00": {
-   "x": 752,
-   "y": 2808,
+   "x": 496,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "interior-home/iwB_home/unica/00": {
-   "x": 768,
-   "y": 2808,
+   "x": 512,
+   "y": 2840,
    "w": 16,
    "h": 16
   },
   "interior-home/iwT_home/unica/00": {
-   "x": 784,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "interior-shop/floorS/unica/00": {
-   "x": 800,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "interior-shop/iwB_shop/unica/00": {
-   "x": 816,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "interior-shop/iwT_shop/unica/00": {
-   "x": 832,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "paloma/idle/unica/00": {
-   "x": 848,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "paloma/idle/unica/01": {
-   "x": 864,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "paloma/idle/unica/02": {
-   "x": 880,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "paloma/idle/unica/03": {
-   "x": 896,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "prop-seto/seto/unica/00": {
-   "x": 912,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/barcounter/unica/00": {
-   "x": 928,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/bench/unica/00": {
-   "x": 944,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/bottles/unica/00": {
-   "x": 960,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/btable/unica/00": {
-   "x": 976,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/bush/unica/00": {
-   "x": 992,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/counter/unica/00": {
-   "x": 1008,
-   "y": 2808,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/crate/unica/00": {
-   "x": 0,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/display/unica/00": {
-   "x": 16,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/fence/unica/00": {
-   "x": 32,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/iwin/unica/00": {
-   "x": 48,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/jukebox/unica/00": {
-   "x": 64,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/lab/unica/00": {
-   "x": 80,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/lab2/unica/00": {
-   "x": 96,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/luces/unica/00": {
-   "x": 112,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/luces/unica/01": {
-   "x": 128,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/luces/unica/02": {
-   "x": 144,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/luces/unica/03": {
-   "x": 160,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/pc/unica/00": {
-   "x": 176,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/plantDeco/unica/00": {
-   "x": 192,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/poster/unica/00": {
-   "x": 208,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/shelfW/unica/00": {
-   "x": 224,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/sign/unica/00": {
-   "x": 240,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/stool/unica/00": {
-   "x": 256,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-16/table/unica/00": {
-   "x": 272,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-altura/barcounter/unica/00": {
-   "x": 288,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "props-altura/counter/unica/00": {
-   "x": 304,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tiles-exterior/bridgeB/unica/00": {
-   "x": 320,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tiles-exterior/bridgeT/unica/00": {
-   "x": 336,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tiles-exterior/dirt/unica/00": {
-   "x": 352,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tiles-exterior/dock/unica/00": {
-   "x": 368,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tiles-exterior/flowers/unica/00": {
-   "x": 384,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tiles-exterior/grass/unica/00": {
-   "x": 400,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tiles-exterior/plaza/unica/00": {
-   "x": 416,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tiles-exterior/roadB/unica/00": {
-   "x": 432,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tiles-exterior/roadT/unica/00": {
-   "x": 448,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tiles-exterior/tallgrass/unica/00": {
-   "x": 464,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tiles-exterior/walk/unica/00": {
-   "x": 480,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tiles-exterior/water/unica/00": {
-   "x": 496,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tiles-firmes/hormigon/unica/00": {
-   "x": 512,
-   "y": 2824,
-   "w": 64,
-   "h": 16
-  },
-  "tiles-firmes/pista/unica/00": {
-   "x": 576,
-   "y": 2824,
-   "w": 64,
-   "h": 16
-  },
-  "tiles-firmes/rotoB/unica/00": {
-   "x": 640,
-   "y": 2824,
-   "w": 64,
-   "h": 16
-  },
-  "tiles-firmes/rotoT/unica/00": {
-   "x": 704,
-   "y": 2824,
-   "w": 64,
-   "h": 16
-  },
-  "tiles-interior-extra/mat/unica/00": {
-   "x": 768,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-01/unica/00": {
-   "x": 784,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-02/unica/00": {
-   "x": 800,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-03/unica/00": {
-   "x": 816,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-04/unica/00": {
-   "x": 832,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-05/unica/00": {
-   "x": 848,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-06/unica/00": {
-   "x": 864,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-07/unica/00": {
-   "x": 880,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-08/unica/00": {
-   "x": 896,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-09/unica/00": {
-   "x": 912,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-10/unica/00": {
-   "x": 928,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-11/unica/00": {
-   "x": 944,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-12/unica/00": {
-   "x": 960,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-13/unica/00": {
-   "x": 976,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-14/unica/00": {
-   "x": 992,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-01/unica/00": {
-   "x": 1008,
-   "y": 2824,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-02/unica/00": {
-   "x": 0,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-03/unica/00": {
-   "x": 16,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-04/unica/00": {
-   "x": 32,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-05/unica/00": {
-   "x": 48,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-06/unica/00": {
-   "x": 64,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-07/unica/00": {
-   "x": 80,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-08/unica/00": {
-   "x": 96,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-09/unica/00": {
-   "x": 112,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-10/unica/00": {
-   "x": 128,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-11/unica/00": {
-   "x": 144,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-12/unica/00": {
-   "x": 160,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-13/unica/00": {
-   "x": 176,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-14/unica/00": {
-   "x": 192,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-01/unica/00": {
-   "x": 208,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-02/unica/00": {
-   "x": 224,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-03/unica/00": {
-   "x": 240,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-04/unica/00": {
-   "x": 256,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-05/unica/00": {
-   "x": 272,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-06/unica/00": {
-   "x": 288,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-07/unica/00": {
-   "x": 304,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-08/unica/00": {
-   "x": 320,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-09/unica/00": {
-   "x": 336,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-10/unica/00": {
-   "x": 352,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-11/unica/00": {
-   "x": 368,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-12/unica/00": {
-   "x": 384,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-13/unica/00": {
-   "x": 400,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-14/unica/00": {
-   "x": 416,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-acaros/efecto/unica/00": {
-   "x": 432,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-acaros/efecto/unica/01": {
-   "x": 448,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-acaros/efecto/unica/02": {
-   "x": 464,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-acaros/efecto/unica/03": {
-   "x": 480,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-brillo/efecto/unica/00": {
-   "x": 496,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-brillo/efecto/unica/01": {
-   "x": 512,
-   "y": 2840,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-brillo/efecto/unica/02": {
    "x": 528,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-brillo/efecto/unica/03": {
+  "interior-shop/floorS/unica/00": {
    "x": 544,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-golpe/efecto/unica/00": {
+  "interior-shop/iwB_shop/unica/00": {
    "x": 560,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-golpe/efecto/unica/01": {
+  "interior-shop/iwT_shop/unica/00": {
    "x": 576,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-golpe/efecto/unica/02": {
+  "paloma/idle/unica/00": {
    "x": 592,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-golpe/efecto/unica/03": {
+  "paloma/idle/unica/01": {
    "x": 608,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-gotas/efecto/unica/00": {
+  "paloma/idle/unica/02": {
    "x": 624,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-gotas/efecto/unica/01": {
+  "paloma/idle/unica/03": {
    "x": 640,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-gotas/efecto/unica/02": {
+  "prop-seto/seto/unica/00": {
    "x": 656,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-gotas/efecto/unica/03": {
+  "props-16/barcounter/unica/00": {
    "x": 672,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/00": {
+  "props-16/bench/unica/00": {
    "x": 688,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/01": {
+  "props-16/bottles/unica/00": {
    "x": 704,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/02": {
+  "props-16/btable/unica/00": {
    "x": 720,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/03": {
+  "props-16/bush/unica/00": {
    "x": 736,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/04": {
+  "props-16/counter/unica/00": {
    "x": 752,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/05": {
+  "props-16/crate/unica/00": {
    "x": 768,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/00": {
+  "props-16/display/unica/00": {
    "x": 784,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/01": {
+  "props-16/fence/unica/00": {
    "x": 800,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/02": {
+  "props-16/iwin/unica/00": {
    "x": 816,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/03": {
+  "props-16/jukebox/unica/00": {
    "x": 832,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/04": {
+  "props-16/lab/unica/00": {
    "x": 848,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/05": {
+  "props-16/lab2/unica/00": {
    "x": 864,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/00": {
+  "props-16/luces/unica/00": {
    "x": 880,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/01": {
+  "props-16/luces/unica/01": {
    "x": 896,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/02": {
+  "props-16/luces/unica/02": {
    "x": 912,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/03": {
+  "props-16/luces/unica/03": {
    "x": 928,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/04": {
+  "props-16/pc/unica/00": {
    "x": 944,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/05": {
+  "props-16/plantDeco/unica/00": {
    "x": 960,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/00": {
+  "props-16/poster/unica/00": {
    "x": 976,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/01": {
+  "props-16/shelfW/unica/00": {
    "x": 992,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/02": {
+  "props-16/sign/unica/00": {
    "x": 1008,
    "y": 2840,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/03": {
+  "props-16/stool/unica/00": {
    "x": 0,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/04": {
+  "props-16/table/unica/00": {
    "x": 16,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/05": {
+  "props-altura/barcounter/unica/00": {
    "x": 32,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/00": {
+  "props-altura/counter/unica/00": {
    "x": 48,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/01": {
+  "tiles-exterior/bridgeB/unica/00": {
    "x": 64,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/02": {
+  "tiles-exterior/bridgeT/unica/00": {
    "x": 80,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/03": {
+  "tiles-exterior/dirt/unica/00": {
    "x": 96,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/04": {
+  "tiles-exterior/dock/unica/00": {
    "x": 112,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/05": {
+  "tiles-exterior/flowers/unica/00": {
    "x": 128,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/00": {
+  "tiles-exterior/grass/unica/00": {
    "x": 144,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/01": {
+  "tiles-exterior/plaza/unica/00": {
    "x": 160,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/02": {
+  "tiles-exterior/roadB/unica/00": {
    "x": 176,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/03": {
+  "tiles-exterior/roadT/unica/00": {
    "x": 192,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/04": {
+  "tiles-exterior/tallgrass/unica/00": {
    "x": 208,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/05": {
+  "tiles-exterior/walk/unica/00": {
    "x": 224,
    "y": 2856,
    "w": 16,
    "h": 16
   },
-  "detalles-hierba/detalles/unica/00": {
+  "tiles-exterior/water/unica/00": {
    "x": 240,
    "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tiles-firmes/hormigon/unica/00": {
+   "x": 256,
+   "y": 2856,
+   "w": 64,
+   "h": 16
+  },
+  "tiles-firmes/pista/unica/00": {
+   "x": 320,
+   "y": 2856,
+   "w": 64,
+   "h": 16
+  },
+  "tiles-firmes/rotoB/unica/00": {
+   "x": 384,
+   "y": 2856,
+   "w": 64,
+   "h": 16
+  },
+  "tiles-firmes/rotoT/unica/00": {
+   "x": 448,
+   "y": 2856,
+   "w": 64,
+   "h": 16
+  },
+  "tiles-interior-extra/mat/unica/00": {
+   "x": 512,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/agua-01/unica/00": {
+   "x": 528,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/agua-02/unica/00": {
+   "x": 544,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/agua-03/unica/00": {
+   "x": 560,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/agua-04/unica/00": {
+   "x": 576,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/agua-05/unica/00": {
+   "x": 592,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/agua-06/unica/00": {
+   "x": 608,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/agua-07/unica/00": {
+   "x": 624,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/agua-08/unica/00": {
+   "x": 640,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/agua-09/unica/00": {
+   "x": 656,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/agua-10/unica/00": {
+   "x": 672,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/agua-11/unica/00": {
+   "x": 688,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/agua-12/unica/00": {
+   "x": 704,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/agua-13/unica/00": {
+   "x": 720,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/agua-14/unica/00": {
+   "x": 736,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/plaza-01/unica/00": {
+   "x": 752,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/plaza-02/unica/00": {
+   "x": 768,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/plaza-03/unica/00": {
+   "x": 784,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/plaza-04/unica/00": {
+   "x": 800,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/plaza-05/unica/00": {
+   "x": 816,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/plaza-06/unica/00": {
+   "x": 832,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/plaza-07/unica/00": {
+   "x": 848,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/plaza-08/unica/00": {
+   "x": 864,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/plaza-09/unica/00": {
+   "x": 880,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/plaza-10/unica/00": {
+   "x": 896,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/plaza-11/unica/00": {
+   "x": 912,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/plaza-12/unica/00": {
+   "x": 928,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/plaza-13/unica/00": {
+   "x": 944,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/plaza-14/unica/00": {
+   "x": 960,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-01/unica/00": {
+   "x": 976,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-02/unica/00": {
+   "x": 992,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-03/unica/00": {
+   "x": 1008,
+   "y": 2856,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-04/unica/00": {
+   "x": 0,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-05/unica/00": {
+   "x": 16,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-06/unica/00": {
+   "x": 32,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-07/unica/00": {
+   "x": 48,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-08/unica/00": {
+   "x": 64,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-09/unica/00": {
+   "x": 80,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-10/unica/00": {
+   "x": 96,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-11/unica/00": {
+   "x": 112,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-12/unica/00": {
+   "x": 128,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-13/unica/00": {
+   "x": 144,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-14/unica/00": {
+   "x": 160,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-acaros/efecto/unica/00": {
+   "x": 176,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-acaros/efecto/unica/01": {
+   "x": 192,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-acaros/efecto/unica/02": {
+   "x": 208,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-acaros/efecto/unica/03": {
+   "x": 224,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-brillo/efecto/unica/00": {
+   "x": 240,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-brillo/efecto/unica/01": {
+   "x": 256,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-brillo/efecto/unica/02": {
+   "x": 272,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-brillo/efecto/unica/03": {
+   "x": 288,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-golpe/efecto/unica/00": {
+   "x": 304,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-golpe/efecto/unica/01": {
+   "x": 320,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-golpe/efecto/unica/02": {
+   "x": 336,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-golpe/efecto/unica/03": {
+   "x": 352,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-gotas/efecto/unica/00": {
+   "x": 368,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-gotas/efecto/unica/01": {
+   "x": 384,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-gotas/efecto/unica/02": {
+   "x": 400,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-gotas/efecto/unica/03": {
+   "x": 416,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-cigarro/efecto/unica/00": {
+   "x": 432,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-cigarro/efecto/unica/01": {
+   "x": 448,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-cigarro/efecto/unica/02": {
+   "x": 464,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-cigarro/efecto/unica/03": {
+   "x": 480,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-cigarro/efecto/unica/04": {
+   "x": 496,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-cigarro/efecto/unica/05": {
+   "x": 512,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-pipa/efecto/unica/00": {
+   "x": 528,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-pipa/efecto/unica/01": {
+   "x": 544,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-pipa/efecto/unica/02": {
+   "x": 560,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-pipa/efecto/unica/03": {
+   "x": 576,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-pipa/efecto/unica/04": {
+   "x": 592,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-pipa/efecto/unica/05": {
+   "x": 608,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-porro/efecto/unica/00": {
+   "x": 624,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-porro/efecto/unica/01": {
+   "x": 640,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-porro/efecto/unica/02": {
+   "x": 656,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-porro/efecto/unica/03": {
+   "x": 672,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-porro/efecto/unica/04": {
+   "x": 688,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-porro/efecto/unica/05": {
+   "x": 704,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-puro/efecto/unica/00": {
+   "x": 720,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-puro/efecto/unica/01": {
+   "x": 736,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-puro/efecto/unica/02": {
+   "x": 752,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-puro/efecto/unica/03": {
+   "x": 768,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-puro/efecto/unica/04": {
+   "x": 784,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-puro/efecto/unica/05": {
+   "x": 800,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-monedas/efecto/unica/00": {
+   "x": 816,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-monedas/efecto/unica/01": {
+   "x": 832,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-monedas/efecto/unica/02": {
+   "x": 848,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-monedas/efecto/unica/03": {
+   "x": 864,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-monedas/efecto/unica/04": {
+   "x": 880,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-monedas/efecto/unica/05": {
+   "x": 896,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/00": {
+   "x": 912,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/01": {
+   "x": 928,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/02": {
+   "x": 944,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/03": {
+   "x": 960,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/04": {
+   "x": 976,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/05": {
+   "x": 992,
+   "y": 2872,
+   "w": 16,
+   "h": 16
+  },
+  "detalles-hierba/detalles/unica/00": {
+   "x": 0,
+   "y": 2888,
    "w": 40,
    "h": 8
   }
@@ -9059,6 +9203,14 @@
    ]
   },
   "unai": {
+   "w": 32,
+   "h": 32,
+   "ancla": [
+    16,
+    30
+   ]
+  },
+  "vehiculos": {
    "w": 32,
    "h": 32,
    "ancla": [
@@ -13534,6 +13686,80 @@
       "unai/walk/south/01",
       "unai/walk/south/02",
       "unai/walk/south/03"
+     ]
+    }
+   }
+  },
+  "vehiculos": {
+   "bici-atras": {
+    "fps": 8,
+    "bucle": true,
+    "dirs": {
+     "east": [
+      "vehiculos/bici-atras/east/00",
+      "vehiculos/bici-atras/east/01"
+     ],
+     "north": [
+      "vehiculos/bici-atras/north/00",
+      "vehiculos/bici-atras/north/01"
+     ],
+     "south": [
+      "vehiculos/bici-atras/south/00",
+      "vehiculos/bici-atras/south/01"
+     ]
+    }
+   },
+   "bici-delante": {
+    "fps": 8,
+    "bucle": true,
+    "dirs": {
+     "east": [
+      "vehiculos/bici-delante/east/00",
+      "vehiculos/bici-delante/east/01"
+     ],
+     "north": [
+      "vehiculos/bici-delante/north/00",
+      "vehiculos/bici-delante/north/01"
+     ],
+     "south": [
+      "vehiculos/bici-delante/south/00",
+      "vehiculos/bici-delante/south/01"
+     ]
+    }
+   },
+   "patinete-atras": {
+    "fps": 8,
+    "bucle": true,
+    "dirs": {
+     "east": [
+      "vehiculos/patinete-atras/east/00",
+      "vehiculos/patinete-atras/east/01"
+     ],
+     "north": [
+      "vehiculos/patinete-atras/north/00",
+      "vehiculos/patinete-atras/north/01"
+     ],
+     "south": [
+      "vehiculos/patinete-atras/south/00",
+      "vehiculos/patinete-atras/south/01"
+     ]
+    }
+   },
+   "patinete-delante": {
+    "fps": 8,
+    "bucle": true,
+    "dirs": {
+     "east": [
+      "vehiculos/patinete-delante/east/00",
+      "vehiculos/patinete-delante/east/01"
+     ],
+     "north": [
+      "vehiculos/patinete-delante/north/00",
+      "vehiculos/patinete-delante/north/01"
+     ],
+     "south": [
+      "vehiculos/patinete-delante/south/00",
+      "vehiculos/patinete-delante/south/01"
      ]
     }
    }

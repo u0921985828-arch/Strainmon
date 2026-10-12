@@ -84,6 +84,11 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
     P: { x: 19, y: 21, dir: 'left', moving: true, fx: 20, fy: 21, t: 60, dur: 240, parity: 1, px: (20 - 60 / 240) * 16, py: 21 * 16 },
     ents: { pat0: { x: 22, y: 21, fx: 23, fy: 21, px: (23 - 105 / 210) * 16, py: 21 * 16, dir: 'left', moving: true, t: 105, caza: true, dur: 210 } },
     SOSP: { v: 100, alarma: 'pat0' } },
+  // montado (1.13): la bici de lado, pedaleando por la plaza, y el patinete de frente en Mendialde
+  { k: 'calle-bici', sw: 400, mode: 'world', now: T + 210, seed: 4242, S: { ch: 6, min: 12 * 60, day: 3, rep: 30, veh: { bici: 2, patinete: 1 }, flags: { darko1: true } },
+    map: 'town', P: { x: 21, y: 21, dir: 'right', moving: true, fx: 20, fy: 21, t: 60, dur: 110, parity: 1, px: (20 + 60 / 110) * 16, py: 21 * 16 } },
+  { k: 'calle-patinete', sw: 280, mode: 'world', now: T + 640, S: { ch: 4, min: 8 * 60, day: 2, veh: { patinete: 1 }, flags: {} }, map: 'mendialde',
+    P: { x: 21, y: 20, dir: 'down', moving: true, fx: 21, fy: 19, t: 100, dur: 150, parity: 0, px: 21 * 16, py: (19 + 100 / 150) * 16 } },
   // la vista C con todo (1.10, antes en la vista B): carpa de 150 con extras (goteo con el depósito a 400 de 975 L en la mirilla,
   // sus ramales, llaves y microtubos; filtro y ventilador), macetas de todo tipo, fases, plaga, seca y muerta; elegida una plaza de
   // atrás (la fila de delante en transparencia)

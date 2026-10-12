@@ -1,5 +1,20 @@
 # Cambios
 
+## 1.13.0 · 12 de octubre de 2026
+
+Patinete y bici, y un repaso de errores. Godot, 0.7.0.
+
+- **Nuevo: el patinete y la bici** (`VEHICULOS`, 12c-salon). Se compran en la tienda online (Muebles y transporte: patinete 119 €, bici de segunda mano 239 €) y el mensajero los deja en el portal al día siguiente. En la calle (cualquier zona exterior) vas montado: el patinete, 150 ms por casilla (110 con B); la bici, 110 (80 con B), la más rápida para dejar atrás a una patrulla (los agentes corren a 180-210). En casa y en los interiores, a pie. Dibujados a mano (`tools/sprites/a-mano/vehiculos.py`) en dos capas, detrás y delante del protagonista, con las ruedas que giran y el pedal de la bici.
+- **Arreglado: Darko ya no entra a robar durante una siesta**; solo al dormir hasta el día siguiente.
+- **Arreglado: la redada solo se lleva lo de encima si estás en casa** (el arcón, siempre). El texto dice lo que encuentran (o «No encuentran nada que llevarse») y la multa entera; si no te llega, cuánto pagas.
+- **Arreglado: el aviso de la orden** solo menciona a Molina desde el capítulo 5 (antes no lo conoces).
+- **Arreglado: la factura de la luz** dice lo que pagas y lo que te falta si no llega.
+- **Arreglado: al cargar la partida** salen la redada o el plazo vencido que quedaron pendientes al guardar en la cama.
+- **Arreglado: la cuota de Molina** cubre 10 días justos (antes, 11 la primera vez).
+- **Arreglado: los encargos de Baltasar** piden una bolsa en la que quepan (2 kg, bolsa de deporte; 5 y 10 kg, maleta).
+- **Cambiado: los plazos dicen «antes de que acabe el día X»** (el día X todavía vale).
+- **Cambiado: la ficha de la planta en la vista C** lleva su número o su nombre y la ★.
+
 ## 1.12.0 · 12 de octubre de 2026
 
 Pantalla más alta, nombre nuevo y personajes sin caras que cambian. Godot, 0.6.0.

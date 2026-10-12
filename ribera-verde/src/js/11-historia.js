@@ -227,7 +227,7 @@ async function talkMolina(){
   else if(S.protect)await say(`Estás cubierto hasta el día ${S.protHasta}. ${S.protHasta>S.day?`Te quedan ${S.protHasta-S.day} días.`:'Se acaba HOY.'}`,N);
   const c=await ask(S.protect?'¿Pagar ya los diez días siguientes?':'¿Aceptas el trato del sargento?',['Pagar '+eur(SOBORNO),'No'],N);
   if(c===0){if(S.money<SOBORNO)await say('¿Con qué dinero? Vuelve cuando lo tengas.',N);
-    else{S.money-=SOBORNO;S.protHasta=Math.max(S.day,S.protect?S.protHasta:0)+CUOTA_DIAS;S.protect=true;sfx('coin');await say(`Bien. Mis agentes mirarán hacia otro lado hasta el día ${S.protHasta}.`,N);}}
+    else{S.money-=SOBORNO;S.protHasta=(S.protect?S.protHasta:S.day-1)+CUOTA_DIAS;S.protect=true;sfx('coin');await say(`Bien. Mis agentes mirarán hacia otro lado hasta el día ${S.protHasta}.`,N);}}
   else if(!S.protect){S.heat=Math.min(100,S.heat+10);await say('Tú sabrás. Mis agentes van a estar muy atentos.',N);heatWarn();}
   if(plaza){await say('Si me necesitas, estoy en la comisaría del barrio alto.',N);await fade(1);buildEnts();await fade(0);}
 }
@@ -282,11 +282,11 @@ function objectiveText(){
   switch(S.ch){
     case 1:return S.flags.llegada===false?'Coge el autobús en la plaza de Mendialde hasta Ribera Verde.':!S.flags.letter?(S.map==='home'?'Lee la carta que hay en la mesa.':'Entra en el piso de la tía Maite, enfrente de la parada, y lee la carta que hay en la mesa.'):!S.flags.kiko1?'Visita el growshop de Kiko, al lado de casa.':'Planta y consigue tu primera cosecha.';
     case 2:return `Gana ${META_VENTAS} € vendiendo (${Math.min(META_VENTAS,Math.round(S.sales))}/${META_VENTAS}).`;
-    case 3:return (!S.flags.metB?`Ve al bar El Ancla antes del día ${S.deadline}: Don Baltasar quiere ${eur(S.due)}.`:`Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`)+llevas();
+    case 3:return (!S.flags.metB?`Ve al bar El Ancla antes de que acabe el día ${S.deadline}: Don Baltasar quiere ${eur(S.due)}.`:`Paga ${eur(S.due)} a Don Baltasar antes de que acabe el día ${S.deadline}.`)+llevas();
     case 4:return !S.flags.lab?'Kiko quiere verte en el growshop.':`Saca en la mesa 2 variedades de receta y cosecha una planta de cada (${recCount()}/2).`;
-    case 5:return `Paga ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`+llevas();
+    case 5:return `Paga ${eur(S.due)} a Don Baltasar antes de que acabe el día ${S.deadline}.`+llevas();
     case 6:return 'Gana la Copa: 20 g con más de 26,8% de THC al jurado de la plaza.';
-    case 7:return `Paga los últimos ${eur(S.due)} a Don Baltasar antes del día ${S.deadline}.`+llevas();
+    case 7:return `Paga los últimos ${eur(S.due)} a Don Baltasar antes de que acabe el día ${S.deadline}.`+llevas();
     default:{if(S.encargo)return `Encargo de Don Baltasar: lleva ${kgTxt(S.encargo.g)} al almacén de los astilleros, de noche, antes de que acabe el día ${S.encargo.hasta}.`;
       const n=imperioNivel(),sig=IMPERIO[n+1],gen=`Genoteca ${DEX.filter(k=>S.disc[k]).length}/${DEX.length}`;
       return sig?`Tu imperio · ${IMPERIO[n].n}. Facturado desde la deuda: ${eur(Math.min(sig.meta,facturado()))} de ${eur(sig.meta)} para ser ${sig.n.toLowerCase()}. ${gen}.`:`Tu imperio · ${IMPERIO[n].n}. Completa la ${gen}.`;}
@@ -344,19 +344,20 @@ async function embargo(){
 }
 // el aviso de la orden de registro (1.11): un día antes de la redada
 async function avisoOrden(){
-  sfx('bad');await talk('SMS · KIKO',['Me dice uno de la comisaría que mañana entran en tu piso con orden de registro.','Esta noche, el dinero y los cogollos a la caja o fuera de casa. Las plantas no se pueden esconder.','O paga a Molina, que aún estás a tiempo.']);
+  sfx('bad');await talk('SMS · KIKO',['Me dice uno de la comisaría que mañana entran en tu piso con orden de registro.','Esta noche, el dinero y los cogollos a la caja o fuera de casa. Las plantas no se pueden esconder.',...S.ch>=5?['O paga a Molina, que aún estás a tiempo.']:[]]);
 }
 // la redada (1.11): lo de fuera y las plantas, siempre; la caja fuerte, nunca. La multa (multaRedada) sale de lo de fuera y, si no
-// llega, de la caja
+// llega, de la caja. Lo de encima, solo si estás en casa (1.13)
 async function raidEvent(){
   S.orden=0;
   if(S.protect){S.heat=50;return talk('SMS · MOLINA',['Esta noche había orden de entrada en tu piso. La he parado.','Baja el ritmo.']);}
   sfx('bad');await say('REDADA. La policía entra en tu piso con una orden de registro.');
-  const g=Math.floor(totalBuds()+arconG()),r=totalRosin()+arconR(),hs=huecos(),np=S.pots.filter(p=>p&&!p.dead).length,eq=new Set();   // lo de encima y el arcón (1.10)
+  const casa=S.map==='home',g=Math.floor((casa?totalBuds():0)+arconG()),r=(casa?totalRosin():0)+arconR(),hs=huecos(),np=S.pots.filter(p=>p&&!p.dead).length,eq=new Set();   // lo de encima y el arcón (1.10)
   S.carpas.forEach((c,ci)=>{if(c&&hs.some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead))for(const k in EXTRAS)if(c[k]){eq.add(EXTRAS[k].n.toLowerCase());delete c[k];if(k==='goteo')delete c.dep;if(k==='garrafas')delete c.gar;}});
-  S.pots=S.pots.map(()=>null);S.buds={};S.rosin={};S.arcon={buds:{},rosin:{}};S.esquejes=[];S.bandejas=[];S.heat=CALOR_REDADA;
+  S.pots=S.pots.map(()=>null);if(casa){S.buds={};S.rosin={};}S.arcon={buds:{},rosin:{}};S.esquejes=[];S.bandejas=[];S.heat=CALOR_REDADA;
   const multa=multaRedada(np,g+Math.round(r/ROSIN.rend)),fine=multa-pagarCasa(multa);   // el rosin, como la flor de la que sale
-  await say(`Se llevan todas las plantas${r?`${g?`, ${g} g`:''} y ${rosinTxt(r)}`:` y ${g} g`}. Multa: ${eur(fine)}.`);
+  const lo=[np?'todas las plantas':'',g?g+' g':'',r?rosinTxt(r):''].filter(Boolean);
+  await say(`${lo.length?'Se llevan '+yLista(lo):'No encuentran nada que llevarse'}. Multa: ${eur(multa)}${fine<multa?` (pagas ${eur(fine)}: no tienes más)`:''}.`);
   if(eq.size)await say('Y el equipo de las carpas con plantas: '+[...eq].join(', ')+'.');
   await say(S.caja?'La caja de detrás del diploma ni la ven. Las semillas no son delito: se quedan.':'Las semillas no son delito: se quedan.');
   await say('Toca empezar de nuevo. Y vender menos una temporada.');
