@@ -211,7 +211,7 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
  5  M████████████████████████████████████.MM
  6  M████████████████████████████████████bMM
  7  M████████████████████████████████████.MM
- 8  M--------------------------------------M
+ 8  M---------@----------------------------M
  9  M.S++L+++++++++L+++A+++++++L+++++++L++MM
 10  M.++++++++++++++++++++++++++++++++++++MM
 11  M.++++++++++++@+++++++++++++++++++++++MM
@@ -242,7 +242,7 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
  5  M-███████-██████:c:███████---████████--M
  6  M-███████-██████:::███████---████████--M
  7  M-███████-██████c::███████---████████--M
- 8  M-S------L--------L---------L----------M
+ 8  M-S------L--@-----L---------L----------M
  9  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 10  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 11  M-----L-------A---------L--------------M
@@ -314,7 +314,7 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 15  M████████████+++++++*.*++++++++████████████M
 16  M████████████++++++++++++++++++████████████M
 17  M████████████++++n+++++++n+++++████████████M
-18  M+++++++++++++..b.++++++++.b..+++++++++++++M
+18  M+++++@+++++++..b.++++++++.b..+++++++++++++M
 19  M+++++++++++S+L*.*++++++++*.*L+++++++++++++M
 20  M---L----A----------L---------------L----S-M
 21  M==========================================+
@@ -349,7 +349,7 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
  6  M████████-████████-████████-████████-████████M
  7  M████████-████████-████████-████████-████████M
  8  M████████b████████b████████b████████b████████M
- 9  M----L--------L--------L--------L--------L---M
+ 9  M----L------@-L--------L--------L--------L---M
 10  =============================================M
 11  =============================================M
 12  M-S--------L---------------------L-----------M
@@ -545,6 +545,10 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 | bixente | valdehierro | (30,15) | no | siempre |
 | andoni | errotabarri | (24,19) | no | siempre |
 | ibarbitarra | ensanche | (22,14) | radio 2 | siempre |
+| club_puerto | puerto | (10,8) | no | `S.ch>=C.ch` |
+| club_valde | valdehierro | (12,8) | no | `S.ch>=C.ch` |
+| club_ibar | ibarbide | (6,18) | no | `S.ch>=C.ch` |
+| club_ens | ensanche | (12,9) | no | `S.ch>=C.ch` |
 
 Los **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acera, plaza y tierra: en el barrio, 4 + reputación/15 (+1 desde el capítulo 4, máximo 10); en los astilleros, 2 (3 desde el capítulo 4), estudiantes y currelas, que pagan el gramo un 20 % más; en el barrio alto, desde el capítulo 3, 2 (3 desde el 4), pijos y turistas; en Puerto Viejo, 2 (3 desde el 4), turistas, currelas y estudiantes; en Valdehierro, 2 (3 desde el 4), estudiantes y currelas; y en los pueblos, 1: un currela en Mendialde y un currela o un turista en Errotabarri; en Ibarbide, desde el capítulo 4, 3 en el Casco Viejo (turistas, pijos y estudiantes) y 3 en el Ensanche (pijos, currelas y estudiantes), 4 desde el 5.
 
@@ -657,4 +661,5 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Bolsa de deporte | 35 € | 3 | Llevas encima hasta 3 kg de cogollos y rosin (la mochila, 1 kg). |
 | Maleta con ruedas | 90 € | 5 | Llevas encima hasta 10 kg de cogollos y rosin. |
 | Carro de esquejes | 165 € | 2 | Dos bandejas de 12 esquejes, tapadas y bajo tubos T5, y una mesita con la tabla de corte: pinchados ahí aguantan 3 días (sueltos, 1). Kiko te lo sube al piso mañana. |
+| Analizador de cannabinoides y terpenos | 180 € | 3 | Medidor de bolsillo (1.15): THC, CBD y el terpeno principal de un lote, desde la mochila. Lo analizado se vende mejor en la calle y un 5 % más en los clubs, y la cata dice el THC exacto y el terpeno de cada aroma. |
 | Prensa de rosin | 250 € | 3 | Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores. |

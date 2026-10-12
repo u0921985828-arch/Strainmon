@@ -1010,6 +1010,12 @@
      "x": 23,
      "y": 17,
      "deambula": 0
+    },
+    {
+     "id": "club_puerto",
+     "x": 10,
+     "y": 8,
+     "deambula": 0
     }
    ],
    "objetos": [
@@ -1089,6 +1095,12 @@
      "id": "bixente",
      "x": 30,
      "y": 15,
+     "deambula": 0
+    },
+    {
+     "id": "club_valde",
+     "x": 12,
+     "y": 8,
      "deambula": 0
     }
    ],
@@ -1325,7 +1337,14 @@
     }
    ],
    "salidas": [],
-   "npcs": [],
+   "npcs": [
+    {
+     "id": "club_ibar",
+     "x": 6,
+     "y": 18,
+     "deambula": 0
+    }
+   ],
    "objetos": [
     {
      "o": "fountain",
@@ -1406,6 +1425,12 @@
      "x": 22,
      "y": 14,
      "deambula": 2
+    },
+    {
+     "id": "club_ens",
+     "x": 12,
+     "y": 9,
+     "deambula": 0
     }
    ],
    "objetos": [
