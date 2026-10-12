@@ -146,7 +146,7 @@ function newDay(){
   if(S.orden&&S.day>S.orden)queue('raid',raidEvent);
   else if(!S.orden&&S.heat>=NIVEL_POLI[3][0]){if(S.protect)queue('raid',raidEvent);else{S.orden=S.day;queue('orden',avisoOrden);}}
   S.heat=Math.max(0,S.heat-bajaCalor());
-  const luz=facturaLuz(),olor=olorDia(),av=[],nf=luz>0?pagarCasa(luz):0;S.luz={d:S.day,e:luz-nf,o:olor};if(luz>0)av.push('Factura de la luz: −'+eur(luz-nf)+(nf?` (te faltan ${eur(nf)})`:''));   // de lo de fuera y, si no llega, de la caja (1.10)
+  const luz=facturaLuz(),olor=olorDia(),av=[],nf=luz>0?pagarCasa(luz):0;S.luz={d:S.day,e:luz,o:olor};if(luz>0)av.push('Factura de la luz: −'+eur(luz-nf)+(nf?` (te faltan ${eur(nf)})`:''));   // de lo de fuera y, si no llega, de la caja (1.10)
   if(olor){S.heat=Math.min(100,S.heat+olor);av.push('Olor a cogollo: calor +'+olor);}   // después de bajar el calor: cuenta para la redada de mañana
   const sec=S.esquejes.filter(e=>S.day-e.dia>ESQUEJE_DIAS).length;if(sec){S.esquejes=S.esquejes.filter(e=>S.day-e.dia<=ESQUEJE_DIAS);av.push(`Se ${sec>1?'han secado '+sec+' esquejes':'ha secado un esqueje'} sin plantar`);}
   const seb=S.bandejas.filter(e=>S.day-e.dia>CARRO.dias).length;if(seb){S.bandejas=S.bandejas.filter(e=>S.day-e.dia<=CARRO.dias);av.push(`Se ${seb>1?'han secado '+seb+' esquejes':'ha secado un esqueje'} en las bandejas`);}

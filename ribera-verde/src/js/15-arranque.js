@@ -64,7 +64,7 @@ function enterGame(){
   if(tileSolid(MAPS[S.map],P.x,P.y))enterMap(S.map,...(S.map==='home'?[2,4]:[5,9]),'down');   // partidas viejas: la casilla puede ser ahora una carpa
   if(S.clientsDay!==S.day)spawnClients();
   // 1.13: lo que se quedó en la cola al guardar (la cama guarda antes de que salgan los avisos de la noche)
-  if(S.orden&&S.day>S.orden)queue('raid',raidEvent);if(S.due>0&&S.day>S.deadline)queue('penalty',penaltyEvent);
+  if(S.orden&&S.day>S.orden)queue('raid',raidEvent);else if(S.orden&&S.orden===S.day)queue('orden',avisoOrden);if(S.due>0&&S.day>S.deadline)queue('penalty',penaltyEvent);
   updateHUD();
 }
 function update(dt){

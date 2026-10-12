@@ -829,6 +829,7 @@ func raid_event():
 	sfx("bad")
 	await say("REDADA. La policía entra en tu piso con una orden de registro.")
 	var casa: bool = S.map == "home"
+	var ne: int = S.esquejes.size() + S.bandejas.size()
 	var g := int(floor((total_buds() if casa else 0.0) + arcon_g()))   # lo de encima y el arcón (1.10)
 	var ro: float = (total_rosin() if casa else 0.0) + arcon_r()
 	var hs := huecos()
@@ -873,6 +874,8 @@ func raid_event():
 	var lo := []
 	if npl:
 		lo.append("todas las plantas")
+	if ne:
+		lo.append("los esquejes" if ne > 1 else "el esqueje")
 	if g:
 		lo.append("%d g" % g)
 	if ro:

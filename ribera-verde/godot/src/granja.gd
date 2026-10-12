@@ -118,7 +118,7 @@ func new_day() -> void:
 	var olor := olor_dia()
 	var av := []
 	var nf: float = pagar_casa(luz) if luz > 0 else 0.0    # de lo de fuera y, si no llega, de la caja (1.10)
-	S.luz = {"d": S.day, "e": luz - nf, "o": olor}
+	S.luz = {"d": S.day, "e": luz, "o": olor}
 	if luz > 0:
 		av.append("Factura de la luz: −" + Datos.eur(luz - nf) + ((" (te faltan %s)" % Datos.eur(nf)) if nf else ""))
 	if olor:

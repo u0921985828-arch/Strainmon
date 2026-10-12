@@ -352,11 +352,11 @@ async function raidEvent(){
   S.orden=0;
   if(S.protect){S.heat=50;return talk('SMS · MOLINA',['Esta noche había orden de entrada en tu piso. La he parado.','Baja el ritmo.']);}
   sfx('bad');await say('REDADA. La policía entra en tu piso con una orden de registro.');
-  const casa=S.map==='home',g=Math.floor((casa?totalBuds():0)+arconG()),r=(casa?totalRosin():0)+arconR(),hs=huecos(),np=S.pots.filter(p=>p&&!p.dead).length,eq=new Set();   // lo de encima y el arcón (1.10)
+  const casa=S.map==='home',ne=S.esquejes.length+S.bandejas.length,g=Math.floor((casa?totalBuds():0)+arconG()),r=(casa?totalRosin():0)+arconR(),hs=huecos(),np=S.pots.filter(p=>p&&!p.dead).length,eq=new Set();   // lo de encima y el arcón (1.10)
   S.carpas.forEach((c,ci)=>{if(c&&hs.some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead))for(const k in EXTRAS)if(c[k]){eq.add(EXTRAS[k].n.toLowerCase());delete c[k];if(k==='goteo')delete c.dep;if(k==='garrafas')delete c.gar;}});
   S.pots=S.pots.map(()=>null);if(casa){S.buds={};S.rosin={};}S.arcon={buds:{},rosin:{}};S.esquejes=[];S.bandejas=[];S.heat=CALOR_REDADA;
   const multa=multaRedada(np,g+Math.round(r/ROSIN.rend)),fine=multa-pagarCasa(multa);   // el rosin, como la flor de la que sale
-  const lo=[np?'todas las plantas':'',g?g+' g':'',r?rosinTxt(r):''].filter(Boolean);
+  const lo=[np?'todas las plantas':'',ne?(ne>1?'los esquejes':'el esqueje'):'',g?g+' g':'',r?rosinTxt(r):''].filter(Boolean);
   await say(`${lo.length?'Se llevan '+yLista(lo):'No encuentran nada que llevarse'}. Multa: ${eur(multa)}${fine<multa?` (pagas ${eur(fine)}: no tienes más)`:''}.`);
   if(eq.size)await say('Y el equipo de las carpas con plantas: '+[...eq].join(', ')+'.');
   await say(S.caja?'La caja de detrás del diploma ni la ven. Las semillas no son delito: se quedan.':'Las semillas no son delito: se quedan.');

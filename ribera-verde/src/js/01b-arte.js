@@ -85,7 +85,7 @@ function pjFrame(e,g,now,isP,dur){
 // montado (1.13): la acción si la hay; si no, en la bici pedalea (walk) y en el patinete va de pie (base)
 function frameMonta(e,g,v,now,dur){
   const a=e.act,t=a?now-a.t0:0,f=a&&frameDe(g,a.n,DIR4[e.dir],t);if(f&&t<duracion(g,a.n))return f;e.act=null;
-  return v==='bici'&&e.moving?frameDe(g,'walk',DIR4[e.dir],0,{ph:(e.parity+Math.min(1,e.t/dur))/2}):frameDe(g,'base',DIR4[e.dir],0,{i:0});
+  return v==='bici'&&e.moving&&frameDe(g,'walk',DIR4[e.dir],0,{ph:(e.parity+Math.min(1,e.t/dur))/2})||frameDe(g,'base',DIR4[e.dir],0,{i:0});
 }
 function dibujarPJ(e,look,now,cam,isP,dur){
   const g=grupoLook(look);if(!g)return false;

@@ -627,7 +627,9 @@ func _monta_frame(e: Dictionary, gr, v: String, dur: float):
 			return f
 		e.act = null
 	if v == "bici" and e.moving:
-		return Atlas.frame_de(gr, "walk", dir, 0, {"ph": (e.parity + minf(1, e.t / dur)) / 2})
+		var w = Atlas.frame_de(gr, "walk", dir, 0, {"ph": (e.parity + minf(1, e.t / dur)) / 2})
+		if w:
+			return w
 	return Atlas.frame_de(gr, "base", dir, 0, {"i": 0})
 
 func _pj_frame(e: Dictionary, gr, isP: bool, dur: float):

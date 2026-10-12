@@ -77,18 +77,19 @@ def patinete(d, f):
 def bici(d, f):
     A, D = Lienzo(32, 32), Lienzo(32, 32)
     if d == 'east':
-        rueda_lado(A, 7, 26, 4, f); rueda_lado(A, 24, 26, 4, f)
-        bb = (15, 27)
-        for (x0, y0, x1, y1), c in ((((7, 26, 15, 27)), MOST_S), (((7, 26, 13, 20)), MOST_S), (((15, 27, 13, 20)), MOST),
-                                     (((13, 20, 21, 20)), MOST), (((15, 27, 21, 21)), MOST), (((21, 20, 24, 26)), MOST)):
+        # corta (1.13): de rueda a rueda, 17 px (8-24), casi una casilla, para no invadir las de al lado
+        rueda_lado(A, 11, 27, 3, f); rueda_lado(A, 21, 27, 3, f)
+        bb = (15, 28)
+        for (x0, y0, x1, y1), c in ((((11, 27, 15, 28)), MOST_S), (((11, 27, 14, 21)), MOST_S), (((15, 28, 14, 21)), MOST),
+                                     (((14, 21, 19, 21)), MOST), (((15, 28, 19, 22)), MOST), (((19, 21, 21, 27)), MOST)):
             linea(A, x0, y0, x1, y1, c)
-        A.hl(11, 15, 19, O); A.hl(12, 14, 18, GOMA); A.p(11, 18, O); A.p(15, 18, O); A.hl(12, 14, 17, O)   # el sillín
-        A.vl(21, 18, 19, GRIS)
+        A.hl(12, 16, 19, O); A.hl(13, 15, 18, GOMA); A.p(12, 18, O); A.p(16, 18, O); A.hl(13, 15, 17, O)   # el sillín
+        A.vl(19, 19, 20, GRIS)
         A.p(bb[0], bb[1], GOMA)
         # la biela y el pedal (del lado de la cámara, delante de la pierna): arriba-delante o abajo-atrás según el fotograma
-        px, py = (17, 26) if f == 0 else (13, 28)
+        px, py = (17, 27) if f == 0 else (13, 29)
         linea(D, bb[0], bb[1], px, py, GRIS); D.hl(px - 1, px + 1, py, O)
-        D.hl(19, 22, 18, O); D.hl(20, 22, 17, GOMA); D.p(19, 17, O); D.p(23, 17, O); D.hl(20, 22, 16, O)   # el puño
+        D.hl(18, 21, 18, O); D.hl(19, 21, 17, GOMA); D.p(18, 17, O); D.p(22, 17, O); D.hl(19, 21, 16, O)   # el puño
     elif d == 'south':   # de frente: la rueda de delante y la horquilla le tapan las piernas; el manillar, en las manos
         rueda_frente(D, 15, 21, 30, f)
         D.vl(14, 20, 26, MOST); D.vl(17, 20, 26, MOST_S); D.hl(14, 17, 19, MOST)

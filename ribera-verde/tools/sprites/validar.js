@@ -198,7 +198,7 @@ for (const a of M.assets) {
       if (a.entrada && a.entrada.style_images) E(a.id, `lote ${a.lote}: un asset con style_images no puede compartir llamada`); } }
   for (const [k, v] of Object.entries(a.ajuste_por_sprite || {})) {
     if (!['pies', 'centro', 'exacto'].includes(v)) E(a.id, `ajuste_por_sprite.${k}: «${v}» no es pies, centro ni exacto`);
-    if (!(a.cubre || []).some(c => c.endsWith(':' + k))) E(a.id, `ajuste_por_sprite.${k}: no está en cubre`);
+    if (!(a.cubre || []).some(c => c.endsWith(':' + k)) && !(a.animaciones || []).some(x => x.nombre === k)) E(a.id, `ajuste_por_sprite.${k}: no está en cubre ni es una animación`);   // 1.13: en un grupo de animaciones (vehiculos), por animación
   }
   // el nombre de la animación es la carpeta en art/crudo/<grupo>/<nombre>: no puede repetirse en el mismo grupo
   const nombres = (a.animaciones || []).map(an => an.nombre);
