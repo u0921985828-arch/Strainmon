@@ -4,7 +4,7 @@
    Todo el arte es procedural y original.
    ========================================================= */
 const TS=16, SH=180, SW_MAX=450;   // 180 px de alto (1.12); el ancho, de 240 a SW_MAX
-let SW=240;   // ancho del juego: 06b-pantalla.js lo ajusta al móvil (240-400)
+let SW=240;   // ancho del juego: 06b-pantalla.js lo ajusta al móvil (240-SW_MAX)
 const $=id=>document.getElementById(id);
 const cv=$('c'), ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));

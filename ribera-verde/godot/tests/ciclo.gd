@@ -8,7 +8,7 @@
 # Comprueba también los mandos (teclado, dedos en los mandos, varios a la vez, el ratón y Atrás), los menús en bucle, tocar el
 # diálogo, el sonido (síntesis, música de cada sitio y SONIDO), el HUD, la ficha, las barras de cada planta (en transparencia
 # las de delante de la elegida), el aviso de plaga y el de las secas de cada noche, los daños y que tratada vuelve a ser la de
-# siempre, y que el aviso de arriba no pisa la ficha, el HUD ni START con 6 tamaños de ventana. Capturas `juego-*.png`.
+# siempre, y que el aviso de arriba no pisa la ficha, el HUD ni START con 7 tamaños de ventana. Capturas `juego-*.png`.
 #   xvfb-run … godot --path godot --rendering-driver opengl3 --audio-driver Dummy --fixed-fps 60 --resolution 1560x720
 #     --script res://tests/ciclo.gd -- --salida <dir> [--azar N]
 # Con --fixed-fps cada fotograma son 16,7 ms del reloj del juego: el tiempo que pasa andando, y con él el azar, sale siempre

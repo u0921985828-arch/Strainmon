@@ -51,10 +51,10 @@ func _init() -> void:
 	for n in [base, luz, encima]:
 		add_child(n)
 	luz.centered = false
-	var sh := Shader.new()
-	sh.code = OVERLAY
+	var shd := Shader.new()
+	shd.code = OVERLAY
 	luz.material = ShaderMaterial.new()
-	luz.material.shader = sh
+	luz.material.shader = shd
 	base.draw.connect(_pinta_base)
 	encima.draw.connect(_pinta_encima)
 
