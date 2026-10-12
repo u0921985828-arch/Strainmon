@@ -1204,16 +1204,8 @@
      "puerta": 15
     },
     {
-     "id": "casco2",
-     "x": 19,
-     "y": 3,
-     "w": 3,
-     "h": 5,
-     "puerta": null
-    },
-    {
      "id": "casco",
-     "x": 22,
+     "x": 21,
      "y": 2,
      "w": 4,
      "h": 6,
@@ -1221,7 +1213,7 @@
     },
     {
      "id": "casco3",
-     "x": 26,
+     "x": 25,
      "y": 1,
      "w": 5,
      "h": 7,
@@ -1229,7 +1221,7 @@
     },
     {
      "id": "casco",
-     "x": 31,
+     "x": 30,
      "y": 2,
      "w": 4,
      "h": 6,
@@ -1237,7 +1229,7 @@
     },
     {
      "id": "casco2",
-     "x": 35,
+     "x": 34,
      "y": 3,
      "w": 3,
      "h": 5,
@@ -1245,7 +1237,7 @@
     },
     {
      "id": "casco3",
-     "x": 38,
+     "x": 37,
      "y": 1,
      "w": 5,
      "h": 7,
@@ -1310,6 +1302,16 @@
      "x": 16,
      "y": 7,
      "a": "growcity"
+    },
+    {
+     "x": 19,
+     "y": 0,
+     "a": "callejon"
+    },
+    {
+     "x": 20,
+     "y": 0,
+     "a": "callejon"
     },
     {
      "x": 43,
@@ -1492,6 +1494,109 @@
      "o": "plantDeco",
      "x": 9,
      "y": 7
+    }
+   ],
+   "carpas": []
+  },
+  "callejon": {
+   "nombre": "callejon",
+   "titulo": "IBARBIDE · Kale Zaharra (detrás del growshop, sin patrullas)",
+   "w": 23,
+   "h": 18,
+   "edificios": [
+    {
+     "id": "casco3",
+     "x": 1,
+     "y": 1,
+     "w": 5,
+     "h": 7,
+     "puerta": null
+    },
+    {
+     "id": "casco",
+     "x": 6,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "casco2",
+     "x": 10,
+     "y": 3,
+     "w": 3,
+     "h": 5,
+     "puerta": null
+    },
+    {
+     "id": "casco",
+     "x": 13,
+     "y": 2,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "casco3",
+     "x": 17,
+     "y": 1,
+     "w": 5,
+     "h": 7,
+     "puerta": null
+    },
+    {
+     "id": "casco3",
+     "x": 1,
+     "y": 11,
+     "w": 5,
+     "h": 7,
+     "puerta": null
+    },
+    {
+     "id": "casco",
+     "x": 6,
+     "y": 12,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "casco",
+     "x": 12,
+     "y": 12,
+     "w": 4,
+     "h": 6,
+     "puerta": null
+    },
+    {
+     "id": "casco3",
+     "x": 16,
+     "y": 11,
+     "w": 5,
+     "h": 7,
+     "puerta": null
+    }
+   ],
+   "puertas": [
+    {
+     "x": 10,
+     "y": 17,
+     "a": "ibarbide"
+    },
+    {
+     "x": 11,
+     "y": 17,
+     "a": "ibarbide"
+    }
+   ],
+   "salidas": [],
+   "npcs": [],
+   "objetos": [
+    {
+     "o": "h_kale",
+     "x": 21,
+     "y": 10,
+     "item": 1
     }
    ],
    "carpas": []

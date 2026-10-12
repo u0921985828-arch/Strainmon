@@ -943,6 +943,13 @@ function bosque(m,cx,cy,rx,ry,sem){
   for(let y=Math.floor(cy-ry-1);y<=cy+ry+1;y++)for(let x=Math.floor(cx-rx-1);x<=cx+rx+1;x++){
     const dx=(x-cx)/rx,dy=(y-cy)/ry,an=Math.round((Math.atan2(dy,dx)+Math.PI)*3),r=.75+ruido(an,sem,2)*.5;if(dx*dx+dy*dy<r*r)enMonte(m,x,y);}
 }
+// caminos que tuercen (1.14): pasan a k las casillas de hierba a menos de r del trazo (pts, los puntos por los que pasa, en casillas).
+// Con las orillas de la tierra y la plaza sobre la hierba (TRANS, 01b-arte), el borde sale redondeado; la orilla se come media
+// casilla por cada lado, así que con r 1,15 (3 casillas) se ve un camino de unas 2 que no se corta en las diagonales
+function senda(m,pts,k,r=1.15){
+  const d2=(px,py,[ax,ay],[bx,by])=>{const vx=bx-ax,vy=by-ay,l=vx*vx+vy*vy,t=l?Math.max(0,Math.min(1,((px-ax)*vx+(py-ay)*vy)/l)):0,dx=ax+t*vx-px,dy=ay+t*vy-py;return dx*dx+dy*dy;};
+  for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++)for(let i=1;i<pts.length;i++)if(/^(grass|flowers)$/.test(m.g[y][x])&&d2(x,y,pts[i-1],pts[i])<=r*r){gr(m,x,y,k);break;}
+}
 // op (1.10, edificios grises con puerta): ancha, la puerta ocupa doorX y doorX + 1 (se pinta centrada entre las dos: dx 8);
 // fachada, el arte de la fachada si no es el de id ('gray-puerta': la gris con las ventanas de abajo separadas para la puerta);
 // puerta, la fachada de la que sale la animación de la puerta ('home'); mascara, sin el trozo de pared de esa fachada
@@ -958,7 +965,8 @@ function building(m,id,x0,y0,w,h,doorX,warp,op){
 const ZONAS={town:{n:'Ribera Verde',lad:1,precio:1},alto:{n:'Barrio alto',lad:.5,precio:1},astilleros:{n:'Astilleros',lad:2,precio:1.2},
   puerto:{n:'Puerto Viejo',lad:.6,precio:1.15},valdehierro:{n:'Valdehierro',lad:1.4,precio:.9},
   mendialde:{n:'Mendialde',lad:.1,precio:1},errotabarri:{n:'Errotabarri',lad:.1,precio:1},
-  ibarbide:{n:'Ibarbide · Casco Viejo',lad:.8,precio:1.3},ensanche:{n:'Ibarbide · Ensanche',lad:1.2,precio:1.25}};   // la ciudad grande (1.14)
+  ibarbide:{n:'Ibarbide · Casco Viejo',lad:.8,precio:1.3},ensanche:{n:'Ibarbide · Ensanche',lad:1.2,precio:1.25},
+  callejon:{n:'Ibarbide · Kale Zaharra',lad:1.6,precio:1.3}};   // la ciudad grande (1.14)
 // paradas del autobús (1.10): el poste (x, y), dónde te deja el autobús (a: x, y, hacia dónde miras) y lo que hay hasta la estación
 // de Ribera Verde (min, €): todas las líneas pasan por ella, así que un viaje entre dos pueblos suma los dos tramos. De 7:00 a 21:00.
 // cap (1.14): el capítulo desde el que hay línea (las ciudades pequeñas, en la calle; Errotabarri, con la deuda; Ibarbide, la
@@ -984,7 +992,6 @@ function buildMaps(){
   [11,21,31].forEach(x=>ob(m,x,9,'lamp'));
   // park
   rect(m,1,13,11,13,(x,y)=>{if(x!==5&&x!==6)ob(m,x,y,'fence');});ob(m,4,13,'sign');
-  rect(m,5,13,6,27,(x,y)=>gr(m,x,y,'dirt'));
   rect(m,7,18,10,20,(x,y)=>gr(m,x,y,'tallgrass'));rect(m,1,21,3,23,(x,y)=>gr(m,x,y,'tallgrass'));
   // árboles altos (1.10): la copa ocupa 3 casillas de ancho y las 5 de encima del tronco; ninguna tapa un objeto, un arbusto
   // con premio ni la zona por la que pasea un personaje
@@ -992,8 +999,13 @@ function buildMaps(){
   [[9,16],[2,26],[10,24]].forEach(([x,y])=>ob(m,x,y,'bush'));
   ob(m,3,17,'bench');
   [[2,14],[9,14],[8,22],[3,19],[10,27],[4,26],[9,25]].forEach(([x,y])=>gr(m,x,y,'flowers'));
+  // el camino del parque (1.14, antes una recta de 2 m): de la verja baja torciendo entre la hierba alta y, a media altura, sale
+  // un ramal hacia la plaza
+  senda(m,[[5.5,13],[5.5,15],[5,18],[5.5,21],[6.5,23.5],[6,26],[6,27]],'dirt');senda(m,[[6,22],[9,22.5],[12.5,23],[13.5,21]],'dirt');
   // plaza
   rect(m,14,14,26,24,(x,y)=>gr(m,x,y,'plaza'));rect(m,18,13,22,13,(x,y)=>gr(m,x,y,'plaza'));
+  // entradas (1.14): por el oeste, desde el ramal del parque; por el este, hacia el muelle; por el sur, entre los árboles
+  rect(m,13,19,13,21,(x,y)=>gr(m,x,y,'plaza'));rect(m,27,19,27,20,(x,y)=>gr(m,x,y,'plaza'));rect(m,19,25,21,25,(x,y)=>gr(m,x,y,'plaza'));
   ob(m,20,19,'fountain');[[16,16],[24,16],[16,22],[24,22]].forEach(([x,y])=>ob(m,x,y,'bench'));
   [[14,14],[26,14],[14,24],[26,24]].forEach(([x,y])=>ob(m,x,y,'lamp'));ob(m,17,13,'sign');
   [17,20,23,26].forEach(x=>ob(m,x,28,'tree'));[[13,18],[12,22],[27,16],[18,27],[25,28],[13,27]].forEach(([x,y])=>gr(m,x,y,'flowers'));
@@ -1140,21 +1152,29 @@ function buildMaps(){
   // al este, el Ensanche. Más policía que en ningún sitio, pero los clientes pagan más
   const ib=newMap('ibarbide',44,30,'plaza');ib.music='ibarbide';
   rect(ib,0,0,43,1,(x,y)=>gr(ib,x,y,'grass'));
-  let ix=1;[['casco',4,6],['casco2',3,5],['casco3',5,7],['growcity',6,6],['casco2',3,5],['casco',4,6],['casco3',5,7],['casco',4,6],['casco2',3,5],['casco3',5,7]]
-    .forEach(([k,w,h])=>{building(ib,k,ix,8-h,w,h,k==='growcity'?ix+2:null,k==='growcity'?{to:'growcity',x:4,y:6,dir:'up'}:null,k==='growcity'?{ancha:1,dx:8}:null);
+  // entre el growshop y la casa de al lado, un callejón de 2 m que sube a la Kale Zaharra (callejon), la plazuela de detrás
+  let ix=1;[['casco',4,6],['casco2',3,5],['casco3',5,7],['growcity',6,6],['callejon',2,8],['casco',4,6],['casco3',5,7],['casco',4,6],['casco2',3,5],['casco3',5,7]]
+    .forEach(([k,w,h])=>{if(k==='callejon'){ix+=w;return;}building(ib,k,ix,8-h,w,h,k==='growcity'?ix+2:null,k==='growcity'?{to:'growcity',x:4,y:6,dir:'up'}:null,k==='growcity'?{ancha:1,dx:8}:null);
       for(let x=ix;x<ix+w;x++){for(let y=0;y<8-h;y++)gr(ib,x,y,'grass');for(let y=0;y<8-h;y++)monte(ib,x,y);}ix+=w;});
+  for(let y=0;y<8;y++){gr(ib,42,y,'grass');monte(ib,42,y);}
+  rect(ib,19,0,20,1,(x,y)=>gr(ib,x,y,'plaza'));[19,20].forEach(x=>ib.doors[x+',0']={to:'callejon',x:x-9,y:16,dir:'up'});
   for(let x=1;x<43;x++)gr(ib,x,8,'walk');
   [[1,11,'casco3',5,7],[6,12,'casco',4,6],[10,13,'casco2',3,5],[31,13,'casco2',3,5],[34,12,'casco',4,6],[38,11,'casco3',5,7]].forEach(([x,y,k,w,h])=>building(ib,k,x,y,w,h,null));
   // la plaza Nueva: soportales en los lados (bancos y farolas), la fuente en medio
+  // la fuente, en un parterre redondo; abajo, dos jardineras dejan tres entradas a la plaza desde la avenida (la grande en medio)
+  rect(ib,20,13,22,15,(x,y)=>gr(ib,x,y,(x+y)%2?'flowers':'grass'));gr(ib,21,14,'plaza');
+  rect(ib,14,18,17,19,(x,y)=>gr(ib,x,y,'grass'));rect(ib,26,18,29,19,(x,y)=>gr(ib,x,y,'grass'));
+  [[16,18],[27,18]].forEach(([x,y])=>ob(ib,x,y,'bush'));[[15,19],[17,19],[26,19],[28,19]].forEach(([x,y])=>gr(ib,x,y,'flowers'));
   ob(ib,21,14,'fountain');[[17,12],[25,12],[17,17],[25,17]].forEach(([x,y])=>ob(ib,x,y,'bench'));[[14,10],[29,10],[14,19],[29,19]].forEach(([x,y])=>ob(ib,x,y,'lamp'));
   for(let x=1;x<43;x++){gr(ib,x,20,'walk');gr(ib,x,21,'roadT');gr(ib,x,22,'roadB');gr(ib,x,23,'walk');}
-  ob(ib,9,20,'parada');ob(ib,13,9,'sign');ob(ib,12,19,'sign');ob(ib,41,20,'sign');[4,20,36].forEach(x=>ob(ib,x,20,'lamp'));[12,28].forEach(x=>ob(ib,x,23,'lamp'));
+  ob(ib,9,20,'parada');ob(ib,13,9,'sign');ob(ib,21,8,'sign');ob(ib,12,19,'sign');ob(ib,41,20,'sign');[4,20,36].forEach(x=>ob(ib,x,20,'lamp'));[12,28].forEach(x=>ob(ib,x,23,'lamp'));
   // el parque de la estación
   rect(ib,1,24,42,28,(x,y)=>gr(ib,x,y,'grass'));rect(ib,1,29,42,29,(x,y)=>{gr(ib,x,y,'grass');ob(ib,x,y,'seto');});
-  rect(ib,6,24,7,28,(x,y)=>gr(ib,x,y,'dirt'));rect(ib,8,26,35,26,(x,y)=>gr(ib,x,y,'dirt'));rect(ib,36,24,37,28,(x,y)=>gr(ib,x,y,'dirt'));
   [[3,28],[11,28],[16,28],[24,28],[30,28],[40,28]].forEach(([x,y])=>ob(ib,x,y,'tree'));[[20,28],[34,28]].forEach(([x,y])=>ob(ib,x,y,'tree2'));
   [[10,25],[22,27],[31,25]].forEach(([x,y])=>ob(ib,x,y,'bench'));[[2,25],[14,24],[27,24],[41,25]].forEach(([x,y])=>ob(ib,x,y,'bush'));
   [[4,24],[9,27],[18,25],[26,27],[34,25],[39,27]].forEach(([x,y])=>gr(ib,x,y,'flowers'));
+  // el paseo del parque: entra por las dos esquinas de la avenida y serpentea entre los árboles
+  senda(ib,[[7,24],[8,25.5],[12,26.5],[16,26],[21,25.5],[26,25.5],[31,26.5],[35,26],[37,25],[37,24]],'dirt');
   for(let y=0;y<30;y++){if(y>=20&&y<=23)continue;[0,43].forEach(x=>{gr(ib,x,y,'grass');monte(ib,x,y);});}
   [20,23].forEach(y=>{gr(ib,0,y,'grass');monte(ib,0,y);gr(ib,43,y,'grass');monte(ib,43,y);});[21,22].forEach(y=>{gr(ib,0,y,'grass');monte(ib,0,y);});
   [21,22].forEach(y=>ib.doors['43,'+y]={to:'ensanche',x:1,y:y-11,dir:'right'});
@@ -1164,15 +1184,33 @@ function buildMaps(){
   rect(en,0,0,45,1,(x,y)=>{gr(en,x,y,'grass');monte(en,x,y);});
   [1,10,19,28,37].forEach((x,i)=>{building(en,i%2?'bloque2':'bloque',x,2,8,7,null);if(i<4){gr(en,x+8,2,'grass');gr(en,x+8,3,'grass');monte(en,x+8,2);ob(en,x+8,8,'bush');}});
   for(let x=0;x<46;x++){gr(en,x,10,'roadT');gr(en,x,11,'roadB');}
-  [5,14,23,32,41].forEach(x=>ob(en,x,9,'lamp'));[9,27].forEach(x=>ob(en,x,12,'lamp'));ob(en,2,12,'sign');
+  [5,14,23,32,41].forEach(x=>ob(en,x,9,'lamp'));[11,33].forEach(x=>ob(en,x,12,'lamp'));ob(en,2,12,'sign');
   rect(en,0,13,45,21,(x,y)=>gr(en,x,y,'grass'));rect(en,1,21,44,21,(x,y)=>ob(en,x,y,'seto'));
-  rect(en,19,14,26,19,(x,y)=>gr(en,x,y,'plaza'));rect(en,1,16,44,16,(x,y)=>{if(x<19||x>26)gr(en,x,y,'dirt');});
+  // el parque: un seto a lo largo de la acera con tres entradas, la plaza redonda de la fuente y un paseo que tuerce de punta a punta
+  for(let x=1;x<45;x++)if(!(x>=7&&x<=9)&&!(x>=21&&x<=24)&&!(x>=36&&x<=38)){ob(en,x,13,'seto');}
+  for(let y=13;y<=20;y++)for(let x=17;x<=28;x++){const dx=(x-22.5)/5.2,dy=(y-16.5)/3.4;if(dx*dx+dy*dy<=1)gr(en,x,y,'plaza');}
+  senda(en,[[1,17],[5,16.5],[10,17.5],[14,16.5],[18,16.5]],'dirt');senda(en,[[27,16.5],[31,17.5],[36,16.5],[40,17.5],[44,16.5]],'dirt');
+  senda(en,[[8,13],[8,14.5],[9.5,17]],'dirt');senda(en,[[37,13],[37,14.5],[36,16.5]],'dirt');rect(en,21,13,24,13,(x,y)=>gr(en,x,y,'plaza'));
   ob(en,22,16,'fountain');[[20,14],[25,14],[20,19],[25,19]].forEach(([x,y])=>ob(en,x,y,'lamp'));[[21,18],[24,18]].forEach(([x,y])=>ob(en,x,y,'bench'));
   [[3,20],[8,19],[13,20],[31,19],[36,20],[42,19]].forEach(([x,y])=>ob(en,x,y,'tree'));[[16,19],[29,20]].forEach(([x,y])=>ob(en,x,y,'tree2'));   // abajo: la copa no tapa la avenida
-  [[6,14],[11,14],[34,14],[40,14]].forEach(([x,y])=>ob(en,x,y,'bench'));[[1,14],[17,14],[28,17],[44,14]].forEach(([x,y])=>ob(en,x,y,'bush'));
-  [[5,14],[10,18],[15,17],[30,14],[38,18],[43,17]].forEach(([x,y])=>gr(en,x,y,'flowers'));
+  [[6,15],[12,15],[33,15],[41,15]].forEach(([x,y])=>ob(en,x,y,'bench'));[[1,14],[16,14],[29,14],[44,14]].forEach(([x,y])=>ob(en,x,y,'bush'));
+  [[5,14],[10,19],[15,18],[30,15],[39,19],[43,18]].forEach(([x,y])=>gr(en,x,y,'flowers'));
   for(let y=2;y<22;y++){if(y===10||y===11)continue;[0,45].forEach(x=>{if(en.g[y][x]!=='roadT'){gr(en,x,y,'grass');monte(en,x,y);}});}
   [10,11].forEach(y=>{en.doors['0,'+y]={to:'ibarbide',x:42,y:y+11,dir:'left'};gr(en,45,y,'grass');monte(en,45,y);});
+  // la Kale Zaharra (1.14): detrás del growshop, por el callejón, una plazuela de casas viejas. Sin patrullas (no entran), pero con
+  // más ladrones: para vender en la ciudad sin policía. Se sale por el mismo callejón, entre dos casas, abajo
+  const cj=newMap('callejon',23,18,'plaza');cj.music='callejon';
+  rect(cj,0,0,22,1,(x,y)=>{gr(cj,x,y,'grass');monte(cj,x,y);});
+  let cx=1;[['casco3',5,7],['casco',4,6],['casco2',3,5],['casco',4,6],['casco3',5,7]].forEach(([k,w,h])=>{building(cj,k,cx,8-h,w,h,null);
+    for(let x=cx;x<cx+w;x++)for(let y=0;y<8-h;y++){gr(cj,x,y,'grass');monte(cj,x,y);}cx+=w;});
+  [[1,11,'casco3',5,7],[6,12,'casco',4,6],[12,12,'casco',4,6],[16,11,'casco3',5,7]].forEach(([x,y,k,w,h])=>building(cj,k,x,y,w,h,null));
+  rect(cj,6,11,9,11,(x,y)=>gr(cj,x,y,'plaza'));rect(cj,12,11,15,11,(x,y)=>gr(cj,x,y,'plaza'));
+  for(let y=2;y<18;y++)[0,22].forEach(x=>{gr(cj,x,y,'grass');monte(cj,x,y);});for(let y=11;y<18;y++){gr(cj,21,y,'grass');monte(cj,21,y);}
+  // la plazuela: un árbol viejo en su alcorque, bancos, cajas de la frutería, una farola y un arbusto (con algo dentro)
+  rect(cj,4,8,6,10,(x,y)=>gr(cj,x,y,'grass'));ob(cj,5,9,'tree2');gr(cj,4,8,'flowers');gr(cj,6,10,'flowers');
+  [[9,8],[14,8]].forEach(([x,y])=>ob(cj,x,y,'bench'));[[18,9],[19,9],[19,10]].forEach(([x,y])=>ob(cj,x,y,'crate'));ob(cj,12,10,'lamp');
+  gr(cj,21,9,'grass');gr(cj,21,10,'grass');ob(cj,21,10,'bush');ob(cj,8,10,'sign');
+  [10,11].forEach(x=>cj.doors[x+',17']={to:'ibarbide',x:x+9,y:1,dir:'down'});
 
   // ---------- HOME ----------
   // 1 casilla = 1 m: 18 × 6 m de suelo (108 m²). Dormitorio a la izquierda, escritorio y mesa de genética al fondo,
@@ -1255,7 +1293,8 @@ function computeClientTiles(){
     astilleros:(x,y,g)=>y>=12&&y<=21&&x>=2&&(g==='dirt'||g==='dock')&&!(x>=15&&x<=22&&y<=14),
     puerto:(x,y,g)=>y>=9&&(g==='plaza'||g==='dock'),valdehierro:(x,y,g)=>(y===8||y===11||y>=20)&&(g==='walk'||g==='grass'),
     mendialde:(x,y,g)=>g==='plaza',errotabarri:(x,y,g)=>g==='pista',
-    ibarbide:(x,y,g)=>y>=8&&y<=23&&y!==21&&y!==22&&!(y===8&&x>=14&&x<=17)&&(g==='plaza'||g==='walk'||g==='hormigon')&&!(y===20&&x>=7&&x<=12),ensanche:(x,y,g)=>(y===9||y===12||y>=13)&&(g==='walk'||g==='plaza'||g==='dirt')};   // la ciudad (1.14)
+    ibarbide:(x,y,g)=>y>=8&&y<=23&&y!==21&&y!==22&&!(y===8&&x>=14&&x<=17)&&(g==='plaza'||g==='walk'||g==='hormigon')&&!(y===20&&x>=7&&x<=12),ensanche:(x,y,g)=>(y===9||y===12||y>=13)&&(g==='walk'||g==='plaza'||g==='dirt'),
+    callejon:(x,y,g)=>y>=8&&y<=11&&g==='plaza'};   // la ciudad (1.14)
   for(const k in zona){const m=MAPS[k],l=CLIENT_TILES[k]=[],tp=tapadas(m),va=aPie(m,entrada(k));
     for(let y=1;y<m.h-1;y++)for(let x=1;x<m.w-1;x++){const g=m.g[y][x];if(zona[k](x,y,g)&&va.has(x+','+y)&&!tp.has(x+','+y)&&!(PARADAS[k]&&PARADAS[k].a[0]===x&&PARADAS[k].a[1]===y))l.push([x,y]);}}   // ni en la casilla donde deja el autobús (1.10)
 }
@@ -1361,6 +1400,9 @@ const CANCIONES={
     mel:'g5 . bb5 . c6 - bb5 . | a5 . g5 . f5 - d5 . | g5 . bb5 . d6 - c6 . | a5 - - . f#5 - d5 . | eb5 . g5 . bb5 - g5 . | f5 . a5 . c6 - a5 . | bb5 - a5 g5 . d5 g5 . | f#5 - - - d5 . . .',bat:'k . h k s . h h'},
   ensanche:{bpm:128,mo:'pulse12',ao:'pulse25',ap:'0 1 2 1',bp:'R R 8 R',ch:'C C Am Am F F G G C C Am Am F G C C',
     mel:'e5 . g5 . c6 . g5 . | e5 - d5 . c5 - . . | a4 . c5 . e5 . a5 . | g5 - e5 . c5 - . . | f5 . a5 . c6 . a5 . | g5 . b5 . d6 - b5 . | c6 . b5 . a5 . g5 . | e5 - d5 - c5 - . .',bat:'k h s h k h s h'},
+  // la Kale Zaharra (1.14): bajo y pasos, en la menor, sin batería fuerte
+  callejon:{bpm:84,mo:'triangle',ao:'pulse12',ap:'0 . . 1',bp:'R . . R',ch:'Am Am Am Am F F E E Am Am Dm Dm F E Am Am',
+    mel:'e5 - - . c5 . . . | d5 - - . b4 . . . | e5 - . a5 - . g5 . | f5 - - . e5 - . . | . . c5 . e5 . a5 - | g#5 - - . e5 - . . | a5 - g5 . f5 . e5 . | d5 - c5 . b4 - - .',bat:'. . h . . . h h'},
   // interiores: la tienda (reggae), el bar (tango) y la comisaría (tensa)
   shop:{bpm:150,ap:'. . 1 .',ao:'pulse12',ch:'G G C C G G D D G G C C Em Em D D',
     mel:'. . b4 d5 . . g5 . | e5 - - . c5 . e5 . | d5 . b4 . g4 - - . | . . a4 c5 d5 - . . | . . b5 . a5 . g5 . | e5 - g5 - e5 . c5 . | b4 - - e5 g5 - . . | f#5 - - d5 - . . .',bat:'. h . h s h . h'},
@@ -1710,6 +1752,7 @@ const ITEMS=[
   {id:'h_ins',map:'town',x:10,y:24,hidden:1,give:async()=>{S.items.insect+=1;await got('1 tratamiento de INSECTICIDA');}},
   {id:'i_ast',map:'astilleros',x:4,y:5,give:async()=>{S.items.spray+=2;await got('2 × SPRAY DE PIMIENTA');}},
   {id:'h_alto',map:'alto',x:2,y:10,hidden:1,give:async()=>{S.money+=80;await got('80 € en un sobre arrugado');}},
+  {id:'h_kale',map:'callejon',x:21,y:10,hidden:1,give:async()=>{S.money+=120;await got('120 € en una riñonera abandonada');}},   // la Kale Zaharra (1.14)
 ];
 const itemAt=(x,y)=>ITEMS.find(it=>!it.hidden&&it.map===S.map&&it.x===x&&it.y===y&&!S.taken[it.id]);
 async function pickItem(it){S.taken[it.id]=true;await it.give();}
@@ -1795,6 +1838,7 @@ const SIGNS={'town:9,8':'Calle Ribera, 3.\nPiso de la tía Maite.','town:13,8':'
   'errotabarri:2,10':'ERROTABARRI\nEl pueblo del molino.','errotabarri:26,18':'ERROTA ZAHARRA\nMolino harinero del siglo XVIII. Semillas viejas: pregunta por Andoni.',
   'puerto:25,15':'LONJA DE PUERTO VIEJO\nSubasta de madrugada. Cargas para los barcos de fuera.',
   'ibarbide:13,9':'GROW IBARBIDE\nTodo para el cultivo, a precio de ciudad.','ibarbide:12,19':'PLAZA NUEVA\nCasco Viejo de Ibarbide.','ibarbide:41,20':'ENSANCHE →\nAvenida de la Estación.',
+  'ibarbide:21,8':'↑ KALE ZAHARRA\nPor el callejón.','callejon:8,10':'KALE ZAHARRA\nLa calle vieja. Aquí no entra la patrulla.',
   'ensanche:2,12':'IBARBIDE · ENSANCHE\n← Casco Viejo y estación de autobuses.'};
 async function objectAction(x,y){
   const m=MAPS[S.map],o=m.o[y]&&m.o[y][x];
@@ -1845,7 +1889,7 @@ async function objectAction(x,y){
   if(o==='display')return say('Sobres de semillas de bancos de todo el mundo, ordenados por tipo.');
   if(o==='bottles')return say('Txakoli, pacharán y orujo casero.');
   if(o==='jukebox'){sfx('get');return say('La gramola suena: rock vasco de los 80.');}
-  if(o==='crate')return say(S.map==='astilleros'?'Cajas de madera de los astilleros, podridas por la humedad.':S.map==='valdehierro'?'Cajas de piezas de la fundición, oxidadas.':'Cajas de pescado vacías del puerto.');
+  if(o==='crate')return say(S.map==='astilleros'?'Cajas de madera de los astilleros, podridas por la humedad.':S.map==='valdehierro'?'Cajas de piezas de la fundición, oxidadas.':S.map==='callejon'?'Cajas de fruta vacías. La frutería de la esquina cerró en verano.':'Cajas de pescado vacías del puerto.');
 }
 // el autobús de la comarca (1.10): en el poste de la parada, a dónde, cuánto y cuánto tarda; el reloj corre lo que dura el viaje.
 // El primer viaje (del pueblo al piso: S.flags.llegada === false) lo paga ama y solo va a Ribera Verde. Fuera de horario, esperar
@@ -3057,12 +3101,12 @@ function spawnClients(){
     const tipos=()=>{const t=['est','est','cur','cur'];if(S.ch>=3)t.push('tur');if(S.ch>=4)t.push('pij','pij');return t;};
     const zonas=[['town',n,tipos()],['astilleros',2+(S.ch>=4?1:0),['est','cur']]];if(S.ch>=3)zonas.push(['alto',2+(S.ch>=4?1:0),['pij','tur']]);
     zonas.push(['puerto',2+(S.ch>=4?1:0),['tur','tur','cur','est']],['valdehierro',2+(S.ch>=4?1:0),['est','cur','cur']],['mendialde',1,['cur']],['errotabarri',1,['cur','tur']]);   // la comarca (1.10)
-    if(S.ch>=4)zonas.push(['ibarbide',3+(S.ch>=5?1:0),['tur','tur','pij','est']],['ensanche',3+(S.ch>=5?1:0),['pij','pij','cur','est']]);   // la ciudad grande (1.14), con su línea
+    if(S.ch>=4)zonas.push(['ibarbide',3+(S.ch>=5?1:0),['tur','tur','pij','est']],['ensanche',3+(S.ch>=5?1:0),['pij','pij','cur','est']],['callejon',2,['est','cur','pij']]);   // la ciudad grande (1.14), con su línea
     const usado={};
     const pon=(map,nz,types,pre)=>{
       const used=usado[map]=usado[map]||new Set(NPCDEF.filter(d=>d.map===map).map(d=>d.x+','+d.y).concat(ITEMS.filter(it=>it.map===map).map(it=>it.x+','+it.y)));
       for(let i=0;i<nz;i++){let t;for(let k=0;k<30;k++){t=pick(CLIENT_TILES[map]);if(!used.has(t+''))break;}used.add(t+'');
-        const type=pick(types),ct=CTYPES[type],id='c'+S.day+'_'+pre+{town:'',alto:'b',astilleros:'s',puerto:'p',valdehierro:'v',mendialde:'m',errotabarri:'e',ibarbide:'i',ensanche:'n'}[map]+i;
+        const type=pick(types),ct=CTYPES[type],id='c'+S.day+'_'+pre+{town:'',alto:'b',astilleros:'s',puerto:'p',valdehierro:'v',mendialde:'m',errotabarri:'e',ibarbide:'i',ensanche:'n',callejon:'k'}[map]+i;
         S.clients.push({id,map,x:t[0],y:t[1],type,want:ri(ct.g[0],ct.g[1]),minThc:type==='pij'?Math.min(24,15+S.ch):(type==='tur'&&Math.random()<.4?15:0),look:randLook(id,'client')});}
     };
     for(const [map,nz,types] of zonas)pon(map,nz,types,'');
@@ -3107,7 +3151,7 @@ function heatWarn(){if(S.heat>=70&&!S.flags.heatW){S.flags.heatW=true;S.flags.he
    ========================================================= */
 // cuántos agentes andan por cada mapa de fuera, [de día, de noche], desde el capítulo 2: el barrio 1–2 y el barrio alto 2, las
 // ciudades pequeñas y los astilleros 1, los pueblos ninguno. No se guardan: salen al entrar en el mapa
-const PATRULLAS={town:[1,2],alto:[2,2],astilleros:[1,1],puerto:[1,1],valdehierro:[1,1],mendialde:[0,0],errotabarri:[0,0],ibarbide:[2,2],ensanche:[2,3]};   // la ciudad grande (1.14): la que más
+const PATRULLAS={town:[1,2],alto:[2,2],astilleros:[1,1],puerto:[1,1],valdehierro:[1,1],mendialde:[0,0],errotabarri:[0,0],ibarbide:[2,2],ensanche:[2,3],callejon:[0,0]};   // la ciudad grande (1.14): la que más
 // la ronda: un paso cada paso[día, noche] ms; sigue recto 3 de cada 4 veces y cada 5–10 pasos se para 0,9–1,8 s a mirar (y a falta
 // de 0,6 s gira; fuera de la calle, vuelve a ella). Ve vista casillas hacia delante (cono: de lado, como mucho lo que tiene delante) y la de al lado, si nada alto
 // tapa (edificios, árboles, monte, setos, cajas). De noche no se ve por dónde mira (sigilo), pero la sospecha sube sube[1] veces
