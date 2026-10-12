@@ -29,17 +29,17 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 15  MT...::.......++++@++++@+++.T..~~~~~~~~M
 16  M....::..$....++n+++++++n++*...~~~#####M
 17  M..n.::.......++++++++@++++....~~~####cM
-18  M..@.::""""..*+++@+++++++++..S.~~~####cM
-19  M..*.::""""...++++++O++++++----HHH####SM
-20  MT...::""""...+++++++++++++----HHH######
-21  M""".::....T..+++++++@+++++....~~~###@##
-22  M""".::.*...*.++n+++++++n++....~~~#####M
-23  M""".::.......+i+++++++++++....~~~#####M
-24  M.T..::...$...L+++++++++++L..T.~~~##i##M
-25  M....::.i*.....................~~~c####M
-26  M.$.*::........................~~~~~~~~M
-27  M....::...*..*....*.........T..~~~~~~~~M
-28  M...T.......T....T..T..T.*T....~~~~~~~~M
+18  M..@:::""""..*+++@+++++++++..S.~~~####cM
+19  M..*.::""""..+++++++O++++++----HHH####SM
+20  MT...::""""*.++++++++++++++----HHH######
+21  M""".::....T.++++++++@+++++....~~~###@##
+22  M""".:::::::::++n+++++++n++....~~~#####M
+23  M"""..::::::::+i+++++++++++....~~~#####M
+24  M.T...::..$.::L+++++++++++L..T.~~~##i##M
+25  M.....::i*.........+++.........~~~c####M
+26  M.$.*:::.......................~~~~~~~~M
+27  M....:::..*..*....*.........T..~~~~~~~~M
+28  M...T.:.....T....T..T..T.*T....~~~~~~~~M
 29  MhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhM
 ```
 
@@ -296,40 +296,42 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 ```
     0         1         2         3         4   
     01234567890123456789012345678901234567890123
- 0  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
- 1  MMMMMMMM^^^^^MMMMMMMMMMMMM^^^^^MMMMMMM^^^^^M
- 2  M^^^^MMM^^^^^^^^^^^MMM^^^^^^^^^^^^^MMM^^^^^M
- 3  M^^^^^^^█████^^^^^^^^^^^^^█████^^^^^^^█████M
- 4  M████^^^███████████^^^█████████████^^^█████M
- 5  M██████████████████████████████████████████M
- 6  M██████████████████████████████████████████M
- 7  M██████████████DD██████████████████████████M
- 8  M------------------------------------------M
+ 0  MMMMMMMMMMMMMMMMMMM++MMMMMMMMMMMMMMMMMMMMMMM
+ 1  MMMMMMMM^^^^^MMMMMM++MMMM^^^^^MMMMMMM^^^^^MM
+ 2  M^^^^MMM^^^^^^^^^^^++^^^^^^^^^^^^^MMM^^^^^MM
+ 3  M^^^^^^^█████^^^^^^++^^^^█████^^^^^^^█████MM
+ 4  M████^^^███████████++█████████████^^^█████MM
+ 5  M██████████████████++█████████████████████MM
+ 6  M██████████████████++█████████████████████MM
+ 7  M██████████████DD██++█████████████████████MM
+ 8  M--------------------S---------------------M
  9  M++++++++++++S+++++++++++++++++++++++++++++M
 10  M+++++++++++++L++++++++++++++L+++++++++++++M
 11  M^^^^^++++++++++++++++++++++++++++++++^^^^^M
 12  M^^^^^^^^^+++++++n+++++++n++++++++^^^^^^^^^M
-13  M█████^^^^^^^++++++++++++++++++^^^^^^^█████M
-14  M█████████^^^++++++++O+++++++++^^^█████████M
-15  M████████████++++++++++++++++++████████████M
+13  M█████^^^^^^^+++++++*.*++++++++^^^^^^^█████M
+14  M█████████^^^+++++++.O.++++++++^^^█████████M
+15  M████████████+++++++*.*++++++++████████████M
 16  M████████████++++++++++++++++++████████████M
 17  M████████████++++n+++++++n+++++████████████M
-18  M++++++++++++++++++++++++++++++++++++++++++M
-19  M+++++++++++S+L++++++++++++++L+++++++++++++M
+18  M+++++++++++++..b.++++++++.b..+++++++++++++M
+19  M+++++++++++S+L*.*++++++++*.*L+++++++++++++M
 20  M---L----A----------L---------------L----S-M
 21  M==========================================+
 22  M==========================================+
 23  M-----------L---------------L--------------M
-24  M...*.::......b............b........::.....M
-25  M.b...::..n.......*............n..*.::...b.M
-26  M.....::::::::::::::::::::::::::::::::.....M
-27  M.....::.*............n...*.........::.*...M
-28  M..T..::...T....T...T...T.....T...T.::..T..M
+24  M...*.:::.....b............b........:::....M
+25  M.b....:::n....:::::::::::::::.n..:::::..b.M
+26  M......:::::::::::::::::::::::::::::::.....M
+27  M........*::::::::....n...*.::::::::...*...M
+28  M..T.......T....T...T...T.....T...T.....T..M
 29  MhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhM
 ```
 
 - puerta (15,7) → growcity (4,6)
 - puerta (16,7) → growcity (5,6)
+- puerta (19,0) → callejon (10,16)
+- puerta (20,0) → callejon (11,16)
 - puerta (43,21) → ensanche (1,10)
 - puerta (43,22) → ensanche (1,11)
 
@@ -350,20 +352,48 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
  9  M----L--------L--------L--------L--------L---M
 10  =============================================M
 11  =============================================M
-12  M-S------L-----------------L-----------------M
-13  M............................................M
-14  Mb...*n....n.....b.+L+@++L+...*...n.....n...bM
-15  M..................++++++++..................M
-16  M::::::::::::::::::+++O++++::::::::::::::::::M
-17  M..............*...++++++++.b..............*.M
-18  M.........*........++n++n++...........*......M
-19  M.......T.......T..+L++++L+....T..........T..M
+12  M-S--------L---------------------L-----------M
+13  Mhhhhhh:::hhhhhhhhhhh++++hhhhhhhhhhh:::hhhhhhM
+14  Mb...*.:::......b..+L+@++L+..b......:::.....bM
+15  M.....n:::..n.....++++++++++..*..n..:::..n...M
+16  M::::::::::.::::::++++O+++++::...::::::...:::M
+17  M:::::::::::::::::++++++++++:::::::::::::::::M
+18  M::....::::::..*..+++n++n+++.::::::...:::::*.M
+19  M.......T.*.....T..+L++++L+....T.......*..T..M
 20  M..T.........T...............T......T........M
 21  MhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhM
 ```
 
 - puerta (0,10) → ibarbide (42,21)
 - puerta (0,11) → ibarbide (42,22)
+
+## Ibarbide · Kale Zaharra (la plazuela de detrás del growshop, por el callejón; sin patrullas) — 23 × 18
+
+```
+    0         1         2  
+    01234567890123456789012
+ 0  MMMMMMMMMMMMMMMMMMMMMMM
+ 1  M^^^^^MMMMMMMMMMM^^^^^M
+ 2  M^^^^^^^^^MMM^^^^^^^^^M
+ 3  M█████^^^^^^^^^^^█████M
+ 4  M█████████^^^█████████M
+ 5  M█████████████████████M
+ 6  M█████████████████████M
+ 7  M█████████████████████M
+ 8  M+++*..++n++++n+++++++M
+ 9  M+++.T.+++++++++++cc+.M
+10  M+++..*+S+++L++++++c+$M
+11  M^^^^^++++++++++^^^^^MM
+12  M^^^^^^^^^++^^^^^^^^^MM
+13  M█████^^^^++^^^^█████MM
+14  M█████████++█████████MM
+15  M█████████++█████████MM
+16  M█████████++█████████MM
+17  M█████████++█████████MM
+```
+
+- puerta (10,17) → ibarbide (19,1)
+- puerta (11,17) → ibarbide (20,1)
 
 ## Piso de la tía Maite — 18 × 8 (1 casilla = 1 m; con el armario de 60, la carpa de 150 y el salón amueblado)
 
@@ -531,7 +561,7 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Errotabarri | errotabarri (6,13) | (7,13) | 30 min · 3 € | 3 |
 | Ibarbide | ibarbide (9,20) | (10,20) | 35 min · 4 € | 4 |
 
-**Zonas** (`ZONAS` y `PATRULLAS`): factor de ladrones y de precio en cada mapa de fuera, y los agentes que patrullan de día y de noche (desde el capítulo 2). Ribera Verde: ladrones ×1, precio ×1, 1/2 agentes · Barrio alto: ladrones ×0,5, precio ×1, 2/2 agentes · Astilleros: ladrones ×2, precio ×1,2, 1/1 agentes · Puerto Viejo: ladrones ×0,6, precio ×1,15, 1/1 agentes · Valdehierro: ladrones ×1,4, precio ×0,9, 1/1 agentes · Mendialde: ladrones ×0,1, precio ×1, 0/0 agentes · Errotabarri: ladrones ×0,1, precio ×1, 0/0 agentes · Ibarbide · Casco Viejo: ladrones ×0,8, precio ×1,3, 2/2 agentes · Ibarbide · Ensanche: ladrones ×1,2, precio ×1,25, 2/3 agentes. Dentro de las casas no hay encuentros.
+**Zonas** (`ZONAS` y `PATRULLAS`): factor de ladrones y de precio en cada mapa de fuera, y los agentes que patrullan de día y de noche (desde el capítulo 2). Ribera Verde: ladrones ×1, precio ×1, 1/2 agentes · Barrio alto: ladrones ×0,5, precio ×1, 2/2 agentes · Astilleros: ladrones ×2, precio ×1,2, 1/1 agentes · Puerto Viejo: ladrones ×0,6, precio ×1,15, 1/1 agentes · Valdehierro: ladrones ×1,4, precio ×0,9, 1/1 agentes · Mendialde: ladrones ×0,1, precio ×1, 0/0 agentes · Errotabarri: ladrones ×0,1, precio ×1, 0/0 agentes · Ibarbide · Casco Viejo: ladrones ×0,8, precio ×1,3, 2/2 agentes · Ibarbide · Ensanche: ladrones ×1,2, precio ×1,25, 2/3 agentes · Ibarbide · Kale Zaharra: ladrones ×1,6, precio ×1,3, 0/0 agentes. Dentro de las casas no hay encuentros.
 
 ## Objetos
 
@@ -545,6 +575,7 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | h_ins | town (10,24) | oculto en arbusto (pulsa A delante) | 1 tratamiento de INSECTICIDA |
 | i_ast | astilleros (4,5) | bolsa en el suelo | 2 × SPRAY DE PIMIENTA |
 | h_alto | alto (2,10) | oculto en arbusto (pulsa A delante) | 80 € en un sobre arrugado |
+| h_kale | callejon (21,10) | oculto en arbusto (pulsa A delante) | 120 € en una riñonera abandonada |
 
 ## Carteles
 
@@ -571,6 +602,8 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 - **ibarbide:13,9** — GROW IBARBIDE · Todo para el cultivo, a precio de ciudad.
 - **ibarbide:12,19** — PLAZA NUEVA · Casco Viejo de Ibarbide.
 - **ibarbide:41,20** — ENSANCHE → · Avenida de la Estación.
+- **ibarbide:21,8** — ↑ KALE ZAHARRA · Por el callejón.
+- **callejon:8,10** — KALE ZAHARRA · La calle vieja. Aquí no entra la patrulla.
 - **ensanche:2,12** — IBARBIDE · ENSANCHE · ← Casco Viejo y estación de autobuses.
 
 ## Tienda de Kiko
