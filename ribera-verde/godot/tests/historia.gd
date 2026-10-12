@@ -1959,7 +1959,7 @@ func _pasos() -> void:
 		R.a4 = jj(J.S.arcon)
 		J.S = S0,
 		func(): return chk(R.g > 10 and R.encima == 1000 and R.arcon == R.g - 10 and re("en la mochila: %d g van al arcón" % (R.g - 10), R.aviso) and R.a2 == 490 + R.g and R.b2 == 0
-			and R.cap == 3000 and R.bolsa == 1 and R.control == R.a2 and re("y %d g\\." % int(floor(5 + R.a2)), R.redada) and R.a3 == 0
+			and R.cap == 3000 and R.bolsa == 1 and R.control == R.a2 and re("^Se llevan %d g\\." % int(floor(5 + R.a2)), R.redada) and R.a3 == 0
 			and R.sacar == "3000,500,true" and re("Se han llevado 0 €, 50 g y 1,5 g de rosin\\.", R.darko) and R.a4 == "{\"buds\":{\"ria\":{\"g\":51,\"thc\":12}},\"rosin\":{\"ria\":{\"g\":1.5,\"thc\":36}}}", R))
 	step("Móvil (1.10): START → MÓVIL; pedir a Kiko (+15 %, llega mañana) y su SMS en Mensajes; llamar a Kiko; quien te compra te da su número y, llamado, viene a la calle (20 min, +1 de calor, una vez al día)",
 		["MÓVIL", "Pedir a Kiko", "^Abono", "Salir", "Colgar", "SALIR", "MÓVIL", "Mensajes", "<B>", "Llamar", "^Kiko", "Colgar", "SALIR", "^Skunk", "Rebaja",

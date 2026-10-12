@@ -3384,7 +3384,7 @@ async function talkMolina(){
   else if(S.protect)await say(`Estás cubierto hasta el día ${S.protHasta}. ${S.protHasta>S.day?`Te quedan ${S.protHasta-S.day} días.`:'Se acaba HOY.'}`,N);
   const c=await ask(S.protect?'¿Pagar ya los diez días siguientes?':'¿Aceptas el trato del sargento?',['Pagar '+eur(SOBORNO),'No'],N);
   if(c===0){if(S.money<SOBORNO)await say('¿Con qué dinero? Vuelve cuando lo tengas.',N);
-    else{S.money-=SOBORNO;S.protHasta=(S.protect?S.protHasta:S.day-1)+CUOTA_DIAS;S.protect=true;sfx('coin');await say(`Bien. Mis agentes mirarán hacia otro lado hasta el día ${S.protHasta}.`,N);}}
+    else{S.money-=SOBORNO;S.protHasta=Math.max(S.day,S.protect?S.protHasta:0)+CUOTA_DIAS;S.protect=true;sfx('coin');await say(`Bien. Mis agentes mirarán hacia otro lado hasta el día ${S.protHasta}.`,N);}}
   else if(!S.protect){S.heat=Math.min(100,S.heat+10);await say('Tú sabrás. Mis agentes van a estar muy atentos.',N);heatWarn();}
   if(plaza){await say('Si me necesitas, estoy en la comisaría del barrio alto.',N);await fade(1);buildEnts();await fade(0);}
 }

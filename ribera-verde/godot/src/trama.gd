@@ -450,7 +450,7 @@ func talk_molina():
 			await say("¿Con qué dinero? Vuelve cuando lo tengas.", N)
 		else:
 			S.money -= sob
-			S.protHasta = int(S.protHasta if S.protect else S.day - 1) + cd
+			S.protHasta = int(max(S.day, S.protHasta if S.protect else 0)) + cd
 			S.protect = true
 			sfx("coin")
 			await say("Bien. Mis agentes mirarán hacia otro lado hasta el día %s." % n(S.protHasta), N)

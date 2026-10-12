@@ -10,7 +10,6 @@ Patinete y bici, y un repaso de errores. Godot, 0.7.0.
 - **Arreglado: el aviso de la orden** solo menciona a Molina desde el capítulo 5 (antes no lo conoces).
 - **Arreglado: la factura de la luz** dice lo que pagas y lo que te falta si no llega.
 - **Arreglado: al cargar la partida** salen la redada o el plazo vencido que quedaron pendientes al guardar en la cama.
-- **Arreglado: la cuota de Molina** cubre 10 días justos (antes, 11 la primera vez).
 - **Arreglado: los encargos de Baltasar** piden una bolsa en la que quepan (2 kg, bolsa de deporte; 5 y 10 kg, maleta).
 - **Cambiado: los plazos dicen «antes de que acabe el día X»** (el día X todavía vale).
 - **Cambiado: la ficha de la planta en la vista C** lleva su número o su nombre y la ★.

@@ -636,7 +636,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.arcon = { buds: { ria: { g: 101, thc: 12 } }, rosin: { ria: { g: 3, thc: 36 } } }; S.money = 0; S.buds = {}; S.rosin = {};
     const l2 = LOG.length; await run(roboDarko); R.darko = LOG.slice(l2).filter(l => /Se han llevado/.test(l)).join('|'); R.a4 = JSON.stringify(S.arcon); S = S0;
   }, () => R.g > 10 && R.encima === 1000 && R.arcon === R.g - 10 && new RegExp(`en la mochila: ${R.g - 10} g van al arcón`).test(R.aviso) && R.a2 === 490 + R.g && R.b2 === 0
-    && R.cap === 3000 && R.bolsa === 1 && R.control === R.a2 && new RegExp(`y ${Math.floor(5 + R.a2)} g\\.`).test(R.redada) && R.a3 === 0
+    && R.cap === 3000 && R.bolsa === 1 && R.control === R.a2 && new RegExp(`^Se llevan ${Math.floor(5 + R.a2)} g\\.`).test(R.redada) && R.a3 === 0
     && R.sacar === '3000,500,true' && /Se han llevado 0 €, 50 g y 1,5 g de rosin\./.test(R.darko) && R.a4 === '{"buds":{"ria":{"g":51,"thc":12}},"rosin":{"ria":{"g":1.5,"thc":36}}}' || R);
   await step('Móvil (1.10): START → MÓVIL; pedir a Kiko (+15 %, llega mañana) y su SMS en Mensajes; llamar a Kiko; quien te compra te da su número y, llamado, viene a la calle (20 min, +1 de calor, una vez al día)',
     ['MÓVIL', 'Pedir a Kiko', '^Abono', 'Salir', 'Colgar', 'SALIR', 'MÓVIL', 'Mensajes', '<B>', 'Llamar', '^Kiko', 'Colgar', 'SALIR', '^Skunk', 'Rebaja',
