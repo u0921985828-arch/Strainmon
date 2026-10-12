@@ -2587,7 +2587,7 @@ func encargo_club(k: String) -> void:
 	var cand := []
 	for it in D.SHOP:
 		if it.get("sid") and S.ch >= it.ch:
-			cand.append([it.sid, int(it.p) * int(EN.n) * int(EN.f)])
+			cand.append([it.sid, Datos.jsround(it.p * EN.n * EN.f)])
 	if S.ch >= 4:
 		var vistos := []
 		for h in D.RECIPES:

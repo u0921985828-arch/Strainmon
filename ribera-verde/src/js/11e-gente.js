@@ -135,7 +135,7 @@ async function encargoClub(k){
     toast(`+${eur(E.pago)} · ${E.n} semillas de ${s.n}`,1600);await say('Las sembramos para los socios. Buen trabajo.',N);await checkStory();return;
   }
   if(S.clubEncDia===S.day)return say('Hoy ya no hay más encargos. Mañana.',N);
-  const cand=SHOP.filter(it=>it.sid&&S.ch>=it.ch).map(it=>[it.sid,it.p*CLUB.enc.n*CLUB.enc.f]).concat(S.ch>=4?[...new Set(Object.values(RECIPES))].filter(s=>S.disc[s]).map(s=>[s,CLUB.enc.receta*CLUB.enc.n]):[]);
+  const cand=SHOP.filter(it=>it.sid&&S.ch>=it.ch).map(it=>[it.sid,Math.round(it.p*CLUB.enc.n*CLUB.enc.f)]).concat(S.ch>=4?[...new Set(Object.values(RECIPES))].filter(s=>S.disc[s]).map(s=>[s,CLUB.enc.receta*CLUB.enc.n]):[]);
   const [sid,pago]=pick(cand),s=STRAINS[sid];
   if(await ask(`Los socios quieren ${CLUB.enc.n} semillas de ${s.n}. Pagamos ${eur(pago)}, en ${CLUB.enc.dias} días. ¿Te encargas?`,['Aceptar','No'],N)!==0)return say('Si cambias de idea, aquí estamos.',N);
   S.clubEnc={k,sid,n:CLUB.enc.n,hasta:S.day+CLUB.enc.dias,pago};await say(`Hasta el día ${S.clubEnc.hasta}. Las semillas, aquí.`,N);
