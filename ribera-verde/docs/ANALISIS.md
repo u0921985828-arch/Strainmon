@@ -3,7 +3,7 @@
 Este documento revisa:
 
 - la historia y sus misiones;
-- lo que puede pasarte por la calle (ladrones, patrullas de policía con su sospecha y su persecución, controles, sobornos, calor y redadas) en las siete zonas: el barrio, el barrio alto y los astilleros de Ribera Verde, las ciudades pequeñas de Puerto Viejo y Valdehierro y los pueblos de Mendialde y Errotabarri;
+- lo que puede pasarte por la calle (ladrones, patrullas de policía con su sospecha y su persecución, controles, sobornos, calor y redadas) en las nueve zonas: el barrio, el barrio alto y los astilleros de Ribera Verde, las ciudades pequeñas de Puerto Viejo y Valdehierro, los pueblos de Mendialde y Errotabarri y, desde el capítulo 4, el Casco Viejo y el Ensanche de Ibarbide, la ciudad grande;
 - la **caja fuerte** del piso.
 
 La primera versión de este análisis encontró 10 problemas (el resumen de abajo). La 1.10 los resuelve todos, y el documento ya describe el juego tal como queda.
@@ -129,7 +129,7 @@ Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo a Iñaki
   | Errotabarri | Autobús: 30 min, 3 € | 0 / 0 | ×0,1 | ×1 |
 
 - **Encuentros.**
-  - En las siete zonas, desde el capítulo 2. No hay encuentros dentro de las casas.
+  - En las nueve zonas, desde el capítulo 2 (Ibarbide, desde el 4). No hay encuentros dentro de las casas.
   - Después de un encuentro vienen 24 pasos tranquilos (`S.cool` se pone a 25 y baja antes de mirar). Los pasos dentro de casa, del growshop o del bar también descuentan.
   - Cada paso tira un número al azar: si sale por debajo de *pt*, hay ladrón. *pt* = 0,004 × (2,5 de noche, de 21:00 a 6:00) × (3 en hierba alta) × ladrones de la zona. Solo si llevas encima 5 g o más (el rosin cuenta como la flor de la que sale: 1 g = 5 g; las tablas son sin rosin), o 150 € o más. El calor no cuenta.
   - Desde la 1.10, la policía ya no sale al azar por paso: patrulla por la calle y se ve (abajo). Mientras un agente te persigue, no hay ladrones.
@@ -177,7 +177,7 @@ Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo a Iñaki
 | Con gramos, de noche en hierba alta | 3,00 % | 33 | 2,99 % |
 <!-- /auto:paso -->
 
-Las mismas situaciones en las siete zonas:
+Las mismas situaciones en las nueve zonas:
 
 <!-- auto:zonas -->
 | Cap. 5 | Ribera Verde (el barrio) | Barrio alto | Astilleros | Puerto Viejo | Valdehierro | Mendialde | Errotabarri |

@@ -44,7 +44,9 @@ const ZON = { town: { n: 'Ribera Verde (el barrio)', lad: 1, precio: 1, pat: [1,
   astilleros: { n: 'Astilleros', lad: 2, precio: 1.2, pat: [1, 1] },
   // la comarca (1.10): las dos ciudades pequeñas y los dos pueblos, a un autobús
   puerto: { n: 'Puerto Viejo', lad: .6, precio: 1.15, pat: [1, 1] }, valdehierro: { n: 'Valdehierro', lad: 1.4, precio: .9, pat: [1, 1] },
-  mendialde: { n: 'Mendialde', lad: .1, precio: 1, pat: [0, 0] }, errotabarri: { n: 'Errotabarri', lad: .1, precio: 1, pat: [0, 0] } };
+  mendialde: { n: 'Mendialde', lad: .1, precio: 1, pat: [0, 0] }, errotabarri: { n: 'Errotabarri', lad: .1, precio: 1, pat: [0, 0] },
+  // la ciudad grande (1.14), desde el capítulo 4: el Casco Viejo y el Ensanche de Ibarbide
+  ibarbide: { n: 'Ibarbide · Casco Viejo', lad: .8, precio: 1.3, pat: [2, 2] }, ensanche: { n: 'Ibarbide · Ensanche', lad: 1.2, precio: 1.25, pat: [2, 3] } };
 const Z = e => ZON[e.zona || 'town'];
 // un paso por la calle (08-mundo, onStepEnd), desde el capítulo 2: ladrón si Math.random() < pt (con la alarma, nada). La policía
 // ya no sale por paso (1.10): patrulla por la calle. Solo cuenta lo que llevas encima: lo de la caja fuerte no
@@ -519,7 +521,7 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
     // ---------- 1 b. por zona (1.10): las mismas reglas × lad de cada zona, andadas en cada mapa; y sus patrullas ----------
     for (const z in ZON) exige(`zona ${z}`, ['lad', 'precio'].every(k => zc.ZONAS[z] && zc.ZONAS[z][k] === ZON[z][k]) && zc.PATRULLAS[z].join() === ZON[z].pat.join(),
       [zc.ZONAS[z], zc.PATRULLAS[z]]);
-    exige('zonas: las siete', Object.keys(zc.ZONAS).join() === Object.keys(ZON).join(), Object.keys(zc.ZONAS));
+    exige('zonas: las nueve', Object.keys(zc.ZONAS).join() === Object.keys(ZON).join(), Object.keys(zc.ZONAS));
     const SZ = [{ n: 'Con gramos, de día', ch: 5, heat: 50, g: 50, money: 2000 }, { n: 'Con gramos, de noche', ch: 5, heat: 50, g: 50, money: 2000, night: true },
       { n: 'Solo dinero (0 g, ≥ 150 €), de noche', ch: 5, heat: 50, g: 0, money: 2000, night: true }];
     const filasZ = [];
