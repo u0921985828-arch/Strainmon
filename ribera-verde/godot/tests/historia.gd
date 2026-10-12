@@ -1438,6 +1438,8 @@ func _pasos() -> void:
 		R.e = Datos.jsround(J.precio_calle(12) * D.ZONAS.town.precio * (50 - v.g) * (1 - D.CURRO.vend.com)) if v else 0
 		R.dinero = J.S.money - (R.m - int(D.CURRO.jard.sueldo) + R.e - R.luz)
 		R.sms = J.S.sms.size() - R.sms
+		J.S.curro = {"jard": null, "vend": []}
+		J.S.fijos = []
 		J.enter_map("home", 5, 5, "up"),
 		func(): return chk(R.patxi == 1 and R.patxi2 == 1 and R.jard and R.vend == "cF,50" and R.g == 150 and R.agua and (R.gone or R.v < 50) and R.dinero == 0 and R.sms >= 1, R))
 	step("Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas", ["^Hindu Kush"], func():
