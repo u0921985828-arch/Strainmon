@@ -1,5 +1,16 @@
 # Cambios
 
+## 1.24.0 · 13 de octubre de 2026
+
+Más genéticas y los ojos que faltaban. Godot, 0.18.0.
+
+- **Nuevo: cuatro landraces más**, de las regiones clásicas que faltaban, con la forma de su planta en la historia de la Genoteca: **Kerala** (India del Sur: tronco recio, hasta 3 m, ramas como un helecho, flor pequeña y muy resinosa, aroma especiado), **Lebanese** (valle de la Bekaa: baja, tallos finos, hoja ancha, cogollo resinoso con hoja; la del hachís), **Manga Rosa** (Brasil) y **Durban Poison** (Sudáfrica). Se piden al banco de semillas del PC: Lebanese desde el capítulo 3, Kerala y Manga Rosa desde el 4 y Durban Poison desde el 5.
+- **Nuevo: cinco híbridos clásicos de receta**, con su linaje real: **White Widow** (Manga Rosa × Kerala, la sativa de Brasil con la planta del sur de la India; ≈), **Purple Haze** (Purple Thai × Haze; ≈), **White Russian** (White Widow × AK-47), **Blue Widow** (Blueberry × White Widow) y **Super Lemon Haze** (Lemon Skunk × Super Silver Haze, la primera de 4.ª generación). La Haze tiene otra receta con la India del Sur (Punto Rojo + Michoacán + Thai + Kerala). El diario de la tía Maite pasa de 32 a 37 variedades, cada una con su nota; la Genoteca, de 59 a 68 (las nuevas, al final, para no cambiar el número de las demás).
+- **Ojos de la opción C en Josune, Iñaki, Patxi y Molina** (de frente y de lado) y en los lados de Baltasar y Darko: los ojos que PixelLab les dibujó no se podían buscar por su blanco (sin blanco, o con brillos y cejas blancas), así que van a mano (`A_MANO` en `tools/sprites/a-mano/npc_ojos.py`), donde estaban los viejos.
+- **Arreglado:** contra la carga de Darko, la guardia o la esquiva de la ronda en que coge la barra se gastan; ya no protegían del golpe doble de la ronda siguiente.
+- Igual en Godot.
+- Tests: `npm test` 107/107 (el árbol, con las 40 de la tabla hasta la 4.ª generación; el recetario, con las 37; la carga de Darko gasta la guardia y la esquiva); Godot, historia 107 pasos.
+
 ## 1.23.0 · 13 de octubre de 2026
 
 Marcas de abono, Julen y el itinerario. Godot, 0.17.0.

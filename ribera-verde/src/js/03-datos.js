@@ -4,7 +4,9 @@
 // Variedades reales (nombres de uso común entre cultivadores; ningún banco de semillas, criador ni persona). Los ids internos
 // son los de las primeras versiones para no romper partidas guardadas (1.11: algunos cambian de variedad). c = tono del cogollo.
 // h = historia (Genoteca). gen (1.11): generación del árbol de híbridos clásicos (1.ª, 2.ª o 3.ª); «≈ origen incierto» en o
-// cuando los padres no están documentados. Las landraces salen del catálogo de Strainmon (src/species.js), con su nombre real.
+// cuando los padres no están documentados. Las landraces salen del catálogo de Strainmon (src/species.js), con su nombre real;
+// las de 1.24 (India del Sur, Líbano, Brasil y Sudáfrica), de las regiones clásicas, con su forma de planta. Van al final para no
+// cambiar el número de las demás en la Genoteca.
 const STRAINS={
   // de growshop (SHOP)
   ria:{n:'Skunk #1',thc:12,y:40,d:2.5,r:75,c:'#9bd35a',ind:65,hj:'#57a33e',gen:1,o:'Afghani × Colombian Gold × Acapulco Gold',h:'Fijada a finales de los setenta con tres landraces: robusta, estable y fácil. Es la base de media genética moderna.'},
@@ -70,6 +72,16 @@ const STRAINS={
   dragon:{n:'Sour Diesel',thc:27,y:36,d:4,r:60,c:'#90b448',ind:30,hj:'#6fa53e',gen:3,o:'Chemdawg × Super Skunk · ≈ origen incierto',h:'Olor a gasóleo agrio y efecto rápido. Una de las más buscadas.'},
   kali47:{n:'Kali 47',thc:21,y:36,d:3.5,r:65,c:'#b0cc68',ind:30,hj:'#72a63e',gen:3,o:'Kali Mist × AK-47',h:'La Kali Mist con la AK-47: sativa más rápida y productiva.'},
   reina:{n:'Critical Kali Mist',thc:21,y:42,d:3.5,r:75,c:'#98c058',ind:45,hj:'#5c9a48',gen:3,o:'Critical Mass × Kali Mist',h:'La producción de la Critical Mass con el efecto de la Kali Mist.'},
+  // 1.24: más landraces (del banco de semillas) y sus cruces
+  kerala:{n:'Kerala',thc:16,y:28,d:5,r:50,c:'#b8cc60',ind:25,hj:'#76a63e',o:'Landrace · sierras de Kerala, India del Sur',h:'Sativa de la India del Sur: tronco recio, hasta tres metros y ramas laterales como las de un helecho. Flores pequeñas, curvadas y muy resinosas, de aroma especiado.'},
+  libano:{n:'Lebanese',thc:14,y:30,d:3,r:75,c:'#a4b45c',ind:85,hj:'#4f9a3c',o:'Landrace · valle de la Bekaa, Líbano',h:'La planta del hachís libanés: baja, de tallos finos y pocas ramas, hoja ancha de verde medio y cogollo resinoso con bastante hoja. Efecto narcótico.'},
+  mangarosa:{n:'Manga Rosa',thc:15,y:30,d:4.5,r:55,c:'#c4c060',ind:5,hj:'#86a83e',o:'Landrace · nordeste de Brasil',h:'Sativa brasileña de cogollo largo y pistilos rosados, con aroma a fruta tropical.'},
+  durban:{n:'Durban Poison',thc:18,y:34,d:3.5,r:65,c:'#b4d060',ind:0,hj:'#8aa83e',o:'Landrace · puerto de Durban, Sudáfrica',h:'Sativa sudafricana, rápida para su tipo y muy resinosa. Aroma dulce, a anís, y efecto claro.'},
+  ww:{n:'White Widow',thc:20,y:40,d:3.5,r:70,c:'#e4eed0',ind:60,hj:'#5ba33e',gen:1,o:'sativa de Brasil × planta resinosa del sur de la India · ≈ origen incierto',h:'Se cubre de tricomas hasta verse blanca. Arrasó a mediados de los noventa. En la mesa: Manga Rosa × Kerala.'},
+  purplehaze:{n:'Purple Haze',thc:19,y:30,d:4.5,r:50,c:'#a07cc0',ind:15,hj:'#7ea63e',gen:2,o:'Purple Thai × Haze · ≈ origen incierto',h:'Una Haze morada: el efecto eléctrico de la Haze con el color de la Purple Thai.'},
+  whiterussian:{n:'White Russian',thc:22,y:40,d:3.5,r:70,c:'#dce8c8',ind:60,hj:'#5ba33e',gen:2,o:'White Widow × AK-47',h:'La White Widow con la AK-47: todavía más resina y floración corta. Premiada a finales de los noventa.'},
+  bluewidow:{n:'Blue Widow',thc:19,y:40,d:3.5,r:65,c:'#a8c0d8',ind:65,hj:'#57a33e',gen:3,o:'Blueberry × White Widow',h:'La White Widow con el dulzor y el azul de la Blueberry.'},
+  superlemon:{n:'Super Lemon Haze',thc:23,y:38,d:4,r:65,c:'#dce870',ind:30,hj:'#72a63e',gen:4,o:'Lemon Skunk × Super Silver Haze',h:'Limón y escarcha: la Super Silver Haze con la Lemon Skunk. Campeona dos años seguidos a finales de los 2000.'},
 };
 const DEX=Object.keys(STRAINS);
 // forma del cogollo en los menús (cogollos-genoteca del atlas)
@@ -106,7 +118,9 @@ const RECIPES={},RECETA_ORD={};
  [['amanecer','hthai','rif'],'niebla'],[['ria','nl'],'shiva'],[['haze','nlhaze'],'neville'],[['choco','cannalope'],'chocolope'],
  [['sollimon','hawai'],'orotrop'],[['calorange','ria'],'brumaog'],[['haze','lamb','rif','lao'],'tormenta'],[['haze','lamb','hawai','lao'],'tormenta'],
  [['haze','nl','shiva'],'leyenda'],[['ria','nl','haze'],'ssh'],[['silver','ria'],'ssh'],[['niebla','haze'],'nieblamor'],[['niebla','cheese'],'bluetx'],
- [['citrus','silver'],'limon'],[['chemdawg','txoko'],'dragon'],[['kali','ak47'],'kali47'],[['kushrif','kali'],'reina']]
+ [['citrus','silver'],'limon'],[['chemdawg','txoko'],'dragon'],[['kali','ak47'],'kali47'],[['kushrif','kali'],'reina'],
+ [['mangarosa','kerala'],'ww'],[['punto','mich','thai','kerala'],'haze'],[['amanecer','haze'],'purplehaze'],[['ww','ak47'],'whiterussian'],
+ [['niebla','ww'],'bluewidow'],[['citrus','ssh'],'superlemon']]
  .forEach(([h,c])=>{RECIPES[h.slice().sort().join('+')]=c;});
 [['ria','rif','txoko'],['rif','ria','kushrif'],['nl','haze','nlhaze'],['haze','nl','silver']].forEach(([a,b,c])=>{RECETA_ORD[a+'>'+b]=c;});
 const hojasDe=id=>(S&&S.custom&&S.custom[id]&&S.custom[id].hojas)||[id];

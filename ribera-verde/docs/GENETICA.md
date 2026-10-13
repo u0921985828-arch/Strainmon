@@ -2,7 +2,7 @@
 
 > Generado automáticamente con `node tools/generar-docs.js` a partir de los datos del juego. No editar a mano: cambia `src/js/03-datos.js` y regenera.
 
-## Las 59 variedades de la Genoteca
+## Las 68 variedades de la Genoteca
 
 | # | Variedad | THC | Rinde (g/m²) | Días | Resist. | Índica | Tipo | Cogollo | Hoja | Cómo se consigue |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -65,6 +65,15 @@
 | 57 | Sour Diesel | 27% | 450 | 4 | 60% | 30 % | cruce (F1 en la mesa) | `#90b448` | `#6fa53e` | Cruce: Chemdawg × Super Skunk · ≈ origen incierto |
 | 58 | Kali 47 | 21% | 450 | 3,5 | 65% | 30 % | cruce (F1 en la mesa) | `#b0cc68` | `#72a63e` | Cruce: Kali Mist × AK-47 |
 | 59 | Critical Kali Mist | 21% | 530 | 3,5 | 75% | 45 % | cruce (F1 en la mesa) | `#98c058` | `#5c9a48` | Cruce: Critical Mass × Kali Mist |
+| 60 | Kerala | 16% | 350 | 5 | 50% | 25 % | landrace | `#b8cc60` | `#76a63e` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 4; llega al día siguiente) |
+| 61 | Lebanese | 14% | 380 | 3 | 75% | 85 % | landrace | `#a4b45c` | `#4f9a3c` | Banco de semillas del PC, sobre de 10 por 25 € (cap. 3; llega al día siguiente) |
+| 62 | Manga Rosa | 15% | 380 | 4,5 | 55% | 5 % | landrace | `#c4c060` | `#86a83e` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 4; llega al día siguiente) |
+| 63 | Durban Poison | 18% | 430 | 3,5 | 65% | 0 % | landrace | `#b4d060` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 40 € (cap. 5; llega al día siguiente) |
+| 64 | White Widow | 20% | 500 | 3,5 | 70% | 60 % | cruce (F1 en la mesa) | `#e4eed0` | `#5ba33e` | Cruce: sativa de Brasil × planta resinosa del sur de la India · ≈ origen incierto |
+| 65 | Purple Haze | 19% | 380 | 4,5 | 50% | 15 % | cruce (F1 en la mesa) | `#a07cc0` | `#7ea63e` | Cruce: Purple Thai × Haze · ≈ origen incierto |
+| 66 | White Russian | 22% | 500 | 3,5 | 70% | 60 % | cruce (F1 en la mesa) | `#dce8c8` | `#5ba33e` | Cruce: White Widow × AK-47 |
+| 67 | Blue Widow | 19% | 500 | 3,5 | 65% | 65 % | cruce (F1 en la mesa) | `#a8c0d8` | `#57a33e` | Cruce: Blueberry × White Widow |
+| 68 | Super Lemon Haze | 23% | 480 | 4 | 65% | 30 % | cruce (F1 en la mesa) | `#dce870` | `#72a63e` | Cruce: Lemon Skunk × Super Silver Haze |
 
 **Índica** es el % índica (el resto, sativa), con datos reales de cada variedad; **hoja**, el tono de su hoja. Dan la forma de la planta en la carpa (`porteInd`): 70 % o más, índica (hoja ancha de 7 foliolos, colas gordas y cortas, internudo corto); menos de 30 %, sativa (9 foliolos finos y largos, colas finas y largas, internudo largo); en medio, híbrida. La sativa tiene la hoja clara y amarillenta; la índica, oscura.
 
@@ -129,10 +138,19 @@ Las landraces y los híbridos clásicos de la 1.9 salen del catálogo de Strainm
 | Sour Diesel | Chemdawg × Super Skunk · ≈ origen incierto | Olor a gasóleo agrio y efecto rápido. Una de las más buscadas. |
 | Kali 47 | Kali Mist × AK-47 | La Kali Mist con la AK-47: sativa más rápida y productiva. |
 | Critical Kali Mist | Critical Mass × Kali Mist | La producción de la Critical Mass con el efecto de la Kali Mist. |
+| Kerala | Landrace · sierras de Kerala, India del Sur | Sativa de la India del Sur: tronco recio, hasta tres metros y ramas laterales como las de un helecho. Flores pequeñas, curvadas y muy resinosas, de aroma especiado. |
+| Lebanese | Landrace · valle de la Bekaa, Líbano | La planta del hachís libanés: baja, de tallos finos y pocas ramas, hoja ancha de verde medio y cogollo resinoso con bastante hoja. Efecto narcótico. |
+| Manga Rosa | Landrace · nordeste de Brasil | Sativa brasileña de cogollo largo y pistilos rosados, con aroma a fruta tropical. |
+| Durban Poison | Landrace · puerto de Durban, Sudáfrica | Sativa sudafricana, rápida para su tipo y muy resinosa. Aroma dulce, a anís, y efecto claro. |
+| White Widow | sativa de Brasil × planta resinosa del sur de la India · ≈ origen incierto | Se cubre de tricomas hasta verse blanca. Arrasó a mediados de los noventa. En la mesa: Manga Rosa × Kerala. |
+| Purple Haze | Purple Thai × Haze · ≈ origen incierto | Una Haze morada: el efecto eléctrico de la Haze con el color de la Purple Thai. |
+| White Russian | White Widow × AK-47 | La White Widow con la AK-47: todavía más resina y floración corta. Premiada a finales de los noventa. |
+| Blue Widow | Blueberry × White Widow | La White Widow con el dulzor y el azul de la Blueberry. |
+| Super Lemon Haze | Lemon Skunk × Super Silver Haze | Limón y escarcha: la Super Silver Haze con la Lemon Skunk. Campeona dos años seguidos a finales de los 2000. |
 
 ## El árbol por generaciones (1.11)
 
-Los híbridos clásicos, de las landraces a la 3.ª generación. ✔ padres documentados; ≈ origen incierto (se marca en la Genoteca).
+Los híbridos clásicos, de las landraces a la 4.ª generación. ✔ padres documentados; ≈ origen incierto (se marca en la Genoteca).
 
 | Gen. | Variedad | Padres | | THC | Índica |
 |---|---|---|---|---|---|
@@ -150,6 +168,7 @@ Los híbridos clásicos, de las landraces a la 3.ª generación. ✔ padres docu
 | 1.ª | Congo × Panama | Congolese × Panama Red | ✔ | 18% | 0 % |
 | 1.ª | Malawi × Panama | Malawi Gold × Panama Red | ✔ | 20% | 0 % |
 | 1.ª | Malawi × PCK | Malawi Gold × Chitral Kush (PCK) | ✔ | 19% | 40 % |
+| 1.ª | White Widow | sativa de Brasil × planta resinosa del sur de la India | ≈ | 20% | 60 % |
 | 2.ª | Super Skunk | Skunk #1 × Afghani | ✔ | 19% | 80 % |
 | 2.ª | Blueberry | Purple Thai × Highland Thai × Afghani | ✔ | 17% | 80 % |
 | 2.ª | Cheese | Fenotipo de Skunk #1 (Reino Unido) | ✔ | 17% | 60 % |
@@ -162,6 +181,8 @@ Los híbridos clásicos, de las landraces a la 3.ª generación. ✔ padres docu
 | 2.ª | Pineapple Express | Trainwreck × Hawaiian | ≈ | 21% | 40 % |
 | 2.ª | Tangie | California Orange × Skunk #1 | ✔ | 20% | 30 % |
 | 2.ª | Amnesia Haze | Haze + jamaicana + afgana o hawaiana + Laos | ≈ | 26% | 20 % |
+| 2.ª | Purple Haze | Purple Thai × Haze | ≈ | 19% | 15 % |
+| 2.ª | White Russian | White Widow × AK-47 | ✔ | 22% | 60 % |
 | 3.ª | Lemon Haze | Lemon Skunk × Silver Haze | ≈ | 15% | 20 % |
 | 3.ª | Big Bud | base Afghani | ≈ | 17% | 85 % |
 | 3.ª | Jack Herer | Haze × (NL5 × Shiva Skunk) | ✔ | 28% | 45 % |
@@ -171,8 +192,10 @@ Los híbridos clásicos, de las landraces a la 3.ª generación. ✔ padres docu
 | 3.ª | Sour Diesel | Chemdawg × Super Skunk | ≈ | 27% | 30 % |
 | 3.ª | Kali 47 | Kali Mist × AK-47 | ✔ | 21% | 30 % |
 | 3.ª | Critical Kali Mist | Critical Mass × Kali Mist | ✔ | 21% | 45 % |
+| 3.ª | Blue Widow | Blueberry × White Widow | ✔ | 19% | 65 % |
+| 4.ª | Super Lemon Haze | Lemon Skunk × Super Silver Haze | ✔ | 23% | 30 % |
 
-## Recetas de cruce (36)
+## Recetas de cruce (42)
 
 Cada receta es un conjunto de variedades de partida («hojas»). Un cruce de dos da la variedad si sus hojas juntas son las de la receta; si no, un híbrido propio que guarda las hojas de sus padres. Así las de 3 o 4 padres se hacen en varios cruces: (Afghani × Colombian Gold) × Acapulco Gold = Skunk #1, en cualquier orden que no pase antes por otra receta. En las marcadas **madre × padre** el orden cuenta. Cada cruce gasta 1 semilla de cada padre y da 2 semillas del resultado.
 
@@ -214,6 +237,12 @@ Cada receta es un conjunto de variedades de partida («hojas»). Un cruce de dos
 | Chemdawg + Super Skunk | **Sour Diesel** | 3.ª | 27% |
 | AK-47 + Kali Mist | **Kali 47** | 3.ª | 21% |
 | Kali Mist + Critical Mass | **Critical Kali Mist** | 3.ª | 21% |
+| Kerala + Manga Rosa | **White Widow** | 1.ª | 20% |
+| Kerala + Michoacán + Punto Rojo + Thai | **Haze** | 1.ª | 20% |
+| Purple Thai + Haze | **Purple Haze** | 2.ª | 19% |
+| AK-47 + White Widow | **White Russian** | 2.ª | 22% |
+| Blueberry + White Widow | **Blue Widow** | 3.ª | 19% |
+| Lemon Skunk + Super Silver Haze | **Super Lemon Haze** | 4.ª | 23% |
 
 ## Árbol hasta la Jack Herer
 
@@ -295,6 +324,17 @@ flowchart LR
   kali["Kali Mist"] --> kali47["Kali 47"]
   kali["Kali Mist"] --> reina["Critical Kali Mist"]
   kushrif["Critical Mass"] --> reina["Critical Kali Mist"]
+  kerala["Kerala"] --> ww["White Widow"]
+  mangarosa["Manga Rosa"] --> ww["White Widow"]
+  kerala["Kerala"] --> haze["Haze"]
+  amanecer["Purple Thai"] --> purplehaze["Purple Haze"]
+  haze["Haze"] --> purplehaze["Purple Haze"]
+  ak47["AK-47"] --> whiterussian["White Russian"]
+  ww["White Widow"] --> whiterussian["White Russian"]
+  niebla["Blueberry"] --> bluewidow["Blue Widow"]
+  ww["White Widow"] --> bluewidow["Blue Widow"]
+  citrus["Lemon Skunk"] --> superlemon["Super Lemon Haze"]
+  ssh["Super Silver Haze"] --> superlemon["Super Lemon Haze"]
   style leyenda fill:#40e0a0,color:#062
 ```
 

@@ -750,12 +750,13 @@ func _pasos() -> void:
 			return chk(bien and I.ria == "65" and absf(I.media - 50) < 1 and absf(I.sd - D.GENETICA.landrace.si) < 1 and Cultivo.tipo_gen(J.S, "ria") == "estable"
 				and Cultivo.tipo_gen(J.S, "txoko") == "f1" and Cultivo.tipo_gen(J.S, "limon") == "poli" and Cultivo.tipo_gen(J.S, "thai") == "landrace"
 				and re("Cruce F1: [^\\n]*\\n2\\.ª generación · Skunk #1 × Afghani$", J.strain_line("txoko")) and re("origen incierto", J.strain_line("mango")), {"R": R, "I": I}))
-	step("Árbol por generaciones (1.11): las 35 de la tabla con su generación y ✔/≈; todas salen en la mesa desde landraces y tienda; sin criadores", [], func():
-		var T := {1: "Skunk #1 ✔|Haze ≈|Northern Lights ≈|Purple Thai ✔|Trainwreck ≈|AK-47 ✔|Laughing Buddha ✔|Cannalope Haze ✔|Master Kush ≈|Purple Kush ≈|Congo × Panama ✔|Malawi × Panama ✔|Malawi × PCK ✔|Kali Mist ≈",
-			2: "Blueberry ✔|Super Skunk ✔|Shiva Skunk ✔|Critical Mass ✔|Cheese ✔|NL5 × Haze ✔|Neville's Haze ✔|Silver Haze ≈|Chocolope ✔|Pineapple Express ≈|Tangie ✔|Amnesia Haze ≈",
-			3: "Jack Herer ✔|Super Silver Haze ✔|Blue Dream ✔|Blue Cheese ✔|Lemon Haze ≈|Sour Diesel ≈|Kali 47 ✔|Critical Kali Mist ✔|Big Bud ≈"}
+	step("Árbol por generaciones (1.11; 1.24, hasta la 4.ª): las 40 de la tabla con su generación y ✔/≈; todas salen en la mesa desde landraces y tienda; sin criadores", [], func():
+		var T := {1: "Skunk #1 ✔|Haze ≈|Northern Lights ≈|Purple Thai ✔|Trainwreck ≈|AK-47 ✔|Laughing Buddha ✔|Cannalope Haze ✔|Master Kush ≈|Purple Kush ≈|Congo × Panama ✔|Malawi × Panama ✔|Malawi × PCK ✔|Kali Mist ≈|White Widow ≈",
+			2: "Blueberry ✔|Super Skunk ✔|Shiva Skunk ✔|Critical Mass ✔|Cheese ✔|NL5 × Haze ✔|Neville's Haze ✔|Silver Haze ≈|Chocolope ✔|Pineapple Express ≈|Tangie ✔|Amnesia Haze ≈|Purple Haze ≈|White Russian ✔",
+			3: "Jack Herer ✔|Super Silver Haze ✔|Blue Dream ✔|Blue Cheese ✔|Lemon Haze ≈|Sour Diesel ≈|Kali 47 ✔|Critical Kali Mist ✔|Big Bud ≈|Blue Widow ✔",
+			4: "Super Lemon Haze ✔"}
 		var tabla := true
-		for g in [1, 2, 3]:
+		for g in [1, 2, 3, 4]:
 			var l := []
 			for k in D.DEX:
 				if D.STRAINS[k].get("gen") == g:
@@ -1560,11 +1561,12 @@ func _pasos() -> void:
 		J.S.hpMax = 30
 		R.jefe = J.rival_b("darko").jefe
 		await run(func():
-			J.B = {"kind": "thief", "rival": "Darko", "jefe": 1, "name": "DARKO", "atk": [6, 6], "hp": 40, "hpMax": 40, "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
+			J.B = {"kind": "thief", "rival": "Darko", "jefe": 1, "name": "DARKO", "atk": [6, 6], "hp": 40, "hpMax": 40, "t": 0.0, "flashE": 0.0, "shakeP": 0.0, "cubre": 1, "esquiva": 1}
 			Cultivo.fijo = 0
 			R.r1 = await J.enemy_hits()
 			R.carga = J.B.carga
 			R.hp1 = J.S.hp
+			R.gasta = "%d,%d" % [J.B.cubre, J.B.esquiva]
 			Cultivo.fijo = .99
 			J.B.cubre = 1
 			await J.enemy_hits()
@@ -1616,7 +1618,7 @@ func _pasos() -> void:
 		J.S.flags.miren = 0
 		J.S.buds = {}
 		J.enter_map("home", 5, 5, "up"),
-		func(): return chk(R.dk and not R.dk2 and ",".join(PackedStringArray(R.b)) == "thief,darko" and R.vend == 10 and R.fin and R.rep == D.DARKO.rep and R.jefe == 1 and R.r1 == null and R.carga == 1 and R.hp1 == 30 and R.hp2 == 24 and R.carga2 == 0 and R.hp3 == 18
+		func(): return chk(R.dk and not R.dk2 and ",".join(PackedStringArray(R.b)) == "thief,darko" and R.vend == 10 and R.fin and R.rep == D.DARKO.rep and R.jefe == 1 and R.r1 == null and R.carga == 1 and R.hp1 == 30 and R.gasta == "0,0" and R.hp2 == 24 and R.carga2 == 0 and R.hp3 == 18
 			and R.t1 == null and R.hp4 == 12 and R.t2 == "win" and R.repJ == 0 and R.hpMax == 32 and LOG.has("«Aquí ya no hay nada que hablar.»") and LOG.has("Darko cae al suelo, sin aire.")
 			and R.mi == "24,10" and R.m1 and R.pt == "5,false" and R.ria == 30 and R.h == D.MIREN.n and R.pag and R.ult == 2
 			and LOG.has("DARKO: Las esquinas son tuyas. Yo me largo de aquí una temporada.") and LOG.has("SMS · DON BALTASAR: Me han contado lo de mi sobrino.") and LOG.has("Darko coge una barra de hierro del suelo. El próximo golpe va a doler."), R))
@@ -2632,7 +2634,7 @@ func _pasos() -> void:
 		func(): return chk(R.n1 == "Madre Lima" and R.esq == "9995" and R.n2 == "Madre Lima" and R.esq2 == 0 and R.seeds == '{"ria":2}' and R.lab and R.n3 == false
 			and LOG.any(func(l): return l == "  [texto] Nombre de la planta (y sus esquejes) → Madre Lima") and LOG.any(func(l): return l == "  [texto] Nombre de la planta (y sus esquejes) → (B)")
 			and LOG.any(func(l): return l.begins_with("Cortas una punta de la Skunk #1 «Madre Lima»")) and LOG.any(func(l): return l == "Sin nombre: vuelve a ser la nº 9995."), R))
-	step("Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave; se cambia el nombre de una propia (sin repetir otro); el recetario, con las 32 y de dónde sale cada semilla",
+	step("Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave; se cambia el nombre de una propia (sin repetir otro); el recetario, con las 37 y de dónde sale cada semilla",
 		["GENOTECA", "DIARIO DE LA TÍA", "Skunk #1$", "Volver", "<B>", "^★ Skunk Haze", "=Haze Corta", "^★ Haze Corta", "=skunk #1", "<B>", "SALIR"], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))
@@ -2688,7 +2690,7 @@ func _pasos() -> void:
 		R.diario = ",".join(PackedStringArray(Rc.keys().filter(func(t): return J.diario_txt(t) == "")))
 		J.S = S0,
 		func(): return chk(R.n > 50 and R.x == 0 and R.max <= 20 and R.rep == 0 and R.dex == 0 and R.mig == "xv1:Skunk Haze|xv2:Northern Thai|xv3:Thai Haze" and R.ren == "Haze Corta"
-			and R.rec == 32 and R.sin == "" and R.diario == "" and R.parque == "Semillas: escondidas en el parque del barrio." and R.ss == "Skunk #1 × Afghani, en ese orden"
+			and R.rec == 37 and R.sin == "" and R.diario == "" and R.parque == "Semillas: escondidas en el parque del barrio." and R.ss == "Skunk #1 × Afghani, en ese orden"
 			and LOG.any(func(l): return l == "  [texto] Nuevo nombre de la variedad → Haze Corta") and LOG.any(func(l): return l == "Ya hay una variedad con ese nombre.") and LOG.any(func(l): return re("\\[menú\\] .*Afghani.*Volver  → Volver", l)), R))
 	step("Exportar partida (1.11): OPCIONES → EXPORTAR PARTIDA copia el JSON de la partida", ["OPCIONES", "EXPORTAR", "VOLVER", "SALIR"], func():
 		J.exportado = ""

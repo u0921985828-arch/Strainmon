@@ -393,7 +393,8 @@ async function pcAction(){
 }
 // banco de semillas (1.9): las landraces de Strainmon en sobres de SOBRE semillas, a precio de bancos de conservación
 // (1.10: 2-4,50 € la semilla); el pedido llega por mensajero al día siguiente (newDay)
-const SOBRE=10,BANCO=[['mich',25,2],['punto',30,2],['colgold',30,2],['thai',30,2],['kif',20,2],['beldia',20,2],['chitral',35,3],['nepal',30,3],['congo',30,3],['lamb',30,3],['oaxaca',25,3],['choco',35,3],['hthai',30,3],['hawai',30,3],['lao',40,4],['panama',45,4]];
+const SOBRE=10,BANCO=[['mich',25,2],['punto',30,2],['colgold',30,2],['thai',30,2],['kif',20,2],['beldia',20,2],['chitral',35,3],['nepal',30,3],['congo',30,3],['lamb',30,3],['oaxaca',25,3],['choco',35,3],['hthai',30,3],['hawai',30,3],['lao',40,4],['panama',45,4],
+  ['libano',25,3],['kerala',35,4],['mangarosa',35,4],['durban',40,5]];
 async function bancoSemillas(){
   let i=0;
   for(;;){

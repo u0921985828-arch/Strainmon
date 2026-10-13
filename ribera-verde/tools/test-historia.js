@@ -280,11 +280,12 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && tipoGen('ria') === 'estable' && tipoGen('txoko') === 'f1' && tipoGen('limon') === 'poli' && tipoGen('thai') === 'landrace' && /Cruce F1: [^\n]*\n2\.ª generación · Skunk #1 × Afghani$/.test(strainLine('txoko')) && /\n≈|origen incierto/.test(strainLine('mango')) || { R, I });
   // el árbol de la tabla (1.11): generación y ✔/≈ de cada una; todas salen en la mesa, con crossResult de verdad, desde las landraces y las de
   // tienda que no son de receta (los cruces de 3 o 4 padres, por híbridos propios con sus hojas); sin bancos, criadores ni personas
-  await step('Árbol por generaciones (1.11): las 35 de la tabla con su generación y ✔/≈; todas salen en la mesa desde landraces y tienda; sin criadores', [], async () => {
-    const T = { 1: 'Skunk #1 ✔|Haze ≈|Northern Lights ≈|Purple Thai ✔|Trainwreck ≈|AK-47 ✔|Laughing Buddha ✔|Cannalope Haze ✔|Master Kush ≈|Purple Kush ≈|Congo × Panama ✔|Malawi × Panama ✔|Malawi × PCK ✔|Kali Mist ≈',
-      2: 'Blueberry ✔|Super Skunk ✔|Shiva Skunk ✔|Critical Mass ✔|Cheese ✔|NL5 × Haze ✔|Neville\'s Haze ✔|Silver Haze ≈|Chocolope ✔|Pineapple Express ≈|Tangie ✔|Amnesia Haze ≈',
-      3: 'Jack Herer ✔|Super Silver Haze ✔|Blue Dream ✔|Blue Cheese ✔|Lemon Haze ≈|Sour Diesel ≈|Kali 47 ✔|Critical Kali Mist ✔|Big Bud ≈' };
-    window.R = { tabla: [1, 2, 3].every(g => DEX.filter(k => STRAINS[k].gen === g).map(k => STRAINS[k].n + (/origen incierto/.test(STRAINS[k].o) ? ' ≈' : ' ✔')).sort().join('|') === T[g].split('|').sort().join('|')) };
+  await step('Árbol por generaciones (1.11; 1.24, hasta la 4.ª): las 40 de la tabla con su generación y ✔/≈; todas salen en la mesa desde landraces y tienda; sin criadores', [], async () => {
+    const T = { 1: 'Skunk #1 ✔|Haze ≈|Northern Lights ≈|Purple Thai ✔|Trainwreck ≈|AK-47 ✔|Laughing Buddha ✔|Cannalope Haze ✔|Master Kush ≈|Purple Kush ≈|Congo × Panama ✔|Malawi × Panama ✔|Malawi × PCK ✔|Kali Mist ≈|White Widow ≈',
+      2: 'Blueberry ✔|Super Skunk ✔|Shiva Skunk ✔|Critical Mass ✔|Cheese ✔|NL5 × Haze ✔|Neville\'s Haze ✔|Silver Haze ≈|Chocolope ✔|Pineapple Express ≈|Tangie ✔|Amnesia Haze ≈|Purple Haze ≈|White Russian ✔',
+      3: 'Jack Herer ✔|Super Silver Haze ✔|Blue Dream ✔|Blue Cheese ✔|Lemon Haze ≈|Sour Diesel ≈|Kali 47 ✔|Critical Kali Mist ✔|Big Bud ≈|Blue Widow ✔',
+      4: 'Super Lemon Haze ✔' };
+    window.R = { tabla: [1, 2, 3, 4].every(g => DEX.filter(k => STRAINS[k].gen === g).map(k => STRAINS[k].n + (/origen incierto/.test(STRAINS[k].o) ? ' ≈' : ' ✔')).sort().join('|') === T[g].split('|').sort().join('|')) };
     const sale = new Set([...Object.values(RECIPES), ...Object.values(RECETA_ORD)]), RS = Object.keys(RECIPES).map(k => k.split('+'));
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); S.custom = {}; const ids = new Set(DEX.filter(k => !sale.has(k))), via = {}, vistas = new Set(ids);
     for (let cambia = true; cambia;) { cambia = false; const L = [...ids];
@@ -486,7 +487,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     await run(cl('cx6')); want(['^Pelear']); R.dk = ents.some(e => e.id === 'darko2'); R.rep = S.rep; await run(talkDarko); R.fin = S.flags.darkoFin === S.day; R.rep = S.rep - R.rep; R.dk2 = ents.some(e => e.id === 'darko2');
     await run(cl('cx7')); R.vend = S.buds.ria.g; window.battle = b0;
     S.hp = 30; S.hpMax = 30; R.jefe = rivalB('darko').jefe;
-    await run(async () => { B = { kind: 'thief', rival: 'Darko', jefe: 1, name: 'DARKO', atk: [6, 6], hp: 40, hpMax: 40, t: 0, flashE: 0, shakeP: 0 }; Math.random = () => 0; R.r1 = await enemyHits(); R.carga = B.carga; R.hp1 = S.hp;
+    await run(async () => { B = { kind: 'thief', rival: 'Darko', jefe: 1, name: 'DARKO', atk: [6, 6], hp: 40, hpMax: 40, t: 0, flashE: 0, shakeP: 0, cubre: 1, esquiva: 1 }; Math.random = () => 0; R.r1 = await enemyHits(); R.carga = B.carga; R.hp1 = S.hp; R.gasta = [B.cubre, B.esquiva].join();
       Math.random = () => .99; B.cubre = 1; await enemyHits(); R.hp2 = S.hp; R.carga2 = B.carga; await enemyHits(); R.hp3 = S.hp;
       B.hp = 1; R.rep0 = S.rep; want(['HABLAR', 'CALMAR']); R.t1 = await thiefRound(); R.hp4 = S.hp; Math.random = () => 0; want(['LUCHAR', 'PUÑETAZO', '^Fuerza']); R.t2 = await thiefRound(); R.repJ = S.rep - R.rep0; R.hpMax = S.hpMax; Math.random = r0; B = null; });
     S.hp = sv.hp; S.hpMax = sv.hpMax; S.rep = sv.rep; S.pelea = sv.pelea;
@@ -496,7 +497,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     addBuds('amanecer*', 10, 20); addBuds('amanecer', 15, 18); addBuds('ria', 30, 12); want(['^Dárselos']); await run(talkMiren); R.pt = [S.buds['amanecer*'] ? S.buds['amanecer*'].g : 0, !!S.buds.amanecer].join(); R.ria = S.buds.ria.g; R.h = S.seeds.haze - R.h0; R.pag = S.flags.pagina === S.day;
     const l0 = LOG.length; want(['La última página', 'Volver']); await run(recetario); R.ult = LOG.slice(l0).filter(l => /\[menú\].*La última página/.test(l)).length;
     S.flags.pagina = 0; S.flags.miren = 0; S.buds = {}; enterMap('home', 5, 5, 'up');
-  }, () => R.dk && !R.dk2 && R.b.join() === 'thief,darko' && R.vend === 10 && R.fin && R.rep === DARKO.rep && R.jefe === 1 && R.r1 === null && R.carga === 1 && R.hp1 === 30 && R.hp2 === 24 && R.carga2 === 0 && R.hp3 === 18
+  }, () => R.dk && !R.dk2 && R.b.join() === 'thief,darko' && R.vend === 10 && R.fin && R.rep === DARKO.rep && R.jefe === 1 && R.r1 === null && R.carga === 1 && R.hp1 === 30 && R.gasta === '0,0' && R.hp2 === 24 && R.carga2 === 0 && R.hp3 === 18
     && R.t1 === null && R.hp4 === 12 && R.t2 === 'win' && R.repJ === 0 && R.hpMax === 32 && LOG.some(l => l === '«Aquí ya no hay nada que hablar.»') && LOG.some(l => l === 'Darko cae al suelo, sin aire.')
     && R.mi === '24,10' && R.m1 && R.pt === '5,false' && R.ria === 30 && R.h === MIREN.n && R.pag && R.ult === 2
     && LOG.some(l => l === 'DARKO: Las esquinas son tuyas. Yo me largo de aquí una temporada.') && LOG.some(l => l === 'SMS · DON BALTASAR: Me han contado lo de mi sobrino.') && LOG.some(l => l === 'Darko coge una barra de hierro del suelo. El próximo golpe va a doler.') || R);
@@ -803,7 +804,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   }, () => R.n1 === 'Madre Lima' && R.esq === '9995' && R.n2 === 'Madre Lima' && R.esq2 === 0 && R.seeds === '{"ria":2}' && R.lab && R.n3 === false
     && LOG.some(l => l === '  [texto] Nombre de la planta (y sus esquejes) → Madre Lima') && LOG.some(l => l === '  [texto] Nombre de la planta (y sus esquejes) → (B)')
     && LOG.some(l => l.startsWith('Cortas una punta de la Skunk #1 «Madre Lima»')) && LOG.some(l => l === 'Sin nombre: vuelve a ser la nº 9995.') || R);
-  await step('Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave; se cambia el nombre de una propia (sin repetir otro); el recetario, con las 32 y de dónde sale cada semilla',
+  await step('Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave; se cambia el nombre de una propia (sin repetir otro); el recetario, con las 37 y de dónde sale cada semilla',
     ['GENOTECA', 'DIARIO DE LA TÍA', 'Skunk #1$', 'Volver', '<B>', '^★ Skunk Haze', '=Haze Corta', '^★ Haze Corta', '=skunk #1', '<B>', 'SALIR'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); S.custom = {}; S.map = 'home';
     const Rn = rngSeed(7), pool = DEX.slice();
@@ -817,7 +818,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     const Rc = recetas(), hojas = [...new Set(Object.values(Rc).flat().flatMap(o => o.k))];
     R.rec = Object.keys(Rc).length; R.sin = hojas.filter(k => dondeSemilla(k) === 'Semillas: .').join(); R.parque = dondeSemilla('acapulco'); R.ss = Rc.txoko.map(recetaTxt).join('|'); R.diario = Object.keys(Rc).filter(t => !diarioTxt(t)).join(); S = S0;
   }, () => R.n > 50 && R.x === 0 && R.max <= 20 && R.rep === 0 && R.dex === 0 && R.mig === 'xv1:Skunk Haze|xv2:Northern Thai|xv3:Thai Haze' && R.ren === 'Haze Corta'
-    && R.rec === 32 && R.sin === '' && R.diario === '' && R.parque === 'Semillas: escondidas en el parque del barrio.' && R.ss === 'Skunk #1 × Afghani, en ese orden'
+    && R.rec === 37 && R.sin === '' && R.diario === '' && R.parque === 'Semillas: escondidas en el parque del barrio.' && R.ss === 'Skunk #1 × Afghani, en ese orden'
     && LOG.some(l => l === '  [texto] Nuevo nombre de la variedad → Haze Corta') && LOG.some(l => l === 'Ya hay una variedad con ese nombre.') && LOG.some(l => /\[menú\] .*Afghani.*Volver  → Volver/.test(l)) || R);
   await step('Exportar partida (1.11): OPCIONES → EXPORTAR PARTIDA copia el JSON de la partida', ['OPCIONES', 'EXPORTAR', 'VOLVER', 'SALIR'], async () => {
     window.CLIP = ''; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async t => { window.CLIP = t; } }, configurable: true });

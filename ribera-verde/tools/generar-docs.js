@@ -101,12 +101,12 @@ Las landraces y los híbridos clásicos de la 1.9 salen del catálogo de Strainm
   g += `
 ## El árbol por generaciones (1.11)
 
-Los híbridos clásicos, de las landraces a la 3.ª generación. ✔ padres documentados; ≈ origen incierto (se marca en la Genoteca).
+Los híbridos clásicos, de las landraces a la 4.ª generación. ✔ padres documentados; ≈ origen incierto (se marca en la Genoteca).
 
 | Gen. | Variedad | Padres | | THC | Índica |
 |---|---|---|---|---|---|
 `;
-  for (const n of [1, 2, 3]) for (const s of D.strains.filter(s => s.gen === n)) g += `| ${n}.ª | ${s.n} | ${s.o.replace(' · ≈ origen incierto', '').replace(/ \(padres sin publicar\)/, '').replace(' · LEGENDARIA', '')} | ${/origen incierto/.test(s.o) ? '≈' : '✔'} | ${pct(s.thc)}% | ${s.ind} % |\n`;
+  for (const n of [1, 2, 3, 4]) for (const s of D.strains.filter(s => s.gen === n)) g += `| ${n}.ª | ${s.n} | ${s.o.replace(' · ≈ origen incierto', '').replace(/ \(padres sin publicar\)/, '').replace(' · LEGENDARIA', '')} | ${/origen incierto/.test(s.o) ? '≈' : '✔'} | ${pct(s.thc)}% | ${s.ind} % |\n`;
   g += `
 ## Recetas de cruce (${D.recipes.length})
 

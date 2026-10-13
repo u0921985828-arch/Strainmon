@@ -1732,9 +1732,12 @@ func el_b() -> String:
 	return B.rival if B.has("rival") else "El " + B.name.to_lower()
 
 func enemy_hits():
-	# la carga de Darko (1.17): a veces coge la barra y el golpe siguiente vale el doble (CUBRIRSE lo deja en la mitad)
+	# la carga de Darko (1.17): a veces coge la barra y el golpe siguiente vale el doble (CUBRIRSE lo deja en la mitad). La guardia o la
+	# esquiva de esta ronda se gastan con ella (1.24): contra la barra hay que cubrirse o apartarse en la ronda del golpe
 	if B.get("jefe") and not B.get("carga") and Cultivo.azar() < float(D.DARKO.carga):
 		B.carga = 1
+		B.cubre = 0
+		B.esquiva = 0
 		await say("%s coge una barra de hierro del suelo. El próximo golpe va a doler." % el_b())
 		return null
 	# ESQUIVAR (1.18): con suerte (prob_esquiva, los reflejos) no te toca y tu golpe siguiente no falla y hace PELEA.contra más

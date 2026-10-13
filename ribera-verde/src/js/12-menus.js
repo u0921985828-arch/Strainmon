@@ -96,7 +96,12 @@ const DIARIO={ria:'La primera que fijamos Kiko y yo. Tres padres y mucha pacienc
   txoko:'Skunk #1 de madre y Afghani de padre. Al revés sale otra: la madre manda.',
   kushrif:'Afghani de madre y Skunk #1 de padre. Cogollos tan densos que hay que vigilar el moho.',
   nlhaze:'Northern Lights de madre y Haze de padre: la más fácil de las Haze.',
-  silver:'Haze de madre y Northern Lights de padre. Al revés no sale igual.'};
+  silver:'Haze de madre y Northern Lights de padre. Al revés no sale igual.',
+  ww:'Brasileña con la del sur de la India: se cubre de escarcha blanca. La que todos pedían en el 95.',
+  purplehaze:'Purple Thai con Haze: morada y eléctrica. Ponía música en la carpa cuando florecía.',
+  whiterussian:'White Widow con AK-47: aún más blanca. Kiko la llamaba «la del invierno».',
+  bluewidow:'Blueberry con White Widow: dulce y escarchada. Con noches frías le sale el azul.',
+  superlemon:'Lemon Skunk con Super Silver Haze: limón y escarcha. Larga de flor, pero merece la pena.'};
 // la página que falta (1.17): Miren te la da en Errotabarri (S.flags.pagina) y sale al final del diario
 const PAGINA='Si lees esto, Miren te ha encontrado. El segundo premio del 98 lo sacamos entre las dos, aunque el diploma lo colgué yo. Lo de Baltasar no fue por el piso: le pedí el dinero cuando a Miren le querían quitar el caserío, y no se lo conté a nadie. No le debas nada a quien no sabe perder. Y cuida las semillas: son lo único que no se puede comprar. M.';
 const diarioTxt=t=>(DIARIO[t]?`«${DIARIO[t]}»\n`:'');

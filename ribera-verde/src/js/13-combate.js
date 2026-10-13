@@ -48,8 +48,9 @@ async function battle(kind){
 }
 const elB=()=>B.rival||'El '+B.name.toLowerCase();
 async function enemyHits(){
-  // la carga de Darko (1.17): a veces coge la barra y el golpe siguiente vale el doble (CUBRIRSE lo deja en la mitad)
-  if(B.jefe&&!B.carga&&Math.random()<DARKO.carga){B.carga=1;await say(`${elB()} coge una barra de hierro del suelo. El próximo golpe va a doler.`);return null;}
+  // la carga de Darko (1.17): a veces coge la barra y el golpe siguiente vale el doble (CUBRIRSE lo deja en la mitad). La guardia o la
+  // esquiva de esta ronda se gastan con ella (1.24): contra la barra hay que cubrirse o apartarse en la ronda del golpe
+  if(B.jefe&&!B.carga&&Math.random()<DARKO.carga){B.carga=1;B.cubre=B.esquiva=0;await say(`${elB()} coge una barra de hierro del suelo. El próximo golpe va a doler.`);return null;}
   // ESQUIVAR (1.18): con suerte (probEsquiva, los reflejos) no te toca y tu golpe siguiente no falla y hace PELEA.contra más
   // (B.contra); si no, te da entero. La amenaza fallida (B.furia) suma PELEA.furia al golpe
   if(B.esquiva){B.esquiva=0;
