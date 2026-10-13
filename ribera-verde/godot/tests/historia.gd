@@ -651,12 +651,14 @@ func _pasos() -> void:
 	for k in 20:
 		spray.append_array(["MOCHILA", "SPRAY"])
 	step("Combate ladrón: ganar con spray", spray.slice(0, 24), func():
+		var pv: Dictionary = J.S.pelea.duplicate()
 		J.S.hpMax = 60
 		J.S.hp = 60
 		J.S.items.spray = 12
 		J.S.money = 100
 		await run(func(): await J.battle("thief"))
-		WANT = [],
+		WANT = []
+		J.S.pelea = pv,
 		func(): return chk(J.S.money > 100 and J.S.hpMax == 60 and J.mode == "world", {"money": J.S.money, "hpMax": J.S.hpMax, "mode": J.mode}))
 	step("Combate ladrón: desmayo → despiertas en casa (se lleva la mitad de la flor y del rosin y el 30 % del dinero, y lo dice)", [], func():
 		J.S.hpMax = 30
@@ -670,11 +672,13 @@ func _pasos() -> void:
 		func(): return chk(J.S.map == "home" and J.S.hp == J.S.hpMax and J.S.money == 700 and J.S.buds.ria.g == 10 and J.S.rosin.ria.g == 1.5
 			and LOG.any(func(l): return "Te roba 10 g, 1,5 g de rosin y 300 €" in l), {"map": J.S.map, "hp": J.S.hp, "money": J.S.money, "buds": J.S.buds, "rosin": J.S.rosin}))
 	step("Ladrón vencido sube la VIDA máxima", ["LUCHAR", "PATADA"] + spray, func():
+		var pv: Dictionary = J.S.pelea.duplicate()
 		J.S.hpMax = 40
 		J.S.hp = 40
 		J.S.items.spray = 20
 		await run(func(): await J.battle("thief"))
-		WANT = [],
+		WANT = []
+		J.S.pelea = pv,
 		func(): return chk(J.S.hpMax == 42, {"hpMax": J.S.hpMax}))
 	step("Policía: soborno con protección (40 + 4 × calor + 0,5 × gramos + 5 % del dinero encima)", ["SOBORNAR", "^Sí"], func():
 		J.S.protect = true
@@ -1517,7 +1521,7 @@ func _pasos() -> void:
 	step("Darko y Miren (1.17): en el capítulo 8, el ajuste de cuentas con Darko en los astilleros (coge la barra: el golpe siguiente, doble, y CUBRIRSE lo deja en la mitad; si le ganas, se va y sus chicos ya no salen); Miren, la amiga de la tía Maite, en Errotabarri: 20 g de Purple Thai por la última página del diario y 5 semillas de Haze", ["^Pelear"], func():
 		J.S.ch = 8
 		J.S.flags.darkoFin = 0
-		var sv := {"hp": J.S.hp, "hpMax": J.S.hpMax, "rep": J.S.rep}
+		var sv := {"hp": J.S.hp, "hpMax": J.S.hpMax, "rep": J.S.rep, "pelea": J.S.pelea.duplicate()}
 		R = {"b": []}
 		J.gancho_combate = func(t):
 			R.b.append(t)
@@ -1562,11 +1566,11 @@ func _pasos() -> void:
 			R.hp3 = J.S.hp
 			J.B.hp = 1
 			R.rep0 = J.S.rep
-			want(["HABLAR"])
+			want(["HABLAR", "CALMAR"])
 			R.t1 = await J.thief_round()
 			R.hp4 = J.S.hp
 			Cultivo.fijo = 0
-			want(["LUCHAR", "PUÑETAZO"])
+			want(["LUCHAR", "PUÑETAZO", "^Fuerza"])
 			R.t2 = await J.thief_round()
 			R.repJ = J.S.rep - R.rep0
 			R.hpMax = J.S.hpMax
@@ -1575,6 +1579,7 @@ func _pasos() -> void:
 		J.S.hp = sv.hp
 		J.S.hpMax = sv.hpMax
 		J.S.rep = sv.rep
+		J.S.pelea = sv.pelea
 		J.S.flags.darkoFin = 0
 		J.S.ch = 5
 		J.S.flags.miren = 0
@@ -1607,6 +1612,86 @@ func _pasos() -> void:
 			and R.t1 == null and R.hp4 == 12 and R.t2 == "win" and R.repJ == 0 and R.hpMax == 32 and LOG.has("«Aquí ya no hay nada que hablar.»") and LOG.has("Darko cae al suelo, sin aire.")
 			and R.mi == "24,10" and R.m1 and R.pt == "5,false" and R.ria == 30 and R.h == D.MIREN.n and R.pag and R.ult == 2
 			and LOG.has("DARKO: Las esquinas son tuyas. Yo me largo de aquí una temporada.") and LOG.has("SMS · DON BALTASAR: Me han contado lo de mi sobrino.") and LOG.has("Darko coge una barra de hierro del suelo. El próximo golpe va a doler."), R))
+	step("Combates con más fondo (1.18): ESQUIVAR (si te apartas, tu golpe siguiente no falla y hace 3 más; si no, te da entero), AMENAZAR (mejor cuanto más tocado está; si falla, el golpe siguiente hace 2 más; a Darko no se le amenaza) y la experiencia: al ganar subes de nivel y eliges FUERZA o REFLEJOS (hasta 5 cada una), con la fila Pelea en la MOCHILA", [], func():
+		var sv := {"hp": J.S.hp, "hpMax": J.S.hpMax, "rep": J.S.rep, "money": J.S.money, "pelea": J.S.pelea.duplicate()}
+		R = {}
+		J.S.hp = 30
+		J.S.hpMax = 30
+		J.S.pelea = {"xp": 0, "fue": 0, "ref": 0}
+		await run(func():
+			J.B = {"kind": "thief", "name": "ATRACADOR", "atk": [5, 5], "hp": 20, "hpMax": 20, "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
+			Cultivo.fijo = 0
+			want(["LUCHAR", "ESQUIVAR"])
+			R.e1 = await J.thief_round()
+			R.hp1 = J.S.hp
+			R.contra = J.B.contra
+			Cultivo.fijo = .99
+			want(["LUCHAR", "PUÑETAZO"])
+			await J.thief_round()
+			R.bh = J.B.hp
+			R.hp2 = J.S.hp
+			want(["LUCHAR", "ESQUIVAR"])
+			await J.thief_round()
+			R.hp3 = J.S.hp
+			R.pa = J.prob_amenaza()
+			want(["HABLAR", "AMENAZAR"])
+			await J.thief_round()
+			R.hp4 = J.S.hp
+			R.furia = J.B.furia
+			Cultivo.fijo = 0
+			want(["HABLAR", "AMENAZAR"])
+			R.am = await J.thief_round()
+			J.B = {"kind": "thief", "rival": "Darko", "jefe": 1, "name": "DARKO", "atk": [6, 6], "hp": 1, "hpMax": 40, "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
+			Cultivo.fijo = .5
+			want(["HABLAR", "AMENAZAR"])
+			R.am2 = await J.thief_round()
+			R.hp5 = J.S.hp
+			J.B.carga = 1
+			Cultivo.fijo = 0
+			want(["LUCHAR", "ESQUIVAR"])
+			R.e2 = await J.thief_round()
+			R.carga3 = J.B.carga
+			R.hp6 = J.S.hp
+			J.S.pelea = {"xp": 0, "fue": 0, "ref": 0}
+			want(["LUCHAR", "PUÑETAZO", "^Fuerza"])
+			R.wd = await J.thief_round()
+			R.dx = "%d,%d" % [int(J.S.pelea.xp), int(J.S.pelea.fue)]
+			J.S.hp = 30
+			J.S.pelea = {"xp": 1, "fue": 0, "ref": 0}
+			J.B = {"kind": "thief", "name": "ATRACADOR", "atk": [5, 5], "hp": 1, "hpMax": 20, "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
+			Cultivo.fijo = 0
+			want(["LUCHAR", "PUÑETAZO", "^Reflejos"])
+			R.w = await J.thief_round()
+			R.pe = "%d,%d,%d" % [int(J.S.pelea.xp), int(J.S.pelea.fue), int(J.S.pelea.ref)]
+			R.nv = J.nivel_pelea()
+			R.ficha = J.ficha_pelea()
+			J.S.pelea = {"xp": 64, "fue": 5, "ref": 4}
+			J.B = {"kind": "thief", "rival": "Rober", "name": "ROBER", "atk": [5, 5], "hp": 1, "hpMax": 20, "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
+			want(["LUCHAR", "PUÑETAZO"])
+			R.w2 = await J.thief_round()
+			R.max = "%d,%d,%d" % [int(J.S.pelea.xp), int(J.S.pelea.fue), int(J.S.pelea.ref)]
+			R.pe5 = J.prob_esquiva()
+			J.B = {"kind": "thief", "name": "ATRACADOR", "atk": [5, 5], "hp": 20, "hpMax": 20, "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
+			Cultivo.fijo = .69
+			want(["HUIR"])
+			R.h = await J.thief_round()
+			Cultivo.fijo = -1
+			J.B = null)
+		var l0 := LOG.size()
+		want(["<B>"])
+		await run(J.mochila)
+		R.fila = LOG.slice(l0).filter(func(l): return l.contains("[menú]") and l.contains("| Pelea |")).size()
+		J.S.hp = sv.hp
+		J.S.hpMax = sv.hpMax
+		J.S.rep = sv.rep
+		J.S.money = sv.money
+		J.S.pelea = sv.pelea,
+		func(): return chk(R.e1 == null and R.hp1 == 30 and R.contra == 1 and R.bh == 20 - (7 + int(D.PELEA.contra)) and R.hp2 == 25 and R.hp3 == 20 and absf(R.pa - (float(D.PELEA.amen0) + .5 * float(D.PELEA.amen))) < 1e-9 and R.hp4 == 20 - (5 + int(D.PELEA.furia)) and R.furia == 0 and R.am == "talk"
+			and R.am2 == null and R.hp5 == 13 - (6 + int(D.PELEA.furia)) and R.e2 == null and R.carga3 == 0 and R.hp6 == R.hp5 and R.wd == "win" and R.dx == "%d,1" % int(D.PELEA.xp.darko)
+			and R.w == "win" and R.pe == "2,0,1" and R.nv == 1 and R.ficha == "Fuerza 0 · reflejos 1 · 2 de experiencia (nivel 2 con 5).\nSube ganando peleas: un ladrón da 1, un rival 2."
+			and R.w2 == "win" and R.max == "66,5,5" and absf(R.pe5 - .75) < 1e-9 and R.h == "flee" and R.fila == 1
+			and LOG.has("El atracador se lanza y te apartas a tiempo.") and LOG.has("Darko baja la barra y te apartas a tiempo.") and LOG.has("Le pillas abierto.") and LOG.has("No te apartas a tiempo.") and LOG.has("«¿A mí? Ahora vas a ver.»")
+			and LOG.has("El atracador se lo piensa mejor y se va.") and LOG.has("«A mí no me amenaza nadie.»") and LOG.has("Subes a nivel 1 de pelea.") and LOG.has("REFLEJOS 5: aciertas, esquivas y escapas mejor."), R))
 	step("Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas", ["^Hindu Kush"], func():
 		J.S.ch = 5
 		J.S.flags.txaro = true

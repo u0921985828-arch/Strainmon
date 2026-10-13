@@ -339,6 +339,7 @@ const exige = (que, ok, det) => { comprobadas++;if (!ok) fallos.push(que + (det 
           const a = quiere(), l = items.map(x => typeof x === 'string' ? x : x.label);
           if (l[0] === 'LUCHAR') return a === 'spray' || a === 'bocata' ? 1 : a === 'hablar' ? 2 : a === 'huir' ? 3 : 0;
           if (l[0] === 'PUÑETAZO') return a === 'patada' ? 1 : 0;
+          if (l[0] === 'CALMAR') return 0;   // HABLAR (1.18): CALMAR, el de antes
           return a === 'bocata' ? 1 : 0;   // mochila: el spray o el bocata
         };
         res = null;await ORIG.battle('thief');

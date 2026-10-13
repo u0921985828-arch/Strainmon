@@ -211,6 +211,8 @@ El muelle es lo más lejano del barrio: 43 pasos. De noche, más de una de cada 
 
 ### 2.4 Ladrones
 
+Sin experiencia de pelea (FUERZA y REFLEJOS a 0, 1.18); HABLAR es CALMAR.
+
 <!-- auto:ladron -->
 | Cap. | Ladrón: vida · golpe | Tu vida | Puñetazo | Patada | 2 sprays, luego puñetazo | Huir | Hablar (rep. 0) | Hablar (rep. 60) | La mejor, sin spray ni bocata | La mejor, con 2 sprays y 1 bocata |
 |---|---|---|---|---|---|---|---|---|---|---|

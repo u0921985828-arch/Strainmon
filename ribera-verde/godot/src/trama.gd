@@ -1347,8 +1347,10 @@ func mochila() -> void:
 			var CJ: Dictionary = D.CAJA[S.caja.nivel]
 			rows.append({"label": "Caja fuerte", "right": "%s · %d g%s" % [Datos.eur(caja_e()), int(floor(caja_g())), (" · " + Datos.coma(Datos.jsround(caja_r() * 10) / 10.0) + " g rosin") if caja_r() >= .1 else ""], "ic": icono("billetes"),
 				"desc": "%s, detrás del diploma. Caben %s y %s.\nLo que está dentro no lo llevas encima." % [CJ.n, Datos.eur(CJ.money), _kg(int(CJ.g))]})
-		rows.append_array([{"label": "Vida", "right": "%s/%s" % [n(S.hp), n(S.hpMax)], "desc": "Se recupera durmiendo, comiendo o con el tiempo."},
-			{"label": "Abono (dosis)", "right": "×" + n(S.items.fert), "ic": icono("abono"), "desc": "De floración. Una por planta: +%d %% de cosecha, con el pH corregido." % Datos.jsround(D.ABONO.rend * 100)}])
+		rows.append({"label": "Vida", "right": "%s/%s" % [n(S.hp), n(S.hpMax)], "desc": "Se recupera durmiendo, comiendo o con el tiempo."})
+		if int(S.pelea.xp) > 0:
+			rows.append({"label": "Pelea", "right": "nivel %d" % nivel_pelea(), "desc": ficha_pelea()})
+		rows.append_array([{"label": "Abono (dosis)", "right": "×" + n(S.items.fert), "ic": icono("abono"), "desc": "De floración. Una por planta: +%d %% de cosecha, con el pH corregido." % Datos.jsround(D.ABONO.rend * 100)}])
 		if S.items.get("fertv", 0) > 0:
 			rows.append({"label": "Abono de crecimiento", "right": "×" + n(S.items.fertv), "ic": icono("abono"), "desc": "Una por planta en crecimiento: crece un %d %% más deprisa hasta florecer." % Datos.jsround(D.ABONO.veg * 100)})
 		if S.items.get("phm", 0) > 0:
@@ -1479,7 +1481,7 @@ func grupo_combate(who: String):
 	if who == "P":
 		return Atlas.cubre("combate:espalda:player")
 	if B.kind == "thief":
-		var g = null if B.get("jefe") else Atlas.grupo_look(B.look)   # Darko (1.17): su personaje es de 32 px; pelea con el del ladrón
+		var g = null if B.get("jefe") else Atlas.grupo_look(B.get("look"))   # sin look (como en grupoLook), el del ladrón; Darko (1.17): su personaje es de 32 px; pelea con el del ladrón
 		return g if g else Atlas.cubre("combate:frente:ladron")
 	return Atlas.cubre("combate:frente:policia")
 
@@ -1579,10 +1581,23 @@ func enemy_hits():
 		B.carga = 1
 		await say("%s coge una barra de hierro del suelo. El próximo golpe va a doler." % el_b())
 		return null
-	var dmg := ri(int(B.atk[0]), int(B.atk[1])) * (2 if B.get("carga") else 1)
+	# ESQUIVAR (1.18): con suerte (prob_esquiva, los reflejos) no te toca y tu golpe siguiente no falla y hace PELEA.contra más
+	# (B.contra); si no, te da entero. La amenaza fallida (B.furia) suma PELEA.furia al golpe
+	if B.get("esquiva"):
+		B.esquiva = 0
+		if Cultivo.azar() < prob_esquiva():
+			b_anim("E", "ataque")
+			await say(("%s baja la barra y te apartas a tiempo." % el_b()) if B.get("carga") else ("%s se lanza y te apartas a tiempo." % el_b()))
+			B.carga = 0
+			B.furia = 0
+			B.contra = 1
+			return null
+		await say("No te apartas a tiempo.")
+	var dmg := (ri(int(B.atk[0]), int(B.atk[1])) + (int(D.PELEA.furia) if B.get("furia") else 0)) * (2 if B.get("carga") else 1)
 	b_anim("E", "ataque")
 	await say(("%s te da con la barra." % el_b()) if B.get("carga") else ("%s %s." % [el_b(), pick(["te golpea", "te empuja contra un portal", "te da una patada", "te tira al suelo"])]))
 	B.carga = 0
+	B.furia = 0
 	var dd: int = int(ceil(dmg / 2.0)) if B.get("cubre") else dmg
 	if B.get("cubre"):   # CUBRIRSE (1.16)
 		B.cubre = 0
@@ -1621,21 +1636,31 @@ func thief_round():
 	var c: int = await menu(["LUCHAR", "MOCHILA", "HABLAR", "HUIR"], {"cls": "battle", "cancel": false})
 	if c == 0:
 		prompt("Elige un golpe.")
-		var m: int = await menu(["PUÑETAZO", "PATADA", "CUBRIRSE"], {"cls": "battle"})
+		var m: int = await menu(["PUÑETAZO", "PATADA", "CUBRIRSE", "ESQUIVAR"], {"cls": "battle"})
 		if m < 0:
 			return null
 		if m == 2:
 			B.cubre = 1
 			B.guardia = 1
+			B.esquiva = 0
 			await say("Te pones en guardia: el próximo golpe no fallará.")
+			return await enemy_hits()
+		if m == 3:   # ESQUIVAR (1.18)
+			B.esquiva = 1
+			B.cubre = 0
+			await say("Te quedas atento para apartarte.")
 			return await enemy_hits()
 		var mv := {"n": "PATADA", "acc": .65, "d": [8, 12]} if m else {"n": "PUÑETAZO", "acc": .92, "d": [4, 7]}
 		await wait(b_anim("P", "patada" if m else "golpe") * .6)
 		await say("Le das una patada." if mv.n == "PATADA" else "Le das un puñetazo.")
 		var g = B.get("guardia")
+		var k = B.get("contra")
 		B.guardia = 0
-		if g or Cultivo.azar() < mv.acc:
-			var d := ri(mv.d[0], mv.d[1])
+		B.contra = 0
+		if g or k or Cultivo.azar() < minf(float(D.PELEA.accMax), mv.acc + int(S.pelea.ref) * float(D.PELEA.acc)):   # la fuerza suma al golpe y los reflejos, a la puntería (1.18)
+			var d: int = ri(mv.d[0], mv.d[1]) + int(S.pelea.fue) + (int(D.PELEA.contra) if k else 0)
+			if k:
+				await say("Le pillas abierto.")
 			b_anim("E", "herido")
 			vfx_combate("vfx-golpe", 178, 40)
 			B.flashE = 500.0
@@ -1678,13 +1703,25 @@ func thief_round():
 			bhud_act()
 			await say("Te comes un BOCATA. Recuperas vida.")
 	elif c == 2:
-		await say("%s: «Tranquilo. Somos del mismo barrio.»" % S.name)
-		if not B.get("jefe") and Cultivo.azar() < clampf(.25 + S.rep / 300.0, .25, .7):
-			await say("«Vale... Tú eres el de Maite. Olvídalo.»")
-			return "talk"
-		await say("«Aquí ya no hay nada que hablar.»" if B.get("jefe") else "«No me cuentes historias.»")
+		prompt("¿Qué le dices?")
+		var h: int = await menu(["CALMAR", "AMENAZAR"], {"cls": "battle"})
+		if h < 0:
+			return null
+		if h == 0:
+			await say("%s: «Tranquilo. Somos del mismo barrio.»" % S.name)
+			if not B.get("jefe") and Cultivo.azar() < clampf(.25 + S.rep / 300.0, .25, .7):
+				await say("«Vale... Tú eres el de Maite. Olvídalo.»")
+				return "talk"
+			await say("«Aquí ya no hay nada que hablar.»" if B.get("jefe") else "«No me cuentes historias.»")
+		else:   # AMENAZAR (1.18): funciona mejor cuanto más tocado está y cuanta más fuerza tienes; si falla, te pega con rabia
+			await say("%s: «Lárgate ahora que puedes.»" % S.name)
+			if not B.get("jefe") and Cultivo.azar() < prob_amenaza():
+				await say(("%s se lo piensa mejor." if B.has("rival") else "%s se lo piensa mejor y se va.") % el_b())
+				return "talk"
+			B.furia = 1
+			await say("«A mí no me amenaza nadie.»" if B.get("jefe") else "«¿A mí? Ahora vas a ver.»")
 	elif c == 3:
-		if Cultivo.azar() < .5:
+		if Cultivo.azar() < minf(float(D.PELEA.huirMax), .5 + int(S.pelea.ref) * float(D.PELEA.huir)):
 			sfx("door")
 			await say("Consigues escapar.")
 			return "flee"
@@ -1705,6 +1742,7 @@ func thief_round():
 				S.hp += 2
 				bhud_act()
 				await say("Aguantas más. VIDA máxima: %d." % S.hpMax)
+			await experiencia()
 			return "win"
 		var loot: int = ri(20, 40) + S.ch * 10
 		S.money += loot
@@ -1717,8 +1755,49 @@ func thief_round():
 			S.hp += 2
 			bhud_act()
 			await say("Aguantas más. VIDA máxima: %d." % S.hpMax)
+		await experiencia()
 		return "win"
 	return await enemy_hits()
+
+# la experiencia (1.18): cada pelea ganada da PELEA.xp y con cada PELEA.nv subes un nivel y eliges FUERZA o REFLEJOS (13-combate.js)
+func nivel_pelea() -> int:
+	var x := int(S.pelea.xp)
+	return D.PELEA.nv.filter(func(v): return x >= int(v)).size()
+
+func prob_esquiva() -> float:
+	return float(D.PELEA.esq0) + int(S.pelea.ref) * float(D.PELEA.esq)
+
+func prob_amenaza() -> float:
+	return clampf(float(D.PELEA.amen0) + (1 - float(B.hp) / float(B.hpMax)) * float(D.PELEA.amen) + int(S.pelea.fue) * float(D.PELEA.amenF), float(D.PELEA.amen0), float(D.PELEA.amenMax))
+
+func experiencia() -> void:
+	var P: Dictionary = S.pelea
+	P.xp = int(P.xp) + int(D.PELEA.xp["darko" if B.get("jefe") else ("rival" if B.has("rival") else "thief")])
+	var mx := int(D.PELEA.max)
+	while nivel_pelea() > int(P.fue) + int(P.ref) and (int(P.fue) < mx or int(P.ref) < mx):
+		sfx("get")
+		await say("Subes a nivel %d de pelea." % (int(P.fue) + int(P.ref) + 1))
+		var f := int(P.fue) < mx
+		var r := int(P.ref) < mx
+		var o := 0 if f else 1
+		if f and r:   # sin cancelar: las dos son una elección
+			await type_text("¿Qué entrenas?", "")
+			o = await menu(["Fuerza", "Reflejos"], {"cls": "right", "cancel": false})
+			if not oraculo:
+				dlg.hide()
+				dlg_nm.hide()
+		if o == 0:
+			P.fue = int(P.fue) + 1
+			await say("FUERZA %d: cada golpe hace %d más." % [P.fue, P.fue])
+		else:
+			P.ref = int(P.ref) + 1
+			await say("REFLEJOS %d: aciertas, esquivas y escapas mejor." % P.ref)
+
+func ficha_pelea() -> String:   # la fila Pelea de la MOCHILA
+	var P: Dictionary = S.pelea
+	var nv := nivel_pelea()
+	var s := "" if nv >= D.PELEA.nv.size() else " (nivel %d con %d)" % [nv + 1, int(D.PELEA.nv[nv])]
+	return "Fuerza %d · reflejos %d · %d de experiencia%s.\nSube ganando peleas: un ladrón da %d, un rival %d." % [int(P.fue), int(P.ref), int(P.xp), s, int(D.PELEA.xp.thief), int(D.PELEA.xp.rival)]
 
 # devuelve lo requisado en texto (cogollos y, si hay, rosin) y la multa
 func confiscate(extra_fine := true) -> Array:

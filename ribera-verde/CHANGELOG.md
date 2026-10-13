@@ -1,5 +1,15 @@
 # Cambios
 
+## 1.18.0 · 13 de octubre de 2026
+
+Combates con más fondo: esquivar, amenazar y experiencia. Godot, 0.12.0.
+
+- **Nuevo: ESQUIVAR** (LUCHAR → ESQUIVAR). Te quedas atento para apartarte del golpe siguiente: si lo consigues (45 %, +6 % por cada punto de REFLEJOS), no te toca y tu golpe siguiente no falla y hace 3 más («Le pillas abierto.»); si no, te da entero. Contra la barra de Darko, si te apartas, la barra se queda en nada. CUBRIRSE sigue siendo lo seguro: la mitad del golpe y tu golpe siguiente asegurado. Una postura quita la otra.
+- **Nuevo: AMENAZAR** (HABLAR → CALMAR o AMENAZAR). CALMAR es el HABLAR de antes (mejor con reputación). AMENAZAR funciona mejor cuanto más tocado está el otro (10 % de base y hasta un 60 % más según la vida que ha perdido, +3 % por punto de FUERZA, con un tope del 80 %): se lo piensa mejor y se va. Si falla, su golpe siguiente hace 2 más. A Darko no se le amenaza. Con la policía, nada cambia.
+- **Nuevo: experiencia de pelea** (`PELEA`, `S.pelea`, `experiencia`). Cada pelea ganada da experiencia (un ladrón 1, un rival 2, Darko 3); con 2, 5, 9, 14, 20, 27, 35, 44, 54 y 65 subes un nivel y eliges qué entrenas: **FUERZA** (+1 de daño en cada golpe) o **REFLEJOS** (+2 % de puntería, hasta el 98 %; +6 % de esquivar, y +4 % de escapar de ladrones y rivales, hasta el 70 %), hasta 5 cada una. Al subir hay que elegir: B no la salta. Sigues ganando VIDA máxima como antes. En la MOCHILA, la fila **Pelea** (desde la primera victoria) dice el nivel, la fuerza, los reflejos y lo que falta para el siguiente.
+- Igual en Godot. `docs/ANALISIS.md` sigue sin experiencia de pelea (HABLAR es CALMAR).
+- Tests: `npm test` 102/102 (paso nuevo con esquivar, la contra, amenazar, la rabia, Darko, subir de nivel, los topes y la fila de la MOCHILA); Godot, historia 102 pasos.
+
 ## 1.17.0 · 13 de octubre de 2026
 
 Más fondo: el ajuste de cuentas con Darko y la amiga de la tía Maite. Godot, 0.11.0.

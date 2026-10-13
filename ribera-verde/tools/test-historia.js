@@ -252,14 +252,14 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
 
   // ---------- sistemas sueltos ----------
   await step('Combate ladrón: ganar con spray', Array(12).fill(['MOCHILA', 'SPRAY']).flat(), async () => {
-    S.hpMax = 60; S.hp = 60; S.items.spray = 12; S.money = 100; await run(() => battle('thief')); WANT = [];
+    const pv = Object.assign({}, S.pelea); S.hpMax = 60; S.hp = 60; S.items.spray = 12; S.money = 100; await run(() => battle('thief')); WANT = []; S.pelea = pv;
   }, () => S.money > 100 && S.hpMax === 60 && mode === 'world' || { money: S.money, hpMax: S.hpMax, mode });
   await step('Combate ladrón: desmayo → despiertas en casa (se lleva la mitad de la flor y del rosin y el 30 % del dinero, y lo dice)', [], async () => {
     S.hpMax = 30; S.hp = 1; S.money = 1000; S.buds = {}; addBuds('ria', 20, 12); S.rosin = { ria: { g: 3, thc: 36 } }; S.map = 'town'; await run(() => battle('thief'));
   }, () => S.map === 'home' && S.hp === S.hpMax && S.money === 700 && S.buds.ria.g === 10 && S.rosin.ria.g === 1.5 && LOG.some(l => l.includes('Te roba 10 g, 1,5 g de rosin y 300 €'))
     || { map: S.map, hp: S.hp, money: S.money, buds: S.buds, rosin: S.rosin });
   await step('Ladrón vencido sube la VIDA máxima', ['LUCHAR', 'PATADA'].concat(Array(20).fill(['MOCHILA', 'SPRAY']).flat()), async () => {
-    S.hpMax = 40; S.hp = 40; S.items.spray = 20; await run(() => battle('thief')); WANT = [];
+    const pv = Object.assign({}, S.pelea); S.hpMax = 40; S.hp = 40; S.items.spray = 20; await run(() => battle('thief')); WANT = []; S.pelea = pv;
   }, () => S.hpMax === 42 || { hpMax: S.hpMax });
   await step('Policía: soborno con protección (40 + 4 × calor + 0,5 × gramos + 5 % del dinero encima)', ['SOBORNAR', '^Sí'], async () => {
     S.protect = true; S.rosin = {}; S.heat = 40; S.money = 1000; addBuds('ria', 10, 12); window.R = { p: precioSoborno(), g: totalBuds() }; await run(() => battle('police'));
@@ -480,7 +480,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && R.obj === 'cuadro,,sillon,sillon2,sofa,sofa2' && R.cuadro === '2,cuadro-2' && R.sofa === 'sofa-2' && R.t === 30 && R.tienda === 'sofa,tv,gpc,sillon,cuadro'
     && LOG.some(l => l === 'ROBER: Eh, tú. Llevas 8 ventas en el barrio alto.') && LOG.some(l => l === 'Te cubres: el golpe duele la mitad.') && LOG.some(l => l === 'Rober no volverá por el barrio alto en 7 días. Mientras, sus clientes te pagan un 5 % más.') || R);
   await step('Darko y Miren (1.17): en el capítulo 8, el ajuste de cuentas con Darko en los astilleros (coge la barra: el golpe siguiente, doble, y CUBRIRSE lo deja en la mitad; si le ganas, se va y sus chicos ya no salen); Miren, la amiga de la tía Maite, en Errotabarri: 20 g de Purple Thai por la última página del diario y 5 semillas de Haze', ['^Pelear'], async () => {
-    S.ch = 8; S.flags.darkoFin = 0; const r0 = Math.random, b0 = battle, sv = { hp: S.hp, hpMax: S.hpMax, rep: S.rep }; window.R = { b: [] }; window.battle = async t => { R.b.push(t); return 'win'; };
+    S.ch = 8; S.flags.darkoFin = 0; const r0 = Math.random, b0 = battle, sv = { hp: S.hp, hpMax: S.hpMax, rep: S.rep, pelea: Object.assign({}, S.pelea) }; window.R = { b: [] }; window.battle = async t => { R.b.push(t); return 'win'; };
     enterMap('astilleros', 24, 17, 'up'); S.buds = {}; addBuds('ria', 30, 12);
     const cl = id => { const c = { id, map: 'astilleros', x: 5, y: 20, type: 'cur', want: 10, minThc: 0 }; S.clients.push(c); want(['Justo']); return async () => { Math.random = () => .2; await talkClient(c); Math.random = r0; }; };
     await run(cl('cx6')); want(['^Pelear']); R.dk = ents.some(e => e.id === 'darko2'); R.rep = S.rep; await run(talkDarko); R.fin = S.flags.darkoFin === S.day; R.rep = S.rep - R.rep; R.dk2 = ents.some(e => e.id === 'darko2');
@@ -488,8 +488,8 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.hp = 30; S.hpMax = 30; R.jefe = rivalB('darko').jefe;
     await run(async () => { B = { kind: 'thief', rival: 'Darko', jefe: 1, name: 'DARKO', atk: [6, 6], hp: 40, hpMax: 40, t: 0, flashE: 0, shakeP: 0 }; Math.random = () => 0; R.r1 = await enemyHits(); R.carga = B.carga; R.hp1 = S.hp;
       Math.random = () => .99; B.cubre = 1; await enemyHits(); R.hp2 = S.hp; R.carga2 = B.carga; await enemyHits(); R.hp3 = S.hp;
-      B.hp = 1; R.rep0 = S.rep; want(['HABLAR']); R.t1 = await thiefRound(); R.hp4 = S.hp; Math.random = () => 0; want(['LUCHAR', 'PUÑETAZO']); R.t2 = await thiefRound(); R.repJ = S.rep - R.rep0; R.hpMax = S.hpMax; Math.random = r0; B = null; });
-    S.hp = sv.hp; S.hpMax = sv.hpMax; S.rep = sv.rep;
+      B.hp = 1; R.rep0 = S.rep; want(['HABLAR', 'CALMAR']); R.t1 = await thiefRound(); R.hp4 = S.hp; Math.random = () => 0; want(['LUCHAR', 'PUÑETAZO', '^Fuerza']); R.t2 = await thiefRound(); R.repJ = S.rep - R.rep0; R.hpMax = S.hpMax; Math.random = r0; B = null; });
+    S.hp = sv.hp; S.hpMax = sv.hpMax; S.rep = sv.rep; S.pelea = sv.pelea;
     S.flags.darkoFin = 0; S.ch = 5; S.flags.miren = 0; S.flags.pagina = 0; S.buds = {};
     enterMap('errotabarri', 24, 11, 'up'); R.mi = ents.filter(e => e.id === 'miren').map(e => e.x + ',' + e.y).join();
     await run(talkMiren); R.m1 = !!S.flags.miren; await run(talkMiren); R.h0 = S.seeds.haze || 0;
@@ -500,6 +500,33 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && R.t1 === null && R.hp4 === 12 && R.t2 === 'win' && R.repJ === 0 && R.hpMax === 32 && LOG.some(l => l === '«Aquí ya no hay nada que hablar.»') && LOG.some(l => l === 'Darko cae al suelo, sin aire.')
     && R.mi === '24,10' && R.m1 && R.pt === '5,false' && R.ria === 30 && R.h === MIREN.n && R.pag && R.ult === 2
     && LOG.some(l => l === 'DARKO: Las esquinas son tuyas. Yo me largo de aquí una temporada.') && LOG.some(l => l === 'SMS · DON BALTASAR: Me han contado lo de mi sobrino.') && LOG.some(l => l === 'Darko coge una barra de hierro del suelo. El próximo golpe va a doler.') || R);
+  await step('Combates con más fondo (1.18): ESQUIVAR (si te apartas, tu golpe siguiente no falla y hace 3 más; si no, te da entero), AMENAZAR (mejor cuanto más tocado está; si falla, el golpe siguiente hace 2 más; a Darko no se le amenaza) y la experiencia: al ganar subes de nivel y eliges FUERZA o REFLEJOS (hasta 5 cada una), con la fila Pelea en la MOCHILA', [], async () => {
+    const r0 = Math.random, sv = { hp: S.hp, hpMax: S.hpMax, rep: S.rep, money: S.money, pelea: Object.assign({}, S.pelea) }; window.R = {};
+    S.hp = 30; S.hpMax = 30; S.pelea = { xp: 0, fue: 0, ref: 0 };
+    await run(async () => { B = { kind: 'thief', name: 'ATRACADOR', atk: [5, 5], hp: 20, hpMax: 20, t: 0, flashE: 0, shakeP: 0 };
+      Math.random = () => 0; want(['LUCHAR', 'ESQUIVAR']); R.e1 = await thiefRound(); R.hp1 = S.hp; R.contra = B.contra;
+      Math.random = () => .99; want(['LUCHAR', 'PUÑETAZO']); await thiefRound(); R.bh = B.hp; R.hp2 = S.hp;
+      want(['LUCHAR', 'ESQUIVAR']); await thiefRound(); R.hp3 = S.hp; R.pa = probAmenaza();
+      want(['HABLAR', 'AMENAZAR']); await thiefRound(); R.hp4 = S.hp; R.furia = B.furia;
+      Math.random = () => 0; want(['HABLAR', 'AMENAZAR']); R.am = await thiefRound();
+      B = { kind: 'thief', rival: 'Darko', jefe: 1, name: 'DARKO', atk: [6, 6], hp: 1, hpMax: 40, t: 0, flashE: 0, shakeP: 0 };
+      Math.random = () => .5; want(['HABLAR', 'AMENAZAR']); R.am2 = await thiefRound(); R.hp5 = S.hp;
+      B.carga = 1; Math.random = () => 0; want(['LUCHAR', 'ESQUIVAR']); R.e2 = await thiefRound(); R.carga3 = B.carga; R.hp6 = S.hp;
+      S.pelea = { xp: 0, fue: 0, ref: 0 }; want(['LUCHAR', 'PUÑETAZO', '^Fuerza']); R.wd = await thiefRound(); R.dx = [S.pelea.xp, S.pelea.fue].join();
+      S.hp = 30; S.pelea = { xp: 1, fue: 0, ref: 0 }; B = { kind: 'thief', name: 'ATRACADOR', atk: [5, 5], hp: 1, hpMax: 20, t: 0, flashE: 0, shakeP: 0 };
+      Math.random = () => 0; want(['LUCHAR', 'PUÑETAZO', '^Reflejos']); R.w = await thiefRound(); R.pe = [S.pelea.xp, S.pelea.fue, S.pelea.ref].join(); R.nv = nivelPelea(); R.ficha = fichaPelea();
+      S.pelea = { xp: 64, fue: 5, ref: 4 }; B = { kind: 'thief', rival: 'Rober', name: 'ROBER', atk: [5, 5], hp: 1, hpMax: 20, t: 0, flashE: 0, shakeP: 0 };
+      want(['LUCHAR', 'PUÑETAZO']); R.w2 = await thiefRound(); R.max = [S.pelea.xp, S.pelea.fue, S.pelea.ref].join(); R.pe5 = probEsquiva();
+      B = { kind: 'thief', name: 'ATRACADOR', atk: [5, 5], hp: 20, hpMax: 20, t: 0, flashE: 0, shakeP: 0 }; Math.random = () => .69; want(['HUIR']); R.h = await thiefRound();
+      Math.random = r0; B = null; });
+    const l0 = LOG.length; want(['<B>']); await run(mochila); R.fila = LOG.slice(l0).filter(l => /\[menú\].*\| Pelea \|/.test(l)).length;
+    S.hp = sv.hp; S.hpMax = sv.hpMax; S.rep = sv.rep; S.money = sv.money; S.pelea = sv.pelea;
+  }, () => R.e1 === null && R.hp1 === 30 && R.contra === 1 && R.bh === 20 - (7 + PELEA.contra) && R.hp2 === 25 && R.hp3 === 20 && Math.abs(R.pa - (PELEA.amen0 + .5 * PELEA.amen)) < 1e-9 && R.hp4 === 20 - (5 + PELEA.furia) && R.furia === 0 && R.am === 'talk'
+    && R.am2 === null && R.hp5 === 13 - (6 + PELEA.furia) && R.e2 === null && R.carga3 === 0 && R.hp6 === R.hp5 && R.wd === 'win' && R.dx === PELEA.xp.darko + ',1'
+    && R.w === 'win' && R.pe === '2,0,1' && R.nv === 1 && R.ficha === 'Fuerza 0 · reflejos 1 · 2 de experiencia (nivel 2 con 5).\nSube ganando peleas: un ladrón da 1, un rival 2.'
+    && R.w2 === 'win' && R.max === '66,5,5' && Math.abs(R.pe5 - .75) < 1e-9 && R.h === 'flee' && R.fila === 1
+    && LOG.some(l => l === 'El atracador se lanza y te apartas a tiempo.') && LOG.some(l => l === 'Darko baja la barra y te apartas a tiempo.') && LOG.some(l => l === 'Le pillas abierto.') && LOG.some(l => l === 'No te apartas a tiempo.') && LOG.some(l => l === '«¿A mí? Ahora vas a ver.»')
+    && LOG.some(l => l === 'El atracador se lo piensa mejor y se va.') && LOG.some(l => l === '«A mí no me amenaza nadie.»') && LOG.some(l => l === 'Subes a nivel 1 de pelea.') && LOG.some(l => l === 'REFLEJOS 5: aciertas, esquivas y escapas mejor.') || R);
   await step('Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas', ['^Hindu Kush'], async () => {
     S.ch = 5; S.flags.txaro = true; S.flags.txaro2 = false; S.map = 'txaro'; buildEnts(); window.R = { ent: ents.filter(e => e.id === 'txaro').map(e => e.x + ',' + e.y).join() };
     S.buds = {}; addBuds('ria', 20, 12); addBuds('hindu', 15, 18); addBuds('thai', 20, 16); R.ch = S.seeds.chitral || 0; R.boc = S.items.bocata; R.rep = S.rep;

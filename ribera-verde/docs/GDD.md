@@ -164,12 +164,16 @@ Probabilidades de cada encuentro, de cada estrategia y del soborno, por paso y p
 |---|---|
 | LUCHAR → Puñetazo | 92 % de acierto, 4–7 de daño |
 | LUCHAR → Patada | 65 % de acierto, 8–12 de daño |
+| LUCHAR → Cubrirse (1.16) | El golpe siguiente duele la mitad y tu golpe siguiente no falla |
+| LUCHAR → Esquivar (1.18) | 45 % (+6 % por REFLEJOS) de que no te toque; si sale, tu golpe siguiente no falla y hace 3 más; si no, te da entero |
 | MOCHILA → Spray de pimienta | 12–16 de daño seguro |
 | MOCHILA → Bocata | +15 de vida |
-| HABLAR | Se va con probabilidad `0,25 + reputación/300` (25 %–70 %) |
-| HUIR | 50 % |
+| HABLAR → Calmar | Se va con probabilidad `0,25 + reputación/300` (25 %–70 %) |
+| HABLAR → Amenazar (1.18) | Se va con probabilidad `0,1 + 0,6 × vida perdida + 0,03 × FUERZA` (10 %–80 %); si falla, su golpe siguiente hace 2 más. A Darko, nunca |
+| HUIR | 50 % (+4 % por REFLEJOS, hasta el 70 %) |
 
 - **Victoria:** 20–40 € + 10 × capítulo, +2 de reputación y **+2 de VIDA máxima** (tope 60).
+- **Experiencia (1.18):** cada victoria da 1 (ladrón), 2 (rival) o 3 (Darko); con 2, 5, 9, 14, 20, 27, 35, 44, 54 y 65 subes un nivel y eliges FUERZA (+1 de daño por golpe) o REFLEJOS (+2 % de puntería hasta el 98 %, +6 % de esquivar, +4 % de huir), hasta 5 cada una.
 - **Derrota:** pierdes la mitad de los gramos de cada variedad y el 30 % del dinero que llevas encima, y te despiertas en casa 6 horas después con la vida llena.
 
 ## 10. Combate contra la policía
