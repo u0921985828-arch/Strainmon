@@ -673,6 +673,6 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Bolsa de deporte | 35 € | 3 | Llevas encima hasta 3 kg de cogollos y rosin (la mochila, 1 kg). |
 | Maleta con ruedas | 90 € | 5 | Llevas encima hasta 10 kg de cogollos y rosin. |
 | Carro de esquejes | 165 € | 2 | Dos bandejas de 12 esquejes, tapadas y bajo tubos T5, y una mesita con la tabla de corte: pinchados ahí aguantan 3 días (sueltos, 1). Kiko te lo sube al piso mañana. |
-| Analizador de cannabinoides y terpenos | 180 € | 3 | Medidor de bolsillo (1.15): THC, CBD y el terpeno principal de un lote, desde la mochila. Lo analizado se vende mejor en la calle y un 5 % más en los clubs, y la cata dice el THC exacto y el terpeno de cada aroma. |
+| Analizador de cannabinoides y terpenos | 3.000 € | 3 | Medidor de bolsillo (1.15): THC, CBD y el terpeno principal de un lote, desde la mochila. Lo analizado se vende mejor en la calle y un 5 % más en los clubs, y la cata dice el THC exacto y el terpeno de cada aroma. |
 | Prensa de rosin | 250 € | 3 | Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores. |
 | Tarros de curado | 30 € | 1 | Tarros de cristal herméticos (1.29) para el arcón de casa: lo que guardas ahí se cura en 2 días, se vende un 15 % más caro y ya no pierde THC. Sin curar, a los 3 días de cosecharla empieza a perder. |

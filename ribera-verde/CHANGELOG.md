@@ -1,5 +1,12 @@
 # Cambios
 
+## 1.29.2 · 13 de octubre de 2026
+
+Precio real del analizador. Godot, 0.23.2.
+
+- El analizador de cannabinoides y terpenos cuesta 3.000 € en el growshop (antes, 180 €), como un aparato de verdad que mide THC, CBD y terpenos; pedido a Kiko por el móvil, 3.450 € (su 15 %). Lo demás de lo añadido últimamente ya tenía precios de tienda reales (tarros 30 €, medidor de pH y EC 35 €, prensa de rosin 250 €, carro de esquejes 165 €, deshumidificador 190 €, aire acondicionado 320 €, PC gaming 1.490 €) y no cambia.
+- Igual en Godot. Tests: `npm test` 111/111; Godot, historia 111 pasos.
+
 ## 1.29.1 · 13 de octubre de 2026
 
 Lo que quedaba del curado. Godot, 0.23.1.
