@@ -357,8 +357,9 @@ async function estabilizar(k){
 // la cama del piso y, desde la 1.10, la de casa de ama (txt): allí no hay robo de Darko ni aviso de plagas (las plantas están en el piso).
 // El aviso dice solo la luz pagada durmiendo (1.11): la factura es de un día entero, a medianoche (newDay); una siesta que no pasa de las 12, nada
 async function bedAction(txt){
-  const piso=S.map==='home',c=await ask(txt||'Tu cama. Todavía huele a la colonia de la tía.',['Dormir hasta las 7','Siesta de 3 h'].concat(piso?['Cambiarte de ropa']:[],['Nada']));
+  const piso=S.map==='home',deco=piso&&conDeco().length>0,c=await ask(txt||'Tu cama. Todavía huele a la colonia de la tía.',['Dormir hasta las 7','Siesta de 3 h'].concat(piso?['Cambiarte de ropa']:[],deco?['Decorar la casa']:[],['Nada']));
   if(piso&&c===2)return vestirte();   // ropa y pelo (1.21, 12c-salon)
+  if(deco&&c===3)return decorar();   // 1.27
   if(c>1)return;
   await fade(1);
   const mins=c===1?180:(((7*60-S.min)+1440)%1440||1440),antes=S.pots.map(p=>p&&[!!p.pest,!!p.dead]),d0=S.day;

@@ -363,7 +363,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.lector.visible, 60)
 	await espera(3)
 	await foto("0b-creditos")
-	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.20.0") \
+	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.21.0") \
 		and J.lector_txt.text.contains("Open Font License") and J.lector_txt.text.contains("FICCIÓN") and J.lector.get_global_rect().encloses(J.lector_sc.get_global_rect()))
 	await pulsa("B")
 	await elige("LICENCIAS")
@@ -557,11 +557,18 @@ func menu_start() -> void:
 	# OBJETIVO (1.11): una lista con el capítulo, las misiones (ninguna antes de conocer a Kiko) y la deuda
 	await elige("OBJETIVO")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OBJETIVO", 60)
-	check("Objetivo: el capítulo y la carta, el itinerario (1.23) al principio, sin misiones hasta conocer a Kiko, y la deuda", etiquetas() == ["CAPÍTULO 1", "ITINERARIO", "DEUDA", "Volver"]
-		and str(J.m_items[0].desc).contains("carta") and J.m_i == 1 and str(J.m_items[1].right) == "1/14" and str(J.m_items[2].right) == Datos.eur(30000))
+	check("Objetivo: el capítulo y la carta, el itinerario (1.23) al principio, sin misiones hasta conocer a Kiko, los logros (1.27) y la deuda", etiquetas() == ["CAPÍTULO 1", "ITINERARIO", "LOGROS", "DEUDA", "Volver"]
+		and str(J.m_items[0].desc).contains("carta") and J.m_i == 1 and str(J.m_items[1].right) == "1/14" and str(J.m_items[2].right) == "%d/%d" % [J.logros_n(), J.D.LOGROS.size()] and str(J.m_items[3].right) == Datos.eur(30000))
 	await pulsa("A")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "ITINERARIO", 60)
 	check("ITINERARIO: los 14 pasos y Volver; hecho el autobús, ahora la carta", J.m_items.size() == 15 and J.m_items[0].get("right") == "HECHO" and J.m_items[1].get("right") == "AHORA" and J.m_i == 1)
+	await pulsa("B")
+	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OBJETIVO", 60)
+	# LOGROS (1.27): todos, sin ninguno aún, y Volver
+	await elige("LOGROS")
+	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "LOGROS", 60)
+	check("LOGROS: los %d y Volver, ninguno conseguido al llegar al piso" % J.D.LOGROS.size(), J.m_items.size() == J.D.LOGROS.size() + 1 and J.m_items[0].label == "Primera venta"
+		and J.m_items.all(func(x): return x.get("right") == null) and str(J.m_o.get("title2")) == "0 de %d" % J.D.LOGROS.size())
 	await pulsa("B")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OBJETIVO", 60)
 	await pulsa("B")

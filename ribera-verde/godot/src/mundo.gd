@@ -334,15 +334,35 @@ func montar_casa() -> void:
 	for c in S.carpas:
 		ks.append(c.t if c else "-")
 	var ya := muebles_ya()
-	var key := ",".join(ks) + "|" + ",".join(ya)
+	var su := deco_v("suelo")
+	var pa := deco_v("pared")
+	var al = D.MUEBLES.alfombra if "alfombra" in ya else null
+	var key := ",".join(ks) + "|" + ",".join(ya) + "|" + ",".join([su, pa, deco_v("alfombra")])
 	if h.get("carpasK") == key:
 		return
 	h.carpasK = key
+	# 1.27: el suelo y las paredes de la reforma (REFORMA) y la alfombra (suelo: 1, sus 4 trozos sobre el suelo que haya)
+	var vs := ("-" + str(pa)) if pa else ""
+	var fs := ("-" + str(su)) if su else ""
+	for y in int(h.h):
+		for x in int(h.w):
+			if h.g[y][x] == "mat":
+				continue
+			if y == 0:
+				h.g[y][x] = "iwT_home" + vs
+			elif y == 1:
+				h.g[y][x] = "iwB_home" + vs
+			elif al and x >= al.x and x <= al.x + 1 and y >= al.y and y <= al.y + 1:
+				h.g[y][x] = "alf" + str(deco_v("alfombra")) + "abcd"[(y - int(al.y)) * 2 + x - int(al.x)] + fs
+			else:
+				h.g[y][x] = "floor" + fs
 	for s in D.SITIOS:
 		for x in range(s.x, s.x + s.w):
 			h.o[s.y][x] = null
 	for k in D.MUEBLES:   # los muebles del salón que ya han llegado (12c-salon): k y k + "2"
 		var mu: Dictionary = D.MUEBLES[k]
+		if mu.get("suelo"):
+			continue
 		h.o[mu.y][mu.x] = k if k in ya else null
 		if not mu.get("uno"):
 			h.o[mu.y][mu.x + 1] = (k + "2") if k in ya else null
@@ -372,7 +392,7 @@ func mueble_de(o) -> String:
 		return ""
 	if D.MUEBLES.has(o):
 		return o
-	if o.ends_with("2") and D.MUEBLES.has(o.left(-1)) and not D.MUEBLES[o.left(-1)].get("uno"):
+	if o.ends_with("2") and D.MUEBLES.has(o.left(-1)) and not D.MUEBLES[o.left(-1)].get("uno") and not D.MUEBLES[o.left(-1)].get("suelo"):
 		return o.left(-1)
 	return ""
 
@@ -844,6 +864,8 @@ func object_action(x: int, y: int) -> void:
 			return
 		for k in D.MUEBLES:   # el sitio vacío de un mueble del salón
 			var mu: Dictionary = D.MUEBLES[k]
+			if mu.get("suelo") and k in muebles_ya():   # la alfombra puesta no es un objeto: nada (1.27)
+				continue
 			if (x == mu.x or (not mu.get("uno") and x == mu.x + 1)) and y == mu.y:
 				var pd = S.get("muebles", {}).get(k) if S.get("muebles") is Dictionary else null
 				if mu.get("grow") and not pd:   # el carro de esquejes (1.11): sin pedir, nada

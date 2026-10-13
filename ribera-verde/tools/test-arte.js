@@ -432,12 +432,39 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       const R = q => document.querySelector(q).getBoundingClientRect(), bm = R('#bMovil'), dp = R('#dpad'), hud = R('#hud');
       r.boton = [bm.width > 20, bm.bottom <= dp.top, Math.abs((bm.left + bm.right) / 2 - (R('#dpad .cruz').left + R('#dpad .cruz').right) / 2) < 2].join();
       S = S0; montarCasa(); return r; });
+    // reformas y logros (1.27): el suelo y las paredes por la tienda online (pagados al pedir, puestos al día siguiente por llegaMueble
+    // y montarCasa, con su arte del atlas; la pared sigue siendo sólida), la alfombra en el suelo (sus 4 trozos sobre el suelo que haya),
+    // DECORAR en la cama, y los logros: revisaLogros los marca con el día y avisa con un toast
+    const reforma = await page.evaluate(async () => {
+      const S0 = S, r = {}, s0 = say, me0 = menu, a0 = ask, t0 = toast; let dicho = [], pide = [];
+      S = newState(); Object.assign(S, { money: 12000, map: 'home', day: 5, muebles: { sofa: 1, cartel: 1, alfombra: 1 } }); montarCasa();
+      const m = MAPS.home, g = () => [m.g[0][3], m.g[1][3], m.g[4][3], m.g[3][13], m.g[4][14], m.g[7][5]].join();
+      try {
+        say = async t => { dicho.push(t); };
+        menu = async (items, o) => { if (o.title === 'REFORMAS') { r.items = r.items || items.map(i => i.label + (i.disabled ? '×' : '') + (i.right ? '=' + i.right : '')).join('|'); const k = pide.shift(); return k == null ? -1 : k; }
+          if (o.title === 'Decorar la casa') r.deco = items.map(i => i.label).join('|'); return -1; };
+        pide = [7, 3]; await reformas(); r.pago = S.money; r.obra = JSON.stringify(S.obra); r.antes = g();
+        S.day++; llegaMueble(); while (pending.length) await pending.shift()(); r.despues = g(); r.dicho = dicho.join(' / ');
+        r.solido = tileSolid(m, 3, 1) && !tileSolid(m, 13, 3) && !tileSolid(m, 3, 4);
+        r.arte = ['floor-1', 'floor-2', 'floor-3', 'iwT_home-1', 'iwB_home-3', 'alf2d-3', 'alf1a'].every(k => ARTE.cubre['tile:' + k]) && !!ARTE.cubre['obj:cartel'];
+        ask = async (t, o) => { r.cama = o.join('|'); return o.length - 1; }; await bedAction(); await decorar();
+        toast = h => { r.toast = h; }; r.n = LOGROS.length; S.sales = 50; revisaLogros(); r.log = JSON.stringify(S.logros); while (pending.length) await pending.shift()();
+      } finally { say = s0; menu = me0; ask = a0; toast = t0; }
+      S = S0; montarCasa(); return r; });
+    check('Reformas (suelo y paredes, al día siguiente), alfombra en el suelo, DECORAR en la cama y logros con su aviso (1.27)',
+      reforma.items === 'Suelo: Tarima de roble · en casa×=1.950 €|Suelo: Tarima de nogal=1.950 €|Suelo: Vinílico gris=2.380 €|Suelo: Baldosa hidráulica=5.400 €|Paredes: Papel crema de rayas · en casa×=1.900 €|Paredes: Pintura verde salvia=850 €|Paredes: Pintura azul grisáceo=850 €|Paredes: Ladrillo visto=5.900 €|Volver' &&
+      reforma.pago === 700 && reforma.obra === '{"pared":{"v":3,"dia":6},"suelo":{"v":3,"dia":6}}' &&
+      reforma.antes === 'iwT_home,iwB_home,floor,alf0a,alf0d,mat' && reforma.despues === 'iwT_home-3,iwB_home-3,floor-3,alf0a-3,alf0d-3,mat' &&
+      reforma.dicho === 'El pintor viene a primera hora: paredes nuevas, ladrillo visto. / El instalador viene a primera hora: suelo nuevo, baldosa hidráulica.' &&
+      reforma.solido && reforma.arte && reforma.cama === 'Dormir hasta las 7|Siesta de 3 h|Cambiarte de ropa|Decorar la casa|Nada' &&
+      reforma.deco === 'El sofá: azul|El póster: el faro|La alfombra: bereber crema|Listo' && reforma.log === '{"venta":6,"casa":6}' &&
+      reforma.toast === `<small>LOGROS · 2/${reforma.n}</small>Primera venta · A tu gusto` && reforma.n >= 26, reforma);
     const salonM = await page.evaluate(async () => { const m0 = movilMenu; let n = 0; movilMenu = async () => { n++; };
       try { mode = 'world'; while (handlers.length) handlers.pop(); press('MOVIL'); await new Promise(r => setTimeout(r, 50));
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'p' })); await new Promise(r => setTimeout(r, 50)); } finally { movilMenu = m0; } return n; });
     check('Salón: muebles por internet (llegan mañana), 2 casillas con su arte, sofá, tele y PC; menú START con iconos y el día; botón MÓVIL encima de la cruceta',
-      salon.vacio && salon.tienda === 'Sofá de 2 plazas|Tele de 43" con mueble|PC gaming con mesa|Sillón con lámpara de pie|Cuadro para el salón|Patinete|Bici de segunda mano|Salir' && salon.pago.join() === '0,111' && salon.ped === '{"sofa":2,"gpc":2}' &&
-      salon.tienda2 === 'Sofá de 2 plazas · pedido×|Tele de 43" con mueble|PC gaming con mesa · pedido×|Sillón con lámpara de pie|Cuadro para el salón|Patinete|Bici de segunda mano|Salir' && salon.hoy === '' && salon.ya === 'sofa,gpc' && /el sofá y el PC gaming/.test(salon.llega) &&
+      salon.vacio && salon.tienda === 'Sofá de 2 plazas|Tele de 43" con mueble|PC gaming con mesa|Sillón con lámpara de pie|Cuadro para el salón|Póster enmarcado|Alfombra de 180 × 140|Patinete|Bici de segunda mano|Reformas: suelo y paredes|Salir' && salon.pago.join() === '0,111' && salon.ped === '{"sofa":2,"gpc":2}' &&
+      salon.tienda2 === 'Sofá de 2 plazas · pedido×|Tele de 43" con mueble|PC gaming con mesa · pedido×|Sillón con lámpara de pie|Cuadro para el salón|Póster enmarcado|Alfombra de 180 × 140|Patinete|Bici de segunda mano|Reformas: suelo y paredes|Salir' && salon.hoy === '' && salon.ya === 'sofa,gpc' && /el sofá y el PC gaming/.test(salon.llega) &&
       salon.solido && salon.arte && salon.sofa[0] === 15 && salon.sofa[1] >= 60 && salon.sofa[1] < 64 && /^Aquí iría bien la tele/.test(salon.vacioTv) && /^Noticias: la policía busca/.test(salon.tv[0]) && salon.tv[1] >= 60 && salon.tv[1] < 64 &&
       /^Foro de cultivo · /.test(salon.foro[0]) && salon.foro[1] >= 30 && salon.foro[1] < 34 && salon.opc === 'true,true' && salon.start === '8,true,true,0 €' && salon.boton === 'true,true,true' && salonM === 2, { ...salon, salonM });
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
@@ -530,7 +557,8 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
   // ---------- ?arte=procedural ----------
   {
     const { page, errors } = await abrir(html, '?arte=procedural');
-    const ok = await page.evaluate(() => ARTE.ok === false && typeof ATLAS === 'object' && ATLAS !== null && Object.keys(MUEBLES).every(k => TILES[k] && (MUEBLES[k].uno || TILES[k + '2'])));   // los muebles de 2 casillas, también sin atlas
+    const ok = await page.evaluate(() => ARTE.ok === false && typeof ATLAS === 'object' && ATLAS !== null && Object.keys(MUEBLES).every(k => MUEBLES[k].suelo ? TILES.alf0a && TILES['alf2d-3'] : TILES[k] && (MUEBLES[k].uno || TILES[k + '2'])) &&
+      ['floor-3', 'iwT_home-3', 'iwB_home-1'].every(k => TILES[k]));   // los muebles de 2 casillas, la alfombra y la reforma, también sin atlas
     await page.waitForTimeout(300);
     check('?arte=procedural ignora el atlas', ok && errors.length === 0, errors);
     await page.close();

@@ -952,6 +952,7 @@ func revisa_misiones() -> void:
 					add_seeds(k, int(s[k]))
 	if mision_aviso.size():
 		queue("mision", aviso_mision)
+	revisa_logros()   # 1.27
 
 func aviso_mision():
 	while mision_aviso.size():
@@ -966,8 +967,116 @@ func aviso_mision():
 		for t in premio_txt(m):
 			await got(t)
 	var sg = mision_sig()
-	if sg:
-		toast("<small>MISIÓN</small>" + sg.t, 3200)
+	var h := con_logro(("<small>MISIÓN</small>" + sg.t) if sg else "")
+	if h != "":
+		toast(h, 3200)
+
+# ---------- logros (1.27, 11i-logros.js): textos del HTML (D.LOGROS); aquí, lo que mira cada uno ----------
+var logro_aviso: Array = []
+
+func logro_ok(id: String) -> bool:
+	var F: Dictionary = S.flags
+	var disc := func(l): return l.all(func(k): return true if S.disc.get(k) else false)
+	match id:
+		"venta":
+			return S.sales > 0
+		"cosecha":
+			return true if F.get("harvest1") else false
+		"diario":
+			return true if F.get("diario") else false
+		"estrella":
+			return S.fenos.values().has("estrella")
+		"receta":
+			return rec_count() >= 1
+		"recetas10":
+			return rec_count() >= 10
+		"jack":
+			return S.rec.get("leyenda") == 2
+		"mitad":
+			return D.DEX.filter(func(k): return S.disc.get(k)).size() >= ceili(D.DEX.size() / 2.0)
+		"genoteca":
+			return disc.call(D.DEX)
+		"landraces":
+			return disc.call(D.LANDRACES)
+		"tia":
+			return disc.call(D.TIA_DEJO)
+		"rosin":
+			return S.rosin.size() > 0 or S.arcon.rosin.size() > 0
+		"cata":
+			return S.catas.size() > 0
+		"club":
+			return S.clubs.values().any(func(v): return true if v else false)
+		"goteo":
+			return S.carpas.any(func(c): return c is Dictionary and c.get("goteo"))
+		"carpas":
+			return S.carpas.filter(func(c): return c is Dictionary).size() >= 3
+		"plazo":
+			return S.ch >= 4
+		"libre":
+			return S.debt <= 0
+		"ventas10":
+			return S.sales >= 10000
+		"ventas100":
+			return S.sales >= 100000
+		"rival":
+			return S.rivalFuera.size() > 0
+		"darko":
+			return true if F.get("darkoFin") else false
+		"plantilla":
+			return S.plantilla.size() > 0
+		"nave":
+			return true if S.get("nave") else false
+		"ruedas":
+			return S.get("veh") is Dictionary and S.veh.values().any(func(d): return d and d <= S.day)
+		"casa":
+			return deco_v("suelo") > 0 or deco_v("pared") > 0
+	return false
+
+func logros_n() -> int:
+	return D.LOGROS.filter(func(l): return S.logros.has(l.id)).size()
+
+func revisa_logros() -> void:
+	for l in D.LOGROS:
+		if not S.logros.has(l.id) and logro_ok(l.id):
+			S.logros[l.id] = S.day
+			logro_aviso.append(l.id)
+	if logro_aviso.size():
+		queue("logro", aviso_logro)
+
+func logro_txt() -> String:
+	var l := []
+	for id in logro_aviso:
+		for x in D.LOGROS:
+			if x.id == id:
+				l.append(esc(x.t))
+	logro_aviso.clear()
+	if l.is_empty():
+		return ""
+	sfx("get")
+	return "<small>%s · %d/%d</small>%s" % ["LOGROS" if l.size() > 1 else "LOGRO", logros_n(), D.LOGROS.size(), " · ".join(l)]
+
+# el aviso h (del itinerario o de la misión, en la cola mientras corre) con los logros debajo, si el otro no viene después
+func con_logro(h: String) -> String:
+	if queued.has("itin") and queued.has("mision"):
+		return h
+	var l := logro_txt()
+	return ((h + "<br>") if h != "" else "") + l if l != "" else h
+
+func aviso_logro():
+	if queued.has("itin") or queued.has("mision"):   # lo dirán ellos
+		return
+	var l := logro_txt()
+	if l != "":
+		toast(l, 2600)
+
+# START → OBJETIVO → LOGROS
+func logros_menu():
+	var it := []
+	for l in D.LOGROS:
+		var h: bool = S.logros.has(l.id)
+		it.append({"label": l.t, "right": (("día %s" % n(S.logros[l.id])) if S.logros[l.id] else "HECHO") if h else null, "desc": l.d})
+	it.append({"label": "Volver", "desc": ""})
+	await menu(it, {"cls": "full", "title": "LOGROS", "title2": "%d de %d" % [logros_n(), D.LOGROS.size()], "desc": true})
 
 # el plazo (1.11): Toño avisa cuando quedan 3 días y el último, con lo que llevas
 func recuerdo_plazo():
@@ -994,11 +1103,15 @@ func objetivo_menu():
 		if iti and itin_sig() != null:
 			ini = 1
 		var plazo := ("Plazo: %s antes de que acabe el día %s. Llevas %s.\n" % [Datos.eur(S.due), n(S.deadline), Datos.eur(S.money + caja_e())]) if S.due > 0 else ""
+		it.append({"label": "LOGROS", "right": "%d/%d" % [logros_n(), D.LOGROS.size()], "desc": "Lo que llevas conseguido en la partida. Pulsa A para verlos."})   # 1.27
 		it.append({"label": "DEUDA", "right": Datos.eur(S.debt), "desc": plazo + "Ventas %s · Reputación %s · Calor %d %%" % [Datos.eur(S.sales), n(S.rep), Datos.jsround(S.heat)]})
 		it.append({"label": "Volver", "desc": ""})
 		var i: int = await menu(it, {"cls": "full", "title": "OBJETIVO", "title2": "cap. %d" % S.ch, "desc": true, "initial": ini})
 		if iti and i == 1:
 			await itinerario_menu()
+			continue
+		if i == it.size() - 3:   # 1.27
+			await logros_menu()
 			continue
 		return
 
@@ -1118,7 +1231,7 @@ func aviso_itin():
 		if x.id == ids[-1]:
 			p = x
 	var sg = itin_sig()
-	toast("<small>ITINERARIO · %d/%d</small>%s" % [itin_n(), D.ITINERARIO.size(), p.t] + ("<br>Ahora: " + sg.t if sg != null else ""), 2800)
+	toast(con_logro("<small>ITINERARIO · %d/%d</small>%s" % [itin_n(), D.ITINERARIO.size(), p.t] + ("<br>Ahora: " + sg.t if sg != null else "")), 2800)
 	var j := ids.map(func(id): return D.JULEN.ok.get(id)).filter(func(x): return x != null)
 	if julen_aqui() and j.size():
 		await say(j[-1], "JULEN")

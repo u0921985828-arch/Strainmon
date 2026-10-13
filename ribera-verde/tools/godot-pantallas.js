@@ -40,6 +40,12 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
   // el carro de esquejes (1.11) delante de las carpas, con el salón amueblado
   { k: 'casa-carro', sw: 400, mode: 'world', now: T + 99, S: { ch: 4, muebles: { carro: 1, sofa: 1, tv: 1, gpc: 1, sillon: 1, cuadro: 1 }, deco: { sofa: 2, sillon: 1, cuadro: 2 }, flags: { letter: true, kiko1: true } },
     carpas: [{ t: 'p80', foco: 'led200' }, { t: 'g150', foco: 'led480' }], map: 'home', P: { x: 10, y: 6, dir: 'up' } },
+  // las reformas (1.27): baldosa hidráulica y ladrillo visto con la alfombra persa y el póster del mapa; tarima de nogal y pintura
+  // verde salvia con la alfombra lisa y el de la ola
+  { k: 'casa-reforma', sw: 320, mode: 'world', now: T + 120, S: { ch: 4, muebles: { sofa: 1, tv: 1, gpc: 1, sillon: 1, cuadro: 1, cartel: 1, alfombra: 1 }, deco: { suelo: 3, pared: 3, alfombra: 1, cartel: 3 }, flags: { letter: true, kiko1: true } },
+    map: 'home', P: { x: 12, y: 6, dir: 'up' } },
+  { k: 'casa-reforma2', sw: 400, mode: 'world', now: T + 160, S: { ch: 4, muebles: { sofa: 1, tv: 1, cartel: 1, alfombra: 1 }, deco: { suelo: 1, pared: 1, alfombra: 2, cartel: 1, sofa: 1 }, flags: { letter: true, kiko1: true } },
+    map: 'home', P: { x: 6, y: 4, dir: 'left' } },
   // la plaza de día: el jugador andando, policía con la radio, Molina fumando (con su humo), clientes (uno andando), Patxi y su
   // paloma, bocadillos, la fuente animada y monedas
   { k: 'calle-plaza', sw: 320, mode: 'world', now: T, seed: 4242, S: { ch: 6, min: 12 * 60, day: 3, rep: 30, flags: { darko1: true } }, clientes: true,

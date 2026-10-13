@@ -14,9 +14,9 @@ Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: 
 | Objetos sueltos en lote | 36 | 10 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 180 + sin documentar |
 | Imágenes simples | 22 | 11 | create_image_pixflux (init_image + color_image) | 7 + sin documentar |
 | Se queda procedural | 2 | 1 | — | 0 |
-| Importado | 159 | 51 | importado | 0 + sin documentar |
+| Importado | 217 | 52 | importado | 0 + sin documentar |
 
-**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 315/315 claves.
+**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 373/373 claves.
 
 ## Orden de creación
 
@@ -181,7 +181,8 @@ Arte propio del repositorio que ya existe (Strainmon): se adapta en local (recor
 | iconos-equipo | — | importado | — | solo texto | F9 | — | 0+? |
 | props-escala | fridge, crate | importado | — | solo texto | F9 | — | 0+? |
 | salon | sofa, tv, gpc, carro, sillon | importado | — | solo texto | F9 | — | 0+? |
-| salon-pared | cuadro | importado | — | solo texto | F9 | — | 0+? |
+| salon-pared | cuadro, cartel | importado | — | solo texto | F9 | — | 0+? |
+| casa-reforma | alf0a, alf0a-1, alf0a-2, alf0a-3, alf0b, alf0b-1, alf0b-2, alf0b-3, alf0c, alf0c-1, alf0c-2, alf0c-3, alf0d, alf0d-1, alf0d-2, alf0d-3, alf1a, alf1a-1, alf1a-2, alf1a-3, alf1b, alf1b-1, alf1b-2, alf1b-3, alf1c, alf1c-1, alf1c-2, alf1c-3, alf1d, alf1d-1, alf1d-2, alf1d-3, alf2a, alf2a-1, alf2a-2, alf2a-3, alf2b, alf2b-1, alf2b-2, alf2b-3, alf2c, alf2c-1, alf2c-2, alf2c-3, alf2d, alf2d-1, alf2d-2, alf2d-3, floor-1, floor-2, floor-3, iwB_home-1, iwB_home-2, iwB_home-3, iwT_home-1, iwT_home-2, iwT_home-3 | importado | — | solo texto | F9 | — | 0+? |
 | vehiculos | — | importado | — | solo texto | F9 | patinete-atras, patinete-delante, bici-atras, bici-delante | 0+? |
 | iconos-menu | — | importado | — | solo texto | F9 | — | 0+? |
 | tiles-firmes | hormigon, pista, rotoT, rotoB | importado | — | solo texto | F4 | — | 0+? |

@@ -1,6 +1,6 @@
 {
  "generado": "tools/sprites/catalogo.js",
- "claves": 315,
+ "claves": 373,
  "catalogo": {
   "look:player": [
    {
@@ -2674,6 +2674,528 @@
   "obj:cuadro": [
    {
     "asset": "salon-pared",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "obj:cartel": [
+   {
+    "asset": "salon-pared",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0a": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0a-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0a-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0a-3": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0b": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0b-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0b-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0b-3": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0c": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0c-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0c-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0c-3": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0d": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0d-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0d-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf0d-3": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1a": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1a-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1a-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1a-3": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1b": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1b-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1b-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1b-3": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1c": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1c-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1c-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1c-3": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1d": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1d-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1d-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf1d-3": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2a": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2a-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2a-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2a-3": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2b": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2b-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2b-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2b-3": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2c": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2c-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2c-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2c-3": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2d": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2d-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2d-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:alf2d-3": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:floor-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:floor-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:floor-3": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:iwB_home-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:iwB_home-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:iwB_home-3": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:iwT_home-1": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:iwT_home-2": [
+   {
+    "asset": "casa-reforma",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "tile:iwT_home-3": [
+   {
+    "asset": "casa-reforma",
     "familia": "importado",
     "herramienta": "importado",
     "fase": "F9",

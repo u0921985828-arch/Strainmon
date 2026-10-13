@@ -268,7 +268,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.protect = false; addBuds('ria', 5, 12); await run(talkCop);
   }, () => Object.keys(S.buds).length === 0 || { buds: S.buds });
   await step('Menú START: Genoteca, Mochila, Plantas, Objetivo', ['GENOTECA', '<B>', 'MOCHILA', '<B>', 'PLANTAS', '<B>', 'OBJETIVO', '<B>', 'SALIR'],
-    async () => { await run(startMenu); }, () => handlers.length === 0 && LOG.some(l => l.startsWith(`  [menú] CAPÍTULO ${S.ch} | ${MISIONES.map(m => m.t).join(' | ')} | DEUDA | Volver`)) || LOG.slice(-4));
+    async () => { await run(startMenu); }, () => handlers.length === 0 && LOG.some(l => l.startsWith(`  [menú] CAPÍTULO ${S.ch} | ${MISIONES.map(m => m.t).join(' | ')} | LOGROS | DEUDA | Volver`)) || LOG.slice(-4));
   await step('Cama: siesta de 3 horas', ['Siesta'], async () => { S.min = 600; S.hp = 5; await run(bedAction); },
     () => (S.min === 780 || S.min === 781) && S.hp === S.hpMax || { min: S.min, hp: S.hp });   // 780 = 600 + 180; entre la siesta y la comprobación puede pasar un minuto de reloj real
   // y el % índica de cada planta: igual al de su variedad en una línea estable; alrededor del suyo (σ de su tipo) en una landrace
@@ -478,7 +478,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     R.min = S.min; want(['^Leer el diario', 'Volver']); await run(() => muebleAction('sillon')); R.t = S.min - R.min;
     R.tienda = Object.keys(MUEBLES).filter(k => !MUEBLES[k].grow).join(); S.muebles = m0; S.deco = {}; enterMap('home', 5, 5, 'up');
   }, () => !R.q7 && R.c7 === 7 && R.b.join() === 'rival' && R.fuera === RIVAL.dias && R.cero === 0 && R.f === 1.05 && R.otra === 0 && R.pago === 230 && R.irte === 6 && R.lejos === 8 && R.hp === 17
-    && R.obj === 'cuadro,,sillon,sillon2,sofa,sofa2' && R.cuadro === '2,cuadro-2' && R.sofa === 'sofa-2' && R.t === 30 && R.tienda === 'sofa,tv,gpc,sillon,cuadro'
+    && R.obj === 'cuadro,,sillon,sillon2,sofa,sofa2' && R.cuadro === '2,cuadro-2' && R.sofa === 'sofa-2' && R.t === 30 && R.tienda === 'sofa,tv,gpc,sillon,cuadro,cartel,alfombra'
     && LOG.some(l => l === 'ROBER: Eh, tú. Llevas 8 ventas en el barrio alto.') && LOG.some(l => l === 'Te cubres: el golpe duele la mitad.') && LOG.some(l => l === 'Rober no volverá por el barrio alto en 7 días. Mientras, sus clientes te pagan un 5 % más.') || R);
   await step('Darko y Miren (1.17): en el capítulo 8, el ajuste de cuentas con Darko en los astilleros (coge la barra: el golpe siguiente, doble, y CUBRIRSE lo deja en la mitad; si le ganas, se va y sus chicos ya no salen); Miren, la amiga de la tía Maite, en Errotabarri: 20 g de Purple Thai por la última página del diario y 5 semillas de Haze', ['^Pelear'], async () => {
     S.ch = 8; S.flags.darkoFin = 0; const r0 = Math.random, b0 = battle, sv = { hp: S.hp, hpMax: S.hpMax, rep: S.rep, pelea: Object.assign({}, S.pelea) }; window.R = { b: [] }; window.battle = async t => { R.b.push(t); return 'win'; };
@@ -777,7 +777,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     await run(() => potAction(0)); R.pot = S.pots[0] && S.pots[0].f.id === 9997 && S.pots[0].prog === .12; R.queda = S.bandejas.length;
     S.bandejas.push({ sid: 'limon', f, dia: S.day - 1 }); newDay(); await idle(); R.seca = S.bandejas.map(e => e.dia).join();
     await run(raidEvent); R.redada = S.bandejas.length; S = S0; montarCasa(); R.vacio = !MAPS.home.o[5][8];
-  }, () => R.libre && R.online === 'sofa,tv,gpc,sillon,cuadro' && R.m === 500 - CARRO.p && R.ped === R.d + 1 && R.ya && R.solido && R.n === '0,3,true' && R.l1 === 4
+  }, () => R.libre && R.online === 'sofa,tv,gpc,sillon,cuadro,cartel,alfombra' && R.m === 500 - CARRO.p && R.ped === R.d + 1 && R.ya && R.solido && R.n === '0,3,true' && R.l1 === 4
     && R.dura === 3 && R.pot && R.queda === 2 && R.seca === String(R.d + CARRO.dias) && R.redada === 0 && R.vacio
     && LOG.some(l => l.includes('Kiko te sube el carro de esquejes')) || R);
   await step('Cama (1.11): la siesta que no pasa de las 12 no cobra la luz; dormir hasta las 7 pasando la medianoche cobra el día y lo dice', ['Siesta', 'Dormir hasta las 7'], async () => {
@@ -921,6 +921,26 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && R.crec[0] > R.crec[1] && R.g[3] > R.g[2] && R.sig === 'cosecha' && R.n === 8 && R.TO.length === 4 && R.TO[0] === '<small>ITINERARIO · 5/14</small>Plantar<br>Ahora: Regar'
     && R.TO[3] === '<small>ITINERARIO · 8/14</small>Abono de floración<br>Ahora: Primera cosecha' && R.fin.join() === '2,false,true,true' && R.log.every(Boolean)
     && R.vieja === 'cosecha' && R.ph === 'Abonada (crecimiento bio) · sustrato vivo · EC 0,8 · pH 7,5' && R.mark && R.tarde.join() === 'true,true,2,true,false' || R);
+  await step('Reformas, decoración y logros (1.27): en la tienda online, el póster, la alfombra y REFORMAS (suelo y paredes: se pagan al pedir y vienen al día siguiente; el piso cambia sus casillas, la alfombra va en el suelo nuevo y la pared sigue siendo sólida); DECORAR LA CASA en la cama; los logros con su aviso (detrás del SMS de la misión, sin pisarlo) y START → OBJETIVO → LOGROS; en una partida de antes, lo conseguido, sin aviso',
+    ['Póster', 'Alfombra', 'Reformas', 'Suelo: Baldosa', 'Paredes: Pintura verde', 'Volver', 'Salir', 'Decorar', 'póster', 'La ola', 'alfombra', 'Persa', 'Listo', 'LOGROS', 'Volver', 'Volver'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0));
+    Object.assign(S, { ch: 8, map: 'home', day: 20, min: 12 * 60, money: 9000, sales: 0, caja: { nivel: 1, money: 0, buds: {}, rosin: {} }, muebles: {}, deco: {}, obra: {} });
+    S.flags.kiko1 = true; S.misiones = Object.fromEntries(MISIONES.map(m => [m.id, 0])); S.itin = Object.fromEntries(ITINERARIO.map(p => [p.id, 0]));
+    S.logros = Object.fromEntries(LOGROS.filter(l => l.id !== 'casa' && l.id !== 'venta').map(l => [l.id, 0])); enterMap('home', 10, 6, 'up');
+    const T = [], _t = toast; window.toast = (h, ms) => { T.push(h); _t(h, ms); };
+    await run(tiendaOnline); await idle(); window.R = { compra: [S.money, JSON.stringify(S.obra), JSON.stringify(S.muebles)].join(' ') };
+    await run(async () => { S.day++; llegaMueble(); }); await idle();
+    const m = MAPS.home; R.g = [m.g[0][3], m.g[1][3], m.g[4][3], m.g[3][13], m.g[4][14]].join(); R.o = m.o[1][4]; R.solido = [tileSolid(m, 3, 1), tileSolid(m, 13, 3)].join();
+    await run(bedAction); await idle(); R.deco = [S.deco.cartel, S.deco.alfombra, decoSprite('cartel'), m.g[3][13]].join();
+    delete S.misiones.caja; S.sales = 50; await run(async () => {}); await idle();
+    await run(objetivoMenu); await idle(); R.n = logrosN(); R.TO = T.slice(); window.toast = _t;
+    delete S.logros; migrate(); R.mig = [Object.keys(S.logros).length === LOGROS.filter(l => l.ok()).length, Object.values(S.logros).every(v => v === 0), pending.length].join();
+    S = S0; enterMap('home', 5, 5, 'up');
+  }, () => R.compra === '2582 {"suelo":{"v":3,"dia":21},"pared":{"v":1,"dia":21}} {"cartel":21,"alfombra":21}' && R.g === 'iwT_home-1,iwB_home-1,floor-3,alf0a-3,alf0d-3' && R.o === 'cartel' && R.solido === 'true,false'
+    && LOG.includes('El instalador viene a primera hora: suelo nuevo, baldosa hidráulica.') && LOG.includes('El pintor viene a primera hora: paredes nuevas, pintura verde salvia.')
+    && R.deco === '1,1,cartel-1,alf1a-3' && LOG.includes('Cambias el dibujo del póster: la ola.') && R.n === LOGROS.length && R.mig === 'true,true,0'
+    && R.TO.join('|') === `Pedido: Póster enmarcado · llega mañana|Pedido: Alfombra de 180 × 140 · llega mañana|Pedido: suelo, baldosa hidráulica · mañana|Pedido: paredes, pintura verde salvia · mañana|<small>LOGRO · ${LOGROS.length - 1}/${LOGROS.length}</small>A tu gusto|<small>MISIÓN CUMPLIDA</small>La caja de la tía|<small>LOGRO · ${LOGROS.length}/${LOGROS.length}</small>Primera venta`
+    && LOG.some(l => l.startsWith(`  [menú] ${LOGROS.map(l => l.t).join(' | ')} | Volver`)) || R);
   await step('Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también arcón, sala, agenda, mensajes, pedidos y bolsa); con Toño ya visto, sale en el móvil', [], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 3, due: 0, deadline: 0, protect: true }); S.flags.metB = false; delete S.flags.tono;
     for (const k of ['caja', 'rec', 'vencidos', 'protHasta', 'encargo', 'encVeto', 'arcon', 'sala', 'fijos', 'sms', 'envio', 'misiones', 'itin']) delete S[k]; delete S.items.bolsa; migrate();

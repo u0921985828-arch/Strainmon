@@ -108,6 +108,15 @@ function buildTiles(){
   T('sillon',t=>{t.F(4,6,12,9,'#b08a30');t.F(4,6,12,2,'#d0aa48');t.F(4,4,3,3,'#d0aa48');t.F(5,15,1,1,'#3a2a1c');t.F(14,15,1,1,'#3a2a1c');});
   T('sillon2',t=>{t.F(4,0,1,15,'#3a3a44');t.F(1,0,7,4,'#f0d890');t.F(2,15,5,1,'#3a3a44');});
   T('cuadro',t=>{t.box(3,1,10,12,'#a46e40','#74502e');t.F(4,2,8,5,'#76b4f2');t.F(4,7,8,5,'#3f8a46');});
+  // reformas del piso, el póster y la alfombra (1.27; con el atlas, los de tools/sprites/a-mano/casa.py y salon.py): sin él, el suelo
+  // y la pared lisos con sus juntas, y la alfombra, un rectángulo de su color sobre el suelo que haya
+  const SUELO_V=['#d8a868','#8a5e3c','#b0aca4','#e4e0d6'];
+  SUELO_V.slice(1).forEach((c,i)=>T('floor-'+(i+1),t=>{t.F(0,0,16,16,c);for(let y=3;y<16;y+=4)t.F(0,y,16,1,shade(c,-30));}));
+  ['#b2c4a6','#aabac6','#a8503a'].forEach((c,i)=>{T('iwT_home-'+(i+1),t=>{t.F(0,0,16,16,c);t.F(0,0,16,4,shade(c,-60));t.F(0,4,16,1,shade(c,-30));});
+    T('iwB_home-'+(i+1),t=>{t.F(0,0,16,16,c);t.F(0,11,16,5,'#dfdfe1');t.F(0,12,16,1,'#fffffe');});});
+  ['#e4dcc6','#8c2c30','#84878c'].forEach((c,v)=>SUELO_V.forEach((s,f)=>[[2,5,14,11],[0,5,15,11],[2,0,14,11],[0,0,15,11]].forEach(([x,y,w,h],q)=>
+    T('alf'+v+'abcd'[q]+(f?'-'+f:''),t=>{t.F(0,0,16,16,s);t.F(x,y,w,h,c);}))));
+  T('cartel',t=>{t.box(3,1,11,14,'#f0e6cc','#8a8e96');t.F(4,9,9,5,'#3a5e9a');});
   // el carro de esquejes (1.11): el carro con sus dos bandejas tapadas y, a la derecha, la mesita con la tabla de corte
   T('carro',t=>{t.F(0,1,16,15,'#26262e');t.F(1,1,14,2,'#a8b0bc');t.F(1,8,14,1,'#a8b0bc');t.F(1,14,14,1,'#a8b0bc');t.F(2,4,12,3,'#8ec0d2');t.F(2,10,12,3,'#8ec0d2');
     for(let x=3;x<14;x+=2){t.P(x,6,'#84cc6c');t.P(x,12,'#84cc6c');}t.F(2,3,12,1,'#fff6d0');t.F(2,9,12,1,'#fff6d0');});

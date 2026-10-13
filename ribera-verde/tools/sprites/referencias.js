@@ -33,7 +33,8 @@ const OUT = path.join(ROOT, 'art', 'referencias');
     // qué claves de TILES se usan como suelo y cuáles como objeto
     const ground = new Set(), objects = new Set();
     for (const m of Object.values(MAPS)) for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) { ground.add(m.g[y][x]); if (m.o[y][x]) objects.add(m.o[y][x]); }
-    Object.keys(MUEBLES).forEach(k => objects.add(k));   // los muebles que se compran (1.10, 1.16), aunque no estén montados
+    Object.keys(MUEBLES).filter(k => !MUEBLES[k].suelo).forEach(k => objects.add(k));   // los muebles que se compran (1.10, 1.16), aunque no estén montados
+    Object.keys(TILES).filter(k => /^(floor|iwT_home|iwB_home)-\d$|^alf\d[a-d]/.test(k)).forEach(k => ground.add(k));   // el suelo y las paredes de las reformas y la alfombra (1.27), aunque no estén puestos
     const files = {};
     for (const [k, frames] of Object.entries(TILES)) {
       if (SEGUNDA.has(k)) continue;   // la mitad derecha de un mueble del salón (sofa2…) no se pinta: el sprite del mueble ocupa las dos casillas

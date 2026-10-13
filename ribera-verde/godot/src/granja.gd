@@ -709,9 +709,13 @@ func estabilizar(k: String) -> void:
 # El aviso dice solo la luz pagada durmiendo (1.11): la factura es de un día entero, a medianoche (new_day); una siesta que no pasa de las 12, nada
 func bed_action(txt := ""):
 	var piso: bool = S.map == "home"
-	var c: int = await ask(txt if txt else "Tu cama. Todavía huele a la colonia de la tía.", ["Dormir hasta las 7", "Siesta de 3 h"] + (["Cambiarte de ropa"] if piso else []) + ["Nada"])
+	var deco: bool = piso and con_deco().size() > 0
+	var c: int = await ask(txt if txt else "Tu cama. Todavía huele a la colonia de la tía.", ["Dormir hasta las 7", "Siesta de 3 h"] + (["Cambiarte de ropa"] if piso else []) + (["Decorar la casa"] if deco else []) + ["Nada"])
 	if piso and c == 2:   # ropa y pelo (1.21)
 		await vestirte()
+		return
+	if deco and c == 3:   # 1.27
+		await decorar()
 		return
 	if c > 1:
 		return
@@ -920,7 +924,61 @@ func cambiar_deco(k: String) -> void:
 		return
 	S.deco[k] = i
 	sfx("sel")
+	montar_casa()
 	await say("Cambias %s %s: %s." % [Dk.q, ("de " + D.MUEBLES[k].art).replace("de el ", "del "), Dk.v[i].to_lower()])
+
+# decorar la casa (1.27): en la cama del piso, lo que tiene DECO de lo que ya ha llegado
+func con_deco() -> Array:
+	return muebles_ya().filter(func(k): return D.DECO.has(k))
+
+func decorar() -> void:
+	var i := 0
+	while true:
+		var ks := con_deco()
+		var items := []
+		for k in ks:
+			var a: String = D.MUEBLES[k].art
+			items.append({"label": "%s: %s" % [a.left(1).to_upper() + a.substr(1), String(D.DECO[k].v[deco_v(k)]).to_lower()]})
+		items.append({"label": "Listo"})
+		i = await menu(items, {"title": "Decorar la casa", "initial": i})
+		if i < 0 or i >= ks.size():
+			return
+		await cambiar_deco(ks[i])
+
+# reformas (1.27, REFORMA de 12c-salon): el suelo y las paredes, por la tienda online; el instalador o el pintor viene al día siguiente
+func reformas() -> void:
+	var i := 0
+	while true:
+		var items := []
+		var ks := []
+		for k in D.REFORMA:
+			var R: Dictionary = D.REFORMA[k]
+			var v := deco_v(k)
+			var o = S.obra.get(k) if S.get("obra") is Dictionary else null
+			for j in R.v.size():
+				var en: bool = j == v
+				var pd: bool = o != null and int(o.v) == j
+				ks.append([k, j])
+				items.append({"label": "%s: %s" % [R.n, R.v[j][0]] + (" · pedido" if pd else " · en casa" if en else ""), "right": Datos.eur(R.v[j][1]), "disabled": o != null or en,
+					"desc": R.v[j][2] + (("\n%s viene mañana." % R.quien) if pd else "\nYa hay una obra pedida: viene mañana." if o != null else "" if en else ("\n%s viene mañana." % R.quien))})
+		items.append({"label": "Volver", "desc": "Pagas con lo que llevas y, si no llega, con la caja fuerte."})
+		i = await menu(items, {"cls": "full", "title": "REFORMAS", "title2": "Suelo y paredes · tienes " + Datos.eur(S.money + caja_e()), "desc": true, "initial": i})
+		if i < 0 or i >= ks.size():
+			return
+		var k: String = ks[i][0]
+		var j: int = ks[i][1]
+		var R: Dictionary = D.REFORMA[k]
+		var p = R.v[j][1]
+		if S.money + caja_e() < p:
+			sfx("bad")
+			await say("No te llega el dinero.")
+			continue
+		pagar_casa(p)
+		if not (S.get("obra") is Dictionary):
+			S.obra = {}
+		S.obra[k] = {"v": j, "dia": S.day + 1}
+		sfx("coin")
+		toast("Pedido: %s, %s · mañana" % [R.n.to_lower(), String(R.v[j][0]).to_lower()], 1400)
 
 # ropa y pelo (1.21, vestirte): desde la cama del piso, la camiseta, el pantalón, la gorra y el pelo (S.ropa[k], índice en ROPA[k].v)
 func vestirte() -> void:
@@ -956,16 +1014,21 @@ func tienda_online() -> void:
 			var m: Dictionary = D.MUEBLES[k]
 			var en: bool = k in ya
 			var pd: bool = not en and S.get("muebles") is Dictionary and float(S.muebles.get(k, 0)) > 0
+			var al := "a casa" if k == "cartel" else "al salón"   # el póster, al dormitorio (1.27)
 			items.append({"label": m.n + (" · en casa" if en else " · pedido" if pd else ""), "right": Datos.eur(m.p), "disabled": en or pd,
-				"desc": m.d + ("" if en else "\nLlega mañana: te lo suben al salón." if pd else "\nLlega mañana y te lo suben al salón.")})
+				"desc": m.d + ("" if en else ("\nLlega mañana: te lo suben %s." % al) if pd else ("\nLlega mañana y te lo suben %s." % al))})
 		for k in vs:   # el patinete y la bici (1.13)
 			var v: Dictionary = D.VEHICULOS[k]
 			var d = S.veh.get(k) if S.get("veh") is Dictionary else null
 			var en: bool = d != null and float(d) <= S.day
 			items.append({"label": v.n + (" · tuyo" if en else " · pedido" if d else ""), "right": Datos.eur(v.p), "disabled": d != null and float(d) > 0,
 				"desc": v.d + ("" if en else "\nLlega mañana: te lo dejan en el portal.")})
+		items.append({"label": "Reformas: suelo y paredes", "desc": "El suelo y las paredes del piso: el instalador o el pintor vienen al día siguiente."})   # 1.27
 		items.append({"label": "Salir", "desc": "Pagas con lo que llevas y, si no llega, con la caja fuerte."})
 		i = await menu(items, {"cls": "full", "title": "TIENDA ONLINE", "title2": "Muebles y transporte · tienes " + Datos.eur(S.money + caja_e()), "desc": true, "initial": i})
+		if i == ks.size() + vs.size():
+			await reformas()
+			continue
 		if i < 0 or i >= ks.size() + vs.size():
 			return
 		var es_m: bool = i < ks.size()
@@ -984,6 +1047,21 @@ func tienda_online() -> void:
 		toast("Pedido: " + m.n + " · llega mañana", 1400)
 
 func llega_mueble() -> void:
+	var ob := []   # las reformas (1.27)
+	if S.get("obra") is Dictionary:
+		for k in S.obra.keys():
+			if S.obra[k].dia <= S.day:
+				ob.append(k)
+	if ob.size():
+		for k in ob:
+			S.deco[k] = S.obra[k].v
+			S.obra.erase(k)
+		montar_casa()
+		queue("obra", func():
+			sfx("get")
+			for k in ob:
+				var R: Dictionary = D.REFORMA[k]
+				await say("%s viene a primera hora: %s, %s." % [R.quien, R.nuevo, String(R.v[deco_v(k)][0]).to_lower()]))
 	var vs := []   # el patinete y la bici (1.13)
 	if S.get("veh") is Dictionary:
 		for k in D.VEHICULOS:
@@ -1027,7 +1105,7 @@ func llega_mueble() -> void:
 	queue("mueble", func():
 		sfx("get")
 		if on.size():
-			await say("Llega el mensajero con %s: te lo dejan montado en el salón." % _lista(on))
+			await say("Llega el mensajero con %s: te lo dejan montado en %s." % [_lista(on), "casa" if D.MUEBLES.cartel.art in on else "el salón"])   # el póster, en el dormitorio (1.27)
 		if gr.size():
 			await say("Kiko te sube %s y te lo deja montado delante de las carpas." % _lista(gr)))
 

@@ -39,13 +39,14 @@ function revisaMisiones(){
     for(const k in m.p||{})S.items[k]+=m.p[k];for(const k in m.s||{})addSeeds(k,m.s[k]);
   }
   if(misionAviso.length)queue('mision',avisoMision);
+  revisaLogros();   // 1.27 (11i-logros)
 }
 async function avisoMision(){
   while(misionAviso.length){
     const id=misionAviso.shift(),m=MISIONES.find(x=>x.id===id);sfx('get');toast(`<small>MISIÓN CUMPLIDA</small>${m.t}`,2400);
     await talk('SMS · KIKO',m.sms);for(const t of premioTxt(m))await got(t);
   }
-  const s=misionSig();if(s)toast(`<small>MISIÓN</small>${s.t}`,3200);
+  const s=misionSig(),h=conLogro(s?`<small>MISIÓN</small>${s.t}`:'');if(h)toast(h,3200);
 }
 // el plazo (1.11): Toño avisa cuando quedan 3 días y el último, con lo que llevas
 async function recuerdoPlazo(){
@@ -60,9 +61,10 @@ async function objetivoMenu(){
     const iti=S.ch<=4?[itinRow()]:[],j=misionesVer().findIndex(m=>!(m.id in S.misiones));
     const it=[{label:`CAPÍTULO ${S.ch}`,desc:`${CH_TITLES[S.ch]||''}\n${objectiveText()}`}].concat(iti)
       .concat(misionesVer().map(m=>({label:m.t,right:m.id in S.misiones?'HECHA':null,desc:m.d})))
-      .concat([{label:'DEUDA',right:eur(S.debt),desc:(S.due>0?`Plazo: ${eur(S.due)} antes de que acabe el día ${S.deadline}. Llevas ${eur(S.money+cajaE())}.\n`:'')+`Ventas ${eur(S.sales)} · Reputación ${S.rep} · Calor ${Math.round(S.heat)} %`},{label:'Volver',desc:''}]);
+      .concat([{label:'LOGROS',right:`${logrosN()}/${LOGROS.length}`,desc:'Lo que llevas conseguido en la partida. Pulsa A para verlos.'},{label:'DEUDA',right:eur(S.debt),desc:(S.due>0?`Plazo: ${eur(S.due)} antes de que acabe el día ${S.deadline}. Llevas ${eur(S.money+cajaE())}.\n`:'')+`Ventas ${eur(S.sales)} · Reputación ${S.rep} · Calor ${Math.round(S.heat)} %`},{label:'Volver',desc:''}]);
     const i=await menu(it,{cls:'full',title:'OBJETIVO',title2:'cap. '+S.ch,desc:true,initial:iti.length&&itinSig()?1:j<0?0:j+1+iti.length});
     if(iti.length&&i===1){await itinerarioMenu();continue;}
+    if(i===it.length-3){await logrosMenu();continue;}   // 1.27
     return;
   }
 }

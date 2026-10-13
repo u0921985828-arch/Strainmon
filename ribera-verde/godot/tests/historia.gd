@@ -703,7 +703,7 @@ func _pasos() -> void:
 		await run(J.talk_cop),
 		func(): return chk(J.S.buds.is_empty(), {"buds": J.S.buds}))
 	step("Menú START: Genoteca, Mochila, Plantas, Objetivo", ["GENOTECA", "<B>", "MOCHILA", "<B>", "PLANTAS", "<B>", "OBJETIVO", "<B>", "SALIR"], func(): await run(J.start_menu),
-		func(): return chk(J.handlers.is_empty() and LOG.any(func(l): return l.begins_with("  [menú] CAPÍTULO %d | %s | DEUDA | Volver" % [J.S.ch, " | ".join(PackedStringArray(J.D.MISIONES.map(func(m): return m.t)))])), LOG.slice(-4)))
+		func(): return chk(J.handlers.is_empty() and LOG.any(func(l): return l.begins_with("  [menú] CAPÍTULO %d | %s | LOGROS | DEUDA | Volver" % [J.S.ch, " | ".join(PackedStringArray(J.D.MISIONES.map(func(m): return m.t)))])), LOG.slice(-4)))
 	step("Cama: siesta de 3 horas", ["Siesta"], func():
 		J.S.min = 600
 		J.S.hp = 5
@@ -1525,7 +1525,7 @@ func _pasos() -> void:
 		J.S.deco = {}
 		J.enter_map("home", 5, 5, "up"),
 		func(): return chk(not R.q7 and R.c7 == 7 and ",".join(PackedStringArray(R.b)) == "rival" and R.fuera == D.RIVAL.dias and R.cero == 0 and is_equal_approx(R.f, 1.05) and R.otra == 0 and R.pago == 230 and R.irte == 6 and R.lejos == 8 and R.hp == 17
-			and R.obj == "cuadro,,sillon,sillon2,sofa,sofa2" and R.cuadro == "2,cuadro-2" and R.sofa == "sofa-2" and R.t == 30 and R.tienda == "sofa,tv,gpc,sillon,cuadro"
+			and R.obj == "cuadro,,sillon,sillon2,sofa,sofa2" and R.cuadro == "2,cuadro-2" and R.sofa == "sofa-2" and R.t == 30 and R.tienda == "sofa,tv,gpc,sillon,cuadro,cartel,alfombra"
 			and LOG.has("ROBER: Eh, tú. Llevas 8 ventas en el barrio alto.") and LOG.has("Te cubres: el golpe duele la mitad.") and LOG.has("Rober no volverá por el barrio alto en 7 días. Mientras, sus clientes te pagan un 5 % más."), R))
 	step("Darko y Miren (1.17): en el capítulo 8, el ajuste de cuentas con Darko en los astilleros (coge la barra: el golpe siguiente, doble, y CUBRIRSE lo deja en la mitad; si le ganas, se va y sus chicos ya no salen); Miren, la amiga de la tía Maite, en Errotabarri: 20 g de Purple Thai por la última página del diario y 5 semillas de Haze", ["^Pelear"], func():
 		J.S.ch = 8
@@ -2583,7 +2583,7 @@ func _pasos() -> void:
 		J.S = S0
 		J.montar_casa()
 		R.vacio = not h.o[5][8],
-		func(): return chk(R.libre and R.online == "sofa,tv,gpc,sillon,cuadro" and R.m == 500 - D.CARRO.p and R.ped == R.d + 1 and R.ya and R.solido and R.n == "0,3,true" and R.l1 == 4
+		func(): return chk(R.libre and R.online == "sofa,tv,gpc,sillon,cuadro,cartel,alfombra" and R.m == 500 - D.CARRO.p and R.ped == R.d + 1 and R.ya and R.solido and R.n == "0,3,true" and R.l1 == 4
 			and R.dura == 3 and R.pot and R.queda == 2 and R.seca == Datos.js_num(R.d + D.CARRO.dias) and R.redada == 0 and R.vacio
 			and LOG.any(func(l): return l.contains("Kiko te sube el carro de esquejes")), R))
 	step("Cama (1.11): la siesta que no pasa de las 12 no cobra la luz; dormir hasta las 7 pasando la medianoche cobra el día y lo dice", ["Siesta", "Dormir hasta las 7"], func():
@@ -2727,7 +2727,7 @@ func _pasos() -> void:
 		R.mig = J.S.flags.diario
 		var mov := ["choco", "oaxaca", "lamb", "kerala", "mangarosa", "hawai", "lao"]
 		R.banco = ",".join(PackedStringArray(D.BANCO.map(func(b): return b[0])))
-		R.fuera = ",".join(PackedStringArray(mov.filter(func(k): return D.BANCO.any(func(b): return b[0] == k) or not J.REGALO.has(k) or not re("Semillas: [^.]", J.donde_semilla(k)))))
+		R.fuera = ",".join(PackedStringArray(mov.filter(func(k): return D.BANCO.any(func(b): return b[0] == k) or not D.REGALO.has(k) or not re("Semillas: [^.]", J.donde_semilla(k)))))
 		J.S.seeds = {}
 		for k in mov:
 			J.S.disc.erase(k)
@@ -2989,6 +2989,65 @@ func _pasos() -> void:
 			and R.crec[0] > R.crec[1] and R.g[3] > R.g[2] and R.sig == "cosecha" and R.n == 8 and R.TO.size() == 4 and R.TO[0] == "<small>ITINERARIO · 5/14</small>Plantar<br>Ahora: Regar"
 			and R.TO[3] == "<small>ITINERARIO · 8/14</small>Abono de floración<br>Ahora: Primera cosecha" and R.fin[0] == 2 and not R.fin[1] and R.fin[2] and R.fin[3] and R.log.all(func(x): return x)
 			and R.vieja == "cosecha" and R.ph == "Abonada (crecimiento bio) · sustrato vivo · EC 0,8 · pH 7,5" and R.tarde[0] and R.tarde[1] and R.tarde[2] == 2 and R.tarde[3] and R.mark and not R.tarde[4], R))
+	step("Reformas, decoración y logros (1.27): en la tienda online, el póster, la alfombra y REFORMAS (suelo y paredes: se pagan al pedir y vienen al día siguiente; el piso cambia sus casillas, la alfombra va en el suelo nuevo y la pared sigue siendo sólida); DECORAR LA CASA en la cama; los logros con su aviso (detrás del SMS de la misión, sin pisarlo) y START → OBJETIVO → LOGROS; en una partida de antes, lo conseguido, sin aviso",
+		["Póster", "Alfombra", "Reformas", "Suelo: Baldosa", "Paredes: Pintura verde", "Volver", "Salir", "Decorar", "póster", "La ola", "alfombra", "Persa", "Listo", "LOGROS", "Volver", "Volver"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.merge({"ch": 8, "map": "home", "day": 20, "min": 12 * 60, "money": 9000, "sales": 0, "caja": {"nivel": 1, "money": 0, "buds": {}, "rosin": {}}, "muebles": {}, "deco": {}, "obra": {}}, true)
+		J.S.flags.kiko1 = true
+		var mis := {}
+		for m in D.MISIONES:
+			mis[m.id] = 0
+		J.S.misiones = mis
+		var iti := {}
+		for p in D.ITINERARIO:
+			iti[p.id] = 0
+		J.S.itin = iti
+		var lg := {}
+		for l in D.LOGROS:
+			if l.id != "casa" and l.id != "venta":
+				lg[l.id] = 0
+		J.S.logros = lg
+		J.enter_map("home", 10, 6, "up")
+		var to0 = TO
+		TO = []
+		capta = true
+		await run(J.tienda_online)
+		await idle()
+		R = {"compra": "%s %s %s" % [Datos.js_num(J.S.money), jj(J.S.obra), jj(J.S.muebles)]}
+		await run(func():
+			J.S.day += 1
+			J.llega_mueble())
+		await idle()
+		var m: Dictionary = J.MAPS.home
+		R.g = ",".join([m.g[0][3], m.g[1][3], m.g[4][3], m.g[3][13], m.g[4][14]])
+		R.o = m.o[1][4]
+		R.solido = jn([J.tile_solid(m, 3, 1), J.tile_solid(m, 13, 3)])
+		await run(J.bed_action)
+		await idle()
+		R.deco = jn([J.S.deco.cartel, J.S.deco.alfombra, J.deco_sprite("cartel"), m.g[3][13]])
+		J.S.misiones.erase("caja")
+		J.S.sales = 50
+		await run(func(): pass)
+		await idle()
+		await run(J.objetivo_menu)
+		await idle()
+		R.n = J.logros_n()
+		R.TO = TO.duplicate()
+		capta = false
+		TO = to0
+		J.S.erase("logros")
+		J.migrate()
+		R.mig = jn([J.S.logros.size() == D.LOGROS.filter(func(l): return J.logro_ok(l.id)).size(), J.S.logros.values().all(func(v): return v == 0), J.pending.size()])
+		J.S = S0
+		J.enter_map("home", 5, 5, "up"),
+		func():
+			var n: int = D.LOGROS.size()
+			return chk(R.compra == "2582 {\"suelo\":{\"v\":3,\"dia\":21},\"pared\":{\"v\":1,\"dia\":21}} {\"cartel\":21,\"alfombra\":21}" and R.g == "iwT_home-1,iwB_home-1,floor-3,alf0a-3,alf0d-3" and R.o == "cartel" and R.solido == "true,false"
+				and LOG.has("El instalador viene a primera hora: suelo nuevo, baldosa hidráulica.") and LOG.has("El pintor viene a primera hora: paredes nuevas, pintura verde salvia.")
+				and R.deco == "1,1,cartel-1,alf1a-3" and LOG.has("Cambias el dibujo del póster: la ola.") and R.n == n and R.mig == "true,true,0"
+				and "|".join(R.TO) == "Pedido: Póster enmarcado · llega mañana|Pedido: Alfombra de 180 × 140 · llega mañana|Pedido: suelo, baldosa hidráulica · mañana|Pedido: paredes, pintura verde salvia · mañana|<small>LOGRO · %d/%d</small>A tu gusto|<small>MISIÓN CUMPLIDA</small>La caja de la tía|<small>LOGRO · %d/%d</small>Primera venta" % [n - 1, n, n, n]
+				and LOG.any(func(l): return l.begins_with("  [menú] %s | Volver" % " | ".join(PackedStringArray(D.LOGROS.map(func(x): return x.t))))), R))
 	step("Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también arcón, sala, agenda, mensajes, pedidos y bolsa); con Toño ya visto, sale en el móvil", [], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))

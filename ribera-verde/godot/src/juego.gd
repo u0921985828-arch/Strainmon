@@ -111,6 +111,7 @@ func migrate() -> void:
 		S.deadline = maxi(S.get("deadline", 0) if S.get("deadline") else 0, S.day + (10 if S.ch == 5 else 7))
 	var sin_mis: bool = not S.has("misiones")
 	var sin_itin: bool = not S.has("itin")
+	var sin_log: bool = not S.has("logros")
 	var d := new_state()
 	for k in d:
 		if not S.has(k):
@@ -160,6 +161,10 @@ func migrate() -> void:
 		S.pots.append(null)
 	while S.macetas.size() < nh:
 		S.macetas.append("plastico7")
+	if sin_log:   # 1.27: lo conseguido, sin aviso (al final: con el diario de arriba)
+		for l in D.LOGROS:
+			if logro_ok(l.id):
+				S.logros[l.id] = 0
 
 # ---------- título y partida nueva ----------
 func show_title() -> void:

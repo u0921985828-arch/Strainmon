@@ -73,7 +73,7 @@ function revisaItinerario(){
 }
 async function avisoItin(){
   const ids=itinAviso.splice(0),p=ITINERARIO.find(x=>x.id===ids[ids.length-1]),s=itinSig();
-  toast(`<small>ITINERARIO · ${itinN()}/${ITINERARIO.length}</small>${p.t}`+(s?`<br>Ahora: ${s.t}`:''),2800);
+  toast(conLogro(`<small>ITINERARIO · ${itinN()}/${ITINERARIO.length}</small>${p.t}`+(s?`<br>Ahora: ${s.t}`:'')),2800);
   const j=ids.map(id=>JULEN.ok[id]).filter(Boolean);
   if(julenAqui()&&j.length)await say(j[j.length-1],'JULEN');
 }

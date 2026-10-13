@@ -345,12 +345,17 @@ function buildMaps(){
 }
 // carpas del piso según S.carpas: un mueble sólido ('carpa') en las casillas de su sitio; se pinta entero desde su base.
 // Y los muebles del salón que ya han llegado (mueblesYa, 12c-salon): k y k + '2'
-// (14-render) y por dentro se ve en la vista de carpa (09b-carpa)
+// (14-render) y por dentro se ve en la vista de carpa (09b-carpa). 1.27: el suelo y las paredes de la reforma (REFORMA: floor-v,
+// iwT_home-v, iwB_home-v; 0, las de serie) y la alfombra (suelo: 1): sus 4 trozos, alf + estampado + a/b/c/d, sobre el suelo que haya
 function montarCasa(){
   const h=MAPS.home;if(!h||!S)return;
-  const ya=mueblesYa(),key=S.carpas.map(c=>c?c.t:'-').join()+'|'+ya.join();if(h.carpasK===key)return;h.carpasK=key;
+  const ya=mueblesYa(),su=decoV('suelo'),pa=decoV('pared'),al=ya.includes('alfombra')?MUEBLES.alfombra:null;
+  const key=S.carpas.map(c=>c?c.t:'-').join()+'|'+ya.join()+'|'+[su,pa,decoV('alfombra')].join();if(h.carpasK===key)return;h.carpasK=key;
+  const vs=pa?'-'+pa:'',fs=su?'-'+su:'';
+  for(let y=0;y<h.h;y++)for(let x=0;x<h.w;x++){if(h.g[y][x]==='mat')continue;
+    h.g[y][x]=y===0?'iwT_home'+vs:y===1?'iwB_home'+vs:al&&x>=al.x&&x<=al.x+1&&y>=al.y&&y<=al.y+1?'alf'+decoV('alfombra')+'abcd'[(y-al.y)*2+x-al.x]+fs:'floor'+fs;}
   SITIOS.forEach(s=>{for(let x=s.x;x<s.x+s.w;x++)ob(h,x,s.y,null);});
-  for(const k in MUEBLES){const m=MUEBLES[k],en=ya.includes(k);ob(h,m.x,m.y,en?k:null);if(!m.uno)ob(h,m.x+1,m.y,en?k+'2':null);}
+  for(const k in MUEBLES){const m=MUEBLES[k],en=ya.includes(k);if(m.suelo)continue;ob(h,m.x,m.y,en?k:null);if(!m.uno)ob(h,m.x+1,m.y,en?k+'2':null);}
   h.carpas=[];
   S.carpas.forEach((c,ci)=>{
     if(!c)return;const s=SITIOS[ci],x0=s.x,x1=x0+CARPAS[c.t].w-1;

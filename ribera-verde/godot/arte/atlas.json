@@ -3,7 +3,7 @@
  "imagen": "atlas.png",
  "tamano": [
   1024,
-  3112
+  3128
  ],
  "frames": {
   "carpa-c-fondo/carpa-c-luz-led/unica/00": {
@@ -8010,1107 +8010,1473 @@
    "w": 48,
    "h": 16
   },
-  "gaviota/idle/unica/00": {
+  "casa-reforma/alf0a-1/unica/00": {
    "x": 592,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "gaviota/idle/unica/01": {
+  "casa-reforma/alf0a-2/unica/00": {
    "x": 608,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "gaviota/idle/unica/02": {
+  "casa-reforma/alf0a-3/unica/00": {
    "x": 624,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "gaviota/idle/unica/03": {
+  "casa-reforma/alf0a/unica/00": {
    "x": 640,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos-equipo/armario/unica/00": {
+  "casa-reforma/alf0b-1/unica/00": {
    "x": 656,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos-equipo/carpa/unica/00": {
+  "casa-reforma/alf0b-2/unica/00": {
    "x": 672,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos-equipo/filtro/unica/00": {
+  "casa-reforma/alf0b-3/unica/00": {
    "x": 688,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos-equipo/garrafa/unica/00": {
+  "casa-reforma/alf0b/unica/00": {
    "x": 704,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos-equipo/goteo/unica/00": {
+  "casa-reforma/alf0c-1/unica/00": {
    "x": 720,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos-equipo/led/unica/00": {
+  "casa-reforma/alf0c-2/unica/00": {
    "x": 736,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos-equipo/ventilador/unica/00": {
+  "casa-reforma/alf0c-3/unica/00": {
    "x": 752,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos-menu/altavoz/unica/00": {
+  "casa-reforma/alf0c/unica/00": {
    "x": 768,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos-menu/cogollo/unica/00": {
+  "casa-reforma/alf0d-1/unica/00": {
    "x": 784,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos-menu/guardar/unica/00": {
+  "casa-reforma/alf0d-2/unica/00": {
    "x": 800,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos-menu/movil/unica/00": {
+  "casa-reforma/alf0d-3/unica/00": {
    "x": 816,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos-menu/salir/unica/00": {
+  "casa-reforma/alf0d/unica/00": {
    "x": 832,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos/abono/unica/00": {
+  "casa-reforma/alf1a-1/unica/00": {
    "x": 848,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos/billetes/unica/00": {
+  "casa-reforma/alf1a-2/unica/00": {
    "x": 864,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos/bocadillo/unica/00": {
+  "casa-reforma/alf1a-3/unica/00": {
    "x": 880,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos/bolsa/unica/00": {
+  "casa-reforma/alf1a/unica/00": {
    "x": 896,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos/cogollo/unica/00": {
+  "casa-reforma/alf1b-1/unica/00": {
    "x": 912,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos/insecticida/unica/00": {
+  "casa-reforma/alf1b-2/unica/00": {
    "x": 928,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos/lampara/unica/00": {
+  "casa-reforma/alf1b-3/unica/00": {
    "x": 944,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos/maceta/unica/00": {
+  "casa-reforma/alf1b/unica/00": {
    "x": 960,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos/monedas/unica/00": {
+  "casa-reforma/alf1c-1/unica/00": {
    "x": 976,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos/polinizador/unica/00": {
+  "casa-reforma/alf1c-2/unica/00": {
    "x": 992,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos/semillas/unica/00": {
+  "casa-reforma/alf1c-3/unica/00": {
    "x": 1008,
    "y": 3048,
    "w": 16,
    "h": 16
   },
-  "iconos/spray/unica/00": {
+  "casa-reforma/alf1c/unica/00": {
    "x": 0,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf1d-1/unica/00": {
+   "x": 16,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf1d-2/unica/00": {
+   "x": 32,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf1d-3/unica/00": {
+   "x": 48,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf1d/unica/00": {
+   "x": 64,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2a-1/unica/00": {
+   "x": 80,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2a-2/unica/00": {
+   "x": 96,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2a-3/unica/00": {
+   "x": 112,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2a/unica/00": {
+   "x": 128,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2b-1/unica/00": {
+   "x": 144,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2b-2/unica/00": {
+   "x": 160,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2b-3/unica/00": {
+   "x": 176,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2b/unica/00": {
+   "x": 192,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2c-1/unica/00": {
+   "x": 208,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2c-2/unica/00": {
+   "x": 224,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2c-3/unica/00": {
+   "x": 240,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2c/unica/00": {
+   "x": 256,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2d-1/unica/00": {
+   "x": 272,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2d-2/unica/00": {
+   "x": 288,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2d-3/unica/00": {
+   "x": 304,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf2d/unica/00": {
+   "x": 320,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/floor-1/unica/00": {
+   "x": 336,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/floor-2/unica/00": {
+   "x": 352,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/floor-3/unica/00": {
+   "x": 368,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/iwB_home-1/unica/00": {
+   "x": 384,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/iwB_home-2/unica/00": {
+   "x": 400,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/iwB_home-3/unica/00": {
+   "x": 416,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/iwT_home-1/unica/00": {
+   "x": 432,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/iwT_home-2/unica/00": {
+   "x": 448,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/iwT_home-3/unica/00": {
+   "x": 464,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "gaviota/idle/unica/00": {
+   "x": 480,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "gaviota/idle/unica/01": {
+   "x": 496,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "gaviota/idle/unica/02": {
+   "x": 512,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "gaviota/idle/unica/03": {
+   "x": 528,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos-equipo/armario/unica/00": {
+   "x": 544,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos-equipo/carpa/unica/00": {
+   "x": 560,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos-equipo/filtro/unica/00": {
+   "x": 576,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos-equipo/garrafa/unica/00": {
+   "x": 592,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos-equipo/goteo/unica/00": {
+   "x": 608,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos-equipo/led/unica/00": {
+   "x": 624,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos-equipo/ventilador/unica/00": {
+   "x": 640,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos-menu/altavoz/unica/00": {
+   "x": 656,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos-menu/cogollo/unica/00": {
+   "x": 672,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos-menu/guardar/unica/00": {
+   "x": 688,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos-menu/movil/unica/00": {
+   "x": 704,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos-menu/salir/unica/00": {
+   "x": 720,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos/abono/unica/00": {
+   "x": 736,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos/billetes/unica/00": {
+   "x": 752,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos/bocadillo/unica/00": {
+   "x": 768,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos/bolsa/unica/00": {
+   "x": 784,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos/cogollo/unica/00": {
+   "x": 800,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos/insecticida/unica/00": {
+   "x": 816,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos/lampara/unica/00": {
+   "x": 832,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos/maceta/unica/00": {
+   "x": 848,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos/monedas/unica/00": {
+   "x": 864,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos/polinizador/unica/00": {
+   "x": 880,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos/semillas/unica/00": {
+   "x": 896,
+   "y": 3064,
+   "w": 16,
+   "h": 16
+  },
+  "iconos/spray/unica/00": {
+   "x": 912,
    "y": 3064,
    "w": 16,
    "h": 16
   },
   "iconos/trofeo/unica/00": {
-   "x": 16,
+   "x": 928,
    "y": 3064,
    "w": 16,
    "h": 16
   },
   "interior-bar/floorB/unica/00": {
-   "x": 32,
+   "x": 944,
    "y": 3064,
    "w": 16,
    "h": 16
   },
   "interior-bar/iwB_bar/unica/00": {
-   "x": 48,
+   "x": 960,
    "y": 3064,
    "w": 16,
    "h": 16
   },
   "interior-bar/iwT_bar/unica/00": {
-   "x": 64,
+   "x": 976,
    "y": 3064,
    "w": 16,
    "h": 16
   },
   "interior-home/floor/unica/00": {
-   "x": 80,
+   "x": 992,
    "y": 3064,
    "w": 16,
    "h": 16
   },
   "interior-home/iwB_home/unica/00": {
-   "x": 96,
+   "x": 1008,
    "y": 3064,
    "w": 16,
    "h": 16
   },
   "interior-home/iwT_home/unica/00": {
-   "x": 112,
-   "y": 3064,
+   "x": 0,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "interior-shop/floorS/unica/00": {
-   "x": 128,
-   "y": 3064,
+   "x": 16,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "interior-shop/iwB_shop/unica/00": {
-   "x": 144,
-   "y": 3064,
+   "x": 32,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "interior-shop/iwT_shop/unica/00": {
-   "x": 160,
-   "y": 3064,
+   "x": 48,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "paloma/idle/unica/00": {
-   "x": 176,
-   "y": 3064,
+   "x": 64,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "paloma/idle/unica/01": {
-   "x": 192,
-   "y": 3064,
+   "x": 80,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "paloma/idle/unica/02": {
-   "x": 208,
-   "y": 3064,
+   "x": 96,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "paloma/idle/unica/03": {
-   "x": 224,
-   "y": 3064,
+   "x": 112,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "prop-seto/seto/unica/00": {
-   "x": 240,
-   "y": 3064,
+   "x": 128,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/barcounter/unica/00": {
-   "x": 256,
-   "y": 3064,
+   "x": 144,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/bench/unica/00": {
-   "x": 272,
-   "y": 3064,
+   "x": 160,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/bottles/unica/00": {
-   "x": 288,
-   "y": 3064,
+   "x": 176,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/btable/unica/00": {
-   "x": 304,
-   "y": 3064,
+   "x": 192,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/bush/unica/00": {
-   "x": 320,
-   "y": 3064,
+   "x": 208,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/counter/unica/00": {
-   "x": 336,
-   "y": 3064,
+   "x": 224,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/crate/unica/00": {
-   "x": 352,
-   "y": 3064,
+   "x": 240,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/display/unica/00": {
-   "x": 368,
-   "y": 3064,
+   "x": 256,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/fence/unica/00": {
-   "x": 384,
-   "y": 3064,
+   "x": 272,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/iwin/unica/00": {
-   "x": 400,
-   "y": 3064,
+   "x": 288,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/jukebox/unica/00": {
-   "x": 416,
-   "y": 3064,
+   "x": 304,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/lab/unica/00": {
-   "x": 432,
-   "y": 3064,
+   "x": 320,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/lab2/unica/00": {
-   "x": 448,
-   "y": 3064,
+   "x": 336,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/luces/unica/00": {
-   "x": 464,
-   "y": 3064,
+   "x": 352,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/luces/unica/01": {
-   "x": 480,
-   "y": 3064,
+   "x": 368,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/luces/unica/02": {
-   "x": 496,
-   "y": 3064,
+   "x": 384,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/luces/unica/03": {
-   "x": 512,
-   "y": 3064,
+   "x": 400,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/pc/unica/00": {
-   "x": 528,
-   "y": 3064,
+   "x": 416,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/plantDeco/unica/00": {
-   "x": 544,
-   "y": 3064,
+   "x": 432,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/poster/unica/00": {
-   "x": 560,
-   "y": 3064,
+   "x": 448,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/shelfW/unica/00": {
-   "x": 576,
-   "y": 3064,
+   "x": 464,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/sign/unica/00": {
-   "x": 592,
-   "y": 3064,
+   "x": 480,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/stool/unica/00": {
-   "x": 608,
-   "y": 3064,
+   "x": 496,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-16/table/unica/00": {
-   "x": 624,
-   "y": 3064,
+   "x": 512,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-altura/barcounter/unica/00": {
-   "x": 640,
-   "y": 3064,
+   "x": 528,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "props-altura/counter/unica/00": {
-   "x": 656,
-   "y": 3064,
+   "x": 544,
+   "y": 3080,
+   "w": 16,
+   "h": 16
+  },
+  "salon-pared/cartel-1/unica/00": {
+   "x": 560,
+   "y": 3080,
+   "w": 16,
+   "h": 16
+  },
+  "salon-pared/cartel-2/unica/00": {
+   "x": 576,
+   "y": 3080,
+   "w": 16,
+   "h": 16
+  },
+  "salon-pared/cartel-3/unica/00": {
+   "x": 592,
+   "y": 3080,
+   "w": 16,
+   "h": 16
+  },
+  "salon-pared/cartel/unica/00": {
+   "x": 608,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "salon-pared/cuadro-1/unica/00": {
-   "x": 672,
-   "y": 3064,
+   "x": 624,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "salon-pared/cuadro-2/unica/00": {
-   "x": 688,
-   "y": 3064,
+   "x": 640,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "salon-pared/cuadro/unica/00": {
-   "x": 704,
-   "y": 3064,
+   "x": 656,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/bridgeB/unica/00": {
-   "x": 720,
-   "y": 3064,
+   "x": 672,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/bridgeT/unica/00": {
-   "x": 736,
-   "y": 3064,
+   "x": 688,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/dirt/unica/00": {
-   "x": 752,
-   "y": 3064,
+   "x": 704,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/dock/unica/00": {
-   "x": 768,
-   "y": 3064,
+   "x": 720,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/flowers/unica/00": {
-   "x": 784,
-   "y": 3064,
+   "x": 736,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/grass/unica/00": {
-   "x": 800,
-   "y": 3064,
+   "x": 752,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/plaza/unica/00": {
-   "x": 816,
-   "y": 3064,
+   "x": 768,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/roadB/unica/00": {
-   "x": 832,
-   "y": 3064,
+   "x": 784,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/roadT/unica/00": {
-   "x": 848,
-   "y": 3064,
+   "x": 800,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/tallgrass/unica/00": {
-   "x": 864,
-   "y": 3064,
+   "x": 816,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/walk/unica/00": {
-   "x": 880,
-   "y": 3064,
+   "x": 832,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/water/unica/00": {
-   "x": 896,
-   "y": 3064,
+   "x": 848,
+   "y": 3080,
    "w": 16,
    "h": 16
   },
   "tiles-firmes/hormigon/unica/00": {
-   "x": 912,
-   "y": 3064,
+   "x": 864,
+   "y": 3080,
    "w": 64,
    "h": 16
   },
   "tiles-firmes/pista/unica/00": {
-   "x": 0,
+   "x": 928,
    "y": 3080,
    "w": 64,
    "h": 16
   },
   "tiles-firmes/rotoB/unica/00": {
-   "x": 64,
-   "y": 3080,
+   "x": 0,
+   "y": 3096,
    "w": 64,
    "h": 16
   },
   "tiles-firmes/rotoT/unica/00": {
-   "x": 128,
-   "y": 3080,
+   "x": 64,
+   "y": 3096,
    "w": 64,
    "h": 16
   },
   "tiles-interior-extra/mat/unica/00": {
-   "x": 192,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-01/unica/00": {
-   "x": 208,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-02/unica/00": {
-   "x": 224,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-03/unica/00": {
-   "x": 240,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-04/unica/00": {
-   "x": 256,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-05/unica/00": {
-   "x": 272,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-06/unica/00": {
-   "x": 288,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-07/unica/00": {
-   "x": 304,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-08/unica/00": {
-   "x": 320,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-09/unica/00": {
-   "x": 336,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-10/unica/00": {
-   "x": 352,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-11/unica/00": {
-   "x": 368,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-12/unica/00": {
-   "x": 384,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-13/unica/00": {
-   "x": 400,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/agua-14/unica/00": {
-   "x": 416,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-01/unica/00": {
-   "x": 432,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-02/unica/00": {
-   "x": 448,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-03/unica/00": {
-   "x": 464,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-04/unica/00": {
-   "x": 480,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-05/unica/00": {
-   "x": 496,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-06/unica/00": {
-   "x": 512,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-07/unica/00": {
-   "x": 528,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-08/unica/00": {
-   "x": 544,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-09/unica/00": {
-   "x": 560,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-10/unica/00": {
-   "x": 576,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-11/unica/00": {
-   "x": 592,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-12/unica/00": {
-   "x": 608,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-13/unica/00": {
-   "x": 624,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/plaza-14/unica/00": {
-   "x": 640,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-01/unica/00": {
-   "x": 656,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-02/unica/00": {
-   "x": 672,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-03/unica/00": {
-   "x": 688,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-04/unica/00": {
-   "x": 704,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-05/unica/00": {
-   "x": 720,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-06/unica/00": {
-   "x": 736,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-07/unica/00": {
-   "x": 752,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-08/unica/00": {
-   "x": 768,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-09/unica/00": {
-   "x": 784,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-10/unica/00": {
-   "x": 800,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-11/unica/00": {
-   "x": 816,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-12/unica/00": {
-   "x": 832,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-13/unica/00": {
-   "x": 848,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-14/unica/00": {
-   "x": 864,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-acaros/efecto/unica/00": {
-   "x": 880,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-acaros/efecto/unica/01": {
-   "x": 896,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-acaros/efecto/unica/02": {
-   "x": 912,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-acaros/efecto/unica/03": {
-   "x": 928,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-brillo/efecto/unica/00": {
-   "x": 944,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-brillo/efecto/unica/01": {
-   "x": 960,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-brillo/efecto/unica/02": {
-   "x": 976,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-brillo/efecto/unica/03": {
-   "x": 992,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-golpe/efecto/unica/00": {
-   "x": 1008,
-   "y": 3080,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-golpe/efecto/unica/01": {
-   "x": 0,
-   "y": 3096,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-golpe/efecto/unica/02": {
-   "x": 16,
-   "y": 3096,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-golpe/efecto/unica/03": {
-   "x": 32,
-   "y": 3096,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-gotas/efecto/unica/00": {
-   "x": 48,
-   "y": 3096,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-gotas/efecto/unica/01": {
-   "x": 64,
-   "y": 3096,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-gotas/efecto/unica/02": {
-   "x": 80,
-   "y": 3096,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-gotas/efecto/unica/03": {
-   "x": 96,
-   "y": 3096,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-humo-cigarro/efecto/unica/00": {
-   "x": 112,
-   "y": 3096,
-   "w": 16,
-   "h": 16
-  },
-  "vfx-humo-cigarro/efecto/unica/01": {
    "x": 128,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/02": {
+  "tileset-transiciones/agua-01/unica/00": {
    "x": 144,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/03": {
+  "tileset-transiciones/agua-02/unica/00": {
    "x": 160,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/04": {
+  "tileset-transiciones/agua-03/unica/00": {
    "x": 176,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/05": {
+  "tileset-transiciones/agua-04/unica/00": {
    "x": 192,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/00": {
+  "tileset-transiciones/agua-05/unica/00": {
    "x": 208,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/01": {
+  "tileset-transiciones/agua-06/unica/00": {
    "x": 224,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/02": {
+  "tileset-transiciones/agua-07/unica/00": {
    "x": 240,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/03": {
+  "tileset-transiciones/agua-08/unica/00": {
    "x": 256,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/04": {
+  "tileset-transiciones/agua-09/unica/00": {
    "x": 272,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/05": {
+  "tileset-transiciones/agua-10/unica/00": {
    "x": 288,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/00": {
+  "tileset-transiciones/agua-11/unica/00": {
    "x": 304,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/01": {
+  "tileset-transiciones/agua-12/unica/00": {
    "x": 320,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/02": {
+  "tileset-transiciones/agua-13/unica/00": {
    "x": 336,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/03": {
+  "tileset-transiciones/agua-14/unica/00": {
    "x": 352,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/04": {
+  "tileset-transiciones/plaza-01/unica/00": {
    "x": 368,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/05": {
+  "tileset-transiciones/plaza-02/unica/00": {
    "x": 384,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/00": {
+  "tileset-transiciones/plaza-03/unica/00": {
    "x": 400,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/01": {
+  "tileset-transiciones/plaza-04/unica/00": {
    "x": 416,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/02": {
+  "tileset-transiciones/plaza-05/unica/00": {
    "x": 432,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/03": {
+  "tileset-transiciones/plaza-06/unica/00": {
    "x": 448,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/04": {
+  "tileset-transiciones/plaza-07/unica/00": {
    "x": 464,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/05": {
+  "tileset-transiciones/plaza-08/unica/00": {
    "x": 480,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/00": {
+  "tileset-transiciones/plaza-09/unica/00": {
    "x": 496,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/01": {
+  "tileset-transiciones/plaza-10/unica/00": {
    "x": 512,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/02": {
+  "tileset-transiciones/plaza-11/unica/00": {
    "x": 528,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/03": {
+  "tileset-transiciones/plaza-12/unica/00": {
    "x": 544,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/04": {
+  "tileset-transiciones/plaza-13/unica/00": {
    "x": 560,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/05": {
+  "tileset-transiciones/plaza-14/unica/00": {
    "x": 576,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/00": {
+  "tileset-transiciones/tierra-01/unica/00": {
    "x": 592,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/01": {
+  "tileset-transiciones/tierra-02/unica/00": {
    "x": 608,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/02": {
+  "tileset-transiciones/tierra-03/unica/00": {
    "x": 624,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/03": {
+  "tileset-transiciones/tierra-04/unica/00": {
    "x": 640,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/04": {
+  "tileset-transiciones/tierra-05/unica/00": {
    "x": 656,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/05": {
+  "tileset-transiciones/tierra-06/unica/00": {
    "x": 672,
    "y": 3096,
    "w": 16,
    "h": 16
   },
-  "detalles-hierba/detalles/unica/00": {
+  "tileset-transiciones/tierra-07/unica/00": {
    "x": 688,
    "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-08/unica/00": {
+   "x": 704,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-09/unica/00": {
+   "x": 720,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-10/unica/00": {
+   "x": 736,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-11/unica/00": {
+   "x": 752,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-12/unica/00": {
+   "x": 768,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-13/unica/00": {
+   "x": 784,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "tileset-transiciones/tierra-14/unica/00": {
+   "x": 800,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-acaros/efecto/unica/00": {
+   "x": 816,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-acaros/efecto/unica/01": {
+   "x": 832,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-acaros/efecto/unica/02": {
+   "x": 848,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-acaros/efecto/unica/03": {
+   "x": 864,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-brillo/efecto/unica/00": {
+   "x": 880,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-brillo/efecto/unica/01": {
+   "x": 896,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-brillo/efecto/unica/02": {
+   "x": 912,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-brillo/efecto/unica/03": {
+   "x": 928,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-golpe/efecto/unica/00": {
+   "x": 944,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-golpe/efecto/unica/01": {
+   "x": 960,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-golpe/efecto/unica/02": {
+   "x": 976,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-golpe/efecto/unica/03": {
+   "x": 992,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-gotas/efecto/unica/00": {
+   "x": 1008,
+   "y": 3096,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-gotas/efecto/unica/01": {
+   "x": 0,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-gotas/efecto/unica/02": {
+   "x": 16,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-gotas/efecto/unica/03": {
+   "x": 32,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-cigarro/efecto/unica/00": {
+   "x": 48,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-cigarro/efecto/unica/01": {
+   "x": 64,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-cigarro/efecto/unica/02": {
+   "x": 80,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-cigarro/efecto/unica/03": {
+   "x": 96,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-cigarro/efecto/unica/04": {
+   "x": 112,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-cigarro/efecto/unica/05": {
+   "x": 128,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-pipa/efecto/unica/00": {
+   "x": 144,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-pipa/efecto/unica/01": {
+   "x": 160,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-pipa/efecto/unica/02": {
+   "x": 176,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-pipa/efecto/unica/03": {
+   "x": 192,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-pipa/efecto/unica/04": {
+   "x": 208,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-pipa/efecto/unica/05": {
+   "x": 224,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-porro/efecto/unica/00": {
+   "x": 240,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-porro/efecto/unica/01": {
+   "x": 256,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-porro/efecto/unica/02": {
+   "x": 272,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-porro/efecto/unica/03": {
+   "x": 288,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-porro/efecto/unica/04": {
+   "x": 304,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-porro/efecto/unica/05": {
+   "x": 320,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-puro/efecto/unica/00": {
+   "x": 336,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-puro/efecto/unica/01": {
+   "x": 352,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-puro/efecto/unica/02": {
+   "x": 368,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-puro/efecto/unica/03": {
+   "x": 384,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-puro/efecto/unica/04": {
+   "x": 400,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-humo-puro/efecto/unica/05": {
+   "x": 416,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-monedas/efecto/unica/00": {
+   "x": 432,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-monedas/efecto/unica/01": {
+   "x": 448,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-monedas/efecto/unica/02": {
+   "x": 464,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-monedas/efecto/unica/03": {
+   "x": 480,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-monedas/efecto/unica/04": {
+   "x": 496,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-monedas/efecto/unica/05": {
+   "x": 512,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/00": {
+   "x": 528,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/01": {
+   "x": 544,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/02": {
+   "x": 560,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/03": {
+   "x": 576,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/04": {
+   "x": 592,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/05": {
+   "x": 608,
+   "y": 3112,
+   "w": 16,
+   "h": 16
+  },
+  "detalles-hierba/detalles/unica/00": {
+   "x": 624,
+   "y": 3112,
    "w": 40,
    "h": 8
   }
@@ -9842,6 +10208,14 @@
    "ancla": [
     24,
     15
+   ]
+  },
+  "casa-reforma": {
+   "w": 16,
+   "h": 16,
+   "ancla": [
+    0,
+    0
    ]
   },
   "gaviota": {
@@ -14832,6 +15206,521 @@
     }
    }
   },
+  "casa-reforma": {
+   "alf0a-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0a-1/unica/00"
+     ]
+    }
+   },
+   "alf0a-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0a-2/unica/00"
+     ]
+    }
+   },
+   "alf0a-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0a-3/unica/00"
+     ]
+    }
+   },
+   "alf0a": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0a/unica/00"
+     ]
+    }
+   },
+   "alf0b-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0b-1/unica/00"
+     ]
+    }
+   },
+   "alf0b-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0b-2/unica/00"
+     ]
+    }
+   },
+   "alf0b-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0b-3/unica/00"
+     ]
+    }
+   },
+   "alf0b": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0b/unica/00"
+     ]
+    }
+   },
+   "alf0c-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0c-1/unica/00"
+     ]
+    }
+   },
+   "alf0c-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0c-2/unica/00"
+     ]
+    }
+   },
+   "alf0c-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0c-3/unica/00"
+     ]
+    }
+   },
+   "alf0c": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0c/unica/00"
+     ]
+    }
+   },
+   "alf0d-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0d-1/unica/00"
+     ]
+    }
+   },
+   "alf0d-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0d-2/unica/00"
+     ]
+    }
+   },
+   "alf0d-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0d-3/unica/00"
+     ]
+    }
+   },
+   "alf0d": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf0d/unica/00"
+     ]
+    }
+   },
+   "alf1a-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1a-1/unica/00"
+     ]
+    }
+   },
+   "alf1a-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1a-2/unica/00"
+     ]
+    }
+   },
+   "alf1a-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1a-3/unica/00"
+     ]
+    }
+   },
+   "alf1a": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1a/unica/00"
+     ]
+    }
+   },
+   "alf1b-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1b-1/unica/00"
+     ]
+    }
+   },
+   "alf1b-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1b-2/unica/00"
+     ]
+    }
+   },
+   "alf1b-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1b-3/unica/00"
+     ]
+    }
+   },
+   "alf1b": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1b/unica/00"
+     ]
+    }
+   },
+   "alf1c-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1c-1/unica/00"
+     ]
+    }
+   },
+   "alf1c-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1c-2/unica/00"
+     ]
+    }
+   },
+   "alf1c-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1c-3/unica/00"
+     ]
+    }
+   },
+   "alf1c": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1c/unica/00"
+     ]
+    }
+   },
+   "alf1d-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1d-1/unica/00"
+     ]
+    }
+   },
+   "alf1d-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1d-2/unica/00"
+     ]
+    }
+   },
+   "alf1d-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1d-3/unica/00"
+     ]
+    }
+   },
+   "alf1d": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf1d/unica/00"
+     ]
+    }
+   },
+   "alf2a-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2a-1/unica/00"
+     ]
+    }
+   },
+   "alf2a-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2a-2/unica/00"
+     ]
+    }
+   },
+   "alf2a-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2a-3/unica/00"
+     ]
+    }
+   },
+   "alf2a": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2a/unica/00"
+     ]
+    }
+   },
+   "alf2b-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2b-1/unica/00"
+     ]
+    }
+   },
+   "alf2b-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2b-2/unica/00"
+     ]
+    }
+   },
+   "alf2b-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2b-3/unica/00"
+     ]
+    }
+   },
+   "alf2b": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2b/unica/00"
+     ]
+    }
+   },
+   "alf2c-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2c-1/unica/00"
+     ]
+    }
+   },
+   "alf2c-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2c-2/unica/00"
+     ]
+    }
+   },
+   "alf2c-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2c-3/unica/00"
+     ]
+    }
+   },
+   "alf2c": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2c/unica/00"
+     ]
+    }
+   },
+   "alf2d-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2d-1/unica/00"
+     ]
+    }
+   },
+   "alf2d-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2d-2/unica/00"
+     ]
+    }
+   },
+   "alf2d-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2d-3/unica/00"
+     ]
+    }
+   },
+   "alf2d": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/alf2d/unica/00"
+     ]
+    }
+   },
+   "floor-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/floor-1/unica/00"
+     ]
+    }
+   },
+   "floor-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/floor-2/unica/00"
+     ]
+    }
+   },
+   "floor-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/floor-3/unica/00"
+     ]
+    }
+   },
+   "iwB_home-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/iwB_home-1/unica/00"
+     ]
+    }
+   },
+   "iwB_home-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/iwB_home-2/unica/00"
+     ]
+    }
+   },
+   "iwB_home-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/iwB_home-3/unica/00"
+     ]
+    }
+   },
+   "iwT_home-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/iwT_home-1/unica/00"
+     ]
+    }
+   },
+   "iwT_home-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/iwT_home-2/unica/00"
+     ]
+    }
+   },
+   "iwT_home-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "casa-reforma/iwT_home-3/unica/00"
+     ]
+    }
+   }
+  },
   "gaviota": {
    "idle": {
     "fps": 6,
@@ -15405,6 +16294,42 @@
    }
   },
   "salon-pared": {
+   "cartel-1": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "salon-pared/cartel-1/unica/00"
+     ]
+    }
+   },
+   "cartel-2": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "salon-pared/cartel-2/unica/00"
+     ]
+    }
+   },
+   "cartel-3": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "salon-pared/cartel-3/unica/00"
+     ]
+    }
+   },
+   "cartel": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "salon-pared/cartel/unica/00"
+     ]
+    }
+   },
    "cuadro-1": {
     "fps": 0,
     "bucle": false,
@@ -16332,6 +17257,63 @@
   "misc:foco-c-40": "carpa-c-focos",
   "misc:foco-c-44": "carpa-c-focos",
   "misc:foco-c-46": "carpa-c-focos",
+  "tile:alf0a": "casa-reforma",
+  "tile:alf0a-1": "casa-reforma",
+  "tile:alf0a-2": "casa-reforma",
+  "tile:alf0a-3": "casa-reforma",
+  "tile:alf0b": "casa-reforma",
+  "tile:alf0b-1": "casa-reforma",
+  "tile:alf0b-2": "casa-reforma",
+  "tile:alf0b-3": "casa-reforma",
+  "tile:alf0c": "casa-reforma",
+  "tile:alf0c-1": "casa-reforma",
+  "tile:alf0c-2": "casa-reforma",
+  "tile:alf0c-3": "casa-reforma",
+  "tile:alf0d": "casa-reforma",
+  "tile:alf0d-1": "casa-reforma",
+  "tile:alf0d-2": "casa-reforma",
+  "tile:alf0d-3": "casa-reforma",
+  "tile:alf1a": "casa-reforma",
+  "tile:alf1a-1": "casa-reforma",
+  "tile:alf1a-2": "casa-reforma",
+  "tile:alf1a-3": "casa-reforma",
+  "tile:alf1b": "casa-reforma",
+  "tile:alf1b-1": "casa-reforma",
+  "tile:alf1b-2": "casa-reforma",
+  "tile:alf1b-3": "casa-reforma",
+  "tile:alf1c": "casa-reforma",
+  "tile:alf1c-1": "casa-reforma",
+  "tile:alf1c-2": "casa-reforma",
+  "tile:alf1c-3": "casa-reforma",
+  "tile:alf1d": "casa-reforma",
+  "tile:alf1d-1": "casa-reforma",
+  "tile:alf1d-2": "casa-reforma",
+  "tile:alf1d-3": "casa-reforma",
+  "tile:alf2a": "casa-reforma",
+  "tile:alf2a-1": "casa-reforma",
+  "tile:alf2a-2": "casa-reforma",
+  "tile:alf2a-3": "casa-reforma",
+  "tile:alf2b": "casa-reforma",
+  "tile:alf2b-1": "casa-reforma",
+  "tile:alf2b-2": "casa-reforma",
+  "tile:alf2b-3": "casa-reforma",
+  "tile:alf2c": "casa-reforma",
+  "tile:alf2c-1": "casa-reforma",
+  "tile:alf2c-2": "casa-reforma",
+  "tile:alf2c-3": "casa-reforma",
+  "tile:alf2d": "casa-reforma",
+  "tile:alf2d-1": "casa-reforma",
+  "tile:alf2d-2": "casa-reforma",
+  "tile:alf2d-3": "casa-reforma",
+  "tile:floor-1": "casa-reforma",
+  "tile:floor-2": "casa-reforma",
+  "tile:floor-3": "casa-reforma",
+  "tile:iwB_home-1": "casa-reforma",
+  "tile:iwB_home-2": "casa-reforma",
+  "tile:iwB_home-3": "casa-reforma",
+  "tile:iwT_home-1": "casa-reforma",
+  "tile:iwT_home-2": "casa-reforma",
+  "tile:iwT_home-3": "casa-reforma",
   "misc:bolsa": "iconos",
   "tile:floorB": "interior-bar",
   "tile:iwT_bar": "interior-bar",
@@ -16362,6 +17344,7 @@
   "obj:counter": "props-altura",
   "obj:barcounter": "props-altura",
   "obj:cuadro": "salon-pared",
+  "obj:cartel": "salon-pared",
   "tile:hormigon": "tiles-firmes",
   "tile:pista": "tiles-firmes",
   "tile:rotoT": "tiles-firmes",

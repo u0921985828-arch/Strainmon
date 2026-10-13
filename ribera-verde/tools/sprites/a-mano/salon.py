@@ -95,6 +95,39 @@ def cuadro(n):
     L.contorno('#2a2a34')
     return L
 
+def cartel(n):
+    """(1.27) el póster del dormitorio, encima del ordenador de la tía (celda objeto_1x1, 16 × 16; ALZA lo sube): 50 × 70 cm con
+    marco de aluminio (11 × 14 px) y uno de cuatro dibujos"""
+    L = Lienzo(16, 16); A0, A1, A2 = '#5a5e66', '#8a8e96', '#c4c8d0'
+    L.r(3, 1, 11, 14, A1); L.hl(3, 13, 1, A2); L.vl(3, 2, 14, A2); L.vl(13, 2, 14, A0); L.hl(4, 13, 14, A0)
+    x0, y0, w, h = 4, 2, 9, 12                                            # el dibujo, dentro del marco
+    if n == 0:                                                            # el faro al atardecer: rayas rojas y blancas sobre las rocas
+        L.r(x0, y0, w, 4, '#f2b26a'); L.r(x0, 6, w, 3, '#e08a62'); L.r(x0, 9, w, 5, '#3a5e9a')
+        L.hl(5, 6, 12, '#7aa4d8'); L.hl(10, 11, 11, '#7aa4d8')
+        L.r(7, 4, 3, 6, '#f4f4ee'); L.hl(7, 9, 5, '#c83a34'); L.hl(7, 9, 7, '#c83a34'); L.hl(7, 9, 9, '#c83a34')
+        L.hl(7, 9, 3, '#2a2a34'); L.p(8, 2, '#2a2a34'); L.p(8, 3, '#ffe890')
+        L.hl(5, 11, 10, '#4a4a52'); L.hl(6, 10, 11, '#4a4a52')
+    elif n == 1:                                                          # la ola: el rizo azul con su espuma y el sol
+        L.r(x0, y0, w, h, '#f0e6cc'); L.r(10, 3, 2, 2, '#e86a3a')
+        for x, ya in ((4, 9), (5, 8), (6, 7), (7, 6), (8, 6), (9, 7), (10, 8), (11, 9), (12, 10)):
+            L.vl(x, ya, 13, '#2e6aa8')
+        L.hl(6, 8, 6, '#ffffff'); L.p(9, 7, '#ffffff'); L.p(8, 7, '#7ab4e0'); L.p(8, 8, '#f0e6cc'); L.p(7, 8, '#7ab4e0')
+        L.hl(4, 12, 12, '#7ab4e0'); L.hl(4, 12, 13, '#1e4a80')
+    elif n == 2:                                                          # la planta en flor, como en un libro de botánica
+        L.r(x0, y0, w, h, '#f2ecd8'); G1, G2, C = '#3f7a3a', '#5aa04a', '#7ab84e'
+        L.vl(8, 5, 12, G1)
+        for (x, y) in ((7, 9), (6, 9), (5, 8), (9, 9), (10, 9), (11, 8), (7, 11), (6, 12), (9, 11), (10, 12)): L.p(x, y, G2)
+        L.r(7, 3, 3, 3, C); L.p(8, 2, C); L.p(7, 4, '#e08a3a'); L.p(9, 3, '#e08a3a'); L.p(8, 5, '#e08a3a')
+        L.hl(6, 10, 13, '#8a7a5a')
+    else:                                                                 # el mapa de la costa: la orilla, la ruta y la rosa de los vientos
+        L.r(x0, y0, w, h, '#e8d8a8'); L.hl(x0, 12, 2, '#cdb880'); L.hl(x0, 12, 13, '#cdb880')
+        for y, xs in ((3, 10), (4, 9), (5, 9), (6, 10), (7, 11), (8, 11), (9, 10), (10, 9), (11, 9), (12, 10)):
+            L.hl(xs, 12, y, '#8ab8d8'); L.p(xs - 1, y, '#6a5a3a')
+        for (x, y) in ((5, 11), (6, 9), (6, 7), (7, 5), (8, 4)): L.p(x, y, '#c0443a')
+        L.p(5, 3, '#4a4a52'); L.p(4, 4, '#4a4a52'); L.p(6, 4, '#4a4a52'); L.p(5, 5, '#4a4a52'); L.p(5, 4, '#c0443a')
+    L.contorno('#2a2a34')
+    return L
+
 def tv():
     L = Lienzo(48, 48); M0, M1, M2, M3 = '#3e2a1a', '#5e4028', '#7e5836', '#9e744a'
     x0, x1 = 13, 34                                                       # mueble de 140 cm: 22 px
@@ -236,6 +269,7 @@ sale('cogollo', cogollo(), 'iconos-menu')
 for i, t in enumerate(TAP_SOFA): sale('sofa' + (f'-{i}' if i else ''), sofa(t))
 for i, t in enumerate(TAP_SILLON): sale('sillon' + (f'-{i}' if i else ''), sillon(t))
 for i in range(3): sale('cuadro' + (f'-{i}' if i else ''), cuadro(i), 'salon-pared')
+for i in range(4): sale('cartel' + (f'-{i}' if i else ''), cartel(i), 'salon-pared')   # 1.27
 sale('tv', tv())
 sale('gpc', gpc())
 sale('carro', carro())

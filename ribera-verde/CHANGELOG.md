@@ -1,5 +1,17 @@
 # Cambios
 
+## 1.27.0 · 13 de octubre de 2026
+
+La casa a tu gusto y los logros. Godot, 0.21.0.
+
+- **Nuevo: reformas del piso**, en la tienda online (REFORMAS: SUELO Y PAREDES). El suelo, en tarima de roble (la de serie), de nogal, vinílico gris o baldosa hidráulica, y las paredes, en papel crema de rayas (el de serie), pintura verde salvia o azul grisáceo, o ladrillo visto, con precios reales por los 108 m² de suelo y unos 120 m² de pared, colocación incluida. Se paga al pedir y el instalador o el pintor viene al día siguiente; lo que ya tienes sale como «en casa». Arte a mano: `tools/sprites/a-mano/casa.py` (asset `casa-reforma`).
+- **Nuevo en la tienda online: un póster enmarcado** (39 €; el faro, la ola, la planta en flor o el mapa de la costa), en la pared del dormitorio, encima del ordenador, y **una alfombra de 180 × 140** (129 €; bereber crema, persa granate o lisa gris) para el salón, entre la tele y el sofá: se pisa y va sobre el suelo que tengas.
+- **DECORAR LA CASA en la cama**: el tapizado del sofá y del sillón, la lámina del cuadro, el dibujo del póster y el estampado de la alfombra, todo en un sitio.
+- **Nuevo: LOGROS**, en START → OBJETIVO → LOGROS: 26, de la primera venta y la primera cosecha a la Jack Herer, la Genoteca completa, las landraces de la tía, el rosin, la cata, el club, el goteo, los plazos, la deuda saldada, las ventas, los rivales, Darko, la plantilla, la nave, las ruedas y la casa reformada, cada uno con el día en que se consiguió. Al conseguir uno sale su aviso; si a la vez llega el de la misión o el del itinerario, va debajo, en el mismo aviso, para que no se pisen. En las partidas de antes, lo ya conseguido se apunta sin aviso.
+- Igual en Godot.
+- **Arreglado (pruebas de Godot):** el paso de la 1.25 de `historia.gd` leía `REGALO` del juego en vez de los datos (7 errores de script, sin cambiar el resultado).
+- Tests: `npm test` 109/109 (paso nuevo: reformas, póster y alfombra en la tienda online, al día siguiente; DECORAR LA CASA; los logros, su aviso detrás del de la misión y en una partida de antes); `test:arte` 29/29; Godot, historia 109 pasos, 41 pantallas (`casa-reforma`, `casa-reforma2`) y el ciclo, con LOGROS en OBJETIVO.
+
 ## 1.26.0 · 13 de octubre de 2026
 
 Más genéticas, todas reales: 87 variedades y 50 de receta. Ninguna landrace ni ningún linaje inventado. Godot, 0.20.0.
