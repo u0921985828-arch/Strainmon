@@ -646,7 +646,10 @@ func estabilizar(k: String) -> void:
 # El aviso dice solo la luz pagada durmiendo (1.11): la factura es de un día entero, a medianoche (new_day); una siesta que no pasa de las 12, nada
 func bed_action(txt := ""):
 	var piso: bool = S.map == "home"
-	var c: int = await ask(txt if txt else "Tu cama. Todavía huele a la colonia de la tía.", ["Dormir hasta las 7", "Siesta de 3 h", "Nada"])
+	var c: int = await ask(txt if txt else "Tu cama. Todavía huele a la colonia de la tía.", ["Dormir hasta las 7", "Siesta de 3 h"] + (["Cambiarte de ropa"] if piso else []) + ["Nada"])
+	if piso and c == 2:   # ropa y pelo (1.21)
+		await vestirte()
+		return
 	if c > 1:
 		return
 	await fade(1)
@@ -842,6 +845,29 @@ func cambiar_deco(k: String) -> void:
 	S.deco[k] = i
 	sfx("sel")
 	await say("Cambias %s %s: %s." % [Dk.q, ("de " + D.MUEBLES[k].art).replace("de el ", "del "), Dk.v[i].to_lower()])
+
+# ropa y pelo (1.21, vestirte): desde la cama del piso, la camiseta, el pantalón, la gorra y el pelo (S.ropa[k], índice en ROPA[k].v)
+func vestirte() -> void:
+	while true:
+		var ks: Array = D.ROPA.keys()
+		var items := []
+		for k in ks:
+			items.append({"label": "%s: %s" % [D.ROPA[k].n, String(D.ROPA[k].v[ropa_v(k)][0]).to_lower()]})
+		items.append({"label": "Listo"})
+		var i: int = await menu(items, {"title": "Ropa y pelo"})
+		if i < 0 or i >= ks.size():
+			return
+		var k: String = ks[i]
+		var R: Dictionary = D.ROPA[k]
+		var v := ropa_v(k)
+		var its := []
+		for n in R.v.size():
+			its.append({"label": R.v[n][0] + (" · ahora" if n == v else "")})
+		its.append({"label": "Volver"})
+		var j: int = await menu(its, {"title": R.n, "initial": v})
+		if j >= 0 and j < R.v.size() and j != v:
+			S.ropa[k] = j
+			sfx("sel")
 
 func tienda_online() -> void:
 	var i := 0

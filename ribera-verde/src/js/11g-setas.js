@@ -44,8 +44,9 @@ async function talkTxomin(){
     const op=ops[await ask(`El bajo: ${est}${hum.length?' · humedad '+Math.round(hum.reduce((a,b)=>a+b.hum,0)/hum.length)+' %':''}.`,ops,T)];
     if(!op||op==='Nada')return;
     if(op.startsWith('Comprar')){if(S.money<SETAS.bandeja){sfx('bad');await say('Sin dinero no hay bandeja.',T);continue;}
-      S.money-=SETAS.bandeja;B.push({d:S.day,hum:100});sfx('coin');await say(`Lista para colonizar. En ${SETAS.colon} días la ha cogido el micelio; ${SETAS.fruto} más y a recoger.`,T);continue;}
-    if(op==='Pulverizar'){hum.forEach(b=>b.hum=100);advanceTime(SETAS.min);updateHUD();sfx('sel');await say('Pulverizas las bandejas: humedad al 100 %.');continue;}
+      S.money-=SETAS.bandeja;B.push({d:S.day,hum:100});sfx('coin');await say(`Lista para colonizar. En ${SETAS.colon} días la habrá cogido el micelio; ${SETAS.fruto} más y a recoger.`,T);continue;}
+    if(op==='Pulverizar'){hum.forEach(b=>b.hum=100);advanceTime(SETAS.min);updateHUD();if(!S.setas)return;sfx('sel');   // si pasa de medianoche, setasDia puede cerrar el bajo
+      await say('Pulverizas las bandejas: humedad al 100 %.');continue;}
     if(op==='Recoger'){let g=0;L.bandejas=B.filter(b=>{if(faseSeta(b)!=='lista')return true;g+=ri(SETAS.g[0],SETAS.g[1]);return false;});L.g+=g;sfx('get');
       await say(`Recoges las setas y las dejas secando en el bajo: ${g} g.`);continue;}
     if(op==='Tirar las malas'){const k=B.filter(b=>b.mala).length;L.bandejas=B.filter(b=>!b.mala);await say(k>1?`Tiras ${k} bandejas.`:'Tiras la bandeja.');continue;}

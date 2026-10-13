@@ -367,6 +367,35 @@ func mueble_de(o) -> String:
 		return o.left(-1)
 	return ""
 
+# ropa y pelo (1.21, ropaMapa/ropaC): el fotograma del protagonista (grupo g: player o player-combate) con los colores de S.ropa
+func ropa_v(k: String) -> int:
+	return int(S.ropa.get(k, 0)) if S.get("ropa") is Dictionary else 0
+
+func ropa_mapa(g):
+	if not (S.get("ropa") is Dictionary):
+		return null
+	var m := {}
+	var id := ""
+	for k in D.ROPA:
+		var i := ropa_v(k)
+		var s = D.ROPA[k].src.get(g)
+		if i == 0 or s == null or i >= D.ROPA[k].v.size():
+			continue
+		id += k.substr(0, 1) + str(i)
+		for j in s.size():
+			var d = D.ROPA[k].v[i][j + 1]
+			if s[j] != null and d != null:
+				m[s[j]] = d
+	return [m, id] if id != "" else null
+
+func ropa_c(f, g):
+	var r = ropa_mapa(g) if f != null else null
+	if r == null:
+		return f
+	var o: Dictionary = f.duplicate()
+	o.c = Atlas.con_rampa(f.c, r[0], "ropa|" + r[1])
+	return o
+
 # personalizar la casa (1.16, 12c-salon): el tapizado o la lámina de un mueble (S.deco[k], índice en DECO[k].v) y su sprite
 func deco_v(k: String) -> int:
 	return int(S.deco.get(k, 0)) if S.get("deco") is Dictionary else 0

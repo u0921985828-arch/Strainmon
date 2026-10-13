@@ -124,6 +124,12 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
   { k: 'combate-policia', sw: 450, mode: 'battle', now: T + 5000, S: { ch: 5 }, B: { kind: 'police', name: 'AGENTE', look: 'cop', t: 900, flashE: 0, shakeP: 0 } },
   { k: 'combate-huida', sw: 320, mode: 'battle', now: T + 60, S: { ch: 4 },
     B: { kind: 'thief', name: 'CHORIZO', look: 'th0.75', t: 5000, flashE: 0, shakeP: 0, gone: true, aE: { n: 'huir', t0: T + 60 - 200 } } },
+  // ropa y pelo (1.21): el protagonista con la camiseta amarilla, el pantalón negro, la gorra roja y el pelo pelirrojo, en el piso
+  // de frente, y en el combate con Darko (su sprite de combate, 1.21) con otra ropa, de espaldas
+  { k: 'casa-ropa', sw: 240, mode: 'world', now: T + 40, S: { ch: 3, ropa: { camiseta: 4, pantalon: 1, gorra: 1, pelo: 3 }, flags: { letter: true, kiko1: true } },
+    map: 'home', P: { x: 5, y: 5, dir: 'down' } },
+  { k: 'combate-darko', sw: 320, mode: 'battle', now: T + 700, S: { ch: 8, ropa: { camiseta: 1, pantalon: 2, gorra: 3, pelo: 2 } },
+    B: { kind: 'thief', rival: 'Darko', jefe: 1, name: 'DARKO', look: 'darko', t: 900, flashE: 0, shakeP: 0 } },
   { k: 'titulo-240', sw: 240, mode: 'title', now: T },
   { k: 'titulo-400', sw: 400, mode: 'title', now: T + 1717 },
   { k: 'titulo-450', sw: 450, mode: 'title', now: T + 2900 },

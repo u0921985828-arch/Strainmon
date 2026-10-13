@@ -1,5 +1,17 @@
 # Cambios
 
+## 1.21.0 · 13 de octubre de 2026
+
+Arte: ropa y pelo, Darko y Miren con sprite propio y los ojos de los personajes. Godot, 0.15.0.
+
+- **Nuevo: ropa y pelo** (la cama del piso → CAMBIARTE DE ROPA; `ROPA`, `S.ropa`, `vestirte`, 12c-salon). Camiseta (7 colores), pantalón (5), gorra (6) y pelo (5): cambian los colores del protagonista andando, montado y de espaldas en el combate (`ropaC`, por colores exactos con `conRampa`). Fuera del piso, la cama no lo ofrece.
+- **Darko pelea con su sprite** (`darko-combate`: sudadera negra y pañuelo rojo; antes, el del ladrón) y **Miren lleva el suyo** (`miren`: pelo canoso y top verde; antes, el de una clienta).
+- **Ojos de los personajes** como los del protagonista (opción C, `tools/sprites/a-mano/npc_ojos.py`): párpado, blanco e iris de frente y de lado, en la cabeza de cada dirección, que `npc_cara.py` pega en cada paso. Iñaki, Josune, Molina y Patxi se quedan como estaban (sus ojos no se dejan medir) y Baltasar y Darko, solo de frente; con gafas, Jurado y Txaro, sin tocar.
+- Pelo del protagonista: sus dos tonos ya no son los de la cara (`player_pelo.py`), para poder cambiarlos sin tocar cejas ni sombras.
+- Arreglos de la 1.19 y la 1.20: el alquiler de la nave se cobra antes que los sueldos (sin él, Arrieta cambia la cerradura antes de que nadie trabaje); PULVERIZAR pasada la medianoche ya no deja el menú del bajo abierto si el bajo se ha cerrado al cambiar de día.
+- Igual en Godot. Pantallas: 39 (con el piso con ropa y el combate de Darko).
+- Tests: `npm test` 105/105 (paso nuevo: la ropa en la cama del piso y fuera de él, los colores del protagonista, el combate y el sprite de Darko y el de Miren); Godot, historia 105 pasos.
+
 ## 1.20.0 · 13 de octubre de 2026
 
 El bajo de las setas: un local clandestino en la Kale Zaharra. Godot, 0.14.0.
@@ -17,7 +29,7 @@ La plantilla: poner al barrio a trabajar. Godot, 0.13.0.
 - **Nuevo: la plantilla** (MÓVIL → PLANTILLA, desde el capítulo 3; `PLANTILLA`, `S.plantilla`, 11f-plantilla). Patxi te manda a alguien del barrio por un sobre de 150 €: no sabes a quién hasta que llega, y le contratas o no (el sobre ya está pagado). Cada uno trae tres números del 1 al 5: **labia** (vende más y le timan menos), **cuidado** (le para la policía y le atracan menos; en la nave, saca más) y **lealtad** (se larga menos con lo tuyo y, de gerente, sisa menos). Hasta 6 a la vez; se les cambia de trabajo, se les deja libres o se les despide desde el móvil.
 - **A la calle** con un lote de 25, 50 o 100 g: cada mañana vende de 2 a 4 g por punto de labia a precio de calle del barrio y se queda el 30 %; o le para la policía (5 % con cuidado 1, 1 % con 5: pierde el lote y el calor sube 10), le atracan (8 % → 2 %: la mitad del lote), se larga con todo (6 % con lealtad 1, nunca con 5; la mitad con gerente) o le pagan con billetes falsos (6 % → 2 %: los gramos, sin dinero). Lo que le quede al dejarlo vuelve al arcón.
 - **De gerente** (uno, 40 € al día): cada mañana riega, trata las plagas con tu insecticida y rellena garrafas y depósitos, como Begoña, y cosecha lo que esté listo al arcón (las semillas y la estrella, como tú), quitando su sisa: un 3 % por cada punto de lealtad por debajo de 5.
-- **La nave de Valdehierro** (Arrieta, al lado de la nave, desde el capítulo 5; `NAVE`, `S.nave`): 3.000 € de fianza y 60 € al día. Pones a trabajar hasta 4 (30 € al día cada uno) y eliges la variedad con una semilla: cada uno saca 16-24 g al día según su cuidado, al 90 % del THC de la variedad, que se recogen allí. Una redada (del 2 % al 0,5 % al día, según el más cuidadoso) se lo lleva todo, nave y gente incluidos (calor +20). Sin el alquiler, Arrieta cambia la cerradura y se queda la fianza; si la dejas, te la devuelve.
+- **La nave de Valdehierro** (Arrieta, al lado de la nave, desde el capítulo 5; `NAVE`, `S.nave`): 3.000 € de fianza y 60 € al día. Pones a trabajar hasta 4 (30 € al día cada uno) y eliges la variedad con una semilla: cada uno saca 16-24 g al día según su cuidado, al 90 % del THC de la variedad, que se recogen allí. Una redada (del 1,7 % al 0,5 % al día, según el más cuidadoso) se lo lleva todo, nave y gente incluidos (calor +20). Sin el alquiler, Arrieta cambia la cerradura y se queda la fianza; si la dejas, te la devuelve.
 - Sin dinero para el sueldo, el gerente y los de la nave lo dejan.
 - Igual en Godot. Begoña y el gerente comparten `cuidarPlantas`; la cosecha, `thcCosecha` y `semillasCosecha`.
 - Tests: `npm test` 103/103 (paso nuevo: los sobres, la calle con sus cinco salidas, el gerente con su sisa, la nave con el alquiler, lo que crece, la redada, dejarla e impagarla); Godot, historia 103 pasos.

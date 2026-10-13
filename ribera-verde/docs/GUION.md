@@ -447,7 +447,7 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
   - *Esqueje:* «Cortas una punta de la [variedad] y la pones a enraizar. Plántala antes del día D: es la misma planta.» · propagador lleno, «El propagador está lleno: 12 esquejes. Planta alguno antes.» · al plantarlo, «Plantas el esqueje de [variedad].» · si se seca, aviso al cambiar de día: «Se ha secado un esqueje sin plantar».
   - *Abono e insecticida:* «Echas una dosis de ABONO. Dará más cosecha.» / «No te queda ABONO.» · «Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.»
 - **Objetos del piso:**
-  - *Cama:* «Tu cama. Todavía huele a la colonia de la tía.»
+  - *Cama:* «Tu cama. Todavía huele a la colonia de la tía.» (Dormir hasta las 7 / Siesta de 3 h / Cambiarte de ropa / Nada; la ropa, 1.21: «Ropa y pelo» → Camiseta / Pantalón / Gorra / Pelo, cada uno con sus colores.)
   - *Ordenador:* «El ordenador de la tía. Tiene su registro de cultivos de veinte años.»
   - *Nevera:* «La nevera: medio limón, leche y un táper de alubias que dejó la tía.»
   - *Monstera:* «Una monstera. La tía Maite le hablaba cada mañana.»

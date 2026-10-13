@@ -1481,7 +1481,7 @@ func grupo_combate(who: String):
 	if who == "P":
 		return Atlas.cubre("combate:espalda:player")
 	if B.kind == "thief":
-		var g = null if B.get("jefe") else Atlas.grupo_look(B.get("look"))   # sin look (como en grupoLook), el del ladrón; Darko (1.17): su personaje es de 32 px; pelea con el del ladrón
+		var g = Atlas.cubre("combate:frente:darko") if B.get("jefe") else Atlas.grupo_look(B.get("look"))   # sin look (como en grupoLook), el del ladrón; Darko (1.17): su personaje es de 32 px; pelea con el suyo de combate (1.21)
 		return g if g else Atlas.cubre("combate:frente:ladron")
 	return Atlas.cubre("combate:frente:policia")
 
@@ -3121,6 +3121,7 @@ func cuidar_casa(w: Dictionary) -> int:
 func plantilla_dia() -> void:
 	var P: Dictionary = D.PLANTILLA
 	var fuera := []
+	nave_alquiler()
 	for w in S.plantilla:
 		if w.get("rol") != "gerente" and w.get("rol") != "nave":
 			continue
@@ -3177,10 +3178,9 @@ func plantilla_dia() -> void:
 		S.plantilla = S.plantilla.filter(func(w): return not fuera.has(w))
 	nave_dia()
 
-# la nave: el alquiler cada mañana (sin él, Arrieta cambia la cerradura y se queda la fianza), la redada (menos con cuidado) y lo que crece
-func nave_dia() -> void:
-	var N = S.get("nave")
-	if N == null:
+# la nave: el alquiler, lo primero de la mañana (antes que los sueldos; sin él, Arrieta cambia la cerradura y se queda la fianza)
+func nave_alquiler() -> void:
+	if S.get("nave") == null:
 		return
 	if S.money < D.NAVE.dia:
 		for w in naveros():
@@ -3189,6 +3189,12 @@ func nave_dia() -> void:
 		queue("nave", func(): await talk("SMS · ARRIETA", ["No me has pagado la nave. Cambio la cerradura y me quedo la fianza."]))
 		return
 	S.money -= int(D.NAVE.dia)
+
+# después de la calle, la redada (menos con cuidado) y lo que crece
+func nave_dia() -> void:
+	var N = S.get("nave")
+	if N == null:
+		return
 	var W := naveros()
 	if W.is_empty() or not N.get("sid"):
 		return
@@ -3380,12 +3386,14 @@ func talk_txomin() -> void:
 			S.money -= int(Z.bandeja)
 			B.append({"d": S.day, "hum": 100})
 			sfx("coin")
-			await say("Lista para colonizar. En %d días la ha cogido el micelio; %d más y a recoger." % [int(Z.colon), int(Z.fruto)], T)
+			await say("Lista para colonizar. En %d días la habrá cogido el micelio; %d más y a recoger." % [int(Z.colon), int(Z.fruto)], T)
 		elif op == "Pulverizar":
 			for b in hum:
 				b.hum = 100
 			advance_time(int(Z.min))
 			update_hud()
+			if S.get("setas") == null:   # si pasa de medianoche, setas_dia puede cerrar el bajo
+				return
 			sfx("sel")
 			await say("Pulverizas las bandejas: humedad al 100 %.")
 		elif op == "Recoger":

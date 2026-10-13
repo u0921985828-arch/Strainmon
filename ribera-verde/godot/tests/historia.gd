@@ -11,6 +11,7 @@ const Datos = preload("res://src/datos.gd")
 const Cultivo = preload("res://src/cultivo.gd")
 const Motor = preload("res://src/motor.gd")
 const Juego = preload("res://src/juego.gd")
+const Atlas = preload("res://src/atlas.gd")
 
 var J
 var M
@@ -1938,6 +1939,43 @@ func _pasos() -> void:
 				and LOG.has("TXOMIN: ¿Setas? Eso era antes, chaval. Ahora solo paseo.") and LOG.has("SMS · TXOMIN: Se te han echado a perder 2 bandejas. Tíralas.") and LOG.has("Tiras 2 bandejas.")
 				and LOG.has("TXOMIN: El bajo: 1 lista · humedad %s %%." % Datos.js_num(100 - Z.seca)) and LOG.has("Recoges las setas y las dejas secando en el bajo: 33 g.")
 				and LOG.has("La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas.") and LOG.has("SMS · TXOMIN: No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí."), R))
+	step("Ropa y pelo, Darko y Miren (1.21): en la cama del piso, CAMBIARTE DE ROPA (camiseta, pantalón, gorra y pelo: cambian los colores del protagonista, también de espaldas en el combate; fuera del piso, no sale); Darko pelea con su sprite de combate y Miren lleva el suyo", [], func():
+		R = {}
+		var sv := {"ropa": J.S.get("ropa"), "map": J.S.map}
+		J.S.ropa = {}
+		J.enter_map("home", 5, 5, "up")
+		want(["^Cambiarte de ropa", "^Camiseta", "^Azul", "^Pelo", "^Rubio", "^Pelo", "^Volver", "^Listo"])
+		await run(func(): await J.bed_action())
+		R.ropa = jn([J.S.ropa.get("camiseta"), J.S.ropa.get("pelo"), J.S.ropa.get("gorra", 0)])
+		var n := func(im: Image, h: String) -> int:
+			var v := Datos.hexi(h)
+			var k := 0
+			for y in im.get_height():
+				for x in im.get_width():
+					var p := im.get_pixel(x, y)
+					if p.a8 and ((p.r8 << 16) | (p.g8 << 8) | p.b8) == v:
+						k += 1
+			return k
+		var f = Atlas.frame_de("player", "base", "south", 0, {"i": 0})
+		var c: Image = J.ropa_c(f, "player").c
+		R.px = jn([n.call(f.c, "#c83838"), n.call(c, "#c83838"), n.call(c, "#3a6ac8"), n.call(f.c, "#4a2a2b"), n.call(c, "#c8a050"), n.call(f.c, "#e8b894") == n.call(c, "#e8b894")])
+		R.comb = J.ropa_mapa("player-combate")[1]
+		var b0 = J.B
+		J.B = {"kind": "thief", "jefe": 1, "look": D.LOOKS.darko}
+		R.darko = J.grupo_combate("E")
+		J.B = b0
+		R.miren = Atlas.grupo_look(D.LOOKS.miren)
+		J.S.map = "txaro"
+		want(["^Nada"])
+		await run(func(): await J.bed_action("Una cama."))
+		J.S.map = sv.map
+		J.S.ropa = sv.ropa if sv.ropa is Dictionary else {}
+		J.enter_map("home", 5, 5, "up"),
+		func():
+			var p: PackedStringArray = str(R.px).split(",")
+			return chk(R.ropa == "1,2,0" and int(p[0]) > 0 and int(p[1]) == 0 and p[2] == p[0] and int(p[3]) > 0 and p[4] == p[3] and p[5] == "true" and R.comb == "c1p2"
+				and R.darko == "darko-combate" and R.miren == "miren" and LOG.any(func(l): return l.contains("[menú] Dormir hasta las 7 | Siesta de 3 h | Cambiarte de ropa | Nada"))
+				and LOG.any(func(l): return l.contains("[menú] Camiseta: azul | Pantalón: vaquero | Gorra: verde | Pelo: rubio | Listo")) and LOG.any(func(l): return l.contains("[menú] Dormir hasta las 7 | Siesta de 3 h | Nada")), R))
 	step("Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas", ["^Hindu Kush"], func():
 		J.S.ch = 5
 		J.S.flags.txaro = true

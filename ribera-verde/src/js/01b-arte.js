@@ -91,15 +91,23 @@ function dibujarPJ(e,look,now,cam,isP,dur){
   const g=grupoLook(look);if(!g)return false;
   const v=isP&&animDe('vehiculos',(vehiculo()||'-')+'-atras')?vehiculo():null;   // en la calle, con el patinete o la bici: detrás, él (subido) y delante
   const f=v?frameMonta(e,g,v,now,dur):pjFrame(e,g,now,isP,dur);if(!f)return false;
-  const xp=Math.round(e.px-cam.x)+8,yp=Math.round(e.py-cam.y)+15;   // pies en la última fila de la casilla
+  const xp=Math.round(e.px-cam.x)+8,yp=Math.round(e.py-cam.y)+15,c=isP?ropaC(f,g):null;   // pies en la última fila de la casilla
   sombra(xp,yp);
   if(v){const o={i:e.moving?Math.min(1,Math.floor(e.t/dur*2)):0},d=DIR4[e.dir],a=frameDe('vehiculos',v+'-atras',d,0,o),b=frameDe('vehiculos',v+'-delante',d,0,o);
-    if(a)pinta(a,xp,yp);pinta(f,xp,yp-VEHICULOS[v].sube);if(b)pinta(b,xp,yp);}
-  else pinta(f,xp,yp);
+    if(a)pinta(a,xp,yp);pinta(f,xp,yp-VEHICULOS[v].sube,c);if(b)pinta(b,xp,yp);}
+  else pinta(f,xp,yp,c);
   const a=e.act;
   if(a&&a.humo&&!a.humoHecho&&f.i>=a.humo.frame){a.humoHecho=1;lanzarVfx(a.humo.vfx,e.px+8+a.humo.off[0],e.py+15+a.humo.off[1],now,S.map,true);}
   return true;
 }
+// ropa y pelo (1.21, ROPA en 12c-salon): el fotograma del protagonista (grupo g: player o player-combate) con sus colores
+function ropaMapa(g){
+  const R=S&&S.ropa;if(!R)return null;const m={};let id='';
+  for(const k in ROPA){const i=R[k]|0,s=ROPA[k].src[g];if(!i||!s||!ROPA[k].v[i])continue;id+=k[0]+i;
+    s.forEach((c,j)=>{const d=ROPA[k].v[i][j+1];if(c&&d)m[c]=d;});}
+  return id?[m,id]:null;
+}
+const ropaC=(f,g)=>{const r=ropaMapa(g);return r?conRampa(f.c,r[0],'ropa|'+r[1]):f.c;};
 // ambiente: solo quieto, en pantalla y sin diálogo; al hablarle se corta
 function ambiente(e,now,cam){
   const g=grupoLook(e.look);if(!g)return;
@@ -259,7 +267,7 @@ function arteCriaturas(now,cam,list){
 function grupoCombate(who){
   if(!ARTE.ok||!B)return null;
   if(who==='P')return ARTE.cubre['combate:espalda:player']||null;
-  if(B.kind==='thief')return (!B.jefe&&grupoLook(B.look))||ARTE.cubre['combate:frente:ladron']||null;   // Darko (1.17): su personaje es de 32 px; pelea con el del ladrón
+  if(B.kind==='thief')return (B.jefe&&ARTE.cubre['combate:frente:darko'])||(!B.jefe&&grupoLook(B.look))||ARTE.cubre['combate:frente:ladron']||null;   // Darko (1.17): su personaje es de 32 px; pelea con el suyo de combate (1.21)
   return ARTE.cubre['combate:frente:policia']||null;
 }
 // lanza una animación de combate; devuelve su duración en ms (0 sin atlas)

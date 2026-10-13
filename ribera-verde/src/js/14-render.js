@@ -115,7 +115,7 @@ function renderBattle(now){
   if(fE){if(B.gone&&B.aE&&B.aE.n==='huir')pinta(fE,ex+24+Math.round((now-B.aE.t0)*.12),66);
     else if(!B.gone&&!(B.flashE>0&&Math.floor(B.flashE/70)%2===0))pinta(fE,ex+24,66);}
   else if(!B.gone&&!(B.flashE>0&&Math.floor(B.flashE/70)%2===0))ctx.drawImage(spriteFor(B.look,'down',0),ex,6,48,60);
-  if(fP)pinta(fP,px+24+sh,142);else ctx.drawImage(spriteFor(LOOKS.player,'up',0),px+sh,82,48,60);
+  if(fP)pinta(fP,px+24+sh,142,ropaC(fP,grupoCombate('P')));else ctx.drawImage(spriteFor(LOOKS.player,'up',0),px+sh,82,48,60);
   if(ARTE.ok)pintarVfx(now,{x:0,y:0},'*');
   ctx.restore();
 }

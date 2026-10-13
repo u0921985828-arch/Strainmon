@@ -599,6 +599,8 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 	var f = _monta_frame(e, gr, v, dur) if v else _pj_frame(e, gr, isP, dur)
 	if f == null:
 		return
+	if isP:
+		f = J.ropa_c(f, gr)   # ropa y pelo (1.21)
 	var xp: int = Datos.jsround(e.px - cam.x) + 8
 	var yp: int = Datos.jsround(e.py - cam.y) + 15
 	var sm := Color8(0, 0, 0, 56)
@@ -775,7 +777,7 @@ func _combate() -> void:
 	var ex := Datos.jsround(154 - (1 - e) * 180)
 	var px := Datos.jsround(40 + (1 - e) * 190)
 	var fE = _comb_frame("E")
-	var fP = _comb_frame("P")
+	var fP = J.ropa_c(_comb_frame("P"), J.grupo_combate("P"))
 	var sh := Datos.jsround(sin(float(B.shakeP) / 18) * 3) if B.shakeP > 0 else 0
 	var parpadea: bool = B.flashE > 0 and floori(float(B.flashE) / 70) % 2 == 0
 	if fE:

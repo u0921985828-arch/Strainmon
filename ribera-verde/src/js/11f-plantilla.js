@@ -75,7 +75,7 @@ function cuidarCasa(w){
 }
 // al amanecer (desde curroDia): sueldos, el gerente, la calle y la nave
 function plantillaDia(){
-  const P=PLANTILLA,fuera=[];
+  const P=PLANTILLA,fuera=[];naveAlquiler();
   for(const w of S.plantilla){if(w.rol!=='gerente'&&w.rol!=='nave')continue;
     if(S.money<P.sueldo[w.rol]){w.rol=null;queue('pl'+w.id,()=>talk('SMS · '+w.n.toUpperCase(),['Sin cobrar no curro. Cuando tengas el dinero, me llamas.']));}
     else S.money-=P.sueldo[w.rol];}
@@ -95,11 +95,15 @@ function plantillaDia(){
   if(fuera.length)S.plantilla=S.plantilla.filter(w=>!fuera.includes(w));
   naveDia();
 }
-// la nave: el alquiler cada mañana (sin él, Arrieta cambia la cerradura y se queda la fianza), la redada (menos con cuidado) y lo que crece
-function naveDia(){
-  const N=S.nave;if(!N)return;
+// la nave: el alquiler, lo primero de la mañana (antes que los sueldos; sin él, Arrieta cambia la cerradura y se queda la fianza)
+function naveAlquiler(){
+  if(!S.nave)return;
   if(S.money<NAVE.dia){naveros().forEach(libre);S.nave=null;queue('nave',()=>talk('SMS · ARRIETA',['No me has pagado la nave. Cambio la cerradura y me quedo la fianza.']));return;}
   S.money-=NAVE.dia;
+}
+// después de la calle, la redada (menos con cuidado) y lo que crece
+function naveDia(){
+  const N=S.nave;if(!N)return;
   const W=naveros();if(!W.length||!N.sid)return;
   if(Math.random()<Math.max(0,NAVE.redada-NAVE.redadaC*Math.max(...W.map(w=>w.cui)))){
     const ns=W.map(w=>w.n),quien=ns.length>1?ns.slice(0,-1).join(', ')+' y '+ns[ns.length-1]:ns[0];

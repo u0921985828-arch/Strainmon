@@ -2851,6 +2851,72 @@
    "coste_real": 26.1
   },
   {
+   "id": "miren",
+   "tipo": "personaje",
+   "fase": "F3",
+   "herramienta": "importado",
+   "cubre": [
+    "look:miren"
+   ],
+   "origen": "tools/sprites/a-mano/recolor.py: cliente5 (aprobado) con el pelo canoso y el top verde, cambiando colores exactos (mismo dibujo)",
+   "descripcion": "Miren, la amiga de la tía Maite (Errotabarri): mujer mayor, pelo canoso largo, chaqueta negra sobre un top verde",
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "walk",
+     "herramienta": "importado",
+     "direcciones": [
+      "south",
+      "north",
+      "east"
+     ],
+     "fps": 8,
+     "bucle": true
+    },
+    {
+     "nombre": "fumar",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "ambiente": {
+    "acciones": [
+     "fumar"
+    ],
+    "cada_s": [
+     12,
+     30
+    ],
+    "solo_quieto": true
+   },
+   "fumador": {
+    "tipo": "cigarro",
+    "vfx": "vfx-humo-cigarro",
+    "frame_humo": 6,
+    "offset_boca": [
+     4,
+     -18
+    ]
+   },
+   "notas": "1.21: antes llevaba el sprite de cliente5 (la del pelo rojo). Pedido por el usuario: «Miren con sprite propio»."
+  },
+  {
    "id": "cliente6",
    "tipo": "personaje",
    "fase": "F3",
@@ -3228,6 +3294,60 @@
     "notas_animacion": "v3 a medida, keep_first_frame false; plantillas no (en F1 salían de espaldas). Si un fotograma (encajado por los pies del primero) se sale de la celda por arriba, se baja lo justo (1 px en 3 fotogramas de ladrones)."
    },
    "coste_real": 26
+  },
+  {
+   "id": "darko-combate",
+   "tipo": "combate",
+   "fase": "F6",
+   "herramienta": "importado",
+   "cubre": [
+    "combate:frente:darko"
+   ],
+   "origen": "tools/sprites/a-mano/recolor.py: ladron1-combate (aprobado) con la sudadera negra, el pañuelo rojo y el pantalón oscuro, cambiando colores exactos (mismo dibujo)",
+   "descripcion": "Darko en las peleas: sudadera negra con la capucha puesta, pañuelo rojo en la boca, pantalón oscuro, puños arriba",
+   "celda": "combate",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": true
+    },
+    {
+     "nombre": "ataque",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "herido",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 10,
+     "bucle": false
+    },
+    {
+     "nombre": "huir",
+     "herramienta": "importado",
+     "direcciones": [
+      "east"
+     ],
+     "fps": 12,
+     "bucle": true
+    }
+   ],
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "notas": "1.21: antes Darko peleaba con el sprite del ladrón 1. Pedido por el usuario: «Darko en combate»."
   },
   {
    "id": "ladron2-combate",

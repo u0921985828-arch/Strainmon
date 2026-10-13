@@ -14,7 +14,7 @@ from PIL import Image
 
 RAIZ = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'art', 'procesado')
 GRUPOS = ('baltasar', 'begona', 'cliente1', 'cliente2', 'cliente3', 'cliente4', 'cliente5', 'cliente6', 'cop', 'darko', 'inaki',
-          'josune', 'jurado', 'kiko', 'molina', 'patxi', 'tono', 'txaro', 'unai')
+          'josune', 'jurado', 'kiko', 'miren', 'molina', 'patxi', 'tono', 'txaro', 'unai')
 CUELLO = .42   # la cabeza: la parte de arriba del personaje, hasta este tanto de su alto
 
 def abre(f): return Image.open(f).convert('RGBA')

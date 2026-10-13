@@ -587,6 +587,20 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && LOG.some(l => l === 'TXOMIN: ¿Setas? Eso era antes, chaval. Ahora solo paseo.') && LOG.some(l => l === 'SMS · TXOMIN: Se te han echado a perder 2 bandejas. Tíralas.') && LOG.some(l => l === 'Tiras 2 bandejas.')
     && LOG.some(l => l === `TXOMIN: El bajo: 1 lista · humedad ${100 - SETAS.seca} %.`) && LOG.some(l => l === 'Recoges las setas y las dejas secando en el bajo: 33 g.')
     && LOG.some(l => l === 'La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas.') && LOG.some(l => l === 'SMS · TXOMIN: No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí.') || R);
+  await step('Ropa y pelo, Darko y Miren (1.21): en la cama del piso, CAMBIARTE DE ROPA (camiseta, pantalón, gorra y pelo: cambian los colores del protagonista, también de espaldas en el combate; fuera del piso, no sale); Darko pelea con su sprite de combate y Miren lleva el suyo', [], async () => {
+    window.R = {}; const sv = { ropa: S.ropa, map: S.map }; S.ropa = {}; enterMap('home', 5, 5, 'up');
+    want(['^Cambiarte de ropa', '^Camiseta', '^Azul', '^Pelo', '^Rubio', '^Pelo', '^Volver', '^Listo']); await run(() => bedAction());
+    R.ropa = [S.ropa.camiseta, S.ropa.pelo, S.ropa.gorra || 0].join();
+    const n = (cv, h) => { const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data, v = parseInt(h.slice(1), 16); let k = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 3] && (d[i] << 16 | d[i + 1] << 8 | d[i + 2]) === v) k++; return k; };
+    const f = frameDe('player', 'base', 'south', 0, { i: 0 }), c = ropaC(f, 'player');
+    R.px = [n(f.c, '#c83838'), n(c, '#c83838'), n(c, '#3a6ac8'), n(f.c, '#4a2a2b'), n(c, '#c8a050'), n(f.c, '#e8b894') === n(c, '#e8b894')].join();
+    R.comb = ropaMapa('player-combate')[1];
+    const b0 = B; B = { kind: 'thief', jefe: 1, look: LOOKS.darko }; R.darko = grupoCombate('E'); B = b0; R.miren = grupoLook(LOOKS.miren);
+    S.map = 'txaro'; want(['^Nada']); await run(() => bedAction('Una cama.')); S.map = sv.map;
+    S.ropa = sv.ropa || {}; enterMap('home', 5, 5, 'up');
+  }, () => { const [a, b, c, d, e, piel] = R.px.split(','); return R.ropa === '1,2,0' && +a > 0 && +b === 0 && c === a && +d > 0 && e === d && piel === 'true' && R.comb === 'c1p2'
+    && R.darko === 'darko-combate' && R.miren === 'miren' && LOG.some(l => /\[menú\] Dormir hasta las 7 \| Siesta de 3 h \| Cambiarte de ropa \| Nada/.test(l))
+    && LOG.some(l => /\[menú\] Camiseta: azul \| Pantalón: vaquero \| Gorra: verde \| Pelo: rubio \| Listo/.test(l)) && LOG.some(l => /\[menú\] Dormir hasta las 7 \| Siesta de 3 h \| Nada/.test(l)) || R; });
   await step('Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas', ['^Hindu Kush'], async () => {
     S.ch = 5; S.flags.txaro = true; S.flags.txaro2 = false; S.map = 'txaro'; buildEnts(); window.R = { ent: ents.filter(e => e.id === 'txaro').map(e => e.x + ',' + e.y).join() };
     S.buds = {}; addBuds('ria', 20, 12); addBuds('hindu', 15, 18); addBuds('thai', 20, 16); R.ch = S.seeds.chitral || 0; R.boc = S.items.bocata; R.rep = S.rep;
