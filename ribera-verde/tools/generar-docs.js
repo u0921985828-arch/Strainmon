@@ -25,7 +25,7 @@ const ROOT = path.join(__dirname, '..');
       rotoT: '%', rotoB: '%', hormigon: '_', pista: ',', floor: '.', floorB: '.', floorS: '.', mat: 'm', void: ' ' };
     const O = { tree: 'T', bush: 'b', fence: 'f', sign: 'S', lamp: 'L', bench: 'n', fountain: 'O', crate: 'c', bedT: 'B', bedB: 'B', pc: 'P', lab: 'G', lab2: 'G',
       table: 't', fridge: 'F', shelfW: 's', counter: 'C', display: 'd', plantDeco: 'p', barcounter: 'C', bottles: 's', stool: 'x', btable: 't', jukebox: 'J', iwin: 'v', poster: 'v', carpa: 'K',
-      monte: 'M', monte2: 'M', seto: 'h', parada: 'A', tree2: 'T', manzano: 'Y' };
+      monte: 'M', monte2: 'M', seto: 'h', parada: 'A', tree2: 'T', manzano: 'Y', silla: 'r', sillaG: 'r', sillaG2: 'r' };
     const maps = {};
     for (const [name, m] of Object.entries(MAPS)) {
       const rows = [];
@@ -270,7 +270,7 @@ Saldada la deuda, el juego sigue: cada rango se gana facturando desde el último
   // ---------- MAPA.md ----------
   const legend = `Leyenda: \`.\` suelo/hierba · \`*\` flores · \`"\` hierba alta (ladrones ×3, a cualquier hora) · \`:\` tierra · \`-\` acera · \`=\` carretera · \`%\` carretera rota (baches y parches) · \`_\` hormigón · \`,\` pista de tierra · \`+\` plaza · \`~\` agua · \`H\` puente · \`#\` muelle
 \`^\` tejado · \`█\` pared/ventana · \`D\` puerta · \`T\` árbol · \`Y\` manzano · \`b\` arbusto · \`$\` arbusto con objeto oculto · \`i\` objeto en el suelo · \`f\` valla · \`S\` cartel · \`L\` farola · \`n\` banco · \`O\` fuente · \`c\` cajas · \`@\` personaje · \`M\` monte (el bosque de los lindes) · \`h\` seto · \`A\` parada del autobús
-Interiores: \`B\` cama · \`P\` ordenador · \`G\` mesa de genética · \`t\` mesa · \`F\` nevera · \`K\` carpa (mueble: el armario de 60 u 80 en x 8, la carpa de 100 o 150 en x 10-11 y la de 120 en x 2-3; sus plazas se ven por dentro, en la vista de carpa) · \`C\` mostrador · \`s\` estantería · \`d\` expositor · \`x\` taburete · \`J\` gramola · \`v\` ventana/póster · \`m\` felpudo (salida)`;
+Interiores: \`B\` cama · \`P\` ordenador · \`r\` silla (la de la tía y la gaming, con el PC gaming) · \`G\` mesa de genética · \`t\` mesa · \`F\` nevera · \`K\` carpa (mueble: el armario de 60 u 80 en x 8, la carpa de 100 o 150 en x 10-11 y la de 120 en x 2-3; sus plazas se ven por dentro, en la vista de carpa) · \`C\` mostrador · \`s\` estantería · \`d\` expositor · \`x\` taburete · \`J\` gramola · \`v\` ventana/póster · \`m\` felpudo (salida)`;
   let m = `# Mapa de Ribera Verde
 
 > Generado automáticamente con \`node tools/generar-docs.js\`. Coordenadas (x, y) en casillas de 16 px; (0,0) es la esquina superior izquierda.

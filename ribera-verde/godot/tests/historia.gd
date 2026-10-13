@@ -2989,7 +2989,7 @@ func _pasos() -> void:
 			and R.crec[0] > R.crec[1] and R.g[3] > R.g[2] and R.sig == "cosecha" and R.n == 8 and R.TO.size() == 4 and R.TO[0] == "<small>ITINERARIO · 5/14</small>Plantar<br>Ahora: Regar"
 			and R.TO[3] == "<small>ITINERARIO · 8/14</small>Abono de floración<br>Ahora: Primera cosecha" and R.fin[0] == 2 and not R.fin[1] and R.fin[2] and R.fin[3] and R.log.all(func(x): return x)
 			and R.vieja == "cosecha" and R.ph == "Abonada (crecimiento bio) · sustrato vivo · EC 0,8 · pH 7,5" and R.tarde[0] and R.tarde[1] and R.tarde[2] == 2 and R.tarde[3] and R.mark and not R.tarde[4], R))
-	step("Reformas, decoración y logros (1.27): en la tienda online, el póster, la alfombra y REFORMAS (suelo y paredes: se pagan al pedir y vienen al día siguiente; el piso cambia sus casillas, la alfombra va en el suelo nuevo y la pared sigue siendo sólida); DECORAR LA CASA en la cama; los logros con su aviso (detrás del SMS de la misión, sin pisarlo) y START → OBJETIVO → LOGROS; en una partida de antes, lo conseguido, sin aviso",
+	step("Reformas, decoración y logros (1.27): en la tienda online, el póster, la alfombra y REFORMAS (suelo y paredes: se pagan al pedir y vienen al día siguiente; el piso cambia sus casillas, la alfombra va en el suelo nuevo y la pared sigue siendo sólida); DECORAR LA CASA en la cama; los logros con su aviso (detrás del SMS de la misión, sin pisarlo) y START → OBJETIVO → LOGROS; en una partida de antes, lo conseguido, sin aviso; las sillas de los ordenadores (1.27.1): sólidas y, con A desde cualquier lado, el ordenador de encima; la gaming llega con el PC gaming",
 		["Póster", "Alfombra", "Reformas", "Suelo: Baldosa", "Paredes: Pintura verde", "Volver", "Salir", "Decorar", "póster", "La ola", "alfombra", "Persa", "Listo", "LOGROS", "Volver", "Volver"], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))
@@ -3039,13 +3039,29 @@ func _pasos() -> void:
 		J.S.erase("logros")
 		J.migrate()
 		R.mig = jn([J.S.logros.size() == D.LOGROS.filter(func(l): return J.logro_ok(l.id)).size(), J.S.logros.values().all(func(v): return v == 0), J.pending.size()])
+		J.enter_map("home", 4, 4, "up")   # 1.27.1: las sillas
+		var si: Array = J.delante()
+		si.append_array([m.o[3][4], J.tile_solid(m, 4, 3)])
+		J.enter_map("home", 3, 3, "right")
+		si.append_array(J.delante())
+		J.S.muebles.gpc = J.S.day
+		J.enter_map("home", 15, 3, "right")
+		si.append_array(J.delante())
+		si.append_array([m.o[3][16], m.o[3][17], J.tile_solid(m, 17, 3)])
+		J.enter_map("home", 17, 4, "up")
+		si.append_array(J.delante())
+		si.append(m.o[2][17])
+		J.S.muebles.erase("gpc")
+		J.montar_casa()
+		si.append(m.o[3][16])
+		R.silla = jn(si)
 		J.S = S0
 		J.enter_map("home", 5, 5, "up"),
 		func():
 			var n: int = D.LOGROS.size()
 			return chk(R.compra == "2582 {\"suelo\":{\"v\":3,\"dia\":21},\"pared\":{\"v\":1,\"dia\":21}} {\"cartel\":21,\"alfombra\":21}" and R.g == "iwT_home-1,iwB_home-1,floor-3,alf0a-3,alf0d-3" and R.o == "cartel" and R.solido == "true,false"
 				and LOG.has("El instalador viene a primera hora: suelo nuevo, baldosa hidráulica.") and LOG.has("El pintor viene a primera hora: paredes nuevas, pintura verde salvia.")
-				and R.deco == "1,1,cartel-1,alf1a-3" and LOG.has("Cambias el dibujo del póster: la ola.") and R.n == n and R.mig == "true,true,0"
+				and R.deco == "1,1,cartel-1,alf1a-3" and LOG.has("Cambias el dibujo del póster: la ola.") and R.n == n and R.mig == "true,true,0" and R.silla == "4,2,silla,true,4,2,16,2,sillaG,sillaG2,true,17,2,gpc2,"
 				and "|".join(R.TO) == "Pedido: Póster enmarcado · llega mañana|Pedido: Alfombra de 180 × 140 · llega mañana|Pedido: suelo, baldosa hidráulica · mañana|Pedido: paredes, pintura verde salvia · mañana|<small>LOGRO · %d/%d</small>A tu gusto|<small>MISIÓN CUMPLIDA</small>La caja de la tía|<small>LOGRO · %d/%d</small>Primera venta" % [n - 1, n, n, n]
 				and LOG.any(func(l): return l.begins_with("  [menú] %s | Volver" % " | ".join(PackedStringArray(D.LOGROS.map(func(x): return x.t))))), R))
 	step("Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también arcón, sala, agenda, mensajes, pedidos y bolsa); con Toño ya visto, sale en el móvil", [], func():

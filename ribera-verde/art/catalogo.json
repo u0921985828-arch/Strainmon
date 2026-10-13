@@ -1,6 +1,6 @@
 {
  "generado": "tools/sprites/catalogo.js",
- "claves": 373,
+ "claves": 375,
  "catalogo": {
   "look:player": [
    {
@@ -2663,6 +2663,24 @@
    }
   ],
   "obj:sillon": [
+   {
+    "asset": "salon",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "obj:silla": [
+   {
+    "asset": "salon",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "obj:sillaG": [
    {
     "asset": "salon",
     "familia": "importado",

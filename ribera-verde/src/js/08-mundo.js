@@ -167,8 +167,10 @@ function worldPress(b){
   if(!isFree()||P.moving)return;
   if(b==='A')interact();else if(b==='START')run(startMenu);else if(b==='MOVIL')run(movilMenu);
 }
+// la casilla de delante; si es una silla (1.27.1), la de encima, desde cualquier lado: el ordenador que tiene delante
+function delante(){const [dx,dy]=DV[P.dir],m=MAPS[S.map];let tx=P.x+dx,ty=P.y+dy;if(m.o[ty]&&SILLAS.has(m.o[ty][tx]))ty--;return [tx,ty];}
 function interact(){
-  const [dx,dy]=DV[P.dir],m=MAPS[S.map];let tx=P.x+dx,ty=P.y+dy;
+  const [dx,dy]=DV[P.dir],m=MAPS[S.map],[tx,ty]=delante();
   let e=entAt(tx,ty);
   if(!e&&m.o[ty]&&COUNTERS.has(m.o[ty][tx]))e=entAt(tx+dx,ty+dy);
   if(e){run(async()=>{if(!e.moving)e.dir=OPP[P.dir];if(e.def.client)await talkClient(e.def.client);else{await e.def.talk(e);if(!e.pat)saludo(e.id.startsWith('club_')?e.id.slice(5):e.id==='darko2'?'darko':e.id);}});return;}

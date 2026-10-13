@@ -7,6 +7,7 @@ const TS := 16
 const DV := {"up": [0, -1], "down": [0, 1], "left": [-1, 0], "right": [1, 0]}
 const OPP := {"up": "down", "down": "up", "left": "right", "right": "left"}
 const COUNTERS := ["counter", "barcounter", "btable"]
+const SILLAS := ["silla", "sillaG", "sillaG2"]   # 1.27.1: delante de un ordenador; con A, el ordenador de encima (delante)
 var SOLID_G := RegEx.create_from_string("^(water|roof|wall|win|iwT|iwB|void)")
 
 var lock := 0
@@ -366,6 +367,9 @@ func montar_casa() -> void:
 		h.o[mu.y][mu.x] = k if k in ya else null
 		if not mu.get("uno"):
 			h.o[mu.y][mu.x + 1] = (k + "2") if k in ya else null
+	var g: Dictionary = D.MUEBLES.gpc   # 1.27.1: la silla gaming, con el PC
+	h.o[g.y + 1][g.x] = "sillaG" if "gpc" in ya else null
+	h.o[g.y + 1][g.x + 1] = "sillaG2" if "gpc" in ya else null
 	h.carpas = []
 	for ci in S.carpas.size():
 		var c = S.carpas[ci]
@@ -822,11 +826,22 @@ func world_press(b: String) -> void:
 	elif b == "MOVIL":
 		run(movil_menu)
 
-func interact() -> void:
+# la casilla de delante; si es una silla (1.27.1), la de encima, desde cualquier lado: el ordenador que tiene delante
+func delante() -> Array:
 	var dv: Array = DV[P.dir]
 	var m: Dictionary = MAPS[S.map]
 	var tx: int = P.x + dv[0]
 	var ty: int = P.y + dv[1]
+	if ty >= 0 and ty < m.h and tx >= 0 and tx < m.w and m.o[ty][tx] in SILLAS:
+		ty -= 1
+	return [tx, ty]
+
+func interact() -> void:
+	var dv: Array = DV[P.dir]
+	var m: Dictionary = MAPS[S.map]
+	var de := delante()
+	var tx: int = de[0]
+	var ty: int = de[1]
 	var e = ent_at(tx, ty)
 	if e == null and ty >= 0 and ty < m.h and tx >= 0 and tx < m.w and m.o[ty][tx] in COUNTERS:
 		e = ent_at(tx + dv[0], ty + dv[1])

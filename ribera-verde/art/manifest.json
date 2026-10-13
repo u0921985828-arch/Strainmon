@@ -7087,7 +7087,9 @@
     "obj:tv",
     "obj:gpc",
     "obj:carro",
-    "obj:sillon"
+    "obj:sillon",
+    "obj:silla",
+    "obj:sillaG"
    ],
    "celda": "mueble_ancho",
    "ajuste_por_sprite": {
@@ -7099,10 +7101,12 @@
     "sofa-2": "exacto",
     "sillon": "exacto",
     "sillon-1": "exacto",
-    "sillon-2": "exacto"
+    "sillon-2": "exacto",
+    "silla": "exacto",
+    "sillaG": "exacto"
    },
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/salon.py",
-   "descripcion": "Lámina 14: los muebles del salón, que se compran por internet, a 16 px/m: sofá de 2 plazas (180 cm) visto por detrás, tele de 43\" sobre un mueble bajo de 140 cm con la consola y mesa gaming de 140 cm con monitor de 27\", teclado, torre con ventiladores y tira de LED; y (1.11) el carro de esquejes de 100 cm con dos bandejas de propagación tapadas bajo tubos T5 y la mesita de 80 cm con la tabla de corte, el bisturí y la hormona. Y (1.16, personalizar la casa) el sofá en tres tapizados (azul, verde oliva y granate: sofa, sofa-1, sofa-2) y el sillón orejero de 80 cm visto por detrás con la lámpara de pie de 160 cm encendida, en mostaza, gris y verde botella (sillon, sillon-1, sillon-2).",
+   "descripcion": "Lámina 14: los muebles del salón, que se compran por internet, a 16 px/m: sofá de 2 plazas (180 cm) visto por detrás, tele de 43\" sobre un mueble bajo de 140 cm con la consola y mesa gaming de 140 cm con monitor de 27\", teclado, torre con ventiladores y tira de LED; y (1.11) el carro de esquejes de 100 cm con dos bandejas de propagación tapadas bajo tubos T5 y la mesita de 80 cm con la tabla de corte, el bisturí y la hormona. Y (1.16, personalizar la casa) el sofá en tres tapizados (azul, verde oliva y granate: sofa, sofa-1, sofa-2) y el sillón orejero de 80 cm visto por detrás con la lámpara de pie de 160 cm encendida, en mostaza, gris y verde botella (sillon, sillon-1, sillon-2). Y (1.27.1) las sillas de delante de los ordenadores, vistas por detrás: la de madera de la tía (silla), con su travesaño curvo, un listón y el asiento entre las patas, y la gaming que viene con el PC gaming (sillaG, centrada en sus 2 casillas), con orejas, reposacabezas, dos franjas magenta, los brazos, el pistón y la base de cinco radios.",
    "notas": "1.10 salón. Cada mueble ocupa 2 casillas (k en x y k + '2' en x + 1, que no se pinta). Como la nevera: frente a su tamaño real y tapa a medio fondo; dentro de la lista de profundidad.",
    "montaje": "tal cual (salon.py), base en (16, 47) (ajuste exacto)"
   },

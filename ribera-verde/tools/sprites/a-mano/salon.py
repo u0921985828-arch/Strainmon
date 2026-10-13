@@ -8,6 +8,8 @@
 #  · carro (1.11): la estación de esquejes, que vende Kiko: un carro de 100 × 50 × 120 cm con ruedas y dos bandejas de propagación
 #    con su tapa (los esquejes dentro) bajo dos tubos T5, y al lado una mesita de 80 × 75 cm con la tabla de corte, el bisturí y
 #    el bote de hormona de enraizamiento.
+#  · silla y sillaG (1.27.1): la silla de madera de la tía, delante de su ordenador, y la silla gaming, que viene con el PC gaming
+#    (centrada en sus dos casillas), las dos vistas por detrás.
 # Y los iconos del menú START que faltaban (celda icono, 16 × 16, como los aprobados: contorno #2a2a34, luz arriba a la izquierda):
 #  · movil (el móvil, con la pantalla encendida), guardar (la libreta de la tía), altavoz y salir (la puerta entornada y la flecha).
 #  · cogollo (la Genoteca): un cogollo fresco, verde, con los cálices apilados, pistilos naranjas y la escarcha de los tricomas
@@ -171,6 +173,46 @@ def gpc():
     suelo(L, x0, x1, '#0a0a0e')
     return L
 
+def silla(yF=42):
+    """(1.27.1) silla de madera de la tía delante de su ordenador (casilla de debajo, celda mueble_ancho), vista por detrás (mira al ordenador): el respaldo con su travesaño curvo y un listón,
+    el asiento entre las patas y las patas de delante más arriba (más lejos)"""
+    L = Lienzo(48, 48); O, D, M, W, C, H = '#2e2a2a', '#3a2a20', '#74502e', '#c48a52', '#d8a868', '#e6bc80'
+    x0, x1 = 12, 19; yT = yF - 11; yS = yF - 5                          # 8 px de ancho; respaldo de 11 y asiento a 5 del suelo
+    L.r(x0 + 1, yS - 2, 6, 2, C); L.hl(x0 + 1, x1 - 1, yS - 2, H)        # el asiento, que asoma entre los palos del respaldo
+    L.hl(x0 + 1, x1 - 1, yS, D)                                          # el canto del asiento por debajo
+    L.vl(x0 + 1, yS + 1, yF - 2, D); L.vl(x1 - 1, yS + 1, yF - 2, D)     # las patas de delante, más lejos
+    L.vl(x0, yT + 2, yF, W); L.vl(x1, yT + 2, yF, M)                     # los palos de atrás, que bajan a ser las patas
+    L.r(x0, yT, 8, 3, W); L.hl(x0 + 1, x1 - 1, yT, H); L.hl(x0, x1, yT + 2, M)   # el travesaño de arriba, curvo
+    L.p(x0, yT, None); L.p(x1, yT, None)
+    L.vl(15, yT + 3, yS - 1, W); L.vl(16, yT + 3, yS - 1, M)             # el listón del medio
+    L.hl(x0, x1, yS - 1, M)                                              # el travesaño de abajo, a la altura del asiento
+    L.contorno(O)
+    return L
+
+def sillaG(yF=43):
+    """(1.27.1) silla gaming, que viene con el PC gaming: centrada en sus 2 casillas (x 24), un poco separada de la mesa y vista por detrás: respaldo alto con orejas y reposacabezas, dos franjas, los brazos a los lados, el pistón
+    y la base de cinco radios con ruedas"""
+    L = Lienzo(48, 48); O, N0, N1, N2, N3 = '#0a0a0e', '#141518', '#24262c', '#383a42', '#55585f'; F1, F2 = '#e040e0', '#40c0f0'
+    yT = yF - 21
+    L.r(20, yT, 9, 15, N1)                                               # el respaldo (130 cm, 55 de ancho)
+    L.r(21, yT, 7, 3, N2); L.hl(22, 26, yT, N3)                          # el reposacabezas
+    L.p(20, yT, None); L.p(28, yT, None)
+    L.r(19, yT + 4, 1, 8, N2); L.r(29, yT + 4, 1, 8, N0)                 # las orejas de los lados
+    L.vl(20, yT + 3, yT + 14, N2); L.vl(28, yT + 3, yT + 14, N0)
+    L.vl(22, yT + 4, yT + 13, F1); L.vl(26, yT + 4, yT + 13, F1)         # las franjas
+    L.hl(21, 27, yT + 3, N0)
+    L.r(17, yT + 10, 2, 2, N2); L.r(30, yT + 10, 2, 2, N1)               # los brazos, a los lados
+    L.vl(18, yT + 12, yT + 14, N1); L.vl(30, yT + 12, yT + 14, N0)
+    L.hl(21, 27, yT + 15, N0)                                            # el asiento por debajo
+    L.r(23, yT + 16, 3, 2, N0)                                           # el mecanismo
+    L.vl(24, yT + 17, yF - 2, N3); L.vl(23, yT + 18, yF - 2, N2)          # el pistón
+    L.hl(19, 29, yF - 1, N1); L.hl(20, 28, yF - 2, N2)                   # los radios
+    for x in (18, 30): L.r(x, yF - 1, 1, 2, N0)                          # las ruedas de atrás
+    for x in (20, 28): L.p(x, yF - 3, N0)                                # las de delante, más lejos
+    L.p(24, yF, N0)
+    L.contorno(O)
+    return L
+
 def carro():
     L = Lienzo(48, 48); O = '#1a1c22'
     M1, M2, M3 = '#6c7480', '#a8b0bc', '#dfe5ec'                          # el cromado del carro
@@ -273,6 +315,8 @@ for i in range(4): sale('cartel' + (f'-{i}' if i else ''), cartel(i), 'salon-par
 sale('tv', tv())
 sale('gpc', gpc())
 sale('carro', carro())
+sale('silla', silla())     # 1.27.1: delante del ordenador de la tía
+sale('sillaG', sillaG())   # 1.27.1: con el PC gaming
 
 def escribe(raiz=None):
     for g, S in SAL.items():

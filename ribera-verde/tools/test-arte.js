@@ -463,8 +463,8 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       try { mode = 'world'; while (handlers.length) handlers.pop(); press('MOVIL'); await new Promise(r => setTimeout(r, 50));
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'p' })); await new Promise(r => setTimeout(r, 50)); } finally { movilMenu = m0; } return n; });
     check('Salón: muebles por internet (llegan mañana), 2 casillas con su arte, sofá, tele y PC; menú START con iconos y el día; botón MÓVIL encima de la cruceta',
-      salon.vacio && salon.tienda === 'Sofá de 2 plazas|Tele de 43" con mueble|PC gaming con mesa|Sillón con lámpara de pie|Cuadro para el salón|Póster enmarcado|Alfombra de 180 × 140|Patinete|Bici de segunda mano|Reformas: suelo y paredes|Salir' && salon.pago.join() === '0,111' && salon.ped === '{"sofa":2,"gpc":2}' &&
-      salon.tienda2 === 'Sofá de 2 plazas · pedido×|Tele de 43" con mueble|PC gaming con mesa · pedido×|Sillón con lámpara de pie|Cuadro para el salón|Póster enmarcado|Alfombra de 180 × 140|Patinete|Bici de segunda mano|Reformas: suelo y paredes|Salir' && salon.hoy === '' && salon.ya === 'sofa,gpc' && /el sofá y el PC gaming/.test(salon.llega) &&
+      salon.vacio && salon.tienda === 'Sofá de 2 plazas|Tele de 43" con mueble|PC gaming con mesa y silla|Sillón con lámpara de pie|Cuadro para el salón|Póster enmarcado|Alfombra de 180 × 140|Patinete|Bici de segunda mano|Reformas: suelo y paredes|Salir' && salon.pago.join() === '0,111' && salon.ped === '{"sofa":2,"gpc":2}' &&
+      salon.tienda2 === 'Sofá de 2 plazas · pedido×|Tele de 43" con mueble|PC gaming con mesa y silla · pedido×|Sillón con lámpara de pie|Cuadro para el salón|Póster enmarcado|Alfombra de 180 × 140|Patinete|Bici de segunda mano|Reformas: suelo y paredes|Salir' && salon.hoy === '' && salon.ya === 'sofa,gpc' && /el sofá y el PC gaming/.test(salon.llega) &&
       salon.solido && salon.arte && salon.sofa[0] === 15 && salon.sofa[1] >= 60 && salon.sofa[1] < 64 && /^Aquí iría bien la tele/.test(salon.vacioTv) && /^Noticias: la policía busca/.test(salon.tv[0]) && salon.tv[1] >= 60 && salon.tv[1] < 64 &&
       /^Foro de cultivo · /.test(salon.foro[0]) && salon.foro[1] >= 30 && salon.foro[1] < 34 && salon.opc === 'true,true' && salon.start === '8,true,true,0 €' && salon.boton === 'true,true,true' && salonM === 2, { ...salon, salonM });
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
@@ -558,7 +558,7 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
   {
     const { page, errors } = await abrir(html, '?arte=procedural');
     const ok = await page.evaluate(() => ARTE.ok === false && typeof ATLAS === 'object' && ATLAS !== null && Object.keys(MUEBLES).every(k => MUEBLES[k].suelo ? TILES.alf0a && TILES['alf2d-3'] : TILES[k] && (MUEBLES[k].uno || TILES[k + '2'])) &&
-      ['floor-3', 'iwT_home-3', 'iwB_home-1'].every(k => TILES[k]));   // los muebles de 2 casillas, la alfombra y la reforma, también sin atlas
+      ['floor-3', 'iwT_home-3', 'iwB_home-1', 'silla', 'sillaG', 'sillaG2'].every(k => TILES[k]));   // los muebles de 2 casillas, la alfombra, la reforma y las sillas (1.27.1), también sin atlas
     await page.waitForTimeout(300);
     check('?arte=procedural ignora el atlas', ok && errors.length === 0, errors);
     await page.close();

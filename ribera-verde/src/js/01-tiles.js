@@ -104,6 +104,9 @@ function buildTiles(){
   T('tv2',t=>{t.F(0,9,11,7,'#5e4028');t.F(0,9,11,1,'#9e744a');t.F(0,0,9,8,'#18181e');t.F(0,1,8,6,'#232834');t.F(0,8,3,1,'#2a2a34');t.P(7,6,'#e04040');});
   T('gpc',t=>{t.F(5,7,11,4,'#383a42');t.F(5,10,11,1,'#e040e0');t.F(5,11,2,5,'#24262c');t.F(10,0,6,6,'#141518');t.F(11,1,5,4,'#2a4a9a');});
   T('gpc2',t=>{t.F(0,7,11,4,'#383a42');t.F(0,10,11,1,'#40c0f0');t.F(9,11,2,5,'#24262c');t.F(0,0,2,6,'#141518');t.F(0,1,1,4,'#2a4a9a');t.F(2,0,4,7,'#24262c');t.P(3,2,'#e040e0');t.P(3,4,'#40c0f0');});
+  T('silla',t=>{t.F(4,1,8,2,'#c48a52');t.F(4,1,8,1,'#e6bc80');t.F(4,3,1,8,'#c48a52');t.F(11,3,1,8,'#74502e');t.F(7,3,2,4,'#a46e40');t.F(5,6,6,1,'#d8a868');});
+  T('sillaG',t=>{t.F(12,0,4,12,'#24262c');t.F(13,2,1,8,'#e040e0');t.F(15,12,1,3,'#55585f');t.F(10,14,6,1,'#24262c');});
+  T('sillaG2',t=>{t.F(0,0,4,12,'#24262c');t.F(2,2,1,8,'#e040e0');t.F(0,12,1,3,'#55585f');t.F(0,14,6,1,'#24262c');});
   // el sillón con la lámpara de pie y el cuadro (1.16)
   T('sillon',t=>{t.F(4,6,12,9,'#b08a30');t.F(4,6,12,2,'#d0aa48');t.F(4,4,3,3,'#d0aa48');t.F(5,15,1,1,'#3a2a1c');t.F(14,15,1,1,'#3a2a1c');});
   T('sillon2',t=>{t.F(4,0,1,15,'#3a3a44');t.F(1,0,7,4,'#f0d890');t.F(2,15,5,1,'#3a3a44');});
@@ -153,4 +156,5 @@ function drawLeafPx(t,cx,cy,s,col){
 }
 const SOLID_G=/^(water|roof|wall|win|iwT|iwB|void)/;
 const COUNTERS=new Set(['counter','barcounter','btable']);
+const SILLAS=new Set(['silla','sillaG','sillaG2']);   // 1.27.1: delante de un ordenador; con A, el ordenador de encima (delante, 08-mundo)
 

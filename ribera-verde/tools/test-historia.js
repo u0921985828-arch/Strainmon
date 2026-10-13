@@ -921,7 +921,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && R.crec[0] > R.crec[1] && R.g[3] > R.g[2] && R.sig === 'cosecha' && R.n === 8 && R.TO.length === 4 && R.TO[0] === '<small>ITINERARIO · 5/14</small>Plantar<br>Ahora: Regar'
     && R.TO[3] === '<small>ITINERARIO · 8/14</small>Abono de floración<br>Ahora: Primera cosecha' && R.fin.join() === '2,false,true,true' && R.log.every(Boolean)
     && R.vieja === 'cosecha' && R.ph === 'Abonada (crecimiento bio) · sustrato vivo · EC 0,8 · pH 7,5' && R.mark && R.tarde.join() === 'true,true,2,true,false' || R);
-  await step('Reformas, decoración y logros (1.27): en la tienda online, el póster, la alfombra y REFORMAS (suelo y paredes: se pagan al pedir y vienen al día siguiente; el piso cambia sus casillas, la alfombra va en el suelo nuevo y la pared sigue siendo sólida); DECORAR LA CASA en la cama; los logros con su aviso (detrás del SMS de la misión, sin pisarlo) y START → OBJETIVO → LOGROS; en una partida de antes, lo conseguido, sin aviso',
+  await step('Reformas, decoración y logros (1.27): en la tienda online, el póster, la alfombra y REFORMAS (suelo y paredes: se pagan al pedir y vienen al día siguiente; el piso cambia sus casillas, la alfombra va en el suelo nuevo y la pared sigue siendo sólida); DECORAR LA CASA en la cama; los logros con su aviso (detrás del SMS de la misión, sin pisarlo) y START → OBJETIVO → LOGROS; en una partida de antes, lo conseguido, sin aviso; las sillas de los ordenadores (1.27.1): sólidas y, con A desde cualquier lado, el ordenador de encima; la gaming llega con el PC gaming',
     ['Póster', 'Alfombra', 'Reformas', 'Suelo: Baldosa', 'Paredes: Pintura verde', 'Volver', 'Salir', 'Decorar', 'póster', 'La ola', 'alfombra', 'Persa', 'Listo', 'LOGROS', 'Volver', 'Volver'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0));
     Object.assign(S, { ch: 8, map: 'home', day: 20, min: 12 * 60, money: 9000, sales: 0, caja: { nivel: 1, money: 0, buds: {}, rosin: {} }, muebles: {}, deco: {}, obra: {} });
@@ -935,10 +935,13 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     delete S.misiones.caja; S.sales = 50; await run(async () => {}); await idle();
     await run(objetivoMenu); await idle(); R.n = logrosN(); R.TO = T.slice(); window.toast = _t;
     delete S.logros; migrate(); R.mig = [Object.keys(S.logros).length === LOGROS.filter(l => l.ok()).length, Object.values(S.logros).every(v => v === 0), pending.length].join();
+    enterMap('home', 4, 4, 'up'); const si = [...delante(), m.o[3][4], tileSolid(m, 4, 3)]; enterMap('home', 3, 3, 'right'); si.push(...delante());   // 1.27.1: las sillas
+    S.muebles.gpc = S.day; enterMap('home', 15, 3, 'right'); si.push(...delante(), m.o[3][16], m.o[3][17], tileSolid(m, 17, 3)); enterMap('home', 17, 4, 'up'); si.push(...delante(), m.o[2][17]);
+    delete S.muebles.gpc; montarCasa(); si.push(m.o[3][16]); R.silla = si.join();
     S = S0; enterMap('home', 5, 5, 'up');
   }, () => R.compra === '2582 {"suelo":{"v":3,"dia":21},"pared":{"v":1,"dia":21}} {"cartel":21,"alfombra":21}' && R.g === 'iwT_home-1,iwB_home-1,floor-3,alf0a-3,alf0d-3' && R.o === 'cartel' && R.solido === 'true,false'
     && LOG.includes('El instalador viene a primera hora: suelo nuevo, baldosa hidráulica.') && LOG.includes('El pintor viene a primera hora: paredes nuevas, pintura verde salvia.')
-    && R.deco === '1,1,cartel-1,alf1a-3' && LOG.includes('Cambias el dibujo del póster: la ola.') && R.n === LOGROS.length && R.mig === 'true,true,0'
+    && R.deco === '1,1,cartel-1,alf1a-3' && LOG.includes('Cambias el dibujo del póster: la ola.') && R.n === LOGROS.length && R.mig === 'true,true,0' && R.silla === '4,2,silla,true,4,2,16,2,sillaG,sillaG2,true,17,2,gpc2,'
     && R.TO.join('|') === `Pedido: Póster enmarcado · llega mañana|Pedido: Alfombra de 180 × 140 · llega mañana|Pedido: suelo, baldosa hidráulica · mañana|Pedido: paredes, pintura verde salvia · mañana|<small>LOGRO · ${LOGROS.length - 1}/${LOGROS.length}</small>A tu gusto|<small>MISIÓN CUMPLIDA</small>La caja de la tía|<small>LOGRO · ${LOGROS.length}/${LOGROS.length}</small>Primera venta`
     && LOG.some(l => l.startsWith(`  [menú] ${LOGROS.map(l => l.t).join(' | ')} | Volver`)) || R);
   await step('Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también arcón, sala, agenda, mensajes, pedidos y bolsa); con Toño ya visto, sale en el móvil', [], async () => {

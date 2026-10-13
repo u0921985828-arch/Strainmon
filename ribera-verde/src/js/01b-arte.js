@@ -204,7 +204,7 @@ const ALZA={iwin:-13,poster:-13,shelfW:-16,bottles:-13,cuadro:-13,cartel:-13};
 const SOMBRA_OBJ=new Set(['fridge','crate','table','btable','stool','plantDeco','lab','lab2','pc','display','counter','barcounter','jukebox','bench','bedB']);
 function arteObj(o,tx,ty,cam,now,list,sombras){
   if(!ARTE.ok)return false;
-  if(SEGUNDA.has(o))return !!ARTE.cubre['obj:'+o.slice(0,-1)];   // la mitad de la derecha de un mueble del salón: la pinta la de la izquierda
+  if(SEGUNDA.has(o)||o==='sillaG2')return !!ARTE.cubre['obj:'+o.slice(0,-1)];   // la mitad de la derecha de un mueble del salón: la pinta la de la izquierda
   const g=ARTE.cubre['obj:'+o];if(!g)return false;
   const an=ARTE.sobre['obj:'+o],d=desfase(o,tx,ty);
   const sp=decoSprite(o),f=an?frameDe(an[0][0],an[0][1],'unica',now,{bucle:true}):frameDe(g,sp,'unica',0,{i:0,esp:d.esp})||(sp!==o?frameDe(g,o,'unica',0,{i:0,esp:d.esp}):null);   // 1.16: su tapizado o lámina

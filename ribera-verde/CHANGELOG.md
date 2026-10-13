@@ -1,5 +1,13 @@
 # Cambios
 
+## 1.27.1 · 13 de octubre de 2026
+
+Una silla delante de cada ordenador. Godot, 0.21.1.
+
+- **Nuevo: la silla de madera de la tía**, delante de su ordenador del dormitorio, y **la silla gaming** (negra con franjas magenta, pistón y base de cinco radios), que llega con el PC gaming (ahora «PC gaming con mesa y silla», al mismo precio) delante de su mesa, en sus dos casillas. Las dos se ven por detrás, mirando a la pantalla, y no se pisan: con A sobre la silla, desde cualquier lado, se usa el ordenador que tiene delante. Arte a mano en `tools/sprites/a-mano/salon.py` (`silla`, `sillaG`).
+- Igual en Godot. En `docs/MAPA.md`, las sillas son `r`.
+- Tests: `npm test` 109/109 (el paso de la 1.27 mira las sillas: sólidas, A hacia el ordenador y la gaming con el PC); `test:arte` 29/29 (las sillas, también sin atlas); Godot, historia 109 pasos, 41 pantallas (el piso, con las dos sillas) y el ciclo.
+
 ## 1.27.0 · 13 de octubre de 2026
 
 La casa a tu gusto y los logros. Godot, 0.21.0.

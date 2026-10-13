@@ -9,7 +9,7 @@
 const MUEBLES={
   sofa:{n:'Sofá de 2 plazas',art:'el sofá',p:399,x:13,y:5,d:'Sofá de 180 cm, tapizado, mirando a la tele. Para echar una cabezada sin meterte en la cama.'},
   tv:{n:'Tele de 43" con mueble',art:'la tele',p:449,x:13,y:2,d:'Smart TV de 43 pulgadas y un mueble bajo de 140 cm con hueco para la consola. Noticias y documentales.'},
-  gpc:{n:'PC gaming con mesa',art:'el PC gaming',p:1490,x:16,y:2,d:'Torre con gráfica, monitor de 27", teclado mecánico y mesa de 140 cm con LED. Para jugar, leer el foro de cultivo y comprar.'},
+  gpc:{n:'PC gaming con mesa y silla',art:'el PC gaming',p:1490,x:16,y:2,d:'Torre con gráfica, monitor de 27", teclado mecánico, mesa de 140 cm con LED y silla gaming. Para jugar, leer el foro de cultivo y comprar.'},   // 1.27.1: y la silla (sillaG, montarCasa)
   carro:{n:'Carro de esquejes',art:'el carro de esquejes',p:CARRO.p,x:8,y:5,grow:1,d:`Carro con ruedas, dos bandejas de ${CARRO.plazas} tacos tapadas bajo tubos T5 y una mesita con la tabla de corte.`},
   sillon:{n:'Sillón con lámpara de pie',art:'el sillón',p:229,x:16,y:5,d:'Sillón orejero de lectura con una lámpara de pie de luz cálida. Para leer el diario de la tía Maite con calma.'},
   cuadro:{n:'Cuadro para el salón',art:'el cuadro',p:59,x:12,y:1,uno:1,d:'Una lámina enmarcada de 40 × 50 cm para la pared del salón: la ría, el caserío o la hoja, la que quieras.'},
