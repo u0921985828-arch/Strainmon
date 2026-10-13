@@ -36,6 +36,7 @@ const SHOP=[
   {lbl:'Carro de esquejes',p:CARRO.p,ch:2,mueble:'carro',desc:`Dos bandejas de ${CARRO.plazas} esquejes, tapadas y bajo tubos T5, y una mesita con la tabla de corte: pinchados ahí aguantan ${CARRO.dias} días (sueltos, ${ESQUEJE_DIAS}). Kiko te lo sube al piso mañana.`,cond:()=>!(S.muebles&&S.muebles.carro)},
   {lbl:'Analizador de cannabinoides y terpenos',p:180,ch:3,item:'analizador',desc:'Medidor de bolsillo (1.15): THC, CBD y el terpeno principal de un lote, desde la mochila. Lo analizado se vende mejor en la calle y un 5 % más en los clubs, y la cata dice el THC exacto y el terpeno de cada aroma.',cond:()=>!S.items.analizador&&!S.envio.includes('Analizador de cannabinoides y terpenos')},
   {lbl:'Prensa de rosin',p:250,ch:3,item:'prensa',desc:'Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores.',cond:()=>!S.items.prensa},
+  {lbl:'Tarros de curado',p:30,ch:1,item:'tarros',desc:`Tarros de cristal herméticos (1.29) para el arcón de casa: lo que guardas ahí se cura en ${CURADO.dias} días, se vende un ${pct0(CURADO.precio)} % más caro y ya no pierde THC. Sin curar, a los ${CURADO.fresco} días de cosecharla empieza a perder.`,cond:()=>!S.items.tarros&&!S.envio.includes('Tarros de curado')},
 ];
 const SOBRES=[[1,1],[3,.95],[5,.9],[10,.85]],GRANEL=[50,.6];   // [semillas, precio por semilla relativo]
 const precioSobre=(it,[n,f])=>Math.round(it.p*n*f);
@@ -193,7 +194,7 @@ async function talkInaki(){
   const lots=budLots(10);if(!lots.length)return say('Pues nada. Si consigues 10 g, aquí estaré.',N);
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué le vendes?'});
   if(i<0||i>=lots.length)return;
-  const [sid,b]=lots[i],amt=Math.round(precioCalle(b.thc)*1.2*10);
+  const [sid,b]=lots[i],amt=Math.round(precioCalle(b.thc)*calidad(b)*1.2*10);
   if(await ask(`Te doy ${amt} € por 10 g de ${lotNombre(sid)}. ¿Hecho?`,['Hecho','No'],N)!==0)return;
   useBuds(sid,10);S.money+=amt;S.sales+=amt;S.heat=Math.min(100,S.heat+3);S.iDay=S.day;S.rep+=2;confia('inaki',1);sfx('coin');
   if(!S.flags.inaki){S.flags.inaki=true;await say('Toma. Me las dio un marinero de Malaui en Mombasa, en el último viaje.',N);addSeeds('malawi',2);await got('2 semillas de MALAWI GOLD');}
@@ -210,7 +211,7 @@ async function ventaMayor(N){
   if(!lots.length)return say(`Al por mayor, de 100 g para arriba. Pago entre ${coma(precioMayor(12).toFixed(2))} y ${coma(precioMayor(30).toFixed(2))} € el gramo, según lo bueno que sea. Hasta ${mayorDia()>=1000?coma(mayorDia()/1000)+' kg':mayorDia()+' g'} por carga.`,N);
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote?'});
   if(i<0||i>=lots.length)return say('Otro día.',N);
-  const [k,b]=lots[i],pg=Math.round(precioMayor(b.thc)*(rel('inaki')>=REL.amigo?1.05:1)*100)/100,tope=Math.min(Math.floor(b.g),mayorDia());   // 1.15: con confianza, un 5 % más
+  const [k,b]=lots[i],pg=Math.round(precioMayor(b.thc)*calidad(b)*(rel('inaki')>=REL.amigo?1.05:1)*100)/100,tope=Math.min(Math.floor(b.g),mayorDia());   // 1.15: con confianza, un 5 % más
   const ops=[100,250,500,1000,2000,5000,10000].filter(g=>g<tope).concat([tope]),kg=kgTxt;
   const j=await ask(`${lotNombre(k)} a ${coma(pg.toFixed(2))} € el gramo. ¿Cuánto cargas?`,ops.map(g=>`${kg(g)} · ${eur(g*pg)}`).concat(['Nada']),N);
   if(j<0||j>=ops.length)return;

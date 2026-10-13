@@ -2899,6 +2899,78 @@ func _pasos() -> void:
 		func(): return chk(R.g > 10 and R.encima == 1000 and R.arcon == R.g - 10 and re("en la mochila: %d g van al arcón" % (R.g - 10), R.aviso) and R.a2 == 490 + R.g and R.b2 == 0
 			and R.cap == 3000 and R.bolsa == 1 and R.control == R.a2 and re("^Se llevan %d g\\." % int(floor(5 + R.a2)), R.redada) and R.a3 == 0
 			and R.sacar == "3000,500,true" and re("Se han llevado 0 €, 50 g y 1,5 g de rosin\\.", R.darko) and R.a4 == "{\"buds\":{\"ria\":{\"g\":51,\"thc\":12}},\"rosin\":{\"ria\":{\"g\":1.5,\"thc\":36}}}", R))
+	# 1.29: el curado en el arcón con los tarros y lo que pierde lo que no está curado
+	step("Curado (1.29): los tarros de Kiko (30 €); en el arcón, con ellos, un lote se cura en 2 días (el THC no sube), se vende un 15 % más caro y ya no pierde; sin curar, desde el 4.º día pierde un 2 % de THC al día y lo avisa; al juntar lotes, por gramos; la cata lo dice; los lotes de antes de la 1.29, nada",
+		["Tarros de curado", "Salir", "^Thai", "^100 g", "^Catar", "^Catar"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.merge({"ch": 5, "map": "home", "money": 100, "buds": {}, "rosin": {}, "arcon": {"buds": {}, "rosin": {}}, "caja": null, "envio": [], "due": 0, "heat": 0, "protect": false, "orden": 0, "rel": {}, "mDay": 0}, true)
+		J.S.items.tarros = 0
+		await run(J.shop)
+		R = {"t": J.S.items.tarros, "m": 100 - J.S.money, "otra": J.shop_cond(D.SHOP.filter(func(s): return s.lbl == "Tarros de curado")[0]), "aviso": S0.flags.get("curado", 0) != 0}
+		var to0 = TO
+		TO = []
+		capta = true
+		J.add_buds("ria", 100, 20)
+		J.add_buds("thai", 200, 16, J.S.arcon.buds)
+		J.S.buds.hindu = {"g": 30, "thc": 18}   # la de antes, sin día
+		var d0: int = J.S.day
+		R.nuevo = J.S.buds.ria
+		J.new_day()
+		await idle()
+		R.cu1 = J.S.arcon.buds.thai.cu
+		J.new_day()
+		await idle()
+		R.cu2 = J.S.arcon.buds.thai.cu
+		R.thc2 = J.S.arcon.buds.thai.thc
+		J.new_day()
+		await idle()
+		R.ria3 = J.S.buds.ria.thc
+		J.new_day()
+		await idle()
+		R.ria4 = J.S.buds.ria.thc
+		J.new_day()
+		await idle()
+		R.ria5 = J.S.buds.ria.thc
+		R.thai5 = J.S.arcon.buds.thai.thc
+		R.viejo = J.S.buds.hindu
+		R.dias = J.S.day - d0
+		var tl := []
+		for h in TO:
+			if re("Curada en el arcón|Sin curar, pierde", h):
+				tl.append(",".join(Array(h.split("<br>")).filter(func(l): return re("Curada|Sin curar", l))))
+		R.to = "|".join(tl)
+		J.mover_lote(J.S.arcon.buds, J.S.buds, "thai", 200)
+		R.sale = J.S.buds.thai
+		R.cal = [J.calidad(J.S.buds.thai), J.calidad(J.S.buds.ria), J.calidad(J.S.buds.hindu)]
+		var m0: int = J.S.money
+		await run(func(): await J.venta_mayor("IÑAKI"))
+		R.mayor = J.S.money - m0
+		var l0 := LOG.size()
+		await run(func(): await J.lote_accion("thai"))
+		await run(func(): await J.lote_accion("ria"))
+		R.cata = "|".join(LOG.slice(l0).filter(func(l): return re("^(Catas|Thai:|Skunk #1:)", l)))
+		var t := {"g": 100, "thc": 20, "dia": 10, "cu": 1}
+		J.junta_lote(t, 100, 10, 0, 20)
+		R.junta = t
+		var v := {"g": 30, "thc": 18}
+		J.add_buds("hindu", 10, 18, {"hindu": v})
+		R.jv = v
+		var w1 := {"id": "plT", "n": "Ane", "rol": "calle", "k": "thai", "thc": 20, "g": 50, "dia": J.S.day - 4}
+		var w2 := {"id": "plV", "n": "Unai", "rol": "calle", "k": "hindu", "thc": 18, "g": 50}
+		J.S.plantilla = [w1, w2]   # la plantilla también pierde; lo de antes vuelve sin día
+		J.S.arcon.buds = {}
+		J.curado_dia([])
+		J.libre(w2)
+		R.pl = [w1.thc, jj(J.S.arcon.buds.hindu)]
+		capta = false
+		TO = to0
+		J.S = S0,
+		func(): return chk(R.t == 1 and R.m == 30 and R.otra == false and R.aviso and R.nuevo.dia > 0 and not R.nuevo.has("cu") and R.cu1 == .5 and R.cu2 == 1 and R.thc2 == 16
+			and R.ria3 == 20 and absf(R.ria4 - 19.6) < 1e-9 and absf(R.ria5 - 19.208) < 1e-9 and R.thai5 == 16 and jj(R.viejo) == "{\"g\":30,\"thc\":18}" and R.dias == 5
+			and R.to == "Curada en el arcón: Thai|Sin curar, pierde THC: Skunk #1" and R.sale.cu == 1 and R.sale.dia == R.nuevo.dia and absf(R.cal[0] - 1.15) < 1e-9 and R.cal[1] == 1 and R.cal[2] == 1
+			and R.mayor == 414 and re("^Thai: 100 g · 16,0 % · curada\\|Catas Thai: .+\\. Bien curada: suave y con todo el aroma\\.\\|Skunk #1: 100 g · 19,2 % · sin curar\\|Catas Skunk #1: .+\\. Sin curar del todo: rasca y huele a verde\\.$", R.cata)
+			and jj(R.junta) == "{\"g\":200,\"thc\":15,\"dia\":15,\"cu\":0.5}" and R.jv.g == 40 and R.jv.dia > 0 and not R.jv.has("cu") and absf(R.pl[0] - 19.6) < 1e-9 and R.pl[1] == "{\"g\":50,\"thc\":18}", R))
 	step("Móvil (1.10): START → MÓVIL; pedir a Kiko (+15 %, llega mañana) y su SMS en Mensajes; llamar a Kiko; quien te compra te da su número y, llamado, viene a la calle (20 min, +1 de calor, una vez al día)",
 		["MÓVIL", "Pedir a Kiko", "^Abono", "Salir", "Colgar", "SALIR", "MÓVIL", "Mensajes", "<B>", "Llamar", "^Kiko", "Colgar", "SALIR", "^Skunk", "Rebaja",
 			"MÓVIL", "Llamar", "^(?!Kiko|Nada)", "^Skunk", "Rebaja", "SALIR", "MÓVIL", "Llamar", "^(?!Kiko|Nada)", "Colgar", "SALIR"], func():

@@ -30,6 +30,7 @@ En el PC también vale el teclado (flechas o WASD, Z/Espacio = A, X/Esc = B, M =
 - **Calle:** clientes con `$` (estudiante, currela, turista y pijo) a los que les pides precio de rebaja, justo o caro, y desde el capítulo 3, venta al por mayor a Iñaki. Cada venta sube el **calor policial**, que marca el nivel de la policía (tranquilo, vigilancia, investigación); a 90, orden de registro: un día de aviso y la redada, que no toca la caja fuerte.
 - **Combates por turnos:** contra ladrones (luchar, mochila, hablar, huir) y contra la policía (sobornar, hablar, huir, entregar).
 - **Historia:** la herencia de la tía Maite, la deuda de 30.000 € con Don Baltasar, el sargento Molina, el rival Darko y la Copa de Ribera. Misiones guiadas en START → OBJETIVO hasta la Copa, con las suyas: una genética potente, la floración a tope y llegar al 27 %. Saldada la deuda, empieza tu imperio.
+- **Curado (1.29):** la hierba sale sin curar y, a los 3 días, pierde THC cada día; en el arcón, con los tarros de Kiko, se cura en 2 días, se vende un 15 % más cara y ya no se estropea.
 - **Casa:** muebles (el PC gaming, con su silla), tapizados y láminas, póster y alfombra por la tienda online, y reformas del suelo y las paredes del piso; DECORAR LA CASA desde la cama.
 - **Logros:** 26, en START → OBJETIVO → LOGROS, con su aviso al conseguirlos.
 - Día y noche, chiptune propio y guardado local.

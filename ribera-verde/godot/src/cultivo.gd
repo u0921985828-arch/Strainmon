@@ -333,12 +333,21 @@ static func cosecha(S: Dictionary, i: int) -> Dictionary:
 	elif not fem or azar() < D.SEMILLA_HERMA:
 		n = ri(1, 3)
 	var k: String = p.sid + ("*" if cl == "estrella" else "")
-	if S.buds.has(k):
+	if S.buds.has(k):   # como juntaLote (1.29): THC, curado y día por gramos
 		var b: Dictionary = S.buds[k]
-		b.thc = (b.thc * b.g + thc * g) / (b.g + g)
-		b.g += g
+		var nn: float = b.g + g
+		var c: float = float(b.get("cu", 0)) * b.g / nn
+		b.thc = (b.thc * b.g + thc * g) / nn
+		if c:
+			b.cu = c
+		else:
+			b.erase("cu")
+		b.dia = Datos.jsround((float(b.get("dia", S.day)) * b.g + float(S.day) * g) / nn)
+		b.g = nn
+		b.erase("cata")
+		b.erase("ana")
 	else:
-		S.buds[k] = {"g": g, "thc": thc}
+		S.buds[k] = {"g": g, "thc": thc, "dia": S.day}
 	if n:
 		S.seeds[p.sid] = int(S.seeds.get(p.sid, 0)) + n
 	if p.get("f") is Dictionary and p.f.get("id"):

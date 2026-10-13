@@ -1748,7 +1748,7 @@ const P={x:0,y:0,px:0,py:0,dir:'down',moving:false,fx:0,fy:0,t:0,dur:240,parity:
 const DV={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]},OPP={up:'down',down:'up',left:'right',right:'left'};
 const CH_TITLES={1:'La herencia',2:'La calle',3:'La deuda',4:'Genética',5:'El sargento',6:'La Copa de Ribera',7:'Libertad',8:'Tu imperio'};
 function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,min:8*60,money:150,hp:30,hpMax:30,heat:0,rep:0,ch:0,flags:{diario:0},sales:0,
-  seeds:{},buds:{},rosin:{},items:Object.assign({fert:0,fertv:0,phm:0,ofert:0,ofertv:0,ophm:0,medidor:0,insect:0,spray:0,bocata:1,prensa:0,bolsa:0,analizador:0},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
+  seeds:{},buds:{},rosin:{},items:Object.assign({fert:0,fertv:0,phm:0,ofert:0,ofertv:0,ophm:0,medidor:0,insect:0,spray:0,bocata:1,prensa:0,bolsa:0,analizador:0,tarros:0},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},gen:{},pedido:[],esquejes:[],bandejas:[],fenos:{},fenoN:0,fnom:{},eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
   caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0,arcon:{buds:{},rosin:{}},sala:{},fijos:[],sms:[],envio:[],orden:0,misiones:{},itin:{},lonja:0,trueque:0,chatarra:null,
@@ -1769,7 +1769,7 @@ function discover(sid){if(!S.disc[sid]){S.disc[sid]=true;toast(`<small>NUEVA EN 
 function addSeeds(sid,n){S.seeds[sid]=(S.seeds[sid]||0)+n;discover(sid);}
 // cogollos por lotes: clave = variedad, o variedad + '*' para lo de un fenotipo estrella (se vende y se presenta aparte)
 const lotSid=k=>k.replace(/\*$/,''),lotNombre=k=>getStrain(lotSid(k)).n+(k.endsWith('*')?' ★':'');
-function addBuds(k,g,thc,L=S.buds){const b=L[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;delete b.cata;delete b.ana;}else L[k]={g,thc};discover(lotSid(k));}   // L: otro sitio (el arcón)
+function addBuds(k,g,thc,L=S.buds,cu=0,dia=S.day){const b=L[k];if(b){juntaLote(b,g,thc,cu,dia);delete b.cata;delete b.ana;}else{L[k]=Object.assign({g,thc},dia!=null?{dia}:{});if(cu)L[k].cu=cu;}discover(lotSid(k));}   // L: otro sitio (el arcón); cu y dia: el curado y el día de la cosecha (1.29, 09c-sala; sin dar dia, hoy; dia null, sin día, como los de antes)
 function useBuds(k,g){const b=S.buds[k];b.g-=g;if(b.g<.5)delete S.buds[k];}
 function budLots(min,minThc=0){return Object.entries(S.buds).filter(([k,b])=>b.g>=min&&b.thc>=minThc);}
 // rosin (1.10): lo que sale de prensar cogollos en la mesa (prensar, 09-cultivo), por lotes como ellos y al décimo de gramo
@@ -2175,6 +2175,7 @@ function newDay(){
   if(olor){S.heat=Math.min(100,S.heat+olor);av.push('Olor a cogollo: calor +'+olor);}   // después de bajar el calor: cuenta para la redada de mañana
   const sec=S.esquejes.filter(e=>S.day-e.dia>ESQUEJE_DIAS).length;if(sec){S.esquejes=S.esquejes.filter(e=>S.day-e.dia<=ESQUEJE_DIAS);av.push(`Se ${sec>1?'han secado '+sec+' esquejes':'ha secado un esqueje'} sin plantar`);}
   const seb=S.bandejas.filter(e=>S.day-e.dia>CARRO.dias).length;if(seb){S.bandejas=S.bandejas.filter(e=>S.day-e.dia<=CARRO.dias);av.push(`Se ${seb>1?'han secado '+seb+' esquejes':'ha secado un esqueje'} en las bandejas`);}
+  curadoDia(av);   // el curado (1.29, 09c-sala)
   if(av.length&&mode==='world')toast(av.join('<br>'),1600);
   spawnClients();recibirPedido();recibirEnvio();instalarCaja();llegaMueble();vencerEncargo();curroDia();setasDia();vencerEncargoClub();   // la gente (1.15)
   // 1.10: el plazo vencido, también sin haber visto a Baltasar (el plazo corre desde Toño); 1.11: el aviso, a 3 días y el último
@@ -2345,6 +2346,7 @@ async function harvest(i){
   if(cl==='estrella'){sfx('enc');await say(`¡Fenotipo estrella! THC ×${coma(fe.t)} y cosecha ×${coma(fe.y)} sobre la media de la ${s.n}.`);await say('Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.');}
   else if(cl==='floja')await say(`Fenotipo flojo: THC ×${coma(fe.t)} y cosecha ×${coma(fe.y)} de la media.`);
   if(n)await say(cria?`Las plantas de la línea se han polinizado entre ellas: recoges ${n} semillas de ${s.n}.`:!fem?`Son semillas regulares: algún macho ha polinizado unas flores. Recoges ${n} semilla${n>1?'s':''} de ${s.n}.`:`Una flor hermafrodita ha polinizado unas pocas: recoges ${n} semilla${n>1?'s':''} de ${s.n}.`);
+  if(!S.items.tarros&&!S.flags.curado){S.flags.curado=S.day;await say(`Sale sin curar: a los ${CURADO.fresco} días empieza a perder THC. En el arcón, con unos tarros de curado (los vende Kiko), se cura en ${CURADO.dias} y se vende más cara.`);}   // 1.29, una vez
   S.flags.harvest1=true;await checkStory();
 }
 // estabilizar: la línea cruzada consigo misma sube una generación (F1 → F2 → F3 → estable)
@@ -3195,10 +3197,36 @@ const bolsaYa=()=>Math.max(S.items.bolsa||0,...S.envio.map(l=>(SHOP.find(x=>x.lb
 const pesoEncima=()=>totalBuds()+totalRosin(),capMochila=()=>MOCHILAS[S.items.bolsa||0].g,libreMochila=()=>Math.max(0,capMochila()-pesoEncima());
 const arconG=()=>Object.values(S.arcon.buds).reduce((a,b)=>a+b.g,0),arconR=()=>Object.values(S.arcon.rosin).reduce((a,b)=>a+b.g,0);
 const arconTxt=()=>arconR()>=.1?`${gTxt(arconG())} y ${rosinTxt(arconR())}`:gTxt(arconG());
+/* ---------- el curado (1.29) ----------
+   Cada lote de cogollos lleva el día de la cosecha (b.dia) y lo curado (b.cu, de 0 a 1; sin él, nada). En el arcón, con los tarros de
+   Kiko (S.items.tarros), se cura 1/CURADO.dias al día; curado se vende CURADO.precio más caro (calidad) y ya no pierde THC. Sin curar
+   del todo, pasados CURADO.fresco días desde la cosecha pierde CURADO.pierde de su THC cada día (×(1 − cu)), esté donde esté. El THC
+   no sube al curar. Los lotes de antes de la 1.29 (sin día) no pierden nada. Al juntar dos lotes, el THC, lo curado y el día van por gramos */
+const CURADO={dias:2,fresco:3,pierde:.02,precio:.15};
+const calidad=b=>1+CURADO.precio*(b.cu||0);
+const curaDe=b=>Object.assign({},b.dia!=null?{dia:b.dia}:{},b.cu?{cu:b.cu}:{});
+function juntaLote(t,g,thc,cu,dia){
+  const n=t.g+g,c=((t.cu||0)*t.g+(cu||0)*g)/n;t.thc=(t.thc*t.g+thc*g)/n;
+  if(c)t.cu=c;else delete t.cu;if(dia!=null)t.dia=Math.round(((t.dia??dia)*t.g+dia*g)/n);t.g=n;
+}
+// al amanecer (newDay): lo que se cura en el arcón y lo que pierde THC; av, los avisos del día
+function curadoDia(av){
+  const listos=[],pierden=[];
+  if(S.items.tarros)for(const [k,b] of Object.entries(S.arcon.buds))if((b.cu||0)<1){b.cu=Math.min(1,(b.cu||0)+1/CURADO.dias);if(b.cu>=1)listos.push(lotNombre(k));}
+  for(const L of [S.buds,S.arcon.buds,S.caja?S.caja.buds:{}])for(const [k,b] of Object.entries(L))
+    if(b.dia!=null&&(b.cu||0)<1&&S.day-b.dia>CURADO.fresco){b.thc*=1-CURADO.pierde*(1-(b.cu||0));if(S.day-b.dia===CURADO.fresco+1)pierden.push(lotNombre(k));}
+  for(const w of S.plantilla)if(w.rol==='calle'&&w.dia!=null&&(w.cu||0)<1&&S.day-w.dia>CURADO.fresco)w.thc*=1-CURADO.pierde*(1-(w.cu||0));   // lo que lleva alguien de la plantilla, igual (sin aviso)
+  if(listos.length)av.push('Curada en el arcón: '+yLista(listos));
+  if(pierden.length)av.push('Sin curar, pierde THC: '+yLista(pierden));
+}
+// cómo está un lote, para la mochila: curado, curándose o sin curar ('' en los de antes de la 1.29)
+const curaTxt=b=>b.cu>=1?`Curada: se vende un ${pct0(CURADO.precio)} % más cara y ya no pierde THC.`:b.cu?`Curándose (${pct0(b.cu)} %): termina de curarla en el arcón con los tarros.`
+  :b.dia==null?'':`Sin curar: ${S.day-b.dia>CURADO.fresco?'pierde THC cada día':`desde el día ${b.dia+CURADO.fresco+1} pierde THC`}. Cúrala en el arcón con tarros.`;
+const curaCorto=b=>b.cu>=1?' · curada':b.cu?' · curándose':b.dia!=null?' · sin curar':'';
 async function arconAction(){
   for(;;){
     const ops=['Guardar todo','Guardar un lote','Sacar un lote','Cerrar'];
-    const op=ops[await ask(`El arcón: ${arconTxt()}.\nEncima: ${gTxt(pesoEncima())} de ${kgTxt(capMochila())}.`,ops)];
+    const op=ops[await ask(`El arcón: ${arconTxt()}.\nEncima: ${gTxt(pesoEncima())} de ${kgTxt(capMochila())}.`+(S.items.tarros?`\nCon los tarros, los cogollos se curan en ${CURADO.dias} días.`:''),ops)];
     if(!op||op==='Cerrar')return;
     if(op==='Guardar todo'){
       const g=totalBuds(),r=totalRosin();
@@ -3263,7 +3291,7 @@ async function talkClient(c){
   if(!lots.length)return say((ext?totalRosin():totalBuds())>0?'Eso no me vale. Vuelve cuando tengas lo que busco.':'¿No llevas nada? Vale.',N);
   const i=await menu(lots.map(ext?rosinItem:lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué le vendes?'});
   if(i<0||i>=lots.length)return say('Vale, otro día.',N);
-  const [sid,b]=lots[i],base=(ext?precioRosin:precioCalle)(b.thc)*ct.mult*ZONAS[c.map||'town'].precio*rivalF(c.map||'town')*c.want;
+  const [sid,b]=lots[i],base=(ext?precioRosin(b.thc):precioCalle(b.thc)*calidad(b))*ct.mult*ZONAS[c.map||'town'].precio*rivalF(c.map||'town')*c.want;
   const pr=[Math.round(base*.85),Math.round(base),Math.round(base*1.3)];
   const j=await ask(`${c.want} g de ${ext?'rosin de ':''}${lotNombre(sid)}. ¿Cuánto le pides?`,[`Rebaja · ${pr[0]} €`,`Justo · ${pr[1]} €`,`Caro · ${pr[2]} €`,'Cancelar']);
   if(j===3)return say('Entonces me voy.',N);
@@ -3450,6 +3478,7 @@ const SHOP=[
   {lbl:'Carro de esquejes',p:CARRO.p,ch:2,mueble:'carro',desc:`Dos bandejas de ${CARRO.plazas} esquejes, tapadas y bajo tubos T5, y una mesita con la tabla de corte: pinchados ahí aguantan ${CARRO.dias} días (sueltos, ${ESQUEJE_DIAS}). Kiko te lo sube al piso mañana.`,cond:()=>!(S.muebles&&S.muebles.carro)},
   {lbl:'Analizador de cannabinoides y terpenos',p:180,ch:3,item:'analizador',desc:'Medidor de bolsillo (1.15): THC, CBD y el terpeno principal de un lote, desde la mochila. Lo analizado se vende mejor en la calle y un 5 % más en los clubs, y la cata dice el THC exacto y el terpeno de cada aroma.',cond:()=>!S.items.analizador&&!S.envio.includes('Analizador de cannabinoides y terpenos')},
   {lbl:'Prensa de rosin',p:250,ch:3,item:'prensa',desc:'Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores.',cond:()=>!S.items.prensa},
+  {lbl:'Tarros de curado',p:30,ch:1,item:'tarros',desc:`Tarros de cristal herméticos (1.29) para el arcón de casa: lo que guardas ahí se cura en ${CURADO.dias} días, se vende un ${pct0(CURADO.precio)} % más caro y ya no pierde THC. Sin curar, a los ${CURADO.fresco} días de cosecharla empieza a perder.`,cond:()=>!S.items.tarros&&!S.envio.includes('Tarros de curado')},
 ];
 const SOBRES=[[1,1],[3,.95],[5,.9],[10,.85]],GRANEL=[50,.6];   // [semillas, precio por semilla relativo]
 const precioSobre=(it,[n,f])=>Math.round(it.p*n*f);
@@ -3607,7 +3636,7 @@ async function talkInaki(){
   const lots=budLots(10);if(!lots.length)return say('Pues nada. Si consigues 10 g, aquí estaré.',N);
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué le vendes?'});
   if(i<0||i>=lots.length)return;
-  const [sid,b]=lots[i],amt=Math.round(precioCalle(b.thc)*1.2*10);
+  const [sid,b]=lots[i],amt=Math.round(precioCalle(b.thc)*calidad(b)*1.2*10);
   if(await ask(`Te doy ${amt} € por 10 g de ${lotNombre(sid)}. ¿Hecho?`,['Hecho','No'],N)!==0)return;
   useBuds(sid,10);S.money+=amt;S.sales+=amt;S.heat=Math.min(100,S.heat+3);S.iDay=S.day;S.rep+=2;confia('inaki',1);sfx('coin');
   if(!S.flags.inaki){S.flags.inaki=true;await say('Toma. Me las dio un marinero de Malaui en Mombasa, en el último viaje.',N);addSeeds('malawi',2);await got('2 semillas de MALAWI GOLD');}
@@ -3624,7 +3653,7 @@ async function ventaMayor(N){
   if(!lots.length)return say(`Al por mayor, de 100 g para arriba. Pago entre ${coma(precioMayor(12).toFixed(2))} y ${coma(precioMayor(30).toFixed(2))} € el gramo, según lo bueno que sea. Hasta ${mayorDia()>=1000?coma(mayorDia()/1000)+' kg':mayorDia()+' g'} por carga.`,N);
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote?'});
   if(i<0||i>=lots.length)return say('Otro día.',N);
-  const [k,b]=lots[i],pg=Math.round(precioMayor(b.thc)*(rel('inaki')>=REL.amigo?1.05:1)*100)/100,tope=Math.min(Math.floor(b.g),mayorDia());   // 1.15: con confianza, un 5 % más
+  const [k,b]=lots[i],pg=Math.round(precioMayor(b.thc)*calidad(b)*(rel('inaki')>=REL.amigo?1.05:1)*100)/100,tope=Math.min(Math.floor(b.g),mayorDia());   // 1.15: con confianza, un 5 % más
   const ops=[100,250,500,1000,2000,5000,10000].filter(g=>g<tope).concat([tope]),kg=kgTxt;
   const j=await ask(`${lotNombre(k)} a ${coma(pg.toFixed(2))} € el gramo. ¿Cuánto cargas?`,ops.map(g=>`${kg(g)} · ${eur(g*pg)}`).concat(['Nada']),N);
   if(j<0||j>=ops.length)return;
@@ -3816,7 +3845,7 @@ const cajaR=()=>S.caja&&S.caja.rosin?Object.values(S.caja.rosin).reduce((a,b)=>a
 // pagar desde el piso: primero lo de fuera y después la caja. Devuelve lo que falta
 function pagarCasa(e){const a=Math.min(S.money,e);S.money-=a;e-=a;if(e>0&&S.caja){const b=Math.min(S.caja.money,e);S.caja.money-=b;e-=b;}return e;}
 // g gramos del lote k de «de» a «a»: si el lote ya está, se juntan con el THC medio por gramos
-function moverLote(de,a,k,g){const b=de[k],t=a[k];if(t){t.thc=(t.thc*t.g+b.thc*g)/(t.g+g);t.g+=g;}else a[k]={g,thc:b.thc};b.g-=g;if(b.g<.5)delete de[k];}
+function moverLote(de,a,k,g){const b=de[k],t=a[k];if(t)juntaLote(t,g,b.thc,b.cu,b.dia);else a[k]=Object.assign({g,thc:b.thc},curaDe(b));b.g-=g;if(b.g<.5)delete de[k];}   // 1.29: con su curado y su día
 // lo mismo con el rosin, al décimo de gramo (como addRosin y useRosin)
 function moverRosin(de,a,k,g){const b=de[k],t=a[k];if(t){t.thc=(t.thc*t.g+b.thc*g)/(t.g+g);t.g=Math.round((t.g+g)*10)/10;}else a[k]={g,thc:b.thc};b.g=Math.round((b.g-g)*10)/10;if(b.g<.1)delete de[k];}
 // «300 € y 50 g», «300 €, 50 g y 2 g de rosin» o, sin cogollos, «300 € y 2 g de rosin»
@@ -3983,7 +4012,7 @@ const MISIONES=[
     ok:()=>POTENTES.some(k=>S.rec[k]),p:{fert:4,phm:4},sms:['Con esa ya puedes plantarle cara a Darko. Ahora, a sacarle todo el THC.']},
   {id:'flor27',ch:6,t:'Floración a tope',d:`El THC sube con la luz y el abono: el LED de 720 W (${eur(precioDe(it=>it.foco==='led720'))}, en la carpa de 120 o la de 150), +${pct(FOCOS.led720.thc)}, y MEATZA FLORACIÓN con pH− y el medidor de pH y EC (${eur(precioDe(it=>it.item==='medidor'))}), +${pct(ABONO.thc)} si lo aprovecha entero (ORTUA BIO, +${pct(ABONO_BIO.thc)}).`,
     ok:()=>S.pots.some((p,i)=>{const h=huecos()[i];return p&&!p.dead&&fq(p)>=1&&h&&S.carpas[h.c].foco==='led720';}),p:{ofert:2,ophm:2},sms:['Así, a tope. Ahí tienes ORTUA BIO para la próxima: el orgánico da algo más de THC.']},
-  {id:'copa27',ch:6,t:'Llegar al 27 %',d:`20 g de un solo lote con más del ${pct(COPA_THC)} % de THC, en la mochila. Cosecha la mejor y preséntala antes de cosechar otra de la misma variedad: el lote se queda con la media (la de fenotipo estrella ★ va aparte).`,
+  {id:'copa27',ch:6,t:'Llegar al 27 %',d:`20 g de un solo lote con más del ${pct(COPA_THC)} % de THC, en la mochila. Cosecha la mejor y preséntala antes de cosechar otra de la misma variedad: el lote se queda con la media (la de fenotipo estrella ★ va aparte). Sin curar, a los ${CURADO.fresco} días empieza a perder THC: preséntala antes o cúrala en el arcón con tarros.`,
     ok:()=>budLots(20).some(([,b])=>Math.round(b.thc*10)/10>COPA_THC),sms:['Con eso le ganas a Darko. Llévaselo al jurado de la plaza antes de venderlo.']}];
 const cerrarCopa=()=>MISIONES.forEach(m=>{if(m.ch===6&&!(m.id in S.misiones))S.misiones[m.id]=0;});   // ganada la Copa, sin aviso ni regalo
 const PREMIO_N={fert:'dosis de MEATZA FLORACIÓN',fertv:'dosis de MEATZA CRECIMIENTO',phm:'dosis de pH− MEATZA',ofert:'dosis de ORTUA BIO FLORACIÓN',ofertv:'dosis de ORTUA BIO CRECIMIENTO',ophm:'dosis de pH− ORTUA BIO',insect:'tratamiento de INSECTICIDA'};
@@ -4070,7 +4099,7 @@ async function talkNerea(){
   if(!lots.length)return say(`Cargo para los barcos de fuera: de 100 a ${L.g} g, un ${Math.round((L.f-1)*100)} % por encima de lo que paga Iñaki. Cada ${L.dias} días.`,N);
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote?'});
   if(i<0||i>=lots.length)return say('Otro día.',N);
-  const [k,b]=lots[i],pg=Math.round(precioMayor(b.thc)*L.f*100)/100,tope=Math.min(Math.floor(b.g),L.g);
+  const [k,b]=lots[i],pg=Math.round(precioMayor(b.thc)*calidad(b)*L.f*100)/100,tope=Math.min(Math.floor(b.g),L.g);
   const ops=[100,250].filter(g=>g<tope).concat([tope]);
   const j=await ask(`${lotNombre(k)} a ${coma(pg.toFixed(2))} € el gramo. ¿Cuánto cargas?`,ops.map(g=>`${kgTxt(g)} · ${eur(g*pg)}`).concat(['Nada']),N);
   if(j<0||j>=ops.length)return;
@@ -4145,7 +4174,7 @@ function curroDia(){
     const r=Math.random(),N='SMS · '+v.n.toUpperCase();
     if(r<V.pilla){fin.push(v);S.heat=Math.min(100,S.heat+V.calorPilla);confia(v.id,-5);queue('vend'+v.id,()=>talk(N,[`Me ha parado la policía. Se han quedado con ${gTxt(v.g)} de ${lotNombre(v.k)}. Lo siento.`]));continue;}
     if(r<V.pilla+V.estafa*(REL.max-rel(v.id))/REL.max){fin.push(v);S.fijos=S.fijos.filter(f=>f.id!==v.id);S.rel[v.id]=0;queue('vend'+v.id,()=>say(`${v.n} no contesta al móvil. Se ha largado con ${gTxt(v.g)} de ${lotNombre(v.k)}.`));continue;}
-    const g=Math.min(Math.floor(v.g),ri(V.g[0],V.g[1])),e=Math.round(precioCalle(v.thc)*ZONAS.town.precio*g*(1-V.com));
+    const g=Math.min(Math.floor(v.g),ri(V.g[0],V.g[1])),e=Math.round(precioCalle(v.thc)*calidad(v)*ZONAS.town.precio*g*(1-V.com));
     v.g-=g;S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+V.calor);confia(v.id,1);vende=true;
     if(v.g<1){fin.push(v);queue('vend'+v.id,()=>talk(N,[`Vendidos los últimos ${g} g: ${eur(e)} en tu buzón. Si quieres que siga, déjame más.`]));}
     else queue('vend'+v.id,()=>talk(N,[`Vendidos ${g} g: ${eur(e)} en tu buzón. Me quedan ${gTxt(v.g)}.`]));
@@ -4180,7 +4209,7 @@ async function contratarVendedor(f){
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote le dejas?'});if(i<0||i>=lots.length)return false;
   const [k,b]=lots[i],ops=V.lotes.filter(g=>g<=Math.floor(b.g));
   const j=await ask(`${f.n} vende a precio de calle y se queda el ${pct0(V.com)} %. ¿Cuánto le dejas?`,ops.map(g=>g+' g').concat(['Nada']));if(j<0||j>=ops.length)return false;
-  useBuds(k,ops[j]);S.curro.vend.push({id:f.id,n:f.n,k,thc:b.thc,g:ops[j],dia:S.day});sfx('sel');
+  useBuds(k,ops[j]);S.curro.vend.push(Object.assign({id:f.id,n:f.n,k,thc:b.thc,g:ops[j],dia:S.day},b.cu?{cu:b.cu}:{}));sfx('sel');
   await say(`${f.n}: «Hecho. Cada día te dejo lo vendido en el buzón».`);return false;
 }
 // MÓVIL → GENTE: a quién conoces y cuánto se fía de ti
@@ -4237,7 +4266,7 @@ async function venderClub(k){
   if(S.clubDia[k]===S.day)return say('Hoy ya hemos cerrado caja. Mañana.',N);
   const lots=budLots(CLUB.g[0]);if(!lots.length)return say(`De ${CLUB.g[0]} g para arriba, entre ${coma(precioClub(12).toFixed(2))} y ${coma(precioClub(30).toFixed(2))} € el gramo según el THC. Una entrega al día.`,N);
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote?'});if(i<0||i>=lots.length)return;
-  const [kk,b]=lots[i],pg=Math.round(precioClub(b.thc)*(b.ana?1.05:1)*100)/100,ops=CLUB.g.filter(g=>g<=Math.floor(b.g));
+  const [kk,b]=lots[i],pg=Math.round(precioClub(b.thc)*calidad(b)*(b.ana?1.05:1)*100)/100,ops=CLUB.g.filter(g=>g<=Math.floor(b.g));
   const j=await ask(`${lotNombre(kk)} a ${coma(pg.toFixed(2))} € el gramo${b.ana?' (analizado)':''}. ¿Cuánto?`,ops.map(g=>`${g} g · ${eur(g*pg)}`).concat(['Nada']),N);if(j<0||j>=ops.length)return;
   const g=ops[j],e=Math.round(g*pg);useBuds(kk,g);S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+CLUB.calor);S.rep+=1;S.clubDia[k]=S.day;confia(k,2);sfx('coin');
   await accion('vender',{id:'vfx-monedas',x:P.px+8,y:P.py+2});toast(`+${eur(e)} · ${g} g al club`,1600);await say('Por la puerta de atrás, como siempre. Gracias.',N);await checkStory();
@@ -4248,7 +4277,7 @@ async function comprarClub(k){
   if(await ask(`Hoy tenemos ${s.n} (${pct(s.thc)} %): ${CLUB.compra} g por ${eur(p)}. ¿Te los llevas?`,['Comprar','No'],N)!==0)return;
   if(S.money<p){sfx('bad');return say('Sin dinero no hay reparto.',N);}
   if(libreMochila()<CLUB.compra)return say('No te caben en la bolsa.',N);
-  S.money-=p;S.clubCompra[k]=S.day;addBuds(sid,CLUB.compra,s.thc);discover(sid);sfx('coin');toast(`Comprado: ${CLUB.compra} g de ${s.n}`,1200);
+  S.money-=p;S.clubCompra[k]=S.day;addBuds(sid,CLUB.compra,s.thc,S.buds,1);discover(sid);sfx('coin');toast(`Comprado: ${CLUB.compra} g de ${s.n}`,1200);
 }
 async function encargoClub(k){
   const C=CLUBS[k],N=C.n,E=S.clubEnc;
@@ -4279,13 +4308,13 @@ function notaCata(sid,thc){const ind=indDe(sid),a=aromaDe(sid),e=ind>=65?'relaja
   return `Aroma ${a}${S.items.analizador?' ('+TERPENOS[a]+')':''} · ${e} · ${S.items.analizador?pct(thc)+' % de THC':thc<12?'floja':thc<18?'media':thc<24?'fuerte':'muy fuerte'}`;}
 async function catar(k){
   const b=S.buds[k];if(!b||b.g<CATA.g)return;
-  const sid=lotSid(k),thc=b.thc;useBuds(k,CATA.g);if(S.buds[k])S.buds[k].cata=true;S.catas[sid]=notaCata(sid,thc);advanceTime(CATA.min);updateHUD();
-  await say(`Catas ${lotNombre(k)}: ${S.catas[sid]}.`);
+  const sid=lotSid(k),thc=b.thc,cu=b.cu||0,fresca=b.dia!=null;useBuds(k,CATA.g);if(S.buds[k])S.buds[k].cata=true;S.catas[sid]=notaCata(sid,thc);advanceTime(CATA.min);updateHUD();
+  await say(`Catas ${lotNombre(k)}: ${S.catas[sid]}.`+(cu>=1?' Bien curada: suave y con todo el aroma.':cu||fresca?' Sin curar del todo: rasca y huele a verde.':''));   // 1.29
 }
 async function analizar(k){const b=S.buds[k];if(!b||!S.items.analizador)return;const sid=lotSid(k);b.ana=true;sfx('get');await say(`Analizado: ${lotNombre(k)} · THC ${pct(b.thc)} % · CBD ${pct(cbdDe(sid))} % · terpeno principal, ${TERPENOS[aromaDe(sid)]}. Lo que va con análisis se vende mejor.`);}
 async function loteAccion(k){
   const b=S.buds[k],ops=[`Catar ${coma(CATA.g)} g`].concat(S.items.analizador&&!b.ana?['Analizar']:[],['Nada']);
-  const op=ops[await ask(`${lotNombre(k)}: ${Math.floor(b.g)} g · ${pct(b.thc)} %${b.cata?' · catado':''}${b.ana?' · analizado':''}`,ops)];
+  const op=ops[await ask(`${lotNombre(k)}: ${Math.floor(b.g)} g · ${pct(b.thc)} %${curaCorto(b)}${b.cata?' · catado':''}${b.ana?' · analizado':''}`,ops)];
   if(op&&op.startsWith('Catar'))return catar(k);if(op==='Analizar')return analizar(k);
 }
 /* =========================================================
@@ -4309,7 +4338,7 @@ function rolDesc(w){const P=PLANTILLA;
   return w.rol==='calle'?`Vende ${lotNombre(w.k)} en la calle: le quedan ${gTxt(w.g)}.`:w.rol==='gerente'?`Cuida el piso y cosecha al arcón por ${eur(P.sueldo.gerente)} al día.`
     :w.rol==='nave'?`Cultiva en la nave por ${eur(P.sueldo.nave)} al día: ${naveG(w)} g.`:'Dale trabajo: calle, gerente o nave.';}
 // deja el trabajo; lo que le quedaba del lote vuelve al arcón
-function libre(w){if(w.rol==='calle'&&w.g>=1)addBuds(w.k,w.g,w.thc,S.arcon.buds);w.rol=null;delete w.k;delete w.thc;delete w.g;}
+function libre(w){if(w.rol==='calle'&&w.g>=1)addBuds(w.k,w.g,w.thc,S.arcon.buds,w.cu,w.dia??null);w.rol=null;delete w.k;delete w.thc;delete w.g;delete w.cu;delete w.dia;}
 async function plantilla(){
   let i=0;
   for(;;){
@@ -4330,14 +4359,14 @@ async function pedirGente(){
   if(await ask(`${n}: ${fichaGente(w)}. ¿Le contratas?`,['Contratar','No'])!==0)return say(`${n} se va por donde ha venido. El sobre ya es de Patxi.`);
   S.plantilla.push(w);sfx('sel');return say(`${n} entra en tu plantilla. Dale trabajo desde aquí.`);
 }
-// un lote de los de encima para la calle: [clave, THC, gramos] o null
+// un lote de los de encima para la calle: [clave, THC, gramos, {dia, cu} (1.29)] o null
 async function loteCalle(w){
   const P=PLANTILLA,lots=budLots(P.lotes[0]);
   if(!lots.length){await say(`Para la calle hace falta un lote de ${P.lotes[0]} g o más encima.`);return null;}
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote le das?'});if(i<0||i>=lots.length)return null;
   const [k,b]=lots[i],ops=P.lotes.filter(g=>g<=Math.floor(b.g));
   const j=await ask(`${w.n} vende a precio de calle y se queda el ${pct0(P.com)} %. ¿Cuánto le das?`,ops.map(g=>g+' g').concat(['Nada']));if(j<0||j>=ops.length)return null;
-  const thc=b.thc;useBuds(k,ops[j]);return [k,thc,ops[j]];
+  const thc=b.thc,c=curaDe(b);useBuds(k,ops[j]);return [k,thc,ops[j],c];
 }
 async function trabajo(w){
   const P=PLANTILLA,ops=[];
@@ -4346,7 +4375,7 @@ async function trabajo(w){
   if(w.rol!=='nave'&&S.nave&&naveros().length<NAVE.max)ops.push('A la nave');
   if(w.rol)ops.push('Dejarlo libre');ops.push('Despedir','Nada');
   const op=ops[await ask(`${w.n} · ${fichaGente(w)} · ${rolTxt(w)}`,ops)];
-  if(op==='A la calle'){const r=await loteCalle(w);if(!r)return;libre(w);w.rol='calle';[w.k,w.thc,w.g]=r;sfx('sel');return say(`${w.n}: «Hecho. Cada día te dejo lo vendido en el buzón».`);}
+  if(op==='A la calle'){const r=await loteCalle(w);if(!r)return;libre(w);w.rol='calle';[w.k,w.thc,w.g]=r;Object.assign(w,r[3]);sfx('sel');return say(`${w.n}: «Hecho. Cada día te dejo lo vendido en el buzón».`);}
   if(op==='De gerente'){libre(w);w.rol='gerente';sfx('sel');return say(`${w.n}: «Cada mañana me paso por el piso: riego, trato las plagas y lo que esté listo lo cosecho y lo dejo en el arcón. ${eur(P.sueldo.gerente)} al día».`);}
   if(op==='A la nave'){libre(w);w.rol='nave';sfx('sel');return say(`${w.n}: «Mañana empiezo en la nave. ${eur(P.sueldo.nave)} al día».`);}
   if(op==='Dejarlo libre'){const g=w.rol==='calle'?w.g:0;libre(w);return say(g>=1?`${w.n} te deja lo que le quedaba en el arcón: ${gTxt(g)}.`:`${w.n} se queda sin trabajo.`);}
@@ -4378,7 +4407,7 @@ function plantillaDia(){
     else if(r<pf){fuera.push(w);const g=w.g;queue('pl'+w.id,()=>say(`${w.n} no contesta al móvil. Se ha largado con ${gTxt(g)} de ${lote}.`));continue;}
     else{const q=Math.min(Math.floor(w.g),ri(P.g[0],P.g[1])*w.lab);w.g-=q;
       if(r<pt)m=`Me han pagado ${q} g con billetes falsos. No me he dado cuenta hasta el banco.`;
-      else{const e=Math.round(precioCalle(w.thc)*ZONAS.town.precio*q*(1-P.com));S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+P.calor);vende=true;
+      else{const e=Math.round(precioCalle(w.thc)*calidad(w)*ZONAS.town.precio*q*(1-P.com));S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+P.calor);vende=true;
         m=w.g>=1?`Vendidos ${q} g: ${eur(e)} en tu buzón. Me quedan ${gTxt(w.g)}.`:`Vendidos los últimos ${q} g: ${eur(e)} en tu buzón. Dame más cuando quieras.`;}}
     if(w.g<1)libre(w);queue('pl'+w.id,()=>talk(N,[m]));
   }
@@ -4844,14 +4873,15 @@ async function mochila(){
       desc:'En casa, entre la cama y la nevera. Un control en la calle no lo ve; una redada se lo lleva.'}]:[],S.caja?[{label:'Caja fuerte',right:`${eur(cajaE())} · ${Math.floor(cajaG())} g${cajaR()>=.1?' · '+coma(Math.round(cajaR()*10)/10)+' g rosin':''}`,ic:icono('billetes'),
       desc:`${CAJA[S.caja.nivel].n}, detrás del diploma. Caben ${eur(CAJA[S.caja.nivel].money)} y ${kgTxt(CAJA[S.caja.nivel].g)}.\nLo que está dentro no lo llevas encima.`}]:[],[{label:'Vida',right:`${S.hp}/${S.hpMax}`,desc:'Se recupera durmiendo, comiendo o con el tiempo.'},
       ...(S.pelea.xp>0?[{label:'Pelea',right:'nivel '+nivelPelea(),desc:fichaPelea()}]:[]),].concat(Object.keys(PRODUCTOS).filter(k=>k==='fert'||S.items[k]>0).map(k=>({label:PRODUCTOS[k].n,right:'×'+S.items[k],ic:icono('abono'),desc:descProducto(k)})),   // abonos y pH− por marca (1.23)
-      S.items.medidor?[{label:'Medidor de pH y EC',right:'×1',desc:'Con él corriges el pH justo y ves la EC y el pH de cada maceta en PLANTAS.'}]:[],[{label:'Insecticida (tratamientos)',right:'×'+S.items.insect,ic:icono('insecticida'),desc:'Úsalo en una maceta con plaga.'},
+      S.items.medidor?[{label:'Medidor de pH y EC',right:'×1',desc:'Con él corriges el pH justo y ves la EC y el pH de cada maceta en PLANTAS.'}]:[],
+      S.items.tarros?[{label:'Tarros de curado',right:'en el arcón',desc:`Lo que guardas en el arcón se cura en ${CURADO.dias} días: se vende un ${pct0(CURADO.precio)} % más caro y ya no pierde THC.`}]:[],[{label:'Insecticida (tratamientos)',right:'×'+S.items.insect,ic:icono('insecticida'),desc:'Úsalo en una maceta con plaga.'},
       {label:'Spray de pimienta',right:'×'+S.items.spray,ic:icono('spray'),desc:'Solo en combate.'},{label:'Bocata',right:'×'+S.items.bocata,ic:icono('bocadillo'),desc:'Pulsa A para comerlo: +15 de vida.',k:'bocata'}]));
     for(const k in MACETAS)if(S.items['m_'+k]>0)rows.push({label:'Maceta '+MACETAS[k].n,right:'×'+S.items['m_'+k],ic:icono('maceta'),desc:descMaceta(k)+'\nSe cambia en una plaza vacía de la carpa.'});
     for(const k in FOCOS)if(S.items['f_'+k]>0)rows.push({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],ic:icono(icoFoco(k)),desc:descFoco(k)+'\nSe cuelga desde la vista de carpa: ▲ hasta el foco y A.'});
     for(const k in EXTRAS)if(S.items['x_'+k]>0)rows.push({label:EXTRAS[k].n,right:'×'+S.items['x_'+k],ic:icono(ICX[k]),desc:EXTRAS[k].d+`\nSe pone${EXTRAS[k].pl?'n':''} desde la vista de carpa: ▲ hasta el foco y A.`});
     for(const [k,v] of Object.entries(S.seeds))rows.push({label:'Semilla '+getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:icono('semillas'),desc:strainLine(k)+'\nPulsa A para tirarlas.',k:'s',sid:k});
     for(const e of S.esquejes)rows.push({label:'Esqueje '+getStrain(e.sid).n+etiq(e.f),right:'día '+(e.dia+ESQUEJE_DIAS),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),desc:`Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+ESQUEJE_DIAS}.\nPulsa A para ponerle nombre o tirarlo.`,k:'e',e});
-    for(const [k,b] of Object.entries(S.buds))rows.push({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k)),desc:(k.endsWith('*')?'Cogollos de un fenotipo estrella, en lote aparte.\n':'Cogollos listos para vender.\n')+(S.catas[lotSid(k)]?S.catas[lotSid(k)]+'\n':'')+getStrain(lotSid(k)).o+'\nPulsa A para catarlo'+(S.items.analizador?' o analizarlo.':'.'),k:'b',key:k});
+    for(const [k,b] of Object.entries(S.buds))rows.push({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k)),desc:(k.endsWith('*')?'Cogollos de un fenotipo estrella, en lote aparte.\n':'Cogollos listos para vender.\n')+(curaTxt(b)?curaTxt(b)+'\n':'')+(S.catas[lotSid(k)]?S.catas[lotSid(k)]+'\n':'')+getStrain(lotSid(k)).o+'\nPulsa A para catarlo'+(S.items.analizador?' o analizarlo.':'.'),k:'b',key:k});
     for(const [k,b] of Object.entries(S.rosin))rows.push({label:'Rosin · '+lotNombre(k),right:`${coma(b.g)} g · ${pct(b.thc)}%`,sw:'#d89a18',ic:iconoCogollo(lotSid(k)),desc:'Rosin: extracción prensada sin disolventes. Lo compran los catadores.\n'+getStrain(lotSid(k)).o});
     if(S.items.prensa)rows.push({label:'Prensa de rosin',right:'en la mesa',desc:'De 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso.'});
     i=await menu(rows,{cls:'full',title:'MOCHILA',title2:`${Math.floor(totalBuds())} g encima`+(S.caja?` · ${Math.floor(cajaG())} g en la caja`:''),desc:true,initial:i});

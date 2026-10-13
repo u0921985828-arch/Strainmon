@@ -888,6 +888,33 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   }, () => R.g > 10 && R.encima === 1000 && R.arcon === R.g - 10 && new RegExp(`en la mochila: ${R.g - 10} g van al arcón`).test(R.aviso) && R.a2 === 490 + R.g && R.b2 === 0
     && R.cap === 3000 && R.bolsa === 1 && R.control === R.a2 && new RegExp(`^Se llevan ${Math.floor(5 + R.a2)} g\\.`).test(R.redada) && R.a3 === 0
     && R.sacar === '3000,500,true' && /Se han llevado 0 €, 50 g y 1,5 g de rosin\./.test(R.darko) && R.a4 === '{"buds":{"ria":{"g":51,"thc":12}},"rosin":{"ria":{"g":1.5,"thc":36}}}' || R);
+  // 1.29: el curado en el arcón con los tarros y lo que pierde lo que no está curado
+  await step('Curado (1.29): los tarros de Kiko (30 €); en el arcón, con ellos, un lote se cura en 2 días (el THC no sube), se vende un 15 % más caro y ya no pierde; sin curar, desde el 4.º día pierde un 2 % de THC al día y lo avisa; al juntar lotes, por gramos; la cata lo dice; los lotes de antes de la 1.29, nada',
+    ['Tarros de curado', 'Salir', '^Thai', '^100 g', '^Catar', '^Catar'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0));
+    Object.assign(S, { ch: 5, map: 'home', money: 100, buds: {}, rosin: {}, arcon: { buds: {}, rosin: {} }, caja: null, envio: [], due: 0, heat: 0, protect: false, orden: 0, rel: {}, mDay: 0 });
+    S.items.tarros = 0; await run(shop); window.R = { t: S.items.tarros, m: 100 - S.money, otra: SHOP.find(it => it.lbl === 'Tarros de curado').cond(), aviso: !!S0.flags.curado };
+    const T = [], _t = toast; window.toast = (h, ms) => { T.push(h); _t(h, ms); };
+    addBuds('ria', 100, 20); addBuds('thai', 200, 16, S.arcon.buds); S.buds.hindu = { g: 30, thc: 18 };   // la de antes, sin día
+    const d0 = S.day; R.nuevo = S.buds.ria;
+    newDay(); await idle(); R.cu1 = S.arcon.buds.thai.cu; newDay(); await idle(); R.cu2 = S.arcon.buds.thai.cu; R.thc2 = S.arcon.buds.thai.thc;
+    newDay(); await idle(); R.ria3 = S.buds.ria.thc; newDay(); await idle(); R.ria4 = S.buds.ria.thc; newDay(); await idle(); R.ria5 = S.buds.ria.thc;
+    R.thai5 = S.arcon.buds.thai.thc; R.viejo = S.buds.hindu; R.dias = S.day - d0;
+    R.to = T.filter(h => /Curada en el arcón|Sin curar, pierde/.test(h)).map(h => h.split('<br>').filter(l => /Curada|Sin curar/.test(l)).join()).join('|');
+    moverLote(S.arcon.buds, S.buds, 'thai', 200); R.sale = S.buds.thai; R.cal = [calidad(S.buds.thai), calidad(S.buds.ria), calidad(S.buds.hindu)];
+    const m0 = S.money; await run(() => ventaMayor('IÑAKI')); R.mayor = S.money - m0;
+    const l0 = LOG.length; await run(() => loteAccion('thai')); await run(() => loteAccion('ria'));
+    R.cata = LOG.slice(l0).filter(l => /^(Catas|Thai:|Skunk #1:)/.test(l)).join('|');
+    const t = { g: 100, thc: 20, dia: 10, cu: 1 }; juntaLote(t, 100, 10, 0, 20); R.junta = t;
+    const v = { g: 30, thc: 18 }; addBuds('hindu', 10, 18, { hindu: v }); R.jv = v;
+    const w1 = { id: 'plT', n: 'Ane', rol: 'calle', k: 'thai', thc: 20, g: 50, dia: S.day - 4 }, w2 = { id: 'plV', n: 'Unai', rol: 'calle', k: 'hindu', thc: 18, g: 50 };
+    S.plantilla = [w1, w2]; S.arcon.buds = {}; curadoDia([]); libre(w2); R.pl = [w1.thc, JSON.stringify(S.arcon.buds.hindu)];   // la plantilla también pierde; lo de antes vuelve sin día
+    window.toast = _t; S = S0;
+  }, () => R.t === 1 && R.m === 30 && R.otra === false && R.aviso && R.nuevo.dia > 0 && !('cu' in R.nuevo) && R.cu1 === .5 && R.cu2 === 1 && R.thc2 === 16
+    && R.ria3 === 20 && Math.abs(R.ria4 - 19.6) < 1e-9 && Math.abs(R.ria5 - 19.208) < 1e-9 && R.thai5 === 16 && JSON.stringify(R.viejo) === '{"g":30,"thc":18}' && R.dias === 5
+    && R.to === 'Curada en el arcón: Thai|Sin curar, pierde THC: Skunk #1' && R.sale.cu === 1 && R.sale.dia === R.nuevo.dia && Math.abs(R.cal[0] - 1.15) < 1e-9 && R.cal[1] === 1 && R.cal[2] === 1
+    && R.mayor === 414 && /^Thai: 100 g · 16,0 % · curada\|Catas Thai: .+\. Bien curada: suave y con todo el aroma\.\|Skunk #1: 100 g · 19,2 % · sin curar\|Catas Skunk #1: .+\. Sin curar del todo: rasca y huele a verde\.$/.test(R.cata)
+    && JSON.stringify(R.junta) === '{"g":200,"thc":15,"dia":15,"cu":0.5}' && R.jv.g === 40 && R.jv.dia > 0 && !('cu' in R.jv) && Math.abs(R.pl[0] - 19.6) < 1e-9 && R.pl[1] === '{"g":50,"thc":18}' || R);
   await step('Móvil (1.10): START → MÓVIL; pedir a Kiko (+15 %, llega mañana) y su SMS en Mensajes; llamar a Kiko; quien te compra te da su número y, llamado, viene a la calle (20 min, +1 de calor, una vez al día)',
     ['MÓVIL', 'Pedir a Kiko', '^Abono', 'Salir', 'Colgar', 'SALIR', 'MÓVIL', 'Mensajes', '<B>', 'Llamar', '^Kiko', 'Colgar', 'SALIR', '^Skunk', 'Rebaja',
       'MÓVIL', 'Llamar', '^(?!Kiko|Nada)', '^Skunk', 'Rebaja', 'SALIR', 'MÓVIL', 'Llamar', '^(?!Kiko|Nada)', 'Colgar', 'SALIR'], async () => {

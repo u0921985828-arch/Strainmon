@@ -11,8 +11,8 @@ func shop_cond(it: Dictionary) -> bool:
 		return not S.items.get("prensa")
 	if it.get("item") == "analizador":   # el analizador de cannabinoides y terpenos (1.15), uno
 		return not S.items.get("analizador") and not S.envio.has(it.lbl)
-	if it.get("item") == "medidor":   # el medidor de pH y EC (1.11), uno
-		return not S.items.get("medidor") and not S.envio.has(it.lbl)
+	if it.get("item") == "medidor" or it.get("item") == "tarros":   # el medidor de pH y EC (1.11) y los tarros de curado (1.29), uno
+		return not S.items.get(it.item) and not S.envio.has(it.lbl)
 	if it.get("aparato"):   # los aparatos de la sala (1.10), uno de cada; lo pedido por el móvil no se vuelve a vender
 		return not S.sala.get(it.aparato) and not S.envio.has(it.lbl)
 	if it.get("mueble"):   # el carro de esquejes (1.11), uno
@@ -361,7 +361,7 @@ func talk_inaki():
 		return
 	var sid: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
-	var amt := Datos.jsround(precio_calle(b.thc) * 1.2 * 10)
+	var amt := Datos.jsround(precio_calle(b.thc) * calidad(b) * 1.2 * 10)
 	if await ask("Te doy %d € por 10 g de %s. ¿Hecho?" % [amt, lot_nombre(sid)], ["Hecho", "No"], N) != 0:
 		return
 	use_buds(sid, 10)
@@ -406,7 +406,7 @@ func venta_mayor(N: String) -> void:
 		return
 	var k: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
-	var pg := Datos.jsround(precio_mayor(b.thc) * (1.05 if rel("inaki") >= D.REL.amigo else 1.0) * 100) / 100.0   # 1.15: con confianza, un 5 % más
+	var pg := Datos.jsround(precio_mayor(b.thc) * calidad(b) * (1.05 if rel("inaki") >= D.REL.amigo else 1.0) * 100) / 100.0   # 1.15: con confianza, un 5 % más
 	var tope := mini(int(floor(b.g)), mayor_dia())
 	var ops := []
 	for g in [100, 250, 500, 1000, 2000, 5000, 10000]:
@@ -520,7 +520,7 @@ func talk_nerea():
 		return
 	var k: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
-	var pg := Datos.jsround(precio_mayor(b.thc) * L.f * 100) / 100.0
+	var pg := Datos.jsround(precio_mayor(b.thc) * calidad(b) * L.f * 100) / 100.0
 	var tope := mini(int(floor(b.g)), int(L.g))
 	var ops := []
 	for g in [100, 250]:
@@ -1673,6 +1673,8 @@ func mochila() -> void:
 				rows.append({"label": D.PRODUCTOS[k].n, "right": "×" + n(S.items.get(k, 0)), "ic": icono("abono"), "desc": D.DESC_PROD[k]})
 		if S.items.get("medidor", 0):
 			rows.append({"label": "Medidor de pH y EC", "right": "×1", "desc": "Con él corriges el pH justo y ves la EC y el pH de cada maceta en PLANTAS."})
+		if S.items.get("tarros"):
+			rows.append({"label": "Tarros de curado", "right": "en el arcón", "desc": "Lo que guardas en el arcón se cura en %d días: se vende un %d %% más caro y ya no pierde THC." % [int(D.CURADO.dias), Datos.jsround(D.CURADO.precio * 100)]})
 		rows.append_array([{"label": "Insecticida (tratamientos)", "right": "×" + n(S.items.insect), "ic": icono("insecticida"), "desc": "Úsalo en una maceta con plaga."},
 			{"label": "Spray de pimienta", "right": "×" + n(S.items.spray), "ic": icono("spray"), "desc": "Solo en combate."},
 			{"label": "Bocata", "right": "×" + n(S.items.bocata), "ic": icono("bocadillo"), "desc": "Pulsa A para comerlo: +15 de vida.", "k": "bocata"}])
@@ -1693,7 +1695,7 @@ func mochila() -> void:
 		for k in S.buds:
 			var b: Dictionary = S.buds[k]
 			rows.append({"label": lot_nombre(k), "right": "%d g · %s%%" % [int(floor(b.g)), Datos.pct(b.thc)], "sw": strain(lot_sid(k)).c, "ic": ic_cog(lot_sid(k)),
-				"desc": ("Cogollos de un fenotipo estrella, en lote aparte.\n" if k.ends_with("*") else "Cogollos listos para vender.\n") + ((S.catas[lot_sid(k)] + "\n") if S.catas.has(lot_sid(k)) else "") + strain(lot_sid(k)).o + "\nPulsa A para catarlo" + (" o analizarlo." if S.items.get("analizador") else "."), "k": "b", "key": k})
+				"desc": ("Cogollos de un fenotipo estrella, en lote aparte.\n" if k.ends_with("*") else "Cogollos listos para vender.\n") + ((cura_txt(b) + "\n") if cura_txt(b) else "") + ((S.catas[lot_sid(k)] + "\n") if S.catas.has(lot_sid(k)) else "") + strain(lot_sid(k)).o + "\nPulsa A para catarlo" + (" o analizarlo." if S.items.get("analizador") else "."), "k": "b", "key": k})
 		for k in S.rosin:
 			var b: Dictionary = S.rosin[k]
 			rows.append({"label": "Rosin · " + lot_nombre(k), "right": "%s g · %s%%" % [Datos.coma(b.g), Datos.pct(b.thc)], "sw": "#d89a18", "ic": ic_cog(lot_sid(k)),
@@ -2559,7 +2561,7 @@ func arcon_txt() -> String:
 func arcon_action():
 	while true:
 		var ops := ["Guardar todo", "Guardar un lote", "Sacar un lote", "Cerrar"]
-		var oi: int = await ask("El arcón: %s.\nEncima: %s de %s." % [arcon_txt(), g_txt(peso_encima()), _kg(int(cap_mochila()))], ops)
+		var oi: int = await ask("El arcón: %s.\nEncima: %s de %s." % [arcon_txt(), g_txt(peso_encima()), _kg(int(cap_mochila()))] + (("\nCon los tarros, los cogollos se curan en %d días." % int(D.CURADO.dias)) if S.items.get("tarros") else ""), ops)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 		if op == "" or op == "Cerrar":
 			return
@@ -2817,7 +2819,7 @@ func curro_dia() -> void:
 			queue("vend" + v.id, func(): await say("%s no contesta al móvil. Se ha largado con %s de %s." % [v.n, g_txt(v.g), lot_nombre(v.k)]))
 			continue
 		var g: int = mini(int(floor(v.g)), ri(int(V.g[0]), int(V.g[1])))
-		var e := Datos.jsround(precio_calle(v.thc) * D.ZONAS.town.precio * g * (1 - V.com))
+		var e := Datos.jsround(precio_calle(v.thc) * calidad(v) * D.ZONAS.town.precio * g * (1 - V.com))
 		v.g -= g
 		S.money += e
 		S.sales += e
@@ -2923,7 +2925,10 @@ func contratar_vendedor(f: Dictionary) -> bool:
 	if j < 0 or j >= ops.size():
 		return false
 	use_buds(k, ops[j])
-	S.curro.vend.append({"id": f.id, "n": f.n, "k": k, "thc": b.thc, "g": ops[j], "dia": S.day})
+	var vd := {"id": f.id, "n": f.n, "k": k, "thc": b.thc, "g": ops[j], "dia": S.day}
+	if b.get("cu"):
+		vd.cu = b.cu
+	S.curro.vend.append(vd)
 	sfx("sel")
 	await say("%s: «Hecho. Cada día te dejo lo vendido en el buzón»." % f.n)
 	return false
@@ -3040,7 +3045,7 @@ func vender_club(k: String) -> void:
 		return
 	var kk: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
-	var pg := Datos.jsround(precio_club(b.thc) * (1.05 if b.get("ana") else 1.0) * 100) / 100.0
+	var pg := Datos.jsround(precio_club(b.thc) * calidad(b) * (1.05 if b.get("ana") else 1.0) * 100) / 100.0
 	var ops := []
 	for g in D.CLUB.g:
 		if g <= floor(b.g):
@@ -3087,7 +3092,7 @@ func comprar_club(k: String) -> void:
 		return
 	S.money -= p
 	S.clubCompra[k] = S.day
-	add_buds(sid, D.CLUB.compra, s.thc)
+	add_buds(sid, D.CLUB.compra, s.thc, S.buds, 1)
 	discover(sid)
 	sfx("coin")
 	toast("Comprado: %d g de %s" % [int(D.CLUB.compra), s.n], 1200)
@@ -3173,13 +3178,15 @@ func catar(k: String) -> void:
 		return
 	var sid := lot_sid(k)
 	var thc: float = b.thc
+	var cu := float(b.get("cu", 0))
+	var fresca: bool = b.get("dia") != null
 	use_buds(k, D.CATA.g)
 	if S.buds.has(k):
 		S.buds[k].cata = true
 	S.catas[sid] = nota_cata(sid, thc)
 	advance_time(int(D.CATA.min))
 	update_hud()
-	await say("Catas %s: %s." % [lot_nombre(k), S.catas[sid]])
+	await say("Catas %s: %s." % [lot_nombre(k), S.catas[sid]] + (" Bien curada: suave y con todo el aroma." if cu >= 1 else (" Sin curar del todo: rasca y huele a verde." if cu or fresca else "")))   # 1.29
 
 func analizar(k: String) -> void:
 	var b = S.buds.get(k)
@@ -3196,7 +3203,7 @@ func lote_accion(k: String) -> void:
 	if S.items.get("analizador") and not b.get("ana"):
 		ops.append("Analizar")
 	ops.append("Nada")
-	var oi: int = await ask("%s: %d g · %s %%%s%s" % [lot_nombre(k), int(floor(b.g)), Datos.pct(b.thc), " · catado" if b.get("cata") else "", " · analizado" if b.get("ana") else ""], ops)
+	var oi: int = await ask("%s: %d g · %s %%%s%s%s" % [lot_nombre(k), int(floor(b.g)), Datos.pct(b.thc), cura_corto(b), " · catado" if b.get("cata") else "", " · analizado" if b.get("ana") else ""], ops)
 	var op: String = ops[oi]
 	if op.begins_with("Catar"):
 		await catar(k)
@@ -3294,11 +3301,13 @@ func rol_desc(w: Dictionary) -> String:
 # deja el trabajo; lo que le quedaba del lote vuelve al arcón
 func libre(w: Dictionary) -> void:
 	if w.get("rol") == "calle" and w.g >= 1:
-		add_buds(w.k, w.g, w.thc, S.arcon.buds)
+		add_buds(w.k, w.g, w.thc, S.arcon.buds, w.get("cu"), w.get("dia"))
 	w.rol = null
 	w.erase("k")
 	w.erase("thc")
 	w.erase("g")
+	w.erase("cu")
+	w.erase("dia")
 
 func plantilla() -> void:
 	var P: Dictionary = D.PLANTILLA
@@ -3370,8 +3379,9 @@ func lote_calle(w: Dictionary):
 	if j < 0 or j >= ops.size():
 		return null
 	var thc: float = b.thc
+	var c := cura_de(b)
 	use_buds(k, ops[j])
-	return [k, thc, ops[j]]
+	return [k, thc, ops[j], c]
 
 func trabajo(w: Dictionary) -> void:
 	var P: Dictionary = D.PLANTILLA
@@ -3396,6 +3406,7 @@ func trabajo(w: Dictionary) -> void:
 		w.k = r[0]
 		w.thc = r[1]
 		w.g = r[2]
+		w.merge(r[3], true)
 		sfx("sel")
 		await say("%s: «Hecho. Cada día te dejo lo vendido en el buzón»." % w.n)
 	elif op == "De gerente":
@@ -3501,7 +3512,7 @@ func plantilla_dia() -> void:
 			if r < pt:
 				m = "Me han pagado %d g con billetes falsos. No me he dado cuenta hasta el banco." % q
 			else:
-				var e := Datos.jsround(precio_calle(w.thc) * D.ZONAS.town.precio * q * (1 - P.com))
+				var e := Datos.jsround(precio_calle(w.thc) * calidad(w) * D.ZONAS.town.precio * q * (1 - P.com))
 				S.money += e
 				S.sales += e
 				S.heat = min(100, S.heat + P.calor)

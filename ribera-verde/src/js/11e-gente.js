@@ -25,7 +25,7 @@ function curroDia(){
     const r=Math.random(),N='SMS · '+v.n.toUpperCase();
     if(r<V.pilla){fin.push(v);S.heat=Math.min(100,S.heat+V.calorPilla);confia(v.id,-5);queue('vend'+v.id,()=>talk(N,[`Me ha parado la policía. Se han quedado con ${gTxt(v.g)} de ${lotNombre(v.k)}. Lo siento.`]));continue;}
     if(r<V.pilla+V.estafa*(REL.max-rel(v.id))/REL.max){fin.push(v);S.fijos=S.fijos.filter(f=>f.id!==v.id);S.rel[v.id]=0;queue('vend'+v.id,()=>say(`${v.n} no contesta al móvil. Se ha largado con ${gTxt(v.g)} de ${lotNombre(v.k)}.`));continue;}
-    const g=Math.min(Math.floor(v.g),ri(V.g[0],V.g[1])),e=Math.round(precioCalle(v.thc)*ZONAS.town.precio*g*(1-V.com));
+    const g=Math.min(Math.floor(v.g),ri(V.g[0],V.g[1])),e=Math.round(precioCalle(v.thc)*calidad(v)*ZONAS.town.precio*g*(1-V.com));
     v.g-=g;S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+V.calor);confia(v.id,1);vende=true;
     if(v.g<1){fin.push(v);queue('vend'+v.id,()=>talk(N,[`Vendidos los últimos ${g} g: ${eur(e)} en tu buzón. Si quieres que siga, déjame más.`]));}
     else queue('vend'+v.id,()=>talk(N,[`Vendidos ${g} g: ${eur(e)} en tu buzón. Me quedan ${gTxt(v.g)}.`]));
@@ -60,7 +60,7 @@ async function contratarVendedor(f){
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote le dejas?'});if(i<0||i>=lots.length)return false;
   const [k,b]=lots[i],ops=V.lotes.filter(g=>g<=Math.floor(b.g));
   const j=await ask(`${f.n} vende a precio de calle y se queda el ${pct0(V.com)} %. ¿Cuánto le dejas?`,ops.map(g=>g+' g').concat(['Nada']));if(j<0||j>=ops.length)return false;
-  useBuds(k,ops[j]);S.curro.vend.push({id:f.id,n:f.n,k,thc:b.thc,g:ops[j],dia:S.day});sfx('sel');
+  useBuds(k,ops[j]);S.curro.vend.push(Object.assign({id:f.id,n:f.n,k,thc:b.thc,g:ops[j],dia:S.day},b.cu?{cu:b.cu}:{}));sfx('sel');
   await say(`${f.n}: «Hecho. Cada día te dejo lo vendido en el buzón».`);return false;
 }
 // MÓVIL → GENTE: a quién conoces y cuánto se fía de ti
@@ -117,7 +117,7 @@ async function venderClub(k){
   if(S.clubDia[k]===S.day)return say('Hoy ya hemos cerrado caja. Mañana.',N);
   const lots=budLots(CLUB.g[0]);if(!lots.length)return say(`De ${CLUB.g[0]} g para arriba, entre ${coma(precioClub(12).toFixed(2))} y ${coma(precioClub(30).toFixed(2))} € el gramo según el THC. Una entrega al día.`,N);
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote?'});if(i<0||i>=lots.length)return;
-  const [kk,b]=lots[i],pg=Math.round(precioClub(b.thc)*(b.ana?1.05:1)*100)/100,ops=CLUB.g.filter(g=>g<=Math.floor(b.g));
+  const [kk,b]=lots[i],pg=Math.round(precioClub(b.thc)*calidad(b)*(b.ana?1.05:1)*100)/100,ops=CLUB.g.filter(g=>g<=Math.floor(b.g));
   const j=await ask(`${lotNombre(kk)} a ${coma(pg.toFixed(2))} € el gramo${b.ana?' (analizado)':''}. ¿Cuánto?`,ops.map(g=>`${g} g · ${eur(g*pg)}`).concat(['Nada']),N);if(j<0||j>=ops.length)return;
   const g=ops[j],e=Math.round(g*pg);useBuds(kk,g);S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+CLUB.calor);S.rep+=1;S.clubDia[k]=S.day;confia(k,2);sfx('coin');
   await accion('vender',{id:'vfx-monedas',x:P.px+8,y:P.py+2});toast(`+${eur(e)} · ${g} g al club`,1600);await say('Por la puerta de atrás, como siempre. Gracias.',N);await checkStory();
@@ -128,7 +128,7 @@ async function comprarClub(k){
   if(await ask(`Hoy tenemos ${s.n} (${pct(s.thc)} %): ${CLUB.compra} g por ${eur(p)}. ¿Te los llevas?`,['Comprar','No'],N)!==0)return;
   if(S.money<p){sfx('bad');return say('Sin dinero no hay reparto.',N);}
   if(libreMochila()<CLUB.compra)return say('No te caben en la bolsa.',N);
-  S.money-=p;S.clubCompra[k]=S.day;addBuds(sid,CLUB.compra,s.thc);discover(sid);sfx('coin');toast(`Comprado: ${CLUB.compra} g de ${s.n}`,1200);
+  S.money-=p;S.clubCompra[k]=S.day;addBuds(sid,CLUB.compra,s.thc,S.buds,1);discover(sid);sfx('coin');toast(`Comprado: ${CLUB.compra} g de ${s.n}`,1200);
 }
 async function encargoClub(k){
   const C=CLUBS[k],N=C.n,E=S.clubEnc;
@@ -159,12 +159,12 @@ function notaCata(sid,thc){const ind=indDe(sid),a=aromaDe(sid),e=ind>=65?'relaja
   return `Aroma ${a}${S.items.analizador?' ('+TERPENOS[a]+')':''} · ${e} · ${S.items.analizador?pct(thc)+' % de THC':thc<12?'floja':thc<18?'media':thc<24?'fuerte':'muy fuerte'}`;}
 async function catar(k){
   const b=S.buds[k];if(!b||b.g<CATA.g)return;
-  const sid=lotSid(k),thc=b.thc;useBuds(k,CATA.g);if(S.buds[k])S.buds[k].cata=true;S.catas[sid]=notaCata(sid,thc);advanceTime(CATA.min);updateHUD();
-  await say(`Catas ${lotNombre(k)}: ${S.catas[sid]}.`);
+  const sid=lotSid(k),thc=b.thc,cu=b.cu||0,fresca=b.dia!=null;useBuds(k,CATA.g);if(S.buds[k])S.buds[k].cata=true;S.catas[sid]=notaCata(sid,thc);advanceTime(CATA.min);updateHUD();
+  await say(`Catas ${lotNombre(k)}: ${S.catas[sid]}.`+(cu>=1?' Bien curada: suave y con todo el aroma.':cu||fresca?' Sin curar del todo: rasca y huele a verde.':''));   // 1.29
 }
 async function analizar(k){const b=S.buds[k];if(!b||!S.items.analizador)return;const sid=lotSid(k);b.ana=true;sfx('get');await say(`Analizado: ${lotNombre(k)} · THC ${pct(b.thc)} % · CBD ${pct(cbdDe(sid))} % · terpeno principal, ${TERPENOS[aromaDe(sid)]}. Lo que va con análisis se vende mejor.`);}
 async function loteAccion(k){
   const b=S.buds[k],ops=[`Catar ${coma(CATA.g)} g`].concat(S.items.analizador&&!b.ana?['Analizar']:[],['Nada']);
-  const op=ops[await ask(`${lotNombre(k)}: ${Math.floor(b.g)} g · ${pct(b.thc)} %${b.cata?' · catado':''}${b.ana?' · analizado':''}`,ops)];
+  const op=ops[await ask(`${lotNombre(k)}: ${Math.floor(b.g)} g · ${pct(b.thc)} %${curaCorto(b)}${b.cata?' · catado':''}${b.ana?' · analizado':''}`,ops)];
   if(op&&op.startsWith('Catar'))return catar(k);if(op==='Analizar')return analizar(k);
 }

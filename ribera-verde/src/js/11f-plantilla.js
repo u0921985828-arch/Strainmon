@@ -19,7 +19,7 @@ function rolDesc(w){const P=PLANTILLA;
   return w.rol==='calle'?`Vende ${lotNombre(w.k)} en la calle: le quedan ${gTxt(w.g)}.`:w.rol==='gerente'?`Cuida el piso y cosecha al arcón por ${eur(P.sueldo.gerente)} al día.`
     :w.rol==='nave'?`Cultiva en la nave por ${eur(P.sueldo.nave)} al día: ${naveG(w)} g.`:'Dale trabajo: calle, gerente o nave.';}
 // deja el trabajo; lo que le quedaba del lote vuelve al arcón
-function libre(w){if(w.rol==='calle'&&w.g>=1)addBuds(w.k,w.g,w.thc,S.arcon.buds);w.rol=null;delete w.k;delete w.thc;delete w.g;}
+function libre(w){if(w.rol==='calle'&&w.g>=1)addBuds(w.k,w.g,w.thc,S.arcon.buds,w.cu,w.dia??null);w.rol=null;delete w.k;delete w.thc;delete w.g;delete w.cu;delete w.dia;}
 async function plantilla(){
   let i=0;
   for(;;){
@@ -40,14 +40,14 @@ async function pedirGente(){
   if(await ask(`${n}: ${fichaGente(w)}. ¿Le contratas?`,['Contratar','No'])!==0)return say(`${n} se va por donde ha venido. El sobre ya es de Patxi.`);
   S.plantilla.push(w);sfx('sel');return say(`${n} entra en tu plantilla. Dale trabajo desde aquí.`);
 }
-// un lote de los de encima para la calle: [clave, THC, gramos] o null
+// un lote de los de encima para la calle: [clave, THC, gramos, {dia, cu} (1.29)] o null
 async function loteCalle(w){
   const P=PLANTILLA,lots=budLots(P.lotes[0]);
   if(!lots.length){await say(`Para la calle hace falta un lote de ${P.lotes[0]} g o más encima.`);return null;}
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote le das?'});if(i<0||i>=lots.length)return null;
   const [k,b]=lots[i],ops=P.lotes.filter(g=>g<=Math.floor(b.g));
   const j=await ask(`${w.n} vende a precio de calle y se queda el ${pct0(P.com)} %. ¿Cuánto le das?`,ops.map(g=>g+' g').concat(['Nada']));if(j<0||j>=ops.length)return null;
-  const thc=b.thc;useBuds(k,ops[j]);return [k,thc,ops[j]];
+  const thc=b.thc,c=curaDe(b);useBuds(k,ops[j]);return [k,thc,ops[j],c];
 }
 async function trabajo(w){
   const P=PLANTILLA,ops=[];
@@ -56,7 +56,7 @@ async function trabajo(w){
   if(w.rol!=='nave'&&S.nave&&naveros().length<NAVE.max)ops.push('A la nave');
   if(w.rol)ops.push('Dejarlo libre');ops.push('Despedir','Nada');
   const op=ops[await ask(`${w.n} · ${fichaGente(w)} · ${rolTxt(w)}`,ops)];
-  if(op==='A la calle'){const r=await loteCalle(w);if(!r)return;libre(w);w.rol='calle';[w.k,w.thc,w.g]=r;sfx('sel');return say(`${w.n}: «Hecho. Cada día te dejo lo vendido en el buzón».`);}
+  if(op==='A la calle'){const r=await loteCalle(w);if(!r)return;libre(w);w.rol='calle';[w.k,w.thc,w.g]=r;Object.assign(w,r[3]);sfx('sel');return say(`${w.n}: «Hecho. Cada día te dejo lo vendido en el buzón».`);}
   if(op==='De gerente'){libre(w);w.rol='gerente';sfx('sel');return say(`${w.n}: «Cada mañana me paso por el piso: riego, trato las plagas y lo que esté listo lo cosecho y lo dejo en el arcón. ${eur(P.sueldo.gerente)} al día».`);}
   if(op==='A la nave'){libre(w);w.rol='nave';sfx('sel');return say(`${w.n}: «Mañana empiezo en la nave. ${eur(P.sueldo.nave)} al día».`);}
   if(op==='Dejarlo libre'){const g=w.rol==='calle'?w.g:0;libre(w);return say(g>=1?`${w.n} te deja lo que le quedaba en el arcón: ${gTxt(g)}.`:`${w.n} se queda sin trabajo.`);}
@@ -88,7 +88,7 @@ function plantillaDia(){
     else if(r<pf){fuera.push(w);const g=w.g;queue('pl'+w.id,()=>say(`${w.n} no contesta al móvil. Se ha largado con ${gTxt(g)} de ${lote}.`));continue;}
     else{const q=Math.min(Math.floor(w.g),ri(P.g[0],P.g[1])*w.lab);w.g-=q;
       if(r<pt)m=`Me han pagado ${q} g con billetes falsos. No me he dado cuenta hasta el banco.`;
-      else{const e=Math.round(precioCalle(w.thc)*ZONAS.town.precio*q*(1-P.com));S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+P.calor);vende=true;
+      else{const e=Math.round(precioCalle(w.thc)*calidad(w)*ZONAS.town.precio*q*(1-P.com));S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+P.calor);vende=true;
         m=w.g>=1?`Vendidos ${q} g: ${eur(e)} en tu buzón. Me quedan ${gTxt(w.g)}.`:`Vendidos los últimos ${q} g: ${eur(e)} en tu buzón. Dame más cuando quieras.`;}}
     if(w.g<1)libre(w);queue('pl'+w.id,()=>talk(N,[m]));
   }

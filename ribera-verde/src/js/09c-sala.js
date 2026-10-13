@@ -75,10 +75,36 @@ const bolsaYa=()=>Math.max(S.items.bolsa||0,...S.envio.map(l=>(SHOP.find(x=>x.lb
 const pesoEncima=()=>totalBuds()+totalRosin(),capMochila=()=>MOCHILAS[S.items.bolsa||0].g,libreMochila=()=>Math.max(0,capMochila()-pesoEncima());
 const arconG=()=>Object.values(S.arcon.buds).reduce((a,b)=>a+b.g,0),arconR=()=>Object.values(S.arcon.rosin).reduce((a,b)=>a+b.g,0);
 const arconTxt=()=>arconR()>=.1?`${gTxt(arconG())} y ${rosinTxt(arconR())}`:gTxt(arconG());
+/* ---------- el curado (1.29) ----------
+   Cada lote de cogollos lleva el día de la cosecha (b.dia) y lo curado (b.cu, de 0 a 1; sin él, nada). En el arcón, con los tarros de
+   Kiko (S.items.tarros), se cura 1/CURADO.dias al día; curado se vende CURADO.precio más caro (calidad) y ya no pierde THC. Sin curar
+   del todo, pasados CURADO.fresco días desde la cosecha pierde CURADO.pierde de su THC cada día (×(1 − cu)), esté donde esté. El THC
+   no sube al curar. Los lotes de antes de la 1.29 (sin día) no pierden nada. Al juntar dos lotes, el THC, lo curado y el día van por gramos */
+const CURADO={dias:2,fresco:3,pierde:.02,precio:.15};
+const calidad=b=>1+CURADO.precio*(b.cu||0);
+const curaDe=b=>Object.assign({},b.dia!=null?{dia:b.dia}:{},b.cu?{cu:b.cu}:{});
+function juntaLote(t,g,thc,cu,dia){
+  const n=t.g+g,c=((t.cu||0)*t.g+(cu||0)*g)/n;t.thc=(t.thc*t.g+thc*g)/n;
+  if(c)t.cu=c;else delete t.cu;if(dia!=null)t.dia=Math.round(((t.dia??dia)*t.g+dia*g)/n);t.g=n;
+}
+// al amanecer (newDay): lo que se cura en el arcón y lo que pierde THC; av, los avisos del día
+function curadoDia(av){
+  const listos=[],pierden=[];
+  if(S.items.tarros)for(const [k,b] of Object.entries(S.arcon.buds))if((b.cu||0)<1){b.cu=Math.min(1,(b.cu||0)+1/CURADO.dias);if(b.cu>=1)listos.push(lotNombre(k));}
+  for(const L of [S.buds,S.arcon.buds,S.caja?S.caja.buds:{}])for(const [k,b] of Object.entries(L))
+    if(b.dia!=null&&(b.cu||0)<1&&S.day-b.dia>CURADO.fresco){b.thc*=1-CURADO.pierde*(1-(b.cu||0));if(S.day-b.dia===CURADO.fresco+1)pierden.push(lotNombre(k));}
+  for(const w of S.plantilla)if(w.rol==='calle'&&w.dia!=null&&(w.cu||0)<1&&S.day-w.dia>CURADO.fresco)w.thc*=1-CURADO.pierde*(1-(w.cu||0));   // lo que lleva alguien de la plantilla, igual (sin aviso)
+  if(listos.length)av.push('Curada en el arcón: '+yLista(listos));
+  if(pierden.length)av.push('Sin curar, pierde THC: '+yLista(pierden));
+}
+// cómo está un lote, para la mochila: curado, curándose o sin curar ('' en los de antes de la 1.29)
+const curaTxt=b=>b.cu>=1?`Curada: se vende un ${pct0(CURADO.precio)} % más cara y ya no pierde THC.`:b.cu?`Curándose (${pct0(b.cu)} %): termina de curarla en el arcón con los tarros.`
+  :b.dia==null?'':`Sin curar: ${S.day-b.dia>CURADO.fresco?'pierde THC cada día':`desde el día ${b.dia+CURADO.fresco+1} pierde THC`}. Cúrala en el arcón con tarros.`;
+const curaCorto=b=>b.cu>=1?' · curada':b.cu?' · curándose':b.dia!=null?' · sin curar':'';
 async function arconAction(){
   for(;;){
     const ops=['Guardar todo','Guardar un lote','Sacar un lote','Cerrar'];
-    const op=ops[await ask(`El arcón: ${arconTxt()}.\nEncima: ${gTxt(pesoEncima())} de ${kgTxt(capMochila())}.`,ops)];
+    const op=ops[await ask(`El arcón: ${arconTxt()}.\nEncima: ${gTxt(pesoEncima())} de ${kgTxt(capMochila())}.`+(S.items.tarros?`\nCon los tarros, los cogollos se curan en ${CURADO.dias} días.`:''),ops)];
     if(!op||op==='Cerrar')return;
     if(op==='Guardar todo'){
       const g=totalBuds(),r=totalRosin();

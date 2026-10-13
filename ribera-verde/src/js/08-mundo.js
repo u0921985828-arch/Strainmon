@@ -8,7 +8,7 @@ const P={x:0,y:0,px:0,py:0,dir:'down',moving:false,fx:0,fy:0,t:0,dur:240,parity:
 const DV={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]},OPP={up:'down',down:'up',left:'right',right:'left'};
 const CH_TITLES={1:'La herencia',2:'La calle',3:'La deuda',4:'Genética',5:'El sargento',6:'La Copa de Ribera',7:'Libertad',8:'Tu imperio'};
 function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,min:8*60,money:150,hp:30,hpMax:30,heat:0,rep:0,ch:0,flags:{diario:0},sales:0,
-  seeds:{},buds:{},rosin:{},items:Object.assign({fert:0,fertv:0,phm:0,ofert:0,ofertv:0,ophm:0,medidor:0,insect:0,spray:0,bocata:1,prensa:0,bolsa:0,analizador:0},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
+  seeds:{},buds:{},rosin:{},items:Object.assign({fert:0,fertv:0,phm:0,ofert:0,ofertv:0,ophm:0,medidor:0,insect:0,spray:0,bocata:1,prensa:0,bolsa:0,analizador:0,tarros:0},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},gen:{},pedido:[],esquejes:[],bandejas:[],fenos:{},fenoN:0,fnom:{},eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
   caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0,arcon:{buds:{},rosin:{}},sala:{},fijos:[],sms:[],envio:[],orden:0,misiones:{},itin:{},lonja:0,trueque:0,chatarra:null,
@@ -29,7 +29,7 @@ function discover(sid){if(!S.disc[sid]){S.disc[sid]=true;toast(`<small>NUEVA EN 
 function addSeeds(sid,n){S.seeds[sid]=(S.seeds[sid]||0)+n;discover(sid);}
 // cogollos por lotes: clave = variedad, o variedad + '*' para lo de un fenotipo estrella (se vende y se presenta aparte)
 const lotSid=k=>k.replace(/\*$/,''),lotNombre=k=>getStrain(lotSid(k)).n+(k.endsWith('*')?' ★':'');
-function addBuds(k,g,thc,L=S.buds){const b=L[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;delete b.cata;delete b.ana;}else L[k]={g,thc};discover(lotSid(k));}   // L: otro sitio (el arcón)
+function addBuds(k,g,thc,L=S.buds,cu=0,dia=S.day){const b=L[k];if(b){juntaLote(b,g,thc,cu,dia);delete b.cata;delete b.ana;}else{L[k]=Object.assign({g,thc},dia!=null?{dia}:{});if(cu)L[k].cu=cu;}discover(lotSid(k));}   // L: otro sitio (el arcón); cu y dia: el curado y el día de la cosecha (1.29, 09c-sala; sin dar dia, hoy; dia null, sin día, como los de antes)
 function useBuds(k,g){const b=S.buds[k];b.g-=g;if(b.g<.5)delete S.buds[k];}
 function budLots(min,minThc=0){return Object.entries(S.buds).filter(([k,b])=>b.g>=min&&b.thc>=minThc);}
 // rosin (1.10): lo que sale de prensar cogollos en la mesa (prensar, 09-cultivo), por lotes como ellos y al décimo de gramo

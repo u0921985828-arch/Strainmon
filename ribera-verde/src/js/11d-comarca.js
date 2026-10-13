@@ -40,7 +40,7 @@ async function talkNerea(){
   if(!lots.length)return say(`Cargo para los barcos de fuera: de 100 a ${L.g} g, un ${Math.round((L.f-1)*100)} % por encima de lo que paga Iñaki. Cada ${L.dias} días.`,N);
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote?'});
   if(i<0||i>=lots.length)return say('Otro día.',N);
-  const [k,b]=lots[i],pg=Math.round(precioMayor(b.thc)*L.f*100)/100,tope=Math.min(Math.floor(b.g),L.g);
+  const [k,b]=lots[i],pg=Math.round(precioMayor(b.thc)*calidad(b)*L.f*100)/100,tope=Math.min(Math.floor(b.g),L.g);
   const ops=[100,250].filter(g=>g<tope).concat([tope]);
   const j=await ask(`${lotNombre(k)} a ${coma(pg.toFixed(2))} € el gramo. ¿Cuánto cargas?`,ops.map(g=>`${kgTxt(g)} · ${eur(g*pg)}`).concat(['Nada']),N);
   if(j<0||j>=ops.length)return;

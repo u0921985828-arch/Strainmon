@@ -181,15 +181,14 @@ func pagar_casa(e: float) -> float:
 		e -= b
 	return e
 
-# g gramos del lote k de «de» a «a»: si el lote ya está, se juntan con el THC medio por gramos
+# g gramos del lote k de «de» a «a»: si el lote ya está, se juntan con el THC medio por gramos (1.29: con su curado y su día)
 func mover_lote(de: Dictionary, a: Dictionary, k: String, g: float) -> void:
 	var b: Dictionary = de[k]
 	if a.has(k):
-		var t: Dictionary = a[k]
-		t.thc = (t.thc * t.g + b.thc * g) / (t.g + g)
-		t.g += g
+		junta_lote(a[k], g, b.thc, b.get("cu", 0), b.get("dia"))
 	else:
 		a[k] = {"g": g, "thc": b.thc}
+		a[k].merge(cura_de(b))
 	b.g -= g
 	if b.g < .5:
 		de.erase(k)
@@ -241,18 +240,95 @@ func lot_sid(k: String) -> String:
 func lot_nombre(k: String) -> String:
 	return strain(lot_sid(k)).n + (" ★" if k.ends_with("*") else "")
 
-func add_buds(k: String, g: float, thc: float, L = null) -> void:   # L: otro sitio (el arcón)
+# L: otro sitio (el arcón); cu y dia: el curado y el día de la cosecha (1.29; sin dar dia, hoy; dia null, sin día, como los de antes)
+func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1) -> void:
 	if L == null:
 		L = S.buds
+	if dia != null and float(dia) < 0:
+		dia = S.day
 	if L.has(k):
 		var b: Dictionary = L[k]
-		b.thc = (b.thc * b.g + thc * g) / (b.g + g)
-		b.g += g
+		junta_lote(b, g, thc, cu, dia)
 		b.erase("cata")   # 1.15: lo que entra nuevo no está catado ni analizado
 		b.erase("ana")
 	else:
 		L[k] = {"g": g, "thc": thc}
+		if dia != null:
+			L[k].dia = dia
+		if cu:
+			L[k].cu = cu
 	discover(lot_sid(k))
+
+# ---------- el curado (1.29, 09c-sala) ----------
+# Cada lote lleva el día de la cosecha (dia) y lo curado (cu, de 0 a 1; sin él, nada). En el arcón, con los tarros, 1/CURADO.dias al
+# día; curado se vende CURADO.precio más caro (calidad) y ya no pierde THC. Sin curar del todo, pasados CURADO.fresco días pierde
+# CURADO.pierde de su THC cada día (×(1 − cu)), esté donde esté. Los lotes de antes de la 1.29 (sin día) no pierden nada
+func calidad(b: Dictionary) -> float:
+	return 1 + D.CURADO.precio * float(b.get("cu", 0))
+
+func cura_de(b: Dictionary) -> Dictionary:
+	var o := {}
+	if b.get("dia") != null:
+		o.dia = b.dia
+	if b.get("cu"):
+		o.cu = b.cu
+	return o
+
+func junta_lote(t: Dictionary, g: float, thc: float, cu, dia) -> void:
+	var nn: float = t.g + g
+	var c: float = (float(t.get("cu", 0)) * t.g + float(cu if cu else 0) * g) / nn
+	t.thc = (t.thc * t.g + thc * g) / nn
+	if c:
+		t.cu = c
+	else:
+		t.erase("cu")
+	if dia != null:
+		t.dia = Datos.jsround((float(t.get("dia", dia)) * t.g + float(dia) * g) / nn)
+	t.g = nn
+
+func y_lista(l: Array) -> String:
+	return (", ".join(l.slice(0, -1)) + " y " + l[-1]) if l.size() > 1 else l[0]
+
+# al amanecer (new_day): lo que se cura en el arcón y lo que pierde THC; av, los avisos del día
+func curado_dia(av: Array) -> void:
+	var listos := []
+	var pierden := []
+	if S.items.get("tarros"):
+		for k in S.arcon.buds:
+			var b: Dictionary = S.arcon.buds[k]
+			if float(b.get("cu", 0)) < 1:
+				b.cu = minf(1.0, float(b.get("cu", 0)) + 1.0 / D.CURADO.dias)
+				if b.cu >= 1:
+					listos.append(lot_nombre(k))
+	for L in [S.buds, S.arcon.buds, S.caja.buds if S.caja else {}]:
+		for k in L:
+			var b: Dictionary = L[k]
+			if b.get("dia") != null and float(b.get("cu", 0)) < 1 and S.day - b.dia > D.CURADO.fresco:
+				b.thc *= 1 - D.CURADO.pierde * (1 - float(b.get("cu", 0)))
+				if S.day - b.dia == D.CURADO.fresco + 1:
+					pierden.append(lot_nombre(k))
+	for w in S.plantilla:   # lo que lleva alguien de la plantilla, igual (sin aviso)
+		if w.get("rol") == "calle" and w.get("dia") != null and float(w.get("cu", 0)) < 1 and S.day - w.dia > D.CURADO.fresco:
+			w.thc *= 1 - D.CURADO.pierde * (1 - float(w.get("cu", 0)))
+	if listos.size():
+		av.append("Curada en el arcón: " + y_lista(listos))
+	if pierden.size():
+		av.append("Sin curar, pierde THC: " + y_lista(pierden))
+
+# cómo está un lote, para la mochila: curado, curándose o sin curar ("" en los de antes de la 1.29)
+func cura_txt(b: Dictionary) -> String:
+	var cu := float(b.get("cu", 0))
+	if cu >= 1:
+		return "Curada: se vende un %d %% más cara y ya no pierde THC." % Datos.jsround(D.CURADO.precio * 100)
+	if cu:
+		return "Curándose (%d %%): termina de curarla en el arcón con los tarros." % Datos.jsround(cu * 100)
+	if b.get("dia") == null:
+		return ""
+	return "Sin curar: %s. Cúrala en el arcón con tarros." % ["pierde THC cada día" if S.day - b.dia > D.CURADO.fresco else "desde el día %d pierde THC" % int(b.dia + D.CURADO.fresco + 1)]
+
+func cura_corto(b: Dictionary) -> String:
+	var cu := float(b.get("cu", 0))
+	return " · curada" if cu >= 1 else (" · curándose" if cu else (" · sin curar" if b.get("dia") != null else ""))
 
 func use_buds(k: String, g: float) -> void:
 	var b: Dictionary = S.buds[k]
@@ -1093,7 +1169,7 @@ func talk_client(c: Dictionary) -> void:
 		return
 	var sid: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
-	var base: float = (precio_rosin(b.thc) if ext else precio_calle(b.thc)) * ct.mult * D.ZONAS[c.get("map", "town")].precio * rival_f(c.get("map", "town")) * c.want
+	var base: float = (precio_rosin(b.thc) if ext else precio_calle(b.thc) * calidad(b)) * ct.mult * D.ZONAS[c.get("map", "town")].precio * rival_f(c.get("map", "town")) * c.want
 	var pr := [Datos.jsround(base * .85), Datos.jsround(base), Datos.jsround(base * 1.3)]
 	var j: int = await ask("%s g de %s%s. ¿Cuánto le pides?" % [n(c.want), "rosin de " if ext else "", lot_nombre(sid)], ["Rebaja · %d €" % pr[0], "Justo · %d €" % pr[1], "Caro · %d €" % pr[2], "Cancelar"])
 	if j == 3:

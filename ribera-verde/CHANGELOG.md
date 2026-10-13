@@ -1,5 +1,18 @@
 # Cambios
 
+## 1.29.0 · 13 de octubre de 2026
+
+La hierba se cura y, sin curar, se estropea. Godot, 0.23.0.
+
+- **Nuevo: el curado.** Cada lote de cogollos lleva el día de la cosecha y sale **sin curar**. En el arcón de casa, con los **tarros de curado** de Kiko (30 €, en el growshop o por el móvil, desde el capítulo 1), se cura en 2 días. Curado, el THC no sube (como en la realidad), pero se vende un 15 % más caro en la calle, a Iñaki (los 10 g y al por mayor), en la lonja, en los clubs y con los vendedores y la plantilla, la cata lo nota («Bien curada: suave y con todo el aroma») y ya no pierde nada.
+- **Nuevo: perecedera.** Sin curar, a los 3 días de la cosecha empieza a perder un 2 % de su THC cada día, esté en la mochila, en el arcón o en la caja fuerte (a medio curar, la mitad). Al amanecer avisa el primer día que pierde («Sin curar, pierde THC: …») y el día que queda curada en el arcón.
+- La primera cosecha lo cuenta, una vez. En la MOCHILA, cada lote dice si está curado, curándose o desde qué día pierde, y al catarlo sale en la línea («· curada», «· sin curar»). El arcón dice que con los tarros se cura lo de dentro.
+- Al juntar dos lotes (cosechar otra de la misma variedad, guardar o sacar del arcón), el THC, lo curado y el día van por gramos. Lo que compras en un club ya viene curado. Lo que lleva alguien de la plantilla en la calle también pierde si no está curado, y lo que le queda vuelve al arcón con su curado y su día (los lotes de antes, sin día).
+- Las partidas de antes: los lotes que ya tenías no pierden nada (no tienen día); lo que coseches desde ahora, sí.
+- La misión «Llegar al 27 %» avisa: sin curar, a los 3 días empieza a perder THC; preséntala antes o cúrala en el arcón.
+- Igual en Godot. Desde esta versión solo se construye y se entrega la app de Godot: el HTML queda como fuente de datos, arte y pruebas de Godot (`npm run godot`), sin APK propia.
+- Tests: `npm test` 111/111 (paso nuevo: los tarros, 2 días de curado en el arcón, lo que pierde un lote sin curar desde el 4.º día, los avisos, el precio al por mayor un 15 % más alto, la cata, cómo se juntan los lotes y la plantilla); Godot, historia 111 pasos, 41 pantallas y el ciclo.
+
 ## 1.28.0 · 13 de octubre de 2026
 
 Misiones para la Copa: cómo llegar al 27 %. Godot, 0.22.0.

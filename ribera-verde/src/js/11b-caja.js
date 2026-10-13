@@ -12,7 +12,7 @@ const cajaR=()=>S.caja&&S.caja.rosin?Object.values(S.caja.rosin).reduce((a,b)=>a
 // pagar desde el piso: primero lo de fuera y después la caja. Devuelve lo que falta
 function pagarCasa(e){const a=Math.min(S.money,e);S.money-=a;e-=a;if(e>0&&S.caja){const b=Math.min(S.caja.money,e);S.caja.money-=b;e-=b;}return e;}
 // g gramos del lote k de «de» a «a»: si el lote ya está, se juntan con el THC medio por gramos
-function moverLote(de,a,k,g){const b=de[k],t=a[k];if(t){t.thc=(t.thc*t.g+b.thc*g)/(t.g+g);t.g+=g;}else a[k]={g,thc:b.thc};b.g-=g;if(b.g<.5)delete de[k];}
+function moverLote(de,a,k,g){const b=de[k],t=a[k];if(t)juntaLote(t,g,b.thc,b.cu,b.dia);else a[k]=Object.assign({g,thc:b.thc},curaDe(b));b.g-=g;if(b.g<.5)delete de[k];}   // 1.29: con su curado y su día
 // lo mismo con el rosin, al décimo de gramo (como addRosin y useRosin)
 function moverRosin(de,a,k,g){const b=de[k],t=a[k];if(t){t.thc=(t.thc*t.g+b.thc*g)/(t.g+g);t.g=Math.round((t.g+g)*10)/10;}else a[k]={g,thc:b.thc};b.g=Math.round((b.g-g)*10)/10;if(b.g<.1)delete de[k];}
 // «300 € y 50 g», «300 €, 50 g y 2 g de rosin» o, sin cogollos, «300 € y 2 g de rosin»

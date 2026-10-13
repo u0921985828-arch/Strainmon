@@ -138,6 +138,7 @@ func new_day() -> void:
 	if seb:
 		S.bandejas = S.bandejas.filter(func(e): return S.day - e.dia <= D.CARRO.dias)
 		av.append("Se %s en las bandejas" % [("han secado %d esquejes" % seb) if seb > 1 else "ha secado un esqueje"])
+	curado_dia(av)   # el curado (1.29)
 	if av.size() and mode == "world":
 		toast("<br>".join(av), 1600)
 	spawn_clients()
@@ -676,6 +677,9 @@ func harvest(i: int) -> void:
 			await say("Son semillas regulares: algún macho ha polinizado unas flores. Recoges %d semilla%s de %s." % [nn, pl, s.n])
 		else:
 			await say("Una flor hermafrodita ha polinizado unas pocas: recoges %d semilla%s de %s." % [nn, pl, s.n])
+	if not S.items.get("tarros") and not S.flags.get("curado"):   # 1.29, una vez
+		S.flags.curado = S.day
+		await say("Sale sin curar: a los %d días empieza a perder THC. En el arcón, con unos tarros de curado (los vende Kiko), se cura en %d y se vende más cara." % [int(D.CURADO.fresco), int(D.CURADO.dias)])
 	S.flags.harvest1 = true
 	await check_story()
 
