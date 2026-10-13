@@ -461,6 +461,24 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.pots.forEach(p => { if (p) p.water = 20; }); R.m = S.money; R.luz = facturaLuz(); R.sms = S.sms.length; newDay(); await idle(); R.agua = S.pots.filter(Boolean).every(p => p.water === 100);
     const v = S.curro.vend[0]; R.gone = !v; R.v = v ? v.g : 0; R.e = v ? Math.round(precioCalle(12) * ZONAS.town.precio * (50 - v.g) * (1 - CURRO.vend.com)) : 0; R.dinero = S.money - (R.m - CURRO.jard.sueldo + R.e - R.luz); R.sms = S.sms.length - R.sms; S.curro = { jard: null, vend: [] }; S.fijos = []; enterMap('home', 5, 5, 'up');   // que no sigan vendiendo ni cobrando en los pasos de después
   }, () => R.patxi === 1 && R.patxi2 === 1 && R.jard && R.vend === 'cF,50' && R.g === 150 && R.agua && (R.gone || R.v < 50) && R.dinero === 0 && R.sms >= 1 || R);
+  await step('Rivales, combates y la casa (1.16): el rival de la zona sale a la 8.ª venta (si le ganas, se va una semana y sus clientes pagan un 5 % más; o le pagas su cuota, o te apartas); CUBRIRSE para la mitad del golpe; el sillón con la lámpara y el cuadro, con su tapizado y su lámina, y el diario de la tía Maite desde el sillón', ['^Pelear'], async () => {
+    S.ch = 5; S.money = 1000; S.min = 10 * 60; S.rivales = {}; S.rivalFuera = {}; const b0 = battle; window.R = { b: [] }; window.battle = async t => { R.b.push(t); return 'win'; };
+    const [x, y] = CLIENT_TILES.alto[0]; enterMap('alto', x, y, 'down');
+    for (let k = 0; k < RIVAL.umbral - 1; k++) rivalVenta('alto'); R.q7 = queued.has('rival'); R.c7 = S.rivales.alto; rivalVenta('alto'); await idle();
+    R.fuera = S.rivalFuera.alto - S.day; R.cero = S.rivales.alto; R.f = rivalF('alto'); rivalVenta('alto'); R.otra = S.rivales.alto;
+    const [x2, y2] = CLIENT_TILES.puerto[0]; enterMap('puerto', x2, y2, 'down'); S.rivales.puerto = RIVAL.umbral; want(['^Pagarle']); R.m = S.money; await run(() => rivalEvent('puerto')); R.pago = R.m - S.money;
+    const [x3, y3] = CLIENT_TILES.ensanche[0]; enterMap('ensanche', x3, y3, 'down'); S.rivales.ensanche = RIVAL.umbral; want(['^Irte']); await run(() => rivalEvent('ensanche')); R.irte = S.rivales.ensanche;
+    S.rivales.ibarbide = RIVAL.umbral; await run(() => rivalEvent('ibarbide')); R.lejos = S.rivales.ibarbide; window.battle = b0; S.rivales = {}; S.rivalFuera = {};
+    S.hp = 20; S.hpMax = 30; await run(async () => { B = { kind: 'thief', name: 'ATRACADOR', atk: [5, 5], hp: 10, hpMax: 10, cubre: 1, t: 0, flashE: 0, shakeP: 0 }; await enemyHits(); B = null; }); R.hp = S.hp;
+    const m0 = JSON.parse(JSON.stringify(S.muebles || {})); S.muebles = { sofa: S.day, sillon: S.day, cuadro: S.day }; S.deco = {}; enterMap('home', 12, 2, 'up');
+    const o = MAPS.home.o; R.obj = [o[1][12], o[1][13], o[5][16], o[5][17], o[5][13], o[5][14]].map(v => v || '').join();
+    want(['^Cambiar la lámina', '^La hoja']); await run(() => muebleAction('cuadro')); R.cuadro = [S.deco.cuadro, decoSprite('cuadro')].join();
+    want(['^Cambiar el tapizado', '^Granate']); await run(() => muebleAction('sofa')); R.sofa = decoSprite('sofa');
+    R.min = S.min; want(['^Leer el diario', 'Volver']); await run(() => muebleAction('sillon')); R.t = S.min - R.min;
+    R.tienda = Object.keys(MUEBLES).filter(k => !MUEBLES[k].grow).join(); S.muebles = m0; S.deco = {}; enterMap('home', 5, 5, 'up');
+  }, () => !R.q7 && R.c7 === 7 && R.b.join() === 'rival' && R.fuera === RIVAL.dias && R.cero === 0 && R.f === 1.05 && R.otra === 0 && R.pago === 230 && R.irte === 6 && R.lejos === 8 && R.hp === 17
+    && R.obj === 'cuadro,,sillon,sillon2,sofa,sofa2' && R.cuadro === '2,cuadro-2' && R.sofa === 'sofa-2' && R.t === 30 && R.tienda === 'sofa,tv,gpc,sillon,cuadro'
+    && LOG.some(l => l === 'ROBER: Eh, tú. Llevas 8 ventas en el barrio alto.') && LOG.some(l => l === 'Te cubres: el golpe duele la mitad.') && LOG.some(l => l === 'Rober no volverá por el barrio alto en 7 días. Mientras, sus clientes te pagan un 5 % más.') || R);
   await step('Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas', ['^Hindu Kush'], async () => {
     S.ch = 5; S.flags.txaro = true; S.flags.txaro2 = false; S.map = 'txaro'; buildEnts(); window.R = { ent: ents.filter(e => e.id === 'txaro').map(e => e.x + ',' + e.y).join() };
     S.buds = {}; addBuds('ria', 20, 12); addBuds('hindu', 15, 18); addBuds('thai', 20, 16); R.ch = S.seeds.chitral || 0; R.boc = S.items.bocata; R.rep = S.rep;
@@ -633,7 +651,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     await run(() => potAction(0)); R.pot = S.pots[0] && S.pots[0].f.id === 9997 && S.pots[0].prog === .12; R.queda = S.bandejas.length;
     S.bandejas.push({ sid: 'limon', f, dia: S.day - 1 }); newDay(); await idle(); R.seca = S.bandejas.map(e => e.dia).join();
     await run(raidEvent); R.redada = S.bandejas.length; S = S0; montarCasa(); R.vacio = !MAPS.home.o[5][8];
-  }, () => R.libre && R.online === 'sofa,tv,gpc' && R.m === 500 - CARRO.p && R.ped === R.d + 1 && R.ya && R.solido && R.n === '0,3,true' && R.l1 === 4
+  }, () => R.libre && R.online === 'sofa,tv,gpc,sillon,cuadro' && R.m === 500 - CARRO.p && R.ped === R.d + 1 && R.ya && R.solido && R.n === '0,3,true' && R.l1 === 4
     && R.dura === 3 && R.pot && R.queda === 2 && R.seca === String(R.d + CARRO.dias) && R.redada === 0 && R.vacio
     && LOG.some(l => l.includes('Kiko te sube el carro de esquejes')) || R);
   await step('Cama (1.11): la siesta que no pasa de las 12 no cobra la luz; dormir hasta las 7 pasando la medianoche cobra el día y lo dice', ['Siesta', 'Dormir hasta las 7'], async () => {
@@ -661,7 +679,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && LOG.some(l => l === '  [texto] Nombre de la planta (y sus esquejes) → Madre Lima') && LOG.some(l => l === '  [texto] Nombre de la planta (y sus esquejes) → (B)')
     && LOG.some(l => l.startsWith('Cortas una punta de la Skunk #1 «Madre Lima»')) && LOG.some(l => l === 'Sin nombre: vuelve a ser la nº 9995.') || R);
   await step('Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave; se cambia el nombre de una propia (sin repetir otro); el recetario, con las 32 y de dónde sale cada semilla',
-    ['GENOTECA', 'RECETARIO', 'Skunk #1$', 'Volver', '<B>', '^★ Skunk Haze', '=Haze Corta', '^★ Haze Corta', '=skunk #1', '<B>', 'SALIR'], async () => {
+    ['GENOTECA', 'DIARIO DE LA TÍA', 'Skunk #1$', 'Volver', '<B>', '^★ Skunk Haze', '=Haze Corta', '^★ Haze Corta', '=skunk #1', '<B>', 'SALIR'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); S.custom = {}; S.map = 'home';
     const Rn = rngSeed(7), pool = DEX.slice();
     for (let g = 0; g < 120; g++) { const a = pool[Math.floor(Rn() * pool.length)], c = pool[Math.floor(Rn() * pool.length)]; if (a === c) continue; const id = crossResult(a, c); if (!pool.includes(id)) pool.push(id); }
@@ -672,9 +690,9 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.disc = Object.assign({}, S.disc, { xv1: true, xv2: true, xv3: true }); migrate(); R.mig = Object.keys(S.custom).map(k => k + ':' + S.custom[k].n).join('|');
     await run(startMenu); R.ren = S.custom.xv1.n;
     const Rc = recetas(), hojas = [...new Set(Object.values(Rc).flat().flatMap(o => o.k))];
-    R.rec = Object.keys(Rc).length; R.sin = hojas.filter(k => dondeSemilla(k) === 'Semillas: .').join(); R.parque = dondeSemilla('acapulco'); R.ss = Rc.txoko.map(recetaTxt).join('|'); S = S0;
+    R.rec = Object.keys(Rc).length; R.sin = hojas.filter(k => dondeSemilla(k) === 'Semillas: .').join(); R.parque = dondeSemilla('acapulco'); R.ss = Rc.txoko.map(recetaTxt).join('|'); R.diario = Object.keys(Rc).filter(t => !diarioTxt(t)).join(); S = S0;
   }, () => R.n > 50 && R.x === 0 && R.max <= 20 && R.rep === 0 && R.dex === 0 && R.mig === 'xv1:Skunk Haze|xv2:Northern Thai|xv3:Thai Haze' && R.ren === 'Haze Corta'
-    && R.rec === 32 && R.sin === '' && R.parque === 'Semillas: escondidas en el parque del barrio.' && R.ss === 'Skunk #1 × Afghani, en ese orden'
+    && R.rec === 32 && R.sin === '' && R.diario === '' && R.parque === 'Semillas: escondidas en el parque del barrio.' && R.ss === 'Skunk #1 × Afghani, en ese orden'
     && LOG.some(l => l === '  [texto] Nuevo nombre de la variedad → Haze Corta') && LOG.some(l => l === 'Ya hay una variedad con ese nombre.') && LOG.some(l => /\[menú\] .*Afghani.*Volver  → Volver/.test(l)) || R);
   await step('Exportar partida (1.11): OPCIONES → EXPORTAR PARTIDA copia el JSON de la partida', ['OPCIONES', 'EXPORTAR', 'VOLVER', 'SALIR'], async () => {
     window.CLIP = ''; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async t => { window.CLIP = t; } }, configurable: true });

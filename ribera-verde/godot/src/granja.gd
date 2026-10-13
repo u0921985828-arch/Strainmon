@@ -745,15 +745,38 @@ func mueble_action(k):
 	if k == "carro":
 		await carro_action()
 		return
+	if k == "sillon":
+		var o := ["Leer el diario de la tía Maite", "Cambiar el tapizado", "Nada"]
+		var oi: int = await ask("Tu sillón de lectura. La lámpara da una luz cálida.", o)
+		var c: String = o[oi] if oi >= 0 and oi < o.size() else ""
+		if c == "Cambiar el tapizado":
+			await cambiar_deco(k)
+			return
+		if c != "Leer el diario de la tía Maite":
+			return
+		advance_time(30)
+		update_hud()
+		await recetario()
+		return
+	if k == "cuadro":
+		var o := ["Cambiar la lámina", "Nada"]
+		var oi: int = await ask("%s, enmarcada en la pared del salón." % D.DECO.cuadro.v[deco_v("cuadro")], o)
+		if oi == 0:
+			await cambiar_deco(k)
+		return
 	if k == "sofa":
 		var o := ["Echar una cabezada (1 h)"]
 		if "tv" in muebles_ya():
 			o.append("Ver la tele")
+		o.append("Cambiar el tapizado")
 		o.append("Nada")
 		var oi: int = await ask("Tu sofá. Todavía huele a nuevo.", o)
 		var c: String = o[oi] if oi >= 0 and oi < o.size() else ""
 		if c == "Ver la tele":
 			await mueble_action("tv")
+			return
+		if c == "Cambiar el tapizado":
+			await cambiar_deco(k)
 			return
 		if c != "Echar una cabezada (1 h)":
 			return
@@ -796,6 +819,21 @@ func mueble_action(k):
 		await say("Foro de cultivo · " + t)
 	elif c == "Tienda online":
 		await tienda_online()
+
+# personalizar la casa (1.16): elegir el tapizado o la lámina (DECO, 12c-salon)
+func cambiar_deco(k: String) -> void:
+	var Dk: Dictionary = D.DECO[k]
+	var v := deco_v(k)
+	var items := []
+	for j in Dk.v.size():
+		items.append({"label": Dk.v[j] + (" · ahora" if j == v else "")})
+	items.append({"label": "Volver"})
+	var i: int = await menu(items, {"title": "Cambiar " + Dk.q, "initial": v})
+	if i < 0 or i >= Dk.v.size() or i == v:
+		return
+	S.deco[k] = i
+	sfx("sel")
+	await say("Cambias %s de %s: %s." % [Dk.q, D.MUEBLES[k].art, Dk.v[i].to_lower()])
 
 func tienda_online() -> void:
 	var i := 0

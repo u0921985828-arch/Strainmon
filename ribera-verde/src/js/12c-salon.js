@@ -10,7 +10,21 @@ const MUEBLES={
   sofa:{n:'Sofá de 2 plazas',art:'el sofá',p:399,x:13,y:5,d:'Sofá de 180 cm, de tela azul, mirando a la tele. Para echar una cabezada sin meterte en la cama.'},
   tv:{n:'Tele de 43" con mueble',art:'la tele',p:449,x:13,y:2,d:'Smart TV de 43 pulgadas y un mueble bajo de 140 cm con hueco para la consola. Noticias y documentales.'},
   gpc:{n:'PC gaming con mesa',art:'el PC gaming',p:1490,x:16,y:2,d:'Torre con gráfica, monitor de 27", teclado mecánico y mesa de 140 cm con LED. Para jugar, leer el foro de cultivo y comprar.'},
-  carro:{n:'Carro de esquejes',art:'el carro de esquejes',p:CARRO.p,x:8,y:5,grow:1,d:`Carro con ruedas, dos bandejas de ${CARRO.plazas} tacos tapadas bajo tubos T5 y una mesita con la tabla de corte.`}};
+  carro:{n:'Carro de esquejes',art:'el carro de esquejes',p:CARRO.p,x:8,y:5,grow:1,d:`Carro con ruedas, dos bandejas de ${CARRO.plazas} tacos tapadas bajo tubos T5 y una mesita con la tabla de corte.`},
+  sillon:{n:'Sillón con lámpara de pie',art:'el sillón',p:229,x:16,y:5,d:'Sillón orejero de lectura con una lámpara de pie de luz cálida. Para leer el diario de la tía Maite con calma.'},
+  cuadro:{n:'Cuadro para el salón',art:'el cuadro',p:59,x:12,y:1,uno:1,d:'Una lámina enmarcada de 40 × 50 cm para la pared del salón: la ría, el caserío o la hoja, la que quieras.'}};
+// personalizar la casa (1.16): el tapizado del sofá y del sillón y la lámina del cuadro (S.deco[k], el índice en DECO[k].v; 0 = la
+// de serie). Cada una es su sprite del atlas: k, k + '-1', k + '-2' (tools/sprites/a-mano/salon.py). El cuadro (uno: 1) ocupa 1 casilla,
+// en la pared (ALZA)
+const DECO={sofa:{q:'el tapizado',v:['Azul','Verde oliva','Granate']},sillon:{q:'el tapizado',v:['Mostaza','Gris','Verde botella']},
+  cuadro:{q:'la lámina',v:['La ría','El caserío','La hoja']}};
+const decoV=k=>(S&&S.deco&&S.deco[k])||0;
+const decoSprite=o=>{const v=DECO[o]?decoV(o):0;return v?o+'-'+v:o;};
+async function cambiarDeco(k){
+  const D=DECO[k],v=decoV(k),i=await menu(D.v.map((n,j)=>({label:n+(j===v?' · ahora':'')})).concat([{label:'Volver'}]),{title:'Cambiar '+D.q,initial:v});
+  if(i<0||i>=D.v.length||i===v)return;
+  S.deco[k]=i;sfx('sel');return say(`Cambias ${D.q} de ${MUEBLES[k].art}: ${D.v[i].toLowerCase()}.`);
+}
 // el patinete y la bici (1.13): por la tienda online, llegan al día siguiente (S.veh[k] = ese día) y, en la calle (las ZONAS), vas
 // montado en el mejor que tengas (vehiculo()). paso: ms por casilla [sin B, con B] (a pie, 240 y 130; la policía corre a 210 y 180);
 // sube: los px que sube el protagonista (en la tabla o en el sillín; dibujarPJ, arte de tools/sprites/a-mano/vehiculos.py).
@@ -18,7 +32,7 @@ const VEHICULOS={
   patinete:{n:'Patinete',art:'el patinete',p:119,paso:[150,110],sube:3,d:'Patinete de aluminio con ruedas de 200 mm. Más rápido que andar y, con B, que correr; se pliega para el autobús.'},
   bici:{n:'Bici de segunda mano',art:'la bici',p:239,paso:[110,80],sube:5,d:'Bici urbana de segunda mano, cuadro mostaza. La más rápida: la policía no te sigue.'}};
 const vehiculo=()=>{const v=S&&S.veh;if(!v||!ZONAS[S.map])return null;return ['bici','patinete'].find(k=>v[k]&&v[k]<=S.day)||null;};
-const SEGUNDA=new Set(Object.keys(MUEBLES).map(k=>k+'2'));
+const SEGUNDA=new Set(Object.keys(MUEBLES).filter(k=>!MUEBLES[k].uno).map(k=>k+'2'));
 const muebleDe=o=>o&&(MUEBLES[o]?o:SEGUNDA.has(o)?o.slice(0,-1):null);
 const mueblesYa=()=>Object.keys(MUEBLES).filter(k=>S.muebles&&S.muebles[k]&&S.muebles[k]<=S.day);
 const carroYa=()=>mueblesYa().includes('carro');
@@ -45,9 +59,20 @@ function noticia(){
 }
 async function muebleAction(k){
   if(k==='carro')return carroAction();
+  if(k==='sillon'){
+    const o=['Leer el diario de la tía Maite','Cambiar el tapizado','Nada'],c=o[await ask('Tu sillón de lectura. La lámpara da una luz cálida.',o)];
+    if(c==='Cambiar el tapizado')return cambiarDeco(k);
+    if(c!=='Leer el diario de la tía Maite')return;
+    advanceTime(30);updateHUD();return recetario();
+  }
+  if(k==='cuadro'){
+    const o=['Cambiar la lámina','Nada'],c=o[await ask(`${DECO.cuadro.v[decoV('cuadro')]}, enmarcada en la pared del salón.`,o)];
+    if(c==='Cambiar la lámina')return cambiarDeco(k);return;
+  }
   if(k==='sofa'){
-    const o=['Echar una cabezada (1 h)'].concat(mueblesYa().includes('tv')?['Ver la tele']:[],['Nada']);const c=o[await ask('Tu sofá. Todavía huele a nuevo.',o)];
+    const o=['Echar una cabezada (1 h)'].concat(mueblesYa().includes('tv')?['Ver la tele']:[],['Cambiar el tapizado','Nada']);const c=o[await ask('Tu sofá. Todavía huele a nuevo.',o)];
     if(c==='Ver la tele')return muebleAction('tv');
+    if(c==='Cambiar el tapizado')return cambiarDeco(k);
     if(c!=='Echar una cabezada (1 h)')return;
     await fade(1);advanceTime(60);S.hp=Math.min(S.hpMax,S.hp+5);buildEnts();updateHUD();await wait(300);await fade(0);
     return say('Una cabezada en el sofá: +5 de vida.');

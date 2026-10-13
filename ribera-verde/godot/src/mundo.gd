@@ -333,7 +333,8 @@ func montar_casa() -> void:
 	for k in D.MUEBLES:   # los muebles del salón que ya han llegado (12c-salon): k y k + "2"
 		var mu: Dictionary = D.MUEBLES[k]
 		h.o[mu.y][mu.x] = k if k in ya else null
-		h.o[mu.y][mu.x + 1] = (k + "2") if k in ya else null
+		if not mu.get("uno"):
+			h.o[mu.y][mu.x + 1] = (k + "2") if k in ya else null
 	h.carpas = []
 	for ci in S.carpas.size():
 		var c = S.carpas[ci]
@@ -360,9 +361,17 @@ func mueble_de(o) -> String:
 		return ""
 	if D.MUEBLES.has(o):
 		return o
-	if o.ends_with("2") and D.MUEBLES.has(o.left(-1)):
+	if o.ends_with("2") and D.MUEBLES.has(o.left(-1)) and not D.MUEBLES[o.left(-1)].get("uno"):
 		return o.left(-1)
 	return ""
+
+# personalizar la casa (1.16, 12c-salon): el tapizado o la lámina de un mueble (S.deco[k], índice en DECO[k].v) y su sprite
+func deco_v(k: String) -> int:
+	return int(S.deco.get(k, 0)) if S.get("deco") is Dictionary else 0
+
+func deco_sprite(o: String) -> String:
+	var v := deco_v(o) if D.DECO.has(o) else 0
+	return (o + "-" + str(v)) if v else o
 
 func sitio_visible(ci: int) -> bool:
 	return not (ci < S.carpas.size() and S.carpas[ci]) and (ci < 2 or (S.carpas.size() > 1 and S.carpas[1] != null))
@@ -775,7 +784,7 @@ func object_action(x: int, y: int) -> void:
 			return
 		for k in D.MUEBLES:   # el sitio vacío de un mueble del salón
 			var mu: Dictionary = D.MUEBLES[k]
-			if (x == mu.x or x == mu.x + 1) and y == mu.y:
+			if (x == mu.x or (not mu.get("uno") and x == mu.x + 1)) and y == mu.y:
 				var pd = S.get("muebles", {}).get(k) if S.get("muebles") is Dictionary else null
 				if mu.get("grow") and not pd:   # el carro de esquejes (1.11): sin pedir, nada
 					break
@@ -888,6 +897,10 @@ func lanzar_vfx(id: String, x: float, y: float, now: float, capa: String, sube: 
 func precio_calle(thc: float) -> float:
 	return 4 + thc * .2
 
+# los rivales (1.16, 13-combate): con el rival de la zona echado, sus clientes pagan un RIVAL.f más
+func rival_f(z: String) -> float:
+	return float(D.RIVAL.f) if float(S.rivalFuera.get(z, 0)) >= S.day else 1.0
+
 func precio_mayor(thc: float) -> float:
 	return 2 + thc * .1
 
@@ -978,7 +991,7 @@ func talk_client(c: Dictionary) -> void:
 		return
 	var sid: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
-	var base: float = (precio_rosin(b.thc) if ext else precio_calle(b.thc)) * ct.mult * D.ZONAS[c.get("map", "town")].precio * c.want
+	var base: float = (precio_rosin(b.thc) if ext else precio_calle(b.thc)) * ct.mult * D.ZONAS[c.get("map", "town")].precio * rival_f(c.get("map", "town")) * c.want
 	var pr := [Datos.jsround(base * .85), Datos.jsround(base), Datos.jsround(base * 1.3)]
 	var j: int = await ask("%s g de %s%s. ¿Cuánto le pides?" % [n(c.want), "rosin de " if ext else "", lot_nombre(sid)], ["Rebaja · %d €" % pr[0], "Justo · %d €" % pr[1], "Caro · %d €" % pr[2], "Cancelar"])
 	if j == 3:
@@ -1008,6 +1021,7 @@ func talk_client(c: Dictionary) -> void:
 		visto_vender()
 		heat_warn()
 		await check_story()
+		rival_venta(c.get("map", "town"))
 		# en las esquinas de Darko (1.10), 1 de cada 3 ventas acaba con uno de sus chicos encima
 		if c.get("map") == "astilleros" and Cultivo.azar() < 1.0 / 3:
 			await say("Uno de los chicos de Darko te ha visto vender.")
@@ -1433,6 +1447,10 @@ func notas_tia():
 func pedir_caja():
 	pass
 func battle(_kind):
+	pass
+func rival_venta(_z):
+	pass
+func recetario():
 	pass
 func start_menu():
 	pass

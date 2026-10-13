@@ -436,8 +436,8 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       try { mode = 'world'; while (handlers.length) handlers.pop(); press('MOVIL'); await new Promise(r => setTimeout(r, 50));
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'p' })); await new Promise(r => setTimeout(r, 50)); } finally { movilMenu = m0; } return n; });
     check('Salón: muebles por internet (llegan mañana), 2 casillas con su arte, sofá, tele y PC; menú START con iconos y el día; botón MÓVIL encima de la cruceta',
-      salon.vacio && salon.tienda === 'Sofá de 2 plazas|Tele de 43" con mueble|PC gaming con mesa|Patinete|Bici de segunda mano|Salir' && salon.pago.join() === '0,111' && salon.ped === '{"sofa":2,"gpc":2}' &&
-      salon.tienda2 === 'Sofá de 2 plazas · pedido×|Tele de 43" con mueble|PC gaming con mesa · pedido×|Patinete|Bici de segunda mano|Salir' && salon.hoy === '' && salon.ya === 'sofa,gpc' && /el sofá y el PC gaming/.test(salon.llega) &&
+      salon.vacio && salon.tienda === 'Sofá de 2 plazas|Tele de 43" con mueble|PC gaming con mesa|Sillón con lámpara de pie|Cuadro para el salón|Patinete|Bici de segunda mano|Salir' && salon.pago.join() === '0,111' && salon.ped === '{"sofa":2,"gpc":2}' &&
+      salon.tienda2 === 'Sofá de 2 plazas · pedido×|Tele de 43" con mueble|PC gaming con mesa · pedido×|Sillón con lámpara de pie|Cuadro para el salón|Patinete|Bici de segunda mano|Salir' && salon.hoy === '' && salon.ya === 'sofa,gpc' && /el sofá y el PC gaming/.test(salon.llega) &&
       salon.solido && salon.arte && salon.sofa[0] === 15 && salon.sofa[1] >= 60 && salon.sofa[1] < 64 && /^Aquí iría bien la tele/.test(salon.vacioTv) && /^Noticias: la policía busca/.test(salon.tv[0]) && salon.tv[1] >= 60 && salon.tv[1] < 64 &&
       /^Foro de cultivo · /.test(salon.foro[0]) && salon.foro[1] >= 30 && salon.foro[1] < 34 && salon.opc === 'true,true' && salon.start === '8,true,true,0 €' && salon.boton === 'true,true,true' && salonM === 2, { ...salon, salonM });
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };

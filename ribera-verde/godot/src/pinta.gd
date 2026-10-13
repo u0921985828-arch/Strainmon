@@ -415,7 +415,7 @@ func _arte_orilla(m: Dictionary, k: String, tx: int, ty: int, sx: int, sy: int) 
 		L.draw_texture_rect(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), false)
 
 # los de la pared, subidos a su altura (1.10, ALZA de 01b-arte.js: px)
-const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13}
+const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadro": -13}
 
 # los muebles que dejan sombra en el suelo (1.10 P5, SOMBRA_OBJ de 01b-arte.js): 1 px a cada lado del dibujo en sus 2 últimas filas
 # y la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo; se pintan con todo el suelo ya puesto
@@ -426,7 +426,10 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		return
 	var an = Atlas.sobre.get("obj:" + o)
 	var d := desfase(o, tx, ty)
-	var f = Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, o, "unica", 0, {"i": 0, "esp": d.esp})
+	var sp: String = J.deco_sprite(o)   # 1.16: su tapizado o lámina
+	var f = Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, sp, "unica", 0, {"i": 0, "esp": d.esp})
+	if f == null and not an and sp != o:
+		f = Atlas.frame_de(gr, o, "unica", 0, {"i": 0, "esp": d.esp})
 	if f == null:
 		return
 	var xp: int = tx * 16 + 8 + d.dx - cam.x

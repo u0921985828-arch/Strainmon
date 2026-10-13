@@ -363,7 +363,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.lector.visible, 60)
 	await espera(3)
 	await foto("0b-creditos")
-	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.9.0") \
+	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.10.0") \
 		and J.lector_txt.text.contains("Open Font License") and J.lector_txt.text.contains("FICCIÓN") and J.lector.get_global_rect().encloses(J.lector_sc.get_global_rect()))
 	await pulsa("B")
 	await elige("LICENCIAS")
@@ -545,7 +545,7 @@ func menu_start() -> void:
 	var l := etiquetas()
 	check("START abre el menú (%s)" % ", ".join(l), l == ["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "GUARDAR", "OPCIONES", "SALIR"])
 	await elige("GENOTECA")
-	check("Genoteca: el recetario y %d filas, todas sin descubrir" % (J.m_items.size() - 1), J.m_items.size() == J.D.DEX.size() + 1 and J.m_items[0].label == "RECETARIO"
+	check("Genoteca: el diario de la tía Maite y %d filas, todas sin descubrir" % (J.m_items.size() - 1), J.m_items.size() == J.D.DEX.size() + 1 and J.m_items[0].label == "DIARIO DE LA TÍA MAITE"
 		and J.m_items.slice(1).all(func(x): return x.label.ends_with("??????")))
 	await pulsa("B")
 	await elige("MOCHILA")

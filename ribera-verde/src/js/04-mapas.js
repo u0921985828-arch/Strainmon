@@ -350,7 +350,7 @@ function montarCasa(){
   const h=MAPS.home;if(!h||!S)return;
   const ya=mueblesYa(),key=S.carpas.map(c=>c?c.t:'-').join()+'|'+ya.join();if(h.carpasK===key)return;h.carpasK=key;
   SITIOS.forEach(s=>{for(let x=s.x;x<s.x+s.w;x++)ob(h,x,s.y,null);});
-  for(const k in MUEBLES){const m=MUEBLES[k],en=ya.includes(k);ob(h,m.x,m.y,en?k:null);ob(h,m.x+1,m.y,en?k+'2':null);}
+  for(const k in MUEBLES){const m=MUEBLES[k],en=ya.includes(k);ob(h,m.x,m.y,en?k:null);if(!m.uno)ob(h,m.x+1,m.y,en?k+'2':null);}
   h.carpas=[];
   S.carpas.forEach((c,ci)=>{
     if(!c)return;const s=SITIOS[ci],x0=s.x,x1=x0+CARPAS[c.t].w-1;

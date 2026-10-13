@@ -45,6 +45,40 @@ function recetas(){const R={},add=(t,o)=>(R[t]=R[t]||[]).push(o);
 const recetaTxt=o=>o.k.map(k=>STRAINS[k].n).join(o.ord?' × ':' + ')+(o.ord?', en ese orden':'');
 const REGALO={ria:'te las da Kiko al conocerlo',rif:'te las da Kiko con la mesa de genética',hindu:'Txaro, la vecina, por 5 g de cogollo',
   chitral:'Txaro, por 10 g de una índica',malawi:'Iñaki, el del muelle, al venderle 10 g',acapulco:'escondidas en el parque del barrio'};
+// el diario de la tía Maite (1.16): el recetario es su cuaderno; una nota suya por variedad de receta
+const DIARIO={ria:'La primera que fijamos Kiko y yo. Tres padres y mucha paciencia: cuando huele a mofeta, va bien.',
+  haze:'Tarda una eternidad en flor. En el armario no cabe; en la carpa grande, y a 12/12 pronto.',
+  nl:'Afgana y tailandesa. Aguanta el frío de la ría y no huele tanto: la de los años malos.',
+  amanecer:'Las noches frías de octubre le sacan el morado. Que no te engañe el color: pega suave.',
+  sollimon:'Huele a limón y a pino. Ata las colas, que pesan y se tronchan.',
+  ak47:'Cuatro sangres y florece en ocho semanas. Si solo tienes sitio para una, esta.',
+  buddha:'Tailandesa con jamaicana. La que le daba la risa a Txaro los domingos.',
+  cannalope:'Haze con mexicana: huele a melón maduro. Pide sitio a lo alto.',
+  afkush:'Las dos montañas juntas. Resina de la de verdad; la que tamizábamos en seco.',
+  purpurah:'Hindu Kush con la púrpura: morada hasta el tallo. La del aceite de Txaro.',
+  congopan:'Dos ecuatoriales: eléctrica y lenta. En el armario, ni lo intentes.',
+  malapan:'Africana y panameña. Muy alta y muy clara de efecto; ponle tutor.',
+  malapck:'Malawi con la de Chitral. La rara del cuaderno: si te sale, guárdale semillas.',
+  niebla:'Sabe a arándanos de verdad. Tres generaciones me costó que oliera así.',
+  shiva:'Skunk con Northern Lights: corta, gorda y obediente. La de mi primer año.',
+  neville:'Haze con NL5 × Haze: la sativa más alta que he tenido. Doce semanas largas de flor.',
+  chocolope:'Chocolate y melón. No la cuelgues a secar con otra, que se le pega el olor.',
+  orotrop:'Sabe a piña. Kiko decía que era la de los veranos.',
+  brumaog:'Pela una mandarina: así huele la carpa cuando florece.',
+  tormenta:'Cuatro landraces y una Haze. Si la sacas, ya sabes cruzar.',
+  leyenda:'La que nunca terminé. Haze, Northern Lights y Shiva: el cuaderno acaba aquí. Termínala tú.',
+  ssh:'Plateada de tricomas. Skunk, Northern Lights y Haze en un solo cogollo.',
+  nieblamor:'Blueberry con Haze: dulce y despierta. La que más me pedían en el muelle.',
+  bluetx:'Blueberry con queso. Huele fuerte: extractor y filtro antes de plantarla.',
+  limon:'Huele a limón recién cortado. Cosecha con los tricomas lechosos.',
+  dragon:'Huele a gasoil. Ni el mejor filtro la tapa del todo.',
+  kali47:'Una sativa que florece a tiempo. Un milagro, en esta ría.',
+  reina:'Produce como ninguna: la de pagar las facturas.',
+  txoko:'Skunk #1 de madre y Afghani de padre. Al revés sale otra: la madre manda.',
+  kushrif:'Afghani de madre y Skunk #1 de padre. Cogollos tan densos que hay que vigilar el moho.',
+  nlhaze:'Northern Lights de madre y Haze de padre: la más fácil de las Haze.',
+  silver:'Haze de madre y Northern Lights de padre. Al revés no sale igual.'};
+const diarioTxt=t=>(DIARIO[t]?`«${DIARIO[t]}»\n`:'');
 function dondeSemilla(k){
   const b=BANCO.find(x=>x[0]===k),t=SHOP.find(it=>it.sid===k),l=[];
   if(REGALO[k])l.push(REGALO[k]);if(t)l.push(`en el growshop de Kiko desde el cap. ${t.ch}`);if(b)l.push(`en el banco de semillas del PC desde el cap. ${b[2]}`);
@@ -55,7 +89,7 @@ async function recetario(){
   const R=recetas(),ts=Object.keys(R);let i=0;
   for(;;){
     i=await menu(ts.map(t=>({label:(S.disc[t]?'✓ ':'  ')+STRAINS[t].n,right:R[t].length>1?R[t].length+' recetas':'',sw:STRAINS[t].c,ic:iconoCogollo(t),
-      desc:R[t].map(recetaTxt).join('\no '),k:t})).concat([{label:'Volver',desc:''}]),{cls:'full',title:'RECETARIO',title2:`${ts.filter(t=>S.disc[t]).length}/${ts.length}`,desc:true,initial:i});
+      desc:diarioTxt(t)+R[t].map(recetaTxt).join('\no '),k:t})).concat([{label:'Volver',desc:''}]),{cls:'full',title:'DIARIO DE LA TÍA MAITE',title2:`${ts.filter(t=>S.disc[t]).length}/${ts.length}`,desc:true,initial:i});
     if(i<0||i>=ts.length)return;
     const t=ts[i],ks=[...new Set(R[t].flatMap(o=>o.k))];
     await menu(ks.map(k=>({label:(S.disc[k]?'✓ ':'  ')+STRAINS[k].n,right:S.seeds[k]?'×'+S.seeds[k]:'',sw:STRAINS[k].c,ic:iconoCogollo(k),desc:dondeSemilla(k)}))
@@ -71,7 +105,7 @@ async function renombrarVariedad(k){
 async function genoteca(){
   let i=0;
   for(;;){
-    const items=[{label:'RECETARIO',right:`${Object.keys(recetas()).filter(t=>S.disc[t]).length}/${Object.keys(recetas()).length}`,ic:icono('semillas'),desc:'Las recetas de las variedades clásicas y dónde conseguir lo que entra en cada una.'}]
+    const items=[{label:'DIARIO DE LA TÍA MAITE',right:`${Object.keys(recetas()).filter(t=>S.disc[t]).length}/${Object.keys(recetas()).length}`,ic:icono('guardar'),desc:'Su cuaderno de recetas: las variedades clásicas, lo que apuntó de cada una y dónde conseguir lo que entra.'}]
       .concat(DEX.map((k,n)=>{const s=STRAINS[k],nn=String(n+1).padStart(2,'0');return S.disc[k]?{label:`${nn} ${s.n}`,right:pct(s.thc)+'%',sw:s.c,ic:iconoCogollo(k),desc:strainLine(k)+(s.h?'\n'+s.h:'')+(S.catas[k]?'\nCata: '+S.catas[k]:'')}:{label:`${nn} ??????`,desc:'Sin descubrir.'};}));
     const cust=Object.keys(S.custom).filter(k=>S.disc[k]);
     cust.forEach(k=>{const s=S.custom[k];items.push({label:'★ '+s.n,right:pct(s.thc)+'%',sw:s.c,ic:iconoCogollo(k),desc:strainLine(k)+'\nPulsa A para cambiarle el nombre.',c:k});});

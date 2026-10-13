@@ -26,9 +26,15 @@ def suelo(L, x0, x1, c):
     for x in range(x0, x1 + 1):
         if L.lleno(x, 46) and not L.lleno(x, 47): L.p(x, 47, c)
 
-def sofa():
+# los tapizados (1.16, personalizar la casa): el de serie y los otros dos, del oscuro al claro y el contorno
+TAP_SOFA = [('#2c3a52', '#3e5272', '#566e94', '#7890b6', '#1a2030'), ('#3a4224', '#556034', '#6e7c46', '#909e64', '#20240f'),
+            ('#4a1e24', '#6a2a32', '#8a3c44', '#ac5a60', '#2a1014')]
+TAP_SILLON = [('#7a5a18', '#a07a24', '#c49a38', '#dcb85a', '#3a2a0a'), ('#3a3c44', '#55585f', '#72767e', '#9498a0', '#1e2026'),
+              ('#143a2a', '#1e5a40', '#2e7a56', '#4a9a72', '#0a1e16')]
+
+def sofa(tap=TAP_SOFA[0]):
     L = Lienzo(48, 48); x0, x1 = 10, 38                                  # 29 px = 180 cm
-    S0, S1, S2, S3 = '#2c3a52', '#3e5272', '#566e94', '#7890b6'
+    S0, S1, S2, S3, SC = tap
     # los brazos, que asoman por detrás del respaldo a lo lejos (60 cm de alto, 90 de fondo)
     for x in (x0, x1 - 3):
         L.r(x, 30, 4, 3, S2); L.hl(x, x + 3, 30, S3)
@@ -40,8 +46,53 @@ def sofa():
     for x in range(x0 + 2, x1 - 1, 4): L.p(x, 38, S0); L.p(x + 2, 41, S0)  # el tejido
     L.hl(x0, x1, 44, S0)
     L.p(x0 + 1, 45, '#3a2a1c'); L.p(x0 + 2, 45, '#3a2a1c'); L.p(x1 - 2, 45, '#3a2a1c'); L.p(x1 - 1, 45, '#3a2a1c')   # patas
-    L.contorno('#1a2030')
-    suelo(L, x0, x1, '#1a2030')
+    L.contorno(SC)
+    suelo(L, x0, x1, SC)
+    return L
+
+def sillon(tap=TAP_SILLON[0]):
+    """(1.16) sillón orejero de 80 × 100 cm visto por detrás, como el sofá (mira a la tele), y a su derecha la lámpara de pie de
+    160 cm con la pantalla encendida"""
+    L = Lienzo(48, 48); S0, S1, S2, S3, SC = tap; x0, x1 = 12, 24          # 13 px = 80 cm
+    L.r(x0 - 1, 38, 2, 7, S2); L.r(x1, 38, 2, 7, S2)                      # los brazos, que asoman a los lados
+    L.hl(x0 - 1, x0, 38, S3); L.hl(x1, x1 + 1, 38, S3)
+    L.r(x0, 31, 13, 14, S1)                                               # el respaldo (16 px = 100 cm)
+    L.r(x0, 31, 2, 8, S2); L.r(x1 - 1, 31, 2, 8, S2)                      # las orejas
+    L.hl(x0 + 1, x1 - 1, 31, S3); L.vl(x0, 32, 44, S2); L.vl(x1, 32, 44, S0)
+    L.p(x0, 31, None); L.p(x1, 31, None)
+    for y in (35, 39): L.p(18, y, S0)                                     # los botones del capitoné
+    L.hl(x0, x1, 44, S0)
+    L.p(x0 + 1, 45, '#3a2a1c'); L.p(x1 - 1, 45, '#3a2a1c')               # las patas
+    # la lámpara de pie: el pie redondo, el palo y la pantalla de tela con la luz
+    P0, P1, P2 = '#2e2e36', '#4a4a54', '#6a6a76'
+    L.hl(30, 35, 46, P0); L.hl(31, 34, 45, P1)
+    L.vl(32, 24, 44, P1); L.vl(33, 24, 44, P0)
+    L.r(29, 18, 8, 6, '#e0c070'); L.hl(30, 35, 18, '#f0d890'); L.hl(29, 36, 23, '#c49a38')
+    L.vl(29, 19, 22, '#f0d890'); L.r(31, 20, 4, 2, '#fff2c0')
+    L.contorno(SC)
+    suelo(L, x0 - 1, 35, SC)
+    return L
+
+def cuadro(n):
+    """(1.16) el cuadro del salón, en la pared (celda objeto_1x1, 16 × 16; ALZA lo sube): marco de madera y una de tres láminas"""
+    L = Lienzo(16, 16); W0, W1, W2 = '#74502e', '#a46e40', '#dcac6c'
+    L.r(3, 2, 10, 13, W1); L.hl(3, 12, 2, W2); L.vl(3, 3, 14, W2); L.vl(12, 3, 14, W0); L.hl(4, 12, 14, W0)
+    x0, y0, w, h = 4, 3, 8, 11                                            # la lámina, dentro del marco
+    if n == 0:                                                            # la ría: el cielo, el monte, la orilla y el agua con su reflejo
+        L.r(x0, y0, w, 4, '#b4dcfa'); L.p(9, 4, '#ffffff'); L.p(10, 4, '#ffffff')
+        L.r(x0, 7, w, 2, '#3f8a46'); L.hl(6, 9, 6, '#62aa56')
+        L.r(x0, 9, w, 5, '#4a92e0'); L.hl(5, 8, 10, '#b4dcfa'); L.hl(7, 10, 12, '#76b4f2')
+    elif n == 1:                                                          # el caserío: blanco con tejado rojo en el prado
+        L.r(x0, y0, w, 6, '#b4dcfa'); L.r(x0, 9, w, 5, '#62aa56'); L.hl(x0, x0 + w - 1, 9, '#84cc6c')
+        L.hl(6, 9, 5, '#d65a4a'); L.hl(5, 10, 6, '#d65a4a'); L.hl(5, 10, 7, '#a83c30')
+        L.r(6, 8, 4, 3, '#f8f8f0'); L.p(7, 9, '#74502e'); L.p(7, 10, '#74502e'); L.p(9, 9, '#46749a')
+    else:                                                                 # la hoja: una de siete foliolos sobre crema
+        L.r(x0, y0, w, h, '#f0ead8')
+        G1, G2 = '#3f8a46', '#62aa56'
+        L.vl(8, 4, 12, G1)
+        for (x, y) in ((7, 5), (9, 5), (7, 6), (9, 6), (6, 7), (10, 7), (5, 8), (11, 8), (6, 9), (10, 9), (5, 10), (11, 10)): L.p(x, y, G2)
+        L.p(8, 13, '#74502e')
+    L.contorno('#2a2a34')
     return L
 
 def tv():
@@ -182,7 +233,9 @@ sale('salir', salir(), 'iconos-menu')
 sale('guardar', guardar(), 'iconos-menu')
 sale('altavoz', altavoz(), 'iconos-menu')
 sale('cogollo', cogollo(), 'iconos-menu')
-sale('sofa', sofa())
+for i, t in enumerate(TAP_SOFA): sale('sofa' + (f'-{i}' if i else ''), sofa(t))
+for i, t in enumerate(TAP_SILLON): sale('sillon' + (f'-{i}' if i else ''), sillon(t))
+for i in range(3): sale('cuadro' + (f'-{i}' if i else ''), cuadro(i), 'salon-pared')
 sale('tv', tv())
 sale('gpc', gpc())
 sale('carro', carro())

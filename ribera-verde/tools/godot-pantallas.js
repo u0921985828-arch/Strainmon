@@ -38,7 +38,7 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
     carpas: [{ t: 'p80', foco: 'sodio250' }, { t: 'm100', foco: 'led480' }, { t: 'm120', foco: 'cfl' }],
     pots: { 0: pl('ria', .5), 3: pl('limon', .8) }, map: 'home', P: { x: 4, y: 6, dir: 'left' } },
   // el carro de esquejes (1.11) delante de las carpas, con el salón amueblado
-  { k: 'casa-carro', sw: 400, mode: 'world', now: T + 99, S: { ch: 4, muebles: { carro: 1, sofa: 1, tv: 1, gpc: 1 }, flags: { letter: true, kiko1: true } },
+  { k: 'casa-carro', sw: 400, mode: 'world', now: T + 99, S: { ch: 4, muebles: { carro: 1, sofa: 1, tv: 1, gpc: 1, sillon: 1, cuadro: 1 }, deco: { sofa: 2, sillon: 1, cuadro: 2 }, flags: { letter: true, kiko1: true } },
     carpas: [{ t: 'p80', foco: 'led200' }, { t: 'g150', foco: 'led480' }], map: 'home', P: { x: 10, y: 6, dir: 'up' } },
   // la plaza de día: el jugador andando, policía con la radio, Molina fumando (con su humo), clientes (uno andando), Patxi y su
   // paloma, bocadillos, la fuente animada y monedas

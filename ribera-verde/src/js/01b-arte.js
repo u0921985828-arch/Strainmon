@@ -190,7 +190,7 @@ function arteOrilla(m,k,tx,ty,sx,sy){
 // objetos: los de 1 casilla en el suelo; los altos van a la lista ordenada por Y (tapan al jugador si está detrás). Los de la
 // pared (fila de abajo de la pared, 2 m a 16 px/m), subidos a su altura (1.10, ALZA px): ventanas y cuadros con el alféizar a
 // 0,9 m, las baldas de las plantas a 1 m y la de las botellas a 1,05 m (antes, todos a ras de suelo)
-const ALZA={iwin:-13,poster:-13,shelfW:-16,bottles:-13};
+const ALZA={iwin:-13,poster:-13,shelfW:-16,bottles:-13,cuadro:-13};
 // los muebles que dejan sombra en el suelo (1.10 P5): como la de los personajes, 1 px a cada lado del dibujo en sus 2 últimas filas y
 // la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo. Van a «sombras» y se pintan con todo el suelo ya puesto
 const SOMBRA_OBJ=new Set(['fridge','crate','table','btable','stool','plantDeco','lab','lab2','pc','display','counter','barcounter','jukebox','bench','bedB']);
@@ -199,7 +199,7 @@ function arteObj(o,tx,ty,cam,now,list,sombras){
   if(SEGUNDA.has(o))return !!ARTE.cubre['obj:'+o.slice(0,-1)];   // la mitad de la derecha de un mueble del salón: la pinta la de la izquierda
   const g=ARTE.cubre['obj:'+o];if(!g)return false;
   const an=ARTE.sobre['obj:'+o],d=desfase(o,tx,ty);
-  const f=an?frameDe(an[0][0],an[0][1],'unica',now,{bucle:true}):frameDe(g,o,'unica',0,{i:0,esp:d.esp});
+  const sp=decoSprite(o),f=an?frameDe(an[0][0],an[0][1],'unica',now,{bucle:true}):frameDe(g,sp,'unica',0,{i:0,esp:d.esp})||(sp!==o?frameDe(g,o,'unica',0,{i:0,esp:d.esp}):null);   // 1.16: su tapizado o lámina
   if(!f)return false;
   const xp=tx*16+8+d.dx-cam.x,yp=ty*16+15+d.dy+(ALZA[o]||0)-cam.y;
   if(sombras&&SOMBRA_OBJ.has(o)){

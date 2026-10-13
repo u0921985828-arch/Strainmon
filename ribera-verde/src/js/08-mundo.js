@@ -12,7 +12,7 @@ function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},gen:{},pedido:[],esquejes:[],bandejas:[],fenos:{},fenoN:0,fnom:{},eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
   caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0,arcon:{buds:{},rosin:{}},sala:{},fijos:[],sms:[],envio:[],orden:0,misiones:{},lonja:0,trueque:0,chatarra:null,
-  rel:{},relDia:{},curro:{jard:null,vend:[]},clubs:{},clubDia:{},clubCompra:{},clubEnc:null,clubEncDia:0,catas:{}};}   // la gente (1.15, 11e-gente)
+  rel:{},relDia:{},curro:{jard:null,vend:[]},clubs:{},clubDia:{},clubCompra:{},clubEnc:null,clubEncDia:0,catas:{},rivales:{},rivalFuera:{},deco:{}};}   // la gente (1.15, 11e-gente)
 const isFree=()=>mode==='world'&&lock===0&&handlers.length===0;
 const isNight=()=>S.min>=21*60||S.min<6*60;
 async function run(fn){lock++;try{await fn();}catch(e){console.error(e);}finally{lock--;}if(!lock&&S&&S.misiones)revisaMisiones();}
@@ -190,7 +190,7 @@ async function objectAction(x,y){
     if(o==='fridge')return say('La nevera: medio limón, leche y un táper de alubias que dejó la tía.');
     if(o==='crate')return arconAction();
     if(muebleDe(o))return muebleAction(muebleDe(o));
-    {const k=Object.keys(MUEBLES).find(k=>(x===MUEBLES[k].x||x===MUEBLES[k].x+1)&&y===MUEBLES[k].y);   // el sitio vacío de un mueble del salón
+    {const k=Object.keys(MUEBLES).find(k=>(x===MUEBLES[k].x||!MUEBLES[k].uno&&x===MUEBLES[k].x+1)&&y===MUEBLES[k].y);   // el sitio vacío de un mueble del salón
       if(k&&(!MUEBLES[k].grow||S.muebles&&S.muebles[k]))return say(S.muebles&&S.muebles[k]?`Aquí va ${MUEBLES[k].art}: llega mañana.`:`Aquí iría bien ${MUEBLES[k].art}. Se compra por internet: en el ordenador de la tía o con el móvil.`);}
     if(o==='plantDeco')return say('Una monstera. La tía Maite le hablaba cada mañana.');
     if(o==='iwin')return say('Por la ventana se ve la ría. Huele a salitre.');

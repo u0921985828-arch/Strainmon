@@ -1175,7 +1175,11 @@ func donde_semilla(k: String) -> String:
 		l.append("de su receta")
 	return "Semillas: " + "; ".join(PackedStringArray(l)) + "."
 
-func recetario() -> void:
+# el diario de la tía Maite (1.16): su nota de cada variedad de receta (DIARIO, de 12-menus)
+func diario_txt(t: String) -> String:
+	return ("«%s»\n" % D.DIARIO[t]) if D.DIARIO.has(t) else ""
+
+func recetario():
 	var R := recetas()
 	var ts: Array = R.keys()
 	var i := 0
@@ -1186,9 +1190,9 @@ func recetario() -> void:
 			if S.disc.get(t):
 				nd += 1
 			items.append({"label": ("✓ " if S.disc.get(t) else "  ") + D.STRAINS[t].n, "right": ("%d recetas" % R[t].size()) if R[t].size() > 1 else "", "sw": D.STRAINS[t].c, "ic": ic_cog(t),
-				"desc": "\no ".join(PackedStringArray(R[t].map(func(o): return receta_txt(o))))})
+				"desc": diario_txt(t) + "\no ".join(PackedStringArray(R[t].map(func(o): return receta_txt(o))))})
 		items.append({"label": "Volver", "desc": ""})
-		i = await menu(items, {"cls": "full", "title": "RECETARIO", "title2": "%d/%d" % [nd, ts.size()], "desc": true, "initial": i})
+		i = await menu(items, {"cls": "full", "title": "DIARIO DE LA TÍA MAITE", "title2": "%d/%d" % [nd, ts.size()], "desc": true, "initial": i})
 		if i < 0 or i >= ts.size():
 			return
 		var t: String = ts[i]
@@ -1236,7 +1240,7 @@ func menu_genoteca(i0: int) -> int:
 	for t in R:
 		if S.disc.get(t):
 			nr += 1
-	var items := [{"label": "RECETARIO", "right": "%d/%d" % [nr, R.size()], "ic": icono("semillas"), "desc": "Las recetas de las variedades clásicas y dónde conseguir lo que entra en cada una."}]
+	var items := [{"label": "DIARIO DE LA TÍA MAITE", "right": "%d/%d" % [nr, R.size()], "ic": icono("guardar"), "desc": "Su cuaderno de recetas: las variedades clásicas, lo que apuntó de cada una y dónde conseguir lo que entra."}]
 	var DEX: Array = D.DEX
 	for j in DEX.size():
 		var k: String = DEX[j]
@@ -1426,8 +1430,7 @@ func vfx_combate(id: String, x: float, y: float) -> void:
 
 func battle(kind):
 	if gancho_combate.is_valid():
-		await gancho_combate.call(kind)
-		return null
+		return await gancho_combate.call(kind)
 	lock += 1
 	var res = null
 	music("battle")
@@ -1443,19 +1446,26 @@ func battle(kind):
 	if kind == "thief":
 		var nm_: String = pick(D.THIEVES)
 		B = {"kind": kind, "name": nm_, "look": Datos.rand_look("th" + Datos.js_num(Cultivo.azar()), "thief"), "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
-		# desde el capítulo 5 (1.10), ladrones más duros: +4 de vida y +1 a cada golpe
-		var dd := 1 if ch >= 5 else 0
-		B.hpMax = 12 + ch * 2 + ri(0, 4) + 4 * dd
-		B.hp = B.hpMax
-		B.atk = [2 + (ch >> 2) + dd, 4 + (ch >> 1) + dd]
+	elif kind == "rival":
+		B = rival_b()
 	else:
 		B = {"kind": kind, "name": pick(D.COPS), "look": D.LOOKS.cop, "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
+	if B.kind == "thief":
+		# desde el capítulo 5 (1.10), ladrones más duros: +4 de vida y +1 a cada golpe; un rival (1.16), RIVAL.vida más y +1 a cada golpe
+		var dd := 1 if ch >= 5 else 0
+		var rr := 1 if B.has("rival") else 0
+		B.hpMax = 12 + ch * 2 + ri(0, 4) + 4 * dd + int(D.RIVAL.vida) * rr
+		B.hp = B.hpMax
+		B.atk = [2 + (ch >> 2) + dd + rr, 4 + (ch >> 1) + dd + rr]
 	mode = "battle"
 	update_hud()
 	wipe_fuera()
 	await wait(650)
 	bhud_build()
-	if kind == "thief":
+	if B.has("rival"):
+		await say("%s se te planta delante." % B.rival)
+		await say(pick(["«Te lo he dicho por las buenas.»", "«Aquí se vende lo mío.»", "«Vamos a arreglarlo.»"]), B.name)
+	elif kind == "thief":
 		await say("Un %s te corta el paso." % B.name.to_lower())
 		await say(pick(["«La mochila. Dámela y no pasa nada.»", "«Eh, tú. Sé lo que llevas encima.»", "«Quieto. El dinero y lo que lleves.»"]), B.name)
 	else:
@@ -1463,7 +1473,7 @@ func battle(kind):
 		await say("%s te da el alto." % B.name)
 		await say(pick(["«Control rutinario. ¿Llevas algo encima?»", "«Documentación. Y vacía los bolsillos.»", "«Aquí huele a marihuana. ¿Es tuya?»"]), B.name)
 	while not res:
-		if kind == "thief":
+		if B.kind == "thief":
 			res = await thief_round()
 		else:
 			res = await cop_round()
@@ -1488,16 +1498,24 @@ func battle(kind):
 	S.cool = 25
 	heat_warn()
 	lock -= 1
+	return res
+
+func el_b() -> String:
+	return B.rival if B.has("rival") else "El " + B.name.to_lower()
 
 func enemy_hits():
 	var dmg := ri(int(B.atk[0]), int(B.atk[1]))
 	b_anim("E", "ataque")
-	await say("El %s %s." % [B.name.to_lower(), pick(["te golpea", "te empuja contra un portal", "te da una patada", "te tira al suelo"])])
+	await say("%s %s." % [el_b(), pick(["te golpea", "te empuja contra un portal", "te da una patada", "te tira al suelo"])])
+	var dd: int = int(ceil(dmg / 2.0)) if B.get("cubre") else dmg
+	if B.get("cubre"):   # CUBRIRSE (1.16)
+		B.cubre = 0
+		await say("Te cubres: el golpe duele la mitad.")
 	b_anim("P", "herido")
 	vfx_combate("vfx-golpe", 64, 112)
 	B.shakeP = 450.0
 	sfx("hurt")
-	S.hp = maxi(0, S.hp - dmg)
+	S.hp = maxi(0, S.hp - dd)
 	bhud_act()
 	await wait(450)
 	if S.hp <= 0:
@@ -1527,9 +1545,13 @@ func thief_round():
 	var c: int = await menu(["LUCHAR", "MOCHILA", "HABLAR", "HUIR"], {"cls": "battle", "cancel": false})
 	if c == 0:
 		prompt("Elige un golpe.")
-		var m: int = await menu(["PUÑETAZO", "PATADA"], {"cls": "battle"})
+		var m: int = await menu(["PUÑETAZO", "PATADA", "CUBRIRSE"], {"cls": "battle"})
 		if m < 0:
 			return null
+		if m == 2:
+			B.cubre = 1
+			await say("Te pones en guardia.")
+			return await enemy_hits()
 		var mv := {"n": "PATADA", "acc": .65, "d": [8, 12]} if m else {"n": "PUÑETAZO", "acc": .92, "d": [4, 7]}
 		await wait(b_anim("P", "patada" if m else "golpe") * .6)
 		await say("Le das una patada." if mv.n == "PATADA" else "Le das un puñetazo.")
@@ -1591,7 +1613,15 @@ func thief_round():
 	if B.hp <= 0:
 		B.gone = true
 		b_anim("E", "huir")
-		await say("El %s sale corriendo." % B.name.to_lower())
+		await say("%s sale corriendo." % el_b())
+		if B.has("rival"):
+			S.rep += int(D.RIVAL.rep)
+			if S.hpMax < 60:
+				S.hpMax += 2
+				S.hp += 2
+				bhud_act()
+				await say("Aguantas más. VIDA máxima: %d." % S.hpMax)
+			return "win"
 		var loot: int = ri(20, 40) + S.ch * 10
 		S.money += loot
 		S.rep += 2
@@ -2664,3 +2694,57 @@ func lote_accion(k: String) -> void:
 		await catar(k)
 	elif op == "Analizar":
 		await analizar(k)
+
+# los rivales (1.16, 13-combate): en las zonas de venta lejos de Darko, un camello que no quiere competencia. Cada venta en la calle
+# de su zona le suma una (S.rivales[zona]); con RIVAL.umbral sale a buscarte: pelear, pagarle su cuota o irte
+func nom_rival(R: Dictionary) -> String:
+	return R.n.substr(0, 1) + R.n.substr(1).to_lower()
+
+func cuota_rival(z: String) -> int:
+	return Datos.jsround(D.RIVAL.cuota * D.ZONAS[z].precio)
+
+func rival_b() -> Dictionary:
+	var R: Dictionary = D.RIVALES.get(S.map, D.RIVALES.alto)
+	return {"kind": "thief", "rival": nom_rival(R), "name": R.n, "look": Datos.rand_look("rival" + R.n, "thief"), "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
+
+func rival_venta(z):
+	if S.ch < D.RIVAL.ch or not D.RIVALES.has(z) or float(S.rivalFuera.get(z, 0)) >= S.day:
+		return
+	S.rivales[z] = int(S.rivales.get(z, 0)) + 1
+	if S.rivales[z] >= D.RIVAL.umbral:
+		queue("rival", func(): await rival_event(z))
+
+func rival_event(z: String) -> void:
+	if S.map != z:   # si te has ido de su zona, te buscará en la próxima venta
+		return
+	var R: Dictionary = D.RIVALES[z]
+	var N: String = R.n
+	var nom := nom_rival(R)
+	var c := cuota_rival(z)
+	await talk(N, ["Eh, tú. Llevas %d ventas en %s." % [int(S.rivales[z]), R.sitio], R.frase, "O me pagas %s o lo arreglamos aquí." % Datos.eur(c)])
+	var o: int = await ask("¿Qué haces?", ["Pelear", "Pagarle " + Datos.eur(c), "Irte"], N)
+	if o == 0:
+		var r = await battle("rival")
+		if r == "win":
+			S.rivalFuera[z] = S.day + int(D.RIVAL.dias)
+			S.rivales[z] = 0
+			sfx("get")
+			await say("%s no volverá por %s en %d días. Mientras, sus clientes te pagan un %d %% más." % [nom, R.sitio, int(D.RIVAL.dias), Datos.jsround((D.RIVAL.f - 1) * 100)])
+			return
+		if r == "talk":
+			S.rivales[z] = 0
+			await say("%s: «Vale. Pero no te quiero ver tanto por aquí.»" % nom)
+			return
+		S.rivales[z] = 0 if r == "ko" else int(D.RIVAL.umbral) - int(D.RIVAL.vuelve)
+		return
+	if o == 1 and S.money >= c:
+		S.money -= c
+		S.rivales[z] = 0
+		sfx("coin")
+		update_hud()
+		await say("%s se guarda el dinero. «Así me gusta. Hasta la próxima.»" % nom)
+		return
+	if o == 1:
+		await say("No llevas tanto dinero encima.")
+	S.rivales[z] = int(D.RIVAL.umbral) - int(D.RIVAL.vuelve)
+	await say("Te apartas. %s se queda mirándote." % nom)

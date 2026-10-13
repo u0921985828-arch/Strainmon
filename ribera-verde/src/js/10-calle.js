@@ -42,7 +42,7 @@ async function talkClient(c){
   if(!lots.length)return say((ext?totalRosin():totalBuds())>0?'Eso no me vale. Vuelve cuando tengas lo que busco.':'¿No llevas nada? Vale.',N);
   const i=await menu(lots.map(ext?rosinItem:lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué le vendes?'});
   if(i<0||i>=lots.length)return say('Vale, otro día.',N);
-  const [sid,b]=lots[i],base=(ext?precioRosin:precioCalle)(b.thc)*ct.mult*ZONAS[c.map||'town'].precio*c.want;
+  const [sid,b]=lots[i],base=(ext?precioRosin:precioCalle)(b.thc)*ct.mult*ZONAS[c.map||'town'].precio*rivalF(c.map||'town')*c.want;
   const pr=[Math.round(base*.85),Math.round(base),Math.round(base*1.3)];
   const j=await ask(`${c.want} g de ${ext?'rosin de ':''}${lotNombre(sid)}. ¿Cuánto le pides?`,[`Rebaja · ${pr[0]} €`,`Justo · ${pr[1]} €`,`Caro · ${pr[2]} €`,'Cancelar']);
   if(j===3)return say('Entonces me voy.',N);
@@ -56,7 +56,7 @@ async function talkClient(c){
     removeClient(c.id);apuntaFijo(c);
     await say(pick(['Trato hecho.','Gracias. Nos vemos.','Bien. Se lo diré a mis amigos.']),N);
     toast(`+${eur(pr[j])} · ${c.want} g ${ext?'de rosin ':''}vendidos`,1600);
-    vistoVender();heatWarn();await checkStory();
+    vistoVender();heatWarn();await checkStory();rivalVenta(c.map||'town');
     // en las esquinas de Darko (1.10), 1 de cada 3 ventas acaba con uno de sus chicos encima
     if(c.map==='astilleros'&&Math.random()<1/3){await say('Uno de los chicos de Darko te ha visto vender.');await say('«Te dijimos que lejos de nuestras esquinas.»','CHICO DE DARKO');await battle('thief');}
   }else{S.rep=Math.max(0,S.rep-1);if(c.fid)confia(c.fid,-2);sfx('bad');removeClient(c.id);await say(pick(['¿Tanto? No.','A ese precio, paso.','Eso es demasiado. Adiós.']),N);}

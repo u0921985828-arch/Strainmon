@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.16.0 · 12 de octubre de 2026
+
+El diario de la tía Maite, los rivales de cada zona y la casa a tu gusto. Godot, 0.10.0.
+
+- **Nuevo: el diario de la tía Maite.** El recetario de la Genoteca es ahora su cuaderno (DIARIO DE LA TÍA MAITE): cada una de las 32 variedades de receta lleva su nota escrita por ella (`DIARIO`, 12-menus), encima de sus recetas y de dónde sale cada semilla.
+- **Nuevo: los rivales** (`RIVALES`, 13-combate): en el barrio alto, Puerto Viejo, Valdehierro, el Casco Viejo, el Ensanche y la Kale Zaharra, desde el capítulo 3, un camello que no quiere competencia (los astilleros siguen siendo de Darko). Cada venta en la calle de su zona le suma una; a la 8.ª sale a buscarte: pelear (más duro que un ladrón: +6 de vida y +1 a cada golpe), pagarle su cuota (200 € por el precio de la zona) o apartarte (vuelve 2 ventas después). Si le ganas, se va 7 días, sus clientes te pagan un 5 % más y ganas reputación.
+- **Nuevo en los combates: CUBRIRSE** (LUCHAR → CUBRIRSE): el siguiente golpe duele la mitad.
+- **Nuevo: personalizar la casa.** En la tienda online, el sillón orejero con lámpara de pie (229 €; desde él se lee el diario de la tía Maite, 30 min) y un cuadro para la pared del salón (59 €). El sofá y el sillón cambian de tapizado (tres cada uno) y el cuadro, de lámina (la ría, el caserío o la hoja), desde el propio mueble (`DECO`, `S.deco`; arte a mano en `tools/sprites/a-mano/salon.py`).
+
 ## 1.15.0 · 12 de octubre de 2026
 
 La gente: confianza con cada persona, trabajadores, clubs cannábicos y la cata. Godot, 0.9.0.

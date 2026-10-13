@@ -25,14 +25,15 @@ async function battle(kind){
     fadeEl.style.transition='';fadeEl.classList.remove('white');
     const w=$('wipe');w.hidden=false;w.classList.remove('go');void w.offsetWidth;w.classList.add('go');await wait(480);
     const ch=S.ch;
-    B=kind==='thief'?{kind,name:pick(THIEVES),look:randLook('th'+Math.random(),'thief'),t:0,flashE:0,shakeP:0}:{kind,name:pick(COPS),look:LOOKS.cop,t:0,flashE:0,shakeP:0};
-    // desde el capítulo 5 (1.10), ladrones más duros: +4 de vida y +1 a cada golpe
-    if(kind==='thief'){const d=ch>=5?1:0;B.hpMax=12+ch*2+ri(0,4)+4*d;B.hp=B.hpMax;B.atk=[2+(ch>>2)+d,4+(ch>>1)+d];}
+    B=kind==='thief'?{kind,name:pick(THIEVES),look:randLook('th'+Math.random(),'thief'),t:0,flashE:0,shakeP:0}:kind==='rival'?rivalB():{kind,name:pick(COPS),look:LOOKS.cop,t:0,flashE:0,shakeP:0};
+    // desde el capítulo 5 (1.10), ladrones más duros: +4 de vida y +1 a cada golpe; un rival (1.16), RIVAL.vida más y +1 a cada golpe
+    if(B.kind==='thief'){const d=ch>=5?1:0,r=B.rival?1:0;B.hpMax=12+ch*2+ri(0,4)+4*d+RIVAL.vida*r;B.hp=B.hpMax;B.atk=[2+(ch>>2)+d+r,4+(ch>>1)+d+r];}
     mode='battle';updateHUD();w.hidden=true;w.classList.remove('go');
     await wait(650);bhudBuild();
-    if(kind==='thief'){await say(`Un ${B.name.toLowerCase()} te corta el paso.`);await say(pick(['«La mochila. Dámela y no pasa nada.»','«Eh, tú. Sé lo que llevas encima.»','«Quieto. El dinero y lo que lleves.»']),B.name);}
+    if(B.rival){await say(`${B.rival} se te planta delante.`);await say(pick(['«Te lo he dicho por las buenas.»','«Aquí se vende lo mío.»','«Vamos a arreglarlo.»']),B.name);}
+    else if(kind==='thief'){await say(`Un ${B.name.toLowerCase()} te corta el paso.`);await say(pick(['«La mochila. Dámela y no pasa nada.»','«Eh, tú. Sé lo que llevas encima.»','«Quieto. El dinero y lo que lleves.»']),B.name);}
     else{bAnim('E','alto');await say(`${B.name} te da el alto.`);await say(pick(['«Control rutinario. ¿Llevas algo encima?»','«Documentación. Y vacía los bolsillos.»','«Aquí huele a marihuana. ¿Es tuya?»']),B.name);}
-    while(!res)res=kind==='thief'?await thiefRound():await copRound();
+    while(!res)res=B.kind==='thief'?await thiefRound():await copRound();
   }catch(e){console.error(e);res=res||'flee';}
   finally{
     $('bE').hidden=true;$('bP').hidden=true;dlg.hidden=true;menuEl.hidden=true;
@@ -42,12 +43,15 @@ async function battle(kind){
     if(res==='ko')await say('Te despiertas en casa con la cabeza vendada. Un vecino te encontró en el portal.');
     S.cool=25;heatWarn();lock--;
   }
+  return res;
 }
+const elB=()=>B.rival||'El '+B.name.toLowerCase();
 async function enemyHits(){
   const dmg=ri(B.atk[0],B.atk[1]);
   bAnim('E','ataque');
-  await say(`El ${B.name.toLowerCase()} ${pick(['te golpea','te empuja contra un portal','te da una patada','te tira al suelo'])}.`);
-  bAnim('P','herido');vfxCombate('vfx-golpe',64,112);B.shakeP=450;sfx('hurt');S.hp=Math.max(0,S.hp-dmg);bhud();await wait(450);
+  await say(`${elB()} ${pick(['te golpea','te empuja contra un portal','te da una patada','te tira al suelo'])}.`);
+  const dd=B.cubre?Math.ceil(dmg/2):dmg;if(B.cubre){B.cubre=0;await say('Te cubres: el golpe duele la mitad.');}   // CUBRIRSE (1.16)
+  bAnim('P','herido');vfxCombate('vfx-golpe',64,112);B.shakeP=450;sfx('hurt');S.hp=Math.max(0,S.hp-dd);bhud();await wait(450);
   if(S.hp<=0){
     bAnim('P','desmayo');await say('Pierdes el conocimiento.');
     let lost=0;for(const b of Object.values(S.buds)){const l=Math.floor(b.g/2);lost+=l;b.g-=l;}
@@ -64,7 +68,8 @@ async function thiefRound(){
   const c=await menu(['LUCHAR','MOCHILA','HABLAR','HUIR'],{cls:'battle',cancel:false});
   if(c===0){
     prompt('Elige un golpe.');
-    const m=await menu(['PUÑETAZO','PATADA'],{cls:'battle'});if(m<0)return null;
+    const m=await menu(['PUÑETAZO','PATADA','CUBRIRSE'],{cls:'battle'});if(m<0)return null;
+    if(m===2){B.cubre=1;await say('Te pones en guardia.');return enemyHits();}
     const mv=m?{n:'PATADA',acc:.65,d:[8,12]}:{n:'PUÑETAZO',acc:.92,d:[4,7]};
     await wait(bAnim('P',m?'patada':'golpe')*.6);await say(mv.n==='PATADA'?'Le das una patada.':'Le das un puñetazo.');
     if(Math.random()<mv.acc){const d=ri(mv.d[0],mv.d[1]);bAnim('E','herido');vfxCombate('vfx-golpe',178,40);B.flashE=500;sfx('hit');B.hp-=d;bhud();await wait(500);if(m&&d>=11)await say('Le has hecho daño de verdad.');}
@@ -83,13 +88,48 @@ async function thiefRound(){
     await say('Te corta el paso. No puedes escapar.');
   }
   if(B.hp<=0){
-    B.gone=true;bAnim('E','huir');await say(`El ${B.name.toLowerCase()} sale corriendo.`);
+    B.gone=true;bAnim('E','huir');await say(`${elB()} sale corriendo.`);
+    if(B.rival){S.rep+=RIVAL.rep;if(S.hpMax<60){S.hpMax+=2;S.hp+=2;bhud();await say(`Aguantas más. VIDA máxima: ${S.hpMax}.`);}return 'win';}
     const loot=ri(20,40)+S.ch*10;S.money+=loot;S.rep+=2;sfx('coin');bhud();
     await say(`Al huir se le cae la cartera: +${eur(loot)}.`);
     if(S.hpMax<60){S.hpMax+=2;S.hp+=2;bhud();await say(`Aguantas más. VIDA máxima: ${S.hpMax}.`);}
     return 'win';
   }
   return enemyHits();
+}
+// los rivales (1.16): en las zonas de venta lejos de Darko, un camello que no quiere competencia. Cada venta en la calle de su zona
+// le suma una (S.rivales[zona]); con RIVAL.umbral sale a buscarte (queue('rival')): pelear, pagarle su cuota o irte. Si le ganas,
+// se va RIVAL.dias días (S.rivalFuera[zona] = el último) y sus clientes te pagan un RIVAL.f más (rivalF, en talkClient)
+const RIVAL={ch:3,umbral:8,cuota:200,dias:7,rep:5,f:1.05,vida:6,vuelve:2};
+const RIVALES={alto:{n:'ROBER',sitio:'el barrio alto',frase:'Los pijos de esta plaza son míos desde hace años.'},
+  puerto:{n:'KEPA',sitio:'el puerto',frase:'Aquí los marineros me compran a mí.'},
+  valdehierro:{n:'MONTXO',sitio:'Valdehierro',frase:'En esta ciudad no entra nadie sin pasar por mí.'},
+  ibarbide:{n:'ENEKO',sitio:'el Casco Viejo',frase:'Las calles del Casco tienen dueño.'},
+  ensanche:{n:'YOLANDA',sitio:'el Ensanche',frase:'Los del Ensanche pagan bien. Y me pagan a mí.'},
+  callejon:{n:'TXUSMA',sitio:'Kale Zaharra',frase:'Este callejón es mío. Pregunta a cualquiera.'}};
+const nomRival=R=>R.n[0]+R.n.slice(1).toLowerCase();
+const rivalF=z=>(S.rivalFuera[z]||0)>=S.day?RIVAL.f:1;
+const cuotaRival=z=>Math.round(RIVAL.cuota*ZONAS[z].precio);
+function rivalB(){const R=RIVALES[S.map]||RIVALES.alto;return {kind:'thief',rival:nomRival(R),name:R.n,look:randLook('rival'+R.n,'thief'),t:0,flashE:0,shakeP:0};}
+function rivalVenta(z){
+  if(S.ch<RIVAL.ch||!RIVALES[z]||(S.rivalFuera[z]||0)>=S.day)return;
+  S.rivales[z]=(S.rivales[z]||0)+1;if(S.rivales[z]>=RIVAL.umbral)queue('rival',()=>rivalEvent(z));
+}
+async function rivalEvent(z){
+  const R=RIVALES[z];if(S.map!==z)return;   // si te has ido de su zona, te buscará en la próxima venta
+  const N=R.n,nom=nomRival(R),c=cuotaRival(z);
+  await talk(N,[`Eh, tú. Llevas ${S.rivales[z]} ventas en ${R.sitio}.`,R.frase,`O me pagas ${eur(c)} o lo arreglamos aquí.`]);
+  const o=await ask('¿Qué haces?',['Pelear',`Pagarle ${eur(c)}`,'Irte'],N);
+  if(o===0){
+    const r=await battle('rival');
+    if(r==='win'){S.rivalFuera[z]=S.day+RIVAL.dias;S.rivales[z]=0;sfx('get');
+      return say(`${nom} no volverá por ${R.sitio} en ${RIVAL.dias} días. Mientras, sus clientes te pagan un ${Math.round((RIVAL.f-1)*100)} % más.`);}
+    if(r==='talk'){S.rivales[z]=0;return say(`${nom}: «Vale. Pero no te quiero ver tanto por aquí.»`);}
+    S.rivales[z]=r==='ko'?0:RIVAL.umbral-RIVAL.vuelve;return;
+  }
+  if(o===1&&S.money>=c){S.money-=c;S.rivales[z]=0;sfx('coin');updateHUD();return say(`${nom} se guarda el dinero. «Así me gusta. Hasta la próxima.»`);}
+  if(o===1)await say('No llevas tanto dinero encima.');
+  S.rivales[z]=RIVAL.umbral-RIVAL.vuelve;return say(`Te apartas. ${nom} se queda mirándote.`);
 }
 const MULTA_CALLE=601;   // tenencia en la vía pública: la mínima de la Ley de Seguridad Ciudadana (601-30.000 €). Devuelve lo requisado en texto
 // (cogollos y, si hay, rosin) y la multa

@@ -1442,6 +1442,78 @@ func _pasos() -> void:
 		J.S.fijos = []
 		J.enter_map("home", 5, 5, "up"),
 		func(): return chk(R.patxi == 1 and R.patxi2 == 1 and R.jard and R.vend == "cF,50" and R.g == 150 and R.agua and (R.gone or R.v < 50) and R.dinero == 0 and R.sms >= 1, R))
+	step("Rivales, combates y la casa (1.16): el rival de la zona sale a la 8.ª venta (si le ganas, se va una semana y sus clientes pagan un 5 % más; o le pagas su cuota, o te apartas); CUBRIRSE para la mitad del golpe; el sillón con la lámpara y el cuadro, con su tapizado y su lámina, y el diario de la tía Maite desde el sillón", ["^Pelear"], func():
+		J.S.ch = 5
+		J.S.money = 1000
+		J.S.min = 10 * 60
+		J.S.rivales = {}
+		J.S.rivalFuera = {}
+		R = {"b": []}
+		J.gancho_combate = func(t):
+			R.b.append(t)
+			return "win"
+		var c1: Array = D.CLIENT_TILES.alto[0]
+		J.enter_map("alto", int(c1[0]), int(c1[1]), "down")
+		for k in int(D.RIVAL.umbral) - 1:
+			J.rival_venta("alto")
+		R.q7 = J.queued.has("rival")
+		R.c7 = J.S.rivales.alto
+		J.rival_venta("alto")
+		await idle()
+		R.fuera = J.S.rivalFuera.alto - J.S.day
+		R.cero = J.S.rivales.alto
+		R.f = J.rival_f("alto")
+		J.rival_venta("alto")
+		R.otra = J.S.rivales.alto
+		var c2: Array = D.CLIENT_TILES.puerto[0]
+		J.enter_map("puerto", int(c2[0]), int(c2[1]), "down")
+		J.S.rivales.puerto = int(D.RIVAL.umbral)
+		want(["^Pagarle"])
+		R.m = J.S.money
+		await run(func(): await J.rival_event("puerto"))
+		R.pago = R.m - J.S.money
+		var c3: Array = D.CLIENT_TILES.ensanche[0]
+		J.enter_map("ensanche", int(c3[0]), int(c3[1]), "down")
+		J.S.rivales.ensanche = int(D.RIVAL.umbral)
+		want(["^Irte"])
+		await run(func(): await J.rival_event("ensanche"))
+		R.irte = J.S.rivales.ensanche
+		J.S.rivales.ibarbide = int(D.RIVAL.umbral)
+		await run(func(): await J.rival_event("ibarbide"))
+		R.lejos = J.S.rivales.ibarbide
+		J.gancho_combate = Callable()
+		J.S.rivales = {}
+		J.S.rivalFuera = {}
+		J.S.hp = 20
+		J.S.hpMax = 30
+		await run(func():
+			J.B = {"kind": "thief", "name": "ATRACADOR", "atk": [5, 5], "hp": 10, "hpMax": 10, "cubre": 1, "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
+			await J.enemy_hits()
+			J.B = null)
+		R.hp = J.S.hp
+		var m0 = J.S.get("muebles", {}).duplicate(true)
+		J.S.muebles = {"sofa": J.S.day, "sillon": J.S.day, "cuadro": J.S.day}
+		J.S.deco = {}
+		J.enter_map("home", 12, 2, "up")
+		var o: Array = J.MAPS.home.o
+		R.obj = ",".join(PackedStringArray([o[1][12], o[1][13], o[5][16], o[5][17], o[5][13], o[5][14]].map(func(v): return v if v else "")))
+		want(["^Cambiar la lámina", "^La hoja"])
+		await run(func(): await J.mueble_action("cuadro"))
+		R.cuadro = "%d,%s" % [int(J.S.deco.cuadro), J.deco_sprite("cuadro")]
+		want(["^Cambiar el tapizado", "^Granate"])
+		await run(func(): await J.mueble_action("sofa"))
+		R.sofa = J.deco_sprite("sofa")
+		R.min = J.S.min
+		want(["^Leer el diario", "Volver"])
+		await run(func(): await J.mueble_action("sillon"))
+		R.t = J.S.min - R.min
+		R.tienda = ",".join(PackedStringArray(D.MUEBLES.keys().filter(func(k): return not D.MUEBLES[k].get("grow"))))
+		J.S.muebles = m0
+		J.S.deco = {}
+		J.enter_map("home", 5, 5, "up"),
+		func(): return chk(not R.q7 and R.c7 == 7 and ",".join(PackedStringArray(R.b)) == "rival" and R.fuera == D.RIVAL.dias and R.cero == 0 and is_equal_approx(R.f, 1.05) and R.otra == 0 and R.pago == 230 and R.irte == 6 and R.lejos == 8 and R.hp == 17
+			and R.obj == "cuadro,,sillon,sillon2,sofa,sofa2" and R.cuadro == "2,cuadro-2" and R.sofa == "sofa-2" and R.t == 30 and R.tienda == "sofa,tv,gpc,sillon,cuadro"
+			and LOG.has("ROBER: Eh, tú. Llevas 8 ventas en el barrio alto.") and LOG.has("Te cubres: el golpe duele la mitad.") and LOG.has("Rober no volverá por el barrio alto en 7 días. Mientras, sus clientes te pagan un 5 % más."), R))
 	step("Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas", ["^Hindu Kush"], func():
 		J.S.ch = 5
 		J.S.flags.txaro = true
@@ -2036,7 +2108,7 @@ func _pasos() -> void:
 		J.S = S0
 		J.montar_casa()
 		R.vacio = not h.o[5][8],
-		func(): return chk(R.libre and R.online == "sofa,tv,gpc" and R.m == 500 - D.CARRO.p and R.ped == R.d + 1 and R.ya and R.solido and R.n == "0,3,true" and R.l1 == 4
+		func(): return chk(R.libre and R.online == "sofa,tv,gpc,sillon,cuadro" and R.m == 500 - D.CARRO.p and R.ped == R.d + 1 and R.ya and R.solido and R.n == "0,3,true" and R.l1 == 4
 			and R.dura == 3 and R.pot and R.queda == 2 and R.seca == Datos.js_num(R.d + D.CARRO.dias) and R.redada == 0 and R.vacio
 			and LOG.any(func(l): return l.contains("Kiko te sube el carro de esquejes")), R))
 	step("Cama (1.11): la siesta que no pasa de las 12 no cobra la luz; dormir hasta las 7 pasando la medianoche cobra el día y lo dice", ["Siesta", "Dormir hasta las 7"], func():
@@ -2091,7 +2163,7 @@ func _pasos() -> void:
 			and LOG.any(func(l): return l == "  [texto] Nombre de la planta (y sus esquejes) → Madre Lima") and LOG.any(func(l): return l == "  [texto] Nombre de la planta (y sus esquejes) → (B)")
 			and LOG.any(func(l): return l.begins_with("Cortas una punta de la Skunk #1 «Madre Lima»")) and LOG.any(func(l): return l == "Sin nombre: vuelve a ser la nº 9995."), R))
 	step("Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave; se cambia el nombre de una propia (sin repetir otro); el recetario, con las 32 y de dónde sale cada semilla",
-		["GENOTECA", "RECETARIO", "Skunk #1$", "Volver", "<B>", "^★ Skunk Haze", "=Haze Corta", "^★ Haze Corta", "=skunk #1", "<B>", "SALIR"], func():
+		["GENOTECA", "DIARIO DE LA TÍA", "Skunk #1$", "Volver", "<B>", "^★ Skunk Haze", "=Haze Corta", "^★ Haze Corta", "=skunk #1", "<B>", "SALIR"], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))
 		J.S.custom = {}
@@ -2143,9 +2215,10 @@ func _pasos() -> void:
 		R.sin = ",".join(PackedStringArray(hojas.filter(func(k): return J.donde_semilla(k) == "Semillas: .")))
 		R.parque = J.donde_semilla("acapulco")
 		R.ss = "|".join(PackedStringArray(Rc.txoko.map(func(o): return J.receta_txt(o))))
+		R.diario = ",".join(PackedStringArray(Rc.keys().filter(func(t): return J.diario_txt(t) == "")))
 		J.S = S0,
 		func(): return chk(R.n > 50 and R.x == 0 and R.max <= 20 and R.rep == 0 and R.dex == 0 and R.mig == "xv1:Skunk Haze|xv2:Northern Thai|xv3:Thai Haze" and R.ren == "Haze Corta"
-			and R.rec == 32 and R.sin == "" and R.parque == "Semillas: escondidas en el parque del barrio." and R.ss == "Skunk #1 × Afghani, en ese orden"
+			and R.rec == 32 and R.sin == "" and R.diario == "" and R.parque == "Semillas: escondidas en el parque del barrio." and R.ss == "Skunk #1 × Afghani, en ese orden"
 			and LOG.any(func(l): return l == "  [texto] Nuevo nombre de la variedad → Haze Corta") and LOG.any(func(l): return l == "Ya hay una variedad con ese nombre.") and LOG.any(func(l): return re("\\[menú\\] .*Afghani.*Volver  → Volver", l)), R))
 	step("Exportar partida (1.11): OPCIONES → EXPORTAR PARTIDA copia el JSON de la partida", ["OPCIONES", "EXPORTAR", "VOLVER", "SALIR"], func():
 		J.exportado = ""
