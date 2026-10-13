@@ -76,7 +76,7 @@ Lo que hay dentro no va encima: no cuenta para los encuentros ni se lo llevan un
 
 ## Semillas
 
-Feminizadas de tienda, Skunk #1 5 €, Lemon Haze 9 €, Super Skunk 10 €, Blueberry 8 €, Big Bud 7 €, Lemon Skunk 8 €, Cheese 9 €, Purple Afghani 8 €, Kali Mist 10 €, California Orange 8 €, Chemdawg 12 € la semilla. Sobres: 1, 3 (−5 %), 5 (−10 %), 10 (−15 %); desde el capítulo 3, bolsa de 50 a granel (−40 %). Landraces del banco del PC (13): sobres de 10 por 20-45 €; otras 7 no se venden (1.25): la nevera, la caja fuerte, 4 arbustos de la comarca y Miren.
+Feminizadas de tienda, Skunk #1 5 €, Lemon Haze 9 €, Super Skunk 10 €, Blueberry 8 €, Big Bud 7 €, Lemon Skunk 8 €, Cheese 9 €, Purple Afghani 8 €, Kali Mist 10 €, California Orange 8 €, Chemdawg 12 € la semilla. Sobres: 1, 3 (−5 %), 5 (−10 %), 10 (−15 %); desde el capítulo 3, bolsa de 50 a granel (−40 %). Landraces del banco del PC (19): sobres de 10 por 20-45 €; otras 7 no se venden (1.25): la nevera, la caja fuerte, 4 arbustos de la comarca y Miren.
 
 ## La deuda
 

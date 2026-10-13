@@ -224,7 +224,7 @@ func strain_line(k: String) -> String:
 func discover(sid: String) -> void:
 	if not S.disc.get(sid):
 		S.disc[sid] = true
-		var cu := ""   # 1.25: cuántas de las 68 llevas
+		var cu := ""   # 1.25: cuántas de la Genoteca llevas
 		if D.STRAINS.has(sid):
 			cu = " · %d/%d" % [D.DEX.filter(func(k): return S.disc.get(k)).size(), D.DEX.size()]
 		toast("<small>NUEVA EN LA GENOTECA%s</small>" % cu + esc(strain(sid).n))

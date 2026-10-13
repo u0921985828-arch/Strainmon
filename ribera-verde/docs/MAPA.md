@@ -585,10 +585,10 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | i_ast | astilleros (4,5) | bolsa en el suelo | 2 × SPRAY DE PIMIENTA |
 | h_alto | alto (2,10) | oculto en arbusto (pulsa A delante) | 80 € en un sobre arrugado |
 | h_kale | callejon (21,10) | oculto en arbusto (pulsa A delante) | 120 € en una riñonera abandonada |
-| h_lamb | puerto (37,6) | oculto en arbusto (pulsa A delante) |  |
-| h_kerala | mendialde (42,11) | oculto en arbusto (pulsa A delante) |  |
-| h_manga | errotabarri (28,10) | oculto en arbusto (pulsa A delante) |  |
-| h_hawai | ensanche (16,14) | oculto en arbusto (pulsa A delante) |  |
+| h_lamb | puerto (37,6) | oculto en arbusto (pulsa A delante) | 2 semillas de Lamb's Bread |
+| h_kerala | mendialde (42,11) | oculto en arbusto (pulsa A delante) | 2 semillas de Kerala |
+| h_manga | errotabarri (28,10) | oculto en arbusto (pulsa A delante) | 2 semillas de Manga Rosa |
+| h_hawai | ensanche (16,14) | oculto en arbusto (pulsa A delante) | 2 semillas de Hawaiian |
 
 ## Carteles
 

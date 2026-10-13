@@ -2,7 +2,7 @@
 
 > Generado automáticamente con `node tools/generar-docs.js` a partir de los datos del juego. No editar a mano: cambia `src/js/03-datos.js` y regenera.
 
-## Las 68 variedades de la Genoteca
+## Las 87 variedades de la Genoteca
 
 | # | Variedad | THC | Rinde (g/m²) | Días | Resist. | Índica | Tipo | Cogollo | Hoja | Cómo se consigue |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -31,7 +31,7 @@
 | 23 | Chitral Kush | 17% | 400 | 3 | 70% | 100 % | landrace | `#7a9a48` | `#4a6e3c` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 3; llega al día siguiente) |
 | 24 | Nepalese | 16% | 350 | 3,5 | 65% | 50 % | landrace | `#88906a` | `#63a43e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
 | 25 | Congolese | 16% | 400 | 3,5 | 55% | 0 % | landrace | `#b4d058` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
-| 26 | Lamb's Bread | 16% | 380 | 4 | 60% | 0 % | landrace | `#a8d070` | `#8aa83e` | En un arbusto de Puerto Viejo (37,6), de cara al mar: 2 semillas (cap. 2) |
+| 26 | Lamb's Bread | 16% | 380 | 4 | 60% | 0 % | landrace | `#a8d070` | `#8aa83e` | En un arbusto al fondo del callejón del este de Puerto Viejo (37,6): 2 semillas (cap. 2) |
 | 27 | Hawaiian | 15% | 380 | 4 | 55% | 20 % | landrace | `#b8d870` | `#7aa63e` | En un seto del Ensanche de Ibarbide (16,14): 2 semillas (cap. 4) |
 | 28 | Kif | 13% | 350 | 3 | 80% | 80 % | landrace | `#a8c060` | `#4d913a` | Banco de semillas del PC, sobre de 10 por 20 € (cap. 2; llega al día siguiente) |
 | 29 | Beldia | 12% | 300 | 3 | 75% | 80 % | landrace | `#98b45c` | `#4d913a` | Banco de semillas del PC, sobre de 10 por 20 € (cap. 2; llega al día siguiente) |
@@ -65,7 +65,7 @@
 | 57 | Sour Diesel | 27% | 450 | 4 | 60% | 30 % | cruce (F1 en la mesa) | `#90b448` | `#6fa53e` | Cruce: Chemdawg × Super Skunk · ≈ origen incierto |
 | 58 | Kali 47 | 21% | 450 | 3,5 | 65% | 30 % | cruce (F1 en la mesa) | `#b0cc68` | `#72a63e` | Cruce: Kali Mist × AK-47 |
 | 59 | Critical Kali Mist | 21% | 530 | 3,5 | 75% | 45 % | cruce (F1 en la mesa) | `#98c058` | `#5c9a48` | Cruce: Critical Mass × Kali Mist |
-| 60 | Kerala | 16% | 350 | 5 | 50% | 10 % | landrace | `#b8cc60` | `#82a73e` | En un arbusto del monte de Mendialde (42,11): 2 semillas |
+| 60 | Kerala | 16% | 350 | 5 | 50% | 10 % | landrace | `#b8cc60` | `#82a73e` | En un arbusto junto a un caserío, al este de Mendialde (42,11): 2 semillas |
 | 61 | Lebanese | 14% | 380 | 3 | 75% | 85 % | landrace | `#a4b45c` | `#4f9a3c` | Banco de semillas del PC, sobre de 10 por 25 € (cap. 3; llega al día siguiente) |
 | 62 | Manga Rosa | 15% | 380 | 4,5 | 55% | 5 % | landrace | `#c4c060` | `#86a83e` | En un arbusto de Errotabarri (28,10): 2 semillas (cap. 3) |
 | 63 | Durban Poison | 18% | 430 | 3,5 | 65% | 0 % | landrace | `#b4d060` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 40 € (cap. 5; llega al día siguiente) |
@@ -74,6 +74,25 @@
 | 66 | White Russian | 22% | 500 | 3,5 | 70% | 60 % | cruce (F1 en la mesa) | `#dce8c8` | `#5ba33e` | Cruce: White Widow × AK-47 |
 | 67 | Blue Widow | 19% | 500 | 3,5 | 65% | 65 % | cruce (F1 en la mesa) | `#a8c0d8` | `#57a33e` | Cruce: Blueberry × White Widow |
 | 68 | Super Lemon Haze | 23% | 480 | 4 | 65% | 30 % | cruce (F1 en la mesa) | `#dce870` | `#72a63e` | Cruce: Lemon Skunk × Super Silver Haze |
+| 69 | Swazi Gold | 16% | 380 | 4 | 60% | 10 % | landrace | `#d4c058` | `#82a73e` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 4; llega al día siguiente) |
+| 70 | Zamal | 15% | 330 | 5 | 50% | 0 % | landrace | `#a8cc68` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 40 € (cap. 5; llega al día siguiente) |
+| 71 | Malana | 17% | 330 | 3,5 | 70% | 70 % | landrace | `#7a8a50` | `#549d3d` | Banco de semillas del PC, sobre de 10 por 40 € (cap. 4; llega al día siguiente) |
+| 72 | Kashmiri | 15% | 350 | 3 | 75% | 85 % | landrace | `#6e8a48` | `#498c38` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
+| 73 | Vietnamese Black | 15% | 380 | 4,5 | 55% | 20 % | landrace | `#6a7a4a` | `#7aa63e` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 4; llega al día siguiente) |
+| 74 | Ethiopian Highland | 14% | 330 | 4 | 60% | 10 % | landrace | `#b0c060` | `#82a73e` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 5; llega al día siguiente) |
+| 75 | Chronic | 20% | 600 | 3 | 80% | 70 % | cruce (F1 en la mesa) | `#9cc858` | `#549d3d` | Cruce: Skunk #1 × Northern Lights × AK-47 |
+| 76 | White Rhino | 20% | 550 | 3,5 | 80% | 80 % | cruce (F1 en la mesa) | `#d8e4c4` | `#4d913a` | Cruce: White Widow × índica norteamericana · ≈ origen incierto |
+| 77 | White Shark | 19% | 530 | 3 | 75% | 60 % | cruce (F1 en la mesa) | `#d0e0cc` | `#5ba33e` | Cruce: Super Skunk × brasileña × India del Sur |
+| 78 | Hawaiian Snow | 22% | 400 | 5 | 50% | 10 % | cruce (F1 en la mesa) | `#d4ecc8` | `#82a73e` | Cruce: Hawaiian Haze × Neville's Haze × Haze |
+| 79 | Jack Flash | 21% | 500 | 3,5 | 65% | 45 % | cruce (F1 en la mesa) | `#c4dc88` | `#67a53e` | Cruce: Jack Herer × Super Skunk × Haze |
+| 80 | Jack 47 | 21% | 500 | 3,5 | 70% | 40 % | cruce (F1 en la mesa) | `#bcd47c` | `#6ba53e` | Cruce: Jack Herer × AK-47 |
+| 81 | Sour Tangie | 23% | 450 | 4 | 60% | 20 % | cruce (F1 en la mesa) | `#d0b848` | `#7aa63e` | Cruce: Sour Diesel × Tangie |
+| 82 | Ice | 20% | 550 | 3 | 80% | 80 % | cruce (F1 en la mesa) | `#c8dccc` | `#4d913a` | Cruce: Afghani × Northern Lights × Shiva Skunk |
+| 83 | NL × Big Bud | 18% | 630 | 3 | 80% | 85 % | cruce (F1 en la mesa) | `#a4c050` | `#498c38` | Cruce: Northern Lights × Big Bud |
+| 84 | Critical Jack | 21% | 550 | 3,5 | 70% | 55 % | cruce (F1 en la mesa) | `#bcd870` | `#5fa43e` | Cruce: Critical × Jack Herer · ≈ origen incierto |
+| 85 | Critical 47 | 20% | 550 | 3 | 75% | 55 % | cruce (F1 en la mesa) | `#a8cc60` | `#5fa43e` | Cruce: Critical × AK-47 · ≈ origen incierto |
+| 86 | Critical Cheese | 19% | 550 | 3 | 75% | 70 % | cruce (F1 en la mesa) | `#b0c464` | `#549d3d` | Cruce: Critical × Cheese · ≈ origen incierto |
+| 87 | Northern Light Blue | 19% | 500 | 3 | 75% | 85 % | cruce (F1 en la mesa) | `#7aa0b8` | `#498c38` | Cruce: Northern Lights × Blueberry |
 
 **Índica** es el % índica (el resto, sativa), con datos reales de cada variedad; **hoja**, el tono de su hoja. Dan la forma de la planta en la carpa (`porteInd`): 70 % o más, índica (hoja ancha de 7 foliolos, colas gordas y cortas, internudo corto); menos de 30 %, sativa (9 foliolos finos y largos, colas finas y largas, internudo largo); en medio, híbrida. La sativa tiene la hoja clara y amarillenta; la índica, oscura.
 
@@ -147,6 +166,25 @@ Las landraces y los híbridos clásicos de la 1.9 salen del catálogo de Strainm
 | White Russian | White Widow × AK-47 | La White Widow con la AK-47: todavía más resina y floración corta. Premiada a mediados de los noventa. |
 | Blue Widow | Blueberry × White Widow | La White Widow con el dulzor y el azul de la Blueberry. |
 | Super Lemon Haze | Lemon Skunk × Super Silver Haze | Limón y escarcha: la Super Silver Haze con la Lemon Skunk. Campeona dos años seguidos a finales de los 2000. |
+| Swazi Gold | Landrace · montes de Esuatini (Suazilandia) | Sativa del sur de África, de cogollo dorado y aroma cítrico. Se cultiva al aire libre en los montes desde hace generaciones. |
+| Zamal | Landrace · isla de la Reunión | Sativa de isla, altísima y de floración larguísima, con aroma a incienso y madera. |
+| Malana | Landrace · valle de Parvati, Himachal Pradesh, India | La planta del charas del Himalaya indio: su resina se frota a mano en los bancales de las aldeas. |
+| Kashmiri | Landrace · valle de Cachemira | Índica de altura, baja y compacta, de hoja ancha y oscura. Aguanta el frío de los valles. |
+| Vietnamese Black | Landrace · montes de Vietnam | Sativa del sudeste asiático de cogollo oscuro, casi negro al final, y aroma a especia y tierra. |
+| Ethiopian Highland | Landrace · tierras altas de Etiopía | Sativa africana de altura: florece antes que las de la costa y huele a fruta y especias. |
+| Chronic | Skunk #1 × Northern Lights × AK-47 | Índica de mucha producción: la Skunk #1 y la Northern Lights con la AK-47. Cogollos grandes sin perder potencia. |
+| White Rhino | White Widow × índica norteamericana · ≈ origen incierto | La White Widow con una índica de Norteamérica sin documentar: más baja, más pesada y de cogollo más denso. En la mesa, con Afghani. |
+| White Shark | Super Skunk × brasileña × India del Sur | La Super Skunk con las dos madres de la White Widow: blanca de resina, rápida y aromática. |
+| Hawaiian Snow | Hawaiian Haze × Neville's Haze × Haze | Tres Haze y una sativa de Hawái: altísima, lenta y de efecto muy claro. |
+| Jack Flash | Jack Herer × Super Skunk × Haze | La Jack Herer con más Haze y la Super Skunk: algo más rápida y productiva. |
+| Jack 47 | Jack Herer × AK-47 | La Jack Herer con la AK-47: más fácil de cultivar y de floración más corta. |
+| Sour Tangie | Sour Diesel × Tangie | El gasóleo agrio de la Sour Diesel con la mandarina de la Tangie. |
+| Ice | Afghani × Northern Lights × Shiva Skunk | Índica tan cargada de resina que parece helada: de las preferidas para las extracciones. Rápida y fácil. |
+| NL × Big Bud | Northern Lights × Big Bud | La Northern Lights con el tamaño de la Big Bud: de las que más producen. |
+| Critical Jack | Critical × Jack Herer · ≈ origen incierto | La producción de una Critical con el efecto de la Jack Herer. Qué Critical se usó no está claro; en la mesa, la Critical Mass. |
+| Critical 47 | Critical × AK-47 · ≈ origen incierto | Una Critical con la AK-47: corta, productiva y fácil. En la mesa, con la Critical Mass. |
+| Critical Cheese | Critical × Cheese · ≈ origen incierto | Una Critical con el olor a queso de la Cheese. En la mesa, con la Critical Mass. |
+| Northern Light Blue | Northern Lights × Blueberry | La Northern Lights con el dulzor y el azul de la Blueberry. |
 
 ## El árbol por generaciones (1.11)
 
@@ -183,6 +221,8 @@ Los híbridos clásicos, de las landraces a la 4.ª generación. ✔ padres docu
 | 2.ª | Amnesia Haze | Haze + jamaicana + afgana o hawaiana + Laos | ≈ | 26% | 20 % |
 | 2.ª | Purple Haze | Purple Thai × Haze | ≈ | 19% | 15 % |
 | 2.ª | White Russian | White Widow × AK-47 | ✔ | 22% | 60 % |
+| 2.ª | Chronic | Skunk #1 × Northern Lights × AK-47 | ✔ | 20% | 70 % |
+| 2.ª | White Rhino | White Widow × índica norteamericana | ≈ | 20% | 80 % |
 | 3.ª | Lemon Haze | Lemon Skunk × Silver Haze | ≈ | 15% | 20 % |
 | 3.ª | Big Bud | base Afghani | ≈ | 17% | 85 % |
 | 3.ª | Jack Herer | Haze × (NL5 × Shiva Skunk) | ✔ | 28% | 45 % |
@@ -193,9 +233,20 @@ Los híbridos clásicos, de las landraces a la 4.ª generación. ✔ padres docu
 | 3.ª | Kali 47 | Kali Mist × AK-47 | ✔ | 21% | 30 % |
 | 3.ª | Critical Kali Mist | Critical Mass × Kali Mist | ✔ | 21% | 45 % |
 | 3.ª | Blue Widow | Blueberry × White Widow | ✔ | 19% | 65 % |
+| 3.ª | White Shark | Super Skunk × brasileña × India del Sur | ✔ | 19% | 60 % |
+| 3.ª | Hawaiian Snow | Hawaiian Haze × Neville's Haze × Haze | ✔ | 22% | 10 % |
+| 3.ª | Ice | Afghani × Northern Lights × Shiva Skunk | ✔ | 20% | 80 % |
+| 3.ª | Critical 47 | Critical × AK-47 | ≈ | 20% | 55 % |
+| 3.ª | Critical Cheese | Critical × Cheese | ≈ | 19% | 70 % |
+| 3.ª | Northern Light Blue | Northern Lights × Blueberry | ✔ | 19% | 85 % |
 | 4.ª | Super Lemon Haze | Lemon Skunk × Super Silver Haze | ✔ | 23% | 30 % |
+| 4.ª | Jack Flash | Jack Herer × Super Skunk × Haze | ✔ | 21% | 45 % |
+| 4.ª | Jack 47 | Jack Herer × AK-47 | ✔ | 21% | 40 % |
+| 4.ª | Sour Tangie | Sour Diesel × Tangie | ✔ | 23% | 20 % |
+| 4.ª | NL × Big Bud | Northern Lights × Big Bud | ✔ | 18% | 85 % |
+| 4.ª | Critical Jack | Critical × Jack Herer | ≈ | 21% | 55 % |
 
-## Recetas de cruce (42)
+## Recetas de cruce (58)
 
 Cada receta es un conjunto de variedades de partida («hojas»). Un cruce de dos da la variedad si sus hojas juntas son las de la receta; si no, un híbrido propio que guarda las hojas de sus padres. Así las de 3 o 4 padres se hacen en varios cruces: (Afghani × Colombian Gold) × Acapulco Gold = Skunk #1, en cualquier orden que no pase antes por otra receta. En las marcadas **madre × padre** el orden cuenta. Cada cruce gasta 1 semilla de cada padre y da 2 semillas del resultado.
 
@@ -243,6 +294,22 @@ Cada receta es un conjunto de variedades de partida («hojas»). Un cruce de dos
 | AK-47 + White Widow | **White Russian** | 2.ª | 22% |
 | Blueberry + White Widow | **Blue Widow** | 3.ª | 19% |
 | Lemon Skunk + Super Silver Haze | **Super Lemon Haze** | 4.ª | 23% |
+| AK-47 + Northern Lights + Skunk #1 | **Chronic** | 2.ª | 20% |
+| AK-47 + Shiva Skunk | **Chronic** | 2.ª | 20% |
+| Afghani + White Widow | **White Rhino** | 2.ª | 20% |
+| Super Skunk + White Widow | **White Shark** | 3.ª | 19% |
+| Kerala + Manga Rosa + Super Skunk | **White Shark** | 3.ª | 19% |
+| Hawaiian + Haze + Neville's Haze | **Hawaiian Snow** | 3.ª | 22% |
+| Haze + Jack Herer + Super Skunk | **Jack Flash** | 4.ª | 21% |
+| AK-47 + Jack Herer | **Jack 47** | 4.ª | 21% |
+| Tangie + Sour Diesel | **Sour Tangie** | 4.ª | 23% |
+| Northern Lights + Skunk #1 + Afghani | **Ice** | 3.ª | 20% |
+| Afghani + Shiva Skunk | **Ice** | 3.ª | 20% |
+| Big Bud + Northern Lights | **NL × Big Bud** | 4.ª | 18% |
+| Critical Mass + Jack Herer | **Critical Jack** | 4.ª | 21% |
+| AK-47 + Critical Mass | **Critical 47** | 3.ª | 20% |
+| Cheese + Critical Mass | **Critical Cheese** | 3.ª | 19% |
+| Blueberry + Northern Lights | **Northern Light Blue** | 3.ª | 19% |
 
 ## Árbol hasta la Jack Herer
 
@@ -335,6 +402,40 @@ flowchart LR
   ww["White Widow"] --> bluewidow["Blue Widow"]
   citrus["Lemon Skunk"] --> superlemon["Super Lemon Haze"]
   ssh["Super Silver Haze"] --> superlemon["Super Lemon Haze"]
+  ak47["AK-47"] --> chronic["Chronic"]
+  nl["Northern Lights"] --> chronic["Chronic"]
+  ria["Skunk #1"] --> chronic["Chronic"]
+  shiva["Shiva Skunk"] --> chronic["Chronic"]
+  rif["Afghani"] --> whiterhino["White Rhino"]
+  ww["White Widow"] --> whiterhino["White Rhino"]
+  txoko["Super Skunk"] --> whiteshark["White Shark"]
+  ww["White Widow"] --> whiteshark["White Shark"]
+  kerala["Kerala"] --> whiteshark["White Shark"]
+  mangarosa["Manga Rosa"] --> whiteshark["White Shark"]
+  hawai["Hawaiian"] --> hawaisnow["Hawaiian Snow"]
+  haze["Haze"] --> hawaisnow["Hawaiian Snow"]
+  neville["Neville's Haze"] --> hawaisnow["Hawaiian Snow"]
+  haze["Haze"] --> jackflash["Jack Flash"]
+  leyenda["Jack Herer"] --> jackflash["Jack Flash"]
+  txoko["Super Skunk"] --> jackflash["Jack Flash"]
+  ak47["AK-47"] --> jack47["Jack 47"]
+  leyenda["Jack Herer"] --> jack47["Jack 47"]
+  brumaog["Tangie"] --> sourtangie["Sour Tangie"]
+  dragon["Sour Diesel"] --> sourtangie["Sour Tangie"]
+  nl["Northern Lights"] --> ice["Ice"]
+  ria["Skunk #1"] --> ice["Ice"]
+  rif["Afghani"] --> ice["Ice"]
+  shiva["Shiva Skunk"] --> ice["Ice"]
+  mango["Big Bud"] --> nlbigbud["NL × Big Bud"]
+  nl["Northern Lights"] --> nlbigbud["NL × Big Bud"]
+  kushrif["Critical Mass"] --> criticaljack["Critical Jack"]
+  leyenda["Jack Herer"] --> criticaljack["Critical Jack"]
+  ak47["AK-47"] --> critical47["Critical 47"]
+  kushrif["Critical Mass"] --> critical47["Critical 47"]
+  cheese["Cheese"] --> criticalcheese["Critical Cheese"]
+  kushrif["Critical Mass"] --> criticalcheese["Critical Cheese"]
+  niebla["Blueberry"] --> nlblue["Northern Light Blue"]
+  nl["Northern Lights"] --> nlblue["Northern Light Blue"]
   style leyenda fill:#40e0a0,color:#062
 ```
 

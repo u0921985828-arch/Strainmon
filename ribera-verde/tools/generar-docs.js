@@ -45,7 +45,8 @@ const ROOT = path.join(__dirname, '..');
       maps[name] = { w: m.w, h: m.h, rows, doors: m.doors, exits: m.exits };
     }
     const npcs = NPCDEF.map(d => ({ id: d.id, map: d.map, x: d.x, y: d.y, wander: d.wander || 0, cond: d.cond ? d.cond.toString().replace(/^\(\)=>/, '') : '' }));
-    const items = ITEMS.map(i => ({ id: i.id, map: i.map, x: i.x, y: i.y, hidden: !!i.hidden, give: i.give.toString().match(/got\('([^']+)'/)?.[1] || i.give.toString().match(/money\+=(\d+)/)?.[0] }));
+    const items = ITEMS.map(i => ({ id: i.id, map: i.map, x: i.x, y: i.y, hidden: !!i.hidden, give: i.give.toString().match(/got\('([^']+)'/)?.[1] || i.give.toString().match(/money\+=(\d+)/)?.[0]
+      || (m => m && `${m[2] || 2} semillas de ${STRAINS[m[1]].n}`)(i.give.toString().match(/semillasTia\('(\w+)','[^']*'(?:,(\d+))?\)/)) }));
     const shop = SHOP.map(s => ({ lbl: s.lbl, p: s.p, ch: s.ch, sid: s.sid, foco: s.foco, maceta: s.maceta, carpa: s.carpa, desc: (s.desc || '').replace(/\n/g, ' · ') }));
     const carpas = Object.entries(CARPAS).map(([k, C]) => ({ k, ...C, tierra: Math.round(C.cm[0] * C.cm[2] / 1e4 * LITROS_M2) }));
     // montajes de ejemplo: Skunk #1 sana y abonada, fenotipo medio, ciclo de 2,5 días
@@ -69,7 +70,7 @@ const ROOT = path.join(__dirname, '..');
     rif: 'Kiko, al montar la mesa de genética: de un amigo de Mazar-i-Sharif (cap. 4)', hindu: 'Txaro, a cambio de 5 g para hacer aceite (parque): del viaje de su marido a Pakistán en 1976', acapulco: 'En un bote de carrete escondido en un arbusto del parque (2,26), «Guerrero, 1979»', malawi: 'Iñaki, el marinero, tras venderle 10 g (muelle): de un marinero de Malaui en Mombasa',
     // 1.25: las que no están en el banco (su nota del diario dice dónde)
     choco: 'En la nevera del piso, en un bote de cristal: 3 semillas, una vez', oaxaca: 'En un sobre al fondo de la caja fuerte de la tía, al abrirla: 3 semillas',
-    lamb: 'En un arbusto de Puerto Viejo (37,6), de cara al mar: 2 semillas (cap. 2)', kerala: 'En un arbusto del monte de Mendialde (42,11): 2 semillas',
+    lamb: 'En un arbusto al fondo del callejón del este de Puerto Viejo (37,6): 2 semillas (cap. 2)', kerala: 'En un arbusto junto a un caserío, al este de Mendialde (42,11): 2 semillas',
     mangarosa: 'En un arbusto de Errotabarri (28,10): 2 semillas (cap. 3)', hawai: 'En un seto del Ensanche de Ibarbide (16,14): 2 semillas (cap. 4)',
     lao: 'Miren, en Errotabarri, con la última página del diario (20 g de Purple Thai): 3 semillas (cap. 4)' };
 

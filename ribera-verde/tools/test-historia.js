@@ -280,11 +280,11 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && tipoGen('ria') === 'estable' && tipoGen('txoko') === 'f1' && tipoGen('limon') === 'poli' && tipoGen('thai') === 'landrace' && /Cruce F1: [^\n]*\n2\.ª generación · Skunk #1 × Afghani$/.test(strainLine('txoko')) && /\n≈|origen incierto/.test(strainLine('mango')) || { R, I });
   // el árbol de la tabla (1.11): generación y ✔/≈ de cada una; todas salen en la mesa, con crossResult de verdad, desde las landraces y las de
   // tienda que no son de receta (los cruces de 3 o 4 padres, por híbridos propios con sus hojas); sin bancos, criadores ni personas
-  await step('Árbol por generaciones (1.11; 1.24, hasta la 4.ª): las 40 de la tabla con su generación y ✔/≈; todas salen en la mesa desde landraces y tienda; sin criadores', [], async () => {
+  await step('Árbol por generaciones (1.11; 1.24, hasta la 4.ª; 1.26, más cruces clásicos): las 53 de la tabla con su generación y ✔/≈; todas salen en la mesa desde landraces y tienda; sin criadores', [], async () => {
     const T = { 1: 'Skunk #1 ✔|Haze ≈|Northern Lights ≈|Purple Thai ✔|Trainwreck ≈|AK-47 ✔|Laughing Buddha ✔|Cannalope Haze ✔|Master Kush ≈|Purple Kush ≈|Congo × Panama ✔|Malawi × Panama ✔|Malawi × PCK ✔|Kali Mist ≈|White Widow ≈',
-      2: 'Blueberry ✔|Super Skunk ✔|Shiva Skunk ✔|Critical Mass ✔|Cheese ✔|NL5 × Haze ✔|Neville\'s Haze ✔|Silver Haze ≈|Chocolope ✔|Pineapple Express ≈|Tangie ✔|Amnesia Haze ≈|Purple Haze ≈|White Russian ✔',
-      3: 'Jack Herer ✔|Super Silver Haze ✔|Blue Dream ✔|Blue Cheese ✔|Lemon Haze ≈|Sour Diesel ≈|Kali 47 ✔|Critical Kali Mist ✔|Big Bud ≈|Blue Widow ✔',
-      4: 'Super Lemon Haze ✔' };
+      2: 'Blueberry ✔|Super Skunk ✔|Shiva Skunk ✔|Critical Mass ✔|Cheese ✔|NL5 × Haze ✔|Neville\'s Haze ✔|Silver Haze ≈|Chocolope ✔|Pineapple Express ≈|Tangie ✔|Amnesia Haze ≈|Purple Haze ≈|White Russian ✔|Chronic ✔|White Rhino ≈',
+      3: 'Jack Herer ✔|Super Silver Haze ✔|Blue Dream ✔|Blue Cheese ✔|Lemon Haze ≈|Sour Diesel ≈|Kali 47 ✔|Critical Kali Mist ✔|Big Bud ≈|Blue Widow ✔|White Shark ✔|Hawaiian Snow ✔|Ice ✔|Critical 47 ≈|Critical Cheese ≈|Northern Light Blue ✔',
+      4: 'Super Lemon Haze ✔|Jack Flash ✔|Jack 47 ✔|Sour Tangie ✔|NL × Big Bud ✔|Critical Jack ≈' };
     window.R = { tabla: [1, 2, 3, 4].every(g => DEX.filter(k => STRAINS[k].gen === g).map(k => STRAINS[k].n + (/origen incierto/.test(STRAINS[k].o) ? ' ≈' : ' ✔')).sort().join('|') === T[g].split('|').sort().join('|')) };
     const sale = new Set([...Object.values(RECIPES), ...Object.values(RECETA_ORD)]), RS = Object.keys(RECIPES).map(k => k.split('+'));
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); S.custom = {}; const ids = new Set(DEX.filter(k => !sale.has(k))), via = {}, vistas = new Set(ids);
@@ -804,7 +804,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   }, () => R.n1 === 'Madre Lima' && R.esq === '9995' && R.n2 === 'Madre Lima' && R.esq2 === 0 && R.seeds === '{"ria":2}' && R.lab && R.n3 === false
     && LOG.some(l => l === '  [texto] Nombre de la planta (y sus esquejes) → Madre Lima') && LOG.some(l => l === '  [texto] Nombre de la planta (y sus esquejes) → (B)')
     && LOG.some(l => l.startsWith('Cortas una punta de la Skunk #1 «Madre Lima»')) && LOG.some(l => l === 'Sin nombre: vuelve a ser la nº 9995.') || R);
-  await step('Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave (y las que se llaman como una variedad, 1.24); se cambia el nombre de una propia (sin repetir otro); el recetario, con las 37 de receta y de dónde sale cada semilla (1.25: el diario, con una nota de la tía en las 68)',
+  await step('Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave (y las que se llaman como una variedad, 1.24); se cambia el nombre de una propia (sin repetir otro); el recetario, con las 50 de receta y de dónde sale cada semilla (1.25: el diario, con una nota de la tía en todas; 1.26: 87)',
     ['GENOTECA', 'DIARIO DE LA TÍA', 'Skunk #1$', 'Volver', '<B>', '^★ Skunk Haze', '=Haze Corta', '^★ Haze Corta', '=skunk #1', '<B>', 'SALIR'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); S.custom = {}; S.map = 'home';
     const Rn = rngSeed(7), pool = DEX.slice();
@@ -818,9 +818,9 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     const Rc = recetas(), hojas = [...new Set(Object.values(Rc).flat().flatMap(o => o.k))];
     R.rec = Object.keys(Rc).length; R.sin = hojas.filter(k => dondeSemilla(k) === 'Semillas: .').join(); R.parque = dondeSemilla('acapulco'); R.ss = Rc.txoko.map(recetaTxt).join('|'); R.diario = DEX.filter(t => !diarioTxt(t)).join(); S = S0;
   }, () => R.n > 50 && R.x === 0 && R.max <= 20 && R.rep === 0 && R.dex === 0 && R.mig === 'xv1:Skunk Haze|xv2:Northern Thai|xv3:Thai Haze|xv4:Haze Purple' && R.ren === 'Haze Corta'
-    && R.rec === 37 && R.sin === '' && R.diario === '' && R.parque === 'Semillas: escondidas en el parque del barrio.' && R.ss === 'Skunk #1 × Afghani, en ese orden'
+    && R.rec === 50 && R.sin === '' && R.diario === '' && R.parque === 'Semillas: escondidas en el parque del barrio.' && R.ss === 'Skunk #1 × Afghani, en ese orden'
     && LOG.some(l => l === '  [texto] Nuevo nombre de la variedad → Haze Corta') && LOG.some(l => l === 'Ya hay una variedad con ese nombre.') && LOG.some(l => /\[menú\] .*Afghani.*Volver  → Volver/.test(l)) || R);
-  await step('El diario y las landraces de la tía (1.25): el diario sale bajo la almohada la primera vez que duermes en el piso (antes, ni en la Genoteca ni en el sillón; las partidas de antes ya lo tienen); 13 landraces en el banco y las otras 7 en la nevera, la caja fuerte, 4 arbustos de la comarca y Miren; la Genoteca cuenta cada nueva',
+  await step('El diario y las landraces de la tía (1.25): el diario sale bajo la almohada la primera vez que duermes en el piso (antes, ni en la Genoteca ni en el sillón; las partidas de antes ya lo tienen); 13 landraces en el banco (19 desde la 1.26) y las otras 7 en la nevera, la caja fuerte, 4 arbustos de la comarca y Miren; la Genoteca cuenta cada nueva; el trueque del molino da antes la que se te acabe (1.26)',
     ['GENOTECA', '<B>', 'SALIR', 'Siesta', 'GENOTECA', '<B>', 'SALIR', 'Siesta', 'Nada', 'Cerrar'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); window.R = {}; S.flags.diario = 0; S.map = 'home'; S.min = 600; S.ch = 5;
     let l0 = LOG.length; await run(startMenu); R.antes = LOG.slice(l0).some(l => /\[menú\] DIARIO DE LA TÍA/.test(l));
@@ -839,9 +839,12 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     for (const id of ['h_lamb', 'h_kerala', 'h_manga', 'h_hawai']) { const it = ITEMS.find(i => i.id === id); delete S.taken[id]; S.map = it.map; await run(() => objectAction(it.x, it.y)); }
     R.sem = ['lamb', 'kerala', 'mangarosa', 'hawai'].map(k => S.seeds[k] || 0).join();
     S.map = 'errotabarri'; S.flags.pagina = S.day; await run(talkMiren); R.lao = S.seeds.lao; R.laoF = S.flags.lao === S.day;
-    R.nuevas = DEX.filter(k => S.disc[k]).length - n0; S = S0; enterMap('home', 5, 5, 'up');
-  }, () => !R.antes && R.alm === 3 && R.f && R.despues && !R.otra && R.sillon && R.mig === 1 && R.banco === 'mich,punto,colgold,thai,kif,beldia,chitral,nepal,congo,hthai,panama,libano,durban' && R.fuera === ''
-    && R.toast && R.choco === 3 && R.oax === 3 && R.oax2 && R.arb === 'true:bush:lamb,true:bush:kerala,true:bush:mangarosa,true:bush:hawai' && R.sem === '2,2,2,2' && R.lao === 3 && R.laoF && R.nuevas === 7 || R);
+    R.nuevas = DEX.filter(k => S.disc[k]).length - n0;
+    BANCO.forEach(b => { S.disc[b[0]] = 1; }); S.ch = 8; Object.keys(REGALO).forEach(k => { if (!S.seeds[k]) S.seeds[k] = 1; }); S.seeds.lamb = 0; R.tq = landraceTrueque();
+    S.seeds.lamb = 1; R.tq2 = landraceTrueque(); S = S0; enterMap('home', 5, 5, 'up');
+  }, () => !R.antes && R.alm === 3 && R.f && R.despues && !R.otra && R.sillon && R.mig === 1 && R.banco === 'mich,punto,colgold,thai,kif,beldia,chitral,nepal,congo,hthai,panama,libano,durban,kashmir,swazi,malana,vietblack,zamal,etiopia' && R.fuera === ''
+    && R.toast && R.choco === 3 && R.oax === 3 && R.oax2 && R.arb === 'true:bush:lamb,true:bush:kerala,true:bush:mangarosa,true:bush:hawai' && R.sem === '2,2,2,2' && R.lao === 3 && R.laoF && R.nuevas === 7
+    && R.tq === 'lamb' && (BANCO.some(b => b[0] === R.tq2) || !!REGALO[R.tq2]) || R);
   await step('Exportar partida (1.11): OPCIONES → EXPORTAR PARTIDA copia el JSON de la partida', ['OPCIONES', 'EXPORTAR', 'VOLVER', 'SALIR'], async () => {
     window.CLIP = ''; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async t => { window.CLIP = t; } }, configurable: true });
     await run(startMenu); const s = JSON.parse(CLIP || 'null'); window.R = { clip: !!s && s.day === S.day && s.money === S.money && JSON.stringify(s.custom) === JSON.stringify(S.custom) };

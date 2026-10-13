@@ -549,14 +549,23 @@ func talk_nerea():
 	heat_warn()
 	await check_story()
 
-# la landrace del trueque: la primera del banco (las de su capítulo) que no tienes en la Genoteca; si las tienes todas, una según el día
+# la landrace del trueque: la primera del banco (las de su capítulo) que no tienes en la Genoteca; si no, una según el día. 1.26: también
+# las que no se venden (REGALO), ya descubiertas, y antes que nada una de esas de la que no te queden semillas: que no se pierdan
 func landrace_trueque() -> String:
+	var r := []
+	for k in D.REGALO:
+		if S.disc.get(k) and str(D.STRAINS[k].o).begins_with("Landrace"):
+			r.append(k)
 	var l := []
 	for b in D.BANCO:
 		if S.ch >= int(b[2]):
 			l.append(b[0])
+	l.append_array(r)
 	for k in l:
 		if not S.disc.get(k):
+			return k
+	for k in r:
+		if not S.seeds.get(k):
 			return k
 	return l[S.day % l.size()]
 
@@ -1387,17 +1396,12 @@ func recetas() -> Dictionary:
 func receta_txt(o: Dictionary) -> String:
 	return (" × " if o.ord else " + ").join(PackedStringArray(o.k.map(func(k): return D.STRAINS[k].n))) + (", en ese orden" if o.ord else "")
 
-# 1.25: las landraces que no están en el banco (BANCO), en casa de la tía, en arbustos de la comarca (ITEMS) y con Miren (MIREN.s2)
-const REGALO := {"ria": "te las da Kiko al conocerlo", "rif": "te las da Kiko con la mesa de genética", "hindu": "Txaro, la vecina, por 5 g de cogollo",
-	"chitral": "Txaro, por 10 g de una índica", "malawi": "Iñaki, el del muelle, al venderle 10 g", "acapulco": "escondidas en el parque del barrio",
-	"choco": "en la nevera del piso, en un bote de cristal", "oaxaca": "en un sobre al fondo de la caja fuerte de la tía", "lamb": "escondidas en Puerto Viejo, en un arbusto de cara al mar",
-	"kerala": "escondidas en el monte de Mendialde", "mangarosa": "escondidas en un arbusto de Errotabarri", "hawai": "escondidas en un seto del Ensanche, en Ibarbide",
-	"lao": "Miren, en Errotabarri, con la última página del diario"}
+# REGALO (12-menus, por datos.json): las semillas que se consiguen sin comprarlas
 
 func donde_semilla(k: String) -> String:
 	var l := []
-	if REGALO.has(k):
-		l.append(REGALO[k])
+	if D.REGALO.has(k):
+		l.append(D.REGALO[k])
 	for it in D.SHOP:
 		if it.get("sid") == k:
 			l.append("en el growshop de Kiko desde el cap. %s" % n(it.ch))
@@ -1412,11 +1416,11 @@ func donde_semilla(k: String) -> String:
 		l.append("de su receta")
 	return "Semillas: " + "; ".join(PackedStringArray(l)) + "."
 
-# el diario de la tía Maite (1.16): su nota de cada variedad (DIARIO, de 12-menus; 1.25: las 68)
+# el diario de la tía Maite (1.16): su nota de cada variedad (DIARIO, de 12-menus; 1.25: todas)
 func diario_txt(t: String) -> String:
 	return ("«%s»\n" % D.DIARIO[t]) if D.DIARIO.has(t) else ""
 
-# 1.25: las 68 de la Genoteca, en su orden; las de receta abren lo que entra; las demás dicen dónde están sus semillas
+# 1.25: todas las de la Genoteca, en su orden; las de receta abren lo que entra; las demás dicen dónde están sus semillas
 func tipo_diario(t: String, R: Dictionary) -> String:
 	if R.has(t):
 		return ("%d recetas" % R[t].size()) if R[t].size() > 1 else "receta"
@@ -1491,7 +1495,7 @@ func menu_genoteca(i0: int) -> int:
 			nr += 1
 	var items := []
 	if S.flags.get("diario"):   # sale bajo la almohada (1.25)
-		items.append({"label": "DIARIO DE LA TÍA MAITE", "right": "%d/%d" % [nr, DEX.size()], "ic": icono("guardar"), "diario": 1, "desc": "Su cuaderno: las 68 variedades, lo que apuntó de cada una, las recetas de los cruces y dónde conseguir las semillas."})
+		items.append({"label": "DIARIO DE LA TÍA MAITE", "right": "%d/%d" % [nr, DEX.size()], "ic": icono("guardar"), "diario": 1, "desc": "Su cuaderno: las %d variedades, lo que apuntó de cada una, las recetas de los cruces y dónde conseguir las semillas." % DEX.size()})
 	for j in DEX.size():
 		var k: String = DEX[j]
 		var s: Dictionary = D.STRAINS[k]
