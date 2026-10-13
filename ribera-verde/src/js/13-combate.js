@@ -25,12 +25,13 @@ async function battle(kind){
     fadeEl.style.transition='';fadeEl.classList.remove('white');
     const w=$('wipe');w.hidden=false;w.classList.remove('go');void w.offsetWidth;w.classList.add('go');await wait(480);
     const ch=S.ch;
-    B=kind==='thief'?{kind,name:pick(THIEVES),look:randLook('th'+Math.random(),'thief'),t:0,flashE:0,shakeP:0}:kind==='rival'?rivalB():{kind,name:pick(COPS),look:LOOKS.cop,t:0,flashE:0,shakeP:0};
-    // desde el capítulo 5 (1.10), ladrones más duros: +4 de vida y +1 a cada golpe; un rival (1.16), RIVAL.vida más y +1 a cada golpe
-    if(B.kind==='thief'){const d=ch>=5?1:0,r=B.rival?1:0;B.hpMax=12+ch*2+ri(0,4)+4*d+RIVAL.vida*r;B.hp=B.hpMax;B.atk=[2+(ch>>2)+d+r,4+(ch>>1)+d+r];}
+    B=kind==='thief'?{kind,name:pick(THIEVES),look:randLook('th'+Math.random(),'thief'),t:0,flashE:0,shakeP:0}:kind==='rival'||kind==='darko'?rivalB(kind):{kind,name:pick(COPS),look:LOOKS.cop,t:0,flashE:0,shakeP:0};
+    // desde el capítulo 5 (1.10), ladrones más duros: +4 de vida y +1 a cada golpe; un rival (1.16), RIVAL.vida más y +1 a cada golpe; Darko (1.17), DARKO.vida más
+    if(B.kind==='thief'){const d=ch>=5?1:0,r=B.rival?1:0;B.hpMax=12+ch*2+ri(0,4)+4*d+RIVAL.vida*r+(B.jefe?DARKO.vida:0);B.hp=B.hpMax;B.atk=[2+(ch>>2)+d+r,4+(ch>>1)+d+r];}
     mode='battle';updateHUD();w.hidden=true;w.classList.remove('go');
     await wait(650);bhudBuild();
-    if(B.rival){await say(`${B.rival} se te planta delante.`);await say(pick(['«Te lo he dicho por las buenas.»','«Aquí se vende lo mío.»','«Vamos a arreglarlo.»']),B.name);}
+    if(B.jefe){await say('Darko se quita la sudadera y la tira al suelo.');await say('«Ni Iñaki ni mi tío. Tú y yo.»',B.name);}
+    else if(B.rival){await say(`${B.rival} se te planta delante.`);await say(pick(['«Te lo he dicho por las buenas.»','«Aquí se vende lo mío.»','«Vamos a arreglarlo.»']),B.name);}
     else if(kind==='thief'){await say(`Un ${B.name.toLowerCase()} te corta el paso.`);await say(pick(['«La mochila. Dámela y no pasa nada.»','«Eh, tú. Sé lo que llevas encima.»','«Quieto. El dinero y lo que lleves.»']),B.name);}
     else{bAnim('E','alto');await say(`${B.name} te da el alto.`);await say(pick(['«Control rutinario. ¿Llevas algo encima?»','«Documentación. Y vacía los bolsillos.»','«Aquí huele a marihuana. ¿Es tuya?»']),B.name);}
     while(!res)res=B.kind==='thief'?await thiefRound():await copRound();
@@ -47,9 +48,11 @@ async function battle(kind){
 }
 const elB=()=>B.rival||'El '+B.name.toLowerCase();
 async function enemyHits(){
-  const dmg=ri(B.atk[0],B.atk[1]);
+  // la carga de Darko (1.17): a veces coge la barra y el golpe siguiente vale el doble (CUBRIRSE lo deja en la mitad)
+  if(B.jefe&&!B.carga&&Math.random()<DARKO.carga){B.carga=1;await say(`${elB()} coge una barra de hierro del suelo. El próximo golpe va a doler.`);return null;}
+  const dmg=ri(B.atk[0],B.atk[1])*(B.carga?2:1);
   bAnim('E','ataque');
-  await say(`${elB()} ${pick(['te golpea','te empuja contra un portal','te da una patada','te tira al suelo'])}.`);
+  await say(B.carga?`${elB()} te da con la barra.`:`${elB()} ${pick(['te golpea','te empuja contra un portal','te da una patada','te tira al suelo'])}.`);B.carga=0;
   const dd=B.cubre?Math.ceil(dmg/2):dmg;if(B.cubre){B.cubre=0;await say('Te cubres: el golpe duele la mitad.');}   // CUBRIRSE (1.16)
   bAnim('P','herido');vfxCombate('vfx-golpe',64,112);B.shakeP=450;sfx('hurt');S.hp=Math.max(0,S.hp-dd);bhud();await wait(450);
   if(S.hp<=0){
@@ -82,8 +85,8 @@ async function thiefRound(){
     else{if(!S.items.bocata){await say('No te quedan BOCATAS.');return null;}S.items.bocata--;bAnim('P','comer');S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');bhud();await say('Te comes un BOCATA. Recuperas vida.');}
   }else if(c===2){
     await say(`${S.name}: «Tranquilo. Somos del mismo barrio.»`);
-    if(Math.random()<clamp(.25+S.rep/300,.25,.7)){await say('«Vale... Tú eres el de Maite. Olvídalo.»');return 'talk';}
-    await say('«No me cuentes historias.»');
+    if(!B.jefe&&Math.random()<clamp(.25+S.rep/300,.25,.7)){await say('«Vale... Tú eres el de Maite. Olvídalo.»');return 'talk';}
+    await say(B.jefe?'«Aquí ya no hay nada que hablar.»':'«No me cuentes historias.»');
   }else if(c===3){
     if(Math.random()<.5){sfx('door');await say('Consigues escapar.');return 'flee';}
     await say('Te corta el paso. No puedes escapar.');
@@ -111,7 +114,10 @@ const RIVALES={alto:{n:'ROBER',sitio:'el barrio alto',frase:'Los pijos de esta p
 const nomRival=R=>R.n[0]+R.n.slice(1).toLowerCase();
 const rivalF=z=>(S.rivalFuera[z]||0)>=S.day?RIVAL.f:1;
 const cuotaRival=z=>Math.round(RIVAL.cuota*ZONAS[z].precio);
-function rivalB(){const R=RIVALES[S.map]||RIVALES.alto;return {kind:'thief',rival:nomRival(R),name:R.n,look:randLook('rival'+R.n,'thief'),t:0,flashE:0,shakeP:0};}
+function rivalB(kind){
+  if(kind==='darko')return {kind:'thief',rival:'Darko',jefe:1,name:'DARKO',look:LOOKS.darko,t:0,flashE:0,shakeP:0};
+  const R=RIVALES[S.map]||RIVALES.alto;return {kind:'thief',rival:nomRival(R),name:R.n,look:randLook('rival'+R.n,'thief'),t:0,flashE:0,shakeP:0};
+}
 function rivalVenta(z){
   if(S.ch<RIVAL.ch||!RIVALES[z]||(S.rivalFuera[z]||0)>=S.day)return;
   S.rivales[z]=(S.rivales[z]||0)+1;if(S.rivales[z]>=RIVAL.umbral)queue('rival',()=>rivalEvent(z));
@@ -131,6 +137,21 @@ async function rivalEvent(z){
   if(o===1&&S.money>=c){S.money-=c;S.rivales[z]=0;sfx('coin');updateHUD();return say(`${nom} se guarda el dinero. «Así me gusta. Hasta la próxima.»`);}
   if(o===1)await say('No llevas tanto dinero encima.');
   S.rivales[z]=RIVAL.umbral-RIVAL.vuelve;return say(`Te apartas. ${nom} se queda mirándote.`);
+}
+// Darko (1.17): en el capítulo 8, el ajuste de cuentas en sus esquinas de los astilleros. Pelea como un rival con DARKO.vida más
+// y la carga (enemyHits). Si le ganas, se va (S.flags.darkoFin = el día): ni él ni sus chicos vuelven por los astilleros
+const DARKO={ch:8,vida:4,carga:.3,rep:10};
+async function ajusteDarko(){
+  const N='DARKO';
+  await talk(N,['Mírate. Cargas en el barco de Iñaki y mi tío te llama socio.','A mí me trata como a un recadero. Y todo empezó contigo.','Esto lo arreglamos tú y yo. Aquí y ahora.']);
+  if(await ask('¿Peleas con Darko?',['Pelear','Ahora no'],N)!==0)return say('Ya sabes dónde estoy. Mis chicos también.',N);
+  const r=await battle('darko');
+  if(r==='ko')return;
+  if(r!=='win')return say('Corre, corre. Aquí te espero.',N);
+  S.flags.darkoFin=S.day;S.rep+=DARKO.rep;sfx('get');
+  await talk(N,['Vale. Vale. Ya está.','Las esquinas son tuyas. Yo me largo de aquí una temporada.']);
+  await fade(1);buildEnts();await fade(0);
+  await talk('SMS · DON BALTASAR',['Me han contado lo de mi sobrino.','Se va a trabajar a un pesquero de fuera. Le vendrá bien.','Tú y yo seguimos como siempre.']);
 }
 const MULTA_CALLE=601;   // tenencia en la vía pública: la mínima de la Ley de Seguridad Ciudadana (601-30.000 €). Devuelve lo requisado en texto
 // (cogollos y, si hay, rosin) y la multa

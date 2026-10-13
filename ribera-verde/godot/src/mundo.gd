@@ -393,7 +393,9 @@ func npc_cond(d: Dictionary) -> bool:
 		"darko":
 			return (S.ch >= 2 and S.ch < 7 and not S.flags.get("darko1")) or S.ch == 6
 		"darko2":
-			return S.ch >= 7
+			return S.ch >= 7 and not S.flags.get("darkoFin")
+		"miren":   # la amiga de la tía Maite (1.17)
+			return S.ch >= int(D.MIREN.ch)
 		"txaro":    # 1.10: después del aceite, en su casa
 			return (d.map == "txaro") == (true if S.flags.get("txaro") else false)
 		"molina":   # 1.10: la primera vez en la plaza; después, en la comisaría
@@ -421,6 +423,8 @@ func npc_talk(d: Dictionary) -> void:
 			await talk_bixente()
 		"andoni":
 			await talk_andoni()
+		"miren":
+			await talk_miren()
 		"ibarbitarra":
 			await say(pick(["Esto es el Ensanche: pisos, oficinas y el parque. El Casco Viejo, por la avenida.", "En Ibarbide hay policía en cada esquina. Y aun así...", "Los de los pueblos venís en autobús, ¿no? La estación está en el Casco."]), "VECINO")
 		"josune":
@@ -1023,7 +1027,7 @@ func talk_client(c: Dictionary) -> void:
 		await check_story()
 		rival_venta(c.get("map", "town"))
 		# en las esquinas de Darko (1.10), 1 de cada 3 ventas acaba con uno de sus chicos encima
-		if c.get("map") == "astilleros" and Cultivo.azar() < 1.0 / 3:
+		if c.get("map") == "astilleros" and not S.flags.get("darkoFin") and Cultivo.azar() < 1.0 / 3:
 			await say("Uno de los chicos de Darko te ha visto vender.")
 			await say("«Te dijimos que lejos de nuestras esquinas.»", "CHICO DE DARKO")
 			await battle("thief")
@@ -1401,6 +1405,8 @@ func talk_nerea():
 func talk_bixente():
 	pass
 func talk_andoni():
+	pass
+func talk_miren():
 	pass
 func talk_josune():
 	pass

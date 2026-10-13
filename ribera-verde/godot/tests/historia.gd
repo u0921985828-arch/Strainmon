@@ -1514,6 +1514,79 @@ func _pasos() -> void:
 		func(): return chk(not R.q7 and R.c7 == 7 and ",".join(PackedStringArray(R.b)) == "rival" and R.fuera == D.RIVAL.dias and R.cero == 0 and is_equal_approx(R.f, 1.05) and R.otra == 0 and R.pago == 230 and R.irte == 6 and R.lejos == 8 and R.hp == 17
 			and R.obj == "cuadro,,sillon,sillon2,sofa,sofa2" and R.cuadro == "2,cuadro-2" and R.sofa == "sofa-2" and R.t == 30 and R.tienda == "sofa,tv,gpc,sillon,cuadro"
 			and LOG.has("ROBER: Eh, tú. Llevas 8 ventas en el barrio alto.") and LOG.has("Te cubres: el golpe duele la mitad.") and LOG.has("Rober no volverá por el barrio alto en 7 días. Mientras, sus clientes te pagan un 5 % más."), R))
+	step("Darko y Miren (1.17): en el capítulo 8, el ajuste de cuentas con Darko en los astilleros (coge la barra: el golpe siguiente, doble, y CUBRIRSE lo deja en la mitad; si le ganas, se va y sus chicos ya no salen); Miren, la amiga de la tía Maite, en Errotabarri: 20 g de Purple Thai por la última página del diario y 5 semillas de Haze", ["^Pelear"], func():
+		J.S.ch = 8
+		J.S.flags.darkoFin = 0
+		R = {"b": []}
+		J.gancho_combate = func(t):
+			R.b.append(t)
+			return "win"
+		J.enter_map("astilleros", 24, 17, "up")
+		R.dk = J.ents.any(func(e): return e.id == "darko2")
+		R.rep = J.S.rep
+		await run(J.talk_darko)
+		R.fin = J.S.flags.darkoFin == J.S.day
+		R.rep = J.S.rep - R.rep
+		R.dk2 = J.ents.any(func(e): return e.id == "darko2")
+		J.S.buds = {}
+		J.add_buds("ria", 20, 12)
+		var c := {"id": "cx7", "map": "astilleros", "x": 5, "y": 20, "type": "cur", "want": 10, "minThc": 0}
+		J.S.clients.append(c)
+		want(["Justo"])
+		await run(func():
+			Cultivo.fijo = .2
+			await J.talk_client(c)
+			Cultivo.fijo = -1)
+		R.chico = R.b.size()
+		J.gancho_combate = Callable()
+		J.S.hp = 30
+		J.S.hpMax = 30
+		R.jefe = J.rival_b("darko").jefe
+		await run(func():
+			J.B = {"kind": "thief", "rival": "Darko", "jefe": 1, "name": "DARKO", "atk": [6, 6], "hp": 40, "hpMax": 40, "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
+			Cultivo.fijo = 0
+			R.r1 = await J.enemy_hits()
+			R.carga = J.B.carga
+			R.hp1 = J.S.hp
+			Cultivo.fijo = .99
+			J.B.cubre = 1
+			await J.enemy_hits()
+			R.hp2 = J.S.hp
+			R.carga2 = J.B.carga
+			await J.enemy_hits()
+			R.hp3 = J.S.hp
+			Cultivo.fijo = -1
+			J.B = null)
+		J.S.flags.darkoFin = 0
+		J.S.ch = 5
+		J.S.flags.miren = 0
+		J.S.flags.pagina = 0
+		J.S.buds = {}
+		J.enter_map("errotabarri", 24, 11, "up")
+		R.mi = ",".join(PackedStringArray(J.ents.filter(func(e): return e.id == "miren").map(func(e): return "%d,%d" % [int(e.x), int(e.y)])))
+		await run(J.talk_miren)
+		R.m1 = true if J.S.flags.miren else false
+		await run(J.talk_miren)
+		R.h0 = int(J.S.seeds.get("haze", 0))
+		J.add_buds("amanecer", 25, 18)
+		J.add_buds("ria", 30, 12)
+		want(["^Dárselos"])
+		await run(J.talk_miren)
+		R.pt = J.S.buds.amanecer.g
+		R.ria = J.S.buds.ria.g
+		R.h = int(J.S.seeds.haze) - R.h0
+		R.pag = J.S.flags.pagina == J.S.day
+		var l0 := LOG.size()
+		want(["La última página", "Volver"])
+		await run(J.recetario)
+		R.ult = LOG.slice(l0).any(func(l): return l.contains("→   La última página"))
+		J.S.flags.pagina = 0
+		J.S.flags.miren = 0
+		J.S.buds = {}
+		J.enter_map("home", 5, 5, "up"),
+		func(): return chk(R.dk and not R.dk2 and ",".join(PackedStringArray(R.b)) == "darko" and R.fin and R.rep == D.DARKO.rep and R.chico == 1 and R.jefe == 1 and R.r1 == null and R.carga == 1 and R.hp1 == 30 and R.hp2 == 24 and R.carga2 == 0 and R.hp3 == 18
+			and R.mi == "24,10" and R.m1 and R.pt == 5 and R.ria == 30 and R.h == D.MIREN.n and R.pag and R.ult
+			and LOG.has("DARKO: Las esquinas son tuyas. Yo me largo de aquí una temporada.") and LOG.has("SMS · DON BALTASAR: Me han contado lo de mi sobrino.") and LOG.has("Darko coge una barra de hierro del suelo. El próximo golpe va a doler."), R))
 	step("Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas", ["^Hindu Kush"], func():
 		J.S.ch = 5
 		J.S.flags.txaro = true

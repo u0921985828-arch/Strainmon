@@ -559,6 +559,56 @@ func landrace_trueque() -> String:
 			return k
 	return l[S.day % l.size()]
 
+# Darko (1.17): en el capítulo 8, el ajuste de cuentas en sus esquinas de los astilleros. Pelea como un rival con DARKO.vida más
+# y la carga (enemy_hits). Si le ganas, se va (S.flags.darkoFin = el día): ni él ni sus chicos vuelven por los astilleros
+func ajuste_darko() -> void:
+	var N := "DARKO"
+	await talk(N, ["Mírate. Cargas en el barco de Iñaki y mi tío te llama socio.", "A mí me trata como a un recadero. Y todo empezó contigo.", "Esto lo arreglamos tú y yo. Aquí y ahora."])
+	if await ask("¿Peleas con Darko?", ["Pelear", "Ahora no"], N) != 0:
+		await say("Ya sabes dónde estoy. Mis chicos también.", N)
+		return
+	var r = await battle("darko")
+	if r == "ko":
+		return
+	if r != "win":
+		await say("Corre, corre. Aquí te espero.", N)
+		return
+	S.flags.darkoFin = S.day
+	S.rep += int(D.DARKO.rep)
+	sfx("get")
+	await talk(N, ["Vale. Vale. Ya está.", "Las esquinas son tuyas. Yo me largo de aquí una temporada."])
+	await fade(1)
+	build_ents()
+	await fade(0)
+	await talk("SMS · DON BALTASAR", ["Me han contado lo de mi sobrino.", "Se va a trabajar a un pesquero de fuera. Le vendrá bien.", "Tú y yo seguimos como siempre."])
+
+# Miren (1.17): la amiga de la tía Maite, en Errotabarri desde el capítulo MIREN.ch. Le llevas MIREN.g g de la variedad que
+# cultivaban juntas (MIREN.sid) y te da la página que falta del diario (S.flags.pagina, PAGINA) y MIREN.n semillas
+func talk_miren():
+	var N := "MIREN"
+	var M: Dictionary = D.MIREN
+	var v: String = String(D.STRAINS[M.sid].n).to_upper()
+	if S.flags.get("pagina"):
+		await say(pick(["Tu tía subía cada otoño con un táper de cogollos y se quedaba a dormir.", "Del caserío no me echó nadie gracias a ella. Eso no se olvida.", "Cuando la Haze te salga sola, acuérdate de nosotras."]), N)
+		return
+	if not S.flags.get("miren"):
+		S.flags.miren = S.day
+		await talk(N, ["¿Tú eres el de Maite? Tienes sus ojos.", "Me llamo Miren. Tu tía y yo cultivábamos juntas en este caserío, hace treinta años.", "Su diario tiene una página arrancada. Me la dio la última vez que subió.", "Tráeme %d g de %s, la que hacíamos las dos, y es tuya." % [int(M.g), v]])
+		return
+	var lots := bud_lots(int(M.g)).filter(func(l): return lot_sid(l[0]) == M.sid)
+	if lots.is_empty():
+		await say("¿Me traes los %d g de %s? Sin prisa: aquí estoy." % [int(M.g), v], N)
+		return
+	if await ask("¿Le das %d g de %s?" % [int(M.g), v], ["Dárselos", "Todavía no"], N) != 0:
+		await say("Cuando quieras.", N)
+		return
+	use_buds(lots[0][0], int(M.g))
+	S.flags.pagina = S.day
+	add_seeds(M.s, int(M.n))
+	await talk(N, ["Huele igual que entonces.", "Toma. La página que falta, y unas semillas de su Haze."])
+	await got("la última página del diario y %d semillas de %s" % [int(M.n), String(D.STRAINS[M.s].n).to_upper()])
+	await say("Léela en casa, con calma.", N)
+
 func talk_andoni():
 	var N := "ANDONI"
 	var T: Dictionary = D.TRUEQUE
@@ -597,6 +647,9 @@ func talk_darko():
 	var N := "DARKO"
 	if S.ch == 6:
 		await talk(N, ["¿Vienes a la Copa? Mi AMNESIA HAZE dio un 26,8 % de THC en el laboratorio.", "Nadie en Ribera ha pasado del 26. No vas a ser tú el primero."])
+		return
+	if S.ch >= int(D.DARKO.ch):   # el ajuste de cuentas (1.17)
+		await ajuste_darko()
 		return
 	if S.ch >= 7:   # en los astilleros (1.10)
 		await talk(N, ["¿Has dormido bien últimamente?" if S.flags.get("robo") else "Mi tío dice que ya no le debes nada. A mí, sí.", "Estas esquinas son mías. Si vendes aquí, mis chicos te lo van a recordar."])
@@ -1191,8 +1244,12 @@ func recetario():
 				nd += 1
 			items.append({"label": ("✓ " if S.disc.get(t) else "  ") + D.STRAINS[t].n, "right": ("%d recetas" % R[t].size()) if R[t].size() > 1 else "", "sw": D.STRAINS[t].c, "ic": ic_cog(t),
 				"desc": diario_txt(t) + "\no ".join(PackedStringArray(R[t].map(func(o): return receta_txt(o))))})
+		if S.flags.get("pagina"):   # la página que falta (1.17)
+			items.append({"label": "  La última página", "desc": "«%s»" % D.PAGINA})
 		items.append({"label": "Volver", "desc": ""})
 		i = await menu(items, {"cls": "full", "title": "DIARIO DE LA TÍA MAITE", "title2": "%d/%d" % [nd, ts.size()], "desc": true, "initial": i})
+		if i == ts.size() and S.flags.get("pagina"):
+			continue
 		if i < 0 or i >= ts.size():
 			return
 		var t: String = ts[i]
@@ -1446,15 +1503,15 @@ func battle(kind):
 	if kind == "thief":
 		var nm_: String = pick(D.THIEVES)
 		B = {"kind": kind, "name": nm_, "look": Datos.rand_look("th" + Datos.js_num(Cultivo.azar()), "thief"), "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
-	elif kind == "rival":
-		B = rival_b()
+	elif kind == "rival" or kind == "darko":
+		B = rival_b(kind)
 	else:
 		B = {"kind": kind, "name": pick(D.COPS), "look": D.LOOKS.cop, "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
 	if B.kind == "thief":
 		# desde el capítulo 5 (1.10), ladrones más duros: +4 de vida y +1 a cada golpe; un rival (1.16), RIVAL.vida más y +1 a cada golpe
 		var dd := 1 if ch >= 5 else 0
 		var rr := 1 if B.has("rival") else 0
-		B.hpMax = 12 + ch * 2 + ri(0, 4) + 4 * dd + int(D.RIVAL.vida) * rr
+		B.hpMax = 12 + ch * 2 + ri(0, 4) + 4 * dd + int(D.RIVAL.vida) * rr + (int(D.DARKO.vida) if B.get("jefe") else 0)
 		B.hp = B.hpMax
 		B.atk = [2 + (ch >> 2) + dd + rr, 4 + (ch >> 1) + dd + rr]
 	mode = "battle"
@@ -1462,7 +1519,10 @@ func battle(kind):
 	wipe_fuera()
 	await wait(650)
 	bhud_build()
-	if B.has("rival"):
+	if B.get("jefe"):
+		await say("Darko se quita la sudadera y la tira al suelo.")
+		await say("«Ni Iñaki ni mi tío. Tú y yo.»", B.name)
+	elif B.has("rival"):
 		await say("%s se te planta delante." % B.rival)
 		await say(pick(["«Te lo he dicho por las buenas.»", "«Aquí se vende lo mío.»", "«Vamos a arreglarlo.»"]), B.name)
 	elif kind == "thief":
@@ -1504,9 +1564,15 @@ func el_b() -> String:
 	return B.rival if B.has("rival") else "El " + B.name.to_lower()
 
 func enemy_hits():
-	var dmg := ri(int(B.atk[0]), int(B.atk[1]))
+	# la carga de Darko (1.17): a veces coge la barra y el golpe siguiente vale el doble (CUBRIRSE lo deja en la mitad)
+	if B.get("jefe") and not B.get("carga") and Cultivo.azar() < float(D.DARKO.carga):
+		B.carga = 1
+		await say("%s coge una barra de hierro del suelo. El próximo golpe va a doler." % el_b())
+		return null
+	var dmg := ri(int(B.atk[0]), int(B.atk[1])) * (2 if B.get("carga") else 1)
 	b_anim("E", "ataque")
-	await say("%s %s." % [el_b(), pick(["te golpea", "te empuja contra un portal", "te da una patada", "te tira al suelo"])])
+	await say(("%s te da con la barra." % el_b()) if B.get("carga") else ("%s %s." % [el_b(), pick(["te golpea", "te empuja contra un portal", "te da una patada", "te tira al suelo"])]))
+	B.carga = 0
 	var dd: int = int(ceil(dmg / 2.0)) if B.get("cubre") else dmg
 	if B.get("cubre"):   # CUBRIRSE (1.16)
 		B.cubre = 0
@@ -1603,10 +1669,10 @@ func thief_round():
 			await say("Te comes un BOCATA. Recuperas vida.")
 	elif c == 2:
 		await say("%s: «Tranquilo. Somos del mismo barrio.»" % S.name)
-		if Cultivo.azar() < clampf(.25 + S.rep / 300.0, .25, .7):
+		if not B.get("jefe") and Cultivo.azar() < clampf(.25 + S.rep / 300.0, .25, .7):
 			await say("«Vale... Tú eres el de Maite. Olvídalo.»")
 			return "talk"
-		await say("«No me cuentes historias.»")
+		await say("«Aquí ya no hay nada que hablar.»" if B.get("jefe") else "«No me cuentes historias.»")
 	elif c == 3:
 		if Cultivo.azar() < .5:
 			sfx("door")
@@ -2706,7 +2772,9 @@ func nom_rival(R: Dictionary) -> String:
 func cuota_rival(z: String) -> int:
 	return Datos.jsround(D.RIVAL.cuota * D.ZONAS[z].precio)
 
-func rival_b() -> Dictionary:
+func rival_b(kind := "rival") -> Dictionary:
+	if kind == "darko":
+		return {"kind": "thief", "rival": "Darko", "jefe": 1, "name": "DARKO", "look": D.LOOKS.darko, "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
 	var R: Dictionary = D.RIVALES.get(S.map, D.RIVALES.alto)
 	return {"kind": "thief", "rival": nom_rival(R), "name": R.n, "look": Datos.rand_look("rival" + R.n, "thief"), "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
 

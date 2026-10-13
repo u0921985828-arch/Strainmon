@@ -221,6 +221,7 @@ async function talkCop(){
 async function talkDarko(){
   const N='DARKO';
   if(S.ch===6)return talk(N,['¿Vienes a la Copa? Mi AMNESIA HAZE dio un 26,8 % de THC en el laboratorio.','Nadie en Ribera ha pasado del 26. No vas a ser tú el primero.']);
+  if(S.ch>=DARKO.ch)return ajusteDarko();   // el ajuste de cuentas (1.17)
   if(S.ch>=7)return talk(N,[S.flags.robo?'¿Has dormido bien últimamente?':'Mi tío dice que ya no le debes nada. A mí, sí.','Estas esquinas son mías. Si vendes aquí, mis chicos te lo van a recordar.']);   // en los astilleros (1.10)
   S.flags.darko1=true;
   await talk(N,['Así que tú te has quedado el piso de Maite.','Soy DARKO. La hierba de este barrio la muevo yo.','Vende lo tuyo si quieres, pero lejos de mis esquinas.','No me hagas repetirlo.']);

@@ -178,6 +178,7 @@ const LOOKS={
   ane:{id:'cliente4',skin:'#f0c0a0',hair:'#2a1a14',style:'long',shirt:'#5ab868',pants:'#3a3a44'},
   nerea:{id:'cliente5',skin:'#e8b088',hair:'#8a2a1a',style:'bun',shirt:'#e0b84a',pants:'#24346a'},
   bixente:{id:'cliente6',skin:'#d49a74',hair:'#5a3a24',style:'short',beard:1,shirt:'#7a5a3a',pants:'#3a3a44'},
+  miren:{id:'cliente5',skin:'#f0c8a8',hair:'#b8b8c0',style:'bun',shirt:'#4a8a5a',pants:'#4a3a3a'},
   andoni:{id:'oldman',skin:'#e8b894',hair:'#d8d8d8',style:'bald',beard:'#d8d8d8',shirt:'#b8a070',pants:'#5a5048'},
   ibarbitarra:{id:'cliente1',skin:'#f0d0b8',hair:'#1a1a1a',style:'short',shirt:'#3a3a48',pants:'#2a2a30',glasses:1},
   portero:{id:'cliente2',skin:'#b07850',hair:'#1a1a1a',style:'bald',beard:1,shirt:'#2a2a30',pants:'#2a2a30'},   // los clubs (1.15)

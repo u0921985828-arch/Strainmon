@@ -15,7 +15,7 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 | **Tía Maite** | Solo aparece en su carta y en un diploma enmarcado (2.º premio de la Copa 1998) | Piso |
 | **Don Baltasar** | Antagonista. Maite le debía 30.000 € | Bar El Ancla |
 | **Toño** | Matón de Baltasar | Bar, mensajes y, en el imperio, el almacén de los astilleros |
-| **Darko** | Rival. Sobrino de Baltasar y campeón de la Copa | Plaza (desde el cap. 2 hasta que te cruzas con él, y en el cap. 6) y astilleros (desde el cap. 7) |
+| **Darko** | Rival. Sobrino de Baltasar y campeón de la Copa | Plaza (desde el cap. 2 hasta que te cruzas con él, y en el cap. 6) y astilleros (desde el cap. 7 hasta que le ganas el ajuste de cuentas, en el 8) |
 | **Sargento Molina** | Policía corrupto que vende «protección» | Plaza (la primera vez, en el cap. 5) y comisaría del barrio alto |
 | **Josune** | Camarera del bar | Bar El Ancla |
 | **Abuela Txaro** | Vecina con quimioterapia; Maite la ayudaba. Tiene semillas de Pakistán | Parque y, después, su casa (la gris, al lado del bar) |
@@ -32,6 +32,7 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 | **Nerea** (1.14) | La lonja: carga para los barcos de fuera, de 100 a 500 g, un 15 % por encima de Iñaki, cada 3 días (desde el cap. 3) | Puerto Viejo |
 | **Bixente** (1.14) | La chatarrería del solar: 3 piezas de equipo al día, de segunda mano, a mitad de precio (desde el cap. 2) | Valdehierro |
 | **Rivales** (1.16) | ROBER (barrio alto), KEPA (Puerto Viejo), MONTXO (Valdehierro), ENEKO (Casco Viejo), YOLANDA (Ensanche) y TXUSMA (Kale Zaharra): el camello de la zona, que sale a buscarte a la 8.ª venta (desde el cap. 3) | Su zona |
+| **Miren** (1.17) | Amiga de la tía Maite; cultivaban juntas. Tiene la página que falta del diario | Errotabarri (desde el cap. 4) |
 | **Andoni** (1.14) | El molino: 3 semillas de una landrace del banco que aún no tengas por 20 g de lo tuyo, una vez por semana (desde el cap. 3) | Errotabarri |
 
 ## Prólogo
@@ -288,6 +289,13 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 
 ## Capítulo 8 · Tu imperio
 
+**El ajuste de cuentas con Darko (1.17, astilleros, al hablarle):**
+> **DARKO:** Mírate. Cargas en el barco de Iñaki y mi tío te llama socio. / A mí me trata como a un recadero. Y todo empezó contigo. / Esto lo arreglamos tú y yo. Aquí y ahora.
+> ¿Peleas con Darko? → *Pelear / Ahora no* («Ya sabes dónde estoy. Mis chicos también.»)
+> *Combate:* «Darko se quita la sudadera y la tira al suelo.» / **DARKO:** «Ni Iñaki ni mi tío. Tú y yo.» · *La carga:* «Darko coge una barra de hierro del suelo. El próximo golpe va a doler.» y «Darko te da con la barra.» (doble) · *HABLAR:* «Aquí ya no hay nada que hablar.»
+> *Si huyes:* **DARKO:** «Corre, corre. Aquí te espero.»
+> *Si ganas:* **DARKO:** «Vale. Vale. Ya está.» / «Las esquinas son tuyas. Yo me largo de aquí una temporada.» y **SMS · DON BALTASAR:** «Me han contado lo de mi sobrino.» / «Se va a trabajar a un pesquero de fuera. Le vendrá bien.» / «Tú y yo seguimos como siempre.»
+
 *Objetivo: «Tu imperio · [rango]. Facturado desde la deuda: Y € de X € para ser [rango siguiente]. Genoteca N/41.» Con un encargo de Baltasar, el objetivo es el encargo.*
 
 **Encargos de Don Baltasar** (bar):
@@ -312,6 +320,17 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 > Te tiemblan las manos: es JACK HERER.
 > **SMS · KIKO:** ¿Jack Herer? ¿De semilla propia? Llevo veinte años detrás de ella.
 > **SMS · KIKO:** Tu tía estaría orgullosa. Estabilízala y guárdala bien: eso vale más que el piso.
+
+## Miren (1.17)
+
+*En Errotabarri, delante del caserío de arriba, desde el capítulo 4.*
+
+> **MIREN:** ¿Tú eres el de Maite? Tienes sus ojos. / Me llamo Miren. Tu tía y yo cultivábamos juntas en este caserío, hace treinta años. / Su diario tiene una página arrancada. Me la dio la última vez que subió. / Tráeme 20 g de PURPLE THAI, la que hacíamos las dos, y es tuya.
+> *Sin ellos:* «¿Me traes los 20 g de PURPLE THAI? Sin prisa: aquí estoy.» · *Con ellos:* ¿Le das 20 g de PURPLE THAI? → *Dárselos / Todavía no* («Cuando quieras.»)
+> **MIREN:** Huele igual que entonces. / Toma. La página que falta, y unas semillas de su Haze. → «Consigues la última página del diario y 5 semillas de HAZE.» / «Léela en casa, con calma.»
+> *Después:* «Tu tía subía cada otoño con un táper de cogollos y se quedaba a dormir.» / «Del caserío no me echó nadie gracias a ella. Eso no se olvida.» / «Cuando la Haze te salga sola, acuérdate de nosotras.»
+
+**La última página** (al final del diario): «Si lees esto, Miren te ha encontrado. El segundo premio del 98 lo sacamos entre las dos, aunque el diploma lo colgué yo. Lo de Baltasar no fue por el piso: le pedí el dinero cuando a Miren le querían quitar el caserío, y no se lo conté a nadie. No le debas nada a quien no sabe perder. Y cuida las semillas: son lo único que no se puede comprar. M.»
 
 ## La caja fuerte
 
@@ -347,7 +366,7 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
   - *Derrota:* «Pierdes el conocimiento.» / «Te roba X g y Y €.» / «Te despiertas en casa con la cabeza vendada. Un vecino te encontró en el portal.»
   - *Nombres:* ENCAPUCHADO, ATRACADOR, DESCONOCIDO, TIRONERO, CARTERISTA.
   - *CUBRIRSE (1.16):* «Te pones en guardia: el próximo golpe no fallará.» y, con el golpe, «Te cubres: el golpe duele la mitad.» El siguiente golpe propio no falla.
-  - *En los astilleros, 1 de cada 3 ventas:* «Uno de los chicos de Darko te ha visto vender.» / **CHICO DE DARKO:** «Te dijimos que lejos de nuestras esquinas.» y combate de ladrón.
+  - *En los astilleros, 1 de cada 3 ventas (hasta que ganas a Darko, 1.17):* «Uno de los chicos de Darko te ha visto vender.» / **CHICO DE DARKO:** «Te dijimos que lejos de nuestras esquinas.» y combate de ladrón.
 - *Rival (1.16), a la 8.ª venta en su zona:* **[RIVAL]:** «Eh, tú. Llevas X ventas en [su zona].» / su frase (ROBER: «Los pijos de esta plaza son míos desde hace años.»; KEPA: «Aquí los marineros me compran a mí.»; MONTXO: «En esta ciudad no entra nadie sin pasar por mí.»; ENEKO: «Las calles del Casco tienen dueño.»; YOLANDA: «Los del Ensanche pagan bien. Y me pagan a mí.»; TXUSMA: «Este callejón es mío. Pregunta a cualquiera.») / «O me pagas X € o lo arreglamos aquí.» → Pelear / Pagarle / Irte.
   - *Pelear:* «[Rival] se te planta delante.» y una de estas: «Te lo he dicho por las buenas.» / «Aquí se vende lo mío.» / «Vamos a arreglarlo.»; el combate de ladrón, con «[Rival] te golpea…» y «[Rival] sale corriendo.» Si ganas: «[Rival] no volverá por [su zona] en 7 días. Mientras, sus clientes te pagan un 5 % más.» Con HABLAR: «[Rival]: «Vale. Pero no te quiero ver tanto por aquí.»»
   - *Pagarle:* «[Rival] se guarda el dinero. «Así me gusta. Hasta la próxima.»» (sin bastante: «No llevas tanto dinero encima.» y te apartas) · *Irte:* «Te apartas. [Rival] se queda mirándote.»

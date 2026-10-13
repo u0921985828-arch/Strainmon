@@ -1,5 +1,13 @@
 # Cambios
 
+## 1.17.0 · 13 de octubre de 2026
+
+Más fondo: el ajuste de cuentas con Darko y la amiga de la tía Maite. Godot, 0.11.0.
+
+- **Nuevo: el ajuste de cuentas con Darko** (capítulo 8, astilleros; `ajusteDarko`, `DARKO`, 13-combate). Al hablarle, te reta: «Esto lo arreglamos tú y yo». Pelea como un rival con 4 de vida más y, a veces (30 %), coge una barra de hierro: el golpe siguiente vale el doble, y CUBRIRSE lo deja en la mitad. Con él no vale HABLAR. Si le ganas (+10 de reputación, además de la del rival), se va de los astilleros (`S.flags.darkoFin`): ni él ni sus chicos vuelven a salirte al vender, y Don Baltasar te escribe. Si te vence o huyes, te espera allí.
+- **Nuevo: Miren** (Errotabarri, desde el capítulo 4; `talkMiren`, `MIREN`, 11d-comarca), la amiga con la que la tía Maite cultivaba hace treinta años. Te pide 20 g de Purple Thai, la que hacían las dos, y te da la página que faltaba del diario (`PAGINA`, al final del DIARIO DE LA TÍA MAITE: de dónde salió la deuda con Baltasar) y 5 semillas de Haze.
+- CUBRIRSE asegura también tu siguiente golpe (1.16, tras la revisión).
+
 ## 1.16.0 · 12 de octubre de 2026
 
 El diario de la tía Maite, los rivales de cada zona y la casa a tu gusto. Godot, 0.10.0.

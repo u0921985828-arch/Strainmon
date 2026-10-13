@@ -58,7 +58,7 @@ const NPCDEF=[
   {id:'inaki',map:'town',x:37,y:21,dir:'left',look:'sailor',cond:()=>S.ch>=2,talk:()=>talkInaki()},
   {id:'cop',map:'town',x:22,y:17,wander:3,look:'cop',cond:()=>S.ch>=2,talk:()=>talkCop()},
   {id:'darko',map:'town',x:20,y:14,dir:'up',look:'darko',cond:()=>(S.ch>=2&&S.ch<7&&!S.flags.darko1)||S.ch===6,talk:()=>talkDarko()},
-  {id:'darko2',map:'astilleros',x:24,y:16,look:'darko',cond:()=>S.ch>=7,talk:()=>talkDarko()},   // sus esquinas (1.10)
+  {id:'darko2',map:'astilleros',x:24,y:16,look:'darko',cond:()=>S.ch>=7&&!S.flags.darkoFin,talk:()=>talkDarko()},   // sus esquinas (1.10)
   {id:'molina',map:'town',x:23,y:15,look:'molina',cond:()=>S.ch>=5&&!S.flags.molina1,talk:()=>talkMolina()},
   {id:'molina',map:'comisaria',x:4,y:2,look:'molina',cond:()=>S.ch>=5&&!!S.flags.molina1,talk:()=>talkMolina()},   // la cuota, en la comisaría (1.10)
   {id:'tono2',map:'almacen',x:5,y:2,look:'tono',cond:()=>!!S.encargo,talk:()=>talkTonoAlmacen()},   // los encargos de Baltasar (1.10)
@@ -79,6 +79,7 @@ function buildEnts(){
 // los sitios con función (1.14, 11d-comarca): la tienda de la ciudad, la lonja, la chatarrería y el molino
 NPCDEF.push({id:'ane',map:'growcity',x:4,y:2,look:'ane',talk:()=>talkAne()},{id:'nerea',map:'puerto',x:23,y:17,dir:'down',look:'nerea',talk:()=>talkNerea()},
   {id:'bixente',map:'valdehierro',x:30,y:15,dir:'down',look:'bixente',talk:()=>talkBixente()},{id:'andoni',map:'errotabarri',x:24,y:19,dir:'down',look:'andoni',talk:()=>talkAndoni()},
+  {id:'miren',map:'errotabarri',x:24,y:10,dir:'down',look:'miren',cond:()=>S.ch>=MIREN.ch,talk:()=>talkMiren()},   // la amiga de la tía Maite (1.17)
   {id:'ibarbitarra',map:'ensanche',x:22,y:14,wander:2,look:'ibarbitarra',talk:()=>say(pick(['Esto es el Ensanche: pisos, oficinas y el parque. El Casco Viejo, por la avenida.','En Ibarbide hay policía en cada esquina. Y aun así...','Los de los pueblos venís en autobús, ¿no? La estación está en el Casco.']),'VECINO')});
 const ITEMS=[
   {id:'i_spray',map:'town',x:8,y:25,give:async()=>{S.items.spray+=2;await got('2 × SPRAY DE PIMIENTA');}},

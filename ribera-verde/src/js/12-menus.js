@@ -78,6 +78,8 @@ const DIARIO={ria:'La primera que fijamos Kiko y yo. Tres padres y mucha pacienc
   kushrif:'Afghani de madre y Skunk #1 de padre. Cogollos tan densos que hay que vigilar el moho.',
   nlhaze:'Northern Lights de madre y Haze de padre: la más fácil de las Haze.',
   silver:'Haze de madre y Northern Lights de padre. Al revés no sale igual.'};
+// la página que falta (1.17): Miren te la da en Errotabarri (S.flags.pagina) y sale al final del diario
+const PAGINA='Si lees esto, Miren te ha encontrado. El segundo premio del 98 lo sacamos entre las dos, aunque el diploma lo colgué yo. Lo de Baltasar no fue por el piso: le pedí el dinero cuando a Miren le querían quitar el caserío, y no se lo conté a nadie. No le debas nada a quien no sabe perder. Y cuida las semillas: son lo único que no se puede comprar. M.';
 const diarioTxt=t=>(DIARIO[t]?`«${DIARIO[t]}»\n`:'');
 function dondeSemilla(k){
   const b=BANCO.find(x=>x[0]===k),t=SHOP.find(it=>it.sid===k),l=[];
@@ -89,7 +91,8 @@ async function recetario(){
   const R=recetas(),ts=Object.keys(R);let i=0;
   for(;;){
     i=await menu(ts.map(t=>({label:(S.disc[t]?'✓ ':'  ')+STRAINS[t].n,right:R[t].length>1?R[t].length+' recetas':'',sw:STRAINS[t].c,ic:iconoCogollo(t),
-      desc:diarioTxt(t)+R[t].map(recetaTxt).join('\no '),k:t})).concat([{label:'Volver',desc:''}]),{cls:'full',title:'DIARIO DE LA TÍA MAITE',title2:`${ts.filter(t=>S.disc[t]).length}/${ts.length}`,desc:true,initial:i});
+      desc:diarioTxt(t)+R[t].map(recetaTxt).join('\no '),k:t})).concat(S.flags.pagina?[{label:'  La última página',desc:`«${PAGINA}»`}]:[],[{label:'Volver',desc:''}]),{cls:'full',title:'DIARIO DE LA TÍA MAITE',title2:`${ts.filter(t=>S.disc[t]).length}/${ts.length}`,desc:true,initial:i});
+    if(i===ts.length&&S.flags.pagina)continue;
     if(i<0||i>=ts.length)return;
     const t=ts[i],ks=[...new Set(R[t].flatMap(o=>o.k))];
     await menu(ks.map(k=>({label:(S.disc[k]?'✓ ':'  ')+STRAINS[k].n,right:S.seeds[k]?'×'+S.seeds[k]:'',sw:STRAINS[k].c,ic:iconoCogollo(k),desc:dondeSemilla(k)}))

@@ -58,7 +58,7 @@ async function talkClient(c){
     toast(`+${eur(pr[j])} · ${c.want} g ${ext?'de rosin ':''}vendidos`,1600);
     vistoVender();heatWarn();await checkStory();rivalVenta(c.map||'town');
     // en las esquinas de Darko (1.10), 1 de cada 3 ventas acaba con uno de sus chicos encima
-    if(c.map==='astilleros'&&Math.random()<1/3){await say('Uno de los chicos de Darko te ha visto vender.');await say('«Te dijimos que lejos de nuestras esquinas.»','CHICO DE DARKO');await battle('thief');}
+    if(c.map==='astilleros'&&!S.flags.darkoFin&&Math.random()<1/3){await say('Uno de los chicos de Darko te ha visto vender.');await say('«Te dijimos que lejos de nuestras esquinas.»','CHICO DE DARKO');await battle('thief');}
   }else{S.rep=Math.max(0,S.rep-1);if(c.fid)confia(c.fid,-2);sfx('bad');removeClient(c.id);await say(pick(['¿Tanto? No.','A ese precio, paso.','Eso es demasiado. Adiós.']),N);}
 }
 // 1.11: un aviso antes, con 50 (con 60 investigan), que dice por dónde se vende sin tanto calor

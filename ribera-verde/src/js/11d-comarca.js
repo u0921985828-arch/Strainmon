@@ -64,3 +64,19 @@ async function talkAndoni(){
   useBuds(lots[i][0],T.g);addSeeds(k,T.n);S.trueque=S.day;
   await got(`${T.n} semillas de ${STRAINS[k].n.toUpperCase()}`);await say('Cuídalas. Ya no quedan muchas así.',N);
 }
+// Miren (1.17): la amiga de la tía Maite, en Errotabarri desde el capítulo MIREN.ch. Le llevas MIREN.g g de la variedad que
+// cultivaban juntas (MIREN.sid) y te da la página que falta del diario (S.flags.pagina, PAGINA en 12-menus) y MIREN.n semillas
+const MIREN={ch:4,sid:'amanecer',g:20,s:'haze',n:5};
+async function talkMiren(){
+  const N='MIREN',M=MIREN,v=STRAINS[M.sid].n.toUpperCase();
+  if(S.flags.pagina)return say(pick(['Tu tía subía cada otoño con un táper de cogollos y se quedaba a dormir.','Del caserío no me echó nadie gracias a ella. Eso no se olvida.','Cuando la Haze te salga sola, acuérdate de nosotras.']),N);
+  if(!S.flags.miren){S.flags.miren=S.day;
+    return talk(N,['¿Tú eres el de Maite? Tienes sus ojos.','Me llamo Miren. Tu tía y yo cultivábamos juntas en este caserío, hace treinta años.','Su diario tiene una página arrancada. Me la dio la última vez que subió.',`Tráeme ${M.g} g de ${v}, la que hacíamos las dos, y es tuya.`]);}
+  const lots=budLots(M.g).filter(([k])=>lotSid(k)===M.sid);
+  if(!lots.length)return say(`¿Me traes los ${M.g} g de ${v}? Sin prisa: aquí estoy.`,N);
+  if(await ask(`¿Le das ${M.g} g de ${v}?`,['Dárselos','Todavía no'],N)!==0)return say('Cuando quieras.',N);
+  useBuds(lots[0][0],M.g);S.flags.pagina=S.day;addSeeds(M.s,M.n);
+  await talk(N,['Huele igual que entonces.','Toma. La página que falta, y unas semillas de su Haze.']);
+  await got(`la última página del diario y ${M.n} semillas de ${STRAINS[M.s].n.toUpperCase()}`);
+  return say('Léela en casa, con calma.',N);
+}
