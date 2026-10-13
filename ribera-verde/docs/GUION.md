@@ -346,7 +346,7 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
   - *Victoria:* «El [nombre] sale corriendo.» / «Al huir se le cae la cartera: +X €.» / «Aguantas más. VIDA máxima: X.»
   - *Derrota:* «Pierdes el conocimiento.» / «Te roba X g y Y €.» / «Te despiertas en casa con la cabeza vendada. Un vecino te encontró en el portal.»
   - *Nombres:* ENCAPUCHADO, ATRACADOR, DESCONOCIDO, TIRONERO, CARTERISTA.
-  - *CUBRIRSE (1.16):* «Te pones en guardia.» y, con el golpe, «Te cubres: el golpe duele la mitad.»
+  - *CUBRIRSE (1.16):* «Te pones en guardia: el próximo golpe no fallará.» y, con el golpe, «Te cubres: el golpe duele la mitad.» El siguiente golpe propio no falla.
   - *En los astilleros, 1 de cada 3 ventas:* «Uno de los chicos de Darko te ha visto vender.» / **CHICO DE DARKO:** «Te dijimos que lejos de nuestras esquinas.» y combate de ladrón.
 - *Rival (1.16), a la 8.ª venta en su zona:* **[RIVAL]:** «Eh, tú. Llevas X ventas en [su zona].» / su frase (ROBER: «Los pijos de esta plaza son míos desde hace años.»; KEPA: «Aquí los marineros me compran a mí.»; MONTXO: «En esta ciudad no entra nadie sin pasar por mí.»; ENEKO: «Las calles del Casco tienen dueño.»; YOLANDA: «Los del Ensanche pagan bien. Y me pagan a mí.»; TXUSMA: «Este callejón es mío. Pregunta a cualquiera.») / «O me pagas X € o lo arreglamos aquí.» → Pelear / Pagarle / Irte.
   - *Pelear:* «[Rival] se te planta delante.» y una de estas: «Te lo he dicho por las buenas.» / «Aquí se vende lo mío.» / «Vamos a arreglarlo.»; el combate de ladrón, con «[Rival] te golpea…» y «[Rival] sale corriendo.» Si ganas: «[Rival] no volverá por [su zona] en 7 días. Mientras, sus clientes te pagan un 5 % más.» Con HABLAR: «[Rival]: «Vale. Pero no te quiero ver tanto por aquí.»»

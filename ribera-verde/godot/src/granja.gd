@@ -760,7 +760,7 @@ func mueble_action(k):
 		return
 	if k == "cuadro":
 		var o := ["Cambiar la lámina", "Nada"]
-		var oi: int = await ask("%s, enmarcada en la pared del salón." % D.DECO.cuadro.v[deco_v("cuadro")], o)
+		var oi: int = await ask("En la pared del salón: %s." % D.DECO.cuadro.v[deco_v("cuadro")].to_lower(), o)
 		if oi == 0:
 			await cambiar_deco(k)
 		return
@@ -833,7 +833,7 @@ func cambiar_deco(k: String) -> void:
 		return
 	S.deco[k] = i
 	sfx("sel")
-	await say("Cambias %s de %s: %s." % [Dk.q, D.MUEBLES[k].art, Dk.v[i].to_lower()])
+	await say("Cambias %s %s: %s." % [Dk.q, ("de " + D.MUEBLES[k].art).replace("de el ", "del "), Dk.v[i].to_lower()])
 
 func tienda_online() -> void:
 	var i := 0

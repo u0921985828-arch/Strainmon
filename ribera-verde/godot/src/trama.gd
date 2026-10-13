@@ -1550,12 +1550,15 @@ func thief_round():
 			return null
 		if m == 2:
 			B.cubre = 1
-			await say("Te pones en guardia.")
+			B.guardia = 1
+			await say("Te pones en guardia: el próximo golpe no fallará.")
 			return await enemy_hits()
 		var mv := {"n": "PATADA", "acc": .65, "d": [8, 12]} if m else {"n": "PUÑETAZO", "acc": .92, "d": [4, 7]}
 		await wait(b_anim("P", "patada" if m else "golpe") * .6)
 		await say("Le das una patada." if mv.n == "PATADA" else "Le das un puñetazo.")
-		if Cultivo.azar() < mv.acc:
+		var g = B.get("guardia")
+		B.guardia = 0
+		if g or Cultivo.azar() < mv.acc:
 			var d := ri(mv.d[0], mv.d[1])
 			b_anim("E", "herido")
 			vfx_combate("vfx-golpe", 178, 40)

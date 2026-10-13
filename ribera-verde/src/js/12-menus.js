@@ -65,7 +65,7 @@ const DIARIO={ria:'La primera que fijamos Kiko y yo. Tres padres y mucha pacienc
   chocolope:'Chocolate y melón. No la cuelgues a secar con otra, que se le pega el olor.',
   orotrop:'Sabe a piña. Kiko decía que era la de los veranos.',
   brumaog:'Pela una mandarina: así huele la carpa cuando florece.',
-  tormenta:'Cuatro landraces y una Haze. Si la sacas, ya sabes cruzar.',
+  tormenta:'Tres landraces y una Haze. Si la sacas, ya sabes cruzar.',
   leyenda:'La que nunca terminé. Haze, Northern Lights y Shiva: el cuaderno acaba aquí. Termínala tú.',
   ssh:'Plateada de tricomas. Skunk, Northern Lights y Haze en un solo cogollo.',
   nieblamor:'Blueberry con Haze: dulce y despierta. La que más me pedían en el muelle.',

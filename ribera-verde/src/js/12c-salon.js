@@ -7,7 +7,7 @@
    (S.bandejas, CARRO en 09-cultivo) y se plantan desde ahí (plantar).
    ========================================================= */
 const MUEBLES={
-  sofa:{n:'Sofá de 2 plazas',art:'el sofá',p:399,x:13,y:5,d:'Sofá de 180 cm, de tela azul, mirando a la tele. Para echar una cabezada sin meterte en la cama.'},
+  sofa:{n:'Sofá de 2 plazas',art:'el sofá',p:399,x:13,y:5,d:'Sofá de 180 cm, tapizado, mirando a la tele. Para echar una cabezada sin meterte en la cama.'},
   tv:{n:'Tele de 43" con mueble',art:'la tele',p:449,x:13,y:2,d:'Smart TV de 43 pulgadas y un mueble bajo de 140 cm con hueco para la consola. Noticias y documentales.'},
   gpc:{n:'PC gaming con mesa',art:'el PC gaming',p:1490,x:16,y:2,d:'Torre con gráfica, monitor de 27", teclado mecánico y mesa de 140 cm con LED. Para jugar, leer el foro de cultivo y comprar.'},
   carro:{n:'Carro de esquejes',art:'el carro de esquejes',p:CARRO.p,x:8,y:5,grow:1,d:`Carro con ruedas, dos bandejas de ${CARRO.plazas} tacos tapadas bajo tubos T5 y una mesita con la tabla de corte.`},
@@ -23,7 +23,7 @@ const decoSprite=o=>{const v=DECO[o]?decoV(o):0;return v?o+'-'+v:o;};
 async function cambiarDeco(k){
   const D=DECO[k],v=decoV(k),i=await menu(D.v.map((n,j)=>({label:n+(j===v?' · ahora':'')})).concat([{label:'Volver'}]),{title:'Cambiar '+D.q,initial:v});
   if(i<0||i>=D.v.length||i===v)return;
-  S.deco[k]=i;sfx('sel');return say(`Cambias ${D.q} de ${MUEBLES[k].art}: ${D.v[i].toLowerCase()}.`);
+  S.deco[k]=i;sfx('sel');return say(`Cambias ${D.q} ${('de '+MUEBLES[k].art).replace('de el ','del ')}: ${D.v[i].toLowerCase()}.`);
 }
 // el patinete y la bici (1.13): por la tienda online, llegan al día siguiente (S.veh[k] = ese día) y, en la calle (las ZONAS), vas
 // montado en el mejor que tengas (vehiculo()). paso: ms por casilla [sin B, con B] (a pie, 240 y 130; la policía corre a 210 y 180);
@@ -66,7 +66,7 @@ async function muebleAction(k){
     advanceTime(30);updateHUD();return recetario();
   }
   if(k==='cuadro'){
-    const o=['Cambiar la lámina','Nada'],c=o[await ask(`${DECO.cuadro.v[decoV('cuadro')]}, enmarcada en la pared del salón.`,o)];
+    const o=['Cambiar la lámina','Nada'],c=o[await ask(`En la pared del salón: ${DECO.cuadro.v[decoV('cuadro')].toLowerCase()}.`,o)];
     if(c==='Cambiar la lámina')return cambiarDeco(k);return;
   }
   if(k==='sofa'){

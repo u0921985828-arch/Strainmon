@@ -69,10 +69,11 @@ async function thiefRound(){
   if(c===0){
     prompt('Elige un golpe.');
     const m=await menu(['PUÑETAZO','PATADA','CUBRIRSE'],{cls:'battle'});if(m<0)return null;
-    if(m===2){B.cubre=1;await say('Te pones en guardia.');return enemyHits();}
+    if(m===2){B.cubre=B.guardia=1;await say('Te pones en guardia: el próximo golpe no fallará.');return enemyHits();}
     const mv=m?{n:'PATADA',acc:.65,d:[8,12]}:{n:'PUÑETAZO',acc:.92,d:[4,7]};
     await wait(bAnim('P',m?'patada':'golpe')*.6);await say(mv.n==='PATADA'?'Le das una patada.':'Le das un puñetazo.');
-    if(Math.random()<mv.acc){const d=ri(mv.d[0],mv.d[1]);bAnim('E','herido');vfxCombate('vfx-golpe',178,40);B.flashE=500;sfx('hit');B.hp-=d;bhud();await wait(500);if(m&&d>=11)await say('Le has hecho daño de verdad.');}
+    const g=B.guardia;B.guardia=0;
+    if(g||Math.random()<mv.acc){const d=ri(mv.d[0],mv.d[1]);bAnim('E','herido');vfxCombate('vfx-golpe',178,40);B.flashE=500;sfx('hit');B.hp-=d;bhud();await wait(500);if(m&&d>=11)await say('Le has hecho daño de verdad.');}
     else await say('Fallas.');
   }else if(c===1){
     prompt('¿Qué usas?');
