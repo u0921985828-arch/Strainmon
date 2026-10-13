@@ -208,7 +208,14 @@
      "a": "town"
     }
    ],
-   "npcs": [],
+   "npcs": [
+    {
+     "id": "julen",
+     "x": 9,
+     "y": 3,
+     "deambula": 0
+    }
+   ],
    "objetos": [
     {
      "o": "iwin",
@@ -336,6 +343,12 @@
     {
      "id": "kiko",
      "x": 4,
+     "y": 2,
+     "deambula": 0
+    },
+    {
+     "id": "julen",
+     "x": 7,
      "y": 2,
      "deambula": 0
     }
