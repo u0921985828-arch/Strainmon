@@ -241,7 +241,7 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
  4  M-███████-██████:::███████---████████--M
  5  M-███████-██████:c:███████---████████--M
  6  M-███████-██████:::███████---████████--M
- 7  M-███████-██████c::███████---████████--M
+ 7  M-███████-██████c@:███████---████████--M
  8  M-S------L--@-----L---------L----------M
  9  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 10  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -380,7 +380,7 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
  5  M█████████████████████M
  6  M█████████████████████M
  7  M█████████████████████M
- 8  M+++*..++n++++n+++++++M
+ 8  M+++*..++n++++n++@++++M
  9  M+++.T.+++++++++++cc+.M
 10  M+++..*+S+++L++++++c+$M
 11  M^^^^^++++++++++^^^^^MM
@@ -550,6 +550,8 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 | club_valde | valdehierro | (12,8) | no | `S.ch>=C.ch` |
 | club_ibar | ibarbide | (6,18) | no | `S.ch>=C.ch` |
 | club_ens | ensanche | (12,9) | no | `S.ch>=C.ch` |
+| arrieta | valdehierro | (17,7) | no | siempre |
+| txomin | callejon | (17,8) | no | siempre |
 
 Los **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acera, plaza y tierra: en el barrio, 4 + reputación/15 (+1 desde el capítulo 4, máximo 10); en los astilleros, 2 (3 desde el capítulo 4), estudiantes y currelas, que pagan el gramo un 20 % más; en el barrio alto, desde el capítulo 3, 2 (3 desde el 4), pijos y turistas; en Puerto Viejo, 2 (3 desde el 4), turistas, currelas y estudiantes; en Valdehierro, 2 (3 desde el 4), estudiantes y currelas; y en los pueblos, 1: un currela en Mendialde y un currela o un turista en Errotabarri; en Ibarbide, desde el capítulo 4, 3 en el Casco Viejo (turistas, pijos y estudiantes) y 3 en el Ensanche (pijos, currelas y estudiantes), 4 desde el 5.
 

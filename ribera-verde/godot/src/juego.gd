@@ -218,6 +218,22 @@ func partida_valida(s) -> bool:
 	return s is Dictionary and s.get("name") is String and (s.get("day") is int or s.get("day") is float) and (s.get("ch") is int or s.get("ch") is float) \
 		and s.get("map") is String and MAPS.has(s.map) and s.get("pots") is Array and s.get("flags") is Dictionary
 
+# lo pegado no trae <, >, " ni ` (como en el HTML, donde los nombres van a menús y avisos)
+static func limpia_import(v):
+	if v is String:
+		return v.replace("<", "").replace(">", "").replace("\"", "").replace("`", "")
+	if v is Array:
+		var a := []
+		for x in v:
+			a.append(limpia_import(x))
+		return a
+	if v is Dictionary:
+		var o := {}
+		for k in v:
+			o[limpia_import(k)] = limpia_import(v[k])
+		return o
+	return v
+
 func importar(desde_titulo := false) -> void:
 	var ini := DisplayServer.clipboard_get().strip_edges() if DisplayServer.has_feature(DisplayServer.FEATURE_CLIPBOARD) else ""
 	if ini.length() > IMPORTA_MAX:
@@ -226,7 +242,7 @@ func importar(desde_titulo := false) -> void:
 	if t == null:
 		return
 	var js := JSON.new()   # (JSON.parse_string avisa en la consola si no es JSON)
-	var s = Datos.enteros(js.data) if js.parse(t) == OK and js.data is Dictionary else null
+	var s = limpia_import(Datos.enteros(js.data)) if js.parse(t) == OK and js.data is Dictionary else null
 	if not partida_valida(s):
 		await say("Eso no es una partida exportada.")
 		return
@@ -234,21 +250,25 @@ func importar(desde_titulo := false) -> void:
 	if await ask("¿Cargar la partida de %s, día %s?%s" % [s.name, n(s.day), pierde], ["Cargar", "No"]) != 0:
 		return
 	if desde_titulo:
-		var f := FileAccess.open(GUARDADO, FileAccess.WRITE)
-		if f == null:
+		var tmp := GUARDADO + ".tmp"   # como save(): a un .tmp y, entero, en su sitio
+		var f := FileAccess.open(tmp, FileAccess.WRITE)
+		if f != null:
+			f.store_string(JSON.stringify(s, "", false, true))
+			f.close()
+		if f == null or DirAccess.rename_absolute(tmp, GUARDADO) != OK:
 			await say("No se ha podido guardar la partida.")
 			return
-		f.store_string(JSON.stringify(s, "", false, true))
-		f.close()
-	else:
-		S = s
-		pending.clear()
-		queued.clear()
-		migrate()
-		enter_game()
-		save()
+		sfx("coin")
+		await say("Partida cargada.")
+		return
+	S = s
+	pending.clear()
+	queued.clear()
+	migrate()
+	enter_game()
+	var ok = save()
 	sfx("coin")
-	await say("Partida cargada.")
+	await say("Partida cargada." if ok else "Partida cargada, pero no se ha podido guardar.")
 
 # OPCIONES (en el título y en el menú START): A cambia cada fila; se guardan al momento
 func opciones(desde_titulo := false) -> void:

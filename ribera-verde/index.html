@@ -1596,7 +1596,7 @@ addEventListener('pointerdown',function fijar(){
    UI: diálogos, menús, avisos
    ========================================================= */
 const dlg=$('dlg'),dlgText=$('dlgText'),dlgName=$('dlgName'),dlgMore=$('dlgMore'),menuEl=$('menu');
-function nm(t){return S?t.replace(/\{N\}/g,S.name):t;}
+function nm(t){return S?t.replace(/\{N\}/g,()=>S.name):t;}
 function typeText(text,name){return new Promise(res=>{
   dlg.hidden=false;dlgName.hidden=!name;dlgName.textContent=name||'';dlgMore.hidden=true;
   const full=nm(text),paso=[1,3,1e5][AJ.texto];let i=0,n=0,done=false;dlgText.textContent='';   // OPCIONES · TEXTO: normal, rápido o al momento
@@ -4376,16 +4376,19 @@ async function exportar(){
 // sustituye a la de ahora (migrate, como CONTINUAR) y se guarda; la cola de avisos de la otra partida se vacía
 const IMPORTA_MAX=2000000;
 const partidaValida=s=>!!s&&typeof s==='object'&&!Array.isArray(s)&&typeof s.name==='string'&&typeof s.day==='number'&&typeof s.ch==='number'
-  &&typeof s.map==='string'&&!!MAPS[s.map]&&Array.isArray(s.pots)&&!!s.flags&&typeof s.flags==='object'&&!Array.isArray(s.flags);
+  &&typeof s.map==='string'&&Object.prototype.hasOwnProperty.call(MAPS,s.map)&&Array.isArray(s.pots)&&!!s.flags&&typeof s.flags==='object'&&!Array.isArray(s.flags);
+// lo pegado no trae <, >, " ni ` (los nombres van a menús y avisos en HTML)
+const limpiaImport=v=>typeof v==='string'?v.replace(/[<>"`]/g,''):Array.isArray(v)?v.map(limpiaImport)
+  :v&&typeof v==='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[limpiaImport(k),limpiaImport(x)])):v;
 async function importar(){
   let ini='';try{ini=String(await navigator.clipboard.readText()||'').trim();}catch(e){}
   if(ini.length>IMPORTA_MAX)ini='';
   const t=await pedirTexto('Pega aquí la partida exportada',ini,IMPORTA_MAX,false,true,true);if(t==null)return;
-  let s=null;try{s=JSON.parse(t);}catch(e){}
+  let s=null;try{s=limpiaImport(JSON.parse(t));}catch(e){}
   if(!partidaValida(s))return say('Eso no es una partida exportada.');
   if(await ask(`¿Cargar la partida de ${s.name}, día ${s.day}? La de ahora se pierde.`,['Cargar','No'])!==0)return;
-  S=s;pending.length=0;queued.clear();migrate();enterGame();save();sfx('coin');
-  return say('Partida cargada.');
+  S=s;pending.length=0;queued.clear();migrate();enterGame();const ok=save();sfx('coin');
+  return say(ok?'Partida cargada.':'Partida cargada, pero no se ha podido guardar.');
 }
 // recetario (1.11): cada variedad de receta con sus maneras de sacarla (RECIPES, en cualquier orden; RECETA_ORD, madre × padre)
 // y, de cada una que entra, dónde se consiguen las semillas

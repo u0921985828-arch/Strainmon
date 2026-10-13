@@ -380,7 +380,7 @@ func ropa_mapa(g):
 		var i := ropa_v(k)
 		var s = D.ROPA[k].src.get(g)
 		id += str(i)
-		if i == 0 or s == null or i >= D.ROPA[k].v.size():
+		if i <= 0 or s == null or i >= D.ROPA[k].v.size():   # como en el HTML: un índice negativo no viste
 			continue
 		for j in s.size():
 			var d = D.ROPA[k].v[i][j + 1]

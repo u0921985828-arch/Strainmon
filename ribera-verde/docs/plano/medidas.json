@@ -1112,6 +1112,12 @@
      "x": 12,
      "y": 8,
      "deambula": 0
+    },
+    {
+     "id": "arrieta",
+     "x": 17,
+     "y": 7,
+     "deambula": 0
     }
    ],
    "objetos": [
@@ -1631,7 +1637,14 @@
     }
    ],
    "salidas": [],
-   "npcs": [],
+   "npcs": [
+    {
+     "id": "txomin",
+     "x": 17,
+     "y": 8,
+     "deambula": 0
+    }
+   ],
    "objetos": [
     {
      "o": "h_kale",

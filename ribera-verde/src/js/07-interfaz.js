@@ -2,7 +2,7 @@
    UI: diálogos, menús, avisos
    ========================================================= */
 const dlg=$('dlg'),dlgText=$('dlgText'),dlgName=$('dlgName'),dlgMore=$('dlgMore'),menuEl=$('menu');
-function nm(t){return S?t.replace(/\{N\}/g,S.name):t;}
+function nm(t){return S?t.replace(/\{N\}/g,()=>S.name):t;}
 function typeText(text,name){return new Promise(res=>{
   dlg.hidden=false;dlgName.hidden=!name;dlgName.textContent=name||'';dlgMore.hidden=true;
   const full=nm(text),paso=[1,3,1e5][AJ.texto];let i=0,n=0,done=false;dlgText.textContent='';   // OPCIONES · TEXTO: normal, rápido o al momento
