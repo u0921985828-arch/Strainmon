@@ -8,7 +8,7 @@ function bubble(x,y,ch,col){ctx.fillStyle='#26262e';ctx.fillRect(x-1,y-1,9,10);c
   ctx.fillStyle=col;GLYPH[ch].forEach((r,j)=>{for(let i=0;i<5;i++)if(r[i]==='#')ctx.fillRect(x+1+i,y+(j>3?j-0:j)+0,1,1);});}
 function storyMark(id){
   switch(id){case 'kiko':return !S.flags.kiko1||(S.ch===4&&!S.flags.lab);case 'baltasar':return (S.ch===3&&!S.flags.metB)||(S.due>0&&S.money>=S.due)||(S.ch>=8&&!S.encargo&&!(S.encVeto>S.day));case 'tono2':return isNight();
-    case 'jurado':return true;case 'molina':return !S.flags.molina1||!S.protect;case 'darko':return S.ch<6;case 'darko2':return S.ch>=DARKO.ch&&!S.flags.darkoFin;case 'txaro':return S.ch>=2&&!S.flags.txaro||S.ch>=4&&!S.flags.txaro2;case 'inaki':return !S.flags.inaki;}
+    case 'jurado':return true;case 'molina':return !S.flags.molina1||!S.protect;case 'darko':return S.ch<6;case 'darko2':return S.ch>=DARKO.ch&&!S.flags.darkoFin;case 'txaro':return S.ch>=2&&!S.flags.txaro||S.ch>=4&&!S.flags.txaro2;case 'inaki':return !S.flags.inaki;case 'julen':return !S.flags.julen1;}
   return false;
 }
 let LAMPS={};   // farolas de cada zona de fuera (1.10): su luz de noche

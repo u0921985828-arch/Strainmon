@@ -191,6 +191,7 @@ func story_mark(id: String) -> bool:
 		"darko2": return S.ch >= int(J.D.DARKO.ch) and not F.get("darkoFin")
 		"txaro": return (S.ch >= 2 and not F.get("txaro")) or (S.ch >= 4 and not F.get("txaro2"))
 		"inaki": return not F.get("inaki")
+		"julen": return not F.get("julen1")
 	return false
 
 func _mundo() -> void:

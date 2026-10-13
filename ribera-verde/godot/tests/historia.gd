@@ -2869,6 +2869,26 @@ func _pasos() -> void:
 		await idle()
 		R.fin = [J.S.ch, J.ents.any(func(e): return e.id == "julen"), D.NPCDEF.any(func(d): return d.id == "julen" and d.map == "shop" and J.npc_cond(d)), J.S.itin.get("cosecha") == J.S.day]
 		R.log = [LOG.has("JULEN: " + D.JULEN.ok.plantar), LOG.has("JULEN: " + D.JULEN.adios[0]), LOG.has("JULEN: " + D.ITINERARIO[8].d)]
+		# riego automático y partida de antes de gVeg/gFlor (abonada, en flor); pH por marca; Julen por primera vez tras la cosecha
+		J.S.merge({"itin": {}, "carpas": [{"t": "m100", "foco": "cfl", "garrafas": true}], "pots": [{"sid": "ria", "prog": .8, "water": 100, "health": 100, "fert": true, "fq": 1, "pest": false}, null, null, null]}, true)
+		J.S.flags = {"llegada": true, "letter": true, "kiko1": true, "julen1": true}
+		R.vieja = J.itin_sig().id
+		J.S.items.medidor = 1
+		R.ph = J.abono_txt({"sid": "ria", "fv": D.ABONO_BIO.q[0], "fvo": 1, "org": 1, "fert": false})
+		J.S.items.medidor = 0
+		J.S.flags = {"llegada": true, "letter": true, "kiko1": true, "harvest1": true}
+		J.S.map = "shop"
+		var pt = load("res://src/pinta.gd").new()   # la «!» (story_mark, de pinta.gd; en el oráculo no hay pintor)
+		pt.J = J
+		R.mark = pt.story_mark("julen")
+		var l3 := LOG.size()
+		var o0: int = J.S.items.ofertv
+		await run(J.talk_julen)
+		await idle()
+		var L3 := LOG.slice(l3)
+		R.tarde = [L3.has("JULEN: " + D.JULEN.tarde[1]), not L3.has("JULEN: " + D.JULEN.aqui[0]), J.S.items.ofertv - o0, si(J.S.flags.get("julen1")), pt.story_mark("julen")]
+		for x in [pt.c0, pt.ad, pt.vc, pt.c1, pt]:
+			x.free()
 		J.S = S0
 		J.build_ents(),
 		func(): return chk(R.julen and R.obj == D.ITINERARIO[3].d and R.it[0] == 2 and R.it[1] == 4 and R.it[2] and R.it[3] == "bus,carta,kiko,julen,plantar"
@@ -2876,7 +2896,8 @@ func _pasos() -> void:
 			and absf(R.p1[0] - .75) < 1e-9 and R.p1[1] == 0 and R.p1[2] == 2 and R.p1[3] == "Abonada (floración)"
 			and absf(R.p2[0] - .95) < 1e-9 and R.p2[1] == 1 and R.p2[2] == 1 and R.p2[3] == "Abonada (floración bio) · sustrato vivo"
 			and R.crec[0] > R.crec[1] and R.g[3] > R.g[2] and R.sig == "cosecha" and R.n == 8 and R.TO.size() == 4 and R.TO[0] == "<small>ITINERARIO · 5/14</small>Plantar<br>Ahora: Regar"
-			and R.TO[3] == "<small>ITINERARIO · 8/14</small>Abono de floración<br>Ahora: Primera cosecha" and R.fin[0] == 2 and not R.fin[1] and R.fin[2] and R.fin[3] and R.log.all(func(x): return x), R))
+			and R.TO[3] == "<small>ITINERARIO · 8/14</small>Abono de floración<br>Ahora: Primera cosecha" and R.fin[0] == 2 and not R.fin[1] and R.fin[2] and R.fin[3] and R.log.all(func(x): return x)
+			and R.vieja == "cosecha" and R.ph == "Abonada (crecimiento bio) · sustrato vivo · EC 0,8 · pH 7,5" and R.tarde[0] and R.tarde[1] and R.tarde[2] == 2 and R.tarde[3] and R.mark and not R.tarde[4], R))
 	step("Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también arcón, sala, agenda, mensajes, pedidos y bolsa); con Toño ya visto, sale en el móvil", [], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))

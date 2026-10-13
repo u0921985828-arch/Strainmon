@@ -998,12 +998,12 @@ func itin_ok(id: String) -> bool:
 			return (true if F.get("julen1") else false) or h1
 		"plantar":
 			return S.pots.any(func(p): return p is Dictionary) or h1
-		"regar":
-			return (true if F.get("gRiego") else false) or h1
+		"regar":   # o riego automático
+			return (true if F.get("gRiego") else false) or h1 or (S.pots.any(func(p): return p is Dictionary) and S.carpas.any(func(c): return c is Dictionary and (true if (c.get("goteo") or c.get("garrafas")) else false)))
 		"veg":   # ya en flor, no toca
-			return (true if (F.get("gVeg") or F.get("gFlor") or F.get("harvest1")) else false) or S.pots.any(func(p): return p is Dictionary and p.prog >= .65)
+			return (true if (F.get("gVeg") or F.get("gFlor") or F.get("harvest1")) else false) or S.pots.any(func(p): return p is Dictionary and (p.prog >= .65 or (true if (p.get("fv") or p.get("fert")) else false)))   # p.fv, p.fert: partidas de antes de gVeg
 		"flor":
-			return (true if F.get("gFlor") else false) or h1
+			return (true if F.get("gFlor") else false) or h1 or S.pots.any(func(p): return p is Dictionary and (true if p.get("fert") else false))
 		"cosecha":
 			return h1
 		"vender":
@@ -1051,12 +1051,12 @@ func paso_cultivo() -> String:
 func talk_julen():
 	var N := "JULEN"
 	if not S.flags.get("julen1"):
-		await talk(N, D.JULEN.hola)
+		await talk(N, D.JULEN.tarde if S.flags.get("harvest1") else D.JULEN.hola)
 		S.items.ofertv += 2
 		await got("2 dosis de ORTUA BIO CRECIMIENTO")
 		S.items.ophm += 4
 		await got("4 dosis de pH− ORTUA BIO")
-		await talk(N, D.JULEN.ph + D.MINERAL_ORG + D.JULEN.aqui)
+		await talk(N, D.JULEN.ph + D.MINERAL_ORG + ([] if S.flags.get("harvest1") else D.JULEN.aqui))
 		S.flags.julen1 = true
 		return
 	if not S.flags.get("harvest1"):
@@ -1133,10 +1133,10 @@ func imperio_nivel() -> int:
 
 func check_story():
 	if S.ch == 1 and S.flags.get("harvest1"):
+		if S.flags.get("julen1"):   # 1.23: se vuelve al growshop (antes del capítulo, que lo quita del piso)
+			await talk("JULEN", D.JULEN.adios)
 		await chapter(2)
 		spawn_clients()
-		if S.flags.get("julen1"):   # 1.23: se vuelve al growshop
-			await talk("JULEN", D.JULEN.adios)
 		await talk("SMS · KIKO", ["Primera cosecha. Bien hecho.", "La gente que busca material lleva un $ encima. Puedes venderles en la calle.", "Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba."])
 		await lineas_nuevas()
 		show_objective()

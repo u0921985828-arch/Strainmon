@@ -11,10 +11,10 @@ const ITINERARIO=[
   {id:'kiko',t:'Kiko, en el growshop',d:'Visita el growshop de Kiko, al lado de casa.',ok:()=>!!S.flags.kiko1},
   {id:'julen',t:'Julen',d:'Julen, el hijo de Kiko, te espera en el piso.',ok:()=>!!S.flags.julen1||!!S.flags.harvest1},
   {id:'plantar',t:'Plantar',d:'Delante del armario de la tía, A: planta una semilla en una maceta.',ok:()=>S.pots.some(Boolean)||!!S.flags.harvest1},
-  {id:'regar',t:'Regar',d:'Cuando el agua de la maceta baje del 30 %, riega.',ok:()=>!!S.flags.gRiego||!!S.flags.harvest1},
+  {id:'regar',t:'Regar',d:'Cuando el agua de la maceta baje del 30 %, riega.',ok:()=>!!S.flags.gRiego||!!S.flags.harvest1||S.pots.some(Boolean)&&S.carpas.some(c=>c&&(c.goteo||c.garrafas))},   // o riego automático
   {id:'veg',t:'Abono de crecimiento',d:'Mientras crece, una dosis de abono de crecimiento con su pH−.',
-    ok:()=>!!(S.flags.gVeg||S.flags.gFlor||S.flags.harvest1)||S.pots.some(p=>p&&p.prog>=.65)},   // ya en flor, no toca
-  {id:'flor',t:'Abono de floración',d:'Cuando florezca, una dosis de abono de floración con su pH−.',ok:()=>!!S.flags.gFlor||!!S.flags.harvest1},
+    ok:()=>!!(S.flags.gVeg||S.flags.gFlor||S.flags.harvest1)||S.pots.some(p=>p&&(p.prog>=.65||p.fv||p.fert))},   // ya en flor, no toca (p.fv, p.fert: partidas de antes de gVeg)
+  {id:'flor',t:'Abono de floración',d:'Cuando florezca, una dosis de abono de floración con su pH−.',ok:()=>!!S.flags.gFlor||!!S.flags.harvest1||S.pots.some(p=>p&&p.fert)},
   {id:'cosecha',t:'Primera cosecha',d:'Cuando la planta esté lista, cosecha. Si ves araña roja, insecticida.',ok:()=>!!S.flags.harvest1},
   {id:'vender',t:'Primera venta',d:'Véndele a alguien que lleve un $ encima, en la calle.',ok:()=>S.sales>0},
   {id:'ventas',t:`${META_VENTAS} € en ventas`,d:`Gana ${META_VENTAS} € vendiendo.`,ok:()=>S.ch>=3},
@@ -33,6 +33,7 @@ const JULEN={
   aqui:['Lo que toca hacer lo tienes en START → OBJETIVO → ITINERARIO. Yo me quedo por aquí hasta que coseches.'],
   ok:{plantar:'Bien plantada. Ahora, el agua: riega cuando la barra azul baje del 30 %.',regar:'Así. Mientras crece, échale el abono de crecimiento: con su pH−, lo aprovecha entero.',
     veg:'Eso es. Cuando empiece a florecer, el de floración. Una dosis por planta.',flor:'Ya está todo. Ahora, paciencia: cuando esté lista, cosecha.'},
+  tarde:['Kaixo. Soy Julen, el hijo de Kiko. Estudio Agrónomas en Ibarbide y le echo una mano en la tienda.','Ya has cosechado sin mí. Aun así, toma: para que pruebes el orgánico.'],
   adios:['Primera cosecha. Ya no me necesitas.','Me vuelvo al growshop con mi aita. Pásate cuando quieras: algún consejo te daré.'],
   tips:['Con el medidor de pH aciertas siempre: la planta aprovecha el abono entero.','El orgánico no acelera la floración. Si te aprieta un plazo, mineral.',
     'Si solo le echas orgánico, con su pH− cítrico, el sustrato se queda vivo: menos plagas.','El pH− MEATZA es ácido fosfórico, mineral: con él ya no hay sustrato vivo.',
@@ -52,9 +53,9 @@ function pasoCultivo(){
 async function talkJulen(){
   const N='JULEN';
   if(!S.flags.julen1){
-    await talk(N,JULEN.hola);
+    await talk(N,S.flags.harvest1?JULEN.tarde:JULEN.hola);
     S.items.ofertv+=2;await got('2 dosis de ORTUA BIO CRECIMIENTO');S.items.ophm+=4;await got('4 dosis de pH− ORTUA BIO');
-    await talk(N,JULEN.ph.concat(MINERAL_ORG,JULEN.aqui));S.flags.julen1=true;return;
+    await talk(N,JULEN.ph.concat(MINERAL_ORG,S.flags.harvest1?[]:JULEN.aqui));S.flags.julen1=true;return;
   }
   if(!S.flags.harvest1){
     const c=await ask('¿Qué pasa?',['¿Qué hago ahora?','Mineral u orgánico','Nada'],N);

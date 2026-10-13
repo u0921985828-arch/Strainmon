@@ -119,7 +119,8 @@ const aboDe=o=>o?ABONO_BIO:ABONO,sustratoVivo=p=>!!p.org&&!p.min;
 // el pH− que se gasta con un abono: el de su marca y, si no hay, el otro
 const phItem=bio=>{const ks=bio?['ophm','phm']:['phm','ophm'];return ks.find(k=>S.items[k]>0)||null;};
 const abonoQ=(bio=0)=>aboDe(bio).q[phItem(bio)?S.items.medidor?2:1:0],fq=p=>p.fert?p.fq??1:0;
-const ecDe=p=>Math.round((.4+(p.fv?p.fvo?.4:.7:0)+(p.fert?p.fo?.5:.9:0))*10)/10,phDe=p=>{const q=Math.min(p.fv||1,p.fert?fq(p):1);return q>=ABONO.q[2]?ABONO.ph[2]:q>=ABONO.q[1]?ABONO.ph[1]:ABONO.ph[0];};
+const ecDe=p=>Math.round((.4+(p.fv?p.fvo?.4:.7:0)+(p.fert?p.fo?.5:.9:0))*10)/10,phI=(q,bio)=>{const Q=aboDe(bio).q;return q>=Q[2]?2:q>=Q[1]?1:0;},
+  phDe=p=>ABONO.ph[Math.min(p.fv?phI(p.fv,p.fvo):2,p.fert?phI(fq(p),p.fo):2)];   // cada dosis, con la q de su marca
 const abonoTxt=p=>{const L=(p.fv?['crecimiento'+(p.fvo?' bio':'')]:[]).concat(p.fert?['floración'+(p.fo?' bio':'')]:[]);
   return (L.length?'Abonada ('+L.join(' y ')+')':'Sin abonar')+(sustratoVivo(p)?' · sustrato vivo':'')+(S.items.medidor&&L.length?` · EC ${coma(ecDe(p))} · pH ${coma(phDe(p))}`:'');};
 // lo que hace cada producto (tienda y mochila)
@@ -252,6 +253,7 @@ async function abonar(p,vegK){
   if(veg){p.fv=q;if(bio)p.fvo=1;S.flags.gVeg=1;}else{p.fert=true;p.fq=q;if(bio)p.fo=1;S.flags.gFlor=1;}sfx('sel');
   await say(`Echas una dosis de ${PRODUCTOS[k].n.toUpperCase()}. ${veg?'Crecerá más deprisa.':'Dará más cosecha.'}`+(ph?S.items.medidor?`\nCon el medidor, el pH al ${coma(ABONO.ph[2])}: lo aprovecha entero.`:'\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo.'
     :bio?`\nSin pH−, la tierra amortigua el agua del grifo: lo aprovecha al ${pct0(ABONO_BIO.q[0])} %.`:`\nSin pH−, el agua del grifo (pH ${coma(ABONO.ph[0])}) bloquea ${pct0(1-ABONO.q[0])} % del abono.`));
+  if(ph&&PRODUCTOS[ph].bio!==PRODUCTOS[k].bio)await say(`No te queda pH− de su marca: gastas una dosis de ${PRODUCTOS[ph].n}.`+(bio?' Con el mineral, el sustrato ya no está vivo.':''));
 }
 function stageName(p){return p.prog<.12?'Germinando':p.prog<.35?'Plántula':p.prog<.65?'Vegetativo':'Floración';}
 async function potAction(i){

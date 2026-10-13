@@ -317,8 +317,8 @@ const facturado=()=>Math.max(0,S.sales-(S.imp0||0));
 const imperioNivel=()=>{let n=0;IMPERIO.forEach((r,i)=>{if(facturado()>=r.meta)n=i;});return n;};
 async function checkStory(){
   if(S.ch===1&&S.flags.harvest1){
+    if(S.flags.julen1)await talk('JULEN',JULEN.adios);   // 1.23: se vuelve al growshop (antes del capítulo, que lo quita del piso)
     await chapter(2);spawnClients();
-    if(S.flags.julen1)await talk('JULEN',JULEN.adios);   // 1.23: se vuelve al growshop
     await talk('SMS · KIKO',['Primera cosecha. Bien hecho.','La gente que busca material lleva un $ encima. Puedes venderles en la calle.','Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba.']);await lineasNuevas();showObjective();
   }
   if(S.ch===2&&S.sales>=META_VENTAS){

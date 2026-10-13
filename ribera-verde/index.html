@@ -2054,7 +2054,8 @@ const aboDe=o=>o?ABONO_BIO:ABONO,sustratoVivo=p=>!!p.org&&!p.min;
 // el pH− que se gasta con un abono: el de su marca y, si no hay, el otro
 const phItem=bio=>{const ks=bio?['ophm','phm']:['phm','ophm'];return ks.find(k=>S.items[k]>0)||null;};
 const abonoQ=(bio=0)=>aboDe(bio).q[phItem(bio)?S.items.medidor?2:1:0],fq=p=>p.fert?p.fq??1:0;
-const ecDe=p=>Math.round((.4+(p.fv?p.fvo?.4:.7:0)+(p.fert?p.fo?.5:.9:0))*10)/10,phDe=p=>{const q=Math.min(p.fv||1,p.fert?fq(p):1);return q>=ABONO.q[2]?ABONO.ph[2]:q>=ABONO.q[1]?ABONO.ph[1]:ABONO.ph[0];};
+const ecDe=p=>Math.round((.4+(p.fv?p.fvo?.4:.7:0)+(p.fert?p.fo?.5:.9:0))*10)/10,phI=(q,bio)=>{const Q=aboDe(bio).q;return q>=Q[2]?2:q>=Q[1]?1:0;},
+  phDe=p=>ABONO.ph[Math.min(p.fv?phI(p.fv,p.fvo):2,p.fert?phI(fq(p),p.fo):2)];   // cada dosis, con la q de su marca
 const abonoTxt=p=>{const L=(p.fv?['crecimiento'+(p.fvo?' bio':'')]:[]).concat(p.fert?['floración'+(p.fo?' bio':'')]:[]);
   return (L.length?'Abonada ('+L.join(' y ')+')':'Sin abonar')+(sustratoVivo(p)?' · sustrato vivo':'')+(S.items.medidor&&L.length?` · EC ${coma(ecDe(p))} · pH ${coma(phDe(p))}`:'');};
 // lo que hace cada producto (tienda y mochila)
@@ -2187,6 +2188,7 @@ async function abonar(p,vegK){
   if(veg){p.fv=q;if(bio)p.fvo=1;S.flags.gVeg=1;}else{p.fert=true;p.fq=q;if(bio)p.fo=1;S.flags.gFlor=1;}sfx('sel');
   await say(`Echas una dosis de ${PRODUCTOS[k].n.toUpperCase()}. ${veg?'Crecerá más deprisa.':'Dará más cosecha.'}`+(ph?S.items.medidor?`\nCon el medidor, el pH al ${coma(ABONO.ph[2])}: lo aprovecha entero.`:'\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo.'
     :bio?`\nSin pH−, la tierra amortigua el agua del grifo: lo aprovecha al ${pct0(ABONO_BIO.q[0])} %.`:`\nSin pH−, el agua del grifo (pH ${coma(ABONO.ph[0])}) bloquea ${pct0(1-ABONO.q[0])} % del abono.`));
+  if(ph&&PRODUCTOS[ph].bio!==PRODUCTOS[k].bio)await say(`No te queda pH− de su marca: gastas una dosis de ${PRODUCTOS[ph].n}.`+(bio?' Con el mineral, el sustrato ya no está vivo.':''));
 }
 function stageName(p){return p.prog<.12?'Germinando':p.prog<.35?'Plántula':p.prog<.65?'Vegetativo':'Floración';}
 async function potAction(i){
@@ -3651,8 +3653,8 @@ const facturado=()=>Math.max(0,S.sales-(S.imp0||0));
 const imperioNivel=()=>{let n=0;IMPERIO.forEach((r,i)=>{if(facturado()>=r.meta)n=i;});return n;};
 async function checkStory(){
   if(S.ch===1&&S.flags.harvest1){
+    if(S.flags.julen1)await talk('JULEN',JULEN.adios);   // 1.23: se vuelve al growshop (antes del capítulo, que lo quita del piso)
     await chapter(2);spawnClients();
-    if(S.flags.julen1)await talk('JULEN',JULEN.adios);   // 1.23: se vuelve al growshop
     await talk('SMS · KIKO',['Primera cosecha. Bien hecho.','La gente que busca material lleva un $ encima. Puedes venderles en la calle.','Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba.']);await lineasNuevas();showObjective();
   }
   if(S.ch===2&&S.sales>=META_VENTAS){
@@ -4395,10 +4397,10 @@ const ITINERARIO=[
   {id:'kiko',t:'Kiko, en el growshop',d:'Visita el growshop de Kiko, al lado de casa.',ok:()=>!!S.flags.kiko1},
   {id:'julen',t:'Julen',d:'Julen, el hijo de Kiko, te espera en el piso.',ok:()=>!!S.flags.julen1||!!S.flags.harvest1},
   {id:'plantar',t:'Plantar',d:'Delante del armario de la tía, A: planta una semilla en una maceta.',ok:()=>S.pots.some(Boolean)||!!S.flags.harvest1},
-  {id:'regar',t:'Regar',d:'Cuando el agua de la maceta baje del 30 %, riega.',ok:()=>!!S.flags.gRiego||!!S.flags.harvest1},
+  {id:'regar',t:'Regar',d:'Cuando el agua de la maceta baje del 30 %, riega.',ok:()=>!!S.flags.gRiego||!!S.flags.harvest1||S.pots.some(Boolean)&&S.carpas.some(c=>c&&(c.goteo||c.garrafas))},   // o riego automático
   {id:'veg',t:'Abono de crecimiento',d:'Mientras crece, una dosis de abono de crecimiento con su pH−.',
-    ok:()=>!!(S.flags.gVeg||S.flags.gFlor||S.flags.harvest1)||S.pots.some(p=>p&&p.prog>=.65)},   // ya en flor, no toca
-  {id:'flor',t:'Abono de floración',d:'Cuando florezca, una dosis de abono de floración con su pH−.',ok:()=>!!S.flags.gFlor||!!S.flags.harvest1},
+    ok:()=>!!(S.flags.gVeg||S.flags.gFlor||S.flags.harvest1)||S.pots.some(p=>p&&(p.prog>=.65||p.fv||p.fert))},   // ya en flor, no toca (p.fv, p.fert: partidas de antes de gVeg)
+  {id:'flor',t:'Abono de floración',d:'Cuando florezca, una dosis de abono de floración con su pH−.',ok:()=>!!S.flags.gFlor||!!S.flags.harvest1||S.pots.some(p=>p&&p.fert)},
   {id:'cosecha',t:'Primera cosecha',d:'Cuando la planta esté lista, cosecha. Si ves araña roja, insecticida.',ok:()=>!!S.flags.harvest1},
   {id:'vender',t:'Primera venta',d:'Véndele a alguien que lleve un $ encima, en la calle.',ok:()=>S.sales>0},
   {id:'ventas',t:`${META_VENTAS} € en ventas`,d:`Gana ${META_VENTAS} € vendiendo.`,ok:()=>S.ch>=3},
@@ -4417,6 +4419,7 @@ const JULEN={
   aqui:['Lo que toca hacer lo tienes en START → OBJETIVO → ITINERARIO. Yo me quedo por aquí hasta que coseches.'],
   ok:{plantar:'Bien plantada. Ahora, el agua: riega cuando la barra azul baje del 30 %.',regar:'Así. Mientras crece, échale el abono de crecimiento: con su pH−, lo aprovecha entero.',
     veg:'Eso es. Cuando empiece a florecer, el de floración. Una dosis por planta.',flor:'Ya está todo. Ahora, paciencia: cuando esté lista, cosecha.'},
+  tarde:['Kaixo. Soy Julen, el hijo de Kiko. Estudio Agrónomas en Ibarbide y le echo una mano en la tienda.','Ya has cosechado sin mí. Aun así, toma: para que pruebes el orgánico.'],
   adios:['Primera cosecha. Ya no me necesitas.','Me vuelvo al growshop con mi aita. Pásate cuando quieras: algún consejo te daré.'],
   tips:['Con el medidor de pH aciertas siempre: la planta aprovecha el abono entero.','El orgánico no acelera la floración. Si te aprieta un plazo, mineral.',
     'Si solo le echas orgánico, con su pH− cítrico, el sustrato se queda vivo: menos plagas.','El pH− MEATZA es ácido fosfórico, mineral: con él ya no hay sustrato vivo.',
@@ -4436,9 +4439,9 @@ function pasoCultivo(){
 async function talkJulen(){
   const N='JULEN';
   if(!S.flags.julen1){
-    await talk(N,JULEN.hola);
+    await talk(N,S.flags.harvest1?JULEN.tarde:JULEN.hola);
     S.items.ofertv+=2;await got('2 dosis de ORTUA BIO CRECIMIENTO');S.items.ophm+=4;await got('4 dosis de pH− ORTUA BIO');
-    await talk(N,JULEN.ph.concat(MINERAL_ORG,JULEN.aqui));S.flags.julen1=true;return;
+    await talk(N,JULEN.ph.concat(MINERAL_ORG,S.flags.harvest1?[]:JULEN.aqui));S.flags.julen1=true;return;
   }
   if(!S.flags.harvest1){
     const c=await ask('¿Qué pasa?',['¿Qué hago ahora?','Mineral u orgánico','Nada'],N);
@@ -5129,7 +5132,7 @@ function bubble(x,y,ch,col){ctx.fillStyle='#26262e';ctx.fillRect(x-1,y-1,9,10);c
   ctx.fillStyle=col;GLYPH[ch].forEach((r,j)=>{for(let i=0;i<5;i++)if(r[i]==='#')ctx.fillRect(x+1+i,y+(j>3?j-0:j)+0,1,1);});}
 function storyMark(id){
   switch(id){case 'kiko':return !S.flags.kiko1||(S.ch===4&&!S.flags.lab);case 'baltasar':return (S.ch===3&&!S.flags.metB)||(S.due>0&&S.money>=S.due)||(S.ch>=8&&!S.encargo&&!(S.encVeto>S.day));case 'tono2':return isNight();
-    case 'jurado':return true;case 'molina':return !S.flags.molina1||!S.protect;case 'darko':return S.ch<6;case 'darko2':return S.ch>=DARKO.ch&&!S.flags.darkoFin;case 'txaro':return S.ch>=2&&!S.flags.txaro||S.ch>=4&&!S.flags.txaro2;case 'inaki':return !S.flags.inaki;}
+    case 'jurado':return true;case 'molina':return !S.flags.molina1||!S.protect;case 'darko':return S.ch<6;case 'darko2':return S.ch>=DARKO.ch&&!S.flags.darkoFin;case 'txaro':return S.ch>=2&&!S.flags.txaro||S.ch>=4&&!S.flags.txaro2;case 'inaki':return !S.flags.inaki;case 'julen':return !S.flags.julen1;}
   return false;
 }
 let LAMPS={};   // farolas de cada zona de fuera (1.10): su luz de noche

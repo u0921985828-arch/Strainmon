@@ -510,6 +510,8 @@ func abonar(p: Dictionary, veg_k: Array) -> void:
 	else:
 		t += "\nSin pH−, el agua del grifo (pH %s) bloquea %d %% del abono." % [Datos.coma(D.ABONO.ph[0]), Datos.jsround((1 - D.ABONO.q[0]) * 100)]
 	await say(t)
+	if ph != null and (true if D.PRODUCTOS[ph].bio else false) != bio:
+		await say(("No te queda pH− de su marca: gastas una dosis de %s." % D.PRODUCTOS[ph].n) + (" Con el mineral, el sustrato ya no está vivo." if bio else ""))
 
 func _fv(p: Dictionary) -> float:
 	return float(p.fv) if p.get("fv") != null else 0.0
@@ -525,9 +527,14 @@ func abono_txt(p: Dictionary) -> String:
 		t += " · sustrato vivo"
 	if S.items.get("medidor", 0) and L.size():
 		var ec := Datos.jsround((.4 + ((.4 if p.get("fvo") else .7) if _fv(p) > 0 else 0.0) + ((.5 if p.get("fo") else .9) if p.fert else 0.0)) * 10) / 10.0
-		var q := minf(_fv(p) if _fv(p) > 0 else 1.0, Cultivo.fq(p) if p.fert else 1.0)
-		t += " · EC %s · pH %s" % [Datos.coma(ec), Datos.coma(D.ABONO.ph[2] if q >= D.ABONO.q[2] else (D.ABONO.ph[1] if q >= D.ABONO.q[1] else D.ABONO.ph[0]))]
+		var iv := _ph_i(_fv(p), p.get("fvo")) if _fv(p) > 0 else 2   # cada dosis, con la q de su marca (phDe)
+		var ifl := _ph_i(Cultivo.fq(p), p.get("fo")) if p.fert else 2
+		t += " · EC %s · pH %s" % [Datos.coma(ec), Datos.coma(D.ABONO.ph[mini(iv, ifl)])]
 	return t
+
+func _ph_i(q: float, bio) -> int:
+	var Q: Array = Cultivo.abo_de(bio).q
+	return 2 if q >= float(Q[2]) else (1 if q >= float(Q[1]) else 0)
 
 # el goteo llega lleno y las garrafas que hubiera vuelven a la mochila; las garrafas llegan llenas; un kit de extracción
 # devuelve el que hubiera (1.11: lo devuelve poner_extra, para el mensaje)

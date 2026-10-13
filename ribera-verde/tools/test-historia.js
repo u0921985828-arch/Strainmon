@@ -883,11 +883,18 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.flags.harvest1 = true; await run(checkStory); await idle();
     R.fin = [S.ch, ents.some(e => e.id === 'julen'), NPCDEF.some(d => d.id === 'julen' && d.map === 'shop' && d.cond()), S.itin.cosecha === S.day];
     R.log = [LOG.includes('JULEN: ' + JULEN.ok.plantar), LOG.includes('JULEN: ' + JULEN.adios[0]), LOG.includes('JULEN: ' + ITINERARIO[8].d)];
+    // riego automático y partida de antes de gVeg/gFlor (abonada, en flor); pH por marca; Julen por primera vez tras la cosecha, con su «!»
+    Object.assign(S, { itin: {}, carpas: [{ t: 'm100', foco: 'cfl', garrafas: true }], pots: [{ sid: 'ria', prog: .8, water: 100, health: 100, fert: true, fq: 1, pest: false }, null, null, null] });
+    S.flags = { llegada: true, letter: true, kiko1: true, julen1: true }; R.vieja = itinSig().id;
+    S.items.medidor = 1; R.ph = abonoTxt({ sid: 'ria', fv: ABONO_BIO.q[0], fvo: 1, org: 1, fert: false }); S.items.medidor = 0;
+    S.flags = { llegada: true, letter: true, kiko1: true, harvest1: true }; S.map = 'shop'; R.mark = storyMark('julen'); const l3 = LOG.length, o0 = S.items.ofertv;
+    await run(talkJulen); await idle(); const L3 = LOG.slice(l3); R.tarde = [L3.includes('JULEN: ' + JULEN.tarde[1]), !L3.includes('JULEN: ' + JULEN.aqui[0]), S.items.ofertv - o0, !!S.flags.julen1, storyMark('julen')];
     S = S0; buildEnts();
   }, () => R.julen && R.obj === ITINERARIO[3].d && R.it.join() === '2,4,true,bus,carta,kiko,julen,plantar'
     && R.p0.join() === '0.95,1,3,Abonada (crecimiento bio) · sustrato vivo' && R.p1.join() === '0.75,0,2,Abonada (floración)' && R.p2.join() === '0.95,1,1,Abonada (floración bio) · sustrato vivo'
     && R.crec[0] > R.crec[1] && R.g[3] > R.g[2] && R.sig === 'cosecha' && R.n === 8 && R.TO.length === 4 && R.TO[0] === '<small>ITINERARIO · 5/14</small>Plantar<br>Ahora: Regar'
-    && R.TO[3] === '<small>ITINERARIO · 8/14</small>Abono de floración<br>Ahora: Primera cosecha' && R.fin.join() === '2,false,true,true' && R.log.every(Boolean) || R);
+    && R.TO[3] === '<small>ITINERARIO · 8/14</small>Abono de floración<br>Ahora: Primera cosecha' && R.fin.join() === '2,false,true,true' && R.log.every(Boolean)
+    && R.vieja === 'cosecha' && R.ph === 'Abonada (crecimiento bio) · sustrato vivo · EC 0,8 · pH 7,5' && R.mark && R.tarde.join() === 'true,true,2,true,false' || R);
   await step('Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también arcón, sala, agenda, mensajes, pedidos y bolsa); con Toño ya visto, sale en el móvil', [], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 3, due: 0, deadline: 0, protect: true }); S.flags.metB = false; delete S.flags.tono;
     for (const k of ['caja', 'rec', 'vencidos', 'protHasta', 'encargo', 'encVeto', 'arcon', 'sala', 'fijos', 'sms', 'envio', 'misiones', 'itin']) delete S[k]; delete S.items.bolsa; migrate();
