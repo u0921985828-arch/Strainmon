@@ -140,6 +140,10 @@ func migrate() -> void:
 		S.protHasta = S.day + int(D.CUOTA_DIAS)
 	if not S.flags.has("diario"):   # 1.25: el diario sale bajo la almohada; las partidas de antes ya lo tenían
 		S.flags.diario = 1
+	if not S.flags.has("vendDia"):   # 1.29.1: el dia de un vendedor era el de la entrega; ahora, el de la cosecha (los de antes no pierden)
+		for v in S.curro.vend:
+			v.erase("dia")
+		S.flags.vendDia = 1
 	for k in S.custom:   # 1.11: los cruces con nombre largo («A × B», de antes) pasan a uno corto, con la misma clave; 1.24: y
 		# los que se llaman como una variedad nueva (Purple Thai × Haze, sin receta antes, se llamaba «Purple Haze»)
 		var C: Dictionary = S.custom[k]

@@ -28,6 +28,7 @@ function migrate(){
   if(S.flags.metB&&!('tono' in S.flags))S.flags.tono=S.day;   // ya conoces a Toño: sale en el móvil (12b-movil)
   if(S.protect&&!S.protHasta)S.protHasta=S.day+CUOTA_DIAS;
   if(!('diario' in S.flags))S.flags.diario=1;   // 1.25: el diario sale bajo la almohada; las partidas de antes ya lo tenían
+  if(!('vendDia' in S.flags)){S.curro.vend.forEach(v=>delete v.dia);S.flags.vendDia=1;}   // 1.29.1: el dia de un vendedor era el de la entrega; ahora, el de la cosecha (los de antes no pierden)
   for(const k in S.custom){   // 1.11: los cruces con nombre largo («A × B», de antes) pasan a uno corto, con la misma clave; 1.24: y
     // los que se llaman como una variedad nueva (Purple Thai × Haze, sin receta antes, se llamaba «Purple Haze»)
     const C=S.custom[k];if(!C.n.includes(' × ')&&C.n.length<=NOM_MAX&&!DEX.some(d=>STRAINS[d].n.toLowerCase()===C.n.toLowerCase()))continue;

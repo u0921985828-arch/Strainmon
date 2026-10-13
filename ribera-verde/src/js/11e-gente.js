@@ -60,7 +60,7 @@ async function contratarVendedor(f){
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote le dejas?'});if(i<0||i>=lots.length)return false;
   const [k,b]=lots[i],ops=V.lotes.filter(g=>g<=Math.floor(b.g));
   const j=await ask(`${f.n} vende a precio de calle y se queda el ${pct0(V.com)} %. ¿Cuánto le dejas?`,ops.map(g=>g+' g').concat(['Nada']));if(j<0||j>=ops.length)return false;
-  useBuds(k,ops[j]);S.curro.vend.push(Object.assign({id:f.id,n:f.n,k,thc:b.thc,g:ops[j],dia:S.day},b.cu?{cu:b.cu}:{}));sfx('sel');
+  useBuds(k,ops[j]);S.curro.vend.push(Object.assign({id:f.id,n:f.n,k,thc:b.thc,g:ops[j]},curaDe(b)));sfx('sel');
   await say(`${f.n}: «Hecho. Cada día te dejo lo vendido en el buzón».`);return false;
 }
 // MÓVIL → GENTE: a quién conoces y cuánto se fía de ti

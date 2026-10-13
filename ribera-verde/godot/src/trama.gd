@@ -2925,9 +2925,8 @@ func contratar_vendedor(f: Dictionary) -> bool:
 	if j < 0 or j >= ops.size():
 		return false
 	use_buds(k, ops[j])
-	var vd := {"id": f.id, "n": f.n, "k": k, "thc": b.thc, "g": ops[j], "dia": S.day}
-	if b.get("cu"):
-		vd.cu = b.cu
+	var vd := {"id": f.id, "n": f.n, "k": k, "thc": b.thc, "g": ops[j]}
+	vd.merge(cura_de(b))
 	S.curro.vend.append(vd)
 	sfx("sel")
 	await say("%s: «Hecho. Cada día te dejo lo vendido en el buzón»." % f.n)

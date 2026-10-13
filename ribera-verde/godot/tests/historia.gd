@@ -2900,8 +2900,8 @@ func _pasos() -> void:
 			and R.cap == 3000 and R.bolsa == 1 and R.control == R.a2 and re("^Se llevan %d g\\." % int(floor(5 + R.a2)), R.redada) and R.a3 == 0
 			and R.sacar == "3000,500,true" and re("Se han llevado 0 €, 50 g y 1,5 g de rosin\\.", R.darko) and R.a4 == "{\"buds\":{\"ria\":{\"g\":51,\"thc\":12}},\"rosin\":{\"ria\":{\"g\":1.5,\"thc\":36}}}", R))
 	# 1.29: el curado en el arcón con los tarros y lo que pierde lo que no está curado
-	step("Curado (1.29): los tarros de Kiko (30 €); en el arcón, con ellos, un lote se cura en 2 días (el THC no sube), se vende un 15 % más caro y ya no pierde; sin curar, desde el 4.º día pierde un 2 % de THC al día y lo avisa; al juntar lotes, por gramos; la cata lo dice; los lotes de antes de la 1.29, nada",
-		["Tarros de curado", "Salir", "^Thai", "^100 g", "^Catar", "^Catar"], func():
+	step("Curado (1.29): los tarros de Kiko (30 €); en el arcón, con ellos, un lote se cura en 2 días (el THC no sube), se vende un 15 % más caro y ya no pierde; sin curar, desde el 4.º día pierde un 2 % de THC al día y lo avisa; al juntar lotes, por gramos; la cata lo dice; los lotes de antes de la 1.29, nada; lo que lleva un vendedor, también, desde su cosecha (1.29.1)",
+		["Tarros de curado", "Salir", "^Thai", "^100 g", "^Catar", "^Catar", "^Skunk #1", "^25 g", "^Thai", "^25 g"], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))
 		J.S.merge({"ch": 5, "map": "home", "money": 100, "buds": {}, "rosin": {}, "arcon": {"buds": {}, "rosin": {}}, "caja": null, "envio": [], "due": 0, "heat": 0, "protect": false, "orden": 0, "rel": {}, "mDay": 0}, true)
@@ -2950,6 +2950,12 @@ func _pasos() -> void:
 		await run(func(): await J.lote_accion("thai"))
 		await run(func(): await J.lote_accion("ria"))
 		R.cata = "|".join(LOG.slice(l0).filter(func(l): return re("^(Catas|Thai:|Skunk #1:)", l)))
+		J.S.curro.vend = []   # 1.29.1: el vendedor se lleva el día de la cosecha
+		await run(func(): await J.contratar_vendedor({"id": "vC", "n": "Iker"}))
+		R.vc = J.S.curro.vend[0].duplicate()
+		await run(func(): await J.contratar_vendedor({"id": "vC2", "n": "Ane"}))   # el curado también va con él
+		R.vc2 = J.S.curro.vend[1].duplicate()
+		R.ns = J.new_state().flags.vendDia
 		var t := {"g": 100, "thc": 20, "dia": 10, "cu": 1}
 		J.junta_lote(t, 100, 10, 0, 20)
 		R.junta = t
@@ -2960,9 +2966,18 @@ func _pasos() -> void:
 		var w2 := {"id": "plV", "n": "Unai", "rol": "calle", "k": "hindu", "thc": 18, "g": 50}
 		J.S.plantilla = [w1, w2]   # la plantilla también pierde; lo de antes vuelve sin día
 		J.S.arcon.buds = {}
+		J.S.curro.vend.append({"id": "vD", "n": "Unai", "k": "hindu", "thc": 18, "g": 50})
 		J.curado_dia([])
 		J.libre(w2)
 		R.pl = [w1.thc, jj(J.S.arcon.buds.hindu)]
+		R.vd = [J.S.curro.vend[0].thc, jj(J.S.curro.vend[2]), J.S.curro.vend[1].thc]   # y los vendedores (1.29.1)
+		J.S.curro.vend = [{"id": "vE", "n": "Ane", "k": "thai", "thc": 16, "g": 25, "dia": 3}]   # el día de antes era el de la entrega
+		J.S.flags.erase("vendDia")
+		J.migrate()
+		R.mig = [jj(J.S.curro.vend[0]), J.S.flags.vendDia]
+		J.S.curro.vend[0].dia = 7
+		J.migrate()
+		R.mig2 = J.S.curro.vend[0].dia
 		capta = false
 		TO = to0
 		J.S = S0,
@@ -2970,7 +2985,10 @@ func _pasos() -> void:
 			and R.ria3 == 20 and absf(R.ria4 - 19.6) < 1e-9 and absf(R.ria5 - 19.208) < 1e-9 and R.thai5 == 16 and jj(R.viejo) == "{\"g\":30,\"thc\":18}" and R.dias == 5
 			and R.to == "Curada en el arcón: Thai|Sin curar, pierde THC: Skunk #1" and R.sale.cu == 1 and R.sale.dia == R.nuevo.dia and absf(R.cal[0] - 1.15) < 1e-9 and R.cal[1] == 1 and R.cal[2] == 1
 			and R.mayor == 414 and re("^Thai: 100 g · 16,0 % · curada\\|Catas Thai: .+\\. Bien curada: suave y con todo el aroma\\.\\|Skunk #1: 100 g · 19,2 % · sin curar\\|Catas Skunk #1: .+\\. Sin curar del todo: rasca y huele a verde\\.$", R.cata)
-			and jj(R.junta) == "{\"g\":200,\"thc\":15,\"dia\":15,\"cu\":0.5}" and R.jv.g == 40 and R.jv.dia > 0 and not R.jv.has("cu") and absf(R.pl[0] - 19.6) < 1e-9 and R.pl[1] == "{\"g\":50,\"thc\":18}", R))
+			and jj(R.junta) == "{\"g\":200,\"thc\":15,\"dia\":15,\"cu\":0.5}" and R.jv.g == 40 and R.jv.dia > 0 and not R.jv.has("cu") and absf(R.pl[0] - 19.6) < 1e-9 and R.pl[1] == "{\"g\":50,\"thc\":18}"
+			and R.vc.dia == R.nuevo.dia and not R.vc.has("cu") and absf(R.vc.thc - 19.208) < 1e-9 and R.vc.g == 25 and absf(R.vd[0] - 19.208 * .98) < 1e-9 and R.vd[1] == "{\"id\":\"vD\",\"n\":\"Unai\",\"k\":\"hindu\",\"thc\":18,\"g\":50}"
+			and R.vc2.cu == 1 and R.vc2.dia == R.sale.dia and R.vc2.thc == 16 and R.vd[2] == 16 and R.ns == 1
+			and R.mig[0] == "{\"id\":\"vE\",\"n\":\"Ane\",\"k\":\"thai\",\"thc\":16,\"g\":25}" and R.mig[1] == 1 and R.mig2 == 7, R))
 	step("Móvil (1.10): START → MÓVIL; pedir a Kiko (+15 %, llega mañana) y su SMS en Mensajes; llamar a Kiko; quien te compra te da su número y, llamado, viene a la calle (20 min, +1 de calor, una vez al día)",
 		["MÓVIL", "Pedir a Kiko", "^Abono", "Salir", "Colgar", "SALIR", "MÓVIL", "Mensajes", "<B>", "Llamar", "^Kiko", "Colgar", "SALIR", "^Skunk", "Rebaja",
 			"MÓVIL", "Llamar", "^(?!Kiko|Nada)", "^Skunk", "Rebaja", "SALIR", "MÓVIL", "Llamar", "^(?!Kiko|Nada)", "Colgar", "SALIR"], func():

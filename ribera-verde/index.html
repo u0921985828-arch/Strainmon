@@ -1747,7 +1747,7 @@ const MS_PER_MIN=1000/6;
 const P={x:0,y:0,px:0,py:0,dir:'down',moving:false,fx:0,fy:0,t:0,dur:240,parity:0,hold:0,chain:false,bumpT:0};
 const DV={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]},OPP={up:'down',down:'up',left:'right',right:'left'};
 const CH_TITLES={1:'La herencia',2:'La calle',3:'La deuda',4:'Genética',5:'El sargento',6:'La Copa de Ribera',7:'Libertad',8:'Tu imperio'};
-function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,min:8*60,money:150,hp:30,hpMax:30,heat:0,rep:0,ch:0,flags:{diario:0},sales:0,
+function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,min:8*60,money:150,hp:30,hpMax:30,heat:0,rep:0,ch:0,flags:{diario:0,vendDia:1},sales:0,
   seeds:{},buds:{},rosin:{},items:Object.assign({fert:0,fertv:0,phm:0,ofert:0,ofertv:0,ophm:0,medidor:0,insect:0,spray:0,bocata:1,prensa:0,bolsa:0,analizador:0,tarros:0},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},gen:{},pedido:[],esquejes:[],bandejas:[],fenos:{},fenoN:0,fnom:{},eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
@@ -3215,7 +3215,7 @@ function curadoDia(av){
   if(S.items.tarros)for(const [k,b] of Object.entries(S.arcon.buds))if((b.cu||0)<1){b.cu=Math.min(1,(b.cu||0)+1/CURADO.dias);if(b.cu>=1)listos.push(lotNombre(k));}
   for(const L of [S.buds,S.arcon.buds,S.caja?S.caja.buds:{}])for(const [k,b] of Object.entries(L))
     if(b.dia!=null&&(b.cu||0)<1&&S.day-b.dia>CURADO.fresco){b.thc*=1-CURADO.pierde*(1-(b.cu||0));if(S.day-b.dia===CURADO.fresco+1)pierden.push(lotNombre(k));}
-  for(const w of S.plantilla)if(w.rol==='calle'&&w.dia!=null&&(w.cu||0)<1&&S.day-w.dia>CURADO.fresco)w.thc*=1-CURADO.pierde*(1-(w.cu||0));   // lo que lleva alguien de la plantilla, igual (sin aviso)
+  for(const w of S.plantilla.filter(w=>w.rol==='calle').concat(S.curro.vend))if(w.dia!=null&&(w.cu||0)<1&&S.day-w.dia>CURADO.fresco)w.thc*=1-CURADO.pierde*(1-(w.cu||0));   // lo que lleva alguien de la plantilla o un vendedor (1.29.1), igual (sin aviso)
   if(listos.length)av.push('Curada en el arcón: '+yLista(listos));
   if(pierden.length)av.push('Sin curar, pierde THC: '+yLista(pierden));
 }
@@ -4209,7 +4209,7 @@ async function contratarVendedor(f){
   const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote le dejas?'});if(i<0||i>=lots.length)return false;
   const [k,b]=lots[i],ops=V.lotes.filter(g=>g<=Math.floor(b.g));
   const j=await ask(`${f.n} vende a precio de calle y se queda el ${pct0(V.com)} %. ¿Cuánto le dejas?`,ops.map(g=>g+' g').concat(['Nada']));if(j<0||j>=ops.length)return false;
-  useBuds(k,ops[j]);S.curro.vend.push(Object.assign({id:f.id,n:f.n,k,thc:b.thc,g:ops[j],dia:S.day},b.cu?{cu:b.cu}:{}));sfx('sel');
+  useBuds(k,ops[j]);S.curro.vend.push(Object.assign({id:f.id,n:f.n,k,thc:b.thc,g:ops[j]},curaDe(b)));sfx('sel');
   await say(`${f.n}: «Hecho. Cada día te dejo lo vendido en el buzón».`);return false;
 }
 // MÓVIL → GENTE: a quién conoces y cuánto se fía de ti
@@ -5604,6 +5604,7 @@ function migrate(){
   if(S.flags.metB&&!('tono' in S.flags))S.flags.tono=S.day;   // ya conoces a Toño: sale en el móvil (12b-movil)
   if(S.protect&&!S.protHasta)S.protHasta=S.day+CUOTA_DIAS;
   if(!('diario' in S.flags))S.flags.diario=1;   // 1.25: el diario sale bajo la almohada; las partidas de antes ya lo tenían
+  if(!('vendDia' in S.flags)){S.curro.vend.forEach(v=>delete v.dia);S.flags.vendDia=1;}   // 1.29.1: el dia de un vendedor era el de la entrega; ahora, el de la cosecha (los de antes no pierden)
   for(const k in S.custom){   // 1.11: los cruces con nombre largo («A × B», de antes) pasan a uno corto, con la misma clave; 1.24: y
     // los que se llaman como una variedad nueva (Purple Thai × Haze, sin receta antes, se llamaba «Purple Haze»)
     const C=S.custom[k];if(!C.n.includes(' × ')&&C.n.length<=NOM_MAX&&!DEX.some(d=>STRAINS[d].n.toLowerCase()===C.n.toLowerCase()))continue;

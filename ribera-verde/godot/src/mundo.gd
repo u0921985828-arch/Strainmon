@@ -307,8 +307,8 @@ func curado_dia(av: Array) -> void:
 				b.thc *= 1 - D.CURADO.pierde * (1 - float(b.get("cu", 0)))
 				if S.day - b.dia == D.CURADO.fresco + 1:
 					pierden.append(lot_nombre(k))
-	for w in S.plantilla:   # lo que lleva alguien de la plantilla, igual (sin aviso)
-		if w.get("rol") == "calle" and w.get("dia") != null and float(w.get("cu", 0)) < 1 and S.day - w.dia > D.CURADO.fresco:
+	for w in S.plantilla.filter(func(x): return x.get("rol") == "calle") + S.curro.vend:   # lo que lleva alguien de la plantilla o un vendedor (1.29.1), igual (sin aviso)
+		if w.get("dia") != null and float(w.get("cu", 0)) < 1 and S.day - w.dia > D.CURADO.fresco:
 			w.thc *= 1 - D.CURADO.pierde * (1 - float(w.get("cu", 0)))
 	if listos.size():
 		av.append("Curada en el arcón: " + y_lista(listos))

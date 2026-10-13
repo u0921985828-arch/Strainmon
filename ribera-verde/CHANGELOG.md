@@ -1,5 +1,13 @@
 # Cambios
 
+## 1.29.1 · 13 de octubre de 2026
+
+Lo que quedaba del curado. Godot, 0.23.1.
+
+- El lote que le dejas a un vendedor de la agenda también pierde THC si no está curado, como el de la plantilla: cuenta desde el día de la cosecha, no desde el día en que se lo das, y vende al THC que le queda. Curado, no pierde.
+- Las partidas de antes: el día que guardaban los vendedores era el de la entrega; se borra al cargar, así que lo que ya llevan no pierde nada (como los lotes de antes de la 1.29).
+- Igual en Godot. Tests: `npm test` 111/111 (el paso del curado añade el vendedor: el día de la cosecha, lo que pierde, uno de antes que no pierde y la partida vieja); Godot, historia 111 pasos.
+
 ## 1.29.0 · 13 de octubre de 2026
 
 La hierba se cura y, sin curar, se estropea. Godot, 0.23.0.

@@ -93,7 +93,7 @@ function curadoDia(av){
   if(S.items.tarros)for(const [k,b] of Object.entries(S.arcon.buds))if((b.cu||0)<1){b.cu=Math.min(1,(b.cu||0)+1/CURADO.dias);if(b.cu>=1)listos.push(lotNombre(k));}
   for(const L of [S.buds,S.arcon.buds,S.caja?S.caja.buds:{}])for(const [k,b] of Object.entries(L))
     if(b.dia!=null&&(b.cu||0)<1&&S.day-b.dia>CURADO.fresco){b.thc*=1-CURADO.pierde*(1-(b.cu||0));if(S.day-b.dia===CURADO.fresco+1)pierden.push(lotNombre(k));}
-  for(const w of S.plantilla)if(w.rol==='calle'&&w.dia!=null&&(w.cu||0)<1&&S.day-w.dia>CURADO.fresco)w.thc*=1-CURADO.pierde*(1-(w.cu||0));   // lo que lleva alguien de la plantilla, igual (sin aviso)
+  for(const w of S.plantilla.filter(w=>w.rol==='calle').concat(S.curro.vend))if(w.dia!=null&&(w.cu||0)<1&&S.day-w.dia>CURADO.fresco)w.thc*=1-CURADO.pierde*(1-(w.cu||0));   // lo que lleva alguien de la plantilla o un vendedor (1.29.1), igual (sin aviso)
   if(listos.length)av.push('Curada en el arcón: '+yLista(listos));
   if(pierden.length)av.push('Sin curar, pierde THC: '+yLista(pierden));
 }
