@@ -554,7 +554,7 @@ func talk_nerea():
 func landrace_trueque() -> String:
 	var r := []
 	for k in D.REGALO:
-		if S.disc.get(k) and str(D.STRAINS[k].o).begins_with("Landrace"):
+		if S.disc.get(k) and str(D.STRAINS[k].o).begins_with("Landrace") and not D.BANCO.any(func(b): return b[0] == k):
 			r.append(k)
 	var l := []
 	for b in D.BANCO:

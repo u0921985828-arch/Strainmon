@@ -2771,6 +2771,7 @@ func _pasos() -> void:
 		for k in D.REGALO:
 			if not J.S.seeds.get(k):
 				J.S.seeds[k] = 1
+		J.S.seeds.chitral = 0
 		J.S.seeds.lamb = 0
 		R.tq = J.landrace_trueque()
 		J.S.seeds.lamb = 1

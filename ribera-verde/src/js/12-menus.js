@@ -67,7 +67,7 @@ const recetaTxt=o=>o.k.map(k=>STRAINS[k].n).join(o.ord?' × ':' + ')+(o.ord?', e
 const REGALO={ria:'te las da Kiko al conocerlo',rif:'te las da Kiko con la mesa de genética',hindu:'Txaro, la vecina, por 5 g de cogollo',
   chitral:'Txaro, por 10 g de una índica',malawi:'Iñaki, el del muelle, al venderle 10 g',acapulco:'escondidas en el parque del barrio',
   choco:'en la nevera del piso, en un bote de cristal',oaxaca:'en un sobre al fondo de la caja fuerte de la tía',lamb:'escondidas en Puerto Viejo, en un arbusto al fondo del callejón del este',
-  kerala:'escondidas en un arbusto junto a un caserío, al este de Mendialde',mangarosa:'escondidas en un arbusto de Errotabarri',hawai:'escondidas en un seto del Ensanche, en Ibarbide',
+  kerala:'escondidas en un arbusto junto a una borda, al este de Mendialde',mangarosa:'escondidas en un arbusto de Errotabarri',hawai:'escondidas en un seto del Ensanche, en Ibarbide',
   lao:'Miren, en Errotabarri, con la última página del diario'};
 // el diario de la tía Maite (1.16): el recetario es su cuaderno; una nota suya por variedad (1.25: todas, no solo las de receta)
 const DIARIO={ria:'La primera que fijamos Kiko y yo. Tres padres y mucha paciencia: cuando huele a mofeta, va bien.',
@@ -134,7 +134,7 @@ const DIARIO={ria:'La primera que fijamos Kiko y yo. Tres padres y mucha pacienc
   beldia:'La vieja de Ketama, la de antes de los híbridos. Para tamizar en seco.',
   oaxaca:'Mexicana de la sierra. Las guardé bajo llave, en la caja de detrás del diploma. Con Chocolate Thai, la Purple Thai.',
   panama:'Roja de Panamá, de flor larguísima. Con Congolese o con Malawi Gold.',
-  kerala:'Del sur de la India. Escondí unas en un arbusto junto a un caserío, al este de Mendialde. Con Manga Rosa, la White Widow.',
+  kerala:'Del sur de la India. Escondí unas en un arbusto junto a una borda, al este de Mendialde. Con Manga Rosa, la White Widow.',
   libano:'Del valle de la Bekaa: el hachís rubio. Ninguna receta; prueba tú.',
   mangarosa:'Brasileña, de cogollo rosado. Dejé unas en Errotabarri, en un arbusto. Con Kerala, la White Widow.',
   durban:'Sudafricana, de las sativas más rápidas. Ninguna receta: para tus cruces.',
@@ -150,11 +150,11 @@ const DIARIO={ria:'La primera que fijamos Kiko y yo. Tres padres y mucha pacienc
   whiteshark:'Super Skunk con las dos de la White Widow. Huele fuerte: filtro antes de plantarla.',
   hawaisnow:'Tres Haze y la de Hawái: no me cabía en ninguna carpa. Si la sacas, a 12/12 pronto.',
   jackflash:'La Jack Herer con más Haze y Super Skunk. Termina la Jack primero.',
-  jack47:'La Jack Herer con la AK-47: la Jack para los que tienen prisa.',
+  jack47:'Si terminas la Jack, con la AK-47: la Jack para los que tienen prisa.',
   sourtangie:'Gasoil y mandarina. Suena raro, pero funciona.',
   ice:'Tanta resina que parece helada. La de las extracciones.',
   nlbigbud:'Northern Lights con Big Bud: el arcón lleno. Ponle malla, que las ramas no aguantan.',
-  criticaljack:'Critical Mass con Jack Herer: la producción con el efecto. Hay quien dice que su Critical era otra.',
+  criticaljack:'Si terminas la Jack, con la Critical Mass: la producción con el efecto. Hay quien dice que su Critical era otra.',
   critical47:'Critical Mass con AK-47: corta y generosa. La de los balcones.',
   criticalcheese:'Critical Mass con Cheese. Huele a queso hasta en la escalera.',
   nlblue:'Northern Lights con Blueberry: dulce, corta y obediente.'};

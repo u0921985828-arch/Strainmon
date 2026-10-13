@@ -52,7 +52,7 @@ async function talkNerea(){
 }
 // la landrace del trueque: la primera del banco (las de su capítulo) que no tienes en la Genoteca; si no, una según el día. 1.26: también
 // las que no se venden (REGALO), ya descubiertas, y antes que nada una de esas de la que no te queden semillas: que no se pierdan
-function landraceTrueque(){const r=Object.keys(REGALO).filter(k=>S.disc[k]&&/^Landrace/.test(STRAINS[k].o)),l=BANCO.filter(([,,ch])=>S.ch>=ch).map(b=>b[0]).concat(r);
+function landraceTrueque(){const r=Object.keys(REGALO).filter(k=>S.disc[k]&&/^Landrace/.test(STRAINS[k].o)&&!BANCO.some(b=>b[0]===k)),l=BANCO.filter(([,,ch])=>S.ch>=ch).map(b=>b[0]).concat(r);
   return l.find(k=>!S.disc[k])||r.find(k=>!S.seeds[k])||l[S.day%l.length];}
 async function talkAndoni(){
   const N='ANDONI',T=TRUEQUE;

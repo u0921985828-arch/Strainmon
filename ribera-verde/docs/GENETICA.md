@@ -65,7 +65,7 @@
 | 57 | Sour Diesel | 27% | 450 | 4 | 60% | 30 % | cruce (F1 en la mesa) | `#90b448` | `#6fa53e` | Cruce: Chemdawg × Super Skunk · ≈ origen incierto |
 | 58 | Kali 47 | 21% | 450 | 3,5 | 65% | 30 % | cruce (F1 en la mesa) | `#b0cc68` | `#72a63e` | Cruce: Kali Mist × AK-47 |
 | 59 | Critical Kali Mist | 21% | 530 | 3,5 | 75% | 45 % | cruce (F1 en la mesa) | `#98c058` | `#5c9a48` | Cruce: Critical Mass × Kali Mist |
-| 60 | Kerala | 16% | 350 | 5 | 50% | 10 % | landrace | `#b8cc60` | `#82a73e` | En un arbusto junto a un caserío, al este de Mendialde (42,11): 2 semillas |
+| 60 | Kerala | 16% | 350 | 5 | 50% | 10 % | landrace | `#b8cc60` | `#82a73e` | En un arbusto junto a una borda, al este de Mendialde (42,11): 2 semillas |
 | 61 | Lebanese | 14% | 380 | 3 | 75% | 85 % | landrace | `#a4b45c` | `#4f9a3c` | Banco de semillas del PC, sobre de 10 por 25 € (cap. 3; llega al día siguiente) |
 | 62 | Manga Rosa | 15% | 380 | 4,5 | 55% | 5 % | landrace | `#c4c060` | `#86a83e` | En un arbusto de Errotabarri (28,10): 2 semillas (cap. 3) |
 | 63 | Durban Poison | 18% | 430 | 3,5 | 65% | 0 % | landrace | `#b4d060` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 40 € (cap. 5; llega al día siguiente) |
@@ -78,18 +78,18 @@
 | 70 | Zamal | 15% | 330 | 5 | 50% | 0 % | landrace | `#a8cc68` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 40 € (cap. 5; llega al día siguiente) |
 | 71 | Malana | 17% | 330 | 3,5 | 70% | 70 % | landrace | `#7a8a50` | `#549d3d` | Banco de semillas del PC, sobre de 10 por 40 € (cap. 4; llega al día siguiente) |
 | 72 | Kashmiri | 15% | 350 | 3 | 75% | 85 % | landrace | `#6e8a48` | `#498c38` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
-| 73 | Vietnamese Black | 15% | 380 | 4,5 | 55% | 20 % | landrace | `#6a7a4a` | `#7aa63e` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 4; llega al día siguiente) |
+| 73 | Vietnamese Black | 15% | 380 | 5 | 55% | 20 % | landrace | `#6a7a4a` | `#7aa63e` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 4; llega al día siguiente) |
 | 74 | Ethiopian Highland | 14% | 330 | 4 | 60% | 10 % | landrace | `#b0c060` | `#82a73e` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 5; llega al día siguiente) |
-| 75 | Chronic | 20% | 600 | 3 | 80% | 70 % | cruce (F1 en la mesa) | `#9cc858` | `#549d3d` | Cruce: Skunk #1 × Northern Lights × AK-47 |
+| 75 | Chronic | 20% | 600 | 3,5 | 80% | 70 % | cruce (F1 en la mesa) | `#9cc858` | `#549d3d` | Cruce: Skunk #1 × Northern Lights × AK-47 |
 | 76 | White Rhino | 20% | 550 | 3,5 | 80% | 80 % | cruce (F1 en la mesa) | `#d8e4c4` | `#4d913a` | Cruce: White Widow × índica norteamericana · ≈ origen incierto |
-| 77 | White Shark | 19% | 530 | 3 | 75% | 60 % | cruce (F1 en la mesa) | `#d0e0cc` | `#5ba33e` | Cruce: Super Skunk × brasileña × India del Sur |
+| 77 | White Shark | 19% | 530 | 3,5 | 75% | 75 % | cruce (F1 en la mesa) | `#d0e0cc` | `#50973b` | Cruce: Super Skunk × brasileña × India del Sur |
 | 78 | Hawaiian Snow | 22% | 400 | 5 | 50% | 10 % | cruce (F1 en la mesa) | `#d4ecc8` | `#82a73e` | Cruce: Hawaiian Haze × Neville's Haze × Haze |
 | 79 | Jack Flash | 21% | 500 | 3,5 | 65% | 45 % | cruce (F1 en la mesa) | `#c4dc88` | `#67a53e` | Cruce: Jack Herer × Super Skunk × Haze |
 | 80 | Jack 47 | 21% | 500 | 3,5 | 70% | 40 % | cruce (F1 en la mesa) | `#bcd47c` | `#6ba53e` | Cruce: Jack Herer × AK-47 |
 | 81 | Sour Tangie | 23% | 450 | 4 | 60% | 20 % | cruce (F1 en la mesa) | `#d0b848` | `#7aa63e` | Cruce: Sour Diesel × Tangie |
-| 82 | Ice | 20% | 550 | 3 | 80% | 80 % | cruce (F1 en la mesa) | `#c8dccc` | `#4d913a` | Cruce: Afghani × Northern Lights × Shiva Skunk |
+| 82 | Ice | 20% | 550 | 3,5 | 80% | 80 % | cruce (F1 en la mesa) | `#c8dccc` | `#4d913a` | Cruce: Afghani × Northern Lights × Shiva Skunk |
 | 83 | NL × Big Bud | 18% | 630 | 3 | 80% | 85 % | cruce (F1 en la mesa) | `#a4c050` | `#498c38` | Cruce: Northern Lights × Big Bud |
-| 84 | Critical Jack | 21% | 550 | 3,5 | 70% | 55 % | cruce (F1 en la mesa) | `#bcd870` | `#5fa43e` | Cruce: Critical × Jack Herer · ≈ origen incierto |
+| 84 | Critical Jack | 21% | 550 | 3,5 | 70% | 40 % | cruce (F1 en la mesa) | `#bcd870` | `#6ba53e` | Cruce: Critical × Jack Herer · ≈ origen incierto |
 | 85 | Critical 47 | 20% | 550 | 3 | 75% | 55 % | cruce (F1 en la mesa) | `#a8cc60` | `#5fa43e` | Cruce: Critical × AK-47 · ≈ origen incierto |
 | 86 | Critical Cheese | 19% | 550 | 3 | 75% | 70 % | cruce (F1 en la mesa) | `#b0c464` | `#549d3d` | Cruce: Critical × Cheese · ≈ origen incierto |
 | 87 | Northern Light Blue | 19% | 500 | 3 | 75% | 85 % | cruce (F1 en la mesa) | `#7aa0b8` | `#498c38` | Cruce: Northern Lights × Blueberry |
@@ -233,7 +233,7 @@ Los híbridos clásicos, de las landraces a la 4.ª generación. ✔ padres docu
 | 3.ª | Kali 47 | Kali Mist × AK-47 | ✔ | 21% | 30 % |
 | 3.ª | Critical Kali Mist | Critical Mass × Kali Mist | ✔ | 21% | 45 % |
 | 3.ª | Blue Widow | Blueberry × White Widow | ✔ | 19% | 65 % |
-| 3.ª | White Shark | Super Skunk × brasileña × India del Sur | ✔ | 19% | 60 % |
+| 3.ª | White Shark | Super Skunk × brasileña × India del Sur | ✔ | 19% | 75 % |
 | 3.ª | Hawaiian Snow | Hawaiian Haze × Neville's Haze × Haze | ✔ | 22% | 10 % |
 | 3.ª | Ice | Afghani × Northern Lights × Shiva Skunk | ✔ | 20% | 80 % |
 | 3.ª | Critical 47 | Critical × AK-47 | ≈ | 20% | 55 % |
@@ -244,7 +244,7 @@ Los híbridos clásicos, de las landraces a la 4.ª generación. ✔ padres docu
 | 4.ª | Jack 47 | Jack Herer × AK-47 | ✔ | 21% | 40 % |
 | 4.ª | Sour Tangie | Sour Diesel × Tangie | ✔ | 23% | 20 % |
 | 4.ª | NL × Big Bud | Northern Lights × Big Bud | ✔ | 18% | 85 % |
-| 4.ª | Critical Jack | Critical × Jack Herer | ≈ | 21% | 55 % |
+| 4.ª | Critical Jack | Critical × Jack Herer | ≈ | 21% | 40 % |
 
 ## Recetas de cruce (58)
 

@@ -70,7 +70,7 @@ const ROOT = path.join(__dirname, '..');
     rif: 'Kiko, al montar la mesa de genética: de un amigo de Mazar-i-Sharif (cap. 4)', hindu: 'Txaro, a cambio de 5 g para hacer aceite (parque): del viaje de su marido a Pakistán en 1976', acapulco: 'En un bote de carrete escondido en un arbusto del parque (2,26), «Guerrero, 1979»', malawi: 'Iñaki, el marinero, tras venderle 10 g (muelle): de un marinero de Malaui en Mombasa',
     // 1.25: las que no están en el banco (su nota del diario dice dónde)
     choco: 'En la nevera del piso, en un bote de cristal: 3 semillas, una vez', oaxaca: 'En un sobre al fondo de la caja fuerte de la tía, al abrirla: 3 semillas',
-    lamb: 'En un arbusto al fondo del callejón del este de Puerto Viejo (37,6): 2 semillas (cap. 2)', kerala: 'En un arbusto junto a un caserío, al este de Mendialde (42,11): 2 semillas',
+    lamb: 'En un arbusto al fondo del callejón del este de Puerto Viejo (37,6): 2 semillas (cap. 2)', kerala: 'En un arbusto junto a una borda, al este de Mendialde (42,11): 2 semillas',
     mangarosa: 'En un arbusto de Errotabarri (28,10): 2 semillas (cap. 3)', hawai: 'En un seto del Ensanche de Ibarbide (16,14): 2 semillas (cap. 4)',
     lao: 'Miren, en Errotabarri, con la última página del diario (20 g de Purple Thai): 3 semillas (cap. 4)' };
 

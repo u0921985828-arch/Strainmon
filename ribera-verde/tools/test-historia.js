@@ -840,7 +840,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     R.sem = ['lamb', 'kerala', 'mangarosa', 'hawai'].map(k => S.seeds[k] || 0).join();
     S.map = 'errotabarri'; S.flags.pagina = S.day; await run(talkMiren); R.lao = S.seeds.lao; R.laoF = S.flags.lao === S.day;
     R.nuevas = DEX.filter(k => S.disc[k]).length - n0;
-    BANCO.forEach(b => { S.disc[b[0]] = 1; }); S.ch = 8; Object.keys(REGALO).forEach(k => { if (!S.seeds[k]) S.seeds[k] = 1; }); S.seeds.lamb = 0; R.tq = landraceTrueque();
+    BANCO.forEach(b => { S.disc[b[0]] = 1; }); S.ch = 8; Object.keys(REGALO).forEach(k => { if (!S.seeds[k]) S.seeds[k] = 1; }); S.seeds.chitral = 0; S.seeds.lamb = 0; R.tq = landraceTrueque();
     S.seeds.lamb = 1; R.tq2 = landraceTrueque(); S = S0; enterMap('home', 5, 5, 'up');
   }, () => !R.antes && R.alm === 3 && R.f && R.despues && !R.otra && R.sillon && R.mig === 1 && R.banco === 'mich,punto,colgold,thai,kif,beldia,chitral,nepal,congo,hthai,panama,libano,durban,kashmir,swazi,malana,vietblack,zamal,etiopia' && R.fuera === ''
     && R.toast && R.choco === 3 && R.oax === 3 && R.oax2 && R.arb === 'true:bush:lamb,true:bush:kerala,true:bush:mangarosa,true:bush:hawai' && R.sem === '2,2,2,2' && R.lao === 3 && R.laoF && R.nuevas === 7
