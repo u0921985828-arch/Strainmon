@@ -728,13 +728,26 @@ func bed_action(txt := ""):
 	await wait(500)
 	await fade(0)
 	var hoy = S.luz if S.get("luz") and S.day > d0 else null
+	var diario: bool = piso and not S.flags.get("diario")   # el diario de la tía, bajo la almohada (1.25)
+	if diario:
+		S.flags.diario = S.day
 	save()
 	toast("Has descansado" + ((" · Luz −" + Datos.eur(hoy.e)) if hoy and hoy.e else "") + ((" · Olor: calor +" + n(hoy.o)) if hoy and hoy.o else "") + " · Partida guardada", 1800)
 	if not piso:
 		return
+	if diario:
+		await almohada()
 	if S.day > d0 and S.ch == 7 and not S.flags.get("robo") and (S.money > 1000 or gramos_flor() + arcon_g() + arcon_r() / D.ROSIN.rend > 100):
 		await robo_darko()   # la amenaza de Darko (1.10; con lo del arcón)
 	await aviso_plaga(antes)
+
+# la primera vez que duermes en el piso (1.25): el diario de la tía Maite, bajo la almohada (S.flags.diario; el recetario, en trama)
+func almohada() -> void:
+	await say("Das vueltas y más vueltas. Al ahuecar la almohada notas algo duro dentro de la funda.")
+	sfx("get")
+	await say("Un cuaderno de tapas verdes, gastado de tanto abrirlo: «Cuaderno de cultivo · M.». El diario de la tía Maite.")
+	await say("Una página por cada variedad que conoció: lo que apuntó de ella, las recetas de sus cruces y dónde guardaba las semillas que no se venden.")
+	await say("Lo tienes en START → GENOTECA. Algunas landraces no están en ningún banco: habrá que buscarlas.")
 
 static func _lista(L: Array) -> String:
 	return L[0] if L.size() == 1 else ", ".join(L.slice(0, -1)) + " y " + L[-1]
@@ -820,7 +833,7 @@ func mueble_action(k):
 		await carro_action()
 		return
 	if k == "sillon":
-		var o := ["Leer el diario de la tía Maite", "Cambiar el tapizado", "Nada"]
+		var o := (["Leer el diario de la tía Maite"] if S.flags.get("diario") else []) + ["Cambiar el tapizado", "Nada"]
 		var oi: int = await ask("Tu sillón de lectura. La lámpara da una luz cálida.", o)
 		var c: String = o[oi] if oi >= 0 and oi < o.size() else ""
 		if c == "Cambiar el tapizado":

@@ -28,7 +28,11 @@ async function diplomaAction(){
   await say('Clic. La caja se abre.');
   await say(`Dentro hay ${eur(MAITE_CAJA)} y una nota de la tía: «Para ti, {N}. Lo que guardes aquí no te lo quita nadie en la calle».`);
   await say(`Caben ${eur(CAJA[1].money)} y ${kgTxt(CAJA[1].g)}. Lo que está dentro no lo llevas encima.`);
+  return sobreCaja();
 }
+// al fondo de la caja (1.25), un sobre con semillas de una landrace que no está en el banco (S.flags.cajaSem; las partidas de antes,
+// la próxima vez que la abres)
+async function sobreCaja(){S.flags.cajaSem=S.day;await say('Al fondo de la caja hay un sobre de papel de estraza: «Oaxaca, 1979».');return semillasTia('oaxaca','Bien secas y a oscuras: siguen buenas.',3);}
 // cuánto: los pasos que caben por debajo del máximo y el máximo; 0 si no eliges nada
 async function cuanto(txt,max,pasos,fmt){
   const ops=pasos.filter(v=>v<max).concat([max]),j=await ask(txt,ops.map(fmt).concat(['Nada']));
@@ -36,6 +40,7 @@ async function cuanto(txt,max,pasos,fmt){
 }
 const gTxt=g=>Math.floor(g)+' g';
 async function cajaAction(){
+  if(!S.flags.cajaSem)await sobreCaja();
   for(;;){
     const C=CAJA[S.caja.nivel],ro=!!S.items.prensa||cajaR()>0;   // con la prensa (o rosin dentro), también el rosin
     const ops=['Guardar todo','Guardar dinero','Guardar cogollos'].concat(ro?['Guardar rosin']:[],['Sacar dinero','Sacar cogollos'],ro?['Sacar rosin']:[],['Sacar todo','Cerrar']);

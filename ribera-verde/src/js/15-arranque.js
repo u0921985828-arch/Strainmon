@@ -26,6 +26,7 @@ function migrate(){
   if(S.ch===3&&!S.flags.metB&&!(S.due>0)){S.due=PLAZOS[3];S.deadline=S.day+7;S.flags.tono=S.day;}
   if(S.flags.metB&&!('tono' in S.flags))S.flags.tono=S.day;   // ya conoces a Toño: sale en el móvil (12b-movil)
   if(S.protect&&!S.protHasta)S.protHasta=S.day+CUOTA_DIAS;
+  if(!('diario' in S.flags))S.flags.diario=1;   // 1.25: el diario sale bajo la almohada; las partidas de antes ya lo tenían
   for(const k in S.custom){   // 1.11: los cruces con nombre largo («A × B», de antes) pasan a uno corto, con la misma clave; 1.24: y
     // los que se llaman como una variedad nueva (Purple Thai × Haze, sin receta antes, se llamaba «Purple Haze»)
     const C=S.custom[k];if(!C.n.includes(' × ')&&C.n.length<=NOM_MAX&&!DEX.some(d=>STRAINS[d].n.toLowerCase()===C.n.toLowerCase()))continue;

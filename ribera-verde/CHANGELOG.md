@@ -1,5 +1,17 @@
 # Cambios
 
+## 1.25.0 · 13 de octubre de 2026
+
+Cazar genéticas: el diario de la tía, bajo la almohada, y las landraces que no se venden. Godot, 0.19.0.
+
+- **Nuevo: el diario de la tía Maite se encuentra.** La primera vez que duermes o te echas la siesta en el piso, das vueltas, ahuecas la almohada y dentro de la funda está su cuaderno. Hasta entonces no sale ni en la Genoteca ni en el sillón; en las partidas de antes ya lo tienes (`S.flags.diario`, `almohada` en 09-cultivo).
+- **El diario trae las 68 variedades**, en el orden de la Genoteca, cada una con una nota de la tía (antes, solo las 37 de receta). A la derecha, «receta», «N recetas», «tienda» o «landrace»; en las de receta, A abre lo que entra; en las demás, la nota y dónde están sus semillas. El contador va sobre las 68.
+- **Nuevo: siete landraces que no están en ningún banco**, para que algunos cruces cuesten más. El banco del PC se queda con 13; las otras 7, donde las dejó la tía (y su nota del diario da la pista): **Chocolate Thai** en la nevera del piso (3 semillas, en un bote de cristal), **Highland Oaxacan Gold** al fondo de la caja fuerte (3; en las partidas con la caja ya abierta, la próxima vez que la abres), **Lamb's Bread** en un arbusto de Puerto Viejo, **Kerala** en el monte de Mendialde, **Manga Rosa** en Errotabarri y **Hawaiian** en un seto del Ensanche de Ibarbide (2 cada una), y **Luang Prabang** con Miren, junto con la última página (3; si ya tenías la página, al volver a hablarle). Así, la Purple Thai pide la nevera y la caja; la Amnesia Haze, la Purple Thai para Miren; la White Widow, dos pueblos.
+- **La Genoteca cuenta cada nueva**: «NUEVA EN LA GENOTECA · n/68».
+- **Ojos de la opción C en las acciones de los NPC** (fumar, el móvil, la pipa, contar, servir…): `tools/sprites/a-mano/npc_ojos_acc.py`, después de `npc_ojos.py`/`npc_cara.py`, pega la cara nueva donde casa la cabeza de antes y dibuja a mano las que giran la cara; los ojos cerrados (al dar una calada, al mirar abajo) y los perfiles se quedan como estaban.
+- Igual en Godot.
+- Tests: `npm test` 108/108 (paso nuevo: el diario bajo la almohada, el banco con 13 y las 7 de la tía; Miren da la de Laos; el diario, con nota en las 68); Godot, historia 108 pasos; el ciclo, la Genoteca sin el diario hasta la primera noche.
+
 ## 1.24.0 · 13 de octubre de 2026
 
 Más genéticas y los ojos que faltaban. Godot, 0.18.0.

@@ -363,7 +363,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.lector.visible, 60)
 	await espera(3)
 	await foto("0b-creditos")
-	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.18.0") \
+	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.19.0") \
 		and J.lector_txt.text.contains("Open Font License") and J.lector_txt.text.contains("FICCIÓN") and J.lector.get_global_rect().encloses(J.lector_sc.get_global_rect()))
 	await pulsa("B")
 	await elige("LICENCIAS")
@@ -545,8 +545,8 @@ func menu_start() -> void:
 	var l := etiquetas()
 	check("START abre el menú (%s)" % ", ".join(l), l == ["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "GUARDAR", "OPCIONES", "SALIR"])
 	await elige("GENOTECA")
-	check("Genoteca: el diario de la tía Maite y %d filas, todas sin descubrir" % (J.m_items.size() - 1), J.m_items.size() == J.D.DEX.size() + 1 and J.m_items[0].label == "DIARIO DE LA TÍA MAITE"
-		and J.m_items.slice(1).all(func(x): return x.label.ends_with("??????")))
+	check("Genoteca: %d filas, todas sin descubrir, y sin el diario de la tía (sale bajo la almohada)" % J.m_items.size(), J.m_items.size() == J.D.DEX.size()
+		and J.m_items.all(func(x): return x.label.ends_with("??????")))
 	await pulsa("B")
 	await elige("MOCHILA")
 	check("Mochila: dinero, la mochila (1 kg), vida y lo de siempre", J.m_items.size() == 7 and J.m_items[0].right == "150 €" and J.m_items[1].right == "0 de 1 kg")
@@ -816,6 +816,7 @@ func ciclo() -> void:
 		check("noche %d: %d secas nuevas y %s" % [noches, nuevas_secas.size(), "aviso" if aviso_s != "" else "sin aviso"], (aviso_s != "") == (nuevas_secas.size() > 0) and nuevas_secas.all(func(m): return aviso_s.contains(m)))
 		if noches == 1:
 			await check_aviso("al despertar")
+			check("noche 1: el diario de la tía Maite, bajo la almohada", S.flags.get("diario") == S.day and textos.any(func(t): return t.contains("almohada")) and textos.any(func(t): return t.contains("START → GENOTECA")))
 		print("noche %d: " % noches, S.pots.map(func(p): return "-" if p == null else "%s %.2f a%d s%d%s%s" % [p.sid, p.prog, p.water, p.health, " P" if p.pest else "", " M" if p.get("dead") else ""]))
 		# vuelta a la carpa
 		var ok_vuelta := await anda(frente)

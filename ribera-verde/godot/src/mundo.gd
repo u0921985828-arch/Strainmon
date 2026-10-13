@@ -224,7 +224,10 @@ func strain_line(k: String) -> String:
 func discover(sid: String) -> void:
 	if not S.disc.get(sid):
 		S.disc[sid] = true
-		toast("<small>NUEVA EN LA GENOTECA</small>" + esc(strain(sid).n))
+		var cu := ""   # 1.25: cuántas de las 68 llevas
+		if D.STRAINS.has(sid):
+			cu = " · %d/%d" % [D.DEX.filter(func(k): return S.disc.get(k)).size(), D.DEX.size()]
+		toast("<small>NUEVA EN LA GENOTECA%s</small>" % cu + esc(strain(sid).n))
 		queue("historia", check_story)
 
 func add_seeds(sid: String, k: int) -> void:
@@ -315,6 +318,12 @@ func llegando() -> bool:
 func got(t: String) -> void:
 	sfx("get")
 	await say("Consigues %s." % t)
+
+# las semillas que escondió la tía Maite (1.25): landraces que no están en el banco
+func semillas_tia(k: String, txt: String, k_n: int = 2) -> void:
+	add_seeds(k, k_n)
+	await got("%d semillas de %s" % [k_n, D.STRAINS[k].n.to_upper()])
+	await say(txt)
 
 # ---------- mapas (04-mapas) ----------
 func montar_casa() -> void:
@@ -558,6 +567,14 @@ func item_give(id: String) -> void:
 		"h_kale":   # la Kale Zaharra (1.14)
 			S.money += 120
 			await got("120 € en una riñonera abandonada")
+		"h_lamb":   # las de la tía Maite (1.25)
+			await semillas_tia("lamb", "Una lata de tabaco oxidada con una etiqueta a boli: «Jamaica». Es la letra de la tía Maite.")
+		"h_kerala":
+			await semillas_tia("kerala", "Un bote de carrete envuelto en plástico: «Kerala, India». Es la letra de la tía Maite.")
+		"h_manga":
+			await semillas_tia("mangarosa", "Un sobre en una bolsa de congelar: «Manga Rosa · Brasil». Es la letra de la tía Maite.")
+		"h_hawai":
+			await semillas_tia("hawai", "Un tubo de pastillas con semillas dentro: «Hawái». Es la letra de la tía Maite.")
 
 func item_at(x: int, y: int):
 	for it in D.ITEMS:
@@ -847,7 +864,12 @@ func object_action(x: int, y: int) -> void:
 				await letter_action()
 				return
 			"fridge":
-				await say("La nevera: medio limón, leche y un táper de alubias que dejó la tía.")
+				if S.flags.get("nevera"):
+					await say("La nevera: medio limón, leche y un táper de alubias que dejó la tía.")
+					return
+				S.flags.nevera = S.day   # 1.25: el bote de la tía
+				await say("Detrás del táper de alubias hay un bote de cristal con una etiqueta: «Choco Thai. NO TOCAR».")
+				await semillas_tia("choco", "El frío las ha conservado: siguen buenas.", 3)
 				return
 			"crate":
 				await arcon_action()

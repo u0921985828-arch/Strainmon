@@ -25,17 +25,17 @@
 | 17 | Punto Rojo | 16% | 380 | 4,5 | 45% | 0 % | landrace | `#b4a24c` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 2; llega al día siguiente) |
 | 18 | Colombian Gold | 16% | 380 | 4,5 | 55% | 0 % | landrace | `#ccc050` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 2; llega al día siguiente) |
 | 19 | Thai | 17% | 330 | 5 | 40% | 0 % | landrace | `#b0d468` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 2; llega al día siguiente) |
-| 20 | Chocolate Thai | 16% | 300 | 5 | 40% | 0 % | landrace | `#9a8a50` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 3; llega al día siguiente) |
+| 20 | Chocolate Thai | 16% | 300 | 5 | 40% | 0 % | landrace | `#9a8a50` | `#8aa83e` | En la nevera del piso, en un bote de cristal: 3 semillas, una vez |
 | 21 | Highland Thai | 15% | 330 | 4,5 | 50% | 10 % | landrace | `#a8c870` | `#82a73e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
-| 22 | Luang Prabang | 15% | 380 | 4,5 | 50% | 0 % | landrace | `#8a9a5c` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 40 € (cap. 4; llega al día siguiente) |
+| 22 | Luang Prabang | 15% | 380 | 4,5 | 50% | 0 % | landrace | `#8a9a5c` | `#8aa83e` | Miren, en Errotabarri, con la última página del diario (20 g de Purple Thai): 3 semillas (cap. 4) |
 | 23 | Chitral Kush | 17% | 400 | 3 | 70% | 100 % | landrace | `#7a9a48` | `#4a6e3c` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 3; llega al día siguiente) |
 | 24 | Nepalese | 16% | 350 | 3,5 | 65% | 50 % | landrace | `#88906a` | `#63a43e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
 | 25 | Congolese | 16% | 400 | 3,5 | 55% | 0 % | landrace | `#b4d058` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
-| 26 | Lamb's Bread | 16% | 380 | 4 | 60% | 0 % | landrace | `#a8d070` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
-| 27 | Hawaiian | 15% | 380 | 4 | 55% | 20 % | landrace | `#b8d870` | `#7aa63e` | Banco de semillas del PC, sobre de 10 por 30 € (cap. 3; llega al día siguiente) |
+| 26 | Lamb's Bread | 16% | 380 | 4 | 60% | 0 % | landrace | `#a8d070` | `#8aa83e` | En un arbusto de Puerto Viejo (37,6), de cara al mar: 2 semillas (cap. 2) |
+| 27 | Hawaiian | 15% | 380 | 4 | 55% | 20 % | landrace | `#b8d870` | `#7aa63e` | En un seto del Ensanche de Ibarbide (16,14): 2 semillas (cap. 4) |
 | 28 | Kif | 13% | 350 | 3 | 80% | 80 % | landrace | `#a8c060` | `#4d913a` | Banco de semillas del PC, sobre de 10 por 20 € (cap. 2; llega al día siguiente) |
 | 29 | Beldia | 12% | 300 | 3 | 75% | 80 % | landrace | `#98b45c` | `#4d913a` | Banco de semillas del PC, sobre de 10 por 20 € (cap. 2; llega al día siguiente) |
-| 30 | Highland Oaxacan Gold | 15% | 400 | 4 | 65% | 0 % | landrace | `#b0a84a` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 25 € (cap. 3; llega al día siguiente) |
+| 30 | Highland Oaxacan Gold | 15% | 400 | 4 | 65% | 0 % | landrace | `#b0a84a` | `#8aa83e` | En un sobre al fondo de la caja fuerte de la tía, al abrirla: 3 semillas |
 | 31 | Panama Red | 17% | 350 | 4,5 | 50% | 0 % | landrace | `#b8984c` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 45 € (cap. 4; llega al día siguiente) |
 | 32 | Haze | 20% | 400 | 5 | 45% | 10 % | cruce (F1 en la mesa) | `#c8dc68` | `#82a73e` | Cruce: Colombia × México × Tailandia (quizá India del Sur) · ≈ origen incierto |
 | 33 | Northern Lights | 18% | 530 | 3 | 80% | 90 % | cruce (F1 en la mesa) | `#7cae4c` | `#468637` | Cruce: Afghani, con algo de Thai · ≈ origen incierto |
@@ -65,9 +65,9 @@
 | 57 | Sour Diesel | 27% | 450 | 4 | 60% | 30 % | cruce (F1 en la mesa) | `#90b448` | `#6fa53e` | Cruce: Chemdawg × Super Skunk · ≈ origen incierto |
 | 58 | Kali 47 | 21% | 450 | 3,5 | 65% | 30 % | cruce (F1 en la mesa) | `#b0cc68` | `#72a63e` | Cruce: Kali Mist × AK-47 |
 | 59 | Critical Kali Mist | 21% | 530 | 3,5 | 75% | 45 % | cruce (F1 en la mesa) | `#98c058` | `#5c9a48` | Cruce: Critical Mass × Kali Mist |
-| 60 | Kerala | 16% | 350 | 5 | 50% | 10 % | landrace | `#b8cc60` | `#82a73e` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 4; llega al día siguiente) |
+| 60 | Kerala | 16% | 350 | 5 | 50% | 10 % | landrace | `#b8cc60` | `#82a73e` | En un arbusto del monte de Mendialde (42,11): 2 semillas |
 | 61 | Lebanese | 14% | 380 | 3 | 75% | 85 % | landrace | `#a4b45c` | `#4f9a3c` | Banco de semillas del PC, sobre de 10 por 25 € (cap. 3; llega al día siguiente) |
-| 62 | Manga Rosa | 15% | 380 | 4,5 | 55% | 5 % | landrace | `#c4c060` | `#86a83e` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 4; llega al día siguiente) |
+| 62 | Manga Rosa | 15% | 380 | 4,5 | 55% | 5 % | landrace | `#c4c060` | `#86a83e` | En un arbusto de Errotabarri (28,10): 2 semillas (cap. 3) |
 | 63 | Durban Poison | 18% | 430 | 3,5 | 65% | 0 % | landrace | `#b4d060` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 40 € (cap. 5; llega al día siguiente) |
 | 64 | White Widow | 20% | 500 | 3,5 | 70% | 60 % | cruce (F1 en la mesa) | `#e4eed0` | `#5ba33e` | Cruce: sativa de Brasil × planta resinosa del sur de la India · ≈ origen incierto |
 | 65 | Purple Haze | 19% | 380 | 4,5 | 50% | 15 % | cruce (F1 en la mesa) | `#a07cc0` | `#7ea63e` | Cruce: Purple Thai × Haze · ≈ origen incierto |

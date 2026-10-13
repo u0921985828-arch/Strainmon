@@ -66,7 +66,12 @@ const ROOT = path.join(__dirname, '..');
   const pct = n => String(n).replace('.', ',');
   const name = k => D.strains.find(s => s.k === k).n;
   const ORIGIN = { ria: 'Growshop (cap. 1)', limon: 'Growshop (cap. 2)', txoko: 'Growshop (cap. 2)', niebla: 'Growshop (cap. 3)', mango: 'Growshop (cap. 3)', purpura: 'Growshop (cap. 4)',
-    rif: 'Kiko, al montar la mesa de genética: de un amigo de Mazar-i-Sharif (cap. 4)', hindu: 'Txaro, a cambio de 5 g para hacer aceite (parque): del viaje de su marido a Pakistán en 1976', acapulco: 'En un bote de carrete escondido en un arbusto del parque (2,26), «Guerrero, 1979»', malawi: 'Iñaki, el marinero, tras venderle 10 g (muelle): de un marinero de Malaui en Mombasa' };
+    rif: 'Kiko, al montar la mesa de genética: de un amigo de Mazar-i-Sharif (cap. 4)', hindu: 'Txaro, a cambio de 5 g para hacer aceite (parque): del viaje de su marido a Pakistán en 1976', acapulco: 'En un bote de carrete escondido en un arbusto del parque (2,26), «Guerrero, 1979»', malawi: 'Iñaki, el marinero, tras venderle 10 g (muelle): de un marinero de Malaui en Mombasa',
+    // 1.25: las que no están en el banco (su nota del diario dice dónde)
+    choco: 'En la nevera del piso, en un bote de cristal: 3 semillas, una vez', oaxaca: 'En un sobre al fondo de la caja fuerte de la tía, al abrirla: 3 semillas',
+    lamb: 'En un arbusto de Puerto Viejo (37,6), de cara al mar: 2 semillas (cap. 2)', kerala: 'En un arbusto del monte de Mendialde (42,11): 2 semillas',
+    mangarosa: 'En un arbusto de Errotabarri (28,10): 2 semillas (cap. 3)', hawai: 'En un seto del Ensanche de Ibarbide (16,14): 2 semillas (cap. 4)',
+    lao: 'Miren, en Errotabarri, con la última página del diario (20 g de Purple Thai): 3 semillas (cap. 4)' };
 
   for (const [k, p, ch] of D.banco) ORIGIN[k] = `Banco de semillas del PC, sobre de ${D.sobre} por ${p} € (cap. ${ch}; llega al día siguiente)`;
   for (const it of D.shop) if (it.sid) ORIGIN[it.sid] = `Growshop (cap. ${it.ch}), ${it.p} € la semilla`;
@@ -241,7 +246,7 @@ Lo que hay dentro no va encima: no cuenta para los encuentros ni se lo llevan un
 
 ## Semillas
 
-Feminizadas de tienda, ${D.shop.filter(s => s.sid).map(s => s.lbl.replace('Semillas ', '') + ' ' + eu(s.p)).join(', ')} la semilla. Sobres: ${c.SOBRES.map(([n, f]) => n + (f < 1 ? ' (−' + Math.round((1 - f) * 100) + ' %)' : '')).join(', ')}; desde el capítulo 3, bolsa de ${c.GRANEL[0]} a granel (−${Math.round((1 - c.GRANEL[1]) * 100)} %). Landraces del banco del PC: sobres de ${D.sobre} por 20-45 €.
+Feminizadas de tienda, ${D.shop.filter(s => s.sid).map(s => s.lbl.replace('Semillas ', '') + ' ' + eu(s.p)).join(', ')} la semilla. Sobres: ${c.SOBRES.map(([n, f]) => n + (f < 1 ? ' (−' + Math.round((1 - f) * 100) + ' %)' : '')).join(', ')}; desde el capítulo 3, bolsa de ${c.GRANEL[0]} a granel (−${Math.round((1 - c.GRANEL[1]) * 100)} %). Landraces del banco del PC (${D.banco.length}): sobres de ${D.sobre} por 20-45 €; otras 7 no se venden (1.25): la nevera, la caja fuerte, 4 arbustos de la comarca y Miren.
 
 ## La deuda
 

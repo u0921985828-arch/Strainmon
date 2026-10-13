@@ -493,13 +493,13 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.hp = sv.hp; S.hpMax = sv.hpMax; S.rep = sv.rep; S.pelea = sv.pelea;
     S.flags.darkoFin = 0; S.ch = 5; S.flags.miren = 0; S.flags.pagina = 0; S.buds = {};
     enterMap('errotabarri', 24, 11, 'up'); R.mi = ents.filter(e => e.id === 'miren').map(e => e.x + ',' + e.y).join();
-    await run(talkMiren); R.m1 = !!S.flags.miren; await run(talkMiren); R.h0 = S.seeds.haze || 0;
-    addBuds('amanecer*', 10, 20); addBuds('amanecer', 15, 18); addBuds('ria', 30, 12); want(['^Dárselos']); await run(talkMiren); R.pt = [S.buds['amanecer*'] ? S.buds['amanecer*'].g : 0, !!S.buds.amanecer].join(); R.ria = S.buds.ria.g; R.h = S.seeds.haze - R.h0; R.pag = S.flags.pagina === S.day;
+    await run(talkMiren); R.m1 = !!S.flags.miren; await run(talkMiren); R.h0 = S.seeds.haze || 0; S.flags.lao = 0; R.l0 = S.seeds.lao || 0;
+    addBuds('amanecer*', 10, 20); addBuds('amanecer', 15, 18); addBuds('ria', 30, 12); want(['^Dárselos']); await run(talkMiren); R.pt = [S.buds['amanecer*'] ? S.buds['amanecer*'].g : 0, !!S.buds.amanecer].join(); R.ria = S.buds.ria.g; R.h = S.seeds.haze - R.h0; R.lao = S.seeds.lao - R.l0; R.pag = S.flags.pagina === S.day;
     const l0 = LOG.length; want(['La última página', 'Volver']); await run(recetario); R.ult = LOG.slice(l0).filter(l => /\[menú\].*La última página/.test(l)).length;
     S.flags.pagina = 0; S.flags.miren = 0; S.buds = {}; enterMap('home', 5, 5, 'up');
   }, () => R.dk && !R.dk2 && R.b.join() === 'thief,darko' && R.vend === 10 && R.fin && R.rep === DARKO.rep && R.jefe === 1 && R.r1 === null && R.carga === 1 && R.hp1 === 30 && R.gasta === '0,0' && R.hp2 === 24 && R.carga2 === 0 && R.hp3 === 18
     && R.t1 === null && R.hp4 === 12 && R.t2 === 'win' && R.repJ === 0 && R.hpMax === 32 && LOG.some(l => l === '«Aquí ya no hay nada que hablar.»') && LOG.some(l => l === 'Darko cae al suelo, sin aire.')
-    && R.mi === '24,10' && R.m1 && R.pt === '5,false' && R.ria === 30 && R.h === MIREN.n && R.pag && R.ult === 2
+    && R.mi === '24,10' && R.m1 && R.pt === '5,false' && R.ria === 30 && R.h === MIREN.n && R.lao === MIREN.n2 && R.pag && R.ult === 2
     && LOG.some(l => l === 'DARKO: Las esquinas son tuyas. Yo me largo de aquí una temporada.') && LOG.some(l => l === 'SMS · DON BALTASAR: Me han contado lo de mi sobrino.') && LOG.some(l => l === 'Darko coge una barra de hierro del suelo. El próximo golpe va a doler.') || R);
   await step('Combates con más fondo (1.18): ESQUIVAR (si te apartas, tu golpe siguiente no falla y hace 3 más; si no, te da entero), AMENAZAR (mejor cuanto más tocado está; si falla, el golpe siguiente hace 2 más; a Darko no se le amenaza) y la experiencia: al ganar subes de nivel y eliges FUERZA o REFLEJOS (hasta 5 cada una), con la fila Pelea en la MOCHILA', [], async () => {
     const r0 = Math.random, sv = { hp: S.hp, hpMax: S.hpMax, rep: S.rep, money: S.money, pelea: Object.assign({}, S.pelea) }; window.R = {};
@@ -804,7 +804,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   }, () => R.n1 === 'Madre Lima' && R.esq === '9995' && R.n2 === 'Madre Lima' && R.esq2 === 0 && R.seeds === '{"ria":2}' && R.lab && R.n3 === false
     && LOG.some(l => l === '  [texto] Nombre de la planta (y sus esquejes) → Madre Lima') && LOG.some(l => l === '  [texto] Nombre de la planta (y sus esquejes) → (B)')
     && LOG.some(l => l.startsWith('Cortas una punta de la Skunk #1 «Madre Lima»')) && LOG.some(l => l === 'Sin nombre: vuelve a ser la nº 9995.') || R);
-  await step('Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave (y las que se llaman como una variedad, 1.24); se cambia el nombre de una propia (sin repetir otro); el recetario, con las 37 y de dónde sale cada semilla',
+  await step('Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave (y las que se llaman como una variedad, 1.24); se cambia el nombre de una propia (sin repetir otro); el recetario, con las 37 de receta y de dónde sale cada semilla (1.25: el diario, con una nota de la tía en las 68)',
     ['GENOTECA', 'DIARIO DE LA TÍA', 'Skunk #1$', 'Volver', '<B>', '^★ Skunk Haze', '=Haze Corta', '^★ Haze Corta', '=skunk #1', '<B>', 'SALIR'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); S.custom = {}; S.map = 'home';
     const Rn = rngSeed(7), pool = DEX.slice();
@@ -816,10 +816,32 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.disc = Object.assign({}, S.disc, { xv1: true, xv2: true, xv3: true, xv4: true }); migrate(); R.mig = Object.keys(S.custom).map(k => k + ':' + S.custom[k].n).join('|');
     await run(startMenu); R.ren = S.custom.xv1.n;
     const Rc = recetas(), hojas = [...new Set(Object.values(Rc).flat().flatMap(o => o.k))];
-    R.rec = Object.keys(Rc).length; R.sin = hojas.filter(k => dondeSemilla(k) === 'Semillas: .').join(); R.parque = dondeSemilla('acapulco'); R.ss = Rc.txoko.map(recetaTxt).join('|'); R.diario = Object.keys(Rc).filter(t => !diarioTxt(t)).join(); S = S0;
+    R.rec = Object.keys(Rc).length; R.sin = hojas.filter(k => dondeSemilla(k) === 'Semillas: .').join(); R.parque = dondeSemilla('acapulco'); R.ss = Rc.txoko.map(recetaTxt).join('|'); R.diario = DEX.filter(t => !diarioTxt(t)).join(); S = S0;
   }, () => R.n > 50 && R.x === 0 && R.max <= 20 && R.rep === 0 && R.dex === 0 && R.mig === 'xv1:Skunk Haze|xv2:Northern Thai|xv3:Thai Haze|xv4:Haze Purple' && R.ren === 'Haze Corta'
     && R.rec === 37 && R.sin === '' && R.diario === '' && R.parque === 'Semillas: escondidas en el parque del barrio.' && R.ss === 'Skunk #1 × Afghani, en ese orden'
     && LOG.some(l => l === '  [texto] Nuevo nombre de la variedad → Haze Corta') && LOG.some(l => l === 'Ya hay una variedad con ese nombre.') && LOG.some(l => /\[menú\] .*Afghani.*Volver  → Volver/.test(l)) || R);
+  await step('El diario y las landraces de la tía (1.25): el diario sale bajo la almohada la primera vez que duermes en el piso (antes, ni en la Genoteca ni en el sillón; las partidas de antes ya lo tienen); 13 landraces en el banco y las otras 7 en la nevera, la caja fuerte, 4 arbustos de la comarca y Miren; la Genoteca cuenta cada nueva',
+    ['GENOTECA', '<B>', 'SALIR', 'Siesta', 'GENOTECA', '<B>', 'SALIR', 'Siesta', 'Nada', 'Cerrar'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0)); window.R = {}; S.flags.diario = 0; S.map = 'home'; S.min = 600; S.ch = 5;
+    let l0 = LOG.length; await run(startMenu); R.antes = LOG.slice(l0).some(l => /\[menú\] DIARIO DE LA TÍA/.test(l));
+    l0 = LOG.length; await run(bedAction); R.alm = LOG.slice(l0).filter(l => /almohada|tapas verdes|START → GENOTECA/.test(l)).length; R.f = S.flags.diario === S.day;
+    l0 = LOG.length; await run(startMenu); R.despues = LOG.slice(l0).some(l => /\[menú\] DIARIO DE LA TÍA MAITE \| 01 /.test(l));
+    S.min = 600; l0 = LOG.length; await run(bedAction); R.otra = LOG.slice(l0).some(l => /almohada/.test(l));
+    S.flags.diario = 0; l0 = LOG.length; await run(() => muebleAction('sillon')); R.sillon = LOG.slice(l0).some(l => /\[menú\] Cambiar el tapizado \| Nada/.test(l));
+    delete S.flags.diario; migrate(); R.mig = S.flags.diario;
+    const mov = ['choco', 'oaxaca', 'lamb', 'kerala', 'mangarosa', 'hawai', 'lao'];
+    R.banco = BANCO.map(b => b[0]).join(); R.fuera = mov.filter(k => BANCO.some(b => b[0] === k) || !REGALO[k] || !/Semillas: [^.]/.test(dondeSemilla(k))).join();
+    S.seeds = {}; for (const k of mov) delete S.disc[k]; S.flags.nevera = 0; S.flags.cajaSem = 0; S.flags.lao = 0;
+    const T0 = window.TO, _t = toast, n0 = DEX.filter(k => S.disc[k]).length; window.TO = []; window.toast = (h, ms) => { TO.push(h); _t(h, ms); };
+    await run(() => objectAction(0, 6)); R.toast = TO.some(h => h.includes(`NUEVA EN LA GENOTECA · ${n0 + 1}/${DEX.length}</small>`)); window.toast = _t; window.TO = T0; await run(() => objectAction(0, 6)); R.choco = S.seeds.choco;
+    S.caja = { money: 0, buds: {}, nivel: 1 }; await run(cajaAction); R.oax = S.seeds.oaxaca; R.oax2 = S.flags.cajaSem === S.day;
+    R.arb = [['h_lamb', 'lamb'], ['h_kerala', 'kerala'], ['h_manga', 'mangarosa'], ['h_hawai', 'hawai']].map(([id, k]) => { const it = ITEMS.find(i => i.id === id); return [!!it.hidden, MAPS[it.map].o[it.y][it.x], k].join(':'); }).join();
+    for (const id of ['h_lamb', 'h_kerala', 'h_manga', 'h_hawai']) { const it = ITEMS.find(i => i.id === id); delete S.taken[id]; S.map = it.map; await run(() => objectAction(it.x, it.y)); }
+    R.sem = ['lamb', 'kerala', 'mangarosa', 'hawai'].map(k => S.seeds[k] || 0).join();
+    S.map = 'errotabarri'; S.flags.pagina = S.day; await run(talkMiren); R.lao = S.seeds.lao; R.laoF = S.flags.lao === S.day;
+    R.nuevas = DEX.filter(k => S.disc[k]).length - n0; S = S0; enterMap('home', 5, 5, 'up');
+  }, () => !R.antes && R.alm === 3 && R.f && R.despues && !R.otra && R.sillon && R.mig === 1 && R.banco === 'mich,punto,colgold,thai,kif,beldia,chitral,nepal,congo,hthai,panama,libano,durban' && R.fuera === ''
+    && R.toast && R.choco === 3 && R.oax === 3 && R.oax2 && R.arb === 'true:bush:lamb,true:bush:kerala,true:bush:mangarosa,true:bush:hawai' && R.sem === '2,2,2,2' && R.lao === 3 && R.laoF && R.nuevas === 7 || R);
   await step('Exportar partida (1.11): OPCIONES → EXPORTAR PARTIDA copia el JSON de la partida', ['OPCIONES', 'EXPORTAR', 'VOLVER', 'SALIR'], async () => {
     window.CLIP = ''; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async t => { window.CLIP = t; } }, configurable: true });
     await run(startMenu); const s = JSON.parse(CLIP || 'null'); window.R = { clip: !!s && s.day === S.day && s.money === S.money && JSON.stringify(s.custom) === JSON.stringify(S.custom) };

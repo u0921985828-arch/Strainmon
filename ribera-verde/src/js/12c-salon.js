@@ -85,7 +85,7 @@ function noticia(){
 async function muebleAction(k){
   if(k==='carro')return carroAction();
   if(k==='sillon'){
-    const o=['Leer el diario de la tía Maite','Cambiar el tapizado','Nada'],c=o[await ask('Tu sillón de lectura. La lámpara da una luz cálida.',o)];
+    const o=(S.flags.diario?['Leer el diario de la tía Maite']:[]).concat(['Cambiar el tapizado','Nada']),c=o[await ask('Tu sillón de lectura. La lámpara da una luz cálida.',o)];
     if(c==='Cambiar el tapizado')return cambiarDeco(k);
     if(c!=='Leer el diario de la tía Maite')return;
     advanceTime(30);updateHUD();return recetario();

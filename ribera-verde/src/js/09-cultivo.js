@@ -363,11 +363,19 @@ async function bedAction(txt){
   await fade(1);
   const mins=c===1?180:(((7*60-S.min)+1440)%1440||1440),antes=S.pots.map(p=>p&&[!!p.pest,!!p.dead]),d0=S.day;
   advanceTime(mins);S.hp=S.hpMax;buildEnts();updateHUD();await wait(500);await fade(0);
-  const hoy=S.day>d0&&S.luz;
+  const hoy=S.day>d0&&S.luz,diario=piso&&!S.flags.diario;if(diario)S.flags.diario=S.day;   // el diario de la tía, bajo la almohada (1.25)
   save();toast('Has descansado'+(hoy&&hoy.e?' · Luz −'+eur(hoy.e):'')+(hoy&&hoy.o?' · Olor: calor +'+hoy.o:'')+' · Partida guardada',1800);
   if(!piso)return;
+  if(diario)await almohada();
   if(S.day>d0&&S.ch===7&&!S.flags.robo&&(S.money>1000||gramosFlor()+arconG()+arconR()/ROSIN.rend>100))await roboDarko();   // la amenaza de Darko (1.10; con lo del arcón)
   await avisoPlaga(antes);
+}
+// la primera vez que duermes en el piso (1.25): el diario de la tía Maite, bajo la almohada (S.flags.diario; el recetario, en 12-menus)
+async function almohada(){
+  await say('Das vueltas y más vueltas. Al ahuecar la almohada notas algo duro dentro de la funda.');
+  sfx('get');await say('Un cuaderno de tapas verdes, gastado de tanto abrirlo: «Cuaderno de cultivo · M.». El diario de la tía Maite.');
+  await say('Una página por cada variedad que conoció: lo que apuntó de ella, las recetas de sus cruces y dónde guardaba las semillas que no se venden.');
+  return say('Lo tienes en START → GENOTECA. Algunas landraces no están en ningún banco: habrá que buscarlas.');
 }
 // al despertar (1.10): las plantas que han cogido plaga mientras dormías (y el insecticida que te queda), las que la siguen teniendo
 // sin tratar, las que se han secado del todo (antes: [plaga, muerta] de cada plaza al acostarte) y las que florecen con moho
@@ -392,9 +400,10 @@ async function pcAction(){
   else if(c==='Guardar partida')await say(save()?'Partida guardada.':'No se ha podido guardar en este navegador.');
 }
 // banco de semillas (1.9): las landraces de Strainmon en sobres de SOBRE semillas, a precio de bancos de conservación
-// (1.10: 2-4,50 € la semilla); el pedido llega por mensajero al día siguiente (newDay)
-const SOBRE=10,BANCO=[['mich',25,2],['punto',30,2],['colgold',30,2],['thai',30,2],['kif',20,2],['beldia',20,2],['chitral',35,3],['nepal',30,3],['congo',30,3],['lamb',30,3],['oaxaca',25,3],['choco',35,3],['hthai',30,3],['hawai',30,3],['lao',40,4],['panama',45,4],
-  ['libano',25,3],['kerala',35,4],['mangarosa',35,4],['durban',40,5]];
+// (1.10: 2-4,50 € la semilla); el pedido llega por mensajero al día siguiente (newDay). 1.25: 13; las otras 7 no se venden
+// (REGALO en 12-menus: la nevera, la caja fuerte, arbustos de la comarca y Miren)
+const SOBRE=10,BANCO=[['mich',25,2],['punto',30,2],['colgold',30,2],['thai',30,2],['kif',20,2],['beldia',20,2],['chitral',35,3],['nepal',30,3],['congo',30,3],['hthai',30,3],['panama',45,4],
+  ['libano',25,3],['durban',40,5]];
 async function bancoSemillas(){
   let i=0;
   for(;;){

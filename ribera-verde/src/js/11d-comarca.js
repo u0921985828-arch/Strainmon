@@ -65,10 +65,14 @@ async function talkAndoni(){
   await got(`${T.n} semillas de ${STRAINS[k].n.toUpperCase()}`);await say('Cuídalas. Ya no quedan muchas así.',N);
 }
 // Miren (1.17): la amiga de la tía Maite, en Errotabarri desde el capítulo MIREN.ch. Le llevas MIREN.g g de la variedad que
-// cultivaban juntas (MIREN.sid) y te da la página que falta del diario (S.flags.pagina, PAGINA en 12-menus) y MIREN.n semillas
-const MIREN={ch:4,sid:'amanecer',g:20,s:'haze',n:5};
+// cultivaban juntas (MIREN.sid) y te da la página que falta del diario (S.flags.pagina, PAGINA en 12-menus) y MIREN.n semillas;
+// 1.25: y MIREN.n2 de la de Laos (MIREN.s2, que no está en el banco; S.flags.lao: las partidas de antes, al volver a hablarle)
+const MIREN={ch:4,sid:'amanecer',g:20,s:'haze',n:5,s2:'lao',n2:3};
+async function laoMiren(N){S.flags.lao=S.day;addSeeds(MIREN.s2,MIREN.n2);await say('Y esto también era de las dos. La de Laos: la guardábamos para la Amnesia.',N);
+  return got(`${MIREN.n2} semillas de ${STRAINS[MIREN.s2].n.toUpperCase()}`);}
 async function talkMiren(){
   const N='MIREN',M=MIREN,v=STRAINS[M.sid].n.toUpperCase();
+  if(S.flags.pagina&&!S.flags.lao)return laoMiren(N);
   if(S.flags.pagina)return say(pick(['Tu tía subía cada otoño con un táper de cogollos y se quedaba a dormir.','Del caserío no me echó nadie gracias a ella. Eso no se olvida.','Cuando la Haze te salga sola, acuérdate de nosotras.']),N);
   if(!S.flags.miren){S.flags.miren=S.day;
     return talk(N,['¿Tú eres el de Maite? Tienes sus ojos.','Me llamo Miren. Tu tía y yo cultivábamos juntas en este caserío, hace treinta años.','Su diario tiene una página arrancada. Me la dio la última vez que subió.',`Tráeme ${M.g} g de ${v}, la que hacíamos las dos, y es tuya.`]);}
@@ -79,5 +83,6 @@ async function talkMiren(){
   S.flags.pagina=S.day;addSeeds(M.s,M.n);
   await talk(N,['Huele igual que entonces.','Toma. La página que falta, y unas semillas de su Haze.']);
   await got(`la última página del diario y ${M.n} semillas de ${STRAINS[M.s].n.toUpperCase()}`);
+  await laoMiren(N);
   return say('Léela en casa, con calma.',N);
 }

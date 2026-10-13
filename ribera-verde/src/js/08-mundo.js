@@ -7,7 +7,7 @@ const MS_PER_MIN=1000/6;
 const P={x:0,y:0,px:0,py:0,dir:'down',moving:false,fx:0,fy:0,t:0,dur:240,parity:0,hold:0,chain:false,bumpT:0};
 const DV={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]},OPP={up:'down',down:'up',left:'right',right:'left'};
 const CH_TITLES={1:'La herencia',2:'La calle',3:'La deuda',4:'Genética',5:'El sargento',6:'La Copa de Ribera',7:'Libertad',8:'Tu imperio'};
-function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,min:8*60,money:150,hp:30,hpMax:30,heat:0,rep:0,ch:0,flags:{},sales:0,
+function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,min:8*60,money:150,hp:30,hpMax:30,heat:0,rep:0,ch:0,flags:{diario:0},sales:0,
   seeds:{},buds:{},rosin:{},items:Object.assign({fert:0,fertv:0,phm:0,ofert:0,ofertv:0,ophm:0,medidor:0,insect:0,spray:0,bocata:1,prensa:0,bolsa:0,analizador:0},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},gen:{},pedido:[],esquejes:[],bandejas:[],fenos:{},fenoN:0,fnom:{},eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
@@ -25,7 +25,7 @@ const recCount=()=>Object.values(S.rec).filter(v=>v===2).length;
 // % índica de la variedad y, en un híbrido propio, lo que sacó de la madre (la 1.ª del cruce, la de la izquierda en «o») y del padre
 const lineaInd=k=>{const s=getStrain(k),i=indDe(k);return `Índica ${i} % · sativa ${100-i} %${s.m?` · ${s.m} % madre · ${100-s.m} % padre`:''}`;};
 function strainLine(k){const s=getStrain(k),G=GENETICA[tipoGen(k)];return `THC ${pct(s.thc)}% · ~${gm2(s)} g/m² · ${coma(s.d)} días · Resist. ${s.r}%\n${lineaInd(k)}\n${G.n}${PADRES[k]?' ('+PADRES[k]+')':''}: ${G.d}. Estrella: 1 de cada ~${miles(G.uno)}.\n${s.gen?s.gen+'.ª generación · ':''}${s.o}`;}
-function discover(sid){if(!S.disc[sid]){S.disc[sid]=true;toast(`<small>NUEVA EN LA GENOTECA</small>${esc(getStrain(sid).n)}`);queue('historia',checkStory);}}
+function discover(sid){if(!S.disc[sid]){S.disc[sid]=true;toast(`<small>NUEVA EN LA GENOTECA${STRAINS[sid]?' · '+DEX.filter(k=>S.disc[k]).length+'/'+DEX.length:''}</small>${esc(getStrain(sid).n)}`);queue('historia',checkStory);}}
 function addSeeds(sid,n){S.seeds[sid]=(S.seeds[sid]||0)+n;discover(sid);}
 // cogollos por lotes: clave = variedad, o variedad + '*' para lo de un fenotipo estrella (se vende y se presenta aparte)
 const lotSid=k=>k.replace(/\*$/,''),lotNombre=k=>getStrain(lotSid(k)).n+(k.endsWith('*')?' ★':'');
@@ -94,9 +94,15 @@ const ITEMS=[
   {id:'i_ast',map:'astilleros',x:4,y:5,give:async()=>{S.items.spray+=2;await got('2 × SPRAY DE PIMIENTA');}},
   {id:'h_alto',map:'alto',x:2,y:10,hidden:1,give:async()=>{S.money+=80;await got('80 € en un sobre arrugado');}},
   {id:'h_kale',map:'callejon',x:21,y:10,hidden:1,give:async()=>{S.money+=120;await got('120 € en una riñonera abandonada');}},   // la Kale Zaharra (1.14)
+  // las semillas que escondió la tía Maite (1.25): landraces que no están en el banco (su nota en el diario dice dónde)
+  {id:'h_lamb',map:'puerto',x:37,y:6,hidden:1,give:()=>semillasTia('lamb','Una lata de tabaco oxidada con una etiqueta a boli: «Jamaica». Es la letra de la tía Maite.')},
+  {id:'h_kerala',map:'mendialde',x:42,y:11,hidden:1,give:()=>semillasTia('kerala','Un bote de carrete envuelto en plástico: «Kerala, India». Es la letra de la tía Maite.')},
+  {id:'h_manga',map:'errotabarri',x:28,y:10,hidden:1,give:()=>semillasTia('mangarosa','Un sobre en una bolsa de congelar: «Manga Rosa · Brasil». Es la letra de la tía Maite.')},
+  {id:'h_hawai',map:'ensanche',x:16,y:14,hidden:1,give:()=>semillasTia('hawai','Un tubo de pastillas con semillas dentro: «Hawái». Es la letra de la tía Maite.')},
 ];
 const itemAt=(x,y)=>ITEMS.find(it=>!it.hidden&&it.map===S.map&&it.x===x&&it.y===y&&!S.taken[it.id]);
 async function pickItem(it){S.taken[it.id]=true;await it.give();}
+async function semillasTia(k,txt,n=2){addSeeds(k,n);await got(`${n} semillas de ${STRAINS[k].n.toUpperCase()}`);return say(txt);}
 function tileSolid(m,x,y){
   if(x<0||y<0||x>=m.w||y>=m.h)return true;
   if(SOLID_G.test(m.g[y][x])||m.o[y][x])return true;
@@ -191,7 +197,8 @@ async function objectAction(x,y){
     if(o==='pc')return pcAction();
     if(o==='lab'||o==='lab2')return labAction();
     if(o==='table')return letterAction();
-    if(o==='fridge')return say('La nevera: medio limón, leche y un táper de alubias que dejó la tía.');
+    if(o==='fridge'){if(S.flags.nevera)return say('La nevera: medio limón, leche y un táper de alubias que dejó la tía.');   // 1.25: el bote de la tía
+      S.flags.nevera=S.day;await say('Detrás del táper de alubias hay un bote de cristal con una etiqueta: «Choco Thai. NO TOCAR».');return semillasTia('choco','El frío las ha conservado: siguen buenas.',3);}
     if(o==='crate')return arconAction();
     if(muebleDe(o))return muebleAction(muebleDe(o));
     {const k=Object.keys(MUEBLES).find(k=>(x===MUEBLES[k].x||!MUEBLES[k].uno&&x===MUEBLES[k].x+1)&&y===MUEBLES[k].y);   // el sitio vacío de un mueble del salón

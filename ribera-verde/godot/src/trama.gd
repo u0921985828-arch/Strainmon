@@ -589,6 +589,9 @@ func talk_miren():
 	var N := "MIREN"
 	var M: Dictionary = D.MIREN
 	var v: String = String(D.STRAINS[M.sid].n).to_upper()
+	if S.flags.get("pagina") and not S.flags.get("lao"):
+		await lao_miren(N)
+		return
 	if S.flags.get("pagina"):
 		await say(pick(["Tu tía subía cada otoño con un táper de cogollos y se quedaba a dormir.", "Del caserío no me echó nadie gracias a ella. Eso no se olvida.", "Cuando la Haze te salga sola, acuérdate de nosotras."]), N)
 		return
@@ -618,7 +621,16 @@ func talk_miren():
 	add_seeds(M.s, int(M.n))
 	await talk(N, ["Huele igual que entonces.", "Toma. La página que falta, y unas semillas de su Haze."])
 	await got("la última página del diario y %d semillas de %s" % [int(M.n), String(D.STRAINS[M.s].n).to_upper()])
+	await lao_miren(N)
 	await say("Léela en casa, con calma.", N)
+
+# 1.25: y MIREN.n2 de la de Laos (MIREN.s2, que no está en el banco; S.flags.lao: las partidas de antes, al volver a hablarle)
+func lao_miren(N: String) -> void:
+	var M: Dictionary = D.MIREN
+	S.flags.lao = S.day
+	add_seeds(M.s2, int(M.n2))
+	await say("Y esto también era de las dos. La de Laos: la guardábamos para la Amnesia.", N)
+	await got("%d semillas de %s" % [int(M.n2), String(D.STRAINS[M.s2].n).to_upper()])
 
 func talk_andoni():
 	var N := "ANDONI"
@@ -1375,8 +1387,12 @@ func recetas() -> Dictionary:
 func receta_txt(o: Dictionary) -> String:
 	return (" × " if o.ord else " + ").join(PackedStringArray(o.k.map(func(k): return D.STRAINS[k].n))) + (", en ese orden" if o.ord else "")
 
+# 1.25: las landraces que no están en el banco (BANCO), en casa de la tía, en arbustos de la comarca (ITEMS) y con Miren (MIREN.s2)
 const REGALO := {"ria": "te las da Kiko al conocerlo", "rif": "te las da Kiko con la mesa de genética", "hindu": "Txaro, la vecina, por 5 g de cogollo",
-	"chitral": "Txaro, por 10 g de una índica", "malawi": "Iñaki, el del muelle, al venderle 10 g", "acapulco": "escondidas en el parque del barrio"}
+	"chitral": "Txaro, por 10 g de una índica", "malawi": "Iñaki, el del muelle, al venderle 10 g", "acapulco": "escondidas en el parque del barrio",
+	"choco": "en la nevera del piso, en un bote de cristal", "oaxaca": "en un sobre al fondo de la caja fuerte de la tía", "lamb": "escondidas en Puerto Viejo, en un arbusto de cara al mar",
+	"kerala": "escondidas en el monte de Mendialde", "mangarosa": "escondidas en un arbusto de Errotabarri", "hawai": "escondidas en un seto del Ensanche, en Ibarbide",
+	"lao": "Miren, en Errotabarri, con la última página del diario"}
 
 func donde_semilla(k: String) -> String:
 	var l := []
@@ -1396,13 +1412,19 @@ func donde_semilla(k: String) -> String:
 		l.append("de su receta")
 	return "Semillas: " + "; ".join(PackedStringArray(l)) + "."
 
-# el diario de la tía Maite (1.16): su nota de cada variedad de receta (DIARIO, de 12-menus)
+# el diario de la tía Maite (1.16): su nota de cada variedad (DIARIO, de 12-menus; 1.25: las 68)
 func diario_txt(t: String) -> String:
 	return ("«%s»\n" % D.DIARIO[t]) if D.DIARIO.has(t) else ""
 
+# 1.25: las 68 de la Genoteca, en su orden; las de receta abren lo que entra; las demás dicen dónde están sus semillas
+func tipo_diario(t: String, R: Dictionary) -> String:
+	if R.has(t):
+		return ("%d recetas" % R[t].size()) if R[t].size() > 1 else "receta"
+	return "tienda" if D.SHOP.any(func(it): return it.get("sid") == t) else "landrace"
+
 func recetario():
 	var R := recetas()
-	var ts: Array = R.keys()
+	var ts: Array = D.DEX
 	var i := 0
 	while true:
 		var items := []
@@ -1410,8 +1432,8 @@ func recetario():
 		for t in ts:
 			if S.disc.get(t):
 				nd += 1
-			items.append({"label": ("✓ " if S.disc.get(t) else "  ") + D.STRAINS[t].n, "right": ("%d recetas" % R[t].size()) if R[t].size() > 1 else "", "sw": D.STRAINS[t].c, "ic": ic_cog(t),
-				"desc": diario_txt(t) + "\no ".join(PackedStringArray(R[t].map(func(o): return receta_txt(o))))})
+			items.append({"label": ("✓ " if S.disc.get(t) else "  ") + D.STRAINS[t].n, "right": tipo_diario(t, R), "sw": D.STRAINS[t].c, "ic": ic_cog(t),
+				"desc": diario_txt(t) + ("\no ".join(PackedStringArray(R[t].map(func(o): return receta_txt(o)))) if R.has(t) else donde_semilla(t))})
 		if S.flags.get("pagina"):   # la página que falta (1.17)
 			items.append({"label": "  La última página", "desc": "«%s»" % D.PAGINA})
 		items.append({"label": "Volver", "desc": ""})
@@ -1420,6 +1442,8 @@ func recetario():
 			continue
 		if i < 0 or i >= ts.size():
 			return
+		if not R.has(ts[i]):
+			continue
 		var t: String = ts[i]
 		var ks := []
 		for o in R[t]:
@@ -1460,13 +1484,14 @@ func genoteca():
 			break
 
 func menu_genoteca(i0: int) -> int:
-	var R := recetas()
+	var DEX: Array = D.DEX
 	var nr := 0
-	for t in R:
+	for t in DEX:
 		if S.disc.get(t):
 			nr += 1
-	var items := [{"label": "DIARIO DE LA TÍA MAITE", "right": "%d/%d" % [nr, R.size()], "ic": icono("guardar"), "desc": "Su cuaderno de recetas: las variedades clásicas, lo que apuntó de cada una y dónde conseguir lo que entra."}]
-	var DEX: Array = D.DEX
+	var items := []
+	if S.flags.get("diario"):   # sale bajo la almohada (1.25)
+		items.append({"label": "DIARIO DE LA TÍA MAITE", "right": "%d/%d" % [nr, DEX.size()], "ic": icono("guardar"), "diario": 1, "desc": "Su cuaderno: las 68 variedades, lo que apuntó de cada una, las recetas de los cruces y dónde conseguir las semillas."})
 	for j in DEX.size():
 		var k: String = DEX[j]
 		var s: Dictionary = D.STRAINS[k]
@@ -1487,9 +1512,9 @@ func menu_genoteca(i0: int) -> int:
 		if S.disc.get(k):
 			nd += 1
 	var i: int = await menu(items, {"cls": "full", "title": "GENOTECA", "title2": "%d/%d · %d propias" % [nd, DEX.size(), cust.size()], "desc": true, "initial": i0})
-	if i == 0:
+	if i >= 0 and i < items.size() and items[i].get("diario"):
 		await recetario()
-	elif i > 0 and items[i].get("c"):
+	elif i >= 0 and i < items.size() and items[i].get("c"):
 		await renombrar_variedad(items[i].c)
 	return i
 
@@ -2054,6 +2079,14 @@ func diploma_action():
 	await say("Clic. La caja se abre.")
 	await say("Dentro hay %s y una nota de la tía: «Para ti, {N}. Lo que guardes aquí no te lo quita nadie en la calle»." % Datos.eur(D.MAITE_CAJA))
 	await say("Caben %s y %s. Lo que está dentro no lo llevas encima." % [Datos.eur(D.CAJA[1].money), _kg(int(D.CAJA[1].g))])
+	await sobre_caja()
+
+# al fondo de la caja (1.25), un sobre con semillas de una landrace que no está en el banco (S.flags.cajaSem; las partidas de antes,
+# la próxima vez que la abres)
+func sobre_caja() -> void:
+	S.flags.cajaSem = S.day
+	await say("Al fondo de la caja hay un sobre de papel de estraza: «Oaxaca, 1979».")
+	await semillas_tia("oaxaca", "Bien secas y a oscuras: siguen buenas.", 3)
 
 # cuánto: los pasos que caben por debajo del máximo y el máximo; 0 si no eliges nada
 func cuanto(txt: String, mx: float, pasos: Array, fmt: Callable):
@@ -2087,6 +2120,8 @@ func _hueco_r(C: Dictionary) -> float:
 	return floor(_hueco(C) * 10 + 1e-9) / 10.0
 
 func caja_action():
+	if not S.flags.get("cajaSem"):
+		await sobre_caja()
 	while true:
 		var C: Dictionary = D.CAJA[int(S.caja.nivel)]
 		var ro: bool = (true if S.items.get("prensa") else false) or caja_r() > 0   # con la prensa (o rosin dentro), también el rosin
