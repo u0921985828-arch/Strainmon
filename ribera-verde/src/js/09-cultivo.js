@@ -151,7 +151,7 @@ function newDay(){
   const sec=S.esquejes.filter(e=>S.day-e.dia>ESQUEJE_DIAS).length;if(sec){S.esquejes=S.esquejes.filter(e=>S.day-e.dia<=ESQUEJE_DIAS);av.push(`Se ${sec>1?'han secado '+sec+' esquejes':'ha secado un esqueje'} sin plantar`);}
   const seb=S.bandejas.filter(e=>S.day-e.dia>CARRO.dias).length;if(seb){S.bandejas=S.bandejas.filter(e=>S.day-e.dia<=CARRO.dias);av.push(`Se ${seb>1?'han secado '+seb+' esquejes':'ha secado un esqueje'} en las bandejas`);}
   if(av.length&&mode==='world')toast(av.join('<br>'),1600);
-  spawnClients();recibirPedido();recibirEnvio();instalarCaja();llegaMueble();vencerEncargo();curroDia();vencerEncargoClub();   // la gente (1.15)
+  spawnClients();recibirPedido();recibirEnvio();instalarCaja();llegaMueble();vencerEncargo();curroDia();setasDia();vencerEncargoClub();   // la gente (1.15)
   // 1.10: el plazo vencido, también sin haber visto a Baltasar (el plazo corre desde Toño); 1.11: el aviso, a 3 días y el último
   if(S.due>0&&S.day>S.deadline)queue('penalty',penaltyEvent);
   else if(S.due>0&&(S.deadline-S.day===3||S.deadline===S.day))queue('plazo',recuerdoPlazo);
@@ -291,12 +291,13 @@ async function temporizador(ci){
 // demás (las landraces, como el Afghani que te da Kiko, y tus líneas fijadas) son regulares: algún macho poliniza unas flores y dan 1-3; una línea sin
 // fijar (F1-F3) la estás criando: se polinizan entre ellas y das 2-5 semillas por planta para seguir estabilizando
 const SEMILLA_HERMA=.12;
+const thcCosecha=(p,f)=>{const fe=p.f||{t:1,y:1};return Math.min(35,Math.round((getStrain(p.sid).thc*fe.t*(.85+.15*p.health/100)+f.thc+ABONO.thc*fq(p))*10)/10);};
+function semillasCosecha(p){const cria=genDe(p.sid)<GEN_ESTABLE,fem=SHOP.some(it=>it.sid===p.sid);return {cria,fem,n:cria?ri(2,5):!fem||Math.random()<SEMILLA_HERMA?ri(1,3):0};}
 async function harvest(i){
   const p=S.pots[i],s=getStrain(p.sid),f=factores(i),fe=p.f||{t:1,y:1},cl=claseFeno(p.f);
-  const g=gramosPlanta(p,f);
-  const thc=Math.min(35,Math.round((s.thc*fe.t*(.85+.15*p.health/100)+f.thc+ABONO.thc*fq(p))*10)/10);
+  const g=gramosPlanta(p,f),thc=thcCosecha(p,f);
   const [vx,vy]=posPlaza(i);await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:vx,y:vy-12});
-  const cria=genDe(p.sid)<GEN_ESTABLE,fem=SHOP.some(it=>it.sid===p.sid),n=cria?ri(2,5):!fem||Math.random()<SEMILLA_HERMA?ri(1,3):0;
+  const {cria,fem,n}=semillasCosecha(p);
   const lk=cl==='estrella'?p.sid+'*':p.sid;addBuds(lk,g,thc);if(n)addSeeds(p.sid,n);
   const sobra=Math.min(g,Math.floor(pesoEncima()-capMochila()));if(sobra>=1)moverLote(S.buds,S.arcon.buds,lk,sobra);   // lo que no cabe encima, al arcón (1.10)
   if(p.f&&p.f.id)S.fenos[p.f.id]=cl;S.pots[i]=null;sfx('get');

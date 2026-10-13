@@ -1,5 +1,27 @@
 # Cambios
 
+## 1.20.0 · 13 de octubre de 2026
+
+El bajo de las setas: un local clandestino en la Kale Zaharra. Godot, 0.14.0.
+
+- **Nuevo: el bajo de las setas** (Txomin, en la Kale Zaharra, desde el capítulo 4; `SETAS`, `S.setas`, 11g-setas). Txomin, el setero viejo del callejón, alquila el bajo de su casa: 1.500 € de fianza y 20 € al día, que cobra cada mañana. Él prepara las bandejas (45 € cada una, hasta 6); tú las tienes húmedas (PULVERIZAR, 10 minutos, las deja al 100 %; cada día pierden 34 puntos) y esperas: 6 días colonizando, 4 fructificando y listas.
+- Cada mañana, una bandeja que no está lista puede contaminarse (2 %; un 15 % más por debajo de la mitad de humedad) y, a 0, se seca: las dos se tiran (TIRAR LAS MALAS). RECOGER da de 25 a 40 g por bandeja lista, que se secan en el bajo, y Txomin te los compra a 9 € el gramo (calor +3).
+- Una redada en el bajo (1 % al día con bandejas vivas) se lo lleva todo, el local incluido (calor +15). Sin el alquiler, Txomin cambia la cerradura y se queda la fianza y lo de dentro; si lo dejas, te la devuelve.
+- Igual en Godot.
+- Tests: `npm test` 104/104 (paso nuevo: alquilar, las bandejas, la humedad, las fases, contaminar y secar, recoger, vender, la redada, impagar y dejarlo); Godot, historia 104 pasos.
+
+## 1.19.0 · 13 de octubre de 2026
+
+La plantilla: poner al barrio a trabajar. Godot, 0.13.0.
+
+- **Nuevo: la plantilla** (MÓVIL → PLANTILLA, desde el capítulo 3; `PLANTILLA`, `S.plantilla`, 11f-plantilla). Patxi te manda a alguien del barrio por un sobre de 150 €: no sabes a quién hasta que llega, y le contratas o no (el sobre ya está pagado). Cada uno trae tres números del 1 al 5: **labia** (vende más y le timan menos), **cuidado** (le para la policía y le atracan menos; en la nave, saca más) y **lealtad** (se larga menos con lo tuyo y, de gerente, sisa menos). Hasta 6 a la vez; se les cambia de trabajo, se les deja libres o se les despide desde el móvil.
+- **A la calle** con un lote de 25, 50 o 100 g: cada mañana vende de 2 a 4 g por punto de labia a precio de calle del barrio y se queda el 30 %; o le para la policía (5 % con cuidado 1, 1 % con 5: pierde el lote y el calor sube 10), le atracan (8 % → 2 %: la mitad del lote), se larga con todo (6 % con lealtad 1, nunca con 5; la mitad con gerente) o le pagan con billetes falsos (6 % → 2 %: los gramos, sin dinero). Lo que le quede al dejarlo vuelve al arcón.
+- **De gerente** (uno, 40 € al día): cada mañana riega, trata las plagas con tu insecticida y rellena garrafas y depósitos, como Begoña, y cosecha lo que esté listo al arcón (las semillas y la estrella, como tú), quitando su sisa: un 3 % por cada punto de lealtad por debajo de 5.
+- **La nave de Valdehierro** (Arrieta, al lado de la nave, desde el capítulo 5; `NAVE`, `S.nave`): 3.000 € de fianza y 60 € al día. Pones a trabajar hasta 4 (30 € al día cada uno) y eliges la variedad con una semilla: cada uno saca 16-24 g al día según su cuidado, al 90 % del THC de la variedad, que se recogen allí. Una redada (del 2 % al 0,5 % al día, según el más cuidadoso) se lo lleva todo, nave y gente incluidos (calor +20). Sin el alquiler, Arrieta cambia la cerradura y se queda la fianza; si la dejas, te la devuelve.
+- Sin dinero para el sueldo, el gerente y los de la nave lo dejan.
+- Igual en Godot. Begoña y el gerente comparten `cuidarPlantas`; la cosecha, `thcCosecha` y `semillasCosecha`.
+- Tests: `npm test` 103/103 (paso nuevo: los sobres, la calle con sus cinco salidas, el gerente con su sisa, la nave con el alquiler, lo que crece, la redada, dejarla e impagarla); Godot, historia 103 pasos.
+
 ## 1.18.0 · 13 de octubre de 2026
 
 Combates con más fondo: esquivar, amenazar y experiencia. Godot, 0.12.0.

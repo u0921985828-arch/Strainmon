@@ -18,10 +18,7 @@ function curroDia(){
   const C=S.curro,J=CURRO.jard,V=CURRO.vend;
   if(C.jard){
     if(S.money<J.sueldo){C.jard=null;confia('begona',-10);queue('jard',()=>talk('SMS · BEGOÑA',['Sin cobrar no vuelvo, majo. Cuando tengas el dinero, hablamos.']));}
-    else{S.money-=J.sueldo;
-      S.pots.forEach(p=>{if(!p||p.dead)return;p.water=100;if(p.pest&&S.items.insect>0){S.items.insect--;p.pest=false;}});
-      S.carpas.forEach((c,ci)=>{if(!c)return;if(c.garrafas)delete c.gar;if(c.goteo)c.dep=goteoL(ci);});
-      S.heat=Math.min(100,S.heat+J.calor);}
+    else{S.money-=J.sueldo;cuidarPlantas();S.heat=Math.min(100,S.heat+J.calor);}
   }
   const fin=[];
   for(const v of C.vend){
@@ -34,6 +31,12 @@ function curroDia(){
     else queue('vend'+v.id,()=>talk(N,[`Vendidos ${g} g: ${eur(e)} en tu buzón. Me quedan ${gTxt(v.g)}.`]));
   }
   if(fin.length)C.vend=C.vend.filter(v=>!fin.includes(v));
+  plantillaDia();   // la plantilla (1.19, 11f-plantilla)
+}
+// regar, tratar las plagas con tu insecticida y rellenar garrafas y depósitos (Begoña y el gerente de la plantilla)
+function cuidarPlantas(){
+  S.pots.forEach(p=>{if(!p||p.dead)return;p.water=100;if(p.pest&&S.items.insect>0){S.items.insect--;p.pest=false;}});
+  S.carpas.forEach((c,ci)=>{if(!c)return;if(c.garrafas)delete c.gar;if(c.goteo)c.dep=goteoL(ci);});
 }
 // un cliente de la agenda, desde el móvil: que venga, un regalo (una vez al día), cómo va su venta o que venda para ti
 async function fijoMenu(f){

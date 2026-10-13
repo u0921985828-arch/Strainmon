@@ -237,15 +237,17 @@ func lot_sid(k: String) -> String:
 func lot_nombre(k: String) -> String:
 	return strain(lot_sid(k)).n + (" ★" if k.ends_with("*") else "")
 
-func add_buds(k: String, g: float, thc: float) -> void:
-	if S.buds.has(k):
-		var b: Dictionary = S.buds[k]
+func add_buds(k: String, g: float, thc: float, L = null) -> void:   # L: otro sitio (el arcón)
+	if L == null:
+		L = S.buds
+	if L.has(k):
+		var b: Dictionary = L[k]
 		b.thc = (b.thc * b.g + thc * g) / (b.g + g)
 		b.g += g
 		b.erase("cata")   # 1.15: lo que entra nuevo no está catado ni analizado
 		b.erase("ana")
 	else:
-		S.buds[k] = {"g": g, "thc": thc}
+		L[k] = {"g": g, "thc": thc}
 	discover(lot_sid(k))
 
 func use_buds(k: String, g: float) -> void:
@@ -425,6 +427,10 @@ func npc_talk(d: Dictionary) -> void:
 			await talk_andoni()
 		"miren":
 			await talk_miren()
+		"arrieta":   # la nave de Valdehierro (1.19)
+			await talk_nave()
+		"txomin":   # el bajo de las setas (1.20)
+			await talk_txomin()
 		"ibarbitarra":
 			await say(pick(["Esto es el Ensanche: pisos, oficinas y el parque. El Casco Viejo, por la avenida.", "En Ibarbide hay policía en cada esquina. Y aun así...", "Los de los pueblos venís en autobús, ¿no? La estación está en el Casco."]), "VECINO")
 		"josune":
@@ -1405,6 +1411,12 @@ func talk_nerea():
 func talk_bixente():
 	pass
 func talk_andoni():
+	pass
+func talk_nave():
+	pass
+func talk_txomin():
+	pass
+func setas_dia():
 	pass
 func talk_miren():
 	pass

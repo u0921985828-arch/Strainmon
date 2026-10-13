@@ -182,6 +182,8 @@ const LOOKS={
   andoni:{id:'oldman',skin:'#e8b894',hair:'#d8d8d8',style:'bald',beard:'#d8d8d8',shirt:'#b8a070',pants:'#5a5048'},
   ibarbitarra:{id:'cliente1',skin:'#f0d0b8',hair:'#1a1a1a',style:'short',shirt:'#3a3a48',pants:'#2a2a30',glasses:1},
   portero:{id:'cliente2',skin:'#b07850',hair:'#1a1a1a',style:'bald',beard:1,shirt:'#2a2a30',pants:'#2a2a30'},   // los clubs (1.15)
+  arrieta:{id:'cliente1',skin:'#d8a880',hair:'#6a6a70',style:'short',stache:'#6a6a70',shirt:'#5a6a7a',pants:'#3a3a44'},   // el de la nave (1.19)
+  txomin:{id:'oldman',skin:'#e0aa84',hair:'#c8c8c8',style:'cap',hat:'#5a4a3a',hat2:'#3a2a20',shirt:'#6a7a4a',pants:'#4a4038'},   // el setero de la Kale Zaharra (1.20)
   portera:{id:'cliente5',skin:'#f6c8a0',hair:'#8a2a1a',style:'long',shirt:'#2a2a30',pants:'#3a3a44',glasses:1},
   judge:{id:'judge',skin:'#f0c4a0',hair:'#6a4a2a',style:'short',shirt:'#3a3a48',shirt2:'#c0a040',pants:'#2a2a34',glasses:1},
 };

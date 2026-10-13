@@ -527,6 +527,66 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && R.w2 === 'win' && R.max === '66,5,5' && Math.abs(R.pe5 - .75) < 1e-9 && R.h === 'flee' && R.fila === 1
     && LOG.some(l => l === 'El atracador se lanza y te apartas a tiempo.') && LOG.some(l => l === 'Darko baja la barra y te apartas a tiempo.') && LOG.some(l => l === 'Le pillas abierto.') && LOG.some(l => l === 'No te apartas a tiempo.') && LOG.some(l => l === '«¿A mí? Ahora vas a ver.»')
     && LOG.some(l => l === 'El atracador se lo piensa mejor y se va.') && LOG.some(l => l === '«A mí no me amenaza nadie.»') && LOG.some(l => l === 'Subes a nivel 1 de pelea.') && LOG.some(l => l === 'REFLEJOS 5: aciertas, esquivas y escapas mejor.') || R);
+  await step('La plantilla (1.19): Patxi te manda gente del barrio por un sobre (labia, cuidado y lealtad del 1 al 5); a la calle con un lote (vende, o le para la policía, le atracan, se larga o le timan, según sus números), de gerente (cuida y cosecha al arcón con su sisa) y en la nave de Valdehierro, que alquila Arrieta (cada mañana, el alquiler, la redada y lo que saca cada uno)', [], async () => {
+    const r0 = Math.random, sv = JSON.parse(JSON.stringify({ money: S.money, heat: S.heat, buds: S.buds, arcon: S.arcon, pots: S.pots, carpas: S.carpas, seeds: S.seeds, sales: S.sales, ch: S.ch, fenos: S.fenos, rec: S.rec, h1: S.flags.harvest1 || false })); window.R = {};
+    S.ch = 5; S.money = 5000; S.heat = 0; S.plantilla = []; S.plN = 0; S.nave = null; S.buds = {}; addBuds('ria', 100, 12); S.arcon = { buds: {}, rosin: {} };
+    const fi = w => w ? [w.n, w.lab, w.cui, w.lea, w.rol || ''].join() : '', dia = async v => { Math.random = () => v; plantillaDia(); Math.random = r0; await idle(); };
+    await run(async () => {
+      Math.random = () => .99; want(['^Contratar']); await pedirGente(); R.w1 = fi(S.plantilla[0]);
+      Math.random = () => 0; want(['^No']); await pedirGente(); R.n2 = S.plantilla.length; want(['^Contratar']); await pedirGente(); R.w2 = fi(S.plantilla[1]);
+      Math.random = () => .5; want(['^Contratar']); await pedirGente(); R.w3 = fi(S.plantilla[2]); R.pl = [S.plN, 5000 - S.money].join(); Math.random = r0; });
+    const [itz, mik, ike] = S.plantilla;
+    want(['^A la calle', '^Skunk', '^25 g']); await run(() => trabajo(mik)); R.calle = [mik.rol, mik.k, mik.g, S.buds.ria.g].join();
+    want(['^De gerente']); await run(() => trabajo(ike)); const l0 = LOG.length; want(['<B>']); await run(() => trabajo(itz)); R.ops = LOG.slice(l0).filter(l => l.startsWith('  [menú] A la calle | Despedir | Nada')).length;
+    S.pots = S.pots.map(() => null); S.pots[0] = { sid: 'ria', prog: 1, water: 100, health: 100, fert: false, pest: false, f: { t: 1, y: 1 } }; R.gc = gramosPlanta(S.pots[0], factores(0));
+    R.m = S.money; await dia(.5); R.e = Math.round(precioCalle(12) * ZONAS.town.precio * 3 * (1 - PLANTILLA.com)); R.venta = [mik.g, S.money - R.m + PLANTILLA.sueldo.gerente, S.heat].join();
+    R.arc = S.arcon.buds.ria ? S.arcon.buds.ria.g : 0; R.pot = S.pots[0];
+    R.m = S.money; await dia(.01); R.poli = [mik.rol || '', mik.g === undefined, S.heat, R.m - S.money].join();
+    want(['^A la calle', '^Skunk', '^25 g']); await run(() => trabajo(mik)); await dia(.1); R.robo = mik.g; await dia(.2); R.m = S.money; R.timo = mik.g; await dia(.14); R.fuga = S.plantilla.map(w => w.n).join();
+    S.money = 10; await dia(.5); R.sin = [ike.rol || '', S.money].join();
+    S.money = 5000; enterMap('valdehierro', 17, 8, 'up'); R.ar = ents.filter(e => e.id === 'arrieta').map(e => e.x + ',' + e.y).join();
+    want(['^Alquilarla']); await run(talkNave); R.nave = [!!S.nave, 5000 - S.money].join();
+    want(['^A la nave']); await run(() => trabajo(itz)); S.seeds.ria = (S.seeds.ria || 0) + 1; R.s0 = S.seeds.ria; want(['^Cambiar', '^' + getStrain('ria').n + '$']); await run(talkNave); R.var = [S.nave.sid, S.nave.thc, R.s0 - (S.seeds.ria || 0)].join();
+    R.m = S.money; await dia(.99); R.crece = [S.nave.g, R.m - S.money].join(); R.b = S.buds.ria.g; want(['^Recoger']); await run(talkNave); R.rec = [S.buds.ria.g - R.b, S.nave.g].join();
+    R.h = S.heat; await dia(0); R.redada = [S.nave === null, S.plantilla.map(w => w.n).join(), S.heat - R.h].join();
+    S.money = 5000; want(['^Alquilarla']); await run(talkNave); R.m = S.money; want(['^Dejar la nave', '^Dejarla']); await run(talkNave); R.dejar = [S.nave === null, S.money - R.m].join();
+    S.money = 5000; want(['^Alquilarla']); await run(talkNave); S.money = 50; await dia(.5); R.impago = [S.nave === null, S.money].join();
+    const l1 = LOG.length; want(['<B>']); await run(movilMenu); want(['<B>']); await run(plantilla); R.menus = LOG.slice(l1).filter(l => / \| Gente \| Plantilla \| /.test(l) || /\| Pedir gente a Patxi  → \(B\)$/.test(l)).length;
+    R.ln = lotNombre('ria'); S.plantilla = []; S.plN = 0; S.nave = null; S.money = sv.money; S.heat = sv.heat; S.buds = sv.buds; S.arcon = sv.arcon; S.pots = sv.pots; S.carpas = sv.carpas; S.seeds = sv.seeds; S.sales = sv.sales; S.ch = sv.ch; S.fenos = sv.fenos; S.rec = sv.rec; S.flags.harvest1 = sv.h1;
+    enterMap('home', 5, 5, 'up');
+  }, () => R.w1 === 'Itziar,5,5,5,' && R.n2 === 1 && R.w2 === 'Mikel,1,1,1,' && R.w3 === 'Iker,3,3,3,' && R.pl === '4,' + 4 * PLANTILLA.sobre && R.calle === 'calle,ria,25,75' && R.ops === 1
+    && R.venta === `22,${R.e},${PLANTILLA.calor}` && R.arc === R.gc - Math.floor(R.gc * PLANTILLA.sisa * 2) && R.pot === null && R.poli === `,true,${PLANTILLA.calor + PLANTILLA.calorPoli},${PLANTILLA.sueldo.gerente}`
+    && R.robo === 12 && R.timo === 10 && R.fuga === 'Itziar,Iker' && R.sin === ',10' && R.ar === '17,7' && R.nave === 'true,' + NAVE.fianza
+    && R.var === `ria,${Math.round(STRAINS.ria.thc * NAVE.thc * 10) / 10},1` && R.crece === `${NAVE.g + 2 * NAVE.gC},${NAVE.dia + PLANTILLA.sueldo.nave}` && R.rec === `${NAVE.g + 2 * NAVE.gC},0` && R.redada === `true,Iker,${NAVE.calor}`
+    && R.dejar === 'true,' + NAVE.fianza && R.impago === 'true,50' && R.menus === 2
+    && LOG.some(l => l === 'SMS · PATXI: Te mando a Itziar. Vale oro.') && LOG.some(l => l === 'Mikel se va por donde ha venido. El sobre ya es de Patxi.') && LOG.some(l => l === 'SMS · PATXI: Te mando a Iker. Gente normal del barrio.')
+    && LOG.some(l => l === `SMS · IKER: He cosechado ${R.arc} g. Está en el arcón.`) && LOG.some(l => l === `SMS · MIKEL: Me ha parado la policía. Se han quedado con 22 g de ${R.ln}. Lo siento.`)
+    && LOG.some(l => l === `SMS · MIKEL: Me han atracado en un portal. Se han llevado 13 g de ${R.ln}. Me quedan 12 g.`) && LOG.some(l => l === 'SMS · MIKEL: Me han pagado 2 g con billetes falsos. No me he dado cuenta hasta el banco.')
+    && LOG.some(l => l === `Mikel no contesta al móvil. Se ha largado con 10 g de ${R.ln}.`) && LOG.some(l => l === 'SMS · IKER: Sin cobrar no curro. Cuando tengas el dinero, me llamas.')
+    && LOG.some(l => l === 'La policía ha entrado en la nave de Valdehierro. Se lleva las plantas y a Itziar.') && LOG.some(l => l === 'SMS · ARRIETA: No me has pagado la nave. Cambio la cerradura y me quedo la fianza.') || R);
+  await step('El bajo de las setas (1.20): Txomin alquila el bajo de la Kale Zaharra desde el capítulo 4; las bandejas que prepara él (húmedas: cada día pierden; secas o contaminadas, a tirar), 6 días colonizando y 4 fructificando; la cosecha se seca en el bajo y él la compra; el alquiler cada mañana, la redada, el impago y dejarlo', [], async () => {
+    const r0 = Math.random, sv = { money: S.money, heat: S.heat, sales: S.sales, ch: S.ch, day: S.day, min: S.min }; window.R = {};
+    const dia = async v => { S.day++; Math.random = () => v; setasDia(); Math.random = r0; await idle(); };
+    S.ch = 3; S.money = 5000; S.heat = 0; S.min = 600; S.setas = null; enterMap('callejon', 17, 9, 'up'); R.tx = ents.filter(e => e.id === 'txomin').map(e => e.x + ',' + e.y).join();
+    await run(talkTxomin); R.antes = S.setas; S.ch = 4;
+    want(['^Alquilarlo']); await run(talkTxomin); R.alq = [!!S.setas, 5000 - S.money].join();
+    want(['^Comprar', '^Comprar', '^Comprar', '^Nada']); await run(talkTxomin); const [A, B, C] = S.setas.bandejas; R.b = [S.setas.bandejas.length, 5000 - S.money].join();
+    R.m = S.money; await dia(.5); R.d1 = [A.hum, faseSeta(A), R.m - S.money].join(); R.min = S.min; want(['^Pulverizar', '^Nada']); await run(talkTxomin); R.pulv = [A.hum, B.hum, C.hum, S.min - R.min].join();
+    A.hum = 40; B.hum = 30; await dia(.1); R.malas = [faseSeta(A), faseSeta(B), faseSeta(C), C.hum].join();
+    want(['^Tirar', '^Nada']); await run(talkTxomin); R.tirar = S.setas.bandejas.length;
+    S.day = C.d + SETAS.colon - 1; R.f1 = faseSeta(C); S.day = C.d + SETAS.colon; R.f2 = faseSeta(C); S.day = C.d + SETAS.colon + SETAS.fruto; R.f3 = faseSeta(C);
+    await run(async () => { Math.random = () => .5; want(['^Recoger', '^Nada']); await talkTxomin(); Math.random = r0; }); R.g = S.setas.g; R.quedan = S.setas.bandejas.length;
+    R.m = S.money; R.h = S.heat; want(['^Venderle', '^Nada']); await run(talkTxomin); R.venta = [S.money - R.m, S.heat - R.h, S.setas.g].join();
+    want(['^Comprar', '^Nada']); await run(talkTxomin); R.h = S.heat; await dia(0); R.redada = [S.setas === null, S.heat - R.h].join();
+    want(['^Alquilarlo']); await run(talkTxomin); S.money = 10; await dia(.5); R.impago = [S.setas === null, S.money].join();
+    S.money = 5000; want(['^Alquilarlo']); await run(talkTxomin); R.m = S.money; want(['^Dejar el bajo', '^Dejarlo']); await run(talkTxomin); R.dejar = [S.setas === null, S.money - R.m].join();
+    S.setas = null; S.money = sv.money; S.heat = sv.heat; S.sales = sv.sales; S.ch = sv.ch; S.day = sv.day; S.min = sv.min; enterMap('home', 5, 5, 'up');
+  }, () => R.tx === '17,8' && R.antes === null && R.alq === 'true,' + SETAS.fianza && R.b === '3,' + (SETAS.fianza + 3 * SETAS.bandeja) && R.d1 === `${100 - SETAS.seca},colonizando,${SETAS.dia}` && R.pulv === `100,100,100,${SETAS.min}`
+    && R.malas === `contaminada,seca,colonizando,${100 - SETAS.seca}` && R.tirar === 1 && R.f1 === 'colonizando' && R.f2 === 'fructificando' && R.f3 === 'lista' && R.g === 33 && R.quedan === 0
+    && R.venta === `${33 * SETAS.precio},${SETAS.calor},0` && R.redada === 'true,' + SETAS.calorRedada && R.impago === 'true,10' && R.dejar === 'true,' + SETAS.fianza
+    && LOG.some(l => l === 'TXOMIN: ¿Setas? Eso era antes, chaval. Ahora solo paseo.') && LOG.some(l => l === 'SMS · TXOMIN: Se te han echado a perder 2 bandejas. Tíralas.') && LOG.some(l => l === 'Tiras 2 bandejas.')
+    && LOG.some(l => l === `TXOMIN: El bajo: 1 lista · humedad ${100 - SETAS.seca} %.`) && LOG.some(l => l === 'Recoges las setas y las dejas secando en el bajo: 33 g.')
+    && LOG.some(l => l === 'La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas.') && LOG.some(l => l === 'SMS · TXOMIN: No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí.') || R);
   await step('Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas', ['^Hindu Kush'], async () => {
     S.ch = 5; S.flags.txaro = true; S.flags.txaro2 = false; S.map = 'txaro'; buildEnts(); window.R = { ent: ents.filter(e => e.id === 'txaro').map(e => e.x + ',' + e.y).join() };
     S.buds = {}; addBuds('ria', 20, 12); addBuds('hindu', 15, 18); addBuds('thai', 20, 16); R.ch = S.seeds.chitral || 0; R.boc = S.items.bocata; R.rep = S.rep;

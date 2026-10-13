@@ -12,7 +12,7 @@ function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},gen:{},pedido:[],esquejes:[],bandejas:[],fenos:{},fenoN:0,fnom:{},eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
   caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0,arcon:{buds:{},rosin:{}},sala:{},fijos:[],sms:[],envio:[],orden:0,misiones:{},lonja:0,trueque:0,chatarra:null,
-  rel:{},relDia:{},curro:{jard:null,vend:[]},clubs:{},clubDia:{},clubCompra:{},clubEnc:null,clubEncDia:0,catas:{},rivales:{},rivalFuera:{},deco:{},pelea:{xp:0,fue:0,ref:0}};}   // la gente (1.15, 11e-gente)
+  rel:{},relDia:{},curro:{jard:null,vend:[]},clubs:{},clubDia:{},clubCompra:{},clubEnc:null,clubEncDia:0,catas:{},rivales:{},rivalFuera:{},deco:{},pelea:{xp:0,fue:0,ref:0},plantilla:[],plN:0,nave:null,setas:null};}   // la gente (1.15, 11e-gente)
 const isFree=()=>mode==='world'&&lock===0&&handlers.length===0;
 const isNight=()=>S.min>=21*60||S.min<6*60;
 async function run(fn){lock++;try{await fn();}catch(e){console.error(e);}finally{lock--;}if(!lock&&S&&S.misiones)revisaMisiones();}
@@ -29,7 +29,7 @@ function discover(sid){if(!S.disc[sid]){S.disc[sid]=true;toast(`<small>NUEVA EN 
 function addSeeds(sid,n){S.seeds[sid]=(S.seeds[sid]||0)+n;discover(sid);}
 // cogollos por lotes: clave = variedad, o variedad + '*' para lo de un fenotipo estrella (se vende y se presenta aparte)
 const lotSid=k=>k.replace(/\*$/,''),lotNombre=k=>getStrain(lotSid(k)).n+(k.endsWith('*')?' ★':'');
-function addBuds(k,g,thc){const b=S.buds[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;delete b.cata;delete b.ana;}else S.buds[k]={g,thc};discover(lotSid(k));}
+function addBuds(k,g,thc,L=S.buds){const b=L[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;delete b.cata;delete b.ana;}else L[k]={g,thc};discover(lotSid(k));}   // L: otro sitio (el arcón)
 function useBuds(k,g){const b=S.buds[k];b.g-=g;if(b.g<.5)delete S.buds[k];}
 function budLots(min,minThc=0){return Object.entries(S.buds).filter(([k,b])=>b.g>=min&&b.thc>=minThc);}
 // rosin (1.10): lo que sale de prensar cogollos en la mesa (prensar, 09-cultivo), por lotes como ellos y al décimo de gramo

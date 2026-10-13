@@ -35,6 +35,13 @@ func arg(k: String, d := "") -> String:
 	var i := a.find(k)
 	return a[i + 1] if i >= 0 and i + 1 < a.size() else d
 
+# Array.join(',') de JavaScript: null → '', números como en JS
+func jn(a: Array) -> String:
+	var o := []
+	for x in a:
+		o.append("" if x == null else ("true" if x else "false") if x is bool else Datos.js_num(x) if (x is int or x is float) else str(x))
+	return ",".join(PackedStringArray(o))
+
 # ---------- JSON como el de JavaScript (para R.antes, R.pot…) ----------
 func jj(v) -> String:
 	if v == null:
@@ -1692,6 +1699,245 @@ func _pasos() -> void:
 			and R.w2 == "win" and R.max == "66,5,5" and absf(R.pe5 - .75) < 1e-9 and R.h == "flee" and R.fila == 1
 			and LOG.has("El atracador se lanza y te apartas a tiempo.") and LOG.has("Darko baja la barra y te apartas a tiempo.") and LOG.has("Le pillas abierto.") and LOG.has("No te apartas a tiempo.") and LOG.has("«¿A mí? Ahora vas a ver.»")
 			and LOG.has("El atracador se lo piensa mejor y se va.") and LOG.has("«A mí no me amenaza nadie.»") and LOG.has("Subes a nivel 1 de pelea.") and LOG.has("REFLEJOS 5: aciertas, esquivas y escapas mejor."), R))
+	step("La plantilla (1.19): Patxi te manda gente del barrio por un sobre (labia, cuidado y lealtad del 1 al 5); a la calle con un lote (vende, o le para la policía, le atracan, se larga o le timan, según sus números), de gerente (cuida y cosecha al arcón con su sisa) y en la nave de Valdehierro, que alquila Arrieta (cada mañana, el alquiler, la redada y lo que saca cada uno)", [], func():
+		var sv: Dictionary = {"money": J.S.money, "heat": J.S.heat, "buds": J.S.buds.duplicate(true), "arcon": J.S.arcon.duplicate(true), "pots": J.S.pots.duplicate(true), "carpas": J.S.carpas.duplicate(true), "seeds": J.S.seeds.duplicate(true),
+			"sales": J.S.sales, "ch": J.S.ch, "fenos": J.S.fenos.duplicate(true), "rec": J.S.rec.duplicate(true), "h1": J.S.flags.get("harvest1", false)}
+		R = {}
+		J.S.ch = 5
+		J.S.money = 5000
+		J.S.heat = 0
+		J.S.plantilla = []
+		J.S.plN = 0
+		J.S.nave = null
+		J.S.buds = {}
+		J.add_buds("ria", 100, 12)
+		J.S.arcon = {"buds": {}, "rosin": {}}
+		var fi := func(w): return ("%s,%d,%d,%d,%s" % [w.n, int(w.lab), int(w.cui), int(w.lea), w.rol if w.rol else ""]) if w else ""
+		var dia := func(v: float):
+			Cultivo.fijo = v
+			J.plantilla_dia()
+			Cultivo.fijo = -1
+			await idle()
+		await run(func():
+			Cultivo.fijo = .99
+			want(["^Contratar"])
+			await J.pedir_gente()
+			R.w1 = fi.call(J.S.plantilla[0])
+			Cultivo.fijo = 0
+			want(["^No"])
+			await J.pedir_gente()
+			R.n2 = J.S.plantilla.size()
+			want(["^Contratar"])
+			await J.pedir_gente()
+			R.w2 = fi.call(J.S.plantilla[1])
+			Cultivo.fijo = .5
+			want(["^Contratar"])
+			await J.pedir_gente()
+			R.w3 = fi.call(J.S.plantilla[2])
+			R.pl = "%d,%d" % [int(J.S.plN), 5000 - J.S.money]
+			Cultivo.fijo = -1)
+		var itz: Dictionary = J.S.plantilla[0]
+		var mik: Dictionary = J.S.plantilla[1]
+		var ike: Dictionary = J.S.plantilla[2]
+		want(["^A la calle", "^Skunk", "^25 g"])
+		await run(func(): await J.trabajo(mik))
+		R.calle = "%s,%s,%d,%d" % [mik.rol, mik.k, int(mik.g), int(J.S.buds.ria.g)]
+		want(["^De gerente"])
+		await run(func(): await J.trabajo(ike))
+		var l0 := LOG.size()
+		want(["<B>"])
+		await run(func(): await J.trabajo(itz))
+		R.ops = LOG.slice(l0).filter(func(l): return l.begins_with("  [menú] A la calle | Despedir | Nada")).size()
+		J.S.pots = J.S.pots.map(func(_p): return null)
+		J.S.pots[0] = {"sid": "ria", "prog": 1, "water": 100, "health": 100, "fert": false, "pest": false, "f": {"t": 1, "y": 1}}
+		R.gc = J.gramos_planta(J.S.pots[0], J.factores(0))
+		R.m = J.S.money
+		await dia.call(.5)
+		R.e = Datos.jsround(J.precio_calle(12) * D.ZONAS.town.precio * 3 * (1 - D.PLANTILLA.com))
+		R.venta = jn([mik.g, J.S.money - R.m + int(D.PLANTILLA.sueldo.gerente), J.S.heat])
+		R.arc = J.S.arcon.buds.ria.g if J.S.arcon.buds.has("ria") else 0
+		R.pot = J.S.pots[0]
+		R.m = J.S.money
+		await dia.call(.01)
+		R.poli = jn([mik.rol, not mik.has("g"), J.S.heat, R.m - J.S.money])
+		want(["^A la calle", "^Skunk", "^25 g"])
+		await run(func(): await J.trabajo(mik))
+		await dia.call(.1)
+		R.robo = mik.g
+		await dia.call(.2)
+		R.timo = mik.g
+		await dia.call(.14)
+		R.fuga = ",".join(PackedStringArray(J.S.plantilla.map(func(w): return w.n)))
+		J.S.money = 10
+		await dia.call(.5)
+		R.sin = jn([ike.rol, J.S.money])
+		J.S.money = 5000
+		J.enter_map("valdehierro", 17, 8, "up")
+		R.ar = ",".join(PackedStringArray(J.ents.filter(func(e): return e.id == "arrieta").map(func(e): return "%d,%d" % [e.x, e.y])))
+		want(["^Alquilarla"])
+		await run(func(): await J.talk_nave())
+		R.nave = jn([J.S.nave != null, 5000 - J.S.money])
+		want(["^A la nave"])
+		await run(func(): await J.trabajo(itz))
+		J.S.seeds.ria = int(J.S.seeds.get("ria", 0)) + 1
+		R.s0 = J.S.seeds.ria
+		want(["^Cambiar", "^" + J.strain("ria").n + "$"])
+		await run(func(): await J.talk_nave())
+		R.var = jn([J.S.nave.sid, J.S.nave.thc, R.s0 - int(J.S.seeds.get("ria", 0))])
+		R.m = J.S.money
+		await dia.call(.99)
+		R.crece = jn([J.S.nave.g, R.m - J.S.money])
+		R.b = J.S.buds.ria.g
+		want(["^Recoger"])
+		await run(func(): await J.talk_nave())
+		R.rec = jn([J.S.buds.ria.g - R.b, J.S.nave.g])
+		R.h = J.S.heat
+		await dia.call(0)
+		R.redada = jn([J.S.nave == null, ",".join(PackedStringArray(J.S.plantilla.map(func(w): return w.n))), J.S.heat - R.h])
+		J.S.money = 5000
+		want(["^Alquilarla"])
+		await run(func(): await J.talk_nave())
+		R.m = J.S.money
+		want(["^Dejar la nave", "^Dejarla"])
+		await run(func(): await J.talk_nave())
+		R.dejar = jn([J.S.nave == null, J.S.money - R.m])
+		J.S.money = 5000
+		want(["^Alquilarla"])
+		await run(func(): await J.talk_nave())
+		J.S.money = 50
+		await dia.call(.5)
+		R.impago = jn([J.S.nave == null, J.S.money])
+		var l1 := LOG.size()
+		want(["<B>"])
+		await run(J.movil_menu)
+		want(["<B>"])
+		await run(J.plantilla)
+		R.menus = LOG.slice(l1).filter(func(l): return l.contains(" | Gente | Plantilla | ") or l.ends_with("| Pedir gente a Patxi  → (B)")).size()
+		R.ln = J.lot_nombre("ria")
+		J.S.plantilla = []
+		J.S.plN = 0
+		J.S.nave = null
+		J.S.money = sv.money
+		J.S.heat = sv.heat
+		J.S.buds = sv.buds
+		J.S.arcon = sv.arcon
+		J.S.pots = sv.pots
+		J.S.carpas = sv.carpas
+		J.S.seeds = sv.seeds
+		J.S.sales = sv.sales
+		J.S.ch = sv.ch
+		J.S.fenos = sv.fenos
+		J.S.rec = sv.rec
+		J.S.flags.harvest1 = sv.h1
+		J.enter_map("home", 5, 5, "up"),
+		func():
+			var P: Dictionary = D.PLANTILLA
+			var N: Dictionary = D.NAVE
+			return chk(R.w1 == "Itziar,5,5,5," and R.n2 == 1 and R.w2 == "Mikel,1,1,1," and R.w3 == "Iker,3,3,3," and R.pl == "4,%d" % (4 * int(P.sobre)) and R.calle == "calle,ria,25,75" and R.ops == 1
+				and R.venta == jn([22, R.e, P.calor]) and R.arc == R.gc - int(floor(R.gc * P.sisa * 2)) and R.pot == null
+				and R.poli == jn([null, true, P.calor + P.calorPoli, P.sueldo.gerente])
+				and R.robo == 12 and R.timo == 10 and R.fuga == "Itziar,Iker" and R.sin == ",10" and R.ar == "17,7" and R.nave == jn([true, N.fianza])
+				and R.var == jn(["ria", Datos.jsround(J.strain("ria").thc * N.thc * 10) / 10.0, 1]) and R.crece == jn([N.g + 2 * N.gC, N.dia + P.sueldo.nave])
+				and R.rec == jn([N.g + 2 * N.gC, 0]) and R.redada == jn([true, "Iker", N.calor])
+				and R.dejar == jn([true, N.fianza]) and R.impago == "true,50" and R.menus == 2
+				and LOG.has("SMS · PATXI: Te mando a Itziar. Vale oro.") and LOG.has("Mikel se va por donde ha venido. El sobre ya es de Patxi.") and LOG.has("SMS · PATXI: Te mando a Iker. Gente normal del barrio.")
+				and LOG.has("SMS · IKER: He cosechado %d g. Está en el arcón." % R.arc) and LOG.has("SMS · MIKEL: Me ha parado la policía. Se han quedado con 22 g de %s. Lo siento." % R.ln)
+				and LOG.has("SMS · MIKEL: Me han atracado en un portal. Se han llevado 13 g de %s. Me quedan 12 g." % R.ln) and LOG.has("SMS · MIKEL: Me han pagado 2 g con billetes falsos. No me he dado cuenta hasta el banco.")
+				and LOG.has("Mikel no contesta al móvil. Se ha largado con 10 g de %s." % R.ln) and LOG.has("SMS · IKER: Sin cobrar no curro. Cuando tengas el dinero, me llamas.")
+				and LOG.has("La policía ha entrado en la nave de Valdehierro. Se lleva las plantas y a Itziar.") and LOG.has("SMS · ARRIETA: No me has pagado la nave. Cambio la cerradura y me quedo la fianza."), R))
+	step("El bajo de las setas (1.20): Txomin alquila el bajo de la Kale Zaharra desde el capítulo 4; las bandejas que prepara él (húmedas: cada día pierden; secas o contaminadas, a tirar), 6 días colonizando y 4 fructificando; la cosecha se seca en el bajo y él la compra; el alquiler cada mañana, la redada, el impago y dejarlo", [], func():
+		var sv: Dictionary = {"money": J.S.money, "heat": J.S.heat, "sales": J.S.sales, "ch": J.S.ch, "day": J.S.day, "min": J.S.min}
+		R = {}
+		var dia := func(v: float):
+			J.S.day += 1
+			Cultivo.fijo = v
+			J.setas_dia()
+			Cultivo.fijo = -1
+			await idle()
+		J.S.ch = 3
+		J.S.money = 5000
+		J.S.heat = 0
+		J.S.min = 600
+		J.S.setas = null
+		J.enter_map("callejon", 17, 9, "up")
+		R.tx = ",".join(PackedStringArray(J.ents.filter(func(e): return e.id == "txomin").map(func(e): return "%d,%d" % [e.x, e.y])))
+		await run(J.talk_txomin)
+		R.antes = J.S.setas
+		J.S.ch = 4
+		want(["^Alquilarlo"])
+		await run(J.talk_txomin)
+		R.alq = jn([J.S.setas != null, 5000 - J.S.money])
+		want(["^Comprar", "^Comprar", "^Comprar", "^Nada"])
+		await run(J.talk_txomin)
+		var A: Dictionary = J.S.setas.bandejas[0]
+		var B: Dictionary = J.S.setas.bandejas[1]
+		var C: Dictionary = J.S.setas.bandejas[2]
+		R.b = jn([J.S.setas.bandejas.size(), 5000 - J.S.money])
+		R.m = J.S.money
+		await dia.call(.5)
+		R.d1 = jn([A.hum, J.fase_seta(A), R.m - J.S.money])
+		R.min = J.S.min
+		want(["^Pulverizar", "^Nada"])
+		await run(J.talk_txomin)
+		R.pulv = jn([A.hum, B.hum, C.hum, J.S.min - R.min])
+		A.hum = 40
+		B.hum = 30
+		await dia.call(.1)
+		R.malas = jn([J.fase_seta(A), J.fase_seta(B), J.fase_seta(C), C.hum])
+		want(["^Tirar", "^Nada"])
+		await run(J.talk_txomin)
+		R.tirar = J.S.setas.bandejas.size()
+		J.S.day = C.d + D.SETAS.colon - 1
+		R.f1 = J.fase_seta(C)
+		J.S.day = C.d + D.SETAS.colon
+		R.f2 = J.fase_seta(C)
+		J.S.day = C.d + D.SETAS.colon + D.SETAS.fruto
+		R.f3 = J.fase_seta(C)
+		await run(func():
+			Cultivo.fijo = .5
+			want(["^Recoger", "^Nada"])
+			await J.talk_txomin()
+			Cultivo.fijo = -1)
+		R.g = J.S.setas.g
+		R.quedan = J.S.setas.bandejas.size()
+		R.m = J.S.money
+		R.h = J.S.heat
+		want(["^Venderle", "^Nada"])
+		await run(J.talk_txomin)
+		R.venta = jn([J.S.money - R.m, J.S.heat - R.h, J.S.setas.g])
+		want(["^Comprar", "^Nada"])
+		await run(J.talk_txomin)
+		R.h = J.S.heat
+		await dia.call(0)
+		R.redada = jn([J.S.setas == null, J.S.heat - R.h])
+		want(["^Alquilarlo"])
+		await run(J.talk_txomin)
+		J.S.money = 10
+		await dia.call(.5)
+		R.impago = jn([J.S.setas == null, J.S.money])
+		J.S.money = 5000
+		want(["^Alquilarlo"])
+		await run(J.talk_txomin)
+		R.m = J.S.money
+		want(["^Dejar el bajo", "^Dejarlo"])
+		await run(J.talk_txomin)
+		R.dejar = jn([J.S.setas == null, J.S.money - R.m])
+		J.S.setas = null
+		J.S.money = sv.money
+		J.S.heat = sv.heat
+		J.S.sales = sv.sales
+		J.S.ch = sv.ch
+		J.S.day = sv.day
+		J.S.min = sv.min
+		J.enter_map("home", 5, 5, "up"),
+		func():
+			var Z: Dictionary = D.SETAS
+			return chk(R.tx == "17,8" and R.antes == null and R.alq == jn([true, Z.fianza]) and R.b == jn([3, Z.fianza + 3 * Z.bandeja]) and R.d1 == jn([100 - Z.seca, "colonizando", Z.dia]) and R.pulv == jn([100, 100, 100, Z.min])
+				and R.malas == jn(["contaminada", "seca", "colonizando", 100 - Z.seca]) and R.tirar == 1 and R.f1 == "colonizando" and R.f2 == "fructificando" and R.f3 == "lista" and R.g == 33 and R.quedan == 0
+				and R.venta == jn([33 * Z.precio, Z.calor, 0]) and R.redada == jn([true, Z.calorRedada]) and R.impago == "true,10" and R.dejar == jn([true, Z.fianza])
+				and LOG.has("TXOMIN: ¿Setas? Eso era antes, chaval. Ahora solo paseo.") and LOG.has("SMS · TXOMIN: Se te han echado a perder 2 bandejas. Tíralas.") and LOG.has("Tiras 2 bandejas.")
+				and LOG.has("TXOMIN: El bajo: 1 lista · humedad %s %%." % Datos.js_num(100 - Z.seca)) and LOG.has("Recoges las setas y las dejas secando en el bajo: 33 g.")
+				and LOG.has("La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas.") and LOG.has("SMS · TXOMIN: No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí."), R))
 	step("Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas", ["^Hindu Kush"], func():
 		J.S.ch = 5
 		J.S.flags.txaro = true

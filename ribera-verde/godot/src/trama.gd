@@ -2295,7 +2295,10 @@ func movil_menu():
 		var ops := ["Llamar"]
 		if S.flags.get("kiko1"):
 			ops.append("Pedir a Kiko")
-		ops.append_array(["Mensajes", "Gente", "Tienda online", "Colgar"])
+		ops.append_array(["Mensajes", "Gente"])
+		if S.ch >= int(D.PLANTILLA.ch):
+			ops.append("Plantilla")
+		ops.append_array(["Tienda online", "Colgar"])
 		var ns: int = S.sms.size()
 		var oi: int = await ask("MÓVIL · día %s, %s%s" % [n(S.day), reloj_txt(), (" · %d mensaje%s" % [ns, "s" if ns > 1 else ""]) if ns else ""], ops)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
@@ -2310,6 +2313,8 @@ func movil_menu():
 			await tienda_online()
 		elif op == "Gente":   # 1.15
 			await gente()
+		elif op == "Plantilla":   # 1.19
+			await plantilla()
 		else:
 			await mensajes()
 
@@ -2461,21 +2466,7 @@ func curro_dia() -> void:
 			queue("jard", func(): await talk("SMS · BEGOÑA", ["Sin cobrar no vuelvo, majo. Cuando tengas el dinero, hablamos."]))
 		else:
 			S.money -= int(J.sueldo)
-			for p in S.pots:
-				if p == null or p.get("dead"):
-					continue
-				p.water = 100
-				if p.get("pest") and S.items.insect > 0:
-					S.items.insect -= 1
-					p.pest = false
-			for ci in S.carpas.size():
-				var c = S.carpas[ci]
-				if c == null:
-					continue
-				if c.get("garrafas"):
-					c.erase("gar")
-				if c.get("goteo"):
-					c.dep = Cultivo.goteo_l(S, ci)
+			cuidar_plantas()
 			S.heat = min(100, S.heat + J.calor)
 	var fin := []
 	for v in C.vend:
@@ -2507,6 +2498,25 @@ func curro_dia() -> void:
 			queue("vend" + v.id, func(): await talk(N, ["Vendidos %d g: %s en tu buzón. Me quedan %s." % [g, Datos.eur(e), g_txt(v.g)]]))
 	if fin.size():
 		C.vend = C.vend.filter(func(v): return not fin.has(v))
+	plantilla_dia()   # la plantilla (1.19)
+
+# regar, tratar las plagas con tu insecticida y rellenar garrafas y depósitos (Begoña y el gerente de la plantilla)
+func cuidar_plantas() -> void:
+	for p in S.pots:
+		if p == null or p.get("dead"):
+			continue
+		p.water = 100
+		if p.get("pest") and S.items.insect > 0:
+			S.items.insect -= 1
+			p.pest = false
+	for ci in S.carpas.size():
+		var c = S.carpas[ci]
+		if c == null:
+			continue
+		if c.get("garrafas"):
+			c.erase("gar")
+		if c.get("goteo"):
+			c.dep = Cultivo.goteo_l(S, ci)
 
 func _vend_de(id: String):
 	for v in S.curro.vend:
@@ -2913,3 +2923,502 @@ func rival_event(z: String) -> void:
 		await say("No llevas tanto dinero encima.")
 	S.rivales[z] = int(D.RIVAL.umbral) - int(D.RIVAL.vuelve)
 	await say("Te apartas. %s se queda mirándote." % nom)
+
+# ---------- la plantilla (1.19, 11f-plantilla): gente del barrio que trabaja para ti ----------
+func ficha_gente(w: Dictionary) -> String:
+	return "Labia %d · cuidado %d · lealtad %d" % [w.lab, w.cui, w.lea]
+
+func gerente():
+	for w in S.plantilla:
+		if w.get("rol") == "gerente":
+			return w
+	return null
+
+func naveros() -> Array:
+	return S.plantilla.filter(func(w): return w.get("rol") == "nave")
+
+func nave_g(w: Dictionary) -> int:
+	return int(D.NAVE.g + D.NAVE.gC * (w.cui - 3))
+
+func rol_txt(w: Dictionary) -> String:
+	if w.get("rol") == "calle":
+		return "calle · " + g_txt(w.g)
+	return w.rol if w.get("rol") else "sin trabajo"
+
+func rol_desc(w: Dictionary) -> String:
+	var P: Dictionary = D.PLANTILLA
+	match w.get("rol"):
+		"calle":
+			return "Vende %s en la calle: le quedan %s." % [lot_nombre(w.k), g_txt(w.g)]
+		"gerente":
+			return "Cuida el piso y cosecha al arcón por %s al día." % Datos.eur(P.sueldo.gerente)
+		"nave":
+			return "Cultiva en la nave por %s al día: %d g." % [Datos.eur(P.sueldo.nave), nave_g(w)]
+	return "Dale trabajo: calle, gerente o nave."
+
+# deja el trabajo; lo que le quedaba del lote vuelve al arcón
+func libre(w: Dictionary) -> void:
+	if w.get("rol") == "calle" and w.g >= 1:
+		add_buds(w.k, w.g, w.thc, S.arcon.buds)
+	w.rol = null
+	w.erase("k")
+	w.erase("thc")
+	w.erase("g")
+
+func plantilla() -> void:
+	var P: Dictionary = D.PLANTILLA
+	var i := 0
+	while true:
+		var L: Array = S.plantilla
+		var rows := []
+		for w in L:
+			rows.append({"label": w.n, "right": rol_txt(w), "desc": ficha_gente(w) + ". " + rol_desc(w)})
+		if L.size() < int(P.max):
+			rows.append({"label": "Pedir gente a Patxi", "right": Datos.eur(P.sobre), "desc": "Patxi te manda a alguien del barrio que quiere currar. No sabes a quién hasta que llega."})
+		var t2: String = "%d de %d" % [L.size(), int(P.max)] + ((" · nave " + g_txt(S.nave.g)) if S.get("nave") != null else "")
+		i = await menu(rows, {"cls": "full", "title": "PLANTILLA", "title2": t2, "desc": true, "initial": mini(i, rows.size() - 1)})
+		if i < 0:
+			return
+		if i >= L.size():
+			await pedir_gente()
+		else:
+			await trabajo(L[i])
+
+func pedir_gente() -> void:
+	var P: Dictionary = D.PLANTILLA
+	var libres := []
+	for nb in D.BARRIO:
+		if not S.plantilla.any(func(w): return w.n == nb):
+			libres.append(nb)
+	if S.money < P.sobre:
+		sfx("bad")
+		await say("Patxi cobra %s por el sobre. No te llega." % Datos.eur(P.sobre))
+		return
+	if libres.is_empty():
+		await say("Patxi ya no conoce a nadie más que quiera currar.")
+		return
+	S.money -= int(P.sobre)
+	var nm: String = pick(libres)
+	S.plN = int(S.plN) + 1
+	var w := {"id": "pl%d" % int(S.plN), "n": nm, "lab": ri(1, 5), "cui": ri(1, 5), "lea": ri(1, 5), "rol": null}
+	var t: int = w.lab + w.cui + w.lea
+	sfx("get")
+	await talk("SMS · PATXI", ["Te mando a %s. %s" % [nm, "Vale oro." if t >= 12 else ("No es gran cosa, pero quiere currar." if t <= 6 else "Gente normal del barrio.")]])
+	if await ask("%s: %s. ¿Le contratas?" % [nm, ficha_gente(w)], ["Contratar", "No"]) != 0:
+		await say("%s se va por donde ha venido. El sobre ya es de Patxi." % nm)
+		return
+	S.plantilla.append(w)
+	sfx("sel")
+	await say("%s entra en tu plantilla. Dale trabajo desde aquí." % nm)
+
+# un lote de los de encima para la calle: [clave, THC, gramos] o null
+func lote_calle(w: Dictionary):
+	var P: Dictionary = D.PLANTILLA
+	var lots := bud_lots(P.lotes[0])
+	if lots.is_empty():
+		await say("Para la calle hace falta un lote de %d g o más encima." % int(P.lotes[0]))
+		return null
+	var it := lots.map(lot_item)
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿Qué lote le das?"})
+	if i < 0 or i >= lots.size():
+		return null
+	var k: String = lots[i][0]
+	var b: Dictionary = lots[i][1]
+	var ops := []
+	for g in P.lotes:
+		if g <= floor(b.g):
+			ops.append(int(g))
+	var o2 := ops.map(func(g): return "%d g" % g)
+	o2.append("Nada")
+	var j: int = await ask("%s vende a precio de calle y se queda el %d %%. ¿Cuánto le das?" % [w.n, Datos.jsround(P.com * 100)], o2)
+	if j < 0 or j >= ops.size():
+		return null
+	var thc: float = b.thc
+	use_buds(k, ops[j])
+	return [k, thc, ops[j]]
+
+func trabajo(w: Dictionary) -> void:
+	var P: Dictionary = D.PLANTILLA
+	var ops := []
+	if w.get("rol") != "calle":
+		ops.append("A la calle")
+	if w.get("rol") != "gerente" and gerente() == null:
+		ops.append("De gerente")
+	if w.get("rol") != "nave" and S.get("nave") != null and naveros().size() < int(D.NAVE.max):
+		ops.append("A la nave")
+	if w.get("rol"):
+		ops.append("Dejarlo libre")
+	ops.append_array(["Despedir", "Nada"])
+	var oi: int = await ask("%s · %s · %s" % [w.n, ficha_gente(w), rol_txt(w)], ops)
+	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+	if op == "A la calle":
+		var r = await lote_calle(w)
+		if r == null:
+			return
+		libre(w)
+		w.rol = "calle"
+		w.k = r[0]
+		w.thc = r[1]
+		w.g = r[2]
+		sfx("sel")
+		await say("%s: «Hecho. Cada día te dejo lo vendido en el buzón»." % w.n)
+	elif op == "De gerente":
+		libre(w)
+		w.rol = "gerente"
+		sfx("sel")
+		await say("%s: «Cada mañana me paso por el piso: riego, trato las plagas y lo que esté listo lo cosecho y lo dejo en el arcón. %s al día»." % [w.n, Datos.eur(P.sueldo.gerente)])
+	elif op == "A la nave":
+		libre(w)
+		w.rol = "nave"
+		sfx("sel")
+		await say("%s: «Mañana empiezo en la nave. %s al día»." % [w.n, Datos.eur(P.sueldo.nave)])
+	elif op == "Dejarlo libre":
+		var g: float = w.g if w.get("rol") == "calle" else 0.0
+		libre(w)
+		await say(("%s te deja lo que le quedaba en el arcón: %s." % [w.n, g_txt(g)]) if g >= 1 else "%s se queda sin trabajo." % w.n)
+	elif op == "Despedir":
+		if await ask("¿Despides a %s?" % w.n, ["Despedir", "No"]) != 0:
+			return
+		var g: float = w.g if w.get("rol") == "calle" else 0.0
+		libre(w)
+		S.plantilla = S.plantilla.filter(func(x): return x != w)
+		await say("%s se va." % w.n + ((" Lo que le quedaba, %s, está en el arcón." % g_txt(g)) if g >= 1 else ""))
+
+# el gerente, cada mañana: cuida las plantas y cosecha las que están listas al arcón (su sisa, por la lealtad); da los gramos
+func cuidar_casa(w: Dictionary) -> int:
+	cuidar_plantas()
+	var tot := 0
+	for i in S.pots.size():
+		var p = S.pots[i]
+		if p == null or p.get("dead") or p.prog < 1:
+			continue
+		var f := factores(i)
+		var g := gramos_planta(p, f)
+		var thc := Cultivo.thc_cosecha(S, p, f)
+		var cl := Cultivo.clase_feno(p.get("f"))
+		var sc := semillas_cosecha(p)
+		var q: int = g - int(floor(g * D.PLANTILLA.sisa * (5 - w.lea)))
+		if q >= 1:
+			add_buds(p.sid + "*" if cl == "estrella" else p.sid, q, thc, S.arcon.buds)
+		if sc.n:
+			add_seeds(p.sid, sc.n)
+		if p.get("f") and p.f.get("id"):
+			S.fenos[str(int(p.f.id))] = cl
+		if S.rec.get(p.sid) == 1:
+			S.rec[p.sid] = 2
+		S.pots[i] = null
+		tot += q
+	if tot:
+		S.flags.harvest1 = true
+		var N: String = "SMS · " + w.n.to_upper()
+		var tt := tot
+		queue("gerente", func(): await talk(N, ["He cosechado %d g. Está en el arcón." % tt]))
+		queue("historia", check_story)
+	return tot
+
+# al amanecer (desde curro_dia): sueldos, el gerente, la calle y la nave
+func plantilla_dia() -> void:
+	var P: Dictionary = D.PLANTILLA
+	var fuera := []
+	for w in S.plantilla:
+		if w.get("rol") != "gerente" and w.get("rol") != "nave":
+			continue
+		if S.money < P.sueldo[w.rol]:
+			w.rol = null
+			var N: String = "SMS · " + w.n.to_upper()
+			queue("pl" + w.id, func(): await talk(N, ["Sin cobrar no curro. Cuando tengas el dinero, me llamas."]))
+		else:
+			S.money -= int(P.sueldo[w.rol])
+	var ger = gerente()
+	if ger != null:
+		cuidar_casa(ger)
+	for w in S.plantilla:
+		if w.get("rol") != "calle":
+			continue
+		var N: String = "SMS · " + w.n.to_upper()
+		var lote := lot_nombre(w.k)
+		var r := Cultivo.azar()
+		var pp: float = P.poli - P.poliC * (w.cui - 1)
+		var pr: float = pp + P.robo - P.roboC * (w.cui - 1)
+		var pf: float = pr + P.fuga * (5 - w.lea) / 4 * (.5 if ger != null else 1.0)
+		var pt: float = pf + P.timo - P.timoL * (w.lab - 1)
+		var m := ""
+		if r < pp:
+			S.heat = min(100, S.heat + P.calorPoli)
+			m = "Me ha parado la policía. Se han quedado con %s de %s. Lo siento." % [g_txt(w.g), lote]
+			w.g = 0
+		elif r < pr:
+			var q: int = int(ceil(w.g / 2.0))
+			w.g -= q
+			m = "Me han atracado en un portal. Se han llevado %s de %s." % [g_txt(q), lote] + ((" Me quedan %s." % g_txt(w.g)) if w.g >= 1 else "")
+		elif r < pf:
+			fuera.append(w)
+			var gg: float = w.g
+			var nm: String = w.n
+			queue("pl" + w.id, func(): await say("%s no contesta al móvil. Se ha largado con %s de %s." % [nm, g_txt(gg), lote]))
+			continue
+		else:
+			var q: int = mini(int(floor(w.g)), ri(int(P.g[0]), int(P.g[1])) * int(w.lab))
+			w.g -= q
+			if r < pt:
+				m = "Me han pagado %d g con billetes falsos. No me he dado cuenta hasta el banco." % q
+			else:
+				var e := Datos.jsround(precio_calle(w.thc) * D.ZONAS.town.precio * q * (1 - P.com))
+				S.money += e
+				S.sales += e
+				S.heat = min(100, S.heat + P.calor)
+				m = ("Vendidos %d g: %s en tu buzón. Me quedan %s." % [q, Datos.eur(e), g_txt(w.g)]) if w.g >= 1 else ("Vendidos los últimos %d g: %s en tu buzón. Dame más cuando quieras." % [q, Datos.eur(e)])
+		if w.g < 1:
+			libre(w)
+		var mm := m
+		queue("pl" + w.id, func(): await talk(N, [mm]))
+	if fuera.size():
+		S.plantilla = S.plantilla.filter(func(w): return not fuera.has(w))
+	nave_dia()
+
+# la nave: el alquiler cada mañana (sin él, Arrieta cambia la cerradura y se queda la fianza), la redada (menos con cuidado) y lo que crece
+func nave_dia() -> void:
+	var N = S.get("nave")
+	if N == null:
+		return
+	if S.money < D.NAVE.dia:
+		for w in naveros():
+			libre(w)
+		S.nave = null
+		queue("nave", func(): await talk("SMS · ARRIETA", ["No me has pagado la nave. Cambio la cerradura y me quedo la fianza."]))
+		return
+	S.money -= int(D.NAVE.dia)
+	var W := naveros()
+	if W.is_empty() or not N.get("sid"):
+		return
+	var mc := 0
+	for w in W:
+		mc = maxi(mc, int(w.cui))
+	if Cultivo.azar() < maxf(0, D.NAVE.redada - D.NAVE.redadaC * mc):
+		var ns: Array = W.map(func(w): return w.n)
+		var quien: String = (", ".join(PackedStringArray(ns.slice(0, -1))) + " y " + ns[-1]) if ns.size() > 1 else ns[0]
+		var gg: float = N.g
+		S.nave = null
+		S.plantilla = S.plantilla.filter(func(w): return w.get("rol") != "nave")
+		S.heat = min(100, S.heat + D.NAVE.calor)
+		sfx("bad")
+		queue("nave", func(): await say("La policía ha entrado en la nave de Valdehierro. Se lleva las plantas%s y a %s." % [(", " + g_txt(gg)) if gg >= 1 else "", quien]))
+		return
+	for w in W:
+		N.g += nave_g(w)
+
+# Arrieta, el dueño de la nave de Valdehierro
+func talk_nave() -> void:
+	var A := "ARRIETA"
+	var N = S.get("nave")
+	if S.ch < int(D.NAVE.ch):
+		await say("La nave no se alquila. Ahora mismo, no.", A)
+		return
+	if N == null:
+		if await ask("La nave está vacía: %s de fianza y %s al día, que te cobro cada mañana. Sin preguntas." % [Datos.eur(D.NAVE.fianza), Datos.eur(D.NAVE.dia)], ["Alquilarla", "No"], A) != 0:
+			return
+		if S.money < D.NAVE.fianza:
+			sfx("bad")
+			await say("Sin la fianza no hay llave.", A)
+			return
+		S.money -= int(D.NAVE.fianza)
+		S.nave = {"sid": null, "g": 0, "thc": 0}
+		sfx("coin")
+		await got("la llave de la nave")
+		await say("Pon a tu gente a trabajar desde el móvil y elige aquí qué se cultiva.", A)
+		return
+	var ops := []
+	if N.g >= 1:
+		ops.append("Recoger " + g_txt(N.g))
+	ops.append_array(["Cambiar la variedad", "Dejar la nave", "Nada"])
+	var cual: String = ("%s (%s %%)" % [strain(N.sid).n, Datos.pct(N.thc)]) if N.get("sid") else "sin variedad"
+	var oi: int = await ask("La nave: %s · %d de %d trabajando." % [cual, naveros().size(), int(D.NAVE.max)], ops, A)
+	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+	if op.begins_with("Recoger"):
+		var q: int = mini(int(floor(N.g)), int(floor(libre_mochila())))
+		if q < 1:
+			await say("No te cabe nada en la bolsa.", A)
+			return
+		add_buds(N.sid, q, N.thc)
+		N.g -= q
+		sfx("get")
+		await say("Recoges %d g de %s." % [q, strain(N.sid).n] + ((" Quedan %s." % g_txt(N.g)) if N.g >= 1 else ""))
+	elif op == "Cambiar la variedad":
+		if N.g >= 1:
+			await say("Recoge antes lo que hay.", A)
+			return
+		var ks := []
+		for k in S.seeds:
+			if S.seeds[k] > 0:
+				ks.append(k)
+		if ks.is_empty():
+			await say("Sin una semilla no se cultiva nada.", A)
+			return
+		var it := ks.map(func(k): return {"label": strain(k).n, "right": "%d sem." % int(S.seeds[k])})
+		it.append({"label": "Nada"})
+		var i: int = await menu(it, {"cls": "right", "title": "¿Qué se cultiva?"})
+		if i < 0 or i >= ks.size():
+			return
+		var k: String = ks[i]
+		S.seeds[k] -= 1
+		if not S.seeds[k]:
+			S.seeds.erase(k)
+		N.sid = k
+		N.thc = Datos.jsround(strain(k).thc * D.NAVE.thc * 10) / 10.0
+		N.g = 0
+		sfx("sel")
+		await say("%s, entonces. Los esquejes los saca tu gente." % strain(k).n, A)
+	elif op == "Dejar la nave":
+		if await ask("¿Dejas la nave? Te devuelvo la fianza%s." % ("; lo que no recojas se queda aquí" if N.g >= 1 else ""), ["Dejarla", "No"], A) != 0:
+			return
+		for w in naveros():
+			libre(w)
+		S.nave = null
+		S.money += int(D.NAVE.fianza)
+		sfx("coin")
+		await say("Trato hecho. Si la quieres otra vez, ya sabes dónde estoy.", A)
+
+# ---------- el bajo de las setas (1.20, 11g-setas): el local clandestino de la Kale Zaharra ----------
+func fase_seta(b: Dictionary) -> String:
+	if b.get("mala"):
+		return b.mala
+	var d: int = int(S.day - b.d)
+	return "colonizando" if d < D.SETAS.colon else ("fructificando" if d < D.SETAS.colon + D.SETAS.fruto else "lista")
+
+func setas_dia() -> void:
+	var L = S.get("setas")
+	if L == null:
+		return
+	var Z: Dictionary = D.SETAS
+	if S.money < Z.dia:
+		S.setas = null
+		queue("setas", func(): await talk("SMS · TXOMIN", ["No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí."]))
+		return
+	S.money -= int(Z.dia)
+	var vivas: Array = L.bandejas.filter(func(b): return not b.get("mala"))
+	if vivas.is_empty():
+		return
+	if Cultivo.azar() < Z.redada:
+		var gg: float = L.g
+		S.setas = null
+		S.heat = min(100, S.heat + Z.calorRedada)
+		sfx("bad")
+		queue("setas", func(): await say("La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas%s." % ((" y " + g_txt(gg) + " de setas") if gg >= 1 else "")))
+		return
+	var malas := []
+	for b in vivas:
+		b.hum = maxf(0, b.hum - Z.seca)
+		if not b.hum:
+			b.mala = "seca"
+			malas.append("seca")
+			continue
+		if fase_seta(b) != "lista" and Cultivo.azar() < Z.cont + (Z.contSeca if b.hum < 50 else 0.0):
+			b.mala = "contaminada"
+			malas.append("contaminada")
+	if malas.size():
+		var t: String = ("Se te han echado a perder %d bandejas. Tíralas." % malas.size()) if malas.size() > 1 else ("Una bandeja se te ha %s. Tírala." % ("secado" if malas[0] == "seca" else "contaminado"))
+		queue("setas", func(): await talk("SMS · TXOMIN", [t]))
+
+func talk_txomin() -> void:
+	var T := "TXOMIN"
+	var Z: Dictionary = D.SETAS
+	if S.ch < int(Z.ch):
+		await say("¿Setas? Eso era antes, chaval. Ahora solo paseo.", T)
+		return
+	if S.get("setas") == null:
+		if await ask("El bajo de mi casa: oscuro, húmedo y nadie pregunta. %s de fianza y %s al día, que te cobro cada mañana. Las bandejas te las preparo yo." % [Datos.eur(Z.fianza), Datos.eur(Z.dia)], ["Alquilarlo", "No"], T) != 0:
+			return
+		if S.money < Z.fianza:
+			sfx("bad")
+			await say("Sin la fianza no hay llave.", T)
+			return
+		S.money -= int(Z.fianza)
+		S.setas = {"bandejas": [], "g": 0}
+		sfx("coin")
+		await got("la llave del bajo")
+		await say("Compra las bandejas y tenlas húmedas. Lo demás lo hace el tiempo.", T)
+		return
+	var L: Dictionary = S.setas
+	while true:
+		var B: Array = L.bandejas
+		var cnt := {}
+		for k in D.FASES_SETA:
+			cnt[k] = 0
+		for b in B:
+			cnt[fase_seta(b)] += 1
+		var hum: Array = B.filter(func(b): return not b.get("mala"))
+		var partes := []
+		for k in D.FASES_SETA:
+			if cnt[k]:
+				partes.append("%d %s" % [cnt[k], D.FASES_SETA[k][1 if cnt[k] > 1 else 0]])
+		var est: String = ", ".join(PackedStringArray(partes)) if B.size() else "sin bandejas"
+		var ops := []
+		if B.size() < Z.max:
+			ops.append("Comprar bandeja (%s)" % Datos.eur(Z.bandeja))
+		if hum.size():
+			ops.append("Pulverizar")
+		if cnt.lista:
+			ops.append("Recoger")
+		if B.any(func(b): return b.get("mala")):
+			ops.append("Tirar las malas")
+		if L.g >= 1:
+			ops.append("Venderle " + g_txt(L.g))
+		ops.append_array(["Dejar el bajo", "Nada"])
+		var hm := 0.0
+		for b in hum:
+			hm += b.hum
+		var oi: int = await ask("El bajo: %s%s." % [est, (" · humedad %d %%" % Datos.jsround(hm / hum.size())) if hum.size() else ""], ops, T)
+		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+		if op == "" or op == "Nada":
+			return
+		if op.begins_with("Comprar"):
+			if S.money < Z.bandeja:
+				sfx("bad")
+				await say("Sin dinero no hay bandeja.", T)
+				continue
+			S.money -= int(Z.bandeja)
+			B.append({"d": S.day, "hum": 100})
+			sfx("coin")
+			await say("Lista para colonizar. En %d días la ha cogido el micelio; %d más y a recoger." % [int(Z.colon), int(Z.fruto)], T)
+		elif op == "Pulverizar":
+			for b in hum:
+				b.hum = 100
+			advance_time(int(Z.min))
+			update_hud()
+			sfx("sel")
+			await say("Pulverizas las bandejas: humedad al 100 %.")
+		elif op == "Recoger":
+			var g := 0
+			var quedan := []
+			for b in B:
+				if fase_seta(b) != "lista":
+					quedan.append(b)
+				else:
+					g += ri(int(Z.g[0]), int(Z.g[1]))
+			L.bandejas = quedan
+			L.g += g
+			sfx("get")
+			await say("Recoges las setas y las dejas secando en el bajo: %d g." % g)
+		elif op == "Tirar las malas":
+			var k: int = B.filter(func(b): return b.get("mala")).size()
+			L.bandejas = B.filter(func(b): return not b.get("mala"))
+			await say(("Tiras %d bandejas." % k) if k > 1 else "Tiras la bandeja.")
+		elif op.begins_with("Venderle"):
+			var g: int = int(floor(L.g))
+			var e: int = g * int(Z.precio)
+			L.g -= g
+			S.money += e
+			S.sales += e
+			S.heat = min(100, S.heat + Z.calor)
+			sfx("coin")
+			toast("+%s · %d g de setas" % [Datos.eur(e), g], 1600)
+			await say("Para mis clientes de siempre. %s." % Datos.eur(e), T)
+		elif op == "Dejar el bajo":
+			if await ask("¿Dejas el bajo? Te devuelvo la fianza; lo que haya dentro se queda.", ["Dejarlo", "No"], T) != 0:
+				continue
+			S.setas = null
+			S.money += int(Z.fianza)
+			sfx("coin")
+			await say("Como quieras. La puerta, cerrada al salir.", T)
+			return

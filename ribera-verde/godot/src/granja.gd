@@ -147,6 +147,7 @@ func new_day() -> void:
 	llega_mueble()
 	vencer_encargo()
 	curro_dia()   # la gente (1.15)
+	setas_dia()   # el bajo de las setas (1.20)
 	vencer_encargo_club()
 	if S.due > 0 and S.day > S.deadline:   # 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
 		queue("penalty", penalty_event)
@@ -554,6 +555,19 @@ func carpa_action(ci: int) -> void:
 		"\nLas garrafas vuelven a la mochila." if vu else "", ("\nEl %s vuelve a la mochila." % D.EXTRAS[vk].c.to_lower()) if vk != "" else ""])
 
 # ---------- cosecha ----------
+func semillas_cosecha(p: Dictionary) -> Dictionary:
+	var cria: bool = Cultivo.gen_de(S, p.sid) < D.GEN_ESTABLE
+	var fem := false
+	for it in D.SHOP:
+		if it.get("sid") == p.sid:
+			fem = true
+	var nn := 0
+	if cria:
+		nn = ri(2, 5)
+	elif not fem or Cultivo.azar() < D.SEMILLA_HERMA:
+		nn = ri(1, 3)
+	return {"cria": cria, "fem": fem, "n": nn}
+
 func harvest(i: int) -> void:
 	var p: Dictionary = S.pots[i]
 	var s = strain(p.sid)
@@ -565,16 +579,10 @@ func harvest(i: int) -> void:
 	var v := pos_plaza(i)
 	await accion("cosechar")
 	await accion("oler", {"id": "vfx-brillo", "x": v[0], "y": v[1] - 12})
-	var cria: bool = Cultivo.gen_de(S, p.sid) < D.GEN_ESTABLE
-	var fem := false
-	for it in D.SHOP:
-		if it.get("sid") == p.sid:
-			fem = true
-	var nn := 0
-	if cria:
-		nn = ri(2, 5)
-	elif not fem or Cultivo.azar() < D.SEMILLA_HERMA:
-		nn = ri(1, 3)
+	var sc := semillas_cosecha(p)
+	var cria: bool = sc.cria
+	var fem: bool = sc.fem
+	var nn: int = sc.n
 	var lk: String = p.sid + "*" if cl == "estrella" else p.sid
 	add_buds(lk, g, thc)
 	if nn:

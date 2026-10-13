@@ -896,6 +896,8 @@ const LOOKS={
   andoni:{id:'oldman',skin:'#e8b894',hair:'#d8d8d8',style:'bald',beard:'#d8d8d8',shirt:'#b8a070',pants:'#5a5048'},
   ibarbitarra:{id:'cliente1',skin:'#f0d0b8',hair:'#1a1a1a',style:'short',shirt:'#3a3a48',pants:'#2a2a30',glasses:1},
   portero:{id:'cliente2',skin:'#b07850',hair:'#1a1a1a',style:'bald',beard:1,shirt:'#2a2a30',pants:'#2a2a30'},   // los clubs (1.15)
+  arrieta:{id:'cliente1',skin:'#d8a880',hair:'#6a6a70',style:'short',stache:'#6a6a70',shirt:'#5a6a7a',pants:'#3a3a44'},   // el de la nave (1.19)
+  txomin:{id:'oldman',skin:'#e0aa84',hair:'#c8c8c8',style:'cap',hat:'#5a4a3a',hat2:'#3a2a20',shirt:'#6a7a4a',pants:'#4a4038'},   // el setero de la Kale Zaharra (1.20)
   portera:{id:'cliente5',skin:'#f6c8a0',hair:'#8a2a1a',style:'long',shirt:'#2a2a30',pants:'#3a3a44',glasses:1},
   judge:{id:'judge',skin:'#f0c4a0',hair:'#6a4a2a',style:'short',shirt:'#3a3a48',shirt2:'#c0a040',pants:'#2a2a34',glasses:1},
 };
@@ -1675,7 +1677,7 @@ function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},gen:{},pedido:[],esquejes:[],bandejas:[],fenos:{},fenoN:0,fnom:{},eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
   caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0,arcon:{buds:{},rosin:{}},sala:{},fijos:[],sms:[],envio:[],orden:0,misiones:{},lonja:0,trueque:0,chatarra:null,
-  rel:{},relDia:{},curro:{jard:null,vend:[]},clubs:{},clubDia:{},clubCompra:{},clubEnc:null,clubEncDia:0,catas:{},rivales:{},rivalFuera:{},deco:{},pelea:{xp:0,fue:0,ref:0}};}   // la gente (1.15, 11e-gente)
+  rel:{},relDia:{},curro:{jard:null,vend:[]},clubs:{},clubDia:{},clubCompra:{},clubEnc:null,clubEncDia:0,catas:{},rivales:{},rivalFuera:{},deco:{},pelea:{xp:0,fue:0,ref:0},plantilla:[],plN:0,nave:null,setas:null};}   // la gente (1.15, 11e-gente)
 const isFree=()=>mode==='world'&&lock===0&&handlers.length===0;
 const isNight=()=>S.min>=21*60||S.min<6*60;
 async function run(fn){lock++;try{await fn();}catch(e){console.error(e);}finally{lock--;}if(!lock&&S&&S.misiones)revisaMisiones();}
@@ -1692,7 +1694,7 @@ function discover(sid){if(!S.disc[sid]){S.disc[sid]=true;toast(`<small>NUEVA EN 
 function addSeeds(sid,n){S.seeds[sid]=(S.seeds[sid]||0)+n;discover(sid);}
 // cogollos por lotes: clave = variedad, o variedad + '*' para lo de un fenotipo estrella (se vende y se presenta aparte)
 const lotSid=k=>k.replace(/\*$/,''),lotNombre=k=>getStrain(lotSid(k)).n+(k.endsWith('*')?' ★':'');
-function addBuds(k,g,thc){const b=S.buds[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;delete b.cata;delete b.ana;}else S.buds[k]={g,thc};discover(lotSid(k));}
+function addBuds(k,g,thc,L=S.buds){const b=L[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g+=g;delete b.cata;delete b.ana;}else L[k]={g,thc};discover(lotSid(k));}   // L: otro sitio (el arcón)
 function useBuds(k,g){const b=S.buds[k];b.g-=g;if(b.g<.5)delete S.buds[k];}
 function budLots(min,minThc=0){return Object.entries(S.buds).filter(([k,b])=>b.g>=min&&b.thc>=minThc);}
 // rosin (1.10): lo que sale de prensar cogollos en la mesa (prensar, 09-cultivo), por lotes como ellos y al décimo de gramo
@@ -2064,7 +2066,7 @@ function newDay(){
   const sec=S.esquejes.filter(e=>S.day-e.dia>ESQUEJE_DIAS).length;if(sec){S.esquejes=S.esquejes.filter(e=>S.day-e.dia<=ESQUEJE_DIAS);av.push(`Se ${sec>1?'han secado '+sec+' esquejes':'ha secado un esqueje'} sin plantar`);}
   const seb=S.bandejas.filter(e=>S.day-e.dia>CARRO.dias).length;if(seb){S.bandejas=S.bandejas.filter(e=>S.day-e.dia<=CARRO.dias);av.push(`Se ${seb>1?'han secado '+seb+' esquejes':'ha secado un esqueje'} en las bandejas`);}
   if(av.length&&mode==='world')toast(av.join('<br>'),1600);
-  spawnClients();recibirPedido();recibirEnvio();instalarCaja();llegaMueble();vencerEncargo();curroDia();vencerEncargoClub();   // la gente (1.15)
+  spawnClients();recibirPedido();recibirEnvio();instalarCaja();llegaMueble();vencerEncargo();curroDia();setasDia();vencerEncargoClub();   // la gente (1.15)
   // 1.10: el plazo vencido, también sin haber visto a Baltasar (el plazo corre desde Toño); 1.11: el aviso, a 3 días y el último
   if(S.due>0&&S.day>S.deadline)queue('penalty',penaltyEvent);
   else if(S.due>0&&(S.deadline-S.day===3||S.deadline===S.day))queue('plazo',recuerdoPlazo);
@@ -2204,12 +2206,13 @@ async function temporizador(ci){
 // demás (las landraces, como el Afghani que te da Kiko, y tus líneas fijadas) son regulares: algún macho poliniza unas flores y dan 1-3; una línea sin
 // fijar (F1-F3) la estás criando: se polinizan entre ellas y das 2-5 semillas por planta para seguir estabilizando
 const SEMILLA_HERMA=.12;
+const thcCosecha=(p,f)=>{const fe=p.f||{t:1,y:1};return Math.min(35,Math.round((getStrain(p.sid).thc*fe.t*(.85+.15*p.health/100)+f.thc+ABONO.thc*fq(p))*10)/10);};
+function semillasCosecha(p){const cria=genDe(p.sid)<GEN_ESTABLE,fem=SHOP.some(it=>it.sid===p.sid);return {cria,fem,n:cria?ri(2,5):!fem||Math.random()<SEMILLA_HERMA?ri(1,3):0};}
 async function harvest(i){
   const p=S.pots[i],s=getStrain(p.sid),f=factores(i),fe=p.f||{t:1,y:1},cl=claseFeno(p.f);
-  const g=gramosPlanta(p,f);
-  const thc=Math.min(35,Math.round((s.thc*fe.t*(.85+.15*p.health/100)+f.thc+ABONO.thc*fq(p))*10)/10);
+  const g=gramosPlanta(p,f),thc=thcCosecha(p,f);
   const [vx,vy]=posPlaza(i);await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:vx,y:vy-12});
-  const cria=genDe(p.sid)<GEN_ESTABLE,fem=SHOP.some(it=>it.sid===p.sid),n=cria?ri(2,5):!fem||Math.random()<SEMILLA_HERMA?ri(1,3):0;
+  const {cria,fem,n}=semillasCosecha(p);
   const lk=cl==='estrella'?p.sid+'*':p.sid;addBuds(lk,g,thc);if(n)addSeeds(p.sid,n);
   const sobra=Math.min(g,Math.floor(pesoEncima()-capMochila()));if(sobra>=1)moverLote(S.buds,S.arcon.buds,lk,sobra);   // lo que no cabe encima, al arcón (1.10)
   if(p.f&&p.f.id)S.fenos[p.f.id]=cl;S.pots[i]=null;sfx('get');
@@ -3962,10 +3965,7 @@ function curroDia(){
   const C=S.curro,J=CURRO.jard,V=CURRO.vend;
   if(C.jard){
     if(S.money<J.sueldo){C.jard=null;confia('begona',-10);queue('jard',()=>talk('SMS · BEGOÑA',['Sin cobrar no vuelvo, majo. Cuando tengas el dinero, hablamos.']));}
-    else{S.money-=J.sueldo;
-      S.pots.forEach(p=>{if(!p||p.dead)return;p.water=100;if(p.pest&&S.items.insect>0){S.items.insect--;p.pest=false;}});
-      S.carpas.forEach((c,ci)=>{if(!c)return;if(c.garrafas)delete c.gar;if(c.goteo)c.dep=goteoL(ci);});
-      S.heat=Math.min(100,S.heat+J.calor);}
+    else{S.money-=J.sueldo;cuidarPlantas();S.heat=Math.min(100,S.heat+J.calor);}
   }
   const fin=[];
   for(const v of C.vend){
@@ -3978,6 +3978,12 @@ function curroDia(){
     else queue('vend'+v.id,()=>talk(N,[`Vendidos ${g} g: ${eur(e)} en tu buzón. Me quedan ${gTxt(v.g)}.`]));
   }
   if(fin.length)C.vend=C.vend.filter(v=>!fin.includes(v));
+  plantillaDia();   // la plantilla (1.19, 11f-plantilla)
+}
+// regar, tratar las plagas con tu insecticida y rellenar garrafas y depósitos (Begoña y el gerente de la plantilla)
+function cuidarPlantas(){
+  S.pots.forEach(p=>{if(!p||p.dead)return;p.water=100;if(p.pest&&S.items.insect>0){S.items.insect--;p.pest=false;}});
+  S.carpas.forEach((c,ci)=>{if(!c)return;if(c.garrafas)delete c.gar;if(c.goteo)c.dep=goteoL(ci);});
 }
 // un cliente de la agenda, desde el móvil: que venga, un regalo (una vez al día), cómo va su venta o que venda para ti
 async function fijoMenu(f){
@@ -4107,6 +4113,199 @@ async function loteAccion(k){
   const b=S.buds[k],ops=[`Catar ${coma(CATA.g)} g`].concat(S.items.analizador&&!b.ana?['Analizar']:[],['Nada']);
   const op=ops[await ask(`${lotNombre(k)}: ${Math.floor(b.g)} g · ${pct(b.thc)} %${b.cata?' · catado':''}${b.ana?' · analizado':''}`,ops)];
   if(op&&op.startsWith('Catar'))return catar(k);if(op==='Analizar')return analizar(k);
+}
+/* =========================================================
+   LA PLANTILLA (1.19): gente del barrio que trabaja para ti
+   ========================================================= */
+// MÓVIL → PLANTILLA (desde el capítulo PLANTILLA.ch): Patxi te manda a alguien del barrio por un sobre (no sabes a quién hasta que
+// llega) con tres números del 1 al 5: labia (vende más y le timan menos), cuidado (le pillan y le atracan menos; en la nave, cultiva
+// más) y lealtad (se larga menos con lo tuyo y, de gerente, sisa menos). Hasta PLANTILLA.max. Trabajos: a la calle con un lote (vende a
+// precio de calle del barrio y se queda PLANTILLA.com), de gerente en casa (uno: cuida las plantas como Begoña, cosecha lo que esté
+// listo al arcón quitando su sisa y, con él, los de la calle se largan la mitad) o en la nave de Valdehierro (NAVE: la alquila
+// Arrieta desde el capítulo NAVE.ch; cada trabajador saca naveG gramos al día de la variedad que elijas). Gerente y nave cobran
+// cada mañana; sin dinero, lo dejan
+const BARRIO=['Mikel','Jaione','Koldo','Edurne','Txema','Arantza','Iker','Garazi','Peio','Amaia','Oier','Itziar'];
+const PLANTILLA={ch:3,sobre:150,max:6,lotes:[25,50,100],com:.3,g:[2,4],poli:.05,poliC:.01,robo:.08,roboC:.015,timo:.06,timoL:.01,fuga:.06,calor:.5,calorPoli:10,sueldo:{gerente:40,nave:30},sisa:.03};
+const NAVE={ch:5,fianza:3000,dia:60,max:4,g:20,gC:2,thc:.9,redada:.02,redadaC:.003,calor:20};
+const fichaGente=w=>`Labia ${w.lab} · cuidado ${w.cui} · lealtad ${w.lea}`;
+const gerente=()=>S.plantilla.find(w=>w.rol==='gerente')||null,naveros=()=>S.plantilla.filter(w=>w.rol==='nave');
+const naveG=w=>NAVE.g+NAVE.gC*(w.cui-3);
+const rolTxt=w=>w.rol==='calle'?'calle · '+gTxt(w.g):w.rol||'sin trabajo';
+function rolDesc(w){const P=PLANTILLA;
+  return w.rol==='calle'?`Vende ${lotNombre(w.k)} en la calle: le quedan ${gTxt(w.g)}.`:w.rol==='gerente'?`Cuida el piso y cosecha al arcón por ${eur(P.sueldo.gerente)} al día.`
+    :w.rol==='nave'?`Cultiva en la nave por ${eur(P.sueldo.nave)} al día: ${naveG(w)} g.`:'Dale trabajo: calle, gerente o nave.';}
+// deja el trabajo; lo que le quedaba del lote vuelve al arcón
+function libre(w){if(w.rol==='calle'&&w.g>=1)addBuds(w.k,w.g,w.thc,S.arcon.buds);w.rol=null;delete w.k;delete w.thc;delete w.g;}
+async function plantilla(){
+  let i=0;
+  for(;;){
+    const L=S.plantilla,rows=L.map(w=>({label:w.n,right:rolTxt(w),desc:fichaGente(w)+'. '+rolDesc(w)}));
+    if(L.length<PLANTILLA.max)rows.push({label:'Pedir gente a Patxi',right:eur(PLANTILLA.sobre),desc:'Patxi te manda a alguien del barrio que quiere currar. No sabes a quién hasta que llega.'});
+    i=await menu(rows,{cls:'full',title:'PLANTILLA',title2:`${L.length} de ${PLANTILLA.max}`+(S.nave?` · nave ${gTxt(S.nave.g)}`:''),desc:true,initial:Math.min(i,rows.length-1)});
+    if(i<0)return;
+    if(i>=L.length)await pedirGente();else await trabajo(L[i]);
+  }
+}
+async function pedirGente(){
+  const P=PLANTILLA,libres=BARRIO.filter(n=>!S.plantilla.some(w=>w.n===n));
+  if(S.money<P.sobre){sfx('bad');return say(`Patxi cobra ${eur(P.sobre)} por el sobre. No te llega.`);}
+  if(!libres.length)return say('Patxi ya no conoce a nadie más que quiera currar.');
+  S.money-=P.sobre;
+  const n=pick(libres),w={id:'pl'+(++S.plN),n,lab:ri(1,5),cui:ri(1,5),lea:ri(1,5),rol:null},t=w.lab+w.cui+w.lea;sfx('get');
+  await talk('SMS · PATXI',[`Te mando a ${n}. ${t>=12?'Vale oro.':t<=6?'No es gran cosa, pero quiere currar.':'Gente normal del barrio.'}`]);
+  if(await ask(`${n}: ${fichaGente(w)}. ¿Le contratas?`,['Contratar','No'])!==0)return say(`${n} se va por donde ha venido. El sobre ya es de Patxi.`);
+  S.plantilla.push(w);sfx('sel');return say(`${n} entra en tu plantilla. Dale trabajo desde aquí.`);
+}
+// un lote de los de encima para la calle: [clave, THC, gramos] o null
+async function loteCalle(w){
+  const P=PLANTILLA,lots=budLots(P.lotes[0]);
+  if(!lots.length){await say(`Para la calle hace falta un lote de ${P.lotes[0]} g o más encima.`);return null;}
+  const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote le das?'});if(i<0||i>=lots.length)return null;
+  const [k,b]=lots[i],ops=P.lotes.filter(g=>g<=Math.floor(b.g));
+  const j=await ask(`${w.n} vende a precio de calle y se queda el ${pct0(P.com)} %. ¿Cuánto le das?`,ops.map(g=>g+' g').concat(['Nada']));if(j<0||j>=ops.length)return null;
+  const thc=b.thc;useBuds(k,ops[j]);return [k,thc,ops[j]];
+}
+async function trabajo(w){
+  const P=PLANTILLA,ops=[];
+  if(w.rol!=='calle')ops.push('A la calle');
+  if(w.rol!=='gerente'&&!gerente())ops.push('De gerente');
+  if(w.rol!=='nave'&&S.nave&&naveros().length<NAVE.max)ops.push('A la nave');
+  if(w.rol)ops.push('Dejarlo libre');ops.push('Despedir','Nada');
+  const op=ops[await ask(`${w.n} · ${fichaGente(w)} · ${rolTxt(w)}`,ops)];
+  if(op==='A la calle'){const r=await loteCalle(w);if(!r)return;libre(w);w.rol='calle';[w.k,w.thc,w.g]=r;sfx('sel');return say(`${w.n}: «Hecho. Cada día te dejo lo vendido en el buzón».`);}
+  if(op==='De gerente'){libre(w);w.rol='gerente';sfx('sel');return say(`${w.n}: «Cada mañana me paso por el piso: riego, trato las plagas y lo que esté listo lo cosecho y lo dejo en el arcón. ${eur(P.sueldo.gerente)} al día».`);}
+  if(op==='A la nave'){libre(w);w.rol='nave';sfx('sel');return say(`${w.n}: «Mañana empiezo en la nave. ${eur(P.sueldo.nave)} al día».`);}
+  if(op==='Dejarlo libre'){const g=w.rol==='calle'?w.g:0;libre(w);return say(g>=1?`${w.n} te deja lo que le quedaba en el arcón: ${gTxt(g)}.`:`${w.n} se queda sin trabajo.`);}
+  if(op==='Despedir'){if(await ask(`¿Despides a ${w.n}?`,['Despedir','No'])!==0)return;
+    const g=w.rol==='calle'?w.g:0;libre(w);S.plantilla=S.plantilla.filter(x=>x!==w);return say(`${w.n} se va.`+(g>=1?` Lo que le quedaba, ${gTxt(g)}, está en el arcón.`:''));}
+}
+// el gerente, cada mañana: cuida las plantas y cosecha las que están listas al arcón (su sisa, por la lealtad); da los gramos
+function cuidarCasa(w){
+  cuidarPlantas();let tot=0;
+  S.pots.forEach((p,i)=>{if(!p||p.dead||p.prog<1)return;
+    const f=factores(i),g=gramosPlanta(p,f),thc=thcCosecha(p,f),cl=claseFeno(p.f),{n}=semillasCosecha(p),q=g-Math.floor(g*PLANTILLA.sisa*(5-w.lea));
+    if(q>=1)addBuds(cl==='estrella'?p.sid+'*':p.sid,q,thc,S.arcon.buds);if(n)addSeeds(p.sid,n);
+    if(p.f&&p.f.id)S.fenos[p.f.id]=cl;if(S.rec[p.sid]===1)S.rec[p.sid]=2;S.pots[i]=null;tot+=q;});
+  if(tot){S.flags.harvest1=true;queue('gerente',()=>talk('SMS · '+w.n.toUpperCase(),[`He cosechado ${tot} g. Está en el arcón.`]));queue('historia',checkStory);}
+  return tot;
+}
+// al amanecer (desde curroDia): sueldos, el gerente, la calle y la nave
+function plantillaDia(){
+  const P=PLANTILLA,fuera=[];
+  for(const w of S.plantilla){if(w.rol!=='gerente'&&w.rol!=='nave')continue;
+    if(S.money<P.sueldo[w.rol]){w.rol=null;queue('pl'+w.id,()=>talk('SMS · '+w.n.toUpperCase(),['Sin cobrar no curro. Cuando tengas el dinero, me llamas.']));}
+    else S.money-=P.sueldo[w.rol];}
+  const ger=gerente();if(ger)cuidarCasa(ger);
+  for(const w of S.plantilla){if(w.rol!=='calle')continue;
+    const N='SMS · '+w.n.toUpperCase(),lote=lotNombre(w.k),r=Math.random(),pp=P.poli-P.poliC*(w.cui-1),pr=pp+P.robo-P.roboC*(w.cui-1),
+      pf=pr+P.fuga*(5-w.lea)/4*(ger?.5:1),pt=pf+P.timo-P.timoL*(w.lab-1);let m;
+    if(r<pp){S.heat=Math.min(100,S.heat+P.calorPoli);m=`Me ha parado la policía. Se han quedado con ${gTxt(w.g)} de ${lote}. Lo siento.`;w.g=0;}
+    else if(r<pr){const q=Math.ceil(w.g/2);w.g-=q;m=`Me han atracado en un portal. Se han llevado ${gTxt(q)} de ${lote}.`+(w.g>=1?` Me quedan ${gTxt(w.g)}.`:'');}
+    else if(r<pf){fuera.push(w);const g=w.g;queue('pl'+w.id,()=>say(`${w.n} no contesta al móvil. Se ha largado con ${gTxt(g)} de ${lote}.`));continue;}
+    else{const q=Math.min(Math.floor(w.g),ri(P.g[0],P.g[1])*w.lab);w.g-=q;
+      if(r<pt)m=`Me han pagado ${q} g con billetes falsos. No me he dado cuenta hasta el banco.`;
+      else{const e=Math.round(precioCalle(w.thc)*ZONAS.town.precio*q*(1-P.com));S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+P.calor);
+        m=w.g>=1?`Vendidos ${q} g: ${eur(e)} en tu buzón. Me quedan ${gTxt(w.g)}.`:`Vendidos los últimos ${q} g: ${eur(e)} en tu buzón. Dame más cuando quieras.`;}}
+    if(w.g<1)libre(w);queue('pl'+w.id,()=>talk(N,[m]));
+  }
+  if(fuera.length)S.plantilla=S.plantilla.filter(w=>!fuera.includes(w));
+  naveDia();
+}
+// la nave: el alquiler cada mañana (sin él, Arrieta cambia la cerradura y se queda la fianza), la redada (menos con cuidado) y lo que crece
+function naveDia(){
+  const N=S.nave;if(!N)return;
+  if(S.money<NAVE.dia){naveros().forEach(libre);S.nave=null;queue('nave',()=>talk('SMS · ARRIETA',['No me has pagado la nave. Cambio la cerradura y me quedo la fianza.']));return;}
+  S.money-=NAVE.dia;
+  const W=naveros();if(!W.length||!N.sid)return;
+  if(Math.random()<Math.max(0,NAVE.redada-NAVE.redadaC*Math.max(...W.map(w=>w.cui)))){
+    const ns=W.map(w=>w.n),quien=ns.length>1?ns.slice(0,-1).join(', ')+' y '+ns[ns.length-1]:ns[0];
+    S.nave=null;S.plantilla=S.plantilla.filter(w=>w.rol!=='nave');S.heat=Math.min(100,S.heat+NAVE.calor);sfx('bad');
+    queue('nave',()=>say(`La policía ha entrado en la nave de Valdehierro. Se lleva las plantas${N.g>=1?', '+gTxt(N.g):''} y a ${quien}.`));return;}
+  N.g+=W.reduce((a,w)=>a+naveG(w),0);
+}
+// Arrieta, el dueño de la nave de Valdehierro
+NPCDEF.push({id:'arrieta',map:'valdehierro',x:17,y:7,dir:'down',look:'arrieta',talk:()=>talkNave()});
+async function talkNave(){
+  const A='ARRIETA',N=S.nave;
+  if(S.ch<NAVE.ch)return say('La nave no se alquila. Ahora mismo, no.',A);
+  if(!N){
+    if(await ask(`La nave está vacía: ${eur(NAVE.fianza)} de fianza y ${eur(NAVE.dia)} al día, que te cobro cada mañana. Sin preguntas.`,['Alquilarla','No'],A)!==0)return;
+    if(S.money<NAVE.fianza){sfx('bad');return say('Sin la fianza no hay llave.',A);}
+    S.money-=NAVE.fianza;S.nave={sid:null,g:0,thc:0};sfx('coin');await got('la llave de la nave');
+    return say('Pon a tu gente a trabajar desde el móvil y elige aquí qué se cultiva.',A);
+  }
+  const ops=(N.g>=1?[`Recoger ${gTxt(N.g)}`]:[]).concat(['Cambiar la variedad','Dejar la nave','Nada']);
+  const op=ops[await ask(`La nave: ${N.sid?getStrain(N.sid).n+' ('+pct(N.thc)+' %)':'sin variedad'} · ${naveros().length} de ${NAVE.max} trabajando.`,ops,A)];
+  if(op&&op.startsWith('Recoger')){const q=Math.min(Math.floor(N.g),Math.floor(libreMochila()));if(q<1)return say('No te cabe nada en la bolsa.',A);
+    addBuds(N.sid,q,N.thc);N.g-=q;sfx('get');return say(`Recoges ${q} g de ${getStrain(N.sid).n}.`+(N.g>=1?` Quedan ${gTxt(N.g)}.`:''));}
+  if(op==='Cambiar la variedad'){
+    if(N.g>=1)return say('Recoge antes lo que hay.',A);
+    const ks=Object.keys(S.seeds).filter(k=>S.seeds[k]>0);if(!ks.length)return say('Sin una semilla no se cultiva nada.',A);
+    const i=await menu(ks.map(k=>({label:getStrain(k).n,right:S.seeds[k]+' sem.'})).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué se cultiva?'});if(i<0||i>=ks.length)return;
+    const k=ks[i];S.seeds[k]--;if(!S.seeds[k])delete S.seeds[k];N.sid=k;N.thc=Math.round(getStrain(k).thc*NAVE.thc*10)/10;N.g=0;sfx('sel');
+    return say(`${getStrain(k).n}, entonces. Los esquejes los saca tu gente.`,A);
+  }
+  if(op==='Dejar la nave'){
+    if(await ask(`¿Dejas la nave? Te devuelvo la fianza${N.g>=1?'; lo que no recojas se queda aquí':''}.`,['Dejarla','No'],A)!==0)return;
+    naveros().forEach(libre);S.nave=null;S.money+=NAVE.fianza;sfx('coin');return say('Trato hecho. Si la quieres otra vez, ya sabes dónde estoy.',A);
+  }
+}
+/* =========================================================
+   EL BAJO DE LAS SETAS (1.20): el local clandestino de la Kale Zaharra
+   ========================================================= */
+// Txomin, el setero viejo de la Kale Zaharra, alquila el bajo de su casa desde el capítulo SETAS.ch (fianza y SETAS.dia al día, que
+// cobra cada mañana; sin él, cambia la cerradura y se queda la fianza y lo que haya dentro). Él prepara las bandejas (SETAS.bandeja €
+// cada una, hasta SETAS.max): tú las tienes húmedas (PULVERIZAR, 10 min, las deja a 100; cada día pierden SETAS.seca) y esperas:
+// SETAS.colon días el micelio coge la bandeja, SETAS.fruto días más y están listas. Cada mañana, cada bandeja puede contaminarse
+// (SETAS.cont; SETAS.contSeca más si está por debajo de la mitad de humedad) y, a 0, se seca: las dos se tiran. Lo cosechado se seca
+// en el bajo (S.setas.g) y Txomin te lo compra a SETAS.precio el gramo (calor +SETAS.calor). Una redada en el bajo (SETAS.redada al
+// día con bandejas) se lo lleva todo, el local incluido
+const SETAS={ch:4,fianza:1500,dia:20,max:6,bandeja:45,colon:6,fruto:4,seca:34,cont:.02,contSeca:.15,g:[25,40],precio:9,calor:3,redada:.01,calorRedada:15,min:10};
+const FASES_SETA={colonizando:['colonizando','colonizando'],fructificando:['fructificando','fructificando'],lista:['lista','listas'],contaminada:['contaminada','contaminadas'],seca:['seca','secas']};
+const faseSeta=b=>b.mala?b.mala:S.day-b.d<SETAS.colon?'colonizando':S.day-b.d<SETAS.colon+SETAS.fruto?'fructificando':'lista';
+function setasDia(){
+  const L=S.setas;if(!L)return;
+  if(S.money<SETAS.dia){S.setas=null;queue('setas',()=>talk('SMS · TXOMIN',['No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí.']));return;}
+  S.money-=SETAS.dia;
+  const vivas=L.bandejas.filter(b=>!b.mala);if(!vivas.length)return;
+  if(Math.random()<SETAS.redada){S.setas=null;S.heat=Math.min(100,S.heat+SETAS.calorRedada);sfx('bad');
+    queue('setas',()=>say(`La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas${L.g>=1?' y '+gTxt(L.g)+' de setas':''}.`));return;}
+  const malas=[];
+  for(const b of vivas){
+    b.hum=Math.max(0,b.hum-SETAS.seca);
+    if(!b.hum){b.mala='seca';malas.push('seca');continue;}
+    if(faseSeta(b)!=='lista'&&Math.random()<SETAS.cont+(b.hum<50?SETAS.contSeca:0)){b.mala='contaminada';malas.push('contaminada');}
+  }
+  if(malas.length)queue('setas',()=>talk('SMS · TXOMIN',[malas.length>1?`Se te han echado a perder ${malas.length} bandejas. Tíralas.`:`Una bandeja se te ha ${malas[0]==='seca'?'secado':'contaminado'}. Tírala.`]));
+}
+// Txomin y su bajo, en la Kale Zaharra
+NPCDEF.push({id:'txomin',map:'callejon',x:17,y:8,dir:'down',look:'txomin',talk:()=>talkTxomin()});
+async function talkTxomin(){
+  const T='TXOMIN',L=S.setas;
+  if(S.ch<SETAS.ch)return say('¿Setas? Eso era antes, chaval. Ahora solo paseo.',T);
+  if(!L){
+    if(await ask(`El bajo de mi casa: oscuro, húmedo y nadie pregunta. ${eur(SETAS.fianza)} de fianza y ${eur(SETAS.dia)} al día, que te cobro cada mañana. Las bandejas te las preparo yo.`,['Alquilarlo','No'],T)!==0)return;
+    if(S.money<SETAS.fianza){sfx('bad');return say('Sin la fianza no hay llave.',T);}
+    S.money-=SETAS.fianza;S.setas={bandejas:[],g:0};sfx('coin');await got('la llave del bajo');
+    return say('Compra las bandejas y tenlas húmedas. Lo demás lo hace el tiempo.',T);
+  }
+  for(;;){
+    const B=L.bandejas,n=k=>B.filter(b=>faseSeta(b)===k).length,hum=B.filter(b=>!b.mala);
+    const est=B.length?Object.keys(FASES_SETA).filter(k=>n(k)).map(k=>`${n(k)} ${FASES_SETA[k][n(k)>1?1:0]}`).join(', '):'sin bandejas';
+    const ops=(B.length<SETAS.max?[`Comprar bandeja (${eur(SETAS.bandeja)})`]:[]).concat(hum.length?['Pulverizar']:[],n('lista')?['Recoger']:[],B.some(b=>b.mala)?['Tirar las malas']:[],L.g>=1?[`Venderle ${gTxt(L.g)}`]:[],['Dejar el bajo','Nada']);
+    const op=ops[await ask(`El bajo: ${est}${hum.length?' · humedad '+Math.round(hum.reduce((a,b)=>a+b.hum,0)/hum.length)+' %':''}.`,ops,T)];
+    if(!op||op==='Nada')return;
+    if(op.startsWith('Comprar')){if(S.money<SETAS.bandeja){sfx('bad');await say('Sin dinero no hay bandeja.',T);continue;}
+      S.money-=SETAS.bandeja;B.push({d:S.day,hum:100});sfx('coin');await say(`Lista para colonizar. En ${SETAS.colon} días la ha cogido el micelio; ${SETAS.fruto} más y a recoger.`,T);continue;}
+    if(op==='Pulverizar'){hum.forEach(b=>b.hum=100);advanceTime(SETAS.min);updateHUD();sfx('sel');await say('Pulverizas las bandejas: humedad al 100 %.');continue;}
+    if(op==='Recoger'){let g=0;L.bandejas=B.filter(b=>{if(faseSeta(b)!=='lista')return true;g+=ri(SETAS.g[0],SETAS.g[1]);return false;});L.g+=g;sfx('get');
+      await say(`Recoges las setas y las dejas secando en el bajo: ${g} g.`);continue;}
+    if(op==='Tirar las malas'){const k=B.filter(b=>b.mala).length;L.bandejas=B.filter(b=>!b.mala);await say(k>1?`Tiras ${k} bandejas.`:'Tiras la bandeja.');continue;}
+    if(op.startsWith('Venderle')){const g=Math.floor(L.g),e=g*SETAS.precio;L.g-=g;S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+SETAS.calor);sfx('coin');
+      toast(`+${eur(e)} · ${g} g de setas`,1600);await say(`Para mis clientes de siempre. ${eur(e)}.`,T);continue;}
+    if(op==='Dejar el bajo'){if(await ask(`¿Dejas el bajo? Te devuelvo la fianza; lo que haya dentro se queda.`,['Dejarlo','No'],T)!==0)continue;
+      S.setas=null;S.money+=SETAS.fianza;sfx('coin');return say('Como quieras. La puerta, cerrada al salir.',T);}
+  }
 }
 /* =========================================================
    MENÚ START
@@ -4285,13 +4484,13 @@ function apuntaFijo(c){if(c.fijo||S.fijos.length>=FIJOS_MAX||S.fijos.some(f=>f.i
 const relojTxt=()=>String(Math.floor(S.min/60)).padStart(2,'0')+':'+String(S.min%60).padStart(2,'0');
 async function movilMenu(){
   for(;;){
-    const ops=['Llamar'].concat(S.flags.kiko1?['Pedir a Kiko']:[],['Mensajes','Gente','Tienda online','Colgar']);
+    const ops=['Llamar'].concat(S.flags.kiko1?['Pedir a Kiko']:[],['Mensajes','Gente'],S.ch>=PLANTILLA.ch?['Plantilla']:[],['Tienda online','Colgar']);
     const op=ops[await ask(`MÓVIL · día ${S.day}, ${relojTxt()}${S.sms.length?` · ${S.sms.length} mensaje${S.sms.length>1?'s':''}`:''}`,ops)];
     if(!op||op==='Colgar')return;
     if(op==='Llamar'){if(await llamar())return;}
     else if(op==='Pedir a Kiko')await pedirKiko();
     else if(op==='Tienda online')await tiendaOnline();
-    else if(op==='Gente')await gente();   // 1.15 (11e-gente)
+    else if(op==='Gente')await gente();else if(op==='Plantilla')await plantilla();   // 1.15 (11e-gente)
     else await mensajes();
   }
 }
