@@ -1,5 +1,17 @@
 # Cambios
 
+## 1.28.0 · 13 de octubre de 2026
+
+Misiones para la Copa: cómo llegar al 27 %. Godot, 0.22.0.
+
+- **Nuevo: tres misiones en el capítulo 6**, en START → OBJETIVO, con su SMS de Kiko y su regalo, como las de antes:
+  - **Una genética potente:** la marca de Darko es una Amnesia Haze del 26,8 % y, sin un fenotipo estrella, solo pasan de ahí, con buena luz y abono, las de receta del 26 % o más (Amnesia Haze, Jack Herer y Sour Diesel). La más a mano, la Sour Diesel: Chemdawg × Super Skunk en la mesa, con sus precios. Se cumple al sacar una en la mesa. Regalo: 4 dosis de MEATZA FLORACIÓN y 4 de pH−.
+  - **Floración a tope:** el LED de 720 W (+1,4 de THC; en la carpa de 120 o la de 150) y el abono de floración con pH− y el medidor (+0,3 si lo aprovecha entero; el orgánico, +0,4). Se cumple con una planta abonada así bajo el LED de 720 W. Regalo: 2 dosis de ORTUA BIO FLORACIÓN y 2 de su pH−.
+  - **Llegar al 27 %:** 20 g de un solo lote en la mochila con más del 26,8 %, redondeado como lo mide el jurado; recuerda que el lote se queda con la media (cosecha la mejor y preséntala antes que otra de la misma variedad; las de fenotipo estrella van aparte). Se cumple al tenerlo y Kiko te manda al jurado.
+- Al ganar la Copa, las que falten se dan por hechas, sin aviso ni regalo, igual que en las partidas que ya la ganaron. Nada cambia en el equilibrio: la marca sigue en 26,8 %.
+- Igual en Godot.
+- Tests: `npm test` 110/110 (paso nuevo: las tres misiones, con 26,8 % que no llega y 26,9 % que sí, sus SMS y regalos; al ganar la Copa, la que falta, cerrada, también en `migrate`); Godot, historia 110 pasos, 41 pantallas y el ciclo.
+
 ## 1.27.1 · 13 de octubre de 2026
 
 Una silla delante de cada ordenador. Godot, 0.21.1.

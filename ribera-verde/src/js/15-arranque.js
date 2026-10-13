@@ -21,6 +21,7 @@ function migrate(){
   if((S.ch===5||S.ch===7)&&!(S.due>0)&&S.debt>0){S.due=S.ch===5?Math.min(PLAZOS[5],S.debt):S.debt;S.deadline=Math.max(S.deadline||0,S.day+(S.ch===5?10:7));}
   const sinMis=!S.misiones,sinItin=!S.itin,sinLog=!S.logros,d=newState();for(const k in d)if(!(k in S))S[k]=d[k];for(const k in d.items)if(!(k in S.items))S.items[k]=0;
   if(sinMis)MISIONES.forEach(m=>{if(m.ch<S.ch)S.misiones[m.id]=0;});   // 1.11: las de capítulos pasados, hechas y sin regalo
+  if(S.ch>6)cerrarCopa();   // 1.28: las de la Copa, en una partida que ya la ganó
   if(sinItin)ITINERARIO.forEach(p=>{if(p.ok())S.itin[p.id]=0;});   // 1.23: lo hecho, sin aviso
   // 1.10: el plazo del capítulo 3 corre desde Toño (las partidas sin él, desde hoy) y la protección de Molina dura 10 días desde hoy
   if(S.ch===3&&!S.flags.metB&&!(S.due>0)){S.due=PLAZOS[3];S.deadline=S.day+7;S.flags.tono=S.day;}

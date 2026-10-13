@@ -49,7 +49,7 @@ async function comprarSemillas(it){
 // la deuda de la tía (1.10, a escala real): 30.000 € en tres plazos (capítulos 3, 5 y 7). Con equipo y precios reales, un
 // jugador que reinvierte paga cada plazo en las mismas cosechas que antes (simulación en docs/ECONOMIA.md). Si un plazo
 // vence, Toño suma INTERES. META_VENTAS: lo que hay que vender en la calle en el capítulo 2
-const DEUDA=30000,PLAZOS={3:3000,5:12000,7:15000},INTERES=.2,PREMIO_COPA=5000,SOBORNO=1500,META_VENTAS=300;
+const DEUDA=30000,PLAZOS={3:3000,5:12000,7:15000},INTERES=.2,PREMIO_COPA=5000,COPA_THC=26.8,SOBORNO=1500,META_VENTAS=300;   // COPA_THC: la marca de Darko
 // policía por niveles (1.11): el calor (0-100) marca el nivel; con 60 o más, una patrulla más por zona. Al cambiar de día con 90 o
 // más llega la orden de registro: Kiko te avisa y la redada es al cambiar el día siguiente (con Molina pagado, la para). Cada día el
 // calor baja lo del nivel (con Molina, × 1,5); con la orden, nada. La redada se lleva las plantas, el equipo de las carpas que las
@@ -256,11 +256,11 @@ async function talkJurado(){
   await fade(1);await wait(500);await fade(0);
   await say('Resultado del laboratorio. AMNESIA HAZE de Darko: 26,8 % de THC.',N);
   await say(`${name} de {N}: ${pct(thc)} % de THC.`,N);
-  if(thc>26.8){
+  if(thc>COPA_THC){
     sfx('get');await say('Nueva marca. {N} gana la COPA DE RIBERA.',N);
     S.money+=PREMIO_COPA;S.rep+=20;await got(eur(PREMIO_COPA)+' y el trofeo de la Copa');
     await talk('DARKO',['Esto no se acaba aquí.','Mi tío se va a enterar.']);
-    S.flags.copa=true;S.due=S.debt;S.deadline=S.day+7;await chapter(7);showObjective();   // el plazo, antes: chapter() guarda
+    S.flags.copa=true;S.due=S.debt;S.deadline=S.day+7;cerrarCopa();await chapter(7);showObjective();   // el plazo, antes: chapter() guarda
   }else{sfx('bad');await say('Gana DARKO. La Copa sigue abierta: vuelve con algo más potente.',N);}
 }
 async function talkBaltasar(){

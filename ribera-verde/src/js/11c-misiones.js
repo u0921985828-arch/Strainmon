@@ -7,6 +7,8 @@
 // S.misiones[id] = día en que se cumplió (0: partida vieja, de un capítulo anterior, sin regalo)
 const precioDe=f=>SHOP.find(f).p;
 const conFoco=()=>S.carpas.filter(c=>c&&FOCOS[c.foco]);
+// 1.28: las de receta que pasan la marca de Darko (COPA_THC) con su THC, el LED de 720 W y el abono de floración entero
+const POTENTES=(r=>DEX.filter(k=>r.has(k)&&STRAINS[k].thc+FOCOS.led720.thc+ABONO.thc>COPA_THC))(new Set(Object.values(RECIPES).concat(Object.values(RECETA_ORD))));
 const MISIONES=[
   {id:'caja',ch:1,t:'La caja de la tía',d:'Tu tía guardaba dinero en casa. Mira sus notas en el ordenador: la combinación de la caja fuerte, detrás del diploma.',
     ok:()=>!!S.caja,sms:['Lo de la caja de tu tía ya lo sabía yo. Gástalo bien.']},
@@ -25,7 +27,15 @@ const MISIONES=[
   {id:'led',ch:4,t:'Escalar',d:`Un LED de 480 W (${eur(precioDe(it=>it.foco==='led480'))}): más gramos por vatio y menos calor en la carpa. El segundo plazo es de ${eur(PLAZOS[5])}.`,
     ok:()=>conFoco().some(c=>FOCOS[c.foco].tipo==='led'&&FOCOS[c.foco].w>=480),p:{fert:4},sms:['Con LED grandes, la luz se paga sola.']},
   {id:'seis',ch:4,t:'Seis plazas',d:`La carpa de 150 en lugar de la de 100 (${eur(precioDe(it=>it.carpa==='g150'))}) y, en el capítulo 5, la de 120 junto a la cama: seis plantas cada una.`,
-    ok:()=>S.carpas.some(c=>c&&CARPAS[c.t].plazas>=6),s:{txoko:5},sms:['Seis plantas por carpa. Esto ya es un negocio.']}];
+    ok:()=>S.carpas.some(c=>c&&CARPAS[c.t].plazas>=6),s:{txoko:5},sms:['Seis plantas por carpa. Esto ya es un negocio.']},
+  // 1.28: la Copa, hasta pasar la marca de Darko (al ganarla, las que falten se cierran: cerrarCopa)
+  {id:'potente',ch:6,t:'Una genética potente',d:`Darko presenta una Amnesia Haze del ${pct(COPA_THC)} %. Para pasarla, una de receta del ${Math.min(...POTENTES.map(k=>STRAINS[k].thc))} % o más (${yLista(POTENTES.map(k=>STRAINS[k].n))}). La más a mano, la ${STRAINS.dragon.n}: ${STRAINS.chemdawg.n} (${eur(precioDe(it=>it.sid==='chemdawg'))}) × ${STRAINS.txoko.n} (${eur(precioDe(it=>it.sid==='txoko'))}) en la mesa.`,
+    ok:()=>POTENTES.some(k=>S.rec[k]),p:{fert:4,phm:4},sms:['Con esa ya puedes plantarle cara a Darko. Ahora, a sacarle todo el THC.']},
+  {id:'flor27',ch:6,t:'Floración a tope',d:`El THC sube con la luz y el abono: el LED de 720 W (${eur(precioDe(it=>it.foco==='led720'))}, en la carpa de 120 o la de 150), +${pct(FOCOS.led720.thc)}, y MEATZA FLORACIÓN con pH− y el medidor de pH y EC (${eur(precioDe(it=>it.item==='medidor'))}), +${pct(ABONO.thc)} si lo aprovecha entero (ORTUA BIO, +${pct(ABONO_BIO.thc)}).`,
+    ok:()=>S.pots.some((p,i)=>{const h=huecos()[i];return p&&!p.dead&&fq(p)>=1&&h&&S.carpas[h.c].foco==='led720';}),p:{ofert:2,ophm:2},sms:['Así, a tope. Ahí tienes ORTUA BIO para la próxima: el orgánico da algo más de THC.']},
+  {id:'copa27',ch:6,t:'Llegar al 27 %',d:`20 g de un solo lote con más del ${pct(COPA_THC)} % de THC, en la mochila. Cosecha la mejor y preséntala antes de cosechar otra de la misma variedad: el lote se queda con la media (la de fenotipo estrella ★ va aparte).`,
+    ok:()=>budLots(20).some(([,b])=>Math.round(b.thc*10)/10>COPA_THC),sms:['Con eso le ganas a Darko. Llévaselo al jurado de la plaza antes de venderlo.']}];
+const cerrarCopa=()=>MISIONES.forEach(m=>{if(m.ch===6&&!(m.id in S.misiones))S.misiones[m.id]=0;});   // ganada la Copa, sin aviso ni regalo
 const PREMIO_N={fert:'dosis de MEATZA FLORACIÓN',fertv:'dosis de MEATZA CRECIMIENTO',phm:'dosis de pH− MEATZA',ofert:'dosis de ORTUA BIO FLORACIÓN',ofertv:'dosis de ORTUA BIO CRECIMIENTO',ophm:'dosis de pH− ORTUA BIO',insect:'tratamiento de INSECTICIDA'};
 const premioTxt=m=>Object.entries(m.p||{}).map(([k,n])=>`${n} ${PREMIO_N[k]}`).concat(Object.entries(m.s||{}).map(([k,n])=>`${n} semillas de ${STRAINS[k].n.toUpperCase()}`));
 const misionesVer=()=>S.flags.kiko1?MISIONES.filter(m=>m.ch<=S.ch):[];

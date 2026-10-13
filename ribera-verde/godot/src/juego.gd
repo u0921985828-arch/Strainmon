@@ -123,6 +123,8 @@ func migrate() -> void:
 		for m in D.MISIONES:
 			if m.ch < S.ch:
 				S.misiones[m.id] = 0
+	if S.ch > 6:   # 1.28: las de la Copa, en una partida que ya la ganó
+		cerrar_copa()
 	if sin_itin:   # 1.23: lo hecho, sin aviso
 		for p in D.ITINERARIO:
 			if itin_ok(p.id):

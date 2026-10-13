@@ -746,7 +746,7 @@ func talk_jurado():
 	await fade(0)
 	await say("Resultado del laboratorio. AMNESIA HAZE de Darko: 26,8 % de THC.", N)
 	await say("%s de {N}: %s %% de THC." % [name_, Datos.pct(thc)], N)
-	if thc > 26.8:
+	if thc > float(D.COPA_THC):
 		sfx("get")
 		await say("Nueva marca. {N} gana la COPA DE RIBERA.", N)
 		S.money += int(D.PREMIO_COPA)
@@ -756,6 +756,7 @@ func talk_jurado():
 		S.flags.copa = true
 		S.due = S.debt
 		S.deadline = S.day + 7
+		cerrar_copa()
 		await chapter(7)   # el plazo, antes: chapter() guarda
 		show_objective()
 	else:
@@ -910,7 +911,24 @@ func mision_ok(id: String) -> bool:
 			return _con_foco().any(func(c): return D.FOCOS[c.foco].tipo == "led" and float(D.FOCOS[c.foco].w) >= 480)
 		"seis":
 			return S.carpas.any(func(c): return c is Dictionary and int(D.CARPAS[c.t].plazas) >= 6)
+		"potente":   # 1.28: la Copa
+			return D.POTENTES.any(func(k): return int(S.rec.get(k, 0)) > 0)
+		"flor27":
+			var H := huecos()
+			for i in S.pots.size():
+				var p = S.pots[i]
+				if p is Dictionary and not p.get("dead") and Cultivo.fq(p) >= 1 and i < H.size() and S.carpas[H[i].c].foco == "led720":
+					return true
+			return false
+		"copa27":
+			return bud_lots(20).any(func(l): return Datos.jsround(l[1].thc * 10) / 10.0 > float(D.COPA_THC))
 	return false
+
+# ganada la Copa, las misiones que falten del capítulo 6, sin aviso ni regalo
+func cerrar_copa() -> void:
+	for m in D.MISIONES:
+		if int(m.ch) == 6 and not S.misiones.has(m.id):
+			S.misiones[m.id] = 0
 
 func misiones_ver() -> Array:
 	if not S.flags.get("kiko1"):

@@ -238,9 +238,26 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   await step('Darko presume', [], async () => { await run(talkDarko); }, () => S.ch === 6);
   await step('Copa: presentar Skunk #1 (12%) → pierde', ['Skunk'], async () => { addBuds('ria', 25, 12); await run(talkJurado); },
     () => S.ch === 6 && Math.round(S.buds.ria.g) === 5 || { ch: S.ch, buds: S.buds });
+  // 1.28: las misiones de la Copa, hasta pasar la marca de Darko (26,8 % no llega; 26,9 %, sí), con sus SMS y regalos
+  await step('Misiones de la Copa: una genética potente, floración a tope (el abono entero, bajo el LED de 720 W) y llegar al 27 %', [], async () => {
+    const sv = JSON.stringify({ carpas: S.carpas, pots: S.pots, items: S.items, misiones: S.misiones, buds: S.buds, rec: S.rec }), f0 = S.items.fert, l0 = LOG.length;
+    MISIONES.forEach(m => { if (m.ch < 6) S.misiones[m.id] = 0; });   // las de antes, hechas: que no salgan aquí
+    window.R = { ver: misionesVer().filter(m => m.ch === 6).map(m => m.id + (m.id in S.misiones ? '+' : '')).join(), pot: POTENTES.join(), sig: misionSig().id };
+    S.rec.dragon = 1; await run(async () => {}); await idle(); R.pot1 = S.misiones.potente === S.day; R.fert = S.items.fert - f0; R.sig2 = misionSig().id;
+    S.carpas = [{ t: 'm120', foco: 'led720' }]; S.pots = [{ sid: 'dragon', prog: .8, water: 70, health: 100, fert: true, fq: .75, pest: false }];
+    await run(async () => {}); await idle(); R.flor0 = 'flor27' in S.misiones;
+    S.pots[0].fq = 1; await run(async () => {}); await idle(); R.flor = S.misiones.flor27 === S.day;
+    addBuds('dragon', 20, 26.8); await run(async () => {}); await idle(); R.c268 = 'copa27' in S.misiones;
+    S.buds.dragon.thc = 26.9; await run(async () => {}); await idle(); R.copa = S.misiones.copa27 === S.day;
+    R.log = LOG.slice(l0).filter(l => /^(SMS · KIKO|Consigues)/.test(l)).join('|');
+    const o = JSON.parse(sv); S.carpas = o.carpas; S.pots = o.pots; S.items = o.items; S.buds = o.buds; S.rec = o.rec;
+    S.misiones = Object.assign(o.misiones, { potente: S.misiones.potente, flor27: S.misiones.flor27 });   // la del 27 %, sin hacer: la cierra la Copa
+  }, () => R.ver === 'potente,flor27,copa27' && R.pot === 'tormenta,leyenda,dragon' && R.sig === 'potente' && R.pot1 && R.fert === 4 && R.sig2 === 'flor27' && !R.flor0 && R.flor && !R.c268 && R.copa
+    && R.log === 'SMS · KIKO: Con esa ya puedes plantarle cara a Darko. Ahora, a sacarle todo el THC.|Consigues 4 dosis de MEATZA FLORACIÓN.|Consigues 4 dosis de pH− MEATZA.|SMS · KIKO: Así, a tope. Ahí tienes ORTUA BIO para la próxima: el orgánico da algo más de THC.|Consigues 2 dosis de ORTUA BIO FLORACIÓN.|Consigues 2 dosis de pH− ORTUA BIO.|SMS · KIKO: Con eso le ganas a Darko. Llévaselo al jurado de la plaza antes de venderlo.' || R);
   await step('Copa: presentar Sour Diesel (27,2%) → gana → capítulo 7', ['Sour Diesel'], async () => {
     S.money = 0; addBuds('dragon', 25, 27.2); await run(talkJurado);
-  }, () => S.ch === 7 && S.money === 5000 && S.due === 15000 && S.flags.copa && loadSave().due === 15000 || { ch: S.ch, money: S.money, due: S.due, guardado: loadSave().due });
+    window.R = { c27: S.misiones.copa27 }; delete S.misiones.copa27; migrate(); R.mig = S.misiones.copa27;   // 1.28: la que faltaba, cerrada al ganar (y en migrate)
+  }, () => S.ch === 7 && S.money === 5000 && S.due === 15000 && S.flags.copa && loadSave().due === 15000 && R.c27 === 0 && R.mig === 0 || { ch: S.ch, money: S.money, due: S.due, guardado: loadSave().due, R });
 
   // ---------- capítulo 7 → final ----------
   await step('Pagar los últimos 15.000 € → deuda saldada: empieza tu imperio (capítulo 8, con su rótulo)', ['^Pagar'], async () => {

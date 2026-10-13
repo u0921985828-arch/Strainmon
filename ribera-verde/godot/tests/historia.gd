@@ -632,13 +632,61 @@ func _pasos() -> void:
 		J.add_buds("ria", 25, 12)
 		await run(J.talk_jurado),
 		func(): return chk(J.S.ch == 6 and Datos.jsround(J.S.buds.ria.g) == 5, {"ch": J.S.ch, "buds": J.S.buds}))
+	# 1.28: las misiones de la Copa, hasta pasar la marca de Darko (26,8 % no llega; 26,9 %, sí), con sus SMS y regalos
+	step("Misiones de la Copa: una genética potente, floración a tope (el abono entero, bajo el LED de 720 W) y llegar al 27 %", [], func():
+		var sv := {"carpas": J.S.carpas.duplicate(true), "pots": J.S.pots.duplicate(true), "items": J.S.items.duplicate(true), "misiones": J.S.misiones.duplicate(true), "buds": J.S.buds.duplicate(true), "rec": J.S.rec.duplicate(true)}
+		var f0 = J.S.items.fert
+		var l0 := LOG.size()
+		for m in D.MISIONES:   # las de antes, hechas: que no salgan aquí
+			if int(m.ch) < 6:
+				J.S.misiones[m.id] = 0
+		R = {"ver": ",".join(PackedStringArray(J.misiones_ver().filter(func(m): return int(m.ch) == 6).map(func(m): return m.id + ("+" if J.S.misiones.has(m.id) else "")))),
+			"pot": ",".join(PackedStringArray(D.POTENTES)), "sig": J.mision_sig().id}
+		J.S.rec.dragon = 1
+		await run(func(): pass)
+		await idle()
+		R.pot1 = J.S.misiones.get("potente") == J.S.day
+		R.fert = J.S.items.fert - f0
+		R.sig2 = J.mision_sig().id
+		J.S.carpas = [{"t": "m120", "foco": "led720"}]
+		J.S.pots = [{"sid": "dragon", "prog": 0.8, "water": 70, "health": 100, "fert": true, "fq": 0.75, "pest": false}]
+		await run(func(): pass)
+		await idle()
+		R.flor0 = J.S.misiones.has("flor27")
+		J.S.pots[0].fq = 1
+		await run(func(): pass)
+		await idle()
+		R.flor = J.S.misiones.get("flor27") == J.S.day
+		J.add_buds("dragon", 20, 26.8)
+		await run(func(): pass)
+		await idle()
+		R.c268 = J.S.misiones.has("copa27")
+		J.S.buds.dragon.thc = 26.9
+		await run(func(): pass)
+		await idle()
+		R.copa = J.S.misiones.get("copa27") == J.S.day
+		R.log = "|".join(PackedStringArray(LOG.slice(l0).filter(func(l): return l.begins_with("SMS · KIKO") or l.begins_with("Consigues"))))
+		J.S.carpas = sv.carpas
+		J.S.pots = sv.pots
+		J.S.items = sv.items
+		J.S.buds = sv.buds
+		J.S.rec = sv.rec
+		sv.misiones.potente = J.S.misiones.potente   # la del 27 %, sin hacer: la cierra la Copa
+		sv.misiones.flor27 = J.S.misiones.flor27
+		J.S.misiones = sv.misiones,
+		func(): return chk(R.ver == "potente,flor27,copa27" and R.pot == "tormenta,leyenda,dragon" and R.sig == "potente" and R.pot1 and R.fert == 4 and R.sig2 == "flor27" and not R.flor0 and R.flor and not R.c268 and R.copa
+			and R.log == "SMS · KIKO: Con esa ya puedes plantarle cara a Darko. Ahora, a sacarle todo el THC.|Consigues 4 dosis de MEATZA FLORACIÓN.|Consigues 4 dosis de pH− MEATZA.|SMS · KIKO: Así, a tope. Ahí tienes ORTUA BIO para la próxima: el orgánico da algo más de THC.|Consigues 2 dosis de ORTUA BIO FLORACIÓN.|Consigues 2 dosis de pH− ORTUA BIO.|SMS · KIKO: Con eso le ganas a Darko. Llévaselo al jurado de la plaza antes de venderlo.", R))
 	step("Copa: presentar Sour Diesel (27,2%) → gana → capítulo 7", ["Sour Diesel"], func():
 		J.S.money = 0
 		J.add_buds("dragon", 25, 27.2)
-		await run(J.talk_jurado),
+		await run(J.talk_jurado)
+		R = {"c27": J.S.misiones.get("copa27")}   # 1.28: la que faltaba, cerrada al ganar (y en migrate)
+		J.S.misiones.erase("copa27")
+		J.migrate()
+		R.mig = J.S.misiones.get("copa27"),
 		func():
 			var sv = J.load_save()
-			return chk(J.S.ch == 7 and J.S.money == 5000 and J.S.due == 15000 and si(J.S.flags.get("copa")) and sv and sv.due == 15000, {"ch": J.S.ch, "money": J.S.money, "due": J.S.due, "guardado": sv.due if sv else null}))
+			return chk(J.S.ch == 7 and J.S.money == 5000 and J.S.due == 15000 and si(J.S.flags.get("copa")) and sv and sv.due == 15000 and R.c27 == 0 and R.mig == 0, {"ch": J.S.ch, "money": J.S.money, "due": J.S.due, "guardado": sv.due if sv else null, "R": R}))
 
 	# ---------- capítulo 7 → final ----------
 	step("Pagar los últimos 15.000 € → deuda saldada: empieza tu imperio (capítulo 8, con su rótulo)", ["^Pagar"], func():
