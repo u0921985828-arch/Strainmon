@@ -64,8 +64,8 @@ async function contratarVendedor(f){
   await say(`${f.n}: «Hecho. Cada día te dejo lo vendido en el buzón».`);return false;
 }
 // MÓVIL → GENTE: a quién conoces y cuánto se fía de ti
-const GENTE={kiko:'Kiko',josune:'Josune',begona:'Begoña',patxi:'Patxi',txaro:'Txaro',inaki:'Iñaki',ane:'Ane',nerea:'Nerea',bixente:'Bixente',andoni:'Andoni',baltasar:'Don Baltasar',molina:'Sgto. Molina',darko:'Darko'};
-const QUE_DA={kiko:`Con ${REL.amigo}: un 5 % menos en el growshop. Cada compra suma.`,inaki:`Con ${REL.amigo}: un 5 % más al por mayor. Cada venta suma.`,begona:`Con ${REL.amigo} (desde el cap. ${CURRO.jard.ch}): te cuida las plantas por ${CURRO.jard.sueldo} € al día.`,txaro:'Sus semillas, por sus favores.'};
+const GENTE={kiko:'Kiko',julen:'Julen',josune:'Josune',begona:'Begoña',patxi:'Patxi',txaro:'Txaro',inaki:'Iñaki',ane:'Ane',nerea:'Nerea',bixente:'Bixente',andoni:'Andoni',baltasar:'Don Baltasar',molina:'Sgto. Molina',darko:'Darko'};
+const QUE_DA={kiko:`Con ${REL.amigo}: un 5 % menos en el growshop. Cada compra suma.`,inaki:`Con ${REL.amigo}: un 5 % más al por mayor. Cada venta suma.`,begona:`Con ${REL.amigo} (desde el cap. ${CURRO.jard.ch}): te cuida las plantas por ${CURRO.jard.sueldo} € al día.`,txaro:'Sus semillas, por sus favores.',julen:'El hijo de Kiko: te ayuda con la primera cosecha. Después, consejos en el growshop.'};
 async function gente(){
   const rows=[];
   for(const [id,n] of Object.entries(GENTE))if(S.rel[id]!=null)rows.push({label:n,right:`${rel(id)} · ${id==='begona'&&S.curro.jard?'jardinera':relNivel(id)}`,desc:QUE_DA[id]||'Hablar cada día suma confianza.'});

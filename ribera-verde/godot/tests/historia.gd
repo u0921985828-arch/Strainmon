@@ -2807,10 +2807,76 @@ func _pasos() -> void:
 		R.otra = "|".join(LOG.slice(l2))
 		J.S = S0
 		J.enter_map("home", 5, 5, "up"),
-		func(): return chk(R.m == 100 - Datos.jsround(pr("Abono") * D.ENVIO) and R.envio == "Abono de floración 1 L" and R.fert == 4 and R.envio2 == 0 and R.sms != null and R.sms.t == "Te he dejado el paquete en casa: Abono de floración 1 L."
+		func(): return chk(R.m == 100 - Datos.jsround(pr("Abono") * D.ENVIO) and R.envio == "Abono floración MEATZA 1 L" and R.fert == 4 and R.envio2 == 0 and R.sms != null and R.sms.t == "Te he dejado el paquete en casa: Abono floración MEATZA 1 L."
 			and R.log.any(func(l): return re("\\[menú\\] KIKO", l)) and R.log.any(func(l): return l.begins_with("KIKO: ")) and R.fijos == jj([{"id": "cz1", "n": R.nom, "t": "cur", "dia": 0}])
 			and R.t == D.LLAMADA_MIN and R.dh >= 1 + D.CALOR_CALLE.base and R.cobra > 0 and R.dia and R.log2.any(func(l): return l == "  [menú] Kiko | %s | Nada  → %s" % [R.nom, R.nom])
 			and R.log2.any(func(l): return l.begins_with(R.nom.to_upper() + ": Busco")) and re("%s ya ha venido hoy" % R.nom, R.otra), R))
+	step("Marcas, Julen e itinerario (1.23): Julen, en el piso tras Kiko, regala ORTUA BIO y pH− y lo explica; el itinerario apunta los pasos y avisa (y Julen lo comenta); el de crecimiento orgánico con su pH− cítrico (×0,95, sustrato vivo); en flor, a elegir marca: MEATZA con el pH− de la otra (×0,75) y ORTUA BIO (no acelera, más THC); «¿Qué hago ahora?»; START → OBJETIVO → ITINERARIO; con la primera cosecha, Julen se despide y se va al growshop",
+		["Regar", "Abonar", "Abonar", "MEATZA", "Abonar", "¿Qué hago", "ITINERARIO", "Volver", "Volver"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.merge({"ch": 1, "map": "home", "day": 3, "min": 12 * 60, "sales": 0, "itin": {}, "flags": {"llegada": true, "letter": true, "kiko1": true}, "carpas": [{"t": "m100", "foco": "cfl"}], "macetas": ["plastico7", "plastico7", "plastico7", "plastico7"]}, true)
+		var mis := {}
+		for m in D.MISIONES:
+			mis[m.id] = 0
+		J.S.misiones = mis
+		J.S.pots = []
+		for q in 3:
+			J.S.pots.append({"sid": "ria", "prog": .3, "water": 100, "health": 100, "fert": false, "pest": false})
+		J.S.pots.append(null)
+		J.S.items.merge({"fert": 1, "fertv": 0, "phm": 0, "ofert": 1, "ofertv": 0, "ophm": 0, "medidor": 0}, true)
+		var to0 = TO
+		TO = []
+		capta = true
+		J.build_ents()
+		R = {"julen": J.ents.any(func(e): return e.id == "julen"), "obj": J.objective_text()}
+		await run(J.talk_julen)
+		await idle()
+		R.it = [J.S.items.ofertv, J.S.items.ophm, si(J.S.flags.get("julen1")), ",".join(PackedStringArray(J.S.itin.keys()))]
+		await run(func(): await J.pot_action(0))
+		await idle()
+		await run(func(): await J.pot_action(0))
+		await idle()
+		R.p0 = [J.S.pots[0].fv, J.S.pots[0].fvo, J.S.items.ophm, J.abono_txt(J.S.pots[0])]
+		J.S.pots[1].prog = .8
+		J.S.pots[2].prog = .8
+		await run(func(): await J.pot_action(1))
+		await idle()
+		R.p1 = [J.S.pots[1].fq, J.S.pots[1].get("fo", 0), J.S.items.ophm, J.abono_txt(J.S.pots[1])]
+		await run(func(): await J.pot_action(2))
+		await idle()
+		R.p2 = [J.S.pots[2].fq, J.S.pots[2].fo, J.S.items.ophm, J.abono_txt(J.S.pots[2])]
+		var f: Dictionary = J.factores(0).duplicate()
+		f.plaga = 0
+		var pm := {"sid": "ria", "prog": .7, "water": 100, "health": 100, "fert": true, "fq": 1, "pest": false}
+		var pb := pm.duplicate()
+		pb.fo = 1
+		Cultivo.plant_step(J.S, pm, 1, f)
+		Cultivo.plant_step(J.S, pb, 1, f)
+		R.crec = [pm.prog, pb.prog]
+		R.g = [Cultivo.gramos_planta(J.S, J.S.pots[1], f), Cultivo.gramos_planta(J.S, J.S.pots[2], f), Cultivo.thc_cosecha(J.S, J.S.pots[1], f), Cultivo.thc_cosecha(J.S, J.S.pots[2], f)]
+		await run(J.talk_julen)
+		await idle()
+		R.sig = J.itin_sig().id
+		await run(J.objetivo_menu)
+		await idle()
+		R.n = J.itin_n()
+		R.TO = TO.duplicate()
+		capta = false
+		TO = to0
+		J.S.flags.harvest1 = true
+		await run(J.check_story)
+		await idle()
+		R.fin = [J.S.ch, J.ents.any(func(e): return e.id == "julen"), D.NPCDEF.any(func(d): return d.id == "julen" and d.map == "shop" and J.npc_cond(d)), J.S.itin.get("cosecha") == J.S.day]
+		R.log = [LOG.has("JULEN: " + D.JULEN.ok.plantar), LOG.has("JULEN: " + D.JULEN.adios[0]), LOG.has("JULEN: " + D.ITINERARIO[8].d)]
+		J.S = S0
+		J.build_ents(),
+		func(): return chk(R.julen and R.obj == D.ITINERARIO[3].d and R.it[0] == 2 and R.it[1] == 4 and R.it[2] and R.it[3] == "bus,carta,kiko,julen,plantar"
+			and absf(R.p0[0] - .95) < 1e-9 and R.p0[1] == 1 and R.p0[2] == 3 and R.p0[3] == "Abonada (crecimiento bio) · sustrato vivo"
+			and absf(R.p1[0] - .75) < 1e-9 and R.p1[1] == 0 and R.p1[2] == 2 and R.p1[3] == "Abonada (floración)"
+			and absf(R.p2[0] - .95) < 1e-9 and R.p2[1] == 1 and R.p2[2] == 1 and R.p2[3] == "Abonada (floración bio) · sustrato vivo"
+			and R.crec[0] > R.crec[1] and R.g[3] > R.g[2] and R.sig == "cosecha" and R.n == 8 and R.TO.size() == 4 and R.TO[0] == "<small>ITINERARIO · 5/14</small>Plantar<br>Ahora: Regar"
+			and R.TO[3] == "<small>ITINERARIO · 8/14</small>Abono de floración<br>Ahora: Primera cosecha" and R.fin[0] == 2 and not R.fin[1] and R.fin[2] and R.fin[3] and R.log.all(func(x): return x), R))
 	step("Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también arcón, sala, agenda, mensajes, pedidos y bolsa); con Toño ya visto, sale en el móvil", [], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))
@@ -2820,13 +2886,14 @@ func _pasos() -> void:
 		J.S.protect = true
 		J.S.flags.metB = false
 		J.S.flags.erase("tono")
-		for k in ["caja", "rec", "vencidos", "protHasta", "encargo", "encVeto", "arcon", "sala", "fijos", "sms", "envio", "misiones"]:
+		for k in ["caja", "rec", "vencidos", "protHasta", "encargo", "encVeto", "arcon", "sala", "fijos", "sms", "envio", "misiones", "itin"]:
 			J.S.erase(k)
 		J.S.items.erase("bolsa")
 		J.migrate()
 		R = {"due": J.S.due, "dias": J.S.deadline - J.S.day, "tono": J.S.flags.get("tono") == J.S.day, "hasta": J.S.protHasta - J.S.day,
 			"campos": jj([J.S.caja, J.S.rec, J.S.vencidos, J.S.encargo, J.S.encVeto]), "nuevos": jj([J.S.arcon, J.S.sala, J.S.fijos, J.S.sms, J.S.envio, J.S.items.bolsa]),
-			"mis": ",".join(PackedStringArray(J.S.misiones.keys())) + "/" + ",".join(PackedStringArray(J.S.misiones.values().map(func(v): return str(int(v)))))}
+			"mis": ",".join(PackedStringArray(J.S.misiones.keys())) + "/" + ",".join(PackedStringArray(J.S.misiones.values().map(func(v): return str(int(v))))),
+			"iti": ",".join(PackedStringArray(J.S.itin.keys())) + "/" + ",".join(PackedStringArray(J.S.itin.values().map(func(v): return str(int(v)))))}
 		J.S = Datos.enteros(norm(S0))
 		J.S.flags.metB = true
 		J.S.flags.erase("tono")
@@ -2834,7 +2901,8 @@ func _pasos() -> void:
 		R.tono2 = J.S.flags.get("tono") == J.S.day
 		J.S = S0,
 		func(): return chk(R.due == 3000 and R.dias == 7 and R.tono and R.hasta == 10 and R.campos == "[null,{},0,null,0]"
-			and R.nuevos == "[{\"buds\":{},\"rosin\":{}},{},[],[],[],0]" and R.tono2 and R.mis == "caja,luz,carpa,olor,inaki/0,0,0,0,0", R))
+			and R.nuevos == "[{\"buds\":{},\"rosin\":{}},{},[],[],[],0]" and R.tono2 and R.mis == "caja,luz,carpa,olor,inaki/0,0,0,0,0"
+			and R.iti == "bus,carta,kiko,julen,plantar,regar,veg,flor,cosecha,vender,ventas/0,0,0,0,0,0,0,0,0,0,0", R))
 	step("Guardar y cargar la partida", [], func(): J.save(),
 		func():
 			var sv = J.load_save()

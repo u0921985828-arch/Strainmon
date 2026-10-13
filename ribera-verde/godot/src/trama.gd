@@ -85,7 +85,7 @@ func comprar_carpa(t: String, ci: int) -> void:
 	S.pots = np
 	S.macetas = nm_
 
-const IC := {"fert": "abono", "fertv": "abono", "phm": "abono", "insect": "insecticida", "spray": "spray", "bocata": "bocadillo"}
+const IC := {"fert": "abono", "fertv": "abono", "phm": "abono", "ofert": "abono", "ofertv": "abono", "ophm": "abono", "insect": "insecticida", "spray": "spray", "bocata": "bocadillo"}
 
 # las tiendas (1.14, D.TIENDAS): GROWSHOP KIKO y GROW IBARBIDE (ANE: un 10 % más barato y un capítulo antes, sin semillas, muebles ni
 # aparatos: su ok() del JS, aquí a mano)
@@ -221,10 +221,11 @@ func talk_kiko():
 		add_seeds("ria", 3)
 		await got("3 semillas de SKUNK #1")
 		S.items.fert += 2
-		await got("2 dosis de ABONO")
+		await got("2 dosis de MEATZA FLORACIÓN")
 		await talk(N, ["La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.", "Planta en las macetas del armario de tu tía y riega cuando baje el agua.",
 			"El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.", "Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.",
-			"Las plantas siguen creciendo mientras duermes.", "Te iré mandando al móvil lo que te hace falta para salir adelante. Lo tienes en START, en OBJETIVO."])
+			"Las plantas siguen creciendo mientras duermes.", "Te iré mandando al móvil lo que te hace falta para salir adelante. Lo tienes en START, en OBJETIVO.",
+			"Mi hijo Julen te espera en el piso. Sabe más que yo de esto: te ayudará hasta tu primera cosecha."])
 		S.flags.kiko1 = true
 		show_objective()
 		return
@@ -820,7 +821,10 @@ func objective_text() -> String:
 				return "Coge el autobús en la plaza de Mendialde hasta Ribera Verde."
 			if not S.flags.get("letter"):
 				return "Lee la carta que hay en la mesa." if S.map == "home" else "Entra en el piso de la tía Maite, enfrente de la parada, y lee la carta que hay en la mesa."
-			return ("Visita el growshop de Kiko, al lado de casa." if not S.flags.get("kiko1") else "Planta y consigue tu primera cosecha.")
+			if not S.flags.get("kiko1"):
+				return "Visita el growshop de Kiko, al lado de casa."
+			var sg = itin_sig()   # 1.23: el paso del itinerario
+			return sg.d if sg != null and not S.flags.get("harvest1") else "Planta y consigue tu primera cosecha."
 		2:
 			var mv := int(D.META_VENTAS)
 			return "Gana %d € vendiendo (%d/%d)." % [mv, mini(mv, Datos.jsround(S.sales)), mv]
@@ -912,6 +916,7 @@ func premio_txt(m: Dictionary) -> Array:
 
 # run() la llama al acabar cada guion: marca las cumplidas, da el regalo y encola el SMS
 func revisa_misiones() -> void:
+	revisa_itinerario()   # 1.23
 	for m in misiones_ver():
 		if not S.misiones.has(m.id) and mision_ok(m.id):
 			S.misiones[m.id] = S.day
@@ -951,19 +956,170 @@ func recuerdo_plazo():
 	await say(("Llevas %s entre el bolsillo y la caja: te faltan %s." % [Datos.eur(ll), Datos.eur(S.due - ll)]) if ll < S.due else "Llevas %s entre el bolsillo y la caja: ya lo tienes.%s Ve al bar El Ancla." % [Datos.eur(ll), " Saca lo que falte de la caja y" if S.money < S.due else ""])
 
 # START → OBJETIVO: el del capítulo, las misiones (con lo que hay que hacer abajo) y la deuda
+# (1.23: y el ITINERARIO hasta el primer plazo, hasta el capítulo 4; con A, sus pasos)
 func objetivo_menu():
-	var it := [{"label": "CAPÍTULO %d" % S.ch, "desc": "%s\n%s" % [D.CH_TITLES.get(str(S.ch), ""), objective_text()]}]
-	var ini := 0
-	var mv := misiones_ver()
-	for i in mv.size():
-		var hecha: bool = S.misiones.has(mv[i].id)
-		it.append({"label": mv[i].t, "right": "HECHA" if hecha else null, "desc": mv[i].d})
-		if not hecha and ini == 0:
-			ini = i + 1
-	var plazo := ("Plazo: %s antes de que acabe el día %s. Llevas %s.\n" % [Datos.eur(S.due), n(S.deadline), Datos.eur(S.money + caja_e())]) if S.due > 0 else ""
-	it.append({"label": "DEUDA", "right": Datos.eur(S.debt), "desc": plazo + "Ventas %s · Reputación %s · Calor %d %%" % [Datos.eur(S.sales), n(S.rep), Datos.jsround(S.heat)]})
+	while true:
+		var iti: bool = S.ch <= 4
+		var it := [{"label": "CAPÍTULO %d" % S.ch, "desc": "%s\n%s" % [D.CH_TITLES.get(str(S.ch), ""), objective_text()]}]
+		if iti:
+			it.append(itin_row())
+		var ini := 0
+		var mv := misiones_ver()
+		for i in mv.size():
+			var hecha: bool = S.misiones.has(mv[i].id)
+			it.append({"label": mv[i].t, "right": "HECHA" if hecha else null, "desc": mv[i].d})
+			if not hecha and ini == 0:
+				ini = i + 1 + (1 if iti else 0)
+		if iti and itin_sig() != null:
+			ini = 1
+		var plazo := ("Plazo: %s antes de que acabe el día %s. Llevas %s.\n" % [Datos.eur(S.due), n(S.deadline), Datos.eur(S.money + caja_e())]) if S.due > 0 else ""
+		it.append({"label": "DEUDA", "right": Datos.eur(S.debt), "desc": plazo + "Ventas %s · Reputación %s · Calor %d %%" % [Datos.eur(S.sales), n(S.rep), Datos.jsround(S.heat)]})
+		it.append({"label": "Volver", "desc": ""})
+		var i: int = await menu(it, {"cls": "full", "title": "OBJETIVO", "title2": "cap. %d" % S.ch, "desc": true, "initial": ini})
+		if iti and i == 1:
+			await itinerario_menu()
+			continue
+		return
+
+# ---------- Julen y el itinerario (1.23, 11h-guia.js): textos del HTML (D.ITINERARIO, D.JULEN, D.MINERAL_ORG); aquí, lo que mira cada paso ----------
+var itin_aviso: Array = []
+
+func itin_ok(id: String) -> bool:
+	var F: Dictionary = S.flags
+	var h1: bool = true if F.get("harvest1") else false
+	match id:
+		"bus":
+			return not llegando()
+		"carta":
+			return true if F.get("letter") else false
+		"kiko":
+			return true if F.get("kiko1") else false
+		"julen":
+			return (true if F.get("julen1") else false) or h1
+		"plantar":
+			return S.pots.any(func(p): return p is Dictionary) or h1
+		"regar":
+			return (true if F.get("gRiego") else false) or h1
+		"veg":   # ya en flor, no toca
+			return (true if (F.get("gVeg") or F.get("gFlor") or F.get("harvest1")) else false) or S.pots.any(func(p): return p is Dictionary and p.prog >= .65)
+		"flor":
+			return (true if F.get("gFlor") else false) or h1
+		"cosecha":
+			return h1
+		"vender":
+			return S.sales > 0
+		"ventas":
+			return S.ch >= 3
+		"baltasar":
+			return (true if F.get("metB") else false) or S.ch >= 4
+		"juntar":
+			return S.ch >= 4 or (S.ch == 3 and S.due > 0 and S.money + caja_e() >= S.due)
+		"pagar":
+			return S.ch >= 4
+	return false
+
+func itin_hecho(p: Dictionary) -> bool:
+	return S.itin.has(p.id) or itin_ok(p.id)
+
+func itin_sig():
+	for p in D.ITINERARIO:
+		if not itin_hecho(p):
+			return p
+	return null
+
+func itin_n() -> int:
+	return D.ITINERARIO.filter(func(p): return itin_hecho(p)).size()
+
+func julen_aqui() -> bool:
+	return S.map == "home" and (true if S.flags.get("julen1") else false) and not S.flags.get("harvest1")   # ya te ha saludado y sigue en el piso
+
+# lo que toca ahora, con lo que te falta para hacerlo
+func paso_cultivo() -> String:
+	var sg = itin_sig()
+	if sg == null:
+		return pick(D.JULEN.tips)
+	var sin := func(ks: Array) -> bool: return not ks.any(func(k): return S.items.get(k, 0) > 0)
+	var t: String = sg.d
+	if sg.id == "plantar" and not S.seeds.values().any(func(v): return v > 0):
+		t += " Si no te quedan semillas, mi aita tiene."
+	elif (sg.id == "veg" and sin.call(["fertv", "ofertv"])) or (sg.id == "flor" and sin.call(["fert", "ofert"])):
+		t += " No te queda: mi aita lo vende en el growshop."
+	elif (sg.id == "veg" or sg.id == "flor") and sin.call(["phm", "ophm"]):
+		t += " Y te falta pH−: lo tiene mi aita."
+	return t
+
+func talk_julen():
+	var N := "JULEN"
+	if not S.flags.get("julen1"):
+		await talk(N, D.JULEN.hola)
+		S.items.ofertv += 2
+		await got("2 dosis de ORTUA BIO CRECIMIENTO")
+		S.items.ophm += 4
+		await got("4 dosis de pH− ORTUA BIO")
+		await talk(N, D.JULEN.ph + D.MINERAL_ORG + D.JULEN.aqui)
+		S.flags.julen1 = true
+		return
+	if not S.flags.get("harvest1"):
+		var c: int = await ask("¿Qué pasa?", ["¿Qué hago ahora?", "Mineral u orgánico", "Nada"], N)
+		if c == 0:
+			await say(paso_cultivo(), N)
+		elif c == 1:
+			await talk(N, D.MINERAL_ORG)
+		else:
+			await say("Aquí estoy si me necesitas.", N)
+		return
+	var c: int = await ask("¿Qué tal la cosecha?", ["Un consejo", "Mineral u orgánico", "Nada"], N)
+	if c == 0:
+		await say(pick(D.JULEN.tips), N)
+	elif c == 1:
+		await talk(N, D.MINERAL_ORG)
+	else:
+		await say("Agur. Saluda a las plantas de mi parte.", N)
+
+# run() → revisa_misiones → aquí: apunta los pasos hechos y avisa del último (y del siguiente); si Julen está delante, lo comenta
+func revisa_itinerario() -> void:
+	if not S.has("itin"):
+		return
+	var I: Array = D.ITINERARIO
+	for i in I.size():
+		if not S.itin.has(I[i].id) and itin_ok(I[i].id):
+			S.itin[I[i].id] = S.day
+			if i >= int(D.ITIN_MUDO):
+				itin_aviso.append(I[i].id)
+	if itin_aviso.size():
+		queue("itin", aviso_itin)
+
+func aviso_itin():
+	var ids := itin_aviso.duplicate()
+	itin_aviso.clear()
+	var p: Dictionary = {}
+	for x in D.ITINERARIO:
+		if x.id == ids[-1]:
+			p = x
+	var sg = itin_sig()
+	toast("<small>ITINERARIO · %d/%d</small>%s" % [itin_n(), D.ITINERARIO.size(), p.t] + ("<br>Ahora: " + sg.t if sg != null else ""), 2800)
+	var j := ids.map(func(id): return D.JULEN.ok.get(id)).filter(func(x): return x != null)
+	if julen_aqui() and j.size():
+		await say(j[-1], "JULEN")
+
+# START → OBJETIVO → ITINERARIO
+func itin_row() -> Dictionary:
+	var sg = itin_sig()
+	var I: Array = D.ITINERARIO
+	var i: int = I.find(sg) if sg != null else -1
+	var desc := "Hecho: el primer plazo, pagado."
+	if sg != null:
+		desc = "Ahora: %s. %s" % [sg.t, sg.d] + (("\nDespués: %s." % I[i + 1].t) if i + 1 < I.size() else "")
+	return {"label": "ITINERARIO", "right": "%d/%d" % [itin_n(), I.size()], "itin": 1, "desc": desc}
+
+func itinerario_menu():
+	var sg = itin_sig()
+	var I: Array = D.ITINERARIO
+	var it := []
+	for p in I:
+		it.append({"label": p.t, "right": "HECHO" if itin_hecho(p) else ("AHORA" if p == sg else null), "desc": p.d})
 	it.append({"label": "Volver", "desc": ""})
-	await menu(it, {"cls": "full", "title": "OBJETIVO", "title2": "cap. %d" % S.ch, "desc": true, "initial": ini})
+	await menu(it, {"cls": "full", "title": "ITINERARIO", "title2": "%d/%d" % [itin_n(), I.size()], "desc": true, "initial": maxi(0, I.find(sg) if sg != null else 0)})
 
 func facturado() -> float:
 	return maxf(0, S.sales - S.get("imp0", 0))
@@ -979,6 +1135,8 @@ func check_story():
 	if S.ch == 1 and S.flags.get("harvest1"):
 		await chapter(2)
 		spawn_clients()
+		if S.flags.get("julen1"):   # 1.23: se vuelve al growshop
+			await talk("JULEN", D.JULEN.adios)
 		await talk("SMS · KIKO", ["Primera cosecha. Bien hecho.", "La gente que busca material lleva un $ encima. Puedes venderles en la calle.", "Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba."])
 		await lineas_nuevas()
 		show_objective()
@@ -1350,11 +1508,9 @@ func mochila() -> void:
 		rows.append({"label": "Vida", "right": "%s/%s" % [n(S.hp), n(S.hpMax)], "desc": "Se recupera durmiendo, comiendo o con el tiempo."})
 		if int(S.pelea.xp) > 0:
 			rows.append({"label": "Pelea", "right": "nivel %d" % nivel_pelea(), "desc": ficha_pelea()})
-		rows.append_array([{"label": "Abono (dosis)", "right": "×" + n(S.items.fert), "ic": icono("abono"), "desc": "De floración. Una por planta: +%d %% de cosecha, con el pH corregido." % Datos.jsround(D.ABONO.rend * 100)}])
-		if S.items.get("fertv", 0) > 0:
-			rows.append({"label": "Abono de crecimiento", "right": "×" + n(S.items.fertv), "ic": icono("abono"), "desc": "Una por planta en crecimiento: crece un %d %% más deprisa hasta florecer." % Datos.jsround(D.ABONO.veg * 100)})
-		if S.items.get("phm", 0) > 0:
-			rows.append({"label": "pH− (dosis)", "right": "×" + n(S.items.phm), "ic": icono("abono"), "desc": "Se gasta una con cada dosis de abono: baja el pH del agua al %s." % Datos.coma(D.ABONO.ph[2])})
+		for k in D.PRODUCTOS:   # 1.23: por marca
+			if k == "fert" or S.items.get(k, 0) > 0:
+				rows.append({"label": D.PRODUCTOS[k].n, "right": "×" + n(S.items.get(k, 0)), "ic": icono("abono"), "desc": D.DESC_PROD[k]})
 		if S.items.get("medidor", 0):
 			rows.append({"label": "Medidor de pH y EC", "right": "×1", "desc": "Con él corriges el pH justo y ves la EC y el pH de cada maceta en PLANTAS."})
 		rows.append_array([{"label": "Insecticida (tratamientos)", "right": "×" + n(S.items.insect), "ic": icono("insecticida"), "desc": "Úsalo en una maceta con plaga."},

@@ -1,6 +1,6 @@
 {
  "generado": "tools/sprites/catalogo.js",
- "claves": 312,
+ "claves": 315,
  "catalogo": {
   "look:player": [
    {
@@ -536,6 +536,24 @@
   "npc:miren": [
    {
     "asset": "miren",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:julen": [
+   {
+    "asset": "julen",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:julen": [
+   {
+    "asset": "julen",
     "familia": "importado",
     "herramienta": "importado",
     "fase": "F3",

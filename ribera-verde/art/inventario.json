@@ -181,6 +181,7 @@
   "personajes": [
     "player",
     "kiko",
+    "julen",
     "josune",
     "baltasar",
     "tono",
@@ -220,6 +221,7 @@
   "personajes_fijos": [
     "player",
     "kiko",
+    "julen",
     "josune",
     "baltasar",
     "tono",
@@ -251,6 +253,18 @@
     {
       "id": "kiko",
       "look": "kiko",
+      "mapa": "shop",
+      "deambula": false
+    },
+    {
+      "id": "julen",
+      "look": "julen",
+      "mapa": "home",
+      "deambula": false
+    },
+    {
+      "id": "julen",
+      "look": "julen",
       "mapa": "shop",
       "deambula": false
     },

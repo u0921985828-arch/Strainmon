@@ -363,7 +363,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.lector.visible, 60)
 	await espera(3)
 	await foto("0b-creditos")
-	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.16.0") \
+	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.17.0") \
 		and J.lector_txt.text.contains("Open Font License") and J.lector_txt.text.contains("FICCIÓN") and J.lector.get_global_rect().encloses(J.lector_sc.get_global_rect()))
 	await pulsa("B")
 	await elige("LICENCIAS")
@@ -557,7 +557,13 @@ func menu_start() -> void:
 	# OBJETIVO (1.11): una lista con el capítulo, las misiones (ninguna antes de conocer a Kiko) y la deuda
 	await elige("OBJETIVO")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OBJETIVO", 60)
-	check("Objetivo: el capítulo y la carta, sin misiones hasta conocer a Kiko, y la deuda", etiquetas() == ["CAPÍTULO 1", "DEUDA", "Volver"] and str(J.m_items[0].desc).contains("carta") and str(J.m_items[1].right) == Datos.eur(30000))
+	check("Objetivo: el capítulo y la carta, el itinerario (1.23) al principio, sin misiones hasta conocer a Kiko, y la deuda", etiquetas() == ["CAPÍTULO 1", "ITINERARIO", "DEUDA", "Volver"]
+		and str(J.m_items[0].desc).contains("carta") and J.m_i == 1 and str(J.m_items[1].right) == "1/14" and str(J.m_items[2].right) == Datos.eur(30000))
+	await pulsa("A")
+	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "ITINERARIO", 60)
+	check("ITINERARIO: los 14 pasos y Volver; hecho el autobús, ahora la carta", J.m_items.size() == 15 and J.m_items[0].get("right") == "HECHO" and J.m_items[1].get("right") == "AHORA" and J.m_i == 1)
+	await pulsa("B")
+	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OBJETIVO", 60)
 	await pulsa("B")
 	await hasta(func(): return J.menu_box.visible and etiquetas().has("GUARDAR"), 60)
 	# OPCIONES · SONIDO apaga la música y los efectos (y lo dice el mando de arriba); otra vez, los enciende

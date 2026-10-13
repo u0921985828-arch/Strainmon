@@ -403,7 +403,7 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
  0  ██████████████████
  1  ██████vv█v█████v██
  2  Bp..PGG.K.KK.??.??
- 3  B.................
+ 3  B........@........
  4  c.................
  5  ...t.........??...
  6  F.................
@@ -419,7 +419,7 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
     0123456789
  0  ██████████
  1  ss██v███ss
- 2  ....@.....
+ 2  ....@..@..
  3  ..CCCCCC..
  4  ..........
  5  d........d
@@ -520,6 +520,8 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 | id | Mapa | Posición | Deambula | Aparece cuando |
 |---|---|---|---|---|
 | kiko | shop | (4,2) | no | siempre |
+| julen | home | (9,3) | no | `!!S.flags.kiko1&&!S.flags.harvest1` |
+| julen | shop | (7,2) | no | `!!S.flags.harvest1` |
 | josune | bar | (2,2) | no | siempre |
 | baltasar | bar | (7,4) | no | siempre |
 | tono | bar | (5,4) | no | `S.ch>=3&&S.ch<8` |
@@ -575,7 +577,7 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | id | Posición | Tipo | Contenido |
 |---|---|---|---|
 | i_spray | town (8,25) | bolsa en el suelo | 2 × SPRAY DE PIMIENTA |
-| i_fert | town (36,24) | bolsa en el suelo | 3 dosis de ABONO |
+| i_fert | town (36,24) | bolsa en el suelo | 3 dosis de MEATZA FLORACIÓN |
 | i_boc | town (15,23) | bolsa en el suelo | 2 × BOCATA |
 | h_acap | town (2,26) | oculto en arbusto (pulsa A delante) | 2 semillas de ACAPULCO GOLD |
 | h_50 | town (9,16) | oculto en arbusto (pulsa A delante) | 50 € en billetes doblados |
@@ -628,9 +630,12 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Semillas Kali Mist | 10 € | 4 |  |
 | Semillas California Orange | 8 € | 4 |  |
 | Semillas Chemdawg | 12 € | 5 |  |
-| Abono de floración 1 L | 14 € | 1 | 4 dosis. Una por planta: +25 % de cosecha, con el pH corregido (sin pH−, ×0,5). |
-| Abono de crecimiento 1 L | 12 € | 1 | 4 dosis. Una por planta en crecimiento: crece un 15 % más deprisa hasta florecer (sin pH−, ×0,5). |
-| pH− 250 ml | 6 € | 1 | 10 dosis. Se gasta una con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. Sin él, el abono rinde ×0,5; sin medidor, a ojo (×0,75). |
+| Abono floración MEATZA 1 L | 14 € | 1 | 4 dosis. Mineral. Una dosis por planta: +25 % de cosecha, +0,3 de THC y florece un 10 % más deprisa, con el pH corregido (sin pH−, ×0,5). |
+| Abono crecimiento MEATZA 1 L | 12 € | 1 | 4 dosis. Mineral. Una dosis por planta en crecimiento: crece un 15 % más deprisa hasta florecer (sin pH−, ×0,5). |
+| pH− MEATZA 250 ml | 6 € | 1 | 10 dosis. Ácido fosfórico. Se gasta una dosis con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. Sin pH−, el mineral rinde ×0,5; sin medidor, a ojo (×0,75). |
+| Abono floración ORTUA BIO 1 L | 19 € | 1 | 4 dosis. Orgánico, de liberación lenta. Una dosis por planta: +20 % de cosecha y +0,4 de THC, sin acelerar la floración. Sin pH−, ×0,85. Sin nada mineral, el sustrato vivo frena las plagas. |
+| Abono crecimiento ORTUA BIO 1 L | 16 € | 1 | 4 dosis. Orgánico, de liberación lenta. Una dosis por planta en crecimiento: crece un 8 % más deprisa hasta florecer. Sin pH−, la tierra lo amortigua (×0,85). |
+| pH− ORTUA BIO 250 ml | 7 € | 1 | 10 dosis. Ácido cítrico. Se gasta una dosis con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. No mata la vida del sustrato. |
 | Medidor de pH y EC | 35 € | 2 | Mide el pH y la EC del riego: con pH−, el abono rinde entero, y en PLANTAS ves la EC y el pH de cada maceta. |
 | Insecticida de neem 500 ml | 12 € | 1 | 3 tratamientos. Cada uno elimina una plaga de araña roja. |
 | Bocata | 5 € | 1 | Recupera 15 de vida. En combate o desde la mochila. |

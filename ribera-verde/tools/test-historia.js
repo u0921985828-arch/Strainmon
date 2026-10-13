@@ -858,16 +858,44 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     await run(() => talkClient(c)); R.fijos = JSON.stringify(S.fijos); R.nom = nombreFijo('cz1');
     R.h = S.heat; R.min = S.min; R.mon = S.money; const l1 = LOG.length; await run(startMenu); R.t = S.min - R.min; R.dh = S.heat - R.h; R.cobra = S.money - R.mon; R.dia = S.fijos[0].dia === S.day;
     R.log2 = LOG.slice(l1); const l2 = LOG.length; await run(startMenu); R.otra = LOG.slice(l2).join('|'); S = S0; enterMap('home', 5, 5, 'up');
-  }, () => R.m === 100 - Math.round(pr('Abono') * ENVIO) && R.envio === 'Abono de floración 1 L' && R.fert === 4 && R.envio2 === 0 && R.sms && R.sms.t === 'Te he dejado el paquete en casa: Abono de floración 1 L.'
+  }, () => R.m === 100 - Math.round(pr('Abono') * ENVIO) && R.envio === 'Abono floración MEATZA 1 L' && R.fert === 4 && R.envio2 === 0 && R.sms && R.sms.t === 'Te he dejado el paquete en casa: Abono floración MEATZA 1 L.'
     && R.log.some(l => /\[menú\] KIKO/.test(l)) && R.log.some(l => /^KIKO: /.test(l)) && R.fijos === JSON.stringify([{ id: 'cz1', n: R.nom, t: 'cur', dia: 0 }])
     && R.t === LLAMADA_MIN && R.dh >= 1 + CALOR_CALLE.base && R.cobra > 0 && R.dia && R.log2.some(l => l === `  [menú] Kiko | ${R.nom} | Nada  → ${R.nom}`) && R.log2.some(l => l.startsWith(R.nom.toUpperCase() + ': Busco')) && new RegExp(`${R.nom} ya ha venido hoy`).test(R.otra) || R);
+  await step('Marcas, Julen e itinerario (1.23): Julen, en el piso tras Kiko, regala ORTUA BIO y pH− y lo explica; el itinerario apunta los pasos y avisa (y Julen lo comenta); el de crecimiento orgánico con su pH− cítrico (×0,95, sustrato vivo); en flor, a elegir marca: MEATZA con el pH− de la otra (×0,75) y ORTUA BIO (no acelera, más THC); «¿Qué hago ahora?»; START → OBJETIVO → ITINERARIO; con la primera cosecha, Julen se despide y se va al growshop',
+    ['Regar', 'Abonar', 'Abonar', 'MEATZA', 'Abonar', '¿Qué hago', 'ITINERARIO', 'Volver', 'Volver'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0));
+    Object.assign(S, { ch: 1, map: 'home', day: 3, min: 12 * 60, sales: 0, itin: {}, flags: { llegada: true, letter: true, kiko1: true }, carpas: [{ t: 'm100', foco: 'cfl' }], macetas: Array(4).fill('plastico7') });
+    S.misiones = Object.fromEntries(MISIONES.map(m => [m.id, 0]));
+    S.pots = [0, 1, 2].map(() => ({ sid: 'ria', prog: .3, water: 100, health: 100, fert: false, pest: false })).concat([null]);
+    Object.assign(S.items, { fert: 1, fertv: 0, phm: 0, ofert: 1, ofertv: 0, ophm: 0, medidor: 0 });
+    const T = [], _t = toast; window.toast = (h, ms) => { T.push(h); _t(h, ms); };
+    buildEnts(); window.R = { julen: ents.some(e => e.id === 'julen'), obj: objectiveText() };
+    await run(talkJulen); await idle(); R.it = [S.items.ofertv, S.items.ophm, !!S.flags.julen1, Object.keys(S.itin).join()];
+    await run(() => potAction(0)); await idle(); await run(() => potAction(0)); await idle(); R.p0 = [S.pots[0].fv, S.pots[0].fvo, S.items.ophm, abonoTxt(S.pots[0])];
+    S.pots[1].prog = S.pots[2].prog = .8;
+    await run(() => potAction(1)); await idle(); R.p1 = [S.pots[1].fq, S.pots[1].fo || 0, S.items.ophm, abonoTxt(S.pots[1])];
+    await run(() => potAction(2)); await idle(); R.p2 = [S.pots[2].fq, S.pots[2].fo, S.items.ophm, abonoTxt(S.pots[2])];
+    const f = Object.assign({}, factores(0), { plaga: 0 }), pm = { sid: 'ria', prog: .7, water: 100, health: 100, fert: true, fq: 1, pest: false }, pb = Object.assign({}, pm, { fo: 1 });
+    plantStep(pm, 1, f); plantStep(pb, 1, f); R.crec = [pm.prog, pb.prog];
+    R.g = [gramosPlanta(S.pots[1], f), gramosPlanta(S.pots[2], f), thcCosecha(S.pots[1], f), thcCosecha(S.pots[2], f)];
+    await run(talkJulen); await idle(); R.sig = itinSig().id;
+    await run(objetivoMenu); await idle(); R.n = itinN(); R.TO = T.slice(); window.toast = _t;
+    S.flags.harvest1 = true; await run(checkStory); await idle();
+    R.fin = [S.ch, ents.some(e => e.id === 'julen'), NPCDEF.some(d => d.id === 'julen' && d.map === 'shop' && d.cond()), S.itin.cosecha === S.day];
+    R.log = [LOG.includes('JULEN: ' + JULEN.ok.plantar), LOG.includes('JULEN: ' + JULEN.adios[0]), LOG.includes('JULEN: ' + ITINERARIO[8].d)];
+    S = S0; buildEnts();
+  }, () => R.julen && R.obj === ITINERARIO[3].d && R.it.join() === '2,4,true,bus,carta,kiko,julen,plantar'
+    && R.p0.join() === '0.95,1,3,Abonada (crecimiento bio) · sustrato vivo' && R.p1.join() === '0.75,0,2,Abonada (floración)' && R.p2.join() === '0.95,1,1,Abonada (floración bio) · sustrato vivo'
+    && R.crec[0] > R.crec[1] && R.g[3] > R.g[2] && R.sig === 'cosecha' && R.n === 8 && R.TO.length === 4 && R.TO[0] === '<small>ITINERARIO · 5/14</small>Plantar<br>Ahora: Regar'
+    && R.TO[3] === '<small>ITINERARIO · 8/14</small>Abono de floración<br>Ahora: Primera cosecha' && R.fin.join() === '2,false,true,true' && R.log.every(Boolean) || R);
   await step('Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también arcón, sala, agenda, mensajes, pedidos y bolsa); con Toño ya visto, sale en el móvil', [], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 3, due: 0, deadline: 0, protect: true }); S.flags.metB = false; delete S.flags.tono;
-    for (const k of ['caja', 'rec', 'vencidos', 'protHasta', 'encargo', 'encVeto', 'arcon', 'sala', 'fijos', 'sms', 'envio', 'misiones']) delete S[k]; delete S.items.bolsa; migrate();
+    for (const k of ['caja', 'rec', 'vencidos', 'protHasta', 'encargo', 'encVeto', 'arcon', 'sala', 'fijos', 'sms', 'envio', 'misiones', 'itin']) delete S[k]; delete S.items.bolsa; migrate();
     window.R = { due: S.due, dias: S.deadline - S.day, tono: S.flags.tono === S.day, hasta: S.protHasta - S.day, campos: JSON.stringify([S.caja, S.rec, S.vencidos, S.encargo, S.encVeto]),
-      nuevos: JSON.stringify([S.arcon, S.sala, S.fijos, S.sms, S.envio, S.items.bolsa]), mis: Object.keys(S.misiones).join() + '/' + Object.values(S.misiones).join() };
+      nuevos: JSON.stringify([S.arcon, S.sala, S.fijos, S.sms, S.envio, S.items.bolsa]), mis: Object.keys(S.misiones).join() + '/' + Object.values(S.misiones).join(), iti: Object.keys(S.itin).join() + '/' + Object.values(S.itin).join() };
     S = JSON.parse(JSON.stringify(S0)); S.flags.metB = true; delete S.flags.tono; migrate(); R.tono2 = S.flags.tono === S.day; S = S0;
-  }, () => R.due === 3000 && R.dias === 7 && R.tono && R.hasta === 10 && R.campos === '[null,{},0,null,0]' && R.nuevos === '[{"buds":{},"rosin":{}},{},[],[],[],0]' && R.tono2 && R.mis === 'caja,luz,carpa,olor,inaki/0,0,0,0,0' || R);
+  }, () => R.due === 3000 && R.dias === 7 && R.tono && R.hasta === 10 && R.campos === '[null,{},0,null,0]' && R.nuevos === '[{"buds":{},"rosin":{}},{},[],[],[],0]' && R.tono2 && R.mis === 'caja,luz,carpa,olor,inaki/0,0,0,0,0'
+    && R.iti === 'bus,carta,kiko,julen,plantar,regar,veg,flor,cosecha,vender,ventas/0,0,0,0,0,0,0,0,0,0,0' || R);
   await step('Guardar y cargar la partida', [], async () => { save(); },
     () => { const sv = loadSave(); return sv && sv.ch === S.ch && sv.money === S.money && JSON.stringify(sv.disc) === JSON.stringify(S.disc) || 'no coincide'; });
 

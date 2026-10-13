@@ -435,6 +435,8 @@ func npc_cond(d: Dictionary) -> bool:
 			return S.get("encargo") != null
 		"jurado":
 			return S.ch == 6
+		"julen":   # 1.23: en el piso hasta la primera cosecha; después, en el growshop
+			return (S.flags.get("kiko1") and not S.flags.get("harvest1")) if d.map == "home" else (true if S.flags.get("harvest1") else false)
 	if d.id.begins_with("club_"):   # los clubs (1.15), desde su capítulo
 		return S.ch >= int(D.CLUBS[d.id.substr(5)].ch)
 	return true
@@ -446,6 +448,8 @@ func npc_talk(d: Dictionary) -> void:
 	match d.id:
 		"kiko":
 			await talk_kiko()
+		"julen":
+			await talk_julen()
 		"ane":
 			await talk_ane()
 		"nerea":
@@ -531,7 +535,7 @@ func item_give(id: String) -> void:
 			await got("2 × SPRAY DE PIMIENTA")
 		"i_fert":
 			S.items.fert += 3
-			await got("3 dosis de ABONO")
+			await got("3 dosis de MEATZA FLORACIÓN")
 		"i_boc":
 			S.items.bocata += 2
 			await got("2 × BOCATA")
@@ -1433,6 +1437,10 @@ func revisa_misiones() -> void:
 	pass
 func talk_kiko():
 	pass
+func talk_julen():
+	pass
+func itin_ok(_id: String) -> bool:
+	return false
 func talk_ane():
 	pass
 func talk_nerea():

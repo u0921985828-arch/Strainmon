@@ -2928,6 +2928,36 @@
    "notas": "1.21: antes llevaba el sprite de cliente5 (la del pelo rojo). Pedido por el usuario: «Miren con sprite propio»."
   },
   {
+   "id": "julen",
+   "tipo": "personaje",
+   "fase": "F3",
+   "herramienta": "importado",
+   "cubre": [
+    "look:julen",
+    "npc:julen"
+   ],
+   "origen": "tools/sprites/a-mano/julen.py: kiko (aprobado) con el pelo castaño oscuro, la camiseta naranja y vaqueros, por zonas del alto (mismo dibujo)",
+   "descripcion": "Julen, el hijo de Kiko (unos 25 años): pelo castaño largo, camiseta naranja y vaqueros; te ayuda con el primer cultivo",
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "importado",
+     "direcciones": [
+      "south",
+      "north",
+      "east"
+     ],
+     "fps": 4,
+     "bucle": true
+    }
+   ],
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "notas": "1.23: pedido por el usuario: «el hijo de Kiko, que te ayude en el primer cultivo, hasta la primera cosecha»."
+  },
+  {
    "id": "cliente6",
    "tipo": "personaje",
    "fase": "F3",

@@ -314,9 +314,13 @@ func pot_action(i: int) -> void:
 				p.f = roll_feno(p.sid)
 			await nombrar_planta(p.f)
 		return
-	var veg: bool = p.prog < .65 and not (float(p.get("fv", 0) if p.get("fv") != null else 0) > 0) and S.items.get("fertv", 0) > 0
+	var veg_k := []
+	if p.prog < .65 and not _fv(p) > 0:
+		for k in ["fertv", "ofertv"]:
+			if S.items.get(k, 0) > 0:
+				veg_k.append(k)
 	var opts := ["Regar"]
-	if not p.fert or veg:
+	if not p.fert or veg_k.size():
 		opts.append("Abonar")
 	if p.pest:
 		opts.append("Tratar plaga")
@@ -330,24 +334,11 @@ func pot_action(i: int) -> void:
 		var v := pos_plaza(i)
 		await accion("regar", {"id": "vfx-gotas", "x": v[0], "y": v[1] - 6})
 		p.water = 100
+		S.flags.gRiego = 1
 		sfx("sel")
 		await say("Riegas la planta. Agua al 100%.")
 	elif op == "Abonar":
-		if veg or S.items.fert > 0:
-			var q := abono_q()
-			if S.items.get("phm", 0) > 0:
-				S.items.phm -= 1
-			if veg:
-				S.items.fertv -= 1
-				p.fv = q
-			else:
-				S.items.fert -= 1
-				p.fert = true
-				p.fq = q
-			sfx("sel")
-			await say(("Echas una dosis de ABONO DE CRECIMIENTO. Crecerá más deprisa." if veg else "Echas una dosis de ABONO. Dará más cosecha.") + (("\nCon el medidor, el pH al %s: lo aprovecha entero." % Datos.coma(D.ABONO.ph[2])) if q == D.ABONO.q[2] else ("\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo." if q > D.ABONO.q[0] else "\nSin pH−, el agua del grifo (pH %s) bloquea %d %% del abono." % [Datos.coma(D.ABONO.ph[0]), Datos.jsround((1 - D.ABONO.q[0]) * 100)])))
-		else:
-			await say("No te queda ABONO.")
+		await abonar(p, veg_k)
 	elif op == "Tratar plaga":
 		if S.items.insect > 0:
 			S.items.insect -= 1
@@ -454,9 +445,71 @@ func extras_libres(ci: int) -> Array:
 			o.append(k)
 	return o
 
-# abono, pH y EC (1.11, 09-cultivo): lo que aprovecha la dosis (con pH− y medidor, 1; a ojo, .75; sin pH−, .5) y su texto
-func abono_q() -> float:
-	return float(D.ABONO.q[(2 if S.items.get("medidor", 0) else 1) if S.items.get("phm", 0) > 0 else 0])
+# abono, pH y EC (1.11, 09-cultivo): lo que aprovecha la dosis (con pH− y medidor, 1; a ojo, .75; sin pH−, .5) y su texto.
+# 1.23: por marca (D.PRODUCTOS): el pH− que se gasta es el de su marca y, si no hay, el otro
+func ph_item(bio):
+	for k in (["ophm", "phm"] if bio else ["phm", "ophm"]):
+		if S.items.get(k, 0) > 0:
+			return k
+	return null
+
+func abono_q(bio = 0) -> float:
+	return float(Cultivo.abo_de(bio).q[(2 if S.items.get("medidor", 0) else 1) if ph_item(bio) != null else 0])
+
+# 1.23 (09-cultivo: abonar): el de crecimiento (veg_k: los que hay, en vegetativo y sin él) o el de floración; con dos marcas, eliges
+func abonar(p: Dictionary, veg_k: Array) -> void:
+	var veg := veg_k.size() > 0
+	var ks := veg_k
+	if not veg:
+		ks = []
+		for x in ["fert", "ofert"]:
+			if S.items.get(x, 0) > 0:
+				ks.append(x)
+	if ks.is_empty():
+		await say("No te queda ABONO.")
+		return
+	var k: String = ks[0]
+	if ks.size() > 1:
+		var L := []
+		for x in ks:
+			L.append("%s ×%s" % [D.PRODUCTOS[x].n, n(S.items[x])])
+		L.append("Nada")
+		var c: int = await ask("¿Qué abono le echas?", L)
+		if c < 0 or c >= ks.size():
+			return
+		k = ks[c]
+	var bio: bool = true if D.PRODUCTOS[k].bio else false
+	var ph = ph_item(bio)
+	var q := abono_q(bio)
+	if ph != null:
+		S.items[ph] -= 1
+		if not D.PRODUCTOS[ph].bio:
+			p.min = 1
+	S.items[k] -= 1
+	if bio:
+		p.org = 1
+	else:
+		p.min = 1
+	if veg:
+		p.fv = q
+		if bio:
+			p.fvo = 1
+		S.flags.gVeg = 1
+	else:
+		p.fert = true
+		p.fq = q
+		if bio:
+			p.fo = 1
+		S.flags.gFlor = 1
+	sfx("sel")
+	var t := "Echas una dosis de %s. %s" % [String(D.PRODUCTOS[k].n).to_upper(), "Crecerá más deprisa." if veg else "Dará más cosecha."]
+	if ph != null:
+		t += ("\nCon el medidor, el pH al %s: lo aprovecha entero." % Datos.coma(D.ABONO.ph[2])) if S.items.get("medidor", 0) else "\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo."
+	elif bio:
+		t += "\nSin pH−, la tierra amortigua el agua del grifo: lo aprovecha al %d %%." % Datos.jsround(D.ABONO_BIO.q[0] * 100)
+	else:
+		t += "\nSin pH−, el agua del grifo (pH %s) bloquea %d %% del abono." % [Datos.coma(D.ABONO.ph[0]), Datos.jsround((1 - D.ABONO.q[0]) * 100)]
+	await say(t)
 
 func _fv(p: Dictionary) -> float:
 	return float(p.fv) if p.get("fv") != null else 0.0
@@ -464,12 +517,14 @@ func _fv(p: Dictionary) -> float:
 func abono_txt(p: Dictionary) -> String:
 	var L := []
 	if _fv(p) > 0:
-		L.append("crecimiento")
+		L.append("crecimiento" + (" bio" if p.get("fvo") else ""))
 	if p.fert:
-		L.append("floración")
+		L.append("floración" + (" bio" if p.get("fo") else ""))
 	var t := ("Abonada (" + " y ".join(L) + ")") if L.size() else "Sin abonar"
+	if Cultivo.sustrato_vivo(p):
+		t += " · sustrato vivo"
 	if S.items.get("medidor", 0) and L.size():
-		var ec := Datos.jsround((.4 + (.7 if _fv(p) > 0 else 0.0) + (.9 if p.fert else 0.0)) * 10) / 10.0
+		var ec := Datos.jsround((.4 + ((.4 if p.get("fvo") else .7) if _fv(p) > 0 else 0.0) + ((.5 if p.get("fo") else .9) if p.fert else 0.0)) * 10) / 10.0
 		var q := minf(_fv(p) if _fv(p) > 0 else 1.0, Cultivo.fq(p) if p.fert else 1.0)
 		t += " · EC %s · pH %s" % [Datos.coma(ec), Datos.coma(D.ABONO.ph[2] if q >= D.ABONO.q[2] else (D.ABONO.ph[1] if q >= D.ABONO.q[1] else D.ABONO.ph[0]))]
 	return t

@@ -81,15 +81,31 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 > **KIKO:** {N}, pasa. Te pareces a tu tía.
 > **KIKO:** Maite y yo cultivamos juntos desde que cerraron los astilleros. Ella tenía mano; yo, paciencia.
 > **KIKO:** Para empezar, toma esto.
-> Consigues 3 semillas de SKUNK #1. · Consigues 2 dosis de ABONO.
+> Consigues 3 semillas de SKUNK #1. · Consigues 2 dosis de MEATZA FLORACIÓN.
 > **KIKO:** La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.
 > **KIKO:** Planta en las macetas del armario de tu tía y riega cuando baje el agua.
 > **KIKO:** El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.
 > **KIKO:** Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.
 > **KIKO:** Las plantas siguen creciendo mientras duermes.
+> **KIKO:** Te iré mandando al móvil lo que te hace falta para salir adelante. Lo tienes en START, en OBJETIVO.
+> **KIKO:** Mi hijo Julen te espera en el piso. Sabe más que yo de esto: te ayudará hasta tu primera cosecha.
+
+*Objetivo (1.23): el paso del ITINERARIO (START → OBJETIVO → ITINERARIO: 14 pasos hasta el primer plazo). Julen, en el piso, delante del armario:*
+
+> **JULEN:** Kaixo. Soy Julen, el hijo de Kiko. Estudio Agrónomas en Ibarbide y le echo una mano en la tienda.
+> **JULEN:** Mi aita me ha pedido que te ayude hasta tu primera cosecha. A él también le enseñaba tu tía.
+> **JULEN:** Lo primero, el agua. La del grifo sale a pH 7,5 y las raíces la quieren a 6,2: con el pH alto, la planta no puede comer el abono.
+> Consigues 2 dosis de ORTUA BIO CRECIMIENTO. · Consigues 4 dosis de pH− ORTUA BIO.
+> **JULEN:** Cada dosis de abono gasta una de pH−. Con un medidor de pH aciertas siempre; a ojo, casi.
+> **JULEN:** El abono que te ha dado mi aita es mineral, MEATZA. El que te doy yo es orgánico, ORTUA BIO.
+> **JULEN:** (mineral u orgánico, tres frases) · Lo que toca hacer lo tienes en START → OBJETIVO → ITINERARIO. Yo me quedo por aquí hasta que coseches.
+
+*Después:* «¿Qué pasa?» → *¿Qué hago ahora? / Mineral u orgánico / Nada*; al cumplir cada paso del itinerario, «ITINERARIO · n/14» y un comentario suyo.
 
 *Objetivo: plantar y conseguir la primera cosecha. Con ella empieza el capítulo 2.*
 
+> **JULEN:** Primera cosecha. Ya no me necesitas.
+> **JULEN:** Me vuelvo al growshop con mi aita. Pásate cuando quieras: algún consejo te daré.
 > **SMS · KIKO:** Primera cosecha. Bien hecho.
 > **SMS · KIKO:** La gente que busca material lleva un $ encima. Puedes venderles en la calle.
 > **SMS · KIKO:** Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba.
@@ -392,7 +408,7 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
   - *Sin semillas, plantas, cogollos ni 15 €:* «¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.» → Consigues 2 semillas de SKUNK #1.
   - *Tienda:* semillas, «Semillas feminizadas de [variedad]. ¿Cuántas?» → *1 semilla / Sobre de 3 / Sobre de 5 / Sobre de 10 / Bolsa de 50 (desde el capítulo 3) / Nada* · sin dinero, «No te llega el dinero.» · carpa de 100: «Te la monto esta tarde en el piso, al lado del armario de tu tía. Viene con un CFL; si quieres más luz, aquí tienes focos.» · carpa de 150: «Me llevo la de 100 y te monto la de 150 en su sitio. Las plantas ni se enteran.» · foco: «¿Lo cuelgo ya? El que quites va a tu mochila.» (si no aguanta en ninguna carpa: «Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande.»)
   - *Consejos* (opción «Un consejo»):
-    - *Capítulo 1:* «Riega cuando el agua baje del 30 %. Una planta seca enferma.» / «El abono se echa una vez por planta. Merece la pena.» / «Las plantas crecen mientras duermes. No hace falta mirarlas cada hora.» / «Un CFL da poco: unos 0,3 gramos por vatio. Un LED, el triple.»
+    - *Capítulo 1:* «Riega cuando el agua baje del 30 %. Una planta seca enferma.» / «El abono de floración, una dosis por planta; el de crecimiento, antes de que florezca. Y con cada dosis, una de pH−.» / «MEATZA es mineral: más cogollo y más deprisa, si corriges el pH. ORTUA BIO es orgánico: más lento, algo más potente y perdona el pH.» / «Las plantas crecen mientras duermes. No hace falta mirarlas cada hora.» / «Un CFL da poco: unos 0,3 gramos por vatio. Un LED, el triple.»
     - *Capítulo 2:* «Los clientes cambian cada día. No los hagas esperar.» / «Pedir caro funciona con turistas, con gente de dinero y con cogollo potente.» / «Si la presión policial (CALOR) sube mucho, deja de vender unos días.» / «Una carpa más grande es la mejor inversión que puedes hacer.» / «Tu tía pedía landraces a un banco de semillas por internet. Mira en su ordenador.» / «Lo que sale de un cruce es una F1: cada planta sale distinta. Crúzala consigo misma hasta fijarla.» / «Las macetas de tela airean las raíces: más cosecha y menos plagas, pero hay que regar más.» / «Cada semilla es una planta distinta. Si compras muchas, alguna sale estrella: más potente y más productiva.» / «Si una planta promete, sácale esquejes en crecimiento. Un esqueje es la misma planta: así se guarda un fenotipo estrella.» / «Una maceta pequeña no da más de unos 8 gramos por litro de tierra, por mucho foco que le pongas.»
     - *Capítulo 3:* «El LED cuesta más, pero rinde más y apenas da calor. El sodio es barato y seca las macetas.» / «Un foco pequeño en una carpa grande no llega a todas las plantas.» / «La luz se paga: cada carpa con plantas suma su factura cada día. Un LED de 720 W gasta unos 280 kWh al día: 45 €.» / «Una plaza vacía es luz que pagas y no aprovechas.» / «Iñaki, el del muelle, compra cantidad. Paga menos por gramo que la calle, pero se lo lleva todo.» / «De noche, en el parque, roban. Lleva el spray de pimienta.»
     - *Desde el capítulo 4:* las pistas de recetas (la lista de Patxi, en el capítulo 4), «Las landraces no las vendo. Pregunta por el barrio: Txaro, Iñaki el del muelle... y mira bien en el parque.» y los consejos del capítulo 2.

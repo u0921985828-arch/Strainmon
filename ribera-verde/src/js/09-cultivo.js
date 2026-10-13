@@ -104,14 +104,36 @@ function factores(i){
    Dos abonos: el de floración (p.fert: cosecha × 1,25, THC + 0,3 y crece × 1,1) y el de crecimiento (p.fv: crece × 1,15 hasta
    florecer). Al echar una dosis se corrige el pH si tienes pH− (gasta 1): con el medidor, al 6,2 y lo aprovecha entero (1); a
    ojo, 0,75; sin pH−, el agua del grifo (pH 7,5) bloquea la mitad (0,5). p.fq y p.fv guardan lo que aprovecha cada uno (sin p.fq,
-   partida vieja: entero). Con el medidor, PLANTAS enseña la EC y el pH de cada maceta */
+   partida vieja: entero). Con el medidor, PLANTAS enseña la EC y el pH de cada maceta.
+   Marcas (1.23, inventadas): MEATZA, sales minerales (fert, fertv y su pH− de ácido fosfórico, phm), es lo de antes. ORTUA BIO,
+   orgánico de liberación lenta (ofert, ofertv y su pH− de ácido cítrico, ophm; ABONO_BIO): empuja menos (no acelera la floración,
+   crece menos deprisa y da algo menos de cosecha) pero da más THC, y la tierra amortigua el pH (sin pH−, ×0,85). Con algo orgánico
+   y nada mineral (tampoco el pH− fosfórico), el sustrato sigue vivo: plaga ×0,75. En la planta: p.fvo y p.fo (el de crecimiento y
+   el de floración eran orgánicos), p.org y p.min (ha llevado algo orgánico / algo mineral) */
 // ABONO: rend (cosecha +), thc (+), crec (crece ×1+), veg (el de crecimiento), q y ph: [sin pH−, a ojo, con medidor]
-const ABONO={rend:.25,thc:.3,crec:.1,veg:.15,q:[.5,.75,1],ph:[7.5,6.6,6.2]};
-const abonoQ=()=>ABONO.q[S.items.phm>0?S.items.medidor?2:1:0],fq=p=>p.fert?p.fq??1:0;
-const ecDe=p=>Math.round((.4+(p.fv?.7:0)+(p.fert?.9:0))*10)/10,phDe=p=>{const q=Math.min(p.fv||1,p.fert?fq(p):1);return q>=ABONO.q[2]?ABONO.ph[2]:q>=ABONO.q[1]?ABONO.ph[1]:ABONO.ph[0];};
-const abonoTxt=p=>{const L=(p.fv?['crecimiento']:[]).concat(p.fert?['floración']:[]);return (L.length?'Abonada ('+L.join(' y ')+')':'Sin abonar')+(S.items.medidor&&L.length?` · EC ${coma(ecDe(p))} · pH ${coma(phDe(p))}`:'');};
+const ABONO={rend:.25,thc:.3,crec:.1,veg:.15,q:[.5,.75,1],ph:[7.5,6.6,6.2]},ABONO_BIO={rend:.2,thc:.4,crec:0,veg:.08,q:[.85,.95,1],plaga:.75};
+// lo que se vende de cada marca: n, el nombre; bio, orgánico; veg, el de crecimiento; ph, el pH−
+const PRODUCTOS={fert:{n:'MEATZA Floración',bio:0},fertv:{n:'MEATZA Crecimiento',bio:0,veg:1},phm:{n:'pH− MEATZA',bio:0,ph:1},
+  ofert:{n:'ORTUA BIO Floración',bio:1},ofertv:{n:'ORTUA BIO Crecimiento',bio:1,veg:1},ophm:{n:'pH− ORTUA BIO',bio:1,ph:1}};
+const aboDe=o=>o?ABONO_BIO:ABONO,sustratoVivo=p=>!!p.org&&!p.min;
+// el pH− que se gasta con un abono: el de su marca y, si no hay, el otro
+const phItem=bio=>{const ks=bio?['ophm','phm']:['phm','ophm'];return ks.find(k=>S.items[k]>0)||null;};
+const abonoQ=(bio=0)=>aboDe(bio).q[phItem(bio)?S.items.medidor?2:1:0],fq=p=>p.fert?p.fq??1:0;
+const ecDe=p=>Math.round((.4+(p.fv?p.fvo?.4:.7:0)+(p.fert?p.fo?.5:.9:0))*10)/10,phDe=p=>{const q=Math.min(p.fv||1,p.fert?fq(p):1);return q>=ABONO.q[2]?ABONO.ph[2]:q>=ABONO.q[1]?ABONO.ph[1]:ABONO.ph[0];};
+const abonoTxt=p=>{const L=(p.fv?['crecimiento'+(p.fvo?' bio':'')]:[]).concat(p.fert?['floración'+(p.fo?' bio':'')]:[]);
+  return (L.length?'Abonada ('+L.join(' y ')+')':'Sin abonar')+(sustratoVivo(p)?' · sustrato vivo':'')+(S.items.medidor&&L.length?` · EC ${coma(ecDe(p))} · pH ${coma(phDe(p))}`:'');};
+// lo que hace cada producto (tienda y mochila)
+function descProducto(k){
+  const P=PRODUCTOS[k],A=aboDe(P.bio);
+  if(P.ph)return P.bio?`Ácido cítrico. Se gasta una dosis con cada dosis de abono: baja el pH del agua del grifo (${coma(ABONO.ph[0])}) a ${coma(ABONO.ph[2])}. No mata la vida del sustrato.`
+    :`Ácido fosfórico. Se gasta una dosis con cada dosis de abono: baja el pH del agua del grifo (${coma(ABONO.ph[0])}) a ${coma(ABONO.ph[2])}. Sin pH−, el mineral rinde ×${coma(ABONO.q[0])}; sin medidor, a ojo (×${coma(ABONO.q[1])}).`;
+  if(P.veg)return P.bio?`Orgánico, de liberación lenta. Una dosis por planta en crecimiento: crece un ${pct0(A.veg)} % más deprisa hasta florecer. Sin pH−, la tierra lo amortigua (×${coma(A.q[0])}).`
+    :`Mineral. Una dosis por planta en crecimiento: crece un ${pct0(A.veg)} % más deprisa hasta florecer (sin pH−, ×${coma(A.q[0])}).`;
+  return P.bio?`Orgánico, de liberación lenta. Una dosis por planta: +${pct0(A.rend)} % de cosecha y +${coma(A.thc)} de THC, sin acelerar la floración. Sin pH−, ×${coma(A.q[0])}. Sin nada mineral, el sustrato vivo frena las plagas.`
+    :`Mineral. Una dosis por planta: +${pct0(A.rend)} % de cosecha, +${coma(A.thc)} de THC y florece un ${pct0(A.crec)} % más deprisa, con el pH corregido (sin pH−, ×${coma(A.q[0])}).`;
+}
 // gramos de una planta al cosecharla (f: factores de su plaza)
-const gramosPlanta=(p,f)=>{const s=getStrain(p.sid),fe=p.f||{y:1};return Math.max(1,Math.round(Math.min(f.cap,f.g*s.y/Y_MEDIA*(.4+.6*p.health/100)*(1+ABONO.rend*fq(p))*fe.y)*(1-CORTA_REND*(p.corta||0))));};
+const gramosPlanta=(p,f)=>{const s=getStrain(p.sid),fe=p.f||{y:1};return Math.max(1,Math.round(Math.min(f.cap,f.g*s.y/Y_MEDIA*(.4+.6*p.health/100)*(1+aboDe(p.fo).rend*fq(p))*fe.y)*(1-CORTA_REND*(p.corta||0))));};
 const plantasVivas=ci=>huecos().some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead);
 const enFlor=ci=>huecos().some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead&&S.pots[i].prog>=.65);
 const olorDia=()=>S.carpas.reduce((a,c,ci)=>a+(c&&enFlor(ci)?!kitDe(c)?OLOR:extCarpa(ci)<OLOR_MAL?1:0:0),0);
@@ -120,8 +142,8 @@ function facturaLuz(){let e=0;S.carpas.forEach((c,ci)=>{if(c&&plantasVivas(ci))e
 function plantStep(p,h,f){
   if(p.dead)return;const s=getStrain(p.sid);
   p.water=Math.max(0,p.water-3.5*h*f.agua);
-  if(!p.pest&&p.prog<1&&Math.random()<.006*h*(100-s.r)/40*f.plaga)p.pest=true;
-  let g=h/(s.d*24)*f.crec;if(p.water<20)g*=.4;if(p.water<=0)g=0;g*=1+ABONO.crec*fq(p);if(p.fv&&p.prog<.65)g*=1+ABONO.veg*p.fv;
+  if(!p.pest&&p.prog<1&&Math.random()<.006*h*(100-s.r)/40*f.plaga*(sustratoVivo(p)?ABONO_BIO.plaga:1))p.pest=true;
+  let g=h/(s.d*24)*f.crec;if(p.water<20)g*=.4;if(p.water<=0)g=0;g*=1+aboDe(p.fo).crec*fq(p);if(p.fv&&p.prog<.65)g*=1+aboDe(p.fvo).veg*p.fv;
   if(p.prog<1){
     if(f.ciclo==='veg'&&p.prog<.65)g=Math.max(0,Math.min(g,VEG_TOPE-p.prog));   // madre: no pasa de vegetativo (si ya florece, sigue)
     else if(f.ciclo==='flor'&&p.prog>=.35&&p.prog<.65){const e=Math.min(g,(.65-p.prog)/2);p.corta=Math.min(1,(p.corta||0)+e/.15);g+=e;}
@@ -219,6 +241,18 @@ async function sacarEsqueje(i){
   await say(`Cortas una punta de la ${s.n}${nomPlanta(p.f)} y la pones a enraizar.\nPlántala antes del día ${S.day+ESQUEJE_DIAS+1}: es la misma planta.`);
   if(carroYa())return say(`O pínchala en el carro: allí aguanta ${CARRO.dias} días.`);
 }
+// abonar (1.23): con abono de las dos marcas para lo que toca, preguntas cuál; el pH− se gasta solo (el de su marca primero)
+async function abonar(p,vegK){
+  const veg=vegK.length>0,ks=veg?vegK:['fert','ofert'].filter(k=>S.items[k]>0);
+  if(!ks.length)return say('No te queda ABONO.');
+  let k=ks[0];if(ks.length>1){const c=await ask('¿Qué abono le echas?',ks.map(x=>`${PRODUCTOS[x].n} ×${S.items[x]}`).concat(['Nada']));if(c<0||c>=ks.length)return;k=ks[c];}
+  const bio=PRODUCTOS[k].bio,ph=phItem(bio),q=abonoQ(bio);
+  if(ph){S.items[ph]--;if(!PRODUCTOS[ph].bio)p.min=1;}
+  S.items[k]--;if(bio)p.org=1;else p.min=1;
+  if(veg){p.fv=q;if(bio)p.fvo=1;S.flags.gVeg=1;}else{p.fert=true;p.fq=q;if(bio)p.fo=1;S.flags.gFlor=1;}sfx('sel');
+  await say(`Echas una dosis de ${PRODUCTOS[k].n.toUpperCase()}. ${veg?'Crecerá más deprisa.':'Dará más cosecha.'}`+(ph?S.items.medidor?`\nCon el medidor, el pH al ${coma(ABONO.ph[2])}: lo aprovecha entero.`:'\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo.'
+    :bio?`\nSin pH−, la tierra amortigua el agua del grifo: lo aprovecha al ${pct0(ABONO_BIO.q[0])} %.`:`\nSin pH−, el agua del grifo (pH ${coma(ABONO.ph[0])}) bloquea ${pct0(1-ABONO.q[0])} % del abono.`));
+}
 function stageName(p){return p.prog<.12?'Germinando':p.prog<.35?'Plántula':p.prog<.65?'Vegetativo':'Floración';}
 async function potAction(i){
   const p=S.pots[i];
@@ -230,12 +264,11 @@ async function potAction(i){
   if(p.dead){await say(`La ${s.n} se ha secado del todo.`);S.pots[i]=null;return say('Retiras la planta muerta.');}
   if(p.prog>=1){const c=await ask(`${s.n}${etiq(p.f)} lista para cosechar.\nSalud ${Math.round(p.health)}% · Agua ${Math.round(p.water)}%`,['Cosechar','Nombrar','Esperar']);
     if(c===0)await harvest(i);else if(c===1){if(!p.f)p.f=rollFeno(p.sid);await nombrarPlanta(p.f);}return;}
-  const veg=p.prog<.65&&!p.fv&&S.items.fertv>0,opts=['Regar'];if(!p.fert||veg)opts.push('Abonar');if(p.pest)opts.push('Tratar plaga');if(p.prog>=.2&&p.prog<.65)opts.push('Sacar esqueje');opts.push('Nombrar','Arrancar','Salir');
+  const vegK=p.prog<.65&&!p.fv?['fertv','ofertv'].filter(k=>S.items[k]>0):[],opts=['Regar'];if(!p.fert||vegK.length)opts.push('Abonar');if(p.pest)opts.push('Tratar plaga');if(p.prog>=.2&&p.prog<.65)opts.push('Sacar esqueje');opts.push('Nombrar','Arrancar','Salir');
   const c=await ask(`${s.n}${etiq(p.f)} · ${stageName(p)} ${Math.floor(p.prog*100)}%\nAgua ${Math.round(p.water)}% · Salud ${Math.round(p.health)}%${p.pest?' · PLAGA':''}`,opts);
   const op=opts[c];
-  if(op==='Regar'){const [vx,vy]=posPlaza(i);await accion('regar',{id:'vfx-gotas',x:vx,y:vy-6});p.water=100;sfx('sel');await say('Riegas la planta. Agua al 100%.');}
-  else if(op==='Abonar'){if(veg||S.items.fert>0){const q=abonoQ();if(S.items.phm>0)S.items.phm--;if(veg){S.items.fertv--;p.fv=q;}else{S.items.fert--;p.fert=true;p.fq=q;}sfx('sel');
-    await say((veg?'Echas una dosis de ABONO DE CRECIMIENTO. Crecerá más deprisa.':'Echas una dosis de ABONO. Dará más cosecha.')+(q===ABONO.q[2]?`\nCon el medidor, el pH al ${coma(ABONO.ph[2])}: lo aprovecha entero.`:q>ABONO.q[0]?'\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo.':`\nSin pH−, el agua del grifo (pH ${coma(ABONO.ph[0])}) bloquea ${pct0(1-ABONO.q[0])} % del abono.`));}else await say('No te queda ABONO.');}
+  if(op==='Regar'){const [vx,vy]=posPlaza(i);await accion('regar',{id:'vfx-gotas',x:vx,y:vy-6});p.water=100;S.flags.gRiego=1;sfx('sel');await say('Riegas la planta. Agua al 100%.');}
+  else if(op==='Abonar')await abonar(p,vegK);
   else if(op==='Tratar plaga'){if(S.items.insect>0){S.items.insect--;p.pest=false;sfx('sel');await say('Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.');}else await say('No tienes INSECTICIDA. Kiko lo vende.');}
   else if(op==='Sacar esqueje')await sacarEsqueje(i);
   else if(op==='Nombrar'){if(!p.f)p.f=rollFeno(p.sid);await nombrarPlanta(p.f);}
@@ -292,7 +325,7 @@ async function temporizador(ci){
 // demás (las landraces, como el Afghani que te da Kiko, y tus líneas fijadas) son regulares: algún macho poliniza unas flores y dan 1-3; una línea sin
 // fijar (F1-F3) la estás criando: se polinizan entre ellas y das 2-5 semillas por planta para seguir estabilizando
 const SEMILLA_HERMA=.12;
-const thcCosecha=(p,f)=>{const fe=p.f||{t:1,y:1};return Math.min(35,Math.round((getStrain(p.sid).thc*fe.t*(.85+.15*p.health/100)+f.thc+ABONO.thc*fq(p))*10)/10);};
+const thcCosecha=(p,f)=>{const fe=p.f||{t:1,y:1};return Math.min(35,Math.round((getStrain(p.sid).thc*fe.t*(.85+.15*p.health/100)+f.thc+aboDe(p.fo).thc*fq(p))*10)/10);};
 function semillasCosecha(p){const cria=genDe(p.sid)<GEN_ESTABLE,fem=SHOP.some(it=>it.sid===p.sid);return {cria,fem,n:cria?ri(2,5):!fem||Math.random()<SEMILLA_HERMA?ri(1,3):0};}
 async function harvest(i){
   const p=S.pots[i],s=getStrain(p.sid),f=factores(i),fe=p.f||{t:1,y:1},cl=claseFeno(p.f);

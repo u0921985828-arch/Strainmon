@@ -101,5 +101,5 @@ Si la revisión lo rechaza, se puede recurrir desde la consola explicando que es
    `…_USER` y `…_PASSWORD`. El APK de ahora va firmado con una clave de depuración pública y no vale para la tienda.
 5. **Política de privacidad pública**: Play pide una URL. Publica `docs/PRIVACIDAD.md` en una página abierta (GitHub Pages,
    una web propia…) y pon tu correo de contacto.
-6. **Versión**: cada subida necesita un `version/code` mayor (`godot/export_presets.cfg`, ahora 18) y el `version/name` a juego
+6. **Versión**: cada subida necesita un `version/code` mayor (`godot/export_presets.cfg`, ahora 19) y el `version/name` a juego
    (0.5.0, también en `application/config/version` de `godot/project.godot`, que sale en los créditos).

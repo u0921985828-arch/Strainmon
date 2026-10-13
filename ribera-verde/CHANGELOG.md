@@ -1,5 +1,16 @@
 # Cambios
 
+## 1.23.0 · 13 de octubre de 2026
+
+Marcas de abono, Julen y el itinerario. Godot, 0.17.0.
+
+- **Nuevo: marcas de abono y pH−** (inventadas). **MEATZA**, mineral: crecimiento, floración y pH− de ácido fosfórico, como el abono de antes (+25 % de cosecha, +0,3 de THC y florece un 10 % antes; sin pH−, la mitad). **ORTUA BIO**, orgánico, de liberación lenta: +20 % de cosecha y +0,4 de THC sin acelerar la floración, el de crecimiento da un 8 % (el mineral, un 15 %) y la tierra amortigua el pH (sin pH−, ×0,85; a ojo, ×0,95). Con algo orgánico y nada mineral (tampoco el pH− fosfórico), el **sustrato vivo** frena las plagas (×0,75). El pH− que se gasta es el de la marca del abono y, si no hay, el otro; con las dos marcas, al abonar eliges cuál (`PRODUCTOS`, `ABONO_BIO`, `abonar`, 09-cultivo). En la tienda, 6 productos; en la mochila, uno por fila con lo que hace; en PLANTAS, «bio» y «sustrato vivo».
+- **Nuevo: Julen, el hijo de Kiko** (estudia Agrónomas; sprite de Kiko con otro pelo y otra ropa, `tools/sprites/a-mano/julen.py`). Desde que conoces a Kiko hasta la primera cosecha está en el piso, delante del armario: te regala 2 dosis de ORTUA BIO CRECIMIENTO y 4 de pH− ORTUA BIO, te explica el pH y la diferencia entre mineral y orgánico, te dice qué toca ahora y comenta cada paso. Con la primera cosecha se despide y vuelve al growshop, donde da consejos (`11h-guia.js`; en GENTE).
+- **Nuevo: el itinerario** (START → OBJETIVO → ITINERARIO, hasta el capítulo 4): 14 pasos desde el autobús hasta el primer plazo pagado (plantar, regar, los dos abonos, cosechar, vender, los 300 €, Baltasar, juntar el plazo y pagarlo). Al cumplir uno sale «ITINERARIO · n/14» con el siguiente; el objetivo del capítulo 1 es el paso de ahora. Las partidas viejas apuntan lo que ya tienen, sin aviso (`ITINERARIO`, `S.itin`).
+- Kiko habla de las dos marcas en sus consejos y te manda a ver a Julen.
+- Igual en Godot.
+- Tests: `npm test` 107/107 (paso nuevo: las marcas, Julen y el itinerario; las partidas viejas apuntan el itinerario); Godot, historia 107 pasos.
+
 ## 1.22.0 · 13 de octubre de 2026
 
 Repaso: HUD más pequeño, importar la partida y errores. Godot, 0.16.0.

@@ -26,13 +26,14 @@ const MISIONES=[
     ok:()=>conFoco().some(c=>FOCOS[c.foco].tipo==='led'&&FOCOS[c.foco].w>=480),p:{fert:4},sms:['Con LED grandes, la luz se paga sola.']},
   {id:'seis',ch:4,t:'Seis plazas',d:`La carpa de 150 en lugar de la de 100 (${eur(precioDe(it=>it.carpa==='g150'))}) y, en el capítulo 5, la de 120 junto a la cama: seis plantas cada una.`,
     ok:()=>S.carpas.some(c=>c&&CARPAS[c.t].plazas>=6),s:{txoko:5},sms:['Seis plantas por carpa. Esto ya es un negocio.']}];
-const PREMIO_N={fert:'dosis de ABONO DE FLORACIÓN',fertv:'dosis de ABONO DE CRECIMIENTO',phm:'dosis de pH−',insect:'tratamiento de INSECTICIDA'};
+const PREMIO_N={fert:'dosis de MEATZA FLORACIÓN',fertv:'dosis de MEATZA CRECIMIENTO',phm:'dosis de pH− MEATZA',ofert:'dosis de ORTUA BIO FLORACIÓN',ofertv:'dosis de ORTUA BIO CRECIMIENTO',ophm:'dosis de pH− ORTUA BIO',insect:'tratamiento de INSECTICIDA'};
 const premioTxt=m=>Object.entries(m.p||{}).map(([k,n])=>`${n} ${PREMIO_N[k]}`).concat(Object.entries(m.s||{}).map(([k,n])=>`${n} semillas de ${STRAINS[k].n.toUpperCase()}`));
 const misionesVer=()=>S.flags.kiko1?MISIONES.filter(m=>m.ch<=S.ch):[];
 const misionSig=()=>misionesVer().find(m=>!(m.id in S.misiones));
 let misionAviso=[];
 // run() la llama al acabar cada guion: marca las cumplidas, da el regalo y encola el SMS
 function revisaMisiones(){
+  revisaItinerario();   // 1.23 (11h-guia)
   for(const m of misionesVer())if(!(m.id in S.misiones)&&m.ok()){
     S.misiones[m.id]=S.day;misionAviso.push(m.id);
     for(const k in m.p||{})S.items[k]+=m.p[k];for(const k in m.s||{})addSeeds(k,m.s[k]);
@@ -53,9 +54,15 @@ async function recuerdoPlazo(){
   await say(ll<S.due?`Llevas ${eur(ll)} entre el bolsillo y la caja: te faltan ${eur(S.due-ll)}.`:`Llevas ${eur(ll)} entre el bolsillo y la caja: ya lo tienes.${S.money<S.due?' Saca lo que falte de la caja y':''} Ve al bar El Ancla.`);
 }
 // START → OBJETIVO: el del capítulo, las misiones (con lo que hay que hacer abajo) y la deuda
+// (1.23: y el ITINERARIO hasta el primer plazo, hasta el capítulo 4; con A, sus pasos)
 async function objetivoMenu(){
-  const it=[{label:`CAPÍTULO ${S.ch}`,desc:`${CH_TITLES[S.ch]||''}\n${objectiveText()}`}]
-    .concat(misionesVer().map(m=>({label:m.t,right:m.id in S.misiones?'HECHA':null,desc:m.d})))
-    .concat([{label:'DEUDA',right:eur(S.debt),desc:(S.due>0?`Plazo: ${eur(S.due)} antes de que acabe el día ${S.deadline}. Llevas ${eur(S.money+cajaE())}.\n`:'')+`Ventas ${eur(S.sales)} · Reputación ${S.rep} · Calor ${Math.round(S.heat)} %`},{label:'Volver',desc:''}]);
-  await menu(it,{cls:'full',title:'OBJETIVO',title2:'cap. '+S.ch,desc:true,initial:Math.max(0,misionesVer().findIndex(m=>!(m.id in S.misiones))+1)});
+  for(;;){
+    const iti=S.ch<=4?[itinRow()]:[],j=misionesVer().findIndex(m=>!(m.id in S.misiones));
+    const it=[{label:`CAPÍTULO ${S.ch}`,desc:`${CH_TITLES[S.ch]||''}\n${objectiveText()}`}].concat(iti)
+      .concat(misionesVer().map(m=>({label:m.t,right:m.id in S.misiones?'HECHA':null,desc:m.d})))
+      .concat([{label:'DEUDA',right:eur(S.debt),desc:(S.due>0?`Plazo: ${eur(S.due)} antes de que acabe el día ${S.deadline}. Llevas ${eur(S.money+cajaE())}.\n`:'')+`Ventas ${eur(S.sales)} · Reputación ${S.rep} · Calor ${Math.round(S.heat)} %`},{label:'Volver',desc:''}]);
+    const i=await menu(it,{cls:'full',title:'OBJETIVO',title2:'cap. '+S.ch,desc:true,initial:iti.length&&itinSig()?1:j<0?0:j+1+iti.length});
+    if(iti.length&&i===1){await itinerarioMenu();continue;}
+    return;
+  }
 }

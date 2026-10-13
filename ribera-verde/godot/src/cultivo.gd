@@ -95,6 +95,13 @@ static func fq(p: Dictionary) -> float:
 	var q = p.get("fq")
 	return 1.0 if q == null else float(q)
 
+# las marcas (1.23, 09-cultivo): MEATZA, mineral (ABONO), u ORTUA BIO, orgánico (ABONO_BIO); sustrato vivo: orgánico y nada mineral
+static func abo_de(o) -> Dictionary:
+	return Datos.carga().ABONO_BIO if o else Datos.carga().ABONO
+
+static func sustrato_vivo(p: Dictionary) -> bool:
+	return (true if p.get("org") else false) and not p.get("min")
+
 # el temporizador de la carpa (1.10, 09-cultivo: CICLOS): c.ciclo; sin él, automático
 static func ciclo_de(c) -> String:
 	var k = c.get("ciclo") if c is Dictionary else null
@@ -227,16 +234,16 @@ static func plant_step(S: Dictionary, p: Dictionary, h: float, f: Dictionary) ->
 		return
 	var s = Datos.strain(S, p.sid)
 	p.water = maxf(0, p.water - 3.5 * h * f.agua)
-	if not p.pest and p.prog < 1 and azar() < .006 * h * (100 - s.r) / 40 * f.plaga:
+	if not p.pest and p.prog < 1 and azar() < .006 * h * (100 - s.r) / 40 * f.plaga * (Datos.carga().ABONO_BIO.plaga if sustrato_vivo(p) else 1.0):
 		p.pest = true
 	var g: float = h / (s.d * 24) * f.crec
 	if p.water < 20:
 		g *= .4
 	if p.water <= 0:
 		g = 0
-	g *= 1 + Datos.carga().ABONO.crec * fq(p)
+	g *= 1 + abo_de(p.get("fo")).crec * fq(p)
 	if float(p.get("fv", 0) if p.get("fv") != null else 0) > 0 and p.prog < .65:
-		g *= 1 + Datos.carga().ABONO.veg * float(p.fv)
+		g *= 1 + abo_de(p.get("fvo")).veg * float(p.fv)
 	if p.prog < 1:
 		if f.get("ciclo") == "veg" and p.prog < .65:   # madre: no pasa de vegetativo (si ya florece, sigue)
 			g = maxf(0, minf(g, Datos.carga().VEG_TOPE - p.prog))
@@ -341,12 +348,12 @@ static func cosecha(S: Dictionary, i: int) -> Dictionary:
 static func gramos_planta(S: Dictionary, p: Dictionary, f: Dictionary) -> int:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"y": 1}
-	return maxi(1, Datos.jsround(minf(f.cap, f.g * s.y / Datos.carga().Y_MEDIA * (.4 + .6 * p.health / 100) * (1 + Datos.carga().ABONO.rend * fq(p)) * fe.y) * (1 - Datos.carga().CORTA_REND * float(p.get("corta", 0)))))
+	return maxi(1, Datos.jsround(minf(f.cap, f.g * s.y / Datos.carga().Y_MEDIA * (.4 + .6 * p.health / 100) * (1 + abo_de(p.get("fo")).rend * fq(p)) * fe.y) * (1 - Datos.carga().CORTA_REND * float(p.get("corta", 0)))))
 
 static func thc_cosecha(S: Dictionary, p: Dictionary, f: Dictionary) -> float:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"t": 1}
-	return minf(35, Datos.jsround((s.thc * fe.t * (.85 + .15 * p.health / 100) + f.thc + Datos.carga().ABONO.thc * fq(p)) * 10) / 10.0)
+	return minf(35, Datos.jsround((s.thc * fe.t * (.85 + .15 * p.health / 100) + f.thc + abo_de(p.get("fo")).thc * fq(p)) * 10) / 10.0)
 
 static func plantas_vivas(S: Dictionary, ci: int) -> bool:
 	var H := huecos(S)

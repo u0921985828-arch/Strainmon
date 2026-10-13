@@ -7,9 +7,13 @@ const SHOP=[
   {lbl:'Semillas Skunk #1',p:5,ch:1,sid:'ria'},{lbl:'Semillas Lemon Haze',p:9,ch:2,sid:'limon'},{lbl:'Semillas Super Skunk',p:10,ch:2,sid:'txoko'},
   {lbl:'Semillas Blueberry',p:8,ch:3,sid:'niebla'},{lbl:'Semillas Big Bud',p:7,ch:3,sid:'mango'},{lbl:'Semillas Lemon Skunk',p:8,ch:3,sid:'citrus'},{lbl:'Semillas Cheese',p:9,ch:3,sid:'cheese'},
   {lbl:'Semillas Purple Afghani',p:8,ch:4,sid:'purpura'},{lbl:'Semillas Kali Mist',p:10,ch:4,sid:'kali'},{lbl:'Semillas California Orange',p:8,ch:4,sid:'calorange'},{lbl:'Semillas Chemdawg',p:12,ch:5,sid:'chemdawg'},
-  {lbl:'Abono de floración 1 L',p:14,ch:1,item:'fert',n:4,desc:`4 dosis. Una por planta: +${pct0(ABONO.rend)} % de cosecha, con el pH corregido (sin pH−, ×${coma(ABONO.q[0])}).`},
-  {lbl:'Abono de crecimiento 1 L',p:12,ch:1,item:'fertv',n:4,desc:`4 dosis. Una por planta en crecimiento: crece un ${pct0(ABONO.veg)} % más deprisa hasta florecer (sin pH−, ×${coma(ABONO.q[0])}).`},
-  {lbl:'pH− 250 ml',p:6,ch:1,item:'phm',n:10,desc:`10 dosis. Se gasta una con cada dosis de abono: baja el pH del agua del grifo (${coma(ABONO.ph[0])}) a ${coma(ABONO.ph[2])}. Sin él, el abono rinde ×${coma(ABONO.q[0])}; sin medidor, a ojo (×${coma(ABONO.q[1])}).`},
+  // abonos y pH− de dos marcas (inventadas, 1.23): MEATZA, mineral, y ORTUA BIO, orgánico (PRODUCTOS y descProducto, 09-cultivo)
+  {lbl:'Abono floración MEATZA 1 L',p:14,ch:1,item:'fert',n:4,desc:'4 dosis. '+descProducto('fert')},
+  {lbl:'Abono crecimiento MEATZA 1 L',p:12,ch:1,item:'fertv',n:4,desc:'4 dosis. '+descProducto('fertv')},
+  {lbl:'pH− MEATZA 250 ml',p:6,ch:1,item:'phm',n:10,desc:'10 dosis. '+descProducto('phm')},
+  {lbl:'Abono floración ORTUA BIO 1 L',p:19,ch:1,item:'ofert',n:4,desc:'4 dosis. '+descProducto('ofert')},
+  {lbl:'Abono crecimiento ORTUA BIO 1 L',p:16,ch:1,item:'ofertv',n:4,desc:'4 dosis. '+descProducto('ofertv')},
+  {lbl:'pH− ORTUA BIO 250 ml',p:7,ch:1,item:'ophm',n:10,desc:'10 dosis. '+descProducto('ophm')},
   {lbl:'Medidor de pH y EC',p:35,ch:2,item:'medidor',desc:'Mide el pH y la EC del riego: con pH−, el abono rinde entero, y en PLANTAS ves la EC y el pH de cada maceta.',cond:()=>!S.items.medidor&&!S.envio.includes('Medidor de pH y EC')},
   {lbl:'Insecticida de neem 500 ml',p:12,ch:1,item:'insect',n:3,desc:'3 tratamientos. Cada uno elimina una plaga de araña roja.'},
   {lbl:'Bocata',p:5,ch:1,item:'bocata',desc:'Recupera 15 de vida. En combate o desde la mochila.'},
@@ -78,7 +82,7 @@ async function shop(T=TIENDAS.kiko){
   let i=0;
   for(;;){
     const list=SHOP.filter(it=>S.ch+T.ch>=it.ch&&T.ok(it)&&(!it.cond||it.cond()));
-    const IC={fert:'abono',fertv:'abono',phm:'abono',insect:'insecticida',spray:'spray',bocata:'bocadillo'};
+    const IC={fert:'abono',fertv:'abono',phm:'abono',ofert:'abono',ofertv:'abono',ophm:'abono',insect:'insecticida',spray:'spray',bocata:'bocadillo'};
     const items=list.map(it=>({label:it.lbl,right:eur(precioT(T,it))+(it.sid?'/u':''),sw:it.sid?STRAINS[it.sid].c:null,ic:it.sid?icono('semillas'):it.item?icono(IC[it.item]):it.maceta?icono('maceta'):it.foco?icono(icoFoco(it.foco)):it.extra?icono(ICX[it.extra]):it.carpa?icono(icoCarpa(it.carpa)):null,desc:it.sid?strainLine(it.sid):it.desc}));
     items.push({label:'Salir',desc:'Volver al mostrador.'});
     i=await menu(items,{cls:'full',title:T.t,title2:'Tienes '+eur(S.money),desc:true,initial:i});
@@ -119,7 +123,7 @@ const RECIPE_HINTS=['Afghani, Colombian Gold y Acapulco Gold: de esas tres sali�
   'Skunk #1, Northern Lights y Haze: la Super Silver Haze. La Lemon Haze sale de Lemon Skunk con Silver Haze.','Kali Mist con Critical Mass: la Critical Kali Mist. Con AK-47, la Kali 47.',
   'La Sour Diesel sale de Chemdawg con Super Skunk. Hace falta paciencia.','Haze × (Northern Lights × Shiva Skunk)... de ahí sale la Jack Herer. Yo nunca lo he conseguido.'];
 function kikoTip(){
-  const t=[['Riega cuando el agua baje del 30 %. Una planta seca enferma.','El abono se echa una vez por planta. Merece la pena.','Las plantas crecen mientras duermes. No hace falta mirarlas cada hora.','Un CFL da poco: unos 0,3 gramos por vatio. Un LED, el triple.'],
+  const t=[['Riega cuando el agua baje del 30 %. Una planta seca enferma.','El abono de floración, una dosis por planta; el de crecimiento, antes de que florezca. Y con cada dosis, una de pH−.','MEATZA es mineral: más cogollo y más deprisa, si corriges el pH. ORTUA BIO es orgánico: más lento, algo más potente y perdona el pH.','Las plantas crecen mientras duermes. No hace falta mirarlas cada hora.','Un CFL da poco: unos 0,3 gramos por vatio. Un LED, el triple.'],
     ['Los clientes cambian cada día. No los hagas esperar.','Pedir caro funciona con turistas, con gente de dinero y con cogollo potente.',`El CALOR tiene niveles: con ${NIVEL_POLI[1][0]}, vigilancia; con ${NIVEL_POLI[2][0]}, investigación y más patrullas; con ${NIVEL_POLI[3][0]} al cambiar el día, orden de registro. Lo de la caja fuerte no lo tocan.`,'Una carpa más grande es la mejor inversión que puedes hacer.','Tu tía pedía landraces a un banco de semillas por internet. Mira en su ordenador.','Lo que sale de un cruce es una F1: cada planta sale distinta. Crúzala consigo misma hasta fijarla.','Las macetas de tela airean las raíces: más cosecha y menos plagas, pero hay que regar más.','Cada semilla es una planta distinta. Si compras muchas, alguna sale estrella: más potente y más productiva.','Si una planta promete, sácale esquejes en crecimiento. Un esqueje es la misma planta: así se guarda un fenotipo estrella.','Una maceta pequeña no da más de unos 8 gramos por litro de tierra, por mucho foco que le pongas.'],
     ['El LED cuesta más, pero rinde más y apenas da calor. El sodio es barato y seca las macetas.','Un foco pequeño en una carpa grande no llega a todas las plantas.','La luz se paga: cada carpa con plantas suma su factura cada día. Un LED de 720 W gasta unos 280 kWh al día: 45 €.','Una plaza vacía es luz que pagas y no aprovechas.','Iñaki, el del muelle, compra cantidad. Paga menos por gramo que la calle, pero se lo lleva todo.','De noche, en el parque, roban. Lleva el spray de pimienta.'],
     RECIPE_HINTS.concat(['Las landraces no las vendo. Pregunta por el barrio: Txaro, Iñaki el del muelle... y mira bien en el parque.'])];
@@ -129,8 +133,8 @@ async function talkKiko(){
   const N='KIKO';
   if(!S.flags.kiko1){
     await talk(N,['{N}, pasa. Te pareces a tu tía.','Maite y yo cultivamos juntos desde que cerraron los astilleros. Ella tenía mano; yo, paciencia.','Para empezar, toma esto.']);
-    addSeeds('ria',3);await got('3 semillas de SKUNK #1');S.items.fert+=2;await got('2 dosis de ABONO');
-    await talk(N,['La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.','Planta en las macetas del armario de tu tía y riega cuando baje el agua.','El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.','Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.','Las plantas siguen creciendo mientras duermes.','Te iré mandando al móvil lo que te hace falta para salir adelante. Lo tienes en START, en OBJETIVO.']);
+    addSeeds('ria',3);await got('3 semillas de SKUNK #1');S.items.fert+=2;await got('2 dosis de MEATZA FLORACIÓN');
+    await talk(N,['La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.','Planta en las macetas del armario de tu tía y riega cuando baje el agua.','El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.','Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.','Las plantas siguen creciendo mientras duermes.','Te iré mandando al móvil lo que te hace falta para salir adelante. Lo tienes en START, en OBJETIVO.','Mi hijo Julen te espera en el piso. Sabe más que yo de esto: te ayudará hasta tu primera cosecha.']);
     S.flags.kiko1=true;showObjective();return;
   }
   if(S.ch===4&&!S.flags.lab){
@@ -291,7 +295,7 @@ async function lineasNuevas(){const l=Object.keys(PARADAS).filter(k=>PARADAS[k].
 async function chapter(n){S.ch=n;sfx('get');toast(`<small>CAPÍTULO ${n}</small>${CH_TITLES[n]}`,2800);capHasta=Date.now()+2800;buildEnts();await wait(400);save();}
 function objectiveText(){
   switch(S.ch){
-    case 1:return S.flags.llegada===false?'Coge el autobús en la plaza de Mendialde hasta Ribera Verde.':!S.flags.letter?(S.map==='home'?'Lee la carta que hay en la mesa.':'Entra en el piso de la tía Maite, enfrente de la parada, y lee la carta que hay en la mesa.'):!S.flags.kiko1?'Visita el growshop de Kiko, al lado de casa.':'Planta y consigue tu primera cosecha.';
+    case 1:return S.flags.llegada===false?'Coge el autobús en la plaza de Mendialde hasta Ribera Verde.':!S.flags.letter?(S.map==='home'?'Lee la carta que hay en la mesa.':'Entra en el piso de la tía Maite, enfrente de la parada, y lee la carta que hay en la mesa.'):!S.flags.kiko1?'Visita el growshop de Kiko, al lado de casa.':itinSig()&&!S.flags.harvest1?itinSig().d:'Planta y consigue tu primera cosecha.';   // 1.23: el paso del itinerario
     case 2:return `Gana ${META_VENTAS} € vendiendo (${Math.min(META_VENTAS,Math.round(S.sales))}/${META_VENTAS}).`;
     case 3:return (!S.flags.metB?`Ve al bar El Ancla antes de que acabe el día ${S.deadline}: Don Baltasar quiere ${eur(S.due)}.`:`Paga ${eur(S.due)} a Don Baltasar antes de que acabe el día ${S.deadline}.`)+llevas();
     case 4:return !S.flags.lab?'Kiko quiere verte en el growshop.':`Saca en la mesa 2 variedades de receta y cosecha una planta de cada (${recCount()}/2).`;
@@ -314,6 +318,7 @@ const imperioNivel=()=>{let n=0;IMPERIO.forEach((r,i)=>{if(facturado()>=r.meta)n
 async function checkStory(){
   if(S.ch===1&&S.flags.harvest1){
     await chapter(2);spawnClients();
+    if(S.flags.julen1)await talk('JULEN',JULEN.adios);   // 1.23: se vuelve al growshop
     await talk('SMS · KIKO',['Primera cosecha. Bien hecho.','La gente que busca material lleva un $ encima. Puedes venderles en la calle.','Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba.']);await lineasNuevas();showObjective();
   }
   if(S.ch===2&&S.sales>=META_VENTAS){

@@ -14,16 +14,16 @@ Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: 
 | Objetos sueltos en lote | 36 | 10 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 180 + sin documentar |
 | Imágenes simples | 22 | 11 | create_image_pixflux (init_image + color_image) | 7 + sin documentar |
 | Se queda procedural | 2 | 1 | — | 0 |
-| Importado | 157 | 50 | importado | 0 + sin documentar |
+| Importado | 159 | 51 | importado | 0 + sin documentar |
 
-**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 312/312 claves.
+**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 315/315 claves.
 
 ## Orden de creación
 
 Las dependencias mandan: nada que use el estilo de otra cosa se genera antes de que esa otra esté aprobada.
 
 - **F1 · Ancla de estilo:** player.
-- **F3 · Personajes:** kiko, josune, baltasar, tono, begona, unai, patxi, txaro, inaki, cop, molina, darko, jurado, cliente1, cliente2, cliente3, cliente4, cliente5, miren, cliente6, vfx-16, vfx-32.
+- **F3 · Personajes:** kiko, josune, baltasar, tono, begona, unai, patxi, txaro, inaki, cop, molina, darko, jurado, cliente1, cliente2, cliente3, cliente4, cliente5, miren, julen, cliente6, vfx-16, vfx-32.
 - **F4 · Entorno:** tiles-exterior, interior-home, interior-shop, interior-bar, tiles-interior-extra, edificio-home (tras tiles-exterior), edificio-shop (tras tiles-exterior), edificio-bar (tras tiles-exterior), edificio-gray (tras tiles-exterior), edificio-gray-puerta, edificio-comisaria, edificio-nave, edificio-caserio, edificio-caserio2, edificio-marinera, edificio-marinera2, edificio-marinera3, edificio-marinera4, edificio-ladrillo, edificio-fabrica, props-altura, prop-farola-alta, prop-gramola-alta, props-16, props-32, prop-arbol (tras tiles-exterior), prop-arbol-alto, prop-monte, prop-seto, prop-parada, prop-farola (tras tiles-exterior), prop-fuente (tras tiles-exterior), tiles-firmes, detalles-hierba, edificio-caserio3, edificio-borda, edificio-marinera5, edificio-marinera6, prop-manzano, prop-arbol-alto2, edificio-casco, edificio-casco2, edificio-casco3, edificio-growcity, edificio-bloque, edificio-bloque2.
 - **F4b · Transiciones (opcional):** tileset-transiciones — opcional.
 - **F5 · Plantas:** planta-fases.
@@ -148,6 +148,7 @@ Arte propio del repositorio que ya existe (Strainmon): se adapta en local (recor
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
 | miren | miren | importado | — | solo texto | F3 | idle, walk, fumar | 0+? |
+| julen | julen | importado | — | solo texto | F3 | idle | 0+? |
 | darko-combate | frente:darko | importado | — | solo texto | F6 | idle, ataque, herido, huir | 0+? |
 | edificio-gray-puerta | door_gray | importado | — | solo texto | F4 | — | 0+? |
 | edificio-comisaria | roofT_comisaria, roofB_comisaria, wall_comisaria, win_comisaria, door_comisaria | importado | — | solo texto | F4 | puerta | 0+? |
