@@ -33,6 +33,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
     // qué claves de TILES se usan como suelo y cuáles como objeto
     const ground = new Set(), objects = new Set();
     for (const m of Object.values(MAPS)) for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) { ground.add(m.g[y][x]); if (m.o[y][x]) objects.add(m.o[y][x]); }
+    Object.keys(MUEBLES).forEach(k => objects.add(k));   // los muebles que se compran (1.10, 1.16), aunque no estén montados
     const files = {};
     for (const [k, frames] of Object.entries(TILES)) {
       if (SEGUNDA.has(k)) continue;   // la mitad derecha de un mueble del salón (sofa2…) no se pinta: el sprite del mueble ocupa las dos casillas
@@ -88,7 +89,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
       personajes_fijos: Object.keys(LOOKS),
       npcs: NPCDEF.map(d => ({ id: d.id, look: d.look, mapa: d.map, deambula: !!d.wander })),
       plantas: { vista: 'misc:planta-vista (cepa × fase, de ../assets/plants)', colores_cogollo: Object.fromEntries(Object.entries(STRAINS).map(([k, s]) => [k, s.c])) },
-      combate: ['fondo-ladron', 'fondo-policia', 'frente:ladron', 'frente:policia', 'espalda:player'],
+      combate: ['fondo-ladron', 'fondo-policia', 'frente:ladron', 'frente:darko', 'frente:policia', 'espalda:player'],   // Darko, con su sprite (1.21)
       misc: ['bolsa', 'hoja-titulo', 'burbuja-$', 'burbuja-!', ...Object.keys(CARPAS).flatMap(t => ['carpa-' + t + '-mapa', 'carpa-' + t + '-vista']), 'cuarto-cultivo', 'carpa-c-pared', 'carpa-c-luz', 'carpa-c-luz-led', 'foco-c-40', 'foco-c-44', 'foco-c-46', 'maceta-c-15', 'maceta-c-22', 'foco-c-cfl-36', ...['i', 'h', 's'].flatMap(p => [38, 32].flatMap(w => ['planta-c-' + p + '-' + w, 'planta-c-' + p + '2-' + w])), 'planta-c-h1-18', 'planta-c-h0-8',
         'foco-c-led100-26', 'foco-c-led100-20', 'foco-c-led200-30', 'foco-c-led200-24', 'foco-c-led480-47', 'foco-c-cfl-25', 'foco-c-led720-78',
         'maceta-c-tela11-26', 'maceta-c-tela11-20', 'maceta-c-tela25-27', 'maceta-c-plastico18-26', 'maceta-c-plastico18-23',

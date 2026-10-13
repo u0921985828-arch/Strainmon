@@ -46,12 +46,13 @@ async function talkTxomin(){
     if(op.startsWith('Comprar')){if(S.money<SETAS.bandeja){sfx('bad');await say('Sin dinero no hay bandeja.',T);continue;}
       S.money-=SETAS.bandeja;B.push({d:S.day,hum:100});sfx('coin');await say(`Lista para colonizar. En ${SETAS.colon} días la habrá cogido el micelio; ${SETAS.fruto} más y a recoger.`,T);continue;}
     if(op==='Pulverizar'){hum.forEach(b=>b.hum=100);advanceTime(SETAS.min);updateHUD();if(!S.setas)return;sfx('sel');   // si pasa de medianoche, setasDia puede cerrar el bajo
-      await say('Pulverizas las bandejas: humedad al 100 %.');continue;}
+      const v=L.bandejas.filter(b=>!b.mala);   // pasada la medianoche, setasDia ya las ha secado (o echado a perder)
+      await say(v.length?`Pulverizas las bandejas: humedad al ${Math.round(v.reduce((a,b)=>a+b.hum,0)/v.length)} %.`:'Pulverizas las bandejas.');continue;}
     if(op==='Recoger'){let g=0;L.bandejas=B.filter(b=>{if(faseSeta(b)!=='lista')return true;g+=ri(SETAS.g[0],SETAS.g[1]);return false;});L.g+=g;sfx('get');
       await say(`Recoges las setas y las dejas secando en el bajo: ${g} g.`);continue;}
     if(op==='Tirar las malas'){const k=B.filter(b=>b.mala).length;L.bandejas=B.filter(b=>!b.mala);await say(k>1?`Tiras ${k} bandejas.`:'Tiras la bandeja.');continue;}
     if(op.startsWith('Venderle')){const g=Math.floor(L.g),e=g*SETAS.precio;L.g-=g;S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+SETAS.calor);sfx('coin');
-      toast(`+${eur(e)} · ${g} g de setas`,1600);await say(`Para mis clientes de siempre. ${eur(e)}.`,T);continue;}
+      toast(`+${eur(e)} · ${g} g de setas`,1600);await say(`Para mis clientes de siempre. ${eur(e)}.`,T);await checkStory();continue;}
     if(op==='Dejar el bajo'){if(await ask(`¿Dejas el bajo? Te devuelvo la fianza; lo que haya dentro se queda.`,['Dejarlo','No'],T)!==0)continue;
       S.setas=null;S.money+=SETAS.fianza;sfx('coin');return say('Como quieras. La puerta, cerrada al salir.',T);}
   }

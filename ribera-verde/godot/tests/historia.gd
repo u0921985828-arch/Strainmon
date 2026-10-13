@@ -115,7 +115,7 @@ func _gancho_pedir(t: String, ini: String, mx: int, cancela: bool):
 	elif WANT.size() and WANT[0] is String and WANT[0] == "<B>" and cancela:
 		WANT.pop_front()
 		v = null
-	LOG.append("  [texto] " + t + " → " + ("(B)" if v == null else v))
+	LOG.append("  [texto] " + t + " → " + ("(B)" if v == null else "(texto largo)" if v.length() > 60 else v))   # la partida importada (1.22), sin copiarla
 	return v
 
 func _gancho_texto(t: String, n: String) -> void:
@@ -1941,7 +1941,8 @@ func _pasos() -> void:
 				and LOG.has("La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas.") and LOG.has("SMS · TXOMIN: No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí."), R))
 	step("Ropa y pelo, Darko y Miren (1.21): en la cama del piso, CAMBIARTE DE ROPA (camiseta, pantalón, gorra y pelo: cambian los colores del protagonista, también de espaldas en el combate; fuera del piso, no sale); Darko pelea con su sprite de combate y Miren lleva el suyo", [], func():
 		R = {}
-		var sv := {"ropa": J.S.get("ropa"), "map": J.S.map}
+		var l0 := LOG.size()
+		var sv = J.S.get("ropa")
 		J.S.ropa = {}
 		J.enter_map("home", 5, 5, "up")
 		want(["^Cambiarte de ropa", "^Camiseta", "^Azul", "^Pelo", "^Rubio", "^Pelo", "^Volver", "^Listo"])
@@ -1958,8 +1959,14 @@ func _pasos() -> void:
 			return k
 		var f = Atlas.frame_de("player", "base", "south", 0, {"i": 0})
 		var c: Image = J.ropa_c(f, "player").c
-		R.px = jn([n.call(f.c, "#c83838"), n.call(c, "#c83838"), n.call(c, "#3a6ac8"), n.call(f.c, "#4a2a2b"), n.call(c, "#c8a050"), n.call(f.c, "#e8b894") == n.call(c, "#e8b894")])
+		R.px = jn([n.call(f.c, "#c83839"), n.call(c, "#c83839"), n.call(c, "#3a6ac8"), n.call(f.c, "#4a2a2b"), n.call(c, "#c8a050"), n.call(f.c, "#e8b894") == n.call(c, "#e8b894")])
 		R.comb = J.ropa_mapa("player-combate")[1]
+		var r0 = J.S.ropa
+		J.S.ropa = {"gorra": 1}   # la gorra roja (1.22): las zapatillas no
+		var fc = Atlas.frame_de("player-combate", "base", "north", 0, {"i": 0})
+		var cc: Image = J.ropa_c(fc, "player-combate").c
+		R.zap = jn([n.call(fc.c, "#5aa860") > 0, n.call(fc.c, "#5aa860") == n.call(cc, "#5aa860"), n.call(cc, "#5aa861"), n.call(cc, "#e06060") == n.call(fc.c, "#5aa861")])
+		J.S.ropa = r0
 		var b0 = J.B
 		J.B = {"kind": "thief", "jefe": 1, "look": D.LOOKS.darko}
 		R.darko = J.grupo_combate("E")
@@ -1968,14 +1975,15 @@ func _pasos() -> void:
 		J.S.map = "txaro"
 		want(["^Nada"])
 		await run(func(): await J.bed_action("Una cama."))
-		J.S.map = sv.map
-		J.S.ropa = sv.ropa if sv.ropa is Dictionary else {}
+		var lg := LOG.slice(l0)
+		R.log = jn([lg.any(func(l): return l.contains("[menú] Dormir hasta las 7 | Siesta de 3 h | Cambiarte de ropa | Nada")),
+			lg.any(func(l): return l.contains("[menú] Camiseta: azul | Pantalón: vaquero | Gorra: verde | Pelo: rubio | Listo")), lg.any(func(l): return l.contains("[menú] Dormir hasta las 7 | Siesta de 3 h | Nada"))])
+		J.S.ropa = sv if sv is Dictionary else {}
 		J.enter_map("home", 5, 5, "up"),
 		func():
 			var p: PackedStringArray = str(R.px).split(",")
-			return chk(R.ropa == "1,2,0" and int(p[0]) > 0 and int(p[1]) == 0 and p[2] == p[0] and int(p[3]) > 0 and p[4] == p[3] and p[5] == "true" and R.comb == "c1p2"
-				and R.darko == "darko-combate" and R.miren == "miren" and LOG.any(func(l): return l.contains("[menú] Dormir hasta las 7 | Siesta de 3 h | Cambiarte de ropa | Nada"))
-				and LOG.any(func(l): return l.contains("[menú] Camiseta: azul | Pantalón: vaquero | Gorra: verde | Pelo: rubio | Listo")) and LOG.any(func(l): return l.contains("[menú] Dormir hasta las 7 | Siesta de 3 h | Nada")), R))
+			return chk(R.ropa == "1,2,0" and int(p[0]) > 0 and int(p[1]) == 0 and p[2] == p[0] and int(p[3]) > 0 and p[4] == p[3] and p[5] == "true" and R.comb == "1002" and R.zap == "true,true,0,true"
+				and R.darko == "darko-combate" and R.miren == "miren" and R.log == "true,true,true", R))
 	step("Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas", ["^Hindu Kush"], func():
 		J.S.ch = 5
 		J.S.flags.txaro = true
@@ -2688,6 +2696,24 @@ func _pasos() -> void:
 		var s = JSON.parse_string(J.exportado) if J.exportado != "" else null
 		R = {"clip": s is Dictionary and int(s.day) == int(J.S.day) and float(s.money) == float(J.S.money) and JSON.stringify(norm(s.custom)) == JSON.stringify(norm(J.S.custom))},
 		func(): return chk(R.clip and LOG.any(func(l): return l == "Partida copiada al portapapeles. Pégala en una nota o en un correo para guardarla."), R))
+	step("Importar partida (1.22): OPCIONES → IMPORTAR PARTIDA con algo que no es una partida, no; con la exportada (pegada), la carga en lugar de la de ahora y la guarda", ["OPCIONES", "IMPORTAR", "=hola", "VOLVER", "SALIR"], func():
+		await run(J.start_menu)
+		J.S.x = J.P.x
+		J.S.y = J.P.y
+		J.S.dir = J.P.dir
+		var t := JSON.stringify(J.S, "", false, true)
+		var m0 = J.S.money
+		var d0 = J.S.day
+		var S0 = J.S
+		J.S.money += 777
+		want(["OPCIONES", "IMPORTAR", "=" + t, "^Cargar", "VOLVER", "SALIR"])
+		await run(J.start_menu)
+		var g = JSON.parse_string(FileAccess.get_file_as_string(Juego.GUARDADO))
+		R = {"imp": jn([not is_same(J.S, S0), float(J.S.money) == float(m0), int(J.S.day) == int(d0), g is Dictionary and float(g.money) == float(m0), J.pending.size()])},
+		func():
+			var re := RegEx.create_from_string("^¿Cargar la partida de .+, día \\d+\\? La de ahora se pierde\\.$")
+			return chk(R.imp == "true,true,true,true,0" and LOG.has("Eso no es una partida exportada.") and LOG.has("  [texto] Pega aquí la partida exportada → (texto largo)")
+				and LOG.any(func(l): return re.search(l) != null) and LOG.has("Partida cargada."), R))
 	step("Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad",
 		["Sacar un lote", "^Hindu", "^10 g", "Guardar todo", "Cerrar", "Bolsa de deporte", "Salir", "Sacar todo", "Cerrar"], func():
 		var S0 = J.S

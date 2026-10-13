@@ -1,5 +1,16 @@
 # Cambios
 
+## 1.22.0 · 13 de octubre de 2026
+
+Repaso: HUD más pequeño, importar la partida y errores. Godot, 0.16.0.
+
+- **HUD más pequeño:** letra de 6,5 px de juego en vez de 7,5, barras de 28 × 2,5 en vez de 34 × 3 y menos margen: tapa menos del mapa. Igual en Godot (`HUD_*` en `ui.gd`, los mismos números que `.hud` en el CSS).
+- **Nuevo: IMPORTAR PARTIDA** (START → OPCIONES, junto a EXPORTAR PARTIDA; en Godot, también en las OPCIONES del título). Se pega la partida exportada en la caja de texto (lo que haya en el portapapeles sale ya escrito); si es una partida, pregunta («¿Cargar la partida de …, día …? La de ahora se pierde.»), la carga como CONTINUAR (`migrate`) y la guarda. Lo que no es una partida, no se carga. Desde el título de Godot se guarda y sale CONTINUAR.
+- Arreglos de la ropa (1.21): la gorra, la camiseta, el pantalón y el pelo de combate tienen colores propios (`player_ropa.py`), así que las zapatillas, la regadera y la planta ya no cambian con ellos; la caché de cada combinación lleva todas las piezas (antes, pantalón y pelo se pisaban). PULVERIZAR pasada la medianoche dice la humedad que queda.
+- Errores: un vendedor que se larga a medianoche mientras viene a la llamada ya no aparece a comprar; lo que venden los vendedores, la plantilla de calle y el bajo de las setas cuenta para la historia (`checkStory`); el CBD del analizador sale del 0,2 al 1 % (salía diez veces más); el olor de la noche también da el aviso de calor (`heatWarn` al cambiar el día), y hablar con Darko en los astilleros sube su confianza (antes, la de otra ficha).
+- Sprites: `validar.js` da 0 errores (los tapizados y láminas `k-N` cuentan como su mueble; el inventario lleva los muebles que se compran y el combate de Darko; los personajes nuevos de la 1.15 a la 1.21, cubiertos en el manifiesto) y el catálogo, al día.
+- Tests: `npm test` 106/106 (paso nuevo: importar algo que no es una partida y la exportada); Godot, historia 106 pasos; el ciclo, con IMPORTAR en las OPCIONES del título.
+
 ## 1.21.0 · 13 de octubre de 2026
 
 Arte: ropa y pelo, Darko y Miren con sprite propio y los ojos de los personajes. Godot, 0.15.0.

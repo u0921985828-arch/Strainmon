@@ -2361,11 +2361,13 @@ func llamar_fijo(f: Dictionary) -> bool:
 		await say("%s: «¿Con la policía detrás? Ni de broma»." % f.n)
 		return false
 	var ct: Dictionary = D.CTYPES[f.t]
-	f.dia = S.day
 	S.heat = minf(100, S.heat + 1)
 	await say("%s: «Vale, voy para allá»." % f.n)
 	advance_time(int(D.LLAMADA_MIN))
 	update_hud()
+	if not S.fijos.any(func(x): return x.id == f.id):   # 1.22: se ha largado a medianoche mientras venía (curro_dia)
+		return true
+	f.dia = S.day
 	await talk_client({"id": "tel-" + f.id, "fijo": true, "fid": f.id, "n": f.n.to_upper(), "map": S.map, "x": P.x, "y": P.y, "type": f.t, "want": ri(int(ct.g[0]), int(ct.g[1])),
 		"minThc": mini(24, 15 + int(S.ch)) if f.t == "pij" else 0})
 	return true
@@ -2469,6 +2471,7 @@ func curro_dia() -> void:
 			cuidar_plantas()
 			S.heat = min(100, S.heat + J.calor)
 	var fin := []
+	var vende := false
 	for v in C.vend:
 		var r := Cultivo.azar()
 		var N: String = "SMS · " + v.n.to_upper()
@@ -2491,6 +2494,7 @@ func curro_dia() -> void:
 		S.sales += e
 		S.heat = min(100, S.heat + V.calor)
 		confia(v.id, 1)
+		vende = true
 		if v.g < 1:
 			fin.append(v)
 			queue("vend" + v.id, func(): await talk(N, ["Vendidos los últimos %d g: %s en tu buzón. Si quieres que siga, déjame más." % [g, Datos.eur(e)]]))
@@ -2498,6 +2502,8 @@ func curro_dia() -> void:
 			queue("vend" + v.id, func(): await talk(N, ["Vendidos %d g: %s en tu buzón. Me quedan %s." % [g, Datos.eur(e), g_txt(v.g)]]))
 	if fin.size():
 		C.vend = C.vend.filter(func(v): return not fin.has(v))
+	if vende:   # 1.22: lo vendido cuenta para la historia
+		queue("historia", check_story)
 	plantilla_dia()   # la plantilla (1.19)
 
 # regar, tratar las plagas con tu insecticida y rellenar garrafas y depósitos (Begoña y el gerente de la plantilla)
@@ -2830,7 +2836,7 @@ func aroma_de(sid: String) -> String:
 	return D.AROMAS[Datos.hash_str(sid) % D.AROMAS.size()]
 
 func cbd_de(sid: String) -> float:   # CBD del 0,2 al 1 % según el % índica
-	return Datos.jsround(20 + Datos.ind_de(S, sid) * 8) / 100.0
+	return Datos.jsround(20 + Datos.ind_de(S, sid) * 0.8) / 100.0
 
 func catar(k: String) -> void:
 	var b = S.buds.get(k)
@@ -3121,6 +3127,7 @@ func cuidar_casa(w: Dictionary) -> int:
 func plantilla_dia() -> void:
 	var P: Dictionary = D.PLANTILLA
 	var fuera := []
+	var vende := false
 	nave_alquiler()
 	for w in S.plantilla:
 		if w.get("rol") != "gerente" and w.get("rol") != "nave":
@@ -3169,6 +3176,7 @@ func plantilla_dia() -> void:
 				S.money += e
 				S.sales += e
 				S.heat = min(100, S.heat + P.calor)
+				vende = true
 				m = ("Vendidos %d g: %s en tu buzón. Me quedan %s." % [q, Datos.eur(e), g_txt(w.g)]) if w.g >= 1 else ("Vendidos los últimos %d g: %s en tu buzón. Dame más cuando quieras." % [q, Datos.eur(e)])
 		if w.g < 1:
 			libre(w)
@@ -3176,6 +3184,8 @@ func plantilla_dia() -> void:
 		queue("pl" + w.id, func(): await talk(N, [mm]))
 	if fuera.size():
 		S.plantilla = S.plantilla.filter(func(w): return not fuera.has(w))
+	if vende:   # 1.22: lo vendido cuenta para la historia
+		queue("historia", check_story)
 	nave_dia()
 
 # la nave: el alquiler, lo primero de la mañana (antes que los sueldos; sin él, Arrieta cambia la cerradura y se queda la fianza)
@@ -3395,7 +3405,11 @@ func talk_txomin() -> void:
 			if S.get("setas") == null:   # si pasa de medianoche, setas_dia puede cerrar el bajo
 				return
 			sfx("sel")
-			await say("Pulverizas las bandejas: humedad al 100 %.")
+			var v: Array = L.bandejas.filter(func(b): return not b.get("mala"))   # pasada la medianoche, setas_dia ya las ha secado (o echado a perder)
+			var hv := 0.0
+			for b in v:
+				hv += b.hum
+			await say(("Pulverizas las bandejas: humedad al %d %%." % Datos.jsround(hv / v.size())) if v.size() else "Pulverizas las bandejas.")
 		elif op == "Recoger":
 			var g := 0
 			var quedan := []
@@ -3422,6 +3436,7 @@ func talk_txomin() -> void:
 			sfx("coin")
 			toast("+%s · %d g de setas" % [Datos.eur(e), g], 1600)
 			await say("Para mis clientes de siempre. %s." % Datos.eur(e), T)
+			await check_story()
 		elif op == "Dejar el bajo":
 			if await ask("¿Dejas el bajo? Te devuelvo la fianza; lo que haya dentro se queda.", ["Dejarlo", "No"], T) != 0:
 				continue

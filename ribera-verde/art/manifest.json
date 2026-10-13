@@ -1541,7 +1541,9 @@
     "look:oldman",
     "npc:patxi",
     "look:andoni",
-    "npc:andoni"
+    "npc:andoni",
+    "look:txomin",
+    "npc:txomin"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -2290,7 +2292,9 @@
     "look:excursionista",
     "npc:excursionista",
     "look:ibarbitarra",
-    "npc:ibarbitarra"
+    "npc:ibarbitarra",
+    "look:arrieta",
+    "npc:arrieta"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -2399,7 +2403,10 @@
    "cubre": [
     "look:cliente2",
     "look:obrero",
-    "npc:obrero"
+    "npc:obrero",
+    "look:portero",
+    "npc:club_puerto",
+    "npc:club_ibar"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -2738,7 +2745,10 @@
    "cubre": [
     "look:cliente5",
     "look:nerea",
-    "npc:nerea"
+    "npc:nerea",
+    "look:portera",
+    "npc:club_valde",
+    "npc:club_ens"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -2856,7 +2866,8 @@
    "fase": "F3",
    "herramienta": "importado",
    "cubre": [
-    "look:miren"
+    "look:miren",
+    "npc:miren"
    ],
    "origen": "tools/sprites/a-mano/recolor.py: cliente5 (aprobado) con el pelo canoso y el top verde, cambiando colores exactos (mismo dibujo)",
    "descripcion": "Miren, la amiga de la tía Maite (Errotabarri): mujer mayor, pelo canoso largo, chaqueta negra sobre un top verde",

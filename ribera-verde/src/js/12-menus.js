@@ -21,20 +21,36 @@ const TEXTO_VEL=['NORMAL','RÁPIDO','AL MOMENTO'];
 async function opciones(){
   let i=0;
   for(;;){
-    i=await menu([{label:'MÚSICA',right:AJ.musica*25+' %'},{label:'EFECTOS',right:AJ.efectos*25+' %'},{label:'TEXTO',right:TEXTO_VEL[AJ.texto]},{label:'SONIDO',right:soundOn?'SÍ':'NO'},{label:'EXPORTAR PARTIDA'},{label:'VOLVER'}],
+    i=await menu([{label:'MÚSICA',right:AJ.musica*25+' %'},{label:'EFECTOS',right:AJ.efectos*25+' %'},{label:'TEXTO',right:TEXTO_VEL[AJ.texto]},{label:'SONIDO',right:soundOn?'SÍ':'NO'},{label:'EXPORTAR PARTIDA'},{label:'IMPORTAR PARTIDA'},{label:'VOLVER'}],
       {cls:'start',initial:i,title:'OPCIONES'});
-    if(i<0||i===5)return;
+    if(i<0||i===6)return;
     if(i===4){await exportar();continue;}
+    if(i===5){await importar();continue;}
     if(i===0)AJ.musica=(AJ.musica+1)%5;else if(i===1)AJ.efectos=(AJ.efectos+1)%5;else if(i===2)AJ.texto=(AJ.texto+1)%3;else setSound(!soundOn);
     guardaAjustes();if(i===1)sfx('coin');
   }
 }
-// exportar la partida (1.11): el JSON de S al portapapeles, para guardarlo en una nota (no hay importar)
+// exportar la partida (1.11): el JSON de S al portapapeles, para guardarlo en una nota (y luego importarla, 1.22)
 async function exportar(){
   const t=JSON.stringify(S);let ok=false;
   try{await navigator.clipboard.writeText(t);ok=true;}catch(e){}
   if(!ok){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{ok=document.execCommand('copy');}catch(e){}a.remove();}
   return say(ok?'Partida copiada al portapapeles. Pégala en una nota o en un correo para guardarla.':'No se ha podido copiar en este navegador.');
+}
+// importar la partida (1.22): la exportada, pegada en la caja de texto (lo que haya en el portapapeles sale ya escrito);
+// sustituye a la de ahora (migrate, como CONTINUAR) y se guarda; la cola de avisos de la otra partida se vacía
+const IMPORTA_MAX=2000000;
+const partidaValida=s=>!!s&&typeof s==='object'&&!Array.isArray(s)&&typeof s.name==='string'&&typeof s.day==='number'&&typeof s.ch==='number'
+  &&typeof s.map==='string'&&!!MAPS[s.map]&&Array.isArray(s.pots)&&!!s.flags&&typeof s.flags==='object'&&!Array.isArray(s.flags);
+async function importar(){
+  let ini='';try{ini=String(await navigator.clipboard.readText()||'').trim();}catch(e){}
+  if(ini.length>IMPORTA_MAX)ini='';
+  const t=await pedirTexto('Pega aquí la partida exportada',ini,IMPORTA_MAX,false,true,true);if(t==null)return;
+  let s=null;try{s=JSON.parse(t);}catch(e){}
+  if(!partidaValida(s))return say('Eso no es una partida exportada.');
+  if(await ask(`¿Cargar la partida de ${s.name}, día ${s.day}? La de ahora se pierde.`,['Cargar','No'])!==0)return;
+  S=s;pending.length=0;queued.clear();migrate();enterGame();save();sfx('coin');
+  return say('Partida cargada.');
 }
 // recetario (1.11): cada variedad de receta con sus maneras de sacarla (RECIPES, en cualquier orden; RECETA_ORD, madre × padre)
 // y, de cada una que entra, dónde se consiguen las semillas

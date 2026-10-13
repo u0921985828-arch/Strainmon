@@ -60,7 +60,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
       let v = ini;
       if (WANT[0] && WANT[0].txt !== undefined) v = WANT.shift().txt.trim().slice(0, max);
       else if (WANT[0] === '<B>' && cancela) { WANT.shift(); v = null; }
-      LOG.push('  [texto] ' + t + ' → ' + (v === null ? '(B)' : v)); return v;
+      LOG.push('  [texto] ' + t + ' → ' + (v === null ? '(B)' : v.length > 60 ? '(texto largo)' : v)); return v;   // la partida importada (1.22), sin copiarla
     };
     window.pr = l => SHOP.find(it => it.lbl.startsWith(l)).p;   // precio de tienda por el principio del rótulo
     // las patrullas (1.10) no andan solas (ni con el reloj en marcha): los pasos que las prueban llaman a UPAT con un dt fijo
@@ -588,19 +588,22 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && LOG.some(l => l === `TXOMIN: El bajo: 1 lista · humedad ${100 - SETAS.seca} %.`) && LOG.some(l => l === 'Recoges las setas y las dejas secando en el bajo: 33 g.')
     && LOG.some(l => l === 'La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas.') && LOG.some(l => l === 'SMS · TXOMIN: No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí.') || R);
   await step('Ropa y pelo, Darko y Miren (1.21): en la cama del piso, CAMBIARTE DE ROPA (camiseta, pantalón, gorra y pelo: cambian los colores del protagonista, también de espaldas en el combate; fuera del piso, no sale); Darko pelea con su sprite de combate y Miren lleva el suyo', [], async () => {
-    window.R = {}; const sv = { ropa: S.ropa, map: S.map }; S.ropa = {}; enterMap('home', 5, 5, 'up');
+    window.R = {}; const l0 = LOG.length, sv = S.ropa; S.ropa = {}; enterMap('home', 5, 5, 'up');
     want(['^Cambiarte de ropa', '^Camiseta', '^Azul', '^Pelo', '^Rubio', '^Pelo', '^Volver', '^Listo']); await run(() => bedAction());
     R.ropa = [S.ropa.camiseta, S.ropa.pelo, S.ropa.gorra || 0].join();
     const n = (cv, h) => { const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data, v = parseInt(h.slice(1), 16); let k = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 3] && (d[i] << 16 | d[i + 1] << 8 | d[i + 2]) === v) k++; return k; };
     const f = frameDe('player', 'base', 'south', 0, { i: 0 }), c = ropaC(f, 'player');
-    R.px = [n(f.c, '#c83838'), n(c, '#c83838'), n(c, '#3a6ac8'), n(f.c, '#4a2a2b'), n(c, '#c8a050'), n(f.c, '#e8b894') === n(c, '#e8b894')].join();
+    R.px = [n(f.c, '#c83839'), n(c, '#c83839'), n(c, '#3a6ac8'), n(f.c, '#4a2a2b'), n(c, '#c8a050'), n(f.c, '#e8b894') === n(c, '#e8b894')].join();
     R.comb = ropaMapa('player-combate')[1];
+    const r0 = S.ropa; S.ropa = { gorra: 1 }; const fc = frameDe('player-combate', 'base', 'north', 0, { i: 0 }), cc = ropaC(fc, 'player-combate');   // la gorra roja (1.22): las zapatillas no
+    R.zap = [n(fc.c, '#5aa860') > 0, n(fc.c, '#5aa860') === n(cc, '#5aa860'), n(cc, '#5aa861'), n(cc, '#e06060') === n(fc.c, '#5aa861')].join(); S.ropa = r0;
     const b0 = B; B = { kind: 'thief', jefe: 1, look: LOOKS.darko }; R.darko = grupoCombate('E'); B = b0; R.miren = grupoLook(LOOKS.miren);
-    S.map = 'txaro'; want(['^Nada']); await run(() => bedAction('Una cama.')); S.map = sv.map;
-    S.ropa = sv.ropa || {}; enterMap('home', 5, 5, 'up');
-  }, () => { const [a, b, c, d, e, piel] = R.px.split(','); return R.ropa === '1,2,0' && +a > 0 && +b === 0 && c === a && +d > 0 && e === d && piel === 'true' && R.comb === 'c1p2'
-    && R.darko === 'darko-combate' && R.miren === 'miren' && LOG.some(l => /\[menú\] Dormir hasta las 7 \| Siesta de 3 h \| Cambiarte de ropa \| Nada/.test(l))
-    && LOG.some(l => /\[menú\] Camiseta: azul \| Pantalón: vaquero \| Gorra: verde \| Pelo: rubio \| Listo/.test(l)) && LOG.some(l => /\[menú\] Dormir hasta las 7 \| Siesta de 3 h \| Nada/.test(l)) || R; });
+    S.map = 'txaro'; want(['^Nada']); await run(() => bedAction('Una cama.')); const lg = LOG.slice(l0);
+    R.log = [lg.some(l => /\[menú\] Dormir hasta las 7 \| Siesta de 3 h \| Cambiarte de ropa \| Nada/.test(l)), lg.some(l => /\[menú\] Camiseta: azul \| Pantalón: vaquero \| Gorra: verde \| Pelo: rubio \| Listo/.test(l)),
+      lg.some(l => /\[menú\] Dormir hasta las 7 \| Siesta de 3 h \| Nada/.test(l))].join();
+    S.ropa = sv || {}; enterMap('home', 5, 5, 'up');
+  }, () => { const [a, b, c, d, e, piel] = R.px.split(','); return R.ropa === '1,2,0' && +a > 0 && +b === 0 && c === a && +d > 0 && e === d && piel === 'true' && R.comb === '1002' && R.zap === 'true,true,0,true'
+    && R.darko === 'darko-combate' && R.miren === 'miren' && R.log === 'true,true,true' || R; });
   await step('Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas', ['^Hindu Kush'], async () => {
     S.ch = 5; S.flags.txaro = true; S.flags.txaro2 = false; S.map = 'txaro'; buildEnts(); window.R = { ent: ents.filter(e => e.id === 'txaro').map(e => e.x + ',' + e.y).join() };
     S.buds = {}; addBuds('ria', 20, 12); addBuds('hindu', 15, 18); addBuds('thai', 20, 16); R.ch = S.seeds.chitral || 0; R.boc = S.items.bocata; R.rep = S.rep;
@@ -820,6 +823,12 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     window.CLIP = ''; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async t => { window.CLIP = t; } }, configurable: true });
     await run(startMenu); const s = JSON.parse(CLIP || 'null'); window.R = { clip: !!s && s.day === S.day && s.money === S.money && JSON.stringify(s.custom) === JSON.stringify(S.custom) };
   }, () => R.clip && LOG.some(l => l === 'Partida copiada al portapapeles. Pégala en una nota o en un correo para guardarla.') || R);
+  await step('Importar partida (1.22): OPCIONES → IMPORTAR PARTIDA con algo que no es una partida, no; con la exportada (pegada), la carga en lugar de la de ahora y la guarda', ['OPCIONES', 'IMPORTAR', '=hola', 'VOLVER', 'SALIR'], async () => {
+    await run(startMenu); S.x = P.x; S.y = P.y; S.dir = P.dir; const t = JSON.stringify(S), m0 = S.money, d0 = S.day, S0 = S; S.money += 777;
+    want(['OPCIONES', 'IMPORTAR', '=' + t, '^Cargar', 'VOLVER', 'SALIR']); await run(startMenu);
+    window.R = { imp: [S !== S0, S.money === m0, S.day === d0, JSON.parse(localStorage.getItem(SAVE_KEY)).money === m0, pending.length].join() };
+  }, () => R.imp === 'true,true,true,true,0' && LOG.some(l => l === 'Eso no es una partida exportada.') && LOG.some(l => l === '  [texto] Pega aquí la partida exportada → (texto largo)')
+    && LOG.some(l => /^¿Cargar la partida de .+, día \d+\? La de ahora se pierde\.$/.test(l)) && LOG.some(l => l === 'Partida cargada.') || R);
   await step('Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad',
     ['Sacar un lote', '^Hindu', '^10 g', 'Guardar todo', 'Cerrar', 'Bolsa de deporte', 'Salir', 'Sacar todo', 'Cerrar'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 5, map: 'home', buds: {}, rosin: {}, arcon: { buds: {}, rosin: {} }, protect: false, caja: null });

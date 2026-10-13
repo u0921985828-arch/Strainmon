@@ -155,6 +155,7 @@ function newDay(){
   // 1.10: el plazo vencido, también sin haber visto a Baltasar (el plazo corre desde Toño); 1.11: el aviso, a 3 días y el último
   if(S.due>0&&S.day>S.deadline)queue('penalty',penaltyEvent);
   else if(S.due>0&&(S.deadline-S.day===3||S.deadline===S.day))queue('plazo',recuerdoPlazo);
+  queue('calor',heatWarn);   // 1.22: el olor de la noche también avisa
 }
 /* ---------- fenotipo (1.10) ----------
    Cada planta de semilla tira el suyo al germinar (t: THC, y: gramos; σ según tipoGen, 03-datos). Un esqueje es la misma

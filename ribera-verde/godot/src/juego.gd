@@ -209,6 +209,47 @@ func _title_press() -> void:
 			await new_game()
 			return
 
+# importar la partida (1.22, importar de 12-menus): la exportada, pegada en la caja de texto (lo que haya en el portapapeles sale ya
+# escrito); sustituye a la de ahora (migrate, como CONTINUAR) y se guarda; la cola de avisos de la otra partida se vacía. Desde el
+# título no hay partida en marcha: se guarda tal cual y el título ofrece CONTINUAR
+const IMPORTA_MAX := 2000000
+
+func partida_valida(s) -> bool:
+	return s is Dictionary and s.get("name") is String and (s.get("day") is int or s.get("day") is float) and (s.get("ch") is int or s.get("ch") is float) \
+		and s.get("map") is String and MAPS.has(s.map) and s.get("pots") is Array and s.get("flags") is Dictionary
+
+func importar(desde_titulo := false) -> void:
+	var ini := DisplayServer.clipboard_get().strip_edges() if DisplayServer.has_feature(DisplayServer.FEATURE_CLIPBOARD) else ""
+	if ini.length() > IMPORTA_MAX:
+		ini = ""
+	var t = await pedir_texto("Pega aquí la partida exportada", ini, IMPORTA_MAX, false, true, true)
+	if t == null:
+		return
+	var js := JSON.new()   # (JSON.parse_string avisa en la consola si no es JSON)
+	var s = Datos.enteros(js.data) if js.parse(t) == OK and js.data is Dictionary else null
+	if not partida_valida(s):
+		await say("Eso no es una partida exportada.")
+		return
+	var pierde := " La de ahora se pierde." if not desde_titulo else (" La guardada se pierde." if FileAccess.file_exists(GUARDADO) else "")
+	if await ask("¿Cargar la partida de %s, día %s?%s" % [s.name, n(s.day), pierde], ["Cargar", "No"]) != 0:
+		return
+	if desde_titulo:
+		var f := FileAccess.open(GUARDADO, FileAccess.WRITE)
+		if f == null:
+			await say("No se ha podido guardar la partida.")
+			return
+		f.store_string(JSON.stringify(s, "", false, true))
+		f.close()
+	else:
+		S = s
+		pending.clear()
+		queued.clear()
+		migrate()
+		enter_game()
+		save()
+	sfx("coin")
+	await say("Partida cargada.")
+
 # OPCIONES (en el título y en el menú START): A cambia cada fila; se guardan al momento
 func opciones(desde_titulo := false) -> void:
 	var i := 0
@@ -217,6 +258,7 @@ func opciones(desde_titulo := false) -> void:
 			{"label": "TEXTO", "right": TEXTO_VEL[aj.texto]}, {"label": "SONIDO", "right": "SÍ" if aj.sonido else "NO"}]
 		if not desde_titulo:
 			it.append({"label": "EXPORTAR PARTIDA"})
+		it.append({"label": "IMPORTAR PARTIDA"})
 		if desde_titulo and FileAccess.file_exists(GUARDADO):
 			it.append({"label": "BORRAR PARTIDA"})
 		it.append({"label": "VOLVER"})
@@ -225,6 +267,9 @@ func opciones(desde_titulo := false) -> void:
 			return
 		if it[i].label == "EXPORTAR PARTIDA":
 			await exportar()
+			continue
+		if it[i].label == "IMPORTAR PARTIDA":
+			await importar(desde_titulo)
 			continue
 		match it[i].label:
 			"MÚSICA":

@@ -379,14 +379,14 @@ func ropa_mapa(g):
 	for k in D.ROPA:
 		var i := ropa_v(k)
 		var s = D.ROPA[k].src.get(g)
+		id += str(i)
 		if i == 0 or s == null or i >= D.ROPA[k].v.size():
 			continue
-		id += k.substr(0, 1) + str(i)
 		for j in s.size():
 			var d = D.ROPA[k].v[i][j + 1]
 			if s[j] != null and d != null:
 				m[s[j]] = d
-	return [m, id] if id != "" else null
+	return [m, id] if not m.is_empty() else null   # id: el color de cada pieza, en orden (1.22)
 
 func ropa_c(f, g):
 	var r = ropa_mapa(g) if f != null else null
@@ -798,7 +798,7 @@ func interact() -> void:
 			else:
 				await npc_talk(e.def)
 				if not e.get("pat"):
-					saludo(e.id.substr(5) if e.id.begins_with("club_") else e.id))
+					saludo(e.id.substr(5) if e.id.begins_with("club_") else ("darko" if e.id == "darko2" else e.id)))
 		return
 	var it = item_at(tx, ty)
 	if it:

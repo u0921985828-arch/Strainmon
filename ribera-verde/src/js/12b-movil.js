@@ -42,9 +42,11 @@ async function llamarFijo(f){
   if(f.dia===S.day){await say(`${f.n} ya ha venido hoy.`);return false;}
   if(!ZONAS[S.map]){await say(`${f.n}: «¿Dónde estás? Quedamos en la calle».`);return false;}
   if(SOSP.alarma){await say(`${f.n}: «¿Con la policía detrás? Ni de broma».`);return false;}
-  const ct=CTYPES[f.t];f.dia=S.day;S.heat=Math.min(100,S.heat+1);
+  const ct=CTYPES[f.t];S.heat=Math.min(100,S.heat+1);
   await say(`${f.n}: «Vale, voy para allá».`);
   advanceTime(LLAMADA_MIN);updateHUD();
+  if(!S.fijos.some(x=>x.id===f.id))return true;   // 1.22: se ha largado a medianoche mientras venía (curroDia)
+  f.dia=S.day;
   await talkClient({id:'tel-'+f.id,fijo:true,fid:f.id,n:f.n.toUpperCase(),map:S.map,x:P.x,y:P.y,type:f.t,want:ri(ct.g[0],ct.g[1]),minThc:f.t==='pij'?Math.min(24,15+S.ch):0});
   return true;
 }

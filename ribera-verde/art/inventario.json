@@ -1,5 +1,5 @@
 {
-  "generado": "2026-10-12",
+  "generado": "2026-10-13",
   "tiles_suelo": [
     "bridgeB",
     "bridgeT",
@@ -143,6 +143,7 @@
     "carro",
     "counter",
     "crate",
+    "cuadro",
     "display",
     "fence",
     "fountain",
@@ -163,6 +164,7 @@
     "seto",
     "shelfW",
     "sign",
+    "sillon",
     "sofa",
     "stool",
     "table",
@@ -197,8 +199,13 @@
     "ane",
     "nerea",
     "bixente",
+    "miren",
     "andoni",
     "ibarbitarra",
+    "portero",
+    "arrieta",
+    "txomin",
+    "portera",
     "judge",
     "cliente1",
     "cliente2",
@@ -231,8 +238,13 @@
     "ane",
     "nerea",
     "bixente",
+    "miren",
     "andoni",
     "ibarbitarra",
+    "portero",
+    "arrieta",
+    "txomin",
+    "portera",
     "judge"
   ],
   "npcs": [
@@ -387,10 +399,52 @@
       "deambula": false
     },
     {
+      "id": "miren",
+      "look": "miren",
+      "mapa": "errotabarri",
+      "deambula": false
+    },
+    {
       "id": "ibarbitarra",
       "look": "ibarbitarra",
       "mapa": "ensanche",
       "deambula": true
+    },
+    {
+      "id": "club_puerto",
+      "look": "portero",
+      "mapa": "puerto",
+      "deambula": false
+    },
+    {
+      "id": "club_valde",
+      "look": "portera",
+      "mapa": "valdehierro",
+      "deambula": false
+    },
+    {
+      "id": "club_ibar",
+      "look": "portero",
+      "mapa": "ibarbide",
+      "deambula": false
+    },
+    {
+      "id": "club_ens",
+      "look": "portera",
+      "mapa": "ensanche",
+      "deambula": false
+    },
+    {
+      "id": "arrieta",
+      "look": "arrieta",
+      "mapa": "valdehierro",
+      "deambula": false
+    },
+    {
+      "id": "txomin",
+      "look": "txomin",
+      "mapa": "callejon",
+      "deambula": false
     }
   ],
   "plantas": {
@@ -461,6 +515,7 @@
     "fondo-ladron",
     "fondo-policia",
     "frente:ladron",
+    "frente:darko",
     "frente:policia",
     "espalda:player"
   ],

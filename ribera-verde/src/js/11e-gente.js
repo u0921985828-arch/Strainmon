@@ -20,17 +20,18 @@ function curroDia(){
     if(S.money<J.sueldo){C.jard=null;confia('begona',-10);queue('jard',()=>talk('SMS · BEGOÑA',['Sin cobrar no vuelvo, majo. Cuando tengas el dinero, hablamos.']));}
     else{S.money-=J.sueldo;cuidarPlantas();S.heat=Math.min(100,S.heat+J.calor);}
   }
-  const fin=[];
+  const fin=[];let vende=false;
   for(const v of C.vend){
     const r=Math.random(),N='SMS · '+v.n.toUpperCase();
     if(r<V.pilla){fin.push(v);S.heat=Math.min(100,S.heat+V.calorPilla);confia(v.id,-5);queue('vend'+v.id,()=>talk(N,[`Me ha parado la policía. Se han quedado con ${gTxt(v.g)} de ${lotNombre(v.k)}. Lo siento.`]));continue;}
     if(r<V.pilla+V.estafa*(REL.max-rel(v.id))/REL.max){fin.push(v);S.fijos=S.fijos.filter(f=>f.id!==v.id);S.rel[v.id]=0;queue('vend'+v.id,()=>say(`${v.n} no contesta al móvil. Se ha largado con ${gTxt(v.g)} de ${lotNombre(v.k)}.`));continue;}
     const g=Math.min(Math.floor(v.g),ri(V.g[0],V.g[1])),e=Math.round(precioCalle(v.thc)*ZONAS.town.precio*g*(1-V.com));
-    v.g-=g;S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+V.calor);confia(v.id,1);
+    v.g-=g;S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+V.calor);confia(v.id,1);vende=true;
     if(v.g<1){fin.push(v);queue('vend'+v.id,()=>talk(N,[`Vendidos los últimos ${g} g: ${eur(e)} en tu buzón. Si quieres que siga, déjame más.`]));}
     else queue('vend'+v.id,()=>talk(N,[`Vendidos ${g} g: ${eur(e)} en tu buzón. Me quedan ${gTxt(v.g)}.`]));
   }
   if(fin.length)C.vend=C.vend.filter(v=>!fin.includes(v));
+  if(vende)queue('historia',checkStory);   // 1.22: lo vendido cuenta para la historia
   plantillaDia();   // la plantilla (1.19, 11f-plantilla)
 }
 // regar, tratar las plagas con tu insecticida y rellenar garrafas y depósitos (Begoña y el gerente de la plantilla)
@@ -153,7 +154,7 @@ function vencerEncargoClub(){
 const CATA={g:.5,min:30},AROMAS=['cítrico','a pino','terroso','dulce','a especias','a gasóleo','afrutado','a incienso'];
 // el analizador de cannabinoides y terpenos: THC, CBD (del 0,2 al 1 % según el % índica) y el terpeno principal, por el aroma
 const TERPENOS={'cítrico':'limoneno','a pino':'pineno','terroso':'mirceno','dulce':'linalool','a especias':'cariofileno','a gasóleo':'mirceno y cariofileno','afrutado':'mirceno','a incienso':'humuleno'};
-const aromaDe=sid=>AROMAS[hashStr(sid)%AROMAS.length],cbdDe=sid=>Math.round(20+indDe(sid)*8)/100;
+const aromaDe=sid=>AROMAS[hashStr(sid)%AROMAS.length],cbdDe=sid=>Math.round(20+indDe(sid)*.8)/100;
 function notaCata(sid,thc){const ind=indDe(sid),a=aromaDe(sid),e=ind>=65?'relaja y pesa':ind<=35?'sube y despeja':'equilibrado';
   return `Aroma ${a}${S.items.analizador?' ('+TERPENOS[a]+')':''} · ${e} · ${S.items.analizador?pct(thc)+' % de THC':thc<12?'floja':thc<18?'media':thc<24?'fuerte':'muy fuerte'}`;}
 async function catar(k){

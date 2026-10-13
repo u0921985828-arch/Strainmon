@@ -8,26 +8,26 @@ Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: 
 
 | Familia | Claves del juego | Assets | Herramientas | Generaciones aprox. |
 |---|---|---|---|---|
-| Personajes | 49 | 25 | create_character · animate_character · create_image_pro (paso previo) | 1111 |
+| Personajes | 69 | 25 | create_character · animate_character · create_image_pro (paso previo) | 1111 |
 | Mapa · terreno | 22 | 6 | create_tiles_pro · create_building_kit · create_topdown_tileset · animate_image | 15 + sin documentar |
 | Mapa · objetos con el estilo del mapa | 26 | 13 | create_map_object (background_image + máscara) · animate_image | 14 + sin documentar |
 | Objetos sueltos en lote | 36 | 10 | create_1_direction_object (item_descriptions) · select_object_frames · animate_object | 180 + sin documentar |
 | Imágenes simples | 22 | 11 | create_image_pixflux (init_image + color_image) | 7 + sin documentar |
 | Se queda procedural | 2 | 1 | — | 0 |
-| Importado | 126 | 40 | importado | 0 + sin documentar |
+| Importado | 157 | 50 | importado | 0 + sin documentar |
 
-**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 261/261 claves.
+**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 312/312 claves.
 
 ## Orden de creación
 
 Las dependencias mandan: nada que use el estilo de otra cosa se genera antes de que esa otra esté aprobada.
 
 - **F1 · Ancla de estilo:** player.
-- **F3 · Personajes:** kiko, josune, baltasar, tono, begona, unai, patxi, txaro, inaki, cop, molina, darko, jurado, cliente1, cliente2, cliente3, cliente4, cliente5, cliente6, vfx-16, vfx-32.
-- **F4 · Entorno:** tiles-exterior, interior-home, interior-shop, interior-bar, tiles-interior-extra, edificio-home (tras tiles-exterior), edificio-shop (tras tiles-exterior), edificio-bar (tras tiles-exterior), edificio-gray (tras tiles-exterior), edificio-gray-puerta, edificio-comisaria, edificio-nave, edificio-caserio, edificio-caserio2, edificio-marinera, edificio-marinera2, edificio-marinera3, edificio-marinera4, edificio-ladrillo, edificio-fabrica, props-altura, prop-farola-alta, prop-gramola-alta, props-16, props-32, prop-arbol (tras tiles-exterior), prop-arbol-alto, prop-monte, prop-seto, prop-parada, prop-farola (tras tiles-exterior), prop-fuente (tras tiles-exterior), tiles-firmes, detalles-hierba, edificio-caserio3, edificio-borda, edificio-marinera5, edificio-marinera6, prop-manzano, prop-arbol-alto2.
+- **F3 · Personajes:** kiko, josune, baltasar, tono, begona, unai, patxi, txaro, inaki, cop, molina, darko, jurado, cliente1, cliente2, cliente3, cliente4, cliente5, miren, cliente6, vfx-16, vfx-32.
+- **F4 · Entorno:** tiles-exterior, interior-home, interior-shop, interior-bar, tiles-interior-extra, edificio-home (tras tiles-exterior), edificio-shop (tras tiles-exterior), edificio-bar (tras tiles-exterior), edificio-gray (tras tiles-exterior), edificio-gray-puerta, edificio-comisaria, edificio-nave, edificio-caserio, edificio-caserio2, edificio-marinera, edificio-marinera2, edificio-marinera3, edificio-marinera4, edificio-ladrillo, edificio-fabrica, props-altura, prop-farola-alta, prop-gramola-alta, props-16, props-32, prop-arbol (tras tiles-exterior), prop-arbol-alto, prop-monte, prop-seto, prop-parada, prop-farola (tras tiles-exterior), prop-fuente (tras tiles-exterior), tiles-firmes, detalles-hierba, edificio-caserio3, edificio-borda, edificio-marinera5, edificio-marinera6, prop-manzano, prop-arbol-alto2, edificio-casco, edificio-casco2, edificio-casco3, edificio-growcity, edificio-bloque, edificio-bloque2.
 - **F4b · Transiciones (opcional):** tileset-transiciones — opcional.
 - **F5 · Plantas:** planta-fases.
-- **F6 · Combate:** player-combate (tras player), ladron1-combate, ladron2-combate, ladron3-combate, policia-combate (tras cop), fondo-combate-ladron, fondo-combate-policia.
+- **F6 · Combate:** player-combate (tras player), ladron1-combate, darko-combate, ladron2-combate, ladron3-combate, policia-combate (tras cop), fondo-combate-ladron, fondo-combate-policia.
 - **F7 · Iconos y título:** iconos, cogollos-genoteca, titulo, burbujas.
 - **F8 · Pulido y cierre:** carpa-g150 (tras interior-home, tiles-interior-extra), carpa-g150-fuera (tras interior-home, tiles-interior-extra), carpa-m100 (tras carpa-g150), carpa-m100-fuera (tras carpa-g150-fuera), carpa-p60 (tras carpa-g150), carpa-p60-fuera (tras carpa-g150-fuera), macetas, focos, mesa-cultivo.
 
@@ -44,19 +44,19 @@ Rig humanoide: rotaciones coherentes y plantillas de animación a 1 generación 
 | tono | tono, tono2 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: tono.png | F3 | idle*, nudillos*, fumar* | 44 |
 | begona | begona | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: begona.png | F3 | idle*, walk*, cotillear* | 44 |
 | unai | kid, unai | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: unai.png | F3 | idle*, walk*, pelota* | 44 |
-| patxi | oldman, patxi | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: patxi.png | F3 | idle*, palomas* | 42 |
+| patxi | oldman, patxi, andoni, txomin | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: patxi.png | F3 | idle*, palomas* | 42 |
 | txaro | granny, txaro | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: txaro.png | F3 | idle*, punto* | 41 |
 | inaki | sailor, inaki | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: inaki.png | F3 | idle*, pipa*, cabo* | 43 |
 | cop | cop | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cop.png | F3 | idle*, walk*, radio* | 44 |
 | molina | molina | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: molina.png | F3 | idle*, fumar* | 41 |
 | darko | darko, darko2 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: darko.png | F3 | idle*, vapear* | 42 |
 | jurado | judge, jurado | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: jurado.png | F3 | idle*, notas* | 41 |
-| cliente1 | cliente1, excursionista | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente1.png | F3 | idle*, walk*, movil* | 44 |
-| cliente2 | cliente2, obrero | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente2.png | F3 | idle*, walk*, fumar* | 44 |
+| cliente1 | cliente1, excursionista, ibarbitarra, arrieta | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente1.png | F3 | idle*, walk*, movil* | 44 |
+| cliente2 | cliente2, obrero, portero, club_puerto, club_ibar | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente2.png | F3 | idle*, walk*, fumar* | 44 |
 | cliente3 | cliente3, turista | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente3.png | F3 | idle*, walk*, movil* | 44 |
-| cliente4 | cliente4 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente4.png | F3 | idle*, walk*, movil* | 44 |
-| cliente5 | cliente5 | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente5.png | F3 | idle*, walk*, fumar* | 44 |
-| cliente6 | cliente6, vecina | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente6.png | F3 | idle*, walk*, movil* | 44 |
+| cliente4 | cliente4, ane | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente4.png | F3 | idle*, walk*, movil* | 44 |
+| cliente5 | cliente5, nerea, portera, club_valde, club_ens | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente5.png | F3 | idle*, walk*, fumar* | 44 |
+| cliente6 | cliente6, vecina, bixente | create_character (v3) | v3: 8 direcciones, 32 px | previo create_image_pro (solo texto) · reference_image_base64: cliente6.png | F3 | idle*, walk*, movil* | 44 |
 | player-combate | espalda:player | create_character (v3) | v3: 8 direcciones, 64 px | previo create_image_pro (solo texto) · reference_image_base64: player-combate.png | F6 · tras player | idle*, golpe*, patada*, spray*, comer*, herido*, desmayo* | 46 |
 | ladron1-combate | ladron1, frente:ladron | create_character (v3) | v3: 8 direcciones, 64 px | previo create_image_pro (solo texto) · reference_image_base64: ladron1-combate.png | F6 | idle*, ataque*, herido*, huir* | 43 |
 | ladron2-combate | ladron2, frente:ladron | create_character (v3) | v3: 8 direcciones, 64 px | previo create_image_pro (solo texto) · reference_image_base64: ladron2-combate.png | F6 | idle*, ataque*, herido*, huir* | 43 |
@@ -147,6 +147,8 @@ Arte propio del repositorio que ya existe (Strainmon): se adapta en local (recor
 
 | Asset | Cubre | Herramienta | Lote | Entrada | Fase | Animaciones | Gen. |
 |---|---|---|---|---|---|---|---|
+| miren | miren | importado | — | solo texto | F3 | idle, walk, fumar | 0+? |
+| darko-combate | frente:darko | importado | — | solo texto | F6 | idle, ataque, herido, huir | 0+? |
 | edificio-gray-puerta | door_gray | importado | — | solo texto | F4 | — | 0+? |
 | edificio-comisaria | roofT_comisaria, roofB_comisaria, wall_comisaria, win_comisaria, door_comisaria | importado | — | solo texto | F4 | puerta | 0+? |
 | edificio-nave | roofT_nave, roofB_nave, wall_nave, win_nave, door_nave | importado | — | solo texto | F4 | puerta | 0+? |
@@ -177,7 +179,9 @@ Arte propio del repositorio que ya existe (Strainmon): se adapta en local (recor
 | carpa-c-extras | extra-c-vent, extra-c-filtro-28, extra-c-filtro-39, extra-c-garrafa-20, extra-c-garrafa-23, extra-c-garrafa-26, extra-c-garrafa-29, extra-c-llave, extra-c-deposito | importado | — | solo texto | F9 | — | 0+? |
 | iconos-equipo | — | importado | — | solo texto | F9 | — | 0+? |
 | props-escala | fridge, crate | importado | — | solo texto | F9 | — | 0+? |
-| salon | sofa, tv, gpc | importado | — | solo texto | F9 | — | 0+? |
+| salon | sofa, tv, gpc, carro, sillon | importado | — | solo texto | F9 | — | 0+? |
+| salon-pared | cuadro | importado | — | solo texto | F9 | — | 0+? |
+| vehiculos | — | importado | — | solo texto | F9 | patinete-atras, patinete-delante, bici-atras, bici-delante | 0+? |
 | iconos-menu | — | importado | — | solo texto | F9 | — | 0+? |
 | tiles-firmes | hormigon, pista, rotoT, rotoB | importado | — | solo texto | F4 | — | 0+? |
 | detalles-hierba | detalles | importado | — | solo texto | F4 | — | 0+? |
@@ -187,6 +191,12 @@ Arte propio del repositorio que ya existe (Strainmon): se adapta en local (recor
 | edificio-marinera6 | roofT_marinera6, roofB_marinera6, wall_marinera6, win_marinera6 | importado | — | solo texto | F4 | — | 0+? |
 | prop-manzano | manzano | importado | — | solo texto | F4 | — | 0+? |
 | prop-arbol-alto2 | tree2 | importado | — | solo texto | F4 | — | 0+? |
+| edificio-casco | roofT_casco, roofB_casco, wall_casco, win_casco | importado | — | solo texto | F4 | — | 0+? |
+| edificio-casco2 | roofT_casco2, roofB_casco2, wall_casco2, win_casco2 | importado | — | solo texto | F4 | — | 0+? |
+| edificio-casco3 | roofT_casco3, roofB_casco3, wall_casco3, win_casco3 | importado | — | solo texto | F4 | — | 0+? |
+| edificio-growcity | roofT_growcity, roofB_growcity, wall_growcity, win_growcity, door_growcity | importado | — | solo texto | F4 | puerta | 0+? |
+| edificio-bloque | roofT_bloque, roofB_bloque, wall_bloque, win_bloque | importado | — | solo texto | F4 | — | 0+? |
+| edificio-bloque2 | roofT_bloque2, roofB_bloque2, wall_bloque2, win_bloque2 | importado | — | solo texto | F4 | — | 0+? |
 
 ## Lotes compartidos
 

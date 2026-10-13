@@ -153,6 +153,7 @@ func new_day() -> void:
 		queue("penalty", penalty_event)
 	elif S.due > 0 and (S.deadline - S.day == 3 or S.deadline == S.day):   # 1.11: a 3 días y el último
 		queue("plazo", recuerdo_plazo)
+	queue("calor", heat_warn)   # 1.22: el olor de la noche también avisa
 
 # ---------- fenotipo ----------
 func tira_feno(sg: float) -> Dictionary:

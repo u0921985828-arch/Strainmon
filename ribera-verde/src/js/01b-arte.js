@@ -103,9 +103,9 @@ function dibujarPJ(e,look,now,cam,isP,dur){
 // ropa y pelo (1.21, ROPA en 12c-salon): el fotograma del protagonista (grupo g: player o player-combate) con sus colores
 function ropaMapa(g){
   const R=S&&S.ropa;if(!R)return null;const m={};let id='';
-  for(const k in ROPA){const i=R[k]|0,s=ROPA[k].src[g];if(!i||!s||!ROPA[k].v[i])continue;id+=k[0]+i;
+  for(const k in ROPA){const i=R[k]|0,s=ROPA[k].src[g];id+=i;if(!i||!s||!ROPA[k].v[i])continue;
     s.forEach((c,j)=>{const d=ROPA[k].v[i][j+1];if(c&&d)m[c]=d;});}
-  return id?[m,id]:null;
+  return Object.keys(m).length?[m,id]:null;   // id: el color de cada pieza, en orden (1.22; con la inicial, pantalón y pelo se pisaban en la caché)
 }
 const ropaC=(f,g)=>{const r=ropaMapa(g);return r?conRampa(f.c,r[0],'ropa|'+r[1]):f.c;};
 // ambiente: solo quieto, en pantalla y sin diálogo; al hablarle se corta

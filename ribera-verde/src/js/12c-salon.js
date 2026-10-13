@@ -28,17 +28,18 @@ async function cambiarDeco(k){
 // ropa y pelo (1.21): en la cama del piso, la camiseta, el pantalón, la gorra y el pelo del protagonista (S.ropa[k], el índice en
 // ROPA[k].v; 0 = el de serie). El dibujo es el mismo: cambian sus colores exactos (conRampa, 01b-arte: ropaC) en los fotogramas de
 // player y de player-combate. src[grupo]: sus colores de serie [claro, medio, oscuro] (null: ese tono no está); cada color, el nombre
-// y los tres. El pelo de player lleva dos colores propios (tools/sprites/a-mano/player_pelo.py), que no están en la cara
+// y los tres. El pelo de player lleva dos colores propios (tools/sprites/a-mano/player_pelo.py), que no están en la cara, y la gorra, la
+// camiseta, el pantalón y el pelo de combate, los suyos (player_ropa.py, 1.22): las zapatillas, la regadera y la planta no cambian
 const ROPA={
-  camiseta:{n:'Camiseta',src:{player:[null,'#c83838','#a03030'],'player-combate':[null,'#c83838','#a03030']},
+  camiseta:{n:'Camiseta',src:{player:[null,'#c83839','#a03031'],'player-combate':[null,'#c83839','#a03031']},
     v:[['Roja'],['Azul','#5a8ae0','#3a6ac8','#2a4a98'],['Negra','#4a4a54','#34343c','#24242a'],['Blanca','#ffffff','#e4e4e8','#b4b4bc'],
       ['Amarilla','#f0d060','#e0b830','#b08a20'],['Verde','#6ab870','#3a8a4a','#2a6a38'],['Morada','#9a6ac8','#7a4aa8','#583480']]},
-  pantalon:{n:'Pantalón',src:{player:['#6c7482','#36466e',null],'player-combate':['#385896','#24345c',null]},
+  pantalon:{n:'Pantalón',src:{player:['#6c7483','#36466f',null],'player-combate':['#385897','#24345d',null]},
     v:[['Vaquero'],['Negro','#4a4a54','#2a2a30',null],['Gris','#9a9aa4','#686874',null],['Marrón','#8a6a4a','#5a4030',null],['Caqui','#8a8a5a','#5e6040',null]]},
-  gorra:{n:'Gorra',src:{player:['#5aa860','#2a8a5a',null],'player-combate':['#5aa860','#3f8a46','#2a6a40']},
+  gorra:{n:'Gorra',src:{player:['#5aa861','#2a8a5b',null],'player-combate':['#5aa861','#3f8a47','#2a6a41']},
     v:[['Verde'],['Roja','#e06060','#b83838','#8a2828'],['Azul','#6a90d8','#3a62b0','#2a4880'],['Negra','#54545e','#34343c','#24242a'],
       ['Blanca','#ffffff','#d8d8e0','#a8a8b4'],['Amarilla','#f0d060','#d0a828','#a08020']]},
-  pelo:{n:'Pelo',src:{player:['#7a5a3b','#4a2a2b',null],'player-combate':['#483e36','#2a2030',null]},
+  pelo:{n:'Pelo',src:{player:['#7a5a3b','#4a2a2b',null],'player-combate':['#483e37','#2a2031',null]},
     v:[['Castaño'],['Negro','#3a3438','#1e1a20',null],['Rubio','#e8c878','#c8a050',null],['Pelirrojo','#c86a3a','#9a4420',null],['Canoso','#c0c0c8','#90909a',null]]}};
 const ropaV=k=>(S&&S.ropa&&S.ropa[k])||0;
 async function vestirte(){

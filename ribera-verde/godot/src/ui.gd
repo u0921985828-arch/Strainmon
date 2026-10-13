@@ -444,12 +444,12 @@ func _estilos() -> void:
 	pon_letra(toast_txt, letra, 9 * us, INK)
 	toast_txt.add_theme_font_override("bold_font", negrita)
 	toast_txt.add_theme_constant_override("line_separation", roundi(12 * us - letra.get_height(roundi(9 * us))))
-	hud.add_theme_stylebox_override("panel", plana(Color(16 / 255.0, 28 / 255.0, 22 / 255.0, .78), 3 * u, 2 * u, 4 * u))
+	hud.add_theme_stylebox_override("panel", plana(Color(16 / 255.0, 28 / 255.0, 22 / 255.0, .78), HUD_R * u, HUD_PV * u, HUD_PH * u))
 	hud_txt.add_theme_font_override("normal_font", negrita)
-	hud_txt.add_theme_font_size_override("normal_font_size", maxi(5, roundi(7.5 * u)))
+	hud_txt.add_theme_font_size_override("normal_font_size", maxi(5, roundi(HUD_FS * u)))
 	hud_txt.add_theme_color_override("default_color", Color("#eef8f0"))
-	hud_txt.add_theme_constant_override("line_separation", roundi(9 * u - negrita.get_height(roundi(7.5 * u))))
-	hud_bar.custom_minimum_size = Vector2(0, 9 * u)
+	hud_txt.add_theme_constant_override("line_separation", roundi(HUD_LH * u - negrita.get_height(roundi(HUD_FS * u))))
+	hud_bar.custom_minimum_size = Vector2(0, HUD_LH * u)
 	vc_info.add_theme_stylebox_override("panel", caja(u, 3, 4))
 	for b in [bE, bP]:
 		b.add_theme_stylebox_override("panel", caja(u, 3, 6))
@@ -686,7 +686,7 @@ func suelta_todo() -> void:
 static func limpia_texto(s: String, mx: int) -> String:
 	return RegEx.create_from_string("[^\\p{L}\\p{N} #'.\\-]").sub(s, "", true).strip_edges().substr(0, mx)
 
-func pedir_texto(txt: String, ini := "", mx := 12, mayus := false, cancela := true):
+func pedir_texto(txt: String, ini := "", mx := 12, mayus := false, cancela := true, crudo := false):   # crudo (1.22): el texto tal cual (la partida importada)
 	if gancho_pedir.is_valid():
 		return gancho_pedir.call(txt, ini, mx, cancela)
 	var pr := Motor.Prom.new()
@@ -700,7 +700,7 @@ func pedir_texto(txt: String, ini := "", mx := 12, mayus := false, cancela := tr
 	name_in.grab_focus.call_deferred()
 	push(func(b: String):
 		if b == "A" or (b == "B" and cancela):
-			var v = limpia_texto(name_in.text, mx) if b == "A" else null
+			var v = (name_in.text.strip_edges() if crudo else limpia_texto(name_in.text, mx)) if b == "A" else null
 			name_box.hide()
 			name_in.release_focus()
 			pop()
@@ -1204,7 +1204,7 @@ func _coloca() -> void:
 		name_box.position = R.get_center() - name_box.size / 2
 	if hud.visible:
 		hud.reset_size()
-		hud.position = scr.position + Vector2(3 * u, 3 * u)
+		hud.position = scr.position + Vector2(HUD_M * u, HUD_M * u)
 	if vc_info.visible:
 		vc_info.position = Vector2(3 * u, 3 * u)
 		vc_info.size = Vector2(66 * u, 0)
@@ -1337,24 +1337,36 @@ func hud_pon(t: String, heat: int, sosp := -1, alarma := false, orden := false) 
 	hud_bar.queue_redraw()
 	_coloca.call_deferred()
 
+# el HUD (1.22, más pequeño): los mismos números que .hud en el CSS
+const HUD_FS := 6.5   # letra
+const HUD_LH := 7.5   # alto de línea
+const HUD_M := 2.0    # margen a la pantalla
+const HUD_PV := 1.5
+const HUD_PH := 3.0
+const HUD_R := 2.0
+const HUD_BW := 28.0  # barra
+const HUD_BH := 2.5
+const HUD_GAP := 2.5
+
 func _pinta_hud_bar() -> void:
 	var f := negrita
-	var fs := roundi(7.5 * u)
+	var fs := roundi(HUD_FS * u)
+	var lh := HUD_LH * u
 	var eti := "ORDEN" if hud_orden else "CALOR"
-	hud_bar.draw_string(f, Vector2(0, f.get_ascent(fs) + (9 * u - f.get_height(fs)) / 2), eti, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#eef8f0"))
-	var x := f.get_string_size(eti, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 3 * u
-	var y := (9 * u - 3 * u) / 2
-	hud_bar.draw_rect(Rect2(x, y, 34 * u, 3 * u), Color("#2e3a34"))
-	hud_bar.draw_rect(Rect2(x, y, 34 * u * hud_heat / 100.0, 3 * u), Color("#f04040") if hud_heat >= 70 else Color("#f0a030"))
-	var w := x + 34 * u
+	hud_bar.draw_string(f, Vector2(0, f.get_ascent(fs) + (lh - f.get_height(fs)) / 2), eti, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#eef8f0"))
+	var x := f.get_string_size(eti, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + HUD_GAP * u
+	var y := (lh - HUD_BH * u) / 2
+	hud_bar.draw_rect(Rect2(x, y, HUD_BW * u, HUD_BH * u), Color("#2e3a34"))
+	hud_bar.draw_rect(Rect2(x, y, HUD_BW * u * hud_heat / 100.0, HUD_BH * u), Color("#f04040") if hud_heat >= 70 else Color("#f0a030"))
+	var w := x + HUD_BW * u
 	if hud_sosp >= 0:
 		var et := "¡ALARMA!" if hud_alarma else "SOSPECHA"
-		hud_bar.draw_string(f, Vector2(0, 9 * u + f.get_ascent(fs) + (9 * u - f.get_height(fs)) / 2), et, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#eef8f0"))
-		var x2 := f.get_string_size(et, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 3 * u
-		hud_bar.draw_rect(Rect2(x2, 9 * u + y, 34 * u, 3 * u), Color("#2e3a34"))
-		hud_bar.draw_rect(Rect2(x2, 9 * u + y, 34 * u * (100 if hud_alarma else hud_sosp) / 100.0, 3 * u), Color("#f04040") if hud_alarma else Color("#e8d040"))
-		w = maxf(w, x2 + 34 * u)
-	hud_bar.custom_minimum_size = Vector2(w, 18 * u if hud_sosp >= 0 else 9 * u)
+		hud_bar.draw_string(f, Vector2(0, lh + f.get_ascent(fs) + (lh - f.get_height(fs)) / 2), et, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#eef8f0"))
+		var x2 := f.get_string_size(et, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + HUD_GAP * u
+		hud_bar.draw_rect(Rect2(x2, lh + y, HUD_BW * u, HUD_BH * u), Color("#2e3a34"))
+		hud_bar.draw_rect(Rect2(x2, lh + y, HUD_BW * u * (100 if hud_alarma else hud_sosp) / 100.0, HUD_BH * u), Color("#f04040") if hud_alarma else Color("#e8d040"))
+		w = maxf(w, x2 + HUD_BW * u)
+	hud_bar.custom_minimum_size = Vector2(w, lh * 2 if hud_sosp >= 0 else lh)
 
 # ---------- ficha de la carpa (vcInfo): [título, [líneas]] · una línea que empieza por «!» va en rojo ----------
 var vc_lineas := []

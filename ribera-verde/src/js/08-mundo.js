@@ -162,7 +162,7 @@ function interact(){
   const [dx,dy]=DV[P.dir],m=MAPS[S.map];let tx=P.x+dx,ty=P.y+dy;
   let e=entAt(tx,ty);
   if(!e&&m.o[ty]&&COUNTERS.has(m.o[ty][tx]))e=entAt(tx+dx,ty+dy);
-  if(e){run(async()=>{if(!e.moving)e.dir=OPP[P.dir];if(e.def.client)await talkClient(e.def.client);else{await e.def.talk(e);if(!e.pat)saludo(e.id.startsWith('club_')?e.id.slice(5):e.id);}});return;}
+  if(e){run(async()=>{if(!e.moving)e.dir=OPP[P.dir];if(e.def.client)await talkClient(e.def.client);else{await e.def.talk(e);if(!e.pat)saludo(e.id.startsWith('club_')?e.id.slice(5):e.id==='darko2'?'darko':e.id);}});return;}
   const it=itemAt(tx,ty);if(it){run(()=>pickItem(it));return;}
   run(()=>objectAction(tx,ty));
 }

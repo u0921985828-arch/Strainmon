@@ -75,7 +75,7 @@ function cuidarCasa(w){
 }
 // al amanecer (desde curroDia): sueldos, el gerente, la calle y la nave
 function plantillaDia(){
-  const P=PLANTILLA,fuera=[];naveAlquiler();
+  const P=PLANTILLA,fuera=[];let vende=false;naveAlquiler();
   for(const w of S.plantilla){if(w.rol!=='gerente'&&w.rol!=='nave')continue;
     if(S.money<P.sueldo[w.rol]){w.rol=null;queue('pl'+w.id,()=>talk('SMS · '+w.n.toUpperCase(),['Sin cobrar no curro. Cuando tengas el dinero, me llamas.']));}
     else S.money-=P.sueldo[w.rol];}
@@ -88,11 +88,12 @@ function plantillaDia(){
     else if(r<pf){fuera.push(w);const g=w.g;queue('pl'+w.id,()=>say(`${w.n} no contesta al móvil. Se ha largado con ${gTxt(g)} de ${lote}.`));continue;}
     else{const q=Math.min(Math.floor(w.g),ri(P.g[0],P.g[1])*w.lab);w.g-=q;
       if(r<pt)m=`Me han pagado ${q} g con billetes falsos. No me he dado cuenta hasta el banco.`;
-      else{const e=Math.round(precioCalle(w.thc)*ZONAS.town.precio*q*(1-P.com));S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+P.calor);
+      else{const e=Math.round(precioCalle(w.thc)*ZONAS.town.precio*q*(1-P.com));S.money+=e;S.sales+=e;S.heat=Math.min(100,S.heat+P.calor);vende=true;
         m=w.g>=1?`Vendidos ${q} g: ${eur(e)} en tu buzón. Me quedan ${gTxt(w.g)}.`:`Vendidos los últimos ${q} g: ${eur(e)} en tu buzón. Dame más cuando quieras.`;}}
     if(w.g<1)libre(w);queue('pl'+w.id,()=>talk(N,[m]));
   }
   if(fuera.length)S.plantilla=S.plantilla.filter(w=>!fuera.includes(w));
+  if(vende)queue('historia',checkStory);   // 1.22: lo vendido cuenta para la historia
   naveDia();
 }
 // la nave: el alquiler, lo primero de la mañana (antes que los sueldos; sin él, Arrieta cambia la cerradura y se queda la fianza)

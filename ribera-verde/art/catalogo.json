@@ -1,6 +1,6 @@
 {
  "generado": "tools/sprites/catalogo.js",
- "claves": 261,
+ "claves": 312,
  "catalogo": {
   "look:player": [
    {
@@ -138,6 +138,42 @@
    }
   ],
   "npc:patxi": [
+   {
+    "asset": "patxi",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:andoni": [
+   {
+    "asset": "patxi",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:andoni": [
+   {
+    "asset": "patxi",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:txomin": [
+   {
+    "asset": "patxi",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:txomin": [
    {
     "asset": "patxi",
     "familia": "personaje",
@@ -290,6 +326,42 @@
     "depende_de": []
    }
   ],
+  "look:ibarbitarra": [
+   {
+    "asset": "cliente1",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:ibarbitarra": [
+   {
+    "asset": "cliente1",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:arrieta": [
+   {
+    "asset": "cliente1",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:arrieta": [
+   {
+    "asset": "cliente1",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
   "look:cliente2": [
    {
     "asset": "cliente2",
@@ -309,6 +381,33 @@
    }
   ],
   "npc:obrero": [
+   {
+    "asset": "cliente2",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:portero": [
+   {
+    "asset": "cliente2",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:club_puerto": [
+   {
+    "asset": "cliente2",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:club_ibar": [
    {
     "asset": "cliente2",
     "familia": "personaje",
@@ -353,11 +452,92 @@
     "depende_de": []
    }
   ],
+  "look:ane": [
+   {
+    "asset": "cliente4",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:ane": [
+   {
+    "asset": "cliente4",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
   "look:cliente5": [
    {
     "asset": "cliente5",
     "familia": "personaje",
     "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:nerea": [
+   {
+    "asset": "cliente5",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:nerea": [
+   {
+    "asset": "cliente5",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:portera": [
+   {
+    "asset": "cliente5",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:club_valde": [
+   {
+    "asset": "cliente5",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:club_ens": [
+   {
+    "asset": "cliente5",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:miren": [
+   {
+    "asset": "miren",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:miren": [
+   {
+    "asset": "miren",
+    "familia": "importado",
+    "herramienta": "importado",
     "fase": "F3",
     "depende_de": []
    }
@@ -381,6 +561,24 @@
    }
   ],
   "npc:vecina": [
+   {
+    "asset": "cliente6",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "look:bixente": [
+   {
+    "asset": "cliente6",
+    "familia": "personaje",
+    "herramienta": "create_character",
+    "fase": "F3",
+    "depende_de": []
+   }
+  ],
+  "npc:bixente": [
    {
     "asset": "cliente6",
     "familia": "personaje",
@@ -428,6 +626,15 @@
     "asset": "ladron3-combate",
     "familia": "personaje",
     "herramienta": "create_character",
+    "fase": "F6",
+    "depende_de": []
+   }
+  ],
+  "combate:frente:darko": [
+   {
+    "asset": "darko-combate",
+    "familia": "importado",
+    "herramienta": "importado",
     "fase": "F6",
     "depende_de": []
    }
@@ -2428,6 +2635,33 @@
     "depende_de": []
    }
   ],
+  "obj:carro": [
+   {
+    "asset": "salon",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "obj:sillon": [
+   {
+    "asset": "salon",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
+  "obj:cuadro": [
+   {
+    "asset": "salon-pared",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F9",
+    "depende_de": []
+   }
+  ],
   "tile:hormigon": [
    {
     "asset": "tiles-firmes",
@@ -2629,6 +2863,231 @@
   "obj:tree2": [
    {
     "asset": "prop-arbol-alto2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_casco": [
+   {
+    "asset": "edificio-casco",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_casco": [
+   {
+    "asset": "edificio-casco",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_casco": [
+   {
+    "asset": "edificio-casco",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_casco": [
+   {
+    "asset": "edificio-casco",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_casco2": [
+   {
+    "asset": "edificio-casco2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_casco2": [
+   {
+    "asset": "edificio-casco2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_casco2": [
+   {
+    "asset": "edificio-casco2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_casco2": [
+   {
+    "asset": "edificio-casco2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_casco3": [
+   {
+    "asset": "edificio-casco3",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_casco3": [
+   {
+    "asset": "edificio-casco3",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_casco3": [
+   {
+    "asset": "edificio-casco3",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_casco3": [
+   {
+    "asset": "edificio-casco3",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_growcity": [
+   {
+    "asset": "edificio-growcity",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_growcity": [
+   {
+    "asset": "edificio-growcity",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_growcity": [
+   {
+    "asset": "edificio-growcity",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_growcity": [
+   {
+    "asset": "edificio-growcity",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:door_growcity": [
+   {
+    "asset": "edificio-growcity",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_bloque": [
+   {
+    "asset": "edificio-bloque",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_bloque": [
+   {
+    "asset": "edificio-bloque",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_bloque": [
+   {
+    "asset": "edificio-bloque",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_bloque": [
+   {
+    "asset": "edificio-bloque",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofT_bloque2": [
+   {
+    "asset": "edificio-bloque2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:roofB_bloque2": [
+   {
+    "asset": "edificio-bloque2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:wall_bloque2": [
+   {
+    "asset": "edificio-bloque2",
+    "familia": "importado",
+    "herramienta": "importado",
+    "fase": "F4",
+    "depende_de": []
+   }
+  ],
+  "tile:win_bloque2": [
+   {
+    "asset": "edificio-bloque2",
     "familia": "importado",
     "herramienta": "importado",
     "fase": "F4",
