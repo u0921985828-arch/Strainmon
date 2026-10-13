@@ -26,8 +26,9 @@ function migrate(){
   if(S.ch===3&&!S.flags.metB&&!(S.due>0)){S.due=PLAZOS[3];S.deadline=S.day+7;S.flags.tono=S.day;}
   if(S.flags.metB&&!('tono' in S.flags))S.flags.tono=S.day;   // ya conoces a Toño: sale en el móvil (12b-movil)
   if(S.protect&&!S.protHasta)S.protHasta=S.day+CUOTA_DIAS;
-  for(const k in S.custom){   // 1.11: los cruces con nombre largo («A × B», de antes) pasan a uno corto, con la misma clave
-    const C=S.custom[k];if(!C.n.includes(' × ')&&C.n.length<=NOM_MAX)continue;
+  for(const k in S.custom){   // 1.11: los cruces con nombre largo («A × B», de antes) pasan a uno corto, con la misma clave; 1.24: y
+    // los que se llaman como una variedad nueva (Purple Thai × Haze, sin receta antes, se llamaba «Purple Haze»)
+    const C=S.custom[k];if(!C.n.includes(' × ')&&C.n.length<=NOM_MAX&&!DEX.some(d=>STRAINS[d].n.toLowerCase()===C.n.toLowerCase()))continue;
     const p=C.n.split(' × '),t=palabras(C.n),h=Math.ceil(t.length/2),wa=p.length>1?palabras(p[0]):t.slice(0,h),wb=p.length>1?palabras(p[p.length-1]):t.slice(h);
     C.n=nombreCruce(wa,wb,n=>DEX.some(d=>STRAINS[d].n.toLowerCase()===n.toLowerCase())||Object.values(S.custom).some(c=>c!==C&&c.n.toLowerCase()===n.toLowerCase()));
   }

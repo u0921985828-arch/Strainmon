@@ -65,7 +65,7 @@
 | 57 | Sour Diesel | 27% | 450 | 4 | 60% | 30 % | cruce (F1 en la mesa) | `#90b448` | `#6fa53e` | Cruce: Chemdawg × Super Skunk · ≈ origen incierto |
 | 58 | Kali 47 | 21% | 450 | 3,5 | 65% | 30 % | cruce (F1 en la mesa) | `#b0cc68` | `#72a63e` | Cruce: Kali Mist × AK-47 |
 | 59 | Critical Kali Mist | 21% | 530 | 3,5 | 75% | 45 % | cruce (F1 en la mesa) | `#98c058` | `#5c9a48` | Cruce: Critical Mass × Kali Mist |
-| 60 | Kerala | 16% | 350 | 5 | 50% | 25 % | landrace | `#b8cc60` | `#76a63e` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 4; llega al día siguiente) |
+| 60 | Kerala | 16% | 350 | 5 | 50% | 10 % | landrace | `#b8cc60` | `#82a73e` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 4; llega al día siguiente) |
 | 61 | Lebanese | 14% | 380 | 3 | 75% | 85 % | landrace | `#a4b45c` | `#4f9a3c` | Banco de semillas del PC, sobre de 10 por 25 € (cap. 3; llega al día siguiente) |
 | 62 | Manga Rosa | 15% | 380 | 4,5 | 55% | 5 % | landrace | `#c4c060` | `#86a83e` | Banco de semillas del PC, sobre de 10 por 35 € (cap. 4; llega al día siguiente) |
 | 63 | Durban Poison | 18% | 430 | 3,5 | 65% | 0 % | landrace | `#b4d060` | `#8aa83e` | Banco de semillas del PC, sobre de 10 por 40 € (cap. 5; llega al día siguiente) |
@@ -142,9 +142,9 @@ Las landraces y los híbridos clásicos de la 1.9 salen del catálogo de Strainm
 | Lebanese | Landrace · valle de la Bekaa, Líbano | La planta del hachís libanés: baja, de tallos finos y pocas ramas, hoja ancha de verde medio y cogollo resinoso con bastante hoja. Efecto narcótico. |
 | Manga Rosa | Landrace · nordeste de Brasil | Sativa brasileña de cogollo largo y pistilos rosados, con aroma a fruta tropical. |
 | Durban Poison | Landrace · puerto de Durban, Sudáfrica | Sativa sudafricana, rápida para su tipo y muy resinosa. Aroma dulce, a anís, y efecto claro. |
-| White Widow | sativa de Brasil × planta resinosa del sur de la India · ≈ origen incierto | Se cubre de tricomas hasta verse blanca. Arrasó a mediados de los noventa. En la mesa: Manga Rosa × Kerala. |
+| White Widow | sativa de Brasil × planta resinosa del sur de la India · ≈ origen incierto | Se cubre de tricomas hasta verse blanca. Arrasó a mediados de los noventa. Su padre fue una índica resinosa del sur de la India sin documentar, por eso sale más índica que las sativas de la mesa: Manga Rosa × Kerala. |
 | Purple Haze | Purple Thai × Haze · ≈ origen incierto | Una Haze morada: el efecto eléctrico de la Haze con el color de la Purple Thai. |
-| White Russian | White Widow × AK-47 | La White Widow con la AK-47: todavía más resina y floración corta. Premiada a finales de los noventa. |
+| White Russian | White Widow × AK-47 | La White Widow con la AK-47: todavía más resina y floración corta. Premiada a mediados de los noventa. |
 | Blue Widow | Blueberry × White Widow | La White Widow con el dulzor y el azul de la Blueberry. |
 | Super Lemon Haze | Lemon Skunk × Super Silver Haze | Limón y escarcha: la Super Silver Haze con la Lemon Skunk. Campeona dos años seguidos a finales de los 2000. |
 

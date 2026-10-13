@@ -804,7 +804,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   }, () => R.n1 === 'Madre Lima' && R.esq === '9995' && R.n2 === 'Madre Lima' && R.esq2 === 0 && R.seeds === '{"ria":2}' && R.lab && R.n3 === false
     && LOG.some(l => l === '  [texto] Nombre de la planta (y sus esquejes) → Madre Lima') && LOG.some(l => l === '  [texto] Nombre de la planta (y sus esquejes) → (B)')
     && LOG.some(l => l.startsWith('Cortas una punta de la Skunk #1 «Madre Lima»')) && LOG.some(l => l === 'Sin nombre: vuelve a ser la nº 9995.') || R);
-  await step('Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave; se cambia el nombre de una propia (sin repetir otro); el recetario, con las 37 y de dónde sale cada semilla',
+  await step('Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave (y las que se llaman como una variedad, 1.24); se cambia el nombre de una propia (sin repetir otro); el recetario, con las 37 y de dónde sale cada semilla',
     ['GENOTECA', 'DIARIO DE LA TÍA', 'Skunk #1$', 'Volver', '<B>', '^★ Skunk Haze', '=Haze Corta', '^★ Haze Corta', '=skunk #1', '<B>', 'SALIR'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); S.custom = {}; S.map = 'home';
     const Rn = rngSeed(7), pool = DEX.slice();
@@ -812,12 +812,12 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     const ns = Object.values(S.custom).map(c => c.n);
     window.R = { n: ns.length, x: ns.filter(n => n.includes('×')).length, max: Math.max(...ns.map(n => n.length)), rep: ns.length - new Set(ns).size, dex: ns.filter(n => DEX.some(k => STRAINS[k].n === n)).length };
     const base = { thc: 15, y: 400, d: 9, r: 50, o: 'x', c: '#5a8a3a' };
-    S.custom = { xv1: Object.assign({ n: 'Skunk #1 × Lemon Haze F5' }, base), xv2: Object.assign({ n: 'Northern Lights Haze Skunk Lemon Thai' }, base), xv3: Object.assign({ n: 'Thai Haze' }, base) };
-    S.disc = Object.assign({}, S.disc, { xv1: true, xv2: true, xv3: true }); migrate(); R.mig = Object.keys(S.custom).map(k => k + ':' + S.custom[k].n).join('|');
+    S.custom = { xv1: Object.assign({ n: 'Skunk #1 × Lemon Haze F5' }, base), xv2: Object.assign({ n: 'Northern Lights Haze Skunk Lemon Thai' }, base), xv3: Object.assign({ n: 'Thai Haze' }, base), xv4: Object.assign({ n: 'Purple Haze' }, base) };
+    S.disc = Object.assign({}, S.disc, { xv1: true, xv2: true, xv3: true, xv4: true }); migrate(); R.mig = Object.keys(S.custom).map(k => k + ':' + S.custom[k].n).join('|');
     await run(startMenu); R.ren = S.custom.xv1.n;
     const Rc = recetas(), hojas = [...new Set(Object.values(Rc).flat().flatMap(o => o.k))];
     R.rec = Object.keys(Rc).length; R.sin = hojas.filter(k => dondeSemilla(k) === 'Semillas: .').join(); R.parque = dondeSemilla('acapulco'); R.ss = Rc.txoko.map(recetaTxt).join('|'); R.diario = Object.keys(Rc).filter(t => !diarioTxt(t)).join(); S = S0;
-  }, () => R.n > 50 && R.x === 0 && R.max <= 20 && R.rep === 0 && R.dex === 0 && R.mig === 'xv1:Skunk Haze|xv2:Northern Thai|xv3:Thai Haze' && R.ren === 'Haze Corta'
+  }, () => R.n > 50 && R.x === 0 && R.max <= 20 && R.rep === 0 && R.dex === 0 && R.mig === 'xv1:Skunk Haze|xv2:Northern Thai|xv3:Thai Haze|xv4:Haze Purple' && R.ren === 'Haze Corta'
     && R.rec === 37 && R.sin === '' && R.diario === '' && R.parque === 'Semillas: escondidas en el parque del barrio.' && R.ss === 'Skunk #1 × Afghani, en ese orden'
     && LOG.some(l => l === '  [texto] Nuevo nombre de la variedad → Haze Corta') && LOG.some(l => l === 'Ya hay una variedad con ese nombre.') && LOG.some(l => /\[menú\] .*Afghani.*Volver  → Volver/.test(l)) || R);
   await step('Exportar partida (1.11): OPCIONES → EXPORTAR PARTIDA copia el JSON de la partida', ['OPCIONES', 'EXPORTAR', 'VOLVER', 'SALIR'], async () => {

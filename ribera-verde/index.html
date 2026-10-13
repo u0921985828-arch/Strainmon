@@ -733,7 +733,7 @@ function makeMisc(){
    ========================================================= */
 // Variedades reales (nombres de uso común entre cultivadores; ningún banco de semillas, criador ni persona). Los ids internos
 // son los de las primeras versiones para no romper partidas guardadas (1.11: algunos cambian de variedad). c = tono del cogollo.
-// h = historia (Genoteca). gen (1.11): generación del árbol de híbridos clásicos (1.ª, 2.ª o 3.ª); «≈ origen incierto» en o
+// h = historia (Genoteca). gen (1.11): generación del árbol de híbridos clásicos (1.ª a 4.ª); «≈ origen incierto» en o
 // cuando los padres no están documentados. Las landraces salen del catálogo de Strainmon (src/species.js), con su nombre real;
 // las de 1.24 (India del Sur, Líbano, Brasil y Sudáfrica), de las regiones clásicas, con su forma de planta. Van al final para no
 // cambiar el número de las demás en la Genoteca.
@@ -803,13 +803,13 @@ const STRAINS={
   kali47:{n:'Kali 47',thc:21,y:36,d:3.5,r:65,c:'#b0cc68',ind:30,hj:'#72a63e',gen:3,o:'Kali Mist × AK-47',h:'La Kali Mist con la AK-47: sativa más rápida y productiva.'},
   reina:{n:'Critical Kali Mist',thc:21,y:42,d:3.5,r:75,c:'#98c058',ind:45,hj:'#5c9a48',gen:3,o:'Critical Mass × Kali Mist',h:'La producción de la Critical Mass con el efecto de la Kali Mist.'},
   // 1.24: más landraces (del banco de semillas) y sus cruces
-  kerala:{n:'Kerala',thc:16,y:28,d:5,r:50,c:'#b8cc60',ind:25,hj:'#76a63e',o:'Landrace · sierras de Kerala, India del Sur',h:'Sativa de la India del Sur: tronco recio, hasta tres metros y ramas laterales como las de un helecho. Flores pequeñas, curvadas y muy resinosas, de aroma especiado.'},
+  kerala:{n:'Kerala',thc:16,y:28,d:5,r:50,c:'#b8cc60',ind:10,hj:'#82a73e',o:'Landrace · sierras de Kerala, India del Sur',h:'Sativa de la India del Sur: tronco recio, hasta tres metros y ramas laterales como las de un helecho. Flores pequeñas, curvadas y muy resinosas, de aroma especiado.'},
   libano:{n:'Lebanese',thc:14,y:30,d:3,r:75,c:'#a4b45c',ind:85,hj:'#4f9a3c',o:'Landrace · valle de la Bekaa, Líbano',h:'La planta del hachís libanés: baja, de tallos finos y pocas ramas, hoja ancha de verde medio y cogollo resinoso con bastante hoja. Efecto narcótico.'},
   mangarosa:{n:'Manga Rosa',thc:15,y:30,d:4.5,r:55,c:'#c4c060',ind:5,hj:'#86a83e',o:'Landrace · nordeste de Brasil',h:'Sativa brasileña de cogollo largo y pistilos rosados, con aroma a fruta tropical.'},
   durban:{n:'Durban Poison',thc:18,y:34,d:3.5,r:65,c:'#b4d060',ind:0,hj:'#8aa83e',o:'Landrace · puerto de Durban, Sudáfrica',h:'Sativa sudafricana, rápida para su tipo y muy resinosa. Aroma dulce, a anís, y efecto claro.'},
-  ww:{n:'White Widow',thc:20,y:40,d:3.5,r:70,c:'#e4eed0',ind:60,hj:'#5ba33e',gen:1,o:'sativa de Brasil × planta resinosa del sur de la India · ≈ origen incierto',h:'Se cubre de tricomas hasta verse blanca. Arrasó a mediados de los noventa. En la mesa: Manga Rosa × Kerala.'},
+  ww:{n:'White Widow',thc:20,y:40,d:3.5,r:70,c:'#e4eed0',ind:60,hj:'#5ba33e',gen:1,o:'sativa de Brasil × planta resinosa del sur de la India · ≈ origen incierto',h:'Se cubre de tricomas hasta verse blanca. Arrasó a mediados de los noventa. Su padre fue una índica resinosa del sur de la India sin documentar, por eso sale más índica que las sativas de la mesa: Manga Rosa × Kerala.'},
   purplehaze:{n:'Purple Haze',thc:19,y:30,d:4.5,r:50,c:'#a07cc0',ind:15,hj:'#7ea63e',gen:2,o:'Purple Thai × Haze · ≈ origen incierto',h:'Una Haze morada: el efecto eléctrico de la Haze con el color de la Purple Thai.'},
-  whiterussian:{n:'White Russian',thc:22,y:40,d:3.5,r:70,c:'#dce8c8',ind:60,hj:'#5ba33e',gen:2,o:'White Widow × AK-47',h:'La White Widow con la AK-47: todavía más resina y floración corta. Premiada a finales de los noventa.'},
+  whiterussian:{n:'White Russian',thc:22,y:40,d:3.5,r:70,c:'#dce8c8',ind:60,hj:'#5ba33e',gen:2,o:'White Widow × AK-47',h:'La White Widow con la AK-47: todavía más resina y floración corta. Premiada a mediados de los noventa.'},
   bluewidow:{n:'Blue Widow',thc:19,y:40,d:3.5,r:65,c:'#a8c0d8',ind:65,hj:'#57a33e',gen:3,o:'Blueberry × White Widow',h:'La White Widow con el dulzor y el azul de la Blueberry.'},
   superlemon:{n:'Super Lemon Haze',thc:23,y:38,d:4,r:65,c:'#dce870',ind:30,hj:'#72a63e',gen:4,o:'Lemon Skunk × Super Silver Haze',h:'Limón y escarcha: la Super Silver Haze con la Lemon Skunk. Campeona dos años seguidos a finales de los 2000.'},
 };
@@ -3472,7 +3472,9 @@ const RECIPE_HINTS=['Afghani, Colombian Gold y Acapulco Gold: de esas tres sali�
   'Una Haze con la NL5 × Haze da la Neville\'s Haze, casi pura Haze.','Trainwreck con Hawaiian: la Pineapple Express. California Orange con Skunk #1: la Tangie.',
   'Haze, Lamb\'s Bread, Luang Prabang y una Afghani o una Hawaiian: así se hizo la Amnesia Haze de Darko.','Blueberry con Haze, Blue Dream; con Cheese, Blue Cheese.',
   'Skunk #1, Northern Lights y Haze: la Super Silver Haze. La Lemon Haze sale de Lemon Skunk con Silver Haze.','Kali Mist con Critical Mass: la Critical Kali Mist. Con AK-47, la Kali 47.',
-  'La Sour Diesel sale de Chemdawg con Super Skunk. Hace falta paciencia.','Haze × (Northern Lights × Shiva Skunk)... de ahí sale la Jack Herer. Yo nunca lo he conseguido.'];
+  'La Sour Diesel sale de Chemdawg con Super Skunk. Hace falta paciencia.',
+  'Manga Rosa con Kerala, la brasileña con la del sur de la India: la White Widow. Con AK-47, la White Russian; con Blueberry, la Blue Widow.',
+  'Purple Thai con Haze: la Purple Haze. Lemon Skunk con Super Silver Haze: la Super Lemon Haze. Y Punto Rojo, Michoacán, Thai y Kerala también dan la Haze.','Haze × (Northern Lights × Shiva Skunk)... de ahí sale la Jack Herer. Yo nunca lo he conseguido.'];
 function kikoTip(){
   const t=[['Riega cuando el agua baje del 30 %. Una planta seca enferma.','El abono de floración, una dosis por planta; el de crecimiento, antes de que florezca. Y con cada dosis, una de pH−.','MEATZA es mineral: más cogollo y más deprisa, si corriges el pH. ORTUA BIO es orgánico: más lento, algo más potente y perdona el pH.','Las plantas crecen mientras duermes. No hace falta mirarlas cada hora.','Un CFL da poco: unos 0,3 gramos por vatio. Un LED, el triple.'],
     ['Los clientes cambian cada día. No los hagas esperar.','Pedir caro funciona con turistas, con gente de dinero y con cogollo potente.',`El CALOR tiene niveles: con ${NIVEL_POLI[1][0]}, vigilancia; con ${NIVEL_POLI[2][0]}, investigación y más patrullas; con ${NIVEL_POLI[3][0]} al cambiar el día, orden de registro. Lo de la caja fuerte no lo tocan.`,'Una carpa más grande es la mejor inversión que puedes hacer.','Tu tía pedía landraces a un banco de semillas por internet. Mira en su ordenador.','Lo que sale de un cruce es una F1: cada planta sale distinta. Crúzala consigo misma hasta fijarla.','Las macetas de tela airean las raíces: más cosecha y menos plagas, pero hay que regar más.','Cada semilla es una planta distinta. Si compras muchas, alguna sale estrella: más potente y más productiva.','Si una planta promete, sácale esquejes en crecimiento. Un esqueje es la misma planta: así se guarda un fenotipo estrella.','Una maceta pequeña no da más de unos 8 gramos por litro de tierra, por mucho foco que le pongas.'],
@@ -5316,8 +5318,9 @@ function migrate(){
   if(S.ch===3&&!S.flags.metB&&!(S.due>0)){S.due=PLAZOS[3];S.deadline=S.day+7;S.flags.tono=S.day;}
   if(S.flags.metB&&!('tono' in S.flags))S.flags.tono=S.day;   // ya conoces a Toño: sale en el móvil (12b-movil)
   if(S.protect&&!S.protHasta)S.protHasta=S.day+CUOTA_DIAS;
-  for(const k in S.custom){   // 1.11: los cruces con nombre largo («A × B», de antes) pasan a uno corto, con la misma clave
-    const C=S.custom[k];if(!C.n.includes(' × ')&&C.n.length<=NOM_MAX)continue;
+  for(const k in S.custom){   // 1.11: los cruces con nombre largo («A × B», de antes) pasan a uno corto, con la misma clave; 1.24: y
+    // los que se llaman como una variedad nueva (Purple Thai × Haze, sin receta antes, se llamaba «Purple Haze»)
+    const C=S.custom[k];if(!C.n.includes(' × ')&&C.n.length<=NOM_MAX&&!DEX.some(d=>STRAINS[d].n.toLowerCase()===C.n.toLowerCase()))continue;
     const p=C.n.split(' × '),t=palabras(C.n),h=Math.ceil(t.length/2),wa=p.length>1?palabras(p[0]):t.slice(0,h),wb=p.length>1?palabras(p[p.length-1]):t.slice(h);
     C.n=nombreCruce(wa,wb,n=>DEX.some(d=>STRAINS[d].n.toLowerCase()===n.toLowerCase())||Object.values(S.custom).some(c=>c!==C&&c.n.toLowerCase()===n.toLowerCase()));
   }

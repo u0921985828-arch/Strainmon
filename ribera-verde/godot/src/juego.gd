@@ -135,9 +135,10 @@ func migrate() -> void:
 		S.flags.tono = S.day
 	if S.get("protect") and not S.get("protHasta"):
 		S.protHasta = S.day + int(D.CUOTA_DIAS)
-	for k in S.custom:   # 1.11: los cruces con nombre largo («A × B», de antes) pasan a uno corto, con la misma clave
+	for k in S.custom:   # 1.11: los cruces con nombre largo («A × B», de antes) pasan a uno corto, con la misma clave; 1.24: y
+		# los que se llaman como una variedad nueva (Purple Thai × Haze, sin receta antes, se llamaba «Purple Haze»)
 		var C: Dictionary = S.custom[k]
-		if not C.n.contains(" × ") and C.n.length() <= Datos.NOM_MAX:
+		if not C.n.contains(" × ") and C.n.length() <= Datos.NOM_MAX and not D.DEX.any(func(dx): return String(D.STRAINS[dx].n).to_lower() == String(C.n).to_lower()):
 			continue
 		var cp: PackedStringArray = C.n.split(" × ")
 		var cw := Datos.palabras(C.n)

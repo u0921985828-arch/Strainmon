@@ -104,7 +104,7 @@ if __name__ == '__main__':
         im = Image.open(ruta('south')).convert('RGBA'); F0 = a_mano(im, 'south', M['south']) if 'south' in M else ojos(im, 'south')
         if F0: im.save(ruta('south'))
         lados = {d: Image.open(ruta(d)).convert('RGBA') for d in ('east', 'west') if os.path.exists(ruta(d))}
-        hechos = {d: a_mano(im, d, M[d]) if d in M else F0 and ojos(im, d, F0) for d, im in lados.items()}
+        hechos = {d: a_mano(im, d, M[d]) if d in M else F0 and ojos(im, d, F0 if isinstance(F0, tuple) else None) for d, im in lados.items()}
         if lados and all(hechos.values()):   # de lado, los dos o ninguno
             for d, im in lados.items(): im.save(ruta(d))
         print(g, 'frente' if F0 else '-', 'lados' if lados and all(hechos.values()) else '')

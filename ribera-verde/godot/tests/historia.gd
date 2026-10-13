@@ -2634,7 +2634,7 @@ func _pasos() -> void:
 		func(): return chk(R.n1 == "Madre Lima" and R.esq == "9995" and R.n2 == "Madre Lima" and R.esq2 == 0 and R.seeds == '{"ria":2}' and R.lab and R.n3 == false
 			and LOG.any(func(l): return l == "  [texto] Nombre de la planta (y sus esquejes) → Madre Lima") and LOG.any(func(l): return l == "  [texto] Nombre de la planta (y sus esquejes) → (B)")
 			and LOG.any(func(l): return l.begins_with("Cortas una punta de la Skunk #1 «Madre Lima»")) and LOG.any(func(l): return l == "Sin nombre: vuelve a ser la nº 9995."), R))
-	step("Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave; se cambia el nombre de una propia (sin repetir otro); el recetario, con las 37 y de dónde sale cada semilla",
+	step("Cruces y recetario (1.11): nombres cortos (sin «×», hasta 20 letras, sin repetir); las partidas viejas pasan a nombres cortos con la misma clave (y las que se llaman como una variedad, 1.24); se cambia el nombre de una propia (sin repetir otro); el recetario, con las 37 y de dónde sale cada semilla",
 		["GENOTECA", "DIARIO DE LA TÍA", "Skunk #1$", "Volver", "<B>", "^★ Skunk Haze", "=Haze Corta", "^★ Haze Corta", "=skunk #1", "<B>", "SALIR"], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))
@@ -2667,8 +2667,8 @@ func _pasos() -> void:
 					nd += 1
 		R = {"n": ns.size(), "x": nx, "max": mx, "rep": ns.size() - un.size(), "dex": nd}
 		var base := {"thc": 15, "y": 400, "d": 9, "r": 50, "o": "x", "c": "#5a8a3a"}
-		J.S.custom = {"xv1": base.merged({"n": "Skunk #1 × Lemon Haze F5"}), "xv2": base.merged({"n": "Northern Lights Haze Skunk Lemon Thai"}), "xv3": base.merged({"n": "Thai Haze"})}
-		J.S.disc.merge({"xv1": true, "xv2": true, "xv3": true}, true)
+		J.S.custom = {"xv1": base.merged({"n": "Skunk #1 × Lemon Haze F5"}), "xv2": base.merged({"n": "Northern Lights Haze Skunk Lemon Thai"}), "xv3": base.merged({"n": "Thai Haze"}), "xv4": base.merged({"n": "Purple Haze"})}
+		J.S.disc.merge({"xv1": true, "xv2": true, "xv3": true, "xv4": true}, true)
 		J.migrate()
 		var mg := []
 		for k in J.S.custom:
@@ -2689,7 +2689,7 @@ func _pasos() -> void:
 		R.ss = "|".join(PackedStringArray(Rc.txoko.map(func(o): return J.receta_txt(o))))
 		R.diario = ",".join(PackedStringArray(Rc.keys().filter(func(t): return J.diario_txt(t) == "")))
 		J.S = S0,
-		func(): return chk(R.n > 50 and R.x == 0 and R.max <= 20 and R.rep == 0 and R.dex == 0 and R.mig == "xv1:Skunk Haze|xv2:Northern Thai|xv3:Thai Haze" and R.ren == "Haze Corta"
+		func(): return chk(R.n > 50 and R.x == 0 and R.max <= 20 and R.rep == 0 and R.dex == 0 and R.mig == "xv1:Skunk Haze|xv2:Northern Thai|xv3:Thai Haze|xv4:Haze Purple" and R.ren == "Haze Corta"
 			and R.rec == 37 and R.sin == "" and R.diario == "" and R.parque == "Semillas: escondidas en el parque del barrio." and R.ss == "Skunk #1 × Afghani, en ese orden"
 			and LOG.any(func(l): return l == "  [texto] Nuevo nombre de la variedad → Haze Corta") and LOG.any(func(l): return l == "Ya hay una variedad con ese nombre.") and LOG.any(func(l): return re("\\[menú\\] .*Afghani.*Volver  → Volver", l)), R))
 	step("Exportar partida (1.11): OPCIONES → EXPORTAR PARTIDA copia el JSON de la partida", ["OPCIONES", "EXPORTAR", "VOLVER", "SALIR"], func():

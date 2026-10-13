@@ -43,7 +43,7 @@ Generado con `npm run analisis`: 751 cifras comprobadas con el juego (20.000 com
 | 5 · El sargento | Pagar 12.000 €. Molina te ofrece protección: 1.500 € cada 10 días. Si dices que no, +10 de calor | Pagar en el bar | 10 días | Capítulo 6. Baltasar: «La COPA DE RIBERA se juega estos días en la plaza» |
 | 6 · La Copa | Llevar 20 g de un lote con más del 26,8 % de THC | `talkJurado`: `round(thc·10)/10 > 26,8` | Ninguno (se puede repetir) | 5.000 € y +20 de reputación. Capítulo 7, con todo lo que queda (15.000 €) en 7 días |
 | 7 · Libertad | Pagar 15.000 €. La primera vez que duermas con más de 1.000 € o 100 g fuera de la caja (el rosin cuenta como la flor de la que sale: 1 g = 5 g), Darko te roba | Pagar en el bar | 7 días | Pantalla final y capítulo 8. Baltasar te ofrece trabajo |
-| 8 · Tu imperio | Facturar 25.000, 100.000 y 250.000 € desde el último pago. Los encargos de Baltasar | `imperioNivel()` | Cada encargo, 2 días | Iñaki te carga 2, 5 y 10 kg al día. La meta final es completar la genoteca de 59 y sacar la Jack Herer |
+| 8 · Tu imperio | Facturar 25.000, 100.000 y 250.000 € desde el último pago. Los encargos de Baltasar | `imperioNivel()` | Cada encargo, 2 días | Iñaki te carga 2, 5 y 10 kg al día. La meta final es completar la genoteca de 68 y sacar la Jack Herer |
 
 Si un plazo vence (capítulos 3, 5 y 7), Toño se presenta al cambiar de día:
 
