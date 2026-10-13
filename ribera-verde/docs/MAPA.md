@@ -275,7 +275,7 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
  7  MMM.████████......~~~..██████.....MM
  8  MM..████████b.....~~~T.██████......M
  9  MM.....,,.....Y..~~~.....,,...T....M
-10  MMS....,,.......~~~......,,.b......M
+10  MMS....,,.......~~~.....@,,.b......M
 11  ,,,,,,,,,,,,,,,,HHH,,,,,,,,,,,,,,,,,
 12  ,,,,,,,,,,,,,,,,HHH,,,,,,,,,,,,,,,,,
 13  MM....A.....b...~~~.b......^^^^^^,,M
@@ -531,7 +531,7 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 | inaki | town | (37,21) | no | `S.ch>=2` |
 | cop | town | (22,17) | radio 3 | `S.ch>=2` |
 | darko | town | (20,14) | no | `(S.ch>=2&&S.ch<7&&!S.flags.darko1)||S.ch===6` |
-| darko2 | astilleros | (24,16) | no | `S.ch>=7` |
+| darko2 | astilleros | (24,16) | no | `S.ch>=7&&!S.flags.darkoFin` |
 | molina | town | (23,15) | no | `S.ch>=5&&!S.flags.molina1` |
 | molina | comisaria | (4,2) | no | `S.ch>=5&&!!S.flags.molina1` |
 | tono2 | almacen | (5,2) | no | `!!S.encargo` |
@@ -544,6 +544,7 @@ Interiores: `B` cama · `P` ordenador · `G` mesa de genética · `t` mesa · `F
 | nerea | puerto | (23,17) | no | siempre |
 | bixente | valdehierro | (30,15) | no | siempre |
 | andoni | errotabarri | (24,19) | no | siempre |
+| miren | errotabarri | (24,10) | no | `S.ch>=MIREN.ch` |
 | ibarbitarra | ensanche | (22,14) | radio 2 | siempre |
 | club_puerto | puerto | (10,8) | no | `S.ch>=C.ch` |
 | club_valde | valdehierro | (12,8) | no | `S.ch>=C.ch` |
