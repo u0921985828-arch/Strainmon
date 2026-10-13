@@ -292,7 +292,7 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 **El ajuste de cuentas con Darko (1.17, astilleros, al hablarle):**
 > **DARKO:** Mírate. Cargas en el barco de Iñaki y mi tío te llama socio. / A mí me trata como a un recadero. Y todo empezó contigo. / Esto lo arreglamos tú y yo. Aquí y ahora.
 > ¿Peleas con Darko? → *Pelear / Ahora no* («Ya sabes dónde estoy. Mis chicos también.»)
-> *Combate:* «Darko se quita la sudadera y la tira al suelo.» / **DARKO:** «Ni Iñaki ni mi tío. Tú y yo.» · *La carga:* «Darko coge una barra de hierro del suelo. El próximo golpe va a doler.» y «Darko te da con la barra.» (doble) · *HABLAR:* «Aquí ya no hay nada que hablar.»
+> *Combate:* «Darko se quita la sudadera y la tira al suelo.» / **DARKO:** «Ni Iñaki ni mi tío. Tú y yo.» · *La carga:* «Darko coge una barra de hierro del suelo. El próximo golpe va a doler.» y «Darko te da con la barra.» (doble) · *HABLAR:* «Aquí ya no hay nada que hablar.» · *Al vencerle:* «Darko cae al suelo, sin aire.»
 > *Si huyes:* **DARKO:** «Corre, corre. Aquí te espero.»
 > *Si ganas:* **DARKO:** «Vale. Vale. Ya está.» / «Las esquinas son tuyas. Yo me largo de aquí una temporada.» y **SMS · DON BALTASAR:** «Me han contado lo de mi sobrino.» / «Se va a trabajar a un pesquero de fuera. Le vendrá bien.» / «Tú y yo seguimos como siempre.»
 

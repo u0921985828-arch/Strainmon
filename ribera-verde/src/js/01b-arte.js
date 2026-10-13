@@ -259,7 +259,7 @@ function arteCriaturas(now,cam,list){
 function grupoCombate(who){
   if(!ARTE.ok||!B)return null;
   if(who==='P')return ARTE.cubre['combate:espalda:player']||null;
-  if(B.kind==='thief')return grupoLook(B.look)||ARTE.cubre['combate:frente:ladron']||null;
+  if(B.kind==='thief')return (!B.jefe&&grupoLook(B.look))||ARTE.cubre['combate:frente:ladron']||null;   // Darko (1.17): su personaje es de 32 px; pelea con el del ladrón
   return ARTE.cubre['combate:frente:policia']||null;
 }
 // lanza una animación de combate; devuelve su duración en ms (0 sin atlas)

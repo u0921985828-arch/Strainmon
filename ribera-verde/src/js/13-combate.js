@@ -92,8 +92,9 @@ async function thiefRound(){
     await say('Te corta el paso. No puedes escapar.');
   }
   if(B.hp<=0){
-    B.gone=true;bAnim('E','huir');await say(`${elB()} sale corriendo.`);
-    if(B.rival){S.rep+=RIVAL.rep;if(S.hpMax<60){S.hpMax+=2;S.hp+=2;bhud();await say(`Aguantas más. VIDA máxima: ${S.hpMax}.`);}return 'win';}
+    if(B.jefe){bAnim('E','herido');await say(`${elB()} cae al suelo, sin aire.`);}   // Darko (1.17) no huye, y la reputación la da ajusteDarko
+    else{B.gone=true;bAnim('E','huir');await say(`${elB()} sale corriendo.`);}
+    if(B.rival){if(!B.jefe)S.rep+=RIVAL.rep;if(S.hpMax<60){S.hpMax+=2;S.hp+=2;bhud();await say(`Aguantas más. VIDA máxima: ${S.hpMax}.`);}return 'win';}
     const loot=ri(20,40)+S.ch*10;S.money+=loot;S.rep+=2;sfx('coin');bhud();
     await say(`Al huir se le cae la cartera: +${eur(loot)}.`);
     if(S.hpMax<60){S.hpMax+=2;S.hp+=2;bhud();await say(`Aguantas más. VIDA máxima: ${S.hpMax}.`);}

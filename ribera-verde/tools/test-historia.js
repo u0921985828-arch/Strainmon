@@ -480,21 +480,25 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && R.obj === 'cuadro,,sillon,sillon2,sofa,sofa2' && R.cuadro === '2,cuadro-2' && R.sofa === 'sofa-2' && R.t === 30 && R.tienda === 'sofa,tv,gpc,sillon,cuadro'
     && LOG.some(l => l === 'ROBER: Eh, tú. Llevas 8 ventas en el barrio alto.') && LOG.some(l => l === 'Te cubres: el golpe duele la mitad.') && LOG.some(l => l === 'Rober no volverá por el barrio alto en 7 días. Mientras, sus clientes te pagan un 5 % más.') || R);
   await step('Darko y Miren (1.17): en el capítulo 8, el ajuste de cuentas con Darko en los astilleros (coge la barra: el golpe siguiente, doble, y CUBRIRSE lo deja en la mitad; si le ganas, se va y sus chicos ya no salen); Miren, la amiga de la tía Maite, en Errotabarri: 20 g de Purple Thai por la última página del diario y 5 semillas de Haze', ['^Pelear'], async () => {
-    S.ch = 8; S.flags.darkoFin = 0; const r0 = Math.random, b0 = battle; window.R = { b: [] }; window.battle = async t => { R.b.push(t); return 'win'; };
-    enterMap('astilleros', 24, 17, 'up'); R.dk = ents.some(e => e.id === 'darko2'); R.rep = S.rep; await run(talkDarko); R.fin = S.flags.darkoFin === S.day; R.rep = S.rep - R.rep; R.dk2 = ents.some(e => e.id === 'darko2');
-    S.buds = {}; addBuds('ria', 20, 12); const c = { id: 'cx7', map: 'astilleros', x: 5, y: 20, type: 'cur', want: 10, minThc: 0 }; S.clients.push(c); want(['Justo']);
-    await run(async () => { Math.random = () => .2; await talkClient(c); Math.random = r0; }); R.chico = R.b.length; window.battle = b0;
+    S.ch = 8; S.flags.darkoFin = 0; const r0 = Math.random, b0 = battle, sv = { hp: S.hp, hpMax: S.hpMax, rep: S.rep }; window.R = { b: [] }; window.battle = async t => { R.b.push(t); return 'win'; };
+    enterMap('astilleros', 24, 17, 'up'); S.buds = {}; addBuds('ria', 30, 12);
+    const cl = id => { const c = { id, map: 'astilleros', x: 5, y: 20, type: 'cur', want: 10, minThc: 0 }; S.clients.push(c); want(['Justo']); return async () => { Math.random = () => .2; await talkClient(c); Math.random = r0; }; };
+    await run(cl('cx6')); want(['^Pelear']); R.dk = ents.some(e => e.id === 'darko2'); R.rep = S.rep; await run(talkDarko); R.fin = S.flags.darkoFin === S.day; R.rep = S.rep - R.rep; R.dk2 = ents.some(e => e.id === 'darko2');
+    await run(cl('cx7')); R.vend = S.buds.ria.g; window.battle = b0;
     S.hp = 30; S.hpMax = 30; R.jefe = rivalB('darko').jefe;
     await run(async () => { B = { kind: 'thief', rival: 'Darko', jefe: 1, name: 'DARKO', atk: [6, 6], hp: 40, hpMax: 40, t: 0, flashE: 0, shakeP: 0 }; Math.random = () => 0; R.r1 = await enemyHits(); R.carga = B.carga; R.hp1 = S.hp;
-      Math.random = () => .99; B.cubre = 1; await enemyHits(); R.hp2 = S.hp; R.carga2 = B.carga; await enemyHits(); R.hp3 = S.hp; Math.random = r0; B = null; });
+      Math.random = () => .99; B.cubre = 1; await enemyHits(); R.hp2 = S.hp; R.carga2 = B.carga; await enemyHits(); R.hp3 = S.hp;
+      B.hp = 1; R.rep0 = S.rep; want(['HABLAR']); R.t1 = await thiefRound(); R.hp4 = S.hp; Math.random = () => 0; want(['LUCHAR', 'PUÑETAZO']); R.t2 = await thiefRound(); R.repJ = S.rep - R.rep0; R.hpMax = S.hpMax; Math.random = r0; B = null; });
+    S.hp = sv.hp; S.hpMax = sv.hpMax; S.rep = sv.rep;
     S.flags.darkoFin = 0; S.ch = 5; S.flags.miren = 0; S.flags.pagina = 0; S.buds = {};
     enterMap('errotabarri', 24, 11, 'up'); R.mi = ents.filter(e => e.id === 'miren').map(e => e.x + ',' + e.y).join();
     await run(talkMiren); R.m1 = !!S.flags.miren; await run(talkMiren); R.h0 = S.seeds.haze || 0;
-    addBuds('amanecer', 25, 18); addBuds('ria', 30, 12); want(['^Dárselos']); await run(talkMiren); R.pt = S.buds.amanecer.g; R.ria = S.buds.ria.g; R.h = S.seeds.haze - R.h0; R.pag = S.flags.pagina === S.day;
-    const l0 = LOG.length; want(['La última página', 'Volver']); await run(recetario); R.ult = LOG.slice(l0).some(l => /→ {3}La última página/.test(l));
+    addBuds('amanecer*', 10, 20); addBuds('amanecer', 15, 18); addBuds('ria', 30, 12); want(['^Dárselos']); await run(talkMiren); R.pt = [S.buds['amanecer*'] ? S.buds['amanecer*'].g : 0, !!S.buds.amanecer].join(); R.ria = S.buds.ria.g; R.h = S.seeds.haze - R.h0; R.pag = S.flags.pagina === S.day;
+    const l0 = LOG.length; want(['La última página', 'Volver']); await run(recetario); R.ult = LOG.slice(l0).filter(l => /\[menú\].*La última página/.test(l)).length;
     S.flags.pagina = 0; S.flags.miren = 0; S.buds = {}; enterMap('home', 5, 5, 'up');
-  }, () => R.dk && !R.dk2 && R.b.join() === 'darko' && R.fin && R.rep === DARKO.rep && R.chico === 1 && R.jefe === 1 && R.r1 === null && R.carga === 1 && R.hp1 === 30 && R.hp2 === 24 && R.carga2 === 0 && R.hp3 === 18
-    && R.mi === '24,10' && R.m1 && R.pt === 5 && R.ria === 30 && R.h === MIREN.n && R.pag && R.ult
+  }, () => R.dk && !R.dk2 && R.b.join() === 'thief,darko' && R.vend === 10 && R.fin && R.rep === DARKO.rep && R.jefe === 1 && R.r1 === null && R.carga === 1 && R.hp1 === 30 && R.hp2 === 24 && R.carga2 === 0 && R.hp3 === 18
+    && R.t1 === null && R.hp4 === 12 && R.t2 === 'win' && R.repJ === 0 && R.hpMax === 32 && LOG.some(l => l === '«Aquí ya no hay nada que hablar.»') && LOG.some(l => l === 'Darko cae al suelo, sin aire.')
+    && R.mi === '24,10' && R.m1 && R.pt === '5,false' && R.ria === 30 && R.h === MIREN.n && R.pag && R.ult === 2
     && LOG.some(l => l === 'DARKO: Las esquinas son tuyas. Yo me largo de aquí una temporada.') && LOG.some(l => l === 'SMS · DON BALTASAR: Me han contado lo de mi sobrino.') && LOG.some(l => l === 'Darko coge una barra de hierro del suelo. El próximo golpe va a doler.') || R);
   await step('Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas', ['^Hindu Kush'], async () => {
     S.ch = 5; S.flags.txaro = true; S.flags.txaro2 = false; S.map = 'txaro'; buildEnts(); window.R = { ent: ents.filter(e => e.id === 'txaro').map(e => e.x + ',' + e.y).join() };

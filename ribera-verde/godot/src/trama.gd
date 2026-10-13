@@ -595,14 +595,24 @@ func talk_miren():
 		S.flags.miren = S.day
 		await talk(N, ["¿Tú eres el de Maite? Tienes sus ojos.", "Me llamo Miren. Tu tía y yo cultivábamos juntas en este caserío, hace treinta años.", "Su diario tiene una página arrancada. Me la dio la última vez que subió.", "Tráeme %d g de %s, la que hacíamos las dos, y es tuya." % [int(M.g), v]])
 		return
-	var lots := bud_lots(int(M.g)).filter(func(l): return lot_sid(l[0]) == M.sid)
-	if lots.is_empty():
+	var ks: Array = S.buds.keys().filter(func(k): return lot_sid(k) == M.sid)
+	ks.sort_custom(func(a, b): return not a.ends_with("*") and b.ends_with("*"))   # primero lo que no es estrella
+	var tot := 0.0
+	for k in ks:
+		tot += float(S.buds[k].g)
+	if tot < float(M.g):
 		await say("¿Me traes los %d g de %s? Sin prisa: aquí estoy." % [int(M.g), v], N)
 		return
 	if await ask("¿Le das %d g de %s?" % [int(M.g), v], ["Dárselos", "Todavía no"], N) != 0:
 		await say("Cuando quieras.", N)
 		return
-	use_buds(lots[0][0], int(M.g))
+	var q := float(M.g)
+	for k in ks:
+		var t: float = minf(q, float(S.buds[k].g))
+		use_buds(k, t)
+		q -= t
+		if q <= 0:
+			break
 	S.flags.pagina = S.day
 	add_seeds(M.s, int(M.n))
 	await talk(N, ["Huele igual que entonces.", "Toma. La página que falta, y unas semillas de su Haze."])
@@ -1469,7 +1479,7 @@ func grupo_combate(who: String):
 	if who == "P":
 		return Atlas.cubre("combate:espalda:player")
 	if B.kind == "thief":
-		var g = Atlas.grupo_look(B.look)
+		var g = null if B.get("jefe") else Atlas.grupo_look(B.look)   # Darko (1.17): su personaje es de 32 px; pelea con el del ladrón
 		return g if g else Atlas.cubre("combate:frente:ladron")
 	return Atlas.cubre("combate:frente:policia")
 
@@ -1680,11 +1690,16 @@ func thief_round():
 			return "flee"
 		await say("Te corta el paso. No puedes escapar.")
 	if B.hp <= 0:
-		B.gone = true
-		b_anim("E", "huir")
-		await say("%s sale corriendo." % el_b())
+		if B.get("jefe"):   # Darko (1.17) no huye: se queda en el suelo, y la reputación la da ajuste_darko
+			b_anim("E", "herido")
+			await say("%s cae al suelo, sin aire." % el_b())
+		else:
+			B.gone = true
+			b_anim("E", "huir")
+			await say("%s sale corriendo." % el_b())
 		if B.has("rival"):
-			S.rep += int(D.RIVAL.rep)
+			if not B.get("jefe"):
+				S.rep += int(D.RIVAL.rep)
 			if S.hpMax < 60:
 				S.hpMax += 2
 				S.hp += 2

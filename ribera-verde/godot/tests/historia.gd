@@ -1517,27 +1517,32 @@ func _pasos() -> void:
 	step("Darko y Miren (1.17): en el capítulo 8, el ajuste de cuentas con Darko en los astilleros (coge la barra: el golpe siguiente, doble, y CUBRIRSE lo deja en la mitad; si le ganas, se va y sus chicos ya no salen); Miren, la amiga de la tía Maite, en Errotabarri: 20 g de Purple Thai por la última página del diario y 5 semillas de Haze", ["^Pelear"], func():
 		J.S.ch = 8
 		J.S.flags.darkoFin = 0
+		var sv := {"hp": J.S.hp, "hpMax": J.S.hpMax, "rep": J.S.rep}
 		R = {"b": []}
 		J.gancho_combate = func(t):
 			R.b.append(t)
 			return "win"
 		J.enter_map("astilleros", 24, 17, "up")
+		J.S.buds = {}
+		J.add_buds("ria", 30, 12)
+		var cl := func(id: String) -> Callable:
+			var c := {"id": id, "map": "astilleros", "x": 5, "y": 20, "type": "cur", "want": 10, "minThc": 0}
+			J.S.clients.append(c)
+			want(["Justo"])
+			return func():
+				Cultivo.fijo = .2
+				await J.talk_client(c)
+				Cultivo.fijo = -1
+		await run(cl.call("cx6"))
+		want(["^Pelear"])
 		R.dk = J.ents.any(func(e): return e.id == "darko2")
 		R.rep = J.S.rep
 		await run(J.talk_darko)
 		R.fin = J.S.flags.darkoFin == J.S.day
 		R.rep = J.S.rep - R.rep
 		R.dk2 = J.ents.any(func(e): return e.id == "darko2")
-		J.S.buds = {}
-		J.add_buds("ria", 20, 12)
-		var c := {"id": "cx7", "map": "astilleros", "x": 5, "y": 20, "type": "cur", "want": 10, "minThc": 0}
-		J.S.clients.append(c)
-		want(["Justo"])
-		await run(func():
-			Cultivo.fijo = .2
-			await J.talk_client(c)
-			Cultivo.fijo = -1)
-		R.chico = R.b.size()
+		await run(cl.call("cx7"))
+		R.vend = J.S.buds.ria.g
 		J.gancho_combate = Callable()
 		J.S.hp = 30
 		J.S.hpMax = 30
@@ -1555,8 +1560,21 @@ func _pasos() -> void:
 			R.carga2 = J.B.carga
 			await J.enemy_hits()
 			R.hp3 = J.S.hp
+			J.B.hp = 1
+			R.rep0 = J.S.rep
+			want(["HABLAR"])
+			R.t1 = await J.thief_round()
+			R.hp4 = J.S.hp
+			Cultivo.fijo = 0
+			want(["LUCHAR", "PUÑETAZO"])
+			R.t2 = await J.thief_round()
+			R.repJ = J.S.rep - R.rep0
+			R.hpMax = J.S.hpMax
 			Cultivo.fijo = -1
 			J.B = null)
+		J.S.hp = sv.hp
+		J.S.hpMax = sv.hpMax
+		J.S.rep = sv.rep
 		J.S.flags.darkoFin = 0
 		J.S.ch = 5
 		J.S.flags.miren = 0
@@ -1568,24 +1586,26 @@ func _pasos() -> void:
 		R.m1 = true if J.S.flags.miren else false
 		await run(J.talk_miren)
 		R.h0 = int(J.S.seeds.get("haze", 0))
-		J.add_buds("amanecer", 25, 18)
+		J.add_buds("amanecer*", 10, 20)
+		J.add_buds("amanecer", 15, 18)
 		J.add_buds("ria", 30, 12)
 		want(["^Dárselos"])
 		await run(J.talk_miren)
-		R.pt = J.S.buds.amanecer.g
+		R.pt = "%s,%s" % [J.n(J.S.buds["amanecer*"].g) if J.S.buds.has("amanecer*") else "0", "true" if J.S.buds.has("amanecer") else "false"]
 		R.ria = J.S.buds.ria.g
 		R.h = int(J.S.seeds.haze) - R.h0
 		R.pag = J.S.flags.pagina == J.S.day
 		var l0 := LOG.size()
 		want(["La última página", "Volver"])
 		await run(J.recetario)
-		R.ult = LOG.slice(l0).any(func(l): return l.contains("→   La última página"))
+		R.ult = LOG.slice(l0).filter(func(l): return l.contains("[menú]") and l.contains("La última página")).size()
 		J.S.flags.pagina = 0
 		J.S.flags.miren = 0
 		J.S.buds = {}
 		J.enter_map("home", 5, 5, "up"),
-		func(): return chk(R.dk and not R.dk2 and ",".join(PackedStringArray(R.b)) == "darko" and R.fin and R.rep == D.DARKO.rep and R.chico == 1 and R.jefe == 1 and R.r1 == null and R.carga == 1 and R.hp1 == 30 and R.hp2 == 24 and R.carga2 == 0 and R.hp3 == 18
-			and R.mi == "24,10" and R.m1 and R.pt == 5 and R.ria == 30 and R.h == D.MIREN.n and R.pag and R.ult
+		func(): return chk(R.dk and not R.dk2 and ",".join(PackedStringArray(R.b)) == "thief,darko" and R.vend == 10 and R.fin and R.rep == D.DARKO.rep and R.jefe == 1 and R.r1 == null and R.carga == 1 and R.hp1 == 30 and R.hp2 == 24 and R.carga2 == 0 and R.hp3 == 18
+			and R.t1 == null and R.hp4 == 12 and R.t2 == "win" and R.repJ == 0 and R.hpMax == 32 and LOG.has("«Aquí ya no hay nada que hablar.»") and LOG.has("Darko cae al suelo, sin aire.")
+			and R.mi == "24,10" and R.m1 and R.pt == "5,false" and R.ria == 30 and R.h == D.MIREN.n and R.pag and R.ult == 2
 			and LOG.has("DARKO: Las esquinas son tuyas. Yo me largo de aquí una temporada.") and LOG.has("SMS · DON BALTASAR: Me han contado lo de mi sobrino.") and LOG.has("Darko coge una barra de hierro del suelo. El próximo golpe va a doler."), R))
 	step("Abuela Txaro, en su casa desde el capítulo 4: 10 g de una índica (solo le valen las de 70 % o más) → 3 semillas de Chitral Kush y 3 bocatas", ["^Hindu Kush"], func():
 		J.S.ch = 5

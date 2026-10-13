@@ -188,6 +188,7 @@ func story_mark(id: String) -> bool:
 		"jurado": return true
 		"molina": return not F.get("molina1") or not S.protect
 		"darko": return S.ch < 6
+		"darko2": return S.ch >= int(J.D.DARKO.ch) and not F.get("darkoFin")
 		"txaro": return (S.ch >= 2 and not F.get("txaro")) or (S.ch >= 4 and not F.get("txaro2"))
 		"inaki": return not F.get("inaki")
 	return false

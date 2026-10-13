@@ -72,10 +72,11 @@ async function talkMiren(){
   if(S.flags.pagina)return say(pick(['Tu tía subía cada otoño con un táper de cogollos y se quedaba a dormir.','Del caserío no me echó nadie gracias a ella. Eso no se olvida.','Cuando la Haze te salga sola, acuérdate de nosotras.']),N);
   if(!S.flags.miren){S.flags.miren=S.day;
     return talk(N,['¿Tú eres el de Maite? Tienes sus ojos.','Me llamo Miren. Tu tía y yo cultivábamos juntas en este caserío, hace treinta años.','Su diario tiene una página arrancada. Me la dio la última vez que subió.',`Tráeme ${M.g} g de ${v}, la que hacíamos las dos, y es tuya.`]);}
-  const lots=budLots(M.g).filter(([k])=>lotSid(k)===M.sid);
-  if(!lots.length)return say(`¿Me traes los ${M.g} g de ${v}? Sin prisa: aquí estoy.`,N);
+  const ks=Object.keys(S.buds).filter(k=>lotSid(k)===M.sid).sort((a,b)=>a.endsWith('*')-b.endsWith('*')),tot=ks.reduce((s,k)=>s+S.buds[k].g,0);   // primero lo que no es estrella
+  if(tot<M.g)return say(`¿Me traes los ${M.g} g de ${v}? Sin prisa: aquí estoy.`,N);
   if(await ask(`¿Le das ${M.g} g de ${v}?`,['Dárselos','Todavía no'],N)!==0)return say('Cuando quieras.',N);
-  useBuds(lots[0][0],M.g);S.flags.pagina=S.day;addSeeds(M.s,M.n);
+  let q=M.g;for(const k of ks){const t=Math.min(q,S.buds[k].g);useBuds(k,t);q-=t;if(q<=0)break;}
+  S.flags.pagina=S.day;addSeeds(M.s,M.n);
   await talk(N,['Huele igual que entonces.','Toma. La página que falta, y unas semillas de su Haze.']);
   await got(`la última página del diario y ${M.n} semillas de ${STRAINS[M.s].n.toUpperCase()}`);
   return say('Léela en casa, con calma.',N);
