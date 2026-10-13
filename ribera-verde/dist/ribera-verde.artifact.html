@@ -590,7 +590,7 @@ function arteCriaturas(now,cam,list){
 function grupoCombate(who){
   if(!ARTE.ok||!B)return null;
   if(who==='P')return ARTE.cubre['combate:espalda:player']||null;
-  if(B.kind==='thief')return grupoLook(B.look)||ARTE.cubre['combate:frente:ladron']||null;
+  if(B.kind==='thief')return (!B.jefe&&grupoLook(B.look))||ARTE.cubre['combate:frente:ladron']||null;   // Darko (1.17): su personaje es de 32 px; pelea con el del ladrón
   return ARTE.cubre['combate:frente:policia']||null;
 }
 // lanza una animación de combate; devuelve su duración en ms (0 sin atlas)
@@ -3933,10 +3933,11 @@ async function talkMiren(){
   if(S.flags.pagina)return say(pick(['Tu tía subía cada otoño con un táper de cogollos y se quedaba a dormir.','Del caserío no me echó nadie gracias a ella. Eso no se olvida.','Cuando la Haze te salga sola, acuérdate de nosotras.']),N);
   if(!S.flags.miren){S.flags.miren=S.day;
     return talk(N,['¿Tú eres el de Maite? Tienes sus ojos.','Me llamo Miren. Tu tía y yo cultivábamos juntas en este caserío, hace treinta años.','Su diario tiene una página arrancada. Me la dio la última vez que subió.',`Tráeme ${M.g} g de ${v}, la que hacíamos las dos, y es tuya.`]);}
-  const lots=budLots(M.g).filter(([k])=>lotSid(k)===M.sid);
-  if(!lots.length)return say(`¿Me traes los ${M.g} g de ${v}? Sin prisa: aquí estoy.`,N);
+  const ks=Object.keys(S.buds).filter(k=>lotSid(k)===M.sid).sort((a,b)=>a.endsWith('*')-b.endsWith('*')),tot=ks.reduce((s,k)=>s+S.buds[k].g,0);   // primero lo que no es estrella
+  if(tot<M.g)return say(`¿Me traes los ${M.g} g de ${v}? Sin prisa: aquí estoy.`,N);
   if(await ask(`¿Le das ${M.g} g de ${v}?`,['Dárselos','Todavía no'],N)!==0)return say('Cuando quieras.',N);
-  useBuds(lots[0][0],M.g);S.flags.pagina=S.day;addSeeds(M.s,M.n);
+  let q=M.g;for(const k of ks){const t=Math.min(q,S.buds[k].g);useBuds(k,t);q-=t;if(q<=0)break;}
+  S.flags.pagina=S.day;addSeeds(M.s,M.n);
   await talk(N,['Huele igual que entonces.','Toma. La página que falta, y unas semillas de su Haze.']);
   await got(`la última página del diario y ${M.n} semillas de ${STRAINS[M.s].n.toUpperCase()}`);
   return say('Léela en casa, con calma.',N);
@@ -4579,8 +4580,9 @@ async function thiefRound(){
     await say('Te corta el paso. No puedes escapar.');
   }
   if(B.hp<=0){
-    B.gone=true;bAnim('E','huir');await say(`${elB()} sale corriendo.`);
-    if(B.rival){S.rep+=RIVAL.rep;if(S.hpMax<60){S.hpMax+=2;S.hp+=2;bhud();await say(`Aguantas más. VIDA máxima: ${S.hpMax}.`);}return 'win';}
+    if(B.jefe){bAnim('E','herido');await say(`${elB()} cae al suelo, sin aire.`);}   // Darko (1.17) no huye, y la reputación la da ajusteDarko
+    else{B.gone=true;bAnim('E','huir');await say(`${elB()} sale corriendo.`);}
+    if(B.rival){if(!B.jefe)S.rep+=RIVAL.rep;if(S.hpMax<60){S.hpMax+=2;S.hp+=2;bhud();await say(`Aguantas más. VIDA máxima: ${S.hpMax}.`);}return 'win';}
     const loot=ri(20,40)+S.ch*10;S.money+=loot;S.rep+=2;sfx('coin');bhud();
     await say(`Al huir se le cae la cartera: +${eur(loot)}.`);
     if(S.hpMax<60){S.hpMax+=2;S.hp+=2;bhud();await say(`Aguantas más. VIDA máxima: ${S.hpMax}.`);}
@@ -4685,7 +4687,7 @@ function bubble(x,y,ch,col){ctx.fillStyle='#26262e';ctx.fillRect(x-1,y-1,9,10);c
   ctx.fillStyle=col;GLYPH[ch].forEach((r,j)=>{for(let i=0;i<5;i++)if(r[i]==='#')ctx.fillRect(x+1+i,y+(j>3?j-0:j)+0,1,1);});}
 function storyMark(id){
   switch(id){case 'kiko':return !S.flags.kiko1||(S.ch===4&&!S.flags.lab);case 'baltasar':return (S.ch===3&&!S.flags.metB)||(S.due>0&&S.money>=S.due)||(S.ch>=8&&!S.encargo&&!(S.encVeto>S.day));case 'tono2':return isNight();
-    case 'jurado':return true;case 'molina':return !S.flags.molina1||!S.protect;case 'darko':return S.ch<6;case 'txaro':return S.ch>=2&&!S.flags.txaro||S.ch>=4&&!S.flags.txaro2;case 'inaki':return !S.flags.inaki;}
+    case 'jurado':return true;case 'molina':return !S.flags.molina1||!S.protect;case 'darko':return S.ch<6;case 'darko2':return S.ch>=DARKO.ch&&!S.flags.darkoFin;case 'txaro':return S.ch>=2&&!S.flags.txaro||S.ch>=4&&!S.flags.txaro2;case 'inaki':return !S.flags.inaki;}
   return false;
 }
 let LAMPS={};   // farolas de cada zona de fuera (1.10): su luz de noche
