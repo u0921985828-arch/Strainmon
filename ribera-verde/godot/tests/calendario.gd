@@ -35,6 +35,13 @@ func foto(dir: String, k: String) -> void:
 			await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(dir.path_join(k + ".png"))
 
+# 1.43 (lo pidió el usuario): centrado como la nevera y la caja, a lo ancho y en lo que deja el cuadro del texto, sin que lo pise
+func centrado(k: String, o: Vector2i, w: int, h: int) -> void:
+	var al: int = J.alto_libre()
+	chk(abs(J.SW - w - 2 * o.x) <= 1, "%s, a lo ancho: x %d en %d" % [k, o.x, J.SW])
+	chk(o.y + h <= al and abs(al - h - 2 * o.y) <= 4 or o.y <= 2, "%s, a lo alto: y %d, h %d, libre %d" % [k, o.y, h, al])
+	chk(al >= 116, "%s: el cuadro del texto deja %d px" % [k, al])
+
 func _corre() -> void:
 	Juego.GUARDADO = "user://prueba-cal.json"
 	Juego.AJUSTES = "user://prueba-cal-ajustes.json"
@@ -91,6 +98,9 @@ func _corre() -> void:
 	for y in [2026, 2027, 2028]:
 		for m in range(1, 13):
 			var r2: Array = Croquis.rects_cal(J.SW, {"y": y, "m": m}, 1, [])
+			var oc := Croquis.origen_cal(J.SW, {"y": y, "m": m})
+			if abs(Croquis.LIBRE - Croquis.alto_cal({"y": y, "m": m}) - 2 * oc.y) > 4:
+				chk(false, "%d-%d sin centrar: %d" % [y, m, oc.y])
 			if not r2.all(func(r): return r[1] + r[3] <= 120):
 				chk(false, "%d-%d se sale" % [y, m])
 	# 5 · el mapa: seis pueblos, los cerrados en gris, el marco y la chincheta dentro
@@ -129,14 +139,17 @@ func _corre() -> void:
 		J.CAL_V = {"y": 2026, "m": 5}
 		J._dlg_fijo(Croquis.desc_cal(J.CAL_V, 30, J.marcas_cal()), "CALENDARIO")
 		await foto(dir, "cal-mayo")
+		centrado("calendario", Croquis.origen_cal(J.SW, J.CAL_V, J.alto_libre()), 7 * Croquis.CW + 8, Croquis.alto_cal(J.CAL_V))
 		J.CAL_V = null
 		J.MAPA_V = {"i": 1}
-		J._dlg_fijo(Croquis.desc_mapa(J.D, 3, J.MAPA_V, "town"), "MAPA DE LA COMARCA")
+		J._dlg_fijo(Croquis.desc_mapa(J.D, 3, J.MAPA_V, "town"), "")   # 1.43: sin pestaña, que no pise el croquis
 		await foto(dir, "mapa-cap3")
+		centrado("mapa", Croquis.origen_mapa(J.SW, J.alto_libre()), Croquis.MW, Croquis.MH)
 		J.S.ch = 8
 		J.MAPA_V = {"i": 2}
-		J._dlg_fijo(Croquis.desc_mapa(J.D, 8, J.MAPA_V, "town"), "MAPA DE LA COMARCA")
+		J._dlg_fijo(Croquis.desc_mapa(J.D, 8, J.MAPA_V, "town"), "")   # 1.43: sin pestaña, que no pise el croquis
 		await foto(dir, "mapa-cap8")
+		centrado("mapa 8", Croquis.origen_mapa(J.SW, J.alto_libre()), Croquis.MW, Croquis.MH)
 		J.MAPA_V = null
 	for x in fallos:
 		print("  FALLO ", x)

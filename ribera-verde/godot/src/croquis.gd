@@ -52,12 +52,12 @@ static func texto(rs: Array, x: int, y: int, t: String, c: String) -> void:
 # ---------- el croquis ----------
 # los pueblos: p, en el croquis; z, las zonas del juego que caen en él; d, lo que cuenta al elegirlo
 const PUEBLOS := {
-	"puerto": {"p": [40, 30], "d": "Puerto Viejo, pueblo de pescadores en la costa: el puerto, la lonja y el club de los marineros."},
-	"town": {"p": [116, 48], "d": "Ribera Verde, tu barrio, a los dos lados de la ría: el piso de la tía, el barrio alto con la asociación y los astilleros en la desembocadura."},
-	"ibarbide": {"p": [190, 34], "d": "Ibarbide, la ciudad grande, junto al mar: el Casco Viejo, el Ensanche con la discoteca y la Kale Zaharra por detrás del growshop."},
-	"valdehierro": {"p": [48, 80], "d": "Valdehierro, el pueblo de las fábricas: chimeneas, naves, la chatarrería y tu nave."},
-	"mendialde": {"p": [122, 94], "d": "Mendialde, el pueblo del monte: el caserío donde empezó todo, prados y bosque."},
-	"errotabarri": {"p": [194, 84], "d": "Errotabarri, aldea de campos y del molino viejo, al final de la pista."},
+	"puerto": {"p": [40, 30], "d": "Puerto Viejo, en la costa: el puerto, la lonja y el club de los marineros."},
+	"town": {"p": [116, 48], "d": "Ribera Verde, tu barrio, en la ría: el piso de la tía, el barrio alto y los astilleros."},
+	"ibarbide": {"p": [190, 34], "d": "Ibarbide, la ciudad grande: el Casco Viejo, el Ensanche y la Kale Zaharra."},
+	"valdehierro": {"p": [48, 80], "d": "Valdehierro, el pueblo de las fábricas: naves, la chatarrería y tu nave."},
+	"mendialde": {"p": [122, 94], "d": "Mendialde, el pueblo del monte: el caserío donde empezó todo."},
+	"errotabarri": {"p": [194, 84], "d": "Errotabarri, la aldea del molino viejo, al final de la pista."},
 }
 const ORDEN := ["puerto", "town", "ibarbide", "errotabarri", "mendialde", "valdehierro"]
 const ZONA := {"town": "town", "alto": "town", "astilleros": "town", "home": "town", "shop": "town", "bar": "town", "txaro": "town",
@@ -264,12 +264,18 @@ static func imagen(D: Dictionary, ch: int) -> Image:
 			_px(im, MW - 1 - e, j, Color8(84, 62, 40))
 	return im
 
-static func origen_mapa(sw: int) -> Vector2i:
-	return Vector2i((sw - MW) >> 1, 4)
+# 1.43 (lo pidió el usuario): centrados como la nevera y la caja fuerte, a lo ancho y en el alto que deja libre el cuadro del texto
+const LIBRE := 133   # sin cuadro a la vista (las pruebas), lo que deja uno de dos líneas: 180 − 47
+
+static func centro_y(h: int, alto: int) -> int:
+	return maxi(2, (alto - h) >> 1)
+
+static func origen_mapa(sw: int, alto := LIBRE) -> Vector2i:
+	return Vector2i((sw - MW) >> 1, centro_y(MH, alto))
 
 # encima de la imagen: el marco del pueblo elegido y la chincheta de dónde estás (rectángulos [x, y, w, h, color])
-static func rects_mapa(sw: int, V: Dictionary, aqui: String) -> Array:
-	var o := origen_mapa(sw)
+static func rects_mapa(sw: int, V: Dictionary, aqui: String, alto := LIBRE) -> Array:
+	var o := origen_mapa(sw, alto)
 	var rs := []
 	var p: Array = PUEBLOS[ORDEN[int(V.i)]].p
 	var x: int = o.x + p[0] - 12
@@ -290,11 +296,11 @@ static func desc_mapa(D: Dictionary, ch: int, V: Dictionary, aqui: String) -> St
 	if k == aqui:
 		t += " Estás aquí."
 	if k == "town":
-		t += "\nTodas las líneas de autobús salen de su plaza."
+		t += "\nDe su plaza salen todos los autobuses."
 	elif abierto(D, ch, k):
-		t += "\nAutobús desde Ribera Verde: %d min, %s." % [int(D.PARADAS[k].min), Datos.eur(D.PARADAS[k].eur)]
+		t += "\nAutobús: %d min, %s." % [int(D.PARADAS[k].min), Datos.eur(D.PARADAS[k].eur)]
 	else:
-		t += "\nTodavía no hay línea de autobús (llega en el capítulo %d)." % int(D.PARADAS[k].cap)
+		t += "\nSin autobús hasta el capítulo %d." % int(D.PARADAS[k].cap)
 	return t
 
 static func mueve_mapa(V: Dictionary, b: String) -> bool:
@@ -307,12 +313,16 @@ static func mueve_mapa(V: Dictionary, b: String) -> bool:
 	return false
 
 # ---------- el calendario ----------
-static func origen_cal(sw: int) -> Vector2i:
-	return Vector2i((sw - (7 * CW + 8)) >> 1, 4)
+static func alto_cal(V: Dictionary) -> int:
+	var s0: int = Datos.fecha(Datos.dia_de(V.y, V.m, 1)).s
+	return 22 + int(ceil((s0 + Datos.dias_mes(V.y, V.m)) / 7.0)) * CH + 4
+
+static func origen_cal(sw: int, V: Dictionary, alto := LIBRE) -> Vector2i:
+	return Vector2i((sw - (7 * CW + 8)) >> 1, centro_y(alto_cal(V) + 4, alto) + 2)
 
 # los días señalados del mes que se ve: [{d (día de partida), c (color), t (texto)}]
-static func rects_cal(sw: int, V: Dictionary, hoy: int, marcas: Array) -> Array:
-	var o := origen_cal(sw)
+static func rects_cal(sw: int, V: Dictionary, hoy: int, marcas: Array, alto := LIBRE) -> Array:
+	var o := origen_cal(sw, V, alto)
 	var rs := []
 	var W := 7 * CW + 8
 	var y: int = V.y
@@ -320,8 +330,7 @@ static func rects_cal(sw: int, V: Dictionary, hoy: int, marcas: Array) -> Array:
 	var nd := Datos.dias_mes(y, m)
 	var d1 := Datos.dia_de(y, m, 1)
 	var s0: int = Datos.fecha(d1).s
-	var filas := int(ceil((s0 + nd) / 7.0))
-	var H := 22 + filas * CH + 4
+	var H := alto_cal(V)
 	rs.append([o.x - 2, o.y - 2, W + 4, H + 4, "#54402a"])
 	rs.append([o.x, o.y, W, H, "#f0e6c8"])
 	rs.append([o.x, o.y, W, 11, "#3a6a3a"])
@@ -357,6 +366,8 @@ static func desc_cal(V: Dictionary, hoy: int, marcas: Array) -> String:
 	for e in marcas:
 		if int(e.d) >= d1 and int(e.d) <= d2 and int(e.d) >= hoy:
 			L.append("%d, %s" % [int(Datos.fecha(int(e.d)).d), e.t])
+	if L.size() > 3:   # 1.43: el cuadro, de tres líneas como mucho; el resto, en los puntos de colores
+		L = L.slice(0, 2) + ["y %d más" % (L.size() - 2)]
 	if L.size():
 		t += " En %s: %s." % [Datos.MES_N[V.m - 1], " · ".join(L)]
 	t += "\nFlechas: otro mes · B: cerrar."

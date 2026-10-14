@@ -150,6 +150,7 @@ func new_day() -> void:
 	curro_dia()   # la gente (1.15)
 	setas_dia()   # el bajo de las setas (1.20)
 	recibos_dia()   # 1.35
+	conce_dia()   # 1.43
 	vencer_encargo_club()
 	if S.due > 0 and S.day > S.deadline:   # 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
 		queue("penalty", penalty_event)
@@ -1011,7 +1012,7 @@ func tienda_online() -> void:
 	var i := 0
 	while true:
 		var ks: Array = D.MUEBLES.keys().filter(func(k): return not D.MUEBLES[k].get("grow"))
-		var vs: Array = D.VEHICULOS.keys()
+		var vs: Array = D.VEHICULOS.keys().filter(func(k): return not D.VEHICULOS[k].get("conce"))   # 1.43: la moto, en el concesionario
 		var ya := muebles_ya()
 		var items := []
 		for k in ks:
@@ -1222,6 +1223,18 @@ func viaje(a: String, b: String) -> Dictionary:
 func parada_action():
 	var aqui: String = S.map
 	var pa: Dictionary = D.PARADAS[aqui]
+	var mios := coches_mios()   # 1.43: con un vehículo del concesionario, a dónde quieras y a cualquier hora
+	if mios.size() and not llegando():
+		var ops: Array = ["En autobús"]
+		for k in mios:
+			ops.append("En " + String(D.CONCE.v[k].art))
+		ops.append("Nada")
+		var c: int = await ask("PARADA DE %s\n¿Cómo vas?" % String(pa.n).to_upper(), ops)
+		if c < 0 or c > mios.size():
+			return
+		if c > 0:
+			await conducir(mios[c - 1])
+			return
 	if S.min < int(D.BUS_HORAS[0]) or S.min > int(D.BUS_HORAS[1]):   # fuera de horario: se puede esperar al primero (el reloj corre hasta las 7:00)
 		if await ask("PARADA DE %s\nEl primer autobús pasa a las 7:00 y el último, a las 21:00." % String(pa.n).to_upper(), ["Esperar al de las 7:00", "Nada"]) != 0:
 			return
@@ -1640,6 +1653,9 @@ func recibos() -> Array:
 		r.append(["Bajo de la Kale Zaharra", S.setas.r, recibo_setas(), "efectivo", r.size()])
 	for k in S.loc:
 		r.append([D.LOCALES[k].n, S.loc[k].r, D.LOCALES[k].sem, "cuenta", r.size()])
+	for k in D.CONCE.orden:   # 1.43: el seguro de cada vehículo, domiciliado, cada mes
+		if S.get("coches") is Dictionary and S.coches.has(k) and S.coches[k].get("r") != null:
+			r.append(["Seguro · " + String(D.CONCE.v[k].n), S.coches[k].r, seguro_mes(k), "cuenta", r.size()])
 	if S.protect and S.get("protHasta"):
 		r.append(["Sargento Molina", S.protHasta + 1, D.SOBORNO, "mano", r.size()])
 	r.sort_custom(func(a, b): return a[1] < b[1] or a[1] == b[1] and a[4] < b[4])   # estable, como sort de JS
@@ -1657,7 +1673,7 @@ func banca() -> void:
 	await menu(it, {"cls": "full", "title": "BANCA", "title2": "Saldo " + Datos.eur(S.banco), "desc": true})
 
 # un recibo (o.r, el día): el aviso, el cobro (en efectivo, de lo que llevas y de la caja; o domiciliado) y la gracia; false si se pierde
-func cobra(o: Dictionary, e: float, quien: String, banco: bool, t: String) -> bool:
+func cobra(o: Dictionary, e: float, quien: String, banco: bool, t: String, per := 0) -> bool:
 	var N := "SMS · " + quien
 	if S.day == o.r - D.RECIBO.aviso:
 		var tx: String = ("El %s se carga el recibo de %s: %s. Saldo: %s." % [Datos.fd(o.r, S.day), t, Datos.eur(e), Datos.eur(S.banco)]) if banco else ("El %s paso a cobrar: %s, en efectivo. Tenlo preparado." % [Datos.fd(o.r, S.day), Datos.eur(e)])
@@ -1666,7 +1682,7 @@ func cobra(o: Dictionary, e: float, quien: String, banco: bool, t: String) -> bo
 		return true
 	var ok: bool = cobro_banco(e, "Recibo · " + t) if banco else (S.money + caja_e() >= e and pagar_casa(e) == 0)
 	if ok:
-		o.r += D.RECIBO.dias
+		o.r += per if per else int(D.RECIBO.dias)   # 1.43: el seguro, cada mes (per)
 		return true
 	if S.day < o.r + (D.RECIBO.graciaB if banco else D.RECIBO.gracia):
 		var tx: String = ("Recibo de %s devuelto: %s. Si el %s no hay saldo, se rescinde el contrato." % [t, Datos.eur(e), Datos.fd(o.r + D.RECIBO.graciaB, S.day)]) if banco else "He pasado a cobrar y no había nada. Vuelvo mañana; como no esté, cambio la cerradura."

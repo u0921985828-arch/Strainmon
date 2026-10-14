@@ -412,14 +412,15 @@ func _encima() -> void:
 		var kc := "croquis|%d" % int(J.S.ch)
 		if not cache.has(kc):
 			cache[kc] = Croquis.imagen(J.D, int(J.S.ch))
-		var o := Croquis.origen_mapa(J.SW)
+		var al: int = J.alto_libre()
+		var o := Croquis.origen_mapa(J.SW, al)
 		_img(cache[kc], o.x, o.y)
-		for e in Croquis.rects_mapa(J.SW, J.MAPA_V, Croquis.pueblo_de(J.S.map)):
+		for e in Croquis.rects_mapa(J.SW, J.MAPA_V, Croquis.pueblo_de(J.S.map), al):
 			if e[4] == "#f8d040" and int(now / 400.0) % 2:
 				continue
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.CAL_V != null:   # 1.42: la hoja del mes
-		for e in Croquis.rects_cal(J.SW, J.CAL_V, int(J.S.day), J.marcas_cal()):
+		for e in Croquis.rects_cal(J.SW, J.CAL_V, int(J.S.day), J.marcas_cal(), J.alto_libre()):
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.ALMACEN != null:   # la caja fuerte y la nevera por dentro (1.36)
 		for e in J.rects_almacen(J.ALMACEN):
@@ -821,7 +822,12 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 		var vd = Atlas.frame_de("vehiculos", v + "-delante", d, 0, o)
 		if va:
 			_pinta(va, xp, yp)
-		_pinta(f, xp, yp - int(J.D.VEHICULOS[v].sube))
+		var V: Dictionary = J.D.VEHICULOS[v]
+		if V.has("corta"):   # en coche (1.43): de la cintura para arriba, sentado detrás del cristal o en el descapotable
+			var cy := int(V.corta)
+			L.draw_texture_rect_region(Atlas.tex(f.c), Rect2(Datos.jsround(xp - f.cel.ancla[0]), Datos.jsround(yp - int(V.sube) - f.cel.ancla[1]), f.c.get_width(), cy), Rect2(0, 0, f.c.get_width(), cy))
+		else:
+			_pinta(f, xp, yp - int(V.sube))
 		if vd:
 			_pinta(vd, xp, yp)
 	else:

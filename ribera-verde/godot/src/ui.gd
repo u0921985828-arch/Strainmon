@@ -395,6 +395,12 @@ func geo_mandos(W: float, H: float, il: float, ir: float, it: float, ib: float, 
 		"start": R.call(stx - 7.5 * s, ay - 16.25 * s, 15 * s, 7 * s), "movil": R.call(cx - 7.5 * s, cy - 23 * s, 15 * s, 7 * s), "sonido": R.call(W - ir - 4.5 * m - 15 * s, it + 3 * s, 15 * s, 7 * s)}
 
 # rectángulo del escenario .ui (en px de pantalla)
+# 1.43: lo que queda libre del lienzo (en píxeles del juego) por encima del cuadro del texto, para centrar ahí el calendario y el mapa
+func alto_libre() -> int:
+	if oraculo or not dlg.visible or u <= 0:
+		return SH - 47
+	return clampi(int(floor((dlg_nm.position.y if dlg_nm.visible else dlg.position.y) - scr.position.y) / u) - 1, 40, SH)
+
 func ui_rect() -> Rect2:
 	return Rect2(scr.position.x + scr.size.x / 2 - uiw / 2, scr.position.y + ut, uiw, scr.size.y - ut)
 
@@ -1257,6 +1263,9 @@ func _coloca() -> void:
 		dlg_nm.position = dlg.position + Vector2(6 * us, -12 * us)
 		dlg_more.position = dlg.position + dlg.size - Vector2(8 * us + 8 * us, 4 * us + 5 * us)
 		dlg_more.size = Vector2(8 * us, 7 * us)
+		# 1.43: la primera vez, el texto aún no sabe su ancho y el cuadro sale de toda la pantalla; se recoloca al fotograma siguiente
+		if dlg.size.y > R.size.y * 0.6 and not get_tree().process_frame.is_connected(_coloca):
+			get_tree().process_frame.connect(_coloca, CONNECT_ONE_SHOT)
 	if menu_box.visible:
 		var cls: String = menu_box.get_meta("cls", "right")
 		menu_box.custom_minimum_size = Vector2(60 * us, 0)

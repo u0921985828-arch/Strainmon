@@ -6,7 +6,7 @@ extends "res://src/ui.gd"
 const TS := 16
 const DV := {"up": [0, -1], "down": [0, 1], "left": [-1, 0], "right": [1, 0]}
 const OPP := {"up": "down", "down": "up", "left": "right", "right": "left"}
-const COUNTERS := ["counter", "barcounter", "btable", "vitrina", "barraD", "cabina", "cabina2"]   # 1.30: la vitrina del dispensario, la barra y la cabina del DJ
+const COUNTERS := ["counter", "barcounter", "btable", "vitrina", "barraD", "cabina", "cabina2", "mesaK", "mesaK2"]   # 1.30: la vitrina del dispensario, la barra y la cabina del DJ; 1.43: la mesa del concesionario
 const SILLAS := ["silla", "sillaG", "sillaG2"]   # 1.27.1: delante de un ordenador; con A, el ordenador de encima (delante)
 var SOLID_G := RegEx.create_from_string("^(water|roof|wall|win|iwT|iwB|void)")
 
@@ -490,6 +490,57 @@ func montar_nave() -> void:
 				n.o[int(e[1])][int(e[0])] = e[2]
 	if S != null:
 		aplica_orden("nave")
+	# 1.43: el carro de las bandejas de clones (S.nave.bc), contra la pared, entre el secadero y el escritorio
+	for x in [8, 9]:
+		if n.o[2][x] in ["clonN", "clonN2"]:
+			n.o[2][x] = null
+	if S != null and S.get("nave") != null and Datos.CAL and not S.nave.has("bc"):
+		S.nave.bc = []
+	if S != null and S.get("nave") != null and S.nave.has("bc") and n.o[2][8] == null and n.o[2][9] == null:
+		n.o[2][8] = "clonN"
+		n.o[2][9] = "clonN2"
+
+# el concesionario del barrio alto (1.43, lo pidió el usuario): con AUTOS RIBERA abierto (S.flags.conce), su edificio (D.CONCE.bld),
+# sin los árboles de donde va (CONCE.quita), con la acera, las banderas y la puerta; sin él, el barrio alto como estaba
+var _alto0 = null
+func montar_alto() -> void:
+	var m = MAPS.get("alto")
+	if m == null:
+		return
+	var C: Dictionary = D.CONCE
+	var b: Dictionary = C.bld
+	var abre: bool = S != null and S.get("flags") is Dictionary and S.flags.get("conce") != null
+	if _alto0 == null:
+		_alto0 = {"g": m.g.duplicate(true), "o": m.o.duplicate(true), "doors": m.doors.duplicate(true), "blds": m.blds.duplicate(true)}
+	if m.get("conceK", false) == abre:
+		return
+	m.conceK = abre
+	for y in int(m.h):
+		m.g[y] = _alto0.g[y].duplicate()
+		m.o[y] = _alto0.o[y].duplicate()
+	m.doors.clear()
+	m.doors.merge(_alto0.doors.duplicate(true))
+	m.blds.clear()
+	m.blds.append_array(_alto0.blds.duplicate(true))
+	if not abre:
+		return
+	for q in C.quita:
+		m.o[int(q[1])][int(q[0])] = null
+	var y0 := int(b.y0)
+	var dy: int = y0 + int(b.h) - 1
+	for y in range(y0, dy + 1):
+		for x in range(int(b.x0), int(b.x0) + int(b.w)):
+			m.g[y][x] = ("roofT_" if y == y0 else "roofB_" if y == y0 + 1 else "wall_") + "conce"
+			m.o[y][x] = null
+	for x in range(int(b.x0) + 1, int(b.x0) + int(b.w) - 1):   # la acera de delante
+		m.g[dy + 1][x] = "walk"
+	for j in 2:
+		var x: int = int(b.doorX) + j
+		m.g[dy][x] = "door_conce"
+		m.doors["%d,%d" % [x, dy]] = {"to": "conce", "x": 8 + j, "y": 8, "dir": "up"}
+	for f in C.fuera:
+		m.o[int(f[1])][int(f[0])] = f[2]
+	m.blds.append(b.duplicate())
 
 func montar_casa() -> void:
 	var h: Dictionary = MAPS.home
@@ -706,6 +757,8 @@ func npc_cond(d: Dictionary) -> bool:
 			return S.get("nave") != null and navero_de(int(d.id.substr(2))) != null
 		"nvm":   # 1.34: el de las madres
 			return S.get("nave") != null and cuida_madres() != null
+		"arantxa", "conce2":   # 1.43: el concesionario
+			return S.get("flags") is Dictionary and S.flags.get("conce") != null
 		"gorila":
 			return S.ch >= int(D.DISCO.ch)
 	return true
@@ -756,6 +809,10 @@ func npc_talk(d: Dictionary) -> void:
 			await talk_navero(int(d.id.substr(2)))
 		"nvm":   # 1.34: las madres de la nave
 			await talk_madres()
+		"arantxa":   # 1.43: el concesionario
+			await talk_conce()
+		"conce2":
+			await say(pick(["Vengo a por la berlina de empresa. Bueno, a mirar; lo de comprar, lo decide mi mujer.", "¿Has visto el rojo? Doscientos cuarenta y cinco mil. Con eso me compro dos pisos en el pueblo.", "La moto es lo más práctico: aparcas en cualquier sitio y gasta nada."]), "CLIENTE")
 		"cg1", "cg2", "cg3", "cg4":   # 1.34: los demás socios de cada club
 			await talk_gente_club(S.map.substr(5), int(d.id.substr(2)) - 1)
 		"pres_puerto", "pres_valde", "pres_ibar", "pres_ens":   # 1.34: los presidentes de los clubs de fuera
@@ -933,6 +990,8 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 		montar_casa()
 	if name_ == "nave":
 		montar_nave()
+	if name_ == "alto":
+		montar_alto()
 	montar_club(name_)
 	P.x = x
 	P.y = y
@@ -1034,12 +1093,21 @@ func try_move(d: String) -> void:
 # el patinete o la bici (1.13, vehiculo() de 12c-salon): en la calle (ZONAS), el mejor que tengas
 func vehiculo():
 	var v = S.get("veh")
-	if not (v is Dictionary) or not D.ZONAS.has(S.map):
+	if not D.ZONAS.has(S.map):
+		return null
+	for k in ["deportivo", "berlina", "utilitario", "moto"]:   # 1.43: lo del concesionario, antes que nada (el mejor que tengas)
+		if coche_ya(k) and not S.coches[k].get("grua") and D.VEHICULOS.has(k):
+			return k
+	if not (v is Dictionary):
 		return null
 	for k in ["bici", "patinete"]:
 		if v.get(k) and float(v[k]) <= S.day:
 			return k
 	return null
+
+# 1.43: un vehículo del concesionario (S.coches: {k: {dia: cuándo llega, p: lo pagado, r: el próximo recibo del seguro o null}}), ya entregado
+func coche_ya(k: String) -> bool:
+	return S.get("coches") is Dictionary and S.coches.has(k) and int(S.coches[k].dia) <= int(S.day)
 
 func paso_ms() -> float:   # ms por casilla: a pie, corriendo o montado (pasoMs)
 	var v = vehiculo()
@@ -1924,6 +1992,16 @@ func sprite_local(o: String) -> String:
 func bandejas_balda(_x: int) -> Array:
 	return []
 func talk_madres():
+	pass
+func talk_conce():   # trama (1.43)
+	pass
+func coches_mios() -> Array:
+	return []
+func conducir(_k):
+	pass
+func seguro_mes(_k) -> int:
+	return 0
+func conce_dia() -> void:
 	pass
 func talk_gente_club(_k, _j):
 	pass

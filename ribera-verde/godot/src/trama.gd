@@ -3716,7 +3716,10 @@ func nave_dia() -> void:
 		elif Me.abo == 2 and N.ab.o >= R.dosis:
 			N.ab.o = Datos.jsround((N.ab.o - R.dosis) * 10) / 10.0
 			Me.ao = int(Me.get("ao", 0)) + 1
+		var p0 := p
 		p += 1.0 / float(strain(lot_sid(Me.k)).d)
+		if Datos.CAL and N.has("bc") and p0 < FLOR_MESA and p >= FLOR_MESA:   # 1.43: antes de pasarla a 12/12, la bandeja de clones
+			corta_bandeja(int(W[i].mesa), Me)
 		if p < 1:
 			Me.p = Datos.jsround(p * 1000) / 1000.0
 			continue
@@ -3725,6 +3728,8 @@ func nave_dia() -> void:
 			c.t = Datos.jsround((Me.h.t * Me.h.g + c.t * c.g) / (Me.h.g + c.g) * 10) / 10.0
 			c.g = Datos.jsround((Me.h.g + c.g) * 10) / 10.0
 		Me.h = {"g": c.g, "t": c.t, "d": S.day}
+		if N.has("bc"):   # 1.43: la mesa vuelve a empezar con su bandeja (la de antes de la 1.43, con los clones que ya tenía)
+			N.bc = N.bc.filter(func(b): return int(b.m) != int(W[i].mesa))
 		Me.p = float(D.NAVE.clon)
 		Me.n = int(Me.get("n", 0)) + 1
 		Me.dn = 0
@@ -4019,6 +4024,9 @@ func obj_local(x: int, y: int, o) -> bool:
 			"carpaM", "carpaM2":   # 1.34
 				await carpa_madres()
 				return true
+			"clonN", "clonN2":   # 1.43
+				await bandejas_nave()
+				return true
 			"crate":
 				txt = "Sacos de sustrato y macetas apiladas."
 	if S.map == "setas":   # 1.34: el bajo de las setas por dentro
@@ -4043,6 +4051,27 @@ func obj_local(x: int, y: int, o) -> bool:
 				txt = "Cajas de bandejas vacías de Txomin, apiladas."
 			"cuboS":
 				txt = "Un cubo y un cepillo. Lo que se echa a perder, fuera."
+	if S.map == "conce":   # 1.43
+		var C: Dictionary = D.CONCE
+		for k in C.orden:
+			if o == C.v[k].o or o == C.v[k].o + "2":
+				await ficha_expo(k)
+				return true
+		match o:
+			"rotuloK", "rotuloK2":
+				txt = "AUTOS RIBERA. Debajo, más pequeño: «Concesionario · Taller · Financiación»."
+			"preciosK":
+				txt = "Precios con IVA. Aparte, la matriculación (el impuesto, según las emisiones) y %s de gestoría y placas." % Datos.eur(C.gastos)
+			"catalogoK":
+				txt = "Catálogos con las fichas técnicas: potencia, consumo, emisiones y la etiqueta medioambiental."
+			"cafeK":
+				txt = "Una cafetera de cápsulas y vasitos para los clientes. Huele a café y a coche nuevo."
+			"ruedasK":
+				txt = "Neumáticos de invierno, apilados. Con el coche se monta un juego en el taller."
+			"mesaK", "mesaK2":
+				txt = "La mesa de %s, con el ordenador y los contratos. Habla con ella." % "Arantxa"
+			"plantDeco":
+				txt = "Una planta de plástico con polvo."
 	if S.map == "disco":
 		match o:
 			"bottles":
@@ -4073,6 +4102,9 @@ func sprite_local(o: String) -> String:
 		return "secaS-%d" % (1 if S.get("setas") != null and S.setas.g >= 1 else 0)
 	if o == "carpaM":
 		return "carpaM-%d" % (S.nave.ma.size() if S.get("nave") != null and S.nave.has("ma") else 0)
+	if o == "clonN":   # 1.43: el carro de bandejas de la nave, por lo lleno
+		var nb: int = S.nave.bc.size() if S.get("nave") != null and S.nave.has("bc") else 0
+		return "clonN-%d" % (0 if nb == 0 else 1 if nb <= 2 else 2)
 	if o == "rotuloL":   # 1.35 (granja.gd)
 		return sprite_rotulo()
 	var e = MAPS[S.map].get("est") if MAPS.has(S.map) else null
@@ -4505,7 +4537,8 @@ func elegir_planta(title: String, madres: bool):
 	for e in S.bandejas:
 		esq.append([e, 1])
 	var ma: Array = S.nave.ma if madres and S.get("nave") != null else []
-	if own.is_empty() and esq.is_empty() and ma.is_empty():
+	var bc: Array = bandejas_listas() if madres else []   # 1.43: las bandejas de clones enraizados de la nave
+	if own.is_empty() and esq.is_empty() and ma.is_empty() and bc.is_empty():
 		await say("No llevas semillas ni esquejes.")
 		return null
 	var items := []
@@ -4513,6 +4546,10 @@ func elegir_planta(title: String, madres: bool):
 		var k := lot_sid(ma[j].k)
 		var s = strain(k)
 		items.append({"label": "Madre %d: %s%s" % [j + 1, s.n, etiq(ma[j].get("f"))], "right": "clon", "sw": s.c, "ic": ic_cog(k), "desc": "Un clon de la carpa de las madres: no se gasta nada."})
+	for b in bc:
+		var k := lot_sid(b.k)
+		var s = strain(k)
+		items.append({"label": "Bandeja: %s%s" % [s.n, etiq(b.get("f"))], "right": "%d clones" % int(D.NAVE.tacos), "sw": s.c, "ic": ic_cog(k), "desc": "Los clones enraizados del carro de bandejas: una mesa entera."})
 	for o in own:
 		var s = strain(o[0])
 		items.append({"label": s.n, "right": "×" + n(o[1]), "sw": s.c, "ic": ic_cog(o[0]), "desc": strain_line(o[0])})
@@ -4526,6 +4563,10 @@ func elegir_planta(title: String, madres: bool):
 	if j < ma.size():
 		return {"sid": lot_sid(ma[j].k), "f": ma[j].f}
 	j -= ma.size()
+	if j < bc.size():
+		S.nave.bc.erase(bc[j])
+		return {"sid": lot_sid(bc[j].k), "f": bc[j].get("f")}
+	j -= bc.size()
 	if j < own.size():
 		var sid: String = own[j][0]
 		S.seeds[sid] -= 1
@@ -6099,7 +6140,7 @@ func elegir_cal() -> void:
 func elegir_mapa() -> void:
 	var aqui := Croquis.pueblo_de(S.map)
 	MAPA_V = {"i": Croquis.ORDEN.find(aqui)}
-	_dlg_fijo(Croquis.desc_mapa(D, int(S.ch), MAPA_V, aqui), "MAPA DE LA COMARCA")
+	_dlg_fijo(Croquis.desc_mapa(D, int(S.ch), MAPA_V, aqui), "")   # 1.43: sin pestaña, que no pise el croquis
 	var pr := Motor.Prom.new()
 	push(func(b: String):
 		if b == "A" or b == "B":
@@ -6108,9 +6149,277 @@ func elegir_mapa() -> void:
 			return
 		if Croquis.mueve_mapa(MAPA_V, b):
 			sfx("sel")
-			_dlg_fijo(Croquis.desc_mapa(D, int(S.ch), MAPA_V, aqui), "MAPA DE LA COMARCA"))
+			_dlg_fijo(Croquis.desc_mapa(D, int(S.ch), MAPA_V, aqui), ""))   # 1.43: sin pestaña, que no pise el croquis
 	await Motor.espera(pr)
 	MAPA_V = null
 	if not oraculo:
 		dlg.hide()
 		dlg_nm.hide()
+
+# ---------- las bandejas de clones de la nave (1.43, lo pidió el usuario: «en la nave debería haber bandejas de clones») ----------
+# Antes de pasar una mesa a 12/12 (FLOR_MESA), su navero le corta los esquejes a las plantas en crecimiento y los pincha en una bandeja
+# de D.NAVE.tacos tacos (S.nave.bc: {m: la mesa, k, f, d: el día del corte}), con su tapa, bajo los T5 del carro; enraízan en NAVE.raiz
+# días (al ritmo del juego, como las mesas: un ciclo entero son unos pocos días) y, cuando la mesa se cosecha, vuelve a empezar con ellos. Las enraizadas también se plantan a mano en una mesa vacía
+const FLOR_MESA := .65
+const BANDEJAS_NAVE := 4
+
+func corta_bandeja(i: int, Me: Dictionary) -> void:
+	var N: Dictionary = S.nave
+	if N.bc.size() >= BANDEJAS_NAVE or N.bc.any(func(b): return int(b.m) == i):
+		return
+	N.bc.append({"m": i, "k": Me.k, "f": Me.get("f"), "d": int(S.day)})
+
+func bandeja_lista(b: Dictionary) -> bool:
+	return int(S.day) - int(b.d) >= int(D.NAVE.raiz)
+
+func bandejas_listas() -> Array:
+	if S.get("nave") == null or not S.nave.has("bc"):
+		return []
+	return S.nave.bc.filter(func(b): return bandeja_lista(b))
+
+func bandejas_nave() -> void:
+	var N: Dictionary = S.nave
+	if not N.has("bc") or N.bc.is_empty():
+		await say("El carro de las bandejas de clones: dos baldas con sus tubos T5 y sus tapas. Vacío. Antes de pasar cada mesa a 12/12, quien la cuida le corta %d esquejes y aquí echan raíces en %s; con ellos, la mesa vuelve a empezar." % [int(D.NAVE.tacos), "un día" if int(D.NAVE.raiz) == 1 else "%d días" % int(D.NAVE.raiz)])
+		return
+	var rows := []
+	for b in N.bc:
+		var k := lot_sid(b.k)
+		var s = strain(k)
+		var faltan: int = int(D.NAVE.raiz) - (int(S.day) - int(b.d))
+		rows.append({"label": "Mesa %d · %s" % [int(b.m) + 1, s.n], "right": "enraizada" if faltan <= 0 else ("%d d" % faltan), "sw": s.c, "ic": ic_cog(k),
+			"desc": "%d esquejes de %s%s, cortados el %s, en tacos de turba con su tapa. %s" % [int(D.NAVE.tacos), s.n, etiq(b.get("f")), Datos.fd(int(b.d), S.day),
+				"Ya tienen raíces: la mesa %d vuelve a empezar con ellos al cosecharse." % (int(b.m) + 1) if faltan <= 0 else "Les faltan %s para echar raíces." % ("un día" if faltan == 1 else "%d días" % faltan)]})
+	rows.append({"label": "Volver", "desc": ""})
+	await menu(rows, {"cls": "full", "title": "BANDEJAS DE CLONES", "title2": "%d de %d" % [N.bc.size(), BANDEJAS_NAVE], "desc": true})
+
+# ---------- el concesionario (1.43, lo pidió el usuario) ----------
+# AUTOS RIBERA abre en el barrio alto (montar_alto) con el capítulo CONCE.ch y CONCE.patri entre efectivo y cuenta. Precios con IVA;
+# aparte, el impuesto de matriculación (IEDMT: por los g de CO2/km, sobre el precio sin IVA) y los gastos de gestoría y placas. En
+# efectivo, como mucho CONCE.efe (Ley 11/2021); el resto, por transferencia. El seguro, domiciliado cada mes (recibos). La entrega,
+# a los días de matricularlo; el deportivo, bajo pedido. Se revende con la depreciación (CONCE.dep). Con un vehículo vas de parada en
+# parada a cualquier hora (conducir): con su gasolina y, a veces, un control de tráfico; la moto, además, por la calle (vehiculo)
+func coches_mios() -> Array:
+	var r := []
+	for k in D.CONCE.orden:
+		if coche_ya(k) and not S.coches[k].get("grua"):
+			r.append(k)
+	return r
+
+func iedmt(k: String) -> int:
+	var V: Dictionary = D.CONCE.v[k]
+	if V.get("exenta"):
+		return 0
+	for t in D.CONCE.iedmt:
+		if float(V.co2) <= float(t[0]):
+			return roundi(float(V.p) / 1.21 * float(t[1]))
+	return 0
+
+func total_coche(k: String) -> int:
+	return int(D.CONCE.v[k].p) + iedmt(k) + int(D.CONCE.gastos)
+
+func seguro_mes(k) -> int:
+	return roundi(float(D.CONCE.v[k].seg) / 12.0)
+
+# lo que te paga el concesionario por el tuyo: el precio, menos lo que pierde al salir (dep.ya) y cada mes (dep.mes), hasta dep.min
+func valor_coche(k: String) -> int:
+	var c: Dictionary = S.coches[k]
+	var dp: Dictionary = D.CONCE.dep
+	var meses: int = maxi(0, int(S.day) - int(c.dia)) / int(D.CONCE.mes)
+	return roundi(float(D.CONCE.v[k].p) * maxf(float(dp.min), 1.0 - float(dp.ya) - float(dp.mes) * meses))
+
+func ficha_coche(k: String) -> String:
+	var V: Dictionary = D.CONCE.v[k]
+	var ie := iedmt(k)
+	return "%s\n%s l/100 km · %d g CO2/km · seguro %s al año. Total %s (matriculación %s, gastos %s). Entrega en %d días." % [V.d, Datos.coma(V.l), int(V.co2),
+		Datos.eur(V.seg), Datos.eur(total_coche(k)), Datos.eur(ie) if ie else "exenta", Datos.eur(D.CONCE.gastos), int(V.entrega)]
+
+func _art_m(k: String) -> String:   # «la moto» → «a»; «el utilitario» → «o»
+	return "a" if String(D.CONCE.v[k].art).begins_with("la ") else "o"
+
+func ficha_expo(k: String) -> void:
+	var V: Dictionary = D.CONCE.v[k]
+	if S.get("coches") is Dictionary and S.coches.has(k):
+		await say("%s, como %s tuy%s." % [mayus(V.art), V.art, _art_m(k)])
+		return
+	if await ask("%s · %s.\n%s" % [V.n, Datos.eur(V.p), V.d], ["Hablar con Arantxa", "Nada"]) == 0:
+		await comprar_coche(k)
+
+func talk_conce():
+	var C: Dictionary = D.CONCE
+	var i := 0
+	while true:
+		var it := []
+		var tuyos := []
+		var sin := []
+		for k in C.orden:
+			var V: Dictionary = C.v[k]
+			var c = S.coches.get(k) if S.get("coches") is Dictionary else null
+			if c != null and coche_ya(k):
+				tuyos.append(k)
+				if c.get("r") == null:
+					sin.append(k)
+			it.append({"label": V.n + (" · tuy" + _art_m(k) if c != null and coche_ya(k) else " · pedid" + _art_m(k) if c != null else ""), "right": Datos.eur(V.p), "desc": ficha_coche(k)})
+		it.append({"label": "Vender", "disabled": tuyos.is_empty(), "desc": "Te lo recompran: pierde un %d %% al salir del concesionario y un %s %% cada mes, hasta el %d %% de lo que valía." % [roundi(C.dep.ya * 100), Datos.coma(C.dep.mes * 100), roundi(C.dep.min * 100)]})
+		it.append({"label": "Asegurar", "disabled": sin.is_empty(), "desc": "Sin seguro no se puede circular: la multa es de %s y el vehículo, a la grúa." % Datos.eur(C.sinSeguro)})
+		it.append({"label": "Nada", "desc": "Precios con IVA. Aparte, la matriculación por emisiones y %s de gestoría y placas." % Datos.eur(C.gastos)})
+		i = await menu(it, {"cls": "full", "title": C.n, "title2": "Cuenta %s · efectivo %s" % [Datos.eur(S.banco), Datos.eur(S.money)], "desc": true, "initial": i})
+		var no: int = C.orden.size()
+		if i < 0 or i >= no + 2:
+			if S.get("coches") is Dictionary and not S.coches.is_empty():
+				await say("Cualquier cosa, aquí estamos. Y ojo con la ITV.", "ARANTXA")
+			return
+		if i < no:
+			await comprar_coche(C.orden[i])
+		elif i == no:
+			await vender_coche(tuyos)
+		else:
+			await asegurar_coche(sin)
+
+func comprar_coche(k: String) -> void:
+	var A := "ARANTXA"
+	var C: Dictionary = D.CONCE
+	var V: Dictionary = C.v[k]
+	if S.get("coches") is Dictionary and S.coches.has(k):
+		await say(("%s ya es tuy%s." % [mayus(V.art), _art_m(k)]) if coche_ya(k) else ("%s está en camino: te aviso por SMS." % mayus(V.art)), A)
+		return
+	var tot := total_coche(k)
+	var sm := seguro_mes(k)
+	var efe: int = mini(mini(int(S.money), int(C.efe)), tot)
+	var tr: int = tot - efe
+	if await ask("%s: %s en total. %s en efectivo, que más no deja la ley, y %s por transferencia; el seguro, %s al mes, domiciliado. ¿Lo firmas?" % [V.n, Datos.eur(tot), Datos.eur(efe), Datos.eur(tr), Datos.eur(sm)], ["Firmar", "No"], A) != 0:
+		return
+	if S.banco < tr + sm:
+		sfx("bad")
+		await say("Con la transferencia y el primer mes del seguro hacen falta %s en tu cuenta, y hay %s. Lo dejamos reservado si quieres." % [Datos.eur(tr + sm), Datos.eur(S.banco)], A)
+		return
+	S.money -= efe
+	cobro_banco(tr, C.n + " · " + V.n)
+	cobro_banco(sm, "Seguro · " + V.n)
+	if not (S.get("coches") is Dictionary):
+		S.coches = {}
+	S.coches[k] = {"dia": int(S.day) + int(V.entrega), "p": tot, "r": int(S.day) + int(V.entrega) + int(C.mes)}
+	if V.calor:
+		S.heat = mini(100, int(S.heat) + int(V.calor))
+	sfx("coin")
+	update_hud()
+	await say("Firmado. %s, a tu nombre: en %d días está matriculad%s y te aviso por SMS.%s" % [mayus(V.art), int(V.entrega), _art_m(k), " Lo traen bajo pedido de fábrica." if k == "deportivo" else ""], A)
+
+func vender_coche(l: Array) -> void:
+	var A := "ARANTXA"
+	var it := []
+	for k in l:
+		it.append({"label": D.CONCE.v[k].n, "right": Datos.eur(valor_coche(k)), "desc": "Pagaste %s. Te damos %s, por transferencia." % [Datos.eur(S.coches[k].p), Datos.eur(valor_coche(k))]})
+	it.append({"label": "Nada", "desc": ""})
+	var j: int = await menu(it, {"cls": "full", "title": "VENDER", "desc": true})
+	if j < 0 or j >= l.size():
+		return
+	var k: String = l[j]
+	var v := valor_coche(k)
+	if await ask("Por %s te damos %s. ¿Trato hecho?" % [D.CONCE.v[k].art, Datos.eur(v)], ["Vender", "No"], A) != 0:
+		return
+	S.coches.erase(k)
+	abono_banco(v, D.CONCE.n + " · venta")
+	sfx("coin")
+	update_hud()
+	await say("Hecho: %s en tu cuenta. El seguro se da de baja hoy." % Datos.eur(v), A)
+
+func asegurar_coche(l: Array) -> void:
+	var k: String = l[0]
+	var sm := seguro_mes(k)
+	if not cobro_banco(sm, "Seguro · " + D.CONCE.v[k].n):
+		sfx("bad")
+		await say("El primer mes son %s, de la cuenta, y no hay." % Datos.eur(sm), "ARANTXA")
+		return
+	S.coches[k].r = int(S.day) + int(D.CONCE.mes)
+	S.coches[k].erase("grua")
+	sfx("coin")
+	await say("Póliza en vigor: %s al mes, domiciliado.%s" % [Datos.eur(sm), " Y te saco %s del depósito de la grúa." % D.CONCE.v[k].art], "ARANTXA")
+
+# cada mañana: la apertura (con el capítulo y el dinero), las entregas y el seguro de cada uno; sin pagar, la póliza se anula
+func conce_dia() -> void:
+	if not Datos.CAL:   # contra el HTML congelado (1.37), nada
+		return
+	var C: Dictionary = D.CONCE
+	if S.flags.get("conce") == null and int(S.ch) >= int(C.ch) and float(S.money) + float(S.banco) >= float(C.patri):
+		S.flags.conce = S.day
+		if S.map == "alto":
+			montar_alto()
+		queue("conce", func(): await talk("SMS · " + C.n, [C.txt.abre]))
+	if not (S.get("coches") is Dictionary):
+		return
+	for k in C.orden:
+		var c = S.coches.get(k)
+		if c == null:
+			continue
+		var V: Dictionary = C.v[k]
+		if int(c.dia) == int(S.day):
+			var tx: String = "%s ya está matriculad%s y con el seguro en vigor. Desde cualquier parada de autobús puedes ir en %s, a la hora que quieras.%s" % [mayus(V.art), _art_m(k), "ella" if _art_m(k) == "a" else "él", " Y en la calle, montado." if k == "moto" else " Y en la calle, al volante." if D.VEHICULOS.has(k) else ""]
+			queue("coche" + k, func(): await talk("SMS · " + C.n, [tx]))
+		if c.get("r") != null and not cobra(c, seguro_mes(k), "ASEGURADORA", true, "seguro de " + String(V.art), int(C.mes)):
+			c.r = null
+			var tx2: String = "Póliza anulada por impago: %s ya no tiene seguro. Sin seguro no se puede circular." % V.art
+			queue("seg" + k, func(): await talk("SMS · ASEGURADORA", [tx2]))
+
+# de parada en parada con tu vehículo (CONCE.km de cada una; CONCE.v[k].t del tiempo del autobús, sin esperas)
+func tramo(a: String, b: String, k: String) -> Dictionary:
+	var V: Dictionary = D.CONCE.v[k]
+	var km: int = int(D.CONCE.km[a]) + int(D.CONCE.km[b])
+	return {"km": km, "min": maxi(5, roundi(viaje(a, b).min * float(V.t))), "eur": maxi(1, roundi(km * float(V.l) / 100.0 * float(D.CONCE.litro)))}
+
+func conducir(k):
+	var aqui: String = S.map
+	var ds := []
+	for x in D.PARADAS:
+		if x != aqui and S.ch >= int(D.PARADAS[x].cap):
+			ds.append(x)
+	var it := []
+	for x in ds:
+		var t := tramo(aqui, x, k)
+		it.append({"label": D.PARADAS[x].n, "right": "%d min · %s" % [t.min, Datos.eur(t.eur)]})
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿A dónde vas?"})
+	if i < 0 or i >= ds.size():
+		return
+	var x: String = ds[i]
+	var t := tramo(aqui, x, k)
+	if S.money >= t.eur:   # la gasolina: en efectivo o con tarjeta
+		S.money -= t.eur
+	elif not cobro_banco(t.eur, "Gasolinera"):
+		sfx("bad")
+		await say("Para la gasolina hacen falta %s y no te llega." % Datos.eur(t.eur))
+		return
+	sfx("door")
+	await fade(1)
+	advance_time(t.min)
+	var a: Array = D.PARADAS[x].a
+	enter_map(x, int(a[0]), int(a[1]), a[2])
+	if S.clientsDay != S.day:
+		spawn_clients()
+	update_hud()
+	await wait(80)
+	await fade(0)
+	await control_trafico(k)
+
+# el control de tráfico (CONCE.control; el deportivo, el triple): el seguro y, si te registran, lo que lleves encima
+func control_trafico(k: String) -> void:
+	var C: Dictionary = D.CONCE
+	if Cultivo.azar() >= float(C.control) * (3.0 if k == "deportivo" else 1.0):
+		return
+	var V: Dictionary = C.v[k]
+	sfx("bad")
+	await say("Control de tráfico a la entrada. «Buenas. Carné, permiso de circulación y el seguro de %s.»" % V.art, "AGENTE")
+	if S.coches[k].get("r") == null:
+		var f: float = pagar_recibo(float(C.sinSeguro), "Multa · sin seguro")
+		S.coches[k].grua = true
+		await say("Sin seguro en vigor: denuncia de %s%s y %s, a la grúa hasta que lo asegures." % [Datos.eur(C.sinSeguro), (" (te faltan %s)" % Datos.eur(f)) if f > 0 else "", V.art], "AGENTE")
+	if total_buds() < 1 and total_rosin() <= 0:
+		await say("«Todo en orden. Circule.»", "AGENTE")
+		return
+	if Cultivo.azar() >= .5 + float(S.heat) / 200.0:
+		await say("Te mira un rato. «Circule.»", "AGENTE")
+		return
+	var r := confiscate()
+	S.heat = mini(100, int(S.heat) + 10)
+	update_hud()
+	await say("«¿Y este olor?» Te registran %s: te requisan %s y te multan con %s." % [V.art, r[0], Datos.eur(r[1])], "AGENTE")

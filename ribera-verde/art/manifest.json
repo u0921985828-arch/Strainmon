@@ -682,6 +682,16 @@
    ],
    "ajuste": "exacto",
    "nota": "1.36.2: lo de dentro de los tarros, cogollos pelados y sin pelar y cada extracción, por nivel (almacen.py)"
+  },
+  "vehiculo_expo": {
+   "w": 80,
+   "h": 48,
+   "ancla": [
+    8,
+    47
+   ],
+   "ajuste": "exacto",
+   "nota": "1.43: los coches de la exposición del concesionario, de perfil a 16 px/m: 5 casillas de ancho, la base en el centro de la de la izquierda (8, 47); las otras cuatro (k + \"2\") no se pintan"
   }
  },
  "fases": [
@@ -7513,18 +7523,91 @@
      "frames": 2,
      "herramienta": "importado",
      "notas": "0-1: las ruedas giran (y el pedal en la bici); oeste = espejo del este"
+    },
+    {
+     "nombre": "moto-atras",
+     "fps": 8,
+     "bucle": true,
+     "frames": 2,
+     "herramienta": "importado",
+     "notas": "0-1: las ruedas giran; oeste = espejo del este (1.43)"
+    },
+    {
+     "nombre": "moto-delante",
+     "fps": 8,
+     "bucle": true,
+     "frames": 2,
+     "herramienta": "importado",
+     "notas": "0-1: las ruedas giran; oeste = espejo del este (1.43)"
+    },
+    {
+     "nombre": "utilitario-atras",
+     "fps": 8,
+     "bucle": true,
+     "frames": 2,
+     "herramienta": "importado",
+     "notas": "1.43: el utilitario del concesionario por la calle, de juguete (vehiculos.py, coche())"
+    },
+    {
+     "nombre": "utilitario-delante",
+     "fps": 8,
+     "bucle": true,
+     "frames": 2,
+     "herramienta": "importado",
+     "notas": "1.43: el utilitario del concesionario por la calle, de juguete (vehiculos.py, coche())"
+    },
+    {
+     "nombre": "berlina-atras",
+     "fps": 8,
+     "bucle": true,
+     "frames": 2,
+     "herramienta": "importado",
+     "notas": "1.43: el berlina del concesionario por la calle, de juguete (vehiculos.py, coche())"
+    },
+    {
+     "nombre": "berlina-delante",
+     "fps": 8,
+     "bucle": true,
+     "frames": 2,
+     "herramienta": "importado",
+     "notas": "1.43: el berlina del concesionario por la calle, de juguete (vehiculos.py, coche())"
+    },
+    {
+     "nombre": "deportivo-atras",
+     "fps": 8,
+     "bucle": true,
+     "frames": 2,
+     "herramienta": "importado",
+     "notas": "1.43: el deportivo del concesionario por la calle, de juguete (vehiculos.py, coche())"
+    },
+    {
+     "nombre": "deportivo-delante",
+     "fps": 8,
+     "bucle": true,
+     "frames": 2,
+     "herramienta": "importado",
+     "notas": "1.43: el deportivo del concesionario por la calle, de juguete (vehiculos.py, coche())"
     }
    ],
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/vehiculos.py",
-   "descripcion": "Tanda 3 (1.13): el patinete (tabla de aluminio con lija, ruedas de 200 mm, barra y manillar) y la bici urbana de segunda mano (cuadro mostaza, ruedas de radios, sillín, manillar y pedal), a la escala del protagonista, en dos capas: lo que queda detrás de él y lo que le tapa.",
+   "descripcion": "Tanda 3 (1.13): el patinete (tabla de aluminio con lija, ruedas de 200 mm, barra y manillar) y la bici urbana de segunda mano (cuadro mostaza, ruedas de radios, sillín, manillar y pedal), a la escala del protagonista, en dos capas: lo que queda detrás de él y lo que le tapa. Y (1.43) la moto de 125 cc del concesionario: scooter negro con el escudo azul, en las mismas dos capas.",
    "notas": "1.13. dibujarPJ pinta <v>-atras, el protagonista subido VEHICULOS[v].sube px y <v>-delante, en la celda del personaje (pies en (16, 30)). Sur, este y norte; oeste en espejo.",
    "montaje": "tal cual (vehiculos.py), 32 × 32 (ajuste exacto)",
    "ajuste_por_sprite": {
     "patinete-atras": "exacto",
     "patinete-delante": "exacto",
     "bici-atras": "exacto",
-    "bici-delante": "exacto"
-   }
+    "bici-delante": "exacto",
+    "moto-atras": "exacto",
+    "moto-delante": "exacto",
+    "utilitario-atras": "exacto",
+    "utilitario-delante": "exacto",
+    "berlina-atras": "exacto",
+    "berlina-delante": "exacto",
+    "deportivo-atras": "exacto",
+    "deportivo-delante": "exacto"
+   },
+   "max_colores": 48
   },
   {
    "fase": "F9",
@@ -7976,6 +8059,38 @@
    "paleta": "propia",
    "coste_real": 0,
    "tipo": "edificio",
+   "id": "edificio-conce",
+   "cubre": [],
+   "celda": "edificio_8x6",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/concesionario.py",
+   "puerta": {
+    "x": 3
+   },
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose desde el centro (interior #26262e), de concesionario.py (doble)",
+     "herramienta": "importado"
+    }
+   ],
+   "max_colores": 40,
+   "descripcion": "1.43, el concesionario AUTOS RIBERA del barrio alto (8 × 6, nombre inventado y sin marcas): la cubierta plana de grava con el peto y dos máquinas de clima, la banda azul con el rótulo, el escaparate de cristal con un coche a cada lado y la puerta corredera de cristal de dos hojas en las casillas 3-4.",
+   "notas": "1.43, pedido por el usuario: «abren un concesionario en el barrio … espacio y lugar del concesionario con el atrezzo, los coches y vehículos en venta». Sale en el barrio alto solo desde que abre (montar_alto, mundo.gd).",
+   "montaje": "tal cual (concesionario.py), 128 × 96",
+   "calco": "comisaria"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "edificio",
    "id": "edificio-bajo-setas",
    "calco": "casco3",
    "cubre": [
@@ -8107,11 +8222,14 @@
     "tile:iwB_bajo",
     "tile:floorG",
     "tile:iwT_grow",
-    "tile:iwB_grow"
+    "tile:iwB_grow",
+    "tile:floorK",
+    "tile:iwT_conce",
+    "tile:iwB_conce"
    ],
    "celda": "tile",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
-   "descripcion": "1.30, los locales por dentro: el club (parqué de tablero de cuadros de 8 × 8, papel verde botella con la moldura y zócalo de cuarterones), la nave de cultivo (hormigón pulido en losas de 1 m y chapa grecada con la viga y el murete) y la discoteca (baldosa negra con brillo y paneles acolchados con la tira de LED rosa arriba y la azul abajo); 1.34: un suelo y una pared por club (floorC_/iwT_club_/iwB_club_<estilo>: kalea, baldosa hidráulica y piedra vista con la viga; itsaso, tarima de cubierta y machihembrado blanco con el zócalo marino; fundicion, chapa lagrimada y ladrillo visto con la viga de hierro; ensanche, espiga de roble claro y liso blanco con la franja verde), el bajo de las setas (hormigón húmedo, pared encalada con verdín y el zócalo de azulejo) y GROW IBARBIDE (baldosa gris, ladrillo blanco con la canaleta y el zócalo verde)",
+   "descripcion": "1.30, los locales por dentro: el club (parqué de tablero de cuadros de 8 × 8, papel verde botella con la moldura y zócalo de cuarterones), la nave de cultivo (hormigón pulido en losas de 1 m y chapa grecada con la viga y el murete) y la discoteca (baldosa negra con brillo y paneles acolchados con la tira de LED rosa arriba y la azul abajo); 1.34: un suelo y una pared por club (floorC_/iwT_club_/iwB_club_<estilo>: kalea, baldosa hidráulica y piedra vista con la viga; itsaso, tarima de cubierta y machihembrado blanco con el zócalo marino; fundicion, chapa lagrimada y ladrillo visto con la viga de hierro; ensanche, espiga de roble claro y liso blanco con la franja verde), el bajo de las setas (hormigón húmedo, pared encalada con verdín y el zócalo de azulejo) y GROW IBARBIDE (baldosa gris, ladrillo blanco con la canaleta y el zócalo verde) 1.43: el concesionario (floorK, el porcelánico pulido; iwT_conce/iwB_conce, el falso techo con los downlights y la pared gris con la franja azul).",
    "estilo_ref": "las paredes y suelos de serie (interior-home, interior-bar)",
    "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca». 1.34, pedido por el usuario: «los decorados y distribución del local en casa asociación sea diferente, como también en cada grow» y «Aquí falta un espacio por crear no? Con sus sprites necesarios»."
   },
@@ -8175,11 +8293,14 @@
     "obj:botesW",
     "obj:neonG",
     "obj:semillero",
-    "obj:rotuloL"
+    "obj:rotuloL",
+    "obj:preciosK",
+    "obj:ruedasK",
+    "obj:catalogoK"
    ],
    "celda": "objeto_1x1",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
-   "descripcion": "1.30: la vitrina del dispensario (mueble de madera con la urna y dos tarros), la balda de tarros, la pizarra de la variedad del día, las normas del club, el taquero con el triángulo, la mesa baja con cenicero, grinder y librillo, la barra acolchada de GAUA con su tira azul, el neón de la luna, la mesa del reservado con la cubitera y dos copas y el cordón de terciopelo (poste y cuerda; cordonF, el último poste); 1.33, el equipo de la nave: los focos de las mesas, aparte (focoN-<led|sodio|lec>-<0|1>, el LED de barras, la campana de sodio y los dos reflectores de cerámica (CMH), apagados y encendidos, con las asas en la fila 9 para las poleas), el extractor en línea de 250 mm (extrN) y el de 315 (extrG) con su tubo, el filtro de carbón colgado (filtroN) y el controlador de riego (ctrlN); 1.34: la mesita y la vitrina de cada club (mesita-<estilo>: la de nogal redonda con la vela, un baúl de marinero, un bidón con el tablero y la de cristal; vitrina-<estilo>: nogal, teca, acero y laca blanca), lo de sus paredes (la foto antigua del Casco Viejo, el ojo de buey, el timón, la red con los corchos, la diana, el piñón de la fundición, el aro de neón verde con la hoja y las copas de la tía), lo del bajo de las setas (el pulverizador, la tubería que suda y el cubo con el cepillo) y lo de los grows (los sacos de sustrato, las macetas de tela apiladas, la balda de botes de abono, el neón de la hoja y el propagador de esquejes); 1.35: el caballete de la acera de los locales, «se alquila» (rotuloL-0) y la pizarra del negocio abierto (rotuloL-1)",
+   "descripcion": "1.30: la vitrina del dispensario (mueble de madera con la urna y dos tarros), la balda de tarros, la pizarra de la variedad del día, las normas del club, el taquero con el triángulo, la mesa baja con cenicero, grinder y librillo, la barra acolchada de GAUA con su tira azul, el neón de la luna, la mesa del reservado con la cubitera y dos copas y el cordón de terciopelo (poste y cuerda; cordonF, el último poste); 1.33, el equipo de la nave: los focos de las mesas, aparte (focoN-<led|sodio|lec>-<0|1>, el LED de barras, la campana de sodio y los dos reflectores de cerámica (CMH), apagados y encendidos, con las asas en la fila 9 para las poleas), el extractor en línea de 250 mm (extrN) y el de 315 (extrG) con su tubo, el filtro de carbón colgado (filtroN) y el controlador de riego (ctrlN); 1.34: la mesita y la vitrina de cada club (mesita-<estilo>: la de nogal redonda con la vela, un baúl de marinero, un bidón con el tablero y la de cristal; vitrina-<estilo>: nogal, teca, acero y laca blanca), lo de sus paredes (la foto antigua del Casco Viejo, el ojo de buey, el timón, la red con los corchos, la diana, el piñón de la fundición, el aro de neón verde con la hoja y las copas de la tía), lo del bajo de las setas (el pulverizador, la tubería que suda y el cubo con el cepillo) y lo de los grows (los sacos de sustrato, las macetas de tela apiladas, la balda de botes de abono, el neón de la hoja y el propagador de esquejes); 1.35: el caballete de la acera de los locales, «se alquila» (rotuloL-0) y la pizarra del negocio abierto (rotuloL-1) 1.43: el concesionario: el cartel de la oferta (preciosK), los neumáticos (ruedasK) y el expositor de folletos (catalogoK).",
    "ajuste_por_sprite": {
     "vitrina": "exacto",
     "tarros": "exacto",
@@ -8227,7 +8348,10 @@
     "mesita-ensanche": "exacto",
     "vitrina-ensanche": "exacto",
     "rotuloL-0": "exacto",
-    "rotuloL-1": "exacto"
+    "rotuloL-1": "exacto",
+    "preciosK": "exacto",
+    "ruedasK": "exacto",
+    "catalogoK": "exacto"
    },
    "estilo_ref": "props-16 (botellero, mostrador, gramola)",
    "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca». 1.34, pedido por el usuario: «los decorados y distribución del local en casa asociación sea diferente, como también en cada grow» y «Aquí falta un espacio por crear no? Con sus sprites necesarios»."
@@ -8250,11 +8374,13 @@
     "obj:libreria",
     "obj:baldaS",
     "obj:secaS",
-    "obj:cajero"
+    "obj:cajero",
+    "obj:cafeK",
+    "obj:banderaK"
    ],
    "celda": "objeto_alto",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
-   "descripcion": "1.30: la estantería metálica de los abonos de la nave (100 × 180 cm, garrafas de MEATZA y ORTUA BIO y sacos de sustrato), el secadero de red de 4 pisos colgado con los cogollos tendidos y el altavoz de la pista (cajón de graves y caja con conos); 1.33: el tanque de 1.000 L de la nave (un IBC en su jaula, con la solución nutritiva, el palé, la llave, la bomba y la manguera) y la máquina de fertirrigación (el armario con la pantalla y las tres dosificadoras con sus botes); 1.34: la librería de la asociación (libros, las actas y una maceta encima) y el bajo de las setas: la estantería de rejilla con tres baldas (baldaS), sus bandejas aparte en cada fase y en cada balda (bandejaS-<colonizando|fructificando|lista|contaminada|seca>-<0 abajo|1 arriba>; tapadas, sin método) y el secadero de malla vacío y con setas (secaS-0, secaS-1); 1.35: el cajero de la calle (la columna de acero con la visera verde, la pantalla, el teclado, la ranura y la boca de los billetes; logo inventado)",
+   "descripcion": "1.30: la estantería metálica de los abonos de la nave (100 × 180 cm, garrafas de MEATZA y ORTUA BIO y sacos de sustrato), el secadero de red de 4 pisos colgado con los cogollos tendidos y el altavoz de la pista (cajón de graves y caja con conos); 1.33: el tanque de 1.000 L de la nave (un IBC en su jaula, con la solución nutritiva, el palé, la llave, la bomba y la manguera) y la máquina de fertirrigación (el armario con la pantalla y las tres dosificadoras con sus botes); 1.34: la librería de la asociación (libros, las actas y una maceta encima) y el bajo de las setas: la estantería de rejilla con tres baldas (baldaS), sus bandejas aparte en cada fase y en cada balda (bandejaS-<colonizando|fructificando|lista|contaminada|seca>-<0 abajo|1 arriba>; tapadas, sin método) y el secadero de malla vacío y con setas (secaS-0, secaS-1); 1.35: el cajero de la calle (la columna de acero con la visera verde, la pantalla, el teclado, la ranura y la boca de los billetes; logo inventado) 1.43: la máquina de café del concesionario (cafeK) y la bandera de su entrada (banderaK).",
    "ajuste_por_sprite": {
     "estanteN": "exacto",
     "secadero": "exacto",
@@ -8275,7 +8401,9 @@
     "bandejaS-contaminada-1": "exacto",
     "bandejaS-seca-0": "exacto",
     "bandejaS-seca-1": "exacto",
-    "cajero": "exacto"
+    "cajero": "exacto",
+    "cafeK": "exacto",
+    "banderaK": "exacto"
    },
    "estilo_ref": "los muebles a escala del piso (props-escala)",
    "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca». 1.34, pedido por el usuario: «los decorados y distribución del local en casa asociación sea diferente, como también en cada grow» y «Aquí falta un espacio por crear no? Con sus sprites necesarios»."
@@ -8878,11 +9006,14 @@
     "obj:mesaN",
     "obj:fotoMaite",
     "obj:carpaM",
-    "obj:carpaDemo"
+    "obj:carpaDemo",
+    "obj:rotuloK",
+    "obj:mesaK",
+    "obj:clonN"
    ],
    "celda": "mueble_ancho",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
-   "descripcion": "1.30, muebles de 2 casillas a 16 px/m: la mesa de billar de 210 cm con el tapete a medio fondo, las troneras y las bolas, y la lámpara de tres pantallas verdes colgada encima; el sofá chester verde de frente (sofaF) y por detrás (sofaB), el de terciopelo morado del reservado (sofaV), la cabina del DJ con los platos, la mesa y el rótulo, la mesa de oficina de la nave con el portátil y la cajonera, y la mesa de cultivo de 240 × 120 cm vista desde arriba a medio fondo (1.32: la bandeja con su fondo acanalado, el canto, el larguero y tres patas, y cinco macetas de 11 L a tresbolillo, tres delante y dos al fondo) bajo dos LED de barras de 100 cm, como los de las carpas (1.31; mesaN-0 vacía y apagados, mesaN-1 plantada y encendidos); 1.31: sus plantas, aparte y encima, en los colores de la planta A (hojas, tallo, contorno y la rampa clave del cogollo, para que el juego les ponga el tono de hoja y el color de cogollo de cada variedad, como en la vista C): plantasN-1 recién plantadas y plantasN-<fase>-<porte> (2 creciendo, 3 en flor, 4 dando; 1.32: con copa, la corona y las puntas, no en forma de pino: i ancha y baja de hoja ancha y oscura y cogollos gordos, h entre medias, s alta y estrecha de hoja fina y clara y colas largas); 1.33: la foto de la tía Maite con Delroy de joven (de la 1.32, ahora de 2 casillas y con más detalle: el marco de 28 × 18 con la placa de latón, el paspartú y, en el campo, ella con la melena castaña y la blusa morada, él con las rastas negras y la camisa crema y una planta en flor entre los dos), en la asociación; la mesa sin los focos, que van aparte (locales-16); 1.34: los sofás y el billar de cada club (sofaF-/sofaB-/billar-<estilo>: terciopelo granate con nogal y tapete burdeos; cuero azul marino con teca, latón y tapete azul; cuero marrón con acero y tapete gris; sofás blancos de líneas rectas con el cojín verde y billar lacado con tapete turquesa), la carpa de las madres de la nave (120 × 120, plateada, abierta de frente, con el panel LED encendido y de 0 a 4 madres podadas: carpaM-<n>) y la de exposición de GROW IBARBIDE (carpaDemo)",
+   "descripcion": "1.30, muebles de 2 casillas a 16 px/m: la mesa de billar de 210 cm con el tapete a medio fondo, las troneras y las bolas, y la lámpara de tres pantallas verdes colgada encima; el sofá chester verde de frente (sofaF) y por detrás (sofaB), el de terciopelo morado del reservado (sofaV), la cabina del DJ con los platos, la mesa y el rótulo, la mesa de oficina de la nave con el portátil y la cajonera, y la mesa de cultivo de 240 × 120 cm vista desde arriba a medio fondo (1.32: la bandeja con su fondo acanalado, el canto, el larguero y tres patas, y cinco macetas de 11 L a tresbolillo, tres delante y dos al fondo) bajo dos LED de barras de 100 cm, como los de las carpas (1.31; mesaN-0 vacía y apagados, mesaN-1 plantada y encendidos); 1.31: sus plantas, aparte y encima, en los colores de la planta A (hojas, tallo, contorno y la rampa clave del cogollo, para que el juego les ponga el tono de hoja y el color de cogollo de cada variedad, como en la vista C): plantasN-1 recién plantadas y plantasN-<fase>-<porte> (2 creciendo, 3 en flor, 4 dando; 1.32: con copa, la corona y las puntas, no en forma de pino: i ancha y baja de hoja ancha y oscura y cogollos gordos, h entre medias, s alta y estrecha de hoja fina y clara y colas largas); 1.33: la foto de la tía Maite con Delroy de joven (de la 1.32, ahora de 2 casillas y con más detalle: el marco de 28 × 18 con la placa de latón, el paspartú y, en el campo, ella con la melena castaña y la blusa morada, él con las rastas negras y la camisa crema y una planta en flor entre los dos), en la asociación; la mesa sin los focos, que van aparte (locales-16); 1.34: los sofás y el billar de cada club (sofaF-/sofaB-/billar-<estilo>: terciopelo granate con nogal y tapete burdeos; cuero azul marino con teca, latón y tapete azul; cuero marrón con acero y tapete gris; sofás blancos de líneas rectas con el cojín verde y billar lacado con tapete turquesa), la carpa de las madres de la nave (120 × 120, plateada, abierta de frente, con el panel LED encendido y de 0 a 4 madres podadas: carpaM-<n>) y la de exposición de GROW IBARBIDE (carpaDemo) 1.43: el rótulo de la pared de AUTOS RIBERA (rotuloK), su mostrador (mesaK) y, en la nave, el estante de las bandejas de clones (clonN-0 apagado, 1 y 2 con una o las dos baldas llenas, bajo los tubos T5).",
    "ajuste_por_sprite": {
     "billar": "exacto",
     "sofaF": "exacto",
@@ -8920,11 +9051,45 @@
     "carpaM-2": "exacto",
     "carpaM-3": "exacto",
     "carpaM-4": "exacto",
-    "carpaDemo": "exacto"
+    "carpaDemo": "exacto",
+    "rotuloK": "exacto",
+    "mesaK": "exacto",
+    "clonN-0": "exacto",
+    "clonN-1": "exacto",
+    "clonN-2": "exacto"
    },
    "estilo_ref": "los muebles del salón (salon)",
    "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca». 1.33, pedido por el usuario: «Ese cuadro... poca calidad no?». 1.34, pedido por el usuario: «los decorados y distribución del local en casa asociación sea diferente, como también en cada grow» y «Aquí falta un espacio por crear no? Con sus sprites necesarios».",
    "max_colores": 40
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "id": "conce-expo",
+   "celda": "vehiculo_expo",
+   "cubre": [
+    "obj:expoU",
+    "obj:expoM",
+    "obj:expoS",
+    "obj:expoMo"
+   ],
+   "ajuste_por_sprite": {
+    "expoU": "exacto",
+    "expoM": "exacto",
+    "expoS": "exacto",
+    "expoMo": "exacto"
+   },
+   "max_colores": 48,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/concesionario.py",
+   "estilo_ref": "los muebles de los locales (locales-ancho)",
+   "descripcion": "1.43: los vehículos de la exposición de AUTOS RIBERA, de perfil a 16 px/m y sin marcas: el utilitario de 5 puertas blanco (4 m), la berlina gris plomo (4,8 m), el deportivo rojo bajo en cuña con alerón sobre la plataforma giratoria (4,6 m) y la moto de 125 cc (scooter negro con el escudo azul, 2 m).",
+   "notas": "1.43, pedido por el usuario («una moto, un coche sin más, uno de gama media y un super deportivo»).",
+   "montaje": "tal cual (concesionario.py), 80 × 48 (ajuste exacto)"
   }
  ],
  "familias": {

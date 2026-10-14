@@ -1,5 +1,38 @@
 # Cambios
 
+## 1.43.0 · 14 de octubre de 2026
+
+Ventanas centradas, el concesionario del barrio y las bandejas de clones de la nave (lo pidió el usuario: «esos pop-up o pestañas tienen que estar centradas como la nevera y la caja fuerte», «abren un concesionario en el barrio y puedes comprar una moto, un coche sin más, uno de gama media y un superdeportivo ya cuando tengas mucho dinero, precios realistas y todas las mecánicas realistas, espacio y lugar del concesionario con el atrezo, los coches y vehículos en venta», «en la nave debería haber bandejas de clones también, ¿no?»). Solo Godot (0.37.0).
+
+- **Ventanas centradas** (`croquis.gd`: `LIBRE`, `centro_y`, `origen_mapa`/`origen_cal` con el alto libre; `alto_libre` en `ui.gd`):
+  - El calendario y el mapa del móvil van centrados como la nevera y la caja: a lo ancho y, a lo alto, en lo que deja el cuadro del texto, sin que lo pise.
+  - El mapa ya no lleva pestaña con el nombre encima del croquis, y sus textos son más cortos (como mucho tres marcas en el calendario: «y N más»).
+  - El cuadro del texto ya no sale gigante la primera vez (se recoloca en el fotograma siguiente).
+- **AUTOS RIBERA, el concesionario** (`D.CONCE`; `montar_alto` en `mundo.gd`; `talk_conce`, `comprar_coche`, `vender_coche`, `asegurar_coche`, `conce_dia`, `conducir`, `tramo`, `control_trafico` en `trama.gd`):
+  - Abre en el barrio alto, al lado de la asociación, desde el capítulo 5 y con 20.000 € entre efectivo y cuenta. Avisa por SMS. Antes, el barrio alto está como siempre.
+  - Por fuera: fachada con dos escaparates, el rótulo, la puerta de cristal de dos hojas, la acera y dos banderolas. Por dentro (18 × 10): suelo de baldosa, la pared con la franja azul, el rótulo, los precios, la cafetera, el expositor de catálogos, los neumáticos, plantas, la mesa de Arantxa (la comercial) con su ordenador y un cliente mirando.
+  - A la venta, a precios de hoy con IVA: scooter de 125 cc (3.490 €), utilitario (15.900 €), berlina de gama media (34.500 €) y un superdeportivo de motor central (245.000 €). Todo el arte es propio y sin marcas.
+  - Aparte, el impuesto de matriculación por emisiones (0 % hasta 120 g de CO2/km, 4,75 %, 9,75 % y 14,75 % desde 200 g, sobre el precio sin IVA; la moto, exenta) y 300 € de gestoría y placas.
+  - En efectivo, como mucho 1.000 € (Ley 11/2021); el resto, por transferencia desde la cuenta.
+  - Se entrega a los días de matricularlo (la moto en 2, el utilitario en 5, la berlina en 7) y el superdeportivo, bajo pedido, en 30. El superdeportivo, además, sube el calor: en el barrio se habla.
+  - El seguro (de 190 € al año la moto a 4.900 € el superdeportivo) va domiciliado cada mes y sale en la banca y en el calendario. Sin saldo, el recibo se devuelve y, pasada la gracia, la póliza se anula.
+  - Con un vehículo, en cualquier parada de autobús eliges «¿Cómo vas?»: vas a cualquier hora, sin esperar, en menos tiempo que el autobús, y pagas la gasolina por los km de cada tramo y el consumo del vehículo (1,60 €/l).
+  - A veces hay control de tráfico (el superdeportivo, el triple). Sin seguro: 1.500 € de multa y el vehículo a la grúa hasta que lo asegures. Con algo encima, si te registran, te lo requisan con su multa.
+  - Se puede revender: pierde un 20 % al salir del concesionario y un 1,2 % cada mes, hasta el 30 % de lo que valía. Lo pagan por transferencia.
+  - La moto, además, se lleva en la calle: vas montado, más rápido que en bici. No se vende en la tienda online.
+- **Los coches por la calle, a escala de juguete** (lo pidió el usuario: «este rollo de que el coche sea más bajo que el personaje mola, aunque no van a ser todos descapotables, con lo que habría un conflicto con el personaje y el techo del vehículo»; `VEHICULOS.utilitario`/`berlina`/`deportivo` con `sube` negativo y `corta`, `_pj` en `pinta.gd`):
+  - El utilitario, la berlina y el superdeportivo también se llevan por la calle, más bajos que el protagonista de pie, y con el mejor que tengas (el superdeportivo, la berlina, el utilitario y la moto, por ese orden). El que está en la grúa, no.
+  - El utilitario (blanco) y la berlina (gris) llevan techo: el protagonista va sentado dentro, de la cintura para arriba, y se le ve la cara por el parabrisas, con dos reflejos en el cristal; de espaldas, la nuca por la luna de atrás.
+  - El superdeportivo (rojo) es descapotable: la cabeza y los hombros asoman por encima del parabrisas bajo, con el respaldo detrás y el alerón.
+  - Cuanto más caro, más rápido (y con B, aún más).
+- **Las bandejas de clones de la nave** (`S.nave.bc`; `corta_bandeja`, `bandejas_listas`, `bandejas_nave` en `trama.gd`):
+  - Un carro con dos baldas, sus tubos T5 y sus bandejas con tapa, contra la pared, entre el secadero y el escritorio.
+  - Antes de pasar cada mesa a 12/12, quien la cuida le corta 24 esquejes y los pincha en una bandeja. Echan raíces en un día (al ritmo del juego, como las mesas) y, al cosechar, la mesa vuelve a empezar con ellos.
+  - Con A, el carro te enseña cada bandeja: de qué mesa es, la variedad y si ya tiene raíces. Las enraizadas también se pueden plantar a mano en una mesa vacía.
+  - El carro se ve más o menos lleno según las bandejas.
+- **Arte** (todo a mano y propio): `tools/sprites/a-mano/concesionario.py` (la fachada, el suelo y la pared, el rótulo, los precios, los neumáticos, los catálogos, la cafetera, las banderolas, la mesa, los cuatro vehículos de exposición y el carro de bandejas) y la moto y los tres coches (atrás y delante, en tres direcciones) en `vehiculos.py`.
+- **Pruebas:** `tests/concesionario.gd`, 78 comprobaciones: los precios, el impuesto, la apertura, el edificio y su vuelta atrás, que se llega a todo, la compra con el tope de efectivo, la entrega, el seguro (cobrado, devuelto y anulado), el viaje, el control, la grúa, la reventa, el superdeportivo, la moto y los coches en la calle, las bandejas de clones y los renders. `tests/calendario.gd` comprueba el centrado (44 con los renders).
+
 ## 1.42.0 · 14 de octubre de 2026
 
 El calendario de verdad, el mapa de la comarca y el juego en WordPress (lo pidió el usuario: «que empiece el juego el 20 de abril de 2026, y de ahí se van sumando días; 7 días son 1 semana; haz todos los días del mes y del año», «un mapa donde se vean todos los pueblos, no detalladamente pero modo croquis texturizado» y «convierte el juego en un plugin para WordPress como este, actualizado»). Solo Godot, 0.36.0.
