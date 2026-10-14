@@ -57,13 +57,17 @@ async function elegirAlmacen(t,i0=0){
     if(mueveAlmacen(ALMACEN,b)){sfx('sel');muestra();}}));
   ALMACEN=null;dlg.hidden=true;return r;
 }
-// un tarro de w × h en (x, y), a escala k: por dentro, lo que lleva hasta f (0-1) del color c; encima, el cristal y la tapa
-// (spr: alm-tarro, alm-tarro-s o alm-bote, almacen.py; -g al doble) y la etiqueta, verde si está curado
-function tarro(o,x,y,w,h,c,f,cu,spr,k=1){
-  o.push([x+k,y+4*k,(w-2)*k,(h-5)*k,'#2a343a']);
-  const hh=Math.max(2,Math.round((h-5)*Math.min(1,f)))*k;o.push([x+k,y+(h-1)*k-hh,(w-2)*k,hh,c]);
-  o.push(['@',spr+(k>1?'-g':''),x,y]);
-  if(w>=14){const yl=y+Math.round(h/2)*k;o.push([x+4*k,yl,(w-8)*k,4*k,'#f0ead8']);if(cu)o.push([x+6*k,yl+k,(w-12)*k,2*k,'#3f8a46']);}
+// un tarro de w × h en (x, y), a escala k: por dentro, lo que lleva hasta f (0-1) del color c (los cogollos, con alm-cogos encima
+// y la cima irregular, alm-copa) y lo vacío del color v (en la nevera, el blanco de detrás a través del cristal); encima, el
+// cristal y la tapa (spr: alm-tarro, alm-tarro-s o alm-bote, almacen.py; -g al doble) y la etiqueta de papel con el sello verde
+// del curado (1.36.1, lo pidió el usuario: más realistas)
+function tarro(o,x,y,w,h,c,f,cu,spr,k=1,v='#2a343a'){
+  const g=k>1?'-g':'',iw=(w-2)*k,ih=(h-5)*k;
+  o.push([x+k,y+4*k,iw,ih,v]);
+  const hh=Math.max(2,Math.round((h-5)*Math.min(1,f)))*k;o.push([x+k,y+(h-1)*k-hh,iw,hh,c]);
+  if(w>=14)o.push(['@','alm-cogos'+g,x+k,y+4*k],[x+k,y+4*k,iw,ih-hh,v],['@','alm-copa'+g,x+k,y+(h-1)*k-hh]);
+  o.push(['@',spr+g,x,y]);
+  if(w>=14){const yl=y+Math.round(h/2)*k;o.push(['@','alm-etiqueta'+g,x+4*k,yl]);if(cu)o.push([x+11*k,yl+k,2*k,2*k,'#3f8a46']);}
   else if(cu)o.push([x+(w-3)*k,y+4*k,2*k,2*k,'#58c070']);
 }
 // el marco amarillo del elegido
@@ -116,7 +120,7 @@ function rectsAlmacen(A){
   TIPOS_EXTR().forEach((e,s)=>{
     const y=y0+19+s*14,L=it.filter(x=>x.s===s),off=c&&c.s===s?Math.max(0,c.j-ALM.piso+1):0;
     o.push([x0+6,y+2,5,10,COLOR_EXTR[e]],[x0+6,y+2,5,1,'#ffffff']);
-    L.slice(off,off+ALM.piso).forEach((J,q)=>{const x=x0+15+q*15;tarro(o,x,y+1,12,12,COLOR_EXTR[e],J.b.g/(NEVERA.g/ALM.piso/3),J.b.cu>=1,'alm-bote');
+    L.slice(off,off+ALM.piso).forEach((J,q)=>{const x=x0+15+q*15;tarro(o,x,y+1,12,12,COLOR_EXTR[e],J.b.g/(NEVERA.g/ALM.piso/3),J.b.cu>=1,'alm-bote',1,'#c4d6dc');
       if(c&&c.s===s&&J.j===c.j)marco(o,x-2,y-1,16,16);});
     if(off>0)o.push([x0+12,y+6,1,3,'#f8a020'],[x0+11,y+7,1,1,'#f8a020']);
     if(L.length>off+ALM.piso)o.push([x0+136,y+6,1,3,'#f8a020'],[x0+137,y+7,1,1,'#f8a020']);

@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.36.1 · 14 de octubre de 2026
+
+Los tarros y la nevera, más realistas (lo pidió el usuario). Godot, 0.30.1.
+
+- Los tarros de cogollos (`alm-tarro`, `alm-tarro-s`): de cristal, con la tapa de rosca estriada más ancha que el cuello, los hombros y el culo redondos, el culo grueso y sus brillos. Por dentro, los cogollos apilados (`alm-cogos`: cada uno con su sombra, la escarcha arriba y algún pelo naranja, sobre el color de la variedad), la cima irregular (`alm-copa`) y la etiqueta de papel escrita a mano (`alm-etiqueta`), con el sello verde del curado.
+- Los botes de los extractos (`alm-bote`): bajos, de boca ancha y culo grueso, con la tapa negra de rosca; en la nevera, lo vacío se ve blanco a través del cristal (`tarro(…, v)`).
+- La nevera por dentro (`alm-nevera`): la junta de goma, el plástico blanco con las paredes en sombra y el fondo más frío abajo, el plafón con su luz, la rejilla del aire, las baldas de cristal con su canto, el perfil blanco, las guías y su sombra, los portaetiquetas y el visor de lo lleno que está como una pantalla.
+- Todo a mano en `tools/sprites/a-mano/almacen.py`; Godot, `_tarro` en `trama.gd`.
+
 ## 1.36.0 · 14 de octubre de 2026
 
 El curado sin pérdidas y con un 1 % más de THC, en la caja fuerte y en la nevera (adiós al arcón); tirar cogollos y extractos; los visores de la caja y la nevera dibujados, con GUARDAR y la ficha de lo que eliges; los minijuegos centrados; la mesa de manicurar; un mueble por cada extracción, con la lavadora y la máquina de static; las mallas 00; y las extracciones contadas como se hacen de verdad. Godot, 0.30.0.

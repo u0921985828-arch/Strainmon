@@ -44,19 +44,43 @@ def caja():
     return L
 
 # ---------- la nevera por dentro ----------
-N0, N1, N2, N3 = '#7a8494', '#b8c4cc', '#e8eef2', '#eef4f8'
+# 1.36.1 (lo pidió el usuario: «poco realistas»): la junta de goma gris alrededor, el plástico blanco con las paredes de los lados
+# en sombra, el fondo más frío abajo con sus nervios, el plafón de la luz con su resplandor, la rejilla del aire, y cada balda de
+# cristal con su canto verdoso y el perfil blanco de delante, apoyada en sus guías y con su sombra en el fondo
 def nevera():
     L = Lienzo(152, 120)
-    L.r(0, 0, 152, 120, N1); L.hl(1, 150, 1, N2); L.vl(1, 1, 118, N2); L.hl(1, 150, 118, N0); L.vl(150, 1, 118, N0)
-    L.r(3, 3, 146, 114, N3); L.hl(3, 148, 3, '#cfdfe8'); L.hl(3, 148, 4, '#dde9f0')
-    for x in range(20, 140, 24): L.vl(x, 18, 116, '#e6eef3')                  # los paneles del fondo
-    L.r(64, 5, 24, 3, '#fff8d0'); L.hl(66, 85, 4, '#ffffff'); L.hl(62, 89, 8, '#e8eec8')   # la luz de arriba
-    L.hl(3, 148, 17, '#9fbccb'); L.hl(3, 148, 18, '#dbe8ef')                 # la balda de GUARDAR
-    for s in range(7):                                                        # siete baldas de cristal, una por extracción
+    L.r(0, 0, 152, 120, '#d4dce2'); L.hl(1, 150, 0, '#eef3f6'); L.vl(0, 1, 118, '#eef3f6'); L.hl(1, 150, 119, '#9aa6ae'); L.vl(151, 1, 118, '#9aa6ae')
+    L.r(1, 1, 150, 2, '#8e989f'); L.r(1, 117, 150, 2, '#8e989f'); L.r(1, 1, 2, 118, '#8e989f'); L.r(149, 1, 2, 118, '#8e989f')   # la junta
+    L.hl(2, 149, 2, '#a8b2b8'); L.vl(2, 2, 117, '#a8b2b8')
+    for (x, y) in ((3, 3), (148, 3), (3, 116), (148, 116)): L.p(x, y, '#a8b2b8')                # las esquinas redondas
+    FONDO = ('#f4f8fa', '#eef4f7', '#e8f0f4', '#e2ebf0', '#dce6ec')                             # el fondo, más frío abajo
+    for y in range(4, 116):
+        c = FONDO[min(4, (y - 4) * 5 // 112)]
+        L.hl(4, 147, y, c)
+    for x in range(30, 136, 26): L.vl(x, 20, 115, '#e0e9ee')    # los nervios del fondo
+    for (x, c) in ((3, '#bccad2'), (4, '#cad6dd'), (5, '#d6e0e6')): L.vl(x, 4, 115, c)          # la pared izquierda
+    for (x, c) in ((138, '#d6e0e6'), (139, '#cad6dd'), (140, '#bccad2')): L.vl(x, 4, 115, c)    # la derecha (con el visor)
+    L.hl(4, 147, 3, '#b4c2ca'); L.hl(4, 147, 4, '#cdd8de')                                     # el techo
+    L.r(62, 3, 28, 4, '#c4ced4'); L.hl(63, 88, 3, '#dbe3e8'); L.r(65, 5, 22, 2, '#fffbe6'); L.hl(66, 85, 5, '#ffffff')   # el plafón
+    for (x0, x1, y, c) in ((58, 93, 7, '#f8f8ec'), (54, 97, 8, '#f6f8f0'), (50, 101, 9, '#f5f8f4')): L.hl(x0, x1, y, c)   # su luz
+    for y in (8, 10, 12):                                                                         # la rejilla del aire
+        L.hl(108, 130, y, '#b8c6ce'); L.hl(108, 130, y + 1, '#fafcfd')
+    def balda(y):
+        L.hl(4, 137, y, '#bfe0e6'); L.hl(6, 135, y, '#d4eef2')                                   # el canto del cristal
+        for x in range(12, 136, 31): L.p(x, y, '#ffffff'); L.p(x + 1, y, '#ffffff')              # sus brillos
+        L.hl(4, 137, y + 1, '#fbfcfd'); L.p(4, y + 1, '#e2e8ec'); L.p(137, y + 1, '#e2e8ec')     # el perfil blanco
+        L.hl(6, 135, y + 2, '#d2dde3')                                                            # su sombra en el fondo
+        L.r(3, y - 1, 3, 3, '#9eb0ba'); L.hl(3, 5, y - 1, '#c2d0d8')                            # las guías
+        L.r(138, y - 1, 3, 3, '#9eb0ba'); L.hl(138, 140, y - 1, '#c2d0d8')
+    balda(17)                                                                                     # la de GUARDAR
+    for s in range(7):                                                                            # siete baldas, una por extracción
         y = 19 + s * 14
-        L.hl(5, 138, y + 13, '#9fbccb'); L.hl(5, 138, y + 14, '#dbe8ef'); L.p(5, y + 12, '#c8d8e2'); L.p(138, y + 12, '#c8d8e2')
-        L.r(5, y + 2, 7, 10, '#dde8ee')                                       # el hueco de la ficha del tipo
-    L.r(141, 18, 7, 98, '#c8d4dc'); L.vl(141, 18, 115, '#a8b8c4')             # la guía de lo llena que está
+        L.r(5, y + 2, 7, 10, '#c6d2d8'); L.r(6, y + 3, 5, 8, '#eef2f4')                         # el portaetiquetas
+        if s < 6: balda(y + 13)
+    L.hl(4, 147, 116, '#c2ced5'); L.hl(4, 147, 115, '#e8eef2')                                  # el suelo
+    L.r(141, 18, 7, 98, '#4a545c'); L.vl(141, 18, 115, '#6a747c'); L.hl(141, 147, 18, '#6a747c')   # el visor de lo lleno que está
+    L.r(142, 19, 5, 96, '#1c2428'); L.vl(146, 19, 114, '#283238')
+    for y in range(30, 114, 12): L.p(142, y, '#4a6070')                                          # sus marcas
     return L
 
 # ---------- la ventana del elegido ----------
@@ -72,36 +96,85 @@ def panel():
     return L
 
 # ---------- los tarros ----------
+# 1.36.1 (lo pidió el usuario: «poco realistas»): tarros de cristal de verdad, con la tapa de rosca estriada más ancha que el
+# cuello, los hombros y el culo redondos, el culo de cristal grueso y los brillos; por dentro, el juego pinta lo que llevan
+# (alm-cogos: los cogollos apilados, con su escarcha, sus pelos y las grietas entre uno y otro; alm-copa, la de arriba, irregular)
+# y la etiqueta de papel escrita a mano (alm-etiqueta)
+VI0, VI1, VI2, VI3, VI4 = '#6e8c98', '#8eaab6', '#a8c4ce', '#c8dce4', '#e8f4f8'   # el cristal, de sombra a brillo
+def cuerpo(L, w, h, tapa):
+    """el cristal de w × h: la tapa (3 filas, si la hay), el cuello (fila 3), los hombros (4) y el culo (h − 2 y h − 1)"""
+    if tapa:
+        t0, t1, t2 = tapa
+        L.hl(3, w - 4, 0, t2); L.p(2, 0, None); L.hl(2, w - 3, 1, t1); L.hl(3, w - 4, 0, t2)
+        for x in range(2, w - 2):
+            L.p(x, 1, t1 if x % 2 else t0)                                                       # las estrías
+            L.p(x, 2, t0)
+        L.p(2, 1, t0); L.p(3, 1, t2); L.p(w - 3, 1, t0)
+    L.hl(3, w - 4, 3, VI2); L.p(3, 3, VI1); L.p(w - 4, 3, VI0)                                 # el cuello con la rosca
+    L.p(1, 4, VI1); L.p(2, 4, VI3); L.p(w - 3, 4, VI2); L.p(w - 2, 4, VI0)                     # los hombros
+    L.vl(0, 5, h - 3, VI1); L.vl(w - 1, 5, h - 3, VI0)                                          # los lados
+    L.p(1, 5, VI2)
+    L.p(1, h - 2, VI1); L.p(w - 2, h - 2, VI0)                                                  # el culo redondo
+    L.hl(2, w - 3, h - 1, VI0); L.hl(3, w // 2, h - 1, VI1)                                     # el cristal grueso de abajo
+    L.vl(2, 6, h - 5, VI4); L.vl(3, 6, 6 + (h - 12) // 4, VI4)                                  # los brillos
+    L.vl(w - 3, 7, 7 + (h - 12) // 3, VI3); L.p(w - 3, h - 4, VI3)
+
 def tarro(tapa):
-    """el cristal de 18 × 25 (hueco por dentro: x 1-16, y 4-23) y la tapa de rosca"""
-    L = Lienzo(18, 25)
-    t0, t1, t2 = tapa
-    L.r(2, 0, 14, 2, t1); L.hl(2, 15, 0, t2); L.p(2, 1, t0); L.p(15, 1, t0)
-    for x in range(4, 15, 3): L.p(x, 1, t0)                                   # las estrías
-    L.hl(3, 14, 2, '#5a4a2a')                                                 # el cuello
-    L.hl(1, 16, 3, '#c8dce4'); L.vl(0, 4, 23, '#9fb6c0'); L.vl(17, 4, 23, '#7a96a2'); L.hl(1, 16, 24, '#7a96a2')
-    L.vl(2, 5, 18, '#e4f2f6'); L.p(3, 5, '#e4f2f6'); L.p(3, 6, '#e4f2f6')    # los brillos
-    L.vl(15, 6, 9, '#c8dce4')
-    return L
+    """18 × 25 (por dentro: x 1-16, y 4-23)"""
+    L = Lienzo(18, 25); cuerpo(L, 18, 25, tapa); return L
 
 def bote():
-    """el bote pequeño de 12 × 12 (hueco por dentro: x 1-10, y 4-10), con la tapa de aluminio"""
+    """el bote de los extractos, de 12 × 12 (por dentro: x 1-10, y 4-10): bajo, ancho y de boca ancha, con la tapa negra de rosca
+    tan ancha como el cristal y el culo grueso"""
     L = Lienzo(12, 12)
-    L.r(2, 0, 8, 2, '#c8ccd0'); L.hl(2, 9, 0, '#eef0f2'); L.hl(2, 9, 1, '#9a9ea4')
-    L.hl(3, 8, 2, '#5a5e66')
-    L.hl(1, 10, 3, '#c8dce4'); L.vl(0, 4, 10, '#9fb6c0'); L.vl(11, 4, 10, '#7a96a2'); L.hl(1, 10, 11, '#7a96a2')
-    L.vl(2, 5, 8, '#e4f2f6')
+    L.hl(2, 9, 0, '#62626e'); L.hl(1, 10, 1, '#2e2e36'); L.hl(1, 10, 2, '#141418'); L.p(2, 1, '#62626e')
+    for x in (4, 7, 10): L.p(x, 1, '#1e1e24')                                                   # las estrías
+    L.hl(1, 10, 3, VI3); L.p(1, 3, VI1); L.p(10, 3, VI0)                                       # el labio del cristal
+    L.vl(0, 3, 9, VI1); L.vl(11, 3, 9, VI0)
+    L.p(1, 10, VI1); L.p(10, 10, VI0); L.hl(2, 9, 11, VI0); L.hl(3, 6, 11, VI1)               # el culo, redondo y grueso
+    L.vl(2, 5, 8, VI4); L.p(9, 5, VI3); L.p(9, 6, VI3)                                         # los brillos
     return L
 
 def mas():
     """GUARDAR en la caja: el tarro abierto, vacío, con el más verde"""
     L = Lienzo(18, 25)
     L.r(1, 4, 16, 20, '#1d2428')
-    L.hl(3, 14, 2, '#8a96a0'); L.hl(2, 15, 3, '#c8dce4')                    # la boca abierta
-    L.vl(0, 4, 23, '#9fb6c0'); L.vl(17, 4, 23, '#7a96a2'); L.hl(1, 16, 24, '#7a96a2')
-    L.vl(2, 5, 20, '#e4f2f6')
-    L.r(8, 9, 3, 11, '#2a5a30'); L.r(4, 13, 11, 3, '#2a5a30')                 # el más, con su sombra
+    cuerpo(L, 18, 25, None)
+    L.hl(2, 15, 2, VI1); L.hl(3, 14, 3, VI3)                                                   # la boca abierta
+    L.r(8, 9, 3, 11, '#2a5a30'); L.r(4, 13, 11, 3, '#2a5a30')                                  # el más, con su sombra
     L.r(7, 8, 3, 11, '#58d080'); L.r(3, 12, 11, 3, '#58d080'); L.p(7, 8, '#a8f0c0'); L.p(3, 12, '#a8f0c0')
+    return L
+
+# los cogollos por dentro (16 × 20): sin color (lo pone el juego, el de la variedad); aquí, solo las grietas oscuras entre
+# cogollo y cogollo, la escarcha de los tricomas arriba a la izquierda de cada uno y algún pelo naranja
+GRIETA, ESCARCHA, ESCARCHA2, PELO = '#20261c', '#eef2dc', '#c4d0ac', '#d0742a'
+NUC = [(3, 1, 3.4), (11, 2, 3.6), (7, 6, 3.4), (1, 8, 3), (14, 8, 3.2), (4, 12, 3.6), (11, 13, 3.4), (1, 18, 3), (8, 18, 3.6), (15, 19, 3)]
+def cogos():
+    """cada cogollo, de atrás adelante: el borde de abajo y de la derecha en sombra (la grieta con el de delante) y la escarcha
+    arriba a la izquierda"""
+    L = Lienzo(16, 20); h = lambda x, y: (x * 73 + y * 151 + x * y * 7) % 97
+    for (a, b, r) in NUC:
+        for y in range(20):
+            for x in range(16):
+                dx, dy = x - a, y - b; d = (dx * dx + dy * dy) ** .5
+                if d > r + .5: continue
+                if d > r - .6 and dx + dy > -1.5: L.p(x, y, GRIETA)
+                elif d > r - .6: L.p(x, y, ESCARCHA2 if h(x, y) % 2 else None) if L.g(x, y)[3] else None
+                elif dx + dy < -1 and d >= 1 and h(x, y) % 3 == 0: L.p(x, y, ESCARCHA)
+                elif L.g(x, y)[3]: L.px[x, y] = (0, 0, 0, 0)                                    # lo de detrás queda tapado
+    for (x, y) in ((7, 7), (12, 14), (3, 2), (4, 13), (14, 9)): L.p(x, y, PELO)
+    return L
+def copa():
+    """lo de arriba (16 × 3): en el color de dentro del tarro vacío, para que la cima de los cogollos no sea una raya"""
+    L = Lienzo(16, 3)
+    for x, d in enumerate((2, 1, 0, 0, 1, 2, 1, 0, 0, 0, 1, 2, 1, 0, 1, 2)):
+        L.vl(x, 0, d - 1, '#2a343a') if d else None
+    return L
+def etiqueta():
+    """la etiqueta de papel (10 × 4) escrita a mano; el juego le pone el sello verde del curado a la derecha"""
+    L = Lienzo(10, 4)
+    L.r(0, 0, 10, 4, '#f0ead8'); L.hl(0, 9, 3, '#cfc6aa'); L.vl(9, 0, 3, '#dcd4bc')
+    L.hl(1, 5, 1, '#5a5448'); L.p(3, 1, '#f0ead8'); L.hl(1, 3, 2, '#8a8474'); L.hl(5, 6, 2, '#8a8474')
     return L
 
 # las letras de 3 × 5 del botón
@@ -159,8 +232,9 @@ ORO = ('#c09020', '#f0c040', '#f8e080')
 sale('alm-caja', caja()); sale('alm-nevera', nevera()); sale('alm-panel', panel())
 sale('alm-tarro', tarro(LATON)); sale('alm-tarro-s', tarro(ORO)); sale('alm-bote', bote()); sale('alm-mas', mas())
 sale('alm-guardar', guardar()); sale('alm-fajo', fajo())
+sale('alm-cogos', cogos()); sale('alm-copa', copa()); sale('alm-etiqueta', etiqueta())
 for n in ('thc', 'cu', 'mc', 'g', 'eur'): sale('alm-ic-' + n, icono(n))
-for n in ('alm-tarro', 'alm-tarro-s', 'alm-bote', 'alm-mas', 'alm-fajo'): sale(n + '-g', doble(SAL[n]))
+for n in ('alm-tarro', 'alm-tarro-s', 'alm-bote', 'alm-mas', 'alm-fajo', 'alm-cogos', 'alm-copa', 'alm-etiqueta'): sale(n + '-g', doble(SAL[n]))
 
 def escribe(raiz=None):
     for n, L in SAL.items():

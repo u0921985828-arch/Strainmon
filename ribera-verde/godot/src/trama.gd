@@ -5265,18 +5265,25 @@ func elegir_almacen(t: String, i0 := 0):
 		dlg_nm.hide()
 	return e
 
-# un tarro de w × h en (x, y), a escala k: por dentro, lo que lleva hasta f (0-1) del color c; encima, el cristal y la tapa
-# (spr: alm-tarro, alm-tarro-s o alm-bote, almacen.py; -g al doble) y la etiqueta, verde si está curado
-func _tarro(o: Array, x: int, y: int, w: int, h: int, c: String, f: float, cu: bool, spr: String, k := 1) -> void:
-	o.append([x + k, y + 4 * k, (w - 2) * k, (h - 5) * k, "#2a343a"])
+# un tarro de w × h en (x, y), a escala k: por dentro, lo que lleva hasta f (0-1) del color c (los cogollos, con alm-cogos encima
+# y la cima irregular, alm-copa) y lo vacío del color v (en la nevera, el blanco de detrás a través del cristal); encima, el
+# cristal y la tapa (spr: alm-tarro, alm-tarro-s o alm-bote, almacen.py; -g al doble) y la etiqueta de papel con el sello verde
+# del curado (1.36.1)
+func _tarro(o: Array, x: int, y: int, w: int, h: int, c: String, f: float, cu: bool, spr: String, k := 1, v := "#2a343a") -> void:
+	var g := "-g" if k > 1 else ""
+	var iw := (w - 2) * k
+	var ih := (h - 5) * k
+	o.append([x + k, y + 4 * k, iw, ih, v])
 	var hh := maxi(2, Datos.jsround((h - 5) * minf(1.0, f))) * k
-	o.append([x + k, y + (h - 1) * k - hh, (w - 2) * k, hh, c])
-	o.append(["@", spr + ("-g" if k > 1 else ""), x, y])
+	o.append([x + k, y + (h - 1) * k - hh, iw, hh, c])
+	if w >= 14:
+		o.append_array([["@", "alm-cogos" + g, x + k, y + 4 * k], [x + k, y + 4 * k, iw, ih - hh, v], ["@", "alm-copa" + g, x + k, y + (h - 1) * k - hh]])
+	o.append(["@", spr + g, x, y])
 	if w >= 14:
 		var yl: int = y + Datos.jsround(h / 2.0) * k
-		o.append([x + 4 * k, yl, (w - 8) * k, 4 * k, "#f0ead8"])
+		o.append(["@", "alm-etiqueta" + g, x + 4 * k, yl])
 		if cu:
-			o.append([x + 6 * k, yl + k, (w - 12) * k, 2 * k, "#3f8a46"])
+			o.append([x + 11 * k, yl + k, 2 * k, 2 * k, "#3f8a46"])
 	elif cu:
 		o.append([x + (w - 3) * k, y + 4 * k, 2 * k, 2 * k, "#58c070"])
 
@@ -5392,7 +5399,7 @@ func rects_almacen(A: Dictionary) -> Array:
 		for q in vis.size():
 			var Jt: Dictionary = vis[q]
 			var x: int = x0 + 15 + q * 15
-			_tarro(o, x, y + 1, 12, 12, D.COLOR_EXTR[e], Jt.b.g / (D.NEVERA.g / D.ALM.piso / 3.0), float(Jt.b.get("cu", 0)) >= 1, "alm-bote")
+			_tarro(o, x, y + 1, 12, 12, D.COLOR_EXTR[e], Jt.b.g / (D.NEVERA.g / D.ALM.piso / 3.0), float(Jt.b.get("cu", 0)) >= 1, "alm-bote", 1, "#c4d6dc")
 			if cs != null and cs.s == s and Jt.j == cs.j:
 				_marco(o, x - 2, y - 1, 16, 16)
 		if off > 0:

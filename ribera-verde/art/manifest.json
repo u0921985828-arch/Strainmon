@@ -622,6 +622,66 @@
    ],
    "ajuste": "exacto",
    "nota": "1.36: los visores de la caja fuerte y la nevera (almacen.py)"
+  },
+  "alm_cogos": {
+   "w": 16,
+   "h": 20,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36.1: lo de dentro de los tarros (almacen.py)"
+  },
+  "alm_copa": {
+   "w": 16,
+   "h": 3,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36.1: lo de dentro de los tarros (almacen.py)"
+  },
+  "alm_etiqueta": {
+   "w": 10,
+   "h": 4,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36.1: lo de dentro de los tarros (almacen.py)"
+  },
+  "alm_cogos_g": {
+   "w": 32,
+   "h": 40,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36.1: lo de dentro de los tarros (almacen.py)"
+  },
+  "alm_copa_g": {
+   "w": 32,
+   "h": 6,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36.1: lo de dentro de los tarros (almacen.py)"
+  },
+  "alm_etiqueta_g": {
+   "w": 20,
+   "h": 8,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36.1: lo de dentro de los tarros (almacen.py)"
   }
  },
  "fases": [
@@ -8279,7 +8339,13 @@
     "misc:alm-tarro-s-g",
     "misc:alm-bote-g",
     "misc:alm-mas-g",
-    "misc:alm-fajo-g"
+    "misc:alm-fajo-g",
+    "misc:alm-cogos",
+    "misc:alm-cogos-g",
+    "misc:alm-copa",
+    "misc:alm-copa-g",
+    "misc:alm-etiqueta",
+    "misc:alm-etiqueta-g"
    ],
    "celda": "alm_tarro",
    "max_colores": 64,
@@ -8359,10 +8425,34 @@
     {
      "nombre": "alm-fajo-g",
      "celda": "alm_fajo_g"
+    },
+    {
+     "nombre": "alm-cogos",
+     "celda": "alm_cogos"
+    },
+    {
+     "nombre": "alm-cogos-g",
+     "celda": "alm_cogos_g"
+    },
+    {
+     "nombre": "alm-copa",
+     "celda": "alm_copa"
+    },
+    {
+     "nombre": "alm-copa-g",
+     "celda": "alm_copa_g"
+    },
+    {
+     "nombre": "alm-etiqueta",
+     "celda": "alm_etiqueta"
+    },
+    {
+     "nombre": "alm-etiqueta-g",
+     "celda": "alm_etiqueta_g"
     }
    ],
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/almacen.py",
-   "descripcion": "1.36: los visores de la caja fuerte y la nevera, con el ancla arriba a la izquierda: la caja por dentro (el acero biselado con remaches, el fondo cepillado, el tabique, la bandeja de los billetes, el cajón y dos baldas de madera), la nevera por dentro (la luz, la fila de GUARDAR y siete baldas de cristal), la ventana del elegido (el visor y tres ranuras de barras), el cristal de los tarros de cogollos con la tapa de latón y la dorada del fenotipo estrella, el bote pequeño de los extractos, el tarro abierto con el más (GUARDAR en la caja), el botón «+ GUARDAR» de la nevera, el fajo de billetes, los iconos de las barras (tricoma, tarro, tijeras, pesa y moneda) y los tarros, el bote y el fajo al doble para la ventana",
+   "descripcion": "1.36: los visores de la caja fuerte y la nevera, con el ancla arriba a la izquierda: la caja por dentro (el acero biselado con remaches, el fondo cepillado, el tabique, la bandeja de los billetes, el cajón y dos baldas de madera), la nevera por dentro (la luz, la fila de GUARDAR y siete baldas de cristal), la ventana del elegido (el visor y tres ranuras de barras), el cristal de los tarros de cogollos con la tapa de latón y la dorada del fenotipo estrella, el bote pequeño de los extractos, el tarro abierto con el más (GUARDAR en la caja), el botón «+ GUARDAR» de la nevera, el fajo de billetes, los iconos de las barras (tricoma, tarro, tijeras, pesa y moneda) y los tarros, el bote y el fajo al doble para la ventana; 1.36.1 (más realistas): tarros con hombros y culo redondos, culo grueso y tapa estriada, el bote bajo de boca ancha con la tapa negra, la nevera con su junta, el plafón, la rejilla y baldas de cristal con perfil, y lo de dentro de los tarros (los cogollos apilados con escarcha y pelos, la cima irregular y la etiqueta escrita)",
    "ajuste_por_sprite": {
     "alm-caja": "exacto",
     "alm-nevera": "exacto",
@@ -8382,7 +8472,13 @@
     "alm-tarro-s-g": "exacto",
     "alm-bote-g": "exacto",
     "alm-mas-g": "exacto",
-    "alm-fajo-g": "exacto"
+    "alm-fajo-g": "exacto",
+    "alm-cogos": "exacto",
+    "alm-cogos-g": "exacto",
+    "alm-copa": "exacto",
+    "alm-copa-g": "exacto",
+    "alm-etiqueta": "exacto",
+    "alm-etiqueta-g": "exacto"
    },
    "estilo_ref": "los muebles a escala del piso (props-escala) y el contorno de salon.py",
    "notas": "1.36, pedido por el usuario: «Quiero para los visores sprites del estilo de todo el juego no? Y también tendría que haber una ventana para ver lo que estás seleccionando no?» y «Los tarros de curado donde están? Como meter ahí la hierba o otras extracciones?»."
