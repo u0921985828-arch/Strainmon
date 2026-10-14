@@ -62,12 +62,12 @@ async function reformas(){
       R.v.forEach(([n,p,d],j)=>{const en=j===v,pd=o&&o.v===j;ks.push([k,j]);
         items.push({label:`${R.n}: ${n}`+(pd?' · pedido':en?' · en casa':''),right:eur(p),disabled:!!(o||en),
           desc:d+(pd?`\n${R.quien} viene mañana.`:o?'\nYa hay una obra pedida: viene mañana.':en?'':`\n${R.quien} viene mañana.`)});});}
-    items.push({label:'Volver',desc:'Pagas con lo que llevas y, si no llega, con la caja fuerte.'});
-    i=await menu(items,{cls:'full',title:'REFORMAS',title2:'Suelo y paredes · tienes '+eur(S.money+cajaE()),desc:true,initial:i});
+    items.push({label:'Volver',desc:'Con tarjeta, de la cuenta del banco.'});
+    i=await menu(items,{cls:'full',title:'REFORMAS',title2:'Suelo y paredes · en la cuenta '+eur(S.banco),desc:true,initial:i});
     if(i<0||i>=ks.length)return;
     const [k,j]=ks[i],R=REFORMA[k],[n,p]=R.v[j];
-    if(S.money+cajaE()<p){sfx('bad');await say('No te llega el dinero.');continue;}
-    pagarCasa(p);(S.obra||(S.obra={}))[k]={v:j,dia:S.day+1};sfx('coin');toast(`Pedido: ${R.n.toLowerCase()}, ${n.toLowerCase()} · mañana`,1400);
+    if(!await tarjeta(p,'Reforma · '+R.n.toLowerCase()))continue;   // 1.35: con tarjeta
+    (S.obra||(S.obra={}))[k]={v:j,dia:S.day+1};sfx('coin');toast(`Pedido: ${R.n.toLowerCase()}, ${n.toLowerCase()} · mañana`,1400);
   }
 }
 // ropa y pelo (1.21): en la cama del piso, la camiseta, el pantalón, la gorra y el pelo del protagonista (S.ropa[k], el índice en
@@ -166,13 +166,13 @@ async function tiendaOnline(){
     for(const k of vs){const v=VEHICULOS[k],d=S.veh&&S.veh[k],en=d&&d<=S.day;
       items.push({label:v.n+(en?' · tuyo':d?' · pedido':''),right:eur(v.p),disabled:!!d,desc:v.d+(en?'':'\nLlega mañana: te lo dejan en el portal.')});}
     items.push({label:'Reformas: suelo y paredes',desc:'El suelo y las paredes del piso: el instalador o el pintor vienen al día siguiente.'});   // 1.27
-    items.push({label:'Salir',desc:'Pagas con lo que llevas y, si no llega, con la caja fuerte.'});
-    i=await menu(items,{cls:'full',title:'TIENDA ONLINE',title2:'Muebles y transporte · tienes '+eur(S.money+cajaE()),desc:true,initial:i});
+    items.push({label:'Salir',desc:'Con tarjeta, de la cuenta del banco.'});
+    i=await menu(items,{cls:'full',title:'TIENDA ONLINE',title2:'Muebles y transporte · en la cuenta '+eur(S.banco),desc:true,initial:i});
     if(i===ks.length+vs.length){await reformas();continue;}
     if(i<0||i>=ks.length+vs.length)return;
     const k=i<ks.length?ks[i]:vs[i-ks.length],m=i<ks.length?MUEBLES[k]:VEHICULOS[k];
-    if(S.money+cajaE()<m.p){sfx('bad');await say('No te llega el dinero.');continue;}
-    pagarCasa(m.p);(i<ks.length?S.muebles||(S.muebles={}):S.veh||(S.veh={}))[k]=S.day+1;sfx('coin');toast('Pedido: '+m.n+' · llega mañana',1400);
+    if(!await tarjeta(m.p,'Tienda online · '+m.n))continue;   // 1.35: con tarjeta
+    (i<ks.length?S.muebles||(S.muebles={}):S.veh||(S.veh={}))[k]=S.day+1;sfx('coin');toast('Pedido: '+m.n+' · llega mañana',1400);
   }
 }
 function llegaMueble(){

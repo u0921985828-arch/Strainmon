@@ -57,7 +57,9 @@ func redibuja(t: float) -> void:
 		modo = "battle"
 	elif m == "carpa" and J.VC:
 		modo = "carpa"
-	elif m == "title" or m == "intro":
+	elif m == "title":
+		modo = "demo"   # 1.35: la partida de fondo (demo_entra, mundo.gd)
+	elif m == "intro":
 		modo = "title"
 	else:
 		return
@@ -73,6 +75,10 @@ func redibuja(t: float) -> void:
 			vc.pinta(J.S, J.VC, now, J.SW, SH)
 	elif modo == "world":
 		cam = camara()
+	elif modo == "demo":
+		var sv: Array = J.demo_entra(now)
+		cam = camara()
+		J.demo_sale(sv)
 	c0.queue_redraw()
 	ad.queue_redraw()
 	c1.queue_redraw()
@@ -81,6 +87,12 @@ func _capa(ci: CanvasItem, n: int) -> void:
 	L = ci
 	if modo == "world":
 		[_mundo, _farolas, _encima][n].call()
+	elif modo == "demo":   # 1.35: el título, con la partida de fondo y el azul encima
+		var sv: Array = J.demo_entra(now)
+		[_mundo, _farolas, _encima][n].call()
+		J.demo_sale(sv)
+		if n == 2:
+			_azul_demo()
 	elif modo == "battle":
 		if n == 0:
 			_combate()
@@ -376,20 +388,26 @@ func _luz(r: int, c: String, a: float) -> Image:
 	cache[key] = im
 	return im
 
-# encima de todo (1.30): la barra del billar mientras apuntas (pintaTiro, 14-render): la fuerza del tiro, que va y viene; en el
-# verde, la bola dentro, y en el amarillo, la rozas
+# encima de todo (1.30): la barra del billar mientras apuntas (pintaTiro, 14-render); 1.35: la mesa de la partida (MESA_B) y dos
+# barras: en la de la dirección, el verde es la tronera (TIRO.a); en la de la fuerza, el verde mete y el rojo cuela la blanca
 func _encima() -> void:
+	if J.MESA_B != null:
+		for e in J.rects_mesa_billar(J.MESA_B):
+			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.TIRO == null:
 		return
 	var B: Dictionary = J.D.BILLAR
 	var w := 120
 	var x0: int = (J.SW - w) >> 1
-	var y0 := 36
-	var p: float = J.fuerza_tiro(now - J.TIRO.t0)
+	var y0 := 60
+	var p: float = J.fuerza_tiro(now - J.TIRO.t0, J.TIRO.get("per", -1.0))
+	var dir: bool = J.TIRO.get("f") == "dir"
+	var a: float = float(J.TIRO.a) if dir else float(B.verde)
 	_rect(x0 - 2, y0 - 2, w + 4, 12, css("#26262e"))
 	_rect(x0, y0, w, 8, css("#3a3446"))
-	_rect(x0 + Datos.jsround((B.centro - B.amarillo) * w), y0, Datos.jsround(2 * B.amarillo * w), 8, css("#e0b84a"))
-	_rect(x0 + Datos.jsround((B.centro - B.verde) * w), y0, Datos.jsround(2 * B.verde * w), 8, css("#58d080"))
+	if not dir:
+		_rect(x0 + Datos.jsround(B.falta * w), y0, w - Datos.jsround(B.falta * w), 8, css("#e04040"))
+	_rect(x0 + Datos.jsround((B.centro - a) * w), y0, Datos.jsround(2 * a * w), 8, css("#58d080"))
 	_rect(x0 + Datos.jsround(p * (w - 2)), y0 - 1, 2, 10, css("#ffffff"))
 
 func _farola(a: float) -> Image:
@@ -577,16 +595,14 @@ func _poleas_nave(x0: int, yb: int) -> Array:
 			[cx - 1, y0 + 1, 3, 5, K], [cx - 2, y0 + 2, 5, 3, K], [cx - 1, y0 + 2, 3, 3, M], [cx, y0 + 3, 1, 1, K], [cx - 1, y0 + 2, 1, 1, H]])
 	return o.filter(func(e): return e[3] > 0)
 
-# la manguera del riego de la nave (1.33, mangueraNave): del tanque por la pared de atrás, con una bajada a cada mesa
+# el riego de la nave (1.35, mangueraNave): el grifo, la tubería por el pie de la pared y, en cada mesa, su llave o su electroválvula
+# y la bajada; los rectángulos de cada nivel salen del HTML (MANGUERA_NAVE)
 func _manguera_nave() -> void:
-	if J.S.get("nave") == null or not int(J.S.nave.get("rg", 0)):
+	var rg := int(J.S.nave.get("rg", 0)) if J.S.get("nave") != null else 0
+	if not rg:
 		return
-	var y := 34
-	var a := 1 * 16 + 15
-	_rect(a - cam.x, y - cam.y, 12 * 16 + 16 - a, 1, css("#3a3c44"))
-	_rect(a - cam.x, y + 1 - cam.y, 12 * 16 + 16 - a, 1, css("#1c1d22"))
-	for x in J.D.MESAS_X:
-		_rect(int(x) * 16 + 16 - cam.x, y + 2 - cam.y, 1, 57 - (y + 2), css("#1c1d22"))
+	for e in J.D.MANGUERA_NAVE[rg - 1]:
+		_rect(float(e[0]) - cam.x, float(e[1]) - cam.y, e[2], e[3], css(e[4]))
 
 # las plantas de la mesa i de la nave en la fase fm (1.31, plantasMesa de 01b-arte): las de su porte (porte_planta, por el % índica de
 # su fenotipo) con el tono de hoja y el color de cogollo de la variedad, como en la vista C (hoja_planta, vc_tonos y la rampa de
@@ -964,6 +980,17 @@ func _comb_frame(who: String):
 	return f if f else Atlas.frame_de(gr, "base", dir, 0, {"i": 0})
 
 # ---------- título e intro ----------
+# el azul del título (1.35, renderDemo): por bandas, más opaco arriba, donde va el rótulo
+func _azul_demo() -> void:
+	var DM: Dictionary = J.D.DEMO
+	var n: int = DM.bandas
+	var h := ceili(SH / float(n))
+	var a0: float = DM.alfa[0]
+	var a1: float = DM.alfa[1]
+	for i in n:
+		var a: float = Datos.jsround((a0 + (a1 - a0) * i / float(n - 1)) * 100) / 100.0
+		_rect(0, i * h, J.SW, h, Color(DM.azul[0] / 255.0, DM.azul[1] / 255.0, DM.azul[2] / 255.0, Datos.jsround(a * 255) / 255.0))
+
 func _titulo() -> void:
 	var t := now / 1000.0
 	var ox := OX()

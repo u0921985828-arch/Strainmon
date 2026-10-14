@@ -20,6 +20,7 @@ function migrate(){
   // partidas guardadas por chapter() antes de poner el plazo (hasta la 1.10): capítulo 5 o 7 sin nada que pagar
   if((S.ch===5||S.ch===7)&&!(S.due>0)&&S.debt>0){S.due=S.ch===5?Math.min(PLAZOS[5],S.debt):S.debt;S.deadline=Math.max(S.deadline||0,S.day+(S.ch===5?10:7));}
   // 1.34: en los clubs donde ya vendías, el encargado y el presidente ya se fían de ti
+  if(S.nave&&S.nave.r==null)S.nave.r=S.day+RECIBO.dias;if(S.setas&&S.setas.r==null)S.setas.r=S.day+RECIBO.dias;   // 1.35: los recibos, cada RECIBO.dias
   if(!S.clubReg&&S.clubDia)for(const k in PRESI)if(S.clubDia[k]!=null||S.clubEnc&&S.clubEnc.k===k)[k,'pres_'+k].forEach(id=>S.rel[id]=Math.max(rel(id),CLUB.confia));
   const sinMis=!S.misiones,sinItin=!S.itin,sinLog=!S.logros,d=newState();for(const k in d)if(!(k in S))S[k]=d[k];for(const k in d.items)if(!(k in S.items))S.items[k]=0;
   if(sinMis)MISIONES.forEach(m=>{if(m.ch<S.ch)S.misiones[m.id]=0;});   // 1.11: las de capítulos pasados, hechas y sin regalo

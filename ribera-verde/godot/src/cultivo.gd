@@ -18,7 +18,7 @@ static func azar() -> float:
 static func nuevo_estado() -> Dictionary:
 	return {"day": 1, "min": 8 * 60, "money": 150, "carpas": [{"t": "m100", "foco": "sodio400"}], "macetas": ["plastico7", "plastico7", "plastico7", "plastico7"],
 		"pots": [null, null, null, null], "seeds": {"ria": 2, "limon": 1, "txoko": 1, "niebla": 1}, "items": {"fert": 2, "insect": 3},
-		"buds": {}, "custom": {}, "gen": {}, "fenos": {}, "fenoN": 0, "flags": {}}
+		"buds": {}, "custom": {}, "gen": {}, "fenos": {}, "fenoN": 0, "flags": {}, "banco": float(Datos.carga().CUENTA.inicial)}
 
 # plazas de todas las carpas, en orden: S.pots[i] y S.macetas[i] son las de la plaza i
 static func huecos(S: Dictionary) -> Array:
@@ -404,6 +404,9 @@ static func avanza(S: Dictionary, minutos: int) -> int:
 				if S.carpas[ci] and plantas_vivas(S, ci):
 					e += luz_carpa(S, ci)
 			e += factura_sala(S)
-			S.money = maxi(0, S.money - e)
+			var b: float = minf(float(S.get("banco", 0)), e)   # 1.35: domiciliada, de la cuenta y, si no llega, del efectivo
+			if b > 0:
+				S.banco -= b
+			S.money = maxi(0, S.money - int(e - b))
 			luz += e
 	return luz

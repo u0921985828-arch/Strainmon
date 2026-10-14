@@ -250,10 +250,10 @@ func add_seeds(sid: String, k: int) -> void:
 	discover(sid)
 
 func lot_sid(k: String) -> String:
-	return k.trim_suffix("*")
+	return k.get_slice("~", 0).trim_suffix("*")   # 1.35: «~tipo», las extracciones
 
 func lot_nombre(k: String) -> String:
-	return strain(lot_sid(k)).n + (" ★" if k.ends_with("*") else "")
+	return strain(lot_sid(k)).n + (" ★" if k.contains("*") else "")
 
 # L: otro sitio (el arcón); cu y dia: el curado y el día de la cosecha (1.29; sin dar dia, hoy; dia null, sin día, como los de antes)
 func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1) -> void:
@@ -400,7 +400,34 @@ func rosin_lots(mn: float) -> Array:
 
 func rosin_item(l: Array) -> Dictionary:
 	var k: String = l[0]
-	return {"label": "Rosin · " + lot_nombre(k), "right": "%s g · %s%%" % [Datos.coma(l[1].g), Datos.pct(l[1].thc)], "sw": "#d89a18", "ic": ic_cog(lot_sid(k))}
+	return {"label": D.EXTR[tipo_extr(k)].n + " · " + lot_nombre(k), "right": "%s g · %s%%" % [Datos.coma(l[1].g), Datos.pct(l[1].thc)], "sw": "#d89a18", "ic": ic_cog(lot_sid(k))}
+
+# las extracciones (1.35, 11l-extraccion): el tipo va en la clave del lote («ria~seco»; el rosin, sin nada)
+func tipo_extr(k: String) -> String:
+	return k.get_slice("~", 1) if k.contains("~") else "rosin"
+
+func base_extr(k: String) -> String:
+	return k.get_slice("~", 0)
+
+func kief_lots(mn: float) -> Array:
+	return rosin_lots(mn).filter(func(l): return D.EXTR[tipo_extr(l[0])].get("kief"))
+
+func mayor_lote(l: Array):
+	var a = null
+	for x in l:
+		if a == null or x[1].g > a[1].g:
+			a = x
+	return a
+
+func extr_algo() -> bool:   # algún aparato: catadores en la calle y el extracto en la caja
+	return true if (S.items.get("prensa") or S.items.get("tamiz") or S.items.get("ice")) else false
+
+# las que puedes hacer: la de cada aparato, el charas con cualquiera, el prensado con kief y el moonrock con la prensa y kief
+func extr_ya() -> Array:
+	var it: Dictionary = S.items
+	var kf: bool = true if (it.get("tamiz") or it.get("ice")) else false
+	var si := {"rosin": it.get("prensa"), "seco": it.get("tamiz"), "ice": it.get("ice"), "charas": extr_algo(), "hash": kf, "moon": it.get("prensa") and kf}
+	return D.EXTR.keys().filter(func(t): return true if si[t] else false)
 
 # el prólogo (1.10): S.flags.llegada === false hasta que el autobús de ama deja al jugador en Ribera Verde (las partidas viejas
 # no la llevan: ya han llegado)
@@ -552,6 +579,70 @@ func sitio_libre(x: int, y: int) -> int:
 	return -1
 
 # ---------- personajes (NPCDEF: cond y talk, que el JSON no lleva) ----------
+# el título (1.35, renderDemo de 14-render): la partida de fondo, a partir del reloj (demo_en: el mismo instante, igual que en el
+# HTML). demo_entra pone S, los personajes y el jugador de la demo y devuelve lo de la partida; demo_sale lo devuelve
+var demo_s = null
+var demo_e = null
+func demo_en(R: Dictionary, T: float) -> Dictionary:
+	var ruta: Array = R.ruta
+	var dur := float(R.dur)
+	var tr := []
+	var tot := 0.0
+	for i in ruta.size():
+		var a: Array = ruta[i]
+		var b: Array = ruta[(i + 1) % ruta.size()]
+		var n: int = absi(int(b[0]) - int(a[0])) + absi(int(b[1]) - int(a[1]))
+		tr.append([a, b, n])
+		tot += n * dur + (float(b[2]) if b.size() > 2 else 0.0)
+	var t := fmod(T, tot)
+	for e in tr:
+		var a: Array = e[0]
+		var b: Array = e[1]
+		var n: int = e[2]
+		var dx: int = signi(int(b[0]) - int(a[0]))
+		var dy: int = signi(int(b[1]) - int(a[1]))
+		var dir := "right" if dx > 0 else "left" if dx < 0 else "down" if dy > 0 else "up"
+		if t < n * dur:
+			var k := floori(t / dur)
+			var f: float = t - k * dur
+			var x: int = int(a[0]) + dx * k
+			var y: int = int(a[1]) + dy * k
+			return {"x": x + dx, "y": y + dy, "px": (x + dx * f / dur) * 16, "py": (y + dy * f / dur) * 16, "dir": dir, "moving": true, "t": f, "dur": dur, "parity": k & 1}
+		t -= n * dur
+		var p: float = float(b[2]) if b.size() > 2 else 0.0
+		if t < p:
+			return {"x": int(b[0]), "y": int(b[1]), "px": float(b[0]) * 16, "py": float(b[1]) * 16, "dir": b[3] if b.size() > 3 else dir, "moving": false, "t": 0.0, "dur": dur, "parity": 0}
+		t -= p
+	var a0: Array = ruta[0]
+	return {"x": int(a0[0]), "y": int(a0[1]), "px": float(a0[0]) * 16, "py": float(a0[1]) * 16, "dir": "down", "moving": false, "t": 0.0, "dur": dur, "parity": 0}
+
+func demo_entra(now_: float) -> Array:
+	var sv := [S, ents]
+	var DM: Dictionary = D.DEMO
+	if demo_s == null:
+		demo_s = new_state()
+		demo_s.map = DM.map
+		demo_s.min = DM.min
+	S = demo_s
+	if demo_e == null:
+		var quieto := func(id: String, x: int, y: int, dir: String, look, def: Dictionary) -> Dictionary:
+			return {"id": id, "x": x, "y": y, "px": x * 16.0, "py": y * 16.0, "hx": x, "hy": y, "fx": x, "fy": y, "dir": dir, "look": look, "def": def,
+				"wander": 0, "wt": 0.0, "moving": false, "t": 0.0, "dur": 320.0, "act": null}
+		demo_e = []
+		for d in D.NPCDEF:
+			if d.map == DM.map and npc_cond(d):
+				demo_e.append(quieto.call(d.id, int(d.x), int(d.y), d.dir if d.get("dir") else "down", d.get("lookObj") if d.get("lookObj") else D.LOOKS.get(d.get("look", "")), d))
+		demo_e.append(quieto.call("demo1", int(DM.cliente[0]), int(DM.cliente[1]), "down", Datos.rand_look("demo1", "client"), {"client": {"type": "cur"}}))
+		demo_e.append(quieto.call("demo2", 0, 0, "left", D.LOOKS.cop, {}))
+	ents = demo_e
+	demo_e[-1].merge(demo_en(DM.poli, now_), true)
+	P.merge(demo_en(DM.P, now_), true)
+	return sv
+
+func demo_sale(sv: Array) -> void:
+	S = sv[0]
+	ents = sv[1]
+
 func npc_cond(d: Dictionary) -> bool:
 	match d.id:
 		"tono":
@@ -698,6 +789,33 @@ func build_ents() -> void:
 		if e.get("pat") and e.mapa == S.map:
 			ents.append(e)
 	pon_patrullas()
+	if S.map == "nave":
+		coloca_naveros()   # 1.35
+
+# dónde trabaja cada uno de la nave (1.35, colocaNaveros de 11j-locales): por la hora, el día y su mesa
+const PUESTO_MIN := 120
+func puestos_mesa(i: int) -> Array:
+	var X := int(D.MESAS_X[i])
+	var p := [[X, 5, "up"], [X + 1, 5, "up"], [X - 1, 4, "right"]]
+	if i:
+		p.append([X, 3, "down"])
+	return p
+
+func puesto_navero(i: int) -> Array:
+	var p := puestos_mesa(i)
+	return p[(int(floor(float(S.min) / PUESTO_MIN)) + int(S.day) + i) % p.size()]
+
+func coloca_naveros() -> void:
+	for e in ents:
+		var id := str(e.id)
+		if not (id.length() == 3 and id.begins_with("nv") and id[2] >= "0" and id[2] <= "9"):
+			continue
+		var q := puesto_navero(int(id[2]))
+		var x := int(q[0])
+		var y := int(q[1])
+		if int(e.x) == x and int(e.y) == y and e.get("puesto"):
+			continue
+		e.x = x; e.y = y; e.px = x * 16.0; e.py = y * 16.0; e.hx = x; e.hy = y; e.fx = x; e.fy = y; e.dir = q[2]; e.moving = false; e.puesto = 1
 
 func item_give(id: String) -> void:
 	match id:
@@ -1114,6 +1232,12 @@ func object_action(x: int, y: int) -> void:
 			await say(D.SIGNS.get("%s:%d,%d" % [S.map, x, y], "Está tan desgastado que no se lee."))
 		"parada":
 			await parada_action()
+		"cajero":   # 1.35 (granja.gd)
+			await cajero()
+		"rotuloL":
+			var k := local_de(S.map, x, y)
+			if k != "":
+				await rotulo_local(k)
 		"bush":
 			for it in D.ITEMS:
 				if it.hidden and it.map == S.map and it.x == x and it.y == y and not S.taken.get(it.id):
@@ -1186,7 +1310,7 @@ func spawn_clients() -> void:
 			var m5 := 1 if S.ch >= 5 else 0
 			zonas.append_array([["ibarbide", 3 + m5, ["tur", "tur", "pij", "est"]], ["ensanche", 3 + m5, ["pij", "pij", "cur", "est"]], ["callejon", 2, ["est", "cur", "pij"]]])
 		var usado := {}
-		if S.ch >= 3 and S.items.get("prensa"):
+		if S.ch >= 3 and extr_algo():
 			for zx in [["town", 2], ["astilleros", 1], ["puerto", 1], ["valdehierro", 1]] + ([["ibarbide", 1], ["ensanche", 1]] if S.ch >= 4 else []):
 				zonas.append([zx[0], zx[1], ["ext"], "x"])
 		for zz in zonas:
@@ -1232,7 +1356,7 @@ func talk_client(c: Dictionary) -> void:
 	var ext: bool = c.type == "ext"
 	await say(pick(ct.greet), N)
 	if ext:
-		await say("Busco %s g de rosin." % n(c.want), N)
+		await say("Busco %s g de rosin o de hachís." % n(c.want), N)
 	else:
 		await say("Busco %s g%s." % [n(c.want), (" de algo potente, mínimo %s%% de THC" % n(c.minThc)) if c.minThc else ""], N)
 	var lots := rosin_lots(c.want) if ext else bud_lots(c.want, c.minThc)
@@ -1247,9 +1371,10 @@ func talk_client(c: Dictionary) -> void:
 		return
 	var sid: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
-	var base: float = (precio_rosin(b.thc) if ext else precio_calle(b.thc) * calidad(b)) * ct.mult * D.ZONAS[c.get("map", "town")].precio * rival_f(c.get("map", "town")) * c.want
+	var xn: String = (D.EXTR[tipo_extr(sid)].n.to_lower() + " ") if ext else ""
+	var base: float = (precio_rosin(b.thc) * D.EXTR[tipo_extr(sid)].px if ext else precio_calle(b.thc) * calidad(b)) * ct.mult * D.ZONAS[c.get("map", "town")].precio * rival_f(c.get("map", "town")) * c.want
 	var pr := [Datos.jsround(base * .85), Datos.jsround(base), Datos.jsround(base * 1.3)]
-	var j: int = await ask("%s g de %s%s. ¿Cuánto le pides?" % [n(c.want), "rosin de " if ext else "", lot_nombre(sid)], ["Rebaja · %d €" % pr[0], "Justo · %d €" % pr[1], "Caro · %d €" % pr[2], "Cancelar"])
+	var j: int = await ask("%s g de %s%s. ¿Cuánto le pides?" % [n(c.want), (xn + "de ") if ext else "", lot_nombre(sid)], ["Rebaja · %d €" % pr[0], "Justo · %d €" % pr[1], "Caro · %d €" % pr[2], "Cancelar"])
 	if j == 3:
 		await say("Entonces me voy.", N)
 		return
@@ -1273,7 +1398,7 @@ func talk_client(c: Dictionary) -> void:
 		remove_client(c.id)
 		apunta_fijo(c)
 		await say(pick(["Trato hecho.", "Gracias. Nos vemos.", "Bien. Se lo diré a mis amigos."]), N)
-		toast("+%s · %s g %svendidos" % [Datos.eur(pr[j]), n(c.want), "de rosin " if ext else ""], 1600)
+		toast("+%s · %s g %svendidos" % [Datos.eur(pr[j]), n(c.want), ("de " + xn) if ext else ""], 1600)
 		visto_vender()
 		heat_warn()
 		await check_story()
@@ -1665,6 +1790,8 @@ func talk_bixente():
 	pass
 func talk_andoni():
 	pass
+func extraer(_t: String):
+	pass
 func talk_nave():
 	pass
 func talk_txomin():
@@ -1763,6 +1890,12 @@ func notas_tia():
 	pass
 func pedir_caja():
 	pass
+func cajero():
+	pass
+func rotulo_local(_k):
+	pass
+func local_de(_m: String, _x: int, _y: int) -> String:
+	return ""
 func battle(_kind):
 	pass
 func rival_venta(_z):

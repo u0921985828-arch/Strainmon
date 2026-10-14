@@ -171,6 +171,8 @@ function buildTiles(){
   T('neonH',t=>{for(let y=3;y<13;y++)t.P(8,y,'#58f080');t.P(6,6,'#58f080');t.P(10,6,'#58f080');t.P(5,8,'#58f080');t.P(11,8,'#58f080');});
   T('baldaS',t=>{t.F(1,0,2,16,'#8a8e96');t.F(13,0,2,16,'#8a8e96');t.F(1,5,14,1,'#b8bcc4');t.F(1,13,14,1,'#b8bcc4');});
   T('humidS',t=>{t.box(4,4,8,11,'#e0e4e8','#5a5e66');t.F(6,1,1,4,'#3a3a40');});T('secaS',t=>{t.F(7,0,2,16,'#3a4048');for(let y=3;y<15;y+=4)t.F(2,y,12,1,'#5a6070');});
+  T('cajero',t=>{t.box(3,1,10,15,'#c8ccd0','#4a4e56');t.F(5,3,6,4,'#3a6ab8');t.F(5,9,6,2,'#2a2a30');t.F(6,12,4,1,'#2a2a30');});   // 1.35 (11k-banco)
+  T('rotuloL',t=>{t.F(4,9,1,7,'#5a3a24');t.F(11,9,1,7,'#5a3a24');t.box(2,2,12,9,'#f4f0e0','#5a3a24');t.F(4,5,8,2,'#c03030');});
   T('tuboS',t=>{t.F(0,5,16,3,'#7a6a5a');t.P(9,9,'#a8c8e0');});T('cuboS',t=>{t.box(4,6,8,9,'#3a6ab8','#1a3a6a');t.F(5,4,6,1,'#8a8e96');});
   doble('carpaM',t=>{t.box(4,0,12,16,'#c8ccd0','#5a5e66');t.F(6,6,10,8,'#2a1a2a');t.blob(10,11,3,3,'#4ea04e','#22522c');},t=>{t.box(0,0,12,16,'#c8ccd0','#5a5e66');t.F(0,6,10,8,'#2a1a2a');t.blob(5,11,3,3,'#4ea04e','#22522c');});
   // 1.34: GROW IBARBIDE (baldosa gris, ladrillo blanco) y lo nuevo de los dos grows

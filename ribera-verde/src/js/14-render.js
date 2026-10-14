@@ -64,7 +64,7 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
         const g=ctx.createRadialGradient(x,y+8,1,x,y+8,28);g.addColorStop(0,`rgba(255,214,120,${a*.7})`);g.addColorStop(1,'rgba(255,214,120,0)');ctx.fillStyle=g;ctx.fillRect(x-30,y-22,60,60);}
         ctx.globalCompositeOperation='source-over';}}
   }
-  if(!camFija){luzLocal(cam,now);if(TIRO)pintaTiro(now);}   // los locales (1.30, 11j-locales)
+  if(!camFija){luzLocal(cam,now);if(MESA_B)pintaRects(rectsMesaBillar(MESA_B));if(TIRO)pintaTiro(now);}   // los locales (1.30, 11j-locales)
 }
 // la luz de los locales (LUZ_CLUB, LUZ_DISCO y, 1.31, los LED de la nave, luzNave): el fondo, si lo hay, encima de todo, y cada luz, un degradado radial (r 1 → r) sumado ('lighter');
 // los focos de GAUA dan una vuelta a la pista cada 7 s (0,9 rad/s), cada uno desde su fase
@@ -76,12 +76,13 @@ function luzLocal(cam,now){
   for(const [c,f] of L.focos||[]){const t=now/1000*.9+f;luz(Math.round(L.c[0]+Math.cos(t)*L.r[0])-cam.x,Math.round(L.c[1]+Math.sin(t)*L.r[1])-cam.y,L.R,c,.5);}
   ctx.globalCompositeOperation='source-over';
 }
-// la barra del billar (1.30): la fuerza del tiro, que va y viene; en el verde, la bola dentro, y en el amarillo, la rozas
+// la barra del billar (1.30; 1.35, dos): la que va y viene; en la de la dirección, el verde es la tronera (TIRO.a); en la de la
+// fuerza, el verde mete y el rojo del final cuela la blanca (BILLAR.falta)
 function pintaTiro(now){
-  const L=BILLAR,w=120,x0=(SW-w)>>1,y0=36,p=fuerzaTiro(now-TIRO.t0);
+  const L=BILLAR,w=120,x0=(SW-w)>>1,y0=60,p=fuerzaTiro(now-TIRO.t0,TIRO.per),a=TIRO.f==='dir'?TIRO.a:L.verde;
   ctx.fillStyle='#26262e';ctx.fillRect(x0-2,y0-2,w+4,12);ctx.fillStyle='#3a3446';ctx.fillRect(x0,y0,w,8);
-  ctx.fillStyle='#e0b84a';ctx.fillRect(x0+Math.round((L.centro-L.amarillo)*w),y0,Math.round(2*L.amarillo*w),8);
-  ctx.fillStyle='#58d080';ctx.fillRect(x0+Math.round((L.centro-L.verde)*w),y0,Math.round(2*L.verde*w),8);
+  if(TIRO.f!=='dir'){ctx.fillStyle='#e04040';ctx.fillRect(x0+Math.round(L.falta*w),y0,w-Math.round(L.falta*w),8);}
+  ctx.fillStyle='#58d080';ctx.fillRect(x0+Math.round((L.centro-a)*w),y0,Math.round(2*a*w),8);
   ctx.fillStyle='#ffffff';ctx.fillRect(x0+Math.round(p*(w-2)),y0-1,2,10);
 }
 // lo oscura que está la noche (0 de día, .5 de 21 a 5, en rampa de 19 a 21 y de 5 a 7)
@@ -139,7 +140,42 @@ function renderBattle(now){
   if(ARTE.ok)pintarVfx(now,{x:0,y:0},'*');
   ctx.restore();
 }
+/* ---------- el título (1.35, lo pidió el usuario) ----------
+   Detrás del azul, una partida que se juega sola: el barrio al atardecer, el protagonista sale del portal, se para con un cliente,
+   sigue la calle y vuelve, y un agente hace la ronda. Todo sale del reloj (demoEn): el mismo instante se ve igual en el HTML y en
+   Godot. Rutas cerradas de [x, y, pausa al llegar en ms, hacia dónde mira en la pausa], a dur ms por casilla; azul: el alfa de la
+   capa de arriba abajo, por bandas (DEMO.bandas), más opaca donde va el rótulo */
+const DEMO={map:'town',min:1200,P:{dur:320,ruta:[[5,9,700,'down'],[5,10],[12,10,1600,'up'],[33,10,900,'down'],[5,10]]},
+  poli:{dur:420,ruta:[[36,11],[2,11,600,'right']]},cliente:[12,9],azul:[14,22,60],alfa:[.66,.34],bandas:12};
+let demoS=null,demoE=null;
+function demoEn(R,T){
+  const tr=R.ruta.map((a,i)=>{const b=R.ruta[(i+1)%R.ruta.length];return [a,b,Math.abs(b[0]-a[0])+Math.abs(b[1]-a[1])];});
+  const tot=tr.reduce((s,[,b,n])=>s+n*R.dur+(b[2]||0),0);let t=T%tot;
+  for(const [a,b,n] of tr){const dx=Math.sign(b[0]-a[0]),dy=Math.sign(b[1]-a[1]),dir=dx>0?'right':dx<0?'left':dy>0?'down':'up';
+    if(t<n*R.dur){const k=Math.floor(t/R.dur),f=t-k*R.dur,x=a[0]+dx*k,y=a[1]+dy*k;
+      return {x:x+dx,y:y+dy,px:(x+dx*f/R.dur)*16,py:(y+dy*f/R.dur)*16,dir,moving:true,t:f,dur:R.dur,parity:k&1};}
+    t-=n*R.dur;const p=b[2]||0;
+    if(t<p)return {x:b[0],y:b[1],px:b[0]*16,py:b[1]*16,dir:b[3]||dir,moving:false,t:0,dur:R.dur,parity:0};
+    t-=p;}
+  const a=R.ruta[0];return {x:a[0],y:a[1],px:a[0]*16,py:a[1]*16,dir:'down',moving:false,t:0,dur:R.dur,parity:0};
+}
+// la partida de fondo: S, los personajes y el jugador de la demo mientras se pinta (lo de la partida, intacto)
+function renderDemo(now){
+  const s0=S,e0=ents;
+  if(!demoS)demoS=Object.assign(newState(),{map:DEMO.map,min:DEMO.min});
+  S=demoS;
+  try{
+    if(!demoE){const [cx,cy]=DEMO.cliente,quieto=(id,x,y,dir,look,def)=>({id,x,y,px:x*16,py:y*16,hx:x,hy:y,fx:x,fy:y,dir,look,def,moving:false,t:0,dur:320});
+      demoE=NPCDEF.filter(d=>d.map===DEMO.map&&(!d.cond||d.cond())).map(d=>quieto(d.id,d.x,d.y,d.dir||'down',d.lookObj||LOOKS[d.look],d))
+        .concat([quieto('demo1',cx,cy,'down',randLook('demo1','client'),{client:{type:'cur'}}),quieto('demo2',0,0,'left',LOOKS.cop,{})]);}
+    ents=demoE;Object.assign(demoE[demoE.length-1],demoEn(DEMO.poli,now));Object.assign(P,demoEn(DEMO.P,now));
+    renderWorld(now);
+  }finally{S=s0;ents=e0;}
+  const [r,g,b]=DEMO.azul,[a0,a1]=DEMO.alfa,n=DEMO.bandas,h=Math.ceil(SH/n);
+  for(let i=0;i<n;i++){ctx.fillStyle=`rgba(${r},${g},${b},${Math.round((a0+(a1-a0)*i/(n-1))*100)/100})`;ctx.fillRect(0,i*h,SW,h);}
+}
 function renderTitle(now){
+  if(mode==='title')return renderDemo(now);
   const t=now/1000,ox=OX(),oy=OY(),art=arteTitulo();   // con atlas: el fondo de PixelLab (cielo, barrio, río y hoja); sin él, el procedural
   ctx.save();ctx.translate(ox,oy);
   if(!art){

@@ -342,7 +342,7 @@ func _corre() -> void:
 
 # ---------- título, intro y nombre ----------
 func titulo_e_intro() -> void:
-	check("arranca en el título", J.mode == "title" and J.titulo.visible and J.pintor.modo == "title" and not J.hud.visible)
+	check("arranca en el título", J.mode == "title" and J.titulo.visible and J.pintor.modo == "demo" and not J.hud.visible)
 	# el primer arranque: el aviso de edad (+18) con su pregunta; aceptado, se guarda en los ajustes y no vuelve a salir
 	textos.clear()
 	var hay_aviso: bool = await hasta(func(): return J.dlg.visible, 60)
@@ -351,12 +351,13 @@ func titulo_e_intro() -> void:
 	check("primer arranque: el aviso de edad (%s) y la pregunta (%s)" % [" / ".join(textos), ", ".join(etiquetas())], hay_aviso and textos.size() >= 1 and textos[0].contains("18 años") \
 		and etiquetas() == ["TENGO 18 O MÁS", "SALIR"])
 	await pulsa("A")
-	await hasta(func(): return J.lock == 0 and J.handlers.is_empty(), 120)
+	await hasta(func(): return J.menu_box.visible, 120)
 	var aj = JSON.parse_string(FileAccess.get_file_as_string(UI.AJUSTES)) if FileAccess.file_exists(UI.AJUSTES) else {}
 	check("aceptado, se guarda en los ajustes", J.aj.aviso and aj is Dictionary and aj.get("aviso") == true and J.mode == "title")
-	await foto("0-titulo")
-	await pulsa("A")
+	# el título abre su menú solo, sin PULSA START (1.35)
 	await hasta(func(): return J.menu_box.visible, 120)
+	await espera(3)
+	await foto("0-titulo")
 	check("sin partida guardada, el título: NUEVA PARTIDA, OPCIONES y CRÉDITOS (%s)" % ", ".join(etiquetas()), etiquetas() == ["NUEVA PARTIDA", "OPCIONES", "CRÉDITOS"])
 	# CRÉDITOS: los créditos, las licencias enteras (Godot y las fuentes) y la privacidad, en un texto con scroll
 	await elige("CRÉDITOS")
@@ -366,7 +367,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.lector.visible, 60)
 	await espera(3)
 	await foto("0b-creditos")
-	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.28.0") \
+	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.29.0") \
 		and J.lector_txt.text.contains("Open Font License") and J.lector_txt.text.contains("FICCIÓN") and J.lector.get_global_rect().encloses(J.lector_sc.get_global_rect()))
 	await pulsa("B")
 	await elige("LICENCIAS")
@@ -1004,7 +1005,6 @@ func continuar() -> void:
 	J = load("res://juego.tscn").instantiate()
 	root.add_child(J)
 	await espera(10)
-	await pulsa("A")
 	await hasta(func(): return J.menu_box.visible, 120)
 	check("con partida guardada, el título pregunta, sin el aviso de edad otra vez (%s)" % ", ".join(etiquetas()), etiquetas() == ["CONTINUAR", "NUEVA PARTIDA", "OPCIONES", "CRÉDITOS"] and not J.dlg.visible)
 	await pulsa("A")

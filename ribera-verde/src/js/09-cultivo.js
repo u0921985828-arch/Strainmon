@@ -169,13 +169,13 @@ function newDay(){
   if(S.orden&&S.day>S.orden)queue('raid',raidEvent);
   else if(!S.orden&&S.heat>=NIVEL_POLI[3][0]){if(S.protect)queue('raid',raidEvent);else{S.orden=S.day;queue('orden',avisoOrden);}}
   S.heat=Math.max(0,S.heat-bajaCalor());
-  const luz=facturaLuz(),olor=olorDia(),av=[],nf=luz>0?pagarCasa(luz):0;S.luz={d:S.day,e:luz,o:olor};if(luz>0)av.push('Factura de la luz: −'+eur(luz-nf)+(nf?` (te faltan ${eur(nf)})`:''));   // de lo de fuera y, si no llega, de la caja (1.10)
+  const luz=facturaLuz(),olor=olorDia(),av=[],nf=luz>0?pagarRecibo(luz,'Luz'):0;S.luz={d:S.day,e:luz,o:olor};if(luz>0)av.push('Factura de la luz: −'+eur(luz-nf)+(nf?` (te faltan ${eur(nf)})`:''));   // 1.35: domiciliada; si no llega, de lo de fuera y de la caja (1.10)
   if(olor){S.heat=Math.min(100,S.heat+olor);av.push('Olor a cogollo: calor +'+olor);}   // después de bajar el calor: cuenta para la redada de mañana
   const sec=S.esquejes.filter(e=>S.day-e.dia>ESQUEJE_DIAS).length;if(sec){S.esquejes=S.esquejes.filter(e=>S.day-e.dia<=ESQUEJE_DIAS);av.push(`Se ${sec>1?'han secado '+sec+' esquejes':'ha secado un esqueje'} sin plantar`);}
   const seb=S.bandejas.filter(e=>S.day-e.dia>CARRO.dias).length;if(seb){S.bandejas=S.bandejas.filter(e=>S.day-e.dia<=CARRO.dias);av.push(`Se ${seb>1?'han secado '+seb+' esquejes':'ha secado un esqueje'} en las bandejas`);}
   curadoDia(av);   // el curado (1.29, 09c-sala)
   if(av.length&&mode==='world')toast(av.join('<br>'),1600);
-  spawnClients();recibirPedido();recibirEnvio();instalarCaja();llegaMueble();vencerEncargo();curroDia();setasDia();vencerEncargoClub();   // la gente (1.15)
+  spawnClients();recibirPedido();recibirEnvio();instalarCaja();llegaMueble();vencerEncargo();curroDia();setasDia();recibosDia();vencerEncargoClub();   // la gente (1.15)
   // 1.10: el plazo vencido, también sin haber visto a Baltasar (el plazo corre desde Toño); 1.11: el aviso, a 3 días y el último
   if(S.due>0&&S.day>S.deadline)queue('penalty',penaltyEvent);
   else if(S.due>0&&(S.deadline-S.day===3||S.deadline===S.day))queue('plazo',recuerdoPlazo);
@@ -413,11 +413,11 @@ async function bancoSemillas(){
     const l=BANCO.filter(([,,ch])=>S.ch>=ch);
     const items=l.map(([k,p])=>{const s=STRAINS[k],n=S.pedido.filter(x=>x===k).length;return {label:s.n+(n?' · pedida':''),right:eur(p),sw:s.c,ic:iconoCogollo(k),desc:strainLine(k)+'\n'+s.h};});
     items.push({label:'Salir',desc:'Los pedidos llegan mañana por la mañana.'});
-    i=await menu(items,{cls:'full',title:'BANCO DE SEMILLAS',title2:`Sobres de ${SOBRE} · tienes `+eur(S.money+cajaE()),desc:true,initial:i});
+    i=await menu(items,{cls:'full',title:'BANCO DE SEMILLAS',title2:`Sobres de ${SOBRE} · en la cuenta `+eur(S.banco),desc:true,initial:i});
     if(i<0||i>=l.length)return;
     const [k,p]=l[i];
-    if(S.money+cajaE()<p){sfx('bad');await say('No te llega el dinero.');continue;}
-    pagarCasa(p);S.pedido.push(k);sfx('coin');toast('Pedido: '+STRAINS[k].n+' · llega mañana',1400);
+    if(!await tarjeta(p,'Banco de semillas'))continue;   // 1.35: con tarjeta
+    S.pedido.push(k);sfx('coin');toast('Pedido: '+STRAINS[k].n+' · llega mañana',1400);
   }
 }
 function recibirPedido(){
@@ -432,23 +432,10 @@ async function letterAction(){
   await talk('CARTA',['«{N}: si lees esto, el piso es tuyo. Cuídalo.»','«Al fondo del salón está mi armario de cultivo. Lo he tenido treinta años y nunca me ha fallado.»','«Pásate por el growshop de Kiko, aquí al lado. Él te enseñará lo que yo no pude.»','«Le debo dinero a Baltasar, el del bar El Ancla. No es buena gente. Lo siento.»']);
   S.flags.letter=true;showObjective();
 }
-// la prensa de rosin (1.10, de Kiko desde el capítulo 3): calor y presión sobre los cogollos; sale el ROSIN.rend del peso (al
-// décimo de gramo) con ROSIN.thc veces su THC, hasta ROSIN.tope. Media hora en la mesa
-const rosinDe=g=>Math.round(g*ROSIN.rend*10)/10;
-async function prensar(){
-  const lots=budLots(5);
-  if(!lots.length)return say('PRENSA DE ROSIN: necesitas 5 g de cogollos como mínimo.');
-  const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué prensas?'});
-  if(i<0||i>=lots.length)return;
-  const [k,b]=lots[i],ops=[5,25,100].filter(g=>g<Math.floor(b.g)).concat([Math.floor(b.g)]);
-  const j=await ask(`${lotNombre(k)}: ${Math.floor(b.g)} g. ¿Cuánto prensas?`,ops.map(g=>`${g} g → ${coma(rosinDe(g))} g de rosin`).concat(['Nada']));
-  if(j<0||j>=ops.length)return;
-  const g=ops[j],r=rosinDe(g),thc=Math.min(ROSIN.tope,b.thc*ROSIN.thc);
-  useBuds(k,g);addRosin(k,r,thc);advanceTime(30);sfx('get');
-  await say(`Prensas ${g} g de ${lotNombre(k)}: ${coma(r)} g de rosin con un ${pct(thc)} % de THC.`);
-}
+// la mesa (1.35): las extracciones que puedes hacer (extrYa, 11l-extraccion), cruzar o nada
 async function labAction(){
-  if(S.items.prensa){const j=await ask('La mesa de la tía. ¿Qué haces?',['Prensar rosin','Cruzar semillas','Nada']);if(j===0)return prensar();if(j!==1)return;}
+  const L=extrYa();
+  if(L.length){const j=await ask('La mesa de la tía. ¿Qué haces?',L.map(t=>EXTR[t].v).concat(['Cruzar semillas','Nada']));if(j>=0&&j<L.length)return extraer(L[j]);if(j!==L.length)return;}
   if(!S.flags.lab)return say('Una mesa con un microscopio viejo y frascos. Kiko sabrá qué hacer con esto.');
   const own=()=>Object.entries(S.seeds).filter(([,v])=>v>0);
   if(own().length<2&&!own().some(([k,v])=>v>=2&&genDe(k)<GEN_ESTABLE))return say('MESA DE GENÉTICA: necesitas semillas de dos variedades distintas para cruzar, o 2 de una línea sin estabilizar.');

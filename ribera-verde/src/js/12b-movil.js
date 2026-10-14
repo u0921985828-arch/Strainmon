@@ -12,12 +12,13 @@ function apuntaFijo(c){if(c.fijo||S.fijos.length>=FIJOS_MAX||S.fijos.some(f=>f.i
 const relojTxt=()=>String(Math.floor(S.min/60)).padStart(2,'0')+':'+String(S.min%60).padStart(2,'0');
 async function movilMenu(){
   for(;;){
-    const ops=['Llamar'].concat(S.flags.kiko1?['Pedir a Kiko']:[],['Mensajes','Gente'],S.ch>=PLANTILLA.ch?['Plantilla']:[],['Tienda online','Colgar']);
+    const ops=['Llamar'].concat(S.flags.kiko1?['Pedir a Kiko']:[],['Mensajes','Gente'],S.ch>=PLANTILLA.ch?['Plantilla']:[],['Banca','Tienda online','Colgar']);   // 1.35: la banca (11k-banco)
     const op=ops[await ask(`MÓVIL · día ${S.day}, ${relojTxt()}${S.sms.length?` · ${S.sms.length} mensaje${S.sms.length>1?'s':''}`:''}`,ops)];
     if(!op||op==='Colgar')return;
     if(op==='Llamar'){if(await llamar())return;}
     else if(op==='Pedir a Kiko')await pedirKiko();
     else if(op==='Tienda online')await tiendaOnline();
+    else if(op==='Banca')await banca();
     else if(op==='Gente')await gente();else if(op==='Plantilla')await plantilla();   // 1.15 (11e-gente)
     else await mensajes();
   }

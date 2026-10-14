@@ -109,6 +109,10 @@ func migrate() -> void:
 	if (S.ch == 5 or S.ch == 7) and not (S.get("due", 0) > 0) and S.get("debt", 0) > 0:
 		S.due = mini(int(D.PLAZOS["5"]), S.debt) if S.ch == 5 else S.debt
 		S.deadline = maxi(S.get("deadline", 0) if S.get("deadline") else 0, S.day + (10 if S.ch == 5 else 7))
+	if S.get("nave") != null and S.nave.get("r") == null:   # 1.35: los recibos, cada RECIBO.dias
+		S.nave.r = S.day + D.RECIBO.dias
+	if S.get("setas") != null and S.setas.get("r") == null:
+		S.setas.r = S.day + D.RECIBO.dias
 	if not S.has("clubReg") and S.has("clubDia"):   # 1.34: en los clubs donde ya vendías, el encargado y el presidente ya se fían de ti
 		for k in D.PRESI:
 			if S.clubDia.has(k) or (S.get("clubEnc") and S.clubEnc.k == k):
@@ -210,8 +214,16 @@ func show_title() -> void:
 		titulo.show()
 	update_hud()
 	music("title")
-	if not oraculo and not aj.aviso:
-		run(aviso_edad)
+	if not oraculo:
+		run(_titulo_entra)
+
+# 1.35: el aviso de edad (la primera vez) y, sin PULSA START, los botones del título; con B se cierran y A o START los abren
+func _titulo_entra() -> void:
+	if not aj.aviso:
+		await aviso_edad()
+		if not aj.aviso:
+			return
+	await _title_press()
 
 # el aviso de contenido, una vez (se guarda en los ajustes): mayores de 18 o salir
 func aviso_edad() -> void:
@@ -237,7 +249,7 @@ func _title_press() -> void:
 	while true:
 		var sv = load_save()
 		var ops := (["CONTINUAR"] if sv else []) + ["NUEVA PARTIDA", "OPCIONES", "CRÉDITOS"]
-		i = await menu(ops, {"cls": "start", "initial": maxi(0, ops.find(ult))})
+		i = await menu(ops, {"cls": "titulo", "initial": maxi(0, ops.find(ult))})
 		if i < 0:
 			return
 		ult = ops[i]

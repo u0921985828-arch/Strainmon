@@ -11,7 +11,7 @@ func shop_cond(it: Dictionary) -> bool:
 		return not S.items.get("prensa")
 	if it.get("item") == "analizador":   # el analizador de cannabinoides y terpenos (1.15), uno
 		return not S.items.get("analizador") and not S.envio.has(it.lbl)
-	if it.get("item") == "medidor" or it.get("item") == "tarros":   # el medidor de pH y EC (1.11) y los tarros de curado (1.29), uno
+	if it.get("item") in ["medidor", "tarros", "tamiz", "ice"]:   # 1.35: los tamices y el kit Ice-o-lator, uno   # el medidor de pH y EC (1.11) y los tarros de curado (1.29), uno
 		return not S.items.get(it.item) and not S.envio.has(it.lbl)
 	if it.get("aparato"):   # los aparatos de la sala (1.10), uno de cada; lo pedido por el móvil no se vuelve a vender
 		return not S.sala.get(it.aparato) and not S.envio.has(it.lbl)
@@ -1706,10 +1706,15 @@ func mochila() -> void:
 				"desc": ("Cogollos de un fenotipo estrella, en lote aparte.\n" if k.ends_with("*") else "Cogollos listos para vender.\n") + ((cura_txt(b) + "\n") if cura_txt(b) else "") + ((S.catas[lot_sid(k)] + "\n") if S.catas.has(lot_sid(k)) else "") + strain(lot_sid(k)).o + "\nPulsa A para catarlo" + (" o analizarlo." if S.items.get("analizador") else "."), "k": "b", "key": k})
 		for k in S.rosin:
 			var b: Dictionary = S.rosin[k]
-			rows.append({"label": "Rosin · " + lot_nombre(k), "right": "%s g · %s%%" % [Datos.coma(b.g), Datos.pct(b.thc)], "sw": "#d89a18", "ic": ic_cog(lot_sid(k)),
-				"desc": "Rosin: extracción prensada sin disolventes. Lo compran los catadores.\n" + strain(lot_sid(k)).o})
+			var ro := rosin_item([k, b])
+			ro.desc = D.EXTR[tipo_extr(k)].n + ": extracción sin disolventes. La compran los catadores.\n" + strain(lot_sid(k)).o
+			rows.append(ro)
 		if S.items.get("prensa"):
 			rows.append({"label": "Prensa de rosin", "right": "en la mesa", "desc": "De 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso."})
+		if S.items.get("tamiz"):
+			rows.append({"label": "Tamices de seda", "right": "en la mesa", "desc": "Dry sift: de la flor, el kief con algo más del doble de THC. Se usa en la mesa del piso."})
+		if S.items.get("ice"):
+			rows.append({"label": "Kit Ice-o-lator", "right": "en la mesa", "desc": "Agua con hielo y bolsas de malla: la resina más limpia. Se usa en la mesa del piso."})
 		i = await menu(rows, {"cls": "full", "title": "MOCHILA", "title2": "%d g encima" % int(floor(total_buds())) + ((" · %d g en la caja" % int(floor(caja_g()))) if S.get("caja") else ""), "desc": true, "initial": i})
 		if i < 0:
 			return
@@ -2269,7 +2274,7 @@ func caja_action():
 		await sobre_caja()
 	while true:
 		var C: Dictionary = D.CAJA[int(S.caja.nivel)]
-		var ro: bool = (true if S.items.get("prensa") else false) or caja_r() > 0   # con la prensa (o rosin dentro), también el rosin
+		var ro: bool = extr_algo() or caja_r() > 0   # con la prensa u otro aparato (o rosin dentro), también el rosin
 		var ops := ["Guardar todo", "Guardar dinero", "Guardar cogollos"] + (["Guardar rosin"] if ro else []) + ["Sacar dinero", "Sacar cogollos"] + (["Sacar rosin"] if ro else []) + ["Sacar todo", "Cerrar"]
 		var oi: int = await ask("%s: %s (caben %s y %s).\nEncima: %s." % [C.n, lo_que(S.caja.money, caja_g(), caja_r()), Datos.eur(C.money), _kg(int(C.g)),
 			lo_que(S.money, total_buds(), total_rosin())], ops)
@@ -2637,7 +2642,7 @@ func movil_menu():
 		ops.append_array(["Mensajes", "Gente"])
 		if S.ch >= int(D.PLANTILLA.ch):
 			ops.append("Plantilla")
-		ops.append_array(["Tienda online", "Colgar"])
+		ops.append_array(["Banca", "Tienda online", "Colgar"])   # 1.35: la banca (granja.gd)
 		var ns: int = S.sms.size()
 		var oi: int = await ask("MÓVIL · día %s, %s%s" % [n(S.day), reloj_txt(), (" · %d mensaje%s" % [ns, "s" if ns > 1 else ""]) if ns else ""], ops)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
@@ -2650,6 +2655,8 @@ func movil_menu():
 			await pedir_kiko()
 		elif op == "Tienda online":
 			await tienda_online()
+		elif op == "Banca":
+			await banca()
 		elif op == "Gente":   # 1.15
 			await gente()
 		elif op == "Plantilla":   # 1.19
@@ -3692,17 +3699,15 @@ func plantilla_dia() -> void:
 		queue("historia", check_story)
 	nave_dia()
 
-# la nave: el alquiler, lo primero de la mañana (antes que los sueldos; sin él, Arrieta cambia la cerradura y se queda la fianza)
+# la nave: el alquiler, lo primero de la mañana (antes que los sueldos; sin él, Arrieta cambia la cerradura y se queda la fianza).
+# 1.35: cada RECIBO.dias, en efectivo, con su aviso (cobra, granja.gd)
 func nave_alquiler() -> void:
-	if S.get("nave") == null:
+	if S.get("nave") == null or cobra(S.nave, recibo_nave(), "ARRIETA", false, "la nave"):
 		return
-	if S.money < D.NAVE.dia:
-		for w in de_la_nave():
-			libre(w)
-		S.nave = null
-		queue("nave", func(): await talk("SMS · ARRIETA", ["No me has pagado la nave. Cambio la cerradura y me quedo la fianza."]))
-		return
-	S.money -= int(D.NAVE.dia)
+	for w in de_la_nave():
+		libre(w)
+	S.nave = null
+	queue("nave", func(): await talk("SMS · ARRIETA", ["No me has pagado la nave. Cambio la cerradura y me quedo la fianza."]))
 
 # después de la calle, la redada (menos con cuidado) y lo que da cada mesa que ya da (1.30): cada trabajador cuida la suya (w.mesa);
 # nave_g × el rendimiento de lo plantado y, con su abono y dosis en la estantería, lo del abono (ABONO, ABONO_BIO), al secadero de
@@ -3785,13 +3790,14 @@ func talk_nave() -> void:
 		await say("La nave no se alquila. Ahora mismo, no.", A)
 		return
 	if N == null:
-		if await ask("La nave está vacía: %s de fianza y %s al día, que te cobro cada mañana. Sin preguntas." % [Datos.eur(D.NAVE.fianza), Datos.eur(D.NAVE.dia)], ["Alquilarla", "No"], A) != 0:
+		var e: float = D.NAVE.fianza + recibo_nave()   # 1.35: la fianza y la primera semana; después, cada RECIBO.dias, en efectivo
+		if await ask("La nave está vacía: %s de fianza y %s cada %s días, en efectivo; el primero, ahora. Paso a cobrar y te aviso antes. Sin preguntas." % [Datos.eur(D.NAVE.fianza), Datos.eur(recibo_nave()), n(D.RECIBO.dias)], ["Alquilarla", "No"], A) != 0:
 			return
-		if S.money < D.NAVE.fianza:
+		if S.money < e:
 			sfx("bad")
-			await say("Sin la fianza no hay llave.", A)
+			await say("Sin %s no hay llave." % Datos.eur(e), A)
 			return
-		S.money -= int(D.NAVE.fianza)
+		S.money -= e
 		S.nave = nave_nueva()
 		sfx("coin")
 		await got("la llave de la nave")
@@ -3985,6 +3991,8 @@ func sprite_local(o: String) -> String:
 		return "secaS-%d" % (1 if S.get("setas") != null and S.setas.g >= 1 else 0)
 	if o == "carpaM":
 		return "carpaM-%d" % (S.nave.ma.size() if S.get("nave") != null and S.nave.has("ma") else 0)
+	if o == "rotuloL":   # 1.35 (granja.gd)
+		return sprite_rotulo()
 	var e = MAPS[S.map].get("est") if MAPS.has(S.map) else null
 	return (o + "-" + e) if e and D.ESTILO_OBJ.has(o) else o
 
@@ -4031,34 +4039,36 @@ func talk_socio(k: String):
 	sfx("sel")
 	await say("Compartes %s en el sofá. %s: «%s»" % [lot_nombre(kk), nn, "Esto es otra liga. Se lo cuento a los del club." if thc >= 20 else "Suave, de los de charlar. Gracias."])
 
-# el billar: hasta BILLAR.dia partidas al día con cada uno, de BILLAR.tiros tiros. Cada tiro, la barra de fuerza va y viene: con A
-# en el verde, la bola dentro (3 puntos); en el amarillo, la rozas (1). El otro mete con BILLAR.hab × 0,6 y la roza hasta BILLAR.hab
-var TIRO = null   # la barra mientras apuntas: {t0}, en el reloj del juego (pinta.gd la dibuja)
+# el billar (1.35, talkBillar de 11j-locales): una partida corta a la bola 8, con el tiro elegido (TIROS) y dos barras, la dirección
+# y la fuerza; quien mete, sigue; gana quien mete la negra con las suyas dentro. MESA_B: la mesa que se ve mientras dura (pinta.gd)
+var TIRO = null   # la barra mientras apuntas: {t0, f: "dir" o "fuerza", a}, en el reloj del juego (pinta.gd la dibuja)
+var MESA_B = null
 
-func fuerza_tiro(ms: float) -> float:
-	var f: float = fmod(ms, float(D.BILLAR.periodo)) / float(D.BILLAR.periodo)
+func fuerza_tiro(ms: float, per := -1.0) -> float:
+	if per < 0:
+		per = float(D.BILLAR.periodo)
+	var f: float = fmod(ms, per) / per
 	return f * 2 if f < .5 else 2 - f * 2
 
-func puntos_tiro(p: float) -> int:
-	var d: float = absf(p - D.BILLAR.centro)
-	return 3 if d <= D.BILLAR.verde else (1 if d <= D.BILLAR.amarillo else 0)
-
-func tiro_rival() -> int:
-	var r := Cultivo.azar()
-	return 3 if r < D.BILLAR.hab * .6 else (1 if r < D.BILLAR.hab else 0)
+func resultado_tiro(d: float, f: float, a: float) -> String:
+	if f >= float(D.BILLAR.falta):
+		return "falta"
+	return "dentro" if absf(d - D.BILLAR.centro) <= a and absf(f - D.BILLAR.centro) <= D.BILLAR.verde else "falla"
 
 # un tiro: el texto y, con A, dónde estaba la barra (de 0 a 1; 1.31: arranca en un punto al azar, para que no baste con contar); las
 # pruebas lo cambian (gancho_billar, ui.gd)
-func tiro_billar(txt: String) -> float:
+func tiro_billar(txt: String, fase := "fuerza", a := 0.0, per := -1.0, nom := "BILLAR") -> float:   # 1.35: per y nom, las extracciones
 	if gancho_billar.is_valid():
 		return float(gancho_billar.call(txt))
-	await type_text(txt, "BILLAR")
+	if per < 0:
+		per = float(D.BILLAR.periodo)
+	await type_text(txt, nom)
 	var pr := Motor.Prom.new()
-	TIRO = {"t0": M.reloj - Cultivo.azar() * D.BILLAR.periodo}
+	TIRO = {"t0": M.reloj - Cultivo.azar() * per, "f": fase, "a": a, "per": per}
 	push(func(b: String):
 		if b == "A":
 			pop()
-			pr.res(fuerza_tiro(M.reloj - TIRO.t0)))
+			pr.res(fuerza_tiro(M.reloj - TIRO.t0, per)))
 	var p: float = await Motor.espera(pr)
 	TIRO = null
 	if not oraculo:
@@ -4067,52 +4077,227 @@ func tiro_billar(txt: String) -> float:
 	sfx("hit")
 	return p
 
+# las extracciones (1.35, 11l-extraccion): una tanda de barras; la calidad q es la parte que entra, y sale rend × (0,6 + 0,4 q)
+# del peso con thc × (0,9 + 0,1 q) veces el THC, hasta tope
+func sale_extr(E: Dictionary, g: float, q: float) -> float:
+	return maxf(.1, Datos.jsround(g * E.rend * (.6 + .4 * q) * 10) / 10.0)
+
+func extraer(t: String):
+	var E: Dictionary = D.EXTR[t]
+	var kief: bool = E.de == "kief"
+	var N: String = E.n.to_upper()
+	var lots: Array = kief_lots(1) if kief else bud_lots(5)
+	if lots.is_empty():
+		await say("%s: necesitas %s como mínimo." % [N, "1 g de kief, del tamiz o del Ice-o-lator," if kief else "5 g de cogollos"])
+		return
+	var oil = null
+	var kf = null
+	if t == "moon":
+		oil = mayor_lote(rosin_lots(D.MOON.oil).filter(func(l): return tipo_extr(l[0]) == "rosin"))
+		kf = mayor_lote(kief_lots(D.MOON.kief))
+		if oil == null or kf == null:
+			await say("MOONROCK: necesitas rosin para bañar el cogollo y kief para rebozarlo.")
+			return
+	var it := lots.map(rosin_item if kief else lot_item)
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "%s: ¿de qué?" % E.n})
+	if i < 0 or i >= lots.size():
+		return
+	var k: String = lots[i][0]
+	var b: Dictionary = lots[i][1]
+	var tope := int(floor(b.g))
+	if oil != null:
+		tope = mini(tope, mini(int(floor(oil[1].g / D.MOON.oil + 1e-9)), int(floor(kf[1].g / D.MOON.kief + 1e-9))))
+	if tope < 1:
+		await say("MOONROCK: no te llega el rosin o el kief para un gramo.")
+		return
+	var base: Array = [1, 5, 25] if kief else ([1, 3, 10] if oil != null else [5, 25, 100])
+	var ops: Array = base.filter(func(g): return g < tope)
+	ops.append(tope)
+	var tx := ops.map(func(g): return "%d g → %s g de %s" % [g, Datos.coma(sale_extr(E, g, 1)), E.n.to_lower()])
+	tx.append("Nada")
+	var j: int = await ask("%s: %d g. ¿Cuánto usas?" % [(E.n + " · " + lot_nombre(k)) if kief else lot_nombre(k), tope], tx)
+	if j < 0 or j >= ops.size():
+		return
+	var g: int = ops[j]
+	await say(E.d, N)
+	var ok := 0
+	for p in E.pasos:
+		var d: float = await tiro_billar(p[0], "dir", p[1], E.per, N)
+		if absf(d - float(D.BILLAR.centro)) <= p[1]:
+			ok += 1
+	var q: float = float(ok) / E.pasos.size()
+	var r := sale_extr(E, g, q)
+	var thc: float = b.thc
+	if oil != null:
+		var o: float = Datos.jsround(g * D.MOON.oil * 10) / 10.0
+		var m: float = Datos.jsround(g * D.MOON.kief * 10) / 10.0
+		thc = (b.thc * g + oil[1].thc * o + kf[1].thc * m) / (g + o + m)
+		use_rosin(oil[0], o)
+		use_rosin(kf[0], m)
+	thc = minf(E.tope, thc * E.thc * (.9 + .1 * q))
+	if kief:
+		use_rosin(k, g)
+	else:
+		use_buds(k, g)
+	add_rosin(k if t == "rosin" else base_extr(k) + "~" + t, r, thc)
+	advance_time(E.min)
+	sfx("get")
+	await say("%s. %s de %s: %s g con un %s %% de THC." % ["Te sale perfecto" if q >= 1 else "Te sale bien, con algo de pérdida" if q >= .5 else "Te sale regular: pierdes bastante",
+		E.n, lot_nombre(base_extr(k)), Datos.coma(r), Datos.pct(thc)])
+
+func una_bola(m: int) -> String:
+	return "una" if m == 1 else str(m)
+
 func talk_billar(k: String):
-	var nb: String = D.BILLAR.n[k]
+	var B: Dictionary = D.BILLAR
+	var nb: String = B.n[k]
 	var N := nb.to_upper()
 	var Db = S.billar.get(k)
 	if not (Db is Dictionary and Db.d == S.day):
 		Db = {"d": S.day, "n": 0}
 		S.billar[k] = Db
-	if Db.n >= D.BILLAR.dia:
+	if Db.n >= B.dia:
 		await say("Por hoy ya está bien. Mañana te doy la revancha.", N)
 		return
-	var ops: Array = D.BILLAR.apuestas.map(func(e): return "A " + Datos.eur(e))
+	var ops: Array = B.apuestas.map(func(e): return "A " + Datos.eur(e))
 	ops.append("Nada")
-	var c: int = await ask("¿Unas bolas? %d tiros cada uno: la bola dentro, 3 puntos; si la rozas, 1. Quien sume más se lleva la apuesta." % int(D.BILLAR.tiros), ops, N)
-	if c < 0 or c >= D.BILLAR.apuestas.size():
+	var c: int = await ask("¿Una a la bola 8? %d lisas para ti, %d rayadas para mí y la negra al final: quien la meta se lleva la apuesta." % [int(B.bolas), int(B.bolas)], ops, N)
+	if c < 0 or c >= B.apuestas.size():
 		return
-	var e: int = int(D.BILLAR.apuestas[c])
+	var e: int = int(B.apuestas[c])
 	if S.money < e:
 		sfx("bad")
 		await say("Sin dinero encima no se juega.", N)
 		return
 	Db.n += 1
-	var yo := 0
-	var el := 0
-	var T := ["Fallas", "La rozas: 1 punto", "¡Dentro! 3 puntos"]
-	var RT := ["falla", "la roza", "¡dentro!"]
-	for i in int(D.BILLAR.tiros):
-		var p := puntos_tiro(await tiro_billar("Tiro %d de %d · tú %d, %s %d. Pulsa A con la barra en el verde." % [i + 1, int(D.BILLAR.tiros), yo, nb, el]))
-		var q := tiro_rival()
-		yo += p
-		el += q
-		await say("%s. %s: %s." % [T[[0, 1, 3].find(p)], nb, RT[[0, 1, 3].find(q)]])
-	if yo > el:
+	var V := {"yo": int(B.bolas), "el": int(B.bolas), "negra": 1}
+	MESA_B = V
+	var yo := true
+	var mano := false
+	var seguro := false
+	var deja := 1.0
+	var fin := ""
+	await say("Sacas tú. Las tuyas, las lisas.")
+	var t := 0
+	while t < int(B.turnos) and fin == "":
+		t += 1
+		if yo:
+			var extra := " Bola en mano: la colocas donde quieras." if mano else (" La blanca ha quedado bien." if deja > 1 else "")
+			var i: int = await ask("Tu turno · te %s; a %s, %s.%s" % ["quedan %d" % V.yo if V.yo else "queda la negra", nb, str(V.el) if V.el else "la negra", extra], D.TIROS.map(func(x): return x.n))
+			var T: Dictionary = D.TIROS[0 if i < 0 else i]
+			if T.get("seguro"):
+				seguro = true
+				deja = 1.0
+				mano = false
+				yo = false
+				await say("Escondes la blanca detrás de sus bolas. Le toca, y no lo tiene fácil.")
+				continue
+			var a: float = Datos.jsround(float(T.a) * deja * (float(B.manoX) if mano else 1.0) * 1000) / 1000.0
+			deja = 1.0
+			mano = false
+			var d1 := await tiro_billar("%s: para la barra en el verde para apuntar." % T.n, "dir", a)
+			var f1 := await tiro_billar("Ahora la fuerza: en el verde, dentro; pasada, se cuela la blanca.", "fuerza")
+			var r := resultado_tiro(d1, f1, a)
+			if r == "falta":
+				if not V.yo:
+					fin = "el"
+					await say("La negra entra... y la blanca detrás. Falta sobre la negra: pierdes.")
+					break
+				mano = true
+				yo = false
+				await say("Demasiado fuerte: la blanca se cuela. Falta: %s juega con bola en mano." % nb)
+				continue
+			if r == "dentro":
+				if not V.yo:
+					V.negra = 0
+					fin = "yo"
+					await say("¡La negra, dentro!")
+					break
+				V.yo -= 1
+				deja = float(T.get("deja", 1))
+				await say(("¡Dentro! Te %s %d. Sigues tú." % ["quedan" if V.yo > 1 else "queda", V.yo]) if V.yo else "¡Dentro! Ya solo te queda la negra. Sigues tú.")
+				continue
+			yo = false
+			await say("No entra. Le toca a %s." % nb)
+			continue
+		var p: float = float(B.hab[k]) + (float(B.mano) if mano else 0.0)
+		var m := 0
+		var falta := false
+		if seguro:
+			p *= float(B.seguro)
+		mano = false
+		seguro = false
+		while true:
+			var rr := Cultivo.azar()
+			if rr < p:
+				if not V.el:
+					V.negra = 0
+					fin = "el"
+					break
+				V.el -= 1
+				m += 1
+				p = float(B.hab[k])
+				continue
+			if rr > float(B.faltaR):
+				falta = true
+			break
+		if fin != "":
+			await say("%s %stira a la negra: dentro." % [nb, ("mete %s y " % una_bola(m)) if m else ""])
+			break
+		if falta and not V.el:
+			fin = "yo"
+			await say("%s tira a la negra y se le cuela la blanca. Falta sobre la negra: pierde." % nb)
+			break
+		if falta:
+			mano = true
+		yo = true
+		var tx: String
+		if m:
+			tx = "mete " + una_bola(m) + (" y se le cuela la blanca: bola en mano para ti." if falta else " y falla.")
+		else:
+			tx = "cuela la blanca: bola en mano para ti." if falta else "falla."
+		await say("%s %s" % [nb, tx])
+	MESA_B = null
+	if fin == "yo":
 		S.money += e
 		confia(k, 1)
 		sfx("coin")
-	elif yo < el:
+	elif fin == "el":
 		S.money -= e
 		sfx("bad")
-	advance_time(int(D.BILLAR.min))
+	advance_time(int(B.min))
 	update_hud()
-	if yo > el:
-		await say("%d a %d: ganas tú. %s te paga %s: «La próxima, la revancha»." % [yo, el, nb, Datos.eur(e)])
-	elif yo < el:
-		await say("%d a %d: gana %s. Le pagas %s." % [yo, el, nb, Datos.eur(e)])
+	if fin == "yo":
+		await say("Ganas tú. %s te paga %s: «La próxima, la revancha»." % [nb, Datos.eur(e)])
+	elif fin == "el":
+		await say("Gana %s. Le pagas %s." % [nb, Datos.eur(e)])
 	else:
-		await say("%d a %d: empate. Nadie paga." % [yo, el])
+		await say("Se hace tarde y lo dejáis en tablas. Nadie paga.")
+
+# la mesa del billar mientras dura la partida (rectsMesaBillar de 11j-locales): [x, y, w, h, color] en la pantalla
+func rects_mesa_billar(V: Dictionary) -> Array:
+	var x0: int = (SW - 100) >> 1
+	var y0 := 4
+	var o := [[x0 - 1, y0 - 1, 102, 54, "#26262e"], [x0, y0, 100, 52, "#74502e"], [x0, y0, 100, 1, "#a46e40"], [x0 + 4, y0 + 4, 92, 44, "#2f7a46"]]
+	for q in [[2, 2], [48, 2], [94, 2], [2, 46], [48, 46], [94, 46]]:
+		o.append([x0 + q[0], y0 + q[1], 4, 4, "#121519"])
+	var MB: Dictionary = D.MESA_BOLAS
+	var bola := func(q, c: String, b: String) -> void:
+		var x: int = int(q[0]) + x0 + 4
+		var y: int = int(q[1]) + y0 + 4
+		o.append([x + 1, y, 2, 4, c])
+		o.append([x, y + 1, 4, 2, c])
+		if b != "":
+			o.append([x, y + 1, 4, 2, b])
+	bola.call(MB.blanca, "#f8f8f0", "")
+	for i in mini(int(V.yo), MB.yo.size()):
+		bola.call(MB.yo[i], "#e0b84a", "")
+	for i in mini(int(V.el), MB.el.size()):
+		bola.call(MB.el[i], "#f8f8f0", "#e04040")
+	if V.negra:
+		bola.call(MB.negra, "#26262e", "")
+	return o
 
 # ---------- la nave: mesas, estantería, secadero y escritorio ----------
 # S.nave: {m: las NAVE.max mesas (null, vacía, o {k: el lote, f: el fenotipo, thc, y: × cosecha, dia: el de plantar, g y t: lo que hay
@@ -4123,7 +4308,7 @@ func nave_nueva() -> Dictionary:
 	var fs := []
 	for i in int(D.NAVE.max):
 		fs.append("led")
-	return {"m": m, "ab": {"m": 0, "o": 0}, "f": fs, "ex": 0, "rg": 0, "ma": []}   # 1.34: las madres (ma)
+	return {"m": m, "ab": {"m": 0, "o": 0}, "f": fs, "ex": 0, "rg": 0, "ma": [], "r": S.day + D.RECIBO.dias}   # 1.34: las madres (ma); 1.35: el día del recibo (r)
 
 # el equipo de la nave (1.33, FOCO_NAVE, EXTR_NAVE, RIEGO_NAVE y NIVEL_NAVE de 11j-locales): el calor de los focos encendidos, lo que
 # quita el que no saca la extracción y las dosis de la estantería, enteras
@@ -4818,11 +5003,10 @@ func setas_dia() -> void:
 	if L == null:
 		return
 	var Z: Dictionary = D.SETAS
-	if S.money < Z.dia:
+	if not cobra(L, recibo_setas(), "TXOMIN", false, "el bajo"):   # 1.35: cada RECIBO.dias (granja.gd)
 		S.setas = null
 		queue("setas", func(): await talk("SMS · TXOMIN", ["No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí."]))
 		return
-	S.money -= int(Z.dia)
 	var vivas: Array = L.bandejas.filter(func(b): return not b.get("mala"))
 	if vivas.is_empty():
 		return
@@ -4854,14 +5038,15 @@ func talk_txomin() -> void:
 		await say("¿Setas? Eso era antes, chaval. Ahora solo paseo.", T)
 		return
 	if S.get("setas") == null:
-		if await ask("El bajo de mi casa: oscuro, húmedo y nadie pregunta. %s de fianza y %s al día, que te cobro cada mañana. Las bandejas te las preparo yo." % [Datos.eur(Z.fianza), Datos.eur(Z.dia)], ["Alquilarlo", "No"], T) != 0:
+		var e: float = Z.fianza + recibo_setas()
+		if await ask("El bajo de mi casa: oscuro, húmedo y nadie pregunta. %s de fianza y %s cada %s días, en efectivo; el primero, ahora. Las bandejas te las preparo yo." % [Datos.eur(Z.fianza), Datos.eur(recibo_setas()), n(D.RECIBO.dias)], ["Alquilarlo", "No"], T) != 0:
 			return
-		if S.money < Z.fianza:
+		if S.money < e:
 			sfx("bad")
-			await say("Sin la fianza no hay llave.", T)
+			await say("Sin %s no hay llave." % Datos.eur(e), T)
 			return
-		S.money -= int(Z.fianza)
-		S.setas = {"bandejas": [], "g": 0}
+		S.money -= e
+		S.setas = {"bandejas": [], "g": 0, "r": S.day + D.RECIBO.dias}
 		sfx("coin")
 		await got("la llave del bajo")
 		await say("Compra las bandejas y tenlas húmedas. Lo demás lo hace el tiempo.", T)

@@ -8004,11 +8004,12 @@
     "obj:macetasP",
     "obj:botesW",
     "obj:neonG",
-    "obj:semillero"
+    "obj:semillero",
+    "obj:rotuloL"
    ],
    "celda": "objeto_1x1",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
-   "descripcion": "1.30: la vitrina del dispensario (mueble de madera con la urna y dos tarros), la balda de tarros, la pizarra de la variedad del día, las normas del club, el taquero con el triángulo, la mesa baja con cenicero, grinder y librillo, la barra acolchada de GAUA con su tira azul, el neón de la luna, la mesa del reservado con la cubitera y dos copas y el cordón de terciopelo (poste y cuerda; cordonF, el último poste); 1.33, el equipo de la nave: los focos de las mesas, aparte (focoN-<led|sodio|lec>-<0|1>, el LED de barras, la campana de sodio y los dos reflectores de cerámica (CMH), apagados y encendidos, con las asas en la fila 9 para las poleas), el extractor en línea de 250 mm (extrN) y el de 315 (extrG) con su tubo, el filtro de carbón colgado (filtroN) y el controlador de riego (ctrlN); 1.34: la mesita y la vitrina de cada club (mesita-<estilo>: la de nogal redonda con la vela, un baúl de marinero, un bidón con el tablero y la de cristal; vitrina-<estilo>: nogal, teca, acero y laca blanca), lo de sus paredes (la foto antigua del Casco Viejo, el ojo de buey, el timón, la red con los corchos, la diana, el piñón de la fundición, el aro de neón verde con la hoja y las copas de la tía), lo del bajo de las setas (el pulverizador, la tubería que suda y el cubo con el cepillo) y lo de los grows (los sacos de sustrato, las macetas de tela apiladas, la balda de botes de abono, el neón de la hoja y el propagador de esquejes)",
+   "descripcion": "1.30: la vitrina del dispensario (mueble de madera con la urna y dos tarros), la balda de tarros, la pizarra de la variedad del día, las normas del club, el taquero con el triángulo, la mesa baja con cenicero, grinder y librillo, la barra acolchada de GAUA con su tira azul, el neón de la luna, la mesa del reservado con la cubitera y dos copas y el cordón de terciopelo (poste y cuerda; cordonF, el último poste); 1.33, el equipo de la nave: los focos de las mesas, aparte (focoN-<led|sodio|lec>-<0|1>, el LED de barras, la campana de sodio y los dos reflectores de cerámica (CMH), apagados y encendidos, con las asas en la fila 9 para las poleas), el extractor en línea de 250 mm (extrN) y el de 315 (extrG) con su tubo, el filtro de carbón colgado (filtroN) y el controlador de riego (ctrlN); 1.34: la mesita y la vitrina de cada club (mesita-<estilo>: la de nogal redonda con la vela, un baúl de marinero, un bidón con el tablero y la de cristal; vitrina-<estilo>: nogal, teca, acero y laca blanca), lo de sus paredes (la foto antigua del Casco Viejo, el ojo de buey, el timón, la red con los corchos, la diana, el piñón de la fundición, el aro de neón verde con la hoja y las copas de la tía), lo del bajo de las setas (el pulverizador, la tubería que suda y el cubo con el cepillo) y lo de los grows (los sacos de sustrato, las macetas de tela apiladas, la balda de botes de abono, el neón de la hoja y el propagador de esquejes); 1.35: el caballete de la acera de los locales, «se alquila» (rotuloL-0) y la pizarra del negocio abierto (rotuloL-1)",
    "ajuste_por_sprite": {
     "vitrina": "exacto",
     "tarros": "exacto",
@@ -8054,7 +8055,9 @@
     "mesita-fundicion": "exacto",
     "vitrina-fundicion": "exacto",
     "mesita-ensanche": "exacto",
-    "vitrina-ensanche": "exacto"
+    "vitrina-ensanche": "exacto",
+    "rotuloL-0": "exacto",
+    "rotuloL-1": "exacto"
    },
    "estilo_ref": "props-16 (botellero, mostrador, gramola)",
    "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca». 1.34, pedido por el usuario: «los decorados y distribución del local en casa asociación sea diferente, como también en cada grow» y «Aquí falta un espacio por crear no? Con sus sprites necesarios»."
@@ -8076,11 +8079,12 @@
     "obj:riegoN",
     "obj:libreria",
     "obj:baldaS",
-    "obj:secaS"
+    "obj:secaS",
+    "obj:cajero"
    ],
    "celda": "objeto_alto",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
-   "descripcion": "1.30: la estantería metálica de los abonos de la nave (100 × 180 cm, garrafas de MEATZA y ORTUA BIO y sacos de sustrato), el secadero de red de 4 pisos colgado con los cogollos tendidos y el altavoz de la pista (cajón de graves y caja con conos); 1.33: el tanque de 1.000 L de la nave (un IBC en su jaula, con la solución nutritiva, el palé, la llave, la bomba y la manguera) y la máquina de fertirrigación (el armario con la pantalla y las tres dosificadoras con sus botes); 1.34: la librería de la asociación (libros, las actas y una maceta encima) y el bajo de las setas: la estantería de rejilla con tres baldas (baldaS), sus bandejas aparte en cada fase y en cada balda (bandejaS-<colonizando|fructificando|lista|contaminada|seca>-<0 abajo|1 arriba>; tapadas, sin método) y el secadero de malla vacío y con setas (secaS-0, secaS-1)",
+   "descripcion": "1.30: la estantería metálica de los abonos de la nave (100 × 180 cm, garrafas de MEATZA y ORTUA BIO y sacos de sustrato), el secadero de red de 4 pisos colgado con los cogollos tendidos y el altavoz de la pista (cajón de graves y caja con conos); 1.33: el tanque de 1.000 L de la nave (un IBC en su jaula, con la solución nutritiva, el palé, la llave, la bomba y la manguera) y la máquina de fertirrigación (el armario con la pantalla y las tres dosificadoras con sus botes); 1.34: la librería de la asociación (libros, las actas y una maceta encima) y el bajo de las setas: la estantería de rejilla con tres baldas (baldaS), sus bandejas aparte en cada fase y en cada balda (bandejaS-<colonizando|fructificando|lista|contaminada|seca>-<0 abajo|1 arriba>; tapadas, sin método) y el secadero de malla vacío y con setas (secaS-0, secaS-1); 1.35: el cajero de la calle (la columna de acero con la visera verde, la pantalla, el teclado, la ranura y la boca de los billetes; logo inventado)",
    "ajuste_por_sprite": {
     "estanteN": "exacto",
     "secadero": "exacto",
@@ -8100,7 +8104,8 @@
     "bandejaS-contaminada-0": "exacto",
     "bandejaS-contaminada-1": "exacto",
     "bandejaS-seca-0": "exacto",
-    "bandejaS-seca-1": "exacto"
+    "bandejaS-seca-1": "exacto",
+    "cajero": "exacto"
    },
    "estilo_ref": "los muebles a escala del piso (props-escala)",
    "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca». 1.34, pedido por el usuario: «los decorados y distribución del local en casa asociación sea diferente, como también en cada grow» y «Aquí falta un espacio por crear no? Con sus sprites necesarios»."

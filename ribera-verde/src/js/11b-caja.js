@@ -42,7 +42,7 @@ const gTxt=g=>Math.floor(g)+' g';
 async function cajaAction(){
   if(!S.flags.cajaSem)await sobreCaja();
   for(;;){
-    const C=CAJA[S.caja.nivel],ro=!!S.items.prensa||cajaR()>0;   // con la prensa (o rosin dentro), también el rosin
+    const C=CAJA[S.caja.nivel],ro=extrAlgo()||cajaR()>0;   // con la prensa u otro aparato (o rosin dentro), también el rosin
     const ops=['Guardar todo','Guardar dinero','Guardar cogollos'].concat(ro?['Guardar rosin']:[],['Sacar dinero','Sacar cogollos'],ro?['Sacar rosin']:[],['Sacar todo','Cerrar']);
     const op=ops[await ask(`${C.n}: ${loQue(S.caja.money,cajaG(),cajaR())} (caben ${eur(C.money)} y ${kgTxt(C.g)}).\nEncima: ${loQue(S.money,totalBuds(),totalRosin())}.`,ops)];
     if(!op||op==='Cerrar')return;

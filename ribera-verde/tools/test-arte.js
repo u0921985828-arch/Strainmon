@@ -61,8 +61,8 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     const { page, errors } = await abrir(html);
     const r0 = await page.evaluate(() => ({ ok: ARTE.ok, n: Object.keys(ARTE.fr).length, esperado: Object.keys(ATLAS.def.frames).length }));
     check('Atlas cargado y recortado', r0.ok && r0.n === r0.esperado && r0.n === N_CALCO, { ...r0, calco: N_CALCO });
-    const titulo = await page.evaluate(() => { const g = ARTE.cubre['misc:hoja-titulo'], m0 = mode; mode = 'title'; renderTitle(performance.now()); const d = ctx.getImageData(OX(), OY(), 1, 1).data, f = frameDe(g, 'base', 'unica', 0, { i: 0 }), e = f.c.getContext('2d').getImageData(0, 0, 1, 1).data; mode = m0; return { g, igual: [0, 1, 2].every(i => d[i] === e[i]) }; });
-    check('Título: el fondo sale del atlas', titulo.g === 'titulo' && titulo.igual, titulo);
+    const titulo = await page.evaluate(() => { const g = ARTE.cubre['misc:hoja-titulo'], m0 = mode; mode = 'intro'; arteTitulo(); const d = ctx.getImageData(OX(), OY(), 1, 1).data, f = frameDe(g, 'base', 'unica', 0, { i: 0 }), e = f.c.getContext('2d').getImageData(0, 0, 1, 1).data; mode = m0; return { g, igual: [0, 1, 2].every(i => d[i] === e[i]) }; });
+    check('Título: el fondo de la intro sale del atlas (1.35: el del título, la partida de fondo)', titulo.g === 'titulo' && titulo.igual, titulo);
 
     const walk = await page.evaluate(() => {
       const g = grupoLook(LOOKS.player), idx = new Set(), keys = ATLAS.def.anims[g].walk.dirs.south;
@@ -409,13 +409,13 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     // de la cruceta sin pisarla, abre el móvil (y la tecla P)
     const salon = await page.evaluate(async () => {
       const S0 = S, r = {}, a0 = ask, s0 = say, me0 = menu, f0 = fade; let opc = {}, pide = [], dicho = [];
-      S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { money: 1500, caja: { nivel: 1, money: 500, buds: {}, rosin: {} }, heat: 70, hp: 10, hpMax: 30, min: 600, map: 'home' }); delete S.muebles; montarCasa();
+      S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { money: 1500, banco: 2000, caja: { nivel: 1, money: 500, buds: {}, rosin: {} }, heat: 70, hp: 10, hpMax: 30, min: 600, map: 'home' }); delete S.muebles; montarCasa();
       const m = MAPS.home; r.vacio = Object.keys(MUEBLES).every(k => !m.o[MUEBLES[k].y][MUEBLES[k].x] && !m.o[MUEBLES[k].y][MUEBLES[k].x + 1]);
       try {
         say = async t => { dicho.push(t); }; fade = async () => {};
         ask = async (t, o) => { opc[t.slice(0, 12)] = o; return o.length - 1; };
         menu = async (items, o) => { if (o.title === 'TIENDA ONLINE') { r.tienda = r.tienda || items.map(i => i.label + (i.disabled ? '×' : '')).join('|'); const k = pide.shift(); return k == null ? -1 : k; } if (o.cls === 'start') { r.start = { items, o }; } return -1; };
-        pide = [0, 2]; await tiendaOnline(); r.pago = [S.money, S.caja.money]; r.ped = JSON.stringify(S.muebles); const ti = r.tienda; r.tienda = null; pide = []; await tiendaOnline(); r.tienda2 = r.tienda; r.tienda = ti;
+        pide = [0, 2]; await tiendaOnline(); r.pago = [S.money, S.caja.money, S.banco]; r.ped = JSON.stringify(S.muebles); const ti = r.tienda; r.tienda = null; pide = []; await tiendaOnline(); r.tienda2 = r.tienda; r.tienda = ti;
         r.hoy = mueblesYa().join(); S.day++; llegaMueble(); while (pending.length) await pending.shift()(); r.ya = mueblesYa().join(); r.llega = dicho.pop();
         r.solido = ['sofa', 'gpc'].every(k => tileSolid(m, MUEBLES[k].x, MUEBLES[k].y) && tileSolid(m, MUEBLES[k].x + 1, MUEBLES[k].y) && m.o[MUEBLES[k].y][MUEBLES[k].x + 1] === k + '2') && !m.o[MUEBLES.tv.y][MUEBLES.tv.x];
         const L = []; r.arte = arteObj('sofa', 13, 5, { x: 0, y: 0 }, 0, L, []) && L.length === 1 && arteObj('sofa2', 14, 5, { x: 0, y: 0 }, 0, L, []) && L.length === 1 && ARTE.cubre['obj:tv'] && ARTE.cubre['obj:gpc'];
@@ -437,13 +437,13 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     // DECORAR en la cama, y los logros: revisaLogros los marca con el día y avisa con un toast
     const reforma = await page.evaluate(async () => {
       const S0 = S, r = {}, s0 = say, me0 = menu, a0 = ask, t0 = toast; let dicho = [], pide = [];
-      S = newState(); Object.assign(S, { money: 12000, map: 'home', day: 5, muebles: { sofa: 1, cartel: 1, alfombra: 1 } }); montarCasa();
+      S = newState(); Object.assign(S, { money: 12000, banco: 12000, map: 'home', day: 5, muebles: { sofa: 1, cartel: 1, alfombra: 1 } }); montarCasa();
       const m = MAPS.home, g = () => [m.g[0][3], m.g[1][3], m.g[4][3], m.g[3][13], m.g[4][14], m.g[7][5]].join();
       try {
         say = async t => { dicho.push(t); };
         menu = async (items, o) => { if (o.title === 'REFORMAS') { r.items = r.items || items.map(i => i.label + (i.disabled ? '×' : '') + (i.right ? '=' + i.right : '')).join('|'); const k = pide.shift(); return k == null ? -1 : k; }
           if (o.title === 'Decorar la casa') r.deco = items.map(i => i.label).join('|'); return -1; };
-        pide = [7, 3]; await reformas(); r.pago = S.money; r.obra = JSON.stringify(S.obra); r.antes = g();
+        pide = [7, 3]; await reformas(); r.pago = S.banco; r.obra = JSON.stringify(S.obra); r.antes = g();
         S.day++; llegaMueble(); while (pending.length) await pending.shift()(); r.despues = g(); r.dicho = dicho.join(' / ');
         r.solido = tileSolid(m, 3, 1) && !tileSolid(m, 13, 3) && !tileSolid(m, 3, 4);
         r.arte = ['floor-1', 'floor-2', 'floor-3', 'iwT_home-1', 'iwB_home-3', 'alf2d-3', 'alf1a'].every(k => ARTE.cubre['tile:' + k]) && !!ARTE.cubre['obj:cartel'];
@@ -463,10 +463,10 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
       try { mode = 'world'; while (handlers.length) handlers.pop(); press('MOVIL'); await new Promise(r => setTimeout(r, 50));
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'p' })); await new Promise(r => setTimeout(r, 50)); } finally { movilMenu = m0; } return n; });
     check('Salón: muebles por internet (llegan mañana), 2 casillas con su arte, sofá, tele y PC; menú START con iconos y el día; botón MÓVIL encima de la cruceta',
-      salon.vacio && salon.tienda === 'Sofá de 2 plazas|Tele de 43" con mueble|PC gaming con mesa y silla|Sillón con lámpara de pie|Cuadro para el salón|Póster enmarcado|Alfombra de 180 × 140|Patinete|Bici de segunda mano|Reformas: suelo y paredes|Salir' && salon.pago.join() === '0,111' && salon.ped === '{"sofa":2,"gpc":2}' &&
+      salon.vacio && salon.tienda === 'Sofá de 2 plazas|Tele de 43" con mueble|PC gaming con mesa y silla|Sillón con lámpara de pie|Cuadro para el salón|Póster enmarcado|Alfombra de 180 × 140|Patinete|Bici de segunda mano|Reformas: suelo y paredes|Salir' && salon.pago.join() === '1500,500,111' && salon.ped === '{"sofa":2,"gpc":2}' &&
       salon.tienda2 === 'Sofá de 2 plazas · pedido×|Tele de 43" con mueble|PC gaming con mesa y silla · pedido×|Sillón con lámpara de pie|Cuadro para el salón|Póster enmarcado|Alfombra de 180 × 140|Patinete|Bici de segunda mano|Reformas: suelo y paredes|Salir' && salon.hoy === '' && salon.ya === 'sofa,gpc' && /el sofá y el PC gaming/.test(salon.llega) &&
       salon.solido && salon.arte && salon.sofa[0] === 15 && salon.sofa[1] >= 60 && salon.sofa[1] < 64 && /^Aquí iría bien la tele/.test(salon.vacioTv) && /^Noticias: la policía busca/.test(salon.tv[0]) && salon.tv[1] >= 60 && salon.tv[1] < 64 &&
-      /^Foro de cultivo · /.test(salon.foro[0]) && salon.foro[1] >= 30 && salon.foro[1] < 34 && salon.opc === 'true,true' && salon.start === '8,true,true,0 €' && salon.boton === 'true,true,true' && salonM === 2, { ...salon, salonM });
+      /^Foro de cultivo · /.test(salon.foro[0]) && salon.foro[1] >= 30 && salon.foro[1] < 34 && salon.opc === 'true,true' && salon.start === '8,true,true,1.500 €' && salon.boton === 'true,true,true' && salonM === 2, { ...salon, salonM });
     const orilla = await page.evaluate(() => { const m = MAPS.town, r = { quince: 0, pintadas: 0 };
       for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (TRANS[m.g[y][x]]) { const k = mascaraOrilla(m, x, y); if (k === 15) r.quince++; if (arteOrilla(m, m.g[y][x], x, y, 0, 0)) r.pintadas++; }
       r.rio = mascaraOrilla(m, 31, 15); r.centro = mascaraOrilla(m, 35, 27); r.sinAtlas = (() => { const ok = ARTE.ok; ARTE.ok = false; const v = arteOrilla(m, 'water', 31, 15, 0, 0); ARTE.ok = ok; return v; })(); return r; });

@@ -326,11 +326,12 @@ function buildMaps(){
   gr(s,4,7,'mat');s.exits['4,7']={to:'town',x:17,y:9,dir:'down'};
   // ---------- GROW IBARBIDE (1.14): el growshop grande del Casco Viejo ----------
   // 1.34 (lo pidió el usuario: cada grow distinto): 12 × 9, suelo de baldosa gris y pared de ladrillo blanco con su neón, la carpa
-  // de exposición montada (x 9-10, y 6), el propagador de esquejes, los sacos y las macetas; Ane detrás del mostrador largo.
+  // de exposición montada, el propagador de esquejes, los sacos y las macetas; Ane detrás del mostrador largo. 1.35 (lo pidió el
+  // usuario: la mejor distribución): la carpa, al fondo a la derecha, fuera del paso; las baldas de la pared, detrás del mostrador.
   const gc=newMap('growcity',12,9,'floorG');gc.music='growcity';
   rect(gc,0,0,11,0,(x,y)=>gr(gc,x,y,'iwT_grow'));rect(gc,0,1,11,1,(x,y)=>gr(gc,x,y,'iwB_grow'));
-  [0,1,10,11].forEach(x=>ob(gc,x,1,'shelfW'));[2,9].forEach(x=>ob(gc,x,1,'botesW'));ob(gc,6,1,'neonG');rect(gc,2,3,8,3,(x,y)=>ob(gc,x,y,'counter'));
-  [[0,4],[0,5],[11,4]].forEach(([x,y])=>ob(gc,x,y,'display'));ob(gc,11,5,'semillero');ob(gc,9,6,'carpaDemo');ob(gc,10,6,'carpaDemo2');
+  [0,1,5,8].forEach(x=>ob(gc,x,1,'shelfW'));[2,7].forEach(x=>ob(gc,x,1,'botesW'));ob(gc,6,1,'neonG');rect(gc,2,3,8,3,(x,y)=>ob(gc,x,y,'counter'));
+  [[0,4],[0,5],[11,4]].forEach(([x,y])=>ob(gc,x,y,'display'));ob(gc,11,5,'semillero');ob(gc,10,2,'carpaDemo');ob(gc,11,2,'carpaDemo2');
   ob(gc,0,7,'sacos');ob(gc,11,7,'macetasP');ob(gc,3,7,'plantDeco');ob(gc,8,7,'plantDeco');
   gr(gc,5,8,'mat');gr(gc,6,8,'mat');gc.exits['5,8']={to:'ibarbide',x:15,y:8,dir:'down'};gc.exits['6,8']={to:'ibarbide',x:16,y:8,dir:'down'};
   // ---------- BAR ----------
@@ -358,6 +359,7 @@ function buildMaps(){
   [[0,2],[1,2],[0,3],[8,2],[9,2],[9,3],[8,6],[9,6],[0,6]].forEach(([x,y])=>ob(w,x,y,'crate'));ob(w,5,4,'btable');ob(w,4,4,'stool');
   gr(w,4,7,'mat');w.exits['4,7']={to:'astilleros',x:18,y:14,dir:'down'};
   mapasLocales();   // los clubs por dentro, la nave y GAUA (1.30, 11j-locales)
+  mapasBanco();   // los cajeros y los locales (1.35, 11k-banco)
 }
 // carpas del piso según S.carpas: un mueble sólido ('carpa') en las casillas de su sitio; se pinta entero desde su base.
 // Y los muebles del salón que ya han llegado (mueblesYa, 12c-salon): k y k + '2'

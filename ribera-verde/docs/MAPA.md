@@ -20,7 +20,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  5  M.███████..--.███████..███████..██████.M
  6  M.███████..--.███████..███████..██████.M
  7  M.███████..--.███████..███████..██████.M
- 8  M.███D███S.--S███D███.S███D███..██DD██.M
+ 8  M.███D███S.--S███D███.S███D███.?██DD██.M
  9  M----------L---------L---------L-------M
 10  M======================================M
 11  M======================================M
@@ -106,13 +106,13 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  1  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
  2  M::::::::::::::::::::::::::::::::::::::M
  3  M:"""""::.T...:::::::::::::::::::::::::M
- 4  M:"""""::...T.::::::::::ffffffffffffff:M
- 5  M:""i"":::::::::::::::::fcc::::::::ccf:M
- 6  M:""""":::::::::::::::::fc::::::::::cf:M
- 7  M:""""":::::::::::::::::f::::::::::::f:M
- 8  M:::::::::::::L:^^^^^^::f:::c::::c:::f:M
- 9  M:::::::::::::::^^^^^^::f::::::::::::f:M
-10  M:T:::::::::::::██████::ffffff::ffffff:M
+ 4  M:"^^^^^^^..T.::::::::::ffffffffffffff:M
+ 5  M:"^i^^^^^::::::::::::::fcc::::::::ccf:M
+ 6  M:"███████::::::::::::::fc::::::::::cf:M
+ 7  M:"███████::::::::::::::f::::::::::::f:M
+ 8  M::███████::::L:^^^^^^::f:::c::::c:::f:M
+ 9  M::███████::::::^^^^^^::f::::::::::::f:M
+10  M:T:::?:::::::::██████::ffffff::ffffff:M
 11  M:::::::::::::::██████:::::::::::::::::M
 12  M:::::::::::::::██████:::::::::::::::::M
 13  M::::::::::::::S██DD██::::::::"""""":::M
@@ -155,7 +155,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  8  M..████████.....████████......................MM
  9  M..████████.....████████...._______...^^^^....MM
 10  MY.████████.Y...████████.Y.._______...^^^^....MM
-11  M..███DD███.................__........████$...MM
+11  M..███DD███........?........__........████$...MM
 12  M...__________________________________████....MM
 13  MM..__________________________________........MM
 14  MM""""""""...__.........b..*..............Y...MM
@@ -213,7 +213,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  5  M████████████████████████████████████.MM
  6  M████████████████████████████████████$MM
  7  M████████DD██████████████████████████.MM
- 8  M--------------------------------------M
+ 8  M------------?-----------------?-------M
  9  M.S++L+++++++++L+++A+++++++L+++++++L++MM
 10  M.++++++++++++++++++++++++++++++++++++MM
 11  M.++++++++++++@+++++++++++++++++++++++MM
@@ -247,10 +247,10 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  5  M-███████-██████:c:███████---████████--M
  6  M-███████-██████:::███████---████████--M
  7  M-███████-██DD██c@:███████---███DD███--M
- 8  M-S------L--------L---------L----------M
+ 8  M-S------L--------L---?-----L----------M
  9  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 10  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-11  M-----L-------A---------L--------------M
+11  M-----L--?----A---------L--------------M
 12  M-------------------fffffffS--fffffffffM
 13  M-^^^^^^^-^^^^^^^---f:::::::::::::::::fM
 14  M-^^^^^^^-^^^^^^^---f::cc:::@:::::::::fM
@@ -284,7 +284,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  6  MMM.████████.Y....~~~..██████.*M..MM
  7  MMM.████████......~~~..██████.....MM
  8  MM..████████b.....~~~T.██████......M
- 9  MM.....,,.....Y..~~~.....,,...T....M
+ 9  MM.....,?.....Y..~~~.....,,...T....M
 10  MMS....,,.......~~~.....@,,.$......M
 11  ,,,,,,,,,,,,,,,,HHH,,,,,,,,,,,,,,,,,
 12  ,,,,,,,,,,,,,,,,HHH,,,,,,,,,,,,,,,,,
@@ -314,7 +314,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  5  M██████████████████++█████████████████████MM
  6  M██████████████████++█████████████████████MM
  7  M██████████████DD██++█████████████████████MM
- 8  M--------------------S---------------------M
+ 8  M-----?--------------S--------?------------M
  9  M++++++++++++S+++++++++++++++++++++++++++++M
 10  M+++++++++++++L++++++++++++++L+++++++++++++M
 11  M^^^^^++++++++++++++++++++++++++++++++^^^^^M
@@ -360,7 +360,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  6  M████████-████████-████████-████████-████████M
  7  M████████-████████-████████-████████-████████M
  8  M████████b██D█████b████████b████████b█DD█████M
- 9  M----L--------L--------L--------L-------@L---M
+ 9  M----L--------L----?---L--------L-------@L---M
 10  =============================================M
 11  =============================================M
 12  M-S--------L---------------------L-----------M
@@ -450,7 +450,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
     0         1 
     012345678901
  0  ████████████
- 1  ss?███?██?ss
+ 1  ss?██s??s███
  2  ????@???????
  3  ??CCCCCCC???
  4  d??????????d
@@ -541,7 +541,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  2  ?@?p???oo??oo??J
  3  CCC????tt@?tt@??
  4  ???????oo??oo???
- 5  ????????????????
+ 5  ?????@??????????
  6  ?oo?????????????
  7  ?tt@????????XX@?
  8  ?oo????????????p
@@ -561,7 +561,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  2  ?@?p??oo??oo??oo?J
  3  CCC???tt@?tt@?tt?@
  4  ??????oo??oo??oo??
- 5  ??????????????????
+ 5  ?????@????????????
  6  ?oo???????????????
  7  ?tt@????????XX@???
  8  ?oo??????????????p
@@ -581,7 +581,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  2  ?@?p????oo????J
  3  CCC?oo??tt@????
  4  ????tt@?oo??XX@
- 5  ????oo?????????
+ 5  ????oo????@????
  6  p?????????????p
  7  ??????mm???????
 ```
@@ -599,9 +599,9 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  2  ?@?p??oo??oo??oo???J
  3  CCC???tt@?tt@?tt@???
  4  ??????oo??oo??oo????
- 5  ????????????????????
+ 5  ?????@??????????????
  6  ?oo??oo?????????????
- 7  ?tt@?tt@??????XX@???
+ 7  ?tt@?tt???????XX@???
  8  ?oo??oo????????????p
  9  p????????mm?????????
 ```
@@ -636,7 +636,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
     012345678901234567
  0  ██████████████████
  1  ██████████████████
- 2  s.....Z....ttc@??.
+ 2  s.....Z.....tt@??c
  3  ..................
  4  .NN.NN..NN.NN.....
  5  .@..@...@..@......
@@ -739,11 +739,14 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 | cg1 | club-ens | (12,3) | no | siempre |
 | cg2 | club-ens | (16,3) | no | siempre |
 | cg3 | club-ens | (3,7) | no | siempre |
-| cg4 | club-ens | (7,7) | no | siempre |
 | socio | club-rv | (7,4) | no | siempre |
 | billarista | club-rv | (12,7) | no | siempre |
 | cg1 | club-rv | (12,4) | no | siempre |
 | cg2 | club-rv | (3,8) | no | siempre |
+| pres_puerto | club-puerto | (5,5) | no | `S.ch>=CLUBS[k].ch` |
+| pres_valde | club-valde | (5,5) | no | `S.ch>=CLUBS[k].ch` |
+| pres_ibar | club-ibar | (10,5) | no | `S.ch>=CLUBS[k].ch` |
+| pres_ens | club-ens | (5,5) | no | `S.ch>=CLUBS[k].ch` |
 | nv0 | nave | (1,5) | no | `!!(S.nave&&naveroDe(i))` |
 | nv1 | nave | (4,5) | no | `!!(S.nave&&naveroDe(i))` |
 | nv2 | nave | (8,5) | no | `!!(S.nave&&naveroDe(i))` |
@@ -894,4 +897,6 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Carro de esquejes | 165 € | 2 | Dos bandejas de 12 esquejes, tapadas y bajo tubos T5, y una mesita con la tabla de corte: pinchados ahí aguantan 3 días (sueltos, 1). Kiko te lo sube al piso mañana. |
 | Analizador de cannabinoides y terpenos | 3.000 € | 3 | Medidor de bolsillo (1.15): THC, CBD y el terpeno principal de un lote, desde la mochila. Lo analizado se vende mejor en la calle y un 5 % más en los clubs, y la cata dice el THC exacto y el terpeno de cada aroma. |
 | Prensa de rosin | 250 € | 3 | Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores. |
+| Tamices de seda | 60 € | 3 | Tres tamices, de grueso a fino (1.35): dry sift en la mesa del piso, y su kief para el hachís prensado y el moonrock. |
+| Kit Ice-o-lator | 140 € | 3 | Cubo y bolsas de malla para agua con hielo (1.35): la resina más limpia, en la mesa del piso. Su kief sirve para el prensado y el moonrock. |
 | Tarros de curado | 30 € | 1 | Tarros de cristal herméticos (1.29) para el arcón de casa: lo que guardas ahí se cura en 2 días, se vende un 15 % más caro y ya no pierde THC. Sin curar, a los 3 días de cosecharla empieza a perder. |

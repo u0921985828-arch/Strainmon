@@ -151,6 +151,9 @@ function atlasCarpa() {
       REFORMA, LOGROS: LOGROS.map(l => ({ id: l.id, t: l.t, d: l.d })), LANDRACES, TIA_DEJO,
       BILLAR, SOCIO, ASO, DELROY, DISCO, MESAS_X, FASE_MESA, LOCAL2: [...LOCAL2], LUZ_CLUB, LUZ_DISCO, LUZ_MESA, ABONO_MESA, FOCO_NAVE, EXTR_NAVE, RIEGO_NAVE, NIVEL_NAVE, EQUIPO_NAVE, FOCO_DX, FOCO_AIRE, FOCO_ALTO, FOCO_ASA, FOCO_POLEA, FOCO_DEG,   // 1.33: el equipo de la nave
       BAILA,   // los locales (1.30)
+      TIROS, MESA_BOLAS, EXTR, MOON, DEMO,   // 1.35: el billar y las extracciones
+      CUENTA, RECIBO, LOCALES,   // 1.35: el banco, los recibos y los locales
+      MANGUERA_NAVE: [1, 2, 3].map(rg => { const s = S; S = { nave: { rg } }; const r = mangueraNave(); S = s; return r; }),   // 1.35: el riego de la nave, por nivel
       LUZ_BAJO, MADRES, MANDO, PRESI, PRESI_TXT, MUEBLE_CLUB, DECO_CLUB, GENTE_CLUB, ESTILO_OBJ: [...ESTILO_OBJ], PIZARRA_KIKO,   // 1.34: el bajo, las madres, la gente y los clubs
       ITINERARIO, ITIN_MUDO, JULEN, MINERAL_ORG, DESC_PROD: Object.fromEntries(Object.keys(PRODUCTOS).map(k => [k, descProducto(k)])),
       ROSIN, PATRULLAS, PAT, CALLE: CALLE.source, TAPA_VISTA: TAPA_VISTA.source, RONDA: Object.fromEntries(Object.keys(PATRULLAS).map(k => [k, casillasRonda(k)])),

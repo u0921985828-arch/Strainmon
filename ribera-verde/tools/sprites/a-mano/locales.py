@@ -1399,6 +1399,43 @@ sale('plantasN-1', plantasN(1, 'h'), 'locales-ancho')
 for f in (2, 3, 4):
     for p in 'ihs': sale(f'plantasN-{f}-{p}', plantasN(f, p), 'locales-ancho')
 
+# ------------------------------------------------------------------------------------------------- el banco y los locales (1.35)
+def cajero():
+    """el cajero de la calle (1,8 m, 29 px; 80 cm de ancho): la columna de acero, la visera, la pantalla azul con su marco, el
+    teclado, la ranura de la tarjeta y la boca de los billetes; un logo inventado (dos aros verdes)"""
+    L = Lienzo(32, 32); A0, A1, A2, A3 = '#4a4e56', '#8a8e96', '#b8bcc4', '#dce0e6'
+    L.r(10, 3, 13, 29, A2); L.vl(10, 3, 31, A3); L.vl(22, 3, 31, A1); L.hl(10, 22, 31, A0)
+    L.r(9, 2, 15, 3, '#2a6a4a'); L.hl(9, 23, 2, '#3a8a5e')                     # la visera verde
+    for x in (14, 15, 17, 18):
+        L.p(x, 3, '#f4f4ee')                                                      # el logo: dos aros
+    L.caja(12, 7, 9, 7, '#2c5aa0', A0); L.r(13, 8, 3, 2, '#6f9fc4'); L.hl(13, 19, 11, '#5a86c0')   # la pantalla
+    for y in (16, 18):
+        for x in (13, 15, 17, 19):
+            L.p(x, y, A0)                                                         # el teclado
+    L.hl(13, 19, 21, '#2a2a30'); L.p(19, 20, '#58c070')                          # la ranura y su luz
+    L.r(13, 24, 7, 2, '#2a2a30'); L.hl(14, 18, 24, '#3a3a40')                     # los billetes
+    L.contorno(K)
+    return L
+
+def rotuloL(abierto):
+    """el caballete de la acera delante del local (90 cm): cerrado, el cartel blanco de «se alquila» con la franja roja y el
+    teléfono; abierto, la pizarra del negocio con sus líneas de tiza"""
+    L = Lienzo(16, 16); M0, M1 = '#5a3a24', '#7a5232'
+    L.vl(3, 3, 15, M0); L.vl(12, 3, 15, M0); L.p(3, 15, M1); L.p(12, 15, M1)
+    if abierto:
+        L.caja(3, 1, 10, 11, '#2a3a32', M1)
+        for y, w in ((3, 6), (5, 4), (7, 5), (9, 3)):
+            L.hl(5, 5 + w - 1, y, '#e8ece4')
+        L.p(10, 9, '#f0d050')
+    else:
+        L.caja(3, 1, 10, 11, '#f4f0e0', M1); L.r(4, 3, 8, 3, '#c03030'); L.hl(5, 10, 4, '#f4f0e0')
+        L.hl(5, 10, 8, '#5a5e66'); L.hl(5, 8, 10, '#5a5e66')
+    L.contorno(K)
+    return L
+
+sale('cajero', cajero(), 'locales-alto')
+for i in range(2): sale(f'rotuloL-{i}', rotuloL(i), 'locales-16')
+
 def escribe(raiz=None):
     for g, S in SAL.items():
         for n, L in S.items():

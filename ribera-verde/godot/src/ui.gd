@@ -440,7 +440,8 @@ func _estilos() -> void:
 	pon_letra(dlg_txt, letra, 10 * us, INK, 13.5 * us)
 	dlg_nm.add_theme_stylebox_override("panel", plana(LINEA, 3 * us, 2.5 * us, 5 * us))
 	pon_letra(dlg_nm_txt, negrita, 8 * us, Color.WHITE, 0, false)
-	menu_box.add_theme_stylebox_override("panel", caja(us, 5, 7))
+	caja_menu = caja(us, 5, 7)
+	menu_box.add_theme_stylebox_override("panel", StyleBoxEmpty.new() if menu_box.get_meta("cls", "") == "titulo" else caja_menu)
 	toast_box.add_theme_stylebox_override("panel", caja(us, 4, 10))
 	pon_letra(toast_txt, letra, 9 * us, INK)
 	toast_txt.add_theme_font_override("bold_font", negrita)
@@ -1008,6 +1009,54 @@ func filas_menu(n: int, o: Dictionary) -> int:
 	var d: float = ui_rect().size.y / us - (6 if o.get("cls") == "start" else 52) - 14 - (19.5 if o.get("title") else 0.0)
 	return n if n * 14.5 <= d + .01 else maxi(1, floori((d - 10) / 14.5 + .01))
 
+# el menú del título (1.35): un botón por fila, centrados; el elegido, en amarillo con su sombra verde y ◀ ▶. Se tocan como las filas
+func _menu_titulo() -> void:
+	var n := m_items.size()
+	var hueco: float = ui_rect().end.y - 6 * us - _tit_fin() - 4 * us
+	var h := clampf(48 * _dp(), TIT_H * us, maxf(TIT_H * us, (hueco - (n - 1) * TIT_SEP * us) / n))
+	var lista := VBoxContainer.new()
+	lista.add_theme_constant_override("separation", roundi(TIT_SEP * us))
+	var fs := roundi(9.5 * us)
+	for k in n:
+		var b := Control.new()
+		b.custom_minimum_size = Vector2(roundf(TIT_W * us), roundf(h))
+		var sel := k == m_i
+		var txt: String = m_items[k].label
+		b.draw.connect(func():
+			var r := Rect2(Vector2.ZERO, b.custom_minimum_size)
+			var rad := roundi(minf(r.size.y, 12 * us) / 2)
+			var st := StyleBoxFlat.new()
+			st.set_corner_radius_all(rad)
+			if sel:
+				var sh := StyleBoxFlat.new()
+				sh.bg_color = Color("#10301c")
+				sh.set_corner_radius_all(rad)
+				sh.draw(b.get_canvas_item(), Rect2(r.position + Vector2(2, 2) * us, r.size))
+				st.bg_color = Color("#ffe680")
+				st.border_color = Color("#2a7a40")
+				st.set_border_width_all(roundi(maxf(1, 1.5 * us)))
+			else:
+				st.bg_color = Color(16 / 255.0, 48 / 255.0, 28 / 255.0, .86)
+				st.border_color = Color(156 / 255.0, 240 / 255.0, 168 / 255.0, .6)
+				st.set_border_width_all(roundi(maxf(1, us)))
+			st.draw(b.get_canvas_item(), r)
+			var tw := negrita.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+			var y := (r.size.y + negrita.get_ascent(fs) - negrita.get_descent(fs)) / 2
+			var col := Color("#10301c") if sel else Color("#e8f8ec")
+			b.draw_string(negrita, Vector2((r.size.x - tw) / 2, y), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
+			if sel:
+				var cy := r.size.y / 2
+				var a := 3.5 * us
+				b.draw_colored_polygon(PackedVector2Array([Vector2(8 * us, cy - a), Vector2(8 * us + a, cy), Vector2(8 * us, cy + a)]), col)
+				b.draw_colored_polygon(PackedVector2Array([Vector2(r.size.x - 8 * us, cy - a), Vector2(r.size.x - 8 * us - a, cy), Vector2(r.size.x - 8 * us, cy + a)]), col))
+		var idx := k
+		b.mouse_filter = Control.MOUSE_FILTER_STOP
+		b.gui_input.connect(func(e):
+			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT and menu_box.has_meta("clic"):
+				menu_box.get_meta("clic").call(idx))
+		lista.add_child(b)
+	menu_col.add_child(lista)
+
 # el menú en nodos: título, flechas y filas (las de un menú a toda altura caben con la descripción debajo), descripción
 func _pinta_menu(rows: int) -> void:
 	for c in menu_col.get_children():
@@ -1015,6 +1064,12 @@ func _pinta_menu(rows: int) -> void:
 		c.queue_free()
 	var o := m_o
 	var cls: String = o.get("cls", "right")
+	menu_box.add_theme_stylebox_override("panel", StyleBoxEmpty.new() if cls == "titulo" else caja_menu)
+	if cls == "titulo":   # 1.35: los botones del título
+		_menu_titulo()
+		menu_box.set_meta("cls", cls)
+		_coloca.call_deferred()
+		return
 	var full := cls == "full"
 	var g := cls == "battle"
 	var fs := (9.5 if g else 10.0) * us
@@ -1208,6 +1263,8 @@ func _coloca() -> void:
 			menu_box.reset_size()
 			if cls == "start":
 				menu_box.position = Vector2(R.end.x - 3 * us - menu_box.size.x, R.position.y + 3 * us)
+			elif cls == "titulo":   # 1.35: centrados, abajo, sin subir del lema
+				menu_box.position = Vector2(roundf(R.get_center().x - menu_box.size.x / 2), maxf(_tit_fin() + 4 * us, R.end.y - 6 * us - menu_box.size.y))
 			else:
 				menu_box.position = Vector2(R.end.x - 3 * us - menu_box.size.x, maxf(R.position.y + 3 * us, R.end.y - 49 * us - menu_box.size.y))
 	if lector.visible:   # como un menú a toda altura
@@ -1488,6 +1545,19 @@ func bhud() -> void:
 	_coloca.call_deferred()
 
 # ---------- título (.title) ----------
+# 1.35 (lo pidió el usuario): el rótulo, el lema y, debajo, los botones (el menú «titulo»); detrás, la partida de fondo (pinta.gd)
+const LEMA := "Caza genéticas. Salda la deuda. Que no te pillen."
+const TIT_W := 132.0   # los botones: de ancho, en u; de alto, 48 dp si caben (TIT_H como poco), con TIT_SEP entre ellos
+const TIT_H := 17.0
+const TIT_SEP := 4.0
+var caja_menu: StyleBox = null
+
+# dónde acaba el lema, en la pantalla (los botones no suben de ahí)
+func _tit_fin() -> float:
+	var s1 := roundi(17 * u)
+	var s2 := roundi(8.5 * u)
+	return titulo.get_global_rect().position.y + tt + display.get_ascent(s1) + 17 * u * 1.05 + 17 * u * .05 + 6 * u + negrita.get_height(s2) + 2 * u
+
 func _pinta_titulo() -> void:
 	var c := titulo
 	var w := c.size.x
@@ -1501,20 +1571,12 @@ func _pinta_titulo() -> void:
 		c.draw_string(f, Vector2(x + 3 * u, y + 3 * u), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#10301c"))
 		c.draw_string(f, Vector2(x + 1.5 * u, y + 1.5 * u), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#2a7a40"))
 		c.draw_string(f, Vector2(x, y), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#ffe680"))
-	var s2 := roundi(10 * u)
-	var t2 := "genética de barrio"
-	y += 17 * u * .05 + 5 * u + f.get_ascent(s2) + 2 * u
-	x = (w - f.get_string_size(t2, HORIZONTAL_ALIGNMENT_LEFT, -1, s2).x) / 2
-	c.draw_string(f, Vector2(x + 3 * u, y + 3 * u), t2, HORIZONTAL_ALIGNMENT_LEFT, -1, s2, Color("#10301c"))
-	c.draw_string(f, Vector2(x + 1.5 * u, y + 1.5 * u), t2, HORIZONTAL_ALIGNMENT_LEFT, -1, s2, Color("#2a7a40"))
-	c.draw_string(f, Vector2(x, y), t2, HORIZONTAL_ALIGNMENT_LEFT, -1, s2, Color("#9cf0a8"))
-	var s3 := roundi(8 * u)
-	var t3 := "Cultiva · Cruza · Vende · Sobrevive"
-	y += 6 * u + letra.get_ascent(s3) + 3 * u
-	x = (w - letra.get_string_size(t3, HORIZONTAL_ALIGNMENT_LEFT, -1, s3).x) / 2
-	c.draw_string(letra, Vector2(x + u, y + u), t3, HORIZONTAL_ALIGNMENT_LEFT, -1, s3, Color("#10301c"))
-	c.draw_string(letra, Vector2(x, y), t3, HORIZONTAL_ALIGNMENT_LEFT, -1, s3, Color("#d8f0e0"))
-	if int(M.reloj / 500) % 2 == 0:
+	var s2 := roundi(8.5 * u)
+	y += 17 * u * .05 + 6 * u + negrita.get_ascent(s2)
+	x = (w - negrita.get_string_size(LEMA, HORIZONTAL_ALIGNMENT_LEFT, -1, s2).x) / 2
+	c.draw_string(negrita, Vector2(x + u, y + u), LEMA, HORIZONTAL_ALIGNMENT_LEFT, -1, s2, Color("#10301c"))
+	c.draw_string(negrita, Vector2(x, y), LEMA, HORIZONTAL_ALIGNMENT_LEFT, -1, s2, Color("#9cf0a8"))
+	if not menu_box.visible and not dlg.visible and int(M.reloj / 500) % 2 == 0:
 		var s4 := roundi(9.5 * u)
 		var t4 := "P U L S A   S T A R T"
 		var y4 := c.size.y - 14 * u

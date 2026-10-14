@@ -429,6 +429,7 @@ func _pasos() -> void:
 		func(): return chk(J.S.carpas[1].foco == "sodio400" and J.S.items.f_cfl == 2 and J.S.items.f_sodio400 == 0, {"carpas": J.S.carpas, "items": J.S.items}))
 	step("Factura de la luz: solo paga la carpa con plantas (sodio 400 W: 157 kWh a 0,16 € = 25 €)", [], func():
 		J.S.money = 100
+		J.S.banco = 0
 		J.S.pots[2] = {"sid": "ria", "prog": .2, "water": 100, "health": 100, "fert": false, "pest": false}
 		J.advance_time(24 * 60)
 		await idle()
@@ -528,10 +529,11 @@ func _pasos() -> void:
 		func(): return chk(",".join(R) == "2:1,3:1,4:1" and not J.S.gen.has("kushrif"), {"R": R, "gen": J.S.gen, "seeds": J.S.seeds.get("kushrif")}))
 	step("Banco de semillas del PC: Punto Rojo y Thai, llegan al día siguiente", ["Banco de semillas", "^Punto Rojo", "^Thai", "Salir"], func():
 		J.S.money = 500
+		J.S.banco = 500
 		await run(J.pc_action)
-		R = {"pedido": J.S.pedido.duplicate(), "money": J.S.money, "antes": si(J.S.seeds.get("thai"))}
+		R = {"pedido": J.S.pedido.duplicate(), "money": J.S.money, "banco": J.S.banco, "antes": si(J.S.seeds.get("thai"))}
 		J.new_day(),
-		func(): return chk(",".join(R.pedido) == "punto,thai" and R.money == 500 - 30 - 30 and not R.antes and J.S.seeds.get("punto") == 10 and J.S.seeds.get("thai") == 10
+		func(): return chk(",".join(R.pedido) == "punto,thai" and R.money == 500 and R.banco == 500 - 30 - 30 and not R.antes and J.S.seeds.get("punto") == 10 and J.S.seeds.get("thai") == 10
 			and si(J.S.disc.get("thai")) and J.S.pedido.is_empty(), {"R": R, "seeds": J.S.seeds, "pedido": J.S.pedido}))
 	step("Cruce de landraces: Punto Rojo × Thai → Haze (F1: cada planta con su fenotipo; la línea da semillas)", ["^Punto Rojo", "^Thai", "Cruzar"], func():
 		await run(J.lab_action)
@@ -589,6 +591,7 @@ func _pasos() -> void:
 		func(): return chk(J.S.heat == 50 and J.S.pots[0] != null, {"heat": J.S.heat, "pot": J.S.pots[0]}))
 	step("Calor 95 sin protección → orden de registro: Kiko avisa, el calor no baja y la redada es al día siguiente (las plantas y el equipo de su carpa, la multa por lo hallado; las semillas se quedan)", [], func():
 		J.S.protect = false
+		J.S.banco = 0
 		J.S.heat = 95
 		J.add_buds("ria", 10, 12)
 		J.S.carpas[0].vent = true
@@ -1877,7 +1880,11 @@ func _pasos() -> void:
 		want(["^Alquilarla"])
 		await run(func(): await J.talk_nave())
 		J.S.money = 50
+		J.S.nave.r = J.S.day - int(D.RECIBO.gracia)
+		var cj = J.S.caja
+		J.S.caja = null
 		await dia.call(.5)
+		J.S.caja = cj
 		R.impago = jn([J.S.nave == null, J.S.money])
 		var l1 := LOG.size()
 		want(["<B>"])
@@ -1911,9 +1918,9 @@ func _pasos() -> void:
 			return chk(R.w1 == "Itziar,5,5,5," and R.n2 == 1 and R.w2 == "Mikel,1,1,1," and R.w3 == "Iker,3,3,3," and R.pl == "4,%d" % (4 * int(P.sobre)) and R.calle == "calle,ria,25,75" and R.ops == 1
 				and R.venta == jn([22, R.e, P.calor]) and R.arc == R.gc - int(floor(R.gc * P.sisa * 2)) and R.pot == null
 				and R.poli == jn([null, true, P.calor + P.calorPoli, P.sueldo.gerente])
-				and R.robo == 12 and R.timo == 10 and R.fuga == "Itziar,Iker" and R.sin == ",10" and R.ar == "17,7" and R.nave == jn([true, N.fianza])
+				and R.robo == 12 and R.timo == 10 and R.fuga == "Itziar,Iker" and R.sin == ",10" and R.ar == "17,7" and R.nave == jn([true, N.fianza + J.recibo_nave()])
 				and R.mesa == "0,Cultiva la mesa 1 de la nave por %s al día: %s g." % [Datos.eur(P.sueldo.nave), Datos.js_num(g1)] and R.cd.split(",")[0] == R.cd.split(",")[1] and Datos.js_num(R.cd2) == R.cd.split(",")[1] and R.cd3.split(",")[0] == R.cd3.split(",")[1]
-				and R.var == jn(["ria", t1, 0, false, 1]) and R.crece == jn([g1, N.dia + P.sueldo.nave]) and R.ab == "3,0,1"
+				and R.var == jn(["ria", t1, 0, false, 1]) and R.crece == jn([g1, P.sueldo.nave]) and R.ab == "3,0,1"
 				and R.abono == jn([g1 + g2, Datos.jsround((t1 * g1 + (t1 + D.ABONO.thc) * g2) / (g1 + g2) * 10) / 10.0, 2]) and R.rec == jn([g1 + g2, 0, 4])
 				and R.redada == jn([true, "Iker", N.calor])
 				and R.dejar == jn([true, N.fianza]) and R.impago == "true,50" and R.menus == 2
@@ -1984,7 +1991,7 @@ func _pasos() -> void:
 		want(["^A 50 €"])
 		R.m = J.S.money
 		await run(func(): await J.talk_billar("puerto"))
-		R.empate = J.S.money - R.m
+		R.gana2 = J.S.money - R.m
 		J.gancho_billar = func(_t): return .05
 		Cultivo.fijo = 0
 		want(["^A 10 €"])
@@ -1995,7 +2002,8 @@ func _pasos() -> void:
 		J.gancho_billar = Callable()
 		Cultivo.fijo = -1
 		var per: float = D.BILLAR.periodo
-		R.p = jn([J.puntos_tiro(.7), J.puntos_tiro(.62), J.puntos_tiro(.85), J.puntos_tiro(.95), J.puntos_tiro(.3), J.fuerza_tiro(0), J.fuerza_tiro(per / 2), J.fuerza_tiro(per / 4)])
+		R.p = jn([J.resultado_tiro(.7, .7, .12), J.resultado_tiro(.6, .7, .12), J.resultado_tiro(.5, .7, .12), J.resultado_tiro(.7, .97, .12), J.resultado_tiro(.7, .85, .12), J.fuerza_tiro(0), J.fuerza_tiro(per / 2), J.fuerza_tiro(per / 4)])
+		R.mesa = jn([J.MESA_B, J.rects_mesa_billar({"yo": 2, "el": 1, "negra": 1}).size()])
 		want(["^Compartir", "^Skunk"])
 		R.r = J.S.rel.puerto
 		await run(func(): await J.talk_socio("puerto"))
@@ -2097,7 +2105,7 @@ func _pasos() -> void:
 			var Dd: Dictionary = D.DISCO
 			var cr := Datos.js_num(N.crece)
 			return chk(R.no == "puerto,%d,%d,false" % [R.pc[0], R.pc[1] + 1] and jn(R.pc) == "9,7" and R.si == "club-puerto,7,8,true," + Datos.js_num(D.CLUBS.puerto.cuota)
-				and R.socio == "club_puerto:1,2 socio:9,3 billarista:14,7" and R.gana == "20,1,3" and R.empate == 0 and R.pierde == "-10,3" and R.p == "3,3,1,0,0,0,1,0.5"
+				and R.socio == "club_puerto:1,2 socio:9,3 billarista:14,7" and R.gana == "20,1,3" and R.gana2 == 50 and R.pierde == "-10,3" and R.p == "dentro,dentro,falla,falta,falla,0,1,0.5" and R.mesa == ",21"
 				and R.comp == jn([D.SOCIO.rel, 50 - D.SOCIO.g, true]) and R.comp2 == 50 - D.SOCIO.g and R.sale == "7,9,puerto,9,8" and R.nave == "club-puerto" and R.mesas == 0
 				and R.cerrada == "ensanche,38,11" and R.entra == jn(["disco", 6, 6, Dd.entrada, true]) and R.otra == "disco,6,6,0" and R.barra == jn([Dd.copa + Dd.ronda, 1, 1, 1, 4])
 				and R.baile == "gaua%s:pij" % Datos.js_num(R.d0) and R.vip == jn([Dd.mesa, Dd.vip[0] + ":vip", 1, 11]) and R.vip2 == 2 and R.echa == "ensanche,38,9" and R.echa0 == "ensanche,38,9" and R.llena == "0,0"
@@ -2354,8 +2362,14 @@ func _pasos() -> void:
 		want(["^Alquilarlo"])
 		await run(J.talk_txomin)
 		J.S.money = 10
+		var cj = J.S.caja.money if J.S.caja else 0   # 1.35: cobra también de la caja
+		if J.S.caja:
+			J.S.caja.money = 0
+		J.S.setas.r = J.S.day
 		await dia.call(.5)
 		R.impago = jn([J.S.setas == null, J.S.money])
+		if J.S.caja:
+			J.S.caja.money = cj
 		J.S.money = 5000
 		want(["^Alquilarlo"])
 		await run(J.talk_txomin)
@@ -2373,12 +2387,78 @@ func _pasos() -> void:
 		J.enter_map("home", 5, 5, "up"),
 		func():
 			var Z: Dictionary = D.SETAS
-			return chk(R.tx == "17,8" and R.antes == null and R.alq == jn([true, Z.fianza]) and R.b == jn([3, Z.fianza + 3 * Z.bandeja]) and R.d1 == jn([100 - Z.seca, "colonizando", Z.dia]) and R.pulv == jn([100, 100, 100, Z.min])
+			return chk(R.tx == "17,8" and R.antes == null and R.alq == jn([true, Z.fianza + J.recibo_setas()]) and R.b == jn([3, Z.fianza + J.recibo_setas() + 3 * Z.bandeja]) and R.d1 == jn([100 - Z.seca, "colonizando", 0]) and R.pulv == jn([100, 100, 100, Z.min])
 				and R.malas == jn(["contaminada", "seca", "colonizando", 100 - Z.seca]) and R.tirar == 1 and R.f1 == "colonizando" and R.f2 == "fructificando" and R.f3 == "lista" and R.g == 33 and R.quedan == 0
 				and R.venta == jn([33 * Z.precio, Z.calor, 0]) and R.redada == jn([true, Z.calorRedada]) and R.impago == "true,10" and R.dejar == jn([true, Z.fianza])
 				and LOG.has("TXOMIN: ¿Setas? Eso era antes, chaval. Ahora solo paseo.") and LOG.has("SMS · TXOMIN: Se te han echado a perder 2 bandejas. Tíralas.") and LOG.has("Tiras 2 bandejas.")
 				and LOG.has("TXOMIN: El bajo: 1 lista · humedad %s %%." % Datos.js_num(100 - Z.seca)) and LOG.has("Recoges las setas y las dejas secando en el bajo: 33 g.")
 				and LOG.has("La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas.") and LOG.has("SMS · TXOMIN: No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí."), R))
+	step("El banco y los locales (1.35): el efectivo y la cuenta; en el cajero, ingresar hasta 400 € al día sin preguntas y sacar hasta 600; el local de los astilleros, cerrado hasta pagarle 3.000 € a Don Baltasar, se alquila con tarjeta y lava hasta 300 € al día (al día siguiente, en la cuenta, menos un 15 %); el recibo, domiciliado, con su SMS dos días antes; devuelto sin saldo y, a los 3 días, rescindido; BANCA en el móvil", [], func():
+		var sv: Dictionary = {"money": J.S.money, "banco": J.S.banco, "debt": J.S.debt, "day": J.S.day, "mov": J.S.mov.duplicate(true), "saca": J.S.saca, "ingr": J.S.ingr, "loc": J.S.loc}
+		R = {}
+		var dia := func():
+			J.S.day += 1
+			J.recibos_dia()
+			await idle()
+		J.S.money = 2000
+		J.S.banco = D.CUENTA.inicial
+		J.S.mov = []
+		J.S.saca = null
+		J.S.ingr = null
+		J.S.loc = {}
+		J.enter_map("town", 31, 9, "up")
+		want(["^Ingresar", "^400", "^Ingresar", "^Sacar", "^600", "^Salir"])
+		await run(func(): await J.object_action(31, 8))
+		R.caj = jn([J.S.money, J.S.banco, "|".join(PackedStringArray(J.S.mov.map(func(m): return m.t + ":" + Datos.js_num(m.e))))])
+		J.enter_map("astilleros", 6, 11, "up")
+		var L: Dictionary = D.LOCALES.rv
+		J.S.debt = D.DEUDA - L.pago + 1
+		await run(func(): await J.object_action(6, 10))
+		R.cerrado = J.S.loc.size()
+		J.S.debt = D.DEUDA - L.pago
+		want(["^Alquilarlo"])
+		await run(func(): await J.object_action(6, 10))
+		R.sin = jn([J.S.loc.size(), J.S.banco])
+		J.S.banco = 2000
+		want(["^Alquilarlo"])
+		await run(func(): await J.object_action(6, 10))
+		R.alq = jn([J.S.loc.has("rv"), J.S.banco, J.S.loc.rv.r - J.S.day if J.S.loc.has("rv") else null])
+		want(["^Meter", "^300", "^Meter", "^Nada"])
+		await run(func(): await J.object_action(6, 10))
+		R.caja = jn([J.S.money, J.S.loc.rv.caja])
+		await dia.call()
+		R.limpio = jn([J.S.banco, J.S.loc.rv.tot, J.S.loc.rv.caja])
+		J.S.day = J.S.loc.rv.r - D.RECIBO.aviso - 1
+		await dia.call()
+		J.S.day = J.S.loc.rv.r - 1
+		R.b0 = J.S.banco
+		await dia.call()
+		R.cobro = jn([R.b0 - J.S.banco, J.S.loc.rv.r - J.S.day])
+		J.S.banco = 0
+		J.S.day = J.S.loc.rv.r - 1
+		await dia.call()
+		R.dev = J.S.loc.has("rv")
+		J.S.day += D.RECIBO.graciaB - 1
+		await dia.call()
+		R.resc = J.S.loc.has("rv")
+		J.S.banco = 500
+		J.S.loc.rv = {"r": J.S.day + 4, "caja": 0, "dia": 0, "tot": 0}
+		await run(J.banca)
+		want(["^Dejar el local", "^Dejarlo"])
+		await run(func(): await J.object_action(6, 10))
+		R.dejar = jn([J.S.loc.has("rv"), J.S.banco])
+		for k in sv:
+			J.S[k] = sv[k]
+		J.enter_map("home", 5, 5, "up"),
+		func():
+			var L: Dictionary = D.LOCALES.rv
+			var tx := func(p: String) -> bool:
+				return LOG.any(func(l): return re(p, l))
+			return chk(R.caj == "2200,100,Cajero:-600|Ingreso en efectivo:400" and R.cerrado == 0 and R.sin == "0,100" and R.alq == jn([true, 2000 - L.fianza - L.sem, D.RECIBO.dias])
+				and R.caja == "1900,300" and R.limpio == jn([2000 - L.fianza - L.sem + 255, 255, 0]) and R.cobro == jn([L.sem, D.RECIBO.dias]) and R.dev == true and R.resc == false
+				and R.dejar == jn([false, 500 + L.fianza]) and tx.call("^Hoy ya has ingresado 400 €\\.") and tx.call("^SE ALQUILA\\.") and tx.call("^La tarjeta no pasa")
+				and tx.call("^SMS · BANCO: El día \\d+ se carga el recibo de Lavadero Distira: 150 €\\.") and tx.call("^SMS · BANCO: Recibo de Lavadero Distira devuelto: 150 €\\.")
+				and LOG.has("SMS · BANCO: Contrato de Lavadero Distira rescindido por impago. La fianza no se devuelve.") and tx.call("\\[menú\\] .*Recibo · Lavadero Distira \\| "), R))
 	step("Ropa y pelo, Darko y Miren (1.21): en la cama del piso, CAMBIARTE DE ROPA (camiseta, pantalón, gorra y pelo: cambian los colores del protagonista, también de espaldas en el combate; fuera del piso, no sale); Darko pelea con su sprite de combate y Miren lleva el suyo", [], func():
 		R = {}
 		var l0 := LOG.size()
@@ -2476,8 +2556,10 @@ func _pasos() -> void:
 		J.add_buds("ria", 40, 12)
 		await run(J.shop)
 		R = {"m": J.S.money, "p": J.S.items.prensa, "min": J.S.min}
+		J.gancho_billar = func(_t): return .7   # 1.35: las barras de la prensa, en el verde
 		J.S.map = "home"
 		await run(J.lab_action)
+		J.gancho_billar = Callable()
 		R.min = J.S.min - R.min
 		R.ros = J.S.rosin.duplicate(true)
 		R.g = J.total_buds()
@@ -2495,6 +2577,38 @@ func _pasos() -> void:
 		J.S.map = "home",
 		func(): return chk(R.m == 750 and R.p == 1 and R.ros.ria.g == 5 and R.ros.ria.thc == 36 and R.g == 15 and R.min == 30 and R.ext == "town,town,astilleros,puerto,valdehierro,ibarbide,ensanche"
 			and R.m1 == Datos.jsround(J.precio_rosin(36) * 2 * .85) and R.r == 3 and D.GLYPH.has("gota") and D.CTYPES.ext.label == "CATADOR", R))
+	step("Extracciones (1.35): en la mesa, dry sift, Ice-o-lator y charas de la flor, hachís prensado del kief y moonrock (cogollo, rosin y kief); cada barra en el verde sube la calidad (rendimiento y THC), y mal hecho se pierde",
+		["Tamizar en seco", "^Skunk", "^25 g", "Ice-o-lator", "^Skunk", "^25 g", "Frotar charas", "^Skunk", "^5 g", "Prensar hachís", "^Dry sift", "^1 g", "Hacer moonrock", "^Skunk", "^1 g"], func():
+		J.S.buds = {}
+		J.S.rosin = {}
+		J.S.items.tamiz = 1
+		J.S.items.ice = 1
+		J.add_buds("ria", 100, 12)
+		J.S.map = "home"
+		R = {"min": J.S.min, "ya": ",".join(J.extr_ya())}
+		J.gancho_billar = func(_t): return .7
+		await run(J.lab_action)
+		await run(J.lab_action)
+		J.gancho_billar = func(_t): return .05
+		await run(J.lab_action)
+		J.gancho_billar = func(_t): return .7
+		await run(J.lab_action)
+		J.add_rosin("ria", 1, 36)
+		await run(J.lab_action)
+		J.gancho_billar = Callable()
+		R.min = J.S.min - R.min
+		var rr := []
+		for k in J.S.rosin:
+			rr.append(k + ":" + Datos.coma(J.S.rosin[k].g) + ":" + Datos.pct(J.S.rosin[k].thc))
+		R.r = " ".join(rr)
+		R.g = J.total_buds()
+		R.n = "|".join(J.rosin_lots(0).map(J.rosin_item).map(func(x): return x.label))
+		R.px = ",".join(PackedStringArray(D.EXTR.values().map(func(e): return Datos.js_num(e.px))))
+		J.S.items.tamiz = 0
+		J.S.items.ice = 0
+		J.S.rosin = {},
+		func(): return chk(R.ya == "rosin,seco,ice,charas,hash,moon" and R.r == "ria~seco:1,5:26,4 ria~ice:2,8:33,6 ria~charas:0,1:21,6 ria~hash:0,9:26,4 ria:0,9:36,0 ria~moon:1,3:17,2"
+			and R.g == 44 and R.min == 40 + 90 + 60 + 20 + 45 and R.n.begins_with("Dry sift · Skunk") and R.n.contains("Moonrock · Skunk"), R))
 	step("Rosin a salvo: la caja lo guarda y lo saca (en el hueco de los cogollos); Darko (con 21 g de rosin = 105 g de flor) se lleva la mitad del de fuera y la caja, intacta; la redada, el de fuera (la caja nunca); el rosin atrae ladrones (1 g = 5 g de flor)",
 		["Guardar rosin", "^Rosin · Skunk", "^1 g", "Guardar todo", "Sacar rosin", "^Rosin · Skunk", "^1 g", "Cerrar", "Dormir"], func():
 		var sv := {"ch": J.S.ch, "robo": J.S.flags.get("robo"), "money": J.S.money, "caja": J.S.caja.duplicate(true), "due": J.S.due, "heat": J.S.heat}
@@ -2921,17 +3035,17 @@ func _pasos() -> void:
 		R.c3 = J.S.carpas[0].has("ciclo")
 		J.S = S0,
 		func(): return chk(R.l1 > R.l0 and R.l0 > R.l2 and R.c1 == "veg" and absf(R.m - D.VEG_TOPE) < 1e-9 and R.a > .65 and R.c2 == "flor" and R.fl[0] > R.a and R.fl[1] > .9 and R.g[0] < R.g[1] * .65 and R.c3 == false, R))
-	step("Salón (1.10): en el ordenador de la tía, la tienda online → el sofá y la tele llegan mañana (lo que no llega de fuera, de la caja); el sofá, una cabezada (+5 de vida); la tele, las noticias según el calor",
+	step("Salón (1.10): en el ordenador de la tía, la tienda online → el sofá y la tele llegan mañana (1.35: con tarjeta, de la cuenta); el sofá, una cabezada (+5 de vida); la tele, las noticias según el calor",
 		["Tienda online", "^Sofá", "^Tele", "Salir", "Echar", "Noticias"], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))
 		J.S.erase("muebles")
-		J.S.merge({"money": 500, "caja": {"nivel": 1, "money": 1000, "buds": {}, "rosin": {}}, "heat": 40, "hp": 10, "map": "home"}, true)
+		J.S.merge({"money": 500, "banco": 1000, "caja": {"nivel": 1, "money": 1000, "buds": {}, "rosin": {}}, "heat": 40, "hp": 10, "map": "home"}, true)
 		J.montar_casa()
 		var h: Dictionary = J.MAPS.home
 		R = {"libre": not J.tile_solid(h, 13, 5), "d": J.S.day}
 		await run(func(): await J.pc_action())
-		R.m = [J.S.money, J.S.caja.money]
+		R.m = [J.S.money, J.S.caja.money, J.S.banco]
 		R.ped = [J.S.muebles.get("sofa"), J.S.muebles.get("tv"), J.S.muebles.has("gpc")]
 		J.S.day += 1
 		J.llega_mueble()
@@ -2944,17 +3058,17 @@ func _pasos() -> void:
 		J.S = S0
 		J.montar_casa()
 		R.vacio = not h.o[5][13],
-		func(): return chk(R.libre and R.m[0] == 0 and R.m[1] == 652 and R.ped[0] == R.d + 1 and R.ped[1] == R.d + 1 and R.ped[2] == false and R.ya == "sofa,tv" and R.solido and R.hp == 15 and R.vacio
+		func(): return chk(R.libre and R.m[0] == 500 and R.m[1] == 1000 and R.m[2] == 152 and R.ped[0] == R.d + 1 and R.ped[1] == R.d + 1 and R.ped[2] == false and R.ya == "sofa,tv" and R.solido and R.hp == 15 and R.vacio
 			and LOG.any(func(l): return l.contains("Llega el mensajero con el sofá y la tele")) and LOG.any(func(l): return l.contains("Noticias: detenido en el puerto")), R))
 	step("Patinete y bici (1.13): por la tienda online, llegan mañana; en la calle vas montado en el mejor (la bici), más rápido que corriendo y con B más aún; en casa, a pie",
 		["Tienda online", "^Patinete", "^Bici", "Salir"], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))
 		J.S.erase("veh")
-		J.S.merge({"money": 500, "map": "home"}, true)
+		J.S.merge({"banco": 500, "map": "home"}, true)
 		R = {"d": J.S.day}
 		await run(func(): await J.pc_action())
-		R.m = J.S.money
+		R.m = J.S.banco
 		R.ped = [J.S.veh.get("patinete"), J.S.veh.get("bici")]
 		J.S.map = "town"
 		R.antes = J.vehiculo()
@@ -3518,7 +3632,7 @@ func _pasos() -> void:
 		["Póster", "Alfombra", "Reformas", "Suelo: Baldosa", "Paredes: Pintura verde", "Volver", "Salir", "Decorar", "póster", "La ola", "alfombra", "Persa", "Listo", "LOGROS", "Volver", "Volver"], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))
-		J.S.merge({"ch": 8, "map": "home", "day": 20, "min": 12 * 60, "money": 9000, "sales": 0, "caja": {"nivel": 1, "money": 0, "buds": {}, "rosin": {}}, "muebles": {}, "deco": {}, "obra": {}}, true)
+		J.S.merge({"ch": 8, "map": "home", "day": 20, "min": 12 * 60, "money": 9000, "banco": 9000, "sales": 0, "caja": {"nivel": 1, "money": 0, "buds": {}, "rosin": {}}, "muebles": {}, "deco": {}, "obra": {}}, true)
 		J.S.flags.kiko1 = true
 		var mis := {}
 		for m in D.MISIONES:
@@ -3539,7 +3653,7 @@ func _pasos() -> void:
 		capta = true
 		await run(J.tienda_online)
 		await idle()
-		R = {"compra": "%s %s %s" % [Datos.js_num(J.S.money), jj(J.S.obra), jj(J.S.muebles)]}
+		R = {"compra": "%s %s %s" % [Datos.js_num(J.S.banco), jj(J.S.obra), jj(J.S.muebles)]}
 		await run(func():
 			J.S.day += 1
 			J.llega_mueble())
@@ -3663,7 +3777,7 @@ func _pasos() -> void:
 			var t := "%d,%d" % [d.x, d.y]
 			if d.to == "growcity" and not gd.has(t):
 				gd.append(t)
-		R.grow = jn(["%dx%d" % [gc.w, gc.h], gc.g[4][4], gc.o[6][9], gc.o[6][10], "|".join(PackedStringArray(gd)), "/".join(PackedStringArray(gc.exits.keys()))])
+		R.grow = jn(["%dx%d" % [gc.w, gc.h], gc.g[4][4], gc.o[2][10], gc.o[2][11], "|".join(PackedStringArray(gd)), "/".join(PackedStringArray(gc.exits.keys()))])
 		# los presidentes: sin ganarte al encargado y al presidente, el club de fuera no te compra; en la asociación del barrio, sí
 		J.S.merge({"ch": 5, "money": 10000, "day": 40, "clubs": {"valde": true}, "clubDia": {}, "clubEnc": null, "clubEncDia": 0, "clubReg": {}, "rel": {}, "buds": {}}, true)
 		J.add_buds("ria", 300, 12)
@@ -3795,7 +3909,7 @@ func _pasos() -> void:
 				and R.cerrado == "callejon,1" and R.dentro == "setas,4,5,4,5" and R.balda == "bandejaS-lista-0+bandejaS-colonizando-1,bandejaS-contaminada-0,secaS-0"
 				and R.rec == jn([Datos.jsround((Z.g[0] + Z.g[1]) / 2.0), 1, "secaS-1"]) and R.pulv == jn([100, Z.min]) and R.sale == "callejon,19,8"
 				and R.carpa == "18,carpaM,carpaM2,carpaM-0,false" and R.meter == "1,1,100,0,carpaM-1" and R.sin == 100 - 2 * D.MADRES.pierde and R.rol == "madres,true"
-				and R.nvm == "14,2" and R.con == jn([100, 2 * D.MADRES.esq, 2 * (D.NAVE.dia + D.PLANTILLA.sueldo.nave + D.PLANTILLA.sueldo.madres)]) and R.esq == "2,0,ria"
+				and R.nvm == "14,2" and R.con == jn([100, 2 * D.MADRES.esq, 2 * (D.PLANTILLA.sueldo.nave + D.PLANTILLA.sueldo.madres)]) and R.esq == "2,0,ria"
 				and R.mesa == "ria,1,1,2" and R.cambia == 2 and R.mando == jn([D.MANDO.prima + D.MANDO.curso, 3, 4, 0, 0]) and R.rel == null
 				and R.muere == 0 and R.mig == "[]" and R.migP == jn([D.CLUB.confia, D.CLUB.confia, 0, "{}"])
 				and R.pres == "puerto:5,5:cliente6 valde:5,5:cliente3 ibar:10,5:cliente6 ens:5,5:cliente3" and R.no == "0,false,true" and R.noEnc == null

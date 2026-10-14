@@ -117,7 +117,7 @@ func new_day() -> void:
 	var luz := factura_luz()
 	var olor := olor_dia()
 	var av := []
-	var nf: float = pagar_casa(luz) if luz > 0 else 0.0    # de lo de fuera y, si no llega, de la caja (1.10)
+	var nf: float = pagar_recibo(luz, "Luz") if luz > 0 else 0.0    # 1.35: domiciliada; si no llega, de lo de fuera y de la caja (1.10)
 	S.luz = {"d": S.day, "e": luz, "o": olor}
 	if luz > 0:
 		av.append("Factura de la luz: −" + Datos.eur(luz - nf) + ((" (te faltan %s)" % Datos.eur(nf)) if nf else ""))
@@ -149,6 +149,7 @@ func new_day() -> void:
 	vencer_encargo()
 	curro_dia()   # la gente (1.15)
 	setas_dia()   # el bajo de las setas (1.20)
+	recibos_dia()   # 1.35
 	vencer_encargo_club()
 	if S.due > 0 and S.day > S.deadline:   # 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
 		queue("penalty", penalty_event)
@@ -973,11 +974,8 @@ func reformas() -> void:
 		var j: int = ks[i][1]
 		var R: Dictionary = D.REFORMA[k]
 		var p = R.v[j][1]
-		if S.money + caja_e() < p:
-			sfx("bad")
-			await say("No te llega el dinero.")
+		if not await tarjeta(p, "Reforma · " + String(R.n).to_lower()):   # 1.35: con tarjeta
 			continue
-		pagar_casa(p)
 		if not (S.get("obra") is Dictionary):
 			S.obra = {}
 		S.obra[k] = {"v": j, "dia": S.day + 1}
@@ -1028,8 +1026,8 @@ func tienda_online() -> void:
 			items.append({"label": v.n + (" · tuyo" if en else " · pedido" if d else ""), "right": Datos.eur(v.p), "disabled": d != null and float(d) > 0,
 				"desc": v.d + ("" if en else "\nLlega mañana: te lo dejan en el portal.")})
 		items.append({"label": "Reformas: suelo y paredes", "desc": "El suelo y las paredes del piso: el instalador o el pintor vienen al día siguiente."})   # 1.27
-		items.append({"label": "Salir", "desc": "Pagas con lo que llevas y, si no llega, con la caja fuerte."})
-		i = await menu(items, {"cls": "full", "title": "TIENDA ONLINE", "title2": "Muebles y transporte · tienes " + Datos.eur(S.money + caja_e()), "desc": true, "initial": i})
+		items.append({"label": "Salir", "desc": "Con tarjeta, de la cuenta del banco."})
+		i = await menu(items, {"cls": "full", "title": "TIENDA ONLINE", "title2": "Muebles y transporte · en la cuenta " + Datos.eur(S.banco), "desc": true, "initial": i})
 		if i == ks.size() + vs.size():
 			await reformas()
 			continue
@@ -1038,11 +1036,8 @@ func tienda_online() -> void:
 		var es_m: bool = i < ks.size()
 		var k: String = ks[i] if es_m else vs[i - ks.size()]
 		var m: Dictionary = D.MUEBLES[k] if es_m else D.VEHICULOS[k]
-		if S.money + caja_e() < m.p:
-			sfx("bad")
-			await say("No te llega el dinero.")
+		if not await tarjeta(m.p, "Tienda online · " + m.n):   # 1.35: con tarjeta
 			continue
-		pagar_casa(m.p)
 		var cl: String = "muebles" if es_m else "veh"
 		if not (S.get(cl) is Dictionary):
 			S[cl] = {}
@@ -1163,16 +1158,13 @@ func banco_semillas() -> void:
 			var np: int = S.pedido.count(b[0])
 			items.append({"label": s.n + (" · pedida" if np else ""), "right": Datos.eur(b[1]), "sw": s.c, "ic": ic_cog(b[0]), "desc": strain_line(b[0]) + "\n" + s.h})
 		items.append({"label": "Salir", "desc": "Los pedidos llegan mañana por la mañana."})
-		i = await menu(items, {"cls": "full", "title": "BANCO DE SEMILLAS", "title2": "Sobres de %s · tienes %s" % [n(D.SOBRE), Datos.eur(S.money + caja_e())], "desc": true, "initial": i})
+		i = await menu(items, {"cls": "full", "title": "BANCO DE SEMILLAS", "title2": "Sobres de %s · en la cuenta %s" % [n(D.SOBRE), Datos.eur(S.banco)], "desc": true, "initial": i})
 		if i < 0 or i >= l.size():
 			return
 		var k: String = l[i][0]
 		var pr := int(l[i][1])
-		if S.money + caja_e() < pr:
-			sfx("bad")
-			await say("No te llega el dinero.")
+		if not await tarjeta(pr, "Banco de semillas"):   # 1.35: con tarjeta
 			continue
-		pagar_casa(pr)
 		S.pedido.append(k)
 		sfx("coin")
 		toast("Pedido: " + D.STRAINS[k].n + " · llega mañana", 1400)
@@ -1269,46 +1261,15 @@ func _mk(l: Array) -> Array:
 		o.append({"label": s.n, "right": "×" + n(e[1]), "sw": s.c, "ic": ic_cog(e[0]), "desc": strain_line(e[0])})
 	return o
 
-# la prensa de rosin (1.10): de un lote de 5 g o más, una parte (5, 25, 100 g o todo) a rosin con el triple de THC
-func rosin_de(g: float) -> float:
-	return Datos.jsround(g * D.ROSIN.rend * 10) / 10.0
-
-func prensar():
-	var lots := bud_lots(5)
-	if lots.is_empty():
-		await say("PRENSA DE ROSIN: necesitas 5 g de cogollos como mínimo.")
-		return
-	var it := lots.map(lot_item)
-	it.append({"label": "Nada"})
-	var i: int = await menu(it, {"cls": "right", "title": "¿Qué prensas?"})
-	if i < 0 or i >= lots.size():
-		return
-	var k: String = lots[i][0]
-	var b: Dictionary = lots[i][1]
-	var tot := int(floor(b.g))
-	var ops := [5, 25, 100].filter(func(g): return g < tot)
-	ops.append(tot)
-	var tx := ops.map(func(g): return "%d g → %s g de rosin" % [g, Datos.coma(rosin_de(g))])
-	tx.append("Nada")
-	var j: int = await ask("%s: %d g. ¿Cuánto prensas?" % [lot_nombre(k), tot], tx)
-	if j < 0 or j >= ops.size():
-		return
-	var g: int = ops[j]
-	var r := rosin_de(g)
-	var thc: float = minf(D.ROSIN.tope, b.thc * D.ROSIN.thc)
-	use_buds(k, g)
-	add_rosin(k, r, thc)
-	advance_time(30)
-	sfx("get")
-	await say("Prensas %d g de %s: %s g de rosin con un %s %% de THC." % [g, lot_nombre(k), Datos.coma(r), Datos.pct(thc)])
-
+# la mesa (1.35): las extracciones que puedes hacer (extr_ya; extraer, en trama), cruzar o nada
 func lab_action():
-	if S.items.get("prensa"):
-		var c: int = await ask("La mesa de la tía. ¿Qué haces?", ["Prensar rosin", "Cruzar semillas", "Nada"])
-		if c == 0:
-			await prensar()
+	var L := extr_ya()
+	if not L.is_empty():
+		var c: int = await ask("La mesa de la tía. ¿Qué haces?", L.map(func(t): return D.EXTR[t].v) + ["Cruzar semillas", "Nada"])
+		if c >= 0 and c < L.size():
+			await extraer(L[c])
 			return
-		if c != 1:
+		if c != L.size():
 			return
 	if not S.flags.get("lab"):
 		await say("Una mesa con un microscopio viejo y frascos. Kiko sabrá qué hacer con esto.")
@@ -1555,3 +1516,234 @@ func recuerdo_plazo():
 	pass
 func penalty_event():
 	pass
+
+# ---------- el banco, los recibos y los locales (1.35, 11k-banco) ----------
+# el efectivo (S.money) y la cuenta (S.banco): con tarjeta, lo que deja rastro; la luz, domiciliada; el cajero, con sus topes al día
+func movimiento(t: String, e: float) -> void:
+	S.mov.push_front({"d": S.day, "t": t, "e": roundi(e)})
+	if S.mov.size() > int(D.CUENTA.mov):
+		S.mov.resize(int(D.CUENTA.mov))
+
+func cobro_banco(e: float, t: String) -> bool:
+	if S.banco < e:
+		return false
+	S.banco -= e
+	movimiento(t, -e)
+	return true
+
+func abono_banco(e: float, t: String) -> void:
+	S.banco += e
+	movimiento(t, e)
+
+func pagar_recibo(e: float, t: String) -> float:
+	var b: float = minf(S.banco, e)
+	if b > 0:
+		S.banco -= b
+		movimiento(t, -b)
+	return pagar_casa(e - b)
+
+func tarjeta(e: float, t: String) -> bool:
+	if cobro_banco(e, t):
+		return true
+	sfx("bad")
+	await say("La tarjeta no pasa: en la cuenta tienes %s. Ingresa efectivo en un cajero." % Datos.eur(S.banco))
+	return false
+
+func sacado() -> float:
+	return float(S.saca.e) if S.get("saca") is Dictionary and S.saca.d == S.day else 0.0
+
+func ingresado() -> float:
+	return float(S.ingr.e) if S.get("ingr") is Dictionary and S.ingr.d == S.day else 0.0
+
+func cantidad(t: String, mx: int) -> int:
+	var v := []
+	for x in D.CUENTA.pasos:
+		if x < mx:
+			v.append(int(x))
+	if mx >= 1:
+		v.append(mx)
+	var ops := []
+	for x in v:
+		ops.append(Datos.eur(x))
+	ops.append("Nada")
+	var i: int = await ask(t, ops)
+	return v[i] if i >= 0 and i < v.size() else 0
+
+func cajero() -> void:
+	while true:
+		var ops := ["Sacar", "Ingresar", "Movimientos", "Salir"]
+		var oi: int = await ask("CAJERO · en la cuenta tienes %s." % Datos.eur(S.banco), ops)
+		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+		if op == "Sacar":
+			var mx := int(floorf(minf(S.banco, D.CUENTA.sacar - sacado())))
+			if mx < 1:
+				sfx("bad")
+				await say("No hay saldo." if S.banco < 1 else "Hoy ya has sacado %s: es el tope del cajero." % Datos.eur(sacado()))
+				continue
+			var e: int = await cantidad("¿Cuánto sacas? Hoy, hasta %s." % Datos.eur(mx), mx)
+			if not e:
+				continue
+			S.saca = {"d": S.day, "e": sacado() + e}
+			S.banco -= e
+			S.money += e
+			movimiento("Cajero", -e)
+			sfx("coin")
+			update_hud()
+		elif op == "Ingresar":
+			var mx := int(floorf(minf(S.money, D.CUENTA.ingreso - ingresado())))
+			if mx < 1:
+				sfx("bad")
+				await say("No llevas efectivo." if S.money < 1 else "Hoy ya has ingresado %s. Más, y el banco pregunta de dónde sale." % Datos.eur(ingresado()))
+				continue
+			var e: int = await cantidad("¿Cuánto ingresas? Sin preguntas, hasta %s al día." % Datos.eur(D.CUENTA.ingreso), mx)
+			if not e:
+				continue
+			S.ingr = {"d": S.day, "e": ingresado() + e}
+			S.money -= e
+			S.banco += e
+			movimiento("Ingreso en efectivo", e)
+			sfx("coin")
+			update_hud()
+		elif op == "Movimientos":
+			await banca()
+		else:
+			return
+
+func recibo_nave() -> float:
+	return D.RECIBO.dias * D.NAVE.dia
+
+func recibo_setas() -> float:
+	return D.RECIBO.dias * D.SETAS.dia
+
+func recibos() -> Array:
+	var r := []
+	if S.get("nave") != null:
+		r.append(["Nave de Valdehierro", S.nave.r, recibo_nave(), "efectivo", r.size()])
+	if S.get("setas") != null:
+		r.append(["Bajo de la Kale Zaharra", S.setas.r, recibo_setas(), "efectivo", r.size()])
+	for k in S.loc:
+		r.append([D.LOCALES[k].n, S.loc[k].r, D.LOCALES[k].sem, "cuenta", r.size()])
+	if S.protect and S.get("protHasta"):
+		r.append(["Sargento Molina", S.protHasta + 1, D.SOBORNO, "mano", r.size()])
+	r.sort_custom(func(a, b): return a[1] < b[1] or a[1] == b[1] and a[4] < b[4])   # estable, como sort de JS
+	return r
+
+const COMO := {"cuenta": "de la cuenta", "efectivo": "en efectivo", "mano": "en mano, en la comisaría"}
+
+func banca() -> void:
+	var it := []
+	for r in recibos():
+		it.append({"label": "Recibo · " + r[0], "right": Datos.eur(r[2]), "desc": "El día %s, %s." % [n(r[1]), COMO[r[3]]]})
+	for m in S.mov:
+		it.append({"label": m.t, "right": ("−" if m.e < 0 else "+") + Datos.eur(absf(m.e)), "desc": "Día %s." % n(m.d)})
+	it.append({"label": "Salir", "desc": "Ingresos en efectivo: hasta %s al día sin preguntas (hoy, %s)." % [Datos.eur(D.CUENTA.ingreso), Datos.eur(ingresado())]})
+	await menu(it, {"cls": "full", "title": "BANCA", "title2": "Saldo " + Datos.eur(S.banco), "desc": true})
+
+# un recibo (o.r, el día): el aviso, el cobro (en efectivo, de lo que llevas y de la caja; o domiciliado) y la gracia; false si se pierde
+func cobra(o: Dictionary, e: float, quien: String, banco: bool, t: String) -> bool:
+	var N := "SMS · " + quien
+	if S.day == o.r - D.RECIBO.aviso:
+		var tx: String = ("El día %s se carga el recibo de %s: %s. Saldo: %s." % [n(o.r), t, Datos.eur(e), Datos.eur(S.banco)]) if banco else ("El día %s paso a cobrar: %s, en efectivo. Tenlo preparado." % [n(o.r), Datos.eur(e)])
+		queue("av" + t, func(): await talk(N, [tx]))
+	if S.day < o.r:
+		return true
+	var ok: bool = cobro_banco(e, "Recibo · " + t) if banco else (S.money + caja_e() >= e and pagar_casa(e) == 0)
+	if ok:
+		o.r += D.RECIBO.dias
+		return true
+	if S.day < o.r + (D.RECIBO.graciaB if banco else D.RECIBO.gracia):
+		var tx: String = ("Recibo de %s devuelto: %s. Si el día %s no hay saldo, se rescinde el contrato." % [t, Datos.eur(e), n(o.r + D.RECIBO.graciaB)]) if banco else "He pasado a cobrar y no había nada. Vuelvo mañana; como no esté, cambio la cerradura."
+		queue("dv" + t, func(): await talk(N, [tx]))
+		return true
+	return false
+
+func recibos_dia() -> void:
+	for k in S.loc.keys():
+		var L: Dictionary = D.LOCALES[k]
+		var o: Dictionary = S.loc[k]
+		if o.caja > 0:   # lo de ayer, ya limpio
+			var nt: int = roundi(o.caja * (1 - L.com))
+			abono_banco(nt, "Ingresos · " + L.n)
+			o.tot += nt
+			o.caja = 0
+		if not cobra(o, L.sem, "BANCO", true, L.n):
+			S.loc.erase(k)
+			var tx: String = "Contrato de %s rescindido por impago. La fianza no se devuelve." % L.n
+			queue("loc" + k, func(): await talk("SMS · BANCO", [tx]))
+	if S.protect and S.protHasta - S.day == D.RECIBO.aviso:
+		var tx: String = "Lo nuestro se acaba el día %s. Si quieres seguir, ya sabes dónde está la comisaría." % n(S.protHasta)
+		queue("avMolina", func(): await talk("SMS · MOLINA", [tx]))
+
+# los locales (LOCALES): uno por pueblo, por lo pagado de la deuda; meter efectivo en la caja del negocio, que sale limpio mañana
+func pagado_deuda() -> float:
+	return D.DEUDA - S.debt
+
+func local_de(m: String, x: int, y: int) -> String:
+	for k in D.LOCALES:
+		var L: Dictionary = D.LOCALES[k]
+		if L.map == m and L.x == x and L.y == y:
+			return k
+	return ""
+
+func del_neg(L: Dictionary) -> String:   # «las llaves del lavadero», «de la taberna»
+	var t: String = L.neg
+	return "del " + t.substr(3) if t.begins_with("el ") else ("de la " + t.substr(3) if t.begins_with("la ") else t)
+
+func metido(o: Dictionary) -> float:
+	return o.caja if o.dia == S.day else 0.0
+
+func rotulo_local(k: String) -> void:
+	var L: Dictionary = D.LOCALES[k]
+	var N: String = String(L.n).to_upper()
+	if not S.loc.has(k):
+		if pagado_deuda() < L.pago:
+			await say("SE ALQUILA. Debajo, a boli: «Preguntar en el bar El Ancla». El dueño es amigo de Don Baltasar: hasta que no le hayas pagado %s, para ti no está." % Datos.eur(L.pago))
+			return
+		if await ask("SE TRASPASA: %s, con el local. %s de fianza y %s cada %s días, domiciliados. Por su caja pasa el efectivo que metas, hasta %s al día: al día siguiente, en tu cuenta, menos un %d %% de gastos e impuestos." % [L.neg, Datos.eur(L.fianza), Datos.eur(L.sem), n(D.RECIBO.dias), Datos.eur(L.tope), roundi(L.com * 100)], ["Alquilarlo", "No"]) != 0:
+			return
+		if not await tarjeta(L.fianza + L.sem, "Fianza · " + L.n):
+			return
+		S.loc[k] = {"r": S.day + D.RECIBO.dias, "caja": 0, "dia": 0, "tot": 0}
+		sfx("coin")
+		update_hud()
+		await got("las llaves " + del_neg(L))
+		await say("%s: el negocio sigue con su gente. Tú metes el efectivo en la caja y, a la mañana siguiente, sale en el banco como lo que ha hecho." % L.n)
+		return
+	var o: Dictionary = S.loc[k]
+	while true:
+		var hoy: float = metido(o)
+		var ops := ["Meter efectivo", "Dejar el local", "Nada"]
+		var oi: int = await ask("Hoy, %s de %s en caja · lavado en total, %s · próximo recibo, el día %s." % [Datos.eur(hoy), Datos.eur(L.tope), Datos.eur(o.tot), n(o.r)], ops, N)
+		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+		if op == "Meter efectivo":
+			var mx := int(floorf(minf(S.money, L.tope - hoy)))
+			if mx < 1:
+				sfx("bad")
+				await say("No llevas efectivo." if S.money < 1 else "Hoy ya hay %s en la caja: más, y Hacienda se fija." % Datos.eur(L.tope))
+				continue
+			var e: int = await cantidad("¿Cuánto metes en la caja? Hoy, hasta %s." % Datos.eur(mx), mx)
+			if not e:
+				continue
+			o.caja = hoy + e
+			o.dia = S.day
+			S.money -= e
+			sfx("coin")
+			update_hud()
+			await say("Mañana entran en la cuenta %s como ingresos %s." % [Datos.eur(roundi(o.caja * (1 - L.com))), del_neg(L)])
+		elif op == "Dejar el local":
+			if await ask("¿Dejas %s? Te devuelven la fianza a la cuenta%s." % [L.neg, "; lo de la caja de hoy se queda en el negocio" if o.caja > 0 else ""], ["Dejarlo", "No"]) != 0:
+				continue
+			S.loc.erase(k)
+			abono_banco(L.fianza, "Fianza · " + L.n)
+			sfx("coin")
+			update_hud()
+			await say("Has dejado %s." % L.neg)
+			return
+		else:
+			return
+
+func sprite_rotulo() -> String:
+	for k in D.LOCALES:
+		if D.LOCALES[k].map == S.map:
+			return "rotuloL-%d" % (1 if S.loc.has(k) else 0)
+	return "rotuloL-0"

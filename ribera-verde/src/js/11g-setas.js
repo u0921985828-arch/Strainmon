@@ -13,8 +13,7 @@ const FASES_SETA={colonizando:['colonizando','colonizando'],fructificando:['fruc
 const faseSeta=b=>b.mala?b.mala:S.day-b.d<SETAS.colon?'colonizando':S.day-b.d<SETAS.colon+SETAS.fruto?'fructificando':'lista';
 function setasDia(){
   const L=S.setas;if(!L)return;
-  if(S.money<SETAS.dia){S.setas=null;queue('setas',()=>talk('SMS · TXOMIN',['No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí.']));return;}
-  S.money-=SETAS.dia;
+  if(!cobra(L,RECIBO.setas(),'TXOMIN',false,'el bajo')){S.setas=null;queue('setas',()=>talk('SMS · TXOMIN',['No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí.']));return;}   // 1.35: cada RECIBO.dias (11k-banco)
   const vivas=L.bandejas.filter(b=>!b.mala);if(!vivas.length)return;
   if(Math.random()<SETAS.redada){S.setas=null;S.heat=Math.min(100,S.heat+SETAS.calorRedada);sfx('bad');
     queue('setas',()=>say(`La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas${L.g>=1?' y '+gTxt(L.g)+' de setas':''}.`));return;}
@@ -38,9 +37,10 @@ async function talkTxomin(){
   const T='TXOMIN',L=S.setas;
   if(S.ch<SETAS.ch)return say('¿Setas? Eso era antes, chaval. Ahora solo paseo.',T);
   if(!L){
-    if(await ask(`El bajo de mi casa: oscuro, húmedo y nadie pregunta. ${eur(SETAS.fianza)} de fianza y ${eur(SETAS.dia)} al día, que te cobro cada mañana. Las bandejas te las preparo yo.`,['Alquilarlo','No'],T)!==0)return;
-    if(S.money<SETAS.fianza){sfx('bad');return say('Sin la fianza no hay llave.',T);}
-    S.money-=SETAS.fianza;S.setas={bandejas:[],g:0};sfx('coin');await got('la llave del bajo');
+    const e=SETAS.fianza+RECIBO.setas();
+    if(await ask(`El bajo de mi casa: oscuro, húmedo y nadie pregunta. ${eur(SETAS.fianza)} de fianza y ${eur(RECIBO.setas())} cada ${RECIBO.dias} días, en efectivo; el primero, ahora. Las bandejas te las preparo yo.`,['Alquilarlo','No'],T)!==0)return;
+    if(S.money<e){sfx('bad');return say(`Sin ${eur(e)} no hay llave.`,T);}
+    S.money-=e;S.setas={bandejas:[],g:0,r:S.day+RECIBO.dias};sfx('coin');await got('la llave del bajo');
     return say('Compra las bandejas y tenlas húmedas. Lo demás lo hace el tiempo.',T);
   }
   return bajoMenu(T);

@@ -7,7 +7,9 @@
 // cuatro mesas de cultivo (una por trabajador; plantas tú, con semilla o esqueje, y eliges su abono), la estantería de los abonos, el
 // secadero y el escritorio. En GAUA (DISCO: de 23:00 a 6:00, desde el capítulo DISCO.ch; la entrada, una vez por noche): la barra,
 // la pista, la cabina del DJ y el reservado, donde la RRPP te presenta un cliente VIP para la agenda (CTYPES.vip)
-const BILLAR={apuestas:[10,20,50],tiros:3,dia:3,min:20,hab:.55,verde:.08,amarillo:.2,centro:.7,periodo:1400,n:{puerto:'Ander',valde:'Izaskun',ibar:'Txetxu',ens:'Olatz',rv:'Koldo'}};
+const BILLAR={apuestas:[10,20,50],dia:3,min:20,bolas:3,turnos:40,hab:{puerto:.42,valde:.38,ibar:.5,ens:.46,rv:.34},mano:.2,manoX:1.5,seguro:.5,
+  falta:.96,faltaR:.95,verde:.1,centro:.7,periodo:1400,n:{puerto:'Ander',valde:'Izaskun',ibar:'Txetxu',ens:'Olatz',rv:'Koldo'}};
+const TIROS=[{n:'Al hueco',a:.12},{n:'Al rincón',a:.07,deja:1.6},{n:'Jugar seguro',seguro:1}];   // 1.35: los tiros del billar
 const SOCIO={g:1,rel:3,min:30,n:{puerto:'Gotzon',valde:'Maribel',ibar:'Joseba',ens:'Lorea',rv:'Imanol'},
   charla:['Aquí cada socio retira lo suyo y se consume dentro. Así funciona una asociación.','Los sábados se llena. Entre semana se está mejor.',
     'Dicen que el del billar no ha perdido una partida este año. Yo no me lo creo.','El encargado prueba todo lo que entra. Si no le convence, no entra.']};
@@ -105,7 +107,7 @@ function mapasLocales(){
   // la carpa de las madres ----------
   const n=newMap('nave',18,8,'floorN');n.music='nave';
   rect(n,0,0,17,0,(x,y)=>gr(n,x,y,'iwT_nave'));rect(n,0,1,17,1,(x,y)=>gr(n,x,y,'iwB_nave'));
-  ob(n,0,2,'estanteN');ob(n,6,2,'secadero');ob(n,11,2,'escritorio');ob(n,12,2,'escritorio2');ob(n,13,2,'crate');ob(n,15,2,'carpaM');ob(n,16,2,'carpaM2');
+  ob(n,0,2,'estanteN');ob(n,6,2,'secadero');ob(n,12,2,'escritorio');ob(n,13,2,'escritorio2');ob(n,17,2,'crate');ob(n,15,2,'carpaM');ob(n,16,2,'carpaM2');
   MESAS_X.forEach(x=>{ob(n,x,4,'mesaN');ob(n,x+1,4,'mesaN2');});
   [6,7].forEach(x=>{gr(n,x,7,'mat');n.exits[x+',7']={to:'valdehierro',x:x+6,y:8,dir:'down'};});
   // ---------- GAUA: 14 × 8, la barra a la izquierda, la cabina y la pista en medio y el reservado a la derecha ----------
@@ -126,6 +128,7 @@ function mapasLocales(){
 function spriteLocal(o){
   if(o==='secaS')return 'secaS-'+(S.setas&&S.setas.g>=1?1:0);
   if(o==='carpaM')return 'carpaM-'+(S.nave&&S.nave.ma?S.nave.ma.length:0);
+  if(o==='rotuloL')return spriteRotulo();   // 1.35 (11k-banco)
   return estiloLocal(o);
 }
 // las bandejas de la balda x del bajo (1.34): las dos de S.setas.bandejas que le tocan (2x abajo, 2x + 1 arriba), en su fase:
@@ -141,6 +144,16 @@ Object.keys(CLUBS).forEach((k,i)=>{const P=CLUB_PLANO[k];NPCDEF.push({id:'socio'
 NPCDEF.forEach(d=>{const P=d.id.startsWith('club_')&&CLUB_PLANO[d.id.slice(5)];if(P)[d.x,d.y]=P.enc;});
 // 1.34: el presidente de cada club de fuera (PRESI, 11e-gente), desde el capítulo del club
 Object.keys(PRESI).forEach(k=>{const P=CLUB_PLANO[k];NPCDEF.push({id:'pres_'+k,map:'club-'+k,x:P.pres[0],y:P.pres[1],dir:'down',look:'presi_'+k,cond:()=>S.ch>=CLUBS[k].ch,talk:()=>talkPresi(k)});});
+// dónde trabaja cada uno (1.35, lo pidió el usuario: que no estén todos plantados delante de su mesa): por la hora (cada PUESTO_MIN
+// minutos), el día y su mesa, en un sitio de su mesa (delante a un lado o al otro, a su izquierda o detrás, mirándola), que no tape
+// ningún mueble (la mesa 1, detrás, el tanque); se colocan al entrar en la nave (buildEnts)
+const PUESTO_MIN=120;
+function puestosMesa(i){const X=MESAS_X[i],p=[[X,5,'up'],[X+1,5,'up'],[X-1,4,'right']];if(i)p.push([X,3,'down']);return p;}
+function puestoNavero(i){const p=puestosMesa(i);return p[(Math.floor(S.min/PUESTO_MIN)+S.day+i)%p.length];}
+function colocaNaveros(){
+  for(const e of ents){const m=/^nv(\d)$/.exec(e.id);if(!m)continue;const [x,y,dir]=puestoNavero(+m[1]);
+    if(e.x===x&&e.y===y&&e.puesto)continue;Object.assign(e,{x,y,px:x*16,py:y*16,hx:x,hy:y,fx:x,fy:y,dir,moving:false,puesto:1});}
+}
 MESAS_X.forEach((x,i)=>NPCDEF.push({id:'nv'+i,map:'nave',x,y:5,dir:'up',look:'navero'+(i+1),cond:()=>!!(S.nave&&naveroDe(i)),talk:()=>talkNavero(i)}));
 NPCDEF.push({id:'nvm',map:'nave',x:14,y:2,dir:'right',look:'navero5',cond:()=>!!(S.nave&&cuidaMadres()),talk:()=>talkMadres()});   // 1.34: el de las madres
 NPCDEF.push({id:'gorila',map:'ensanche',x:40,y:9,dir:'left',look:'gorila',cond:()=>S.ch>=DISCO.ch,talk:()=>talkGorila()},
@@ -242,40 +255,75 @@ async function talkSocio(k){
   const [kk,b]=lots[i],thc=b.thc;useBuds(kk,SOCIO.g);S.porro[k]=S.day;confia(k,SOCIO.rel);advanceTime(SOCIO.min);updateHUD();sfx('sel');
   return say(`Compartes ${lotNombre(kk)} en el sofá. ${n}: «${thc>=20?'Esto es otra liga. Se lo cuento a los del club.':'Suave, de los de charlar. Gracias.'}»`);
 }
-// el billar: hasta BILLAR.dia partidas al día con cada uno, de BILLAR.tiros tiros. Cada tiro, la barra de fuerza va y viene: con A
-// en el verde, la bola dentro (3 puntos); en el amarillo, la rozas (1). El otro mete con BILLAR.hab × 0,6 y la roza hasta BILLAR.hab
-let TIRO=null;   // la barra mientras apuntas: {t0}
-const fuerzaTiro=ms=>{const f=ms%BILLAR.periodo/BILLAR.periodo;return f<.5?f*2:2-f*2;};
-const puntosTiro=p=>{const d=Math.abs(p-BILLAR.centro);return d<=BILLAR.verde?3:d<=BILLAR.amarillo?1:0;};
-const tiroRival=()=>{const r=Math.random();return r<BILLAR.hab*.6?3:r<BILLAR.hab?1:0;};
+// el billar (1.35, lo pidió el usuario: más desarrollado): una partida corta a la bola 8, hasta BILLAR.dia al día con cada uno:
+// BILLAR.bolas lisas para ti, otras tantas rayadas para él y la negra al final. En tu turno eliges el tiro (TIROS: al hueco; al
+// rincón, más estrecho, pero deja la blanca colocada y el siguiente es más ancho; o jugar seguro: no metes, pero se lo pones difícil)
+// y lo das en dos barras: la dirección (en el verde, a la tronera; su ancho, el del tiro) y la fuerza (en el verde, dentro; pasada del
+// todo, la blanca se cuela: falta, y el otro juega con bola en mano). Quien mete, sigue; fallas y tira él (BILLAR.hab[k], más con bola
+// en mano, menos tras tu seguro), que mete y sigue hasta que falla o hace falta (BILLAR.faltaR). Gana quien mete la negra con las
+// suyas ya dentro; colar la blanca tirando a la negra, pierde. MESA_B: la mesa que se ve mientras dura la partida (14-render)
+let TIRO=null,MESA_B=null;   // la barra mientras apuntas: {t0, f: 'dir' o 'fuerza', a: el ancho del verde de la dirección}
+const fuerzaTiro=(ms,per=BILLAR.periodo)=>{const f=ms%per/per;return f<.5?f*2:2-f*2;};
+const resultadoTiro=(d,f,a)=>f>=BILLAR.falta?'falta':Math.abs(d-BILLAR.centro)<=a&&Math.abs(f-BILLAR.centro)<=BILLAR.verde?'dentro':'falla';
 // un tiro: el texto y, con A, dónde estaba la barra (de 0 a 1; 1.31: arranca en un punto al azar, para que no baste con contar); las
-// pruebas lo cambian por una función
-async function tiroBillar(txt){
-  await typeText(txt,'BILLAR');
-  const p=await new Promise(res=>{TIRO={t0:performance.now()-Math.random()*BILLAR.periodo};push(b=>{if(b==='A'){pop();res(fuerzaTiro(performance.now()-TIRO.t0));}});});
+// pruebas lo cambian por una función. 1.35: per y nom, para las extracciones (11l-extraccion)
+async function tiroBillar(txt,f,a,per=BILLAR.periodo,nom='BILLAR'){
+  await typeText(txt,nom);
+  const p=await new Promise(res=>{TIRO={t0:performance.now()-Math.random()*per,f:f||'fuerza',a:a||0,per};push(b=>{if(b==='A'){pop();res(fuerzaTiro(performance.now()-TIRO.t0,per));}});});
   TIRO=null;dlg.hidden=true;sfx('hit');return p;
 }
+const unaBola=m=>m===1?'una':String(m);
 async function talkBillar(k){
   const n=BILLAR.n[k],N=n.toUpperCase();
   const D=S.billar[k]&&S.billar[k].d===S.day?S.billar[k]:(S.billar[k]={d:S.day,n:0});
   if(D.n>=BILLAR.dia)return say('Por hoy ya está bien. Mañana te doy la revancha.',N);
-  const c=await ask(`¿Unas bolas? ${BILLAR.tiros} tiros cada uno: la bola dentro, 3 puntos; si la rozas, 1. Quien sume más se lleva la apuesta.`,BILLAR.apuestas.map(e=>'A '+eur(e)).concat(['Nada']),N);
+  const c=await ask(`¿Una a la bola 8? ${BILLAR.bolas} lisas para ti, ${BILLAR.bolas} rayadas para mí y la negra al final: quien la meta se lleva la apuesta.`,BILLAR.apuestas.map(e=>'A '+eur(e)).concat(['Nada']),N);
   if(c<0||c>=BILLAR.apuestas.length)return;
   const e=BILLAR.apuestas[c];if(S.money<e){sfx('bad');return say('Sin dinero encima no se juega.',N);}
-  D.n++;let yo=0,el=0;const T=['Fallas','La rozas: 1 punto','¡Dentro! 3 puntos'],R=['falla','la roza','¡dentro!'];
-  for(let i=0;i<BILLAR.tiros;i++){
-    const p=puntosTiro(await tiroBillar(`Tiro ${i+1} de ${BILLAR.tiros} · tú ${yo}, ${n} ${el}. Pulsa A con la barra en el verde.`)),q=tiroRival();yo+=p;el+=q;
-    await say(`${T[[0,1,3].indexOf(p)]}. ${n}: ${R[[0,1,3].indexOf(q)]}.`);
+  D.n++;const V=MESA_B={yo:BILLAR.bolas,el:BILLAR.bolas,negra:1};let yo=true,mano=false,seguro=false,deja=1,fin=null;
+  await say('Sacas tú. Las tuyas, las lisas.');
+  for(let t=0;t<BILLAR.turnos&&!fin;t++){
+    if(yo){
+      const i=await ask(`Tu turno · te ${V.yo?'quedan '+V.yo:'queda la negra'}; a ${n}, ${V.el?V.el:'la negra'}.${mano?' Bola en mano: la colocas donde quieras.':deja>1?' La blanca ha quedado bien.':''}`,TIROS.map(x=>x.n)),T=TIROS[i<0?0:i];
+      if(T.seguro){seguro=true;deja=1;mano=false;yo=false;await say('Escondes la blanca detrás de sus bolas. Le toca, y no lo tiene fácil.');continue;}
+      const a=Math.round(T.a*deja*(mano?BILLAR.manoX:1)*1000)/1000;deja=1;mano=false;
+      const r=resultadoTiro(await tiroBillar(`${T.n}: para la barra en el verde para apuntar.`,'dir',a),await tiroBillar('Ahora la fuerza: en el verde, dentro; pasada, se cuela la blanca.','fuerza'),a);
+      if(r==='falta'){if(!V.yo){fin='el';await say('La negra entra... y la blanca detrás. Falta sobre la negra: pierdes.');break;}
+        mano=true;yo=false;await say(`Demasiado fuerte: la blanca se cuela. Falta: ${n} juega con bola en mano.`);continue;}
+      if(r==='dentro'){if(!V.yo){V.negra=0;fin='yo';await say('¡La negra, dentro!');break;}
+        V.yo--;deja=T.deja||1;await say(V.yo?`¡Dentro! Te ${V.yo>1?'quedan':'queda'} ${V.yo}. Sigues tú.`:'¡Dentro! Ya solo te queda la negra. Sigues tú.');continue;}
+      yo=false;await say(`No entra. Le toca a ${n}.`);continue;
+    }
+    let p=BILLAR.hab[k]+(mano?BILLAR.mano:0),m=0,falta=false;if(seguro)p*=BILLAR.seguro;mano=false;seguro=false;
+    for(;;){const r=Math.random();if(r<p){if(!V.el){V.negra=0;fin='el';break;}V.el--;m++;p=BILLAR.hab[k];continue;}if(r>BILLAR.faltaR)falta=true;break;}
+    if(fin){await say(`${n} ${m?'mete '+unaBola(m)+' y ':''}tira a la negra: dentro.`);break;}
+    if(falta&&!V.el){fin='yo';await say(`${n} tira a la negra y se le cuela la blanca. Falta sobre la negra: pierde.`);break;}
+    if(falta)mano=true;yo=true;
+    await say(`${n} ${m?'mete '+unaBola(m)+(falta?' y se le cuela la blanca: bola en mano para ti.':' y falla.'):falta?'cuela la blanca: bola en mano para ti.':'falla.'}`);
   }
-  if(yo>el){S.money+=e;confia(k,1);sfx('coin');}else if(yo<el){S.money-=e;sfx('bad');}
+  MESA_B=null;
+  if(fin==='yo'){S.money+=e;confia(k,1);sfx('coin');}else if(fin==='el'){S.money-=e;sfx('bad');}
   advanceTime(BILLAR.min);updateHUD();
-  return say(yo>el?`${yo} a ${el}: ganas tú. ${n} te paga ${eur(e)}: «La próxima, la revancha».`:yo<el?`${yo} a ${el}: gana ${n}. Le pagas ${eur(e)}.`:`${yo} a ${el}: empate. Nadie paga.`);
+  return say(fin==='yo'?`Ganas tú. ${n} te paga ${eur(e)}: «La próxima, la revancha».`:fin==='el'?`Gana ${n}. Le pagas ${eur(e)}.`:'Se hace tarde y lo dejáis en tablas. Nadie paga.');
+}
+// la mesa del billar mientras dura la partida (1.35, 14-render; Godot, rects_mesa_billar): el tapete con sus seis troneras, la
+// blanca, las lisas y las rayadas que quedan y la negra (rectángulos [x, y, w, h, color], en la pantalla)
+const MESA_BOLAS={yo:[[16,10],[24,30],[14,34]],el:[[60,12],[70,26],[56,34]],negra:[44,22],blanca:[8,22]};
+function rectsMesaBillar(V){
+  const x0=(SW-100)>>1,y0=4,o=[[x0-1,y0-1,102,54,'#26262e'],[x0,y0,100,52,'#74502e'],[x0,y0,100,1,'#a46e40'],[x0+4,y0+4,92,44,'#2f7a46']];
+  for(const [x,y] of [[2,2],[48,2],[94,2],[2,46],[48,46],[94,46]])o.push([x0+x,y0+y,4,4,'#121519']);
+  const bola=([x,y],c,b)=>{x+=x0+4;y+=y0+4;o.push([x+1,y,2,4,c],[x,y+1,4,2,c]);if(b)o.push([x,y+1,4,2,b]);};
+  bola(MESA_BOLAS.blanca,'#f8f8f0');
+  MESA_BOLAS.yo.slice(0,V.yo).forEach(q=>bola(q,'#e0b84a'));
+  MESA_BOLAS.el.slice(0,V.el).forEach(q=>bola(q,'#f8f8f0','#e04040'));
+  if(V.negra)bola(MESA_BOLAS.negra,'#26262e');
+  return o;
 }
 
 /* ---------- la nave: mesas, estantería, secadero y escritorio ---------- */
 // S.nave: {m: las NAVE.max mesas (null, vacía, o {k: el lote, f: el fenotipo, thc, y: × cosecha, dia: el de plantar, g y t: lo que hay
 // en el secadero y su THC medio, abo: 0 sin abono, 1 MEATZA, 2 ORTUA BIO}), ab: {m, o}: dosis de floración de cada marca en la estantería}
-const naveNueva=()=>({m:Array(NAVE.max).fill(null),ab:{m:0,o:0},f:Array(NAVE.max).fill('led'),ex:0,rg:0,ma:[]});   // 1.34: las madres (ma)
+const naveNueva=()=>({m:Array(NAVE.max).fill(null),ab:{m:0,o:0},f:Array(NAVE.max).fill('led'),ex:0,rg:0,ma:[],r:S.day+RECIBO.dias});   // 1.34: las madres (ma); 1.35: el día del recibo (r)
 const naveStock=()=>S.nave?S.nave.m.reduce((a,M)=>a+(M?M.g:0),0):0;
 function faseMesa(i){const M=S.nave&&S.nave.m[i];if(!M)return 0;const d=S.day-M.dia;return d<1?1:d<3?2:d<NAVE.crece?3:4;}
 const thcNave=(sid,f)=>Math.round(getStrain(sid).thc*(f?f.t:1)*NAVE.thc*10)/10;
@@ -303,19 +351,31 @@ const calorNave=()=>S.nave.m.reduce((a,M,i)=>a+(M?FOCO_NAVE[S.nave.f[i]].calor:0
 const sofocoNave=()=>Math.max(.6,1-.08*Math.max(0,calorNave()-EXTR_NAVE[S.nave.ex].cap));
 const dosisTxt=n=>String(Math.round(n*10)/10).replace('.',',');   // con el controlador o la máquina se gastan 0,8 o 0,7: lo que queda, con su decimal
 // lo que se ve del equipo (montarNave, al entrar y al comprar): [x, y, objeto, de qué (ex, rg), desde el nivel, hasta el nivel];
-// en la pared, los extractores (extrN, el de 250 mm; extrG, el de 315), los filtros de carbón y el controlador; en el suelo, junto a la
-// estantería, el tanque y la máquina
-const EQUIPO_NAVE=[[10,1,'extrN','ex',1,1],[10,1,'extrG','ex',2,3],[3,1,'extrG','ex',3,3],[9,1,'filtroN','ex',1,3],[7,1,'filtroN','ex',2,3],
-  [4,1,'filtroN','ex',3,3],[8,1,'filtroN','ex',3,3],[5,1,'ctrlN','rg',2,3],[1,2,'tanqueN','rg',1,3],[2,2,'riegoN','rg',3,3]];
+// en la pared, los extractores (extrN, el de 250 mm; extrG, el de 315) y los filtros de carbón; en el suelo, junto a la estantería, el
+// tanque y, a su lado, la máquina, con el controlador en la pared de al lado (1.35: donde salen las electroválvulas)
+const EQUIPO_NAVE=[[10,1,'extrN','ex',1,1],[10,1,'extrG','ex',2,3],[5,1,'extrG','ex',3,3],[9,1,'filtroN','ex',1,3],[7,1,'filtroN','ex',2,3],
+  [4,1,'filtroN','ex',3,3],[8,1,'filtroN','ex',3,3],[3,1,'ctrlN','rg',2,3],[1,2,'tanqueN','rg',1,3],[2,2,'riegoN','rg',3,3]];
 function montarNave(){
   const n=MAPS.nave;if(!n)return;
   for(const [x,y] of EQUIPO_NAVE)ob(n,x,y,null);
   if(S&&S.nave)for(const [x,y,o,k,a,b] of EQUIPO_NAVE)if(S.nave[k]>=a&&S.nave[k]<=b)ob(n,x,y,o);
 }
-// la manguera del riego (1.33): del tanque, por el pie de la pared, y una bajada a cada mesa, por detrás (rectángulos [x, y, w, h, color])
+// el riego de la nave (1.35, lo pidió el usuario: realista; rectángulos [x, y, w, h, color]): el agua entra por el grifo de la pared,
+// encima del tanque, y cae dentro por su manguera; de la bomba (o de la máquina) sale la tubería de PE por el pie de la pared (RIEGO_Y),
+// detrás de los muebles, sujeta con abrazaderas, y en cada mesa (RIEGO_X: por un hueco de la fila del fondo) una T con su llave de bola
+// (rg 1) o su electroválvula (rg ≥ 2, con el cable del controlador por la pared, RIEGO_CABLE) y la bajada por el suelo hasta la bandeja
+const RIEGO_X=[40,72,136,184],RIEGO_Y=30,RIEGO_CABLE=23,RIEGO_CTRL=[50,62];
 function mangueraNave(){
-  if(!S.nave||!S.nave.rg)return [];const y=34,o=[[1*16+15,y,12*16+16-(1*16+15),1,'#3a3c44'],[1*16+15,y+1,12*16+16-(1*16+15),1,'#1c1d22']];
-  for(const x of MESAS_X)o.push([x*16+16,y+2,1,57-(y+2),'#1c1d22']);
+  if(!S.nave||!S.nave.rg)return [];const rg=S.nave.rg,y=RIEGO_Y,K='#1c1d22',G='#3a3c44',L='#8a92a2',o=[];
+  o.push([24,0,1,12,'#a46e40'],[25,0,1,12,'#dcac6c'],[22,12,5,2,L],[23,10,3,1,'#e04040'],[24,9,1,1,'#e04040'],[24,14,1,2,L],[24,16,1,7,G]);   // el grifo y su manguera
+  o.push([24,y,RIEGO_X[3]+1-24,1,G],[24,y+1,RIEGO_X[3]+1-24,1,K]);   // la tubería
+  for(let x=56;x<RIEGO_X[3];x+=32)o.push([x,y-1,1,3,L]);   // abrazaderas
+  RIEGO_X.forEach(x=>{
+    o.push([x,y+2,1,57-(y+2),K],[x+1,y+2,1,57-(y+2),G]);   // la bajada, por el suelo
+    if(rg<2)o.push([x-1,y-1,3,2,L],[x-1,y-2,3,1,'#e04040']);   // llave de bola
+    else{o.push([x-1,y-2,3,3,'#4a72c2'],[x-1,y-5,3,3,'#26262e']);   // electroválvula, con su cable hasta el controlador
+      const c=x<RIEGO_CTRL[0]?RIEGO_CTRL[0]:RIEGO_CTRL[1];o.push([x,RIEGO_CABLE,1,y-5-RIEGO_CABLE,'#26262e'],[Math.min(x,c),RIEGO_CABLE,Math.abs(c-x)+1,1,'#26262e']);}
+  });
   return o;
 }
 // los dos focos de la mesa i (1.33): de su tipo, encendidos con la mesa plantada (focoN-<tipo>-<0|1>), colgados a FOCO_AIRE px de lo

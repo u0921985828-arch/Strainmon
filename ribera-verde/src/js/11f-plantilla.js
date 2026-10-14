@@ -127,11 +127,11 @@ function plantillaDia(){
   if(vende)queue('historia',checkStory);   // 1.22: lo vendido cuenta para la historia
   naveDia();
 }
-// la nave: el alquiler, lo primero de la mañana (antes que los sueldos; sin él, Arrieta cambia la cerradura y se queda la fianza)
+// la nave: el alquiler, lo primero de la mañana (antes que los sueldos; sin él, Arrieta cambia la cerradura y se queda la fianza).
+// 1.35: cada RECIBO.dias, en efectivo, con su aviso (cobra, 11k-banco)
 function naveAlquiler(){
-  if(!S.nave)return;
-  if(S.money<NAVE.dia){deLaNave().forEach(libre);S.nave=null;queue('nave',()=>talk('SMS · ARRIETA',['No me has pagado la nave. Cambio la cerradura y me quedo la fianza.']));return;}
-  S.money-=NAVE.dia;
+  if(!S.nave||cobra(S.nave,RECIBO.nave(),'ARRIETA',false,'la nave'))return;
+  deLaNave().forEach(libre);S.nave=null;queue('nave',()=>talk('SMS · ARRIETA',['No me has pagado la nave. Cambio la cerradura y me quedo la fianza.']));
 }
 // después de la calle, la redada (menos con cuidado) y lo que da cada mesa que ya da (1.30): cada trabajador cuida la suya (w.mesa);
 // naveG × el rendimiento de lo plantado y, con su abono y dosis en la estantería, lo del abono (ABONO, ABONO_BIO), al secadero de
@@ -166,9 +166,10 @@ async function talkNave(){
   const A='ARRIETA',N=S.nave;
   if(S.ch<NAVE.ch)return say('La nave no se alquila. Ahora mismo, no.',A);
   if(!N){
-    if(await ask(`La nave está vacía: ${eur(NAVE.fianza)} de fianza y ${eur(NAVE.dia)} al día, que te cobro cada mañana. Sin preguntas.`,['Alquilarla','No'],A)!==0)return;
-    if(S.money<NAVE.fianza){sfx('bad');return say('Sin la fianza no hay llave.',A);}
-    S.money-=NAVE.fianza;S.nave=naveNueva();sfx('coin');await got('la llave de la nave');
+    const e=NAVE.fianza+RECIBO.nave();   // 1.35: la fianza y la primera semana; después, cada RECIBO.dias, en efectivo
+    if(await ask(`La nave está vacía: ${eur(NAVE.fianza)} de fianza y ${eur(RECIBO.nave())} cada ${RECIBO.dias} días, en efectivo; el primero, ahora. Paso a cobrar y te aviso antes. Sin preguntas.`,['Alquilarla','No'],A)!==0)return;
+    if(S.money<e){sfx('bad');return say(`Sin ${eur(e)} no hay llave.`,A);}
+    S.money-=e;S.nave=naveNueva();sfx('coin');await got('la llave de la nave');
     return say(`Dentro hay ${NAVE.max} mesas de cultivo, una por persona. Pon a tu gente desde el móvil y planta tú lo que quieras.`,A);
   }
   const op=['Dejar la nave','Nada'][await ask(`La nave: ${N.m.filter(Boolean).length} de ${NAVE.max} mesas plantadas · ${naveros().length} de ${NAVE.max} trabajando. Lo demás, dentro.`,['Dejar la nave','Nada'],A)];

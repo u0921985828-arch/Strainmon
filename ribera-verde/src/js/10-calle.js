@@ -28,23 +28,23 @@ function spawnClients(){
         S.clients.push({id,map,x:t[0],y:t[1],type,want:ri(ct.g[0],ct.g[1]),minThc:type==='pij'?Math.min(24,15+S.ch):(type==='tur'&&Math.random()<.4?15:0),look:randLook(id,'client')});}
     };
     for(const [map,nz,types] of zonas)pon(map,nz,types,'');
-    if(S.ch>=3&&S.items.prensa)for(const [map,nz] of [['town',2],['astilleros',1],['puerto',1],['valdehierro',1]].concat(S.ch>=4?[['ibarbide',1],['ensanche',1]]:[]))pon(map,nz,['ext'],'x');
+    if(S.ch>=3&&extrAlgo())for(const [map,nz] of [['town',2],['astilleros',1],['puerto',1],['valdehierro',1]].concat(S.ch>=4?[['ibarbide',1],['ensanche',1]]:[]))pon(map,nz,['ext'],'x');
   }
   if(ZONAS[S.map])buildEnts();
 }
 function removeClient(id){S.clients=S.clients.filter(c=>c.id!==id);ents=ents.filter(e=>e.id!==id);}
-// el catador (1.10) solo compra rosin: a precioRosin, y el «caro» cuela según lo que pase del 50 % de THC
+// el catador (1.10) solo compra extracciones (1.35: todas, a precioRosin × px): el «caro» cuela según lo que pase del 50 % de THC
 async function talkClient(c){
   const ct=CTYPES[c.type],N=c.n||ct.label,ext=c.type==='ext';   // n: el nombre de un cliente de la agenda (12b-movil)
   await say(pick(ct.greet),N);
-  await say(ext?`Busco ${c.want} g de rosin.`:`Busco ${c.want} g${c.minThc?` de algo potente, mínimo ${c.minThc}% de THC`:''}.`,N);
+  await say(ext?`Busco ${c.want} g de rosin o de hachís.`:`Busco ${c.want} g${c.minThc?` de algo potente, mínimo ${c.minThc}% de THC`:''}.`,N);
   const lots=ext?rosinLots(c.want):budLots(c.want,c.minThc);
   if(!lots.length)return say((ext?totalRosin():totalBuds())>0?'Eso no me vale. Vuelve cuando tengas lo que busco.':'¿No llevas nada? Vale.',N);
   const i=await menu(lots.map(ext?rosinItem:lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué le vendes?'});
   if(i<0||i>=lots.length)return say('Vale, otro día.',N);
-  const [sid,b]=lots[i],base=(ext?precioRosin(b.thc):precioCalle(b.thc)*calidad(b))*ct.mult*ZONAS[c.map||'town'].precio*rivalF(c.map||'town')*c.want;
+  const [sid,b]=lots[i],xn=ext?EXTR[tipoExtr(sid)].n.toLowerCase()+' ':'',base=(ext?precioRosin(b.thc)*EXTR[tipoExtr(sid)].px:precioCalle(b.thc)*calidad(b))*ct.mult*ZONAS[c.map||'town'].precio*rivalF(c.map||'town')*c.want;
   const pr=[Math.round(base*.85),Math.round(base),Math.round(base*1.3)];
-  const j=await ask(`${c.want} g de ${ext?'rosin de ':''}${lotNombre(sid)}. ¿Cuánto le pides?`,[`Rebaja · ${pr[0]} €`,`Justo · ${pr[1]} €`,`Caro · ${pr[2]} €`,'Cancelar']);
+  const j=await ask(`${c.want} g de ${ext?xn+'de ':''}${lotNombre(sid)}. ¿Cuánto le pides?`,[`Rebaja · ${pr[0]} €`,`Justo · ${pr[1]} €`,`Caro · ${pr[2]} €`,'Cancelar']);
   if(j===3)return say('Entonces me voy.',N);
   let acc=[1,.92,clamp(.3+(b.thc-(ext?50:c.minThc||14))*.05+(c.type==='pij'?.25:0)+(c.type==='tur'?.15:0)+(c.type==='vip'?.3:0),.1,.9)][j];
   if(j>0)acc=Math.min(.97,acc+(c.fid?rel(c.fid)/250:0)+(b.cata?.05:0)+(b.ana?.1:0));   // 1.15: la confianza de los de la agenda, la cata y el análisis
@@ -55,7 +55,7 @@ async function talkClient(c){
     await accion('vender',{id:'vfx-monedas',x:P.px+8,y:P.py+2});
     removeClient(c.id);apuntaFijo(c);
     await say(pick(['Trato hecho.','Gracias. Nos vemos.','Bien. Se lo diré a mis amigos.']),N);
-    toast(`+${eur(pr[j])} · ${c.want} g ${ext?'de rosin ':''}vendidos`,1600);
+    toast(`+${eur(pr[j])} · ${c.want} g ${ext?'de '+xn:''}vendidos`,1600);
     vistoVender();heatWarn();await checkStory();rivalVenta(c.map||'town');
     // en las esquinas de Darko (1.10), 1 de cada 3 ventas acaba con uno de sus chicos encima
     if(c.map==='astilleros'&&!S.flags.darkoFin&&Math.random()<1/3){await say('Uno de los chicos de Darko te ha visto vender.');await say('«Te dijimos que lejos de nuestras esquinas.»','CHICO DE DARKO');await battle('thief');}
