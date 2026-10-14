@@ -15,6 +15,7 @@ const Cultivo = preload("res://src/cultivo.gd")
 const Procedural = preload("res://src/procedural.gd")
 const Vista = preload("res://src/vista.gd")
 const Arte = preload("res://src/arte.gd")
+const Escena = preload("res://src/escena_extr.gd")
 
 const SH := 180   # 1.12 (ui.gd); las escenas de 240 × 160 van abajo: OY
 const DIR4 := {"down": "south", "up": "north", "left": "west", "right": "east"}
@@ -426,6 +427,8 @@ func _tiro() -> void:
 		_rect(x0 + Datos.jsround(B.falta * w), y0, w - Datos.jsround(B.falta * w), 8, css("#e04040"))
 	_rect(x0 + Datos.jsround((J.centro_tiro(J.TIRO, now) - a) * w), y0, Datos.jsround(2 * a * w), 8, css("#58d080"))
 	_rect(x0 + Datos.jsround(p * (w - 2)), y0 - 1, 2, 10, css("#ffffff"))
+	if J.TIRO.has("esc"):   # 1.38: la escena de la extracción, encima de la barra
+		Escena.pinta(self, J.TIRO, now, (J.SW - Escena.W) >> 1, y0 - Escena.H - 10)
 
 func _farola(a: float) -> Image:
 	var key := "far|%f" % a

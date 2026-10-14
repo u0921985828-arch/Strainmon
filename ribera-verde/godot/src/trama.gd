@@ -4022,6 +4022,10 @@ func tiro_billar(txt: String, fase := "fuerza", a := 0.0, per := -1.0, nom := "B
 	await type_text(txt, nom)
 	var pr := Motor.Prom.new()
 	TIRO = {"t0": M.reloj - Cultivo.azar() * per, "f": fase, "a": a, "per": per, "mov": float(o.get("mov", 0)), "ritmo": float(o.get("ritmo", 0))}
+	if o.has("esc"):   # 1.38: la escena de la extracción encima de la barra (escena_extr.gd)
+		TIRO.esc = o.esc
+		TIRO.paso = o.paso
+		TIRO.n = o.n
 	push(func(b: String):
 		if b == "A":
 			pop()
@@ -4083,8 +4087,9 @@ func extraer(t: String):
 	var g: int = ops[j]
 	await say(E.d, N)
 	var ok := 0
-	for p in E.pasos:
-		var d: float = await tiro_billar(p[0], "dir", p[1], E.per, N, E)
+	for ip in E.pasos.size():
+		var p: Array = E.pasos[ip]
+		var d: float = await tiro_billar(p[0], "dir", p[1], E.per, N, E.merged({"esc": t, "paso": ip, "n": E.pasos.size()}, true))
 		if absf(d - float(D.BILLAR.centro)) <= p[1]:
 			ok += 1
 	var q: float = float(ok) / E.pasos.size()

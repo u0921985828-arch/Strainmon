@@ -1,5 +1,41 @@
 # Cambios
 
+## 1.38.0 · 14 de octubre de 2026
+
+Cada extracción se ve mientras se hace (lo pidió el usuario: «que sea visual»). Solo Godot, 0.32.0.
+
+- **Encima de la barra, la escena del paso** (`escena_extr.gd`, 160 × 76). Las máquinas son las del piso (`extraccion.py`), con sus colores y sus piezas, a 3 o 4 veces su tamaño, y se mueven como en el proceso de verdad. Abajo, a la derecha, un punto por paso: el de ahora, en verde.
+- **Ice-o-lator en lavadora:** la lavadora de carga superior, con la cuba azul translúcida.
+  - Al cargar, entra el agua con hielo y el termómetro marca la barra (por debajo de 4 °C).
+  - En el lavado, a baja velocidad, los cogollos y los cubitos dan vueltas dentro, a un lado y al otro, con espuma; la lavadora tiembla y su luz verde parpadea.
+  - En el reposo, la manguera desagua al cubo de las bolsas.
+  - Al recoger, cada bolsa (120, 90 y 73) sube, escurre y deja la resina en el fondo, y pasa al tamiz de secar.
+- **Ice-o-lator a mano:** el cubo de 20 L con las bolsas colgadas del borde, abierto por delante.
+  - El hielo flota y el termómetro está a 1–3 °C.
+  - La pala de madera remueve 15 minutos, con su reloj de cocina.
+  - Se saca cada bolsa, de la de trabajo (220) a la fina; escurre y la resina va con la cuchara al cartón.
+  - Al final, se desmenuza con el colador y se seca al aire del ventilador.
+- **Dry sift:** el bastidor de madera con la seda (el de los tamices del piso).
+  - Los cogollos desmenuzados saltan encima mientras las manos lo menean.
+  - El polen cae al papel de cocina de la mesa: verdoso en el de 220, dorado en los finos.
+  - El montón crece, la malla se cierra en cada paso y los tamices que quedan esperan apilados.
+  - En el último paso, la tarjeta lo junta.
+- **Rosin:** la prensa de palanca roja con sus planchas.
+  - Al precalentar, la luz parpadea y el brillo es la barra.
+  - Al apretar, la palanca baja despacio, la bolsa se aplasta y el rosin sale por los lados del papel.
+  - Al soltar, el papel sale con el charco y se recoge con la herramienta.
+- **Charas:** las palmas frotan la cola de la planta viva, en el monte, y se van oscureciendo. Después se rasca la resina y se amasa la bola.
+- **Hachís prensado:** el kief envuelto en papel, tibio en la misma prensa. Al apretar se vuelve una placa marrón.
+- **Moonrock:** el rosin se funde en su bote sobre la placa. El cogollo se baña con las pinzas, se reboza en el kief del cristal y se seca en la rejilla.
+- **Static:** la máquina negra con su bandeja, las guías y la pantallita.
+  - La flor congelada se tamiza a la bandeja.
+  - La placa se carga con el paño y saltan chispas.
+  - La altura de la placa es la barra: lejos, no sube nada; a su altura, suben las cabezas; demasiado cerca, sube también la hoja.
+  - Al final, la tarjeta rasca la placa.
+- El proceso se ha mirado en guías de extracción sin disolventes (agua con hielo a 1:1 y por debajo de 4 °C, 15–20 minutos suaves, reposo y bolsas de la gruesa a la fina; tamices de seda y flor congelada; papel de horno y presión poco a poco; carga estática; charas de la planta viva; moonrock bañado y rebozado).
+- `extraer` pasa a `tiro_billar` la extracción y el paso (`TIRO.esc`, `paso`, `n`). El billar y las pantallas de antes no los llevan y no cambian.
+- Prueba nueva, `tests/extracciones.gd`: en cada tipo y paso (28 escenas) comprueba que la escena se pinta y se mueve.
+
 ## 1.37.0 · 14 de octubre de 2026
 
 Ordenar la casa, la asociación y la nave (lo pidió el usuario). Godot, 0.31.0.
