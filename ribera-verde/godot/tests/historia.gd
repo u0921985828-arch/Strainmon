@@ -227,6 +227,15 @@ func dif(ruta: String, a, b, out: Array) -> void:
 const NUEVO_TIENDA := " | Arcón congelador"
 # y el carro de esquejes (1.40): se ve por dentro, sin el texto ni el menú de antes (el taco se elige con gancho_carro)
 const CARRO_FUERA := ["El carro de esquejes: ", "  [menú] Pinchar esquejes | "]
+# y la nave por ciclos (1.41): del paso de la plantilla, del menú de la mesa 1 al secadero (lo comprueba tests/nave.gd), sin las R de
+# la nave de antes; el texto del sodio (da menos por vatio que el LED) y lo que daba cada mesa al día en la nave equipada
+const NAVE_PASO := "La plantilla (1.19)"
+const NAVE_DESDE := "Mesa 1 · vacía · LED de barras"
+const NAVE_HASTA := "Descuelgas "
+const NAVE_R := {"La plantilla (1.19)": ["mesa", "crece", "cd", "abono", "b", "rec", "cd2", "cd3", "p1", "seco", "sec"], "La nave equipada (1.33)": ["dia"]}
+# el aviso al plantar una mesa (1.41: el ciclo y los días hasta la cosecha), como el de antes
+var PLANTA_NUEVA := RegEx.create_from_string(": enraízan, crecen a 18/6 y florecen a 12/12\\. Se cosecha entera en unos \\d+ días y vuelve a empezar\\.$")
+const SODIO_ANTES := "Dos campanas de 600 W con su balastro: más gramos, pero calientan el doble."
 
 func compara(i: int, log: Array) -> void:
 	if i >= O.pasos.size():
@@ -240,8 +249,13 @@ func compara(i: int, log: Array) -> void:
 		out.append("ok: godot %s ≠ html %s" % [pasos[i].ok, o.ok])
 	# la transcripción, línea a línea (la primera diferencia y el resto en una)
 	var ol: Array = o.log.filter(func(l): return not CARRO_FUERA.any(func(c): return str(l).begins_with(c)))
+	ol = ol.map(func(l): return str(l).replace(SODIO_ANTES, D.FOCO_NAVE.sodio.d))
+	if o.name.begins_with(NAVE_PASO):
+		var a: int = ol.find(ol.filter(func(l): return l.begins_with(NAVE_DESDE))[0])
+		var b: int = ol.find(ol.filter(func(l): return l.begins_with(NAVE_HASTA))[0])
+		ol = ol.slice(0, a) + ol.slice(b + 1)
 	for k in maxi(log.size(), ol.size()):
-		var a = (log[k] if k < log.size() else "(nada)").replace(NUEVO_TIENDA, "")
+		var a = PLANTA_NUEVA.sub((log[k] if k < log.size() else "(nada)").replace(NUEVO_TIENDA, ""), ". A los %d días empieza a dar." % int(D.NAVE.crece))
 		var b = ol[k] if k < ol.size() else "(nada)"
 		if a != b:
 			out.append("log[%d]:\n      godot %s\n      html  %s" % [k, a, b])
@@ -251,7 +265,14 @@ func compara(i: int, log: Array) -> void:
 	dif("S", norm(J.S), o.get("S"), out)
 	if int(o.pm) != Cultivo.pm:
 		out.append("pm: godot %d ≠ html %d" % [Cultivo.pm, int(o.pm)])
-	dif("R", norm(R), o.get("R"), out)
+	var oR = o.get("R")
+	for k in NAVE_R:
+		if o.name.begins_with(k):
+			oR = oR.duplicate()
+			for x in NAVE_R[k]:
+				oR.erase(x)
+				R.erase(x)
+	dif("R", norm(R), oR, out)
 	dif("I", norm(I), o.get("I"), out)
 	dif("TO", norm(TO), o.get("TO"), out)
 	var ents := []
@@ -1859,6 +1880,7 @@ func _pasos() -> void:
 		var fert0 = J.S.items.fert
 		R.mesa = jn([itz.mesa, J.rol_desc(itz)])
 		J.S.esquejes.append({"sid": "ria", "f": {"id": 999, "t": 1, "y": 1, "i": 50}, "dia": J.S.day})
+		var ln0 := LOG.size()   # 1.41: de aquí al secadero, fuera de la comparación (NAVE_DESDE)
 		want(["^Plantar", "^Esqueje .* nº 999"])
 		await run(func(): await J.mesa_nave(0))
 		var M0: Dictionary = J.S.nave.m[0]
@@ -1867,7 +1889,7 @@ func _pasos() -> void:
 		R.m = J.S.money
 		await dia.call(.99)
 		R.crece = jn([M0.g, R.m - J.S.money])
-		R.cd = jn([M0.cd, J.S.day])
+		R.p1 = M0.p
 		J.S.items.fert = 3
 		want(["^Dejar MEATZA"])
 		await run(func(): await J.estante_nave())
@@ -1875,16 +1897,23 @@ func _pasos() -> void:
 		await run(func(): await J.mesa_nave(0))
 		R.ab = jn([J.S.nave.ab.m, J.S.items.fert, M0.abo])
 		await dia.call(.99)
-		R.abono = jn([M0.g, M0.t, J.S.nave.ab.m])
+		R.abono = jn([M0.g, M0.t, J.S.nave.ab.m, M0.p, M0.am, M0.dn])
 		J.S.items.fert = fert0
 		R.b = J.S.buds.ria.g
 		await run(func(): await J.secadero_nave())
 		R.rec = jn([J.S.buds.ria.g - R.b, M0.g, J.fase_mesa(0)])
-		R.cd2 = M0.cd
+		R.sec = LOG[-1]
+		LOG = LOG.slice(0, ln0)
 		M0.g = .4   # lo que queda por debajo de 1 g no se recoge: la cosecha nueva lleva su día
 		M0.cd = int(J.S.day) - 5
 		await dia.call(.99)
-		R.cd3 = jn([M0.cd, J.S.day])
+		R.cd3 = jn([M0.h.g, M0.h.d - J.S.day, M0.p, M0.n, M0.cd, M0.g])
+		J.S.day += 1
+		Cultivo.fijo = .99
+		J.nave_dia()
+		Cultivo.fijo = -1
+		R.seco = jn([M0.get("h") == null, M0.cd - J.S.day, M0.g])
+		J.S.day -= 1
 		M0.g = 0
 		R.h = J.S.heat
 		await dia.call(0)
@@ -1934,14 +1963,16 @@ func _pasos() -> void:
 			var N: Dictionary = D.NAVE
 			var g1: float = N.g + 2 * N.gC
 			var t1: float = Datos.jsround(J.strain("ria").thc * N.thc * 10) / 10.0
-			var g2: float = Datos.jsround(g1 * (1 + D.ABONO.rend) * 10) / 10.0
+			# 1.41: la mesa entera al final del ciclo (3 mañanas de la Skunk #1, 2 de ellas con MEATZA): W × g/W × variedad × cuidado × abono
+			var gc: float = Datos.jsround(float(D.FOCO_NAVE.led.w) * float(D.FOCO_NAVE.led.gpw) * float(J.strain("ria").y) / float(D.Y_MEDIA) * g1 / float(N.g) * (1 + float(D.ABONO.rend) * 2 / 3.0) * 10) / 10.0
 			return chk(R.w1 == "Itziar,5,5,5," and R.n2 == 1 and R.w2 == "Mikel,1,1,1," and R.w3 == "Iker,3,3,3," and R.pl == "4,%d" % (4 * int(P.sobre)) and R.calle == "calle,ria,25,75" and R.ops == 1
 				and R.venta == jn([22, R.e, P.calor]) and R.arc == R.gc - int(floor(R.gc * P.sisa * 2)) and R.pot == null
 				and R.poli == jn([null, true, P.calor + P.calorPoli, P.sueldo.gerente])
 				and R.robo == 12 and R.timo == 10 and R.fuga == "Itziar,Iker" and R.sin == ",10" and R.ar == "17,7" and R.nave == jn([true, N.fianza + J.recibo_nave()])
-				and R.mesa == "0,Cultiva la mesa 1 de la nave por %s al día: %s g." % [Datos.eur(P.sueldo.nave), Datos.js_num(g1)] and R.cd.split(",")[0] == R.cd.split(",")[1] and Datos.js_num(R.cd2) == R.cd.split(",")[1] and R.cd3.split(",")[0] == R.cd3.split(",")[1]
-				and R.var == jn(["ria", t1, 0, false, 1]) and R.crece == jn([g1, P.sueldo.nave]) and R.ab == "3,0,1"
-				and R.abono == jn([g1 + g2, Datos.jsround((t1 * g1 + (t1 + D.ABONO.thc) * g2) / (g1 + g2) * 10) / 10.0, 2]) and R.rec == jn([g1 + g2, 0, 4])
+				and R.mesa == "0,Cultiva la mesa 1 de la nave por %s al día: con su cuidado, la cosecha da un %d %%." % [Datos.eur(P.sueldo.nave), Datos.jsround(100 * g1 / N.g)]
+				and R.var == jn(["ria", t1, 0, false, 1]) and R.crece == jn([0, P.sueldo.nave]) and R.p1 == .52 and R.ab == "3,0,1"
+				and R.abono == jn([0, 0, 2, .92, 1, 2]) and R.rec == jn([0, 0, 4]) and R.sec.begins_with("El secadero está vacío.")
+				and R.cd3 == jn([gc, 0, N.clon, 1, int(J.S.day) - 5, .4]) and R.seco == jn([true, -1, Datos.jsround((.4 + gc) * 10) / 10.0])
 				and R.redada == jn([true, "Iker", N.calor])
 				and R.dejar == jn([true, N.fianza]) and R.impago == "true,50" and R.menus == 2
 				and LOG.has("SMS · PATXI: Te mando a Itziar. Vale oro.") and LOG.has("Mikel se va por donde ha venido. El sobre ya es de Patxi.") and LOG.has("SMS · PATXI: Te mando a Iker. Gente normal del barrio.")
@@ -2295,7 +2326,7 @@ func _pasos() -> void:
 		Cultivo.fijo = .99
 		J.nave_dia()
 		Cultivo.fijo = -1
-		R.dia = jn([N.m[0].g, N.m[0].t, N.m[1].g, N.m[1].t, N.ab.m, J.S.get("nave") != null])
+		R.dia = jn([N.m[0].h.g, N.m[0].h.t, N.m[1].h.g, N.m[1].h.t, N.ab.m, J.S.get("nave") != null])   # 1.41: la mesa de antes acaba su ciclo esa mañana
 		J.S.nave = {"m": [null, null, null, null], "ab": {"m": 0, "o": 0}}
 		J.migrate()
 		R.mig = jn([",".join(PackedStringArray(J.S.nave.f)), J.S.nave.ex, J.S.nave.rg])
@@ -2305,8 +2336,9 @@ func _pasos() -> void:
 		func():
 			var F: Dictionary = D.FOCO_NAVE
 			var RG: Array = D.RIEGO_NAVE
-			var g0: float = Datos.jsround(float(D.NAVE.g) * 1 * float(F.sodio.rend) * (1 + float(RG[2].rend)) * 1 * (1 + float(D.ABONO.rend)) * 10) / 10.0
-			var g1: float = Datos.jsround((float(D.NAVE.g) + 2 * float(D.NAVE.gC)) * 1 * float(F.lec.rend) * (1 + float(RG[2].rend)) * 1 * 10) / 10.0
+			var yr: float = float(J.strain("ria").y) / float(D.Y_MEDIA)
+			var g0: float = Datos.jsround(float(F.sodio.w) * float(F.sodio.gpw) * yr * (1 + float(RG[2].rend)) * 1 * (1 + float(D.ABONO.rend)) * 10) / 10.0
+			var g1: float = Datos.jsround(float(F.lec.w) * float(F.lec.gpw) * yr * (float(D.NAVE.g) + 2 * float(D.NAVE.gC)) / float(D.NAVE.g) * (1 + float(RG[2].rend)) * 1 * 10) / 10.0
 			return chk(R.def == "led,led,led,led,0,0,0,1,-,-,-,-,-,-,-,-,-,-" and R.c4 == "4,1" and R.sodio == jn(["sodio,led,led,led", F.sodio.p, 5, 1 - .08])
 				and R.lec == jn(["lec", float(F.sodio.p) + float(F.lec.p), 5.5, 1 - .08 * 1.5])
 				and R.mej == jn([1, 2, float(D.EXTR_NAVE[1].p) + float(RG[1].p) + float(RG[2].p), "extrN,extrN,-,filtroN,-,-,-,ctrlN,tanqueN,-", 1])

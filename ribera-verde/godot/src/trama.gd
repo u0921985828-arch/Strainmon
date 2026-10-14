@@ -3388,7 +3388,7 @@ func rol_desc(w: Dictionary) -> String:
 		"gerente":
 			return "Cuida el piso y cosecha a la caja fuerte por %s al día." % Datos.eur(P.sueldo.gerente)
 		"nave":
-			return "Cultiva la mesa %d de la nave por %s al día: %d g." % [int(w.mesa) + 1, Datos.eur(P.sueldo.nave), nave_g(w)]
+			return "Cultiva la mesa %d de la nave por %s al día: con su cuidado, la cosecha da un %d %%." % [int(w.mesa) + 1, Datos.eur(P.sueldo.nave), Datos.jsround(100.0 * nave_g(w) / float(D.NAVE.g))]
 		"madres":   # 1.34
 			return "Cuida las madres de la nave por %s al día y les saca esquejes." % Datos.eur(P.sueldo.madres)
 	return "Dale trabajo: calle, gerente, nave o las madres."
@@ -3647,14 +3647,24 @@ func nave_alquiler() -> void:
 	S.nave = null
 	queue("nave", func(): await talk("SMS · ARRIETA", ["No me has pagado la nave. Cambio la cerradura y me quedo la fianza."]))
 
-# después de la calle, la redada (menos con cuidado) y lo que da cada mesa que ya da (1.30): cada trabajador cuida la suya (w.mesa);
-# nave_g × el rendimiento de lo plantado y, con su abono y dosis en la estantería, lo del abono (ABONO, ABONO_BIO), al secadero de
-# esa mesa (Me.g, con su THC medio, Me.t, y el día de la cosecha de lo más viejo que cuelga, Me.cd: 1.31)
+# después de la calle, la redada (menos con cuidado) y el ciclo de cada mesa (1.41, lo pidió el usuario: por ciclos, como de verdad).
+# Los clones de la madre enraízan, crecen a 18/6 y florecen a 12/12 al ritmo de su variedad (prog_mesa: 1/d al día, como en el piso,
+# desde NAVE.clon); al acabar, el navero corta la mesa entera y la cuelga en el secadero (Me.h: {g, t, d}) y vuelve a empezar con
+# los esquejes que sacó antes de pasar a flor. Lo de la cosecha: los W de sus focos × g/W (FOCO_NAVE.gpw) × la variedad y el
+# fenotipo × el cuidado del navero (nave_g / NAVE.g) × el riego × el calor; el abono, por los días del ciclo que lo tuvo (Me.am,
+# Me.ao de Me.dn). Lo colgado se seca NAVE.seca días y pasa a lo que se descuelga (Me.g, con su THC, Me.t, y el día de la cosecha, Me.cd)
 func nave_dia() -> void:
 	var N = S.get("nave")
 	if N == null:
 		return
 	madres_dia()   # 1.34
+	for Me in N.m:
+		if Me and Me.get("h") != null and S.day - int(Me.h.d) >= int(D.NAVE.seca):
+			if not (Me.g >= 1):   # lo que queda por debajo de 1 g no se recoge: cuenta como vacío
+				Me.cd = int(Me.h.d)
+			Me.t = Datos.jsround((Me.t * Me.g + Me.h.t * Me.h.g) / (Me.g + Me.h.g) * 10) / 10.0
+			Me.g = Datos.jsround((Me.g + Me.h.g) * 10) / 10.0
+			Me.erase("h")
 	var W := naveros()
 	if W.is_empty() or not N.m.any(func(x): return x != null):
 		return
@@ -3671,29 +3681,61 @@ func nave_dia() -> void:
 		sfx("bad")
 		queue("nave", func(): await say("La policía ha entrado en la nave de Valdehierro. Se lleva las plantas%s y a %s." % [(", " + g_txt(gg)) if gg >= 1 else "", quien]))
 		return
-	# 1.33: × los focos de su mesa (FOCO_NAVE), el riego (RIEGO_NAVE: también lo que gasta de abono, R.dosis) y el calor que no saca la extracción
 	var R: Dictionary = D.RIEGO_NAVE[int(N.rg)]
 	var so := sofoco_nave()
 	for i in W.size():
 		var Me = N.m[int(W[i].mesa)]
-		if not Me or S.day - Me.dia < D.NAVE.crece:
+		if not Me:
 			continue
-		var F: Dictionary = D.FOCO_NAVE[N.f[int(W[i].mesa)]]
-		var g: float = nave_g(W[i]) * Me.y * F.rend * (1 + R.rend) * so
-		var thc: float = Me.thc + F.thc + R.thc
+		var p := prog_mesa(Me)
+		Me.dn = int(Me.get("dn", 0)) + 1
 		if Me.abo == 1 and N.ab.m >= R.dosis:
 			N.ab.m = Datos.jsround((N.ab.m - R.dosis) * 10) / 10.0
-			g *= 1 + D.ABONO.rend
-			thc += D.ABONO.thc
+			Me.am = int(Me.get("am", 0)) + 1
 		elif Me.abo == 2 and N.ab.o >= R.dosis:
 			N.ab.o = Datos.jsround((N.ab.o - R.dosis) * 10) / 10.0
-			g *= 1 + D.ABONO_BIO.rend
-			thc += D.ABONO_BIO.thc
-		g = Datos.jsround(g * 10) / 10.0
-		if not (Me.g >= 1):   # lo que queda por debajo de 1 g no se recoge: cuenta como vacío
-			Me.cd = S.day
-		Me.t = Datos.jsround((Me.t * Me.g + thc * g) / (Me.g + g) * 10) / 10.0
-		Me.g = Datos.jsround((Me.g + g) * 10) / 10.0
+			Me.ao = int(Me.get("ao", 0)) + 1
+		p += 1.0 / float(strain(lot_sid(Me.k)).d)
+		if p < 1:
+			Me.p = Datos.jsround(p * 1000) / 1000.0
+			continue
+		var c := cosecha_mesa(Me, int(W[i].mesa), W[i], so)
+		if Me.get("h") != null:
+			c.t = Datos.jsround((Me.h.t * Me.h.g + c.t * c.g) / (Me.h.g + c.g) * 10) / 10.0
+			c.g = Datos.jsround((Me.h.g + c.g) * 10) / 10.0
+		Me.h = {"g": c.g, "t": c.t, "d": S.day}
+		Me.p = float(D.NAVE.clon)
+		Me.n = int(Me.get("n", 0)) + 1
+		Me.dn = 0
+		Me.am = 0
+		Me.ao = 0
+
+# lo que va del ciclo de una mesa (0-1): Me.p o, en una mesa de antes de la 1.41 (por días), lo que llevaría desde que se plantó
+func prog_mesa(Me: Dictionary) -> float:
+	if Me.get("p") != null:
+		return float(Me.p)
+	return minf(.95, float(D.NAVE.clon) + float(S.day - Me.dia) / float(strain(lot_sid(Me.k)).d))
+
+# la cosecha entera de la mesa i al final del ciclo: {g, t}
+func cosecha_mesa(Me: Dictionary, i: int, w: Dictionary, so: float) -> Dictionary:
+	var N: Dictionary = S.nave
+	var F: Dictionary = D.FOCO_NAVE[N.f[i]]
+	var R: Dictionary = D.RIEGO_NAVE[int(N.rg)]
+	var dn := maxf(1, float(Me.get("dn", 1)))
+	var am := float(Me.get("am", 0)) / dn
+	var ao := float(Me.get("ao", 0)) / dn
+	var g: float = float(F.w) * float(F.gpw) * float(strain(lot_sid(Me.k)).y) / float(D.Y_MEDIA) * float(Me.y) * nave_g(w) / float(D.NAVE.g) \
+		* (1 + float(R.rend)) * so * (1 + float(D.ABONO.rend) * am + float(D.ABONO_BIO.rend) * ao)
+	var thc: float = Me.thc + float(F.thc) + float(R.thc) + float(D.ABONO.thc) * am + float(D.ABONO_BIO.thc) * ao
+	return {"g": Datos.jsround(g * 10) / 10.0, "t": Datos.jsround(thc * 10) / 10.0}
+
+# los días que le quedan a la mesa hasta la cosecha
+func cosecha_txt(Me: Dictionary) -> String:
+	var d := dias_mesa(Me)
+	return "cosecha mañana" if d == 1 else "cosecha en %d días" % d
+
+func dias_mesa(Me: Dictionary) -> int:
+	return maxi(1, ceili((1 - prog_mesa(Me)) * float(strain(lot_sid(Me.k)).d) - 1e-9))
 
 # las madres de la nave, cada mañana (1.34, MADRES de 11j-locales): con quien las cuide, a 100 de vigor y con sus esquejes; sin nadie,
 # se apagan y, a 0, se mueren
@@ -4299,14 +4341,27 @@ func nave_stock() -> float:
 	if S.get("nave") != null:
 		for Me in S.nave.m:
 			if Me:
-				t += Me.g
+				t += Me.g + (float(Me.h.g) if Me.get("h") != null else 0.0)
+	return t
+
+# lo que cuelga secándose en el secadero (1.41): g
+func colgado_nave() -> float:
+	var t := 0.0
+	if S.get("nave") != null:
+		for Me in S.nave.m:
+			if Me and Me.get("h") != null:
+				t += float(Me.h.g)
 	return t
 
 func fase_mesa(i: int) -> int:
 	if S.get("nave") == null or i < 0 or i >= S.nave.m.size() or not S.nave.m[i]:
 		return 0
-	var d: int = int(S.day - S.nave.m[i].dia)
-	return 1 if d < 1 else (2 if d < 3 else (3 if d < D.NAVE.crece else 4))
+	var Me: Dictionary = S.nave.m[i]
+	if Me.get("p") == null:   # una mesa de antes de la 1.41 (las pantallas del HTML): por días
+		var d: int = int(S.day - Me.dia)
+		return 1 if d < 1 else (2 if d < 3 else (3 if d < D.NAVE.crece else 4))
+	var p := float(Me.p)   # 1.41: por el ciclo, como las plantas del piso (plant_stage)
+	return 1 if p < .35 else (2 if p < .65 else (3 if p < .85 else 4))
 
 func thc_nave(sid: String, f) -> float:
 	return Datos.jsround(strain(sid).thc * (f.t if f else 1.0) * D.NAVE.thc * 10) / 10.0
@@ -4323,12 +4378,15 @@ func mesa_nave(i: int) -> void:
 		ops.append("Abono")
 	ops.append("Focos")
 	ops.append("Nada")
-	var que: String = (mesa_txt(Me) + " · " + D.FASE_MESA[fase_mesa(i)] + " · " + D.ABONO_MESA[int(Me.abo)]) if Me else "vacía"
+	var que: String = (mesa_txt(Me) + " · " + D.FASE_MESA[fase_mesa(i)] + " · " + cosecha_txt(Me) + " · " + D.ABONO_MESA[int(Me.abo)]) if Me else "vacía"
 	var oi: int = await ask("Mesa %d · %s · %s\n%s" % [i + 1, que, D.FOCO_NAVE[N.f[i]].n, ("La cuida " + w.n + ".") if w else "Nadie la cuida: pon a alguien de tu plantilla en la nave."], ops)
 	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 	if op == "Focos":
 		await focos_nave(i)
 	elif op == "Plantar" or op == "Arrancar y plantar":
+		if Me and Me.get("h") != null:
+			await say("Lo de esta mesa aún se está secando en el secadero: espera a descolgarlo.")
+			return
 		if Me and Me.g >= 1:
 			await say("Antes, descuelga del secadero lo de esta mesa.")
 			return
@@ -4388,9 +4446,9 @@ func plantar_mesa(i: int) -> void:
 		return
 	var sid: String = p.sid
 	var f: Dictionary = p.f
-	S.nave.m[i] = {"k": sid + ("*" if Cultivo.clase_feno(f) == "estrella" else ""), "f": f, "thc": thc_nave(sid, f), "y": f.y, "dia": S.day, "g": 0, "t": 0, "abo": 0}
+	S.nave.m[i] = {"k": sid + ("*" if Cultivo.clase_feno(f) == "estrella" else ""), "f": f, "thc": thc_nave(sid, f), "y": f.y, "dia": S.day, "g": 0, "t": 0, "abo": 0, "p": float(D.NAVE.clon), "dn": 0, "am": 0, "ao": 0, "n": 0}
 	sfx("sel")
-	await say("Mesa %d: %s%s. De la madre salen los clones para toda la mesa. A los %d días empieza a dar." % [i + 1, strain(sid).n, etiq(f), int(D.NAVE.crece)])
+	await say("Mesa %d: %s%s. De la madre salen los clones para toda la mesa: enraízan, crecen a 18/6 y florecen a 12/12. Se cosecha entera en unos %d días y vuelve a empezar." % [i + 1, strain(sid).n, etiq(f), dias_mesa(S.nave.m[i])])
 
 # la carpa de las madres (1.34, carpaMadres de 11j-locales): hasta MADRES.max madres (S.nave.ma: {k, f, v: el vigor, e: los esquejes
 # listos}); se mete una con una semilla o un esqueje; los esquejes se recogen aquí, al propagador (S.esquejes, con su tope)
@@ -4539,8 +4597,12 @@ func estante_nave() -> void:
 
 # descolgar del secadero lo que quepa en la mochila, mesa por mesa (cada una, su lote, sin curar y con el día de su cosecha, Me.cd: 1.31)
 func secadero_nave() -> void:
-	if nave_stock() < 1:
-		await say("El secadero está vacío. Cada mesa da cada mañana, a los %d días de plantarla." % int(D.NAVE.crece))
+	var cu := colgado_nave()
+	if nave_stock() - cu < 1:
+		if cu >= 1:
+			await say("En el secadero cuelgan %s secándose: mañana se pueden descolgar." % g_txt(cu))
+		else:
+			await say("El secadero está vacío. Cada mesa se cosecha entera al final de su ciclo y se seca aquí %s." % ("un día" if int(D.NAVE.seca) == 1 else "%d días" % int(D.NAVE.seca)))
 		return
 	var lleva := 0
 	var cabe := int(floor(libre_mochila()))
@@ -4558,7 +4620,7 @@ func secadero_nave() -> void:
 		return
 	sfx("get")
 	update_hud()
-	await say("Descuelgas %s del secadero." % g_txt(lleva) + ((" Quedan %s: no te caben." % g_txt(nave_stock())) if nave_stock() >= 1 else ""))
+	await say("Descuelgas %s del secadero." % g_txt(lleva) + ((" Quedan %s: no te caben." % g_txt(nave_stock() - cu)) if nave_stock() - cu >= 1 else "") + ((" Siguen colgados %s, secándose." % g_txt(cu)) if cu >= 1 else ""))
 
 func _filas_escritorio() -> Array:
 	var N: Dictionary = S.nave
@@ -4568,7 +4630,7 @@ func _filas_escritorio() -> Array:
 		var w = navero_de(i)
 		var ab: String = D.ABONO_MESA[int(Me.abo)] if Me else ""
 		rows.append({"label": "Mesa %d · %s" % [i + 1, strain(lot_sid(Me.k)).n if Me else "vacía"], "right": D.FASE_MESA[fase_mesa(i)] if Me else "",
-			"desc": ("La cuida " + w.n if w else "Nadie la cuida") + ". " + D.FOCO_NAVE[N.f[i]].n + "." + ((" %s · en el secadero, %s." % [ab.substr(0, 1).to_upper() + ab.substr(1), g_txt(Me.g)]) if Me else "")})
+			"desc": ("La cuida " + w.n if w else "Nadie la cuida") + ". " + D.FOCO_NAVE[N.f[i]].n + "." + ((" %s · %s · ciclo %d · en el secadero, %s%s." % [ab.substr(0, 1).to_upper() + ab.substr(1), cosecha_txt(Me), int(Me.get("n", 0)) + 1, g_txt(Me.g), (" y %s secándose" % g_txt(Me.h.g)) if Me.get("h") != null else ""]) if Me else "")})
 	rows.append({"label": "Estantería", "right": "%s + %s dosis" % [dosis_txt(N.ab.m), dosis_txt(N.ab.o)], "desc": "MEATZA FLORACIÓN y ORTUA BIO FLORACIÓN: %suna dosis al día por mesa con abono." % ("menos de " if int(N.rg) >= 2 else "")})
 	var E: Dictionary = D.EXTR_NAVE[int(N.ex)]
 	var so := sofoco_nave()
@@ -4655,10 +4717,8 @@ func talk_navero(i: int):
 	var t: String
 	if not Me:
 		t = "Mi mesa está vacía. Plántame algo y la saco adelante."
-	elif f < 4:
-		t = "La %s va bien: %s. A los %d días empieza a dar." % [strain(lot_sid(Me.k)).n, D.FASE_MESA[f], int(D.NAVE.crece)]
 	else:
-		t = "Cada mañana cuelgo lo de mi mesa en el secadero." + (" Se ha acabado el abono de la estantería." if Me.abo and float(S.nave.ab["m" if Me.abo == 1 else "o"]) < float(D.RIEGO_NAVE[int(S.nave.rg)].dosis) else "") \
+		t = "La %s va bien: %s, %s. Cuando acaba la flor la corto entera, la cuelgo en el secadero y vuelvo a empezar con los esquejes que saqué antes de pasarla a 12/12." % [strain(lot_sid(Me.k)).n, D.FASE_MESA[f], cosecha_txt(Me)] + (" Se ha acabado el abono de la estantería." if Me.abo and float(S.nave.ab["m" if Me.abo == 1 else "o"]) < float(D.RIEGO_NAVE[int(S.nave.rg)].dosis) else "") \
 			+ (" Y aquí dentro hace un calor que no veas: hace falta más extracción." if sofoco_nave() < 1 else "")
 	await say(t, String(w.n).to_upper())
 
@@ -5140,8 +5200,13 @@ func items_almacen(t: String) -> Array:
 	if t == "caja":
 		o.append({"k": "$"})
 		o.append({"k": "+"})   # GUARDAR, el primer tarro (vacío)
+		# 1.41 (lo pidió el usuario: realista): cada lote, en los tarros de ALM.tarro g que llenaría de verdad (de 4 L, sin aplastar)
+		var tg := float(D.ALM.tarro)
 		for l in por_thc(S.caja.buds):
-			o.append({"k": l[0], "b": l[1], "r": 0})
+			var g: float = floor(l[1].g)
+			var nt: int = maxi(1, ceili(g / tg - 1e-9))
+			for q in nt:
+				o.append({"k": l[0], "b": l[1], "r": 0, "q": q, "n": nt, "gj": g - tg * (nt - 1) if q == nt - 1 else tg})
 		return o
 	o.append({"k": "+", "s": -1, "j": 0})
 	var tipos: Array = D.TIPOS_EXTR
@@ -5210,7 +5275,8 @@ func desc_almacen(A: Dictionary) -> String:
 			return "GUARDAR: llevas %s de cogollos y en la caja caben %s más.%s\nA: guardar · B: cerrar." % [g_txt(total_buds()), g_txt(maxf(0, C.g - g)), (" Con los tarros se curan en %d días." % int(D.CURADO.dias)) if S.items.get("tarros") else ""]
 		if it == null or it.k == "$":
 			return "Dinero: %s de %s (%s). Tarros: %s de %s (%s).\nA: guardar o sacar · B: cerrar." % [Datos.eur(S.caja.money), Datos.eur(C.money), _pct_txt(S.caja.money / C.money), g_txt(g), _kg(int(C.g)), _pct_txt(g / C.g)]
-		return "%s: %d g · %s %% THC%s.\nA: sacarlo · B: cerrar." % [lot_nombre(it.k), int(floor(it.b.g)), Datos.pct(it.b.thc), cura_corto(it.b)]
+		var tj: String = (" en %d tarros (este, el %d.º: %d g)" % [int(it.n), int(it.q) + 1, int(it.gj)]) if int(it.n) > 1 else ""
+		return "%s: %d g%s · %s %% THC%s.\nA: sacarlo · B: cerrar." % [lot_nombre(it.k), int(floor(it.b.g)), tj, Datos.pct(it.b.thc), cura_corto(it.b)]
 	var r := nevera_r()
 	if it == null or it.k == "+":
 		return "GUARDAR: llevas %s g de extractos y en la nevera caben %s g más.%s\nA: guardar · B: cerrar." % [Datos.coma(Datos.jsround(total_rosin() * 10) / 10.0), Datos.coma(maxf(0, floor((nevera_cap() - r) * 10 + 1e-9) / 10.0)),
@@ -5328,7 +5394,7 @@ func panel_almacen(o: Array, A: Dictionary, px: int, py: int) -> void:
 		_barra_alm(o, px, py, 1, "cu", caja_g() / C.g if caja else nevera_r() / nevera_cap(), "#58b0e0")
 		return
 	if not it.r:
-		_tarro(o, px + 12, py + 8, 18, 25, _color_lote(it.k), it.b.g / (C.g / D.ALM.tarros), float(it.b.get("cu", 0)) >= 1, "alm-tarro-s" if it.k.contains("*") else "alm-tarro", _dentro_lote(it.k, it.b), 2)
+		_tarro(o, px + 12, py + 8, 18, 25, _color_lote(it.k), float(it.gj) / float(D.ALM.tarro), float(it.b.get("cu", 0)) >= 1, "alm-tarro-s" if it.k.contains("*") else "alm-tarro", _dentro_lote(it.k, it.b), 2)
 		_barra_alm(o, px, py, 0, "thc", it.b.thc / 30.0, "#e8d070")
 		_barra_alm(o, px, py, 1, "cu", float(it.b.get("cu", 0)), "#58c070")
 		_barra_alm(o, px, py, 2, "mc", float(it.b.get("mc", 0)), "#a0c8f0")
@@ -5366,7 +5432,6 @@ func rects_almacen(A: Dictionary) -> Array:
 		var jar := it.slice(1)
 		var sel: int = A.i - 1
 		var fila0: int = 0 if sel < F else int(floor(float(sel) / F)) - 1
-		var cap: float = C.g / D.ALM.tarros
 		for f in 2:
 			var y: int = y0 + 8 + f * 34
 			for c in F:
@@ -5378,7 +5443,7 @@ func rects_almacen(A: Dictionary) -> Array:
 				if Jt.k == "+":
 					o.append(["@", "alm-mas", x, y])
 				else:
-					_tarro(o, x, y, 18, 25, _color_lote(Jt.k), Jt.b.g / cap, float(Jt.b.get("cu", 0)) >= 1, "alm-tarro-s" if Jt.k.contains("*") else "alm-tarro", _dentro_lote(Jt.k, Jt.b))
+					_tarro(o, x, y, 18, 25, _color_lote(Jt.k), float(Jt.gj) / float(D.ALM.tarro), float(Jt.b.get("cu", 0)) >= 1, "alm-tarro-s" if Jt.k.contains("*") else "alm-tarro", _dentro_lote(Jt.k, Jt.b))
 				if q == sel:
 					_marco(o, x - 2, y - 2, 22, 29)
 		if fila0 > 0:

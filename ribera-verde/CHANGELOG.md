@@ -1,5 +1,36 @@
 # Cambios
 
+## 1.41.0 · 14 de octubre de 2026
+
+La nave, por ciclos de cultivo, y la caja fuerte con los tarros que se llenarían de verdad (lo pidió el usuario: «el cultivo en la nave no funciona por ciclos; es muy importante que sea realista, también en el visor de la caja»). Solo Godot, 0.35.0.
+
+- **Cada mesa, un ciclo entero** (`nave_dia`, `prog_mesa`, `cosecha_mesa`, `dias_mesa` en `trama.gd`):
+  - Los clones de la madre entran en la mesa enraizando (`NAVE.clon`, 0,12, como los esquejes del piso). Crecen a 18/6 y florecen a 12/12 al ritmo de su variedad: 1/d por mañana, como las plantas del piso. La Skunk #1 tarda 3 días (unas 10 semanas reales); una sativa como la Kali Mist, 4.
+  - Las fases salen del ciclo (`fase_mesa`): esquejes enraizando, vegetativo (18/6), floración (12/12) y cogollos engordando.
+  - Al acabar, el navero corta la mesa entera y la cuelga en el secadero. Luego vuelve a empezar con los esquejes que sacó antes de pasarla a 12/12 (`Me.n`, el ciclo).
+  - Sin navero, la mesa no avanza.
+- **La cosecha, con cifras reales:**
+  - El cálculo: los vatios de los focos × los g/W de cada luz (`FOCO_NAVE.w`, `gpw`), por la variedad y el fenotipo, el cuidado del navero, el riego y el calor.
+  - Los focos: LED de barras 2 × 720 W a 0,85 g/W, como el LED 720 del piso; sodio 2 × 600 W a 0,55; cerámica 4 × 315 W a 0,7.
+  - Una mesa de LED con la Skunk #1 da unos 1,4 kg por ciclo.
+  - El abono cuenta por los días del ciclo que lo tuvo (`Me.am`, `Me.ao` de `Me.dn`).
+  - Antes, cada mesa daba 20 g al día para siempre.
+- **El secadero:** lo cortado cuelga `NAVE.seca` (1) día secándose (`Me.h`). A la mañana siguiente pasa a lo que se descuelga, con el día de la cosecha para el curado.
+  - Mientras se seca, no se puede descolgar ni replantar la mesa.
+  - La redada también se lo lleva.
+- **Textos:**
+  - Cada mesa y el escritorio dicen la fase, cuántos días faltan para la cosecha, el ciclo y lo que cuelga.
+  - El navero explica cómo trabaja, y su ficha, cuánto da la cosecha con su cuidado.
+  - El sodio ya no dice «más gramos»: da menos por vatio que los LED.
+- **La caja fuerte, por tarros de verdad** (`items_almacen`):
+  - Cada lote ocupa los tarros que llenaría: de 4 L, `ALM.tarro` = 115 g sin aplastar. 300 g son tres tarros (115 + 115 + 70), y cada uno se ve lleno a su nivel.
+  - El texto dice en cuántos tarros va y cuánto lleva el elegido. Sacar sigue sacando el lote.
+- **Las mesas de antes** (por días, sin ciclo) siguen igual hasta la primera mañana: entran en el ciclo casi al final y se cosechan.
+- **Pruebas:**
+  - `tests/nave.gd` (32 comprobaciones, en la batería): plantar, las fases día a día, la cosecha contada aparte, el secado, descolgar, el abono entero y a medias, sin navero, sodio < cerámica < LED, la sativa más larga, la mesa de antes, la redada con lo colgado y los tarros de la caja. Con `--pintar`, la caja llena.
+  - La historia compara con el HTML congelado sin la parte de la nave de antes (`NAVE_DESDE`, `NAVE_R`, `PLANTA_NUEVA`, `SODIO_ANTES`). Esa parte la comprueba ahora con las cifras nuevas.
+  - Las PNG de `caja-dentro` y `caja-guardar` de `tools/ref/pantallas/` son ya de Godot.
+
 ## 1.40.1 · 14 de octubre de 2026
 
 Los esquejes de las bandejas, esquejes de verdad (lo pidió el usuario: «así es solamente una hoja; eso no es un esqueje»). Solo Godot, 0.34.1.
