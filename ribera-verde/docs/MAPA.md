@@ -95,7 +95,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 - puerta (12,29) → town (12,1)
 - puerta (26,18) → comisaria (4,6)
 - puerta (27,18) → comisaria (5,6)
-- puerta (36,18) → club-rv (5,6)
+- puerta (36,18) → club-rv (7,8)
 
 ## Astilleros (exterior, al este del muelle) — 40 × 30
 
@@ -231,8 +231,8 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 23  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
 
-- puerta (9,7) → club-puerto (5,6)
-- puerta (10,7) → club-puerto (6,6)
+- puerta (9,7) → club-puerto (7,8)
+- puerta (10,7) → club-puerto (8,8)
 
 ## Valdehierro (ciudad pequeña, del hierro) — 40 × 24
 
@@ -267,8 +267,8 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 
 - puerta (12,7) → nave (6,6)
 - puerta (13,7) → nave (7,6)
-- puerta (32,7) → club-valde (5,6)
-- puerta (33,7) → club-valde (6,6)
+- puerta (32,7) → club-valde (8,8)
+- puerta (33,7) → club-valde (9,8)
 
 ## Errotabarri (pueblo del molino) — 36 × 24
 
@@ -338,11 +338,11 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 29  MhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhM
 ```
 
-- puerta (15,7) → growcity (4,6)
-- puerta (16,7) → growcity (5,6)
+- puerta (15,7) → growcity (5,7)
+- puerta (16,7) → growcity (6,7)
 - puerta (19,0) → callejon (10,16)
 - puerta (20,0) → callejon (11,16)
-- puerta (9,17) → club-ibar (5,6)
+- puerta (9,17) → club-ibar (6,6)
 - puerta (43,21) → ensanche (1,10)
 - puerta (43,22) → ensanche (1,11)
 
@@ -375,7 +375,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 21  MhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhM
 ```
 
-- puerta (12,8) → club-ens (5,6)
+- puerta (12,8) → club-ens (9,8)
 - puerta (38,8) → disco (6,6)
 - puerta (39,8) → disco (7,6)
 - puerta (0,10) → ibarbide (42,21)
@@ -393,7 +393,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  4  M█████████^^^█████████M
  5  M█████████████████████M
  6  M█████████████████████M
- 7  M█████████████████████M
+ 7  M██████████████████D██M
  8  M+++*..++n++++n++@++++M
  9  M+++.T.+++++++++++cc+.M
 10  M+++..*+S+++L++++++c+$M
@@ -406,6 +406,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 17  M█████████++█████████MM
 ```
 
+- puerta (19,7) → setas (4,5)
 - puerta (10,17) → ibarbide (19,1)
 - puerta (11,17) → ibarbide (20,1)
 
@@ -432,34 +433,35 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
     0         
     0123456789
  0  ██████████
- 1  ss██v███ss
+ 1  ssv█v███ss
  2  ....@..@..
  3  ..CCCCCC..
  4  ..........
  5  d........d
- 6  ..........
+ 6  ?........?
  7  p...m....p
 ```
 
 - salida (4,7) pulsando abajo → town (17,9)
 
-## GROW IBARBIDE (tienda de Ane, en el Casco Viejo) — 10 × 8
+## GROW IBARBIDE (tienda de Ane, en el Casco Viejo; la carpa de exposición y el propagador) — 12 × 9
 
 ```
-    0         
-    0123456789
- 0  ██████████
- 1  sss█v██sss
- 2  ....@.....
- 3  ..CCCCCC..
- 4  d........d
- 5  d........d
- 6  ..........
- 7  p...mm...p
+    0         1 
+    012345678901
+ 0  ████████████
+ 1  ss?███?██?ss
+ 2  ????@???????
+ 3  ??CCCCCCC???
+ 4  d??????????d
+ 5  d???????????
+ 6  ????????????
+ 7  ???p????p???
+ 8  ?????mm?????
 ```
 
-- salida (4,7) pulsando abajo → ibarbide (15,8)
-- salida (5,7) pulsando abajo → ibarbide (16,8)
+- salida (5,8) pulsando abajo → ibarbide (15,8)
+- salida (6,8) pulsando abajo → ibarbide (16,8)
 
 ## Bar El Ancla — 10 × 8
 
@@ -529,109 +531,117 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 
 - salida (4,7) pulsando abajo → astilleros (18,14)
 
-## Club Itsaso (Puerto Viejo, asociación cannábica: dispensario, sofás y billar) — 12 × 8
+## Club Itsaso (Puerto Viejo, asociación cannábica: dispensario, sofás y billar; marinero) — 16 × 10
 
 ```
-    0         1 
-    012345678901
- 0  ████████████
- 1  svs█v██v██v█
- 2  .@.p.oo....J
- 3  CCC..tt@....
- 4  .....oo.XX@.
- 5  ............
- 6  p..........p
- 7  .....mm.....
+    0         1     
+    0123456789012345
+ 0  ████████████████
+ 1  sss█v?v██??██?v█
+ 2  ?@?p???oo??oo??J
+ 3  CCC????tt@?tt@??
+ 4  ???????oo??oo???
+ 5  ????????????????
+ 6  ?oo?????????????
+ 7  ?tt@????????XX@?
+ 8  ?oo????????????p
+ 9  p??????mm???????
 ```
 
-- salida (5,7) pulsando abajo → puerto (9,8)
-- salida (6,7) pulsando abajo → puerto (10,8)
+- salida (7,9) pulsando abajo → puerto (9,8)
+- salida (8,9) pulsando abajo → puerto (10,8)
 
-## Club La Fundición (Valdehierro) — 12 × 8
-
-```
-    0         1 
-    012345678901
- 0  ████████████
- 1  svs█v██v██v█
- 2  .@.p.oo....J
- 3  CCC..tt@....
- 4  .....oo.XX@.
- 5  ............
- 6  p..........p
- 7  .....mm.....
-```
-
-- salida (5,7) pulsando abajo → valdehierro (32,8)
-- salida (6,7) pulsando abajo → valdehierro (33,8)
-
-## Club Kalea (Ibarbide, Casco Viejo) — 12 × 8
+## Club La Fundición (Valdehierro; hormigón y ladrillo) — 18 × 10
 
 ```
-    0         1 
-    012345678901
- 0  ████████████
- 1  svs█v██v██v█
- 2  .@.p.oo....J
- 3  CCC..tt@....
- 4  .....oo.XX@.
- 5  ............
- 6  p..........p
- 7  .....mm.....
+    0         1       
+    012345678901234567
+ 0  ██████████████████
+ 1  sss█vv██??██?v██v█
+ 2  ?@?p??oo??oo??oo?J
+ 3  CCC???tt@?tt@?tt?@
+ 4  ??????oo??oo??oo??
+ 5  ??????????????????
+ 6  ?oo???????????????
+ 7  ?tt@????????XX@???
+ 8  ?oo??????????????p
+ 9  p???????mm????????
 ```
 
-- salida (5,7) pulsando abajo → ibarbide (9,18)
+- salida (8,9) pulsando abajo → valdehierro (32,8)
+- salida (9,9) pulsando abajo → valdehierro (33,8)
+
+## Club Kalea (Ibarbide, Casco Viejo; piedra y vigas, el pequeño) — 15 × 8
+
+```
+    0         1    
+    012345678901234
+ 0  ███████████████
+ 1  sss█v█v████?█v█
+ 2  ?@?p????oo????J
+ 3  CCC?oo??tt@????
+ 4  ????tt@?oo??XX@
+ 5  ????oo?????????
+ 6  p?????????????p
+ 7  ??????mm???????
+```
+
 - salida (6,7) pulsando abajo → ibarbide (9,18)
+- salida (7,7) pulsando abajo → ibarbide (9,18)
 
-## Club Ensanche (Ibarbide) — 12 × 8
-
-```
-    0         1 
-    012345678901
- 0  ████████████
- 1  svs█v██v██v█
- 2  .@.p.oo....J
- 3  CCC..tt@....
- 4  .....oo.XX@.
- 5  ............
- 6  p..........p
- 7  .....mm.....
-```
-
-- salida (5,7) pulsando abajo → ensanche (12,9)
-- salida (6,7) pulsando abajo → ensanche (12,9)
-
-## undefined
+## Club Ensanche (Ibarbide; blanco y moderno, el más grande) — 20 × 10
 
 ```
-    0         1 
-    012345678901
- 0  ████████████
- 1  svs█v██??█v█
- 2  .@.p.oo.@..J
- 3  CCC..tt@....
- 4  .....oo.XX@.
- 5  ............
- 6  p..........p
- 7  .....mm.....
+    0         1         
+    01234567890123456789
+ 0  ████████████████████
+ 1  sss█vv██?███?███v█v█
+ 2  ?@?p??oo??oo??oo???J
+ 3  CCC???tt@?tt@?tt@???
+ 4  ??????oo??oo??oo????
+ 5  ????????????????????
+ 6  ?oo??oo?????????????
+ 7  ?tt@?tt@??????XX@???
+ 8  ?oo??oo????????????p
+ 9  p????????mm?????????
 ```
 
-- salida (5,7) pulsando abajo → alto (36,19)
-- salida (6,7) pulsando abajo → alto (36,19)
+- salida (9,9) pulsando abajo → ensanche (12,9)
+- salida (10,9) pulsando abajo → ensanche (12,9)
 
-## La nave de Valdehierro (cuatro mesas de cultivo, secadero y escritorio) — 14 × 8
+## Asociación Cannábica Ribera Verde (barrio alto; la de la tía Maite) — 16 × 10
 
 ```
-    0         1   
-    01234567890123
- 0  ██████████████
- 1  ██████████████
- 2  s.....Z....ttc
- 3  ..............
- 4  .NN.NN..NN.NN.
- 5  .@..@...@..@..
- 6  ..............
- 7  ......mm......
+    0         1     
+    0123456789012345
+ 0  ████████████████
+ 1  sss█vv█??███?█v█
+ 2  .@.p....@.??...J
+ 3  CCC..oo......oo.
+ 4  .....tt@....@tt.
+ 5  .....oo......oo.
+ 6  ................
+ 7  .oo.......XX@...
+ 8  .tt@...........p
+ 9  .oo....mm.......
+```
+
+- salida (7,9) pulsando abajo → alto (36,19)
+- salida (8,9) pulsando abajo → alto (36,19)
+
+## La nave de Valdehierro (cuatro mesas de cultivo, secadero, escritorio y la carpa de las madres) — 18 × 8
+
+```
+    0         1       
+    012345678901234567
+ 0  ██████████████████
+ 1  ██████████████████
+ 2  s.....Z....ttc@??.
+ 3  ..................
+ 4  .NN.NN..NN.NN.....
+ 5  .@..@...@..@......
+ 6  ..................
+ 7  ......mm..........
 ```
 
 - salida (6,7) pulsando abajo → valdehierro (12,8)
@@ -654,6 +664,23 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 
 - salida (6,7) pulsando abajo → ensanche (38,9)
 - salida (7,7) pulsando abajo → ensanche (39,9)
+
+## El bajo de las setas (casa de Txomin, Kale Zaharra) — 10 × 7
+
+```
+    0         
+    0123456789
+ 0  ██████████
+ 1  ███████?██
+ 2  ?????????c
+ 3  ??????????
+ 4  ??????????
+ 5  ??????????
+ 6  ????mm????
+```
+
+- salida (4,6) pulsando abajo → callejon (19,8)
+- salida (5,6) pulsando abajo → callejon (19,8)
 
 ## Personajes
 
@@ -695,20 +722,33 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 | club_rv | club-rv | (1,2) | no | `S.ch>=C.ch` |
 | arrieta | valdehierro | (17,7) | no | siempre |
 | txomin | callejon | (17,8) | no | siempre |
-| socio | club-puerto | (7,3) | no | siempre |
-| billarista | club-puerto | (10,4) | no | siempre |
-| socio | club-valde | (7,3) | no | siempre |
-| billarista | club-valde | (10,4) | no | siempre |
-| socio | club-ibar | (7,3) | no | siempre |
-| billarista | club-ibar | (10,4) | no | siempre |
-| socio | club-ens | (7,3) | no | siempre |
-| billarista | club-ens | (10,4) | no | siempre |
-| socio | club-rv | (7,3) | no | siempre |
-| billarista | club-rv | (10,4) | no | siempre |
+| socio | club-puerto | (9,3) | no | siempre |
+| billarista | club-puerto | (14,7) | no | siempre |
+| cg1 | club-puerto | (13,3) | no | siempre |
+| cg2 | club-puerto | (3,7) | no | siempre |
+| socio | club-valde | (8,3) | no | siempre |
+| billarista | club-valde | (14,7) | no | siempre |
+| cg1 | club-valde | (12,3) | no | siempre |
+| cg2 | club-valde | (17,3) | no | siempre |
+| cg3 | club-valde | (3,7) | no | siempre |
+| socio | club-ibar | (6,4) | no | siempre |
+| billarista | club-ibar | (14,4) | no | siempre |
+| cg1 | club-ibar | (10,3) | no | siempre |
+| socio | club-ens | (8,3) | no | siempre |
+| billarista | club-ens | (16,7) | no | siempre |
+| cg1 | club-ens | (12,3) | no | siempre |
+| cg2 | club-ens | (16,3) | no | siempre |
+| cg3 | club-ens | (3,7) | no | siempre |
+| cg4 | club-ens | (7,7) | no | siempre |
+| socio | club-rv | (7,4) | no | siempre |
+| billarista | club-rv | (12,7) | no | siempre |
+| cg1 | club-rv | (12,4) | no | siempre |
+| cg2 | club-rv | (3,8) | no | siempre |
 | nv0 | nave | (1,5) | no | `!!(S.nave&&naveroDe(i))` |
 | nv1 | nave | (4,5) | no | `!!(S.nave&&naveroDe(i))` |
 | nv2 | nave | (8,5) | no | `!!(S.nave&&naveroDe(i))` |
 | nv3 | nave | (11,5) | no | `!!(S.nave&&naveroDe(i))` |
+| nvm | nave | (14,2) | no | `!!(S.nave&&cuidaMadres())` |
 | gorila | ensanche | (40,9) | no | `S.ch>=DISCO.ch` |
 | camarera | disco | (1,2) | no | siempre |
 | dj | disco | (6,2) | no | siempre |

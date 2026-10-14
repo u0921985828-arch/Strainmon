@@ -26,7 +26,13 @@ function setasDia(){
   }
   if(malas.length)queue('setas',()=>talk('SMS · TXOMIN',[malas.length>1?`Se te han echado a perder ${malas.length} bandejas. Tíralas.`:`Una bandeja se te ha ${malas[0]==='seca'?'secado':'contaminado'}. Tírala.`]));
 }
-// Txomin y su bajo, en la Kale Zaharra
+// pulverizar las bandejas vivas (SETAS.min): false si, pasada la medianoche, setasDia ha cerrado el bajo
+async function pulverizarBajo(){
+  const L=S.setas;L.bandejas.filter(b=>!b.mala).forEach(b=>b.hum=100);advanceTime(SETAS.min);updateHUD();if(!S.setas)return false;sfx('sel');
+  const v=L.bandejas.filter(b=>!b.mala);   // pasada la medianoche, setasDia ya las ha secado (o echado a perder)
+  await say(v.length?`Pulverizas las bandejas: humedad al ${Math.round(v.reduce((a,b)=>a+b.hum,0)/v.length)} %.`:'Pulverizas las bandejas.');return true;
+}
+// Txomin y su bajo, en la Kale Zaharra (1.34: el bajo, por la puerta de al lado, 11j-locales)
 NPCDEF.push({id:'txomin',map:'callejon',x:17,y:8,dir:'down',look:'txomin',talk:()=>talkTxomin()});
 async function talkTxomin(){
   const T='TXOMIN',L=S.setas;
@@ -37,17 +43,21 @@ async function talkTxomin(){
     S.money-=SETAS.fianza;S.setas={bandejas:[],g:0};sfx('coin');await got('la llave del bajo');
     return say('Compra las bandejas y tenlas húmedas. Lo demás lo hace el tiempo.',T);
   }
+  return bajoMenu(T);
+}
+// las bandejas del bajo: con Txomin, en la puerta (T), todo; 1.34: dentro, en las baldas (sin T), lo de las bandejas: ni comprar
+// (las prepara él), ni venderle, ni dejar el bajo
+async function bajoMenu(T){
+  const L=S.setas;
   for(;;){
     const B=L.bandejas,n=k=>B.filter(b=>faseSeta(b)===k).length,hum=B.filter(b=>!b.mala);
     const est=B.length?Object.keys(FASES_SETA).filter(k=>n(k)).map(k=>`${n(k)} ${FASES_SETA[k][n(k)>1?1:0]}`).join(', '):'sin bandejas';
-    const ops=(B.length<SETAS.max?[`Comprar bandeja (${eur(SETAS.bandeja)})`]:[]).concat(hum.length?['Pulverizar']:[],n('lista')?['Recoger']:[],B.some(b=>b.mala)?['Tirar las malas']:[],L.g>=1?[`Venderle ${gTxt(L.g)}`]:[],['Dejar el bajo','Nada']);
-    const op=ops[await ask(`El bajo: ${est}${hum.length?' · humedad '+Math.round(hum.reduce((a,b)=>a+b.hum,0)/hum.length)+' %':''}.`,ops,T)];
+    const ops=(T&&B.length<SETAS.max?[`Comprar bandeja (${eur(SETAS.bandeja)})`]:[]).concat(hum.length?['Pulverizar']:[],n('lista')?['Recoger']:[],B.some(b=>b.mala)?['Tirar las malas']:[],T&&L.g>=1?[`Venderle ${gTxt(L.g)}`]:[],T?['Dejar el bajo']:[],['Nada']);
+    const op=ops[await ask(`El bajo: ${est}${hum.length?' · humedad '+Math.round(hum.reduce((a,b)=>a+b.hum,0)/hum.length)+' %':''}.`+(T||B.length?'':' Las bandejas las prepara Txomin, en la puerta.'),ops,T||undefined)];
     if(!op||op==='Nada')return;
     if(op.startsWith('Comprar')){if(S.money<SETAS.bandeja){sfx('bad');await say('Sin dinero no hay bandeja.',T);continue;}
       S.money-=SETAS.bandeja;B.push({d:S.day,hum:100});sfx('coin');await say(`Lista para colonizar. En ${SETAS.colon} días la habrá cogido el micelio; ${SETAS.fruto} más y a recoger.`,T);continue;}
-    if(op==='Pulverizar'){hum.forEach(b=>b.hum=100);advanceTime(SETAS.min);updateHUD();if(!S.setas)return;sfx('sel');   // si pasa de medianoche, setasDia puede cerrar el bajo
-      const v=L.bandejas.filter(b=>!b.mala);   // pasada la medianoche, setasDia ya las ha secado (o echado a perder)
-      await say(v.length?`Pulverizas las bandejas: humedad al ${Math.round(v.reduce((a,b)=>a+b.hum,0)/v.length)} %.`:'Pulverizas las bandejas.');continue;}
+    if(op==='Pulverizar'){if(!await pulverizarBajo())return;continue;}
     if(op==='Recoger'){let g=0;L.bandejas=B.filter(b=>{if(faseSeta(b)!=='lista')return true;g+=ri(SETAS.g[0],SETAS.g[1]);return false;});L.g+=g;sfx('get');
       await say(`Recoges las setas y las dejas secando en el bajo: ${g} g.`);continue;}
     if(op==='Tirar las malas'){const k=B.filter(b=>b.mala).length;L.bandejas=B.filter(b=>!b.mala);await say(k>1?`Tiras ${k} bandejas.`:'Tiras la bandeja.');continue;}

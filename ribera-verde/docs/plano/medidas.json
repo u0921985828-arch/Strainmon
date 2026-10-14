@@ -1550,19 +1550,19 @@
   "growcity": {
    "nombre": "growcity",
    "titulo": "GROW IBARBIDE",
-   "w": 10,
-   "h": 8,
+   "w": 12,
+   "h": 9,
    "edificios": [],
    "puertas": [],
    "salidas": [
     {
-     "x": 4,
-     "y": 7,
+     "x": 5,
+     "y": 8,
      "a": "ibarbide"
     },
     {
-     "x": 5,
-     "y": 7,
+     "x": 6,
+     "y": 8,
      "a": "ibarbide"
     }
    ],
@@ -1581,13 +1581,8 @@
      "y": 1
     },
     {
-     "o": "poster",
-     "x": 4,
-     "y": 1
-    },
-    {
      "o": "shelfW",
-     "x": 7,
+     "x": 10,
      "y": 1
     },
     {
@@ -1602,7 +1597,7 @@
     },
     {
      "o": "display",
-     "x": 9,
+     "x": 11,
      "y": 4
     },
     {
@@ -1611,18 +1606,13 @@
      "y": 5
     },
     {
-     "o": "display",
-     "x": 9,
-     "y": 5
-    },
-    {
      "o": "plantDeco",
-     "x": 0,
+     "x": 3,
      "y": 7
     },
     {
      "o": "plantDeco",
-     "x": 9,
+     "x": 8,
      "y": 7
     }
    ],
@@ -1672,7 +1662,7 @@
      "y": 1,
      "w": 5,
      "h": 7,
-     "puerta": null
+     "puerta": 19
     },
     {
      "id": "casco3",
@@ -1709,6 +1699,11 @@
    ],
    "puertas": [
     {
+     "x": 19,
+     "y": 7,
+     "a": "setas"
+    },
+    {
      "x": 10,
      "y": 17,
      "a": "ibarbide"
@@ -1741,19 +1736,19 @@
   "club-puerto": {
    "nombre": "club-puerto",
    "titulo": "CLUB ITSASO (PUERTO VIEJO) · los cuatro clubs y la asociación, iguales por dentro",
-   "w": 12,
-   "h": 8,
+   "w": 16,
+   "h": 10,
    "edificios": [],
    "puertas": [],
    "salidas": [
     {
-     "x": 5,
-     "y": 7,
+     "x": 7,
+     "y": 9,
      "a": "puerto"
     },
     {
-     "x": 6,
-     "y": 7,
+     "x": 8,
+     "y": 9,
      "a": "puerto"
     }
    ],
@@ -1766,23 +1761,30 @@
     },
     {
      "id": "socio",
-     "x": 7,
+     "x": 9,
      "y": 3,
      "deambula": 0
     },
     {
      "id": "billarista",
-     "x": 10,
-     "y": 4,
+     "x": 14,
+     "y": 7,
+     "deambula": 0
+    },
+    {
+     "id": "cg1",
+     "x": 13,
+     "y": 3,
+     "deambula": 0
+    },
+    {
+     "id": "cg2",
+     "x": 3,
+     "y": 7,
      "deambula": 0
     }
    ],
    "objetos": [
-    {
-     "o": "poster",
-     "x": 7,
-     "y": 1
-    },
     {
      "o": "plantDeco",
      "x": 3,
@@ -1790,18 +1792,18 @@
     },
     {
      "o": "jukebox",
-     "x": 11,
+     "x": 15,
      "y": 2
     },
     {
      "o": "plantDeco",
-     "x": 0,
-     "y": 6
+     "x": 15,
+     "y": 8
     },
     {
      "o": "plantDeco",
-     "x": 11,
-     "y": 6
+     "x": 0,
+     "y": 9
     }
    ],
    "carpas": []
@@ -1809,7 +1811,7 @@
   "nave": {
    "nombre": "nave",
    "titulo": "LA NAVE DE VALDEHIERRO",
-   "w": 14,
+   "w": 18,
    "h": 8,
    "edificios": [],
    "puertas": [],
@@ -1848,6 +1850,12 @@
      "id": "nv3",
      "x": 11,
      "y": 5,
+     "deambula": 0
+    },
+    {
+     "id": "nvm",
+     "x": 14,
+     "y": 2,
      "deambula": 0
     }
    ],

@@ -128,6 +128,18 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
   { k: 'asociacion', sw: 320, mode: 'world', now: T + 700, S: { ch: 3, min: 11 * 60, flags: {} }, map: 'alto', P: { x: 35, y: 20, dir: 'up' } },
   { k: 'asociacion2', sw: 320, mode: 'world', now: T + 1300, S: { ch: 3, clubs: { rv: true }, aso: { v: 2, d: 1, tio: true, asam: 0, otra: 0, pres: false, votos: 0, lote: null }, flags: {} },
     map: 'club-rv', P: { x: 8, y: 3, dir: 'up' } },
+  // 1.34: cada club, el suyo (Kalea, la Fundición y el Ensanche, con su gente), el bajo de las setas con bandejas en cada fase y el
+  // secadero con setas, y la nave con la carpa de las madres (tres) y quien las cuida
+  { k: 'club-ibar', sw: 320, mode: 'world', now: T + 900, S: { ch: 5, day: 4, clubs: { ibar: true }, flags: {} }, map: 'club-ibar', P: { x: 7, y: 6, dir: 'up' } },
+  { k: 'club-valde', sw: 320, mode: 'world', now: T + 1100, S: { ch: 5, day: 5, clubs: { valde: true }, flags: {} }, map: 'club-valde', P: { x: 9, y: 6, dir: 'up' } },
+  { k: 'club-ens', sw: 320, mode: 'world', now: T + 1500, S: { ch: 5, day: 6, clubs: { ens: true }, flags: {} }, map: 'club-ens', P: { x: 10, y: 6, dir: 'up' } },
+  { k: 'setas', sw: 240, mode: 'world', now: T + 520, S: { ch: 5, day: 20, flags: {}, setas: { g: 3, bandejas: [{ d: 18, hum: 90 }, { d: 12, hum: 70 }, { d: 9, hum: 80 },
+    { d: 8, hum: 60, mala: 'contaminada' }, { d: 15, hum: 85 }] } }, map: 'setas', P: { x: 4, y: 4, dir: 'up' } },
+  { k: 'nave-madres', sw: 320, mode: 'world', now: T + 1700, S: { ch: 6, day: 20, flags: {},
+    plantilla: [{ id: 'pl1', n: 'Iker', lab: 3, cui: 4, lea: 3, rol: 'nave', mesa: 0 }, { id: 'pl5', n: 'Ane', lab: 2, cui: 4, lea: 4, rol: 'madres' }],
+    nave: { ab: { m: 0, o: 0 }, m: [null, null, null, null], f: ['led', 'led', 'led', 'led'], ex: 0, rg: 0,
+      ma: [{ k: 'ria', f: { id: 1, t: 1, y: 1, i: null }, v: 100, e: 2 }, { k: 'limon', f: { id: 2, t: 1, y: 1, i: null }, v: 90, e: 0 }, { k: 'mango', f: { id: 3, t: 1, y: 1, i: null }, v: 100, e: 4 }] } },
+    map: 'nave', P: { x: 13, y: 4, dir: 'up' } },
   { k: 'disco', sw: 400, mode: 'world', now: T + 1800, S: { ch: 5, min: 23 * 60 + 40, day: 6, noche: { id: 6, copas: 0, ronda: 0, baile: 0, mesa: 0 }, flags: {} },
     map: 'disco', P: { x: 6, y: 6, dir: 'up' } },
   // la vista C con todo (1.10, antes en la vista B): carpa de 150 con extras (goteo con el depósito a 400 de 975 L en la mirilla,

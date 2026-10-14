@@ -456,7 +456,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     R.c = S.clients.filter(c => c.map === 'callejon').length; enterMap('home', 5, 5, 'up');
   }, () => R.en === 'callejon,10,16' && R.m === 120 && R.vuelta === 'ibarbide,20,1' && R.z === '0/0,1.6,1.3,true' && R.c === 2 || R);
   await step('Clubs cannábicos (1.15): el carné (la cuota), un lote al día entre lo de Iñaki y la calle, 10 g de la variedad del día (entra en la Genoteca) y un encargo de semillas que se paga al entregarlo', ['^Hacerme socio', '^Vender al club', '^Skunk', '^100 g'], async () => {
-    S.ch = 5; S.money = 1000; S.buds = {}; addBuds('ria', 300, 12); S.clubs = {}; S.clubDia = {}; S.clubCompra = {}; S.clubEnc = null; S.clubEncDia = 0; S.rel = {}; window.R = {};
+    S.ch = 5; S.money = 1000; S.buds = {}; addBuds('ria', 300, 12); S.clubs = {}; S.clubDia = {}; S.clubCompra = {}; S.clubEnc = null; S.clubEncDia = 0; S.rel = { puerto: CLUB.confia, pres_puerto: CLUB.confia }; window.R = {};
     enterMap('club-puerto', 1, 4, 'up'); R.ent = ents.filter(e => e.id === 'club_puerto').map(e => e.x + ',' + e.y).join();
     R.m = S.money; await run(() => talkClub('puerto')); R.venta = S.money - R.m + CLUBS.puerto.cuota; R.g = S.buds.ria.g; R.pg = Math.round(precioClub(12) * 100) / 100;
     want(['^Vender al club']); R.m = S.money; await run(() => talkClub('puerto')); R.otra = S.money - R.m;
@@ -464,7 +464,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     want(['^Encargo', '^Aceptar']); await run(() => talkClub('puerto')); R.enc = S.clubEnc && [S.clubEnc.k, S.clubEnc.n, S.clubEnc.hasta - S.day].join();
     S.seeds[S.clubEnc.sid] = (S.seeds[S.clubEnc.sid] || 0) + 10; want(['^Entregar']); R.m = S.money; R.rep = S.rep; await run(() => talkClub('puerto')); R.pago = S.money - R.m; R.rep = S.rep - R.rep; R.fin = S.clubEnc === null && S.clubEncDia === S.day;
     R.rel = S.rel.puerto; enterMap('home', 5, 5, 'up');
-  }, () => R.ent === '1,2' && R.venta === Math.round(100 * R.pg) && R.g === 200 && S.clubs.puerto === true && R.otra === 0 && R.compra === R.pc && R.cb === 10 && R.disc && R.enc === 'puerto,10,7' && R.pago > 0 && R.rep === 3 && R.fin && R.rel === 9 || R);
+  }, () => R.ent === '1,2' && R.venta === Math.round(100 * R.pg) && R.g === 200 && S.clubs.puerto === true && R.otra === 0 && R.compra === R.pc && R.cb === 10 && R.disc && R.enc === 'puerto,10,7' && R.pago > 0 && R.rep === 3 && R.fin && R.rel === CLUB.confia + 10 || R);
   await step('La cata y el analizador (1.15): catar medio gramo (30 min) deja la nota (aroma, efecto y potencia) en la Genoteca y marca el lote; con el analizador, el THC exacto y el lote analizado', [], async () => {
     S.ch = 5; S.min = 10 * 60; S.buds = {}; addBuds('ria', 20, 12.3); addBuds('thai', 10, 17); S.catas = {}; S.items.analizador = 0; window.R = { min: S.min };
     await run(() => catar('ria')); R.n1 = S.catas.ria; R.g = S.buds.ria.g; R.c = !!S.buds.ria.cata; R.t = S.min - R.min;
@@ -555,7 +555,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
       Math.random = () => .5; want(['^Contratar']); await pedirGente(); R.w3 = fi(S.plantilla[2]); R.pl = [S.plN, 5000 - S.money].join(); Math.random = r0; });
     const [itz, mik, ike] = S.plantilla;
     want(['^A la calle', '^Skunk', '^25 g']); await run(() => trabajo(mik)); R.calle = [mik.rol, mik.k, mik.g, S.buds.ria.g].join();
-    want(['^De gerente']); await run(() => trabajo(ike)); const l0 = LOG.length; want(['<B>']); await run(() => trabajo(itz)); R.ops = LOG.slice(l0).filter(l => l.startsWith('  [menú] A la calle | Despedir | Nada')).length;
+    want(['^De gerente']); await run(() => trabajo(ike)); const l0 = LOG.length; want(['<B>']); await run(() => trabajo(itz)); R.ops = LOG.slice(l0).filter(l => l.startsWith(`  [menú] A la calle | Prima · ${eur(MANDO.prima)} | Curso · ${eur(MANDO.curso)} | Despedir | Nada`)).length;   // 1.34: la prima y el curso
     S.pots = S.pots.map(() => null); S.pots[0] = { sid: 'ria', prog: 1, water: 100, health: 100, fert: false, pest: false, f: { t: 1, y: 1 } }; R.gc = gramosPlanta(S.pots[0], factores(0));
     R.m = S.money; await dia(.5); R.e = Math.round(precioCalle(12) * ZONAS.town.precio * 3 * (1 - PLANTILLA.com)); R.venta = [mik.g, S.money - R.m + PLANTILLA.sueldo.gerente, S.heat].join();
     R.arc = S.arcon.buds.ria ? S.arcon.buds.ria.g : 0; R.pot = S.pots[0];
@@ -625,9 +625,9 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.plantilla = [{ n: 'a', rol: 'nave', mesa: 2 }, { n: 'b', rol: 'nave', mesa: 0 }]; S.nave.m[3] = S.nave.m[0]; S.nave.m[1] = null; R.ml = [naveroDe(2).n, naveroDe(1), mesaLibre()].join(); S.nave.m[3] = null; R.ml2 = mesaLibre();
     S.plantilla = P0; S.nave = N0;
     Object.assign(S, sv); enterMap('home', 5, 5, 'up');
-  }, () => R.no === `puerto,${R.pc[0]},${R.pc[1] + 1},false` && R.pc.join() === '9,7' && R.si === 'club-puerto,5,6,true,' + CLUBS.puerto.cuota
-    && R.socio === 'club_puerto:1,2 socio:7,3 billarista:10,4' && R.gana === '20,1,3' && R.empate === 0 && R.pierde === '-10,3' && R.p === '3,3,1,0,0,0,1,0.5'
-    && R.comp === `${SOCIO.rel},${50 - SOCIO.g},true` && R.comp2 === 50 - SOCIO.g && R.sale === '5,7,puerto,9,8' && R.nave === 'club-puerto' && R.mesas === 0
+  }, () => R.no === `puerto,${R.pc[0]},${R.pc[1] + 1},false` && R.pc.join() === '9,7' && R.si === 'club-puerto,7,8,true,' + CLUBS.puerto.cuota
+    && R.socio === 'club_puerto:1,2 socio:9,3 billarista:14,7' && R.gana === '20,1,3' && R.empate === 0 && R.pierde === '-10,3' && R.p === '3,3,1,0,0,0,1,0.5'
+    && R.comp === `${SOCIO.rel},${50 - SOCIO.g},true` && R.comp2 === 50 - SOCIO.g && R.sale === '7,9,puerto,9,8' && R.nave === 'club-puerto' && R.mesas === 0
     && R.cerrada === 'ensanche,38,11' && R.entra === `disco,6,6,${DISCO.entrada},true` && R.otra === 'disco,6,6,0' && R.barra === `${DISCO.copa + DISCO.ronda},1,1,1,4`
     && R.baile === `gaua${R.d0}:pij` && R.vip === `${DISCO.mesa},${DISCO.vip[0]}:vip,1,11` && R.vip2 === 2 && R.echa === 'ensanche,38,9' && R.echa0 === 'ensanche,38,9' && R.llena === '0,0'
     && R.mig2 === '0,-,1' && R.ml === 'a,,3' && R.ml2 === 1
@@ -669,7 +669,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     await run(() => objLocal(7, 1, 'fotoMaite')); R.rel = [relDe('delroy'), GENTE.delroy].join();
     delete S.aso; migrate(); R.mig = [S.aso.v, S.aso.tio, S.aso.pres, S.aso.lote, S.aso.asam].join();
     S = S0; enterMap('home', 5, 5, 'up');
-  }, () => R.puerta === '36,18,club-rv,32,12,5,7,36,walk' && R.v1 === `club-rv,5,6,true,1,false,${CLUBS.rv.cuota}` && R.v1b === 1 && R.v2 === '2,8,2,fotoMaite'
+  }, () => R.puerta === '36,18,club-rv,32,12,5,7,36,walk' && R.v1 === `club-rv,7,8,true,1,false,${CLUBS.rv.cuota}` && R.v1b === 1 && R.v2 === '2,8,2,fotoMaite'
     && R.tio === `true,${ASO.dias},5,12` && R.pend === `${ASO.dias},false,${5000 - CLUBS.rv.cuota}` && LOG.some(l => /^DELROY: La asamblea es el día \d+, por la mañana\..*O la refundas ya/.test(l)) && R.pierde === `false,12,${ASO.espera},0` && R.espera === 0 && R.votos === 26 && R.gana === 'true,26,15' && R.logro
     && R.lote === `100,${R.pg},50` && R.d1 === `${Math.round(20 * R.pg)},80,${Math.round(20 * R.pg)}` && R.fin === `,${5 * Math.round(20 * R.pg)}`
     && R.sin === 'false,100' && R.ref === `true,${ASO.refunda}` && R.rel === 'delroy,Delroy' && R.mig === '0,false,false,,0'
@@ -1124,6 +1124,75 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S = JSON.parse(JSON.stringify(S0)); S.flags.metB = true; delete S.flags.tono; migrate(); R.tono2 = S.flags.tono === S.day; S = S0;
   }, () => R.due === 3000 && R.dias === 7 && R.tono && R.hasta === 10 && R.campos === '[null,{},0,null,0]' && R.nuevos === '[{"buds":{},"rosin":{}},{},[],[],[],0]' && R.tono2 && R.mis === 'caja,luz,carpa,olor,inaki/0,0,0,0,0'
     && R.iti === 'bus,carta,kiko,julen,plantar,regar,veg,flor,cosecha,vender,ventas/0,0,0,0,0,0,0,0,0,0,0' || R);
+  await step('Los locales, cada uno el suyo, y las madres de la nave (1.34): los cinco clubs, de distinto tamaño, con su suelo, su pared, sus sofás, mesas y billar y su gente, y el billar con sitio alrededor; GROW IBARBIDE más grande, con la carpa de exposición; el bajo de Txomin por dentro (cerrado sin alquilar; las bandejas en la estantería, en su fase, el pulverizador y el secadero); la carpa de las madres de la nave (meter una madre, quien las cuida, los esquejes de cada mañana, plantar una mesa con su clon sin gastar nada; sin nadie, se apagan) y la gente de la nave desde el escritorio (cambiar de mesa, la prima y el curso); las partidas de antes', [], async () => {
+    const S0 = S, r0 = Math.random; S = JSON.parse(JSON.stringify(S0)); window.R = {};
+    const cuenta = (m, o) => m.o.flat().filter(x => x === o).length;
+    R.clubs = Object.keys(CLUBS).map(k => { const n = 'club-' + k, m = MAPS[n];
+      return [k, m.w + 'x' + m.h, m.est || '-', cuenta(m, 'sofaF') + cuenta(m, 'sofaB'), cuenta(m, 'mesita'), NPCDEF.filter(d => d.map === n && /^cg\d$/.test(d.id)).length].join(':'); }).join(' ');
+    R.bil = Object.keys(CLUBS).map(k => { const n = 'club-' + k, m = MAPS[n], y = m.o.findIndex(f => f.includes('billar')), x = m.o[y].indexOf('billar');
+      let libre = 0; for (let j = y - 1; j <= y + 1; j++) for (let i = x - 1; i <= x + 2; i++) if ((j !== y || i === x - 1 || i === x + 2) && !tileSolid(m, i, j)) libre++;
+      return libre; }).join();
+    R.tiles = ['ibar', 'puerto', 'valde', 'ens', 'rv'].map(k => MAPS['club-' + k].g[5][5]).join();
+    R.spr = ['ibar', 'puerto', 'valde', 'ens', 'rv'].map(k => { S.map = 'club-' + k; return spriteLocal('sofaF'); }).join();
+    R.arte = !ARTE.ok || ['sofaF-kalea', 'sofaF-itsaso', 'sofaF-fundicion', 'sofaF-ensanche'].every(s => !!frameDe(ARTE.cubre['obj:sofaF'], s, 'unica', 0, { i: 0 }));
+    const gc = MAPS.growcity; R.grow = [gc.w + 'x' + gc.h, gc.g[4][4], gc.o[6][9], gc.o[6][10], [...new Set(Object.values(MAPS.ibarbide.doors).filter(d => d.to === 'growcity').map(d => d.x + ',' + d.y))].join('|'), Object.keys(gc.exits).join('/')].join();
+    // los presidentes: sin ganarte al encargado y al presidente, el club de fuera no te compra; en la asociación del barrio, sí
+    Object.assign(S, { ch: 5, money: 10000, day: 40, clubs: { valde: true }, clubDia: {}, clubEnc: null, clubEncDia: 0, clubReg: {}, rel: {}, buds: {} }); addBuds('ria', 300, 12);
+    R.pres = NPCDEF.filter(d => d.id.startsWith('pres_')).map(d => d.map.slice(5) + ':' + d.x + ',' + d.y + ':' + LOOKS[d.look].id).join(' ');
+    R.m = S.money; want(['^Vender al club']); await run(() => talkClub('valde')); R.no = [S.money - R.m, clubTeCompra('valde'), clubTeCompra('rv')].join();
+    want(['^Encargo']); await run(() => talkClub('valde')); R.noEnc = S.clubEnc;
+    want(['^Invitar', '^Skunk']); await run(() => talkClub('valde')); want(['^Invitar']); await run(() => talkClub('valde')); R.inv = [rel('valde'), S.buds.ria.g].join();
+    S.rel.valde = CLUB.confia; S.rel.pres_valde = CLUB.confia - REL.regalo; want(['^Charlar']); await run(() => talkPresi('valde'));
+    want(['^Invitar', '^Skunk']); await run(() => talkPresi('valde')); R.si = [rel('pres_valde'), clubTeCompra('valde')].join();
+    want(['^Vender al club', '^Skunk', '^50 g']); R.m = S.money; await run(() => talkClub('valde')); R.vende = S.money > R.m;
+    // el bajo de las setas
+    Object.assign(S, { ch: 5, money: 10000, day: 40, min: 600, setas: null, esquejes: [], bandejas: [], seeds: { ria: 2 } });
+    const ds = Object.entries(MAPS.callejon.doors).find(([, d]) => d.gate === 'setas'), [dx, dy] = ds[0].split(',').map(Number);
+    enterMap('callejon', dx, dy + 1, 'up'); Object.assign(P, { x: dx, y: dy, px: dx * 16, py: dy * 16 }); await run(() => entraLocal(ds[1])); R.cerrado = [S.map, P.y - dy].join();
+    S.setas = { bandejas: [{ d: S.day - 12, hum: 80 }, { d: S.day, hum: 40 }, { d: S.day - 3, hum: 60, mala: 'contaminada' }], g: 0 };
+    Object.assign(P, { x: dx, y: dy, px: dx * 16, py: dy * 16 }); await run(() => entraLocal(ds[1])); await idle(); R.dentro = [S.map, P.x, P.y, ds[1].x, ds[1].y].join();
+    R.balda = [bandejasBalda(0).map(b => b[0]).join('+'), bandejasBalda(1).map(b => b[0]).join('+'), spriteLocal('secaS')].join();
+    Math.random = () => .5; want(['^Recoger', '^Tirar', '^Nada']); await run(() => objectAction(0, 2)); Math.random = r0; R.rec = [S.setas.g, S.setas.bandejas.length, spriteLocal('secaS')].join();
+    R.min = S.min; await run(() => objectAction(4, 2)); R.pulv = [S.setas.bandejas[0].hum, S.min - R.min].join();
+    await run(() => objectAction(6, 2)); await run(() => objectAction(7, 1)); await run(() => objectAction(9, 5));
+    const sx = MAPS.setas.exits['4,6']; R.sale = [sx.to, sx.x, sx.y].join();
+    S.setas = null; await run(() => objectAction(0, 2));
+    // las madres
+    Object.assign(S, { ch: 6, money: 10000, nave: naveNueva(), plantilla: [{ id: 'p1', n: 'Iker', lab: 3, cui: 4, lea: 3, rol: 'nave', mesa: 0 }, { id: 'p2', n: 'Ane', lab: 2, cui: 3, lea: 2 }] });
+    enterMap('nave', 6, 6, 'up'); const N = S.nave, [iker, ane] = S.plantilla;
+    R.carpa = [MAPS.nave.w, MAPS.nave.o[2][15], MAPS.nave.o[2][16], spriteLocal('carpaM'), ents.some(e => e.id === 'nvm')].join();
+    want(['^Meter una madre', '^Skunk', '<B>']); await run(() => objectAction(15, 2)); R.meter = [N.ma.length, S.seeds.ria, N.ma[0].v, N.ma[0].e, spriteLocal('carpaM')].join();
+    madresDia(); madresDia(); R.sin = N.ma[0].v; R.m = S.money;
+    want(['^A las madres']); await run(() => trabajo(ane)); R.rol = [ane.rol, cuidaMadres() === ane].join();
+    enterMap('nave', 6, 6, 'up'); R.nvm = ents.filter(e => e.id === 'nvm').map(e => e.x + ',' + e.y).join(); await run(talkMadres);
+    Math.random = () => .99; plantillaDia(); plantillaDia(); Math.random = r0; R.con = [N.ma[0].v, N.ma[0].e, R.m - S.money].join();
+    want(['^Madre 1', '^Recoger', '<B>']); await run(carpaMadres); R.esq = [S.esquejes.length, N.ma[0].e, S.esquejes[0] && S.esquejes[0].sid].join();
+    want(['^Madre 1']); await run(() => plantarMesa(1)); R.mesa = [N.m[1] && lotSid(N.m[1].k), S.seeds.ria, N.ma.length, S.esquejes.length].join();
+    want(['^La gente', '^Iker', '^Cambiar de mesa', '^Mesa 3', '<B>', '<B>']); await run(escritorioNave); R.cambia = iker.mesa;
+    R.m = S.money; want(['^Ane', '^Prima', '^Ane', '^Prima', '^Ane', '^Curso', '<B>']); await run(genteNave); R.mando = [R.m - S.money, ane.lea, ane.cui, ane.pr - S.day, ane.cu1 - S.day].join();
+    R.rel = relDe('nvm');
+    // sin nadie, se apagan y se mueren
+    ane.rol = null; for (let i = 0; i < 5; i++) madresDia(); await idle(); R.muere = N.ma.length;
+    delete N.ma; S.clubDia = { puerto: 3 }; S.rel = {}; delete S.clubReg; migrate(); R.mig = JSON.stringify(S.nave.ma); R.migP = [rel('puerto'), rel('pres_puerto'), rel('pres_ibar'), JSON.stringify(S.clubReg)].join();
+    S = S0; montarNave(); enterMap('home', 5, 5, 'up');
+  }, () => R.clubs === 'puerto:16x10:itsaso:6:6:2 valde:18x10:fundicion:8:8:3 ibar:15x8:kalea:4:4:1 ens:20x10:ensanche:10:10:3 rv:16x10:-:6:6:2'
+    && R.bil.split(',').every(n => +n >= 8) && R.tiles === 'floorC_kalea,floorC_itsaso,floorC_fundicion,floorC_ensanche,floorC'
+    && R.spr === 'sofaF-kalea,sofaF-itsaso,sofaF-fundicion,sofaF-ensanche,sofaF' && R.arte
+    && R.grow === '12x9,floorG,carpaDemo,carpaDemo2,5,7|6,7,5,8/6,8'
+    && R.cerrado === 'callejon,1' && R.dentro === 'setas,4,5,4,5' && R.balda === 'bandejaS-lista-0+bandejaS-colonizando-1,bandejaS-contaminada-0,secaS-0'
+    && R.rec === `${Math.round((SETAS.g[0] + SETAS.g[1]) / 2)},1,secaS-1` && R.pulv === `100,${SETAS.min}` && R.sale === 'callejon,19,8'
+    && R.carpa === '18,carpaM,carpaM2,carpaM-0,false' && R.meter === '1,1,100,0,carpaM-1' && R.sin === 100 - 2 * MADRES.pierde && R.rol === 'madres,true'
+    && R.nvm === '14,2' && R.con === `100,${2 * MADRES.esq},${2 * (NAVE.dia + PLANTILLA.sueldo.nave + PLANTILLA.sueldo.madres)}` && R.esq === '2,0,ria'
+    && R.mesa === 'ria,1,1,2' && R.cambia === 2 && R.mando === `${MANDO.prima + MANDO.curso},3,4,0,0` && R.rel === null
+    && R.muere === 0 && R.mig === '[]' && R.migP === `${CLUB.confia},${CLUB.confia},0,{}`
+    && R.pres === 'puerto:5,5:cliente6 valde:5,5:cliente3 ibar:10,5:cliente6 ens:5,5:cliente3' && R.no === '0,false,true' && R.noEnc === null
+    && R.inv === `${REL.regalo},${300 - REL.regaloG}` && R.si === `${CLUB.confia},true` && R.vende
+    && LOG.includes('CLUB LA FUNDICIÓN: Aquí no compramos a cualquiera. Antes te tienes que ganar mi confianza y la de Rosario, la presidenta.')
+    && LOG.includes('CLUB LA FUNDICIÓN: Hoy ya me has invitado. Otro día.') && LOG.includes('ROSARIO: Desde hoy, CLUB LA FUNDICIÓN te compra. Lo tuyo, por la puerta de atrás.')
+    && LOG.includes('La puerta del bajo de Txomin, con un candado. La llave te la da él, si lo alquilas.') && LOG.includes('El bajo ya no es tuyo. Txomin cambiará la cerradura.')
+    && LOG.some(l => l.startsWith('En el secadero, ')) && LOG.includes('Una tubería vieja que suda. Por eso aquí la humedad nunca baja.')
+    && LOG.some(l => /^ANE: Una madre, a 18\/6 y bien regadas\. Cada mañana les saco un esqueje/.test(l))
+    && LOG.some(l => /^A Ane ya le diste una prima el día \d+/.test(l)) && LOG.includes('Sin nadie que la cuide, se ha muerto una madre de la nave.') || R);
   await step('Guardar y cargar la partida', [], async () => { save(); },
     () => { const sv = loadSave(); return sv && sv.ch === S.ch && sv.money === S.money && JSON.stringify(sv.disc) === JSON.stringify(S.disc) || 'no coincide'; });
 

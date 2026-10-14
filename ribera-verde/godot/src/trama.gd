@@ -2948,8 +2948,12 @@ func gente() -> void:
 		if S.rel.has(id):
 			rows.append({"label": D.GENTE[id], "right": "%d · %s" % [rel(id), "jardinera" if id == "begona" and S.curro.get("jard") else rel_nivel(id)], "desc": D.QUE_DA.get(id, "Hablar cada día suma confianza.")})
 	for k in D.CLUBS:
+		var P = D.PRESI.get(k)
+		var no: String = (" Para que te compren, %d con el encargado y con %s %s." % [int(D.CLUB.confia), P.a, P.t]) if P and not club_te_compra(k) else ""
 		if S.rel.has(k):
-			rows.append({"label": D.CLUBS[k].n, "right": "%d · %s" % [rel(k), rel_nivel(k)], "desc": "Eres socio. Vender y cumplir los encargos suma." if S.clubs.get(k) else "Hazte socio para vender y comprar."})
+			rows.append({"label": D.CLUBS[k].n, "right": "%d · %s" % [rel(k), rel_nivel(k)], "desc": ("Eres socio. Vender y cumplir los encargos suma." if S.clubs.get(k) else "Hazte socio para vender y comprar.") + no})
+		if P and S.rel.has("pres_" + k):
+			rows.append({"label": P.n, "right": "%d · %s" % [rel("pres_" + k), rel_nivel("pres_" + k)], "desc": "%s %s de %s. Hablar e invitarle suma.%s" % ["El" if P.a == "el" else "La", P.t, D.CLUBS[k].n, no]})
 	for f in S.fijos:
 		var v = _vend_de(f.id)
 		rows.append({"label": f.n, "right": "%d · %s" % [rel(f.id), "vende para ti" if v else rel_nivel(f.id)],
@@ -3036,17 +3040,74 @@ func talk_club(k: String):
 		if not await carne_club(k):
 			return
 	var E = S.get("clubEnc")
-	var c: int = await ask("¿Qué te trae?", ["Vender al club", "Comprar %d g" % int(D.CLUB.compra), "Entregar las semillas" if E and E.k == k else "Encargo de semillas", "Nada"], N)
-	if c == 0:
+	var ops := ["Vender al club", "Comprar %d g" % int(D.CLUB.compra), "Entregar las semillas" if E and E.k == k else "Encargo de semillas"]
+	if D.PRESI.has(k) and rel(k) < D.CLUB.confia and total_buds() >= D.REL.regaloG:
+		ops.append("Invitar a %d g" % int(D.REL.regaloG))
+	ops.append("Nada")
+	var oi: int = await ask("¿Qué te trae?", ops, N)
+	var op: String = ops[oi]
+	if op == "Vender al club":
 		await vender_club(k)
-	elif c == 1:
+	elif op.begins_with("Comprar"):
 		await comprar_club(k)
-	elif c == 2:
+	elif op.begins_with("Invitar"):
+		await invitar_club(k, k, N)
+	elif op.begins_with("Entregar") or op.begins_with("Encargo"):
 		await encargo_club(k)
+
+# 1.34 (PRESI): fuera del barrio, un club solo te compra (lotes y encargos) si se fían de ti el encargado y su presidente
+func club_te_compra(k: String) -> bool:
+	return not D.PRESI.has(k) or (rel(k) >= D.CLUB.confia and rel("pres_" + k) >= D.CLUB.confia)
+
+func no_compra(k: String) -> void:
+	var P: Dictionary = D.PRESI[k]
+	var e: bool = rel(k) < D.CLUB.confia
+	var p: bool = rel("pres_" + k) < D.CLUB.confia
+	var de: String = "%s, %s %s" % [P.n, P.a, P.t]
+	await say("Aquí no compramos a cualquiera. Antes te tienes que ganar %s." % (("mi confianza y la de " + de) if e and p else ("mi confianza" if e else "la confianza de " + de)), D.CLUBS[k].n)
+
+# invitar a probar REL.regaloG g (al encargado, id = k, o al presidente, "pres_" + k); si con eso ya se fían los dos, lo dicen
+func invitar_club(id: String, k: String, N: String) -> void:
+	if S.clubReg.get(id) == S.day:
+		await say("Hoy ya me has invitado. Otro día.", N)
+		return
+	var lots := bud_lots(D.REL.regaloG)
+	var it := lots.map(lot_item)
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿Qué le das a probar?"})
+	if i < 0 or i >= lots.size():
+		return
+	var antes := club_te_compra(k)
+	use_buds(lots[i][0], D.REL.regaloG)
+	S.clubReg[id] = S.day
+	confia(id, int(D.REL.regalo))
+	sfx("get")
+	await say("Mm. Esto no es de cualquiera. Gracias.", N)
+	if not antes and club_te_compra(k):
+		sfx("get")
+		await say("Desde hoy, %s te compra. Lo tuyo, por la puerta de atrás." % D.CLUBS[k].n, N)
+
+func talk_presi(k: String):
+	var P: Dictionary = D.PRESI[k]
+	var N: String = P.n.to_upper()
+	var id: String = "pres_" + k
+	var ops := ["Charlar"]
+	if total_buds() >= D.REL.regaloG:
+		ops.append("Invitar a %d g" % int(D.REL.regaloG))
+	ops.append("Nada")
+	var oi: int = await ask("Hombre, {N}. Lo tuyo tiene buena fama entre los socios." if rel(id) >= D.CLUB.confia else "Soy %s, %s %s del club. A ti todavía no te conozco." % [P.n, P.a, P.t], ops, N)
+	var op: String = ops[oi]
+	if op == "Charlar":
+		await say(D.PRESI_TXT[(int(S.day) + D.PRESI.keys().find(k)) % D.PRESI_TXT.size()], N)
+	elif op.begins_with("Invitar"):
+		await invitar_club(id, k, N)
 
 func vender_club(k: String) -> void:
 	var C: Dictionary = D.CLUBS[k]
 	var N: String = C.n
+	if not club_te_compra(k):
+		await no_compra(k)
+		return
 	if S.clubDia.get(k) == S.day:
 		await say("Hoy ya hemos cerrado caja. Mañana.", N)
 		return
@@ -3108,6 +3169,7 @@ func comprar_club(k: String) -> void:
 		return
 	S.money -= p
 	S.clubCompra[k] = S.day
+	confia(k, 1)
 	add_buds(sid, D.CLUB.compra, s.thc, S.buds, 1)
 	discover(sid)
 	sfx("coin")
@@ -3139,6 +3201,9 @@ func encargo_club(k: String) -> void:
 		toast("+%s · %d semillas de %s" % [Datos.eur(E.pago), int(E.n), s.n], 1600)
 		await say("Las sembramos para los socios. Buen trabajo.", N)
 		await check_story()
+		return
+	if not club_te_compra(k):
+		await no_compra(k)
 		return
 	if S.clubEncDia == S.day:
 		await say("Hoy ya no hay más encargos. Mañana.", N)
@@ -3295,6 +3360,56 @@ func gerente():
 func naveros() -> Array:
 	return S.plantilla.filter(func(w): return w.get("rol") == "nave")
 
+# 1.34: con el de las madres (cuida_madres)
+func de_la_nave() -> Array:
+	return S.plantilla.filter(func(w): return w.get("rol") == "nave" or w.get("rol") == "madres")
+
+# llevar a la gente (1.34, MANDO de 11f-plantilla): una prima (lealtad +1) y un curso (cuidado +1; a los de la calle, labia +1), hasta
+# 5, cada uno una vez cada MANDO.dias días por persona (w.pr, w.cu1)
+func curso_de(w: Dictionary) -> Array:
+	return ["lab", "labia"] if w.get("rol") == "calle" else ["cui", "cuidado"]
+
+func prima(w: Dictionary) -> void:
+	var M: Dictionary = D.MANDO
+	if w.get("pr") != null and S.day - int(w.pr) < int(M.dias):
+		await say("A %s ya le diste una prima el día %d. Hasta el %d, no." % [w.n, int(w.pr), int(w.pr) + int(M.dias)])
+		return
+	if w.lea >= 5:
+		await say("%s ya te es leal del todo: una prima no le cambia nada." % w.n)
+		return
+	if S.money < M.prima:
+		sfx("bad")
+		await say("No te llega.")
+		return
+	S.money -= int(M.prima)
+	w.pr = S.day
+	w.lea = int(w.lea) + 1
+	sfx("coin")
+	update_hud()
+	await say("%s: «Gracias, jefe. Aquí me tienes». Lealtad %d." % [w.n, int(w.lea)])
+
+func curso(w: Dictionary) -> void:
+	var M: Dictionary = D.MANDO
+	var kn := curso_de(w)
+	var k: String = kn[0]
+	var nn: String = kn[1]
+	if int(w[k]) >= 5:
+		await say("%s ya tiene %s 5: no hay curso que le enseñe más." % [w.n, nn])
+		return
+	if w.get("cu1") != null and S.day - int(w.cu1) < int(M.dias):
+		await say("%s hizo un curso el día %d. Hasta el %d, no." % [w.n, int(w.cu1), int(w.cu1) + int(M.dias)])
+		return
+	if S.money < M.curso:
+		sfx("bad")
+		await say("No te llega.")
+		return
+	S.money -= int(M.curso)
+	w.cu1 = S.day
+	w[k] = int(w[k]) + 1
+	sfx("coin")
+	update_hud()
+	await say("%s hace un curso %s. %s %d." % [w.n, "de venta: a tratar con la gente" if k == "lab" else "de cultivo: riego, plagas y poda", nn.substr(0, 1).to_upper() + nn.substr(1), int(w[k])])
+
 # la mesa de cada trabajador de la nave (1.31: w.mesa, la suya mientras trabaje allí; antes, el orden de la plantilla): quién cuida la
 # mesa i y la mesa que le toca al que llega (la primera plantada sin nadie y, si no, la primera libre)
 func navero_de(i: int):
@@ -3330,7 +3445,9 @@ func rol_desc(w: Dictionary) -> String:
 			return "Cuida el piso y cosecha al arcón por %s al día." % Datos.eur(P.sueldo.gerente)
 		"nave":
 			return "Cultiva la mesa %d de la nave por %s al día: %d g." % [int(w.mesa) + 1, Datos.eur(P.sueldo.nave), nave_g(w)]
-	return "Dale trabajo: calle, gerente o nave."
+		"madres":   # 1.34
+			return "Cuida las madres de la nave por %s al día y les saca esquejes." % Datos.eur(P.sueldo.madres)
+	return "Dale trabajo: calle, gerente, nave o las madres."
 
 # deja el trabajo; lo que le quedaba del lote vuelve al arcón
 func libre(w: Dictionary) -> void:
@@ -3427,9 +3544,11 @@ func trabajo(w: Dictionary) -> void:
 		ops.append("De gerente")
 	if w.get("rol") != "nave" and S.get("nave") != null and naveros().size() < int(D.NAVE.max):
 		ops.append("A la nave")
+	if w.get("rol") != "madres" and S.get("nave") != null and cuida_madres() == null:   # 1.34
+		ops.append("A las madres")
 	if w.get("rol"):
 		ops.append("Dejarlo libre")
-	ops.append_array(["Despedir", "Nada"])
+	ops.append_array(["Prima · " + Datos.eur(D.MANDO.prima), "Curso · " + Datos.eur(D.MANDO.curso), "Despedir", "Nada"])
 	var oi: int = await ask("%s · %s · %s" % [w.n, ficha_gente(w), rol_txt(w)], ops)
 	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 	if op == "A la calle":
@@ -3455,6 +3574,15 @@ func trabajo(w: Dictionary) -> void:
 		w.rol = "nave"
 		sfx("sel")
 		await say("%s: «Mañana empiezo en la mesa %d de la nave. %s al día»." % [w.n, int(w.mesa) + 1, Datos.eur(P.sueldo.nave)])
+	elif op == "A las madres":
+		libre(w)
+		w.rol = "madres"
+		sfx("sel")
+		await say("%s: «Mañana empiezo con las madres de la nave: riego, poda y esquejes. %s al día»." % [w.n, Datos.eur(P.sueldo.madres)])
+	elif op.begins_with("Prima"):
+		await prima(w)
+	elif op.begins_with("Curso"):
+		await curso(w)
 	elif op == "Dejarlo libre":
 		var g: float = w.g if w.get("rol") == "calle" else 0.0
 		libre(w)
@@ -3506,7 +3634,7 @@ func plantilla_dia() -> void:
 	var vende := false
 	nave_alquiler()
 	for w in S.plantilla:
-		if w.get("rol") != "gerente" and w.get("rol") != "nave":
+		if w.get("rol") == null or not P.sueldo.has(w.rol):   # gerente, nave y madres (1.34)
 			continue
 		if S.money < P.sueldo[w.rol]:
 			w.rol = null
@@ -3569,7 +3697,7 @@ func nave_alquiler() -> void:
 	if S.get("nave") == null:
 		return
 	if S.money < D.NAVE.dia:
-		for w in naveros():
+		for w in de_la_nave():
 			libre(w)
 		S.nave = null
 		queue("nave", func(): await talk("SMS · ARRIETA", ["No me has pagado la nave. Cambio la cerradura y me quedo la fianza."]))
@@ -3583,6 +3711,7 @@ func nave_dia() -> void:
 	var N = S.get("nave")
 	if N == null:
 		return
+	madres_dia()   # 1.34
 	var W := naveros()
 	if W.is_empty() or not N.m.any(func(x): return x != null):
 		return
@@ -3590,11 +3719,11 @@ func nave_dia() -> void:
 	for w in W:
 		mc = maxi(mc, int(w.cui))
 	if Cultivo.azar() < maxf(0, D.NAVE.redada - D.NAVE.redadaC * mc) * D.EXTR_NAVE[int(N.ex)].olor:   # 1.33: con los filtros, huele menos
-		var ns: Array = W.map(func(w): return w.n)
+		var ns: Array = de_la_nave().map(func(w): return w.n)
 		var quien: String = (", ".join(PackedStringArray(ns.slice(0, -1))) + " y " + ns[-1]) if ns.size() > 1 else ns[0]
 		var gg: float = nave_stock()
 		S.nave = null
-		S.plantilla = S.plantilla.filter(func(w): return w.get("rol") != "nave")
+		S.plantilla = S.plantilla.filter(func(w): return w.get("rol") != "nave" and w.get("rol") != "madres")
 		S.heat = min(100, S.heat + D.NAVE.calor)
 		sfx("bad")
 		queue("nave", func(): await say("La policía ha entrado en la nave de Valdehierro. Se lleva las plantas%s y a %s." % [(", " + g_txt(gg)) if gg >= 1 else "", quien]))
@@ -3623,6 +3752,31 @@ func nave_dia() -> void:
 		Me.t = Datos.jsround((Me.t * Me.g + thc * g) / (Me.g + g) * 10) / 10.0
 		Me.g = Datos.jsround((Me.g + g) * 10) / 10.0
 
+# las madres de la nave, cada mañana (1.34, MADRES de 11j-locales): con quien las cuide, a 100 de vigor y con sus esquejes; sin nadie,
+# se apagan y, a 0, se mueren
+func madres_dia() -> void:
+	var N: Dictionary = S.nave
+	var c = cuida_madres()
+	if N.ma.is_empty():
+		return
+	var muertas := 0
+	var quedan := []
+	for M in N.ma:
+		if c != null:
+			M.v = 100
+			M.e = mini(int(D.MADRES.tope), int(M.e) + int(D.MADRES.esq) + (1 if c.cui >= 4 else 0))
+			quedan.append(M)
+			continue
+		M.v = maxi(0, int(M.v) - int(D.MADRES.pierde))
+		if M.v > 0:
+			quedan.append(M)
+		else:
+			muertas += 1
+	N.ma = quedan
+	if muertas:
+		var t: String = ("Sin nadie que las cuide, se han muerto %d madres de la nave." % muertas) if muertas > 1 else "Sin nadie que la cuide, se ha muerto una madre de la nave."
+		queue("madres", func(): await say(t))
+
 # Arrieta, el dueño de la nave de Valdehierro
 func talk_nave() -> void:
 	var A := "ARRIETA"
@@ -3649,7 +3803,7 @@ func talk_nave() -> void:
 	if op == "Dejar la nave":
 		if await ask("¿Dejas la nave? Te devuelvo la fianza%s." % ("; lo que no recojas se queda aquí" if nave_stock() >= 1 else ""), ["Dejarla", "No"], A) != 0:
 			return
-		for w in naveros():
+		for w in de_la_nave():
 			libre(w)
 		S.nave = null
 		S.money += int(D.NAVE.fianza)
@@ -3679,6 +3833,11 @@ func entra_local(d: Dictionary):
 			atras_puerta()
 			await say("La persiana está echada con un candado. La llave la tiene Arrieta, el dueño.")
 			return
+	elif t == "setas":   # 1.34: el bajo de Txomin
+		if S.get("setas") == null:
+			atras_puerta()
+			await say("La puerta del bajo de Txomin, con un candado. La llave te la da él, si lo alquilas.")
+			return
 	elif t == "disco":
 		if S.ch < int(D.DISCO.ch) or not disco_abierta():
 			atras_puerta()
@@ -3704,6 +3863,26 @@ func obj_local(x: int, y: int, o) -> bool:
 	if o == null:
 		return false
 	var txt := ""
+	if S.map == "shop" or S.map == "growcity":   # los dos grows (1.34): lo nuevo de cada uno
+		match o:
+			"pizarra":
+				txt = "En la pizarra de Kiko, a tiza: «%s»." % D.PIZARRA_KIKO[int(S.day) % D.PIZARRA_KIKO.size()]
+			"sacos":
+				txt = "Sacos de 50 litros: fibra de coco, perlita y tierra abonada."
+			"macetasP":
+				txt = "Macetas de tela apiladas, de 11, 18 y 25 litros."
+			"botesW":
+				txt = "Botes de abono por litros: MEATZA en azul, ORTUA BIO en verde."
+			"neonG":
+				txt = "Un neón verde: una hoja de siete puntas y GROW IBARBIDE debajo."
+			"semillero":
+				txt = "Un propagador con tapa: bandejas de alveolos con esquejes de muestra y su manta térmica."
+			"carpaDemo", "carpaDemo2":
+				txt = "La carpa de exposición: 120 × 120, con el LED de barras encendido y plantas de plástico dentro."
+		if txt == "":
+			return false
+		await say(txt)
+		return true
 	if S.map.begins_with("club-"):
 		var k: String = S.map.substr(5)
 		var C: Dictionary = D.CLUBS[k]
@@ -3718,10 +3897,10 @@ func obj_local(x: int, y: int, o) -> bool:
 				txt = "El taquero: seis tacos, la tiza y el triángulo."
 			"vitrina":
 				txt = "La vitrina del dispensario: tarros con muestras y una báscula de precisión."
-			"mesita":
-				txt = "Una mesa baja con un cenicero, un grinder y un librillo."
+			"mesita":   # 1.34: cada club, con los suyos
+				txt = D.MUEBLE_CLUB[k].mesa
 			"sofaF", "sofaF2", "sofaB", "sofaB2":
-				txt = "Un sofá chester de cuero verde, gastado de tanto uso."
+				txt = D.MUEBLE_CLUB[k].sofa
 			"billar", "billar2":
 				txt = "La mesa de billar, con el tapete recién cepillado. %s juega con apuesta." % D.BILLAR.n[k]
 			"poster":
@@ -3730,6 +3909,8 @@ func obj_local(x: int, y: int, o) -> bool:
 				txt = "%s, en un campo. En la placa: «Maite, presidenta fundadora»." % ("La tía Maite y Delroy, de jóvenes" if aso().tio else "La tía Maite, joven, con un hombre de rastas negras")
 			"plantDeco":
 				txt = "Una kentia en una maceta de barro."
+		if txt == "" and D.DECO_CLUB.has(o):   # 1.34: lo que cuelga de sus paredes
+			txt = D.DECO_CLUB[o]
 	if S.map == "nave":
 		if S.get("nave") == null:
 			await say("La nave está vacía.")
@@ -3747,8 +3928,33 @@ func obj_local(x: int, y: int, o) -> bool:
 			"escritorio", "escritorio2":
 				await escritorio_nave()
 				return true
+			"carpaM", "carpaM2":   # 1.34
+				await carpa_madres()
+				return true
 			"crate":
 				txt = "Sacos de sustrato y macetas apiladas."
+	if S.map == "setas":   # 1.34: el bajo de las setas por dentro
+		if S.get("setas") == null:
+			await say("El bajo ya no es tuyo. Txomin cambiará la cerradura.")
+			return true
+		match o:
+			"baldaS":
+				await bajo_menu("")
+				return true
+			"humidS":
+				if S.setas.bandejas.any(func(b): return not b.get("mala")):
+					await pulverizar_bajo()
+				else:
+					await say("El pulverizador de mochila de Txomin. Con él se tienen húmedas las bandejas.")
+				return true
+			"secaS":
+				txt = ("En el secadero, %s de setas secas. Txomin te las compra en la puerta." % g_txt(S.setas.g)) if S.setas.g >= 1 else "El secadero está vacío. Lo que recojas se seca aquí."
+			"tuboS":
+				txt = "Una tubería vieja que suda. Por eso aquí la humedad nunca baja."
+			"crate":
+				txt = "Cajas de bandejas vacías de Txomin, apiladas."
+			"cuboS":
+				txt = "Un cubo y un cepillo. Lo que se echa a perder, fuera."
 	if S.map == "disco":
 		match o:
 			"bottles":
@@ -3767,6 +3973,31 @@ func obj_local(x: int, y: int, o) -> bool:
 		return false
 	await say(txt)
 	return true
+
+# 1.34: los demás socios de cada club (GENTE_CLUB)
+func talk_gente_club(k: String, j: int):
+	await say(D.GENTE_CLUB[(int(S.day) + j + D.CLUBS.keys().find(k)) % D.GENTE_CLUB.size()], "SOCIO")
+
+# el sprite de lo que cambia en los locales (1.34, spriteLocal de 11j-locales): el secadero del bajo, con setas o vacío, y la carpa de
+# las madres, con las que tenga; los demás, con estilo, el de su club (estiloLocal)
+func sprite_local(o: String) -> String:
+	if o == "secaS":
+		return "secaS-%d" % (1 if S.get("setas") != null and S.setas.g >= 1 else 0)
+	if o == "carpaM":
+		return "carpaM-%d" % (S.nave.ma.size() if S.get("nave") != null and S.nave.has("ma") else 0)
+	var e = MAPS[S.map].get("est") if MAPS.has(S.map) else null
+	return (o + "-" + e) if e and D.ESTILO_OBJ.has(o) else o
+
+# las bandejas de la balda x del bajo (1.34, bandejasBalda): las dos que le tocan (2x abajo, 2x + 1 arriba), en su fase
+func bandejas_balda(x: int) -> Array:
+	var r := []
+	if S.get("setas") == null:
+		return r
+	var B: Array = S.setas.bandejas
+	for j in 2:
+		if 2 * x + j < B.size():
+			r.append("bandejaS-%s-%d" % [fase_seta(B[2 * x + j]), j])
+	return r
 
 # ---------- el club: el socio y el billar ----------
 func talk_socio(k: String):
@@ -3892,7 +4123,7 @@ func nave_nueva() -> Dictionary:
 	var fs := []
 	for i in int(D.NAVE.max):
 		fs.append("led")
-	return {"m": m, "ab": {"m": 0, "o": 0}, "f": fs, "ex": 0, "rg": 0}
+	return {"m": m, "ab": {"m": 0, "o": 0}, "f": fs, "ex": 0, "rg": 0, "ma": []}   # 1.34: las madres (ma)
 
 # el equipo de la nave (1.33, FOCO_NAVE, EXTR_NAVE, RIEGO_NAVE y NIVEL_NAVE de 11j-locales): el calor de los focos encendidos, lo que
 # quita el que no saca la extracción y las dosis de la estantería, enteras
@@ -3964,45 +4195,128 @@ func mesa_nave(i: int) -> void:
 			Me.abo = c
 			sfx("sel")
 
-# con una semilla o un esqueje, tu gente saca una madre y llena la mesa de clones: toda la mesa, con su fenotipo
-func plantar_mesa(i: int) -> void:
+# una semilla o un esqueje de los tuyos, que se gasta (1.34, elegirPlanta: o, con madres, el clon de una madre de la nave, que no se
+# gasta): {sid, f} o null
+func elegir_planta(title: String, madres: bool):
 	var own := _own()
 	var esq := []   # [esqueje, 1 si es de las bandejas del carro]
 	for e in S.esquejes:
 		esq.append([e, 0])
 	for e in S.bandejas:
 		esq.append([e, 1])
-	if own.is_empty() and esq.is_empty():
+	var ma: Array = S.nave.ma if madres and S.get("nave") != null else []
+	if own.is_empty() and esq.is_empty() and ma.is_empty():
 		await say("No llevas semillas ni esquejes.")
-		return
+		return null
 	var items := []
+	for j in ma.size():
+		var k := lot_sid(ma[j].k)
+		var s = strain(k)
+		items.append({"label": "Madre %d: %s%s" % [j + 1, s.n, etiq(ma[j].get("f"))], "right": "clon", "sw": s.c, "ic": ic_cog(k), "desc": "Un clon de la carpa de las madres: no se gasta nada."})
 	for o in own:
 		var s = strain(o[0])
 		items.append({"label": s.n, "right": "×" + n(o[1]), "sw": s.c, "ic": ic_cog(o[0]), "desc": strain_line(o[0])})
 	for eb in esq:
 		var s = strain(eb[0].sid)
-		items.append({"label": "Esqueje " + s.n + etiq(eb[0].f), "right": "bandeja" if eb[1] else "esqueje", "sw": s.c, "ic": ic_cog(eb[0].sid), "desc": "Clon enraizado: la mesa entera sale con su fenotipo."})
+		items.append({"label": "Esqueje " + s.n + etiq(eb[0].f), "right": "bandeja" if eb[1] else "esqueje", "sw": s.c, "ic": ic_cog(eb[0].sid), "desc": "Clon enraizado: sale con su fenotipo."})
 	items.append({"label": "Cancelar", "desc": ""})
-	var j: int = await menu(items, {"cls": "full", "title": "¿QUÉ PLANTAS EN LA MESA?", "desc": true})
-	if j < 0 or j >= own.size() + esq.size():
-		return
-	var sid: String
-	var f: Dictionary
+	var j: int = await menu(items, {"cls": "full", "title": title, "desc": true})
+	if j < 0 or j >= items.size() - 1:
+		return null
+	if j < ma.size():
+		return {"sid": lot_sid(ma[j].k), "f": ma[j].f}
+	j -= ma.size()
 	if j < own.size():
-		sid = own[j][0]
+		var sid: String = own[j][0]
 		S.seeds[sid] -= 1
 		if not S.seeds[sid]:
 			S.seeds.erase(sid)
-		f = roll_feno(sid)
-	else:
-		var e: Dictionary = esq[j - own.size()][0]
-		var l: Array = S.bandejas if esq[j - own.size()][1] else S.esquejes
-		l.remove_at(l.find(e))
-		sid = e.sid
-		f = e.f
+		return {"sid": sid, "f": roll_feno(sid)}
+	var e: Dictionary = esq[j - own.size()][0]
+	var l: Array = S.bandejas if esq[j - own.size()][1] else S.esquejes
+	l.remove_at(l.find(e))
+	return {"sid": e.sid, "f": e.f}
+
+# con una semilla o un esqueje, tu gente saca una madre y llena la mesa de clones: toda la mesa, con su fenotipo
+func plantar_mesa(i: int) -> void:
+	var p = await elegir_planta("¿QUÉ PLANTAS EN LA MESA?", true)
+	if p == null:
+		return
+	var sid: String = p.sid
+	var f: Dictionary = p.f
 	S.nave.m[i] = {"k": sid + ("*" if Cultivo.clase_feno(f) == "estrella" else ""), "f": f, "thc": thc_nave(sid, f), "y": f.y, "dia": S.day, "g": 0, "t": 0, "abo": 0}
 	sfx("sel")
 	await say("Mesa %d: %s%s. De la madre salen los clones para toda la mesa. A los %d días empieza a dar." % [i + 1, strain(sid).n, etiq(f), int(D.NAVE.crece)])
+
+# la carpa de las madres (1.34, carpaMadres de 11j-locales): hasta MADRES.max madres (S.nave.ma: {k, f, v: el vigor, e: los esquejes
+# listos}); se mete una con una semilla o un esqueje; los esquejes se recogen aquí, al propagador (S.esquejes, con su tope)
+func cuida_madres():
+	for w in S.plantilla:
+		if w.get("rol") == "madres":
+			return w
+	return null
+
+func madre_txt(M: Dictionary) -> String:
+	return strain(lot_sid(M.k)).n + etiq(M.get("f"))
+
+func carpa_madres() -> void:
+	var N: Dictionary = S.nave
+	var i := 0
+	while true:
+		var c = cuida_madres()
+		var rows := []
+		for j in N.ma.size():
+			var M: Dictionary = N.ma[j]
+			var k := lot_sid(M.k)
+			var s = strain(k)
+			rows.append({"label": "Madre %d · %s" % [j + 1, s.n], "right": ("%d esq." % int(M.e)) if M.e else ("%d %%" % int(M.v)), "sw": s.c, "ic": ic_cog(k),
+				"desc": "%s. Vigor %d %%%s." % [madre_txt(M), int(M.v), (" · %d esquejes listos" % int(M.e)) if M.e else ""]})
+		if N.ma.size() < int(D.MADRES.max):
+			rows.append({"label": "Meter una madre", "right": "%d de %d" % [N.ma.size(), int(D.MADRES.max)], "desc": "Con una semilla o un esqueje: la madre de una genética que quieras guardar. De ella salen los esquejes y los clones de las mesas."})
+		rows.append({"label": "Volver", "desc": ""})
+		i = await menu(rows, {"cls": "full", "title": "LAS MADRES", "title2": ("Las cuida " + c.n) if c != null else "Nadie las cuida", "desc": true, "initial": mini(i, rows.size() - 1)})
+		if i < 0 or i == rows.size() - 1:
+			return
+		if i >= N.ma.size():
+			var p = await elegir_planta("¿QUÉ MADRE METES?", false)
+			if p == null:
+				continue
+			N.ma.append({"k": p.sid + ("*" if Cultivo.clase_feno(p.f) == "estrella" else ""), "f": p.f, "v": 100, "e": 0})
+			sfx("sel")
+			await say("La %s%s, a la carpa de las madres: a 18/6, siempre en crecimiento." % [strain(p.sid).n, etiq(p.f)] + ((" %s se encarga." % c.n) if c != null else " Sin nadie que la cuide, se va apagando: pon a alguien de tu plantilla en las madres."))
+			continue
+		var M: Dictionary = N.ma[i]
+		var ops := []
+		if M.e:
+			ops.append("Recoger %d %s" % [int(M.e), "esquejes" if M.e > 1 else "esqueje"])
+		ops.append_array(["Quitarla", "Nada"])
+		var oi: int = await ask("Madre %d: %s · vigor %d %%." % [i + 1, madre_txt(M), int(M.v)] + ("" if M.e else ((" %s le saca esquejes cada mañana." % c.n) if c != null else " Nadie le saca esquejes.")), ops)
+		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+		if op.begins_with("Recoger"):
+			var q: int = mini(int(M.e), int(D.MADRES.propagador) - S.esquejes.size())
+			if q < 1:
+				await say("El propagador está lleno: %d esquejes. Planta alguno antes." % int(D.MADRES.propagador))
+				continue
+			for j in q:
+				S.esquejes.append({"sid": lot_sid(M.k), "f": M.f, "dia": S.day})
+			M.e = int(M.e) - q
+			sfx("get")
+			await say("%s de la %s, al propagador. Plántalos antes del día %d." % [("%d esquejes" % q) if q > 1 else "Un esqueje", madre_txt(M), int(S.day) + int(D.ESQUEJE_DIAS) + 1])
+			continue
+		if op == "Quitarla":
+			if await ask("¿Quitas la madre de %s? Se tira." % madre_txt(M), ["Quitarla", "No"]) != 0:
+				continue
+			N.ma.remove_at(i)
+			sfx("sel")
+
+func talk_madres():
+	var w = cuida_madres()
+	if w == null:
+		return
+	var N: Dictionary = S.nave
+	var dos: bool = int(D.MADRES.esq) + (1 if w.cui >= 4 else 0) > 1
+	await say("La carpa está vacía. Tráeme una madre, una semilla o un esqueje de lo que quieras guardar, y te la cuido." if N.ma.is_empty()
+		else "%s, a 18/6 y bien regadas. Cada mañana les saco %s; los tienes en la carpa." % [("%d madres" % N.ma.size()) if N.ma.size() > 1 else "Una madre", "dos esquejes" if dos else "un esqueje"], w.n.to_upper())
 
 # los focos de la mesa i (1.33, focosNave): cambiarlos por los de otro tipo (los de antes se los queda Arrieta)
 func focos_nave(i: int) -> void:
@@ -4115,6 +4429,7 @@ func _filas_escritorio() -> Array:
 	var E: Dictionary = D.EXTR_NAVE[int(N.ex)]
 	var so := sofoco_nave()
 	rows.append({"label": "Clima", "right": "%s de %s" % [n(calor_nave()), n(E.cap)], "desc": "El calor de los focos encendidos y lo que saca la extracción (%s)." % E.n + ((" Hace demasiado calor: las mesas dan un %d %% menos." % Datos.jsround((1 - so) * 100)) if so < 1 else "")})
+	rows.append({"label": "La gente", "right": "%d aquí" % de_la_nave().size(), "desc": "Quién cuida cada mesa y las madres: cambiarlos de mesa, una prima o un curso. Pulsa A."})   # 1.34
 	rows.append({"label": "Mejoras", "right": "Nave " + nivel_nave(), "desc": "Extracción: %s. Riego: %s. Pulsa A para mejorarlas." % [E.n, D.RIEGO_NAVE[int(N.rg)].n]})
 	return rows
 
@@ -4125,8 +4440,63 @@ func escritorio_nave() -> void:
 		i = await menu(rows, {"cls": "full", "title": "LA NAVE", "title2": "%s al día" % Datos.eur(D.NAVE.dia), "desc": true, "initial": i})
 		if i == rows.size() - 1:
 			await mejoras_nave()
+		elif i == rows.size() - 2:
+			await gente_nave()
 		if i < 0:
 			break
+
+# la gente de la nave (1.34, genteNave): cada uno con su ficha y su sitio; a los de las mesas, cambiarlos de mesa (con el que la tenga,
+# se cambian); a todos, una prima o un curso
+func gente_nave() -> void:
+	var i := 0
+	while true:
+		var W := de_la_nave()
+		W.sort_custom(func(a, b):
+			var ma := 1 if a.rol == "madres" else 0
+			var mb := 1 if b.rol == "madres" else 0
+			if ma != mb:
+				return ma < mb
+			return ma == 0 and int(a.mesa) < int(b.mesa))
+		if W.is_empty():
+			await say("En la nave no trabaja nadie. Pon a tu gente desde el móvil: MÓVIL → PLANTILLA.")
+			return
+		var rows := []
+		for w in W:
+			rows.append({"label": w.n, "right": "madres" if w.rol == "madres" else "mesa %d" % (int(w.mesa) + 1), "desc": ficha_gente(w) + ". " + rol_desc(w)})
+		rows.append({"label": "Volver", "desc": ""})
+		i = await menu(rows, {"cls": "full", "title": "LA GENTE DE LA NAVE", "title2": "%d trabajando" % W.size(), "desc": true, "initial": mini(i, rows.size() - 1)})
+		if i < 0 or i >= W.size():
+			return
+		var w: Dictionary = W[i]
+		var ops := []
+		if w.rol == "nave":
+			ops.append("Cambiar de mesa")
+		ops.append_array(["Prima · " + Datos.eur(D.MANDO.prima), "Curso · " + Datos.eur(D.MANDO.curso), "Nada"])
+		var oi: int = await ask("%s · %s · %s" % [w.n, ficha_gente(w), "las madres" if w.rol == "madres" else "la mesa %d" % (int(w.mesa) + 1)], ops)
+		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+		if op == "Cambiar de mesa":
+			var ms := []
+			for j in int(D.NAVE.max):
+				if j != int(w.mesa):
+					ms.append(j)
+			var lb := []
+			for j in ms:
+				var o = navero_de(j)
+				lb.append("Mesa %d" % (j + 1) + ((" · con " + o.n) if o != null else ""))
+			lb.append("Nada")
+			var c: int = await ask("¿A qué mesa pasa %s?" % w.n, lb)
+			if c < 0 or c >= ms.size():
+				continue
+			var o = navero_de(ms[c])
+			if o != null:
+				o.mesa = w.mesa
+			w.mesa = ms[c]
+			sfx("sel")
+			await say("%s pasa a la mesa %d" % [w.n, int(w.mesa) + 1] + ((" y %s, a la %d." % [o.n, int(o.mesa) + 1]) if o != null else "."))
+		elif op.begins_with("Prima"):
+			await prima(w)
+		elif op.begins_with("Curso"):
+			await curso(w)
 
 func talk_navero(i: int):
 	var w = navero_de(i)
@@ -4496,6 +4866,30 @@ func talk_txomin() -> void:
 		await got("la llave del bajo")
 		await say("Compra las bandejas y tenlas húmedas. Lo demás lo hace el tiempo.", T)
 		return
+	await bajo_menu(T)
+
+# pulverizar las bandejas vivas (SETAS.min): false si, pasada la medianoche, setas_dia ha cerrado el bajo (1.34, pulverizarBajo)
+func pulverizar_bajo() -> bool:
+	var L: Dictionary = S.setas
+	for b in L.bandejas:
+		if not b.get("mala"):
+			b.hum = 100
+	advance_time(int(D.SETAS.min))
+	update_hud()
+	if S.get("setas") == null:
+		return false
+	sfx("sel")
+	var v: Array = L.bandejas.filter(func(b): return not b.get("mala"))   # pasada la medianoche, setas_dia ya las ha secado (o echado a perder)
+	var hv := 0.0
+	for b in v:
+		hv += b.hum
+	await say(("Pulverizas las bandejas: humedad al %d %%." % Datos.jsround(hv / v.size())) if v.size() else "Pulverizas las bandejas.")
+	return true
+
+# las bandejas del bajo (1.34, bajoMenu): con Txomin, en la puerta (T), todo; dentro, en las baldas (T vacío), lo de las bandejas: ni
+# comprar (las prepara él), ni venderle, ni dejar el bajo
+func bajo_menu(T: String) -> void:
+	var Z: Dictionary = D.SETAS
 	var L: Dictionary = S.setas
 	while true:
 		var B: Array = L.bandejas
@@ -4511,7 +4905,7 @@ func talk_txomin() -> void:
 				partes.append("%d %s" % [cnt[k], D.FASES_SETA[k][1 if cnt[k] > 1 else 0]])
 		var est: String = ", ".join(PackedStringArray(partes)) if B.size() else "sin bandejas"
 		var ops := []
-		if B.size() < Z.max:
+		if T != "" and B.size() < Z.max:
 			ops.append("Comprar bandeja (%s)" % Datos.eur(Z.bandeja))
 		if hum.size():
 			ops.append("Pulverizar")
@@ -4519,13 +4913,15 @@ func talk_txomin() -> void:
 			ops.append("Recoger")
 		if B.any(func(b): return b.get("mala")):
 			ops.append("Tirar las malas")
-		if L.g >= 1:
+		if T != "" and L.g >= 1:
 			ops.append("Venderle " + g_txt(L.g))
-		ops.append_array(["Dejar el bajo", "Nada"])
+		if T != "":
+			ops.append("Dejar el bajo")
+		ops.append("Nada")
 		var hm := 0.0
 		for b in hum:
 			hm += b.hum
-		var oi: int = await ask("El bajo: %s%s." % [est, (" · humedad %d %%" % Datos.jsround(hm / hum.size())) if hum.size() else ""], ops, T)
+		var oi: int = await ask("El bajo: %s%s." % [est, (" · humedad %d %%" % Datos.jsround(hm / hum.size())) if hum.size() else ""] + ("" if T != "" or B.size() else " Las bandejas las prepara Txomin, en la puerta."), ops, T)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 		if op == "" or op == "Nada":
 			return
@@ -4539,18 +4935,8 @@ func talk_txomin() -> void:
 			sfx("coin")
 			await say("Lista para colonizar. En %d días la habrá cogido el micelio; %d más y a recoger." % [int(Z.colon), int(Z.fruto)], T)
 		elif op == "Pulverizar":
-			for b in hum:
-				b.hum = 100
-			advance_time(int(Z.min))
-			update_hud()
-			if S.get("setas") == null:   # si pasa de medianoche, setas_dia puede cerrar el bajo
+			if not await pulverizar_bajo():   # si pasa de medianoche, setas_dia puede cerrar el bajo
 				return
-			sfx("sel")
-			var v: Array = L.bandejas.filter(func(b): return not b.get("mala"))   # pasada la medianoche, setas_dia ya las ha secado (o echado a perder)
-			var hv := 0.0
-			for b in v:
-				hv += b.hum
-			await say(("Pulverizas las bandejas: humedad al %d %%." % Datos.jsround(hv / v.size())) if v.size() else "Pulverizas las bandejas.")
 		elif op == "Recoger":
 			var g := 0
 			var quedan := []

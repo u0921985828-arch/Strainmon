@@ -158,13 +158,13 @@ func saludo(id: String) -> void:
 func rel_de(id: String):
 	if id.begins_with("club_"):
 		return id.substr(5)
-	if id == "socio" or id == "billarista":
+	if id == "socio" or id == "billarista" or (id.length() == 3 and id.begins_with("cg") and id[2].is_valid_int()):   # 1.34: los demás socios
 		return S.map.substr(5)
 	if id == "darko2":
 		return "darko"
 	if id in ["gorila", "camarera", "dj", "rrpp"] or (id.length() == 6 and id.begins_with("baila") and id[5].is_valid_int()):
 		return "gaua"
-	if id.length() == 3 and id.begins_with("nv") and id[2].is_valid_int():
+	if id.length() == 3 and id.begins_with("nv") and (id[2].is_valid_int() or id[2] == "m"):   # 1.34: y el de las madres
 		return null
 	return id
 
@@ -576,11 +576,13 @@ func npc_cond(d: Dictionary) -> bool:
 			return (S.flags.get("kiko1") and not S.flags.get("harvest1")) if d.map == "home" else (true if S.flags.get("harvest1") else false)
 	if d.id == "delroy":   # 1.32: en la asociación, desde la segunda visita
 		return delroy_aqui()
-	if d.id.begins_with("club_"):   # los clubs (1.15), desde su capítulo
+	if d.id.begins_with("club_") or d.id.begins_with("pres_"):   # los clubs (1.15) y sus presidentes (1.34), desde su capítulo
 		return S.ch >= int(D.CLUBS[d.id.substr(5)].ch)
 	match d.id:   # los locales (1.30): cada trabajador de la nave, junto a su mesa; el portero de GAUA, desde su capítulo
 		"nv0", "nv1", "nv2", "nv3":
 			return S.get("nave") != null and navero_de(int(d.id.substr(2))) != null
+		"nvm":   # 1.34: el de las madres
+			return S.get("nave") != null and cuida_madres() != null
 		"gorila":
 			return S.ch >= int(D.DISCO.ch)
 	return true
@@ -629,6 +631,12 @@ func npc_talk(d: Dictionary) -> void:
 			await talk_billar(S.map.substr(5))
 		"nv0", "nv1", "nv2", "nv3":
 			await talk_navero(int(d.id.substr(2)))
+		"nvm":   # 1.34: las madres de la nave
+			await talk_madres()
+		"cg1", "cg2", "cg3", "cg4":   # 1.34: los demás socios de cada club
+			await talk_gente_club(S.map.substr(5), int(d.id.substr(2)) - 1)
+		"pres_puerto", "pres_valde", "pres_ibar", "pres_ens":   # 1.34: los presidentes de los clubs de fuera
+			await talk_presi(d.id.substr(5))
 		"gorila":
 			await talk_gorila()
 		"camarera":
@@ -1724,6 +1732,18 @@ func talk_socio(_k):
 func talk_billar(_k):
 	pass
 func talk_navero(_i):
+	pass
+func cuida_madres():
+	return null
+func sprite_local(o: String) -> String:
+	return o
+func bandejas_balda(_x: int) -> Array:
+	return []
+func talk_madres():
+	pass
+func talk_gente_club(_k, _j):
+	pass
+func talk_presi(_k):
 	pass
 func talk_gorila():
 	pass

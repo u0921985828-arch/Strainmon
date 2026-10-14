@@ -109,6 +109,11 @@ func migrate() -> void:
 	if (S.ch == 5 or S.ch == 7) and not (S.get("due", 0) > 0) and S.get("debt", 0) > 0:
 		S.due = mini(int(D.PLAZOS["5"]), S.debt) if S.ch == 5 else S.debt
 		S.deadline = maxi(S.get("deadline", 0) if S.get("deadline") else 0, S.day + (10 if S.ch == 5 else 7))
+	if not S.has("clubReg") and S.has("clubDia"):   # 1.34: en los clubs donde ya vendías, el encargado y el presidente ya se fían de ti
+		for k in D.PRESI:
+			if S.clubDia.has(k) or (S.get("clubEnc") and S.clubEnc.k == k):
+				for id in [k, "pres_" + k]:
+					S.rel[id] = maxi(rel(id), int(D.CLUB.confia))
 	var sin_mis: bool = not S.has("misiones")
 	var sin_itin: bool = not S.has("itin")
 	var sin_log: bool = not S.has("logros")
@@ -153,6 +158,8 @@ func migrate() -> void:
 		S.nave.f = fs
 		S.nave.ex = 0
 		S.nave.rg = 0
+	if S.get("nave") != null and not S.nave.has("ma"):   # 1.34: la carpa de las madres, vacía
+		S.nave.ma = []
 	for w in naveros():   # 1.31: cada trabajador de la nave, su mesa (w.mesa); los de antes, la que les tocaba por el orden de la plantilla
 		if w.get("mesa") == null:
 			for i in int(D.NAVE.max):

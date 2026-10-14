@@ -802,6 +802,559 @@ def plantasN(fase, porte):
         L.pega(planta_mesa(cx, yb, fase, porte, R), 0, 0)
     return L
 
+# ---------------------------------------------------------------------------------------------------------- 1.34: cada club, el suyo
+# (lo pidió el usuario: «los decorados y distribución del local en casa asociación sea diferente, como también en cada grow»). El
+# juego busca primero <objeto>-<estilo> (estiloLocal, 11j-locales) y, si no hay, el de serie (el de la asociación, verde chester):
+#  · kalea (Casco Viejo): baldosa hidráulica, piedra vista con la viga, terciopelo granate, nogal y tapete burdeos;
+#  · itsaso (Puerto Viejo): tarima de cubierta de teca, machihembrado blanco con zócalo marino, cuero azul, un baúl de mesa y tapete azul;
+#  · fundicion (Valdehierro): chapa lagrimada, ladrillo visto con la viga de hierro, cuero marrón, un bidón de mesa y tapete gris;
+#  · ensanche: espiga de roble claro, liso blanco con la franja verde, sofás blancos de líneas rectas, mesa de cristal y tapete turquesa.
+def circulo(L, cx, cy, r, c, r0=-1):
+    for y in range(cy - r, cy + r + 1):
+        for x in range(cx - r, cx + r + 1):
+            d = (x - cx) ** 2 + (y - cy) ** 2
+            if (r0 < 0 or r0 * r0 < d) and d <= r * r + r: L.p(x, y, c)
+
+def floorC_kalea():
+    """baldosa hidráulica de 20 cm (8 × 8): la flor de cuatro pétalos terracota sobre crema, con su orla"""
+    L = Lienzo(16, 16); CR, CR2, TE, TE2, OS = '#d8ccb0', '#c8bc9e', '#a85a3a', '#8a4630', '#4a3a30'
+    for y in range(16):
+        for x in range(16):
+            u, v = x % 8, y % 8
+            du, dv = abs(u - 3.5), abs(v - 3.5)
+            c = CR
+            if du + dv <= 2: c = TE
+            elif (du < 1 and dv < 3.6) or (dv < 1 and du < 3.6): c = TE2
+            elif du > 3 or dv > 3: c = CR2
+            if (u in (0, 7)) and (v in (0, 7)): c = OS
+            L.p(x, y, c)
+    return L
+
+def iwT_club_kalea():
+    """la piedra vista del Casco Viejo, con la viga de roble arriba"""
+    L = Lienzo(16, 16)
+    L.r(0, 0, 16, 16, PIEDRA[1])
+    for j, y in enumerate(range(5, 16, 4)):
+        for i, x in enumerate(range(-3 * (j % 2), 16, 7)):
+            L.r(x + 1, y + 1, 5, 2, PIEDRA[0]); L.hl(x + 1, x + 4, y + 1, PIEDRA[2])
+    L.r(0, 0, 16, 4, '#4a3020'); L.hl(0, 15, 0, '#6a4a30'); L.hl(0, 15, 3, '#2e1e12')
+    for x in (4, 12): L.p(x, 1, '#2e1e12')                      # las vetas
+    return L
+
+def iwB_club_kalea():
+    L = Lienzo(16, 16)
+    L.r(0, 0, 16, 9, PIEDRA[1])
+    for j, y in enumerate(range(0, 9, 4)):
+        for x in range(-3 * (j % 2), 16, 7):
+            L.r(x + 1, y + 1, 5, 2, PIEDRA[0]); L.hl(x + 1, x + 4, y + 1, PIEDRA[2])
+    L.hl(0, 15, 9, '#6a4a30'); L.r(0, 10, 16, 4, '#4a3020'); L.hl(0, 15, 10, '#5a3a24')   # el zócalo de nogal
+    L.r(0, 14, 16, 2, '#2e1e12')
+    return L
+
+def floorC_itsaso():
+    """la tarima de cubierta: tablas de teca de 4 px con la junta negra calafateada, a tope a la contra"""
+    L = Lienzo(16, 16); T0, T1, T2, J = '#9a6a3a', '#b07c46', '#c69458', '#2a2018'
+    for y in range(16):
+        for x in range(16):
+            f = y // 4
+            c = J if y % 4 == 3 else (T2 if y % 4 == 0 else (T1 if (x + f * 5) % 11 else T0))
+            if y % 4 != 3 and (x + f * 6) % 16 == 0: c = J      # las testas, a la contra
+            L.p(x, y, c)
+    return L
+
+def iwT_club_itsaso():
+    """machihembrado blanco en vertical y, arriba, la cornisa azul marino con un cabo"""
+    L = Lienzo(16, 16)
+    L.r(0, 0, 16, 16, '#e8e6de')
+    for x in range(1, 16, 4): L.vl(x, 4, 15, '#c8c6be')
+    L.r(0, 0, 16, 4, '#24345a'); L.hl(0, 15, 3, '#1a2438')
+    for x in range(0, 16, 2): L.p(x, 1 + (x // 2) % 2, '#c8b07a')   # el cabo trenzado
+    return L
+
+def iwB_club_itsaso():
+    L = Lienzo(16, 16)
+    L.r(0, 0, 16, 7, '#e8e6de')
+    for x in range(1, 16, 4): L.vl(x, 0, 6, '#c8c6be')
+    L.hl(0, 15, 7, '#c8b07a'); L.r(0, 8, 16, 6, '#24345a')       # el zócalo azul marino
+    for x in range(3, 16, 4): L.vl(x, 9, 13, '#1a2438')
+    L.r(0, 14, 16, 2, '#121a2a')
+    return L
+
+def floorC_fundicion():
+    """la chapa lagrimada, con sus lágrimas en espiga y el remache de la junta"""
+    L = Lienzo(16, 16); C0, C1, C2 = '#6e7276', '#8a8e92', '#a8acb0'
+    L.r(0, 0, 16, 16, C1)
+    for y in range(0, 16, 4):
+        for x in range(0, 16, 4):
+            o = 2 if (y // 4) % 2 else 0
+            if (y // 4 + x // 4) % 2: L.p((x + o) % 16, y + 1, C2); L.p((x + o + 1) % 16, y + 2, C0)
+            else: L.p((x + o + 1) % 16, y + 1, C2); L.p((x + o) % 16, y + 2, C0)
+    L.hl(0, 15, 15, '#5a5e62'); L.vl(15, 0, 15, '#5a5e62')
+    return L
+
+LADRILLO = ('#8a4a32', '#6a5a50', '#a65e40', '#6e3624')
+def iwT_club_fundicion():
+    L = Lienzo(16, 16)
+    mundo.ladrillos(L, 0, 0, 16, 16, LADRILLO, sem=134)
+    L.r(0, 0, 16, 5, '#3a3e44'); L.hl(0, 15, 0, '#5a5e66'); L.hl(0, 15, 4, '#24282c'); L.hl(0, 15, 2, '#30343a')   # la viga en I
+    for x in (2, 9): L.p(x, 1, '#8a8e96'); L.p(x, 3, '#8a8e96')                   # los remaches
+    return L
+
+def iwB_club_fundicion():
+    L = Lienzo(16, 16)
+    mundo.ladrillos(L, 0, 0, 16, 11, LADRILLO, sem=135)
+    L.r(0, 11, 16, 5, '#8a8680'); L.hl(0, 15, 11, '#a8a49c'); L.hl(0, 15, 15, '#6a6660')   # el murete de hormigón
+    return L
+
+def floorC_ensanche():
+    """la espiga de roble claro: lamas de 6 × 2 a 45°, a la contra"""
+    L = Lienzo(16, 16); A, B, J = '#d8b88a', '#c8a474', '#a8865a'
+    for y in range(16):
+        for x in range(16):
+            k = (x + y) % 8 if (x // 4) % 2 == 0 else (x - y) % 8
+            c = J if k == 0 else (A if ((x // 4) + (y // 6)) % 2 else B)
+            L.p(x, y, c)
+    return L
+
+def iwT_club_ensanche():
+    L = Lienzo(16, 16)
+    L.r(0, 0, 16, 16, '#eceae4')
+    L.r(0, 0, 16, 3, '#c8c6c0'); L.hl(0, 15, 3, '#dcdad4')        # la moldura lisa
+    L.hl(0, 15, 12, '#2f6a4a'); L.hl(0, 15, 13, '#4a8a62')       # la franja verde
+    return L
+
+def iwB_club_ensanche():
+    L = Lienzo(16, 16)
+    L.r(0, 0, 16, 16, '#eceae4')
+    L.hl(0, 15, 1, '#2f6a4a'); L.hl(0, 15, 2, '#4a8a62')
+    L.r(0, 12, 16, 3, '#f8f8f4'); L.hl(0, 15, 12, '#ffffff'); L.hl(0, 15, 15, '#c8c6c0')   # el rodapié blanco
+    return L
+
+# los tapizados de cada club (de oscuro a claro y el contorno, como CHESTER)
+GRANATE = ('#3a1418', '#5a1e24', '#7a2a32', '#9a4048', '#20080c')
+MARINO = ('#141e34', '#24345a', '#34497a', '#4e6698', '#0a1020')
+CUERO = ('#3a2214', '#5a3620', '#7a4c2e', '#9a6a44', '#1e1008')
+BLANCO = ('#a8a8a4', '#d0cec8', '#e4e2dc', '#f8f8f4', '#5a5a5e')
+
+def sofaM(tap=BLANCO):
+    """el sofá del Ensanche (180 cm) de frente: líneas rectas, brazos cuadrados y bajos, dos cojines y las patas de acero"""
+    L = Lienzo(48, 48); S0, S1, S2, S3, SC = tap
+    x0, x1 = 10, 38
+    L.r(x0 + 3, 31, 23, 8, S2); L.hl(x0 + 3, x1 - 3, 31, S3); L.vl(24, 32, 38, S1)   # el respaldo, en dos
+    L.r(x0 + 3, 39, 23, 3, S3); L.hl(x0 + 3, x1 - 3, 41, S1); L.vl(24, 39, 41, S1)   # los cojines del asiento
+    L.r(x0 + 3, 42, 23, 2, S1); L.hl(x0 + 3, x1 - 3, 43, S0)
+    for x in (x0, x1 - 3):
+        L.r(x, 35, 4, 9, S2); L.hl(x, x + 3, 35, S3); L.vl(x + 3 if x == x0 else x, 36, 43, S1)
+    for x in (x0 + 1, x1 - 1): L.p(x, 44, '#8a8e96'); L.p(x, 45, '#5a5e66')
+    L.r(30, 33, 4, 4, '#2f6a4a'); L.hl(30, 33, 33, '#4a8a62')       # un cojín verde
+    L.contorno(SC)
+    suelo(L, x0, x1, SC)
+    return L
+
+def mesita_kalea():
+    """la mesa baja de nogal, redonda, con la vela, el cenicero de barro y el grinder"""
+    L = Lienzo(16, 16); W0, W1, W2 = '#2e1e12', '#4a3020', '#6a4a30'
+    L.r(2, 8, 12, 3, W1); L.hl(3, 12, 7, W2); L.hl(2, 13, 10, W0); L.p(2, 7, None)
+    L.r(6, 11, 4, 1, W0); L.vl(7, 11, 14, W0); L.vl(8, 11, 14, W1); L.hl(5, 10, 15, W0)   # el pie central
+    L.r(4, 6, 2, 2, '#f0e8d0'); L.p(4, 5, '#f0d070'); L.p(4, 4, '#ffb040')             # la vela
+    L.r(8, 7, 3, 2, '#a85a3a'); L.p(9, 7, '#6a3a24')                                  # el cenicero de barro
+    L.r(11, 6, 2, 2, '#3f8a46')
+    L.contorno(K)
+    return L
+
+def mesita_itsaso():
+    """un baúl de marinero de mesa: madera con los flejes de latón, las asas de cabo y una botella con un barco dentro"""
+    L = Lienzo(16, 16); W0, W1, W2 = '#5a3a20', '#8a5e34', '#a87646'
+    L.r(1, 7, 14, 8, W1); L.hl(1, 14, 7, W2); L.hl(1, 14, 14, W0)
+    for x in (3, 12): L.vl(x, 7, 14, '#c8a040')                                       # los flejes
+    L.hl(1, 14, 9, W0); L.p(7, 11, '#c8a040'); L.p(8, 11, '#c8a040')                 # la tapa y el cierre
+    L.r(5, 3, 6, 3, '#a8d4e0'); L.hl(5, 10, 3, '#e0f4f8'); L.p(11, 4, '#8a5e34')      # la botella tumbada
+    L.p(7, 4, '#f4f4ee'); L.p(8, 4, '#5a3a20')                                        # el barco
+    L.contorno(K)
+    return L
+
+def mesita_fundicion():
+    """un bidón de 200 L de mesa, rojo óxido con sus aros, y un tablero redondo de madera encima"""
+    L = Lienzo(16, 16); B0, B1, B2 = '#5a2418', '#8a3a24', '#a84e30'
+    L.r(3, 6, 10, 9, B1); L.vl(3, 6, 14, B2); L.vl(12, 6, 14, B0)
+    for y in (8, 12): L.hl(3, 12, y, B0)
+    L.p(6, 10, '#c88a4a'); L.p(9, 13, '#c88a4a')                                       # el óxido
+    L.r(1, 4, 14, 2, '#a87646'); L.hl(1, 14, 4, '#c8955a'); L.hl(2, 13, 6, '#5a3a24')  # el tablero
+    L.r(9, 2, 3, 2, '#8a8e96'); L.p(10, 2, '#3a3a40')                                  # el cenicero de lata
+    L.contorno(K)
+    return L
+
+def mesita_ensanche():
+    """la mesa de centro de cristal con patas de acero, una revista y una planta pequeña"""
+    L = Lienzo(16, 16)
+    L.r(1, 8, 14, 2, '#a8d4e0'); L.hl(1, 14, 8, '#e0f4f8'); L.hl(1, 14, 10, '#8ab4c0')
+    for x in (2, 13): L.vl(x, 10, 15, '#8a8e96')
+    L.hl(3, 12, 13, '#c8ccd0')                                                         # la balda de abajo
+    L.r(3, 6, 5, 2, '#e8e4d8'); L.hl(3, 7, 6, '#c04848')                               # la revista
+    L.r(10, 6, 3, 2, '#f4f4ee'); L.p(10, 5, '#3f8a46'); L.p(11, 4, '#5aa04a'); L.p(12, 5, '#3f8a46')
+    L.contorno(K)
+    return L
+
+def vitrina_estilo(W0, W1, W2, M):
+    """el mostrador del dispensario en la madera (o el acero, o la laca) de cada club"""
+    L = Lienzo(16, 16)
+    L.r(0, 9, 16, 7, W1); L.hl(0, 15, 9, W2); L.hl(0, 15, 15, W0)
+    L.caja(2, 10, 12, 4, W1, W0)
+    L.r(0, 2, 16, 7, VID); L.hl(0, 15, 2, M); L.hl(0, 15, 8, M); L.vl(0, 2, 8, M); L.vl(15, 2, 8, M)
+    tarro(L, 2, 2, '#c04848'); tarro(L, 9, 2, '#e0b040')
+    L.p(7, 4, VIDL); L.p(14, 3, VIDL)
+    L.contorno(K)
+    return L
+
+def billar_estilo(W, T, pant):
+    """el billar de serie (el de la asociación) con la madera, el tapete y las pantallas de cada club"""
+    L = billar()
+    m = {'#3a2416': W[0], '#5a3a24': W[1], '#7a5232': W[2], '#a07040': W[3], '#1e5a36': T[0], '#2a7a4a': T[1], '#3a9a5e': T[2],
+         '#2e6a3a': pant[0], '#4a9a5a': pant[1]}
+    return L.cambia(m)
+
+ESTILOS = {
+    'kalea': dict(sofa=GRANATE, mesita=mesita_kalea, vit=('#2e1e12', '#4a3020', '#6a4a30', '#c8a040'),
+                  bil=(('#24160c', '#3a2416', '#4a3020', '#6a4a30'), ('#4a1418', '#6a1e24', '#8a2e36'), ('#6a1e24', '#9a4048'))),
+    'itsaso': dict(sofa=MARINO, mesita=mesita_itsaso, vit=('#5a3a20', '#8a5e34', '#a87646', '#c8a040'),
+                   bil=(('#5a3a20', '#8a5e34', '#a87646', '#c69458'), ('#14325a', '#1e4a7a', '#2e64a0'), ('#c8a040', '#e8c860'))),
+    'fundicion': dict(sofa=CUERO, mesita=mesita_fundicion, vit=('#3a3e44', '#5a5e66', '#8a8e96', '#3a3e44'),
+                      bil=(('#2a2c30', '#3a3e44', '#5a5e66', '#8a8e96'), ('#3a4248', '#4e585e', '#68747a'), ('#3a3e44', '#6a737c'))),
+    'ensanche': dict(sofa=BLANCO, mesita=mesita_ensanche, vit=('#a8a8a4', '#e4e2dc', '#f8f8f4', '#c8ccd0'),
+                     bil=(('#a8a8a4', '#d0cec8', '#e4e2dc', '#f8f8f4'), ('#146a6a', '#1e8a8a', '#3aaaa8'), ('#e8e6e0', '#ffffff'))),
+}
+
+# lo de las paredes de cada club (16 × 16, ALZA los sube como los cuadros)
+def fotoK():
+    """el Casco Viejo en una foto antigua, en sepia: la calle estrecha con los balcones y el marco negro"""
+    L = Lienzo(16, 16); S0, S1, S2, S3 = '#4a3a2a', '#7a6248', '#a88a64', '#d8c4a0'
+    L.caja(2, 2, 12, 11, S3, '#1a1a1e')
+    L.r(3, 3, 10, 3, S3); L.r(3, 3, 3, 9, S1); L.r(10, 3, 3, 9, S1)                  # las fachadas a los lados
+    for y in (4, 7): L.p(4, y, S0); L.p(11, y, S0); L.hl(3, 5, y + 1, S0); L.hl(10, 12, y + 1, S0)   # los balcones
+    L.r(6, 9, 4, 3, S2); L.p(7, 8, S0); L.p(7, 9, S0)                                 # el suelo y alguien al fondo
+    return L
+
+def ojoBuey():
+    """el ojo de buey de latón con el mar y el horizonte"""
+    L = Lienzo(16, 16)
+    circulo(L, 8, 7, 6, '#8a6a2a'); circulo(L, 8, 7, 5, '#c8a040'); circulo(L, 8, 7, 4, '#5a8ab0')
+    L.hl(4, 12, 7, '#a8c8e0'); L.r(5, 8, 7, 3, '#2a5a8a'); L.p(6, 9, '#4a7ab0'); L.p(10, 8, '#4a7ab0')
+    for (x, y) in ((8, 1), (14, 7), (8, 13), (2, 7)): L.p(x, y, '#e8c860')             # los tornillos
+    L.p(6, 4, '#e0f4f8')
+    return L
+
+def timon():
+    """el timón de madera con sus ocho cabillas"""
+    L = Lienzo(16, 16); W0, W1, W2 = '#4a2e18', '#8a5e34', '#c69458'
+    circulo(L, 8, 7, 5, W1, 3)
+    for (dx, dy) in ((0, -7), (0, 7), (-7, 0), (7, 0), (-5, -5), (5, -5), (-5, 5), (5, 5)):
+        x, y = 8 + dx, 7 + dy
+        n = max(abs(dx), abs(dy))
+        for i in range(1, n + 1): L.p(8 + dx * i // n, 7 + dy * i // n, W2 if i > 5 else W1)
+    circulo(L, 8, 7, 1, '#c8a040')
+    L.contorno(W0)
+    return L
+
+def red():
+    """la red de pesca colgada, con los corchos naranjas"""
+    L = Lienzo(16, 16)
+    for i in range(1, 15, 3):
+        for j in range(1, 13): L.p(i + (j // 3) % 2, j, '#8a8270')
+    for j in range(1, 13, 3): L.hl(1, 14, j, '#8a8270')
+    L.hl(0, 15, 1, '#5a4a3a')
+    for (x, y) in ((3, 12), (8, 13), (12, 11)): L.r(x, y, 2, 2, '#e07a3a'); L.p(x, y, '#f0a060')
+    return L
+
+def diana():
+    """la diana de los dardos: los anillos, el centro rojo y dos dardos clavados"""
+    L = Lienzo(16, 16)
+    circulo(L, 8, 7, 6, '#1a1a1e'); circulo(L, 8, 7, 5, '#e8e0c8'); circulo(L, 8, 7, 4, '#2a6a3a'); circulo(L, 8, 7, 3, '#e8e0c8')
+    circulo(L, 8, 7, 2, '#c03030'); L.p(8, 7, '#2a6a3a')
+    for (x, y) in ((10, 5), (6, 9)): L.p(x, y, '#c8ccd0'); L.p(x + 1, y - 1, '#e0b040'); L.p(x + 2, y - 2, '#4a7ac8')
+    return L
+
+def engranaje():
+    """un piñón de la fundición vieja, de hierro, colgado como un trofeo"""
+    L = Lienzo(16, 16); F0, F1, F2 = '#2a2a30', '#5a5a62', '#7a7a84'
+    circulo(L, 8, 7, 5, F1)
+    for (dx, dy) in ((0, -6), (0, 6), (-6, 0), (6, 0), (-4, -4), (4, -4), (-4, 4), (4, 4)):
+        L.r(8 + dx - (dx != 0 and abs(dx) < 5), 7 + dy - (dy != 0 and abs(dy) < 5), 2, 2, F1)
+    circulo(L, 8, 7, 2, F0); L.p(6, 4, F2); L.p(5, 5, F2); L.p(10, 10, '#8a4a32')
+    L.contorno('#1a1a1e')
+    return L
+
+def neonH():
+    """el neón verde del Ensanche: la hoja de siete dedos, sobre su placa de metacrilato"""
+    L = Lienzo(16, 16); N, N2 = '#58f080', '#c8ffd8'
+    circulo(L, 8, 7, 6, N, 5)                                       # el aro
+    for (x, y) in ((8, 3), (8, 4), (8, 5), (8, 6), (8, 7), (7, 5), (6, 4), (9, 5), (10, 4), (7, 7), (6, 7), (5, 6), (9, 7), (10, 7), (11, 6)):
+        L.p(x, y, N)
+    L.vl(8, 8, 10, N); L.p(8, 3, N2); L.p(2, 7, N2)
+    return L
+
+def copas():
+    """la balda de las copas de la tía: tres trofeos dorados de las ferias del cáñamo"""
+    L = Lienzo(16, 16); O0, O1, O2 = '#8a6a1a', '#c8a040', '#f0d070'
+    L.r(0, 12, 16, 2, '#74502e'); L.hl(0, 15, 12, '#a87646')
+    for (x, h) in ((2, 5), (7, 7), (12, 4)):
+        L.r(x, 11 - h, 3, h - 2, O1); L.vl(x, 11 - h, 8, O2); L.p(x - 1, 12 - h, O1); L.p(x + 3, 12 - h, O1)
+        L.p(x + 1, 9, O0); L.hl(x, x + 2, 10, O0); L.hl(x, x + 2, 11, '#3a2a1a')
+    L.contorno(K)
+    return L
+
+def libreria():
+    """la librería de la asociación (90 × 180 cm): libros, carpetas de las actas, una caja de semillas y una planta encima"""
+    L = Lienzo(32, 32); W0, W1, W2 = '#3a2414', '#5a3a24', '#7a5232'; R = azar(134)
+    x0, x1 = 8, 23
+    L.r(x0, 4, 16, 28, W1); L.vl(x0, 4, 31, W2); L.vl(x1, 4, 31, W0)
+    LIB = ['#8a3a3a', '#3a5a8a', '#c8a040', '#3a7a4a', '#e8e4d8', '#6a4a8a']
+    for y in (11, 18, 25):
+        L.hl(x0 + 1, x1 - 1, y, W2); L.hl(x0 + 1, x1 - 1, y + 1, W0)
+        x = x0 + 1
+        while x < x1 - 1:
+            w = 1 + (R() < .3); h = 4 + int(R() * 2)
+            if R() < .12: x += 1; continue
+            L.r(x, y - h, w, h, LIB[int(R() * len(LIB))]); x += w
+    L.r(x0 + 1, 26, 14, 5, W0); L.hl(x0 + 1, x1 - 1, 28, W2)                        # el cajón de abajo
+    L.r(14, 0, 4, 4, '#a85a3a'); L.p(15, 0, '#3f8a46')                               # la maceta de encima
+    for (x, y) in ((13, -1), (16, -2), (18, -1), (15, -3)): L.p(x, y + 3, '#5aa04a')
+    L.contorno(K)
+    return L
+
+# ---------------------------------------------------------------------------------------------------------- 1.34: el bajo de las setas
+# (lo pidió el usuario: «Aquí falta un espacio por crear no? Con sus sprites necesarios»). El bajo de Txomin en la Kale Zaharra:
+# hormigón húmedo, pared encalada con manchas y el zócalo de azulejo; tres estanterías de rejilla con dos bandejas cada una (las
+# bandejas, aparte: bandejaS-<fase>-<0 abajo|1 arriba>, para que el juego pinte cada una en su fase), el pulverizador, el secadero de
+# malla (vacío y con setas), la tubería que suda y el cubo de la lejía. Nada de método: bandejas tapadas, cosas genéricas.
+def floorSe():
+    L = Lienzo(16, 16); R = azar(77)
+    L.r(0, 0, 16, 16, '#6a6a62')
+    for _ in range(24): L.p(int(R() * 16), int(R() * 16), '#76766e' if R() < .5 else '#5e5e56')
+    for (x, y) in ((3, 9), (4, 9), (5, 10), (4, 10), (11, 3), (12, 3)): L.p(x, y, '#56564e')   # lo mojado
+    L.hl(0, 15, 15, '#56564e')
+    return L
+
+def iwT_bajo():
+    L = Lienzo(16, 16); R = azar(78)
+    L.r(0, 0, 16, 16, '#d8d4c8')
+    L.r(0, 0, 16, 4, '#8a8a7e'); L.hl(0, 15, 4, '#a8a498')       # el forjado
+    for _ in range(10): L.p(int(R() * 16), 5 + int(R() * 11), '#c8c4b8')
+    for (x, y) in ((10, 8), (11, 8), (10, 9), (11, 10), (12, 9)): L.p(x, y, '#8a9a7a')   # el verdín
+    return L
+
+def iwB_bajo():
+    L = Lienzo(16, 16)
+    L.r(0, 0, 16, 7, '#d8d4c8'); L.p(4, 3, '#b8b4a8'); L.p(5, 4, '#b8b4a8')
+    L.r(0, 7, 16, 9, '#e8ece8')                                  # el azulejo blanco de 15 cm, con la junta
+    for x in (0, 8): L.vl(x, 7, 15, '#b8c0bc')
+    L.hl(0, 15, 7, '#a8b0ac'); L.hl(0, 15, 11, '#b8c0bc'); L.hl(0, 15, 15, '#8a928e')
+    L.p(13, 9, '#c8d0cc'); L.p(3, 13, '#c8d0cc')
+    return L
+
+RJ0, RJ1, RJ2 = '#5a5e66', '#8a8e96', '#b8bcc4'
+BALDA_Y = (24, 12)              # la cara de arriba de cada balda: la de abajo (j = 0) y la de arriba (j = 1)
+def baldaS():
+    """la estantería de rejilla (100 × 180 cm): cuatro patas, tres baldas de rejilla; las bandejas van encima (bandejaS)"""
+    L = Lienzo(32, 32)
+    x0, x1 = 8, 23
+    for x in (x0, x1): L.vl(x, 2, 31, RJ0)
+    for x in (x0 + 1, x1 - 1): L.vl(x, 4, 30, RJ1)                # las patas de detrás
+    for y in BALDA_Y + (30,):
+        L.hl(x0, x1, y, RJ2); L.hl(x0, x1, y + 1, RJ0)
+        for x in range(x0 + 1, x1, 2): L.p(x, y + 1, RJ1)
+    L.hl(x0, x1, 2, RJ2)
+    L.contorno(K)
+    return L
+
+SETA = {'colonizando': None, 'fructificando': 'p', 'lista': 's'}
+def bandejaS(fase, j):
+    """una bandeja tapada (40 × 30 cm: 12 × 5 px) en la balda j: el sustrato y, por fase, lo blanco que coloniza, los primordios,
+    las setas listas (sombreros pardos genéricos), lo contaminado (verde y gris) o lo seco"""
+    L = Lienzo(32, 32); yb = BALDA_Y[j] - 1; x0 = 10
+    TAPA = '#d8e4e4'
+    L.r(x0, yb - 5, 12, 6, '#b8c8c8'); L.hl(x0, x0 + 11, yb - 5, TAPA); L.hl(x0, x0 + 11, yb, '#8a9a9a')   # la caja
+    sus = {'seca': '#8a6a4a', 'contaminada': '#6a5a4a'}.get(fase, '#7a5a3a')
+    L.r(x0 + 1, yb - 3, 10, 3, sus)
+    if fase in ('colonizando', 'fructificando', 'lista'):
+        for x in range(x0 + 1, x0 + 11):
+            if fase != 'colonizando' or x % 3: L.p(x, yb - 3, '#f0eee6')
+            if x % 2: L.p(x, yb - 2, '#e0dcd0')
+    if fase == 'fructificando':
+        for x in (x0 + 2, x0 + 5, x0 + 8): L.p(x, yb - 4, '#e8dcc0')
+    if fase == 'lista':
+        for (x, h) in ((x0 + 2, 2), (x0 + 5, 3), (x0 + 8, 2)):
+            L.vl(x, yb - 3 - h, yb - 4, '#e8e0d0'); L.hl(x - 1, x + 1, yb - 4 - h, '#9a6a3a'); L.p(x, yb - 5 - h, '#7a4a2a')
+    if fase == 'contaminada':
+        for x in (x0 + 2, x0 + 3, x0 + 6, x0 + 9): L.p(x, yb - 3, '#4a8a3a'); L.p(x, yb - 2, '#3a6a2a')
+        L.p(x0 + 7, yb - 3, '#8a8a8a')
+    if fase == 'seca':
+        for x in range(x0 + 2, x0 + 10, 3): L.p(x, yb - 2, '#5a4030')
+    L.contorno(K)
+    return L
+
+def humidS():
+    """el pulverizador de mochila de 5 L en el suelo, con la lanza"""
+    L = Lienzo(16, 16)
+    L.r(4, 5, 8, 10, '#e0e4e8'); L.vl(4, 5, 14, '#f4f6f8'); L.vl(11, 5, 14, '#a8b0b8')
+    L.r(4, 9, 8, 2, '#3a6ab8')                                    # la banda azul
+    L.r(6, 3, 4, 2, '#3a3a40'); L.vl(7, 0, 3, '#3a3a40')           # el tapón y la bomba
+    L.hl(12, 14, 7, '#2a2a30'); L.vl(14, 7, 13, '#2a2a30'); L.p(14, 14, '#8a8e96')   # la lanza
+    L.contorno(K)
+    return L
+
+def secaS(lleno):
+    """el secadero de malla colgado (50 cm, 3 pisos); con lo que secas, las setas pardas, pequeñas y arrugadas"""
+    L = Lienzo(32, 32); N, NL = '#3a3a40', '#8a8e96'
+    L.vl(16, 0, 7, N)
+    for i, y in enumerate((10, 17, 24)):
+        L.hl(10, 22, y, NL); L.hl(9, 23, y + 1, N); L.p(9, y, N); L.p(23, y, N)
+        if lleno:
+            for x in range(11, 22, 3): L.p(x, y - 1, '#8a6a4a'); L.p(x + 1, y - 1, '#6a4a2a')
+        if i < 2: L.vl(9, y + 1, y + 7, NL); L.vl(23, y + 1, y + 7, NL)
+    L.contorno(K)
+    return L
+
+def tuboS():
+    """la tubería vieja de la pared, sudando, con su abrazadera y una gota"""
+    L = Lienzo(16, 16)
+    L.r(0, 5, 16, 4, '#7a6a5a'); L.hl(0, 15, 5, '#9a8a78'); L.hl(0, 15, 8, '#5a4a3a')
+    L.r(7, 4, 2, 6, '#3a3a40')                                    # la abrazadera
+    L.p(11, 9, '#a8c8e0'); L.p(11, 10, '#a8c8e0'); L.p(4, 9, '#8a9a7a')
+    return L
+
+def cuboS():
+    """el cubo azul con la lejía y el cepillo"""
+    L = Lienzo(16, 16)
+    L.r(4, 7, 8, 8, '#3a6ab8'); L.vl(4, 7, 14, '#5a8ad8'); L.hl(4, 11, 14, '#1a3a6a')
+    L.hl(3, 12, 6, '#2a5aa8'); L.r(5, 6, 6, 1, '#d8ecf0')          # el borde y el agua
+    L.vl(10, 1, 6, '#c8a040'); L.r(9, 0, 3, 2, '#e05a3a')          # el cepillo
+    L.contorno(K)
+    return L
+
+def bajo_setas():
+    """la fachada del bajo (1.34): la casa alta de almagre del Casco Viejo (casco3) con la puerta de chapa del bajo en la casilla 2,
+    la rejilla de ventilación encima y el ventanuco con barrotes (recorte en x 32, y 80)"""
+    lz = mundo.casco('casco3', 5, 7, 93)
+    H = 112
+    for y in range(H - 29, H - 1):                                 # la piedra lisa donde va la puerta
+        for x in range(32, 48):
+            lz.p(x, y, PIEDRA[2] if (x + y) % 9 else PIEDRA[1])
+    G0, G1, G2 = '#4a5058', '#6a727c', '#8a929c'
+    lz.caja(35, H - 25, 10, 25, G1, G0)                             # la puerta de chapa
+    for y in range(H - 22, H - 2, 3): lz.hl(36, 43, y, G0)
+    lz.vl(36, H - 24, H - 1, G2); lz.p(42, H - 13, '#c8a040')       # el canto y el cerrojo
+    lz.caja(36, H - 29, 8, 3, '#2a2a30', G0)                        # la rejilla de ventilación
+    for x in range(37, 43, 2): lz.p(x, H - 28, G2)
+    return lz, puertas(lz, 32, 80, (3, 7, 10, 25), 'simple')
+
+# ---------------------------------------------------------------------------------------------------------- 1.34: la sala de madres
+# (lo pidió el usuario: «un indoor en la nave con madres para tener ahí las genéticas seleccionadas»): la carpa de 120 × 120 de la
+# nave, plateada, abierta de frente, con el panel LED encendido (18/6) y de 0 a 4 madres en sus macetas (carpaM-<n>); y la de
+# exposición de GROW IBARBIDE, igual pero con tres plantas de plástico (carpaDemo).
+def carpa_abierta(n, demo=False):
+    L = Lienzo(48, 48); P0, P1, P2 = '#8a8e96', '#c8ccd0', '#e8ecf0'
+    x0, x1, y0 = 12, 35, 15
+    L.r(x0, y0, 24, 32, P1); L.hl(x0, x1, y0, P2)                   # la carpa, plateada
+    L.r(x0 + 2, y0 + 5, 20, 26, '#1e1a22')                          # por dentro, oscura
+    L.r(x0 + 2, y0 + 3, 20, 2, P0)                                  # la tela de delante, enrollada arriba
+    for x in range(x0 + 2, x1 - 1, 3): L.p(x, y0 + 3, P2)
+    L.vl(x0, y0, 46, P0); L.vl(x1, y0, 46, P0)                      # el armazón
+    L.r(x0 + 5, y0 + 6, 14, 2, '#f4f4ee'); L.hl(x0 + 5, x0 + 18, y0 + 8, '#fff2b0')   # el panel LED, encendido
+    L.vl(x0 + 7, y0 + 1, y0 + 5, '#3a3a40'); L.vl(x0 + 16, y0 + 1, y0 + 5, '#3a3a40')
+    for y in range(y0 + 9, y0 + 31):                                # la luz, que abre hacia abajo
+        w = 5 + (y - y0 - 9) // 3
+        L.hl(max(x0 + 2, 24 - w), min(x1 - 2, 23 + w), y, '#2e2a34')
+    # las madres, dos al fondo y dos delante (las de delante tapan): matas podadas, más anchas que altas, en macetas de tela
+    pos = [(18, 45), (29, 45), (23, 40), (23, 40)] if n < 4 else [(17, 45), (30, 45), (20, 40), (27, 40)]
+    pos = sorted(pos[:n], key=lambda p: p[1])
+    hojas = ('#2e5a2a', '#3f7a3a', '#5aa04a', '#84cc6c') if not demo else ('#1e6a2a', '#2e8a3a', '#4ab04a', '#7adc6c')
+    for i, (cx, yb) in enumerate(pos):
+        for j, w in enumerate((2, 3, 4, 4, 4, 3, 3, 2)):            # la madre
+            L.hl(cx - w, cx + w, yb - 4 - j, hojas[1 + (j + i) % 2])
+            L.p(cx - w, yb - 4 - j, hojas[0]); L.p(cx + w, yb - 4 - j, hojas[0])
+        for (dx, dy) in ((-3, -9), (0, -12), (3, -10), (-1, -7), (2, -6)): L.p(cx + dx, yb + dy, hojas[3])   # los brotes claros
+        L.r(cx - 2, yb - 3, 5, 4, '#2a2a30'); L.hl(cx - 2, cx + 2, yb - 3, '#4a4a52')   # la maceta de tela
+    L.hl(x0 + 2, x1 - 2, 46, '#3a3a40')
+    L.contorno(K)
+    suelo(L, x0, x1, K)
+    return L
+
+# ---------------------------------------------------------------------------------------------------------- 1.34: los dos grows
+# GROW IBARBIDE: baldosa gris de 30 cm, ladrillo blanco con el zócalo verde, su neón, los botes de la pared, el propagador, los sacos,
+# las macetas y la carpa de exposición; en la tienda de Kiko, los sacos y las macetas (la pizarra es la de los clubs).
+def floorG():
+    L = Lienzo(16, 16)
+    L.r(0, 0, 16, 16, '#a8aaa8')
+    for x in (0, 8): L.vl(x, 0, 15, '#8a8c8a')
+    for y in (0, 8): L.hl(0, 15, y, '#8a8c8a')
+    L.p(3, 3, '#b8bab8'); L.p(11, 12, '#b8bab8'); L.p(12, 4, '#9c9e9c')
+    return L
+
+BLANCO_LAD = ('#ecebe6', '#c8c6c0', '#f8f8f4', '#d8d6d0')
+def iwT_grow():
+    L = Lienzo(16, 16)
+    mundo.ladrillos(L, 0, 0, 16, 16, BLANCO_LAD, sem=34)
+    L.r(0, 0, 16, 3, '#3a3e44'); L.hl(0, 15, 3, '#24282c')         # la canaleta de la luz
+    return L
+
+def iwB_grow():
+    L = Lienzo(16, 16)
+    mundo.ladrillos(L, 0, 0, 16, 11, BLANCO_LAD, sem=35)
+    L.r(0, 11, 16, 5, '#2f6a4a'); L.hl(0, 15, 11, '#4a8a62'); L.hl(0, 15, 15, '#1f4a30')
+    return L
+
+def sacos():
+    """tres sacos de sustrato de 50 L apilados: el de coco, el de perlita y el de tierra"""
+    L = Lienzo(16, 16)
+    for (x, y, c, e) in ((1, 8, '#c8b48a', '#8a6a42'), (8, 8, '#e8e4d8', '#3a6ab8'), (4, 3, '#5a4a3a', '#3f8a46')):
+        L.r(x, y, 7, 7, c); L.hl(x, x + 6, y, '#f4f0e0' if c != '#5a4a3a' else '#7a6a5a'); L.r(x + 2, y + 3, 3, 2, e)
+    L.contorno(K)
+    return L
+
+def macetasP():
+    """macetas de tela negras, apiladas de tres en tres, y una de barro"""
+    L = Lienzo(16, 16)
+    for (x, y) in ((1, 5), (1, 9), (7, 9)):
+        L.r(x, y, 6, 5, '#2a2a30'); L.hl(x, x + 5, y, '#4a4a52'); L.p(x + 1, y + 2, '#3a3a40')
+    L.r(9, 4, 5, 5, '#a85a3a'); L.hl(9, 13, 4, '#c87a54'); L.hl(10, 12, 8, '#7a3a24')
+    L.contorno(K)
+    return L
+
+def botesW():
+    """la balda de la pared con los botes de abono: azules (MEATZA) y verdes (ORTUA BIO), sin marcas a la vista"""
+    L = Lienzo(16, 16)
+    L.r(0, 12, 16, 2, '#8a8e96'); L.hl(0, 15, 12, '#b8bcc4')
+    for i, x in enumerate((1, 5, 9, 13)):
+        c = '#3a6ab8' if i % 2 == 0 else '#3f8a46'
+        h = 6 if i in (1, 2) else 5
+        L.r(x, 12 - h, 3, h, c); L.p(x + 1, 11 - h, '#2a2a34'); L.r(x, 13 - h, 3, 2, '#e8e8e0')
+    L.contorno(K)
+    return L
+
+def neonG():
+    """el neón de GROW IBARBIDE: la hoja verde y la raya debajo, en su placa negra"""
+    L = Lienzo(16, 16); N, N2 = '#58f080', '#c8ffd8'
+    L.r(1, 1, 14, 13, '#141a16')
+    for (dx, dy) in ((0, -1), (0, -2), (0, -3), (0, -4), (0, -5), (-1, -3), (-2, -4), (-3, -4), (1, -3), (2, -4), (3, -4), (-1, -1), (-2, -1),
+                     (-3, -2), (1, -1), (2, -1), (3, -2)):
+        L.p(8 + dx, 9 + dy, N)
+    L.vl(8, 9, 10, N); L.p(8, 6, N2)
+    L.hl(3, 12, 12, N)
+    return L
+
+def semillero():
+    """el propagador de esquejes en su mesita: la bandeja de alveolos, la tapa transparente con las rejillas y la manta térmica"""
+    L = Lienzo(16, 16)
+    L.r(1, 11, 14, 2, '#c8b088'); L.vl(2, 13, 15, '#8a7458'); L.vl(13, 13, 15, '#8a7458')   # la mesita
+    L.r(2, 9, 12, 2, '#2a2a30'); L.hl(2, 13, 10, '#c04848')                                # la bandeja y la manta
+    for x in range(3, 13, 2): L.p(x, 8, '#5aa04a'); L.p(x, 7, '#84cc6c')                   # los esquejes
+    L.r(2, 4, 12, 4, '#d0e8f0'); L.hl(2, 13, 4, '#f0f8fc'); L.r(5, 4, 2, 1, '#8a8e96'); L.r(9, 4, 2, 1, '#8a8e96')   # la tapa
+    for x in range(3, 13, 2): L.p(x, 7, '#84cc6c')
+    L.contorno(K)
+    return L
+
+FACHADAS['bajo-setas'] = bajo_setas
+
 # ---------------------------------------------------------------------------------------------------------- salida
 for n, f in FACHADAS.items():
     base, ps = f()
@@ -815,6 +1368,25 @@ for n, f in (('vitrina', vitrina), ('tarros', tarros), ('pizarra', pizarra), ('c
              ('barraD', barraD), ('neon', neon), ('mesaV', mesaV), ('cordon', cordon), ('cordonF', lambda: cordon(True)),
              ('extrN', lambda: extractor(False)), ('extrG', lambda: extractor(True)), ('filtroN', filtroN), ('ctrlN', ctrlN)):
     sale(n, f(), 'locales-16')
+for e in ESTILOS:   # 1.34: cada club, el suyo
+    for n, f in ((f'floorC_{e}', globals()[f'floorC_{e}']), (f'iwT_club_{e}', globals()[f'iwT_club_{e}']), (f'iwB_club_{e}', globals()[f'iwB_club_{e}'])):
+        sale(n, f(), 'interior-locales')
+    E = ESTILOS[e]
+    sale(f'mesita-{e}', E['mesita'](), 'locales-16'); sale(f'vitrina-{e}', vitrina_estilo(*E['vit']), 'locales-16')
+    sale(f'sofaF-{e}', sofaM(E['sofa']) if e == 'ensanche' else sofaF(E['sofa']), 'locales-ancho'); sale(f'sofaB-{e}', sofa_atras(E['sofa']), 'locales-ancho')
+    sale(f'billar-{e}', billar_estilo(*E['bil']), 'locales-ancho')
+for n, f in (('floorSe', floorSe), ('iwT_bajo', iwT_bajo), ('iwB_bajo', iwB_bajo), ('floorG', floorG), ('iwT_grow', iwT_grow), ('iwB_grow', iwB_grow)):
+    sale(n, f(), 'interior-locales')
+for n, f in (('fotoK', fotoK), ('ojoBuey', ojoBuey), ('timon', timon), ('red', red), ('diana', diana), ('engranaje', engranaje), ('neonH', neonH),
+             ('copas', copas), ('humidS', humidS), ('tuboS', tuboS), ('cuboS', cuboS), ('sacos', sacos), ('macetasP', macetasP), ('botesW', botesW),
+             ('neonG', neonG), ('semillero', semillero)):
+    sale(n, f(), 'locales-16')
+sale('libreria', libreria(), 'locales-alto'); sale('baldaS', baldaS(), 'locales-alto')
+for i in range(2): sale(f'secaS-{i}', secaS(i), 'locales-alto')
+for fs in ('colonizando', 'fructificando', 'lista', 'contaminada', 'seca'):
+    for j in range(2): sale(f'bandejaS-{fs}-{j}', bandejaS(fs, j), 'locales-alto')
+for n in range(5): sale(f'carpaM-{n}', carpa_abierta(n), 'locales-ancho')
+sale('carpaDemo', carpa_abierta(3, True), 'locales-ancho')
 for t in ('led', 'sodio', 'lec'):
     for on in (0, 1): sale(f'focoN-{t}-{on}', focoN(t, on), 'locales-16')
 for n, f in (('estanteN', estanteN), ('secadero', secadero), ('altavoz', altavoz), ('tanqueN', tanqueN), ('riegoN', riegoN)):

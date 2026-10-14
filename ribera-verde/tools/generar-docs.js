@@ -288,11 +288,12 @@ ${legend}
     mendialde: 'Mendialde (pueblo de caseríos, de donde eres; el prólogo) — 48 × 34', 'casa-ama': 'Caserío de la familia, en Mendialde — 10 × 8',
     puerto: 'Puerto Viejo (ciudad pequeña, pesquera) — 40 × 24', valdehierro: 'Valdehierro (ciudad pequeña, del hierro) — 40 × 24',
     errotabarri: 'Errotabarri (pueblo del molino) — 36 × 24', ibarbide: 'Ibarbide · Casco Viejo (la ciudad grande, desde el capítulo 4) — 44 × 30',
-    ensanche: 'Ibarbide · Ensanche (al este del Casco Viejo, por la avenida) — 46 × 22', growcity: 'GROW IBARBIDE (tienda de Ane, en el Casco Viejo) — 10 × 8',
+    ensanche: 'Ibarbide · Ensanche (al este del Casco Viejo, por la avenida) — 46 × 22', growcity: 'GROW IBARBIDE (tienda de Ane, en el Casco Viejo; la carpa de exposición y el propagador) — 12 × 9',
     callejon: 'Ibarbide · Kale Zaharra (la plazuela de detrás del growshop, por el callejón; sin patrullas) — 23 × 18',
-    'club-puerto': 'Club Itsaso (Puerto Viejo, asociación cannábica: dispensario, sofás y billar) — 12 × 8', 'club-valde': 'Club La Fundición (Valdehierro) — 12 × 8',
-    'club-ibar': 'Club Kalea (Ibarbide, Casco Viejo) — 12 × 8', 'club-ens': 'Club Ensanche (Ibarbide) — 12 × 8',
-    nave: 'La nave de Valdehierro (cuatro mesas de cultivo, secadero y escritorio) — 14 × 8', disco: 'Discoteca GAUA (Ibarbide, Ensanche; de 23:00 a 6:00) — 14 × 8' };
+    'club-puerto': 'Club Itsaso (Puerto Viejo, asociación cannábica: dispensario, sofás y billar; marinero) — 16 × 10', 'club-valde': 'Club La Fundición (Valdehierro; hormigón y ladrillo) — 18 × 10',
+    'club-ibar': 'Club Kalea (Ibarbide, Casco Viejo; piedra y vigas, el pequeño) — 15 × 8', 'club-ens': 'Club Ensanche (Ibarbide; blanco y moderno, el más grande) — 20 × 10',
+    'club-rv': 'Asociación Cannábica Ribera Verde (barrio alto; la de la tía Maite) — 16 × 10', setas: 'El bajo de las setas (casa de Txomin, Kale Zaharra) — 10 × 7',
+    nave: 'La nave de Valdehierro (cuatro mesas de cultivo, secadero, escritorio y la carpa de las madres) — 18 × 8', disco: 'Discoteca GAUA (Ibarbide, Ensanche; de 23:00 a 6:00) — 14 × 8' };
   for (const [k, mp] of Object.entries(D.maps)) {
     const pad = String(mp.w - 1).length;
     let header = '    ' + Array.from({ length: mp.w }, (_, x) => x % 10 === 0 ? String(x / 10 % 10) : ' ').join('') + '\n    ' + Array.from({ length: mp.w }, (_, x) => x % 10).join('');

@@ -14,29 +14,98 @@ const SOCIO={g:1,rel:3,min:30,n:{puerto:'Gotzon',valde:'Maribel',ibar:'Joseba',e
 const DISCO={n:'GAUA',ch:4,abre:23*60,cierra:6*60,entrada:15,copa:10,copaMax:3,ronda:40,mesa:300,ligar:.5,vip:['Kepa','Garbiñe','Aitor','Nekane','Borja','Ainhoa']};
 const MESAS_X=[1,4,8,11],FASE_MESA=['vacía','recién plantada','creciendo','en flor','dando cogollos'];
 // la mitad de la derecha de los muebles de 2 casillas de los locales: la pinta la de la izquierda (01b-arte)
-const LOCAL2=new Set(['billar2','sofaF2','sofaV2','sofaB2','cabina2','escritorio2','mesaN2','fotoMaite2']);   // 1.33: la foto de la tía, de 2
+const LOCAL2=new Set(['billar2','sofaF2','sofaV2','sofaB2','cabina2','escritorio2','mesaN2','fotoMaite2','carpaM2','carpaDemo2']);   // 1.33: la foto de la tía, de 2; 1.34: la carpa de las madres
+// cada club, a su manera (1.34, lo pidió el usuario: «los decorados y distribución del local … sea diferente», «el billar muy pegado,
+// solo dos sofás con dos mesas», «algún club más grande que otro»): su tamaño, su estilo (est: sus casillas, floor<est>, iwT_<est> e
+// iwB_<est>, y el sprite de sus muebles, o + '-' + est, si lo tiene: estiloLocal), sus muebles por filas desde la de la pared (y 1)
+// hasta la de las salidas (la última: M, el felpudo) y su gente: el encargado detrás de la vitrina (enc), el socio que comparte
+// (socio), el del billar (bil), los demás socios en los sofás ([x, y, dir, look]: gente) y, en los de fuera, su presidente (pres; 11e-gente, PRESI).
+// Las letras: en la pared, t tarros, p pizarra, c las normas, q el taquero, o el póster, F la foto de la tía (2 casillas); en el
+// suelo, V la vitrina, P una kentia, J la gramola, S el sofá de frente, B el de espaldas (2 casillas), m la mesa baja, L el billar
+// (2 casillas), l la librería; y las de cada club (deco)
+const PIZARRA_KIKO=['Ojo con la mosca blanca: mirad el envés','Esquejes de los martes, a primera hora','El pH, entre 5,8 y 6,2. Siempre','Lo que se cuelga se seca a oscuras'];   // 1.34
+const PAR_CLUB={F:'fotoMaite',S:'sofaF',B:'sofaB',L:'billar'};
+const LETRA_CLUB={t:'tarros',p:'pizarra',c:'cartelC',q:'tacos',o:'poster',V:'vitrina',P:'plantDeco',J:'jukebox',m:'mesita',l:'libreria'};
+const CLUB_PLANO={
+  ibar:{est:'kalea',deco:{d:'fotoK'},enc:[1,2],socio:[6,4,'left'],bil:[14,4],pres:[10,5],gente:[[10,3,'left','clubg4']],plano:[   // el pequeño, de piedra y vigas
+    'ttt.p.c....d.q.',
+    '...P....SS....J',
+    'VVV.SS..mm.....',
+    '....mm..BB..LL.',
+    '....BB.........',
+    'P.............P',
+    '......MM.......']},
+  puerto:{est:'itsaso',deco:{d:'ojoBuey',e:'timon',f:'red'},enc:[1,2],socio:[9,3,'left'],bil:[14,7],pres:[5,5],gente:[[13,3,'left','clubg2'],[3,7,'left','clubg3']],plano:[   // el marinero: tablas de cubierta
+    'ttt.pdc..ed..fq.',
+    '...P...SS..SS..J',
+    'VVV....mm..mm...',
+    '.......BB..BB...',
+    '................',
+    '.SS.............',
+    '.mm.........LL..',
+    '.BB............P',
+    'P......MM.......']},
+  valde:{est:'fundicion',deco:{d:'diana',e:'engranaje'},enc:[1,2],socio:[8,3,'left'],bil:[14,7],pres:[5,5],gente:[[12,3,'left','clubg1'],[17,3,'left','clubg5'],[3,7,'left','clubg3']],plano:[   // el grande: hormigón y ladrillo
+    'ttt.pc..de..eo..q.',
+    '...P..SS..SS..SS.J',
+    'VVV...mm..mm..mm..',
+    '......BB..BB..BB..',
+    '..................',
+    '.SS...............',
+    '.mm.........LL....',
+    '.BB..............P',
+    'P.......MM........']},
+  ens:{est:'ensanche',deco:{n:'neonH'},enc:[1,2],socio:[8,3,'left'],bil:[16,7],pres:[5,5],gente:[[12,3,'left','clubg3'],[16,3,'left','clubg1'],[3,7,'left','clubg5']],plano:[   // el más grande: blanco y moderno
+    'ttt.pc..n...n...o.q.',
+    '...P..SS..SS..SS...J',
+    'VVV...mm..mm..mm....',
+    '......BB..BB..BB....',
+    '....................',
+    '.SS..SS.............',
+    '.mm..mm.......LL....',
+    '.BB..BB............P',
+    'P........MM.........']},
+  rv:{est:'',deco:{e:'copas'},enc:[1,2],socio:[7,4,'left'],bil:[12,7],gente:[[12,4,'right','clubg4'],[3,8,'left','clubg3']],plano:[   // la de la tía: la de siempre, con sus libros
+    'ttt.pc.FF...e.q.',
+    '...P......ll...J',
+    'VVV..SS......SS.',
+    '.....mm......mm.',
+    '.....BB......BB.',
+    '................',
+    '.SS.......LL....',
+    '.mm............P',
+    '.BB....MM.......']}};
+// lo de cada club que se ve sin entrar: el ancho, el alto y la primera casilla del felpudo
+const planoClub=k=>{const P=CLUB_PLANO[k],M=P.plano[P.plano.length-1];return {w:P.plano[0].length,h:P.plano.length+1,mx:M.indexOf('M')};};
+// el sprite de un mueble en un local con estilo (1.34): el suyo (o + '-' + est), si lo tiene; si no, el de siempre (01b-arte)
+const estiloLocal=o=>{const m=MAPS[S.map],e=m&&m.est;return e&&ESTILO_OBJ.has(o)?o+'-'+e:o;};
+const ESTILO_OBJ=new Set(['sofaF','sofaB','mesita','vitrina','billar']);
 // la luz de los locales (luzLocal, 14-render): el club, en penumbra cálida, con la lámpara del billar y el brillo de la vitrina
-// ([x, y, radio, color, alfa], en px del mapa); GAUA, oscura, con tres focos de colores que giran sobre la pista (centro c, radios r)
-const LUZ_CLUB={fondo:'rgba(24,14,4,.28)',l:[[144,70,30,'255,206,120',.6],[24,56,22,'200,240,255',.35]]};
+// ([x, y, radio, color, alfa], en px del mapa; 1.34: la lámpara, sobre el billar de cada club); GAUA, oscura, con tres focos de
+// colores que giran sobre la pista (centro c, radios r)
+const LUZ_CLUB=Object.fromEntries(Object.entries(CLUB_PLANO).map(([k,P])=>{const y=P.plano.findIndex(f=>f.includes('L')),x=P.plano[y].indexOf('L');
+  return [k,{fondo:k==='ens'?'rgba(20,16,10,.18)':'rgba(24,14,4,.28)',l:[[x*16+16,(y+1)*16+6,30,'255,206,120',.6],[24,56,22,'200,240,255',.35]]}];}));
 const LUZ_DISCO={fondo:'rgba(10,4,30,.55)',focos:[['255,79,200',0],['64,224,240',2.1],['240,208,64',4.2]],c:[120,88],r:[30,14],R:26};
 // la nave (1.31): bajo cada uno de los dos LED de una mesa plantada (encendidos), su luz en las plantas, del color de la de los LED de las
 // carpas (FOCO_LUZ.led); [dx desde la casilla de la mesa, y, radio, color, alfa]
 const LUZ_MESA=[[6,59,15,'240,170,255',.2],[26,59,15,'240,170,255',.2]];
 const luzNave=()=>({l:MESAS_X.flatMap((x,i)=>faseMesa(i)?LUZ_MESA.map(([dx,y,r,c,a])=>[x*16+dx,y,r,FOCO_NAVE[S.nave.f[i]].luz,a]):[])});   // 1.33: del color de sus focos
 function mapasLocales(){
-  // ---------- LOS CLUBS: 12 × 8, el dispensario a la izquierda, los sofás en medio y el billar a la derecha ----------
-  for(const k in CLUBS){const C=CLUBS[k],m=newMap('club-'+k,12,8,'floorC');m.music='club';
-    rect(m,0,0,11,0,(x,y)=>gr(m,x,y,'iwT_club'));rect(m,0,1,11,1,(x,y)=>gr(m,x,y,'iwB_club'));
-    [[0,'tarros'],[1,'pizarra'],[2,'tarros'],[4,'cartelC'],[7,k==='rv'?'fotoMaite':'poster'],[10,'tacos']].forEach(([x,o])=>ob(m,x,1,o));   // 1.32: en la asociación, la foto de la tía
-    if(k==='rv')ob(m,8,1,'fotoMaite2');   // 1.33: más grande, de 2 casillas
-    rect(m,0,3,2,3,(x,y)=>ob(m,x,y,'vitrina'));ob(m,3,2,'plantDeco');
-    ob(m,5,2,'sofaF');ob(m,6,2,'sofaF2');ob(m,5,3,'mesita');ob(m,6,3,'mesita');ob(m,5,4,'sofaB');ob(m,6,4,'sofaB2');
-    ob(m,8,4,'billar');ob(m,9,4,'billar2');ob(m,11,2,'jukebox');ob(m,0,6,'plantDeco');ob(m,11,6,'plantDeco');
-    [5,6].forEach(x=>{gr(m,x,7,'mat');m.exits[x+',7']={to:C.map,x:C.x+(C.ancha?x-5:0),y:C.y,dir:'down'};});}
-  // ---------- LA NAVE: 14 × 8, las cuatro mesas en fila; la estantería, el secadero y el escritorio al fondo ----------
-  const n=newMap('nave',14,8,'floorN');n.music='nave';
-  rect(n,0,0,13,0,(x,y)=>gr(n,x,y,'iwT_nave'));rect(n,0,1,13,1,(x,y)=>gr(n,x,y,'iwB_nave'));
-  ob(n,0,2,'estanteN');ob(n,6,2,'secadero');ob(n,11,2,'escritorio');ob(n,12,2,'escritorio2');ob(n,13,2,'crate');
+  // ---------- LOS CLUBS (1.34: cada uno con su plano, CLUB_PLANO): el dispensario a la izquierda, los sofás y el billar ----------
+  for(const k in CLUBS){const C=CLUBS[k],P=CLUB_PLANO[k],{w,h,mx}=planoClub(k),e=P.est?'_'+P.est:'',m=newMap('club-'+k,w,h,'floorC'+e);m.music='club';m.est=P.est||null;
+    rect(m,0,0,w-1,0,(x,y)=>gr(m,x,y,'iwT_club'+e));rect(m,0,1,w-1,1,(x,y)=>gr(m,x,y,'iwB_club'+e));
+    P.plano.forEach((f,j)=>{const y=j+1;let par=false;
+      for(let x=0;x<w;x++){const c=f[x];
+        if(c==='M'){gr(m,x,y,'mat');m.exits[x+','+y]={to:C.map,x:C.x+(C.ancha?x-mx:0),y:C.y,dir:'down'};par=false;continue;}
+        if(PAR_CLUB[c]){ob(m,x,y,PAR_CLUB[c]+(par?'2':''));par=!par;continue;}
+        par=false;const o=LETRA_CLUB[c]||P.deco[c];if(o)ob(m,x,y,o);}});}
+  // la puerta de cada club (04-mapas) da delante del felpudo (en la casilla de la derecha, si es ancha)
+  for(const n in MAPS)for(const d of Object.values(MAPS[n].doors))if(d.gate&&d.gate.startsWith('club:')){const {h,mx}=planoClub(d.gate.slice(5));d.x=mx+d.x-5;d.y=h-2;}
+  // ---------- LA NAVE: 18 × 8, las cuatro mesas en fila; la estantería, el secadero y el escritorio al fondo; 1.34: y, a la derecha,
+  // la carpa de las madres ----------
+  const n=newMap('nave',18,8,'floorN');n.music='nave';
+  rect(n,0,0,17,0,(x,y)=>gr(n,x,y,'iwT_nave'));rect(n,0,1,17,1,(x,y)=>gr(n,x,y,'iwB_nave'));
+  ob(n,0,2,'estanteN');ob(n,6,2,'secadero');ob(n,11,2,'escritorio');ob(n,12,2,'escritorio2');ob(n,13,2,'crate');ob(n,15,2,'carpaM');ob(n,16,2,'carpaM2');
   MESAS_X.forEach(x=>{ob(n,x,4,'mesaN');ob(n,x+1,4,'mesaN2');});
   [6,7].forEach(x=>{gr(n,x,7,'mat');n.exits[x+',7']={to:'valdehierro',x:x+6,y:8,dir:'down'};});
   // ---------- GAUA: 14 × 8, la barra a la izquierda, la cabina y la pista en medio y el reservado a la derecha ----------
@@ -46,25 +115,48 @@ function mapasLocales(){
   ob(d,5,2,'altavoz');ob(d,8,2,'altavoz');ob(d,6,3,'cabina');ob(d,7,3,'cabina2');
   ob(d,11,2,'sofaV');ob(d,12,2,'sofaV2');ob(d,11,3,'mesaV');ob(d,12,3,'mesaV');ob(d,11,4,'cordon');ob(d,12,4,'cordon');ob(d,13,4,'cordonF');
   [6,7].forEach(x=>{gr(d,x,7,'mat');d.exits[x+',7']={to:'ensanche',x:x+32,y:9,dir:'down'};});
+  // ---------- EL BAJO DE LAS SETAS (1.34): 10 × 7, las tres baldas de las bandejas, el pulverizador y el secadero ----------
+  const b=newMap('setas',10,7,'floorSe');b.music='callejon';
+  rect(b,0,0,9,0,(x,y)=>gr(b,x,y,'iwT_bajo'));rect(b,0,1,9,1,(x,y)=>gr(b,x,y,'iwB_bajo'));
+  [0,1,2].forEach(x=>ob(b,x,2,'baldaS'));ob(b,4,2,'humidS');ob(b,6,2,'secaS');ob(b,7,1,'tuboS');ob(b,9,2,'crate');ob(b,9,5,'cuboS');
+  [4,5].forEach(x=>{gr(b,x,6,'mat');b.exits[x+',6']={to:'callejon',x:19,y:8,dir:'down'};});
 }
+// el sprite de lo que cambia en los locales (1.34): el secadero del bajo, con setas o vacío, y la carpa de las madres, con las que
+// tenga; los demás, con estilo, el de su club (estiloLocal)
+function spriteLocal(o){
+  if(o==='secaS')return 'secaS-'+(S.setas&&S.setas.g>=1?1:0);
+  if(o==='carpaM')return 'carpaM-'+(S.nave&&S.nave.ma?S.nave.ma.length:0);
+  return estiloLocal(o);
+}
+// las bandejas de la balda x del bajo (1.34): las dos de S.setas.bandejas que le tocan (2x abajo, 2x + 1 arriba), en su fase:
+// [sprite, 0 abajo | 1 arriba]
+const bandejasBalda=x=>(S.setas?S.setas.bandejas.slice(2*x,2*x+2):[]).map((B,j)=>['bandejaS-'+faseSeta(B)+'-'+j,j]);
+const LUZ_BAJO={fondo:'rgba(8,10,6,.42)',l:[[72,40,48,'255,214,140',.45]]};   // la bombilla del techo
 // la gente de los locales: en cada club, un socio en los sofás y el del billar; en la nave, cada trabajador junto a su mesa; en GAUA,
 // el portero (fuera), la camarera, el DJ, la RRPP y tres en la pista
-Object.keys(CLUBS).forEach((k,i)=>NPCDEF.push({id:'socio',map:'club-'+k,x:7,y:3,dir:'left',look:i%2?'socia':'socio',talk:()=>talkSocio(k)},
-  {id:'billarista',map:'club-'+k,x:10,y:4,dir:'left',look:i%2?'billarista2':'billarista',talk:()=>talkBillar(k)}));
+// 1.34: en el sitio de su club (CLUB_PLANO), con los demás socios en los sofás; el encargado (11e-gente), también
+Object.keys(CLUBS).forEach((k,i)=>{const P=CLUB_PLANO[k];NPCDEF.push({id:'socio',map:'club-'+k,x:P.socio[0],y:P.socio[1],dir:P.socio[2],look:i%2?'socia':'socio',talk:()=>talkSocio(k)},
+  {id:'billarista',map:'club-'+k,x:P.bil[0],y:P.bil[1],dir:'left',look:i%2?'billarista2':'billarista',talk:()=>talkBillar(k)},
+  ...P.gente.map(([x,y,dir,look],j)=>({id:'cg'+(j+1),map:'club-'+k,x,y,dir,look,talk:()=>talkGenteClub(k,j)})));});
+NPCDEF.forEach(d=>{const P=d.id.startsWith('club_')&&CLUB_PLANO[d.id.slice(5)];if(P)[d.x,d.y]=P.enc;});
+// 1.34: el presidente de cada club de fuera (PRESI, 11e-gente), desde el capítulo del club
+Object.keys(PRESI).forEach(k=>{const P=CLUB_PLANO[k];NPCDEF.push({id:'pres_'+k,map:'club-'+k,x:P.pres[0],y:P.pres[1],dir:'down',look:'presi_'+k,cond:()=>S.ch>=CLUBS[k].ch,talk:()=>talkPresi(k)});});
 MESAS_X.forEach((x,i)=>NPCDEF.push({id:'nv'+i,map:'nave',x,y:5,dir:'up',look:'navero'+(i+1),cond:()=>!!(S.nave&&naveroDe(i)),talk:()=>talkNavero(i)}));
+NPCDEF.push({id:'nvm',map:'nave',x:14,y:2,dir:'right',look:'navero5',cond:()=>!!(S.nave&&cuidaMadres()),talk:()=>talkMadres()});   // 1.34: el de las madres
 NPCDEF.push({id:'gorila',map:'ensanche',x:40,y:9,dir:'left',look:'gorila',cond:()=>S.ch>=DISCO.ch,talk:()=>talkGorila()},
   {id:'camarera',map:'disco',x:1,y:2,look:'camarera',talk:()=>talkBarra()},{id:'dj',map:'disco',x:6,y:2,look:'dj',talk:()=>talkDJ()},
   {id:'rrpp',map:'disco',x:12,y:5,look:'rrpp',talk:()=>talkRRPP()},
   ...[[5,5],[8,5],[7,4]].map(([x,y],i)=>({id:'baila'+(i+1),map:'disco',x,y,wander:1,look:'baila'+(i+1),talk:()=>talkBaila(i)})));
 // de quién es la confianza que suma hablar con alguien (saludo, 08-mundo): el club del encargado, del socio y del del billar; GAUA,
 // la de su gente; los de la nave, ninguna (son de tu plantilla)
-const relDe=id=>id.startsWith('club_')?id.slice(5):id==='socio'||id==='billarista'?S.map.slice(5):id==='darko2'?'darko':/^(gorila|camarera|dj|rrpp|baila\d)$/.test(id)?'gaua':/^nv\d$/.test(id)?null:id;
+const relDe=id=>id.startsWith('club_')?id.slice(5):id==='socio'||id==='billarista'||/^cg\d$/.test(id)?S.map.slice(5):id==='darko2'?'darko':/^(gorila|camarera|dj|rrpp|baila\d)$/.test(id)?'gaua':/^nv(\d|m)$/.test(id)?null:id;
 // la puerta de un local (onStepEnd, 08-mundo): cerrada, te deja delante; el club, la primera vez, el carné; GAUA, la entrada de la noche
 async function entraLocal(d){
   const [t,k]=d.gate.split(':'),cerrada=async txt=>{atrasPuerta();await say(txt);};
   if(t==='club'){if(S.ch<CLUBS[k].ch)return cerrada('Una puerta sin rótulo, con un timbre. No abre nadie.');if(!S.clubs[k]){atrasPuerta();if(!await carneClub(k))return;}
     if(k==='rv')return entraAso(d);}
   else if(t==='nave'){if(!S.nave)return cerrada('La persiana está echada con un candado. La llave la tiene Arrieta, el dueño.');}
+  else if(t==='setas'){if(!S.setas)return cerrada('La puerta del bajo de Txomin, con un candado. La llave te la da él, si lo alquilas.');}
   else if(t==='disco'){if(S.ch<DISCO.ch||!discoAbierta())return cerrada(`${DISCO.n} abre de 23:00 a 6:00.`);if(!nocheYa()){atrasPuerta();if(!await entradaDisco())return;}}
   return warp(d);
 }
@@ -72,16 +164,27 @@ function atrasPuerta(){const y=P.y+1;Object.assign(P,{fy:y,y,py:y*16,dir:'down'}
 // lo que hay dentro de los locales (objectAction, 08-mundo); null si no es de un local
 function objLocal(x,y,o){
   if(!o)return null;
+  if(S.map==='shop'||S.map==='growcity'){   // los dos grows (1.34): lo nuevo de cada uno
+    if(o==='pizarra')return say(`En la pizarra de Kiko, a tiza: «${PIZARRA_KIKO[S.day%PIZARRA_KIKO.length]}».`);
+    if(o==='sacos')return say('Sacos de 50 litros: fibra de coco, perlita y tierra abonada.');
+    if(o==='macetasP')return say('Macetas de tela apiladas, de 11, 18 y 25 litros.');
+    if(o==='botesW')return say('Botes de abono por litros: MEATZA en azul, ORTUA BIO en verde.');
+    if(o==='neonG')return say('Un neón verde: una hoja de siete puntas y GROW IBARBIDE debajo.');
+    if(o==='semillero')return say('Un propagador con tapa: bandejas de alveolos con esquejes de muestra y su manta térmica.');
+    if(o==='carpaDemo'||o==='carpaDemo2')return say('La carpa de exposición: 120 × 120, con el LED de barras encendido y plantas de plástico dentro.');
+    return null;
+  }
   if(S.map.startsWith('club-')){const k=S.map.slice(5),C=CLUBS[k];
     if(o==='tarros')return say('Tarros de cristal con la etiqueta de cada variedad que ha pasado por el club.');
     if(o==='pizarra')return say(`En la pizarra, a tiza: «Hoy, ${STRAINS[C.sid[S.day%C.sid.length]].n}».`);
     if(o==='cartelC')return say(`NORMAS DE ${C.n}\nSolo socios mayores de edad, con el carné a la vista. Lo que se retira, se consume dentro.`);
     if(o==='tacos')return say('El taquero: seis tacos, la tiza y el triángulo.');
     if(o==='vitrina')return say('La vitrina del dispensario: tarros con muestras y una báscula de precisión.');
-    if(o==='mesita')return say('Una mesa baja con un cenicero, un grinder y un librillo.');
-    if(/^sofa[FB]2?$/.test(o))return say('Un sofá chester de cuero verde, gastado de tanto uso.');
+    if(o==='mesita')return say(MUEBLE_CLUB[k].mesa);
+    if(/^sofa[FB]2?$/.test(o))return say(MUEBLE_CLUB[k].sofa);
     if(o==='billar'||o==='billar2')return say(`La mesa de billar, con el tapete recién cepillado. ${BILLAR.n[k]} juega con apuesta.`);
     if(o==='poster')return say('Un cartel antiguo de una feria del cáñamo.');
+    if(DECO_CLUB[o])return say(DECO_CLUB[o]);
     if(o==='fotoMaite'||o==='fotoMaite2')return say(`${aso().tio?'La tía Maite y Delroy, de jóvenes':'La tía Maite, joven, con un hombre de rastas negras'}, en un campo. En la placa: «Maite, presidenta fundadora».`);
     if(o==='plantDeco')return say('Una kentia en una maceta de barro.');
   }
@@ -92,6 +195,16 @@ function objLocal(x,y,o){
     if(o==='secadero')return secaderoNave();
     if(o==='escritorio'||o==='escritorio2')return escritorioNave();
     if(o==='crate')return say('Sacos de sustrato y macetas apiladas.');
+    if(o==='carpaM'||o==='carpaM2')return carpaMadres();
+  }
+  if(S.map==='setas'){
+    if(!S.setas)return say('El bajo ya no es tuyo. Txomin cambiará la cerradura.');
+    if(o==='baldaS')return bajoMenu(null);
+    if(o==='humidS')return S.setas.bandejas.some(b=>!b.mala)?pulverizarBajo():say('El pulverizador de mochila de Txomin. Con él se tienen húmedas las bandejas.');
+    if(o==='secaS')return say(S.setas.g>=1?`En el secadero, ${gTxt(S.setas.g)} de setas secas. Txomin te las compra en la puerta.`:'El secadero está vacío. Lo que recojas se seca aquí.');
+    if(o==='tuboS')return say('Una tubería vieja que suda. Por eso aquí la humedad nunca baja.');
+    if(o==='crate')return say('Cajas de bandejas vacías de Txomin, apiladas.');
+    if(o==='cuboS')return say('Un cubo y un cepillo. Lo que se echa a perder, fuera.');
   }
   if(S.map==='disco'){
     if(o==='bottles')return say('Botellas de ginebra, ron y vodka, iluminadas desde abajo.');
@@ -104,6 +217,19 @@ function objLocal(x,y,o){
   return null;
 }
 
+// 1.34: cada club, con sus sofás y sus mesas, y lo que cuelga de sus paredes
+const MUEBLE_CLUB={ibar:{sofa:'Un sofá de terciopelo granate, de los de antes.',mesa:'Una mesa baja de madera vieja con un cenicero de barro y un grinder.'},
+  puerto:{sofa:'Un sofá de cuero azul marino, con los remaches de latón.',mesa:'Una mesa baja hecha con una tapa de escotilla, con un cenicero y un librillo.'},
+  valde:{sofa:'Un sofá de cuero marrón, cuarteado por los años.',mesa:'Un barril de acero con un tablero encima: el cenicero, el grinder y el librillo.'},
+  ens:{sofa:'Un sofá blanco de diseño, sin una mancha.',mesa:'Una mesa baja de cristal con un cenicero de mármol y un grinder.'},
+  rv:{sofa:'Un sofá chester de cuero verde, gastado de tanto uso.',mesa:'Una mesa baja con un cenicero, un grinder y un librillo.'}};
+const DECO_CLUB={fotoK:'Una foto vieja de la Kale Zaharra, en blanco y negro, de cuando había mercado los sábados.',ojoBuey:'Un ojo de buey de latón, de un barco desguazado en la ría.',
+  timon:'El timón de un pesquero de Puerto Viejo, colgado en la pared.',red:'Una red de pesca con sus corchos, colgada de la pared.',diana:'Una diana con tres dardos clavados. Ninguno en el centro.',
+  engranaje:'Un engranaje de la fundición, de más de un metro. Pesa como un coche.',neonH:'Un neón verde con la forma de una hoja.',libreria:'Libros de botánica, de cultivo y de viajes. Muchos llevan el nombre de la tía Maite en la primera página.',
+  copas:'Las copas de la asociación: «Primer premio de exterior», año tras año, con el nombre de Maite.'};
+const GENTE_CLUB=['Los jueves viene más gente. Se juega al mus.','Aquí nadie pregunta de dónde viene lo que fumas. Eso, en la calle, no pasa.',
+  'El encargado no deja entrar a nadie sin carné. Ni a su cuñado.','¿Has probado la del día? Está bastante bien.','Hace años que vengo. Es como el bar, pero tranquilo.'];
+const talkGenteClub=(k,j)=>say(GENTE_CLUB[(S.day+j+Object.keys(CLUBS).indexOf(k))%GENTE_CLUB.length],'SOCIO');
 /* ---------- el club: el socio y el billar ---------- */
 async function talkSocio(k){
   const n=SOCIO.n[k],N=n.toUpperCase();
@@ -149,7 +275,7 @@ async function talkBillar(k){
 /* ---------- la nave: mesas, estantería, secadero y escritorio ---------- */
 // S.nave: {m: las NAVE.max mesas (null, vacía, o {k: el lote, f: el fenotipo, thc, y: × cosecha, dia: el de plantar, g y t: lo que hay
 // en el secadero y su THC medio, abo: 0 sin abono, 1 MEATZA, 2 ORTUA BIO}), ab: {m, o}: dosis de floración de cada marca en la estantería}
-const naveNueva=()=>({m:Array(NAVE.max).fill(null),ab:{m:0,o:0},f:Array(NAVE.max).fill('led'),ex:0,rg:0});
+const naveNueva=()=>({m:Array(NAVE.max).fill(null),ab:{m:0,o:0},f:Array(NAVE.max).fill('led'),ex:0,rg:0,ma:[]});   // 1.34: las madres (ma)
 const naveStock=()=>S.nave?S.nave.m.reduce((a,M)=>a+(M?M.g:0),0):0;
 function faseMesa(i){const M=S.nave&&S.nave.m[i];if(!M)return 0;const d=S.day-M.dia;return d<1?1:d<3?2:d<NAVE.crece?3:4;}
 const thcNave=(sid,f)=>Math.round(getStrain(sid).thc*(f?f.t:1)*NAVE.thc*10)/10;
@@ -180,7 +306,7 @@ const dosisTxt=n=>String(Math.round(n*10)/10).replace('.',',');   // con el cont
 // en la pared, los extractores (extrN, el de 250 mm; extrG, el de 315), los filtros de carbón y el controlador; en el suelo, junto a la
 // estantería, el tanque y la máquina
 const EQUIPO_NAVE=[[10,1,'extrN','ex',1,1],[10,1,'extrG','ex',2,3],[3,1,'extrG','ex',3,3],[9,1,'filtroN','ex',1,3],[7,1,'filtroN','ex',2,3],
-  [4,1,'filtroN','ex',3,3],[2,1,'filtroN','ex',3,3],[5,1,'ctrlN','rg',2,3],[1,2,'tanqueN','rg',1,3],[2,2,'riegoN','rg',3,3]];
+  [4,1,'filtroN','ex',3,3],[8,1,'filtroN','ex',3,3],[5,1,'ctrlN','rg',2,3],[1,2,'tanqueN','rg',1,3],[2,2,'riegoN','rg',3,3]];
 function montarNave(){
   const n=MAPS.nave;if(!n)return;
   for(const [x,y] of EQUIPO_NAVE)ob(n,x,y,null);
@@ -225,20 +351,61 @@ async function mesaNave(i){
   if(op==='Abono'){const c=await ask(`¿Qué abono le echa cada día? En la estantería: MEATZA ×${dosisTxt(N.ab.m)} · ORTUA BIO ×${dosisTxt(N.ab.o)}.`,['Sin abono','MEATZA Floración','ORTUA BIO Floración','Nada']);
     if(c<3){M.abo=c;sfx('sel');}}
 }
+// una semilla o un esqueje de los tuyos, que se gasta (1.34: o, con madres, el clon de una madre de la nave, que no se gasta): {sid, f} o null
+async function elegirPlanta(title,madres){
+  const own=Object.entries(S.seeds).filter(([,v])=>v>0),esq=S.esquejes.map(e=>[e,S.esquejes]).concat(S.bandejas.map(e=>[e,S.bandejas])),ma=madres&&S.nave?S.nave.ma:[];
+  if(!own.length&&!esq.length&&!ma.length){await say('No llevas semillas ni esquejes.');return null;}
+  const items=ma.map((M,j)=>{const k=lotSid(M.k),s=getStrain(k);return {label:`Madre ${j+1}: ${s.n}${etiq(M.f)}`,right:'clon',sw:s.c,ic:iconoCogollo(k),desc:'Un clon de la carpa de las madres: no se gasta nada.'};})
+    .concat(own.map(([k,v])=>({label:getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:iconoCogollo(k),desc:strainLine(k)})))
+    .concat(esq.map(([e,l])=>{const s=getStrain(e.sid);return {label:'Esqueje '+s.n+etiq(e.f),right:l===S.bandejas?'bandeja':'esqueje',sw:s.c,ic:iconoCogollo(e.sid),desc:'Clon enraizado: sale con su fenotipo.'};}))
+    .concat([{label:'Cancelar',desc:''}]);
+  let j=await menu(items,{cls:'full',title,desc:true});
+  if(j<0||j>=items.length-1)return null;
+  if(j<ma.length)return {sid:lotSid(ma[j].k),f:ma[j].f};
+  j-=ma.length;
+  if(j<own.length){const sid=own[j][0];S.seeds[sid]--;if(!S.seeds[sid])delete S.seeds[sid];return {sid,f:rollFeno(sid)};}
+  const [e,l]=esq[j-own.length];l.splice(l.indexOf(e),1);return {sid:e.sid,f:e.f};
+}
 // con una semilla o un esqueje, tu gente saca una madre y llena la mesa de clones: toda la mesa, con su fenotipo
 async function plantarMesa(i){
-  const own=Object.entries(S.seeds).filter(([,v])=>v>0),esq=S.esquejes.map(e=>[e,S.esquejes]).concat(S.bandejas.map(e=>[e,S.bandejas]));
-  if(!own.length&&!esq.length)return say('No llevas semillas ni esquejes.');
-  const items=own.map(([k,v])=>({label:getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:iconoCogollo(k),desc:strainLine(k)}))
-    .concat(esq.map(([e,l])=>{const s=getStrain(e.sid);return {label:'Esqueje '+s.n+etiq(e.f),right:l===S.bandejas?'bandeja':'esqueje',sw:s.c,ic:iconoCogollo(e.sid),desc:'Clon enraizado: la mesa entera sale con su fenotipo.'};}))
-    .concat([{label:'Cancelar',desc:''}]);
-  const j=await menu(items,{cls:'full',title:'¿QUÉ PLANTAS EN LA MESA?',desc:true});
-  if(j<0||j>=own.length+esq.length)return;
-  let sid,f;
-  if(j<own.length){sid=own[j][0];S.seeds[sid]--;if(!S.seeds[sid])delete S.seeds[sid];f=rollFeno(sid);}
-  else{const [e,l]=esq[j-own.length];l.splice(l.indexOf(e),1);sid=e.sid;f=e.f;}
+  const p=await elegirPlanta('¿QUÉ PLANTAS EN LA MESA?',true);if(!p)return;const {sid,f}=p;
   S.nave.m[i]={k:sid+(claseFeno(f)==='estrella'?'*':''),f,thc:thcNave(sid,f),y:f.y,dia:S.day,g:0,t:0,abo:0};sfx('sel');
   return say(`Mesa ${i+1}: ${getStrain(sid).n}${etiq(f)}. De la madre salen los clones para toda la mesa. A los ${NAVE.crece} días empieza a dar.`);
+}
+// la carpa de las madres (1.34, lo pidió el usuario: «un indoor en la nave con madres para tener ahí las genéticas seleccionadas para
+// que los currelas lo gestionen»): 150 × 150 cm a 18/6 con hasta MADRES.max madres (S.nave.ma: {k: la variedad, ★ si es estrella, f:
+// el fenotipo, v: el vigor, e: los esquejes listos}). Se mete una con una semilla o un esqueje. Con alguien de la plantilla en las
+// madres (rol madres, PLANTILLA.sueldo.madres al día: cuidaMadres), cada mañana siguen a 100 de vigor y sacan MADRES.esq esquejes cada
+// una (uno más con cuidado 4 o más), hasta MADRES.tope; sin nadie, pierden MADRES.pierde de vigor al día y a 0 se mueren (madresDia,
+// 11f-plantilla). Los esquejes se recogen aquí (al propagador, S.esquejes, con su tope) y cada mesa se planta con el clon de una madre
+const MADRES={max:4,esq:1,tope:4,pierde:20,propagador:12};
+const cuidaMadres=()=>S.plantilla.find(w=>w.rol==='madres')||null;
+const madreTxt=M=>getStrain(lotSid(M.k)).n+etiq(M.f);
+async function carpaMadres(){
+  const N=S.nave;let i=0;
+  for(;;){
+    const c=cuidaMadres(),rows=N.ma.map((M,j)=>{const k=lotSid(M.k),s=getStrain(k);
+      return {label:`Madre ${j+1} · ${s.n}`,right:M.e?M.e+' esq.':M.v+' %',sw:s.c,ic:iconoCogollo(k),desc:`${madreTxt(M)}. Vigor ${M.v} %${M.e?` · ${M.e} esquejes listos`:''}.`};});
+    if(N.ma.length<MADRES.max)rows.push({label:'Meter una madre',right:`${N.ma.length} de ${MADRES.max}`,desc:'Con una semilla o un esqueje: la madre de una genética que quieras guardar. De ella salen los esquejes y los clones de las mesas.'});
+    rows.push({label:'Volver',desc:''});
+    i=await menu(rows,{cls:'full',title:'LAS MADRES',title2:c?'Las cuida '+c.n:'Nadie las cuida',desc:true,initial:Math.min(i,rows.length-1)});
+    if(i<0||i===rows.length-1)return;
+    if(i>=N.ma.length){const p=await elegirPlanta('¿QUÉ MADRE METES?',false);if(!p)continue;
+      N.ma.push({k:p.sid+(claseFeno(p.f)==='estrella'?'*':''),f:p.f,v:100,e:0});sfx('sel');
+      await say(`La ${getStrain(p.sid).n}${etiq(p.f)}, a la carpa de las madres: a 18/6, siempre en crecimiento.`+(c?` ${c.n} se encarga.`:' Sin nadie que la cuide, se va apagando: pon a alguien de tu plantilla en las madres.'));continue;}
+    const M=N.ma[i],ops=(M.e?[`Recoger ${M.e} ${M.e>1?'esquejes':'esqueje'}`]:[]).concat(['Quitarla','Nada']);
+    const op=ops[await ask(`Madre ${i+1}: ${madreTxt(M)} · vigor ${M.v} %.`+(M.e?'':c?` ${c.n} le saca esquejes cada mañana.`:' Nadie le saca esquejes.'),ops)];
+    if(op&&op.startsWith('Recoger')){const q=Math.min(M.e,MADRES.propagador-S.esquejes.length);
+      if(q<1){await say(`El propagador está lleno: ${MADRES.propagador} esquejes. Planta alguno antes.`);continue;}
+      for(let j=0;j<q;j++)S.esquejes.push({sid:lotSid(M.k),f:M.f,dia:S.day});M.e-=q;sfx('get');
+      await say(`${q>1?q+' esquejes':'Un esqueje'} de la ${madreTxt(M)}, al propagador. Plántalos antes del día ${S.day+ESQUEJE_DIAS+1}.`);continue;}
+    if(op==='Quitarla'){if(await ask(`¿Quitas la madre de ${madreTxt(M)}? Se tira.`,['Quitarla','No'])!==0)continue;N.ma.splice(i,1);sfx('sel');}
+  }
+}
+async function talkMadres(){
+  const w=cuidaMadres();if(!w)return;const N=S.nave;
+  return say(!N.ma.length?'La carpa está vacía. Tráeme una madre, una semilla o un esqueje de lo que quieras guardar, y te la cuido.'
+    :`${N.ma.length>1?N.ma.length+' madres':'Una madre'}, a 18/6 y bien regadas. Cada mañana les saco ${MADRES.esq+(w.cui>=4?1:0)>1?'dos esquejes':'un esqueje'}; los tienes en la carpa.`,w.n.toUpperCase());
 }
 // los focos de la mesa i (1.33): cambiarlos por los de otro tipo (los de antes se los queda Arrieta)
 async function focosNave(i){
@@ -282,8 +449,30 @@ async function escritorioNave(){
     desc:`${w?'La cuida '+w.n:'Nadie la cuida'}. ${FOCO_NAVE[N.f[i]].n}.`+(M?` ${ABONO_MESA[M.abo][0].toUpperCase()+ABONO_MESA[M.abo].slice(1)} · en el secadero, ${gTxt(M.g)}.`:'')};});
   rows.push({label:'Estantería',right:`${dosisTxt(N.ab.m)} + ${dosisTxt(N.ab.o)} dosis`,desc:`MEATZA FLORACIÓN y ORTUA BIO FLORACIÓN: ${N.rg>=2?'menos de ':''}una dosis al día por mesa con abono.`},
     {label:'Clima',right:`${calorNave()} de ${EXTR_NAVE[N.ex].cap}`,desc:`El calor de los focos encendidos y lo que saca la extracción (${EXTR_NAVE[N.ex].n}).`+(sofocoNave()<1?` Hace demasiado calor: las mesas dan un ${Math.round((1-sofocoNave())*100)} % menos.`:'')},
+    {label:'La gente',right:`${deLaNave().length} aquí`,desc:'Quién cuida cada mesa y las madres: cambiarlos de mesa, una prima o un curso. Pulsa A.'},
     {label:'Mejoras',right:'Nave '+NIVEL_NAVE[N.ex+N.rg],desc:`Extracción: ${EXTR_NAVE[N.ex].n}. Riego: ${RIEGO_NAVE[N.rg].n}. Pulsa A para mejorarlas.`});return rows;};
-  let i=0;do{const rows=filas();i=await menu(rows,{cls:'full',title:'LA NAVE',title2:`${eur(NAVE.dia)} al día`,desc:true,initial:i});if(i===rows.length-1)await mejorasNave();}while(i>=0);
+  let i=0;do{const rows=filas();i=await menu(rows,{cls:'full',title:'LA NAVE',title2:`${eur(NAVE.dia)} al día`,desc:true,initial:i});
+    if(i===rows.length-1)await mejorasNave();else if(i===rows.length-2)await genteNave();}while(i>=0);
+}
+// la gente de la nave (1.34, lo pidió el usuario: «menús para controlar más a la peña»): cada uno con su ficha y su sitio; a los de las
+// mesas, cambiarlos de mesa (con el que la tenga, se cambian); a todos, una prima o un curso (prima, curso: 11f-plantilla)
+async function genteNave(){
+  let i=0;
+  for(;;){
+    const W=deLaNave().sort((a,b)=>(a.rol==='madres')-(b.rol==='madres')||a.mesa-b.mesa);
+    if(!W.length)return say('En la nave no trabaja nadie. Pon a tu gente desde el móvil: MÓVIL → PLANTILLA.');
+    const rows=W.map(w=>({label:w.n,right:w.rol==='madres'?'madres':'mesa '+(w.mesa+1),desc:fichaGente(w)+'. '+rolDesc(w)})).concat([{label:'Volver',desc:''}]);
+    i=await menu(rows,{cls:'full',title:'LA GENTE DE LA NAVE',title2:`${W.length} trabajando`,desc:true,initial:Math.min(i,rows.length-1)});
+    if(i<0||i>=W.length)return;
+    const w=W[i],ops=(w.rol==='nave'?['Cambiar de mesa']:[]).concat([`Prima · ${eur(MANDO.prima)}`,`Curso · ${eur(MANDO.curso)}`,'Nada']);
+    const op=ops[await ask(`${w.n} · ${fichaGente(w)} · ${w.rol==='madres'?'las madres':'la mesa '+(w.mesa+1)}`,ops)];
+    if(op==='Cambiar de mesa'){const ms=[...Array(NAVE.max).keys()].filter(j=>j!==w.mesa);
+      const c=await ask(`¿A qué mesa pasa ${w.n}?`,ms.map(j=>{const o=naveroDe(j);return `Mesa ${j+1}`+(o?' · con '+o.n:'');}).concat(['Nada']));
+      if(c<0||c>=ms.length)continue;const o=naveroDe(ms[c]);if(o)o.mesa=w.mesa;w.mesa=ms[c];sfx('sel');
+      await say(`${w.n} pasa a la mesa ${w.mesa+1}`+(o?` y ${o.n}, a la ${o.mesa+1}.`:'.'));}
+    else if(op&&op.startsWith('Prima'))await prima(w);
+    else if(op&&op.startsWith('Curso'))await curso(w);
+  }
 }
 async function talkNavero(i){
   const w=naveroDe(i),M=S.nave&&S.nave.m[i];if(!w)return;const f=faseMesa(i);

@@ -7806,6 +7806,40 @@
    "paleta": "propia",
    "coste_real": 0,
    "tipo": "edificio",
+   "id": "edificio-bajo-setas",
+   "calco": "casco3",
+   "cubre": [
+    "tile:door_casco3"
+   ],
+   "celda": "edificio_5x7",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "descripcion": "1.34: el bajo de las setas de Txomin, en la Kale Zaharra: la casa alta de almagre del Casco Viejo con la puerta de chapa gris en la casilla 2, la rejilla de ventilación encima y el cerrojo",
+   "puerta": {
+    "x": 2
+   },
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose (interior #26262e), de locales.py (simple)",
+     "herramienta": "importado"
+    }
+   ],
+   "notas": "1.34, pedido por el usuario: «Aquí falta un espacio por crear no? Con sus sprites necesarios».",
+   "max_colores": 28,
+   "montaje": "la fachada de mundo.py (casco3) con la puerta de chapa: 24 colores"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "edificio",
    "id": "edificio-club-ensanche",
    "calco": "bloque2",
    "cubre": [
@@ -7885,13 +7919,31 @@
     "tile:iwB_nave",
     "tile:floorD",
     "tile:iwT_disco",
-    "tile:iwB_disco"
+    "tile:iwB_disco",
+    "tile:floorC_kalea",
+    "tile:iwT_club_kalea",
+    "tile:iwB_club_kalea",
+    "tile:floorC_itsaso",
+    "tile:iwT_club_itsaso",
+    "tile:iwB_club_itsaso",
+    "tile:floorC_fundicion",
+    "tile:iwT_club_fundicion",
+    "tile:iwB_club_fundicion",
+    "tile:floorC_ensanche",
+    "tile:iwT_club_ensanche",
+    "tile:iwB_club_ensanche",
+    "tile:floorSe",
+    "tile:iwT_bajo",
+    "tile:iwB_bajo",
+    "tile:floorG",
+    "tile:iwT_grow",
+    "tile:iwB_grow"
    ],
    "celda": "tile",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
-   "descripcion": "1.30, los locales por dentro: el club (parqué de tablero de cuadros de 8 × 8, papel verde botella con la moldura y zócalo de cuarterones), la nave de cultivo (hormigón pulido en losas de 1 m y chapa grecada con la viga y el murete) y la discoteca (baldosa negra con brillo y paneles acolchados con la tira de LED rosa arriba y la azul abajo)",
+   "descripcion": "1.30, los locales por dentro: el club (parqué de tablero de cuadros de 8 × 8, papel verde botella con la moldura y zócalo de cuarterones), la nave de cultivo (hormigón pulido en losas de 1 m y chapa grecada con la viga y el murete) y la discoteca (baldosa negra con brillo y paneles acolchados con la tira de LED rosa arriba y la azul abajo); 1.34: un suelo y una pared por club (floorC_/iwT_club_/iwB_club_<estilo>: kalea, baldosa hidráulica y piedra vista con la viga; itsaso, tarima de cubierta y machihembrado blanco con el zócalo marino; fundicion, chapa lagrimada y ladrillo visto con la viga de hierro; ensanche, espiga de roble claro y liso blanco con la franja verde), el bajo de las setas (hormigón húmedo, pared encalada con verdín y el zócalo de azulejo) y GROW IBARBIDE (baldosa gris, ladrillo blanco con la canaleta y el zócalo verde)",
    "estilo_ref": "las paredes y suelos de serie (interior-home, interior-bar)",
-   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca»."
+   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca». 1.34, pedido por el usuario: «los decorados y distribución del local en casa asociación sea diferente, como también en cada grow» y «Aquí falta un espacio por crear no? Con sus sprites necesarios»."
   },
   {
    "fase": "F9",
@@ -7936,11 +7988,27 @@
     "obj:extrG",
     "obj:filtroN",
     "obj:ctrlN",
-    "obj:focoN"
+    "obj:focoN",
+    "obj:fotoK",
+    "obj:ojoBuey",
+    "obj:timon",
+    "obj:red",
+    "obj:diana",
+    "obj:engranaje",
+    "obj:neonH",
+    "obj:copas",
+    "obj:humidS",
+    "obj:tuboS",
+    "obj:cuboS",
+    "obj:sacos",
+    "obj:macetasP",
+    "obj:botesW",
+    "obj:neonG",
+    "obj:semillero"
    ],
    "celda": "objeto_1x1",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
-   "descripcion": "1.30: la vitrina del dispensario (mueble de madera con la urna y dos tarros), la balda de tarros, la pizarra de la variedad del día, las normas del club, el taquero con el triángulo, la mesa baja con cenicero, grinder y librillo, la barra acolchada de GAUA con su tira azul, el neón de la luna, la mesa del reservado con la cubitera y dos copas y el cordón de terciopelo (poste y cuerda; cordonF, el último poste); 1.33, el equipo de la nave: los focos de las mesas, aparte (focoN-<led|sodio|lec>-<0|1>, el LED de barras, la campana de sodio y los dos reflectores de cerámica (CMH), apagados y encendidos, con las asas en la fila 9 para las poleas), el extractor en línea de 250 mm (extrN) y el de 315 (extrG) con su tubo, el filtro de carbón colgado (filtroN) y el controlador de riego (ctrlN)",
+   "descripcion": "1.30: la vitrina del dispensario (mueble de madera con la urna y dos tarros), la balda de tarros, la pizarra de la variedad del día, las normas del club, el taquero con el triángulo, la mesa baja con cenicero, grinder y librillo, la barra acolchada de GAUA con su tira azul, el neón de la luna, la mesa del reservado con la cubitera y dos copas y el cordón de terciopelo (poste y cuerda; cordonF, el último poste); 1.33, el equipo de la nave: los focos de las mesas, aparte (focoN-<led|sodio|lec>-<0|1>, el LED de barras, la campana de sodio y los dos reflectores de cerámica (CMH), apagados y encendidos, con las asas en la fila 9 para las poleas), el extractor en línea de 250 mm (extrN) y el de 315 (extrG) con su tubo, el filtro de carbón colgado (filtroN) y el controlador de riego (ctrlN); 1.34: la mesita y la vitrina de cada club (mesita-<estilo>: la de nogal redonda con la vela, un baúl de marinero, un bidón con el tablero y la de cristal; vitrina-<estilo>: nogal, teca, acero y laca blanca), lo de sus paredes (la foto antigua del Casco Viejo, el ojo de buey, el timón, la red con los corchos, la diana, el piñón de la fundición, el aro de neón verde con la hoja y las copas de la tía), lo del bajo de las setas (el pulverizador, la tubería que suda y el cubo con el cepillo) y lo de los grows (los sacos de sustrato, las macetas de tela apiladas, la balda de botes de abono, el neón de la hoja y el propagador de esquejes)",
    "ajuste_por_sprite": {
     "vitrina": "exacto",
     "tarros": "exacto",
@@ -7962,10 +8030,34 @@
     "focoN-sodio-0": "exacto",
     "focoN-sodio-1": "exacto",
     "focoN-lec-0": "exacto",
-    "focoN-lec-1": "exacto"
+    "focoN-lec-1": "exacto",
+    "fotoK": "exacto",
+    "ojoBuey": "exacto",
+    "timon": "exacto",
+    "red": "exacto",
+    "diana": "exacto",
+    "engranaje": "exacto",
+    "neonH": "exacto",
+    "copas": "exacto",
+    "humidS": "exacto",
+    "tuboS": "exacto",
+    "cuboS": "exacto",
+    "sacos": "exacto",
+    "macetasP": "exacto",
+    "botesW": "exacto",
+    "neonG": "exacto",
+    "semillero": "exacto",
+    "mesita-kalea": "exacto",
+    "vitrina-kalea": "exacto",
+    "mesita-itsaso": "exacto",
+    "vitrina-itsaso": "exacto",
+    "mesita-fundicion": "exacto",
+    "vitrina-fundicion": "exacto",
+    "mesita-ensanche": "exacto",
+    "vitrina-ensanche": "exacto"
    },
    "estilo_ref": "props-16 (botellero, mostrador, gramola)",
-   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca»."
+   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca». 1.34, pedido por el usuario: «los decorados y distribución del local en casa asociación sea diferente, como también en cada grow» y «Aquí falta un espacio por crear no? Con sus sprites necesarios»."
   },
   {
    "fase": "F9",
@@ -7981,20 +8073,37 @@
     "obj:secadero",
     "obj:altavoz",
     "obj:tanqueN",
-    "obj:riegoN"
+    "obj:riegoN",
+    "obj:libreria",
+    "obj:baldaS",
+    "obj:secaS"
    ],
    "celda": "objeto_alto",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
-   "descripcion": "1.30: la estantería metálica de los abonos de la nave (100 × 180 cm, garrafas de MEATZA y ORTUA BIO y sacos de sustrato), el secadero de red de 4 pisos colgado con los cogollos tendidos y el altavoz de la pista (cajón de graves y caja con conos); 1.33: el tanque de 1.000 L de la nave (un IBC en su jaula, con la solución nutritiva, el palé, la llave, la bomba y la manguera) y la máquina de fertirrigación (el armario con la pantalla y las tres dosificadoras con sus botes)",
+   "descripcion": "1.30: la estantería metálica de los abonos de la nave (100 × 180 cm, garrafas de MEATZA y ORTUA BIO y sacos de sustrato), el secadero de red de 4 pisos colgado con los cogollos tendidos y el altavoz de la pista (cajón de graves y caja con conos); 1.33: el tanque de 1.000 L de la nave (un IBC en su jaula, con la solución nutritiva, el palé, la llave, la bomba y la manguera) y la máquina de fertirrigación (el armario con la pantalla y las tres dosificadoras con sus botes); 1.34: la librería de la asociación (libros, las actas y una maceta encima) y el bajo de las setas: la estantería de rejilla con tres baldas (baldaS), sus bandejas aparte en cada fase y en cada balda (bandejaS-<colonizando|fructificando|lista|contaminada|seca>-<0 abajo|1 arriba>; tapadas, sin método) y el secadero de malla vacío y con setas (secaS-0, secaS-1)",
    "ajuste_por_sprite": {
     "estanteN": "exacto",
     "secadero": "exacto",
     "altavoz": "exacto",
     "tanqueN": "exacto",
-    "riegoN": "exacto"
+    "riegoN": "exacto",
+    "libreria": "exacto",
+    "baldaS": "exacto",
+    "secaS-0": "exacto",
+    "secaS-1": "exacto",
+    "bandejaS-colonizando-0": "exacto",
+    "bandejaS-colonizando-1": "exacto",
+    "bandejaS-fructificando-0": "exacto",
+    "bandejaS-fructificando-1": "exacto",
+    "bandejaS-lista-0": "exacto",
+    "bandejaS-lista-1": "exacto",
+    "bandejaS-contaminada-0": "exacto",
+    "bandejaS-contaminada-1": "exacto",
+    "bandejaS-seca-0": "exacto",
+    "bandejaS-seca-1": "exacto"
    },
    "estilo_ref": "los muebles a escala del piso (props-escala)",
-   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca»."
+   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca». 1.34, pedido por el usuario: «los decorados y distribución del local en casa asociación sea diferente, como también en cada grow» y «Aquí falta un espacio por crear no? Con sus sprites necesarios»."
   },
   {
    "fase": "F9",
@@ -8013,11 +8122,13 @@
     "obj:cabina",
     "obj:escritorio",
     "obj:mesaN",
-    "obj:fotoMaite"
+    "obj:fotoMaite",
+    "obj:carpaM",
+    "obj:carpaDemo"
    ],
    "celda": "mueble_ancho",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
-   "descripcion": "1.30, muebles de 2 casillas a 16 px/m: la mesa de billar de 210 cm con el tapete a medio fondo, las troneras y las bolas, y la lámpara de tres pantallas verdes colgada encima; el sofá chester verde de frente (sofaF) y por detrás (sofaB), el de terciopelo morado del reservado (sofaV), la cabina del DJ con los platos, la mesa y el rótulo, la mesa de oficina de la nave con el portátil y la cajonera, y la mesa de cultivo de 240 × 120 cm vista desde arriba a medio fondo (1.32: la bandeja con su fondo acanalado, el canto, el larguero y tres patas, y cinco macetas de 11 L a tresbolillo, tres delante y dos al fondo) bajo dos LED de barras de 100 cm, como los de las carpas (1.31; mesaN-0 vacía y apagados, mesaN-1 plantada y encendidos); 1.31: sus plantas, aparte y encima, en los colores de la planta A (hojas, tallo, contorno y la rampa clave del cogollo, para que el juego les ponga el tono de hoja y el color de cogollo de cada variedad, como en la vista C): plantasN-1 recién plantadas y plantasN-<fase>-<porte> (2 creciendo, 3 en flor, 4 dando; 1.32: con copa, la corona y las puntas, no en forma de pino: i ancha y baja de hoja ancha y oscura y cogollos gordos, h entre medias, s alta y estrecha de hoja fina y clara y colas largas); 1.33: la foto de la tía Maite con Delroy de joven (de la 1.32, ahora de 2 casillas y con más detalle: el marco de 28 × 18 con la placa de latón, el paspartú y, en el campo, ella con la melena castaña y la blusa morada, él con las rastas negras y la camisa crema y una planta en flor entre los dos), en la asociación; la mesa sin los focos, que van aparte (locales-16)",
+   "descripcion": "1.30, muebles de 2 casillas a 16 px/m: la mesa de billar de 210 cm con el tapete a medio fondo, las troneras y las bolas, y la lámpara de tres pantallas verdes colgada encima; el sofá chester verde de frente (sofaF) y por detrás (sofaB), el de terciopelo morado del reservado (sofaV), la cabina del DJ con los platos, la mesa y el rótulo, la mesa de oficina de la nave con el portátil y la cajonera, y la mesa de cultivo de 240 × 120 cm vista desde arriba a medio fondo (1.32: la bandeja con su fondo acanalado, el canto, el larguero y tres patas, y cinco macetas de 11 L a tresbolillo, tres delante y dos al fondo) bajo dos LED de barras de 100 cm, como los de las carpas (1.31; mesaN-0 vacía y apagados, mesaN-1 plantada y encendidos); 1.31: sus plantas, aparte y encima, en los colores de la planta A (hojas, tallo, contorno y la rampa clave del cogollo, para que el juego les ponga el tono de hoja y el color de cogollo de cada variedad, como en la vista C): plantasN-1 recién plantadas y plantasN-<fase>-<porte> (2 creciendo, 3 en flor, 4 dando; 1.32: con copa, la corona y las puntas, no en forma de pino: i ancha y baja de hoja ancha y oscura y cogollos gordos, h entre medias, s alta y estrecha de hoja fina y clara y colas largas); 1.33: la foto de la tía Maite con Delroy de joven (de la 1.32, ahora de 2 casillas y con más detalle: el marco de 28 × 18 con la placa de latón, el paspartú y, en el campo, ella con la melena castaña y la blusa morada, él con las rastas negras y la camisa crema y una planta en flor entre los dos), en la asociación; la mesa sin los focos, que van aparte (locales-16); 1.34: los sofás y el billar de cada club (sofaF-/sofaB-/billar-<estilo>: terciopelo granate con nogal y tapete burdeos; cuero azul marino con teca, latón y tapete azul; cuero marrón con acero y tapete gris; sofás blancos de líneas rectas con el cojín verde y billar lacado con tapete turquesa), la carpa de las madres de la nave (120 × 120, plateada, abierta de frente, con el panel LED encendido y de 0 a 4 madres podadas: carpaM-<n>) y la de exposición de GROW IBARBIDE (carpaDemo)",
    "ajuste_por_sprite": {
     "billar": "exacto",
     "sofaF": "exacto",
@@ -8037,10 +8148,28 @@
     "plantasN-4-i": "exacto",
     "plantasN-4-h": "exacto",
     "plantasN-4-s": "exacto",
-    "fotoMaite": "exacto"
+    "fotoMaite": "exacto",
+    "sofaF-kalea": "exacto",
+    "sofaB-kalea": "exacto",
+    "billar-kalea": "exacto",
+    "sofaF-itsaso": "exacto",
+    "sofaB-itsaso": "exacto",
+    "billar-itsaso": "exacto",
+    "sofaF-fundicion": "exacto",
+    "sofaB-fundicion": "exacto",
+    "billar-fundicion": "exacto",
+    "sofaF-ensanche": "exacto",
+    "sofaB-ensanche": "exacto",
+    "billar-ensanche": "exacto",
+    "carpaM-0": "exacto",
+    "carpaM-1": "exacto",
+    "carpaM-2": "exacto",
+    "carpaM-3": "exacto",
+    "carpaM-4": "exacto",
+    "carpaDemo": "exacto"
    },
    "estilo_ref": "los muebles del salón (salon)",
-   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca». 1.33, pedido por el usuario: «Ese cuadro... poca calidad no?».",
+   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca». 1.33, pedido por el usuario: «Ese cuadro... poca calidad no?». 1.34, pedido por el usuario: «los decorados y distribución del local en casa asociación sea diferente, como también en cada grow» y «Aquí falta un espacio por crear no? Con sus sprites necesarios».",
    "max_colores": 40
   }
  ],

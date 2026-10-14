@@ -241,7 +241,7 @@ function buildMaps(){
   rect(ib,0,0,43,1,(x,y)=>gr(ib,x,y,'grass'));
   // entre el growshop y la casa de al lado, un callejón de 2 m que sube a la Kale Zaharra (callejon), la plazuela de detrás
   let ix=1;[['casco',4,6],['casco2',3,5],['casco3',5,7],['growcity',6,6],['callejon',2,8],['casco',4,6],['casco3',5,7],['casco',4,6],['casco2',3,5],['casco3',5,7]]
-    .forEach(([k,w,h])=>{if(k==='callejon'){ix+=w;return;}building(ib,k,ix,8-h,w,h,k==='growcity'?ix+2:null,k==='growcity'?{to:'growcity',x:4,y:6,dir:'up'}:null,k==='growcity'?{ancha:1,dx:8}:null);
+    .forEach(([k,w,h])=>{if(k==='callejon'){ix+=w;return;}building(ib,k,ix,8-h,w,h,k==='growcity'?ix+2:null,k==='growcity'?{to:'growcity',x:5,y:7,dir:'up'}:null,k==='growcity'?{ancha:1,dx:8}:null);
       for(let x=ix;x<ix+w;x++){for(let y=0;y<8-h;y++)gr(ib,x,y,'grass');for(let y=0;y<8-h;y++)monte(ib,x,y);}ix+=w;});
   for(let y=0;y<8;y++){gr(ib,42,y,'grass');monte(ib,42,y);}
   rect(ib,19,0,20,1,(x,y)=>gr(ib,x,y,'plaza'));[19,20].forEach(x=>ib.doors[x+',0']={to:'callejon',x:x-9,y:16,dir:'up'});
@@ -292,7 +292,9 @@ function buildMaps(){
   // más ladrones: para vender en la ciudad sin policía. Se sale por el mismo callejón, entre dos casas, abajo
   const cj=newMap('callejon',23,18,'plaza');cj.music='callejon';
   rect(cj,0,0,22,0,(x,y)=>{gr(cj,x,y,'grass');monte(cj,x,y);});
-  let cx=1;[['casco3',5,7],['casco',4,6],['casco2',3,5],['casco',4,6],['casco3',5,7]].forEach(([k,w,h])=>{building(cj,k,cx,8-h,w,h,null);
+  // 1.34: la quinta, la casa de Txomin, con la puerta del bajo de las setas (gate: 11j-locales) en la casilla 2
+  let cx=1;[['casco3',5,7],['casco',4,6],['casco2',3,5],['casco',4,6],['casco3',5,7]].forEach(([k,w,h],i)=>{const B=i===4;
+    building(cj,k,cx,8-h,w,h,B?cx+2:null,B?{to:'setas',x:4,y:5,dir:'up',gate:'setas'}:null,B?{fachada:'bajo-setas',puerta:'bajo-setas'}:null);
     for(let x=cx;x<cx+w;x++)for(let y=0;y<8-h;y++){gr(cj,x,y,'grass');monte(cj,x,y);}cx+=w;});
   [[1,11,'casco3',5,7],[6,12,'casco',4,6],[12,12,'casco',4,6],[16,11,'casco3',5,7]].forEach(([x,y,k,w,h])=>building(cj,k,x,y,w,h,null));
   rect(cj,6,11,9,11,(x,y)=>gr(cj,x,y,'plaza'));rect(cj,12,11,15,11,(x,y)=>gr(cj,x,y,'plaza'));
@@ -320,13 +322,17 @@ function buildMaps(){
   [0,1,8,9].forEach(x=>ob(s,x,1,'shelfW'));ob(s,4,1,'poster');
   rect(s,2,3,7,3,(x,y)=>ob(s,x,y,'counter'));
   ob(s,0,5,'display');ob(s,9,5,'display');ob(s,0,7,'plantDeco');ob(s,9,7,'plantDeco');
+  ob(s,2,1,'pizarra');ob(s,0,6,'sacos');ob(s,9,6,'macetasP');   // 1.34: la pizarra de Kiko, los sacos y las macetas
   gr(s,4,7,'mat');s.exits['4,7']={to:'town',x:17,y:9,dir:'down'};
   // ---------- GROW IBARBIDE (1.14): el growshop grande del Casco Viejo ----------
-  const gc=newMap('growcity',10,8,'floorS');gc.music='growcity';
-  rect(gc,0,0,9,0,(x,y)=>gr(gc,x,y,'iwT_shop'));rect(gc,0,1,9,1,(x,y)=>gr(gc,x,y,'iwB_shop'));
-  [0,1,2,7,8,9].forEach(x=>ob(gc,x,1,'shelfW'));ob(gc,4,1,'poster');rect(gc,2,3,7,3,(x,y)=>ob(gc,x,y,'counter'));
-  [[0,4],[0,5],[9,4],[9,5]].forEach(([x,y])=>ob(gc,x,y,'display'));ob(gc,0,7,'plantDeco');ob(gc,9,7,'plantDeco');
-  gr(gc,4,7,'mat');gr(gc,5,7,'mat');gc.exits['4,7']={to:'ibarbide',x:15,y:8,dir:'down'};gc.exits['5,7']={to:'ibarbide',x:16,y:8,dir:'down'};
+  // 1.34 (lo pidió el usuario: cada grow distinto): 12 × 9, suelo de baldosa gris y pared de ladrillo blanco con su neón, la carpa
+  // de exposición montada (x 9-10, y 6), el propagador de esquejes, los sacos y las macetas; Ane detrás del mostrador largo.
+  const gc=newMap('growcity',12,9,'floorG');gc.music='growcity';
+  rect(gc,0,0,11,0,(x,y)=>gr(gc,x,y,'iwT_grow'));rect(gc,0,1,11,1,(x,y)=>gr(gc,x,y,'iwB_grow'));
+  [0,1,10,11].forEach(x=>ob(gc,x,1,'shelfW'));[2,9].forEach(x=>ob(gc,x,1,'botesW'));ob(gc,6,1,'neonG');rect(gc,2,3,8,3,(x,y)=>ob(gc,x,y,'counter'));
+  [[0,4],[0,5],[11,4]].forEach(([x,y])=>ob(gc,x,y,'display'));ob(gc,11,5,'semillero');ob(gc,9,6,'carpaDemo');ob(gc,10,6,'carpaDemo2');
+  ob(gc,0,7,'sacos');ob(gc,11,7,'macetasP');ob(gc,3,7,'plantDeco');ob(gc,8,7,'plantDeco');
+  gr(gc,5,8,'mat');gr(gc,6,8,'mat');gc.exits['5,8']={to:'ibarbide',x:15,y:8,dir:'down'};gc.exits['6,8']={to:'ibarbide',x:16,y:8,dir:'down'};
   // ---------- BAR ----------
   const b=newMap('bar',10,8,'floorB');b.music='bar';
   rect(b,0,0,9,0,(x,y)=>gr(b,x,y,'iwT_bar'));rect(b,0,1,9,1,(x,y)=>gr(b,x,y,'iwB_bar'));

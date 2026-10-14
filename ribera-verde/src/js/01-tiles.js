@@ -157,6 +157,30 @@ function buildTiles(){
   T('tanqueN',t=>{t.box(1,0,14,14,'#e4e8e6','#8a8e96');t.F(2,5,12,8,'#8aa86a');t.F(1,14,14,2,'#2a2a30');});
   T('riegoN',t=>{t.box(2,2,12,14,'#8c98a2','#4a525a');t.F(4,4,8,3,'#2a3a5a');});
   doble('fotoMaite',t=>{t.box(10,2,6,11,'#e8dcc0','#74502e');},t=>{t.box(0,2,6,11,'#e8dcc0','#74502e');});
+  // 1.34: los suelos y las paredes de cada club (CLUB_PLANO), el bajo de las setas, lo de sus paredes y la carpa de las madres
+  [['kalea','#8a8478','#6e685e','#5a4636'],['itsaso','#b08454','#7a5434','#2a4a6a'],['fundicion','#9a9690','#82807a','#8a4a32'],['ensanche','#e4e2dc','#c8c6c0','#d8dcd8']].forEach(([k,c,c2,p])=>{
+    suelo('floorC_'+k,c,c2);T('iwT_club_'+k,t=>{t.F(0,0,16,16,p);t.F(0,0,16,4,shade(p,-60));t.F(0,4,16,1,shade(p,-30));});
+    T('iwB_club_'+k,t=>{t.F(0,0,16,16,p);t.F(0,11,16,5,shade(p,-42));t.F(0,11,16,1,shade(p,-62));});});
+  suelo('floorSe','#6a6a62','#5a5a52');T('iwT_bajo',t=>{t.F(0,0,16,16,'#8a8a7e');t.F(0,0,16,4,'#4a4a42');});T('iwB_bajo',t=>{t.F(0,0,16,16,'#8a8a7e');t.F(0,11,16,5,'#5a5a52');t.P(5,6,'#5a6a4a');});
+  T('libreria',t=>{t.box(1,0,14,16,'#6a4a2a','#3a2414');for(let y=3;y<15;y+=4)for(let x=2;x<14;x+=2)t.F(x,y-2,1,3,['#8a3a3a','#3a5a8a','#c8a040','#3a7a4a'][(x+y)%4]);});
+  T('copas',t=>{t.F(1,12,14,2,'#74502e');[3,8,12].forEach(x=>{t.F(x,7,3,4,'#e0b040');t.F(x+1,11,1,1,'#c8a040');});});
+  T('fotoK',t=>{t.box(3,2,10,10,'#a0a0a0','#3a2a1a');t.F(5,6,6,4,'#6a6a6a');});
+  T('ojoBuey',t=>{t.blob(8,7,5,5,'#8ec0d2','#c8a040');});T('timon',t=>{t.blob(8,7,5,5,'#a87646','#5a3a24');t.F(7,6,2,2,'#c8a040');});
+  T('red',t=>{for(let i=2;i<14;i+=3){t.F(i,2,1,11,'#8a8270');t.F(2,i,11,1,'#8a8270');}t.F(4,12,2,2,'#e05a3a');t.F(10,12,2,2,'#e05a3a');});
+  T('diana',t=>{t.blob(8,7,5,5,'#e8e0c8','#1a1a1a');t.blob(8,7,2,2,'#c03030','#1a1a1a');});T('engranaje',t=>{t.blob(8,7,6,6,'#6a6a6e','#3a3a40');t.blob(8,7,2,2,'#2a2a30','#3a3a40');});
+  T('neonH',t=>{for(let y=3;y<13;y++)t.P(8,y,'#58f080');t.P(6,6,'#58f080');t.P(10,6,'#58f080');t.P(5,8,'#58f080');t.P(11,8,'#58f080');});
+  T('baldaS',t=>{t.F(1,0,2,16,'#8a8e96');t.F(13,0,2,16,'#8a8e96');t.F(1,5,14,1,'#b8bcc4');t.F(1,13,14,1,'#b8bcc4');});
+  T('humidS',t=>{t.box(4,4,8,11,'#e0e4e8','#5a5e66');t.F(6,1,1,4,'#3a3a40');});T('secaS',t=>{t.F(7,0,2,16,'#3a4048');for(let y=3;y<15;y+=4)t.F(2,y,12,1,'#5a6070');});
+  T('tuboS',t=>{t.F(0,5,16,3,'#7a6a5a');t.P(9,9,'#a8c8e0');});T('cuboS',t=>{t.box(4,6,8,9,'#3a6ab8','#1a3a6a');t.F(5,4,6,1,'#8a8e96');});
+  doble('carpaM',t=>{t.box(4,0,12,16,'#c8ccd0','#5a5e66');t.F(6,6,10,8,'#2a1a2a');t.blob(10,11,3,3,'#4ea04e','#22522c');},t=>{t.box(0,0,12,16,'#c8ccd0','#5a5e66');t.F(0,6,10,8,'#2a1a2a');t.blob(5,11,3,3,'#4ea04e','#22522c');});
+  // 1.34: GROW IBARBIDE (baldosa gris, ladrillo blanco) y lo nuevo de los dos grows
+  suelo('floorG','#a8aaa8','#9a9c9a');T('iwT_grow',t=>{t.F(0,0,16,16,'#e8e4dc');t.F(0,0,16,4,'#8a8680');for(let y=6;y<16;y+=3)t.F(0,y,16,1,'#d0ccc4');});
+  T('iwB_grow',t=>{t.F(0,0,16,16,'#e8e4dc');for(let y=2;y<11;y+=3)t.F(0,y,16,1,'#d0ccc4');t.F(0,11,16,5,'#5a8a5a');});
+  T('sacos',t=>{t.box(1,5,14,10,'#c8b48a','#6a5a3a');t.F(3,8,10,3,'#5a8a4a');});T('macetasP',t=>{t.box(3,3,10,12,'#3a3a3e','#1a1a1e');t.F(3,6,10,1,'#5a5a60');t.F(3,9,10,1,'#5a5a60');});
+  T('botesW',t=>{t.F(1,12,14,2,'#74502e');[2,6,10].forEach((x,i)=>t.box(x,5,4,7,['#3a6ab8','#4ea04e','#3a6ab8'][i],'#1a1a2a'));});
+  T('neonG',t=>{t.F(2,2,12,10,'#1a2a1a');for(let y=4;y<10;y++)t.P(8,y,'#58f080');t.P(6,6,'#58f080');t.P(10,6,'#58f080');t.F(4,10,8,1,'#58f080');});
+  T('semillero',t=>{t.box(1,6,14,9,'#2a2a30','#1a1a1e');t.F(2,3,12,4,'#d0e8f0');for(let x=3;x<14;x+=3)t.P(x,8,'#84cc6c');});
+  doble('carpaDemo',t=>{t.box(4,0,12,16,'#c8ccd0','#5a5e66');t.F(6,6,10,8,'#f0e8c0');t.blob(10,11,3,3,'#4ea04e','#22522c');},t=>{t.box(0,0,12,16,'#c8ccd0','#5a5e66');t.F(0,6,10,8,'#f0e8c0');t.blob(5,11,3,3,'#4ea04e','#22522c');});
   // el carro de esquejes (1.11): el carro con sus dos bandejas tapadas y, a la derecha, la mesita con la tabla de corte
   T('carro',t=>{t.F(0,1,16,15,'#26262e');t.F(1,1,14,2,'#a8b0bc');t.F(1,8,14,1,'#a8b0bc');t.F(1,14,14,1,'#a8b0bc');t.F(2,4,12,3,'#8ec0d2');t.F(2,10,12,3,'#8ec0d2');
     for(let x=3;x<14;x+=2){t.P(x,6,'#84cc6c');t.P(x,12,'#84cc6c');}t.F(2,3,12,1,'#fff6d0');t.F(2,9,12,1,'#fff6d0');});

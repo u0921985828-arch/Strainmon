@@ -19,6 +19,8 @@ function migrate(){
   }
   // partidas guardadas por chapter() antes de poner el plazo (hasta la 1.10): capítulo 5 o 7 sin nada que pagar
   if((S.ch===5||S.ch===7)&&!(S.due>0)&&S.debt>0){S.due=S.ch===5?Math.min(PLAZOS[5],S.debt):S.debt;S.deadline=Math.max(S.deadline||0,S.day+(S.ch===5?10:7));}
+  // 1.34: en los clubs donde ya vendías, el encargado y el presidente ya se fían de ti
+  if(!S.clubReg&&S.clubDia)for(const k in PRESI)if(S.clubDia[k]!=null||S.clubEnc&&S.clubEnc.k===k)[k,'pres_'+k].forEach(id=>S.rel[id]=Math.max(rel(id),CLUB.confia));
   const sinMis=!S.misiones,sinItin=!S.itin,sinLog=!S.logros,d=newState();for(const k in d)if(!(k in S))S[k]=d[k];for(const k in d.items)if(!(k in S.items))S.items[k]=0;
   if(sinMis)MISIONES.forEach(m=>{if(m.ch<S.ch)S.misiones[m.id]=0;});   // 1.11: las de capítulos pasados, hechas y sin regalo
   if(S.ch>6)cerrarCopa();   // 1.28: las de la Copa, en una partida que ya la ganó
@@ -33,6 +35,7 @@ function migrate(){
   // 1.31: cada trabajador de la nave, su mesa (w.mesa); los de antes, la que les tocaba por el orden de la plantilla
   naveros().forEach(w=>{if(w.mesa==null)w.mesa=[...Array(NAVE.max).keys()].find(i=>!naveroDe(i));});
   if(S.nave&&!S.nave.f)Object.assign(S.nave,{f:Array(NAVE.max).fill('led'),ex:0,rg:0});   // 1.33: el equipo de la nave; la de antes, con los LED de serie y nada más
+  if(S.nave&&!S.nave.ma)S.nave.ma=[];   // 1.34: la carpa de las madres, vacía
   // 1.31: el pH− de 250 ml ya no se vende; lo pedido a Kiko de antes llega como la botella de 1 L
   if(S.envio)S.envio=S.envio.map(l=>/^pH− .* 250 ml$/.test(l)?l.replace(/ 250 ml$/,' 1 L'):l);
   if(!('vendDia' in S.flags)){S.curro.vend.forEach(v=>delete v.dia);S.flags.vendDia=1;}   // 1.29.1: el dia de un vendedor era el de la entrega; ahora, el de la cosecha (los de antes no pierden)

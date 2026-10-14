@@ -69,7 +69,7 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
 // la luz de los locales (LUZ_CLUB, LUZ_DISCO y, 1.31, los LED de la nave, luzNave): el fondo, si lo hay, encima de todo, y cada luz, un degradado radial (r 1 → r) sumado ('lighter');
 // los focos de GAUA dan una vuelta a la pista cada 7 s (0,9 rad/s), cada uno desde su fase
 function luzLocal(cam,now){
-  const L=S.map.startsWith('club-')?LUZ_CLUB:S.map==='disco'?LUZ_DISCO:S.map==='nave'?luzNave():null;if(!L)return;
+  const L=S.map.startsWith('club-')?LUZ_CLUB[S.map.slice(5)]:S.map==='disco'?LUZ_DISCO:S.map==='nave'?luzNave():S.map==='setas'?LUZ_BAJO:null;if(!L)return;
   if(L.fondo){ctx.fillStyle=L.fondo;ctx.fillRect(0,0,SW,SH);}ctx.globalCompositeOperation='lighter';
   const luz=(x,y,r,c,a)=>{const g=ctx.createRadialGradient(x,y,1,x,y,r);g.addColorStop(0,`rgba(${c},${a})`);g.addColorStop(1,`rgba(${c},0)`);ctx.fillStyle=g;ctx.fillRect(x-r,y-r,2*r,2*r);};
   for(const [x,y,r,c,a] of L.l||[])luz(x-cam.x,y-cam.y,r,c,a);

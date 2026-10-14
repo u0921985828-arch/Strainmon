@@ -235,6 +235,18 @@ const LOOKS={
   navero2:{id:'cliente2',skin:'#d49a74',hair:'#1a1a1a',style:'short',shirt:'#5ab868',shirt2:'#6a6a70',pants:'#3a3a44'},
   navero3:{id:'cliente4',skin:'#f0c0a0',hair:'#2a1a14',style:'long',shirt:'#5ab868',pants:'#3a3a44'},
   navero4:{id:'cliente6',skin:'#d49a74',hair:'#5a3a24',style:'short',beard:1,shirt:'#5ab868',pants:'#3a3a44'},
+  navero5:{id:'cliente5',skin:'#f0c8a8',hair:'#8a2a1a',style:'bun',shirt:'#5ab868',pants:'#3a3a44'},   // 1.34: el de las madres
+  // 1.34: los demás socios de los clubs, en los sofás
+  clubg1:{id:'cliente2',skin:'#e8b088',hair:'#5a3a24',style:'short',shirt:'#3a5a7a',pants:'#3a3a44'},
+  clubg2:{id:'cliente5',skin:'#f0c8a8',hair:'#c48a3a',style:'bun',shirt:'#8a5a3a',pants:'#2a2a30',glasses:1},
+  clubg3:{id:'oldman',skin:'#d49a74',hair:'#c8c8c8',style:'bald',beard:'#c8c8c8',shirt:'#e0e0e8',pants:'#36466e'},
+  clubg4:{id:'cliente4',skin:'#b07850',hair:'#2a1a14',style:'curly',shirt:'#c8642c',pants:'#3a3a44'},
+  clubg5:{id:'cliente1',skin:'#f0c8a8',hair:'#3a2a1a',style:'short',shirt:'#6a4a7a',pants:'#3a3a44'},
+  // 1.34: los presidentes de los clubs de fuera (11e-gente, PRESI)
+  presi_puerto:{id:'cliente6',skin:'#e0aa84',hair:'#b8b8c0',style:'short',beard:1,shirt:'#2a4a6a',pants:'#3a3a44'},
+  presi_valde:{id:'cliente3',skin:'#f0c8a8',hair:'#8a8a90',style:'bun',shirt:'#7a3a3a',pants:'#2a2a30',glasses:1},
+  presi_ibar:{id:'cliente6',skin:'#d49a74',hair:'#3a2a1a',style:'short',beard:1,shirt:'#4a5a3a',pants:'#2a2a30'},
+  presi_ens:{id:'cliente3',skin:'#f6c8a0',hair:'#1a1a1a',style:'long',shirt:'#e0e0e8',pants:'#2a2a30'},
   gorila:{id:'cliente2',skin:'#b07850',hair:'#1a1a1a',style:'bald',shirt:'#101014',pants:'#101014'},
   camarera:{id:'cliente5',skin:'#f0d0b8',hair:'#1a1a1a',style:'bun',shirt:'#101014',pants:'#101014'},
   dj:{id:'cliente3',skin:'#e8b088',hair:'#c48a3a',style:'cap',hat:'#c04870',hat2:'#101014',shirt:'#3a3a48',pants:'#2a2a30'},

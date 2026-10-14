@@ -335,7 +335,9 @@ func _mancha(a: float, tipo: String) -> Image:
 func _luz_local():
 	if J.S.map == "nave":
 		return _luz_nave()
-	return J.D.LUZ_CLUB if J.S.map.begins_with("club-") else (J.D.LUZ_DISCO if J.S.map == "disco" else null)
+	if J.S.map.begins_with("club-"):   # 1.34: cada club, con la lámpara sobre su billar
+		return J.D.LUZ_CLUB[J.S.map.substr(5)]
+	return J.D.LUZ_DISCO if J.S.map == "disco" else (J.D.LUZ_BAJO if J.S.map == "setas" else null)   # 1.34: el bajo, con su bombilla
 
 # la nave (1.31, luzNave de 11j-locales): bajo cada uno de los dos focos de una mesa plantada, su luz en las plantas (1.33: del color del foco)
 func _luz_nave() -> Dictionary:
@@ -484,7 +486,7 @@ func _arte_orilla(m: Dictionary, k: String, tx: int, ty: int, sx: int, sy: int) 
 		L.draw_texture_rect(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), false)
 
 # los de la pared, subidos a su altura (1.10, ALZA de 01b-arte.js: px)
-const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadro": -13, "cartel": -13, "tarros": -16, "pizarra": -13, "cartelC": -13, "tacos": -13, "neon": -13, "fotoMaite": -10, "extrN": -14, "extrG": -14, "filtroN": -12, "ctrlN": -12}   # 1.30: los de los locales; 1.32: la foto de la tía (1.33: de 2 casillas, a -10); 1.33: el equipo de la nave en la pared
+const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadro": -13, "cartel": -13, "tarros": -16, "pizarra": -13, "cartelC": -13, "tacos": -13, "neon": -13, "fotoMaite": -10, "extrN": -14, "extrG": -14, "filtroN": -12, "ctrlN": -12, "fotoK": -13, "ojoBuey": -13, "timon": -13, "red": -13, "diana": -13, "engranaje": -13, "neonH": -13, "copas": -16, "tuboS": -13, "botesW": -16, "neonG": -13}   # 1.30: los de los locales; 1.32: la foto de la tía (1.33: de 2 casillas, a -10); 1.33: el equipo de la nave en la pared; 1.34: lo de las paredes de los clubs, del bajo y de los grows
 
 # los muebles que dejan sombra en el suelo (1.10 P5, SOMBRA_OBJ de 01b-arte.js): 1 px a cada lado del dibujo en sus 2 últimas filas
 # y la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo; se pintan con todo el suelo ya puesto
@@ -497,7 +499,7 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var d := desfase(o, tx, ty)
 	var fm: int = J.fase_mesa(J.mesa_de(tx)) if o == "mesaN" else 0
 	var pl = _plantas_mesa(gr, J.mesa_de(tx), fm) if fm else null   # 1.31: las plantas de la mesa de la nave, encima
-	var sp: String = ("mesaN-%d" % mini(fm, 1)) if o == "mesaN" else J.deco_sprite(o)   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada
+	var sp: String = ("mesaN-%d" % mini(fm, 1)) if o == "mesaN" else J.sprite_local(J.deco_sprite(o))   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (sprite_local)
 	var f = Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, sp, "unica", 0, {"i": 0, "esp": d.esp})
 	if f == null and not an and sp != o:
 		f = Atlas.frame_de(gr, o, "unica", 0, {"i": 0, "esp": d.esp})
@@ -518,17 +520,25 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 			sombras.append([x1 + 1, yp - 1, 1, 2])
 		if not ob.call(tx, ty + 1):
 			sombras.append([x0, yp + 1, x1 - x0 + 1, 1])
+	var ex := []   # 1.34: las bandejas del bajo, en su fase
+	if o == "baldaS":
+		for b in J.bandejas_balda(tx):
+			var fb = Atlas.frame_de(gr, b, "unica", 0, {"i": 0})
+			if fb != null:
+				ex.append(fb)
 	if f.cel.h > 16:
-		list.append([ty * 16 + mini(0, d.dy), _pinta_mesa.bind(f, xp, yp, pl, J.mesa_de(tx) if o == "mesaN" else -1, fm)])   # corrido hacia abajo, no pasa delante de quien está en su fila
+		list.append([ty * 16 + mini(0, d.dy), _pinta_mesa.bind(f, xp, yp, pl, J.mesa_de(tx) if o == "mesaN" else -1, fm, ex)])   # corrido hacia abajo, no pasa delante de quien está en su fila
 	else:
-		_pinta_mesa(f, xp, yp, pl, J.mesa_de(tx) if o == "mesaN" else -1, fm)
+		_pinta_mesa(f, xp, yp, pl, J.mesa_de(tx) if o == "mesaN" else -1, fm, ex)
 
-func _pinta_mesa(f, xp: float, yp: float, pl, i := -1, fm := 0) -> void:
+func _pinta_mesa(f, xp: float, yp: float, pl, i := -1, fm := 0, ex := []) -> void:
 	_pinta(f, xp, yp)
 	if pl != null:
 		_pinta(pl, xp, yp)
 	if i >= 0:
 		_focos_mesa(i, xp + cam.x, yp + cam.y, fm, pl.c if pl != null else null)   # 1.33: y sus focos, colgados encima
+	for fb in ex:   # 1.34: las bandejas del bajo
+		_pinta(fb, xp, yp)
 
 # los focos de la mesa i de la nave (1.33, focosMesa de 11j-locales; xp, yp: el ancla de la mesa en el mapa; pl: la imagen de sus
 # plantas): dos, colgados de sus poleas a FOCO_AIRE px por encima de la punta más alta (la primera fila con algo de las plantas) o,
