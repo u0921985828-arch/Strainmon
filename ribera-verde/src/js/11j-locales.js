@@ -7,8 +7,8 @@
 // cuatro mesas de cultivo (una por trabajador; plantas tú, con semilla o esqueje, y eliges su abono), la estantería de los abonos, el
 // secadero y el escritorio. En GAUA (DISCO: de 23:00 a 6:00, desde el capítulo DISCO.ch; la entrada, una vez por noche): la barra,
 // la pista, la cabina del DJ y el reservado, donde la RRPP te presenta un cliente VIP para la agenda (CTYPES.vip)
-const BILLAR={apuestas:[10,20,50],tiros:3,dia:3,min:20,hab:.55,verde:.08,amarillo:.2,centro:.7,periodo:1400,n:{puerto:'Ander',valde:'Izaskun',ibar:'Txetxu',ens:'Olatz'}};
-const SOCIO={g:1,rel:3,min:30,n:{puerto:'Gotzon',valde:'Maribel',ibar:'Joseba',ens:'Lorea'},
+const BILLAR={apuestas:[10,20,50],tiros:3,dia:3,min:20,hab:.55,verde:.08,amarillo:.2,centro:.7,periodo:1400,n:{puerto:'Ander',valde:'Izaskun',ibar:'Txetxu',ens:'Olatz',rv:'Koldo'}};
+const SOCIO={g:1,rel:3,min:30,n:{puerto:'Gotzon',valde:'Maribel',ibar:'Joseba',ens:'Lorea',rv:'Imanol'},
   charla:['Aquí cada socio retira lo suyo y se consume dentro. Así funciona una asociación.','Los sábados se llena. Entre semana se está mejor.',
     'Dicen que el del billar no ha perdido una partida este año. Yo no me lo creo.','El encargado prueba todo lo que entra. Si no le convence, no entra.']};
 const DISCO={n:'GAUA',ch:4,abre:23*60,cierra:6*60,entrada:15,copa:10,copaMax:3,ronda:40,mesa:300,ligar:.5,vip:['Kepa','Garbiñe','Aitor','Nekane','Borja','Ainhoa']};
@@ -27,7 +27,7 @@ function mapasLocales(){
   // ---------- LOS CLUBS: 12 × 8, el dispensario a la izquierda, los sofás en medio y el billar a la derecha ----------
   for(const k in CLUBS){const C=CLUBS[k],m=newMap('club-'+k,12,8,'floorC');m.music='club';
     rect(m,0,0,11,0,(x,y)=>gr(m,x,y,'iwT_club'));rect(m,0,1,11,1,(x,y)=>gr(m,x,y,'iwB_club'));
-    [[0,'tarros'],[1,'pizarra'],[2,'tarros'],[4,'cartelC'],[7,'poster'],[10,'tacos']].forEach(([x,o])=>ob(m,x,1,o));
+    [[0,'tarros'],[1,'pizarra'],[2,'tarros'],[4,'cartelC'],[7,k==='rv'?'fotoMaite':'poster'],[10,'tacos']].forEach(([x,o])=>ob(m,x,1,o));   // 1.32: en la asociación, la foto de la tía
     rect(m,0,3,2,3,(x,y)=>ob(m,x,y,'vitrina'));ob(m,3,2,'plantDeco');
     ob(m,5,2,'sofaF');ob(m,6,2,'sofaF2');ob(m,5,3,'mesita');ob(m,6,3,'mesita');ob(m,5,4,'sofaB');ob(m,6,4,'sofaB2');
     ob(m,8,4,'billar');ob(m,9,4,'billar2');ob(m,11,2,'jukebox');ob(m,0,6,'plantDeco');ob(m,11,6,'plantDeco');
@@ -61,7 +61,8 @@ const relDe=id=>id.startsWith('club_')?id.slice(5):id==='socio'||id==='billarist
 // la puerta de un local (onStepEnd, 08-mundo): cerrada, te deja delante; el club, la primera vez, el carné; GAUA, la entrada de la noche
 async function entraLocal(d){
   const [t,k]=d.gate.split(':'),cerrada=async txt=>{atrasPuerta();await say(txt);};
-  if(t==='club'){if(S.ch<CLUBS[k].ch)return cerrada('Una puerta sin rótulo, con un timbre. No abre nadie.');if(!S.clubs[k]){atrasPuerta();if(!await carneClub(k))return;}}
+  if(t==='club'){if(S.ch<CLUBS[k].ch)return cerrada('Una puerta sin rótulo, con un timbre. No abre nadie.');if(!S.clubs[k]){atrasPuerta();if(!await carneClub(k))return;}
+    if(k==='rv')return entraAso(d);}
   else if(t==='nave'){if(!S.nave)return cerrada('La persiana está echada con un candado. La llave la tiene Arrieta, el dueño.');}
   else if(t==='disco'){if(S.ch<DISCO.ch||!discoAbierta())return cerrada(`${DISCO.n} abre de 23:00 a 6:00.`);if(!nocheYa()){atrasPuerta();if(!await entradaDisco())return;}}
   return warp(d);
@@ -80,6 +81,7 @@ function objLocal(x,y,o){
     if(/^sofa[FB]2?$/.test(o))return say('Un sofá chester de cuero verde, gastado de tanto uso.');
     if(o==='billar'||o==='billar2')return say(`La mesa de billar, con el tapete recién cepillado. ${BILLAR.n[k]} juega con apuesta.`);
     if(o==='poster')return say('Un cartel antiguo de una feria del cáñamo.');
+    if(o==='fotoMaite')return say(`${aso().tio?'La tía Maite y Delroy, de jóvenes':'La tía Maite, joven, con un hombre de rastas negras'}, en un campo. En la placa: «Maite, presidenta fundadora».`);
     if(o==='plantDeco')return say('Una kentia en una maceta de barro.');
   }
   if(S.map==='nave'){
@@ -257,3 +259,73 @@ async function talkRRPP(){
 }
 const BAILA=['¡Esta canción es la mejor!','No pares, que viene el estribillo.','Vengo cada sábado. El DJ es amigo mío.'];
 const talkBaila=i=>say(BAILA[i],'GENTE');
+
+/* ---------- LA ASOCIACIÓN (1.32): la de la tía Maite, en el barrio alto (CLUBS.rv) ---------- */
+// La segunda vez que entras (en otro día: S.aso.v), está Delroy junto a la foto de la tía: su compañero de treinta años, el tío que
+// nunca lo fue de papeles. Te cuenta que ella la fundó y la presidió muchos años y que ahora la lleva una gestora, con la presidencia
+// vacía. Dos caminos: presentarte (la asamblea, ASO.dias después, al amanecer: ganas con ASO.mayoria de ASO.votos; votan por ti los
+// de siempre de Maite, Delroy, ASO.amigo por cada uno del barrio con REL.amigo y uno por cada ASO.relV de confianza con la asociación;
+// si pierdes, otra en ASO.espera días) o refundarla (pagar ASO.refunda: deudas y registro). De presidente, el dispensario: le dejas un
+// lote y cada mañana los socios retiran ASO.dia g a precio de club (× ASO.f y la calidad), que van a tu buzón
+const ASO={visitas:2,dias:3,votos:40,mayoria:21,base:8,delroy:4,amigo:4,relV:10,espera:7,refunda:3000,dia:20,f:1.15,g:[50,100,200],
+  gente:['kiko','julen','josune','begona','patxi','txaro','inaki'],rival:'Ugarte'};
+const DELROY={n:'DELROY',
+  revela:['¿Tú eres el sobrino de Maite? Tienes sus ojos. Yo soy Delroy.',
+    'Vine de Kingston de joven y me quedé por ella. Treinta años juntos, sin papeles ni boda. Tu tío, aunque nunca lo fuera oficialmente.',
+    'Esta asociación la fundó ella y la presidió muchos años: los estatutos, la cuota, que nada saliera a la calle. Todo era Maite.',
+    `Desde que se fue la lleva una gestora, con ${ASO.rival} al frente. Deudas y socios que se van. La presidencia está vacía.`,
+    `Hay dos caminos, sobrino: presentarte a la asamblea y ganarte los votos de los socios, o pagar lo que se debe, ${eur(ASO.refunda)}, y refundarla tú.`],
+  charla:['Maite decía que una planta te cuenta lo que le pasa, si sabes mirarla.','Estos zapatos de ante los compré en Londres hace cuarenta años. Lo bueno, si se cuida, dura.',
+    'Una asociación no es una tienda, sobrino. Es la gente que viene a sentarse en esos sofás.','Tu tía no fumaba nunca antes de las siete. «Primero, el trabajo», decía.']};
+const aso=()=>S.aso||(S.aso={v:0,d:0,tio:false,asam:0,otra:0,pres:false,votos:0,lote:null});
+const delroyAqui=()=>aso().v>=ASO.visitas;
+const votosAso=()=>Math.min(ASO.votos,ASO.base+(aso().tio?ASO.delroy:0)+ASO.amigo*ASO.gente.filter(id=>rel(id)>=REL.amigo).length+Math.floor(rel('rv')/ASO.relV));
+NPCDEF.push({id:'delroy',map:'club-rv',x:8,y:2,dir:'down',look:'delroy',cond:()=>delroyAqui(),talk:()=>talkDelroy()});
+// la puerta (entraLocal): cada día que entras cuenta una visita; la segunda, Delroy está dentro
+async function entraAso(d){
+  const A=aso();if(A.d!==S.day){A.v++;A.d=S.day;}
+  await warp(d);if(delroyAqui()&&!A.tio)await say('Junto a la foto de la tía Maite, un hombre mayor con las rastas y la barba canas no te quita ojo.');
+}
+async function talkDelroy(){
+  const A=aso(),N=DELROY.n;
+  if(!A.tio){await talk(N,DELROY.revela);A.tio=true;confia('delroy',5);}
+  const ops=['Charlar',A.pres?'El dispensario':'La presidencia','Nada'],c=await ask(A.pres?'¿Qué tal, presidente?':'Dime, sobrino.',ops,N);
+  if(c===0)return say(pick(DELROY.charla),N);
+  if(c===1)return A.pres?dispensarioAso():presidenciaAso();
+}
+async function presidenciaAso(){
+  const A=aso(),N=DELROY.n;
+  if(A.asam){   // con la asamblea pendiente, todavía se puede refundar
+    if(await ask(`La asamblea es el día ${A.asam}, por la mañana. Habla con la gente del barrio: cada amigo trae votos. O la refundas ya, por ${eur(ASO.refunda)}.`,['Refundarla','Nada'],N)!==0)return;
+  }else{
+    const c=await ask(`Hacen falta ${ASO.mayoria} votos de ${ASO.votos}. Hoy tendrías ${votosAso()}. O pagas ${eur(ASO.refunda)} de deudas y registro y la refundas tú.`,['Presentarme','Refundarla','Nada'],N);
+    if(c===0){
+      if(S.day<A.otra)return say(`Hasta el día ${A.otra} no hay otra asamblea. Gánate al barrio mientras.`,N);
+      A.asam=S.day+ASO.dias;sfx('sel');return say(`Apuntado. La asamblea, el día ${A.asam}. ${ASO.rival} también se presenta.`,N);
+    }
+    if(c!==1)return;
+  }
+  if(S.money<ASO.refunda){sfx('bad');return say(`Sin los ${eur(ASO.refunda)} no hay refundación.`,N);}
+  S.money-=ASO.refunda;A.pres=true;A.asam=0;confia('delroy',10);confia('rv',10);updateHUD();sfx('get');
+  return say('Pagas las deudas de la gestora y el registro. La asociación vuelve a nacer, con tus estatutos. Maite estaría orgullosa.',N);
+}
+// el dispensario: un lote a la vez; dice cuánto queda y lo que llevas
+async function dispensarioAso(){
+  const A=aso(),N=DELROY.n,L=A.lote;
+  if(L)return say(`En el dispensario quedan ${gTxt(L.g)} de ${lotNombre(L.k)}, a ${coma(L.pg.toFixed(2))} € el gramo. Llevas ${eur(L.tot)}.`,N);
+  const lots=budLots(ASO.g[0]);if(!lots.length)return say(`Déjame ${ASO.g[0]} g o más y los socios lo retiran, ${ASO.dia} g al día. El dinero, a tu buzón.`,N);
+  const i=await menu(lots.map(lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué lote?'});if(i<0||i>=lots.length)return;
+  const [k,b]=lots[i],pg=Math.round(precioClub(b.thc)*calidad(b)*ASO.f*100)/100,ops=ASO.g.filter(g=>g<=Math.floor(b.g));
+  const j=await ask(`${lotNombre(k)} a ${coma(pg.toFixed(2))} € el gramo para los socios. ¿Cuánto dejas?`,ops.map(g=>`${g} g · ${eur(g*pg)}`).concat(['Nada']),N);if(j<0||j>=ops.length)return;
+  useBuds(k,ops[j]);A.lote={k,g:ops[j],pg,tot:0};sfx('sel');return say(`Al dispensario. Cada mañana, ${ASO.dia} g para los socios.`,N);
+}
+// al amanecer (curroDia): la asamblea, si toca, y lo que retiran los socios del dispensario
+function asoDia(){
+  const A=aso();
+  if(A.asam&&S.day>=A.asam){const v=votosAso(),gana=v>=ASO.mayoria;A.asam=0;A.votos=v;
+    if(gana){A.pres=true;confia('delroy',10);}else A.otra=S.day+ASO.espera;
+    queue('aso',()=>talk('SMS · DELROY',[gana?`¡${v} votos de ${ASO.votos}! Eres el presidente de la asociación, sobrino. Como tu tía.`:`${v} votos de ${ASO.votos}: gana ${ASO.rival}. Gánate al barrio y preséntate otra vez desde el día ${A.otra}.`]));}
+  const L=A.lote;if(!A.pres||!L)return;
+  const g=Math.min(L.g,ASO.dia),e=Math.round(g*L.pg);L.g-=g;L.tot+=e;S.money+=e;S.sales+=e;queue('historia',checkStory);
+  if(L.g<1){A.lote=null;queue('asoLote',()=>talk('SMS · DELROY',[`Se acabó lo del dispensario: ${eur(L.tot)} en total, en tu buzón.`]));}
+}

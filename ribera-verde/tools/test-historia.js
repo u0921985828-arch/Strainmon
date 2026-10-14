@@ -644,6 +644,39 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     Object.assign(S, { ch: sv.ch, money: sv.money }); S.items.fert = sv.f; S.items.phm = sv.p;
   }, () => R.m === '0,100,200' && R.dosis === '4/20/40/100,4/20/40/100,40/80/200,4/20/40/100,4/20/40/100,40/80/200'
     && R.c3 === 'Abono floración MEATZA 1 L,Abono floración MEATZA 5 L,Abono floración MEATZA 10 L' && R.env === 'pH− MEATZA 1 L,pH− ORTUA BIO 1 L,Bocata' || R);
+  await step('La asociación (1.32): la Asociación Cannábica Ribera Verde, en el barrio alto, se entra como un club (el carné en la puerta); la segunda vez, otro día, está Delroy, el compañero de la tía Maite, junto a su foto, y lo cuenta todo; presentarte (la asamblea, a los 3 días, al amanecer: con pocos votos gana la gestora y hay que esperar; con los amigos del barrio, presidente) o refundarla pagando; de presidente, el dispensario (los socios retiran 20 g cada mañana y el dinero va al buzón); el logro y las partidas de antes', [], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0)); window.R = {};
+    Object.assign(S, { ch: 3, money: 5000, day: 30, min: 600, clubs: {}, rel: {}, relDia: {}, buds: {}, aso: { v: 0, d: 0, tio: false, asam: 0, otra: 0, pres: false, votos: 0, lote: null } });
+    addBuds('ria', 150, 12);
+    const dk = Object.keys(MAPS.alto.doors).find(k => MAPS.alto.doors[k].gate === 'club:rv'), dr = MAPS.alto.doors[dk], b = MAPS.alto.blds.find(b => b.fachada === 'asociacion');
+    R.puerta = [dk, dr.to, b.x0, b.y0, b.w, b.h, b.doorX, MAPS.alto.g[19][36]].join();
+    const ir = async () => { enterMap('alto', 36, 19, 'up'); Object.assign(P, { x: 36, y: 18, px: 576, py: 288 }); await run(() => entraLocal(dr)); await idle(); };
+    want(['^Hacerme socio']); await ir(); R.v1 = [S.map, P.x, P.y, S.clubs.rv, S.aso.v, ents.some(e => e.id === 'delroy'), 5000 - S.money].join();
+    await ir(); R.v1b = S.aso.v; S.day++; await ir(); R.v2 = [S.aso.v, ents.filter(e => e.id === 'delroy').map(e => e.x + ',' + e.y).join(), MAPS['club-rv'].o[1][7]].join();
+    want(['^La presidencia', '^Presentarme']); await run(talkDelroy); R.tio = [S.aso.tio, S.aso.asam - S.day, rel('delroy'), votosAso()].join();
+    want(['^La presidencia', '^Nada']); await run(talkDelroy); R.pend = [S.aso.asam - S.day, S.aso.pres, S.money].join();
+    S.day = S.aso.asam; asoDia(); await idle(); R.pierde = [S.aso.pres, S.aso.votos, S.aso.otra - S.day, S.aso.asam].join();
+    want(['^La presidencia', '^Presentarme']); await run(talkDelroy); R.espera = S.aso.asam;
+    Object.assign(S.rel, { kiko: 20, begona: 30, patxi: 20, rv: 25 }); R.votos = votosAso();
+    S.day = S.aso.otra; want(['^La presidencia', '^Presentarme']); await run(talkDelroy); S.day = S.aso.asam; asoDia(); await idle();
+    R.gana = [S.aso.pres, S.aso.votos, rel('delroy')].join(); revisaLogros(); await idle(); R.logro = S.logros.presidente === S.day;
+    R.pg = Math.round(precioClub(12) * calidad(S.buds.ria) * ASO.f * 100) / 100;
+    want(['^El dispensario', '^Skunk', '^100 g']); await run(talkDelroy); R.lote = [S.aso.lote.g, S.aso.lote.pg, S.buds.ria.g].join();
+    R.m = S.money; S.day++; asoDia(); await idle(); R.d1 = [S.money - R.m, S.aso.lote.g, S.aso.lote.tot].join();
+    for (let i = 0; i < 4; i++) { S.day++; asoDia(); } await idle(); R.fin = [S.aso.lote, S.money - R.m].join();
+    S.aso.pres = false; S.money = 100; want(['^La presidencia', '^Refundarla']); await run(talkDelroy); R.sin = [S.aso.pres, S.money].join();
+    S.money = 5000; want(['^La presidencia', '^Refundarla']); await run(talkDelroy); R.ref = [S.aso.pres, 5000 - S.money].join();
+    await run(() => objLocal(7, 1, 'fotoMaite')); R.rel = [relDe('delroy'), GENTE.delroy].join();
+    delete S.aso; migrate(); R.mig = [S.aso.v, S.aso.tio, S.aso.pres, S.aso.lote, S.aso.asam].join();
+    S = S0; enterMap('home', 5, 5, 'up');
+  }, () => R.puerta === '36,18,club-rv,32,12,5,7,36,walk' && R.v1 === `club-rv,5,6,true,1,false,${CLUBS.rv.cuota}` && R.v1b === 1 && R.v2 === '2,8,2,fotoMaite'
+    && R.tio === `true,${ASO.dias},5,12` && R.pend === `${ASO.dias},false,${5000 - CLUBS.rv.cuota}` && LOG.some(l => /^DELROY: La asamblea es el día \d+, por la mañana\..*O la refundas ya/.test(l)) && R.pierde === `false,12,${ASO.espera},0` && R.espera === 0 && R.votos === 26 && R.gana === 'true,26,15' && R.logro
+    && R.lote === `100,${R.pg},50` && R.d1 === `${Math.round(20 * R.pg)},80,${Math.round(20 * R.pg)}` && R.fin === `,${5 * Math.round(20 * R.pg)}`
+    && R.sin === 'false,100' && R.ref === `true,${ASO.refunda}` && R.rel === 'delroy,Delroy' && R.mig === '0,false,false,,0'
+    && LOG.includes('Junto a la foto de la tía Maite, un hombre mayor con las rastas y la barba canas no te quita ojo.') && LOG.includes('DELROY: ' + DELROY.revela[1])
+    && LOG.some(l => l.startsWith(`SMS · DELROY: 12 votos de ${ASO.votos}: gana ${ASO.rival}`)) && LOG.some(l => l.startsWith(`SMS · DELROY: ¡26 votos de ${ASO.votos}!`))
+    && LOG.some(l => l.startsWith('SMS · DELROY: Se acabó lo del dispensario')) && LOG.includes(`Sin los ${eur(ASO.refunda)} no hay refundación.`.replace(/^/, 'DELROY: '))
+    && LOG.includes('La tía Maite y Delroy, de jóvenes, en un campo. En la placa: «Maite, presidenta fundadora».') || R);
   await step('El bajo de las setas (1.20): Txomin alquila el bajo de la Kale Zaharra desde el capítulo 4; las bandejas que prepara él (húmedas: cada día pierden; secas o contaminadas, a tirar), 6 días colonizando y 4 fructificando; la cosecha se seca en el bajo y él la compra; el alquiler cada mañana, la redada, el impago y dejarlo', [], async () => {
     const r0 = Math.random, sv = { money: S.money, heat: S.heat, sales: S.sales, ch: S.ch, day: S.day, min: S.min }; window.R = {};
     const dia = async v => { S.day++; Math.random = () => v; setasDia(); Math.random = r0; await idle(); };

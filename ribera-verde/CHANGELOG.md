@@ -1,5 +1,16 @@
 # Cambios
 
+## 1.32.0 · 14 de octubre de 2026
+
+Mesas de la nave que parecen mesas, la asociación de la tía Maite y Delroy. Godot, 0.26.0.
+
+- **Las mesas de la nave, de nuevo.** Ahora se ven a medio fondo, como el billar: la bandeja blanca con su borde, las acanaladuras y el desagüe, el bastidor y las patas, con el suelo por debajo, y los dos LED de barras colgados encima. En cada mesa, **cinco macetas de 11 L a tresbolillo**: tres en la fila de delante (la de los trabajadores) y dos en la del fondo, en los huecos. Las plantas son más grandes y se ven desde arriba, con su **corona y las puntas**, nada de pinos: matas con hojas de cinco y siete dedos y, en flor, las colas con sus pistilos; el porte y los colores siguen saliendo de la variedad (índica, ancha y baja, con cogollos gordos; sativa, alta y fina, con colas largas).
+- **La Asociación Cannábica Ribera Verde**, en el barrio alto, junto a la comisaría (desde el capítulo 3): la casa alta de almagre con la placa de latón, la ventana esmerilada y el portal verde. Por dentro es un club (el carné en la puerta, el dispensario, los sofás con Imanol, el billar con Koldo), y en la pared, **la foto de la tía Maite**.
+- **Delroy, el «tío» que nunca lo fue de papeles.** La segunda vez que vas (otro día) está junto a la foto: el compañero jamaicano de la tía Maite durante treinta años, mayor, con las rastas y la barba canas, camisa crema con una cadena fina, pantalón de pinzas y botas de ante color camel. Te cuenta que ella fundó la asociación y la presidió muchos años, y que desde que se fue la lleva una gestora y la presidencia está vacía. Entra en MÓVIL → GENTE.
+- **Presidir la asociación**, de dos maneras: **presentarte** a la asamblea (a los 3 días, al amanecer; hacen falta 21 votos de 40: votan por ti 8 de los de siempre de la tía, Delroy 4, cada uno del barrio que se fía de ti —Kiko, Julen, Josune, Begoña, Patxi, Txaro e Iñaki, con 20 de confianza— otros 4, y uno por cada 10 de confianza con la asociación; si gana la gestora, a los 7 días puedes volver a presentarte) o **refundarla**, pagando 3.000 € de deudas y registro (también con la asamblea pendiente). De presidente, **el dispensario**: le dejas a Delroy un lote (50, 100 o 200 g) y cada mañana los socios retiran 20 g a precio de club con un 15 % más; el dinero, a tu buzón. Logro nuevo: «Como la tía Maite».
+- Arte a mano, sin PixelLab: la mesa, las macetas y las plantas y la fachada de la asociación y la foto en `tools/sprites/a-mano/locales.py` (con la Ó con su tilde en la placa); Delroy, del dibujo de Kiko, por zonas, en `tools/sprites/a-mano/delroy.py`, con sus ojos, su respiración y su porro.
+- Igual en Godot. Tests: `npm test` 114/114 (paso nuevo: la asociación); `test:arte` 29/29; Godot, historia 114 pasos, 46 pantallas (la asociación por fuera y por dentro, con Delroy, y la nave con las mesas nuevas) y el ciclo.
+
 ## 1.31.0 · 14 de octubre de 2026
 
 Menús largos con flechas, garrafas de abono, pH− por litros y las plantas de la nave según la variedad. Godot, 0.25.0.

@@ -114,6 +114,11 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
       { k: 'ria', f: { id: 3, t: 1, y: 1, i: null }, thc: 18, y: 1, dia: 16, g: 0, t: 0, abo: 0 },
       { k: 'mango', f: { id: 4, t: 1, y: 1, i: null }, thc: 15, y: 1, dia: 18, g: 0, t: 0, abo: 1 }] } },
     map: 'nave', P: { x: 6, y: 6, dir: 'up' } },
+  // la asociación (1.32): por fuera, en el barrio alto (la casa alta de almagre con la placa y el portal verde), y por dentro, con
+  // Delroy junto a la foto de la tía Maite
+  { k: 'asociacion', sw: 320, mode: 'world', now: T + 700, S: { ch: 3, min: 11 * 60, flags: {} }, map: 'alto', P: { x: 35, y: 20, dir: 'up' } },
+  { k: 'asociacion2', sw: 320, mode: 'world', now: T + 1300, S: { ch: 3, clubs: { rv: true }, aso: { v: 2, d: 1, tio: true, asam: 0, otra: 0, pres: false, votos: 0, lote: null }, flags: {} },
+    map: 'club-rv', P: { x: 8, y: 3, dir: 'up' } },
   { k: 'disco', sw: 400, mode: 'world', now: T + 1800, S: { ch: 5, min: 23 * 60 + 40, day: 6, noche: { id: 6, copas: 0, ronda: 0, baile: 0, mesa: 0 }, flags: {} },
     map: 'disco', P: { x: 6, y: 6, dir: 'up' } },
   // la vista C con todo (1.10, antes en la vista B): carpa de 150 con extras (goteo con el depósito a 400 de 975 L en la mirilla,

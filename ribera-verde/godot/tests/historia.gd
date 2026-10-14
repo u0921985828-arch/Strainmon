@@ -2135,6 +2135,106 @@ func _pasos() -> void:
 		J.S.items.phm = sv.p,
 		func(): return chk(R.m == "0,100,200" and R.dosis == "4/20/40/100,4/20/40/100,40/80/200,4/20/40/100,4/20/40/100,40/80/200"
 			and R.c3 == "Abono floración MEATZA 1 L,Abono floración MEATZA 5 L,Abono floración MEATZA 10 L" and R.env == "pH− MEATZA 1 L,pH− ORTUA BIO 1 L,Bocata", R))
+	step("La asociación (1.32): la Asociación Cannábica Ribera Verde, en el barrio alto, se entra como un club (el carné en la puerta); la segunda vez, otro día, está Delroy, el compañero de la tía Maite, junto a su foto, y lo cuenta todo; presentarte (la asamblea, a los 3 días, al amanecer: con pocos votos gana la gestora y hay que esperar; con los amigos del barrio, presidente) o refundarla pagando; de presidente, el dispensario (los socios retiran 20 g cada mañana y el dinero va al buzón); el logro y las partidas de antes", [], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		R = {}
+		J.S.merge({"ch": 3, "money": 5000, "day": 30, "min": 600, "clubs": {}, "rel": {}, "relDia": {}, "buds": {}, "aso": {"v": 0, "d": 0, "tio": false, "asam": 0, "otra": 0, "pres": false, "votos": 0, "lote": null}}, true)
+		J.add_buds("ria", 150, 12)
+		var dk := ""
+		for k in J.MAPS.alto.doors:
+			if J.MAPS.alto.doors[k].get("gate") == "club:rv":
+				dk = k
+				break
+		var dr: Dictionary = J.MAPS.alto.doors[dk]
+		var b: Dictionary = J.MAPS.alto.blds.filter(func(x): return x.get("fachada") == "asociacion")[0]
+		R.puerta = jn([dk, dr.to, b.x0, b.y0, b.w, b.h, b.doorX, J.MAPS.alto.g[19][36]])
+		var ir := func():
+			J.enter_map("alto", 36, 19, "up")
+			J.P.x = 36
+			J.P.y = 18
+			J.P.px = 576.0
+			J.P.py = 288.0
+			await run(func(): await J.entra_local(dr))
+			await idle()
+		want(["^Hacerme socio"])
+		await ir.call()
+		R.v1 = jn([J.S.map, J.P.x, J.P.y, J.S.clubs.get("rv"), J.S.aso.v, J.ents.any(func(e): return e.id == "delroy"), 5000 - J.S.money])
+		await ir.call()
+		R.v1b = J.S.aso.v
+		J.S.day += 1
+		await ir.call()
+		var dl := []
+		for e in J.ents:
+			if e.id == "delroy":
+				dl.append("%d,%d" % [e.x, e.y])
+		R.v2 = jn([J.S.aso.v, ",".join(PackedStringArray(dl)), J.MAPS["club-rv"].o[1][7]])
+		want(["^La presidencia", "^Presentarme"])
+		await run(J.talk_delroy)
+		R.tio = jn([J.S.aso.tio, J.S.aso.asam - J.S.day, J.rel("delroy"), J.votos_aso()])
+		want(["^La presidencia", "^Nada"])
+		await run(J.talk_delroy)
+		R.pend = jn([J.S.aso.asam - J.S.day, J.S.aso.pres, J.S.money])
+		J.S.day = J.S.aso.asam
+		J.aso_dia()
+		await idle()
+		R.pierde = jn([J.S.aso.pres, J.S.aso.votos, J.S.aso.otra - J.S.day, J.S.aso.asam])
+		want(["^La presidencia", "^Presentarme"])
+		await run(J.talk_delroy)
+		R.espera = J.S.aso.asam
+		J.S.rel.merge({"kiko": 20, "begona": 30, "patxi": 20, "rv": 25}, true)
+		R.votos = J.votos_aso()
+		J.S.day = J.S.aso.otra
+		want(["^La presidencia", "^Presentarme"])
+		await run(J.talk_delroy)
+		J.S.day = J.S.aso.asam
+		J.aso_dia()
+		await idle()
+		R.gana = jn([J.S.aso.pres, J.S.aso.votos, J.rel("delroy")])
+		J.revisa_logros()
+		await idle()
+		R.logro = J.S.logros.get("presidente") == J.S.day
+		R.pg = Datos.jsround(J.precio_club(12) * J.calidad(J.S.buds.ria) * float(D.ASO.f) * 100) / 100.0
+		want(["^El dispensario", "^Skunk", "^100 g"])
+		await run(J.talk_delroy)
+		R.lote = jn([J.S.aso.lote.g, J.S.aso.lote.pg, J.S.buds.ria.g])
+		R.m = J.S.money
+		J.S.day += 1
+		J.aso_dia()
+		await idle()
+		R.d1 = jn([J.S.money - R.m, J.S.aso.lote.g, J.S.aso.lote.tot])
+		for i in 4:
+			J.S.day += 1
+			J.aso_dia()
+		await idle()
+		R.fin = jn([J.S.aso.lote, J.S.money - R.m])
+		J.S.aso.pres = false
+		J.S.money = 100
+		want(["^La presidencia", "^Refundarla"])
+		await run(J.talk_delroy)
+		R.sin = jn([J.S.aso.pres, J.S.money])
+		J.S.money = 5000
+		want(["^La presidencia", "^Refundarla"])
+		await run(J.talk_delroy)
+		R.ref = jn([J.S.aso.pres, 5000 - J.S.money])
+		await run(func(): await J.obj_local(7, 1, "fotoMaite"))
+		R.rel = jn([J.rel_de("delroy"), D.GENTE.delroy])
+		J.S.erase("aso")
+		J.migrate()
+		R.mig = jn([J.S.aso.v, J.S.aso.tio, J.S.aso.pres, J.S.aso.lote, J.S.aso.asam])
+		J.S = S0
+		J.enter_map("home", 5, 5, "up"),
+		func():
+			var O: Dictionary = D.ASO
+			var e1 := Datos.jsround(20 * R.pg)
+			return chk(R.puerta == "36,18,club-rv,32,12,5,7,36,walk" and R.v1 == jn(["club-rv", 5, 6, true, 1, false, D.CLUBS.rv.cuota]) and R.v1b == 1 and R.v2 == "2,8,2,fotoMaite"
+				and R.tio == jn([true, O.dias, 5, 12]) and R.pend == jn([O.dias, false, 5000 - int(D.CLUBS.rv.cuota)]) and LOG.any(func(l): return l.begins_with("DELROY: La asamblea es el día ") and l.contains("O la refundas ya")) and R.pierde == jn([false, 12, O.espera, 0]) and R.espera == 0 and R.votos == 26 and R.gana == "true,26,15" and R.logro
+				and R.lote == jn([100, R.pg, 50]) and R.d1 == jn([e1, 80, e1]) and R.fin == jn([null, 5 * e1])
+				and R.sin == "false,100" and R.ref == jn([true, O.refunda]) and R.rel == "delroy,Delroy" and R.mig == "0,false,false,,0"
+				and LOG.has("Junto a la foto de la tía Maite, un hombre mayor con las rastas y la barba canas no te quita ojo.") and LOG.has("DELROY: " + D.DELROY.revela[1])
+				and LOG.any(func(l): return l.begins_with("SMS · DELROY: 12 votos de %s: gana %s" % [Datos.js_num(O.votos), O.rival])) and LOG.any(func(l): return l.begins_with("SMS · DELROY: ¡26 votos de %s!" % Datos.js_num(O.votos)))
+				and LOG.any(func(l): return l.begins_with("SMS · DELROY: Se acabó lo del dispensario")) and LOG.has("DELROY: Sin los %s no hay refundación." % Datos.eur(O.refunda))
+				and LOG.has("La tía Maite y Delroy, de jóvenes, en un campo. En la placa: «Maite, presidenta fundadora»."), R))
 	step("El bajo de las setas (1.20): Txomin alquila el bajo de la Kale Zaharra desde el capítulo 4; las bandejas que prepara él (húmedas: cada día pierden; secas o contaminadas, a tirar), 6 días colonizando y 4 fructificando; la cosecha se seca en el bajo y él la compra; el alquiler cada mañana, la redada, el impago y dejarlo", [], func():
 		var sv: Dictionary = {"money": J.S.money, "heat": J.S.heat, "sales": J.S.sales, "ch": J.S.ch, "day": J.S.day, "min": J.S.min}
 		R = {}

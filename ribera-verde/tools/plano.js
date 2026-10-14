@@ -138,7 +138,7 @@ const REAL = {
     anotar('mendialde', 'MENDIALDE · el pueblo del prólogo'); anotar('casa-ama', 'CASERÍO DE LA FAMILIA (MENDIALDE)'); anotar('puerto', 'PUERTO VIEJO');
     anotar('valdehierro', 'VALDEHIERRO'); anotar('errotabarri', 'ERROTABARRI');
     anotar('ibarbide', 'IBARBIDE · Casco Viejo (la ciudad grande)'); anotar('ensanche', 'IBARBIDE · Ensanche'); anotar('growcity', 'GROW IBARBIDE'); anotar('callejon', 'IBARBIDE · Kale Zaharra (detrás del growshop, sin patrullas)');
-    anotar('club-puerto', `${CLUBS.puerto.n} (PUERTO VIEJO) · los cuatro clubs, iguales por dentro`); anotar('nave', 'LA NAVE DE VALDEHIERRO');
+    anotar('club-puerto', `${CLUBS.puerto.n} (PUERTO VIEJO) · los cuatro clubs y la asociación, iguales por dentro`); anotar('nave', 'LA NAVE DE VALDEHIERRO');
     anotar('disco', `${DISCO.n} (IBARBIDE · Ensanche)`);
 
     // ---------- hoja de escala ----------

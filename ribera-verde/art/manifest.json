@@ -2981,6 +2981,66 @@
    "notas": "1.23: pedido por el usuario: «el hijo de Kiko, que te ayude en el primer cultivo, hasta la primera cosecha»."
   },
   {
+   "id": "delroy",
+   "tipo": "personaje",
+   "fase": "F3",
+   "herramienta": "importado",
+   "cubre": [
+    "look:delroy",
+    "npc:delroy"
+   ],
+   "origen": "tools/sprites/a-mano/delroy.py: kiko (aprobado) de mayor, por zonas del alto (mismo dibujo): rastas y barba canosas, piel oscura, camisa crema con cadena de oro, pantalón gris marengo y botas de ante camel con suela de crepé",
+   "descripcion": "Delroy (1.32), el «tío» jamaicano que nunca lo fue de papeles, el compañero de la tía Maite: un señor mayor, de don, con las rastas y la barba canosas; sin los colores de la bandera",
+   "celda": "personaje",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "importado",
+     "direcciones": [
+      "south",
+      "north",
+      "east"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "fumar",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false,
+     "frames": 12
+    }
+   ],
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "max_colores": 20,
+   "ambiente": {
+    "acciones": [
+     "fumar"
+    ],
+    "cada_s": [
+     14,
+     32
+    ],
+    "solo_quieto": true
+   },
+   "fumador": {
+    "tipo": "porro",
+    "vfx": "vfx-humo-porro",
+    "frame_humo": 9,
+    "offset_boca": [
+     4,
+     -18
+    ]
+   },
+   "notas": "1.32: pedido por el usuario: «aparece el que fue tu nunca oficial \"tío\" jamaiquino… un rasta ya con el pelo canoso y barba, jamaiquino pero no le pongas la típica ropa con los colores rasta… sino realmente un Don» (las botas, de ante, sin marca)."
+  },
+  {
    "id": "cliente6",
    "tipo": "personaje",
    "fase": "F3",
@@ -7712,6 +7772,40 @@
    "paleta": "propia",
    "coste_real": 0,
    "tipo": "edificio",
+   "id": "edificio-asociacion",
+   "calco": "casco3",
+   "cubre": [
+    "tile:door_casco3"
+   ],
+   "celda": "edificio_5x7",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "descripcion": "1.32: la Asociación Cannábica Ribera Verde, en el barrio alto: la casa alta de almagre del Casco Viejo con la lonja tapiada, la ventana de cuarterones esmerilada con la hoja, la placa de latón «ASOCIACIÓN» y el portal verde en la casilla 4",
+   "puerta": {
+    "x": 4
+   },
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose (interior #26262e), de locales.py (simple)",
+     "herramienta": "importado"
+    }
+   ],
+   "notas": "1.32, pedido por el usuario: «También tiene que haber la opción de crear o presentarte a presidente de la asociación cannabica de Ribera Verde, la tía Maite lo fue durante muchos años».",
+   "max_colores": 28,
+   "montaje": "la fachada de mundo.py (casco3) con su placa, su ventana y su portal: 28 colores (la casa alta ya llega a 20 con el mirador)"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "edificio",
    "id": "edificio-club-ensanche",
    "calco": "bloque2",
    "cubre": [
@@ -7837,11 +7931,12 @@
     "obj:neon",
     "obj:mesaV",
     "obj:cordon",
-    "obj:cordonF"
+    "obj:cordonF",
+    "obj:fotoMaite"
    ],
    "celda": "objeto_1x1",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
-   "descripcion": "1.30: la vitrina del dispensario (mueble de madera con la urna y dos tarros), la balda de tarros, la pizarra de la variedad del día, las normas del club, el taquero con el triángulo, la mesa baja con cenicero, grinder y librillo, la barra acolchada de GAUA con su tira azul, el neón de la luna, la mesa del reservado con la cubitera y dos copas y el cordón de terciopelo (poste y cuerda; cordonF, el último poste)",
+   "descripcion": "1.30: la vitrina del dispensario (mueble de madera con la urna y dos tarros), la balda de tarros, la pizarra de la variedad del día, las normas del club, el taquero con el triángulo, la mesa baja con cenicero, grinder y librillo, la barra acolchada de GAUA con su tira azul, el neón de la luna, la mesa del reservado con la cubitera y dos copas y el cordón de terciopelo (poste y cuerda; cordonF, el último poste); 1.32: la foto de la tía Maite con Delroy de joven, en el marco de madera (en la asociación)",
    "ajuste_por_sprite": {
     "vitrina": "exacto",
     "tarros": "exacto",
@@ -7853,7 +7948,8 @@
     "neon": "exacto",
     "mesaV": "exacto",
     "cordon": "exacto",
-    "cordonF": "exacto"
+    "cordonF": "exacto",
+    "fotoMaite": "exacto"
    },
    "estilo_ref": "props-16 (botellero, mostrador, gramola)",
    "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca»."
@@ -7903,7 +7999,7 @@
    ],
    "celda": "mueble_ancho",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
-   "descripcion": "1.30, muebles de 2 casillas a 16 px/m: la mesa de billar de 210 cm con el tapete a medio fondo, las troneras y las bolas, y la lámpara de tres pantallas verdes colgada encima; el sofá chester verde de frente (sofaF) y por detrás (sofaB), el de terciopelo morado del reservado (sofaV), la cabina del DJ con los platos, la mesa y el rótulo, la mesa de oficina de la nave con el portátil y la cajonera, y la mesa de cultivo de 240 × 120 cm con seis macetas bajo dos LED de barras de 100 cm, como los de las carpas (1.31; mesaN-0 vacía y apagados, mesaN-1 plantada y encendidos); 1.31: sus plantas, aparte y encima, en los colores de la planta A (hojas, tallo, contorno y la rampa clave del cogollo, para que el juego les ponga el tono de hoja y el color de cogollo de cada variedad, como en la vista C): plantasN-1 recién plantadas y plantasN-<fase>-<porte> (2 creciendo, 3 en flor, 4 dando; i baja y tupida de hoja ancha y cogollos gordos, h entre medias, s alta y abierta de hoja fina y colas largas)",
+   "descripcion": "1.30, muebles de 2 casillas a 16 px/m: la mesa de billar de 210 cm con el tapete a medio fondo, las troneras y las bolas, y la lámpara de tres pantallas verdes colgada encima; el sofá chester verde de frente (sofaF) y por detrás (sofaB), el de terciopelo morado del reservado (sofaV), la cabina del DJ con los platos, la mesa y el rótulo, la mesa de oficina de la nave con el portátil y la cajonera, y la mesa de cultivo de 240 × 120 cm vista desde arriba a medio fondo (1.32: la bandeja con su fondo acanalado, el canto, el larguero y tres patas, y cinco macetas de 11 L a tresbolillo, tres delante y dos al fondo) bajo dos LED de barras de 100 cm, como los de las carpas (1.31; mesaN-0 vacía y apagados, mesaN-1 plantada y encendidos); 1.31: sus plantas, aparte y encima, en los colores de la planta A (hojas, tallo, contorno y la rampa clave del cogollo, para que el juego les ponga el tono de hoja y el color de cogollo de cada variedad, como en la vista C): plantasN-1 recién plantadas y plantasN-<fase>-<porte> (2 creciendo, 3 en flor, 4 dando; 1.32: con copa, la corona y las puntas, no en forma de pino: i ancha y baja de hoja ancha y oscura y cogollos gordos, h entre medias, s alta y estrecha de hoja fina y clara y colas largas)",
    "ajuste_por_sprite": {
     "billar": "exacto",
     "sofaF": "exacto",

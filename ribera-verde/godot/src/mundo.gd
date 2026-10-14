@@ -561,6 +561,8 @@ func npc_cond(d: Dictionary) -> bool:
 			return S.ch == 6
 		"julen":   # 1.23: en el piso hasta la primera cosecha; después, en el growshop
 			return (S.flags.get("kiko1") and not S.flags.get("harvest1")) if d.map == "home" else (true if S.flags.get("harvest1") else false)
+	if d.id == "delroy":   # 1.32: en la asociación, desde la segunda visita
+		return delroy_aqui()
 	if d.id.begins_with("club_"):   # los clubs (1.15), desde su capítulo
 		return S.ch >= int(D.CLUBS[d.id.substr(5)].ch)
 	match d.id:   # los locales (1.30): cada trabajador de la nave, junto a su mesa; el portero de GAUA, desde su capítulo
@@ -603,8 +605,10 @@ func npc_talk(d: Dictionary) -> void:
 			await say(pick(["Don Baltasar está ocupado. Habla con él si traes el dinero.", "Aquí dentro no se hacen preguntas."]), "TOÑO")
 		"begona":   # 1.15: consejos, regalos y la jardinera
 			await talk_begona()
-		"club_puerto", "club_valde", "club_ibar", "club_ens":   # los clubs (1.15)
+		"club_puerto", "club_valde", "club_ibar", "club_ens", "club_rv":   # los clubs (1.15); la asociación (1.32)
 			await talk_club(d.id.substr(5))
+		"delroy":
+			await talk_delroy()
 		# los locales (1.30, 11j-locales)
 		"socio":
 			await talk_socio(S.map.substr(5))
@@ -1681,6 +1685,11 @@ func recibir_envio():
 func talk_begona():
 	pass
 func talk_club(_k):
+	pass
+# la asociación (1.32, trama.gd)
+func delroy_aqui() -> bool:
+	return false
+func talk_delroy():
 	pass
 # los locales (1.30, trama.gd)
 func naveros() -> Array:

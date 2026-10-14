@@ -1026,6 +1026,8 @@ func logro_ok(id: String) -> bool:
 			return S.catas.size() > 0
 		"club":
 			return S.clubs.values().any(func(v): return true if v else false)
+		"presidente":   # 1.32
+			return S.get("aso") is Dictionary and S.aso.get("pres") == true
 		"goteo":
 			return S.carpas.any(func(c): return c is Dictionary and c.get("goteo"))
 		"carpas":
@@ -2842,6 +2844,7 @@ func curro_dia() -> void:
 	if vende:   # 1.22: lo vendido cuenta para la historia
 		queue("historia", check_story)
 	plantilla_dia()   # la plantilla (1.19)
+	aso_dia()   # la asociación (1.32)
 
 # regar, tratar las plagas con tu insecticida y rellenar garrafas y depósitos (Begoña y el gerente de la plantilla)
 func cuidar_plantas() -> void:
@@ -3012,7 +3015,7 @@ func precio_club(thc: float) -> float:
 func carne_club(k: String) -> bool:
 	var C: Dictionary = D.CLUBS[k]
 	var N: String = C.n
-	if await ask("%s, asociación de consumidores. Dentro no se vende nada: lo tuyo entra por la puerta de atrás. La cuota son %s. ¿Te haces socio?" % [C.n, Datos.eur(C.cuota)], ["Hacerme socio", "No"], N) != 0:
+	if await ask("%s%s. Dentro no se vende nada: lo tuyo entra por la puerta de atrás. La cuota son %s. ¿Te haces socio?" % [C.n, "" if k == "rv" else ", asociación de consumidores", Datos.eur(C.cuota)], ["Hacerme socio", "No"], N) != 0:
 		return false
 	if S.money < C.cuota:
 		sfx("bad")
@@ -3664,6 +3667,9 @@ func entra_local(d: Dictionary):
 			atras_puerta()
 			if not await carne_club(k):
 				return
+		if k == "rv":   # 1.32: la asociación
+			await entra_aso(d)
+			return
 	elif t == "nave":
 		if S.get("nave") == null:
 			atras_puerta()
@@ -3716,6 +3722,8 @@ func obj_local(x: int, y: int, o) -> bool:
 				txt = "La mesa de billar, con el tapete recién cepillado. %s juega con apuesta." % D.BILLAR.n[k]
 			"poster":
 				txt = "Un cartel antiguo de una feria del cáñamo."
+			"fotoMaite":   # 1.32
+				txt = "%s, en un campo. En la placa: «Maite, presidenta fundadora»." % ("La tía Maite y Delroy, de jóvenes" if aso().tio else "La tía Maite, joven, con un hombre de rastas negras")
 			"plantDeco":
 				txt = "Una kentia en una maceta de barro."
 	if S.map == "nave":
@@ -4189,6 +4197,149 @@ func talk_rrpp():
 
 func talk_baila(i: int):
 	await say(D.BAILA[i], "GENTE")
+
+# ---------- LA ASOCIACIÓN (1.32, 11j-locales): la de la tía Maite, en el barrio alto (CLUBS.rv) ----------
+# la segunda vez que entras (otro día), Delroy; presentarte (la asamblea) o refundarla; de presidente, el dispensario (ASO, DELROY)
+func aso() -> Dictionary:
+	if not (S.get("aso") is Dictionary):
+		S.aso = {"v": 0, "d": 0, "tio": false, "asam": 0, "otra": 0, "pres": false, "votos": 0, "lote": null}
+	return S.aso
+
+func delroy_aqui() -> bool:
+	return int(aso().v) >= int(D.ASO.visitas)
+
+func votos_aso() -> int:
+	var O: Dictionary = D.ASO
+	var n := 0
+	for id in O.gente:
+		if rel(id) >= int(D.REL.amigo):
+			n += 1
+	return mini(int(O.votos), int(O.base) + (int(O.delroy) if aso().tio else 0) + int(O.amigo) * n + int(floor(rel("rv") / float(O.relV))))
+
+# la puerta (entra_local): cada día que entras cuenta una visita; la segunda, Delroy está dentro
+func entra_aso(d: Dictionary) -> void:
+	var A := aso()
+	if int(A.d) != int(S.day):
+		A.v = int(A.v) + 1
+		A.d = S.day
+	await warp(d)
+	if delroy_aqui() and not A.tio:
+		await say("Junto a la foto de la tía Maite, un hombre mayor con las rastas y la barba canas no te quita ojo.")
+
+func talk_delroy() -> void:
+	var A := aso()
+	var N: String = D.DELROY.n
+	if not A.tio:
+		await talk(N, D.DELROY.revela)
+		A.tio = true
+		confia("delroy", 5)
+	var c: int = await ask("¿Qué tal, presidente?" if A.pres else "Dime, sobrino.", ["Charlar", "El dispensario" if A.pres else "La presidencia", "Nada"], N)
+	if c == 0:
+		await say(pick(D.DELROY.charla), N)
+	elif c == 1:
+		if A.pres:
+			await dispensario_aso()
+		else:
+			await presidencia_aso()
+
+func presidencia_aso() -> void:
+	var A := aso()
+	var N: String = D.DELROY.n
+	var O: Dictionary = D.ASO
+	if A.asam:   # con la asamblea pendiente, todavía se puede refundar
+		if await ask("La asamblea es el día %d, por la mañana. Habla con la gente del barrio: cada amigo trae votos. O la refundas ya, por %s." % [int(A.asam), Datos.eur(O.refunda)], ["Refundarla", "Nada"], N) != 0:
+			return
+	else:
+		var c: int = await ask("Hacen falta %d votos de %d. Hoy tendrías %d. O pagas %s de deudas y registro y la refundas tú." % [int(O.mayoria), int(O.votos), votos_aso(), Datos.eur(O.refunda)], ["Presentarme", "Refundarla", "Nada"], N)
+		if c == 0:
+			if S.day < int(A.otra):
+				await say("Hasta el día %d no hay otra asamblea. Gánate al barrio mientras." % int(A.otra), N)
+				return
+			A.asam = int(S.day) + int(O.dias)
+			sfx("sel")
+			await say("Apuntado. La asamblea, el día %d. %s también se presenta." % [int(A.asam), O.rival], N)
+			return
+		if c != 1:
+			return
+	if S.money < int(O.refunda):
+		sfx("bad")
+		await say("Sin los %s no hay refundación." % Datos.eur(O.refunda), N)
+		return
+	S.money -= int(O.refunda)
+	A.pres = true
+	A.asam = 0
+	confia("delroy", 10)
+	confia("rv", 10)
+	update_hud()
+	sfx("get")
+	await say("Pagas las deudas de la gestora y el registro. La asociación vuelve a nacer, con tus estatutos. Maite estaría orgullosa.", N)
+
+# el dispensario: un lote a la vez; dice cuánto queda y lo que llevas
+func dispensario_aso() -> void:
+	var A := aso()
+	var N: String = D.DELROY.n
+	var O: Dictionary = D.ASO
+	var L = A.lote
+	if L is Dictionary:
+		await say("En el dispensario quedan %s de %s, a %s € el gramo. Llevas %s." % [g_txt(L.g), lot_nombre(L.k), _dos(L.pg), Datos.eur(L.tot)], N)
+		return
+	var lots := bud_lots(O.g[0])
+	if lots.is_empty():
+		await say("Déjame %d g o más y los socios lo retiran, %d g al día. El dinero, a tu buzón." % [int(O.g[0]), int(O.dia)], N)
+		return
+	var it := lots.map(lot_item)
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿Qué lote?"})
+	if i < 0 or i >= lots.size():
+		return
+	var k: String = lots[i][0]
+	var b: Dictionary = lots[i][1]
+	var pg := Datos.jsround(precio_club(b.thc) * calidad(b) * float(O.f) * 100) / 100.0
+	var ops := []
+	for g in O.g:
+		if g <= floor(b.g):
+			ops.append(int(g))
+	var o := []
+	for g in ops:
+		o.append("%d g · %s" % [g, Datos.eur(g * pg)])
+	o.append("Nada")
+	var j: int = await ask("%s a %s € el gramo para los socios. ¿Cuánto dejas?" % [lot_nombre(k), _dos(pg)], o, N)
+	if j < 0 or j >= ops.size():
+		return
+	use_buds(k, ops[j])
+	A.lote = {"k": k, "g": ops[j], "pg": pg, "tot": 0}
+	sfx("sel")
+	await say("Al dispensario. Cada mañana, %d g para los socios." % int(O.dia), N)
+
+# al amanecer (curro_dia): la asamblea, si toca, y lo que retiran los socios del dispensario
+func aso_dia() -> void:
+	var A := aso()
+	var O: Dictionary = D.ASO
+	if A.asam and S.day >= int(A.asam):
+		var v := votos_aso()
+		var gana := v >= int(O.mayoria)
+		A.asam = 0
+		A.votos = v
+		if gana:
+			A.pres = true
+			confia("delroy", 10)
+		else:
+			A.otra = int(S.day) + int(O.espera)
+		var t: String = ("¡%d votos de %d! Eres el presidente de la asociación, sobrino. Como tu tía." % [v, int(O.votos)]) if gana else ("%d votos de %d: gana %s. Gánate al barrio y preséntate otra vez desde el día %d." % [v, int(O.votos), O.rival, int(A.otra)])
+		queue("aso", func(): await talk("SMS · DELROY", [t]))
+	var L = A.lote
+	if not A.pres or not (L is Dictionary):
+		return
+	var g = min(L.g, O.dia)
+	var e := Datos.jsround(g * L.pg)
+	L.g -= g
+	L.tot += e
+	S.money += e
+	S.sales += e
+	queue("historia", check_story)
+	if L.g < 1:
+		A.lote = null
+		queue("asoLote", func(): await talk("SMS · DELROY", ["Se acabó lo del dispensario: %s en total, en tu buzón." % Datos.eur(L.tot)]))
 
 # ---------- el bajo de las setas (1.20, 11g-setas): el local clandestino de la Kale Zaharra ----------
 func fase_seta(b: Dictionary) -> String:

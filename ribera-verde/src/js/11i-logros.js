@@ -23,6 +23,7 @@ const LOGROS=[
   {id:'rosin',t:'Prensado',d:'Prensa tu primer rosin.',ok:()=>Object.keys(S.rosin).length>0||Object.keys(S.arcon.rosin).length>0},
   {id:'cata',t:'Catador',d:'Cata tu propia hierba.',ok:()=>Object.keys(S.catas).length>0},
   {id:'club',t:'Socio',d:'Hazte el carné de un club cannábico.',ok:()=>Object.values(S.clubs).some(Boolean)},
+  {id:'presidente',t:'Como la tía Maite',d:'Preside la Asociación Cannábica Ribera Verde.',ok:()=>!!(S.aso&&S.aso.pres)},
   {id:'goteo',t:'Riego automático',d:'Monta el goteo en una carpa.',ok:()=>S.carpas.some(c=>c&&c.goteo)},
   {id:'carpas',t:'Tres carpas',d:'Ten tres carpas montadas en el piso.',ok:()=>S.carpas.filter(Boolean).length>=3},
   {id:'plazo',t:'Primer plazo',d:'Paga el primer plazo de la deuda.',ok:()=>S.ch>=4},

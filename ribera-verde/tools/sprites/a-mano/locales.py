@@ -14,7 +14,7 @@
 #    la mesa de cultivo de 240 × 120 cm con dos LED de barras encima (1.31, como los de las carpas), apagados y encendidos, y sus plantas aparte (1.31: plantasN, en los colores
 #    de la planta A para el tono de cada variedad, por fase y porte).
 # Sale a art/crudo/<grupo>/<sprite>/unica/NN.png (después, node tools/sprites/procesar.js <grupos> --atlas)
-import os, sys, glob
+import os, sys, glob, math
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lienzo import Lienzo, P, azar
 import mundo
@@ -32,10 +32,13 @@ K = '#2a2a34'                     # el contorno de los muebles (el de salon.py)
 LETRA = {'C': '111100100100111', 'L': '100100100100111', 'U': '101101101101111', 'B': '110101110101110', 'G': '111100101101111',
          'A': '111101111101101', 'I': '111010010010111', 'T': '111010010010010', 'S': '111100111001111', 'O': '111101101101111',
          'K': '101101110101101', 'E': '111100110100111', 'N': '10011101101110011001', 'R': '110101110101101', 'Z': '111001010100111'}
+TILDE = {'Ó': 'O'}                # 1.32: la vocal con su tilde, dos píxeles en diagonal encima
 def rotulo(lz, x, y, txt, c):
     for ch in txt:
         if ch == ' ':
             x += 2; continue
+        if ch in TILDE:
+            ch = TILDE[ch]; lz.p(x + 1, y - 1, c); lz.p(x + 2, y - 2, c)
         m = LETRA[ch]; an = len(m) // 5
         for j in range(5):
             for i in range(an):
@@ -44,12 +47,12 @@ def rotulo(lz, x, y, txt, c):
     return x
 
 def ancho(txt):
-    return sum(2 if ch == ' ' else len(LETRA[ch]) // 5 + 1 for ch in txt) - 1
+    return sum(2 if ch == ' ' else len(LETRA[TILDE.get(ch, ch)]) // 5 + 1 for ch in txt) - 1
 
 def placa(lz, x, y, txt, fondo, borde, letra):
-    w = ancho(txt) + 4
-    lz.caja(x, y, w, 9, fondo, borde)
-    rotulo(lz, x + 2, y + 2, txt, letra)
+    w, h = ancho(txt) + 4, 10 if any(ch in TILDE for ch in txt) else 9   # con tilde, una fila más
+    lz.caja(x, y, w, h, fondo, borde)
+    rotulo(lz, x + 2, y + h - 7, txt, letra)
 
 # ---------------------------------------------------------------------------------------------------------- fachadas
 LATON = ('#c8a040', '#6a5020', '#2a2018')
@@ -145,7 +148,28 @@ def disco():
         lz.r(xx, 109, 4, 3, '#2a2236'); lz.hl(xx, xx + 3, 108, '#8a50e0')
     return lz, puertas(lz, 16, 80, (5, 14, 22, 18), 'doble')
 
-FACHADAS = {'club-itsaso': club_itsaso, 'club-fundicion': club_fundicion, 'club-kalea': club_kalea, 'club-ensanche': club_ensanche, 'disco': disco}
+def asociacion():
+    """la Asociación Cannábica Ribera Verde (1.32), en el barrio alto: la casa alta de almagre del Casco Viejo (5 × 7) con el bajo
+    de la asociación: la lonja tapiada con la piedra, la ventana de cuarterones esmerilada con la hoja, la placa de latón encima y el
+    portal de la derecha, pintado de verde (recorte en x 48, y 80: la puerta va con dx −8)"""
+    lz = mundo.casco('casco3', 5, 7, 93)
+    H = 112
+    for y in range(H - 29, H - 3):                                 # la lonja, tapiada con la piedra del recercado
+        for x in range(2, 30):
+            if lz.g(x, y)[:3] not in [tuple(int(h[i:i + 2], 16) for i in (1, 3, 5)) for h in PIEDRA]:
+                lz.p(x, y, PIEDRA[2] if (x + y) % 9 else PIEDRA[1])
+    placa(lz, 7, H - 31, 'ASOCIACIÓN', *LATON)
+    lz.caja(8, H - 20, 36, 15, '#c8d8d0', MADERA[0]); lz.hl(9, 42, H - 19, '#e8f0ec')   # la ventana esmerilada, de cuarterones
+    for x in (17, 26, 35): lz.vl(x, H - 19, H - 7, MADERA[0])
+    lz.hl(9, 42, H - 13, MADERA[0])
+    for (x, y) in ((21, 99), (22, 99), (20, 100), (21, 100), (22, 100), (23, 100), (21, 101), (22, 101), (19, 101), (24, 101), (21, 102), (22, 103)):
+        lz.p(x, y, '#3f8a46')
+    lz.hl(7, 44, H - 5, PIEDRA[1])                                  # el alféizar
+    lz.r(64, H - 25, 10, 25, '#2f5a3a'); lz.vl(69, H - 24, H - 1, '#1f4a30')   # el portal, verde
+    lz.r(65, H - 23, 3, 8, '#3f7a4e'); lz.r(70, H - 23, 3, 8, '#3f7a4e'); lz.p(71, H - 12, '#e0b040')
+    return lz, puertas(lz, 48, 80, (16, 7, 10, 25), 'simple')
+
+FACHADAS = {'club-itsaso': club_itsaso, 'club-fundicion': club_fundicion, 'club-kalea': club_kalea, 'club-ensanche': club_ensanche, 'disco': disco, 'asociacion': asociacion}
 
 # ---------------------------------------------------------------------------------------------------------- suelos y paredes
 def floorC():
@@ -290,6 +314,19 @@ def cartelC():
     L.r(3, 1, 10, 14, '#f4f4ee'); L.r(3, 1, 10, 3, '#2f6a4a'); L.hl(4, 11, 2, '#e8e4d8')
     for y in (6, 8, 10): L.hl(4, 11, y, '#8a8a92')
     L.r(9, 11, 3, 3, '#c04848'); L.p(10, 12, '#f4f4ee')
+    L.contorno(K)
+    return L
+
+def fotoMaite():
+    """la foto de la tía Maite (1.32), en la asociación que presidió: el marco de madera y, en la foto, ella, con el pelo cano y la
+    blusa morada, junto a Delroy de joven, con las rastas negras y la camisa crema, en el campo"""
+    L = Lienzo(16, 16)
+    L.r(2, 1, 12, 13, '#74502e'); L.hl(2, 13, 1, '#a87646')                       # el marco
+    L.r(3, 2, 10, 11, '#c8d8d0'); L.r(3, 10, 10, 3, '#6a8a5a')                    # el cielo y el campo
+    L.r(4, 3, 4, 2, '#d8d4cc'); L.r(5, 5, 2, 2, '#d49a74'); L.vl(4, 5, 7, '#d8d4cc'); L.vl(7, 5, 6, '#d8d4cc')   # Maite
+    L.r(4, 8, 4, 5, '#7a4a8a'); L.p(5, 7, '#d49a74'); L.p(6, 7, '#d49a74')
+    L.r(8, 3, 4, 2, '#2a1e18'); L.r(9, 5, 2, 2, '#8a5a3c'); L.vl(8, 5, 8, '#2a1e18'); L.vl(11, 5, 8, '#2a1e18')   # Delroy
+    L.r(9, 7, 2, 1, '#8a5a3c'); L.r(8, 9, 4, 4, '#e8e0c8'); L.p(9, 8, '#e8e0c8'); L.p(10, 8, '#e8e0c8')
     L.contorno(K)
     return L
 
@@ -484,116 +521,146 @@ def escritorio():
 def foco_mesa(L, x0, on, M0, M1, M2):
     """un LED de barras como los de las carpas (equipo_c.py, como los de 720 W de 8 barras) a 16 px/m: 100 cm, 16 px; colgado de dos
     cuerdas con su trinquete, la fuente encima en el centro, el travesaño de delante y las 8 barras de fondo a fondo, de 1 px con 1 de
-    aire, vistas algo desde abajo: la cara de diodos, blanca con algún rosa encendida y gris apagada, y entre barra y barra, oscuro"""
+    aire, vistas algo desde abajo: la cara de diodos, blanca con algún rosa encendida y gris apagada, y entre barra y barra, oscuro
+    (1.32: subido 2 px, para que quepan las plantas, más grandes)"""
     x1 = x0 + 15
     for x in (x0 + 1, x1 - 1):
-        L.vl(x, 0, 5, '#3a3a40'); L.p(x, 2, M1)
-    L.r(x0 + 6, 3, 4, 2, M0); L.p(x0 + 7, 3, M1)                                  # la fuente
-    L.hl(x0, x1, 5, M2); L.p(x0, 5, M1); L.p(x1, 5, M1)                           # el travesaño
-    for y in (6, 7, 8):
+        L.vl(x, 0, 3, '#3a3a40'); L.p(x, 1, M1)
+    L.r(x0 + 6, 1, 4, 2, M0); L.p(x0 + 7, 1, M1)                                  # la fuente
+    L.hl(x0, x1, 3, M2); L.p(x0, 3, M1); L.p(x1, 3, M1)                           # el travesaño
+    for y in (4, 5, 6):
         for x in range(x0, x1 + 1):
             if (x - x0) % 2: L.p(x, y, '#2a2a30')                                  # el aire entre barras
             elif on: L.p(x, y, '#f8d8ff' if (x + 2 * y) % 3 == 0 else '#ffffff')
-            else: L.p(x, y, '#6a6a72' if y < 8 else '#4a4a52')
+            else: L.p(x, y, '#6a6a72' if y < 6 else '#4a4a52')
+
+# la mesa (1.32): las cinco macetas a tresbolillo, tres en la fila de delante (la de los trabajadores) y dos en la del fondo, en
+# los huecos; x del centro y fila del culo de cada una, del fondo a delante (así se pintan sus plantas: las de delante tapan)
+MACETAS_MESA = [(17, 30), (30, 30), (11, 35), (24, 35), (36, 35)]
+BANDEJA = ('#ffffff', '#e8e8ec', '#c8ccd2', '#a8acb4')
+
+def maceta_mesa(L, cx, yb):
+    """una maceta cuadrada negra de 7 × 7 (unos 11 L) vista algo desde arriba: el borde (el de delante, con luz), la tierra y el
+    cuerpo, un poco más estrecho abajo, con la luz a la izquierda"""
+    x0 = cx - 3
+    L.r(x0, yb - 6, 7, 3, '#4a4a52'); L.r(x0 + 1, yb - 5, 5, 1, '#5a4030')        # el borde y la tierra
+    L.hl(x0, x0 + 6, yb - 3, '#6a6a72')                                           # el labio de delante
+    L.r(x0, yb - 2, 7, 2, '#2a2a30'); L.r(x0 + 1, yb, 5, 1, '#2a2a30'); L.vl(x0, yb - 2, yb - 1, '#4a4a52')   # el cuerpo
 
 def mesaN(fase):
-    """la mesa de cultivo de 240 × 120 cm (38 px), de bandeja con desagüe, con seis macetas y encima dos LED de barras de 100 cm, como
-    los de las carpas (1.31); fase: 0 vacía (los focos apagados) y 1 plantada (encendidos); las plantas van aparte (plantasN), encima"""
-    L = Lienzo(48, 48); M0, M1, M2 = '#4a525a', '#8c98a2', '#bcc6ce'
+    """la mesa de cultivo de 240 × 120 cm (38 px) vista desde arriba a medio fondo, como el billar (1.32): la bandeja blanca con su
+    fondo acanalado hacia el desagüe, el canto de delante, el larguero y las tres patas, con el suelo entre ellas, y las cinco
+    macetas a tresbolillo (MACETAS_MESA); encima, dos LED de barras de 100 cm, como los de las carpas (1.31); fase: 0 vacía (los focos
+    apagados) y 1 plantada (encendidos); las plantas van aparte (plantasN), encima"""
+    L = Lienzo(48, 48); M0, M1, M2 = '#4a525a', '#8c98a2', '#bcc6ce'; B0, B1, B2, B3 = BANDEJA
     x0, x1 = 5, 42
     foco_mesa(L, 6, fase, M0, M1, M2); foco_mesa(L, 26, fase, M0, M1, M2)
-    L.r(x0, 35, 38, 3, '#e8e8ec'); L.hl(x0, x1, 35, '#ffffff'); L.hl(x0, x1, 37, '#a8acb4')   # la bandeja blanca
-    L.r(x0 + 1, 38, 36, 2, M1)                                      # el bastidor
-    for x in (x0 + 1, x0 + 18, x1 - 2): L.r(x, 40, 2, 6, M1); L.vl(x, 40, 45, M2)
-    for i in range(6):                                              # las macetas negras, de 6 px
-        cx = x0 + 4 + i * 6
-        L.r(cx - 2, 30, 5, 5, '#2a2a30'); L.hl(cx - 2, cx + 2, 30, '#4a4a52'); L.hl(cx - 1, cx + 1, 31, '#5a4030')
+    L.hl(x0, x1, 25, B0); L.hl(x0 + 1, x1 - 1, 26, B3)                            # el borde del fondo
+    L.r(x0 + 1, 27, 36, 9, B2)                                                    # el fondo de la bandeja
+    for x in range(x0 + 3, x1 - 1, 4): L.vl(x, 27, 35, B3)                         # las acanaladuras, hacia el desagüe
+    L.vl(x0, 25, 37, B0); L.vl(x1, 25, 37, B1)                                    # los bordes de los lados
+    L.hl(x0, x1, 36, B0); L.hl(x0, x1, 37, B1); L.hl(x0, x1, 38, B3)               # el canto de delante
+    L.r(x1 - 5, 37, 2, 2, '#4a4a52')                                              # el desagüe
+    L.hl(x0 + 1, x1 - 1, 39, M1); L.hl(x0 + 1, x1 - 1, 40, M0)                     # el larguero
+    for x in (x0 + 1, 23, x1 - 2): L.r(x, 41, 2, 5, M1); L.vl(x, 41, 45, M2)        # las patas
+    for cx, yb in MACETAS_MESA: maceta_mesa(L, cx, yb)
     L.contorno(K)
     suelo(L, x0, x1, K)
     return L
 
-# las plantas de la mesa (1.31), en los colores de la planta A (exporta.py: hojas D M L H, tallo S, contorno O, cogollo en la rampa
-# clave P Q R, pelos N y tricomas F) para que el juego les ponga, como en la vista C, el tono de hoja y el color de cogollo de la
-# variedad (vcTonos y la rampa de carpa-c-plantas-a). Seis por mesa, a 16 px/m, de la maceta (fila 29) hacia arriba; el porte por el %
-# índica (porteInd): i, baja y tupida, de hoja ancha y cogollos gordos; s, alta y abierta, de hoja fina hacia arriba y colas largas y
-# finas; h, entre las dos. fase: 1 recién plantadas (los clones, iguales en los tres portes), 2 creciendo, 3 en flor (pelos blancos)
-# y 4 dando cogollos (hinchados, con los pelos naranjas)
+# las plantas de la mesa (1.31; 1.32, más grandes y con copa: vistas desde arriba como la mesa, con la corona y las puntas, no en
+# forma de pino), en los colores de la planta A (exporta.py: hojas D M L H, tallo S, contorno O, cogollo en la rampa clave P Q R,
+# pelos N y tricomas F) para que el juego les ponga, como en la vista C, el tono de hoja y el color de cogollo de la variedad
+# (vcTonos y la rampa de carpa-c-plantas-a). Cinco por mesa, una en cada maceta (MACETAS_MESA), cada una con su contorno, y las de
+# delante encima de las del fondo. El porte, por el % índica (porteInd): i, ancha y baja, de hoja ancha y oscura y cogollos gordos;
+# s, alta y estrecha, de hoja fina y clara, con las colas largas y finas; h, entre las dos. fase: 1 recién plantadas (los clones,
+# iguales en los tres portes), 2 creciendo (la copa, con los brotes claros en las puntas), 3 en flor (las colas, pequeñas y con
+# los pelos blancos) y 4 dando cogollos (las colas, gordas, con los pelos naranjas)
 PO, PD, PM, PL, PH, PS = '#0d2620', '#1b4630', '#2f7038', '#57a33e', '#94d255', '#3b5a2e'
 PP, PQ, PR, PN, PF = '#ff5cff', '#d020c8', '#80107a', '#f08a3c', '#f2f4dc'
-PORTE = {   # alto por fase, nudos (cada cuántos px), medio largo de hoja de abajo arriba, hoja, cola (ancho, alto) y laterales [(dx, dy, ancho, alto)]
-    'i': dict(alto={2: 6, 3: 10, 4: 12}, nudo=2, hoja=(3, 3, 3, 2, 2, 2), forma='ancha', cola=(3, 5), lat=[(2, 5, 2, 3), (2, 8, 2, 2)]),
-    'h': dict(alto={2: 7, 3: 12, 4: 14}, nudo=2, hoja=(3, 3, 2, 2, 2, 2), forma='media', cola=(3, 6), lat=[(2, 6, 2, 3), (3, 10, 1, 2)]),
-    's': dict(alto={2: 9, 3: 15, 4: 17}, nudo=3, hoja=(3, 3, 3, 2, 2), forma='fina', cola=(2, 8), lat=[(2, 7, 1, 4), (2, 11, 1, 3)]),
+COPA = {   # la copa por fase (semiejes), las colas (dx, dy desde lo alto de la copa; las del fondo, primero), la cola (ancho, alto)
+           # y los tonos de las hojas (oscuro, medio, claro) y de su punta
+    'i': dict(rx={2: 4.6, 3: 6.6, 4: 6.6}, ry={2: 3, 3: 4, 4: 4}, colas=[(-4, 1), (4, 1), (0, 0), (2, 3), (-2, 3)], cola=(3, 5),
+              tonos=(PD, PM, PL, PL)),
+    'h': dict(rx={2: 4, 3: 5.6, 4: 5.6}, ry={2: 3.6, 3: 5, 4: 5}, colas=[(-3, 1), (3, 1), (0, -1), (-2, 4), (2, 4)], cola=(3, 6),
+              tonos=(PD, PM, PL, PH)),
+    's': dict(rx={2: 3.2, 3: 4.5, 4: 4.5}, ry={2: 4, 3: 6, 4: 6}, colas=[(-3, 2), (3, 2), (0, -1), (-1, 5), (2, 5)], cola=(2, 8),
+              tonos=(PM, PL, PL, PH)),
+}
+HOJA = {   # la hoja de abanico hacia arriba (T, la punta de los dedos; c, la hoja; +, el rabillo, donde se pega)
+    'i': ('T.T.T', 'TcccT', '.c+c.'),
+    'h': ('..T..', 'T.c.T', '.ccc.', '..+..'),
+    's': ('..T..', '..c..', 'T.c.T', '.ccc.', '..+..'),
 }
 
-def hoja(L, x, y, lado, largo, forma):
-    """una hoja de abanico de lado, desde el tallo (x) hacia fuera: la ancha, de dos filas (luz arriba y la punta caída); la media,
-    de una, con la punta clara; la fina, de una, con la punta hacia arriba"""
-    for k in range(1, largo + 1):
-        X = x + lado * k
-        if forma == 'ancha':
-            if k < largo: L.p(X, y - 1, PL if k > 1 else PH)
-            L.p(X, y, PD if k == largo else PM)
-        elif forma == 'media':
-            L.p(X, y - (1 if k == largo else 0), PL if k == largo else PM)
-        else:
-            L.p(X, y - (1 if k == largo else 0), PH if k == largo else PL)
+def hoja_mesa(L, x, y, porte, lado, c, cp):
+    """una hoja de abanico de su porte pegada en (x, y) y vuelta hacia lado: 0 arriba, 1 a la derecha, −1 a la izquierda"""
+    H = HOJA[porte]; h = len(H); ay = h - 1; ax = H[ay].index('+')
+    for j, fila in enumerate(H):
+        for i, ch in enumerate(fila):
+            if ch == '.': continue
+            dx, dy = i - ax, j - ay
+            if lado: dx, dy = -dy * lado, dx                                       # girada a un lado
+            L.p(x + dx, y + dy, cp if ch == 'T' else c)
 
-def cogollo(L, x, y, w, h, fase, R, cola=False):
-    """un cogollo de w × h con la esquina de arriba a la izquierda en (x, y), en punta arriba: en flor (3), pequeño, con un pelo
-    blanco en la punta; dando (4), entero, con la luz a la izquierda (P), el cuerpo (Q) y la sombra a la derecha y abajo (R). La cola
-    (la punta de la planta), con sus hojitas de azúcar abajo y, dando, el pelo naranja en la punta y un tricoma"""
+def cola_mesa(L, x, y, w, h, fase):
+    """una cola de w × h con la punta arriba en (x + w // 2, y): en flor (3), pequeña y con un pelo blanco en la punta; dando (4),
+    gorda, con la luz a la izquierda (P), el cuerpo (Q), la sombra a la derecha y abajo (R), los pelos naranjas y un tricoma"""
     if fase == 3:
-        w, h = max(1, w - 1), max(1, h - 2); y += 2
+        w, h = max(1, w - 1), max(2, h - 2); y += 2
     for j in range(h):
         for i in range(w):
-            if j == 0 and w > 1 and i != (w - 1) // 2: continue                                          # la punta
-            if w >= 3 and h >= 4 and j == h - 1 and i in (0, w - 1): continue                          # el culo, redondo
+            if j == 0 and w > 1 and i != w // 2: continue                                  # la punta
             c = PQ
             if fase == 4 and w > 1:
                 if i == 0: c = PP
                 elif i == w - 1 or j == h - 1: c = PR
             L.p(x + i, y + j, c)
-    top = (x + (w - 1) // 2, y)
+    t = x + w // 2
     if fase == 3:
-        if cola: L.p(top[0], top[1] - 1, PF)
-        return
-    if cola:
-        L.p(top[0], top[1] - 1, PN)
-        L.p(x - 1 if R() < .5 else x + w, y + 1 + int(R() * max(1, h - 2)), PN)
-        if w > 1: L.p(x, y + 1, PF)
-        L.p(x - 1, y + h - 1, PL); L.p(x + w, y + h - 1, PL)
+        L.p(t, y - 1, PF); return
+    L.p(t, y - 1, PN)
+    for j in range(1, h - 1, 2): L.p(x + (j // 2) % 2 * (w - 1), y + j, PN)       # los pelos, a un lado y a otro
+    if w > 2: L.p(x + 1, y + h - 2, PF)
 
-def planta_mesa(L, cx, fase, porte, lado, R):
-    """una planta de la mesa con el tallo en cx; lado (1 o −1) la pone en espejo, para que las seis no salgan iguales"""
-    if fase == 1:   # el clon recién plantado
-        L.p(cx, 29, PS); L.p(cx, 28, PS); L.p(cx - 1, 28, PM); L.p(cx + 1, 28, PL); L.p(cx - lado, 27, PL); L.p(cx, 27, PH)
-        return
-    Pt = PORTE[porte]; alto = Pt['alto'][fase] + (1 if R() < .35 else 0); top = 29 - alto + 1
-    L.vl(cx, top, 29, PS)
-    n = 0
-    for y in range(28, top + (1 if fase == 2 else 3), -Pt['nudo']):     # los nudos, de abajo arriba, a los dos lados
-        lg = Pt['hoja'][min(n, len(Pt['hoja']) - 1)] - (1 if R() < .2 else 0)
-        for s in (lado, -lado):
-            hoja(L, cx, y if s == lado or Pt['nudo'] > 2 else y - 1, s, lg, Pt['forma'])
-        n += 1
-    if fase == 2:   # la punta, con los brotes nuevos claros
-        L.p(cx, top, PH); L.p(cx - 1, top + 1, PL); L.p(cx + 1, top + 1, PL)
-        return
-    cw, ch = Pt['cola']
-    cogollo(L, cx - (cw - 1) // 2 if lado > 0 else cx - cw // 2, top, cw, ch, fase, R, True)
-    for dx, dy, w, h in Pt['lat']:
-        for s in (lado, -lado):
-            x = cx + s * dx if s > 0 else cx - dx - w + 1
-            cogollo(L, x, top + dy, w, h, fase, R)
+def planta_mesa(cx, yb, fase, porte, R):
+    """una planta en la maceta de centro cx y culo en la fila yb, en su propio lienzo con su contorno: la copa (oscura abajo y
+    clara arriba), las hojas de abanico de los lados y de abajo, caídas por encima del borde de la maceta, y la corona: creciendo,
+    las puntas con los brotes claros; en flor, las colas"""
+    L = Lienzo(48, 48); t = yb - 5                                                # la fila de la tierra
+    D, M, Cl, T = COPA[porte]['tonos']
+    if fase == 1:   # el clon recién plantado: el tallo y dos pares de hojitas
+        L.p(cx, t, PS); L.p(cx, t - 1, PS); L.p(cx - 1, t - 1, M); L.p(cx + 1, t - 1, M); L.p(cx - 2, t - 2, Cl); L.p(cx + 2, t - 2, Cl)
+        L.p(cx, t - 2, M); L.p(cx - 1, t - 3, Cl); L.p(cx + 1, t - 3, Cl); L.p(cx, t - 3, PH)
+        L.contorno(PO); return L
+    C = COPA[porte]; rx, ry = C['rx'][fase], C['ry'][fase]; cy = t - ry
+    for y in range(int(cy - ry) - 1, t + 1):                                      # la copa
+        for x in range(int(cx - rx) - 1, int(cx + rx) + 2):
+            u, v = (x - cx) / rx, (y - cy) / ry
+            if u * u + v * v > 1.05: continue
+            k = v * .85 + u * .3
+            L.p(x, y, D if k > .4 else Cl if k < -.45 else M)
+    for s in (-1, 1):                                                             # las hojas de los lados y las de abajo, caídas
+        hoja_mesa(L, cx + s * round(rx), round(cy), porte, s, M, Cl)
+        hoja_mesa(L, cx + s * round(rx * .6), t, porte, s, D, M)
+    top = round(cy - ry)
+    if fase == 2:   # las puntas: hojas hacia arriba con los brotes claros
+        for dx in (-round(rx * .55), 0, round(rx * .55)):
+            hoja_mesa(L, cx + dx, top + (1 if dx else 0), porte, 0, Cl, T)
+        L.contorno(PO); return L
+    for dx in (-round(rx * .7), round(rx * .7)):                                  # las hojas de arriba, entre las colas
+        hoja_mesa(L, cx + dx, top + 2, porte, 0, M, Cl)
+    w, h = C['cola']
+    for dx, dy in C['colas']:
+        cola_mesa(L, cx + dx - w // 2, top + dy - h + 2, w, h, fase)
+    L.contorno(PO)
+    return L
 
 def plantasN(fase, porte):
+    """las cinco plantas de una mesa, del fondo a delante"""
     L = Lienzo(48, 48); R = azar(31 + fase * 7 + 'ihs'.index(porte))
-    for i in range(6):
-        planta_mesa(L, 5 + 4 + i * 6, fase, porte, 1 if i % 2 else -1, R)
-    L.contorno(PO)
-    for y in range(30, 48):                                          # el contorno no pisa las macetas
-        for x in range(48): L.p(x, y, (0, 0, 0, 0))
+    for cx, yb in MACETAS_MESA:
+        L.pega(planta_mesa(cx, yb, fase, porte, R), 0, 0)
     return L
 
 # ---------------------------------------------------------------------------------------------------------- salida
@@ -606,7 +673,7 @@ for n, f in (('floorC', floorC), ('iwT_club', iwT_club), ('iwB_club', iwB_club),
     sale(n, f(), 'interior-locales')
 sale('baile', baile(), 'interior-baile')
 for n, f in (('vitrina', vitrina), ('tarros', tarros), ('pizarra', pizarra), ('cartelC', cartelC), ('tacos', tacos), ('mesita', mesita),
-             ('barraD', barraD), ('neon', neon), ('mesaV', mesaV), ('cordon', cordon), ('cordonF', lambda: cordon(True))):
+             ('barraD', barraD), ('neon', neon), ('mesaV', mesaV), ('cordon', cordon), ('cordonF', lambda: cordon(True)), ('fotoMaite', fotoMaite)):
     sale(n, f(), 'locales-16')
 for n, f in (('estanteN', estanteN), ('secadero', secadero), ('altavoz', altavoz)):
     sale(n, f(), 'locales-alto')

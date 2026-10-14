@@ -33,6 +33,7 @@ function curroDia(){
   if(fin.length)C.vend=C.vend.filter(v=>!fin.includes(v));
   if(vende)queue('historia',checkStory);   // 1.22: lo vendido cuenta para la historia
   plantillaDia();   // la plantilla (1.19, 11f-plantilla)
+  asoDia();   // la asociación (1.32, 11j-locales)
 }
 // regar, tratar las plagas con tu insecticida y rellenar garrafas y depósitos (Begoña y el gerente de la plantilla)
 function cuidarPlantas(){
@@ -64,9 +65,10 @@ async function contratarVendedor(f){
   await say(`${f.n}: «Hecho. Cada día te dejo lo vendido en el buzón».`);return false;
 }
 // MÓVIL → GENTE: a quién conoces y cuánto se fía de ti
-const GENTE={kiko:'Kiko',julen:'Julen',josune:'Josune',begona:'Begoña',patxi:'Patxi',txaro:'Txaro',inaki:'Iñaki',ane:'Ane',nerea:'Nerea',bixente:'Bixente',andoni:'Andoni',baltasar:'Don Baltasar',molina:'Sgto. Molina',darko:'Darko',gaua:'GAUA'};
+const GENTE={kiko:'Kiko',julen:'Julen',josune:'Josune',begona:'Begoña',patxi:'Patxi',txaro:'Txaro',inaki:'Iñaki',ane:'Ane',nerea:'Nerea',bixente:'Bixente',andoni:'Andoni',baltasar:'Don Baltasar',molina:'Sgto. Molina',darko:'Darko',gaua:'GAUA',delroy:'Delroy'};
 const QUE_DA={kiko:`Con ${REL.amigo}: un 5 % menos en el growshop. Cada compra suma.`,inaki:`Con ${REL.amigo}: un 5 % más al por mayor. Cada venta suma.`,begona:`Con ${REL.amigo} (desde el cap. ${CURRO.jard.ch}): te cuida las plantas por ${CURRO.jard.sueldo} € al día.`,txaro:'Sus semillas, por sus favores.',julen:'El hijo de Kiko: te ayuda con la primera cosecha. Después, consejos en el growshop.',
-  gaua:'La discoteca del Ensanche: las rondas, el baile y el reservado suman. En el reservado, la RRPP presenta clientes VIP.'};
+  gaua:'La discoteca del Ensanche: las rondas, el baile y el reservado suman. En el reservado, la RRPP presenta clientes VIP.',
+  delroy:'El compañero de la tía Maite, en la asociación. Su voto cuenta en la asamblea.'};
 async function gente(){
   const rows=[];
   for(const [id,n] of Object.entries(GENTE))if(S.rel[id]!=null)rows.push({label:n,right:`${rel(id)} · ${id==='begona'&&S.curro.jard?'jardinera':relNivel(id)}`,desc:QUE_DA[id]||'Hablar cada día suma confianza.'});
@@ -97,9 +99,11 @@ async function talkBegona(){
 // Clubs cannábicos (CLUBS): uno en Puerto Viejo y otro en Valdehierro (cap. 3) y dos en Ibarbide (cap. 4). Con el carné (la cuota, una
 // vez): vender un lote al día (de 50 a 200 g, entre lo de Iñaki y la calle, calor +1), comprar 10 g de la variedad del día (entra en
 // la Genoteca) y encargos de semillas (10 de una variedad, en 7 días; las de receta pagan más). Un encargo a la vez.
-// 1.30: se entra (el local, 'club-' + k, en 11j-locales); x, y: delante de la puerta, a la que se sale (y en x + 1, si es ancha)
+// 1.30: se entra (el local, 'club-' + k, en 11j-locales); x, y: delante de la puerta, a la que se sale (y en x + 1, si es ancha).
+// 1.32: y la Asociación Cannábica Ribera Verde, en el barrio alto (rv), la que presidió la tía Maite (ASO, 11j-locales)
 const CLUBS={puerto:{n:'CLUB ITSASO',map:'puerto',x:9,y:8,ancha:1,ch:3,cuota:30,sid:['limon','cheese']},valde:{n:'CLUB LA FUNDICIÓN',map:'valdehierro',x:32,y:8,ancha:1,ch:3,cuota:30,sid:['txoko','mango']},
-  ibar:{n:'CLUB KALEA',map:'ibarbide',x:9,y:18,ch:4,cuota:50,sid:['kali','chemdawg']},ens:{n:'CLUB ENSANCHE',map:'ensanche',x:12,y:9,ch:4,cuota:50,sid:['niebla','calorange']}};
+  ibar:{n:'CLUB KALEA',map:'ibarbide',x:9,y:18,ch:4,cuota:50,sid:['kali','chemdawg']},ens:{n:'CLUB ENSANCHE',map:'ensanche',x:12,y:9,ch:4,cuota:50,sid:['niebla','calorange']},
+  rv:{n:'ASOCIACIÓN RIBERA VERDE',map:'alto',x:36,y:19,ch:3,cuota:30,sid:['haze','nl']}};
 const CLUB={g:[50,100,200],compra:10,compraF:1.2,calor:1,enc:{n:10,dias:7,f:1.2,receta:80}};
 const precioClub=thc=>3+thc*.15;
 // el encargado de cada club, desde su capítulo; 1.30: dentro, detrás de la vitrina del dispensario
@@ -107,7 +111,7 @@ Object.keys(CLUBS).forEach((k,i)=>{const C=CLUBS[k];NPCDEF.push({id:'club_'+k,ma
 // el carné (la cuota, una vez); 1.30: también en la puerta, la primera vez que entras (entraLocal, 11j-locales). true si eres socio
 async function carneClub(k){
   const C=CLUBS[k],N=C.n;
-  if(await ask(`${C.n}, asociación de consumidores. Dentro no se vende nada: lo tuyo entra por la puerta de atrás. La cuota son ${eur(C.cuota)}. ¿Te haces socio?`,['Hacerme socio','No'],N)!==0)return false;
+  if(await ask(`${C.n}${k==='rv'?'':', asociación de consumidores'}. Dentro no se vende nada: lo tuyo entra por la puerta de atrás. La cuota son ${eur(C.cuota)}. ¿Te haces socio?`,['Hacerme socio','No'],N)!==0)return false;
   if(S.money<C.cuota){sfx('bad');await say('Sin la cuota no hay carné.',N);return false;}
   S.money-=C.cuota;S.clubs[k]=true;S.rep+=1;confia(k,2);sfx('coin');await got('el carné de '+C.n);return true;
 }

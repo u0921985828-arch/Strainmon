@@ -120,7 +120,9 @@ function buildMaps(){
   [[2,6],[2,10],[2,14],[20,7],[20,12]].forEach(([x,y])=>ob(a,x,y,'bush'));ob(a,10,18,'sign');
   building(a,'comisaria',24,13,6,6,26,{to:'comisaria',x:4,y:6,dir:'up'},{ancha:1,dx:8});   // de piedra (1.10)
   rect(a,23,19,30,19,(x,y)=>gr(a,x,y,'walk'));ob(a,23,19,'sign');
-  rect(a,31,14,37,18,(x,y)=>gr(a,x,y,'flowers'));rect(a,31,12,37,12,(x,y)=>ob(a,x,y,'fence'));[[32,15],[35,17],[36,14]].forEach(([x,y])=>ob(a,x,y,'bush'));
+  // 1.32: la Asociación Cannábica Ribera Verde (CLUBS.rv), la que presidió la tía Maite, en la casa alta de almagre, entre parterres
+  rect(a,31,14,37,18,(x,y)=>gr(a,x,y,'flowers'));rect(a,31,19,37,19,(x,y)=>gr(a,x,y,'walk'));
+  building(a,'casco3',32,12,5,7,36,{to:'club-rv',x:5,y:6,dir:'up',gate:'club:rv'},{dx:-8,fachada:'asociacion',puerta:'asociacion'});
   [[24,4],[28,3],[33,4],[37,6],[26,8],[31,7],[35,9],[29,10]].forEach(([x,y])=>ob(a,x,y,'tree'));
   [[25,6],[30,5],[34,7],[27,10],[32,9]].forEach(([x,y])=>gr(a,x,y,'flowers'));ob(a,22,7,'sign');ob(a,30,8,'bench');
   [6,17,32].forEach(x=>ob(a,x,20,'lamp'));

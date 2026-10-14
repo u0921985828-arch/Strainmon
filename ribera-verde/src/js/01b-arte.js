@@ -198,7 +198,7 @@ function arteOrilla(m,k,tx,ty,sx,sy){
 // objetos: los de 1 casilla en el suelo; los altos van a la lista ordenada por Y (tapan al jugador si está detrás). Los de la
 // pared (fila de abajo de la pared, 2 m a 16 px/m), subidos a su altura (1.10, ALZA px): ventanas y cuadros con el alféizar a
 // 0,9 m, las baldas de las plantas a 1 m y la de las botellas a 1,05 m (antes, todos a ras de suelo)
-const ALZA={iwin:-13,poster:-13,shelfW:-16,bottles:-13,cuadro:-13,cartel:-13,tarros:-16,pizarra:-13,cartelC:-13,tacos:-13,neon:-13};   // 1.30: los de los locales
+const ALZA={iwin:-13,poster:-13,shelfW:-16,bottles:-13,cuadro:-13,cartel:-13,tarros:-16,pizarra:-13,cartelC:-13,tacos:-13,neon:-13,fotoMaite:-13};   // 1.30: los de los locales; 1.32: la foto de la tía
 // los muebles que dejan sombra en el suelo (1.10 P5): como la de los personajes, 1 px a cada lado del dibujo en sus 2 últimas filas y
 // la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo. Van a «sombras» y se pintan con todo el suelo ya puesto
 const SOMBRA_OBJ=new Set(['fridge','crate','table','btable','stool','plantDeco','lab','lab2','pc','display','counter','barcounter','jukebox','bench','bedB','vitrina','mesita','barraD','mesaV','estanteN','secadero','altavoz']);

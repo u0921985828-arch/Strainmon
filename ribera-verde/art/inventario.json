@@ -1,5 +1,5 @@
 {
-  "generado": "2026-10-13",
+  "generado": "2026-10-14",
   "tiles_suelo": [
     "alf0a",
     "alf0a-1",
@@ -58,6 +58,7 @@
     "door_bloque",
     "door_bloque2",
     "door_casco",
+    "door_casco3",
     "door_caserio",
     "door_comisaria",
     "door_fabrica",
@@ -227,6 +228,7 @@
     "escritorio",
     "estanteN",
     "fence",
+    "fotoMaite",
     "fountain",
     "fridge",
     "gpc",
@@ -277,6 +279,7 @@
     "player",
     "kiko",
     "julen",
+    "delroy",
     "josune",
     "baltasar",
     "tono",
@@ -332,6 +335,7 @@
     "player",
     "kiko",
     "julen",
+    "delroy",
     "josune",
     "baltasar",
     "tono",
@@ -574,6 +578,12 @@
       "deambula": false
     },
     {
+      "id": "club_rv",
+      "look": "portero",
+      "mapa": "club-rv",
+      "deambula": false
+    },
+    {
       "id": "arrieta",
       "look": "arrieta",
       "mapa": "valdehierro",
@@ -631,6 +641,18 @@
       "id": "billarista",
       "look": "billarista2",
       "mapa": "club-ens",
+      "deambula": false
+    },
+    {
+      "id": "socio",
+      "look": "socio",
+      "mapa": "club-rv",
+      "deambula": false
+    },
+    {
+      "id": "billarista",
+      "look": "billarista",
+      "mapa": "club-rv",
       "deambula": false
     },
     {
@@ -698,6 +720,12 @@
       "look": "baila3",
       "mapa": "disco",
       "deambula": true
+    },
+    {
+      "id": "delroy",
+      "look": "delroy",
+      "mapa": "club-rv",
+      "deambula": false
     }
   ],
   "plantas": {

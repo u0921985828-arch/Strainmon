@@ -71,14 +71,14 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  9  M..+++++++++++++++++............*..T...M
 10  M.$+++++++++++++++++.......*.T.........M
 11  M..++++++++O++++++++...................M
-12  M..+++++++++++++++++b..........fffffff.M
-13  M..+++++++++++++++++....^^^^^^.........M
-14  M.b++++n+++++++n++++....^^^^^^.*****b*.M
-15  M..+++++++++++++++++....██████.*b*****.M
-16  M..+++++++++++++++++....██████.*******.M
-17  M..L+++++++++++++++L....██████.****b**.M
-18  M.........S--...........██DD██.*******.M
-19  M..........--..........S-------........M
+12  M..+++++++++++++++++b...........^^^^^..M
+13  M..+++++++++++++++++....^^^^^^..^^^^^..M
+14  M.b++++n+++++++n++++....^^^^^^.*█████*.M
+15  M..+++++++++++++++++....██████.*█████*.M
+16  M..+++++++++++++++++....██████.*█████*.M
+17  M..L+++++++++++++++L....██████.*█████*.M
+18  M.........S--...........██DD██.*████D*.M
+19  M..........--..........S--------------.M
 20  M-----L----------L--------------L------M
 21  M======================================M
 22  M======================================M
@@ -95,6 +95,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 - puerta (12,29) → town (12,1)
 - puerta (26,18) → comisaria (4,6)
 - puerta (27,18) → comisaria (5,6)
+- puerta (36,18) → club-rv (5,6)
 
 ## Astilleros (exterior, al este del muelle) — 40 × 30
 
@@ -600,6 +601,24 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 - salida (5,7) pulsando abajo → ensanche (12,9)
 - salida (6,7) pulsando abajo → ensanche (12,9)
 
+## undefined
+
+```
+    0         1 
+    012345678901
+ 0  ████████████
+ 1  svs█v██?██v█
+ 2  .@.p.oo.@..J
+ 3  CCC..tt@....
+ 4  .....oo.XX@.
+ 5  ............
+ 6  p..........p
+ 7  .....mm.....
+```
+
+- salida (5,7) pulsando abajo → alto (36,19)
+- salida (6,7) pulsando abajo → alto (36,19)
+
 ## La nave de Valdehierro (cuatro mesas de cultivo, secadero y escritorio) — 14 × 8
 
 ```
@@ -673,6 +692,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 | club_valde | club-valde | (1,2) | no | `S.ch>=C.ch` |
 | club_ibar | club-ibar | (1,2) | no | `S.ch>=C.ch` |
 | club_ens | club-ens | (1,2) | no | `S.ch>=C.ch` |
+| club_rv | club-rv | (1,2) | no | `S.ch>=C.ch` |
 | arrieta | valdehierro | (17,7) | no | siempre |
 | txomin | callejon | (17,8) | no | siempre |
 | socio | club-puerto | (7,3) | no | siempre |
@@ -683,6 +703,8 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 | billarista | club-ibar | (10,4) | no | siempre |
 | socio | club-ens | (7,3) | no | siempre |
 | billarista | club-ens | (10,4) | no | siempre |
+| socio | club-rv | (7,3) | no | siempre |
+| billarista | club-rv | (10,4) | no | siempre |
 | nv0 | nave | (1,5) | no | `!!(S.nave&&naveroDe(i))` |
 | nv1 | nave | (4,5) | no | `!!(S.nave&&naveroDe(i))` |
 | nv2 | nave | (8,5) | no | `!!(S.nave&&naveroDe(i))` |
@@ -694,6 +716,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 | baila1 | disco | (5,5) | radio 1 | siempre |
 | baila2 | disco | (8,5) | radio 1 | siempre |
 | baila3 | disco | (7,4) | radio 1 | siempre |
+| delroy | club-rv | (8,2) | no | `delroyAqui()` |
 
 Los **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acera, plaza y tierra: en el barrio, 4 + reputación/15 (+1 desde el capítulo 4, máximo 10); en los astilleros, 2 (3 desde el capítulo 4), estudiantes y currelas, que pagan el gramo un 20 % más; en el barrio alto, desde el capítulo 3, 2 (3 desde el 4), pijos y turistas; en Puerto Viejo, 2 (3 desde el 4), turistas, currelas y estudiantes; en Valdehierro, 2 (3 desde el 4), estudiantes y currelas; y en los pueblos, 1: un currela en Mendialde y un currela o un turista en Errotabarri; en Ibarbide, desde el capítulo 4, 3 en el Casco Viejo (turistas, pijos y estudiantes) y 3 en el Ensanche (pijos, currelas y estudiantes), 4 desde el 5.
 
