@@ -218,6 +218,9 @@ func dif(ruta: String, a, b, out: Array) -> void:
 	elif not ((a == null and b == null) or (typeof(a) == typeof(b) and a == b)):
 		out.append("%s: godot %s ≠ html %s" % [ruta, jj(a).left(160), jj(b).left(160)])
 
+# lo que solo tiene Godot (desde la 1.37 el HTML está congelado): la fila del arcón congelador de la tienda online (1.39)
+const NUEVO_TIENDA := " | Arcón congelador"
+
 func compara(i: int, log: Array) -> void:
 	if i >= O.pasos.size():
 		difs.append("paso %d: no está en el oráculo" % i)
@@ -231,7 +234,7 @@ func compara(i: int, log: Array) -> void:
 	# la transcripción, línea a línea (la primera diferencia y el resto en una)
 	var ol: Array = o.log
 	for k in maxi(log.size(), ol.size()):
-		var a = log[k] if k < log.size() else "(nada)"
+		var a = (log[k] if k < log.size() else "(nada)").replace(NUEVO_TIENDA, "")
 		var b = ol[k] if k < ol.size() else "(nada)"
 		if a != b:
 			out.append("log[%d]:\n      godot %s\n      html  %s" % [k, a, b])

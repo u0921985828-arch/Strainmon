@@ -1674,7 +1674,7 @@ func mochila() -> void:
 				"desc": "%s, detrás del diploma. Caben %s y %s.\nLo que está dentro no lo llevas encima." % [CJ.n, Datos.eur(CJ.money), _kg(int(CJ.g))]})
 		if nevera_r() >= .1:
 			rows.append({"label": "Nevera", "right": Datos.coma(Datos.jsround(nevera_r() * 10) / 10.0) + " g", "ic": icono("cogollo"),
-				"desc": "Los extractos, en frío, en casa (caben %s g). Un control en la calle no la ve; una redada se la lleva." % n(D.NEVERA.g)})
+				"desc": "Los extractos, en frío, en casa (caben %s g). Un control en la calle no la ve; una redada se la lleva." % n(nevera_cap())})
 		rows.append({"label": "Vida", "right": "%s/%s" % [n(S.hp), n(S.hpMax)], "desc": "Se recupera durmiendo, comiendo o con el tiempo."})
 		if int(S.pelea.xp) > 0:
 			rows.append({"label": "Pelea", "right": "nivel %d" % nivel_pelea(), "desc": ficha_pelea()})
@@ -5213,11 +5213,11 @@ func desc_almacen(A: Dictionary) -> String:
 		return "%s: %d g · %s %% THC%s.\nA: sacarlo · B: cerrar." % [lot_nombre(it.k), int(floor(it.b.g)), Datos.pct(it.b.thc), cura_corto(it.b)]
 	var r := nevera_r()
 	if it == null or it.k == "+":
-		return "GUARDAR: llevas %s g de extractos y en la nevera caben %s g más.%s\nA: guardar · B: cerrar." % [Datos.coma(Datos.jsround(total_rosin() * 10) / 10.0), Datos.coma(maxf(0, floor((D.NEVERA.g - r) * 10 + 1e-9) / 10.0)),
+		return "GUARDAR: llevas %s g de extractos y en la nevera caben %s g más.%s\nA: guardar · B: cerrar." % [Datos.coma(Datos.jsround(total_rosin() * 10) / 10.0), Datos.coma(maxf(0, floor((nevera_cap() - r) * 10 + 1e-9) / 10.0)),
 			(" En los tarros, en frío, se curan en %d días." % int(D.CURADO.dias)) if S.items.get("tarros") else " Con tarros, se curarían en frío."]
 	var cu := float(it.b.get("cu", 0))
 	return "%s: %s g · %s %% THC · %s. Nevera: %s g de %d (%s).\nA: sacarlo · B: cerrar." % [extr_nombre(it.k), Datos.coma(it.b.g), Datos.pct(it.b.thc), "curado" if cu >= 1 else ("curándose" if cu else "sin curar"),
-		Datos.coma(Datos.jsround(r * 10) / 10.0), int(D.NEVERA.g), _pct_txt(r / D.NEVERA.g)]
+		Datos.coma(Datos.jsround(r * 10) / 10.0), int(nevera_cap()), _pct_txt(r / nevera_cap())]
 
 func _dlg_fijo(t: String, nombre: String) -> void:
 	if oraculo:
@@ -5325,7 +5325,7 @@ func panel_almacen(o: Array, A: Dictionary, px: int, py: int) -> void:
 	if it.k == "+":
 		o.append(["@", "alm-mas-g", px + 12, py + 8])
 		_barra_alm(o, px, py, 0, "g", peso_encima() / cap_mochila(), "#e0a040")
-		_barra_alm(o, px, py, 1, "cu", caja_g() / C.g if caja else nevera_r() / D.NEVERA.g, "#58b0e0")
+		_barra_alm(o, px, py, 1, "cu", caja_g() / C.g if caja else nevera_r() / nevera_cap(), "#58b0e0")
 		return
 	if not it.r:
 		_tarro(o, px + 12, py + 8, 18, 25, _color_lote(it.k), it.b.g / (C.g / D.ALM.tarros), float(it.b.get("cu", 0)) >= 1, "alm-tarro-s" if it.k.contains("*") else "alm-tarro", _dentro_lote(it.k, it.b), 2)
@@ -5333,7 +5333,7 @@ func panel_almacen(o: Array, A: Dictionary, px: int, py: int) -> void:
 		_barra_alm(o, px, py, 1, "cu", float(it.b.get("cu", 0)), "#58c070")
 		_barra_alm(o, px, py, 2, "mc", float(it.b.get("mc", 0)), "#a0c8f0")
 		return
-	var cap: float = D.NEVERA.g / D.ALM.piso / 3.0
+	var cap: float = float(D.NEVERA.bote)
 	_tarro(o, px + 18, py + 20, 12, 12, D.COLOR_EXTR[tipo_extr(it.k)], it.b.g / cap, float(it.b.get("cu", 0)) >= 1, "alm-bote", _dentro_lote(it.k, it.b, true), 2)
 	_barra_alm(o, px, py, 0, "thc", it.b.thc / 90.0, "#e8d070")
 	_barra_alm(o, px, py, 1, "cu", float(it.b.get("cu", 0)), "#58c070")
@@ -5390,7 +5390,7 @@ func rects_almacen(A: Dictionary) -> Array:
 		return o
 	var x0: int = (SW - 216) >> 1
 	var y0 := 4
-	var p := minf(1.0, nevera_r() / D.NEVERA.g)
+	var p := minf(1.0, nevera_r() / nevera_cap())
 	var cs = it[A.i] if A.i < it.size() else null
 	var P := int(D.ALM.piso)
 	o.append_array([["@", "alm-nevera", x0, y0], ["@", "alm-guardar", x0 + 6, y0 + 5]])
@@ -5406,7 +5406,7 @@ func rects_almacen(A: Dictionary) -> Array:
 		for q in vis.size():
 			var Jt: Dictionary = vis[q]
 			var x: int = x0 + 15 + q * 15
-			_tarro(o, x, y + 1, 12, 12, D.COLOR_EXTR[e], Jt.b.g / (D.NEVERA.g / D.ALM.piso / 3.0), float(Jt.b.get("cu", 0)) >= 1, "alm-bote", _dentro_lote(Jt.k, Jt.b, true), 1, "#c4d6dc")
+			_tarro(o, x, y + 1, 12, 12, D.COLOR_EXTR[e], Jt.b.g / float(D.NEVERA.bote), float(Jt.b.get("cu", 0)) >= 1, "alm-bote", _dentro_lote(Jt.k, Jt.b, true), 1, "#c4d6dc")
 			if cs != null and cs.s == s and Jt.j == cs.j:
 				_marco(o, x - 2, y - 1, 16, 16)
 		if off > 0:
@@ -5421,7 +5421,7 @@ func rects_almacen(A: Dictionary) -> Array:
 # GUARDAR (1.36, lo pidió el usuario): el primer tarro de la caja (los cogollos que llevas) y la fila de arriba de la nevera (los
 # extractos): todo lo que quepa o un lote
 func _hueco_alm(caja: bool) -> float:
-	return floor(D.CAJA[int(S.caja.nivel)].g - caja_g()) if caja else floor((D.NEVERA.g - nevera_r()) * 10 + 1e-9) / 10.0
+	return floor(D.CAJA[int(S.caja.nivel)].g - caja_g()) if caja else floor((nevera_cap() - nevera_r()) * 10 + 1e-9) / 10.0
 
 func guardar_almacen(t: String):
 	var caja := t == "caja"

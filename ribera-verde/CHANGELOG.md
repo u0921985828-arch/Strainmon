@@ -1,5 +1,18 @@
 # Cambios
 
+## 1.39.0 · 14 de octubre de 2026
+
+La nevera, a tamaño de nevera (lo pidió el usuario: «cómo se van a poder meter solo 200 g en una nevera»; eligió la opción B). Solo Godot, 0.33.0.
+
+- **La nevera de serie, 1 kg** (`NEVERA.g` en `datos.json`; antes, 200 g).
+- **Arcón congelador en la tienda online:** 320 €, con tarjeta. Llega al día siguiente y lo dejan enchufado al lado de la nevera: caben 5 kg más (6 kg en frío).
+  - Como la caja empotrada, no es un mueble aparte: se abre desde la nevera, que lo cuenta todo (`nevera_cap`, `S.nevera.arcon`: el día de llegada en negativo mientras está pedido, 1 en casa).
+  - La redada vacía la nevera, pero el arcón se queda.
+- **Botes de 40 g** (`NEVERA.bote`): lo que se ve dentro de cada bote ya no depende del tamaño de la nevera.
+- **Pruebas:** `tests/nevera.gd`, sin el HTML (23 comprobaciones: 1 kg de serie, la fila de la tienda, sin dinero no se pide, cobro, llegada al día siguiente, 6 kg y el aviso, en casa, redada y partida guardada).
+  - La historia compara con el HTML congelado sin la fila nueva de la tienda (`NUEVO_TIENDA`).
+  - Las referencias de `nevera-dentro` y `nevera-guardar` pasan a ser las de Godot, con la nevera de 1 kg y los botes de 40 g.
+
 ## 1.38.0 · 14 de octubre de 2026
 
 Cada extracción se ve mientras se hace (lo pidió el usuario: «que sea visual»). Solo Godot, 0.32.0.

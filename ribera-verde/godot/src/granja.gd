@@ -1027,10 +1027,20 @@ func tienda_online() -> void:
 			var en: bool = d != null and float(d) <= S.day
 			items.append({"label": v.n + (" · tuyo" if en else " · pedido" if d else ""), "right": Datos.eur(v.p), "disabled": d != null and float(d) > 0,
 				"desc": v.d + ("" if en else "\nLlega mañana: te lo dejan en el portal.")})
+		var AR: Dictionary = D.NEVERA.arcon   # el arcón congelador (1.39): 5 kg más de extractos, en frío
+		var ar = S.nevera.get("arcon") if S.get("nevera") != null else null
+		items.append({"label": AR.n + (" · en casa" if ar == 1 else " · pedido" if ar != null else ""), "right": Datos.eur(AR.p), "disabled": ar != null,
+			"desc": AR.d + ("\nLa nevera de serie: %s." % (Datos.coma(D.NEVERA.g / 1000.0) + " kg") if ar == null else "")})
 		items.append({"label": "Reformas: suelo y paredes", "desc": "El suelo y las paredes del piso: el instalador o el pintor vienen al día siguiente."})   # 1.27
 		items.append({"label": "Salir", "desc": "Con tarjeta, de la cuenta del banco."})
 		i = await menu(items, {"cls": "full", "title": "TIENDA ONLINE", "title2": "Muebles y transporte · en la cuenta " + Datos.eur(S.banco), "desc": true, "initial": i})
 		if i == ks.size() + vs.size():
+			if ar == null and await tarjeta(AR.p, "Tienda online · " + AR.n):
+				nevera().arcon = -(S.day + 1)   # pedido: el día en que llega, en negativo; 1, en casa
+				sfx("coin")
+				toast("Pedido: " + AR.n + " · llega mañana", 1400)
+			continue
+		if i == ks.size() + vs.size() + 1:
 			await reformas()
 			continue
 		if i < 0 or i >= ks.size() + vs.size():
@@ -1048,6 +1058,11 @@ func tienda_online() -> void:
 		toast("Pedido: " + m.n + " · llega mañana", 1400)
 
 func llega_mueble() -> void:
+	if S.get("nevera") != null and S.nevera.get("arcon") != null and S.nevera.arcon != 1 and -int(S.nevera.arcon) <= S.day:   # el arcón (1.39)
+		S.nevera.arcon = 1
+		queue("arcon", func():
+			sfx("get")
+			await say("Llega el mensajero con el arcón congelador: te lo dejan enchufado al lado de la nevera. En frío caben ahora %s." % (Datos.coma(nevera_cap() / 1000.0) + " kg")))
 	var ob := []   # las reformas (1.27)
 	if S.get("obra") is Dictionary:
 		for k in S.obra.keys():

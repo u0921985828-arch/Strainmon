@@ -314,6 +314,10 @@ func nevera_r() -> float:
 			t += S.nevera.rosin[k].g
 	return t
 
+# lo que cabe en frío (1.39, lo pidió el usuario): la nevera de serie, 1 kg; con el arcón congelador de la tienda online, 5 kg más
+func nevera_cap() -> float:
+	return float(D.NEVERA.g) + (float(D.NEVERA.arcon.g) if S.get("nevera") != null and S.nevera.get("arcon") == 1 else 0.0)
+
 func extr_nombre(k: String, mn := false) -> String:
 	return (D.EXTR[tipo_extr(k)].n.to_lower() if mn else D.EXTR[tipo_extr(k)].n) + " de " + lot_nombre(base_extr(k))
 
