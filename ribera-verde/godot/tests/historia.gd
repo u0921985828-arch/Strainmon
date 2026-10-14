@@ -29,6 +29,7 @@ var pasos: Array = []   # [{name, ok, detail}]
 var O: Dictionary
 
 func _initialize() -> void:
+	Datos.CAL = false   # 1.42: contra el HTML congelado, «día N» y un mes por día
 	_corre.call_deferred()
 
 func arg(k: String, d := "") -> String:
@@ -225,6 +226,7 @@ func dif(ruta: String, a, b, out: Array) -> void:
 
 # lo que solo tiene Godot (desde la 1.37 el HTML está congelado): la fila del arcón congelador de la tienda online (1.39)
 const NUEVO_TIENDA := " | Arcón congelador"
+const NUEVO_MOVIL := " | Calendario | Mapa"   # 1.42: en el móvil
 # y el carro de esquejes (1.40): se ve por dentro, sin el texto ni el menú de antes (el taco se elige con gancho_carro)
 const CARRO_FUERA := ["El carro de esquejes: ", "  [menú] Pinchar esquejes | "]
 # y la nave por ciclos (1.41): del paso de la plantilla, del menú de la mesa 1 al secadero (lo comprueba tests/nave.gd), sin las R de
@@ -236,6 +238,19 @@ const NAVE_R := {"La plantilla (1.19)": ["mesa", "crece", "cd", "abono", "b", "r
 # el aviso al plantar una mesa (1.41: el ciclo y los días hasta la cosecha), como el de antes
 var PLANTA_NUEVA := RegEx.create_from_string(": enraízan, crecen a 18/6 y florecen a 12/12\\. Se cosecha entera en unos \\d+ días y vuelve a empezar\\.$")
 const SODIO_ANTES := "Dos campanas de 600 W con su balastro: más gramos, pero calientan el doble."
+
+# las filas nuevas del móvil (1.42), fuera también de lo que guarda R
+func sin_movil(x):
+	if x is String:
+		return x.replace(NUEVO_MOVIL, "")
+	if x is Array:
+		return x.map(func(v): return sin_movil(v))
+	if x is Dictionary:
+		var r := {}
+		for k in x:
+			r[k] = sin_movil(x[k])
+		return r
+	return x
 
 func compara(i: int, log: Array) -> void:
 	if i >= O.pasos.size():
@@ -255,7 +270,7 @@ func compara(i: int, log: Array) -> void:
 		var b: int = ol.find(ol.filter(func(l): return l.begins_with(NAVE_HASTA))[0])
 		ol = ol.slice(0, a) + ol.slice(b + 1)
 	for k in maxi(log.size(), ol.size()):
-		var a = PLANTA_NUEVA.sub((log[k] if k < log.size() else "(nada)").replace(NUEVO_TIENDA, ""), ". A los %d días empieza a dar." % int(D.NAVE.crece))
+		var a = PLANTA_NUEVA.sub((log[k] if k < log.size() else "(nada)").replace(NUEVO_TIENDA, "").replace(NUEVO_MOVIL, ""), ". A los %d días empieza a dar." % int(D.NAVE.crece))
 		var b = ol[k] if k < ol.size() else "(nada)"
 		if a != b:
 			out.append("log[%d]:\n      godot %s\n      html  %s" % [k, a, b])
@@ -272,7 +287,7 @@ func compara(i: int, log: Array) -> void:
 			for x in NAVE_R[k]:
 				oR.erase(x)
 				R.erase(x)
-	dif("R", norm(R), oR, out)
+	dif("R", sin_movil(norm(R)), oR, out)
 	dif("I", norm(I), o.get("I"), out)
 	dif("TO", norm(TO), o.get("TO"), out)
 	var ents := []

@@ -1,5 +1,32 @@
 # Cambios
 
+## 1.42.0 · 14 de octubre de 2026
+
+El calendario de verdad, el mapa de la comarca y el juego en WordPress (lo pidió el usuario: «que empiece el juego el 20 de abril de 2026, y de ahí se van sumando días; 7 días son 1 semana; haz todos los días del mes y del año», «un mapa donde se vean todos los pueblos, no detalladamente pero modo croquis texturizado» y «convierte el juego en un plugin para WordPress como este, actualizado»). Solo Godot, 0.36.0.
+
+- **El calendario** (`datos.gd`: `CAL`, `CAL0`, `fecha`, `dia_de`, `fd`, `fd_corto`, `fd_hud`, `fd_larga`):
+  - El día 1 de la partida es el lunes 20 de abril de 2026. Cada día suma uno: semanas de lunes a domingo, meses con sus días (30, 31, 28 y 29 en los bisiestos) y años.
+  - El HUD, el menú START y el móvil dicen el día de la semana y la fecha («LUN 20 ABR · 08:00»).
+  - Los plazos, los recibos, los encargos, las primas, la asamblea, los esquejes, los logros y la banca dicen la fecha («antes de que acabe el 1 de mayo»). Si cae en otro año, lo dicen también.
+  - El mes del clima de la sala es el del calendario (`Cultivo.mes_de`).
+- **El calendario en el móvil** (MÓVIL → Calendario; `elegir_cal`, `marcas_cal` en `trama.gd`; `rects_cal`, `desc_cal`, `mueve_cal` en `croquis.gd`):
+  - Muestra la hoja del mes, de lunes a domingo, con hoy en amarillo, los días pasados apagados y los domingos en rojo.
+  - Marca los días señalados: el plazo de Don Baltasar en rojo, los recibos en azul, los encargos en verde y la asamblea en morado. Debajo salen con su texto.
+  - Con las flechas cambias de mes.
+- **El mapa de la comarca** (MÓVIL → Mapa; `elegir_mapa` en `trama.gd`; `croquis.gd`):
+  - Es un croquis en papel con su grano: el mar con olas, la costa, la ría de Ribera Verde con las grúas de los astilleros, los montes de Mendialde, bosques, los campos y el molino de Errotabarri, las chimeneas de Valdehierro, el muelle de Puerto Viejo y la cuadrícula del Ensanche de Ibarbide.
+  - Lleva las líneas de autobús a trazos desde Ribera Verde, con sus minutos. Los pueblos sin línea todavía salen en gris.
+  - Marca dónde estás con una chincheta.
+  - Con las flechas eliges un pueblo y te dice qué hay y cuánto cuesta el autobús.
+  - La fuente de letras de 3 × 5 y todo el dibujo son propios.
+- **Pruebas:**
+  - `tests/calendario.gd`, 35 comprobaciones: el 20-4-2026 lunes, semanas de 7 durante 800 días, el 1 de mayo, el año nuevo, el 29 de febrero de 2028, el mes del clima, los textos, el calendario y el mapa dentro de la pantalla, los pueblos cerrados en gris y los renders.
+  - Las pruebas contra el HTML congelado (historia, C1, capas y pantallas) ponen `Datos.CAL = false` y siguen como antes: «día N» y un mes por día.
+  - `historia.gd` quita las dos filas nuevas del móvil (`NUEVO_MOVIL`).
+- **WordPress:** el plugin `landrace-hunters` 1.3.0 (`wordpress/`, `tools/wordpress.js` → `descargas/landrace-hunters-1.3.0.zip`).
+  - Sirve la versión web del juego Godot de hoy (motor 4.3 sin hilos y el `index.pck` de esta versión, con la música).
+  - Sigue igual que el plugin 1.2.0: dirección propia a pantalla completa, el atajo `[landrace_hunters]`, instalable como app y el panel de ajustes.
+
 ## 1.41.0 · 14 de octubre de 2026
 
 La nave, por ciclos de cultivo, y la caja fuerte con los tarros que se llenarían de verdad (lo pidió el usuario: «el cultivo en la nave no funciona por ciclos; es muy importante que sea realista, también en el visor de la caja»). Solo Godot, 0.35.0.

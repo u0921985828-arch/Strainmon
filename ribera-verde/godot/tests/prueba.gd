@@ -15,6 +15,7 @@ var n_ok := 0
 var fallos := []
 
 func _initialize() -> void:
+	Datos.CAL = false   # 1.42: contra el HTML congelado, «día N» y un mes por día
 	_corre.call_deferred()
 
 func arg(k: String, d := "") -> String:

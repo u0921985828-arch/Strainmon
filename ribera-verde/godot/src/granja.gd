@@ -238,7 +238,7 @@ func plantar(i: int) -> void:
 		var v = feno_visto(e.f)
 		var dv := ("Fenotipo estrella: THC ×%s y cosecha ×%s." % [Datos.coma(e.f.t), Datos.coma(e.f.y)]) if v == "estrella" else ("Fenotipo flojo: rinde menos que la media." if v == "floja" else "Su fenotipo se sabrá cuando coseches a la madre o a un clon suyo.")
 		items.append({"label": "Esqueje " + s.n + etiq(e.f), "right": "bandeja" if eb[1] else "esqueje", "sw": s.c, "ic": ic_cog(e.sid),
-			"desc": "Clon enraizado: la misma planta que su madre, con su fenotipo.\n%s\nSe seca si no lo plantas antes del día %s." % [dv, n(e.dia + (D.CARRO.dias if eb[1] else D.ESQUEJE_DIAS) + 1)]})
+			"desc": "Clon enraizado: la misma planta que su madre, con su fenotipo.\n%s\nSe seca si no lo plantas antes del %s." % [dv, Datos.fd(e.dia + (D.CARRO.dias if eb[1] else D.ESQUEJE_DIAS) + 1, S.day)]})
 	items.append({"label": "Cancelar", "desc": ""})
 	var j: int = await menu(items, {"cls": "full", "title": "¿QUÉ PLANTAS?", "desc": true})
 	if j < 0 or j >= own.size() + esq.size():
@@ -282,7 +282,7 @@ func sacar_esqueje(i: int) -> void:
 		p.f = S.esquejes[-1].f
 	p.health = max(1, p.health - 5)
 	sfx("sel")
-	await say("Cortas una punta de la %s%s y la pones a enraizar.\nPlántala antes del día %s: es la misma planta." % [s.n, nom_planta(p.f), n(S.day + D.ESQUEJE_DIAS + 1)])
+	await say("Cortas una punta de la %s%s y la pones a enraizar.\nPlántala antes del %s: es la misma planta." % [s.n, nom_planta(p.f), Datos.fd(S.day + D.ESQUEJE_DIAS + 1, S.day)])
 	if carro_ya():
 		await say("O pínchala en el carro: allí aguanta %d días." % D.CARRO.dias)
 
@@ -1151,7 +1151,7 @@ func carro_action() -> void:
 		S.esquejes = S.esquejes.slice(m)
 		sfx("sel")
 		await say("En la tabla de corte, corte en bisel y hormona: %s." % (("pinchas %d esquejes" % m) if m > 1 else "pinchas 1 esqueje"))
-		await say("En las bandejas aguantan hasta el día %s: plántalos cuando haya hueco." % n(S.day + D.CARRO.dias))
+		await say("En las bandejas aguantan hasta el %s: plántalos cuando haya hueco." % Datos.fd(S.day + D.CARRO.dias, S.day))
 		var r: int = S.esquejes.size()
 		if r:
 			await say(("No caben %d: se quedan en el propagador." % r) if r > 1 else "No cabe 1: se queda en el propagador.")
@@ -1650,9 +1650,9 @@ const COMO := {"cuenta": "de la cuenta", "efectivo": "en efectivo", "mano": "en 
 func banca() -> void:
 	var it := []
 	for r in recibos():
-		it.append({"label": "Recibo · " + r[0], "right": Datos.eur(r[2]), "desc": "El día %s, %s." % [n(r[1]), COMO[r[3]]]})
+		it.append({"label": "Recibo · " + r[0], "right": Datos.eur(r[2]), "desc": "El %s, %s." % [Datos.fd(r[1], S.day), COMO[r[3]]]})
 	for m in S.mov:
-		it.append({"label": m.t, "right": ("−" if m.e < 0 else "+") + Datos.eur(absf(m.e)), "desc": "Día %s." % n(m.d)})
+		it.append({"label": m.t, "right": ("−" if m.e < 0 else "+") + Datos.eur(absf(m.e)), "desc": mayus(Datos.fd_larga(m.d)) + "."})
 	it.append({"label": "Salir", "desc": "Ingresos en efectivo: hasta %s al día sin preguntas (hoy, %s)." % [Datos.eur(D.CUENTA.ingreso), Datos.eur(ingresado())]})
 	await menu(it, {"cls": "full", "title": "BANCA", "title2": "Saldo " + Datos.eur(S.banco), "desc": true})
 
@@ -1660,7 +1660,7 @@ func banca() -> void:
 func cobra(o: Dictionary, e: float, quien: String, banco: bool, t: String) -> bool:
 	var N := "SMS · " + quien
 	if S.day == o.r - D.RECIBO.aviso:
-		var tx: String = ("El día %s se carga el recibo de %s: %s. Saldo: %s." % [n(o.r), t, Datos.eur(e), Datos.eur(S.banco)]) if banco else ("El día %s paso a cobrar: %s, en efectivo. Tenlo preparado." % [n(o.r), Datos.eur(e)])
+		var tx: String = ("El %s se carga el recibo de %s: %s. Saldo: %s." % [Datos.fd(o.r, S.day), t, Datos.eur(e), Datos.eur(S.banco)]) if banco else ("El %s paso a cobrar: %s, en efectivo. Tenlo preparado." % [Datos.fd(o.r, S.day), Datos.eur(e)])
 		queue("av" + t, func(): await talk(N, [tx]))
 	if S.day < o.r:
 		return true
@@ -1669,7 +1669,7 @@ func cobra(o: Dictionary, e: float, quien: String, banco: bool, t: String) -> bo
 		o.r += D.RECIBO.dias
 		return true
 	if S.day < o.r + (D.RECIBO.graciaB if banco else D.RECIBO.gracia):
-		var tx: String = ("Recibo de %s devuelto: %s. Si el día %s no hay saldo, se rescinde el contrato." % [t, Datos.eur(e), n(o.r + D.RECIBO.graciaB)]) if banco else "He pasado a cobrar y no había nada. Vuelvo mañana; como no esté, cambio la cerradura."
+		var tx: String = ("Recibo de %s devuelto: %s. Si el %s no hay saldo, se rescinde el contrato." % [t, Datos.eur(e), Datos.fd(o.r + D.RECIBO.graciaB, S.day)]) if banco else "He pasado a cobrar y no había nada. Vuelvo mañana; como no esté, cambio la cerradura."
 		queue("dv" + t, func(): await talk(N, [tx]))
 		return true
 	return false
@@ -1688,7 +1688,7 @@ func recibos_dia() -> void:
 			var tx: String = "Contrato de %s rescindido por impago. La fianza no se devuelve." % L.n
 			queue("loc" + k, func(): await talk("SMS · BANCO", [tx]))
 	if S.protect and S.protHasta - S.day == D.RECIBO.aviso:
-		var tx: String = "Lo nuestro se acaba el día %s. Si quieres seguir, ya sabes dónde está la comisaría." % n(S.protHasta)
+		var tx: String = "Lo nuestro se acaba el %s. Si quieres seguir, ya sabes dónde está la comisaría." % Datos.fd(S.protHasta, S.day)
 		queue("avMolina", func(): await talk("SMS · MOLINA", [tx]))
 
 # los locales (LOCALES): uno por pueblo, por lo pagado de la deuda; meter efectivo en la caja del negocio, que sale limpio mañana
@@ -1730,7 +1730,7 @@ func rotulo_local(k: String) -> void:
 	while true:
 		var hoy: float = metido(o)
 		var ops := ["Meter efectivo", "Dejar el local", "Nada"]
-		var oi: int = await ask("Hoy, %s de %s en caja · lavado en total, %s · próximo recibo, el día %s." % [Datos.eur(hoy), Datos.eur(L.tope), Datos.eur(o.tot), n(o.r)], ops, N)
+		var oi: int = await ask("Hoy, %s de %s en caja · lavado en total, %s · próximo recibo, el %s." % [Datos.eur(hoy), Datos.eur(L.tope), Datos.eur(o.tot), Datos.fd(o.r, S.day)], ops, N)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 		if op == "Meter efectivo":
 			var mx := int(floorf(minf(S.money, L.tope - hoy)))

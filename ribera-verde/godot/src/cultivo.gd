@@ -112,6 +112,8 @@ static func es_noche(S: Dictionary) -> bool:
 	return S.min >= 21 * 60 or S.min < 6 * 60
 
 static func mes_de(d: int) -> int:
+	if Datos.CAL:
+		return int(Datos.fecha(d).m) - 1
 	return (int(Datos.carga().MES0) + d - 1) % 12
 
 static func fuera(v: float, r: Array) -> float:

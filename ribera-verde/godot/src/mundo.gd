@@ -29,6 +29,9 @@ func _ready() -> void:
 	Datos.enteros(MAPS)
 
 # ---------- utilidades (00-nucleo) ----------
+static func mayus(t: String) -> String:
+	return t.substr(0, 1).to_upper() + t.substr(1)
+
 static func n(x) -> String:
 	return Datos.js_num(x)
 

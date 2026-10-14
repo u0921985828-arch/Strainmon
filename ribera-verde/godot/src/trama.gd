@@ -2,6 +2,8 @@
 # imperio, el menú START (Genoteca, mochila, cultivo) y los combates con ladrones y policía. Mismo guion, mismo orden de azar.
 extends "res://src/granja.gd"
 
+const Croquis = preload("res://src/croquis.gd")
+
 var cap_hasta := 0.0       # el rótulo del capítulo dura 2,8 s: el objetivo que se pida mientras tanto sale al acabar
 var endcard_on := false
 
@@ -508,7 +510,7 @@ func talk_nerea():
 		await say("De madrugada se subasta el pescado. Lo otro, cuando te conozca más gente.", N)
 		return
 	if S.get("lonja") and S.day < int(S.lonja) + int(L.dias):
-		await say("Los barcos de fuera vuelven el día %d. Tráelo entonces." % (int(S.lonja) + int(L.dias)), N)
+		await say("Los barcos de fuera vuelven el %s. Tráelo entonces." % Datos.fd(int(S.lonja) + int(L.dias), S.day), N)
 		return
 	var lots := bud_lots(100)
 	if lots.is_empty():
@@ -650,7 +652,7 @@ func talk_andoni():
 		await say("El molino muele los domingos. Si te interesan las semillas viejas, vuelve más adelante.", N)
 		return
 	if S.get("trueque") and S.day < int(S.trueque) + int(T.dias):
-		await say("Hasta el día %d no tengo más semillas para cambiar." % (int(S.trueque) + int(T.dias)), N)
+		await say("Hasta el %s no tengo más semillas para cambiar." % Datos.fd(int(S.trueque) + int(T.dias), S.day), N)
 		return
 	var k := landrace_trueque()
 	await say("Mi abuelo guardaba semillas en botes de cristal, junto a la harina. Tengo de %s." % D.STRAINS[k].n, N)
@@ -705,7 +707,7 @@ func talk_molina():
 		S.flags.molina1 = true
 		await talk(N, ["Así que eres tú quien vende en la plaza.", "Podría detenerte ahora mismo. O podemos entendernos.", "Por %s cada %d días, mis patrullas no pasan por tu calle. Y nada de registros en tu piso." % [Datos.eur(sob), cd]])
 	elif S.protect:
-		await say("Estás cubierto hasta el día %s. %s" % [n(S.protHasta), ("Te quedan %s días." % n(S.protHasta - S.day)) if S.protHasta > S.day else "Se acaba HOY."], N)
+		await say("Estás cubierto hasta el %s. %s" % [Datos.fd(S.protHasta, S.day), ("Te quedan %s días." % n(S.protHasta - S.day)) if S.protHasta > S.day else "Se acaba HOY."], N)
 	var c: int = await ask("¿Pagar ya los diez días siguientes?" if S.protect else "¿Aceptas el trato del sargento?", ["Pagar " + Datos.eur(sob), "No"], N)
 	if c == 0:
 		if S.money < sob:
@@ -715,7 +717,7 @@ func talk_molina():
 			S.protHasta = int(max(S.day, S.protHasta if S.protect else 0)) + cd
 			S.protect = true
 			sfx("coin")
-			await say("Bien. Mis agentes mirarán hacia otro lado hasta el día %s." % n(S.protHasta), N)
+			await say("Bien. Mis agentes mirarán hacia otro lado hasta el %s." % Datos.fd(S.protHasta, S.day), N)
 	elif not S.protect:
 		S.heat = min(100, S.heat + 10)
 		await say("Tú sabrás. Mis agentes van a estar muy atentos.", N)
@@ -775,7 +777,7 @@ func talk_baltasar():
 		var tarde: bool = S.flags.has("tono") and S.day - S.flags.tono > 2
 		await talk(N, ["Llegas tarde, {N}. Toño te dijo «hoy»." if tarde else "Siéntate, {N}. Vamos al grano.", "Tu tía Maite me debía %s. Las deudas no se mueren con la gente." % Datos.eur(D.DEUDA).replace(" €", " euros"),
 			"Me los vas a pagar a plazos. El primero, %s%s." % [Datos.eur(S.due), ", con los intereses de tu retraso" if S.due > D.PLAZOS["3"] else ""],
-			"Tienes hasta el día %s. Si no, Toño te hará una visita. Y Toño cobra intereses." % n(S.deadline)])
+			"Tienes hasta el %s. Si no, Toño te hará una visita. Y Toño cobra intereses." % Datos.fd(S.deadline, S.day)])
 		S.flags.metB = true
 		show_objective()
 		return
@@ -789,7 +791,7 @@ func talk_baltasar():
 		await say("Primero, la Copa. Darko te espera en la plaza.", N)
 		return
 	var left: int = S.deadline - S.day
-	await say("Me debes %s para el día %s. %s" % [Datos.eur(S.due), n(S.deadline), ("Te quedan %d días." % left) if left > 0 else "Es HOY."], N)
+	await say("Me debes %s para el %s. %s" % [Datos.eur(S.due), Datos.fd(S.deadline, S.day), ("Te quedan %d días." % left) if left > 0 else "Es HOY."], N)
 	if S.money < S.due:
 		await say("Vuelve cuando tengas el dinero.", N)
 		return
@@ -853,17 +855,17 @@ func objective_text() -> String:
 			var mv := int(D.META_VENTAS)
 			return "Gana %d € vendiendo (%d/%d)." % [mv, mini(mv, Datos.jsround(S.sales)), mv]
 		3:
-			return (("Ve al bar El Ancla antes de que acabe el día %s: Don Baltasar quiere %s." % [n(S.deadline), Datos.eur(S.due)]) if not S.flags.get("metB") else "Paga %s a Don Baltasar antes de que acabe el día %s." % [Datos.eur(S.due), n(S.deadline)]) + llevas()
+			return (("Ve al bar El Ancla antes de que acabe el %s: Don Baltasar quiere %s." % [Datos.fd(S.deadline, S.day), Datos.eur(S.due)]) if not S.flags.get("metB") else "Paga %s a Don Baltasar antes de que acabe el %s." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day)]) + llevas()
 		4:
 			return "Kiko quiere verte en el growshop." if not S.flags.get("lab") else "Saca en la mesa 2 variedades de receta y cosecha una planta de cada (%d/2)." % rec_count()
 		5:
-			return "Paga %s a Don Baltasar antes de que acabe el día %s." % [Datos.eur(S.due), n(S.deadline)] + llevas()
+			return "Paga %s a Don Baltasar antes de que acabe el %s." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day)] + llevas()
 		6:
 			return "Gana la Copa: 20 g con más de 26,8% de THC al jurado de la plaza."
 		7:
-			return "Paga los últimos %s a Don Baltasar antes de que acabe el día %s." % [Datos.eur(S.due), n(S.deadline)] + llevas()
+			return "Paga los últimos %s a Don Baltasar antes de que acabe el %s." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day)] + llevas()
 	if S.get("encargo"):
-		return "Encargo de Don Baltasar: lleva %s al almacén de los astilleros, de noche, antes de que acabe el día %s." % [_kg(int(S.encargo.g)), n(S.encargo.hasta)]
+		return "Encargo de Don Baltasar: lleva %s al almacén de los astilleros, de noche, antes de que acabe el %s." % [_kg(int(S.encargo.g)), Datos.fd(S.encargo.hasta, S.day)]
 	var nv := imperio_nivel()
 	var I: Array = D.IMPERIO
 	var nd := 0
@@ -1096,7 +1098,7 @@ func logros_menu():
 	var it := []
 	for l in D.LOGROS:
 		var h: bool = S.logros.has(l.id)
-		it.append({"label": l.t, "right": (("día %s" % n(S.logros[l.id])) if S.logros[l.id] else "HECHO") if h else null, "desc": l.d})
+		it.append({"label": l.t, "right": ((Datos.fd_corto(S.logros[l.id])) if S.logros[l.id] else "HECHO") if h else null, "desc": l.d})
 	it.append({"label": "Volver", "desc": ""})
 	await menu(it, {"cls": "full", "title": "LOGROS", "title2": "%d de %d" % [logros_n(), D.LOGROS.size()], "desc": true})
 
@@ -1104,7 +1106,7 @@ func logros_menu():
 func recuerdo_plazo():
 	var nd := int(S.deadline - S.day)   # los días, como los cuenta Baltasar (talk_baltasar)
 	var ll: float = S.money + caja_e()
-	await talk("SMS · TOÑO", [("Don Baltasar quiere %s antes de que acabe el día %s. Te quedan %d días." % [Datos.eur(S.due), n(S.deadline), nd]) if nd > 0 else "Hoy es el último día para los %s de Don Baltasar." % Datos.eur(S.due)])
+	await talk("SMS · TOÑO", [("Don Baltasar quiere %s antes de que acabe el %s. Te quedan %d días." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day), nd]) if nd > 0 else "Hoy es el último día para los %s de Don Baltasar." % Datos.eur(S.due)])
 	await say(("Llevas %s entre el bolsillo y la caja: te faltan %s." % [Datos.eur(ll), Datos.eur(S.due - ll)]) if ll < S.due else "Llevas %s entre el bolsillo y la caja: ya lo tienes.%s Ve al bar El Ancla." % [Datos.eur(ll), " Saca lo que falte de la caja y" if S.money < S.due else ""])
 
 # START → OBJETIVO: el del capítulo, las misiones (con lo que hay que hacer abajo) y la deuda
@@ -1124,7 +1126,7 @@ func objetivo_menu():
 				ini = i + 1 + (1 if iti else 0)
 		if iti and itin_sig() != null:
 			ini = 1
-		var plazo := ("Plazo: %s antes de que acabe el día %s. Llevas %s.\n" % [Datos.eur(S.due), n(S.deadline), Datos.eur(S.money + caja_e())]) if S.due > 0 else ""
+		var plazo := ("Plazo: %s antes de que acabe el %s. Llevas %s.\n" % [Datos.eur(S.due), Datos.fd(S.deadline, S.day), Datos.eur(S.money + caja_e())]) if S.due > 0 else ""
 		it.append({"label": "LOGROS", "right": "%d/%d" % [logros_n(), D.LOGROS.size()], "desc": "Lo que llevas conseguido en la partida. Pulsa A para verlos."})   # 1.27
 		it.append({"label": "DEUDA", "right": Datos.eur(S.debt), "desc": plazo + "Ventas %s · Reputación %s · Calor %d %%" % [Datos.eur(S.sales), n(S.rep), Datos.jsround(S.heat)]})
 		it.append({"label": "Volver", "desc": ""})
@@ -1329,7 +1331,7 @@ func penalty_event():
 	S.due += it
 	S.debt += it
 	S.deadline = S.day + 5
-	await say("La deuda del plazo sube a %s. Nuevo límite: día %s." % [Datos.eur(S.due), n(S.deadline)])
+	await say("La deuda del plazo sube a %s. Nuevo límite: %s." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day)])
 	if S.vencidos >= 3:
 		S.vencidos = 0
 		await embargo()
@@ -1492,7 +1494,7 @@ func start_menu():
 			{"label": "MÓVIL", "right": ("%d SMS" % ns) if ns else null, "ic": icono("movil")}, {"label": "PLANTAS", "right": str(vivas), "ic": icono("maceta")},
 			{"label": "OBJETIVO", "right": "cap. %d" % S.ch, "ic": icono("trofeo")}, {"label": "GUARDAR", "ic": icono("guardar")},
 			{"label": "OPCIONES", "ic": icono("altavoz")}, {"label": "SALIR", "ic": icono("salir")}],
-			{"cls": "start", "initial": i, "startCloses": true, "title": "DÍA %d · %s" % [S.day, reloj_txt()], "title2": Datos.eur(S.money)})
+			{"cls": "start", "initial": i, "startCloses": true, "title": "%s · %s" % [Datos.fd_hud(S.day), reloj_txt()], "title2": Datos.eur(S.money)})
 		if i < 0 or i == 7:
 			return
 		if i == 0:
@@ -1700,8 +1702,8 @@ func mochila() -> void:
 		for k in S.seeds:
 			rows.append({"label": "Semilla " + strain(k).n, "right": "×" + n(S.seeds[k]), "sw": strain(k).c, "ic": icono("semillas"), "desc": strain_line(k) + "\nPulsa A para tirarlas.", "k": "s", "sid": k})
 		for e in S.esquejes:
-			rows.append({"label": "Esqueje " + strain(e.sid).n + etiq(e.f), "right": "día " + n(e.dia + D.ESQUEJE_DIAS), "sw": strain(e.sid).c, "ic": ic_cog(e.sid),
-				"desc": "Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día %s.\nPulsa A para ponerle nombre o tirarlo." % n(e.dia + D.ESQUEJE_DIAS), "k": "e", "e": e})
+			rows.append({"label": "Esqueje " + strain(e.sid).n + etiq(e.f), "right": Datos.fd_corto(e.dia + D.ESQUEJE_DIAS), "sw": strain(e.sid).c, "ic": ic_cog(e.sid),
+				"desc": "Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el %s.\nPulsa A para ponerle nombre o tirarlo." % Datos.fd(e.dia + D.ESQUEJE_DIAS, S.day), "k": "e", "e": e})
 		for k in S.buds:
 			var b: Dictionary = S.buds[k]
 			rows.append({"label": lot_nombre(k), "right": "%d g · %s%%" % [int(floor(b.g)), Datos.pct(b.thc)], "sw": strain(lot_sid(k)).c, "ic": ic_cog(lot_sid(k)),
@@ -2445,10 +2447,10 @@ func robo_darko():
 # a PAGO_ENCARGO €/g. Si no llegas, reputación −10 y 5 días sin encargos
 func encargo_baltasar(N: String):
 	if S.get("encargo"):
-		await say("Toño te espera en el almacén de los astilleros, de noche, con %s. Hasta el día %s." % [_kg(int(S.encargo.g)), n(S.encargo.hasta)], N)
+		await say("Toño te espera en el almacén de los astilleros, de noche, con %s. Hasta el %s." % [_kg(int(S.encargo.g)), Datos.fd(S.encargo.hasta, S.day)], N)
 		return
 	if S.get("encVeto", 0) > S.day:
-		await say("Me fallaste, {N}. Vuelve el día %s." % n(S.encVeto), N)
+		await say("Me fallaste, {N}. Vuelve el %s." % Datos.fd(S.encVeto, S.day), N)
 		return
 	var g := int(D.ENCARGO[imperio_nivel()])
 	var pe := int(D.PAGO_ENCARGO)
@@ -2464,7 +2466,7 @@ func encargo_baltasar(N: String):
 		await say("Tú sabrás. La oferta sigue en pie.", N)
 		return
 	S.encargo = {"g": g, "hasta": S.day + int(D.ENCARGO_DIAS)}
-	await say("Toño estará allí cada noche hasta el día %s. No le hagas esperar." % n(S.encargo.hasta), N)
+	await say("Toño estará allí cada noche hasta el %s. No le hagas esperar." % Datos.fd(S.encargo.hasta, S.day), N)
 	show_objective()
 
 func talk_tono_almacen():
@@ -2514,7 +2516,7 @@ func vencer_encargo():
 	S.encargo = null
 	S.rep = max(0, S.rep - 10)
 	S.encVeto = S.day + int(D.ENCARGO_VETO)
-	queue("encargo", func(): await talk("SMS · TOÑO", ["No apareciste. Don Baltasar no se olvida.", "Reputación −10. Nada de encargos hasta el día %s." % n(S.encVeto)]))
+	queue("encargo", func(): await talk("SMS · TOÑO", ["No apareciste. Don Baltasar no se olvida.", "Reputación −10. Nada de encargos hasta el %s." % Datos.fd(S.encVeto, S.day)]))
 
 # ---------- la sala (1.10, 09c-sala): clima y arcón ----------
 func t_clima(cl: Dictionary) -> String:
@@ -2556,12 +2558,18 @@ func movil_menu():
 		ops.append_array(["Mensajes", "Gente"])
 		if S.ch >= int(D.PLANTILLA.ch):
 			ops.append("Plantilla")
-		ops.append_array(["Banca", "Tienda online", "Colgar"])   # 1.35: la banca (granja.gd)
+		ops.append_array(["Banca", "Tienda online", "Calendario", "Mapa", "Colgar"])   # 1.35: la banca (granja.gd); 1.42: el calendario y el mapa (croquis.gd)
 		var ns: int = S.sms.size()
-		var oi: int = await ask("MÓVIL · día %s, %s%s" % [n(S.day), reloj_txt(), (" · %d mensaje%s" % [ns, "s" if ns > 1 else ""]) if ns else ""], ops)
+		var oi: int = await ask("MÓVIL · %s, %s%s" % [Datos.fd_hud(S.day).to_lower(), reloj_txt(), (" · %d mensaje%s" % [ns, "s" if ns > 1 else ""]) if ns else ""], ops)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 		if op == "" or op == "Colgar":
 			return
+		if op == "Calendario":
+			await elegir_cal()
+			continue
+		if op == "Mapa":
+			await elegir_mapa()
+			continue
 		if op == "Llamar":
 			if await llamar():
 				return
@@ -2603,7 +2611,7 @@ func llamar() -> bool:
 			await talk("KIKO", [kiko_tip()])
 			return false
 		"tono":
-			await talk("TOÑO", [("Te quedan %s hasta el día %s. Don Baltasar no espera." % [Datos.eur(S.due), n(S.deadline)]) if S.due > 0 else "Ahora mismo no debes nada. Que siga así."])
+			await talk("TOÑO", [("Te quedan %s hasta el %s. Don Baltasar no espera." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day)]) if S.due > 0 else "Ahora mismo no debes nada. Que siga así."])
 			return false
 		"inaki":
 			await talk("IÑAKI", ["Ahora estoy en la mar. A la vuelta hablamos." if S.ch < 3 else ("Hoy ya he cargado. Mañana sale otro barco." if S.mDay == S.day else "Al por mayor, de 100 g para arriba y hasta %s por carga. Pásate por el muelle." % _kg(mayor_dia()))])
@@ -2709,7 +2717,7 @@ func mensajes():
 	while true:
 		var items := []
 		for m in S.sms:
-			items.append({"label": m.n, "right": "día " + n(m.d), "desc": m.t})
+			items.append({"label": m.n, "right": Datos.fd_corto(m.d), "desc": m.t})
 		i = await menu(items, {"cls": "full", "title": "MENSAJES", "title2": "%d de %s" % [S.sms.size(), n(D.SMS_MAX)], "desc": true, "initial": i})
 		if i < 0:
 			return
@@ -3107,7 +3115,7 @@ func encargo_club(k: String) -> void:
 		var s = strain(E.sid)
 		var t: int = int(S.seeds.get(E.sid, 0))
 		if t < E.n:
-			await say("Nos faltan %d semillas de %s. Hasta el día %s." % [int(E.n) - t, s.n, n(E.hasta)], N)
+			await say("Nos faltan %d semillas de %s. Hasta el %s." % [int(E.n) - t, s.n, Datos.fd(E.hasta, S.day)], N)
 			return
 		S.seeds[E.sid] = t - int(E.n)
 		if not S.seeds[E.sid]:
@@ -3149,7 +3157,7 @@ func encargo_club(k: String) -> void:
 		await say("Si cambias de idea, aquí estamos.", N)
 		return
 	S.clubEnc = {"k": k, "sid": sid, "n": int(EN.n), "hasta": S.day + int(EN.dias), "pago": pago}
-	await say("Hasta el día %s. Las semillas, aquí." % n(S.clubEnc.hasta), N)
+	await say("Hasta el %s. Las semillas, aquí." % Datos.fd(S.clubEnc.hasta, S.day), N)
 
 func vencer_encargo_club() -> void:
 	var E = S.get("clubEnc")
@@ -3316,7 +3324,7 @@ func curso_de(w: Dictionary) -> Array:
 func prima(w: Dictionary) -> void:
 	var M: Dictionary = D.MANDO
 	if w.get("pr") != null and S.day - int(w.pr) < int(M.dias):
-		await say("A %s ya le diste una prima el día %d. Hasta el %d, no." % [w.n, int(w.pr), int(w.pr) + int(M.dias)])
+		await say("A %s ya le diste una prima el %s. Hasta el %s, no." % [w.n, Datos.fd(int(w.pr), S.day), Datos.fd(int(w.pr) + int(M.dias), S.day).trim_prefix("día ")])
 		return
 	if w.lea >= 5:
 		await say("%s ya te es leal del todo: una prima no le cambia nada." % w.n)
@@ -3341,7 +3349,7 @@ func curso(w: Dictionary) -> void:
 		await say("%s ya tiene %s 5: no hay curso que le enseñe más." % [w.n, nn])
 		return
 	if w.get("cu1") != null and S.day - int(w.cu1) < int(M.dias):
-		await say("%s hizo un curso el día %d. Hasta el %d, no." % [w.n, int(w.cu1), int(w.cu1) + int(M.dias)])
+		await say("%s hizo un curso el %s. Hasta el %s, no." % [w.n, Datos.fd(int(w.cu1), S.day), Datos.fd(int(w.cu1) + int(M.dias), S.day).trim_prefix("día ")])
 		return
 	if S.money < M.curso:
 		sfx("bad")
@@ -4503,7 +4511,7 @@ func carpa_madres() -> void:
 				S.esquejes.append({"sid": lot_sid(M.k), "f": M.f, "dia": S.day})
 			M.e = int(M.e) - q
 			sfx("get")
-			await say("%s de la %s, al propagador. Plántalos antes del día %d." % [("%d esquejes" % q) if q > 1 else "Un esqueje", madre_txt(M), int(S.day) + int(D.ESQUEJE_DIAS) + 1])
+			await say("%s de la %s, al propagador. Plántalos antes del %s." % [("%d esquejes" % q) if q > 1 else "Un esqueje", madre_txt(M), Datos.fd(int(S.day) + int(D.ESQUEJE_DIAS) + 1, S.day)])
 			continue
 		if op == "Quitarla":
 			if await ask("¿Quitas la madre de %s? Se tira." % madre_txt(M), ["Quitarla", "No"]) != 0:
@@ -4920,17 +4928,17 @@ func presidencia_aso() -> void:
 	var N: String = D.DELROY.n
 	var O: Dictionary = D.ASO
 	if A.asam:   # con la asamblea pendiente, todavía se puede refundar
-		if await ask("La asamblea es el día %d, por la mañana. Habla con la gente del barrio: cada amigo trae votos. O la refundas ya, por %s." % [int(A.asam), Datos.eur(O.refunda)], ["Refundarla", "Nada"], N) != 0:
+		if await ask("La asamblea es el %s, por la mañana. Habla con la gente del barrio: cada amigo trae votos. O la refundas ya, por %s." % [Datos.fd(int(A.asam), S.day), Datos.eur(O.refunda)], ["Refundarla", "Nada"], N) != 0:
 			return
 	else:
 		var c: int = await ask("Hacen falta %d votos de %d. Hoy tendrías %d. O pagas %s de deudas y registro y la refundas tú." % [int(O.mayoria), int(O.votos), votos_aso(), Datos.eur(O.refunda)], ["Presentarme", "Refundarla", "Nada"], N)
 		if c == 0:
 			if S.day < int(A.otra):
-				await say("Hasta el día %d no hay otra asamblea. Gánate al barrio mientras." % int(A.otra), N)
+				await say("Hasta el %s no hay otra asamblea. Gánate al barrio mientras." % Datos.fd(int(A.otra), S.day), N)
 				return
 			A.asam = int(S.day) + int(O.dias)
 			sfx("sel")
-			await say("Apuntado. La asamblea, el día %d. %s también se presenta." % [int(A.asam), O.rival], N)
+			await say("Apuntado. La asamblea, el %s. %s también se presenta." % [Datos.fd(int(A.asam), S.day), O.rival], N)
 			return
 		if c != 1:
 			return
@@ -4998,7 +5006,7 @@ func aso_dia() -> void:
 			confia("delroy", 10)
 		else:
 			A.otra = int(S.day) + int(O.espera)
-		var t: String = ("¡%d votos de %d! Eres el presidente de la asociación, sobrino. Como tu tía." % [v, int(O.votos)]) if gana else ("%d votos de %d: gana %s. Gánate al barrio y preséntate otra vez desde el día %d." % [v, int(O.votos), O.rival, int(A.otra)])
+		var t: String = ("¡%d votos de %d! Eres el presidente de la asociación, sobrino. Como tu tía." % [v, int(O.votos)]) if gana else ("%d votos de %d: gana %s. Gánate al barrio y preséntate otra vez desde el %s." % [v, int(O.votos), O.rival, Datos.fd(int(A.otra), S.day)])
 		queue("aso", func(): await talk("SMS · DELROY", [t]))
 	var L = A.lote
 	if not A.pres or not (L is Dictionary):
@@ -5756,7 +5764,7 @@ func desc_carro(V: Dictionary) -> String:
 		var e: Dictionary = S.bandejas[V.i]
 		var s = strain(e.sid)
 		var hasta: int = int(e.dia) + int(D.CARRO.dias)
-		return "Esqueje de %s%s: pinchado el día %s, aguanta hasta el día %s%s.\nA: nombrarlo o tirarlo · B: cerrar." % [s.n, etiq(e.f), n(e.dia), n(hasta), " (hoy es el último)" if hasta <= S.day else ""]
+		return "Esqueje de %s%s: pinchado el %s, aguanta hasta el %s%s.\nA: nombrarlo o tirarlo · B: cerrar." % [s.n, etiq(e.f), Datos.fd(e.dia, S.day), Datos.fd(hasta, S.day), " (hoy es el último)" if hasta <= S.day else ""]
 	var pr: int = S.esquejes.size()
 	return "Taco vacío · %d de %d ocupados. %s\n%s · B: cerrar." % [nb, cap, ("En el propagador llevas %d." % pr) if pr else "El propagador está vacío.", "A: pinchar" if pr and nb < cap else "A: ver"]
 
@@ -5955,3 +5963,62 @@ func rects_carro(V: Dictionary) -> Array:
 		o.append_array([[ex - 2, ey, 5, 3, "#6a4026"], [ex - 2, ey, 5, 1, "#8a5a34"]])
 		_esqueje(o, ex, ey, _hoja_de(e.sid), 1, false, CLON_MINI)
 	return o
+
+# ---------- el calendario y el mapa de la comarca (1.42, lo pidió el usuario; croquis.gd) ----------
+var CAL_V = null    # {y, m}: el mes que se ve
+var MAPA_V = null   # {i}: el pueblo elegido (Croquis.ORDEN)
+
+# los días señalados: el plazo de Don Baltasar, los recibos, los encargos y la asamblea
+func marcas_cal() -> Array:
+	var r := []
+	if S.get("due", 0) > 0 and S.get("deadline"):
+		r.append({"d": int(S.deadline), "c": "#d03028", "t": "plazo de Don Baltasar (%s)" % Datos.eur(S.due)})
+	for o in recibos():
+		r.append({"d": int(o[1]), "c": "#3060c0", "t": "recibo de %s" % o[0]})
+	if S.get("encargo") is Dictionary and S.encargo.get("hasta"):
+		r.append({"d": int(S.encargo.hasta), "c": "#308040", "t": "encargo de Toño"})
+	if S.get("clubEnc") is Dictionary and S.clubEnc.get("hasta"):
+		r.append({"d": int(S.clubEnc.hasta), "c": "#308040", "t": "encargo del club"})
+	if S.get("aso") is Dictionary and int(S.aso.get("asam", 0)):
+		r.append({"d": int(S.aso.asam), "c": "#a050b0", "t": "asamblea de la asociación"})
+	r.sort_custom(func(a, b): return a.d < b.d)
+	return r
+
+func elegir_cal() -> void:
+	var f := Datos.fecha(int(S.day))
+	CAL_V = {"y": int(f.y), "m": int(f.m)}
+	var mk := marcas_cal()
+	_dlg_fijo(Croquis.desc_cal(CAL_V, int(S.day), mk), "CALENDARIO")
+	var pr := Motor.Prom.new()
+	push(func(b: String):
+		if b == "A" or b == "B":
+			pop()
+			pr.res(null)
+			return
+		if Croquis.mueve_cal(CAL_V, b):
+			sfx("sel")
+			_dlg_fijo(Croquis.desc_cal(CAL_V, int(S.day), mk), "CALENDARIO"))
+	await Motor.espera(pr)
+	CAL_V = null
+	if not oraculo:
+		dlg.hide()
+		dlg_nm.hide()
+
+func elegir_mapa() -> void:
+	var aqui := Croquis.pueblo_de(S.map)
+	MAPA_V = {"i": Croquis.ORDEN.find(aqui)}
+	_dlg_fijo(Croquis.desc_mapa(D, int(S.ch), MAPA_V, aqui), "MAPA DE LA COMARCA")
+	var pr := Motor.Prom.new()
+	push(func(b: String):
+		if b == "A" or b == "B":
+			pop()
+			pr.res(null)
+			return
+		if Croquis.mueve_mapa(MAPA_V, b):
+			sfx("sel")
+			_dlg_fijo(Croquis.desc_mapa(D, int(S.ch), MAPA_V, aqui), "MAPA DE LA COMARCA"))
+	await Motor.espera(pr)
+	MAPA_V = null
+	if not oraculo:
+		dlg.hide()
+		dlg_nm.hide()

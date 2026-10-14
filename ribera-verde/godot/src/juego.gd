@@ -322,7 +322,7 @@ func importar(desde_titulo := false) -> void:
 		await say("Eso no es una partida exportada.")
 		return
 	var pierde := " La de ahora se pierde." if not desde_titulo else (" La guardada se pierde." if FileAccess.file_exists(GUARDADO) else "")
-	if await ask("¿Cargar la partida de %s, día %s?%s" % [s.name, n(s.day), pierde], ["Cargar", "No"]) != 0:
+	if await ask("¿Cargar la partida de %s, %s?%s" % [s.name, Datos.fd(int(s.day)), pierde], ["Cargar", "No"]) != 0:
 		return
 	if desde_titulo:
 		var tmp := GUARDADO + ".tmp"   # como save(): a un .tmp y, entero, en su sitio
@@ -541,5 +541,5 @@ func update_hud() -> void:
 	hud_visto = sosp_hud()
 	var r := total_rosin()
 	var ro := (" · " + Datos.coma(Datos.jsround(r * 10) / 10.0) + " g rosin") if r else ""
-	hud_pon("DÍA %s · %s:%s\n%s · %d g%s" % [n(S.day), hh, mm, Datos.eur(S.money), int(floor(total_buds())), ro], Datos.jsround(S.heat),
+	hud_pon("%s · %s:%s\n%s · %d g%s" % [Datos.fd_hud(S.day), hh, mm, Datos.eur(S.money), int(floor(total_buds())), ro], Datos.jsround(S.heat),
 		Datos.jsround(SOSP.v) if n_patrullas() else -1, SOSP.alarma != null, float(S.get("orden", 0)) > 0)

@@ -367,7 +367,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.lector.visible, 60)
 	await espera(3)
 	await foto("0b-creditos")
-	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.35.0") \
+	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.36.0") \
 		and J.lector_txt.text.contains("Open Font License") and J.lector_txt.text.contains("FICCIÓN") and J.lector.get_global_rect().encloses(J.lector_sc.get_global_rect()))
 	await pulsa("B")
 	await elige("LICENCIAS")
@@ -489,7 +489,7 @@ func titulo_e_intro() -> void:
 	check("Kiko te llama por tu nombre", textos.any(func(t): return t.begins_with("NAIA. Hacía años")))
 	check("la partida empieza en el caserío de Mendialde (el prólogo), capítulo 1, en (2,4) y sin el título", J.mode == "world" and J.S.map == "casa-ama" and J.S.ch == 1 and Vector2i(J.P.x, J.P.y) == Vector2i(2, 4) \
 		and not J.titulo.visible and J.pintor.modo == "world")
-	check("HUD: «%s»" % J.hud_txt.text.replace("\n", " · "), J.hud.visible and J.hud_txt.text.begins_with("DÍA 1 · 08:") and J.hud_txt.text.contains("150 €"))
+	check("HUD: «%s»" % J.hud_txt.text.replace("\n", " · "), J.hud.visible and J.hud_txt.text.begins_with("LUN 20 ABR · 08:") and J.hud_txt.text.contains("150 €"))
 	check("guardada al empezar el capítulo", FileAccess.file_exists(Juego.GUARDADO))
 	await hasta(func(): return J.toast_box.visible and J.toast_txt.get_parsed_text().contains("OBJETIVO"), 400)
 	await foto("3-caserio")

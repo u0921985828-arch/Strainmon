@@ -10,6 +10,81 @@ static func carga() -> Dictionary:
 	return D
 
 # Math.round de JavaScript: la mitad, hacia arriba (round() de Godot la aleja del cero)
+# ---------- el calendario (1.42, lo pidió el usuario: la partida empieza el lunes 20 de abril de 2026 y cada día suma uno) ----------
+# El día 1 de la partida (S.day) es CAL0; los meses, con sus días (y los bisiestos), y la semana de lunes a domingo. Las pruebas que
+# comparan con el HTML congelado (historia, C1, pantallas) ponen CAL = false: «día N» y un mes por día, como antes.
+static var CAL := true
+const CAL0 := [2026, 4, 20]
+const DIA_SEM := ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+const MES_N := ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+
+static func bisiesto(y: int) -> bool:
+	return (y % 4 == 0 and y % 100 != 0) or y % 400 == 0
+
+static func dias_mes(y: int, m: int) -> int:
+	return [31, 29 if bisiesto(y) else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1]
+
+# los días desde el 1-1-1970 (proléptico gregoriano) y al revés: así no hay que contar mes a mes
+static func dias_civil(y: int, m: int, d: int) -> int:
+	var yy := y - (1 if m <= 2 else 0)
+	var era := (yy if yy >= 0 else yy - 399) / 400
+	var yoe := yy - era * 400
+	var doy := (153 * (m + (-3 if m > 2 else 9)) + 2) / 5 + d - 1
+	var doe := yoe * 365 + yoe / 4 - yoe / 100 + doy
+	return era * 146097 + doe - 719468
+
+static func civil(z0: int) -> Array:
+	var z := z0 + 719468
+	var era := (z if z >= 0 else z - 146096) / 146097
+	var doe := z - era * 146097
+	var yoe := (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365
+	var doy := doe - (365 * yoe + yoe / 4 - yoe / 100)
+	var mp := (5 * doy + 2) / 153
+	var d := doy - (153 * mp + 2) / 5 + 1
+	var m := mp + (3 if mp < 10 else -9)
+	return [yoe + era * 400 + (1 if m <= 2 else 0), m, d]
+
+# el día de partida dia → {y, m (1-12), d, s (0 lunes … 6 domingo)}
+static func fecha(dia: int) -> Dictionary:
+	var z := dias_civil(CAL0[0], CAL0[1], CAL0[2]) + dia - 1
+	var c := civil(z)
+	return {"y": c[0], "m": c[1], "d": c[2], "s": posmod(z + 3, 7)}   # el 1-1-1970 fue jueves
+
+# el día de partida de una fecha
+static func dia_de(y: int, m: int, d: int) -> int:
+	return dias_civil(y, m, d) - dias_civil(CAL0[0], CAL0[1], CAL0[2]) + 1
+
+# «día 12» (CAL = false) o «12 de mayo» (con el año si no es el de hoy, hoy)
+static func fd(dia: int, hoy := -1) -> String:
+	if not CAL:
+		return "día %s" % js_num(dia)
+	var f := fecha(dia)
+	var t := "%d de %s" % [f.d, MES_N[f.m - 1]]
+	if hoy >= 0 and int(fecha(hoy).y) != int(f.y):
+		t += " de %d" % f.y
+	return t
+
+# corto, para las columnas de los menús: «día 12» o «12 may»
+static func fd_corto(dia: int) -> String:
+	if not CAL:
+		return "día %s" % js_num(dia)
+	var f := fecha(dia)
+	return "%d %s" % [f.d, MES_N[f.m - 1].substr(0, 3)]
+
+# el de arriba (HUD, START y móvil): «DÍA 12» o «LUN 20 ABR»
+static func fd_hud(dia: int) -> String:
+	if not CAL:
+		return "DÍA %s" % js_num(dia)
+	var f := fecha(dia)
+	return "%s %d %s" % [DIA_SEM[f.s].substr(0, 3).to_upper(), f.d, MES_N[f.m - 1].substr(0, 3).to_upper()]
+
+# entera: «lunes, 20 de abril de 2026»
+static func fd_larga(dia: int) -> String:
+	if not CAL:
+		return "día %s" % js_num(dia)
+	var f := fecha(dia)
+	return "%s, %d de %s de %d" % [DIA_SEM[f.s], f.d, MES_N[f.m - 1], f.y]
+
 static func jsround(x: float) -> int:
 	return int(floor(x + 0.5))
 

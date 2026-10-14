@@ -16,6 +16,7 @@ const Procedural = preload("res://src/procedural.gd")
 const Vista = preload("res://src/vista.gd")
 const Arte = preload("res://src/arte.gd")
 const Escena = preload("res://src/escena_extr.gd")
+const Croquis = preload("res://src/croquis.gd")
 
 const SH := 180   # 1.12 (ui.gd); las escenas de 240 × 160 van abajo: OY
 const DIR4 := {"down": "south", "up": "north", "left": "west", "right": "east"}
@@ -406,6 +407,19 @@ func _encima() -> void:
 			_rect(float(e[0]) - cm.x, float(e[1]) - cm.y, e[2], e[3], css(e[4]))
 	if J.CARRO_V != null:   # el carro de esquejes por dentro (1.40)
 		for e in J.rects_carro(J.CARRO_V):
+			_rect(e[0], e[1], e[2], e[3], css(e[4]))
+	if J.MAPA_V != null:   # 1.42: el mapa de la comarca, un croquis (croquis.gd)
+		var kc := "croquis|%d" % int(J.S.ch)
+		if not cache.has(kc):
+			cache[kc] = Croquis.imagen(J.D, int(J.S.ch))
+		var o := Croquis.origen_mapa(J.SW)
+		_img(cache[kc], o.x, o.y)
+		for e in Croquis.rects_mapa(J.SW, J.MAPA_V, Croquis.pueblo_de(J.S.map)):
+			if e[4] == "#f8d040" and int(now / 400.0) % 2:
+				continue
+			_rect(e[0], e[1], e[2], e[3], css(e[4]))
+	if J.CAL_V != null:   # 1.42: la hoja del mes
+		for e in Croquis.rects_cal(J.SW, J.CAL_V, int(J.S.day), J.marcas_cal()):
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.ALMACEN != null:   # la caja fuerte y la nevera por dentro (1.36)
 		for e in J.rects_almacen(J.ALMACEN):
