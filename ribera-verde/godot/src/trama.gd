@@ -3648,7 +3648,20 @@ func plantilla_dia() -> void:
 # la nave: el alquiler, lo primero de la mañana (antes que los sueldos; sin él, Arrieta cambia la cerradura y se queda la fianza).
 # 1.35: cada RECIBO.dias, en efectivo, con su aviso (cobra, granja.gd)
 func nave_alquiler() -> void:
-	if S.get("nave") == null or cobra(S.nave, recibo_nave(), "ARRIETA", false, "la nave"):
+	var N = S.get("nave")
+	if N == null or N.get("mia"):   # 1.42: comprada, sin alquiler
+		return
+	var r0: int = int(N.r)
+	if cobra(N, recibo_nave(), "ARRIETA", false, "la nave"):
+		if N.get("op") is Dictionary:
+			if int(N.r) > r0:   # 1.42: la parte del alquiler que va a la compra
+				N.op.pag = int(N.op.pag) + roundi(recibo_nave() * float(D.NAVE.compra.abono))
+			if Datos.CAL and int(Datos.fecha(S.day).d) == 1:
+				var tx := "Este mes puedes comprar la nave, hasta el %s: quedan %s y %s de gastos. Por transferencia, en el notario." % [Datos.fd(S.day + int(D.NAVE.compra.ventana) - 1, S.day), Datos.eur(resto_nave()), Datos.eur(gastos_nave())]
+				queue("naveC", func(): await talk("SMS · ARRIETA", [tx]))
+		elif Datos.CAL and S.get("aso") is Dictionary and S.aso.get("pres") and int(Datos.fecha(S.day).d) == 1 and not N.get("of"):
+			N.of = true
+			queue("naveC", func(): await talk("SMS · ARRIETA", ["Me han dicho que ahora presides la asociación del barrio. Si quieres, la nave te la alquilo con opción a compra: pásate y lo hablamos."]))
 		return
 	for w in de_la_nave():
 		libre(w)
@@ -3792,10 +3805,25 @@ func talk_nave() -> void:
 		await say("Dentro hay %d mesas de cultivo, una por persona. Pon a tu gente desde el móvil y planta tú lo que quieras." % int(D.NAVE.max), A)
 		return
 	var ops := ["Dejar la nave", "Nada"]
-	var oi: int = await ask("La nave: %d de %d mesas plantadas · %d de %d trabajando. Lo demás, dentro." % [N.m.filter(func(x): return x != null).size(), int(D.NAVE.max), naveros().size(), int(D.NAVE.max)], ops, A)
+	var tc := ""   # 1.42: la opción a compra (lo pidió el usuario: siendo presidente de la asociación)
+	if N.get("mia"):
+		ops = ["Nada"]
+		tc = " La nave es tuya."
+	elif N.get("op") is Dictionary:
+		ops.insert(0, "Comprarla")
+		tc = " Opción a compra: llevas %s de %s." % [Datos.eur(N.op.pag), Datos.eur(N.op.p)]
+	elif S.get("aso") is Dictionary and S.aso.get("pres"):
+		ops.insert(0, "Opción a compra")
+	var oi: int = await ask("La nave: %d de %d mesas plantadas · %d de %d trabajando. Lo demás, dentro.%s" % [N.m.filter(func(x): return x != null).size(), int(D.NAVE.max), naveros().size(), int(D.NAVE.max), tc], ops, A)
 	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+	if op == "Opción a compra":
+		await opcion_nave()
+		return
+	if op == "Comprarla":
+		await comprar_nave()
+		return
 	if op == "Dejar la nave":
-		if await ask("¿Dejas la nave? Te devuelvo la fianza%s." % ("; lo que no recojas se queda aquí" if nave_stock() >= 1 else ""), ["Dejarla", "No"], A) != 0:
+		if await ask("¿Dejas la nave? Te devuelvo la fianza%s%s." % ["; lo que no recojas se queda aquí" if nave_stock() >= 1 else "", "; la opción a compra se pierde, y lo pagado para ella" if N.get("op") else ""], ["Dejarla", "No"], A) != 0:
 			return
 		for w in de_la_nave():
 			libre(w)
@@ -3803,6 +3831,68 @@ func talk_nave() -> void:
 		S.money += int(D.NAVE.fianza)
 		sfx("coin")
 		await say("Trato hecho. Si la quieres otra vez, ya sabes dónde estoy.", A)
+
+# ---------- la nave con opción a compra (1.42, lo pidió el usuario: «cuando seas presidente de la asociación, alquilas con opción
+# a compra la nave, por la tranquilidad; cada mes te da la opción de comprarla a tocateja, a un precio realista»). NAVE.compra:
+# 320 m² en el polígono de Valdehierro a unos 690 €/m² (precio, fijo mientras dure); la prima de la opción (prima) y la mitad
+# de cada alquiler (abono) se descuentan; se compra los primeros días de cada mes (ventana), por transferencia desde la cuenta, con
+# los gastos de la compraventa (gastos: transmisiones, notario y registro). Comprada, no hay alquiler ni Arrieta que cambie la cerradura.
+func resto_nave() -> int:
+	var N = S.get("nave")
+	if N == null or not N.get("op") is Dictionary:
+		return int(D.NAVE.compra.precio)
+	return maxi(0, int(N.op.p) - int(N.op.pag))
+
+func gastos_nave() -> int:
+	return roundi(float(D.NAVE.compra.precio) * float(D.NAVE.compra.gastos))
+
+func ventana_nave() -> bool:
+	return int(Datos.fecha(S.day).d) <= int(D.NAVE.compra.ventana)
+
+# el primer día de la próxima ventana
+func proxima_ventana() -> int:
+	var f := Datos.fecha(S.day)
+	var y: int = f.y
+	var m: int = int(f.m) + 1
+	if m > 12:
+		m = 1
+		y += 1
+	return Datos.dia_de(y, m, 1)
+
+func opcion_nave() -> void:
+	var A := "ARRIETA"
+	var C: Dictionary = D.NAVE.compra
+	var t := "Te la vendo por %s (%d m², a unos %s el metro). Firmamos la opción: %s de prima, que se descuentan, y la mitad de cada alquiler va a la compra. El precio no se mueve. Los primeros %d días de cada mes, si quieres, la compras a tocateja con lo que falte, más los gastos (%s), en el notario y por transferencia." % [Datos.eur(C.precio), int(C.m2), Datos.eur(roundi(float(C.precio) / float(C.m2))), Datos.eur(C.prima), int(C.ventana), Datos.eur(gastos_nave())]
+	if await ask(t, ["Firmar la opción", "No"], A) != 0:
+		return
+	if not cobro_banco(float(C.prima), "Prima de la opción · nave"):
+		sfx("bad")
+		await say("La prima, por transferencia: en tu cuenta no hay %s." % Datos.eur(C.prima), A)
+		return
+	S.nave.op = {"d": int(S.day), "pag": int(C.prima), "p": int(C.precio)}
+	sfx("coin")
+	update_hud()
+	await say("Firmado. Quedan %s; la mitad de cada alquiler, a cuenta. El primer día de cada mes te mando un mensaje con lo que falta." % Datos.eur(resto_nave()), A)
+
+func comprar_nave() -> void:
+	var A := "ARRIETA"
+	if not ventana_nave():
+		await say("La compra, los primeros %d días de mes. El próximo, desde el %s." % [int(D.NAVE.compra.ventana), Datos.fd(proxima_ventana(), S.day)], A)
+		return
+	var tot: int = resto_nave() + gastos_nave()
+	if await ask("Quedan %s y %s de gastos: %s, por transferencia. Te devuelvo la fianza de %s. ¿La compras?" % [Datos.eur(resto_nave()), Datos.eur(gastos_nave()), Datos.eur(tot), Datos.eur(D.NAVE.fianza)], ["Comprarla", "No"], A) != 0:
+		return
+	if not cobro_banco(float(tot), "Compra de la nave de Valdehierro"):
+		sfx("bad")
+		await say("En tu cuenta hay %s y hacen falta %s. El mes que viene, otra vez." % [Datos.eur(S.banco), Datos.eur(tot)], A)
+		return
+	S.nave.mia = true
+	S.nave.op.pag = int(S.nave.op.p)
+	S.money += int(D.NAVE.fianza)
+	sfx("get")
+	update_hud()
+	await got("las escrituras de la nave")
+	await say("Firmado en el notario. La nave es tuya: ni alquiler ni cerradura que cambiar. Suerte.", A)
 
 # ---------- los locales (1.30, 11j-locales): los clubs por dentro, la nave y GAUA ----------
 # la puerta de un local (on_step_end, mundo.gd): cerrada, te deja delante; el club, la primera vez, el carné; GAUA, la entrada
@@ -5979,6 +6069,8 @@ func marcas_cal() -> Array:
 		r.append({"d": int(S.encargo.hasta), "c": "#308040", "t": "encargo de Toño"})
 	if S.get("clubEnc") is Dictionary and S.clubEnc.get("hasta"):
 		r.append({"d": int(S.clubEnc.hasta), "c": "#308040", "t": "encargo del club"})
+	if S.get("nave") != null and S.nave.get("op") is Dictionary and not S.nave.get("mia"):
+		r.append({"d": int(S.day) if ventana_nave() else proxima_ventana(), "c": "#d08020", "t": "se puede comprar la nave"})
 	if S.get("aso") is Dictionary and int(S.aso.get("asam", 0)):
 		r.append({"d": int(S.aso.asam), "c": "#a050b0", "t": "asamblea de la asociación"})
 	r.sort_custom(func(a, b): return a.d < b.d)

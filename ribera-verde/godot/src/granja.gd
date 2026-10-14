@@ -1634,7 +1634,7 @@ func recibo_setas() -> float:
 
 func recibos() -> Array:
 	var r := []
-	if S.get("nave") != null:
+	if S.get("nave") != null and not S.nave.get("mia"):
 		r.append(["Nave de Valdehierro", S.nave.r, recibo_nave(), "efectivo", r.size()])
 	if S.get("setas") != null:
 		r.append(["Bajo de la Kale Zaharra", S.setas.r, recibo_setas(), "efectivo", r.size()])

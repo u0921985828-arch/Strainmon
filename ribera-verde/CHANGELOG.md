@@ -23,6 +23,14 @@ El calendario de verdad, el mapa de la comarca y el juego en WordPress (lo pidi�
   - `tests/calendario.gd`, 35 comprobaciones: el 20-4-2026 lunes, semanas de 7 durante 800 días, el 1 de mayo, el año nuevo, el 29 de febrero de 2028, el mes del clima, los textos, el calendario y el mapa dentro de la pantalla, los pueblos cerrados en gris y los renders.
   - Las pruebas contra el HTML congelado (historia, C1, capas y pantallas) ponen `Datos.CAL = false` y siguen como antes: «día N» y un mes por día.
   - `historia.gd` quita las dos filas nuevas del móvil (`NUEVO_MOVIL`).
+- **La nave con opción a compra** (lo pidió el usuario: «cuando seas presidente de la asociación del barrio, alquilas con opción a compra la nave, por la tranquilidad; cada mes te da la opción de comprarla a tocateja, a un precio realista»). Está en `opcion_nave`, `comprar_nave`, `resto_nave`, `gastos_nave` y `nave_alquiler` (`trama.gd`), con los datos en `NAVE.compra`.
+  - Siendo presidente, Arrieta te ofrece la opción. El día 1 de mes manda un SMS y, en la nave, sale «Opción a compra».
+  - El precio es de 220.000 € por 320 m² en el polígono, unos 690 €/m². El alquiler de siempre, 60 € al día, son unos 1.800 € al mes (5,6 €/m²).
+  - La prima es de 10.000 €, por transferencia, y se descuenta. La mitad de cada alquiler va a cuenta. El precio no se mueve.
+  - Los 7 primeros días de cada mes puedes comprarla a tocateja con lo que falte más un 5 % de gastos (transmisiones, notario y registro), por transferencia desde la cuenta. Te devuelven la fianza.
+  - El primero de mes, Arrieta manda un SMS con lo que queda. El calendario marca cuándo se puede comprar.
+  - Comprada, no hay alquiler, ni recibo, ni cerradura que cambiar. Si dejas la nave antes, pierdes la opción.
+  - Prueba: `tests/compra.gd`, 26 comprobaciones.
 - **WordPress:** el plugin `landrace-hunters` 1.3.0 (`wordpress/`, `tools/wordpress.js` → `descargas/landrace-hunters-1.3.0.zip`).
   - Sirve la versión web del juego Godot de hoy (motor 4.3 sin hilos y el `index.pck` de esta versión, con la música).
   - Sigue igual que el plugin 1.2.0: dirección propia a pantalla completa, el atajo `[landrace_hunters]`, instalable como app y el panel de ajustes.
