@@ -823,9 +823,12 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 		if va:
 			_pinta(va, xp, yp)
 		var V: Dictionary = J.D.VEHICULOS[v]
-		if V.has("corta"):   # en coche (1.43): de la cintura para arriba, sentado detrás del cristal o en el descapotable
+		if V.has("corta"):   # sentado (1.43): de la cintura para arriba; con techo, solo por dentro de la cabina (1.43.1)
 			var cy := int(V.corta)
-			L.draw_texture_rect_region(Atlas.tex(f.c), Rect2(Datos.jsround(xp - f.cel.ancla[0]), Datos.jsround(yp - int(V.sube) - f.cel.ancla[1]), f.c.get_width(), cy), Rect2(0, 0, f.c.get_width(), cy))
+			var im: Image = f.c
+			if V.get("cabina") and va:
+				im = _en_cabina(f, va, int(V.sube), cy)
+			L.draw_texture_rect_region(Atlas.tex(im), Rect2(Datos.jsround(xp - f.cel.ancla[0]), Datos.jsround(yp - int(V.sube) - f.cel.ancla[1]), im.get_width(), cy), Rect2(0, 0, im.get_width(), cy))
 		else:
 			_pinta(f, xp, yp - int(V.sube))
 		if vd:
@@ -836,6 +839,27 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 	if a and a.get("humo") and not a.get("humoHecho") and f.i >= a.humo.frame:
 		a.humoHecho = 1
 		J.lanzar_vfx(a.humo.vfx, e.px + 8 + a.humo.off[0], e.py + 15 + a.humo.off[1], now, J.S.map, true)
+
+# en coche con techo (1.43.1): el protagonista, solo donde hay cabina (lo que pinta <v>-atras), para que la visera no se salga
+# del cristal; una vez por par de fotogramas
+var _cabina := {}
+func _en_cabina(f, va, sube: int, cy: int) -> Image:
+	var c: Image = f.c
+	var v: Image = va.c
+	var k := "%d|%d|%d" % [c.get_instance_id(), v.get_instance_id(), sube]
+	if _cabina.has(k):
+		return _cabina[k]
+	var o := Image.create(c.get_width(), c.get_height(), false, Image.FORMAT_RGBA8)
+	var dx: int = int(va.cel.ancla[0]) - int(f.cel.ancla[0])
+	var dy: int = int(va.cel.ancla[1]) - int(f.cel.ancla[1]) - sube
+	for y in mini(cy, c.get_height()):
+		for x in c.get_width():
+			var X := x + dx
+			var Y := y + dy
+			if X >= 0 and Y >= 0 and X < v.get_width() and Y < v.get_height() and v.get_pixel(X, Y).a > 0:
+				o.set_pixel(x, y, c.get_pixel(x, y))
+	_cabina[k] = o
+	return o
 
 # montado (1.13, frameMonta): la acción si la hay; si no, en la bici pedalea (walk) y en el patinete va de pie (base)
 func _monta_frame(e: Dictionary, gr, v: String, dur: float):

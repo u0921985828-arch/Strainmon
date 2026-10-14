@@ -1,5 +1,16 @@
 # Cambios
 
+## 1.43.1 · 14 de octubre de 2026
+
+Vehículos de juguete y ruedas con llanta (lo pidió el usuario: «cuando está montando en la moto parece una bici», «no haría los coches tan realistas porque son demasiado grandes; debe ser un estilo y una escala lógica para con el personaje», «muy finas las ruedas de la moto; en sí son finas todas las ruedas, sin llanta casi»). Solo Godot (0.37.1).
+
+- **La moto, un scooter:** gordito, con el culo redondo, el escudo azul curvo, el piso tapado, el guardabarros, los espejos y las ruedas pequeñas y gordas. Vas sentado: se te ve de la cadera para arriba (`VEHICULOS.moto`: `sube` 3, `corta` 25).
+- **Los coches, de juguete:** más cortos y redondos, con la burbuja de la cabina, el techo redondo, los faros redondos y los pasos de rueda. Del tamaño del protagonista sentado, no de un coche de verdad.
+  - El utilitario y la berlina con techo: se te ve la cara por el parabrisas. La visera de la gorra ya no se sale del cristal: con `cabina`, `_en_cabina` en `pinta.gd` solo pinta al protagonista por dentro de la cabina.
+  - El superdeportivo, descapotable, con el parabrisas más bajo para que se te vea la cara de frente.
+- **Ruedas gordas y con llanta** en todos los vehículos (`rueda_lado`, `rueda_frente` en `vehiculos.py`): contorno, goma y llanta clara con el buje y los radios que giran. De frente, la banda de goma más ancha con su dibujo. También en la bici y el patinete.
+- **Pruebas:** en `tests/pantallas.gd`, la calle con la bici y con el patinete ya no son las del HTML congelado: lo que cambia tiene que quedarse dentro de la celda del vehículo (32 × 32) y todo lo demás, igual (`RUEDAS`).
+
 ## 1.43.0 · 14 de octubre de 2026
 
 Ventanas centradas, el concesionario del barrio y las bandejas de clones de la nave (lo pidió el usuario: «esos pop-up o pestañas tienen que estar centradas como la nevera y la caja fuerte», «abren un concesionario en el barrio y puedes comprar una moto, un coche sin más, uno de gama media y un superdeportivo ya cuando tengas mucho dinero, precios realistas y todas las mecánicas realistas, espacio y lugar del concesionario con el atrezo, los coches y vehículos en venta», «en la nave debería haber bandejas de clones también, ¿no?»). Solo Godot (0.37.0).

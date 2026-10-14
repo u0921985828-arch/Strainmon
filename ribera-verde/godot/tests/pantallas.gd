@@ -17,6 +17,9 @@ const Juego = preload("res://src/juego.gd")
 
 const TOL := 4
 const TOL_C := 5
+# 1.43.1 (lo pidió el usuario: ruedas gordas y con llanta en todos los vehículos): en estas escenas la bici y el patinete ya no
+# son los del HTML congelado; lo de fuera de la celda del vehículo (32 × 32) sigue teniendo que salir igual
+const RUEDAS := ["calle-bici", "calle-patinete"]
 
 var J
 var fallos: Array = []
@@ -66,6 +69,8 @@ func _corre() -> void:
 		var n := 0
 		var n2 := 0
 		var mx := 0
+		var tol := TOL_C if k.begins_with("carpa-c") else TOL
+		var caja := Rect2i()
 		for y in im.get_height():
 			for x in im.get_width():
 				var a := im.get_pixel(x, y)
@@ -76,12 +81,16 @@ func _corre() -> void:
 					mx = maxi(mx, d)
 					if d > 1:
 						n2 += 1
+					if d > tol:
+						caja = Rect2i(x, y, 1, 1) if caja.size == Vector2i.ZERO else caja.expand(Vector2i(x, y)).expand(Vector2i(x + 1, y + 1))
 					dif.set_pixel(x, y, Color(1, 0, 0) if d > 1 else Color(1, 1, 0))
 				else:
 					dif.set_pixel(x, y, Color(b.r, b.g, b.b).darkened(.7))
 		dif.save_png(dir.path_join("dif-p-%s.png" % k))
 		print("%-18s SW %d · píxeles distintos %5d (más de 1: %5d) · diferencia máxima %d" % [k, im.get_width(), n, n2, mx])
-		var tol := TOL_C if k.begins_with("carpa-c") else TOL
+		if k in RUEDAS and mx > tol and caja.size.x <= 32 and caja.size.y <= 32:
+			print("%-18s   el vehículo (1.43.1), en %s: lo demás, igual" % [k, caja])
+			mx = 0
 		if mx > tol:
 			fallos.append("%s: diferencia máxima %d (> %d)" % [k, mx, tol])
 		tot += 1
