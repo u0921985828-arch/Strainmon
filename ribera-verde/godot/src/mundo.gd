@@ -523,7 +523,7 @@ func montar_casa() -> void:
 	for k in D.MUEBLE_EXTR:   # 1.36: las máquinas de las extracciones (11m-almacen)
 		var E: Dictionary = D.MUEBLE_EXTR[k]
 		h.o[E.y][E.x] = k if mueble_ya(E) else null
-	h.o[4][5] = "trim"   # y la mesa de manicurar
+	h.o[7][4] = "trim"   # y la mesa de manicurar (1.36.2: el taller, contra la pared de abajo)
 	var g: Dictionary = D.MUEBLES.gpc   # 1.27.1: la silla gaming, con el PC
 	h.o[g.y + 1][g.x] = "sillaG" if "gpc" in ya else null
 	h.o[g.y + 1][g.x + 1] = "sillaG2" if "gpc" in ya else null

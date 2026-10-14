@@ -3553,23 +3553,23 @@ func _pasos() -> void:
 		await run(func(): await J.object_action(0, 6))
 		R.nev2 = [J.nevera_r(), J.S.rosin.ria.g, J.S.rosin.ria.cu, J.calidad(J.S.rosin.ria)]
 		var m0: int = J.S.min
-		await run(func(): await J.object_action(5, 4))
+		await run(func(): await J.object_action(4, 7))
 		R.mc = [J.S.buds.ria.mc, J.S.min - m0, J.calidad(J.S.buds.ria)]
 		R.txt = "|".join(LOG.slice(l0).filter(func(l): return re("^(Sacas|Guardas|Skunk #1: )", l)))
 		J.S.items.lavadora = 1
 		J.S.items.estatica = 1
 		J.montar_casa()
 		var o: Array = J.MAPS.home.o
-		R.mapa = ",".join([o[4][5], o[4][6], o[4][7], o[6][1], o[6][6], o[6][2]].map(func(x): return x if x else ""))
+		R.mapa = ",".join([o[7][4], o[7][6], o[7][7], o[7][1], o[7][3], o[7][2]].map(func(x): return x if x else ""))
 		J.gancho_billar = func(_t): return .7
-		await run(func(): await J.object_action(1, 6))
-		await run(func(): await J.object_action(6, 6))
+		await run(func(): await J.object_action(1, 7))
+		await run(func(): await J.object_action(3, 7))
 		R.ex = ",".join(J.S.rosin.keys())
 		J.S.items.mallas00 = 0
 		await run(func(): await J.item_give("h_mallas"))
 		J.montar_casa()
-		R.m00 = [J.S.items.mallas00, J.MAPS.home.o[4][7], ",".join(J.extr_ya())]
-		await run(func(): await J.object_action(7, 4))
+		R.m00 = [J.S.items.mallas00, J.MAPS.home.o[7][7], ",".join(J.extr_ya())]
+		await run(func(): await J.object_action(7, 7))
 		J.gancho_billar = Callable()
 		var rr := []
 		for k in J.S.rosin:

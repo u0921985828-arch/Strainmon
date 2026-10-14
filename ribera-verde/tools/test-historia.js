@@ -1102,13 +1102,13 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     R.to = T.filter(h => /Curad/.test(h)).map(h => h.split('<br>').filter(l => /Curad/.test(l)).join()).join('|');
     ALMQ.push(2, null); const l0 = LOG.length; await run(() => objectAction(7, 1)); R.saca = JSON.stringify([S.buds.ria.g, S.buds.ria.cu, S.caja.buds.ria || 0]);
     ALMQ.push(1, null); await run(() => objectAction(0, 6)); R.nev2 = [neveraR(), S.rosin.ria.g, S.rosin.ria.cu, calidad(S.rosin.ria)];
-    const m0 = S.min; await run(() => objectAction(5, 4)); R.mc = [S.buds.ria.mc, S.min - m0, calidad(S.buds.ria)];
+    const m0 = S.min; await run(() => objectAction(4, 7)); R.mc = [S.buds.ria.mc, S.min - m0, calidad(S.buds.ria)];
     R.txt = LOG.slice(l0).filter(l => /^(Sacas|Guardas|Skunk #1: )/.test(l)).join('|');
-    Object.assign(S.items, { lavadora: 1, estatica: 1 }); montarCasa(); const o = MAPS.home.o; R.mapa = [o[4][5], o[4][6], o[4][7], o[6][1], o[6][6], o[6][2]].join();
+    Object.assign(S.items, { lavadora: 1, estatica: 1 }); montarCasa(); const o = MAPS.home.o; R.mapa = [o[7][4], o[7][6], o[7][7], o[7][1], o[7][3], o[7][2]].join();
     const tb = window.tiroBillar; window.tiroBillar = async () => .7;
-    await run(() => objectAction(1, 6)); await run(() => objectAction(6, 6)); R.ex = Object.keys(S.rosin).join();
-    S.items.mallas00 = 0; await run(() => ITEMS.find(i => i.id === 'h_mallas').give()); montarCasa(); R.m00 = [S.items.mallas00, MAPS.home.o[4][7], extrYa().join()];
-    await run(() => objectAction(7, 4)); window.tiroBillar = tb;
+    await run(() => objectAction(1, 7)); await run(() => objectAction(3, 7)); R.ex = Object.keys(S.rosin).join();
+    S.items.mallas00 = 0; await run(() => ITEMS.find(i => i.id === 'h_mallas').give()); montarCasa(); R.m00 = [S.items.mallas00, MAPS.home.o[7][7], extrYa().join()];
+    await run(() => objectAction(7, 7)); window.tiroBillar = tb;
     R.r = Object.entries(S.rosin).map(([k, b]) => k + ':' + coma(b.g) + ':' + pct(b.thc)).join(' ');
     R.shop = ['Lavadora de extracción', 'Máquina de static'].map(l => SHOP.find(it => it.lbl === l).p).join();
     window.toast = _t; S = S0; montarCasa();

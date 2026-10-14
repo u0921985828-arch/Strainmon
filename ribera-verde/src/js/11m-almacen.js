@@ -57,18 +57,20 @@ async function elegirAlmacen(t,i0=0){
     if(mueveAlmacen(ALMACEN,b)){sfx('sel');muestra();}}));
   ALMACEN=null;dlg.hidden=true;return r;
 }
-// un tarro de w × h en (x, y), a escala k: por dentro, lo que lleva hasta f (0-1) del color c (los cogollos, con alm-cogos encima
-// y la cima irregular, alm-copa) y lo vacío del color v (en la nevera, el blanco de detrás a través del cristal); encima, el
-// cristal y la tapa (spr: alm-tarro, alm-tarro-s o alm-bote, almacen.py; -g al doble) y la etiqueta de papel con el sello verde
-// del curado (1.36.1, lo pidió el usuario: más realistas)
-function tarro(o,x,y,w,h,c,f,cu,spr,k=1,v='#2a343a'){
-  const g=k>1?'-g':'',iw=(w-2)*k,ih=(h-5)*k;
-  o.push([x+k,y+4*k,iw,ih,v]);
-  const hh=Math.max(2,Math.round((h-5)*Math.min(1,f)))*k;o.push([x+k,y+(h-1)*k-hh,iw,hh,c]);
-  if(w>=14)o.push(['@','alm-cogos'+g,x+k,y+4*k],[x+k,y+4*k,iw,ih-hh,v],['@','alm-copa'+g,x+k,y+(h-1)*k-hh]);
-  o.push(['@',spr+g,x,y]);
+// un tarro de w × h en (x, y), a escala k: por dentro, lo que lleva (den: alm-cog-p/-s o alm-x-<tipo>, almacen.py) a su nivel,
+// de 1 a 4 cuartos de f (0-1), sobre el color c (el de la variedad, que asoma por los cogollos) o, en los botes, el v de detrás
+// del cristal (en la nevera, el blanco); encima, el cristal y la tapa (spr: alm-tarro, alm-tarro-s o alm-bote; -g al doble) y la
+// etiqueta de papel con el sello verde del curado (1.36.1; 1.36.2, lo pidió el usuario: cada cosa, como es)
+function tarro(o,x,y,w,h,c,f,cu,spr,den,k=1,v='#2a343a'){
+  const g=k>1?'-g':'',n=Math.max(1,Math.min(4,Math.ceil(f*4-1e-9)));
+  o.push([x+k,y+4*k,(w-2)*k,(h-5)*k,w>=14?c:v],['@',den+'-'+n+g,x+k,y+4*k],['@',spr+g,x,y]);
   if(w>=14){const yl=y+Math.round(h/2)*k;o.push(['@','alm-etiqueta'+g,x+4*k,yl]);if(cu)o.push([x+11*k,yl+k,2*k,2*k,'#3f8a46']);}
   else if(cu)o.push([x+(w-3)*k,y+4*k,2*k,2*k,'#58c070']);
+}
+// lo de dentro de un lote: los cogollos pelados (manicurados) o sin pelar; el extracto por su tipo, y el rosin curado, cremoso
+function dentroLote(k,b,r){
+  if(!r)return 'alm-cog-'+((b.mc||0)>=1?'p':'s');
+  const t=tipoExtr(k);return 'alm-x-'+t+(t==='rosin'&&(b.cu||0)>=1?'-cu':'');
 }
 // el marco amarillo del elegido
 const marco=(o,x,y,w,h)=>o.push([x,y,w,1,'#f8d040'],[x,y+h-1,w,1,'#f8d040'],[x,y,1,h,'#f8d040'],[x+w-1,y,1,h,'#f8d040']);
@@ -83,9 +85,9 @@ function panelAlmacen(o,A,px,py){
     for(let q=0;q<n;q++)o.push(['@','alm-fajo-g',px+15,py+38-q*12]);
     barra(0,'eur',S.caja.money/C.money,'#7cc07a');barra(1,'cu',cajaG()/C.g,'#d8b048');return;}
   if(it.k==='+'){o.push(['@','alm-mas-g',px+12,py+8]);barra(0,'g',pesoEncima()/capMochila(),'#e0a040');barra(1,'cu',caja?cajaG()/C.g:neveraR()/NEVERA.g,'#58b0e0');return;}
-  if(!it.r){tarro(o,px+12,py+8,18,25,colorLote(it.k),it.b.g/(C.g/ALM.tarros),it.b.cu>=1,it.k.includes('*')?'alm-tarro-s':'alm-tarro',2);
+  if(!it.r){tarro(o,px+12,py+8,18,25,colorLote(it.k),it.b.g/(C.g/ALM.tarros),it.b.cu>=1,it.k.includes('*')?'alm-tarro-s':'alm-tarro',dentroLote(it.k,it.b),2);
     barra(0,'thc',it.b.thc/30,'#e8d070');barra(1,'cu',it.b.cu||0,'#58c070');barra(2,'mc',it.b.mc||0,'#a0c8f0');return;}
-  const cap=NEVERA.g/ALM.piso/3;tarro(o,px+18,py+20,12,12,COLOR_EXTR[tipoExtr(it.k)],it.b.g/cap,it.b.cu>=1,'alm-bote',2);
+  const cap=NEVERA.g/ALM.piso/3;tarro(o,px+18,py+20,12,12,COLOR_EXTR[tipoExtr(it.k)],it.b.g/cap,it.b.cu>=1,'alm-bote',dentroLote(it.k,it.b,1),2);
   barra(0,'thc',it.b.thc/90,'#e8d070');barra(1,'cu',it.b.cu||0,'#58c070');barra(2,'g',it.b.g/cap,'#e0a040');
 }
 // la vista: la caja (168 × 100) o la nevera (152 × 120) y, a su derecha, la ventana del elegido (60 × 100), centradas juntas
@@ -105,7 +107,7 @@ function rectsAlmacen(A){
     for(let f=0;f<2;f++){const y=y0+8+f*34;
       for(let c=0;c<ALM.fila;c++){const q=(fila0+f)*ALM.fila+c,J=jar[q];if(!J)continue;const x=x0+69+c*23;
         if(J.k==='+')o.push(['@','alm-mas',x,y]);
-        else tarro(o,x,y,18,25,colorLote(J.k),J.b.g/cap,J.b.cu>=1,J.k.includes('*')?'alm-tarro-s':'alm-tarro');
+        else tarro(o,x,y,18,25,colorLote(J.k),J.b.g/cap,J.b.cu>=1,J.k.includes('*')?'alm-tarro-s':'alm-tarro',dentroLote(J.k,J.b));
         if(q===sel)marco(o,x-2,y-2,22,29);}}
     if(fila0>0)o.push([x0+160,y0+8,2,1,'#f8d040'],[x0+159,y0+9,4,1,'#f8d040']);   // hay más arriba
     if(jar.length>(fila0+2)*ALM.fila)o.push([x0+159,y0+71,4,1,'#f8d040'],[x0+160,y0+72,2,1,'#f8d040']);   // y abajo
@@ -120,7 +122,7 @@ function rectsAlmacen(A){
   TIPOS_EXTR().forEach((e,s)=>{
     const y=y0+19+s*14,L=it.filter(x=>x.s===s),off=c&&c.s===s?Math.max(0,c.j-ALM.piso+1):0;
     o.push([x0+6,y+2,5,10,COLOR_EXTR[e]],[x0+6,y+2,5,1,'#ffffff']);
-    L.slice(off,off+ALM.piso).forEach((J,q)=>{const x=x0+15+q*15;tarro(o,x,y+1,12,12,COLOR_EXTR[e],J.b.g/(NEVERA.g/ALM.piso/3),J.b.cu>=1,'alm-bote',1,'#c4d6dc');
+    L.slice(off,off+ALM.piso).forEach((J,q)=>{const x=x0+15+q*15;tarro(o,x,y+1,12,12,COLOR_EXTR[e],J.b.g/(NEVERA.g/ALM.piso/3),J.b.cu>=1,'alm-bote',dentroLote(J.k,J.b,1),1,'#c4d6dc');
       if(c&&c.s===s&&J.j===c.j)marco(o,x-2,y-1,16,16);});
     if(off>0)o.push([x0+12,y+6,1,3,'#f8a020'],[x0+11,y+7,1,1,'#f8a020']);
     if(L.length>off+ALM.piso)o.push([x0+136,y+6,1,3,'#f8a020'],[x0+137,y+7,1,1,'#f8a020']);
@@ -167,8 +169,10 @@ async function manicuraAction(){
 }
 // un mueble por máquina (1.36, lo pidió el usuario), montado en el piso cuando la tienes (montarCasa): la prensa (rosin, hachís y
 // moonrock), los tamices, el cubo con las mallas, la lavadora y la static; el charas, en la mesa de manicurar
-const MUEBLE_EXTR={prensaM:{x:6,y:4,item:'prensa',t:['rosin','hash','moon'],n:'La prensa de rosin, en su mesita'},tamizM:{x:7,y:4,item:'tamiz',alt:'mallas00',t:['seco'],n:'Los tamices de seda, en su bastidor'},
-  mallas:{x:2,y:6,item:'ice',t:['ice'],n:'El cubo con las bolsas de malla'},lavadora:{x:1,y:6,item:'lavadora',t:['lava'],n:'La lavadora de extracción'},staticM:{x:6,y:6,item:'estatica',t:['stat'],n:'La máquina de static'}};
+// 1.36.2 (lo pidió el usuario: en medio cortaban el paso del salón a la cama y la nevera): el taller, en fila contra la pared de
+// abajo, a los dos lados de la puerta: lavadora, cubo, static y manicura a la izquierda; prensa y tamices a la derecha
+const MUEBLE_EXTR={prensaM:{x:6,y:7,item:'prensa',t:['rosin','hash','moon'],n:'La prensa de rosin, en su mesita'},tamizM:{x:7,y:7,item:'tamiz',alt:'mallas00',t:['seco'],n:'Los tamices de seda, en su bastidor'},
+  mallas:{x:2,y:7,item:'ice',t:['ice'],n:'El cubo con las bolsas de malla'},lavadora:{x:1,y:7,item:'lavadora',t:['lava'],n:'La lavadora de extracción'},staticM:{x:3,y:7,item:'estatica',t:['stat'],n:'La máquina de static'}};
 const muebleYa=E=>!!(S.items[E.item]||E.alt&&S.items[E.alt]);
 async function muebleExtr(o){
   const M=MUEBLE_EXTR[o],ya=extrYa(),L=M.t.filter(t=>ya.includes(t));

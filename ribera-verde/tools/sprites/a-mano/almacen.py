@@ -98,7 +98,7 @@ def panel():
 # ---------- los tarros ----------
 # 1.36.1 (lo pidió el usuario: «poco realistas»): tarros de cristal de verdad, con la tapa de rosca estriada más ancha que el
 # cuello, los hombros y el culo redondos, el culo de cristal grueso y los brillos; por dentro, el juego pinta lo que llevan
-# (alm-cogos: los cogollos apilados, con su escarcha, sus pelos y las grietas entre uno y otro; alm-copa, la de arriba, irregular)
+# (1.36.2: alm-cog-* y alm-x-*, lo de dentro, abajo)
 # y la etiqueta de papel escrita a mano (alm-etiqueta)
 VI0, VI1, VI2, VI3, VI4 = '#6e8c98', '#8eaab6', '#a8c4ce', '#c8dce4', '#e8f4f8'   # el cristal, de sombra a brillo
 def cuerpo(L, w, h, tapa):
@@ -145,36 +145,158 @@ def mas():
     L.r(7, 8, 3, 11, '#58d080'); L.r(3, 12, 11, 3, '#58d080'); L.p(7, 8, '#a8f0c0'); L.p(3, 12, '#a8f0c0')
     return L
 
-# los cogollos por dentro (16 × 20): sin color (lo pone el juego, el de la variedad); aquí, solo las grietas oscuras entre
-# cogollo y cogollo, la escarcha de los tricomas arriba a la izquierda de cada uno y algún pelo naranja
-GRIETA, ESCARCHA, ESCARCHA2, PELO = '#20261c', '#eef2dc', '#c4d0ac', '#d0742a'
-NUC = [(3, 1, 3.4), (11, 2, 3.6), (7, 6, 3.4), (1, 8, 3), (14, 8, 3.2), (4, 12, 3.6), (11, 13, 3.4), (1, 18, 3), (8, 18, 3.6), (15, 19, 3)]
-def cogos():
-    """cada cogollo, de atrás adelante: el borde de abajo y de la derecha en sombra (la grieta con el de delante) y la escarcha
-    arriba a la izquierda"""
-    L = Lienzo(16, 20); h = lambda x, y: (x * 73 + y * 151 + x * y * 7) % 97
-    for (a, b, r) in NUC:
-        for y in range(20):
-            for x in range(16):
-                dx, dy = x - a, y - b; d = (dx * dx + dy * dy) ** .5
-                if d > r + .5: continue
-                if d > r - .6 and dx + dy > -1.5: L.p(x, y, GRIETA)
-                elif d > r - .6: L.p(x, y, ESCARCHA2 if h(x, y) % 2 else None) if L.g(x, y)[3] else None
-                elif dx + dy < -1 and d >= 1 and h(x, y) % 3 == 0: L.p(x, y, ESCARCHA)
-                elif L.g(x, y)[3]: L.px[x, y] = (0, 0, 0, 0)                                    # lo de detrás queda tapado
-    for (x, y) in ((7, 7), (12, 14), (3, 2), (4, 13), (14, 9)): L.p(x, y, PELO)
-    return L
-def copa():
-    """lo de arriba (16 × 3): en el color de dentro del tarro vacío, para que la cima de los cogollos no sea una raya"""
-    L = Lienzo(16, 3)
-    for x, d in enumerate((2, 1, 0, 0, 1, 2, 1, 0, 0, 0, 1, 2, 1, 0, 1, 2)):
-        L.vl(x, 0, d - 1, '#2a343a') if d else None
-    return L
 def etiqueta():
     """la etiqueta de papel (10 × 4) escrita a mano; el juego le pone el sello verde del curado a la derecha"""
     L = Lienzo(10, 4)
     L.r(0, 0, 10, 4, '#f0ead8'); L.hl(0, 9, 3, '#cfc6aa'); L.vl(9, 0, 3, '#dcd4bc')
     L.hl(1, 5, 1, '#5a5448'); L.p(3, 1, '#f0ead8'); L.hl(1, 3, 2, '#8a8474'); L.hl(5, 6, 2, '#8a8474')
+    return L
+
+
+# ---------- lo de dentro (1.36.2, lo pidió el usuario: «sprites realistas», pelados y sin pelar, y cada extracción) ----------
+# Cuatro niveles por lo lleno (1-4: un cuarto, medio, tres cuartos, lleno) y dibujados a su tamaño (s = 1) y al doble con más
+# detalle (s = 2, -g), no escalados. Ancla arriba a la izquierda del hueco del tarro: 16 × 20 los cogollos y 10 × 7 los botes.
+#  · alm-cog-p-N / alm-cog-s-N: los cogollos, pelados (manicurados: redondos, prietos y con toda la escarcha a la vista) y sin
+#    pelar (con las hojitas de azúcar asomando, verdes y escarchadas en la punta). El color lo pone el juego (el de la variedad,
+#    un rectángulo debajo): el sprite deja transparente el cuerpo de cada cogollo y pinta encima la sombra, la escarcha y los
+#    pelos; lo vacío de encima va en el gris de dentro del tarro.
+#  · alm-x-<tipo>-N: cada extracción como es (fuentes en el CHANGELOG), con su color, sobre lo vacío:
+#    rosin: fresco, ámbar translúcido y cristalino como savia espesa, plano como un líquido, con su brillo; rosin-cu: curado
+#    en frío, opaco y cremoso («badder»), de crema a tostado claro, con la superficie batida; seco (dry sift): polvo de arena
+#    rubio-tostado, en montón; ice (bubble hash secado): arena rubia en grumos; charas: bolas oscuras, casi negras por fuera,
+#    amasadas a mano, con brillo de grasa; hash (kief prensado): placas marrones apiladas con el canto más claro; moon
+#    (moonrock): cogollos bañados en aceite y rebozados en kief, rocas verdes con costra arenosa; stat (static): polvo finísimo,
+#    casi blanco, de pura cabeza de tricoma.
+VACIO = '#2a343a'
+def azar_px(x, y, sem=0): return (x * 73 + y * 151 + x * y * 7 + sem * 977) % 97
+NIV = (1, 2, 3, 4)
+
+def cogollos(n, pelado, s):
+    W, H = 16 * s, 20 * s
+    L = Lienzo(W, H); L.r(0, 0, W, H, VACIO)
+    alto = round(H * n / 4)                                                                    # hasta dónde llegan
+    r = 3.4 * s
+    # los cogollos, de abajo arriba en filas a tresbolillo; entran los que caben por debajo de su nivel
+    nugs = []
+    filas = int(H / (r * 1.45)) + 2
+    for fi in range(filas):
+        cy = H - r * .9 - fi * r * 1.45
+        off = (r * .95) if fi % 2 else 0
+        cx = -r * .3 + off
+        while cx < W + r:
+            j = azar_px(int(cx * 3), fi, 5) % 7 - 3
+            nugs.append((cx + j * s * .25, cy + (azar_px(fi, int(cx), 2) % 3 - 1) * s * .3, r * (.86 + azar_px(int(cx), fi, 9) % 5 * .06)))
+            cx += r * 1.9
+    nugs = [q for q in nugs if q[1] - q[2] * .55 >= H - alto]
+    nugs.sort(key=lambda q: q[1])                                                              # los de abajo, delante
+    for (cx, cy, rr) in nugs:
+        for y in range(int(cy - rr) - 1, int(cy + rr) + 2):
+            for x in range(int(cx - rr) - 1, int(cx + rr) + 2):
+                dx, dy = x + .5 - cx, (y + .5 - cy) * 1.08; d = (dx * dx + dy * dy) ** .5
+                if d > rr or not (0 <= x < W and 0 <= y < H): continue
+                q = azar_px(x, y, s)
+                if d > rr - .9 * s and dx + dy > -.3 * rr: L.p(x, y, '#1c2418')               # la sombra con el de delante
+                elif d > rr - 1.6 * s and dx + dy > .5 * rr and q % 3 == 0: L.p(x, y, '#3a4a2c')  # el lado en sombra
+                elif dx + dy < -.35 * rr and d > .3 * rr and q % (3 if pelado else 5) == 0:
+                    L.p(x, y, '#e4ecd0' if q % 4 else '#ffffff')                                 # la escarcha, arriba a la izquierda
+                elif not pelado and d > rr - 1.2 * s and q % 4 == 0: L.p(x, y, '#46742e')        # sin pelar: hoja por fuera
+                elif s == 2 and q % 17 == 0: L.p(x, y, '#c8d4b0')                               # tricomas sueltos
+                else: L.px[x, y] = (0, 0, 0, 0)                                                  # el color de la variedad
+        # los pelos (pistilos), naranjas, rizados hacia fuera
+        for k in range(2 if pelado else 3):
+            q = azar_px(int(cx * 7), int(cy * 3), k)
+            ang = (q % 8) * .785; import math
+            x0, y0 = cx + math.cos(ang) * rr * .45, cy + math.sin(ang) * rr * .45
+            for t in range(1 + s):
+                L.p(int(x0 + math.cos(ang) * t), int(y0 + math.sin(ang) * t), '#d8782c' if t < s else '#b85a20')
+        if not pelado:                                                                          # las hojitas de azúcar asomando
+            for k in range(3):
+                q = azar_px(int(cx * 5), int(cy * 11), k + 3)
+                ang = -2.9 + k * 1.3 + (q % 5 - 2) * .2; import math
+                largo = int((2.2 + q % 3 * .6) * s)
+                for t in range(largo):
+                    px = int(cx + math.cos(ang) * (rr * .7 + t)); py = int(cy + math.sin(ang) * (rr * .7 + t))
+                    c = '#3e6a2a' if t < largo - 1 else ('#d8e2c0' if q % 2 else '#5a8a3c')
+                    L.p(px, py, c)
+                    if s == 2 and t < largo - 2: L.p(px + 1, py, '#3c6a2c')
+    return L
+
+def extracto(tipo, n, s):
+    W, H = 10 * s, 7 * s
+    L = Lienzo(W, H)
+    alto = max(s, round(H * n / 4))
+    top = H - alto
+    import math
+    if tipo == 'rosin':                                                                         # savia ámbar, plana, translúcida
+        for y in range(top, H):
+            for x in range(W):
+                c = '#c88a14' if (y - top) < alto * .5 else '#a8680c'
+                if x == 0 or x == W - 1: c = '#8a5208'
+                L.p(x, y, c)
+        L.hl(0, W - 1, top, '#f0c048'); L.p(0, top - 1 if top else top, '#e0b040'); L.p(W - 1, top - 1 if top else top, '#e0b040')   # el menisco
+        for y in range(top + 1, H - 1): L.p(1 + s, y, '#ffe08a') if (y - top) % 3 != 2 else None   # el brillo
+        L.p(W - 2 - s, top + 1 if top + 1 < H else top, '#fff4c0')
+        if s == 2:
+            for (x, y) in ((6, top + 3), (12, top + 5), (15, top + 2)):
+                if y < H: L.p(x, y, '#e8a828')                                                   # las burbujitas de aire
+    elif tipo == 'rosin-cu':                                                                    # badder: cremoso y opaco, batido
+        for x in range(W):
+            hx = top - (1 if azar_px(x, 0, 3) % 3 == 0 and top > 0 else 0)
+            for y in range(hx, H):
+                q = azar_px(x, y, 4)
+                c = '#ecd08a' if q % 4 else '#f6e2a8'
+                if y == hx: c = '#fbecc0'
+                if q % 13 == 0: c = '#d4b064'
+                L.p(x, y, c)
+        L.vl(0, top, H - 1, '#d4b064'); L.vl(W - 1, top, H - 1, '#c4a050')
+    elif tipo in ('seco', 'ice', 'stat'):                                                       # polvos: en montón o en grumos
+        base, claro, oscuro = {'seco': ('#c8a868', '#e2c888', '#a08448'), 'ice': ('#d8bc74', '#eed69a', '#b0904c'),
+                                'stat': ('#efe2b4', '#fff8e0', '#d6c690')}[tipo]
+        for x in range(W):
+            cx = (x + .5 - W / 2) / (W / 2)
+            monte = 0 if tipo == 'stat' and n == 4 else round(alto * .28 * (cx * cx)) if tipo != 'ice' else (azar_px(x, 1, 6) % 3 == 0) * s
+            for y in range(top + monte, H):
+                q = azar_px(x, y, 7 if tipo == 'seco' else 8)
+                c = base
+                if q % 3 == 0: c = claro
+                elif q % 5 == 0: c = oscuro
+                if tipo == 'stat' and q % 2: c = base if q % 7 else '#ffffff'
+                L.p(x, y, c)
+            if top + monte < H: L.p(x, top + monte, claro)
+        if tipo == 'ice':                                                                       # los grumos, con su sombra
+            for k in range(n + 1):
+                gx, gy = (2 + k * 3) % (W - 2), H - 2 - (k * 2) % max(1, alto - 1)
+                if gy >= top: L.r(gx, gy, s + 1, s, claro); L.hl(gx, gx + s, gy + s, oscuro)
+    elif tipo in ('charas', 'moon'):                                                            # bolas a mano / rocas rebozadas
+        cuantas = {1: 1, 2: 2, 3: 4, 4: 6}[n]
+        rr = (1.9 if tipo == 'charas' else 2.1) * s
+        pos = [(W * .3, H - rr), (W * .72, H - rr * .95), (W * .5, H - rr * 2.3), (W * .12, H - rr * 2.1), (W * .88, H - rr * 2.2), (W * .32, H - rr * 3.4)]
+        for (cx, cy) in pos[:cuantas]:
+            for y in range(int(cy - rr) - 1, int(cy + rr) + 2):
+                for x in range(int(cx - rr) - 1, int(cx + rr) + 2):
+                    dx, dy = x + .5 - cx, y + .5 - cy; d = (dx * dx + dy * dy) ** .5
+                    if d > rr: continue
+                    q = azar_px(x, y, 11)
+                    if tipo == 'charas':
+                        c = '#2c1a0e' if dx + dy > 0 else '#4a2e18'
+                        if dx + dy < -rr * .8: c = '#7a5232'                                       # el brillo de la grasa
+                        if q % 9 == 0: c = '#5a3a1e'
+                    else:
+                        c = '#4a5a24' if q % 3 else '#2e3818'                                     # el cogollo bajo el aceite
+                        if q % 2 == 0 or dx + dy < -rr * .3: c = '#c8b070' if q % 3 else '#e2d08c'   # la costra de kief
+                        if dx + dy > rr * .6 and q % 2: c = '#3a3010'
+                    L.p(x, y, c)
+    elif tipo == 'hash':                                                                        # placas prensadas, apiladas
+        gr = max(1, round(1.6 * s))
+        y = H
+        for k in range(n):
+            ancho = W - (k % 2) * s - s
+            x0 = (W - ancho) // 2 + (s if k % 2 else 0)
+            y -= gr
+            if y < 0: break
+            L.r(x0, y, ancho, gr, '#6e4424'); L.hl(x0, x0 + ancho - 1, y, '#9a6a3a')            # la cara de arriba, más clara
+            L.p(x0, y, '#4a2c16'); L.p(x0 + ancho - 1, y + gr - 1, '#3a2010')
+            if s == 2: L.p(x0 + 3 + k * 2, y + 1, '#845630'); L.p(x0 + ancho - 5, y + 2, '#5a3820')
     return L
 
 # las letras de 3 × 5 del botón
@@ -232,9 +354,13 @@ ORO = ('#c09020', '#f0c040', '#f8e080')
 sale('alm-caja', caja()); sale('alm-nevera', nevera()); sale('alm-panel', panel())
 sale('alm-tarro', tarro(LATON)); sale('alm-tarro-s', tarro(ORO)); sale('alm-bote', bote()); sale('alm-mas', mas())
 sale('alm-guardar', guardar()); sale('alm-fajo', fajo())
-sale('alm-cogos', cogos()); sale('alm-copa', copa()); sale('alm-etiqueta', etiqueta())
+sale('alm-etiqueta', etiqueta())
+for g, s in (('', 1), ('-g', 2)):
+    for n in NIV:
+        for p in ('p', 's'): sale('alm-cog-%s-%d%s' % (p, n, g), cogollos(n, p == 'p', s))
+        for t in ('rosin', 'rosin-cu', 'seco', 'ice', 'charas', 'hash', 'moon', 'stat'): sale('alm-x-%s-%d%s' % (t, n, g), extracto(t, n, s))
 for n in ('thc', 'cu', 'mc', 'g', 'eur'): sale('alm-ic-' + n, icono(n))
-for n in ('alm-tarro', 'alm-tarro-s', 'alm-bote', 'alm-mas', 'alm-fajo', 'alm-cogos', 'alm-copa', 'alm-etiqueta'): sale(n + '-g', doble(SAL[n]))
+for n in ('alm-tarro', 'alm-tarro-s', 'alm-bote', 'alm-mas', 'alm-fajo', 'alm-etiqueta'): sale(n + '-g', doble(SAL[n]))
 
 def escribe(raiz=None):
     for n, L in SAL.items():

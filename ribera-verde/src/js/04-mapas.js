@@ -313,7 +313,7 @@ function buildMaps(){
   const h=newMap('home',18,8,'floor');h.music='home';
   rect(h,0,0,17,0,(x,y)=>gr(h,x,y,'iwT_home'));rect(h,0,1,17,1,(x,y)=>gr(h,x,y,'iwB_home'));
   ob(h,6,1,'iwin');ob(h,9,1,'iwin');ob(h,7,1,'poster');ob(h,15,1,'iwin');
-  ob(h,0,2,'bedT');ob(h,0,3,'bedB');ob(h,1,2,'plantDeco');ob(h,4,2,'pc');ob(h,5,2,'lab');ob(h,6,2,'lab2');ob(h,5,4,'trim');   // 1.36: la mesa de manicurar, delante de las mesas (en la fila 2 taparía el diploma o la ventana)
+  ob(h,0,2,'bedT');ob(h,0,3,'bedB');ob(h,1,2,'plantDeco');ob(h,4,2,'pc');ob(h,5,2,'lab');ob(h,6,2,'lab2');ob(h,4,7,'trim');   // 1.36: la mesa de manicurar; 1.36.2 (lo pidió el usuario: no cortar el paso), contra la pared de abajo, junto a la puerta
   ob(h,4,3,'silla');   // 1.27.1: la silla de la tía, delante de su ordenador
   ob(h,0,6,'fridge');ob(h,3,5,'table');ob(h,17,7,'plantDeco');   // 1.36 (lo pidió el usuario): sin el arcón de la 1.10 en (0, 4)
   gr(h,5,7,'mat');h.exits['5,7']={to:'town',x:5,y:9,dir:'down'};
@@ -376,7 +376,7 @@ function montarCasa(){
   SITIOS.forEach(s=>{for(let x=s.x;x<s.x+s.w;x++)ob(h,x,s.y,null);});
   for(const k in MUEBLES){const m=MUEBLES[k],en=ya.includes(k);if(m.suelo)continue;ob(h,m.x,m.y,en?k:null);if(!m.uno)ob(h,m.x+1,m.y,en?k+'2':null);}
   for(const k in MUEBLE_EXTR){const E=MUEBLE_EXTR[k];ob(h,E.x,E.y,muebleYa(E)?k:null);}   // 1.36: las máquinas de las extracciones (11m-almacen)
-  ob(h,5,4,'trim');   // y la mesa de manicurar
+  ob(h,4,7,'trim');   // y la mesa de manicurar (1.36.2: el taller, contra la pared de abajo)
   {const g=MUEBLES.gpc,en=ya.includes('gpc');ob(h,g.x,g.y+1,en?'sillaG':null);ob(h,g.x+1,g.y+1,en?'sillaG2':null);}   // 1.27.1: la silla gaming, con el PC
   h.carpas=[];
   S.carpas.forEach((c,ci)=>{

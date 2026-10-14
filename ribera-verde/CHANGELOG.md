@@ -1,5 +1,15 @@
 # Cambios
 
+## 1.36.2 · 14 de octubre de 2026
+
+El taller de extracciones, contra la pared, y lo de dentro de los tarros y botes, como es de verdad (lo pidió el usuario). Godot, 0.30.2.
+
+- **El paso, libre.** La lavadora, el cubo de mallas, la máquina de static y la mesa de manicurar (ahora en (4, 7)) van en fila contra la pared de abajo, a la izquierda de la puerta, y la prensa y los tamices, a la derecha (`MUEBLE_EXTR`): del salón y las carpas a la nevera y la cama se pasa por el medio sin rodeos.
+- **Los cogollos, pelados o sin pelar.** Lo que se ve dentro de cada tarro depende del lote: manicurado (`alm-cog-p`: cogollos limpios, redondos y con más escarcha) o sin pelar (`alm-cog-s`: con las hojitas de azúcar asomando), siempre en el color de la variedad, con los pelos naranjas, y a cuatro niveles según lo lleno que está.
+- **Cada extracción, la suya** (`alm-x-<tipo>`, cuatro niveles): el rosin fresco, ámbar y translúcido como savia, con su brillo; el rosin curado en frío, opaco y cremoso (badder); el tamizado en seco, un montón de arena rubia; el ice (bubble hash), arena rubia en grumos; el charas, bolas oscuras amasadas a mano, con el brillo de la grasa; el hash prensado, en placas marrones apiladas; el moonrock, cogollos bañados en aceite y rebozados en kief; y la static, un polvo finísimo, casi blanco.
+- `tarro(…, den, k, v)` y `dentroLote` en `11m-almacen.js` (Godot, `_tarro` y `_dentro_lote` en `trama.gd`); arte a mano en `tools/sprites/a-mano/almacen.py`.
+- Fuentes del aspecto: trimleaf.com (hash 101, tipos de hash), weedmaps.com (fresh press, cold-cure badder y jam), floraflex.com (cogollos manicurados o no), thebluntness.com (moon rocks) y la Junta de Control de la Marihuana de Alaska (dry sift); el charas y la static, por su descripción habitual.
+
 ## 1.36.1 · 14 de octubre de 2026
 
 Los tarros y la nevera, más realistas (lo pidió el usuario). Godot, 0.30.1.

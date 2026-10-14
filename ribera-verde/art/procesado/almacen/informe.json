@@ -5,14 +5,14 @@
     25
   ],
   "tope_colores": 64,
-  "secuencias": 25,
-  "fotogramas": 25,
+  "secuencias": 101,
+  "fotogramas": 101,
   "semitransparentes": 0,
-  "en_paleta_antes": 2.6,
+  "en_paleta_antes": 2.2,
   "distancia_media": 0,
   "colores_finales": 41,
   "fundidos": [],
-  "huerfanos_quitados": 6,
+  "huerfanos_quitados": 34,
   "deriva_pies": {},
   "errores": [],
   "avisos": []

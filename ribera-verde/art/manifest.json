@@ -623,49 +623,9 @@
    "ajuste": "exacto",
    "nota": "1.36: los visores de la caja fuerte y la nevera (almacen.py)"
   },
-  "alm_cogos": {
-   "w": 16,
-   "h": 20,
-   "ancla": [
-    0,
-    0
-   ],
-   "ajuste": "exacto",
-   "nota": "1.36.1: lo de dentro de los tarros (almacen.py)"
-  },
-  "alm_copa": {
-   "w": 16,
-   "h": 3,
-   "ancla": [
-    0,
-    0
-   ],
-   "ajuste": "exacto",
-   "nota": "1.36.1: lo de dentro de los tarros (almacen.py)"
-  },
   "alm_etiqueta": {
    "w": 10,
    "h": 4,
-   "ancla": [
-    0,
-    0
-   ],
-   "ajuste": "exacto",
-   "nota": "1.36.1: lo de dentro de los tarros (almacen.py)"
-  },
-  "alm_cogos_g": {
-   "w": 32,
-   "h": 40,
-   "ancla": [
-    0,
-    0
-   ],
-   "ajuste": "exacto",
-   "nota": "1.36.1: lo de dentro de los tarros (almacen.py)"
-  },
-  "alm_copa_g": {
-   "w": 32,
-   "h": 6,
    "ancla": [
     0,
     0
@@ -682,6 +642,46 @@
    ],
    "ajuste": "exacto",
    "nota": "1.36.1: lo de dentro de los tarros (almacen.py)"
+  },
+  "alm_cog": {
+   "w": 16,
+   "h": 20,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36.2: lo de dentro de los tarros, cogollos pelados y sin pelar y cada extracción, por nivel (almacen.py)"
+  },
+  "alm_cog_g": {
+   "w": 32,
+   "h": 40,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36.2: lo de dentro de los tarros, cogollos pelados y sin pelar y cada extracción, por nivel (almacen.py)"
+  },
+  "alm_x": {
+   "w": 10,
+   "h": 7,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36.2: lo de dentro de los tarros, cogollos pelados y sin pelar y cada extracción, por nivel (almacen.py)"
+  },
+  "alm_x_g": {
+   "w": 20,
+   "h": 14,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36.2: lo de dentro de los tarros, cogollos pelados y sin pelar y cada extracción, por nivel (almacen.py)"
   }
  },
  "fases": [
@@ -8340,12 +8340,88 @@
     "misc:alm-bote-g",
     "misc:alm-mas-g",
     "misc:alm-fajo-g",
-    "misc:alm-cogos",
-    "misc:alm-cogos-g",
-    "misc:alm-copa",
-    "misc:alm-copa-g",
     "misc:alm-etiqueta",
-    "misc:alm-etiqueta-g"
+    "misc:alm-etiqueta-g",
+    "misc:alm-cog-p-1",
+    "misc:alm-cog-s-1",
+    "misc:alm-x-rosin-1",
+    "misc:alm-x-rosin-cu-1",
+    "misc:alm-x-seco-1",
+    "misc:alm-x-ice-1",
+    "misc:alm-x-charas-1",
+    "misc:alm-x-hash-1",
+    "misc:alm-x-moon-1",
+    "misc:alm-x-stat-1",
+    "misc:alm-cog-p-2",
+    "misc:alm-cog-s-2",
+    "misc:alm-x-rosin-2",
+    "misc:alm-x-rosin-cu-2",
+    "misc:alm-x-seco-2",
+    "misc:alm-x-ice-2",
+    "misc:alm-x-charas-2",
+    "misc:alm-x-hash-2",
+    "misc:alm-x-moon-2",
+    "misc:alm-x-stat-2",
+    "misc:alm-cog-p-3",
+    "misc:alm-cog-s-3",
+    "misc:alm-x-rosin-3",
+    "misc:alm-x-rosin-cu-3",
+    "misc:alm-x-seco-3",
+    "misc:alm-x-ice-3",
+    "misc:alm-x-charas-3",
+    "misc:alm-x-hash-3",
+    "misc:alm-x-moon-3",
+    "misc:alm-x-stat-3",
+    "misc:alm-cog-p-4",
+    "misc:alm-cog-s-4",
+    "misc:alm-x-rosin-4",
+    "misc:alm-x-rosin-cu-4",
+    "misc:alm-x-seco-4",
+    "misc:alm-x-ice-4",
+    "misc:alm-x-charas-4",
+    "misc:alm-x-hash-4",
+    "misc:alm-x-moon-4",
+    "misc:alm-x-stat-4",
+    "misc:alm-cog-p-1-g",
+    "misc:alm-cog-s-1-g",
+    "misc:alm-x-rosin-1-g",
+    "misc:alm-x-rosin-cu-1-g",
+    "misc:alm-x-seco-1-g",
+    "misc:alm-x-ice-1-g",
+    "misc:alm-x-charas-1-g",
+    "misc:alm-x-hash-1-g",
+    "misc:alm-x-moon-1-g",
+    "misc:alm-x-stat-1-g",
+    "misc:alm-cog-p-2-g",
+    "misc:alm-cog-s-2-g",
+    "misc:alm-x-rosin-2-g",
+    "misc:alm-x-rosin-cu-2-g",
+    "misc:alm-x-seco-2-g",
+    "misc:alm-x-ice-2-g",
+    "misc:alm-x-charas-2-g",
+    "misc:alm-x-hash-2-g",
+    "misc:alm-x-moon-2-g",
+    "misc:alm-x-stat-2-g",
+    "misc:alm-cog-p-3-g",
+    "misc:alm-cog-s-3-g",
+    "misc:alm-x-rosin-3-g",
+    "misc:alm-x-rosin-cu-3-g",
+    "misc:alm-x-seco-3-g",
+    "misc:alm-x-ice-3-g",
+    "misc:alm-x-charas-3-g",
+    "misc:alm-x-hash-3-g",
+    "misc:alm-x-moon-3-g",
+    "misc:alm-x-stat-3-g",
+    "misc:alm-cog-p-4-g",
+    "misc:alm-cog-s-4-g",
+    "misc:alm-x-rosin-4-g",
+    "misc:alm-x-rosin-cu-4-g",
+    "misc:alm-x-seco-4-g",
+    "misc:alm-x-ice-4-g",
+    "misc:alm-x-charas-4-g",
+    "misc:alm-x-hash-4-g",
+    "misc:alm-x-moon-4-g",
+    "misc:alm-x-stat-4-g"
    ],
    "celda": "alm_tarro",
    "max_colores": 64,
@@ -8427,32 +8503,336 @@
      "celda": "alm_fajo_g"
     },
     {
-     "nombre": "alm-cogos",
-     "celda": "alm_cogos"
-    },
-    {
-     "nombre": "alm-cogos-g",
-     "celda": "alm_cogos_g"
-    },
-    {
-     "nombre": "alm-copa",
-     "celda": "alm_copa"
-    },
-    {
-     "nombre": "alm-copa-g",
-     "celda": "alm_copa_g"
-    },
-    {
      "nombre": "alm-etiqueta",
      "celda": "alm_etiqueta"
     },
     {
      "nombre": "alm-etiqueta-g",
      "celda": "alm_etiqueta_g"
+    },
+    {
+     "nombre": "alm-cog-p-1",
+     "celda": "alm_cog"
+    },
+    {
+     "nombre": "alm-cog-s-1",
+     "celda": "alm_cog"
+    },
+    {
+     "nombre": "alm-x-rosin-1",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-rosin-cu-1",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-seco-1",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-ice-1",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-charas-1",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-hash-1",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-moon-1",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-stat-1",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-cog-p-2",
+     "celda": "alm_cog"
+    },
+    {
+     "nombre": "alm-cog-s-2",
+     "celda": "alm_cog"
+    },
+    {
+     "nombre": "alm-x-rosin-2",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-rosin-cu-2",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-seco-2",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-ice-2",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-charas-2",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-hash-2",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-moon-2",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-stat-2",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-cog-p-3",
+     "celda": "alm_cog"
+    },
+    {
+     "nombre": "alm-cog-s-3",
+     "celda": "alm_cog"
+    },
+    {
+     "nombre": "alm-x-rosin-3",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-rosin-cu-3",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-seco-3",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-ice-3",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-charas-3",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-hash-3",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-moon-3",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-stat-3",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-cog-p-4",
+     "celda": "alm_cog"
+    },
+    {
+     "nombre": "alm-cog-s-4",
+     "celda": "alm_cog"
+    },
+    {
+     "nombre": "alm-x-rosin-4",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-rosin-cu-4",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-seco-4",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-ice-4",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-charas-4",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-hash-4",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-moon-4",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-x-stat-4",
+     "celda": "alm_x"
+    },
+    {
+     "nombre": "alm-cog-p-1-g",
+     "celda": "alm_cog_g"
+    },
+    {
+     "nombre": "alm-cog-s-1-g",
+     "celda": "alm_cog_g"
+    },
+    {
+     "nombre": "alm-x-rosin-1-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-rosin-cu-1-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-seco-1-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-ice-1-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-charas-1-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-hash-1-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-moon-1-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-stat-1-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-cog-p-2-g",
+     "celda": "alm_cog_g"
+    },
+    {
+     "nombre": "alm-cog-s-2-g",
+     "celda": "alm_cog_g"
+    },
+    {
+     "nombre": "alm-x-rosin-2-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-rosin-cu-2-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-seco-2-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-ice-2-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-charas-2-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-hash-2-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-moon-2-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-stat-2-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-cog-p-3-g",
+     "celda": "alm_cog_g"
+    },
+    {
+     "nombre": "alm-cog-s-3-g",
+     "celda": "alm_cog_g"
+    },
+    {
+     "nombre": "alm-x-rosin-3-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-rosin-cu-3-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-seco-3-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-ice-3-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-charas-3-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-hash-3-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-moon-3-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-stat-3-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-cog-p-4-g",
+     "celda": "alm_cog_g"
+    },
+    {
+     "nombre": "alm-cog-s-4-g",
+     "celda": "alm_cog_g"
+    },
+    {
+     "nombre": "alm-x-rosin-4-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-rosin-cu-4-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-seco-4-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-ice-4-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-charas-4-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-hash-4-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-moon-4-g",
+     "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-x-stat-4-g",
+     "celda": "alm_x_g"
     }
    ],
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/almacen.py",
-   "descripcion": "1.36: los visores de la caja fuerte y la nevera, con el ancla arriba a la izquierda: la caja por dentro (el acero biselado con remaches, el fondo cepillado, el tabique, la bandeja de los billetes, el cajón y dos baldas de madera), la nevera por dentro (la luz, la fila de GUARDAR y siete baldas de cristal), la ventana del elegido (el visor y tres ranuras de barras), el cristal de los tarros de cogollos con la tapa de latón y la dorada del fenotipo estrella, el bote pequeño de los extractos, el tarro abierto con el más (GUARDAR en la caja), el botón «+ GUARDAR» de la nevera, el fajo de billetes, los iconos de las barras (tricoma, tarro, tijeras, pesa y moneda) y los tarros, el bote y el fajo al doble para la ventana; 1.36.1 (más realistas): tarros con hombros y culo redondos, culo grueso y tapa estriada, el bote bajo de boca ancha con la tapa negra, la nevera con su junta, el plafón, la rejilla y baldas de cristal con perfil, y lo de dentro de los tarros (los cogollos apilados con escarcha y pelos, la cima irregular y la etiqueta escrita)",
+   "descripcion": "1.36: los visores de la caja fuerte y la nevera, con el ancla arriba a la izquierda: la caja por dentro (el acero biselado con remaches, el fondo cepillado, el tabique, la bandeja de los billetes, el cajón y dos baldas de madera), la nevera por dentro (la luz, la fila de GUARDAR y siete baldas de cristal), la ventana del elegido (el visor y tres ranuras de barras), el cristal de los tarros de cogollos con la tapa de latón y la dorada del fenotipo estrella, el bote pequeño de los extractos, el tarro abierto con el más (GUARDAR en la caja), el botón «+ GUARDAR» de la nevera, el fajo de billetes, los iconos de las barras (tricoma, tarro, tijeras, pesa y moneda) y los tarros, el bote y el fajo al doble para la ventana; 1.36.1 (más realistas): tarros con hombros y culo redondos, culo grueso y tapa estriada, el bote bajo de boca ancha con la tapa negra, la nevera con su junta, el plafón, la rejilla y baldas de cristal con perfil, y lo de dentro de los tarros (los cogollos apilados con escarcha y pelos, la cima irregular y la etiqueta escrita); 1.36.2 (lo pidió el usuario: sprites realistas por tipo): lo de dentro por nivel (1-4, de un cuarto a lleno): cogollos pelados (alm-cog-p, manicurados, más escarcha) y sin pelar (alm-cog-s, con las hojitas de azúcar asomando), en el color de la variedad que pone el juego, y cada extracción en su bote (alm-x-<tipo>): rosin fresco ámbar y translúcido, rosin curado en frío cremoso (badder), dry sift en montón de arena rubia, ice en grumos rubios, charas en bolas oscuras amasadas a mano, hash en placas prensadas, moonrock como rocas verdes rebozadas en kief y static en polvo casi blanco",
    "ajuste_por_sprite": {
     "alm-caja": "exacto",
     "alm-nevera": "exacto",
@@ -8473,10 +8853,6 @@
     "alm-bote-g": "exacto",
     "alm-mas-g": "exacto",
     "alm-fajo-g": "exacto",
-    "alm-cogos": "exacto",
-    "alm-cogos-g": "exacto",
-    "alm-copa": "exacto",
-    "alm-copa-g": "exacto",
     "alm-etiqueta": "exacto",
     "alm-etiqueta-g": "exacto"
    },

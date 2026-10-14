@@ -5265,19 +5265,15 @@ func elegir_almacen(t: String, i0 := 0):
 		dlg_nm.hide()
 	return e
 
-# un tarro de w × h en (x, y), a escala k: por dentro, lo que lleva hasta f (0-1) del color c (los cogollos, con alm-cogos encima
-# y la cima irregular, alm-copa) y lo vacío del color v (en la nevera, el blanco de detrás a través del cristal); encima, el
-# cristal y la tapa (spr: alm-tarro, alm-tarro-s o alm-bote, almacen.py; -g al doble) y la etiqueta de papel con el sello verde
-# del curado (1.36.1)
-func _tarro(o: Array, x: int, y: int, w: int, h: int, c: String, f: float, cu: bool, spr: String, k := 1, v := "#2a343a") -> void:
+# un tarro de w × h en (x, y), a escala k: por dentro, lo que lleva (den: alm-cog-p/-s o alm-x-<tipo>, almacen.py) a su nivel,
+# de 1 a 4 cuartos de f (0-1), sobre el color c (el de la variedad, que asoma por los cogollos) o, en los botes, el v de detrás
+# del cristal (en la nevera, el blanco); encima, el cristal y la tapa (spr: alm-tarro, alm-tarro-s o alm-bote; -g al doble) y la
+# etiqueta de papel con el sello verde del curado (1.36.1; 1.36.2: cada cosa, como es)
+func _tarro(o: Array, x: int, y: int, w: int, h: int, c: String, f: float, cu: bool, spr: String, den: String, k := 1, v := "#2a343a") -> void:
 	var g := "-g" if k > 1 else ""
-	var iw := (w - 2) * k
-	var ih := (h - 5) * k
-	o.append([x + k, y + 4 * k, iw, ih, v])
-	var hh := maxi(2, Datos.jsround((h - 5) * minf(1.0, f))) * k
-	o.append([x + k, y + (h - 1) * k - hh, iw, hh, c])
-	if w >= 14:
-		o.append_array([["@", "alm-cogos" + g, x + k, y + 4 * k], [x + k, y + 4 * k, iw, ih - hh, v], ["@", "alm-copa" + g, x + k, y + (h - 1) * k - hh]])
+	var n := clampi(int(ceil(f * 4.0 - 1e-9)), 1, 4)
+	o.append([x + k, y + 4 * k, (w - 2) * k, (h - 5) * k, c if w >= 14 else v])
+	o.append(["@", den + "-" + str(n) + g, x + k, y + 4 * k])
 	o.append(["@", spr + g, x, y])
 	if w >= 14:
 		var yl: int = y + Datos.jsround(h / 2.0) * k
@@ -5286,6 +5282,13 @@ func _tarro(o: Array, x: int, y: int, w: int, h: int, c: String, f: float, cu: b
 			o.append([x + 11 * k, yl + k, 2 * k, 2 * k, "#3f8a46"])
 	elif cu:
 		o.append([x + (w - 3) * k, y + 4 * k, 2 * k, 2 * k, "#58c070"])
+
+# lo de dentro de un lote: los cogollos pelados (manicurados) o sin pelar; el extracto por su tipo, y el rosin curado, cremoso
+func _dentro_lote(k: String, b: Dictionary, r := false) -> String:
+	if not r:
+		return "alm-cog-" + ("p" if float(b.get("mc", 0)) >= 1 else "s")
+	var t := tipo_extr(k)
+	return "alm-x-" + t + ("-cu" if t == "rosin" and float(b.get("cu", 0)) >= 1 else "")
 
 func _marco(o: Array, x: int, y: int, w: int, h: int) -> void:
 	o.append_array([[x, y, w, 1, "#f8d040"], [x, y + h - 1, w, 1, "#f8d040"], [x, y, 1, h, "#f8d040"], [x + w - 1, y, 1, h, "#f8d040"]])
@@ -5321,13 +5324,13 @@ func panel_almacen(o: Array, A: Dictionary, px: int, py: int) -> void:
 		_barra_alm(o, px, py, 1, "cu", caja_g() / C.g if caja else nevera_r() / D.NEVERA.g, "#58b0e0")
 		return
 	if not it.r:
-		_tarro(o, px + 12, py + 8, 18, 25, _color_lote(it.k), it.b.g / (C.g / D.ALM.tarros), float(it.b.get("cu", 0)) >= 1, "alm-tarro-s" if it.k.contains("*") else "alm-tarro", 2)
+		_tarro(o, px + 12, py + 8, 18, 25, _color_lote(it.k), it.b.g / (C.g / D.ALM.tarros), float(it.b.get("cu", 0)) >= 1, "alm-tarro-s" if it.k.contains("*") else "alm-tarro", _dentro_lote(it.k, it.b), 2)
 		_barra_alm(o, px, py, 0, "thc", it.b.thc / 30.0, "#e8d070")
 		_barra_alm(o, px, py, 1, "cu", float(it.b.get("cu", 0)), "#58c070")
 		_barra_alm(o, px, py, 2, "mc", float(it.b.get("mc", 0)), "#a0c8f0")
 		return
 	var cap: float = D.NEVERA.g / D.ALM.piso / 3.0
-	_tarro(o, px + 18, py + 20, 12, 12, D.COLOR_EXTR[tipo_extr(it.k)], it.b.g / cap, float(it.b.get("cu", 0)) >= 1, "alm-bote", 2)
+	_tarro(o, px + 18, py + 20, 12, 12, D.COLOR_EXTR[tipo_extr(it.k)], it.b.g / cap, float(it.b.get("cu", 0)) >= 1, "alm-bote", _dentro_lote(it.k, it.b, true), 2)
 	_barra_alm(o, px, py, 0, "thc", it.b.thc / 90.0, "#e8d070")
 	_barra_alm(o, px, py, 1, "cu", float(it.b.get("cu", 0)), "#58c070")
 	_barra_alm(o, px, py, 2, "g", it.b.g / cap, "#e0a040")
@@ -5371,7 +5374,7 @@ func rects_almacen(A: Dictionary) -> Array:
 				if Jt.k == "+":
 					o.append(["@", "alm-mas", x, y])
 				else:
-					_tarro(o, x, y, 18, 25, _color_lote(Jt.k), Jt.b.g / cap, float(Jt.b.get("cu", 0)) >= 1, "alm-tarro-s" if Jt.k.contains("*") else "alm-tarro")
+					_tarro(o, x, y, 18, 25, _color_lote(Jt.k), Jt.b.g / cap, float(Jt.b.get("cu", 0)) >= 1, "alm-tarro-s" if Jt.k.contains("*") else "alm-tarro", _dentro_lote(Jt.k, Jt.b))
 				if q == sel:
 					_marco(o, x - 2, y - 2, 22, 29)
 		if fila0 > 0:
@@ -5399,7 +5402,7 @@ func rects_almacen(A: Dictionary) -> Array:
 		for q in vis.size():
 			var Jt: Dictionary = vis[q]
 			var x: int = x0 + 15 + q * 15
-			_tarro(o, x, y + 1, 12, 12, D.COLOR_EXTR[e], Jt.b.g / (D.NEVERA.g / D.ALM.piso / 3.0), float(Jt.b.get("cu", 0)) >= 1, "alm-bote", 1, "#c4d6dc")
+			_tarro(o, x, y + 1, 12, 12, D.COLOR_EXTR[e], Jt.b.g / (D.NEVERA.g / D.ALM.piso / 3.0), float(Jt.b.get("cu", 0)) >= 1, "alm-bote", _dentro_lote(Jt.k, Jt.b, true), 1, "#c4d6dc")
 			if cs != null and cs.s == s and Jt.j == cs.j:
 				_marco(o, x - 2, y - 1, 16, 16)
 		if off > 0:
