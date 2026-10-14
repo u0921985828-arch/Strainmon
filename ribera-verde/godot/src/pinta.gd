@@ -404,6 +404,9 @@ func _encima() -> void:
 		var cm := camara()
 		for e in J.rects_orden():
 			_rect(float(e[0]) - cm.x, float(e[1]) - cm.y, e[2], e[3], css(e[4]))
+	if J.CARRO_V != null:   # el carro de esquejes por dentro (1.40)
+		for e in J.rects_carro(J.CARRO_V):
+			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.ALMACEN != null:   # la caja fuerte y la nevera por dentro (1.36)
 		for e in J.rects_almacen(J.ALMACEN):
 			if typeof(e[0]) == TYPE_STRING:   # ['@', sprite, x, y]: un sprite de misc por su esquina

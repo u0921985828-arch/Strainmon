@@ -5656,3 +5656,235 @@ func ordenar(mapa: String) -> void:
 		if i < 0 or i >= L.size():
 			return
 		await mover_pieza(mapa, L[i].k)
+
+# ---------- el carro de esquejes por dentro (1.40, lo pidió el usuario: «que no sea un menú») ----------
+# dos bandejas de 12 tacos (6 × 2), la de arriba y la de abajo, con sus tubos T5 y su tapa; los esquejes de S.bandejas van por
+# orden en los tacos (0-11 arriba, 12-23 abajo). Flechas eligen, A el taco, B cierra. CARRO_V = {i: el elegido}
+var CARRO_V = null
+const CARRO_W := 116
+const CARRO_H := 108
+
+func mueve_carro(V: Dictionary, b: String) -> bool:
+	var P := int(D.CARRO.plazas)
+	var F := P >> 1
+	var nt: int = D.CARRO.bandejas * 2
+	var i: int = V.i
+	var R: int = i / F
+	var c: int = i % F
+	if b == "left":
+		c -= 1
+	elif b == "right":
+		c += 1
+	elif b == "up":
+		R -= 1
+	elif b == "down":
+		R += 1
+	if c < 0 or c >= F or R < 0 or R >= nt:
+		return false
+	V.i = R * F + c
+	return true
+
+func desc_carro(V: Dictionary) -> String:
+	var cap: int = D.CARRO.bandejas * D.CARRO.plazas
+	var nb: int = S.bandejas.size()
+	if V.i < nb:
+		var e: Dictionary = S.bandejas[V.i]
+		var s = strain(e.sid)
+		var hasta: int = int(e.dia) + int(D.CARRO.dias)
+		return "Esqueje de %s%s: pinchado el día %s, aguanta hasta el día %s%s.\nA: nombrarlo o tirarlo · B: cerrar." % [s.n, etiq(e.f), n(e.dia), n(hasta), " (hoy es el último)" if hasta <= S.day else ""]
+	var pr: int = S.esquejes.size()
+	return "Taco vacío · %d de %d ocupados. %s\n%s · B: cerrar." % [nb, cap, ("En el propagador llevas %d." % pr) if pr else "El propagador está vacío.", "A: pinchar" if pr and nb < cap else "A: ver"]
+
+func elegir_carro(i0 := 0):
+	if gancho_carro.is_valid():
+		return gancho_carro.call()
+	var cap: int = D.CARRO.bandejas * D.CARRO.plazas
+	CARRO_V = {"i": clampi(i0, 0, cap - 1)}
+	_dlg_fijo(desc_carro(CARRO_V), "CARRO DE ESQUEJES")
+	var pr := Motor.Prom.new()
+	push(func(b: String):
+		if b == "B":
+			pop()
+			pr.res(null)
+			return
+		if b == "A":
+			pop()
+			pr.res(CARRO_V.i)
+			return
+		if mueve_carro(CARRO_V, b):
+			sfx("sel")
+			_dlg_fijo(desc_carro(CARRO_V), "CARRO DE ESQUEJES"))
+	var e = await Motor.espera(pr)
+	CARRO_V = null
+	if not oraculo:
+		dlg.hide()
+		dlg_nm.hide()
+	return e
+
+# un esqueje en su taco, dibujado a mano a 1 px (k: el tamaño del píxel): el tallo y, arriba, una hoja de cannabis de 7 dedos
+# (X, del color de hoja de la variedad; D, su nervio, más oscuro; T, el tallo); cx: el centro; y: donde el tallo entra en el taco.
+# El del último día, amarillento (seco)
+const CLON := [
+	"......X......",
+	".....XXX.....",
+	".X...XDX...X.",
+	".XX..XDX..XX.",
+	"..XX.XDX.XX..",
+	"...XX.D.XX...",
+	"XX..XXDXX..XX",
+	".XXXX.D.XXXX.",
+	"....X.T.X....",
+	"......T......",
+	"......T......",
+	"......T......"]
+const CLON_MINI := ["..X..", "X.X.X", ".XXX.", "..T.."]
+# el elegido, en grande (48 × 40, 1 px): cuatro hojas de cannabis de 7 dedos, las dos de atrás en sombra (K), y dos brotes;
+# lo saca tools/sprites/a-mano/esqueje.py (L haz, X hoja, D nervio y envés, K sombra, T tallo)
+const CLON_G := [
+	"...............................D................",
+	"................D.............DX...D............",
+	"............D...DX.....XL.....DX..DX............",
+	"............DX..DX.....XL...X.DX.DX.............",
+	".............DX.DX.D...XL...DXDXDDX..DD.........",
+	".........DX..DKXDXDXL..XL..XDXDXDXDDDX..........",
+	"..........DXXXDXDXDXDL.XL.XDXDDXXDDXX...........",
+	"...........DDXXKDDXDXDLXLXXLDDKDDDX..L....X.....",
+	".....L....X..DDDKDDXXXLXLXL.DDDDDDDDXL..XXL.....",
+	".....XLL..XLXXXDKDXXLLXXXLXXX.TKDDXXXL.XXL......",
+	"......XLL.XLDDDDDT..XXXDXXLL.T..XXDXXLXXL.......",
+	".......XLLXLLXDD..T...XXTL..TT...XLXXLXLL.......",
+	".......XXLXLLXL....T....T...T.....XXLXLL.XXXXXX.",
+	".XXLLLL.XXLXXL......T...T..T......XXXDXXXXLLL...",
+	"...XXXLLLLDXXL.......T..T.T........XDXXLLL......",
+	"......XXXXXDD.........T.TT.....TTTTTDXXXX.......",
+	".......LLLLDDTTTTTTTTT.TTTTTTT.....LXXLLXXXX....",
+	"....LLLXXXLDX..........TT..........LXLX.LLLXX...",
+	"...LXXXX.LXLX...........T..........LXLLX....LL..",
+	"..XX....LXXLX...........T...........X.LDX.......",
+	".......LDX.L............T.XL.XL........LX.......",
+	".......LX...............T.XLXL..................",
+	"........................T.XXXX..................",
+	"........................T.TDLL..................",
+	"........................TT......................",
+	"........................T.......................",
+	".................XL.XL..T.......................",
+	"..................XLXL..T.......................",
+	"..................LLDL..T.......................",
+	"..................XXXT..T.......................",
+	"......................TTT.......................",
+	"........................T.......................",
+	"........................T.......................",
+	"........................T.......................",
+	"........................T.......................",
+	"........................T.......................",
+	"........................T.......................",
+	"........................T.......................",
+	"........................T.......................",
+	"........................T......................."]
+# las raíces que asoman por debajo del taco, una fila más cada medio día en la bandeja
+const RAICES := [
+	"..R..R..R...",
+	".R..R.R..R..",
+	"R..R...R..R.",
+	"..R..R...R..",
+	".R..R..R...R",
+	"R......R...."]
+
+func _esqueje(o: Array, cx: int, y: int, hj: String, k := 1, seco := false, bm: Array = CLON) -> void:
+	var c := {"X": hj if not seco else "#b8a050", "D": Color(hj).darkened(.35).to_html(false) if not seco else "#8a7a38", "T": "#4f7a32" if not seco else "#9a8a48",
+		"L": Color(hj).lightened(.3).to_html(false) if not seco else "#d0bc70", "K": Color(hj).darkened(.55).to_html(false) if not seco else "#6a5c2c",
+		"R": "#e8e0c8"}
+	var w: int = bm[0].length() >> 1
+	var y0: int = y - (bm.size() - 1) * k
+	for r in bm.size():
+		var l: String = bm[r]
+		var a := 0
+		while a < l.length():
+			var ch := l[a]
+			if not c.has(ch):
+				a += 1
+				continue
+			var b := a
+			while b < l.length() and l[b] == ch:
+				b += 1
+			o.append([cx + (a - w) * k, y0 + r * k, (b - a) * k, k, ("#" + c[ch]) if not c[ch].begins_with("#") else c[ch]])
+			a = b
+
+# el taco de turba en su alvéolo de la bandeja negra (x, y: la esquina del alvéolo; k: el tamaño del píxel)
+func _taco(o: Array, cx: int, y: int, k := 1) -> void:
+	o.append_array([[cx - 7 * k, y, 14 * k, 7 * k, "#141418"], [cx - 7 * k, y, 14 * k, k, "#30303a"], [cx - 5 * k, y + k, 10 * k, 3 * k, "#8a5a34"],
+		[cx - 4 * k, y + k, 8 * k, k, "#a8743f"], [cx - 5 * k, y + 4 * k, 10 * k, 2 * k, "#6a4026"], [cx - k, y + 2 * k, 2 * k, k, "#4a2c18"]])
+
+# el taco de turba en grande, suelto (como sale de la bandeja): 12 × 9, con la tierra de arriba y su textura
+func _taco_g(o: Array, cx: int, y: int) -> void:
+	o.append_array([[cx - 6, y, 12, 9, "#3a2a1e"], [cx - 6, y, 12, 2, "#5a4030"], [cx - 5, y + 1, 10, 1, "#6a4c38"], [cx - 6, y + 8, 12, 1, "#2a1e16"],
+		[cx - 4, y + 4, 1, 1, "#4e3826"], [cx + 2, y + 3, 1, 1, "#4e3826"], [cx - 1, y + 6, 1, 1, "#4e3826"], [cx + 4, y + 6, 1, 1, "#4e3826"]])
+
+func _hoja_de(sid: String) -> String:
+	var s = strain(sid)
+	return String(s.get("hj", "#57a33e")) if s else "#57a33e"
+
+func rects_carro(V: Dictionary) -> Array:
+	var o := []
+	var x0: int = (SW - CARRO_W - 64) >> 1
+	var y0 := 4
+	var F := int(D.CARRO.plazas) >> 1
+	var nb: int = S.bandejas.size()
+	# el carro: patas, ruedas y las dos baldas
+	o.append_array([[x0, y0, CARRO_W, CARRO_H, "#1c1e24"], [x0 + 1, y0 + 1, CARRO_W - 2, CARRO_H - 2, "#2a2d34"]])
+	o.append_array([[x0 + 2, y0 + 2, 3, CARRO_H - 8, "#8a92a2"], [x0 + CARRO_W - 5, y0 + 2, 3, CARRO_H - 8, "#8a92a2"],
+		[x0 + 3, y0 + 2, 1, CARRO_H - 8, "#b8bec8"], [x0 + CARRO_W - 4, y0 + 2, 1, CARRO_H - 8, "#b8bec8"]])
+	o.append_array([[x0 + 1, y0 + CARRO_H - 6, 6, 5, "#26262e"], [x0 + CARRO_W - 7, y0 + CARRO_H - 6, 6, 5, "#26262e"],
+		[x0 + 3, y0 + CARRO_H - 4, 2, 2, "#6c7482"], [x0 + CARRO_W - 5, y0 + CARRO_H - 4, 2, 2, "#6c7482"]])
+	for t in int(D.CARRO.bandejas):
+		var sy: int = y0 + 3 + t * 51
+		var on: bool = nb > 0
+		# los tubos T5 en su pantalla y su luz
+		o.append_array([[x0 + 7, sy, CARRO_W - 14, 4, "#5a606c"], [x0 + 9, sy + 3, CARRO_W - 18, 2, "#f4f8ec" if on else "#9aa0a8"]])
+		if on:
+			o.append_array([[x0 + 7, sy + 5, CARRO_W - 14, 4, "rgba(250,255,230,0.18)"], [x0 + 7, sy + 9, CARRO_W - 14, 6, "rgba(250,255,230,0.08)"]])
+		var ty: int = sy + 18
+		# la tapa (transparente) y la bandeja negra
+		o.append_array([[x0 + 8, ty - 11, CARRO_W - 16, 1, "rgba(210,236,255,0.55)"], [x0 + 8, ty - 11, 1, 12, "rgba(210,236,255,0.45)"],
+			[x0 + CARRO_W - 9, ty - 11, 1, 12, "rgba(210,236,255,0.45)"], [x0 + 9, ty - 10, CARRO_W - 18, 11, "rgba(210,236,255,0.10)"],
+			[x0 + 12, ty - 9, 10, 1, "rgba(255,255,255,0.5)"], [x0 + 26, ty - 9, 3, 1, "rgba(255,255,255,0.5)"]])
+		o.append_array([[x0 + 7, ty, CARRO_W - 14, 32, "#16161c"], [x0 + 8, ty + 1, CARRO_W - 16, 30, "#26262e"], [x0 + 7, ty + 31, CARRO_W - 14, 2, "#3c3e48"]])
+		for r in 2:
+			for c in F:
+				var s: int = t * F * 2 + r * F + c
+				var cx: int = x0 + 10 + c * 16 + 7
+				var cy: int = ty + 3 + r * 18
+				_taco(o, cx, cy)
+				if s < nb:
+					var e: Dictionary = S.bandejas[s]
+					_esqueje(o, cx, cy + 2, _hoja_de(e.sid), 1, int(e.dia) + int(D.CARRO.dias) <= S.day)
+				if s == V.i:
+					o.append_array([[cx - 8, cy - 11, 16, 1, "#f8d040"], [cx - 8, cy + 8, 16, 1, "#f8d040"], [cx - 8, cy - 11, 1, 20, "#f8d040"], [cx + 7, cy - 11, 1, 20, "#f8d040"]])
+	# a la derecha, el elegido en grande, los días que le quedan y el propagador
+	var px: int = x0 + CARRO_W + 4
+	o.append_array([[px, y0, 60, CARRO_H, "#1c1e24"], [px + 1, y0 + 1, 58, CARRO_H - 2, "#2a2d34"], [px + 6, y0 + 4, 48, 62, "#20222a"]])
+	var cx: int = px + 30
+	if V.i < nb:
+		var e: Dictionary = S.bandejas[V.i]
+		var hasta: int = int(e.dia) + int(D.CARRO.dias)
+		var seco: bool = hasta <= S.day
+		# las raíces, por los días que lleva en la bandeja
+		var ra: Array = RAICES.slice(0, clampi(2 * (int(S.day) - int(e.dia)), 0, RAICES.size()))
+		if ra.size():
+			_esqueje(o, cx, y0 + 52 + ra.size(), "#e8e0c8", 1, false, ra)
+		_taco_g(o, cx, y0 + 44)
+		_esqueje(o, cx, y0 + 45, _hoja_de(e.sid), 1, seco, CLON_G)
+		var f := clampf(float(hasta - S.day + 1) / float(D.CARRO.dias + 1), 0.0, 1.0)
+		o.append_array([[px + 6, y0 + 68, 48, 5, "#16161c"], [px + 6, y0 + 68, Datos.jsround(48 * f), 5, "#58c070" if f > .34 else "#e0a040"]])
+	else:
+		_taco_g(o, cx, y0 + 44)
+	# el propagador: un esqueje por cada uno que espera
+	o.append_array([[px + 6, y0 + 76, 48, 26, "#16161c"], [px + 7, y0 + 77, 46, 1, "rgba(210,236,255,0.45)"]])
+	var pr: int = mini(S.esquejes.size(), 12)
+	for q in pr:
+		var e: Dictionary = S.esquejes[q]
+		var ex: int = px + 10 + (q % 6) * 7
+		var ey: int = y0 + 88 + (q / 6) * 11
+		o.append_array([[ex - 2, ey, 5, 3, "#6a4026"], [ex - 2, ey, 5, 1, "#8a5a34"]])
+		_esqueje(o, ex, ey, _hoja_de(e.sid), 1, false, CLON_MINI)
+	return o

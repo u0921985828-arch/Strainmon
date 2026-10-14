@@ -126,6 +126,11 @@ func _gancho_almacen(t: String):
 	LOG.append("  [almacén] " + t + " → " + ("null" if q == null else str(int(q))))
 	return q
 
+# el carro de esquejes por dentro (1.40, solo Godot): el taco que se elige en la vista; sin nada, se cierra
+var CARROQ := []
+func _gancho_carro():
+	return CARROQ.pop_front() if CARROQ.size() else null
+
 func _gancho_texto(t: String, n: String) -> void:
 	LOG.append((n + ": " if n != "" else "") + J.nm(t))
 
@@ -220,6 +225,8 @@ func dif(ruta: String, a, b, out: Array) -> void:
 
 # lo que solo tiene Godot (desde la 1.37 el HTML está congelado): la fila del arcón congelador de la tienda online (1.39)
 const NUEVO_TIENDA := " | Arcón congelador"
+# y el carro de esquejes (1.40): se ve por dentro, sin el texto ni el menú de antes (el taco se elige con gancho_carro)
+const CARRO_FUERA := ["El carro de esquejes: ", "  [menú] Pinchar esquejes | "]
 
 func compara(i: int, log: Array) -> void:
 	if i >= O.pasos.size():
@@ -232,7 +239,7 @@ func compara(i: int, log: Array) -> void:
 	if si(o.ok) != pasos[i].ok:
 		out.append("ok: godot %s ≠ html %s" % [pasos[i].ok, o.ok])
 	# la transcripción, línea a línea (la primera diferencia y el resto en una)
-	var ol: Array = o.log
+	var ol: Array = o.log.filter(func(l): return not CARRO_FUERA.any(func(c): return str(l).begins_with(c)))
 	for k in maxi(log.size(), ol.size()):
 		var a = (log[k] if k < log.size() else "(nada)").replace(NUEVO_TIENDA, "")
 		var b = ol[k] if k < ol.size() else "(nada)"
@@ -286,6 +293,7 @@ func _corre() -> void:
 	J.gancho_toast = _gancho_toast
 	J.gancho_pedir = _gancho_pedir
 	J.gancho_almacen = _gancho_almacen
+	J.gancho_carro = _gancho_carro
 	M.intervalo(func():
 		if not HOLD and J.handlers.size() and not (J.mode == "carpa" and J.VC and not J.VC.ocupado):
 			J.press("A"), 12)
@@ -3106,7 +3114,7 @@ func _pasos() -> void:
 			and R.p == J.D.VEHICULOS.bici.paso[0] and R.pb == J.D.VEHICULOS.bici.paso[1] and R.p < 130 and R.casa[0] == null and R.casa[1] == 240
 			and LOG.any(func(l): return l.contains("Llega el mensajero con el patinete y la bici")), R))
 	step("Carro de esquejes (1.11): Kiko lo vende (no la tienda online) y lo sube mañana delante de las carpas; en la tabla de corte se pinchan los del propagador; en las bandejas aguantan CARRO.dias y gastan luz; se plantan desde ahí; la redada se los lleva",
-		["Carro de esquejes", "Salir", "Pinchar esquejes", "^Esqueje"], func():
+		["Carro de esquejes", "Salir", "^Esqueje"], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))
 		J.S.erase("muebles")
@@ -3130,6 +3138,7 @@ func _pasos() -> void:
 		for q in 3:
 			J.S.esquejes.append({"sid": "limon", "f": f.duplicate(), "dia": J.S.day - 1})
 		R.l0 = J.factura_luz()
+		CARROQ = [0]
 		await run(func(): await J.object_action(9, 5))
 		R.n = "%d,%d,%s" % [J.S.esquejes.size(), J.S.bandejas.size(), str(J.S.bandejas.all(func(e): return e.dia == J.S.day)).to_lower()]
 		R.l1 = J.factura_luz() - R.l0

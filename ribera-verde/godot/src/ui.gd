@@ -37,6 +37,7 @@ var gancho_pedir := Callable()    # (texto, inicial, máx, cancela) → texto o 
 var gancho_combate := Callable() # (tipo) · las pruebas cambian el combate por una función (window.battle en el HTML)
 var gancho_billar := Callable()  # (texto) → de 0 a 1 · las pruebas cambian el tiro del billar (window.tiroBillar, 1.30)
 var gancho_almacen := Callable() # (caja | nevera) → el elegido o null · las pruebas eligen en la vista de la caja y la nevera (1.36, window.elegirAlmacen)
+var gancho_carro := Callable()   # () → el taco elegido o null · las pruebas eligen en la vista del carro de esquejes (1.40)
 
 var handlers: Array = []
 var held := {"up": false, "down": false, "left": false, "right": false, "A": false, "B": false}
@@ -95,6 +96,7 @@ var ut := 0.0
 var tt := 0.0
 var bp_r := 0.0   # de la caja de vida del jugador al borde derecho de la escena (--bpr)
 var scr := Rect2(0, 0, 240, SH)
+const CRUZ_HUECO := .16   # el hueco entre cada flecha y el cuadrado del medio, en brazos de la cruz (1.40)
 var zona_cruz := Rect2()   # zonas de toque de la cruceta y de A/B, y la cruz que se ve
 var zona_ab := Rect2()
 var cruz := Rect2()
@@ -303,21 +305,27 @@ func ajusta() -> void:
 	zona_ab = G.ab
 	cruz = G.cruz
 	var a: float = cruz.size.x / 3
+	# 1.40 (lo pidió el usuario: «más ergonómicos, más espaciadas las flechas del cuadrado del medio»): cada flecha, una tecla suelta
+	# con sus cuatro esquinas redondas, separada del cuadrado del medio por CRUZ_HUECO del brazo; el toque sigue siendo por ángulo
+	var g: float = roundf(a * CRUZ_HUECO)
 	for b in ["up", "down", "left", "right"]:
-		_estilo(botones[b], Color(24 / 255.0, 28 / 255.0, 34 / 255.0, .5), Color(70 / 255.0, 80 / 255.0, 96 / 255.0, .75), Color(1, 1, 1, .22), kp * 1.6, kp * 2.4, b)
+		_estilo(botones[b], Color(24 / 255.0, 28 / 255.0, 34 / 255.0, .5), Color(70 / 255.0, 80 / 255.0, 96 / 255.0, .75), Color(1, 1, 1, .22), kp * 1.6, kp * 2.4, "")
 	var st := StyleBoxFlat.new()
-	st.bg_color = Color(24 / 255.0, 28 / 255.0, 34 / 255.0, .5)
+	st.bg_color = Color(24 / 255.0, 28 / 255.0, 34 / 255.0, .35)
+	st.border_color = Color(1, 1, 1, .14)
+	st.set_border_width_all(maxi(1, roundi(1.5 * _dp())))
+	st.set_corner_radius_all(roundi(kp * 1.2))
 	botones.mid.add_theme_stylebox_override("panel", st)
 	for b in ["A", "B"]:
 		_estilo(botones[b], Color(109 / 255.0, 44 / 255.0, 75 / 255.0, .55), Color(154 / 255.0, 74 / 255.0, 114 / 255.0, .85), Color(1, 210 / 255.0, 230 / 255.0, .4), G.A.size.x / 2, kp * 3.8, "")
 	for b in ["START", "MOVIL", "SONIDO"]:
 		_estilo(botones[b], Color(24 / 255.0, 28 / 255.0, 34 / 255.0, .55), Color(70 / 255.0, 80 / 255.0, 96 / 255.0, .75), Color(1, 1, 1, .22), kp * 3.5, kp * 2.6, "")
 	# después de la letra: un botón no encoge por debajo de lo que pide la letra que tenía (de una ventana más grande)
-	_pon(botones.up, cruz.position + Vector2(a, 0), Vector2(a, a))
-	_pon(botones.left, cruz.position + Vector2(0, a), Vector2(a, a))
-	_pon(botones.right, cruz.position + Vector2(a * 2, a), Vector2(a, a))
-	_pon(botones.down, cruz.position + Vector2(a, a * 2), Vector2(a, a))
-	_pon(botones.mid, cruz.position + Vector2(a, a), Vector2(a, a))
+	_pon(botones.up, cruz.position + Vector2(a, 0), Vector2(a, a - g))
+	_pon(botones.left, cruz.position + Vector2(0, a), Vector2(a - g, a))
+	_pon(botones.right, cruz.position + Vector2(a * 2 + g, a), Vector2(a - g, a))
+	_pon(botones.down, cruz.position + Vector2(a, a * 2 + g), Vector2(a, a - g))
+	_pon(botones.mid, cruz.position + Vector2(a + g, a + g), Vector2(a - 2 * g, a - 2 * g))
 	_pon(botones.A, G.A.position, G.A.size)
 	_pon(botones.B, G.B.position, G.B.size)
 	_pon(botones.START, G.start.position, G.start.size)

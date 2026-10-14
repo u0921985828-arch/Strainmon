@@ -1,5 +1,17 @@
 # Cambios
 
+## 1.40.0 · 14 de octubre de 2026
+
+El carro de esquejes, a la vista (lo pidió el usuario: «que no sea un menú; que se vea la bandeja, una arriba y una abajo»). Solo Godot, 0.34.0.
+
+- **El carro por dentro** (`rects_carro`, `elegir_carro` en `trama.gd`; `pinta.gd` lo dibuja con `CARRO_V`): el carro con sus patas y ruedas y dos bandejas, la de arriba y la de abajo, cada una con su tubo T5, su tapa transparente y 12 alvéolos negros (6 × 2) con su taco de turba. Los 24 tacos se llenan por orden y cada esqueje sale en el suyo, dibujado a mano a 1 px: el tallo y una hoja de cannabis de 7 dedos con su nervio (`CLON`, `_esqueje`, `_taco`; en el propagador, `CLON_MINI`), del color de hoja de su variedad; el que está en su último día, amarillento (lo pidió el usuario al verlos: «eso no parecen clones de cannabis»).
+  - Flechas para elegir el taco (`mueve_carro`), A para usarlo y B para cerrar; abajo, el texto del elegido (`desc_carro`).
+  - A la derecha, el elegido en grande (`CLON_G`, 48 × 40, de `tools/sprites/a-mano/esqueje.py`; con la imagen de referencia del usuario): el tallo largo, cuatro hojas de cannabis de 7 dedos —las de atrás en sombra— y dos brotes, en su taco de turba suelto, con las raíces asomando por debajo según los días que lleva (`RAICES`); debajo, una barra con los días que le quedan y el propagador con los esquejes que esperan.
+- **A en un taco vacío pincha** los del propagador (los mismos textos de antes: los que caben y los que se quedan); **A en un esqueje**, nombrarlo o tirarlo, como antes. Sin menú.
+- **La cruceta, más ergonómica** (lo pidió el usuario: «más espaciadas las flechas del cuadrado del medio»): cada flecha es una tecla suelta con sus cuatro esquinas redondas, separada del cuadrado del medio por un hueco (`CRUZ_HUECO`, 0,16 del brazo, en `ui.gd`); el cuadrado del medio, redondeado y con su borde. La zona de toque no cambia: la flecha sale del ángulo desde el centro.
+- **Pruebas:** `tests/carro.gd`, sin el HTML (24 comprobaciones: la rejilla y sus bordes, el dibujo de los 24 tacos, el marco del elegido, el del último día, todo dentro de la pantalla, pinchar, el carro casi lleno, tirar un esqueje, el taco vacío sin propagador; con `--pintar`, cuatro capturas).
+  - La historia compara con el HTML congelado sin el texto ni el menú del carro de antes (`CARRO_FUERA`; el taco se elige con `gancho_carro`).
+
 ## 1.39.0 · 14 de octubre de 2026
 
 La nevera, a tamaño de nevera (lo pidió el usuario: «cómo se van a poder meter solo 200 g en una nevera»; eligió la opción B). Solo Godot, 0.33.0.

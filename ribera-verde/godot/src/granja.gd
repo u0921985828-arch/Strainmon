@@ -1128,17 +1128,23 @@ func llega_mueble() -> void:
 # el carro de esquejes (1.11, carroAction): en la tabla de corte, los del propagador se pinchan en las bandejas, donde aguantan
 # CARRO.dias desde ese día; se plantan desde la plaza vacía (plantar)
 func carro_action() -> void:
-	var nb: int = S.bandejas.size()
+	# 1.40 (lo pidió el usuario): el carro se ve tal cual, dos bandejas de tacos (arriba y abajo) en vez de un menú; A en un taco
+	# vacío pincha los del propagador y A en un esqueje lo nombra o lo tira
 	var cap: int = D.CARRO.bandejas * D.CARRO.plazas
-	var o := []
-	if S.esquejes.size() and nb < cap:
-		o.append("Pinchar esquejes")
-	if nb:
-		o.append("Ver las bandejas")
-	o.append("Nada")
-	var j: int = await ask("El carro de esquejes: %d de %d tacos ocupados.%s" % [nb, cap, (" En el propagador llevas %d." % S.esquejes.size()) if S.esquejes.size() else ""], o)
-	var c: String = o[j] if j >= 0 and j < o.size() else ""
-	if c == "Pinchar esquejes":
+	var sel := mini(S.bandejas.size(), cap - 1)
+	while true:
+		var q = await elegir_carro(sel)
+		if q == null:
+			return
+		sel = int(q)
+		var nb: int = S.bandejas.size()
+		if sel < nb:
+			await esqueje_accion(S.bandejas[sel], S.bandejas)
+			sel = mini(sel, maxi(0, S.bandejas.size()))
+			continue
+		if S.esquejes.is_empty():
+			await say("Taco vacío. Saca esquejes de una madre en vegetativo y pínchalos aquí.")
+			continue
 		var m: int = mini(cap - nb, S.esquejes.size())
 		for e in S.esquejes.slice(0, m):
 			S.bandejas.append({"sid": e.sid, "f": e.f, "dia": S.day})
@@ -1146,20 +1152,14 @@ func carro_action() -> void:
 		sfx("sel")
 		await say("En la tabla de corte, corte en bisel y hormona: %s." % (("pinchas %d esquejes" % m) if m > 1 else "pinchas 1 esqueje"))
 		await say("En las bandejas aguantan hasta el día %s: plántalos cuando haya hueco." % n(S.day + D.CARRO.dias))
-		var q: int = S.esquejes.size()
-		if q:
-			await say(("No caben %d: se quedan en el propagador." % q) if q > 1 else "No cabe 1: se queda en el propagador.")
-		return
-	if c == "Ver las bandejas":
-		var items := []
-		for e in S.bandejas:
-			var s = strain(e.sid)
-			items.append({"label": "Esqueje " + s.n + etiq(e.f), "right": "día " + n(e.dia + D.CARRO.dias), "sw": s.c, "ic": ic_cog(e.sid),
-				"desc": "Pinchado el día %s. Plántalo en una plaza vacía antes de que acabe el día %s.\nPulsa A para ponerle nombre o tirarlo." % [n(e.dia), n(e.dia + D.CARRO.dias)]})
-		items.append({"label": "Volver", "desc": ""})
-		var k: int = await menu(items, {"cls": "full", "title": "BANDEJAS", "title2": "%d de %d" % [nb, cap], "desc": true})
-		if k >= 0 and k < nb:
-			await esqueje_accion(S.bandejas[k], S.bandejas)
+		var r: int = S.esquejes.size()
+		if r:
+			await say(("No caben %d: se quedan en el propagador." % r) if r > 1 else "No cabe 1: se queda en el propagador.")
+		sel = mini(S.bandejas.size(), cap - 1)
+
+# la vista del carro (en trama.gd): el taco elegido (0-23: la bandeja de arriba, 0-11, y la de abajo, 12-23) o null
+func elegir_carro(_i0 := 0):
+	return null
 
 # banco de semillas: las landraces en sobres de SOBRE semillas; el pedido llega al día siguiente (new_day)
 func banco_semillas() -> void:
