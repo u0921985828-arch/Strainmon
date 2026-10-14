@@ -2235,6 +2235,57 @@ func _pasos() -> void:
 				and LOG.any(func(l): return l.begins_with("SMS · DELROY: 12 votos de %s: gana %s" % [Datos.js_num(O.votos), O.rival])) and LOG.any(func(l): return l.begins_with("SMS · DELROY: ¡26 votos de %s!" % Datos.js_num(O.votos)))
 				and LOG.any(func(l): return l.begins_with("SMS · DELROY: Se acabó lo del dispensario")) and LOG.has("DELROY: Sin los %s no hay refundación." % Datos.eur(O.refunda))
 				and LOG.has("La tía Maite y Delroy, de jóvenes, en un campo. En la placa: «Maite, presidenta fundadora»."), R))
+	step("La nave equipada (1.33): en cada mesa, LED, sodio o LEC (más gramos o más resina, y más calor); la extracción con sus filtros de carbón (menos olor y menos calor) y el riego, del tanque con su bomba al controlador y a la máquina de fertirrigación, se compran nivel a nivel y se ven montados; si los focos calientan más de lo que saca la extracción, crecen menos; las partidas de antes", [], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		R = {}
+		J.S.merge({"ch": 4, "money": 10000, "nave": J.nave_nueva(), "plantilla": []}, true)
+		J.enter_map("nave", 6, 6, "up")
+		var N: Dictionary = J.S.nave
+		var eq := func() -> String:
+			var o := []
+			for e in D.EQUIPO_NAVE:
+				var v = J.MAPS.nave.o[int(e[1])][int(e[0])]
+				o.append(v if v else "-")
+			return ",".join(PackedStringArray(o))
+		R.def = jn([",".join(PackedStringArray(N.f)), N.ex, N.rg, J.calor_nave(), J.sofoco_nave(), eq.call()])
+		for i in N.m.size():
+			N.m[i] = {"k": "ria", "g": 0, "t": 10, "thc": 10, "y": 1, "dia": J.S.day - int(D.NAVE.crece), "abo": 1}
+		R.c4 = jn([J.calor_nave(), J.sofoco_nave()])
+		want(["^Sodio"])
+		await run(func(): await J.focos_nave(0))
+		R.sodio = jn([",".join(PackedStringArray(N.f)), 10000 - J.S.money, J.calor_nave(), J.sofoco_nave()])
+		want(["^Cerámica"])
+		await run(func(): await J.focos_nave(1))
+		R.lec = jn([N.f[1], 10000 - J.S.money, J.calor_nave(), J.sofoco_nave()])
+		want(["^Extracción", "^Comprar", "^Riego", "^Comprar", "^Riego", "^Comprar", "<B>"])
+		R.m = J.S.money
+		await run(J.mejoras_nave)
+		R.mej = jn([N.ex, N.rg, R.m - J.S.money, eq.call(), J.sofoco_nave()])
+		J.S.plantilla = [{"n": "a", "rol": "nave", "mesa": 0, "cui": 3}, {"n": "b", "rol": "nave", "mesa": 1, "cui": 5}]
+		N.ab.m = 1
+		Cultivo.fijo = .99
+		J.nave_dia()
+		Cultivo.fijo = -1
+		R.dia = jn([N.m[0].g, N.m[0].t, N.m[1].g, N.m[1].t, N.ab.m, J.S.get("nave") != null])
+		J.S.nave = {"m": [null, null, null, null], "ab": {"m": 0, "o": 0}}
+		J.migrate()
+		R.mig = jn([",".join(PackedStringArray(J.S.nave.f)), J.S.nave.ex, J.S.nave.rg])
+		J.S = S0
+		J.montar_nave()
+		J.enter_map("home", 5, 5, "up"),
+		func():
+			var F: Dictionary = D.FOCO_NAVE
+			var RG: Array = D.RIEGO_NAVE
+			var g0: float = Datos.jsround(float(D.NAVE.g) * 1 * float(F.sodio.rend) * (1 + float(RG[2].rend)) * 1 * (1 + float(D.ABONO.rend)) * 10) / 10.0
+			var g1: float = Datos.jsround((float(D.NAVE.g) + 2 * float(D.NAVE.gC)) * 1 * float(F.lec.rend) * (1 + float(RG[2].rend)) * 1 * 10) / 10.0
+			return chk(R.def == "led,led,led,led,0,0,0,1,-,-,-,-,-,-,-,-,-,-" and R.c4 == "4,1" and R.sodio == jn(["sodio,led,led,led", F.sodio.p, 5, 1 - .08])
+				and R.lec == jn(["lec", float(F.sodio.p) + float(F.lec.p), 5.5, 1 - .08 * 1.5])
+				and R.mej == jn([1, 2, float(D.EXTR_NAVE[1].p) + float(RG[1].p) + float(RG[2].p), "extrN,extrN,-,filtroN,-,-,-,ctrlN,tanqueN,-", 1])
+				and R.dia == jn([g0, Datos.jsround((10 + float(D.ABONO.thc)) * 10) / 10.0, g1, 10 + float(F.lec.thc), Datos.jsround((1 - float(RG[2].dosis)) * 10) / 10.0, true])
+				and R.mig == "led,led,led,led,0,0"
+				and LOG.has("Arrieta cuelga los %s en la mesa 1. %s Con tanto foco, la nave se calienta: hará falta más extracción." % [F.sodio.n, F.sodio.d])
+				and LOG.has("Arrieta y los suyos montan %s. La nave ya es una nave %s." % [RG[2].a, D.NIVEL_NAVE[3]]), R))
 	step("El bajo de las setas (1.20): Txomin alquila el bajo de la Kale Zaharra desde el capítulo 4; las bandejas que prepara él (húmedas: cada día pierden; secas o contaminadas, a tirar), 6 días colonizando y 4 fructificando; la cosecha se seca en el bajo y él la compra; el alquiler cada mañana, la redada, el impago y dejarlo", [], func():
 		var sv: Dictionary = {"money": J.S.money, "heat": J.S.heat, "sales": J.S.sales, "ch": J.S.ch, "day": J.S.day, "min": J.S.min}
 		R = {}

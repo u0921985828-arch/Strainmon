@@ -198,7 +198,7 @@ function arteOrilla(m,k,tx,ty,sx,sy){
 // objetos: los de 1 casilla en el suelo; los altos van a la lista ordenada por Y (tapan al jugador si está detrás). Los de la
 // pared (fila de abajo de la pared, 2 m a 16 px/m), subidos a su altura (1.10, ALZA px): ventanas y cuadros con el alféizar a
 // 0,9 m, las baldas de las plantas a 1 m y la de las botellas a 1,05 m (antes, todos a ras de suelo)
-const ALZA={iwin:-13,poster:-13,shelfW:-16,bottles:-13,cuadro:-13,cartel:-13,tarros:-16,pizarra:-13,cartelC:-13,tacos:-13,neon:-13,fotoMaite:-13};   // 1.30: los de los locales; 1.32: la foto de la tía
+const ALZA={iwin:-13,poster:-13,shelfW:-16,bottles:-13,cuadro:-13,cartel:-13,tarros:-16,pizarra:-13,cartelC:-13,tacos:-13,neon:-13,fotoMaite:-10,extrN:-14,extrG:-14,filtroN:-12,ctrlN:-12};   // 1.30: los de los locales; 1.32: la foto de la tía (1.33: de 2 casillas, a -10); 1.33: el equipo de la nave en la pared
 // los muebles que dejan sombra en el suelo (1.10 P5): como la de los personajes, 1 px a cada lado del dibujo en sus 2 últimas filas y
 // la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo. Van a «sombras» y se pintan con todo el suelo ya puesto
 const SOMBRA_OBJ=new Set(['fridge','crate','table','btable','stool','plantDeco','lab','lab2','pc','display','counter','barcounter','jukebox','bench','bedB','vitrina','mesita','barraD','mesaV','estanteN','secadero','altavoz']);
@@ -217,7 +217,7 @@ function arteObj(o,tx,ty,cam,now,list,sombras){
     if(x0-1>=sx||!ob(tx-1,ty))sombras.push([x0-1,yp-1,1,2]);
     if(x1+1<=sx+15||!ob(tx+1,ty))sombras.push([x1+1,yp-1,1,2]);
     if(!ob(tx,ty+1))sombras.push([x0,yp+1,x1-x0+1,1]);}
-  const dib=()=>{pinta(f,xp,yp);if(pl)pinta(pl[0],xp,yp,pl[1]);};
+  const dib=()=>{pinta(f,xp,yp);if(pl)pinta(pl[0],xp,yp,pl[1]);if(o==='mesaN')focosMesa(MESAS_X.indexOf(tx),xp+cam.x,yp+cam.y,fm,pl&&pl[0].c,cam);};   // 1.33: y sus focos, colgados encima
   if(f.cel.h>16&&list)list.push([ty*16+Math.min(0,d.dy),dib]);else dib();   // corrido hacia abajo, no pasa delante de quien está en su fila
   return true;
 }

@@ -114,13 +114,16 @@ function naveAlquiler(){
 function naveDia(){
   const N=S.nave;if(!N)return;
   const W=naveros();if(!W.length||!N.m.some(Boolean))return;
-  if(Math.random()<Math.max(0,NAVE.redada-NAVE.redadaC*Math.max(...W.map(w=>w.cui)))){
+  if(Math.random()<Math.max(0,NAVE.redada-NAVE.redadaC*Math.max(...W.map(w=>w.cui)))*EXTR_NAVE[N.ex].olor){   // 1.33: con los filtros, huele menos
     const ns=W.map(w=>w.n),quien=ns.length>1?ns.slice(0,-1).join(', ')+' y '+ns[ns.length-1]:ns[0],g=naveStock();
     S.nave=null;S.plantilla=S.plantilla.filter(w=>w.rol!=='nave');S.heat=Math.min(100,S.heat+NAVE.calor);sfx('bad');
     queue('nave',()=>say(`La policía ha entrado en la nave de Valdehierro. Se lleva las plantas${g>=1?', '+gTxt(g):''} y a ${quien}.`));return;}
-  W.forEach(w=>{const M=N.m[w.mesa];if(!M||S.day-M.dia<NAVE.crece)return;
-    let g=naveG(w)*M.y,thc=M.thc;
-    if(M.abo===1&&N.ab.m>0){N.ab.m--;g*=1+ABONO.rend;thc+=ABONO.thc;}else if(M.abo===2&&N.ab.o>0){N.ab.o--;g*=1+ABONO_BIO.rend;thc+=ABONO_BIO.thc;}
+  // 1.33: × los focos de su mesa (FOCO_NAVE), el riego (RIEGO_NAVE: también lo que gasta de abono, R.dosis) y el calor que no saca la extracción
+  const R=RIEGO_NAVE[N.rg],so=sofocoNave();
+  W.forEach(w=>{const M=N.m[w.mesa];if(!M||S.day-M.dia<NAVE.crece)return;const F=FOCO_NAVE[N.f[w.mesa]];
+    let g=naveG(w)*M.y*F.rend*(1+R.rend)*so,thc=M.thc+F.thc+R.thc;
+    if(M.abo===1&&N.ab.m>=R.dosis){N.ab.m=Math.round((N.ab.m-R.dosis)*10)/10;g*=1+ABONO.rend;thc+=ABONO.thc;}
+    else if(M.abo===2&&N.ab.o>=R.dosis){N.ab.o=Math.round((N.ab.o-R.dosis)*10)/10;g*=1+ABONO_BIO.rend;thc+=ABONO_BIO.thc;}
     g=Math.round(g*10)/10;if(!(M.g>=1))M.cd=S.day;M.t=Math.round((M.t*M.g+thc*g)/(M.g+g)*10)/10;M.g=Math.round((M.g+g)*10)/10;});
 }
 // Arrieta, el dueño de la nave de Valdehierro

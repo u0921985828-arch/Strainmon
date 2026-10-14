@@ -36,6 +36,7 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
     SITIOS.forEach((st,ci)=>{if(!sitioVisible(ci))return;ctx.strokeStyle='rgba(60,70,90,.45)';ctx.setLineDash([3,2]);ctx.strokeRect(st.x*16+1.5-cam.x,st.y*16+.5-cam.y,st.w*16-3,15);ctx.setLineDash([]);});
     if(!S.flags.letter){const lx=3*16-cam.x,ly=5*16-cam.y;ctx.fillStyle='#fafaf2';ctx.fillRect(lx+5,ly+5,7,5);ctx.fillStyle='#c04040';ctx.fillRect(lx+8,ly+7,2,1);}
   }
+  if(S.map==='nave')list.push([2*16-1,()=>{ctx.save();ctx.translate(-cam.x,-cam.y);pintaRects(mangueraNave());ctx.restore();}]);   // 1.33: la manguera del riego, detrás de lo de la fila 2
   const fr=(e,dur)=>e.moving&&e.t/dur<.5?1+((e.x+e.y)&1):0;
   if(ARTE.ok)for(const e of ents)ambiente(e,now,cam);
   if(ZONAS[S.map])pintarVistas(cam);   // por dónde miran las patrullas, de día (10b-patrulla)

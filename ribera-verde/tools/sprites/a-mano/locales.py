@@ -318,15 +318,50 @@ def cartelC():
     return L
 
 def fotoMaite():
-    """la foto de la tía Maite (1.32), en la asociación que presidió: el marco de madera y, en la foto, ella, con el pelo cano y la
-    blusa morada, junto a Delroy de joven, con las rastas negras y la camisa crema, en el campo"""
-    L = Lienzo(16, 16)
-    L.r(2, 1, 12, 13, '#74502e'); L.hl(2, 13, 1, '#a87646')                       # el marco
-    L.r(3, 2, 10, 11, '#c8d8d0'); L.r(3, 10, 10, 3, '#6a8a5a')                    # el cielo y el campo
-    L.r(4, 3, 4, 2, '#d8d4cc'); L.r(5, 5, 2, 2, '#d49a74'); L.vl(4, 5, 7, '#d8d4cc'); L.vl(7, 5, 6, '#d8d4cc')   # Maite
-    L.r(4, 8, 4, 5, '#7a4a8a'); L.p(5, 7, '#d49a74'); L.p(6, 7, '#d49a74')
-    L.r(8, 3, 4, 2, '#2a1e18'); L.r(9, 5, 2, 2, '#8a5a3c'); L.vl(8, 5, 8, '#2a1e18'); L.vl(11, 5, 8, '#2a1e18')   # Delroy
-    L.r(9, 7, 2, 1, '#8a5a3c'); L.r(8, 9, 4, 4, '#e8e0c8'); L.p(9, 8, '#e8e0c8'); L.p(10, 8, '#e8e0c8')
+    """la foto de la tía Maite (1.32; 1.33, más grande, de 2 casillas, como los muebles anchos: lo pidió el usuario): el marco de
+    madera de 28 × 18 con su luz arriba y a la izquierda, la placa de latón, el paspartú y, en la foto, de color algo amarillento por
+    los años, la tía de joven, con la melena castaña y la blusa morada, junto a Delroy, más alto, con las rastas negras hasta el pecho
+    y la camisa crema, y entre los dos una planta en flor, en el campo, con los montes detrás"""
+    L = Lienzo(48, 48)
+    W0, W1, W2, W3 = '#4a2e18', '#74502e', '#a07040', '#c8955a'
+    x0, x1, y0, y1 = 10, 37, 29, 46
+    L.r(x0, y0, x1 - x0 + 1, y1 - y0 + 1, W1)                                     # el marco
+    L.hl(x0, x1, y0, W3); L.vl(x0, y0, y1, W3); L.hl(x0 + 1, x1 - 1, y0 + 1, W2); L.vl(x0 + 1, y0 + 1, y1 - 1, W2)
+    L.hl(x0, x1, y1, W0); L.vl(x1, y0, y1, W0)
+    L.r(x0 + 2, y0 + 2, x1 - x0 - 3, y1 - y0 - 3, '#e8dcc0')                     # el paspartú
+    px0, px1, py0, py1 = x0 + 3, x1 - 3, y0 + 3, y1 - 3                           # la foto: 22 × 12
+    L.r(px0, py0, px1 - px0 + 1, 3, '#d4dccb'); L.r(px0, py0 + 3, px1 - px0 + 1, 2, '#e4dcbc')   # el cielo, más cálido abajo
+    for x in range(px0, px1 + 1):                                                 # los montes
+        h = 1 + (x * 7 % 5 > 2) + (x % 9 < 3)
+        L.vl(x, py0 + 5 - h, py0 + 5, '#8c9a7a')
+    L.r(px0, py0 + 6, px1 - px0 + 1, py1 - py0 - 5, '#6e7c4c')                    # el campo
+    for x in range(px0, px1 + 1):
+        L.p(x, py0 + 6 + (x % 3 == 0), '#86a05a')
+        if x % 4 == 1: L.p(x, py1 - 1, '#56643c')
+    # la planta en flor, en medio
+    cx = 24
+    L.vl(cx, py0 + 3, py1, '#4e6a34')
+    for j, w in enumerate((1, 3, 2, 3, 3, 2, 1)):                                # una mata con las hojas abiertas, no un pino
+        L.hl(cx - w, cx + w, py0 + 3 + j, '#5e8a3e' if j % 2 else '#6e9a48')
+    for x, y in ((cx - 3, py0 + 3), (cx + 3, py0 + 3), (cx - 4, py0 + 6), (cx + 4, py0 + 6)): L.p(x, y, '#7eaa52')   # las puntas de las hojas
+    for x, y in ((cx, py0 + 2), (cx - 2, py0 + 4), (cx + 2, py0 + 4), (cx - 1, py0 + 7), (cx + 2, py0 + 7)): L.p(x, y, '#c8b878')   # las colas
+    # la tía Maite, a la izquierda: la melena castaña, la cara, la blusa morada
+    mx = 18
+    L.r(mx - 2, py0 + 1, 5, 2, '#6a4430'); L.p(mx - 1, py0 + 1, '#8a5e40'); L.vl(mx - 2, py0 + 3, py0 + 5, '#4e3020'); L.vl(mx + 2, py0 + 3, py0 + 5, '#4e3020')
+    L.r(mx - 1, py0 + 3, 3, 2, '#d49a74'); L.p(mx - 1, py0 + 3, '#3a2a2a'); L.p(mx + 1, py0 + 3, '#3a2a2a'); L.p(mx, py0 + 4, '#b87a5a')
+    L.p(mx, py0 + 5, '#c08a66')
+    L.r(mx - 2, py0 + 6, 5, py1 - py0 - 5, '#7a4a8a'); L.vl(mx - 2, py0 + 6, py1, '#9a6aaa'); L.hl(mx - 1, mx + 1, py0 + 6, '#9a6aaa')
+    L.p(mx + 3, py0 + 7, '#d49a74')                                               # la mano, hacia la planta
+    # Delroy, a la derecha y más alto: las rastas negras hasta el pecho, la cara, la camisa crema
+    dx = 29
+    L.r(dx - 2, py0, 5, 2, '#2a1e18'); L.p(dx - 1, py0, '#4a3a2e'); L.p(dx + 1, py0, '#4a3a2e')
+    for x, l in ((dx - 3, 6), (dx - 2, 7), (dx + 2, 7), (dx + 3, 5)):
+        for y in range(py0 + 1, py0 + 1 + l): L.p(x, y, '#4a3a2e' if (y + x) % 3 == 0 else '#2a1e18')
+    L.r(dx - 1, py0 + 2, 3, 3, '#8a5a3c'); L.p(dx - 1, py0 + 3, '#1e1410'); L.p(dx + 1, py0 + 3, '#1e1410'); L.p(dx, py0 + 4, '#f0e8d8')
+    L.r(dx - 1, py0 + 5, 3, 1, '#2a1e18')                                         # la barba, aún negra
+    L.r(dx - 1, py0 + 6, 3, py1 - py0 - 5, '#e8e0c8'); L.vl(dx + 1, py0 + 6, py1, '#c4b898')
+    L.p(dx - 2, py0 + 7, '#e8e0c8'); L.p(dx - 3, py0 + 8, '#8a5a3c')              # el brazo, por los hombros de ella (detrás)
+    L.r(21, y1 - 1, 6, 2, '#c8a040'); L.hl(21, 26, y1 - 1, '#e8c860')              # la placa de latón
     L.contorno(K)
     return L
 
@@ -534,6 +569,111 @@ def foco_mesa(L, x0, on, M0, M1, M2):
             elif on: L.p(x, y, '#f8d8ff' if (x + 2 * y) % 3 == 0 else '#ffffff')
             else: L.p(x, y, '#6a6a72' if y < 6 else '#4a4a52')
 
+# el equipo de la nave (1.33, lo pidió el usuario): los focos de las mesas, aparte de la mesa (focoN-<tipo>-<0|1>, apagados y
+# encendidos), colgados con las asas en las columnas 1 y 14 de la fila FOCO_ASA (el juego cuelga ahí las cuerdas de las poleas y los
+# sube y baja con las plantas: 11j-locales), y lo que se compra para toda la nave: los extractores de la pared (extrN, de 250 mm;
+# extrG, de 315), los filtros de carbón colgados (filtroN), el controlador de riego (ctrlN), el tanque de 1.000 L con su bomba
+# (tanqueN) y la máquina de fertirrigación (riegoN)
+FOCO_ASA = 9
+def focoN(t, on):
+    """un foco de la mesa, de 100 cm (16 px) y con la parte de abajo en la fila 15: led, el LED de barras de las carpas (foco_mesa);
+    sodio, la campana de alas de gaviota con la bombilla tubular, naranja encendida; lec, dos reflectores cuadrados en un travesaño,
+    cada uno con su bombilla de cerámica, blanca y algo violeta encendida"""
+    L = Lienzo(16, 16); M0, M1, M2 = '#4a525a', '#8c98a2', '#bcc6ce'
+    if t == 'led':
+        A = Lienzo(16, 16); foco_mesa(A, 0, on, M0, M1, M2); L.pega(A, 0, FOCO_ASA)
+    elif t == 'sodio':
+        for x in (1, 14): L.vl(x, FOCO_ASA, FOCO_ASA + 2, '#3a3a40')
+        L.r(6, FOCO_ASA, 4, 2, '#5a5e68'); L.p(7, FOCO_ASA, M1)                    # el portalámparas
+        L.hl(3, 12, FOCO_ASA + 2, M2); L.hl(1, 14, FOCO_ASA + 3, '#c8ccd6'); L.hl(2, 7, FOCO_ASA + 3, '#e8eaf0')   # la campana
+        L.hl(0, 15, FOCO_ASA + 4, '#8a8e98')
+        L.hl(4, 11, FOCO_ASA + 5, '#ffb040' if on else '#6a6a72'); L.hl(6, 9, FOCO_ASA + 5, '#ffe0a0' if on else '#7a7a82')   # la bombilla
+        if on: L.hl(5, 10, FOCO_ASA + 6, '#ff9a30')
+    else:
+        for x in (1, 14): L.vl(x, FOCO_ASA, FOCO_ASA + 1, '#3a3a40')
+        L.hl(1, 14, FOCO_ASA + 1, '#5a5e68')                                       # el travesaño
+        for cx in (4, 11):
+            L.hl(cx - 3, cx + 3, FOCO_ASA + 2, '#8a8e98'); L.r(cx - 3, FOCO_ASA + 3, 7, 2, '#d8dce4'); L.p(cx - 3, FOCO_ASA + 3, '#f0f2f6')
+            L.hl(cx - 3, cx + 3, FOCO_ASA + 5, '#6a6e78')
+            L.hl(cx - 1, cx + 1, FOCO_ASA + 6, '#f4f6ff' if on else '#6a6a72'); L.p(cx, FOCO_ASA + 6, '#d8d0ff' if on else '#7a7a82')
+    L.contorno(K)
+    return L
+
+def extractor(grande):
+    """el extractor en línea de la pared, de 250 mm (11 px) o de 315 (13): la carcasa redonda con la rejilla y el motor, las abrazaderas,
+    el tubo de aluminio corrugado que sube y sale por la pared, y su cable"""
+    L = Lienzo(16, 16); d = 13 if grande else 11; r = d / 2; cx, cy = 8, 15 - r
+    for y in range(16):
+        for x in range(16):
+            e = ((x + .5 - cx) ** 2 + (y + .5 - cy) ** 2) ** .5
+            if e <= r: L.p(x, y, '#3a3c44' if e > r - 1.2 else '#5a5e68' if e > r - 2.4 else '#2a2c32')
+    for a in range(0, 360, 45):                                                   # las aspas, detrás de la rejilla
+        x = int(cx + math.cos(math.radians(a)) * (r - 3)); y = int(cy + math.sin(math.radians(a)) * (r - 3)); L.p(x, y, '#8a8e96')
+    L.p(int(cx), int(cy), '#bcc6ce')
+    L.hl(int(cx - r) + 1, int(cx + r) - 1, int(cy - r) + 1, '#7a7e86')             # el brillo de arriba
+    L.r(6, 0, 4, int(cy - r), '#b8bcc4')                                          # el tubo, hacia arriba
+    for y in range(0, int(cy - r), 2): L.hl(6, 9, y, '#8a8e96')
+    L.contorno(K)
+    return L
+
+def filtroN():
+    """un filtro de carbón (Ø 25 cm, 60 cm de largo) colgado del techo por dos cintas: la brida de arriba con la boca para el tubo,
+    la malla negra perforada y la tapa de abajo"""
+    L = Lienzo(16, 16)
+    for x in (5, 10): L.vl(x, 0, 2, '#3a3a40')                                     # las cintas
+    L.r(4, 3, 8, 2, '#8a8e96'); L.hl(4, 11, 3, '#bcc6ce'); L.r(6, 1, 4, 2, '#b8bcc4')   # la brida y la boca
+    L.r(4, 5, 8, 9, '#2a2c32'); L.vl(4, 5, 13, '#3a3c44')
+    for y in range(6, 13, 2):
+        for x in range(5 + (y // 2) % 2, 11, 2): L.p(x, y, '#4a4c56')               # la malla
+    L.hl(4, 11, 14, '#8a8e96')
+    L.contorno(K)
+    return L
+
+def ctrlN():
+    """el controlador de riego de la pared: la caja blanca con la pantalla verde, los botones, el piloto y los cables de las
+    electroválvulas bajando"""
+    L = Lienzo(16, 16)
+    L.r(3, 3, 10, 10, '#e8e8e0'); L.vl(12, 3, 12, '#bcb4a2'); L.hl(3, 12, 12, '#bcb4a2')
+    L.r(4, 4, 7, 3, '#2a5a3a'); L.hl(5, 8, 5, '#7ae08a')                          # la pantalla
+    for x in (4, 6, 8): L.p(x, 8, '#5a5e68')
+    L.p(10, 8, '#e04040'); L.r(5, 10, 6, 1, '#c8c4b8')
+    for x in (5, 8, 11): L.vl(x, 13, 15, '#1c1d22')                               # los cables
+    L.contorno(K)
+    return L
+
+def tanqueN():
+    """el tanque de 1.000 L (100 × 120 cm, un IBC): la jaula de tubo galvanizado, el depósito blanco translúcido con la solución
+    nutritiva (verde) hasta tres cuartos, el palé negro, la llave de abajo y la bomba con la manguera arriba"""
+    L = Lienzo(32, 32); M0, M1, M2 = '#5a5e66', '#8a8e96', '#c4c8d0'
+    x0, x1, y0, y1 = 8, 23, 9, 28
+    L.r(x0, y0, 16, y1 - y0, '#e4e8e6'); L.r(x0 + 1, y0 + 6, 14, y1 - y0 - 6, '#8aa86a'); L.hl(x0 + 1, x1 - 1, y0 + 6, '#a8c488')   # el depósito y la solución
+    L.vl(x0 + 2, y0 + 1, y1 - 1, '#f4f8f6')
+    for x in (x0, x0 + 5, x0 + 10, x1): L.vl(x, y0, y1 - 1, M1)                    # la jaula
+    for y in (y0, y0 + 6, y0 + 12, y1 - 1): L.hl(x0, x1, y, M1)
+    L.hl(x0, x1, y0, M2)
+    L.r(x0, y1, 16, 3, '#2a2a30'); L.hl(x0, x1, y1, '#4a4a52')                    # el palé
+    L.r(x1 - 4, y1 - 3, 3, 2, '#3a3c44'); L.p(x1 - 3, y1 - 3, '#e0b040')            # la llave
+    L.r(x0 + 4, y0 - 3, 5, 3, '#3a6ab8'); L.hl(x0 + 4, x0 + 8, y0 - 3, '#5a8ad8')     # la bomba
+    L.hl(x0 + 9, x1 + 4, y0 - 2, '#1c1d22'); L.vl(x1 + 4, y0 - 2, y0 + 4, '#1c1d22')  # la manguera, hacia las mesas
+    L.contorno(K)
+    return L
+
+def riegoN():
+    """la máquina de fertirrigación: el armario gris con la pantalla, las tres bombas dosificadoras (A, B y pH) con sus botes encima
+    y los tubos finos hacia el tanque"""
+    L = Lienzo(32, 32); M0, M1, M2 = '#4a525a', '#8c98a2', '#bcc6ce'
+    x0, x1, y0, y1 = 9, 22, 13, 30
+    L.r(x0, y0, 14, y1 - y0 + 1, M1); L.hl(x0, x1, y0, M2); L.vl(x1, y0, y1, M0)
+    L.r(x0 + 2, y0 + 2, 8, 4, '#2a3a5a'); L.hl(x0 + 3, x0 + 8, y0 + 3, '#6ac8f0'); L.hl(x0 + 3, x0 + 6, y0 + 4, '#7ae08a')   # la pantalla
+    for i, c in enumerate(('#3a6ab8', '#c8a040', '#c04848')):                    # las dosificadoras y sus botes
+        x = x0 + 1 + i * 4
+        L.r(x, y0 + 8, 3, 3, '#3a3c44'); L.p(x + 1, y0 + 9, '#bcc6ce')
+        L.r(x, y0 - 5, 3, 5, c); L.p(x + 1, y0 - 6, '#2a2a34'); L.p(x, y0 - 4, '#e8e8e0')
+    L.hl(x0 + 1, x1 - 1, y1 - 2, M0)
+    L.vl(x0 - 1, y0 + 9, y1, '#1c1d22')                                           # el tubo, hacia el tanque
+    L.contorno(K)
+    return L
+
 # la mesa (1.32): las cinco macetas a tresbolillo, tres en la fila de delante (la de los trabajadores) y dos en la del fondo, en
 # los huecos; x del centro y fila del culo de cada una, del fondo a delante (así se pintan sus plantas: las de delante tapan)
 MACETAS_MESA = [(17, 30), (30, 30), (11, 35), (24, 35), (36, 35)]
@@ -550,11 +690,10 @@ def maceta_mesa(L, cx, yb):
 def mesaN(fase):
     """la mesa de cultivo de 240 × 120 cm (38 px) vista desde arriba a medio fondo, como el billar (1.32): la bandeja blanca con su
     fondo acanalado hacia el desagüe, el canto de delante, el larguero y las tres patas, con el suelo entre ellas, y las cinco
-    macetas a tresbolillo (MACETAS_MESA); encima, dos LED de barras de 100 cm, como los de las carpas (1.31); fase: 0 vacía (los focos
-    apagados) y 1 plantada (encendidos); las plantas van aparte (plantasN), encima"""
+    macetas a tresbolillo (MACETAS_MESA); los focos y las plantas van aparte (1.33: focoN; plantasN), encima; fase: 0 vacía y 1
+    plantada (iguales desde la 1.33, que los focos van aparte)"""
     L = Lienzo(48, 48); M0, M1, M2 = '#4a525a', '#8c98a2', '#bcc6ce'; B0, B1, B2, B3 = BANDEJA
     x0, x1 = 5, 42
-    foco_mesa(L, 6, fase, M0, M1, M2); foco_mesa(L, 26, fase, M0, M1, M2)
     L.hl(x0, x1, 25, B0); L.hl(x0 + 1, x1 - 1, 26, B3)                            # el borde del fondo
     L.r(x0 + 1, 27, 36, 9, B2)                                                    # el fondo de la bandeja
     for x in range(x0 + 3, x1 - 1, 4): L.vl(x, 27, 35, B3)                         # las acanaladuras, hacia el desagüe
@@ -673,12 +812,15 @@ for n, f in (('floorC', floorC), ('iwT_club', iwT_club), ('iwB_club', iwB_club),
     sale(n, f(), 'interior-locales')
 sale('baile', baile(), 'interior-baile')
 for n, f in (('vitrina', vitrina), ('tarros', tarros), ('pizarra', pizarra), ('cartelC', cartelC), ('tacos', tacos), ('mesita', mesita),
-             ('barraD', barraD), ('neon', neon), ('mesaV', mesaV), ('cordon', cordon), ('cordonF', lambda: cordon(True)), ('fotoMaite', fotoMaite)):
+             ('barraD', barraD), ('neon', neon), ('mesaV', mesaV), ('cordon', cordon), ('cordonF', lambda: cordon(True)),
+             ('extrN', lambda: extractor(False)), ('extrG', lambda: extractor(True)), ('filtroN', filtroN), ('ctrlN', ctrlN)):
     sale(n, f(), 'locales-16')
-for n, f in (('estanteN', estanteN), ('secadero', secadero), ('altavoz', altavoz)):
+for t in ('led', 'sodio', 'lec'):
+    for on in (0, 1): sale(f'focoN-{t}-{on}', focoN(t, on), 'locales-16')
+for n, f in (('estanteN', estanteN), ('secadero', secadero), ('altavoz', altavoz), ('tanqueN', tanqueN), ('riegoN', riegoN)):
     sale(n, f(), 'locales-alto')
 for n, f in (('billar', billar), ('sofaF', sofaF), ('sofaV', lambda: sofaF(TERCIO)), ('sofaB', lambda: sofa_atras(CHESTER)),
-             ('cabina', cabina), ('escritorio', escritorio)):
+             ('cabina', cabina), ('escritorio', escritorio), ('fotoMaite', fotoMaite)):
     sale(n, f(), 'locales-ancho')
 for i in range(2): sale(f'mesaN-{i}', mesaN(i), 'locales-ancho')
 sale('plantasN-1', plantasN(1, 'h'), 'locales-ancho')

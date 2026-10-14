@@ -1,5 +1,20 @@
 # Cambios
 
+## 1.33.0 · 14 de octubre de 2026
+
+La nave, equipada de verdad: focos a elegir, extracción con filtros y riego que crece contigo. Delroy, con rastas. Godot, 0.27.0.
+
+- **Focos por mesa: LED, sodio o cerámica (CMH).** En cada mesa de la nave, FOCOS: LED de barras (dos de 720 W, 1.800 €: gastan poco y apenas calientan), sodio (dos campanas de 600 W con balastro, 600 €: un 10 % más de gramos, pero el doble de calor) o cerámica (cuatro de halogenuro metálico cerámico de 315 W, 1.400 €: luz de día con algo de ultravioleta, un punto más de THC). Los de antes se los queda Arrieta. Cada uno con su dibujo y su luz: rosada, naranja o blanca.
+- **Los focos cuelgan de poleas** y nunca tocan las puntas: dos cuerdas por foco bajan del techo (se desvanecen hacia arriba) a dos poleas con su tirador, y el foco queda a unos centímetros de la planta más alta de la mesa; a medida que crecen, sube, como en las carpas de casa.
+- **Extracción con filtros de carbón**, en el escritorio → MEJORAS: un extractor de 250 mm con su filtro (450 €), uno de 315 mm con dos filtros (1.200 €) o dos de 315 mm con cuatro filtros (2.600 €). Cada nivel saca más calor y deja salir menos olor: la redada en la nave baja al 70 %, al 45 % y al 25 %. Si los focos calientan más de lo que saca la extracción (CLIMA, en el escritorio), las plantas crecen menos: un 8 % por cada punto de más, hasta un 40 %.
+- **La estantería cuenta los decimales**: con el controlador o la máquina, cada mesa gasta 0,8 o 0,7 dosis, y lo que queda se ve con su decimal (antes, «×0» con abono todavía dentro).
+- **Riego escalable**, también en MEJORAS: el tanque de 1.000 L con su bomba y una manguera a cada mesa (650 €: el abono ya mezclado, +5 % de gramos), el controlador de riego con electroválvulas y un gotero por maceta (1.600 €: +10 % y un 20 % menos de abono) y la máquina de fertirrigación que mide el pH y la EC y dosifica sola (4.500 €: +18 %, medio punto más de THC y un 30 % menos de abono). Todo se ve montado en la nave: los extractores y los filtros en la pared, el controlador, el tanque con su palé y su bomba, la máquina y la manguera por la pared del fondo bajando a cada mesa. La nave sube de nivel: pelada, apañada, en marcha, seria, profesional, de concurso e industrial.
+- **Delroy, con rastas**: las rastas canas, en cordones con su vuelta y las puntas sueltas por encima de los hombros; de frente, dos le caen sobre el pecho.
+- **La foto de la tía Maite, más grande y mejor**: ocupa dos casillas, con marco de madera tallada, paspartú, la tía Maite y Delroy de jóvenes en un campo junto a una mata en flor, y la placa de latón.
+- **La APK, por GitHub**: va en `descargas/LandraceHunters.apk` de la rama, para descargarla entera desde el enlace.
+- Arte a mano, sin PixelLab: los focos, extractores, filtros, controlador, tanque y máquina y la foto en `tools/sprites/a-mano/locales.py`; las rastas, en `tools/sprites/a-mano/delroy.py`. Las partidas de antes llevan LED en todas las mesas y la nave sin mejoras.
+- Igual en Godot. Tests: `npm test` 115/115 (paso nuevo: la nave equipada); `test:arte` 29/29; Godot, historia 115 pasos, 47 pantallas (la nave equipada a tope, con sodio y cerámica) y el ciclo.
+
 ## 1.32.0 · 14 de octubre de 2026
 
 Mesas de la nave que parecen mesas, la asociación de la tía Maite y Delroy. Godot, 0.26.0.

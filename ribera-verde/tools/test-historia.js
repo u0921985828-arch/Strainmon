@@ -677,6 +677,30 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && LOG.some(l => l.startsWith(`SMS · DELROY: 12 votos de ${ASO.votos}: gana ${ASO.rival}`)) && LOG.some(l => l.startsWith(`SMS · DELROY: ¡26 votos de ${ASO.votos}!`))
     && LOG.some(l => l.startsWith('SMS · DELROY: Se acabó lo del dispensario')) && LOG.includes(`Sin los ${eur(ASO.refunda)} no hay refundación.`.replace(/^/, 'DELROY: '))
     && LOG.includes('La tía Maite y Delroy, de jóvenes, en un campo. En la placa: «Maite, presidenta fundadora».') || R);
+  await step('La nave equipada (1.33): en cada mesa, LED, sodio o LEC (más gramos o más resina, y más calor); la extracción con sus filtros de carbón (menos olor y menos calor) y el riego, del tanque con su bomba al controlador y a la máquina de fertirrigación, se compran nivel a nivel y se ven montados; si los focos calientan más de lo que saca la extracción, crecen menos; las partidas de antes', [], async () => {
+    const S0 = S, r0 = Math.random; S = JSON.parse(JSON.stringify(S0)); window.R = {};
+    Object.assign(S, { ch: 4, money: 10000, nave: naveNueva(), plantilla: [] });
+    enterMap('nave', 6, 6, 'up'); const N = S.nave, eq = () => EQUIPO_NAVE.map(([x, y]) => MAPS.nave.o[y][x] || '-').join();
+    R.def = [N.f.join(), N.ex, N.rg, calorNave(), sofocoNave(), eq()].join();
+    N.m = N.m.map(() => ({ k: 'ria', g: 0, t: 10, thc: 10, y: 1, dia: S.day - NAVE.crece, abo: 1 }));
+    R.c4 = [calorNave(), sofocoNave()].join();
+    want(['^Sodio']); await run(() => focosNave(0)); R.sodio = [N.f.join(), 10000 - S.money, calorNave(), sofocoNave()].join();
+    want(['^Cerámica']); await run(() => focosNave(1)); R.lec = [N.f[1], 10000 - S.money, calorNave(), sofocoNave()].join();
+    want(['^Extracción', '^Comprar', '^Riego', '^Comprar', '^Riego', '^Comprar', '<B>']); R.m = S.money; await run(mejorasNave);
+    R.mej = [N.ex, N.rg, R.m - S.money, eq(), sofocoNave()].join();
+    S.plantilla = [{ n: 'a', rol: 'nave', mesa: 0, cui: 3 }, { n: 'b', rol: 'nave', mesa: 1, cui: 5 }]; N.ab.m = 1;
+    Math.random = () => .99; naveDia(); Math.random = r0;
+    R.dia = [N.m[0].g, N.m[0].t, N.m[1].g, N.m[1].t, N.ab.m, !!S.nave].join();
+    S.nave = { m: [null, null, null, null], ab: { m: 0, o: 0 } }; migrate(); R.mig = [S.nave.f.join(), S.nave.ex, S.nave.rg].join();
+    S = S0; montarNave(); enterMap('home', 5, 5, 'up');
+  }, () => R.def === 'led,led,led,led,0,0,0,1,-,-,-,-,-,-,-,-,-,-' && R.c4 === '4,1' && R.sodio === `sodio,led,led,led,${FOCO_NAVE.sodio.p},5,${1 - .08}`
+    && R.lec === `lec,${FOCO_NAVE.sodio.p + FOCO_NAVE.lec.p},5.5,${1 - .08 * 1.5}`
+    && R.mej === `1,2,${EXTR_NAVE[1].p + RIEGO_NAVE[1].p + RIEGO_NAVE[2].p},extrN,extrN,-,filtroN,-,-,-,ctrlN,tanqueN,-,1`
+    && R.dia === [Math.round(NAVE.g * 1 * FOCO_NAVE.sodio.rend * (1 + RIEGO_NAVE[2].rend) * 1 * (1 + ABONO.rend) * 10) / 10, Math.round((10 + ABONO.thc) * 10) / 10,
+      Math.round((NAVE.g + 2 * NAVE.gC) * 1 * FOCO_NAVE.lec.rend * (1 + RIEGO_NAVE[2].rend) * 1 * 10) / 10, 10 + FOCO_NAVE.lec.thc, Math.round((1 - RIEGO_NAVE[2].dosis) * 10) / 10, true].join()
+    && R.mig === 'led,led,led,led,0,0'
+    && LOG.includes(`Arrieta cuelga los ${FOCO_NAVE.sodio.n} en la mesa 1. ${FOCO_NAVE.sodio.d} Con tanto foco, la nave se calienta: hará falta más extracción.`)
+    && LOG.includes(`Arrieta y los suyos montan ${RIEGO_NAVE[2].a}. La nave ya es una nave ${NIVEL_NAVE[3]}.`) || R);
   await step('El bajo de las setas (1.20): Txomin alquila el bajo de la Kale Zaharra desde el capítulo 4; las bandejas que prepara él (húmedas: cada día pierden; secas o contaminadas, a tirar), 6 días colonizando y 4 fructificando; la cosecha se seca en el bajo y él la compra; el alquiler cada mañana, la redada, el impago y dejarlo', [], async () => {
     const r0 = Math.random, sv = { money: S.money, heat: S.heat, sales: S.sales, ch: S.ch, day: S.day, min: S.min }; window.R = {};
     const dia = async v => { S.day++; Math.random = () => v; setasDia(); Math.random = r0; await idle(); };

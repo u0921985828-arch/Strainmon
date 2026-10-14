@@ -112,7 +112,16 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
     nave: { ab: { m: 2, o: 0 }, m: [{ k: 'niebla', f: { id: 1, t: 1, y: 1, i: null }, thc: 15, y: 1, dia: 10, g: 0, t: 0, abo: 0 },
       { k: 'limon', f: { id: 2, t: 1, y: 1, i: null }, thc: 17, y: 1, dia: 10, g: 12.5, t: 17, abo: 1 },
       { k: 'ria', f: { id: 3, t: 1, y: 1, i: null }, thc: 18, y: 1, dia: 16, g: 0, t: 0, abo: 0 },
-      { k: 'mango', f: { id: 4, t: 1, y: 1, i: null }, thc: 15, y: 1, dia: 18, g: 0, t: 0, abo: 1 }] } },
+      { k: 'mango', f: { id: 4, t: 1, y: 1, i: null }, thc: 15, y: 1, dia: 18, g: 0, t: 0, abo: 1 }], f: ['led', 'led', 'led', 'led'], ex: 0, rg: 0 } },
+    map: 'nave', P: { x: 6, y: 6, dir: 'up' } },
+  // la nave equipada (1.33): sodio, cerámica, LED y sodio en las mesas, colgados de sus poleas a la altura de sus plantas; dos extractores
+  // de 315 con cuatro filtros, el controlador, el tanque, la máquina de fertirrigación y la manguera a las mesas
+  { k: 'nave2', sw: 280, mode: 'world', now: T + 910, S: { ch: 6, day: 20, flags: {},
+    plantilla: [{ id: 'pl1', n: 'Iker', lab: 3, cui: 4, lea: 3, rol: 'nave', mesa: 0 }, { id: 'pl2', n: 'Ane', lab: 2, cui: 3, lea: 5, rol: 'nave', mesa: 2 }],
+    nave: { ab: { m: 2, o: 0 }, m: [{ k: 'niebla', f: { id: 1, t: 1, y: 1, i: null }, thc: 15, y: 1, dia: 10, g: 0, t: 0, abo: 0 },
+      { k: 'limon', f: { id: 2, t: 1, y: 1, i: null }, thc: 17, y: 1, dia: 10, g: 12.5, t: 17, abo: 1 },
+      { k: 'ria', f: { id: 3, t: 1, y: 1, i: null }, thc: 18, y: 1, dia: 16, g: 0, t: 0, abo: 0 },
+      { k: 'mango', f: { id: 4, t: 1, y: 1, i: null }, thc: 15, y: 1, dia: 18, g: 0, t: 0, abo: 1 }], f: ['sodio', 'lec', 'led', 'sodio'], ex: 3, rg: 3 } },
     map: 'nave', P: { x: 6, y: 6, dir: 'up' } },
   // la asociación (1.32): por fuera, en el barrio alto (la casa alta de almagre con la placa y el portal verde), y por dentro, con
   // Delroy junto a la foto de la tía Maite

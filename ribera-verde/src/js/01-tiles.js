@@ -151,6 +151,12 @@ function buildTiles(){
     t=>{t.F(0,6,15,4,'#8a6a46');t.F(0,6,15,1,'#a8865a');t.F(12,10,2,6,'#5a4028');t.F(3,3,6,3,'#e8e8f0');});
   doble('mesaN',t=>{t.F(1,8,15,6,'#8a8e96');t.F(2,14,2,2,'#5a5e66');for(let x=3;x<16;x+=5)t.blob(x+1,6,2.5,3,'#4ea04e','#22522c');t.F(1,0,15,1,'#e8e8f0');},
     t=>{t.F(0,8,15,6,'#8a8e96');t.F(12,14,2,2,'#5a5e66');for(let x=1;x<14;x+=5)t.blob(x+1,6,2.5,3,'#4ea04e','#22522c');t.F(0,0,15,1,'#e8e8f0');});
+  // el equipo de la nave (1.33) y la foto de la tía (1.32, de 2 casillas desde la 1.33)
+  T('extrN',t=>{t.F(4,6,8,8,'#3a3c44');t.F(6,0,4,6,'#b8bcc4');});T('extrG',t=>{t.F(3,4,10,10,'#3a3c44');t.F(6,0,4,4,'#b8bcc4');});
+  T('filtroN',t=>{t.F(4,3,8,11,'#2a2c32');t.F(4,3,8,2,'#8a8e96');});T('ctrlN',t=>{t.box(3,3,10,10,'#e8e8e0','#5a5e66');t.F(4,4,7,3,'#2a5a3a');});
+  T('tanqueN',t=>{t.box(1,0,14,14,'#e4e8e6','#8a8e96');t.F(2,5,12,8,'#8aa86a');t.F(1,14,14,2,'#2a2a30');});
+  T('riegoN',t=>{t.box(2,2,12,14,'#8c98a2','#4a525a');t.F(4,4,8,3,'#2a3a5a');});
+  doble('fotoMaite',t=>{t.box(10,2,6,11,'#e8dcc0','#74502e');},t=>{t.box(0,2,6,11,'#e8dcc0','#74502e');});
   // el carro de esquejes (1.11): el carro con sus dos bandejas tapadas y, a la derecha, la mesita con la tabla de corte
   T('carro',t=>{t.F(0,1,16,15,'#26262e');t.F(1,1,14,2,'#a8b0bc');t.F(1,8,14,1,'#a8b0bc');t.F(1,14,14,1,'#a8b0bc');t.F(2,4,12,3,'#8ec0d2');t.F(2,10,12,3,'#8ec0d2');
     for(let x=3;x<14;x+=2){t.P(x,6,'#84cc6c');t.P(x,12,'#84cc6c');}t.F(2,3,12,1,'#fff6d0');t.F(2,9,12,1,'#fff6d0');});

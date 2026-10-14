@@ -14,7 +14,7 @@ const SOCIO={g:1,rel:3,min:30,n:{puerto:'Gotzon',valde:'Maribel',ibar:'Joseba',e
 const DISCO={n:'GAUA',ch:4,abre:23*60,cierra:6*60,entrada:15,copa:10,copaMax:3,ronda:40,mesa:300,ligar:.5,vip:['Kepa','Garbiñe','Aitor','Nekane','Borja','Ainhoa']};
 const MESAS_X=[1,4,8,11],FASE_MESA=['vacía','recién plantada','creciendo','en flor','dando cogollos'];
 // la mitad de la derecha de los muebles de 2 casillas de los locales: la pinta la de la izquierda (01b-arte)
-const LOCAL2=new Set(['billar2','sofaF2','sofaV2','sofaB2','cabina2','escritorio2','mesaN2']);
+const LOCAL2=new Set(['billar2','sofaF2','sofaV2','sofaB2','cabina2','escritorio2','mesaN2','fotoMaite2']);   // 1.33: la foto de la tía, de 2
 // la luz de los locales (luzLocal, 14-render): el club, en penumbra cálida, con la lámpara del billar y el brillo de la vitrina
 // ([x, y, radio, color, alfa], en px del mapa); GAUA, oscura, con tres focos de colores que giran sobre la pista (centro c, radios r)
 const LUZ_CLUB={fondo:'rgba(24,14,4,.28)',l:[[144,70,30,'255,206,120',.6],[24,56,22,'200,240,255',.35]]};
@@ -22,12 +22,13 @@ const LUZ_DISCO={fondo:'rgba(10,4,30,.55)',focos:[['255,79,200',0],['64,224,240'
 // la nave (1.31): bajo cada uno de los dos LED de una mesa plantada (encendidos), su luz en las plantas, del color de la de los LED de las
 // carpas (FOCO_LUZ.led); [dx desde la casilla de la mesa, y, radio, color, alfa]
 const LUZ_MESA=[[6,59,15,'240,170,255',.2],[26,59,15,'240,170,255',.2]];
-const luzNave=()=>({l:MESAS_X.flatMap((x,i)=>faseMesa(i)?LUZ_MESA.map(([dx,y,r,c,a])=>[x*16+dx,y,r,c,a]):[])});
+const luzNave=()=>({l:MESAS_X.flatMap((x,i)=>faseMesa(i)?LUZ_MESA.map(([dx,y,r,c,a])=>[x*16+dx,y,r,FOCO_NAVE[S.nave.f[i]].luz,a]):[])});   // 1.33: del color de sus focos
 function mapasLocales(){
   // ---------- LOS CLUBS: 12 × 8, el dispensario a la izquierda, los sofás en medio y el billar a la derecha ----------
   for(const k in CLUBS){const C=CLUBS[k],m=newMap('club-'+k,12,8,'floorC');m.music='club';
     rect(m,0,0,11,0,(x,y)=>gr(m,x,y,'iwT_club'));rect(m,0,1,11,1,(x,y)=>gr(m,x,y,'iwB_club'));
     [[0,'tarros'],[1,'pizarra'],[2,'tarros'],[4,'cartelC'],[7,k==='rv'?'fotoMaite':'poster'],[10,'tacos']].forEach(([x,o])=>ob(m,x,1,o));   // 1.32: en la asociación, la foto de la tía
+    if(k==='rv')ob(m,8,1,'fotoMaite2');   // 1.33: más grande, de 2 casillas
     rect(m,0,3,2,3,(x,y)=>ob(m,x,y,'vitrina'));ob(m,3,2,'plantDeco');
     ob(m,5,2,'sofaF');ob(m,6,2,'sofaF2');ob(m,5,3,'mesita');ob(m,6,3,'mesita');ob(m,5,4,'sofaB');ob(m,6,4,'sofaB2');
     ob(m,8,4,'billar');ob(m,9,4,'billar2');ob(m,11,2,'jukebox');ob(m,0,6,'plantDeco');ob(m,11,6,'plantDeco');
@@ -81,7 +82,7 @@ function objLocal(x,y,o){
     if(/^sofa[FB]2?$/.test(o))return say('Un sofá chester de cuero verde, gastado de tanto uso.');
     if(o==='billar'||o==='billar2')return say(`La mesa de billar, con el tapete recién cepillado. ${BILLAR.n[k]} juega con apuesta.`);
     if(o==='poster')return say('Un cartel antiguo de una feria del cáñamo.');
-    if(o==='fotoMaite')return say(`${aso().tio?'La tía Maite y Delroy, de jóvenes':'La tía Maite, joven, con un hombre de rastas negras'}, en un campo. En la placa: «Maite, presidenta fundadora».`);
+    if(o==='fotoMaite'||o==='fotoMaite2')return say(`${aso().tio?'La tía Maite y Delroy, de jóvenes':'La tía Maite, joven, con un hombre de rastas negras'}, en un campo. En la placa: «Maite, presidenta fundadora».`);
     if(o==='plantDeco')return say('Una kentia en una maceta de barro.');
   }
   if(S.map==='nave'){
@@ -148,17 +149,80 @@ async function talkBillar(k){
 /* ---------- la nave: mesas, estantería, secadero y escritorio ---------- */
 // S.nave: {m: las NAVE.max mesas (null, vacía, o {k: el lote, f: el fenotipo, thc, y: × cosecha, dia: el de plantar, g y t: lo que hay
 // en el secadero y su THC medio, abo: 0 sin abono, 1 MEATZA, 2 ORTUA BIO}), ab: {m, o}: dosis de floración de cada marca en la estantería}
-const naveNueva=()=>({m:Array(NAVE.max).fill(null),ab:{m:0,o:0}});
+const naveNueva=()=>({m:Array(NAVE.max).fill(null),ab:{m:0,o:0},f:Array(NAVE.max).fill('led'),ex:0,rg:0});
 const naveStock=()=>S.nave?S.nave.m.reduce((a,M)=>a+(M?M.g:0),0):0;
 function faseMesa(i){const M=S.nave&&S.nave.m[i];if(!M)return 0;const d=S.day-M.dia;return d<1?1:d<3?2:d<NAVE.crece?3:4;}
 const thcNave=(sid,f)=>Math.round(getStrain(sid).thc*(f?f.t:1)*NAVE.thc*10)/10;
 const ABONO_MESA=['sin abono','MEATZA','ORTUA BIO'];
+// el equipo de la nave (1.33, lo pidió el usuario), por niveles: se compra en el escritorio (MEJORAS) y lo monta Arrieta en el momento.
+// Los focos, por mesa (S.nave.f, en la mesa: FOCOS): los LED de barras de serie, sodio o cerámica (CMH), con su rendimiento (rend), el THC que
+// suben (thc), lo que calientan encendidos (calor) y el color de su luz. Para toda la nave, la extracción (S.nave.ex, EXTR_NAVE: el
+// calor que saca, cap, y lo que deja salir del olor, × la probabilidad de la redada) y el riego (S.nave.rg, RIEGO_NAVE: de la
+// estantería a mano, el tanque con su bomba, el controlador con goteros o la máquina de fertirrigación; rendimiento, THC y lo que
+// gasta cada mesa con abono de la estantería, dosis). El calor de los focos que pasa de lo que saca la extracción quita un 8 % por
+// punto (sofocoNave, hasta un 40 %). La nave sube de nivel con la extracción y el riego (NIVEL_NAVE)
+const FOCO_NAVE={led:{n:'LED de barras',d:'Dos de 720 W y 8 barras: gastan poco y apenas calientan.',p:1800,rend:1,thc:0,calor:1,luz:'240,170,255'},
+  sodio:{n:'Sodio 600 W',d:'Dos campanas de 600 W con su balastro: más gramos, pero calientan el doble.',p:600,rend:1.1,thc:0,calor:2,luz:'255,170,80'},
+  lec:{n:'Cerámica 315 W',d:'Cuatro de halogenuro metálico cerámico (CMH) de 315 W, dos por campana: luz de día con algo de ultravioleta, más resina.',p:1400,rend:1,thc:1,calor:1.5,luz:'225,235,255'}};
+const EXTR_NAVE=[{n:'Sin extracción',d:'La puerta y las rejillas: el olor sale a la calle.',p:0,cap:4,olor:1},
+  {n:'Extractor de 250 mm',a:'un extractor de 250 mm con su filtro de carbón',d:'Uno en la pared, con un filtro de carbón.',p:450,cap:6,olor:.7},
+  {n:'Extractor de 315 mm',a:'un extractor de 315 mm con dos filtros',d:'Uno grande, con dos filtros de carbón.',p:1200,cap:9,olor:.45},
+  {n:'Dos de 315 mm',a:'otro de 315 mm y dos filtros más',d:'Dos grandes y cuatro filtros de carbón: ni calor ni olor.',p:2600,cap:12,olor:.25}];
+const RIEGO_NAVE=[{n:'A mano',d:'Tu gente riega con regadera y el abono de la estantería.',p:0,rend:0,thc:0,dosis:1},
+  {n:'Tanque de 1.000 L',a:'el tanque de 1.000 L con su bomba',d:'Un depósito con su bomba y una manguera a cada mesa: el abono, ya mezclado.',p:650,rend:.05,thc:0,dosis:1},
+  {n:'Controlador de riego',a:'el controlador de riego y los goteros',d:'Programador con electroválvulas y un gotero por maceta: riega a su hora y gasta menos abono.',p:1600,rend:.1,thc:0,dosis:.8},
+  {n:'Máquina de fertirrigación',a:'la máquina de fertirrigación',d:'Mide el pH y la EC y dosifica el abono sola en cada riego.',p:4500,rend:.18,thc:.5,dosis:.7}];
+const NIVEL_NAVE=['pelada','apañada','en marcha','seria','profesional','de concurso','industrial'];
+const calorNave=()=>S.nave.m.reduce((a,M,i)=>a+(M?FOCO_NAVE[S.nave.f[i]].calor:0),0);
+const sofocoNave=()=>Math.max(.6,1-.08*Math.max(0,calorNave()-EXTR_NAVE[S.nave.ex].cap));
+const dosisTxt=n=>String(Math.round(n*10)/10).replace('.',',');   // con el controlador o la máquina se gastan 0,8 o 0,7: lo que queda, con su decimal
+// lo que se ve del equipo (montarNave, al entrar y al comprar): [x, y, objeto, de qué (ex, rg), desde el nivel, hasta el nivel];
+// en la pared, los extractores (extrN, el de 250 mm; extrG, el de 315), los filtros de carbón y el controlador; en el suelo, junto a la
+// estantería, el tanque y la máquina
+const EQUIPO_NAVE=[[10,1,'extrN','ex',1,1],[10,1,'extrG','ex',2,3],[3,1,'extrG','ex',3,3],[9,1,'filtroN','ex',1,3],[7,1,'filtroN','ex',2,3],
+  [4,1,'filtroN','ex',3,3],[2,1,'filtroN','ex',3,3],[5,1,'ctrlN','rg',2,3],[1,2,'tanqueN','rg',1,3],[2,2,'riegoN','rg',3,3]];
+function montarNave(){
+  const n=MAPS.nave;if(!n)return;
+  for(const [x,y] of EQUIPO_NAVE)ob(n,x,y,null);
+  if(S&&S.nave)for(const [x,y,o,k,a,b] of EQUIPO_NAVE)if(S.nave[k]>=a&&S.nave[k]<=b)ob(n,x,y,o);
+}
+// la manguera del riego (1.33): del tanque, por el pie de la pared, y una bajada a cada mesa, por detrás (rectángulos [x, y, w, h, color])
+function mangueraNave(){
+  if(!S.nave||!S.nave.rg)return [];const y=34,o=[[1*16+15,y,12*16+16-(1*16+15),1,'#3a3c44'],[1*16+15,y+1,12*16+16-(1*16+15),1,'#1c1d22']];
+  for(const x of MESAS_X)o.push([x*16+16,y+2,1,57-(y+2),'#1c1d22']);
+  return o;
+}
+// los dos focos de la mesa i (1.33): de su tipo, encendidos con la mesa plantada (focoN-<tipo>-<0|1>), colgados a FOCO_AIRE px de lo
+// más alto de sus plantas (sin plantas, recogidos a FOCO_ALTO px de la bandeja), que suben al crecer, como en las carpas; cada uno de
+// dos poleas a FOCO_POLEA px del techo, con la cuerda que sube desvaneciéndose hacia el techo (FOCO_DEG pasos), la que baja al asa y
+// la del tirador, por fuera (como vcPoleas). yb: la fila de abajo del foco
+const FOCO_DX=[-10,10],FOCO_AIRE=3,FOCO_ALTO=14,FOCO_ASA=9,FOCO_POLEA=14,FOCO_DEG=8;
+const filasArriba=new WeakMap();
+function filaArriba(c){if(filasArriba.has(c))return filasArriba.get(c);const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let r=c.height;
+  for(let i=3;i<d.length;i+=4)if(d[i]){r=Math.floor((i>>2)/c.width);break;}filasArriba.set(c,r);return r;}
+function focoNaveY(yp,pl){const top=pl?yp-47+filaArriba(pl):yp-47+25-FOCO_ALTO;return Math.max(FOCO_POLEA+12,top-FOCO_AIRE-1);}
+function poleasNave(x0,yb){
+  const K=VC_CUERDA,[M,H]=VC_POLEA,y0=FOCO_POLEA,asa=yb-15+FOCO_ASA,o=[];
+  for(const [X,s] of [[x0+1,-1],[x0+14,1]]){const cx=X+2*s,T=X+4*s;
+    for(let y=0;y<y0;y++)o.push([cx,y,1,1,`rgba(28,29,34,${Math.ceil((y+1)/y0*FOCO_DEG)/FOCO_DEG})`]);   // la cuerda del techo, que se desvanece hacia arriba
+    o.push([X,y0+3,1,asa-(y0+3),K],[T,y0+3,1,8,K],[T-1,y0+11,3,3,K],[T,y0+12,1,1,M],
+      [cx-1,y0+1,3,5,K],[cx-2,y0+2,5,3,K],[cx-1,y0+2,3,3,M],[cx,y0+3,1,1,K],[cx-1,y0+2,1,1,H]);}
+  return o.filter(e=>e[3]>0);
+}
+// (xp, yp: el ancla de la mesa en el mapa; pl: el lienzo de sus plantas, si las hay)
+function focosMesa(i,xp,yp,fm,pl,cam){
+  const g=ARTE.cubre['obj:focoN'],f=g&&frameDe(g,`focoN-${S.nave?S.nave.f[i]:'led'}-${fm?1:0}`,'unica',0,{i:0});if(!f)return;
+  const yb=focoNaveY(yp,pl);ctx.save();ctx.translate(-cam.x,-cam.y);
+  for(const dx of FOCO_DX){pintaRects(poleasNave(xp+dx,yb));pinta(f,xp+8+dx,yb);}
+  ctx.restore();
+}
 const mesaTxt=M=>getStrain(lotSid(M.k)).n+etiq(M.f);
 async function mesaNave(i){
-  const N=S.nave,M=N.m[i],w=naveroDe(i),ops=[M?'Arrancar y plantar':'Plantar'].concat(M?['Abono']:[],['Nada']);
-  const op=ops[await ask(`Mesa ${i+1} · ${M?mesaTxt(M)+' · '+FASE_MESA[faseMesa(i)]+' · '+ABONO_MESA[M.abo]:'vacía'}\n${w?'La cuida '+w.n+'.':'Nadie la cuida: pon a alguien de tu plantilla en la nave.'}`,ops)];
+  const N=S.nave,M=N.m[i],w=naveroDe(i),ops=[M?'Arrancar y plantar':'Plantar'].concat(M?['Abono']:[],['Focos','Nada']);
+  const op=ops[await ask(`Mesa ${i+1} · ${M?mesaTxt(M)+' · '+FASE_MESA[faseMesa(i)]+' · '+ABONO_MESA[M.abo]:'vacía'} · ${FOCO_NAVE[N.f[i]].n}\n${w?'La cuida '+w.n+'.':'Nadie la cuida: pon a alguien de tu plantilla en la nave.'}`,ops)];
+  if(op==='Focos')return focosNave(i);
   if(op==='Plantar'||op==='Arrancar y plantar'){if(M&&M.g>=1)return say('Antes, descuelga del secadero lo de esta mesa.');return plantarMesa(i);}
-  if(op==='Abono'){const c=await ask(`¿Qué abono le echa cada día? En la estantería: MEATZA ×${N.ab.m} · ORTUA BIO ×${N.ab.o}.`,['Sin abono','MEATZA Floración','ORTUA BIO Floración','Nada']);
+  if(op==='Abono'){const c=await ask(`¿Qué abono le echa cada día? En la estantería: MEATZA ×${dosisTxt(N.ab.m)} · ORTUA BIO ×${dosisTxt(N.ab.o)}.`,['Sin abono','MEATZA Floración','ORTUA BIO Floración','Nada']);
     if(c<3){M.abo=c;sfx('sel');}}
 }
 // con una semilla o un esqueje, tu gente saca una madre y llena la mesa de clones: toda la mesa, con su fenotipo
@@ -176,9 +240,32 @@ async function plantarMesa(i){
   S.nave.m[i]={k:sid+(claseFeno(f)==='estrella'?'*':''),f,thc:thcNave(sid,f),y:f.y,dia:S.day,g:0,t:0,abo:0};sfx('sel');
   return say(`Mesa ${i+1}: ${getStrain(sid).n}${etiq(f)}. De la madre salen los clones para toda la mesa. A los ${NAVE.crece} días empieza a dar.`);
 }
+// los focos de la mesa i (1.33): cambiarlos por los de otro tipo (los de antes se los queda Arrieta)
+async function focosNave(i){
+  const N=S.nave,k=N.f[i],ks=Object.keys(FOCO_NAVE).filter(x=>x!==k);
+  const c=await ask(`Mesa ${i+1}: ${FOCO_NAVE[k].n}. ${FOCO_NAVE[k].d}\n¿Los cambias? Los de ahora se los queda Arrieta.`,ks.map(x=>`${FOCO_NAVE[x].n} · ${eur(FOCO_NAVE[x].p)}`).concat(['Nada']));
+  if(c<0||c>=ks.length)return;const F=FOCO_NAVE[ks[c]];
+  if(S.money<F.p){sfx('bad');return say('No te llega.');}
+  S.money-=F.p;N.f[i]=ks[c];sfx('coin');updateHUD();
+  return say(`Arrieta cuelga los ${F.n} en la mesa ${i+1}. ${F.d}`+(calorNave()>EXTR_NAVE[N.ex].cap?' Con tanto foco, la nave se calienta: hará falta más extracción.':''));
+}
+// las mejoras de la nave (1.33): la extracción y el riego, nivel a nivel
+async function mejorasNave(){
+  const N=S.nave;let j=0;
+  for(;;){
+    const fila=(L,k,t)=>{const a=L[N[k]],b=L[N[k]+1];return {label:`${t}: ${a.n}`,right:b?eur(b.p):'a tope',desc:b?`Siguiente: ${b.n}. ${b.d}`:a.d};};
+    j=await menu([fila(EXTR_NAVE,'ex','Extracción'),fila(RIEGO_NAVE,'rg','Riego'),{label:'Volver',desc:''}],{cls:'full',title:'MEJORAS DE LA NAVE',title2:'Nave '+NIVEL_NAVE[N.ex+N.rg],desc:true,initial:j});
+    if(j<0||j>1)return;
+    const [L,k]=j?[RIEGO_NAVE,'rg']:[EXTR_NAVE,'ex'],b=L[N[k]+1];if(!b)continue;
+    if(await ask(`${b.n}: ${b.d} ${eur(b.p)}, montado hoy mismo.`,['Comprar','No'])!==0)continue;
+    if(S.money<b.p){sfx('bad');await say('No te llega.');continue;}
+    S.money-=b.p;N[k]++;sfx('coin');updateHUD();montarNave();
+    await say(`Arrieta y los suyos montan ${b.a}. La nave ya es una nave ${NIVEL_NAVE[N.ex+N.rg]}.`);
+  }
+}
 async function estanteNave(){
   const N=S.nave,ops=(S.items.fert?[`Dejar MEATZA ×${S.items.fert}`]:[]).concat(S.items.ofert?[`Dejar ORTUA BIO ×${S.items.ofert}`]:[],['Nada']);
-  const op=ops[await ask(`La estantería de los abonos: MEATZA FLORACIÓN ×${N.ab.m} · ORTUA BIO FLORACIÓN ×${N.ab.o}. Cada mesa con abono gasta una dosis al día.`,ops)];
+  const op=ops[await ask(`La estantería de los abonos: MEATZA FLORACIÓN ×${dosisTxt(N.ab.m)} · ORTUA BIO FLORACIÓN ×${dosisTxt(N.ab.o)}. Cada mesa con abono gasta ${N.rg>=2?'menos de ':''}una dosis al día.`,ops)];
   if(op&&op.startsWith('Dejar MEATZA')){N.ab.m+=S.items.fert;S.items.fert=0;sfx('sel');}
   else if(op&&op.startsWith('Dejar ORTUA')){N.ab.o+=S.items.ofert;S.items.ofert=0;sfx('sel');}
 }
@@ -191,15 +278,18 @@ async function secaderoNave(){
   sfx('get');updateHUD();return say(`Descuelgas ${gTxt(lleva)} del secadero.`+(naveStock()>=1?` Quedan ${gTxt(naveStock())}: no te caben.`:''));
 }
 async function escritorioNave(){
-  const N=S.nave,rows=N.m.map((M,i)=>{const w=naveroDe(i);return {label:`Mesa ${i+1} · ${M?getStrain(lotSid(M.k)).n:'vacía'}`,right:M?FASE_MESA[faseMesa(i)]:'',
-    desc:`${w?'La cuida '+w.n:'Nadie la cuida'}.`+(M?` ${ABONO_MESA[M.abo][0].toUpperCase()+ABONO_MESA[M.abo].slice(1)} · en el secadero, ${gTxt(M.g)}.`:'')};});
-  rows.push({label:'Estantería',right:`${N.ab.m} + ${N.ab.o} dosis`,desc:'MEATZA FLORACIÓN y ORTUA BIO FLORACIÓN: una dosis al día por mesa con abono.'});
-  let i=0;do{i=await menu(rows,{cls:'full',title:'LA NAVE',title2:`${eur(NAVE.dia)} al día`,desc:true,initial:i});}while(i>=0);
+  const N=S.nave,filas=()=>{const rows=N.m.map((M,i)=>{const w=naveroDe(i);return {label:`Mesa ${i+1} · ${M?getStrain(lotSid(M.k)).n:'vacía'}`,right:M?FASE_MESA[faseMesa(i)]:'',
+    desc:`${w?'La cuida '+w.n:'Nadie la cuida'}. ${FOCO_NAVE[N.f[i]].n}.`+(M?` ${ABONO_MESA[M.abo][0].toUpperCase()+ABONO_MESA[M.abo].slice(1)} · en el secadero, ${gTxt(M.g)}.`:'')};});
+  rows.push({label:'Estantería',right:`${dosisTxt(N.ab.m)} + ${dosisTxt(N.ab.o)} dosis`,desc:`MEATZA FLORACIÓN y ORTUA BIO FLORACIÓN: ${N.rg>=2?'menos de ':''}una dosis al día por mesa con abono.`},
+    {label:'Clima',right:`${calorNave()} de ${EXTR_NAVE[N.ex].cap}`,desc:`El calor de los focos encendidos y lo que saca la extracción (${EXTR_NAVE[N.ex].n}).`+(sofocoNave()<1?` Hace demasiado calor: las mesas dan un ${Math.round((1-sofocoNave())*100)} % menos.`:'')},
+    {label:'Mejoras',right:'Nave '+NIVEL_NAVE[N.ex+N.rg],desc:`Extracción: ${EXTR_NAVE[N.ex].n}. Riego: ${RIEGO_NAVE[N.rg].n}. Pulsa A para mejorarlas.`});return rows;};
+  let i=0;do{const rows=filas();i=await menu(rows,{cls:'full',title:'LA NAVE',title2:`${eur(NAVE.dia)} al día`,desc:true,initial:i});if(i===rows.length-1)await mejorasNave();}while(i>=0);
 }
 async function talkNavero(i){
   const w=naveroDe(i),M=S.nave&&S.nave.m[i];if(!w)return;const f=faseMesa(i);
   return say(!M?'Mi mesa está vacía. Plántame algo y la saco adelante.':f<4?`La ${getStrain(lotSid(M.k)).n} va bien: ${FASE_MESA[f]}. A los ${NAVE.crece} días empieza a dar.`
-    :'Cada mañana cuelgo lo de mi mesa en el secadero.'+(M.abo&&!S.nave.ab[M.abo===1?'m':'o']?' Se ha acabado el abono de la estantería.':''),w.n.toUpperCase());
+    :'Cada mañana cuelgo lo de mi mesa en el secadero.'+(M.abo&&S.nave.ab[M.abo===1?'m':'o']<RIEGO_NAVE[S.nave.rg].dosis?' Se ha acabado el abono de la estantería.':'')
+      +(sofocoNave()<1?' Y aquí dentro hace un calor que no veas: hace falta más extracción.':''),w.n.toUpperCase());
 }
 
 /* ---------- GAUA ---------- */

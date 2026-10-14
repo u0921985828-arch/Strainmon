@@ -607,7 +607,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
     0         1 
     012345678901
  0  ████████████
- 1  svs█v██?██v█
+ 1  svs█v██??█v█
  2  .@.p.oo.@..J
  3  CCC..tt@....
  4  .....oo.XX@.

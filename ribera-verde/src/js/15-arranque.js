@@ -32,6 +32,7 @@ function migrate(){
     if(o.sid)S.nave.m=S.nave.m.map((_,i)=>({k:o.sid,thc:o.thc,y:1,dia:S.day-NAVE.crece,g:i?0:Math.round(o.g*10)/10,t:o.thc,abo:0}));}
   // 1.31: cada trabajador de la nave, su mesa (w.mesa); los de antes, la que les tocaba por el orden de la plantilla
   naveros().forEach(w=>{if(w.mesa==null)w.mesa=[...Array(NAVE.max).keys()].find(i=>!naveroDe(i));});
+  if(S.nave&&!S.nave.f)Object.assign(S.nave,{f:Array(NAVE.max).fill('led'),ex:0,rg:0});   // 1.33: el equipo de la nave; la de antes, con los LED de serie y nada más
   // 1.31: el pH− de 250 ml ya no se vende; lo pedido a Kiko de antes llega como la botella de 1 L
   if(S.envio)S.envio=S.envio.map(l=>/^pH− .* 250 ml$/.test(l)?l.replace(/ 250 ml$/,' 1 L'):l);
   if(!('vendDia' in S.flags)){S.curro.vend.forEach(v=>delete v.dia);S.flags.vendDia=1;}   // 1.29.1: el dia de un vendedor era el de la entrega; ahora, el de la cosecha (los de antes no pierden)

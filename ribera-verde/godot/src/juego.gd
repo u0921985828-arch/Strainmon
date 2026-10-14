@@ -146,6 +146,13 @@ func migrate() -> void:
 		if o.get("sid"):
 			for i in S.nave.m.size():
 				S.nave.m[i] = {"k": o.sid, "thc": o.thc, "y": 1, "dia": int(S.day) - int(D.NAVE.crece), "g": Datos.jsround(o.g * 10) / 10.0 if i == 0 else 0, "t": o.thc, "abo": 0}
+	if S.get("nave") != null and not S.nave.has("f"):   # 1.33: el equipo de la nave; la de antes, con los LED de serie y nada más
+		var fs := []
+		for i in int(D.NAVE.max):
+			fs.append("led")
+		S.nave.f = fs
+		S.nave.ex = 0
+		S.nave.rg = 0
 	for w in naveros():   # 1.31: cada trabajador de la nave, su mesa (w.mesa); los de antes, la que les tocaba por el orden de la plantilla
 		if w.get("mesa") == null:
 			for i in int(D.NAVE.max):

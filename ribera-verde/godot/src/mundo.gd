@@ -418,6 +418,19 @@ func semillas_tia(k: String, txt: String, k_n: int = 2) -> void:
 	await say(txt)
 
 # ---------- mapas (04-mapas) ----------
+# el equipo de la nave (1.33, montarNave de 11j-locales): extractores, filtros, controlador, tanque y máquina según S.nave.ex/rg
+func montar_nave() -> void:
+	var n = MAPS.get("nave")
+	if n == null:
+		return
+	for e in D.EQUIPO_NAVE:
+		n.o[int(e[1])][int(e[0])] = null
+	if S != null and S.get("nave") != null:
+		for e in D.EQUIPO_NAVE:
+			var v := int(S.nave.get(e[3], 0))
+			if v >= int(e[4]) and v <= int(e[5]):
+				n.o[int(e[1])][int(e[0])] = e[2]
+
 func montar_casa() -> void:
 	var h: Dictionary = MAPS.home
 	if S == null:
@@ -749,6 +762,8 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	S.map = name_
 	if name_ == "home":
 		montar_casa()
+	if name_ == "nave":
+		montar_nave()
 	P.x = x
 	P.y = y
 	P.px = x * 16.0

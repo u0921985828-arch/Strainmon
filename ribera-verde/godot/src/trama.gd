@@ -3589,7 +3589,7 @@ func nave_dia() -> void:
 	var mc := 0
 	for w in W:
 		mc = maxi(mc, int(w.cui))
-	if Cultivo.azar() < maxf(0, D.NAVE.redada - D.NAVE.redadaC * mc):
+	if Cultivo.azar() < maxf(0, D.NAVE.redada - D.NAVE.redadaC * mc) * D.EXTR_NAVE[int(N.ex)].olor:   # 1.33: con los filtros, huele menos
 		var ns: Array = W.map(func(w): return w.n)
 		var quien: String = (", ".join(PackedStringArray(ns.slice(0, -1))) + " y " + ns[-1]) if ns.size() > 1 else ns[0]
 		var gg: float = nave_stock()
@@ -3599,18 +3599,22 @@ func nave_dia() -> void:
 		sfx("bad")
 		queue("nave", func(): await say("La policía ha entrado en la nave de Valdehierro. Se lleva las plantas%s y a %s." % [(", " + g_txt(gg)) if gg >= 1 else "", quien]))
 		return
+	# 1.33: × los focos de su mesa (FOCO_NAVE), el riego (RIEGO_NAVE: también lo que gasta de abono, R.dosis) y el calor que no saca la extracción
+	var R: Dictionary = D.RIEGO_NAVE[int(N.rg)]
+	var so := sofoco_nave()
 	for i in W.size():
 		var Me = N.m[int(W[i].mesa)]
 		if not Me or S.day - Me.dia < D.NAVE.crece:
 			continue
-		var g: float = nave_g(W[i]) * Me.y
-		var thc: float = Me.thc
-		if Me.abo == 1 and N.ab.m > 0:
-			N.ab.m -= 1
+		var F: Dictionary = D.FOCO_NAVE[N.f[int(W[i].mesa)]]
+		var g: float = nave_g(W[i]) * Me.y * F.rend * (1 + R.rend) * so
+		var thc: float = Me.thc + F.thc + R.thc
+		if Me.abo == 1 and N.ab.m >= R.dosis:
+			N.ab.m = Datos.jsround((N.ab.m - R.dosis) * 10) / 10.0
 			g *= 1 + D.ABONO.rend
 			thc += D.ABONO.thc
-		elif Me.abo == 2 and N.ab.o > 0:
-			N.ab.o -= 1
+		elif Me.abo == 2 and N.ab.o >= R.dosis:
+			N.ab.o = Datos.jsround((N.ab.o - R.dosis) * 10) / 10.0
 			g *= 1 + D.ABONO_BIO.rend
 			thc += D.ABONO_BIO.thc
 		g = Datos.jsround(g * 10) / 10.0
@@ -3722,7 +3726,7 @@ func obj_local(x: int, y: int, o) -> bool:
 				txt = "La mesa de billar, con el tapete recién cepillado. %s juega con apuesta." % D.BILLAR.n[k]
 			"poster":
 				txt = "Un cartel antiguo de una feria del cáñamo."
-			"fotoMaite":   # 1.32
+			"fotoMaite", "fotoMaite2":   # 1.32 (1.33: de 2 casillas)
 				txt = "%s, en un campo. En la placa: «Maite, presidenta fundadora»." % ("La tía Maite y Delroy, de jóvenes" if aso().tio else "La tía Maite, joven, con un hombre de rastas negras")
 			"plantDeco":
 				txt = "Una kentia en una maceta de barro."
@@ -3885,7 +3889,28 @@ func talk_billar(k: String):
 func nave_nueva() -> Dictionary:
 	var m := []
 	m.resize(int(D.NAVE.max))
-	return {"m": m, "ab": {"m": 0, "o": 0}}
+	var fs := []
+	for i in int(D.NAVE.max):
+		fs.append("led")
+	return {"m": m, "ab": {"m": 0, "o": 0}, "f": fs, "ex": 0, "rg": 0}
+
+# el equipo de la nave (1.33, FOCO_NAVE, EXTR_NAVE, RIEGO_NAVE y NIVEL_NAVE de 11j-locales): el calor de los focos encendidos, lo que
+# quita el que no saca la extracción y las dosis de la estantería, enteras
+func calor_nave() -> float:
+	var t := 0.0
+	for i in S.nave.m.size():
+		if S.nave.m[i]:
+			t += float(D.FOCO_NAVE[S.nave.f[i]].calor)
+	return t
+
+func sofoco_nave() -> float:
+	return maxf(.6, 1 - .08 * maxf(0, calor_nave() - float(D.EXTR_NAVE[int(S.nave.ex)].cap)))
+
+func dosis_txt(x) -> String:
+	return Datos.js_num(Datos.jsround(float(x) * 10) / 10.0).replace(".", ",")
+
+func nivel_nave() -> String:
+	return D.NIVEL_NAVE[int(S.nave.ex) + int(S.nave.rg)]
 
 # la mesa de la nave que empieza en la columna x (MESAS_X), o −1
 func mesa_de(x: int) -> int:
@@ -3921,17 +3946,20 @@ func mesa_nave(i: int) -> void:
 	var ops: Array = ["Arrancar y plantar" if Me else "Plantar"]
 	if Me:
 		ops.append("Abono")
+	ops.append("Focos")
 	ops.append("Nada")
 	var que: String = (mesa_txt(Me) + " · " + D.FASE_MESA[fase_mesa(i)] + " · " + D.ABONO_MESA[int(Me.abo)]) if Me else "vacía"
-	var oi: int = await ask("Mesa %d · %s\n%s" % [i + 1, que, ("La cuida " + w.n + ".") if w else "Nadie la cuida: pon a alguien de tu plantilla en la nave."], ops)
+	var oi: int = await ask("Mesa %d · %s · %s\n%s" % [i + 1, que, D.FOCO_NAVE[N.f[i]].n, ("La cuida " + w.n + ".") if w else "Nadie la cuida: pon a alguien de tu plantilla en la nave."], ops)
 	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
-	if op == "Plantar" or op == "Arrancar y plantar":
+	if op == "Focos":
+		await focos_nave(i)
+	elif op == "Plantar" or op == "Arrancar y plantar":
 		if Me and Me.g >= 1:
 			await say("Antes, descuelga del secadero lo de esta mesa.")
 			return
 		await plantar_mesa(i)
 	elif op == "Abono":
-		var c: int = await ask("¿Qué abono le echa cada día? En la estantería: MEATZA ×%d · ORTUA BIO ×%d." % [int(N.ab.m), int(N.ab.o)], ["Sin abono", "MEATZA Floración", "ORTUA BIO Floración", "Nada"])
+		var c: int = await ask("¿Qué abono le echa cada día? En la estantería: MEATZA ×%s · ORTUA BIO ×%s." % [dosis_txt(N.ab.m), dosis_txt(N.ab.o)], ["Sin abono", "MEATZA Floración", "ORTUA BIO Floración", "Nada"])
 		if c < 3:
 			Me.abo = c
 			sfx("sel")
@@ -3976,6 +4004,62 @@ func plantar_mesa(i: int) -> void:
 	sfx("sel")
 	await say("Mesa %d: %s%s. De la madre salen los clones para toda la mesa. A los %d días empieza a dar." % [i + 1, strain(sid).n, etiq(f), int(D.NAVE.crece)])
 
+# los focos de la mesa i (1.33, focosNave): cambiarlos por los de otro tipo (los de antes se los queda Arrieta)
+func focos_nave(i: int) -> void:
+	var N: Dictionary = S.nave
+	var k: String = N.f[i]
+	var ks := []
+	var ops := []
+	for x in D.FOCO_NAVE:
+		if x != k:
+			ks.append(x)
+			ops.append("%s · %s" % [D.FOCO_NAVE[x].n, Datos.eur(D.FOCO_NAVE[x].p)])
+	ops.append("Nada")
+	var c: int = await ask("Mesa %d: %s. %s\n¿Los cambias? Los de ahora se los queda Arrieta." % [i + 1, D.FOCO_NAVE[k].n, D.FOCO_NAVE[k].d], ops)
+	if c < 0 or c >= ks.size():
+		return
+	var F: Dictionary = D.FOCO_NAVE[ks[c]]
+	if S.money < F.p:
+		sfx("bad")
+		await say("No te llega.")
+		return
+	S.money -= F.p
+	N.f[i] = ks[c]
+	sfx("coin")
+	update_hud()
+	await say("Arrieta cuelga los %s en la mesa %d. %s" % [F.n, i + 1, F.d] + (" Con tanto foco, la nave se calienta: hará falta más extracción." if calor_nave() > float(D.EXTR_NAVE[int(N.ex)].cap) else ""))
+
+# las mejoras de la nave (1.33, mejorasNave): la extracción y el riego, nivel a nivel
+func _fila_mejora(L: Array, k: String, t: String) -> Dictionary:
+	var a: Dictionary = L[int(S.nave[k])]
+	var b = L[int(S.nave[k]) + 1] if int(S.nave[k]) + 1 < L.size() else null
+	return {"label": "%s: %s" % [t, a.n], "right": Datos.eur(b.p) if b else "a tope", "desc": ("Siguiente: %s. %s" % [b.n, b.d]) if b else a.d}
+
+func mejoras_nave() -> void:
+	var N: Dictionary = S.nave
+	var j := 0
+	while true:
+		j = await menu([_fila_mejora(D.EXTR_NAVE, "ex", "Extracción"), _fila_mejora(D.RIEGO_NAVE, "rg", "Riego"), {"label": "Volver", "desc": ""}], {"cls": "full", "title": "MEJORAS DE LA NAVE", "title2": "Nave " + nivel_nave(), "desc": true, "initial": j})
+		if j < 0 or j > 1:
+			return
+		var L: Array = D.RIEGO_NAVE if j else D.EXTR_NAVE
+		var k := "rg" if j else "ex"
+		if int(N[k]) + 1 >= L.size():
+			continue
+		var b: Dictionary = L[int(N[k]) + 1]
+		if await ask("%s: %s %s, montado hoy mismo." % [b.n, b.d, Datos.eur(b.p)], ["Comprar", "No"]) != 0:
+			continue
+		if S.money < b.p:
+			sfx("bad")
+			await say("No te llega.")
+			continue
+		S.money -= b.p
+		N[k] = int(N[k]) + 1
+		sfx("coin")
+		update_hud()
+		montar_nave()
+		await say("Arrieta y los suyos montan %s. La nave ya es una nave %s." % [b.a, nivel_nave()])
+
 func estante_nave() -> void:
 	var N: Dictionary = S.nave
 	var ops := []
@@ -3984,7 +4068,7 @@ func estante_nave() -> void:
 	if S.items.get("ofert", 0):
 		ops.append("Dejar ORTUA BIO ×%d" % int(S.items.ofert))
 	ops.append("Nada")
-	var oi: int = await ask("La estantería de los abonos: MEATZA FLORACIÓN ×%d · ORTUA BIO FLORACIÓN ×%d. Cada mesa con abono gasta una dosis al día." % [int(N.ab.m), int(N.ab.o)], ops)
+	var oi: int = await ask("La estantería de los abonos: MEATZA FLORACIÓN ×%s · ORTUA BIO FLORACIÓN ×%s. Cada mesa con abono gasta %suna dosis al día." % [dosis_txt(N.ab.m), dosis_txt(N.ab.o), "menos de " if int(N.rg) >= 2 else ""], ops)
 	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 	if op.begins_with("Dejar MEATZA"):
 		N.ab.m += S.items.fert
@@ -4018,7 +4102,7 @@ func secadero_nave() -> void:
 	update_hud()
 	await say("Descuelgas %s del secadero." % g_txt(lleva) + ((" Quedan %s: no te caben." % g_txt(nave_stock())) if nave_stock() >= 1 else ""))
 
-func escritorio_nave() -> void:
+func _filas_escritorio() -> Array:
 	var N: Dictionary = S.nave
 	var rows := []
 	for i in N.m.size():
@@ -4026,11 +4110,21 @@ func escritorio_nave() -> void:
 		var w = navero_de(i)
 		var ab: String = D.ABONO_MESA[int(Me.abo)] if Me else ""
 		rows.append({"label": "Mesa %d · %s" % [i + 1, strain(lot_sid(Me.k)).n if Me else "vacía"], "right": D.FASE_MESA[fase_mesa(i)] if Me else "",
-			"desc": ("La cuida " + w.n if w else "Nadie la cuida") + "." + ((" %s · en el secadero, %s." % [ab.substr(0, 1).to_upper() + ab.substr(1), g_txt(Me.g)]) if Me else "")})
-	rows.append({"label": "Estantería", "right": "%d + %d dosis" % [int(N.ab.m), int(N.ab.o)], "desc": "MEATZA FLORACIÓN y ORTUA BIO FLORACIÓN: una dosis al día por mesa con abono."})
+			"desc": ("La cuida " + w.n if w else "Nadie la cuida") + ". " + D.FOCO_NAVE[N.f[i]].n + "." + ((" %s · en el secadero, %s." % [ab.substr(0, 1).to_upper() + ab.substr(1), g_txt(Me.g)]) if Me else "")})
+	rows.append({"label": "Estantería", "right": "%s + %s dosis" % [dosis_txt(N.ab.m), dosis_txt(N.ab.o)], "desc": "MEATZA FLORACIÓN y ORTUA BIO FLORACIÓN: %suna dosis al día por mesa con abono." % ("menos de " if int(N.rg) >= 2 else "")})
+	var E: Dictionary = D.EXTR_NAVE[int(N.ex)]
+	var so := sofoco_nave()
+	rows.append({"label": "Clima", "right": "%s de %s" % [n(calor_nave()), n(E.cap)], "desc": "El calor de los focos encendidos y lo que saca la extracción (%s)." % E.n + ((" Hace demasiado calor: las mesas dan un %d %% menos." % Datos.jsround((1 - so) * 100)) if so < 1 else "")})
+	rows.append({"label": "Mejoras", "right": "Nave " + nivel_nave(), "desc": "Extracción: %s. Riego: %s. Pulsa A para mejorarlas." % [E.n, D.RIEGO_NAVE[int(N.rg)].n]})
+	return rows
+
+func escritorio_nave() -> void:
 	var i := 0
 	while true:
+		var rows := _filas_escritorio()
 		i = await menu(rows, {"cls": "full", "title": "LA NAVE", "title2": "%s al día" % Datos.eur(D.NAVE.dia), "desc": true, "initial": i})
+		if i == rows.size() - 1:
+			await mejoras_nave()
 		if i < 0:
 			break
 
@@ -4046,7 +4140,8 @@ func talk_navero(i: int):
 	elif f < 4:
 		t = "La %s va bien: %s. A los %d días empieza a dar." % [strain(lot_sid(Me.k)).n, D.FASE_MESA[f], int(D.NAVE.crece)]
 	else:
-		t = "Cada mañana cuelgo lo de mi mesa en el secadero." + (" Se ha acabado el abono de la estantería." if Me.abo and not S.nave.ab["m" if Me.abo == 1 else "o"] else "")
+		t = "Cada mañana cuelgo lo de mi mesa en el secadero." + (" Se ha acabado el abono de la estantería." if Me.abo and float(S.nave.ab["m" if Me.abo == 1 else "o"]) < float(D.RIEGO_NAVE[int(S.nave.rg)].dosis) else "") \
+			+ (" Y aquí dentro hace un calor que no veas: hace falta más extracción." if sofoco_nave() < 1 else "")
 	await say(t, String(w.n).to_upper())
 
 # ---------- GAUA ----------

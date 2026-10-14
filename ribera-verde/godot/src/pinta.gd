@@ -231,6 +231,8 @@ func _mundo() -> void:
 			var ly: int = 5 * 16 - cam.y
 			_rect(lx + 5, ly + 5, 7, 5, css("#fafaf2"))
 			_rect(lx + 8, ly + 7, 2, 1, css("#c04040"))
+	if S.map == "nave":
+		list.append([2 * 16 - 1, _manguera_nave])   # 1.33: la manguera del riego, detrás de lo de la fila 2
 	if Atlas.ok and ambiente_on:
 		for e in J.ents:
 			_ambiente(e)
@@ -335,13 +337,14 @@ func _luz_local():
 		return _luz_nave()
 	return J.D.LUZ_CLUB if J.S.map.begins_with("club-") else (J.D.LUZ_DISCO if J.S.map == "disco" else null)
 
-# la nave (1.31, luzNave de 11j-locales): bajo cada uno de los dos LED de una mesa plantada, su luz en las plantas
+# la nave (1.31, luzNave de 11j-locales): bajo cada uno de los dos focos de una mesa plantada, su luz en las plantas (1.33: del color del foco)
 func _luz_nave() -> Dictionary:
 	var l := []
 	for i in J.D.MESAS_X.size():
 		if J.fase_mesa(i):
+			var c: String = J.D.FOCO_NAVE[J.S.nave.f[i]].luz
 			for z in J.D.LUZ_MESA:
-				l.append([int(J.D.MESAS_X[i]) * 16 + int(z[0]), z[1], z[2], z[3], z[4]])
+				l.append([int(J.D.MESAS_X[i]) * 16 + int(z[0]), z[1], z[2], c, z[4]])
 	return {"l": l}
 
 func _luces_local() -> void:
@@ -481,7 +484,7 @@ func _arte_orilla(m: Dictionary, k: String, tx: int, ty: int, sx: int, sy: int) 
 		L.draw_texture_rect(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), false)
 
 # los de la pared, subidos a su altura (1.10, ALZA de 01b-arte.js: px)
-const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadro": -13, "cartel": -13, "tarros": -16, "pizarra": -13, "cartelC": -13, "tacos": -13, "neon": -13, "fotoMaite": -13}   # 1.30: los de los locales; 1.32: la foto de la tía
+const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadro": -13, "cartel": -13, "tarros": -16, "pizarra": -13, "cartelC": -13, "tacos": -13, "neon": -13, "fotoMaite": -10, "extrN": -14, "extrG": -14, "filtroN": -12, "ctrlN": -12}   # 1.30: los de los locales; 1.32: la foto de la tía (1.33: de 2 casillas, a -10); 1.33: el equipo de la nave en la pared
 
 # los muebles que dejan sombra en el suelo (1.10 P5, SOMBRA_OBJ de 01b-arte.js): 1 px a cada lado del dibujo en sus 2 últimas filas
 # y la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo; se pintan con todo el suelo ya puesto
@@ -516,14 +519,64 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		if not ob.call(tx, ty + 1):
 			sombras.append([x0, yp + 1, x1 - x0 + 1, 1])
 	if f.cel.h > 16:
-		list.append([ty * 16 + mini(0, d.dy), _pinta_mesa.bind(f, xp, yp, pl)])   # corrido hacia abajo, no pasa delante de quien está en su fila
+		list.append([ty * 16 + mini(0, d.dy), _pinta_mesa.bind(f, xp, yp, pl, J.mesa_de(tx) if o == "mesaN" else -1, fm)])   # corrido hacia abajo, no pasa delante de quien está en su fila
 	else:
-		_pinta_mesa(f, xp, yp, pl)
+		_pinta_mesa(f, xp, yp, pl, J.mesa_de(tx) if o == "mesaN" else -1, fm)
 
-func _pinta_mesa(f, xp: float, yp: float, pl) -> void:
+func _pinta_mesa(f, xp: float, yp: float, pl, i := -1, fm := 0) -> void:
 	_pinta(f, xp, yp)
 	if pl != null:
 		_pinta(pl, xp, yp)
+	if i >= 0:
+		_focos_mesa(i, xp + cam.x, yp + cam.y, fm, pl.c if pl != null else null)   # 1.33: y sus focos, colgados encima
+
+# los focos de la mesa i de la nave (1.33, focosMesa de 11j-locales; xp, yp: el ancla de la mesa en el mapa; pl: la imagen de sus
+# plantas): dos, colgados de sus poleas a FOCO_AIRE px por encima de la punta más alta (la primera fila con algo de las plantas) o,
+# sin plantas, a la altura de un esqueje; la cuerda del techo se desvanece hacia arriba en FOCO_DEG pasos
+func _focos_mesa(i: int, xp: float, yp: float, fm: int, pl) -> void:
+	var D = J.D
+	var g = Atlas.cubre("obj:focoN")
+	var f = Atlas.frame_de(g, "focoN-%s-%d" % [J.S.nave.f[i] if J.S.get("nave") != null else "led", 1 if fm else 0], "unica", 0, {"i": 0}) if g else null
+	if f == null:
+		return
+	var top: float = (yp - 47 + Arte.fila_arriba(pl)) if pl != null else (yp - 47 + 25 - int(D.FOCO_ALTO))
+	var yb: float = maxf(int(D.FOCO_POLEA) + 12, top - int(D.FOCO_AIRE) - 1)
+	for dx in D.FOCO_DX:
+		for e in _poleas_nave(int(xp) + int(dx), int(yb)):
+			_rect(e[0] - cam.x, e[1] - cam.y, e[2], e[3], e[4])
+		_pinta(f, xp + 8 + int(dx) - cam.x, yb - cam.y)
+
+# poleasNave: dos cuerdas del techo (con su degradado) a dos poleas a FOCO_POLEA px, y de cada polea, el tramo que baja al asa del
+# foco y el del tirador
+func _poleas_nave(x0: int, yb: int) -> Array:
+	var D = J.D
+	var K: Color = Arte.VC_CUERDA
+	var M: Color = Arte.VC_POLEA[0]
+	var H: Color = Arte.VC_POLEA[1]
+	var y0 := int(D.FOCO_POLEA)
+	var dg := float(D.FOCO_DEG)
+	var asa: int = yb - 15 + int(D.FOCO_ASA)
+	var o := []
+	for ls in [[x0 + 1, -1], [x0 + 14, 1]]:
+		var X: int = ls[0]
+		var cx: int = X + 2 * ls[1]
+		var T: int = X + 4 * ls[1]
+		for y in y0:
+			o.append([cx, y, 1, 1, Color8(28, 29, 34, Datos.jsround(ceil(float(y + 1) / y0 * dg) / dg * 255))])
+		o.append_array([[X, y0 + 3, 1, asa - (y0 + 3), K], [T, y0 + 3, 1, 8, K], [T - 1, y0 + 11, 3, 3, K], [T, y0 + 12, 1, 1, M],
+			[cx - 1, y0 + 1, 3, 5, K], [cx - 2, y0 + 2, 5, 3, K], [cx - 1, y0 + 2, 3, 3, M], [cx, y0 + 3, 1, 1, K], [cx - 1, y0 + 2, 1, 1, H]])
+	return o.filter(func(e): return e[3] > 0)
+
+# la manguera del riego de la nave (1.33, mangueraNave): del tanque por la pared de atrás, con una bajada a cada mesa
+func _manguera_nave() -> void:
+	if J.S.get("nave") == null or not int(J.S.nave.get("rg", 0)):
+		return
+	var y := 34
+	var a := 1 * 16 + 15
+	_rect(a - cam.x, y - cam.y, 12 * 16 + 16 - a, 1, css("#3a3c44"))
+	_rect(a - cam.x, y + 1 - cam.y, 12 * 16 + 16 - a, 1, css("#1c1d22"))
+	for x in J.D.MESAS_X:
+		_rect(int(x) * 16 + 16 - cam.x, y + 2 - cam.y, 1, 57 - (y + 2), css("#1c1d22"))
 
 # las plantas de la mesa i de la nave en la fase fm (1.31, plantasMesa de 01b-arte): las de su porte (porte_planta, por el % índica de
 # su fenotipo) con el tono de hoja y el color de cogollo de la variedad, como en la vista C (hoja_planta, vc_tonos y la rampa de

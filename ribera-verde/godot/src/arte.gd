@@ -404,6 +404,24 @@ static func luz(t: String, vc: Dictionary) -> Image:
 	return o
 
 # columnas (primera y última) con algo de cada imagen
+# la primera fila con algo (alfa) de una imagen, o su alto si está vacía (1.33, filaArriba de 11j-locales: la punta de las plantas)
+static func fila_arriba(im: Image) -> int:
+	var k := "arriba|%d" % im.get_instance_id()
+	if cache.has(k):
+		return cache[k]
+	var r := im.get_height()
+	for y in im.get_height():
+		var hay := false
+		for x in im.get_width():
+			if im.get_pixel(x, y).a8 > 0:
+				hay = true
+				break
+		if hay:
+			r = y
+			break
+	cache[k] = r
+	return r
+
 static func caja(im: Image) -> Array:
 	var k := "caja|%d" % im.get_instance_id()
 	if cache.has(k):

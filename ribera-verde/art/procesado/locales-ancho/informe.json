@@ -4,17 +4,14 @@
     48,
     48
   ],
-  "tope_colores": 15,
-  "secuencias": 18,
-  "fotogramas": 18,
+  "tope_colores": 40,
+  "secuencias": 19,
+  "fotogramas": 19,
   "semitransparentes": 0,
-  "en_paleta_antes": 15.1,
+  "en_paleta_antes": 13.2,
   "distancia_media": 0,
-  "colores_finales": 15,
-  "fundidos": [
-    "billar: #f4f4ee→#fff2b0",
-    "billar: #c04848→#a07040"
-  ],
+  "colores_finales": 35,
+  "fundidos": [],
   "huerfanos_quitados": 0,
   "deriva_pies": {},
   "errores": [],

@@ -110,7 +110,7 @@ function tileSolid(m,x,y){
   return !!itemAt(x,y);
 }
 const entAt=(x,y)=>ents.find(e=>(e.x===x&&e.y===y)||(e.moving&&e.fx===x&&e.fy===y));
-function enterMap(name,x,y,dir){S.map=name;if(name==='home')montarCasa();Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];resetSosp();buildEnts();music(mapMusic());}
+function enterMap(name,x,y,dir){S.map=name;if(name==='home')montarCasa();if(name==='nave')montarNave();Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];resetSosp();buildEnts();music(mapMusic());}
 // cada mapa lleva su canción (04-mapas); en la calle, de noche, su versión nocturna (Ribera: night)
 // 1.30: con la alarma, la suya; el piso, de noche, su versión de noche
 const mapMusic=()=>{const m=MAPS[S.map].music;if(ZONAS[S.map]&&SOSP.alarma)return 'alarma';if(S.map==='home'&&isNight())return 'home_n';return ZONAS[S.map]&&isNight()?(m==='town'?'night':m+'_n'):m;};
