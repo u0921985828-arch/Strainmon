@@ -65,6 +65,7 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
         ctx.globalCompositeOperation='source-over';}}
   }
   if(!camFija){luzLocal(cam,now);if(MESA_B)pintaRects(rectsMesaBillar(MESA_B));if(TIRO)pintaTiro(now);}   // los locales (1.30, 11j-locales)
+  if(ALMACEN)pintaRects(rectsAlmacen(ALMACEN));   // la caja fuerte y la nevera por dentro (1.36, 11m-almacen)
 }
 // la luz de los locales (LUZ_CLUB, LUZ_DISCO y, 1.31, los LED de la nave, luzNave): el fondo, si lo hay, encima de todo, y cada luz, un degradado radial (r 1 → r) sumado ('lighter');
 // los focos de GAUA dan una vuelta a la pista cada 7 s (0,9 rad/s), cada uno desde su fase
@@ -79,10 +80,10 @@ function luzLocal(cam,now){
 // la barra del billar (1.30; 1.35, dos): la que va y viene; en la de la dirección, el verde es la tronera (TIRO.a); en la de la
 // fuerza, el verde mete y el rojo del final cuela la blanca (BILLAR.falta)
 function pintaTiro(now){
-  const L=BILLAR,w=120,x0=(SW-w)>>1,y0=60,p=fuerzaTiro(now-TIRO.t0,TIRO.per),a=TIRO.f==='dir'?TIRO.a:L.verde;
+  const L=BILLAR,w=120,x0=(SW-w)>>1,y0=(SH-8)>>1,p=posTiro(TIRO,now),a=TIRO.f==='dir'?TIRO.a:L.verde;
   ctx.fillStyle='#26262e';ctx.fillRect(x0-2,y0-2,w+4,12);ctx.fillStyle='#3a3446';ctx.fillRect(x0,y0,w,8);
   if(TIRO.f!=='dir'){ctx.fillStyle='#e04040';ctx.fillRect(x0+Math.round(L.falta*w),y0,w-Math.round(L.falta*w),8);}
-  ctx.fillStyle='#58d080';ctx.fillRect(x0+Math.round((L.centro-a)*w),y0,Math.round(2*a*w),8);
+  ctx.fillStyle='#58d080';ctx.fillRect(x0+Math.round((centroTiro(TIRO,now)-a)*w),y0,Math.round(2*a*w),8);
   ctx.fillStyle='#ffffff';ctx.fillRect(x0+Math.round(p*(w-2)),y0-1,2,10);
 }
 // lo oscura que está la noche (0 de día, .5 de 21 a 5, en rampa de 19 a 21 y de 5 a 7)

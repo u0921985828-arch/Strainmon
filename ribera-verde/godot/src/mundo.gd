@@ -97,15 +97,7 @@ func caja_g() -> float:
 			t += S.caja.buds[k].g
 	return t
 
-# el rosin de la caja (S.caja.rosin, que no existe hasta que guardas el primero): ocupa el hueco de los cogollos
-func caja_r() -> float:
-	var t := 0.0
-	if S.get("caja") and S.caja.get("rosin"):
-		for k in S.caja.rosin:
-			t += S.caja.rosin[k].g
-	return t
-
-# lo que llevas encima (cogollos y rosin) y su tope, la mochila (1.10, 09c-sala); el arcón de casa no tiene tope
+# lo que llevas encima (cogollos y extractos) y su tope, la mochila (1.10, 09c-sala); lo que no cabe, a la caja fuerte (1.36: sin arcón)
 # la mejor bolsa que tienes o que ya has pedido a Kiko (no se vende otra igual o peor)
 func bolsa_ya() -> int:
 	var b := int(S.items.get("bolsa", 0))
@@ -123,18 +115,6 @@ func cap_mochila() -> float:
 
 func libre_mochila() -> float:
 	return maxf(0, cap_mochila() - peso_encima())
-
-func arcon_g() -> float:
-	var t := 0.0
-	for k in S.arcon.buds:
-		t += S.arcon.buds[k].g
-	return t
-
-func arcon_r() -> float:
-	var t := 0.0
-	for k in S.arcon.rosin:
-		t += S.arcon.rosin[k].g
-	return t
 
 # la agenda del móvil (1.10, 12b-movil): el cliente que te compra te da su número
 # la confianza (1.15, 11e-gente): 0-100 con cada persona con nombre; +1 al hablar el primer día
@@ -200,7 +180,7 @@ func pagar_casa(e: float) -> float:
 func mover_lote(de: Dictionary, a: Dictionary, k: String, g: float) -> void:
 	var b: Dictionary = de[k]
 	if a.has(k):
-		junta_lote(a[k], g, b.thc, b.get("cu", 0), b.get("dia"))
+		junta_lote(a[k], g, b.thc, b.get("cu", 0), b.get("dia"), b.get("mc", 0))
 	else:
 		a[k] = {"g": g, "thc": b.thc}
 		a[k].merge(cura_de(b))
@@ -213,10 +193,17 @@ func mover_rosin(de: Dictionary, a: Dictionary, k: String, g: float) -> void:
 	var b: Dictionary = de[k]
 	if a.has(k):
 		var t: Dictionary = a[k]
+		var c: float = (float(t.get("cu", 0)) * t.g + float(b.get("cu", 0)) * g) / (t.g + g)   # 1.36: con lo curado en la nevera
 		t.thc = (t.thc * t.g + b.thc * g) / (t.g + g)
 		t.g = Datos.jsround((t.g + g) * 10) / 10.0
+		if c:
+			t.cu = c
+		else:
+			t.erase("cu")
 	else:
 		a[k] = {"g": g, "thc": b.thc}
+		if b.get("cu"):
+			a[k].cu = b.cu
 	b.g = Datos.jsround((b.g - g) * 10) / 10.0
 	if b.g < .1:
 		de.erase(k)
@@ -255,15 +242,15 @@ func lot_sid(k: String) -> String:
 func lot_nombre(k: String) -> String:
 	return strain(lot_sid(k)).n + (" ★" if k.contains("*") else "")
 
-# L: otro sitio (el arcón); cu y dia: el curado y el día de la cosecha (1.29; sin dar dia, hoy; dia null, sin día, como los de antes)
-func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1) -> void:
+# L: otro sitio (la caja fuerte); cu y dia: el curado y el día de la cosecha (1.29; sin dar dia, hoy; dia null, sin día, como los de antes)
+func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1, mc = 0) -> void:
 	if L == null:
 		L = S.buds
 	if dia != null and float(dia) < 0:
 		dia = S.day
 	if L.has(k):
 		var b: Dictionary = L[k]
-		junta_lote(b, g, thc, cu, dia)
+		junta_lote(b, g, thc, cu, dia, mc)
 		b.erase("cata")   # 1.15: lo que entra nuevo no está catado ni analizado
 		b.erase("ana")
 	else:
@@ -272,14 +259,17 @@ func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1) -> vo
 			L[k].dia = dia
 		if cu:
 			L[k].cu = cu
+		if mc:
+			L[k].mc = mc
 	discover(lot_sid(k))
 
 # ---------- el curado (1.29, 09c-sala) ----------
-# Cada lote lleva el día de la cosecha (dia) y lo curado (cu, de 0 a 1; sin él, nada). En el arcón, con los tarros, 1/CURADO.dias al
-# día; curado se vende CURADO.precio más caro (calidad) y ya no pierde THC. Sin curar del todo, pasados CURADO.fresco días pierde
-# CURADO.pierde de su THC cada día (×(1 − cu)), esté donde esté. Los lotes de antes de la 1.29 (sin día) no pierden nada
+# Cada lote lleva el día de la cosecha (dia) y lo curado (cu, de 0 a 1; sin él, nada). Con los tarros, en la caja fuerte (1.36: sin arcón)
+# (1.36), 1/CURADO.dias al día; curado se vende CURADO.precio más caro (calidad) y el THC sube CURADO.thc por lo que se cura (1.36). 1.36: sin curar ya no
+# pierde THC; los extractos se curan en frío en la nevera (S.nevera.rosin, sin tarros) y el manicurado (mc, de 0 a 1) pela los
+# cogollos: MANICURA.precio más caro. Al juntar dos lotes, el THC, lo curado, lo manicurado y el día van por gramos
 func calidad(b: Dictionary) -> float:
-	return 1 + D.CURADO.precio * float(b.get("cu", 0))
+	return 1 + D.CURADO.precio * float(b.get("cu", 0)) + D.MANICURA.precio * float(b.get("mc", 0))
 
 func cura_de(b: Dictionary) -> Dictionary:
 	var o := {}
@@ -287,16 +277,23 @@ func cura_de(b: Dictionary) -> Dictionary:
 		o.dia = b.dia
 	if b.get("cu"):
 		o.cu = b.cu
+	if b.get("mc"):
+		o.mc = b.mc
 	return o
 
-func junta_lote(t: Dictionary, g: float, thc: float, cu, dia) -> void:
+func junta_lote(t: Dictionary, g: float, thc: float, cu, dia, mc = 0) -> void:
 	var nn: float = t.g + g
 	var c: float = (float(t.get("cu", 0)) * t.g + float(cu if cu else 0) * g) / nn
+	var m: float = (float(t.get("mc", 0)) * t.g + float(mc if mc else 0) * g) / nn
 	t.thc = (t.thc * t.g + thc * g) / nn
 	if c:
 		t.cu = c
 	else:
 		t.erase("cu")
+	if m:
+		t.mc = m
+	else:
+		t.erase("mc")
 	if dia != null:
 		t.dia = Datos.jsround((float(t.get("dia", dia)) * t.g + float(dia) * g) / nn)
 	t.g = nn
@@ -304,46 +301,62 @@ func junta_lote(t: Dictionary, g: float, thc: float, cu, dia) -> void:
 func y_lista(l: Array) -> String:
 	return (", ".join(l.slice(0, -1)) + " y " + l[-1]) if l.size() > 1 else l[0]
 
-# al amanecer (new_day): lo que se cura en el arcón y lo que pierde THC; av, los avisos del día
-func curado_dia(av: Array) -> void:
-	var listos := []
-	var pierden := []
-	if S.items.get("tarros"):
-		for k in S.arcon.buds:
-			var b: Dictionary = S.arcon.buds[k]
-			if float(b.get("cu", 0)) < 1:
-				b.cu = minf(1.0, float(b.get("cu", 0)) + 1.0 / D.CURADO.dias)
-				if b.cu >= 1:
-					listos.append(lot_nombre(k))
-	for L in [S.buds, S.arcon.buds, S.caja.buds if S.caja else {}]:
-		for k in L:
-			var b: Dictionary = L[k]
-			if b.get("dia") != null and float(b.get("cu", 0)) < 1 and S.day - b.dia > D.CURADO.fresco:
-				b.thc *= 1 - D.CURADO.pierde * (1 - float(b.get("cu", 0)))
-				if S.day - b.dia == D.CURADO.fresco + 1:
-					pierden.append(lot_nombre(k))
-	for w in S.plantilla.filter(func(x): return x.get("rol") == "calle") + S.curro.vend:   # lo que lleva alguien de la plantilla o un vendedor (1.29.1), igual (sin aviso)
-		if w.get("dia") != null and float(w.get("cu", 0)) < 1 and S.day - w.dia > D.CURADO.fresco:
-			w.thc *= 1 - D.CURADO.pierde * (1 - float(w.get("cu", 0)))
-	if listos.size():
-		av.append("Curada en el arcón: " + y_lista(listos))
-	if pierden.size():
-		av.append("Sin curar, pierde THC: " + y_lista(pierden))
+# la nevera (1.36): los extractos, en frío
+func nevera() -> Dictionary:
+	if S.get("nevera") == null:
+		S.nevera = {"rosin": {}}
+	return S.nevera
 
-# cómo está un lote, para la mochila: curado, curándose o sin curar ("" en los de antes de la 1.29)
+func nevera_r() -> float:
+	var t := 0.0
+	if S.get("nevera") != null:
+		for k in S.nevera.rosin:
+			t += S.nevera.rosin[k].g
+	return t
+
+func extr_nombre(k: String, mn := false) -> String:
+	return (D.EXTR[tipo_extr(k)].n.to_lower() if mn else D.EXTR[tipo_extr(k)].n) + " de " + lot_nombre(base_extr(k))
+
+func _cura(L: Dictionary) -> Array:
+	var o := []
+	for k in L:
+		var b: Dictionary = L[k]
+		if float(b.get("cu", 0)) < 1:
+			var c0 := float(b.get("cu", 0))
+			b.cu = minf(1.0, c0 + 1.0 / D.CURADO.dias)
+			b.thc = b.thc * (1 + D.CURADO.thc * (b.cu - c0))
+			if b.cu >= 1:
+				o.append(k)
+	return o
+
+# al amanecer (new_day): lo que se cura; av, los avisos del día
+func curado_dia(av: Array) -> void:
+	var c: Array = _cura(S.caja.buds) if S.items.get("tarros") and S.get("caja") else []
+	var nv: Array = _cura(S.nevera.rosin) if S.items.get("tarros") and S.get("nevera") != null else []   # 1.36: los dos, con los tarros
+	if c.size():
+		av.append("Curada en la caja fuerte: " + y_lista(c.map(lot_nombre)))
+	if nv.size():
+		av.append("Curado en la nevera: " + y_lista(nv.map(extr_nombre)))
+
+# cómo está un lote, para la mochila: curado, curándose o sin curar ("" en los de antes de la 1.29), y manicurado
+func man_txt(b: Dictionary) -> String:
+	var mc := float(b.get("mc", 0))
+	return (" Manicurada: un %d %% más cara." % Datos.jsround(D.MANICURA.precio * 100)) if mc >= 1 else (" Manicurada en parte." if mc else "")
+
 func cura_txt(b: Dictionary) -> String:
 	var cu := float(b.get("cu", 0))
+	var t := ""
 	if cu >= 1:
-		return "Curada: se vende un %d %% más cara y ya no pierde THC." % Datos.jsround(D.CURADO.precio * 100)
-	if cu:
-		return "Curándose (%d %%): termina de curarla en el arcón con los tarros." % Datos.jsround(cu * 100)
-	if b.get("dia") == null:
-		return ""
-	return "Sin curar: %s. Cúrala en el arcón con tarros." % ["pierde THC cada día" if S.day - b.dia > D.CURADO.fresco else "desde el día %d pierde THC" % int(b.dia + D.CURADO.fresco + 1)]
+		t = "Curada: un %d %% más de THC y se vende un %d %% más cara." % [Datos.jsround(D.CURADO.thc * 100), Datos.jsround(D.CURADO.precio * 100)]
+	elif cu:
+		t = "Curándose (%d %%): termina de curarla con los tarros, en la caja fuerte." % Datos.jsround(cu * 100)
+	elif b.get("dia") != null:
+		t = "Sin curar: con tarros, en la caja fuerte, se cura en %d días: sube un %d %% de THC y se vende un %d %% más cara." % [int(D.CURADO.dias), Datos.jsround(D.CURADO.thc * 100), Datos.jsround(D.CURADO.precio * 100)]
+	return (t + man_txt(b)).strip_edges()
 
 func cura_corto(b: Dictionary) -> String:
 	var cu := float(b.get("cu", 0))
-	return " · curada" if cu >= 1 else (" · curándose" if cu else (" · sin curar" if b.get("dia") != null else ""))
+	return (" · curada" if cu >= 1 else (" · curándose" if cu else (" · sin curar" if b.get("dia") != null else ""))) + (" · manicurada" if float(b.get("mc", 0)) >= 1 else "")
 
 func use_buds(k: String, g: float) -> void:
 	var b: Dictionary = S.buds[k]
@@ -373,6 +386,10 @@ func total_rosin() -> float:
 func add_rosin(k: String, g: float, thc: float) -> void:
 	if S.rosin.has(k):
 		var b: Dictionary = S.rosin[k]
+		if b.get("cu"):
+			b.cu = b.cu * b.g / (b.g + g)
+			if not b.cu:
+				b.erase("cu")
 		b.thc = (b.thc * b.g + thc * g) / (b.g + g)
 		b.g = Datos.jsround((b.g + g) * 10) / 10.0
 	else:
@@ -400,7 +417,7 @@ func rosin_lots(mn: float) -> Array:
 
 func rosin_item(l: Array) -> Dictionary:
 	var k: String = l[0]
-	return {"label": D.EXTR[tipo_extr(k)].n + " · " + lot_nombre(k), "right": "%s g · %s%%" % [Datos.coma(l[1].g), Datos.pct(l[1].thc)], "sw": "#d89a18", "ic": ic_cog(lot_sid(k))}
+	return {"label": D.EXTR[tipo_extr(k)].n + " · " + lot_nombre(k) + (" · curado" if float(l[1].get("cu", 0)) >= 1 else ""), "right": "%s g · %s%%" % [Datos.coma(l[1].g), Datos.pct(l[1].thc)], "sw": "#d89a18", "ic": ic_cog(lot_sid(k))}
 
 # las extracciones (1.35, 11l-extraccion): el tipo va en la clave del lote («ria~seco»; el rosin, sin nada)
 func tipo_extr(k: String) -> String:
@@ -419,14 +436,19 @@ func mayor_lote(l: Array):
 			a = x
 	return a
 
+func mueble_ya(E: Dictionary) -> bool:
+	return true if (S.items.get(E.item) or (E.get("alt") and S.items.get(E.alt))) else false
+
 func extr_algo() -> bool:   # algún aparato: catadores en la calle y el extracto en la caja
-	return true if (S.items.get("prensa") or S.items.get("tamiz") or S.items.get("ice")) else false
+	var it: Dictionary = S.items
+	return true if (it.get("prensa") or it.get("tamiz") or it.get("mallas00") or it.get("ice") or it.get("lavadora") or it.get("estatica")) else false
 
 # las que puedes hacer: la de cada aparato, el charas con cualquiera, el prensado con kief y el moonrock con la prensa y kief
 func extr_ya() -> Array:
 	var it: Dictionary = S.items
-	var kf: bool = true if (it.get("tamiz") or it.get("ice")) else false
-	var si := {"rosin": it.get("prensa"), "seco": it.get("tamiz"), "ice": it.get("ice"), "charas": extr_algo(), "hash": kf, "moon": it.get("prensa") and kf}
+	var kf: bool = true if (it.get("tamiz") or it.get("mallas00") or it.get("ice") or it.get("lavadora") or it.get("estatica")) else false
+	var si := {"rosin": it.get("prensa"), "seco": it.get("tamiz") or it.get("mallas00"), "ice": it.get("ice"), "charas": extr_algo(), "hash": kf, "moon": it.get("prensa") and kf,
+		"lava": it.get("lavadora"), "stat": it.get("estatica")}
 	return D.EXTR.keys().filter(func(t): return true if si[t] else false)
 
 # el prólogo (1.10): S.flags.llegada === false hasta que el autobús de ama deja al jugador en Ribera Verde (las partidas viejas
@@ -469,7 +491,7 @@ func montar_casa() -> void:
 	var su := deco_v("suelo")
 	var pa := deco_v("pared")
 	var al = D.MUEBLES.alfombra if "alfombra" in ya else null
-	var key := ",".join(ks) + "|" + ",".join(ya) + "|" + ",".join([su, pa, deco_v("alfombra")])
+	var key := ",".join(ks) + "|" + ",".join(ya) + "|" + ",".join([su, pa, deco_v("alfombra")]) + "|" + ",".join(D.MUEBLE_EXTR.keys().filter(func(k): return mueble_ya(D.MUEBLE_EXTR[k])))
 	if h.get("carpasK") == key:
 		return
 	h.carpasK = key
@@ -498,6 +520,10 @@ func montar_casa() -> void:
 		h.o[mu.y][mu.x] = k if k in ya else null
 		if not mu.get("uno"):
 			h.o[mu.y][mu.x + 1] = (k + "2") if k in ya else null
+	for k in D.MUEBLE_EXTR:   # 1.36: las máquinas de las extracciones (11m-almacen)
+		var E: Dictionary = D.MUEBLE_EXTR[k]
+		h.o[E.y][E.x] = k if mueble_ya(E) else null
+	h.o[4][5] = "trim"   # y la mesa de manicurar
 	var g: Dictionary = D.MUEBLES.gpc   # 1.27.1: la silla gaming, con el PC
 	h.o[g.y + 1][g.x] = "sillaG" if "gpc" in ya else null
 	h.o[g.y + 1][g.x + 1] = "sillaG2" if "gpc" in ya else null
@@ -853,6 +879,10 @@ func item_give(id: String) -> void:
 			await semillas_tia("kerala", "Un bote de carrete envuelto en plástico: «Kerala, India». Es la letra de la tía Maite.")
 		"h_manga":
 			await semillas_tia("mangarosa", "Un sobre en una bolsa de congelar: «Manga Rosa · Brasil». Es la letra de la tía Maite.")
+		"h_mallas":   # 1.36: las mallas 00, en un arbusto de Mendialde
+			S.items.mallas00 = 1
+			await got("unas MALLAS 00 (DOBLE CERO)")
+			await say("Una bolsa de tela con un bastidor y una malla finísima: «00». Con esto se tamiza en seco lo más fino, solo las cabezas de resina.")
 		"h_hawai":
 			await semillas_tia("hawai", "Un tubo de pastillas con semillas dentro: «Hawái». Es la letra de la tía Maite.")
 
@@ -1159,6 +1189,9 @@ func object_action(x: int, y: int) -> void:
 					break
 				await say(("Aquí va %s: llega mañana." % mu.art) if pd else ("Aquí iría bien %s. Se compra por internet: en el ordenador de la tía o con el móvil." % mu.art))
 				return
+		if o != null and D.MUEBLE_EXTR.has(o):   # 1.36: los muebles de las extracciones
+			await mueble_extr(o)
+			return
 		match o:
 			"bedT", "bedB":
 				await bed_action()
@@ -1169,19 +1202,22 @@ func object_action(x: int, y: int) -> void:
 			"lab", "lab2":
 				await lab_action()
 				return
+			"trim":   # 1.36
+				await manicura_action()
+				return
 			"table":
 				await letter_action()
 				return
 			"fridge":
 				if S.flags.get("nevera"):
-					await say("La nevera: medio limón, leche y un táper de alubias que dejó la tía.")
+					if extr_algo() or nevera_r() > 0 or total_rosin() > 0:   # 1.36: los extractos, en frío
+						await nevera_action()
+					else:
+						await say("La nevera: medio limón, leche y un táper de alubias que dejó la tía.")
 					return
 				S.flags.nevera = S.day   # 1.25: el bote de la tía
 				await say("Detrás del táper de alubias hay un bote de cristal con una etiqueta: «Choco Thai. NO TOCAR».")
 				await semillas_tia("choco", "El frío las ha conservado: siguen buenas.", 3)
-				return
-			"crate":
-				await arcon_action()
 				return
 			"plantDeco":
 				await say("Una monstera. La tía Maite le hablaba cada mañana.")
@@ -1372,7 +1408,7 @@ func talk_client(c: Dictionary) -> void:
 	var sid: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
 	var xn: String = (D.EXTR[tipo_extr(sid)].n.to_lower() + " ") if ext else ""
-	var base: float = (precio_rosin(b.thc) * D.EXTR[tipo_extr(sid)].px if ext else precio_calle(b.thc) * calidad(b)) * ct.mult * D.ZONAS[c.get("map", "town")].precio * rival_f(c.get("map", "town")) * c.want
+	var base: float = (precio_rosin(b.thc) * D.EXTR[tipo_extr(sid)].px if ext else precio_calle(b.thc)) * calidad(b) * ct.mult * D.ZONAS[c.get("map", "town")].precio * rival_f(c.get("map", "town")) * c.want
 	var pr := [Datos.jsround(base * .85), Datos.jsround(base), Datos.jsround(base * 1.3)]
 	var j: int = await ask("%s g de %s%s. ¿Cuánto le pides?" % [n(c.want), (xn + "de ") if ext else "", lot_nombre(sid)], ["Rebaja · %d €" % pr[0], "Justo · %d €" % pr[1], "Caro · %d €" % pr[2], "Cancelar"])
 	if j == 3:
@@ -1828,8 +1864,6 @@ func vencer_encargo():
 	pass
 func robo_darko():
 	pass
-func arcon_action():
-	pass
 func recibir_envio():
 	pass
 func talk_begona():
@@ -1915,6 +1949,12 @@ func bed_action(_txt := ""):
 func pc_action():
 	pass
 func lab_action():
+	pass
+func mueble_extr(_o: String):   # 1.36, en trama.gd
+	pass
+func manicura_action():
+	pass
+func nevera_action():
 	pass
 func letter_action():
 	pass

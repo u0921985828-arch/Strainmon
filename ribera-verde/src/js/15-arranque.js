@@ -22,6 +22,10 @@ function migrate(){
   // 1.34: en los clubs donde ya vendías, el encargado y el presidente ya se fían de ti
   if(S.nave&&S.nave.r==null)S.nave.r=S.day+RECIBO.dias;if(S.setas&&S.setas.r==null)S.setas.r=S.day+RECIBO.dias;   // 1.35: los recibos, cada RECIBO.dias
   if(!S.clubReg&&S.clubDia)for(const k in PRESI)if(S.clubDia[k]!=null||S.clubEnc&&S.clubEnc.k===k)[k,'pres_'+k].forEach(id=>S.rel[id]=Math.max(rel(id),CLUB.confia));
+  if(S.arcon){   // 1.36 (lo pidió el usuario): sin el arcón; los cogollos, a la caja fuerte (o encima, sin ella) y los extractos, a la nevera
+    for(const k of Object.keys(S.arcon.buds||{}))moverLote(S.arcon.buds,S.caja?S.caja.buds:S.buds,k,S.arcon.buds[k].g);
+    for(const k of Object.keys(S.arcon.rosin||{}))moverRosin(S.arcon.rosin,nevera().rosin,k,S.arcon.rosin[k].g);delete S.arcon;}
+  if(S.caja&&S.caja.rosin){for(const k of Object.keys(S.caja.rosin))moverRosin(S.caja.rosin,nevera().rosin,k,S.caja.rosin[k].g);delete S.caja.rosin;}
   const sinMis=!S.misiones,sinItin=!S.itin,sinLog=!S.logros,d=newState();for(const k in d)if(!(k in S))S[k]=d[k];for(const k in d.items)if(!(k in S.items))S.items[k]=0;
   if(sinMis)MISIONES.forEach(m=>{if(m.ch<S.ch)S.misiones[m.id]=0;});   // 1.11: las de capítulos pasados, hechas y sin regalo
   if(S.ch>6)cerrarCopa();   // 1.28: las de la Copa, en una partida que ya la ganó

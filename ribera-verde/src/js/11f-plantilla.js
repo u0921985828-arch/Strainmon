@@ -5,7 +5,7 @@
 // llega) con tres números del 1 al 5: labia (vende más y le timan menos), cuidado (le pillan y le atracan menos; en la nave, cultiva
 // más) y lealtad (se larga menos con lo tuyo y, de gerente, sisa menos). Hasta PLANTILLA.max. Trabajos: a la calle con un lote (vende a
 // precio de calle del barrio y se queda PLANTILLA.com), de gerente en casa (uno: cuida las plantas como Begoña, cosecha lo que esté
-// listo al arcón quitando su sisa y, con él, los de la calle se largan la mitad) o en la nave de Valdehierro (NAVE: la alquila
+// listo a la caja fuerte quitando su sisa y, con él, los de la calle se largan la mitad) o en la nave de Valdehierro (NAVE: la alquila
 // Arrieta desde el capítulo NAVE.ch; cada trabajador saca naveG gramos al día de la variedad que elijas). Gerente y nave cobran
 // cada mañana; sin dinero, lo dejan. 1.30: se entra en la nave (11j-locales); cuatro mesas de cultivo (S.nave.m), una por
 // trabajador, que plantas tú con una semilla o un esqueje; a los NAVE.crece días dan cada mañana naveG × su rendimiento, con el
@@ -27,11 +27,11 @@ function mesaLibre(){const L=[...Array(NAVE.max).keys()].filter(i=>!naveroDe(i))
 const naveG=w=>NAVE.g+NAVE.gC*(w.cui-3);
 const rolTxt=w=>w.rol==='calle'?'calle · '+gTxt(w.g):w.rol||'sin trabajo';
 function rolDesc(w){const P=PLANTILLA;
-  return w.rol==='calle'?`Vende ${lotNombre(w.k)} en la calle: le quedan ${gTxt(w.g)}.`:w.rol==='gerente'?`Cuida el piso y cosecha al arcón por ${eur(P.sueldo.gerente)} al día.`
+  return w.rol==='calle'?`Vende ${lotNombre(w.k)} en la calle: le quedan ${gTxt(w.g)}.`:w.rol==='gerente'?`Cuida el piso y cosecha a la caja fuerte por ${eur(P.sueldo.gerente)} al día.`
     :w.rol==='nave'?`Cultiva la mesa ${w.mesa+1} de la nave por ${eur(P.sueldo.nave)} al día: ${naveG(w)} g.`
     :w.rol==='madres'?`Cuida las madres de la nave por ${eur(P.sueldo.madres)} al día y les saca esquejes.`:'Dale trabajo: calle, gerente, nave o las madres.';}
-// deja el trabajo; lo que le quedaba del lote vuelve al arcón
-function libre(w){if(w.rol==='calle'&&w.g>=1)addBuds(w.k,w.g,w.thc,S.arcon.buds,w.cu,w.dia??null);w.rol=null;delete w.k;delete w.thc;delete w.g;delete w.cu;delete w.dia;delete w.mesa;}
+// deja el trabajo; lo que le quedaba del lote vuelve a la caja fuerte
+function libre(w){if(w.rol==='calle'&&w.g>=1)addBuds(w.k,w.g,w.thc,S.caja?S.caja.buds:S.buds,w.cu,w.dia??null,w.mc);w.rol=null;delete w.k;delete w.thc;delete w.g;delete w.cu;delete w.dia;delete w.mc;delete w.mesa;}
 async function plantilla(){
   let i=0;
   for(;;){
@@ -70,14 +70,14 @@ async function trabajo(w){
   if(w.rol)ops.push('Dejarlo libre');ops.push(`Prima · ${eur(MANDO.prima)}`,`Curso · ${eur(MANDO.curso)}`,'Despedir','Nada');
   const op=ops[await ask(`${w.n} · ${fichaGente(w)} · ${rolTxt(w)}`,ops)];
   if(op==='A la calle'){const r=await loteCalle(w);if(!r)return;libre(w);w.rol='calle';[w.k,w.thc,w.g]=r;Object.assign(w,r[3]);sfx('sel');return say(`${w.n}: «Hecho. Cada día te dejo lo vendido en el buzón».`);}
-  if(op==='De gerente'){libre(w);w.rol='gerente';sfx('sel');return say(`${w.n}: «Cada mañana me paso por el piso: riego, trato las plagas y lo que esté listo lo cosecho y lo dejo en el arcón. ${eur(P.sueldo.gerente)} al día».`);}
+  if(op==='De gerente'){libre(w);w.rol='gerente';sfx('sel');return say(`${w.n}: «Cada mañana me paso por el piso: riego, trato las plagas y lo que esté listo lo cosecho y lo dejo en la caja fuerte. ${eur(P.sueldo.gerente)} al día».`);}
   if(op==='A la nave'){libre(w);w.mesa=mesaLibre();w.rol='nave';sfx('sel');return say(`${w.n}: «Mañana empiezo en la mesa ${w.mesa+1} de la nave. ${eur(P.sueldo.nave)} al día».`);}
   if(op==='A las madres'){libre(w);w.rol='madres';sfx('sel');return say(`${w.n}: «Mañana empiezo con las madres de la nave: riego, poda y esquejes. ${eur(P.sueldo.madres)} al día».`);}
   if(op&&op.startsWith('Prima'))return prima(w);
   if(op&&op.startsWith('Curso'))return curso(w);
-  if(op==='Dejarlo libre'){const g=w.rol==='calle'?w.g:0;libre(w);return say(g>=1?`${w.n} te deja lo que le quedaba en el arcón: ${gTxt(g)}.`:`${w.n} se queda sin trabajo.`);}
+  if(op==='Dejarlo libre'){const g=w.rol==='calle'?w.g:0;libre(w);return say(g>=1?`${w.n} te deja lo que le quedaba en la caja fuerte: ${gTxt(g)}.`:`${w.n} se queda sin trabajo.`);}
   if(op==='Despedir'){if(await ask(`¿Despides a ${w.n}?`,['Despedir','No'])!==0)return;
-    const g=w.rol==='calle'?w.g:0;libre(w);S.plantilla=S.plantilla.filter(x=>x!==w);return say(`${w.n} se va.`+(g>=1?` Lo que le quedaba, ${gTxt(g)}, está en el arcón.`:''));}
+    const g=w.rol==='calle'?w.g:0;libre(w);S.plantilla=S.plantilla.filter(x=>x!==w);return say(`${w.n} se va.`+(g>=1?` Lo que le quedaba, ${gTxt(g)}, está en la caja fuerte.`:''));}
 }
 async function prima(w){
   if(S.day-(w.pr??-MANDO.dias)<MANDO.dias)return say(`A ${w.n} ya le diste una prima el día ${w.pr}. Hasta el ${w.pr+MANDO.dias}, no.`);
@@ -94,14 +94,14 @@ async function curso(w){
   S.money-=MANDO.curso;w.cu1=S.day;w[k]++;sfx('coin');updateHUD();
   return say(`${w.n} hace un curso ${k==='lab'?'de venta: a tratar con la gente':'de cultivo: riego, plagas y poda'}. ${n[0].toUpperCase()+n.slice(1)} ${w[k]}.`);
 }
-// el gerente, cada mañana: cuida las plantas y cosecha las que están listas al arcón (su sisa, por la lealtad); da los gramos
+// el gerente, cada mañana: cuida las plantas y cosecha las que están listas a la caja fuerte (su sisa, por la lealtad); da los gramos
 function cuidarCasa(w){
   cuidarPlantas();let tot=0;
   S.pots.forEach((p,i)=>{if(!p||p.dead||p.prog<1)return;
     const f=factores(i),g=gramosPlanta(p,f),thc=thcCosecha(p,f),cl=claseFeno(p.f),{n}=semillasCosecha(p),q=g-Math.floor(g*PLANTILLA.sisa*(5-w.lea));
-    if(q>=1)addBuds(cl==='estrella'?p.sid+'*':p.sid,q,thc,S.arcon.buds);if(n)addSeeds(p.sid,n);
+    if(q>=1)addBuds(cl==='estrella'?p.sid+'*':p.sid,q,thc,S.caja?S.caja.buds:S.buds);if(n)addSeeds(p.sid,n);
     if(p.f&&p.f.id)S.fenos[p.f.id]=cl;if(S.rec[p.sid]===1)S.rec[p.sid]=2;S.pots[i]=null;tot+=q;});
-  if(tot){S.flags.harvest1=true;queue('gerente',()=>talk('SMS · '+w.n.toUpperCase(),[`He cosechado ${tot} g. Está en el arcón.`]));queue('historia',checkStory);}
+  if(tot){S.flags.harvest1=true;queue('gerente',()=>talk('SMS · '+w.n.toUpperCase(),[`He cosechado ${tot} g. Está en la caja fuerte.`]));queue('historia',checkStory);}
   return tot;
 }
 // al amanecer (desde curroDia): sueldos, el gerente, la calle y la nave

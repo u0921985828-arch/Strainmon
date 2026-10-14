@@ -652,9 +652,10 @@ func harvest(i: int) -> void:
 	add_buds(lk, g, thc)
 	if nn:
 		add_seeds(p.sid, nn)
-	var sobra := mini(g, int(floor(peso_encima() - cap_mochila())))   # lo que no cabe encima, al arcón (1.10)
-	if sobra >= 1:
-		mover_lote(S.buds, S.arcon.buds, lk, sobra)
+	var sobra := mini(g, int(floor(peso_encima() - cap_mochila())))   # lo que no cabe encima, a la caja fuerte (1.36; antes, al arcón)
+	var a_caja := mini(sobra, int(floor(D.CAJA[int(S.caja.nivel)].g - caja_g()))) if sobra >= 1 and S.get("caja") else 0
+	if a_caja >= 1:
+		mover_lote(S.buds, S.caja.buds, lk, a_caja)
 	if p.get("f") and p.f.get("id"):
 		S.fenos[str(int(p.f.id))] = cl
 	S.pots[i] = null
@@ -663,7 +664,8 @@ func harvest(i: int) -> void:
 		S.rec[p.sid] = 2
 	await say("Cosechas %d g de %s. THC: %s%%." % [g, s.n, Datos.pct(thc)])
 	if sobra >= 1:
-		await say("No te cabe todo en la %s: %d g van al arcón." % [D.MOCHILAS[int(S.items.get("bolsa", 0))].n.to_lower(), sobra])
+		await say("No te cabe todo en la %s: " % D.MOCHILAS[int(S.items.get("bolsa", 0))].n.to_lower() + ("%d g van a la caja fuerte." % a_caja if a_caja >= 1 else "")
+			+ (("%sLlevas %d g de más: guárdalos en cuanto puedas." % [" " if a_caja >= 1 else "", sobra - a_caja]) if sobra - a_caja >= 1 else ""))
 	if cl == "estrella":
 		sfx("enc")
 		await say("¡Fenotipo estrella! THC ×%s y cosecha ×%s sobre la media de la %s." % [Datos.coma(fe.t), Datos.coma(fe.y), s.n])
@@ -680,7 +682,7 @@ func harvest(i: int) -> void:
 			await say("Una flor hermafrodita ha polinizado unas pocas: recoges %d semilla%s de %s." % [nn, pl, s.n])
 	if not S.items.get("tarros") and not S.flags.get("curado"):   # 1.29, una vez
 		S.flags.curado = S.day
-		await say("Sale sin curar: a los %d días empieza a perder THC. En el arcón, con unos tarros de curado (los vende Kiko), se cura en %d y se vende más cara." % [int(D.CURADO.fresco), int(D.CURADO.dias)])
+		await say("Sale sin curar. Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura en %d días: algo más de THC y se vende más cara. Sin curar no pierde nada." % int(D.CURADO.dias))   # 1.36: ya no pierde THC; curando, sube
 	S.flags.harvest1 = true
 	await check_story()
 
@@ -746,8 +748,8 @@ func bed_action(txt := ""):
 		return
 	if diario:
 		await almohada()
-	if S.day > d0 and S.ch == 7 and not S.flags.get("robo") and (S.money > 1000 or gramos_flor() + arcon_g() + arcon_r() / D.ROSIN.rend > 100):
-		await robo_darko()   # la amenaza de Darko (1.10; con lo del arcón)
+	if S.day > d0 and S.ch == 7 and not S.flags.get("robo") and (S.money > 1000 or gramos_flor() + nevera_r() / D.ROSIN.rend > 100):
+		await robo_darko()   # la amenaza de Darko (1.10; 1.36: con lo de la nevera)
 	await aviso_plaga(antes)
 
 # la primera vez que duermes en el piso (1.25): el diario de la tía Maite, bajo la almohada (S.flags.diario; el recetario, en trama)

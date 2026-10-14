@@ -1,0 +1,173 @@
+# python3 -I tools/sprites/a-mano/almacen.py  (Python 3 + Pillow; no va en los scripts de npm)
+# 1.36 (lo pidió el usuario: «Quiero para los visores sprites del estilo de todo el juego» y «una ventana para ver lo que estás
+# seleccionando»): la caja fuerte y la nevera por dentro, a mano, con la luz y el contorno de los muebles del piso. Todo con el
+# ancla arriba a la izquierda (0, 0): el juego pone encima lo que cambia (lo lleno de cada tarro, las etiquetas, las barras):
+#  · alm-caja (168 × 100): el acero de la caja, el fondo cepillado, el tabique, la bandeja de los billetes, el cajón y dos baldas
+#    de madera para los tarros;
+#  · alm-nevera (152 × 120): la nevera blanca por dentro, la luz, la fila de GUARDAR arriba, siete baldas de cristal y la guía de
+#    lo llena que está;
+#  · alm-panel (60 × 100): la ventana del elegido: el visor oscuro y las tres ranuras de las barras;
+#  · alm-tarro, alm-tarro-s (18 × 25): el cristal del tarro de cogollos, con la tapa de latón (y la dorada del fenotipo estrella),
+#    hueco por dentro para que se vea lo que lleva; alm-bote (12 × 12), el bote pequeño de los extractos, con la tapa de aluminio;
+#  · alm-mas (18 × 25): GUARDAR en la caja, el tarro abierto y vacío con el más; alm-guardar (44 × 11), el botón de la nevera;
+#  · alm-fajo (15 × 8): un fajo de billetes con su faja;
+#  · alm-ic-thc/-cu/-mc/-g/-eur (7 × 7): los iconos de las barras (tricoma, tarro, tijeras, pesa y moneda);
+#  · los mismos al doble (-g), para la ventana: alm-tarro-g, alm-tarro-s-g, alm-bote-g, alm-mas-g y alm-fajo-g.
+# Sale a art/crudo/almacen/<sprite>/unica/00.png (después, node tools/sprites/procesar.js almacen --atlas)
+import os, sys, glob
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lienzo import Lienzo, P
+
+K = '#2a2a34'   # el contorno de los muebles (el de salon.py)
+SAL = {}
+def sale(n, L): SAL[n] = L
+
+# ---------- la caja fuerte por dentro ----------
+A0, A1, A2, A3, A4 = '#0c0d10', '#15171c', '#2a2d34', '#3a3e46', '#5a5e68'   # el acero, de sombra a brillo
+M0, M1, M2 = '#3a2c1c', '#6a5236', '#8a6e4a'                                 # la madera de las baldas
+def caja():
+    L = Lienzo(168, 100)
+    L.r(0, 0, 168, 100, A2); L.hl(1, 166, 1, A4); L.vl(1, 1, 98, A3); L.vl(166, 1, 98, '#1a1c22'); L.hl(1, 166, 98, '#1a1c22')   # el marco, biselado
+    for (x, y) in ((2, 2), (164, 2), (2, 96), (164, 96)): L.r(x, y, 2, 2, '#7a7e88'); L.p(x, y, '#a8acb4')                   # los remaches
+    L.r(4, 4, 160, 92, A1)
+    for x in range(8, 164, 6): L.vl(x, 6, 95, '#1b1e24')                       # el fondo cepillado
+    L.hl(4, 163, 4, A0); L.hl(4, 163, 5, '#111317'); L.vl(4, 4, 95, A0)        # la sombra de dentro
+    L.r(62, 4, 2, 92, A2); L.vl(62, 4, 95, A3)                                 # el tabique
+    # la izquierda: la bandeja de los billetes (sobre la que van los fajos) y el cajón de abajo con su tirador
+    L.r(6, 62, 54, 2, A3); L.hl(6, 59, 62, A4); L.hl(6, 59, 64, A0)
+    L.r(8, 82, 49, 10, A3); L.hl(8, 56, 82, A4); L.hl(8, 56, 91, '#2a2d34'); L.vl(8, 82, 91, A4)
+    L.r(28, 85, 9, 4, '#8a8e96'); L.hl(28, 36, 85, '#c0c4cc'); L.hl(28, 36, 88, '#5a5e66')
+    # la derecha: dos baldas de madera (los tarros se apoyan en y = 33 y 67), con sus escuadras
+    for y in (33, 67):
+        L.r(66, y, 96, 3, M1); L.hl(66, 161, y, M2); L.hl(66, 161, y + 3, M0)
+        for x in (68, 158): L.vl(x, y + 3, y + 5, A4); L.p(x + 1, y + 4, A3)
+    return L
+
+# ---------- la nevera por dentro ----------
+N0, N1, N2, N3 = '#7a8494', '#b8c4cc', '#e8eef2', '#eef4f8'
+def nevera():
+    L = Lienzo(152, 120)
+    L.r(0, 0, 152, 120, N1); L.hl(1, 150, 1, N2); L.vl(1, 1, 118, N2); L.hl(1, 150, 118, N0); L.vl(150, 1, 118, N0)
+    L.r(3, 3, 146, 114, N3); L.hl(3, 148, 3, '#cfdfe8'); L.hl(3, 148, 4, '#dde9f0')
+    for x in range(20, 140, 24): L.vl(x, 18, 116, '#e6eef3')                  # los paneles del fondo
+    L.r(64, 5, 24, 3, '#fff8d0'); L.hl(66, 85, 4, '#ffffff'); L.hl(62, 89, 8, '#e8eec8')   # la luz de arriba
+    L.hl(3, 148, 17, '#9fbccb'); L.hl(3, 148, 18, '#dbe8ef')                 # la balda de GUARDAR
+    for s in range(7):                                                        # siete baldas de cristal, una por extracción
+        y = 19 + s * 14
+        L.hl(5, 138, y + 13, '#9fbccb'); L.hl(5, 138, y + 14, '#dbe8ef'); L.p(5, y + 12, '#c8d8e2'); L.p(138, y + 12, '#c8d8e2')
+        L.r(5, y + 2, 7, 10, '#dde8ee')                                       # el hueco de la ficha del tipo
+    L.r(141, 18, 7, 98, '#c8d4dc'); L.vl(141, 18, 115, '#a8b8c4')             # la guía de lo llena que está
+    return L
+
+# ---------- la ventana del elegido ----------
+def panel():
+    L = Lienzo(60, 100)
+    L.r(0, 0, 60, 100, A2); L.hl(1, 58, 1, A4); L.vl(1, 1, 98, A3); L.vl(58, 1, 98, '#1a1c22'); L.hl(1, 58, 98, '#1a1c22')
+    L.r(4, 4, 52, 58, A1); L.hl(4, 55, 4, A0); L.vl(4, 4, 61, A0); L.hl(4, 55, 62, A4)
+    for y in range(6, 60, 2): L.hl(5, 55, y, '#171a20')                       # el visor, de rayas finas
+    for (x0, x1, y) in ((14, 46, 56), (10, 50, 57), (8, 52, 58)): L.hl(x0, x1, y, '#22262e')   # la peana
+    for i in range(3):                                                        # las ranuras de las barras
+        y = 66 + i * 10
+        L.r(3, y - 2, 9, 9, A1); L.r(14, y - 1, 42, 7, A1); L.hl(14, 55, y - 1, A0); L.hl(14, 55, y + 5, A3)
+    return L
+
+# ---------- los tarros ----------
+def tarro(tapa):
+    """el cristal de 18 × 25 (hueco por dentro: x 1-16, y 4-23) y la tapa de rosca"""
+    L = Lienzo(18, 25)
+    t0, t1, t2 = tapa
+    L.r(2, 0, 14, 2, t1); L.hl(2, 15, 0, t2); L.p(2, 1, t0); L.p(15, 1, t0)
+    for x in range(4, 15, 3): L.p(x, 1, t0)                                   # las estrías
+    L.hl(3, 14, 2, '#5a4a2a')                                                 # el cuello
+    L.hl(1, 16, 3, '#c8dce4'); L.vl(0, 4, 23, '#9fb6c0'); L.vl(17, 4, 23, '#7a96a2'); L.hl(1, 16, 24, '#7a96a2')
+    L.vl(2, 5, 18, '#e4f2f6'); L.p(3, 5, '#e4f2f6'); L.p(3, 6, '#e4f2f6')    # los brillos
+    L.vl(15, 6, 9, '#c8dce4')
+    return L
+
+def bote():
+    """el bote pequeño de 12 × 12 (hueco por dentro: x 1-10, y 4-10), con la tapa de aluminio"""
+    L = Lienzo(12, 12)
+    L.r(2, 0, 8, 2, '#c8ccd0'); L.hl(2, 9, 0, '#eef0f2'); L.hl(2, 9, 1, '#9a9ea4')
+    L.hl(3, 8, 2, '#5a5e66')
+    L.hl(1, 10, 3, '#c8dce4'); L.vl(0, 4, 10, '#9fb6c0'); L.vl(11, 4, 10, '#7a96a2'); L.hl(1, 10, 11, '#7a96a2')
+    L.vl(2, 5, 8, '#e4f2f6')
+    return L
+
+def mas():
+    """GUARDAR en la caja: el tarro abierto, vacío, con el más verde"""
+    L = Lienzo(18, 25)
+    L.r(1, 4, 16, 20, '#1d2428')
+    L.hl(3, 14, 2, '#8a96a0'); L.hl(2, 15, 3, '#c8dce4')                    # la boca abierta
+    L.vl(0, 4, 23, '#9fb6c0'); L.vl(17, 4, 23, '#7a96a2'); L.hl(1, 16, 24, '#7a96a2')
+    L.vl(2, 5, 20, '#e4f2f6')
+    L.r(8, 9, 3, 11, '#2a5a30'); L.r(4, 13, 11, 3, '#2a5a30')                 # el más, con su sombra
+    L.r(7, 8, 3, 11, '#58d080'); L.r(3, 12, 11, 3, '#58d080'); L.p(7, 8, '#a8f0c0'); L.p(3, 12, '#a8f0c0')
+    return L
+
+# las letras de 3 × 5 del botón
+LETRAS = {'G': ['###', '#..', '#.#', '#.#', '###'], 'U': ['#.#', '#.#', '#.#', '#.#', '###'], 'A': ['.#.', '#.#', '###', '#.#', '#.#'],
+          'R': ['##.', '#.#', '##.', '#.#', '#.#'], 'D': ['##.', '#.#', '#.#', '#.#', '##.'], '+': ['...', '.#.', '###', '.#.', '...']}
+def letras(L, x, y, txt, c, sombra):
+    for ch in txt:
+        if ch == ' ': x += 2; continue
+        for j, fila in enumerate(LETRAS[ch]):
+            for i, v in enumerate(fila):
+                if v == '#': L.p(x + i, y + j + 1, sombra); L.p(x + i, y + j, c)
+        x += 4
+
+def guardar():
+    L = Lienzo(44, 11)
+    L.r(1, 0, 42, 11, '#3f8a46'); L.vl(0, 1, 9, '#3f8a46'); L.vl(43, 1, 9, '#2a5a30')
+    L.hl(1, 42, 0, '#58c070'); L.hl(1, 42, 10, '#2a5a30'); L.vl(1, 1, 9, '#58c070')
+    letras(L, 5, 3, '+ GUARDAR', '#ffffff', '#24502a')
+    return L
+
+def fajo():
+    L = Lienzo(15, 8)
+    L.r(0, 0, 15, 8, '#4f8f52'); L.hl(0, 14, 0, '#7cc07a')
+    for y in (2, 4, 6): L.hl(0, 14, y, '#5f9f62')                            # los billetes, uno sobre otro
+    L.hl(0, 14, 7, '#2f5f34'); L.vl(14, 1, 7, '#3f7f44')
+    L.r(6, 0, 3, 8, '#e6d58a'); L.vl(8, 0, 7, '#c8b468'); L.p(7, 3, '#b09848')   # la faja
+    L.p(2, 3, '#a8e0a0'); L.p(11, 5, '#a8e0a0')
+    return L
+
+# ---------- los iconos de las barras (7 × 7) ----------
+def icono(n):
+    L = Lienzo(7, 7)
+    if n == 'thc':      # un tricoma: el tallo y la cabeza de resina
+        L.vl(3, 3, 6, '#c8c0a0'); L.r(2, 0, 3, 3, '#f4e8b0'); L.p(2, 0, '#ffffff'); L.p(4, 2, '#d8b040')
+    elif n == 'cu':     # un tarro con la tapa
+        L.r(1, 0, 5, 1, '#b08a3a'); L.r(1, 1, 5, 6, '#9fb6c0'); L.r(2, 3, 3, 3, '#6fae4a'); L.p(2, 2, '#e4f2f6')
+    elif n == 'mc':     # las tijeras
+        L.p(1, 0, '#d0d4d8'); L.p(2, 1, '#d0d4d8'); L.p(5, 0, '#d0d4d8'); L.p(4, 1, '#d0d4d8'); L.p(3, 2, '#ffffff')
+        L.p(2, 3, '#e06a30'); L.p(4, 3, '#e06a30'); L.r(1, 4, 2, 2, '#e06a30'); L.r(4, 4, 2, 2, '#e06a30'); L.p(1, 4, '#f09060')
+    elif n == 'g':      # la pesa
+        L.r(2, 0, 3, 1, '#8a8e96'); L.r(1, 1, 5, 1, '#8a8e96'); L.r(0, 2, 7, 5, '#5a5e66'); L.hl(1, 5, 2, '#a8acb4'); L.p(3, 4, '#2a2d34')
+    elif n == 'eur':    # la moneda
+        L.r(1, 0, 5, 7, '#d8b048'); L.r(0, 1, 7, 5, '#d8b048'); L.hl(1, 5, 0, '#f4d878'); L.vl(0, 1, 5, '#f4d878')
+        L.vl(2, 2, 4, '#8a6a2a'); L.hl(3, 4, 2, '#8a6a2a'); L.hl(3, 4, 4, '#8a6a2a'); L.hl(1, 3, 3, '#8a6a2a')
+    L.contorno(K)
+    return L
+
+def doble(L):
+    D = Lienzo(L.im.width * 2, L.im.height * 2)
+    D.im = L.im.resize((L.im.width * 2, L.im.height * 2), 0); D.px = D.im.load()
+    return D
+
+LATON = ('#8a6a2a', '#b08a3a', '#d8b860')
+ORO = ('#c09020', '#f0c040', '#f8e080')
+sale('alm-caja', caja()); sale('alm-nevera', nevera()); sale('alm-panel', panel())
+sale('alm-tarro', tarro(LATON)); sale('alm-tarro-s', tarro(ORO)); sale('alm-bote', bote()); sale('alm-mas', mas())
+sale('alm-guardar', guardar()); sale('alm-fajo', fajo())
+for n in ('thc', 'cu', 'mc', 'g', 'eur'): sale('alm-ic-' + n, icono(n))
+for n in ('alm-tarro', 'alm-tarro-s', 'alm-bote', 'alm-mas', 'alm-fajo'): sale(n + '-g', doble(SAL[n]))
+
+def escribe(raiz=None):
+    for n, L in SAL.items():
+        d = os.path.join(raiz, n) if raiz else P('art', 'crudo', 'almacen', n, 'unica'); os.makedirs(d, exist_ok=True)
+        for f in glob.glob(os.path.join(d, '*.png')): os.remove(f)
+        L.im.save(os.path.join(d, '00.png'))
+        print('almacen', n, L.im.size, L.im.getbbox(), len(L.colores()), 'colores')
+
+if __name__ == '__main__':
+    escribe(sys.argv[1] if len(sys.argv) > 1 else None)

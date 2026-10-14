@@ -394,20 +394,30 @@ func _encima() -> void:
 	if J.MESA_B != null:
 		for e in J.rects_mesa_billar(J.MESA_B):
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
-	if J.TIRO == null:
-		return
+	if J.TIRO != null:
+		_tiro()
+	if J.ALMACEN != null:   # la caja fuerte y la nevera por dentro (1.36)
+		for e in J.rects_almacen(J.ALMACEN):
+			if typeof(e[0]) == TYPE_STRING:   # ['@', sprite, x, y]: un sprite de misc por su esquina
+				var f = Atlas.foto_misc(e[1])
+				if f:
+					_img(f.c, e[2], e[3])
+				continue
+			_rect(e[0], e[1], e[2], e[3], css(e[4]))
+
+func _tiro() -> void:
 	var B: Dictionary = J.D.BILLAR
 	var w := 120
 	var x0: int = (J.SW - w) >> 1
-	var y0 := 60
-	var p: float = J.fuerza_tiro(now - J.TIRO.t0, J.TIRO.get("per", -1.0))
+	var y0: int = (J.SH - 8) >> 1   # 1.36: centrada en la pantalla (lo pidió el usuario)
+	var p: float = J.pos_tiro(J.TIRO, now)
 	var dir: bool = J.TIRO.get("f") == "dir"
 	var a: float = float(J.TIRO.a) if dir else float(B.verde)
 	_rect(x0 - 2, y0 - 2, w + 4, 12, css("#26262e"))
 	_rect(x0, y0, w, 8, css("#3a3446"))
 	if not dir:
 		_rect(x0 + Datos.jsround(B.falta * w), y0, w - Datos.jsround(B.falta * w), 8, css("#e04040"))
-	_rect(x0 + Datos.jsround((B.centro - a) * w), y0, Datos.jsround(2 * a * w), 8, css("#58d080"))
+	_rect(x0 + Datos.jsround((J.centro_tiro(J.TIRO, now) - a) * w), y0, Datos.jsround(2 * a * w), 8, css("#58d080"))
 	_rect(x0 + Datos.jsround(p * (w - 2)), y0 - 1, 2, 10, css("#ffffff"))
 
 func _farola(a: float) -> Image:
@@ -508,7 +518,7 @@ const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadr
 
 # los muebles que dejan sombra en el suelo (1.10 P5, SOMBRA_OBJ de 01b-arte.js): 1 px a cada lado del dibujo en sus 2 últimas filas
 # y la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo; se pintan con todo el suelo ya puesto
-const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "plantDeco", "lab", "lab2", "pc", "display", "counter", "barcounter", "jukebox", "bench", "bedB", "vitrina", "mesita", "barraD", "mesaV", "estanteN", "secadero", "altavoz"]
+const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "plantDeco", "lab", "lab2", "pc", "display", "counter", "barcounter", "jukebox", "bench", "bedB", "vitrina", "mesita", "barraD", "mesaV", "estanteN", "secadero", "altavoz", "trim", "prensaM", "tamizM", "mallas", "lavadora", "staticM"]
 func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var gr = Atlas.cubre("obj:" + o)
 	if not gr:

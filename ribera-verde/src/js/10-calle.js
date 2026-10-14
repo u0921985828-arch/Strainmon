@@ -42,7 +42,7 @@ async function talkClient(c){
   if(!lots.length)return say((ext?totalRosin():totalBuds())>0?'Eso no me vale. Vuelve cuando tengas lo que busco.':'¿No llevas nada? Vale.',N);
   const i=await menu(lots.map(ext?rosinItem:lotItem).concat([{label:'Nada'}]),{cls:'right',title:'¿Qué le vendes?'});
   if(i<0||i>=lots.length)return say('Vale, otro día.',N);
-  const [sid,b]=lots[i],xn=ext?EXTR[tipoExtr(sid)].n.toLowerCase()+' ':'',base=(ext?precioRosin(b.thc)*EXTR[tipoExtr(sid)].px:precioCalle(b.thc)*calidad(b))*ct.mult*ZONAS[c.map||'town'].precio*rivalF(c.map||'town')*c.want;
+  const [sid,b]=lots[i],xn=ext?EXTR[tipoExtr(sid)].n.toLowerCase()+' ':'',base=(ext?precioRosin(b.thc)*EXTR[tipoExtr(sid)].px:precioCalle(b.thc))*calidad(b)*ct.mult*ZONAS[c.map||'town'].precio*rivalF(c.map||'town')*c.want;
   const pr=[Math.round(base*.85),Math.round(base),Math.round(base*1.3)];
   const j=await ask(`${c.want} g de ${ext?xn+'de ':''}${lotNombre(sid)}. ¿Cuánto le pides?`,[`Rebaja · ${pr[0]} €`,`Justo · ${pr[1]} €`,`Caro · ${pr[2]} €`,'Cancelar']);
   if(j===3)return say('Entonces me voy.',N);

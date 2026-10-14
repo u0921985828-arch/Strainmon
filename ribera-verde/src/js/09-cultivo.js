@@ -336,15 +336,15 @@ async function harvest(i){
   const [vx,vy]=posPlaza(i);await accion('cosechar');await accion('oler',{id:'vfx-brillo',x:vx,y:vy-12});
   const {cria,fem,n}=semillasCosecha(p);
   const lk=cl==='estrella'?p.sid+'*':p.sid;addBuds(lk,g,thc);if(n)addSeeds(p.sid,n);
-  const sobra=Math.min(g,Math.floor(pesoEncima()-capMochila()));if(sobra>=1)moverLote(S.buds,S.arcon.buds,lk,sobra);   // lo que no cabe encima, al arcón (1.10)
+  const sobra=Math.min(g,Math.floor(pesoEncima()-capMochila())),aCaja=sobra>=1&&S.caja?Math.min(sobra,Math.floor(CAJA[S.caja.nivel].g-cajaG())):0;if(aCaja>=1)moverLote(S.buds,S.caja.buds,lk,aCaja);   // lo que no cabe encima, a la caja fuerte (1.36; antes, al arcón)
   if(p.f&&p.f.id)S.fenos[p.f.id]=cl;S.pots[i]=null;sfx('get');
   if(S.rec[p.sid]===1)S.rec[p.sid]=2;   // una variedad de receta sacada en la mesa, cosechada (capítulo 4)
   await say(`Cosechas ${g} g de ${s.n}. THC: ${pct(thc)}%.`);
-  if(sobra>=1)await say(`No te cabe todo en la ${MOCHILAS[S.items.bolsa||0].n.toLowerCase()}: ${sobra} g van al arcón.`);
+  if(sobra>=1)await say(`No te cabe todo en la ${MOCHILAS[S.items.bolsa||0].n.toLowerCase()}: `+(aCaja>=1?`${aCaja} g van a la caja fuerte.`:'')+(sobra-aCaja>=1?`${aCaja>=1?' ':''}Llevas ${sobra-aCaja} g de más: guárdalos en cuanto puedas.`:''));
   if(cl==='estrella'){sfx('enc');await say(`¡Fenotipo estrella! THC ×${coma(fe.t)} y cosecha ×${coma(fe.y)} sobre la media de la ${s.n}.`);await say('Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.');}
   else if(cl==='floja')await say(`Fenotipo flojo: THC ×${coma(fe.t)} y cosecha ×${coma(fe.y)} de la media.`);
   if(n)await say(cria?`Las plantas de la línea se han polinizado entre ellas: recoges ${n} semillas de ${s.n}.`:!fem?`Son semillas regulares: algún macho ha polinizado unas flores. Recoges ${n} semilla${n>1?'s':''} de ${s.n}.`:`Una flor hermafrodita ha polinizado unas pocas: recoges ${n} semilla${n>1?'s':''} de ${s.n}.`);
-  if(!S.items.tarros&&!S.flags.curado){S.flags.curado=S.day;await say(`Sale sin curar: a los ${CURADO.fresco} días empieza a perder THC. En el arcón, con unos tarros de curado (los vende Kiko), se cura en ${CURADO.dias} y se vende más cara.`);}   // 1.29, una vez
+  if(!S.items.tarros&&!S.flags.curado){S.flags.curado=S.day;await say(`Sale sin curar. Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura en ${CURADO.dias} días: algo más de THC y se vende más cara. Sin curar no pierde nada.`);}   // 1.29, una vez (1.36: ya no pierde THC; curando, sube)
   S.flags.harvest1=true;await checkStory();
 }
 // estabilizar: la línea cruzada consigo misma sube una generación (F1 → F2 → F3 → estable)
@@ -370,7 +370,7 @@ async function bedAction(txt){
   save();toast('Has descansado'+(hoy&&hoy.e?' · Luz −'+eur(hoy.e):'')+(hoy&&hoy.o?' · Olor: calor +'+hoy.o:'')+' · Partida guardada',1800);
   if(!piso)return;
   if(diario)await almohada();
-  if(S.day>d0&&S.ch===7&&!S.flags.robo&&(S.money>1000||gramosFlor()+arconG()+arconR()/ROSIN.rend>100))await roboDarko();   // la amenaza de Darko (1.10; con lo del arcón)
+  if(S.day>d0&&S.ch===7&&!S.flags.robo&&(S.money>1000||gramosFlor()+neveraR()/ROSIN.rend>100))await roboDarko();   // la amenaza de Darko (1.10; 1.36: con lo de la nevera)
   await avisoPlaga(antes);
 }
 // la primera vez que duermes en el piso (1.25): el diario de la tía Maite, bajo la almohada (S.flags.diario; el recetario, en 12-menus)

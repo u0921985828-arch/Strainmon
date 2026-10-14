@@ -267,9 +267,13 @@ const fuerzaTiro=(ms,per=BILLAR.periodo)=>{const f=ms%per/per;return f<.5?f*2:2-
 const resultadoTiro=(d,f,a)=>f>=BILLAR.falta?'falta':Math.abs(d-BILLAR.centro)<=a&&Math.abs(f-BILLAR.centro)<=BILLAR.verde?'dentro':'falla';
 // un tiro: el texto y, con A, dónde estaba la barra (de 0 a 1; 1.31: arranca en un punto al azar, para que no baste con contar); las
 // pruebas lo cambian por una función. 1.35: per y nom, para las extracciones (11l-extraccion)
-async function tiroBillar(txt,f,a,per=BILLAR.periodo,nom='BILLAR'){
+// 1.36, los minijuegos de las máquinas (o: mov y ritmo): con mov, el verde va y viene en mov ms (la static) y sale lo que se separa
+// del verde, como si estuviera quieto en el centro; con ritmo, la barra acelera y frena (la lavadora: el tiempo, deformado)
+const centroTiro=(T,now)=>T.mov?.5+.32*Math.sin((now-T.t0)/T.mov*2*Math.PI):BILLAR.centro;
+const posTiro=(T,now)=>{const ms=now-T.t0,q=T.per*1.6;return fuerzaTiro(T.ritmo?ms+T.ritmo*q/(2*Math.PI)*Math.sin(ms/q*2*Math.PI):ms,T.per);};
+async function tiroBillar(txt,f,a,per=BILLAR.periodo,nom='BILLAR',o={}){
   await typeText(txt,nom);
-  const p=await new Promise(res=>{TIRO={t0:performance.now()-Math.random()*per,f:f||'fuerza',a:a||0,per};push(b=>{if(b==='A'){pop();res(fuerzaTiro(performance.now()-TIRO.t0,per));}});});
+  const p=await new Promise(res=>{TIRO={t0:performance.now()-Math.random()*per,f:f||'fuerza',a:a||0,per,mov:o.mov||0,ritmo:o.ritmo||0};push(b=>{if(b==='A'){pop();const now=performance.now();res(posTiro(TIRO,now)-centroTiro(TIRO,now)+BILLAR.centro);}});});
   TIRO=null;dlg.hidden=true;sfx('hit');return p;
 }
 const unaBola=m=>m===1?'una':String(m);

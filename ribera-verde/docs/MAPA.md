@@ -158,7 +158,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 11  M..███DD███........?........__........████$...MM
 12  M...__________________________________████....MM
 13  MM..__________________________________........MM
-14  MM""""""""...__.........b..*..............Y...MM
+14  MM""""""""...__.........$..*..............Y...MM
 15  MM"""""""".*.__.....*..........T.*.......*....MM
 16  MMffffffff...__......................T.......TMM
 17  ================================================
@@ -419,7 +419,7 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
  1  ██████vv█v█████v██
  2  Bp..PGG.K.KK.??.??
  3  B...r....@......rr
- 4  c.................
+ 4  .....?............
  5  ...t.........??...
  6  F.................
  7  .....m...........p
@@ -794,6 +794,7 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | h_lamb | puerto (37,6) | oculto en arbusto (pulsa A delante) | 2 semillas de Lamb's Bread |
 | h_kerala | mendialde (42,11) | oculto en arbusto (pulsa A delante) | 2 semillas de Kerala |
 | h_manga | errotabarri (28,10) | oculto en arbusto (pulsa A delante) | 2 semillas de Manga Rosa |
+| h_mallas | mendialde (24,14) | oculto en arbusto (pulsa A delante) | unas MALLAS 00 (DOBLE CERO) |
 | h_hawai | ensanche (16,14) | oculto en arbusto (pulsa A delante) | 2 semillas de Hawaiian |
 
 ## Carteles
@@ -899,4 +900,6 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Prensa de rosin | 250 € | 3 | Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores. |
 | Tamices de seda | 60 € | 3 | Tres tamices, de grueso a fino (1.35): dry sift en la mesa del piso, y su kief para el hachís prensado y el moonrock. |
 | Kit Ice-o-lator | 140 € | 3 | Cubo y bolsas de malla para agua con hielo (1.35): la resina más limpia, en la mesa del piso. Su kief sirve para el prensado y el moonrock. |
-| Tarros de curado | 30 € | 1 | Tarros de cristal herméticos (1.29) para el arcón de casa: lo que guardas ahí se cura en 2 días, se vende un 15 % más caro y ya no pierde THC. Sin curar, a los 3 días de cosecharla empieza a perder. |
+| Lavadora de extracción | 900 € | 4 | La lavadora de extracción (1.36): una pequeña de carga superior, con la cuba de plástico; bate sola el agua con hielo y la flor congelada con las bolsas de malla dentro y desagua por la manguera. Más Ice-o-lator y más limpio que a mano. Se monta junto a la nevera del piso. |
+| Máquina de static | 4.500 € | 5 | Separador electrostático de mesa (1.36): la placa cargada levanta las cabezas de resina de la flor fría, sin agua ni disolventes. La resina más pura, hasta un 85 % de THC, en la mesa del piso. Una inversión fuerte. |
+| Tarros de curado | 30 € | 1 | Tarros de cristal herméticos (1.29) para la caja fuerte y la nevera: los cogollos que guardas en la caja se curan en 2 días: suben un 1 % de THC y se venden un 15 % más caros. Sin curar no pierden nada. Los extractos, en sus tarros pequeños, se curan en frío en la nevera. |

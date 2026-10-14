@@ -161,7 +161,7 @@ Desde el capítulo 3, lo que más rinde es cultivar mucho y vendérselo a Iñaki
   - Una requisa se lleva **todos** los gramos que llevas encima y baja el calor 15. La multa es de 601 € (o lo que lleves, si es menos).
 - **Calor, niveles y redada (1.11).** El calor marca el nivel de la policía: tranquilo (0-29), vigilancia (30-59), investigación (60-89) y orden de registro (90). Al cambiar de día (00:00), duermas o no, el juego mira el calor *antes* de bajarlo:
   - con 90 o más, el juez firma la orden de registro y Kiko te avisa: tienes un día para vaciar el piso. Con la orden, el calor no baja;
-  - al día siguiente, la redada: se llevan las plantas, el equipo montado en sus carpas y lo que está a la vista (el arcón y, si estás en casa, lo de encima; 1.13). La caja fuerte no la tocan. La multa sale de lo que encuentran: 601 € + 300 € por planta + 3 € por gramo, hasta 30.000 €, y el calor queda en 40 (§ 2.7);
+  - al día siguiente, la redada: se llevan las plantas, el equipo montado en sus carpas y lo que está a la vista (los extractos de la nevera y, si estás en casa, lo de encima; 1.13; 1.36: sin arcón). La caja fuerte no la tocan. La multa sale de lo que encuentran: 601 € + 300 € por planta + 3 € por gramo, hasta 30.000 €, y el calor queda en 40 (§ 2.7);
   - con la protección de Molina, no hay orden: Molina para la redada y el calor queda en 50.
 
 ### 2.2 Por paso
@@ -332,7 +332,7 @@ Comprobado con el juego: con calor 90 al cambiar el día (y no con 89,9) llega l
 
 La orden se decide al cambiar de día, a las 00:00, duermas o no. A esa hora, el calor tiene que estar por debajo de 90. Durante el día, el calor solo baja de tres formas: con un soborno (−10), con una requisa o entregando (−15). Todo lo demás lo hace la bajada diaria, que depende del nivel (−12 en tranquilo y vigilancia, −8 en investigación, nada con la orden; × 1,5 con protección) y llega *después* de mirar la orden. Bajar de nivel cuesta días: de 89 a 59, cuatro días sin vender (de 8 en 8). Con 3 carpas en flor sin extractor, el olor suma 6 al día y deja muy poco margen para vender en la calle; con un extractor a su medida, nada.
 
-La caja fuerte es lo que guardas de verdad: en la redada no la tocan, y solo sale de ella la multa que no llegue con el dinero de fuera (`pagarCasa`). Con el aviso, el día de margen sirve para meter el dinero y los cogollos en la caja: la multa baja (solo cuenta lo que encuentran) y lo de dentro se queda. Las plantas y el equipo montado se pierden igual. El arcón de casa (1.10) no protege de la redada, que se lo lleva entero: solo te libra de los controles y de los ladrones de la calle (y Darko se lleva la mitad).
+La caja fuerte es lo que guardas de verdad: en la redada no la tocan, y solo sale de ella la multa que no llegue con el dinero de fuera (`pagarCasa`). Con el aviso, el día de margen sirve para meter el dinero y los cogollos en la caja: la multa baja (solo cuenta lo que encuentran) y lo de dentro se queda. Las plantas y el equipo montado se pierden igual. La nevera (1.36, donde se guardan los extractos desde que no hay arcón) no protege de la redada, que se la lleva entera: solo te libra de los controles y de los ladrones de la calle (y Darko se lleva la mitad).
 
 ### 2.8 La Copa
 

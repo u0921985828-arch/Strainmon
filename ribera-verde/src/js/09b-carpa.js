@@ -244,7 +244,7 @@ function vcTemp(x,y,k,on){const K='#26262e',o=[[x+5,0,1,y,VC_CUERDA],[x+1,y,9,1,
 // el del piso, en la pared a la izquierda de la carpa (5 × 7, la rueda del color de su modo) y su cable hasta ella (xl: su borde)
 const mapaTemp=(xl,yb,k)=>{const x=xl-7,y=yb-29;return [[x,y,5,7,'#26262e'],[x+1,y+1,3,5,'#e8e8e0'],[x+1,y+1,3,3,CICLOS[k].col],[x+2,y+2,1,1,'#f8f8f0'],
   [x+2,y+5,1,1,'#26262e'],[x+5,y+4,2,1,VC_CUERDA]];};
-const pintaRects=o=>{for(const [x,y,w,h,k] of o){ctx.fillStyle=k;ctx.fillRect(x,y,w,h);}};
+const pintaRects=o=>{for(const [x,y,w,h,k] of o){if(x==='@'){const f=fotoMisc(y);if(f)ctx.drawImage(f.c,w,h);continue;}ctx.fillStyle=k;ctx.fillRect(x,y,w,h);}};   // ['@', sprite, x, y] (1.36): un misc con el ancla arriba a la izquierda
 function renderCarpaC(g,now){
   const {c,vc}=g,on=plantasVivas(VC.ci),xr=vc.xl+vc.w;
   ctx.fillStyle='#000';ctx.fillRect(0,0,SW,SH);

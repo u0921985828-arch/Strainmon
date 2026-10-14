@@ -27,6 +27,8 @@ const path = require('path');
     S.muebles = Object.fromEntries(Object.keys(MUEBLES).map(k => [k, 0])); S.nave = naveNueva(); S.nave.ex = EXTR_NAVE.length - 1; S.nave.rg = RIEGO_NAVE.length - 1;
     S.plantilla = [0, 1, 2, 3].map(i => ({ id: 'pl' + i, n: BARRIO[i], lab: 3, cui: 3, lea: 3, rol: 'nave', mesa: i }))
       .concat([{ id: 'pl4', n: BARRIO[4], lab: 3, cui: 3, lea: 3, rol: 'madres' }]);
+    // 1.36: las máquinas de extraer del piso, todas, y las tres carpas puestas
+    Object.assign(S.items, { prensa: 1, tamiz: 1, ice: 1, lavadora: 1, estatica: 1 }); S.carpas = [{ t: 'p80' }, { t: 'g150' }, { t: 'm120' }];
     if (typeof montarCasa === 'function') montarCasa(); montarNave();
     // lo que no hace falta mirar de cerca: lo de detrás de un mostrador o de una barra (a la gente de detrás se le habla por encima)
     // y el reservado de GAUA, que abre la RRPP; [mapa:objeto] o [mapa:x,y]
@@ -72,7 +74,8 @@ const path = require('path');
         const izq = LOCAL2.has(o) || SEGUNDA.has(o) ? [x - 1, y] : null;
         const ok = y === 1 ? en(x, 2) || (izq && en(izq[0], 2)) : lado(x, y) || (izq && lado(...izq)) || (m.o[y][x + 1] === o + '2' && lado(x + 1, y));
         const junto = JUNTOS.has(o) && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => m.o[y + dy] && m.o[y + dy][x + dx] === o && lado(x + dx, y + dy));
-        if (!ok && !junto) fallos.push(`${n}: no se puede mirar ${o} (${x}, ${y})`);
+        const silla = m.o[y + 1] && /^silla/.test(m.o[y + 1][x] || '') && lado(x, y + 1);   // con A sobre la silla, el ordenador de encima (SILLAS)
+        if (!ok && !junto && !silla) fallos.push(`${n}: no se puede mirar ${o} (${x}, ${y})`);
       }
       visto[n] = R.size;
     }

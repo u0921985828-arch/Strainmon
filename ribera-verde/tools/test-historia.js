@@ -62,6 +62,10 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
       else if (WANT[0] === '<B>' && cancela) { WANT.shift(); v = null; }
       LOG.push('  [texto] ' + t + ' → ' + (v === null ? '(B)' : v.length > 60 ? '(texto largo)' : v)); return v;   // la partida importada (1.22), sin copiarla
     };
+    // la caja fuerte y la nevera por dentro (1.36): ALMQ, lo que se elige en cada vista (un número, el elegido; null, cerrar); sin
+    // nada, en la caja los billetes (su menú de siempre) y la nevera se cierra
+    window.ALMQ = []; window.elegirAlmacen = async t => { const q = ALMQ.length ? ALMQ.shift() : t === 'caja' ? 0 : null; LOG.push('  [almacén] ' + t + ' → ' + q);
+      if (q === null) return null; const it = itemsAlmacen(t)[q]; return it ? Object.assign({ i: q }, it) : null; };
     window.pr = l => SHOP.find(it => it.lbl.startsWith(l)).p;   // precio de tienda por el principio del rótulo
     // las patrullas (1.10) no andan solas (ni con el reloj en marcha): los pasos que las prueban llaman a UPAT con un dt fijo
     window.UPAT = updatePatrullas; window.updatePatrullas = () => {};
@@ -227,7 +231,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.protect = false; S.banco = 0; S.heat = 95; addBuds('ria', 10, 12); S.carpas[0].vent = true; const l0 = LOG.length; advanceTime(24 * 60); await idle();
     S.pots.forEach(p => { if (p) { delete p.dead; p.health = 100; p.water = 100; } });   // vivas: la redada se lleva el equipo de las carpas con plantas vivas
     window.R = { orden: S.orden === S.day, heat: S.heat, nivel: nivelPoli(), aviso: LOG.slice(l0).some(l => /mañana entran en tu piso con orden de registro/.test(l)), pots: S.pots.filter(p => p).length }; updateHUD(); R.hud = /ORDEN/.test($('hud').textContent);
-    R.np = S.pots.filter(p => p && !p.dead).length; R.sd = JSON.stringify(S.seeds); S.money = 5000; R.multa = multaRedada(R.np, Math.floor(totalBuds() + arconG()) + Math.round((totalRosin() + arconR()) / ROSIN.rend)); const l1 = LOG.length; advanceTime(24 * 60); await idle();
+    R.np = S.pots.filter(p => p && !p.dead).length; R.sd = JSON.stringify(S.seeds); S.money = 5000; R.multa = multaRedada(R.np, Math.floor(totalBuds()) + Math.round((totalRosin() + neveraR()) / ROSIN.rend)); const l1 = LOG.length; advanceTime(24 * 60); await idle();
     R.log = LOG.slice(l1).join('|'); R.m = S.money;
   }, () => R.orden && R.heat === 95 && R.nivel === 3 && R.aviso && R.pots > 0 && R.hud && S.pots.every(p => p === null) && Object.keys(S.buds).length === 0 && S.heat === CALOR_REDADA && !S.orden
     && !S.carpas[0].vent && R.multa > 601 && R.m === 5000 - R.multa - S.luz.e && /equipo de las carpas con plantas: ventilador/.test(R.log) && JSON.stringify(S.seeds) === R.sd || { R, pots: S.pots, buds: S.buds, heat: S.heat });
@@ -545,9 +549,9 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && R.w2 === 'win' && R.max === '66,5,5' && Math.abs(R.pe5 - .75) < 1e-9 && R.h === 'flee' && R.fila === 1
     && LOG.some(l => l === 'El atracador se lanza y te apartas a tiempo.') && LOG.some(l => l === 'Darko baja la barra y te apartas a tiempo.') && LOG.some(l => l === 'Le pillas abierto.') && LOG.some(l => l === 'No te apartas a tiempo.') && LOG.some(l => l === '«¿A mí? Ahora vas a ver.»')
     && LOG.some(l => l === 'El atracador se lo piensa mejor y se va.') && LOG.some(l => l === '«A mí no me amenaza nadie.»') && LOG.some(l => l === 'Subes a nivel 1 de pelea.') && LOG.some(l => l === 'REFLEJOS 5: aciertas, esquivas y escapas mejor.') || R);
-  await step('La plantilla (1.19): Patxi te manda gente del barrio por un sobre (labia, cuidado y lealtad del 1 al 5); a la calle con un lote (vende, o le para la policía, le atracan, se larga o le timan, según sus números), de gerente (cuida y cosecha al arcón con su sisa) y en la nave de Valdehierro, que alquila Arrieta (cada mañana, el alquiler, la redada y lo que saca cada uno)', [], async () => {
-    const r0 = Math.random, sv = JSON.parse(JSON.stringify({ money: S.money, heat: S.heat, buds: S.buds, arcon: S.arcon, pots: S.pots, carpas: S.carpas, seeds: S.seeds, sales: S.sales, ch: S.ch, fenos: S.fenos, rec: S.rec, h1: S.flags.harvest1 || false })); window.R = {};
-    S.ch = 5; S.money = 5000; S.heat = 0; S.plantilla = []; S.plN = 0; S.nave = null; S.buds = {}; addBuds('ria', 100, 12); S.arcon = { buds: {}, rosin: {} };
+  await step('La plantilla (1.19): Patxi te manda gente del barrio por un sobre (labia, cuidado y lealtad del 1 al 5); a la calle con un lote (vende, o le para la policía, le atracan, se larga o le timan, según sus números), de gerente (cuida y cosecha a la caja fuerte con su sisa) y en la nave de Valdehierro, que alquila Arrieta (cada mañana, el alquiler, la redada y lo que saca cada uno)', [], async () => {
+    const r0 = Math.random, sv = JSON.parse(JSON.stringify({ money: S.money, heat: S.heat, buds: S.buds, caja: S.caja, pots: S.pots, carpas: S.carpas, seeds: S.seeds, sales: S.sales, ch: S.ch, fenos: S.fenos, rec: S.rec, h1: S.flags.harvest1 || false })); window.R = {};
+    S.ch = 5; S.money = 5000; S.heat = 0; S.plantilla = []; S.plN = 0; S.nave = null; S.buds = {}; addBuds('ria', 100, 12); S.caja = { nivel: 1, money: 0, buds: {} };   // 1.36: el gerente cosecha a la caja fuerte
     const fi = w => w ? [w.n, w.lab, w.cui, w.lea, w.rol || ''].join() : '', dia = async v => { Math.random = () => v; plantillaDia(); Math.random = r0; await idle(); };
     await run(async () => {
       Math.random = () => .99; want(['^Contratar']); await pedirGente(); R.w1 = fi(S.plantilla[0]);
@@ -558,7 +562,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     want(['^De gerente']); await run(() => trabajo(ike)); const l0 = LOG.length; want(['<B>']); await run(() => trabajo(itz)); R.ops = LOG.slice(l0).filter(l => l.startsWith(`  [menú] A la calle | Prima · ${eur(MANDO.prima)} | Curso · ${eur(MANDO.curso)} | Despedir | Nada`)).length;   // 1.34: la prima y el curso
     S.pots = S.pots.map(() => null); S.pots[0] = { sid: 'ria', prog: 1, water: 100, health: 100, fert: false, pest: false, f: { t: 1, y: 1 } }; R.gc = gramosPlanta(S.pots[0], factores(0));
     R.m = S.money; await dia(.5); R.e = Math.round(precioCalle(12) * ZONAS.town.precio * 3 * (1 - PLANTILLA.com)); R.venta = [mik.g, S.money - R.m + PLANTILLA.sueldo.gerente, S.heat].join();
-    R.arc = S.arcon.buds.ria ? S.arcon.buds.ria.g : 0; R.pot = S.pots[0];
+    R.arc = S.caja.buds.ria ? S.caja.buds.ria.g : 0; R.pot = S.pots[0];
     R.m = S.money; await dia(.01); R.poli = [mik.rol || '', mik.g === undefined, S.heat, R.m - S.money].join();
     want(['^A la calle', '^Skunk', '^25 g']); await run(() => trabajo(mik)); await dia(.1); R.robo = mik.g; await dia(.2); R.m = S.money; R.timo = mik.g; await dia(.14); R.fuga = S.plantilla.map(w => w.n).join();
     S.money = 10; await dia(.5); R.sin = [ike.rol || '', S.money].join();
@@ -576,7 +580,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.money = 5000; want(['^Alquilarla']); await run(talkNave); R.m = S.money; want(['^Dejar la nave', '^Dejarla']); await run(talkNave); R.dejar = [S.nave === null, S.money - R.m].join();
     S.money = 5000; want(['^Alquilarla']); await run(talkNave); S.money = 50; S.nave.r = S.day - RECIBO.gracia; const cj = S.caja; S.caja = null; await dia(.5); S.caja = cj; R.impago = [S.nave === null, S.money].join();
     const l1 = LOG.length; want(['<B>']); await run(movilMenu); want(['<B>']); await run(plantilla); R.menus = LOG.slice(l1).filter(l => / \| Gente \| Plantilla \| /.test(l) || /\| Pedir gente a Patxi  → \(B\)$/.test(l)).length;
-    R.ln = lotNombre('ria'); S.plantilla = []; S.plN = 0; S.nave = null; S.money = sv.money; S.heat = sv.heat; S.buds = sv.buds; S.arcon = sv.arcon; S.pots = sv.pots; S.carpas = sv.carpas; S.seeds = sv.seeds; S.sales = sv.sales; S.ch = sv.ch; S.fenos = sv.fenos; S.rec = sv.rec; S.flags.harvest1 = sv.h1;
+    R.ln = lotNombre('ria'); S.plantilla = []; S.plN = 0; S.nave = null; S.money = sv.money; S.heat = sv.heat; S.buds = sv.buds; S.caja = sv.caja; S.pots = sv.pots; S.carpas = sv.carpas; S.seeds = sv.seeds; S.sales = sv.sales; S.ch = sv.ch; S.fenos = sv.fenos; S.rec = sv.rec; S.flags.harvest1 = sv.h1;
     enterMap('home', 5, 5, 'up');
   }, () => R.w1 === 'Itziar,5,5,5,' && R.n2 === 1 && R.w2 === 'Mikel,1,1,1,' && R.w3 === 'Iker,3,3,3,' && R.pl === '4,' + 4 * PLANTILLA.sobre && R.calle === 'calle,ria,25,75' && R.ops === 1
     && R.venta === `22,${R.e},${PLANTILLA.calor}` && R.arc === R.gc - Math.floor(R.gc * PLANTILLA.sisa * 2) && R.pot === null && R.poli === `,true,${PLANTILLA.calor + PLANTILLA.calorPoli},${PLANTILLA.sueldo.gerente}`
@@ -587,7 +591,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
       return R.abono === `${g1 + g2},${Math.round((t1 * g1 + (t1 + ABONO.thc) * g2) / (g1 + g2) * 10) / 10},2` && R.rec === `${g1 + g2},0,4`; })() && R.redada === `true,Iker,${NAVE.calor}`
     && R.dejar === 'true,' + NAVE.fianza && R.impago === 'true,50' && R.menus === 2
     && LOG.some(l => l === 'SMS · PATXI: Te mando a Itziar. Vale oro.') && LOG.some(l => l === 'Mikel se va por donde ha venido. El sobre ya es de Patxi.') && LOG.some(l => l === 'SMS · PATXI: Te mando a Iker. Gente normal del barrio.')
-    && LOG.some(l => l === `SMS · IKER: He cosechado ${R.arc} g. Está en el arcón.`) && LOG.some(l => l === `SMS · MIKEL: Me ha parado la policía. Se han quedado con 22 g de ${R.ln}. Lo siento.`)
+    && LOG.some(l => l === `SMS · IKER: He cosechado ${R.arc} g. Está en la caja fuerte.`) && LOG.some(l => l === `SMS · MIKEL: Me ha parado la policía. Se han quedado con 22 g de ${R.ln}. Lo siento.`)
     && LOG.some(l => l === `SMS · MIKEL: Me han atracado en un portal. Se han llevado 13 g de ${R.ln}. Me quedan 12 g.`) && LOG.some(l => l === 'SMS · MIKEL: Me han pagado 2 g con billetes falsos. No me he dado cuenta hasta el banco.')
     && LOG.some(l => l === `Mikel no contesta al móvil. Se ha largado con 10 g de ${R.ln}.`) && LOG.some(l => l === 'SMS · IKER: Sin cobrar no curro. Cuando tengas el dinero, me llamas.')
     && LOG.some(l => l === 'La policía ha entrado en la nave de Valdehierro. Se lleva las plantas y a Itziar.') && LOG.some(l => l === 'SMS · ARRIETA: No me has pagado la nave. Cambio la cerradura y me quedo la fianza.') || R);
@@ -796,24 +800,24 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     R.n = rosinLots(0).map(rosinItem).map(x => x.label).join('|'); R.px = Object.values(EXTR).map(e => e.px).join(); S.items.tamiz = 0; S.items.ice = 0; S.rosin = {};
   }, () => R.ya === 'rosin,seco,ice,charas,hash,moon' && R.r === 'ria~seco:1,5:26,4 ria~ice:2,8:33,6 ria~charas:0,1:21,6 ria~hash:0,9:26,4 ria:0,9:36,0 ria~moon:1,3:17,2'
     && R.g === 44 && R.min === 40 + 90 + 60 + 20 + 45 && /^Dry sift · Skunk/.test(R.n) && /Moonrock · Skunk/.test(R.n) || R);
-  await step('Rosin a salvo: la caja lo guarda y lo saca (en el hueco de los cogollos); Darko (con 21 g de rosin = 105 g de flor) se lleva la mitad del de fuera y la caja, intacta; la redada, el de fuera (la caja nunca); el rosin atrae ladrones (1 g = 5 g de flor)',
-    ['Guardar rosin', '^Rosin · Skunk', '^1 g', 'Guardar todo', 'Sacar rosin', '^Rosin · Skunk', '^1 g', 'Cerrar', 'Dormir'], async () => {
-    const sv = { ch: S.ch, robo: S.flags.robo, money: S.money, caja: JSON.parse(JSON.stringify(S.caja)), due: S.due, heat: S.heat };
-    S.map = 'home'; S.ch = 7; S.flags.robo = false; S.due = 0; S.money = 0; S.heat = 0; S.buds = {}; S.rosin = {}; S.pots = S.pots.map(() => null);
-    addRosin('ria', 3, 36); addRosin('hindu', 2, 40); S.caja.money = 0; S.caja.buds = {}; delete S.caja.rosin;
-    const l0 = LOG.length; await run(() => objectAction(7, 1));
-    window.R = { caja: JSON.parse(JSON.stringify(S.caja.rosin)), fuera: JSON.parse(JSON.stringify(S.rosin)), cr: cajaR(), txt: LOG.slice(l0).filter(l => /Guardas/.test(l)).join('|') };
+  await step('Extractos a salvo (1.36: en la nevera; la caja fuerte ya no los guarda): GUARDAR los mete y A los saca; Darko (con 23 g de rosin = 115 g de flor) se lleva la mitad de los de fuera y de la nevera; la redada, todo (la caja, nunca); el rosin atrae ladrones (1 g = 5 g de flor)',
+    ['Todos los extractos', 'Dormir'], async () => {
+    const sv = { ch: S.ch, robo: S.flags.robo, money: S.money, caja: JSON.parse(JSON.stringify(S.caja)), due: S.due, heat: S.heat, nevera: S.nevera ? JSON.parse(JSON.stringify(S.nevera)) : null, nf: S.flags.nevera };
+    S.map = 'home'; S.ch = 7; S.flags.robo = false; S.due = 0; S.money = 0; S.heat = 0; S.buds = {}; S.rosin = {}; S.pots = S.pots.map(() => null); S.flags.nevera = 1; S.nevera = { rosin: {} };
+    addRosin('ria', 3, 36); addRosin('hindu', 2, 40); S.caja.money = 0; S.caja.buds = {};
+    const l0 = LOG.length; ALMQ.push(0, 2, null); await run(() => objectAction(0, 6));
+    window.R = { nev: JSON.stringify(S.nevera.rosin), fuera: JSON.stringify(S.rosin), ops: cajaMenu.toString().includes('rosin'), txt: LOG.slice(l0).filter(l => /^(Guardas|Sacas)/.test(l)).join('|') };
     addRosin('hindu', 20, 40); R.flor = gramosFlor(); S.min = 23 * 60; const l1 = LOG.length; await run(bedAction);
-    R.robo = S.flags.robo; R.f2 = JSON.parse(JSON.stringify(S.rosin)); R.c2 = cajaR(); R.dk = LOG.slice(l1).filter(l => /Se han llevado/.test(l)).join('|');
+    R.robo = S.flags.robo; R.f2 = JSON.parse(JSON.stringify(S.rosin)); R.n2 = neveraR(); R.dk = LOG.slice(l1).filter(l => /Se han llevado/.test(l)).join('|');
     const r0 = Math.random; S.protect = false; Math.random = () => .1; const l2 = LOG.length; await run(raidEvent); Math.random = r0;
-    R.c3 = 'rosin' in S.caja; R.f3 = totalRosin(); R.rd = LOG.slice(l2).filter(l => /ni la ven/.test(l)).join('|');
+    R.f3 = totalRosin() + neveraR(); R.rd = LOG.slice(l2).filter(l => /ni la ven/.test(l)).join('|');
     const enc = () => { const b0 = battle, n = []; window.battle = async t => { n.push(t); }; Math.random = () => 0; S.map = 'town';
       const [x, y] = CLIENT_TILES.town[0]; for (let k = 0; k < 20; k++) { P.x = x; P.y = y; S.cool = 0; onStepEnd(); } Math.random = r0; window.battle = b0; S.map = 'home'; S.cool = 0; return n.length; };
     S.money = 0; S.buds = {}; S.rosin = {}; addRosin('ria', 1, 36); R.l1 = enc(); S.rosin = {}; addRosin('ria', .9, 36); R.l0 = enc(); S.rosin = {};
-    S.ch = sv.ch; S.flags.robo = sv.robo; S.money = sv.money; S.caja = sv.caja; S.due = sv.due; S.heat = sv.heat;
-  }, () => R.caja.ria.g === 2 && R.caja.hindu.g === 2 && R.fuera.ria.g === 1 && !R.fuera.hindu && R.cr === 4 && /Guardas 0 € y 4 g de rosin\./.test(R.txt)
-    && R.flor === 105 && R.robo && R.f2.ria.g === .5 && R.f2.hindu.g === 10 && R.c2 === 4 && /Se han llevado 0 € y 10,5 g de rosin\./.test(R.dk)
-    && R.c3 && R.f3 === 0 && !!R.rd && R.l1 === 20 && R.l0 === 0 || R);
+    S.ch = sv.ch; S.flags.robo = sv.robo; S.money = sv.money; S.caja = sv.caja; S.due = sv.due; S.heat = sv.heat; S.flags.nevera = sv.nf; if (sv.nevera) S.nevera = sv.nevera; else delete S.nevera;
+  }, () => R.nev === '{"hindu":{"g":2,"thc":40}}' && R.fuera === '{"ria":{"g":3,"thc":36}}' && !R.ops && R.txt === 'Guardas 5 g en la nevera.|Sacas 3 g de rosin de Skunk #1.'
+    && R.flor === 115 && R.robo && R.f2.ria.g === 1.5 && R.f2.hindu.g === 10 && R.n2 === 1 && /Se han llevado 0 € y 12,5 g de rosin\./.test(R.dk)
+    && R.f3 === 0 && !!R.rd && R.l1 === 20 && R.l0 === 0 || R);
   await step('Autobús perdido: en Errotabarri a las 23:50, esperar → a las 7:00 del día siguiente sale el primero; en Mendialde, dormir en casa de ama (sin robo de Darko)',
     ['Esperar', '^Ribera Verde', 'Dormir'], async () => {
     const sv = { ch: S.ch, robo: S.flags.robo, money: S.money, due: S.due }, pa = PARADAS.errotabarri, v = viaje('errotabarri', 'town');
@@ -1027,36 +1031,40 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     window.R = { imp: [S !== S0, S.money === m0, S.day === d0, JSON.parse(localStorage.getItem(SAVE_KEY)).money === m0, pending.length].join() };
   }, () => R.imp === 'true,true,true,true,0' && LOG.some(l => l === 'Eso no es una partida exportada.') && LOG.some(l => l === '  [texto] Pega aquí la partida exportada → (texto largo)')
     && LOG.some(l => /^¿Cargar la partida de .+, día \d+\? La de ahora se pierde\.$/.test(l)) && LOG.some(l => l === 'Partida cargada.') || R);
-  await step('Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad',
-    ['Sacar un lote', '^Hindu', '^10 g', 'Guardar todo', 'Cerrar', 'Bolsa de deporte', 'Salir', 'Sacar todo', 'Cerrar'], async () => {
-    const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 5, map: 'home', buds: {}, rosin: {}, arcon: { buds: {}, rosin: {} }, protect: false, caja: null });
-    S.items.bolsa = 0; addBuds('ria', 990, 12); S.pots[0] = { sid: 'hindu', prog: 1, water: 100, health: 100, fert: false, pest: false, f: { id: 9998, t: 1, y: 1 } };
+  await step('La mochila (1.10; 1.36: sin arcón): lo que no cabe al cosechar va a la caja fuerte y, si tampoco cabe, se queda encima; la bolsa de deporte (3 kg); un control solo se lleva lo de encima; la redada, también, y la caja, nunca; de la caja no sacas más del tope; Darko, la mitad de lo de fuera y de la nevera',
+    ['Bolsa de deporte', 'Salir', 'Sacar todo', 'Cerrar'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 5, map: 'home', buds: {}, rosin: {}, protect: false, caja: { money: 0, buds: {}, nivel: 1 } }); delete S.nevera;
+    const pl = () => ({ sid: 'hindu', prog: 1, water: 100, health: 100, fert: false, pest: false, f: { id: 9998, t: 1, y: 1 } });
+    S.items.bolsa = 0; addBuds('ria', 990, 12); S.pots[0] = pl();
     const g = gramosPlanta(S.pots[0], factores(0)), l0 = LOG.length; await run(() => harvest(0));
-    window.R = { g, encima: pesoEncima(), arcon: arconG(), aviso: LOG.slice(l0).filter(l => /arcón/.test(l)).join('|') };
-    useBuds('ria', 500); await run(arconAction); R.a2 = arconG(); R.b2 = totalBuds(); S.money = 100; await run(shop); R.cap = capMochila(); R.bolsa = S.items.bolsa;
-    addBuds('ria', 20, 12); confiscate(false); R.control = arconG(); addBuds('ria', 5, 12);
-    const l1 = LOG.length; await run(raidEvent); R.redada = LOG.slice(l1).filter(l => /Se llevan/.test(l)).join('|'); R.a3 = arconG();
+    window.R = { g, encima: pesoEncima(), caja: cajaG(), aviso: LOG.slice(l0).filter(l => /No te cabe/.test(l)).join('|') };
+    S.caja.buds = {}; addBuds('ria', 1990, 12, S.caja.buds); S.pots[0] = pl(); const l4 = LOG.length; await run(() => harvest(0));
+    R.lleno = [cajaG(), pesoEncima(), LOG.slice(l4).filter(l => /No te cabe/.test(l)).join('|')];
+    S.buds = {}; S.caja.buds = {}; S.money = 100; await run(shop); R.cap = capMochila(); R.bolsa = S.items.bolsa;
+    addBuds('ria', 20, 12); addBuds('ria', 300, 12, S.caja.buds); confiscate(false); R.control = [totalBuds(), cajaG()].join();
+    addBuds('ria', 5, 12); const l1 = LOG.length; await run(raidEvent); R.redada = LOG.slice(l1).filter(l => /Se llevan/.test(l)).join('|'); R.c3 = cajaG();
     S.caja = { money: 0, buds: { ria: { g: 1500, thc: 12 } }, nivel: 1 }; S.buds = {}; addBuds('ria', 2000, 12); const l3 = LOG.length; await run(cajaAction);
     R.sacar = [totalBuds(), cajaG(), LOG.slice(l3).some(l => /No te cabe todo encima/.test(l))].join();
-    S.arcon = { buds: { ria: { g: 101, thc: 12 } }, rosin: { ria: { g: 3, thc: 36 } } }; S.money = 0; S.buds = {}; S.rosin = {};
-    const l2 = LOG.length; await run(roboDarko); R.darko = LOG.slice(l2).filter(l => /Se han llevado/.test(l)).join('|'); R.a4 = JSON.stringify(S.arcon); S = S0;
-  }, () => R.g > 10 && R.encima === 1000 && R.arcon === R.g - 10 && new RegExp(`en la mochila: ${R.g - 10} g van al arcón`).test(R.aviso) && R.a2 === 490 + R.g && R.b2 === 0
-    && R.cap === 3000 && R.bolsa === 1 && R.control === R.a2 && new RegExp(`^Se llevan ${Math.floor(5 + R.a2)} g\\.`).test(R.redada) && R.a3 === 0
-    && R.sacar === '3000,500,true' && /Se han llevado 0 €, 50 g y 1,5 g de rosin\./.test(R.darko) && R.a4 === '{"buds":{"ria":{"g":51,"thc":12}},"rosin":{"ria":{"g":1.5,"thc":36}}}' || R);
-  // 1.29: el curado en el arcón con los tarros y lo que pierde lo que no está curado
-  await step('Curado (1.29): los tarros de Kiko (30 €); en el arcón, con ellos, un lote se cura en 2 días (el THC no sube), se vende un 15 % más caro y ya no pierde; sin curar, desde el 4.º día pierde un 2 % de THC al día y lo avisa; al juntar lotes, por gramos; la cata lo dice; los lotes de antes de la 1.29, nada; lo que lleva un vendedor, también, desde su cosecha (1.29.1)',
+    S.nevera = { rosin: { ria: { g: 3, thc: 36 } } }; S.money = 0; S.buds = {}; addBuds('ria', 101, 12); S.rosin = {};
+    const l2 = LOG.length; await run(roboDarko); R.darko = LOG.slice(l2).filter(l => /Se han llevado/.test(l)).join('|'); R.a4 = [S.buds.ria.g, S.nevera.rosin.ria.g].join(); S = S0;
+  }, () => R.g > 10 && R.encima === 1000 && R.caja === R.g - 10 && R.aviso === `No te cabe todo en la mochila: ${R.g - 10} g van a la caja fuerte.`
+    && R.lleno[0] === 2000 && R.lleno[1] === 1000 + R.g - 10 && R.lleno[2] === `No te cabe todo en la mochila: 10 g van a la caja fuerte. Llevas ${R.g - 10} g de más: guárdalos en cuanto puedas.`
+    && R.cap === 3000 && R.bolsa === 1 && R.control === '0,300' && /^Se llevan 5 g\./.test(R.redada) && R.c3 === 300
+    && R.sacar === '3000,500,true' && /Se han llevado 0 €, 50 g y 1,5 g de rosin\./.test(R.darko) && R.a4 === '51,1.5' || R);
+  // 1.29: el curado con los tarros (1.36: en la caja fuerte, sin arcón; un 1 % más de THC, compuesto: ×1,005 cada día)
+  await step('Curado (1.29): los tarros de Kiko (30 €); en la caja fuerte (1.36), con ellos, un lote se cura en 2 días (y gana un 1 % de THC al perder agua, 1.36), se vende un 15 % más caro; sin curar ya no pierde THC (1.36); al juntar lotes, por gramos; la cata lo dice; los lotes de antes de la 1.29, nada; lo que lleva un vendedor lleva su día de cosecha (1.29.1)',
     ['Tarros de curado', 'Salir', '^Thai', '^100 g', '^Catar', '^Catar', '^Skunk #1', '^25 g', '^Thai', '^25 g'], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0));
-    Object.assign(S, { ch: 5, map: 'home', money: 100, buds: {}, rosin: {}, arcon: { buds: {}, rosin: {} }, caja: null, envio: [], due: 0, heat: 0, protect: false, orden: 0, rel: {}, mDay: 0 });
+    Object.assign(S, { ch: 5, map: 'home', money: 100, buds: {}, rosin: {}, caja: { money: 0, buds: {}, nivel: 1 }, envio: [], due: 0, heat: 0, protect: false, orden: 0, rel: {}, mDay: 0 });
     S.items.tarros = 0; await run(shop); window.R = { t: S.items.tarros, m: 100 - S.money, otra: SHOP.find(it => it.lbl === 'Tarros de curado').cond(), aviso: !!S0.flags.curado };
     const T = [], _t = toast; window.toast = (h, ms) => { T.push(h); _t(h, ms); };
-    addBuds('ria', 100, 20); addBuds('thai', 200, 16, S.arcon.buds); S.buds.hindu = { g: 30, thc: 18 };   // la de antes, sin día
+    addBuds('ria', 100, 20); addBuds('thai', 200, 16, S.caja.buds); S.buds.hindu = { g: 30, thc: 18 };   // la de antes, sin día
     const d0 = S.day; R.nuevo = S.buds.ria;
-    newDay(); await idle(); R.cu1 = S.arcon.buds.thai.cu; newDay(); await idle(); R.cu2 = S.arcon.buds.thai.cu; R.thc2 = S.arcon.buds.thai.thc;
+    newDay(); await idle(); R.cu1 = S.caja.buds.thai.cu; newDay(); await idle(); R.cu2 = S.caja.buds.thai.cu; R.thc2 = S.caja.buds.thai.thc;
     newDay(); await idle(); R.ria3 = S.buds.ria.thc; newDay(); await idle(); R.ria4 = S.buds.ria.thc; newDay(); await idle(); R.ria5 = S.buds.ria.thc;
-    R.thai5 = S.arcon.buds.thai.thc; R.viejo = S.buds.hindu; R.dias = S.day - d0;
-    R.to = T.filter(h => /Curada en el arcón|Sin curar, pierde/.test(h)).map(h => h.split('<br>').filter(l => /Curada|Sin curar/.test(l)).join()).join('|');
-    moverLote(S.arcon.buds, S.buds, 'thai', 200); R.sale = S.buds.thai; R.cal = [calidad(S.buds.thai), calidad(S.buds.ria), calidad(S.buds.hindu)];
+    R.thai5 = S.caja.buds.thai.thc; R.viejo = S.buds.hindu; R.dias = S.day - d0;
+    R.to = T.filter(h => /Curada en la caja|Sin curar/.test(h)).map(h => h.split('<br>').filter(l => /Curada|Sin curar/.test(l)).join()).join('|');
+    moverLote(S.caja.buds, S.buds, 'thai', 200); R.sale = S.buds.thai; R.cal = [calidad(S.buds.thai), calidad(S.buds.ria), calidad(S.buds.hindu)];
     const m0 = S.money; await run(() => ventaMayor('IÑAKI')); R.mayor = S.money - m0;
     const l0 = LOG.length; await run(() => loteAccion('thai')); await run(() => loteAccion('ria'));
     R.cata = LOG.slice(l0).filter(l => /^(Catas|Thai:|Skunk #1:)/.test(l)).join('|');
@@ -1065,20 +1073,50 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     const t = { g: 100, thc: 20, dia: 10, cu: 1 }; juntaLote(t, 100, 10, 0, 20); R.junta = t;
     const v = { g: 30, thc: 18 }; addBuds('hindu', 10, 18, { hindu: v }); R.jv = v;
     const w1 = { id: 'plT', n: 'Ane', rol: 'calle', k: 'thai', thc: 20, g: 50, dia: S.day - 4 }, w2 = { id: 'plV', n: 'Unai', rol: 'calle', k: 'hindu', thc: 18, g: 50 };
-    S.plantilla = [w1, w2]; S.arcon.buds = {}; S.curro.vend.push({ id: 'vD', n: 'Unai', k: 'hindu', thc: 18, g: 50 });
-    curadoDia([]); libre(w2); R.pl = [w1.thc, JSON.stringify(S.arcon.buds.hindu)];   // la plantilla también pierde; lo de antes vuelve sin día
-    R.vd = [S.curro.vend[0].thc, JSON.stringify(S.curro.vend[2]), S.curro.vend[1].thc];   // y los vendedores (1.29.1)
+    S.plantilla = [w1, w2]; S.caja.buds = {}; S.curro.vend.push({ id: 'vD', n: 'Unai', k: 'hindu', thc: 18, g: 50 });
+    curadoDia([]); libre(w2); R.pl = [w1.thc, JSON.stringify(S.caja.buds.hindu)];   // la plantilla tampoco pierde (1.36); lo de antes vuelve sin día
+    R.vd = [S.curro.vend[0].thc, JSON.stringify(S.curro.vend[2]), S.curro.vend[1].thc];   // ni los vendedores (1.36)
     S.curro.vend = [{ id: 'vE', n: 'Ane', k: 'thai', thc: 16, g: 25, dia: 3 }]; delete S.flags.vendDia; migrate(); R.mig = [JSON.stringify(S.curro.vend[0]), S.flags.vendDia];   // el día de antes era el de la entrega
     S.curro.vend[0].dia = 7; migrate(); R.mig2 = S.curro.vend[0].dia;
     window.toast = _t; S = S0;
-  }, () => R.t === 1 && R.m === 30 && R.otra === false && R.aviso && R.nuevo.dia > 0 && !('cu' in R.nuevo) && R.cu1 === .5 && R.cu2 === 1 && R.thc2 === 16
-    && R.ria3 === 20 && Math.abs(R.ria4 - 19.6) < 1e-9 && Math.abs(R.ria5 - 19.208) < 1e-9 && R.thai5 === 16 && JSON.stringify(R.viejo) === '{"g":30,"thc":18}' && R.dias === 5
-    && R.to === 'Curada en el arcón: Thai|Sin curar, pierde THC: Skunk #1' && R.sale.cu === 1 && R.sale.dia === R.nuevo.dia && Math.abs(R.cal[0] - 1.15) < 1e-9 && R.cal[1] === 1 && R.cal[2] === 1
-    && R.mayor === 414 && /^Thai: 100 g · 16,0 % · curada\|Catas Thai: .+\. Bien curada: suave y con todo el aroma\.\|Skunk #1: 100 g · 19,2 % · sin curar\|Catas Skunk #1: .+\. Sin curar del todo: rasca y huele a verde\.$/.test(R.cata)
-    && JSON.stringify(R.junta) === '{"g":200,"thc":15,"dia":15,"cu":0.5}' && R.jv.g === 40 && R.jv.dia > 0 && !('cu' in R.jv) && Math.abs(R.pl[0] - 19.6) < 1e-9 && R.pl[1] === '{"g":50,"thc":18}'
-    && R.vc.dia === R.nuevo.dia && !('cu' in R.vc) && Math.abs(R.vc.thc - 19.208) < 1e-9 && R.vc.g === 25 && Math.abs(R.vd[0] - 19.208 * .98) < 1e-9 && R.vd[1] === '{"id":"vD","n":"Unai","k":"hindu","thc":18,"g":50}'
-    && R.vc2.cu === 1 && R.vc2.dia === R.sale.dia && R.vc2.thc === 16 && R.vd[2] === 16 && R.ns === 1
+  }, () => R.t === 1 && R.m === 30 && R.otra === false && R.aviso && R.nuevo.dia > 0 && !('cu' in R.nuevo) && R.cu1 === .5 && R.cu2 === 1 && Math.abs(R.thc2 - 16 * 1.005 ** 2) < 1e-9
+    && R.ria3 === 20 && R.ria4 === 20 && R.ria5 === 20 && R.thai5 === R.thc2 && JSON.stringify(R.viejo) === '{"g":30,"thc":18}' && R.dias === 5
+    && R.to === 'Curada en la caja fuerte: Thai' && R.sale.cu === 1 && R.sale.dia === R.nuevo.dia && Math.abs(R.cal[0] - 1.15) < 1e-9 && R.cal[1] === 1 && R.cal[2] === 1
+    && R.mayor === 416 && /^Thai: 100 g · 16,2 % · curada\|Catas Thai: .+\. Bien curada: suave y con todo el aroma\.\|Skunk #1: 100 g · 20,0 % · sin curar\|Catas Skunk #1: .+\. Sin curar del todo: rasca y huele a verde\.$/.test(R.cata)
+    && JSON.stringify(R.junta) === '{"g":200,"thc":15,"dia":15,"cu":0.5}' && R.jv.g === 40 && R.jv.dia > 0 && !('cu' in R.jv) && R.pl[0] === 20 && R.pl[1] === '{"g":50,"thc":18}'
+    && R.vc.dia === R.nuevo.dia && !('cu' in R.vc) && R.vc.thc === 20 && R.vc.g === 25 && R.vd[0] === 20 && R.vd[1] === '{"id":"vD","n":"Unai","k":"hindu","thc":18,"g":50}'
+    && R.vc2.cu === 1 && R.vc2.dia === R.sale.dia && R.vc2.thc === R.thc2 && R.vd[2] === R.thc2 && R.ns === 1
     && R.mig[0] === '{"id":"vE","n":"Ane","k":"thai","thc":16,"g":25}' && R.mig[1] === 1 && R.mig2 === 7 || R);
+  // 1.36: la caja fuerte y la nevera por dentro, el curado en la caja y en la nevera, la mesa de manicurar, un mueble por máquina y las mallas 00
+  await step('Almacén y extracciones (1.36): la caja fuerte por dentro (billetes, GUARDAR y los tarros, de más a menos THC; se saca con A) y con tarros cura; la nevera (GUARDAR arriba) guarda los extractos y, con tarros, los cura en frío; la mesa de manicurar (+10 %); un mueble por máquina, montado al tenerla: lavadora (Ice-o-lator) y static; las mallas 00 del arbusto de Mendialde, un paso más en el dry sift',
+    ['Todos los extractos', 'Manicurar un lote', '^Skunk', '^Skunk', '^25 g', '^Skunk', '^5 g', '^Skunk', '^5 g'], async () => {
+    const S0 = S; S = JSON.parse(JSON.stringify(S0));
+    Object.assign(S, { ch: 5, map: 'home', money: 0, buds: {}, rosin: {}, envio: [], due: 0, heat: 0, protect: false, orden: 0, mDay: 0, carpas: [] });
+    S.caja = { money: 500, buds: {}, nivel: 1 }; S.flags.cajaSem = 1; S.flags.nevera = true; delete S.nevera;
+    Object.assign(S.items, { tarros: 1, prensa: 1, tamiz: 0, ice: 0, lavadora: 0, estatica: 0, mallas00: 0, bolsa: 0 });
+    const T = [], _t = toast; window.toast = (h, ms) => { T.push(h); _t(h, ms); };
+    addBuds('thai', 30, 16, S.caja.buds); addBuds('ria', 40, 20, S.caja.buds); addRosin('ria', 2, 30);
+    window.R = { its: itemsAlmacen('caja').map(it => it.k).join() };
+    ALMQ.push(0, null); await run(() => objectAction(0, 6)); R.nev = [neveraR(), totalRosin()];   // la nevera: GUARDAR, todos, y cerrar la vista
+    newDay(); await idle(); newDay(); await idle(); R.cu = [S.caja.buds.ria.cu, S.caja.buds.thai.cu, S.nevera.rosin.ria.cu];
+    R.to = T.filter(h => /Curad/.test(h)).map(h => h.split('<br>').filter(l => /Curad/.test(l)).join()).join('|');
+    ALMQ.push(2, null); const l0 = LOG.length; await run(() => objectAction(7, 1)); R.saca = JSON.stringify([S.buds.ria.g, S.buds.ria.cu, S.caja.buds.ria || 0]);
+    ALMQ.push(1, null); await run(() => objectAction(0, 6)); R.nev2 = [neveraR(), S.rosin.ria.g, S.rosin.ria.cu, calidad(S.rosin.ria)];
+    const m0 = S.min; await run(() => objectAction(5, 4)); R.mc = [S.buds.ria.mc, S.min - m0, calidad(S.buds.ria)];
+    R.txt = LOG.slice(l0).filter(l => /^(Sacas|Guardas|Skunk #1: )/.test(l)).join('|');
+    Object.assign(S.items, { lavadora: 1, estatica: 1 }); montarCasa(); const o = MAPS.home.o; R.mapa = [o[4][5], o[4][6], o[4][7], o[6][1], o[6][6], o[6][2]].join();
+    const tb = window.tiroBillar; window.tiroBillar = async () => .7;
+    await run(() => objectAction(1, 6)); await run(() => objectAction(6, 6)); R.ex = Object.keys(S.rosin).join();
+    S.items.mallas00 = 0; await run(() => ITEMS.find(i => i.id === 'h_mallas').give()); montarCasa(); R.m00 = [S.items.mallas00, MAPS.home.o[4][7], extrYa().join()];
+    await run(() => objectAction(7, 4)); window.tiroBillar = tb;
+    R.r = Object.entries(S.rosin).map(([k, b]) => k + ':' + coma(b.g) + ':' + pct(b.thc)).join(' ');
+    R.shop = ['Lavadora de extracción', 'Máquina de static'].map(l => SHOP.find(it => it.lbl === l).p).join();
+    window.toast = _t; S = S0; montarCasa();
+  }, () => R.its === '$,+,ria,thai' && R.nev.join() === '2,0' && R.cu.join() === '1,1,1' && R.to === 'Curada en la caja fuerte: Thai y Skunk #1,Curado en la nevera: Rosin de Skunk #1'
+    && R.saca === '[40,1,0]' && R.nev2.join() === '0,2,1,1.15' && R.mc.join() === '1,20,1.25'
+    && R.txt === 'Sacas 40 g de Skunk #1.|Sacas 2 g de rosin de Skunk #1.|Skunk #1: 40 g manicurados en 20 min. Se venden un 10 % más caros.'
+    && R.mapa === 'trim,prensaM,,lavadora,staticM,' && R.ex === 'ria,ria~ice,ria~stat' && R.m00.join('|') === '1|tamizM|rosin,seco,charas,hash,moon,lava,stat'
+    && R.r === 'ria:2:30,3 ria~ice:3,5:58,6 ria~stat:0,3:68,7 ria~seco:0,5:52,5' && R.shop === '900,4500' || R);
   await step('Móvil (1.10): START → MÓVIL; pedir a Kiko (+15 %, llega mañana) y su SMS en Mensajes; llamar a Kiko; quien te compra te da su número y, llamado, viene a la calle (20 min, +1 de calor, una vez al día)',
     ['MÓVIL', 'Pedir a Kiko', '^Abono', 'Salir', 'Colgar', 'SALIR', 'MÓVIL', 'Mensajes', '<B>', 'Llamar', '^Kiko', 'Colgar', 'SALIR', '^Skunk', 'Rebaja',
       'MÓVIL', 'Llamar', '^(?!Kiko|Nada)', '^Skunk', 'Rebaja', 'SALIR', 'MÓVIL', 'Llamar', '^(?!Kiko|Nada)', 'Colgar', 'SALIR'], async () => {
@@ -1152,13 +1190,15 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && R.deco === '1,1,cartel-1,alf1a-3' && LOG.includes('Cambias el dibujo del póster: la ola.') && R.n === LOGROS.length && R.mig === 'true,true,0' && R.silla === '4,2,silla,true,4,2,16,2,sillaG,sillaG2,true,17,2,gpc2,'
     && R.TO.join('|') === `Pedido: Póster enmarcado · llega mañana|Pedido: Alfombra de 180 × 140 · llega mañana|Pedido: suelo, baldosa hidráulica · mañana|Pedido: paredes, pintura verde salvia · mañana|<small>LOGRO · ${LOGROS.length - 1}/${LOGROS.length}</small>A tu gusto|<small>MISIÓN CUMPLIDA</small>La caja de la tía|<small>LOGRO · ${LOGROS.length}/${LOGROS.length}</small>Primera venta`
     && LOG.some(l => l.startsWith(`  [menú] ${LOGROS.map(l => l.t).join(' | ')} | Volver`)) || R);
-  await step('Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también arcón, sala, agenda, mensajes, pedidos y bolsa); con Toño ya visto, sale en el móvil', [], async () => {
+  await step('Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también sala, agenda, mensajes, pedidos y bolsa; 1.36: el arcón, a la caja fuerte y la nevera); con Toño ya visto, sale en el móvil', [], async () => {
     const S0 = S; S = JSON.parse(JSON.stringify(S0)); Object.assign(S, { ch: 3, due: 0, deadline: 0, protect: true }); S.flags.metB = false; delete S.flags.tono;
-    for (const k of ['caja', 'rec', 'vencidos', 'protHasta', 'encargo', 'encVeto', 'arcon', 'sala', 'fijos', 'sms', 'envio', 'misiones', 'itin']) delete S[k]; delete S.items.bolsa; migrate();
+    for (const k of ['caja', 'rec', 'vencidos', 'protHasta', 'encargo', 'encVeto', 'sala', 'fijos', 'sms', 'envio', 'misiones', 'itin']) delete S[k]; delete S.items.bolsa; migrate();
     window.R = { due: S.due, dias: S.deadline - S.day, tono: S.flags.tono === S.day, hasta: S.protHasta - S.day, campos: JSON.stringify([S.caja, S.rec, S.vencidos, S.encargo, S.encVeto]),
-      nuevos: JSON.stringify([S.arcon, S.sala, S.fijos, S.sms, S.envio, S.items.bolsa]), mis: Object.keys(S.misiones).join() + '/' + Object.values(S.misiones).join(), iti: Object.keys(S.itin).join() + '/' + Object.values(S.itin).join() };
-    S = JSON.parse(JSON.stringify(S0)); S.flags.metB = true; delete S.flags.tono; migrate(); R.tono2 = S.flags.tono === S.day; S = S0;
-  }, () => R.due === 3000 && R.dias === 7 && R.tono && R.hasta === 10 && R.campos === '[null,{},0,null,0]' && R.nuevos === '[{"buds":{},"rosin":{}},{},[],[],[],0]' && R.tono2 && R.mis === 'caja,luz,carpa,olor,inaki/0,0,0,0,0'
+      nuevos: JSON.stringify([S.sala, S.fijos, S.sms, S.envio, S.items.bolsa]), mis: Object.keys(S.misiones).join() + '/' + Object.values(S.misiones).join(), iti: Object.keys(S.itin).join() + '/' + Object.values(S.itin).join() };
+    S = JSON.parse(JSON.stringify(S0)); S.flags.metB = true; delete S.flags.tono; migrate(); R.tono2 = S.flags.tono === S.day;
+    S = JSON.parse(JSON.stringify(S0)); S.arcon = { buds: { ria: { g: 10, thc: 12 } }, rosin: { ria: { g: 1, thc: 30 } } }; S.caja = { nivel: 1, money: 0, buds: {}, rosin: { hindu: { g: 2, thc: 40 } } }; delete S.nevera;
+    migrate(); R.arc = [!('arcon' in S), cajaG(), JSON.stringify(S.nevera.rosin), 'rosin' in S.caja].join('|'); S = S0;
+  }, () => R.due === 3000 && R.dias === 7 && R.tono && R.hasta === 10 && R.campos === '[null,{},0,null,0]' && R.nuevos === '[{},[],[],[],0]' && R.arc === 'true|10|{"ria":{"g":1,"thc":30},"hindu":{"g":2,"thc":40}}|false' && R.tono2 && R.mis === 'caja,luz,carpa,olor,inaki/0,0,0,0,0'
     && R.iti === 'bus,carta,kiko,julen,plantar,regar,veg,flor,cosecha,vender,ventas/0,0,0,0,0,0,0,0,0,0,0' || R);
   await step('Los locales, cada uno el suyo, y las madres de la nave (1.34): los cinco clubs, de distinto tamaño, con su suelo, su pared, sus sofás, mesas y billar y su gente, y el billar con sitio alrededor; GROW IBARBIDE más grande, con la carpa de exposición; el bajo de Txomin por dentro (cerrado sin alquilar; las bandejas en la estantería, en su fase, el pulverizador y el secadero); la carpa de las madres de la nave (meter una madre, quien las cuida, los esquejes de cada mañana, plantar una mesa con su clon sin gastar nada; sin nadie, se apagan) y la gente de la nave desde el escritorio (cambiar de mesa, la prima y el curso); las partidas de antes', [], async () => {
     const S0 = S, r0 = Math.random; S = JSON.parse(JSON.stringify(S0)); window.R = {};

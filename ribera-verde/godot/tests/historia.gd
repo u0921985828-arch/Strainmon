@@ -118,6 +118,14 @@ func _gancho_pedir(t: String, ini: String, mx: int, cancela: bool):
 	LOG.append("  [texto] " + t + " → " + ("(B)" if v == null else "(texto largo)" if v.length() > 60 else v))   # la partida importada (1.22), sin copiarla
 	return v
 
+# la caja fuerte y la nevera por dentro (1.36, window.ALMQ del piloto): lo que se elige en cada vista (el número; null, cerrar);
+# sin nada, en la caja los billetes (su menú de siempre) y la nevera se cierra
+var ALMQ := []
+func _gancho_almacen(t: String):
+	var q = ALMQ.pop_front() if ALMQ.size() else (0 if t == "caja" else null)
+	LOG.append("  [almacén] " + t + " → " + ("null" if q == null else str(int(q))))
+	return q
+
 func _gancho_texto(t: String, n: String) -> void:
 	LOG.append((n + ": " if n != "" else "") + J.nm(t))
 
@@ -274,6 +282,7 @@ func _corre() -> void:
 	J.gancho_texto = _gancho_texto
 	J.gancho_toast = _gancho_toast
 	J.gancho_pedir = _gancho_pedir
+	J.gancho_almacen = _gancho_almacen
 	M.intervalo(func():
 		if not HOLD and J.handlers.size() and not (J.mode == "carpa" and J.VC and not J.VC.ocupado):
 			J.press("A"), 12)
@@ -615,7 +624,7 @@ func _pasos() -> void:
 		R.np = nviva
 		R.sd = jj(J.S.seeds)
 		J.S.money = 5000
-		R.multa = J.multa_redada(nviva, int(floor(J.total_buds() + J.arcon_g())) + Datos.jsround((J.total_rosin() + J.arcon_r()) / D.ROSIN.rend))
+		R.multa = J.multa_redada(nviva, int(floor(J.total_buds())) + Datos.jsround((J.total_rosin() + J.nevera_r()) / D.ROSIN.rend))
 		var l1 := LOG.size()
 		J.advance_time(24 * 60)
 		await idle()
@@ -1756,8 +1765,8 @@ func _pasos() -> void:
 			and R.w2 == "win" and R.max == "66,5,5" and absf(R.pe5 - .75) < 1e-9 and R.h == "flee" and R.fila == 1
 			and LOG.has("El atracador se lanza y te apartas a tiempo.") and LOG.has("Darko baja la barra y te apartas a tiempo.") and LOG.has("Le pillas abierto.") and LOG.has("No te apartas a tiempo.") and LOG.has("«¿A mí? Ahora vas a ver.»")
 			and LOG.has("El atracador se lo piensa mejor y se va.") and LOG.has("«A mí no me amenaza nadie.»") and LOG.has("Subes a nivel 1 de pelea.") and LOG.has("REFLEJOS 5: aciertas, esquivas y escapas mejor."), R))
-	step("La plantilla (1.19): Patxi te manda gente del barrio por un sobre (labia, cuidado y lealtad del 1 al 5); a la calle con un lote (vende, o le para la policía, le atracan, se larga o le timan, según sus números), de gerente (cuida y cosecha al arcón con su sisa) y en la nave de Valdehierro, que alquila Arrieta (cada mañana, el alquiler, la redada y lo que saca cada uno)", [], func():
-		var sv: Dictionary = {"money": J.S.money, "heat": J.S.heat, "buds": J.S.buds.duplicate(true), "arcon": J.S.arcon.duplicate(true), "pots": J.S.pots.duplicate(true), "carpas": J.S.carpas.duplicate(true), "seeds": J.S.seeds.duplicate(true),
+	step("La plantilla (1.19): Patxi te manda gente del barrio por un sobre (labia, cuidado y lealtad del 1 al 5); a la calle con un lote (vende, o le para la policía, le atracan, se larga o le timan, según sus números), de gerente (cuida y cosecha a la caja fuerte con su sisa) y en la nave de Valdehierro, que alquila Arrieta (cada mañana, el alquiler, la redada y lo que saca cada uno)", [], func():
+		var sv: Dictionary = {"money": J.S.money, "heat": J.S.heat, "buds": J.S.buds.duplicate(true), "caja": J.S.caja.duplicate(true) if J.S.caja else null, "pots": J.S.pots.duplicate(true), "carpas": J.S.carpas.duplicate(true), "seeds": J.S.seeds.duplicate(true),
 			"sales": J.S.sales, "ch": J.S.ch, "fenos": J.S.fenos.duplicate(true), "rec": J.S.rec.duplicate(true), "h1": J.S.flags.get("harvest1", false)}
 		R = {}
 		J.S.ch = 5
@@ -1768,7 +1777,7 @@ func _pasos() -> void:
 		J.S.nave = null
 		J.S.buds = {}
 		J.add_buds("ria", 100, 12)
-		J.S.arcon = {"buds": {}, "rosin": {}}
+		J.S.caja = {"nivel": 1, "money": 0, "buds": {}}   # 1.36: el gerente cosecha a la caja fuerte
 		var fi := func(w): return ("%s,%d,%d,%d,%s" % [w.n, int(w.lab), int(w.cui), int(w.lea), w.rol if w.rol else ""]) if w else ""
 		var dia := func(v: float):
 			Cultivo.fijo = v
@@ -1812,7 +1821,7 @@ func _pasos() -> void:
 		await dia.call(.5)
 		R.e = Datos.jsround(J.precio_calle(12) * D.ZONAS.town.precio * 3 * (1 - D.PLANTILLA.com))
 		R.venta = jn([mik.g, J.S.money - R.m + int(D.PLANTILLA.sueldo.gerente), J.S.heat])
-		R.arc = J.S.arcon.buds.ria.g if J.S.arcon.buds.has("ria") else 0
+		R.arc = J.S.caja.buds.ria.g if J.S.caja.buds.has("ria") else 0
 		R.pot = J.S.pots[0]
 		R.m = J.S.money
 		await dia.call(.01)
@@ -1899,7 +1908,7 @@ func _pasos() -> void:
 		J.S.money = sv.money
 		J.S.heat = sv.heat
 		J.S.buds = sv.buds
-		J.S.arcon = sv.arcon
+		J.S.caja = sv.caja
 		J.S.pots = sv.pots
 		J.S.carpas = sv.carpas
 		J.S.seeds = sv.seeds
@@ -1925,7 +1934,7 @@ func _pasos() -> void:
 				and R.redada == jn([true, "Iker", N.calor])
 				and R.dejar == jn([true, N.fianza]) and R.impago == "true,50" and R.menus == 2
 				and LOG.has("SMS · PATXI: Te mando a Itziar. Vale oro.") and LOG.has("Mikel se va por donde ha venido. El sobre ya es de Patxi.") and LOG.has("SMS · PATXI: Te mando a Iker. Gente normal del barrio.")
-				and LOG.has("SMS · IKER: He cosechado %d g. Está en el arcón." % R.arc) and LOG.has("SMS · MIKEL: Me ha parado la policía. Se han quedado con 22 g de %s. Lo siento." % R.ln)
+				and LOG.has("SMS · IKER: He cosechado %d g. Está en la caja fuerte." % R.arc) and LOG.has("SMS · MIKEL: Me ha parado la policía. Se han quedado con 22 g de %s. Lo siento." % R.ln)
 				and LOG.has("SMS · MIKEL: Me han atracado en un portal. Se han llevado 13 g de %s. Me quedan 12 g." % R.ln) and LOG.has("SMS · MIKEL: Me han pagado 2 g con billetes falsos. No me he dado cuenta hasta el banco.")
 				and LOG.has("Mikel no contesta al móvil. Se ha largado con 10 g de %s." % R.ln) and LOG.has("SMS · IKER: Sin cobrar no curro. Cuando tengas el dinero, me llamas.")
 				and LOG.has("La policía ha entrado en la nave de Valdehierro. Se lleva las plantas y a Itziar.") and LOG.has("SMS · ARRIETA: No me has pagado la nave. Cambio la cerradura y me quedo la fianza."), R))
@@ -2609,9 +2618,9 @@ func _pasos() -> void:
 		J.S.rosin = {},
 		func(): return chk(R.ya == "rosin,seco,ice,charas,hash,moon" and R.r == "ria~seco:1,5:26,4 ria~ice:2,8:33,6 ria~charas:0,1:21,6 ria~hash:0,9:26,4 ria:0,9:36,0 ria~moon:1,3:17,2"
 			and R.g == 44 and R.min == 40 + 90 + 60 + 20 + 45 and R.n.begins_with("Dry sift · Skunk") and R.n.contains("Moonrock · Skunk"), R))
-	step("Rosin a salvo: la caja lo guarda y lo saca (en el hueco de los cogollos); Darko (con 21 g de rosin = 105 g de flor) se lleva la mitad del de fuera y la caja, intacta; la redada, el de fuera (la caja nunca); el rosin atrae ladrones (1 g = 5 g de flor)",
-		["Guardar rosin", "^Rosin · Skunk", "^1 g", "Guardar todo", "Sacar rosin", "^Rosin · Skunk", "^1 g", "Cerrar", "Dormir"], func():
-		var sv := {"ch": J.S.ch, "robo": J.S.flags.get("robo"), "money": J.S.money, "caja": J.S.caja.duplicate(true), "due": J.S.due, "heat": J.S.heat}
+	step("Extractos a salvo (1.36: en la nevera; la caja fuerte ya no los guarda): GUARDAR los mete y A los saca; Darko (con 23 g de rosin = 115 g de flor) se lleva la mitad de los de fuera y de la nevera; la redada, todo (la caja, nunca); el rosin atrae ladrones (1 g = 5 g de flor)",
+		["Todos los extractos", "Dormir"], func():
+		var sv := {"ch": J.S.ch, "robo": J.S.flags.get("robo"), "money": J.S.money, "caja": J.S.caja.duplicate(true), "due": J.S.due, "heat": J.S.heat, "nevera": J.S.nevera.duplicate(true) if J.S.get("nevera") else null, "nf": J.S.flags.get("nevera")}
 		J.S.map = "home"
 		J.S.ch = 7
 		J.S.flags.robo = false
@@ -2621,14 +2630,16 @@ func _pasos() -> void:
 		J.S.buds = {}
 		J.S.rosin = {}
 		vacia.call()
+		J.S.flags.nevera = 1
+		J.S.nevera = {"rosin": {}}
 		J.add_rosin("ria", 3, 36)
 		J.add_rosin("hindu", 2, 40)
 		J.S.caja.money = 0
 		J.S.caja.buds = {}
-		J.S.caja.erase("rosin")
 		var l0 := LOG.size()
-		await run(func(): await J.object_action(7, 1))
-		R = {"caja": norm(J.S.caja.rosin), "fuera": norm(J.S.rosin), "cr": J.caja_r(), "txt": "|".join(LOG.slice(l0).filter(func(l): return re("Guardas", l)))}
+		ALMQ.append_array([0, 2, null])
+		await run(func(): await J.object_action(0, 6))
+		R = {"nev": jj(norm(J.S.nevera.rosin)), "fuera": jj(norm(J.S.rosin)), "ops": false, "txt": "|".join(LOG.slice(l0).filter(func(l): return re("^(Guardas|Sacas)", l)))}
 		J.add_rosin("hindu", 20, 40)
 		R.flor = J.gramos_flor()
 		J.S.min = 23 * 60
@@ -2636,15 +2647,14 @@ func _pasos() -> void:
 		await run(J.bed_action)
 		R.robo = J.S.flags.robo
 		R.f2 = norm(J.S.rosin)
-		R.c2 = J.caja_r()
+		R.n2 = J.nevera_r()
 		R.dk = "|".join(LOG.slice(l1).filter(func(l): return re("Se han llevado", l)))
 		J.S.protect = false
 		Cultivo.fijo = .1
 		var l2 := LOG.size()
 		await run(J.raid_event)
 		Cultivo.fijo = -1
-		R.c3 = J.S.caja.has("rosin")
-		R.f3 = J.total_rosin()
+		R.f3 = J.total_rosin() + J.nevera_r()
 		R.rd = "|".join(LOG.slice(l2).filter(func(l): return re("ni la ven", l)))
 		J.S.money = 0
 		J.S.buds = {}
@@ -2660,10 +2670,15 @@ func _pasos() -> void:
 		J.S.money = sv.money
 		J.S.caja = sv.caja
 		J.S.due = sv.due
-		J.S.heat = sv.heat,
-		func(): return chk(R.caja.ria.g == 2 and R.caja.hindu.g == 2 and R.fuera.ria.g == 1 and not R.fuera.has("hindu") and R.cr == 4 and re("Guardas 0 € y 4 g de rosin\\.", R.txt)
-			and R.flor == 105 and R.robo and R.f2.ria.g == .5 and R.f2.hindu.g == 10 and R.c2 == 4 and re("Se han llevado 0 € y 10,5 g de rosin\\.", R.dk)
-			and R.c3 and R.f3 == 0 and R.rd != "" and R.l1 == 20 and R.l0 == 0, R))
+		J.S.heat = sv.heat
+		J.S.flags.nevera = sv.nf
+		if sv.nevera != null:
+			J.S.nevera = sv.nevera
+		else:
+			J.S.erase("nevera"),
+		func(): return chk(R.nev == '{"hindu":{"g":2,"thc":40}}' and R.fuera == '{"ria":{"g":3,"thc":36}}' and not R.ops and R.txt == "Guardas 5 g en la nevera.|Sacas 3 g de rosin de Skunk #1."
+			and R.flor == 115 and R.robo and R.f2.ria.g == 1.5 and R.f2.hindu.g == 10 and R.n2 == 1 and re("Se han llevado 0 € y 12,5 g de rosin\\.", R.dk)
+			and R.f3 == 0 and R.rd != "" and R.l1 == 20 and R.l0 == 0, R))
 	step("Autobús perdido: en Errotabarri a las 23:50, esperar → a las 7:00 del día siguiente sale el primero; en Mendialde, dormir en casa de ama (sin robo de Darko)",
 		["Esperar", "^Ribera Verde", "Dormir"], func():
 		var sv := {"ch": J.S.ch, "robo": J.S.flags.get("robo"), "money": J.S.money, "due": J.S.due}
@@ -3354,58 +3369,67 @@ func _pasos() -> void:
 			var re := RegEx.create_from_string("^¿Cargar la partida de .+, día \\d+\\? La de ahora se pierde\\.$")
 			return chk(R.imp == "true,true,true,true,0" and LOG.has("Eso no es una partida exportada.") and LOG.has("  [texto] Pega aquí la partida exportada → (texto largo)")
 				and LOG.any(func(l): return re.search(l) != null) and LOG.has("Partida cargada."), R))
-	step("Arcón y mochila (1.10): lo que no cabe al cosechar va al arcón; sacar llega hasta el tope; la bolsa de deporte (3 kg); un control no lo ve; la redada se lo lleva; de la caja tampoco sacas más del tope; Darko, la mitad",
-		["Sacar un lote", "^Hindu", "^10 g", "Guardar todo", "Cerrar", "Bolsa de deporte", "Salir", "Sacar todo", "Cerrar"], func():
+	step("La mochila (1.10; 1.36: sin arcón): lo que no cabe al cosechar va a la caja fuerte y, si tampoco cabe, se queda encima; la bolsa de deporte (3 kg); un control solo se lleva lo de encima; la redada, también, y la caja, nunca; de la caja no sacas más del tope; Darko, la mitad de lo de fuera y de la nevera",
+		["Bolsa de deporte", "Salir", "Sacar todo", "Cerrar"], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))
-		J.S.merge({"ch": 5, "map": "home", "buds": {}, "rosin": {}, "arcon": {"buds": {}, "rosin": {}}, "protect": false, "caja": null}, true)
+		J.S.merge({"ch": 5, "map": "home", "buds": {}, "rosin": {}, "protect": false, "caja": {"money": 0, "buds": {}, "nivel": 1}}, true)
+		J.S.erase("nevera")
+		var pl := func(): return {"sid": "hindu", "prog": 1, "water": 100, "health": 100, "fert": false, "pest": false, "f": {"id": 9998, "t": 1, "y": 1}}
 		J.S.items.bolsa = 0
 		J.add_buds("ria", 990, 12)
-		J.S.pots[0] = {"sid": "hindu", "prog": 1, "water": 100, "health": 100, "fert": false, "pest": false, "f": {"id": 9998, "t": 1, "y": 1}}
+		J.S.pots[0] = pl.call()
 		var g: int = J.gramos_planta(J.S.pots[0], J.factores(0))
 		var l0 := LOG.size()
 		await run(func(): await J.harvest(0))
-		R = {"g": g, "encima": J.peso_encima(), "arcon": J.arcon_g(), "aviso": "|".join(LOG.slice(l0).filter(func(l): return "arcón" in l))}
-		J.use_buds("ria", 500)
-		await run(J.arcon_action)
-		R.a2 = J.arcon_g()
-		R.b2 = J.total_buds()
+		R = {"g": g, "encima": J.peso_encima(), "caja": J.caja_g(), "aviso": "|".join(LOG.slice(l0).filter(func(l): return re("No te cabe", l)))}
+		J.S.caja.buds = {}
+		J.add_buds("ria", 1990, 12, J.S.caja.buds)
+		J.S.pots[0] = pl.call()
+		var l4 := LOG.size()
+		await run(func(): await J.harvest(0))
+		R.lleno = [J.caja_g(), J.peso_encima(), "|".join(LOG.slice(l4).filter(func(l): return re("No te cabe", l)))]
+		J.S.buds = {}
+		J.S.caja.buds = {}
 		J.S.money = 100
 		await run(J.shop)
 		R.cap = J.cap_mochila()
 		R.bolsa = J.S.items.bolsa
 		J.add_buds("ria", 20, 12)
+		J.add_buds("ria", 300, 12, J.S.caja.buds)
 		J.confiscate(false)
-		R.control = J.arcon_g()
+		R.control = jn([J.total_buds(), J.caja_g()])
 		J.add_buds("ria", 5, 12)
 		var l1 := LOG.size()
 		await run(J.raid_event)
 		R.redada = "|".join(LOG.slice(l1).filter(func(l): return "Se llevan" in l))
-		R.a3 = J.arcon_g()
+		R.c3 = J.caja_g()
 		J.S.caja = {"money": 0, "buds": {"ria": {"g": 1500, "thc": 12}}, "nivel": 1}
 		J.S.buds = {}
 		J.add_buds("ria", 2000, 12)
 		var l3 := LOG.size()
 		await run(J.caja_action)
 		R.sacar = "%s,%s,%s" % [Datos.js_num(J.total_buds()), Datos.js_num(J.caja_g()), "true" if LOG.slice(l3).any(func(l): return "No te cabe todo encima" in l) else "false"]
-		J.S.arcon = {"buds": {"ria": {"g": 101, "thc": 12}}, "rosin": {"ria": {"g": 3, "thc": 36}}}
+		J.S.nevera = {"rosin": {"ria": {"g": 3, "thc": 36}}}
 		J.S.money = 0
 		J.S.buds = {}
+		J.add_buds("ria", 101, 12)
 		J.S.rosin = {}
 		var l2 := LOG.size()
 		await run(J.robo_darko)
 		R.darko = "|".join(LOG.slice(l2).filter(func(l): return "Se han llevado" in l))
-		R.a4 = jj(J.S.arcon)
+		R.a4 = jn([J.S.buds.ria.g, J.S.nevera.rosin.ria.g])
 		J.S = S0,
-		func(): return chk(R.g > 10 and R.encima == 1000 and R.arcon == R.g - 10 and re("en la mochila: %d g van al arcón" % (R.g - 10), R.aviso) and R.a2 == 490 + R.g and R.b2 == 0
-			and R.cap == 3000 and R.bolsa == 1 and R.control == R.a2 and re("^Se llevan %d g\\." % int(floor(5 + R.a2)), R.redada) and R.a3 == 0
-			and R.sacar == "3000,500,true" and re("Se han llevado 0 €, 50 g y 1,5 g de rosin\\.", R.darko) and R.a4 == "{\"buds\":{\"ria\":{\"g\":51,\"thc\":12}},\"rosin\":{\"ria\":{\"g\":1.5,\"thc\":36}}}", R))
-	# 1.29: el curado en el arcón con los tarros y lo que pierde lo que no está curado
-	step("Curado (1.29): los tarros de Kiko (30 €); en el arcón, con ellos, un lote se cura en 2 días (el THC no sube), se vende un 15 % más caro y ya no pierde; sin curar, desde el 4.º día pierde un 2 % de THC al día y lo avisa; al juntar lotes, por gramos; la cata lo dice; los lotes de antes de la 1.29, nada; lo que lleva un vendedor, también, desde su cosecha (1.29.1)",
+		func(): return chk(R.g > 10 and R.encima == 1000 and R.caja == R.g - 10 and R.aviso == "No te cabe todo en la mochila: %d g van a la caja fuerte." % (R.g - 10)
+			and R.lleno[0] == 2000 and R.lleno[1] == 1000 + R.g - 10 and R.lleno[2] == "No te cabe todo en la mochila: 10 g van a la caja fuerte. Llevas %d g de más: guárdalos en cuanto puedas." % (R.g - 10)
+			and R.cap == 3000 and R.bolsa == 1 and R.control == "0,300" and re("^Se llevan 5 g\\.", R.redada) and R.c3 == 300
+			and R.sacar == "3000,500,true" and re("Se han llevado 0 €, 50 g y 1,5 g de rosin\\.", R.darko) and R.a4 == "51,1.5", R))
+	# 1.29: el curado con los tarros (1.36: en la caja fuerte, sin arcón; un 1 % más de THC, compuesto: ×1,005 cada día)
+	step("Curado (1.29): los tarros de Kiko (30 €); en la caja fuerte (1.36), con ellos, un lote se cura en 2 días (y gana un 1 % de THC al perder agua, 1.36), se vende un 15 % más caro; sin curar ya no pierde THC (1.36); al juntar lotes, por gramos; la cata lo dice; los lotes de antes de la 1.29, nada; lo que lleva un vendedor lleva su día de cosecha (1.29.1)",
 		["Tarros de curado", "Salir", "^Thai", "^100 g", "^Catar", "^Catar", "^Skunk #1", "^25 g", "^Thai", "^25 g"], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))
-		J.S.merge({"ch": 5, "map": "home", "money": 100, "buds": {}, "rosin": {}, "arcon": {"buds": {}, "rosin": {}}, "caja": null, "envio": [], "due": 0, "heat": 0, "protect": false, "orden": 0, "rel": {}, "mDay": 0}, true)
+		J.S.merge({"ch": 5, "map": "home", "money": 100, "buds": {}, "rosin": {}, "caja": {"money": 0, "buds": {}, "nivel": 1}, "envio": [], "due": 0, "heat": 0, "protect": false, "orden": 0, "rel": {}, "mDay": 0}, true)
 		J.S.items.tarros = 0
 		await run(J.shop)
 		R = {"t": J.S.items.tarros, "m": 100 - J.S.money, "otra": J.shop_cond(D.SHOP.filter(func(s): return s.lbl == "Tarros de curado")[0]), "aviso": S0.flags.get("curado", 0) != 0}
@@ -3413,17 +3437,17 @@ func _pasos() -> void:
 		TO = []
 		capta = true
 		J.add_buds("ria", 100, 20)
-		J.add_buds("thai", 200, 16, J.S.arcon.buds)
+		J.add_buds("thai", 200, 16, J.S.caja.buds)
 		J.S.buds.hindu = {"g": 30, "thc": 18}   # la de antes, sin día
 		var d0: int = J.S.day
 		R.nuevo = J.S.buds.ria
 		J.new_day()
 		await idle()
-		R.cu1 = J.S.arcon.buds.thai.cu
+		R.cu1 = J.S.caja.buds.thai.cu
 		J.new_day()
 		await idle()
-		R.cu2 = J.S.arcon.buds.thai.cu
-		R.thc2 = J.S.arcon.buds.thai.thc
+		R.cu2 = J.S.caja.buds.thai.cu
+		R.thc2 = J.S.caja.buds.thai.thc
 		J.new_day()
 		await idle()
 		R.ria3 = J.S.buds.ria.thc
@@ -3433,15 +3457,15 @@ func _pasos() -> void:
 		J.new_day()
 		await idle()
 		R.ria5 = J.S.buds.ria.thc
-		R.thai5 = J.S.arcon.buds.thai.thc
+		R.thai5 = J.S.caja.buds.thai.thc
 		R.viejo = J.S.buds.hindu
 		R.dias = J.S.day - d0
 		var tl := []
 		for h in TO:
-			if re("Curada en el arcón|Sin curar, pierde", h):
+			if re("Curada en la caja|Sin curar", h):
 				tl.append(",".join(Array(h.split("<br>")).filter(func(l): return re("Curada|Sin curar", l))))
 		R.to = "|".join(tl)
-		J.mover_lote(J.S.arcon.buds, J.S.buds, "thai", 200)
+		J.mover_lote(J.S.caja.buds, J.S.buds, "thai", 200)
 		R.sale = J.S.buds.thai
 		R.cal = [J.calidad(J.S.buds.thai), J.calidad(J.S.buds.ria), J.calidad(J.S.buds.hindu)]
 		var m0: int = J.S.money
@@ -3465,13 +3489,13 @@ func _pasos() -> void:
 		R.jv = v
 		var w1 := {"id": "plT", "n": "Ane", "rol": "calle", "k": "thai", "thc": 20, "g": 50, "dia": J.S.day - 4}
 		var w2 := {"id": "plV", "n": "Unai", "rol": "calle", "k": "hindu", "thc": 18, "g": 50}
-		J.S.plantilla = [w1, w2]   # la plantilla también pierde; lo de antes vuelve sin día
-		J.S.arcon.buds = {}
+		J.S.plantilla = [w1, w2]   # la plantilla tampoco pierde (1.36); lo de antes vuelve sin día
+		J.S.caja.buds = {}
 		J.S.curro.vend.append({"id": "vD", "n": "Unai", "k": "hindu", "thc": 18, "g": 50})
 		J.curado_dia([])
 		J.libre(w2)
-		R.pl = [w1.thc, jj(J.S.arcon.buds.hindu)]
-		R.vd = [J.S.curro.vend[0].thc, jj(J.S.curro.vend[2]), J.S.curro.vend[1].thc]   # y los vendedores (1.29.1)
+		R.pl = [w1.thc, jj(J.S.caja.buds.hindu)]
+		R.vd = [J.S.curro.vend[0].thc, jj(J.S.curro.vend[2]), J.S.curro.vend[1].thc]   # ni los vendedores (1.36)
 		J.S.curro.vend = [{"id": "vE", "n": "Ane", "k": "thai", "thc": 16, "g": 25, "dia": 3}]   # el día de antes era el de la entrega
 		J.S.flags.erase("vendDia")
 		J.migrate()
@@ -3482,14 +3506,85 @@ func _pasos() -> void:
 		capta = false
 		TO = to0
 		J.S = S0,
-		func(): return chk(R.t == 1 and R.m == 30 and R.otra == false and R.aviso and R.nuevo.dia > 0 and not R.nuevo.has("cu") and R.cu1 == .5 and R.cu2 == 1 and R.thc2 == 16
-			and R.ria3 == 20 and absf(R.ria4 - 19.6) < 1e-9 and absf(R.ria5 - 19.208) < 1e-9 and R.thai5 == 16 and jj(R.viejo) == "{\"g\":30,\"thc\":18}" and R.dias == 5
-			and R.to == "Curada en el arcón: Thai|Sin curar, pierde THC: Skunk #1" and R.sale.cu == 1 and R.sale.dia == R.nuevo.dia and absf(R.cal[0] - 1.15) < 1e-9 and R.cal[1] == 1 and R.cal[2] == 1
-			and R.mayor == 414 and re("^Thai: 100 g · 16,0 % · curada\\|Catas Thai: .+\\. Bien curada: suave y con todo el aroma\\.\\|Skunk #1: 100 g · 19,2 % · sin curar\\|Catas Skunk #1: .+\\. Sin curar del todo: rasca y huele a verde\\.$", R.cata)
-			and jj(R.junta) == "{\"g\":200,\"thc\":15,\"dia\":15,\"cu\":0.5}" and R.jv.g == 40 and R.jv.dia > 0 and not R.jv.has("cu") and absf(R.pl[0] - 19.6) < 1e-9 and R.pl[1] == "{\"g\":50,\"thc\":18}"
-			and R.vc.dia == R.nuevo.dia and not R.vc.has("cu") and absf(R.vc.thc - 19.208) < 1e-9 and R.vc.g == 25 and absf(R.vd[0] - 19.208 * .98) < 1e-9 and R.vd[1] == "{\"id\":\"vD\",\"n\":\"Unai\",\"k\":\"hindu\",\"thc\":18,\"g\":50}"
-			and R.vc2.cu == 1 and R.vc2.dia == R.sale.dia and R.vc2.thc == 16 and R.vd[2] == 16 and R.ns == 1
+		func(): return chk(R.t == 1 and R.m == 30 and R.otra == false and R.aviso and R.nuevo.dia > 0 and not R.nuevo.has("cu") and R.cu1 == .5 and R.cu2 == 1 and absf(R.thc2 - 16 * pow(1.005, 2)) < 1e-9
+			and R.ria3 == 20 and R.ria4 == 20 and R.ria5 == 20 and R.thai5 == R.thc2 and jj(R.viejo) == "{\"g\":30,\"thc\":18}" and R.dias == 5
+			and R.to == "Curada en la caja fuerte: Thai" and R.sale.cu == 1 and R.sale.dia == R.nuevo.dia and absf(R.cal[0] - 1.15) < 1e-9 and R.cal[1] == 1 and R.cal[2] == 1
+			and R.mayor == 416 and re("^Thai: 100 g · 16,2 % · curada\\|Catas Thai: .+\\. Bien curada: suave y con todo el aroma\\.\\|Skunk #1: 100 g · 20,0 % · sin curar\\|Catas Skunk #1: .+\\. Sin curar del todo: rasca y huele a verde\\.$", R.cata)
+			and jj(R.junta) == "{\"g\":200,\"thc\":15,\"dia\":15,\"cu\":0.5}" and R.jv.g == 40 and R.jv.dia > 0 and not R.jv.has("cu") and R.pl[0] == 20 and R.pl[1] == "{\"g\":50,\"thc\":18}"
+			and R.vc.dia == R.nuevo.dia and not R.vc.has("cu") and R.vc.thc == 20 and R.vc.g == 25 and R.vd[0] == 20 and R.vd[1] == "{\"id\":\"vD\",\"n\":\"Unai\",\"k\":\"hindu\",\"thc\":18,\"g\":50}"
+			and R.vc2.cu == 1 and R.vc2.dia == R.sale.dia and R.vc2.thc == R.thc2 and R.vd[2] == R.thc2 and R.ns == 1
 			and R.mig[0] == "{\"id\":\"vE\",\"n\":\"Ane\",\"k\":\"thai\",\"thc\":16,\"g\":25}" and R.mig[1] == 1 and R.mig2 == 7, R))
+	# 1.36: la caja fuerte y la nevera por dentro, el curado en la caja y en la nevera, la mesa de manicurar, un mueble por máquina y las mallas 00
+	step("Almacén y extracciones (1.36): la caja fuerte por dentro (billetes, GUARDAR y los tarros, de más a menos THC; se saca con A) y con tarros cura; la nevera (GUARDAR arriba) guarda los extractos y, con tarros, los cura en frío; la mesa de manicurar (+10 %); un mueble por máquina, montado al tenerla: lavadora (Ice-o-lator) y static; las mallas 00 del arbusto de Mendialde, un paso más en el dry sift",
+		["Todos los extractos", "Manicurar un lote", "^Skunk", "^Skunk", "^25 g", "^Skunk", "^5 g", "^Skunk", "^5 g"], func():
+		var S0 = J.S
+		J.S = Datos.enteros(norm(S0))
+		J.S.merge({"ch": 5, "map": "home", "money": 0, "buds": {}, "rosin": {}, "envio": [], "due": 0, "heat": 0, "protect": false, "orden": 0, "mDay": 0, "carpas": []}, true)
+		J.S.caja = {"money": 500, "buds": {}, "nivel": 1}
+		J.S.flags.cajaSem = 1
+		J.S.flags.nevera = true
+		J.S.erase("nevera")
+		J.S.items.merge({"tarros": 1, "prensa": 1, "tamiz": 0, "ice": 0, "lavadora": 0, "estatica": 0, "mallas00": 0, "bolsa": 0}, true)
+		var to0 = TO
+		TO = []
+		capta = true
+		J.add_buds("thai", 30, 16, J.S.caja.buds)
+		J.add_buds("ria", 40, 20, J.S.caja.buds)
+		J.add_rosin("ria", 2, 30)
+		R = {"its": ",".join(J.items_almacen("caja").map(func(it): return it.k))}
+		ALMQ.append_array([0, null])
+		await run(func(): await J.object_action(0, 6))   # la nevera: GUARDAR, todos, y cerrar la vista
+		R.nev = [J.nevera_r(), J.total_rosin()]
+		J.new_day()
+		await idle()
+		J.new_day()
+		await idle()
+		R.cu = [J.S.caja.buds.ria.cu, J.S.caja.buds.thai.cu, J.S.nevera.rosin.ria.cu]
+		var tl := []
+		for h in TO:
+			if re("Curad", h):
+				tl.append(",".join(Array(h.split("<br>")).filter(func(l): return re("Curad", l))))
+		R.to = "|".join(tl)
+		ALMQ.append_array([2, null])
+		var l0 := LOG.size()
+		await run(func(): await J.object_action(7, 1))
+		R.saca = jj([J.S.buds.ria.g, J.S.buds.ria.cu, J.S.caja.buds.get("ria", 0)])
+		ALMQ.append_array([1, null])
+		await run(func(): await J.object_action(0, 6))
+		R.nev2 = [J.nevera_r(), J.S.rosin.ria.g, J.S.rosin.ria.cu, J.calidad(J.S.rosin.ria)]
+		var m0: int = J.S.min
+		await run(func(): await J.object_action(5, 4))
+		R.mc = [J.S.buds.ria.mc, J.S.min - m0, J.calidad(J.S.buds.ria)]
+		R.txt = "|".join(LOG.slice(l0).filter(func(l): return re("^(Sacas|Guardas|Skunk #1: )", l)))
+		J.S.items.lavadora = 1
+		J.S.items.estatica = 1
+		J.montar_casa()
+		var o: Array = J.MAPS.home.o
+		R.mapa = ",".join([o[4][5], o[4][6], o[4][7], o[6][1], o[6][6], o[6][2]].map(func(x): return x if x else ""))
+		J.gancho_billar = func(_t): return .7
+		await run(func(): await J.object_action(1, 6))
+		await run(func(): await J.object_action(6, 6))
+		R.ex = ",".join(J.S.rosin.keys())
+		J.S.items.mallas00 = 0
+		await run(func(): await J.item_give("h_mallas"))
+		J.montar_casa()
+		R.m00 = [J.S.items.mallas00, J.MAPS.home.o[4][7], ",".join(J.extr_ya())]
+		await run(func(): await J.object_action(7, 4))
+		J.gancho_billar = Callable()
+		var rr := []
+		for k in J.S.rosin:
+			rr.append(k + ":" + Datos.coma(J.S.rosin[k].g) + ":" + Datos.pct(J.S.rosin[k].thc))
+		R.r = " ".join(rr)
+		R.shop = ",".join(["Lavadora de extracción", "Máquina de static"].map(func(l): return str(int(D.SHOP.filter(func(it): return it.lbl == l)[0].p))))
+		capta = false
+		TO = to0
+		J.S = S0
+		J.montar_casa(),
+		func(): return chk(R.its == "$,+,ria,thai" and jj(R.nev) == "[2,0]" and jj(R.cu) == "[1,1,1]" and R.to == "Curada en la caja fuerte: Thai y Skunk #1,Curado en la nevera: Rosin de Skunk #1"
+			and R.saca == "[40,1,0]" and jj(R.nev2) == "[0,2,1,1.15]" and jj(R.mc) == "[1,20,1.25]"
+			and R.txt == "Sacas 40 g de Skunk #1.|Sacas 2 g de rosin de Skunk #1.|Skunk #1: 40 g manicurados en 20 min. Se venden un 10 % más caros."
+			and R.mapa == "trim,prensaM,,lavadora,staticM," and R.ex == "ria,ria~ice,ria~stat" and str(R.m00[0]) == "1" and R.m00[1] == "tamizM" and R.m00[2] == "rosin,seco,charas,hash,moon,lava,stat"
+			and R.r == "ria:2:30,3 ria~ice:3,5:58,6 ria~stat:0,3:68,7 ria~seco:0,5:52,5" and R.shop == "900,4500", R))
 	step("Móvil (1.10): START → MÓVIL; pedir a Kiko (+15 %, llega mañana) y su SMS en Mensajes; llamar a Kiko; quien te compra te da su número y, llamado, viene a la calle (20 min, +1 de calor, una vez al día)",
 		["MÓVIL", "Pedir a Kiko", "^Abono", "Salir", "Colgar", "SALIR", "MÓVIL", "Mensajes", "<B>", "Llamar", "^Kiko", "Colgar", "SALIR", "^Skunk", "Rebaja",
 			"MÓVIL", "Llamar", "^(?!Kiko|Nada)", "^Skunk", "Rebaja", "SALIR", "MÓVIL", "Llamar", "^(?!Kiko|Nada)", "Colgar", "SALIR"], func():
@@ -3703,7 +3798,7 @@ func _pasos() -> void:
 				and R.deco == "1,1,cartel-1,alf1a-3" and LOG.has("Cambias el dibujo del póster: la ola.") and R.n == n and R.mig == "true,true,0" and R.silla == "4,2,silla,true,4,2,16,2,sillaG,sillaG2,true,17,2,gpc2,"
 				and "|".join(R.TO) == "Pedido: Póster enmarcado · llega mañana|Pedido: Alfombra de 180 × 140 · llega mañana|Pedido: suelo, baldosa hidráulica · mañana|Pedido: paredes, pintura verde salvia · mañana|<small>LOGRO · %d/%d</small>A tu gusto|<small>MISIÓN CUMPLIDA</small>La caja de la tía|<small>LOGRO · %d/%d</small>Primera venta" % [n - 1, n, n, n]
 				and LOG.any(func(l): return l.begins_with("  [menú] %s | Volver" % " | ".join(PackedStringArray(D.LOGROS.map(func(x): return x.t))))), R))
-	step("Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también arcón, sala, agenda, mensajes, pedidos y bolsa); con Toño ya visto, sale en el móvil", [], func():
+	step("Partidas viejas: capítulo 3 sin plazo → 3.000 € en 7 días desde hoy; protección sin fecha → 10 días; los campos nuevos, con su valor (también sala, agenda, mensajes, pedidos y bolsa; 1.36: el arcón, a la caja fuerte y la nevera); con Toño ya visto, sale en el móvil", [], func():
 		var S0 = J.S
 		J.S = Datos.enteros(norm(S0))
 		J.S.ch = 3
@@ -3712,12 +3807,12 @@ func _pasos() -> void:
 		J.S.protect = true
 		J.S.flags.metB = false
 		J.S.flags.erase("tono")
-		for k in ["caja", "rec", "vencidos", "protHasta", "encargo", "encVeto", "arcon", "sala", "fijos", "sms", "envio", "misiones", "itin"]:
+		for k in ["caja", "rec", "vencidos", "protHasta", "encargo", "encVeto", "sala", "fijos", "sms", "envio", "misiones", "itin"]:
 			J.S.erase(k)
 		J.S.items.erase("bolsa")
 		J.migrate()
 		R = {"due": J.S.due, "dias": J.S.deadline - J.S.day, "tono": J.S.flags.get("tono") == J.S.day, "hasta": J.S.protHasta - J.S.day,
-			"campos": jj([J.S.caja, J.S.rec, J.S.vencidos, J.S.encargo, J.S.encVeto]), "nuevos": jj([J.S.arcon, J.S.sala, J.S.fijos, J.S.sms, J.S.envio, J.S.items.bolsa]),
+			"campos": jj([J.S.caja, J.S.rec, J.S.vencidos, J.S.encargo, J.S.encVeto]), "nuevos": jj([J.S.sala, J.S.fijos, J.S.sms, J.S.envio, J.S.items.bolsa]),
 			"mis": ",".join(PackedStringArray(J.S.misiones.keys())) + "/" + ",".join(PackedStringArray(J.S.misiones.values().map(func(v): return str(int(v))))),
 			"iti": ",".join(PackedStringArray(J.S.itin.keys())) + "/" + ",".join(PackedStringArray(J.S.itin.values().map(func(v): return str(int(v)))))}
 		J.S = Datos.enteros(norm(S0))
@@ -3725,9 +3820,15 @@ func _pasos() -> void:
 		J.S.flags.erase("tono")
 		J.migrate()
 		R.tono2 = J.S.flags.get("tono") == J.S.day
+		J.S = Datos.enteros(norm(S0))
+		J.S.arcon = {"buds": {"ria": {"g": 10, "thc": 12}}, "rosin": {"ria": {"g": 1, "thc": 30}}}
+		J.S.caja = {"nivel": 1, "money": 0, "buds": {}, "rosin": {"hindu": {"g": 2, "thc": 40}}}
+		J.S.erase("nevera")
+		J.migrate()
+		R.arc = "|".join([jn([not J.S.has("arcon")]), Datos.js_num(J.caja_g()), jj(J.S.nevera.rosin), jn([J.S.caja.has("rosin")])])
 		J.S = S0,
 		func(): return chk(R.due == 3000 and R.dias == 7 and R.tono and R.hasta == 10 and R.campos == "[null,{},0,null,0]"
-			and R.nuevos == "[{\"buds\":{},\"rosin\":{}},{},[],[],[],0]" and R.tono2 and R.mis == "caja,luz,carpa,olor,inaki/0,0,0,0,0"
+			and R.nuevos == "[{},[],[],[],0]" and R.arc == "true|10|{\"ria\":{\"g\":1,\"thc\":30},\"hindu\":{\"g\":2,\"thc\":40}}|false" and R.tono2 and R.mis == "caja,luz,carpa,olor,inaki/0,0,0,0,0"
 			and R.iti == "bus,carta,kiko,julen,plantar,regar,veg,flor,cosecha,vender,ventas/0,0,0,0,0,0,0,0,0,0,0", R))
 	step("Los locales, cada uno el suyo, y las madres de la nave (1.34): los cinco clubs, de distinto tamaño, con su suelo, su pared, sus sofás, mesas y billar y su gente, y el billar con sitio alrededor; GROW IBARBIDE más grande, con la carpa de exposición; el bajo de Txomin por dentro (cerrado sin alquilar; las bandejas en la estantería, en su fase, el pulverizador y el secadero); la carpa de las madres de la nave (meter una madre, quien las cuida, los esquejes de cada mañana, plantar una mesa con su clon sin gastar nada; sin nadie, se apagan) y la gente de la nave desde el escritorio (cambiar de mesa, la prima y el curso); las partidas de antes", [], func():
 		var S0 = J.S

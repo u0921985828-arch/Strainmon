@@ -145,7 +145,7 @@ const DIARIO={ria:'La primera que fijamos Kiko y yo. Tres padres y mucha pacienc
   kashmir:'De los valles de Cachemira: baja, oscura y no le asusta el frío. Ninguna receta; prueba tú.',
   vietblack:'Vietnamita de cogollo casi negro, con olor a especia. Ninguna receta: para tus cruces.',
   etiopia:'De las tierras altas de Etiopía: florece antes que las de la costa. Ninguna receta; cruza tú.',
-  chronic:'Skunk, Northern Lights y AK-47: tres de las fáciles en una. La de llenar el arcón.',
+  chronic:'Skunk, Northern Lights y AK-47: tres de las fáciles en una. La de llenar tarros.',
   whiterhino:'White Widow con una índica: más baja y más pesada. Para el armario pequeño.',
   whiteshark:'Super Skunk con las dos de la White Widow. Huele fuerte: filtro antes de plantarla.',
   hawaisnow:'Tres Haze y la de Hawái: no me cabía en ninguna carpa. Si la sacas, a 12/12 pronto.',
@@ -153,7 +153,7 @@ const DIARIO={ria:'La primera que fijamos Kiko y yo. Tres padres y mucha pacienc
   jack47:'Si terminas la Jack, con la AK-47: la Jack para los que tienen prisa.',
   sourtangie:'Gasoil y mandarina. Suena raro, pero funciona.',
   ice:'Tanta resina que parece helada. La de las extracciones.',
-  nlbigbud:'Northern Lights con Big Bud: el arcón lleno. Ponle malla, que las ramas no aguantan.',
+  nlbigbud:'Northern Lights con Big Bud: los tarros llenos. Ponle malla, que las ramas no aguantan.',
   criticaljack:'Si terminas la Jack, con la Critical Mass: la producción con el efecto. Hay quien dice que su Critical era otra.',
   critical47:'Critical Mass con AK-47: corta y generosa. La de los balcones.',
   criticalcheese:'Critical Mass con Cheese. Huele a queso hasta en la escalera.',
@@ -205,28 +205,32 @@ async function mochila(){
   for(;;){
     const M=MOCHILAS[S.items.bolsa||0];
     const rows=[{label:'Dinero',right:eur(S.money),ic:icono('billetes'),desc:'Lo que llevas encima. Don Baltasar también lo cuenta.'},
-      {label:M.n,right:`${Math.floor(pesoEncima())} de ${kgTxt(M.g)}`,ic:icono('bolsa'),desc:'Cogollos y rosin que llevas encima. Lo que no cabe al cosechar va al arcón de casa.'}].concat(arconG()>=1||arconR()>=.1?[{label:'Arcón',right:arconTxt(),ic:icono('cogollo'),
-      desc:'En casa, entre la cama y la nevera. Un control en la calle no lo ve; una redada se lo lleva.'}]:[],S.caja?[{label:'Caja fuerte',right:`${eur(cajaE())} · ${Math.floor(cajaG())} g${cajaR()>=.1?' · '+coma(Math.round(cajaR()*10)/10)+' g rosin':''}`,ic:icono('billetes'),
-      desc:`${CAJA[S.caja.nivel].n}, detrás del diploma. Caben ${eur(CAJA[S.caja.nivel].money)} y ${kgTxt(CAJA[S.caja.nivel].g)}.\nLo que está dentro no lo llevas encima.`}]:[],[{label:'Vida',right:`${S.hp}/${S.hpMax}`,desc:'Se recupera durmiendo, comiendo o con el tiempo.'},
+      {label:M.n,right:`${Math.floor(pesoEncima())} de ${kgTxt(M.g)}`,ic:icono('bolsa'),desc:'Cogollos y extractos que llevas encima. Lo que no cabe al cosechar va a la caja fuerte.'}].concat(S.caja?[{label:'Caja fuerte',right:`${eur(cajaE())} · ${Math.floor(cajaG())} g`,ic:icono('billetes'),
+      desc:`${CAJA[S.caja.nivel].n}, detrás del diploma. Caben ${eur(CAJA[S.caja.nivel].money)} y ${kgTxt(CAJA[S.caja.nivel].g)}.\nLo que está dentro no lo llevas encima.`}]:[],neveraR()>=.1?[{label:'Nevera',right:coma(Math.round(neveraR()*10)/10)+' g',ic:icono('cogollo'),
+      desc:`Los extractos, en frío, en casa (caben ${NEVERA.g} g). Un control en la calle no la ve; una redada se la lleva.`}]:[],[{label:'Vida',right:`${S.hp}/${S.hpMax}`,desc:'Se recupera durmiendo, comiendo o con el tiempo.'},
       ...(S.pelea.xp>0?[{label:'Pelea',right:'nivel '+nivelPelea(),desc:fichaPelea()}]:[]),].concat(Object.keys(PRODUCTOS).filter(k=>k==='fert'||S.items[k]>0).map(k=>({label:PRODUCTOS[k].n,right:'×'+S.items[k],ic:icono('abono'),desc:descProducto(k)})),   // abonos y pH− por marca (1.23)
       S.items.medidor?[{label:'Medidor de pH y EC',right:'×1',desc:'Con él corriges el pH justo y ves la EC y el pH de cada maceta en PLANTAS.'}]:[],
-      S.items.tarros?[{label:'Tarros de curado',right:'en el arcón',desc:`Lo que guardas en el arcón se cura en ${CURADO.dias} días: se vende un ${pct0(CURADO.precio)} % más caro y ya no pierde THC.`}]:[],[{label:'Insecticida (tratamientos)',right:'×'+S.items.insect,ic:icono('insecticida'),desc:'Úsalo en una maceta con plaga.'},
+      S.items.tarros?[{label:'Tarros de curado',right:'en casa',desc:`Los cogollos en la caja fuerte y los extractos en la nevera se curan en ${CURADO.dias} días: suben un ${pct0(CURADO.thc)} % de THC y se venden un ${pct0(CURADO.precio)} % más caros.`}]:[],[{label:'Insecticida (tratamientos)',right:'×'+S.items.insect,ic:icono('insecticida'),desc:'Úsalo en una maceta con plaga.'},
       {label:'Spray de pimienta',right:'×'+S.items.spray,ic:icono('spray'),desc:'Solo en combate.'},{label:'Bocata',right:'×'+S.items.bocata,ic:icono('bocadillo'),desc:'Pulsa A para comerlo: +15 de vida.',k:'bocata'}]));
     for(const k in MACETAS)if(S.items['m_'+k]>0)rows.push({label:'Maceta '+MACETAS[k].n,right:'×'+S.items['m_'+k],ic:icono('maceta'),desc:descMaceta(k)+'\nSe cambia en una plaza vacía de la carpa.'});
     for(const k in FOCOS)if(S.items['f_'+k]>0)rows.push({label:'Foco '+FOCOS[k].n,right:'×'+S.items['f_'+k],ic:icono(icoFoco(k)),desc:descFoco(k)+'\nSe cuelga desde la vista de carpa: ▲ hasta el foco y A.'});
     for(const k in EXTRAS)if(S.items['x_'+k]>0)rows.push({label:EXTRAS[k].n,right:'×'+S.items['x_'+k],ic:icono(ICX[k]),desc:EXTRAS[k].d+`\nSe pone${EXTRAS[k].pl?'n':''} desde la vista de carpa: ▲ hasta el foco y A.`});
     for(const [k,v] of Object.entries(S.seeds))rows.push({label:'Semilla '+getStrain(k).n,right:'×'+v,sw:getStrain(k).c,ic:icono('semillas'),desc:strainLine(k)+'\nPulsa A para tirarlas.',k:'s',sid:k});
     for(const e of S.esquejes)rows.push({label:'Esqueje '+getStrain(e.sid).n+etiq(e.f),right:'día '+(e.dia+ESQUEJE_DIAS),sw:getStrain(e.sid).c,ic:iconoCogollo(e.sid),desc:`Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el día ${e.dia+ESQUEJE_DIAS}.\nPulsa A para ponerle nombre o tirarlo.`,k:'e',e});
-    for(const [k,b] of Object.entries(S.buds))rows.push({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k)),desc:(k.endsWith('*')?'Cogollos de un fenotipo estrella, en lote aparte.\n':'Cogollos listos para vender.\n')+(curaTxt(b)?curaTxt(b)+'\n':'')+(S.catas[lotSid(k)]?S.catas[lotSid(k)]+'\n':'')+getStrain(lotSid(k)).o+'\nPulsa A para catarlo'+(S.items.analizador?' o analizarlo.':'.'),k:'b',key:k});
-    for(const [k,b] of Object.entries(S.rosin))rows.push(Object.assign(rosinItem([k,b]),{desc:EXTR[tipoExtr(k)].n+': extracción sin disolventes. La compran los catadores.\n'+getStrain(lotSid(k)).o}));
+    for(const [k,b] of Object.entries(S.buds))rows.push({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k)),desc:(k.endsWith('*')?'Cogollos de un fenotipo estrella, en lote aparte.\n':'Cogollos listos para vender.\n')+(curaTxt(b)?curaTxt(b)+'\n':'')+(S.catas[lotSid(k)]?S.catas[lotSid(k)]+'\n':'')+getStrain(lotSid(k)).o+'\nPulsa A para catarlo'+(S.items.analizador?', analizarlo':'')+' o tirarlo.',k:'b',key:k});
+    for(const [k,b] of Object.entries(S.rosin))rows.push(Object.assign(rosinItem([k,b]),{desc:EXTR[tipoExtr(k)].n+': extracción sin disolventes. La compran los catadores.\n'+getStrain(lotSid(k)).o+'\nPulsa A para tirarlo.',k:'r',key:k}));
     if(S.items.prensa)rows.push({label:'Prensa de rosin',right:'en la mesa',desc:'De 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso.'});
     if(S.items.tamiz)rows.push({label:'Tamices de seda',right:'en la mesa',desc:'Dry sift: de la flor, el kief con algo más del doble de THC. Se usa en la mesa del piso.'});
     if(S.items.ice)rows.push({label:'Kit Ice-o-lator',right:'en la mesa',desc:'Agua con hielo y bolsas de malla: la resina más limpia. Se usa en la mesa del piso.'});
+    if(S.items.mallas00)rows.push({label:'Mallas 00',right:'en el piso',desc:'La malla «doble cero» de la tía: dry sift de lo más fino, solo las cabezas. Se usa en los tamices del piso.'});   // 1.36
+    if(S.items.lavadora)rows.push({label:'Lavadora de extracción',right:'en el piso',desc:'Ice-o-lator en grande: bate sola con las bolsas de malla. Está montada junto a la nevera.'});
+    if(S.items.estatica)rows.push({label:'Máquina de static',right:'en el piso',desc:'La placa cargada levanta las cabezas de resina de la flor fría: la resina más pura.'});
     i=await menu(rows,{cls:'full',title:'MOCHILA',title2:`${Math.floor(totalBuds())} g encima`+(S.caja?` · ${Math.floor(cajaG())} g en la caja`:''),desc:true,initial:i});
     if(i<0)return;
     if(rows[i].k==='bocata'){if(S.items.bocata>0&&S.hp<S.hpMax){S.items.bocata--;S.hp=Math.min(S.hpMax,S.hp+15);sfx('get');toast('Te comes el bocata. +15 de vida',1200);}else sfx('bump');}
     else if(rows[i].k==='e')await esquejeAccion(rows[i].e,S.esquejes);
-    else if(rows[i].k==='b')await loteAccion(rows[i].key);   // la cata y el análisis (1.15)
+    else if(rows[i].k==='b')await loteAccion(rows[i].key);   // la cata y el análisis (1.15), y tirarlo (1.36)
+    else if(rows[i].k==='r')await tirarLote(rows[i].key,1);   // 1.36: tirar un extracto
     else if(rows[i].k==='s'){   // tirar semillas (1.11)
       const sid=rows[i].sid,n=S.seeds[sid],o=n>1?['Tirar 1','Tirar todas','Nada']:['Tirar','Nada'],c=await ask(`${n>1?n+' semillas':'1 semilla'} de ${getStrain(sid).n}.`,o);
       if(o[c]&&o[c]!=='Nada'){const q=o[c]==='Tirar todas'?n:1;S.seeds[sid]-=q;if(!S.seeds[sid])delete S.seeds[sid];sfx('sel');await say(q>1?`Tiras las ${q} semillas.`:'Tiras 1 semilla.');}

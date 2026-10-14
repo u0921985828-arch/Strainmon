@@ -203,7 +203,14 @@ async function catar(k){
 }
 async function analizar(k){const b=S.buds[k];if(!b||!S.items.analizador)return;const sid=lotSid(k);b.ana=true;sfx('get');await say(`Analizado: ${lotNombre(k)} · THC ${pct(b.thc)} % · CBD ${pct(cbdDe(sid))} % · terpeno principal, ${TERPENOS[aromaDe(sid)]}. Lo que va con análisis se vende mejor.`);}
 async function loteAccion(k){
-  const b=S.buds[k],ops=[`Catar ${coma(CATA.g)} g`].concat(S.items.analizador&&!b.ana?['Analizar']:[],['Nada']);
+  const b=S.buds[k],ops=[`Catar ${coma(CATA.g)} g`].concat(S.items.analizador&&!b.ana?['Analizar']:[],['Tirar','Nada']);
   const op=ops[await ask(`${lotNombre(k)}: ${Math.floor(b.g)} g · ${pct(b.thc)} %${curaCorto(b)}${b.cata?' · catado':''}${b.ana?' · analizado':''}`,ops)];
-  if(op&&op.startsWith('Catar'))return catar(k);if(op==='Analizar')return analizar(k);
+  if(op&&op.startsWith('Catar'))return catar(k);if(op==='Analizar')return analizar(k);if(op==='Tirar')return tirarLote(k,0);
+}
+// tirar un producto (1.36, lo pidió el usuario; como las semillas): cogollos (r 0) o un extracto (r 1) de los que llevas; el dinero, no
+async function tirarLote(k,r){
+  const L=r?S.rosin:S.buds,b=L[k];if(!b)return;
+  const max=r?b.g:Math.floor(b.g),g=await cuanto(`Tirar ${r?extrNombre(k,1):lotNombre(k)}: ¿cuánto?`,max,r?[1,5,10,50]:[10,50,100,500,1000],r?q=>coma(q)+' g':gTxt);if(!g)return;
+  if(r)useRosin(k,g);else{b.g-=g;if(b.g<.5)delete L[k];}
+  sfx('sel');updateHUD();await say(`Tiras ${r?coma(g)+' g de '+extrNombre(k,1):gTxt(g)+' de '+lotNombre(k)}.`);
 }

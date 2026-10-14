@@ -118,6 +118,19 @@ func migrate() -> void:
 			if S.clubDia.has(k) or (S.get("clubEnc") and S.clubEnc.k == k):
 				for id in [k, "pres_" + k]:
 					S.rel[id] = maxi(rel(id), int(D.CLUB.confia))
+	if S.get("arcon"):   # 1.36 (lo pidió el usuario): sin el arcón; los cogollos, a la caja fuerte (o encima, sin ella) y los extractos, a la nevera
+		var A: Dictionary = S.arcon
+		var bu: Dictionary = A.get("buds", {}) if A.get("buds") else {}
+		for k in bu.keys():
+			mover_lote(bu, S.caja.buds if S.get("caja") else S.buds, k, bu[k].g)
+		var ro: Dictionary = A.get("rosin", {}) if A.get("rosin") else {}
+		for k in ro.keys():
+			mover_rosin(ro, nevera().rosin, k, ro[k].g)
+	S.erase("arcon")
+	if S.get("caja") and S.caja.get("rosin"):
+		for k in S.caja.rosin.keys():
+			mover_rosin(S.caja.rosin, nevera().rosin, k, S.caja.rosin[k].g)
+		S.caja.erase("rosin")
 	var sin_mis: bool = not S.has("misiones")
 	var sin_itin: bool = not S.has("itin")
 	var sin_log: bool = not S.has("logros")

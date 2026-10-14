@@ -42,7 +42,9 @@ const SHOP=[
   {lbl:'Prensa de rosin',p:250,ch:3,item:'prensa',desc:'Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso. Lo compran los catadores.',cond:()=>!S.items.prensa},
   {lbl:'Tamices de seda',p:60,ch:3,item:'tamiz',desc:'Tres tamices, de grueso a fino (1.35): dry sift en la mesa del piso, y su kief para el hachís prensado y el moonrock.',cond:()=>!S.items.tamiz&&!S.envio.includes('Tamices de seda')},
   {lbl:'Kit Ice-o-lator',p:140,ch:3,item:'ice',desc:'Cubo y bolsas de malla para agua con hielo (1.35): la resina más limpia, en la mesa del piso. Su kief sirve para el prensado y el moonrock.',cond:()=>!S.items.ice&&!S.envio.includes('Kit Ice-o-lator')},
-  {lbl:'Tarros de curado',p:30,ch:1,item:'tarros',desc:`Tarros de cristal herméticos (1.29) para el arcón de casa: lo que guardas ahí se cura en ${CURADO.dias} días, se vende un ${pct0(CURADO.precio)} % más caro y ya no pierde THC. Sin curar, a los ${CURADO.fresco} días de cosecharla empieza a perder.`,cond:()=>!S.items.tarros&&!S.envio.includes('Tarros de curado')},
+  {lbl:'Lavadora de extracción',p:900,ch:4,item:'lavadora',desc:'La lavadora de extracción (1.36): una pequeña de carga superior, con la cuba de plástico; bate sola el agua con hielo y la flor congelada con las bolsas de malla dentro y desagua por la manguera. Más Ice-o-lator y más limpio que a mano. Se monta junto a la nevera del piso.',cond:()=>!S.items.lavadora&&!S.envio.includes('Lavadora de extracción')},
+  {lbl:'Máquina de static',p:4500,ch:5,item:'estatica',desc:'Separador electrostático de mesa (1.36): la placa cargada levanta las cabezas de resina de la flor fría, sin agua ni disolventes. La resina más pura, hasta un 85 % de THC, en la mesa del piso. Una inversión fuerte.',cond:()=>!S.items.estatica&&!S.envio.includes('Máquina de static')},
+  {lbl:'Tarros de curado',p:30,ch:1,item:'tarros',desc:`Tarros de cristal herméticos (1.29) para la caja fuerte y la nevera: los cogollos que guardas en la caja se curan en ${CURADO.dias} días: suben un ${pct0(CURADO.thc)} % de THC y se venden un ${pct0(CURADO.precio)} % más caros. Sin curar no pierden nada. Los extractos, en sus tarros pequeños, se curan en frío en la nevera.`,cond:()=>!S.items.tarros&&!S.envio.includes('Tarros de curado')},
 ];
 const SOBRES=[[1,1],[3,.95],[5,.9],[10,.85]],GRANEL=[50,.6];   // [semillas, precio por semilla relativo]
 const precioSobre=(it,[n,f])=>Math.round(it.p*n*f);
@@ -60,7 +62,7 @@ const DEUDA=30000,PLAZOS={3:3000,5:12000,7:15000},INTERES=.2,PREMIO_COPA=5000,CO
 // policía por niveles (1.11): el calor (0-100) marca el nivel; con 60 o más, una patrulla más por zona. Al cambiar de día con 90 o
 // más llega la orden de registro: Kiko te avisa y la redada es al cambiar el día siguiente (con Molina pagado, la para). Cada día el
 // calor baja lo del nivel (con Molina, × 1,5); con la orden, nada. La redada se lleva las plantas, el equipo de las carpas que las
-// tienen y lo que está a la vista (cogollos, rosin, arcón y esquejes); la caja fuerte y las semillas, nunca. Multa según lo hallado
+// tienen y lo que está a la vista (cogollos, extractos, la nevera y los esquejes); la caja fuerte y las semillas, nunca. Multa según lo hallado
 const NIVEL_POLI=[[0,'TRANQUILO',12],[30,'VIGILANCIA',12],[60,'INVESTIGACIÓN',8],[90,'ORDEN DE REGISTRO',0]];
 const nivelPoli=()=>S.orden?3:NIVEL_POLI.reduce((n,[c],i)=>S.heat>=c?i:n,0);
 const bajaCalor=()=>NIVEL_POLI[nivelPoli()][2]*(S.protect?1.5:1);
@@ -154,7 +156,7 @@ async function talkKiko(){
       'Empieza por las conocidas: saca dos de receta en la mesa y cosecha una planta de cada. Patxi, el de la plaza, se sabe unas cuantas.']);
     showObjective();await checkStory();return;
   }
-  if(!Object.keys(S.seeds).length&&!S.pots.some(Boolean)&&!totalBuds()&&!totalRosin()&&!cajaG()&&!cajaR()&&!arconG()&&!arconR()&&S.money+cajaE()<15){   // lo de la caja y el arcón también cuenta (1.10)
+  if(!Object.keys(S.seeds).length&&!S.pots.some(Boolean)&&!totalBuds()&&!totalRosin()&&!cajaG()&&!neveraR()&&S.money+cajaE()<15){   // lo de la caja y la nevera también cuenta (1.10; 1.36: sin arcón)
     await say('¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.',N);addSeeds('ria',2);await got('2 semillas de SKUNK #1');
   }
   const c=await ask('¿Qué necesitas?',['Comprar','Un consejo','Nada'],N);
@@ -377,9 +379,9 @@ async function raidEvent(){
   S.orden=0;
   if(S.protect){S.heat=50;return talk('SMS · MOLINA',['Esta noche había orden de entrada en tu piso. La he parado.','Baja el ritmo.']);}
   music('redada');sfx('bad');await say('REDADA. La policía entra en tu piso con una orden de registro.');
-  const casa=S.map==='home',ne=S.esquejes.length+S.bandejas.length,g=Math.floor((casa?totalBuds():0)+arconG()),r=(casa?totalRosin():0)+arconR(),hs=huecos(),np=S.pots.filter(p=>p&&!p.dead).length,eq=new Set();   // lo de encima y el arcón (1.10)
+  const casa=S.map==='home',ne=S.esquejes.length+S.bandejas.length,g=Math.floor(casa?totalBuds():0),r=(casa?totalRosin():0)+neveraR(),hs=huecos(),np=S.pots.filter(p=>p&&!p.dead).length,eq=new Set();   // lo de encima y la nevera (1.36; la caja fuerte, no)
   S.carpas.forEach((c,ci)=>{if(c&&hs.some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead))for(const k in EXTRAS)if(c[k]){eq.add(EXTRAS[k].n.toLowerCase());delete c[k];if(k==='goteo')delete c.dep;if(k==='garrafas')delete c.gar;}});
-  S.pots=S.pots.map(()=>null);if(casa){S.buds={};S.rosin={};}S.arcon={buds:{},rosin:{}};S.esquejes=[];S.bandejas=[];S.heat=CALOR_REDADA;
+  S.pots=S.pots.map(()=>null);if(casa){S.buds={};S.rosin={};}if(S.nevera)S.nevera.rosin={};S.esquejes=[];S.bandejas=[];S.heat=CALOR_REDADA;
   const multa=multaRedada(np,g+Math.round(r/ROSIN.rend)),fine=multa-pagarCasa(multa);   // el rosin, como la flor de la que sale
   const lo=[np?'todas las plantas':'',ne?(ne>1?'los esquejes':'el esqueje'):'',g?g+' g':'',r?rosinTxt(r):''].filter(Boolean);
   await say(`${lo.length?'Se llevan '+yLista(lo):'No encuentran nada que llevarse'}. Multa: ${eur(multa)}${fine<multa?` (pagas ${eur(fine)}: no tienes más)`:''}.`);

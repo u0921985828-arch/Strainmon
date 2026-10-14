@@ -20,7 +20,7 @@ const LOGROS=[
   {id:'genoteca',t:'Genoteca completa',d:`Las ${DEX.length} variedades en la Genoteca.`,ok:()=>DEX.every(k=>S.disc[k])},
   {id:'landraces',t:'Cazador de landraces',d:`Las ${LANDRACES.length} landraces en la Genoteca.`,ok:()=>LANDRACES.every(k=>S.disc[k])},
   {id:'tia',t:'Tras la pista de la tía',d:`Las ${TIA_DEJO.length} landraces que dejó la tía Maite (en casa, por la comarca y con Miren), en la Genoteca.`,ok:()=>TIA_DEJO.every(k=>S.disc[k])},
-  {id:'rosin',t:'Prensado',d:'Prensa tu primer rosin.',ok:()=>Object.keys(S.rosin).length>0||Object.keys(S.arcon.rosin).length>0},
+  {id:'rosin',t:'Prensado',d:'Prensa tu primer rosin.',ok:()=>Object.keys(S.rosin).length>0||neveraR()>0},
   {id:'cata',t:'Catador',d:'Cata tu propia hierba.',ok:()=>Object.keys(S.catas).length>0},
   {id:'club',t:'Socio',d:'Hazte el carné de un club cannábico.',ok:()=>Object.values(S.clubs).some(Boolean)},
   {id:'presidente',t:'Como la tía Maite',d:'Preside la Asociación Cannábica Ribera Verde.',ok:()=>!!(S.aso&&S.aso.pres)},

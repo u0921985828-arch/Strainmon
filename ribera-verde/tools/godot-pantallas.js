@@ -23,7 +23,8 @@ const pl = (sid, prog, o = {}) => Object.assign({ sid, prog, water: 70, health: 
 const T = 123456;   // el instante de las escenas (ms)
 // cada escena: k, sw, mode, now, seed (azar de los clientes), S (encima de newState()), carpas/macetas/pots, map + P (enterMap y
 // luego lo demás de P), clientes (spawnClients), ents ({id: campos}), SOSP (encima de la de enterMap), vfx ([id, x, y, hace ms, capa,
-// sube]), B, VC, TIRO (la barra del billar: hace cuántos ms empezó, ms, y cuál, f; 1.35) y MESA_B (la mesa de la partida)
+// sube]), B, VC, TIRO (la barra del billar: hace cuántos ms empezó, ms, y cuál, f; 1.35; 1.36, per, mov y ritmo de las máquinas), MESA_B
+// (la mesa de la partida) y ALMACEN (la caja fuerte o la nevera por dentro, 1.36)
 const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
   // el piso: carpa 100 del atlas con plantas (luz bajo la puerta), carpa 120 procedural vacía, sitio libre de 2 casillas y la carta
   { k: 'casa-a', sw: 240, mode: 'world', now: T, S: { ch: 2, flags: {} }, carpas: [{ t: 'm100', foco: 'sodio400' }, { t: 'm120', foco: 'cfl' }],
@@ -175,6 +176,33 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
     map: 'home', P: { x: 5, y: 5, dir: 'down' } },
   { k: 'combate-darko', sw: 320, mode: 'battle', now: T + 700, S: { ch: 8, ropa: { camiseta: 1, pantalon: 2, gorra: 3, pelo: 2 } },
     B: { kind: 'thief', rival: 'Darko', jefe: 1, name: 'DARKO', look: 'darko', t: 900, flashE: 0, shakeP: 0 } },
+  // 1.36 (lo pidió el usuario): el piso con la mesa de manicurar y un mueble por máquina de extraer (prensa, tamices, cubo con
+  // mallas, lavadora y static); la caja fuerte por dentro (fajos y tarros por porcentaje, el carrusel en la 2.ª fila) y la nevera
+  // (un piso por tipo, de mayor a menor THC, con más tarros de los que caben en el piso del hielo); la barra de la static (la zona
+  // verde se mueve) y la de la lavadora (a ritmo)
+  { k: 'casa-extr', sw: 320, mode: 'world', now: T + 444, S: { ch: 5, flags: { letter: true, kiko1: true, nevera: true, harvest1: true },
+    items: { prensa: 1, tamiz: 1, ice: 1, lavadora: 1, estatica: 1 } }, map: 'home', P: { x: 4, y: 5, dir: 'left' } },
+  { k: 'caja-dentro', sw: 320, mode: 'world', now: T + 50, S: { ch: 5, flags: { letter: true, kiko1: true },
+    caja: { nivel: 1, money: 13250, buds: { ria: { g: 120, thc: 19.5, cu: 1 }, limon: { g: 64, thc: 22.1, cu: .5 }, kif: { g: 300, thc: 14, cu: 0 },
+      thai: { g: 45, thc: 17.2, cu: 1, mc: 1 }, malawi: { g: 210, thc: 21, cu: 1 }, nepal: { g: 18, thc: 12.4 } } } },
+    map: 'home', P: { x: 7, y: 2, dir: 'up' }, ALMACEN: { t: 'caja', i: 6 } },
+  // GUARDAR (1.36): el primer tarro de la caja, a 240 de ancho (con la ventana del elegido), y la fila de arriba de la nevera
+  { k: 'caja-guardar', sw: 240, mode: 'world', now: T + 60, S: { ch: 5, flags: { letter: true, kiko1: true }, items: { tarros: 1 }, buds: { ria: { g: 80, thc: 18, dia: 30 } },
+    caja: { nivel: 1, money: 2400, buds: { 'ria*': { g: 90, thc: 23.4, cu: 1, mc: 1 }, nepal: { g: 18, thc: 12.4 } } } },
+    map: 'home', P: { x: 7, y: 2, dir: 'up' }, ALMACEN: { t: 'caja', i: 1 } },
+  { k: 'nevera-guardar', sw: 240, mode: 'world', now: T + 80, S: { ch: 5, flags: { letter: true, kiko1: true, nevera: true }, items: { tarros: 1 }, rosin: { ria: { g: 5, thc: 36 } },
+    nevera: { rosin: { ria: { g: 8, thc: 66, cu: 1 }, 'kif~seco': { g: 20, thc: 38 }, 'thai~stat': { g: 1.2, thc: 74, cu: 1 } } } },
+    map: 'home', P: { x: 1, y: 2, dir: 'up' }, ALMACEN: { t: 'nevera', i: 0 } },
+  { k: 'nevera-dentro', sw: 280, mode: 'world', now: T + 70, S: { ch: 5, flags: { letter: true, kiko1: true, nevera: true },
+    nevera: { rosin: { ria: { g: 8, thc: 66, cu: 1 }, limon: { g: 4.5, thc: 70.2, cu: .5 }, 'kif~seco': { g: 20, thc: 38 }, 'malawi~seco': { g: 6, thc: 44, cu: 1 },
+      'ria~ice': { g: 3, thc: 52 }, 'thai~ice': { g: 2, thc: 55, cu: 1 }, 'kif~ice': { g: 9, thc: 47 }, 'limon~ice': { g: 1.5, thc: 58 }, 'nepal~ice': { g: 2.2, thc: 49 },
+      'mango~ice': { g: 4, thc: 51 }, 'lamb~ice': { g: 3.3, thc: 53 }, 'txoko~ice': { g: 1, thc: 45 }, 'acapulco~ice': { g: 2.4, thc: 57 }, 'rif~ice': { g: 5, thc: 43 },
+      'rif~hash': { g: 25, thc: 36 }, 'kif~moon': { g: 3.5, thc: 48 }, 'thai~stat': { g: 1.2, thc: 74, cu: 1 } } } },
+    map: 'home', P: { x: 1, y: 2, dir: 'up' }, ALMACEN: { t: 'nevera', i: 13 } },
+  { k: 'tiro-static', sw: 320, mode: 'world', now: T + 2222, S: { ch: 5, flags: { letter: true, kiko1: true }, items: { estatica: 1 } },
+    map: 'home', P: { x: 6, y: 5, dir: 'down' }, TIRO: { ms: 700, f: 'dir', a: .07, per: 1100, mov: 2600 } },
+  { k: 'tiro-lavadora', sw: 240, mode: 'world', now: T + 3100, S: { ch: 5, flags: { letter: true, kiko1: true }, items: { lavadora: 1 } },
+    map: 'home', P: { x: 1, y: 5, dir: 'down' }, TIRO: { ms: 1300, f: 'dir', a: .1, per: 1200, ritmo: .6 } },
   { k: 'titulo-240', sw: 240, mode: 'title', now: T },
   { k: 'titulo-400', sw: 400, mode: 'title', now: T + 1717 },
   { k: 'titulo-450', sw: 450, mode: 'title', now: T + 2900 },
@@ -199,7 +227,7 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
     for (const e of PANTALLAS) {
       Math.random = pm(e.seed || 1);
       S = newState();
-      for (const k in e.S || {}) S[k] = k === 'flags' ? Object.assign(S.flags, e.S.flags) : copia(e.S[k]);
+      for (const k in e.S || {}) S[k] = k === 'flags' || k === 'items' ? Object.assign(S[k], e.S[k]) : copia(e.S[k]);
       if (e.carpas) {
         S.carpas = copia(e.carpas);const n = huecos().length;
         // una maceta por plaza, como al cargar la partida (15-arranque): las que falten, de 7 L
@@ -227,15 +255,15 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
       for (const [id, x, y, hace, capa, sube] of e.vfx || []) lanzarVfx(id, x, y, e.now - hace, capa, sube);
       if (e.B) { B = copia(e.B);B.look = /^th/.test(e.B.look) ? randLook(e.B.look, 'thief') : LOOKS[e.B.look]; }
       if (e.VC) VC = Object.assign({ ocupado: false }, e.VC);
-      TIRO = e.TIRO == null ? null : { t0: e.now - e.TIRO.ms, f: e.TIRO.f, a: e.TIRO.a || 0 };MESA_B = e.MESA_B || null;
+      TIRO = e.TIRO == null ? null : Object.assign({ t0: e.now - e.TIRO.ms, f: e.TIRO.f, a: e.TIRO.a || 0 }, e.TIRO.per ? { per: e.TIRO.per, mov: e.TIRO.mov || 0, ritmo: e.TIRO.ritmo || 0 } : {});MESA_B = e.MESA_B || null;ALMACEN = e.ALMACEN || null;
       mode = e.mode;
-      const st = copia({ k: e.k, sw: SW, mode, now: e.now, S, P, B, VC, TIRO, MESA_B, vfx: ARTE.vfx,
+      const st = copia({ k: e.k, sw: SW, mode, now: e.now, S, P, B, VC, TIRO, MESA_B, ALMACEN, vfx: ARTE.vfx,
         ents: ents.map(x => Object.assign({ id: x.id, x: x.x, y: x.y, px: x.px, py: x.py, dir: x.dir, moving: x.moving, t: x.t, fx: x.fx, fy: x.fy, act: x.act || null },
           x.pat ? { caza: x.caza, dur: x.dur } : {})), SOSP });
       render(e.now);
       o.png[e.k] = cv.toDataURL('image/png');
       o.escenas.push(st);
-      mode = 'pausa';
+      mode = 'pausa';ALMACEN = null;
     }
     Math.random = rnd0;
     return o;

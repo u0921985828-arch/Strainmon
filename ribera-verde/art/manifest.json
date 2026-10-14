@@ -512,6 +512,116 @@
    ],
    "ajuste": "pies",
    "nota": "fachadas de 8 × 7 casillas (1.14, mundo.py): bloques de pisos del Ensanche de Ibarbide"
+  },
+  "alm_caja": {
+   "w": 168,
+   "h": 100,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36: los visores de la caja fuerte y la nevera (almacen.py)"
+  },
+  "alm_nevera": {
+   "w": 152,
+   "h": 120,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36: los visores de la caja fuerte y la nevera (almacen.py)"
+  },
+  "alm_panel": {
+   "w": 60,
+   "h": 100,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36: los visores de la caja fuerte y la nevera (almacen.py)"
+  },
+  "alm_tarro": {
+   "w": 18,
+   "h": 25,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36: los visores de la caja fuerte y la nevera (almacen.py)"
+  },
+  "alm_bote": {
+   "w": 12,
+   "h": 12,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36: los visores de la caja fuerte y la nevera (almacen.py)"
+  },
+  "alm_guardar": {
+   "w": 44,
+   "h": 11,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36: los visores de la caja fuerte y la nevera (almacen.py)"
+  },
+  "alm_fajo": {
+   "w": 15,
+   "h": 8,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36: los visores de la caja fuerte y la nevera (almacen.py)"
+  },
+  "alm_icono": {
+   "w": 7,
+   "h": 7,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36: los visores de la caja fuerte y la nevera (almacen.py)"
+  },
+  "alm_tarro_g": {
+   "w": 36,
+   "h": 50,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36: los visores de la caja fuerte y la nevera (almacen.py)"
+  },
+  "alm_bote_g": {
+   "w": 24,
+   "h": 24,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36: los visores de la caja fuerte y la nevera (almacen.py)"
+  },
+  "alm_fajo_g": {
+   "w": 30,
+   "h": 16,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.36: los visores de la caja fuerte y la nevera (almacen.py)"
   }
  },
  "fases": [
@@ -8109,6 +8219,173 @@
    },
    "estilo_ref": "los muebles a escala del piso (props-escala)",
    "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca». 1.34, pedido por el usuario: «los decorados y distribución del local en casa asociación sea diferente, como también en cada grow» y «Aquí falta un espacio por crear no? Con sus sprites necesarios»."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "id": "extraccion-piso",
+   "cubre": [
+    "obj:trim",
+    "obj:prensaM",
+    "obj:tamizM",
+    "obj:mallas",
+    "obj:lavadora",
+    "obj:staticM"
+   ],
+   "celda": "objeto_alto",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/extraccion.py",
+   "descripcion": "1.36: los muebles del piso para acabar y extraer: la mesa de manicurar (bandeja de rejilla, cogollos, tijeras y guantes), la prensa de rosin de palanca en su mesita, los tamices de seda apilados con el kief en el cristal, el cubo de 20 L con agua, hielo y las bolsas de malla, la lavadora de extracción de carga superior y la máquina de static con la placa cargada (sin marcas)",
+   "ajuste_por_sprite": {
+    "trim": "exacto",
+    "prensaM": "exacto",
+    "tamizM": "exacto",
+    "mallas": "exacto",
+    "lavadora": "exacto",
+    "staticM": "exacto"
+   },
+   "estilo_ref": "los muebles a escala del piso (props-escala)",
+   "notas": "1.36, pedido por el usuario: «una mesa con tijeras o, o así, o sea, con los utensilios para hacer podas de, de manicurado» y «una lavadora... Eh, unas mallas y tal para hacer los, las demás extracciones también habría que hacer esos sprites»; «otro mueble por cada minijuego o tipo de extracción»."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "id": "almacen",
+   "cubre": [
+    "misc:alm-caja",
+    "misc:alm-nevera",
+    "misc:alm-panel",
+    "misc:alm-tarro",
+    "misc:alm-tarro-s",
+    "misc:alm-bote",
+    "misc:alm-mas",
+    "misc:alm-guardar",
+    "misc:alm-fajo",
+    "misc:alm-ic-thc",
+    "misc:alm-ic-cu",
+    "misc:alm-ic-mc",
+    "misc:alm-ic-g",
+    "misc:alm-ic-eur",
+    "misc:alm-tarro-g",
+    "misc:alm-tarro-s-g",
+    "misc:alm-bote-g",
+    "misc:alm-mas-g",
+    "misc:alm-fajo-g"
+   ],
+   "celda": "alm_tarro",
+   "max_colores": 64,
+   "animaciones": [
+    {
+     "nombre": "alm-caja",
+     "celda": "alm_caja"
+    },
+    {
+     "nombre": "alm-nevera",
+     "celda": "alm_nevera"
+    },
+    {
+     "nombre": "alm-panel",
+     "celda": "alm_panel"
+    },
+    {
+     "nombre": "alm-tarro",
+     "celda": "alm_tarro"
+    },
+    {
+     "nombre": "alm-tarro-s",
+     "celda": "alm_tarro"
+    },
+    {
+     "nombre": "alm-bote",
+     "celda": "alm_bote"
+    },
+    {
+     "nombre": "alm-mas",
+     "celda": "alm_tarro"
+    },
+    {
+     "nombre": "alm-guardar",
+     "celda": "alm_guardar"
+    },
+    {
+     "nombre": "alm-fajo",
+     "celda": "alm_fajo"
+    },
+    {
+     "nombre": "alm-ic-thc",
+     "celda": "alm_icono"
+    },
+    {
+     "nombre": "alm-ic-cu",
+     "celda": "alm_icono"
+    },
+    {
+     "nombre": "alm-ic-mc",
+     "celda": "alm_icono"
+    },
+    {
+     "nombre": "alm-ic-g",
+     "celda": "alm_icono"
+    },
+    {
+     "nombre": "alm-ic-eur",
+     "celda": "alm_icono"
+    },
+    {
+     "nombre": "alm-tarro-g",
+     "celda": "alm_tarro_g"
+    },
+    {
+     "nombre": "alm-tarro-s-g",
+     "celda": "alm_tarro_g"
+    },
+    {
+     "nombre": "alm-bote-g",
+     "celda": "alm_bote_g"
+    },
+    {
+     "nombre": "alm-mas-g",
+     "celda": "alm_tarro_g"
+    },
+    {
+     "nombre": "alm-fajo-g",
+     "celda": "alm_fajo_g"
+    }
+   ],
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/almacen.py",
+   "descripcion": "1.36: los visores de la caja fuerte y la nevera, con el ancla arriba a la izquierda: la caja por dentro (el acero biselado con remaches, el fondo cepillado, el tabique, la bandeja de los billetes, el cajón y dos baldas de madera), la nevera por dentro (la luz, la fila de GUARDAR y siete baldas de cristal), la ventana del elegido (el visor y tres ranuras de barras), el cristal de los tarros de cogollos con la tapa de latón y la dorada del fenotipo estrella, el bote pequeño de los extractos, el tarro abierto con el más (GUARDAR en la caja), el botón «+ GUARDAR» de la nevera, el fajo de billetes, los iconos de las barras (tricoma, tarro, tijeras, pesa y moneda) y los tarros, el bote y el fajo al doble para la ventana",
+   "ajuste_por_sprite": {
+    "alm-caja": "exacto",
+    "alm-nevera": "exacto",
+    "alm-panel": "exacto",
+    "alm-tarro": "exacto",
+    "alm-tarro-s": "exacto",
+    "alm-bote": "exacto",
+    "alm-mas": "exacto",
+    "alm-guardar": "exacto",
+    "alm-fajo": "exacto",
+    "alm-ic-thc": "exacto",
+    "alm-ic-cu": "exacto",
+    "alm-ic-mc": "exacto",
+    "alm-ic-g": "exacto",
+    "alm-ic-eur": "exacto",
+    "alm-tarro-g": "exacto",
+    "alm-tarro-s-g": "exacto",
+    "alm-bote-g": "exacto",
+    "alm-mas-g": "exacto",
+    "alm-fajo-g": "exacto"
+   },
+   "estilo_ref": "los muebles a escala del piso (props-escala) y el contorno de salon.py",
+   "notas": "1.36, pedido por el usuario: «Quiero para los visores sprites del estilo de todo el juego no? Y también tendría que haber una ventana para ver lo que estás seleccionando no?» y «Los tarros de curado donde están? Como meter ahí la hierba o otras extracciones?»."
   },
   {
    "fase": "F9",

@@ -65,63 +65,39 @@ function regarGoteo(p,i){
   let q=0;if(d>=l){p.water=100;q=Math.round((d-l)*100)/100;}else p.water+=d/l*(100-p.water);
   if(c.goteo)c.dep=q;else(c.gar||(c.gar=[]))[h.j]=q;
 }
-/* ---------- arcón y mochila ----------
-   Lo que llevas encima (cogollos y rosin, en gramos) tiene el tope de la mochila (S.items.bolsa: la de serie, la bolsa de
-   deporte o la maleta, del growshop). Lo que no cabe al cosechar va al arcón de casa (S.arcon), que no tiene tope: un control
-   en la calle solo se lleva lo que llevas encima; una redada, todo lo del piso, arcón incluido (no la caja fuerte) */
+/* ---------- la mochila ----------
+   Lo que llevas encima (cogollos y extractos, en gramos) tiene el tope de la mochila (S.items.bolsa: la de serie, la bolsa de
+   deporte o la maleta, del growshop). Lo que no cabe al cosechar va a la caja fuerte (1.36: sin el arcón de la 1.10); un control
+   en la calle solo se lleva lo que llevas encima; una redada, todo lo del piso, la nevera incluida (no la caja fuerte) */
 const MOCHILAS=[{n:'Mochila',g:1000},{n:'Bolsa de deporte',g:3000},{n:'Maleta con ruedas',g:10000}];
 // la mejor bolsa que tienes o que ya has pedido a Kiko (no se vende otra igual o peor)
 const bolsaYa=()=>Math.max(S.items.bolsa||0,...S.envio.map(l=>(SHOP.find(x=>x.lbl===l)||{}).bolsa||0));
 const pesoEncima=()=>totalBuds()+totalRosin(),capMochila=()=>MOCHILAS[S.items.bolsa||0].g,libreMochila=()=>Math.max(0,capMochila()-pesoEncima());
-const arconG=()=>Object.values(S.arcon.buds).reduce((a,b)=>a+b.g,0),arconR=()=>Object.values(S.arcon.rosin).reduce((a,b)=>a+b.g,0);
-const arconTxt=()=>arconR()>=.1?`${gTxt(arconG())} y ${rosinTxt(arconR())}`:gTxt(arconG());
 /* ---------- el curado (1.29) ----------
-   Cada lote de cogollos lleva el día de la cosecha (b.dia) y lo curado (b.cu, de 0 a 1; sin él, nada). En el arcón, con los tarros de
-   Kiko (S.items.tarros), se cura 1/CURADO.dias al día; curado se vende CURADO.precio más caro (calidad) y ya no pierde THC. Sin curar
-   del todo, pasados CURADO.fresco días desde la cosecha pierde CURADO.pierde de su THC cada día (×(1 − cu)), esté donde esté. El THC
-   no sube al curar. Los lotes de antes de la 1.29 (sin día) no pierden nada. Al juntar dos lotes, el THC, lo curado y el día van por gramos */
-const CURADO={dias:2,fresco:3,pierde:.02,precio:.15};
-const calidad=b=>1+CURADO.precio*(b.cu||0);
-const curaDe=b=>Object.assign({},b.dia!=null?{dia:b.dia}:{},b.cu?{cu:b.cu}:{});
-function juntaLote(t,g,thc,cu,dia){
-  const n=t.g+g,c=((t.cu||0)*t.g+(cu||0)*g)/n;t.thc=(t.thc*t.g+thc*g)/n;
-  if(c)t.cu=c;else delete t.cu;if(dia!=null)t.dia=Math.round(((t.dia??dia)*t.g+dia*g)/n);t.g=n;
+   Cada lote de cogollos lleva el día de la cosecha (b.dia) y lo curado (b.cu, de 0 a 1; sin él, nada). Con los tarros de Kiko
+   (S.items.tarros), en la caja fuerte (1.36: sin arcón) se cura 1/CURADO.dias al día; curado se vende CURADO.precio más caro
+   (calidad) y, desde la 1.36 (lo pidió el usuario), el THC sube CURADO.thc (1 %: el cogollo pierde algo de agua y el % por peso sube; no se crea THC), repartido por lo que se cura; sin curar ya no pierde THC; los extractos se curan en frío en la
+   nevera (S.nevera.rosin), también en los tarros, y el manicurado (la mesa de las tijeras, junto a la de genética) pela los cogollos: b.mc, de 0
+   a 1, MANICURA.precio más caro. Al juntar dos lotes, el THC, lo curado, lo manicurado y el día van por gramos */
+const CURADO={dias:2,precio:.15,thc:.01};   // thc (1.36): curado del todo, un 1 % más de THC por el agua que pierde (no se crea THC)
+const MANICURA={precio:.1,min:.5,max:240};   // por gramo, medio minuto de tijera; la tanda, como mucho 4 h
+const calidad=b=>1+CURADO.precio*(b.cu||0)+MANICURA.precio*(b.mc||0);
+const curaDe=b=>Object.assign({},b.dia!=null?{dia:b.dia}:{},b.cu?{cu:b.cu}:{},b.mc?{mc:b.mc}:{});
+function juntaLote(t,g,thc,cu,dia,mc){
+  const n=t.g+g,c=((t.cu||0)*t.g+(cu||0)*g)/n,m=((t.mc||0)*t.g+(mc||0)*g)/n;t.thc=(t.thc*t.g+thc*g)/n;
+  if(c)t.cu=c;else delete t.cu;if(m)t.mc=m;else delete t.mc;if(dia!=null)t.dia=Math.round(((t.dia??dia)*t.g+dia*g)/n);t.g=n;
 }
-// al amanecer (newDay): lo que se cura en el arcón y lo que pierde THC; av, los avisos del día
+const nevera=()=>S.nevera||(S.nevera={rosin:{}}),neveraR=()=>S.nevera?Object.values(S.nevera.rosin).reduce((a,b)=>a+b.g,0):0;
+const extrNombre=(k,min)=>(min?EXTR[tipoExtr(k)].n.toLowerCase():EXTR[tipoExtr(k)].n)+' de '+lotNombre(baseExtr(k));   // min: «rosin de Skunk #1», en medio de una frase
+// al amanecer (newDay): lo que se cura; av, los avisos del día
 function curadoDia(av){
-  const listos=[],pierden=[];
-  if(S.items.tarros)for(const [k,b] of Object.entries(S.arcon.buds))if((b.cu||0)<1){b.cu=Math.min(1,(b.cu||0)+1/CURADO.dias);if(b.cu>=1)listos.push(lotNombre(k));}
-  for(const L of [S.buds,S.arcon.buds,S.caja?S.caja.buds:{}])for(const [k,b] of Object.entries(L))
-    if(b.dia!=null&&(b.cu||0)<1&&S.day-b.dia>CURADO.fresco){b.thc*=1-CURADO.pierde*(1-(b.cu||0));if(S.day-b.dia===CURADO.fresco+1)pierden.push(lotNombre(k));}
-  for(const w of S.plantilla.filter(w=>w.rol==='calle').concat(S.curro.vend))if(w.dia!=null&&(w.cu||0)<1&&S.day-w.dia>CURADO.fresco)w.thc*=1-CURADO.pierde*(1-(w.cu||0));   // lo que lleva alguien de la plantilla o un vendedor (1.29.1), igual (sin aviso)
-  if(listos.length)av.push('Curada en el arcón: '+yLista(listos));
-  if(pierden.length)av.push('Sin curar, pierde THC: '+yLista(pierden));
+  const cura=L=>{const o=[];for(const [k,b] of Object.entries(L))if((b.cu||0)<1){const c0=b.cu||0;b.cu=Math.min(1,c0+1/CURADO.dias);b.thc=b.thc*(1+CURADO.thc*(b.cu-c0));if(b.cu>=1)o.push(k);}return o;};
+  const c=S.items.tarros&&S.caja?cura(S.caja.buds):[],n=S.items.tarros&&S.nevera?cura(S.nevera.rosin):[];   // 1.36: los dos, con los tarros
+  if(c.length)av.push('Curada en la caja fuerte: '+yLista(c.map(lotNombre)));
+  if(n.length)av.push('Curado en la nevera: '+yLista(n.map(extrNombre)));
 }
-// cómo está un lote, para la mochila: curado, curándose o sin curar ('' en los de antes de la 1.29)
-const curaTxt=b=>b.cu>=1?`Curada: se vende un ${pct0(CURADO.precio)} % más cara y ya no pierde THC.`:b.cu?`Curándose (${pct0(b.cu)} %): termina de curarla en el arcón con los tarros.`
-  :b.dia==null?'':`Sin curar: ${S.day-b.dia>CURADO.fresco?'pierde THC cada día':`desde el día ${b.dia+CURADO.fresco+1} pierde THC`}. Cúrala en el arcón con tarros.`;
-const curaCorto=b=>b.cu>=1?' · curada':b.cu?' · curándose':b.dia!=null?' · sin curar':'';
-async function arconAction(){
-  for(;;){
-    const ops=['Guardar todo','Guardar un lote','Sacar un lote','Cerrar'];
-    const op=ops[await ask(`El arcón: ${arconTxt()}.\nEncima: ${gTxt(pesoEncima())} de ${kgTxt(capMochila())}.`+(S.items.tarros?`\nCon los tarros, los cogollos se curan en ${CURADO.dias} días.`:''),ops)];
-    if(!op||op==='Cerrar')return;
-    if(op==='Guardar todo'){
-      const g=totalBuds(),r=totalRosin();
-      if(g<.5&&r<.1){await say('No llevas nada que guardar.');continue;}
-      for(const k of Object.keys(S.buds))moverLote(S.buds,S.arcon.buds,k,S.buds[k].g);
-      for(const k of Object.keys(S.rosin))moverRosin(S.rosin,S.arcon.rosin,k,S.rosin[k].g);
-      sfx('sel');await say(`Guardas ${r>=.1?`${gTxt(g)} y ${rosinTxt(r)}`:gTxt(g)} en el arcón.`);continue;
-    }
-    const mete=op==='Guardar un lote',B=mete?S.buds:S.arcon.buds,Ro=mete?S.rosin:S.arcon.rosin;
-    const lots=Object.entries(B).map(l=>[l,0]).concat(Object.entries(Ro).map(l=>[l,1]));
-    if(!lots.length){await say(mete?'No llevas nada encima.':'El arcón está vacío.');continue;}
-    if(!mete&&libreMochila()<.1){await say('No te cabe nada más encima.');continue;}
-    const i=await menu(lots.map(([l,r])=>r?rosinItem(l):lotItem(l)).concat([{label:'Nada'}]),{cls:'right',title:mete?'¿Qué guardas?':'¿Qué sacas?'});
-    if(i<0||i>=lots.length)continue;
-    const [[k,b],r]=lots[i],tope=mete?b.g:Math.min(b.g,libreMochila()),max=r?Math.floor(tope*10+1e-9)/10:Math.floor(tope);
-    if(max<(r?.1:1)){await say('No te cabe encima.');continue;}
-    const g=await cuanto(`${r?'Rosin · ':''}${lotNombre(k)}: ¿cuánto?`,max,r?[1,5,10,50]:[10,50,100,500,1000],r?q=>coma(q)+' g':gTxt);if(!g)continue;
-    if(r)moverRosin(Ro,mete?S.arcon.rosin:S.rosin,k,g);else moverLote(B,mete?S.arcon.buds:S.buds,k,g);sfx('sel');
-  }
-}
+// cómo está un lote, para la mochila: curado, curándose o sin curar ('' en los de antes de la 1.29), y manicurado
+const manTxt=b=>b.mc>=1?` Manicurada: un ${pct0(MANICURA.precio)} % más cara.`:b.mc?' Manicurada en parte.':'';
+const curaTxt=b=>((b.cu>=1?`Curada: un ${pct0(CURADO.thc)} % más de THC y se vende un ${pct0(CURADO.precio)} % más cara.`:b.cu?`Curándose (${pct0(b.cu)} %): termina de curarla con los tarros, en la caja fuerte.`
+  :b.dia==null?'':`Sin curar: con tarros, en la caja fuerte, se cura en ${CURADO.dias} días: sube un ${pct0(CURADO.thc)} % de THC y se vende un ${pct0(CURADO.precio)} % más cara.`)+manTxt(b)).trim();
+const curaCorto=b=>(b.cu>=1?' · curada':b.cu?' · curándose':b.dia!=null?' · sin curar':'')+(b.mc>=1?' · manicurada':'');

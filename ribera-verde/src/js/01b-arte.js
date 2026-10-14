@@ -201,7 +201,7 @@ function arteOrilla(m,k,tx,ty,sx,sy){
 const ALZA={iwin:-13,poster:-13,shelfW:-16,bottles:-13,cuadro:-13,cartel:-13,tarros:-16,pizarra:-13,cartelC:-13,tacos:-13,neon:-13,fotoMaite:-10,extrN:-14,extrG:-14,filtroN:-12,ctrlN:-12,fotoK:-13,ojoBuey:-13,timon:-13,red:-13,diana:-13,engranaje:-13,neonH:-13,copas:-16,tuboS:-13,botesW:-16,neonG:-13};   // 1.30: los de los locales; 1.32: la foto de la tía (1.33: de 2 casillas, a -10); 1.33: el equipo de la nave en la pared; 1.34: lo de las paredes de los clubs, del bajo y de los grows
 // los muebles que dejan sombra en el suelo (1.10 P5): como la de los personajes, 1 px a cada lado del dibujo en sus 2 últimas filas y
 // la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo. Van a «sombras» y se pintan con todo el suelo ya puesto
-const SOMBRA_OBJ=new Set(['fridge','crate','table','btable','stool','plantDeco','lab','lab2','pc','display','counter','barcounter','jukebox','bench','bedB','vitrina','mesita','barraD','mesaV','estanteN','secadero','altavoz']);
+const SOMBRA_OBJ=new Set(['fridge','crate','table','btable','stool','plantDeco','lab','lab2','pc','display','counter','barcounter','jukebox','bench','bedB','vitrina','mesita','barraD','mesaV','estanteN','secadero','altavoz','trim','prensaM','tamizM','mallas','lavadora','staticM']);
 function arteObj(o,tx,ty,cam,now,list,sombras){
   if(!ARTE.ok)return false;
   if(SEGUNDA.has(o)||o==='sillaG2'||LOCAL2.has(o))return !!ARTE.cubre['obj:'+o.slice(0,-1)];   // la mitad de la derecha de un mueble del salón (y de los locales, 1.30): la pinta la de la izquierda

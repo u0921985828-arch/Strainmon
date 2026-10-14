@@ -8,10 +8,10 @@ const P={x:0,y:0,px:0,py:0,dir:'down',moving:false,fx:0,fy:0,t:0,dur:240,parity:
 const DV={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]},OPP={up:'down',down:'up',left:'right',right:'left'};
 const CH_TITLES={1:'La herencia',2:'La calle',3:'La deuda',4:'Genética',5:'El sargento',6:'La Copa de Ribera',7:'Libertad',8:'Tu imperio'};
 function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,min:8*60,money:150,hp:30,hpMax:30,heat:0,rep:0,ch:0,flags:{diario:0,vendDia:1},sales:0,
-  seeds:{},buds:{},rosin:{},items:Object.assign({fert:0,fertv:0,phm:0,ofert:0,ofertv:0,ophm:0,medidor:0,insect:0,spray:0,bocata:1,prensa:0,tamiz:0,ice:0,bolsa:0,analizador:0,tarros:0},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
+  seeds:{},buds:{},rosin:{},items:Object.assign({fert:0,fertv:0,phm:0,ofert:0,ofertv:0,ophm:0,medidor:0,insect:0,spray:0,bocata:1,prensa:0,tamiz:0,ice:0,lavadora:0,estatica:0,mallas00:0,bolsa:0,analizador:0,tarros:0},...Object.keys(MACETAS).map(k=>({['m_'+k]:0})),...Object.keys(FOCOS).map(k=>({['f_'+k]:0})),...Object.keys(EXTRAS).map(k=>({['x_'+k]:0}))),
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},gen:{},pedido:[],esquejes:[],bandejas:[],fenos:{},fenoN:0,fnom:{},eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
-  caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0,arcon:{buds:{},rosin:{}},sala:{},fijos:[],sms:[],envio:[],orden:0,misiones:{},itin:{},lonja:0,trueque:0,chatarra:null,
+  caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0,sala:{},fijos:[],sms:[],envio:[],orden:0,misiones:{},itin:{},lonja:0,trueque:0,chatarra:null,
   rel:{},relDia:{},curro:{jard:null,vend:[]},clubs:{},clubDia:{},clubCompra:{},clubEnc:null,clubEncDia:0,clubReg:{},catas:{},rivales:{},rivalFuera:{},deco:{},pelea:{xp:0,fue:0,ref:0},plantilla:[],plN:0,nave:null,setas:null,ropa:{},obra:{},logros:{},
   billar:{},porro:{},noche:null,vipN:0,aso:{v:0,d:0,tio:false,asam:0,otra:0,pres:false,votos:0,lote:null},
   banco:CUENTA.inicial,mov:[],saca:null,ingr:null,loc:{}};}   // 1.35: la cuenta, sus movimientos y los locales (11k-banco)   // la gente (1.15, 11e-gente); los locales (1.30) y la asociación (1.32, 11j-locales)
@@ -31,18 +31,18 @@ function discover(sid){if(!S.disc[sid]){S.disc[sid]=true;toast(`<small>NUEVA EN 
 function addSeeds(sid,n){S.seeds[sid]=(S.seeds[sid]||0)+n;discover(sid);}
 // cogollos por lotes: clave = variedad, o variedad + '*' para lo de un fenotipo estrella (se vende y se presenta aparte)
 const lotSid=k=>k.replace(/~.*$/,'').replace(/\*$/,''),lotNombre=k=>getStrain(lotSid(k)).n+(k.includes('*')?' ★':'');   // 1.35: «~tipo», las extracciones
-function addBuds(k,g,thc,L=S.buds,cu=0,dia=S.day){const b=L[k];if(b){juntaLote(b,g,thc,cu,dia);delete b.cata;delete b.ana;}else{L[k]=Object.assign({g,thc},dia!=null?{dia}:{});if(cu)L[k].cu=cu;}discover(lotSid(k));}   // L: otro sitio (el arcón); cu y dia: el curado y el día de la cosecha (1.29, 09c-sala; sin dar dia, hoy; dia null, sin día, como los de antes)
+function addBuds(k,g,thc,L=S.buds,cu=0,dia=S.day,mc=0){const b=L[k];if(b){juntaLote(b,g,thc,cu,dia,mc);delete b.cata;delete b.ana;}else{L[k]=Object.assign({g,thc},dia!=null?{dia}:{});if(cu)L[k].cu=cu;if(mc)L[k].mc=mc;}discover(lotSid(k));}   // L: otro sitio (el arcón); cu y dia: el curado y el día de la cosecha (1.29, 09c-sala; sin dar dia, hoy; dia null, sin día, como los de antes)
 function useBuds(k,g){const b=S.buds[k];b.g-=g;if(b.g<.5)delete S.buds[k];}
 function budLots(min,minThc=0){return Object.entries(S.buds).filter(([k,b])=>b.g>=min&&b.thc>=minThc);}
 // rosin (1.10): lo que sale de prensar cogollos en la mesa (prensar, 09-cultivo), por lotes como ellos y al décimo de gramo
 const totalRosin=()=>Object.values(S.rosin).reduce((a,b)=>a+b.g,0);
-function addRosin(k,g,thc){const b=S.rosin[k];if(b){b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g=Math.round((b.g+g)*10)/10;}else S.rosin[k]={g,thc};}
+function addRosin(k,g,thc){const b=S.rosin[k];if(b){if(b.cu){b.cu=b.cu*b.g/(b.g+g);if(!b.cu)delete b.cu;}b.thc=(b.thc*b.g+thc*g)/(b.g+g);b.g=Math.round((b.g+g)*10)/10;}else S.rosin[k]={g,thc};}
 function useRosin(k,g){const b=S.rosin[k];b.g=Math.round((b.g-g)*10)/10;if(b.g<.1)delete S.rosin[k];}
 const rosinTxt=r=>coma(Math.round(r*10)/10)+' g de rosin';
 // lo que llevas encima en gramos de flor: el rosin, como la flor de la que sale (1 g ↔ 1 / ROSIN.rend = 5 g). Ladrones y Darko
 const gramosFlor=()=>totalBuds()+totalRosin()/ROSIN.rend;
 function rosinLots(min){return Object.entries(S.rosin).filter(([k,b])=>b.g>=min);}
-const rosinItem=([k,b])=>({label:EXTR[tipoExtr(k)].n+' · '+lotNombre(k),right:`${coma(b.g)} g · ${pct(b.thc)}%`,sw:'#d89a18',ic:iconoCogollo(lotSid(k))});
+const rosinItem=([k,b])=>({label:EXTR[tipoExtr(k)].n+' · '+lotNombre(k)+(b.cu>=1?' · curado':''),right:`${coma(b.g)} g · ${pct(b.thc)}%`,sw:'#d89a18',ic:iconoCogollo(lotSid(k))});
 const lotItem=([k,b])=>({label:lotNombre(k),right:`${Math.floor(b.g)} g · ${pct(b.thc)}%`,sw:getStrain(lotSid(k)).c,ic:iconoCogollo(lotSid(k))});
 async function got(t){sfx('get');await say(`Consigues ${t}.`);}
 
@@ -101,6 +101,8 @@ const ITEMS=[
   {id:'h_lamb',map:'puerto',x:37,y:6,hidden:1,give:()=>semillasTia('lamb','Una lata de tabaco oxidada con una etiqueta a boli: «Jamaica». Es la letra de la tía Maite.')},
   {id:'h_kerala',map:'mendialde',x:42,y:11,hidden:1,give:()=>semillasTia('kerala','Un bote de carrete envuelto en plástico: «Kerala, India». Es la letra de la tía Maite.')},
   {id:'h_manga',map:'errotabarri',x:28,y:10,hidden:1,give:()=>semillasTia('mangarosa','Un sobre en una bolsa de congelar: «Manga Rosa · Brasil». Es la letra de la tía Maite.')},
+  // 1.36 (lo pidió el usuario): las mallas 00, escondidas en un arbusto de Mendialde: dry sift sin comprar los tamices, y más fino
+  {id:'h_mallas',map:'mendialde',x:24,y:14,hidden:1,give:async()=>{S.items.mallas00=1;await got('unas MALLAS 00 (DOBLE CERO)');return say('Una bolsa de tela con un bastidor y una malla finísima: «00». Con esto se tamiza en seco lo más fino, solo las cabezas de resina.');}},
   {id:'h_hawai',map:'ensanche',x:16,y:14,hidden:1,give:()=>semillasTia('hawai','Un tubo de pastillas con semillas dentro: «Hawái». Es la letra de la tía Maite.')},
 ];
 const itemAt=(x,y)=>ITEMS.find(it=>!it.hidden&&it.map===S.map&&it.x===x&&it.y===y&&!S.taken[it.id]);
@@ -204,10 +206,10 @@ async function objectAction(x,y){
     if(o==='bedT'||o==='bedB')return bedAction();
     if(o==='pc')return pcAction();
     if(o==='lab'||o==='lab2')return labAction();
+    if(o==='trim')return manicuraAction();if(MUEBLE_EXTR[o])return muebleExtr(o);   // 1.36
     if(o==='table')return letterAction();
-    if(o==='fridge'){if(S.flags.nevera)return say('La nevera: medio limón, leche y un táper de alubias que dejó la tía.');   // 1.25: el bote de la tía
+    if(o==='fridge'){if(S.flags.nevera)return extrAlgo()||neveraR()>0||totalRosin()>0?neveraAction():say('La nevera: medio limón, leche y un táper de alubias que dejó la tía.');   // 1.36: los extractos, en frío   // 1.25: el bote de la tía
       S.flags.nevera=S.day;await say('Detrás del táper de alubias hay un bote de cristal con una etiqueta: «Choco Thai. NO TOCAR».');return semillasTia('choco','El frío las ha conservado: siguen buenas.',3);}
-    if(o==='crate')return arconAction();
     if(muebleDe(o))return muebleAction(muebleDe(o));
     {const k=Object.keys(MUEBLES).find(k=>(x===MUEBLES[k].x||!MUEBLES[k].uno&&x===MUEBLES[k].x+1)&&y===MUEBLES[k].y&&!(MUEBLES[k].suelo&&mueblesYa().includes(k)));   // el sitio vacío de un mueble del salón (la alfombra puesta no es un objeto: nada)
       if(k&&(!MUEBLES[k].grow||S.muebles&&S.muebles[k]))return say(S.muebles&&S.muebles[k]?`Aquí va ${MUEBLES[k].art}: llega mañana.`:`Aquí iría bien ${MUEBLES[k].art}. Se compra por internet: en el ordenador de la tía o con el móvil.`);}
