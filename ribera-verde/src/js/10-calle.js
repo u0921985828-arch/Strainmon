@@ -46,7 +46,7 @@ async function talkClient(c){
   const pr=[Math.round(base*.85),Math.round(base),Math.round(base*1.3)];
   const j=await ask(`${c.want} g de ${ext?'rosin de ':''}${lotNombre(sid)}. ¿Cuánto le pides?`,[`Rebaja · ${pr[0]} €`,`Justo · ${pr[1]} €`,`Caro · ${pr[2]} €`,'Cancelar']);
   if(j===3)return say('Entonces me voy.',N);
-  let acc=[1,.92,clamp(.3+(b.thc-(ext?50:c.minThc||14))*.05+(c.type==='pij'?.25:0)+(c.type==='tur'?.15:0),.1,.9)][j];
+  let acc=[1,.92,clamp(.3+(b.thc-(ext?50:c.minThc||14))*.05+(c.type==='pij'?.25:0)+(c.type==='tur'?.15:0)+(c.type==='vip'?.3:0),.1,.9)][j];
   if(j>0)acc=Math.min(.97,acc+(c.fid?rel(c.fid)/250:0)+(b.cata?.05:0)+(b.ana?.1:0));   // 1.15: la confianza de los de la agenda, la cata y el análisis
   if(Math.random()<acc){
     if(c.fid)confia(c.fid,[3,2,1][j]);

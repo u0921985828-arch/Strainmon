@@ -64,8 +64,9 @@ async function contratarVendedor(f){
   await say(`${f.n}: «Hecho. Cada día te dejo lo vendido en el buzón».`);return false;
 }
 // MÓVIL → GENTE: a quién conoces y cuánto se fía de ti
-const GENTE={kiko:'Kiko',julen:'Julen',josune:'Josune',begona:'Begoña',patxi:'Patxi',txaro:'Txaro',inaki:'Iñaki',ane:'Ane',nerea:'Nerea',bixente:'Bixente',andoni:'Andoni',baltasar:'Don Baltasar',molina:'Sgto. Molina',darko:'Darko'};
-const QUE_DA={kiko:`Con ${REL.amigo}: un 5 % menos en el growshop. Cada compra suma.`,inaki:`Con ${REL.amigo}: un 5 % más al por mayor. Cada venta suma.`,begona:`Con ${REL.amigo} (desde el cap. ${CURRO.jard.ch}): te cuida las plantas por ${CURRO.jard.sueldo} € al día.`,txaro:'Sus semillas, por sus favores.',julen:'El hijo de Kiko: te ayuda con la primera cosecha. Después, consejos en el growshop.'};
+const GENTE={kiko:'Kiko',julen:'Julen',josune:'Josune',begona:'Begoña',patxi:'Patxi',txaro:'Txaro',inaki:'Iñaki',ane:'Ane',nerea:'Nerea',bixente:'Bixente',andoni:'Andoni',baltasar:'Don Baltasar',molina:'Sgto. Molina',darko:'Darko',gaua:'GAUA'};
+const QUE_DA={kiko:`Con ${REL.amigo}: un 5 % menos en el growshop. Cada compra suma.`,inaki:`Con ${REL.amigo}: un 5 % más al por mayor. Cada venta suma.`,begona:`Con ${REL.amigo} (desde el cap. ${CURRO.jard.ch}): te cuida las plantas por ${CURRO.jard.sueldo} € al día.`,txaro:'Sus semillas, por sus favores.',julen:'El hijo de Kiko: te ayuda con la primera cosecha. Después, consejos en el growshop.',
+  gaua:'La discoteca del Ensanche: las rondas, el baile y el reservado suman. En el reservado, la RRPP presenta clientes VIP.'};
 async function gente(){
   const rows=[];
   for(const [id,n] of Object.entries(GENTE))if(S.rel[id]!=null)rows.push({label:n,right:`${rel(id)} · ${id==='begona'&&S.curro.jard?'jardinera':relNivel(id)}`,desc:QUE_DA[id]||'Hablar cada día suma confianza.'});
@@ -95,20 +96,24 @@ async function talkBegona(){
 }
 // Clubs cannábicos (CLUBS): uno en Puerto Viejo y otro en Valdehierro (cap. 3) y dos en Ibarbide (cap. 4). Con el carné (la cuota, una
 // vez): vender un lote al día (de 50 a 200 g, entre lo de Iñaki y la calle, calor +1), comprar 10 g de la variedad del día (entra en
-// la Genoteca) y encargos de semillas (10 de una variedad, en 7 días; las de receta pagan más). Un encargo a la vez
-const CLUBS={puerto:{n:'CLUB ITSASO',map:'puerto',x:10,y:8,ch:3,cuota:30,sid:['limon','cheese']},valde:{n:'CLUB LA FUNDICIÓN',map:'valdehierro',x:12,y:8,ch:3,cuota:30,sid:['txoko','mango']},
-  ibar:{n:'CLUB KALEA',map:'ibarbide',x:6,y:18,ch:4,cuota:50,sid:['kali','chemdawg']},ens:{n:'CLUB ENSANCHE',map:'ensanche',x:12,y:9,ch:4,cuota:50,sid:['niebla','calorange']}};
+// la Genoteca) y encargos de semillas (10 de una variedad, en 7 días; las de receta pagan más). Un encargo a la vez.
+// 1.30: se entra (el local, 'club-' + k, en 11j-locales); x, y: delante de la puerta, a la que se sale (y en x + 1, si es ancha)
+const CLUBS={puerto:{n:'CLUB ITSASO',map:'puerto',x:9,y:8,ancha:1,ch:3,cuota:30,sid:['limon','cheese']},valde:{n:'CLUB LA FUNDICIÓN',map:'valdehierro',x:32,y:8,ancha:1,ch:3,cuota:30,sid:['txoko','mango']},
+  ibar:{n:'CLUB KALEA',map:'ibarbide',x:9,y:18,ch:4,cuota:50,sid:['kali','chemdawg']},ens:{n:'CLUB ENSANCHE',map:'ensanche',x:12,y:9,ch:4,cuota:50,sid:['niebla','calorange']}};
 const CLUB={g:[50,100,200],compra:10,compraF:1.2,calor:1,enc:{n:10,dias:7,f:1.2,receta:80}};
 const precioClub=thc=>3+thc*.15;
-// el encargado de cada club, en la puerta, desde su capítulo
-Object.keys(CLUBS).forEach((k,i)=>{const C=CLUBS[k];NPCDEF.push({id:'club_'+k,map:C.map,x:C.x,y:C.y,dir:'down',look:i%2?'portera':'portero',cond:()=>S.ch>=C.ch,talk:()=>talkClub(k)});});
-async function talkClub(k){
+// el encargado de cada club, desde su capítulo; 1.30: dentro, detrás de la vitrina del dispensario
+Object.keys(CLUBS).forEach((k,i)=>{const C=CLUBS[k];NPCDEF.push({id:'club_'+k,map:'club-'+k,x:1,y:2,dir:'down',look:i%2?'portera':'portero',cond:()=>S.ch>=C.ch,talk:()=>talkClub(k)});});
+// el carné (la cuota, una vez); 1.30: también en la puerta, la primera vez que entras (entraLocal, 11j-locales). true si eres socio
+async function carneClub(k){
   const C=CLUBS[k],N=C.n;
-  if(!S.clubs[k]){
-    if(await ask(`${C.n}, asociación de consumidores. Dentro no se vende nada: lo tuyo entra por la puerta de atrás. La cuota son ${eur(C.cuota)}. ¿Te haces socio?`,['Hacerme socio','No'],N)!==0)return;
-    if(S.money<C.cuota){sfx('bad');return say('Sin la cuota no hay carné.',N);}
-    S.money-=C.cuota;S.clubs[k]=true;S.rep+=1;confia(k,2);sfx('coin');await got('el carné de '+C.n);
-  }
+  if(await ask(`${C.n}, asociación de consumidores. Dentro no se vende nada: lo tuyo entra por la puerta de atrás. La cuota son ${eur(C.cuota)}. ¿Te haces socio?`,['Hacerme socio','No'],N)!==0)return false;
+  if(S.money<C.cuota){sfx('bad');await say('Sin la cuota no hay carné.',N);return false;}
+  S.money-=C.cuota;S.clubs[k]=true;S.rep+=1;confia(k,2);sfx('coin');await got('el carné de '+C.n);return true;
+}
+async function talkClub(k){
+  const N=CLUBS[k].n;
+  if(!S.clubs[k]&&!await carneClub(k))return;
   const E=S.clubEnc,c=await ask('¿Qué te trae?',['Vender al club',`Comprar ${CLUB.compra} g`,E&&E.k===k?'Entregar las semillas':'Encargo de semillas','Nada'],N);
   if(c===0)return venderClub(k);if(c===1)return comprarClub(k);if(c===2)return encargoClub(k);
 }

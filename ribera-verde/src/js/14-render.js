@@ -63,6 +63,25 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
         const g=ctx.createRadialGradient(x,y+8,1,x,y+8,28);g.addColorStop(0,`rgba(255,214,120,${a*.7})`);g.addColorStop(1,'rgba(255,214,120,0)');ctx.fillStyle=g;ctx.fillRect(x-30,y-22,60,60);}
         ctx.globalCompositeOperation='source-over';}}
   }
+  if(!camFija){luzLocal(cam,now);if(TIRO)pintaTiro(now);}   // los locales (1.30, 11j-locales)
+}
+// la luz de los locales (LUZ_CLUB, LUZ_DISCO): el fondo, encima de todo, y cada luz, un degradado radial (r 1 → r) sumado ('lighter');
+// los focos de GAUA dan una vuelta a la pista cada 7 s (0,9 rad/s), cada uno desde su fase
+function luzLocal(cam,now){
+  const L=S.map.startsWith('club-')?LUZ_CLUB:S.map==='disco'?LUZ_DISCO:null;if(!L)return;
+  ctx.fillStyle=L.fondo;ctx.fillRect(0,0,SW,SH);ctx.globalCompositeOperation='lighter';
+  const luz=(x,y,r,c,a)=>{const g=ctx.createRadialGradient(x,y,1,x,y,r);g.addColorStop(0,`rgba(${c},${a})`);g.addColorStop(1,`rgba(${c},0)`);ctx.fillStyle=g;ctx.fillRect(x-r,y-r,2*r,2*r);};
+  for(const [x,y,r,c,a] of L.l||[])luz(x-cam.x,y-cam.y,r,c,a);
+  for(const [c,f] of L.focos||[]){const t=now/1000*.9+f;luz(Math.round(L.c[0]+Math.cos(t)*L.r[0])-cam.x,Math.round(L.c[1]+Math.sin(t)*L.r[1])-cam.y,L.R,c,.5);}
+  ctx.globalCompositeOperation='source-over';
+}
+// la barra del billar (1.30): la fuerza del tiro, que va y viene; en el verde, la bola dentro, y en el amarillo, la rozas
+function pintaTiro(now){
+  const L=BILLAR,w=120,x0=(SW-w)>>1,y0=36,p=fuerzaTiro(now-TIRO.t0);
+  ctx.fillStyle='#26262e';ctx.fillRect(x0-2,y0-2,w+4,12);ctx.fillStyle='#3a3446';ctx.fillRect(x0,y0,w,8);
+  ctx.fillStyle='#e0b84a';ctx.fillRect(x0+Math.round((L.centro-L.amarillo)*w),y0,Math.round(2*L.amarillo*w),8);
+  ctx.fillStyle='#58d080';ctx.fillRect(x0+Math.round((L.centro-L.verde)*w),y0,Math.round(2*L.verde*w),8);
+  ctx.fillStyle='#ffffff';ctx.fillRect(x0+Math.round(p*(w-2)),y0-1,2,10);
 }
 // lo oscura que está la noche (0 de día, .5 de 21 a 5, en rampa de 19 a 21 y de 5 a 7)
 function nocheA(){const h=S.min/60;return h>=21||h<5?.5:h>=19?(h-19)/2*.5:h<7?(7-h)/2*.5:0;}

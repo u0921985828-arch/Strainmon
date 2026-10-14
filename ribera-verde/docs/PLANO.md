@@ -7,7 +7,8 @@ personajes), medido contra su tamaño real. En la 1.7.0 sirvió para decidir la 
 
 - Imágenes: `docs/plano/town.png`, `home.png`, `shop.png`, `bar.png` y, desde la 1.10, `alto.png`, `astilleros.png`,
   `txaro.png`, `comisaria.png`, `almacen.png`, `mendialde.png`, `casa-ama.png`, `puerto.png`, `valdehierro.png` y
-  `errotabarri.png` (rejilla, coordenadas y rótulos),
+  `errotabarri.png`, desde la 1.14, `ibarbide.png`, `ensanche.png`, `growcity.png` y `callejon.png`, y desde la 1.30, los locales
+  por dentro: `club-puerto.png` (los cuatro clubs son iguales por dentro), `nave.png` y `disco.png` (rejilla, coordenadas y rótulos),
   `docs/plano/escala.png` (todos los sprites junto al jugador sobre la misma línea de suelo) y
   `docs/plano/vista-b.png` (las 5 carpas abiertas de la vista B) y, desde la 1.10, `docs/plano/vista-c.png` (las mismas por
   dentro: la vista C, la que se ve con el atlas).

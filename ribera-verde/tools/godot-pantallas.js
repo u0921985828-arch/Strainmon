@@ -23,7 +23,7 @@ const pl = (sid, prog, o = {}) => Object.assign({ sid, prog, water: 70, health: 
 const T = 123456;   // el instante de las escenas (ms)
 // cada escena: k, sw, mode, now, seed (azar de los clientes), S (encima de newState()), carpas/macetas/pots, map + P (enterMap y
 // luego lo demás de P), clientes (spawnClients), ents ({id: campos}), SOSP (encima de la de enterMap), vfx ([id, x, y, hace ms, capa,
-// sube]), B, VC
+// sube]), B, VC, TIRO (la barra del billar: hace cuántos ms empezó)
 const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
   // el piso: carpa 100 del atlas con plantas (luz bajo la puerta), carpa 120 procedural vacía, sitio libre de 2 casillas y la carta
   { k: 'casa-a', sw: 240, mode: 'world', now: T, S: { ch: 2, flags: {} }, carpas: [{ t: 'm100', foco: 'sodio400' }, { t: 'm120', foco: 'cfl' }],
@@ -103,6 +103,18 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
   { k: 'callejon', sw: 320, mode: 'world', now: T + 444, seed: 77, S: { ch: 5, min: 21 * 60 + 30, day: 6, rep: 30, flags: {} }, clientes: true, map: 'callejon',
     P: { x: 11, y: 12, dir: 'up' } },
   { k: 'growcity', sw: 240, mode: 'world', now: T + 150, S: { ch: 4, flags: { ane: true } }, map: 'growcity', P: { x: 4, y: 5, dir: 'up' } },
+  // los locales (1.30): el club de Puerto Viejo por dentro (vitrina, sofás, billar bajo la lámpara y su penumbra), la nave con sus
+  // mesas en cada fase y dos trabajadores, y GAUA de noche con los focos de colores girando sobre la pista
+  { k: 'club', sw: 320, mode: 'world', now: T + 2400, S: { ch: 4, clubs: { puerto: true }, flags: {} }, map: 'club-puerto', P: { x: 9, y: 5, dir: 'up' }, TIRO: 500 },
+  { k: 'nave', sw: 280, mode: 'world', now: T + 610, S: { ch: 6, day: 20, flags: {},
+    plantilla: [{ id: 'pl1', n: 'Iker', lab: 3, cui: 4, lea: 3, rol: 'nave' }, { id: 'pl2', n: 'Ane', lab: 2, cui: 3, lea: 5, rol: 'nave' }],
+    nave: { ab: { m: 2, o: 0 }, m: [{ k: 'ria', f: { id: 1, t: 1, y: 1, i: null }, thc: 18, y: 1, dia: 20, g: 0, t: 0, abo: 0 },
+      { k: 'limon', f: { id: 2, t: 1, y: 1, i: null }, thc: 17, y: 1, dia: 18, g: 0, t: 0, abo: 1 },
+      { k: 'ria', f: { id: 3, t: 1, y: 1, i: null }, thc: 18, y: 1, dia: 16, g: 0, t: 0, abo: 0 },
+      { k: 'limon', f: { id: 4, t: 1, y: 1, i: null }, thc: 17, y: 1, dia: 10, g: 12.5, t: 17, abo: 1 }] } },
+    map: 'nave', P: { x: 6, y: 6, dir: 'up' } },
+  { k: 'disco', sw: 400, mode: 'world', now: T + 1800, S: { ch: 5, min: 23 * 60 + 40, day: 6, noche: { id: 6, copas: 0, ronda: 0, baile: 0, mesa: 0 }, flags: {} },
+    map: 'disco', P: { x: 6, y: 6, dir: 'up' } },
   // la vista C con todo (1.10, antes en la vista B): carpa de 150 con extras (goteo con el depósito a 400 de 975 L en la mirilla,
   // sus ramales, llaves y microtubos; filtro y ventilador), macetas de todo tipo, fases, plaga, seca y muerta; elegida una plaza de
   // atrás (la fila de delante en transparencia)
@@ -188,8 +200,9 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
       for (const [id, x, y, hace, capa, sube] of e.vfx || []) lanzarVfx(id, x, y, e.now - hace, capa, sube);
       if (e.B) { B = copia(e.B);B.look = /^th/.test(e.B.look) ? randLook(e.B.look, 'thief') : LOOKS[e.B.look]; }
       if (e.VC) VC = Object.assign({ ocupado: false }, e.VC);
+      TIRO = e.TIRO == null ? null : { t0: e.now - e.TIRO };
       mode = e.mode;
-      const st = copia({ k: e.k, sw: SW, mode, now: e.now, S, P, B, VC, vfx: ARTE.vfx,
+      const st = copia({ k: e.k, sw: SW, mode, now: e.now, S, P, B, VC, TIRO, vfx: ARTE.vfx,
         ents: ents.map(x => Object.assign({ id: x.id, x: x.x, y: x.y, px: x.px, py: x.py, dir: x.dir, moving: x.moving, t: x.t, fx: x.fx, fy: x.fy, act: x.act || null },
           x.pat ? { caza: x.caza, dur: x.dur } : {})), SOSP });
       render(e.now);

@@ -19,7 +19,7 @@ function prompt(t){dlg.hidden=false;dlgName.hidden=true;dlgMore.hidden=true;dlgT
 async function battle(kind){
   lock++;let res=null;
   try{
-    music('battle');sfx('enc');
+    music(MUS_COMBATE[kind]||'battle');sfx('enc');
     fadeEl.style.transition='none';fadeEl.classList.add('white');
     for(let i=0;i<3;i++){fadeEl.style.opacity=.85;await wait(70);fadeEl.style.opacity=0;await wait(70);}
     fadeEl.style.transition='';fadeEl.classList.remove('white');

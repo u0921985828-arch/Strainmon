@@ -4,7 +4,8 @@
 
 Leyenda: `.` suelo/hierba · `*` flores · `"` hierba alta (ladrones ×3, a cualquier hora) · `:` tierra · `-` acera · `=` carretera · `%` carretera rota (baches y parches) · `_` hormigón · `,` pista de tierra · `+` plaza · `~` agua · `H` puente · `#` muelle
 `^` tejado · `█` pared/ventana · `D` puerta · `T` árbol · `Y` manzano · `b` arbusto · `$` arbusto con objeto oculto · `i` objeto en el suelo · `f` valla · `S` cartel · `L` farola · `n` banco · `O` fuente · `c` cajas · `@` personaje · `M` monte (el bosque de los lindes) · `h` seto · `A` parada del autobús
-Interiores: `B` cama · `P` ordenador · `r` silla (la de la tía y la gaming, con el PC gaming) · `G` mesa de genética · `t` mesa · `F` nevera · `K` carpa (mueble: el armario de 60 u 80 en x 8, la carpa de 100 o 150 en x 10-11 y la de 120 en x 2-3; sus plazas se ven por dentro, en la vista de carpa) · `C` mostrador · `s` estantería · `d` expositor · `x` taburete · `J` gramola · `v` ventana/póster · `m` felpudo (salida)
+Interiores: `B` cama · `P` ordenador · `r` silla (la de la tía y la gaming, con el PC gaming) · `G` mesa de genética · `t` mesa · `F` nevera · `K` carpa (mueble: el armario de 60 u 80 en x 8, la carpa de 100 o 150 en x 10-11 y la de 120 en x 2-3; sus plazas se ven por dentro, en la vista de carpa) · `C` mostrador · `s` estantería · `d` expositor · `x` taburete · `J` gramola · `v` ventana/póster/pizarra/neón · `m` felpudo (salida)
+Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z` secadero · `a` altavoz · `|` cordón del reservado · `:` pista de baile
 
 ## Barrio (exterior) — 40 × 30
 
@@ -210,8 +211,8 @@ Interiores: `B` cama · `P` ordenador · `r` silla (la de la tía y la gaming, c
  4  M████^^^█████████████████^^^█████████.TM
  5  M████████████████████████████████████.MM
  6  M████████████████████████████████████$MM
- 7  M████████████████████████████████████.MM
- 8  M---------@----------------------------M
+ 7  M████████DD██████████████████████████.MM
+ 8  M--------------------------------------M
  9  M.S++L+++++++++L+++A+++++++L+++++++L++MM
 10  M.++++++++++++++++++++++++++++++++++++MM
 11  M.++++++++++++@+++++++++++++++++++++++MM
@@ -229,6 +230,9 @@ Interiores: `B` cama · `P` ordenador · `r` silla (la de la tía y la gaming, c
 23  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
 
+- puerta (9,7) → club-puerto (5,6)
+- puerta (10,7) → club-puerto (6,6)
+
 ## Valdehierro (ciudad pequeña, del hierro) — 40 × 24
 
 ```
@@ -241,8 +245,8 @@ Interiores: `B` cama · `P` ordenador · `r` silla (la de la tía y la gaming, c
  4  M-███████-██████:::███████---████████--M
  5  M-███████-██████:c:███████---████████--M
  6  M-███████-██████:::███████---████████--M
- 7  M-███████-██████c@:███████---████████--M
- 8  M-S------L--@-----L---------L----------M
+ 7  M-███████-██DD██c@:███████---███DD███--M
+ 8  M-S------L--------L---------L----------M
  9  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 10  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 11  M-----L-------A---------L--------------M
@@ -259,6 +263,11 @@ Interiores: `B` cama · `P` ordenador · `r` silla (la de la tía y la gaming, c
 22  M....T....T...T...--fffffffffffffffffffM
 23  MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
 ```
+
+- puerta (12,7) → nave (6,6)
+- puerta (13,7) → nave (7,6)
+- puerta (32,7) → club-valde (5,6)
+- puerta (33,7) → club-valde (6,6)
 
 ## Errotabarri (pueblo del molino) — 36 × 24
 
@@ -313,8 +322,8 @@ Interiores: `B` cama · `P` ordenador · `r` silla (la de la tía y la gaming, c
 14  M█████████^^^+++++++.O.++++++++^^^█████████M
 15  M████████████+++++++*.*++++++++████████████M
 16  M████████████++++++++++++++++++████████████M
-17  M████████████++++n+++++++n+++++████████████M
-18  M+++++@+++++++..b.++++++++.b..+++++++++++++M
+17  M████████D███++++n+++++++n+++++████████████M
+18  M+++++++++++++..b.++++++++.b..+++++++++++++M
 19  M+++++++++++S+L*.*++++++++*.*L+++++++++++++M
 20  M---L----A----------L---------------L----S-M
 21  M==========================================+
@@ -332,6 +341,7 @@ Interiores: `B` cama · `P` ordenador · `r` silla (la de la tía y la gaming, c
 - puerta (16,7) → growcity (5,6)
 - puerta (19,0) → callejon (10,16)
 - puerta (20,0) → callejon (11,16)
+- puerta (9,17) → club-ibar (5,6)
 - puerta (43,21) → ensanche (1,10)
 - puerta (43,22) → ensanche (1,11)
 
@@ -348,8 +358,8 @@ Interiores: `B` cama · `P` ordenador · `r` silla (la de la tía y la gaming, c
  5  M████████-████████-████████-████████-████████M
  6  M████████-████████-████████-████████-████████M
  7  M████████-████████-████████-████████-████████M
- 8  M████████b████████b████████b████████b████████M
- 9  M----L------@-L--------L--------L--------L---M
+ 8  M████████b██D█████b████████b████████b█DD█████M
+ 9  M----L--------L--------L--------L-------@L---M
 10  =============================================M
 11  =============================================M
 12  M-S--------L---------------------L-----------M
@@ -364,6 +374,9 @@ Interiores: `B` cama · `P` ordenador · `r` silla (la de la tía y la gaming, c
 21  MhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhM
 ```
 
+- puerta (12,8) → club-ens (5,6)
+- puerta (38,8) → disco (6,6)
+- puerta (39,8) → disco (7,6)
 - puerta (0,10) → ibarbide (42,21)
 - puerta (0,11) → ibarbide (42,22)
 
@@ -515,6 +528,114 @@ Interiores: `B` cama · `P` ordenador · `r` silla (la de la tía y la gaming, c
 
 - salida (4,7) pulsando abajo → astilleros (18,14)
 
+## Club Itsaso (Puerto Viejo, asociación cannábica: dispensario, sofás y billar) — 12 × 8
+
+```
+    0         1 
+    012345678901
+ 0  ████████████
+ 1  svs█v██v██v█
+ 2  .@.p.oo....J
+ 3  CCC..tt@....
+ 4  .....oo.XX@.
+ 5  ............
+ 6  p..........p
+ 7  .....mm.....
+```
+
+- salida (5,7) pulsando abajo → puerto (9,8)
+- salida (6,7) pulsando abajo → puerto (10,8)
+
+## Club La Fundición (Valdehierro) — 12 × 8
+
+```
+    0         1 
+    012345678901
+ 0  ████████████
+ 1  svs█v██v██v█
+ 2  .@.p.oo....J
+ 3  CCC..tt@....
+ 4  .....oo.XX@.
+ 5  ............
+ 6  p..........p
+ 7  .....mm.....
+```
+
+- salida (5,7) pulsando abajo → valdehierro (32,8)
+- salida (6,7) pulsando abajo → valdehierro (33,8)
+
+## Club Kalea (Ibarbide, Casco Viejo) — 12 × 8
+
+```
+    0         1 
+    012345678901
+ 0  ████████████
+ 1  svs█v██v██v█
+ 2  .@.p.oo....J
+ 3  CCC..tt@....
+ 4  .....oo.XX@.
+ 5  ............
+ 6  p..........p
+ 7  .....mm.....
+```
+
+- salida (5,7) pulsando abajo → ibarbide (9,18)
+- salida (6,7) pulsando abajo → ibarbide (9,18)
+
+## Club Ensanche (Ibarbide) — 12 × 8
+
+```
+    0         1 
+    012345678901
+ 0  ████████████
+ 1  svs█v██v██v█
+ 2  .@.p.oo....J
+ 3  CCC..tt@....
+ 4  .....oo.XX@.
+ 5  ............
+ 6  p..........p
+ 7  .....mm.....
+```
+
+- salida (5,7) pulsando abajo → ensanche (12,9)
+- salida (6,7) pulsando abajo → ensanche (12,9)
+
+## La nave de Valdehierro (cuatro mesas de cultivo, secadero y escritorio) — 14 × 8
+
+```
+    0         1   
+    01234567890123
+ 0  ██████████████
+ 1  ██████████████
+ 2  s.....Z....ttc
+ 3  ..............
+ 4  .NN.NN..NN.NN.
+ 5  .@..@...@..@..
+ 6  ..............
+ 7  ......mm......
+```
+
+- salida (6,7) pulsando abajo → valdehierro (12,8)
+- salida (7,7) pulsando abajo → valdehierro (13,8)
+
+## Discoteca GAUA (Ibarbide, Ensanche; de 23:00 a 6:00) — 14 × 8
+
+```
+    0         1   
+    01234567890123
+ 0  ██████████████
+ 1  sssv███████v██
+ 2  .@...a@.a..oo.
+ 3  CCCC..CC...tt.
+ 4  .....::@::.|||
+ 5  .....@::@:..@.
+ 6  .....:::::....
+ 7  ......mm......
+```
+
+- salida (6,7) pulsando abajo → ensanche (38,9)
+- salida (7,7) pulsando abajo → ensanche (39,9)
+
 ## Personajes
 
 | id | Mapa | Posición | Deambula | Aparece cuando |
@@ -548,12 +669,31 @@ Interiores: `B` cama · `P` ordenador · `r` silla (la de la tía y la gaming, c
 | andoni | errotabarri | (24,19) | no | siempre |
 | miren | errotabarri | (24,10) | no | `S.ch>=MIREN.ch` |
 | ibarbitarra | ensanche | (22,14) | radio 2 | siempre |
-| club_puerto | puerto | (10,8) | no | `S.ch>=C.ch` |
-| club_valde | valdehierro | (12,8) | no | `S.ch>=C.ch` |
-| club_ibar | ibarbide | (6,18) | no | `S.ch>=C.ch` |
-| club_ens | ensanche | (12,9) | no | `S.ch>=C.ch` |
+| club_puerto | club-puerto | (1,2) | no | `S.ch>=C.ch` |
+| club_valde | club-valde | (1,2) | no | `S.ch>=C.ch` |
+| club_ibar | club-ibar | (1,2) | no | `S.ch>=C.ch` |
+| club_ens | club-ens | (1,2) | no | `S.ch>=C.ch` |
 | arrieta | valdehierro | (17,7) | no | siempre |
 | txomin | callejon | (17,8) | no | siempre |
+| socio | club-puerto | (7,3) | no | siempre |
+| billarista | club-puerto | (10,4) | no | siempre |
+| socio | club-valde | (7,3) | no | siempre |
+| billarista | club-valde | (10,4) | no | siempre |
+| socio | club-ibar | (7,3) | no | siempre |
+| billarista | club-ibar | (10,4) | no | siempre |
+| socio | club-ens | (7,3) | no | siempre |
+| billarista | club-ens | (10,4) | no | siempre |
+| nv0 | nave | (1,5) | no | `!!(S.nave&&naveros()[i])` |
+| nv1 | nave | (4,5) | no | `!!(S.nave&&naveros()[i])` |
+| nv2 | nave | (8,5) | no | `!!(S.nave&&naveros()[i])` |
+| nv3 | nave | (11,5) | no | `!!(S.nave&&naveros()[i])` |
+| gorila | ensanche | (40,9) | no | `S.ch>=DISCO.ch` |
+| camarera | disco | (1,2) | no | siempre |
+| dj | disco | (6,2) | no | siempre |
+| rrpp | disco | (12,5) | no | siempre |
+| baila1 | disco | (5,5) | radio 1 | siempre |
+| baila2 | disco | (8,5) | radio 1 | siempre |
+| baila3 | disco | (7,4) | radio 1 | siempre |
 
 Los **clientes** ($) aparecen cada día desde el capítulo 2 en casillas de acera, plaza y tierra: en el barrio, 4 + reputación/15 (+1 desde el capítulo 4, máximo 10); en los astilleros, 2 (3 desde el capítulo 4), estudiantes y currelas, que pagan el gramo un 20 % más; en el barrio alto, desde el capítulo 3, 2 (3 desde el 4), pijos y turistas; en Puerto Viejo, 2 (3 desde el 4), turistas, currelas y estudiantes; en Valdehierro, 2 (3 desde el 4), estudiantes y currelas; y en los pueblos, 1: un currela en Mendialde y un currela o un turista en Errotabarri; en Ibarbide, desde el capítulo 4, 3 en el Casco Viejo (turistas, pijos y estudiantes) y 3 en el Ensanche (pijos, currelas y estudiantes), 4 desde el 5.
 

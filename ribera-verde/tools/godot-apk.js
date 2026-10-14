@@ -28,7 +28,10 @@ const TPL = path.join(process.env.HOME, '.local/share/godot/export_templates/4.3
 if (!fs.existsSync(TPL)) throw new Error('faltan las plantillas de exportación de Godot 4.3: ' + TPL);
 if (!fs.existsSync(path.join(GD, 'datos', 'datos.json'))) throw new Error('falta godot/datos: node tools/godot.js');
 
-// 0 · iconos del lanzador, de art/icono (tools/sprites/a-mano/icono.py), por vecino más próximo: el normal (48 px de arte) a ×4
+// 0 · la música grabada (1.30, tools/musica.js → godot/musica): solo rehace lo que ha cambiado
+execFileSync(process.execPath, [path.join(__dirname, 'musica.js')], { stdio: 'inherit' });
+
+// 0b · iconos del lanzador, de art/icono (tools/sprites/a-mano/icono.py), por vecino más próximo: el normal (48 px de arte) a ×4
 //     = 192 y, para el adaptativo (Android 8+), sus dos capas (72 px de arte = 108 dp) a ×6 = 432
 const ICO = path.join(GD, 'icono');
 {

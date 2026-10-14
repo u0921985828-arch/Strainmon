@@ -159,7 +159,7 @@ function tickMinute(){
   S.min++;if(S.min%10===0)plantsAdvance(10);
   if(S.min%30===0&&S.hp<S.hpMax)S.hp++;
   if(S.min>=1440){S.min-=1440;newDay();}
-  if(S.min%30===0&&ZONAS[S.map])music(mapMusic());
+  if(S.min%30===0&&(ZONAS[S.map]||S.map==='home'))music(mapMusic());
 }
 function newDay(){
   S.day++;

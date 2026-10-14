@@ -1386,6 +1386,7 @@ func raid_event():
 		S.heat = 50
 		await talk("SMS · MOLINA", ["Esta noche había orden de entrada en tu piso. La he parado.", "Baja el ritmo."])
 		return
+	music("redada")
 	sfx("bad")
 	await say("REDADA. La policía entra en tu piso con una orden de registro.")
 	var casa: bool = S.map == "home"
@@ -1445,9 +1446,11 @@ func raid_event():
 		await say("Y el equipo de las carpas con plantas: " + ", ".join(eq) + ".")
 	await say("La caja de detrás del diploma ni la ven. Las semillas no son delito: se quedan." if S.get("caja") != null else "Las semillas no son delito: se quedan.")
 	await say("Toca empezar de nuevo. Y vender menos una temporada.")
+	music(map_music())
 
 func ending() -> void:
 	await fade(1)
+	music("final")
 	endcard_on = true
 	endcard_pon(["DEUDA SALDADA", "Has saldado los %s de tu tía Maite en %s días." % [Datos.eur(D.DEUDA), n(S.day)], "Variedades: %d · Ventas totales: %s" % [disc_count(), Datos.eur(S.sales)],
 		"Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.\n¿Completarás la GENOTECA? ¿Conseguirás la JACK HERER?", "Pulsa A"])
@@ -1462,6 +1465,7 @@ func ending() -> void:
 	await fade(1)
 	endcard_on = false
 	endcard_pon(null)
+	music(map_music())
 	await fade(0)
 	await chapter(8)
 	show_objective()
@@ -1820,7 +1824,7 @@ func battle(kind):
 		return await gancho_combate.call(kind)
 	lock += 1
 	var res = null
-	music("battle")
+	music(D.MUS_COMBATE.get(kind, "battle"))
 	sfx("enc")
 	for k in 3:
 		fade_pon(.85, true, true)
@@ -2700,7 +2704,7 @@ func llamar_fijo(f: Dictionary) -> bool:
 		return true
 	f.dia = S.day
 	await talk_client({"id": "tel-" + f.id, "fijo": true, "fid": f.id, "n": f.n.to_upper(), "map": S.map, "x": P.x, "y": P.y, "type": f.t, "want": ri(int(ct.g[0]), int(ct.g[1])),
-		"minThc": mini(24, 15 + int(S.ch)) if f.t == "pij" else 0})
+		"minThc": mini(24, 15 + int(S.ch)) if f.t == "pij" or f.t == "vip" else 0})   # 1.30: el VIP de GAUA, como un pijo
 	return true
 
 # lo que Kiko manda a casa: lo del growshop que no son semillas, carpas ni la prensa, más caro; lo que ya está pedido no se repite
@@ -3002,22 +3006,30 @@ func talk_begona():
 func precio_club(thc: float) -> float:
 	return 3 + thc * .15
 
-func talk_club(k: String):
+# el carné (la cuota, una vez); 1.30: también en la puerta, la primera vez que entras (entra_local). true si eres socio
+func carne_club(k: String) -> bool:
 	var C: Dictionary = D.CLUBS[k]
 	var N: String = C.n
+	if await ask("%s, asociación de consumidores. Dentro no se vende nada: lo tuyo entra por la puerta de atrás. La cuota son %s. ¿Te haces socio?" % [C.n, Datos.eur(C.cuota)], ["Hacerme socio", "No"], N) != 0:
+		return false
+	if S.money < C.cuota:
+		sfx("bad")
+		await say("Sin la cuota no hay carné.", N)
+		return false
+	S.money -= int(C.cuota)
+	S.clubs[k] = true
+	S.rep += 1
+	confia(k, 2)
+	sfx("coin")
+	await got("el carné de " + C.n)
+	return true
+
+# el encargado de cada club; 1.30: dentro, detrás de la vitrina del dispensario
+func talk_club(k: String):
+	var N: String = D.CLUBS[k].n
 	if not S.clubs.get(k):
-		if await ask("%s, asociación de consumidores. Dentro no se vende nada: lo tuyo entra por la puerta de atrás. La cuota son %s. ¿Te haces socio?" % [C.n, Datos.eur(C.cuota)], ["Hacerme socio", "No"], N) != 0:
+		if not await carne_club(k):
 			return
-		if S.money < C.cuota:
-			sfx("bad")
-			await say("Sin la cuota no hay carné.", N)
-			return
-		S.money -= int(C.cuota)
-		S.clubs[k] = true
-		S.rep += 1
-		confia(k, 2)
-		sfx("coin")
-		await got("el carné de " + C.n)
 	var E = S.get("clubEnc")
 	var c: int = await ask("¿Qué te trae?", ["Vender al club", "Comprar %d g" % int(D.CLUB.compra), "Entregar las semillas" if E and E.k == k else "Encargo de semillas", "Nada"], N)
 	if c == 0:
@@ -3294,7 +3306,7 @@ func rol_desc(w: Dictionary) -> String:
 		"gerente":
 			return "Cuida el piso y cosecha al arcón por %s al día." % Datos.eur(P.sueldo.gerente)
 		"nave":
-			return "Cultiva en la nave por %s al día: %d g." % [Datos.eur(P.sueldo.nave), nave_g(w)]
+			return "Cultiva la mesa %d de la nave por %s al día: %d g." % [naveros().find(w) + 1, Datos.eur(P.sueldo.nave), nave_g(w)]
 	return "Dale trabajo: calle, gerente o nave."
 
 # deja el trabajo; lo que le quedaba del lote vuelve al arcón
@@ -3318,7 +3330,7 @@ func plantilla() -> void:
 			rows.append({"label": w.n, "right": rol_txt(w), "desc": ficha_gente(w) + ". " + rol_desc(w)})
 		if L.size() < int(P.max):
 			rows.append({"label": "Pedir gente a Patxi", "right": Datos.eur(P.sobre), "desc": "Patxi te manda a alguien del barrio que quiere currar. No sabes a quién hasta que llega."})
-		var t2: String = "%d de %d" % [L.size(), int(P.max)] + ((" · nave " + g_txt(S.nave.g)) if S.get("nave") != null else "")
+		var t2: String = "%d de %d" % [L.size(), int(P.max)] + ((" · nave " + g_txt(nave_stock())) if S.get("nave") != null else "")
 		i = await menu(rows, {"cls": "full", "title": "PLANTILLA", "title2": t2, "desc": true, "initial": mini(i, rows.size() - 1)})
 		if i < 0:
 			return
@@ -3539,13 +3551,15 @@ func nave_alquiler() -> void:
 		return
 	S.money -= int(D.NAVE.dia)
 
-# después de la calle, la redada (menos con cuidado) y lo que crece
+# después de la calle, la redada (menos con cuidado) y lo que da cada mesa que ya da (1.30): el trabajador i cuida la mesa i;
+# nave_g × el rendimiento de lo plantado y, con su abono y dosis en la estantería, lo del abono (ABONO, ABONO_BIO), al secadero de
+# esa mesa (Me.g, con su THC medio, Me.t)
 func nave_dia() -> void:
 	var N = S.get("nave")
 	if N == null:
 		return
 	var W := naveros()
-	if W.is_empty() or not N.get("sid"):
+	if W.is_empty() or not N.m.any(func(x): return x != null):
 		return
 	var mc := 0
 	for w in W:
@@ -3553,15 +3567,30 @@ func nave_dia() -> void:
 	if Cultivo.azar() < maxf(0, D.NAVE.redada - D.NAVE.redadaC * mc):
 		var ns: Array = W.map(func(w): return w.n)
 		var quien: String = (", ".join(PackedStringArray(ns.slice(0, -1))) + " y " + ns[-1]) if ns.size() > 1 else ns[0]
-		var gg: float = N.g
+		var gg: float = nave_stock()
 		S.nave = null
 		S.plantilla = S.plantilla.filter(func(w): return w.get("rol") != "nave")
 		S.heat = min(100, S.heat + D.NAVE.calor)
 		sfx("bad")
 		queue("nave", func(): await say("La policía ha entrado en la nave de Valdehierro. Se lleva las plantas%s y a %s." % [(", " + g_txt(gg)) if gg >= 1 else "", quien]))
 		return
-	for w in W:
-		N.g += nave_g(w)
+	for i in W.size():
+		var Me = N.m[i] if i < N.m.size() else null
+		if not Me or S.day - Me.dia < D.NAVE.crece:
+			continue
+		var g: float = nave_g(W[i]) * Me.y
+		var thc: float = Me.thc
+		if Me.abo == 1 and N.ab.m > 0:
+			N.ab.m -= 1
+			g *= 1 + D.ABONO.rend
+			thc += D.ABONO.thc
+		elif Me.abo == 2 and N.ab.o > 0:
+			N.ab.o -= 1
+			g *= 1 + D.ABONO_BIO.rend
+			thc += D.ABONO_BIO.thc
+		g = Datos.jsround(g * 10) / 10.0
+		Me.t = Datos.jsround((Me.t * Me.g + thc * g) / (Me.g + g) * 10) / 10.0
+		Me.g = Datos.jsround((Me.g + g) * 10) / 10.0
 
 # Arrieta, el dueño de la nave de Valdehierro
 func talk_nave() -> void:
@@ -3578,54 +3607,16 @@ func talk_nave() -> void:
 			await say("Sin la fianza no hay llave.", A)
 			return
 		S.money -= int(D.NAVE.fianza)
-		S.nave = {"sid": null, "g": 0, "thc": 0}
+		S.nave = nave_nueva()
 		sfx("coin")
 		await got("la llave de la nave")
-		await say("Pon a tu gente a trabajar desde el móvil y elige aquí qué se cultiva.", A)
+		await say("Dentro hay %d mesas de cultivo, una por persona. Pon a tu gente desde el móvil y planta tú lo que quieras." % int(D.NAVE.max), A)
 		return
-	var ops := []
-	if N.g >= 1:
-		ops.append("Recoger " + g_txt(N.g))
-	ops.append_array(["Cambiar la variedad", "Dejar la nave", "Nada"])
-	var cual: String = ("%s (%s %%)" % [strain(N.sid).n, Datos.pct(N.thc)]) if N.get("sid") else "sin variedad"
-	var oi: int = await ask("La nave: %s · %d de %d trabajando." % [cual, naveros().size(), int(D.NAVE.max)], ops, A)
+	var ops := ["Dejar la nave", "Nada"]
+	var oi: int = await ask("La nave: %d de %d mesas plantadas · %d de %d trabajando. Lo demás, dentro." % [N.m.filter(func(x): return x != null).size(), int(D.NAVE.max), naveros().size(), int(D.NAVE.max)], ops, A)
 	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
-	if op.begins_with("Recoger"):
-		var q: int = mini(int(floor(N.g)), int(floor(libre_mochila())))
-		if q < 1:
-			await say("No te cabe nada en la bolsa.", A)
-			return
-		add_buds(N.sid, q, N.thc)
-		N.g -= q
-		sfx("get")
-		await say("Recoges %d g de %s." % [q, strain(N.sid).n] + ((" Quedan %s." % g_txt(N.g)) if N.g >= 1 else ""))
-	elif op == "Cambiar la variedad":
-		if N.g >= 1:
-			await say("Recoge antes lo que hay.", A)
-			return
-		var ks := []
-		for k in S.seeds:
-			if S.seeds[k] > 0:
-				ks.append(k)
-		if ks.is_empty():
-			await say("Sin una semilla no se cultiva nada.", A)
-			return
-		var it := ks.map(func(k): return {"label": strain(k).n, "right": "%d sem." % int(S.seeds[k])})
-		it.append({"label": "Nada"})
-		var i: int = await menu(it, {"cls": "right", "title": "¿Qué se cultiva?"})
-		if i < 0 or i >= ks.size():
-			return
-		var k: String = ks[i]
-		S.seeds[k] -= 1
-		if not S.seeds[k]:
-			S.seeds.erase(k)
-		N.sid = k
-		N.thc = Datos.jsround(strain(k).thc * D.NAVE.thc * 10) / 10.0
-		N.g = 0
-		sfx("sel")
-		await say("%s, entonces. Los esquejes los saca tu gente." % strain(k).n, A)
-	elif op == "Dejar la nave":
-		if await ask("¿Dejas la nave? Te devuelvo la fianza%s." % ("; lo que no recojas se queda aquí" if N.g >= 1 else ""), ["Dejarla", "No"], A) != 0:
+	if op == "Dejar la nave":
+		if await ask("¿Dejas la nave? Te devuelvo la fianza%s." % ("; lo que no recojas se queda aquí" if nave_stock() >= 1 else ""), ["Dejarla", "No"], A) != 0:
 			return
 		for w in naveros():
 			libre(w)
@@ -3633,6 +3624,539 @@ func talk_nave() -> void:
 		S.money += int(D.NAVE.fianza)
 		sfx("coin")
 		await say("Trato hecho. Si la quieres otra vez, ya sabes dónde estoy.", A)
+
+# ---------- los locales (1.30, 11j-locales): los clubs por dentro, la nave y GAUA ----------
+# la puerta de un local (on_step_end, mundo.gd): cerrada, te deja delante; el club, la primera vez, el carné; GAUA, la entrada
+func entra_local(d: Dictionary):
+	var gk: PackedStringArray = String(d.gate).split(":")
+	var t: String = gk[0]
+	if t == "club":
+		var k: String = gk[1]
+		if S.ch < int(D.CLUBS[k].ch):
+			atras_puerta()
+			await say("Una puerta sin rótulo, con un timbre. No abre nadie.")
+			return
+		if not S.clubs.get(k):
+			atras_puerta()
+			if not await carne_club(k):
+				return
+	elif t == "nave":
+		if S.get("nave") == null:
+			atras_puerta()
+			await say("La persiana está echada con un candado. La llave la tiene Arrieta, el dueño.")
+			return
+	elif t == "disco":
+		if S.ch < int(D.DISCO.ch) or not disco_abierta():
+			atras_puerta()
+			await say("%s abre de 23:00 a 6:00." % D.DISCO.n)
+			return
+		if not noche_ya():
+			atras_puerta()
+			if not await entrada_disco():
+				return
+	await warp(d)
+
+func atras_puerta() -> void:
+	var y: int = P.y + 1
+	P.fy = y
+	P.y = y
+	P.py = y * 16.0
+	P.dir = "down"
+	S.y = y
+	S.dir = "down"
+
+# lo que hay dentro de los locales (object_action, mundo.gd); false si no es de un local
+func obj_local(x: int, y: int, o) -> bool:
+	if o == null:
+		return false
+	var txt := ""
+	if S.map.begins_with("club-"):
+		var k: String = S.map.substr(5)
+		var C: Dictionary = D.CLUBS[k]
+		match o:
+			"tarros":
+				txt = "Tarros de cristal con la etiqueta de cada variedad que ha pasado por el club."
+			"pizarra":
+				txt = "En la pizarra, a tiza: «Hoy, %s»." % strain(C.sid[int(S.day) % C.sid.size()]).n
+			"cartelC":
+				txt = "NORMAS DE %s\nSolo socios mayores de edad, con el carné a la vista. Lo que se retira, se consume dentro." % C.n
+			"tacos":
+				txt = "El taquero: seis tacos, la tiza y el triángulo."
+			"vitrina":
+				txt = "La vitrina del dispensario: tarros con muestras y una báscula de precisión."
+			"mesita":
+				txt = "Una mesa baja con un cenicero, un grinder y un librillo."
+			"sofaF", "sofaF2", "sofaB", "sofaB2":
+				txt = "Un sofá chester de cuero verde, gastado de tanto uso."
+			"billar", "billar2":
+				txt = "La mesa de billar, con el tapete recién cepillado. %s juega con apuesta." % D.BILLAR.n[k]
+			"poster":
+				txt = "Un cartel antiguo de una feria del cáñamo."
+			"plantDeco":
+				txt = "Una kentia en una maceta de barro."
+	if S.map == "nave":
+		if S.get("nave") == null:
+			await say("La nave está vacía.")
+			return true
+		match o:
+			"mesaN", "mesaN2":
+				await mesa_nave(mesa_de(x if o == "mesaN" else x - 1))
+				return true
+			"estanteN":
+				await estante_nave()
+				return true
+			"secadero":
+				await secadero_nave()
+				return true
+			"escritorio", "escritorio2":
+				await escritorio_nave()
+				return true
+			"crate":
+				txt = "Sacos de sustrato y macetas apiladas."
+	if S.map == "disco":
+		match o:
+			"bottles":
+				txt = "Botellas de ginebra, ron y vodka, iluminadas desde abajo."
+			"neon":
+				txt = "El neón de %s: la luna rosa." % D.DISCO.n
+			"altavoz":
+				txt = "El altavoz retumba en el pecho."
+			"cabina", "cabina2":
+				txt = "La cabina del DJ: dos platos y la mesa de mezclas."
+			"sofaV", "sofaV2", "mesaV":
+				txt = "El reservado: sofá de terciopelo y una cubitera en la mesa."
+			"cordon", "cordonF":
+				txt = "El cordón del reservado. Lo abre la RRPP."
+	if txt == "":
+		return false
+	await say(txt)
+	return true
+
+# ---------- el club: el socio y el billar ----------
+func talk_socio(k: String):
+	var nn: String = D.SOCIO.n[k]
+	var N := nn.to_upper()
+	var c: int = await ask(pick(["¿Qué tal? Siéntate, hay sitio.", "Aquí se está tranquilo, ¿eh?"]), ["Charlar", "Compartir uno", "Nada"], N)
+	if c == 0:
+		await say(pick(D.SOCIO.charla), N)
+		return
+	if c != 1:
+		return
+	if S.porro.get(k) == S.day:
+		await say("Hoy ya hemos compartido. Mañana, más.", N)
+		return
+	var lots := bud_lots(D.SOCIO.g)
+	if lots.is_empty():
+		await say("Cuando tengas algo encima, lo compartimos. Con %s vale." % g_txt(D.SOCIO.g), N)
+		return
+	var it: Array = lots.map(func(l): return lot_item(l))
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿Qué compartes?"})
+	if i < 0 or i >= lots.size():
+		return
+	var kk: String = lots[i][0]
+	var thc: float = lots[i][1].thc
+	use_buds(kk, D.SOCIO.g)
+	S.porro[k] = S.day
+	confia(k, int(D.SOCIO.rel))
+	advance_time(int(D.SOCIO.min))
+	update_hud()
+	sfx("sel")
+	await say("Compartes %s en el sofá. %s: «%s»" % [lot_nombre(kk), nn, "Esto es otra liga. Se lo cuento a los del club." if thc >= 20 else "Suave, de los de charlar. Gracias."])
+
+# el billar: hasta BILLAR.dia partidas al día con cada uno, de BILLAR.tiros tiros. Cada tiro, la barra de fuerza va y viene: con A
+# en el verde, la bola dentro (3 puntos); en el amarillo, la rozas (1). El otro mete con BILLAR.hab × 0,6 y la roza hasta BILLAR.hab
+var TIRO = null   # la barra mientras apuntas: {t0}, en el reloj del juego (pinta.gd la dibuja)
+
+func fuerza_tiro(ms: float) -> float:
+	var f: float = fmod(ms, float(D.BILLAR.periodo)) / float(D.BILLAR.periodo)
+	return f * 2 if f < .5 else 2 - f * 2
+
+func puntos_tiro(p: float) -> int:
+	var d: float = absf(p - D.BILLAR.centro)
+	return 3 if d <= D.BILLAR.verde else (1 if d <= D.BILLAR.amarillo else 0)
+
+func tiro_rival() -> int:
+	var r := Cultivo.azar()
+	return 3 if r < D.BILLAR.hab * .6 else (1 if r < D.BILLAR.hab else 0)
+
+# un tiro: el texto y, con A, dónde estaba la barra (de 0 a 1); las pruebas lo cambian (gancho_billar, ui.gd)
+func tiro_billar(txt: String) -> float:
+	if gancho_billar.is_valid():
+		return float(gancho_billar.call(txt))
+	await type_text(txt, "BILLAR")
+	var pr := Motor.Prom.new()
+	TIRO = {"t0": M.reloj}
+	push(func(b: String):
+		if b == "A":
+			pop()
+			pr.res(fuerza_tiro(M.reloj - TIRO.t0)))
+	var p: float = await Motor.espera(pr)
+	TIRO = null
+	if not oraculo:
+		dlg.hide()
+		dlg_nm.hide()
+	sfx("hit")
+	return p
+
+func talk_billar(k: String):
+	var nb: String = D.BILLAR.n[k]
+	var N := nb.to_upper()
+	var Db = S.billar.get(k)
+	if not (Db is Dictionary and Db.d == S.day):
+		Db = {"d": S.day, "n": 0}
+		S.billar[k] = Db
+	if Db.n >= D.BILLAR.dia:
+		await say("Por hoy ya está bien. Mañana te doy la revancha.", N)
+		return
+	var ops: Array = D.BILLAR.apuestas.map(func(e): return "A " + Datos.eur(e))
+	ops.append("Nada")
+	var c: int = await ask("¿Unas bolas? %d tiros cada uno: la bola dentro, 3 puntos; si la rozas, 1. Quien sume más se lleva la apuesta." % int(D.BILLAR.tiros), ops, N)
+	if c < 0 or c >= D.BILLAR.apuestas.size():
+		return
+	var e: int = int(D.BILLAR.apuestas[c])
+	if S.money < e:
+		sfx("bad")
+		await say("Sin dinero encima no se juega.", N)
+		return
+	Db.n += 1
+	var yo := 0
+	var el := 0
+	var T := ["Fallas", "La rozas: 1 punto", "¡Dentro! 3 puntos"]
+	var RT := ["falla", "la roza", "¡dentro!"]
+	for i in int(D.BILLAR.tiros):
+		var p := puntos_tiro(await tiro_billar("Tiro %d de %d · tú %d, %s %d. Pulsa A con la barra en el verde." % [i + 1, int(D.BILLAR.tiros), yo, nb, el]))
+		var q := tiro_rival()
+		yo += p
+		el += q
+		await say("%s. %s: %s." % [T[[0, 1, 3].find(p)], nb, RT[[0, 1, 3].find(q)]])
+	if yo > el:
+		S.money += e
+		confia(k, 1)
+		sfx("coin")
+	elif yo < el:
+		S.money -= e
+		sfx("bad")
+	advance_time(int(D.BILLAR.min))
+	update_hud()
+	if yo > el:
+		await say("%d a %d: ganas tú. %s te paga %s: «La próxima, la revancha»." % [yo, el, nb, Datos.eur(e)])
+	elif yo < el:
+		await say("%d a %d: gana %s. Le pagas %s." % [yo, el, nb, Datos.eur(e)])
+	else:
+		await say("%d a %d: empate. Nadie paga." % [yo, el])
+
+# ---------- la nave: mesas, estantería, secadero y escritorio ----------
+# S.nave: {m: las NAVE.max mesas (null, vacía, o {k: el lote, f: el fenotipo, thc, y: × cosecha, dia: el de plantar, g y t: lo que hay
+# en el secadero y su THC medio, abo: 0 sin abono, 1 MEATZA, 2 ORTUA BIO}), ab: {m, o}: dosis de floración de cada marca en la estantería}
+func nave_nueva() -> Dictionary:
+	var m := []
+	m.resize(int(D.NAVE.max))
+	return {"m": m, "ab": {"m": 0, "o": 0}}
+
+# la mesa de la nave que empieza en la columna x (MESAS_X), o −1
+func mesa_de(x: int) -> int:
+	for i in D.MESAS_X.size():
+		if int(D.MESAS_X[i]) == x:
+			return i
+	return -1
+
+func nave_stock() -> float:
+	var t := 0.0
+	if S.get("nave") != null:
+		for Me in S.nave.m:
+			if Me:
+				t += Me.g
+	return t
+
+func fase_mesa(i: int) -> int:
+	if S.get("nave") == null or i < 0 or i >= S.nave.m.size() or not S.nave.m[i]:
+		return 0
+	var d: int = int(S.day - S.nave.m[i].dia)
+	return 1 if d < 1 else (2 if d < 3 else (3 if d < D.NAVE.crece else 4))
+
+func thc_nave(sid: String, f) -> float:
+	return Datos.jsround(strain(sid).thc * (f.t if f else 1.0) * D.NAVE.thc * 10) / 10.0
+
+func mesa_txt(Me: Dictionary) -> String:
+	return strain(lot_sid(Me.k)).n + etiq(Me.get("f"))
+
+func mesa_nave(i: int) -> void:
+	var N: Dictionary = S.nave
+	var Me = N.m[i]
+	var W := naveros()
+	var w = W[i] if i < W.size() else null
+	var ops: Array = ["Arrancar y plantar" if Me else "Plantar"]
+	if Me:
+		ops.append("Abono")
+	ops.append("Nada")
+	var que: String = (mesa_txt(Me) + " · " + D.FASE_MESA[fase_mesa(i)] + " · " + D.ABONO_MESA[int(Me.abo)]) if Me else "vacía"
+	var oi: int = await ask("Mesa %d · %s\n%s" % [i + 1, que, ("La cuida " + w.n + ".") if w else "Nadie la cuida: pon a alguien de tu plantilla en la nave."], ops)
+	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+	if op == "Plantar" or op == "Arrancar y plantar":
+		if Me and Me.g >= 1:
+			await say("Antes, descuelga del secadero lo de esta mesa.")
+			return
+		await plantar_mesa(i)
+	elif op == "Abono":
+		var c: int = await ask("¿Qué abono le echa cada día? En la estantería: MEATZA ×%d · ORTUA BIO ×%d." % [int(N.ab.m), int(N.ab.o)], ["Sin abono", "MEATZA Floración", "ORTUA BIO Floración", "Nada"])
+		if c < 3:
+			Me.abo = c
+			sfx("sel")
+
+# con una semilla o un esqueje, tu gente saca una madre y llena la mesa de clones: toda la mesa, con su fenotipo
+func plantar_mesa(i: int) -> void:
+	var own := _own()
+	var esq := []   # [esqueje, 1 si es de las bandejas del carro]
+	for e in S.esquejes:
+		esq.append([e, 0])
+	for e in S.bandejas:
+		esq.append([e, 1])
+	if own.is_empty() and esq.is_empty():
+		await say("No llevas semillas ni esquejes.")
+		return
+	var items := []
+	for o in own:
+		var s = strain(o[0])
+		items.append({"label": s.n, "right": "×" + n(o[1]), "sw": s.c, "ic": ic_cog(o[0]), "desc": strain_line(o[0])})
+	for eb in esq:
+		var s = strain(eb[0].sid)
+		items.append({"label": "Esqueje " + s.n + etiq(eb[0].f), "right": "bandeja" if eb[1] else "esqueje", "sw": s.c, "ic": ic_cog(eb[0].sid), "desc": "Clon enraizado: la mesa entera sale con su fenotipo."})
+	items.append({"label": "Cancelar", "desc": ""})
+	var j: int = await menu(items, {"cls": "full", "title": "¿QUÉ PLANTAS EN LA MESA?", "desc": true})
+	if j < 0 or j >= own.size() + esq.size():
+		return
+	var sid: String
+	var f: Dictionary
+	if j < own.size():
+		sid = own[j][0]
+		S.seeds[sid] -= 1
+		if not S.seeds[sid]:
+			S.seeds.erase(sid)
+		f = roll_feno(sid)
+	else:
+		var e: Dictionary = esq[j - own.size()][0]
+		var l: Array = S.bandejas if esq[j - own.size()][1] else S.esquejes
+		l.remove_at(l.find(e))
+		sid = e.sid
+		f = e.f
+	S.nave.m[i] = {"k": sid + ("*" if Cultivo.clase_feno(f) == "estrella" else ""), "f": f, "thc": thc_nave(sid, f), "y": f.y, "dia": S.day, "g": 0, "t": 0, "abo": 0}
+	sfx("sel")
+	await say("Mesa %d: %s%s. De la madre salen los clones para toda la mesa. A los %d días empieza a dar." % [i + 1, strain(sid).n, etiq(f), int(D.NAVE.crece)])
+
+func estante_nave() -> void:
+	var N: Dictionary = S.nave
+	var ops := []
+	if S.items.get("fert", 0):
+		ops.append("Dejar MEATZA ×%d" % int(S.items.fert))
+	if S.items.get("ofert", 0):
+		ops.append("Dejar ORTUA BIO ×%d" % int(S.items.ofert))
+	ops.append("Nada")
+	var oi: int = await ask("La estantería de los abonos: MEATZA FLORACIÓN ×%d · ORTUA BIO FLORACIÓN ×%d. Cada mesa con abono gasta una dosis al día." % [int(N.ab.m), int(N.ab.o)], ops)
+	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+	if op.begins_with("Dejar MEATZA"):
+		N.ab.m += S.items.fert
+		S.items.fert = 0
+		sfx("sel")
+	elif op.begins_with("Dejar ORTUA"):
+		N.ab.o += S.items.ofert
+		S.items.ofert = 0
+		sfx("sel")
+
+# descolgar del secadero lo que quepa en la mochila, mesa por mesa (cada una, su lote, sin curar)
+func secadero_nave() -> void:
+	if nave_stock() < 1:
+		await say("El secadero está vacío. Cada mesa da cada mañana, a los %d días de plantarla." % int(D.NAVE.crece))
+		return
+	var lleva := 0
+	var cabe := int(floor(libre_mochila()))
+	for Me in S.nave.m:
+		if not Me or Me.g < 1:
+			continue
+		var q: int = mini(int(floor(Me.g)), cabe - lleva)
+		if q < 1:
+			break
+		add_buds(Me.k, q, Me.t)
+		Me.g = Datos.jsround((Me.g - q) * 10) / 10.0
+		lleva += q
+	if not lleva:
+		await say("No te cabe nada más en la mochila.")
+		return
+	sfx("get")
+	update_hud()
+	await say("Descuelgas %s del secadero." % g_txt(lleva) + ((" Quedan %s: no te caben." % g_txt(nave_stock())) if nave_stock() >= 1 else ""))
+
+func escritorio_nave() -> void:
+	var N: Dictionary = S.nave
+	var W := naveros()
+	var rows := []
+	for i in N.m.size():
+		var Me = N.m[i]
+		var w = W[i] if i < W.size() else null
+		var ab: String = D.ABONO_MESA[int(Me.abo)] if Me else ""
+		rows.append({"label": "Mesa %d · %s" % [i + 1, strain(lot_sid(Me.k)).n if Me else "vacía"], "right": D.FASE_MESA[fase_mesa(i)] if Me else "",
+			"desc": ("La cuida " + w.n if w else "Nadie la cuida") + "." + ((" %s · en el secadero, %s." % [ab.substr(0, 1).to_upper() + ab.substr(1), g_txt(Me.g)]) if Me else "")})
+	rows.append({"label": "Estantería", "right": "%d + %d dosis" % [int(N.ab.m), int(N.ab.o)], "desc": "MEATZA FLORACIÓN y ORTUA BIO FLORACIÓN: una dosis al día por mesa con abono."})
+	var i := 0
+	while true:
+		i = await menu(rows, {"cls": "full", "title": "LA NAVE", "title2": "%s al día" % Datos.eur(D.NAVE.dia), "desc": true, "initial": i})
+		if i < 0:
+			break
+
+func talk_navero(i: int):
+	var W := naveros()
+	var w = W[i] if i < W.size() else null
+	if not w:
+		return
+	var Me = S.nave.m[i] if S.get("nave") != null else null
+	var f := fase_mesa(i)
+	var t: String
+	if not Me:
+		t = "Mi mesa está vacía. Plántame algo y la saco adelante."
+	elif f < 4:
+		t = "La %s va bien: %s. A los %d días empieza a dar." % [strain(lot_sid(Me.k)).n, D.FASE_MESA[f], int(D.NAVE.crece)]
+	else:
+		t = "Cada mañana cuelgo lo de mi mesa en el secadero." + (" Se ha acabado el abono de la estantería." if Me.abo and not S.nave.ab["m" if Me.abo == 1 else "o"] else "")
+	await say(t, String(w.n).to_upper())
+
+# ---------- GAUA ----------
+# la noche empieza a las 23:00: lo de después de medianoche es de la noche del día anterior (S.noche: lo pagado y hecho esa noche)
+func noche_id() -> int:
+	return int(S.day) if S.min >= D.DISCO.abre else int(S.day) - 1
+
+func disco_abierta() -> bool:
+	return S.min >= D.DISCO.abre or S.min < D.DISCO.cierra
+
+func noche_ya() -> bool:
+	return S.get("noche") is Dictionary and int(S.noche.id) == noche_id()
+
+func noche_gaua() -> Dictionary:
+	if not noche_ya():
+		S.noche = {"id": noche_id(), "copas": 0, "ronda": 0, "baile": 0, "mesa": 0}
+	return S.noche
+
+func entrada_disco() -> bool:
+	var N := "PORTERO"
+	if await ask("La entrada, %s. Se paga una vez por noche." % Datos.eur(D.DISCO.entrada), ["Pagar", "No"], N) != 0:
+		return false
+	if S.money < D.DISCO.entrada:
+		sfx("bad")
+		await say("Sin entrada no se pasa.", N)
+		return false
+	S.money -= int(D.DISCO.entrada)
+	noche_gaua()
+	sfx("coin")
+	update_hud()
+	return true
+
+func echar_disco():
+	await say("Las seis. Se encienden las luces y el portero echa a todo el mundo.", "PORTERO")
+	await warp({"to": "ensanche", "x": 38, "y": 9, "dir": "down"})
+
+func talk_gorila():
+	await say("Abrimos a las once de la noche. Hasta las seis." if not disco_abierta() else ("Ya has pagado esta noche. Pasa." if noche_ya() else "La entrada, %s. En la puerta." % Datos.eur(D.DISCO.entrada)), "PORTERO")
+
+func talk_barra():
+	var N := "CAMARERA"
+	var X := noche_gaua()
+	var c: int = await ask("¿Qué te pongo?", ["Una copa · " + Datos.eur(D.DISCO.copa), "Invitar a una ronda · " + Datos.eur(D.DISCO.ronda), "Nada"], N)
+	if c == 0:
+		if X.copas >= D.DISCO.copaMax:
+			await say("Por hoy ya vale. Agua, si quieres.", N)
+			return
+		if S.money < D.DISCO.copa:
+			sfx("bad")
+			await say("Sin dinero no hay copa.", N)
+			return
+		S.money -= int(D.DISCO.copa)
+		X.copas += 1
+		if X.copas == 1:
+			confia("gaua", 1)
+		advance_time(10)
+		sfx("coin")
+		update_hud()
+		await say(["Un gin-tonic con mucho hielo.", "Otra. La música sube.", "La tercera. Mejor que sea la última."][int(X.copas) - 1])
+	elif c == 1:
+		if X.ronda:
+			await say("Ya has invitado esta noche. Con una, ya te conocen.", N)
+			return
+		if S.money < D.DISCO.ronda:
+			sfx("bad")
+			await say("No te llega para la ronda.", N)
+			return
+		S.money -= int(D.DISCO.ronda)
+		X.ronda = 1
+		S.rep += 1
+		confia("gaua", 3)
+		advance_time(10)
+		sfx("coin")
+		update_hud()
+		await say("Invitas a la barra entera. Medio local brinda por ti.")
+
+func talk_dj():
+	var c: int = await ask(pick(["¿Qué tal suena?", "Esta noche se llena."]), ["Bailar", "Pedir una canción", "Nada"], "DJ")
+	if c == 0:
+		await bailar()
+	elif c == 1:
+		sfx("sel")
+		await say(pick(["Te la pongo después de esta.", "¿Esa? Hace años que no la pincho. Venga, va.", "Esa no la tengo. Te pongo algo parecido."]), "DJ")
+
+# bailar (una vez por noche): media hora y, la mitad de las veces, alguien te pide el número (un pijo para la agenda)
+func bailar() -> void:
+	var X := noche_gaua()
+	if X.baile:
+		await say("Ya has bailado esta noche. Las piernas no dan para más.")
+		return
+	X.baile = 1
+	await fade(1)
+	advance_time(30)
+	update_hud()
+	await wait(200)
+	await fade(0)
+	confia("gaua", 2)
+	var id := "gaua%d" % int(X.id)
+	if S.fijos.size() < D.FIJOS_MAX and not S.fijos.any(func(f): return f.id == id) and Cultivo.azar() < D.DISCO.ligar:
+		var nf := nombre_fijo(id)
+		S.fijos.append({"id": id, "n": nf, "t": "pij", "dia": 0})
+		sfx("get")
+		await say("Bailas media hora sin parar. %s te pide el número: «Si tienes de lo bueno, llámame»." % nf)
+		return
+	await say("Bailas media hora sin parar. Sales de la pista con la camiseta empapada.")
+
+# el reservado (una vez por noche): una hora y la RRPP te presenta a un cliente VIP (CTYPES.vip) para la agenda
+func talk_rrpp():
+	var N := "RRPP"
+	var X := noche_gaua()
+	if X.mesa:
+		await say("Disfruta del reservado. Si conoces a alguien que merezca la pena, me lo presentas.", N)
+		return
+	if await ask("El reservado: sofá, mesa y botella, %s la noche. Ahí se sienta la gente que importa." % Datos.eur(D.DISCO.mesa), ["Reservar", "No"], N) != 0:
+		return
+	if S.money < D.DISCO.mesa:
+		sfx("bad")
+		await say("Para el reservado hace falta dinero. Otra noche.", N)
+		return
+	S.money -= int(D.DISCO.mesa)
+	X.mesa = 1
+	confia("gaua", 5)
+	sfx("coin")
+	await fade(1)
+	advance_time(60)
+	update_hud()
+	await wait(200)
+	await fade(0)
+	if S.fijos.size() >= D.FIJOS_MAX:
+		await say("Una hora en el reservado. Conoces a mucha gente, pero tu agenda ya está llena.")
+		return
+	var nv: String = D.DISCO.vip[int(S.vipN) % D.DISCO.vip.size()]
+	var id := "vip%d" % int(S.vipN)
+	S.vipN += 1
+	S.fijos.append({"id": id, "n": nv, "t": "vip", "dia": 0})
+	sfx("get")
+	await say("Una hora en el reservado. La RRPP te presenta a %s: «Me han dicho que lo tuyo es de lo mejor. Llámame». Apuntas su número." % nv)
+
+func talk_baila(i: int):
+	await say(D.BAILA[i], "GENTE")
 
 # ---------- el bajo de las setas (1.20, 11g-setas): el local clandestino de la Kale Zaharra ----------
 func fase_seta(b: Dictionary) -> String:

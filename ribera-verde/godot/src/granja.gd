@@ -95,7 +95,7 @@ func tick_minute() -> void:
 	if S.min >= 1440:
 		S.min -= 1440
 		new_day()
-	if S.min % 30 == 0 and D.ZONAS.has(S.map):
+	if S.min % 30 == 0 and (D.ZONAS.has(S.map) or S.map == "home"):
 		music(map_music())
 
 func new_day() -> void:

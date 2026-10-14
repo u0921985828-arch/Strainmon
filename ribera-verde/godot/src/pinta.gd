@@ -80,7 +80,7 @@ func redibuja(t: float) -> void:
 func _capa(ci: CanvasItem, n: int) -> void:
 	L = ci
 	if modo == "world":
-		[_mundo, _farolas, func(): pass][n].call()
+		[_mundo, _farolas, _encima][n].call()
 	elif modo == "battle":
 		if n == 0:
 			_combate()
@@ -273,6 +273,9 @@ func _mundo() -> void:
 		var a := noche()
 		if a > 0:
 			_rect(0, 0, J.SW, SH, Color8(14, 20, 72, Datos.jsround(a * 255)))
+	var LZ = _luz_local()   # los locales (1.30): el fondo, encima de todo; sus luces, en _farolas
+	if LZ:
+		_rect(0, 0, J.SW, SH, css(LZ.fondo))
 
 func noche() -> float:
 	var h: float = J.S.min / 60.0
@@ -282,6 +285,7 @@ func noche() -> float:
 func _farolas() -> void:
 	if J.S.map == "home":
 		_manchas()
+	_luces_local()
 	if not J.D.ZONAS.has(J.S.map):   # farolas de cada zona de fuera (1.10)
 		return
 	var a := noche()
@@ -324,6 +328,54 @@ func _mancha(a: float, tipo: String) -> Image:
 	cache[key] = im
 	return im
 
+# la luz de los locales (luzLocal, 14-render; LUZ_CLUB y LUZ_DISCO): cada luz, un degradado radial (r 1 → r) sumado; los focos de
+# GAUA dan una vuelta a la pista cada 7 s (0,9 rad/s), cada uno desde su fase
+func _luz_local():
+	return J.D.LUZ_CLUB if J.S.map.begins_with("club-") else (J.D.LUZ_DISCO if J.S.map == "disco" else null)
+
+func _luces_local() -> void:
+	var LZ = _luz_local()
+	if not LZ:
+		return
+	for l in LZ.get("l", []):
+		_img(_luz(int(l[2]), l[3], float(l[4])), int(l[0]) - cam.x - int(l[2]), int(l[1]) - cam.y - int(l[2]))
+	for fo in LZ.get("focos", []):
+		var t: float = now / 1000.0 * .9 + float(fo[1])
+		var R := int(LZ.R)
+		var x: int = Datos.jsround(LZ.c[0] + cos(t) * LZ.r[0]) - cam.x
+		var y: int = Datos.jsround(LZ.c[1] + sin(t) * LZ.r[1]) - cam.y
+		_img(_luz(R, fo[0], .5), x - R, y - R)
+
+func _luz(r: int, c: String, a: float) -> Image:
+	var key := "luz|%d|%s|%f" % [r, c, a]
+	if cache.has(key):
+		return cache[key]
+	var cc := c.split(",")
+	var im := Image.create(2 * r, 2 * r, false, Image.FORMAT_RGBA8)
+	for y in 2 * r:
+		for x in 2 * r:
+			var d := Vector2(x + .5 - r, y + .5 - r).length()
+			var al := a * (1 - clampf((d - 1) / (r - 1.0), 0, 1))
+			im.set_pixel(x, y, Color8(Datos.jsround(int(cc[0]) * al), Datos.jsround(int(cc[1]) * al), Datos.jsround(int(cc[2]) * al), 255))
+	cache[key] = im
+	return im
+
+# encima de todo (1.30): la barra del billar mientras apuntas (pintaTiro, 14-render): la fuerza del tiro, que va y viene; en el
+# verde, la bola dentro, y en el amarillo, la rozas
+func _encima() -> void:
+	if J.TIRO == null:
+		return
+	var B: Dictionary = J.D.BILLAR
+	var w := 120
+	var x0: int = (J.SW - w) >> 1
+	var y0 := 36
+	var p: float = J.fuerza_tiro(now - J.TIRO.t0)
+	_rect(x0 - 2, y0 - 2, w + 4, 12, css("#26262e"))
+	_rect(x0, y0, w, 8, css("#3a3446"))
+	_rect(x0 + Datos.jsround((B.centro - B.amarillo) * w), y0, Datos.jsround(2 * B.amarillo * w), 8, css("#e0b84a"))
+	_rect(x0 + Datos.jsround((B.centro - B.verde) * w), y0, Datos.jsround(2 * B.verde * w), 8, css("#58d080"))
+	_rect(x0 + Datos.jsround(p * (w - 2)), y0 - 1, 2, 10, css("#ffffff"))
+
 func _farola(a: float) -> Image:
 	var key := "far|%f" % a
 	if cache.has(key):
@@ -358,7 +410,8 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 	if f == null:
 		return false
 	if f.c.get_width() > 16 and f.c.get_height() == 16:   # tira de variantes (orgánico)
-		L.draw_texture_rect_region(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), Rect2(variante(k, tx, ty) * 16, 0, 16, 16))
+		var v: int = (variante(k, tx, ty) + floori(now / 600)) % 4 if k == "baile" else variante(k, tx, ty)   # la pista de GAUA cambia cada 0,6 s (1.30)
+		L.draw_texture_rect_region(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), Rect2(v * 16, 0, 16, 16))
 		return true
 	L.draw_texture_rect(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), false)
 	if k == "grass":
@@ -417,18 +470,18 @@ func _arte_orilla(m: Dictionary, k: String, tx: int, ty: int, sx: int, sy: int) 
 		L.draw_texture_rect(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), false)
 
 # los de la pared, subidos a su altura (1.10, ALZA de 01b-arte.js: px)
-const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadro": -13, "cartel": -13}
+const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadro": -13, "cartel": -13, "tarros": -16, "pizarra": -13, "cartelC": -13, "tacos": -13, "neon": -13}   # 1.30: los de los locales
 
 # los muebles que dejan sombra en el suelo (1.10 P5, SOMBRA_OBJ de 01b-arte.js): 1 px a cada lado del dibujo en sus 2 últimas filas
 # y la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo; se pintan con todo el suelo ya puesto
-const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "plantDeco", "lab", "lab2", "pc", "display", "counter", "barcounter", "jukebox", "bench", "bedB"]
+const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "plantDeco", "lab", "lab2", "pc", "display", "counter", "barcounter", "jukebox", "bench", "bedB", "vitrina", "mesita", "barraD", "mesaV", "estanteN", "secadero", "altavoz"]
 func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var gr = Atlas.cubre("obj:" + o)
 	if not gr:
 		return
 	var an = Atlas.sobre.get("obj:" + o)
 	var d := desfase(o, tx, ty)
-	var sp: String = J.deco_sprite(o)   # 1.16: su tapizado o lámina
+	var sp: String = ("mesaN-%d" % J.fase_mesa(J.mesa_de(tx))) if o == "mesaN" else J.deco_sprite(o)   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, en su fase
 	var f = Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, sp, "unica", 0, {"i": 0, "esp": d.esp})
 	if f == null and not an and sp != o:
 		f = Atlas.frame_de(gr, o, "unica", 0, {"i": 0, "esp": d.esp})

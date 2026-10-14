@@ -97,6 +97,7 @@ func monta(e: Dictionary) -> void:
 	J.S = e.S
 	J.B = e.B
 	J.VC = e.VC
+	J.TIRO = e.get("TIRO")
 	J.vfx = e.vfx
 	J.ents = []
 	if e.mode == "world" or e.mode == "carpa":

@@ -1400,7 +1400,7 @@ func _pasos() -> void:
 		J.S.clubEncDia = 0
 		J.S.rel = {}
 		R = {}
-		J.enter_map("puerto", 10, 9, "up")
+		J.enter_map("club-puerto", 1, 4, "up")
 		var l := []
 		for e in J.ents:
 			if e.id == "club_puerto":
@@ -1436,7 +1436,7 @@ func _pasos() -> void:
 		R.fin = J.S.get("clubEnc") == null and J.S.clubEncDia == J.S.day
 		R.rel = J.S.rel.get("puerto")
 		J.enter_map("home", 5, 5, "up"),
-		func(): return chk(R.ent == "10,8" and R.venta == Datos.jsround(100 * R.pg) and R.g == 200 and J.S.clubs.get("puerto") == true and R.otra == 0 and R.compra == R.pc and R.cb == 10 and R.disc and R.enc == "puerto,10,7" and R.pago > 0 and R.rep == 3 and R.fin and R.rel == 9, R))
+		func(): return chk(R.ent == "1,2" and R.venta == Datos.jsround(100 * R.pg) and R.g == 200 and J.S.clubs.get("puerto") == true and R.otra == 0 and R.compra == R.pc and R.cb == 10 and R.disc and R.enc == "puerto,10,7" and R.pago > 0 and R.rep == 3 and R.fin and R.rel == 9, R))
 	step("La cata y el analizador (1.15): catar medio gramo (30 min) deja la nota (aroma, efecto y potencia) en la Genoteca y marca el lote; con el analizador, el THC exacto y el lote analizado", [], func():
 		J.S.ch = 5
 		J.S.min = 10 * 60
@@ -1833,18 +1833,28 @@ func _pasos() -> void:
 		R.nave = jn([J.S.nave != null, 5000 - J.S.money])
 		want(["^A la nave"])
 		await run(func(): await J.trabajo(itz))
-		J.S.seeds.ria = int(J.S.seeds.get("ria", 0)) + 1
-		R.s0 = J.S.seeds.ria
-		want(["^Cambiar", "^" + J.strain("ria").n + "$"])
-		await run(func(): await J.talk_nave())
-		R.var = jn([J.S.nave.sid, J.S.nave.thc, R.s0 - int(J.S.seeds.get("ria", 0))])
+		var fert0 = J.S.items.fert
+		J.S.esquejes.append({"sid": "ria", "f": {"id": 999, "t": 1, "y": 1, "i": 50}, "dia": J.S.day})
+		want(["^Plantar", "^Esqueje .* nº 999"])
+		await run(func(): await J.mesa_nave(0))
+		var M0: Dictionary = J.S.nave.m[0]
+		R.var = jn([M0.k, M0.thc, M0.g, J.S.esquejes.any(func(e): return int(e.f.id) == 999), J.fase_mesa(0)])
+		M0.dia = int(J.S.day) - int(D.NAVE.crece)
 		R.m = J.S.money
 		await dia.call(.99)
-		R.crece = jn([J.S.nave.g, R.m - J.S.money])
+		R.crece = jn([M0.g, R.m - J.S.money])
+		J.S.items.fert = 3
+		want(["^Dejar MEATZA"])
+		await run(func(): await J.estante_nave())
+		want(["^Abono", "^MEATZA"])
+		await run(func(): await J.mesa_nave(0))
+		R.ab = jn([J.S.nave.ab.m, J.S.items.fert, M0.abo])
+		await dia.call(.99)
+		R.abono = jn([M0.g, M0.t, J.S.nave.ab.m])
+		J.S.items.fert = fert0
 		R.b = J.S.buds.ria.g
-		want(["^Recoger"])
-		await run(func(): await J.talk_nave())
-		R.rec = jn([J.S.buds.ria.g - R.b, J.S.nave.g])
+		await run(func(): await J.secadero_nave())
+		R.rec = jn([J.S.buds.ria.g - R.b, M0.g, J.fase_mesa(0)])
 		R.h = J.S.heat
 		await dia.call(0)
 		R.redada = jn([J.S.nave == null, ",".join(PackedStringArray(J.S.plantilla.map(func(w): return w.n))), J.S.heat - R.h])
@@ -1887,18 +1897,182 @@ func _pasos() -> void:
 		func():
 			var P: Dictionary = D.PLANTILLA
 			var N: Dictionary = D.NAVE
+			var g1: float = N.g + 2 * N.gC
+			var t1: float = Datos.jsround(J.strain("ria").thc * N.thc * 10) / 10.0
+			var g2: float = Datos.jsround(g1 * (1 + D.ABONO.rend) * 10) / 10.0
 			return chk(R.w1 == "Itziar,5,5,5," and R.n2 == 1 and R.w2 == "Mikel,1,1,1," and R.w3 == "Iker,3,3,3," and R.pl == "4,%d" % (4 * int(P.sobre)) and R.calle == "calle,ria,25,75" and R.ops == 1
 				and R.venta == jn([22, R.e, P.calor]) and R.arc == R.gc - int(floor(R.gc * P.sisa * 2)) and R.pot == null
 				and R.poli == jn([null, true, P.calor + P.calorPoli, P.sueldo.gerente])
 				and R.robo == 12 and R.timo == 10 and R.fuga == "Itziar,Iker" and R.sin == ",10" and R.ar == "17,7" and R.nave == jn([true, N.fianza])
-				and R.var == jn(["ria", Datos.jsround(J.strain("ria").thc * N.thc * 10) / 10.0, 1]) and R.crece == jn([N.g + 2 * N.gC, N.dia + P.sueldo.nave])
-				and R.rec == jn([N.g + 2 * N.gC, 0]) and R.redada == jn([true, "Iker", N.calor])
+				and R.var == jn(["ria", t1, 0, false, 1]) and R.crece == jn([g1, N.dia + P.sueldo.nave]) and R.ab == "3,0,1"
+				and R.abono == jn([g1 + g2, Datos.jsround((t1 * g1 + (t1 + D.ABONO.thc) * g2) / (g1 + g2) * 10) / 10.0, 2]) and R.rec == jn([g1 + g2, 0, 4])
+				and R.redada == jn([true, "Iker", N.calor])
 				and R.dejar == jn([true, N.fianza]) and R.impago == "true,50" and R.menus == 2
 				and LOG.has("SMS · PATXI: Te mando a Itziar. Vale oro.") and LOG.has("Mikel se va por donde ha venido. El sobre ya es de Patxi.") and LOG.has("SMS · PATXI: Te mando a Iker. Gente normal del barrio.")
 				and LOG.has("SMS · IKER: He cosechado %d g. Está en el arcón." % R.arc) and LOG.has("SMS · MIKEL: Me ha parado la policía. Se han quedado con 22 g de %s. Lo siento." % R.ln)
 				and LOG.has("SMS · MIKEL: Me han atracado en un portal. Se han llevado 13 g de %s. Me quedan 12 g." % R.ln) and LOG.has("SMS · MIKEL: Me han pagado 2 g con billetes falsos. No me he dado cuenta hasta el banco.")
 				and LOG.has("Mikel no contesta al móvil. Se ha largado con 10 g de %s." % R.ln) and LOG.has("SMS · IKER: Sin cobrar no curro. Cuando tengas el dinero, me llamas.")
 				and LOG.has("La policía ha entrado en la nave de Valdehierro. Se lleva las plantas y a Itziar.") and LOG.has("SMS · ARRIETA: No me has pagado la nave. Cambio la cerradura y me quedo la fianza."), R))
+	step("Los locales (1.30): los clubs, la nave y GAUA se entran como una casa: el carné en la puerta del club, el billar con apuesta (la barra de fuerza), compartir en el sofá con un socio, la nave cerrada sin alquilar y sus mesas, y GAUA de noche: la entrada, la barra, la pista, el reservado (un contacto VIP) y a las seis, a la calle", [], func():
+		var sv := {}
+		for k in ["money", "ch", "min", "clubs", "rel", "fijos", "rep", "buds", "nave", "billar", "porro", "noche", "vipN"]:
+			sv[k] = J.S[k].duplicate(true) if (J.S[k] is Dictionary or J.S[k] is Array) else J.S[k]
+		R = {}
+		var prt := func(m: String, g: String):
+			for k in J.MAPS[m].doors:
+				if J.MAPS[m].doors[k].get("gate") == g:
+					return J.MAPS[m].doors[k]
+			return null
+		var dnd := func(): return jn([J.S.map, J.P.x, J.P.y])
+		J.S.ch = 4
+		J.S.money = 2000
+		J.S.min = 600
+		J.S.clubs = {}
+		J.S.rel = {}
+		J.S.fijos = []
+		J.S.billar = {}
+		J.S.porro = {}
+		J.S.noche = null
+		J.S.vipN = 0
+		J.S.nave = null
+		J.S.buds = {}
+		J.add_buds("ria", 50, 12)
+		var dc: Dictionary = prt.call("puerto", "club:puerto")
+		J.enter_map("puerto", int(dc.x) - 5 + 4, 9, "up")
+		var pc := []
+		for k in J.MAPS.puerto.doors:
+			if J.MAPS.puerto.doors[k] == dc:
+				pc = Array(String(k).split(",")).map(func(s): return int(s))
+				break
+		var pon := func():
+			J.P.x = pc[0]
+			J.P.y = pc[1]
+			J.P.px = pc[0] * 16.0
+			J.P.py = pc[1] * 16.0
+		pon.call()
+		want(["^No"])
+		await run(func(): await J.entra_local(dc))
+		R.no = jn([dnd.call(), J.S.clubs.get("puerto", false) == true])
+		R.pc = pc
+		pon.call()
+		want(["^Hacerme socio"])
+		R.m = J.S.money
+		await run(func(): await J.entra_local(dc))
+		await idle()
+		R.si = jn([dnd.call(), J.S.clubs.get("puerto"), R.m - J.S.money])
+		var so := []
+		for e in J.ents:
+			if e.id in ["socio", "billarista", "club_puerto"]:
+				so.append("%s:%d,%d" % [e.id, e.x, e.y])
+		R.socio = " ".join(PackedStringArray(so))
+		J.gancho_billar = func(_t): return .7
+		Cultivo.fijo = .9
+		want(["^A 20 €"])
+		R.m = J.S.money
+		await run(func(): await J.talk_billar("puerto"))
+		R.gana = jn([J.S.money - R.m, J.S.billar.puerto.n, J.S.rel.puerto])
+		Cultivo.fijo = 0
+		want(["^A 50 €"])
+		R.m = J.S.money
+		await run(func(): await J.talk_billar("puerto"))
+		R.empate = J.S.money - R.m
+		J.gancho_billar = func(_t): return .05
+		Cultivo.fijo = 0
+		want(["^A 10 €"])
+		R.m = J.S.money
+		await run(func(): await J.talk_billar("puerto"))
+		R.pierde = jn([J.S.money - R.m, J.S.billar.puerto.n])
+		await run(func(): await J.talk_billar("puerto"))
+		J.gancho_billar = Callable()
+		Cultivo.fijo = -1
+		var per: float = D.BILLAR.periodo
+		R.p = jn([J.puntos_tiro(.7), J.puntos_tiro(.62), J.puntos_tiro(.85), J.puntos_tiro(.95), J.puntos_tiro(.3), J.fuerza_tiro(0), J.fuerza_tiro(per / 2), J.fuerza_tiro(per / 4)])
+		want(["^Compartir", "^Skunk"])
+		R.r = J.S.rel.puerto
+		await run(func(): await J.talk_socio("puerto"))
+		R.comp = jn([J.S.rel.puerto - R.r, J.S.buds.ria.g, J.S.porro.get("puerto") == J.S.day])
+		want(["^Compartir"])
+		await run(func(): await J.talk_socio("puerto"))
+		R.comp2 = J.S.buds.ria.g
+		var sk: String = J.MAPS["club-puerto"].exits.keys()[0]
+		var sal: Dictionary = J.MAPS["club-puerto"].exits[sk]
+		R.sale = jn([sk, sal.to, sal.x, sal.y])
+		var dn: Dictionary = prt.call("valdehierro", "nave")
+		await run(func(): await J.entra_local(dn))
+		R.nave = J.S.map
+		J.enter_map("nave", 6, 6, "up")
+		J.S.nave = J.nave_nueva()
+		R.mesas = J.ents.filter(func(e): return re("^nv\\d$", e.id)).size()
+		want(["^Nada"])
+		await run(func(): await J.object_action(2, 4))
+		want(["<B>"])
+		await run(func(): await J.object_action(11, 2))
+		var dd: Dictionary = prt.call("ensanche", "disco")
+		J.S.min = 720
+		J.enter_map("ensanche", 38, 10, "up")
+		await run(func(): await J.entra_local(dd))
+		R.cerrada = dnd.call()
+		J.S.min = 23 * 60 + 30
+		want(["^Pagar"])
+		R.m = J.S.money
+		await run(func(): await J.entra_local(dd))
+		await idle()
+		R.entra = jn([dnd.call(), R.m - J.S.money, J.S.noche != null and J.S.noche.id == J.S.day])
+		R.d0 = J.S.day
+		J.enter_map("ensanche", 38, 10, "up")
+		R.m = J.S.money
+		await run(func(): await J.entra_local(dd))
+		await idle()
+		R.otra = jn([dnd.call(), R.m - J.S.money])
+		want(["^Una copa"])
+		R.m = J.S.money
+		await run(func(): await J.talk_barra())
+		want(["^Invitar"])
+		R.rep = J.S.rep
+		await run(func(): await J.talk_barra())
+		R.barra = jn([R.m - J.S.money, J.S.noche.copas, J.S.noche.ronda, J.S.rep - R.rep, J.S.rel.gaua])
+		Cultivo.fijo = 0
+		want(["^Bailar"])
+		await run(func(): await J.talk_dj())
+		Cultivo.fijo = -1
+		R.baile = ",".join(PackedStringArray(J.S.fijos.map(func(f): return "%s:%s" % [f.id, f.t])))
+		want(["^Reservar"])
+		R.m = J.S.money
+		await run(func(): await J.talk_rrpp())
+		R.vip = jn([R.m - J.S.money, "%s:%s" % [J.S.fijos[-1].n, J.S.fijos[-1].t], J.S.vipN, J.S.rel.gaua])
+		await run(func(): await J.talk_rrpp())
+		R.vip2 = J.S.fijos.size()
+		J.S.min = 6 * 60 + 1
+		J.on_step_end()
+		await idle()
+		R.echa = dnd.call()
+		var rl := []
+		for id in ["socio", "rrpp", "baila2", "nv0", "club_valde", "darko2", "kiko"]:
+			var m: String = J.S.map
+			J.S.map = "club-puerto"
+			rl.append(J.rel_de(id))
+			J.S.map = m
+		R.rel = jn(rl)
+		var N0 = J.S.nave
+		J.S.nave = {"sid": "ria", "g": 30.5, "thc": 10.8}
+		J.migrate()
+		R.mig = jj(J.S.nave.m.map(func(Me): return [Me.k, Me.g, Me.t, J.S.day - Me.dia] if Me else null)) + Datos.js_num(J.S.nave.ab.m)
+		J.S.nave = N0
+		for k in sv:
+			J.S[k] = sv[k]
+		J.enter_map("home", 5, 5, "up"),
+		func():
+			var N: Dictionary = D.NAVE
+			var Dd: Dictionary = D.DISCO
+			var cr := Datos.js_num(N.crece)
+			return chk(R.no == "puerto,%d,%d,false" % [R.pc[0], R.pc[1] + 1] and jn(R.pc) == "9,7" and R.si == "club-puerto,5,6,true," + Datos.js_num(D.CLUBS.puerto.cuota)
+				and R.socio == "club_puerto:1,2 socio:7,3 billarista:10,4" and R.gana == "20,1,3" and R.empate == 0 and R.pierde == "-10,3" and R.p == "3,3,1,0,0,0,1,0.5"
+				and R.comp == jn([D.SOCIO.rel, 50 - D.SOCIO.g, true]) and R.comp2 == 50 - D.SOCIO.g and R.sale == "5,7,puerto,9,8" and R.nave == "club-puerto" and R.mesas == 0
+				and R.cerrada == "ensanche,38,11" and R.entra == jn(["disco", 6, 6, Dd.entrada, true]) and R.otra == "disco,6,6,0" and R.barra == jn([Dd.copa + Dd.ronda, 1, 1, 1, 4])
+				and R.baile == "gaua%s:pij" % Datos.js_num(R.d0) and R.vip == jn([Dd.mesa, Dd.vip[0] + ":vip", 1, 11]) and R.vip2 == 2 and R.echa == "ensanche,38,9"
+				and R.rel == "puerto,gaua,gaua,,valde,darko,kiko" and R.mig == '[["ria",30.5,10.8,%s],["ria",0,10.8,%s],["ria",0,10.8,%s],["ria",0,10.8,%s]]0' % [cr, cr, cr, cr]
+				and LOG.has("La persiana está echada con un candado. La llave la tiene Arrieta, el dueño.") and LOG.has("%s abre de 23:00 a 6:00." % Dd.n)
+				and LOG.any(func(l): return l.contains("Mesa 1 · vacía")), R))
 	step("El bajo de las setas (1.20): Txomin alquila el bajo de la Kale Zaharra desde el capítulo 4; las bandejas que prepara él (húmedas: cada día pierden; secas o contaminadas, a tirar), 6 días colonizando y 4 fructificando; la cosecha se seca en el bajo y él la compra; el alquiler cada mañana, la redada, el impago y dejarlo", [], func():
 		var sv: Dictionary = {"money": J.S.money, "heat": J.S.heat, "sales": J.S.sales, "ch": J.S.ch, "day": J.S.day, "min": J.S.min}
 		R = {}

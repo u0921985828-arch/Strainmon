@@ -304,8 +304,11 @@ func check_aviso(cuando: String) -> void:
 	check("los mandos caben y no pisan el escenario de diálogos ni la caja de vida del combate (%s; mal en: %s)" % [cuando, ", ".join(mal_m)], mal_m.is_empty())
 
 # lo más alto de una onda (16 bits con signo)
-func pico(w: AudioStreamWAV) -> int:
-	var d := w.data
+# 1.30: la grabada (OGG) no se puede leer sin tocarla: cuenta como que suena si dura (tools/musica.js ya mide su pico)
+func pico(w: AudioStream) -> int:
+	if w is AudioStreamOggVorbis:
+		return 32767 if w.get_length() > 20 else 0
+	var d: PackedByteArray = w.data
 	var m := 0
 	for k in range(0, d.size() - 1, 2 * 37):
 		m = maxi(m, absi(d.decode_s16(k)))
@@ -363,7 +366,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.lector.visible, 60)
 	await espera(3)
 	await foto("0b-creditos")
-	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.23.2") \
+	check("los créditos: autor, versión, fuentes y aviso de ficción", J.lector.visible and J.lector_txt.text.contains("Un juego de Eddie") and J.lector_txt.text.contains("0.24.0") \
 		and J.lector_txt.text.contains("Open Font License") and J.lector_txt.text.contains("FICCIÓN") and J.lector.get_global_rect().encloses(J.lector_sc.get_global_rect()))
 	await pulsa("B")
 	await elige("LICENCIAS")
@@ -423,7 +426,7 @@ func titulo_e_intro() -> void:
 	var so = J.sonido
 	await hasta(func(): return so.temas.has("home"), 1800)
 	check("la canción de la intro (home) ya está sintetizada", so.temas.has("home"))
-	await hasta(func(): return so.temas.size() == J.D.TUNES.size(), 6000)
+	await hasta(func(): return so.temas.size() == so.total, 6000)
 	var oye := true
 	var mudos := []
 	for k in so.efectos:
@@ -435,7 +438,8 @@ func titulo_e_intro() -> void:
 	oye = mudos.is_empty()
 	if not oye:
 		print("  en silencio: ", mudos, " · ", mudos.map(func(k): return pico(so.efectos[k] if so.efectos.has(k) else so.temas[k])))
-	check("sonido: %d efectos y %d canciones sintetizados, ninguno en silencio" % [so.efectos.size(), so.temas.size()], so.listo and so.efectos.size() == 12 and so.temas.size() == J.D.TUNES.size() and oye)
+	var ogg: int = so.temas.values().filter(func(w): return w is AudioStreamOggVorbis).size()
+	check("sonido: %d efectos y %d canciones (%d grabadas, todas las de musica/), ninguno en silencio" % [so.efectos.size(), so.temas.size(), ogg], so.listo and so.efectos.size() == 12 and so.temas.size() == so.total and ogg == so.grabadas.size() and ogg >= 40 and oye)
 	# (la del título se apaga en 0,3 s y la nueva entra a los 0,4 s)
 	await hasta(func(): return so.actual == "home" and so.musica.playing and so.musica.stream == so.temas.home, 120)
 	check("en la intro suena la música de casa, tras el fundido", so.actual == "home" and so.musica.playing and so.musica.stream == so.temas.home)
@@ -509,10 +513,10 @@ func prologo() -> void:
 	var dia := {}
 	for k in J.MAPS:
 		var mu: String = J.MAPS[k].music
-		temas_ok = temas_ok and J.sonido.temas.has(mu)
+		temas_ok = temas_ok and J.sonido.temas.has(mu) and J.sonido.temas[mu] is AudioStreamOggVorbis
 		if J.D.ZONAS.has(k):
 			var n: String = "night" if mu == "town" else mu + "_n"
-			temas_ok = temas_ok and J.sonido.temas.has(n) and n != mu
+			temas_ok = temas_ok and J.sonido.temas.has(n) and J.sonido.temas[n] is AudioStreamOggVorbis and n != mu
 			dia[mu] = n
 	check("música: %d mapas con su canción; %d zonas con la suya de día y de noche, distintas" % [J.MAPS.size(), dia.size()], temas_ok and dia.size() == J.D.ZONAS.size())
 	var pa: Dictionary = J.D.PARADAS.mendialde
@@ -585,7 +589,7 @@ func menu_start() -> void:
 	var calla: bool = not so.on and so.musica.volume_db == -80.0 and J.botones.SONIDO.text == "SILENCIO" and J.m_items[3].right == "NO"
 	await elige("SONIDO")
 	await hasta(func(): return J.menu_box.visible, 60)
-	check("OPCIONES en el menú START (con su icono, como todas las filas; sin BORRAR PARTIDA): SONIDO apaga y enciende", ini and sin_borrar and calla and so.on and so.musica.volume_db == 0.0 and J.botones.SONIDO.text == "SONIDO")
+	check("OPCIONES en el menú START (con su icono, como todas las filas; sin BORRAR PARTIDA): SONIDO apaga y enciende", ini and sin_borrar and calla and so.on and so.musica.volume_db == so.MUSICA_DB and J.botones.SONIDO.text == "SONIDO")
 	await elige("VOLVER")
 	await hasta(func(): return J.menu_box.visible and etiquetas().has("GUARDAR"), 60)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Juego.GUARDADO))
@@ -649,7 +653,7 @@ func paseo() -> void:
 			puerta = Vector2i(int(p[0]), int(p[1]))
 	await anda(puerta)
 	await libre()
-	check("por el portal, de vuelta al piso, con su música", J.S.map == "home" and J.sonido.actual == "home" and J.P.dir == "up")
+	check("por el portal, de vuelta al piso, con su música", J.S.map == "home" and J.sonido.actual == ("home_n" if J.is_night() else "home") and J.P.dir == "up")
 	# contra la pared no se mueve
 	await anda(Vector2i(3, 2))
 	await toque(0, "up", true)

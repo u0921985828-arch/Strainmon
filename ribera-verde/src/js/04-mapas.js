@@ -171,7 +171,7 @@ function buildMaps(){
   [[11,15],[20,15],[27,14],[33,15],[5,29],[9,31],[36,30],[41,15],[16,23],[30,24]].forEach(([x,y])=>gr(v,x,y,'flowers'));
   bosque(v,44,3,5,4,11);bosque(v,2,31,4,4,12);linde(v,{n:[2,5],s:[1,1],o:[1,3],e:[1,3],sem:5});
   // ---------- CASA DE AMA (1.10): dentro del caserío de la familia ----------
-  const ca=newMap('casa-ama',10,8,'floor');ca.music='mendialde_n';
+  const ca=newMap('casa-ama',10,8,'floor');ca.music='casa_ama';
   rect(ca,0,0,9,0,(x,y)=>gr(ca,x,y,'iwT_home'));rect(ca,0,1,9,1,(x,y)=>gr(ca,x,y,'iwB_home'));
   ob(ca,2,1,'iwin');ob(ca,7,1,'iwin');ob(ca,0,2,'bedT');ob(ca,0,3,'bedB');ob(ca,9,6,'fridge');ob(ca,5,4,'table');
   ob(ca,9,2,'plantDeco');ob(ca,0,7,'plantDeco');
@@ -182,7 +182,8 @@ function buildMaps(){
   // orgánico: casas de tres anchos y tres alturas (la fila sigue la línea del paseo; por arriba, monte hasta donde llega cada una)
   rect(pv,0,0,39,7,(x,y)=>gr(pv,x,y,'grass'));rect(pv,0,8,1,15,(x,y)=>gr(pv,x,y,'grass'));rect(pv,38,8,39,15,(x,y)=>gr(pv,x,y,'grass'));
   let px=1;[['marinera',4,6],['marinera6',3,5],['marinera2',4,6],['marinera5',5,7],['marinera3',4,6],['marinera4',4,6],['marinera6',3,5],['marinera',4,6],['marinera5',5,7]]
-    .forEach(([k,w,h])=>{building(pv,k,px,8-h,w,h,null);for(let x=px;x<px+w;x++)for(let y=0;y<8-h;y++)enMonte(pv,x,y);px+=w;});
+    .forEach(([k,w,h],i)=>{const C=i===2;   // la tercera, el CLUB ITSASO (1.30: se entra, gate en 11j-locales)
+      building(pv,k,px,8-h,w,h,C?px+1:null,C?{to:'club-puerto',x:5,y:6,dir:'up',gate:'club:puerto'}:null,C?{ancha:1,dx:8,fachada:'club-itsaso',puerta:'club-itsaso'}:null);for(let x=px;x<px+w;x++)for(let y=0;y<8-h;y++)enMonte(pv,x,y);px+=w;});
   ob(pv,37,6,'bush');
   for(let x=1;x<39;x++)gr(pv,x,8,'walk');
   rect(pv,0,16,39,23,(x,y)=>{gr(pv,x,y,'water');ob(pv,x,y,null);});
@@ -198,7 +199,9 @@ function buildMaps(){
   // orgánico: la carretera, de asfalto roto (baches, parches y la raya borrada); una nave entre los bloques; el borde, de monte
   // que entra y sale por donde no hay ciudad
   rect(vh,0,0,39,1,(x,y)=>gr(vh,x,y,'grass'));rect(vh,0,2,0,23,(x,y)=>gr(vh,x,y,'grass'));rect(vh,39,2,39,23,(x,y)=>gr(vh,x,y,'grass'));rect(vh,0,23,39,23,(x,y)=>gr(vh,x,y,'grass'));
-  building(vh,'ladrillo',2,2,7,6,null);building(vh,'nave',10,2,6,6,null);rect(vh,16,2,18,7,(x,y)=>gr(vh,x,y,'dirt'));building(vh,'ladrillo',19,2,7,6,null);building(vh,'fabrica',29,2,8,6,null);
+  // 1.30: en la nave (la que alquila Arrieta) y en la fundición (el CLUB LA FUNDICIÓN) se entra
+  building(vh,'ladrillo',2,2,7,6,null);building(vh,'nave',10,2,6,6,12,{to:'nave',x:6,y:6,dir:'up',gate:'nave'},{ancha:1,dx:8});rect(vh,16,2,18,7,(x,y)=>gr(vh,x,y,'dirt'));building(vh,'ladrillo',19,2,7,6,null);
+  building(vh,'fabrica',29,2,8,6,32,{to:'club-valde',x:5,y:6,dir:'up',gate:'club:valde'},{ancha:1,dx:8,fachada:'club-fundicion',puerta:'club-fundicion'});
   for(let x=0;x<40;x++){gr(vh,x,9,'rotoT');gr(vh,x,10,'rotoB');}
   building(vh,'ladrillo',2,13,7,6,null);building(vh,'ladrillo',10,13,7,6,null);
   rect(vh,21,13,37,21,(x,y)=>gr(vh,x,y,'dirt'));rect(vh,20,12,38,12,(x,y)=>{if(x!==28&&x!==29)ob(vh,x,y,'fence');});
@@ -241,7 +244,9 @@ function buildMaps(){
   for(let y=0;y<8;y++){gr(ib,42,y,'grass');monte(ib,42,y);}
   rect(ib,19,0,20,1,(x,y)=>gr(ib,x,y,'plaza'));[19,20].forEach(x=>ib.doors[x+',0']={to:'callejon',x:x-9,y:16,dir:'up'});
   for(let x=1;x<43;x++)gr(ib,x,8,'walk');
-  [[1,11,'casco3',5,7],[6,12,'casco',4,6],[10,13,'casco2',3,5],[31,13,'casco2',3,5],[34,12,'casco',4,6],[38,11,'casco3',5,7]].forEach(([x,y,k,w,h])=>building(ib,k,x,y,w,h,null));
+  // 1.30: la segunda, el CLUB KALEA (el portal de la derecha)
+  [[1,11,'casco3',5,7],[6,12,'casco',4,6],[10,13,'casco2',3,5],[31,13,'casco2',3,5],[34,12,'casco',4,6],[38,11,'casco3',5,7]].forEach(([x,y,k,w,h],i)=>
+    building(ib,k,x,y,w,h,i===1?9:null,i===1?{to:'club-ibar',x:5,y:6,dir:'up',gate:'club:ibar'}:null,i===1?{dx:-8,fachada:'club-kalea',puerta:'club-kalea'}:null));
   // la plaza Nueva: soportales en los lados (bancos y farolas), la fuente en medio
   // la fuente, en un parterre redondo; abajo, dos jardineras dejan tres entradas a la plaza desde la avenida (la grande en medio)
   rect(ib,20,13,22,15,(x,y)=>gr(ib,x,y,(x+y)%2?'flowers':'grass'));gr(ib,21,14,'plaza');
@@ -264,7 +269,9 @@ function buildMaps(){
   // fuente. Ladrones y patrullas; clientes con dinero
   const en=newMap('ensanche',46,22,'walk');en.music='ensanche';
   rect(en,0,0,45,1,(x,y)=>{gr(en,x,y,'grass');monte(en,x,y);});
-  [1,10,19,28,37].forEach((x,i)=>{building(en,i%2?'bloque2':'bloque',x,2,8,7,null);if(i<4){gr(en,x+8,2,'grass');gr(en,x+8,3,'grass');monte(en,x+8,2);ob(en,x+8,8,'bush');}});
+  // 1.30: en el bajo del segundo, el CLUB ENSANCHE; en el del último, GAUA, la discoteca
+  const BAJOS={1:[12,{to:'club-ens',x:5,y:6,dir:'up',gate:'club:ens'},{fachada:'club-ensanche',puerta:'club-ensanche'}],4:[38,{to:'disco',x:6,y:6,dir:'up',gate:'disco'},{ancha:1,dx:8,fachada:'disco',puerta:'disco'}]};
+  [1,10,19,28,37].forEach((x,i)=>{building(en,i%2?'bloque2':'bloque',x,2,8,7,...(BAJOS[i]||[null]));if(i<4){gr(en,x+8,2,'grass');gr(en,x+8,3,'grass');monte(en,x+8,2);ob(en,x+8,8,'bush');}});
   for(let x=0;x<46;x++){gr(en,x,10,'roadT');gr(en,x,11,'roadB');}
   [5,14,23,32,41].forEach(x=>ob(en,x,9,'lamp'));[11,33].forEach(x=>ob(en,x,12,'lamp'));ob(en,2,12,'sign');
   rect(en,0,13,45,21,(x,y)=>gr(en,x,y,'grass'));rect(en,1,21,44,21,(x,y)=>ob(en,x,y,'seto'));
@@ -313,7 +320,7 @@ function buildMaps(){
   ob(s,0,5,'display');ob(s,9,5,'display');ob(s,0,7,'plantDeco');ob(s,9,7,'plantDeco');
   gr(s,4,7,'mat');s.exits['4,7']={to:'town',x:17,y:9,dir:'down'};
   // ---------- GROW IBARBIDE (1.14): el growshop grande del Casco Viejo ----------
-  const gc=newMap('growcity',10,8,'floorS');gc.music='shop';
+  const gc=newMap('growcity',10,8,'floorS');gc.music='growcity';
   rect(gc,0,0,9,0,(x,y)=>gr(gc,x,y,'iwT_shop'));rect(gc,0,1,9,1,(x,y)=>gr(gc,x,y,'iwB_shop'));
   [0,1,2,7,8,9].forEach(x=>ob(gc,x,1,'shelfW'));ob(gc,4,1,'poster');rect(gc,2,3,7,3,(x,y)=>ob(gc,x,y,'counter'));
   [[0,4],[0,5],[9,4],[9,5]].forEach(([x,y])=>ob(gc,x,y,'display'));ob(gc,0,7,'plantDeco');ob(gc,9,7,'plantDeco');
@@ -326,7 +333,7 @@ function buildMaps(){
   ob(b,7,5,'btable');ob(b,9,2,'jukebox');ob(b,8,2,'btable');
   gr(b,4,7,'mat');b.exits['4,7']={to:'town',x:26,y:9,dir:'down'};
   // ---------- CASA DE TXARO (1.10) ----------
-  const tx=newMap('txaro',10,8,'floor');tx.music='home';
+  const tx=newMap('txaro',10,8,'floor');tx.music='txaro';
   rect(tx,0,0,9,0,(x,y)=>gr(tx,x,y,'iwT_home'));rect(tx,0,1,9,1,(x,y)=>gr(tx,x,y,'iwB_home'));
   ob(tx,2,1,'iwin');ob(tx,7,1,'iwin');ob(tx,0,2,'bedT');ob(tx,0,3,'bedB');ob(tx,9,6,'fridge');
   ob(tx,5,4,'table');ob(tx,1,2,'plantDeco');ob(tx,9,2,'plantDeco');ob(tx,0,7,'plantDeco');
@@ -338,10 +345,11 @@ function buildMaps(){
   ob(c,0,5,'bench');ob(c,9,5,'bench');ob(c,0,7,'plantDeco');ob(c,9,7,'plantDeco');
   gr(c,4,7,'mat');c.exits['4,7']={to:'alto',x:26,y:19,dir:'down'};
   // ---------- ALMACÉN DE LOS ASTILLEROS (1.10) ----------
-  const w=newMap('almacen',10,8,'floorB');w.music='astilleros_n';
+  const w=newMap('almacen',10,8,'floorB');w.music='almacen';
   rect(w,0,0,9,0,(x,y)=>gr(w,x,y,'iwT_bar'));rect(w,0,1,9,1,(x,y)=>gr(w,x,y,'iwB_bar'));ob(w,6,1,'iwin');
   [[0,2],[1,2],[0,3],[8,2],[9,2],[9,3],[8,6],[9,6],[0,6]].forEach(([x,y])=>ob(w,x,y,'crate'));ob(w,5,4,'btable');ob(w,4,4,'stool');
   gr(w,4,7,'mat');w.exits['4,7']={to:'astilleros',x:18,y:14,dir:'down'};
+  mapasLocales();   // los clubs por dentro, la nave y GAUA (1.30, 11j-locales)
 }
 // carpas del piso según S.carpas: un mueble sólido ('carpa') en las casillas de su sitio; se pinta entero desde su base.
 // Y los muebles del salón que ya han llegado (mueblesYa, 12c-salon): k y k + '2'

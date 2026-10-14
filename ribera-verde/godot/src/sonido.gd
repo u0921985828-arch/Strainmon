@@ -4,12 +4,17 @@
 # convertido en pasos por tema() de 05-audio: melodía con su largo, arpegio, bajo y batería), en un hilo aparte, primero la que
 # toca sonar, y suenan en cuanto están; al cambiar de canción, la que suena se apaga en 0,3 s y la nueva entra a los 0,4 s.
 # El ruido sale de un generador propio con semilla fija: no toca el azar del juego (Cultivo.azar).
+# 1.30: la música grabada (tools/musica.js → musica/<clave>.ogg, con indice.json: dónde empieza el bucle) va antes que el
+# chiptune: el hilo la carga en vez de sintetizarla, suena en bucle desde su intro y MUSICA_DB más baja (sale a -17 dBFS de
+# RMS) para quedar a la altura de los efectos. Una clave sin grabar suena con su chiptune o, si no lo hay, con la de MUS_ALIAS.
 extends Node
 
 const Datos = preload("res://src/datos.gd")
 
 const HZ := 22050
 const MASTER := .16
+const MUSICA_DB := -15.0
+const MUSICA := "res://musica/"
 
 var on := true
 var vm := 1.0   # volumen de la música y de los efectos (OPCIONES, de 0 a 1)
@@ -31,6 +36,9 @@ var cerrojo := Mutex.new()
 var parar := false
 var espera := 0.0   # lo que falta para que entre la canción nueva (tiempo de juego, como el fundido)
 var fundido: Tween = null
+var grabadas := {}   # clave → segundo en el que empieza el bucle
+var alias := {}
+var total := 0   # las canciones que hay (grabadas y sintetizadas)
 
 func init() -> void:
 	if listo:
@@ -60,8 +68,21 @@ func init() -> void:
 			3:
 				_ruido(g, 0, .03, .05)
 		golpes[k] = g
-	T = Datos.carga().TUNES
-	cola = T.keys()
+	var D: Dictionary = Datos.carga()
+	T = D.TUNES
+	alias = D.get("MUS_ALIAS", {})
+	if FileAccess.file_exists(MUSICA + "indice.json"):
+		var idx = JSON.parse_string(FileAccess.get_file_as_string(MUSICA + "indice.json"))
+		if idx is Dictionary:
+			for k in idx:
+				if FileAccess.file_exists(MUSICA + k + ".ogg"):
+					grabadas[k] = float(idx[k].bucle)
+	cola = grabadas.keys()
+	for k in T:
+		if not grabadas.has(k):
+			cola.append(k)
+	total = cola.size()
+	actual = clave(actual)
 	if cola.has(actual):
 		cola.erase(actual)
 		cola.push_front(actual)
@@ -168,13 +189,28 @@ func _hilo() -> void:
 			return
 		var n: String = cola.pop_front()
 		cerrojo.unlock()
-		var b := _tema(T[n])
-		if parar:
-			return
-		var d := _bytes(b)
+		var d: Variant = _ogg(n) if grabadas.has(n) else null
+		if d == null:
+			var b := _tema(T[n]) if T.has(n) else PackedFloat32Array()
+			if parar:
+				return
+			d = _bytes(b)
 		cerrojo.lock()
 		hechos[n] = d
 		cerrojo.unlock()
+
+func _ogg(n: String) -> AudioStreamOggVorbis:
+	var o := AudioStreamOggVorbis.load_from_buffer(FileAccess.get_file_as_bytes(MUSICA + n + ".ogg"))
+	if o:
+		o.loop = true
+		o.loop_offset = grabadas[n]
+	return o
+
+# la canción que suena por una clave: la suya si existe (grabada o en chiptune) y, si no, la de MUS_ALIAS
+func clave(n: String) -> String:
+	if grabadas.has(n) or T.has(n) or not alias.has(n):
+		return n
+	return alias[n]
 
 # una nota de la música (voz de 05-audio): onda a f, de vol a la mitad en dur (lineal) y suelta en 30 ms
 func _nota(cache: Dictionary, tipo: String, f: float, dur: float, vol: float) -> PackedFloat32Array:
@@ -274,6 +310,7 @@ func sfx(k: String) -> void:
 	voces[0].play()
 
 func music(n: String) -> void:
+	n = clave(n)
 	if n == actual:
 		return
 	actual = n
@@ -302,6 +339,7 @@ func music(n: String) -> void:
 func _suena() -> void:
 	if temas.has(actual) and espera <= 0 and (musica.stream != temas[actual] or not musica.playing):
 		musica.stream = temas[actual]
+		_vol()
 		musica.play()
 
 func _process(d: float) -> void:
@@ -313,7 +351,7 @@ func _process(d: float) -> void:
 	hechos = {}
 	cerrojo.unlock()
 	for n in h:
-		temas[n] = _wav_de(h[n], true)
+		temas[n] = h[n] if h[n] is AudioStream else _wav_de(h[n], true)
 	if actual != "":
 		_suena()
 
@@ -323,12 +361,15 @@ func _exit_tree() -> void:
 		hilo.wait_to_finish()
 
 func _vol() -> void:
-	musica.volume_db = linear_to_db(vm) if on and vm > 0 else -80.0
+	musica.volume_db = db_musica() if on and vm > 0 else -80.0
 	if (not on or vm <= 0) and fundido and fundido.is_valid():
 		fundido.kill()
 		otra.stop()
 	for v in voces:
 		v.volume_db = linear_to_db(ve) if on and ve > 0 else -80.0
+
+func db_musica() -> float:
+	return linear_to_db(vm) + (MUSICA_DB if musica.stream is AudioStreamOggVorbis else 0.0)
 
 func set_on(v: bool) -> void:
 	on = v

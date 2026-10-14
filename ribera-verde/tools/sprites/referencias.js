@@ -37,7 +37,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
     Object.keys(TILES).filter(k => /^(floor|iwT_home|iwB_home)-\d$|^alf\d[a-d]/.test(k)).forEach(k => ground.add(k));   // el suelo y las paredes de las reformas y la alfombra (1.27), aunque no estén puestos
     const files = {};
     for (const [k, frames] of Object.entries(TILES)) {
-      if (SEGUNDA.has(k) || k === 'sillaG2') continue;   // la mitad derecha de un mueble del salón (sofa2…, y la silla gaming, 1.27.1) no se pinta: el sprite del mueble ocupa las dos casillas
+      if (SEGUNDA.has(k) || k === 'sillaG2' || LOCAL2.has(k)) continue;   // la mitad derecha de un mueble del salón (sofa2…, la silla gaming, 1.27.1, y los de los locales, billar2…, 1.30) no se pinta: el sprite del mueble ocupa las dos casillas
       const dir = objects.has(k) ? 'objetos' : 'tiles';
       frames.forEach((c, i) => { files[`${dir}/${k}${frames.length > 1 ? '_f' + i : ''}.png`] = png(c); });
     }
@@ -84,7 +84,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
     const inventario = {
       generado: new Date().toISOString().slice(0, 10),
       tiles_suelo: [...ground].sort(),
-      objetos: [...objects].filter(k => k !== 'carpa' && !SEGUNDA.has(k) && k !== 'sillaG2').sort(),   // la carpa del piso es misc:carpa-<t>-mapa
+      objetos: [...objects].filter(k => k !== 'carpa' && !SEGUNDA.has(k) && k !== 'sillaG2' && !LOCAL2.has(k)).sort(),   // la carpa del piso es misc:carpa-<t>-mapa
       tiles_animados: Object.entries(TILES).filter(([, f]) => f.length > 1).map(([k, f]) => ({ clave: k, fotogramas: f.length })),
       personajes: Object.keys(looks),
       personajes_fijos: Object.keys(LOOKS),

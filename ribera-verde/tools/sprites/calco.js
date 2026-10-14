@@ -101,7 +101,7 @@ for (const a of M.assets) {
   if (/^carpa-c-|^carpas-medias-vista$/.test(a.id)) for (const c of a.cubre || []) { const n = c.slice(5), d = path.join(ROOT, 'art', 'procesado', a.id, n, 'unica');
     if (fs.existsSync(d)) fs.readdirSync(d).filter(f => f.endsWith('.png')).sort().forEach((f, i) => wr(a.id, n, 'unica', i, PNG.sync.read(fs.readFileSync(path.join(d, f))))); }
   // las láminas 12 y 13 (1.10 P5, a mano: iconos del equipo y muebles a escala) tampoco tienen referencia: la lámina ya procesada
-  const A_MANO = ['iconos-equipo', 'props-escala', 'salon', 'iconos-menu', 'vehiculos'];   // y la 14 (1.10: salón e iconos del menú) y los vehículos (1.13)
+  const A_MANO = ['iconos-equipo', 'props-escala', 'salon', 'iconos-menu', 'vehiculos', 'locales-alto', 'locales-ancho'];   // y la 14 (1.10: salón e iconos del menú), los vehículos (1.13) y los muebles altos y anchos de los locales (1.30)
   if (A_MANO.includes(a.id)) { const g = path.join(ROOT, 'art', 'procesado', a.id);
     if (fs.existsSync(g)) for (const n of fs.readdirSync(g).filter(n => fs.existsSync(path.join(g, n, 'unica')))) { const d = path.join(g, n, 'unica');
       fs.readdirSync(d).filter(f => f.endsWith('.png')).sort().forEach((f, i) => wr(a.id, n, 'unica', i, PNG.sync.read(fs.readFileSync(path.join(d, f))))); } }
@@ -130,8 +130,9 @@ for (const a of M.assets) {
   // ---------- edificios (una pieza del tamaño de su celda, de 3×5 a 8×6 casillas, montada como en building()) ----------
   if (a.tipo === 'edificio') {
     // gray-puerta (fachada retocada a mano para la puerta de home) se calca de las losetas de gray. La puerta: en la casilla
-    // 3 (las aprobadas de 7 × 6) o en a.puerta = {x, ancha} (las de mundo.py, 1.10: ancha ocupa x y x + 1 y se recorta centrada)
-    const id = a.id.replace('edificio-', ''), ref = id.replace(/-puerta$/, ''), w = M.celdas[a.celda].w / 16, h = M.celdas[a.celda].h / 16;   // alto de la celda (orgánico: 4, 5, 6 o 7)
+    // 3 (las aprobadas de 7 × 6) o en a.puerta = {x, ancha} (las de mundo.py, 1.10: ancha ocupa x y x + 1 y se recorta centrada).
+    // Las fachadas de los locales (1.30) se calcan de las losetas del edificio en el que van (a.calco)
+    const id = a.id.replace('edificio-', ''), ref = a.calco || id.replace(/-puerta$/, ''), w = M.celdas[a.celda].w / 16, h = M.celdas[a.celda].h / 16;   // alto de la celda (orgánico: 4, 5, 6 o 7)
     const doorX = a.puerta ? a.puerta.x : ref === 'gray' || !(a.animaciones || []).some(an => an.nombre === 'puerta') ? null : 3, an2 = a.puerta && a.puerta.ancha ? 1 : 0;
     const o = blank(w * 16, h * 16), t = k => rd(`tiles/${k}_${ref}.png`);
     for (let x = 0; x < w; x++) { copy(t('roofT'), o, x * 16, 0); copy(t('roofB'), o, x * 16, 16); for (let y = 2; y < h; y++) copy(t('wall'), o, x * 16, y * 16); if (x % 3 === 1 && x !== doorX) copy(t('win'), o, x * 16, 48); }

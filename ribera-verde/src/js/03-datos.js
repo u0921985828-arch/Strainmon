@@ -225,6 +225,22 @@ const LOOKS={
   arrieta:{id:'cliente1',skin:'#d8a880',hair:'#6a6a70',style:'short',stache:'#6a6a70',shirt:'#5a6a7a',pants:'#3a3a44'},   // el de la nave (1.19)
   txomin:{id:'oldman',skin:'#e0aa84',hair:'#c8c8c8',style:'cap',hat:'#5a4a3a',hat2:'#3a2a20',shirt:'#6a7a4a',pants:'#4a4038'},   // el setero de la Kale Zaharra (1.20)
   portera:{id:'cliente5',skin:'#f6c8a0',hair:'#8a2a1a',style:'long',shirt:'#2a2a30',pants:'#3a3a44',glasses:1},
+  // los locales (1.30, 11j-locales): los socios y los del billar de los clubs, los de la nave, y la gente de GAUA
+  socio:{id:'cliente3',skin:'#e8b088',hair:'#5a3a24',style:'short',beard:1,shirt:'#5a7a4a',pants:'#3a3a44'},
+  socia:{id:'cliente6',skin:'#f0c8a8',hair:'#2a1a14',style:'long',shirt:'#c04870',pants:'#2a2a30'},
+  billarista:{id:'cliente1',skin:'#d49a74',hair:'#1a1a1a',style:'short',stache:'#1a1a1a',shirt:'#e0e0e8',pants:'#2a2a30'},
+  billarista2:{id:'cliente4',skin:'#f6c8a0',hair:'#8a2a1a',style:'bun',shirt:'#3a3a48',pants:'#2a2a30'},
+  navero1:{id:'cliente1',skin:'#e8b088',hair:'#5a3a24',style:'short',shirt:'#5ab868',pants:'#3a3a44'},
+  navero2:{id:'cliente2',skin:'#d49a74',hair:'#1a1a1a',style:'short',shirt:'#5ab868',shirt2:'#6a6a70',pants:'#3a3a44'},
+  navero3:{id:'cliente4',skin:'#f0c0a0',hair:'#2a1a14',style:'long',shirt:'#5ab868',pants:'#3a3a44'},
+  navero4:{id:'cliente6',skin:'#d49a74',hair:'#5a3a24',style:'short',beard:1,shirt:'#5ab868',pants:'#3a3a44'},
+  gorila:{id:'cliente2',skin:'#b07850',hair:'#1a1a1a',style:'bald',shirt:'#101014',pants:'#101014'},
+  camarera:{id:'cliente5',skin:'#f0d0b8',hair:'#1a1a1a',style:'bun',shirt:'#101014',pants:'#101014'},
+  dj:{id:'cliente3',skin:'#e8b088',hair:'#c48a3a',style:'cap',hat:'#c04870',hat2:'#101014',shirt:'#3a3a48',pants:'#2a2a30'},
+  rrpp:{id:'cliente4',skin:'#f6c8a0',hair:'#d8c070',style:'long',shirt:'#a060c0',pants:'#101014'},
+  baila1:{id:'cliente3',skin:'#f0d0b8',hair:'#2a1a14',style:'curly',shirt:'#40a0a0',pants:'#36466e'},
+  baila2:{id:'cliente6',skin:'#b07850',hair:'#1a1a1a',style:'long',shirt:'#f0c838',pants:'#2a2a30'},
+  baila3:{id:'cliente1',skin:'#e8b088',hair:'#8a2a1a',style:'short',shirt:'#e65040',pants:'#36466e'},
   judge:{id:'judge',skin:'#f0c4a0',hair:'#6a4a2a',style:'short',shirt:'#3a3a48',shirt2:'#c0a040',pants:'#2a2a34',glasses:1},
 };
 const SKINS=['#f6c8a0','#e8b088','#d49a74','#b07850','#8a5a3a','#f0d0b8'];
@@ -240,6 +256,7 @@ const CTYPES={
   cur:{label:'CURRELA',mult:1,g:[3,8],greet:['Buenas. Salgo de doble turno.','Qué tal. Lo de siempre, sin líos.']},
   tur:{label:'TURISTA',mult:1.15,g:[4,9],greet:['Hello. ¿Tú vendes... marihuana? Pago bien.','Bonjour. Me han dicho que aquí se cultiva bien.']},
   pij:{label:'PIJO',mult:1.35,g:[5,12],greet:['Busco algo de calidad para una cena en Neguri.','Solo quiero lo mejor. El precio me da igual.']},
+  vip:{label:'VIP',mult:1.6,g:[10,25],greet:['Me ha dicho la RRPP de GAUA que tienes lo mejor.','Para el fin de semana. Que sea lo bueno, el precio da igual.']},   // el reservado de GAUA (1.30)
   ext:{label:'CATADOR',mult:1,g:[1,3],greet:['¿Tienes rosin? Me han dicho que prensas tú mismo.','Busco extracción sin disolventes. Rosin, nada de BHO.']},   // solo rosin (1.10)
 };
 

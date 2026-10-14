@@ -1,0 +1,19 @@
+{
+  "grupo": "locales-alto",
+  "celda": [
+    32,
+    32
+  ],
+  "tope_colores": 15,
+  "secuencias": 3,
+  "fotogramas": 3,
+  "semitransparentes": 0,
+  "en_paleta_antes": 45.5,
+  "distancia_media": 0,
+  "colores_finales": 10,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

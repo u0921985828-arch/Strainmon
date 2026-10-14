@@ -541,15 +541,21 @@ node('tools/build.js', '--atlas-dir', path.join(PAR, 'atlas'), '--salida', PAR);
     // cada canción del mismo largo y con notas; y todas se programan en WebAudio sin error (ondas de pulso, ligaduras, batería)
     const mus = await page.evaluate(() => {
       const r = { mal: [], dia: [], err: null, n: 0 };
-      for (const k in MAPS) if (!TUNES[MAPS[k].music]) r.mal.push(k + ':' + MAPS[k].music);
+      for (const k in MAPS) if (!(TUNES[MAPS[k].music] || TUNES[MUS_ALIAS[MAPS[k].music]])) r.mal.push(k + ':' + MAPS[k].music);
+      for (const [k, v] of Object.entries(MUS_ALIAS)) if (!TUNES[v] || TUNES[k]) r.mal.push('alias ' + k);
+      r.claves = [...new Set([...Object.values(MAPS).map(m => m.music), ...Object.keys(MUS_ALIAS), ...Object.keys(TUNES)])];
       for (const z in ZONAS) { const m = MAPS[z].music, n = m === 'town' ? 'night' : m + '_n'; r.dia.push(m); if (!TUNES[n] || n === m) r.mal.push(z + ' de noche'); }
       for (const [k, t] of Object.entries(TUNES)) { const L = t.mel.length; if (!L || ['md', 'arm', 'bas', 'bat'].some(x => t[x].length !== L) || !t.mel.some(Boolean) || !t.bas.some(Boolean)) r.mal.push('canción ' + k); }
       const S0 = { map: S.map, min: S.min };
-      S.map = 'puerto'; S.min = 12 * 60; const d = mapMusic(); S.min = 23 * 60; const n = mapMusic(); S.map = 'town'; const t = mapMusic(); S.map = 'bar'; const b = mapMusic();
-      Object.assign(S, S0); r.mapa = [d, n, t, b].join();
+      S.map = 'puerto'; S.min = 12 * 60; const d = mapMusic(); S.min = 23 * 60; const n = mapMusic(); S.map = 'town'; const t = mapMusic(); S.map = 'bar'; const b = mapMusic(); S.map = 'home'; const h = mapMusic(); S.min = 12 * 60; const h2 = mapMusic();
+      S.map = 'puerto'; SOSP.alarma = 1; const a = mapMusic(); SOSP.alarma = null;
+      Object.assign(S, S0); r.mapa = [d, n, t, b, h, h2, a].join();
       try { audioInit(); for (const k in TUNES) { music(k); seqT = AC.currentTime; schedule(); r.n++; } music(mapMusic()); } catch (e) { r.err = String(e); }
       r.distintas = new Set(r.dia).size === Object.keys(ZONAS).length; return r; });
-    check(`Música por zona: ${Object.keys(mus.dia).length} zonas con su canción de día y de noche, distintas; cada mapa con la suya (el bar, su tango); ${mus.n} canciones programadas sin error`, !mus.mal.length && mus.distintas && mus.mapa === 'puerto,puerto_n,night,bar' && !mus.err && mus.n >= 20, mus);
+    // 1.30: la app de Godot trae la música grabada (tools/musica/temas.js): una por cada clave que pide el juego
+    const { TEMAS } = require('./musica/temas.js'), grabadas = Object.entries(TEMAS).flatMap(([k, T]) => T.calle ? [k, k === 'town' ? 'night' : k + '_n'] : [k]);
+    const sinGrabar = mus.claves.filter(k => !grabadas.includes(k)), sobran = grabadas.filter(k => !mus.claves.includes(k));
+    check(`Música por zona: ${Object.keys(mus.dia).length} zonas con su canción de día y de noche, distintas; cada mapa con la suya (el bar, su tango; el piso, de noche, la suya; con la alarma, la alarma); ${mus.n} canciones programadas sin error; ${grabadas.length} grabadas para Godot, una por clave`, !mus.mal.length && mus.distintas && mus.mapa === 'puerto,puerto_n,night,bar,home_n,home,alarma' && !mus.err && mus.n >= 20 && !sinGrabar.length && !sobran.length, { mus, sinGrabar, sobran });
     await page.waitForTimeout(300);
     check('Con atlas: 0 errores de JavaScript', errors.length === 0, errors.slice(0, 5));
     await page.close();

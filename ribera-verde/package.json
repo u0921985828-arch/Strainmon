@@ -1,6 +1,6 @@
 {
   "name": "ribera-verde",
-  "version": "1.29.2",
+  "version": "1.30.0",
   "private": true,
   "description": "RPG de cultivo en pixel art estilo portátil de 16 bits, inspirado en las mecánicas de Weed Firm.",
   "scripts": {
@@ -18,7 +18,8 @@
     "test:arte": "node tools/test-arte.js",
     "apk": "node tools/build.js && node tools/build-apk.js",
     "godot": "node tools/build.js && node tools/godot.js && node tools/godot-pantallas.js && RV_ORACULO=godot/tests/historia.json node tools/test-historia.js",
-    "godot:apk": "node tools/godot-apk.js"
+    "godot:apk": "node tools/godot-apk.js",
+    "musica": "node tools/musica.js"
   },
   "devDependencies": {
     "playwright": "^1.56.0",

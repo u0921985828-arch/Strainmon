@@ -2294,7 +2294,13 @@
     "look:ibarbitarra",
     "npc:ibarbitarra",
     "look:arrieta",
-    "npc:arrieta"
+    "npc:arrieta",
+    "look:billarista",
+    "npc:billarista",
+    "look:navero1",
+    "npc:nv0",
+    "look:baila3",
+    "npc:baila3"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -2406,7 +2412,11 @@
     "npc:obrero",
     "look:portero",
     "npc:club_puerto",
-    "npc:club_ibar"
+    "npc:club_ibar",
+    "look:navero2",
+    "npc:nv1",
+    "look:gorila",
+    "npc:gorila"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -2525,7 +2535,13 @@
    "cubre": [
     "look:cliente3",
     "look:turista",
-    "npc:turista"
+    "npc:turista",
+    "look:socio",
+    "npc:socio",
+    "look:dj",
+    "npc:dj",
+    "look:baila1",
+    "npc:baila1"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -2635,7 +2651,12 @@
    "cubre": [
     "look:cliente4",
     "look:ane",
-    "npc:ane"
+    "npc:ane",
+    "look:billarista2",
+    "look:navero3",
+    "npc:nv2",
+    "look:rrpp",
+    "npc:rrpp"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -2748,7 +2769,9 @@
     "npc:nerea",
     "look:portera",
     "npc:club_valde",
-    "npc:club_ens"
+    "npc:club_ens",
+    "look:camarera",
+    "npc:camarera"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -2966,7 +2989,12 @@
     "look:vecina",
     "npc:vecina",
     "look:bixente",
-    "npc:bixente"
+    "npc:bixente",
+    "look:socia",
+    "look:navero4",
+    "npc:nv3",
+    "look:baila2",
+    "npc:baila2"
    ],
    "herramienta": "create_character",
    "parametros": {
@@ -5128,8 +5156,7 @@
    "cubre": [
     "tile:roofT_marinera2",
     "tile:roofB_marinera2",
-    "tile:wall_marinera2",
-    "tile:win_marinera2"
+    "tile:wall_marinera2"
    ],
    "celda": "edificio_4x6",
    "origen": "tools/sprites/a-mano/mundo.py (marinera): dibujado a mano a 16 px/m con la luz y el estilo de las fachadas aprobadas",
@@ -7572,6 +7599,326 @@
    "origen": "tools/sprites/a-mano/mundo.py: dibujado a mano a 16 px/m con la paleta y la luz de lo aprobado",
    "descripcion": "bloque de pisos del Ensanche (gris): azotea, terrazas y locales con toldo azul",
    "notas": "1.14, pedido por el usuario: una ciudad grande con sus barrios y casas según el bioma («que no sea todo atrezo»)."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "edificio",
+   "id": "edificio-club-itsaso",
+   "calco": "marinera2",
+   "cubre": [
+    "tile:door_marinera2"
+   ],
+   "celda": "edificio_4x6",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "descripcion": "1.30: el club de Puerto Viejo (Itsaso) en la casa marinera azul, con la placa de latón «CLUB» sobre la puerta, la hoja en el cristal esmerilado y el farol",
+   "puerta": {
+    "x": 1,
+    "ancha": 1
+   },
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose (interior #26262e), de locales.py (simple)",
+     "herramienta": "importado"
+    }
+   ],
+   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca».",
+   "max_colores": 24,
+   "montaje": "la fachada de mundo.py con su rótulo y su puerta: 24 colores (la de mundo.py ya llega a 15 y el rótulo, el neón o la placa se fundirían en el gris)"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "edificio",
+   "id": "edificio-club-fundicion",
+   "calco": "fabrica",
+   "cubre": [
+    "tile:door_fabrica"
+   ],
+   "celda": "edificio_8x6",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "descripcion": "1.30: el club de Valdehierro en la fundición vieja: una puerta peatonal con ventanuco cortada en el portón de chapa y la placa «CLUB» con su aplique",
+   "puerta": {
+    "x": 3,
+    "ancha": 1
+   },
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose (interior #26262e), de locales.py (simple)",
+     "herramienta": "importado"
+    }
+   ],
+   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca».",
+   "max_colores": 24,
+   "montaje": "la fachada de mundo.py con su rótulo y su puerta: 24 colores (la de mundo.py ya llega a 15 y el rótulo, el neón o la placa se fundirían en el gris)"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "edificio",
+   "id": "edificio-club-kalea",
+   "calco": "casco",
+   "cubre": [
+    "tile:door_casco"
+   ],
+   "celda": "edificio_4x6",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "descripcion": "1.30: el club del Casco Viejo de Ibarbide (Kalea): la lonja con el cristal esmerilado y la hoja, el portal de madera en la casilla 3 y la placa de latón en la piedra",
+   "puerta": {
+    "x": 3
+   },
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose (interior #26262e), de locales.py (simple)",
+     "herramienta": "importado"
+    }
+   ],
+   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca».",
+   "max_colores": 24,
+   "montaje": "la fachada de mundo.py con su rótulo y su puerta: 24 colores (la de mundo.py ya llega a 15 y el rótulo, el neón o la placa se fundirían en el gris)"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "edificio",
+   "id": "edificio-club-ensanche",
+   "calco": "bloque2",
+   "cubre": [
+    "tile:door_bloque2"
+   ],
+   "celda": "edificio_8x7",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "descripcion": "1.30: el club del Ensanche, en el bajo izquierdo del bloque gris: toldo verde con «CLUB», escaparate esmerilado con la hoja, puerta de cristal en la casilla 2 y el portero automático",
+   "puerta": {
+    "x": 2
+   },
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose (interior #26262e), de locales.py (simple)",
+     "herramienta": "importado"
+    }
+   ],
+   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca».",
+   "max_colores": 24,
+   "montaje": "la fachada de mundo.py con su rótulo y su puerta: 24 colores (la de mundo.py ya llega a 15 y el rótulo, el neón o la placa se fundirían en el gris)"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "edificio",
+   "id": "edificio-disco",
+   "calco": "bloque",
+   "cubre": [
+    "tile:door_bloque"
+   ],
+   "celda": "edificio_8x7",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "descripcion": "1.30: la discoteca GAUA, en el bajo izquierdo del bloque crema: fachada negra, el neón rosa «GAUA» con la luna y la estrella azules, el marco de luz y la puerta doble acolchada",
+   "puerta": {
+    "x": 1,
+    "ancha": 1
+   },
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose (interior #26262e), de locales.py (doble)",
+     "herramienta": "importado"
+    }
+   ],
+   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca».",
+   "max_colores": 24,
+   "montaje": "la fachada de mundo.py con su rótulo y su puerta: 24 colores (la de mundo.py ya llega a 15 y el rótulo, el neón o la placa se fundirían en el gris)"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "tiles",
+   "id": "interior-locales",
+   "cubre": [
+    "tile:floorC",
+    "tile:iwT_club",
+    "tile:iwB_club",
+    "tile:floorN",
+    "tile:iwT_nave",
+    "tile:iwB_nave",
+    "tile:floorD",
+    "tile:iwT_disco",
+    "tile:iwB_disco"
+   ],
+   "celda": "tile",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "descripcion": "1.30, los locales por dentro: el club (parqué de tablero de cuadros de 8 × 8, papel verde botella con la moldura y zócalo de cuarterones), la nave de cultivo (hormigón pulido en losas de 1 m y chapa grecada con la viga y el murete) y la discoteca (baldosa negra con brillo y paneles acolchados con la tira de LED rosa arriba y la azul abajo)",
+   "estilo_ref": "las paredes y suelos de serie (interior-home, interior-bar)",
+   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca»."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "tiles",
+   "id": "interior-baile",
+   "cubre": [
+    "tile:baile"
+   ],
+   "celda": "tile_tira",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "descripcion": "1.30: la pista de baile de GAUA, 2 × 2 paneles de colores por casilla en 4 variantes (tira de 64 × 16; el juego coge una por casilla con hashT)",
+   "estilo_ref": "los firmes en tira (tiles-firmes)",
+   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca»."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "id": "locales-16",
+   "cubre": [
+    "obj:vitrina",
+    "obj:tarros",
+    "obj:pizarra",
+    "obj:cartelC",
+    "obj:tacos",
+    "obj:mesita",
+    "obj:barraD",
+    "obj:neon",
+    "obj:mesaV",
+    "obj:cordon",
+    "obj:cordonF"
+   ],
+   "celda": "objeto_1x1",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "descripcion": "1.30: la vitrina del dispensario (mueble de madera con la urna y dos tarros), la balda de tarros, la pizarra de la variedad del día, las normas del club, el taquero con el triángulo, la mesa baja con cenicero, grinder y librillo, la barra acolchada de GAUA con su tira azul, el neón de la luna, la mesa del reservado con la cubitera y dos copas y el cordón de terciopelo (poste y cuerda; cordonF, el último poste)",
+   "ajuste_por_sprite": {
+    "vitrina": "exacto",
+    "tarros": "exacto",
+    "pizarra": "exacto",
+    "cartelC": "exacto",
+    "tacos": "exacto",
+    "mesita": "exacto",
+    "barraD": "exacto",
+    "neon": "exacto",
+    "mesaV": "exacto",
+    "cordon": "exacto",
+    "cordonF": "exacto"
+   },
+   "estilo_ref": "props-16 (botellero, mostrador, gramola)",
+   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca»."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "id": "locales-alto",
+   "cubre": [
+    "obj:estanteN",
+    "obj:secadero",
+    "obj:altavoz"
+   ],
+   "celda": "objeto_alto",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "descripcion": "1.30: la estantería metálica de los abonos de la nave (100 × 180 cm, garrafas de MEATZA y ORTUA BIO y sacos de sustrato), el secadero de red de 4 pisos colgado con los cogollos tendidos y el altavoz de la pista (cajón de graves y caja con conos)",
+   "ajuste_por_sprite": {
+    "estanteN": "exacto",
+    "secadero": "exacto",
+    "altavoz": "exacto"
+   },
+   "estilo_ref": "los muebles a escala del piso (props-escala)",
+   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca»."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "id": "locales-ancho",
+   "cubre": [
+    "obj:billar",
+    "obj:sofaF",
+    "obj:sofaV",
+    "obj:sofaB",
+    "obj:cabina",
+    "obj:escritorio",
+    "obj:mesaN"
+   ],
+   "celda": "mueble_ancho",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "descripcion": "1.30, muebles de 2 casillas a 16 px/m: la mesa de billar de 210 cm con el tapete a medio fondo, las troneras y las bolas, y la lámpara de tres pantallas verdes colgada encima; el sofá chester verde de frente (sofaF) y por detrás (sofaB), el de terciopelo morado del reservado (sofaV), la cabina del DJ con los platos, la mesa y el rótulo, la mesa de oficina de la nave con el portátil y la cajonera, y la mesa de cultivo de 240 × 120 cm con seis macetas bajo la barra de LED en sus cinco fases (mesaN-0 vacía, -1 plántulas, -2 vegetativo, -3 flor, -4 cogollos)",
+   "ajuste_por_sprite": {
+    "billar": "exacto",
+    "sofaF": "exacto",
+    "sofaV": "exacto",
+    "sofaB": "exacto",
+    "cabina": "exacto",
+    "escritorio": "exacto",
+    "mesaN-0": "exacto",
+    "mesaN-1": "exacto",
+    "mesaN-2": "exacto",
+    "mesaN-3": "exacto",
+    "mesaN-4": "exacto"
+   },
+   "estilo_ref": "los muebles del salón (salon)",
+   "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca»."
   }
  ],
  "familias": {

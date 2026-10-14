@@ -370,7 +370,7 @@ async function avisoOrden(){
 async function raidEvent(){
   S.orden=0;
   if(S.protect){S.heat=50;return talk('SMS · MOLINA',['Esta noche había orden de entrada en tu piso. La he parado.','Baja el ritmo.']);}
-  sfx('bad');await say('REDADA. La policía entra en tu piso con una orden de registro.');
+  music('redada');sfx('bad');await say('REDADA. La policía entra en tu piso con una orden de registro.');
   const casa=S.map==='home',ne=S.esquejes.length+S.bandejas.length,g=Math.floor((casa?totalBuds():0)+arconG()),r=(casa?totalRosin():0)+arconR(),hs=huecos(),np=S.pots.filter(p=>p&&!p.dead).length,eq=new Set();   // lo de encima y el arcón (1.10)
   S.carpas.forEach((c,ci)=>{if(c&&hs.some((h,i)=>h.c===ci&&S.pots[i]&&!S.pots[i].dead))for(const k in EXTRAS)if(c[k]){eq.add(EXTRAS[k].n.toLowerCase());delete c[k];if(k==='goteo')delete c.dep;if(k==='garrafas')delete c.gar;}});
   S.pots=S.pots.map(()=>null);if(casa){S.buds={};S.rosin={};}S.arcon={buds:{},rosin:{}};S.esquejes=[];S.bandejas=[];S.heat=CALOR_REDADA;
@@ -379,13 +379,13 @@ async function raidEvent(){
   await say(`${lo.length?'Se llevan '+yLista(lo):'No encuentran nada que llevarse'}. Multa: ${eur(multa)}${fine<multa?` (pagas ${eur(fine)}: no tienes más)`:''}.`);
   if(eq.size)await say('Y el equipo de las carpas con plantas: '+[...eq].join(', ')+'.');
   await say(S.caja?'La caja de detrás del diploma ni la ven. Las semillas no son delito: se quedan.':'Las semillas no son delito: se quedan.');
-  await say('Toca empezar de nuevo. Y vender menos una temporada.');
+  await say('Toca empezar de nuevo. Y vender menos una temporada.');music(mapMusic());
 }
 async function ending(){
-  await fade(1);const e=$('endcard');
+  await fade(1);music('final');const e=$('endcard');
   e.innerHTML=`<h2>DEUDA SALDADA</h2><div>Has saldado los ${eur(DEUDA)} de tu tía Maite en ${S.day} días.</div><div>Variedades: ${discCount()} · Ventas totales: ${eur(S.sales)}</div><div>Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.<br>¿Completarás la GENOTECA? ¿Conseguirás la JACK HERER?</div><div style="opacity:.7">Pulsa A</div>`;
   e.hidden=false;await fade(0);sfx('get');
   await new Promise(r=>push(b=>{if(b==='A'||b==='START'){pop();r();}}));
-  await fade(1);e.hidden=true;await fade(0);await chapter(8);showObjective();
+  await fade(1);e.hidden=true;music(mapMusic());await fade(0);await chapter(8);showObjective();
 }
 

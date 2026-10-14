@@ -159,7 +159,7 @@ function arteTile(k,tx,ty,sx,sy,now){
     }
   }
   const f=frameDe(ARTE.cubre['tile:'+k],k,'unica',0,{i:0});if(!f)return false;
-  if(f.c.width>16&&f.c.height===16){ctx.drawImage(f.c,variante(k,tx,ty)*16,0,16,16,sx,sy,16,16);return true;}   // tira de variantes (orgánico)
+  if(f.c.width>16&&f.c.height===16){ctx.drawImage(f.c,(k==='baile'?(variante(k,tx,ty)+Math.floor(now/600))%4:variante(k,tx,ty))*16,0,16,16,sx,sy,16,16);return true;}   // tira de variantes (orgánico); la pista de GAUA cambia cada 0,6 s (1.30)
   ctx.drawImage(f.c,sx,sy,16,16);
   if(k==='grass')detalle(tx,ty,sx,sy);
   return true;
@@ -198,16 +198,17 @@ function arteOrilla(m,k,tx,ty,sx,sy){
 // objetos: los de 1 casilla en el suelo; los altos van a la lista ordenada por Y (tapan al jugador si está detrás). Los de la
 // pared (fila de abajo de la pared, 2 m a 16 px/m), subidos a su altura (1.10, ALZA px): ventanas y cuadros con el alféizar a
 // 0,9 m, las baldas de las plantas a 1 m y la de las botellas a 1,05 m (antes, todos a ras de suelo)
-const ALZA={iwin:-13,poster:-13,shelfW:-16,bottles:-13,cuadro:-13,cartel:-13};
+const ALZA={iwin:-13,poster:-13,shelfW:-16,bottles:-13,cuadro:-13,cartel:-13,tarros:-16,pizarra:-13,cartelC:-13,tacos:-13,neon:-13};   // 1.30: los de los locales
 // los muebles que dejan sombra en el suelo (1.10 P5): como la de los personajes, 1 px a cada lado del dibujo en sus 2 últimas filas y
 // la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo. Van a «sombras» y se pintan con todo el suelo ya puesto
-const SOMBRA_OBJ=new Set(['fridge','crate','table','btable','stool','plantDeco','lab','lab2','pc','display','counter','barcounter','jukebox','bench','bedB']);
+const SOMBRA_OBJ=new Set(['fridge','crate','table','btable','stool','plantDeco','lab','lab2','pc','display','counter','barcounter','jukebox','bench','bedB','vitrina','mesita','barraD','mesaV','estanteN','secadero','altavoz']);
 function arteObj(o,tx,ty,cam,now,list,sombras){
   if(!ARTE.ok)return false;
-  if(SEGUNDA.has(o)||o==='sillaG2')return !!ARTE.cubre['obj:'+o.slice(0,-1)];   // la mitad de la derecha de un mueble del salón: la pinta la de la izquierda
+  if(SEGUNDA.has(o)||o==='sillaG2'||LOCAL2.has(o))return !!ARTE.cubre['obj:'+o.slice(0,-1)];   // la mitad de la derecha de un mueble del salón (y de los locales, 1.30): la pinta la de la izquierda
   const g=ARTE.cubre['obj:'+o];if(!g)return false;
   const an=ARTE.sobre['obj:'+o],d=desfase(o,tx,ty);
-  const sp=decoSprite(o),f=an?frameDe(an[0][0],an[0][1],'unica',now,{bucle:true}):frameDe(g,sp,'unica',0,{i:0,esp:d.esp})||(sp!==o?frameDe(g,o,'unica',0,{i:0,esp:d.esp}):null);   // 1.16: su tapizado o lámina
+  const sp=o==='mesaN'?'mesaN-'+faseMesa(MESAS_X.indexOf(tx)):decoSprite(o),f=   // 1.30: la mesa de la nave, en su fase
+    an?frameDe(an[0][0],an[0][1],'unica',now,{bucle:true}):frameDe(g,sp,'unica',0,{i:0,esp:d.esp})||(sp!==o?frameDe(g,o,'unica',0,{i:0,esp:d.esp}):null);   // 1.16: su tapizado o lámina
   if(!f)return false;
   const xp=tx*16+8+d.dx-cam.x,yp=ty*16+15+d.dy+(ALZA[o]||0)-cam.y;
   if(sombras&&SOMBRA_OBJ.has(o)){

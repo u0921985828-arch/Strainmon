@@ -35,6 +35,7 @@ var gancho_texto := Callable()   # (texto, nombre) · transcripción
 var gancho_toast := Callable()   # (html, ms)
 var gancho_pedir := Callable()    # (texto, inicial, máx, cancela) → texto o null · las pruebas escriben en la caja de texto
 var gancho_combate := Callable() # (tipo) · las pruebas cambian el combate por una función (window.battle en el HTML)
+var gancho_billar := Callable()  # (texto) → de 0 a 1 · las pruebas cambian el tiro del billar (window.tiroBillar, 1.30)
 
 var handlers: Array = []
 var held := {"up": false, "down": false, "left": false, "right": false, "A": false, "B": false}

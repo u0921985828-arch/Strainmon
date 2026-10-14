@@ -1,0 +1,25 @@
+{
+  "grupo": "locales-ancho",
+  "celda": [
+    48,
+    48
+  ],
+  "tope_colores": 15,
+  "secuencias": 11,
+  "fotogramas": 11,
+  "semitransparentes": 0,
+  "en_paleta_antes": 43.6,
+  "distancia_media": 0,
+  "colores_finales": 15,
+  "fundidos": [
+    "billar: #f4f4ee→#fff2b0",
+    "billar: #c04848→#a07040",
+    "mesaN-3: #5a4030→#3a3a40",
+    "mesaN-4: #5a4030→#3a3a40",
+    "mesaN-4: #bcc6ce→#a8acb4"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

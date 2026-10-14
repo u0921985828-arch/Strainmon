@@ -12,7 +12,8 @@ function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},gen:{},pedido:[],esquejes:[],bandejas:[],fenos:{},fenoN:0,fnom:{},eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
   caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0,arcon:{buds:{},rosin:{}},sala:{},fijos:[],sms:[],envio:[],orden:0,misiones:{},itin:{},lonja:0,trueque:0,chatarra:null,
-  rel:{},relDia:{},curro:{jard:null,vend:[]},clubs:{},clubDia:{},clubCompra:{},clubEnc:null,clubEncDia:0,catas:{},rivales:{},rivalFuera:{},deco:{},pelea:{xp:0,fue:0,ref:0},plantilla:[],plN:0,nave:null,setas:null,ropa:{},obra:{},logros:{}};}   // la gente (1.15, 11e-gente)
+  rel:{},relDia:{},curro:{jard:null,vend:[]},clubs:{},clubDia:{},clubCompra:{},clubEnc:null,clubEncDia:0,catas:{},rivales:{},rivalFuera:{},deco:{},pelea:{xp:0,fue:0,ref:0},plantilla:[],plN:0,nave:null,setas:null,ropa:{},obra:{},logros:{},
+  billar:{},porro:{},noche:null,vipN:0};}   // la gente (1.15, 11e-gente); los locales (1.30, 11j-locales)
 const isFree=()=>mode==='world'&&lock===0&&handlers.length===0;
 const isNight=()=>S.min>=21*60||S.min<6*60;
 async function run(fn){lock++;try{await fn();}catch(e){console.error(e);}finally{lock--;}if(!lock&&S&&S.misiones)revisaMisiones();}
@@ -111,7 +112,8 @@ function tileSolid(m,x,y){
 const entAt=(x,y)=>ents.find(e=>(e.x===x&&e.y===y)||(e.moving&&e.fx===x&&e.fy===y));
 function enterMap(name,x,y,dir){S.map=name;if(name==='home')montarCasa();Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];resetSosp();buildEnts();music(mapMusic());}
 // cada mapa lleva su canción (04-mapas); en la calle, de noche, su versión nocturna (Ribera: night)
-const mapMusic=()=>{const m=MAPS[S.map].music;return ZONAS[S.map]&&isNight()?(m==='town'?'night':m+'_n'):m;};
+// 1.30: con la alarma, la suya; el piso, de noche, su versión de noche
+const mapMusic=()=>{const m=MAPS[S.map].music;if(ZONAS[S.map]&&SOSP.alarma)return 'alarma';if(S.map==='home'&&isNight())return 'home_n';return ZONAS[S.map]&&isNight()?(m==='town'?'night':m+'_n'):m;};
 async function warp(w){sfx('door');await fade(1);enterMap(w.to,w.x,w.y,w.dir);updateHUD();await wait(80);await fade(0);}
 
 /* ---------- movement ---------- */
@@ -137,7 +139,8 @@ const pasoMs=()=>{const v=vehiculo();return v?VEHICULOS[v].paso[held.B?1:0]:held
 function onStepEnd(){
   S.x=P.x;S.y=P.y;S.dir=P.dir;S.steps++;if(S.cool>0)S.cool--;
   const m=MAPS[S.map],door=m.doors[P.x+','+P.y];
-  if(door){run(()=>warp(door));return;}
+  if(door){run(()=>door.gate?entraLocal(door):warp(door));return;}   // 1.30: la puerta de un local (11j-locales)
+  if(S.map==='disco'&&!discoAbierta()){run(echarDisco);return;}
   const Z=ZONAS[S.map];if(!Z)return;
   if(S.map==='town'&&P.y>=13&&P.y<=14&&P.x>=18&&P.x<=22){
     if(S.ch>=2&&S.ch<7&&!S.flags.darko1){queue('darko',async()=>{const e=ents.find(e=>e.id==='darko');if(e)e.dir='up';await talkDarko();});return;}
@@ -173,7 +176,7 @@ function interact(){
   const [dx,dy]=DV[P.dir],m=MAPS[S.map],[tx,ty]=delante();
   let e=entAt(tx,ty);
   if(!e&&m.o[ty]&&COUNTERS.has(m.o[ty][tx]))e=entAt(tx+dx,ty+dy);
-  if(e){run(async()=>{if(!e.moving)e.dir=OPP[P.dir];if(e.def.client)await talkClient(e.def.client);else{await e.def.talk(e);if(!e.pat)saludo(e.id.startsWith('club_')?e.id.slice(5):e.id==='darko2'?'darko':e.id);}});return;}
+  if(e){run(async()=>{if(!e.moving)e.dir=OPP[P.dir];if(e.def.client)await talkClient(e.def.client);else{await e.def.talk(e);const r=relDe(e.id);if(!e.pat&&r)saludo(r);}});return;}
   const it=itemAt(tx,ty);if(it){run(()=>pickItem(it));return;}
   run(()=>objectAction(tx,ty));
 }
@@ -191,6 +194,7 @@ const SIGNS={'town:9,8':'Calle Ribera, 3.\nPiso de la tía Maite.','town:13,8':'
   'ensanche:2,12':'IBARBIDE · ENSANCHE\n← Casco Viejo y estación de autobuses.'};
 async function objectAction(x,y){
   const m=MAPS[S.map],o=m.o[y]&&m.o[y][x];
+  {const lo=objLocal(x,y,o);if(lo)return lo;}   // los locales (1.30, 11j-locales)
   if(S.map==='home'){
     const t=(m.carpas||[]).find(t=>x>=t.x0&&x<=t.x1&&y===t.y);if(t)return abrirCarpa(t.ci);
     const sl=sitioLibre(x,y);

@@ -49,16 +49,22 @@
     "alf2d-1",
     "alf2d-2",
     "alf2d-3",
+    "baile",
     "bridgeB",
     "bridgeT",
     "dirt",
     "dock",
     "door_bar",
+    "door_bloque",
+    "door_bloque2",
+    "door_casco",
     "door_caserio",
     "door_comisaria",
+    "door_fabrica",
     "door_gray",
     "door_growcity",
     "door_home",
+    "door_marinera2",
     "door_nave",
     "door_shop",
     "floor",
@@ -66,21 +72,30 @@
     "floor-2",
     "floor-3",
     "floorB",
+    "floorC",
+    "floorD",
+    "floorN",
     "floorS",
     "flowers",
     "grass",
     "hormigon",
     "iwB_bar",
+    "iwB_club",
+    "iwB_disco",
     "iwB_home",
     "iwB_home-1",
     "iwB_home-2",
     "iwB_home-3",
+    "iwB_nave",
     "iwB_shop",
     "iwT_bar",
+    "iwT_club",
+    "iwT_disco",
     "iwT_home",
     "iwT_home-1",
     "iwT_home-2",
     "iwT_home-3",
+    "iwT_nave",
     "iwT_shop",
     "mat",
     "pista",
@@ -181,7 +196,6 @@
     "win_home",
     "win_ladrillo",
     "win_marinera",
-    "win_marinera2",
     "win_marinera3",
     "win_marinera4",
     "win_marinera5",
@@ -190,19 +204,28 @@
     "win_shop"
   ],
   "objetos": [
+    "altavoz",
     "barcounter",
+    "barraD",
     "bedB",
     "bedT",
     "bench",
+    "billar",
     "bottles",
     "btable",
     "bush",
+    "cabina",
     "carro",
     "cartel",
+    "cartelC",
+    "cordon",
+    "cordonF",
     "counter",
     "crate",
     "cuadro",
     "display",
+    "escritorio",
+    "estanteN",
     "fence",
     "fountain",
     "fridge",
@@ -213,12 +236,18 @@
     "lab2",
     "lamp",
     "manzano",
+    "mesaN",
+    "mesaV",
+    "mesita",
     "monte",
     "monte2",
+    "neon",
     "parada",
     "pc",
+    "pizarra",
     "plantDeco",
     "poster",
+    "secadero",
     "seto",
     "shelfW",
     "sign",
@@ -226,11 +255,17 @@
     "sillaG",
     "sillon",
     "sofa",
+    "sofaB",
+    "sofaF",
+    "sofaV",
     "stool",
     "table",
+    "tacos",
+    "tarros",
     "tree",
     "tree2",
-    "tv"
+    "tv",
+    "vitrina"
   ],
   "tiles_animados": [
     {
@@ -267,6 +302,21 @@
     "arrieta",
     "txomin",
     "portera",
+    "socio",
+    "socia",
+    "billarista",
+    "billarista2",
+    "navero1",
+    "navero2",
+    "navero3",
+    "navero4",
+    "gorila",
+    "camarera",
+    "dj",
+    "rrpp",
+    "baila1",
+    "baila2",
+    "baila3",
     "judge",
     "cliente1",
     "cliente2",
@@ -307,6 +357,21 @@
     "arrieta",
     "txomin",
     "portera",
+    "socio",
+    "socia",
+    "billarista",
+    "billarista2",
+    "navero1",
+    "navero2",
+    "navero3",
+    "navero4",
+    "gorila",
+    "camarera",
+    "dj",
+    "rrpp",
+    "baila1",
+    "baila2",
+    "baila3",
     "judge"
   ],
   "npcs": [
@@ -487,25 +552,25 @@
     {
       "id": "club_puerto",
       "look": "portero",
-      "mapa": "puerto",
+      "mapa": "club-puerto",
       "deambula": false
     },
     {
       "id": "club_valde",
       "look": "portera",
-      "mapa": "valdehierro",
+      "mapa": "club-valde",
       "deambula": false
     },
     {
       "id": "club_ibar",
       "look": "portero",
-      "mapa": "ibarbide",
+      "mapa": "club-ibar",
       "deambula": false
     },
     {
       "id": "club_ens",
       "look": "portera",
-      "mapa": "ensanche",
+      "mapa": "club-ens",
       "deambula": false
     },
     {
@@ -519,6 +584,120 @@
       "look": "txomin",
       "mapa": "callejon",
       "deambula": false
+    },
+    {
+      "id": "socio",
+      "look": "socio",
+      "mapa": "club-puerto",
+      "deambula": false
+    },
+    {
+      "id": "billarista",
+      "look": "billarista",
+      "mapa": "club-puerto",
+      "deambula": false
+    },
+    {
+      "id": "socio",
+      "look": "socia",
+      "mapa": "club-valde",
+      "deambula": false
+    },
+    {
+      "id": "billarista",
+      "look": "billarista2",
+      "mapa": "club-valde",
+      "deambula": false
+    },
+    {
+      "id": "socio",
+      "look": "socio",
+      "mapa": "club-ibar",
+      "deambula": false
+    },
+    {
+      "id": "billarista",
+      "look": "billarista",
+      "mapa": "club-ibar",
+      "deambula": false
+    },
+    {
+      "id": "socio",
+      "look": "socia",
+      "mapa": "club-ens",
+      "deambula": false
+    },
+    {
+      "id": "billarista",
+      "look": "billarista2",
+      "mapa": "club-ens",
+      "deambula": false
+    },
+    {
+      "id": "nv0",
+      "look": "navero1",
+      "mapa": "nave",
+      "deambula": false
+    },
+    {
+      "id": "nv1",
+      "look": "navero2",
+      "mapa": "nave",
+      "deambula": false
+    },
+    {
+      "id": "nv2",
+      "look": "navero3",
+      "mapa": "nave",
+      "deambula": false
+    },
+    {
+      "id": "nv3",
+      "look": "navero4",
+      "mapa": "nave",
+      "deambula": false
+    },
+    {
+      "id": "gorila",
+      "look": "gorila",
+      "mapa": "ensanche",
+      "deambula": false
+    },
+    {
+      "id": "camarera",
+      "look": "camarera",
+      "mapa": "disco",
+      "deambula": false
+    },
+    {
+      "id": "dj",
+      "look": "dj",
+      "mapa": "disco",
+      "deambula": false
+    },
+    {
+      "id": "rrpp",
+      "look": "rrpp",
+      "mapa": "disco",
+      "deambula": false
+    },
+    {
+      "id": "baila1",
+      "look": "baila1",
+      "mapa": "disco",
+      "deambula": true
+    },
+    {
+      "id": "baila2",
+      "look": "baila2",
+      "mapa": "disco",
+      "deambula": true
+    },
+    {
+      "id": "baila3",
+      "look": "baila3",
+      "mapa": "disco",
+      "deambula": true
     }
   ],
   "plantas": {

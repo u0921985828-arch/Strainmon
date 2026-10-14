@@ -974,7 +974,7 @@
      "y": 2,
      "w": 4,
      "h": 6,
-     "puerta": null
+     "puerta": 9
     },
     {
      "id": "marinera5",
@@ -1025,7 +1025,18 @@
      "puerta": null
     }
    ],
-   "puertas": [],
+   "puertas": [
+    {
+     "x": 9,
+     "y": 7,
+     "a": "club-puerto"
+    },
+    {
+     "x": 10,
+     "y": 7,
+     "a": "club-puerto"
+    }
+   ],
    "salidas": [],
    "npcs": [
     {
@@ -1038,12 +1049,6 @@
      "id": "nerea",
      "x": 23,
      "y": 17,
-     "deambula": 0
-    },
-    {
-     "id": "club_puerto",
-     "x": 10,
-     "y": 8,
      "deambula": 0
     }
    ],
@@ -1082,7 +1087,7 @@
      "y": 2,
      "w": 6,
      "h": 6,
-     "puerta": null
+     "puerta": 12
     },
     {
      "id": "ladrillo",
@@ -1098,7 +1103,7 @@
      "y": 2,
      "w": 8,
      "h": 6,
-     "puerta": null
+     "puerta": 32
     },
     {
      "id": "ladrillo",
@@ -1117,7 +1122,28 @@
      "puerta": null
     }
    ],
-   "puertas": [],
+   "puertas": [
+    {
+     "x": 12,
+     "y": 7,
+     "a": "nave"
+    },
+    {
+     "x": 13,
+     "y": 7,
+     "a": "nave"
+    },
+    {
+     "x": 32,
+     "y": 7,
+     "a": "club-valde"
+    },
+    {
+     "x": 33,
+     "y": 7,
+     "a": "club-valde"
+    }
+   ],
    "salidas": [],
    "npcs": [
     {
@@ -1130,12 +1156,6 @@
      "id": "bixente",
      "x": 30,
      "y": 15,
-     "deambula": 0
-    },
-    {
-     "id": "club_valde",
-     "x": 12,
-     "y": 8,
      "deambula": 0
     },
     {
@@ -1322,7 +1342,7 @@
      "y": 12,
      "w": 4,
      "h": 6,
-     "puerta": null
+     "puerta": 9
     },
     {
      "id": "casco2",
@@ -1379,6 +1399,11 @@
      "a": "callejon"
     },
     {
+     "x": 9,
+     "y": 17,
+     "a": "club-ibar"
+    },
+    {
      "x": 43,
      "y": 21,
      "a": "ensanche"
@@ -1390,14 +1415,7 @@
     }
    ],
    "salidas": [],
-   "npcs": [
-    {
-     "id": "club_ibar",
-     "x": 6,
-     "y": 18,
-     "deambula": 0
-    }
-   ],
+   "npcs": [],
    "objetos": [
     {
      "o": "fountain",
@@ -1432,7 +1450,7 @@
      "y": 2,
      "w": 8,
      "h": 7,
-     "puerta": null
+     "puerta": 12
     },
     {
      "id": "bloque",
@@ -1456,10 +1474,25 @@
      "y": 2,
      "w": 8,
      "h": 7,
-     "puerta": null
+     "puerta": 38
     }
    ],
    "puertas": [
+    {
+     "x": 12,
+     "y": 8,
+     "a": "club-ens"
+    },
+    {
+     "x": 38,
+     "y": 8,
+     "a": "disco"
+    },
+    {
+     "x": 39,
+     "y": 8,
+     "a": "disco"
+    },
     {
      "x": 0,
      "y": 10,
@@ -1480,8 +1513,8 @@
      "deambula": 2
     },
     {
-     "id": "club_ens",
-     "x": 12,
+     "id": "gorila",
+     "x": 40,
      "y": 9,
      "deambula": 0
     }
@@ -1688,6 +1721,194 @@
      "x": 21,
      "y": 10,
      "item": 1
+    }
+   ],
+   "carpas": []
+  },
+  "club-puerto": {
+   "nombre": "club-puerto",
+   "titulo": "CLUB ITSASO (PUERTO VIEJO) · los cuatro clubs, iguales por dentro",
+   "w": 12,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 5,
+     "y": 7,
+     "a": "puerto"
+    },
+    {
+     "x": 6,
+     "y": 7,
+     "a": "puerto"
+    }
+   ],
+   "npcs": [
+    {
+     "id": "club_puerto",
+     "x": 1,
+     "y": 2,
+     "deambula": 0
+    },
+    {
+     "id": "socio",
+     "x": 7,
+     "y": 3,
+     "deambula": 0
+    },
+    {
+     "id": "billarista",
+     "x": 10,
+     "y": 4,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "poster",
+     "x": 7,
+     "y": 1
+    },
+    {
+     "o": "plantDeco",
+     "x": 3,
+     "y": 2
+    },
+    {
+     "o": "jukebox",
+     "x": 11,
+     "y": 2
+    },
+    {
+     "o": "plantDeco",
+     "x": 0,
+     "y": 6
+    },
+    {
+     "o": "plantDeco",
+     "x": 11,
+     "y": 6
+    }
+   ],
+   "carpas": []
+  },
+  "nave": {
+   "nombre": "nave",
+   "titulo": "LA NAVE DE VALDEHIERRO",
+   "w": 14,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 6,
+     "y": 7,
+     "a": "valdehierro"
+    },
+    {
+     "x": 7,
+     "y": 7,
+     "a": "valdehierro"
+    }
+   ],
+   "npcs": [
+    {
+     "id": "nv0",
+     "x": 1,
+     "y": 5,
+     "deambula": 0
+    },
+    {
+     "id": "nv1",
+     "x": 4,
+     "y": 5,
+     "deambula": 0
+    },
+    {
+     "id": "nv2",
+     "x": 8,
+     "y": 5,
+     "deambula": 0
+    },
+    {
+     "id": "nv3",
+     "x": 11,
+     "y": 5,
+     "deambula": 0
+    }
+   ],
+   "objetos": [
+    {
+     "o": "crate",
+     "x": 13,
+     "y": 2
+    }
+   ],
+   "carpas": []
+  },
+  "disco": {
+   "nombre": "disco",
+   "titulo": "GAUA (IBARBIDE · Ensanche)",
+   "w": 14,
+   "h": 8,
+   "edificios": [],
+   "puertas": [],
+   "salidas": [
+    {
+     "x": 6,
+     "y": 7,
+     "a": "ensanche"
+    },
+    {
+     "x": 7,
+     "y": 7,
+     "a": "ensanche"
+    }
+   ],
+   "npcs": [
+    {
+     "id": "camarera",
+     "x": 1,
+     "y": 2,
+     "deambula": 0
+    },
+    {
+     "id": "dj",
+     "x": 6,
+     "y": 2,
+     "deambula": 0
+    },
+    {
+     "id": "rrpp",
+     "x": 12,
+     "y": 5,
+     "deambula": 0
+    },
+    {
+     "id": "baila1",
+     "x": 5,
+     "y": 5,
+     "deambula": 1
+    },
+    {
+     "id": "baila2",
+     "x": 8,
+     "y": 5,
+     "deambula": 1
+    },
+    {
+     "id": "baila3",
+     "x": 7,
+     "y": 4,
+     "deambula": 1
+    }
+   ],
+   "objetos": [
+    {
+     "o": "bottles",
+     "x": 0,
+     "y": 1
     }
    ],
    "carpas": []

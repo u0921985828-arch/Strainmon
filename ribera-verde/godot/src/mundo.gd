@@ -6,7 +6,7 @@ extends "res://src/ui.gd"
 const TS := 16
 const DV := {"up": [0, -1], "down": [0, 1], "left": [-1, 0], "right": [1, 0]}
 const OPP := {"up": "down", "down": "up", "left": "right", "right": "left"}
-const COUNTERS := ["counter", "barcounter", "btable"]
+const COUNTERS := ["counter", "barcounter", "btable", "vitrina", "barraD", "cabina", "cabina2"]   # 1.30: la vitrina del dispensario, la barra y la cabina del DJ
 const SILLAS := ["silla", "sillaG", "sillaG2"]   # 1.27.1: delante de un ordenador; con A, el ordenador de encima (delante)
 var SOLID_G := RegEx.create_from_string("^(water|roof|wall|win|iwT|iwB|void)")
 
@@ -152,6 +152,21 @@ func saludo(id: String) -> void:
 		return
 	S.relDia[id] = S.day
 	confia(id, int(D.REL.charla))
+
+# de quién es la confianza que suma hablar con alguien (relDe, 11j-locales; 1.30): el club del encargado, del socio y del del
+# billar; GAUA, la de su gente; los de la nave, ninguna (son de tu plantilla)
+func rel_de(id: String):
+	if id.begins_with("club_"):
+		return id.substr(5)
+	if id == "socio" or id == "billarista":
+		return S.map.substr(5)
+	if id == "darko2":
+		return "darko"
+	if id in ["gorila", "camarera", "dj", "rrpp"] or (id.length() == 6 and id.begins_with("baila") and id[5].is_valid_int()):
+		return "gaua"
+	if id.length() == 3 and id.begins_with("nv") and id[2].is_valid_int():
+		return null
+	return id
 
 func nombre_fijo(id: String) -> String:
 	var a := 0
@@ -548,6 +563,11 @@ func npc_cond(d: Dictionary) -> bool:
 			return (S.flags.get("kiko1") and not S.flags.get("harvest1")) if d.map == "home" else (true if S.flags.get("harvest1") else false)
 	if d.id.begins_with("club_"):   # los clubs (1.15), desde su capítulo
 		return S.ch >= int(D.CLUBS[d.id.substr(5)].ch)
+	match d.id:   # los locales (1.30): cada trabajador de la nave, junto a su mesa; el portero de GAUA, desde su capítulo
+		"nv0", "nv1", "nv2", "nv3":
+			return S.get("nave") != null and naveros().size() > int(d.id.substr(2))
+		"gorila":
+			return S.ch >= int(D.DISCO.ch)
 	return true
 
 func npc_talk(d: Dictionary) -> void:
@@ -585,6 +605,23 @@ func npc_talk(d: Dictionary) -> void:
 			await talk_begona()
 		"club_puerto", "club_valde", "club_ibar", "club_ens":   # los clubs (1.15)
 			await talk_club(d.id.substr(5))
+		# los locales (1.30, 11j-locales)
+		"socio":
+			await talk_socio(S.map.substr(5))
+		"billarista":
+			await talk_billar(S.map.substr(5))
+		"nv0", "nv1", "nv2", "nv3":
+			await talk_navero(int(d.id.substr(2)))
+		"gorila":
+			await talk_gorila()
+		"camarera":
+			await talk_barra()
+		"dj":
+			await talk_dj()
+		"rrpp":
+			await talk_rrpp()
+		"baila1", "baila2", "baila3":
+			await talk_baila(int(d.id.substr(5)) - 1)
 		"unai":
 			await say(pick(["Si mantienes pulsado B, corres.", "Mi hermano dice que de noche, en la hierba alta del parque, roban a la gente.", "Con START abres tu GENOTECA y la mochila.", "En los arbustos del parque la gente esconde cosas. Mira delante de ellos con A."]), "UNAI")
 		"patxi":
@@ -727,9 +764,14 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	build_ents()
 	music(map_music())
 
-# cada mapa lleva su canción (04-mapas); en la calle, de noche, su versión nocturna (Ribera: night)
+# cada mapa lleva su canción (04-mapas); en la calle, de noche, su versión nocturna (Ribera: night); 1.30: con la alarma,
+# la suya, y el piso de noche, la suya
 func map_music() -> String:
 	var m: String = MAPS[S.map].music
+	if D.ZONAS.has(S.map) and SOSP.alarma != null:
+		return "alarma"
+	if S.map == "home" and is_night():
+		return "home_n"
 	if D.ZONAS.has(S.map) and is_night():
 		return "night" if m == "town" else m + "_n"
 	return m
@@ -826,7 +868,13 @@ func on_step_end() -> void:
 	var m: Dictionary = MAPS[S.map]
 	var door = m.doors.get("%d,%d" % [P.x, P.y])
 	if door:
-		run(func(): await warp(door))
+		if door.get("gate"):   # 1.30: la puerta de un local (entra_local, trama.gd)
+			run(func(): await entra_local(door))
+		else:
+			run(func(): await warp(door))
+		return
+	if S.map == "disco" and not disco_abierta():
+		run(func(): await echar_disco())
 		return
 	if not D.ZONAS.has(S.map):
 		return
@@ -929,8 +977,9 @@ func interact() -> void:
 				await talk_client(e.def.client)
 			else:
 				await npc_talk(e.def)
-				if not e.get("pat"):
-					saludo(e.id.substr(5) if e.id.begins_with("club_") else ("darko" if e.id == "darko2" else e.id)))
+				var r = rel_de(e.id)
+				if not e.get("pat") and r:
+					saludo(r))
 		return
 	var it = item_at(tx, ty)
 	if it:
@@ -941,6 +990,8 @@ func interact() -> void:
 func object_action(x: int, y: int) -> void:
 	var m: Dictionary = MAPS[S.map]
 	var o = m.o[y][x] if y >= 0 and y < m.h and x >= 0 and x < m.w else null
+	if await obj_local(x, y, o):   # los locales (1.30)
+		return
 	if S.map == "home":
 		for t in m.get("carpas", []):
 			if x >= t.x0 and x <= t.x1 and y == t.y:
@@ -1176,7 +1227,7 @@ func talk_client(c: Dictionary) -> void:
 		await say("Entonces me voy.", N)
 		return
 	var mt: float = 50.0 if ext else (c.minThc if c.minThc else 14)
-	var acc: float = [1.0, .92, clampf(.3 + (b.thc - mt) * .05 + (.25 if c.type == "pij" else 0.0) + (.15 if c.type == "tur" else 0.0), .1, .9)][j]
+	var acc: float = [1.0, .92, clampf(.3 + (b.thc - mt) * .05 + (.25 if c.type == "pij" else 0.0) + (.15 if c.type == "tur" else 0.0) + (.3 if c.type == "vip" else 0.0), .1, .9)][j]
 	if j > 0:   # 1.15: la confianza de los de la agenda, la cata y el análisis
 		acc = minf(.97, acc + (rel(c.fid) / 250.0 if c.get("fid") else 0.0) + (.05 if b.get("cata") else 0.0) + (.1 if b.get("ana") else 0.0))
 	if Cultivo.azar() < acc:
@@ -1508,6 +1559,7 @@ func update_patrullas(dt: float) -> void:
 		if e == null:   # al cambiar el turno se va el que te seguía
 			SOSP.alarma = null
 			SOSP.v = 50.0
+			music(map_music())
 			toast("Lo has despistado.", 1600)
 			return
 		if ve:
@@ -1519,6 +1571,7 @@ func update_patrullas(dt: float) -> void:
 			e.espera = 1200.0
 			SOSP.alarma = null
 			SOSP.v = 50.0
+			music(map_music())
 			toast("Lo has despistado.", 1600)
 		return
 	if SOSP.tregua > 0:
@@ -1540,6 +1593,7 @@ func alarma(e: Dictionary) -> void:
 	e.caza = true
 	e.espera = float(D.PAT.alto)
 	sfx("enc")
+	music(map_music())
 	toast("<small>¡ALTO, POLICÍA!</small>Corre (B): métete en un portal o aléjate.", 2200)
 
 # vender cerca de un agente (talk_client), aunque no mire: la sospecha sube de golpe
@@ -1627,6 +1681,33 @@ func recibir_envio():
 func talk_begona():
 	pass
 func talk_club(_k):
+	pass
+# los locales (1.30, trama.gd)
+func naveros() -> Array:
+	return []
+func entra_local(_d):
+	pass
+func obj_local(_x: int, _y: int, _o) -> bool:
+	return false
+func disco_abierta() -> bool:
+	return false
+func echar_disco():
+	pass
+func talk_socio(_k):
+	pass
+func talk_billar(_k):
+	pass
+func talk_navero(_i):
+	pass
+func talk_gorila():
+	pass
+func talk_barra():
+	pass
+func talk_dj():
+	pass
+func talk_rrpp():
+	pass
+func talk_baila(_i):
 	pass
 func curro_dia():
 	pass

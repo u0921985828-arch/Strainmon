@@ -140,6 +140,12 @@ func migrate() -> void:
 		S.protHasta = S.day + int(D.CUOTA_DIAS)
 	if not S.flags.has("diario"):   # 1.25: el diario sale bajo la almohada; las partidas de antes ya lo tenían
 		S.flags.diario = 1
+	if S.get("nave") != null and not S.nave.has("m"):   # 1.30: la nave de antes (una variedad para todos) pasa a 4 mesas con ella, ya dando, y lo que había, en la 1.ª
+		var o: Dictionary = S.nave
+		S.nave = nave_nueva()
+		if o.get("sid"):
+			for i in S.nave.m.size():
+				S.nave.m[i] = {"k": o.sid, "thc": o.thc, "y": 1, "dia": int(S.day) - int(D.NAVE.crece), "g": Datos.jsround(o.g * 10) / 10.0 if i == 0 else 0, "t": o.thc, "abo": 0}
 	if not S.flags.has("vendDia"):   # 1.29.1: el dia de un vendedor era el de la entrega; ahora, el de la cosecha (los de antes no pierden)
 		for v in S.curro.vend:
 			v.erase("dia")

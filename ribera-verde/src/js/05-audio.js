@@ -97,6 +97,11 @@ const CANCIONES={
     mel:'. . b4 d5 . . g5 . | e5 - - . c5 . e5 . | d5 . b4 . g4 - - . | . . a4 c5 d5 - . . | . . b5 . a5 . g5 . | e5 - g5 - e5 . c5 . | b4 - - e5 g5 - . . | f#5 - - d5 - . . .',bat:'. h . h s h . h'},
   bar:{bpm:120,bp:'R . . 5',ap:'0 . 1 .',ch:'Dm Dm A A Dm Dm Gm A Dm Dm Gm Gm Dm A A A',
     mel:'d5 . . d5 f5 . a5 . | e5 - - c#5 a4 . . . | d5 . . f5 a5 . d6 . | bb5 - a5 . g5 . e5 . | f5 . . a5 d6 - c6 . | bb5 . . g5 d5 - . . | f5 - e5 d5 c#5 - e5 . | a4 - - - . . . .',bat:'k . . h s . h .'},
+  // los locales (1.30): el club, bossa tranquila en la menor; GAUA, house en do menor a 128
+  club:{bpm:90,mo:'triangle',ao:'pulse12',ap:'. 0 . 1',bp:'R . . 5',ch:'Am Am Dm Dm Am Am Em Em F F G G Am Am E E',
+    mel:'a4 - - c5 e5 - - . | d5 - - f5 a5 - - . | c5 - e5 - a5 - g5 . | e5 - - - . . . . | f5 - a5 - c6 - a5 . | g5 - b5 - d6 - b5 . | a5 - g5 - e5 - c5 . | b4 - - - g#4 - . .',bat:'k . h . s . h .'},
+  disco:{bpm:128,mo:'pulse12',ao:'pulse25',bo:'sawtooth',bp:'R 8 R 8',ap:'0 1 2 1',ch:'Cm Cm Ab Ab Eb Eb Bb Bb Cm Cm Ab Ab Fm Fm G G',
+    mel:'c5 . eb5 . g5 . c6 . | bb5 - g5 . eb5 - . . | ab5 . c6 . eb6 . c6 . | bb5 - ab5 . g5 - . . | g5 . c6 . g5 . eb5 . | f5 - eb5 . d5 - . . | c5 . eb5 . f5 . ab5 . | g5 - - - b4 - d5 .',bat:'k h k h k s k h'},
   comisaria:{bpm:96,bp:'R . R .',ch:'Em Em Em Em C C B B Em Em Em Em C C B B',
     mel:'b4 - - - . . . . | c5 - b4 - . . g4 . | e5 - - - . . . . | d#5 - - - f#5 - . . | b5 - - - a5 - g5 - | f#5 - - - e5 - . . | e5 - g5 - c6 - - . | b5 - - - . . . .',bat:'h . . . h . . .'},
 };
@@ -104,6 +109,10 @@ const CANCIONES={
 const ZONA_MUSICA=Object.keys(ZONAS).filter(k=>k!=='town');
 for(const k of ZONA_MUSICA)CANCIONES[k+'_n']=nocturno(CANCIONES[k]);
 const TUNES=Object.fromEntries(Object.entries(CANCIONES).map(([k,d])=>[k,tema(d)]));
+// 1.30: la app de Godot trae una canción grabada por sitio y por momento (tools/musica.js); aquí, cada una suena con la más parecida
+const MUS_ALIAS={home_n:'home',txaro:'home',growcity:'shop',almacen:'astilleros_n',casa_ama:'mendialde_n',nave:'valdehierro_n',
+  battle_police:'battle',battle_rival:'battle',battle_darko:'battle',alarma:'battle',redada:'comisaria',final:'title'};
+const MUS_COMBATE={police:'battle_police',rival:'battle_rival',darko:'battle_darko'};
 // las ondas de pulso (25 y 12,5 %) son formas propias de WebAudio (serie de Fourier del pulso)
 const ONDAS={};
 function onda(w){if(!ONDAS[w]){const d=w==='pulse25'?.25:.125,N=32,re=new Float32Array(N),im=new Float32Array(N);
@@ -112,7 +121,7 @@ function onda(w){if(!ONDAS[w]){const d=w==='pulse25'?.25:.125,N=32,re=new Float3
 function voz(f,t,dur,w,vol){const o=AC.createOscillator(),g=AC.createGain();if(w==='pulse25'||w==='pulse12')o.setPeriodicWave(onda(w));else o.type=w;o.frequency.setValueAtTime(f,t);
   g.gain.setValueAtTime(vol,t);g.gain.linearRampToValueAtTime(vol*.5,t+dur);g.gain.linearRampToValueAtTime(0,t+dur+.03);o.connect(g);g.connect(musF);o.start(t);o.stop(t+dur+.05);}
 // al cambiar de canción, la que suena se apaga en ~0,3 s y la nueva entra a los 0,4 s
-function music(name){const nt=TUNES[name]||null;if(tune===nt)return;const habia=!!tune;tune=nt;seqStep=0;if(!AC)return;const t=AC.currentTime;
+function music(name){const nt=TUNES[name]||TUNES[MUS_ALIAS[name]]||null;if(tune===nt)return;const habia=!!tune;tune=nt;seqStep=0;if(!AC)return;const t=AC.currentTime;
   if(musF){const o=musF;o.gain.cancelScheduledValues(t);o.gain.setTargetAtTime(0,t,.08);setTimeout(()=>o.disconnect(),4000);}
   musF=AC.createGain();musF.connect(musG);seqT=t+(habia?.4:.05);musF.gain.setValueAtTime(0,t);musF.gain.setTargetAtTime(1,seqT,.03);}
 function schedule(){if(!AC||!tune)return;if(!musF){musF=AC.createGain();musF.connect(musG);}if(seqT<AC.currentTime)seqT=AC.currentTime+.02;const T=tune,st=60/T.bpm/2;

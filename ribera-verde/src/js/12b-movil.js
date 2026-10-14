@@ -47,7 +47,7 @@ async function llamarFijo(f){
   advanceTime(LLAMADA_MIN);updateHUD();
   if(!S.fijos.some(x=>x.id===f.id))return true;   // 1.22: se ha largado a medianoche mientras venía (curroDia)
   f.dia=S.day;
-  await talkClient({id:'tel-'+f.id,fijo:true,fid:f.id,n:f.n.toUpperCase(),map:S.map,x:P.x,y:P.y,type:f.t,want:ri(ct.g[0],ct.g[1]),minThc:f.t==='pij'?Math.min(24,15+S.ch):0});
+  await talkClient({id:'tel-'+f.id,fijo:true,fid:f.id,n:f.n.toUpperCase(),map:S.map,x:P.x,y:P.y,type:f.t,want:ri(ct.g[0],ct.g[1]),minThc:f.t==='pij'||f.t==='vip'?Math.min(24,15+S.ch):0});   // 1.30: el VIP de GAUA, como un pijo
   return true;
 }
 // lo que Kiko manda a casa: lo del growshop que no son semillas, carpas ni la prensa, más caro; lo que ya está pedido no se repite

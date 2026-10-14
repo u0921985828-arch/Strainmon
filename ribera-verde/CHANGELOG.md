@@ -1,5 +1,18 @@
 # Cambios
 
+## 1.30.0 · 13 de octubre de 2026
+
+Los locales se entran como una casa y la música es nueva. Godot, 0.24.0.
+
+- **Los clubs por dentro.** Cada club (Itsaso en Puerto Viejo, La Fundición en Valdehierro, Kalea en el Casco Viejo y el del Ensanche) tiene su fachada propia con su puerta, y dentro una sala de 12 × 8: el dispensario con la vitrina y el encargado detrás (comprar, vender, encargos, como antes), los tarros, la pizarra con la variedad del día, las normas, los sofás chester con la mesa baja, el billar bajo su lámpara de techo, el taquero, la gramola y las plantas, en penumbra cálida. El carné se pide en la puerta la primera vez.
+- **Billar con apuesta.** El del billar juega a 10, 20 o 50 €: 3 tiros cada uno con una barra de fuerza que va y viene (A en el verde, la bola dentro, 3 puntos; en el amarillo, la rozas, 1). Quien sume más se lleva la apuesta; 3 partidas al día con cada uno, y ganar suma confianza con el club.
+- **Un socio en los sofás.** Se charla o se comparte un gramo de lo tuyo (una vez al día, media hora): +3 de confianza con el club.
+- **La nave por dentro.** Cuatro mesas de cultivo en fila, una por trabajador (cada uno junto a la suya). Plantas tú, con semilla o esqueje (el THC sale de la variedad y del fenotipo, y la estrella va a su lote), y eliges el abono de cada mesa: MEATZA u ORTUA BIO, que se dejan en la estantería y se gastan una dosis por mesa y día (más gramos y algo más de THC). Cada mesa pasa por recién plantada, creciendo, en flor y dando cogollos, que se ve en la mesa; desde el quinto día cuelga cada mañana lo suyo en el secadero, que se recoge allí. El escritorio enseña las cuatro mesas. Sin alquilar, la persiana está echada. Las naves de antes pasan su variedad y lo que había en el secadero a las cuatro mesas.
+- **GAUA, la discoteca del Ensanche** (desde el capítulo 4, de 23:00 a 6:00). El portero cobra la entrada (15 €, una vez por noche). Dentro: la barra (copa 10 €, hasta 3; invitar a una ronda 40 €, +1 de reputación), la pista con luces de colores, la cabina del DJ (bailar media hora; a veces alguien te pide el número y entra en la agenda) y el reservado (300 €, una hora): la RRPP te presenta a un **cliente VIP** que va a la agenda. El VIP pide de lo bueno, como un pijo, y paga un 60 % más. A las seis se encienden las luces y el portero echa a todo el mundo. La gente de GAUA cuenta como una sola confianza en MÓVIL → GENTE.
+- **Música nueva** (solo en la app de Godot): 40 canciones grabadas en lugar del chiptune, con instrumentos de verdad sintetizados (piano eléctrico, guitarra, bajo, acordeón, órgano, cuerdas, metales, marimba…), batería, reverb y eco, cada una con su intro y su bucle sin cortes. Una por sitio y momento: cada zona de la calle de día y otra de noche, el piso de día y de noche, el growshop, el bar, el club, la nave, GAUA, la comisaría, el almacén, el caserío, el título, el final, la alarma de la patrulla, la redada y cuatro combates (ladrón, policía, rival y Darko).
+- Igual en Godot (los locales, la luz de cada uno y la barra del billar). Arte a mano, sin PixelLab: `tools/sprites/a-mano/locales.py` (fachadas, suelos y paredes, la pista y los muebles, con la mesa de cultivo en sus cinco fases); la gente de los locales sale de los personajes que ya había.
+- Tests: `npm test` 112/112 (paso nuevo: los locales; el de los clubs, dentro del club; el de la plantilla, con las mesas, la estantería y el secadero de la nave); `test:arte` 29/29; Godot, historia 112 pasos, 44 pantallas (el club con la barra del billar, la nave con sus mesas y GAUA de noche) y el ciclo, con la música grabada.
+
 ## 1.29.2 · 13 de octubre de 2026
 
 Precio real del analizador. Godot, 0.23.2.

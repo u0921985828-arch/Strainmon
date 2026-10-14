@@ -95,9 +95,9 @@ function updatePatrullas(dt){
   }
   const ve=pats.find(tePilla),seg=dt/1000;
   if(SOSP.alarma){const e=pats.find(p=>p.id===SOSP.alarma);
-    if(!e){SOSP.alarma=null;SOSP.v=50;toast('Lo has despistado.',1600);return;}   // al cambiar el turno se va el que te seguía
+    if(!e){SOSP.alarma=null;SOSP.v=50;music(mapMusic());toast('Lo has despistado.',1600);return;}   // al cambiar el turno se va el que te seguía
     if(ve)SOSP.sinVer=0;else SOSP.sinVer+=dt;
-    if(SOSP.sinVer>=PAT.olvida&&Math.abs(e.x-P.x)+Math.abs(e.y-P.y)>PAT.pierde){e.caza=false;e.espera=1200;SOSP.alarma=null;SOSP.v=50;toast('Lo has despistado.',1600);}
+    if(SOSP.sinVer>=PAT.olvida&&Math.abs(e.x-P.x)+Math.abs(e.y-P.y)>PAT.pierde){e.caza=false;e.espera=1200;SOSP.alarma=null;SOSP.v=50;music(mapMusic());toast('Lo has despistado.',1600);}
     return;
   }
   if(SOSP.tregua>0)SOSP.tregua-=dt;
@@ -107,7 +107,7 @@ function updatePatrullas(dt){
   else SOSP.v=Math.max(0,SOSP.v-PAT.baja*seg);
   if(SOSP.v>=100)alarma(ve||pats[0]);
 }
-function alarma(e){SOSP.alarma=e.id;SOSP.sinVer=0;e.caza=true;e.espera=PAT.alto;sfx('enc');toast('<small>¡ALTO, POLICÍA!</small>Corre (B): métete en un portal o aléjate.',2200);}
+function alarma(e){SOSP.alarma=e.id;SOSP.sinVer=0;e.caza=true;e.espera=PAT.alto;sfx('enc');music(mapMusic());toast('<small>¡ALTO, POLICÍA!</small>Corre (B): métete en un portal o aléjate.',2200);}
 // vender cerca de un agente (talkClient), aunque no mire: la sospecha sube de golpe
 function vistoVender(){if(!SOSP.alarma&&ents.some(e=>e.pat&&veCasilla(e,P.x,P.y,PAT.vista[0]))){SOSP.v=Math.min(100,SOSP.v+PAT.vende);SOSP.aviso=1;toast('Un agente te ha visto vender.',1600);}}
 // te alcanza: el control de siempre (battle, 13-combate); después, una tregua
