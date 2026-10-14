@@ -805,7 +805,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     const sv = { ch: S.ch, robo: S.flags.robo, money: S.money, caja: JSON.parse(JSON.stringify(S.caja)), due: S.due, heat: S.heat, nevera: S.nevera ? JSON.parse(JSON.stringify(S.nevera)) : null, nf: S.flags.nevera };
     S.map = 'home'; S.ch = 7; S.flags.robo = false; S.due = 0; S.money = 0; S.heat = 0; S.buds = {}; S.rosin = {}; S.pots = S.pots.map(() => null); S.flags.nevera = 1; S.nevera = { rosin: {} };
     addRosin('ria', 3, 36); addRosin('hindu', 2, 40); S.caja.money = 0; S.caja.buds = {};
-    const l0 = LOG.length; ALMQ.push(0, 2, null); await run(() => objectAction(0, 6));
+    const l0 = LOG.length; ALMQ.push(0, 2, null); await run(() => objectAction(...posPieza('home', 'nevera')));
     window.R = { nev: JSON.stringify(S.nevera.rosin), fuera: JSON.stringify(S.rosin), ops: cajaMenu.toString().includes('rosin'), txt: LOG.slice(l0).filter(l => /^(Guardas|Sacas)/.test(l)).join('|') };
     addRosin('hindu', 20, 40); R.flor = gramosFlor(); S.min = 23 * 60; const l1 = LOG.length; await run(bedAction);
     R.robo = S.flags.robo; R.f2 = JSON.parse(JSON.stringify(S.rosin)); R.n2 = neveraR(); R.dk = LOG.slice(l1).filter(l => /Se han llevado/.test(l)).join('|');
@@ -1009,7 +1009,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     R.banco = BANCO.map(b => b[0]).join(); R.fuera = mov.filter(k => BANCO.some(b => b[0] === k) || !REGALO[k] || !/Semillas: [^.]/.test(dondeSemilla(k))).join();
     S.seeds = {}; for (const k of mov) delete S.disc[k]; S.flags.nevera = 0; S.flags.cajaSem = 0; S.flags.lao = 0;
     const T0 = window.TO, _t = toast, n0 = DEX.filter(k => S.disc[k]).length; window.TO = []; window.toast = (h, ms) => { TO.push(h); _t(h, ms); };
-    await run(() => objectAction(0, 6)); R.toast = TO.some(h => h.includes(`NUEVA EN LA GENOTECA · ${n0 + 1}/${DEX.length}</small>`)); window.toast = _t; window.TO = T0; await run(() => objectAction(0, 6)); R.choco = S.seeds.choco;
+    await run(() => objectAction(...posPieza('home', 'nevera'))); R.toast = TO.some(h => h.includes(`NUEVA EN LA GENOTECA · ${n0 + 1}/${DEX.length}</small>`)); window.toast = _t; window.TO = T0; await run(() => objectAction(...posPieza('home', 'nevera'))); R.choco = S.seeds.choco;
     S.caja = { money: 0, buds: {}, nivel: 1 }; await run(cajaAction); R.oax = S.seeds.oaxaca; R.oax2 = S.flags.cajaSem === S.day;
     R.arb = [['h_lamb', 'lamb'], ['h_kerala', 'kerala'], ['h_manga', 'mangarosa'], ['h_hawai', 'hawai']].map(([id, k]) => { const it = ITEMS.find(i => i.id === id); return [!!it.hidden, MAPS[it.map].o[it.y][it.x], k].join(':'); }).join();
     for (const id of ['h_lamb', 'h_kerala', 'h_manga', 'h_hawai']) { const it = ITEMS.find(i => i.id === id); delete S.taken[id]; S.map = it.map; await run(() => objectAction(it.x, it.y)); }
@@ -1097,11 +1097,11 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     const T = [], _t = toast; window.toast = (h, ms) => { T.push(h); _t(h, ms); };
     addBuds('thai', 30, 16, S.caja.buds); addBuds('ria', 40, 20, S.caja.buds); addRosin('ria', 2, 30);
     window.R = { its: itemsAlmacen('caja').map(it => it.k).join() };
-    ALMQ.push(0, null); await run(() => objectAction(0, 6)); R.nev = [neveraR(), totalRosin()];   // la nevera: GUARDAR, todos, y cerrar la vista
+    ALMQ.push(0, null); await run(() => objectAction(...posPieza('home', 'nevera'))); R.nev = [neveraR(), totalRosin()];   // la nevera: GUARDAR, todos, y cerrar la vista
     newDay(); await idle(); newDay(); await idle(); R.cu = [S.caja.buds.ria.cu, S.caja.buds.thai.cu, S.nevera.rosin.ria.cu];
     R.to = T.filter(h => /Curad/.test(h)).map(h => h.split('<br>').filter(l => /Curad/.test(l)).join()).join('|');
     ALMQ.push(2, null); const l0 = LOG.length; await run(() => objectAction(7, 1)); R.saca = JSON.stringify([S.buds.ria.g, S.buds.ria.cu, S.caja.buds.ria || 0]);
-    ALMQ.push(1, null); await run(() => objectAction(0, 6)); R.nev2 = [neveraR(), S.rosin.ria.g, S.rosin.ria.cu, calidad(S.rosin.ria)];
+    ALMQ.push(1, null); await run(() => objectAction(...posPieza('home', 'nevera'))); R.nev2 = [neveraR(), S.rosin.ria.g, S.rosin.ria.cu, calidad(S.rosin.ria)];
     const m0 = S.min; await run(() => objectAction(4, 7)); R.mc = [S.buds.ria.mc, S.min - m0, calidad(S.buds.ria)];
     R.txt = LOG.slice(l0).filter(l => /^(Sacas|Guardas|Skunk #1: )/.test(l)).join('|');
     Object.assign(S.items, { lavadora: 1, estatica: 1 }); montarCasa(); const o = MAPS.home.o; R.mapa = [o[7][4], o[7][6], o[7][7], o[7][1], o[7][3], o[7][2]].join();
@@ -1269,6 +1269,40 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     && LOG.some(l => l.startsWith('En el secadero, ')) && LOG.includes('Una tubería vieja que suda. Por eso aquí la humedad nunca baja.')
     && LOG.some(l => /^ANE: Una madre, a 18\/6 y bien regadas\. Cada mañana les saco un esqueje/.test(l))
     && LOG.some(l => /^A Ane ya le diste una prima el día \d+/.test(l)) && LOG.includes('Sin nadie que la cuide, se ha muerto una madre de la nave.') || R);
+  await step('Ordenar la casa, la asociación y la nave (1.37): la nevera, de serie entre la planta y el ordenador; con la carta leída, la mesa redonda → ORDENAR LA CASA; flechas y A (si cabe: no en lo de otro, ni en el hueco de la carpa, ni cortando el paso), B como estaba; con la carpa C, la nevera a su sitio de reserva; de presidente, una mesita de la asociación ordena el local (el del billar y su lámpara, con él); en la nave, desde el escritorio, las mesas y el tanque, con la manguera guiada del tanque a cada mesa por el suelo libre', ['Ordenar la casa', 'Terminar'], async () => {
+    const S0 = JSON.parse(JSON.stringify(S)), sim = (k, ...b) => { HOLD = true; const p = moverPieza(S.map, k); for (const x of b) press(x); HOLD = false; return p; };
+    S.muebles = Object.fromEntries(Object.keys(MUEBLES).map(k => [k, S.day])); S.carpas = [S.carpas[0], null, null]; S.coloca = {}; S.flags.letter = true;
+    enterMap('home', 9, 4, 'down'); const h = MAPS.home;
+    window.R = { def: JSON.stringify(h.opos), nev: h.o[2][2] };
+    R.mot = [['nevera', 0, 2], ['nevera', 5, 6], ['nevera', 10, 2], ['nevera', 9, 4], ['mesa', 1, 3], ['sofa', 3, 5], ['planta', 8, 6]].map(([k, x, y]) => cabePieza('home', k, x, y) || 'si').join();
+    await run(() => objectAction(...posPieza('home', 'mesa')));
+    R.mueve = await sim('nevera', 'down', 'down', 'right', 'A'); R.nev2 = [JSON.stringify(S.coloca.home), h.o[4][3], h.o[2][2] || ''].join('|');
+    R.vuelve = await sim('mesa', 'right', 'right', 'B'); R.mesa = [JSON.stringify(posPieza('home', 'mesa')), h.o[5][3]].join();
+    R.no = await sim('trim', 'right', 'A', 'B'); R.trim = h.o[7][4];   // en el felpudo, no: A no hace nada y B la deja
+    R.alf = await sim('alfombra', 'down', 'down', 'A'); R.alfS = [h.g[5][13], h.g[3][13], h.o[5][13]].join();   // la alfombra, debajo del sofá
+    S.carpas[1] = { t: 'm100', foco: 'cfl' }; S.carpas[2] = { t: 'm120', foco: 'cfl' }; S.coloca.home.nevera = [2, 2]; montarCasa(); R.carpaC = [JSON.stringify(S.coloca.home.nevera), h.o[6][0]].join();
+    // la asociación, de presidente
+    aso().pres = true; enterMap('club-rv', 7, 6, 'up'); const c = MAPS['club-rv'];
+    R.rvP = [JSON.stringify((S.coloca['club-rv'] || {}).planta || null), cabePieza('club-rv', 'planta', 3, 2) || 'si', cabePieza('club-rv', 'planta', 7, 4) || 'si'].join();   // de serie, en su sitio; la gente no se pisa
+    want(['Ordenar el local', 'Terminar']); await run(() => objectAction(5, 4)); R.club = LOG.some(l => /ORDENAR EL LOCAL/.test(l) || /Ordenar el local/.test(l));
+    R.bil = await sim('billar', 'left', 'left', 'left', 'left', 'left', 'A'); const bi = ents.find(e => e.id === 'billarista');
+    R.bilS = [c.o[7][5], c.o[7][10] || '', bi.x, bi.y, luzClub('rv').l[0].slice(0, 2).join('/')].join();
+    // la nave: con el riego entero
+    S.nave = S.nave || naveNueva(); S.nave.rg = 3; enterMap('nave', 6, 6, 'up'); const n = MAPS.nave;
+    R.rutas = MESAS_X.map((_, i) => { const r = rutaRiego(i); return r && r.c + ':' + r.lado + ':' + r.t.map(t => t.join('.')).join('-'); }).join(' ');
+    R.mang = JSON.stringify(mangueraNave()).length;
+    R.nmot = [['m0', 1, 6], ['m1', 2, 3], ['riego', 9, 2], ['riego', 4, 3], ['m3', 14, 3]].map(([k, x, y]) => cabePieza('nave', k, x, y) || 'si').join();
+    R.m0 = await sim('m0', 'down', 'down', 'A'); R.m0S = [n.o[6][1], n.o[4][1] || '', mesaIdx(2, 6), JSON.stringify(rutaRiego(0)), puestosMesa(0).map(p => p.join('.')).join('-')].join('|');
+    R.tq = await sim('riego', 'right', 'right', 'right', 'right', 'right', 'right', 'right', 'right', 'A'); R.tqS = [n.o[2][9], n.o[2][10], n.o[1][11], n.o[2][1] || ''].join();
+    R.mang2 = mangueraNave().filter(r => r[4] === '#4a72c2').map(r => r[0]).join();
+    S = S0; S.coloca = {}; MAPS.home.carpasK = null; montarCasa(); montarNave(); montarClub('club-rv'); enterMap('home', 9, 4, 'down');
+  }, () => R.def === '{"nevera":[2,2],"mesa":[3,5],"planta":[1,2],"planta2":[17,7],"trim":[4,7],"prensaM":[6,7],"tv":[13,2],"gpc":[16,2],"sofa":[13,5],"sillon":[16,5],"carro":[8,5],"alfombra":[13,3]}'
+    && R.nev === 'fridge' && R.mot === 'ocupado,paso,carpa,tu,paso,ocupado,si' && R.mueve === true && R.nev2 === '{"nevera":[3,4]}|fridge|'
+    && R.vuelve === false && R.mesa === '[3,5],table' && R.no === false && R.trim === 'trim' && R.alf === true && R.alfS === 'alf0a,floor,sofa'
+    && R.carpaC === '[0,6],fridge' && R.club && R.bil === true && R.bilS === 'billar,,7,7,96/118' && R.rvP === 'null,si,ocupado'
+    && R.rutas === '2:up:2.3 4:up:4.3 8:up:8.3 11:up:11.3' && R.nmot === 'si,ocupado,si,fuera,paso' && R.m0 === true
+    && R.m0S === 'mesaN||0|{"c":2,"t":[[2,3],[2,4],[2,5]],"lado":"up","Y":6}|1.7.up-2.7.up-0.6.right-1.5.down'
+    && R.tq === true && R.tqS === 'tanqueN,riegoN,ctrlN,' && R.mang2 === '23,71,135,183' || R);
   await step('Guardar y cargar la partida', [], async () => { save(); },
     () => { const sv = loadSave(); return sv && sv.ch === S.ch && sv.money === S.money && JSON.stringify(sv.disc) === JSON.stringify(S.disc) || 'no coincide'; });
 

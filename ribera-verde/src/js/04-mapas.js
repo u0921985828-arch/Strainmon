@@ -315,7 +315,7 @@ function buildMaps(){
   ob(h,6,1,'iwin');ob(h,9,1,'iwin');ob(h,7,1,'poster');ob(h,15,1,'iwin');
   ob(h,0,2,'bedT');ob(h,0,3,'bedB');ob(h,1,2,'plantDeco');ob(h,4,2,'pc');ob(h,5,2,'lab');ob(h,6,2,'lab2');ob(h,4,7,'trim');   // 1.36: la mesa de manicurar; 1.36.2 (lo pidió el usuario: no cortar el paso), contra la pared de abajo, junto a la puerta
   ob(h,4,3,'silla');   // 1.27.1: la silla de la tía, delante de su ordenador
-  ob(h,0,6,'fridge');ob(h,3,5,'table');ob(h,17,7,'plantDeco');   // 1.36 (lo pidió el usuario): sin el arcón de la 1.10 en (0, 4)
+  ob(h,2,2,'fridge');ob(h,3,5,'table');ob(h,17,7,'plantDeco');   // 1.36 (lo pidió el usuario): sin el arcón de la 1.10 en (0, 4); 1.37: la nevera, entre la planta y el ordenador (y todo, donde lo ponga el jugador: ORDEN_P, 12d-orden)
   gr(h,5,7,'mat');h.exits['5,7']={to:'town',x:5,y:9,dir:'down'};
   // ---------- SHOP ----------
   const s=newMap('shop',10,8,'floorS');s.music='shop';
@@ -368,22 +368,21 @@ function buildMaps(){
 // iwT_home-v, iwB_home-v; 0, las de serie) y la alfombra (suelo: 1): sus 4 trozos, alf + estampado + a/b/c/d, sobre el suelo que haya
 function montarCasa(){
   const h=MAPS.home;if(!h||!S)return;
-  const ya=mueblesYa(),su=decoV('suelo'),pa=decoV('pared'),al=ya.includes('alfombra')?MUEBLES.alfombra:null;
-  const key=S.carpas.map(c=>c?c.t:'-').join()+'|'+ya.join()+'|'+[su,pa,decoV('alfombra')].join()+'|'+Object.keys(MUEBLE_EXTR).filter(k=>muebleYa(MUEBLE_EXTR[k])).join();if(h.carpasK===key)return;h.carpasK=key;
-  const vs=pa?'-'+pa:'',fs=su?'-'+su:'';
+  const ya=mueblesYa(),su=decoV('suelo'),pa=decoV('pared');
+  const key=S.carpas.map(c=>c?c.t:'-').join()+'|'+ya.join()+'|'+[su,pa,decoV('alfombra')].join()+'|'+Object.keys(MUEBLE_EXTR).filter(k=>muebleYa(MUEBLE_EXTR[k])).join()+'|'+JSON.stringify(S.coloca&&S.coloca.home||{});if(h.carpasK===key)return;h.carpasK=key;
+  quitaOrden('home');   // 1.37: los muebles que se ordenan (12d-orden), fuera; después, donde los puso el jugador
+  const vs=pa?'-'+pa:'',fs=su?'-'+su:'',al=ya.includes('alfombra')?posPieza('home','alfombra'):null;
   for(let y=0;y<h.h;y++)for(let x=0;x<h.w;x++){if(h.g[y][x]==='mat')continue;
-    h.g[y][x]=y===0?'iwT_home'+vs:y===1?'iwB_home'+vs:al&&x>=al.x&&x<=al.x+1&&y>=al.y&&y<=al.y+1?'alf'+decoV('alfombra')+'abcd'[(y-al.y)*2+x-al.x]+fs:'floor'+fs;}
+    h.g[y][x]=y===0?'iwT_home'+vs:y===1?'iwB_home'+vs:al&&x>=al[0]&&x<=al[0]+1&&y>=al[1]&&y<=al[1]+1?'alf'+decoV('alfombra')+'abcd'[(y-al[1])*2+x-al[0]]+fs:'floor'+fs;}
   SITIOS.forEach(s=>{for(let x=s.x;x<s.x+s.w;x++)ob(h,x,s.y,null);});
-  for(const k in MUEBLES){const m=MUEBLES[k],en=ya.includes(k);if(m.suelo)continue;ob(h,m.x,m.y,en?k:null);if(!m.uno)ob(h,m.x+1,m.y,en?k+'2':null);}
-  for(const k in MUEBLE_EXTR){const E=MUEBLE_EXTR[k];ob(h,E.x,E.y,muebleYa(E)?k:null);}   // 1.36: las máquinas de las extracciones (11m-almacen)
-  ob(h,4,7,'trim');   // y la mesa de manicurar (1.36.2: el taller, contra la pared de abajo)
-  {const g=MUEBLES.gpc,en=ya.includes('gpc');ob(h,g.x,g.y+1,en?'sillaG':null);ob(h,g.x+1,g.y+1,en?'sillaG2':null);}   // 1.27.1: la silla gaming, con el PC
+  for(const k in MUEBLES){const m=MUEBLES[k],en=ya.includes(k);if(m.suelo||piezaDe('home',k))continue;ob(h,m.x,m.y,en?k:null);if(!m.uno)ob(h,m.x+1,m.y,en?k+'2':null);}   // los de la pared (el cuadro y el póster), en su sitio
   h.carpas=[];
   S.carpas.forEach((c,ci)=>{
     if(!c)return;const s=SITIOS[ci],x0=s.x,x1=x0+CARPAS[c.t].w-1;
     for(let x=x0;x<=x1;x++)ob(h,x,s.y,'carpa');
     h.carpas.push({ci,t:c.t,x0,x1,y:s.y});
   });
+  aplicaOrden('home');   // la nevera, la mesa, las plantas, el taller y los muebles del salón (con la silla gaming, 1.27.1)
 }
 const sitioVisible=ci=>!S.carpas[ci]&&(ci<2||!!S.carpas[1]);   // C, junto a la cama, después de B
 const sitioLibre=(x,y)=>SITIOS.findIndex((s,ci)=>sitioVisible(ci)&&x>=s.x&&x<s.x+s.w&&y===s.y);

@@ -12,7 +12,7 @@ function newState(){return{v:1,name:'EDDIE',map:'home',x:2,y:4,dir:'down',day:1,
   carpas:[{t:'p60',foco:'cfl'}],macetas:['plastico7','plastico7'],pots:[null,null],luz:null,protect:false,
   disc:{},custom:{},gen:{},pedido:[],esquejes:[],bandejas:[],fenos:{},fenoN:0,fnom:{},eco:2,debt:DEUDA,due:0,deadline:0,mDay:0,clients:[],clientsDay:0,taken:{},cool:0,steps:0,patxi:0,iDay:0,
   caja:null,rec:{},vencidos:0,protHasta:0,encargo:null,encVeto:0,sala:{},fijos:[],sms:[],envio:[],orden:0,misiones:{},itin:{},lonja:0,trueque:0,chatarra:null,
-  rel:{},relDia:{},curro:{jard:null,vend:[]},clubs:{},clubDia:{},clubCompra:{},clubEnc:null,clubEncDia:0,clubReg:{},catas:{},rivales:{},rivalFuera:{},deco:{},pelea:{xp:0,fue:0,ref:0},plantilla:[],plN:0,nave:null,setas:null,ropa:{},obra:{},logros:{},
+  coloca:{},rel:{},relDia:{},curro:{jard:null,vend:[]},clubs:{},clubDia:{},clubCompra:{},clubEnc:null,clubEncDia:0,clubReg:{},catas:{},rivales:{},rivalFuera:{},deco:{},pelea:{xp:0,fue:0,ref:0},plantilla:[],plN:0,nave:null,setas:null,ropa:{},obra:{},logros:{},
   billar:{},porro:{},noche:null,vipN:0,aso:{v:0,d:0,tio:false,asam:0,otra:0,pres:false,votos:0,lote:null},
   banco:CUENTA.inicial,mov:[],saca:null,ingr:null,loc:{}};}   // 1.35: la cuenta, sus movimientos y los locales (11k-banco)   // la gente (1.15, 11e-gente); los locales (1.30) y la asociación (1.32, 11j-locales)
 const isFree=()=>mode==='world'&&lock===0&&handlers.length===0;
@@ -80,6 +80,7 @@ function buildEnts(){
   for(const d of NPCDEF){if(d.map!==S.map||(d.cond&&!d.cond()))continue;ents.push(old[d.id]&&old[d.id].def===d?old[d.id]:mkEnt(d));}
   for(const c of S.clients)if((c.map||'town')===S.map){const o=old[c.id];ents.push(o||mkEnt({id:c.id,x:c.x,y:c.y,wander:2,lookObj:c.look,client:c}));}
   for(const e of Object.values(old))if(e.pat&&e.mapa===S.map)ents.push(e);ponPatrullas();   // las patrullas (10b-patrulla)
+  if(ORDEN_P[S.map])colocaGente(S.map);   // 1.37: la gente de los sofás y del billar, donde estén (12d-orden)
   if(S.map==='nave')colocaNaveros();   // 1.35: cada uno, en su sitio de la hora (11j-locales)
 }
 // los sitios con función (1.14, 11d-comarca): la tienda de la ciudad, la lonja, la chatarrería y el molino
@@ -114,7 +115,7 @@ function tileSolid(m,x,y){
   return !!itemAt(x,y);
 }
 const entAt=(x,y)=>ents.find(e=>(e.x===x&&e.y===y)||(e.moving&&e.fx===x&&e.fy===y));
-function enterMap(name,x,y,dir){S.map=name;if(name==='home')montarCasa();if(name==='nave')montarNave();Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];resetSosp();buildEnts();music(mapMusic());}
+function enterMap(name,x,y,dir){S.map=name;if(name==='home')montarCasa();if(name==='nave')montarNave();montarClub(name);Object.assign(P,{x,y,px:x*16,py:y*16,fx:x,fy:y,moving:false,chain:false,hold:0});if(dir)P.dir=dir;S.x=x;S.y=y;S.dir=P.dir;ents=[];resetSosp();buildEnts();music(mapMusic());}
 // cada mapa lleva su canción (04-mapas); en la calle, de noche, su versión nocturna (Ribera: night)
 // 1.30: con la alarma, la suya; el piso, de noche, su versión de noche
 const mapMusic=()=>{const m=MAPS[S.map].music;if(ZONAS[S.map]&&SOSP.alarma)return 'alarma';if(S.map==='home'&&isNight())return 'home_n';return ZONAS[S.map]&&isNight()?(m==='town'?'night':m+'_n'):m;};
@@ -207,11 +208,12 @@ async function objectAction(x,y){
     if(o==='pc')return pcAction();
     if(o==='lab'||o==='lab2')return labAction();
     if(o==='trim')return manicuraAction();if(MUEBLE_EXTR[o])return muebleExtr(o);   // 1.36
-    if(o==='table')return letterAction();
+    if(o==='table'){if(!S.flags.letter)return letterAction();   // 1.37 (lo pidió el usuario): con la carta leída, la mesa redonda ordena la casa (12d-orden)
+      const j=await ask('La mesa redonda de la tía. Desde aquí se ve todo el piso.',['Ordenar la casa','Leer la carta','Nada']);return j===0?ordenar('home'):j===1?letterAction():null;}
     if(o==='fridge'){if(S.flags.nevera)return extrAlgo()||neveraR()>0||totalRosin()>0?neveraAction():say('La nevera: medio limón, leche y un táper de alubias que dejó la tía.');   // 1.36: los extractos, en frío   // 1.25: el bote de la tía
       S.flags.nevera=S.day;await say('Detrás del táper de alubias hay un bote de cristal con una etiqueta: «Choco Thai. NO TOCAR».');return semillasTia('choco','El frío las ha conservado: siguen buenas.',3);}
     if(muebleDe(o))return muebleAction(muebleDe(o));
-    {const k=Object.keys(MUEBLES).find(k=>(x===MUEBLES[k].x||!MUEBLES[k].uno&&x===MUEBLES[k].x+1)&&y===MUEBLES[k].y&&!(MUEBLES[k].suelo&&mueblesYa().includes(k)));   // el sitio vacío de un mueble del salón (la alfombra puesta no es un objeto: nada)
+    {const k=Object.keys(MUEBLES).find(k=>{const [mx,my]=piezaDe('home',k)?posPieza('home',k):[MUEBLES[k].x,MUEBLES[k].y];return (x===mx||!MUEBLES[k].uno&&x===mx+1)&&y===my&&!(MUEBLES[k].suelo&&mueblesYa().includes(k));});   // 1.37: donde lo puso el jugador (12d-orden)   // el sitio vacío de un mueble del salón (la alfombra puesta no es un objeto: nada)
       if(k&&(!MUEBLES[k].grow||S.muebles&&S.muebles[k]))return say(S.muebles&&S.muebles[k]?`Aquí va ${MUEBLES[k].art}: llega mañana.`:`Aquí iría bien ${MUEBLES[k].art}. Se compra por internet: en el ordenador de la tía o con el móvil.`);}
     if(o==='plantDeco')return say('Una monstera. La tía Maite le hablaba cada mañana.');
     if(o==='iwin')return say('Por la ventana se ve la ría. Huele a salitre.');

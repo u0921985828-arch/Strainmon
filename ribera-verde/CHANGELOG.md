@@ -1,5 +1,17 @@
 # Cambios
 
+## 1.37.0 · 14 de octubre de 2026
+
+Ordenar la casa, la asociación y la nave (lo pidió el usuario). Godot, 0.31.0.
+
+- **La nevera, en su sitio.** De serie va entre la planta y el ordenador de la tía (2, 2), y abajo queda sitio para la esquina de los procesados. Con la tercera carpa montada, a su sitio de reserva (0, 6).
+- **ORDENAR LA CASA** desde la mesa redonda, en cuanto se ha leído la carta: la nevera, la mesa redonda, las dos plantas, la mesa de manicurar, cada máquina de extracción, la tele, el PC gaming (con su silla), el sofá, el sillón, el carro de esquejes y la alfombra. Con las flechas se lleva, A la deja si cabe y B la devuelve a donde estaba. No cabe encima de otra cosa, en el hueco de una carpa ni cortando el paso (desde la puerta, a la cama y a todo lo que se usa); el motivo sale en el cuadro. La cama, la caja fuerte, el ordenador de la tía y lo de las paredes no se mueven.
+- **ORDENAR EL LOCAL** en la asociación, siendo su presidente, desde una mesita: los sofás con sus socios, el billar con su jugador y la lámpara encima, la librería, la gramola y las plantas. El dispensario no se mueve.
+- **ORDENAR LA NAVE** desde el escritorio: las cuatro mesas (con su foco, sus poleas y su trabajador) y el tanque del riego con el controlador y la máquina. La manguera sale del tanque por el pie de la pared y baja a cada mesa por el suelo libre, por el camino más corto. Una mesa o un tanque que la dejen sin camino no caben.
+- La gente no se pisa: nadie se queda sin poder hablarle (desde al lado o por encima de un mostrador) y no se cuenta como paso libre; la planta de la entrada de la asociación se queda en su sitio de serie.
+- Lo elegido se guarda en `S.coloca` (`12d-orden.js`: `ORDEN_P`, `posPieza`, `cabePieza`, `moverPieza`, `rutaRiego`, `mangueraNave`). Godot: `mundo.gd` (`pos_pieza`, `cabe_pieza`, `aplica_orden`, `ruta_riego`, `manguera_nave`) y `trama.gd` (`mover_pieza`, `ordenar`).
+- Pruebas: un paso más en la historia (120) y tres pantallas (casa-orden, nave-orden y club-orden, 62).
+
 ## 1.36.2 · 14 de octubre de 2026
 
 El taller de extracciones, contra la pared, y lo de dentro de los tarros y botes, como es de verdad (lo pidió el usuario). Godot, 0.30.2.

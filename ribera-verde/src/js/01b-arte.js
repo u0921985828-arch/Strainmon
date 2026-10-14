@@ -207,7 +207,7 @@ function arteObj(o,tx,ty,cam,now,list,sombras){
   if(SEGUNDA.has(o)||o==='sillaG2'||LOCAL2.has(o))return !!ARTE.cubre['obj:'+o.slice(0,-1)];   // la mitad de la derecha de un mueble del salón (y de los locales, 1.30): la pinta la de la izquierda
   const g=ARTE.cubre['obj:'+o];if(!g)return false;
   const an=ARTE.sobre['obj:'+o],d=desfase(o,tx,ty);
-  const fm=o==='mesaN'?faseMesa(MESAS_X.indexOf(tx)):0,pl=fm?plantasMesa(g,MESAS_X.indexOf(tx),fm):null;   // 1.31: las plantas de la mesa de la nave, encima
+  const fm=o==='mesaN'?faseMesa(mesaIdx(tx,ty)):0,pl=fm?plantasMesa(g,mesaIdx(tx,ty),fm):null;   // 1.31: las plantas de la mesa de la nave, encima
   const sp=o==='mesaN'?'mesaN-'+Math.min(fm,1):spriteLocal(decoSprite(o)),f=   // 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (spriteLocal)
     an?frameDe(an[0][0],an[0][1],'unica',now,{bucle:true}):frameDe(g,sp,'unica',0,{i:0,esp:d.esp})||(sp!==o?frameDe(g,o,'unica',0,{i:0,esp:d.esp}):null);   // 1.16: su tapizado o lámina
   if(!f)return false;
@@ -217,7 +217,7 @@ function arteObj(o,tx,ty,cam,now,list,sombras){
     if(x0-1>=sx||!ob(tx-1,ty))sombras.push([x0-1,yp-1,1,2]);
     if(x1+1<=sx+15||!ob(tx+1,ty))sombras.push([x1+1,yp-1,1,2]);
     if(!ob(tx,ty+1))sombras.push([x0,yp+1,x1-x0+1,1]);}
-  const dib=()=>{pinta(f,xp,yp);if(pl)pinta(pl[0],xp,yp,pl[1]);if(o==='mesaN')focosMesa(MESAS_X.indexOf(tx),xp+cam.x,yp+cam.y,fm,pl&&pl[0].c,cam);   // 1.33: y sus focos, colgados encima
+  const dib=()=>{pinta(f,xp,yp);if(pl)pinta(pl[0],xp,yp,pl[1]);if(o==='mesaN')focosMesa(mesaIdx(tx,ty),xp+cam.x,yp+cam.y,fm,pl&&pl[0].c,cam);   // 1.33: y sus focos, colgados encima
     if(o==='baldaS')for(const [b] of bandejasBalda(tx)){const fb=frameDe(g,b,'unica',0,{i:0});if(fb)pinta(fb,xp,yp);}};   // 1.34: las bandejas del bajo, en su fase
   if(f.cel.h>16&&list)list.push([ty*16+Math.min(0,d.dy),dib]);else dib();   // corrido hacia abajo, no pasa delante de quien está en su fila
   return true;

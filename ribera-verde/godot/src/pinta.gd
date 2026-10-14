@@ -182,8 +182,9 @@ func _fondo_ancho(img: Image, cortes = null) -> void:
 # ---------- mundo ----------
 func camara() -> Vector2i:
 	var m: Dictionary = J.MAPS[J.S.map]
-	var cx: float = J.P.px + 8 - J.SW / 2.0
-	var cy: float = J.P.py + 8 - SH / 2.0
+	var o: bool = J.ORDEN != null and J.ORDEN.mapa == J.S.map   # 1.37: al ordenar, sobre la pieza (12d-orden)
+	var cx: float = (J.ORDEN.x * 16.0 if o else J.P.px) + 8 - J.SW / 2.0
+	var cy: float = (J.ORDEN.y * 16.0 if o else J.P.py) + 8 - SH / 2.0
 	var mw: int = m.w * 16
 	var mh: int = m.h * 16
 	cx = (mw - J.SW) / 2.0 if mw <= J.SW else clampf(cx, 0, mw - J.SW)
@@ -239,8 +240,9 @@ func _mundo() -> void:
 			if J.sitio_visible(ci):
 				_sitio(J.D.SITIOS[ci])
 		if not S.flags.get("letter"):
-			var lx: int = 3 * 16 - cam.x
-			var ly: int = 5 * 16 - cam.y
+			var mp: Array = J.pos_pieza("home", "mesa")   # 1.37: la carta, en la mesa redonda, donde esté
+			var lx: int = mp[0] * 16 - cam.x
+			var ly: int = mp[1] * 16 - cam.y
 			_rect(lx + 5, ly + 5, 7, 5, css("#fafaf2"))
 			_rect(lx + 8, ly + 7, 2, 1, css("#c04040"))
 	if S.map == "nave":
@@ -348,7 +350,7 @@ func _luz_local():
 	if J.S.map == "nave":
 		return _luz_nave()
 	if J.S.map.begins_with("club-"):   # 1.34: cada club, con la lámpara sobre su billar
-		return J.D.LUZ_CLUB[J.S.map.substr(5)]
+		return J.luz_club(J.S.map.substr(5))   # 1.37: la de la asociación, sobre el billar donde esté
 	return J.D.LUZ_DISCO if J.S.map == "disco" else (J.D.LUZ_BAJO if J.S.map == "setas" else null)   # 1.34: el bajo, con su bombilla
 
 # la nave (1.31, luzNave de 11j-locales): bajo cada uno de los dos focos de una mesa plantada, su luz en las plantas (1.33: del color del foco)
@@ -357,8 +359,9 @@ func _luz_nave() -> Dictionary:
 	for i in J.D.MESAS_X.size():
 		if J.fase_mesa(i):
 			var c: String = J.D.FOCO_NAVE[J.S.nave.f[i]].luz
+			var XY: Array = J.pos_mesa(i)   # 1.37: donde esté la mesa
 			for z in J.D.LUZ_MESA:
-				l.append([int(J.D.MESAS_X[i]) * 16 + int(z[0]), z[1], z[2], c, z[4]])
+				l.append([int(XY[0]) * 16 + int(z[0]), int(z[1]) + (int(XY[1]) - 4) * 16, z[2], c, z[4]])
 	return {"l": l}
 
 func _luces_local() -> void:
@@ -396,6 +399,10 @@ func _encima() -> void:
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.TIRO != null:
 		_tiro()
+	if J.ORDEN != null and J.ORDEN.mapa == J.S.map:   # 1.37: el marco de la pieza que mueves (12d-orden)
+		var cm := camara()
+		for e in J.rects_orden():
+			_rect(float(e[0]) - cm.x, float(e[1]) - cm.y, e[2], e[3], css(e[4]))
 	if J.ALMACEN != null:   # la caja fuerte y la nevera por dentro (1.36)
 		for e in J.rects_almacen(J.ALMACEN):
 			if typeof(e[0]) == TYPE_STRING:   # ['@', sprite, x, y]: un sprite de misc por su esquina
@@ -525,8 +532,8 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		return
 	var an = Atlas.sobre.get("obj:" + o)
 	var d := desfase(o, tx, ty)
-	var fm: int = J.fase_mesa(J.mesa_de(tx)) if o == "mesaN" else 0
-	var pl = _plantas_mesa(gr, J.mesa_de(tx), fm) if fm else null   # 1.31: las plantas de la mesa de la nave, encima
+	var fm: int = J.fase_mesa(J.mesa_idx(tx, ty)) if o == "mesaN" else 0
+	var pl = _plantas_mesa(gr, J.mesa_idx(tx, ty), fm) if fm else null   # 1.31: las plantas de la mesa de la nave, encima
 	var sp: String = ("mesaN-%d" % mini(fm, 1)) if o == "mesaN" else J.sprite_local(J.deco_sprite(o))   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (sprite_local)
 	var f = Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, sp, "unica", 0, {"i": 0, "esp": d.esp})
 	if f == null and not an and sp != o:
@@ -555,9 +562,9 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 			if fb != null:
 				ex.append(fb)
 	if f.cel.h > 16:
-		list.append([ty * 16 + mini(0, d.dy), _pinta_mesa.bind(f, xp, yp, pl, J.mesa_de(tx) if o == "mesaN" else -1, fm, ex)])   # corrido hacia abajo, no pasa delante de quien está en su fila
+		list.append([ty * 16 + mini(0, d.dy), _pinta_mesa.bind(f, xp, yp, pl, J.mesa_idx(tx, ty) if o == "mesaN" else -1, fm, ex)])   # corrido hacia abajo, no pasa delante de quien está en su fila
 	else:
-		_pinta_mesa(f, xp, yp, pl, J.mesa_de(tx) if o == "mesaN" else -1, fm, ex)
+		_pinta_mesa(f, xp, yp, pl, J.mesa_idx(tx, ty) if o == "mesaN" else -1, fm, ex)
 
 func _pinta_mesa(f, xp: float, yp: float, pl, i := -1, fm := 0, ex := []) -> void:
 	_pinta(f, xp, yp)
@@ -606,12 +613,9 @@ func _poleas_nave(x0: int, yb: int) -> Array:
 	return o.filter(func(e): return e[3] > 0)
 
 # el riego de la nave (1.35, mangueraNave): el grifo, la tubería por el pie de la pared y, en cada mesa, su llave o su electroválvula
-# y la bajada; los rectángulos de cada nivel salen del HTML (MANGUERA_NAVE)
+# y la bajada; 1.37: guiada del tanque a cada mesa, donde estén (manguera_nave, mundo.gd)
 func _manguera_nave() -> void:
-	var rg := int(J.S.nave.get("rg", 0)) if J.S.get("nave") != null else 0
-	if not rg:
-		return
-	for e in J.D.MANGUERA_NAVE[rg - 1]:
+	for e in J.manguera_nave():
 		_rect(float(e[0]) - cam.x, float(e[1]) - cam.y, e[2], e[3], css(e[4]))
 
 # las plantas de la mesa i de la nave en la fase fm (1.31, plantasMesa de 01b-arte): las de su porte (porte_planta, por el % índica de

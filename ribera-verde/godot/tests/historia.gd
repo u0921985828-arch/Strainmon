@@ -2638,7 +2638,7 @@ func _pasos() -> void:
 		J.S.caja.buds = {}
 		var l0 := LOG.size()
 		ALMQ.append_array([0, 2, null])
-		await run(func(): await J.object_action(0, 6))
+		await run(func(): await J.object_action(J.pos_pieza("home", "nevera")[0], J.pos_pieza("home", "nevera")[1]))
 		R = {"nev": jj(norm(J.S.nevera.rosin)), "fuera": jj(norm(J.S.rosin)), "ops": false, "txt": "|".join(LOG.slice(l0).filter(func(l): return re("^(Guardas|Sacas)", l)))}
 		J.add_rosin("hindu", 20, 40)
 		R.flor = J.gramos_flor()
@@ -3302,11 +3302,11 @@ func _pasos() -> void:
 		var T0 = TO
 		TO = []
 		capta = true
-		await run(func(): await J.object_action(0, 6))
+		await run(func(): await J.object_action(J.pos_pieza("home", "nevera")[0], J.pos_pieza("home", "nevera")[1]))
 		R.toast = TO.any(func(h): return h.contains("NUEVA EN LA GENOTECA · %d/%d</small>" % [n0 + 1, D.DEX.size()]))
 		capta = false
 		TO = T0
-		await run(func(): await J.object_action(0, 6))
+		await run(func(): await J.object_action(J.pos_pieza("home", "nevera")[0], J.pos_pieza("home", "nevera")[1]))
 		R.choco = J.S.seeds.choco
 		J.S.caja = {"money": 0, "buds": {}, "nivel": 1}
 		await run(J.caja_action)
@@ -3533,7 +3533,7 @@ func _pasos() -> void:
 		J.add_rosin("ria", 2, 30)
 		R = {"its": ",".join(J.items_almacen("caja").map(func(it): return it.k))}
 		ALMQ.append_array([0, null])
-		await run(func(): await J.object_action(0, 6))   # la nevera: GUARDAR, todos, y cerrar la vista
+		await run(func(): await J.object_action(J.pos_pieza("home", "nevera")[0], J.pos_pieza("home", "nevera")[1]))   # la nevera: GUARDAR, todos, y cerrar la vista
 		R.nev = [J.nevera_r(), J.total_rosin()]
 		J.new_day()
 		await idle()
@@ -3550,7 +3550,7 @@ func _pasos() -> void:
 		await run(func(): await J.object_action(7, 1))
 		R.saca = jj([J.S.buds.ria.g, J.S.buds.ria.cu, J.S.caja.buds.get("ria", 0)])
 		ALMQ.append_array([1, null])
-		await run(func(): await J.object_action(0, 6))
+		await run(func(): await J.object_action(J.pos_pieza("home", "nevera")[0], J.pos_pieza("home", "nevera")[1]))
 		R.nev2 = [J.nevera_r(), J.S.rosin.ria.g, J.S.rosin.ria.cu, J.calidad(J.S.rosin.ria)]
 		var m0: int = J.S.min
 		await run(func(): await J.object_action(4, 7))
@@ -4021,6 +4021,103 @@ func _pasos() -> void:
 				and LOG.any(func(l): return l.begins_with("En el secadero, ")) and LOG.has("Una tubería vieja que suda. Por eso aquí la humedad nunca baja.")
 				and LOG.any(func(l): return l.begins_with("ANE: Una madre, a 18/6 y bien regadas. Cada mañana les saco un esqueje"))
 				and LOG.any(func(l): return l.begins_with("A Ane ya le diste una prima el día ")) and LOG.has("Sin nadie que la cuide, se ha muerto una madre de la nave."), R))
+	step("Ordenar la casa, la asociación y la nave (1.37): la nevera, de serie entre la planta y el ordenador; con la carta leída, la mesa redonda → ORDENAR LA CASA; flechas y A (si cabe: no en lo de otro, ni en el hueco de la carpa, ni cortando el paso), B como estaba; con la carpa C, la nevera a su sitio de reserva; de presidente, una mesita de la asociación ordena el local (el del billar y su lámpara, con él); en la nave, desde el escritorio, las mesas y el tanque, con la manguera guiada del tanque a cada mesa por el suelo libre", ["Ordenar la casa", "Terminar"], func():
+		var S0 = Datos.enteros(norm(J.S))
+		var sim := func(k: String, b: Array):
+			HOLD = true
+			var st := {}
+			var co := func(): st.r = await J.mover_pieza(J.S.map, k)
+			co.call()
+			for x in b:
+				J.press(x)
+			HOLD = false
+			await hasta(func(): return st.has("r"))
+			return st.r
+		var sv := func(v): return "" if v == null else str(v)
+		J.S.muebles = {}
+		for k in D.MUEBLES:
+			J.S.muebles[k] = J.S.day
+		J.S.carpas = [J.S.carpas[0], null, null]
+		J.S.coloca = {}
+		J.S.flags.letter = true
+		J.enter_map("home", 9, 4, "down")
+		var h: Dictionary = J.MAPS.home
+		R = {"def": jj(h.opos), "nev": h.o[2][2]}
+		var mot := []
+		for c in [["nevera", 0, 2], ["nevera", 5, 6], ["nevera", 10, 2], ["nevera", 9, 4], ["mesa", 1, 3], ["sofa", 3, 5], ["planta", 8, 6]]:
+			var r: String = J.cabe_pieza("home", c[0], c[1], c[2])
+			mot.append(r if r != "" else "si")
+		R.mot = ",".join(PackedStringArray(mot))
+		var pm: Array = J.pos_pieza("home", "mesa")
+		await run(func(): await J.object_action(pm[0], pm[1]))
+		R.mueve = await sim.call("nevera", ["down", "down", "right", "A"])
+		R.nev2 = "|".join([jj(J.S.coloca.home), sv.call(h.o[4][3]), sv.call(h.o[2][2])])
+		R.vuelve = await sim.call("mesa", ["right", "right", "B"])
+		R.mesa = jj(J.pos_pieza("home", "mesa")) + "," + sv.call(h.o[5][3])
+		R.no = await sim.call("trim", ["right", "A", "B"])
+		R.trim = h.o[7][4]
+		R.alf = await sim.call("alfombra", ["down", "down", "A"])
+		R.alfS = jn([h.g[5][13], h.g[3][13], h.o[5][13]])
+		J.S.carpas[1] = {"t": "m100", "foco": "cfl"}
+		J.S.carpas[2] = {"t": "m120", "foco": "cfl"}
+		J.S.coloca.home.nevera = [2, 2]
+		J.montar_casa()
+		R.carpaC = jj(J.S.coloca.home.nevera) + "," + sv.call(h.o[6][0])
+		# la asociación, de presidente
+		J.aso().pres = true
+		J.enter_map("club-rv", 7, 6, "up")
+		var c_: Dictionary = J.MAPS["club-rv"]
+		var cr = J.S.coloca.get("club-rv", {})
+		var pl0 = cr.get("planta") if cr is Dictionary else null
+		var c1: String = J.cabe_pieza("club-rv", "planta", 3, 2)
+		var c2: String = J.cabe_pieza("club-rv", "planta", 7, 4)
+		R.rvP = jn(["null" if pl0 == null else JSON.stringify(pl0), c1 if c1 != "" else "si", c2 if c2 != "" else "si"])
+		want(["Ordenar el local", "Terminar"])
+		await run(func(): await J.object_action(5, 4))
+		R.club = LOG.any(func(l): return re("ORDENAR EL LOCAL", l) or re("Ordenar el local", l))
+		R.bil = await sim.call("billar", ["left", "left", "left", "left", "left", "A"])
+		var bi = null
+		for e in J.ents:
+			if e.id == "billarista":
+				bi = e
+		var lz: Array = J.luz_club("rv").l[0]
+		R.bilS = jn([c_.o[7][5], c_.o[7][10], bi.x, bi.y, jn([lz[0], lz[1]]).replace(",", "/")])
+		# la nave: con el riego entero
+		if J.S.get("nave") == null:
+			J.S.nave = J.nave_nueva()
+		J.S.nave.rg = 3
+		J.enter_map("nave", 6, 6, "up")
+		var n_: Dictionary = J.MAPS.nave
+		var ru := []
+		for i in D.MESAS_X.size():
+			var r = J.ruta_riego(i)
+			ru.append("" if r == null else str(int(r.c)) + ":" + r.lado + ":" + "-".join(PackedStringArray(r.t.map(func(t): return "%d.%d" % [t[0], t[1]]))))
+		R.rutas = " ".join(PackedStringArray(ru))
+		R.mang = jj(J.manguera_nave()).length()
+		var nm := []
+		for c in [["m0", 1, 6], ["m1", 2, 3], ["riego", 9, 2], ["riego", 4, 3], ["m3", 14, 3]]:
+			var r: String = J.cabe_pieza("nave", c[0], c[1], c[2])
+			nm.append(r if r != "" else "si")
+		R.nmot = ",".join(PackedStringArray(nm))
+		R.m0 = await sim.call("m0", ["down", "down", "A"])
+		R.m0S = "|".join([sv.call(n_.o[6][1]), sv.call(n_.o[4][1]), str(J.mesa_idx(2, 6)), jj(J.ruta_riego(0)), "-".join(PackedStringArray(J.puestos_mesa(0).map(func(p): return "%d.%d.%s" % [p[0], p[1], p[2]])))])
+		R.tq = await sim.call("riego", ["right", "right", "right", "right", "right", "right", "right", "right", "A"])
+		R.tqS = jn([n_.o[2][9], n_.o[2][10], n_.o[1][11], n_.o[2][1]])
+		R.mang2 = jn(J.manguera_nave().filter(func(r): return r[4] == "#4a72c2").map(func(r): return r[0]))
+		J.S = S0
+		J.S.coloca = {}
+		J.MAPS.home.carpasK = null
+		J.montar_casa()
+		J.montar_nave()
+		J.montar_club("club-rv")
+		J.enter_map("home", 9, 4, "down"),
+		func(): return chk(R.def == "{\"nevera\":[2,2],\"mesa\":[3,5],\"planta\":[1,2],\"planta2\":[17,7],\"trim\":[4,7],\"prensaM\":[6,7],\"tv\":[13,2],\"gpc\":[16,2],\"sofa\":[13,5],\"sillon\":[16,5],\"carro\":[8,5],\"alfombra\":[13,3]}"
+			and R.nev == "fridge" and R.mot == "ocupado,paso,carpa,tu,paso,ocupado,si" and R.mueve == true and R.nev2 == "{\"nevera\":[3,4]}|fridge|"
+			and R.vuelve == false and R.mesa == "[3,5],table" and R.no == false and R.trim == "trim" and R.alf == true and R.alfS == "alf0a,floor,sofa"
+			and R.carpaC == "[0,6],fridge" and R.club and R.bil == true and R.bilS == "billar,,7,7,96/118" and R.rvP == "null,si,ocupado"
+			and R.rutas == "2:up:2.3 4:up:4.3 8:up:8.3 11:up:11.3" and R.nmot == "si,ocupado,si,fuera,paso" and R.m0 == true
+			and R.m0S == "mesaN||0|{\"c\":2,\"t\":[[2,3],[2,4],[2,5]],\"lado\":\"up\",\"Y\":6}|1.7.up-2.7.up-0.6.right-1.5.down"
+			and R.tq == true and R.tqS == "tanqueN,riegoN,ctrlN," and R.mang2 == "23,71,135,183", R))
 	step("Guardar y cargar la partida", [], func(): J.save(),
 		func():
 			var sv = J.load_save()

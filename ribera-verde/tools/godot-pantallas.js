@@ -203,6 +203,16 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
     map: 'home', P: { x: 6, y: 5, dir: 'down' }, TIRO: { ms: 700, f: 'dir', a: .07, per: 1100, mov: 2600 } },
   { k: 'tiro-lavadora', sw: 240, mode: 'world', now: T + 3100, S: { ch: 5, flags: { letter: true, kiko1: true }, items: { lavadora: 1 } },
     map: 'home', P: { x: 1, y: 5, dir: 'down' }, TIRO: { ms: 1300, f: 'dir', a: .1, per: 1200, ritmo: .6 } },
+  // ordenar (1.37): la casa con la nevera movida y su marco mientras se coloca; la nave con la mesa 1 abajo y el tanque a la derecha,
+  // la manguera guiada por el suelo libre; la asociación de presidente con el billar a la izquierda y su lámpara encima
+  { k: 'casa-orden', sw: 320, mode: 'world', now: T + 1370, S: { ch: 4, muebles: { sofa: 1, tv: 1, gpc: 1, sillon: 1, cuadro: 1, alfombra: 1 },
+    flags: { letter: true, kiko1: true, nevera: true }, coloca: { home: { nevera: [3, 4], sofa: [9, 6] } } },
+    map: 'home', P: { x: 6, y: 4, dir: 'left' }, ORDEN: { mapa: 'home', k: 'nevera', x: 3, y: 4, no: '' } },
+  { k: 'nave-orden', sw: 320, mode: 'world', now: T + 1371, S: { ch: 6, day: 20, flags: {},
+    nave: { ab: { m: 0, o: 0 }, m: [null, null, null, null], f: ['led', 'led', 'sodio', 'lec'], ex: 1, rg: 3 },
+    coloca: { nave: { m0: [1, 6], riego: [9, 2] } } }, map: 'nave', P: { x: 6, y: 4, dir: 'up' } },
+  { k: 'club-orden', sw: 320, mode: 'world', now: T + 1372, S: { ch: 3, clubs: { rv: true }, aso: { v: 2, d: 1, tio: true, asam: 0, otra: 0, pres: true, votos: 0, lote: null }, flags: {},
+    coloca: { 'club-rv': { billar: [5, 7] } } }, map: 'club-rv', P: { x: 8, y: 4, dir: 'up' } },
   { k: 'titulo-240', sw: 240, mode: 'title', now: T },
   { k: 'titulo-400', sw: 400, mode: 'title', now: T + 1717 },
   { k: 'titulo-450', sw: 450, mode: 'title', now: T + 2900 },
@@ -255,15 +265,15 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
       for (const [id, x, y, hace, capa, sube] of e.vfx || []) lanzarVfx(id, x, y, e.now - hace, capa, sube);
       if (e.B) { B = copia(e.B);B.look = /^th/.test(e.B.look) ? randLook(e.B.look, 'thief') : LOOKS[e.B.look]; }
       if (e.VC) VC = Object.assign({ ocupado: false }, e.VC);
-      TIRO = e.TIRO == null ? null : Object.assign({ t0: e.now - e.TIRO.ms, f: e.TIRO.f, a: e.TIRO.a || 0 }, e.TIRO.per ? { per: e.TIRO.per, mov: e.TIRO.mov || 0, ritmo: e.TIRO.ritmo || 0 } : {});MESA_B = e.MESA_B || null;ALMACEN = e.ALMACEN || null;
+      TIRO = e.TIRO == null ? null : Object.assign({ t0: e.now - e.TIRO.ms, f: e.TIRO.f, a: e.TIRO.a || 0 }, e.TIRO.per ? { per: e.TIRO.per, mov: e.TIRO.mov || 0, ritmo: e.TIRO.ritmo || 0 } : {});MESA_B = e.MESA_B || null;ALMACEN = e.ALMACEN || null;ORDEN = e.ORDEN || null;
       mode = e.mode;
-      const st = copia({ k: e.k, sw: SW, mode, now: e.now, S, P, B, VC, TIRO, MESA_B, ALMACEN, vfx: ARTE.vfx,
+      const st = copia({ k: e.k, sw: SW, mode, now: e.now, S, P, B, VC, TIRO, MESA_B, ALMACEN, ORDEN, vfx: ARTE.vfx,
         ents: ents.map(x => Object.assign({ id: x.id, x: x.x, y: x.y, px: x.px, py: x.py, dir: x.dir, moving: x.moving, t: x.t, fx: x.fx, fy: x.fy, act: x.act || null },
           x.pat ? { caza: x.caza, dur: x.dur } : {})), SOSP });
       render(e.now);
       o.png[e.k] = cv.toDataURL('image/png');
       o.escenas.push(st);
-      mode = 'pausa';ALMACEN = null;
+      mode = 'pausa';ALMACEN = null;ORDEN = null;
     }
     Math.random = rnd0;
     return o;

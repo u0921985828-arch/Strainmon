@@ -1,7 +1,7 @@
 /* =========================================================
    RENDER
    ========================================================= */
-const camera=()=>{const m=MAPS[S.map];let cx=P.px+8-SW/2,cy=P.py+8-SH/2;const mw=m.w*16,mh=m.h*16;
+const camera=()=>{const m=MAPS[S.map],o=ORDEN&&ORDEN.mapa===S.map;let cx=(o?ORDEN.x*16:P.px)+8-SW/2,cy=(o?ORDEN.y*16:P.py)+8-SH/2;const mw=m.w*16,mh=m.h*16;   // 1.37: al ordenar, sobre la pieza (12d-orden)
   cx=mw<=SW?(mw-SW)/2:clamp(cx,0,mw-SW);cy=mh<=SH?(mh-SH)/2:clamp(cy,0,mh-SH);return{x:Math.round(cx),y:Math.round(cy)};};
 const GLYPH={'$':['..#..','.####','#.#..','.###.','..#.#','####.','..#..'],'!':['..#..','..#..','..#..','..#..','..#..','.....','..#..'],'gota':['..#..','..#..','.###.','.###.','#####','#####','.###.']};   // gota: el catador de rosin (1.10)
 function bubble(x,y,ch,col){ctx.fillStyle='#26262e';ctx.fillRect(x-1,y-1,9,10);ctx.fillStyle='#ffffff';ctx.fillRect(x,y,7,8);ctx.fillRect(x+2,y+8,3,1);
@@ -34,7 +34,8 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
     // la luz se escapa bajo la puerta. Sitio libre: el hueco marcado en el suelo.
     for(const t of m.carpas)list.push([t.y*16,()=>pintarCarpaMapa(t,cam)]);
     SITIOS.forEach((st,ci)=>{if(!sitioVisible(ci))return;ctx.strokeStyle='rgba(60,70,90,.45)';ctx.setLineDash([3,2]);ctx.strokeRect(st.x*16+1.5-cam.x,st.y*16+.5-cam.y,st.w*16-3,15);ctx.setLineDash([]);});
-    if(!S.flags.letter){const lx=3*16-cam.x,ly=5*16-cam.y;ctx.fillStyle='#fafaf2';ctx.fillRect(lx+5,ly+5,7,5);ctx.fillStyle='#c04040';ctx.fillRect(lx+8,ly+7,2,1);}
+    // la carta, en la mesa redonda, donde esté (1.37)
+    if(!S.flags.letter){const [mx,my]=posPieza('home','mesa'),lx=mx*16-cam.x,ly=my*16-cam.y;ctx.fillStyle='#fafaf2';ctx.fillRect(lx+5,ly+5,7,5);ctx.fillStyle='#c04040';ctx.fillRect(lx+8,ly+7,2,1);}
   }
   if(S.map==='nave')list.push([2*16-1,()=>{ctx.save();ctx.translate(-cam.x,-cam.y);pintaRects(mangueraNave());ctx.restore();}]);   // 1.33: la manguera del riego, detrás de lo de la fila 2
   const fr=(e,dur)=>e.moving&&e.t/dur<.5?1+((e.x+e.y)&1):0;
@@ -65,12 +66,13 @@ function renderWorld(now,camFija){   // camFija: cámara explícita y sin jugado
         ctx.globalCompositeOperation='source-over';}}
   }
   if(!camFija){luzLocal(cam,now);if(MESA_B)pintaRects(rectsMesaBillar(MESA_B));if(TIRO)pintaTiro(now);}   // los locales (1.30, 11j-locales)
+  if(ORDEN&&ORDEN.mapa===S.map){ctx.save();ctx.translate(-cam.x,-cam.y);pintaRects(rectsOrden());ctx.restore();}   // 1.37: el marco de la pieza que mueves (12d-orden)
   if(ALMACEN)pintaRects(rectsAlmacen(ALMACEN));   // la caja fuerte y la nevera por dentro (1.36, 11m-almacen)
 }
 // la luz de los locales (LUZ_CLUB, LUZ_DISCO y, 1.31, los LED de la nave, luzNave): el fondo, si lo hay, encima de todo, y cada luz, un degradado radial (r 1 → r) sumado ('lighter');
 // los focos de GAUA dan una vuelta a la pista cada 7 s (0,9 rad/s), cada uno desde su fase
 function luzLocal(cam,now){
-  const L=S.map.startsWith('club-')?LUZ_CLUB[S.map.slice(5)]:S.map==='disco'?LUZ_DISCO:S.map==='nave'?luzNave():S.map==='setas'?LUZ_BAJO:null;if(!L)return;
+  const L=S.map.startsWith('club-')?luzClub(S.map.slice(5)):S.map==='disco'?LUZ_DISCO:S.map==='nave'?luzNave():S.map==='setas'?LUZ_BAJO:null;if(!L)return;
   if(L.fondo){ctx.fillStyle=L.fondo;ctx.fillRect(0,0,SW,SH);}ctx.globalCompositeOperation='lighter';
   const luz=(x,y,r,c,a)=>{const g=ctx.createRadialGradient(x,y,1,x,y,r);g.addColorStop(0,`rgba(${c},${a})`);g.addColorStop(1,`rgba(${c},0)`);ctx.fillStyle=g;ctx.fillRect(x-r,y-r,2*r,2*r);};
   for(const [x,y,r,c,a] of L.l||[])luz(x-cam.x,y-cam.y,r,c,a);

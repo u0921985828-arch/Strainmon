@@ -3830,6 +3830,10 @@ func obj_local(x: int, y: int, o) -> bool:
 	if S.map.begins_with("club-"):
 		var k: String = S.map.substr(5)
 		var C: Dictionary = D.CLUBS[k]
+		if o == "mesita" and D.ORDEN_P.has(S.map) and aso().pres:   # 1.37 (lo pidió el usuario): de presidente, desde una mesita se ordena el local
+			if await ask(D.MUEBLE_CLUB[k].mesa, ["Ordenar el local", "Nada"]) == 0:
+				await ordenar(S.map)
+			return true
 		match o:
 			"tarros":
 				txt = "Tarros de cristal con la etiqueta de cada variedad que ha pasado por el club."
@@ -3861,7 +3865,7 @@ func obj_local(x: int, y: int, o) -> bool:
 			return true
 		match o:
 			"mesaN", "mesaN2":
-				await mesa_nave(mesa_de(x if o == "mesaN" else x - 1))
+				await mesa_nave(mesa_idx(x, y))   # 1.37: donde esté (12d-orden)
 				return true
 			"estanteN":
 				await estante_nave()
@@ -4285,13 +4289,6 @@ func dosis_txt(x) -> String:
 func nivel_nave() -> String:
 	return D.NIVEL_NAVE[int(S.nave.ex) + int(S.nave.rg)]
 
-# la mesa de la nave que empieza en la columna x (MESAS_X), o −1
-func mesa_de(x: int) -> int:
-	for i in D.MESAS_X.size():
-		if int(D.MESAS_X[i]) == x:
-			return i
-	return -1
-
 func nave_stock() -> float:
 	var t := 0.0
 	if S.get("nave") != null:
@@ -4571,6 +4568,7 @@ func _filas_escritorio() -> Array:
 	var E: Dictionary = D.EXTR_NAVE[int(N.ex)]
 	var so := sofoco_nave()
 	rows.append({"label": "Clima", "right": "%s de %s" % [n(calor_nave()), n(E.cap)], "desc": "El calor de los focos encendidos y lo que saca la extracción (%s)." % E.n + ((" Hace demasiado calor: las mesas dan un %d %% menos." % Datos.jsround((1 - so) * 100)) if so < 1 else "")})
+	rows.append({"label": "Ordenar la nave", "right": "", "desc": "Mover las mesas y el tanque del riego: la manguera va del tanque a cada mesa por el suelo libre. Pulsa A."})   # 1.37 (12d-orden)
 	rows.append({"label": "La gente", "right": "%d aquí" % de_la_nave().size(), "desc": "Quién cuida cada mesa y las madres: cambiarlos de mesa, una prima o un curso. Pulsa A."})   # 1.34
 	rows.append({"label": "Mejoras", "right": "Nave " + nivel_nave(), "desc": "Extracción: %s. Riego: %s. Pulsa A para mejorarlas." % [E.n, D.RIEGO_NAVE[int(N.rg)].n]})
 	return rows
@@ -4580,10 +4578,13 @@ func escritorio_nave() -> void:
 	while true:
 		var rows := _filas_escritorio()
 		i = await menu(rows, {"cls": "full", "title": "LA NAVE", "title2": "%s al día" % Datos.eur(D.NAVE.dia), "desc": true, "initial": i})
-		if i == rows.size() - 1:
+		var l: String = rows[i].label if i >= 0 else ""
+		if l == "Mejoras":
 			await mejoras_nave()
-		elif i == rows.size() - 2:
+		elif l == "La gente":
 			await gente_nave()
+		elif l == "Ordenar la nave":
+			await ordenar("nave")
 		if i < 0:
 			break
 
@@ -5214,8 +5215,6 @@ func desc_almacen(A: Dictionary) -> String:
 		Datos.coma(Datos.jsround(r * 10) / 10.0), int(D.NEVERA.g), _pct_txt(r / D.NEVERA.g)]
 
 func _dlg_fijo(t: String, nombre: String) -> void:
-	if gancho_texto.is_valid():
-		gancho_texto.call(t, nombre)
 	if oraculo:
 		return
 	dlg.show()
@@ -5532,3 +5531,123 @@ func mueble_extr(o: String):
 	var j: int = await ask(Mu.n + ". ¿Qué haces?", ops)
 	if j >= 0 and j < L.size():
 		await extraer(L[j])
+
+# ---------- ordenar (1.37, 12d-orden): mover una pieza con las flechas; A la deja si cabe y B la devuelve ----------
+# mientras mueves, la pieza se ve en el mapa en el cursor (aunque no quepa); O y G, los objetos y el suelo sin ella
+func _vista_orden(m: Dictionary, P_: Dictionary, O: Array, G: Array) -> void:
+	for y in int(m.h):
+		m.o[y] = O[y].duplicate()
+		m.g[y] = G[y].duplicate()
+	if P_.get("suelo"):
+		var fs := ("-" + str(deco_v("suelo"))) if deco_v("suelo") else ""
+		for y in int(m.h):
+			for x in int(m.w):
+				if str(m.g[y][x]).begins_with("alf"):
+					m.g[y][x] = "floor" + fs
+		var cs := celdas_p(P_, ORDEN.x, ORDEN.y)
+		for j in cs.size():
+			var c: Array = cs[j]
+			if c[1] >= 0 and c[1] < int(m.h) and c[0] >= 0 and c[0] < int(m.w) and m.g[c[1]][c[0]] != "mat":
+				m.g[c[1]][c[0]] = "alf" + str(deco_v("alfombra")) + "abcd"[j] + fs
+		return
+	for c in celdas_p(P_, ORDEN.x, ORDEN.y):
+		if c[2] and c[1] >= 0 and c[1] < int(m.h) and c[0] >= 0 and c[0] < int(m.w):
+			m.o[c[1]][c[0]] = c[2]
+
+func mover_pieza(mapa: String, k: String) -> bool:
+	var m: Dictionary = MAPS[mapa]
+	var P_ := pieza_de(mapa, k)
+	if not m.get("opos", {}).has(k):
+		return false
+	var x0: int = int(m.opos[k][0])
+	var y0: int = int(m.opos[k][1])
+	if not P_.get("suelo"):
+		for c in celdas_p(P_, x0, y0):
+			m.o[c[1]][c[0]] = null
+	var O := copia_o(m)
+	var G: Array = m.g.map(func(r): return r.duplicate())
+	ORDEN = {"mapa": mapa, "k": k, "x": x0, "y": y0, "no": ""}
+	var xs := []
+	var ys := []
+	for o in P_.o:
+		xs.append(int(o[0])); ys.append(int(o[1]))
+	for g in P_.get("gente", []):
+		xs.append(int(g[0])); ys.append(int(g[1]))
+	var mx := [-int(xs.min()), int(m.w) - 1 - int(xs.max())]
+	var my := [-int(ys.min()), int(m.h) - 1 - int(ys.max())]
+	var muestra := func():
+		ORDEN.no = cabe_pieza(mapa, k, ORDEN.x, ORDEN.y, O)
+		_vista_orden(m, P_, O, G)
+		_dlg_fijo("%s · %s\nFlechas: mover · A: dejar aquí · B: como estaba" % [P_.n, D.ORDEN_MOTIVO[ORDEN.no] if ORDEN.no != "" else "Aquí cabe."], D.ORDEN_P[mapa].n)
+	muestra.call()
+	var pr := Motor.Prom.new()
+	push(func(b: String):
+		if b == "B":
+			pop()
+			pr.res(false)
+			return
+		if b == "A":
+			if ORDEN.no != "":
+				sfx("no")
+				return
+			pop()
+			pr.res(true)
+			return
+		var d = {"left": [-1, 0], "right": [1, 0], "up": [0, -1], "down": [0, 1]}.get(b)
+		if d == null:
+			return
+		var nx := clampi(ORDEN.x + d[0], mx[0], mx[1])
+		var ny := clampi(ORDEN.y + d[1], my[0], my[1])
+		if nx == ORDEN.x and ny == ORDEN.y:
+			return
+		ORDEN.x = nx
+		ORDEN.y = ny
+		sfx("sel")
+		muestra.call())
+	var r: bool = await Motor.espera(pr)
+	var x: int = ORDEN.x
+	var y: int = ORDEN.y
+	ORDEN = null
+	if not oraculo:
+		dlg.hide()
+		dlg_nm.hide()
+	for j in int(m.h):
+		m.o[j] = O[j].duplicate()
+		m.g[j] = G[j].duplicate()
+	if not P_.get("suelo"):
+		for c in celdas_p(P_, x0, y0):
+			m.o[c[1]][c[0]] = c[2]
+	if r:
+		if not (S.get("coloca") is Dictionary):
+			S.coloca = {}
+		if not S.coloca.has(mapa):
+			S.coloca[mapa] = {}
+		S.coloca[mapa][k] = [x, y]
+	rehace_orden(mapa)
+	if r:
+		sfx("get")
+	return r
+
+# después de mover: el mapa con lo elegido y la gente en su sitio
+func rehace_orden(mapa: String) -> void:
+	if mapa == "home":
+		MAPS.home.carpasK = null
+		montar_casa()
+	elif mapa == "nave":
+		montar_nave()
+	else:
+		montar_club(mapa)
+	if S.map == mapa:
+		coloca_gente(mapa)
+
+# ORDENAR: la lista de lo que se puede mover, hasta Terminar
+func ordenar(mapa: String) -> void:
+	var i := 0
+	while true:
+		var L := piezas_ya(mapa)
+		var items: Array = L.map(func(P_): return {"label": P_.n})
+		items.append({"label": "Terminar"})
+		i = await menu(items, {"title": D.ORDEN_P[mapa].n, "initial": i, "cancel": true})
+		if i < 0 or i >= L.size():
+			return
+		await mover_pieza(mapa, L[i].k)

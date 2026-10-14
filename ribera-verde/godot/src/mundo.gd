@@ -472,13 +472,17 @@ func montar_nave() -> void:
 	var n = MAPS.get("nave")
 	if n == null:
 		return
+	quita_orden("nave")   # 1.37: las mesas y el tanque, donde los puso el jugador (12d-orden: la pieza riego)
 	for e in D.EQUIPO_NAVE:
-		n.o[int(e[1])][int(e[0])] = null
+		if e[3] == "ex":
+			n.o[int(e[1])][int(e[0])] = null
 	if S != null and S.get("nave") != null:
 		for e in D.EQUIPO_NAVE:
 			var v := int(S.nave.get(e[3], 0))
-			if v >= int(e[4]) and v <= int(e[5]):
+			if e[3] == "ex" and v >= int(e[4]) and v <= int(e[5]):
 				n.o[int(e[1])][int(e[0])] = e[2]
+	if S != null:
+		aplica_orden("nave")
 
 func montar_casa() -> void:
 	var h: Dictionary = MAPS.home
@@ -490,11 +494,12 @@ func montar_casa() -> void:
 	var ya := muebles_ya()
 	var su := deco_v("suelo")
 	var pa := deco_v("pared")
-	var al = D.MUEBLES.alfombra if "alfombra" in ya else null
-	var key := ",".join(ks) + "|" + ",".join(ya) + "|" + ",".join([su, pa, deco_v("alfombra")]) + "|" + ",".join(D.MUEBLE_EXTR.keys().filter(func(k): return mueble_ya(D.MUEBLE_EXTR[k])))
+	var key := ",".join(ks) + "|" + ",".join(ya) + "|" + ",".join([su, pa, deco_v("alfombra")]) + "|" + ",".join(D.MUEBLE_EXTR.keys().filter(func(k): return mueble_ya(D.MUEBLE_EXTR[k]))) + "|" + JSON.stringify(S.get("coloca", {}).get("home", {}) if S.get("coloca") is Dictionary else {})
 	if h.get("carpasK") == key:
 		return
 	h.carpasK = key
+	quita_orden("home")   # 1.37: los muebles que se ordenan (12d-orden), fuera; después, donde los puso el jugador
+	var al = pos_pieza("home", "alfombra") if "alfombra" in ya else null
 	# 1.27: el suelo y las paredes de la reforma (REFORMA) y la alfombra (suelo: 1, sus 4 trozos sobre el suelo que haya)
 	var vs := ("-" + str(pa)) if pa else ""
 	var fs := ("-" + str(su)) if su else ""
@@ -506,27 +511,20 @@ func montar_casa() -> void:
 				h.g[y][x] = "iwT_home" + vs
 			elif y == 1:
 				h.g[y][x] = "iwB_home" + vs
-			elif al and x >= al.x and x <= al.x + 1 and y >= al.y and y <= al.y + 1:
-				h.g[y][x] = "alf" + str(deco_v("alfombra")) + "abcd"[(y - int(al.y)) * 2 + x - int(al.x)] + fs
+			elif al and x >= al[0] and x <= al[0] + 1 and y >= al[1] and y <= al[1] + 1:
+				h.g[y][x] = "alf" + str(deco_v("alfombra")) + "abcd"[(y - int(al[1])) * 2 + x - int(al[0])] + fs
 			else:
 				h.g[y][x] = "floor" + fs
 	for s in D.SITIOS:
 		for x in range(s.x, s.x + s.w):
 			h.o[s.y][x] = null
-	for k in D.MUEBLES:   # los muebles del salón que ya han llegado (12c-salon): k y k + "2"
+	for k in D.MUEBLES:   # los de la pared que ya han llegado (12c-salon: el cuadro y el póster), en su sitio; los demás, piezas (1.37)
 		var mu: Dictionary = D.MUEBLES[k]
-		if mu.get("suelo"):
+		if mu.get("suelo") or not pieza_de("home", k).is_empty():
 			continue
 		h.o[mu.y][mu.x] = k if k in ya else null
 		if not mu.get("uno"):
 			h.o[mu.y][mu.x + 1] = (k + "2") if k in ya else null
-	for k in D.MUEBLE_EXTR:   # 1.36: las máquinas de las extracciones (11m-almacen)
-		var E: Dictionary = D.MUEBLE_EXTR[k]
-		h.o[E.y][E.x] = k if mueble_ya(E) else null
-	h.o[7][4] = "trim"   # y la mesa de manicurar (1.36.2: el taller, contra la pared de abajo)
-	var g: Dictionary = D.MUEBLES.gpc   # 1.27.1: la silla gaming, con el PC
-	h.o[g.y + 1][g.x] = "sillaG" if "gpc" in ya else null
-	h.o[g.y + 1][g.x + 1] = "sillaG2" if "gpc" in ya else null
 	h.carpas = []
 	for ci in S.carpas.size():
 		var c = S.carpas[ci]
@@ -538,6 +536,7 @@ func montar_casa() -> void:
 		for x in range(x0, x1 + 1):
 			h.o[s.y][x] = "carpa"
 		h.carpas.append({"ci": ci, "t": c.t, "x0": x0, "x1": x1, "y": int(s.y)})
+	aplica_orden("home")   # la nevera, la mesa, las plantas, el taller y los muebles del salón (con la silla gaming)
 
 # el salón (1.10, 12c-salon): los muebles comprados que ya han llegado, y de qué mueble es un objeto (k o su mitad k + "2")
 func muebles_ya() -> Array:
@@ -815,17 +814,24 @@ func build_ents() -> void:
 		if e.get("pat") and e.mapa == S.map:
 			ents.append(e)
 	pon_patrullas()
+	if D.ORDEN_P.has(S.map):
+		coloca_gente(S.map)   # 1.37: la gente de los sofás y del billar, donde estén (12d-orden)
 	if S.map == "nave":
 		coloca_naveros()   # 1.35
 
 # dónde trabaja cada uno de la nave (1.35, colocaNaveros de 11j-locales): por la hora, el día y su mesa
 const PUESTO_MIN := 120
-func puestos_mesa(i: int) -> Array:
-	var X := int(D.MESAS_X[i])
-	var p := [[X, 5, "up"], [X + 1, 5, "up"], [X - 1, 4, "right"]]
-	if i:
-		p.append([X, 3, "down"])
-	return p
+func puestos_mesa(i: int) -> Array:   # 1.37: donde esté la mesa, en las casillas libres; detrás, solo si no tapa nada (ni el sitio del tanque)
+	var XY := pos_mesa(i)
+	var X: int = XY[0]
+	var Y: int = XY[1]
+	var m: Dictionary = MAPS.nave
+	var T := pos_pieza("nave", "riego")
+	var p := [[X, Y + 1, "up"], [X + 1, Y + 1, "up"], [X - 1, Y, "right"]]
+	if Y - 1 >= 3 and not m.o[Y - 2][X] and not (T[0] == X and T[1] == Y - 2):
+		p.append([X, Y - 1, "down"])
+	var q := p.filter(func(c): return pisable(m, c[0], c[1]) and not m.o[c[1]][c[0]])
+	return q if q.size() else [[X, Y + 1, "up"]]
 
 func puesto_navero(i: int) -> Array:
 	var p := puestos_mesa(i)
@@ -920,6 +926,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 		montar_casa()
 	if name_ == "nave":
 		montar_nave()
+	montar_club(name_)
 	P.x = x
 	P.y = y
 	P.px = x * 16.0
@@ -1183,7 +1190,8 @@ func object_action(x: int, y: int) -> void:
 			var mu: Dictionary = D.MUEBLES[k]
 			if mu.get("suelo") and k in muebles_ya():   # la alfombra puesta no es un objeto: nada (1.27)
 				continue
-			if (x == mu.x or (not mu.get("uno") and x == mu.x + 1)) and y == mu.y:
+			var mp: Array = pos_pieza("home", k) if not pieza_de("home", k).is_empty() else [int(mu.x), int(mu.y)]   # 1.37: donde lo puso el jugador
+			if (o == null or o == "plantDeco") and (x == mp[0] or (not mu.get("uno") and x == mp[0] + 1)) and y == mp[1]:   # lo que haya encima, antes (como en el HTML)
 				var pd = S.get("muebles", {}).get(k) if S.get("muebles") is Dictionary else null
 				if mu.get("grow") and not pd:   # el carro de esquejes (1.11): sin pedir, nada
 					break
@@ -1206,7 +1214,15 @@ func object_action(x: int, y: int) -> void:
 				await manicura_action()
 				return
 			"table":
-				await letter_action()
+				if not S.flags.get("letter"):
+					await letter_action()
+					return
+				# 1.37 (lo pidió el usuario): con la carta leída, la mesa redonda ordena la casa (12d-orden)
+				var j := await ask("La mesa redonda de la tía. Desde aquí se ve todo el piso.", ["Ordenar la casa", "Leer la carta", "Nada"])
+				if j == 0:
+					await ordenar("home")
+				elif j == 1:
+					await letter_action()
 				return
 			"fridge":
 				if S.flags.get("nevera"):
@@ -1962,3 +1978,492 @@ func parada_action():
 	pass
 func title_press(_b):
 	pass
+
+# ---------- ordenar la casa, la asociación y la nave (1.37, 12d-orden) ----------
+# cada pieza (D.ORDEN_P): sus objetos [dx, dy, objeto (, desde el nivel de riego)], su gente [dx, dy, id, dir] y su sitio de serie;
+# lo elegido, en S.coloca[mapa][pieza] = [x, y]; ORDEN, mientras mueves una (mover_pieza, en trama)
+var ORDEN = null
+var ORDEN_SIN_LADO := RegEx.create_from_string("^(bedT|pc|gpc|.*2)$")
+var RIEGO_CACHE = null
+const DIRS_ORDEN := [[0, 1], [-1, 0], [1, 0], [0, -1]]
+
+func pieza_de(mapa: String, k: String) -> Dictionary:
+	for P_ in D.ORDEN_P[mapa].piezas:
+		if P_.k == k:
+			return P_
+	return {}
+
+func pieza_ya(P_: Dictionary) -> bool:
+	match str(P_.get("si", "")):
+		"extr":
+			return mueble_ya(D.MUEBLE_EXTR[P_.k])
+		"mueble":
+			return P_.k in muebles_ya()
+		"riego":
+			return S.get("nave") != null and int(S.nave.get("rg", 0)) >= 1
+	return true
+
+func piezas_ya(mapa: String) -> Array:
+	return D.ORDEN_P[mapa].piezas.filter(func(P_): return pieza_ya(P_))
+
+func pos_pieza(mapa: String, k: String) -> Array:
+	if ORDEN != null and ORDEN.mapa == mapa and ORDEN.k == k:
+		return [int(ORDEN.x), int(ORDEN.y)]
+	var c = S.get("coloca") if S != null else null
+	if c is Dictionary and c.get(mapa) is Dictionary and c[mapa].has(k):
+		return [int(c[mapa][k][0]), int(c[mapa][k][1])]
+	var d: Array = pieza_de(mapa, k).def
+	return [int(d[0]), int(d[1])]
+
+func celdas_p(P_: Dictionary, x: int, y: int) -> Array:
+	var l := []
+	for o in P_.o:
+		var ob_ = o[2] if o.size() > 2 else null
+		if o.size() > 3 and not (S.get("nave") != null and int(S.nave.get("rg", 0)) >= int(o[3])):
+			ob_ = null
+		l.append([x + int(o[0]), y + int(o[1]), ob_])
+	return l
+
+func gente_p(P_: Dictionary, x: int, y: int) -> Array:
+	var l := []
+	for g in P_.get("gente", []):
+		l.append([x + int(g[0]), y + int(g[1]), g[2], g[3]])
+	return l
+
+func gente_fija(mapa: String) -> Array:
+	var con := {}
+	for P_ in D.ORDEN_P[mapa].piezas:
+		for g in P_.get("gente", []):
+			con[g[2]] = true
+	var l := []
+	for d in D.NPCDEF:
+		if d.map == mapa and not con.has(d.id):
+			l.append([int(d.x), int(d.y)])
+	return l
+
+func hueco_carpa(mapa: String) -> Array:
+	var l := []
+	if mapa != "home":
+		return l
+	for ci in D.SITIOS.size():
+		if sitio_visible(ci):
+			var s: Dictionary = D.SITIOS[ci]
+			for j in int(s.w):
+				l.append([int(s.x) + j, int(s.y)])
+	return l
+
+func pisable(m: Dictionary, x: int, y: int) -> bool:
+	if x < 0 or y < 0 or x >= int(m.w) or y >= int(m.h):
+		return false
+	var k := "%d,%d" % [x, y]
+	return SOLID_G.search(m.g[y][x]) == null and m.g[y][x] != "mat" and not m.exits.has(k) and not m.doors.has(k)
+
+func andable(m: Dictionary, O: Array, B := {}) -> Dictionary:
+	var v := {}
+	var q := []
+	for k in m.exits:
+		var p: PackedStringArray = k.split(",")
+		var x := int(p[0])
+		var y := int(p[1])
+		for d in [[0, -1], [-1, 0], [1, 0], [0, 1]]:
+			var nx: int = x + d[0]
+			var ny: int = y + d[1]
+			var kk := "%d,%d" % [nx, ny]
+			if not v.has(kk) and pisable(m, nx, ny) and not O[ny][nx] and not B.has(kk):
+				v[kk] = true
+				q.append([nx, ny])
+	var i := 0
+	while i < q.size():
+		var c: Array = q[i]
+		i += 1
+		for d in DIRS_ORDEN:
+			var nx: int = c[0] + d[0]
+			var ny: int = c[1] + d[1]
+			var kk := "%d,%d" % [nx, ny]
+			if not v.has(kk) and pisable(m, nx, ny) and not O[ny][nx] and not B.has(kk):
+				v[kk] = true
+				q.append([nx, ny])
+	return v
+
+func copia_o(m: Dictionary) -> Array:
+	return m.o.map(func(r): return r.duplicate())
+
+func sin_pieza(mapa: String, k: String) -> Array:
+	var m: Dictionary = MAPS[mapa]
+	var O := copia_o(m)
+	var P_ := pieza_de(mapa, k)
+	var op = m.get("opos", {})
+	if op.has(k) and not P_.get("suelo"):
+		for c in celdas_p(P_, int(op[k][0]), int(op[k][1])):
+			if c[1] >= 0 and c[1] < O.size() and c[0] >= 0 and c[0] < O[c[1]].size():
+				O[c[1]][c[0]] = null
+	return O
+
+# '' si la pieza k cabe en (x, y); si no, el motivo (D.ORDEN_MOTIVO)
+func cabe_pieza(mapa: String, k: String, x: int, y: int, O = null, jug := true) -> String:
+	if O == null:
+		O = sin_pieza(mapa, k)
+	var m: Dictionary = MAPS[mapa]
+	var Dm: Dictionary = D.ORDEN_P[mapa]
+	var P_ := pieza_de(mapa, k)
+	var F := celdas_p(P_, x, y)
+	var G := gente_p(P_, x, y)
+	for c in F + G:
+		if c[0] < 0 or c[1] < 0 or c[0] >= int(m.w) or c[1] >= int(m.h):
+			return "fuera"
+	var fila := func(cy: int, dy: int) -> bool:
+		if dy < 0:
+			return cy == 1
+		if P_.has("fila"):
+			return cy == int(P_.fila)
+		return cy >= int(Dm.filas[0]) and cy <= int(Dm.filas[1])
+	if P_.get("suelo"):
+		for c in F:
+			if not fila.call(c[1], 0) or not pisable(m, c[0], c[1]):
+				return "fuera"
+		return ""
+	for j in F.size():
+		var dy := int(P_.o[j][1])
+		if not fila.call(F[j][1], dy) or (dy >= 0 and not pisable(m, F[j][0], F[j][1])):
+			return "fuera"
+	for c in G:
+		if not pisable(m, c[0], c[1]):
+			return "fuera"
+	var res := {}
+	for c in gente_fija(mapa) + Dm.pie + D.ORDEN_RESERVA.get(mapa, []):
+		res["%d,%d" % [int(c[0]), int(c[1])]] = true
+	var otras: Array = piezas_ya(mapa).filter(func(Q): return Q.k != k)
+	for Q in otras:
+		var q := pos_pieza(mapa, Q.k)
+		for g in gente_p(Q, q[0], q[1]):
+			res["%d,%d" % [g[0], g[1]]] = true
+	var hueco := {}
+	for c in hueco_carpa(mapa):
+		hueco["%d,%d" % [c[0], c[1]]] = true
+	for c in F + G:
+		var kk := "%d,%d" % [c[0], c[1]]
+		if hueco.has(kk):
+			return "carpa"
+		if O[c[1]][c[0]] or res.has(kk):
+			return "ocupado"
+	if jug and S.map == mapa:
+		for c in F + G:
+			if c[0] == int(P.x) and c[1] == int(P.y):
+				return "tu"
+	var O2: Array = O.map(func(r): return r.duplicate())
+	for c in F:
+		O2[c[1]][c[0]] = c[2]
+	# la gente no se mueve y no se pasa por ella: a cada uno se le habla desde al lado o por encima de un mostrador
+	var gente: Array = gente_fija(mapa) + G
+	for Q in otras:
+		var q := pos_pieza(mapa, Q.k)
+		gente += gente_p(Q, q[0], q[1])
+	var B := {}
+	for g in gente:
+		B["%d,%d" % [int(g[0]), int(g[1])]] = true
+	var v := andable(m, O2, B)
+	var deben: Array = Dm.pie + hueco_carpa(mapa)
+	if jug and S.map == mapa:
+		deben.append([int(P.x), int(P.y)])
+	for c in deben:
+		if not v.has("%d,%d" % [int(c[0]), int(c[1])]):
+			return "paso"
+	for g in gente:
+		var gx := int(g[0])
+		var gy := int(g[1])
+		var ok := false
+		for d in DIRS_ORDEN:
+			var nx: int = gx + d[0]
+			var ny: int = gy + d[1]
+			if v.has("%d,%d" % [nx, ny]):
+				ok = true
+			elif ny >= 0 and ny < O2.size() and nx >= 0 and nx < O2[ny].size() and O2[ny][nx] and v.has("%d,%d" % [gx + 2 * d[0], gy + 2 * d[1]]):
+				ok = true
+			if ok:
+				break
+		if not ok:
+			return "paso"
+	for cy in range(2, int(m.h)):
+		for cx in int(m.w):
+			var o = O2[cy][cx]
+			if not o or ORDEN_SIN_LADO.search(o) != null:
+				continue
+			var lado := false
+			for d in DIRS_ORDEN:
+				var kd := "%d,%d" % [cx + d[0], cy + d[1]]
+				if v.has(kd) or B.has(kd):
+					lado = true
+					break
+			if not lado:
+				return "paso"
+	if mapa == "nave" and S.get("nave") != null and int(S.nave.get("rg", 0)) >= 1:
+		var pos := {k: [x, y]}
+		for i in D.MESAS_X.size():
+			if ruta_riego(i, O2, pos) == null:
+				return "riego"
+	return ""
+
+# quita las piezas del mapa (las de serie del plano la primera vez: las que están enteras en su sitio de serie)
+func quita_orden(mapa: String) -> void:
+	var m: Dictionary = MAPS[mapa]
+	if not m.has("opos"):
+		m.opos = {}
+		for P_ in D.ORDEN_P[mapa].piezas:
+			if P_.get("suelo"):
+				continue
+			var ok := true
+			for o in P_.o:
+				var yy: int = int(P_.def[1]) + int(o[1])
+				var xx: int = int(P_.def[0]) + int(o[0])
+				if not (yy >= 0 and yy < int(m.h) and xx >= 0 and xx < int(m.w) and m.o[yy][xx] == (o[2] if o.size() > 2 else null)):
+					ok = false
+					break
+			if ok:
+				m.opos[P_.k] = [int(P_.def[0]), int(P_.def[1])]
+	for k in m.opos:
+		var P_ := pieza_de(mapa, k)
+		if P_.get("suelo"):
+			continue
+		for o in P_.o:
+			var xx: int = int(m.opos[k][0]) + int(o[0])
+			var yy: int = int(m.opos[k][1]) + int(o[1])
+			if xx >= 0 and yy >= 0 and xx < int(m.w) and yy < int(m.h):
+				m.o[yy][xx] = null
+	m.opos = {}
+
+# monta las piezas: cada una donde se eligió; si ya no cabe, en su sitio de reserva o en el libre más cercano (y se apunta)
+func aplica_orden(mapa: String) -> void:
+	if not MAPS.has(mapa) or S == null:
+		return
+	var m: Dictionary = MAPS[mapa]
+	quita_orden(mapa)
+	for P_ in piezas_ya(mapa):
+		var p := pos_pieza(mapa, P_.k)
+		if cabe_pieza(mapa, P_.k, p[0], p[1], copia_o(m), false) != "":
+			var cs := []
+			if P_.has("alt"):
+				cs.append([int(P_.alt[0]), int(P_.alt[1])])
+			cs += cercanas(m, p)
+			var hit = null
+			for c in cs:
+				if cabe_pieza(mapa, P_.k, c[0], c[1], copia_o(m), false) == "":
+					hit = c
+					break
+			if hit == null:
+				continue
+			p = hit
+			if not (S.get("coloca") is Dictionary):
+				S.coloca = {}
+			if not S.coloca.has(mapa):
+				S.coloca[mapa] = {}
+			S.coloca[mapa][P_.k] = [p[0], p[1]]
+		m.opos[P_.k] = [p[0], p[1]]
+		if not P_.get("suelo"):
+			for c in celdas_p(P_, p[0], p[1]):
+				if c[0] >= 0 and c[1] >= 0 and c[0] < int(m.w) and c[1] < int(m.h):
+					m.o[c[1]][c[0]] = c[2]
+
+func cercanas(m: Dictionary, p: Array) -> Array:
+	var c := []
+	for y in int(m.h):
+		for x in int(m.w):
+			c.append([x, y])
+	var x0: int = p[0]
+	var y0: int = p[1]
+	c.sort_custom(func(a, b):
+		var da: int = absi(a[0] - x0) + absi(a[1] - y0)
+		var db: int = absi(b[0] - x0) + absi(b[1] - y0)
+		if da != db:
+			return da < db
+		if a[1] != b[1]:
+			return a[1] < b[1]
+		return a[0] < b[0])
+	return c
+
+func coloca_gente(mapa: String) -> void:
+	if mapa == "nave":
+		coloca_naveros()
+		return
+	for P_ in piezas_ya(mapa):
+		var q := pos_pieza(mapa, P_.k)
+		for g in gente_p(P_, q[0], q[1]):
+			for e in ents:
+				if e.id == g[2]:
+					e.x = g[0]; e.y = g[1]; e.px = g[0] * 16.0; e.py = g[1] * 16.0; e.hx = g[0]; e.hy = g[1]; e.fx = g[0]; e.fy = g[1]; e.dir = g[3]; e.moving = false
+					break
+
+func montar_club(mapa: String) -> void:
+	if mapa.begins_with("club-") and D.ORDEN_P.has(mapa):
+		aplica_orden(mapa)
+
+func ordenar(_mapa: String) -> void:   # trama
+	pass
+
+# el marco de la pieza en el cursor: verde si cabe, rojo si no; y la casilla de su gente, en azul
+func rects_orden() -> Array:
+	if ORDEN == null:
+		return []
+	var P_ := pieza_de(ORDEN.mapa, ORDEN.k)
+	var F := []
+	var cs := celdas_p(P_, ORDEN.x, ORDEN.y)
+	for j in cs.size():
+		if P_.get("suelo") or int(P_.o[j][1]) >= 0:
+			F.append(cs[j])
+	var c := "#e04040" if ORDEN.no != "" else "#58d080"
+	var x0 := 99999
+	var y0 := 99999
+	var x1 := -99999
+	var y1 := -99999
+	for f in F:
+		x0 = mini(x0, f[0] * 16); y0 = mini(y0, f[1] * 16); x1 = maxi(x1, (f[0] + 1) * 16); y1 = maxi(y1, (f[1] + 1) * 16)
+	var o := [[x0, y0, x1 - x0, 1, c], [x0, y1 - 1, x1 - x0, 1, c], [x0, y0, 1, y1 - y0, c], [x1 - 1, y0, 1, y1 - y0, c]]
+	for g in gente_p(P_, ORDEN.x, ORDEN.y):
+		o.append([g[0] * 16 + 6, g[1] * 16 + 6, 4, 4, "#80b0f0"])
+	return o
+
+# las mesas de la nave, donde estén
+func pos_mesa(i: int) -> Array:
+	return pos_pieza("nave", "m" + str(i))
+
+func mesa_idx(x: int, y: int) -> int:
+	for i in D.MESAS_X.size():
+		var p := pos_mesa(i)
+		if p[1] == y and (p[0] == x or p[0] + 1 == x):
+			return i
+	return -1
+
+# la lámpara del billar de la asociación, sobre el billar, donde esté
+func luz_club(k: String) -> Dictionary:
+	var L: Dictionary = D.LUZ_CLUB[k]
+	if k != "rv":
+		return L
+	var p := pos_pieza("club-rv", "billar")
+	var l0: Array = [p[0] * 16 + 16, p[1] * 16 + 6] + L.l[0].slice(2)
+	return {"fondo": L.fondo, "l": [l0, L.l[1]]}
+
+# la manguera guiada (rutaRiego): {c, t, lado, Y} o null
+func ruta_riego(i: int, O = null, pos := {}):
+	var m: Dictionary = MAPS.nave
+	if O == null:
+		O = m.o
+	var XY: Array = pos["m" + str(i)] if pos.has("m" + str(i)) else pos_mesa(i)
+	var X: int = int(XY[0])
+	var Y: int = int(XY[1])
+	var T: int = int((pos.riego if pos.has("riego") else pos_pieza("nave", "riego"))[0])
+	var libre := func(x: int, y: int) -> bool: return y >= 3 and pisable(m, x, y) and not O[y][x]
+	var fin := func(x: int, y: int) -> String:
+		if y == Y - 1 and (x == X or x == X + 1):
+			return "up"
+		if y == Y and x == X - 1:
+			return "right"
+		if y == Y and x == X + 2:
+			return "left"
+		return ""
+	var peso := func(c: int) -> float: return (100.0 if c == T else 0.0) + (0.0 if c == X else 0.5 if c == X + 1 else 1.0 + absi(c - X))
+	var cols := range(int(m.w))
+	cols.sort_custom(func(a, b):
+		var pa: float = peso.call(a)
+		var pb: float = peso.call(b)
+		if pa != pb:
+			return pa < pb
+		return a < b)
+	for c in cols:
+		if Y == 3:
+			if c == X or c == X + 1:
+				return {"c": c, "t": [], "lado": "up", "Y": Y}
+			continue
+		if not libre.call(c, 3):
+			continue
+		var pa := {"%d,3" % c: null}
+		var q := [[c, 3]]
+		var hit = null
+		var i_ := 0
+		while i_ < q.size():
+			var cu: Array = q[i_]
+			i_ += 1
+			if fin.call(cu[0], cu[1]) != "":
+				hit = cu
+				break
+			for d in DIRS_ORDEN:
+				var nx: int = cu[0] + d[0]
+				var ny: int = cu[1] + d[1]
+				var kk := "%d,%d" % [nx, ny]
+				if not pa.has(kk) and libre.call(nx, ny):
+					pa[kk] = cu
+					q.append([nx, ny])
+		if hit == null:
+			continue
+		var t := []
+		var p = hit
+		while p != null:
+			t.push_front(p)
+			p = pa["%d,%d" % [p[0], p[1]]]
+		return {"c": c, "t": t, "lado": fin.call(hit[0], hit[1]), "Y": Y}
+	return null
+
+# la manguera de la nave (mangueraNave, 11j-locales): el grifo, la tubería por el pie de la pared y cada bajada por su ruta
+func manguera_nave() -> Array:
+	if S == null or S.get("nave") == null or not int(S.nave.get("rg", 0)):
+		return []
+	var rg := int(S.nave.rg)
+	var key := str(rg) + "|" + JSON.stringify(S.get("coloca", {}).get("nave", {})) + "|" + (str(ORDEN.k) + str(ORDEN.x) + "," + str(ORDEN.y) if ORDEN != null and ORDEN.mapa == "nave" else "")
+	if RIEGO_CACHE != null and RIEGO_CACHE.key == key:
+		return RIEGO_CACHE.o
+	var y: int = int(D.RIEGO_Y)
+	var K := "#1c1d22"
+	var G := "#3a3c44"
+	var L := "#8a92a2"
+	var o := []
+	var TX: int = pos_pieza("nave", "riego")[0]
+	var t0: int = TX * 16 + 8
+	var cx: int = (TX + 2) * 16
+	var rutas := []
+	for i in D.MESAS_X.size():
+		var r = ruta_riego(i)
+		if r != null:
+			rutas.append(r)
+	o.append_array([[t0, 0, 1, 12, "#a46e40"], [t0 + 1, 0, 1, 12, "#dcac6c"], [t0 - 2, 12, 5, 2, L], [t0 - 1, 10, 3, 1, "#e04040"], [t0, 9, 1, 1, "#e04040"], [t0, 14, 1, 2, L], [t0, 16, 1, 7, G]])
+	var a := t0
+	var b := t0
+	for r in rutas:
+		a = mini(a, int(r.c) * 16 + 8)
+		b = maxi(b, int(r.c) * 16 + 8)
+	o.append_array([[a, y, b + 1 - a, 1, G], [a, y + 1, b + 1 - a, 1, K]])
+	var xx := t0 + 32
+	while xx < b:
+		o.append([xx, y - 1, 1, 3, L])
+		xx += 32
+	xx = t0 - 32
+	while xx > a:
+		o.append([xx, y - 1, 1, 3, L])
+		xx -= 32
+	for r in rutas:
+		var x: int = int(r.c) * 16 + 8
+		var pts := [[x, y + 2]]
+		for tt in r.t:
+			pts.append([int(tt[0]) * 16 + 8, int(tt[1]) * 16 + 8])
+		var e: Array = pts[pts.size() - 1]
+		pts.append([e[0], int(r.Y) * 16 - 7] if r.lado == "up" else [e[0] + (-9 if r.lado == "left" else 9), e[1]])
+		var j := pts.size() - 2
+		while j > 0:
+			var p0: Array = pts[j - 1]
+			var p1: Array = pts[j]
+			var p2: Array = pts[j + 1]
+			if (p0[0] == p1[0] and p1[0] == p2[0]) or (p0[1] == p1[1] and p1[1] == p2[1]):
+				pts.remove_at(j)
+			j -= 1
+		for jj in range(1, pts.size()):
+			var q1: Array = pts[jj - 1]
+			var q2: Array = pts[jj]
+			if q1[0] == q2[0]:
+				o.append_array([[q1[0], mini(q1[1], q2[1]), 1, absi(q2[1] - q1[1]), K], [q1[0] + 1, mini(q1[1], q2[1]), 1, absi(q2[1] - q1[1]), G]])
+			else:
+				o.append_array([[mini(q1[0], q2[0]), q1[1], absi(q2[0] - q1[0]) + 2, 1, K], [mini(q1[0], q2[0]), q1[1] + 1, absi(q2[0] - q1[0]) + 2, 1, G]])
+		if rg < 2:
+			o.append_array([[x - 1, y - 1, 3, 2, L], [x - 1, y - 2, 3, 1, "#e04040"]])
+		else:
+			o.append_array([[x - 1, y - 2, 3, 3, "#4a72c2"], [x - 1, y - 5, 3, 3, "#26262e"]])
+			var c: int = cx + (int(D.RIEGO_CTRL[0]) if x < cx + int(D.RIEGO_CTRL[0]) else int(D.RIEGO_CTRL[1]))
+			o.append_array([[x, int(D.RIEGO_CABLE), 1, y - 5 - int(D.RIEGO_CABLE), "#26262e"], [mini(x, c), int(D.RIEGO_CABLE), absi(c - x) + 1, 1, "#26262e"]])
+	RIEGO_CACHE = {"key": key, "o": o}
+	return o

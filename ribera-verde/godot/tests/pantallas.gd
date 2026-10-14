@@ -100,6 +100,7 @@ func monta(e: Dictionary) -> void:
 	J.TIRO = e.get("TIRO")
 	J.MESA_B = e.get("MESA_B")
 	J.ALMACEN = e.get("ALMACEN")
+	J.ORDEN = e.get("ORDEN")
 	J.vfx = e.vfx
 	J.ents = []
 	if e.mode == "world" or e.mode == "carpa":

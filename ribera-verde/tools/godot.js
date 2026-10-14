@@ -154,7 +154,7 @@ function atlasCarpa() {
       TIROS, MESA_BOLAS, EXTR, MOON, DEMO,   // 1.35: el billar y las extracciones
       CUENTA, RECIBO, LOCALES,   // 1.35: el banco, los recibos y los locales
       MANICURA, NEVERA, ALM, COLOR_EXTR, SECO00, MUEBLE_EXTR, TIPOS_EXTR: TIPOS_EXTR(),   // 1.36: la manicura, la caja y la nevera por dentro y los muebles de extraer
-      MANGUERA_NAVE: [1, 2, 3].map(rg => { const s = S; S = { nave: { rg } }; const r = mangueraNave(); S = s; return r; }),   // 1.35: el riego de la nave, por nivel
+      ORDEN_P, ORDEN_RESERVA, ORDEN_MOTIVO, RIEGO_Y, RIEGO_CABLE, RIEGO_CTRL,   // 1.37: ordenar (12d-orden) y la manguera guiada de la nave
       LUZ_BAJO, MADRES, MANDO, PRESI, PRESI_TXT, MUEBLE_CLUB, DECO_CLUB, GENTE_CLUB, ESTILO_OBJ: [...ESTILO_OBJ], PIZARRA_KIKO,   // 1.34: el bajo, las madres, la gente y los clubs
       ITINERARIO, ITIN_MUDO, JULEN, MINERAL_ORG, DESC_PROD: Object.fromEntries(Object.keys(PRODUCTOS).map(k => [k, descProducto(k)])),
       ROSIN, PATRULLAS, PAT, CALLE: CALLE.source, TAPA_VISTA: TAPA_VISTA.source, RONDA: Object.fromEntries(Object.keys(PATRULLAS).map(k => [k, casillasRonda(k)])),

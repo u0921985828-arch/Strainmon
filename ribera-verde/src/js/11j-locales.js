@@ -91,7 +91,7 @@ const LUZ_DISCO={fondo:'rgba(10,4,30,.55)',focos:[['255,79,200',0],['64,224,240'
 // la nave (1.31): bajo cada uno de los dos LED de una mesa plantada (encendidos), su luz en las plantas, del color de la de los LED de las
 // carpas (FOCO_LUZ.led); [dx desde la casilla de la mesa, y, radio, color, alfa]
 const LUZ_MESA=[[6,59,15,'240,170,255',.2],[26,59,15,'240,170,255',.2]];
-const luzNave=()=>({l:MESAS_X.flatMap((x,i)=>faseMesa(i)?LUZ_MESA.map(([dx,y,r,c,a])=>[x*16+dx,y,r,FOCO_NAVE[S.nave.f[i]].luz,a]):[])});   // 1.33: del color de sus focos
+const luzNave=()=>({l:MESAS_X.flatMap((_,i)=>{const [X,Y]=posMesa(i);return faseMesa(i)?LUZ_MESA.map(([dx,y,r,c,a])=>[X*16+dx,y+(Y-4)*16,r,FOCO_NAVE[S.nave.f[i]].luz,a]):[];})});   // 1.37: donde esté la mesa (12d-orden)   // 1.33: del color de sus focos
 function mapasLocales(){
   // ---------- LOS CLUBS (1.34: cada uno con su plano, CLUB_PLANO): el dispensario a la izquierda, los sofás y el billar ----------
   for(const k in CLUBS){const C=CLUBS[k],P=CLUB_PLANO[k],{w,h,mx}=planoClub(k),e=P.est?'_'+P.est:'',m=newMap('club-'+k,w,h,'floorC'+e);m.music='club';m.est=P.est||null;
@@ -148,7 +148,10 @@ Object.keys(PRESI).forEach(k=>{const P=CLUB_PLANO[k];NPCDEF.push({id:'pres_'+k,m
 // minutos), el día y su mesa, en un sitio de su mesa (delante a un lado o al otro, a su izquierda o detrás, mirándola), que no tape
 // ningún mueble (la mesa 1, detrás, el tanque); se colocan al entrar en la nave (buildEnts)
 const PUESTO_MIN=120;
-function puestosMesa(i){const X=MESAS_X[i],p=[[X,5,'up'],[X+1,5,'up'],[X-1,4,'right']];if(i)p.push([X,3,'down']);return p;}
+// 1.37: donde esté la mesa (12d-orden), en las casillas libres; detrás, solo si no tapa nada (ni el sitio del tanque)
+function puestosMesa(i){const [X,Y]=posMesa(i),m=MAPS.nave,T=posPieza('nave','riego'),libre=(x,y)=>pisable(m,x,y)&&!m.o[y][x];
+  const p=[[X,Y+1,'up'],[X+1,Y+1,'up'],[X-1,Y,'right']];if(Y-1>=3&&!m.o[Y-2][X]&&!(T[0]===X&&T[1]===Y-2))p.push([X,Y-1,'down']);
+  const q=p.filter(([x,y])=>libre(x,y));return q.length?q:[[X,Y+1,'up']];}
 function puestoNavero(i){const p=puestosMesa(i);return p[(Math.floor(S.min/PUESTO_MIN)+S.day+i)%p.length];}
 function colocaNaveros(){
   for(const e of ents){const m=/^nv(\d)$/.exec(e.id);if(!m)continue;const [x,y,dir]=puestoNavero(+m[1]);
@@ -193,7 +196,8 @@ function objLocal(x,y,o){
     if(o==='cartelC')return say(`NORMAS DE ${C.n}\nSolo socios mayores de edad, con el carné a la vista. Lo que se retira, se consume dentro.`);
     if(o==='tacos')return say('El taquero: seis tacos, la tiza y el triángulo.');
     if(o==='vitrina')return say('La vitrina del dispensario: tarros con muestras y una báscula de precisión.');
-    if(o==='mesita')return say(MUEBLE_CLUB[k].mesa);
+    if(o==='mesita'){if(!ORDEN_P[S.map]||!aso().pres)return say(MUEBLE_CLUB[k].mesa);   // 1.37 (lo pidió el usuario): de presidente, desde una mesita se ordena el local (12d-orden)
+      return ask(MUEBLE_CLUB[k].mesa,['Ordenar el local','Nada']).then(j=>j===0?ordenar(S.map):null);}
     if(/^sofa[FB]2?$/.test(o))return say(MUEBLE_CLUB[k].sofa);
     if(o==='billar'||o==='billar2')return say(`La mesa de billar, con el tapete recién cepillado. ${BILLAR.n[k]} juega con apuesta.`);
     if(o==='poster')return say('Un cartel antiguo de una feria del cáñamo.');
@@ -203,7 +207,7 @@ function objLocal(x,y,o){
   }
   if(S.map==='nave'){
     if(!S.nave)return say('La nave está vacía.');
-    if(o==='mesaN'||o==='mesaN2')return mesaNave(MESAS_X.indexOf(o==='mesaN'?x:x-1));
+    if(o==='mesaN'||o==='mesaN2')return mesaNave(mesaIdx(x,y));   // 1.37: donde esté (12d-orden)
     if(o==='estanteN')return estanteNave();
     if(o==='secadero')return secaderoNave();
     if(o==='escritorio'||o==='escritorio2')return escritorioNave();
@@ -361,26 +365,43 @@ const EQUIPO_NAVE=[[10,1,'extrN','ex',1,1],[10,1,'extrG','ex',2,3],[5,1,'extrG',
   [4,1,'filtroN','ex',3,3],[8,1,'filtroN','ex',3,3],[3,1,'ctrlN','rg',2,3],[1,2,'tanqueN','rg',1,3],[2,2,'riegoN','rg',3,3]];
 function montarNave(){
   const n=MAPS.nave;if(!n)return;
-  for(const [x,y] of EQUIPO_NAVE)ob(n,x,y,null);
-  if(S&&S.nave)for(const [x,y,o,k,a,b] of EQUIPO_NAVE)if(S.nave[k]>=a&&S.nave[k]<=b)ob(n,x,y,o);
+  quitaOrden('nave');   // 1.37: las mesas y el tanque, donde los puso el jugador (12d-orden: la pieza riego)
+  for(const [x,y,,k] of EQUIPO_NAVE)if(k==='ex')ob(n,x,y,null);
+  if(S&&S.nave)for(const [x,y,o,k,a,b] of EQUIPO_NAVE)if(k==='ex'&&S.nave[k]>=a&&S.nave[k]<=b)ob(n,x,y,o);
+  if(S)aplicaOrden('nave');
 }
 // el riego de la nave (1.35, lo pidió el usuario: realista; rectángulos [x, y, w, h, color]): el agua entra por el grifo de la pared,
 // encima del tanque, y cae dentro por su manguera; de la bomba (o de la máquina) sale la tubería de PE por el pie de la pared (RIEGO_Y),
 // detrás de los muebles, sujeta con abrazaderas, y en cada mesa (RIEGO_X: por un hueco de la fila del fondo) una T con su llave de bola
 // (rg 1) o su electroválvula (rg ≥ 2, con el cable del controlador por la pared, RIEGO_CABLE) y la bajada por el suelo hasta la bandeja
-const RIEGO_X=[40,72,136,184],RIEGO_Y=30,RIEGO_CABLE=23,RIEGO_CTRL=[50,62];
+// 1.37 (lo pidió el usuario: «guiar desde cualquier punto desde el depósito hasta las mesas»): el tanque y las mesas, donde estén
+// (12d-orden); la tubería, del tanque a la columna más lejana, y cada bajada, por su camino (rutaRiego) hasta su mesa. RIEGO_CTRL:
+// las dos salidas del controlador, desde su casilla; las bajadas (RIEGO_X, el de serie: 40, 72, 136 y 184), de rutaRiego
+const RIEGO_Y=30,RIEGO_CABLE=23,RIEGO_CTRL=[2,14];
+let RIEGO_CACHE=null;
 function mangueraNave(){
-  if(!S.nave||!S.nave.rg)return [];const rg=S.nave.rg,y=RIEGO_Y,K='#1c1d22',G='#3a3c44',L='#8a92a2',o=[];
-  o.push([24,0,1,12,'#a46e40'],[25,0,1,12,'#dcac6c'],[22,12,5,2,L],[23,10,3,1,'#e04040'],[24,9,1,1,'#e04040'],[24,14,1,2,L],[24,16,1,7,G]);   // el grifo y su manguera
-  o.push([24,y,RIEGO_X[3]+1-24,1,G],[24,y+1,RIEGO_X[3]+1-24,1,K]);   // la tubería
-  for(let x=56;x<RIEGO_X[3];x+=32)o.push([x,y-1,1,3,L]);   // abrazaderas
-  RIEGO_X.forEach(x=>{
-    o.push([x,y+2,1,57-(y+2),K],[x+1,y+2,1,57-(y+2),G]);   // la bajada, por el suelo
+  if(!S.nave||!S.nave.rg)return [];
+  const key=S.nave.rg+'|'+JSON.stringify(S.coloca&&S.coloca.nave||{})+'|'+(ORDEN&&ORDEN.mapa==='nave'?ORDEN.k+ORDEN.x+','+ORDEN.y:'');
+  if(RIEGO_CACHE&&RIEGO_CACHE.key===key)return RIEGO_CACHE.o;
+  const rg=S.nave.rg,y=RIEGO_Y,K='#1c1d22',G='#3a3c44',L='#8a92a2',o=[],[TX]=posPieza('nave','riego'),t0=TX*16+8,cx=(TX+2)*16;
+  const rutas=MESAS_X.map((_,i)=>rutaRiego(i)).filter(Boolean),xs=rutas.map(r=>r.c*16+8);
+  o.push([t0,0,1,12,'#a46e40'],[t0+1,0,1,12,'#dcac6c'],[t0-2,12,5,2,L],[t0-1,10,3,1,'#e04040'],[t0,9,1,1,'#e04040'],[t0,14,1,2,L],[t0,16,1,7,G]);   // el grifo y su manguera
+  const a=Math.min(t0,...xs),b=Math.max(t0,...xs);
+  o.push([a,y,b+1-a,1,G],[a,y+1,b+1-a,1,K]);   // la tubería
+  for(let x=t0+32;x<b;x+=32)o.push([x,y-1,1,3,L]);for(let x=t0-32;x>a;x-=32)o.push([x,y-1,1,3,L]);   // abrazaderas
+  rutas.forEach(r=>{const x=r.c*16+8;
+    // la bajada: por la fila del fondo hasta el suelo y por sus casillas (por el centro) hasta la mesa
+    const pts=[[x,y+2]].concat(r.t.map(([tx,ty])=>[tx*16+8,ty*16+8]));
+    {const [ex,ey]=pts[pts.length-1];pts.push(r.lado==='up'?[ex,r.Y*16-7]:[ex+(r.lado==='left'?-9:9),ey]);}   // hasta el borde de la mesa
+    for(let j=pts.length-2;j>0;j--){const [a,b,c]=[pts[j-1],pts[j],pts[j+1]];if(a[0]===b[0]&&b[0]===c[0]||a[1]===b[1]&&b[1]===c[1])pts.splice(j,1);}   // los tramos rectos, de una pieza
+    for(let j=1;j<pts.length;j++){const [x1,y1]=pts[j-1],[x2,y2]=pts[j];
+      if(x1===x2)o.push([x1,Math.min(y1,y2),1,Math.abs(y2-y1),K],[x1+1,Math.min(y1,y2),1,Math.abs(y2-y1),G]);
+      else o.push([Math.min(x1,x2),y1,Math.abs(x2-x1)+2,1,K],[Math.min(x1,x2),y1+1,Math.abs(x2-x1)+2,1,G]);}
     if(rg<2)o.push([x-1,y-1,3,2,L],[x-1,y-2,3,1,'#e04040']);   // llave de bola
     else{o.push([x-1,y-2,3,3,'#4a72c2'],[x-1,y-5,3,3,'#26262e']);   // electroválvula, con su cable hasta el controlador
-      const c=x<RIEGO_CTRL[0]?RIEGO_CTRL[0]:RIEGO_CTRL[1];o.push([x,RIEGO_CABLE,1,y-5-RIEGO_CABLE,'#26262e'],[Math.min(x,c),RIEGO_CABLE,Math.abs(c-x)+1,1,'#26262e']);}
+      const c=cx+(x<cx+RIEGO_CTRL[0]?RIEGO_CTRL[0]:RIEGO_CTRL[1]);o.push([x,RIEGO_CABLE,1,y-5-RIEGO_CABLE,'#26262e'],[Math.min(x,c),RIEGO_CABLE,Math.abs(c-x)+1,1,'#26262e']);}
   });
-  return o;
+  RIEGO_CACHE={key,o};return o;
 }
 // los dos focos de la mesa i (1.33): de su tipo, encendidos con la mesa plantada (focoN-<tipo>-<0|1>), colgados a FOCO_AIRE px de lo
 // más alto de sus plantas (sin plantas, recogidos a FOCO_ALTO px de la bandeja), que suben al crecer, como en las carpas; cada uno de
@@ -513,10 +534,11 @@ async function escritorioNave(){
     desc:`${w?'La cuida '+w.n:'Nadie la cuida'}. ${FOCO_NAVE[N.f[i]].n}.`+(M?` ${ABONO_MESA[M.abo][0].toUpperCase()+ABONO_MESA[M.abo].slice(1)} · en el secadero, ${gTxt(M.g)}.`:'')};});
   rows.push({label:'Estantería',right:`${dosisTxt(N.ab.m)} + ${dosisTxt(N.ab.o)} dosis`,desc:`MEATZA FLORACIÓN y ORTUA BIO FLORACIÓN: ${N.rg>=2?'menos de ':''}una dosis al día por mesa con abono.`},
     {label:'Clima',right:`${calorNave()} de ${EXTR_NAVE[N.ex].cap}`,desc:`El calor de los focos encendidos y lo que saca la extracción (${EXTR_NAVE[N.ex].n}).`+(sofocoNave()<1?` Hace demasiado calor: las mesas dan un ${Math.round((1-sofocoNave())*100)} % menos.`:'')},
+    {label:'Ordenar la nave',right:'',desc:'Mover las mesas y el tanque del riego: la manguera va del tanque a cada mesa por el suelo libre. Pulsa A.'},   // 1.37 (12d-orden)
     {label:'La gente',right:`${deLaNave().length} aquí`,desc:'Quién cuida cada mesa y las madres: cambiarlos de mesa, una prima o un curso. Pulsa A.'},
     {label:'Mejoras',right:'Nave '+NIVEL_NAVE[N.ex+N.rg],desc:`Extracción: ${EXTR_NAVE[N.ex].n}. Riego: ${RIEGO_NAVE[N.rg].n}. Pulsa A para mejorarlas.`});return rows;};
   let i=0;do{const rows=filas();i=await menu(rows,{cls:'full',title:'LA NAVE',title2:`${eur(NAVE.dia)} al día`,desc:true,initial:i});
-    if(i===rows.length-1)await mejorasNave();else if(i===rows.length-2)await genteNave();}while(i>=0);
+    const l=i>=0&&rows[i].label;if(l==='Mejoras')await mejorasNave();else if(l==='La gente')await genteNave();else if(l==='Ordenar la nave')await ordenar('nave');}while(i>=0);
 }
 // la gente de la nave (1.34, lo pidió el usuario: «menús para controlar más a la peña»): cada uno con su ficha y su sitio; a los de las
 // mesas, cambiarlos de mesa (con el que la tenga, se cambian); a todos, una prima o un curso (prima, curso: 11f-plantilla)
