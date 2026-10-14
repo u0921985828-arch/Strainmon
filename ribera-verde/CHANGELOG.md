@@ -1,5 +1,12 @@
 # Cambios
 
+## 1.40.1 · 14 de octubre de 2026
+
+Los esquejes de las bandejas, esquejes de verdad (lo pidió el usuario: «así es solamente una hoja; eso no es un esqueje»). Solo Godot, 0.34.1.
+
+- **`CLON`, de 13 × 12 a 15 × 15:** el tallo largo, dos hojas de cannabis abiertas a los lados con sus peciolos, el brote de arriba y dos brotes en el tallo, como la referencia.
+- **Las bandejas, sin el hueco de antes:** la tapa, encima de los esquejes, y las filas de tacos a 22 px para que quepa el esqueje entero; el carro mide lo mismo.
+
 ## 1.40.0 · 14 de octubre de 2026
 
 El carro de esquejes, a la vista (lo pidió el usuario: «que no sea un menú; que se vea la bandeja, una arriba y una abajo»). Solo Godot, 0.34.0.

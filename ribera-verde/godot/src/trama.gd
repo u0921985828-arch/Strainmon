@@ -5721,22 +5721,26 @@ func elegir_carro(i0 := 0):
 		dlg_nm.hide()
 	return e
 
-# un esqueje en su taco, dibujado a mano a 1 px (k: el tamaño del píxel): el tallo y, arriba, una hoja de cannabis de 7 dedos
-# (X, del color de hoja de la variedad; D, su nervio, más oscuro; T, el tallo); cx: el centro; y: donde el tallo entra en el taco.
+# un esqueje en su taco, dibujado a mano a 1 px (k: el tamaño del píxel), como la referencia del usuario: el tallo largo, dos hojas
+# de cannabis abiertas a los lados (X, del color de hoja de la variedad; D, los peciolos y el arranque, más oscuros), el brote
+# de arriba y dos brotes en el tallo (L, más claros; T, el tallo); cx: el tallo; y: donde el tallo entra en el taco.
 # El del último día, amarillento (seco)
 const CLON := [
-	"......X......",
-	".....XXX.....",
-	".X...XDX...X.",
-	".XX..XDX..XX.",
-	"..XX.XDX.XX..",
-	"...XX.D.XX...",
-	"XX..XXDXX..XX",
-	".XXXX.D.XXXX.",
-	"....X.T.X....",
-	"......T......",
-	"......T......",
-	"......T......"]
+	"......L.L......",
+	"...X..LLL..X...",
+	".X.XX.LLL.XX.X.",
+	"..XXX..L..XXX..",
+	"XX.DXX.L.XXD.XX",
+	"..XXDDXTXDDXX..",
+	".XX...DTD...XX.",
+	"X......T......X",
+	".....L.T.......",
+	"....LLLT.......",
+	".....L.T.L.....",
+	".......TLLL....",
+	".......T.L.....",
+	".......T.......",
+	".......T......."]
 const CLON_MINI := ["..X..", "X.X.X", ".XXX.", "..T.."]
 # el elegido, en grande (48 × 40, 1 px): cuatro hojas de cannabis de 7 dedos, las dos de atrás en sombra (K), y dos brotes;
 # lo saca tools/sprites/a-mano/esqueje.py (L haz, X hoja, D nervio y envés, K sombra, T tallo)
@@ -5843,23 +5847,21 @@ func rects_carro(V: Dictionary) -> Array:
 		o.append_array([[x0 + 7, sy, CARRO_W - 14, 4, "#5a606c"], [x0 + 9, sy + 3, CARRO_W - 18, 2, "#f4f8ec" if on else "#9aa0a8"]])
 		if on:
 			o.append_array([[x0 + 7, sy + 5, CARRO_W - 14, 4, "rgba(250,255,230,0.18)"], [x0 + 7, sy + 9, CARRO_W - 14, 6, "rgba(250,255,230,0.08)"]])
-		var ty: int = sy + 18
-		# la tapa (transparente) y la bandeja negra
-		o.append_array([[x0 + 8, ty - 11, CARRO_W - 16, 1, "rgba(210,236,255,0.55)"], [x0 + 8, ty - 11, 1, 12, "rgba(210,236,255,0.45)"],
-			[x0 + CARRO_W - 9, ty - 11, 1, 12, "rgba(210,236,255,0.45)"], [x0 + 9, ty - 10, CARRO_W - 18, 11, "rgba(210,236,255,0.10)"],
-			[x0 + 12, ty - 9, 10, 1, "rgba(255,255,255,0.5)"], [x0 + 26, ty - 9, 3, 1, "rgba(255,255,255,0.5)"]])
-		o.append_array([[x0 + 7, ty, CARRO_W - 14, 32, "#16161c"], [x0 + 8, ty + 1, CARRO_W - 16, 30, "#26262e"], [x0 + 7, ty + 31, CARRO_W - 14, 2, "#3c3e48"]])
+		# la bandeja negra y, encima, la tapa transparente con su reflejo
+		o.append_array([[x0 + 7, sy + 8, CARRO_W - 14, 41, "#16161c"], [x0 + 8, sy + 9, CARRO_W - 16, 39, "#26262e"], [x0 + 7, sy + 47, CARRO_W - 14, 2, "#3c3e48"]])
+		o.append_array([[x0 + 8, sy + 6, CARRO_W - 16, 1, "rgba(210,236,255,0.55)"], [x0 + 8, sy + 6, 1, 10, "rgba(210,236,255,0.45)"],
+			[x0 + CARRO_W - 9, sy + 6, 1, 10, "rgba(210,236,255,0.45)"], [x0 + 12, sy + 7, 10, 1, "rgba(255,255,255,0.5)"], [x0 + 26, sy + 7, 3, 1, "rgba(255,255,255,0.5)"]])
 		for r in 2:
 			for c in F:
 				var s: int = t * F * 2 + r * F + c
 				var cx: int = x0 + 10 + c * 16 + 7
-				var cy: int = ty + 3 + r * 18
+				var cy: int = sy + 17 + r * 22
 				_taco(o, cx, cy)
 				if s < nb:
 					var e: Dictionary = S.bandejas[s]
 					_esqueje(o, cx, cy + 2, _hoja_de(e.sid), 1, int(e.dia) + int(D.CARRO.dias) <= S.day)
 				if s == V.i:
-					o.append_array([[cx - 8, cy - 11, 16, 1, "#f8d040"], [cx - 8, cy + 8, 16, 1, "#f8d040"], [cx - 8, cy - 11, 1, 20, "#f8d040"], [cx + 7, cy - 11, 1, 20, "#f8d040"]])
+					o.append_array([[cx - 8, cy - 13, 16, 1, "#f8d040"], [cx - 8, cy + 8, 16, 1, "#f8d040"], [cx - 8, cy - 13, 1, 22, "#f8d040"], [cx + 7, cy - 13, 1, 22, "#f8d040"]])
 	# a la derecha, el elegido en grande, los días que le quedan y el propagador
 	var px: int = x0 + CARRO_W + 4
 	o.append_array([[px, y0, 60, CARRO_H, "#1c1e24"], [px + 1, y0 + 1, 58, CARRO_H - 2, "#2a2d34"], [px + 6, y0 + 4, 48, 62, "#20222a"]])
