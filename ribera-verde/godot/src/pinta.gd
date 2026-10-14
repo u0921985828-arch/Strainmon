@@ -274,7 +274,7 @@ func _mundo() -> void:
 		if a > 0:
 			_rect(0, 0, J.SW, SH, Color8(14, 20, 72, Datos.jsround(a * 255)))
 	var LZ = _luz_local()   # los locales (1.30): el fondo, encima de todo; sus luces, en _farolas
-	if LZ:
+	if LZ and LZ.get("fondo"):
 		_rect(0, 0, J.SW, SH, css(LZ.fondo))
 
 func noche() -> float:
@@ -328,10 +328,21 @@ func _mancha(a: float, tipo: String) -> Image:
 	cache[key] = im
 	return im
 
-# la luz de los locales (luzLocal, 14-render; LUZ_CLUB y LUZ_DISCO): cada luz, un degradado radial (r 1 → r) sumado; los focos de
+# la luz de los locales (luzLocal, 14-render; LUZ_CLUB, LUZ_DISCO y, 1.31, los LED de la nave, _luz_nave): cada luz, un degradado radial (r 1 → r) sumado; los focos de
 # GAUA dan una vuelta a la pista cada 7 s (0,9 rad/s), cada uno desde su fase
 func _luz_local():
+	if J.S.map == "nave":
+		return _luz_nave()
 	return J.D.LUZ_CLUB if J.S.map.begins_with("club-") else (J.D.LUZ_DISCO if J.S.map == "disco" else null)
+
+# la nave (1.31, luzNave de 11j-locales): bajo cada uno de los dos LED de una mesa plantada, su luz en las plantas
+func _luz_nave() -> Dictionary:
+	var l := []
+	for i in J.D.MESAS_X.size():
+		if J.fase_mesa(i):
+			for z in J.D.LUZ_MESA:
+				l.append([int(J.D.MESAS_X[i]) * 16 + int(z[0]), z[1], z[2], z[3], z[4]])
+	return {"l": l}
 
 func _luces_local() -> void:
 	var LZ = _luz_local()
@@ -481,7 +492,9 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		return
 	var an = Atlas.sobre.get("obj:" + o)
 	var d := desfase(o, tx, ty)
-	var sp: String = ("mesaN-%d" % J.fase_mesa(J.mesa_de(tx))) if o == "mesaN" else J.deco_sprite(o)   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, en su fase
+	var fm: int = J.fase_mesa(J.mesa_de(tx)) if o == "mesaN" else 0
+	var pl = _plantas_mesa(gr, J.mesa_de(tx), fm) if fm else null   # 1.31: las plantas de la mesa de la nave, encima
+	var sp: String = ("mesaN-%d" % mini(fm, 1)) if o == "mesaN" else J.deco_sprite(o)   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada
 	var f = Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, sp, "unica", 0, {"i": 0, "esp": d.esp})
 	if f == null and not an and sp != o:
 		f = Atlas.frame_de(gr, o, "unica", 0, {"i": 0, "esp": d.esp})
@@ -503,9 +516,37 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		if not ob.call(tx, ty + 1):
 			sombras.append([x0, yp + 1, x1 - x0 + 1, 1])
 	if f.cel.h > 16:
-		list.append([ty * 16 + mini(0, d.dy), _pinta.bind(f, xp, yp)])   # corrido hacia abajo, no pasa delante de quien está en su fila
+		list.append([ty * 16 + mini(0, d.dy), _pinta_mesa.bind(f, xp, yp, pl)])   # corrido hacia abajo, no pasa delante de quien está en su fila
 	else:
-		_pinta(f, xp, yp)
+		_pinta_mesa(f, xp, yp, pl)
+
+func _pinta_mesa(f, xp: float, yp: float, pl) -> void:
+	_pinta(f, xp, yp)
+	if pl != null:
+		_pinta(pl, xp, yp)
+
+# las plantas de la mesa i de la nave en la fase fm (1.31, plantasMesa de 01b-arte): las de su porte (porte_planta, por el % índica de
+# su fenotipo) con el tono de hoja y el color de cogollo de la variedad, como en la vista C (hoja_planta, vc_tonos y la rampa de
+# carpa-c-plantas-a); el fotograma, con su imagen ya cambiada
+func _plantas_mesa(gr, i: int, fm: int):
+	var S_: Dictionary = J.S
+	var Me = S_.nave.m[i] if S_.get("nave") != null else null
+	if not Me:
+		return null
+	var p := {"sid": J.lot_sid(Me.k), "f": Me.get("f")}
+	var f = Atlas.frame_de(gr, "plantasN-1" if fm == 1 else "plantasN-%d-%s" % [fm, Datos.porte_planta(S_, p)], "unica", 0, {"i": 0})
+	if f == null:
+		return null
+	var s = Datos.strain(S_, p.sid)
+	var rk = Atlas.d.get("rampas", {}).get("carpa-c-plantas-a", {}).get("cogollo")
+	if rk == null or s == null:
+		return f
+	var hj := Datos.hoja_planta(S_, p)
+	var m := {rk.rampa[0]: Datos.shade(s.c, 50), rk.rampa[1]: s.c, rk.rampa[2]: Datos.shade(s.c, -60)}
+	m.merge(Datos.vc_tonos(hj), true)
+	var o: Dictionary = f.duplicate()
+	o.c = Atlas.con_rampa(f.c, m, "g|" + s.c + "|" + hj)
+	return o
 
 func _arte_edificios(m: Dictionary) -> void:
 	if not Atlas.ok:

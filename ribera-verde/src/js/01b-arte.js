@@ -207,7 +207,8 @@ function arteObj(o,tx,ty,cam,now,list,sombras){
   if(SEGUNDA.has(o)||o==='sillaG2'||LOCAL2.has(o))return !!ARTE.cubre['obj:'+o.slice(0,-1)];   // la mitad de la derecha de un mueble del salón (y de los locales, 1.30): la pinta la de la izquierda
   const g=ARTE.cubre['obj:'+o];if(!g)return false;
   const an=ARTE.sobre['obj:'+o],d=desfase(o,tx,ty);
-  const sp=o==='mesaN'?'mesaN-'+faseMesa(MESAS_X.indexOf(tx)):decoSprite(o),f=   // 1.30: la mesa de la nave, en su fase
+  const fm=o==='mesaN'?faseMesa(MESAS_X.indexOf(tx)):0,pl=fm?plantasMesa(g,MESAS_X.indexOf(tx),fm):null;   // 1.31: las plantas de la mesa de la nave, encima
+  const sp=o==='mesaN'?'mesaN-'+Math.min(fm,1):decoSprite(o),f=   // 1.30: la mesa de la nave, vacía o plantada
     an?frameDe(an[0][0],an[0][1],'unica',now,{bucle:true}):frameDe(g,sp,'unica',0,{i:0,esp:d.esp})||(sp!==o?frameDe(g,o,'unica',0,{i:0,esp:d.esp}):null);   // 1.16: su tapizado o lámina
   if(!f)return false;
   const xp=tx*16+8+d.dx-cam.x,yp=ty*16+15+d.dy+(ALZA[o]||0)-cam.y;
@@ -216,8 +217,17 @@ function arteObj(o,tx,ty,cam,now,list,sombras){
     if(x0-1>=sx||!ob(tx-1,ty))sombras.push([x0-1,yp-1,1,2]);
     if(x1+1<=sx+15||!ob(tx+1,ty))sombras.push([x1+1,yp-1,1,2]);
     if(!ob(tx,ty+1))sombras.push([x0,yp+1,x1-x0+1,1]);}
-  if(f.cel.h>16&&list)list.push([ty*16+Math.min(0,d.dy),()=>pinta(f,xp,yp)]);else pinta(f,xp,yp);   // corrido hacia abajo, no pasa delante de quien está en su fila
+  const dib=()=>{pinta(f,xp,yp);if(pl)pinta(pl[0],xp,yp,pl[1]);};
+  if(f.cel.h>16&&list)list.push([ty*16+Math.min(0,d.dy),dib]);else dib();   // corrido hacia abajo, no pasa delante de quien está en su fila
   return true;
+}
+// las plantas de la mesa i de la nave en la fase fm (1.31): las de su porte (portePlanta, por el % índica de su fenotipo) con el tono
+// de hoja y el color de cogollo de la variedad, como en la vista C (hojaPlanta, vcTonos y la rampa de carpa-c-plantas-a): [fotograma, lienzo]
+function plantasMesa(g,i,fm){
+  const M=S.nave&&S.nave.m[i];if(!M)return null;const p={sid:lotSid(M.k),f:M.f},s=getStrain(p.sid);
+  const f=frameDe(g,fm===1?'plantasN-1':`plantasN-${fm}-${portePlanta(p)}`,'unica',0,{i:0});if(!f)return null;
+  const rk=((ARTE.d.rampas||{})['carpa-c-plantas-a']||{}).cogollo,hj=hojaPlanta(p);
+  return [f,rk&&s?conRampa(f.c,{[rk.rampa[0]]:shade(s.c,50),[rk.rampa[1]]:s.c,[rk.rampa[2]]:shade(s.c,-60),...vcTonos(hj)},'g|'+s.c+'|'+hj):f.c];
 }
 // edificios grises con puerta (1.10): su fachada (b.fachada, con hueco para la puerta), la puerta de otra (b.puerta) y, con b.mascara,
 // sin su trozo de pared (PARED: los colores de la fachada del piso, quitados desde el borde del fotograma hacia dentro mientras sigan siendo pared)

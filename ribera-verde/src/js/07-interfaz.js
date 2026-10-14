@@ -28,24 +28,33 @@ function pedirTexto(txt,ini='',max=12,mayus=false,cancela=true,crudo=false){retu
   push(b=>{if(b==='A')done(vale());else if(b==='B'&&cancela)done(null);});
   inp.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter'){e.preventDefault();done(vale());}else if(e.key==='Escape'&&cancela){e.preventDefault();done(null);}};});}
 dlg.addEventListener('click',()=>press('A'));
+// los menús que no van a toda altura (1.31): si no caben entre el borde de arriba y el diálogo (o el de abajo, el de START), las filas
+// que quepan, con las flechas ▲▼. Las cuentas, en píxeles del escenario (u), las mismas que en Godot: fila 14,5; caja (borde y relleno) 14;
+// título 19,5; flechas 10
+const MENU_FILA=14.5,MENU_CAJA=14,MENU_TTL=19.5,MENU_ARR=10;
+function filasMenu(n,o){
+  const us=parseFloat($('consola').style.getPropertyValue('--us'))||1,H=$('ui').clientHeight/us;
+  const d=H-(o.cls==='start'?6:52)-MENU_CAJA-(o.title?MENU_TTL:0);
+  return n*MENU_FILA<=d+.01?n:Math.max(1,Math.floor((d-MENU_ARR)/MENU_FILA+.01));}
 function menu(items,o={}){return new Promise(res=>{
   items=items.map(it=>typeof it==='string'?{label:it}:it);
-  let i=clamp(o.initial||0,0,items.length-1),top=0;const rows=o.rows||(o.cls==='full'?(o.desc?5:8):items.length);
+  let i=clamp(o.initial||0,0,items.length-1),top=0;const rows=o.rows||(o.cls==='full'?(o.desc?5:8):items.length),corre=o.cls!=='full'&&o.cls!=='battle';
   menuEl.className='box menu '+(o.cls||'right');
   // menú a toda altura: si la descripción ocupa más líneas, caben menos filas (vis) y la lista no se monta sobre ella
   const draw=(vis=rows)=>{
+    if(corre)vis=filasMenu(items.length,o);const fl=o.cls==='full'||vis<items.length;
     if(i<top)top=i;if(i>=top+vis)top=i-vis+1;
     let h='';if(o.title)h+=`<div class="ttl"><span>${o.title}</span>${o.title2?`<span>${o.title2}</span>`:''}</div>`;
-    if(o.cls==='full')h+=`<div class="arr">${top>0?'▲':''}</div><div class="list">`;
+    if(fl)h+=`<div class="arr" data-b="up">${top>0?'▲':''}</div>`;if(o.cls==='full')h+=`<div class="list">`;
     items.slice(top,top+vis).forEach((it,k)=>{const idx=top+k;h+=`<div class="it ${idx===i?'sel':''} ${it.disabled?'dis':''}" data-i="${idx}"><span>${it.ic?`<i class="ic" style="background-image:url(${it.ic});width:${icPx(ICO_N[it.ic]||16)}px;height:${icPx(ICO_N[it.ic]||16)}px"></i>`:it.sw?`<i class="sw" style="background:${it.sw}"></i>`:''}${esc(it.label)}</span>${it.right!=null?`<span class="r">${esc(it.right)}</span>`:''}</div>`;});
-    if(o.cls==='full')h+=`</div><div class="arr">${top+vis<items.length?'▼':''}</div>`;
+    if(o.cls==='full')h+=`</div>`;if(fl)h+=`<div class="arr" data-b="down">${top+vis<items.length?'▼':''}</div>`;
     if(o.desc)h+=`<div class="desc">${esc(items[i].desc||'')}</div>`;
     menuEl.innerHTML=h;
     const l=o.cls==='full'&&!menuEl.hidden&&menuEl.querySelector('.list');if(l&&vis>1&&l.scrollHeight>l.clientHeight+1)draw(vis-1);
   };
   menuEl.hidden=false;draw();menuRedraw=()=>draw();
   const done=v=>{pop();menuRedraw=null;menuEl.hidden=true;menuEl.onclick=null;res(v);};
-  menuEl.onclick=e=>{const it=e.target.closest('.it');if(!it)return;const n=+it.dataset.i;if(n===i)handler('A');else{i=n;draw();}};
+  menuEl.onclick=e=>{const ar=e.target.closest('.arr');if(ar&&ar.textContent){handler(ar.dataset.b);return;}const it=e.target.closest('.it');if(!it)return;const n=+it.dataset.i;if(n===i)handler('A');else{i=n;draw();}};
   const handler=b=>{const g=o.cls==='battle';const n=items.length;
     if(b==='up'){i=g?(i>=2?i-2:i):(i-1+n)%n;sfx('tick');draw();}
     else if(b==='down'){i=g?(i+2<n?i+2:i):(i+1)%n;sfx('tick');draw();}

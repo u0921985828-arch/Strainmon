@@ -7903,7 +7903,7 @@
    ],
    "celda": "mueble_ancho",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
-   "descripcion": "1.30, muebles de 2 casillas a 16 px/m: la mesa de billar de 210 cm con el tapete a medio fondo, las troneras y las bolas, y la lámpara de tres pantallas verdes colgada encima; el sofá chester verde de frente (sofaF) y por detrás (sofaB), el de terciopelo morado del reservado (sofaV), la cabina del DJ con los platos, la mesa y el rótulo, la mesa de oficina de la nave con el portátil y la cajonera, y la mesa de cultivo de 240 × 120 cm con seis macetas bajo la barra de LED en sus cinco fases (mesaN-0 vacía, -1 plántulas, -2 vegetativo, -3 flor, -4 cogollos)",
+   "descripcion": "1.30, muebles de 2 casillas a 16 px/m: la mesa de billar de 210 cm con el tapete a medio fondo, las troneras y las bolas, y la lámpara de tres pantallas verdes colgada encima; el sofá chester verde de frente (sofaF) y por detrás (sofaB), el de terciopelo morado del reservado (sofaV), la cabina del DJ con los platos, la mesa y el rótulo, la mesa de oficina de la nave con el portátil y la cajonera, y la mesa de cultivo de 240 × 120 cm con seis macetas bajo dos LED de barras de 100 cm, como los de las carpas (1.31; mesaN-0 vacía y apagados, mesaN-1 plantada y encendidos); 1.31: sus plantas, aparte y encima, en los colores de la planta A (hojas, tallo, contorno y la rampa clave del cogollo, para que el juego les ponga el tono de hoja y el color de cogollo de cada variedad, como en la vista C): plantasN-1 recién plantadas y plantasN-<fase>-<porte> (2 creciendo, 3 en flor, 4 dando; i baja y tupida de hoja ancha y cogollos gordos, h entre medias, s alta y abierta de hoja fina y colas largas)",
    "ajuste_por_sprite": {
     "billar": "exacto",
     "sofaF": "exacto",
@@ -7913,9 +7913,16 @@
     "escritorio": "exacto",
     "mesaN-0": "exacto",
     "mesaN-1": "exacto",
-    "mesaN-2": "exacto",
-    "mesaN-3": "exacto",
-    "mesaN-4": "exacto"
+    "plantasN-1": "exacto",
+    "plantasN-2-i": "exacto",
+    "plantasN-2-h": "exacto",
+    "plantasN-2-s": "exacto",
+    "plantasN-3-i": "exacto",
+    "plantasN-3-h": "exacto",
+    "plantasN-3-s": "exacto",
+    "plantasN-4-i": "exacto",
+    "plantasN-4-h": "exacto",
+    "plantasN-4-s": "exacto"
    },
    "estilo_ref": "los muebles del salón (salon)",
    "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca»."

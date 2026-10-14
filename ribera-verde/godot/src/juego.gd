@@ -146,6 +146,17 @@ func migrate() -> void:
 		if o.get("sid"):
 			for i in S.nave.m.size():
 				S.nave.m[i] = {"k": o.sid, "thc": o.thc, "y": 1, "dia": int(S.day) - int(D.NAVE.crece), "g": Datos.jsround(o.g * 10) / 10.0 if i == 0 else 0, "t": o.thc, "abo": 0}
+	for w in naveros():   # 1.31: cada trabajador de la nave, su mesa (w.mesa); los de antes, la que les tocaba por el orden de la plantilla
+		if w.get("mesa") == null:
+			for i in int(D.NAVE.max):
+				if navero_de(i) == null:
+					w.mesa = i
+					break
+	if S.get("envio") is Array:   # 1.31: el pH− de 250 ml ya no se vende; lo pedido a Kiko de antes llega como la botella de 1 L
+		for i in S.envio.size():
+			var l: String = S.envio[i]
+			if l.begins_with("pH− ") and l.ends_with(" 250 ml"):
+				S.envio[i] = l.trim_suffix(" 250 ml") + " 1 L"
 	if not S.flags.has("vendDia"):   # 1.29.1: el dia de un vendedor era el de la entrega; ahora, el de la cosecha (los de antes no pierden)
 		for v in S.curro.vend:
 			v.erase("dia")

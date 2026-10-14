@@ -998,8 +998,15 @@ func menu(items_: Array, o := {}) -> int:
 			else:
 				st.i = n
 				draw.call())
+		menu_box.set_meta("flecha", func(b: String): handler.call(b))   # 1.31: tocar ▲ o ▼
 	push(handler)
 	return await Motor.espera(p)
+
+# los menús que no van a toda altura (1.31, filasMenu de 07-interfaz): si no caben entre el borde de arriba y el diálogo (o el de abajo,
+# el de START), las filas que quepan, con las flechas ▲▼. En u, como en el HTML: fila 14,5; caja 14; título 19,5; flechas 10
+func filas_menu(n: int, o: Dictionary) -> int:
+	var d: float = ui_rect().size.y / us - (6 if o.get("cls") == "start" else 52) - 14 - (19.5 if o.get("title") else 0.0)
+	return n if n * 14.5 <= d + .01 else maxi(1, floori((d - 10) / 14.5 + .01))
 
 # el menú en nodos: título, flechas y filas (las de un menú a toda altura caben con la descripción debajo), descripción
 func _pinta_menu(rows: int) -> void:
@@ -1027,13 +1034,15 @@ func _pinta_menu(rows: int) -> void:
 			alto -= maxf(24 * us, lineas * 11.5 * us) + 7 * us
 		while vis > 1 and vis * lh > alto:
 			vis -= 1
+	elif not g:
+		vis = filas_menu(m_items.size(), o)
+	else:
+		vis = m_items.size()
+	var fl := full or vis < m_items.size()
 	if m_i < m_top:
 		m_top = m_i
 	if m_i >= m_top + vis:
 		m_top = m_i - vis + 1
-	if not full:
-		m_top = 0
-		vis = m_items.size()
 	if o.get("title"):
 		var t := HBoxContainer.new()
 		var a := Label.new()
@@ -1054,8 +1063,8 @@ func _pinta_menu(rows: int) -> void:
 		var hueco := Control.new()
 		hueco.custom_minimum_size = Vector2(0, 3 * us)
 		menu_col.add_child(hueco)
-	if full:
-		menu_col.add_child(_flecha("▲" if m_top > 0 else ""))
+	if fl:
+		menu_col.add_child(_flecha("▲" if m_top > 0 else "", "up"))
 	var lista: Container = GridContainer.new() if g else VBoxContainer.new()
 	if g:
 		lista.columns = 2
@@ -1132,8 +1141,8 @@ func _pinta_menu(rows: int) -> void:
 				menu_box.get_meta("clic").call(idx))
 		lista.add_child(f)
 	menu_col.add_child(lista)
-	if full:
-		menu_col.add_child(_flecha("▼" if m_top + vis < m_items.size() else ""))
+	if fl:
+		menu_col.add_child(_flecha("▼" if m_top + vis < m_items.size() else "", "down"))
 	if o.get("desc"):
 		var raya := ColorRect.new()
 		raya.color = LINEA2
@@ -1151,9 +1160,14 @@ func _pinta_menu(rows: int) -> void:
 	menu_box.set_meta("cls", cls)
 	_coloca.call_deferred()
 
-func _flecha(t: String) -> Label:
+func _flecha(t: String, b := "") -> Label:
 	var a := Label.new()
 	a.text = t
+	if t != "" and b != "":   # 1.31: se toca como la cruceta
+		a.mouse_filter = Control.MOUSE_FILTER_STOP
+		a.gui_input.connect(func(e):
+			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT and menu_box.has_meta("flecha"):
+				menu_box.get_meta("flecha").call(b))
 	a.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	a.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	a.custom_minimum_size = Vector2(0, 5 * us)

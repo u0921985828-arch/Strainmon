@@ -1834,6 +1834,7 @@ func _pasos() -> void:
 		want(["^A la nave"])
 		await run(func(): await J.trabajo(itz))
 		var fert0 = J.S.items.fert
+		R.mesa = jn([itz.mesa, J.rol_desc(itz)])
 		J.S.esquejes.append({"sid": "ria", "f": {"id": 999, "t": 1, "y": 1, "i": 50}, "dia": J.S.day})
 		want(["^Plantar", "^Esqueje .* nº 999"])
 		await run(func(): await J.mesa_nave(0))
@@ -1843,6 +1844,7 @@ func _pasos() -> void:
 		R.m = J.S.money
 		await dia.call(.99)
 		R.crece = jn([M0.g, R.m - J.S.money])
+		R.cd = jn([M0.cd, J.S.day])
 		J.S.items.fert = 3
 		want(["^Dejar MEATZA"])
 		await run(func(): await J.estante_nave())
@@ -1855,6 +1857,12 @@ func _pasos() -> void:
 		R.b = J.S.buds.ria.g
 		await run(func(): await J.secadero_nave())
 		R.rec = jn([J.S.buds.ria.g - R.b, M0.g, J.fase_mesa(0)])
+		R.cd2 = M0.cd
+		M0.g = .4   # lo que queda por debajo de 1 g no se recoge: la cosecha nueva lleva su día
+		M0.cd = int(J.S.day) - 5
+		await dia.call(.99)
+		R.cd3 = jn([M0.cd, J.S.day])
+		M0.g = 0
 		R.h = J.S.heat
 		await dia.call(0)
 		R.redada = jn([J.S.nave == null, ",".join(PackedStringArray(J.S.plantilla.map(func(w): return w.n))), J.S.heat - R.h])
@@ -1904,6 +1912,7 @@ func _pasos() -> void:
 				and R.venta == jn([22, R.e, P.calor]) and R.arc == R.gc - int(floor(R.gc * P.sisa * 2)) and R.pot == null
 				and R.poli == jn([null, true, P.calor + P.calorPoli, P.sueldo.gerente])
 				and R.robo == 12 and R.timo == 10 and R.fuga == "Itziar,Iker" and R.sin == ",10" and R.ar == "17,7" and R.nave == jn([true, N.fianza])
+				and R.mesa == "0,Cultiva la mesa 1 de la nave por %s al día: %s g." % [Datos.eur(P.sueldo.nave), Datos.js_num(g1)] and R.cd.split(",")[0] == R.cd.split(",")[1] and Datos.js_num(R.cd2) == R.cd.split(",")[1] and R.cd3.split(",")[0] == R.cd3.split(",")[1]
 				and R.var == jn(["ria", t1, 0, false, 1]) and R.crece == jn([g1, N.dia + P.sueldo.nave]) and R.ab == "3,0,1"
 				and R.abono == jn([g1 + g2, Datos.jsround((t1 * g1 + (t1 + D.ABONO.thc) * g2) / (g1 + g2) * 10) / 10.0, 2]) and R.rec == jn([g1 + g2, 0, 4])
 				and R.redada == jn([true, "Iker", N.calor])
@@ -2036,6 +2045,14 @@ func _pasos() -> void:
 		await run(func(): await J.talk_dj())
 		Cultivo.fijo = -1
 		R.baile = ",".join(PackedStringArray(J.S.fijos.map(func(f): return "%s:%s" % [f.id, f.t])))
+		var F0 = J.S.fijos
+		J.S.fijos = []
+		for k in int(D.FIJOS_MAX):
+			J.S.fijos.append({"id": "x%d" % k, "n": "X", "t": "pij", "dia": 0})
+		R.m = J.S.money
+		await run(func(): await J.talk_rrpp())
+		R.llena = jn([R.m - J.S.money, J.S.noche.mesa])
+		J.S.fijos = F0
 		want(["^Reservar"])
 		R.m = J.S.money
 		await run(func(): await J.talk_rrpp())
@@ -2043,6 +2060,9 @@ func _pasos() -> void:
 		await run(func(): await J.talk_rrpp())
 		R.vip2 = J.S.fijos.size()
 		J.S.min = 6 * 60 + 1
+		await run(func(): await J.talk_barra())
+		R.echa0 = dnd.call()
+		J.enter_map("disco", 6, 6, "up")
 		J.on_step_end()
 		await idle()
 		R.echa = dnd.call()
@@ -2057,6 +2077,17 @@ func _pasos() -> void:
 		J.S.nave = {"sid": "ria", "g": 30.5, "thc": 10.8}
 		J.migrate()
 		R.mig = jj(J.S.nave.m.map(func(Me): return [Me.k, Me.g, Me.t, J.S.day - Me.dia] if Me else null)) + Datos.js_num(J.S.nave.ab.m)
+		var P0 = J.S.plantilla
+		J.S.plantilla = [{"n": "a", "rol": "nave"}, {"n": "b", "rol": "calle"}, {"n": "c", "rol": "nave"}]
+		J.migrate()
+		R.mig2 = ",".join(PackedStringArray(J.S.plantilla.map(func(w): return Datos.js_num(w.mesa) if w.get("mesa") != null else "-")))
+		J.S.plantilla = [{"n": "a", "rol": "nave", "mesa": 2}, {"n": "b", "rol": "nave", "mesa": 0}]
+		J.S.nave.m[3] = J.S.nave.m[0]
+		J.S.nave.m[1] = null
+		R.ml = jn([J.navero_de(2).n, J.navero_de(1), J.mesa_libre()])
+		J.S.nave.m[3] = null
+		R.ml2 = J.mesa_libre()
+		J.S.plantilla = P0
 		J.S.nave = N0
 		for k in sv:
 			J.S[k] = sv[k]
@@ -2069,10 +2100,41 @@ func _pasos() -> void:
 				and R.socio == "club_puerto:1,2 socio:7,3 billarista:10,4" and R.gana == "20,1,3" and R.empate == 0 and R.pierde == "-10,3" and R.p == "3,3,1,0,0,0,1,0.5"
 				and R.comp == jn([D.SOCIO.rel, 50 - D.SOCIO.g, true]) and R.comp2 == 50 - D.SOCIO.g and R.sale == "5,7,puerto,9,8" and R.nave == "club-puerto" and R.mesas == 0
 				and R.cerrada == "ensanche,38,11" and R.entra == jn(["disco", 6, 6, Dd.entrada, true]) and R.otra == "disco,6,6,0" and R.barra == jn([Dd.copa + Dd.ronda, 1, 1, 1, 4])
-				and R.baile == "gaua%s:pij" % Datos.js_num(R.d0) and R.vip == jn([Dd.mesa, Dd.vip[0] + ":vip", 1, 11]) and R.vip2 == 2 and R.echa == "ensanche,38,9"
+				and R.baile == "gaua%s:pij" % Datos.js_num(R.d0) and R.vip == jn([Dd.mesa, Dd.vip[0] + ":vip", 1, 11]) and R.vip2 == 2 and R.echa == "ensanche,38,9" and R.echa0 == "ensanche,38,9" and R.llena == "0,0"
+				and R.mig2 == "0,-,1" and R.ml == "a,,3" and R.ml2 == 1
 				and R.rel == "puerto,gaua,gaua,,valde,darko,kiko" and R.mig == '[["ria",30.5,10.8,%s],["ria",0,10.8,%s],["ria",0,10.8,%s],["ria",0,10.8,%s]]0' % [cr, cr, cr, cr]
 				and LOG.has("La persiana está echada con un candado. La llave la tiene Arrieta, el dueño.") and LOG.has("%s abre de 23:00 a 6:00." % Dd.n)
 				and LOG.any(func(l): return l.contains("Mesa 1 · vacía")), R))
+	step("Garrafas de abono y botellas de pH− (1.31): la de 25 L de MEATZA Floración (100 dosis) y la de 5 L de pH− (200 dosis), desde el capítulo 4; cuanto más grande, más barata la dosis; en el 3, hasta la de 10 L", ["Abono floración MEATZA 25 L", "pH− MEATZA 5 L", "Salir"], func():
+		var sv := {"ch": J.S.ch, "money": J.S.money, "f": J.S.items.fert, "p": J.S.items.phm}
+		J.S.ch = 4
+		J.S.money = 1000
+		var it := func(l: String): return D.SHOP.filter(func(x): return x.lbl == l)[0]
+		var gasto: int = J.precio_t(D.TIENDAS.kiko, it.call("Abono floración MEATZA 25 L")) + J.precio_t(D.TIENDAS.kiko, it.call("pH− MEATZA 5 L"))
+		await run(J.shop)
+		R = {"m": jn([1000 - J.S.money - gasto, J.S.items.fert - sv.f, J.S.items.phm - sv.p])}
+		var ds := []
+		for k in ["fert", "fertv", "phm", "ofert", "ofertv", "ophm"]:
+			var L: Array = D.SHOP.filter(func(x): return x.get("item") == k)
+			L.sort_custom(func(a, b): return a.n < b.n)
+			var ok := true
+			for i in range(1, L.size()):
+				if not (float(L[i].p) / L[i].n < float(L[i - 1].p) / L[i - 1].n):
+					ok = false
+			ds.append("/".join(PackedStringArray(L.map(func(x): return Datos.js_num(x.n)))) + ("" if ok else "!"))
+		R.dosis = ",".join(PackedStringArray(ds))
+		R.c3 = ",".join(PackedStringArray(D.SHOP.filter(func(x): return x.get("item") == "fert" and 3 + int(D.TIENDAS.kiko.ch) >= int(x.ch)).map(func(x): return x.lbl)))
+		var E0 = J.S.envio   # lo pedido antes de la 1.31
+		J.S.envio = ["pH− MEATZA 250 ml", "pH− ORTUA BIO 250 ml", "Bocata"]
+		J.migrate()
+		R.env = ",".join(PackedStringArray(J.S.envio))
+		J.S.envio = E0
+		J.S.ch = sv.ch
+		J.S.money = sv.money
+		J.S.items.fert = sv.f
+		J.S.items.phm = sv.p,
+		func(): return chk(R.m == "0,100,200" and R.dosis == "4/20/40/100,4/20/40/100,40/80/200,4/20/40/100,4/20/40/100,40/80/200"
+			and R.c3 == "Abono floración MEATZA 1 L,Abono floración MEATZA 5 L,Abono floración MEATZA 10 L" and R.env == "pH− MEATZA 1 L,pH− ORTUA BIO 1 L,Bocata", R))
 	step("El bajo de las setas (1.20): Txomin alquila el bajo de la Kale Zaharra desde el capítulo 4; las bandejas que prepara él (húmedas: cada día pierden; secas o contaminadas, a tirar), 6 días colonizando y 4 fructificando; la cosecha se seca en el bajo y él la compra; el alquiler cada mañana, la redada, el impago y dejarlo", [], func():
 		var sv: Dictionary = {"money": J.S.money, "heat": J.S.heat, "sales": J.S.sales, "ch": J.S.ch, "day": J.S.day, "min": J.S.min}
 		R = {}

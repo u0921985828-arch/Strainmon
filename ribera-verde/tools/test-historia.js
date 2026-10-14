@@ -564,13 +564,14 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     S.money = 10; await dia(.5); R.sin = [ike.rol || '', S.money].join();
     S.money = 5000; enterMap('valdehierro', 17, 8, 'up'); R.ar = ents.filter(e => e.id === 'arrieta').map(e => e.x + ',' + e.y).join();
     want(['^Alquilarla']); await run(talkNave); R.nave = [!!S.nave, 5000 - S.money].join();
-    want(['^A la nave']); await run(() => trabajo(itz)); const fert0 = S.items.fert;
+    want(['^A la nave']); await run(() => trabajo(itz)); const fert0 = S.items.fert; R.mesa = [itz.mesa, rolDesc(itz)].join();
     S.esquejes.push({ sid: 'ria', f: { id: 999, t: 1, y: 1, i: 50 }, dia: S.day }); want(['^Plantar', '^Esqueje .* nº 999']); await run(() => mesaNave(0)); const M0 = S.nave.m[0];
     R.var = [M0.k, M0.thc, M0.g, S.esquejes.some(e => e.f.id === 999), faseMesa(0)].join();
-    M0.dia = S.day - NAVE.crece; R.m = S.money; await dia(.99); R.crece = [M0.g, R.m - S.money].join();
+    M0.dia = S.day - NAVE.crece; R.m = S.money; await dia(.99); R.crece = [M0.g, R.m - S.money].join(); R.cd = [M0.cd, S.day].join();
     S.items.fert = 3; want(['^Dejar MEATZA']); await run(estanteNave); want(['^Abono', '^MEATZA']); await run(() => mesaNave(0)); R.ab = [S.nave.ab.m, S.items.fert, M0.abo].join();
     await dia(.99); R.abono = [M0.g, M0.t, S.nave.ab.m].join(); S.items.fert = fert0;
-    R.b = S.buds.ria.g; await run(secaderoNave); R.rec = [S.buds.ria.g - R.b, M0.g, faseMesa(0)].join();
+    R.b = S.buds.ria.g; await run(secaderoNave); R.rec = [S.buds.ria.g - R.b, M0.g, faseMesa(0)].join(); R.cd2 = M0.cd;
+    M0.g = .4; M0.cd = S.day - 5; await dia(.99); R.cd3 = [M0.cd, S.day].join(); M0.g = 0;   // lo que queda por debajo de 1 g no se recoge: la cosecha nueva lleva su día
     R.h = S.heat; await dia(0); R.redada = [S.nave === null, S.plantilla.map(w => w.n).join(), S.heat - R.h].join();
     S.money = 5000; want(['^Alquilarla']); await run(talkNave); R.m = S.money; want(['^Dejar la nave', '^Dejarla']); await run(talkNave); R.dejar = [S.nave === null, S.money - R.m].join();
     S.money = 5000; want(['^Alquilarla']); await run(talkNave); S.money = 50; await dia(.5); R.impago = [S.nave === null, S.money].join();
@@ -580,6 +581,7 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
   }, () => R.w1 === 'Itziar,5,5,5,' && R.n2 === 1 && R.w2 === 'Mikel,1,1,1,' && R.w3 === 'Iker,3,3,3,' && R.pl === '4,' + 4 * PLANTILLA.sobre && R.calle === 'calle,ria,25,75' && R.ops === 1
     && R.venta === `22,${R.e},${PLANTILLA.calor}` && R.arc === R.gc - Math.floor(R.gc * PLANTILLA.sisa * 2) && R.pot === null && R.poli === `,true,${PLANTILLA.calor + PLANTILLA.calorPoli},${PLANTILLA.sueldo.gerente}`
     && R.robo === 12 && R.timo === 10 && R.fuga === 'Itziar,Iker' && R.sin === ',10' && R.ar === '17,7' && R.nave === 'true,' + NAVE.fianza
+    && R.mesa === `0,Cultiva la mesa 1 de la nave por ${eur(PLANTILLA.sueldo.nave)} al día: ${NAVE.g + 2 * NAVE.gC} g.` && R.cd === `${R.cd.split(',')[1]},${R.cd.split(',')[1]}` && R.cd2 === +R.cd.split(',')[1] && R.cd3.split(',')[0] === R.cd3.split(',')[1]
     && R.var === `ria,${Math.round(STRAINS.ria.thc * NAVE.thc * 10) / 10},0,false,1` && R.crece === `${NAVE.g + 2 * NAVE.gC},${NAVE.dia + PLANTILLA.sueldo.nave}` && R.ab === '3,0,1'
     && (() => { const g1 = NAVE.g + 2 * NAVE.gC, t1 = Math.round(STRAINS.ria.thc * NAVE.thc * 10) / 10, g2 = Math.round(g1 * (1 + ABONO.rend) * 10) / 10;
       return R.abono === `${g1 + g2},${Math.round((t1 * g1 + (t1 + ABONO.thc) * g2) / (g1 + g2) * 10) / 10},2` && R.rec === `${g1 + g2},0,4`; })() && R.redada === `true,Iker,${NAVE.calor}`
@@ -613,20 +615,35 @@ if (!Number.isInteger(SEMILLA) || SEMILLA < 1 || SEMILLA > 2147483646) throw new
     enterMap('ensanche', 38, 10, 'up'); R.m = S.money; await run(() => entraLocal(dd)); await idle(); R.otra = [donde(), R.m - S.money].join();
     want(['^Una copa']); R.m = S.money; await run(talkBarra); want(['^Invitar']); R.rep = S.rep; await run(talkBarra); R.barra = [R.m - S.money, S.noche.copas, S.noche.ronda, S.rep - R.rep, S.rel.gaua].join();
     Math.random = () => 0; want(['^Bailar']); await run(talkDJ); Math.random = r0; R.baile = S.fijos.map(f => [f.id, f.t].join(':')).join();
+    const F0 = S.fijos; S.fijos = Array.from({ length: FIJOS_MAX }, (_, k) => ({ id: 'x' + k, n: 'X', t: 'pij', dia: 0 })); R.m = S.money; await run(talkRRPP); R.llena = [R.m - S.money, S.noche.mesa].join(); S.fijos = F0;
     want(['^Reservar']); R.m = S.money; await run(talkRRPP); R.vip = [R.m - S.money, S.fijos.map(f => f.n + ':' + f.t).slice(-1)[0], S.vipN, S.rel.gaua].join();
     await run(talkRRPP); R.vip2 = S.fijos.length;
-    S.min = 6 * 60 + 1; onStepEnd(); await idle(); R.echa = donde();
+    S.min = 6 * 60 + 1; await run(talkBarra); R.echa0 = donde(); enterMap('disco', 6, 6, 'up'); onStepEnd(); await idle(); R.echa = donde();
     R.rel = ['socio', 'rrpp', 'baila2', 'nv0', 'club_valde', 'darko2', 'kiko'].map(id => { const m = S.map; S.map = 'club-puerto'; const r = relDe(id); S.map = m; return r; }).join();
-    const N0 = S.nave; S.nave = { sid: 'ria', g: 30.5, thc: 10.8 }; migrate(); R.mig = JSON.stringify(S.nave.m.map(M => M && [M.k, M.g, M.t, S.day - M.dia])) + S.nave.ab.m; S.nave = N0;
+    const N0 = S.nave; S.nave = { sid: 'ria', g: 30.5, thc: 10.8 }; migrate(); R.mig = JSON.stringify(S.nave.m.map(M => M && [M.k, M.g, M.t, S.day - M.dia])) + S.nave.ab.m;
+    const P0 = S.plantilla; S.plantilla = [{ n: 'a', rol: 'nave' }, { n: 'b', rol: 'calle' }, { n: 'c', rol: 'nave' }]; migrate(); R.mig2 = S.plantilla.map(w => w.mesa ?? '-').join();
+    S.plantilla = [{ n: 'a', rol: 'nave', mesa: 2 }, { n: 'b', rol: 'nave', mesa: 0 }]; S.nave.m[3] = S.nave.m[0]; S.nave.m[1] = null; R.ml = [naveroDe(2).n, naveroDe(1), mesaLibre()].join(); S.nave.m[3] = null; R.ml2 = mesaLibre();
+    S.plantilla = P0; S.nave = N0;
     Object.assign(S, sv); enterMap('home', 5, 5, 'up');
   }, () => R.no === `puerto,${R.pc[0]},${R.pc[1] + 1},false` && R.pc.join() === '9,7' && R.si === 'club-puerto,5,6,true,' + CLUBS.puerto.cuota
     && R.socio === 'club_puerto:1,2 socio:7,3 billarista:10,4' && R.gana === '20,1,3' && R.empate === 0 && R.pierde === '-10,3' && R.p === '3,3,1,0,0,0,1,0.5'
     && R.comp === `${SOCIO.rel},${50 - SOCIO.g},true` && R.comp2 === 50 - SOCIO.g && R.sale === '5,7,puerto,9,8' && R.nave === 'club-puerto' && R.mesas === 0
     && R.cerrada === 'ensanche,38,11' && R.entra === `disco,6,6,${DISCO.entrada},true` && R.otra === 'disco,6,6,0' && R.barra === `${DISCO.copa + DISCO.ronda},1,1,1,4`
-    && R.baile === `gaua${R.d0}:pij` && R.vip === `${DISCO.mesa},${DISCO.vip[0]}:vip,1,11` && R.vip2 === 2 && R.echa === 'ensanche,38,9'
+    && R.baile === `gaua${R.d0}:pij` && R.vip === `${DISCO.mesa},${DISCO.vip[0]}:vip,1,11` && R.vip2 === 2 && R.echa === 'ensanche,38,9' && R.echa0 === 'ensanche,38,9' && R.llena === '0,0'
+    && R.mig2 === '0,-,1' && R.ml === 'a,,3' && R.ml2 === 1
     && R.rel === 'puerto,gaua,gaua,,valde,darko,kiko' && R.mig === `[["ria",30.5,10.8,${NAVE.crece}],["ria",0,10.8,${NAVE.crece}],["ria",0,10.8,${NAVE.crece}],["ria",0,10.8,${NAVE.crece}]]0`
     && LOG.some(l => l === 'La persiana está echada con un candado. La llave la tiene Arrieta, el dueño.') && LOG.some(l => l === `${DISCO.n} abre de 23:00 a 6:00.`)
     && LOG.some(l => /Mesa 1 · vacía/.test(l)) || R);
+  await step('Garrafas de abono y botellas de pH− (1.31): la de 25 L de MEATZA Floración (100 dosis) y la de 5 L de pH− (200 dosis), desde el capítulo 4; cuanto más grande, más barata la dosis; en el 3, hasta la de 10 L', ['Abono floración MEATZA 25 L', 'pH− MEATZA 5 L', 'Salir'], async () => {
+    const sv = { ch: S.ch, money: S.money, f: S.items.fert, p: S.items.phm }; S.ch = 4; S.money = 1000;
+    const it = l => SHOP.find(x => x.lbl === l), gasto = precioT(TIENDAS.kiko, it('Abono floración MEATZA 25 L')) + precioT(TIENDAS.kiko, it('pH− MEATZA 5 L'));
+    await run(shop); window.R = { m: [1000 - S.money - gasto, S.items.fert - sv.f, S.items.phm - sv.p].join() };
+    R.dosis = ['fert', 'fertv', 'phm', 'ofert', 'ofertv', 'ophm'].map(k => { const L = SHOP.filter(x => x.item === k).sort((a, b) => a.n - b.n); return L.map(x => x.n).join('/') + (L.every((x, i) => !i || x.p / x.n < L[i - 1].p / L[i - 1].n) ? '' : '!'); }).join();
+    R.c3 = SHOP.filter(x => x.item === 'fert' && 3 + TIENDAS.kiko.ch >= x.ch).map(x => x.lbl).join();
+    const E0 = S.envio; S.envio = ['pH− MEATZA 250 ml', 'pH− ORTUA BIO 250 ml', 'Bocata']; migrate(); R.env = S.envio.join(); S.envio = E0;   // lo pedido antes de la 1.31
+    Object.assign(S, { ch: sv.ch, money: sv.money }); S.items.fert = sv.f; S.items.phm = sv.p;
+  }, () => R.m === '0,100,200' && R.dosis === '4/20/40/100,4/20/40/100,40/80/200,4/20/40/100,4/20/40/100,40/80/200'
+    && R.c3 === 'Abono floración MEATZA 1 L,Abono floración MEATZA 5 L,Abono floración MEATZA 10 L' && R.env === 'pH− MEATZA 1 L,pH− ORTUA BIO 1 L,Bocata' || R);
   await step('El bajo de las setas (1.20): Txomin alquila el bajo de la Kale Zaharra desde el capítulo 4; las bandejas que prepara él (húmedas: cada día pierden; secas o contaminadas, a tirar), 6 días colonizando y 4 fructificando; la cosecha se seca en el bajo y él la compra; el alquiler cada mañana, la redada, el impago y dejarlo', [], async () => {
     const r0 = Math.random, sv = { money: S.money, heat: S.heat, sales: S.sales, ch: S.ch, day: S.day, min: S.min }; window.R = {};
     const dia = async v => { S.day++; Math.random = () => v; setasDia(); Math.random = r0; await idle(); };

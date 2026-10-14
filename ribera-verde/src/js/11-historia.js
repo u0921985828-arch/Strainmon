@@ -3,17 +3,21 @@
    ========================================================= */
 // precios de growshop reales (1.10). Semillas: lo que cuesta una feminizada; se venden en sobres (SOBRES), más baratas cuanto
 // más grande el sobre, y desde el capítulo 3 en bolsas de 50 a granel. n: dosis que trae el bote
+// 1.31: el abono, también en garrafas de 5, 10 y 25 L (4 dosis el litro, como la botella) y el pH−, en botellas de 1, 2 y 5 L (40 dosis
+// el litro) en vez de la de 250 ml; cuanto más grande, más barata la dosis. ic: el icono, si no es el de su item
+const garrafas=(lbl,item,ps)=>[[5,2],[10,3],[25,4]].map(([l,ch],j)=>({lbl:`${lbl} ${l} L`,p:ps[j],ch,item,n:l*4,ic:'garrafa',desc:`Garrafa de ${l} L: ${l*4} dosis. `+descProducto(item)}));
+const botesPh=(lbl,item,ps)=>[[1,1],[2,2],[5,3]].map(([l,ch],j)=>({lbl:`${lbl} ${l} L`,p:ps[j],ch,item,n:l*40,...(l>2?{ic:'garrafa'}:{}),desc:`${l*40} dosis. `+descProducto(item)}));
 const SHOP=[
   {lbl:'Semillas Skunk #1',p:5,ch:1,sid:'ria'},{lbl:'Semillas Lemon Haze',p:9,ch:2,sid:'limon'},{lbl:'Semillas Super Skunk',p:10,ch:2,sid:'txoko'},
   {lbl:'Semillas Blueberry',p:8,ch:3,sid:'niebla'},{lbl:'Semillas Big Bud',p:7,ch:3,sid:'mango'},{lbl:'Semillas Lemon Skunk',p:8,ch:3,sid:'citrus'},{lbl:'Semillas Cheese',p:9,ch:3,sid:'cheese'},
   {lbl:'Semillas Purple Afghani',p:8,ch:4,sid:'purpura'},{lbl:'Semillas Kali Mist',p:10,ch:4,sid:'kali'},{lbl:'Semillas California Orange',p:8,ch:4,sid:'calorange'},{lbl:'Semillas Chemdawg',p:12,ch:5,sid:'chemdawg'},
   // abonos y pH− de dos marcas (inventadas, 1.23): MEATZA, mineral, y ORTUA BIO, orgánico (PRODUCTOS y descProducto, 09-cultivo)
-  {lbl:'Abono floración MEATZA 1 L',p:14,ch:1,item:'fert',n:4,desc:'4 dosis. '+descProducto('fert')},
-  {lbl:'Abono crecimiento MEATZA 1 L',p:12,ch:1,item:'fertv',n:4,desc:'4 dosis. '+descProducto('fertv')},
-  {lbl:'pH− MEATZA 250 ml',p:6,ch:1,item:'phm',n:10,desc:'10 dosis. '+descProducto('phm')},
-  {lbl:'Abono floración ORTUA BIO 1 L',p:19,ch:1,item:'ofert',n:4,desc:'4 dosis. '+descProducto('ofert')},
-  {lbl:'Abono crecimiento ORTUA BIO 1 L',p:16,ch:1,item:'ofertv',n:4,desc:'4 dosis. '+descProducto('ofertv')},
-  {lbl:'pH− ORTUA BIO 250 ml',p:7,ch:1,item:'ophm',n:10,desc:'10 dosis. '+descProducto('ophm')},
+  {lbl:'Abono floración MEATZA 1 L',p:14,ch:1,item:'fert',n:4,desc:'4 dosis. '+descProducto('fert')},...garrafas('Abono floración MEATZA','fert',[55,99,215]),
+  {lbl:'Abono crecimiento MEATZA 1 L',p:12,ch:1,item:'fertv',n:4,desc:'4 dosis. '+descProducto('fertv')},...garrafas('Abono crecimiento MEATZA','fertv',[48,86,190]),
+  ...botesPh('pH− MEATZA','phm',[10,17,35]),
+  {lbl:'Abono floración ORTUA BIO 1 L',p:19,ch:1,item:'ofert',n:4,desc:'4 dosis. '+descProducto('ofert')},...garrafas('Abono floración ORTUA BIO','ofert',[75,135,299]),
+  {lbl:'Abono crecimiento ORTUA BIO 1 L',p:16,ch:1,item:'ofertv',n:4,desc:'4 dosis. '+descProducto('ofertv')},...garrafas('Abono crecimiento ORTUA BIO','ofertv',[64,115,255]),
+  ...botesPh('pH− ORTUA BIO','ophm',[12,20,42]),
   {lbl:'Medidor de pH y EC',p:35,ch:2,item:'medidor',desc:'Mide el pH y la EC del riego: con pH−, el abono rinde entero, y en PLANTAS ves la EC y el pH de cada maceta.',cond:()=>!S.items.medidor&&!S.envio.includes('Medidor de pH y EC')},
   {lbl:'Insecticida de neem 500 ml',p:12,ch:1,item:'insect',n:3,desc:'3 tratamientos. Cada uno elimina una plaga de araña roja.'},
   {lbl:'Bocata',p:5,ch:1,item:'bocata',desc:'Recupera 15 de vida. En combate o desde la mochila.'},
@@ -84,7 +88,7 @@ async function shop(T=TIENDAS.kiko){
   for(;;){
     const list=SHOP.filter(it=>S.ch+T.ch>=it.ch&&T.ok(it)&&(!it.cond||it.cond()));
     const IC={fert:'abono',fertv:'abono',phm:'abono',ofert:'abono',ofertv:'abono',ophm:'abono',insect:'insecticida',spray:'spray',bocata:'bocadillo'};
-    const items=list.map(it=>({label:it.lbl,right:eur(precioT(T,it))+(it.sid?'/u':''),sw:it.sid?STRAINS[it.sid].c:null,ic:it.sid?icono('semillas'):it.item?icono(IC[it.item]):it.maceta?icono('maceta'):it.foco?icono(icoFoco(it.foco)):it.extra?icono(ICX[it.extra]):it.carpa?icono(icoCarpa(it.carpa)):null,desc:it.sid?strainLine(it.sid):it.desc}));
+    const items=list.map(it=>({label:it.lbl,right:eur(precioT(T,it))+(it.sid?'/u':''),sw:it.sid?STRAINS[it.sid].c:null,ic:it.sid?icono('semillas'):it.ic?icono(it.ic):it.item?icono(IC[it.item]):it.maceta?icono('maceta'):it.foco?icono(icoFoco(it.foco)):it.extra?icono(ICX[it.extra]):it.carpa?icono(icoCarpa(it.carpa)):null,desc:it.sid?strainLine(it.sid):it.desc}));
     items.push({label:'Salir',desc:'Volver al mostrador.'});
     i=await menu(items,{cls:'full',title:T.t,title2:'Tienes '+eur(S.money),desc:true,initial:i});
     if(i<0||i>=list.length)break;

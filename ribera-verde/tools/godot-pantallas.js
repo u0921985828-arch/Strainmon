@@ -104,14 +104,15 @@ const PANTALLAS = PAN ? JSON.parse(fs.readFileSync(PAN, 'utf8')) : [
     P: { x: 11, y: 12, dir: 'up' } },
   { k: 'growcity', sw: 240, mode: 'world', now: T + 150, S: { ch: 4, flags: { ane: true } }, map: 'growcity', P: { x: 4, y: 5, dir: 'up' } },
   // los locales (1.30): el club de Puerto Viejo por dentro (vitrina, sofás, billar bajo la lámpara y su penumbra), la nave con sus
-  // mesas en cada fase y dos trabajadores, y GAUA de noche con los focos de colores girando sobre la pista
+  // mesas en cada fase y dos trabajadores (1.31: cada uno en su mesa, la 1.ª y la 3.ª, y las plantas con el porte y los colores de
+  // su variedad: Blueberry y Big Bud índicas, Lemon Haze sativa y Skunk #1 híbrida), y GAUA de noche con los focos de colores girando sobre la pista
   { k: 'club', sw: 320, mode: 'world', now: T + 2400, S: { ch: 4, clubs: { puerto: true }, flags: {} }, map: 'club-puerto', P: { x: 9, y: 5, dir: 'up' }, TIRO: 500 },
   { k: 'nave', sw: 280, mode: 'world', now: T + 610, S: { ch: 6, day: 20, flags: {},
-    plantilla: [{ id: 'pl1', n: 'Iker', lab: 3, cui: 4, lea: 3, rol: 'nave' }, { id: 'pl2', n: 'Ane', lab: 2, cui: 3, lea: 5, rol: 'nave' }],
-    nave: { ab: { m: 2, o: 0 }, m: [{ k: 'ria', f: { id: 1, t: 1, y: 1, i: null }, thc: 18, y: 1, dia: 20, g: 0, t: 0, abo: 0 },
-      { k: 'limon', f: { id: 2, t: 1, y: 1, i: null }, thc: 17, y: 1, dia: 18, g: 0, t: 0, abo: 1 },
+    plantilla: [{ id: 'pl1', n: 'Iker', lab: 3, cui: 4, lea: 3, rol: 'nave', mesa: 0 }, { id: 'pl2', n: 'Ane', lab: 2, cui: 3, lea: 5, rol: 'nave', mesa: 2 }],
+    nave: { ab: { m: 2, o: 0 }, m: [{ k: 'niebla', f: { id: 1, t: 1, y: 1, i: null }, thc: 15, y: 1, dia: 10, g: 0, t: 0, abo: 0 },
+      { k: 'limon', f: { id: 2, t: 1, y: 1, i: null }, thc: 17, y: 1, dia: 10, g: 12.5, t: 17, abo: 1 },
       { k: 'ria', f: { id: 3, t: 1, y: 1, i: null }, thc: 18, y: 1, dia: 16, g: 0, t: 0, abo: 0 },
-      { k: 'limon', f: { id: 4, t: 1, y: 1, i: null }, thc: 17, y: 1, dia: 10, g: 12.5, t: 17, abo: 1 }] } },
+      { k: 'mango', f: { id: 4, t: 1, y: 1, i: null }, thc: 15, y: 1, dia: 18, g: 0, t: 0, abo: 1 }] } },
     map: 'nave', P: { x: 6, y: 6, dir: 'up' } },
   { k: 'disco', sw: 400, mode: 'world', now: T + 1800, S: { ch: 5, min: 23 * 60 + 40, day: 6, noche: { id: 6, copas: 0, ronda: 0, baile: 0, mesa: 0 }, flags: {} },
     map: 'disco', P: { x: 6, y: 6, dir: 'up' } },

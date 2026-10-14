@@ -190,8 +190,11 @@ func _hilo() -> void:
 		var n: String = cola.pop_front()
 		cerrojo.unlock()
 		var d: Variant = _ogg(n) if grabadas.has(n) else null
+		var r: String = n if T.has(n) else alias.get(n, "")   # 1.31: un OGG que no se puede leer suena con su chiptune o, sin él, con la de MUS_ALIAS
+		if d == null and r != n and grabadas.has(r):
+			d = _ogg(r)
 		if d == null:
-			var b := _tema(T[n]) if T.has(n) else PackedFloat32Array()
+			var b := _tema(T[r]) if T.has(r) else PackedFloat32Array()
 			if parar:
 				return
 			d = _bytes(b)

@@ -683,10 +683,10 @@ Locales (1.30): `o` sofá · `X` billar · `N` mesa de cultivo de la nave · `Z`
 | billarista | club-ibar | (10,4) | no | siempre |
 | socio | club-ens | (7,3) | no | siempre |
 | billarista | club-ens | (10,4) | no | siempre |
-| nv0 | nave | (1,5) | no | `!!(S.nave&&naveros()[i])` |
-| nv1 | nave | (4,5) | no | `!!(S.nave&&naveros()[i])` |
-| nv2 | nave | (8,5) | no | `!!(S.nave&&naveros()[i])` |
-| nv3 | nave | (11,5) | no | `!!(S.nave&&naveros()[i])` |
+| nv0 | nave | (1,5) | no | `!!(S.nave&&naveroDe(i))` |
+| nv1 | nave | (4,5) | no | `!!(S.nave&&naveroDe(i))` |
+| nv2 | nave | (8,5) | no | `!!(S.nave&&naveroDe(i))` |
+| nv3 | nave | (11,5) | no | `!!(S.nave&&naveroDe(i))` |
 | gorila | ensanche | (40,9) | no | `S.ch>=DISCO.ch` |
 | camarera | disco | (1,2) | no | siempre |
 | dj | disco | (6,2) | no | siempre |
@@ -775,11 +775,27 @@ En el poste de cada parada (`A`), de 7:00 a 21:00. Cada parada está a un tramo 
 | Semillas California Orange | 8 € | 4 |  |
 | Semillas Chemdawg | 12 € | 5 |  |
 | Abono floración MEATZA 1 L | 14 € | 1 | 4 dosis. Mineral. Una dosis por planta: +25 % de cosecha, +0,3 de THC y florece un 10 % más deprisa, con el pH corregido (sin pH−, ×0,5). |
+| Abono floración MEATZA 5 L | 55 € | 2 | Garrafa de 5 L: 20 dosis. Mineral. Una dosis por planta: +25 % de cosecha, +0,3 de THC y florece un 10 % más deprisa, con el pH corregido (sin pH−, ×0,5). |
+| Abono floración MEATZA 10 L | 99 € | 3 | Garrafa de 10 L: 40 dosis. Mineral. Una dosis por planta: +25 % de cosecha, +0,3 de THC y florece un 10 % más deprisa, con el pH corregido (sin pH−, ×0,5). |
+| Abono floración MEATZA 25 L | 215 € | 4 | Garrafa de 25 L: 100 dosis. Mineral. Una dosis por planta: +25 % de cosecha, +0,3 de THC y florece un 10 % más deprisa, con el pH corregido (sin pH−, ×0,5). |
 | Abono crecimiento MEATZA 1 L | 12 € | 1 | 4 dosis. Mineral. Una dosis por planta en crecimiento: crece un 15 % más deprisa hasta florecer (sin pH−, ×0,5). |
-| pH− MEATZA 250 ml | 6 € | 1 | 10 dosis. Ácido fosfórico. Se gasta una dosis con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. Sin pH−, el mineral rinde ×0,5; sin medidor, a ojo (×0,75). |
+| Abono crecimiento MEATZA 5 L | 48 € | 2 | Garrafa de 5 L: 20 dosis. Mineral. Una dosis por planta en crecimiento: crece un 15 % más deprisa hasta florecer (sin pH−, ×0,5). |
+| Abono crecimiento MEATZA 10 L | 86 € | 3 | Garrafa de 10 L: 40 dosis. Mineral. Una dosis por planta en crecimiento: crece un 15 % más deprisa hasta florecer (sin pH−, ×0,5). |
+| Abono crecimiento MEATZA 25 L | 190 € | 4 | Garrafa de 25 L: 100 dosis. Mineral. Una dosis por planta en crecimiento: crece un 15 % más deprisa hasta florecer (sin pH−, ×0,5). |
+| pH− MEATZA 1 L | 10 € | 1 | 40 dosis. Ácido fosfórico. Se gasta una dosis con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. Sin pH−, el mineral rinde ×0,5; sin medidor, a ojo (×0,75). |
+| pH− MEATZA 2 L | 17 € | 2 | 80 dosis. Ácido fosfórico. Se gasta una dosis con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. Sin pH−, el mineral rinde ×0,5; sin medidor, a ojo (×0,75). |
+| pH− MEATZA 5 L | 35 € | 3 | 200 dosis. Ácido fosfórico. Se gasta una dosis con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. Sin pH−, el mineral rinde ×0,5; sin medidor, a ojo (×0,75). |
 | Abono floración ORTUA BIO 1 L | 19 € | 1 | 4 dosis. Orgánico, de liberación lenta. Una dosis por planta: +20 % de cosecha y +0,4 de THC, sin acelerar la floración. Sin pH−, ×0,85. Sin nada mineral, el sustrato vivo frena las plagas. |
+| Abono floración ORTUA BIO 5 L | 75 € | 2 | Garrafa de 5 L: 20 dosis. Orgánico, de liberación lenta. Una dosis por planta: +20 % de cosecha y +0,4 de THC, sin acelerar la floración. Sin pH−, ×0,85. Sin nada mineral, el sustrato vivo frena las plagas. |
+| Abono floración ORTUA BIO 10 L | 135 € | 3 | Garrafa de 10 L: 40 dosis. Orgánico, de liberación lenta. Una dosis por planta: +20 % de cosecha y +0,4 de THC, sin acelerar la floración. Sin pH−, ×0,85. Sin nada mineral, el sustrato vivo frena las plagas. |
+| Abono floración ORTUA BIO 25 L | 299 € | 4 | Garrafa de 25 L: 100 dosis. Orgánico, de liberación lenta. Una dosis por planta: +20 % de cosecha y +0,4 de THC, sin acelerar la floración. Sin pH−, ×0,85. Sin nada mineral, el sustrato vivo frena las plagas. |
 | Abono crecimiento ORTUA BIO 1 L | 16 € | 1 | 4 dosis. Orgánico, de liberación lenta. Una dosis por planta en crecimiento: crece un 8 % más deprisa hasta florecer. Sin pH−, la tierra lo amortigua (×0,85). |
-| pH− ORTUA BIO 250 ml | 7 € | 1 | 10 dosis. Ácido cítrico. Se gasta una dosis con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. No mata la vida del sustrato. |
+| Abono crecimiento ORTUA BIO 5 L | 64 € | 2 | Garrafa de 5 L: 20 dosis. Orgánico, de liberación lenta. Una dosis por planta en crecimiento: crece un 8 % más deprisa hasta florecer. Sin pH−, la tierra lo amortigua (×0,85). |
+| Abono crecimiento ORTUA BIO 10 L | 115 € | 3 | Garrafa de 10 L: 40 dosis. Orgánico, de liberación lenta. Una dosis por planta en crecimiento: crece un 8 % más deprisa hasta florecer. Sin pH−, la tierra lo amortigua (×0,85). |
+| Abono crecimiento ORTUA BIO 25 L | 255 € | 4 | Garrafa de 25 L: 100 dosis. Orgánico, de liberación lenta. Una dosis por planta en crecimiento: crece un 8 % más deprisa hasta florecer. Sin pH−, la tierra lo amortigua (×0,85). |
+| pH− ORTUA BIO 1 L | 12 € | 1 | 40 dosis. Ácido cítrico. Se gasta una dosis con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. No mata la vida del sustrato. |
+| pH− ORTUA BIO 2 L | 20 € | 2 | 80 dosis. Ácido cítrico. Se gasta una dosis con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. No mata la vida del sustrato. |
+| pH− ORTUA BIO 5 L | 42 € | 3 | 200 dosis. Ácido cítrico. Se gasta una dosis con cada dosis de abono: baja el pH del agua del grifo (7,5) a 6,2. No mata la vida del sustrato. |
 | Medidor de pH y EC | 35 € | 2 | Mide el pH y la EC del riego: con pH−, el abono rinde entero, y en PLANTAS ves la EC y el pH de cada maceta. |
 | Insecticida de neem 500 ml | 12 € | 1 | 3 tratamientos. Cada uno elimina una plaga de araña roja. |
 | Bocata | 5 € | 1 | Recupera 15 de vida. En combate o desde la mochila. |

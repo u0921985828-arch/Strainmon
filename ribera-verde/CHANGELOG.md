@@ -1,5 +1,16 @@
 # Cambios
 
+## 1.31.0 · 14 de octubre de 2026
+
+Menús largos con flechas, garrafas de abono, pH− por litros y las plantas de la nave según la variedad. Godot, 0.25.0.
+
+- **Los menús largos ya no se salen de la pantalla.** Los de la derecha (el arcón y la caja fuerte con muchos lotes, ¿QUÉ LOTE?, las preguntas con muchas respuestas, START) enseñan las filas que caben entre el borde de arriba y el diálogo, con ▲ y ▼ cuando hay más arriba o más abajo; la cruceta llega hasta el último, y ▲ y ▼ también se tocan. La misma cuenta en el HTML y en Godot, a cualquier tamaño de pantalla.
+- **Garrafas de abono** de 5, 10 y 25 L (desde los capítulos 2, 3 y 4) de los cuatro abonos, MEATZA y ORTUA BIO, además de la botella de 1 L: 4 dosis el litro, y cuanto más grande, más barata la dosis (la floración MEATZA: 14 € el litro, 55 € la de 5 L, 99 € la de 10 L, 215 € la de 25 L).
+- **pH− por litros**: la botella de 250 ml pasa a ser de 1 L (capítulo 1), 2 L (capítulo 2) y 5 L (capítulo 3), 40 dosis el litro (MEATZA 10, 17 y 35 €; ORTUA BIO 12, 20 y 42 €).
+- **Las plantas de la nave, según su variedad.** Como en las carpas de casa: el porte sale del % índica (índica baja y ancha, sativa alta y fina, híbrida entre las dos) y el color de las hojas y los cogollos, de la variedad. Las mesas pasan de verde a la flor con sus pistilos y a los cogollos maduros; dibujadas a mano y nuevas (`tools/sprites/a-mano/locales.py`, encima de la mesa). Y encima de cada mesa, dos **LED de barras como los de las carpas** (de 100 cm y 8 barras, colgados de sus cuerdas con trinquete y la fuente encima): encendidos con la mesa plantada, con su luz rosada sobre las plantas, y apagados con la mesa vacía.
+- **Arreglos de los locales.** El billar no empieza siempre la barra en el mismo sitio (contar ya no vale). La RRPP de GAUA mira antes de cobrar si cabe alguien más en la agenda. Cada trabajador de la nave tiene su mesa fija (despedir o mover a uno ya no cambia la mesa de los demás; las partidas de antes conservan la que tenían). Lo que se recoge en el secadero lleva el día de la cosecha (y empieza a contar el curado desde ahí). La barra, el DJ y el reservado de GAUA, cerrados a partir de las seis. En Godot, una canción grabada que no se puede leer suena con la de reserva en lugar de quedarse en silencio.
+- Igual en Godot. Tests: `npm test` 113/113 (paso nuevo: garrafas y botellas de pH−; el de la plantilla, con la mesa fija y el día del secadero; el de los locales, con la agenda llena, GAUA cerrada y la partida vieja); `test:arte` 29/29; Godot, historia 113 pasos, 44 pantallas (la nave con cuatro variedades en sus fases) y el ciclo.
+
 ## 1.30.0 · 13 de octubre de 2026
 
 Los locales se entran como una casa y la música es nueva. Godot, 0.24.0.

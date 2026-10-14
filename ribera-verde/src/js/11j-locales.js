@@ -19,6 +19,10 @@ const LOCAL2=new Set(['billar2','sofaF2','sofaV2','sofaB2','cabina2','escritorio
 // ([x, y, radio, color, alfa], en px del mapa); GAUA, oscura, con tres focos de colores que giran sobre la pista (centro c, radios r)
 const LUZ_CLUB={fondo:'rgba(24,14,4,.28)',l:[[144,70,30,'255,206,120',.6],[24,56,22,'200,240,255',.35]]};
 const LUZ_DISCO={fondo:'rgba(10,4,30,.55)',focos:[['255,79,200',0],['64,224,240',2.1],['240,208,64',4.2]],c:[120,88],r:[30,14],R:26};
+// la nave (1.31): bajo cada uno de los dos LED de una mesa plantada (encendidos), su luz en las plantas, del color de la de los LED de las
+// carpas (FOCO_LUZ.led); [dx desde la casilla de la mesa, y, radio, color, alfa]
+const LUZ_MESA=[[6,59,15,'240,170,255',.2],[26,59,15,'240,170,255',.2]];
+const luzNave=()=>({l:MESAS_X.flatMap((x,i)=>faseMesa(i)?LUZ_MESA.map(([dx,y,r,c,a])=>[x*16+dx,y,r,c,a]):[])});
 function mapasLocales(){
   // ---------- LOS CLUBS: 12 × 8, el dispensario a la izquierda, los sofás en medio y el billar a la derecha ----------
   for(const k in CLUBS){const C=CLUBS[k],m=newMap('club-'+k,12,8,'floorC');m.music='club';
@@ -46,7 +50,7 @@ function mapasLocales(){
 // el portero (fuera), la camarera, el DJ, la RRPP y tres en la pista
 Object.keys(CLUBS).forEach((k,i)=>NPCDEF.push({id:'socio',map:'club-'+k,x:7,y:3,dir:'left',look:i%2?'socia':'socio',talk:()=>talkSocio(k)},
   {id:'billarista',map:'club-'+k,x:10,y:4,dir:'left',look:i%2?'billarista2':'billarista',talk:()=>talkBillar(k)}));
-MESAS_X.forEach((x,i)=>NPCDEF.push({id:'nv'+i,map:'nave',x,y:5,dir:'up',look:'navero'+(i+1),cond:()=>!!(S.nave&&naveros()[i]),talk:()=>talkNavero(i)}));
+MESAS_X.forEach((x,i)=>NPCDEF.push({id:'nv'+i,map:'nave',x,y:5,dir:'up',look:'navero'+(i+1),cond:()=>!!(S.nave&&naveroDe(i)),talk:()=>talkNavero(i)}));
 NPCDEF.push({id:'gorila',map:'ensanche',x:40,y:9,dir:'left',look:'gorila',cond:()=>S.ch>=DISCO.ch,talk:()=>talkGorila()},
   {id:'camarera',map:'disco',x:1,y:2,look:'camarera',talk:()=>talkBarra()},{id:'dj',map:'disco',x:6,y:2,look:'dj',talk:()=>talkDJ()},
   {id:'rrpp',map:'disco',x:12,y:5,look:'rrpp',talk:()=>talkRRPP()},
@@ -115,10 +119,11 @@ let TIRO=null;   // la barra mientras apuntas: {t0}
 const fuerzaTiro=ms=>{const f=ms%BILLAR.periodo/BILLAR.periodo;return f<.5?f*2:2-f*2;};
 const puntosTiro=p=>{const d=Math.abs(p-BILLAR.centro);return d<=BILLAR.verde?3:d<=BILLAR.amarillo?1:0;};
 const tiroRival=()=>{const r=Math.random();return r<BILLAR.hab*.6?3:r<BILLAR.hab?1:0;};
-// un tiro: el texto y, con A, dónde estaba la barra (de 0 a 1); las pruebas lo cambian por una función
+// un tiro: el texto y, con A, dónde estaba la barra (de 0 a 1; 1.31: arranca en un punto al azar, para que no baste con contar); las
+// pruebas lo cambian por una función
 async function tiroBillar(txt){
   await typeText(txt,'BILLAR');
-  const p=await new Promise(res=>{TIRO={t0:performance.now()};push(b=>{if(b==='A'){pop();res(fuerzaTiro(performance.now()-TIRO.t0));}});});
+  const p=await new Promise(res=>{TIRO={t0:performance.now()-Math.random()*BILLAR.periodo};push(b=>{if(b==='A'){pop();res(fuerzaTiro(performance.now()-TIRO.t0));}});});
   TIRO=null;dlg.hidden=true;sfx('hit');return p;
 }
 async function talkBillar(k){
@@ -148,7 +153,7 @@ const thcNave=(sid,f)=>Math.round(getStrain(sid).thc*(f?f.t:1)*NAVE.thc*10)/10;
 const ABONO_MESA=['sin abono','MEATZA','ORTUA BIO'];
 const mesaTxt=M=>getStrain(lotSid(M.k)).n+etiq(M.f);
 async function mesaNave(i){
-  const N=S.nave,M=N.m[i],w=naveros()[i],ops=[M?'Arrancar y plantar':'Plantar'].concat(M?['Abono']:[],['Nada']);
+  const N=S.nave,M=N.m[i],w=naveroDe(i),ops=[M?'Arrancar y plantar':'Plantar'].concat(M?['Abono']:[],['Nada']);
   const op=ops[await ask(`Mesa ${i+1} · ${M?mesaTxt(M)+' · '+FASE_MESA[faseMesa(i)]+' · '+ABONO_MESA[M.abo]:'vacía'}\n${w?'La cuida '+w.n+'.':'Nadie la cuida: pon a alguien de tu plantilla en la nave.'}`,ops)];
   if(op==='Plantar'||op==='Arrancar y plantar'){if(M&&M.g>=1)return say('Antes, descuelga del secadero lo de esta mesa.');return plantarMesa(i);}
   if(op==='Abono'){const c=await ask(`¿Qué abono le echa cada día? En la estantería: MEATZA ×${N.ab.m} · ORTUA BIO ×${N.ab.o}.`,['Sin abono','MEATZA Floración','ORTUA BIO Floración','Nada']);
@@ -175,22 +180,22 @@ async function estanteNave(){
   if(op&&op.startsWith('Dejar MEATZA')){N.ab.m+=S.items.fert;S.items.fert=0;sfx('sel');}
   else if(op&&op.startsWith('Dejar ORTUA')){N.ab.o+=S.items.ofert;S.items.ofert=0;sfx('sel');}
 }
-// descolgar del secadero lo que quepa en la mochila, mesa por mesa (cada una, su lote, sin curar)
+// descolgar del secadero lo que quepa en la mochila, mesa por mesa (cada una, su lote, sin curar y con el día de su cosecha, M.cd: 1.31)
 async function secaderoNave(){
   if(naveStock()<1)return say(`El secadero está vacío. Cada mesa da cada mañana, a los ${NAVE.crece} días de plantarla.`);
   let lleva=0;const cabe=Math.floor(libreMochila());
-  for(const M of S.nave.m){if(!M||M.g<1)continue;const q=Math.min(Math.floor(M.g),cabe-lleva);if(q<1)break;addBuds(M.k,q,M.t);M.g=Math.round((M.g-q)*10)/10;lleva+=q;}
+  for(const M of S.nave.m){if(!M||M.g<1)continue;const q=Math.min(Math.floor(M.g),cabe-lleva);if(q<1)break;addBuds(M.k,q,M.t,S.buds,0,M.cd??S.day);M.g=Math.round((M.g-q)*10)/10;lleva+=q;}
   if(!lleva)return say('No te cabe nada más en la mochila.');
   sfx('get');updateHUD();return say(`Descuelgas ${gTxt(lleva)} del secadero.`+(naveStock()>=1?` Quedan ${gTxt(naveStock())}: no te caben.`:''));
 }
 async function escritorioNave(){
-  const N=S.nave,rows=N.m.map((M,i)=>{const w=naveros()[i];return {label:`Mesa ${i+1} · ${M?getStrain(lotSid(M.k)).n:'vacía'}`,right:M?FASE_MESA[faseMesa(i)]:'',
+  const N=S.nave,rows=N.m.map((M,i)=>{const w=naveroDe(i);return {label:`Mesa ${i+1} · ${M?getStrain(lotSid(M.k)).n:'vacía'}`,right:M?FASE_MESA[faseMesa(i)]:'',
     desc:`${w?'La cuida '+w.n:'Nadie la cuida'}.`+(M?` ${ABONO_MESA[M.abo][0].toUpperCase()+ABONO_MESA[M.abo].slice(1)} · en el secadero, ${gTxt(M.g)}.`:'')};});
   rows.push({label:'Estantería',right:`${N.ab.m} + ${N.ab.o} dosis`,desc:'MEATZA FLORACIÓN y ORTUA BIO FLORACIÓN: una dosis al día por mesa con abono.'});
   let i=0;do{i=await menu(rows,{cls:'full',title:'LA NAVE',title2:`${eur(NAVE.dia)} al día`,desc:true,initial:i});}while(i>=0);
 }
 async function talkNavero(i){
-  const w=naveros()[i],M=S.nave&&S.nave.m[i];if(!w)return;const f=faseMesa(i);
+  const w=naveroDe(i),M=S.nave&&S.nave.m[i];if(!w)return;const f=faseMesa(i);
   return say(!M?'Mi mesa está vacía. Plántame algo y la saco adelante.':f<4?`La ${getStrain(lotSid(M.k)).n} va bien: ${FASE_MESA[f]}. A los ${NAVE.crece} días empieza a dar.`
     :'Cada mañana cuelgo lo de mi mesa en el secadero.'+(M.abo&&!S.nave.ab[M.abo===1?'m':'o']?' Se ha acabado el abono de la estantería.':''),w.n.toUpperCase());
 }
@@ -209,7 +214,9 @@ async function entradaDisco(){
 }
 async function echarDisco(){await say('Las seis. Se encienden las luces y el portero echa a todo el mundo.','PORTERO');return warp({to:'ensanche',x:38,y:9,dir:'down'});}
 const talkGorila=()=>say(!discoAbierta()?'Abrimos a las once de la noche. Hasta las seis.':nocheYa()?'Ya has pagado esta noche. Pasa.':`La entrada, ${eur(DISCO.entrada)}. En la puerta.`,'PORTERO');
+// la barra, el DJ y la RRPP, solo con GAUA abierta (1.31): si te quedas quieto pasadas las seis, el portero te echa al hablar con ellos
 async function talkBarra(){
+  if(!discoAbierta())return echarDisco();
   const N='CAMARERA',X=nocheGaua();
   const c=await ask('¿Qué te pongo?',[`Una copa · ${eur(DISCO.copa)}`,`Invitar a una ronda · ${eur(DISCO.ronda)}`,'Nada'],N);
   if(c===0){if(X.copas>=DISCO.copaMax)return say('Por hoy ya vale. Agua, si quieres.',N);
@@ -222,6 +229,7 @@ async function talkBarra(){
     return say('Invitas a la barra entera. Medio local brinda por ti.');}
 }
 async function talkDJ(){
+  if(!discoAbierta())return echarDisco();
   const c=await ask(pick(['¿Qué tal suena?','Esta noche se llena.']),['Bailar','Pedir una canción','Nada'],'DJ');
   if(c===0)return bailar();
   if(c===1){sfx('sel');return say(pick(['Te la pongo después de esta.','¿Esa? Hace años que no la pincho. Venga, va.','Esa no la tengo. Te pongo algo parecido.']),'DJ');}
@@ -237,12 +245,13 @@ async function bailar(){
 }
 // el reservado (una vez por noche): una hora y la RRPP te presenta a un cliente VIP (CTYPES.vip) para la agenda
 async function talkRRPP(){
+  if(!discoAbierta())return echarDisco();
   const N='RRPP',X=nocheGaua();
   if(X.mesa)return say('Disfruta del reservado. Si conoces a alguien que merezca la pena, me lo presentas.',N);
+  if(S.fijos.length>=FIJOS_MAX)return say('Tu agenda ya está llena. Cuando tengas sitio para alguien que importa, vuelve.',N);   // 1.31: antes de cobrar
   if(await ask(`El reservado: sofá, mesa y botella, ${eur(DISCO.mesa)} la noche. Ahí se sienta la gente que importa.`,['Reservar','No'],N)!==0)return;
   if(S.money<DISCO.mesa){sfx('bad');return say('Para el reservado hace falta dinero. Otra noche.',N);}
   S.money-=DISCO.mesa;X.mesa=1;confia('gaua',5);sfx('coin');await fade(1);advanceTime(60);updateHUD();await wait(200);await fade(0);
-  if(S.fijos.length>=FIJOS_MAX)return say('Una hora en el reservado. Conoces a mucha gente, pero tu agenda ya está llena.');
   const n=DISCO.vip[S.vipN%DISCO.vip.length],id='vip'+S.vipN;S.vipN++;S.fijos.push({id,n,t:'vip',dia:0});sfx('get');
   return say(`Una hora en el reservado. La RRPP te presenta a ${n}: «Me han dicho que lo tuyo es de lo mejor. Llámame». Apuntas su número.`);
 }

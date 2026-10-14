@@ -565,7 +565,7 @@ func npc_cond(d: Dictionary) -> bool:
 		return S.ch >= int(D.CLUBS[d.id.substr(5)].ch)
 	match d.id:   # los locales (1.30): cada trabajador de la nave, junto a su mesa; el portero de GAUA, desde su capítulo
 		"nv0", "nv1", "nv2", "nv3":
-			return S.get("nave") != null and naveros().size() > int(d.id.substr(2))
+			return S.get("nave") != null and navero_de(int(d.id.substr(2))) != null
 		"gorila":
 			return S.ch >= int(D.DISCO.ch)
 	return true
@@ -1685,6 +1685,8 @@ func talk_club(_k):
 # los locales (1.30, trama.gd)
 func naveros() -> Array:
 	return []
+func navero_de(_i: int):
+	return null
 func entra_local(_d):
 	pass
 func obj_local(_x: int, _y: int, _o) -> bool:

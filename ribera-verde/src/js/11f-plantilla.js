@@ -15,13 +15,17 @@ const PLANTILLA={ch:3,sobre:150,max:6,lotes:[25,50,100],com:.3,g:[2,4],poli:.05,
 const NAVE={ch:5,fianza:3000,dia:60,max:4,g:20,gC:2,thc:.9,redada:.02,redadaC:.003,calor:20,crece:5};
 const fichaGente=w=>`Labia ${w.lab} · cuidado ${w.cui} · lealtad ${w.lea}`;
 const gerente=()=>S.plantilla.find(w=>w.rol==='gerente')||null,naveros=()=>S.plantilla.filter(w=>w.rol==='nave');
+// la mesa de cada trabajador de la nave (1.31: w.mesa, la suya mientras trabaje allí; antes, el orden de la plantilla): quién cuida la
+// mesa i y la mesa que le toca al que llega (la primera plantada sin nadie y, si no, la primera libre)
+const naveroDe=i=>S.plantilla.find(w=>w.rol==='nave'&&w.mesa===i)||null;
+function mesaLibre(){const L=[...Array(NAVE.max).keys()].filter(i=>!naveroDe(i));return L.find(i=>S.nave.m[i])??L[0];}
 const naveG=w=>NAVE.g+NAVE.gC*(w.cui-3);
 const rolTxt=w=>w.rol==='calle'?'calle · '+gTxt(w.g):w.rol||'sin trabajo';
 function rolDesc(w){const P=PLANTILLA;
   return w.rol==='calle'?`Vende ${lotNombre(w.k)} en la calle: le quedan ${gTxt(w.g)}.`:w.rol==='gerente'?`Cuida el piso y cosecha al arcón por ${eur(P.sueldo.gerente)} al día.`
-    :w.rol==='nave'?`Cultiva la mesa ${naveros().indexOf(w)+1} de la nave por ${eur(P.sueldo.nave)} al día: ${naveG(w)} g.`:'Dale trabajo: calle, gerente o nave.';}
+    :w.rol==='nave'?`Cultiva la mesa ${w.mesa+1} de la nave por ${eur(P.sueldo.nave)} al día: ${naveG(w)} g.`:'Dale trabajo: calle, gerente o nave.';}
 // deja el trabajo; lo que le quedaba del lote vuelve al arcón
-function libre(w){if(w.rol==='calle'&&w.g>=1)addBuds(w.k,w.g,w.thc,S.arcon.buds,w.cu,w.dia??null);w.rol=null;delete w.k;delete w.thc;delete w.g;delete w.cu;delete w.dia;}
+function libre(w){if(w.rol==='calle'&&w.g>=1)addBuds(w.k,w.g,w.thc,S.arcon.buds,w.cu,w.dia??null);w.rol=null;delete w.k;delete w.thc;delete w.g;delete w.cu;delete w.dia;delete w.mesa;}
 async function plantilla(){
   let i=0;
   for(;;){
@@ -60,7 +64,7 @@ async function trabajo(w){
   const op=ops[await ask(`${w.n} · ${fichaGente(w)} · ${rolTxt(w)}`,ops)];
   if(op==='A la calle'){const r=await loteCalle(w);if(!r)return;libre(w);w.rol='calle';[w.k,w.thc,w.g]=r;Object.assign(w,r[3]);sfx('sel');return say(`${w.n}: «Hecho. Cada día te dejo lo vendido en el buzón».`);}
   if(op==='De gerente'){libre(w);w.rol='gerente';sfx('sel');return say(`${w.n}: «Cada mañana me paso por el piso: riego, trato las plagas y lo que esté listo lo cosecho y lo dejo en el arcón. ${eur(P.sueldo.gerente)} al día».`);}
-  if(op==='A la nave'){libre(w);w.rol='nave';sfx('sel');return say(`${w.n}: «Mañana empiezo en la nave. ${eur(P.sueldo.nave)} al día».`);}
+  if(op==='A la nave'){libre(w);w.mesa=mesaLibre();w.rol='nave';sfx('sel');return say(`${w.n}: «Mañana empiezo en la mesa ${w.mesa+1} de la nave. ${eur(P.sueldo.nave)} al día».`);}
   if(op==='Dejarlo libre'){const g=w.rol==='calle'?w.g:0;libre(w);return say(g>=1?`${w.n} te deja lo que le quedaba en el arcón: ${gTxt(g)}.`:`${w.n} se queda sin trabajo.`);}
   if(op==='Despedir'){if(await ask(`¿Despides a ${w.n}?`,['Despedir','No'])!==0)return;
     const g=w.rol==='calle'?w.g:0;libre(w);S.plantilla=S.plantilla.filter(x=>x!==w);return say(`${w.n} se va.`+(g>=1?` Lo que le quedaba, ${gTxt(g)}, está en el arcón.`:''));}
@@ -104,9 +108,9 @@ function naveAlquiler(){
   if(S.money<NAVE.dia){naveros().forEach(libre);S.nave=null;queue('nave',()=>talk('SMS · ARRIETA',['No me has pagado la nave. Cambio la cerradura y me quedo la fianza.']));return;}
   S.money-=NAVE.dia;
 }
-// después de la calle, la redada (menos con cuidado) y lo que da cada mesa que ya da (1.30): el trabajador i cuida la mesa i;
+// después de la calle, la redada (menos con cuidado) y lo que da cada mesa que ya da (1.30): cada trabajador cuida la suya (w.mesa);
 // naveG × el rendimiento de lo plantado y, con su abono y dosis en la estantería, lo del abono (ABONO, ABONO_BIO), al secadero de
-// esa mesa (M.g, con su THC medio, M.t)
+// esa mesa (M.g, con su THC medio, M.t, y el día de la cosecha de lo más viejo que cuelga, M.cd: 1.31; lo de menos de 1 g no se recoge y no cuenta)
 function naveDia(){
   const N=S.nave;if(!N)return;
   const W=naveros();if(!W.length||!N.m.some(Boolean))return;
@@ -114,10 +118,10 @@ function naveDia(){
     const ns=W.map(w=>w.n),quien=ns.length>1?ns.slice(0,-1).join(', ')+' y '+ns[ns.length-1]:ns[0],g=naveStock();
     S.nave=null;S.plantilla=S.plantilla.filter(w=>w.rol!=='nave');S.heat=Math.min(100,S.heat+NAVE.calor);sfx('bad');
     queue('nave',()=>say(`La policía ha entrado en la nave de Valdehierro. Se lleva las plantas${g>=1?', '+gTxt(g):''} y a ${quien}.`));return;}
-  W.forEach((w,i)=>{const M=N.m[i];if(!M||S.day-M.dia<NAVE.crece)return;
+  W.forEach(w=>{const M=N.m[w.mesa];if(!M||S.day-M.dia<NAVE.crece)return;
     let g=naveG(w)*M.y,thc=M.thc;
     if(M.abo===1&&N.ab.m>0){N.ab.m--;g*=1+ABONO.rend;thc+=ABONO.thc;}else if(M.abo===2&&N.ab.o>0){N.ab.o--;g*=1+ABONO_BIO.rend;thc+=ABONO_BIO.thc;}
-    g=Math.round(g*10)/10;M.t=Math.round((M.t*M.g+thc*g)/(M.g+g)*10)/10;M.g=Math.round((M.g+g)*10)/10;});
+    g=Math.round(g*10)/10;if(!(M.g>=1))M.cd=S.day;M.t=Math.round((M.t*M.g+thc*g)/(M.g+g)*10)/10;M.g=Math.round((M.g+g)*10)/10;});
 }
 // Arrieta, el dueño de la nave de Valdehierro
 NPCDEF.push({id:'arrieta',map:'valdehierro',x:17,y:7,dir:'down',look:'arrieta',talk:()=>talkNave()});

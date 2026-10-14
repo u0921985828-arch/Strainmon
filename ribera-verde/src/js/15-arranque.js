@@ -30,6 +30,10 @@ function migrate(){
   if(!('diario' in S.flags))S.flags.diario=1;   // 1.25: el diario sale bajo la almohada; las partidas de antes ya lo tenían
   if(S.nave&&!S.nave.m){const o=S.nave;S.nave=naveNueva();   // 1.30: la nave de antes (una variedad para todos) pasa a 4 mesas con ella, ya dando, y lo que había, en la 1.ª
     if(o.sid)S.nave.m=S.nave.m.map((_,i)=>({k:o.sid,thc:o.thc,y:1,dia:S.day-NAVE.crece,g:i?0:Math.round(o.g*10)/10,t:o.thc,abo:0}));}
+  // 1.31: cada trabajador de la nave, su mesa (w.mesa); los de antes, la que les tocaba por el orden de la plantilla
+  naveros().forEach(w=>{if(w.mesa==null)w.mesa=[...Array(NAVE.max).keys()].find(i=>!naveroDe(i));});
+  // 1.31: el pH− de 250 ml ya no se vende; lo pedido a Kiko de antes llega como la botella de 1 L
+  if(S.envio)S.envio=S.envio.map(l=>/^pH− .* 250 ml$/.test(l)?l.replace(/ 250 ml$/,' 1 L'):l);
   if(!('vendDia' in S.flags)){S.curro.vend.forEach(v=>delete v.dia);S.flags.vendDia=1;}   // 1.29.1: el dia de un vendedor era el de la entrega; ahora, el de la cosecha (los de antes no pierden)
   for(const k in S.custom){   // 1.11: los cruces con nombre largo («A × B», de antes) pasan a uno corto, con la misma clave; 1.24: y
     // los que se llaman como una variedad nueva (Purple Thai × Haze, sin receta antes, se llamaba «Purple Haze»)
