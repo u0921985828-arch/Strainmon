@@ -692,6 +692,26 @@
    ],
    "ajuste": "exacto",
    "nota": "1.43: los coches de la exposición del concesionario, de perfil a 16 px/m: 5 casillas de ancho, la base en el centro de la de la izquierda (8, 47); las otras cuatro (k + \"2\") no se pintan"
+  },
+  "alm_tarro_xl": {
+   "w": 22,
+   "h": 31,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.43.6: los tarros de 10 L del camarote (almacen.py)"
+  },
+  "alm_cog_xl": {
+   "w": 20,
+   "h": 26,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.43.6: lo de dentro de los tarros de 10 L (almacen.py)"
   }
  },
  "fases": [
@@ -8549,7 +8569,20 @@
     "misc:alm-x-charas-4-g",
     "misc:alm-x-hash-4-g",
     "misc:alm-x-moon-4-g",
-    "misc:alm-x-stat-4-g"
+    "misc:alm-x-stat-4-g",
+    "misc:alm-camarote",
+    "misc:alm-tarro-xl",
+    "misc:alm-tarro-xl-s",
+    "misc:alm-mas-xl",
+    "misc:alm-ic-hr",
+    "misc:alm-cog-p-1-xl",
+    "misc:alm-cog-s-1-xl",
+    "misc:alm-cog-p-2-xl",
+    "misc:alm-cog-s-2-xl",
+    "misc:alm-cog-p-3-xl",
+    "misc:alm-cog-s-3-xl",
+    "misc:alm-cog-p-4-xl",
+    "misc:alm-cog-s-4-xl"
    ],
    "celda": "alm_tarro",
    "max_colores": 64,
@@ -8957,6 +8990,58 @@
     {
      "nombre": "alm-x-stat-4-g",
      "celda": "alm_x_g"
+    },
+    {
+     "nombre": "alm-camarote",
+     "celda": "alm_caja"
+    },
+    {
+     "nombre": "alm-tarro-xl",
+     "celda": "alm_tarro_xl"
+    },
+    {
+     "nombre": "alm-tarro-xl-s",
+     "celda": "alm_tarro_xl"
+    },
+    {
+     "nombre": "alm-mas-xl",
+     "celda": "alm_tarro_xl"
+    },
+    {
+     "nombre": "alm-ic-hr",
+     "celda": "alm_icono"
+    },
+    {
+     "nombre": "alm-cog-p-1-xl",
+     "celda": "alm_cog_xl"
+    },
+    {
+     "nombre": "alm-cog-s-1-xl",
+     "celda": "alm_cog_xl"
+    },
+    {
+     "nombre": "alm-cog-p-2-xl",
+     "celda": "alm_cog_xl"
+    },
+    {
+     "nombre": "alm-cog-s-2-xl",
+     "celda": "alm_cog_xl"
+    },
+    {
+     "nombre": "alm-cog-p-3-xl",
+     "celda": "alm_cog_xl"
+    },
+    {
+     "nombre": "alm-cog-s-3-xl",
+     "celda": "alm_cog_xl"
+    },
+    {
+     "nombre": "alm-cog-p-4-xl",
+     "celda": "alm_cog_xl"
+    },
+    {
+     "nombre": "alm-cog-s-4-xl",
+     "celda": "alm_cog_xl"
     }
    ],
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/almacen.py",
@@ -8982,10 +9067,23 @@
     "alm-mas-g": "exacto",
     "alm-fajo-g": "exacto",
     "alm-etiqueta": "exacto",
-    "alm-etiqueta-g": "exacto"
+    "alm-etiqueta-g": "exacto",
+    "alm-camarote": "exacto",
+    "alm-tarro-xl": "exacto",
+    "alm-tarro-xl-s": "exacto",
+    "alm-mas-xl": "exacto",
+    "alm-ic-hr": "exacto",
+    "alm-cog-p-1-xl": "exacto",
+    "alm-cog-s-1-xl": "exacto",
+    "alm-cog-p-2-xl": "exacto",
+    "alm-cog-s-2-xl": "exacto",
+    "alm-cog-p-3-xl": "exacto",
+    "alm-cog-s-3-xl": "exacto",
+    "alm-cog-p-4-xl": "exacto",
+    "alm-cog-s-4-xl": "exacto"
    },
    "estilo_ref": "los muebles a escala del piso (props-escala) y el contorno de salon.py",
-   "notas": "1.36, pedido por el usuario: «Quiero para los visores sprites del estilo de todo el juego no? Y también tendría que haber una ventana para ver lo que estás seleccionando no?» y «Los tarros de curado donde están? Como meter ahí la hierba o otras extracciones?»."
+   "notas": "1.36, pedido por el usuario: «Quiero para los visores sprites del estilo de todo el juego no? Y también tendría que haber una ventana para ver lo que estás seleccionando no?» y «Los tarros de curado donde están? Como meter ahí la hierba o otras extracciones?». 1.43.6, pedido por el usuario: «hacer una reforma con Pladur… para usarlo de almacén con botes más grandes de cristal con bóvedas de humedad… O sino… habilitar el camarote de arriba, el piso de arriba, como almacen»."
   },
   {
    "fase": "F9",
@@ -9090,6 +9188,82 @@
    "descripcion": "1.43: los vehículos de la exposición de AUTOS RIBERA, de perfil a 16 px/m y sin marcas: el utilitario de 5 puertas blanco (4 m), la berlina gris plomo (4,8 m), el deportivo rojo bajo en cuña con alerón sobre la plataforma giratoria (4,6 m) y la moto de 125 cc (scooter negro con el escudo azul, 2 m).",
    "notas": "1.43, pedido por el usuario («una moto, un coche sin más, uno de gama media y un super deportivo»).",
    "montaje": "tal cual (concesionario.py), 80 × 48 (ajuste exacto)"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/camarote.py",
+   "notas": "1.43.6, pedido por el usuario: «hacer una reforma con Pladur… para usarlo de almacén con botes más grandes de cristal con bóvedas de humedad… O sino… habilitar el camarote de arriba, el piso de arriba, como almacen».",
+   "max_colores": 32,
+   "tipo": "tiles",
+   "id": "camarote-tiles",
+   "celda": "tile",
+   "estilo_ref": "las paredes y suelos de serie (interior-home)",
+   "cubre": [
+    "tile:floorCam",
+    "tile:iwT_cam",
+    "tile:iwT_camV",
+    "tile:iwB_cam",
+    "tile:trampC"
+   ],
+   "ajuste_por_sprite": {
+    "floorCam": "exacto",
+    "iwT_cam": "exacto",
+    "iwT_camV": "exacto",
+    "iwB_cam": "exacto",
+    "trampC": "exacto"
+   },
+   "descripcion": "1.43.6: el camarote por dentro: la tarima de pino, el techo abuhardillado de machihembrado (con y sin la ventana de tejado), el murete de pladur con el rodapié y la trampilla con la escalera."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/camarote.py",
+   "notas": "1.43.6, pedido por el usuario: «hacer una reforma con Pladur… para usarlo de almacén con botes más grandes de cristal con bóvedas de humedad… O sino… habilitar el camarote de arriba, el piso de arriba, como almacen».",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "camarote-alto",
+   "celda": "objeto_alto",
+   "estilo_ref": "los muebles a escala del piso (props-escala)",
+   "cubre": [
+    "obj:estanteC",
+    "obj:escaleraC"
+   ],
+   "ajuste_por_sprite": {
+    "estanteC": "exacto",
+    "escaleraC": "exacto"
+   },
+   "descripcion": "1.43.6: la estantería metálica de 180 cm con los tarros de cristal de 10 L y sus sobres de humedad, y la escalera escamoteable del piso con la trampilla del techo abierta."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/camarote.py",
+   "notas": "1.43.6, pedido por el usuario: «hacer una reforma con Pladur… para usarlo de almacén con botes más grandes de cristal con bóvedas de humedad… O sino… habilitar el camarote de arriba, el piso de arriba, como almacen».",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "camarote-16",
+   "celda": "objeto_1x1",
+   "estilo_ref": "props-16",
+   "cubre": [
+    "obj:deshumC"
+   ],
+   "ajuste_por_sprite": {
+    "deshumC": "exacto"
+   },
+   "descripcion": "1.43.6: el deshumidificador del camarote."
   }
  ],
  "familias": {

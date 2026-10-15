@@ -1033,6 +1033,8 @@ func tienda_online() -> void:
 		items.append({"label": AR.n + (" · en casa" if ar == 1 else " · pedido" if ar != null else ""), "right": Datos.eur(AR.p), "disabled": ar != null,
 			"desc": AR.d + ("\nLa nevera de serie: %s." % (Datos.coma(D.NEVERA.g / 1000.0) + " kg") if ar == null else "")})
 		items.append({"label": "Reformas: suelo y paredes", "desc": "El suelo y las paredes del piso: el instalador o el pintor vienen al día siguiente."})   # 1.27
+		if Datos.CAL:   # 1.43.6: el camarote
+			items.append({"label": "El camarote: almacén", "desc": "Habilitar el camarote de arriba como almacén, las estanterías de tarros de cristal de 10 L y los sobres de humedad."})
 		items.append({"label": "Salir", "desc": "Con tarjeta, de la cuenta del banco."})
 		i = await menu(items, {"cls": "full", "title": "TIENDA ONLINE", "title2": "Muebles y transporte · en la cuenta " + Datos.eur(S.banco), "desc": true, "initial": i})
 		if i == ks.size() + vs.size():
@@ -1043,6 +1045,9 @@ func tienda_online() -> void:
 			continue
 		if i == ks.size() + vs.size() + 1:
 			await reformas()
+			continue
+		if Datos.CAL and i == ks.size() + vs.size() + 2:
+			await camarote_tienda()
 			continue
 		if i < 0 or i >= ks.size() + vs.size():
 			return
@@ -1058,7 +1063,71 @@ func tienda_online() -> void:
 		sfx("coin")
 		toast("Pedido: " + m.n + " · llega mañana", 1400)
 
+# el camarote (1.43.6, lo pidió el usuario: «habilitar el camarote de arriba… como almacén» con «botes más grandes de cristal con
+# bóvedas de humedad»): la obra, las estanterías de 6 tarros de 10 L (hasta CAMAROTE.est.max) y las cajas de sobres al 62 %; todo
+# con tarjeta y al día siguiente (llega_camarote)
+func camarote_tienda() -> void:
+	var CM: Dictionary = D.CAMAROTE
+	var i := 0
+	while true:
+		var c := cam()
+		var hecha: bool = c.has("d")
+		var lista := cam_ya()
+		var ne: int = c.get("e", []).size()
+		var pend_e: int = ne - cam_est()
+		var pend_s := 0
+		for q in c.get("sp", []):
+			pend_s += int(q[1])
+		var items := [
+			{"label": CM.obra.n + (" · hecho" if lista else " · mañana" if hecha else ""), "right": Datos.eur(CM.obra.p), "disabled": hecha, "desc": CM.obra.d},
+			{"label": "%s · %d/%d%s" % [CM.est.n, ne, int(CM.est.max), (" · %d mañana" % pend_e) if pend_e else ""], "right": Datos.eur(CM.est.p), "disabled": not hecha or ne >= int(CM.est.max),
+				"desc": (CM.est.d % int(CM.tarro)) + ("" if hecha else "\nAntes hay que habilitar el camarote.")},
+			{"label": CM.sob.n + ((" · quedan %d" % ceili(float(c.get("sob", 0)) - 1e-9)) if float(c.get("sob", 0)) > 0 else "") + ((" · %d mañana" % pend_s) if pend_s else ""), "right": Datos.eur(CM.sob.p), "disabled": not hecha,
+				"desc": (CM.sob.d % int(CM.dura)) + ("\nCon sobres, lo curado se afina en %d días: se vende un %d %% más caro." % [int(CM.af), Datos.jsround(CM.extra * 100)])},
+			{"label": "Volver"}]
+		i = await menu(items, {"cls": "full", "title": "EL CAMAROTE", "title2": "Almacén · en la cuenta " + Datos.eur(S.banco), "desc": true, "initial": i})
+		if i < 0 or i > 2:
+			return
+		var art: Dictionary = [CM.obra, CM.est, CM.sob][i]
+		if not await tarjeta(art.p, "Tienda online · " + art.n):
+			continue
+		if not (S.get("cam") is Dictionary):
+			S.cam = {"e": [], "sob": 0.0, "sp": [], "buds": {}}
+		if i == 0:
+			S.cam.d = S.day + 1
+		elif i == 1:
+			S.cam.e.append(S.day + 1)
+		else:
+			S.cam.sp.append([S.day + 1, int(CM.sob.u)])
+		sfx("coin")
+		toast("Pedido: " + art.n + " · " + ("los obreros vienen mañana" if i == 0 else "llega mañana"), 1400)
+
+func llega_camarote() -> void:
+	if not Datos.CAL or not (S.get("cam") is Dictionary):
+		return
+	var av := []
+	if S.cam.has("d") and int(S.cam.d) == S.day:
+		av.append("Los obreros acaban el camarote: aislado, con pladur, tarima, luz y deshumidificador. Se sube por la escalera escamoteable de entre las carpas.")
+	var ne: int = S.cam.e.filter(func(d): return int(d) == S.day).size()
+	if ne:
+		av.append("Llega%s %s: te %s suben al camarote. Caben ahora %s kg." % ["" if ne == 1 else "n", "la estantería de tarros de 10 L" if ne == 1 else "%d estanterías de tarros de 10 L" % ne, "la" if ne == 1 else "las", Datos.coma(cam_cap() / 1000.0)])
+	var quedan := []
+	for q in S.cam.sp:
+		if int(q[0]) <= S.day:
+			S.cam.sob = float(S.cam.get("sob", 0)) + int(q[1])
+			av.append("Llegan los sobres de humedad al 62 %%: uno en cada tarro del camarote (quedan %d)." % ceili(S.cam.sob - 1e-9))
+		else:
+			quedan.append(q)
+	S.cam.sp = quedan
+	if av.size():
+		montar_casa()
+		queue("camarote", func():
+			sfx("get")
+			for t in av:
+				await say(t))
+
 func llega_mueble() -> void:
+	llega_camarote()   # 1.43.6
 	if S.get("nevera") != null and S.nevera.get("arcon") != null and S.nevera.arcon != 1 and -int(S.nevera.arcon) <= S.day:   # el arcón (1.39)
 		S.nevera.arcon = 1
 		queue("arcon", func():

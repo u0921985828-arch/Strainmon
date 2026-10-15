@@ -1,5 +1,17 @@
 # Cambios
 
+## 1.43.6 · 15 de octubre de 2026
+
+El camarote de arriba, de almacén (lo pidió el usuario: «habilitar el camarote de arriba, el piso de arriba, como almacén», con «botes más grandes de cristal con bóvedas de humedad»). Solo Godot (0.37.6), con `Datos.CAL`.
+
+- **La obra** (tienda online → El camarote: almacén, con tarjeta, llega al día siguiente): habilitar el camarote, 3.500 €; la escalera escamoteable baja en el piso entre la carpa A y la B, debajo de la ventana (`escaleraC` en (9, 2), se usa desde (9, 3); ORDENAR no deja nada ahí, `reserva_orden`, y lo que estaba se recoloca).
+- **Arriba** (`MAPS.camarote`, 10 × 6): tarima de pino, techo abuhardillado con dos ventanas de tejado, murete de pladur, deshumidificador y la trampilla para bajar.
+- **Estanterías de tarros de 10 L** (180 €, hasta 4): 6 tarros de cristal de 290 g cada una (`CAMAROTE.est`, `cam_cap`). Curan los lotes como los tarros de Kiko, sin necesitarlos.
+- **Sobres de humedad al 62 %** (36 € la caja de 12 sobres de 67 g): un sobre por tarro dura 60 días (`CAMAROTE.dura`); con sobres, lo curado se afina en 14 días (`af`): +10 % en todas las ventas (`calidad`). Se gastan por tarros ocupados al día, con aviso al acabarse.
+- **La vista por dentro** (CAMAROTE, como la caja y la nevera): los tarros de 10 L por estante, GUARDAR, la ficha con curado y afinado (`items_almacen("cam")`, `rects_almacen`, `_guardar_cam`).
+- **La redada** se lleva lo del camarote: el desván no está escondido como la caja.
+- Arte a mano en `tools/sprites/a-mano/camarote.py` (casillas, estantería, escalera, deshumidificador) y `almacen.py` (el fondo del camarote, el tarro de 10 L y lo de dentro). Prueba nueva `tests/camarote.gd` (70 comprobaciones).
+
 ## 1.43.5 · 15 de octubre de 2026
 
 El APK también para móviles de 32 bits (lo pidió el usuario, tras la revisión de Gemini). Solo Godot (0.37.5).

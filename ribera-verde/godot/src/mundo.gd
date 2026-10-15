@@ -225,7 +225,7 @@ func pagar_casa(e: float) -> float:
 func mover_lote(de: Dictionary, a: Dictionary, k: String, g: float) -> void:
 	var b: Dictionary = de[k]
 	if a.has(k):
-		junta_lote(a[k], g, b.thc, b.get("cu", 0), b.get("dia"), b.get("mc", 0))
+		junta_lote(a[k], g, b.thc, b.get("cu", 0), b.get("dia"), b.get("mc", 0), b.get("af", 0))
 	else:
 		a[k] = {"g": g, "thc": b.thc}
 		a[k].merge(cura_de(b))
@@ -314,7 +314,7 @@ func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1, mc = 
 # pierde THC; los extractos se curan en frío en la nevera (S.nevera.rosin, sin tarros) y el manicurado (mc, de 0 a 1) pela los
 # cogollos: MANICURA.precio más caro. Al juntar dos lotes, el THC, lo curado, lo manicurado y el día van por gramos
 func calidad(b: Dictionary) -> float:
-	return 1 + D.CURADO.precio * float(b.get("cu", 0)) + D.MANICURA.precio * float(b.get("mc", 0))
+	return 1 + D.CURADO.precio * float(b.get("cu", 0)) + D.MANICURA.precio * float(b.get("mc", 0)) + D.CAMAROTE.extra * float(b.get("af", 0))   # 1.43.6: afinado en el camarote
 
 func cura_de(b: Dictionary) -> Dictionary:
 	var o := {}
@@ -324,10 +324,17 @@ func cura_de(b: Dictionary) -> Dictionary:
 		o.cu = b.cu
 	if b.get("mc"):
 		o.mc = b.mc
+	if b.get("af"):
+		o.af = b.af
 	return o
 
-func junta_lote(t: Dictionary, g: float, thc: float, cu, dia, mc = 0) -> void:
+func junta_lote(t: Dictionary, g: float, thc: float, cu, dia, mc = 0, af = 0) -> void:
 	var nn: float = t.g + g
+	var fa: float = (float(t.get("af", 0)) * t.g + float(af if af else 0) * g) / nn   # 1.43.6: lo afinado en el camarote, por gramos
+	if fa:
+		t.af = fa
+	else:
+		t.erase("af")
 	var c: float = (float(t.get("cu", 0)) * t.g + float(cu if cu else 0) * g) / nn
 	var m: float = (float(t.get("mc", 0)) * t.g + float(mc if mc else 0) * g) / nn
 	t.thc = (t.thc * t.g + thc * g) / nn
@@ -363,6 +370,34 @@ func nevera_r() -> float:
 func nevera_cap() -> float:
 	return float(D.NEVERA.g) + (float(D.NEVERA.arcon.g) if S.get("nevera") != null and S.nevera.get("arcon") == 1 else 0.0)
 
+# ---------- el camarote (1.43.6, lo pidió el usuario: «habilitar el camarote de arriba… como almacén», solo con Datos.CAL) ----------
+# S.cam = {d: el día en que acaban la obra, e: [el día en que llega cada estantería], sob: los sobres de humedad que quedan (uno por
+# tarro cada CAMAROTE.dura días), sp: [[día, sobres]] los pedidos, buds: los lotes}; caben CAMAROTE.tarro g por tarro de 10 L
+func cam() -> Dictionary:
+	return S.cam if S.get("cam") is Dictionary else {}
+
+func cam_ya() -> bool:
+	return Datos.CAL and cam().has("d") and float(S.cam.d) <= S.day
+
+func cam_est() -> int:
+	return cam().get("e", []).filter(func(d): return float(d) <= S.day).size()
+
+func cam_cap() -> float:
+	return float(cam_est() * int(D.CAMAROTE.est.tarros) * int(D.CAMAROTE.tarro))
+
+func cam_g() -> float:
+	var t := 0.0
+	for k in cam().get("buds", {}):
+		t += S.cam.buds[k].g
+	return t
+
+# los tarros de 10 L que ocupan los lotes (cada lote, en los suyos)
+func cam_tarros() -> int:
+	var n := 0
+	for k in cam().get("buds", {}):
+		n += maxi(1, ceili(floor(S.cam.buds[k].g) / float(D.CAMAROTE.tarro) - 1e-9))
+	return n
+
 func extr_nombre(k: String, mn := false) -> String:
 	return (D.EXTR[tipo_extr(k)].n.to_lower() if mn else D.EXTR[tipo_extr(k)].n) + " de " + lot_nombre(base_extr(k))
 
@@ -386,6 +421,23 @@ func curado_dia(av: Array) -> void:
 		av.append("Curada en la caja fuerte: " + y_lista(c.map(lot_nombre)))
 	if nv.size():
 		av.append("Curado en la nevera: " + y_lista(nv.map(extr_nombre)))
+	if cam_ya() and cam().get("buds", {}).size():   # 1.43.6: el camarote cura en sus tarros de 10 L y, con sobres, afina
+		var cc: Array = _cura(S.cam.buds)
+		if cc.size():
+			av.append("Curada en el camarote: " + y_lista(cc.map(lot_nombre)))
+		if float(S.cam.get("sob", 0)) > 0:
+			var af := []
+			for k in S.cam.buds:
+				var b: Dictionary = S.cam.buds[k]
+				if float(b.get("cu", 0)) >= 1 and float(b.get("af", 0)) < 1:
+					b.af = minf(1.0, float(b.get("af", 0)) + 1.0 / float(D.CAMAROTE.af))
+					if b.af >= 1:
+						af.append(k)
+			if af.size():
+				av.append("Afinada al 62 %% en el camarote: %s (un %d %% más cara)" % [y_lista(af.map(lot_nombre)), Datos.jsround(D.CAMAROTE.extra * 100)])
+			S.cam.sob = maxf(0.0, float(S.cam.sob) - float(cam_tarros()) / float(D.CAMAROTE.dura))
+			if S.cam.sob <= 0:
+				av.append("Se han gastado los sobres de humedad del camarote")
 
 # cómo está un lote, para la mochila: curado, curándose o sin curar ("" en los de antes de la 1.29), y manicurado
 func man_txt(b: Dictionary) -> String:
@@ -594,7 +646,7 @@ func montar_casa() -> void:
 	var ya := muebles_ya()
 	var su := deco_v("suelo")
 	var pa := deco_v("pared")
-	var key := ",".join(ks) + "|" + ",".join(ya) + "|" + ",".join([su, pa, deco_v("alfombra")]) + "|" + ",".join(D.MUEBLE_EXTR.keys().filter(func(k): return mueble_ya(D.MUEBLE_EXTR[k]))) + "|" + JSON.stringify(S.get("coloca", {}).get("home", {}) if S.get("coloca") is Dictionary else {})
+	var key := ",".join(ks) + "|" + ",".join(ya) + "|" + ",".join([su, pa, deco_v("alfombra")]) + "|" + ",".join(D.MUEBLE_EXTR.keys().filter(func(k): return mueble_ya(D.MUEBLE_EXTR[k]))) + "|" + JSON.stringify(S.get("coloca", {}).get("home", {}) if S.get("coloca") is Dictionary else {}) + ("|cam" if cam_ya() else "")
 	if h.get("carpasK") == key:
 		return
 	h.carpasK = key
@@ -637,6 +689,36 @@ func montar_casa() -> void:
 			h.o[s.y][x] = "carpa"
 		h.carpas.append({"ci": ci, "t": c.t, "x0": x0, "x1": x1, "y": int(s.y)})
 	aplica_orden("home")   # la nevera, la mesa, las plantas, el taller y los muebles del salón (con la silla gaming)
+	# 1.43.6: la escalera escamoteable del camarote, entre las carpas A y B, bajo la ventana; se sube desde la casilla de delante
+	# (CAMAROTE.vuelta); ninguna de las dos se ocupa al ordenar
+	var CM: Dictionary = D.CAMAROTE
+	if h.o[int(CM.y)][int(CM.x)] == "escaleraC":
+		h.o[int(CM.y)][int(CM.x)] = null
+	if not cam_ya():
+		return
+	var esc := [[int(CM.x), int(CM.y)], [int(CM.vuelta[0]), int(CM.vuelta[1])]]
+	var fuera := false
+	for Q in piezas_ya("home"):   # lo que estuviera en la escalera o delante vuelve a su sitio (las de serie no caen ahí)
+		var q := pos_pieza("home", Q.k)
+		for c in celdas_p(Q, q[0], q[1]) + gente_p(Q, q[0], q[1]):
+			if [int(c[0]), int(c[1])] in esc and S.get("coloca") is Dictionary and S.coloca.get("home") is Dictionary and S.coloca.home.has(Q.k):
+				S.coloca.home.erase(Q.k)
+				fuera = true
+	if fuera:
+		h.carpasK = ""
+		montar_casa()
+		return
+	h.o[int(CM.y)][int(CM.x)] = "escaleraC"
+
+# el camarote por dentro: las estanterías que han llegado, contra la pared de arriba (x 1, 3, 5 y 7)
+func montar_camarote() -> void:
+	var m: Dictionary = MAPS.camarote
+	for i in int(D.CAMAROTE.est.max):
+		m.o[2][1 + i * 2] = "estanteC" if i < cam_est() else null
+
+# lo que no se puede ocupar al ordenar (12d-orden): delante de la escalera del camarote (1.43.6)
+func reserva_orden(mapa: String) -> Array:
+	return D.ORDEN_RESERVA.get(mapa, []) + ([[D.CAMAROTE.x, D.CAMAROTE.y], D.CAMAROTE.vuelta] if mapa == "home" and cam_ya() else [])
 
 # el salón (1.10, 12c-salon): los muebles comprados que ya han llegado, y de qué mueble es un objeto (k o su mitad k + "2")
 func muebles_ya() -> Array:
@@ -1043,6 +1125,8 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 		montar_nave()
 	if name_ == "alto":
 		montar_alto()
+	if name_ == "camarote":
+		montar_camarote()
 	montar_club(name_)
 	P.x = x
 	P.y = y
@@ -1369,6 +1453,25 @@ func object_action(x: int, y: int) -> void:
 				return
 			"poster":
 				await diploma_action()
+				return
+	if o == "escaleraC" and S.map == "home":   # 1.43.6: el camarote
+		sfx("door")
+		await fade(1)
+		enter_map("camarote", int(D.CAMAROTE.desde[0]), int(D.CAMAROTE.desde[1]), "up")
+		update_hud()
+		await wait(80)
+		await fade(0)
+		return
+	if S.map == "camarote":
+		match o:
+			"estanteC":
+				await camarote_action()
+				return
+			"deshumC":
+				await say("El deshumidificador: deja el camarote entre el 58 y el 62 % de humedad, a 18 °C. Los sobres de dentro de los tarros hacen el resto.")
+				return
+			"crate":
+				await say("Cajas de la tía: revistas de jardinería, un ventilador viejo y los adornos de Navidad.")
 				return
 	if S.map == "casa-ama":   # el caserío de la familia, en Mendialde (1.10)
 		match o:
@@ -2108,6 +2211,8 @@ func manicura_action():
 	pass
 func nevera_action():
 	pass
+func camarote_action():   # 1.43.6, en trama.gd
+	pass
 func letter_action():
 	pass
 func parada_action():
@@ -2266,7 +2371,7 @@ func cabe_pieza(mapa: String, k: String, x: int, y: int, O = null, jug := true) 
 		if not pisable(m, c[0], c[1]):
 			return "fuera"
 	var res := {}
-	for c in gente_fija(mapa) + Dm.pie + D.ORDEN_RESERVA.get(mapa, []):
+	for c in gente_fija(mapa) + Dm.pie + reserva_orden(mapa):
 		res["%d,%d" % [int(c[0]), int(c[1])]] = true
 	var otras: Array = piezas_ya(mapa).filter(func(Q): return Q.k != k)
 	for Q in otras:

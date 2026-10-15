@@ -119,9 +119,9 @@ def cuerpo(L, w, h, tapa):
     L.vl(2, 6, h - 5, VI4); L.vl(3, 6, 6 + (h - 12) // 4, VI4)                                  # los brillos
     L.vl(w - 3, 7, 7 + (h - 12) // 3, VI3); L.p(w - 3, h - 4, VI3)
 
-def tarro(tapa):
-    """18 × 25 (por dentro: x 1-16, y 4-23)"""
-    L = Lienzo(18, 25); cuerpo(L, 18, 25, tapa); return L
+def tarro(tapa, w=18, h=25):
+    """18 × 25 (por dentro: x 1-16, y 4-23); 1.43.6, el de 10 L del camarote, 22 × 31 (por dentro: x 1-20, y 4-29)"""
+    L = Lienzo(w, h); cuerpo(L, w, h, tapa); return L
 
 def bote():
     """el bote de los extractos, de 12 × 12 (por dentro: x 1-10, y 4-10): bajo, ancho y de boca ancha, con la tapa negra de rosca
@@ -135,14 +135,45 @@ def bote():
     L.vl(2, 5, 8, VI4); L.p(9, 5, VI3); L.p(9, 6, VI3)                                         # los brillos
     return L
 
-def mas():
-    """GUARDAR en la caja: el tarro abierto, vacío, con el más verde"""
-    L = Lienzo(18, 25)
-    L.r(1, 4, 16, 20, '#1d2428')
-    cuerpo(L, 18, 25, None)
-    L.hl(2, 15, 2, VI1); L.hl(3, 14, 3, VI3)                                                   # la boca abierta
-    L.r(8, 9, 3, 11, '#2a5a30'); L.r(4, 13, 11, 3, '#2a5a30')                                  # el más, con su sombra
-    L.r(7, 8, 3, 11, '#58d080'); L.r(3, 12, 11, 3, '#58d080'); L.p(7, 8, '#a8f0c0'); L.p(3, 12, '#a8f0c0')
+def mas(w=18, h=25):
+    """GUARDAR en la caja: el tarro abierto, vacío, con el más verde (1.43.6: y el de 10 L del camarote)"""
+    L = Lienzo(w, h)
+    L.r(1, 4, w - 2, h - 5, '#1d2428')
+    cuerpo(L, w, h, None)
+    L.hl(2, w - 3, 2, VI1); L.hl(3, w - 4, 3, VI3)                                             # la boca abierta
+    dx, dy = (w - 18) // 2, (h - 25) // 2
+    L.r(8 + dx, 9 + dy, 3, 11, '#2a5a30'); L.r(4 + dx, 13 + dy, 11, 3, '#2a5a30')              # el más, con su sombra
+    L.r(7 + dx, 8 + dy, 3, 11, '#58d080'); L.r(3 + dx, 12 + dy, 11, 3, '#58d080'); L.p(7 + dx, 8 + dy, '#a8f0c0'); L.p(3 + dx, 12 + dy, '#a8f0c0')
+    return L
+
+# ---------- el camarote por dentro (1.43.6, lo pidió el usuario: «botes más grandes de cristal con bóvedas de humedad») ----------
+# alm-camarote (168 × 100): el machihembrado de pino de la buhardilla, la luz de la ventana de tejado y dos baldas de la estantería
+# metálica, con sus montantes perforados; los tarros de 10 L (22 × 31) se apoyan en y = 37 y 83, seis por balda
+def camarote():
+    L = Lienzo(168, 100)
+    PINO = ('#c89c64', '#b08452', '#8a6640', '#d8b07a')
+    for x in range(168):
+        c = PINO[0] if x % 6 else PINO[2]
+        if x % 6 == 1: c = PINO[3]
+        L.vl(x, 0, 99, c)
+    for y in range(0, 100, 3):
+        for x in range(2 + (y // 3) % 4, 168, 23): L.p(x, y, PINO[1])                         # las vetas
+    L.r(56, 0, 56, 3, '#f4f0d8'); L.hl(60, 107, 3, '#e8dcb8'); L.hl(64, 103, 4, '#dccc9e')    # la luz de la ventana de tejado
+    L.r(0, 0, 168, 2, '#4e341e'); L.r(0, 96, 168, 4, '#4e341e'); L.hl(0, 167, 96, '#7a5432')  # las vigas
+    for x in (2, 162):                                                                         # los montantes perforados
+        L.r(x, 2, 4, 94, '#5a646e'); L.vl(x, 2, 95, '#8c98a2'); L.vl(x + 3, 2, 95, '#3a4048')
+        for y in range(6, 94, 5): L.p(x + 1, y, '#2a2e34'); L.p(x + 2, y, '#2a2e34')
+    for y in (37, 83):                                                                         # las baldas de chapa
+        L.r(4, y, 160, 4, '#7e8a94'); L.hl(4, 163, y, '#b4bec6'); L.hl(4, 163, y + 3, '#3a4048')
+        L.hl(6, 161, y + 4, '#6e5434')                                                         # su sombra en la pared
+    return L
+
+def higro():
+    """el icono de la humedad (7 × 7): una gota"""
+    L = Lienzo(7, 7)
+    L.p(3, 0, '#4e9ad8'); L.hl(2, 4, 1, '#4e9ad8'); L.hl(1, 5, 2, '#4e9ad8'); L.r(1, 3, 5, 3, '#4e9ad8'); L.hl(2, 4, 6, '#2e6aa0')
+    L.p(2, 3, '#b4dcfa'); L.p(2, 4, '#8ec0ec')
+    L.contorno(K)
     return L
 
 def etiqueta():
@@ -171,8 +202,8 @@ VACIO = '#2a343a'
 def azar_px(x, y, sem=0): return (x * 73 + y * 151 + x * y * 7 + sem * 977) % 97
 NIV = (1, 2, 3, 4)
 
-def cogollos(n, pelado, s):
-    W, H = 16 * s, 20 * s
+def cogollos(n, pelado, s, W=None, H=None):
+    W, H = W or 16 * s, H or 20 * s
     L = Lienzo(W, H); L.r(0, 0, W, H, VACIO)
     alto = round(H * n / 4)                                                                    # hasta dónde llegan
     r = 3.4 * s
@@ -360,6 +391,10 @@ for g, s in (('', 1), ('-g', 2)):
         for p in ('p', 's'): sale('alm-cog-%s-%d%s' % (p, n, g), cogollos(n, p == 'p', s))
         for t in ('rosin', 'rosin-cu', 'seco', 'ice', 'charas', 'hash', 'moon', 'stat'): sale('alm-x-%s-%d%s' % (t, n, g), extracto(t, n, s))
 for n in ('thc', 'cu', 'mc', 'g', 'eur'): sale('alm-ic-' + n, icono(n))
+sale('alm-ic-hr', higro())
+sale('alm-camarote', camarote()); sale('alm-tarro-xl', tarro(LATON, 22, 31)); sale('alm-tarro-xl-s', tarro(ORO, 22, 31)); sale('alm-mas-xl', mas(22, 31))
+for n in NIV:
+    for p in ('p', 's'): sale('alm-cog-%s-%d-xl' % (p, n), cogollos(n, p == 'p', 1, 20, 26))
 for n in ('alm-tarro', 'alm-tarro-s', 'alm-bote', 'alm-mas', 'alm-fajo', 'alm-etiqueta'): sale(n + '-g', doble(SAL[n]))
 
 def escribe(raiz=None):

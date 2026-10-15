@@ -249,7 +249,7 @@ func talk_kiko():
 	for p in S.pots:
 		if p:
 			alguna = true
-	if S.seeds.is_empty() and not alguna and not total_buds() and not total_rosin() and not caja_g() and not nevera_r() and S.money + caja_e() < 15:   # lo de la caja y la nevera también cuenta (1.10; 1.36: sin arcón)
+	if S.seeds.is_empty() and not alguna and not total_buds() and not total_rosin() and not caja_g() and not cam_g() and not nevera_r() and S.money + caja_e() < 15:   # lo de la caja y la nevera también cuenta (1.10; 1.36: sin arcón)
 		await say("¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.", N)
 		add_seeds("ria", 2)
 		await got("2 semillas de SKUNK #1")
@@ -1395,9 +1395,10 @@ func raid_event():
 	music("redada")
 	sfx("bad")
 	await say("REDADA. La policía entra en tu piso con una orden de registro.")
-	var casa: bool = S.map == "home"
+	var casa: bool = S.map == "home" or S.map == "camarote"
 	var ne: int = S.esquejes.size() + S.bandejas.size()
-	var g := int(floor(total_buds() if casa else 0.0))   # lo de encima y la nevera (1.36; la caja fuerte, no)
+	var gc := int(floor(cam_g()))   # 1.43.6: el camarote no está escondido: se lo llevan
+	var g := int(floor(total_buds() if casa else 0.0)) + gc   # lo de encima y la nevera (1.36; la caja fuerte, no)
 	var ro: float = (total_rosin() if casa else 0.0) + nevera_r()
 	var hs := huecos()
 	var npl := 0
@@ -1434,6 +1435,8 @@ func raid_event():
 		S.rosin = {}
 	if S.get("nevera") != null:
 		S.nevera.rosin = {}
+	if gc:
+		S.cam.buds = {}
 	S.esquejes = []
 	S.bandejas = []
 	S.heat = D.CALOR_REDADA
@@ -1445,7 +1448,7 @@ func raid_event():
 	if ne:
 		lo.append("los esquejes" if ne > 1 else "el esqueje")
 	if g:
-		lo.append("%d g" % g)
+		lo.append(("%d g (%d del camarote)" % [g, gc]) if gc else "%d g" % g)
 	if ro:
 		lo.append(rosin_txt(ro))
 	await say("%s. Multa: %s%s." % [("Se llevan " + _lista(lo)) if lo.size() else "No encuentran nada que llevarse", Datos.eur(multa), (" (pagas %s: no tienes más)" % Datos.eur(fine)) if fine < multa else ""])
@@ -5348,6 +5351,15 @@ func por_thc(L: Dictionary) -> Array:
 
 func items_almacen(t: String) -> Array:
 	var o := []
+	if t == "cam":   # 1.43.6: el camarote, GUARDAR y los tarros de 10 L (CAMAROTE.tarro g cada uno)
+		o.append({"k": "+"})
+		var tc := float(D.CAMAROTE.tarro)
+		for l in por_thc(cam().get("buds", {})):
+			var g: float = floor(l[1].g)
+			var nt: int = maxi(1, ceili(g / tc - 1e-9))
+			for q in nt:
+				o.append({"k": l[0], "b": l[1], "r": 0, "q": q, "n": nt, "gj": g - tc * (nt - 1) if q == nt - 1 else tc})
+		return o
 	if t == "caja":
 		o.append({"k": "$"})
 		o.append({"k": "+"})   # GUARDAR, el primer tarro (vacío)
@@ -5378,7 +5390,11 @@ func mueve_almacen(A: Dictionary, b: String) -> bool:
 		return false
 	var j := i
 	var F := int(D.ALM.fila)
-	if A.t == "caja":
+	if A.t == "cam":   # 1.43.6: seis por balda
+		var FC := int(D.CAMAROTE.est.tarros)
+		j = i + {"left": -1, "right": 1, "up": -FC, "down": FC}.get(b, 0)
+		j = maxi(0, mini(nn - 1, j))
+	elif A.t == "caja":
 		if b == "left":
 			j = i - 1
 		elif b == "right":
@@ -5419,6 +5435,16 @@ func _pct_txt(p: float) -> String:
 func desc_almacen(A: Dictionary) -> String:
 	var its := items_almacen(A.t)
 	var it = its[A.i] if A.i < its.size() else null
+	if A.t == "cam":   # 1.43.6
+		var CM: Dictionary = D.CAMAROTE
+		var so: float = float(cam().get("sob", 0))
+		var sob_t := ("Sobres de humedad: %d (uno por tarro, %d días)." % [ceili(so - 1e-9), int(CM.dura)]) if so > 0 else "Sin sobres de humedad: lo curado no se afina."
+		if it == null or it.k == "+":
+			return "GUARDAR: llevas %s de cogollos y en el camarote caben %s más (%d tarros de 10 L). %s\nA: guardar · B: cerrar." % [g_txt(total_buds()), g_txt(maxf(0, cam_cap() - cam_g())), cam_est() * int(CM.est.tarros), sob_t]
+		var tj: String = (" en %d tarros (este, el %d.º: %d g)" % [int(it.n), int(it.q) + 1, int(it.gj)]) if int(it.n) > 1 else ""
+		var af := float(it.b.get("af", 0))
+		return "%s: %d g%s · %s %% THC%s%s.\nA: sacarlo · B: cerrar." % [lot_nombre(it.k), int(floor(it.b.g)), tj, Datos.pct(it.b.thc), cura_corto(it.b),
+			(" · afinada al 62 %%" if af >= 1 else (" · afinándose (%d %%)" % Datos.jsround(af * 100))) if af else ""]
 	if A.t == "caja":
 		var C: Dictionary = D.CAJA[int(S.caja.nivel)]
 		var g := caja_g()
@@ -5460,7 +5486,7 @@ func elegir_almacen(t: String, i0 := 0):
 		return r
 	var nn := items_almacen(t).size()
 	ALMACEN = {"t": t, "i": maxi(0, mini(nn - 1, i0))}
-	var N := "CAJA FUERTE" if t == "caja" else "NEVERA"
+	var N := "CAJA FUERTE" if t == "caja" else "CAMAROTE" if t == "cam" else "NEVERA"
 	_dlg_fijo(desc_almacen(ALMACEN), N)
 	var pr := Motor.Prom.new()
 	push(func(b: String):
@@ -5490,11 +5516,11 @@ func elegir_almacen(t: String, i0 := 0):
 # de 1 a 4 cuartos de f (0-1), sobre el color c (el de la variedad, que asoma por los cogollos) o, en los botes, el v de detrás
 # del cristal (en la nevera, el blanco); encima, el cristal y la tapa (spr: alm-tarro, alm-tarro-s o alm-bote; -g al doble) y la
 # etiqueta de papel con el sello verde del curado (1.36.1; 1.36.2: cada cosa, como es)
-func _tarro(o: Array, x: int, y: int, w: int, h: int, c: String, f: float, cu: bool, spr: String, den: String, k := 1, v := "#2a343a") -> void:
+func _tarro(o: Array, x: int, y: int, w: int, h: int, c: String, f: float, cu: bool, spr: String, den: String, k := 1, v := "#2a343a", suf := "") -> void:
 	var g := "-g" if k > 1 else ""
 	var n := clampi(int(ceil(f * 4.0 - 1e-9)), 1, 4)
 	o.append([x + k, y + 4 * k, (w - 2) * k, (h - 5) * k, c if w >= 14 else v])
-	o.append(["@", den + "-" + str(n) + g, x + k, y + 4 * k])
+	o.append(["@", den + "-" + str(n) + g + suf, x + k, y + 4 * k])   # suf: «-xl», lo de dentro de los tarros de 10 L (1.43.6)
 	o.append(["@", spr + g, x, y])
 	if w >= 14:
 		var yl: int = y + Datos.jsround(h / 2.0) * k
@@ -5530,6 +5556,19 @@ func panel_almacen(o: Array, A: Dictionary, px: int, py: int) -> void:
 	o.append(["@", "alm-panel", px, py])
 	if it == null:
 		return
+	if A.t == "cam":   # 1.43.6: el tarro de 10 L y sus barras (lo afinado, con la gota)
+		var so: float = float(cam().get("sob", 0))
+		if it.k == "+":
+			o.append(["@", "alm-mas-xl", px + 19, py + 16])
+			_barra_alm(o, px, py, 0, "g", peso_encima() / cap_mochila(), "#e0a040")
+			_barra_alm(o, px, py, 1, "cu", cam_g() / maxf(1.0, cam_cap()), "#d8b048")
+			_barra_alm(o, px, py, 2, "hr", minf(1.0, so / float(maxi(1, cam_tarros()))), "#4e9ad8")
+			return
+		_tarro(o, px + 19, py + 16, 22, 31, _color_lote(it.k), float(it.gj) / float(D.CAMAROTE.tarro), float(it.b.get("cu", 0)) >= 1, "alm-tarro-xl-s" if it.k.contains("*") else "alm-tarro-xl", _dentro_lote(it.k, it.b), 1, "#2a343a", "-xl")
+		_barra_alm(o, px, py, 0, "thc", it.b.thc / 30.0, "#e8d070")
+		_barra_alm(o, px, py, 1, "cu", float(it.b.get("cu", 0)), "#58c070")
+		_barra_alm(o, px, py, 2, "hr", float(it.b.get("af", 0)), "#4e9ad8")
+		return
 	var caja: bool = A.t == "caja"
 	var C: Dictionary = D.CAJA[int(S.caja.nivel)] if caja else {}
 	if it.k == "$":
@@ -5562,6 +5601,33 @@ func rects_almacen(A: Dictionary) -> Array:
 	var o := []
 	var it := items_almacen(A.t)
 	var F := int(D.ALM.fila)
+	if A.t == "cam":   # 1.43.6: el camarote (168 × 100), seis tarros de 10 L por balda y dos baldas a la vista
+		var FC := int(D.CAMAROTE.est.tarros)
+		var x0: int = (SW - 232) >> 1
+		var y0 := 4
+		o.append(["@", "alm-camarote", x0, y0])
+		var fila0: int = 0 if A.i < FC else int(floor(float(A.i) / FC)) - 1
+		for f in 2:
+			var y: int = y0 + 6 + f * 46
+			for c in FC:
+				var q: int = (fila0 + f) * FC + c
+				if q >= it.size():
+					continue
+				var Jt: Dictionary = it[q]
+				var x: int = x0 + 7 + c * 26
+				if Jt.k == "+":
+					o.append(["@", "alm-mas-xl", x, y])
+				else:
+					_tarro(o, x, y, 22, 31, _color_lote(Jt.k), float(Jt.gj) / float(D.CAMAROTE.tarro), float(Jt.b.get("cu", 0)) >= 1, "alm-tarro-xl-s" if Jt.k.contains("*") else "alm-tarro-xl", _dentro_lote(Jt.k, Jt.b), 1, "#2a343a", "-xl")
+				if q == A.i:
+					_marco(o, x - 2, y - 2, 26, 35)
+		if fila0 > 0:
+			o.append_array([[x0 + 160, y0 + 3, 2, 1, "#f8d040"], [x0 + 159, y0 + 4, 4, 1, "#f8d040"]])
+		if it.size() > (fila0 + 2) * FC:
+			o.append_array([[x0 + 159, y0 + 88, 4, 1, "#f8d040"], [x0 + 160, y0 + 89, 2, 1, "#f8d040"]])
+		o.append_array([[x0 + 8, y0 + 89, 140, 5, "#2a2d34"], [x0 + 9, y0 + 90, Datos.jsround(138 * minf(1.0, cam_g() / maxf(1.0, cam_cap()))), 3, "#d8b048"]])
+		panel_almacen(o, A, x0 + 172, y0)
+		return o
 	if A.t == "caja":
 		var C: Dictionary = D.CAJA[int(S.caja.nivel)]
 		var x0: int = (SW - 232) >> 1
@@ -5640,6 +5706,9 @@ func _hueco_alm(caja: bool) -> float:
 	return floor(D.CAJA[int(S.caja.nivel)].g - caja_g()) if caja else floor((nevera_cap() - nevera_r()) * 10 + 1e-9) / 10.0
 
 func guardar_almacen(t: String):
+	if t == "cam":   # 1.43.6: el camarote, como la caja
+		await _guardar_cam()
+		return
 	var caja := t == "caja"
 	var L := bud_lots(1) if caja else rosin_lots(.1)
 	var de: Dictionary = S.buds if caja else S.rosin
@@ -5688,6 +5757,65 @@ func guardar_almacen(t: String):
 	else:
 		mover_rosin(de, a, k, g)
 	sfx("sel")
+
+func _guardar_cam():
+	var L := bud_lots(1)
+	var hueco := func() -> float: return floor(cam_cap() - cam_g())
+	if L.is_empty():
+		await say("No llevas cogollos encima.")
+		return
+	if hueco.call() < 1:
+		await say("En el camarote no caben más tarros: pide otra estantería en la tienda online." if cam_est() < int(D.CAMAROTE.est.max) else "El camarote está lleno.")
+		return
+	var j: int = await ask("¿Qué guardas en el camarote?", ["Todos los cogollos", "Un lote", "Nada"])
+	if j == 0:
+		var q := 0.0
+		for l in L:
+			var g: float = minf(l[1].g, hueco.call())
+			if g < 1:
+				break
+			q += g
+			mover_lote(S.buds, S.cam.buds, l[0], g)
+		sfx("sel")
+		await say("Guardas %s en los tarros del camarote.%s" % [g_txt(q), " No cabe todo: el resto se queda fuera." if total_buds() >= 1 else ""])
+		return
+	if j != 1:
+		return
+	var its := L.map(lot_item)
+	its.append({"label": "Nada"})
+	var i: int = await menu(its, {"cls": "right", "title": "¿Qué guardas?"})
+	if i < 0 or i >= L.size():
+		return
+	var k: String = L[i][0]
+	var g = await cuanto("%s: ¿cuánto?" % lot_nombre(k), minf(floor(L[i][1].g), hueco.call()), [10, 50, 100, 500, 1000], func(v): return g_txt(v))
+	if not g:
+		return
+	mover_lote(S.buds, S.cam.buds, k, g)
+	sfx("sel")
+
+# el camarote (1.43.6): las estanterías de tarros de 10 L; GUARDAR el primero y, en los demás, sacar un lote
+func camarote_action():
+	if cam_est() == 0:
+		await say("Aquí van las estanterías de los tarros de 10 L. Se piden en la tienda online.")
+		return
+	if not (S.cam.get("buds") is Dictionary):
+		S.cam.buds = {}
+	var i := 0
+	while true:
+		var e = await elegir_almacen("cam", i)
+		if e == null:
+			return
+		i = e.i
+		if e.k == "+":
+			await guardar_almacen("cam")
+			continue
+		var g: float = minf(floor(e.b.g * 10) / 10.0, floor(libre_mochila()))
+		if g < 1:
+			await say("No te cabe nada más encima.")
+			continue
+		mover_lote(S.cam.buds, S.buds, e.k, g)
+		sfx("sel")
+		await say("Sacas %s de %s." % [g_txt(g), lot_nombre(e.k)])
 
 # la nevera (1.36): en la vista, GUARDAR arriba y, en los pisos, sacar un extracto
 func nevera_action():

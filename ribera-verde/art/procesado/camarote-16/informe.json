@@ -1,0 +1,19 @@
+{
+  "grupo": "camarote-16",
+  "celda": [
+    16,
+    16
+  ],
+  "tope_colores": 32,
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 34.7,
+  "distancia_media": 0,
+  "colores_finales": 10,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}
