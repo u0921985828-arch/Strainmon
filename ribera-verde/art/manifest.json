@@ -9264,6 +9264,82 @@
     "deshumC": "exacto"
    },
    "descripcion": "1.43.6: el deshumidificador del camarote."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bajo.py",
+   "notas": "1.44, pedido por el usuario: «los sprites y todo para crear el piso bajo, donde se cultivan, se secan, almacenan y se crean microdosis y comestibles».",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "bajo-alto",
+   "celda": "objeto_alto",
+   "estilo_ref": "los muebles a escala del piso (props-escala)",
+   "cubre": [
+    "obj:armS",
+    "obj:mesaS"
+   ],
+   "ajuste_por_sprite": {
+    "armS-0-0-0": "exacto",
+    "armS-0-0-1": "exacto",
+    "armS-0-0-2": "exacto",
+    "armS-0-1-0": "exacto",
+    "armS-0-1-1": "exacto",
+    "armS-0-1-2": "exacto",
+    "armS-0-2-0": "exacto",
+    "armS-0-2-1": "exacto",
+    "armS-0-2-2": "exacto",
+    "armS-1-0-0": "exacto",
+    "armS-1-0-1": "exacto",
+    "armS-1-0-2": "exacto",
+    "armS-1-1-0": "exacto",
+    "armS-1-1-1": "exacto",
+    "armS-1-1-2": "exacto",
+    "armS-1-2-0": "exacto",
+    "armS-1-2-1": "exacto",
+    "armS-1-2-2": "exacto",
+    "armS-2-0-0": "exacto",
+    "armS-2-0-1": "exacto",
+    "armS-2-0-2": "exacto",
+    "armS-2-1-0": "exacto",
+    "armS-2-1-1": "exacto",
+    "armS-2-1-2": "exacto",
+    "armS-2-2-0": "exacto",
+    "armS-2-2-1": "exacto",
+    "armS-2-2-2": "exacto",
+    "mesaS-0-0": "exacto",
+    "mesaS-0-1": "exacto",
+    "mesaS-1-0": "exacto",
+    "mesaS-1-1": "exacto"
+   },
+   "descripcion": "1.44: el armario de almacén del bajo (botes, microdosis y bombones por lo lleno) y la mesa de trabajo (encapsuladora y moldes)."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bajo.py",
+   "notas": "1.44, pedido por el usuario: «los sprites y todo para crear el piso bajo, donde se cultivan, se secan, almacenan y se crean microdosis y comestibles».",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "bajo-16",
+   "celda": "objeto_1x1",
+   "estilo_ref": "props-16",
+   "cubre": [
+    "obj:deshidS"
+   ],
+   "ajuste_por_sprite": {
+    "deshidS-0": "exacto",
+    "deshidS-1": "exacto"
+   },
+   "descripcion": "1.44: el deshidratador del bajo, apagado o con setas."
   }
  ],
  "familias": {

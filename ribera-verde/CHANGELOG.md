@@ -1,5 +1,23 @@
 # Cambios
 
+## 1.44.0 · 15 de octubre de 2026
+
+El bajo de las setas entero (lo pidió el usuario: «los sprites y todo para crear el piso bajo, donde se cultivan, se secan, almacenan y se crean microdosis y comestibles»). Solo Godot (0.38.0), con `Datos.CAL`. Nada de método ni de dosis: lotes y cajas, como el resto del bajo.
+
+- **Muebles nuevos** (`montar_setas`, `SETAS_PRO.x`), dibujados a mano en `tools/sprites/a-mano/bajo.py`:
+  - el armario de almacén (3, 2), con sus tres baldas a la vista según lo lleno (`armS-<b>-<m>-<c>`);
+  - la mesa de trabajo (7, 5), con la báscula y, si las tienes, la encapsuladora y los moldes (`mesaS-<e>-<m>`);
+  - el deshidratador (8, 2), con setas y el piloto cuando está secando (`deshidS-<0|1>`).
+- **Secar:** lo que recoges se tiende a secar (`S.setas.fr`).
+  - En la malla del secadero tarda 3 días; con el deshidratador (90 €, de Txomin), 1.
+  - Seco, pasa al armario al amanecer (`secar_setas`). El secadero y el deshidratador dicen cuánto se seca y qué día pasa.
+- **Almacenar:** A en el armario lo abre por dentro (`vista_armario`, `rects_armario`): los botes de setas secas (uno por cada 50 g), las cajitas de microdosis y las cajas de comestibles.
+- **La mesa de trabajo:**
+  - con la encapsuladora (120 €), un lote de 10 g secos hace una caja de microdosis (1 h);
+  - con los moldes (45 €), el lote más 6 € de chocolate hace una caja de comestibles (1 h 30).
+- **Vender:** Txomin, en la puerta, compra las cajas: 140 € la de microdosis y 150 € la de comestibles. Sube el calor 2 por caja, y la redada se lo lleva todo.
+- Prueba nueva `tests/bajo.gd` (45 comprobaciones; con `--pintar`, el bajo amueblado y el armario por dentro).
+
 ## 1.43.9 · 15 de octubre de 2026
 
 El bajo de las setas a la vista (lo pidió el usuario: «que puedas entrar al bajo y veas las setas crecer»). Como el carro de esquejes, ya no es un menú. Solo Godot (0.37.9), con `Datos.CAL`.

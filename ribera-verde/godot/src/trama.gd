@@ -4076,8 +4076,17 @@ func obj_local(x: int, y: int, o) -> bool:
 				else:
 					await say("El pulverizador de mochila de Txomin. Con él se tienen húmedas las bandejas.")
 				return true
-			"secaS":
-				txt = ("En el secadero, %s de setas secas. Txomin te las compra en la puerta." % g_txt(S.setas.g)) if S.setas.g >= 1 else "El secadero está vacío. Lo que recojas se seca aquí."
+			"secaS", "deshidS":
+				if Datos.CAL:   # 1.44: lo que se seca, y cuándo pasa al armario
+					txt = txt_secando(o)
+				else:
+					txt = ("En el secadero, %s de setas secas. Txomin te las compra en la puerta." % g_txt(S.setas.g)) if S.setas.g >= 1 else "El secadero está vacío. Lo que recojas se seca aquí."
+			"armS":   # 1.44: el armario de almacén, por dentro
+				await vista_armario()
+				return true
+			"mesaS":   # 1.44: la mesa de trabajo
+				await mesa_setas()
+				return true
 			"tuboS":
 				txt = "Una tubería vieja que suda. Por eso aquí la humedad nunca baja."
 			"crate":
@@ -4137,7 +4146,15 @@ func talk_gente_club(k: String, j: int):
 # las madres, con las que tenga; los demás, con estilo, el de su club (estiloLocal)
 func sprite_local(o: String) -> String:
 	if o == "secaS":
+		if Datos.CAL:   # 1.44: con setas tendidas mientras se secan en la malla (sin deshidratador)
+			return "secaS-%d" % (1 if S.get("setas") != null and not S.setas.get("dh") and S.setas.get("fr", []).size() else 0)
 		return "secaS-%d" % (1 if S.get("setas") != null and S.setas.g >= 1 else 0)
+	if o == "deshidS":
+		return "deshidS-%d" % (1 if S.get("setas") != null and S.setas.get("fr", []).size() else 0)
+	if o == "armS":
+		return "armS-%d-%d-%d" % [lleno_arm("g"), lleno_arm("mc"), lleno_arm("cc")]
+	if o == "mesaS":
+		return "mesaS-%d-%d" % [1 if S.get("setas") != null and S.setas.get("enc") else 0, 1 if S.get("setas") != null and S.setas.get("mol") else 0]
 	if o == "carpaM":
 		return "carpaM-%d" % (S.nave.ma.size() if S.get("nave") != null and S.nave.has("ma") else 0)
 	if o == "clonN":   # 1.43: el carro de bandejas de la nave, por lo lleno
@@ -5212,6 +5229,8 @@ func setas_dia() -> void:
 		S.setas = null
 		queue("setas", func(): await talk("SMS · TXOMIN", ["No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí."]))
 		return
+	if Datos.CAL:
+		secar_setas()   # 1.44: lo seco, al armario
 	var vivas: Array = L.bandejas.filter(func(b): return not b.get("mala"))
 	if vivas.is_empty():
 		return
@@ -5305,6 +5324,18 @@ func bajo_menu(T: String) -> void:
 			ops.append("Tirar las malas")
 		if T != "" and L.g >= 1:
 			ops.append("Venderle " + g_txt(L.g))
+		if T != "" and Datos.CAL:   # 1.44: el equipo del bajo y lo que haces en la mesa
+			var ZP: Dictionary = D.SETAS_PRO
+			if L.get("mc", 0):
+				ops.append("Microdosis: %d %s" % [L.mc, "caja" if L.mc == 1 else "cajas"])
+			if L.get("cc", 0):
+				ops.append("Comestibles: %d %s" % [L.cc, "caja" if L.cc == 1 else "cajas"])
+			if not L.get("dh"):
+				ops.append("Deshidratador (%s)" % Datos.eur(ZP.deshid))
+			if not L.get("enc"):
+				ops.append("Encapsuladora (%s)" % Datos.eur(ZP.encap))
+			if not L.get("mol"):
+				ops.append("Moldes (%s)" % Datos.eur(ZP.moldes))
 		if T != "":
 			ops.append("Dejar el bajo")
 		ops.append("Nada")
@@ -5336,13 +5367,42 @@ func bajo_menu(T: String) -> void:
 				else:
 					g += ri(int(Z.g[0]), int(Z.g[1]))
 			L.bandejas = quedan
-			L.g += g
 			sfx("get")
-			await say("Recoges las setas y las dejas secando en el bajo: %d g." % g)
+			if Datos.CAL:   # 1.44: frescas, a secar; secas, al armario (secar_setas)
+				L.fr = L.get("fr", []) + [{"g": g, "d": S.day}]
+				await say("Recoges %d g de setas y las tiendes en %s: en %s, al armario." % [g, "el deshidratador" if L.get("dh") else "la malla del secadero", "un día" if dias_secar(L) == 1 else "%d días" % dias_secar(L)])
+			else:
+				L.g += g
+				await say("Recoges las setas y las dejas secando en el bajo: %d g." % g)
 		elif op == "Tirar las malas":
 			var k: int = B.filter(func(b): return b.get("mala")).size()
 			L.bandejas = B.filter(func(b): return not b.get("mala"))
 			await say(("Tiras %d bandejas." % k) if k > 1 else "Tiras la bandeja.")
+		elif op.begins_with("Microdosis:") or op.begins_with("Comestibles:"):
+			var kk: String = "mc" if op.begins_with("Micro") else "cc"
+			var nn: int = int(L[kk])
+			var e: int = nn * int(D.SETAS_PRO.p[kk])
+			L[kk] = 0
+			S.money += e
+			S.sales += e
+			S.heat = min(100, S.heat + D.SETAS_PRO.calor * nn)
+			sfx("coin")
+			toast("+%s · %d %s de %s" % [Datos.eur(e), nn, "caja" if nn == 1 else "cajas", "microdosis" if kk == "mc" else "comestibles"], 1600)
+			await say("Esto se mueve solo. %s." % Datos.eur(e), T)
+			await check_story()
+		elif op.begins_with("Deshidratador") or op.begins_with("Encapsuladora") or op.begins_with("Moldes"):
+			var kk: String = "dh" if op.begins_with("Desh") else ("enc" if op.begins_with("Enc") else "mol")
+			var pz: int = int(D.SETAS_PRO[{"dh": "deshid", "enc": "encap", "mol": "moldes"}[kk]])
+			if S.money < pz:
+				sfx("bad")
+				await say("Sin %s no hay trato." % Datos.eur(pz), T)
+				continue
+			S.money -= pz
+			L[kk] = true
+			sfx("coin")
+			await say({"dh": "Te lo bajo yo y lo enchufo junto al secadero: lo que recojas, seco en un día.",
+				"enc": "La encapsuladora, en la mesa de trabajo. Con setas secas del armario, cajas de microdosis.",
+				"mol": "Los moldes y el chocolate, en la mesa de trabajo. Con setas secas del armario, cajas de comestibles."}[kk], T)
 		elif op.begins_with("Venderle"):
 			var g: int = int(floor(L.g))
 			var e: int = g * int(Z.precio)
@@ -6458,6 +6518,148 @@ func rects_bajo(V: Dictionary) -> Array:
 		o.append_array([[px + 6, y0 + 76, 48, 4, "#0e0e12"], [px + 6, y0 + 76, Datos.jsround(48 * Z.colon / tot), 4, "#3a3830"],
 			[px + 6, y0 + 76, Datos.jsround(48 * fp), 4, "#8a5a3a" if e.get("mala") else ("#e8e0d0" if fp < Z.colon / tot else "#c89060")]])
 		o.append([px + 6 + Datos.jsround(48 * Z.colon / tot), y0 + 75, 1, 6, "#f0eee6"])
+	return o
+
+# ---------- el bajo entero (1.44, lo pidió el usuario: «donde se cultivan, se secan, almacenan y se crean microdosis y comestibles») ----
+# Lo recogido se tiende a secar (S.setas.fr: [{g, d}]) en la malla (SETAS_PRO.seca días) o en el deshidratador (sech); seco, pasa al
+# armario (S.setas.g, al amanecer en setas_dia). En la mesa de trabajo, con la encapsuladora (enc) o los moldes (mol), un lote de
+# SETAS_PRO.lote g secos hace una caja de microdosis (mc) o de comestibles (cc); Txomin lo compra en la puerta. Nada de método ni de
+# dosis: cajas y lotes. La redada (setas_dia) se lo lleva todo.
+var ARM_V = null   # {}: el armario abierto
+
+func dias_secar(L: Dictionary) -> int:
+	return int(D.SETAS_PRO.sech if L.get("dh") else D.SETAS_PRO.seca)
+
+func secar_setas() -> int:
+	var L = S.get("setas")
+	if L == null or not L.has("fr"):
+		return 0
+	var q := []
+	var g := 0
+	for f in L.fr:
+		if int(S.day - f.d) >= dias_secar(L):
+			g += int(f.g)
+		else:
+			q.append(f)
+	L.fr = q
+	L.g += g
+	return g
+
+func txt_secando(o: String) -> String:
+	var L: Dictionary = S.setas
+	var dh: bool = L.get("dh", false)
+	if o == "secaS" and dh:
+		return "La malla del secadero, sin usar: ahora secas en el deshidratador."
+	var fr: Array = L.get("fr", [])
+	var nm: String = "el deshidratador" if o == "deshidS" else "la malla del secadero"
+	if fr.is_empty():
+		return "%s está %s. Lo que recojas se seca aquí y pasa al armario." % [nm[0].to_upper() + nm.substr(1), "vacío" if o == "deshidS" else "vacía"]
+	var g := 0
+	var d: int = 1 << 30
+	for f in fr:
+		g += int(f.g)
+		d = mini(d, int(f.d) + dias_secar(L))
+	return "En %s, %s de setas secándose; las primeras pasan al armario el %s." % [nm, g_txt(g), Datos.fd(d, S.day)]
+
+# lo lleno de cada piso del armario: 0 vacío, 1 a medias, 2 lleno (SETAS_PRO.lleno)
+func lleno_arm(k: String) -> int:
+	if S.get("setas") == null:
+		return 0
+	var v: float = float(S.setas.get(k, 0))
+	var u: Array = D.SETAS_PRO.lleno[k]
+	return 0 if v < float(u[0]) else (1 if v < float(u[1]) else 2)
+
+func mesa_setas() -> void:
+	var Z: Dictionary = D.SETAS_PRO
+	while S.get("setas") != null:
+		var L: Dictionary = S.setas
+		var ops := []
+		if L.get("enc"):
+			ops.append("Microdosis (%d g)" % int(Z.lote))
+		if L.get("mol"):
+			ops.append("Comestibles (%d g + %s)" % [int(Z.lote), Datos.eur(Z.choco)])
+		if ops.is_empty():
+			await say("La mesa de trabajo, con la báscula. Para las microdosis falta la encapsuladora y para los comestibles, los moldes: te los consigue Txomin, en la puerta.")
+			return
+		ops.append("Nada")
+		var oi: int = await ask("La mesa de trabajo. En el armario, %s de setas secas." % g_txt(L.g), ops)
+		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+		if op == "" or op == "Nada":
+			return
+		var mc: bool = op.begins_with("Micro")
+		if L.g < Z.lote:
+			sfx("bad")
+			await say("Hacen falta %d g de setas secas del armario." % int(Z.lote))
+			continue
+		if not mc and S.money < Z.choco:
+			sfx("bad")
+			await say("Sin %s no hay chocolate." % Datos.eur(Z.choco))
+			continue
+		L.g -= Z.lote
+		if not mc:
+			S.money -= int(Z.choco)
+		var kk: String = "mc" if mc else "cc"
+		L[kk] = int(L.get(kk, 0)) + 1
+		advance_time(int(Z.min[kk]))
+		update_hud()
+		sfx("get")
+		await say("Llenas las cápsulas con la encapsuladora y cierras la cajita: una caja de microdosis, al armario." if mc else "Fundes el chocolate, llenas los moldes y, cuando enfría, los encajas: una caja de comestibles, al armario.")
+
+func desc_armario() -> String:
+	var L: Dictionary = S.setas
+	var fr: Array = L.get("fr", [])
+	var g := 0
+	for f in fr:
+		g += int(f.g)
+	return "Setas secas: %s · microdosis: %d · comestibles: %d.%s\nB: cerrar." % [g_txt(L.g), int(L.get("mc", 0)), int(L.get("cc", 0)), (" Secándose, %s." % g_txt(g)) if g else ""]
+
+func vista_armario() -> void:
+	if gancho_bajo.is_valid():
+		gancho_bajo.call(-1)
+		return
+	ARM_V = {}
+	_dlg_fijo(desc_armario(), "EL ARMARIO")
+	var pr := Motor.Prom.new()
+	push(func(b: String):
+		if b == "A" or b == "B":
+			pop()
+			pr.res(null))
+	await Motor.espera(pr)
+	ARM_V = null
+	if not oraculo:
+		dlg.hide()
+		dlg_nm.hide()
+
+# el armario por dentro: tres baldas de acero; arriba los botes de cristal (uno por cada 50 g), en medio las cajitas de las
+# microdosis y abajo las cajas de los comestibles (hasta lo que cabe a la vista)
+func rects_armario() -> Array:
+	var o := []
+	var L: Dictionary = S.setas if S.get("setas") != null else {}
+	var w := 150
+	var h := 108
+	var x0: int = (SW - w) >> 1
+	var y0 := 4
+	o.append_array([[x0, y0, w, h, "#4a4e56"], [x0 + 2, y0 + 2, w - 4, h - 4, "#2e3036"], [x0, y0, w, 2, "#ccd0d6"], [x0, y0, 2, h, "#a8acb4"]])
+	for j in 3:
+		var sy: int = y0 + 34 + j * 34
+		o.append_array([[x0 + 2, sy - 2, w - 4, 2, "#a8acb4"], [x0 + 2, sy, w - 4, 1, "#4a4e56"]])
+	# los botes: 12 × 18 con la tapa negra y lo seco dentro
+	var nb: int = mini(int(ceil(float(L.get("g", 0)) / 50.0)), 10)
+	for k in nb:
+		var bx: int = x0 + 6 + k * 14
+		var by: int = y0 + 13
+		o.append_array([[bx, by + 2, 12, 17, "#cfe2e6"], [bx + 9, by + 2, 3, 17, "#a6c0c6"], [bx, by, 12, 3, "#2a2a30"],
+			[bx, by + 9, 12, 10, "#8a6a4a"], [bx + 2, by + 10, 2, 2, "#a8865a"], [bx + 6, by + 13, 3, 2, "#6a4a2a"], [bx + 3, by + 16, 2, 2, "#6a4a2a"]])
+	# las cajitas de las microdosis: 9 × 13, blancas con la banda azul
+	for k in mini(int(L.get("mc", 0)), 13):
+		var bx: int = x0 + 5 + k * 11
+		var by: int = y0 + 53
+		o.append_array([[bx, by, 9, 13, "#f0f0ea"], [bx + 7, by, 2, 13, "#c8c8c0"], [bx, by + 3, 9, 2, "#4a7ac0"]])
+	# las cajas de los comestibles: 16 × 9, cartón crema con la tapa de chocolate, de dos en dos
+	for k in mini(int(L.get("cc", 0)), 16):
+		var bx: int = x0 + 6 + (k % 8) * 17
+		var by: int = y0 + 93 - (k / 8) * 10
+		o.append_array([[bx, by, 16, 9, "#e8d8b8"], [bx, by, 16, 2, "#6a3a20"], [bx + 6, by + 4, 4, 2, "#8a4a28"]])
 	return o
 
 # ---------- el calendario y el mapa de la comarca (1.42, lo pidió el usuario; croquis.gd) ----------

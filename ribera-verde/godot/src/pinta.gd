@@ -411,6 +411,9 @@ func _encima() -> void:
 	if J.SETAS_V != null:   # 1.43.9: las baldas del bajo de las setas, a la vista
 		for e in J.rects_bajo(J.SETAS_V):
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
+	if J.ARM_V != null:   # 1.44: el armario del bajo, por dentro
+		for e in J.rects_armario():
+			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.MAPA_V != null:   # 1.42: el mapa de la comarca, un croquis (croquis.gd)
 		var kc := "croquis|%d" % int(J.S.ch)
 		if not cache.has(kc):
@@ -549,7 +552,7 @@ const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadr
 
 # los muebles que dejan sombra en el suelo (1.10 P5, SOMBRA_OBJ de 01b-arte.js): 1 px a cada lado del dibujo en sus 2 últimas filas
 # y la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo; se pintan con todo el suelo ya puesto
-const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "plantDeco", "lab", "lab2", "pc", "display", "counter", "barcounter", "jukebox", "bench", "bedB", "vitrina", "mesita", "barraD", "mesaV", "estanteN", "secadero", "altavoz", "trim", "prensaM", "tamizM", "mallas", "lavadora", "staticM"]
+const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "plantDeco", "lab", "lab2", "pc", "display", "counter", "barcounter", "jukebox", "bench", "bedB", "vitrina", "mesita", "barraD", "mesaV", "estanteN", "secadero", "altavoz", "trim", "prensaM", "tamizM", "mallas", "lavadora", "staticM", "armS", "mesaS"]
 func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var gr = Atlas.cubre("obj:" + o)
 	if not gr:

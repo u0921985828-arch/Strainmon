@@ -749,6 +749,25 @@ func montar_casa() -> void:
 	h.o[int(CM.y)][int(CM.x)] = "escaleraC"
 
 # el camarote por dentro: las estanterías que han llegado, contra la pared de arriba (x 1, 3, 5 y 7)
+# el bajo de las setas entero (1.44, con Datos.CAL): el armario de almacén, la mesa de trabajo y, si se lo has comprado a Txomin,
+# el deshidratador (SETAS_PRO.x); sin Datos.CAL, el bajo de antes
+var _setas0 = null
+func montar_setas() -> void:
+	var m = MAPS.get("setas")
+	if m == null:
+		return
+	if _setas0 == null:
+		_setas0 = m.o.duplicate(true)
+	for y in int(m.h):
+		m.o[y] = _setas0[y].duplicate()
+	if not Datos.CAL:
+		return
+	var X: Dictionary = D.SETAS_PRO.x
+	m.o[int(X.armS[1])][int(X.armS[0])] = "armS"
+	m.o[int(X.mesaS[1])][int(X.mesaS[0])] = "mesaS"
+	if S != null and S.get("setas") is Dictionary and S.setas.get("dh"):
+		m.o[int(X.deshidS[1])][int(X.deshidS[0])] = "deshidS"
+
 func montar_camarote() -> void:
 	var m: Dictionary = MAPS.camarote
 	for i in int(D.CAMAROTE.est.max):
@@ -1165,6 +1184,8 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 		montar_alto()
 	if name_ == "camarote":
 		montar_camarote()
+	if name_ == "setas":
+		montar_setas()
 	montar_club(name_)
 	P.x = x
 	P.y = y
