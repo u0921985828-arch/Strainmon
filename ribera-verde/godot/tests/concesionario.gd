@@ -135,7 +135,11 @@ func _corre() -> void:
 	chk(J.iedmt("berlina") == roundi(34500 / 1.21 * .0475), "IEDMT de la berlina: %d" % J.iedmt("berlina"))
 	chk(J.iedmt("deportivo") == roundi(245000 / 1.21 * .1475), "IEDMT del deportivo: %d" % J.iedmt("deportivo"))
 	chk(J.total_coche("berlina") == 34500 + J.iedmt("berlina") + int(C.gastos), "total")
-	chk(J.seguro_mes("utilitario") == 35, "seguro al mes: %d" % J.seguro_mes("utilitario"))
+	chk(J.seguro_anio("utilitario") == 420, "seguro al año: %d" % J.seguro_anio("utilitario"))
+	for k in C.orden:   # 1.43.2: impuesto de circulación al año y el taller por km, en cifras de verdad
+		var Vk: Dictionary = C.v[k]
+		chk(Vk.ivtm >= 5 and Vk.ivtm <= 300 and Vk.revKm >= 5000 and Vk.revKm <= 20000 and Vk.neuKm >= 10000 and Vk.neuKm <= 50000 and Vk.rev > 0 and Vk.neu > 0, "gastos de %s: %s" % [k, Vk])
+	chk(J.ficha_coche("berlina").contains("Al año") and J.ficha_coche("berlina").contains("Sin billete"), "la ficha con los gastos")
 	# 1 · abre con el capítulo y el dinero, con su SMS; el edificio en el barrio alto, y sin él, el barrio como estaba
 	J.S.flags.erase("conce")
 	J.S.coches = {}
@@ -188,12 +192,15 @@ func _corre() -> void:
 	var tot: int = J.total_coche("utilitario")
 	J.S.banco = 20000
 	t = haz(J.talk_conce, ["Utilitario", "Firmar", "Nada"])
-	chk(J.S.coches.has("utilitario") and int(J.S.money) == 4000 and int(J.S.banco) == 20000 - (tot - 1000) - J.seguro_mes("utilitario"), "comprado: %s %s %s" % [J.S.money, J.S.banco, J.S.coches])
+	chk(J.S.coches.has("utilitario") and int(J.S.money) == 4000 and int(J.S.banco) == 20000 - (tot - 1000) - J.seguro_anio("utilitario"), "comprado: %s %s %s" % [J.S.money, J.S.banco, J.S.coches])
 	chk(int(J.S.coches.utilitario.dia) == 115 and not J.coche_ya("utilitario"), "llega en 5 días")
-	chk(J.recibos().any(func(r): return r[0] == "Seguro · Utilitario" and int(r[1]) == 145 and r[3] == "cuenta"), "el seguro, en los recibos")
-	chk(J.marcas_cal().any(func(x): return x.d == 145 and x.t.contains("Seguro")), "y en el calendario")
+	chk(J.recibos().any(func(r): return r[0] == "Seguro · Utilitario" and int(r[1]) == 115 + 365 and r[3] == "cuenta"), "el seguro, en los recibos, al año")
+	chk(J.recibos().any(func(r): return r[0] == "Impuesto de circulación · Utilitario" and int(r[1]) == 115 and int(r[2]) == 62), "el impuesto de circulación, en los recibos")
+	chk(J.marcas_cal().any(func(x): return x.d == 115 + 365 and x.t.contains("Seguro")), "y en el calendario")
+	var b1: int = int(J.S.banco)
 	t = dia(115)
 	chk(t.contains("matriculado") and J.coche_ya("utilitario"), "entregado: " + t)
+	chk(int(J.S.banco) == b1 - 62 and int(J.S.coches.utilitario.iv) == 115 + 365, "el impuesto, al entregarlo: %s %s" % [J.S.banco, J.S.coches.utilitario])
 	# 4 · de parada en parada: sin esperar al autobús, más rápido, con su gasolina
 	J.S.ch = 5
 	J.enter_map("town", 7, 12, "down")
@@ -203,21 +210,34 @@ func _corre() -> void:
 	chk(tr.min == roundi(25 * .55) and tr.eur == roundi(18 * 5.4 / 100 * 1.6), "tramo: %s" % [tr])
 	Cultivo.fijo = .99   # sin control
 	t = haz(J.parada_action, ["En el utilitario", "Puerto Viejo"])
-	chk(J.S.map == "puerto" and int(J.S.money) == 100 - int(tr.eur), "en coche a Puerto Viejo, de noche: %s %s" % [J.S.map, J.S.money])
+	chk(J.S.map == "puerto" and int(J.S.money) == 100 - int(tr.eur), "en coche a Puerto Viejo, de noche, sin billete: %s %s" % [J.S.map, J.S.money])
+	chk(int(J.S.coches.utilitario.km) == 18 and not t.contains("TALLER"), "los km: %s" % [J.S.coches.utilitario])
+	# 4b · el taller por km: al pasar los 15.000, la revisión; a los 40.000, también los neumáticos
+	J.S.coches.utilitario.km = 14990
+	J.S.banco = 1000
+	J.S.money = 100
+	t = haz(J.parada_action, ["En el utilitario", "Ribera Verde"])
+	chk(int(J.S.coches.utilitario.km) == 15008 and int(J.S.banco) == 1000 - 220 and t.contains("revisión") and not t.contains("neumáticos"), "la revisión: %s %s %s" % [J.S.banco, J.S.coches.utilitario, t])
+	J.S.coches.utilitario.km = 39990
+	J.S.banco = 1000
+	t = haz(J.parada_action, ["En el utilitario", "Puerto Viejo"])
+	chk(int(J.S.banco) == 1000 - 300 and t.contains("neumáticos") and not t.contains("revisión"), "los neumáticos: %s %s" % [J.S.banco, t])
+	J.S.coches.utilitario.km = 18
 	# 5 · control de tráfico: con algo encima y registro, te lo quitan
 	J.S.buds = {"thai": {"g": 20, "thc": 18}}
 	Cultivo.fijo = 0.0
 	t = haz(func(): await J.control_trafico("utilitario"), [])
 	chk(J.total_buds() == 0 and t.contains("requisan"), "control: " + t)
 	Cultivo.fijo = -1
-	# 6 · el seguro, cada 30 días; sin saldo, devuelto y, pasada la gracia, anulado (y entonces, a la grúa en un control)
+	# 6 · el seguro, cada año; sin saldo, devuelto y, pasada la gracia, anulado (y entonces, a la grúa en un control)
 	J.S.banco = 1000
-	t = dia(145)
-	chk(int(J.S.banco) == 1000 - J.seguro_mes("utilitario") and int(J.S.coches.utilitario.r) == 175, "recibo cobrado: %s %s" % [J.S.banco, J.S.coches.utilitario])
+	J.S.coches.utilitario.iv = 999   # el impuesto, aparte (6b)
+	t = dia(480)
+	chk(int(J.S.banco) == 1000 - J.seguro_anio("utilitario") and int(J.S.coches.utilitario.r) == 845, "recibo cobrado: %s %s" % [J.S.banco, J.S.coches.utilitario])
 	J.S.banco = 0
-	t = dia(175)
-	chk(J.S.coches.utilitario.r == 175 and t.contains("devuelto"), "devuelto: " + t)
-	t = dia(175 + int(D.RECIBO.graciaB))
+	t = dia(845)
+	chk(J.S.coches.utilitario.r == 845 and t.contains("devuelto"), "devuelto: " + t)
+	t = dia(845 + int(D.RECIBO.graciaB))
 	chk(J.S.coches.utilitario.get("r") == null and t.contains("anulada"), "anulada: " + t)
 	J.S.money = 0
 	J.S.banco = 5000
@@ -225,11 +245,23 @@ func _corre() -> void:
 	t = haz(func(): await J.control_trafico("utilitario"), [])
 	Cultivo.fijo = -1
 	chk(J.S.coches.utilitario.get("grua") and int(J.S.banco) == 5000 - int(C.sinSeguro) and not J.coches_mios().has("utilitario"), "sin seguro: grúa y multa: " + t)
+	# 6b · el impuesto sin pagar: devuelto y, pasada la gracia, por apremio con recargo
+	J.S.coches.utilitario.iv = int(J.S.day) + 1
+	J.S.banco = 0
+	J.S.money = 0
+	t = dia(int(J.S.day) + 1)
+	chk(t.contains("apremio") and t.contains("devuelto"), "impuesto devuelto: " + t)
+	J.S.money = 500
+	var iv0: int = int(J.S.coches.utilitario.iv)
+	t = dia(iv0 + int(D.RECIBO.graciaB))
+	chk(t.contains("Providencia") and int(J.S.money) == 500 - roundi(62 * 1.2) and int(J.S.coches.utilitario.iv) == iv0 + 365, "apremio: %s %s %s" % [J.S.money, J.S.coches.utilitario, t])
+	J.S.banco = 5000
 	J.enter_map("conce", 14, 5, "up")
 	t = haz(J.talk_conce, ["Asegurar", "Nada"])
-	chk(J.S.coches.utilitario.get("r") == J.S.day + 30 and J.coches_mios().has("utilitario"), "asegurado otra vez: " + t)
+	chk(J.S.coches.utilitario.get("r") == J.S.day + 365 and J.coches_mios().has("utilitario"), "asegurado otra vez: " + t)
 	# 7 · vender: lo que pierde al salir y cada mes
 	J.S.day = 115 + 60
+	J.S.coches.utilitario.iv = 999
 	var v: int = J.valor_coche("utilitario")
 	chk(v == roundi(15900 * (1 - .2 - .012 * 2)), "valor a los dos meses: %d" % v)
 	var b0: int = int(J.S.banco)

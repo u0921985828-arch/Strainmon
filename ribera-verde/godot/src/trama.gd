@@ -6218,8 +6218,8 @@ func iedmt(k: String) -> int:
 func total_coche(k: String) -> int:
 	return int(D.CONCE.v[k].p) + iedmt(k) + int(D.CONCE.gastos)
 
-func seguro_mes(k) -> int:
-	return roundi(float(D.CONCE.v[k].seg) / 12.0)
+func seguro_anio(k) -> int:   # 1.43.2: la póliza, al año
+	return int(D.CONCE.v[k].seg)
 
 # lo que te paga el concesionario por el tuyo: el precio, menos lo que pierde al salir (dep.ya) y cada mes (dep.mes), hasta dep.min
 func valor_coche(k: String) -> int:
@@ -6231,8 +6231,9 @@ func valor_coche(k: String) -> int:
 func ficha_coche(k: String) -> String:
 	var V: Dictionary = D.CONCE.v[k]
 	var ie := iedmt(k)
-	return "%s\n%s l/100 km · %d g CO2/km · seguro %s al año. Total %s (matriculación %s, gastos %s). Entrega en %d días." % [V.d, Datos.coma(V.l), int(V.co2),
-		Datos.eur(V.seg), Datos.eur(total_coche(k)), Datos.eur(ie) if ie else "exenta", Datos.eur(D.CONCE.gastos), int(V.entrega)]
+	return "%s\n%s l/100 km · %d g CO2/km. Total %s (matriculación %s, gastos %s). Entrega en %d días.\nAl año: seguro %s e impuesto de circulación %s. Revisión cada %s km (%s) y neumáticos cada %s km (%s). Sin billete de autobús: solo la gasolina." % [V.d, Datos.coma(V.l), int(V.co2),
+		Datos.eur(total_coche(k)), Datos.eur(ie) if ie else "exenta", Datos.eur(D.CONCE.gastos), int(V.entrega),
+		Datos.eur(V.seg), Datos.eur(V.ivtm), Datos.miles(V.revKm), Datos.eur(V.rev), Datos.miles(V.neuKm), Datos.eur(V.neu)]
 
 func _art_m(k: String) -> String:   # «la moto» → «a»; «el utilitario» → «o»
 	return "a" if String(D.CONCE.v[k].art).begins_with("la ") else "o"
@@ -6284,21 +6285,21 @@ func comprar_coche(k: String) -> void:
 		await say(("%s ya es tuy%s." % [mayus(V.art), _art_m(k)]) if coche_ya(k) else ("%s está en camino: te aviso por SMS." % mayus(V.art)), A)
 		return
 	var tot := total_coche(k)
-	var sm := seguro_mes(k)
+	var sm := seguro_anio(k)
 	var efe: int = mini(mini(int(S.money), int(C.efe)), tot)
 	var tr: int = tot - efe
-	if await ask("%s: %s en total. %s en efectivo, que más no deja la ley, y %s por transferencia; el seguro, %s al mes, domiciliado. ¿Lo firmas?" % [V.n, Datos.eur(tot), Datos.eur(efe), Datos.eur(tr), Datos.eur(sm)], ["Firmar", "No"], A) != 0:
+	if await ask("%s: %s en total. %s en efectivo, que más no deja la ley, y %s por transferencia; el seguro, %s al año, domiciliado. ¿Lo firmas?" % [V.n, Datos.eur(tot), Datos.eur(efe), Datos.eur(tr), Datos.eur(sm)], ["Firmar", "No"], A) != 0:
 		return
 	if S.banco < tr + sm:
 		sfx("bad")
-		await say("Con la transferencia y el primer mes del seguro hacen falta %s en tu cuenta, y hay %s. Lo dejamos reservado si quieres." % [Datos.eur(tr + sm), Datos.eur(S.banco)], A)
+		await say("Con la transferencia y el primer año del seguro hacen falta %s en tu cuenta, y hay %s. Lo dejamos reservado si quieres." % [Datos.eur(tr + sm), Datos.eur(S.banco)], A)
 		return
 	S.money -= efe
 	cobro_banco(tr, C.n + " · " + V.n)
 	cobro_banco(sm, "Seguro · " + V.n)
 	if not (S.get("coches") is Dictionary):
 		S.coches = {}
-	S.coches[k] = {"dia": int(S.day) + int(V.entrega), "p": tot, "r": int(S.day) + int(V.entrega) + int(C.mes)}
+	S.coches[k] = {"dia": int(S.day) + int(V.entrega), "p": tot, "r": int(S.day) + int(V.entrega) + int(C.anio), "iv": int(S.day) + int(V.entrega), "km": 0}
 	if V.calor:
 		S.heat = mini(100, int(S.heat) + int(V.calor))
 	sfx("coin")
@@ -6309,7 +6310,7 @@ func vender_coche(l: Array) -> void:
 	var A := "ARANTXA"
 	var it := []
 	for k in l:
-		it.append({"label": D.CONCE.v[k].n, "right": Datos.eur(valor_coche(k)), "desc": "Pagaste %s. Te damos %s, por transferencia." % [Datos.eur(S.coches[k].p), Datos.eur(valor_coche(k))]})
+		it.append({"label": D.CONCE.v[k].n, "right": Datos.eur(valor_coche(k)), "desc": "Pagaste %s y lleva %s km. Te damos %s, por transferencia." % [Datos.eur(S.coches[k].p), Datos.miles(S.coches[k].get("km", 0)), Datos.eur(valor_coche(k))]})
 	it.append({"label": "Nada", "desc": ""})
 	var j: int = await menu(it, {"cls": "full", "title": "VENDER", "desc": true})
 	if j < 0 or j >= l.size():
@@ -6326,15 +6327,15 @@ func vender_coche(l: Array) -> void:
 
 func asegurar_coche(l: Array) -> void:
 	var k: String = l[0]
-	var sm := seguro_mes(k)
+	var sm := seguro_anio(k)
 	if not cobro_banco(sm, "Seguro · " + D.CONCE.v[k].n):
 		sfx("bad")
-		await say("El primer mes son %s, de la cuenta, y no hay." % Datos.eur(sm), "ARANTXA")
+		await say("El año de póliza son %s, de la cuenta, y no hay." % Datos.eur(sm), "ARANTXA")
 		return
-	S.coches[k].r = int(S.day) + int(D.CONCE.mes)
+	S.coches[k].r = int(S.day) + int(D.CONCE.anio)
 	S.coches[k].erase("grua")
 	sfx("coin")
-	await say("Póliza en vigor: %s al mes, domiciliado.%s" % [Datos.eur(sm), " Y te saco %s del depósito de la grúa." % D.CONCE.v[k].art], "ARANTXA")
+	await say("Póliza en vigor: %s al año, domiciliado.%s" % [Datos.eur(sm), " Y te saco %s del depósito de la grúa." % D.CONCE.v[k].art], "ARANTXA")
 
 # cada mañana: la apertura (con el capítulo y el dinero), las entregas y el seguro de cada uno; sin pagar, la póliza se anula
 func conce_dia() -> void:
@@ -6356,10 +6357,18 @@ func conce_dia() -> void:
 		if int(c.dia) == int(S.day):
 			var tx: String = "%s ya está matriculad%s y con el seguro en vigor. Desde cualquier parada de autobús puedes ir en %s, a la hora que quieras.%s" % [mayus(V.art), _art_m(k), "ella" if _art_m(k) == "a" else "él", " Y en la calle, montado." if k == "moto" else " Y en la calle, al volante." if D.VEHICULOS.has(k) else ""]
 			queue("coche" + k, func(): await talk("SMS · " + C.n, [tx]))
-		if c.get("r") != null and not cobra(c, seguro_mes(k), "ASEGURADORA", true, "seguro de " + String(V.art), int(C.mes)):
+		if c.get("r") != null and not cobra(c, seguro_anio(k), "ASEGURADORA", true, "seguro de " + String(V.art), int(C.anio)):
 			c.r = null
 			var tx2: String = "Póliza anulada por impago: %s ya no tiene seguro. Sin seguro no se puede circular." % V.art
 			queue("seg" + k, func(): await talk("SMS · ASEGURADORA", [tx2]))
+		if c.get("iv") == null:   # de antes de la 1.43.2
+			c.iv = maxi(int(c.dia), int(S.day))
+		if not cobra(c, float(V.ivtm), "AYUNTAMIENTO", true, "impuesto de circulación de " + String(V.art), int(C.anio), "iv"):   # sin pagar, por apremio con recargo
+			var e: float = roundf(float(V.ivtm) * (1.0 + float(C.recargo)))
+			pagar_recibo(e, "Apremio · IVTM · " + String(V.n))
+			c.iv = int(c.iv) + int(C.anio)
+			var tx3: String = "Providencia de apremio: el impuesto de circulación de %s, con un %d %% de recargo, %s, cobrado de lo que tienes." % [V.art, roundi(float(C.recargo) * 100), Datos.eur(e)]
+			queue("iv" + k, func(): await talk("SMS · AYUNTAMIENTO", [tx3]))
 
 # de parada en parada con tu vehículo (CONCE.km de cada una; CONCE.v[k].t del tiempo del autobús, sin esperas)
 func tramo(a: String, b: String, k: String) -> Dictionary:
@@ -6389,6 +6398,7 @@ func conducir(k):
 		sfx("bad")
 		await say("Para la gasolina hacen falta %s y no te llega." % Datos.eur(t.eur))
 		return
+	var taller := kilometros(k, int(t.km))
 	sfx("door")
 	await fade(1)
 	advance_time(t.min)
@@ -6399,7 +6409,25 @@ func conducir(k):
 	update_hud()
 	await wait(80)
 	await fade(0)
+	if taller != "":
+		sfx("bad")
+		await talk("SMS · TALLER", [taller])
 	await control_trafico(k)
+
+# 1.43.2: los km de cada vehículo; al pasar cada CONCE.v[k].revKm, la revisión (aceite y filtros), y cada neuKm, los neumáticos
+func kilometros(k: String, km: int) -> String:
+	var V: Dictionary = D.CONCE.v[k]
+	var c: Dictionary = S.coches[k]
+	var a: int = int(c.get("km", 0))
+	c.km = a + km
+	var tx := []
+	for q in [["rev", "revKm", "la revisión de %s km (aceite y filtros)"], ["neu", "neuKm", "neumáticos nuevos a los %s km"]]:
+		var n: int = int(c.km) / int(V[q[1]]) - a / int(V[q[1]])
+		if n > 0:
+			var e: float = float(V[q[0]]) * n
+			var f := pagar_recibo(e, "Taller · " + String(V.n))
+			tx.append("%s: %s%s" % [String(q[2]) % Datos.miles(int(c.km) / int(V[q[1]]) * int(V[q[1]])), Datos.eur(e), (" (te quedan a deber %s)" % Datos.eur(f)) if f > 0 else ""])
+	return ("%s, en el taller. " % mayus(V.art) + ". ".join(tx) + ".") if tx.size() else ""
 
 # el control de tráfico (CONCE.control; el deportivo, el triple): el seguro y, si te registran, lo que lleves encima
 func control_trafico(k: String) -> void:

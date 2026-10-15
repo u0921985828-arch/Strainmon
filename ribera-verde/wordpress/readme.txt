@@ -1,10 +1,10 @@
 === Landrace Hunters ===
-Version: 1.4.1
+Version: 1.4.2
 Autor: WOLFCADE
 
 Juego «Landrace Hunters» (Godot 4.3, exportación web sin hilos) servido desde el plugin.
 
-Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.4.1.zip → Activar.
+Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.4.2.zip → Activar.
 Jugar: /landrace-hunters/ (cambiable en Ajustes → Landrace Hunters).
 Incrustar: [landrace_hunters alto="80vh"].
 
@@ -13,6 +13,7 @@ Si el servidor no deja subir un archivo tan grande, descomprímelo y súbelo por
 Fuentes: Atkinson Hyperlegible y Press Start 2P, licencia SIL OFL (game/OFL-*.txt).
 
 Cambios
+1.4.2 — Landrace Hunters 1.43.2 (Godot 0.37.2): con tu vehículo no pagas autobús, solo gasolina; el seguro y el impuesto de circulación al año y el taller por km (revisión y neumáticos).
 1.4.1 — Landrace Hunters 1.43.1 (Godot 0.37.1): coches de juguete a la escala del protagonista, la moto como un scooter en el que vas sentado y todas las ruedas gordas y con llanta.
 1.4.0 — El juego de hoy (Landrace Hunters 1.43.0, Godot 0.37.0): el concesionario del barrio alto (moto, utilitario, berlina y superdeportivo, con seguro, gasolina y controles), las bandejas de clones de la nave, el calendario y el mapa centrados, y todo lo anterior.
 1.3.0 — El juego de hoy (Landrace Hunters 1.42.0, Godot 0.36.0): calendario desde el lunes 20 de abril de 2026, mapa de la comarca en el móvil, la nave con opción a compra, la nave por ciclos, la caja por tarros, el carro de esquejes, la nevera ampliable, las extracciones a la vista, la música por zonas y todo lo anterior.

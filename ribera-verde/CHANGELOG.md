@@ -1,5 +1,19 @@
 # Cambios
 
+## 1.43.2 · 15 de octubre de 2026
+
+Lo que cuesta tener un vehículo (lo pidió el usuario: «los coches y la moto sirven para no pagar el autobús para ir de pueblo a pueblo; el gasto es la gasolina, eso sí. Gasto al año de seguro y más cosas, igual al mes o por cierto uso de distancia»). Solo Godot (0.37.2).
+
+- **Sin billete:** con tu vehículo, de parada en parada no pagas autobús, solo la gasolina del tramo (como en la 1.43.0).
+- **El seguro, al año** (`seguro_anio`, `CONCE.anio`): se paga el año entero al firmar y se renueva domiciliado cada 365 días. Sin saldo, devuelto y, pasada la gracia, anulado, como antes.
+- **El impuesto de circulación** (`CONCE.v[k].ivtm`, `S.coches[k].iv`): un recibo al año, domiciliado, desde el día de la entrega, según la potencia fiscal y con cuotas de ayuntamiento de hoy: 9 € la moto, 62 € el utilitario, 128 € la berlina y 232 € el superdeportivo. Sin pagar, devuelto y, pasada la gracia, por apremio con un 20 % de recargo (`CONCE.recargo`), cobrado de la cuenta, de lo que llevas y de la caja.
+- **El taller, por km** (`kilometros`, `S.coches[k].km`): cada viaje suma sus km y, al pasar cada tramo, el taller cobra con su SMS:
+  - la revisión (aceite y filtros): la moto cada 6.000 km (120 €), el utilitario y la berlina cada 15.000 (220 € y 320 €) y el superdeportivo cada 10.000 (1.600 €);
+  - los neumáticos: la moto cada 12.000 km (160 €), el utilitario cada 40.000 (300 €), la berlina cada 35.000 (480 €) y el superdeportivo cada 15.000 (2.200 €).
+- La ficha de cada vehículo dice lo que cuesta al año y por km; el seguro y el impuesto salen en la banca y en el calendario; al venderlo, sus km.
+- `cobra` admite el campo de la fecha (`f`, «r» por defecto), para llevar dos recibos en el mismo vehículo.
+- **Pruebas:** `tests/concesionario.gd`, 94 comprobaciones (el seguro al año, el impuesto y su apremio, los km y el taller a los 15.000 y a los 40.000).
+
 ## 1.43.1 · 14 de octubre de 2026
 
 Vehículos de juguete y ruedas con llanta (lo pidió el usuario: «cuando está montando en la moto parece una bici», «no haría los coches tan realistas porque son demasiado grandes; debe ser un estilo y una escala lógica para con el personaje», «muy finas las ruedas de la moto; en sí son finas todas las ruedas, sin llanta casi»). Solo Godot (0.37.1).

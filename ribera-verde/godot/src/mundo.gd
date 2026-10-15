@@ -1999,7 +1999,7 @@ func coches_mios() -> Array:
 	return []
 func conducir(_k):
 	pass
-func seguro_mes(_k) -> int:
+func seguro_anio(_k) -> int:
 	return 0
 func conce_dia() -> void:
 	pass

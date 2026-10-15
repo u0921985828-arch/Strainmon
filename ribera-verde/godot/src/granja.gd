@@ -1653,9 +1653,12 @@ func recibos() -> Array:
 		r.append(["Bajo de la Kale Zaharra", S.setas.r, recibo_setas(), "efectivo", r.size()])
 	for k in S.loc:
 		r.append([D.LOCALES[k].n, S.loc[k].r, D.LOCALES[k].sem, "cuenta", r.size()])
-	for k in D.CONCE.orden:   # 1.43: el seguro de cada vehículo, domiciliado, cada mes
-		if S.get("coches") is Dictionary and S.coches.has(k) and S.coches[k].get("r") != null:
-			r.append(["Seguro · " + String(D.CONCE.v[k].n), S.coches[k].r, seguro_mes(k), "cuenta", r.size()])
+	for k in D.CONCE.orden:   # 1.43.2: el seguro y el impuesto de circulación de cada vehículo, domiciliados, cada año
+		if S.get("coches") is Dictionary and S.coches.has(k):
+			if S.coches[k].get("r") != null:
+				r.append(["Seguro · " + String(D.CONCE.v[k].n), S.coches[k].r, seguro_anio(k), "cuenta", r.size()])
+			if S.coches[k].get("iv") != null:
+				r.append(["Impuesto de circulación · " + String(D.CONCE.v[k].n), S.coches[k].iv, D.CONCE.v[k].ivtm, "cuenta", r.size()])
 	if S.protect and S.get("protHasta"):
 		r.append(["Sargento Molina", S.protHasta + 1, D.SOBORNO, "mano", r.size()])
 	r.sort_custom(func(a, b): return a[1] < b[1] or a[1] == b[1] and a[4] < b[4])   # estable, como sort de JS
@@ -1673,19 +1676,19 @@ func banca() -> void:
 	await menu(it, {"cls": "full", "title": "BANCA", "title2": "Saldo " + Datos.eur(S.banco), "desc": true})
 
 # un recibo (o.r, el día): el aviso, el cobro (en efectivo, de lo que llevas y de la caja; o domiciliado) y la gracia; false si se pierde
-func cobra(o: Dictionary, e: float, quien: String, banco: bool, t: String, per := 0) -> bool:
+func cobra(o: Dictionary, e: float, quien: String, banco: bool, t: String, per := 0, f := "r") -> bool:
 	var N := "SMS · " + quien
-	if S.day == o.r - D.RECIBO.aviso:
-		var tx: String = ("El %s se carga el recibo de %s: %s. Saldo: %s." % [Datos.fd(o.r, S.day), t, Datos.eur(e), Datos.eur(S.banco)]) if banco else ("El %s paso a cobrar: %s, en efectivo. Tenlo preparado." % [Datos.fd(o.r, S.day), Datos.eur(e)])
+	if S.day == o[f] - D.RECIBO.aviso:
+		var tx: String = ("El %s se carga el recibo de %s: %s. Saldo: %s." % [Datos.fd(o[f], S.day), t, Datos.eur(e), Datos.eur(S.banco)]) if banco else ("El %s paso a cobrar: %s, en efectivo. Tenlo preparado." % [Datos.fd(o[f], S.day), Datos.eur(e)])
 		queue("av" + t, func(): await talk(N, [tx]))
-	if S.day < o.r:
+	if S.day < o[f]:
 		return true
 	var ok: bool = cobro_banco(e, "Recibo · " + t) if banco else (S.money + caja_e() >= e and pagar_casa(e) == 0)
 	if ok:
-		o.r += per if per else int(D.RECIBO.dias)   # 1.43: el seguro, cada mes (per)
+		o[f] += per if per else int(D.RECIBO.dias)   # 1.43.2: el seguro y el impuesto, cada año (per; f, el campo de la fecha)
 		return true
-	if S.day < o.r + (D.RECIBO.graciaB if banco else D.RECIBO.gracia):
-		var tx: String = ("Recibo de %s devuelto: %s. Si el %s no hay saldo, se rescinde el contrato." % [t, Datos.eur(e), Datos.fd(o.r + D.RECIBO.graciaB, S.day)]) if banco else "He pasado a cobrar y no había nada. Vuelvo mañana; como no esté, cambio la cerradura."
+	if S.day < o[f] + (D.RECIBO.graciaB if banco else D.RECIBO.gracia):
+		var tx: String = ("Recibo de %s devuelto: %s. Si el %s no hay saldo, %s." % [t, Datos.eur(e), Datos.fd(o[f] + D.RECIBO.graciaB, S.day), "se cobra por apremio, con recargo" if f == "iv" else "se rescinde el contrato"]) if banco else "He pasado a cobrar y no había nada. Vuelvo mañana; como no esté, cambio la cerradura."
 		queue("dv" + t, func(): await talk(N, [tx]))
 		return true
 	return false
