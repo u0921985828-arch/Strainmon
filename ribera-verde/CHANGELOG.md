@@ -1,5 +1,12 @@
 # Cambios
 
+## 1.43.5 · 15 de octubre de 2026
+
+El APK también para móviles de 32 bits (lo pidió el usuario, tras la revisión de Gemini). Solo Godot (0.37.5).
+
+- `export_presets.cfg`: `armeabi-v7a` además de `arm64-v8a`; el APK pasa de 52 a 75 MB. Firma v1/v2/v3 verificada.
+- De la revisión de Gemini, lo demás ya estaba bien: el atlas y la vista C se leen con `load_png_from_buffer` (por eso `importer="keep"`), las fuentes `.woff2` las carga `FontFile.data`, `icono/` y `musica/` los genera `godot:apk`, los `.json` van por `include_filter`, los tests se excluyen, las licencias OFL tienen que ir y `libc++_shared.so` es de la plantilla oficial.
+
 ## 1.43.4 · 15 de octubre de 2026
 
 Exportar e importar la partida, más escondidos (lo pidió el usuario). Solo Godot (0.37.4), con `Datos.CAL`.

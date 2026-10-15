@@ -3,7 +3,7 @@
   Ribera Verde — APK del port a Godot (godot/, el juego entero), sin Android SDK ni Gradle
     1. Godot 4.3 (GODOT=… o /home/user/godot-bin/Godot_v4.3-stable_linux.x86_64) con sus plantillas de exportación
        (~/.local/share/godot/export_templates/4.3.stable) exporta la plantilla release sin firmar (godot/export_presets.cfg:
-       arm64-v8a, com.riberaverde.godot). La comprobación del SDK solo mira que existan adb y apksigner: se le da una carpeta
+       arm64-v8a y armeabi-v7a desde la 1.43.5, com.riberaverde.godot). La comprobación del SDK solo mira que existan adb y apksigner: se le da una carpeta
        con dos scripts vacíos (tools/salida/godot-sdk), porque la firma la hace el paso 2.
     1b. Godot reescala los iconos a cada densidad con un filtro suave (pixel art borroso en xxhdpi, ×4,5): se vuelven a escribir
        en el APK por vecino más próximo desde art/icono, al tamaño que dejó Godot.
