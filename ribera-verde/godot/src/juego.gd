@@ -345,21 +345,42 @@ func importar(desde_titulo := false) -> void:
 	sfx("coin")
 	await say("Partida cargada." if ok else "Partida cargada, pero no se ha podido guardar.")
 
+# 1.43.4 (lo pidió el usuario: exportar e importar, más escondidos): al final de OPCIONES, en su submenú y con su aviso
+func copia_seguridad(desde_titulo: bool) -> void:
+	var it := []
+	if not desde_titulo:
+		it.append({"label": "EXPORTAR PARTIDA"})
+	it.append({"label": "IMPORTAR PARTIDA"})
+	it.append({"label": "VOLVER"})
+	var i: int = await menu(it, {"cls": "start", "title": "COPIA DE SEGURIDAD"})
+	if i < 0 or it[i].label == "VOLVER":
+		return
+	if it[i].label == "EXPORTAR PARTIDA":
+		await exportar()
+	else:
+		await importar(desde_titulo)
+
 # OPCIONES (en el título y en el menú START): A cambia cada fila; se guardan al momento
 func opciones(desde_titulo := false) -> void:
 	var i := 0
 	while true:
 		var it := [{"label": "MÚSICA", "right": "%d %%" % (aj.musica * 25)}, {"label": "EFECTOS", "right": "%d %%" % (aj.efectos * 25)},
 			{"label": "TEXTO", "right": TEXTO_VEL[aj.texto]}, {"label": "SONIDO", "right": "SÍ" if aj.sonido else "NO"}]
-		if not desde_titulo:
-			it.append({"label": "EXPORTAR PARTIDA"})
-		it.append({"label": "IMPORTAR PARTIDA"})
+		if not Datos.CAL:   # 1.43.4: las pruebas contra el HTML, como antes
+			if not desde_titulo:
+				it.append({"label": "EXPORTAR PARTIDA"})
+			it.append({"label": "IMPORTAR PARTIDA"})
 		if desde_titulo and FileAccess.file_exists(GUARDADO):
 			it.append({"label": "BORRAR PARTIDA"})
+		if Datos.CAL:
+			it.append({"label": "COPIA DE SEGURIDAD"})
 		it.append({"label": "VOLVER"})
 		i = await menu(it, {"cls": "start", "initial": i, "title": "OPCIONES"})
 		if i < 0 or it[i].label == "VOLVER":
 			return
+		if it[i].label == "COPIA DE SEGURIDAD":
+			await copia_seguridad(desde_titulo)
+			continue
 		if it[i].label == "EXPORTAR PARTIDA":
 			await exportar()
 			continue

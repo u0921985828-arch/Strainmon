@@ -1,5 +1,12 @@
 # Cambios
 
+## 1.43.4 · 15 de octubre de 2026
+
+Exportar e importar la partida, más escondidos (lo pidió el usuario). Solo Godot (0.37.4), con `Datos.CAL`.
+
+- En OPCIONES ya no salen EXPORTAR PARTIDA ni IMPORTAR PARTIDA: van en COPIA DE SEGURIDAD, la última fila antes de VOLVER (`copia_seguridad` en `juego.gd`); en el título, solo importar. Siguen ahí para pasar la partida a otro móvil.
+- Prueba nueva `tests/copia.gd`.
+
 ## 1.43.3 · 15 de octubre de 2026
 
 Cada nombre con su muñeco (lo pidió el usuario: «los nombres de chica tienen que ir con personajes chica, y los chicos lo mismo»). Solo Godot (0.37.3), con `Datos.CAL` (las pruebas contra el HTML, como antes).
