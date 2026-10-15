@@ -408,6 +408,9 @@ func _encima() -> void:
 	if J.CARRO_V != null:   # el carro de esquejes por dentro (1.40)
 		for e in J.rects_carro(J.CARRO_V):
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
+	if J.SETAS_V != null:   # 1.43.9: las baldas del bajo de las setas, a la vista
+		for e in J.rects_bajo(J.SETAS_V):
+			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.MAPA_V != null:   # 1.42: el mapa de la comarca, un croquis (croquis.gd)
 		var kc := "croquis|%d" % int(J.S.ch)
 		if not cache.has(kc):

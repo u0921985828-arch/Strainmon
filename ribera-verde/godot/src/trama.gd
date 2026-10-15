@@ -4065,7 +4065,10 @@ func obj_local(x: int, y: int, o) -> bool:
 			return true
 		match o:
 			"baldaS":
-				await bajo_menu("")
+				if Datos.CAL:   # 1.43.9: las baldas a la vista, con las setas creciendo
+					await vista_bajo(2 * x)
+				else:
+					await bajo_menu("")
 				return true
 			"humidS":
 				if S.setas.bandejas.any(func(b): return not b.get("mala")):
@@ -6258,6 +6261,203 @@ func rects_carro(V: Dictionary) -> Array:
 		var ey: int = y0 + 88 + (q / 6) * 11
 		o.append_array([[ex - 2, ey, 5, 3, "#6a4026"], [ex - 2, ey, 5, 1, "#8a5a34"]])
 		_esqueje(o, ex, ey, _hoja_de(e.sid), 1, false, CLON_MINI)
+	return o
+
+# ---------- el bajo de las setas a la vista (1.43.9, lo pidió el usuario: «que puedas entrar al bajo y veas las setas crecer») ----------
+# las tres estanterías de rejilla del bajo con sus dos bandejas (2r abajo, 2r + 1 arriba, como bandejas_balda), dibujadas a mano por
+# rectángulos: el micelio blanco que va cubriendo el sustrato día a día (y hora a hora), los primordios y las setas que crecen y abren
+# el sombrero (genéricas, pardas: sin especie ni método), las gotas de la tapa por la humedad, lo contaminado y lo seco. A la
+# derecha, la elegida en grande con su humedad y lo que le falta. A: lo de las bandejas (bajo_menu) · B: cerrar
+var SETAS_V = null   # {i}: la bandeja elegida (0-5)
+const BAJO_W := 208
+const BAJO_H := 108
+
+# lo que lleva la bandeja, en días con decimales (la hora cuenta: se ve crecer)
+func t_seta(b: Dictionary) -> float:
+	return float(S.day - b.d) + float(S.min) / 1440.0
+
+# un número de 0 a 1 fijo por bandeja y sitio (las manchas del micelio y dónde sale cada seta)
+func _hs(a: int, b: int, c: int) -> float:
+	var h: int = (a * 73856093) ^ (b * 19349663) ^ (c * 83492791)
+	return float(absi(h) % 1000) / 1000.0
+
+func mueve_bajo(V: Dictionary, b: String) -> bool:
+	var r: int = V.i >> 1
+	var j: int = V.i & 1
+	if b == "left":
+		r -= 1
+	elif b == "right":
+		r += 1
+	elif b == "up":
+		j = 1
+	elif b == "down":
+		j = 0
+	var n2: int = 2 * r + j
+	if r < 0 or r > 2 or n2 == V.i:
+		return false
+	V.i = n2
+	return true
+
+func desc_bajo(V: Dictionary) -> String:
+	var Z: Dictionary = D.SETAS
+	var B: Array = S.setas.bandejas
+	if V.i >= B.size():
+		return "Hueco libre en la balda · %d de %d bandejas. Las prepara Txomin, en la puerta.\nB: cerrar." % [B.size(), int(Z.max)]
+	var b: Dictionary = B[V.i]
+	var f: String = fase_seta(b)
+	var t := t_seta(b)
+	var tot: int = int(Z.colon) + int(Z.fruto)
+	var q := ""
+	match f:
+		"colonizando":
+			q = "el micelio cubre el %d %% del sustrato" % Datos.jsround(100 * clampf(t / Z.colon, 0, 1))
+		"fructificando":
+			q = "las setas crecen: %d %%" % Datos.jsround(100 * clampf((t - Z.colon) / Z.fruto, 0, 1))
+		"lista":
+			q = "lista para recoger"
+		"contaminada":
+			q = "contaminada: hay que tirarla"
+		"seca":
+			q = "seca: hay que tirarla"
+	var dd: String = (" · día %d de %d" % [mini(int(S.day - b.d) + 1, tot), tot]) if not b.get("mala") else ""
+	return "Bandeja %d · %s%s · humedad %d %%.\nA: pulverizar, recoger o tirar · B: cerrar." % [V.i + 1, q, dd, Datos.jsround(b.hum)]
+
+func elegir_bajo(i0 := 0):
+	if gancho_bajo.is_valid():
+		return gancho_bajo.call(i0)
+	SETAS_V = {"i": clampi(i0, 0, 5)}
+	_dlg_fijo(desc_bajo(SETAS_V), "EL BAJO")
+	var pr := Motor.Prom.new()
+	push(func(b: String):
+		if b == "B":
+			pop()
+			pr.res(null)
+			return
+		if b == "A":
+			pop()
+			pr.res(SETAS_V.i)
+			return
+		if mueve_bajo(SETAS_V, b):
+			sfx("sel")
+			_dlg_fijo(desc_bajo(SETAS_V), "EL BAJO"))
+	var e = await Motor.espera(pr)
+	SETAS_V = null
+	if not oraculo:
+		dlg.hide()
+		dlg_nm.hide()
+	return e
+
+# la vista hasta B: con A sobre una bandeja, el menú de las bandejas (y se vuelve a las baldas); sobre un hueco, que las prepara Txomin
+func vista_bajo(i0 := 0) -> void:
+	var i := i0
+	while S.get("setas") != null:
+		var r = await elegir_bajo(i)
+		if r == null:
+			return
+		i = int(r)
+		if S.get("setas") == null:
+			return
+		if i < S.setas.bandejas.size():
+			await bajo_menu("")
+		else:
+			await say("En ese hueco no hay bandeja. Las prepara Txomin: se las compras en la puerta.")
+
+# una bandeja (19 × 15 unidades de u px) en x, y: la caja de plástico con la tapa, el sustrato, el micelio, las setas y las gotas
+func _bandeja_seta(o: Array, b, x: int, y: int, u: int, sid: int) -> void:
+	var R := func(cx: int, cy: int, w: int, h: int, c: String): o.append([x + cx * u, y + cy * u, w * u, h * u, c])
+	R.call(0, 0, 19, 15, "rgba(200,222,222,0.16)")
+	R.call(0, 1, 1, 14, "#8a9a9a")
+	R.call(18, 1, 1, 14, "#8a9a9a")
+	R.call(0, 14, 19, 1, "#6a7a7a")
+	R.call(0, 0, 19, 1, "#d8e4e4")
+	if b == null:
+		R.call(1, 13, 17, 1, "#3a3e44")
+		return
+	var Z: Dictionary = D.SETAS
+	var f: String = fase_seta(b)
+	var t := t_seta(b)
+	var mala = b.get("mala")
+	# el sustrato
+	R.call(1, 10, 17, 4, "#8a6a4a" if mala == "seca" else "#7a5a3a")
+	R.call(1, 12, 17, 2, "#6a4a2e" if mala != "seca" else "#7a5a3c")
+	# el micelio: celdas blancas por lo que lleva colonizado (entera desde que fructifica)
+	var cov: float = 1.0 if f in ["fructificando", "lista"] else (clampf(t / Z.colon, 0, 1) if mala == null else 0.5)
+	for cy in [10, 11, 12, 13]:
+		for cx in range(1, 18):
+			var h := _hs(sid, cx, cy)
+			if h * (1.0 + (cy - 10) * 0.6) < cov:
+				R.call(cx, cy, 1, 1, ("#f0eee6" if cy == 10 else "#e0dcd0") if mala != "seca" else "#b8a888")
+	if mala == "contaminada":
+		for k in 6:
+			var cx: int = 2 + int(_hs(sid, k, 7) * 15)
+			var cy: int = 10 + int(_hs(sid, k, 8) * 3)
+			R.call(cx, cy, 2, 1, "#4a8a3a" if k % 2 else "#3a6a2a")
+		R.call(2 + int(_hs(sid, 9, 9) * 14), 11, 1, 1, "#8a8a8a")
+	elif mala == "seca":
+		for cx in range(3, 17, 4):
+			R.call(cx, 11, 1, 2, "#5a4030")
+	else:
+		# las setas: cinco, cada una a su ritmo; primordio (punto), tallo y sombrero que se abre
+		var fr: float = 1.0 if f == "lista" else clampf((t - Z.colon) / Z.fruto, 0, 1) if f == "fructificando" else -1.0
+		if fr >= 0:
+			for k in 5:
+				var cx: int = 2 + k * 3 + int(_hs(sid, k, 1) * 3)
+				var dl: float = _hs(sid, k, 2) * 0.3
+				var g: float = 1.0 if f == "lista" else clampf((fr - dl) / (1.0 - dl), 0, 1)
+				var hs: int = int(round(g * (3 + int(_hs(sid, k, 3) * 4))))
+				if g < 0.15:
+					R.call(cx, 9, 1, 1, "#e8dcc0")
+					continue
+				R.call(cx, 10 - hs, 1, hs, "#e8e0d0")
+				var cw: int = 1 if g < 0.4 else (3 if g < 0.8 else 5)
+				R.call(cx - (cw >> 1), 9 - hs, cw, 1, "#9a6a3a")
+				R.call(cx - maxi(0, (cw >> 1) - 1), 8 - hs, maxi(1, cw - 2), 1, "#7a4a2a")
+				if cw >= 3:
+					R.call(cx - (cw >> 1), 9 - hs, 1, 1, "#b8865a")
+	# las gotas de la tapa: más cuanto más húmeda
+	var nd: int = int(round(float(b.hum) / 100.0 * 9))
+	for k in nd:
+		R.call(1 + int(_hs(sid, k, 4) * 17), 1 + int(_hs(sid, k, 5) * 3), 1, 1, "rgba(225,242,255,0.75)")
+
+func rects_bajo(V: Dictionary) -> Array:
+	var o := []
+	var x0: int = (SW - BAJO_W) >> 1
+	var y0 := 4
+	var B: Array = S.setas.bandejas if S.get("setas") != null else []
+	# la pared del bajo y la bombilla
+	o.append_array([[x0, y0, BAJO_W, BAJO_H, "#1a1814"], [x0 + 1, y0 + 1, BAJO_W - 2, BAJO_H - 2, "#24211c"],
+		[x0 + 1, y0 + 1, 140, 30, "rgba(255,214,140,0.06)"], [x0 + 70, y0 + 1, 2, 3, "#3a3a40"], [x0 + 68, y0 + 4, 6, 4, "#ffe6a8"]])
+	for r in 3:
+		var rx: int = x0 + 4 + r * 46
+		# la estantería: dos patas, la barra de arriba y dos baldas de rejilla
+		o.append_array([[rx, y0 + 8, 2, 98, "#5a5e66"], [rx + 42, y0 + 8, 2, 98, "#5a5e66"], [rx + 1, y0 + 8, 1, 98, "#8a8e96"], [rx + 43, y0 + 8, 1, 98, "#8a8e96"],
+			[rx, y0 + 8, 44, 2, "#8a8e96"]])
+		for j in 2:
+			var sy: int = y0 + (52 if j == 1 else 100)   # la cara de la balda: arriba (j = 1) y abajo (j = 0)
+			o.append_array([[rx, sy, 44, 2, "#b8bcc4"], [rx, sy + 2, 44, 1, "#5a5e66"]])
+			for gx in range(rx + 2, rx + 42, 3):
+				o.append([gx, sy + 2, 1, 1, "#8a8e96"])
+			var i: int = 2 * r + j
+			var bx: int = rx + 3
+			var by: int = sy - 31
+			_bandeja_seta(o, B[i] if i < B.size() else null, bx, by, 2, i * 131 + (int(B[i].d) if i < B.size() else 0))
+			if i < B.size() and not B[i].get("mala"):   # su humedad, debajo de la balda
+				o.append_array([[bx, sy + 4, 38, 2, "#16161c"], [bx, sy + 4, Datos.jsround(38 * clampf(B[i].hum / 100.0, 0, 1)), 2, "#58a8e0" if B[i].hum >= 50 else "#e0a040"]])
+			if i == V.i:
+				o.append_array([[bx - 2, by - 2, 42, 1, "#f8d040"], [bx - 2, by + 30, 42, 1, "#f8d040"], [bx - 2, by - 2, 1, 33, "#f8d040"], [bx + 39, by - 2, 1, 33, "#f8d040"]])
+	# a la derecha, la elegida en grande, su humedad y lo que lleva
+	var px: int = x0 + 144
+	o.append_array([[px, y0 + 4, 60, BAJO_H - 8, "#16161c"], [px + 1, y0 + 5, 58, BAJO_H - 10, "#20222a"]])
+	var e = B[V.i] if V.i < B.size() else null
+	_bandeja_seta(o, e, px + 1, y0 + 12, 3, V.i * 131 + (int(e.d) if e != null else 0))
+	if e != null:
+		var Z: Dictionary = D.SETAS
+		var tot: float = Z.colon + Z.fruto
+		var fp: float = 1.0 if e.get("mala") else clampf(t_seta(e) / tot, 0, 1)
+		o.append_array([[px + 6, y0 + 66, 48, 4, "#0e0e12"], [px + 6, y0 + 66, Datos.jsround(48 * clampf(e.hum / 100.0, 0, 1)), 4, "#58a8e0" if e.hum >= 50 else "#e0a040"]])
+		o.append_array([[px + 6, y0 + 76, 48, 4, "#0e0e12"], [px + 6, y0 + 76, Datos.jsround(48 * Z.colon / tot), 4, "#3a3830"],
+			[px + 6, y0 + 76, Datos.jsround(48 * fp), 4, "#8a5a3a" if e.get("mala") else ("#e8e0d0" if fp < Z.colon / tot else "#c89060")]])
+		o.append([px + 6 + Datos.jsround(48 * Z.colon / tot), y0 + 75, 1, 6, "#f0eee6"])
 	return o
 
 # ---------- el calendario y el mapa de la comarca (1.42, lo pidió el usuario; croquis.gd) ----------

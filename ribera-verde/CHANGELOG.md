@@ -1,5 +1,18 @@
 # Cambios
 
+## 1.43.9 · 15 de octubre de 2026
+
+El bajo de las setas a la vista (lo pidió el usuario: «que puedas entrar al bajo y veas las setas crecer»). Como el carro de esquejes, ya no es un menú. Solo Godot (0.37.9), con `Datos.CAL`.
+
+- **Las baldas por dentro:** A en una de las tres estanterías del bajo abre la vista de las seis bandejas, dos por estantería, arriba y abajo (`vista_bajo`, `elegir_bajo`, `rects_bajo`). Se mueve con las flechas. A abre lo de las bandejas (pulverizar, recoger o tirar) y después vuelve a las baldas; B cierra.
+- **Se ven crecer:** cada bandeja está dibujada a mano por rectángulos (`_bandeja_seta`).
+  - El micelio blanco cubre el sustrato día a día y hora a hora (`t_seta`).
+  - Después salen los primordios, los tallos y los sombreros, que se abren; cada seta va a su ritmo.
+  - Las gotas de la tapa dependen de la humedad, y se ve lo contaminado (verde) y lo seco.
+  - Las setas son genéricas, sin especie ni método.
+- **La elegida, en grande:** a la derecha, con la barra de humedad y la del ciclo (colonizar → fructificar). El texto dice la fase, el % de micelio o de setas, el día de 10 y la humedad.
+- Prueba nueva `tests/setas_vista.gd` (26 comprobaciones; con `--pintar`, las capturas día a día).
+
 ## 1.43.8 · 15 de octubre de 2026
 
 Dónde está el bajo de las setas (lo pidió el usuario: «no existe mapa y sitio del bajo de las setas»). El bajo ya estaba (Ibarbide → el callejón junto a GROW IBARBIDE → la Kale Zaharra → la puerta gris de Txomin), pero nada en el juego decía dónde. Solo Godot (0.37.8), con `Datos.CAL`.
