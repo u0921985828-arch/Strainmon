@@ -2596,7 +2596,7 @@ func llamar() -> bool:
 	if S.flags.get("inaki"):
 		C.append({"label": "Iñaki", "right": "muelle", "desc": "Compra al por mayor.", "k": "inaki"})
 	for f in S.fijos:
-		C.append({"label": f.n, "right": D.CTYPES[f.t].label.to_lower(), "desc": "Ya ha venido hoy." if f.dia == S.day else "Te compró en la calle. Si estás fuera, viene a buscarte.", "f": f})
+		C.append({"label": f.n, "right": etiqueta_ct(f.t, mujer_nombre(f.n)).to_lower(), "desc": "Ya ha venido hoy." if f.dia == S.day else "Te compró en la calle. Si estás fuera, viene a buscarte.", "f": f})
 	if C.is_empty():
 		await say("La agenda está vacía.")
 		return false
@@ -2811,7 +2811,7 @@ func fijo_menu(f: Dictionary) -> bool:
 	elif puede:
 		ops.append("Que venda para mí")
 	ops.append("Nada")
-	var oi: int = await ask("%s · %s · confianza %d (%s)" % [f.n, D.CTYPES[f.t].label.to_lower(), rel(f.id), rel_nivel(f.id)], ops)
+	var oi: int = await ask("%s · %s · confianza %d (%s)" % [f.n, etiqueta_ct(f.t, mujer_nombre(f.n)).to_lower(), rel(f.id), rel_nivel(f.id)], ops)
 	var op: String = ops[oi]
 	if op == "Que venga":
 		return await llamar_fijo(f)
@@ -2878,7 +2878,7 @@ func gente() -> void:
 			rows.append({"label": D.GENTE[id], "right": "%d · %s" % [rel(id), "jardinera" if id == "begona" and S.curro.get("jard") else rel_nivel(id)], "desc": D.QUE_DA.get(id, "Hablar cada día suma confianza.")})
 	for k in D.CLUBS:
 		var P = D.PRESI.get(k)
-		var no: String = (" Para que te compren, %d con el encargado y con %s %s." % [int(D.CLUB.confia), P.a, P.t]) if P and not club_te_compra(k) else ""
+		var no: String = (" Para que te compren, %d con %s y con %s %s." % [int(D.CLUB.confia), D.GENERO.enc.get(k, "el encargado") if Datos.CAL else "el encargado", P.a, P.t]) if P and not club_te_compra(k) else ""
 		if S.rel.has(k):
 			rows.append({"label": D.CLUBS[k].n, "right": "%d · %s" % [rel(k), rel_nivel(k)], "desc": ("Eres socio. Vender y cumplir los encargos suma." if S.clubs.get(k) else "Hazte socio para vender y comprar.") + no})
 		if P and S.rel.has("pres_" + k):
@@ -3255,7 +3255,14 @@ func rival_b(kind := "rival") -> Dictionary:
 	if kind == "darko":
 		return {"kind": "thief", "rival": "Darko", "jefe": 1, "name": "DARKO", "look": D.LOOKS.darko, "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
 	var R: Dictionary = D.RIVALES.get(S.map, D.RIVALES.alto)
-	return {"kind": "thief", "rival": nom_rival(R), "name": R.n, "look": Datos.rand_look("rival" + R.n, "thief"), "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
+	return {"kind": "thief", "rival": nom_rival(R), "name": R.n, "look": look_rival(R), "t": 0.0, "flashE": 0.0, "shakeP": 0.0}
+
+# 1.43.3: el muñeco del rival, del sexo de su nombre (GENERO.rival)
+func look_rival(R: Dictionary) -> Dictionary:
+	var o := Datos.rand_look("rival" + R.n, "thief")
+	if Datos.CAL and D.GENERO.rival.has(R.n):
+		o.id = D.GENERO.rival[R.n]
+	return o
 
 func rival_venta(z):
 	if S.ch < D.RIVAL.ch or not D.RIVALES.has(z) or float(S.rivalFuera.get(z, 0)) >= S.day:
@@ -4091,9 +4098,14 @@ func obj_local(x: int, y: int, o) -> bool:
 	await say(txt)
 	return true
 
+# 1.43.3: donde lleva el club una mujer (GENERO.enc), «la encargada»
+func con_encargada(t: String, k: String) -> String:
+	return t.replace("El encargado", "La encargada") if Datos.CAL and D.GENERO.enc.has(k) else t
+
 # 1.34: los demás socios de cada club (GENTE_CLUB)
 func talk_gente_club(k: String, j: int):
-	await say(D.GENTE_CLUB[(int(S.day) + j + D.CLUBS.keys().find(k)) % D.GENTE_CLUB.size()], "SOCIO")
+	var e = ents.filter(func(x): return x.id == "cg%d" % (j + 1))
+	await say(con_encargada(D.GENTE_CLUB[(int(S.day) + j + D.CLUBS.keys().find(k)) % D.GENTE_CLUB.size()], k), "SOCIA" if Datos.CAL and e.size() and mujer_look(e[0].look) else "SOCIO")
 
 # el sprite de lo que cambia en los locales (1.34, spriteLocal de 11j-locales): el secadero del bajo, con setas o vacío, y la carpa de
 # las madres, con las que tenga; los demás, con estilo, el de su club (estiloLocal)
@@ -4127,7 +4139,7 @@ func talk_socio(k: String):
 	var N := nn.to_upper()
 	var c: int = await ask(pick(["¿Qué tal? Siéntate, hay sitio.", "Aquí se está tranquilo, ¿eh?"]), ["Charlar", "Compartir uno", "Nada"], N)
 	if c == 0:
-		await say(pick(D.SOCIO.charla), N)
+		await say(con_encargada(pick(D.SOCIO.charla), k), N)
 		return
 	if c != 1:
 		return

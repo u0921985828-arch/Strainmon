@@ -1,5 +1,17 @@
 # Cambios
 
+## 1.43.3 · 15 de octubre de 2026
+
+Cada nombre con su muñeco (lo pidió el usuario: «los nombres de chica tienen que ir con personajes chica, y los chicos lo mismo»). Solo Godot (0.37.3), con `Datos.CAL` (las pruebas contra el HTML, como antes).
+
+- **Los presidentes de los clubs:** Xabier (Itsaso) y Eneko (Kalea) salían con muñeco de chica y Rosario (La Fundición) y Nagore (Ensanche) con muñeco de chico; ahora Xabier de traje, Eneko de chico, Rosario la señora del moño gris y Nagore la de la melena (`GENERO.look`).
+- **Bixente** (Mendialde), con muñeco de chico.
+- **La agenda:** el nombre que le pones a un cliente de la calle es del sexo de su muñeco (`nombre_fijo`); y la chica que compra caro es la PIJA, y la del rosin, la CATADORA (`etiqueta_ct`).
+- **La nave:** cada navero y quien cuida las madres sale con un muñeco de su sexo (Jaione, Edurne, Amaia… de chica; Mikel, Koldo… de chico; `look_genero`).
+- **Yolanda**, la rival del Ensanche, ya no sale con barba (`look_rival`).
+- **Los clubs:** en La Fundición y en el Ensanche quien está en la puerta es una mujer: «la encargada» en los textos (`con_encargada`, `GENERO.enc`), y las socias que hablan en el club salen como SOCIA.
+- Prueba nueva `tests/generos.gd` (417 comprobaciones).
+
 ## 1.43.2 · 15 de octubre de 2026
 
 Lo que cuesta tener un vehículo (lo pidió el usuario: «los coches y la moto sirven para no pagar el autobús para ir de pueblo a pueblo; el gasto es la gasolina, eso sí. Gasto al año de seguro y más cosas, igual al mes o por cierto uso de distancia»). Solo Godot (0.37.2).

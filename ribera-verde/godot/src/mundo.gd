@@ -155,7 +155,49 @@ func nombre_fijo(id: String) -> String:
 	var a := 0
 	for i in id.length():
 		a = (a * 31 + id.unicode_at(i)) % 9973
-	return D.NOMBRES_FIJO[a % D.NOMBRES_FIJO.size()]
+	var L: Array = D.NOMBRES_FIJO
+	if Datos.CAL and not id.begins_with("gaua"):   # 1.43.3: del mismo sexo que el muñeco del cliente
+		var m := mujer_look({"id": "n" + id})
+		L = L.filter(func(x): return mujer_nombre(x) == m)
+	return L[a % L.size()]
+
+# 1.43.3 (GENERO): el muñeco de un look (como Atlas.grupo_look: los de la calle, por su hash) y si es de chica
+func sprite_look(look) -> String:
+	if not look:
+		return ""
+	var id := str(look.id)
+	if id.length() > 1 and not _sprites_look().has(id):
+		if id[0] == "n":
+			return "cliente" + str(1 + Datos.hash_str(id) % 6)
+		if id[0] == "t":
+			return "ladron" + str(1 + Datos.hash_str(id) % 3)
+	return id
+
+var _spr_look := {}
+func _sprites_look() -> Dictionary:
+	if _spr_look.is_empty():
+		for k in D.LOOKS:
+			if D.LOOKS[k] is Dictionary and D.LOOKS[k].has("id"):
+				_spr_look[str(D.LOOKS[k].id)] = 1
+	return _spr_look
+
+func mujer_look(look) -> bool:
+	return D.GENERO.mujeres.has(sprite_look(look))
+
+# PIJA, CATADORA: la etiqueta del tipo de cliente, en femenino si es una chica (1.43.3)
+func etiqueta_ct(t: String, m: bool) -> String:
+	return D.GENERO.ctM.get(t, D.CTYPES[t].label) if m and Datos.CAL else D.CTYPES[t].label
+
+func mujer_nombre(n: String) -> bool:
+	return D.GENERO.nombresM.has(n.capitalize()) or D.GENERO.nombresM.has(n)
+
+# el look de una persona con nombre n: si el muñeco no es de su sexo, otro de la lista (lH / lM) por el índice i
+func look_genero(look, n: String, i: int, lH: Array, lM: Array):
+	if not Datos.CAL or not look or mujer_look(look) == mujer_nombre(n):
+		return look
+	var o: Dictionary = look.duplicate()
+	o.id = (lM if mujer_nombre(n) else lH)[i % (lM if mujer_nombre(n) else lH).size()]
+	return o
 
 func apunta_fijo(c: Dictionary) -> void:
 	if c.get("fijo") or S.fijos.size() >= D.FIJOS_MAX:
@@ -859,6 +901,9 @@ func mk_ent(d: Dictionary) -> Dictionary:
 	var look = d.get("lookObj")
 	if look == null:
 		look = D.LOOKS.get(d.get("look", ""))
+		if Datos.CAL and look and D.GENERO.look.has(d.get("look", "")):   # 1.43.3: cada nombre con su muñeco
+			look = look.duplicate()
+			look.id = D.GENERO.look[d.look]
 	return {"id": d.id, "x": d.x, "y": d.y, "px": d.x * 16.0, "py": d.y * 16.0, "hx": d.x, "hy": d.y, "dir": d.dir if d.get("dir") else "down",
 		"look": look, "def": d, "wander": d.get("wander", 0) if d.get("wander") else 0, "wt": 800 + Cultivo.azar() * 2400, "moving": false, "t": 0.0, "fx": d.x, "fy": d.y, "act": null}
 
@@ -882,6 +927,12 @@ func build_ents() -> void:
 		coloca_gente(S.map)   # 1.37: la gente de los sofás y del billar, donde estén (12d-orden)
 	if S.map == "nave":
 		coloca_naveros()   # 1.35
+		for e in ents:   # 1.43.3: el muñeco de cada uno, del sexo de su nombre
+			if e.id.length() == 3 and e.id.begins_with("nv"):
+				var w = cuida_madres() if e.id == "nvm" else navero_de(int(e.id[2]))
+				if w:
+					var lk = D.LOOKS.get(e.def.get("look", ""))
+					e.look = look_genero(lk, str(w.n), 4 if e.id == "nvm" else int(e.id[2]), D.GENERO.naveH, D.GENERO.naveM)
 
 # dónde trabaja cada uno de la nave (1.35, colocaNaveros de 11j-locales): por la hora, el día y su mesa
 const PUESTO_MIN := 120
@@ -1479,7 +1530,7 @@ func remove_client(id: String) -> void:
 # el catador (1.10) solo compra rosin: a precio_rosin, y el «caro» cuela según lo que pase del 50 % de THC
 func talk_client(c: Dictionary) -> void:
 	var ct: Dictionary = D.CTYPES[c.type]
-	var N: String = c.get("n", ct.label)   # n: el nombre de un cliente de la agenda (12b-movil)
+	var N: String = c.get("n", etiqueta_ct(c.type, mujer_look(c.get("look"))))   # n: el nombre de un cliente de la agenda (12b-movil)
 	var ext: bool = c.type == "ext"
 	await say(pick(ct.greet), N)
 	if ext:
