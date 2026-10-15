@@ -1548,7 +1548,8 @@ func object_action(x: int, y: int) -> void:
 		return
 	match o:
 		"sign":
-			await say(D.SIGNS.get("%s:%d,%d" % [S.map, x, y], "Está tan desgastado que no se lee."))
+			var st: String = "%s:%d,%d" % [S.map, x, y]
+			await say(D.SIGNS.get(st, "Está tan desgastado que no se lee.") + (("\n" + D.SETAS_SITIO.cartel) if Datos.CAL and st == D.SETAS_SITIO.k else ""))   # 1.43.8
 		"parada":
 			await parada_action()
 		"cajero":   # 1.35 (granja.gd)

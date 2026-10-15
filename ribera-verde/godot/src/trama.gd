@@ -1332,6 +1332,11 @@ func check_story():
 		await chapter(5)
 		await talk("SMS · TOÑO", ["Don Baltasar quiere %s en diez días." % Datos.eur(D.PLAZOS["5"]), "Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza."])
 		show_objective()
+	# 1.43.8 (lo pidió el usuario: «no existe mapa y sitio del bajo de las setas»; con Datos.CAL): nada te decía dónde estaba. Con
+	# Ibarbide abierta, una vez, el SMS de Julen con el sitio (también en MÓVIL → Mapa y en el cartel de la Kale Zaharra)
+	if Datos.CAL and S.ch >= int(D.SETAS.ch) and S.get("setas") == null and not S.flags.get("setasSms"):
+		S.flags.setasSms = S.day
+		await talk("SMS · JULEN", D.SETAS_SITIO.sms)
 
 func penalty_event():
 	await say("TOÑO te estaba esperando.")

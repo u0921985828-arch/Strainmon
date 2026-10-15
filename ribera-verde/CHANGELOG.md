@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.43.8 · 15 de octubre de 2026
+
+Dónde está el bajo de las setas (lo pidió el usuario: «no existe mapa y sitio del bajo de las setas»). El bajo ya estaba (Ibarbide → el callejón junto a GROW IBARBIDE → la Kale Zaharra → la puerta gris de Txomin), pero nada en el juego decía dónde. Solo Godot (0.37.8), con `Datos.CAL`.
+
+- **SMS de Julen:** con Ibarbide abierta (cap. 4, `SETAS.ch`) y el bajo sin alquilar, una vez (`S.flags.setasSms`), el sitio y cómo se llega (`SETAS_SITIO.sms`; se guarda en los SMS del móvil).
+- **MÓVIL → Mapa:** al elegir Ibarbide, la línea del bajo de las setas (`SETAS_SITIO.mapa`, `desc_mapa` en `croquis.gd`).
+- **El cartel de la Kale Zaharra** (8, 10) añade dónde está la puerta del bajo (`SETAS_SITIO.cartel`).
+- Prueba nueva `tests/setas_sitio.gd` (23 comprobaciones: mapas, puertas, que se llega andando de la parada a Txomin y a la puerta, el SMS, el mapa y el cartel, y nada sin `Datos.CAL`).
+
 ## 1.43.7 · 15 de octubre de 2026
 
 Las extracciones se venden donde los cogollos (lo pidió el usuario: «las extracciones se deberían de poder vender al por mayor, en clubes y donde se pueda vender cogollos»). Solo Godot (0.37.7), con `Datos.CAL`.

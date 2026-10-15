@@ -295,6 +295,8 @@ static func desc_mapa(D: Dictionary, ch: int, V: Dictionary, aqui: String) -> St
 	var t: String = PUEBLOS[k].d
 	if k == aqui:
 		t += " Estás aquí."
+	if Datos.CAL and k == "ibarbide" and ch >= int(D.SETAS.ch):   # 1.43.8: el bajo de las setas, en el mapa
+		t += " " + D.SETAS_SITIO.mapa
 	if k == "town":
 		t += "\nDe su plaza salen todos los autobuses."
 	elif abierto(D, ch, k):
