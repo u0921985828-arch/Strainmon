@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Landrace Hunters
  * Description: Hospeda el juego «Landrace Hunters» (Godot 4.3, versión web: la misma partida que la app de Android) dentro de WordPress: dirección propia a pantalla completa y atajo [landrace_hunters] para incrustarlo en cualquier página. Todo se sirve desde el propio plugin.
- * Version: 1.4.2
+ * Version: 1.4.3
  * Author: WOLFCADE
  * License: GPL-2.0-or-later
  * Text Domain: landrace-hunters
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Landrace_Hunters {
 
-	const VERSION   = '1.4.2';
+	const VERSION   = '1.4.3';
 	const OPTION    = 'landrace_hunters';
 	const QUERY_VAR = 'landrace_hunters';
 
@@ -58,6 +58,7 @@ final class Landrace_Hunters {
 
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'rewrite' ) );
+		add_action( 'init', array( __CLASS__, 'maybe_upgrade' ), 20 );
 		add_filter( 'query_vars', array( __CLASS__, 'query_vars' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'maybe_serve' ) );
 		add_shortcode( 'landrace_hunters', array( __CLASS__, 'shortcode' ) );
@@ -73,6 +74,19 @@ final class Landrace_Hunters {
 		}
 	}
 
+	/**
+	 * Al subir una versión nueva («Reemplazar actual con el subido») no se ejecuta la activación.
+	 * La primera visita tras el cambio vacía la caché de página de Kuboplay Shield, si está,
+	 * para que nadie se quede con la página vieja guardada de antes.
+	 */
+	public static function maybe_upgrade() {
+		if ( get_option( self::OPTION . '_ver' ) === self::VERSION ) {
+			return;
+		}
+		update_option( self::OPTION . '_ver', self::VERSION, false );
+		do_action( 'kp_shield_purge' );
+	}
+
 	public static function query_vars( $vars ) {
 		$vars[] = self::QUERY_VAR;
 		return $vars;
@@ -84,8 +98,16 @@ final class Landrace_Hunters {
 		flush_rewrite_rules();
 	}
 
+	/** Al borrar el plugin no deja nada en la base de datos. */
+	public static function uninstall() {
+		delete_option( self::OPTION );
+		delete_option( self::OPTION . '_ver' );
+	}
+
 	public static function deactivate() {
-		flush_rewrite_rules();
+		// flush_rewrite_rules() volvería a guardar la regla, que ya se registró en init:
+		// se borran y WordPress las rehace en la siguiente visita, ya sin el plugin.
+		delete_option( 'rewrite_rules' );
 	}
 
 	/**
@@ -102,6 +124,11 @@ final class Landrace_Hunters {
 		}
 		if ( 'manifest' === $q ) {
 			self::manifest();
+		}
+		// La página ya lleva su propia ETag y 304. Que ninguna caché de página (Kuboplay Shield)
+		// la guarde horas: al actualizar el plugin se seguiría sirviendo el HTML viejo.
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true );
 		}
 
 		$file = self::game_file();
@@ -347,4 +374,5 @@ final class Landrace_Hunters {
 
 register_activation_hook( __FILE__, array( 'Landrace_Hunters', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'Landrace_Hunters', 'deactivate' ) );
+register_uninstall_hook( __FILE__, array( 'Landrace_Hunters', 'uninstall' ) );
 Landrace_Hunters::init();

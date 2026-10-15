@@ -2,7 +2,7 @@
 /*
   Ribera Verde — 1.42: el plugin de WordPress «landrace-hunters» con la versión web del juego Godot de hoy (lo pidió el usuario:
   «convierte el juego en un plugin para WordPress como este, actualizado al punto en el que estamos»).
-    0. La música grabada (tools/musica.js → godot/musica), como para el APK.
+    0. La música grabada (tools/musica.js → godot/musica), como para el APK; en la copia de la web, en mono y a calidad 0 (1.4.3).
     1. Copia godot/ a una carpeta temporal, le añade un preset «Web» (sin hilos, sin extensiones) y exporta solo el paquete:
        index.pck (--export-pack). export_presets.cfg del repo no se toca.
     2. Monta landrace-hunters/: el plugin (wordpress/: PHP, readme, .htaccess, lh-fs.js, index.html, iconos y licencias), el motor
@@ -35,6 +35,12 @@ execFileSync(process.execPath, [path.join(__dirname, 'musica.js')], { stdio: 'in
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'lh-wp-'));
 const PROY = path.join(TMP, 'godot');
 fs.cpSync(GD, PROY, { recursive: true });
+// 1.4.3: la música de la versión web, en mono y a calidad 0 (el zip, por debajo de 30 MB); la del APK no se toca
+for (const f of fs.readdirSync(path.join(PROY, 'musica')).filter((x) => x.endsWith('.ogg'))) {
+  const o = path.join(PROY, 'musica', f), t = o + '.tmp.ogg';
+  execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', o, '-c:a', 'libvorbis', '-q:a', '0', '-ac', '1', t]);
+  fs.renameSync(t, o);
+}
 const pre = fs.readFileSync(path.join(PROY, 'export_presets.cfg'), 'utf8');
 const filtro = (k) => (pre.match(new RegExp('^' + k + '="([^"]*)"', 'm')) || [])[1] || '';
 fs.writeFileSync(path.join(PROY, 'export_presets.cfg'), `[preset.0]
